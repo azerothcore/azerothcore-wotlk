@@ -1210,6 +1210,7 @@ private:
     uint32 _limit;
 };
 
+// 28764 - Adaptive Warding (Frostfire Regalia Set)
 enum AdaptiveWarding
 {
     SPELL_GEN_ADAPTIVE_WARDING_FIRE     = 28765,
@@ -1219,7 +1220,6 @@ enum AdaptiveWarding
     SPELL_GEN_ADAPTIVE_WARDING_ARCANE   = 28770
 };
 
-// 28764 - Adaptive Warding (Frostfire Regalia Set)
 class spell_gen_adaptive_warding : public AuraScript
 {
     PrepareAuraScript(spell_gen_adaptive_warding);
@@ -1245,7 +1245,7 @@ class spell_gen_adaptive_warding : public AuraScript
         if (!GetTarget()->GetAuraEffect(SPELL_AURA_MOD_MANA_REGEN_INTERRUPT, SPELLFAMILY_MAGE, 0x10000000, 0x0, 0x0))
             return false;
 
-        switch (GetFirstSchoolInMask(eventInfo.GetSchoolMask()))
+        switch (GetFirstSchoolInMask(eventInfo.GetSpellInfo()->GetSchoolMask()))
         {
             case SPELL_SCHOOL_NORMAL:
             case SPELL_SCHOOL_HOLY:
@@ -1253,6 +1253,7 @@ class spell_gen_adaptive_warding : public AuraScript
             default:
                 break;
         }
+
         return true;
     }
 
@@ -1261,27 +1262,31 @@ class spell_gen_adaptive_warding : public AuraScript
         PreventDefaultAction();
 
         uint32 spellId = 0;
-        switch (GetFirstSchoolInMask(eventInfo.GetSchoolMask()))
+        if (Player* player = eventInfo.GetActionTarget()->ToPlayer())
         {
-            case SPELL_SCHOOL_FIRE:
-                spellId = SPELL_GEN_ADAPTIVE_WARDING_FIRE;
-                break;
-            case SPELL_SCHOOL_NATURE:
-                spellId = SPELL_GEN_ADAPTIVE_WARDING_NATURE;
-                break;
-            case SPELL_SCHOOL_FROST:
-                spellId = SPELL_GEN_ADAPTIVE_WARDING_FROST;
-                break;
-            case SPELL_SCHOOL_SHADOW:
-                spellId = SPELL_GEN_ADAPTIVE_WARDING_SHADOW;
-                break;
-            case SPELL_SCHOOL_ARCANE:
-                spellId = SPELL_GEN_ADAPTIVE_WARDING_ARCANE;
-                break;
-            default:
-                return;
+            switch (GetFirstSchoolInMask(eventInfo.GetSpellInfo()->GetSchoolMask()))
+            {
+                case SPELL_SCHOOL_FIRE:
+                    spellId = SPELL_GEN_ADAPTIVE_WARDING_FIRE;
+                    break;
+                case SPELL_SCHOOL_NATURE:
+                    spellId = SPELL_GEN_ADAPTIVE_WARDING_NATURE;
+                    break;
+                case SPELL_SCHOOL_FROST:
+                    spellId = SPELL_GEN_ADAPTIVE_WARDING_FROST;
+                    break;
+                case SPELL_SCHOOL_SHADOW:
+                    spellId = SPELL_GEN_ADAPTIVE_WARDING_SHADOW;
+                    break;
+                case SPELL_SCHOOL_ARCANE:
+                    spellId = SPELL_GEN_ADAPTIVE_WARDING_ARCANE;
+                    break;
+                default:
+                    return;
+            }
+
+            player->CastSpell(player, spellId, true, nullptr, aurEff);
         }
-        GetTarget()->CastSpell(GetTarget(), spellId, true, nullptr, aurEff);
     }
 
     void Register() override
@@ -1564,6 +1569,7 @@ class spell_gen_nightmare_vine : public SpellScript
     }
 };
 
+// 27539 - Obsidian Armor
 enum ObsidianArmor
 {
     SPELL_GEN_OBSIDIAN_ARMOR_HOLY       = 27536,
@@ -1574,7 +1580,6 @@ enum ObsidianArmor
     SPELL_GEN_OBSIDIAN_ARMOR_ARCANE     = 27540
 };
 
-// 27539 - Obsidian Armor
 class spell_gen_obsidian_armor : public AuraScript
 {
     PrepareAuraScript(spell_gen_obsidian_armor);
@@ -1594,52 +1599,54 @@ class spell_gen_obsidian_armor : public AuraScript
 
     bool CheckProc(ProcEventInfo& eventInfo)
     {
-        if (eventInfo.GetSpellInfo())
-        {
+        if (!eventInfo.GetSpellInfo())
             return false;
-        }
 
-        if (GetFirstSchoolInMask(eventInfo.GetSchoolMask()) == SPELL_SCHOOL_NORMAL)
+        if (GetFirstSchoolInMask(eventInfo.GetSpellInfo()->GetSchoolMask()) == SPELL_SCHOOL_NORMAL)
             return false;
 
         return true;
     }
 
-    void OnProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
+    void HandleProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
     {
         PreventDefaultAction();
 
-        uint32 spellId = 0;
-        switch (GetFirstSchoolInMask(eventInfo.GetSchoolMask()))
+        if (Player* player = eventInfo.GetActionTarget()->ToPlayer())
         {
-            case SPELL_SCHOOL_HOLY:
-                spellId = SPELL_GEN_OBSIDIAN_ARMOR_HOLY;
-                break;
-            case SPELL_SCHOOL_FIRE:
-                spellId = SPELL_GEN_OBSIDIAN_ARMOR_FIRE;
-                break;
-            case SPELL_SCHOOL_NATURE:
-                spellId = SPELL_GEN_OBSIDIAN_ARMOR_NATURE;
-                break;
-            case SPELL_SCHOOL_FROST:
-                spellId = SPELL_GEN_OBSIDIAN_ARMOR_FROST;
-                break;
-            case SPELL_SCHOOL_SHADOW:
-                spellId = SPELL_GEN_OBSIDIAN_ARMOR_SHADOW;
-                break;
-            case SPELL_SCHOOL_ARCANE:
-                spellId = SPELL_GEN_OBSIDIAN_ARMOR_ARCANE;
-                break;
-            default:
-                return;
+            uint32 spellId = 0;
+            switch (GetFirstSchoolInMask(eventInfo.GetSpellInfo()->GetSchoolMask()))
+            {
+                case SPELL_SCHOOL_HOLY:
+                    spellId = SPELL_GEN_OBSIDIAN_ARMOR_HOLY;
+                    break;
+                case SPELL_SCHOOL_FIRE:
+                    spellId = SPELL_GEN_OBSIDIAN_ARMOR_FIRE;
+                    break;
+                case SPELL_SCHOOL_NATURE:
+                    spellId = SPELL_GEN_OBSIDIAN_ARMOR_NATURE;
+                    break;
+                case SPELL_SCHOOL_FROST:
+                    spellId = SPELL_GEN_OBSIDIAN_ARMOR_FROST;
+                    break;
+                case SPELL_SCHOOL_SHADOW:
+                    spellId = SPELL_GEN_OBSIDIAN_ARMOR_SHADOW;
+                    break;
+                case SPELL_SCHOOL_ARCANE:
+                    spellId = SPELL_GEN_OBSIDIAN_ARMOR_ARCANE;
+                    break;
+                default:
+                    return;
+            }
+
+            player->CastSpell(player, spellId, true, nullptr, aurEff);
         }
-        GetTarget()->CastSpell(GetTarget(), spellId, true, nullptr, aurEff);
     }
 
     void Register() override
     {
         DoCheckProc += AuraCheckProcFn(spell_gen_obsidian_armor::CheckProc);
-        OnEffectProc += AuraEffectProcFn(spell_gen_obsidian_armor::OnProc, EFFECT_0, SPELL_AURA_DUMMY);
+        OnEffectProc += AuraEffectProcFn(spell_gen_obsidian_armor::HandleProc, EFFECT_0, SPELL_AURA_DUMMY);
     }
 };
 

@@ -125,12 +125,11 @@ enum Misc
 
 struct boss_janalai : public BossAI
 {
-    boss_janalai(Creature* creature) : BossAI(creature, DATA_JANALAIEVENT) { }
+    boss_janalai(Creature* creature) : BossAI(creature, DATA_JANALAI) { }
 
     void Reset() override
     {
         BossAI::Reset();
-        instance->SetData(DATA_JANALAIEVENT, NOT_STARTED);
         HatchAllEggs(HATCH_RESET);
         _isBombing = false;
         _isFlameBreathing = false;
@@ -153,7 +152,6 @@ struct boss_janalai : public BossAI
     void JustDied(Unit* killer) override
     {
         Talk(SAY_DEATH);
-        instance->SetData(DATA_JANALAIEVENT, DONE);
         BossAI::JustDied(killer);
     }
 
@@ -169,7 +167,6 @@ struct boss_janalai : public BossAI
     void JustEngagedWith(Unit* who) override
     {
         BossAI::JustEngagedWith(who);
-        instance->SetData(DATA_JANALAIEVENT, IN_PROGRESS);
         Talk(SAY_AGGRO);
         //schedule abilities
         ScheduleTimedEvent(30s, [&]{
