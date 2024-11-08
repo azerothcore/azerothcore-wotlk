@@ -22,7 +22,6 @@
 #include "ModelInstance.h"
 #include "PathCommon.h"
 #include "StringFormat.h"
-#include "VMapFactory.h"
 #include "VMapMgr2.h"
 #include <DetourCommon.h>
 #include <DetourNavMesh.h>

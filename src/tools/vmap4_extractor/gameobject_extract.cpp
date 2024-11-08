@@ -19,7 +19,6 @@
 #include "dbcfile.h"
 #include "model.h"
 #include "vmapexport.h"
-#include <algorithm>
 #include <cstdio>
 
 bool ExtractSingleModel(std::string& fname)
