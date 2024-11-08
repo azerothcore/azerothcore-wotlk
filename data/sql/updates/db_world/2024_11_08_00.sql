@@ -1,3 +1,4 @@
+-- DB update 2024_11_07_06 -> 2024_11_08_00
 -- Arzeth the Merciless
 UPDATE `creature` SET `position_x`=-659.412, `position_y`=4799.82, `position_z`=49.0951 WHERE `guid` = 69051 AND `id1` = 19354;
 
