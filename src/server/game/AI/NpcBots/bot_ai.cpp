@@ -5334,15 +5334,17 @@ void bot_ai::_extendAttackRange(float& dist) const
 }
 bool bot_ai::_canSwitchToTarget(Unit const* from, Unit const* newTarget, int8 byspell) const
 {
-    if (newTarget)
+    if (newTarget && newTarget != me->GetVictim())
     {
         if (IAmFree())
         {
-            if (newTarget != me->GetVictim() &&
-                (!from || me->GetDistance(newTarget) < me->GetDistance(from) - 10.0f || newTarget->GetHealth() < from->GetHealth()) &&
+            if ((!from || me->GetDistance(newTarget) < me->GetDistance(from) - 10.0f || newTarget->GetHealth() < from->GetHealth()) &&
                 CanBotAttack(newTarget, byspell))
                 return true;
         }
+        else if (!from && me->GetDistance(newTarget) < 0.75f * _getAttackDistance(float(master->GetBotMgr()->GetBotFollowDist())) &&
+            CanBotAttack(newTarget, byspell))
+            return true;
     }
 
     return false;
@@ -17681,13 +17683,17 @@ bool bot_ai::GlobalUpdate(uint32 diff)
         //Faction
         //ensure master is not controlled
         ChrRacesEntry const* rEntry = sChrRacesStore.LookupEntry(master->GetRace());
-        uint32 fac = rEntry ? rEntry->FactionID : 0;
-        if (me->GetFaction() != master->GetFaction() && master->GetFaction() == fac)
+        uint32 fac_orig = rEntry ? rEntry->FactionID : 0;
+        if (master->GetFaction() == fac_orig)
         {
-            //std::ostringstream msg;
-            //msg << "Something changed my faction (now " << me->GetFaction() << "), changing back to " << fac << "!";
-            //BotWhisper(msg.str().c_str());
-            me->SetFaction(fac);
+            uint32 fac = (!IAmFree() && me->GetMap()->IsBattleArena()) ? FACTION_MONSTER : fac_orig;
+            if (me->GetFaction() != fac)
+            {
+                //std::ostringstream msg;
+                //msg << "Something changed my faction (now " << me->GetFaction() << "), changing back to " << fac << "!";
+                //BotWhisper(msg.str().c_str());
+                me->SetFaction(fac);
+            }
         }
         //Visibility
         if (!me->IsVisible() && master->IsVisible())
@@ -18682,6 +18688,16 @@ bool bot_ai::FinishTeleport(bool reset)
             me->CastSpell(me, COSMETIC_TELEPORT_EFFECT, true);
         }
         //me->CastSpell(me, HONORLESS_TARGET, true);
+
+        //Arena flags
+        Battleground const* bg = GetBG();
+        if (bg && bg->isArena())
+        {
+            TeamId teamId = bg->GetBotTeamId(me->GetGUID());
+            uint32 flag_spell = teamId == TEAM_ALLIANCE ? master->GetTeamId() == TEAM_HORDE ? ARENA_FLAG_TEAM_H_GOLD : ARENA_FLAG_TEAM_A_GOLD :
+                master->GetTeamId() == TEAM_HORDE ? ARENA_FLAG_TEAM_H_GREEN : ARENA_FLAG_TEAM_A_GREEN;
+            me->CastSpell(me, flag_spell, true);
+        }
 
         //update group member online state
         if (Group* gr = master->GetGroup())
@@ -20015,18 +20031,23 @@ void bot_ai::OnBotEnterBattleground()
     if (bg->GetStatus() != STATUS_IN_PROGRESS && IsWanderer())
     {
         BotWPFlags myTeamSpawnFlags;
-        switch (bg->GetBotTeamId(me->GetGUID()))
+        if (bg->isArena())
+            myTeamSpawnFlags = BotWPFlags::BOTWP_FLAG_SPAWN;
+        else
         {
-            case TEAM_ALLIANCE: myTeamSpawnFlags = BotWPFlags::BOTWP_FLAG_ALLIANCE_SPAWN_POINT; break;
-            case TEAM_HORDE:    myTeamSpawnFlags = BotWPFlags::BOTWP_FLAG_HORDE_SPAWN_POINT;    break;
-            default:            myTeamSpawnFlags = BotWPFlags::BOTWP_FLAG_SPAWN;                break;
+            switch (bg->GetBotTeamId(me->GetGUID()))
+            {
+                case TEAM_ALLIANCE: myTeamSpawnFlags = BotWPFlags::BOTWP_FLAG_ALLIANCE_SPAWN_POINT; break;
+                case TEAM_HORDE:    myTeamSpawnFlags = BotWPFlags::BOTWP_FLAG_HORDE_SPAWN_POINT;    break;
+                default:            myTeamSpawnFlags = BotWPFlags::BOTWP_FLAG_SPAWN;                break;
+            }
         }
 
         uint32 mapId = bg->GetBgMap()->GetId();
         float mindist = 50000.0f;
         WanderNode const* startNode = nullptr;
         WanderNode::DoForAllMapWPs(mapId, [pos = me->GetPosition(), spawnFlags = myTeamSpawnFlags, &mindist, &startNode](WanderNode const* wp) {
-            if (wp->HasFlag(spawnFlags))
+            if (wp->HasAllFlags(spawnFlags))
             {
                 float dist = pos.GetExactDist2d(wp);
                 if (dist < mindist)

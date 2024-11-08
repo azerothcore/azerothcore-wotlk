@@ -1189,9 +1189,8 @@ void BotMgr::Update(uint32 diff)
         if (ai->GetReviveTimer() <= diff)
         {
             if (bot->IsInMap(_owner) && !bot->IsAlive() && !ai->IsDuringTeleport() && _owner->IsAlive() && !_owner->IsInCombat() &&
-                !_owner->IsBeingTeleported() && !_owner->InArena() && !_owner->IsInFlight() &&
-                !_owner->HasUnitFlag2(UNIT_FLAG2_FEIGN_DEATH) &&
-                !_owner->HasInvisibilityAura() && !_owner->HasStealthAura())
+                !_owner->IsBeingTeleported() && !_owner->GetMap()->IsBattleArena() && !_owner->IsInFlight() &&
+                !_owner->HasUnitFlag2(UNIT_FLAG2_FEIGN_DEATH) && !_owner->HasInvisibilityAura() && !_owner->HasStealthAura())
             {
                 _reviveBot(bot);
                 continue;
@@ -1253,10 +1252,11 @@ bool BotMgr::RestrictBots(Creature const* bot, bool add) const
 
     if (LimitBots(currMap))
     {
+        Group const* gr = _owner->GetGroup();
+
         //if bot is not in instance group - deny (only if trying to teleport to instance)
         if (add)
         {
-            Group const* gr = _owner->GetGroup();
             if (!gr || !gr->IsMember(bot->GetGUID()))
                 return true;
 
@@ -1293,13 +1293,23 @@ bool BotMgr::RestrictBots(Creature const* bot, bool add) const
         uint32 max_players = 0;
         if (currMap->IsDungeon())
             max_players = currMap->ToInstanceMap()->GetMaxPlayers();
-        else if (currMap->IsBattleground())
+        else if (currMap->IsBattleground() || currMap->IsBattleArena())
             max_players = _owner->GetBattleground()->GetMaxPlayersPerTeam();
-        else if (currMap->IsBattleArena())
-            max_players = _owner->GetBattleground()->GetArenaType();
 
-        if (max_players && currMap->GetPlayersCountExceptGMs() + uint32(add) > max_players)
-            return true;
+        if (max_players)
+        {
+            uint32 curPlayers;
+            if (gr && currMap->IsBattlegroundOrArena())
+            {
+                curPlayers = std::ranges::count_if(GetAllGroupMembers(gr), [this](Unit const* u) {
+                    return u->IsInWorld() && u->IsInMap(_owner) && !(u->IsNPCBot() && u->ToCreature()->IsTempBot());
+                });
+            }
+            else
+                curPlayers = currMap->GetPlayersCountExceptGMs();
+            if (curPlayers + uint32(add) > max_players)
+                return true;
+        }
     }
 
     return false;

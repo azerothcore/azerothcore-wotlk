@@ -2437,13 +2437,12 @@ bool bot_pet_ai::GlobalUpdate(uint32 diff)
         //Faction
         //ensure master is not controlled
         ChrRacesEntry const* rEntry = sChrRacesStore.LookupEntry(petOwner->GetBotOwner()->GetRace());
-        uint32 fac = rEntry ? rEntry->FactionID : 0;
-        if (me->GetFaction() != petOwner->GetBotOwner()->GetFaction() && petOwner->GetBotOwner()->GetFaction() == fac)
+        uint32 fac_orig = rEntry ? rEntry->FactionID : 0;
+        if (petOwner->GetBotOwner()->GetFaction() == fac_orig)
         {
-            //std::ostringstream msg;
-            //msg << "Something changed my faction (now " << me->GetFaction() << "), changing back to " << fac << "!";
-            //BotWhisper(msg.str().c_str());
-            me->SetFaction(fac);
+            uint32 fac = (!IAmFree() && me->GetMap()->IsBattleArena()) ? FACTION_MONSTER : fac_orig;
+            if (me->GetFaction() != fac)
+                me->SetFaction(fac);
         }
         //Visibility
         if (!me->IsVisible() && petOwner->GetBotOwner()->IsVisible())
