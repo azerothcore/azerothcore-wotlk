@@ -386,7 +386,7 @@ class spell_claw_rage_aura : public AuraScript
         return ValidateSpellInfo({ SPELL_CLAW_RAGE_DAMAGE });
     }
 
-    void OnPeriodic(AuraEffect const* aurEff)
+    void OnPeriodic(AuraEffect const* /*aurEff*/)
     {
         if (Creature* caster = GetCaster()->ToCreature())
         {
