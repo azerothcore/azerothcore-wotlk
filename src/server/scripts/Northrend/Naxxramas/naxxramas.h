@@ -197,7 +197,8 @@ enum NXEvents
 {
     EVENT_THADDIUS_SCREAMS          = 0,
     EVENT_KELTHUZAD_WING_TAUNT      = 1,
-    EVENT_FROSTWYRM_WATERFALL_DOOR  = 2
+    EVENT_FROSTWYRM_WATERFALL_DOOR  = 2,
+    EVENT_HORSEMEN_INTRO            = 3
 };
 
 template <class AI, class T>

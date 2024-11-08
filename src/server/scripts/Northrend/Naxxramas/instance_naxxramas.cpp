@@ -100,6 +100,7 @@ public:
             _screamTimer = 2 * MINUTE * IN_MILLISECONDS;
             _hadThaddiusGreet = false;
             _currentWingTaunt = SAY_FIRST_WING_TAUNT;
+            _currentHorsemenLine = 0;
             _horsemanLoadDoneState = false;
 
             // Achievements
@@ -174,6 +175,7 @@ public:
         bool _hadThaddiusGreet;
         EventMap events;
         uint8 _currentWingTaunt;
+        uint8 _currentHorsemenLine;
         bool _horsemanLoadDoneState;
 
         // Achievements
@@ -927,6 +929,7 @@ public:
                         {
                             go->SetGoState(GO_STATE_ACTIVE);
                         }
+                        events.ScheduleEvent(EVENT_HORSEMEN_INTRO, 10s);
                         break;
                     case BOSS_SAPPHIRON:
                         events.ScheduleEvent(EVENT_FROSTWYRM_WATERFALL_DOOR, 5s);
@@ -1056,6 +1059,52 @@ public:
                     {
                         go->SetGoState(GO_STATE_ACTIVE);
                     }
+                    break;
+                case EVENT_HORSEMEN_INTRO:
+                    switch (_currentHorsemenLine)
+                    {
+                        case 0: // To arms, ye roustabouts! We've got company!
+                            if (Creature* korthazz = instance->GetCreature(_korthazzGUID))
+                                korthazz->AI()->Talk(5);
+                            events.ScheduleEvent(EVENT_HORSEMEN_INTRO, 4500ms);
+                            break;
+                        case 1: // Invaders, cease this foolish venture at once! Turn away while you still can!
+                            if (Creature* zeliek = instance->GetCreature(_zeliekGUID))
+                                zeliek->AI()->Talk(5);
+                            events.ScheduleEvent(EVENT_HORSEMEN_INTRO, 6500ms);
+                            break;
+                        case 2: // Come, Zeliek, do not drive them out. Not before we've had our fun!
+                            if (Creature* blaumeux = instance->GetCreature(_blaumeuxGUID))
+                                blaumeux->AI()->Talk(5);
+                            events.ScheduleEvent(EVENT_HORSEMEN_INTRO, 6500ms);
+                            break;
+                        case 3: // Enough prattling. Let them come. We shall grind their bones to dust.
+                            if (Creature* rivendare = instance->GetCreature(_rivendareGUID))
+                                rivendare->AI()->Talk(5);
+                            events.ScheduleEvent(EVENT_HORSEMEN_INTRO, 6500ms);
+                            break;
+                        case 4: // I do hope they stay alive long enough for me to... introduce myself.
+                            if (Creature* blaumeux = instance->GetCreature(_blaumeuxGUID))
+                                blaumeux->AI()->Talk(6);
+                            events.ScheduleEvent(EVENT_HORSEMEN_INTRO, 6500ms);
+                            break;
+                        case 5: // Perhaps they will come to their senses... and run away as fast as they can.
+                            if (Creature* zeliek = instance->GetCreature(_zeliekGUID))
+                                zeliek->AI()->Talk(6);
+                            events.ScheduleEvent(EVENT_HORSEMEN_INTRO, 6500ms);
+                            break;
+                        case 6: // I've heard about enough a' yer snivelin'! Shut yer flytrap before I shut it for ye'!
+                            if (Creature* korthazz = instance->GetCreature(_korthazzGUID))
+                                korthazz->AI()->Talk(6);
+                            events.ScheduleEvent(EVENT_HORSEMEN_INTRO, 6500ms);
+                            break;
+                        case 7: // Conserve your anger. Harness your rage. You will all have outlets for your frustrations soon enough.
+                            if (Creature* rivendare = instance->GetCreature(_rivendareGUID))
+                                rivendare->AI()->Talk(6);
+                            events.ScheduleEvent(EVENT_HORSEMEN_INTRO, 6500ms);
+                            break;
+                    }
+                    ++_currentHorsemenLine;
                     break;
             }
         }
