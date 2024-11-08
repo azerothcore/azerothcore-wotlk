@@ -1454,6 +1454,11 @@ void Creature::SetLootRecipient(Unit* unit, bool withGroup)
     else
         m_lootRecipientGroup = 0;
 
+    //npcbot: prevent visual tap on owned bots
+    if (IsNPCBotOrPet() && !IsFreeBot())
+        return;
+    //end npcbot
+
     SetDynamicFlag(UNIT_DYNFLAG_TAPPED);
 }
 

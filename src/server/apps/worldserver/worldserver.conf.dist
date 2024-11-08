@@ -4945,6 +4945,18 @@ NpcBot.WanderingBots.Continents.Maps = 0,1,530,571
 NpcBot.WanderingBots.Continents.XPGain = 1.0
 
 #
+#    NpcBot.WanderingBots.MaxItemLevel.Levels
+#        Description: Maximum item ilevel to generate for wandering bots per level bracket:
+#                     0-9, 10-19, 20,29, ... , 70-79, 80+.
+#        Note:        If item generation attempt fails becuse of item ilevel restriction
+#                     the item will be generated again with this restriction ignored
+#        Example:     0,0,0,0,0,0,0,0,200 makes level 80+ wandering bots only generate
+#                     items of ilevel 200 or less
+#        Default:     0,0,0,0,0,0,0,0,0
+
+NpcBot.WanderingBots.MaxItemLevel.Levels = 0,0,0,0,0,0,0,0,0
+
+#
 #    NpcBot.WanderingBots.BG.Enable
 #        Description: Allow wandering bots generation for Battlegrounds.
 #        Note:        Bots are temporarily borrowed from non-spawned bots pool.

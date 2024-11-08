@@ -2331,6 +2331,14 @@ GroupJoinBattlegroundResult Group::CanJoinBattlegroundQueue(Battleground const* 
         }
     }
 
+    //npcbot
+    for (GroupBotReference* bitr = GetFirstBotMember(); bitr != nullptr; bitr = bitr->next(), ++memberscount)
+    {
+        if (!bitr->GetSource())
+            return ERR_BATTLEGROUND_JOIN_FAILED;
+    }
+    //end npcbot
+
     // for arenas: check party size is proper
     if (bgTemplate->isArena() && memberscount != MinPlayerCount)
         return ERR_ARENA_TEAM_PARTY_SIZE;

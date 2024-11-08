@@ -23,6 +23,10 @@ enum BotSpells : uint32
     SUMMONING_STONE_EFFECT              = 59782,//Cast time 5s + Channeled 2m
     SHOOT_WAND                          = 5019,
     OPEN_FLAG_BG                        = 21651,
+    ARENA_FLAG_TEAM_A_GOLD              = 32724,
+    ARENA_FLAG_TEAM_A_GREEN             = 32725,
+    ARENA_FLAG_TEAM_H_GOLD              = 35774,
+    ARENA_FLAG_TEAM_H_GREEN             = 35775,
 ///Portals
     PORTAL_STORMWIND                    = 10059,
     PORTAL_IRONFORGE                    = 11416,

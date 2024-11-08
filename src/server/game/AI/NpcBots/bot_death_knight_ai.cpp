@@ -789,6 +789,7 @@ public:
             bool noDiseases = (mytar->GetTypeId() == TYPEID_UNIT && (mytar->ToCreature()->GetCreatureTemplate()->MechanicImmuneMask & (1<<(MECHANIC_INFECTED-1))));
             AuraEffect const* blop = noDiseases ? nullptr : mytar->GetAuraEffect(SPELL_AURA_PERIODIC_DAMAGE, SPELLFAMILY_DEATHKNIGHT, 0x0, 0x2000000, 0x0, me->GetGUID());
             AuraEffect const* frof = noDiseases ? nullptr : mytar->GetAuraEffect(SPELL_AURA_PERIODIC_DAMAGE, SPELLFAMILY_DEATHKNIGHT, 0x0, 0x4000000, 0x0, me->GetGUID());
+            AuraEffect const* ebop = (noDiseases || GetSpec() != BOT_SPEC_DK_UNHOLY) ? nullptr : mytar->GetAuraEffect(SPELL_AURA_LINKED, SPELLFAMILY_DEATHKNIGHT, 0x0, 0x800, 0x0, me->GetGUID());
 
             auto [can_do_frost, can_do_shadow, can_do_physical] = CanAffectVictimBools(mytar, SPELL_SCHOOL_FROST, SPELL_SCHOOL_SHADOW, SPELL_SCHOOL_NORMAL);
 
@@ -903,7 +904,7 @@ public:
                     return;
             }
             //OBLITERATE
-            if (IsSpellReady(OBLITERATE_1, diff) && (noDiseases || (blop && frof)) && HaveRunes(OBLITERATE_1))
+            if (IsSpellReady(OBLITERATE_1, diff) && GetSpec() == BOT_SPEC_DK_FROST && blop && frof && HaveRunes(OBLITERATE_1))
             {
                 //DEATHCHILL
                 if (IsSpellReady(DEATHCHILL_1, diff, false) && doCast(me, GetSpell(DEATHCHILL_1)))
@@ -918,18 +919,18 @@ public:
                 if (doCast(mytar, GetSpell(HEART_STRIKE_1)))
                     return;
             }
+            //SCOURGE STRIKE unused
+            if (IsSpellReady(SCOURGE_STRIKE_1, diff) && blop && frof && ebop && HaveRunes(SCOURGE_STRIKE_1))
+            {
+                if (doCast(mytar, GetSpell(SCOURGE_STRIKE_1)))
+                    return;
+            }
             //BLOOD STRIKE
             if (IsSpellReady(BLOOD_STRIKE_1, diff) && (noDiseases || (blop && frof)) && HaveRunes(BLOOD_STRIKE_1))
             {
                 if (doCast(mytar, GetSpell(BLOOD_STRIKE_1)))
                     return;
             }
-            //SCOURGE STRIKE unused
-            //if (IsSpellReady(SCOURGE_STRIKE_1, diff) && (noDiseases || (blop && frof)) && HaveRunes(SCOURGE_STRIKE_1))
-            //{
-            //    if (doCast(mytar, GetSpell(SCOURGE_STRIKE_1)))
-            //        return;
-            //}
 
             //END DISEASE SECTION
 

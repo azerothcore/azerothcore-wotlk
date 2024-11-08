@@ -53,6 +53,16 @@ protected:
     void RemovePlayer(Player* /*player*/) override;
 
     void FillInitialWorldStates(WorldPacket& data) override;
+
+    //npcbot
+    void AddBot(Creature* bot) override;
+    void RemoveBotAtLeave(ObjectGuid guid) override;
+    void RemoveBot(ObjectGuid /*guid*/) override;
+    void HandleBotKillPlayer(Creature* killer, Player* victim) override;
+    void HandleBotKillBot(Creature* killer, Creature* victim) override;
+    void HandlePlayerKillBot(Creature* victim, Player* killer) override;
+    //end npcbot
+
     void UpdateArenaWorldState();
 
     void HandleKillPlayer(Player* player, Player* killer) override;
