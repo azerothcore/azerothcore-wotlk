@@ -189,6 +189,7 @@ std::vector<float> _mult_hp_levels;
 std::vector<float> _mult_mp_levels;
 LvlBrackets _max_npcbots;
 PctBrackets _botwanderer_pct_level_brackets;
+ItemLvlBrackets _botwanderer_itemlvl_level_brackets;
 std::vector<uint32> _disabled_instance_maps;
 std::vector<uint32> _enabled_wander_node_maps;
 
@@ -597,6 +598,19 @@ void BotMgr::LoadConfig(bool reload)
             continue;
         }
         _disabled_instance_maps.push_back(uval);
+    }
+
+    _botwanderer_itemlvl_level_brackets = {};
+    std::string itemlevel_by_levels = sConfigMgr->GetStringDefault("NpcBot.WanderingBots.MaxItemLevel.Levels", "0,0,0,0,0,0,0,0,0");
+    std::vector<std::string_view> tok8 = Bcore::Tokenize(itemlevel_by_levels, ',', false);
+    ASSERT(tok8.size() == BracketsCount, "NpcBot.WanderingBots.MaxItemLevel.Levels must have exactly %u values", uint32(BracketsCount));
+    for (decltype(tok8)::size_type i = 0; i != tok8.size(); ++i)
+    {
+        Optional<uint32> val = Bcore::StringTo<uint32>(tok8[i]);
+        if (val == std::nullopt)
+            BOT_LOG_ERROR("server.loading", "NpcBot.WanderingBots.MaxItemLevel.Levels contains invalid uint32 value '{}', set to default", tok8[i]);
+        uint32 uval = val.value_or(uint32(0));
+        _botwanderer_itemlvl_level_brackets[i] = uval;
     }
 
     //limits
@@ -3116,6 +3130,10 @@ float BotMgr::GetBotWandererXPGainMod()
 PctBrackets BotMgr::GetBotWandererLevelBrackets()
 {
     return _botwanderer_pct_level_brackets;
+}
+uint32 BotMgr::GetBotWandererMaxItemLevel(uint8 level)
+{
+    return _botwanderer_itemlvl_level_brackets[std::min<size_t>(BracketsCount - 1, level / 10)];
 }
 float BotMgr::GetBotDamageModByClass(uint8 botclass)
 {

@@ -2166,11 +2166,18 @@ Item* BotDataMgr::GenerateWanderingBotItem(uint8 slot, uint8 botclass, uint8 lev
     {
         ItemIdVector validVec;
         validVec.reserve(itemIdVec->size());
-        for (uint32 iid : *itemIdVec)
+        uint32 maxItemLevel = BotMgr::GetBotWandererMaxItemLevel(level);
+        for (uint32 maxLvl : { maxItemLevel, static_cast<decltype(maxItemLevel)>(0) })
         {
-            ItemTemplate const* proto = sObjectMgr->GetItemTemplate(iid);
-            if (check(proto))
-                validVec.push_back(iid);
+            if (!validVec.empty())
+                break;
+
+            for (uint32 iid : *itemIdVec)
+            {
+                ItemTemplate const* proto = sObjectMgr->GetItemTemplate(iid);
+                if ((!maxLvl || proto->ItemLevel <= maxLvl) && check(proto))
+                    validVec.push_back(iid);
+            }
         }
 
         if (!validVec.empty())
