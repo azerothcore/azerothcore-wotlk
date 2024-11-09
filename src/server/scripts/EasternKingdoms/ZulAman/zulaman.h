@@ -33,13 +33,12 @@ enum DataTypes
     DATA_ZULJIN                         = 5,
     MAX_ENCOUNTER                       = 6,
     DATA_SPIRIT_LYNX                    = 7,
-    DATA_CHESTLOOTED                    = 8,
-    TYPE_RAND_VENDOR_1                  = 9,
-    TYPE_RAND_VENDOR_2                  = 10,
-    DATA_UPDATE_INSTANCE_TIMER          = 11,
-    DATA_STRANGE_GONG                   = 12,
-    DATA_MASSIVE_GATE                   = 13,
-    DATA_HEXLORD_GATE                   = 14
+    TYPE_RAND_VENDOR_1                  = 8,
+    TYPE_RAND_VENDOR_2                  = 9,
+    DATA_UPDATE_INSTANCE_TIMER          = 10,
+    DATA_STRANGE_GONG                   = 11,
+    DATA_MASSIVE_GATE                   = 12,
+    DATA_HEXLORD_GATE                   = 13
 };
 
 enum CreatureIds

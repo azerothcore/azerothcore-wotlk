@@ -511,8 +511,6 @@ public:
         InstanceScript* instance = creature->GetInstanceScript();
         if (instance)
         {
-            //uint8 progress = instance->GetData(DATA_CHESTLOOTED);
-            instance->SetData(DATA_CHESTLOOTED, 0);
             float x, y, z;
             creature->GetPosition(x, y, z);
             uint32 entry = creature->GetEntry();

@@ -85,10 +85,7 @@ BossBoundaryData const boundaries =
 class instance_zulaman : public InstanceMapScript
 {
 public:
-    instance_zulaman()
-        : InstanceMapScript("instance_zulaman", 568)
-    {
-    }
+    instance_zulaman() : InstanceMapScript("instance_zulaman", 568) { }
 
     struct instance_zulaman_InstanceMapScript : public InstanceScript
     {
@@ -101,7 +98,6 @@ public:
 
         uint32 QuestTimer;
         uint16 QuestMinute;
-        uint16 ChestLooted;
         uint32 RandVendor[RAND_VENDOR];
 
         void Initialize() override
@@ -114,7 +110,6 @@ public:
 
             QuestTimer = 0;
             QuestMinute = 0;
-            ChestLooted = 0;
 
             for (uint8 i = 0; i < RAND_VENDOR; ++i)
                 RandVendor[i] = NOT_STARTED;
@@ -173,7 +168,7 @@ public:
             OUT_SAVE_INST_DATA;
 
             std::ostringstream ss;
-            ss << "S "  << ' ' << ChestLooted << ' ' << QuestMinute;
+            ss << "S "  << ' ' << QuestMinute;
 
             OUT_SAVE_INST_DATA_COMPLETE;
             return ss.str();
@@ -186,13 +181,12 @@ public:
 
             std::istringstream ss(load);
             char dataHead; // S
-            uint16 data1, data2, data3;
-            ss >> dataHead >> data1 >> data2 >> data3;
+            uint16 data1, data2;
+            ss >> dataHead >> data1 >> data2;
 
             if (dataHead == 'S')
             {
-                ChestLooted = data2;
-                QuestMinute = data3;
+                QuestMinute = data2;
             }
             else
             {
@@ -204,10 +198,6 @@ public:
         {
             switch (type)
             {
-                case DATA_CHESTLOOTED:
-                    ++ChestLooted;
-                    SaveToDB();
-                    break;
                 case TYPE_RAND_VENDOR_1:
                     RandVendor[0] = data;
                     break;
@@ -283,8 +273,6 @@ public:
         {
             switch (type)
             {
-                case DATA_CHESTLOOTED:
-                    return ChestLooted;
                 case TYPE_RAND_VENDOR_1:
                     return RandVendor[0];
                 case TYPE_RAND_VENDOR_2:
