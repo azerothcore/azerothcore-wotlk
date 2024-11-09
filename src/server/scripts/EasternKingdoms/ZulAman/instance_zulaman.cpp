@@ -54,6 +54,12 @@ static SHostageInfo HostageInfo[] =
 
 Position const HarrisonJonesLoc = {120.687f, 1674.0f, 42.0217f, 1.59044f};
 
+DoorData const doorData[] =
+{
+    { GO_ZULJIN_FIREWALL, DATA_ZULJIN, DOOR_TYPE_ROOM  },
+    { 0,                  0,           DOOR_TYPE_ROOM  } // END
+};
+
 ObjectData const creatureData[] =
 {
     { NPC_SPIRIT_LYNX, DATA_SPIRIT_LYNX   },
@@ -93,7 +99,6 @@ public:
         ObjectGuid ZulJinGateGUID;
         ObjectGuid MassiveGateGUID;
         ObjectGuid AkilzonDoorGUID;
-        ObjectGuid ZulJinDoorGUID;
         ObjectGuid HalazziDoorGUID;
 
         uint32 QuestTimer;
@@ -111,6 +116,7 @@ public:
             memset(&m_auiEncounter, 0, sizeof(m_auiEncounter));
             SetBossNumber(MAX_ENCOUNTER);
             LoadBossBoundaries(boundaries);
+            LoadDoorData(doorData);
 
             QuestTimer = 0;
             QuestMinute = 0;
@@ -121,15 +127,6 @@ public:
                 RandVendor[i] = NOT_STARTED;
 
             m_auiEncounter[DATA_GONGEVENT] = NOT_STARTED;
-        }
-
-        bool IsEncounterInProgress() const override
-        {
-            for (uint8 i = 0; i < MAX_ENCOUNTER; ++i)
-                if (m_auiEncounter[i] == IN_PROGRESS)
-                    return true;
-
-            return false;
         }
 
         void OnPlayerEnter(Player* /*player*/) override
@@ -145,11 +142,6 @@ public:
                 case NPC_HARRISON_JONES:
                     HarrisonJonesGUID = creature->GetGUID();
                     break;
-                case NPC_JANALAI:
-                case NPC_ZULJIN:
-                case NPC_HEXLORD:
-                case NPC_HALAZZI:
-                case NPC_NALORAKK:
                 default:
                     break;
             }
@@ -175,9 +167,6 @@ public:
                 case GO_DOOR_AKILZON:
                     AkilzonDoorGUID = go->GetGUID();
                     break;
-                case GO_DOOR_ZULJIN:
-                    ZulJinDoorGUID = go->GetGUID();
-                    break;
 
                 case GO_HARKORS_SATCHEL:
                     HarkorsSatchelGUID = go->GetGUID();
@@ -198,6 +187,8 @@ public:
                     break;
             }
             CheckInstanceStatus();
+
+            InstanceScript::OnGameObjectCreate(go);
         }
 
         void SummonHostage(uint8 num)
@@ -318,11 +309,6 @@ public:
                         HandleGameObject(HexLordGateGUID, false);
                     else if (data == NOT_STARTED)
                         CheckInstanceStatus();
-                    SaveToDB();
-                    break;
-                case DATA_ZULJIN:
-                    m_auiEncounter[DATA_ZULJIN] = data;
-                    HandleGameObject(ZulJinDoorGUID, data != IN_PROGRESS);
                     SaveToDB();
                     break;
                 case DATA_CHESTLOOTED:

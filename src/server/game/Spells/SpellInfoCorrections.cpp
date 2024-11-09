@@ -4856,6 +4856,12 @@ void SpellMgr::LoadSpellInfoCorrections()
         spellInfo->AttributesEx3 |= SPELL_ATTR3_SUPPRESS_CASTER_PROCS;
     });
 
+    // Claw Rage
+    ApplySpellFix({ 43149 }, [](SpellInfo* spellInfo)
+    {
+        spellInfo->Effects[EFFECT_0].TriggerSpell = 0;
+    });
+
     // Black Qiraji Battle Tank
     ApplySpellFix({ 26655, 26656 }, [](SpellInfo* spellInfo)
     {
