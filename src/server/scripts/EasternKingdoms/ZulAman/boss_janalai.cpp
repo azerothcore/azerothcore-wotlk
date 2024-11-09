@@ -359,7 +359,7 @@ struct npc_janalai_hatcher : public ScriptedAI
                 me->CastCustomSpell(SPELL_HATCH_EGG_ALL, SPELLVALUE_MAX_TARGETS, context.GetRepeatCounter() + 1);
 
                 if (me->FindNearestCreature(NPC_EGG, 100.0f))
-                    context.Repeat(2s);
+                    context.Repeat(4s);
             });
         }
         else
