@@ -142,11 +142,6 @@ public:
                 case NPC_HARRISON_JONES:
                     HarrisonJonesGUID = creature->GetGUID();
                     break;
-                case NPC_JANALAI:
-                case NPC_ZULJIN:
-                case NPC_HEXLORD:
-                case NPC_HALAZZI:
-                case NPC_NALORAKK:
                 default:
                     break;
             }
