@@ -1553,7 +1553,14 @@ bool BotDataMgr::GenerateBattlegroundBots(Player const* groupLeader, [[maybe_unu
     uint32 minteamplayers = bg_template->GetMinPlayersPerTeam();
     uint32 maxteamplayers = bg_template->GetMaxPlayersPerTeam();
 
-    RoundToInterval(tarteamplayers, minteamplayers, maxteamplayers);
+    uint32 normalCount = tarteamplayers;
+    RoundToInterval(normalCount, minteamplayers, maxteamplayers);
+    if (tarteamplayers != normalCount)
+    {
+        BOT_LOG_ERROR("npcbots", "NpcBot.WanderingBots.BG.TargetTeamPlayersCount value {} for BG {} '{}' is out of bounds ({}-{})! Normalized to {}!",
+            tarteamplayers, uint32(bgTypeId), bg_template->GetName(), minteamplayers, maxteamplayers, normalCount);
+        tarteamplayers = normalCount;
+    }
 
     uint32 queued_players_a = 0;
     uint32 queued_players_h = 0;
