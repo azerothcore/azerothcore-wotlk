@@ -1293,7 +1293,7 @@ bool BotMgr::RestrictBots(Creature const* bot, bool add) const
         uint32 max_players = 0;
         if (currMap->IsDungeon())
             max_players = currMap->ToInstanceMap()->GetMaxPlayers();
-        else if (currMap->IsBattleground() || currMap->IsBattleArena())
+        else if (currMap->IsBattlegroundOrArena())
             max_players = _owner->GetBattleground()->GetMaxPlayersPerTeam();
 
         if (max_players)
