@@ -72,6 +72,8 @@ ObjectData const gameObjectData[] =
 {
     { GO_STRANGE_GONG, DATA_STRANGE_GONG },
     { GO_MASSIVE_GATE, DATA_MASSIVE_GATE },
+    { GO_GATE_HEXLORD, DATA_HEXLORD_GATE },
+    { GO_GATE_ZULJIN,  DATA_ZULJIN_GATE  },
     { 0,               0                 }
 };
 
@@ -92,14 +94,8 @@ public:
     {
         instance_zulaman_InstanceMapScript(Map* map) : InstanceScript(map) {}
 
-        ObjectGuid HarkorsSatchelGUID;
-        ObjectGuid TanzarsTrunkGUID;
-        ObjectGuid AshlisBagGUID;
-        ObjectGuid KrazsPackageGUID;
         ObjectGuid HarrisonJonesGUID;
 
-        ObjectGuid HexLordGateGUID;
-        ObjectGuid ZulJinGateGUID;
         ObjectGuid AkilzonDoorGUID;
         ObjectGuid HalazziDoorGUID;
 
@@ -142,33 +138,7 @@ public:
 
         void OnGameObjectCreate(GameObject* go) override
         {
-            switch (go->GetEntry())
-            {
-                case GO_GATE_ZULJIN:
-                    ZulJinGateGUID = go->GetGUID();
-                    break;
-                case GO_GATE_HEXLORD:
-                    HexLordGateGUID = go->GetGUID();
-                    break;
-
-                case GO_HARKORS_SATCHEL:
-                    HarkorsSatchelGUID = go->GetGUID();
-                    break;
-                case GO_TANZARS_TRUNK:
-                    TanzarsTrunkGUID = go->GetGUID();
-                    break;
-                case GO_ASHLIS_BAG:
-                    AshlisBagGUID = go->GetGUID();
-                    break;
-                case GO_KRAZS_PACKAGE:
-                    KrazsPackageGUID = go->GetGUID();
-                    break;
-                default:
-                    break;
-            }
-
             CheckInstanceStatus();
-
             InstanceScript::OnGameObjectCreate(go);
         }
 
@@ -195,10 +165,10 @@ public:
         void CheckInstanceStatus()
         {
             if (BossKilled >= DATA_HALAZZI)
-                HandleGameObject(HexLordGateGUID, true);
+                HandleGameObject(ObjectGuid::Empty, true, GetGameObject(DATA_HEXLORD_GATE));
 
             if (BossKilled >= DATA_HEXLORD)
-                HandleGameObject(ZulJinGateGUID, true);
+                HandleGameObject(ObjectGuid::Empty, true, GetGameObject(DATA_ZULJIN_GATE));
         }
 
         std::string GetSaveData() override
@@ -293,7 +263,7 @@ public:
                     break;
                 case DATA_HEXLORD:
                     if (state == IN_PROGRESS)
-                        HandleGameObject(HexLordGateGUID, false);
+                        HandleGameObject(ObjectGuid::Empty, false, GetGameObject(DATA_HEXLORD_GATE));
                     else if (state == NOT_STARTED)
                         CheckInstanceStatus();
                     break;
