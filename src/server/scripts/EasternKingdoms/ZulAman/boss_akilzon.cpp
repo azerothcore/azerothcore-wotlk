@@ -204,7 +204,7 @@ public:
                 Cell::VisitAllObjects(me, searcher, SIZE_OF_GRIDS);
 
                 // deal damage
-                for (const auto& target : tempUnitMap)
+                for (auto const& target : tempUnitMap)
                 {
                     if (target)
                     {
