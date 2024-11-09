@@ -199,37 +199,13 @@ public:
         {
             if (instance)
             {
-                uint32 cEntry = NPC_MANNUTH;
-                switch (urand(0, 9))
+                auto const& entries =
                 {
-                    case 1:
-                        cEntry = NPC_DEEZ;
-                        break;
-                    case 2:
-                        cEntry = NPC_GALATHRYN;
-                        break;
-                    case 3:
-                        cEntry = NPC_ADARRAH;
-                        break;
-                    case 4:
-                        cEntry = NPC_FUDGERICK;
-                        break;
-                    case 5:
-                        cEntry = NPC_DARWEN;
-                        break;
-                    case 6:
-                        cEntry = NPC_MITZI;
-                        break;
-                    case 7:
-                        cEntry = NPC_CHRISTIAN;
-                        break;
-                    case 8:
-                        cEntry = NPC_BRENNAN;
-                        break;
-                    case 9:
-                        cEntry = NPC_HOLLEE;
-                        break;
-                }
+                    NPC_MANNUTH, NPC_DEEZ, NPC_GALATHRYN, NPC_ADARRAH, NPC_FUDGERICK, NPC_DARWEN, NPC_MITZI,
+                    NPC_CHRISTIAN, NPC_BRENNAN, NPC_HOLLEE
+                };
+
+                uint32 cEntry = Acore::Containers::SelectRandomContainerElement(entries);
 
                 if (!instance->GetData(TYPE_RAND_VENDOR_1) && roll_chance_i(10))
                 {
@@ -261,7 +237,7 @@ public:
                 if (roll_chance_i(2))
                 {
                     DoCast(caster, SPELL_PUSH_MOJO, true);
-                    me->GetMotionMaster()->MovePoint(POINT_DESPAWN, caster->GetPositionX(), caster->GetPositionY(), caster->GetPositionZ());
+                    me->GetMotionMaster()->MovePoint(POINT_DESPAWN, caster->GetPosition());
                 }
                 else
                     DoSpawnRandom();
