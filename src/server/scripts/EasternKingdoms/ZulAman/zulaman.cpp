@@ -381,179 +381,168 @@ enum Weapons
     WEAPON_SPEAR                        = 13631
 };
 
-class npc_harrison_jones : public CreatureScript
+struct npc_harrison_jones : public ScriptedAI
 {
-public:
-    npc_harrison_jones() : CreatureScript("npc_harrison_jones") { }
-
-    struct npc_harrison_jonesAI : public ScriptedAI
+    npc_harrison_jones(Creature* creature) : ScriptedAI(creature)
     {
-        npc_harrison_jonesAI(Creature* creature) : ScriptedAI(creature)
+        instance = creature->GetInstanceScript();
+    }
+
+    InstanceScript* instance;
+
+    uint8 _gongEvent;
+    uint32 _gongTimer;
+    ObjectGuid uiTargetGUID;
+
+    void Reset() override
+    {
+        _gongEvent = 0;
+        _gongTimer = 0;
+        uiTargetGUID.Clear();
+    }
+
+    void JustEngagedWith(Unit* /*who*/) override { }
+
+    void sGossipSelect(Player* player, uint32 sender, uint32 action) override
+    {
+        if (me->GetCreatureTemplate()->GossipMenuId == sender && !action)
         {
-            instance = creature->GetInstanceScript();
+            CloseGossipMenuFor(player);
+            me->SetFacingToObject(player);
+            me->RemoveNpcFlag(UNIT_NPC_FLAG_GOSSIP);
+            Talk(SAY_HARRISON_0);
+            _gongEvent = GONG_EVENT_1;
+            _gongTimer = 4000;
         }
+    }
 
-        InstanceScript* instance;
-
-        uint8 _gongEvent;
-        uint32 _gongTimer;
-        ObjectGuid uiTargetGUID;
-
-        void Reset() override
+    void SpellHit(Unit*, SpellInfo const* spell) override
+    {
+        if (spell->Id == SPELL_COSMETIC_SPEAR_THROW)
         {
-            _gongEvent = 0;
-            _gongTimer = 0;
-            uiTargetGUID.Clear();
+            me->RemoveAllAuras();
+            me->SetEntry(NPC_HARRISON_JONES_2);
+            me->SetDisplayId(MODEL_HARRISON_JONES_2);
+            me->SetTarget();
+            me->SetByteValue(UNIT_FIELD_BYTES_1, UNIT_BYTES_1_OFFSET_STAND_STATE, UNIT_STAND_STATE_DEAD);
+            me->SetDynamicFlag(UNIT_DYNFLAG_DEAD);
+            instance->StorePersistentData(DATA_TIMED_RUN, 21);
+            instance->DoAction(ACTION_START_TIMED_RUN);
         }
+    }
 
-        void JustEngagedWith(Unit* /*who*/) override { }
-
-        void sGossipSelect(Player* player, uint32 sender, uint32 action) override
+    void UpdateAI(uint32 diff) override
+    {
+        if (_gongEvent)
         {
-            if (me->GetCreatureTemplate()->GossipMenuId == sender && !action)
+            if (_gongTimer <= diff)
             {
-                CloseGossipMenuFor(player);
-                me->SetFacingToObject(player);
-                me->RemoveNpcFlag(UNIT_NPC_FLAG_GOSSIP);
-                Talk(SAY_HARRISON_0);
-                _gongEvent = GONG_EVENT_1;
-                _gongTimer = 4000;
-            }
-        }
-
-        void SpellHit(Unit*, SpellInfo const* spell) override
-        {
-            if (spell->Id == SPELL_COSMETIC_SPEAR_THROW)
-            {
-                me->RemoveAllAuras();
-                me->SetEntry(NPC_HARRISON_JONES_2);
-                me->SetDisplayId(MODEL_HARRISON_JONES_2);
-                me->SetTarget();
-                me->SetByteValue(UNIT_FIELD_BYTES_1, UNIT_BYTES_1_OFFSET_STAND_STATE, UNIT_STAND_STATE_DEAD);
-                me->SetDynamicFlag(UNIT_DYNFLAG_DEAD);
-                instance->StorePersistentData(DATA_TIMED_RUN, 21);
-                instance->DoAction(ACTION_START_TIMED_RUN);
-            }
-        }
-
-        void UpdateAI(uint32 diff) override
-        {
-            if (_gongEvent)
-            {
-                if (_gongTimer <= diff)
+                switch (_gongEvent)
                 {
-                    switch (_gongEvent)
+                case GONG_EVENT_1:
+                    me->GetMotionMaster()->MovePath(HARRISON_MOVE_1, false);
+                    _gongEvent = GONG_EVENT_2;
+                    _gongTimer = 12000;
+                    break;
+                case GONG_EVENT_2:
+                    me->SetFacingTo(6.235659f);
+                    Talk(SAY_HARRISON_1);
+                    DoCast(me, SPELL_BANGING_THE_GONG);
+                    me->SetUInt32Value(UNIT_VIRTUAL_ITEM_SLOT_ID + 0, uint32(WEAPON_MACE));
+                    me->SetSheath(SHEATH_STATE_MELEE);
+                    _gongEvent = GONG_EVENT_3;
+                    _gongTimer = 4000;
+                    break;
+                case GONG_EVENT_3:
+                    if (GameObject* gong = instance->GetGameObject(DATA_STRANGE_GONG))
+                        gong->RemoveGameObjectFlag(GO_FLAG_NOT_SELECTABLE);
+                    _gongEvent = GONG_EVENT_4;
+                    _gongTimer = 105000;
+                    break;
+                case GONG_EVENT_4:
+                    me->RemoveAura(SPELL_BANGING_THE_GONG);
+                    if (GameObject* gong = instance->GetGameObject(DATA_STRANGE_GONG))
+                        gong->SetGameObjectFlag(GO_FLAG_NOT_SELECTABLE);
+
+                    // Players are Now Saved to instance at SPECIAL (Player should be notified?)
+                    me->GetMotionMaster()->MovePath(HARRISON_MOVE_2, false);
+                    _gongEvent = GONG_EVENT_5;
+                    _gongTimer = 5000;
+                    break;
+                case GONG_EVENT_5:
+                    me->SetEntry(NPC_HARRISON_JONES_1);
+                    me->SetDisplayId(MODEL_HARRISON_JONES_1);
+                    Talk(SAY_HARRISON_2);
+                    _gongTimer = 12000;
+                    _gongEvent = GONG_EVENT_6;
+                    break;
+                case GONG_EVENT_6:
+                    me->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_STATE_USE_STANDING);
+                    Talk(SAY_HARRISON_3);
+                    _gongTimer = 7000;
+                    _gongEvent = GONG_EVENT_7;
+                    break;
+                case GONG_EVENT_7:
+                    if (!uiTargetGUID)
                     {
-                        case GONG_EVENT_1:
-                            me->GetMotionMaster()->MovePath(HARRISON_MOVE_1, false);
-                            _gongEvent = GONG_EVENT_2;
-                            _gongTimer = 12000;
-                            break;
-                        case GONG_EVENT_2:
-                            me->SetFacingTo(6.235659f);
-                            Talk(SAY_HARRISON_1);
-                            DoCast(me, SPELL_BANGING_THE_GONG);
-                            me->SetUInt32Value(UNIT_VIRTUAL_ITEM_SLOT_ID + 0, uint32(WEAPON_MACE));
-                            me->SetSheath(SHEATH_STATE_MELEE);
-                            _gongEvent = GONG_EVENT_3;
-                            _gongTimer = 4000;
-                            break;
-                        case GONG_EVENT_3:
-                            if (GameObject* gong = instance->GetGameObject(DATA_STRANGE_GONG))
-                                gong->RemoveGameObjectFlag(GO_FLAG_NOT_SELECTABLE);
-                            _gongEvent = GONG_EVENT_4;
-                            _gongTimer = 105000;
-                            break;
-                        case GONG_EVENT_4:
-                            me->RemoveAura(SPELL_BANGING_THE_GONG);
-                            if (GameObject* gong = instance->GetGameObject(DATA_STRANGE_GONG))
-                                gong->SetGameObjectFlag(GO_FLAG_NOT_SELECTABLE);
-
-                            // Players are Now Saved to instance at SPECIAL (Player should be notified?)
-                            me->GetMotionMaster()->MovePath(HARRISON_MOVE_2, false);
-                            _gongEvent = GONG_EVENT_5;
-                            _gongTimer = 5000;
-                            break;
-                        case GONG_EVENT_5:
-                            me->SetEntry(NPC_HARRISON_JONES_1);
-                            me->SetDisplayId(MODEL_HARRISON_JONES_1);
-                            Talk(SAY_HARRISON_2);
-                            _gongTimer = 12000;
-                            _gongEvent = GONG_EVENT_6;
-                            break;
-                        case GONG_EVENT_6:
-                            me->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_STATE_USE_STANDING);
-                            Talk(SAY_HARRISON_3);
-                            _gongTimer = 7000;
-                            _gongEvent = GONG_EVENT_7;
-                            break;
-                        case GONG_EVENT_7:
-                            if (!uiTargetGUID)
+                        std::list<Creature*> targetList;
+                        GetCreatureListWithEntryInGrid(targetList, me, NPC_AMANISHI_GUARDIAN, 26.0f);
+                        if (!targetList.empty())
+                        {
+                            for (auto const& creature : targetList)
                             {
-                                std::list<Creature*> targetList;
-                                GetCreatureListWithEntryInGrid(targetList, me, NPC_AMANISHI_GUARDIAN, 26.0f);
-                                if (!targetList.empty())
+                                if (creature)
                                 {
-                                    for (auto const& creature : targetList)
-                                    {
-                                        if (creature)
-                                        {
-                                            creature->SetImmuneToPC(true);
-                                            creature->SetReactState(REACT_PASSIVE);
+                                    creature->SetImmuneToPC(true);
+                                    creature->SetReactState(REACT_PASSIVE);
 
-                                            if (creature->GetPositionX() > 120)
-                                            {
-                                                creature->SetUInt32Value(UNIT_VIRTUAL_ITEM_SLOT_ID + 0, uint32(WEAPON_SPEAR));
-                                                creature->AI()->SetData(0, 1);
-                                            }
-                                            else
-                                            {
-                                                creature->AI()->SetData(0, 2);
-                                            }
-                                        }
+                                    if (creature->GetPositionX() > 120)
+                                    {
+                                        creature->SetUInt32Value(UNIT_VIRTUAL_ITEM_SLOT_ID + 0, uint32(WEAPON_SPEAR));
+                                        creature->AI()->SetData(0, 1);
+                                    }
+                                    else
+                                    {
+                                        creature->AI()->SetData(0, 2);
                                     }
                                 }
                             }
-
-                            if (GameObject* gate = instance->GetGameObject(DATA_MASSIVE_GATE))
-                                gate->SetGoState(GO_STATE_ACTIVE);
-                            _gongTimer = 2000;
-                            _gongEvent = GONG_EVENT_8;
-                            break;
-                        case GONG_EVENT_8:
-                            DoCast(me, SPELL_STEALTH);
-                            me->SetUInt32Value(UNIT_VIRTUAL_ITEM_SLOT_ID + 0, uint32(0));
-                            me->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_ONESHOT_NONE);
-                            me->GetMotionMaster()->MovePath(HARRISON_MOVE_3, false);
-                            _gongTimer = 1000;
-                            _gongEvent = 0;
-                            break;
-                        case GONG_EVENT_9:
-                            me->GetMotionMaster()->MovePoint(0, 120.687f, 1674.0f, 42.0217f);
-                            _gongTimer = 12000;
-                            _gongEvent = GONG_EVENT_10;
-                            break;
-                        case GONG_EVENT_10:
-                            me->SetFacingTo(1.59044f);
-                            _gongEvent = 11;
-                            _gongTimer = 6000;
-                            break;
-                        case GONG_EVENT_11:
-                            me->SetNpcFlag(UNIT_NPC_FLAG_GOSSIP);
-                            _gongEvent = 0;
-                            _gongTimer = 1000;
-                            break;
+                        }
                     }
-                }
-                else
-                    _gongTimer -= diff;
-            }
-        }
-    };
 
-    CreatureAI* GetAI(Creature* creature) const override
-    {
-        return GetZulAmanAI<npc_harrison_jonesAI>(creature);
+                    if (GameObject* gate = instance->GetGameObject(DATA_MASSIVE_GATE))
+                        gate->SetGoState(GO_STATE_ACTIVE);
+                    _gongTimer = 2000;
+                    _gongEvent = GONG_EVENT_8;
+                    break;
+                case GONG_EVENT_8:
+                    DoCast(me, SPELL_STEALTH);
+                    me->SetUInt32Value(UNIT_VIRTUAL_ITEM_SLOT_ID + 0, uint32(0));
+                    me->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_ONESHOT_NONE);
+                    me->GetMotionMaster()->MovePath(HARRISON_MOVE_3, false);
+                    _gongTimer = 1000;
+                    _gongEvent = 0;
+                    break;
+                case GONG_EVENT_9:
+                    me->GetMotionMaster()->MovePoint(0, 120.687f, 1674.0f, 42.0217f);
+                    _gongTimer = 12000;
+                    _gongEvent = GONG_EVENT_10;
+                    break;
+                case GONG_EVENT_10:
+                    me->SetFacingTo(1.59044f);
+                    _gongEvent = 11;
+                    _gongTimer = 6000;
+                    break;
+                case GONG_EVENT_11:
+                    me->SetNpcFlag(UNIT_NPC_FLAG_GOSSIP);
+                    _gongEvent = 0;
+                    _gongTimer = 1000;
+                    break;
+                }
+            }
+            else
+                _gongTimer -= diff;
+        }
     }
 };
 
@@ -561,5 +550,5 @@ void AddSC_zulaman()
 {
     RegisterZulAmanCreatureAI(npc_forest_frog);
     new npc_zulaman_hostage();
-    new npc_harrison_jones();
+    RegisterZulAmanCreatureAI(npc_harrison_jones);
 }
