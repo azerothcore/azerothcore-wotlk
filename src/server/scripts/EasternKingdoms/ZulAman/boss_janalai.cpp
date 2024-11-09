@@ -335,10 +335,7 @@ private:
 
 struct npc_janalai_hatcher : public ScriptedAI
 {
-    npc_janalai_hatcher(Creature* creature) : ScriptedAI(creature)
-    {
-        _instance = creature->GetInstanceScript();
-    }
+    npc_janalai_hatcher(Creature* creature) : ScriptedAI(creature) { }
 
     void Reset() override
     {
@@ -347,7 +344,6 @@ struct npc_janalai_hatcher : public ScriptedAI
         _side = (me->GetPositionY() < 1150);
         _waypoint = 0;
         _isHatching = false;
-        _hasChangedSide = false;
         me->GetMotionMaster()->Clear();
         me->GetMotionMaster()->MovePoint(0, hatcherway[_side][0]);
     }
@@ -357,29 +353,13 @@ struct npc_janalai_hatcher : public ScriptedAI
         if (_waypoint == 5)
         {
             _isHatching = true;
-            std::list<Creature* > eggList;
-            me->GetCreaturesWithEntryInRange(eggList, 50.0f, NPC_EGG);
-            scheduler.Schedule(1500ms, SCHEDULER_GROUP_HATCHING, [this, eggList](TaskContext context)
+
+            scheduler.Schedule(1500ms, SCHEDULER_GROUP_HATCHING, [this](TaskContext context)
             {
-                std::list<Creature* > unhatchedEggs;
-                for (Creature* egg : eggList)
-                {
-                    if (egg->IsAlive())
-                        unhatchedEggs.emplace_front(egg);
-                }
-                Acore::Containers::RandomResize(unhatchedEggs, 1);
-                if (Creature* egg = unhatchedEggs.front())
-                    egg->AI()->DoCastSelf(SPELL_HATCH_EGG_SINGULAR);
-                else if (!_hasChangedSide)
-                {
-                    _side = _side ? 0 : 1;
-                    _isHatching = false;
-                    _waypoint = 3;
-                    MoveToNewWaypoint(_waypoint);
-                    _hasChangedSide = true;
-                    context.CancelGroup(SCHEDULER_GROUP_HATCHING);
-                }
-                context.Repeat(1500ms);
+                me->CastCustomSpell(SPELL_HATCH_EGG_ALL, SPELLVALUE_MAX_TARGETS, context.GetRepeatCounter() + 1);
+
+                if (me->FindNearestCreature(NPC_EGG, 100.0f))
+                    context.Repeat(2s);
             });
         }
         else
@@ -411,19 +391,14 @@ struct npc_janalai_hatcher : public ScriptedAI
     void MoveInLineOfSight(Unit* /*who*/) override { }
 
 private:
-    InstanceScript* _instance;
     uint8 _side;
     uint8 _waypoint;
     bool _isHatching;
-    bool _hasChangedSide;
 };
 
 struct npc_janalai_hatchling : public ScriptedAI
 {
-    npc_janalai_hatchling(Creature* creature) : ScriptedAI(creature)
-    {
-        _instance = creature->GetInstanceScript();
-    }
+    npc_janalai_hatchling(Creature* creature) : ScriptedAI(creature) { }
 
     void Reset() override
     {
@@ -454,20 +429,6 @@ struct npc_janalai_hatchling : public ScriptedAI
 
         DoMeleeAttackIfReady();
     }
-
-private:
-    InstanceScript* _instance;
-};
-
-struct npc_janalai_egg : public NullCreatureAI
-{
-    npc_janalai_egg(Creature* creature) : NullCreatureAI(creature) { }
-
-    void SpellHit(Unit* /*caster*/, SpellInfo const* spell) override
-    {
-        if (spell->Id == SPELL_HATCH_EGG_ALL || spell->Id == SPELL_HATCH_EGG_SINGULAR)
-            DoCastSelf(SPELL_SUMMON_HATCHLING);
-    }
 };
 
 void AddSC_boss_janalai()
@@ -475,5 +436,4 @@ void AddSC_boss_janalai()
     RegisterZulAmanCreatureAI(boss_janalai);
     RegisterZulAmanCreatureAI(npc_janalai_hatcher);
     RegisterZulAmanCreatureAI(npc_janalai_hatchling);
-    RegisterZulAmanCreatureAI(npc_janalai_egg);
 }
