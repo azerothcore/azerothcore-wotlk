@@ -80,11 +80,6 @@ struct npc_forest_frog : public ScriptedAI
         instance = creature->GetInstanceScript();
     }
 
-    InstanceScript* instance;
-    EventMap events;
-    uint8 eventTimer;
-    ObjectGuid PlayerGUID;
-
     void JustEngagedWith(Unit* /*who*/) override { }
 
     void MovementInform(uint32 type, uint32 data) override
@@ -233,6 +228,12 @@ struct npc_forest_frog : public ScriptedAI
                 DoSpawnRandom();
         }
     }
+
+    private:
+        InstanceScript* instance;
+        EventMap events;
+        uint8 eventTimer;
+        ObjectGuid PlayerGUID;
 };
 
 /*######
@@ -385,14 +386,8 @@ struct npc_harrison_jones : public ScriptedAI
 {
     npc_harrison_jones(Creature* creature) : ScriptedAI(creature)
     {
-        instance = creature->GetInstanceScript();
+        _instance = creature->GetInstanceScript();
     }
-
-    InstanceScript* instance;
-
-    uint8 _gongEvent;
-    uint32 _gongTimer;
-    ObjectGuid uiTargetGUID;
 
     void Reset() override
     {
@@ -426,8 +421,8 @@ struct npc_harrison_jones : public ScriptedAI
             me->SetTarget();
             me->SetByteValue(UNIT_FIELD_BYTES_1, UNIT_BYTES_1_OFFSET_STAND_STATE, UNIT_STAND_STATE_DEAD);
             me->SetDynamicFlag(UNIT_DYNFLAG_DEAD);
-            instance->StorePersistentData(DATA_TIMED_RUN, 21);
-            instance->DoAction(ACTION_START_TIMED_RUN);
+            _instance->StorePersistentData(DATA_TIMED_RUN, 21);
+            _instance->DoAction(ACTION_START_TIMED_RUN);
         }
     }
 
@@ -447,21 +442,21 @@ struct npc_harrison_jones : public ScriptedAI
                 case GONG_EVENT_2:
                     me->SetFacingTo(6.235659f);
                     Talk(SAY_HARRISON_1);
-                    DoCast(me, SPELL_BANGING_THE_GONG);
+                    DoCastSelf(SPELL_BANGING_THE_GONG);
                     me->SetUInt32Value(UNIT_VIRTUAL_ITEM_SLOT_ID + 0, uint32(WEAPON_MACE));
                     me->SetSheath(SHEATH_STATE_MELEE);
                     _gongEvent = GONG_EVENT_3;
                     _gongTimer = 4000;
                     break;
                 case GONG_EVENT_3:
-                    if (GameObject* gong = instance->GetGameObject(DATA_STRANGE_GONG))
+                    if (GameObject* gong = _instance->GetGameObject(DATA_STRANGE_GONG))
                         gong->RemoveGameObjectFlag(GO_FLAG_NOT_SELECTABLE);
                     _gongEvent = GONG_EVENT_4;
                     _gongTimer = 105000;
                     break;
                 case GONG_EVENT_4:
                     me->RemoveAura(SPELL_BANGING_THE_GONG);
-                    if (GameObject* gong = instance->GetGameObject(DATA_STRANGE_GONG))
+                    if (GameObject* gong = _instance->GetGameObject(DATA_STRANGE_GONG))
                         gong->SetGameObjectFlag(GO_FLAG_NOT_SELECTABLE);
 
                     // Players are Now Saved to instance at SPECIAL (Player should be notified?)
@@ -502,21 +497,19 @@ struct npc_harrison_jones : public ScriptedAI
                                         creature->AI()->SetData(0, 1);
                                     }
                                     else
-                                    {
                                         creature->AI()->SetData(0, 2);
-                                    }
                                 }
                             }
                         }
                     }
 
-                    if (GameObject* gate = instance->GetGameObject(DATA_MASSIVE_GATE))
+                    if (GameObject* gate = _instance->GetGameObject(DATA_MASSIVE_GATE))
                         gate->SetGoState(GO_STATE_ACTIVE);
                     _gongTimer = 2000;
                     _gongEvent = GONG_EVENT_8;
                     break;
                 case GONG_EVENT_8:
-                    DoCast(me, SPELL_STEALTH);
+                    DoCastSelf(SPELL_STEALTH);
                     me->SetUInt32Value(UNIT_VIRTUAL_ITEM_SLOT_ID + 0, uint32(0));
                     me->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_ONESHOT_NONE);
                     me->GetMotionMaster()->MovePath(HARRISON_MOVE_3, false);
@@ -544,6 +537,12 @@ struct npc_harrison_jones : public ScriptedAI
                 _gongTimer -= diff;
         }
     }
+
+    private:
+        InstanceScript* _instance;
+        uint8 _gongEvent;
+        uint32 _gongTimer;
+        ObjectGuid uiTargetGUID;
 };
 
 void AddSC_zulaman()
