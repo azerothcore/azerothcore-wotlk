@@ -93,7 +93,6 @@ public:
         ObjectGuid AshlisBagGUID;
         ObjectGuid KrazsPackageGUID;
         ObjectGuid StrangeGongGUID;
-        ObjectGuid HarrisonJonesGUID;
 
         ObjectGuid HexLordGateGUID;
         ObjectGuid ZulJinGateGUID;
@@ -127,25 +126,6 @@ public:
                 RandVendor[i] = NOT_STARTED;
 
             m_auiEncounter[DATA_GONGEVENT] = NOT_STARTED;
-        }
-
-        void OnPlayerEnter(Player* /*player*/) override
-        {
-            if (!HarrisonJonesGUID)
-                instance->SummonCreature(NPC_HARRISON_JONES, HarrisonJonesLoc);
-        }
-
-        void OnCreatureCreate(Creature* creature) override
-        {
-            switch (creature->GetEntry())
-            {
-                case NPC_HARRISON_JONES:
-                    HarrisonJonesGUID = creature->GetGUID();
-                    break;
-                default:
-                    break;
-            }
-            InstanceScript::OnCreatureCreate(creature);
         }
 
         void OnGameObjectCreate(GameObject* go) override
