@@ -172,15 +172,10 @@ public:
 
         void SetData(uint32 type, uint32 data) override
         {
-            switch (type)
-            {
-                case TYPE_RAND_VENDOR_1:
-                    RandVendor[0] = data;
-                    break;
-                case TYPE_RAND_VENDOR_2:
-                    RandVendor[1] = data;
-                    break;
-            }
+            if (type == TYPE_RAND_VENDOR_1)
+                RandVendor[0] = data;
+            else if (type == TYPE_RAND_VENDOR_2)
+                RandVendor[1] = data;
         }
 
         bool SetBossState(uint32 type, EncounterState state) override
@@ -244,15 +239,12 @@ public:
 
         uint32 GetData(uint32 type) const override
         {
-            switch (type)
-            {
-                case TYPE_RAND_VENDOR_1:
-                    return RandVendor[0];
-                case TYPE_RAND_VENDOR_2:
-                    return RandVendor[1];
-                default:
-                    return 0;
-            }
+            if (type == TYPE_RAND_VENDOR_1)
+                return RandVendor[0];
+            else if (type == TYPE_RAND_VENDOR_2)
+                return RandVendor[1];
+
+            return 0;
         }
 
         void Update(uint32 diff) override
