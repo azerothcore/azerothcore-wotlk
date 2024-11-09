@@ -87,9 +87,9 @@ public:
         void Initialize() override
         {
             SetHeaders(DataHeader);
-            LoadObjectData(creatureData, gameObjectData);
             SetBossNumber(MAX_ENCOUNTER);
             SetPersistentDataCount(PersistentDataCount);
+            LoadObjectData(creatureData, gameObjectData);
             LoadBossBoundaries(boundaries);
             LoadDoorData(doorData);
 
