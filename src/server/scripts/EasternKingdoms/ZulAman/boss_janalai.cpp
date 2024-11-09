@@ -333,17 +333,6 @@ private:
     bool _isFlameBreathing;
 };
 
-struct npc_janalai_firebomb : public NullCreatureAI
-{
-    npc_janalai_firebomb(Creature* creature) : NullCreatureAI(creature) { }
-
-    void SpellHit(Unit* /*caster*/, SpellInfo const* spell) override
-    {
-        if (spell->Id == SPELL_FIRE_BOMB_THROW)
-            DoCastSelf(SPELL_FIRE_BOMB_DUMMY, true);
-    }
-};
-
 struct npc_janalai_hatcher : public ScriptedAI
 {
     npc_janalai_hatcher(Creature* creature) : ScriptedAI(creature)
@@ -484,7 +473,6 @@ struct npc_janalai_egg : public NullCreatureAI
 void AddSC_boss_janalai()
 {
     RegisterZulAmanCreatureAI(boss_janalai);
-    RegisterZulAmanCreatureAI(npc_janalai_firebomb);
     RegisterZulAmanCreatureAI(npc_janalai_hatcher);
     RegisterZulAmanCreatureAI(npc_janalai_hatchling);
     RegisterZulAmanCreatureAI(npc_janalai_egg);
