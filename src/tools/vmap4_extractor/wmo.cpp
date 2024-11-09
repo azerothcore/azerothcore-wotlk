@@ -23,7 +23,6 @@
 #include <cstdio>
 #include <cstdlib>
 #include <map>
-#include <utility>
 #undef min
 #undef max
 #include "mpq_libmpq04.h"
