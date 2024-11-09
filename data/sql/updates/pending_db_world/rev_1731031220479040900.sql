@@ -1,15 +1,18 @@
--- Adding Comment column to the other missing FactionChange
+-- Adding COMMENT COLUMN
 -- Achievements
 ALTER TABLE `player_factionchange_achievement`
 ADD `alliance_comment` TEXT NOT NULL COLLATE 'utf8mb4_unicode_ci' AFTER `alliance_id`,
 ADD `horde_comment` TEXT NOT NULL COLLATE 'utf8mb4_unicode_ci' AFTER `horde_id`;
+-- Reputations
+ALTER TABLE `player_factionchange_reputations`
+ADD `alliance_comment` TEXT NOT NULL COLLATE 'utf8mb4_unicode_ci' AFTER `alliance_id`,
+ADD `horde_comment` TEXT NOT NULL COLLATE 'utf8mb4_unicode_ci' AFTER `horde_id`;
 
-
+-- Adding Achievements 
 DELETE FROM `player_factionchange_achievement` WHERE `alliance_id` IN
 (33,34,35,37,41,58,202,203,206,220,225,230,246,388,433,434,435,436,437,438,439,440,441,442,470,471,472,473,604,610,611,612,613,614,701,707,709,711,713,764,899,907,908,942,948,963,966,969,970,1012,1022,1023,1024,1028,1029,1030,1034,1035,1038,1040,1151,1167,1169,1172,1184,1189,1191,1192,1255,1262,1279,1466,1563,1656,1676,1678,1681,1684,1686,1692,1697,1707,1737,1752,1757,1762,1782,2016,2144,2194,2419,2421,2536,2760,2761,2762,2763,2764,2770,2777,2778,2779,2780,2781,2782,2797,2817,3356,3478,3556,3576,3580,3596,3676,3846,3851,3856,3857,4156,4296,4298,4436,4784,4786);
-
--- Adding the comments to their respecitve IDs
 INSERT INTO `player_factionchange_achievement` (`alliance_id`, `alliance_comment`, `horde_id`, `horde_comment`) VALUES
+-- Achievements
 (33, "Nothing Boring About Borean", 1358, "Nothing Boring About Borean"),
 (34, "I've Toured the Fjord", 1356, "I've Toured the Fjord"),
 (35, "Might of Dragonblight", 1359, "Might of Dragonblight"),
@@ -134,4 +137,22 @@ INSERT INTO `player_factionchange_achievement` (`alliance_id`, `alliance_comment
 (4436, "BB King", 4437, "BB King"),
 (4784, "Emblematic", 4785, "Emblematic"),
 (4786, "Operation: Gnomeregan", 4790, "Zalazane's Fall");
-
+-- Reputation
+DELETE FROM `player_factionchange_reputations` WHERE `alliance_id` IN
+(47,54,69,72,509,730,890,930,946,978,1037,1050,1068,1094,1126);
+INSERT INTO `player_factionchange_reputations` (`alliance_id`, `alliance_comment`, `horde_id`, `horde_comment`) VALUES
+(47, "Ironforge", 530, "Darkspear Trolls"),
+(54, "Gnomeregan Exiles", 81, "Thunder Bluff"),
+(69, "Darnassus", 68, "Undercity"),
+(72, "Stormwind", 76, "Orgrimmar"),
+(509, "The League of Arathor", 510, "The Defilers"),
+(730, "Stormpike Guard", 729, "Frostwolf Clan"),
+(890, "Silverwing Sentinels", 889, "Warsong Outriders"),
+(930, "Exodar", 911, "Silvermoon City"),
+(946, "Honor Hold", 947, "Thrallmar"),
+(978, "Kurenai", 941, "The Mag'har"),
+(1037, "Alliance Vanguard", 1052, "Horde Expedition"),
+(1050, "Valiance Expedition", 1085, "Warsong Offensive"),
+(1068, "Explorers' League", 1064, "The Taunka"),
+(1094, "The Silver Covenant", 1124, "The Sunreavers"),
+(1126, "The Frostborn", 1067, "The Hand of Vengeance");
