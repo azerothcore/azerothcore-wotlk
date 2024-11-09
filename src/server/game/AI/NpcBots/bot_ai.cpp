@@ -2675,7 +2675,7 @@ void bot_ai::SetStats(bool force)
     //Do not store resistance bonuses directly lest we want calcs screwed up
     for (uint8 i = SPELL_SCHOOL_HOLY; i != MAX_SPELL_SCHOOL; ++i)
     {
-        value = IAmFree() ? 0 : mylevel;
+        value = IAmFree() ? 0 : (GetBG() && GetBG()->isArena()) ? 0 : mylevel;
         value += _getTotalBotStat(BotStatMods(BOT_STAT_MOD_RESIST_HOLY + (i - 1)));
 
         //res bonuses
