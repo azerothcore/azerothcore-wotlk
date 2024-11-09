@@ -260,8 +260,6 @@ public:
         bool IsLoot;
         ObjectGuid PlayerGUID;
 
-        void Reset() override { }
-
         void JustEngagedWith(Unit* /*who*/) override { }
 
         void JustDied(Unit* /*killer*/) override
@@ -301,15 +299,13 @@ public:
 
         creature->RemoveNpcFlag(UNIT_NPC_FLAG_GOSSIP);
 
-        InstanceScript* instance = creature->GetInstanceScript();
-        if (instance)
+        if (InstanceScript* instance = creature->GetInstanceScript())
         {
             float x, y, z;
             creature->GetPosition(x, y, z);
-            uint32 entry = creature->GetEntry();
             for (uint8 i = 0; i < 4; ++i)
             {
-                if (HostageEntry[i] == entry)
+                if (HostageEntry[i] == creature->GetEntry())
                 {
                     creature->SummonGameObject(ChestEntry[i], x - 2, y, z, 0, 0, 0, 0, 0, 0);
                     break;
