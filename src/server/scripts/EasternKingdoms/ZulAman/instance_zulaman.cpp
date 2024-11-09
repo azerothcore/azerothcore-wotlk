@@ -56,19 +56,23 @@ Position const HarrisonJonesLoc = {120.687f, 1674.0f, 42.0217f, 1.59044f};
 
 DoorData const doorData[] =
 {
-    { GO_ZULJIN_FIREWALL, DATA_ZULJIN, DOOR_TYPE_ROOM  },
-    { 0,                  0,           DOOR_TYPE_ROOM  } // END
+    { GO_ZULJIN_FIREWALL, DATA_ZULJIN,  DOOR_TYPE_ROOM },
+    { GO_DOOR_HALAZZI,    DATA_HALAZZI, DOOR_TYPE_ROOM },
+    { GO_DOOR_AKILZON,    DATA_AKILZON, DOOR_TYPE_ROOM },
+    { 0,                  0,            DOOR_TYPE_ROOM } // END
 };
 
 ObjectData const creatureData[] =
 {
-    { NPC_SPIRIT_LYNX, DATA_SPIRIT_LYNX   },
-    { 0,               0                  }
+    { NPC_SPIRIT_LYNX, DATA_SPIRIT_LYNX },
+    { 0,               0                }
 };
 
 ObjectData const gameObjectData[] =
 {
-    { 0,               0                }
+    { GO_STRANGE_GONG, DATA_STRANGE_GONG },
+    { GO_MASSIVE_GATE, DATA_MASSIVE_GATE },
+    { 0,               0                 }
 };
 
 BossBoundaryData const boundaries =
@@ -92,12 +96,10 @@ public:
         ObjectGuid TanzarsTrunkGUID;
         ObjectGuid AshlisBagGUID;
         ObjectGuid KrazsPackageGUID;
-        ObjectGuid StrangeGongGUID;
         ObjectGuid HarrisonJonesGUID;
 
         ObjectGuid HexLordGateGUID;
         ObjectGuid ZulJinGateGUID;
-        ObjectGuid MassiveGateGUID;
         ObjectGuid AkilzonDoorGUID;
         ObjectGuid HalazziDoorGUID;
 
@@ -105,15 +107,12 @@ public:
         uint16 BossKilled;
         uint16 QuestMinute;
         uint16 ChestLooted;
-
-        uint32 m_auiEncounter[MAX_ENCOUNTER];
         uint32 RandVendor[RAND_VENDOR];
 
         void Initialize() override
         {
             SetHeaders(DataHeader);
             LoadObjectData(creatureData, gameObjectData);
-            memset(&m_auiEncounter, 0, sizeof(m_auiEncounter));
             SetBossNumber(MAX_ENCOUNTER);
             LoadBossBoundaries(boundaries);
             LoadDoorData(doorData);
@@ -125,8 +124,6 @@ public:
 
             for (uint8 i = 0; i < RAND_VENDOR; ++i)
                 RandVendor[i] = NOT_STARTED;
-
-            m_auiEncounter[DATA_GONGEVENT] = NOT_STARTED;
         }
 
         void OnPlayerEnter(Player* /*player*/) override
@@ -137,14 +134,9 @@ public:
 
         void OnCreatureCreate(Creature* creature) override
         {
-            switch (creature->GetEntry())
-            {
-                case NPC_HARRISON_JONES:
-                    HarrisonJonesGUID = creature->GetGUID();
-                    break;
-                default:
-                    break;
-            }
+            if (creature->GetEntry() == NPC_HARRISON_JONES)
+                HarrisonJonesGUID = creature->GetGUID();
+
             InstanceScript::OnCreatureCreate(creature);
         }
 
@@ -152,20 +144,11 @@ public:
         {
             switch (go->GetEntry())
             {
-                case GO_DOOR_HALAZZI:
-                    HalazziDoorGUID = go->GetGUID();
-                    break;
                 case GO_GATE_ZULJIN:
                     ZulJinGateGUID = go->GetGUID();
                     break;
                 case GO_GATE_HEXLORD:
                     HexLordGateGUID = go->GetGUID();
-                    break;
-                case GO_MASSIVE_GATE:
-                    MassiveGateGUID = go->GetGUID();
-                    break;
-                case GO_DOOR_AKILZON:
-                    AkilzonDoorGUID = go->GetGUID();
                     break;
 
                 case GO_HARKORS_SATCHEL:
@@ -180,12 +163,10 @@ public:
                 case GO_KRAZS_PACKAGE:
                     KrazsPackageGUID = go->GetGUID();
                     break;
-                case GO_STRANGE_GONG:
-                    StrangeGongGUID = go->GetGUID();
-                    break;
                 default:
                     break;
             }
+
             CheckInstanceStatus();
 
             InstanceScript::OnGameObjectCreate(go);
@@ -257,60 +238,6 @@ public:
         {
             switch (type)
             {
-                case DATA_GONGEVENT:
-                    m_auiEncounter[DATA_GONGEVENT] = data;
-                    if (data == IN_PROGRESS)
-                        SaveToDB();
-                    else if (data == DONE)
-                        QuestMinute = 21;
-                    break;
-                case DATA_NALORAKK:
-                    m_auiEncounter[DATA_NALORAKK] = data;
-                    if (data == DONE)
-                    {
-                        if (QuestMinute)
-                        {
-                            QuestMinute += 15;
-                            DoUpdateWorldState(WORLDSTATE_TIME_TO_SACRIFICE, QuestMinute);
-                        }
-                        SummonHostage(0);
-                        SaveToDB();
-                    }
-                    break;
-                case DATA_AKILZON:
-                    m_auiEncounter[DATA_AKILZON] = data;
-                    HandleGameObject(AkilzonDoorGUID, data != IN_PROGRESS);
-                    if (data == DONE)
-                    {
-                        if (QuestMinute)
-                        {
-                            QuestMinute += 10;
-                            DoUpdateWorldState(WORLDSTATE_TIME_TO_SACRIFICE, QuestMinute);
-                        }
-                        SummonHostage(1);
-                        SaveToDB();
-                    }
-                    break;
-                case DATA_JANALAI:
-                    m_auiEncounter[DATA_JANALAI] = data;
-                    if (data == DONE)
-                        SummonHostage(2);
-                    SaveToDB();
-                    break;
-                case DATA_HALAZZI:
-                    m_auiEncounter[DATA_HALAZZI] = data;
-                    HandleGameObject(HalazziDoorGUID, data != IN_PROGRESS);
-                    if (data == DONE) SummonHostage(3);
-                    SaveToDB();
-                    break;
-                case DATA_HEXLORD:
-                    m_auiEncounter[DATA_HEXLORD] = data;
-                    if (data == IN_PROGRESS)
-                        HandleGameObject(HexLordGateGUID, false);
-                    else if (data == NOT_STARTED)
-                        CheckInstanceStatus();
-                    SaveToDB();
-                    break;
                 case DATA_CHESTLOOTED:
                     ++ChestLooted;
                     SaveToDB();
@@ -321,9 +248,58 @@ public:
                 case TYPE_RAND_VENDOR_2:
                     RandVendor[1] = data;
                     break;
+                case DATA_UPDATE_INSTANCE_TIMER:
+                    QuestMinute = data;
+                    break;
+            }
+        }
+
+        bool SetBossState(uint32 type, EncounterState state) override
+        {
+            if (!InstanceScript::SetBossState(type, state))
+                return false;
+
+            switch (type)
+            {
+                case DATA_NALORAKK:
+                    if (state == DONE)
+                    {
+                        if (QuestMinute)
+                        {
+                            QuestMinute += 15;
+                            DoUpdateWorldState(WORLDSTATE_TIME_TO_SACRIFICE, QuestMinute);
+                        }
+                        SummonHostage(0);
+                    }
+                    break;
+                case DATA_AKILZON:
+                    if (state == DONE)
+                    {
+                        if (QuestMinute)
+                        {
+                            QuestMinute += 10;
+                            DoUpdateWorldState(WORLDSTATE_TIME_TO_SACRIFICE, QuestMinute);
+                        }
+                        SummonHostage(1);
+                    }
+                    break;
+                case DATA_JANALAI:
+                    if (state == DONE)
+                        SummonHostage(2);
+                    break;
+                case DATA_HALAZZI:
+                    if (state == DONE)
+                        SummonHostage(3);
+                    break;
+                case DATA_HEXLORD:
+                    if (state == IN_PROGRESS)
+                        HandleGameObject(HexLordGateGUID, false);
+                    else if (state == NOT_STARTED)
+                        CheckInstanceStatus();
+                    break;
             }
 
-            if (data == DONE)
+            if (state == DONE)
             {
                 ++BossKilled;
                 if (QuestMinute && BossKilled >= DATA_HALAZZI)
@@ -331,29 +307,17 @@ public:
                     QuestMinute = 0;
                     DoUpdateWorldState(WORLDSTATE_SHOW_TIMER, 0);
                 }
+
                 CheckInstanceStatus();
-                SaveToDB();
             }
+
+            return true;
         }
 
         uint32 GetData(uint32 type) const override
         {
             switch (type)
             {
-                case DATA_GONGEVENT:
-                    return m_auiEncounter[DATA_GONGEVENT];
-                case DATA_NALORAKK:
-                    return m_auiEncounter[DATA_NALORAKK];
-                case DATA_AKILZON:
-                    return m_auiEncounter[DATA_AKILZON];
-                case DATA_JANALAI:
-                    return m_auiEncounter[DATA_JANALAI];
-                case DATA_HALAZZI:
-                    return m_auiEncounter[DATA_HALAZZI];
-                case DATA_HEXLORD:
-                    return m_auiEncounter[DATA_HEXLORD];
-                case DATA_ZULJIN:
-                    return m_auiEncounter[DATA_ZULJIN];
                 case DATA_CHESTLOOTED:
                     return ChestLooted;
                 case TYPE_RAND_VENDOR_1:
@@ -383,19 +347,6 @@ public:
                 }
                 QuestTimer -= diff;
             }
-        }
-
-        ObjectGuid GetGuidData(uint32 type) const override
-        {
-            switch (type)
-            {
-                case GO_STRANGE_GONG:
-                    return StrangeGongGUID;
-                case GO_MASSIVE_GATE:
-                    return MassiveGateGUID;
-            }
-
-            return ObjectGuid::Empty;
         }
     };
 

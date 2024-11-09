@@ -643,7 +643,7 @@ public:
                 me->SetTarget();
                 me->SetByteValue(UNIT_FIELD_BYTES_1, UNIT_BYTES_1_OFFSET_STAND_STATE, UNIT_STAND_STATE_DEAD);
                 me->SetDynamicFlag(UNIT_DYNFLAG_DEAD);
-                instance->SetData(DATA_GONGEVENT, DONE);
+                instance->SetData(DATA_UPDATE_INSTANCE_TIMER, 21);
             }
         }
 
@@ -670,32 +670,20 @@ public:
                             _gongTimer = 4000;
                             break;
                         case GONG_EVENT_3:
-                            if (GameObject* gong = me->GetMap()->GetGameObject(instance->GetGuidData(GO_STRANGE_GONG)))
+                            if (GameObject* gong = instance->GetGameObject(DATA_STRANGE_GONG))
                                 gong->RemoveGameObjectFlag(GO_FLAG_NOT_SELECTABLE);
                             _gongEvent = GONG_EVENT_4;
                             _gongTimer = 105000;
                             break;
                         case GONG_EVENT_4:
                             me->RemoveAura(SPELL_BANGING_THE_GONG);
-                            if (GameObject* gong = me->GetMap()->GetGameObject(instance->GetGuidData(GO_STRANGE_GONG)))
+                            if (GameObject* gong = instance->GetGameObject(DATA_STRANGE_GONG))
                                 gong->SetGameObjectFlag(GO_FLAG_NOT_SELECTABLE);
 
-                            // trigger or gong will need to be scripted to set IN_PROGRESS after enough hits.
-                            // This is temp workaround.
-                            instance->SetData(DATA_GONGEVENT, IN_PROGRESS); // to be removed.
-
-                            if (instance->GetData(DATA_GONGEVENT) == IN_PROGRESS)
-                            {
-                                // Players are Now Saved to instance at SPECIAL (Player should be notified?)
-                                me->GetMotionMaster()->MovePath(HARRISON_MOVE_2, false);
-                                _gongEvent = GONG_EVENT_5;
-                                _gongTimer = 5000;
-                            }
-                            else
-                            {
-                                _gongTimer = 1000;
-                                _gongEvent = GONG_EVENT_9;
-                            }
+                            // Players are Now Saved to instance at SPECIAL (Player should be notified?)
+                            me->GetMotionMaster()->MovePath(HARRISON_MOVE_2, false);
+                            _gongEvent = GONG_EVENT_5;
+                            _gongTimer = 5000;
                             break;
                         case GONG_EVENT_5:
                             me->SetEntry(NPC_HARRISON_JONES_1);
@@ -717,29 +705,28 @@ public:
                                 GetCreatureListWithEntryInGrid(targetList, me, NPC_AMANISHI_GUARDIAN, 26.0f);
                                 if (!targetList.empty())
                                 {
-                                    for (std::list<Creature*>::const_iterator itr = targetList.begin(); itr != targetList.end(); ++itr)
+                                    for (auto const& creature : targetList)
                                     {
-                                        if (Creature* ptarget = *itr)
+                                        if (creature)
                                         {
-                                            if (ptarget->GetPositionX() > 120)
+                                            creature->SetImmuneToPC(true);
+                                            creature->SetReactState(REACT_PASSIVE);
+
+                                            if (creature->GetPositionX() > 120)
                                             {
-                                                ptarget->SetUInt32Value(UNIT_VIRTUAL_ITEM_SLOT_ID + 0, uint32(WEAPON_SPEAR));
-                                                ptarget->SetImmuneToPC(true);
-                                                ptarget->SetReactState(REACT_PASSIVE);
-                                                ptarget->AI()->SetData(0, 1);
+                                                creature->SetUInt32Value(UNIT_VIRTUAL_ITEM_SLOT_ID + 0, uint32(WEAPON_SPEAR));
+                                                creature->AI()->SetData(0, 1);
                                             }
                                             else
                                             {
-                                                ptarget->SetImmuneToPC(true);
-                                                ptarget->SetReactState(REACT_PASSIVE);
-                                                ptarget->AI()->SetData(0, 2);
+                                                creature->AI()->SetData(0, 2);
                                             }
                                         }
                                     }
                                 }
                             }
 
-                            if (GameObject* gate = me->GetMap()->GetGameObject(instance->GetGuidData(GO_MASSIVE_GATE)))
+                            if (GameObject* gate = instance->GetGameObject(DATA_MASSIVE_GATE))
                                 gate->SetGoState(GO_STATE_ACTIVE);
                             _gongTimer = 2000;
                             _gongEvent = GONG_EVENT_8;
@@ -764,8 +751,6 @@ public:
                             break;
                         case GONG_EVENT_11:
                             me->SetNpcFlag(UNIT_NPC_FLAG_GOSSIP);
-
-                            instance->SetData(DATA_GONGEVENT, NOT_STARTED);
                             _gongEvent = 0;
                             _gongTimer = 1000;
                             break;
