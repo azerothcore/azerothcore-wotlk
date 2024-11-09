@@ -56,10 +56,11 @@ Position const HarrisonJonesLoc = {120.687f, 1674.0f, 42.0217f, 1.59044f};
 
 DoorData const doorData[] =
 {
-    { GO_ZULJIN_FIREWALL, DATA_ZULJIN,  DOOR_TYPE_ROOM },
-    { GO_DOOR_HALAZZI,    DATA_HALAZZI, DOOR_TYPE_ROOM },
-    { GO_DOOR_AKILZON,    DATA_AKILZON, DOOR_TYPE_ROOM },
-    { 0,                  0,            DOOR_TYPE_ROOM } // END
+    { GO_ZULJIN_FIREWALL, DATA_ZULJIN,  DOOR_TYPE_ROOM    },
+    { GO_DOOR_HALAZZI,    DATA_HALAZZI, DOOR_TYPE_ROOM    },
+    { GO_DOOR_AKILZON,    DATA_AKILZON, DOOR_TYPE_ROOM    },
+    { GO_GATE_ZULJIN,     DATA_HEXLORD, DOOR_TYPE_PASSAGE },
+    { 0,                  0,            DOOR_TYPE_ROOM    } // END
 };
 
 ObjectData const creatureData[] =
@@ -73,7 +74,6 @@ ObjectData const gameObjectData[] =
     { GO_STRANGE_GONG, DATA_STRANGE_GONG },
     { GO_MASSIVE_GATE, DATA_MASSIVE_GATE },
     { GO_GATE_HEXLORD, DATA_HEXLORD_GATE },
-    { GO_GATE_ZULJIN,  DATA_ZULJIN_GATE  },
     { 0,               0                 }
 };
 
@@ -100,7 +100,6 @@ public:
         ObjectGuid HalazziDoorGUID;
 
         uint32 QuestTimer;
-        uint16 BossKilled;
         uint16 QuestMinute;
         uint16 ChestLooted;
         uint32 RandVendor[RAND_VENDOR];
@@ -115,7 +114,6 @@ public:
 
             QuestTimer = 0;
             QuestMinute = 0;
-            BossKilled = 0;
             ChestLooted = 0;
 
             for (uint8 i = 0; i < RAND_VENDOR; ++i)
@@ -138,7 +136,9 @@ public:
 
         void OnGameObjectCreate(GameObject* go) override
         {
-            CheckInstanceStatus();
+            if (go->GetEntry() == GO_GATE_HEXLORD)
+                CheckInstanceStatus();
+
             InstanceScript::OnGameObjectCreate(go);
         }
 
@@ -164,11 +164,8 @@ public:
 
         void CheckInstanceStatus()
         {
-            if (BossKilled >= DATA_HALAZZI)
+            if (AllBossesDone({ DATA_NALORAKK, DATA_AKILZON, DATA_JANALAI, DATA_HALAZZI }))
                 HandleGameObject(ObjectGuid::Empty, true, GetGameObject(DATA_HEXLORD_GATE));
-
-            if (BossKilled >= DATA_HEXLORD)
-                HandleGameObject(ObjectGuid::Empty, true, GetGameObject(DATA_ZULJIN_GATE));
         }
 
         std::string GetSaveData() override
@@ -176,7 +173,7 @@ public:
             OUT_SAVE_INST_DATA;
 
             std::ostringstream ss;
-            ss << "S " << BossKilled << ' ' << ChestLooted << ' ' << QuestMinute;
+            ss << "S "  << ' ' << ChestLooted << ' ' << QuestMinute;
 
             OUT_SAVE_INST_DATA_COMPLETE;
             return ss.str();
@@ -194,7 +191,6 @@ public:
 
             if (dataHead == 'S')
             {
-                BossKilled = data1;
                 ChestLooted = data2;
                 QuestMinute = data3;
             }
@@ -271,8 +267,7 @@ public:
 
             if (state == DONE)
             {
-                ++BossKilled;
-                if (QuestMinute && BossKilled >= DATA_HALAZZI)
+                if (QuestMinute && AllBossesDone({ DATA_NALORAKK, DATA_AKILZON, DATA_JANALAI, DATA_HALAZZI }))
                 {
                     QuestMinute = 0;
                     DoUpdateWorldState(WORLDSTATE_SHOW_TIMER, 0);

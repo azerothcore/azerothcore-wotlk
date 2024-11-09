@@ -39,8 +39,7 @@ enum DataTypes
     DATA_UPDATE_INSTANCE_TIMER          = 11,
     DATA_STRANGE_GONG                   = 12,
     DATA_MASSIVE_GATE                   = 13,
-    DATA_HEXLORD_GATE                   = 14,
-    DATA_ZULJIN_GATE                    = 15
+    DATA_HEXLORD_GATE                   = 14
 };
 
 enum CreatureIds

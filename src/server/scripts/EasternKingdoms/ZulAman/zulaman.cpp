@@ -594,9 +594,7 @@ enum Weapons
 class npc_harrison_jones : public CreatureScript
 {
 public:
-    npc_harrison_jones() : CreatureScript("npc_harrison_jones")
-    {
-    }
+    npc_harrison_jones() : CreatureScript("npc_harrison_jones") { }
 
     struct npc_harrison_jonesAI : public ScriptedAI
     {
