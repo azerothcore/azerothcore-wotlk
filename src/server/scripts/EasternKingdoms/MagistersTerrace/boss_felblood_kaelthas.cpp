@@ -70,6 +70,7 @@ enum Misc
     EVENT_GRAVITY_LAPSE_4       = 11,
     EVENT_GRAVITY_LAPSE_5       = 12,
     EVENT_FINISH_TALK           = 13,
+    EVENT_SWITCH_TARGET         = 14,
 
     ACTION_TELEPORT_PLAYERS     = 1,
     ACTION_KNOCKUP              = 2,
@@ -309,8 +310,66 @@ class spell_mt_phoenix_burn : public SpellScript
     }
 };
 
+struct npc_arcane_sphere : public ScriptedAI
+{
+    npc_arcane_sphere(Creature* creature) : ScriptedAI(creature) {}
+
+    EventMap events;
+    ObjectGuid currentTargetGuid;
+
+    void Reset() override
+    {
+        events.Reset();
+        SelectNewTarget();
+        events.ScheduleEvent(EVENT_SWITCH_TARGET, urand(10000, 15000));
+    }
+
+    void SelectNewTarget()
+    {
+        std::list<Player*> playerList;
+
+        Map::PlayerList const& players = me->GetMap()->GetPlayers();
+        for (Map::PlayerList::const_iterator itr = players.begin(); itr != players.end(); ++itr)
+        {
+            if (Player* player = itr->GetSource())
+            {
+                if (me->IsWithinDistInMap(player, 100.0f) && player->IsAlive())
+                {
+                    playerList.push_back(player);
+                }
+            }
+        }
+
+        playerList.remove_if([this](Player* player) { return player->GetGUID() == currentTargetGuid; });
+
+        if (!playerList.empty())
+        {
+            Player* newTarget = Acore::Containers::SelectRandomContainerElement(playerList);
+            if (newTarget)
+            {
+                currentTargetGuid = newTarget->GetGUID();
+                AttackStart(newTarget);
+            }
+        }
+    }
+
+    void UpdateAI(uint32 diff) override
+    {
+        events.Update(diff);
+
+        if (events.ExecuteEvent() == EVENT_SWITCH_TARGET)
+        {
+            SelectNewTarget();
+            events.ScheduleEvent(EVENT_SWITCH_TARGET, urand(10000, 15000));
+        }
+
+        DoMeleeAttackIfReady();
+    }
+};
+
 void AddSC_boss_felblood_kaelthas()
 {
     RegisterMagistersTerraceCreatureAI(boss_felblood_kaelthas);
     RegisterSpellScript(spell_mt_phoenix_burn);
+    RegisterCreatureAI(npc_arcane_sphere);
 }
