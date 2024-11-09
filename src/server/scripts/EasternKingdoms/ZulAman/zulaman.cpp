@@ -299,17 +299,14 @@ public:
 
         creature->RemoveNpcFlag(UNIT_NPC_FLAG_GOSSIP);
 
-        if (InstanceScript* instance = creature->GetInstanceScript())
+        float x, y, z;
+        creature->GetPosition(x, y, z);
+        for (uint8 i = 0; i < 4; ++i)
         {
-            float x, y, z;
-            creature->GetPosition(x, y, z);
-            for (uint8 i = 0; i < 4; ++i)
+            if (HostageEntry[i] == creature->GetEntry())
             {
-                if (HostageEntry[i] == creature->GetEntry())
-                {
-                    creature->SummonGameObject(ChestEntry[i], x - 2, y, z, 0, 0, 0, 0, 0, 0);
-                    break;
-                }
+                creature->SummonGameObject(ChestEntry[i], x - 2, y, z, 0, 0, 0, 0, 0, 0);
+                break;
             }
         }
 
