@@ -457,7 +457,7 @@ void BotMgr::LoadConfig(bool reload)
     _max_npcbots = {};
     std::string max_npcbots_by_levels = sConfigMgr->GetStringDefault("NpcBot.MaxBots", "1,1,1,1,1,1,1,1,1");
     std::vector<std::string_view> toks0 = Bcore::Tokenize(max_npcbots_by_levels, ',', false);
-    ASSERT(toks0.size() == BracketsCount, "NpcBot.MaxBots must have exactly %u values", uint32(BracketsCount));
+    ASSERT(toks0.size() == BRACKETS_COUNT, "NpcBot.MaxBots must have exactly %u values", uint32(BRACKETS_COUNT));
     for (decltype(toks0)::size_type i = 0; i != toks0.size(); ++i)
     {
         Optional<uint8> val = Bcore::StringTo<uint8>(toks0[i]);
@@ -484,7 +484,7 @@ void BotMgr::LoadConfig(bool reload)
     _mult_dmg_levels.clear();
     std::string mult_dps_by_levels = sConfigMgr->GetStringDefault("NpcBot.Mult.Damage.Levels", "1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0");
     std::vector<std::string_view> toks1 = Bcore::Tokenize(mult_dps_by_levels, ',', false);
-    ASSERT(toks1.size() >= BracketsCount, "NpcBot.Mult.Damage.Levels must have at least %u values", uint32(BracketsCount));
+    ASSERT(toks1.size() >= BRACKETS_COUNT, "NpcBot.Mult.Damage.Levels must have at least %u values", uint32(BRACKETS_COUNT));
     for (decltype(toks1)::size_type i = 0; i != toks1.size(); ++i)
     {
         Optional<float> val = Bcore::StringTo<float>(toks1[i]);
@@ -498,7 +498,7 @@ void BotMgr::LoadConfig(bool reload)
     _mult_heal_levels.clear();
     std::string mult_healing_by_levels = sConfigMgr->GetStringDefault("NpcBot.Mult.Healing.Levels", "1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0");
     std::vector<std::string_view> toks5 = Bcore::Tokenize(mult_healing_by_levels, ',', false);
-    ASSERT(toks5.size() >= BracketsCount, "NpcBot.Mult.Healing.Levels must have at least %u values", uint32(BracketsCount));
+    ASSERT(toks5.size() >= BRACKETS_COUNT, "NpcBot.Mult.Healing.Levels must have at least %u values", uint32(BRACKETS_COUNT));
     for (decltype(toks5)::size_type i = 0; i != toks5.size(); ++i)
     {
         Optional<float> val = Bcore::StringTo<float>(toks5[i]);
@@ -512,7 +512,7 @@ void BotMgr::LoadConfig(bool reload)
     _mult_hp_levels.clear();
     std::string mult_hp_by_levels = sConfigMgr->GetStringDefault("NpcBot.Mult.HP.Levels", "1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0");
     std::vector<std::string_view> toks6 = Bcore::Tokenize(mult_hp_by_levels, ',', false);
-    ASSERT(toks6.size() >= BracketsCount, "NpcBot.Mult.HP.Levels must have at least %u values", uint32(BracketsCount));
+    ASSERT(toks6.size() >= BRACKETS_COUNT, "NpcBot.Mult.HP.Levels must have at least %u values", uint32(BRACKETS_COUNT));
     for (decltype(toks6)::size_type i = 0; i != toks6.size(); ++i)
     {
         Optional<float> val = Bcore::StringTo<float>(toks6[i]);
@@ -526,7 +526,7 @@ void BotMgr::LoadConfig(bool reload)
     _mult_mp_levels.clear();
     std::string mult_mp_by_levels = sConfigMgr->GetStringDefault("NpcBot.Mult.MP.Levels", "1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0");
     std::vector<std::string_view> toks7 = Bcore::Tokenize(mult_mp_by_levels, ',', false);
-    ASSERT(toks7.size() >= BracketsCount, "NpcBot.Mult.MP.Levels must have at least %u values", uint32(BracketsCount));
+    ASSERT(toks7.size() >= BRACKETS_COUNT, "NpcBot.Mult.MP.Levels must have at least %u values", uint32(BRACKETS_COUNT));
     for (decltype(toks7)::size_type i = 0; i != toks7.size(); ++i)
     {
         Optional<float> val = Bcore::StringTo<float>(toks7[i]);
@@ -540,7 +540,7 @@ void BotMgr::LoadConfig(bool reload)
     _botwanderer_pct_level_brackets = {};
     std::string wanderers_by_levels = sConfigMgr->GetStringDefault("NpcBot.WanderingBots.Continents.Levels", "20,15,15,10,10,15,15,0,0");
     std::vector<std::string_view> toks2 = Bcore::Tokenize(wanderers_by_levels, ',', false);
-    ASSERT(toks2.size() == BracketsCount, "NpcBot.WanderingBots.Continents.Levels must have exactly %u values", uint32(BracketsCount));
+    ASSERT(toks2.size() == BRACKETS_COUNT, "NpcBot.WanderingBots.Continents.Levels must have exactly %u values", uint32(BRACKETS_COUNT));
     uint32 total_pct = 0;
     for (decltype(toks2)::size_type i = 0; i != toks2.size(); ++i)
     {
@@ -603,7 +603,7 @@ void BotMgr::LoadConfig(bool reload)
     _botwanderer_itemlvl_level_brackets = {};
     std::string itemlevel_by_levels = sConfigMgr->GetStringDefault("NpcBot.WanderingBots.MaxItemLevel.Levels", "0,0,0,0,0,0,0,0,0");
     std::vector<std::string_view> tok8 = Bcore::Tokenize(itemlevel_by_levels, ',', false);
-    ASSERT(tok8.size() == BracketsCount, "NpcBot.WanderingBots.MaxItemLevel.Levels must have exactly %u values", uint32(BracketsCount));
+    ASSERT(tok8.size() == BRACKETS_COUNT, "NpcBot.WanderingBots.MaxItemLevel.Levels must have exactly %u values", uint32(BRACKETS_COUNT));
     for (decltype(tok8)::size_type i = 0; i != tok8.size(); ++i)
     {
         Optional<uint32> val = Bcore::StringTo<uint32>(tok8[i]);
@@ -1090,7 +1090,7 @@ uint8 BotMgr::GetNpcBotMountLevel100()
 
 uint8 BotMgr::GetMaxNpcBots(uint8 level)
 {
-    return _max_npcbots[std::min<size_t>(BracketsCount - 1, level / 10)];
+    return _max_npcbots[std::min<size_t>(BRACKETS_COUNT - 1, level / 10)];
 }
 
 int32 BotMgr::GetBotInfoPacketsLimit()
@@ -2236,14 +2236,14 @@ std::string BotMgr::GetTargetIconString(uint8 icon_idx) const
 {
     std::ostringstream ss;
     ss << "|TInterface\\TargetingFrame\\UI-RaidTargetingIcon_" << uint32(icon_idx + 1) << ":12|t";
-    if (size_t(icon_idx) < TargetIconNamesCacheSize)
+    if (size_t(icon_idx) < TARGET_ICON_NAMES_CACHE_SIZE)
         ss << _targetIconNamesCache[icon_idx];
 
     return ss.str();
 }
 void BotMgr::UpdateTargetIconName(uint8 id, std::string const& name)
 {
-    if (id >= TargetIconNamesCacheSize)
+    if (id >= TARGET_ICON_NAMES_CACHE_SIZE)
         return;
 
     _targetIconNamesCache[id] = name;
@@ -3143,7 +3143,7 @@ PctBrackets BotMgr::GetBotWandererLevelBrackets()
 }
 uint32 BotMgr::GetBotWandererMaxItemLevel(uint8 level)
 {
-    return _botwanderer_itemlvl_level_brackets[std::min<size_t>(BracketsCount - 1, level / 10)];
+    return _botwanderer_itemlvl_level_brackets[std::min<size_t>(BRACKETS_COUNT - 1, level / 10)];
 }
 float BotMgr::GetBotDamageModByClass(uint8 botclass)
 {
