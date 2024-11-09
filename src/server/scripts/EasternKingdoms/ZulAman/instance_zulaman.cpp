@@ -91,25 +91,14 @@ public:
     {
         instance_zulaman_InstanceMapScript(Map* map) : InstanceScript(map) {}
 
-        ObjectGuid HarrisonJonesGUID;
-
-        ObjectGuid AkilzonDoorGUID;
-        ObjectGuid HalazziDoorGUID;
-
-        uint32 QuestTimer;
-        uint16 QuestMinute;
-        uint32 RandVendor[RAND_VENDOR];
-
         void Initialize() override
         {
             SetHeaders(DataHeader);
             LoadObjectData(creatureData, gameObjectData);
             SetBossNumber(MAX_ENCOUNTER);
+            SetPersistentDataCount(PersistentDataCount);
             LoadBossBoundaries(boundaries);
             LoadDoorData(doorData);
-
-            QuestTimer = 0;
-            QuestMinute = 0;
 
             for (uint8 i = 0; i < RAND_VENDOR; ++i)
                 RandVendor[i] = NOT_STARTED;
@@ -117,16 +106,8 @@ public:
 
         void OnPlayerEnter(Player* /*player*/) override
         {
-            if (!HarrisonJonesGUID)
-                instance->SummonCreature(NPC_HARRISON_JONES, HarrisonJonesLoc);
-        }
-
-        void OnCreatureCreate(Creature* creature) override
-        {
-            if (creature->GetEntry() == NPC_HARRISON_JONES)
-                HarrisonJonesGUID = creature->GetGUID();
-
-            InstanceScript::OnCreatureCreate(creature);
+            if (!scheduler.IsGroupScheduled(GROUP_TIMED_RUN))
+                DoAction(ACTION_START_TIMED_RUN);
         }
 
         void OnGameObjectCreate(GameObject* go) override
@@ -139,7 +120,7 @@ public:
 
         void SummonHostage(uint8 num)
         {
-            if (!QuestMinute)
+            if (!GetPersistentData(DATA_TIMED_RUN))
                 return;
 
             Map::PlayerList const& PlayerList = instance->GetPlayers();
@@ -157,41 +138,36 @@ public:
             }
         }
 
+        void DoAction(int32 actionId) override
+        {
+            if (actionId == ACTION_START_TIMED_RUN)
+            {
+                if (uint32 timer = GetPersistentData(DATA_TIMED_RUN))
+                {
+                    DoUpdateWorldState(WORLDSTATE_SHOW_TIMER, 1);
+                    DoUpdateWorldState(WORLDSTATE_TIME_TO_SACRIFICE, timer);
+                }
+
+                scheduler.Schedule(1min, GROUP_TIMED_RUN, [this](TaskContext context)
+                {
+                    if (uint32 timer = GetPersistentData(DATA_TIMED_RUN))
+                    {
+                        --timer;
+                        DoUpdateWorldState(WORLDSTATE_SHOW_TIMER, 1);
+                        DoUpdateWorldState(WORLDSTATE_TIME_TO_SACRIFICE, timer);
+                        StorePersistentData(DATA_TIMED_RUN, timer);
+                        context.Repeat();
+                    }
+                    else
+                        DoUpdateWorldState(WORLDSTATE_SHOW_TIMER, 0);
+                });
+            }
+        }
+
         void CheckInstanceStatus()
         {
             if (AllBossesDone({ DATA_NALORAKK, DATA_AKILZON, DATA_JANALAI, DATA_HALAZZI }))
                 HandleGameObject(ObjectGuid::Empty, true, GetGameObject(DATA_HEXLORD_GATE));
-        }
-
-        std::string GetSaveData() override
-        {
-            OUT_SAVE_INST_DATA;
-
-            std::ostringstream ss;
-            ss << "S "  << ' ' << QuestMinute;
-
-            OUT_SAVE_INST_DATA_COMPLETE;
-            return ss.str();
-        }
-
-        void Load(const char* load) override
-        {
-            if (!load)
-                return;
-
-            std::istringstream ss(load);
-            char dataHead; // S
-            uint16 data1, data2;
-            ss >> dataHead >> data1 >> data2;
-
-            if (dataHead == 'S')
-            {
-                QuestMinute = data2;
-            }
-            else
-            {
-                LOG_ERROR("misc", "Zul'aman: corrupted save data.");
-            }
         }
 
         void SetData(uint32 type, uint32 data) override
@@ -203,9 +179,6 @@ public:
                     break;
                 case TYPE_RAND_VENDOR_2:
                     RandVendor[1] = data;
-                    break;
-                case DATA_UPDATE_INSTANCE_TIMER:
-                    QuestMinute = data;
                     break;
             }
         }
@@ -220,10 +193,10 @@ public:
                 case DATA_NALORAKK:
                     if (state == DONE)
                     {
-                        if (QuestMinute)
+                        if (uint32 timer = GetPersistentData(DATA_TIMED_RUN))
                         {
-                            QuestMinute += 15;
-                            DoUpdateWorldState(WORLDSTATE_TIME_TO_SACRIFICE, QuestMinute);
+                            StorePersistentData(DATA_TIMED_RUN, timer += 15);
+                            DoUpdateWorldState(WORLDSTATE_TIME_TO_SACRIFICE, timer);
                         }
                         SummonHostage(0);
                     }
@@ -231,10 +204,10 @@ public:
                 case DATA_AKILZON:
                     if (state == DONE)
                     {
-                        if (QuestMinute)
+                        if (uint32 timer = GetPersistentData(DATA_TIMED_RUN))
                         {
-                            QuestMinute += 10;
-                            DoUpdateWorldState(WORLDSTATE_TIME_TO_SACRIFICE, QuestMinute);
+                            StorePersistentData(DATA_TIMED_RUN, timer += 10);
+                            DoUpdateWorldState(WORLDSTATE_TIME_TO_SACRIFICE, timer);
                         }
                         SummonHostage(1);
                     }
@@ -257,9 +230,9 @@ public:
 
             if (state == DONE)
             {
-                if (QuestMinute && AllBossesDone({ DATA_NALORAKK, DATA_AKILZON, DATA_JANALAI, DATA_HALAZZI }))
+                if (GetPersistentData(DATA_TIMED_RUN) && AllBossesDone({ DATA_NALORAKK, DATA_AKILZON, DATA_JANALAI, DATA_HALAZZI }))
                 {
-                    QuestMinute = 0;
+                    StorePersistentData(DATA_TIMED_RUN, 0);
                     DoUpdateWorldState(WORLDSTATE_SHOW_TIMER, 0);
                 }
 
@@ -284,23 +257,11 @@ public:
 
         void Update(uint32 diff) override
         {
-            if (QuestMinute)
-            {
-                if (QuestTimer <= diff)
-                {
-                    QuestMinute--;
-                    SaveToDB();
-                    QuestTimer += 60000;
-                    if (QuestMinute)
-                    {
-                        DoUpdateWorldState(WORLDSTATE_SHOW_TIMER, 1);
-                        DoUpdateWorldState(WORLDSTATE_TIME_TO_SACRIFICE, QuestMinute);
-                    }
-                    else DoUpdateWorldState(WORLDSTATE_SHOW_TIMER, 0);
-                }
-                QuestTimer -= diff;
-            }
+            scheduler.Update(diff);
         }
+
+        private:
+            uint32 RandVendor[RAND_VENDOR];
     };
 
     InstanceScript* GetInstanceScript(InstanceMap* map) const override

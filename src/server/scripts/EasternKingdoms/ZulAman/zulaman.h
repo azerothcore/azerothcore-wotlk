@@ -35,10 +35,9 @@ enum DataTypes
     DATA_SPIRIT_LYNX                    = 7,
     TYPE_RAND_VENDOR_1                  = 8,
     TYPE_RAND_VENDOR_2                  = 9,
-    DATA_UPDATE_INSTANCE_TIMER          = 10,
-    DATA_STRANGE_GONG                   = 11,
-    DATA_MASSIVE_GATE                   = 12,
-    DATA_HEXLORD_GATE                   = 13
+    DATA_STRANGE_GONG                   = 10,
+    DATA_MASSIVE_GATE                   = 11,
+    DATA_HEXLORD_GATE                   = 12
 };
 
 enum CreatureIds
@@ -70,6 +69,15 @@ enum GameobjectIds
     GO_KRAZS_PACKAGE                    = 186667,
     GO_STRANGE_GONG                     = 187359
 };
+
+enum MiscIds
+{
+    DATA_TIMED_RUN                      = 0,
+    ACTION_START_TIMED_RUN              = 0,
+    GROUP_TIMED_RUN                     = 1
+};
+
+uint32 constexpr PersistentDataCount = 1;
 
 template <class AI, class T>
 inline AI* GetZulAmanAI(T* obj)

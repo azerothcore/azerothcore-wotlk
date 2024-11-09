@@ -639,7 +639,8 @@ public:
                 me->SetTarget();
                 me->SetByteValue(UNIT_FIELD_BYTES_1, UNIT_BYTES_1_OFFSET_STAND_STATE, UNIT_STAND_STATE_DEAD);
                 me->SetDynamicFlag(UNIT_DYNFLAG_DEAD);
-                instance->SetData(DATA_UPDATE_INSTANCE_TIMER, 21);
+                instance->StorePersistentData(DATA_TIMED_RUN, 21);
+                instance->DoAction(ACTION_START_TIMED_RUN);
             }
         }
 
