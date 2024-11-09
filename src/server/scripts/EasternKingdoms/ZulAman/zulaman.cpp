@@ -63,66 +63,14 @@ enum ForestFrog
     NPC_BRENNAN                       = 24453,
     NPC_HOLLEE                        = 24455,
 
-    // Says
-    SAY_MANNUTH_0                     = 0,
-    SAY_MANNUTH_1                     = 1,
-    SAY_MANNUTH_2                     = 2,
-    SAY_MANNUTH_3                     = 3,
+    // Adarrah is spawned elsewhere.
+    // So her text 0 isn't used in this instance.
+    SAY_THANKS_FREED                  = 0,
+    SAY_CHEST_SPAWN                   = 1,
+    SAY_CHEST_TALK                    = 2,
+    SAY_GOODBYE                       = 3,
 
-    SAY_DEEZ_0                        = 0,
-    SAY_DEEZ_1                        = 1,
-    SAY_DEEZ_2                        = 2,
-    SAY_DEEZ_3                        = 3,
-
-    SAY_GALATHRYN_0                   = 0,
-    SAY_GALATHRYN_1                   = 1,
-    SAY_GALATHRYN_2                   = 2,
-    SAY_GALATHRYN_3                   = 3,
-
-    SAY_ADARRAH_1                     = 1,
-    SAY_ADARRAH_2                     = 2,
-    SAY_ADARRAH_3                     = 3,
-    SAY_ADARRAH_4                     = 4,
-
-    SAY_DARWEN_0                      = 0,
-    SAY_DARWEN_1                      = 1,
-    SAY_DARWEN_2                      = 2,
-    SAY_DARWEN_3                      = 3,
-
-    SAY_FUDGERICK_0                   = 0,
-    SAY_FUDGERICK_1                   = 1,
-    SAY_FUDGERICK_2                   = 2,
-    SAY_FUDGERICK_3                   = 3,
-
-    SAY_GUNTER_0                      = 0,
-    SAY_GUNTER_1                      = 1,
-    SAY_GUNTER_2                      = 2,
-
-    SAY_KYREN_0                       = 0,
-    SAY_KYREN_1                       = 1,
-    SAY_KYREN_2                       = 2,
-
-    SAY_MITZI_0                       = 0,
-    SAY_MITZI_1                       = 1,
-    SAY_MITZI_2                       = 2,
-    SAY_MITZI_3                       = 3,
-
-    SAY_CHRISTIAN_0                   = 0,
-    SAY_CHRISTIAN_1                   = 1,
-    SAY_CHRISTIAN_2                   = 2,
-    SAY_CHRISTIAN_3                   = 3,
-
-    SAY_BRENNAN_0                     = 0,
-    SAY_BRENNAN_1                     = 1,
-    SAY_BRENNAN_2                     = 2,
-    SAY_BRENNAN_3                     = 3,
-
-    SAY_HOLLEE_0                      = 0,
-    SAY_HOLLEE_1                      = 1,
-    SAY_HOLLEE_2                      = 2,
-    SAY_HOLLEE_3                      = 3,
-
-    POINT_DESPAWN                     = 1
+    POINT_DESPAWN                     = 1,
 };
 
 class npc_forest_frog : public CreatureScript
@@ -161,45 +109,12 @@ public:
                 switch (events.ExecuteEvent())
                 {
                     case 1:
-                        switch (me->GetEntry())
-                        {
-                            case NPC_MANNUTH:
-                                Talk(SAY_MANNUTH_0, player);
-                                break;
-                            case NPC_DEEZ:
-                                Talk(SAY_DEEZ_0, player);
-                                break;
-                            case NPC_GALATHRYN:
-                                Talk(SAY_GALATHRYN_0, player);
-                                break;
-                            case NPC_ADARRAH:
-                                Talk(SAY_ADARRAH_1, player);
-                                break;
-                            case NPC_DARWEN:
-                                Talk(SAY_DARWEN_0, player);
-                                break;
-                            case NPC_FUDGERICK:
-                                Talk(SAY_FUDGERICK_0, player);
-                                break;
-                            case NPC_GUNTER:
-                                Talk(SAY_GUNTER_0, player);
-                                break;
-                            case NPC_KYREN:
-                                Talk(SAY_KYREN_0, player);
-                                break;
-                            case NPC_MITZI:
-                                Talk(SAY_MITZI_0, player);
-                                break;
-                            case NPC_CHRISTIAN:
-                                Talk(SAY_CHRISTIAN_0, player);
-                                break;
-                            case NPC_BRENNAN:
-                                Talk(SAY_BRENNAN_0, player);
-                                break;
-                            case NPC_HOLLEE:
-                                Talk(SAY_HOLLEE_0, player);
-                                break;
-                        }
+
+                        if (me->GetEntry() == NPC_ADARRAH)
+                            Talk(SAY_THANKS_FREED + 1, player);
+                        else
+                            Talk(SAY_THANKS_FREED, player);
+
                         eventTimer = 2;
                         events.ScheduleEvent(eventTimer, urand(4000, 5000));
                         break;
@@ -210,52 +125,31 @@ public:
                         switch (me->GetEntry())
                         {
                             case NPC_MANNUTH:
-                                DoCast(me, SPELL_SUMMON_AMANI_CHARM_CHEST_2, true);
-                                Talk(SAY_MANNUTH_1, player);
-                                break;
                             case NPC_DEEZ:
-                                DoCast(me, SPELL_SUMMON_AMANI_CHARM_CHEST_2, true);
-                                Talk(SAY_DEEZ_1, player);
-                                break;
                             case NPC_GALATHRYN:
-                                DoCast(me, SPELL_SUMMON_AMANI_CHARM_CHEST_2, true);
-                                Talk(SAY_GALATHRYN_1, player);
+                                DoCastSelf(SPELL_SUMMON_AMANI_CHARM_CHEST_2, true);
+                                Talk(SAY_CHEST_SPAWN, player);
                                 break;
                             case NPC_ADARRAH:
-                                DoCast(me, SPELL_SUMMON_AMANI_CHARM_CHEST_2, true);
-                                Talk(SAY_ADARRAH_2, player);
+                                DoCastSelf(SPELL_SUMMON_AMANI_CHARM_CHEST_2, true);
+                                Talk(SAY_CHEST_SPAWN + 1, player);
                                 break;
                             case NPC_DARWEN:
-                                DoCast(me, SPELL_SUMMON_MONEY_BAG, true);
-                                me->LoadEquipment(0, true);
-                                Talk(SAY_DARWEN_1, player);
-                                break;
                             case NPC_FUDGERICK:
-                                DoCast(me, SPELL_SUMMON_MONEY_BAG, true);
+                                DoCastSelf(SPELL_SUMMON_MONEY_BAG, true);
                                 me->LoadEquipment(0, true);
-                                Talk(SAY_FUDGERICK_1, player);
-                                break;
-                            case NPC_GUNTER:
-                                Talk(SAY_GUNTER_1, player);
+                                Talk(SAY_CHEST_SPAWN, player);
                                 break;
                             case NPC_KYREN:
-                                Talk(SAY_KYREN_1, player);
+                            case NPC_GUNTER:
+                                Talk(SAY_CHEST_SPAWN, player);
                                 break;
                             case NPC_MITZI:
-                                DoCast(me, SPELL_SUMMON_AMANI_CHARM_CHEST_1, true);
-                                Talk(SAY_MITZI_1, player);
-                                break;
                             case NPC_CHRISTIAN:
-                                DoCast(me, SPELL_SUMMON_AMANI_CHARM_CHEST_1, true);
-                                Talk(SAY_CHRISTIAN_1, player);
-                                break;
                             case NPC_BRENNAN:
-                                DoCast(me, SPELL_SUMMON_AMANI_CHARM_CHEST_1, true);
-                                Talk(SAY_BRENNAN_1, player);
-                                break;
                             case NPC_HOLLEE:
-                                DoCast(me, SPELL_SUMMON_AMANI_CHARM_CHEST_1, true);
-                                Talk(SAY_HOLLEE_1, player);
+                                DoCastSelf(SPELL_SUMMON_AMANI_CHARM_CHEST_1, true);
+                                Talk(SAY_CHEST_SPAWN, player);
                                 break;
                         }
                         eventTimer = 3;
@@ -263,45 +157,12 @@ public:
                         break;
                     case 3:
                         me->SetStandState(EMOTE_ONESHOT_NONE);
-                        switch (me->GetEntry())
-                        {
-                            case NPC_MANNUTH:
-                                Talk(SAY_MANNUTH_2, player);
-                                break;
-                            case NPC_DEEZ:
-                                Talk(SAY_DEEZ_2, player);
-                                break;
-                            case NPC_GALATHRYN:
-                                Talk(SAY_GALATHRYN_2, player);
-                                break;
-                            case NPC_ADARRAH:
-                                Talk(SAY_ADARRAH_3, player);
-                                break;
-                            case NPC_DARWEN:
-                                Talk(SAY_DARWEN_2, player);
-                                break;
-                            case NPC_FUDGERICK:
-                                Talk(SAY_FUDGERICK_2, player);
-                                break;
-                            case NPC_GUNTER:
-                                Talk(SAY_GUNTER_2, player);
-                                break;
-                            case NPC_KYREN:
-                                Talk(SAY_KYREN_2, player);
-                                break;
-                            case NPC_MITZI:
-                                Talk(SAY_MITZI_2, player);
-                                break;
-                            case NPC_CHRISTIAN:
-                                Talk(SAY_CHRISTIAN_2, player);
-                                break;
-                            case NPC_BRENNAN:
-                                Talk(SAY_BRENNAN_2, player);
-                                break;
-                            case NPC_HOLLEE:
-                                Talk(SAY_HOLLEE_2, player);
-                                break;
-                        }
+
+                        if (me->GetEntry() == NPC_ADARRAH)
+                            Talk(SAY_CHEST_TALK + 1, player);
+                        else
+                            Talk(SAY_CHEST_TALK);
+
                         eventTimer = 4;
                         if (me->GetEntry() == NPC_GUNTER || me->GetEntry() == NPC_KYREN)
                             events.ScheduleEvent(eventTimer, 5 * MINUTE * IN_MILLISECONDS); // vendors wait for 5 minutes before running away and despawning
@@ -310,49 +171,20 @@ public:
                         break;
                     case 4:
                         me->HandleEmoteCommand(EMOTE_ONESHOT_WAVE);
-                        switch (me->GetEntry())
-                        {
-                            case NPC_MANNUTH:
-                                Talk(SAY_MANNUTH_3, player);
-                                break;
-                            case NPC_DEEZ:
-                                Talk(SAY_DEEZ_3, player);
-                                break;
-                            case NPC_GALATHRYN:
-                                Talk(SAY_GALATHRYN_3, player);
-                                break;
-                            case NPC_ADARRAH:
-                                Talk(SAY_ADARRAH_4, player);
-                                break;
-                            case NPC_DARWEN:
-                                Talk(SAY_DARWEN_3, player);
-                                break;
-                            case NPC_FUDGERICK:
-                                Talk(SAY_FUDGERICK_3, player);
-                                break;
-                            case NPC_MITZI:
-                                Talk(SAY_MITZI_3, player);
-                                break;
-                            case NPC_CHRISTIAN:
-                                Talk(SAY_CHRISTIAN_3, player);
-                                break;
-                            case NPC_BRENNAN:
-                                Talk(SAY_BRENNAN_3, player);
-                                break;
-                            case NPC_HOLLEE:
-                                Talk(SAY_HOLLEE_3, player);
-                                break;
-                        }
+
+                        if (me->GetEntry() == NPC_ADARRAH)
+                            Talk(SAY_GOODBYE + 1, player);
+                        else
+                            Talk(SAY_GOODBYE);
+
                         eventTimer = 5;
                         events.ScheduleEvent(eventTimer, 2000);
                         break;
                     case 5:
-                        switch (me->GetEntry())
-                        {
-                            case NPC_ADARRAH:
-                                DoCast(me, SPELL_STEALTH_, true);
-                                break;
-                        }
+
+                        if (me->GetEntry() == NPC_ADARRAH)
+                            DoCastSelf(SPELL_STEALTH_, true);
+
                         if (me->GetPositionY() > 1290.0f)
                             me->GetMotionMaster()->MovePoint(POINT_DESPAWN, 118.2742f, 1400.657f, -9.118711f);
                         else
