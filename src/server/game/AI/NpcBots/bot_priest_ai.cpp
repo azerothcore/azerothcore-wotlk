@@ -524,7 +524,6 @@ public:
             {
                 SummonBotPet(mytar);
                 SetSpellCooldown(SHADOWFIEND_1, 180000); // (5 - 2) min with Veiled Shadows
-                return;
             }
 
             if (!HasRole(BOT_ROLE_HEAL) || GetManaPCT(me) > 35 || botPet)
@@ -538,7 +537,7 @@ public:
                     !mytar->GetAuraEffect(SPELL_AURA_PERIODIC_DAMAGE, SPELLFAMILY_PRIEST, 0x0, 0x400, 0x0, me->GetGUID()) &&
                     doCast(mytar, GetSpell(VAMPIRIC_TOUCH_1)))
                     return;
-                if (IsSpellReady(SW_PAIN_1, diff) && can_do_shadow && Rand() < 60 &&
+                if (IsSpellReady(SW_PAIN_1, diff) && can_do_shadow && Rand() < 100 &&
                     mytar->GetHealth() > me->GetMaxHealth()/2 * (1 + mytar->getAttackers().size()) &&
                     !mytar->GetAuraEffect(SPELL_AURA_PERIODIC_DAMAGE, SPELLFAMILY_PRIEST, 0x8000, 0x0, 0x0, me->GetGUID()))
                 {
@@ -547,7 +546,7 @@ public:
                         if (doCast(mytar, GetSpell(SW_PAIN_1)))
                             return;
                 }
-                if (IsSpellReady(DEVOURING_PLAGUE_1, diff) && can_do_shadow && !Devcheck && Rand() < 80 &&
+                if (IsSpellReady(DEVOURING_PLAGUE_1, diff) && can_do_shadow && !Devcheck && Rand() < 100 &&
                     (GetSpec() == BOT_SPEC_PRIEST_SHADOW || mytar->IsControlledByPlayer()) &&
                     mytar->GetHealth() > me->GetMaxHealth()/2 * (1 + mytar->getAttackers().size()) &&
                     !(mytar->GetTypeId() == TYPEID_UNIT && (mytar->ToCreature()->GetCreatureTemplate()->MechanicImmuneMask & (1<<(MECHANIC_INFECTED-1)))) &&

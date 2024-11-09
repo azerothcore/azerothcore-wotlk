@@ -543,14 +543,14 @@ public:
             return false;
 
         uint32 total_bots_in_brackets = 0;
-        for (size_t k = 0; k < BracketsCount; ++k)
+        for (size_t k = 0; k < BRACKETS_COUNT; ++k)
         {
             if (!bracketPcts[k])
                 continue;
             bots_per_bracket[k] = CalculatePct(count, bracketPcts[k]);
             total_bots_in_brackets += bots_per_bracket[k];
         }
-        for (int32 j = BracketsCount - 1; j >= 0; --j)
+        for (int32 j = BRACKETS_COUNT - 1; j >= 0; --j)
         {
             if (bots_per_bracket[j])
             {
@@ -561,7 +561,7 @@ public:
 
         std::vector<uint8> brackets_shuffled;
         brackets_shuffled.reserve(count);
-        for (uint8 bracket = 0; bracket < BracketsCount; ++bracket)
+        for (uint8 bracket = 0; bracket < BRACKETS_COUNT; ++bracket)
         {
             while (bots_per_bracket[bracket])
             {
@@ -1553,7 +1553,14 @@ bool BotDataMgr::GenerateBattlegroundBots(Player const* groupLeader, [[maybe_unu
     uint32 minteamplayers = bg_template->GetMinPlayersPerTeam();
     uint32 maxteamplayers = bg_template->GetMaxPlayersPerTeam();
 
-    RoundToInterval(tarteamplayers, minteamplayers, maxteamplayers);
+    uint32 normalCount = tarteamplayers;
+    RoundToInterval(normalCount, minteamplayers, maxteamplayers);
+    if (tarteamplayers != normalCount)
+    {
+        BOT_LOG_ERROR("npcbots", "NpcBot.WanderingBots.BG.TargetTeamPlayersCount value {} for BG {} '{}' is out of bounds ({}-{})! Normalized to {}!",
+            tarteamplayers, uint32(bgTypeId), bg_template->GetName(), minteamplayers, maxteamplayers, normalCount);
+        tarteamplayers = normalCount;
+    }
 
     uint32 queued_players_a = 0;
     uint32 queued_players_h = 0;

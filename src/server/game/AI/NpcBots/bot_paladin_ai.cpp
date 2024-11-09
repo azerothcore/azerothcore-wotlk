@@ -894,7 +894,7 @@ public:
 
         void CheckAura(uint32 diff)
         {
-            if (checkAuraTimer > diff || GC_Timer > diff || IAmFree() || IsCasting() ||
+            if (checkAuraTimer > diff || GC_Timer > diff || (IAmFree() && !GetBG()) || IsCasting() ||
                 /*me->GetExactDist(master) > 40 || me->IsMounted() || Feasting() || */Rand() > 20)
                 return;
 
@@ -960,6 +960,12 @@ public:
                 (!(mask & SPECIFIC_AURA_FIRE_RES) || idMap[FIRE_RESISTANCE_AURA_1] < FIRE_RESISTANCE_AURA))
             {
                 if (doCast(me, FIRE_RESISTANCE_AURA))
+                    return;
+            }
+            if (SHADOW_RESISTANCE_AURA && GetBG() &&
+                (!(mask & SPECIFIC_AURA_SHADOW_RES) || idMap[SHADOW_RESISTANCE_AURA_1] < SHADOW_RESISTANCE_AURA))
+            {
+                if (doCast(me, SHADOW_RESISTANCE_AURA))
                     return;
             }
             if (FROST_RESISTANCE_AURA &&
