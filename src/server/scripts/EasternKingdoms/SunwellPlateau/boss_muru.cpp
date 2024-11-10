@@ -72,260 +72,227 @@ enum Misc
     DATA_NEGATIVE_ENERGY_TARGETS    = 2
 };
 
-class boss_muru : public CreatureScript
+struct boss_muru : public BossAI
 {
-public:
-    boss_muru() : CreatureScript("boss_muru") { }
+    boss_muru(Creature* creature) : BossAI(creature, DATA_MURU) { }
 
-    struct boss_muruAI : public BossAI
+    void Reset() override
     {
-        boss_muruAI(Creature* creature) : BossAI(creature, DATA_MURU) { }
+        BossAI::Reset();
+        me->SetReactState(REACT_AGGRESSIVE);
+        me->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
+        me->SetVisible(true);
+    }
 
-        void Reset() override
+    void JustEngagedWith(Unit* who) override
+    {
+        BossAI::JustEngagedWith(who);
+        me->CastSpell(me, SPELL_NEGATIVE_ENERGY, true);
+        me->CastSpell(me, SPELL_SUMMON_BLOOD_ELVES_PERIODIC, true);
+        me->CastSpell(me, SPELL_OPEN_PORTAL_PERIODIC, true);
+        me->CastSpell(me, SPELL_DARKNESS_PERIODIC, true);
+
+        events.ScheduleEvent(EVENT_SPELL_ENRAGE, 600000);
+    }
+
+    void DamageTaken(Unit*, uint32& damage, DamageEffectType, SpellSchoolMask) override
+    {
+        if (damage >= me->GetHealth())
         {
-            BossAI::Reset();
+            damage = 0;
+            if (!me->HasUnitFlag(UNIT_FLAG_NOT_SELECTABLE))
+            {
+                me->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
+                me->RemoveAllAuras();
+                me->CastSpell(me, SPELL_OPEN_ALL_PORTALS, true);
+                events.ScheduleEvent(EVENT_SUMMON_ENTROPIUS, 7000);
+            }
+        }
+    }
+
+    void JustSummoned(Creature* summon) override
+    {
+        if (summon->GetEntry() == NPC_ENTROPIUS)
+            summon->AI()->SetData(DATA_ENRAGE_TIMER, events.GetNextEventTime(EVENT_SPELL_ENRAGE));
+        else
+        {
+            if (!summon->IsTrigger())
+                summon->SetInCombatWithZone();
+            summons.Summon(summon);
+        }
+    }
+
+    void UpdateAI(uint32 diff) override
+    {
+        if (!UpdateVictim())
+            return;
+
+        events.Update(diff);
+        if (me->HasUnitState(UNIT_STATE_CASTING))
+            return;
+
+        switch (events.ExecuteEvent())
+        {
+        case EVENT_SPELL_ENRAGE:
+            me->CastSpell(me, SPELL_ENRAGE, true);
+            break;
+        case EVENT_SUMMON_ENTROPIUS:
+            me->CastSpell(me, SPELL_SUMMON_ENTROPIUS, false);
+            events.ScheduleEvent(EVENT_SET_INVISIBLE, 1000);
+            break;
+        case EVENT_SET_INVISIBLE:
+            me->SetVisible(false);
+            break;
+        }
+    }
+};
+
+struct boss_entropius : public ScriptedAI
+{
+    boss_entropius(Creature* creature) : ScriptedAI(creature) { }
+
+    EventMap events;
+    EventMap events2;
+
+    void Reset() override
+    {
+        events.Reset();
+        events2.Reset();
+        events2.ScheduleEvent(EVENT_ENTROPIUS_AURAS, 0);
+        events2.ScheduleEvent(EVENT_ENTROPIUS_COMBAT, 3000);
+        me->SetReactState(REACT_PASSIVE);
+    }
+
+    void EnterEvadeMode(EvadeReason why) override
+    {
+        if (InstanceScript* instance = me->GetInstanceScript())
+            if (Creature* muru = ObjectAccessor::GetCreature(*me, instance->GetGuidData(NPC_MURU)))
+                if (!muru->IsInEvadeMode())
+                    muru->AI()->EnterEvadeMode(why);
+
+        me->DespawnOrUnsummon();
+    }
+
+    void JustEngagedWith(Unit* /*who*/) override
+    {
+        events.ScheduleEvent(EVENT_SPAWN_BLACK_HOLE, 15000);
+        events.ScheduleEvent(EVENT_SPAWN_DARKNESS, 10000);
+    }
+
+    void SetData(uint32 type, uint32 data) override
+    {
+        if (type == DATA_ENRAGE_TIMER)
+            events.ScheduleEvent(EVENT_SPELL_ENRAGE, data);
+    }
+
+    uint32 GetData(uint32 type) const override
+    {
+        if (type == DATA_NEGATIVE_ENERGY_TARGETS)
+            return 1 + uint32(events.GetTimer() / 12000);
+        return 0;
+    }
+
+    void JustDied(Unit* /*killer*/) override
+    {
+        if (InstanceScript* instance = me->GetInstanceScript())
+            if (Creature* muru = ObjectAccessor::GetCreature(*me, instance->GetGuidData(NPC_MURU)))
+                Unit::Kill(muru, muru);
+    }
+
+    void UpdateAI(uint32 diff) override
+    {
+        events2.Update(diff);
+        switch (events2.ExecuteEvent())
+        {
+        case EVENT_ENTROPIUS_AURAS:
+            me->CastSpell(me, SPELL_ENTROPIUS_COSMETIC_SPAWN, false);
+            me->CastSpell(me, SPELL_NEGATIVE_ENERGY_PERIODIC, true);
+            break;
+        case EVENT_ENTROPIUS_COMBAT:
             me->SetReactState(REACT_AGGRESSIVE);
-            me->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
-            me->SetVisible(true);
+            me->SetInCombatWithZone();
+            AttackStart(SelectTargetFromPlayerList(50.0f));
+            break;
         }
 
-        void JustEngagedWith(Unit* who) override
+        if (!events2.Empty())
+            return;
+
+        if (!UpdateVictim())
+            return;
+
+        events.Update(diff);
+        if (me->HasUnitState(UNIT_STATE_CASTING))
+            return;
+
+        switch (events.ExecuteEvent())
         {
-            BossAI::JustEngagedWith(who);
-            me->CastSpell(me, SPELL_NEGATIVE_ENERGY, true);
-            me->CastSpell(me, SPELL_SUMMON_BLOOD_ELVES_PERIODIC, true);
-            me->CastSpell(me, SPELL_OPEN_PORTAL_PERIODIC, true);
-            me->CastSpell(me, SPELL_DARKNESS_PERIODIC, true);
-
-            events.ScheduleEvent(EVENT_SPELL_ENRAGE, 600000);
-        }
-
-        void DamageTaken(Unit*, uint32& damage, DamageEffectType, SpellSchoolMask) override
-        {
-            if (damage >= me->GetHealth())
-            {
-                damage = 0;
-                if (!me->HasUnitFlag(UNIT_FLAG_NOT_SELECTABLE))
-                {
-                    me->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
-                    me->RemoveAllAuras();
-                    me->CastSpell(me, SPELL_OPEN_ALL_PORTALS, true);
-                    events.ScheduleEvent(EVENT_SUMMON_ENTROPIUS, 7000);
-                }
-            }
-        }
-
-        void JustSummoned(Creature* summon) override
-        {
-            if (summon->GetEntry() == NPC_ENTROPIUS)
-                summon->AI()->SetData(DATA_ENRAGE_TIMER, events.GetNextEventTime(EVENT_SPELL_ENRAGE));
-            else
-            {
-                if (!summon->IsTrigger())
-                    summon->SetInCombatWithZone();
-                summons.Summon(summon);
-            }
-        }
-
-        void UpdateAI(uint32 diff) override
-        {
-            if (!UpdateVictim())
-                return;
-
-            events.Update(diff);
-            if (me->HasUnitState(UNIT_STATE_CASTING))
-                return;
-
-            switch (events.ExecuteEvent())
-            {
-                case EVENT_SPELL_ENRAGE:
-                    me->CastSpell(me, SPELL_ENRAGE, true);
-                    break;
-                case EVENT_SUMMON_ENTROPIUS:
-                    me->CastSpell(me, SPELL_SUMMON_ENTROPIUS, false);
-                    events.ScheduleEvent(EVENT_SET_INVISIBLE, 1000);
-                    break;
-                case EVENT_SET_INVISIBLE:
-                    me->SetVisible(false);
-                    break;
-            }
-        }
-    };
-
-    CreatureAI* GetAI(Creature* creature) const override
-    {
-        return GetSunwellPlateauAI<boss_muruAI>(creature);
-    }
-};
-
-class boss_entropius : public CreatureScript
-{
-public:
-    boss_entropius() : CreatureScript("boss_entropius") { }
-
-    struct boss_entropiusAI : public ScriptedAI
-    {
-        boss_entropiusAI(Creature* creature) : ScriptedAI(creature) { }
-
-        EventMap events;
-        EventMap events2;
-
-        void Reset() override
-        {
-            events.Reset();
-            events2.Reset();
-            events2.ScheduleEvent(EVENT_ENTROPIUS_AURAS, 0);
-            events2.ScheduleEvent(EVENT_ENTROPIUS_COMBAT, 3000);
-            me->SetReactState(REACT_PASSIVE);
-        }
-
-        void EnterEvadeMode(EvadeReason why) override
-        {
-            if (InstanceScript* instance = me->GetInstanceScript())
-                if (Creature* muru = ObjectAccessor::GetCreature(*me, instance->GetGuidData(NPC_MURU)))
-                    if (!muru->IsInEvadeMode())
-                        muru->AI()->EnterEvadeMode(why);
-
-            me->DespawnOrUnsummon();
-        }
-
-        void JustEngagedWith(Unit* /*who*/) override
-        {
+        case EVENT_SPELL_ENRAGE:
+            me->CastSpell(me, SPELL_ENRAGE, true);
+            break;
+        case EVENT_SPAWN_DARKNESS:
+            if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 50.0f, true))
+                me->CastSpell(target, SPELL_DARKNESS, true);
+            events.ScheduleEvent(EVENT_SPAWN_DARKNESS, 15000);
+            break;
+        case EVENT_SPAWN_BLACK_HOLE:
+            if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 50.0f, true))
+                me->CastSpell(target, SPELL_BLACK_HOLE, true);
             events.ScheduleEvent(EVENT_SPAWN_BLACK_HOLE, 15000);
-            events.ScheduleEvent(EVENT_SPAWN_DARKNESS, 10000);
+            break;
         }
 
-        void SetData(uint32 type, uint32 data) override
-        {
-            if (type == DATA_ENRAGE_TIMER)
-                events.ScheduleEvent(EVENT_SPELL_ENRAGE, data);
-        }
-
-        uint32 GetData(uint32 type) const override
-        {
-            if (type == DATA_NEGATIVE_ENERGY_TARGETS)
-                return 1 + uint32(events.GetTimer() / 12000);
-            return 0;
-        }
-
-        void JustDied(Unit* /*killer*/) override
-        {
-            if (InstanceScript* instance = me->GetInstanceScript())
-                if (Creature* muru = ObjectAccessor::GetCreature(*me, instance->GetGuidData(NPC_MURU)))
-                    Unit::Kill(muru, muru);
-        }
-
-        void UpdateAI(uint32 diff) override
-        {
-            events2.Update(diff);
-            switch (events2.ExecuteEvent())
-            {
-                case EVENT_ENTROPIUS_AURAS:
-                    me->CastSpell(me, SPELL_ENTROPIUS_COSMETIC_SPAWN, false);
-                    me->CastSpell(me, SPELL_NEGATIVE_ENERGY_PERIODIC, true);
-                    break;
-                case EVENT_ENTROPIUS_COMBAT:
-                    me->SetReactState(REACT_AGGRESSIVE);
-                    me->SetInCombatWithZone();
-                    AttackStart(SelectTargetFromPlayerList(50.0f));
-                    break;
-            }
-
-            if (!events2.Empty())
-                return;
-
-            if (!UpdateVictim())
-                return;
-
-            events.Update(diff);
-            if (me->HasUnitState(UNIT_STATE_CASTING))
-                return;
-
-            switch (events.ExecuteEvent())
-            {
-                case EVENT_SPELL_ENRAGE:
-                    me->CastSpell(me, SPELL_ENRAGE, true);
-                    break;
-                case EVENT_SPAWN_DARKNESS:
-                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 50.0f, true))
-                        me->CastSpell(target, SPELL_DARKNESS, true);
-                    events.ScheduleEvent(EVENT_SPAWN_DARKNESS, 15000);
-                    break;
-                case EVENT_SPAWN_BLACK_HOLE:
-                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 50.0f, true))
-                        me->CastSpell(target, SPELL_BLACK_HOLE, true);
-                    events.ScheduleEvent(EVENT_SPAWN_BLACK_HOLE, 15000);
-                    break;
-            }
-
-            DoMeleeAttackIfReady();
-        }
-    };
-
-    CreatureAI* GetAI(Creature* creature) const override
-    {
-        return GetSunwellPlateauAI<boss_entropiusAI>(creature);
+        DoMeleeAttackIfReady();
     }
 };
 
-class npc_singularity : public CreatureScript
+struct npc_singularity : public NullCreatureAI
 {
-public:
-    npc_singularity() : CreatureScript("npc_singularity") { }
-
-    CreatureAI* GetAI(Creature* creature) const override
+    npc_singularity(Creature* creature) : NullCreatureAI(creature)
     {
-        return GetSunwellPlateauAI<npc_singularityAI>(creature);
     }
 
-    struct npc_singularityAI : public NullCreatureAI
+    EventMap events;
+
+    void Reset() override
     {
-        npc_singularityAI(Creature* creature) : NullCreatureAI(creature)
-        {
-        }
+        me->DespawnOrUnsummon(18000);
+        me->CastSpell(me, SPELL_BLACK_HOLE_SUMMON_VISUAL, true);
+        me->CastSpell(me, SPELL_BLACK_HOLE_SUMMON_VISUAL2, true);
+        events.ScheduleEvent(EVENT_START_BLACK_HOLE, 3500);
+        events.ScheduleEvent(EVENT_SWITCH_BLACK_HOLE_TARGET, 5000);
+        events.ScheduleEvent(EVENT_SINGULARITY_DEATH, 17000);
+    }
 
-        EventMap events;
-
-        void Reset() override
+    void UpdateAI(uint32 diff) override
+    {
+        events.Update(diff);
+        switch (events.ExecuteEvent())
         {
-            me->DespawnOrUnsummon(18000);
-            me->CastSpell(me, SPELL_BLACK_HOLE_SUMMON_VISUAL, true);
-            me->CastSpell(me, SPELL_BLACK_HOLE_SUMMON_VISUAL2, true);
-            events.ScheduleEvent(EVENT_START_BLACK_HOLE, 3500);
-            events.ScheduleEvent(EVENT_SWITCH_BLACK_HOLE_TARGET, 5000);
-            events.ScheduleEvent(EVENT_SINGULARITY_DEATH, 17000);
-        }
-
-        void UpdateAI(uint32 diff) override
+        case EVENT_SINGULARITY_DEATH:
+            me->KillSelf();
+            break;
+        case EVENT_START_BLACK_HOLE:
+            me->RemoveAurasDueToSpell(SPELL_BLACK_HOLE_SUMMON_VISUAL2);
+            me->CastSpell(me, SPELL_BLACK_HOLE_VISUAL2, true);
+            me->CastSpell(me, SPELL_BLACK_HOLE_PASSIVE, true);
+            break;
+        case EVENT_SWITCH_BLACK_HOLE_TARGET:
         {
-            events.Update(diff);
-            switch (events.ExecuteEvent())
-            {
-                case EVENT_SINGULARITY_DEATH:
-                    me->KillSelf();
-                    break;
-                case EVENT_START_BLACK_HOLE:
-                    me->RemoveAurasDueToSpell(SPELL_BLACK_HOLE_SUMMON_VISUAL2);
-                    me->CastSpell(me, SPELL_BLACK_HOLE_VISUAL2, true);
-                    me->CastSpell(me, SPELL_BLACK_HOLE_PASSIVE, true);
-                    break;
-                case EVENT_SWITCH_BLACK_HOLE_TARGET:
+            Map::PlayerList const& players = me->GetMap()->GetPlayers();
+            for (Map::PlayerList::const_iterator itr = players.begin(); itr != players.end(); ++itr)
+                if (Player* player = itr->GetSource())
+                    if (me->GetDistance2d(player) < 15.0f && player->GetPositionZ() < 72.0f && player->IsAlive() && !player->HasAura(SPELL_BLACK_HOLE_EFFECT))
                     {
-                        Map::PlayerList const& players = me->GetMap()->GetPlayers();
-                        for (Map::PlayerList::const_iterator itr = players.begin(); itr != players.end(); ++itr)
-                            if (Player* player = itr->GetSource())
-                                if (me->GetDistance2d(player) < 15.0f && player->GetPositionZ() < 72.0f && player->IsAlive() && !player->HasAura(SPELL_BLACK_HOLE_EFFECT))
-                                {
-                                    me->GetMotionMaster()->MovePoint(0, player->GetPositionX(), player->GetPositionY(), player->GetPositionZ(), false, true);
-                                    events.ScheduleEvent(EVENT_SWITCH_BLACK_HOLE_TARGET, 5000);
-                                    return;
-                                }
-                        events.ScheduleEvent(EVENT_SWITCH_BLACK_HOLE_TARGET, 500);
-                        break;
+                        me->GetMotionMaster()->MovePoint(0, player->GetPositionX(), player->GetPositionY(), player->GetPositionZ(), false, true);
+                        events.ScheduleEvent(EVENT_SWITCH_BLACK_HOLE_TARGET, 5000);
+                        return;
                     }
-            }
+            events.ScheduleEvent(EVENT_SWITCH_BLACK_HOLE_TARGET, 500);
+            break;
         }
-    };
+        }
+    }
 };
 
 class spell_muru_summon_blood_elves_periodic_aura : public AuraScript
@@ -475,9 +442,9 @@ class spell_entropius_black_hole_effect : public SpellScript
 
 void AddSC_boss_muru()
 {
-    new boss_muru();
-    new boss_entropius();
-    new npc_singularity();
+    RegisterSunwellPlateauCreatureAI(boss_muru);
+    RegisterSunwellPlateauCreatureAI(boss_entropius);
+    RegisterSunwellPlateauCreatureAI(npc_singularity);
 
     RegisterSpellScript(spell_muru_summon_blood_elves_periodic_aura);
     RegisterSpellScript(spell_muru_darkness_aura);
