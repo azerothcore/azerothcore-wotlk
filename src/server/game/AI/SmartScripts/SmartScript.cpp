@@ -5073,7 +5073,7 @@ void SmartScript::GetScript()
 
         if (CreatureTemplate const* cInfo = me->GetCreatureTemplate())
         {
-            if (cInfo->HasFlagsExtra(CREATURE_FLAG_DONT_OVERRIDE_ENTRY_SAI))
+            if (cInfo->HasFlagsExtra(CREATURE_FLAG_EXTRA_DONT_OVERRIDE_ENTRY_SAI))
             {
                 e = sSmartScriptMgr->GetScript((int32)me->GetEntry(), mScriptType);
                 FillScript(e, me, nullptr);
