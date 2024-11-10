@@ -696,6 +696,10 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
                     if (isWithinLOSInMap && isWithinMeleeRange && isRangedAttack && isTargetRooted && canCastSpell && !me->IsVehicle())
                     {
                         failedSpellCast = true; // Mark spellcast as failed so we can retry it later
+
+                        if (me->IsRooted()) // Rooted inhabit type, never move/reposition
+                            continue;
+
                         float minDistance = std::max(meleeRange, spellMinRange) - distanceToTarget + NOMINAL_MELEE_RANGE;
                         CAST_AI(SmartAI, me->AI())->MoveAway(std::min(minDistance, spellMaxRange));
                         continue;
@@ -705,12 +709,20 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
                     if (distanceToTarget > spellMaxRange && isWithinLOSInMap)
                     {
                         failedSpellCast = true;
+
+                        if (me->IsRooted()) // Rooted inhabit type, never move/reposition
+                            continue;
+
                         CAST_AI(SmartAI, me->AI())->SetCombatMove(true, std::max(spellMaxRange - NOMINAL_MELEE_RANGE, 0.0f));
                         continue;
                     }
                     else if (distanceToTarget < spellMinRange || !(isWithinLOSInMap || isSpellIgnoreLOS))
                     {
                         failedSpellCast = true;
+
+                        if (me->IsRooted()) // Rooted inhabit type, never move/reposition
+                            continue;
+
                         CAST_AI(SmartAI, me->AI())->SetCombatMove(true);
                         continue;
                     }
