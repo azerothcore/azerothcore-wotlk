@@ -128,6 +128,14 @@ struct boss_leotheras_the_blind : public BossAI
         });
     }
 
+    void AttackStart(Unit* who) override
+    {
+        if (me->HasAura(SPELL_METAMORPHOSIS))
+            AttackStartCaster(who, 40.0f);
+        else
+            ScriptedAI::AttackStart(who);
+    }
+
     void DoAction(int32 actionId) override
     {
         if (actionId == ACTION_CHECK_SPELLBINDERS)
@@ -178,9 +186,7 @@ struct boss_leotheras_the_blind : public BossAI
             me->AddThreat(target, 0.0f);
         }
         else
-        {
             me->GetMotionMaster()->Clear();
-        }
     }
 
     void DemonTime()
@@ -223,9 +229,7 @@ struct boss_leotheras_the_blind : public BossAI
         if (me->GetDisplayId() == me->GetNativeDisplayId())
         {
             if (me->GetReactState() != REACT_PASSIVE)
-            {
                 DoMeleeAttackIfReady();
-            }
         }
         else if (me->isAttackReady(BASE_ATTACK))
         {
@@ -235,9 +239,7 @@ struct boss_leotheras_the_blind : public BossAI
                 DoMeleeAttackIfReady();
             }
             else
-            {
                 me->setAttackTimer(BASE_ATTACK, 2000);
-            }
         }
     }
 private:
