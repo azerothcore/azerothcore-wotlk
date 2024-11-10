@@ -137,8 +137,7 @@ struct boss_janalai : public BossAI
             me->GetMotionMaster()->Clear();
             me->SetPosition(janalainPos);
             me->StopMovingOnCurrentPos();
-            DoCastSelf(SPELL_HATCH_ALL);
-            HatchAllEggs(HATCH_ALL);
+            DoCastAOE(SPELL_HATCH_ALL);
         });
     }
 
@@ -202,19 +201,19 @@ struct boss_janalai : public BossAI
             return false;
 
         if (hatchAction == HATCH_RESET)
+        {
             for (Creature* egg : eggList)
                 egg->Respawn();
-        else if (hatchAction == HATCH_ALL)
-            DoCastSelf(SPELL_HATCH_EGG_ALL);
 
-        if (hatchAction == HATCH_RESET)
-        {
             std::list<Creature* > hatchlingList;
             me->GetCreaturesWithEntryInRange(hatchlingList, 100.0f, NPC_HATCHLING);
             for (Creature* hatchling : hatchlingList)
                 hatchling->DespawnOrUnsummon();
             hatchlingList.clear();
         }
+        else if (hatchAction == HATCH_ALL)
+            DoCastSelf(SPELL_HATCH_EGG_ALL);
+
         eggList.clear();
         return true;
     }
@@ -250,18 +249,16 @@ struct boss_janalai : public BossAI
 
     void Boom()
     {
-        std::list<Creature*> fireBombs;
-        me->GetCreaturesWithEntryInRange(fireBombs, 100.0f, NPC_FIRE_BOMB);
-
-        if (fireBombs.empty())
-            return;
-
-        for (Creature* bomb : fireBombs)
-        {
-            bomb->AI()->DoCastSelf(SPELL_FIRE_BOMB_DAMAGE, true);
-            bomb->RemoveAllAuras();
-        }
-        fireBombs.clear();
+        summons.DoForAllSummons([&](WorldObject* summon) {
+            if (summon->GetEntry() == NPC_FIRE_BOMB)
+            {
+                if (Creature* bomb = summon->ToCreature())
+                {
+                    bomb->AI()->DoCastSelf(SPELL_FIRE_BOMB_DAMAGE, true);
+                    bomb->RemoveAllAuras();
+                }
+            }
+        });
     }
 
     void StartBombing()
@@ -399,7 +396,6 @@ struct npc_janalai_hatchling : public ScriptedAI
         else
             me->GetMotionMaster()->MovePoint(0, hatcherway[1][3].GetPositionX() + rand() % 4 - 2, 1150.0f + rand() % 4 - 2, hatcherway[1][3].GetPositionY());
 
-        me->SetDisableGravity(true);
         me->SetInCombatWithZone();
     }
 
