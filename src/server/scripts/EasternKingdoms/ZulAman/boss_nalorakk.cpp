@@ -178,12 +178,12 @@ struct boss_nalorakk : public BossAI
                     _introScheduler.Schedule(5s, GROUP_CHECK_DEAD, [this](TaskContext context)
                     {
                         if (CheckFullyDeadGroup(_waveList))
-                        {
                             if (_phase == PHASE_SEND_GUARDS_3)
+                            {
                                 _introScheduler.CancelGroup(GROUP_CHECK_DEAD);
                                 _waveList.clear();
                                 Talk(SAY_RUN_AWAY);
-                                me->GetMotionMaster()->MovePath(me->GetEntry()*100+3, false);
+                                me->GetMotionMaster()->MovePath(me->GetEntry() * 100 + 3, false);
                                 _introScheduler.Schedule(6s, [this](TaskContext)
                                 {
                                     me->SetFacingTo(1.54f);
