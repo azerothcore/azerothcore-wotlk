@@ -127,10 +127,6 @@ struct boss_janalai : public BossAI
         _isBombing = false;
         _isFlameBreathing = false;
 
-        ScheduleHealthCheckEvent(25, [&]{
-            DoCastSelf(SPELL_ENRAGE, true);
-        });
-
         ScheduleHealthCheckEvent(35, [&]{
             Talk(SAY_ALL_EGGS);
             me->AttackStop();
@@ -138,6 +134,10 @@ struct boss_janalai : public BossAI
             me->SetPosition(janalainPos);
             me->StopMovingOnCurrentPos();
             DoCastAOE(SPELL_HATCH_ALL);
+        });
+
+        ScheduleHealthCheckEvent(25, [&] {
+            DoCastSelf(SPELL_ENRAGE, true);
         });
     }
 
