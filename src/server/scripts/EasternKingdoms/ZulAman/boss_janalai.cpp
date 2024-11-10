@@ -15,13 +15,6 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-/* ScriptData
-SDName: Boss_Janalai
-SD%Complete: 100
-SDComment:
-SDCategory: Zul'Aman
-EndScriptData */
-
 #include "CellImpl.h"
 #include "CreatureScript.h"
 #include "GridNotifiers.h"
@@ -239,9 +232,7 @@ struct boss_janalai : public BossAI
                         : me->SummonCreature(NPC_FIRE_BOMB, fireWallCoords[i].GetPositionX() - 2 + 4 * j, fireWallCoords[i].GetPositionY(), fireWallCoords[i].GetPositionZ(), fireWallCoords[i].GetOrientation(), TEMPSUMMON_TIMED_DESPAWN, 15000);
 
                 if (wall)
-                {
                     wall->AI()->DoCastSelf(SPELL_FIRE_WALL, true);
-                }
             }
         }
     }
@@ -286,14 +277,11 @@ struct boss_janalai : public BossAI
         SpawnBombs();
         _isBombing = true;
 
-        if (Map* map = me->GetMap())
+        me->GetMap()->DoForAllPlayers([&](Player* player)
         {
-            map->DoForAllPlayers([&](Player* player)
-            {
-                if (player->IsAlive())
-                    DoTeleportPlayer(player, janalainPos.GetPositionX() - 5 + rand() % 10, janalainPos.GetPositionY() - 5 + rand() % 10, janalainPos.GetPositionZ(), 0.0f);
-            });
-        }
+            if (player->IsAlive())
+                DoTeleportPlayer(player, janalainPos.GetPositionX() - 5 + rand() % 10, janalainPos.GetPositionY() - 5 + rand() % 10, janalainPos.GetPositionZ(), 0.0f);
+        });
         //DoCast(Temp, SPELL_SUMMON_PLAYERS, true) // core bug, spell does not work if too far
         ThrowBombs();
 
@@ -308,20 +296,23 @@ struct boss_janalai : public BossAI
 
     void ThrowBombs()
     {
-        std::list<Creature*> fireBombs;
         std::chrono::milliseconds bombTimer = 100ms;
-        me->GetCreaturesWithEntryInRange(fireBombs, 100.0f, NPC_FIRE_BOMB);
-        for (Creature* bomb : fireBombs)
-        {
-            scheduler.Schedule(bombTimer, [this, bomb](TaskContext)
+
+        summons.DoForAllSummons([this, &bombTimer](WorldObject* summon) {
+            if (summon->GetEntry() == NPC_FIRE_BOMB)
             {
-                bomb->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
-                DoCast(bomb, SPELL_FIRE_BOMB_THROW, true);
-                bomb->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
-            });
-            bombTimer = bombTimer + 100ms;
-        }
-        fireBombs.clear();
+                if (Creature* bomb = summon->ToCreature())
+                {
+                    bomb->m_Events.AddEventAtOffset([this, bomb] {
+                        bomb->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
+                        DoCast(bomb, SPELL_FIRE_BOMB_THROW, true);
+                        bomb->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
+                    }, bombTimer);
+                }
+
+                bombTimer += 100ms;
+            }
+        });
     }
 
     bool CheckEvadeIfOutOfCombatArea() const override
