@@ -3292,6 +3292,11 @@ void Spell::EffectTaunt(SpellEffIndex /*effIndex*/)
         // trick here: check has wrath to replace lack glyph of Reckoning 
         if (!m_caster->HasAura(25780)) {
             unitTarget->RemoveAura(62124);
+            for (uint8 i = 0; i < MAX_SPELL_EFFECTS; ++i)
+            {
+                if (m_spellInfo->Effects[i].ApplyAuraName == SPELL_AURA_MOD_TAUNT)
+                    const_cast<uint32&>(m_spellInfo->Effects[i].ApplyAuraName) = 0;
+            }
             return;
         }
         unitTarget->CombatStart(m_caster);
