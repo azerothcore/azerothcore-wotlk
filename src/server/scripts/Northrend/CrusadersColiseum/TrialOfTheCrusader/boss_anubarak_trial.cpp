@@ -549,6 +549,8 @@ public:
             if (ID)
                 me->ApplySpellImmune(0, IMMUNITY_ID, ID, true);
 
+            //immune to star fall
+            const_cast<uint32&>(me->GetCreatureTemplate()->flags_extra) |= CREATURE_FLAG_EXTRA_AVOID_AOE;
             permafrostTimer = 0;
             me->CastSpell(me, SPELL_FROST_SPHERE, true);
             me->GetMotionMaster()->MoveRandom(20.0f);
