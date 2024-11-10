@@ -739,10 +739,9 @@ void BossAI::UpdateAI(uint32 diff)
     DoMeleeAttackIfReady();
 }
 
-void BossAI::DamageTaken(Unit* /*attacker*/, uint32& damage, DamageEffectType /*damagetype*/, SpellSchoolMask /*damageSchoolMask*/)
+void BossAI::DamageTaken(Unit* attacker, uint32& damage, DamageEffectType damagetype, SpellSchoolMask damageSchoolMask)
 {
-    if (IsInvincible() && damage >= me->GetHealth())
-        damage = me->GetHealth() - 1;
+    ScriptedAI::DamageTaken(attacker, damage, damagetype, damageSchoolMask);
 
     if (_nextHealthCheck._valid)
         if (me->HealthBelowPctDamaged(_nextHealthCheck._healthPct, damage))
