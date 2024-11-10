@@ -23,6 +23,7 @@
 
 ObjectData const creatureData[] =
 {
+    { NPC_KAEL_THAS,       DATA_KAELTHAS         },
     { NPC_KALECGOS,        DATA_KALECGOS         },
     { 0,                   0                     }
 };
@@ -60,7 +61,6 @@ public:
         }
 
         ObjectGuid DelrissaGUID;
-        ObjectGuid KaelGUID;
 
         void ProcessEvent(WorldObject* /*obj*/, uint32 eventId) override
         {
@@ -82,12 +82,9 @@ public:
                 case NPC_DELRISSA:
                     DelrissaGUID = creature->GetGUID();
                     break;
-                case NPC_KAEL_THAS:
-                    KaelGUID = creature->GetGUID();
-                    break;
                 case NPC_PHOENIX:
                 case NPC_PHOENIX_EGG:
-                    if (Creature* kael = instance->GetCreature(KaelGUID))
+                    if (Creature* kael = GetCreature(DATA_KAELTHAS))
                         kael->AI()->JustSummoned(creature);
                     break;
             }
