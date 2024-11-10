@@ -1698,18 +1698,6 @@ public:
             botPet = myPet;
         }
 
-        void UnsummonAll(bool savePets = true) override
-        {
-            UnsummonPet(savePets);
-        }
-
-        void SummonedCreatureDies(Creature* /*summon*/, Unit* /*killer*/) override
-        {
-            //BOT_LOG_ERROR("entities.unit", "SummonedCreatureDies: %s's %s", me->GetName().c_str(), summon->GetName().c_str());
-            //if (summon == botPet)
-            //    botPet = nullptr;
-        }
-
         void SummonedCreatureDespawn(Creature* summon) override
         {
             //all hunter bot pets despawn at death or manually (gossip, teleport, etc.)
@@ -1719,6 +1707,11 @@ public:
                 petSummonTimer = 30000;
                 botPet = nullptr;
             }
+        }
+
+        void UnsummonAll(bool savePets = true) override
+        {
+            UnsummonPet(savePets);
         }
 
         uint32 GetAIMiscValue(uint32 data) const override

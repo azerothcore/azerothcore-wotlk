@@ -615,6 +615,23 @@ class spell_dk_dancing_rune_weapon : public AuraScript
 
     bool CheckProc(ProcEventInfo& eventInfo)
     {
+        //npcbot
+        if (eventInfo.GetActor() && eventInfo.GetActor()->IsNPCBot())
+        {
+            if (!eventInfo.GetActor() || !eventInfo.GetActionTarget() || !eventInfo.GetActionTarget()->IsAlive())
+                return false;
+
+            if (SpellInfo const* spellInfo = eventInfo.GetSpellInfo())
+            {
+                if (spellInfo->SpellFamilyFlags.HasFlag(0x20A1220, 0x10000000, 0x0) || spellInfo->IsTargetingArea() && eventInfo.GetActor() != eventInfo.GetActionTarget() ||
+                    spellInfo->HasEffect(SPELL_EFFECT_SUMMON) || spellInfo->IsPositive())
+                    return false;
+            }
+
+            return true;
+        }
+        //end npcbot
+
         if (!eventInfo.GetActor() || !eventInfo.GetActionTarget() || !eventInfo.GetActionTarget()->IsAlive() || !eventInfo.GetActor()->IsPlayer())
             return false;
 
@@ -702,6 +719,18 @@ class spell_dk_dancing_rune_weapon_visual : public AuraScript
     void HandleEffectApply(AuraEffect const*  /*aurEff*/, AuraEffectHandleModes /*mode*/)
     {
         PreventDefaultAction();
+        //npcbot
+        if (GetUnitOwner()->ToTempSummon()->GetSummonerGUID().IsCreature())
+        {
+            if (Unit* owner = GetUnitOwner()->ToTempSummon()->GetSummonerUnit())
+            {
+                GetUnitOwner()->SetUInt32Value(UNIT_VIRTUAL_ITEM_SLOT_ID, owner->GetUInt32Value(UNIT_VIRTUAL_ITEM_SLOT_ID + 0));
+                GetUnitOwner()->SetUInt32Value(UNIT_VIRTUAL_ITEM_SLOT_ID + 1, owner->GetUInt32Value(UNIT_VIRTUAL_ITEM_SLOT_ID + 1));
+                GetUnitOwner()->SetFloatValue(UNIT_FIELD_COMBATREACH, 0.01f);
+            }
+        }
+        else
+        //end npcbot
         if (Unit* owner = GetUnitOwner()->ToTempSummon()->GetSummonerUnit())
         {
             GetUnitOwner()->SetUInt32Value(UNIT_VIRTUAL_ITEM_SLOT_ID, owner->GetUInt32Value(PLAYER_VISIBLE_ITEM_16_ENTRYID));

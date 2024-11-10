@@ -14834,8 +14834,12 @@ bool Unit::_IsValidAttackTarget(Unit const* target, SpellInfo const* bySpell, Wo
     }
     //end npcbot
 
-    //npcbot
+    //npcbot: allow bots and their summons to ignore this rule
     if (IsNPCBotOrPet() || target->IsNPCBotOrPet())
+    {}
+    else if (GetOwnerGUID() && GetOwnerGUID().IsCreature() && sObjectMgr->GetCreatureTemplate(GetOwnerGUID().GetEntry())->IsNPCBotOrPet())
+    {}
+    else if (target->GetOwnerGUID() && target->GetOwnerGUID().IsCreature() && sObjectMgr->GetCreatureTemplate(target->GetOwnerGUID().GetEntry())->IsNPCBotOrPet())
     {}
     else
     //end npcbot
