@@ -194,6 +194,7 @@ ScriptedAI::ScriptedAI(Creature* creature) : CreatureAI(creature),
 {
     _isHeroic = me->GetMap()->IsHeroic();
     _difficulty = Difficulty(me->GetMap()->GetSpawnMode());
+    _invincible = false;
 }
 
 void ScriptedAI::AttackStartNoMove(Unit* who)
@@ -220,6 +221,12 @@ void ScriptedAI::UpdateAI(uint32 /*diff*/)
         return;
 
     DoMeleeAttackIfReady();
+}
+
+void ScriptedAI::DamageTaken(Unit* /*attacker*/, uint32& damage, DamageEffectType /*damagetype*/, SpellSchoolMask /*damageSchoolMask*/)
+{
+    if (IsInvincible() && damage >= me->GetHealth())
+        damage = me->GetHealth() - 1;
 }
 
 void ScriptedAI::DoStartMovement(Unit* victim, float distance, float angle)
@@ -734,6 +741,9 @@ void BossAI::UpdateAI(uint32 diff)
 
 void BossAI::DamageTaken(Unit* /*attacker*/, uint32& damage, DamageEffectType /*damagetype*/, SpellSchoolMask /*damageSchoolMask*/)
 {
+    if (IsInvincible() && damage >= me->GetHealth())
+        damage = me->GetHealth() - 1;
+
     if (_nextHealthCheck._valid)
         if (me->HealthBelowPctDamaged(_nextHealthCheck._healthPct, damage))
         {
