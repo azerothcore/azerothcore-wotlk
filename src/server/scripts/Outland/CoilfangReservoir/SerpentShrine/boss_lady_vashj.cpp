@@ -292,9 +292,7 @@ class spell_lady_vashj_remove_tainted_cores : public SpellScript
     {
         PreventHitDefaultEffect(effIndex);
         if (Player* target = GetHitPlayer())
-        {
             target->DestroyItemCount(ITEM_TAINTED_CORE, -1, true);
-        }
     }
 
     void Register() override
@@ -327,9 +325,7 @@ class spell_lady_vashj_spore_drop_effect : public SpellScript
     {
         PreventHitDefaultEffect(effIndex);
         if (Unit* target = GetHitUnit())
-        {
             target->CastSpell(target, SPELL_TOXIC_SPORES, true, nullptr, nullptr, GetCaster()->GetGUID());
-        }
     }
 
     void Register() override
