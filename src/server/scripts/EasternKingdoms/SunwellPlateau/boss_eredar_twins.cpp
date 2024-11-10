@@ -82,290 +82,268 @@ enum Misc
     EVENT_SPELL_FLAME_SEAR      = 9
 };
 
-class boss_sacrolash : public CreatureScript
+struct boss_sacrolash : public BossAI
 {
-public:
-    boss_sacrolash() : CreatureScript("boss_sacrolash") { }
+    boss_sacrolash(Creature* creature) : BossAI(creature, DATA_EREDAR_TWINS) {}
 
-    struct boss_sacrolashAI : public BossAI
+    bool sisterDied;
+    void Reset() override
     {
-        boss_sacrolashAI(Creature* creature) : BossAI(creature, DATA_EREDAR_TWINS) {}
+        me->CastSpell(me, SPELL_SHADOWFORM, true);
+        sisterDied = false;
+        BossAI::Reset();
+        me->SetLootMode(0);
+    }
 
-        bool sisterDied;
-        void Reset() override
+    void DoAction(int32 param) override
+    {
+        if (param == ACTION_SISTER_DIED)
         {
-            me->CastSpell(me, SPELL_SHADOWFORM, true);
-            sisterDied = false;
-            BossAI::Reset();
-            me->SetLootMode(0);
+            me->ResetLootMode();
+            sisterDied = true;
+            Talk(YELL_SISTER_ALYTHESS_DEAD);
+            me->CastSpell(me, SPELL_EMPOWER, true);
+
+            uint32 timer = events.GetNextEventTime(EVENT_SPELL_SHADOW_NOVA);
+            events.CancelEvent(EVENT_SPELL_SHADOW_NOVA);
+            events.ScheduleEvent(EVENT_SPELL_CONFLAGRATION, timer - events.GetTimer());
         }
+    }
 
-        void DoAction(int32 param) override
+    void EnterEvadeMode(EvadeReason why) override
+    {
+        BossAI::EnterEvadeMode(why);
+        if (Creature* alythess = ObjectAccessor::GetCreature(*me, instance->GetGuidData(NPC_GRAND_WARLOCK_ALYTHESS)))
         {
-            if (param == ACTION_SISTER_DIED)
-            {
-                me->ResetLootMode();
-                sisterDied = true;
-                Talk(YELL_SISTER_ALYTHESS_DEAD);
-                me->CastSpell(me, SPELL_EMPOWER, true);
-
-                uint32 timer = events.GetNextEventTime(EVENT_SPELL_SHADOW_NOVA);
-                events.CancelEvent(EVENT_SPELL_SHADOW_NOVA);
-                events.ScheduleEvent(EVENT_SPELL_CONFLAGRATION, timer - events.GetTimer());
-            }
+            if (!alythess->IsAlive())
+                alythess->Respawn(true);
+            else if (!alythess->IsInEvadeMode())
+                alythess->AI()->EnterEvadeMode(why);
         }
+    }
 
-        void EnterEvadeMode(EvadeReason why) override
+    void JustEngagedWith(Unit* who) override
+    {
+        BossAI::JustEngagedWith(who);
+        if (Creature* alythess = ObjectAccessor::GetCreature(*me, instance->GetGuidData(NPC_GRAND_WARLOCK_ALYTHESS)))
+            if (alythess->IsAlive() && !alythess->IsInCombat())
+                alythess->AI()->AttackStart(who);
+
+        events.ScheduleEvent(EVENT_SPELL_SHADOW_BLADES, 10000);
+        events.ScheduleEvent(EVENT_SPELL_SHADOW_NOVA, 36000);
+        events.ScheduleEvent(EVENT_SPELL_CONFOUNDING_BLOW, 25000);
+        events.ScheduleEvent(EVENT_SHADOW_IMAGE, 20000);
+        events.ScheduleEvent(EVENT_SPELL_ENRAGE, 360000);
+    }
+
+    void KilledUnit(Unit* victim) override
+    {
+        if (victim->IsPlayer() && urand(0, 1))
+            Talk(YELL_SAC_KILL);
+    }
+
+    void JustDied(Unit* /*killer*/) override
+    {
+        events.Reset();
+        summons.DespawnAll();
+
+        if (sisterDied)
         {
-            BossAI::EnterEvadeMode(why);
-            if (Creature* alythess = ObjectAccessor::GetCreature(*me, instance->GetGuidData(NPC_GRAND_WARLOCK_ALYTHESS)))
-            {
-                if (!alythess->IsAlive())
-                    alythess->Respawn(true);
-                else if (!alythess->IsInEvadeMode())
-                    alythess->AI()->EnterEvadeMode(why);
-            }
+            Talk(YELL_SAC_DEAD);
+            instance->SetBossState(DATA_EREDAR_TWINS, DONE);
         }
+        else if (Creature* alythess = ObjectAccessor::GetCreature(*me, instance->GetGuidData(NPC_GRAND_WARLOCK_ALYTHESS)))
+            alythess->AI()->DoAction(ACTION_SISTER_DIED);
+    }
 
-        void JustEngagedWith(Unit* who) override
+    void JustSummoned(Creature* summon) override
+    {
+        summons.Summon(summon);
+        if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 50.0f, true))
         {
-            BossAI::JustEngagedWith(who);
-            if (Creature* alythess = ObjectAccessor::GetCreature(*me, instance->GetGuidData(NPC_GRAND_WARLOCK_ALYTHESS)))
-                if (alythess->IsAlive() && !alythess->IsInCombat())
-                    alythess->AI()->AttackStart(who);
+            summon->AI()->AttackStart(target);
+            summon->AddThreat(target, 10000000);
+        }
+    }
 
+    void UpdateAI(uint32 diff) override
+    {
+        if (!UpdateVictim())
+            return;
+
+        events.Update(diff);
+        if (me->HasUnitState(UNIT_STATE_CASTING))
+            return;
+
+        switch (events.ExecuteEvent())
+        {
+        case EVENT_SPELL_ENRAGE:
+            Talk(YELL_ENRAGE);
+            me->CastSpell(me, SPELL_ENRAGE, true);
+            break;
+        case EVENT_SPELL_CONFOUNDING_BLOW:
+            me->CastSpell(me->GetVictim(), SPELL_CONFOUNDING_BLOW, false);
+            events.ScheduleEvent(EVENT_SPELL_CONFOUNDING_BLOW, urand(20000, 25000));
+            break;
+        case EVENT_SPELL_SHADOW_BLADES:
+            me->CastSpell(me, SPELL_SHADOW_BLADES, false);
             events.ScheduleEvent(EVENT_SPELL_SHADOW_BLADES, 10000);
-            events.ScheduleEvent(EVENT_SPELL_SHADOW_NOVA, 36000);
-            events.ScheduleEvent(EVENT_SPELL_CONFOUNDING_BLOW, 25000);
-            events.ScheduleEvent(EVENT_SHADOW_IMAGE, 20000);
-            events.ScheduleEvent(EVENT_SPELL_ENRAGE, 360000);
-        }
-
-        void KilledUnit(Unit* victim) override
+            break;
+        case EVENT_SPELL_SHADOW_NOVA:
         {
-            if (victim->IsPlayer() && urand(0, 1))
-                Talk(YELL_SAC_KILL);
+            Unit* target = SelectTarget(SelectTargetMethod::MaxThreat, 1, 100.0f);
+            if (!target)
+                target = me->GetVictim();
+            Talk(EMOTE_SHADOW_NOVA, target);
+            Talk(YELL_SHADOW_NOVA);
+            me->CastSpell(target, SPELL_SHADOW_NOVA, false);
+            events.ScheduleEvent(EVENT_SPELL_SHADOW_NOVA, urand(30000, 35000));
+            break;
         }
-
-        void JustDied(Unit* /*killer*/) override
+        case EVENT_SHADOW_IMAGE:
+            me->SummonCreature(NPC_SHADOW_IMAGE, me->GetPositionX(), me->GetPositionY(), me->GetPositionZ(), me->GetOrientation(), TEMPSUMMON_TIMED_DESPAWN, 12000);
+            events.ScheduleEvent(EVENT_SHADOW_IMAGE, 6000);
+            break;
+        case EVENT_SPELL_CONFLAGRATION:
         {
-            events.Reset();
-            summons.DespawnAll();
-
-            if (sisterDied)
-            {
-                Talk(YELL_SAC_DEAD);
-                instance->SetBossState(DATA_EREDAR_TWINS, DONE);
-            }
-            else if (Creature* alythess = ObjectAccessor::GetCreature(*me, instance->GetGuidData(NPC_GRAND_WARLOCK_ALYTHESS)))
-                alythess->AI()->DoAction(ACTION_SISTER_DIED);
+            Unit* target = SelectTarget(SelectTargetMethod::MaxThreat, 1, 100.0f);
+            if (!target)
+                target = me->GetVictim();
+            me->CastSpell(target, SPELL_CONFLAGRATION, false);
+            events.ScheduleEvent(EVENT_SPELL_CONFLAGRATION, urand(30000, 35000));
+            break;
+        }
         }
 
-        void JustSummoned(Creature* summon) override
-        {
-            summons.Summon(summon);
-            if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 50.0f, true))
-            {
-                summon->AI()->AttackStart(target);
-                summon->AddThreat(target, 10000000);
-            }
-        }
-
-        void UpdateAI(uint32 diff) override
-        {
-            if (!UpdateVictim())
-                return;
-
-            events.Update(diff);
-            if (me->HasUnitState(UNIT_STATE_CASTING))
-                return;
-
-            switch (events.ExecuteEvent())
-            {
-                case EVENT_SPELL_ENRAGE:
-                    Talk(YELL_ENRAGE);
-                    me->CastSpell(me, SPELL_ENRAGE, true);
-                    break;
-                case EVENT_SPELL_CONFOUNDING_BLOW:
-                    me->CastSpell(me->GetVictim(), SPELL_CONFOUNDING_BLOW, false);
-                    events.ScheduleEvent(EVENT_SPELL_CONFOUNDING_BLOW, urand(20000, 25000));
-                    break;
-                case EVENT_SPELL_SHADOW_BLADES:
-                    me->CastSpell(me, SPELL_SHADOW_BLADES, false);
-                    events.ScheduleEvent(EVENT_SPELL_SHADOW_BLADES, 10000);
-                    break;
-                case EVENT_SPELL_SHADOW_NOVA:
-                    {
-                        Unit* target = SelectTarget(SelectTargetMethod::MaxThreat, 1, 100.0f);
-                        if (!target)
-                            target = me->GetVictim();
-                        Talk(EMOTE_SHADOW_NOVA, target);
-                        Talk(YELL_SHADOW_NOVA);
-                        me->CastSpell(target, SPELL_SHADOW_NOVA, false);
-                        events.ScheduleEvent(EVENT_SPELL_SHADOW_NOVA, urand(30000, 35000));
-                        break;
-                    }
-                case EVENT_SHADOW_IMAGE:
-                    me->SummonCreature(NPC_SHADOW_IMAGE, me->GetPositionX(), me->GetPositionY(), me->GetPositionZ(), me->GetOrientation(), TEMPSUMMON_TIMED_DESPAWN, 12000);
-                    events.ScheduleEvent(EVENT_SHADOW_IMAGE, 6000);
-                    break;
-                case EVENT_SPELL_CONFLAGRATION:
-                    {
-                        Unit* target = SelectTarget(SelectTargetMethod::MaxThreat, 1, 100.0f);
-                        if (!target)
-                            target = me->GetVictim();
-                        me->CastSpell(target, SPELL_CONFLAGRATION, false);
-                        events.ScheduleEvent(EVENT_SPELL_CONFLAGRATION, urand(30000, 35000));
-                        break;
-                    }
-            }
-
-            DoMeleeAttackIfReady();
-        }
-    };
-
-    CreatureAI* GetAI(Creature* creature) const override
-    {
-        return GetSunwellPlateauAI<boss_sacrolashAI>(creature);
-    };
+        DoMeleeAttackIfReady();
+    }
 };
 
-class boss_alythess : public CreatureScript
+struct boss_alythess : public BossAI
 {
-public:
-    boss_alythess() : CreatureScript("boss_alythess") { }
+    boss_alythess(Creature* creature) : BossAI(creature, DATA_EREDAR_TWINS) { }
 
-    struct boss_alythessAI : public BossAI
+    bool sisterDied;
+    void Reset() override
     {
-        boss_alythessAI(Creature* creature) : BossAI(creature, DATA_EREDAR_TWINS) { }
+        me->CastSpell(me, SPELL_FIREFORM, true);
+        sisterDied = false;
+        BossAI::Reset();
+        me->SetLootMode(0);
+    }
 
-        bool sisterDied;
-        void Reset() override
+    void DoAction(int32 param) override
+    {
+        if (param == ACTION_SISTER_DIED)
         {
-            me->CastSpell(me, SPELL_FIREFORM, true);
-            sisterDied = false;
-            BossAI::Reset();
-            me->SetLootMode(0);
+            me->ResetLootMode();
+            sisterDied = true;
+            Talk(YELL_SISTER_SACROLASH_DEAD);
+            me->CastSpell(me, SPELL_EMPOWER, true);
+
+            uint32 timer = events.GetNextEventTime(EVENT_SPELL_CONFLAGRATION);
+            events.CancelEvent(EVENT_SPELL_CONFLAGRATION);
+            events.ScheduleEvent(EVENT_SPELL_SHADOW_NOVA, timer - events.GetTimer());
         }
+    }
 
-        void DoAction(int32 param) override
+    void EnterEvadeMode(EvadeReason why) override
+    {
+        BossAI::EnterEvadeMode(why);
+        if (Creature* scorlash = ObjectAccessor::GetCreature(*me, instance->GetGuidData(NPC_LADY_SACROLASH)))
         {
-            if (param == ACTION_SISTER_DIED)
-            {
-                me->ResetLootMode();
-                sisterDied = true;
-                Talk(YELL_SISTER_SACROLASH_DEAD);
-                me->CastSpell(me, SPELL_EMPOWER, true);
-
-                uint32 timer = events.GetNextEventTime(EVENT_SPELL_CONFLAGRATION);
-                events.CancelEvent(EVENT_SPELL_CONFLAGRATION);
-                events.ScheduleEvent(EVENT_SPELL_SHADOW_NOVA, timer - events.GetTimer());
-            }
+            if (!scorlash->IsAlive())
+                scorlash->Respawn(true);
+            else if (!scorlash->IsInEvadeMode())
+                scorlash->AI()->EnterEvadeMode(why);
         }
+    }
 
-        void EnterEvadeMode(EvadeReason why) override
+    void JustEngagedWith(Unit* who) override
+    {
+        BossAI::JustEngagedWith(who);
+        if (Creature* scorlash = ObjectAccessor::GetCreature(*me, instance->GetGuidData(NPC_LADY_SACROLASH)))
+            if (scorlash->IsAlive() && !scorlash->IsInCombat())
+                scorlash->AI()->AttackStart(who);
+
+        events.ScheduleEvent(EVENT_SPELL_BLAZE, 100);
+        events.ScheduleEvent(EVENT_SPELL_PYROGENICS, 15000);
+        events.ScheduleEvent(EVENT_SPELL_FLAME_SEAR, 20000);
+        events.ScheduleEvent(EVENT_SPELL_CONFLAGRATION, 30000);
+        events.ScheduleEvent(EVENT_SPELL_ENRAGE, 360000);
+    }
+
+    void KilledUnit(Unit* victim) override
+    {
+        if (victim->IsPlayer() && urand(0, 1))
+            Talk(YELL_SAC_KILL);
+    }
+
+    void JustDied(Unit* /*killer*/) override
+    {
+        events.Reset();
+        summons.DespawnAll();
+
+        if (sisterDied)
         {
-            BossAI::EnterEvadeMode(why);
-            if (Creature* scorlash = ObjectAccessor::GetCreature(*me, instance->GetGuidData(NPC_LADY_SACROLASH)))
-            {
-                if (!scorlash->IsAlive())
-                    scorlash->Respawn(true);
-                else if (!scorlash->IsInEvadeMode())
-                    scorlash->AI()->EnterEvadeMode(why);
-            }
+            Talk(YELL_SAC_DEAD);
+            instance->SetBossState(DATA_EREDAR_TWINS, DONE);
         }
+        else if (Creature* scorlash = ObjectAccessor::GetCreature(*me, instance->GetGuidData(NPC_LADY_SACROLASH)))
+            scorlash->AI()->DoAction(ACTION_SISTER_DIED);
+    }
 
-        void JustEngagedWith(Unit* who) override
+    void UpdateAI(uint32 diff) override
+    {
+        if (!UpdateVictim())
+            return;
+
+        events.Update(diff);
+        if (me->HasUnitState(UNIT_STATE_CASTING))
+            return;
+
+        switch (events.ExecuteEvent())
         {
-            BossAI::JustEngagedWith(who);
-            if (Creature* scorlash = ObjectAccessor::GetCreature(*me, instance->GetGuidData(NPC_LADY_SACROLASH)))
-                if (scorlash->IsAlive() && !scorlash->IsInCombat())
-                    scorlash->AI()->AttackStart(who);
-
-            events.ScheduleEvent(EVENT_SPELL_BLAZE, 100);
+        case EVENT_SPELL_ENRAGE:
+            Talk(YELL_BERSERK);
+            me->CastSpell(me, SPELL_ENRAGE, true);
+            break;
+        case EVENT_SPELL_PYROGENICS:
+            me->CastSpell(me, SPELL_PYROGENICS, false);
             events.ScheduleEvent(EVENT_SPELL_PYROGENICS, 15000);
-            events.ScheduleEvent(EVENT_SPELL_FLAME_SEAR, 20000);
-            events.ScheduleEvent(EVENT_SPELL_CONFLAGRATION, 30000);
-            events.ScheduleEvent(EVENT_SPELL_ENRAGE, 360000);
-        }
-
-        void KilledUnit(Unit* victim) override
+            break;
+        case EVENT_SPELL_FLAME_SEAR:
+            me->CastCustomSpell(SPELL_FLAME_SEAR, SPELLVALUE_MAX_TARGETS, 5, me, TRIGGERED_NONE);
+            events.ScheduleEvent(EVENT_SPELL_FLAME_SEAR, 15000);
+            break;
+        case EVENT_SPELL_BLAZE:
+            me->CastSpell(me->GetVictim(), SPELL_BLAZE, false);
+            events.ScheduleEvent(EVENT_SPELL_BLAZE, 3800);
+            break;
+        case EVENT_SPELL_SHADOW_NOVA:
         {
-            if (victim->IsPlayer() && urand(0, 1))
-                Talk(YELL_SAC_KILL);
+            Unit* target = SelectTarget(SelectTargetMethod::MaxThreat, 1, 100.0f);
+            if (!target)
+                target = me->GetVictim();
+            me->CastSpell(target, SPELL_SHADOW_NOVA, false);
+            events.ScheduleEvent(EVENT_SPELL_SHADOW_NOVA, urand(30000, 35000));
+            break;
         }
-
-        void JustDied(Unit* /*killer*/) override
+        case EVENT_SPELL_CONFLAGRATION:
         {
-            events.Reset();
-            summons.DespawnAll();
-
-            if (sisterDied)
-            {
-                Talk(YELL_SAC_DEAD);
-                instance->SetBossState(DATA_EREDAR_TWINS, DONE);
-            }
-            else if (Creature* scorlash = ObjectAccessor::GetCreature(*me, instance->GetGuidData(NPC_LADY_SACROLASH)))
-                scorlash->AI()->DoAction(ACTION_SISTER_DIED);
+            Unit* target = SelectTarget(SelectTargetMethod::MaxThreat, 1, 100.0f);
+            if (!target)
+                target = me->GetVictim();
+            Talk(EMOTE_CONFLAGRATION, target);
+            Talk(YELL_CANFLAGRATION);
+            me->CastSpell(target, SPELL_CONFLAGRATION, false);
+            events.ScheduleEvent(EVENT_SPELL_CONFLAGRATION, urand(30000, 35000));
+            break;
+        }
         }
 
-        void UpdateAI(uint32 diff) override
-        {
-            if (!UpdateVictim())
-                return;
-
-            events.Update(diff);
-            if (me->HasUnitState(UNIT_STATE_CASTING))
-                return;
-
-            switch (events.ExecuteEvent())
-            {
-                case EVENT_SPELL_ENRAGE:
-                    Talk(YELL_BERSERK);
-                    me->CastSpell(me, SPELL_ENRAGE, true);
-                    break;
-                case EVENT_SPELL_PYROGENICS:
-                    me->CastSpell(me, SPELL_PYROGENICS, false);
-                    events.ScheduleEvent(EVENT_SPELL_PYROGENICS, 15000);
-                    break;
-                case EVENT_SPELL_FLAME_SEAR:
-                    me->CastCustomSpell(SPELL_FLAME_SEAR, SPELLVALUE_MAX_TARGETS, 5, me, TRIGGERED_NONE);
-                    events.ScheduleEvent(EVENT_SPELL_FLAME_SEAR, 15000);
-                    break;
-                case EVENT_SPELL_BLAZE:
-                    me->CastSpell(me->GetVictim(), SPELL_BLAZE, false);
-                    events.ScheduleEvent(EVENT_SPELL_BLAZE, 3800);
-                    break;
-                case EVENT_SPELL_SHADOW_NOVA:
-                    {
-                        Unit* target = SelectTarget(SelectTargetMethod::MaxThreat, 1, 100.0f);
-                        if (!target)
-                            target = me->GetVictim();
-                        me->CastSpell(target, SPELL_SHADOW_NOVA, false);
-                        events.ScheduleEvent(EVENT_SPELL_SHADOW_NOVA, urand(30000, 35000));
-                        break;
-                    }
-                case EVENT_SPELL_CONFLAGRATION:
-                    {
-                        Unit* target = SelectTarget(SelectTargetMethod::MaxThreat, 1, 100.0f);
-                        if (!target)
-                            target = me->GetVictim();
-                        Talk(EMOTE_CONFLAGRATION, target);
-                        Talk(YELL_CANFLAGRATION);
-                        me->CastSpell(target, SPELL_CONFLAGRATION, false);
-                        events.ScheduleEvent(EVENT_SPELL_CONFLAGRATION, urand(30000, 35000));
-                        break;
-                    }
-            }
-
-            DoMeleeAttackIfReady();
-        }
-    };
-
-    CreatureAI* GetAI(Creature* creature) const override
-    {
-        return GetSunwellPlateauAI<boss_alythessAI>(creature);
-    };
+        DoMeleeAttackIfReady();
+    }
 };
 
 class spell_eredar_twins_apply_dark_touched : public SpellScript
@@ -496,8 +474,8 @@ public:
 
 void AddSC_boss_eredar_twins()
 {
-    new boss_sacrolash();
-    new boss_alythess();
+    RegisterSunwellPlateauCreatureAI(boss_sacrolash);
+    RegisterSunwellPlateauCreatureAI(boss_alythess);
     RegisterSpellScript(spell_eredar_twins_apply_dark_touched);
     RegisterSpellScript(spell_eredar_twins_apply_flame_touched);
     RegisterSpellScript(spell_eredar_twins_handle_touch);

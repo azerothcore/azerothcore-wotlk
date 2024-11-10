@@ -105,4 +105,6 @@ inline AI* GetSunwellPlateauAI(T* obj)
     return GetInstanceAI<AI>(obj, SWPScriptName);
 }
 
+#define RegisterSunwellPlateauCreatureAI(ai_name) RegisterCreatureAIWithFactory(ai_name, GetSunwellPlateauAI)
+
 #endif // SUNWELL_PLATEAU_H
