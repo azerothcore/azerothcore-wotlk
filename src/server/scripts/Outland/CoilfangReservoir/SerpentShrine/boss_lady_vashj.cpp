@@ -58,17 +58,13 @@ enum Spells
     SPELL_SUMMON_SPOREBAT2          = 38490,
     SPELL_SUMMON_SPOREBAT3          = 38492,
     SPELL_SUMMON_SPOREBAT4          = 38493,
-    SPELL_TOXIC_SPORES              = 38574,
-
-    SPELL_POISON_BOLT               = 38253
+    SPELL_TOXIC_SPORES              = 38574
 };
 
 enum Misc
 {
     ITEM_TAINTED_CORE               = 31088,
-
     POINT_HOME                      = 1,
-
     NPC_TRIGGER                     = 15384
 };
 
@@ -125,29 +121,29 @@ struct boss_lady_vashj : public BossAI
         BossAI::JustEngagedWith(who);
         Talk(SAY_AGGRO);
         DoCastSelf(SPELL_REMOVE_TAINTED_CORES, true);
-
         ScheduleSpells();
     }
 
     void JustSummoned(Creature* summon) override
     {
         summons.Summon(summon);
-        switch (summon->GetEntry()) {
-            case(WORLD_TRIGGER):
+        switch (summon->GetEntry())
+        {
+            case WORLD_TRIGGER:
                 summon->CastSpell(summon, SPELL_MAGIC_BARRIER);
                 break;
-            case(NPC_ENCHANTED_ELEMENTAL):
+            case NPC_ENCHANTED_ELEMENTAL:
                 summon->GetMotionMaster()->MoveFollow(me, 0.0f, 0.0f, MOTION_SLOT_ACTIVE, false);
                 summon->SetWalk(true);
                 summon->SetReactState(REACT_PASSIVE);
                 break;
-            case(NPC_TAINTED_ELEMENTAL):
+            case NPC_TAINTED_ELEMENTAL:
                 break;
-            case(NPC_TOXIC_SPOREBAT):
+            case NPC_TOXIC_SPOREBAT:
                 summon->GetMotionMaster()->MoveRandom(30.0f);
                 break;
               default:
-                summon->GetMotionMaster()->MovePoint(POINT_HOME, me->GetPositionX(), me->GetPositionY(), me->GetPositionZ(), true, true);
+                summon->GetMotionMaster()->MovePoint(POINT_HOME, me->GetPosition());
         }
     }
 
@@ -182,9 +178,8 @@ struct boss_lady_vashj : public BossAI
     void MovementInform(uint32 type, uint32 id) override
     {
         if (type != POINT_MOTION_TYPE || id != POINT_HOME)
-        {
             return;
-        }
+
         me->AddUnitState(UNIT_STATE_ROOT);
         me->SetFacingTo(me->GetHomePosition().GetOrientation());
         instance->SetData(DATA_ACTIVATE_SHIELD, 0);
@@ -232,9 +227,7 @@ struct boss_lady_vashj : public BossAI
                 });
             }
             else
-            {
                 context.Repeat(1s);
-            }
         });
     }
 
@@ -246,19 +239,15 @@ struct boss_lady_vashj : public BossAI
         scheduler.Update(diff);
 
         if (me->GetReactState() != REACT_AGGRESSIVE || !me->isAttackReady())
-        {
             return;
-        }
 
         if (!me->IsWithinMeleeRange(me->GetVictim()))
         {
             me->resetAttackTimer();
             me->SetSheath(SHEATH_STATE_RANGED);
-            me->CastSpell(me->GetVictim(), roll_chance_i(33) ? SPELL_MULTI_SHOT : SPELL_SHOOT, false);
+            DoCastVictim(roll_chance_i(33) ? SPELL_MULTI_SHOT : SPELL_SHOOT);
             if (roll_chance_i(15))
-            {
                 Talk(SAY_BOWSHOT);
-            }
         }
         else
         {
@@ -278,42 +267,6 @@ private:
     bool _intro;
     int32 _count;
     std::chrono::seconds _batTimer;
-};
-
-struct npc_tainted_elemental : public ScriptedAI
-{
-    npc_tainted_elemental(Creature* creature) : ScriptedAI(creature) { }
-
-    void Reset() override
-    {
-        scheduler.CancelAll();
-        me->SetInCombatWithZone();
-        if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0))
-        {
-            me->AddThreat(target, 1000.0f);
-        }
-    }
-
-    void JustEngagedWith(Unit* /*who*/) override
-    {
-        scheduler.Schedule(100ms, 500ms, [this](TaskContext context)
-        {
-            DoCastVictim(SPELL_POISON_BOLT);
-            context.Repeat(2350ms, 2650ms);
-        }).Schedule(15s, [this](TaskContext)
-        {
-            me->DespawnOrUnsummon();
-        });
-    }
-
-    void UpdateAI(uint32 diff) override
-    {
-        if (!UpdateVictim())
-            return;
-
-        scheduler.Update(diff);
-    }
-
 };
 
 class spell_lady_vashj_magic_barrier : public AuraScript
@@ -339,9 +292,7 @@ class spell_lady_vashj_remove_tainted_cores : public SpellScript
     {
         PreventHitDefaultEffect(effIndex);
         if (Player* target = GetHitPlayer())
-        {
             target->DestroyItemCount(ITEM_TAINTED_CORE, -1, true);
-        }
     }
 
     void Register() override
@@ -374,9 +325,7 @@ class spell_lady_vashj_spore_drop_effect : public SpellScript
     {
         PreventHitDefaultEffect(effIndex);
         if (Unit* target = GetHitUnit())
-        {
             target->CastSpell(target, SPELL_TOXIC_SPORES, true, nullptr, nullptr, GetCaster()->GetGUID());
-        }
     }
 
     void Register() override
@@ -455,7 +404,6 @@ class spell_lady_vashj_summons : public SpellScript
 void AddSC_boss_lady_vashj()
 {
     RegisterSerpentShrineAI(boss_lady_vashj);
-    RegisterSerpentShrineAI(npc_tainted_elemental);
     RegisterSpellScript(spell_lady_vashj_magic_barrier);
     RegisterSpellScript(spell_lady_vashj_remove_tainted_cores);
     RegisterSpellScript(spell_lady_vashj_summon_sporebat);
