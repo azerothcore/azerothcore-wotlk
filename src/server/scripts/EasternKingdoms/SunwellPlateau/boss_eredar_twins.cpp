@@ -451,22 +451,20 @@ class spell_eredar_twins_blaze : public SpellScript
     }
 };
 
-class AreaTrigger_at_sunwell_eredar_twins : public AreaTriggerScript
+class at_sunwell_eredar_twins : public OnlyOnceAreaTriggerScript
 {
 public:
-    AreaTrigger_at_sunwell_eredar_twins() : AreaTriggerScript("at_sunwell_eredar_twins") {}
+    at_sunwell_eredar_twins() : OnlyOnceAreaTriggerScript("at_sunwell_eredar_twins") {}
 
-    bool OnTrigger(Player* player, AreaTrigger const* /*trigger*/) override
+    bool _OnTrigger(Player* player, AreaTrigger const* /*trigger*/) override
     {
         if (InstanceScript* instance = player->GetInstanceScript())
-            if (instance->GetBossState(DATA_EREDAR_TWINS_INTRO) != DONE)
-            {
-                instance->SetBossState(DATA_EREDAR_TWINS_INTRO, DONE);
-                if (Creature* creature = ObjectAccessor::GetCreature(*player, instance->GetGuidData(NPC_LADY_SACROLASH)))
-                    creature->AI()->Talk(YELL_INTRO_SAC);
-                if (Creature* creature = ObjectAccessor::GetCreature(*player, instance->GetGuidData(NPC_GRAND_WARLOCK_ALYTHESS)))
-                    creature->AI()->Talk(YELL_INTRO_ALY);
-            }
+        {
+            if (Creature* creature = instance->GetCreature(DATA_SACROLASH))
+                creature->AI()->Talk(YELL_INTRO_SAC);
+            if (Creature* creature = instance->GetCreature(DATA_ALYTHESS))
+                creature->AI()->Talk(YELL_INTRO_ALY);
+        }
 
         return true;
     }
@@ -480,5 +478,5 @@ void AddSC_boss_eredar_twins()
     RegisterSpellScript(spell_eredar_twins_apply_flame_touched);
     RegisterSpellScript(spell_eredar_twins_handle_touch);
     RegisterSpellScript(spell_eredar_twins_blaze);
-    new AreaTrigger_at_sunwell_eredar_twins();
+    new at_sunwell_eredar_twins();
 }

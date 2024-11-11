@@ -109,7 +109,7 @@ struct boss_brutallus : public BossAI
         Talk(YELL_DEATH);
 
         me->CastSpell(me, SPELL_SUMMON_BRUTALLUS_DEATH_CLOUD, true);
-        if (Creature* madrigosa = ObjectAccessor::GetCreature(*me, instance->GetGuidData(NPC_MADRIGOSA)))
+        if (Creature* madrigosa = instance->GetCreature(DATA_MADRIGOSA))
             madrigosa->AI()->DoAction(ACTION_SPAWN_FELMYST);
     }
 
@@ -204,10 +204,11 @@ struct npc_madrigosa : public NullCreatureAI
     npc_madrigosa(Creature* creature) : NullCreatureAI(creature)
     {
         instance = creature->GetInstanceScript();
-        bool appear = instance->GetBossState(DATA_BRUTALLUS) != DONE && instance->GetBossState(DATA_MADRIGOSA) == DONE;
-        creature->SetVisible(appear);
         creature->SetStandState(UNIT_STAND_STATE_DEAD);
         creature->SetDynamicFlag(UNIT_DYNFLAG_DEAD);
+
+        if (instance->IsBossDone(DATA_BRUTALLUS))
+            creature->SetVisible(false);
     }
 
     EventMap events;
@@ -475,21 +476,17 @@ class spell_brutallus_burn : public SpellScript
     }
 };
 
-class AreaTrigger_at_sunwell_madrigosa : public AreaTriggerScript
+class at_sunwell_madrigosa : public OnlyOnceAreaTriggerScript
 {
 public:
-    AreaTrigger_at_sunwell_madrigosa() : AreaTriggerScript("at_sunwell_madrigosa") {}
+    at_sunwell_madrigosa() : OnlyOnceAreaTriggerScript("at_sunwell_madrigosa") {}
 
-    bool OnTrigger(Player* player, AreaTrigger const* /*trigger*/) override
+    bool _OnTrigger(Player* player, AreaTrigger const* /*trigger*/) override
     {
         if (InstanceScript* instance = player->GetInstanceScript())
-            if (instance->GetBossState(DATA_MADRIGOSA) != DONE)
-            {
-                instance->SetBossState(DATA_MADRIGOSA, NOT_STARTED);
-                instance->SetBossState(DATA_MADRIGOSA, DONE);
-                if (Creature* creature = ObjectAccessor::GetCreature(*player, instance->GetGuidData(NPC_MADRIGOSA)))
+            if (!instance->IsBossDone(DATA_BRUTALLUS))
+                if (Creature* creature = instance->GetCreature(DATA_MADRIGOSA))
                     creature->AI()->DoAction(ACTION_START_EVENT);
-            }
 
         return true;
     }
@@ -502,5 +499,5 @@ void AddSC_boss_brutallus()
     RegisterSpellScript(spell_madrigosa_activate_barrier);
     RegisterSpellScript(spell_madrigosa_deactivate_barrier);
     RegisterSpellScript(spell_brutallus_burn);
-    new AreaTrigger_at_sunwell_madrigosa();
+    new at_sunwell_madrigosa();
 }
