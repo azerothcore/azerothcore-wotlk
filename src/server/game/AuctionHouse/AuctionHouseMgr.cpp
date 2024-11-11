@@ -737,18 +737,19 @@ bool AuctionHouseObject::BuildListAuctionItems(WorldPacket& data, Player* player
 {
     if (getAll)
     {
-        auto itr = GetAuctionsBegin();
-        for (; itr != GetAuctionsEnd(); ++itr)
+        for (AuctionEntryMap::iterator itr = GetAuctionsBegin(); itr != GetAuctionsEnd(); ++itr)
         {
-            auto auction = itr->second;
-            Item* item = sAuctionMgr->GetAItem(auction->item_guid);
-            if (!item)
-            {
+            AuctionEntry* Aentry = itr->second;
+            if (!Aentry)
                 continue;
-            }
+
+            Item* item = sAuctionMgr->GetAItem(Aentry->item_guid);
+            if (!item)
+                continue;
+
             ++count;
             ++totalcount;
-            auction->BuildAuctionInfo(data);
+            Aentry->BuildAuctionInfo(data);
         }
         return true;
     }
