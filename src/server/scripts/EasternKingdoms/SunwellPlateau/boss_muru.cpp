@@ -166,7 +166,7 @@ struct boss_entropius : public ScriptedAI
     void EnterEvadeMode(EvadeReason why) override
     {
         if (InstanceScript* instance = me->GetInstanceScript())
-            if (Creature* muru = ObjectAccessor::GetCreature(*me, instance->GetGuidData(NPC_MURU)))
+            if (Creature* muru = instance->GetCreature(DATA_MURU))
                 if (!muru->IsInEvadeMode())
                     muru->AI()->EnterEvadeMode(why);
 
@@ -195,7 +195,7 @@ struct boss_entropius : public ScriptedAI
     void JustDied(Unit* /*killer*/) override
     {
         if (InstanceScript* instance = me->GetInstanceScript())
-            if (Creature* muru = ObjectAccessor::GetCreature(*me, instance->GetGuidData(NPC_MURU)))
+            if (Creature* muru = instance->GetCreature(DATA_MURU))
                 Unit::Kill(muru, muru);
     }
 
