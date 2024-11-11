@@ -750,6 +750,9 @@ bool AuctionHouseObject::BuildListAuctionItems(WorldPacket& data, Player* player
             ++count;
             ++totalcount;
             Aentry->BuildAuctionInfo(data);
+
+            if (count >= MAX_GETALL_RETURN)
+                break;
         }
         return true;
     }

@@ -31,6 +31,7 @@ class Player;
 
 #define MIN_AUCTION_TIME (12*HOUR)
 #define MAX_AUCTION_ITEMS 160
+#define MAX_GETALL_RETURN 55000
 
 enum AuctionError
 {
