@@ -1,3 +1,4 @@
+-- DB update 2024_11_11_03 -> 2024_11_11_04
 DELETE FROM `spell_linked_spell` WHERE `spell_trigger` IN (-40568, -40575, -40572, -40567, -40573, -40576);
 INSERT INTO `spell_linked_spell` (`spell_trigger`, `spell_effect`, `type`, `comment`) VALUES
 (-40568, -40582, 0, 'Unstable Flask of the Elder'),
