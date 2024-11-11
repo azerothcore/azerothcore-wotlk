@@ -41,11 +41,10 @@ enum DataTypes
     DATA_SACROLASH                          = 7,
     DATA_ALYTHESS                           = 8,
     DATA_MADRIGOSA                          = 9,
-    DATA_ICEBARRIER                         = 10,
-    DATA_SATHROVARR                         = 11,
-    DATA_KJ_CONTROLLER                      = 12,
-    DATA_ANVEENA                            = 13,
-    DATA_KALECGOS_KJ                        = 14
+    DATA_SATHROVARR                         = 10,
+    DATA_KJ_CONTROLLER                      = 11,
+    DATA_ANVEENA                            = 12,
+    DATA_KALECGOS_KJ                        = 13
 };
 
 enum DataTypesObjects
@@ -53,7 +52,8 @@ enum DataTypesObjects
     DATA_ORB_OF_THE_BLUE_DRAGONFLIGHT_1     = 0,
     DATA_ORB_OF_THE_BLUE_DRAGONFLIGHT_2     = 1,
     DATA_ORB_OF_THE_BLUE_DRAGONFLIGHT_3     = 2,
-    DATA_ORB_OF_THE_BLUE_DRAGONFLIGHT_4     = 3
+    DATA_ORB_OF_THE_BLUE_DRAGONFLIGHT_4     = 3,
+    DATA_ICEBARRIER                         = 4,
 };
 
 enum CreatureIds
