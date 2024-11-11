@@ -1,3 +1,4 @@
+-- DB update 2024_11_11_01 -> 2024_11_11_02
 --
 UPDATE `creature` SET `ScriptName` = '' WHERE `guid` = 320 AND `id1` = 24358;
 DELETE FROM `creature` WHERE `guid` = 89357 AND `id1` = 24239;
