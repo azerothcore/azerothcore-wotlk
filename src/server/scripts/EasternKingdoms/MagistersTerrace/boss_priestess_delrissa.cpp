@@ -32,12 +32,9 @@ enum Spells
     SPELL_MEDALION_OF_IMMUNITY = 46227,
     SPELL_DISPEL_MAGIC         = 27609,
     SPELL_FLASH_HEAL           = 17843,
-    SPELL_SHADOW_WORD_PAIN_N   = 14032,
-    SPELL_SHADOW_WORD_PAIN_H   = 15654,
-    SPELL_POWER_WORD_SHIELD_N  = 44291,
-    SPELL_POWER_WORD_SHIELD_H  = 46193,
-    SPELL_RENEW_N              = 44174,
-    SPELL_RENEW_H              = 46192,
+    SPELL_SHADOW_WORD_PAIN     = 14032,
+    SPELL_POWER_WORD_SHIELD    = 44291,
+    SPELL_RENEW                = 44174
 };
 
 enum Misc
@@ -196,14 +193,14 @@ struct boss_priestess_delrissa : public ScriptedAI
             break;
         case EVENT_SPELL_RENEW:
             if (Unit* target = DoSelectLowestHpFriendly(40.0f, 1000))
-                me->CastSpell(target, DUNGEON_MODE(SPELL_RENEW_N, SPELL_RENEW_H), false);
+                me->CastSpell(target, SPELL_RENEW, false);
             events.ScheduleEvent(EVENT_SPELL_RENEW, 7000);
             break;
         case EVENT_SPELL_PW_SHIELD:
         {
-            std::list<Creature*> cList = DoFindFriendlyMissingBuff(40.0f, DUNGEON_MODE(SPELL_POWER_WORD_SHIELD_N, SPELL_POWER_WORD_SHIELD_H));
+            std::list<Creature*> cList = DoFindFriendlyMissingBuff(40.0f, SPELL_POWER_WORD_SHIELD);
             if (Unit* target = Acore::Containers::SelectRandomContainerElement(cList))
-                me->CastSpell(target, DUNGEON_MODE(SPELL_POWER_WORD_SHIELD_N, SPELL_POWER_WORD_SHIELD_H), false);
+                me->CastSpell(target, SPELL_POWER_WORD_SHIELD, false);
             events.ScheduleEvent(EVENT_SPELL_PW_SHIELD, 10000);
             break;
         }
@@ -239,7 +236,7 @@ struct boss_priestess_delrissa : public ScriptedAI
             break;
         case EVENT_SPELL_SW_PAIN:
             if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 30.0f))
-                me->CastSpell(target, DUNGEON_MODE(SPELL_SHADOW_WORD_PAIN_N, SPELL_SHADOW_WORD_PAIN_H), false);
+                me->CastSpell(target, SPELL_SHADOW_WORD_PAIN, false);
             events.ScheduleEvent(EVENT_SPELL_SW_PAIN, 10000);
             break;
         }
@@ -397,10 +394,8 @@ enum RogueEnum
     SPELL_VANISH       = 44290,
     SPELL_GOUGE        = 12540,
     SPELL_KICK         = 27613,
-    SPELL_BACKSTAB_N   = 15657,
-    SPELL_BACKSTAB_H   = 15582,
-    SPELL_EVISCERATE_N = 27611,
-    SPELL_EVISCERATE_H = 46189,
+    SPELL_BACKSTAB     = 15657,
+    SPELL_EVISCERATE   = 27611,
 
     EVENT_SPELL_GOUGE      = 1,
     EVENT_SPELL_KICK       = 2,
@@ -461,13 +456,13 @@ struct boss_kagani_nightstrike : public boss_priestess_lackey_commonAI
                 events.ScheduleEvent(EVENT_SPELL_KICK, 1000);
             break;
         case EVENT_SPELL_EVISCERATE:
-            me->CastSpell(me->GetVictim(), DUNGEON_MODE(SPELL_EVISCERATE_N, SPELL_EVISCERATE_H), false);
+            me->CastSpell(me->GetVictim(), SPELL_EVISCERATE, false);
             events.ScheduleEvent(EVENT_SPELL_EVISCERATE, 10000);
             break;
         case EVENT_SPELL_BACKSTAB:
             if (!me->GetVictim()->HasInArc(static_cast<float>(M_PI), me))
             {
-                me->CastSpell(me->GetVictim(), DUNGEON_MODE(SPELL_BACKSTAB_N, SPELL_BACKSTAB_H), false);
+                me->CastSpell(me->GetVictim(), SPELL_BACKSTAB, false);
                 events.ScheduleEvent(EVENT_SPELL_BACKSTAB, 5000);
             }
             else
@@ -481,12 +476,9 @@ struct boss_kagani_nightstrike : public boss_priestess_lackey_commonAI
 
 enum WarlockEnum
 {
-    SPELL_IMMOLATE_N         = 44267,
-    SPELL_IMMOLATE_H         = 46191,
-    SPELL_SHADOW_BOLT_N      = 12471,
-    SPELL_SHADOW_BOLT_H      = 15232,
-    SPELL_CURSE_OF_AGONY_N   = 14875,
-    SPELL_CURSE_OF_AGONY_H   = 46190,
+    SPELL_IMMOLATE           = 44267,
+    SPELL_SHADOW_BOLT        = 12471,
+    SPELL_CURSE_OF_AGONY     = 14875,
     SPELL_SEED_OF_CORRUPTION = 44141,
     SPELL_FEAR               = 38595,
     SPELL_SUMMON_IMP         = 44163,
@@ -525,11 +517,11 @@ struct boss_ellris_duskhallow : public boss_priestess_lackey_commonAI
         {
         case EVENT_SPELL_IMMOLATE:
             if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 30.0f))
-                me->CastSpell(target, DUNGEON_MODE(SPELL_IMMOLATE_N, SPELL_IMMOLATE_H), false);
+                me->CastSpell(target, SPELL_IMMOLATE, false);
             events.ScheduleEvent(EVENT_SPELL_IMMOLATE, 12000);
             break;
         case EVENT_SPELL_SHADOW_BOLT:
-            me->CastSpell(me->GetVictim(), DUNGEON_MODE(SPELL_SHADOW_BOLT_N, SPELL_SHADOW_BOLT_H), false);
+            me->CastSpell(me->GetVictim(), SPELL_SHADOW_BOLT, false);
             events.ScheduleEvent(EVENT_SPELL_SHADOW_BOLT, 5000);
             break;
         case EVENT_SPELL_SEED_OF_CORRUPTION:
@@ -539,7 +531,7 @@ struct boss_ellris_duskhallow : public boss_priestess_lackey_commonAI
             break;
         case EVENT_SPELL_CURSE_OF_AGONY:
             if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 30.0f))
-                me->CastSpell(target, DUNGEON_MODE(SPELL_CURSE_OF_AGONY_N, SPELL_CURSE_OF_AGONY_H), false);
+                me->CastSpell(target, SPELL_CURSE_OF_AGONY, false);
             events.ScheduleEvent(EVENT_SPELL_CURSE_OF_AGONY, 13000);
             break;
         case EVENT_SPELL_FEAR:
@@ -555,8 +547,7 @@ struct boss_ellris_duskhallow : public boss_priestess_lackey_commonAI
 
 enum MonkEnum
 {
-    SPELL_KNOCKDOWN_N     = 11428,
-    SPELL_KNOCKDOWN_H     = 46183,
+    SPELL_KNOCKDOWN       = 11428,
     SPELL_SNAP_KICK       = 46182,
     SPELL_FISTS_OF_ARCANE = 44120,
 
@@ -588,7 +579,7 @@ struct boss_eramas_brightblaze : public boss_priestess_lackey_commonAI
         switch (actualEventId)
         {
         case EVENT_SPELL_KNOCKDOWN:
-            me->CastSpell(me->GetVictim(), DUNGEON_MODE(SPELL_KNOCKDOWN_N, SPELL_KNOCKDOWN_H), false);
+            me->CastSpell(me->GetVictim(), SPELL_KNOCKDOWN, false);
             events.ScheduleEvent(EVENT_SPELL_KNOCKDOWN, 10000);
             break;
         case EVENT_SPELL_SNAP_KICK:
@@ -609,14 +600,10 @@ enum MageEnum
 {
     SPELL_POLYMORPH      = 13323,
     SPELL_ICE_BLOCK      = 27619,
-    SPELL_BLIZZARD_N     = 44178,
-    SPELL_BLIZZARD_H     = 46195,
-    SPELL_ICE_LANCE_N    = 44176,
-    SPELL_ICE_LANCE_H    = 46194,
-    SPELL_CONE_OF_COLD_N = 38384,
-    SPELL_CONE_OF_COLD_H = 12611,
-    SPELL_FROSTBOLT_N    = 15043,
-    SPELL_FROSTBOLT_H    = 15530,
+    SPELL_BLIZZARD       = 44178,
+    SPELL_ICE_LANCE      = 44176,
+    SPELL_CONE_OF_COLD   = 12611,
+    SPELL_FROSTBOLT      = 15043,
     SPELL_BLINK          = 14514,
 
     EVENT_SPELL_POLYMORPH = 1,
@@ -669,19 +656,19 @@ struct boss_yazzai : public boss_priestess_lackey_commonAI
             break;
         case EVENT_SPELL_BLIZZARD:
             if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0))
-                me->CastSpell(target, DUNGEON_MODE(SPELL_BLIZZARD_N, SPELL_BLIZZARD_H), false);
+                me->CastSpell(target, SPELL_BLIZZARD, false);
             events.ScheduleEvent(EVENT_SPELL_BLIZZARD, 20000);
             break;
         case EVENT_SPELL_ICE_LANCE:
-            me->CastSpell(me->GetVictim(), DUNGEON_MODE(SPELL_ICE_LANCE_N, SPELL_ICE_LANCE_H), false);
+            me->CastSpell(me->GetVictim(), SPELL_ICE_LANCE, false);
             events.ScheduleEvent(EVENT_SPELL_ICE_LANCE, 12000);
             break;
         case EVENT_SPELL_COC:
-            me->CastSpell(me->GetVictim(), DUNGEON_MODE(SPELL_CONE_OF_COLD_N, SPELL_CONE_OF_COLD_H), false);
+            me->CastSpell(me->GetVictim(), SPELL_CONE_OF_COLD, false);
             events.ScheduleEvent(EVENT_SPELL_COC, 10000);
             break;
         case EVENT_SPELL_FROSTBOLT:
-            me->CastSpell(me->GetVictim(), DUNGEON_MODE(SPELL_FROSTBOLT_N, SPELL_FROSTBOLT_H), false);
+            me->CastSpell(me->GetVictim(), SPELL_FROSTBOLT, false);
             events.ScheduleEvent(EVENT_SPELL_FROSTBOLT, 8000);
             break;
         case EVENT_SPELL_BLINK:
@@ -784,8 +771,7 @@ struct boss_warlord_salaris : public boss_priestess_lackey_commonAI
 enum HunterEnum
 {
     SPELL_AIMED_SHOT            = 44271,
-    SPELL_SHOOT_N               = 15620,
-    SPELL_SHOOT_H               = 22907,
+    SPELL_SHOOT                 = 15620,
     SPELL_CONCUSSIVE_SHOT       = 27634,
     SPELL_MULTI_SHOT            = 31942,
     SPELL_WING_CLIP             = 44286,
@@ -848,7 +834,7 @@ struct boss_garaxxas : public boss_priestess_lackey_commonAI
             events.ScheduleEvent(EVENT_SPELL_MULTI_SHOT, 10000);
             break;
         case EVENT_SPELL_SHOOT:
-            me->CastSpell(me->GetVictim(), DUNGEON_MODE(SPELL_SHOOT_N, SPELL_SHOOT_H), false);
+            me->CastSpell(me->GetVictim(), SPELL_SHOOT, false);
             events.ScheduleEvent(EVENT_SPELL_SHOOT, 2500);
             break;
         }
@@ -864,10 +850,8 @@ enum ShamanEnum
     SPELL_EARTHBIND_TOTEM       = 15786,
     SPELL_WAR_STOMP             = 46026,
     SPELL_PURGE                 = 27626,
-    SPELL_LESSER_HEALING_WAVE_N = 44256,
-    SPELL_LESSER_HEALING_WAVE_H = 46181,
-    SPELL_FROST_SHOCK_N         = 21401,
-    SPELL_FROST_SHOCK_H         = 46180,
+    SPELL_LESSER_HEALING_WAVE   = 44256,
+    SPELL_FROST_SHOCK           = 21401,
 
     EVENT_SPELL_TOTEM1       = 1,
     EVENT_SPELL_TOTEM2       = 2,
@@ -933,12 +917,12 @@ struct boss_apoko : public boss_priestess_lackey_commonAI
             events.ScheduleEvent(EVENT_SPELL_PURGE, 15000);
             break;
         case EVENT_SPELL_FROST_SHOCK:
-            me->CastSpell(me, DUNGEON_MODE(SPELL_FROST_SHOCK_N, SPELL_FROST_SHOCK_H), false);
+            me->CastSpell(me, SPELL_FROST_SHOCK, false);
             events.ScheduleEvent(EVENT_SPELL_FROST_SHOCK, 12000);
             break;
         case EVENT_SPELL_HEALING_WAVE:
             if (Unit* target = DoSelectLowestHpFriendly(40.0f, 1000))
-                me->CastSpell(target, DUNGEON_MODE(SPELL_LESSER_HEALING_WAVE_N, SPELL_LESSER_HEALING_WAVE_H), false);
+                me->CastSpell(target, SPELL_LESSER_HEALING_WAVE, false);
             events.ScheduleEvent(EVENT_SPELL_HEALING_WAVE, 12000);
             break;
         }
@@ -949,12 +933,9 @@ struct boss_apoko : public boss_priestess_lackey_commonAI
 
 enum EngineerEnum
 {
-    SPELL_GOBLIN_DRAGON_GUN_N  = 44272,
-    SPELL_GOBLIN_DRAGON_GUN_H  = 46186,
-    SPELL_ROCKET_LAUNCH_N      = 44137,
-    SPELL_ROCKET_LAUNCH_H      = 46187,
-    SPELL_FEL_IRON_BOMB_N      = 46024,
-    SPELL_FEL_IRON_BOMB_H      = 46184,
+    SPELL_GOBLIN_DRAGON_GUN    = 44272,
+    SPELL_ROCKET_LAUNCH        = 44137,
+    SPELL_FEL_IRON_BOMB        = 46024,
     SPELL_RECOMBOBULATE        = 44274,
     SPELL_HIGH_EXPLOSIVE_SHEEP = 44276,
 
@@ -990,16 +971,16 @@ struct boss_zelfan : public boss_priestess_lackey_commonAI
         switch (actualEventId)
         {
         case EVENT_SPELL_DRAGON_GUN:
-            me->CastSpell(me->GetVictim(), DUNGEON_MODE(SPELL_GOBLIN_DRAGON_GUN_N, SPELL_GOBLIN_DRAGON_GUN_H), false);
+            me->CastSpell(me->GetVictim(), SPELL_GOBLIN_DRAGON_GUN, false);
             events.ScheduleEvent(EVENT_SPELL_DRAGON_GUN, 20000);
             break;
         case EVENT_SPELL_ROCKET_LAUNCH:
-            me->CastSpell(me->GetVictim(), DUNGEON_MODE(SPELL_ROCKET_LAUNCH_N, SPELL_ROCKET_LAUNCH_H), false);
+            me->CastSpell(me->GetVictim(), SPELL_ROCKET_LAUNCH, false);
             events.ScheduleEvent(EVENT_SPELL_ROCKET_LAUNCH, 20000);
             break;
         case EVENT_SPELL_IRON_BOMB:
             if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 15.0f))
-                me->CastSpell(target, DUNGEON_MODE(SPELL_FEL_IRON_BOMB_N, SPELL_FEL_IRON_BOMB_H), false);
+                me->CastSpell(target, SPELL_FEL_IRON_BOMB, false);
             events.ScheduleEvent(EVENT_SPELL_IRON_BOMB, 20000);
             break;
         case EVENT_SPELL_RECOMBOBULATE:

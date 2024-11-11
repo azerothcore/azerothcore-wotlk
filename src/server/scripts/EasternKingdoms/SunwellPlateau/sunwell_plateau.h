@@ -24,18 +24,23 @@
 
 #define SWPScriptName "instance_sunwell_plateau"
 
-enum DataTypes
+enum BossIds
 {
     DATA_KALECGOS                           = 0,
-    DATA_MADRIGOSA                          = 1,
-    DATA_BRUTALLUS                          = 2,
-    DATA_FELMYST                            = 3,
-    DATA_FELMYST_DOORS                      = 4,
-    DATA_EREDAR_TWINS_INTRO                 = 5,
-    DATA_EREDAR_TWINS                       = 6,
-    DATA_MURU                               = 7,
-    DATA_KILJAEDEN                          = 8,
-    MAX_ENCOUNTERS                          = 9,
+    DATA_BRUTALLUS                          = 1,
+    DATA_FELMYST                            = 2,
+    DATA_FELMYST_DOORS                      = 3,
+    DATA_EREDAR_TWINS                       = 4,
+    DATA_MURU                               = 5,
+    DATA_KILJAEDEN                          = 6,
+    MAX_ENCOUNTERS
+};
+
+enum DataTypes
+{
+    DATA_SACROLASH                          = 0,
+    DATA_ALYTHESS                           = 1,
+    DATA_MADRIGOSA                          = 2,
 
     // GameObject GUIDs
     DATA_ORB_OF_THE_BLUE_DRAGONFLIGHT_1     = 10,
@@ -104,5 +109,7 @@ inline AI* GetSunwellPlateauAI(T* obj)
 {
     return GetInstanceAI<AI>(obj, SWPScriptName);
 }
+
+#define RegisterSunwellPlateauCreatureAI(ai_name) RegisterCreatureAIWithFactory(ai_name, GetSunwellPlateauAI)
 
 #endif // SUNWELL_PLATEAU_H
