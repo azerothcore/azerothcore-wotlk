@@ -6238,6 +6238,21 @@ void Spell::SummonGuardian(uint32 i, uint32 entry, SummonPropertiesEntry const* 
     if (Player* modOwner = m_originalCaster->GetSpellModOwner())
         modOwner->ApplySpellMod(m_spellInfo->Id, SPELLMOD_DURATION, duration);
 
+    //npcbot: most bot summons are botpets, we have no place to put summon duration mods, keep them here for now
+    if (m_originalCaster->IsNPCBot())
+    {
+        switch (m_spellInfo->Id)
+        {
+            case 49028: // Dancing Rune Weapon
+                //Glyph of Dancing Rune Weapon: +5 sec duration
+                duration += 5000;
+                break;
+            default:
+                break;
+        }
+    }
+    //end npcbot
+
     //TempSummonType summonType = (duration == 0) ? TEMPSUMMON_DEAD_DESPAWN : TEMPSUMMON_TIMED_DESPAWN;
     Map* map = caster->GetMap();
     TempSummon* summon = nullptr;

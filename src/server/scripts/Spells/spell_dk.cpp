@@ -25,6 +25,11 @@
 #include "SpellScriptLoader.h"
 #include "Totem.h"
 #include "UnitAI.h"
+
+//npcbot
+#include "botmgr.h"
+//end npcbot
+
 /*
  * Scripts for spells with SPELLFAMILY_DEATHKNIGHT and SPELLFAMILY_GENERIC spells used by deathknight players.
  * Ordered alphabetically using scriptname.
@@ -775,6 +780,11 @@ class spell_dk_pet_scaling : public AuraScript
         // xinef: dk ghoul inherits 70% of strength and 30% of stamina
         if (GetUnitOwner()->GetEntry() != NPC_RISEN_GHOUL)
         {
+            //npcbot
+            if (GetUnitOwner()->GetEntry() == NPC_EBON_GARGOYLE && stat == STAT_STAMINA && GetUnitOwner()->GetCreator() && GetUnitOwner()->GetCreator()->IsNPCBot())
+                amount = CalculatePct(std::max<int32>(0, BotMgr::GetBotStat(GetUnitOwner()->GetCreator()->ToCreature(), stat)), 30);
+            else
+            //end npcbot
             // xinef: ebon garogyle - inherit 30% of stamina
             if (GetUnitOwner()->GetEntry() == NPC_EBON_GARGOYLE && stat == STAT_STAMINA)
                 if (Unit* owner = GetUnitOwner()->GetOwner())

@@ -2232,6 +2232,23 @@ uint8 BotMgr::GetBotEquipmentClass(uint8 bot_class)
     return BotMgr::GetBotPlayerClass(bot_class);
 }
 
+BotStatMods BotMgr::GetBotStatModByUnitStat(Stats stat)
+{
+    BotStatMods bot_stat;
+    switch (stat)
+    {
+        case STAT_STRENGTH:  bot_stat = BotStatMods::BOT_STAT_MOD_STRENGTH;  break;
+        case STAT_AGILITY:   bot_stat = BotStatMods::BOT_STAT_MOD_AGILITY;   break;
+        case STAT_STAMINA:   bot_stat = BotStatMods::BOT_STAT_MOD_STAMINA;   break;
+        case STAT_INTELLECT: bot_stat = BotStatMods::BOT_STAT_MOD_INTELLECT; break;
+        case STAT_SPIRIT:    bot_stat = BotStatMods::BOT_STAT_MOD_SPIRIT;    break;
+        default: //should not happen
+            bot_stat = BOT_STAT_MOD_HEALTH;
+            break;
+    }
+    return bot_stat;
+}
+
 std::string BotMgr::GetTargetIconString(uint8 icon_idx) const
 {
     std::ostringstream ss;
@@ -3091,6 +3108,11 @@ float BotMgr::GetBotDamageTakenMod(Creature const* bot, bool magic)
 int32 BotMgr::GetBotStat(Creature const* bot, BotStatMods stat)
 {
     return bot->GetBotAI()->GetTotalBotStat(stat);
+}
+
+int32 BotMgr::GetBotStat(Creature const* bot, Stats stat)
+{
+    return GetBotStat(bot, GetBotStatModByUnitStat(stat));
 }
 
 float BotMgr::GetBotResilience(Creature const* botOrPet)
