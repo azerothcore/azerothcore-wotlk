@@ -115,9 +115,6 @@ public:
 
             InstanceScript::OnCreatureCreate(creature);
         }
-
-    protected:
-        ObjectGuid KalecgosKjGUID;
     };
 
     InstanceScript* GetInstanceScript(InstanceMap* map) const override
