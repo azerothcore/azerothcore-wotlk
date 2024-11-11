@@ -87,7 +87,16 @@ struct boss_murmur : public BossAI
 
     bool CanAIAttack(Unit const* victim) const override
     {
-        return me->IsWithinMeleeRange(victim);
+        if (!victim)
+            return false;
+
+        float distance = me->GetDistance(victim);
+        if (distance < 45.0f)
+        {
+            return true;
+        }
+
+        return false;
     }
 
     void EnterEvadeMode(EvadeReason why) override
