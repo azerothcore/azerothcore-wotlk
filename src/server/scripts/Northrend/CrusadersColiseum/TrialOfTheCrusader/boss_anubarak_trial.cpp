@@ -567,6 +567,7 @@ public:
                 if (!me->HasUnitFlag(UNIT_FLAG_NOT_SELECTABLE))
                 {
                     me->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
+                    const_cast<uint32&>(me->GetCreatureTemplate()->flags_extra) &= ~CREATURE_FLAG_EXTRA_AVOID_AOE;
                     me->GetMotionMaster()->MoveIdle();
                     me->GetMotionMaster()->MoveCharge(me->GetPositionX(), me->GetPositionY(), 143.0f, 20.0f);
                     permafrostTimer = 1500;
