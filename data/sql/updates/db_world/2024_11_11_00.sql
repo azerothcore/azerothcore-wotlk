@@ -1,3 +1,4 @@
+-- DB update 2024_11_10_05 -> 2024_11_11_00
 -- Humbert's set
 DELETE FROM `reference_loot_template` WHERE `Item` IN (3053,4723,4724);
 
