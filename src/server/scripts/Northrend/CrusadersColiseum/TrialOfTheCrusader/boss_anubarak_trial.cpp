@@ -549,8 +549,6 @@ public:
             if (ID)
                 me->ApplySpellImmune(0, IMMUNITY_ID, ID, true);
 
-            //immune to star fall
-            const_cast<uint32&>(me->GetCreatureTemplate()->flags_extra) |= CREATURE_FLAG_EXTRA_AVOID_AOE;
             permafrostTimer = 0;
             me->CastSpell(me, SPELL_FROST_SPHERE, true);
             me->GetMotionMaster()->MoveRandom(20.0f);
@@ -559,15 +557,21 @@ public:
 
         uint32 permafrostTimer;
 
-        void DamageTaken(Unit*, uint32& damage, DamageEffectType, SpellSchoolMask) override
+        void DamageTaken(Unit* attacker, uint32& damage, DamageEffectType, SpellSchoolMask) override
         {
+            //immune to starfall
+            if (!me->HasUnitFlag(UNIT_FLAG_NOT_SELECTABLE))
+            {
+                if (attacker->HasAura(48505)) {
+                    damage = 0;
+                }
+            }
             if (me->GetHealth() <= damage )
             {
                 damage = 0;
                 if (!me->HasUnitFlag(UNIT_FLAG_NOT_SELECTABLE))
                 {
-                    me->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
-                    const_cast<uint32&>(me->GetCreatureTemplate()->flags_extra) &= ~CREATURE_FLAG_EXTRA_AVOID_AOE;
+                    me->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE);                   
                     me->GetMotionMaster()->MoveIdle();
                     me->GetMotionMaster()->MoveCharge(me->GetPositionX(), me->GetPositionY(), 143.0f, 20.0f);
                     permafrostTimer = 1500;
