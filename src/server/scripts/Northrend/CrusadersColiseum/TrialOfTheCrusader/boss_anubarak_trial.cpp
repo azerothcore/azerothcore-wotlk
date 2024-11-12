@@ -559,13 +559,6 @@ public:
 
         void DamageTaken(Unit* attacker, uint32& damage, DamageEffectType, SpellSchoolMask) override
         {
-            //immune to starfall
-            if (!me->HasUnitFlag(UNIT_FLAG_NOT_SELECTABLE))
-            {
-                if (attacker->HasAura(48505)) {
-                    damage = 0;
-                }
-            }
             if (me->GetHealth() <= damage )
             {
                 damage = 0;
