@@ -184,7 +184,7 @@ struct boss_kalecgos : public BossAI
             events.Reset();
             events2.ScheduleEvent(EVENT_TALK_GOOD_1, 1000);
             ClearPlayerAuras();
-            if (Creature* Sath = ObjectAccessor::GetCreature(*me, instance->GetGuidData(NPC_SATHROVARR)))
+            if (Creature* Sath = instance->GetCreature(DATA_SATHROVARR))
             {
                 Sath->RemoveAllAuras();
                 Sath->GetMotionMaster()->MovementExpired();
@@ -243,7 +243,7 @@ struct boss_kalecgos : public BossAI
             events2.ScheduleEvent(EVENT_TALK_GOOD_2, 1000);
             break;
         case EVENT_TALK_GOOD_2:
-            if (Creature* Sath = ObjectAccessor::GetCreature(*me, instance->GetGuidData(NPC_SATHROVARR)))
+            if (Creature* Sath = instance->GetCreature(DATA_SATHROVARR))
             {
                 summons.Despawn(Sath);
                 Unit::Kill(me, Sath);
@@ -329,7 +329,7 @@ struct boss_kalecgos : public BossAI
         case EVENT_CHECK_HEALTH:
             if (me->HealthBelowPct(10))
             {
-                if (Creature* Sath = ObjectAccessor::GetCreature(*me, instance->GetGuidData(NPC_SATHROVARR)))
+                if (Creature* Sath = instance->GetCreature(DATA_SATHROVARR))
                     Sath->AI()->DoAction(ACTION_ENRAGE_OTHER);
                 DoAction(ACTION_ENRAGE);
                 break;
@@ -403,7 +403,7 @@ struct boss_kalec : public ScriptedAI
     void JustDied(Unit*) override
     {
         if (InstanceScript* instance = me->GetInstanceScript())
-            if (Creature* kalecgos = ObjectAccessor::GetCreature(*me, instance->GetGuidData(NPC_KALECGOS)))
+            if (Creature* kalecgos = instance->GetCreature(DATA_KALECGOS))
                 kalecgos->AI()->DoAction(ACTION_KALEC_DIED);
     }
 
@@ -576,7 +576,7 @@ struct boss_sathrovarr : public ScriptedAI
         case EVENT_CHECK_HEALTH2:
             if (me->HealthBelowPct(1))
             {
-                if (Creature* kalecgos = ObjectAccessor::GetCreature(*me, instance->GetGuidData(NPC_KALECGOS)))
+                if (Creature* kalecgos = instance->GetCreature(DATA_KALECGOS))
                     kalecgos->AI()->DoAction(ACTION_SATH_BANISH);
                 DoAction(ACTION_BANISH);
                 break;
