@@ -692,13 +692,6 @@ enum IreSpeaker_Spells
 };
 
 
-enum IreSpeaker_Events
-{
-    EVENT_FEL_FIREBALL = 1,
-    EVENT_CURSE_OF_WEAKNESS = 2,
-};
-
-
 class npc_irespeaker : public CreatureScript
 {
 public:
@@ -706,82 +699,107 @@ public:
 
     struct npc_irespeakerAI : public ScriptedAI
     {
-        npc_irespeakerAI(Creature* creature) : ScriptedAI(creature), isInMeleeRange(false) { }
+        npc_irespeakerAI(Creature* creature) : ScriptedAI(creature) {
+            me->SetCombatMovement(false); // Disable movement toward the target
+        }
 
-        EventMap events;
-        bool isInMeleeRange;
 
         void Reset() override
         {
-            events.Reset();
-            isInMeleeRange = false;
-            me->SetReactState(REACT_PASSIVE);  // Start passive to prevent charging
+            _scheduler.CancelAll();
+            me->SetCombatMovement(false); // Disable movement toward the target
         }
+
 
         void JustEngagedWith(Unit* who) override
         {
-            if (who)
+            // Start with Fel Fireball if initially out of melee range
+            if (who && !me->IsWithinMeleeRange(who))
             {
-                me->SetReactState(REACT_PASSIVE);  // Stay passive until in melee range
-                events.ScheduleEvent(EVENT_FEL_FIREBALL, 5000);  // Schedule Fel Fireball every 5-30 seconds
-                isInMeleeRange = false;  // Start in ranged mode
-                me->Attack(who, true);  // Ensure the NPC attacks the target
+                ScheduleFelFireball(); // Start with Fel Fireball if initially out of melee range
             }
+            else
+            {
+                ScheduleCurseOfWeakness(); // Start with Curse of Weakness if in melee range
+            }
+
+            _scheduler.Schedule(1ms, [this](TaskContext context) {
+                CheckRange();
+            context.Repeat(100ms);
+                });
+
         }
 
         void JustDied(Unit* /*killer*/) override
         {
             me->CastSpell(me, SPELL_FEL_CONSUMPTION, true);
+            _scheduler.CancelAll(); // Cancel all tasks on death
         }
 
         void UpdateAI(uint32 diff) override
         {
+            if (!UpdateVictim())
+                return;
 
-            events.Update(diff);
-
-          
-
-
-            if (Unit* target = me->GetVictim())
-            {
-
-                isInMeleeRange = me->IsWithinMeleeRange(target);
-              
-                // Check if player is within melee range
-                if (!isInMeleeRange)
-                {
-                    me->Yell(std::string_view("You are not in range"), LANG_UNIVERSAL, NULL);
-                    me->SetReactState(REACT_PASSIVE);  // Revert to passive for ranged behavior
-                    events.CancelEvent(EVENT_CURSE_OF_WEAKNESS);  // Stop casting Curse of Weakness
-                    events.ScheduleEvent(EVENT_FEL_FIREBALL, 10000 + urand(5000, 15000));  // Re-schedule Fel Fireball
-                }
-                else
-                {
-                    me->Yell(std::string_view("You are in range"), LANG_UNIVERSAL, NULL);
-                    me->SetReactState(REACT_AGGRESSIVE);  // Enable combat movement for melee
-                    events.CancelEvent(EVENT_FEL_FIREBALL);  // Stop casting Fel Fireball
-                    events.ScheduleEvent(EVENT_CURSE_OF_WEAKNESS, 0);  // Schedule Curse of Weakness
-
-  
-                }
-            }
-
-            // Execute events
-            switch (events.ExecuteEvent())
-            {
-            case EVENT_FEL_FIREBALL:
-                DoCastVictim(SPELL_FEL_FIREBALL);
-                events.ScheduleEvent(EVENT_FEL_FIREBALL, 10000 + urand(5000, 15000));  // Re-schedule Fel Fireball every 10-25 seconds
-                break;
-
-            case EVENT_CURSE_OF_WEAKNESS:
-                DoCastVictim(SPELL_CURSE_OF_WEAKNESS);
-                events.ScheduleEvent(EVENT_CURSE_OF_WEAKNESS, 13000 + urand(3000, 20000));  // Re-schedule Curse of Weakness every 13-35 seconds
-                break;
-            }
-
+            _scheduler.Update(diff); // Update the TaskScheduler
             DoMeleeAttackIfReady();
         }
+
+
+
+    private:
+        TaskScheduler _scheduler;
+        bool _wasInMeleeRange = false;
+
+        void CheckRange() {
+            if (Unit* target = me->GetVictim())
+            {
+                bool currentlyInMeleeRange = me->IsWithinMeleeRange(target);
+
+                // Entering melee range
+                if (currentlyInMeleeRange && !_wasInMeleeRange)
+                {
+                    _wasInMeleeRange = true;
+                    _scheduler.CancelAll(); // Cancel current spell casting tasks
+                    me->SetCombatMovement(true); // Enable movement toward the target
+                    ScheduleCurseOfWeakness(); // Start casting Curse of Weakness
+                }
+                // Leaving melee range
+                else if (!currentlyInMeleeRange && _wasInMeleeRange)
+                {
+                    _wasInMeleeRange = false;
+                    _scheduler.CancelAll(); // Cancel current spell casting tasks
+                    me->SetCombatMovement(false); // Still no movement
+                    ScheduleFelFireball(); // Start casting Fel Fireball
+                }
+            }
+        }
+
+        void ScheduleFelFireball()
+        {
+            _scheduler.Schedule(0s, [this](TaskContext context)
+                {
+                    if (Unit* target = me->GetVictim())
+                        if (!me->IsWithinMeleeRange(target)) // Only cast if out of melee range
+                            DoCast(target, SPELL_FEL_FIREBALL);
+                    
+            // Schedule subsequent casts every 10-25 seconds
+            context.Repeat(10s + std::chrono::seconds(urand(0, 15)));
+                });
+        }
+
+        void ScheduleCurseOfWeakness()
+        {
+            _scheduler.Schedule(0s, [this](TaskContext context) {
+                if (Unit* target = me->GetVictim())
+                    if (me->IsWithinMeleeRange(target))
+                        DoCast(target, SPELL_CURSE_OF_WEAKNESS);
+
+            context.Repeat(13s + std::chrono::seconds(urand(0, 22)));
+                }
+            );
+        }
+
     };
 
     CreatureAI* GetAI(Creature* creature) const override
@@ -802,6 +820,6 @@ void AddSC_isle_of_queldanas()
     // THEIR:
     new npc_greengill_slave();
 
-    // Generic
+    // IreSpeaker
     new npc_irespeaker();
 }
