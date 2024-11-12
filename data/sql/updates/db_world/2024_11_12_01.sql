@@ -1,3 +1,4 @@
+-- DB update 2024_11_12_00 -> 2024_11_12_01
 --
 DELETE FROM `spell_script_names` WHERE `spell_id`=39953 AND `ScriptName`='spell_gen_adals_song_of_battle';
 -- A'dal
