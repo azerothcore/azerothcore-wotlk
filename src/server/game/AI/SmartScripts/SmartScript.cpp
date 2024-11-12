@@ -35,6 +35,7 @@
 #include "SmartAI.h"
 #include "SpellMgr.h"
 #include "Vehicle.h"
+#include "WorldState.h"
 
 /// @todo: this import is not necessary for compilation and marked as unused by the IDE
 //  however, for some reasons removing it would cause a damn linking issue
@@ -3267,6 +3268,11 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
                 if (IsUnit(target))
                     target->ToUnit()->ResumeMovement(e.action.move.timer);
 
+            break;
+        }
+        case SMART_ACTION_WORLD_SCRIPT:
+        {
+            sWorldState->HandleExternalEvent(static_cast<WorldStateEvent>(e.action.worldStateScript.eventId), e.action.worldStateScript.param);
             break;
         }
         default:
