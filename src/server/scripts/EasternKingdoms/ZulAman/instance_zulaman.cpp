@@ -28,23 +28,6 @@ enum Misc
     WORLDSTATE_TIME_TO_SACRIFICE   = 3106
 };
 
-// Chests spawn at bear/eagle/dragonhawk/lynx bosses
-// The loots depend on how many bosses have been killed, but not the entries of the chests
-// But we cannot add loots to gameobject, so we have to use the fixed loot_template
-struct SHostageInfo
-{
-    uint32 npc, go; // FIXME go Not used
-    Position pos;
-};
-
-static SHostageInfo HostageInfo[] =
-{
-    {23790, 186648, { -57.0f, 1343.0f, 40.77f, 3.2f } }, // bear
-    {23999, 187021, { 400.0f, 1414.0f, 74.36f, 3.3f } }, // eagle
-    {24001, 186672, { -35.0f, 1134.0f, 18.71f, 1.9f } }, // dragonhawk
-    {24024, 186667, { 413.0f, 1117.0f, 6.32f,  3.1f } }  // lynx
-};
-
 Position const HarrisonJonesLoc = {120.687f, 1674.0f, 42.0217f, 1.59044f};
 
 DoorData const doorData[] =
@@ -111,14 +94,6 @@ public:
             InstanceScript::OnGameObjectCreate(go);
         }
 
-        void SummonHostage(uint8 num)
-        {
-            if (!GetPersistentData(DATA_TIMED_RUN))
-                return;
-
-            instance->SummonCreature(HostageInfo[num].npc, HostageInfo[num].pos);
-        }
-
         void DoAction(int32 actionId) override
         {
             if (actionId == ACTION_START_TIMED_RUN)
@@ -174,7 +149,6 @@ public:
                             StorePersistentData(DATA_TIMED_RUN, timer += 15);
                             DoUpdateWorldState(WORLDSTATE_TIME_TO_SACRIFICE, timer);
                         }
-                        SummonHostage(0);
                     }
                     break;
                 case DATA_AKILZON:
@@ -185,16 +159,7 @@ public:
                             StorePersistentData(DATA_TIMED_RUN, timer += 10);
                             DoUpdateWorldState(WORLDSTATE_TIME_TO_SACRIFICE, timer);
                         }
-                        SummonHostage(1);
                     }
-                    break;
-                case DATA_JANALAI:
-                    if (state == DONE)
-                        SummonHostage(2);
-                    break;
-                case DATA_HALAZZI:
-                    if (state == DONE)
-                        SummonHostage(3);
                     break;
                 case DATA_HEXLORD:
                     if (state == IN_PROGRESS)
