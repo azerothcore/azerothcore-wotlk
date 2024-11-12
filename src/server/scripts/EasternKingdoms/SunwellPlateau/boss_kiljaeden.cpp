@@ -176,7 +176,7 @@ struct npc_kiljaeden_controller : public NullCreatureAI
 
     void ResetOrbs()
     {
-        for (uint8 i = 0; i < 4; ++i)
+        for (uint8 i = DATA_ORB_OF_THE_BLUE_DRAGONFLIGHT_1; i < DATA_ORB_OF_THE_BLUE_DRAGONFLIGHT_4 + 1; ++i)
             if (GameObject* orb = instance->GetGameObject(i))
                 orb->SetGameObjectFlag(GO_FLAG_NOT_SELECTABLE);
     }
@@ -627,7 +627,7 @@ struct boss_kiljaeden : public ScriptedAI
 
     void EmpowerOrb(bool empowerAll)
     {
-        for (uint8 i = 0; i < 4; ++i)
+        for (uint8 i = DATA_ORB_OF_THE_BLUE_DRAGONFLIGHT_1; i < DATA_ORB_OF_THE_BLUE_DRAGONFLIGHT_4 + 1; ++i)
         {
             if (GameObject* orb = instance->GetGameObject(i))
             {
