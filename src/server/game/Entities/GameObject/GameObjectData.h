@@ -19,7 +19,6 @@
 #define GAMEOBJECTDATA_H
 
 #include "SharedDefines.h"
-#include "WorldPacket.h"
 #include <string>
 #include <vector>
 
