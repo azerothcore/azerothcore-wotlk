@@ -27,7 +27,6 @@
 #include "SpellMgr.h"
 #include <limits>
 
-
 typedef uint32 SAIBool;
 
 struct WayPoint
