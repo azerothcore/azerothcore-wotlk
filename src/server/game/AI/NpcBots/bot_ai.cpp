@@ -9660,6 +9660,17 @@ bool bot_ai::OnGossipSelect(Player* player, Creature* creature/* == me*/, uint32
                 break;
             }
 
+            if (uint32 maxStorage = BotMgr::GetGearBankCapacity())
+            {
+                BotBankItemContainer const* botBankItems = BotDataMgr::GetBotBankItems(player->GetGUID());
+                if (botBankItems && botBankItems->size() >= maxStorage)
+                {
+                    BotWhisper(LocalizedNpcText(player, BOT_TEXT_BANK_IS_FULL), player);
+                    return OnGossipSelect(player, me, GOSSIP_SENDER_EQUIPMENT_BANK_MENU, action);
+                    break;
+                }
+            }
+
             BotDataMgr::DepositBotBankItem(player->GetGUID(), item);
             player->MoveItemFromInventory(item->GetBagSlot(), item->GetSlot(), true);
 

@@ -287,7 +287,7 @@ enum BotTexts : uint32
     BOT_TEXT_OWNERSHIP_EXPIRED              = 70550, //"Bot ownership expired due to inactivity"
     BOT_TEXT_BOTADDFAIL_DISABLED            = 70551, //"NpcBot system is currently disabled. Please contact administration."
     BOT_TEXT_BOTADDFAIL_OWNED               = 70552, //"{} will not join you, already has master: {}"
-    BOT_TEXT_DO_REUSE_1                     = 70553, // WAS BOT_TEXT_BOTADDFAIL_TELEPORTED "{} cannot join you while about to teleport"
+    BOT_TEXT_BANK_IS_FULL                   = 70553, //"Bank is full"
     BOT_TEXT_ASPECT                         = 70554, //"Aspect"
     BOT_TEXT_MONKEY                         = 70555, //"Monkey"
     BOT_TEXT_HAWK                           = 70556, //"Hawk"

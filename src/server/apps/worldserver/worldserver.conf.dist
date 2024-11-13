@@ -4795,12 +4795,20 @@ NpcBot.Gossip.ShowEquipmentListItems = 0
 
 #
 #    NpcBot.GearBank.Enable
-#        Description: Enable unlimited extra gear storage (accessible through gossip menu).
-#        Note: Unlimited storage creates an 'unlimited bags' exploit, you have been warned.
-#        Default:     0 - (Disabled)
-#                     1 - (Enabled)
+#        Description: Enable extra bot gear storage, accessed through gossip menu (per player).
+#        Default:     1 - (Enabled)
+#                     0 - (Disabled)
 
-NpcBot.GearBank.Enable = 0
+NpcBot.GearBank.Enable = 1
+
+#
+#    NpcBot.GearBank.Capacity
+#        Description: Maximum number of items player can keep in bot gear storage.
+#        Note:        This parameter only affects player's ability to *deposit* items.
+#        Default:     40 - (Maximum 40 items)
+#                     0 -  (Unlimited capacity)
+
+NpcBot.GearBank.Capacity = 40
 
 #
 #    NpcBot.Classes.<Class>.Enable
