@@ -75,9 +75,9 @@ enum Misc
 
 enum FourHorsemen
 {
-    SAY_AGGRO                           = 0,
-    SAY_TAUNT                           = 1,
-    SAY_SPECIAL                         = 2,
+    // SAY_AGGRO                           = 0,
+    // SAY_TAUNT                           = 1,
+    // SAY_SPECIAL                         = 2,
     SAY_SLAY                            = 3,
     SAY_DEATH                           = 4,
     EMOTE_RAGECAST                      = 7
@@ -299,7 +299,6 @@ public:
             BossAI::JustEngagedWith(who);
             if (movementPhase == MOVE_PHASE_NONE)
             {
-                Talk(SAY_AGGRO);
                 me->SetReactState(REACT_PASSIVE);
                 movementPhase = MOVE_PHASE_STARTED;
                 me->SetSpeed(MOVE_RUN, me->GetSpeedRate(MOVE_RUN), true);
@@ -339,11 +338,9 @@ public:
                     events.Repeat((me->GetEntry() == NPC_LADY_BLAUMEUX || me->GetEntry() == NPC_SIR_ZELIEK) ? 15s : 12s);
                     return;
                 case EVENT_BERSERK:
-                    Talk(SAY_SPECIAL);
                     me->CastSpell(me, SPELL_BERSERK, true);
                     return;
                 case EVENT_PRIMARY_SPELL:
-                    Talk(SAY_TAUNT);
                     me->CastSpell(me->GetVictim(), RAID_MODE(TABLE_SPELL_PRIMARY_10[horsemanId], TABLE_SPELL_PRIMARY_25[horsemanId]), false);
                     events.Repeat(15s);
                     return;

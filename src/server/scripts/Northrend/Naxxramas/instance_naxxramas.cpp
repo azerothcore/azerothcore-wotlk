@@ -60,8 +60,12 @@ DoorData const doorData[] =
 
 ObjectData const creatureData[] =
 {
-    { NPC_RAZUVIOUS, DATA_RAZUVIOUS },
-    { 0,             0              }
+    { NPC_RAZUVIOUS,       DATA_RAZUVIOUS       },
+    { NPC_THANE_KORTHAZZ,  DATA_THANE_KORTHAZZ  },
+    { NPC_SIR_ZELIEK,      DATA_SIR_ZELIEK      },
+    { NPC_BARON_RIVENDARE, DATA_BARON_RIVENDARE },
+    { NPC_LADY_BLAUMEUX,   DATA_LADY_BLAUMEUX   },
+    { 0,                   0                    }
 };
 
 ObjectData const gameObjectData[] =
@@ -253,16 +257,16 @@ public:
                     return;
                 case NPC_LADY_BLAUMEUX:
                     _blaumeuxGUID = creature->GetGUID();
-                    return;
+                    break;
                 case NPC_SIR_ZELIEK:
                     _zeliekGUID = creature->GetGUID();
-                    return;
+                    break;
                 case NPC_BARON_RIVENDARE:
                     _rivendareGUID = creature->GetGUID();
-                    return;
+                    break;
                 case NPC_THANE_KORTHAZZ:
                     _korthazzGUID = creature->GetGUID();
-                    return;
+                    break;
                 case NPC_SAPPHIRON:
                     _sapphironGUID = creature->GetGUID();
                     return;
@@ -929,7 +933,7 @@ public:
                         {
                             go->SetGoState(GO_STATE_ACTIVE);
                         }
-                        events.ScheduleEvent(EVENT_HORSEMEN_INTRO, 10s);
+                        events.ScheduleEvent(EVENT_HORSEMEN_DIALOG, 10s);
                         break;
                     case BOSS_SAPPHIRON:
                         events.ScheduleEvent(EVENT_FROSTWYRM_WATERFALL_DOOR, 5s);
@@ -1060,48 +1064,48 @@ public:
                         go->SetGoState(GO_STATE_ACTIVE);
                     }
                     break;
-                case EVENT_HORSEMEN_INTRO:
+                case EVENT_HORSEMEN_DIALOG:
                     switch (_currentHorsemenLine)
                     {
                         case 0: // To arms, ye roustabouts! We've got company!
-                            if (Creature* korthazz = instance->GetCreature(_korthazzGUID))
-                                korthazz->AI()->Talk(5);
-                            events.ScheduleEvent(EVENT_HORSEMEN_INTRO, 4500ms);
+                            if (Creature* korthazz = GetCreature(DATA_THANE_KORTHAZZ))
+                                korthazz->AI()->Talk(SAY_HORSEMEN_DIALOG_1);
+                            events.ScheduleEvent(EVENT_HORSEMEN_DIALOG, 4500ms);
                             break;
                         case 1: // Invaders, cease this foolish venture at once! Turn away while you still can!
-                            if (Creature* zeliek = instance->GetCreature(_zeliekGUID))
-                                zeliek->AI()->Talk(5);
-                            events.ScheduleEvent(EVENT_HORSEMEN_INTRO, 6500ms);
+                            if (Creature* zeliek = GetCreature(DATA_SIR_ZELIEK))
+                                zeliek->AI()->Talk(SAY_HORSEMEN_DIALOG_1);
+                            events.ScheduleEvent(EVENT_HORSEMEN_DIALOG, 6500ms);
                             break;
                         case 2: // Come, Zeliek, do not drive them out. Not before we've had our fun!
-                            if (Creature* blaumeux = instance->GetCreature(_blaumeuxGUID))
-                                blaumeux->AI()->Talk(5);
-                            events.ScheduleEvent(EVENT_HORSEMEN_INTRO, 6500ms);
+                            if (Creature* blaumeux = GetCreature(DATA_LADY_BLAUMEUX))
+                                blaumeux->AI()->Talk(SAY_HORSEMEN_DIALOG_1);
+                            events.ScheduleEvent(EVENT_HORSEMEN_DIALOG, 6500ms);
                             break;
                         case 3: // Enough prattling. Let them come. We shall grind their bones to dust.
-                            if (Creature* rivendare = instance->GetCreature(_rivendareGUID))
-                                rivendare->AI()->Talk(5);
-                            events.ScheduleEvent(EVENT_HORSEMEN_INTRO, 6500ms);
+                            if (Creature* rivendare = GetCreature(DATA_BARON_RIVENDARE))
+                                rivendare->AI()->Talk(SAY_HORSEMEN_DIALOG_1);
+                            events.ScheduleEvent(EVENT_HORSEMEN_DIALOG, 6500ms);
                             break;
                         case 4: // I do hope they stay alive long enough for me to... introduce myself.
-                            if (Creature* blaumeux = instance->GetCreature(_blaumeuxGUID))
-                                blaumeux->AI()->Talk(6);
-                            events.ScheduleEvent(EVENT_HORSEMEN_INTRO, 6500ms);
+                            if (Creature* blaumeux = GetCreature(DATA_LADY_BLAUMEUX))
+                                blaumeux->AI()->Talk(SAY_HORSEMEN_DIALOG_2);
+                            events.ScheduleEvent(EVENT_HORSEMEN_DIALOG, 6500ms);
                             break;
                         case 5: // Perhaps they will come to their senses... and run away as fast as they can.
-                            if (Creature* zeliek = instance->GetCreature(_zeliekGUID))
-                                zeliek->AI()->Talk(6);
-                            events.ScheduleEvent(EVENT_HORSEMEN_INTRO, 6500ms);
+                            if (Creature* zeliek = GetCreature(DATA_SIR_ZELIEK))
+                                zeliek->AI()->Talk(SAY_HORSEMEN_DIALOG_2);
+                            events.ScheduleEvent(EVENT_HORSEMEN_DIALOG, 6500ms);
                             break;
                         case 6: // I've heard about enough a' yer snivelin'! Shut yer flytrap before I shut it for ye'!
-                            if (Creature* korthazz = instance->GetCreature(_korthazzGUID))
-                                korthazz->AI()->Talk(6);
-                            events.ScheduleEvent(EVENT_HORSEMEN_INTRO, 6500ms);
+                            if (Creature* korthazz = GetCreature(DATA_THANE_KORTHAZZ))
+                                korthazz->AI()->Talk(SAY_HORSEMEN_DIALOG_2);
+                            events.ScheduleEvent(EVENT_HORSEMEN_DIALOG, 6500ms);
                             break;
                         case 7: // Conserve your anger. Harness your rage. You will all have outlets for your frustrations soon enough.
-                            if (Creature* rivendare = instance->GetCreature(_rivendareGUID))
-                                rivendare->AI()->Talk(6);
-                            events.ScheduleEvent(EVENT_HORSEMEN_INTRO, 6500ms);
+                            if (Creature* rivendare = GetCreature(DATA_BARON_RIVENDARE))
+                                rivendare->AI()->Talk(SAY_HORSEMEN_DIALOG_2);
+                            events.ScheduleEvent(EVENT_HORSEMEN_DIALOG, 6500ms);
                             break;
                     }
                     ++_currentHorsemenLine;
@@ -1276,9 +1280,33 @@ public:
     }
 };
 
+class at_deathknight_wing_entrance : public OnlyOnceAreaTriggerScript
+{
+public:
+    at_deathknight_wing_entrance() : OnlyOnceAreaTriggerScript("at_deathknight_wing_entrance") { }
+
+    bool _OnTrigger(Player* player, AreaTrigger const* /*at*/) override
+    {
+        if (InstanceScript* instance = player->GetInstanceScript())
+        {
+            player->GetMap()->LoadGrid(2528.79f, -2948.58f); // Zeliek grid
+            if (instance->GetBossState(BOSS_HORSEMAN) == DONE)
+                return false;
+
+            // Flee, before it's too late!
+            if (Creature* zeliek = instance->GetCreature(DATA_SIR_ZELIEK))
+                zeliek->AI()->Talk(SAY_ZELIEK_INTRO_1);
+
+            return true;
+        }
+        return false;
+    }
+};
+
 void AddSC_instance_naxxramas()
 {
     new instance_naxxramas();
     new boss_naxxramas_misc();
     new at_naxxramas_hub_portal();
+    new at_deathknight_wing_entrance();
 }
