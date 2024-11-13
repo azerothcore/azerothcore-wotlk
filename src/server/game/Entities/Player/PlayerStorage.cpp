@@ -7127,6 +7127,7 @@ void Player::SaveToDB(CharacterDatabaseTransaction trans, bool create, bool logo
 
     //npcbot: save player-related npcbot data
     BotDataMgr::SaveNpcBotStoredGear(GetGUID(), trans);
+    BotDataMgr::SaveNpcBotItemSets(GetGUID(), trans);
     BotDataMgr::SaveNpcBotMgrData(GetGUID(), trans);
     //end npcbot
 }

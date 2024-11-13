@@ -423,7 +423,12 @@ enum BotTexts : uint32
     BOT_TEXT_SET_FOR_ALL_EVERYONE           = 70686, //"<Set for all bots>"
     BOT_TEXT___GEAR_BANK_                   = 70687, //" (gear bank)"
     BOT_TEXT_NOT_ENOUGH_GEAR_BANK_SPACE     = 70688, //"Not enough gear bank space to store %u item(s) (%u / %u)!"
-    //70689-70799 reserved for custom localization strings
+    BOT_TEXT_EQUIPMENT_SETS                 = 70689, //"Equipment sets"
+    BOT_TEXT_CREATE                         = 70690, //"Create"
+    BOT_TEXT_DELETE                         = 70691, //"Delete"
+    BOT_TEXT_EQUIP                          = 70692, //"Equip"
+    BOT_TEXT_MISSING                        = 70693, //"missing"
+    //70694-71000 reserved for custom localization strings
 };
 
 #endif //BOTTEXT_H

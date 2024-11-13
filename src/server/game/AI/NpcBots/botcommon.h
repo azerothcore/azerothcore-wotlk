@@ -16,6 +16,8 @@ Original patch from: LordPsyan https://bitbucket.org/lordpsyan/trinitycore-patch
 
 constexpr std::size_t MAX_BOT_LOG_PARAMS = 5;
 constexpr std::size_t MAX_BOT_LOG_PARAM_LENGTH = 50;
+constexpr std::size_t MAX_BOT_ITEM_SET_NAME_LENGTH = 30;
+constexpr uint8 BOT_GOSSIP_MAX_ITEMS = 32; // Client limitation 3.3.5 code confirmed
 
 struct Position;
 
@@ -455,6 +457,7 @@ enum BotEquipSlot : uint8
 };
 
 constexpr uint8 BOT_TRANSMOG_INVENTORY_SIZE = 13; // BOT_SLOT_BODY + 1
+constexpr uint8 MAX_BOT_EQUIPMENT_SETS = BOT_GOSSIP_MAX_ITEMS - 2;
 
 enum class BotEquipResult : uint8
 {
@@ -468,7 +471,9 @@ enum class BotEquipResult : uint8
     BOT_EQUIP_RESULT_FAIL_SAME_ID               = 6,
     BOT_EQUIP_RESULT_FAIL_WANDERER              = 7,
     BOT_EQUIP_RESULT_FAIL_LINKED_UNEQUIP_FAILED = 8,
-    BOT_EQUIP_RESULT_FAIL_LINKED_RESET_FAILED   = 9
+    BOT_EQUIP_RESULT_FAIL_LINKED_RESET_FAILED   = 9,
+    BOT_EQUIP_RESULT_FAIL_CANT_EQUIP            = 10,
+    BOT_EQUIP_RESULT_FAIL_ITEM_CONFLICT         = 11,
 };
 
 enum BotStatMods: uint8

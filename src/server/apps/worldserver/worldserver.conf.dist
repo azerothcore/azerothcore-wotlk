@@ -4806,9 +4806,19 @@ NpcBot.GearBank.Enable = 1
 #        Description: Maximum number of items player can keep in bot gear storage.
 #        Note:        This parameter only affects player's ability to *deposit* items.
 #        Default:     40 - (Maximum 40 items)
-#                     0 -  (Unlimited capacity)
+#                     0  - (Unlimited capacity)
 
 NpcBot.GearBank.Capacity = 40
+
+#
+#    NpcBot.GearBank.EquipmentSets
+#        Description: Enable players to create bot equipment sets from items currently equipped
+#                     on a bot, allowing to quickly swap bot equipment using gear bank as storage.
+#        Default:     0  - (Disabled)
+#                     10 - (Enabled, allow to keep up to 10 equipment sets per player)
+#                     30 - (Absolute maximum to fit on a single page, this is a hard limit)
+
+NpcBot.GearBank.EquipmentSets = 0
 
 #
 #    NpcBot.Classes.<Class>.Enable

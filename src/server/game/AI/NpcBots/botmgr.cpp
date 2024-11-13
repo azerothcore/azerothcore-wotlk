@@ -67,6 +67,7 @@ uint8 _noDpsTargetIconFlags;
 uint8 _npcBotOwnerExpireMode;
 int32 _botInfoPacketsLimit;
 uint32 _gearBankCapacity;
+uint32 _gearBankEquipmentSetsCount;
 uint32 _npcBotsCost;
 uint32 _npcBotUpdateDelayBase;
 uint32 _npcBotEngageDelayDPS_default;
@@ -301,6 +302,7 @@ void BotMgr::Initialize()
     BotDataMgr::CreateWanderingBotsSortedGear();
     BotDataMgr::LoadNpcBotGroupData();
     BotDataMgr::LoadNpcBotGearStorage();
+    BotDataMgr::LoadNpcBotGearSets();
     BotDataMgr::LoadNpcBotMgrData();
     BotDataMgr::DeleteOldLogs();
 
@@ -386,6 +388,7 @@ void BotMgr::LoadConfig(bool reload)
     _sendEquipListItems             = sConfigMgr->GetBoolDefault("NpcBot.Gossip.ShowEquipmentListItems", false);
     _enableBotGearBank              = sConfigMgr->GetBoolDefault("NpcBot.GearBank.Enable", true);
     _gearBankCapacity               = sConfigMgr->GetIntDefault("NpcBot.GearBank.Capacity", 40);
+    _gearBankEquipmentSetsCount     = sConfigMgr->GetIntDefault("NpcBot.GearBank.EquipmentSets", 0);
     _transmog_enable                = sConfigMgr->GetBoolDefault("NpcBot.Transmog.Enable", false);
     _transmog_mixArmorClasses       = sConfigMgr->GetBoolDefault("NpcBot.Transmog.MixArmorClasses", false);
     _transmog_mixWeaponClasses      = sConfigMgr->GetBoolDefault("NpcBot.Transmog.MixWeaponClasses", false);
@@ -650,6 +653,12 @@ void BotMgr::LoadConfig(bool reload)
 
 void BotMgr::ResolveConfigConflicts()
 {
+    if (_gearBankEquipmentSetsCount > MAX_BOT_EQUIPMENT_SETS)
+    {
+        BOT_LOG_ERROR("server.loading", "NpcBot.GearBank.EquipmentSets can't be greater than {}, reduced (was {})!", uint32(MAX_BOT_EQUIPMENT_SETS), _gearBankEquipmentSetsCount);
+        _gearBankEquipmentSetsCount = MAX_BOT_EQUIPMENT_SETS;
+    }
+
     uint8 dpsFlags = /*_tankingTargetIconFlags | _offTankingTargetIconFlags | */_dpsTargetIconFlags | _rangedDpsTargetIconFlags;
     if (uint8 interFlags = (_noDpsTargetIconFlags & dpsFlags))
     {
@@ -994,6 +1003,10 @@ uint8 BotMgr::GetMaxAccountBots()
 uint32 BotMgr::GetGearBankCapacity()
 {
     return _gearBankCapacity;
+}
+uint32 BotMgr::GetGearBankEquipmentSetsCount()
+{
+    return _gearBankEquipmentSetsCount;
 }
 uint8 BotMgr::GetHealTargetIconFlags()
 {
