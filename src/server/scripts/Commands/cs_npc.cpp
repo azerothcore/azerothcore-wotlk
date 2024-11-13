@@ -502,6 +502,9 @@ public:
         if (!player)
             return false;
 
+        if (!player->GetSelectedUnit())
+            return false;
+
         Creature* creature = player->GetSelectedUnit()->ToCreature();
 
         if (!creature)

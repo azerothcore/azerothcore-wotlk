@@ -176,8 +176,8 @@ struct npc_kiljaeden_controller : public NullCreatureAI
 
     void ResetOrbs()
     {
-        for (uint8 i = 0; i < 4; ++i)
-            if (GameObject* orb = ObjectAccessor::GetGameObject(*me, instance->GetGuidData(DATA_ORB_OF_THE_BLUE_DRAGONFLIGHT_1 + i)))
+        for (uint8 i = DATA_ORB_OF_THE_BLUE_DRAGONFLIGHT_1; i < DATA_ORB_OF_THE_BLUE_DRAGONFLIGHT_4 + 1; ++i)
+            if (GameObject* orb = instance->GetGameObject(i))
                 orb->SetGameObjectFlag(GO_FLAG_NOT_SELECTABLE);
     }
 
@@ -333,7 +333,7 @@ struct boss_kiljaeden : public ScriptedAI
     {
         Talk(SAY_KJ_DEATH);
         instance->SetBossState(DATA_KILJAEDEN, DONE);
-        if (Creature* controller = ObjectAccessor::GetCreature(*me, instance->GetGuidData(NPC_KILJAEDEN_CONTROLLER)))
+        if (Creature* controller = instance->GetCreature(DATA_KJ_CONTROLLER))
             Unit::Kill(controller, controller);
     }
 
@@ -393,17 +393,17 @@ struct boss_kiljaeden : public ScriptedAI
             me->CastSpell(me, SPELL_REBIRTH, false);
             break;
         case EVENT_EMPOWER_ORBS1:
-            if (Creature* kalec = ObjectAccessor::GetCreature(*me, instance->GetGuidData(NPC_KALECGOS_KJ)))
+            if (Creature* kalec = instance->GetCreature(DATA_KALECGOS_KJ))
                 kalec->AI()->Talk(SAY_KALECGOS_READY1);
             EmpowerOrb(false);
             break;
         case EVENT_EMPOWER_ORBS2:
-            if (Creature* kalec = ObjectAccessor::GetCreature(*me, instance->GetGuidData(NPC_KALECGOS_KJ)))
+            if (Creature* kalec = instance->GetCreature(DATA_KALECGOS_KJ))
                 kalec->AI()->Talk(SAY_KALECGOS_READY2);
             EmpowerOrb(false);
             break;
         case EVENT_EMPOWER_ORBS3:
-            if (Creature* kalec = ObjectAccessor::GetCreature(*me, instance->GetGuidData(NPC_KALECGOS_KJ)))
+            if (Creature* kalec = instance->GetCreature(DATA_KALECGOS_KJ))
                 kalec->AI()->Talk(SAY_KALECGOS_READY_ALL);
             EmpowerOrb(true);
             break;
@@ -413,56 +413,56 @@ struct boss_kiljaeden : public ScriptedAI
             me->SetInCombatWithZone();
             return;
         case EVENT_TEXT_SPEACH11:
-            if (Creature* kalec = ObjectAccessor::GetCreature(*me, instance->GetGuidData(NPC_KALECGOS_KJ)))
+            if (Creature* kalec = instance->GetCreature(DATA_KALECGOS_KJ))
                 kalec->AI()->Talk(SAY_KALECGOS_JOIN);
             break;
         case EVENT_TEXT_SPEACH21:
-            if (Creature* kalec = ObjectAccessor::GetCreature(*me, instance->GetGuidData(NPC_KALECGOS_KJ)))
+            if (Creature* kalec = instance->GetCreature(DATA_KALECGOS_KJ))
                 kalec->AI()->Talk(SAY_KALECGOS_AWAKEN);
             break;
         case EVENT_TEXT_SPEACH22:
-            if (Creature* anveena = ObjectAccessor::GetCreature(*me, instance->GetGuidData(NPC_ANVEENA)))
+            if (Creature* anveena = instance->GetCreature(DATA_ANVEENA))
                 sCreatureTextMgr->SendChat(anveena, SAY_ANVEENA_IMPRISONED, nullptr, CHAT_MSG_ADDON, LANG_ADDON, TEXT_RANGE_ZONE);
             break;
         case EVENT_TEXT_SPEACH23:
             Talk(SAY_KJ_PHASE3);
             break;
         case EVENT_TEXT_SPEACH31:
-            if (Creature* kalec = ObjectAccessor::GetCreature(*me, instance->GetGuidData(NPC_KALECGOS_KJ)))
+            if (Creature* kalec = instance->GetCreature(DATA_KALECGOS_KJ))
                 kalec->AI()->Talk(SAY_KALECGOS_LETGO);
             break;
         case EVENT_TEXT_SPEACH32:
-            if (Creature* anveena = ObjectAccessor::GetCreature(*me, instance->GetGuidData(NPC_ANVEENA)))
+            if (Creature* anveena = instance->GetCreature(DATA_ANVEENA))
                 sCreatureTextMgr->SendChat(anveena, SAY_ANVEENA_LOST, nullptr, CHAT_MSG_ADDON, LANG_ADDON, TEXT_RANGE_ZONE);
             break;
         case EVENT_TEXT_SPEACH33:
             Talk(SAY_KJ_PHASE4);
             break;
         case EVENT_TEXT_SPEACH41:
-            if (Creature* kalec = ObjectAccessor::GetCreature(*me, instance->GetGuidData(NPC_KALECGOS_KJ)))
+            if (Creature* kalec = instance->GetCreature(DATA_KALECGOS_KJ))
                 kalec->AI()->Talk(SAY_KALECGOS_FOCUS);
             break;
         case EVENT_TEXT_SPEACH42:
-            if (Creature* anveena = ObjectAccessor::GetCreature(*me, instance->GetGuidData(NPC_ANVEENA)))
+            if (Creature* anveena = instance->GetCreature(DATA_ANVEENA))
                 sCreatureTextMgr->SendChat(anveena, SAY_ANVEENA_KALEC, nullptr, CHAT_MSG_ADDON, LANG_ADDON, TEXT_RANGE_ZONE);
             break;
         case EVENT_TEXT_SPEACH43:
-            if (Creature* kalec = ObjectAccessor::GetCreature(*me, instance->GetGuidData(NPC_KALECGOS_KJ)))
+            if (Creature* kalec = instance->GetCreature(DATA_KALECGOS_KJ))
                 kalec->AI()->Talk(SAY_KALECGOS_FATE);
             break;
         case EVENT_TEXT_SPEACH44:
-            if (Creature* anveena = ObjectAccessor::GetCreature(*me, instance->GetGuidData(NPC_ANVEENA)))
+            if (Creature* anveena = instance->GetCreature(DATA_ANVEENA))
                 sCreatureTextMgr->SendChat(anveena, SAY_ANVEENA_GOODBYE, nullptr, CHAT_MSG_ADDON, LANG_ADDON, TEXT_RANGE_ZONE);
             break;
         case EVENT_TEXT_SPEACH45:
-            if (Creature* anveena = ObjectAccessor::GetCreature(*me, instance->GetGuidData(NPC_ANVEENA)))
+            if (Creature* anveena = instance->GetCreature(DATA_ANVEENA))
             {
                 anveena->RemoveAllAuras();
                 anveena->DespawnOrUnsummon(3500);
             }
             break;
         case EVENT_TEXT_SPEACH46:
-            if (Creature* anveena = ObjectAccessor::GetCreature(*me, instance->GetGuidData(NPC_ANVEENA)))
+            if (Creature* anveena = instance->GetCreature(DATA_ANVEENA))
             {
                 anveena->CastSpell(anveena, SPELL_SACRIFICE_OF_ANVEENA, true);
                 me->CastSpell(me, SPELL_CUSTOM_08_STATE, true);
@@ -627,9 +627,9 @@ struct boss_kiljaeden : public ScriptedAI
 
     void EmpowerOrb(bool empowerAll)
     {
-        for (uint8 i = 0; i < 4; ++i)
+        for (uint8 i = DATA_ORB_OF_THE_BLUE_DRAGONFLIGHT_1; i < DATA_ORB_OF_THE_BLUE_DRAGONFLIGHT_4 + 1; ++i)
         {
-            if (GameObject* orb = ObjectAccessor::GetGameObject(*me, instance->GetGuidData(DATA_ORB_OF_THE_BLUE_DRAGONFLIGHT_1 + i)))
+            if (GameObject* orb = instance->GetGameObject(i))
             {
                 if (orb->HasGameObjectFlag(GO_FLAG_NOT_SELECTABLE))
                 {
@@ -637,7 +637,7 @@ struct boss_kiljaeden : public ScriptedAI
                     if (Creature* trigger = me->SummonTrigger(orb->GetPositionX(), orb->GetPositionY(), orb->GetPositionZ(), 0, 10 * MINUTE * IN_MILLISECONDS))
                     {
                         trigger->CastSpell(trigger, SPELL_RING_OF_BLUE_FLAMES, true, nullptr, nullptr, trigger->GetGUID());
-                        if (Creature* controller = ObjectAccessor::GetCreature(*me, instance->GetGuidData(NPC_KILJAEDEN_CONTROLLER)))
+                        if (Creature* controller = instance->GetCreature(DATA_KJ_CONTROLLER))
                             controller->AI()->JustSummoned(trigger);
                     }
 

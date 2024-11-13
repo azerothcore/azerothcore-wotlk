@@ -38,15 +38,22 @@ enum BossIds
 
 enum DataTypes
 {
-    DATA_SACROLASH                          = 0,
-    DATA_ALYTHESS                           = 1,
-    DATA_MADRIGOSA                          = 2,
+    DATA_SACROLASH                          = 7,
+    DATA_ALYTHESS                           = 8,
+    DATA_MADRIGOSA                          = 9,
+    DATA_SATHROVARR                         = 10,
+    DATA_KJ_CONTROLLER                      = 11,
+    DATA_ANVEENA                            = 12,
+    DATA_KALECGOS_KJ                        = 13
+};
 
-    // GameObject GUIDs
-    DATA_ORB_OF_THE_BLUE_DRAGONFLIGHT_1     = 10,
-    DATA_ORB_OF_THE_BLUE_DRAGONFLIGHT_2     = 11,
-    DATA_ORB_OF_THE_BLUE_DRAGONFLIGHT_3     = 12,
-    DATA_ORB_OF_THE_BLUE_DRAGONFLIGHT_4     = 13
+enum DataTypesObjects
+{
+    DATA_ORB_OF_THE_BLUE_DRAGONFLIGHT_1     = 0,
+    DATA_ORB_OF_THE_BLUE_DRAGONFLIGHT_2     = 1,
+    DATA_ORB_OF_THE_BLUE_DRAGONFLIGHT_3     = 2,
+    DATA_ORB_OF_THE_BLUE_DRAGONFLIGHT_4     = 3,
+    DATA_ICEBARRIER                         = 4,
 };
 
 enum CreatureIds

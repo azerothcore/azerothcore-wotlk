@@ -235,7 +235,7 @@ struct npc_madrigosa : public NullCreatureAI
         {
         case EVENT_MAD_1:
             me->SetVisible(true);
-            if (Creature* brutallus = ObjectAccessor::GetCreature(*me, instance->GetGuidData(NPC_BRUTALLUS)))
+            if (Creature* brutallus = instance->GetCreature(DATA_BRUTALLUS))
             {
                 me->SetTarget(brutallus->GetGUID());
                 brutallus->SetReactState(REACT_PASSIVE);
@@ -261,12 +261,12 @@ struct npc_madrigosa : public NullCreatureAI
             events.ScheduleEvent(EVENT_MAD_4, 7000);
             break;
         case EVENT_MAD_4:
-            if (Creature* brutallus = ObjectAccessor::GetCreature(*me, instance->GetGuidData(NPC_BRUTALLUS)))
+            if (Creature* brutallus = instance->GetCreature(DATA_BRUTALLUS))
                 brutallus->AI()->Talk(YELL_INTRO);
             events.ScheduleEvent(EVENT_MAD_5, 5000);
             break;
         case EVENT_MAD_5:
-            if (Creature* brutallus = ObjectAccessor::GetCreature(*me, instance->GetGuidData(NPC_BRUTALLUS)))
+            if (Creature* brutallus = instance->GetCreature(DATA_BRUTALLUS))
             {
                 brutallus->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_ONESHOT_ATTACK1H);
                 me->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_ONESHOT_ATTACK1H);
@@ -274,7 +274,7 @@ struct npc_madrigosa : public NullCreatureAI
             events.ScheduleEvent(EVENT_MAD_6, 10000);
             break;
         case EVENT_MAD_6:
-            if (Creature* brutallus = ObjectAccessor::GetCreature(*me, instance->GetGuidData(NPC_BRUTALLUS)))
+            if (Creature* brutallus = instance->GetCreature(DATA_BRUTALLUS))
             {
                 brutallus->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_ONESHOT_NONE);
                 me->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_ONESHOT_NONE);
@@ -297,11 +297,11 @@ struct npc_madrigosa : public NullCreatureAI
             events.ScheduleEvent(EVENT_MAD_8, 14000);
             break;
         case EVENT_MAD_8:
-            if (Creature* brutallus = ObjectAccessor::GetCreature(*me, instance->GetGuidData(NPC_BRUTALLUS)))
+            if (Creature* brutallus = instance->GetCreature(DATA_BRUTALLUS))
                 me->CastSpell(brutallus, SPELL_MADRIGOSA_FROSTBOLT, false);
             break;
         case EVENT_MAD_9:
-            if (Creature* brutallus = ObjectAccessor::GetCreature(*me, instance->GetGuidData(NPC_BRUTALLUS)))
+            if (Creature* brutallus = instance->GetCreature(DATA_BRUTALLUS))
             {
                 brutallus->CastSpell(brutallus, SPELL_BRUTALLUS_FLAME_RING, true);
                 brutallus->RemoveAllAuras();
@@ -323,7 +323,7 @@ struct npc_madrigosa : public NullCreatureAI
             events.ScheduleEvent(EVENT_MAD_14, 2000);
             break;
         case EVENT_MAD_14:
-            if (Creature* brutallus = ObjectAccessor::GetCreature(*me, instance->GetGuidData(NPC_BRUTALLUS)))
+            if (Creature* brutallus = instance->GetCreature(DATA_BRUTALLUS))
             {
                 brutallus->SetDisableGravity(true);
                 brutallus->GetMotionMaster()->MovePoint(0, brutallus->GetPositionX(), brutallus->GetPositionY() - 30.0f, brutallus->GetPositionZ() + 15.0f, false, true);
@@ -331,7 +331,7 @@ struct npc_madrigosa : public NullCreatureAI
             events.ScheduleEvent(EVENT_MAD_15, 10000);
             break;
         case EVENT_MAD_15:
-            if (Creature* brutallus = ObjectAccessor::GetCreature(*me, instance->GetGuidData(NPC_BRUTALLUS)))
+            if (Creature* brutallus = instance->GetCreature(DATA_BRUTALLUS))
             {
                 brutallus->RemoveAllAuras();
                 brutallus->SetDisableGravity(false);
@@ -341,12 +341,12 @@ struct npc_madrigosa : public NullCreatureAI
             events.ScheduleEvent(EVENT_MAD_16, 1400);
             break;
         case EVENT_MAD_16:
-            if (Creature* brutallus = ObjectAccessor::GetCreature(*me, instance->GetGuidData(NPC_BRUTALLUS)))
+            if (Creature* brutallus = instance->GetCreature(DATA_BRUTALLUS))
                 brutallus->CastSpell(me, SPELL_BRUTALLUS_CHARGE, true);
             events.ScheduleEvent(EVENT_MAD_17, 1200);
             break;
         case EVENT_MAD_17:
-            if (Creature* brutallus = ObjectAccessor::GetCreature(*me, instance->GetGuidData(NPC_BRUTALLUS)))
+            if (Creature* brutallus = instance->GetCreature(DATA_BRUTALLUS))
                 brutallus->HandleEmoteCommand(EMOTE_ONESHOT_ATTACK1H);
             events.ScheduleEvent(EVENT_MAD_18, 500);
             break;
@@ -357,14 +357,14 @@ struct npc_madrigosa : public NullCreatureAI
             events.ScheduleEvent(EVENT_MAD_19, 6000);
             break;
         case EVENT_MAD_19:
-            if (Creature* brutallus = ObjectAccessor::GetCreature(*me, instance->GetGuidData(NPC_BRUTALLUS)))
+            if (Creature* brutallus = instance->GetCreature(DATA_BRUTALLUS))
                 brutallus->AI()->Talk(YELL_INTRO_KILL_MADRIGOSA);
             events.ScheduleEvent(EVENT_MAD_20, 7000);
             break;
         case EVENT_MAD_20:
             me->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
             me->SetFaction(FACTION_FRIENDLY);
-            if (Creature* brutallus = ObjectAccessor::GetCreature(*me, instance->GetGuidData(NPC_BRUTALLUS)))
+            if (Creature* brutallus = instance->GetCreature(DATA_BRUTALLUS))
             {
                 brutallus->AI()->Talk(YELL_INTRO_TAUNT);
                 brutallus->CastSpell(brutallus, SPELL_BRUTALLUS_BREAK_ICE, false);
@@ -372,7 +372,7 @@ struct npc_madrigosa : public NullCreatureAI
             events.ScheduleEvent(EVENT_MAD_21, 4000);
             break;
         case EVENT_MAD_21:
-            if (Creature* brutallus = ObjectAccessor::GetCreature(*me, instance->GetGuidData(NPC_BRUTALLUS)))
+            if (Creature* brutallus = instance->GetCreature(DATA_BRUTALLUS))
             {
                 brutallus->SetReactState(REACT_AGGRESSIVE);
                 brutallus->SetHealth(brutallus->GetMaxHealth());
@@ -382,7 +382,7 @@ struct npc_madrigosa : public NullCreatureAI
             break;
         case EVENT_SPAWN_FELMYST:
             me->DespawnOrUnsummon(1);
-            if (Creature* felmyst = ObjectAccessor::GetCreature(*me, instance->GetGuidData(NPC_FELMYST)))
+            if (Creature* felmyst = instance->GetCreature(DATA_FELMYST))
                 felmyst->AI()->DoAction(ACTION_START_EVENT);
             break;
         }
