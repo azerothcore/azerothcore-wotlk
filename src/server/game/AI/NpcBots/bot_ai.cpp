@@ -9898,6 +9898,7 @@ bool bot_ai::OnGossipSelect(Player* player, Creature* creature/* == me*/, uint32
         {
             uint32 set_id = uint8(action - GOSSIP_ACTION_INFO_DEF);
             NpcBotItemSet const* item_set = BotDataMgr::GetBotItemSet(player->GetGUID(), set_id);
+            EquipmentInfo const* einfo = BotDataMgr::GetBotEquipmentInfo(me->GetEntry());
             BotBankItemContainer const* botBankItems = BotDataMgr::GetBotBankItems(player->GetGUID());
             auto const& itemset_items = item_set->items;
             uint8 unequip_count = GetRealEquippedItemsCount();
@@ -9910,7 +9911,8 @@ bool bot_ai::OnGossipSelect(Player* player, Creature* creature/* == me*/, uint32
             std::array<bool, BOT_INVENTORY_SIZE> same_item_id{};
             for (uint8 i : NPCBots::index_array<uint8, BOT_INVENTORY_SIZE>)
             {
-                same_item_id[i] = _equips[i] ? (_equips[i]->GetEntry() == itemset_items[i]) : !itemset_items[i];
+                Item const* item = _equips[i];
+                same_item_id[i] = (item && (i > BOT_SLOT_RANGED || einfo->ItemEntry[i] != item->GetEntry())) ? (item->GetEntry() == itemset_items[i]) : !itemset_items[i];
                 if (!same_item_id[i])
                     all_same = false;
             }
@@ -11447,7 +11449,7 @@ bool bot_ai::OnGossipSelectCode(Player* player, Creature* creature/* == me*/, ui
                 item_set.name = std::move(set_name);
                 for (uint8 i : NPCBots::index_array<uint8, BOT_INVENTORY_SIZE>)
                     if (Item const* item = _equips[i])
-                        if (i <= BOT_SLOT_RANGED || einfo->ItemEntry[i] != item->GetEntry())
+                        if (i > BOT_SLOT_RANGED || einfo->ItemEntry[i] != item->GetEntry())
                             item_set.items[i] = item->GetEntry();
             }
             else
