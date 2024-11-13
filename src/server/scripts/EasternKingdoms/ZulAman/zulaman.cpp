@@ -551,7 +551,6 @@ struct npc_harrison_jones : public ScriptedAI
         ObjectGuid uiTargetGUID;
 };
 
-
 class spell_ritual_of_power : public SpellScript
 {
     PrepareSpellScript(spell_ritual_of_power);
