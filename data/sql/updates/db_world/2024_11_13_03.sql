@@ -1,3 +1,4 @@
+-- DB update 2024_11_13_02 -> 2024_11_13_03
 UPDATE `creature` SET `id1` = 17400 WHERE `guid` IN (138247, 138248, 138249, 138250, 138252, 138253);
 
 DELETE FROM `conditions` WHERE `SourceTypeOrReferenceId` = 22 AND `SourceGroup` = 6 AND `SourceEntry` = 17371 AND `ConditionValue1` = 17400;
