@@ -495,8 +495,8 @@ struct boss_jormungarAI : public ScriptedAI
                     events.RescheduleEvent(EVENT_SUBMERGE, 1500ms);
                 break;
             case -2:
-                if (me->HasUnitFlag(UNIT_FLAG_NON_ATTACKABLE))
-                    bIsStationary = true; // it will come out mobile soon
+                //if (me->HasUnitFlag(UNIT_FLAG_NON_ATTACKABLE))
+                //    bIsStationary = true; // it will come out mobile soon
                     //else if (me->GetDisplayId() == _MODEL_STATIONARY)
                     //  events.RescheduleEvent(EVENT_SUBMERGE, 1s);
                     //  else
