@@ -33,6 +33,7 @@ EndContentData */
 #include "ScriptedGossip.h"
 #include "SpellInfo.h"
 #include "SpellScript.h"
+#include "SpellScriptLoader.h"
 
 /*######
 ## npc_forest_frog
@@ -348,6 +349,11 @@ enum Events
     GONG_EVENT_11                     = 11
 };
 
+enum Actions
+{
+    ACTION_FAST_FORWARD_EVENT_3       = 0,
+};
+
 enum Waypoints
 {
     HARRISON_MOVE_1                   = 860440,
@@ -416,6 +422,14 @@ struct npc_harrison_jones : public ScriptedAI
             me->SetDynamicFlag(UNIT_DYNFLAG_DEAD);
             _instance->StorePersistentData(DATA_TIMED_RUN, 21);
             _instance->DoAction(ACTION_START_TIMED_RUN);
+        }
+    }
+
+    void DoAction(int32 action) override
+    {
+        if (action == ACTION_FAST_FORWARD_EVENT_3)
+        {
+            _gongTimer = 0;
         }
     }
 
@@ -538,9 +552,32 @@ struct npc_harrison_jones : public ScriptedAI
         ObjectGuid uiTargetGUID;
 };
 
+
+class spell_ritual_of_power : public SpellScript
+{
+    PrepareSpellScript(spell_ritual_of_power);
+
+    void OnEffect(SpellEffIndex /*effIndex*/)
+    {
+        if (InstanceScript* instance = GetCaster()->GetInstanceScript())
+        {
+            if (Creature* creature = instance->GetCreature(DATA_HARRISON_JONES))
+            {
+                creature->AI()->DoAction(ACTION_FAST_FORWARD_EVENT_3);
+            }
+        }
+    }
+
+    void Register() override
+    {
+        OnEffectLaunch += SpellEffectFn(spell_ritual_of_power::OnEffect, EFFECT_0, SPELL_EFFECT_SEND_EVENT);
+    }
+};
+
 void AddSC_zulaman()
 {
     RegisterZulAmanCreatureAI(npc_forest_frog);
     new npc_zulaman_hostage();
     RegisterZulAmanCreatureAI(npc_harrison_jones);
+    RegisterSpellScript(spell_ritual_of_power);
 }
