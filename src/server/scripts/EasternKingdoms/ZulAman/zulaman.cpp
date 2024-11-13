@@ -351,7 +351,7 @@ enum Events
 
 enum Actions
 {
-    ACTION_FAST_FORWARD_EVENT_3       = 0,
+    ACTION_COMPLETE_EVENT_3           = 0,
 };
 
 enum Waypoints
@@ -427,7 +427,7 @@ struct npc_harrison_jones : public ScriptedAI
 
     void DoAction(int32 action) override
     {
-        if (action == ACTION_FAST_FORWARD_EVENT_3)
+        if (action == ACTION_COMPLETE_EVENT_3)
         {
             _gongEvent = GONG_EVENT_4;
             _gongTimer = 0;
@@ -562,7 +562,7 @@ class spell_ritual_of_power : public SpellScript
         {
             if (Creature* creature = instance->GetCreature(DATA_HARRISON_JONES))
             {
-                creature->AI()->DoAction(ACTION_FAST_FORWARD_EVENT_3);
+                creature->AI()->DoAction(ACTION_COMPLETE_EVENT_3);
             }
         }
     }
