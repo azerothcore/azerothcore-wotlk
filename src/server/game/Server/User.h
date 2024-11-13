@@ -627,7 +627,6 @@ public:                                                 // opcodes handlers
     void HandleSetSelectionOpcode(WDataStore& recvPacket);
     void HandleStandStateChangeOpcode(WDataStore& recvPacket);
     void HandleEmoteOpcode(WorldPackets::Chat::EmoteClient& packet);
-    void HandleBugOpcode(WDataStore& recvPacket);
     void HandleSetAmmoOpcode(WDataStore& recvPacket);
     void HandleItemNameQueryOpcode(WDataStore& recvPacket);
 

@@ -567,7 +567,6 @@ void OpcodeTable::Initialize()
     /*0x1C7*/ DEFINE_SERVER_OPCODE_HANDLER(SMSG_PETITION_QUERY_RESPONSE,                            STATUS_NEVER);
     /*0x1C8*/ DEFINE_SERVER_OPCODE_HANDLER(SMSG_FISH_NOT_HOOKED,                                    STATUS_NEVER);
     /*0x1C9*/ DEFINE_SERVER_OPCODE_HANDLER(SMSG_FISH_ESCAPED,                                       STATUS_NEVER);
-    /*0x1CA*/ DEFINE_HANDLER(CMSG_BUG,                                                              STATUS_LOGGEDIN,   PROCESS_THREADUNSAFE,   &User::HandleBugOpcode                          );
     /*0x1CB*/ DEFINE_SERVER_OPCODE_HANDLER(SMSG_NOTIFICATION,                                       STATUS_NEVER);
     /*0x1CC*/ DEFINE_HANDLER(CMSG_PLAYED_TIME,                                                      STATUS_LOGGEDIN,   PROCESS_INPLACE,        &User::HandlePlayedTime                         );
     /*0x1CD*/ DEFINE_SERVER_OPCODE_HANDLER(SMSG_PLAYED_TIME,                                        STATUS_NEVER);

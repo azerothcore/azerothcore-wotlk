@@ -529,23 +529,6 @@ void User::HandleCharacterAuraFrozen(PreparedQueryResult result)
     } while (result->NextRow());
 }
 
-void User::HandleBugOpcode(WDataStore& recv_data)
-{
-    uint32 suggestion, contentlen, typelen;
-    std::string content, type;
-
-    recv_data >> suggestion >> contentlen >> content;
-
-    recv_data >> typelen >> type;
-
-    CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_INS_BUG_REPORT);
-
-    stmt->SetData(0, type);
-    stmt->SetData(1, content);
-
-    CharacterDatabase.Execute(stmt);
-}
-
 void User::HandleReclaimCorpseOpcode(WDataStore& recv_data)
 {
     WOWGUID corpseGUID;

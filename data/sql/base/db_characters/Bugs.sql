@@ -14,17 +14,16 @@
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
--- Dumping structure for table acore_characters.bugreport
-DROP TABLE IF EXISTS `bugreport`;
-CREATE TABLE IF NOT EXISTS `bugreport` (
-  `id` int unsigned NOT NULL AUTO_INCREMENT COMMENT 'Identifier',
-  `type` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
-  `content` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='Debug System';
-
--- Dumping data for table acore_characters.bugreport: ~0 rows (approximately)
-DELETE FROM `bugreport`;
+-- Dumping structure for table Bugs
+DROP TABLE IF EXISTS `Bugs`;
+CREATE TABLE IF NOT EXISTS `Bugs` (
+	ID int NOT NULL AUTO_INCREMENT,
+	Category int,
+	Title varchar(1024),
+	Description varchar(4096),
+	Time TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+	PRIMARY KEY (ID)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='User Bugs and Suggestions';
 
 /*!40103 SET TIME_ZONE=IFNULL(@OLD_TIME_ZONE, 'system') */;
 /*!40101 SET SQL_MODE=IFNULL(@OLD_SQL_MODE, '') */;

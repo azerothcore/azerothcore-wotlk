@@ -62,10 +62,14 @@ static void UserBootMeHandler (User*        user,
                                NETMESSAGE   msgId,
                                uint         eventTime,
                                WDataStore*  msg);
-static void UserGmResurrectHandler (User*        user,
-                                    NETMESSAGE   msgId,
-                                    uint         eventTime,
-                                    WDataStore*  msg);
+static void UserBugReportHandler (User*       user,
+                                  NETMESSAGE  msgId,
+                                  uint        eventTime,
+                                  WDataStore* msg);
+static void UserGmResurrectHandler (User*       user,
+                                    NETMESSAGE  msgId,
+                                    uint        eventTime,
+                                    WDataStore* msg);
 static void UserWorldTeleportHandler (User*       user,
                                       NETMESSAGE  msgId,
                                       uint        eventTime,
@@ -2045,6 +2049,35 @@ static void UserBootMeHandler (User*        user,
 }
 
 //===========================================================================
+static void UserBugReportHandler (User*       user,
+                                  NETMESSAGE  msgId,
+                                  uint        eventTime,
+                                  WDataStore* msg) {
+
+  uint32 category;
+  msg->Get(category);
+
+  uint32 bytes;
+  msg->Get(bytes);
+
+  auto text = (char*)malloc(bytes);
+  msg->GetString(text, bytes);
+
+  msg->Get(bytes);
+  auto title = (char*)malloc(bytes);
+  msg->GetString(title, bytes);
+
+  auto stmt = CharacterDatabase.GetPreparedStatement(CHAR_INS_BUG_REPORT);
+  stmt->SetData(0, category);
+  stmt->SetData(1, title);
+  stmt->SetData(2, text);
+  CharacterDatabase.Execute(stmt);
+
+  free(text);
+  free(title);
+}
+
+//===========================================================================
 static void UserGmResurrectHandler (User*        user,
                                     NETMESSAGE   msgId,
                                     uint         eventTime,
@@ -2105,6 +2138,7 @@ void UserInitialize () {
   WowConnection::SetMessageHandler(CMSG_BOOTME, UserBootMeHandler, GM_SECURITY);
   WowConnection::SetMessageHandler(CMSG_WORLD_TELEPORT, UserWorldTeleportHandler, GM_SECURITY);
   WowConnection::SetMessageHandler(CMSG_GM_RESURRECT, UserGmResurrectHandler, GM_SECURITY);
+  WowConnection::SetMessageHandler(CMSG_BUG, UserBugReportHandler);
 
   s_initialized = true;
 }
@@ -2116,6 +2150,7 @@ void UserDestroy () {
   WowConnection::ClearMessageHandler(CMSG_BOOTME);
   WowConnection::ClearMessageHandler(CMSG_WORLD_TELEPORT);
   WowConnection::ClearMessageHandler(CMSG_GM_RESURRECT);
+  WowConnection::ClearMessageHandler(CMSG_BUG);
 
   s_initialized = false;
 }
