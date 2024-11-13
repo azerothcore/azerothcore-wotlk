@@ -21,6 +21,7 @@
 #include "Log.h"
 #include "MoveSplineInit.h"
 #include "ObjectMgr.h"
+#include "QueryResult.h"
 #include "WaypointMgr.h"
 
 FormationMgr::~FormationMgr()

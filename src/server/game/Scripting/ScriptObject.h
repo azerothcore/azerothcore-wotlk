@@ -18,8 +18,8 @@
 #ifndef _SCRIPT_OBJECT_H_
 #define _SCRIPT_OBJECT_H_
 
-#include "DatabaseEnvFwd.h"
 #include "ScriptObjectFwd.h"
+#include <string>
 
 //#include "Duration.h"
 //#include "LFG.h"
