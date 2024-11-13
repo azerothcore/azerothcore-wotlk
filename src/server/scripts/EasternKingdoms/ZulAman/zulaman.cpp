@@ -559,12 +559,8 @@ class spell_ritual_of_power : public SpellScript
     void OnEffect(SpellEffIndex /*effIndex*/)
     {
         if (InstanceScript* instance = GetCaster()->GetInstanceScript())
-        {
             if (Creature* creature = instance->GetCreature(DATA_HARRISON_JONES))
-            {
                 creature->AI()->DoAction(ACTION_COMPLETE_EVENT_3);
-            }
-        }
     }
 
     void Register() override
