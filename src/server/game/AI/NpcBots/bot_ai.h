@@ -275,7 +275,7 @@ class bot_ai : public CreatureAI
         Item* GetEquips(uint8 slot) const { return _equips[slot]; }
         Item* GetEquipsByGuid(ObjectGuid itemGuid) const;
         uint32 GetEquipDisplayId(uint8 slot) const;
-        bool UnEquipAll(ObjectGuid receiver);
+        [[nodiscard]] BotEquipResult UnEquipAll(ObjectGuid receiver, bool store_to_bank);
         bool HasRealEquipment() const;
         float GetAverageItemLevel() const;
         std::pair<float, float> GetBotGearScores() const;
@@ -643,9 +643,9 @@ class bot_ai : public CreatureAI
         bool _canUseRelic() const;
         bool _canEquip(ItemTemplate const* newProto, uint8 slot, bool ignoreItemLevel, Item const* newItem = nullptr) const;
         void _removeEquipment(uint8 slot);
-        bool _unequip(uint8 slot, ObjectGuid receiver);
-        bool _equip(uint8 slot, Item* newItem, ObjectGuid receiver);
-        bool _resetEquipment(uint8 slot, ObjectGuid receiver);
+        [[nodiscard]] BotEquipResult _unequip(uint8 slot, ObjectGuid receiver, bool store_to_bank);
+        [[nodiscard]] BotEquipResult _equip(uint8 slot, Item* newItem, ObjectGuid receiver, bool store_to_bank);
+        [[nodiscard]] BotEquipResult _resetEquipment(uint8 slot, ObjectGuid receiver, bool store_to_bank);
 
         void _castBotItemUseSpell(Item const* item, SpellCastTargets const& targets/*, uint8 cast_count = 0, uint32 glyphIndex = 0*/);
 

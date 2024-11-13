@@ -456,6 +456,21 @@ enum BotEquipSlot : uint8
 
 constexpr uint8 BOT_TRANSMOG_INVENTORY_SIZE = 13; // BOT_SLOT_BODY + 1
 
+enum class BotEquipResult : uint8
+{
+    BOT_EQUIP_RESULT_OK                         = 0,
+
+    BOT_EQUIP_RESULT_FAIL_NO_BAG_SPACE          = 1, //unused
+    BOT_EQUIP_RESULT_FAIL_NO_BANK_SPACE         = 2,
+    BOT_EQUIP_RESULT_FAIL_NO_RECEIVER           = 3,
+    BOT_EQUIP_RESULT_FAIL_INVALID_RECEIVER      = 4,
+    BOT_EQUIP_RESULT_FAIL_NO_ITEM               = 5,
+    BOT_EQUIP_RESULT_FAIL_SAME_ID               = 6,
+    BOT_EQUIP_RESULT_FAIL_WANDERER              = 7,
+    BOT_EQUIP_RESULT_FAIL_LINKED_UNEQUIP_FAILED = 8,
+    BOT_EQUIP_RESULT_FAIL_LINKED_RESET_FAILED   = 9
+};
+
 enum BotStatMods: uint8
 {
     //ItemProtoType.h

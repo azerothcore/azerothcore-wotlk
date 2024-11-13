@@ -421,7 +421,9 @@ enum BotTexts : uint32
     BOT_TEXT_DALARAN                        = 70684, //"Dalaran"
     BOT_TEXT_HIREFAIL_MAXBOTS_ACCOUNT       = 70685, //"You exceed max npcbots for your account ({} >= {})"
     BOT_TEXT_SET_FOR_ALL_EVERYONE           = 70686, //"<Set for all bots>"
-    //70687-70799 reserved for custom localization strings
+    BOT_TEXT___GEAR_BANK_                   = 70687, //" (gear bank)"
+    BOT_TEXT_NOT_ENOUGH_GEAR_BANK_SPACE     = 70688, //"Not enough gear bank space to store %u item(s) (%u / %u)!"
+    //70689-70799 reserved for custom localization strings
 };
 
 #endif //BOTTEXT_H
