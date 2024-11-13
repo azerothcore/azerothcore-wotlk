@@ -429,6 +429,7 @@ struct npc_harrison_jones : public ScriptedAI
     {
         if (action == ACTION_FAST_FORWARD_EVENT_3)
         {
+            _gongEvent = GONG_EVENT_4;
             _gongTimer = 0;
         }
     }
@@ -458,8 +459,6 @@ struct npc_harrison_jones : public ScriptedAI
                 case GONG_EVENT_3:
                     if (GameObject* gong = _instance->GetGameObject(DATA_STRANGE_GONG))
                         gong->RemoveGameObjectFlag(GO_FLAG_NOT_SELECTABLE);
-                    _gongEvent = GONG_EVENT_4;
-                    _gongTimer = 105000;
                     break;
                 case GONG_EVENT_4:
                     me->RemoveAura(SPELL_BANGING_THE_GONG);
