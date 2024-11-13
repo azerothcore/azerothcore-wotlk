@@ -773,7 +773,6 @@ public:
                     if (Unit* target = me->GetVictim())
                         if (!me->IsWithinMeleeRange(target)) // Only cast if out of melee range
                             DoCast(target, SPELL_FEL_FIREBALL);
-                    
             // Schedule subsequent casts every 10-25 seconds
             context.Repeat(10s + std::chrono::seconds(urand(0, 15)));
                 });
@@ -785,7 +784,7 @@ public:
                 if (Unit* target = me->GetVictim())
                     if (me->IsWithinMeleeRange(target))
                         DoCast(target, SPELL_CURSE_OF_WEAKNESS);
-
+            // Schedule subsequent casts every 13-35 seconds
             context.Repeat(13s + std::chrono::seconds(urand(0, 22)));
                 }
             );
