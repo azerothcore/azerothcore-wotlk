@@ -1,3 +1,4 @@
+-- DB update 2024_11_13_03 -> 2024_11_13_04
 -- Field Marshal Rohamus smart ai
 SET @ENTRY := 19316;
 UPDATE `creature_template` SET `AIName` = 'SmartAI', `ScriptName` = '' WHERE `entry` = @ENTRY;
