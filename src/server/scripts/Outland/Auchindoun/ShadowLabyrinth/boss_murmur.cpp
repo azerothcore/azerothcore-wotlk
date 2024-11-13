@@ -87,16 +87,37 @@ struct boss_murmur : public BossAI
 
     bool CanAIAttack(Unit const* victim) const override
     {
-        if (!victim)
-            return false;
+        return me->IsWithinDistInMap(victim, me->GetAttackDistance(victim));
+    }
 
-        float distance = me->GetDistance(victim);
-        if (distance < 45.0f)
+    void UpdateAI(uint32 diff) override
+    {
+        BossAI::UpdateAI(diff);
+
+        if (!me->IsInCombat())
         {
-            return true;
+            if (Unit* attacker = me->SelectNearestPlayer(10.0f))
+            {
+                if (attacker->IsHostileTo(me))
+                {
+                    AttackStart(attacker);
+                }
+            }
         }
+        else
+        {
+            Unit* target = me->SelectNearestPlayer(5.0f);
 
-        return false;
+            if (!target)
+            {
+                target = me->SelectNearestPlayer(50.0f);
+            }
+
+            if (target && target->IsHostileTo(me))
+            {
+                me->Attack(target, true);
+            }
+        }
     }
 
     void EnterEvadeMode(EvadeReason why) override
