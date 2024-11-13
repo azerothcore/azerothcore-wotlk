@@ -58,9 +58,9 @@ DoorData const doorData[] =
 
 ObjectData const creatureData[] =
 {
-    { NPC_SPIRIT_LYNX, DATA_SPIRIT_LYNX },
+    { NPC_SPIRIT_LYNX,    DATA_SPIRIT_LYNX    },
     { NPC_HARRISON_JONES, DATA_HARRISON_JONES },
-    { 0,               0                }
+    { 0,                  0                   }
 };
 
 ObjectData const gameObjectData[] =
