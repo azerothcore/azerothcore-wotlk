@@ -424,8 +424,6 @@ bool bot_ai::SetBotOwner(Player* newowner)
 {
     ASSERT(newowner, "Trying to set NULL owner!!!");
     ASSERT(newowner->GetGUID().IsPlayer(), "Trying to set a non-player as owner!!!");
-    //ASSERT(master->GetGUID() == me->GetGUID());
-    //ASSERT(IAmFree());
 
     //have master already
     if (master->GetGUID() != me->GetGUID())
@@ -472,10 +470,7 @@ void bot_ai::CheckOwnerExpiry()
         return;
 
     NpcBotData const* npcBotData = BotDataMgr::SelectNpcBotData(me->GetEntry());
-    ASSERT(npcBotData, "bot_ai::CheckOwnerExpiry(): data not found!");
-
     NpcBotExtras const* npcBotExtra = BotDataMgr::SelectNpcBotExtras(me->GetEntry());
-    ASSERT(npcBotExtra, "bot_ai::CheckOwnerExpiry(): extra data not found!");
 
     if (npcBotData->owner == 0)
         return;
@@ -596,8 +591,6 @@ void bot_ai::InitUnitFlags()
 
 void bot_ai::ResetBotAI(uint8 resetType)
 {
-    //ASSERT(me->IsInWorld());
-
     _botCommandState = 0;
     _botAwaitState = BOT_AWAIT_NONE;
     _reviveTimer = 0;
@@ -1214,14 +1207,10 @@ void bot_ai::MoveToSendPosition(Position const& mpos)
 }
 void bot_ai::MoveToSendPosition(uint32 point_id)
 {
-    ASSERT(point_id < MAX_SEND_POINTS);
-
     MoveToSendPosition(sendpos[point_id]);
 }
 void bot_ai::MarkSendPosition(uint32 point_id)
 {
-    ASSERT(point_id < MAX_SEND_POINTS);
-
     sendpos[point_id].Relocate(me);
 }
 
@@ -3814,7 +3803,6 @@ Unit* bot_ai::_getVehicleTarget(BotVehicleStrats /*strat*/) const
     Creature* veh = me->GetVehicleCreatureBase();
     Creature* masterVeh = master->GetVehicleCreatureBase();
     ASSERT(veh);
-    //ASSERT(masterVeh);
     Unit* mmover = masterVeh ? masterVeh->ToUnit() : master->ToUnit();
     ObjectGuid curTarget = veh->GetTarget();
 
@@ -7748,7 +7736,6 @@ void bot_ai::ApplyBotEffectValueMultiplierMods(SpellInfo const* spellInfo, Spell
 float bot_ai::CalcSpellMaxRange(uint32 spellId, bool enemy) const
 {
     SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(spellId);
-    //ASSERT(spellInfo);
     spellInfo = spellInfo->TryGetSpellInfoOverride(me);
 
     float maxRange = spellInfo->GetMaxRange(!enemy);
@@ -8876,8 +8863,6 @@ bool bot_ai::OnGossipSelect(Player* player, Creature* creature/* == me*/, uint32
             //    break;
 
             EquipmentInfo const* einfo = BotDataMgr::GetBotEquipmentInfo(me->GetEntry());
-            ASSERT(einfo, "Trying to send equipment list for bot with no equip info!");
-
             for (uint8 i = BOT_SLOT_MAINHAND; i != BOT_INVENTORY_SIZE; ++i)
             {
                 Item const* item = _equips[i];
@@ -9115,8 +9100,6 @@ bool bot_ai::OnGossipSelect(Player* player, Creature* creature/* == me*/, uint32
             //subMenu = true; //needed for return
 
             EquipmentInfo const* einfo = BotDataMgr::GetBotEquipmentInfo(me->GetEntry());
-            ASSERT(einfo, "Trying to send equipment info for bot with no equip info!");
-
             uint8 slot = action - GOSSIP_ACTION_INFO_DEF;
             Item const* item = _equips[slot];
             ASSERT(item);
@@ -9139,8 +9122,6 @@ bool bot_ai::OnGossipSelect(Player* player, Creature* creature/* == me*/, uint32
             subMenu = true;
 
             EquipmentInfo const* einfo = BotDataMgr::GetBotEquipmentInfo(me->GetEntry());
-            ASSERT(einfo, "Trying to send equipment show for bot with no equip info!");
-
             std::set<uint32> itemList, idsList;
 
             //s2.1: build list
@@ -9454,8 +9435,6 @@ bool bot_ai::OnGossipSelect(Player* player, Creature* creature/* == me*/, uint32
             subMenu = true;
 
             EquipmentInfo const* einfo = BotDataMgr::GetBotEquipmentInfo(me->GetEntry());
-            ASSERT(einfo, "Trying to send auto-equip for bot with no equip info!");
-
             std::set<uint32> itemList, idsList;
 
             //1: build list
@@ -12785,8 +12764,6 @@ BotEquipResult bot_ai::_equip(uint8 slot, Item* newItem, ObjectGuid receiver, bo
     ASSERT(newItem);
 
     EquipmentInfo const* einfo = BotDataMgr::GetBotEquipmentInfo(me->GetEntry());
-    ASSERT(einfo, "Trying to equip item for bot with no equip info!");
-
     ItemTemplate const* proto = newItem->GetTemplate();
 
     if (newItem->GetState() == ITEM_REMOVED)
@@ -12936,8 +12913,6 @@ BotEquipResult bot_ai::_resetEquipment(uint8 slot, ObjectGuid receiver, bool sto
     ASSERT(slot <= BOT_SLOT_RANGED);
 
     EquipmentInfo const* einfo = BotDataMgr::GetBotEquipmentInfo(me->GetEntry());
-    ASSERT(einfo, "Trying to reset equipment for bot with no equip info!");
-
     uint32 itemId = einfo->ItemEntry[slot];
     Item const* oldItem = _equips[slot];
 
@@ -14665,8 +14640,6 @@ void bot_ai::InitRace()
 void bot_ai::InitOwner()
 {
     NpcBotData const* npcBotData = BotDataMgr::SelectNpcBotData(me->GetEntry());
-    ASSERT(npcBotData, "bot_ai::InitOwner(): data not found!");
-
     _ownerGuid = npcBotData->owner;
 }
 
@@ -14981,7 +14954,6 @@ void bot_ai::InitEquips()
     ASSERT(einfo, "Trying to spawn bot with no equip info!");
 
     NpcBotData const* npcBotData = BotDataMgr::SelectNpcBotData(me->GetEntry());
-    ASSERT(npcBotData, "bot_ai::InitEquips(): data not found!");
 
     if (IsWanderer())
     {
@@ -15534,9 +15506,9 @@ void bot_ai::_AddItemTemplateLink(Player const* forPlayer, ItemTemplate const* i
 
     //max in stack
     if (item->BuyCount > 1)
-        str<< "|cff009900x" << item->BuyCount << ".|r";
+        str<< "|cff009900x" << item->BuyCount << "|r";
     else
-        str << "|cff009900.|r";
+        str << "|cff009900|r";
 }
 // |TInterface\\Icons\\INV_<iconName>:<iconSize>|t|color|Hitem:item_id:perm_ench_id:gem1:gem2:gem3:0:random_property:suffix_factor:reporter_level|h[name]|h|r
 // |TInterface\\Icons\\INV_Misc_Staff_01:16|t|cffa335ee|Hitem:812:0:0:0:0:0:0:0:70|h[Glowing Brightwood Staff]|h|r
@@ -18738,7 +18710,6 @@ void bot_ai::TeleportHomeStart(bool reset)
 void bot_ai::TeleportHome(bool reset)
 {
     ASSERT(teleHomeEvent);
-    //ASSERT(IAmFree());
 
     AbortTeleport();
 
@@ -18747,7 +18718,6 @@ void bot_ai::TeleportHome(bool reset)
     GetHomePosition(mapid, &pos);
 
     Map* map = sMapMgr->CreateBaseMap(mapid);
-    ASSERT(!map->Instanceable(), map->GetDebugInfo().c_str());
     BotMgr::TeleportBot(me, map, &pos, false, reset, this);
 
     spawned = false;
@@ -18757,7 +18727,6 @@ void bot_ai::TeleportHome(bool reset)
 bool bot_ai::FinishTeleport(bool reset)
 {
     ASSERT(teleFinishEvent);
-    //ASSERT(!IAmFree());
     ASSERT(!me->IsInWorld());
 
     AbortTeleport();
@@ -21137,7 +21106,6 @@ void bot_ai::SetGroup(Group* group, int8 subgroup)
     else
     {
         // never use SetGroup without a subgroup unless you specify NULL for group
-        ASSERT(subgroup >= 0);
         _group.link(group, me);
         _group.setSubGroup((uint8)subgroup);
     }
@@ -21167,7 +21135,6 @@ void bot_ai::SetOriginalGroup(Group* group, int8 subgroup)
         _originalGroup.unlink();
     else
     {
-        ASSERT(subgroup >= 0);
         _originalGroup.link(group, me);
         _originalGroup.setSubGroup((uint8)subgroup);
     }

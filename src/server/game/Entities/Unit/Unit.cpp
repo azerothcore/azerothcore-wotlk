@@ -15183,7 +15183,7 @@ bool Unit::IsAlwaysVisibleFor(WorldObject const* seer) const
                     return true;
 
     //npcbot - bots are always visible for owner
-    if (GetCreator() && seer->GetGUID() == GetCreator()->GetGUID())
+    if (GetCreator() && (seer->GetGUID() == GetCreator()->GetGUID() || (seer->IsCreature() && seer->ToCreature()->GetCreator() == GetCreator())))
         return true;
     //end npcbot
 
