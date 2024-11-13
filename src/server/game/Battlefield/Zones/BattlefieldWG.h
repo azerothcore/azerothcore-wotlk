@@ -20,7 +20,6 @@
 
 #include "Battlefield.h"
 #include "Log.h"
-#include "ObjectAccessor.h"
 #include "World.h"
 #include "WorldStatePackets.h"
 

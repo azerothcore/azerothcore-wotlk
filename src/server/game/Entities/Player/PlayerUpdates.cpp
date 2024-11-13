@@ -38,6 +38,7 @@
 #include "Vehicle.h"
 #include "Weather.h"
 #include "WeatherMgr.h"
+#include "WorldState.h"
 #include "WorldStatePackets.h"
 
 /// @todo: this import is not necessary for compilation and marked as unused by the IDE
@@ -1215,6 +1216,8 @@ void Player::UpdateZone(uint32 newZone, uint32 newArea)
     {
         sOutdoorPvPMgr->HandlePlayerLeaveZone(this, m_zoneUpdateId);
         sOutdoorPvPMgr->HandlePlayerEnterZone(this, newZone);
+        sWorldState->HandlePlayerLeaveZone(this, static_cast<WorldStateZoneId>(m_zoneUpdateId));
+        sWorldState->HandlePlayerEnterZone(this, static_cast<WorldStateZoneId>(newZone));
         sBattlefieldMgr->HandlePlayerLeaveZone(this, m_zoneUpdateId);
         sBattlefieldMgr->HandlePlayerEnterZone(this, newZone);
         SendInitWorldStates(newZone,

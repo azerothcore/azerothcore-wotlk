@@ -36,8 +36,7 @@ enum Spells
     SPELL_MANA_RAGE_TRIGGER         = 44321,
 
     //Selin's spells
-    SPELL_DRAIN_LIFE_N              = 44294,
-    SPELL_DRAIN_LIFE_H              = 46155,
+    SPELL_DRAIN_LIFE                = 44294,
     SPELL_FEL_EXPLOSION             = 44314,
     SPELL_DRAIN_MANA                = 46153
 };
@@ -181,7 +180,7 @@ struct boss_selin_fireheart : public ScriptedAI
         {
         case EVENT_SPELL_DRAIN_LIFE:
             if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0))
-                me->CastSpell(target, DUNGEON_MODE(SPELL_DRAIN_LIFE_N, SPELL_DRAIN_LIFE_H), false);
+                me->CastSpell(target, SPELL_DRAIN_LIFE, false);
             events.ScheduleEvent(EVENT_SPELL_DRAIN_LIFE, 10000, 1);
             return;
         case EVENT_SPELL_DRAIN_MANA:

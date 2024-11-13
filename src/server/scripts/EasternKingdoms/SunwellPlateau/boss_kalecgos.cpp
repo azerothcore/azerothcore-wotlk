@@ -114,250 +114,239 @@ enum kalEvents
 
 #define DRAGON_REALM_Z  53.079f
 
-class boss_kalecgos : public CreatureScript
+struct boss_kalecgos : public BossAI
 {
-public:
-    boss_kalecgos() : CreatureScript("boss_kalecgos") { }
-
-    struct boss_kalecgosAI : public BossAI
+    boss_kalecgos(Creature* creature) : BossAI(creature, DATA_KALECGOS)
     {
-        boss_kalecgosAI(Creature* creature) : BossAI(creature, DATA_KALECGOS)
+    }
+
+    bool sathBanished;
+    EventMap events2;
+
+    bool CanAIAttack(Unit const* target) const override
+    {
+        return target->GetPositionZ() > 50.0f;
+    }
+
+    void JustReachedHome() override
+    {
+        BossAI::JustReachedHome();
+        me->SetVisible(true);
+    }
+
+    void Reset() override
+    {
+        BossAI::Reset();
+        me->SetHealth(me->GetMaxHealth());
+        me->SetStandState(UNIT_STAND_STATE_SLEEP);
+        me->SetDisableGravity(false);
+        me->SetReactState(REACT_AGGRESSIVE);
+        me->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_NOT_SELECTABLE);
+        events2.Reset();
+
+        sathBanished = false;
+        ClearPlayerAuras();
+    }
+
+    void ClearPlayerAuras() const
+    {
+        instance->DoRemoveAurasDueToSpellOnPlayers(SPELL_CURSE_OF_BOUNDLESS_AGONY);
+        instance->DoRemoveAurasDueToSpellOnPlayers(SPELL_CURSE_OF_BOUNDLESS_AGONY_PLR);
+        instance->DoRemoveAurasDueToSpellOnPlayers(SPELL_SPECTRAL_REALM);
+    }
+
+    void DoAction(int32 param) override
+    {
+        if (param == ACTION_ENRAGE || param == ACTION_ENRAGE_OTHER)
         {
+            Talk(param == ACTION_ENRAGE ? SAY_KALEC_ENRAGE_SATH : SAY_SATH_ENRAGE_ME);
+            me->CastSpell(me, SPELL_CRAZED_RAGE, true);
+            events.CancelEvent(EVENT_CHECK_HEALTH);
+            return;
         }
-
-        bool sathBanished;
-        EventMap events2;
-
-        bool CanAIAttack(Unit const* target) const override
+        else if (param == ACTION_BANISH)
         {
-            return target->GetPositionZ() > 50.0f;
+            me->CastSpell(me, SPELL_BANISH, true);
+            events.Reset();
         }
-
-        void JustReachedHome() override
+        else if (param == ACTION_SATH_BANISH)
+            sathBanished = true;
+        else if (param == ACTION_KALEC_DIED)
         {
-            BossAI::JustReachedHome();
-            me->SetVisible(true);
-        }
-
-        void Reset() override
-        {
-            BossAI::Reset();
-            me->SetHealth(me->GetMaxHealth());
-            me->SetStandState(UNIT_STAND_STATE_SLEEP);
-            me->SetDisableGravity(false);
-            me->SetReactState(REACT_AGGRESSIVE);
-            me->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_NOT_SELECTABLE);
-            events2.Reset();
-
-            sathBanished = false;
+            events.Reset();
+            events2.ScheduleEvent(EVENT_TALK_BAD_1, 0);
             ClearPlayerAuras();
+            return;
         }
 
-        void ClearPlayerAuras() const
+        if (me->HasAura(SPELL_BANISH) && sathBanished)
         {
-            instance->DoRemoveAurasDueToSpellOnPlayers(SPELL_CURSE_OF_BOUNDLESS_AGONY);
-            instance->DoRemoveAurasDueToSpellOnPlayers(SPELL_CURSE_OF_BOUNDLESS_AGONY_PLR);
-            instance->DoRemoveAurasDueToSpellOnPlayers(SPELL_SPECTRAL_REALM);
-        }
-
-        void DoAction(int32 param) override
-        {
-            if (param == ACTION_ENRAGE || param == ACTION_ENRAGE_OTHER)
+            events.Reset();
+            events2.ScheduleEvent(EVENT_TALK_GOOD_1, 1000);
+            ClearPlayerAuras();
+            if (Creature* Sath = instance->GetCreature(DATA_SATHROVARR))
             {
-                Talk(param == ACTION_ENRAGE ? SAY_KALEC_ENRAGE_SATH : SAY_SATH_ENRAGE_ME);
-                me->CastSpell(me, SPELL_CRAZED_RAGE, true);
-                events.CancelEvent(EVENT_CHECK_HEALTH);
-                return;
-            }
-            else if (param == ACTION_BANISH)
-            {
-                me->CastSpell(me, SPELL_BANISH, true);
-                events.Reset();
-            }
-            else if (param == ACTION_SATH_BANISH)
-                sathBanished = true;
-            else if (param == ACTION_KALEC_DIED)
-            {
-                events.Reset();
-                events2.ScheduleEvent(EVENT_TALK_BAD_1, 0);
-                ClearPlayerAuras();
-                return;
-            }
-
-            if (me->HasAura(SPELL_BANISH) && sathBanished)
-            {
-                events.Reset();
-                events2.ScheduleEvent(EVENT_TALK_GOOD_1, 1000);
-                ClearPlayerAuras();
-                if (Creature* Sath = ObjectAccessor::GetCreature(*me, instance->GetGuidData(NPC_SATHROVARR)))
-                {
-                    Sath->RemoveAllAuras();
-                    Sath->GetMotionMaster()->MovementExpired();
-                    Sath->SetReactState(REACT_PASSIVE);
-                    Sath->NearTeleportTo(1696.20f, 915.0f, DRAGON_REALM_Z, Sath->GetOrientation());
-                }
+                Sath->RemoveAllAuras();
+                Sath->GetMotionMaster()->MovementExpired();
+                Sath->SetReactState(REACT_PASSIVE);
+                Sath->NearTeleportTo(1696.20f, 915.0f, DRAGON_REALM_Z, Sath->GetOrientation());
             }
         }
+    }
 
-        void JustDied(Unit* killer) override
-        {
-            BossAI::JustDied(killer);
-        }
-
-        void JustEngagedWith(Unit* who) override
-        {
-            BossAI::JustEngagedWith(who);
-            events.ScheduleEvent(EVENT_ARCANE_BUFFET, 6000);
-            events.ScheduleEvent(EVENT_FROST_BREATH, 15000);
-            events.ScheduleEvent(EVENT_WILD_MAGIC, 10000);
-            events.ScheduleEvent(EVENT_TAIL_LASH, 25000);
-            events.ScheduleEvent(EVENT_SPECTRAL_BLAST, 20000);
-            events.ScheduleEvent(EVENT_CHECK_POS, 5000);
-            events.ScheduleEvent(EVENT_CHECK_HEALTH, 1000);
-            events.ScheduleEvent(EVENT_CHECK_HEALTH2, 1000);
-            events.ScheduleEvent(EVENT_SPAWN_SPECTRALS, 16000);
-
-            me->SetStandState(UNIT_STAND_STATE_STAND);
-            Talk(SAY_EVIL_AGGRO);
-        }
-
-        void DamageTaken(Unit* attacker, uint32& damage, DamageEffectType, SpellSchoolMask) override
-        {
-            if (damage >= me->GetHealth() && attacker != me)
-                damage = 0;
-        }
-
-        void KilledUnit(Unit* victim) override
-        {
-            if (victim->IsPlayer() && roll_chance_i(50))
-                Talk(SAY_EVIL_SLAY);
-        }
-
-        void UpdateAI(uint32 diff) override
-        {
-            events2.Update(diff);
-            switch (events2.ExecuteEvent())
-            {
-                case EVENT_TALK_GOOD_1:
-                    me->SetRegeneratingHealth(false);
-                    me->RemoveAllAuras();
-                    me->SetReactState(REACT_PASSIVE);
-                    me->CombatStop();
-                    me->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
-                    me->SetFaction(FACTION_FRIENDLY);
-                    events2.ScheduleEvent(EVENT_TALK_GOOD_2, 1000);
-                    break;
-                case EVENT_TALK_GOOD_2:
-                    if (Creature* Sath = ObjectAccessor::GetCreature(*me, instance->GetGuidData(NPC_SATHROVARR)))
-                    {
-                        summons.Despawn(Sath);
-                        Unit::Kill(me, Sath);
-                    }
-                    events2.ScheduleEvent(EVENT_TALK_GOOD_3, 8000);
-                    break;
-                case EVENT_TALK_GOOD_3:
-                    Talk(SAY_GOOD_PLRWIN);
-                    events2.ScheduleEvent(EVENT_TALK_GOOD_4, 10000);
-                    break;
-                case EVENT_TALK_GOOD_4:
-                    me->SetDisableGravity(true);
-                    me->HandleEmoteCommand(EMOTE_ONESHOT_LIFTOFF);
-                    events2.ScheduleEvent(EVENT_TALK_GOOD_5, 10000);
-                    break;
-                case EVENT_TALK_GOOD_5:
-                    me->SetVisible(false);
-                    me->KillSelf();
-                    break;
-                case EVENT_TALK_BAD_1:
-                    me->SetReactState(REACT_PASSIVE);
-                    me->CombatStop();
-                    me->RemoveAllAuras();
-                    me->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
-                    Talk(SAY_EVIL_ENRAGE);
-                    events2.ScheduleEvent(EVENT_TALK_BAD_2, 3000);
-                    break;
-                case EVENT_TALK_BAD_2:
-                    me->SetDisableGravity(true);
-                    me->HandleEmoteCommand(EMOTE_ONESHOT_LIFTOFF);
-                    events2.ScheduleEvent(EVENT_TALK_BAD_3, 15000);
-                    break;
-                case EVENT_TALK_BAD_3:
-                    me->SetVisible(false);
-                    EnterEvadeMode();
-                    break;
-            }
-
-            if (!events2.Empty())
-                return;
-
-            if (!UpdateVictim())
-                return;
-
-            events.Update(diff);
-            if (me->HasUnitState(UNIT_STATE_CASTING))
-                return;
-
-            switch (events.ExecuteEvent())
-            {
-                case EVENT_SPAWN_SPECTRALS:
-                    me->SummonCreature(NPC_KALEC, 1702.21f, 931.7f, -74.56f, 5.07f, TEMPSUMMON_MANUAL_DESPAWN);
-                    me->SummonCreature(NPC_SATHROVARR, 1704.62f, 927.78f, -73.9f, 2.0f, TEMPSUMMON_MANUAL_DESPAWN);
-                    break;
-                case EVENT_ARCANE_BUFFET:
-                    me->CastSpell(me, SPELL_ARCANE_BUFFET, false);
-                    events.ScheduleEvent(EVENT_ARCANE_BUFFET, 8000);
-                    break;
-                case EVENT_FROST_BREATH:
-                    me->CastSpell(me->GetVictim(), SPELL_FROST_BREATH, false);
-                    events.ScheduleEvent(EVENT_FROST_BREATH, 15000);
-                    break;
-                case EVENT_TAIL_LASH:
-                    me->CastSpell(me->GetVictim(), SPELL_TAIL_LASH, false);
-                    events.ScheduleEvent(EVENT_TAIL_LASH, 15000);
-                    break;
-                case EVENT_WILD_MAGIC:
-                    me->CastCustomSpell(RAND(44978, 45001, 45002, 45004, 45006, 45010), SPELLVALUE_MAX_TARGETS, 1, me, false);
-                    events.ScheduleEvent(EVENT_WILD_MAGIC, 20000);
-                    break;
-                case EVENT_SPECTRAL_BLAST:
-                    me->CastSpell(me, SPELL_SPECTRAL_BLAST, false);
-                    events.ScheduleEvent(EVENT_SPECTRAL_BLAST, urand(15000, 25000));
-                    break;
-                case EVENT_CHECK_POS:
-                    if (me->GetDistance(me->GetHomePosition()) > 50.0f)
-                    {
-                        EnterEvadeMode();
-                        return;
-                    }
-                    events.ScheduleEvent(EVENT_CHECK_POS, 5000);
-                    break;
-                case EVENT_CHECK_HEALTH:
-                    if (me->HealthBelowPct(10))
-                    {
-                        if (Creature* Sath = ObjectAccessor::GetCreature(*me, instance->GetGuidData(NPC_SATHROVARR)))
-                            Sath->AI()->DoAction(ACTION_ENRAGE_OTHER);
-                        DoAction(ACTION_ENRAGE);
-                        break;
-                    }
-                    events.ScheduleEvent(EVENT_CHECK_HEALTH, 1000);
-                    break;
-                case EVENT_CHECK_HEALTH2:
-                    if (me->HealthBelowPct(1))
-                    {
-                        DoAction(ACTION_BANISH);
-                        break;
-                    }
-                    events.ScheduleEvent(EVENT_CHECK_HEALTH2, 1000);
-                    break;
-            }
-
-            DoMeleeAttackIfReady();
-        }
-    };
-
-    CreatureAI* GetAI(Creature* creature) const override
+    void JustDied(Unit* killer) override
     {
-        return GetSunwellPlateauAI<boss_kalecgosAI>(creature);
+        BossAI::JustDied(killer);
+    }
+
+    void JustEngagedWith(Unit* who) override
+    {
+        BossAI::JustEngagedWith(who);
+        events.ScheduleEvent(EVENT_ARCANE_BUFFET, 6000);
+        events.ScheduleEvent(EVENT_FROST_BREATH, 15000);
+        events.ScheduleEvent(EVENT_WILD_MAGIC, 10000);
+        events.ScheduleEvent(EVENT_TAIL_LASH, 25000);
+        events.ScheduleEvent(EVENT_SPECTRAL_BLAST, 20000);
+        events.ScheduleEvent(EVENT_CHECK_POS, 5000);
+        events.ScheduleEvent(EVENT_CHECK_HEALTH, 1000);
+        events.ScheduleEvent(EVENT_CHECK_HEALTH2, 1000);
+        events.ScheduleEvent(EVENT_SPAWN_SPECTRALS, 16000);
+
+        me->SetStandState(UNIT_STAND_STATE_STAND);
+        Talk(SAY_EVIL_AGGRO);
+    }
+
+    void DamageTaken(Unit* attacker, uint32& damage, DamageEffectType, SpellSchoolMask) override
+    {
+        if (damage >= me->GetHealth() && attacker != me)
+            damage = 0;
+    }
+
+    void KilledUnit(Unit* victim) override
+    {
+        if (victim->IsPlayer() && roll_chance_i(50))
+            Talk(SAY_EVIL_SLAY);
+    }
+
+    void UpdateAI(uint32 diff) override
+    {
+        events2.Update(diff);
+        switch (events2.ExecuteEvent())
+        {
+        case EVENT_TALK_GOOD_1:
+            me->SetRegeneratingHealth(false);
+            me->RemoveAllAuras();
+            me->SetReactState(REACT_PASSIVE);
+            me->CombatStop();
+            me->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
+            me->SetFaction(FACTION_FRIENDLY);
+            events2.ScheduleEvent(EVENT_TALK_GOOD_2, 1000);
+            break;
+        case EVENT_TALK_GOOD_2:
+            if (Creature* Sath = instance->GetCreature(DATA_SATHROVARR))
+            {
+                summons.Despawn(Sath);
+                Unit::Kill(me, Sath);
+            }
+            events2.ScheduleEvent(EVENT_TALK_GOOD_3, 8000);
+            break;
+        case EVENT_TALK_GOOD_3:
+            Talk(SAY_GOOD_PLRWIN);
+            events2.ScheduleEvent(EVENT_TALK_GOOD_4, 10000);
+            break;
+        case EVENT_TALK_GOOD_4:
+            me->SetDisableGravity(true);
+            me->HandleEmoteCommand(EMOTE_ONESHOT_LIFTOFF);
+            events2.ScheduleEvent(EVENT_TALK_GOOD_5, 10000);
+            break;
+        case EVENT_TALK_GOOD_5:
+            me->SetVisible(false);
+            me->KillSelf();
+            break;
+        case EVENT_TALK_BAD_1:
+            me->SetReactState(REACT_PASSIVE);
+            me->CombatStop();
+            me->RemoveAllAuras();
+            me->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
+            Talk(SAY_EVIL_ENRAGE);
+            events2.ScheduleEvent(EVENT_TALK_BAD_2, 3000);
+            break;
+        case EVENT_TALK_BAD_2:
+            me->SetDisableGravity(true);
+            me->HandleEmoteCommand(EMOTE_ONESHOT_LIFTOFF);
+            events2.ScheduleEvent(EVENT_TALK_BAD_3, 15000);
+            break;
+        case EVENT_TALK_BAD_3:
+            me->SetVisible(false);
+            EnterEvadeMode();
+            break;
+        }
+
+        if (!events2.Empty())
+            return;
+
+        if (!UpdateVictim())
+            return;
+
+        events.Update(diff);
+        if (me->HasUnitState(UNIT_STATE_CASTING))
+            return;
+
+        switch (events.ExecuteEvent())
+        {
+        case EVENT_SPAWN_SPECTRALS:
+            me->SummonCreature(NPC_KALEC, 1702.21f, 931.7f, -74.56f, 5.07f, TEMPSUMMON_MANUAL_DESPAWN);
+            me->SummonCreature(NPC_SATHROVARR, 1704.62f, 927.78f, -73.9f, 2.0f, TEMPSUMMON_MANUAL_DESPAWN);
+            break;
+        case EVENT_ARCANE_BUFFET:
+            me->CastSpell(me, SPELL_ARCANE_BUFFET, false);
+            events.ScheduleEvent(EVENT_ARCANE_BUFFET, 8000);
+            break;
+        case EVENT_FROST_BREATH:
+            me->CastSpell(me->GetVictim(), SPELL_FROST_BREATH, false);
+            events.ScheduleEvent(EVENT_FROST_BREATH, 15000);
+            break;
+        case EVENT_TAIL_LASH:
+            me->CastSpell(me->GetVictim(), SPELL_TAIL_LASH, false);
+            events.ScheduleEvent(EVENT_TAIL_LASH, 15000);
+            break;
+        case EVENT_WILD_MAGIC:
+            me->CastCustomSpell(RAND(44978, 45001, 45002, 45004, 45006, 45010), SPELLVALUE_MAX_TARGETS, 1, me, false);
+            events.ScheduleEvent(EVENT_WILD_MAGIC, 20000);
+            break;
+        case EVENT_SPECTRAL_BLAST:
+            me->CastSpell(me, SPELL_SPECTRAL_BLAST, false);
+            events.ScheduleEvent(EVENT_SPECTRAL_BLAST, urand(15000, 25000));
+            break;
+        case EVENT_CHECK_POS:
+            if (me->GetDistance(me->GetHomePosition()) > 50.0f)
+            {
+                EnterEvadeMode();
+                return;
+            }
+            events.ScheduleEvent(EVENT_CHECK_POS, 5000);
+            break;
+        case EVENT_CHECK_HEALTH:
+            if (me->HealthBelowPct(10))
+            {
+                if (Creature* Sath = instance->GetCreature(DATA_SATHROVARR))
+                    Sath->AI()->DoAction(ACTION_ENRAGE_OTHER);
+                DoAction(ACTION_ENRAGE);
+                break;
+            }
+            events.ScheduleEvent(EVENT_CHECK_HEALTH, 1000);
+            break;
+        case EVENT_CHECK_HEALTH2:
+            if (me->HealthBelowPct(1))
+            {
+                DoAction(ACTION_BANISH);
+                break;
+            }
+            events.ScheduleEvent(EVENT_CHECK_HEALTH2, 1000);
+            break;
+        }
+
+        DoMeleeAttackIfReady();
     }
 };
 
@@ -371,255 +360,233 @@ enum Kalec
     EVENT_KALEC_SCENE_3         = 103
 };
 
-class boss_kalec : public CreatureScript
+struct boss_kalec : public ScriptedAI
 {
-public:
-    boss_kalec() : CreatureScript("boss_kalec") { }
+    boss_kalec(Creature* creature) : ScriptedAI(creature) { }
 
-    CreatureAI* GetAI(Creature* creature) const override
+    EventMap events;
+    EventMap events2;
+
+    void Reset() override
     {
-        return GetSunwellPlateauAI<boss_kalecAI>(creature);
+        events.Reset();
+        events2.Reset();
+        if (me->GetPositionY() < 750.0f)
+        {
+            me->SetSpeed(MOVE_RUN, 2.4f);
+            me->SetDisplayId(MODEL_KALECGOS_DRAGON);
+            me->SetDisableGravity(true);
+            me->GetMotionMaster()->MovePoint(0, 1483.30f, 657.99f, 28.0f, false, true);
+            events2.ScheduleEvent(EVENT_KALEC_SCENE_1, 9000);
+            events2.ScheduleEvent(EVENT_KALEC_SCENE_2, 16000);
+            events2.ScheduleEvent(EVENT_KALEC_SCENE_3, 22000);
+        }
+        else
+            me->CastSpell(me, SPELL_SPECTRAL_INVISIBILITY, true);
     }
 
-    struct boss_kalecAI : public ScriptedAI
+    void DamageTaken(Unit* who, uint32& damage, DamageEffectType, SpellSchoolMask) override
     {
-        boss_kalecAI(Creature* creature) : ScriptedAI(creature) { }
+        if (!who || who->GetEntry() != NPC_SATHROVARR)
+            damage = 0;
+    }
 
-        EventMap events;
-        EventMap events2;
+    void JustEngagedWith(Unit*) override
+    {
+        events.ScheduleEvent(EVENT_CHECK_HEALTH, 1000);
+        events.ScheduleEvent(EVENT_CHECK_HEALTH2, 1000);
+        events.ScheduleEvent(EVENT_SPELL_REVITALIZE, 5000);
+        events.ScheduleEvent(EVENT_SPELL_HEROIC_STRIKE, 3000);
+        Talk(SAY_GOOD_AGGRO);
+    }
 
-        void Reset() override
+    void JustDied(Unit*) override
+    {
+        if (InstanceScript* instance = me->GetInstanceScript())
+            if (Creature* kalecgos = instance->GetCreature(DATA_KALECGOS))
+                kalecgos->AI()->DoAction(ACTION_KALEC_DIED);
+    }
+
+    void UpdateAI(uint32 diff) override
+    {
+        events2.Update(diff);
+        switch (events2.ExecuteEvent())
         {
-            events.Reset();
-            events2.Reset();
-            if (me->GetPositionY() < 750.0f)
+        case EVENT_KALEC_SCENE_1:
+            Talk(SAY_GOOD_MADRIGOSA);
+            me->GetMotionMaster()->MovePoint(0, 1509.0f, 560.0f, 30.0f, false, true);
+            break;
+        case EVENT_KALEC_SCENE_2:
+            me->CastSpell(me, SPELL_OPEN_BRUTALLUS_BACK_DOOR, true);
+            me->GetInstanceScript()->SetBossState(DATA_FELMYST_DOORS, NOT_STARTED);
+            me->GetInstanceScript()->SetBossState(DATA_FELMYST_DOORS, DONE);
+            break;
+        case EVENT_KALEC_SCENE_3:
+            me->GetMotionMaster()->MovePoint(0, 1400.0f, 630.0f, 90.0f, false, true);
+            me->DespawnOrUnsummon(6000);
+            break;
+        }
+
+        if (!UpdateVictim())
+            return;
+
+        events.Update(diff);
+        if (me->HasUnitState(UNIT_STATE_CASTING))
+            return;
+
+        switch (events.ExecuteEvent())
+        {
+        case EVENT_CHECK_HEALTH:
+            if (me->HealthBelowPct(50))
             {
-                me->SetSpeed(MOVE_RUN, 2.4f);
-                me->SetDisplayId(MODEL_KALECGOS_DRAGON);
-                me->SetDisableGravity(true);
-                me->GetMotionMaster()->MovePoint(0, 1483.30f, 657.99f, 28.0f, false, true);
-                events2.ScheduleEvent(EVENT_KALEC_SCENE_1, 9000);
-                events2.ScheduleEvent(EVENT_KALEC_SCENE_2, 16000);
-                events2.ScheduleEvent(EVENT_KALEC_SCENE_3, 22000);
+                Talk(SAY_GOOD_NEAR_DEATH);
+                break;
             }
-            else
-                me->CastSpell(me, SPELL_SPECTRAL_INVISIBILITY, true);
-        }
-
-        void DamageTaken(Unit* who, uint32& damage, DamageEffectType, SpellSchoolMask) override
-        {
-            if (!who || who->GetEntry() != NPC_SATHROVARR)
-                damage = 0;
-        }
-
-        void JustEngagedWith(Unit*) override
-        {
             events.ScheduleEvent(EVENT_CHECK_HEALTH, 1000);
+            break;
+        case EVENT_CHECK_HEALTH2:
+            if (me->HealthBelowPct(10))
+            {
+                Talk(SAY_GOOD_NEAR_DEATH2);
+                break;
+            }
             events.ScheduleEvent(EVENT_CHECK_HEALTH2, 1000);
-            events.ScheduleEvent(EVENT_SPELL_REVITALIZE, 5000);
-            events.ScheduleEvent(EVENT_SPELL_HEROIC_STRIKE, 3000);
-            Talk(SAY_GOOD_AGGRO);
+            break;
+        case EVENT_SPELL_REVITALIZE:
+            me->CastSpell(me, SPELL_REVITALIZE, false);
+            events.ScheduleEvent(EVENT_SPELL_REVITALIZE, 10000);
+            break;
+        case EVENT_SPELL_HEROIC_STRIKE:
+            me->CastSpell(me->GetVictim(), SPELL_HEROIC_STRIKE, false);
+            events.ScheduleEvent(EVENT_SPELL_HEROIC_STRIKE, 5000);
+            break;
         }
 
-        void JustDied(Unit*) override
-        {
-            if (InstanceScript* instance = me->GetInstanceScript())
-                if (Creature* kalecgos = ObjectAccessor::GetCreature(*me, instance->GetGuidData(NPC_KALECGOS)))
-                    kalecgos->AI()->DoAction(ACTION_KALEC_DIED);
-        }
-
-        void UpdateAI(uint32 diff) override
-        {
-            events2.Update(diff);
-            switch (events2.ExecuteEvent())
-            {
-                case EVENT_KALEC_SCENE_1:
-                    Talk(SAY_GOOD_MADRIGOSA);
-                    me->GetMotionMaster()->MovePoint(0, 1509.0f, 560.0f, 30.0f, false, true);
-                    break;
-                case EVENT_KALEC_SCENE_2:
-                    me->CastSpell(me, SPELL_OPEN_BRUTALLUS_BACK_DOOR, true);
-                    me->GetInstanceScript()->SetBossState(DATA_FELMYST_DOORS, NOT_STARTED);
-                    me->GetInstanceScript()->SetBossState(DATA_FELMYST_DOORS, DONE);
-                    break;
-                case EVENT_KALEC_SCENE_3:
-                    me->GetMotionMaster()->MovePoint(0, 1400.0f, 630.0f, 90.0f, false, true);
-                    me->DespawnOrUnsummon(6000);
-                    break;
-            }
-
-            if (!UpdateVictim())
-                return;
-
-            events.Update(diff);
-            if (me->HasUnitState(UNIT_STATE_CASTING))
-                return;
-
-            switch (events.ExecuteEvent())
-            {
-                case EVENT_CHECK_HEALTH:
-                    if (me->HealthBelowPct(50))
-                    {
-                        Talk(SAY_GOOD_NEAR_DEATH);
-                        break;
-                    }
-                    events.ScheduleEvent(EVENT_CHECK_HEALTH, 1000);
-                    break;
-                case EVENT_CHECK_HEALTH2:
-                    if (me->HealthBelowPct(10))
-                    {
-                        Talk(SAY_GOOD_NEAR_DEATH2);
-                        break;
-                    }
-                    events.ScheduleEvent(EVENT_CHECK_HEALTH2, 1000);
-                    break;
-                case EVENT_SPELL_REVITALIZE:
-                    me->CastSpell(me, SPELL_REVITALIZE, false);
-                    events.ScheduleEvent(EVENT_SPELL_REVITALIZE, 10000);
-                    break;
-                case EVENT_SPELL_HEROIC_STRIKE:
-                    me->CastSpell(me->GetVictim(), SPELL_HEROIC_STRIKE, false);
-                    events.ScheduleEvent(EVENT_SPELL_HEROIC_STRIKE, 5000);
-                    break;
-            }
-
-            DoMeleeAttackIfReady();
-        }
-    };
+        DoMeleeAttackIfReady();
+    }
 };
 
-class boss_sathrovarr : public CreatureScript
+struct boss_sathrovarr : public ScriptedAI
 {
-public:
-    boss_sathrovarr() : CreatureScript("boss_sathrovarr") { }
-
-    CreatureAI* GetAI(Creature* creature) const override
+    boss_sathrovarr(Creature* creature) : ScriptedAI(creature)
     {
-        return GetSunwellPlateauAI<boss_sathrovarrAI>(creature);
+        instance = creature->GetInstanceScript();
     }
 
-    struct boss_sathrovarrAI : public ScriptedAI
+    InstanceScript* instance;
+    EventMap events;
+
+    bool CanAIAttack(Unit const* target) const override
     {
-        boss_sathrovarrAI(Creature* creature) : ScriptedAI(creature)
+        return target->GetPositionZ() < 50.0f;
+    }
+
+    void Reset() override
+    {
+        events.Reset();
+        me->CastSpell(me, SPELL_DEMONIC_VISUAL, true);
+        me->CastSpell(me, SPELL_SPECTRAL_INVISIBILITY, true);
+
+        events.ScheduleEvent(EVENT_SHADOW_BOLT, 7000);
+        events.ScheduleEvent(EVENT_AGONY_CURSE, 20000);
+        events.ScheduleEvent(EVENT_CORRUPTION_STRIKE, 13000);
+        events.ScheduleEvent(EVENT_CHECK_HEALTH, 1000);
+        events.ScheduleEvent(EVENT_CHECK_HEALTH2, 1000);
+    }
+
+    void JustEngagedWith(Unit* /*who*/) override
+    {
+        Talk(SAY_SATH_AGGRO);
+    }
+
+    void DamageTaken(Unit* who, uint32& damage, DamageEffectType, SpellSchoolMask) override
+    {
+        if (damage >= me->GetHealth() && who != me)
+            damage = 0;
+    }
+
+    void KilledUnit(Unit* target) override
+    {
+        if (target->IsPlayer())
+            Talk(SAY_SATH_SLAY);
+    }
+
+    void JustDied(Unit* /*killer*/) override
+    {
+        Talk(SAY_SATH_DEATH);
+    }
+
+    void DoAction(int32 param) override
+    {
+        if (param == ACTION_ENRAGE || param == ACTION_ENRAGE_OTHER)
         {
-            instance = creature->GetInstanceScript();
+            me->CastSpell(me, SPELL_CRAZED_RAGE, true);
+            events.CancelEvent(EVENT_CHECK_HEALTH);
         }
-
-        InstanceScript* instance;
-        EventMap events;
-
-        bool CanAIAttack(Unit const* target) const override
+        else if (param == ACTION_BANISH)
         {
-            return target->GetPositionZ() < 50.0f;
-        }
-
-        void Reset() override
-        {
+            me->CastSpell(me, SPELL_BANISH, true);
             events.Reset();
-            me->CastSpell(me, SPELL_DEMONIC_VISUAL, true);
-            me->CastSpell(me, SPELL_SPECTRAL_INVISIBILITY, true);
+        }
+    }
 
-            events.ScheduleEvent(EVENT_SHADOW_BOLT, 7000);
-            events.ScheduleEvent(EVENT_AGONY_CURSE, 20000);
-            events.ScheduleEvent(EVENT_CORRUPTION_STRIKE, 13000);
+    void UpdateAI(uint32 diff) override
+    {
+        if (!UpdateVictim())
+            return;
+
+        events.Update(diff);
+        if (me->HasUnitState(UNIT_STATE_CASTING))
+            return;
+
+        switch (events.ExecuteEvent())
+        {
+        case EVENT_SHADOW_BOLT:
+            if (roll_chance_i(20))
+                Talk(SAY_SATH_SPELL1);
+            me->CastSpell(me->GetVictim(), SPELL_SHADOW_BOLT, false);
+            events.ScheduleEvent(EVENT_SHADOW_BOLT, 9000);
+            break;
+        case EVENT_AGONY_CURSE:
+            me->CastCustomSpell(SPELL_CURSE_OF_BOUNDLESS_AGONY, SPELLVALUE_MAX_TARGETS, 1, me, false);
+            events.ScheduleEvent(EVENT_AGONY_CURSE, 30000);
+            break;
+        case EVENT_CORRUPTION_STRIKE:
+            if (roll_chance_i(20))
+                Talk(SAY_SATH_SPELL2);
+            me->CastSpell(me->GetVictim(), SPELL_CORRUPTION_STRIKE, false);
+            events.ScheduleEvent(EVENT_CORRUPTION_STRIKE, 9000);
+            break;
+        case EVENT_CHECK_HEALTH:
+            if (me->HealthBelowPct(10))
+            {
+                if (InstanceScript* instanceScript = me->GetInstanceScript())
+                {
+                    if (Creature* kalecgos = ObjectAccessor::GetCreature(*me, instanceScript->GetGuidData(
+                        NPC_KALECGOS)))
+                    {
+                        kalecgos->AI()->DoAction(ACTION_ENRAGE_OTHER);
+                    }
+                }
+                DoAction(ACTION_ENRAGE);
+                break;
+            }
             events.ScheduleEvent(EVENT_CHECK_HEALTH, 1000);
+            break;
+        case EVENT_CHECK_HEALTH2:
+            if (me->HealthBelowPct(1))
+            {
+                if (Creature* kalecgos = instance->GetCreature(DATA_KALECGOS))
+                    kalecgos->AI()->DoAction(ACTION_SATH_BANISH);
+                DoAction(ACTION_BANISH);
+                break;
+            }
             events.ScheduleEvent(EVENT_CHECK_HEALTH2, 1000);
+            break;
         }
 
-        void JustEngagedWith(Unit* /*who*/) override
-        {
-            Talk(SAY_SATH_AGGRO);
-        }
-
-        void DamageTaken(Unit* who, uint32& damage, DamageEffectType, SpellSchoolMask) override
-        {
-            if (damage >= me->GetHealth() && who != me)
-                damage = 0;
-        }
-
-        void KilledUnit(Unit* target) override
-        {
-            if (target->IsPlayer())
-                Talk(SAY_SATH_SLAY);
-        }
-
-        void JustDied(Unit* /*killer*/) override
-        {
-            Talk(SAY_SATH_DEATH);
-        }
-
-        void DoAction(int32 param) override
-        {
-            if (param == ACTION_ENRAGE || param == ACTION_ENRAGE_OTHER)
-            {
-                me->CastSpell(me, SPELL_CRAZED_RAGE, true);
-                events.CancelEvent(EVENT_CHECK_HEALTH);
-            }
-            else if (param == ACTION_BANISH)
-            {
-                me->CastSpell(me, SPELL_BANISH, true);
-                events.Reset();
-            }
-        }
-
-        void UpdateAI(uint32 diff) override
-        {
-            if (!UpdateVictim())
-                return;
-
-            events.Update(diff);
-            if (me->HasUnitState(UNIT_STATE_CASTING))
-                return;
-
-            switch (events.ExecuteEvent())
-            {
-                case EVENT_SHADOW_BOLT:
-                    if (roll_chance_i(20))
-                        Talk(SAY_SATH_SPELL1);
-                    me->CastSpell(me->GetVictim(), SPELL_SHADOW_BOLT, false);
-                    events.ScheduleEvent(EVENT_SHADOW_BOLT, 9000);
-                    break;
-                case EVENT_AGONY_CURSE:
-                    me->CastCustomSpell(SPELL_CURSE_OF_BOUNDLESS_AGONY, SPELLVALUE_MAX_TARGETS, 1, me, false);
-                    events.ScheduleEvent(EVENT_AGONY_CURSE, 30000);
-                    break;
-                case EVENT_CORRUPTION_STRIKE:
-                    if (roll_chance_i(20))
-                        Talk(SAY_SATH_SPELL2);
-                    me->CastSpell(me->GetVictim(), SPELL_CORRUPTION_STRIKE, false);
-                    events.ScheduleEvent(EVENT_CORRUPTION_STRIKE, 9000);
-                    break;
-                case EVENT_CHECK_HEALTH:
-                    if (me->HealthBelowPct(10))
-                    {
-                        if (InstanceScript* instanceScript = me->GetInstanceScript())
-                        {
-                            if (Creature *kalecgos = ObjectAccessor::GetCreature(*me, instanceScript->GetGuidData(
-                                    NPC_KALECGOS)))
-                            {
-                                kalecgos->AI()->DoAction(ACTION_ENRAGE_OTHER);
-                            }
-                        }
-                        DoAction(ACTION_ENRAGE);
-                        break;
-                    }
-                    events.ScheduleEvent(EVENT_CHECK_HEALTH, 1000);
-                    break;
-                case EVENT_CHECK_HEALTH2:
-                    if (me->HealthBelowPct(1))
-                    {
-                        if (Creature* kalecgos = ObjectAccessor::GetCreature(*me, instance->GetGuidData(NPC_KALECGOS)))
-                            kalecgos->AI()->DoAction(ACTION_SATH_BANISH);
-                        DoAction(ACTION_BANISH);
-                        break;
-                    }
-                    events.ScheduleEvent(EVENT_CHECK_HEALTH2, 1000);
-                    break;
-            }
-
-            DoMeleeAttackIfReady();
-        }
-    };
+        DoMeleeAttackIfReady();
+    }
 };
 
 class SpectralBlastCheck
@@ -750,9 +717,9 @@ class spell_kalecgos_spectral_realm_aura : public AuraScript
 
 void AddSC_boss_kalecgos()
 {
-    new boss_kalecgos();
-    new boss_sathrovarr();
-    new boss_kalec();
+    RegisterSunwellPlateauCreatureAI(boss_kalecgos);
+    RegisterSunwellPlateauCreatureAI(boss_sathrovarr);
+    RegisterSunwellPlateauCreatureAI(boss_kalec);
     RegisterSpellScript(spell_kalecgos_spectral_blast_dummy);
     RegisterSpellScript(spell_kalecgos_curse_of_boundless_agony_aura);
     RegisterSpellScript(spell_kalecgos_spectral_realm_dummy);

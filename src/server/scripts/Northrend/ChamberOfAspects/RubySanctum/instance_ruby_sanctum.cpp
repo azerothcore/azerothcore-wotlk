@@ -21,7 +21,6 @@
 #include "Player.h"
 #include "SpellScript.h"
 #include "SpellScriptLoader.h"
-#include "TemporarySummon.h"
 #include "WorldPacket.h"
 #include "WorldStatePackets.h"
 #include "ruby_sanctum.h"
