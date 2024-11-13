@@ -49,7 +49,7 @@ namespace Movement
         }
 
         PointsArray path;
-        FacingInfo facing;
+        Optional<FacingInfo> facing;
         MoveSplineFlag flags;
         int32 path_Idx_offset{0};
         float velocity{0.f};

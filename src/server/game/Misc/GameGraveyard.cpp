@@ -46,11 +46,11 @@ void Graveyard::LoadGraveyardFromDB()
 
     do
     {
-        Field* fields = result->Fetch();
-        uint32 ID = fields[0].Get<uint32>();
-
         GraveyardStruct Graveyard;
 
+        Field* fields = result->Fetch();
+
+        Graveyard.ID = fields[0].Get<uint32>();
         Graveyard.Map = fields[1].Get<uint32>();
         Graveyard.x = fields[2].Get<float>();
         Graveyard.y = fields[3].Get<float>();
@@ -65,7 +65,7 @@ void Graveyard::LoadGraveyardFromDB()
 
         wstrToLower(Graveyard.wnameLow);
 
-        _graveyardStore[ID] = Graveyard;
+        _graveyardStore[Graveyard.ID] = std::move(Graveyard);
 
         ++Count;
     } while (result->NextRow());
