@@ -288,7 +288,8 @@ public:
     // Display the 'Message of the day' for the realm
     static bool HandleServerMotdCommand(ChatHandler* handler)
     {
-        handler->PSendSysMessage(LANG_MOTD_CURRENT, sMotdMgr->GetMotd());
+
+        handler->PSendSysMessage(LANG_MOTD_CURRENT, sMotdMgr->GetMotd(handler->GetPlayer()->GetSession()->GetSessionDbLocaleIndex()));
         return true;
     }
 

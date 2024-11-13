@@ -27,8 +27,9 @@
 
 namespace
 {
-    WorldPacket MotdPacket;
-    std::string FormattedMotd;
+    std::unordered_map<LocaleConstant, WorldPacket> MotdPackets;
+    // Define a dictionary to store locale as the key and the message as the value
+    std::unordered_map<LocaleConstant, std::string> MotdMap;
 }
 
 MotdMgr* MotdMgr::instance()
@@ -36,6 +37,7 @@ MotdMgr* MotdMgr::instance()
     static MotdMgr instance;
     return &instance;
 }
+
 
 void MotdMgr::SetMotd(std::string motd)
 {
@@ -50,7 +52,7 @@ void MotdMgr::SetMotd(std::string motd)
     for (std::string_view token : motdTokens)
         data << token;
 
-    MotdPacket = data;
+    MotdPackets[LOCALE_enUS] = data;
 
     if (!motdTokens.size())
         return;
@@ -58,8 +60,29 @@ void MotdMgr::SetMotd(std::string motd)
     std::ostringstream oss;
     std::copy(motdTokens.begin(), motdTokens.end() - 1, std::ostream_iterator<std::string_view>(oss, "\n"));
     oss << *(motdTokens.end() - 1); // copy back element
-    FormattedMotd = oss.str();
+    //FormattedMotd = oss.str();
 }
+
+void MotdMgr::CreateWorldMessages() {
+    for (const auto& [locale, motd] : MotdMap)
+    {
+        // Create a new WorldPacket for this locale
+        WorldPacket data(SMSG_MOTD); // new in 2.0.1
+
+        // Tokenize the motd string by '@'
+        std::vector<std::string_view> motdTokens = Acore::Tokenize(motd, '@', true);
+        data << uint32(motdTokens.size()); // line count
+
+        // Add each token to the packet
+        for (std::string_view token : motdTokens)
+            data << token;
+
+        // Store the constructed packet in MotdPackets with the locale as the key
+        MotdPackets[locale] = data;
+    }
+}
+
+
 
 void MotdMgr::LoadMotd()
 {
@@ -73,8 +96,33 @@ void MotdMgr::LoadMotd()
 
     if (result)
     {
+        // Fetch the fields from the result row
         Field* fields = result->Fetch();
-        motd = fields[0].Get<std::string>();
+
+        // Always populated field, used as placeholder
+        std::string defaultText = "Welcome to an AzerothCore server";
+        uint8_t index = 0;
+        // List of locale keys corresponding to database fields
+        std::array<LocaleConstant, TOTAL_LOCALES> localeConstants = {
+            LOCALE_enUS,
+            LOCALE_koKR,
+            LOCALE_frFR,
+            LOCALE_deDE,
+            LOCALE_zhCN,
+            LOCALE_zhTW,
+            LOCALE_esES,
+            LOCALE_esMX,
+            LOCALE_ruRU
+        };
+
+
+        // Populate the map by iterating through locale keys
+        for (LocaleConstant locale : localeConstants)
+        {
+            // Use text as a fallback if the field is NULL
+            MotdMap[locale] = fields[index].IsNull() ? defaultText : fields[index].Get<std::string>();
+            index++;
+        }
     }
     else
     {
@@ -90,16 +138,22 @@ void MotdMgr::LoadMotd()
         /*"ds"+"sx"*/ + "hc" + "or" +/*"F4"+"k5"*/"e." + "or" +/*"po"+"xs"*/"g|r"/*"F4"+"p2"+"o4"+"A2"+"i2"*/;;
     MotdMgr::SetMotd(motd);
 
+    CreateWorldMessages();
+
     LOG_INFO("server.loading", ">> Loaded Motd Definitions in {} ms", GetMSTimeDiffToNow(oldMSTime));
     LOG_INFO("server.loading", " ");
 }
 
-char const* MotdMgr::GetMotd()
+
+char const* MotdMgr::GetMotd(LocaleConstant locale)
 {
-    return FormattedMotd.c_str();
+    return MotdMap[locale].c_str();
 }
 
-WorldPacket const* MotdMgr::GetMotdPacket()
+
+
+WorldPacket const* MotdMgr::GetMotdPacket(LocaleConstant locale)
 {
-    return &MotdPacket;
+    return &MotdPackets[locale];
 }
+

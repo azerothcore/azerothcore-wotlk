@@ -28,6 +28,10 @@ class AC_GAME_API MotdMgr
 public:
     static MotdMgr* instance();
 
+
+    void CreateWorldMessages();
+
+
     /// Set a new Message of the Day
     void SetMotd(std::string motd);
 
@@ -35,10 +39,9 @@ public:
     void LoadMotd();
 
     /// Get the current Message of the Day
-    char const* GetMotd();
+    char const* GetMotd(LocaleConstant locale);
 
-    /// Get the motd packet to send at login
-    WorldPacket const* GetMotdPacket();
+    WorldPacket const* GetMotdPacket(LocaleConstant locale);
 };
 
 #define sMotdMgr MotdMgr::instance()
