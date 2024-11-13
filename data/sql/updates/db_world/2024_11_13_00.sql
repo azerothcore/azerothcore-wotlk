@@ -1,3 +1,4 @@
+-- DB update 2024_11_12_02 -> 2024_11_13_00
 -- Update Existing Teles
 -- Standardisation and String Corrections
 UPDATE `game_tele` SET  `name` = 'Onyxia' WHERE `id` = 699 AND `name` = 'onyxia';
