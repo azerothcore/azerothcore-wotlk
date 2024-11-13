@@ -85,6 +85,8 @@ public:
 
         void JustEngagedWith(Unit* /*who*/) override
         {
+            _JustEngagedWith();
+
             ScheduleTimedEvent(10s, 20s, [&]{
                 Unit* target = SelectTarget(SelectTargetMethod::Random, 1);
                 if (!target)

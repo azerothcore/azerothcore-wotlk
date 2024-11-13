@@ -19,7 +19,9 @@
 #define CinematicMgr_h__
 
 #include "Define.h"
-#include "Object.h"
+#include "Position.h"
+#include "TemporarySummon.h"
+#include <vector>
 
 constexpr auto CINEMATIC_UPDATEDIFF = 500;
 constexpr auto CINEMATIC_LOOKAHEAD  = 2000;

@@ -18,6 +18,7 @@
 #ifndef SCRIPT_OBJECT_GLOBAL_SCRIPT_H_
 #define SCRIPT_OBJECT_GLOBAL_SCRIPT_H_
 
+#include "DatabaseEnvFwd.h"
 #include "DBCEnums.h"
 #include "ObjectGuid.h"
 #include "ScriptObject.h"

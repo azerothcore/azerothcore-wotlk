@@ -34,6 +34,7 @@
 #include "Language.h"
 #include "MapMgr.h"
 #include "MiscPackets.h"
+#include "MMapFactory.h"
 #include "MovementGenerator.h"
 #include "ObjectAccessor.h"
 #include "Pet.h"
