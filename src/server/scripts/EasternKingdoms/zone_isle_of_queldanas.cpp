@@ -48,8 +48,6 @@ enum ThalorienNpcs
     NPC_CRYPT_RAIDER = 37541,
 };
 
-
-
 enum ThalorienEvents
 {
     EVENT_NONE = 0,
@@ -683,14 +681,12 @@ public:
 ## npc_irespeaker
 ######*/
 
-
 enum IreSpeaker_Spells
 {
     SPELL_FEL_FIREBALL = 35913,
     SPELL_CURSE_OF_WEAKNESS = 18267,
     SPELL_FEL_CONSUMPTION = 45023,
 };
-
 
 class npc_irespeaker : public CreatureScript
 {
@@ -703,13 +699,11 @@ public:
             me->SetCombatMovement(false); // Disable movement toward the target
         }
 
-
         void Reset() override
         {
             _scheduler.CancelAll();
             me->SetCombatMovement(false); // Disable movement toward the target
         }
-
 
         void JustEngagedWith(Unit* who) override
         {
@@ -727,7 +721,6 @@ public:
                 CheckRange();
             context.Repeat(100ms);
                 });
-
         }
 
         void JustDied(Unit* /*killer*/) override
@@ -744,8 +737,6 @@ public:
             _scheduler.Update(diff); // Update the TaskScheduler
             DoMeleeAttackIfReady();
         }
-
-
 
     private:
         TaskScheduler _scheduler;
@@ -807,8 +798,6 @@ public:
         return new npc_irespeakerAI(creature);
     }
 };
-
-
 
 void AddSC_isle_of_queldanas()
 {
