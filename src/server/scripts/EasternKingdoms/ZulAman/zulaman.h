@@ -37,7 +37,8 @@ enum DataTypes
     TYPE_RAND_VENDOR_2                  = 9,
     DATA_STRANGE_GONG                   = 10,
     DATA_MASSIVE_GATE                   = 11,
-    DATA_HEXLORD_GATE                   = 12
+    DATA_HEXLORD_GATE                   = 12,
+    DATA_HARRISON_JONES                 = 13
 };
 
 enum CreatureIds
