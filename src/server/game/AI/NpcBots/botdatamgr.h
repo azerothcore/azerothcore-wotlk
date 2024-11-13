@@ -169,7 +169,7 @@ public:
 struct NpcBotItemSet
 {
 public:
-    NpcBotItemSet() : items{}, name{} {}
+    NpcBotItemSet() : name{}, items{} {}
 
     constexpr operator bool() const noexcept { return !empty(); }
     constexpr bool empty() const noexcept { return items_count() == 0; }
