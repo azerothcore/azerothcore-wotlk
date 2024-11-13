@@ -14977,8 +14977,8 @@ void Player::_SaveCharacter(bool create, CharacterDatabaseTransaction trans)
 
         stmt->SetData(index++, IsInWorld() && !User()->CharacterLoggingOut() ? 1 : 0);
         // Index
-        stmt->SetData(index++, GetGUID().GetCounter());
         stmt->SetData(index++, GetSecurityGroup());
+        stmt->SetData(index++, GetGUID().GetCounter());
     }
 
     trans->Append(stmt);
