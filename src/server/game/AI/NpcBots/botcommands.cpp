@@ -3440,7 +3440,7 @@ public:
                 handler->PSendSysMessage("Cannot delete bot {} from console: has gear but no player to give it back to! Can only delete this bot in-game.", bot->GetName());
                 return false;
             }
-            if (!bot->GetBotAI()->UnEquipAll(receiver))
+            if (bot->GetBotAI()->UnEquipAll(receiver, false) != BotEquipResult::BOT_EQUIP_RESULT_OK)
             {
                 handler->PSendSysMessage("{} is unable to unequip some gear. Please remove equips manually first!", bot->GetName());
                 return false;

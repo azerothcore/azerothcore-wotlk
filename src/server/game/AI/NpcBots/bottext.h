@@ -287,7 +287,7 @@ enum BotTexts : uint32
     BOT_TEXT_OWNERSHIP_EXPIRED              = 70550, //"Bot ownership expired due to inactivity"
     BOT_TEXT_BOTADDFAIL_DISABLED            = 70551, //"NpcBot system is currently disabled. Please contact administration."
     BOT_TEXT_BOTADDFAIL_OWNED               = 70552, //"{} will not join you, already has master: {}"
-    BOT_TEXT_DO_REUSE_1                     = 70553, // WAS BOT_TEXT_BOTADDFAIL_TELEPORTED "{} cannot join you while about to teleport"
+    BOT_TEXT_BANK_IS_FULL                   = 70553, //"Bank is full"
     BOT_TEXT_ASPECT                         = 70554, //"Aspect"
     BOT_TEXT_MONKEY                         = 70555, //"Monkey"
     BOT_TEXT_HAWK                           = 70556, //"Hawk"
@@ -421,7 +421,14 @@ enum BotTexts : uint32
     BOT_TEXT_DALARAN                        = 70684, //"Dalaran"
     BOT_TEXT_HIREFAIL_MAXBOTS_ACCOUNT       = 70685, //"You exceed max npcbots for your account ({} >= {})"
     BOT_TEXT_SET_FOR_ALL_EVERYONE           = 70686, //"<Set for all bots>"
-    //70687-70799 reserved for custom localization strings
+    BOT_TEXT___GEAR_BANK_                   = 70687, //" (gear bank)"
+    BOT_TEXT_NOT_ENOUGH_GEAR_BANK_SPACE     = 70688, //"Not enough gear bank space to store %u item(s) (%u / %u)!"
+    BOT_TEXT_EQUIPMENT_SETS                 = 70689, //"Equipment sets"
+    BOT_TEXT_CREATE                         = 70690, //"Create"
+    BOT_TEXT_DELETE                         = 70691, //"Delete"
+    BOT_TEXT_EQUIP                          = 70692, //"Equip"
+    BOT_TEXT_MISSING                        = 70693, //"missing"
+    //70694-71000 reserved for custom localization strings
 };
 
 #endif //BOTTEXT_H

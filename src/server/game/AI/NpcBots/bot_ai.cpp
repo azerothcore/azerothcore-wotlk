@@ -424,8 +424,6 @@ bool bot_ai::SetBotOwner(Player* newowner)
 {
     ASSERT(newowner, "Trying to set NULL owner!!!");
     ASSERT(newowner->GetGUID().IsPlayer(), "Trying to set a non-player as owner!!!");
-    //ASSERT(master->GetGUID() == me->GetGUID());
-    //ASSERT(IAmFree());
 
     //have master already
     if (master->GetGUID() != me->GetGUID())
@@ -472,10 +470,7 @@ void bot_ai::CheckOwnerExpiry()
         return;
 
     NpcBotData const* npcBotData = BotDataMgr::SelectNpcBotData(me->GetEntry());
-    ASSERT(npcBotData, "bot_ai::CheckOwnerExpiry(): data not found!");
-
     NpcBotExtras const* npcBotExtra = BotDataMgr::SelectNpcBotExtras(me->GetEntry());
-    ASSERT(npcBotExtra, "bot_ai::CheckOwnerExpiry(): extra data not found!");
 
     if (npcBotData->owner == 0)
         return;
@@ -563,7 +558,7 @@ void bot_ai::CheckOwnerExpiry()
             CharacterDatabase.CommitTransaction(trans);
 
             for (uint8 slot = BOT_SLOT_MAINHAND; slot <= BOT_SLOT_RANGED; ++slot)
-                _resetEquipment(slot, ObjectGuid::Empty);
+                if (_resetEquipment(slot, ObjectGuid::Empty, false) != BotEquipResult::BOT_EQUIP_RESULT_OK) {}
 
             BotDataMgr::UpdateNpcBotData(me->GetEntry(), NPCBOT_UPDATE_EQUIPS, _equips);
         }
@@ -596,8 +591,6 @@ void bot_ai::InitUnitFlags()
 
 void bot_ai::ResetBotAI(uint8 resetType)
 {
-    //ASSERT(me->IsInWorld());
-
     _botCommandState = 0;
     _botAwaitState = BOT_AWAIT_NONE;
     _reviveTimer = 0;
@@ -1214,14 +1207,10 @@ void bot_ai::MoveToSendPosition(Position const& mpos)
 }
 void bot_ai::MoveToSendPosition(uint32 point_id)
 {
-    ASSERT(point_id < MAX_SEND_POINTS);
-
     MoveToSendPosition(sendpos[point_id]);
 }
 void bot_ai::MarkSendPosition(uint32 point_id)
 {
-    ASSERT(point_id < MAX_SEND_POINTS);
-
     sendpos[point_id].Relocate(me);
 }
 
@@ -3814,7 +3803,6 @@ Unit* bot_ai::_getVehicleTarget(BotVehicleStrats /*strat*/) const
     Creature* veh = me->GetVehicleCreatureBase();
     Creature* masterVeh = master->GetVehicleCreatureBase();
     ASSERT(veh);
-    //ASSERT(masterVeh);
     Unit* mmover = masterVeh ? masterVeh->ToUnit() : master->ToUnit();
     ObjectGuid curTarget = veh->GetTarget();
 
@@ -7382,7 +7370,7 @@ void bot_ai::_OnAreaUpdate(uint32 areaId)
         {
             if (Item const* item = _equips[slot])
                 if (item->IsLimitedToAnotherMapOrZone(me->GetMapId(), areaId))
-                    if (_resetEquipment(slot, ObjectGuid::Empty))
+                    if (_resetEquipment(slot, ObjectGuid::Empty, false) == BotEquipResult::BOT_EQUIP_RESULT_OK)
                         continue;
         }
     }
@@ -7748,7 +7736,6 @@ void bot_ai::ApplyBotEffectValueMultiplierMods(SpellInfo const* spellInfo, Spell
 float bot_ai::CalcSpellMaxRange(uint32 spellId, bool enemy) const
 {
     SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(spellId);
-    //ASSERT(spellInfo);
     spellInfo = spellInfo->TryGetSpellInfoOverride(me);
 
     float maxRange = spellInfo->GetMaxRange(!enemy);
@@ -8820,8 +8807,10 @@ bool bot_ai::OnGossipSelect(Player* player, Creature* creature/* == me*/, uint32
         {
             subMenu = true;
 
-            //general
+            //show inventory
             AddGossipItemFor(player, GOSSIP_ICON_CHAT, LocalizedNpcText(player, BOT_TEXT_SHOW_INVENTORY), GOSSIP_SENDER_EQUIPMENT_LIST, GOSSIP_ACTION_INFO_DEF + 1);
+
+            //gear bank
             if (BotMgr::IsGearBankEnabled())
                 AddGossipItemFor(player, GOSSIP_ICON_TALK, LocalizedNpcText(player, BOT_TEXT_BOT_GEAR_BANK), GOSSIP_SENDER_EQUIPMENT_BANK_MENU, GOSSIP_ACTION_INFO_DEF + 1);
 
@@ -8858,7 +8847,12 @@ bool bot_ai::OnGossipSelect(Player* player, Creature* creature/* == me*/, uint32
                 AddGossipItemFor(player, GOSSIP_ICON_TALK, LocalizedNpcText(player, BOT_TEXT_SLOT_NECK) + "...", GOSSIP_SENDER_EQUIPMENT_SHOW, GOSSIP_ACTION_INFO_DEF + uint32(BOT_SLOT_NECK));
             }
 
-            AddGossipItemFor(player, GOSSIP_ICON_CHAT, LocalizedNpcText(player, BOT_TEXT_UNEQUIP_ALL), GOSSIP_SENDER_UNEQUIP_ALL, GOSSIP_ACTION_INFO_DEF + 1, LocalizedNpcText(player, BOT_TEXT_UNEQUIP_ALL) + "?", 0, false);
+            AddGossipItemFor(player, GOSSIP_ICON_CHAT, LocalizedNpcText(player, BOT_TEXT_UNEQUIP_ALL), GOSSIP_SENDER_UNEQUIP_ALL,
+                GOSSIP_ACTION_INFO_DEF + 1, LocalizedNpcText(player, BOT_TEXT_UNEQUIP_ALL) + "?", 0, false);
+            if (BotMgr::IsGearBankEnabled())
+                AddGossipItemFor(player, GOSSIP_ICON_CHAT, LocalizedNpcText(player, BOT_TEXT_UNEQUIP_ALL) + LocalizedNpcText(player, BOT_TEXT___GEAR_BANK_),
+                    GOSSIP_SENDER_UNEQUIP_ALL_TO_GEARBANK, GOSSIP_ACTION_INFO_DEF + 1, LocalizedNpcText(player, BOT_TEXT_UNEQUIP_ALL) + LocalizedNpcText(player, BOT_TEXT___GEAR_BANK_) + "?", 0, false);
+
             if (creature->GetCreatureTemplate()->unit_flags2 & UNIT_FLAG2_MIRROR_IMAGE)
                 AddGossipItemFor(player, GOSSIP_ICON_CHAT, LocalizedNpcText(player, BOT_TEXT_UPDATE_VISUAL), GOSSIP_SENDER_MODEL_UPDATE, GOSSIP_ACTION_INFO_DEF + 1);
             AddGossipItemFor(player, GOSSIP_ICON_CHAT, LocalizedNpcText(player, BOT_TEXT_BACK), 1, GOSSIP_ACTION_INFO_DEF + 1);
@@ -8871,8 +8865,6 @@ bool bot_ai::OnGossipSelect(Player* player, Creature* creature/* == me*/, uint32
             //    break;
 
             EquipmentInfo const* einfo = BotDataMgr::GetBotEquipmentInfo(me->GetEntry());
-            ASSERT(einfo, "Trying to send equipment list for bot with no equip info!");
-
             for (uint8 i = BOT_SLOT_MAINHAND; i != BOT_INVENTORY_SIZE; ++i)
             {
                 Item const* item = _equips[i];
@@ -9110,8 +9102,6 @@ bool bot_ai::OnGossipSelect(Player* player, Creature* creature/* == me*/, uint32
             //subMenu = true; //needed for return
 
             EquipmentInfo const* einfo = BotDataMgr::GetBotEquipmentInfo(me->GetEntry());
-            ASSERT(einfo, "Trying to send equipment info for bot with no equip info!");
-
             uint8 slot = action - GOSSIP_ACTION_INFO_DEF;
             Item const* item = _equips[slot];
             ASSERT(item);
@@ -9134,8 +9124,6 @@ bool bot_ai::OnGossipSelect(Player* player, Creature* creature/* == me*/, uint32
             subMenu = true;
 
             EquipmentInfo const* einfo = BotDataMgr::GetBotEquipmentInfo(me->GetEntry());
-            ASSERT(einfo, "Trying to send equipment show for bot with no equip info!");
-
             std::set<uint32> itemList, idsList;
 
             //s2.1: build list
@@ -9230,14 +9218,29 @@ bool bot_ai::OnGossipSelect(Player* player, Creature* creature/* == me*/, uint32
                 if (slot <= BOT_SLOT_RANGED)
                 {
                     if (einfo->ItemEntry[slot] != 0)
+                    {
                         AddGossipItemFor(player, GOSSIP_ICON_CHAT, LocalizedNpcText(player, BOT_TEXT_USE_OLD_EQUIPMENT), GOSSIP_SENDER_EQUIP_RESET, action);
+                        if (BotMgr::IsGearBankEnabled())
+                            AddGossipItemFor(player, GOSSIP_ICON_CHAT, LocalizedNpcText(player, BOT_TEXT_USE_OLD_EQUIPMENT) + LocalizedNpcText(player, BOT_TEXT___GEAR_BANK_),
+                                GOSSIP_SENDER_EQUIP_RESET_TO_GEARBANK, action);
+                    }
                     else
+                    {
                         AddGossipItemFor(player, GOSSIP_ICON_CHAT, LocalizedNpcText(player, BOT_TEXT_UNEQUIP), GOSSIP_SENDER_UNEQUIP, action);
+                        if (BotMgr::IsGearBankEnabled())
+                            AddGossipItemFor(player, GOSSIP_ICON_CHAT, LocalizedNpcText(player, BOT_TEXT_UNEQUIP) + LocalizedNpcText(player, BOT_TEXT___GEAR_BANK_),
+                                GOSSIP_SENDER_UNEQUIP_TO_GEARBANK, action);
+                    }
                 }
 
                 //s2.2.2 add unequip option for non-weapons
                 if (slot > BOT_SLOT_RANGED)
+                {
                     AddGossipItemFor(player, GOSSIP_ICON_CHAT, LocalizedNpcText(player, BOT_TEXT_UNEQUIP), GOSSIP_SENDER_UNEQUIP, action);
+                    if (BotMgr::IsGearBankEnabled())
+                        AddGossipItemFor(player, GOSSIP_ICON_CHAT, LocalizedNpcText(player, BOT_TEXT_UNEQUIP) + LocalizedNpcText(player, BOT_TEXT___GEAR_BANK_),
+                            GOSSIP_SENDER_UNEQUIP_TO_GEARBANK, action);
+                }
             }
 
             //s2.2.3a: add an empty submenu with info if no items are found
@@ -9248,7 +9251,7 @@ bool bot_ai::OnGossipSelect(Player* player, Creature* creature/* == me*/, uint32
             else
             {
                 uint32 counter = 0;
-                uint32 maxcounter = BOT_GOSSIP_MAX_ITEMS - 5; //unequip, reset, current, transmog, back
+                const uint32 maxcounter = BOT_GOSSIP_MAX_ITEMS - 6; //unequip, unequip (gear bank), reset, current, transmog, back
                 Item const* item;
                 //s2.2.3b: add items as gossip options
                 for (std::set<uint32>::const_iterator itr = itemList.begin(); itr != itemList.end() && counter < maxcounter; ++itr)
@@ -9314,27 +9317,54 @@ bool bot_ai::OnGossipSelect(Player* player, Creature* creature/* == me*/, uint32
         }
         case GOSSIP_SENDER_UNEQUIP: //equips change s3: Unequip DEPRECATED
         {
-            if (!_unequip(action - GOSSIP_ACTION_INFO_DEF, player->GetGUID()))
+            if (_unequip(action - GOSSIP_ACTION_INFO_DEF, player->GetGUID(), false) != BotEquipResult::BOT_EQUIP_RESULT_OK)
             {} //BotWhisper("Impossible...", player);
+            return OnGossipSelect(player, creature, GOSSIP_SENDER_EQUIPMENT, GOSSIP_ACTION_INFO_DEF + 1);
+        }
+        case GOSSIP_SENDER_UNEQUIP_TO_GEARBANK:
+        {
+            BotEquipResult unequip_result = _unequip(action - GOSSIP_ACTION_INFO_DEF, player->GetGUID(), true);
+            if (unequip_result != BotEquipResult::BOT_EQUIP_RESULT_OK)
+            {
+                if (unequip_result == BotEquipResult::BOT_EQUIP_RESULT_FAIL_NO_BANK_SPACE)
+                {
+                    uint32 max_size = BotMgr::GetGearBankCapacity();
+                    uint32 gb_size = BotDataMgr::GetBotBankItemsCount(player->GetGUID());
+                    ChatHandler ch(player->GetSession());
+                    ch.PSendSysMessage(bot_ai::LocalizedNpcText(player, BOT_TEXT_NOT_ENOUGH_GEAR_BANK_SPACE).c_str(), uint32(1), gb_size, max_size);
+                }
+                else
+                    BotWhisper(LocalizedNpcText(player, BOT_TEXT_FAILED), player);
+            }
             return OnGossipSelect(player, creature, GOSSIP_SENDER_EQUIPMENT, GOSSIP_ACTION_INFO_DEF + 1);
         }
         case GOSSIP_SENDER_UNEQUIP_ALL:
         {
-            bool suc = true;
-            for (uint8 i = BOT_SLOT_MAINHAND; i != BOT_INVENTORY_SIZE; ++i)
-            {
-                if (!(i <= BOT_SLOT_RANGED ? _resetEquipment(i, player->GetGUID()) : _unequip(i, player->GetGUID())))
-                {
-                    suc = false;
-                    //std::ostringstream estr;
-                    //estr << "Cannot reset equipment in slot " << uint32(i) << " (" << _getNameForSlot(i) << ")!";
-                    //BotWhisper(estr.str().c_str(), player);
-                }
-            }
-
-            if (suc)
+            BotEquipResult unequip_all_result = UnEquipAll(player->GetGUID(), false);
+            if (unequip_all_result != BotEquipResult::BOT_EQUIP_RESULT_OK)
+                BotWhisper(LocalizedNpcText(player, BOT_TEXT_FAILED), player);
+            else
                 me->HandleEmoteCommand(EMOTE_ONESHOT_CRY);
-
+            break;
+        }
+        case GOSSIP_SENDER_UNEQUIP_ALL_TO_GEARBANK:
+        {
+            BotEquipResult unequip_all_result = UnEquipAll(player->GetGUID(), true);
+            if (unequip_all_result != BotEquipResult::BOT_EQUIP_RESULT_OK)
+            {
+                if (unequip_all_result == BotEquipResult::BOT_EQUIP_RESULT_FAIL_NO_BANK_SPACE)
+                {
+                    uint32 max_size = BotMgr::GetGearBankCapacity();
+                    uint32 gb_size = BotDataMgr::GetBotBankItemsCount(player->GetGUID());
+                    uint32 need_count = GetRealEquippedItemsCount();
+                    ChatHandler ch(player->GetSession());
+                    ch.PSendSysMessage(bot_ai::LocalizedNpcText(player, BOT_TEXT_NOT_ENOUGH_GEAR_BANK_SPACE).c_str(), need_count, gb_size, max_size);
+                }
+                else
+                    BotWhisper(LocalizedNpcText(player, BOT_TEXT_FAILED), player);
+            }
+            else
+                me->HandleEmoteCommand(EMOTE_ONESHOT_CRY);
             break;
         }
         //autoequips change s5b: AtoEquip item
@@ -9394,7 +9424,7 @@ bool bot_ai::OnGossipSelect(Player* player, Creature* creature/* == me*/, uint32
                 }
             }
 
-            if (found && _equip(sender - GOSSIP_SENDER_EQUIP_AUTOEQUIP_EQUIP, item, player->GetGUID())){}
+            if (found && _equip(sender - GOSSIP_SENDER_EQUIP_AUTOEQUIP_EQUIP, item, player->GetGUID(), false) == BotEquipResult::BOT_EQUIP_RESULT_OK){}
 
             //break; //no break: update list
         }
@@ -9404,8 +9434,6 @@ bool bot_ai::OnGossipSelect(Player* player, Creature* creature/* == me*/, uint32
             subMenu = true;
 
             EquipmentInfo const* einfo = BotDataMgr::GetBotEquipmentInfo(me->GetEntry());
-            ASSERT(einfo, "Trying to send auto-equip for bot with no equip info!");
-
             std::set<uint32> itemList, idsList;
 
             //1: build list
@@ -9586,7 +9614,25 @@ bool bot_ai::OnGossipSelect(Player* player, Creature* creature/* == me*/, uint32
         }
         case GOSSIP_SENDER_EQUIP_RESET: //equips change s4a: reset equipment
         {
-            if (_resetEquipment(action - GOSSIP_ACTION_INFO_DEF, player->GetGUID())){}
+            if (_resetEquipment(action - GOSSIP_ACTION_INFO_DEF, player->GetGUID(), false) != BotEquipResult::BOT_EQUIP_RESULT_OK)
+                BotWhisper(LocalizedNpcText(player, BOT_TEXT_FAILED), player);
+            return OnGossipSelect(player, creature, GOSSIP_SENDER_EQUIPMENT, GOSSIP_ACTION_INFO_DEF + 1);
+        }
+        case GOSSIP_SENDER_EQUIP_RESET_TO_GEARBANK: //equips change s4a: reset equipment
+        {
+            BotEquipResult reset_result = _resetEquipment(action - GOSSIP_ACTION_INFO_DEF, player->GetGUID(), true);
+            if (reset_result != BotEquipResult::BOT_EQUIP_RESULT_OK)
+            {
+                if (reset_result == BotEquipResult::BOT_EQUIP_RESULT_FAIL_NO_BANK_SPACE)
+                {
+                    uint32 max_size = BotMgr::GetGearBankCapacity();
+                    uint32 gb_size = BotDataMgr::GetBotBankItemsCount(player->GetGUID());
+                    ChatHandler ch(player->GetSession());
+                    ch.PSendSysMessage(bot_ai::LocalizedNpcText(player, BOT_TEXT_NOT_ENOUGH_GEAR_BANK_SPACE).c_str(), uint32(1), gb_size, max_size);
+                }
+                else
+                    BotWhisper(LocalizedNpcText(player, BOT_TEXT_FAILED), player);
+            }
             return OnGossipSelect(player, creature, GOSSIP_SENDER_EQUIPMENT, GOSSIP_ACTION_INFO_DEF + 1);
         }
         //equips change s4b: Equip item
@@ -9646,7 +9692,7 @@ bool bot_ai::OnGossipSelect(Player* player, Creature* creature/* == me*/, uint32
                 }
             }
 
-            if (found && _equip(sender - GOSSIP_SENDER_EQUIP, item, player->GetGUID())){}
+            if (found && _equip(sender - GOSSIP_SENDER_EQUIP, item, player->GetGUID(), false) == BotEquipResult::BOT_EQUIP_RESULT_OK){}
             return OnGossipSelect(player, creature, GOSSIP_SENDER_EQUIPMENT, GOSSIP_ACTION_INFO_DEF + 1);
         }
         case GOSSIP_SENDER_EQUIPMENT_BANK_DEPOSIT_ITEM:
@@ -9660,6 +9706,12 @@ bool bot_ai::OnGossipSelect(Player* player, Creature* creature/* == me*/, uint32
                 break;
             }
 
+            if (!BotDataMgr::CanDepositBotBankItemsCount(player->GetGUID(), 1))
+            {
+                BotWhisper(LocalizedNpcText(player, BOT_TEXT_BANK_IS_FULL), player);
+                return OnGossipSelect(player, me, GOSSIP_SENDER_EQUIPMENT_BANK_MENU, action);
+            }
+
             BotDataMgr::DepositBotBankItem(player->GetGUID(), item);
             player->MoveItemFromInventory(item->GetBagSlot(), item->GetSlot(), true);
 
@@ -9669,6 +9721,12 @@ bool bot_ai::OnGossipSelect(Player* player, Creature* creature/* == me*/, uint32
         }
         case GOSSIP_SENDER_EQUIPMENT_BANK_DEPOSIT:
         {
+            if (!BotDataMgr::CanDepositBotBankItemsCount(player->GetGUID(), 1))
+            {
+                BotWhisper(LocalizedNpcText(player, BOT_TEXT_BANK_IS_FULL), player);
+                return OnGossipSelect(player, me, GOSSIP_SENDER_EQUIPMENT_BANK_MENU, action);
+            }
+
             subMenu = true;
             uint32 page = action - GOSSIP_ACTION_INFO_DEF;
             uint32 items_per_page = BOT_GOSSIP_MAX_ITEMS - 3; // prev page, back, next page
@@ -9798,7 +9856,6 @@ bool bot_ai::OnGossipSelect(Player* player, Creature* creature/* == me*/, uint32
             {
                 BotWhisper(LocalizedNpcText(player, BOT_TEXT_BANK_IS_EMPTY), player);
                 return OnGossipSelect(player, me, GOSSIP_SENDER_EQUIPMENT_BANK_MENU, action);
-                break;
             }
 
             subMenu = true;
@@ -9837,14 +9894,244 @@ bool bot_ai::OnGossipSelect(Player* player, Creature* creature/* == me*/, uint32
             AddGossipItemFor(player, GOSSIP_ICON_CHAT, LocalizedNpcText(player, BOT_TEXT_BACK), GOSSIP_SENDER_EQUIPMENT_BANK_MENU, GOSSIP_ACTION_INFO_DEF + 1);
             break;
         }
+        case GOSSIP_SENDER_EQUIPMENT_BANK_SET_EQUIP:
+        {
+            uint32 set_id = uint8(action - GOSSIP_ACTION_INFO_DEF);
+            NpcBotItemSet const* item_set = BotDataMgr::GetBotItemSet(player->GetGUID(), set_id);
+            EquipmentInfo const* einfo = BotDataMgr::GetBotEquipmentInfo(me->GetEntry());
+            BotBankItemContainer const* botBankItems = BotDataMgr::GetBotBankItems(player->GetGUID());
+            auto const& itemset_items = item_set->items;
+            uint8 unequip_count = GetRealEquippedItemsCount();
+            uint8 equip_count = item_set->items_count();
+
+            std::array<Item*, BOT_INVENTORY_SIZE> items_to_equip{};
+            std::array<Item*, BOT_INVENTORY_SIZE> items_to_unequip{};
+
+            bool all_same = true;
+            std::array<bool, BOT_INVENTORY_SIZE> same_item_id{};
+            for (uint8 i : NPCBots::index_array<uint8, BOT_INVENTORY_SIZE>)
+            {
+                Item const* item = _equips[i];
+                same_item_id[i] = (item && (i > BOT_SLOT_RANGED || einfo->ItemEntry[i] != item->GetEntry())) ? (item->GetEntry() == itemset_items[i]) : !itemset_items[i];
+                if (!same_item_id[i])
+                    all_same = false;
+            }
+
+            BotEquipResult check_res;
+
+            if (all_same)
+                check_res = BotEquipResult::BOT_EQUIP_RESULT_OK;
+            else if (!botBankItems)
+                check_res = BotEquipResult::BOT_EQUIP_RESULT_FAIL_NO_ITEM;
+            else if (BotMgr::GetGearBankCapacity() && int32(unequip_count - equip_count) > int32(BotMgr::GetGearBankCapacity() - botBankItems->size()))
+                check_res = BotEquipResult::BOT_EQUIP_RESULT_FAIL_NO_BANK_SPACE;
+            else
+            {
+                check_res = BotEquipResult::BOT_EQUIP_RESULT_OK;
+                std::map<uint32 /*item_id*/, std::set<Item*>> available_items;
+                for (Item* bitem : *botBankItems)
+                    available_items[bitem->GetEntry()].insert(bitem);
+
+                bool weapons_checked = false;
+                for (uint8 i : NPCBots::index_array<uint8, BOT_INVENTORY_SIZE>)
+                {
+                    if (check_res != BotEquipResult::BOT_EQUIP_RESULT_OK)
+                        break;
+
+                    Item* item = _equips[i];
+                    if (!same_item_id[i])
+                    {
+                        if (itemset_items[i])
+                        {
+                            ItemTemplate const* set_item_proto = sObjectMgr->GetItemTemplate(itemset_items[i]); // validated at load
+                            if (!available_items.contains(itemset_items[i]) || available_items.at(itemset_items[i]).empty())
+                                check_res = BotEquipResult::BOT_EQUIP_RESULT_FAIL_NO_ITEM;
+                            else if (!_canEquip(set_item_proto, i, true, *available_items.at(itemset_items[i]).cbegin()))
+                                check_res = BotEquipResult::BOT_EQUIP_RESULT_FAIL_CANT_EQUIP;
+                            else
+                            {
+                                if (!weapons_checked && i <= BOT_SLOT_OFFHAND && itemset_items[BOT_SLOT_MAINHAND] && itemset_items[BOT_SLOT_OFFHAND])
+                                {
+                                    weapons_checked = true;
+                                    ItemTemplate const* mh_proto = (i == BOT_SLOT_MAINHAND) ? set_item_proto : sObjectMgr->GetItemTemplate(itemset_items[BOT_SLOT_MAINHAND]);
+                                    ItemTemplate const* oh_proto = (i == BOT_SLOT_OFFHAND) ? set_item_proto : sObjectMgr->GetItemTemplate(itemset_items[BOT_SLOT_OFFHAND]);
+                                    if (!_canCombineWeapons(mh_proto, oh_proto))
+                                        check_res = BotEquipResult::BOT_EQUIP_RESULT_FAIL_ITEM_CONFLICT;
+                                }
+                                auto ait = available_items.at(itemset_items[i]).begin();
+                                items_to_equip[i] = *ait;
+                                available_items.at(itemset_items[i]).erase(ait);
+                            }
+                        }
+                        if (item && !items_to_equip[i])
+                            items_to_unequip[i] = item;
+                    }
+                }
+            }
+
+            if (all_same)
+                me->HandleEmoteCommand(EMOTE_ONESHOT_CHICKEN);
+            else if (check_res != BotEquipResult::BOT_EQUIP_RESULT_OK)
+            {
+                std::string err_code = Bcore::ToString(uint32(AsUnderlyingType(check_res)));
+                BotWhisper(LocalizedNpcText(player, BOT_TEXT_FAILED) + " (" + err_code + ")");
+            }
+            else
+            {
+                BotEquipResult all_res = BotEquipResult::BOT_EQUIP_RESULT_OK;
+                for (uint8 i : NPCBots::index_array<uint8, BOT_INVENTORY_SIZE>)
+                {
+                    if (Item* item = items_to_equip[i])
+                    {
+                        BotEquipResult res = _equip(i, item, player->GetGUID(), true, true);
+                        if (res != BotEquipResult::BOT_EQUIP_RESULT_OK)
+                        {
+                            all_res = res;
+                            std::string err_code = Bcore::ToString(uint32(AsUnderlyingType(res)));
+                            BotWhisper(LocalizedNpcText(player, BOT_TEXT_FAILED) + " +" + Bcore::ToString(uint32(i)) + " (" + err_code + ")");
+                            break;
+                        }
+                    }
+                    if (items_to_unequip[i])
+                    {
+                        BotEquipResult res = _unequip(i, player->GetGUID(), true);
+                        if (res != BotEquipResult::BOT_EQUIP_RESULT_OK)
+                        {
+                            std::string err_code = Bcore::ToString(uint32(AsUnderlyingType(res)));
+                            BotWhisper(LocalizedNpcText(player, BOT_TEXT_FAILED) + " -" + Bcore::ToString(uint32(i)) + " (" + err_code + ")");
+                        }
+                    }
+                }
+                if (all_res == BotEquipResult::BOT_EQUIP_RESULT_OK)
+                    BotWhisper(LocalizedNpcText(player, BOT_TEXT_EQUIPPED) + " '" + item_set->name + "'!");
+            }
+
+            return OnGossipSelect(player, creature, GOSSIP_SENDER_EQUIPMENT_BANK_SETS_MENU, action);
+        }
+        case GOSSIP_SENDER_EQUIPMENT_BANK_SET_DELETE:
+        {
+            uint32 set_id = uint8(action - GOSSIP_ACTION_INFO_DEF);
+
+            BotDataMgr::DeleteBotItemSet(player->GetGUID(), (uint8)set_id);
+
+            return OnGossipSelect(player, creature, GOSSIP_SENDER_EQUIPMENT_BANK_SETS_MENU, action);
+        }
         case GOSSIP_SENDER_EQUIPMENT_BANK_MENU:
         {
             subMenu = true;
 
             AddGossipItemFor(player, GOSSIP_ICON_TALK, LocalizedNpcText(player, BOT_TEXT_DEPOSIT_ITEMS), GOSSIP_SENDER_EQUIPMENT_BANK_DEPOSIT, GOSSIP_ACTION_INFO_DEF + 0);
             AddGossipItemFor(player, GOSSIP_ICON_TALK, LocalizedNpcText(player, BOT_TEXT_WITHDRAW_ITEMS), GOSSIP_SENDER_EQUIPMENT_BANK_WITHDRAW, GOSSIP_ACTION_INFO_DEF + 0);
-            AddGossipItemFor(player, GOSSIP_ICON_CHAT, LocalizedNpcText(player, BOT_TEXT_BACK), 1, GOSSIP_ACTION_INFO_DEF + 1);
+            AddGossipItemFor(player, GOSSIP_ICON_TALK, LocalizedNpcText(player, BOT_TEXT_EQUIPMENT_SETS) + "...", GOSSIP_SENDER_EQUIPMENT_BANK_SETS_MENU, GOSSIP_ACTION_INFO_DEF + 0);
+            AddGossipItemFor(player, GOSSIP_ICON_CHAT, LocalizedNpcText(player, BOT_TEXT_BACK), GOSSIP_SENDER_EQUIPMENT, GOSSIP_ACTION_INFO_DEF + 1);
+            break;
+        }
+        case GOSSIP_SENDER_EQUIPMENT_BANK_SET_MENU_ITEM:
+        {
+            uint32 set_slot_packed = action - GOSSIP_ACTION_INFO_DEF;
+            uint8 set_id = PAIR32_HIPART(set_slot_packed);
+            uint8 slot = PAIR32_LOPART(set_slot_packed);
 
+            NpcBotItemSet const* itemSet = BotDataMgr::GetBotItemSet(player->GetGUID(), set_id);
+            BotBankItemContainer const* botBankItems = BotDataMgr::GetBotBankItems(player->GetGUID());
+
+            uint32 item_id = itemSet->items[slot];
+
+            std::ostringstream msg;
+            Item const* item = (_equips[slot] && _equips[slot]->GetEntry() == item_id) ? _equips[slot] : nullptr;
+            if (!item && botBankItems)
+            {
+                BotBankItemContainer::const_iterator cit = std::ranges::find_if(*botBankItems, [=](Item const* item) { return item->GetEntry() == item_id; });
+                if (cit != botBankItems->cend())
+                    item = *cit;
+            }
+            if (item)
+                _AddItemLink(player, item, msg);
+            else
+            {
+                ItemTemplate const* proto = sObjectMgr->GetItemTemplate(item_id);
+                _AddItemTemplateLink(player, proto, msg);
+                msg << " (" << LocalizedNpcText(player, BOT_TEXT_MISSING) << ')';
+            }
+
+            BotWhisper(msg.str(), player);
+            //break;
+            action = GOSSIP_ACTION_INFO_DEF + set_id;
+        }
+        [[fallthrough]];
+        case GOSSIP_SENDER_EQUIPMENT_BANK_SET_MENU:
+        {
+            subMenu = true;
+
+            uint32 set_id = action - GOSSIP_ACTION_INFO_DEF;
+            NpcBotItemSet const* itemSet = BotDataMgr::GetBotItemSet(player->GetGUID(), (uint8)set_id);
+            BotBankItemContainer const* botBankItems = BotDataMgr::GetBotBankItems(player->GetGUID());
+
+            AddGossipItemFor(player, GOSSIP_ICON_CHAT, "<" + LocalizedNpcText(player, BOT_TEXT_EQUIP) + ">", GOSSIP_SENDER_EQUIPMENT_BANK_SET_EQUIP,
+                GOSSIP_ACTION_INFO_DEF + set_id, LocalizedNpcText(player, BOT_TEXT_EQUIP) + " '" + itemSet->name + "'?", 0, false);
+            AddGossipItemFor(player, GOSSIP_ICON_CHAT, "<" + LocalizedNpcText(player, BOT_TEXT_DELETE) + ">", GOSSIP_SENDER_EQUIPMENT_BANK_SET_DELETE,
+                GOSSIP_ACTION_INFO_DEF + set_id, LocalizedNpcText(player, BOT_TEXT_DELETE) + " '" + itemSet->name + "'?", 0, false);
+
+            //list items
+            float gs_total = 0.f;
+            std::ostringstream ss;
+            for (uint8 i : NPCBots::index_array<uint8, BOT_INVENTORY_SIZE>)
+            {
+                uint32 item_id = itemSet->items[i];
+                if (item_id)
+                {
+                    ItemTemplate const* proto = sObjectMgr->GetItemTemplate(item_id);
+                    GossipOptionIcon si_icon = GOSSIP_ICON_CHAT;
+                    Item const* item = (_equips[i] && _equips[i]->GetEntry() == item_id) ? _equips[i] : nullptr;
+                    if (!item && botBankItems)
+                    {
+                        BotBankItemContainer::const_iterator cit = std::ranges::find_if(*botBankItems, [=](Item const* item) { return item->GetEntry() == item_id; });
+                        if (cit != botBankItems->cend())
+                            item = *cit;
+                    }
+                    if (item)
+                    {
+                        _AddItemLink(player, item, ss);
+                        float item_gs = CalculateItemGearScore(me->GetEntry(), me->GetLevel(), GetBotClass(), GetSpec(), i, proto);
+                        gs_total += item_gs;
+                        ss << " GS: " << uint32(item_gs);
+                    }
+                    else
+                    {
+                        si_icon = GOSSIP_ICON_BATTLE;
+                        _AddItemTemplateLink(player, proto, ss);
+                        ss << " (" << LocalizedNpcText(player, BOT_TEXT_MISSING) << ')';
+                    }
+                    uint32 set_slot_packed = MAKE_PAIR32(i, set_id);
+                    AddGossipItemFor(player, si_icon, ss.str(), GOSSIP_SENDER_EQUIPMENT_BANK_SET_MENU_ITEM, GOSSIP_ACTION_INFO_DEF + set_slot_packed);
+                    ss.str("");
+                }
+            }
+
+            ss << "GS: " << uint32(gs_total);
+            AddGossipItemFor(player, GOSSIP_ICON_CHAT, ss.str(), GOSSIP_SENDER_EQUIPMENT_BANK_SET_MENU, action);
+
+            AddGossipItemFor(player, GOSSIP_ICON_CHAT, LocalizedNpcText(player, BOT_TEXT_BACK), GOSSIP_SENDER_EQUIPMENT_BANK_SETS_MENU, GOSSIP_ACTION_INFO_DEF + 1);
+            break;
+        }
+        case GOSSIP_SENDER_EQUIPMENT_BANK_SETS_MENU:
+        {
+            subMenu = true;
+
+            AddGossipItemFor(player, GOSSIP_ICON_CHAT, LocalizedNpcText(player, BOT_TEXT_CREATE) + "...", GOSSIP_SENDER_EQUIPMENT_BANK_SET_CREATE, GOSSIP_ACTION_INFO_DEF + 0, "", 0, true);
+
+            //list existing sets
+            if (BotItemSetsArray const* itemSets = BotDataMgr::GetBotItemSets(player->GetGUID()))
+            {
+                for (uint8 i : NPCBots::index_array<uint8, MAX_BOT_EQUIPMENT_SETS>)
+                {
+                    NpcBotItemSet const& itemSet = itemSets->at(i);
+                    if (!!itemSet)
+                        AddGossipItemFor(player, GOSSIP_ICON_TALK, itemSet.name, GOSSIP_SENDER_EQUIPMENT_BANK_SET_MENU, GOSSIP_ACTION_INFO_DEF + uint32(i));
+                }
+            }
+
+            AddGossipItemFor(player, GOSSIP_ICON_CHAT, LocalizedNpcText(player, BOT_TEXT_BACK), GOSSIP_SENDER_EQUIPMENT_BANK_MENU, GOSSIP_ACTION_INFO_DEF + 1);
             break;
         }
         case GOSSIP_SENDER_ROLES_MAIN_TOGGLE: //ROLES 2: set/unset
@@ -10014,7 +10301,7 @@ bool bot_ai::OnGossipSelect(Player* player, Creature* creature/* == me*/, uint32
                 case GOSSIP_SENDER_ABILITIES_USAGE_TOGGLE_SUPPORT:
                     newSender = GOSSIP_SENDER_ABILITIES_USAGE_LIST_SUPPORT; break;
                 default:
-                    ASSERT(false);
+                    ABORT();
             }
             sender = newSender;
         }
@@ -10047,7 +10334,7 @@ bool bot_ai::OnGossipSelect(Player* player, Creature* creature/* == me*/, uint32
                     myspells = GetSupportSpellsList();
                     break;
                 default:
-                    ASSERT(false);
+                    ABORT();
             }
 
             ASSERT(myspells);
@@ -10418,13 +10705,12 @@ bool bot_ai::OnGossipSelect(Player* player, Creature* creature/* == me*/, uint32
         case GOSSIP_SENDER_DISMISS:
         {
             BotMgr* mgr = player->GetBotMgr();
-            ASSERT(mgr);
-
             //send items to owner -- Unequip all
             bool abort = false;
             for (uint8 i = BOT_SLOT_MAINHAND; i != BOT_INVENTORY_SIZE; ++i)
             {
-                if (!(i <= BOT_SLOT_RANGED ? _resetEquipment(i, player->GetGUID()) : _unequip(i, player->GetGUID())))
+                BotEquipResult slot_result = i <= BOT_SLOT_RANGED ? _resetEquipment(i, player->GetGUID(), false) : _unequip(i, player->GetGUID(), false);
+                if (slot_result != BotEquipResult::BOT_EQUIP_RESULT_OK)
                 {
                     ChatHandler ch(player->GetSession());
                     ch.PSendSysMessage(LocalizedNpcText(player, BOT_TEXT_CANT_DISMISS_EQUIPMENT).c_str(), uint32(i), LocalizedNpcText(player, BOT_TEXT_SLOT_MH + i));
@@ -11150,6 +11436,26 @@ bool bot_ai::OnGossipSelectCode(Player* player, Creature* creature/* == me*/, ui
             AddGossipItemFor(player, GOSSIP_ICON_CHAT, LocalizedNpcText(player, BOT_TEXT_SET_FOR_ALL_EVERYONE), GOSSIP_SENDER_HEAL_HEALTH_THRESHOLD_PROPAGATE, GOSSIP_ACTION_INFO_DEF + 1);
             AddGossipItemFor(player, GOSSIP_ICON_CHAT, LocalizedNpcText(player, BOT_TEXT_BACK), GOSSIP_SENDER_ENGAGE_BEHAVIOR, GOSSIP_ACTION_INFO_DEF + 2);
             break;
+        }
+        case GOSSIP_SENDER_EQUIPMENT_BANK_SET_CREATE:
+        {
+            std::string set_name(code);
+
+            if (!set_name.empty() && set_name.size() <= MAX_BOT_ITEM_SET_NAME_LENGTH && GetRealEquippedItemsCount() != 0)
+            {
+                EquipmentInfo const* einfo = BotDataMgr::GetBotEquipmentInfo(me->GetEntry());
+                NpcBotItemSet& item_set = BotDataMgr::CreateNewBotItemSet(player->GetGUID());
+
+                item_set.name = std::move(set_name);
+                for (uint8 i : NPCBots::index_array<uint8, BOT_INVENTORY_SIZE>)
+                    if (Item const* item = _equips[i])
+                        if (i > BOT_SLOT_RANGED || einfo->ItemEntry[i] != item->GetEntry())
+                            item_set.items[i] = item->GetEntry();
+            }
+            else
+                BotWhisper(LocalizedNpcText(player, BOT_TEXT_FAILED));
+
+            return OnGossipSelect(player, creature, GOSSIP_SENDER_EQUIPMENT_BANK_SETS_MENU, action);
         }
         default:
             break;
@@ -11903,7 +12209,7 @@ void bot_ai::_autoLootCreature(Creature* creature)
 //////////
 //EQUIPS//
 //////////
-bool bot_ai::_canUseOffHand() const
+bool bot_ai::_canUseOffHand(ItemTemplate const* with/* = nullptr*/) const
 {
     //bm can on only equip in main hand
     if (_botclass == BOT_CLASS_BM)
@@ -11922,7 +12228,7 @@ bool bot_ai::_canUseOffHand() const
     if (_botclass == BOT_CLASS_WARRIOR && me->GetLevel() >= 60 && GetSpec() == BOT_SPEC_WARRIOR_FURY)
         return true;
 
-    ItemTemplate const* protoMH = _equips[BOT_SLOT_MAINHAND] ? _equips[BOT_SLOT_MAINHAND]->GetTemplate() : nullptr;
+    ItemTemplate const* protoMH = with ? with : _equips[BOT_SLOT_MAINHAND] ? _equips[BOT_SLOT_MAINHAND]->GetTemplate() : nullptr;
 
     //no mainhand weapon OR
     //mainhand is an one-hand weapon
@@ -11952,6 +12258,11 @@ bool bot_ai::_canUseRelic() const
 {
     return (_botclass == BOT_CLASS_PALADIN || _botclass == BOT_CLASS_SHAMAN ||
         _botclass == BOT_CLASS_DRUID || _botclass == BOT_CLASS_DEATH_KNIGHT);
+}
+
+bool bot_ai::_canCombineWeapons(ItemTemplate const* mh, ItemTemplate const* oh) const
+{
+    return _canEquip(mh, BOT_SLOT_MAINHAND, true) && _canEquip(oh, BOT_SLOT_OFFHAND, true) && _canUseOffHand(mh);
 }
 
 bool bot_ai::_canEquip(ItemTemplate const* newProto, uint8 slot, bool ignoreItemLevel, Item const* newItem) const
@@ -12605,18 +12916,29 @@ void bot_ai::_removeEquipment(uint8 slot)
     _equips[slot] = nullptr;
 }
 
-bool bot_ai::_unequip(uint8 slot, ObjectGuid receiver)
+BotEquipResult bot_ai::_unequip(uint8 slot, ObjectGuid receiver, bool store_to_bank, bool on_equip_from_bank/* = false*/)
 {
     EquipmentInfo const* einfo = BotDataMgr::GetBotEquipmentInfo(me->GetEntry());
-    ASSERT(einfo, "Trying to unequip item for bot with no equip info!");
 
     Item* item = _equips[slot];
     if (!item)
-        return true; //already unequipped
+        return BotEquipResult::BOT_EQUIP_RESULT_OK; //already unequipped
+
+    if (store_to_bank)
+    {
+        if (!receiver || IAmFree())
+            return BotEquipResult::BOT_EQUIP_RESULT_FAIL_NO_RECEIVER;
+        if (receiver != master->GetGUID())
+            return BotEquipResult::BOT_EQUIP_RESULT_FAIL_INVALID_RECEIVER;
+        if (!BotDataMgr::CanDepositBotBankItemsCount(receiver, on_equip_from_bank ? 0 : 1))
+            return BotEquipResult::BOT_EQUIP_RESULT_FAIL_NO_BANK_SPACE;
+    }
 
     uint32 itemId = item->GetEntry();
 
     BotLogger::Log(NPCBOT_LOG_UNEQUIP, me, uint32(slot), uint32(item->GetGUID().GetCounter()), uint32(itemId), uint32(receiver.GetCounter()));
+
+    // !! All errors must be returned BEFORE we remove equipment, we have to store dangling item somewhere and only return BOT_EQUIP_RESULT_OK !!
 
     _removeEquipment(slot);
 
@@ -12627,8 +12949,12 @@ bool bot_ai::_unequip(uint8 slot, ObjectGuid receiver)
         {
             ItemPosCountVec dest;
             uint32 no_space = 0;
-            InventoryResult msg = master->CanStoreNewItem(NULL_BAG, NULL_SLOT, dest, itemId, 1, &no_space);
-            if (msg != EQUIP_ERR_OK)
+
+            if (store_to_bank)
+            {
+                BotDataMgr::DepositBotBankItem(receiver, item);
+            }
+            else if (master->CanStoreNewItem(NULL_BAG, NULL_SLOT, dest, itemId, 1, &no_space) != EQUIP_ERR_OK)
             {
                 std::ostringstream istr;
                 _AddItemLink(master, item, istr, false);
@@ -12642,9 +12968,6 @@ bool bot_ai::_unequip(uint8 slot, ObjectGuid receiver)
                 item->SaveToDB(trans);
                 MailDraft(istr.str(), "").AddItem(item).SendMailTo(trans, MailReceiver(master), MailSender(me));
                 CharacterDatabase.CommitTransaction(trans);
-
-                //master->SendEquipError(msg, nullptr, nullptr, itemId);
-                //return false;
             }
             else
             {
@@ -12680,16 +13003,15 @@ bool bot_ai::_unequip(uint8 slot, ObjectGuid receiver)
     }
 
     _updateEquips(slot, nullptr);
-    return true;
+
+    return BotEquipResult::BOT_EQUIP_RESULT_OK;
 }
 
-bool bot_ai::_equip(uint8 slot, Item* newItem, ObjectGuid receiver)
+BotEquipResult bot_ai::_equip(uint8 slot, Item* newItem, ObjectGuid receiver, bool store_to_bank, bool from_bank/* = false*/)
 {
     ASSERT(newItem);
 
     EquipmentInfo const* einfo = BotDataMgr::GetBotEquipmentInfo(me->GetEntry());
-    ASSERT(einfo, "Trying to equip item for bot with no equip info!");
-
     ItemTemplate const* proto = newItem->GetTemplate();
 
     if (newItem->GetState() == ITEM_REMOVED)
@@ -12697,7 +13019,7 @@ bool bot_ai::_equip(uint8 slot, Item* newItem, ObjectGuid receiver)
         BOT_LOG_ERROR("entities.player",
             "minion_ai::_equip(): player {} ({}) is trying to make bot {} (id: {}) equip item: {} (id: {}, {}) which has state ITEM_REMOVED!",
             master->GetName().c_str(), master->GetGUID().ToString().c_str(), me->GetName().c_str(), me->GetEntry(), proto->Name1.c_str(), proto->ItemId, newItem->GetGUID().ToString().c_str());
-        return false;
+        return BotEquipResult::BOT_EQUIP_RESULT_FAIL_NO_ITEM;
     }
 
     uint32 newItemId = newItem->GetEntry();
@@ -12706,39 +13028,33 @@ bool bot_ai::_equip(uint8 slot, Item* newItem, ObjectGuid receiver)
     {
         //same id
         if (oldItem->GetEntry() == newItemId && !newItem->GetItemRandomPropertyId())
-            return false;
+            return BotEquipResult::BOT_EQUIP_RESULT_FAIL_SAME_ID;
     }
 
-    if (!_unequip(slot, receiver))
-    {
-        //BotWhisper("You have no space for my current item", master);
-        return false;
-    }
+    BotEquipResult unequip_result = _unequip(slot, receiver, store_to_bank, from_bank);
+    if (unequip_result != BotEquipResult::BOT_EQUIP_RESULT_OK)
+        return unequip_result;
 
-    BotLogger::Log(NPCBOT_LOG_EQUIP, me, uint32(slot), uint32(newItem->GetGUID().GetCounter()), uint32(newItemId), uint32(receiver.GetCounter()));
+    ObjectGuid itemGuid = newItem->GetGUID();
+
+    BotLogger::Log(NPCBOT_LOG_EQUIP, me, uint32(slot), uint32(itemGuid.GetCounter()), uint32(newItemId), uint32(receiver.GetCounter()));
 
     if (receiver && (slot > BOT_SLOT_RANGED || einfo->ItemEntry[slot] != newItemId))
     {
         ASSERT(receiver == master->GetGUID());
 
         //cheating
-        if (newItem->GetOwnerGUID() != master->GetGUID() || !master->HasItemCount(newItemId, 1))
+        if ((newItem->GetOwnerGUID() && newItem->GetOwnerGUID() != master->GetGUID()) ||
+            (from_bank ? !BotDataMgr::WithdrawBotBankItem(receiver, itemGuid.GetCounter()) : !master->HasItemCount(newItemId, 1)))
         {
-            //std::ostringstream msg;
-            //msg << "Cannot find ";
-            //_AddItemLink(master, newItem, msg, false);
-            //msg << " (id: " << uint32(newItemId) << ")!";
-            //BotWhisper(msg.str().c_str());
-
             BOT_LOG_ERROR("entities.player",
-                "minion_ai::_equip(): player {} ({}) is trying to make bot {} (id: {}) equip item: {} (id: {}, {}) but either does not have this item or does not own it",
-                master->GetName().c_str(), master->GetGUID().ToString().c_str(), me->GetName().c_str(), me->GetEntry(), proto->Name1.c_str(), proto->ItemId, newItem->GetGUID().ToString().c_str());
-            return false;
+                "bot_ai::_equip(): player {} ({}) is trying to make bot {} (id: {}) equip item: {} (id: {}, {}) but either does not have this item or does not own it (bank: {})",
+                master->GetName(), master->GetGUID().ToString(), me->GetName(), me->GetEntry(), proto->Name1, proto->ItemId, itemGuid.ToString(), uint32(from_bank));
+            return BotEquipResult::BOT_EQUIP_RESULT_FAIL_NO_ITEM;
         }
 
-        master->MoveItemFromInventory(newItem->GetBagSlot(), newItem->GetSlot(), true);
-        //Item is removed from inventory table in _updateEquips(slot, newItem);
-        //newItem->SetOwnerGUID(ObjectGuid::Empty); //needed to prevent some logs to be sent to master, restored at unequip
+        if (!from_bank)
+            master->MoveItemFromInventory(newItem->GetBagSlot(), newItem->GetSlot(), true);
     }
 
     if (slot <= BOT_SLOT_RANGED)
@@ -12793,10 +13109,12 @@ bool bot_ai::_equip(uint8 slot, Item* newItem, ObjectGuid receiver)
         {
             //if have incompatible offhand unequip it
             if (_equips[BOT_SLOT_OFFHAND] != nullptr)
-                _unequip(BOT_SLOT_OFFHAND, receiver);
+                if (_unequip(BOT_SLOT_OFFHAND, receiver, store_to_bank) != BotEquipResult::BOT_EQUIP_RESULT_OK)
+                    return BotEquipResult::BOT_EQUIP_RESULT_FAIL_LINKED_UNEQUIP_FAILED;
         }
         else if (_equips[BOT_SLOT_OFFHAND] == nullptr && einfo->ItemEntry[BOT_SLOT_OFFHAND])
-            _resetEquipment(BOT_SLOT_OFFHAND, receiver);
+            if (_resetEquipment(BOT_SLOT_OFFHAND, receiver, store_to_bank) != BotEquipResult::BOT_EQUIP_RESULT_OK)
+                return BotEquipResult::BOT_EQUIP_RESULT_FAIL_LINKED_RESET_FAILED;
     }
 
     //send info to class ai
@@ -12815,7 +13133,7 @@ bool bot_ai::_equip(uint8 slot, Item* newItem, ObjectGuid receiver)
         }
     }
 
-    return true;
+    return BotEquipResult::BOT_EQUIP_RESULT_OK;
 }
 
 void bot_ai::_updateEquips(uint8 slot, Item* item)
@@ -12824,30 +13142,28 @@ void bot_ai::_updateEquips(uint8 slot, Item* item)
     BotDataMgr::UpdateNpcBotData(me->GetEntry(), NPCBOT_UPDATE_EQUIPS, _equips);
 }
 //Called from gossip menu only (applies only to weapons)
-bool bot_ai::_resetEquipment(uint8 slot, ObjectGuid receiver)
+BotEquipResult bot_ai::_resetEquipment(uint8 slot, ObjectGuid receiver, bool store_to_bank)
 {
     if (IsWanderer())
     {
         BOT_LOG_ERROR("scripts", "bot_ai::_resetEquipment() is called for wanderer bot {} ({}), slot {}!",
             me->GetName().c_str(), me->GetEntry(), uint32(slot));
-        return false;
+        return BotEquipResult::BOT_EQUIP_RESULT_FAIL_WANDERER;
     }
 
     ASSERT(slot <= BOT_SLOT_RANGED);
 
     EquipmentInfo const* einfo = BotDataMgr::GetBotEquipmentInfo(me->GetEntry());
-    ASSERT(einfo, "Trying to reset equipment for bot with no equip info!");
-
     uint32 itemId = einfo->ItemEntry[slot];
     Item const* oldItem = _equips[slot];
 
     BotLogger::Log(NPCBOT_LOG_EQUIP_RESET, me, uint32(slot), uint32(oldItem ? oldItem->GetGUID().GetCounter() : 0), uint32(oldItem ? oldItem->GetEntry() : 0), uint32(receiver.GetCounter()), uint32(itemId));
 
     if (!itemId)
-        return _unequip(slot, receiver);
+        return _unequip(slot, receiver, store_to_bank);
     else if (oldItem)
         if (oldItem->GetEntry() == itemId)
-            return true;
+            return BotEquipResult::BOT_EQUIP_RESULT_OK;
 
     if (slot == BOT_SLOT_MAINHAND && !(_botclass == BOT_CLASS_WARRIOR && me->GetLevel() >= 60 && GetSpec() == BOT_SPEC_WARRIOR_FURY))
     {
@@ -12858,8 +13174,9 @@ bool bot_ai::_resetEquipment(uint8 slot, ObjectGuid receiver)
                 proto->SubClass == ITEM_SUBCLASS_WEAPON_SWORD2 || proto->SubClass == ITEM_SUBCLASS_WEAPON_POLEARM ||
                 proto->SubClass == ITEM_SUBCLASS_WEAPON_STAFF || proto->SubClass == ITEM_SUBCLASS_WEAPON_SPEAR))
             {
-                if (!_unequip(BOT_SLOT_OFFHAND, receiver))
-                    return false;
+                BotEquipResult unequip_offhand_result = _unequip(BOT_SLOT_OFFHAND, receiver, store_to_bank);
+                if (unequip_offhand_result != BotEquipResult::BOT_EQUIP_RESULT_OK)
+                    return BotEquipResult::BOT_EQUIP_RESULT_FAIL_LINKED_UNEQUIP_FAILED;
             }
         }
     }
@@ -12868,13 +13185,14 @@ bool bot_ai::_resetEquipment(uint8 slot, ObjectGuid receiver)
     Item* stItem = Item::CreateItem(itemId, 1, nullptr);
     ASSERT(stItem, "Failed to create standard Item for bot!");
 
-    if (!_equip(slot, stItem, receiver))
+    BotEquipResult equip_result = _equip(slot, stItem, receiver, store_to_bank);
+    if (equip_result != BotEquipResult::BOT_EQUIP_RESULT_OK)
     {
         BOT_LOG_ERROR("entities.player", "minion_ai::_resetEquipment(): player {} ({}) failed to reset equipment for bot {} (id: {}) in slot {}",
             master->GetName().c_str(), master->GetGUID().ToString().c_str(), me->GetName().c_str(), me->GetEntry(), slot);
-        return false;
+        return equip_result;
     }
-    return true;
+    return BotEquipResult::BOT_EQUIP_RESULT_OK;
 }
 
 void bot_ai::ApplyItemBonuses(uint8 slot)
@@ -14177,14 +14495,31 @@ uint32 bot_ai::GetEquipDisplayId(uint8 slot) const
     return uint32(std::max<int32>(displayId, 0));
 }
 
-bool bot_ai::UnEquipAll(ObjectGuid receiver)
+BotEquipResult bot_ai::UnEquipAll(ObjectGuid receiver, bool store_to_bank)
 {
-    bool suc = true;
+    uint8 items_to_store_count = GetRealEquippedItemsCount();
+    if (!items_to_store_count)
+        return BotEquipResult::BOT_EQUIP_RESULT_OK;
+
+    if (store_to_bank)
+    {
+        if (!receiver || IAmFree())
+            return BotEquipResult::BOT_EQUIP_RESULT_FAIL_NO_RECEIVER;
+        if (!receiver.IsPlayer())
+            return BotEquipResult::BOT_EQUIP_RESULT_FAIL_INVALID_RECEIVER;
+        if (receiver.GetCounter() != _ownerGuid)
+            return BotEquipResult::BOT_EQUIP_RESULT_FAIL_INVALID_RECEIVER;
+        if (!BotDataMgr::CanDepositBotBankItemsCount(receiver, items_to_store_count))
+            return BotEquipResult::BOT_EQUIP_RESULT_FAIL_NO_BANK_SPACE;
+    }
+
+    BotEquipResult suc = BotEquipResult::BOT_EQUIP_RESULT_OK;
     for (uint8 i = BOT_SLOT_MAINHAND; i != BOT_INVENTORY_SIZE; ++i)
     {
-        if (!(i <= BOT_SLOT_RANGED ? _resetEquipment(i, receiver) : _unequip(i, receiver)))
+        BotEquipResult slot_result = i <= BOT_SLOT_RANGED ? _resetEquipment(i, receiver, store_to_bank) : _unequip(i, receiver, store_to_bank);
+        if (slot_result != BotEquipResult::BOT_EQUIP_RESULT_OK)
         {
-            suc = false;
+            suc = slot_result;
             break;
         }
     }
@@ -14192,21 +14527,12 @@ bool bot_ai::UnEquipAll(ObjectGuid receiver)
     return suc;
 }
 
-bool bot_ai::HasRealEquipment() const
+uint8 bot_ai::GetRealEquippedItemsCount() const
 {
     EquipmentInfo const* einfo = BotDataMgr::GetBotEquipmentInfo(me->GetEntry());
-    ASSERT(einfo, "Trying to call HasRealEquipment for bot with no equip info!");
-
-    for (uint8 i = BOT_SLOT_MAINHAND; i != BOT_INVENTORY_SIZE; ++i)
-    {
-        if (Item const* item = GetEquips(i))
-        {
-            if (i > BOT_SLOT_RANGED || einfo->ItemEntry[i] != item->GetEntry())
-                return true;
-        }
-    }
-
-    return false;
+    return std::ranges::count_if(NPCBots::index_array<uint8, BOT_INVENTORY_SIZE>, [=, this](uint8 i) {
+        return GetEquips(i) && (i > BOT_SLOT_RANGED || einfo->ItemEntry[i] != GetEquips(i)->GetEntry());
+    });
 }
 
 float bot_ai::GetAverageItemLevel() const
@@ -14531,8 +14857,6 @@ void bot_ai::InitRace()
 void bot_ai::InitOwner()
 {
     NpcBotData const* npcBotData = BotDataMgr::SelectNpcBotData(me->GetEntry());
-    ASSERT(npcBotData, "bot_ai::InitOwner(): data not found!");
-
     _ownerGuid = npcBotData->owner;
 }
 
@@ -14847,7 +15171,6 @@ void bot_ai::InitEquips()
     ASSERT(einfo, "Trying to spawn bot with no equip info!");
 
     NpcBotData const* npcBotData = BotDataMgr::SelectNpcBotData(me->GetEntry());
-    ASSERT(npcBotData, "bot_ai::InitEquips(): data not found!");
 
     if (IsWanderer())
     {
@@ -15400,9 +15723,9 @@ void bot_ai::_AddItemTemplateLink(Player const* forPlayer, ItemTemplate const* i
 
     //max in stack
     if (item->BuyCount > 1)
-        str<< "|cff009900x" << item->BuyCount << ".|r";
+        str<< "|cff009900x" << item->BuyCount << "|r";
     else
-        str << "|cff009900.|r";
+        str << "|cff009900|r";
 }
 // |TInterface\\Icons\\INV_<iconName>:<iconSize>|t|color|Hitem:item_id:perm_ench_id:gem1:gem2:gem3:0:random_property:suffix_factor:reporter_level|h[name]|h|r
 // |TInterface\\Icons\\INV_Misc_Staff_01:16|t|cffa335ee|Hitem:812:0:0:0:0:0:0:0:70|h[Glowing Brightwood Staff]|h|r
@@ -18604,7 +18927,6 @@ void bot_ai::TeleportHomeStart(bool reset)
 void bot_ai::TeleportHome(bool reset)
 {
     ASSERT(teleHomeEvent);
-    //ASSERT(IAmFree());
 
     AbortTeleport();
 
@@ -18613,7 +18935,6 @@ void bot_ai::TeleportHome(bool reset)
     GetHomePosition(mapid, &pos);
 
     Map* map = sMapMgr->CreateBaseMap(mapid);
-    ASSERT(!map->Instanceable(), map->GetDebugInfo().c_str());
     BotMgr::TeleportBot(me, map, &pos, false, reset, this);
 
     spawned = false;
@@ -18623,7 +18944,6 @@ void bot_ai::TeleportHome(bool reset)
 bool bot_ai::FinishTeleport(bool reset)
 {
     ASSERT(teleFinishEvent);
-    //ASSERT(!IAmFree());
     ASSERT(!me->IsInWorld());
 
     AbortTeleport();
@@ -19476,8 +19796,7 @@ WanderNode const* bot_ai::GetNextBGTravelNode() const
                 if (myTeamId != teamId)
                     continue;
 
-                bool all_nodes_assaulted = std::ranges::all_of(([]<typename T, T... I>(std::integer_sequence<T, I...>&&) { return std::array{ I... }; })(std::make_integer_sequence<uint8, 5>{}),
-                    [=](uint8 n) { return ab->IsNodeOccupied(n, teamId) || ab->IsNodeContested(n, teamId); });
+                bool all_nodes_assaulted = std::ranges::all_of(NPCBots::index_array<uint8, 5>, [=](uint8 n) { return ab->IsNodeOccupied(n, teamId) || ab->IsNodeContested(n, teamId); });
                 if (all_nodes_assaulted)
                 {
                     WanderNode const* enemy_base = WanderNode::FindInMapWPs(me->GetMapId(), [=](WanderNode const* mwp) {
@@ -19579,7 +19898,7 @@ WanderNode const* bot_ai::GetNextBGTravelNode() const
         }
         case BATTLEGROUND_EY:
         {
-            const std::array ey_points{ ([]<typename T, T... I>(std::integer_sequence<T, I...>&&) { return std::array{ I... }; })(std::make_integer_sequence<uint8, EY_POINTS_MAX>{}) };
+            const std::array ey_points = NPCBots::index_array<uint8, EY_POINTS_MAX>;
 
             BattlegroundEY* ey = dynamic_cast<BattlegroundEY*>(bg);
 
@@ -19867,7 +20186,7 @@ void bot_ai::OnWanderNodeReached()
                 case BATTLEGROUND_EY:
                 {
                     const std::array dFlagTriggers{ AT_FEL_REAVER_POINT, AT_BLOOD_ELF_POINT, AT_DRAENEI_RUINS_POINT, AT_MAGE_TOWER_POINT };
-                    const std::array index_range{ ([]<typename T, T... I>(std::integer_sequence<T, I...>&&) { return std::array{ I... }; })(std::make_integer_sequence<uint8, EY_POINTS_MAX>{}) };
+                    const std::array index_range = NPCBots::index_array<uint8, EY_POINTS_MAX>;
                     auto cit = std::ranges::find_if(index_range, [this](uint8 index) { return me->GetExactDist2d(BG_EY_TriggerPositions[index][0], BG_EY_TriggerPositions[index][1]) < INTERACTION_DISTANCE; });
                     if (cit != index_range.cend())
                         bg->HandleBotAreaTrigger(me, dFlagTriggers[*cit]);
@@ -21004,7 +21323,6 @@ void bot_ai::SetGroup(Group* group, int8 subgroup)
     else
     {
         // never use SetGroup without a subgroup unless you specify NULL for group
-        ASSERT(subgroup >= 0);
         _group.link(group, me);
         _group.setSubGroup((uint8)subgroup);
     }
@@ -21034,7 +21352,6 @@ void bot_ai::SetOriginalGroup(Group* group, int8 subgroup)
         _originalGroup.unlink();
     else
     {
-        ASSERT(subgroup >= 0);
         _originalGroup.link(group, me);
         _originalGroup.setSubGroup((uint8)subgroup);
     }

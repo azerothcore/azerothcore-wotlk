@@ -66,6 +66,8 @@ uint8 _rangedDpsTargetIconFlags;
 uint8 _noDpsTargetIconFlags;
 uint8 _npcBotOwnerExpireMode;
 int32 _botInfoPacketsLimit;
+uint32 _gearBankCapacity;
+uint32 _gearBankEquipmentSetsCount;
 uint32 _npcBotsCost;
 uint32 _npcBotUpdateDelayBase;
 uint32 _npcBotEngageDelayDPS_default;
@@ -300,6 +302,7 @@ void BotMgr::Initialize()
     BotDataMgr::CreateWanderingBotsSortedGear();
     BotDataMgr::LoadNpcBotGroupData();
     BotDataMgr::LoadNpcBotGearStorage();
+    BotDataMgr::LoadNpcBotGearSets();
     BotDataMgr::LoadNpcBotMgrData();
     BotDataMgr::DeleteOldLogs();
 
@@ -383,7 +386,9 @@ void BotMgr::LoadConfig(bool reload)
     _showCloak                      = sConfigMgr->GetBoolDefault("NpcBot.EquipmentDisplay.ShowCloak", true);
     _showHelm                       = sConfigMgr->GetBoolDefault("NpcBot.EquipmentDisplay.ShowHelm", false);
     _sendEquipListItems             = sConfigMgr->GetBoolDefault("NpcBot.Gossip.ShowEquipmentListItems", false);
-    _enableBotGearBank              = sConfigMgr->GetBoolDefault("NpcBot.GearBank.Enable", false);
+    _enableBotGearBank              = sConfigMgr->GetBoolDefault("NpcBot.GearBank.Enable", true);
+    _gearBankCapacity               = sConfigMgr->GetIntDefault("NpcBot.GearBank.Capacity", 40);
+    _gearBankEquipmentSetsCount     = sConfigMgr->GetIntDefault("NpcBot.GearBank.EquipmentSets", 0);
     _transmog_enable                = sConfigMgr->GetBoolDefault("NpcBot.Transmog.Enable", false);
     _transmog_mixArmorClasses       = sConfigMgr->GetBoolDefault("NpcBot.Transmog.MixArmorClasses", false);
     _transmog_mixWeaponClasses      = sConfigMgr->GetBoolDefault("NpcBot.Transmog.MixWeaponClasses", false);
@@ -440,10 +445,10 @@ void BotMgr::LoadConfig(bool reload)
     _enableWanderingBotsBG          = sConfigMgr->GetBoolDefault("NpcBot.WanderingBots.BG.Enable", false);
     _enableConfigLevelCapBG         = sConfigMgr->GetBoolDefault("NpcBot.WanderingBots.BG.CapLevel", false);
     _enableConfigLevelCapBGFirst    = sConfigMgr->GetBoolDefault("NpcBot.WanderingBots.BG.CapLevelByFirstPlayer", false);
-    _targetBGPlayersPerTeamCount_AV = sConfigMgr->GetIntDefault("NpcBot.WanderingBots.BG.TargetTeamPlayersCount.AV", 0);
+    _targetBGPlayersPerTeamCount_AV = sConfigMgr->GetIntDefault("NpcBot.WanderingBots.BG.TargetTeamPlayersCount.AV", 30);
     _targetBGPlayersPerTeamCount_WS = sConfigMgr->GetIntDefault("NpcBot.WanderingBots.BG.TargetTeamPlayersCount.WS", 8);
     _targetBGPlayersPerTeamCount_AB = sConfigMgr->GetIntDefault("NpcBot.WanderingBots.BG.TargetTeamPlayersCount.AB", 12);
-    _targetBGPlayersPerTeamCount_EY = sConfigMgr->GetIntDefault("NpcBot.WanderingBots.BG.TargetTeamPlayersCount.EY", 0);
+    _targetBGPlayersPerTeamCount_EY = sConfigMgr->GetIntDefault("NpcBot.WanderingBots.BG.TargetTeamPlayersCount.EY", 12);
     _targetBGPlayersPerTeamCount_SA = sConfigMgr->GetIntDefault("NpcBot.WanderingBots.BG.TargetTeamPlayersCount.SA", 0);
     _targetBGPlayersPerTeamCount_IC = sConfigMgr->GetIntDefault("NpcBot.WanderingBots.BG.TargetTeamPlayersCount.IC", 0);
     _bothk_enable                   = sConfigMgr->GetBoolDefault("NpcBot.HK.Enable", true);
@@ -648,11 +653,17 @@ void BotMgr::LoadConfig(bool reload)
 
 void BotMgr::ResolveConfigConflicts()
 {
+    if (_gearBankEquipmentSetsCount > MAX_BOT_EQUIPMENT_SETS)
+    {
+        BOT_LOG_ERROR("server.loading", "NpcBot.GearBank.EquipmentSets can't be greater than {}, reduced (was {})!", uint32(MAX_BOT_EQUIPMENT_SETS), _gearBankEquipmentSetsCount);
+        _gearBankEquipmentSetsCount = MAX_BOT_EQUIPMENT_SETS;
+    }
+
     uint8 dpsFlags = /*_tankingTargetIconFlags | _offTankingTargetIconFlags | */_dpsTargetIconFlags | _rangedDpsTargetIconFlags;
     if (uint8 interFlags = (_noDpsTargetIconFlags & dpsFlags))
     {
         _noDpsTargetIconFlags &= ~interFlags;
-        BOT_LOG_ERROR("server.loading", "BotMgr::LoadConfig: NoDPSTargetIconMask intersects with dps targets flags {:#X}! Removed, new mask: {:#X}",
+        BOT_LOG_ERROR("server.loading", "NpcBot.NoDPSTargetIconMask intersects with dps targets flags {:#X}! Removed, new mask: {:#X}",
             uint32(interFlags), uint32(_noDpsTargetIconFlags));
     }
 
@@ -988,6 +999,14 @@ uint8 BotMgr::GetMaxClassBots()
 uint8 BotMgr::GetMaxAccountBots()
 {
     return _maxAccountNpcBots;
+}
+uint32 BotMgr::GetGearBankCapacity()
+{
+    return _gearBankCapacity;
+}
+uint32 BotMgr::GetGearBankEquipmentSetsCount()
+{
+    return _gearBankEquipmentSetsCount;
 }
 uint8 BotMgr::GetHealTargetIconFlags()
 {
