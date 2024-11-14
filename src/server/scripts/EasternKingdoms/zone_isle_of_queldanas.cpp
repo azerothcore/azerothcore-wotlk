@@ -690,7 +690,12 @@ enum Spells
 
 struct npc_irespeaker : public ScriptedAI
 {
-    npc_irespeaker(Creature* creature) : ScriptedAI(creature), _scheduler() {  }
+    npc_irespeaker(Creature* creature) : ScriptedAI(creature) {  }
+
+
+    void Reset() override {
+        scheduler.CancelAll(); // Cancel all tasks on death
+    }
 
     void JustEngagedWith(Unit* /*who*/ ) override
     {
@@ -700,16 +705,15 @@ struct npc_irespeaker : public ScriptedAI
 
     void JustDied(Unit* /*killer*/) override
     {
-        me->CastSpell(me, SPELL_FEL_CONSUMPTION, true);
-        _scheduler.CancelAll(); // Cancel all tasks on death
+        DoCastSelf(SPELL_FEL_CONSUMPTION);
     }
 
     void UpdateAI(uint32 diff) override
     {
-        _scheduler.Update(diff); // Update the TaskScheduler
-
         if (!UpdateVictim())
             return;
+
+        scheduler.Update(diff); // Update the TaskScheduler
 
         if (me->IsWithinMeleeRange(me->GetVictim()))
             DoMeleeAttackIfReady();
@@ -717,32 +721,31 @@ struct npc_irespeaker : public ScriptedAI
             me->GetMotionMaster()->MoveChase(me->GetVictim(), 25.0f);
     }
 
-private:
-    TaskScheduler _scheduler;
-
     void ScheduleCurseOfWeakness()
     {
-        _scheduler.Schedule(0s, [this](TaskContext context)
+        scheduler.Schedule(0s, [this](TaskContext context)
         {
-            if (me->IsInCombat() && me->IsWithinMeleeRange(me->GetVictim()))
+            if (me->IsWithinMeleeRange(me->GetVictim()))
             {
                 DoCastVictim(SPELL_CURSE_OF_WEAKNESS);
             }
-            context.Repeat(13s + std::chrono::seconds(urand(0, 22)));
+            context.Repeat(13s, 35s);
         });
     }
 
     void ScheduleFelFireball()
     {
-        _scheduler.Schedule(0s, [this](TaskContext context)
+        scheduler.Schedule(0s, [this](TaskContext context)
         {
-            if (me->IsInCombat() && !me->IsWithinMeleeRange(me->GetVictim()))
+            if (!me->IsWithinMeleeRange(me->GetVictim()))
             {
                 DoCastVictim(SPELL_FEL_FIREBALL);
             }
-            context.Repeat(10s + std::chrono::seconds(urand(0, 15)));
+            context.Repeat(10s,25s);
         });
     }
+
+    
 };
 
 void AddSC_isle_of_queldanas()
