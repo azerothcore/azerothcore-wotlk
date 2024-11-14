@@ -310,7 +310,6 @@ struct boss_alar : public BossAI
         }).Schedule(6s, [this](TaskContext)
         {
             me->SetModelVisible(true);
-            DoCastSelf(SPELL_REBIRTH_DIVE);
         }).Schedule(10s, [this](TaskContext)
         {
             me->GetMotionMaster()->MoveChase(me->GetVictim());
