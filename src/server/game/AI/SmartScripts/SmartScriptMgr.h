@@ -20,12 +20,11 @@
 
 #include "Common.h"
 #include "Creature.h"
-#include "CreatureAI.h"
 #include "DBCStores.h"
+#include "ObjectAccessor.h"
+#include "ObjectMgr.h"
 #include "Optional.h"
-#include "Spell.h"
 #include "SpellMgr.h"
-#include "Unit.h"
 #include <limits>
 
 typedef uint32 SAIBool;

@@ -33,6 +33,7 @@ EndContentData */
 #include "ScriptedGossip.h"
 #include "SpellInfo.h"
 #include "SpellScript.h"
+#include "SpellScriptLoader.h"
 
 /*######
 ## npc_forest_frog
@@ -348,6 +349,11 @@ enum Events
     GONG_EVENT_11                     = 11
 };
 
+enum Actions
+{
+    ACTION_COMPLETE_EVENT_3           = 0,
+};
+
 enum Waypoints
 {
     HARRISON_MOVE_1                   = 860440,
@@ -419,6 +425,15 @@ struct npc_harrison_jones : public ScriptedAI
         }
     }
 
+    void DoAction(int32 action) override
+    {
+        if (action == ACTION_COMPLETE_EVENT_3)
+        {
+            _gongEvent = GONG_EVENT_4;
+            _gongTimer = 0;
+        }
+    }
+
     void UpdateAI(uint32 diff) override
     {
         if (_gongEvent)
@@ -444,8 +459,6 @@ struct npc_harrison_jones : public ScriptedAI
                 case GONG_EVENT_3:
                     if (GameObject* gong = _instance->GetGameObject(DATA_STRANGE_GONG))
                         gong->RemoveGameObjectFlag(GO_FLAG_NOT_SELECTABLE);
-                    _gongEvent = GONG_EVENT_4;
-                    _gongTimer = 105000;
                     break;
                 case GONG_EVENT_4:
                     me->RemoveAura(SPELL_BANGING_THE_GONG);
@@ -538,9 +551,27 @@ struct npc_harrison_jones : public ScriptedAI
         ObjectGuid uiTargetGUID;
 };
 
+class spell_ritual_of_power : public SpellScript
+{
+    PrepareSpellScript(spell_ritual_of_power);
+
+    void OnEffect(SpellEffIndex /*effIndex*/)
+    {
+        if (InstanceScript* instance = GetCaster()->GetInstanceScript())
+            if (Creature* creature = instance->GetCreature(DATA_HARRISON_JONES))
+                creature->AI()->DoAction(ACTION_COMPLETE_EVENT_3);
+    }
+
+    void Register() override
+    {
+        OnEffectLaunch += SpellEffectFn(spell_ritual_of_power::OnEffect, EFFECT_0, SPELL_EFFECT_SEND_EVENT);
+    }
+};
+
 void AddSC_zulaman()
 {
     RegisterZulAmanCreatureAI(npc_forest_frog);
     new npc_zulaman_hostage();
     RegisterZulAmanCreatureAI(npc_harrison_jones);
+    RegisterSpellScript(spell_ritual_of_power);
 }
