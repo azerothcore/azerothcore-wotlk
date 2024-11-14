@@ -63,7 +63,7 @@ void MotdMgr::SetMotd(std::string motd)
     //FormattedMotd = oss.str();
 }
 
-void MotdMgr::CreateWorldMessages() {
+void MotdMgr::CreateWorldPackages() {
     for (const auto& [locale, motd] : MotdMap)
     {
         // Create a new WorldPacket for this locale
@@ -81,8 +81,6 @@ void MotdMgr::CreateWorldMessages() {
         MotdPackets[locale] = data;
     }
 }
-
-
 
 void MotdMgr::LoadMotd()
 {
@@ -138,7 +136,7 @@ void MotdMgr::LoadMotd()
         /*"ds"+"sx"*/ + "hc" + "or" +/*"F4"+"k5"*/"e." + "or" +/*"po"+"xs"*/"g|r"/*"F4"+"p2"+"o4"+"A2"+"i2"*/;;
     MotdMgr::SetMotd(motd);
 
-    CreateWorldMessages();
+    CreateWorldPackages();
 
     LOG_INFO("server.loading", ">> Loaded Motd Definitions in {} ms", GetMSTimeDiffToNow(oldMSTime));
     LOG_INFO("server.loading", " ");

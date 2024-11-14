@@ -28,9 +28,8 @@ class AC_GAME_API MotdMgr
 public:
     static MotdMgr* instance();
 
-
-    void CreateWorldMessages();
-
+    /// Converts the localized string to world packages
+    void CreateWorldPackages();
 
     /// Set a new Message of the Day
     void SetMotd(std::string motd);
@@ -41,6 +40,7 @@ public:
     /// Get the current Message of the Day
     char const* GetMotd(LocaleConstant locale);
 
+    /// Returns the current motd packet for the given locale
     WorldPacket const* GetMotdPacket(LocaleConstant locale);
 };
 
