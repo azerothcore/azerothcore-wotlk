@@ -9112,7 +9112,7 @@ bool bot_ai::OnGossipSelect(Player* player, Creature* creature/* == me*/, uint32
             if (slot <= BOT_SLOT_RANGED && einfo->ItemEntry[slot] == item->GetEntry())
                 msg << " |cffe6cc80|h[!" << LocalizedNpcText(player, BOT_TEXT_VISUALONLY) << "!]|h|r";
 
-            msg << " GS: " << uint32(CalculateItemGearScore(me->GetEntry(), me->GetLevel(), GetBotClass(), GetSpec(), slot, item->GetTemplate()));
+            msg << " GS: " << uint32(CalculateItemGearScore(item->GetTemplate(), me->GetEntry(), me->GetLevel(), GetBotClass(), GetSpec(), slot));
 
             BotWhisper(msg.str(), player);
 
@@ -9199,7 +9199,7 @@ bool bot_ai::OnGossipSelect(Player* player, Creature* creature/* == me*/, uint32
                 if (visual_only)
                     str << " |cffe6cc80|h[!" << LocalizedNpcText(player, BOT_TEXT_VISUALONLY) << "!]|h|r";
 
-                str << " GS: " << uint32(CalculateItemGearScore(me->GetEntry(), me->GetLevel(), GetBotClass(), GetSpec(), slot, item->GetTemplate()));
+                str << " GS: " << uint32(CalculateItemGearScore(item->GetTemplate(), me->GetEntry(), me->GetLevel(), GetBotClass(), GetSpec(), slot));
 
                 AddGossipItemFor(player, GOSSIP_ICON_CHAT, str.str(), GOSSIP_SENDER_EQUIPMENT_INFO, action);
 
@@ -9264,7 +9264,7 @@ bool bot_ai::OnGossipSelect(Player* player, Creature* creature/* == me*/, uint32
                         {
                             std::ostringstream name;
                             _AddItemLink(player, item, name);
-                            name << " GS: " << uint32(CalculateItemGearScore(me->GetEntry(), me->GetLevel(), GetBotClass(), GetSpec(), slot, item->GetTemplate()));
+                            name << " GS: " << uint32(CalculateItemGearScore(item->GetTemplate(), me->GetEntry(), me->GetLevel(), GetBotClass(), GetSpec(), slot));
                             if (BotMgr::SendEquipListItems())
                                 BotWhisper(name.str(), player);
                             AddGossipItemFor(player, GOSSIP_ICON_CHAT, name.str(), GOSSIP_SENDER_EQUIP + slot, GOSSIP_ACTION_INFO_DEF + item->GetGUID().GetCounter());
@@ -9288,7 +9288,7 @@ bool bot_ai::OnGossipSelect(Player* player, Creature* creature/* == me*/, uint32
                                 {
                                     std::ostringstream name;
                                     _AddItemLink(player, item, name);
-                                    name << " GS: " << uint32(CalculateItemGearScore(me->GetEntry(), me->GetLevel(), GetBotClass(), GetSpec(), slot, item->GetTemplate()));
+                                    name << " GS: " << uint32(CalculateItemGearScore(item->GetTemplate(), me->GetEntry(), me->GetLevel(), GetBotClass(), GetSpec(), slot));
                                     if (BotMgr::SendEquipListItems())
                                         BotWhisper(name.str(), player);
                                     AddGossipItemFor(player, GOSSIP_ICON_CHAT, name.str(), GOSSIP_SENDER_EQUIP + slot, GOSSIP_ACTION_INFO_DEF + item->GetGUID().GetCounter());
@@ -9883,7 +9883,7 @@ bool bot_ai::OnGossipSelect(Player* player, Creature* creature/* == me*/, uint32
                 else if (GetBotClass() == BOT_CLASS_WARRIOR && _canEquip(proto, BOT_SLOT_MAINHAND, true))
                     slot = BOT_SLOT_MAINHAND;
 
-                name << " GS: " << uint32(CalculateItemGearScore(me->GetEntry(), me->GetLevel(), GetBotClass(), GetSpec(), slot, proto));
+                name << " GS: " << uint32(CalculateItemGearScore(proto, me->GetEntry(), me->GetLevel(), GetBotClass(), GetSpec(), slot));
                 AddGossipItemFor(player, GOSSIP_ICON_CHAT, name.str(), GOSSIP_SENDER_EQUIPMENT_BANK_WITHDRAW_ITEM, GOSSIP_ACTION_INFO_DEF + item->GetGUID().GetCounter());
             }
 
@@ -10092,7 +10092,7 @@ bool bot_ai::OnGossipSelect(Player* player, Creature* creature/* == me*/, uint32
                     if (item)
                     {
                         _AddItemLink(player, item, ss);
-                        float item_gs = CalculateItemGearScore(me->GetEntry(), me->GetLevel(), GetBotClass(), GetSpec(), i, proto);
+                        float item_gs = CalculateItemGearScore(proto, me->GetEntry(), me->GetLevel(), GetBotClass(), GetSpec(), i);
                         gs_total += item_gs;
                         ss << " GS: " << uint32(item_gs);
                     }
@@ -14355,7 +14355,7 @@ float bot_ai::_getItemGearStatScore(ItemTemplate const* iproto, uint8 forslot, I
     for (uint8 i = 0; i != MAX_BOT_ITEM_MOD; ++i)
         itemScore += istats[i] * _getStatScore(i);
 
-    float itemGearScore = CalculateItemGearScore(me->GetEntry(), me->GetLevel(), GetBotClass(), GetSpec(), forslot, iproto);
+    float itemGearScore = CalculateItemGearScore(iproto, me->GetEntry(), me->GetLevel(), GetBotClass(), GetSpec(), forslot);
     itemScore += itemGearScore;
 
     //BOT_LOG_ERROR("scripts", "_getItemGearScore total score %.3f", itemScore);

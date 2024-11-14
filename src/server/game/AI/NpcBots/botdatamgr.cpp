@@ -2,6 +2,7 @@
 #include "BattlegroundQueue.h"
 #include "bot_ai.h"
 #include "botdatamgr.h"
+#include "botgearscore.h"
 #include "botlog.h"
 #include "botmgr.h"
 #include "botspell.h"
@@ -78,7 +79,32 @@ bool BotBankItemCompare::operator()(Item const* item1, Item const* item2) const
 {
     ItemTemplate const* proto1 = item1->GetTemplate();
     ItemTemplate const* proto2 = item2->GetTemplate();
-    return proto1->Name1 < proto2->Name1;
+
+    if (proto1->Class == proto2->Class)
+    {
+        if (proto1->SubClass == proto2->SubClass)
+        {
+            if (proto1->InventoryType == proto2->InventoryType)
+            {
+                if (proto1->Quality == proto2->Quality)
+                {
+                    float gs1 = CalculateItemGearScoreRaw(proto1);
+                    float gs2 = CalculateItemGearScoreRaw(proto1);
+                    if (gs1 == gs2)
+                    {
+                        if (proto1->Name1 == proto2->Name1)
+                            return item1->GetGUID().GetCounter() < item2->GetGUID().GetCounter();
+                        return proto1->Name1 < proto2->Name1;
+                    }
+                    return gs1 < gs2;
+                }
+                return proto1->Quality > proto2->Quality;
+            }
+            return proto1->InventoryType < proto2->InventoryType;
+        }
+        return proto1->SubClass < proto2->SubClass;
+    }
+    return proto1->Class < proto2->Class;
 }
 
 class BotBattlegroundEnterEvent : public BasicEvent
