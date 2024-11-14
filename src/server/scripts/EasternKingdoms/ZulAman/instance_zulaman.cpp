@@ -28,8 +28,6 @@ enum Misc
     WORLDSTATE_TIME_TO_SACRIFICE   = 3106
 };
 
-Position const HarrisonJonesLoc = {120.687f, 1674.0f, 42.0217f, 1.59044f};
-
 DoorData const doorData[] =
 {
     { GO_ZULJIN_FIREWALL, DATA_ZULJIN,  DOOR_TYPE_ROOM    },
@@ -42,6 +40,10 @@ DoorData const doorData[] =
 ObjectData const creatureData[] =
 {
     { NPC_SPIRIT_LYNX, DATA_SPIRIT_LYNX },
+    { NPC_KRAZ,        DATA_KRAZ        },
+    { NPC_TANZAR,      DATA_TANZAR      },
+    { NPC_HARKOR,      DATA_HARKOR      },
+    { NPC_ASHLI,       DATA_ASHLI       },
     { 0,               0                }
 };
 
@@ -92,6 +94,24 @@ public:
                 CheckInstanceStatus();
 
             InstanceScript::OnGameObjectCreate(go);
+        }
+
+        void KillHostages()
+        {
+            if (AllBossesDone({ DATA_NALORAKK, DATA_AKILZON, DATA_JANALAI, DATA_HALAZZI }))
+                return;
+
+            for (uint8 i = DATA_ASHLI; i < DATA_KRAZ; ++i)
+            {
+                Creature* hostage = GetCreature(i);
+                if (!hostage)
+                    break;
+
+                hostage->UpdateEntry(i + 24428);
+                hostage->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
+                hostage->CastSpell(hostage, SPELL_COSMETIC_IMMOLATION);
+                hostage->HandleEmoteCommand(EMOTE_STATE_DEAD); // Not confirmed
+            }
         }
 
         void DoAction(int32 actionId) override

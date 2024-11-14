@@ -463,6 +463,5 @@ struct npc_harrison_jones : public ScriptedAI
 void AddSC_zulaman()
 {
     RegisterZulAmanCreatureAI(npc_forest_frog);
-    new npc_zulaman_hostage();
     RegisterZulAmanCreatureAI(npc_harrison_jones);
 }

@@ -37,7 +37,11 @@ enum DataTypes
     TYPE_RAND_VENDOR_2                  = 9,
     DATA_STRANGE_GONG                   = 10,
     DATA_MASSIVE_GATE                   = 11,
-    DATA_HEXLORD_GATE                   = 12
+    DATA_HEXLORD_GATE                   = 12,
+    DATA_ASHLI                          = 13,
+    DATA_TANZAR                         = 14,
+    DATA_HARKOR                         = 15,
+    DATA_KRAZ                           = 16,
 };
 
 enum CreatureIds
@@ -52,7 +56,11 @@ enum CreatureIds
     NPC_AMANISHI_WARBRINGER             = 23580,
     NPC_AMANISHI_TRIBESMAN              = 23582,
     NPC_AMANISHI_MEDICINE_MAN           = 23581,
-    NPC_AMANISHI_AXE_THROWER            = 23542
+    NPC_AMANISHI_AXE_THROWER            = 23542,
+    NPC_ASHLI                           = 24001,
+    NPC_TANZAR                          = 23790,
+    NPC_HARKOR                          = 23999,
+    NPC_KRAZ                            = 24024,
 };
 
 enum GameobjectIds
@@ -63,10 +71,6 @@ enum GameobjectIds
     GO_MASSIVE_GATE                     = 186728,
     GO_DOOR_AKILZON                     = 186858,
     GO_ZULJIN_FIREWALL                  = 186859,
-    GO_HARKORS_SATCHEL                  = 187021,
-    GO_TANZARS_TRUNK                    = 186648,
-    GO_ASHLIS_BAG                       = 186672,
-    GO_KRAZS_PACKAGE                    = 186667,
     GO_STRANGE_GONG                     = 187359
 };
 
@@ -74,7 +78,8 @@ enum MiscIds
 {
     DATA_TIMED_RUN                      = 0,
     ACTION_START_TIMED_RUN              = 0,
-    GROUP_TIMED_RUN                     = 1
+    GROUP_TIMED_RUN                     = 1,
+    SPELL_COSMETIC_IMMOLATION           = 42726
 };
 
 uint32 constexpr PersistentDataCount = 1;
