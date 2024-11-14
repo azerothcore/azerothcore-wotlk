@@ -1,3 +1,4 @@
+-- DB update 2024_11_14_01 -> 2024_11_14_02
 --
 DELETE FROM `spell_script_names` WHERE `spell_id`=36450 AND `ScriptName`='spell_kaelthas_resurrection';
 DELETE FROM `spell_script_names` WHERE `spell_id`=36709 AND `ScriptName`='spell_kaelthas_kael_phase_two';
