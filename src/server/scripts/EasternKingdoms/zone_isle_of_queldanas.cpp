@@ -744,8 +744,6 @@ struct npc_irespeaker : public ScriptedAI
             context.Repeat(10s,25s);
         });
     }
-
-    
 };
 
 void AddSC_isle_of_queldanas()
