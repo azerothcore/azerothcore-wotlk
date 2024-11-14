@@ -692,7 +692,6 @@ struct npc_irespeaker : public ScriptedAI
 {
     npc_irespeaker(Creature* creature) : ScriptedAI(creature) {  }
 
-
     void Reset() override {
         scheduler.CancelAll(); // Cancel all tasks on death
     }
