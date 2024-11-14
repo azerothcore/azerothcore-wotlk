@@ -40,8 +40,7 @@ Notes:
 
 ## Edit module configuration (optional)
 
-If you need to change the module configuration, go to your server configuration folder (where your `worldserver` or `worldserver.exe` is)
-rename the file mod_ahbot.conf.dist to mod_ahbot.conf and edit it. This will change the overall behavior of the bot.
+If you need to change the module configuration, go to your server configuration folder (where your `worldserver` or `worldserver.exe` is) in `modules` you will have to copy and rename (the copy) the file `mod_ahbot.conf.dist` to `mod_ahbot.conf` and edit it. This will change the overall behavior of the bot.
 
 If you need to change a more specific value (for example the quotas of item sold), you will need to update values int the `mod_auctionhousebot` table or use the command line.
 
