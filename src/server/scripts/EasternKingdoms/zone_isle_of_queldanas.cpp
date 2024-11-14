@@ -809,5 +809,5 @@ void AddSC_isle_of_queldanas()
     new npc_greengill_slave();
 
     // IreSpeaker
-    new npc_irespeaker();
+    RegisterCreatureAI(npc_irespeaker);
 }
