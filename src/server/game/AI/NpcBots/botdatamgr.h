@@ -267,6 +267,7 @@ class BotDataMgr
         static void DepositBotBankItem(ObjectGuid playerGuid, Item* item);
         static void SaveNpcBotStoredGear(ObjectGuid playerGuid, CharacterDatabaseTransaction trans);
 
+        static uint32 GetBotItemSetsCount(ObjectGuid playerGuid);
         static BotItemSetsArray const* GetBotItemSets(ObjectGuid playerGuid);
         static NpcBotItemSet const* GetBotItemSet(ObjectGuid playerGuid, uint8 set_id);
         static NpcBotItemSet& CreateNewBotItemSet(ObjectGuid playerGuid);

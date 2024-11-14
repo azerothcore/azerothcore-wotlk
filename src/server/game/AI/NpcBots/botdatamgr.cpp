@@ -3261,6 +3261,13 @@ void BotDataMgr::SaveNpcBotStoredGear(ObjectGuid playerGuid, CharacterDatabaseTr
     }
 }
 
+uint32 BotDataMgr::GetBotItemSetsCount(ObjectGuid playerGuid)
+{
+    if (BotItemSetsArray const* item_sets = GetBotItemSets(playerGuid))
+        return std::ranges::count_if(NPCBots::index_array<uint8, MAX_BOT_EQUIPMENT_SETS>, [=](uint8 i) { return !!item_sets->at(i); });
+    return 0;
+}
+
 BotItemSetsArray const* BotDataMgr::GetBotItemSets(ObjectGuid playerGuid)
 {
     decltype(_botStoredGearSetMap)::const_iterator sci = _botStoredGearSetMap.find(playerGuid);
