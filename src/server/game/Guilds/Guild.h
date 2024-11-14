@@ -22,7 +22,6 @@
 #include "ObjectMgr.h"
 #include "Optional.h"
 #include "Player.h"
-#include "WorldPacket.h"
 #include <set>
 #include <unordered_map>
 
