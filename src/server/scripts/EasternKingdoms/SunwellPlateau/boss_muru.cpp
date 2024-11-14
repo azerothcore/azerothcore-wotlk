@@ -140,11 +140,11 @@ struct boss_entropius : public ScriptedAI
 
     void JustEngagedWith(Unit* /*who*/) override
     {
-        ScheduleTimedEvent(15s, [&] {
+        ScheduleTimedEvent(10s, [&] {
             DoCastRandomTarget(SPELL_DARKNESS, 0, 50.0f, true, true);
         }, 15s);
 
-        ScheduleTimedEvent(10s, [&] {
+        ScheduleTimedEvent(15s, [&] {
             DoCastRandomTarget(SPELL_BLACK_HOLE, 0, 50.0f, true, true);
         }, 15s);
     }
