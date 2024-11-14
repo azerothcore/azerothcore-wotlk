@@ -411,6 +411,7 @@ struct npc_harrison_jones : public ScriptedAI
             me->SetDynamicFlag(UNIT_DYNFLAG_DEAD);
             _instance->StorePersistentData(DATA_TIMED_RUN, 21);
             _instance->DoAction(ACTION_START_TIMED_RUN);
+            me->DespawnOrUnsummon(3min+30s, 0s);
         }
     }
 
