@@ -6936,6 +6936,8 @@ void Player::_ApplyWeaponDamage(uint8 slot, ItemTemplate const* proto, ScalingSt
 
         if (apply)
         {
+            sScriptMgr->OnApplyWeaponDamage(this, slot, proto, minDamage, maxDamage, i);
+
             if (minDamage > 0.f)
             {
                 SetBaseWeaponDamage(WeaponAttackType(attType), MINDAMAGE, minDamage, i);
