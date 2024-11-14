@@ -70,17 +70,8 @@ struct boss_brutallus : public BossAI
     void Reset() override
     {
         BossAI::Reset();
-        me->CastSpell(me, SPELL_DUAL_WIELD, true);
-    }
-
-    void DamageTaken(Unit* who, uint32& damage, DamageEffectType, SpellSchoolMask) override
-    {
-        if (me->GetReactState() == REACT_PASSIVE && (!who || who->GetEntry() != NPC_MADRIGOSA))
-        {
-            if (who)
-                Unit::Kill(me, who);
-            damage = 0;
-        }
+        DoCastSelf(SPELL_DUAL_WIELD, true);
+        me->m_Events.KillAllEvents(false);
     }
 
     void JustEngagedWith(Unit* who) override
@@ -91,10 +82,24 @@ struct boss_brutallus : public BossAI
         Talk(YELL_AGGRO);
         BossAI::JustEngagedWith(who);
 
-        events.ScheduleEvent(EVENT_SPELL_SLASH, 11000);
-        events.ScheduleEvent(EVENT_SPELL_STOMP, 30000);
-        events.ScheduleEvent(EVENT_SPELL_BURN, 45000);
-        events.ScheduleEvent(EVENT_SPELL_BERSERK, 360000);
+        ScheduleTimedEvent(11s, [&] {
+            DoCastVictim(SPELL_METEOR_SLASH);
+        }, 10s);
+
+        ScheduleTimedEvent(30s, [&] {
+            DoCastVictim(SPELL_STOMP);
+            Talk(YELL_LOVE);
+        }, 30s);
+
+        ScheduleTimedEvent(45s, [&] {
+            if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 100.0f, true, true, -SPELL_BURN_DAMAGE))
+                DoCast(target, SPELL_BURN);
+        }, 1min);
+
+        me->m_Events.AddEventAtOffset([&] {
+            DoCastSelf(SPELL_BERSERK, true);
+            Talk(YELL_BERSERK);
+        }, 6min);
     }
 
     void KilledUnit(Unit* victim) override
@@ -108,7 +113,7 @@ struct boss_brutallus : public BossAI
         BossAI::JustDied(killer);
         Talk(YELL_DEATH);
 
-        me->CastSpell(me, SPELL_SUMMON_BRUTALLUS_DEATH_CLOUD, true);
+        DoCastAOE(SPELL_SUMMON_BRUTALLUS_DEATH_CLOUD, true);
         if (Creature* madrigosa = instance->GetCreature(DATA_MADRIGOSA))
             madrigosa->AI()->DoAction(ACTION_SPAWN_FELMYST);
     }
@@ -118,40 +123,6 @@ struct boss_brutallus : public BossAI
         if (who->GetEntry() == NPC_MADRIGOSA)
             return;
         BossAI::AttackStart(who);
-    }
-
-    void UpdateAI(uint32 diff) override
-    {
-        if (!UpdateVictim())
-            return;
-
-        events.Update(diff);
-        if (me->HasUnitState(UNIT_STATE_CASTING))
-            return;
-
-        switch (events.ExecuteEvent())
-        {
-        case EVENT_SPELL_SLASH:
-            me->CastSpell(me->GetVictim(), SPELL_METEOR_SLASH, false);
-            events.ScheduleEvent(EVENT_SPELL_SLASH, 10000);
-            break;
-        case EVENT_SPELL_STOMP:
-            me->CastSpell(me->GetVictim(), SPELL_STOMP, false);
-            Talk(YELL_LOVE);
-            events.ScheduleEvent(EVENT_SPELL_STOMP, 30000);
-            break;
-        case EVENT_SPELL_BURN:
-            if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 100.0f, true, true, -SPELL_BURN_DAMAGE))
-                me->CastSpell(target, SPELL_BURN, false);
-            events.ScheduleEvent(EVENT_SPELL_BURN, 60000);
-            break;
-        case EVENT_SPELL_BERSERK:
-            me->CastSpell(me, SPELL_BERSERK, true);
-            Talk(YELL_BERSERK);
-            break;
-        }
-
-        DoMeleeAttackIfReady();
     }
 };
 
@@ -400,18 +371,13 @@ class spell_madrigosa_activate_barrier : public SpellScript
         {
             go->SetGoState(GO_STATE_READY);
             if (Map* map = go->GetMap())
-            {
-                Map::PlayerList const& PlayerList = map->GetPlayers();
-                for (Map::PlayerList::const_iterator i = PlayerList.begin(); i != PlayerList.end(); ++i)
-                    if (i->GetSource())
-                    {
-                        UpdateData data;
-                        WorldPacket pkt;
-                        go->BuildValuesUpdateBlockForPlayer(&data, i->GetSource());
-                        data.BuildPacket(pkt);
-                        i->GetSource()->GetSession()->SendPacket(&pkt);
-                    }
-            }
+                map->DoForAllPlayers([&](Player* player) {
+                    UpdateData data;
+                    WorldPacket pkt;
+                    go->BuildValuesUpdateBlockForPlayer(&data, player);
+                    data.BuildPacket(pkt);
+                    player->GetSession()->SendPacket(&pkt);
+                });
         }
     }
 
@@ -432,18 +398,13 @@ class spell_madrigosa_deactivate_barrier : public SpellScript
         {
             go->SetGoState(GO_STATE_ACTIVE);
             if (Map* map = go->GetMap())
-            {
-                Map::PlayerList const& PlayerList = map->GetPlayers();
-                for (Map::PlayerList::const_iterator i = PlayerList.begin(); i != PlayerList.end(); ++i)
-                    if (i->GetSource())
-                    {
-                        UpdateData data;
-                        WorldPacket pkt;
-                        go->BuildValuesUpdateBlockForPlayer(&data, i->GetSource());
-                        data.BuildPacket(pkt);
-                        i->GetSource()->GetSession()->SendPacket(&pkt);
-                    }
-            }
+                map->DoForAllPlayers([&](Player* player) {
+                    UpdateData data;
+                    WorldPacket pkt;
+                    go->BuildValuesUpdateBlockForPlayer(&data, player);
+                    data.BuildPacket(pkt);
+                    player->GetSession()->SendPacket(&pkt);
+                });
         }
     }
 
