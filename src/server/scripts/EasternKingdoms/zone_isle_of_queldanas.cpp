@@ -677,60 +677,6 @@ public:
     };
 };
 
-enum Spells
-{
-    SPELL_SHOOT = 6660,
-    SPELL_IMMOLATION = 35935
-};
-
-struct npc_dawnblade_marksman : public ScriptedAI
-{
-    npc_dawnblade_marksman(Creature* creature) : ScriptedAI(creature), _scheduler() { }
-
-    void Reset() override
-    {
-        _scheduler.Schedule(1s, [this](TaskContext context)
-        {
-            if (me->IsInCombat() && !me->IsWithinMeleeRange(me->GetVictim()))
-            {
-                DoCastVictim(SPELL_SHOOT);
-                context.Repeat(2s);
-            }
-        });
-
-        _scheduler.Schedule(3s, [this](TaskContext context)
-        {
-            if (me->IsInCombat() && !me->IsWithinMeleeRange(me->GetVictim()))
-            {
-                DoCastVictim(SPELL_IMMOLATION);
-                context.Repeat(10s);
-            }
-        });
-    }
-
-    void JustEngagedWith(Unit* who) override
-    {
-        AttackStart(who);
-        me->SetCanDualWield(false);
-    }
-
-    void UpdateAI(uint32 diff) override
-    {
-        _scheduler.Update(diff);
-
-        if (!UpdateVictim())
-            return;
-
-        if (me->IsWithinMeleeRange(me->GetVictim()))
-            DoMeleeAttackIfReady();
-        else
-            me->GetMotionMaster()->MoveChase(me->GetVictim(), 25.0f);
-    }
-
-private:
-    TaskScheduler _scheduler;
-};
-
 void AddSC_isle_of_queldanas()
 {
     // OUR:
@@ -740,6 +686,4 @@ void AddSC_isle_of_queldanas()
 
     // THEIR:
     new npc_greengill_slave();
-
-    RegisterCreatureAI(npc_dawnblade_marksman);
 }
