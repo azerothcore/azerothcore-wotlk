@@ -22,6 +22,7 @@
 #include "ArenaTeam.h"
 #include "AuctionHouseMgr.h"
 #include "Battleground.h"
+#include "ChatCommand.h"
 #include "Common.h"
 #include "DBCStores.h"
 #include "DynamicObject.h"
@@ -672,6 +673,7 @@ public: /* CommandSC */
 
     void OnHandleDevCommand(Player* player, bool& enable);
     bool OnTryExecuteCommand(ChatHandler& handler, std::string_view cmdStr);
+    bool OnBeforeIsInvokerVisible(std::string name, Acore::Impl::ChatCommands::CommandPermissions permissions, ChatHandler const& who);
 
 public: /* DatabaseScript */
 
