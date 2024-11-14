@@ -393,7 +393,11 @@ void InstanceScript::StorePersistentData(uint32 index, uint32 data)
         return;
     }
 
-    persistentData[index] = data;
+    if (persistentData[index] != data)
+    {
+        persistentData[index] = data;
+        SaveToDB();
+    }
 }
 
 void InstanceScript::DoForAllMinions(uint32 id, std::function<void(Creature*)> exec)
