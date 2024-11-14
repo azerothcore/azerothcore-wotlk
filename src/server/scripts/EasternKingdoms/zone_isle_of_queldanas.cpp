@@ -692,7 +692,7 @@ struct npc_irespeaker : public ScriptedAI
 {
     npc_irespeaker(Creature* creature) : ScriptedAI(creature), _scheduler() {  }
 
-    void JustEngagedWith(Unit* who) override
+    void JustEngagedWith(Unit* /*who*/ ) override
     {
         ScheduleFelFireball(); // Start with Fel Fireball if initially out of melee range
         ScheduleCurseOfWeakness(); // Start with Curse of Weakness if in melee range
