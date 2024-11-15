@@ -19,7 +19,6 @@
 #define AC_MOVESPLINEINIT_ARGS_H
 
 #include "MoveSplineFlag.h"
-#include "Optional.h"
 #include <G3D/Vector3.h>
 
 class Unit;
@@ -50,7 +49,7 @@ namespace Movement
         }
 
         PointsArray path;
-        Optional<FacingInfo> facing;
+        FacingInfo facing;
         MoveSplineFlag flags;
         int32 path_Idx_offset{0};
         float velocity{0.f};

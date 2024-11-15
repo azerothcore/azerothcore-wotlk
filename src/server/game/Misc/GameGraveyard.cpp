@@ -59,7 +59,7 @@ void Graveyard::LoadGraveyardFromDB()
 
         if (!Utf8toWStr(Graveyard.name, Graveyard.wnameLow))
         {
-            LOG_ERROR("sql.sql", "Wrong UTF8 name for id {} in `game_graveyard` table, ignoring.", ID);
+            LOG_ERROR("sql.sql", "Wrong UTF8 name for id {} in `game_graveyard` table, ignoring.", Graveyard.ID);
             continue;
         }
 
