@@ -501,7 +501,10 @@ struct npc_harrison_jones : public ScriptedAI
                     }
 
                     if (GameObject* gate = _instance->GetGameObject(DATA_MASSIVE_GATE))
+                    {
+                        gate->AllowSaveToDB(true);
                         gate->SetGoState(GO_STATE_ACTIVE);
+                    }
                     _gongTimer = 2000;
                     _gongEvent = GONG_EVENT_8;
                     break;
