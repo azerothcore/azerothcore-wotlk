@@ -97,21 +97,8 @@ enum Misc
     PHASE_ARMAGEDDON                = 4,
     PHASE_SACRIFICE                 = 5,
 
-    EVENT_GROUP_SPEACH              = 1,
     ACTION_START_POST_EVENT         = 1,
     ACTION_NO_KILL_TALK             = 2,
-
-    // Text events
-    EVENT_TEXT_SPEACH11             = 1,
-    EVENT_TEXT_SPEACH31             = 5,
-    EVENT_TEXT_SPEACH32             = 6,
-    EVENT_TEXT_SPEACH33             = 7,
-    EVENT_TEXT_SPEACH41             = 8,
-    EVENT_TEXT_SPEACH42             = 9,
-    EVENT_TEXT_SPEACH43             = 10,
-    EVENT_TEXT_SPEACH44             = 11,
-    EVENT_TEXT_SPEACH45             = 12,
-    EVENT_TEXT_SPEACH46             = 13,
 
     // Controller events
     EVENT_RANDOM_TALK               = 40,
