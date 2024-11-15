@@ -120,10 +120,6 @@ enum Misc
     // Misc fight events
     EVENT_REBIRTH                   = 50,
     EVENT_INIT_FIGHT                = 51,
-    EVENT_CHECK_HEALTH55            = 53,
-    EVENT_CHECK_HEALTH25            = 54,
-    EVENT_EMPOWER_ORBS1             = 55,
-    EVENT_EMPOWER_ORBS2             = 56,
     EVENT_EMPOWER_ORBS3             = 57,
     EVENT_RESTORE_MELEE             = 58,
     EVENT_KILL_SELF                 = 59,
@@ -134,8 +130,6 @@ enum Misc
     EVENT_SPELL_LEGION_LIGHTNING    = 101,
     EVENT_SPELL_FIRE_BLOOM          = 102,
     EVENT_SUMMON_ORBS               = 103,
-    EVENT_SPELL_DARKNESS            = 107,
-    EVENT_SPELL_ARMAGEDDON          = 108,
 };
 
 class CastArmageddon : public BasicEvent
@@ -260,14 +254,11 @@ struct boss_kiljaeden : public BossAI
     }
 
     EventMap events2;
-    uint8 phase;
 
     void InitializeAI() override
     {
         ScriptedAI::InitializeAI();
         me->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
-
-        phase = PHASE_NORMAL;
         events.Reset();
         events2.Reset();
         events2.ScheduleEvent(EVENT_INIT_FIGHT, 11000);
@@ -280,8 +271,6 @@ struct boss_kiljaeden : public BossAI
         events.Reset();
 
         ScheduleHealthCheckEvent(85, [&]{
-            phase = PHASE_DARKNESS;
-
             if (Creature* kalec = instance->GetCreature(DATA_KALECGOS_KJ))
                 kalec->AI()->Talk(SAY_KALECGOS_AWAKEN, 16s);
 
@@ -290,9 +279,13 @@ struct boss_kiljaeden : public BossAI
 
             Talk(SAY_KJ_PHASE3, 28s);
 
-            events2.RescheduleEvent(EVENT_EMPOWER_ORBS1, 35000);
+            scheduler.CancelAll();
 
-            events.RescheduleEvent(EVENT_SPELL_DARKNESS, 16000); // will be delayed by 29 secs
+            me->m_Events.AddEventAtOffset([&] {
+                if (Creature* kalec = instance->GetCreature(DATA_KALECGOS_KJ))
+                    kalec->AI()->Talk(SAY_KALECGOS_READY1);
+                EmpowerOrb(false);
+            }, 35s);
 
             me->m_Events.AddEventAtOffset([&] {
                 Talk(SAY_KJ_REFLECTION);
@@ -309,7 +302,112 @@ struct boss_kiljaeden : public BossAI
             ScheduleTimedEvent(3s, [&] {
                 DoCastSelf(SPELL_FLAME_DART);
             }, 10s);
-        });  
+
+            ScheduleTimedEvent(16s, [&] {
+                Talk(EMOTE_KJ_DARKNESS);
+                DoCastAOE(SPELL_DARKNESS_OF_A_THOUSAND_SOULS);
+            }, 45s);
+        });
+
+        ScheduleHealthCheckEvent(55, [&] {
+            if (Creature* kalec = instance->GetCreature(DATA_KALECGOS_KJ))
+                kalec->AI()->Talk(SAY_KALECGOS_LETGO, 16s);
+
+            if (Creature* anveena = instance->GetCreature(DATA_ANVEENA))
+                anveena->AI()->Talk(SAY_ANVEENA_LOST, 22s);
+
+            Talk(SAY_KJ_PHASE4, 28s);
+
+            scheduler.CancelAll();
+
+            me->m_Events.AddEventAtOffset([&] {
+                if (Creature* kalec = instance->GetCreature(DATA_KALECGOS_KJ))
+                    kalec->AI()->Talk(SAY_KALECGOS_READY2);
+                EmpowerOrb(false);
+            }, 35s);
+
+            me->m_Events.AddEventAtOffset([&] {
+                Talk(SAY_KJ_REFLECTION);
+                me->CastCustomSpell(SPELL_SINISTER_REFLECTION, SPELLVALUE_MAX_TARGETS, 1, me, TRIGGERED_NONE);
+                me->CastCustomSpell(SPELL_SINISTER_REFLECTION, SPELLVALUE_MAX_TARGETS, 1, me, TRIGGERED_NONE);
+                me->CastCustomSpell(SPELL_SINISTER_REFLECTION, SPELLVALUE_MAX_TARGETS, 1, me, TRIGGERED_NONE);
+                me->CastCustomSpell(SPELL_SINISTER_REFLECTION, SPELLVALUE_MAX_TARGETS, 1, me, TRIGGERED_NONE);
+            }, 1s);
+
+            me->m_Events.AddEventAtOffset([&] {
+                DoCastSelf(SPELL_SHADOW_SPIKE);
+            }, 1200ms);
+
+            ScheduleTimedEvent(15s, [&] {
+                Talk(EMOTE_KJ_DARKNESS);
+                DoCastAOE(SPELL_DARKNESS_OF_A_THOUSAND_SOULS);
+            }, 45s);
+
+            ScheduleTimedEvent(10s, [&] {
+                DoCastSelf(SPELL_ARMAGEDDON_PERIODIC, true);
+            }, 40s);
+        });
+
+        ScheduleHealthCheckEvent(25, [&] {
+            if (Creature* kalec = instance->GetCreature(DATA_KALECGOS_KJ))
+            {
+                kalec->AI()->Talk(SAY_KALECGOS_FOCUS, 8s);
+                kalec->AI()->Talk(SAY_KALECGOS_FATE, 20s + 200ms);
+            }
+
+            if (Creature* anveena = instance->GetCreature(DATA_ANVEENA))
+            {
+                anveena->AI()->Talk(SAY_ANVEENA_KALEC, 18s);
+                anveena->AI()->Talk(SAY_ANVEENA_GOODBYE, 25s);
+            }
+
+            me->m_Events.AddEventAtOffset([&] {
+                if (Creature* anveena = instance->GetCreature(DATA_ANVEENA))
+                {
+                    anveena->RemoveAllAuras();
+                    anveena->DespawnOrUnsummon(3500);
+                }
+            }, 28s);
+
+            me->m_Events.AddEventAtOffset([&] {
+                if (Creature* anveena = instance->GetCreature(DATA_ANVEENA))
+                {
+                    anveena->CastSpell(anveena, SPELL_SACRIFICE_OF_ANVEENA, true);
+                    me->CastSpell(me, SPELL_CUSTOM_08_STATE, true);
+                    me->SetUnitFlag(UNIT_FLAG_PACIFIED);
+                    events.DelayEvents(7001);
+                    events2.ScheduleEvent(EVENT_RESTORE_MELEE, 7000);
+                }
+                Talk(SAY_KJ_PHASE5);
+            }, 30s);
+
+            events2.RescheduleEvent(EVENT_EMPOWER_ORBS3, 61000);
+
+            me->m_Events.AddEventAtOffset([&] {
+                Talk(SAY_KJ_REFLECTION);
+                me->CastCustomSpell(SPELL_SINISTER_REFLECTION, SPELLVALUE_MAX_TARGETS, 1, me, TRIGGERED_NONE);
+                me->CastCustomSpell(SPELL_SINISTER_REFLECTION, SPELLVALUE_MAX_TARGETS, 1, me, TRIGGERED_NONE);
+                me->CastCustomSpell(SPELL_SINISTER_REFLECTION, SPELLVALUE_MAX_TARGETS, 1, me, TRIGGERED_NONE);
+                me->CastCustomSpell(SPELL_SINISTER_REFLECTION, SPELLVALUE_MAX_TARGETS, 1, me, TRIGGERED_NONE);
+            }, 1s);
+
+            ScheduleTimedEvent(15s, [&] {
+                Talk(EMOTE_KJ_DARKNESS);
+                DoCastAOE(SPELL_DARKNESS_OF_A_THOUSAND_SOULS);
+            }, 25s);
+
+            ScheduleTimedEvent(1500ms, [&] {
+                DoCastSelf(SPELL_ARMAGEDDON_PERIODIC, true);
+            }, 20s);
+        });
+    }
+
+    void ScheduleBasicAbilities()
+    {
+        events.ScheduleEvent(EVENT_SPELL_SOUL_FLAY, 0);
+        events.ScheduleEvent(EVENT_SPELL_LEGION_LIGHTNING, 7000);
+        events.ScheduleEvent(EVENT_SPELL_FIRE_BLOOM, 9000);
+        events.ScheduleEvent(EVENT_SUMMON_ORBS, 10000);
     }
 
     void EnterEvadeMode(EvadeReason why) override
@@ -372,16 +470,11 @@ struct boss_kiljaeden : public BossAI
 
     void JustEngagedWith(Unit* /*who*/) override
     {
-        events2.ScheduleEvent(EVENT_TEXT_SPEACH11, 26000, EVENT_GROUP_SPEACH);
-        Talk(SAY_KJ_EMERGE);
+        if (Creature* kalec = instance->GetCreature(DATA_KALECGOS_KJ))
+            kalec->AI()->Talk(SAY_KALECGOS_JOIN, 26s);
 
-        events.SetTimer(200000);
-        events.ScheduleEvent(EVENT_CHECK_HEALTH55, 1000);
-        events.ScheduleEvent(EVENT_CHECK_HEALTH25, 1000);
-        events.ScheduleEvent(EVENT_SPELL_SOUL_FLAY, 0);
-        events.ScheduleEvent(EVENT_SPELL_LEGION_LIGHTNING, 7000);
-        events.ScheduleEvent(EVENT_SPELL_FIRE_BLOOM, 9000);
-        events.ScheduleEvent(EVENT_SUMMON_ORBS, 10000);
+        Talk(SAY_KJ_EMERGE);
+        ScheduleBasicAbilities();
     }
 
     void JustSummoned(Creature* summon) override
@@ -409,16 +502,6 @@ struct boss_kiljaeden : public BossAI
             me->SetVisible(true);
             me->CastSpell(me, SPELL_REBIRTH, false);
             break;
-        case EVENT_EMPOWER_ORBS1:
-            if (Creature* kalec = instance->GetCreature(DATA_KALECGOS_KJ))
-                kalec->AI()->Talk(SAY_KALECGOS_READY1);
-            EmpowerOrb(false);
-            break;
-        case EVENT_EMPOWER_ORBS2:
-            if (Creature* kalec = instance->GetCreature(DATA_KALECGOS_KJ))
-                kalec->AI()->Talk(SAY_KALECGOS_READY2);
-            EmpowerOrb(false);
-            break;
         case EVENT_EMPOWER_ORBS3:
             if (Creature* kalec = instance->GetCreature(DATA_KALECGOS_KJ))
                 kalec->AI()->Talk(SAY_KALECGOS_READY_ALL);
@@ -429,55 +512,6 @@ struct boss_kiljaeden : public BossAI
             me->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
             me->SetInCombatWithZone();
             return;
-        case EVENT_TEXT_SPEACH11:
-            if (Creature* kalec = instance->GetCreature(DATA_KALECGOS_KJ))
-                kalec->AI()->Talk(SAY_KALECGOS_JOIN);
-            break;
-        case EVENT_TEXT_SPEACH31:
-            if (Creature* kalec = instance->GetCreature(DATA_KALECGOS_KJ))
-                kalec->AI()->Talk(SAY_KALECGOS_LETGO);
-            break;
-        case EVENT_TEXT_SPEACH32:
-            if (Creature* anveena = instance->GetCreature(DATA_ANVEENA))
-                sCreatureTextMgr->SendChat(anveena, SAY_ANVEENA_LOST, nullptr, CHAT_MSG_ADDON, LANG_ADDON, TEXT_RANGE_ZONE);
-            break;
-        case EVENT_TEXT_SPEACH33:
-            Talk(SAY_KJ_PHASE4);
-            break;
-        case EVENT_TEXT_SPEACH41:
-            if (Creature* kalec = instance->GetCreature(DATA_KALECGOS_KJ))
-                kalec->AI()->Talk(SAY_KALECGOS_FOCUS);
-            break;
-        case EVENT_TEXT_SPEACH42:
-            if (Creature* anveena = instance->GetCreature(DATA_ANVEENA))
-                sCreatureTextMgr->SendChat(anveena, SAY_ANVEENA_KALEC, nullptr, CHAT_MSG_ADDON, LANG_ADDON, TEXT_RANGE_ZONE);
-            break;
-        case EVENT_TEXT_SPEACH43:
-            if (Creature* kalec = instance->GetCreature(DATA_KALECGOS_KJ))
-                kalec->AI()->Talk(SAY_KALECGOS_FATE);
-            break;
-        case EVENT_TEXT_SPEACH44:
-            if (Creature* anveena = instance->GetCreature(DATA_ANVEENA))
-                sCreatureTextMgr->SendChat(anveena, SAY_ANVEENA_GOODBYE, nullptr, CHAT_MSG_ADDON, LANG_ADDON, TEXT_RANGE_ZONE);
-            break;
-        case EVENT_TEXT_SPEACH45:
-            if (Creature* anveena = instance->GetCreature(DATA_ANVEENA))
-            {
-                anveena->RemoveAllAuras();
-                anveena->DespawnOrUnsummon(3500);
-            }
-            break;
-        case EVENT_TEXT_SPEACH46:
-            if (Creature* anveena = instance->GetCreature(DATA_ANVEENA))
-            {
-                anveena->CastSpell(anveena, SPELL_SACRIFICE_OF_ANVEENA, true);
-                me->CastSpell(me, SPELL_CUSTOM_08_STATE, true);
-                me->SetUnitFlag(UNIT_FLAG_PACIFIED);
-                events.DelayEvents(7001);
-                events2.ScheduleEvent(EVENT_RESTORE_MELEE, 7000);
-            }
-            Talk(SAY_KJ_PHASE5);
-            break;
         case EVENT_RESTORE_MELEE:
             me->RemoveAurasDueToSpell(SPELL_CUSTOM_08_STATE);
             me->RemoveUnitFlag(UNIT_FLAG_PACIFIED);
@@ -496,49 +530,6 @@ struct boss_kiljaeden : public BossAI
 
         switch (events.ExecuteEvent())
         {
-        case EVENT_CHECK_HEALTH55:
-            if (me->HealthBelowPct(55))
-            {
-                phase = PHASE_ARMAGEDDON;
-                events2.CancelEventGroup(EVENT_GROUP_SPEACH);
-                events2.ScheduleEvent(EVENT_TEXT_SPEACH31, 16000, EVENT_GROUP_SPEACH);
-                events2.ScheduleEvent(EVENT_TEXT_SPEACH32, 22000, EVENT_GROUP_SPEACH);
-                events2.ScheduleEvent(EVENT_TEXT_SPEACH33, 28000, EVENT_GROUP_SPEACH);
-                events2.RescheduleEvent(EVENT_EMPOWER_ORBS2, 35000);
-
-                events.DelayEvents(2000);
-                //events.ScheduleEvent(EVENT_SPELL_SINISTER_REFLECTION, 500);
-                //events.ScheduleEvent(EVENT_SPELL_SHADOW_SPIKE, 1200);
-                events.RescheduleEvent(EVENT_SPELL_DARKNESS, 15000); // will be delayed by 29 secs
-                events.ScheduleEvent(EVENT_SPELL_ARMAGEDDON, 10000);
-                break;
-            }
-            events.ScheduleEvent(EVENT_CHECK_HEALTH55, 0);
-            break;
-
-        case EVENT_CHECK_HEALTH25:
-            if (me->HealthBelowPct(25))
-            {
-                phase = PHASE_SACRIFICE;
-                events2.CancelEventGroup(EVENT_GROUP_SPEACH);
-                events2.ScheduleEvent(EVENT_TEXT_SPEACH41, 8000, EVENT_GROUP_SPEACH);
-                events2.ScheduleEvent(EVENT_TEXT_SPEACH42, 18000, EVENT_GROUP_SPEACH);
-                events2.ScheduleEvent(EVENT_TEXT_SPEACH43, 20200, EVENT_GROUP_SPEACH);
-                events2.ScheduleEvent(EVENT_TEXT_SPEACH44, 25000, EVENT_GROUP_SPEACH);
-                events2.ScheduleEvent(EVENT_TEXT_SPEACH45, 28000, EVENT_GROUP_SPEACH);
-                events2.ScheduleEvent(EVENT_TEXT_SPEACH46, 30000, EVENT_GROUP_SPEACH);
-                events2.RescheduleEvent(EVENT_EMPOWER_ORBS3, 61000);
-
-                events.CancelEvent(EVENT_SUMMON_ORBS);
-                events.DelayEvents(4000);
-                //events.ScheduleEvent(EVENT_SPELL_SINISTER_REFLECTION, 500);
-                //events.ScheduleEvent(EVENT_SPELL_SHADOW_SPIKE, 1200);
-                events.RescheduleEvent(EVENT_SPELL_DARKNESS, 15000); // will be delayed by 29 secs
-                events.ScheduleEvent(EVENT_SPELL_ARMAGEDDON, 1500);
-                break;
-            }
-            events.ScheduleEvent(EVENT_CHECK_HEALTH25, 0);
-            break;
         case EVENT_SPELL_SOUL_FLAY:
             me->CastSpell(me->GetVictim(), SPELL_SOUL_FLAY, false);
             events.ScheduleEvent(EVENT_SPELL_SOUL_FLAY, urand(4000, 5000));
@@ -580,17 +571,6 @@ struct boss_kiljaeden : public BossAI
                 }
             }
             events.ScheduleEvent(EVENT_SUMMON_ORBS, 40000);
-            break;
-
-        case EVENT_SPELL_DARKNESS:
-            Talk(EMOTE_KJ_DARKNESS);
-            me->CastSpell(me, SPELL_DARKNESS_OF_A_THOUSAND_SOULS, false);
-            events.ScheduleEvent(EVENT_SPELL_DARKNESS, phase == PHASE_SACRIFICE ? 20000 : 45000);
-            events.DelayEvents(8000);
-            break;
-        case EVENT_SPELL_ARMAGEDDON:
-            me->CastSpell(me, SPELL_ARMAGEDDON_PERIODIC, true);
-            events.ScheduleEvent(EVENT_SPELL_ARMAGEDDON, phase == PHASE_SACRIFICE ? 20000 : 40000);
             break;
         }
 
