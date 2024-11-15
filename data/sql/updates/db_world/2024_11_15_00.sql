@@ -1,3 +1,4 @@
+-- DB update 2024_11_14_05 -> 2024_11_15_00
 SET @entry := 17109;
 SET @PATH := @entry * 10;
 DELETE FROM `waypoints` WHERE `entry`= @PATH;
