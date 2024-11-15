@@ -22,16 +22,10 @@
 #include "Player.h"
 #include "SpellScriptLoader.h"
 #include "zulaman.h"
-/* ScriptData
-SDName: Boss_Hex_Lord_Malacrass
-SD%Complete:
-SDComment:
-SDCategory: Zul'Aman
-EndScriptData */
 
 enum Says
 {
-    SAY_AGGRO = 0,
+    SAY_AGGRO,
     SAY_KILL_ONE,
     SAY_KILL_TWO,
     SAY_DRAIN_POWER,
@@ -117,23 +111,23 @@ enum Spells
     // Death Knight
     SPELL_DK_PLAGUE_STRIKE          = 57599,
     SPELL_DK_DEATH_AND_DECAY        = 43265,
-    SPELL_DK_BLOOD_WORMS            = 97630,
+    SPELL_DK_BLOOD_WORMS            = 97630
 };
 
-const Position addPosition[4] =
+const Position AddPosition[4] =
 {
-    {112.8827f, 921.2795f, 33.8883f, 1.5696f},
-    {107.8827f, 921.2795f, 33.8883f, 1.5696f},
-    {122.8827f, 921.2795f, 33.8883f, 1.5696f},
-    {127.8827f, 921.2795f, 33.8883f, 1.5696f}
+    { 128.48448f, 923.04285f, 33.97255f,  1.588249564170837402f },
+    { 122.60526f, 923.24536f, 33.97256f,  1.570796370506286621f },
+    { 111.69282f, 923.15314f, 33.972576f, 1.570796370506286621f },
+    { 105.40299f, 923.3421f,  33.972588f, 1.553343057632446289f }
 };
 
-static uint32 addEntrySets[4][2] =
+static uint32 AddEntrySets[4][2] =
 {
-    {NPC_THURG,         NPC_ALYSON_ANTILLE  },
-    {NPC_LORD_RADAAN,   NPC_SLITHER         },
-    {NPC_GAZAKROTH,     NPC_FENSTALKER      },
-    {NPC_DARKHEART,     NPC_KORAGG          }
+    { NPC_THURG,         NPC_ALYSON_ANTILLE  },
+    { NPC_LORD_RADAAN,   NPC_SLITHER         },
+    { NPC_GAZAKROTH,     NPC_FENSTALKER      },
+    { NPC_DARKHEART,     NPC_KORAGG          }
 };
 
 enum Misc
@@ -145,11 +139,11 @@ enum Misc
 
 enum AbilityTarget
 {
-    ABILITY_TARGET_SELF = 0,
-    ABILITY_TARGET_VICTIM = 1,
-    ABILITY_TARGET_ENEMY = 2,
-    ABILITY_TARGET_HEAL = 3,
-    ABILITY_TARGET_BUFF = 4,
+    ABILITY_TARGET_SELF    = 0,
+    ABILITY_TARGET_VICTIM  = 1,
+    ABILITY_TARGET_ENEMY   = 2,
+    ABILITY_TARGET_HEAL    = 3,
+    ABILITY_TARGET_BUFF    = 4,
     ABILITY_TARGET_SPECIAL = 5
 };
 
@@ -163,66 +157,66 @@ struct PlayerAbilityStruct
 static PlayerAbilityStruct PlayerAbility[12][3] =
 {
     // 1 warrior
-    {   {SPELL_WR_SPELL_REFLECT, ABILITY_TARGET_SELF, 10000ms},
-        {SPELL_WR_WHIRLWIND, ABILITY_TARGET_SELF, 10000ms},
-        {SPELL_WR_MORTAL_STRIKE, ABILITY_TARGET_VICTIM, 6000ms}
+    {   { SPELL_WR_SPELL_REFLECT, ABILITY_TARGET_SELF,   10000ms },
+        { SPELL_WR_WHIRLWIND,     ABILITY_TARGET_SELF,   10000ms },
+        { SPELL_WR_MORTAL_STRIKE, ABILITY_TARGET_VICTIM, 6000ms  }
     },
     // 2 paladin
-    {   {SPELL_PA_CONSECRATION, ABILITY_TARGET_SELF, 10000ms},
-        {SPELL_PA_HOLY_LIGHT, ABILITY_TARGET_HEAL, 10000ms},
-        {SPELL_PA_AVENGING_WRATH, ABILITY_TARGET_SELF, 10000ms}
+    {   { SPELL_PA_CONSECRATION,   ABILITY_TARGET_SELF, 10000ms },
+        { SPELL_PA_HOLY_LIGHT,     ABILITY_TARGET_HEAL, 10000ms },
+        { SPELL_PA_AVENGING_WRATH, ABILITY_TARGET_SELF, 10000ms }
     },
     // 3 hunter
-    {   {SPELL_HU_EXPLOSIVE_TRAP, ABILITY_TARGET_SELF, 10000ms},
-        {SPELL_HU_FREEZING_TRAP, ABILITY_TARGET_SELF, 10000ms},
-        {SPELL_HU_SNAKE_TRAP, ABILITY_TARGET_SELF, 10000ms}
+    {   { SPELL_HU_EXPLOSIVE_TRAP, ABILITY_TARGET_SELF, 10000ms },
+        { SPELL_HU_FREEZING_TRAP,  ABILITY_TARGET_SELF, 10000ms },
+        { SPELL_HU_SNAKE_TRAP,     ABILITY_TARGET_SELF, 10000ms }
     },
     // 4 rogue
-    {   {SPELL_RO_WOUND_POISON, ABILITY_TARGET_VICTIM, 3000ms},
-        {SPELL_RO_SLICE_DICE, ABILITY_TARGET_SELF, 10000ms},
-        {SPELL_RO_BLIND, ABILITY_TARGET_ENEMY, 10000ms}
+    {   { SPELL_RO_WOUND_POISON, ABILITY_TARGET_VICTIM, 3000ms  },
+        { SPELL_RO_SLICE_DICE,   ABILITY_TARGET_SELF,   10000ms },
+        { SPELL_RO_BLIND,        ABILITY_TARGET_ENEMY,  10000ms }
     },
     // 5 priest
-    {   {SPELL_PR_PAIN_SUPP, ABILITY_TARGET_HEAL, 10000ms},
-        {SPELL_PR_HEAL, ABILITY_TARGET_HEAL, 10000ms},
-        {SPELL_PR_PSYCHIC_SCREAM, ABILITY_TARGET_SELF, 10000ms}
+    {   { SPELL_PR_PAIN_SUPP,      ABILITY_TARGET_HEAL, 10000ms },
+        { SPELL_PR_HEAL,           ABILITY_TARGET_HEAL, 10000ms },
+        { SPELL_PR_PSYCHIC_SCREAM, ABILITY_TARGET_SELF, 10000ms }
     },
     // 6 death knight
     {
-        {SPELL_DK_PLAGUE_STRIKE, ABILITY_TARGET_ENEMY, 2000ms},
-        {SPELL_DK_DEATH_AND_DECAY, ABILITY_TARGET_SELF, 10000ms},
-        {SPELL_DK_BLOOD_WORMS, ABILITY_TARGET_ENEMY, 5000ms}
+        { SPELL_DK_PLAGUE_STRIKE,   ABILITY_TARGET_ENEMY, 2000ms },
+        { SPELL_DK_DEATH_AND_DECAY, ABILITY_TARGET_SELF, 10000ms },
+        { SPELL_DK_BLOOD_WORMS,     ABILITY_TARGET_ENEMY, 5000ms }
     },
     // 7 shaman
-    {   {SPELL_SH_FIRE_NOVA, ABILITY_TARGET_SELF, 10000ms},
-        {SPELL_SH_HEALING_WAVE, ABILITY_TARGET_HEAL, 10000ms},
-        {SPELL_SH_CHAIN_LIGHT, ABILITY_TARGET_ENEMY, 8000ms}
+    {   { SPELL_SH_FIRE_NOVA,    ABILITY_TARGET_SELF, 10000ms },
+        { SPELL_SH_HEALING_WAVE, ABILITY_TARGET_HEAL, 10000ms },
+        { SPELL_SH_CHAIN_LIGHT,  ABILITY_TARGET_ENEMY, 8000ms }
     },
     // 8 mage
-    {   {SPELL_MG_FIREBALL, ABILITY_TARGET_ENEMY, 5000ms},
-        {SPELL_MG_FROSTBOLT, ABILITY_TARGET_ENEMY, 5000ms},
-        {SPELL_MG_ICE_LANCE, ABILITY_TARGET_SPECIAL, 2000ms}
+    {   { SPELL_MG_FIREBALL,  ABILITY_TARGET_ENEMY, 5000ms   },
+        { SPELL_MG_FROSTBOLT, ABILITY_TARGET_ENEMY, 5000ms   },
+        { SPELL_MG_ICE_LANCE, ABILITY_TARGET_SPECIAL, 2000ms }
     },
     // 9 warlock
-    {   {SPELL_WL_CURSE_OF_DOOM, ABILITY_TARGET_ENEMY, 10000ms},
-        {SPELL_WL_RAIN_OF_FIRE, ABILITY_TARGET_ENEMY, 10000ms},
-        {SPELL_WL_UNSTABLE_AFFL, ABILITY_TARGET_ENEMY, 10000ms}
+    {   { SPELL_WL_CURSE_OF_DOOM, ABILITY_TARGET_ENEMY, 10000ms },
+        { SPELL_WL_RAIN_OF_FIRE,  ABILITY_TARGET_ENEMY, 10000ms },
+        { SPELL_WL_UNSTABLE_AFFL, ABILITY_TARGET_ENEMY, 10000ms }
     },
     // 10 UNK class (should never be set)
     {
-        {0, ABILITY_TARGET_SELF, 0ms},
-        {0, ABILITY_TARGET_SELF, 0ms},
-        {0, ABILITY_TARGET_SELF, 0ms}
+        { 0, ABILITY_TARGET_SELF, 0ms},
+        { 0, ABILITY_TARGET_SELF, 0ms},
+        { 0, ABILITY_TARGET_SELF, 0ms}
     },
     // 11 druid
-    {   {SPELL_DR_LIFEBLOOM, ABILITY_TARGET_HEAL, 10000ms},
-        {SPELL_DR_THORNS, ABILITY_TARGET_SELF, 10000ms},
-        {SPELL_DR_MOONFIRE, ABILITY_TARGET_ENEMY, 8000ms}
+    {   { SPELL_DR_LIFEBLOOM, ABILITY_TARGET_HEAL, 10000ms },
+        { SPELL_DR_THORNS,    ABILITY_TARGET_SELF, 10000ms },
+        { SPELL_DR_MOONFIRE,  ABILITY_TARGET_ENEMY, 8000ms }
     },
     // MISC shadow priest
-    {   {SPELL_PR_MIND_CONTROL, ABILITY_TARGET_ENEMY, 15000ms},
-        {SPELL_PR_MIND_BLAST, ABILITY_TARGET_ENEMY, 5000ms},
-        {SPELL_PR_SW_DEATH, ABILITY_TARGET_ENEMY, 10000ms}
+    {   { SPELL_PR_MIND_CONTROL, ABILITY_TARGET_ENEMY, 15000ms },
+        { SPELL_PR_MIND_BLAST,   ABILITY_TARGET_ENEMY, 5000ms  },
+        { SPELL_PR_SW_DEATH,     ABILITY_TARGET_ENEMY, 10000ms }
     }
 };
 
@@ -243,7 +237,7 @@ struct boss_hexlord_malacrass : public BossAI
         for (uint8 i = 0; i < MAX_ADD_COUNT; ++i)
         {
             uint8 flip = urand(0, 1);
-            me->SummonCreature(addEntrySets[i][flip], addPosition[i], TEMPSUMMON_DEAD_DESPAWN, 0);
+            me->SummonCreature(AddEntrySets[i][flip], AddPosition[i], TEMPSUMMON_DEAD_DESPAWN, 0);
         }
     }
 
@@ -274,21 +268,14 @@ struct boss_hexlord_malacrass : public BossAI
                         siphonTrigger->AI()->DoCast(target, SPELL_SIPHON_SOUL, true);
                         siphonTrigger->GetMotionMaster()->MoveChase(me);
                         if (Player* player = target->ToPlayer())
-                        {
-                            if (player->HasAura(AURA_SHADOW_FORM))
-                                _currentClass = ADDITIONAL_CLASS_SPRIEST;
-                            else
-                                _currentClass = player->getClass() - 1;
-                        }
+                            _currentClass = player->HasAura(AURA_SHADOW_FORM) ? ADDITIONAL_CLASS_SPRIEST : player->getClass() - 1;
                     }
                 }
             });
         }, 40s);
         ScheduleTimedEvent(_classAbilityTimer, [&]{
             if (_currentClass)
-            {
                 UseAbility();
-            }
         }, _classAbilityTimer);
     }
 
