@@ -1663,30 +1663,21 @@ public:
         }
     };
 };
-class spell_spiritual_insight : public SpellScriptLoader
+class spell_spiritual_insight : public SpellScript
 {
-public:
-    spell_spiritual_insight() : SpellScriptLoader("spell_spiritual_insight") {}
+    PrepareSpellScript(spell_spiritual_insight);
 
-    class spell_spiritual_insight_SpellScript : public SpellScript
+    void HandleApplyTouch()
     {
-        PrepareSpellScript(spell_spiritual_insight_SpellScript);
-
-        void HandleApplyTouch()
+        if (Unit* target = GetHitUnit())
         {
-            if (Unit* target = GetHitUnit())
-                target->SetDisplayId(23954);    //Spiritual Insight form
+            target->SetDisplayId(23954);
         }
+    }
 
-        void Register() override
-        {
-            AfterHit += SpellHitFn(spell_spiritual_insight_SpellScript::HandleApplyTouch);
-        }
-    };
-
-    SpellScript* GetSpellScript() const override
+    void Register() override
     {
-        return new spell_spiritual_insight_SpellScript;
+        AfterHit += SpellHitFn(spell_spiritual_insight::HandleApplyTouch);
     }
 };
 
@@ -2292,7 +2283,7 @@ void AddSC_dragonblight()
     new npc_q24545_vegard_dummy();
     new npc_q24545_vegard();
     new npc_spiritual_insight();
-    new spell_spiritual_insight();
+    RegisterSpellScript(spell_spiritual_insight);
 
     // Theirs
     new npc_commander_eligor_dawnbringer();
