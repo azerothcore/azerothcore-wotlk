@@ -18,11 +18,13 @@
 #ifndef __SPELL_H
 #define __SPELL_H
 
+#include "ConditionMgr.h"
 #include "GridDefines.h"
-#include "ObjectMgr.h"
+#include "LootMgr.h"
 #include "PathGenerator.h"
 #include "SharedDefines.h"
 #include "SpellInfo.h"
+#include "Unit.h"
 
 class Unit;
 class Player;

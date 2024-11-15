@@ -15,13 +15,6 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-/* ScriptData
-SDName: Boss_Janalai
-SD%Complete: 100
-SDComment:
-SDCategory: Zul'Aman
-EndScriptData */
-
 #include "CellImpl.h"
 #include "CreatureScript.h"
 #include "GridNotifiers.h"
@@ -125,7 +118,13 @@ enum Misc
 
 struct boss_janalai : public BossAI
 {
-    boss_janalai(Creature* creature) : BossAI(creature, DATA_JANALAI) { }
+    boss_janalai(Creature* creature) : BossAI(creature, DATA_JANALAI)
+    {
+        scheduler.SetValidator([this]
+        {
+            return !me->HasUnitState(UNIT_STATE_CASTING);
+        });
+    }
 
     void Reset() override
     {
@@ -134,18 +133,17 @@ struct boss_janalai : public BossAI
         _isBombing = false;
         _isFlameBreathing = false;
 
-        ScheduleHealthCheckEvent(25, [&]{
-            DoCastSelf(SPELL_ENRAGE, true);
-        });
-
         ScheduleHealthCheckEvent(35, [&]{
             Talk(SAY_ALL_EGGS);
             me->AttackStop();
             me->GetMotionMaster()->Clear();
             me->SetPosition(janalainPos);
             me->StopMovingOnCurrentPos();
-            DoCastSelf(SPELL_HATCH_ALL);
-            HatchAllEggs(HATCH_ALL);
+            DoCastAOE(SPELL_HATCH_ALL);
+        });
+
+        ScheduleHealthCheckEvent(25, [&] {
+            DoCastSelf(SPELL_ENRAGE, true);
         });
     }
 
@@ -209,19 +207,19 @@ struct boss_janalai : public BossAI
             return false;
 
         if (hatchAction == HATCH_RESET)
+        {
             for (Creature* egg : eggList)
                 egg->Respawn();
-        else if (hatchAction == HATCH_ALL)
-            DoCastSelf(SPELL_HATCH_EGG_ALL);
 
-        if (hatchAction == HATCH_RESET)
-        {
             std::list<Creature* > hatchlingList;
             me->GetCreaturesWithEntryInRange(hatchlingList, 100.0f, NPC_HATCHLING);
             for (Creature* hatchling : hatchlingList)
                 hatchling->DespawnOrUnsummon();
             hatchlingList.clear();
         }
+        else if (hatchAction == HATCH_ALL)
+            DoCastSelf(SPELL_HATCH_EGG_ALL);
+
         eggList.clear();
         return true;
     }
@@ -239,9 +237,7 @@ struct boss_janalai : public BossAI
                         : me->SummonCreature(NPC_FIRE_BOMB, fireWallCoords[i].GetPositionX() - 2 + 4 * j, fireWallCoords[i].GetPositionY(), fireWallCoords[i].GetPositionZ(), fireWallCoords[i].GetOrientation(), TEMPSUMMON_TIMED_DESPAWN, 15000);
 
                 if (wall)
-                {
                     wall->AI()->DoCastSelf(SPELL_FIRE_WALL, true);
-                }
             }
         }
     }
@@ -259,18 +255,16 @@ struct boss_janalai : public BossAI
 
     void Boom()
     {
-        std::list<Creature*> fireBombs;
-        me->GetCreaturesWithEntryInRange(fireBombs, 100.0f, NPC_FIRE_BOMB);
-
-        if (fireBombs.empty())
-            return;
-
-        for (Creature* bomb : fireBombs)
-        {
-            bomb->AI()->DoCastSelf(SPELL_FIRE_BOMB_DAMAGE, true);
-            bomb->RemoveAllAuras();
-        }
-        fireBombs.clear();
+        summons.DoForAllSummons([&](WorldObject* summon) {
+            if (summon->GetEntry() == NPC_FIRE_BOMB)
+            {
+                if (Creature* bomb = summon->ToCreature())
+                {
+                    bomb->AI()->DoCastSelf(SPELL_FIRE_BOMB_DAMAGE, true);
+                    bomb->RemoveAllAuras();
+                }
+            }
+        });
     }
 
     void StartBombing()
@@ -286,14 +280,11 @@ struct boss_janalai : public BossAI
         SpawnBombs();
         _isBombing = true;
 
-        if (Map* map = me->GetMap())
+        me->GetMap()->DoForAllPlayers([&](Player* player)
         {
-            map->DoForAllPlayers([&](Player* player)
-            {
-                if (player->IsAlive())
-                    DoTeleportPlayer(player, janalainPos.GetPositionX() - 5 + rand() % 10, janalainPos.GetPositionY() - 5 + rand() % 10, janalainPos.GetPositionZ(), 0.0f);
-            });
-        }
+            if (player->IsAlive())
+                DoTeleportPlayer(player, janalainPos.GetPositionX() - 5 + rand() % 10, janalainPos.GetPositionY() - 5 + rand() % 10, janalainPos.GetPositionZ(), 0.0f);
+        });
         //DoCast(Temp, SPELL_SUMMON_PLAYERS, true) // core bug, spell does not work if too far
         ThrowBombs();
 
@@ -308,20 +299,23 @@ struct boss_janalai : public BossAI
 
     void ThrowBombs()
     {
-        std::list<Creature*> fireBombs;
         std::chrono::milliseconds bombTimer = 100ms;
-        me->GetCreaturesWithEntryInRange(fireBombs, 100.0f, NPC_FIRE_BOMB);
-        for (Creature* bomb : fireBombs)
-        {
-            scheduler.Schedule(bombTimer, [this, bomb](TaskContext)
+
+        summons.DoForAllSummons([this, &bombTimer](WorldObject* summon) {
+            if (summon->GetEntry() == NPC_FIRE_BOMB)
             {
-                bomb->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
-                DoCast(bomb, SPELL_FIRE_BOMB_THROW, true);
-                bomb->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
-            });
-            bombTimer = bombTimer + 100ms;
-        }
-        fireBombs.clear();
+                if (Creature* bomb = summon->ToCreature())
+                {
+                    bomb->m_Events.AddEventAtOffset([this, bomb] {
+                        bomb->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
+                        DoCast(bomb, SPELL_FIRE_BOMB_THROW, true);
+                        bomb->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
+                    }, bombTimer);
+                }
+
+                bombTimer += 100ms;
+            }
+        });
     }
 
     bool CheckEvadeIfOutOfCombatArea() const override
@@ -333,23 +327,9 @@ private:
     bool _isFlameBreathing;
 };
 
-struct npc_janalai_firebomb : public NullCreatureAI
-{
-    npc_janalai_firebomb(Creature* creature) : NullCreatureAI(creature) { }
-
-    void SpellHit(Unit* /*caster*/, SpellInfo const* spell) override
-    {
-        if (spell->Id == SPELL_FIRE_BOMB_THROW)
-            DoCastSelf(SPELL_FIRE_BOMB_DUMMY, true);
-    }
-};
-
 struct npc_janalai_hatcher : public ScriptedAI
 {
-    npc_janalai_hatcher(Creature* creature) : ScriptedAI(creature)
-    {
-        _instance = creature->GetInstanceScript();
-    }
+    npc_janalai_hatcher(Creature* creature) : ScriptedAI(creature) { }
 
     void Reset() override
     {
@@ -358,7 +338,6 @@ struct npc_janalai_hatcher : public ScriptedAI
         _side = (me->GetPositionY() < 1150);
         _waypoint = 0;
         _isHatching = false;
-        _hasChangedSide = false;
         me->GetMotionMaster()->Clear();
         me->GetMotionMaster()->MovePoint(0, hatcherway[_side][0]);
     }
@@ -368,29 +347,13 @@ struct npc_janalai_hatcher : public ScriptedAI
         if (_waypoint == 5)
         {
             _isHatching = true;
-            std::list<Creature* > eggList;
-            me->GetCreaturesWithEntryInRange(eggList, 50.0f, NPC_EGG);
-            scheduler.Schedule(1500ms, SCHEDULER_GROUP_HATCHING, [this, eggList](TaskContext context)
+
+            scheduler.Schedule(1500ms, SCHEDULER_GROUP_HATCHING, [this](TaskContext context)
             {
-                std::list<Creature* > unhatchedEggs;
-                for (Creature* egg : eggList)
-                {
-                    if (egg->IsAlive())
-                        unhatchedEggs.emplace_front(egg);
-                }
-                Acore::Containers::RandomResize(unhatchedEggs, 1);
-                if (Creature* egg = unhatchedEggs.front())
-                    egg->AI()->DoCastSelf(SPELL_HATCH_EGG_SINGULAR);
-                else if (!_hasChangedSide)
-                {
-                    _side = _side ? 0 : 1;
-                    _isHatching = false;
-                    _waypoint = 3;
-                    MoveToNewWaypoint(_waypoint);
-                    _hasChangedSide = true;
-                    context.CancelGroup(SCHEDULER_GROUP_HATCHING);
-                }
-                context.Repeat(1500ms);
+                me->CastCustomSpell(SPELL_HATCH_EGG_ALL, SPELLVALUE_MAX_TARGETS, context.GetRepeatCounter() + 1);
+
+                if (me->FindNearestCreature(NPC_EGG, 100.0f))
+                    context.Repeat(4s);
             });
         }
         else
@@ -422,19 +385,14 @@ struct npc_janalai_hatcher : public ScriptedAI
     void MoveInLineOfSight(Unit* /*who*/) override { }
 
 private:
-    InstanceScript* _instance;
     uint8 _side;
     uint8 _waypoint;
     bool _isHatching;
-    bool _hasChangedSide;
 };
 
 struct npc_janalai_hatchling : public ScriptedAI
 {
-    npc_janalai_hatchling(Creature* creature) : ScriptedAI(creature)
-    {
-        _instance = creature->GetInstanceScript();
-    }
+    npc_janalai_hatchling(Creature* creature) : ScriptedAI(creature) { }
 
     void Reset() override
     {
@@ -444,7 +402,6 @@ struct npc_janalai_hatchling : public ScriptedAI
         else
             me->GetMotionMaster()->MovePoint(0, hatcherway[1][3].GetPositionX() + rand() % 4 - 2, 1150.0f + rand() % 4 - 2, hatcherway[1][3].GetPositionY());
 
-        me->SetDisableGravity(true);
         me->SetInCombatWithZone();
     }
 
@@ -465,27 +422,11 @@ struct npc_janalai_hatchling : public ScriptedAI
 
         DoMeleeAttackIfReady();
     }
-
-private:
-    InstanceScript* _instance;
-};
-
-struct npc_janalai_egg : public NullCreatureAI
-{
-    npc_janalai_egg(Creature* creature) : NullCreatureAI(creature) { }
-
-    void SpellHit(Unit* /*caster*/, SpellInfo const* spell) override
-    {
-        if (spell->Id == SPELL_HATCH_EGG_ALL || spell->Id == SPELL_HATCH_EGG_SINGULAR)
-            DoCastSelf(SPELL_SUMMON_HATCHLING);
-    }
 };
 
 void AddSC_boss_janalai()
 {
     RegisterZulAmanCreatureAI(boss_janalai);
-    RegisterZulAmanCreatureAI(npc_janalai_firebomb);
     RegisterZulAmanCreatureAI(npc_janalai_hatcher);
     RegisterZulAmanCreatureAI(npc_janalai_hatchling);
-    RegisterZulAmanCreatureAI(npc_janalai_egg);
 }

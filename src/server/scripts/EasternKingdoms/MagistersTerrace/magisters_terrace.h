@@ -42,8 +42,7 @@ enum MTCreatures
     NPC_KAEL_THAS               = 24664,
     NPC_PHOENIX                 = 21362,
     NPC_PHOENIX_EGG             = 21364,
-    NPC_KALECGOS                = 24844,
-    NPC_HUMAN_KALECGOS          = 24848
+    NPC_KALECGOS                = 24844
 };
 
 enum MTGameObjects
@@ -59,11 +58,6 @@ enum MTGameObjects
 enum InstanceEventIds
 {
     EVENT_SPAWN_KALECGOS = 16547
-};
-
-enum InstanceText
-{
-    SAY_KALECGOS_SPAWN = 0
 };
 
 enum MovementData

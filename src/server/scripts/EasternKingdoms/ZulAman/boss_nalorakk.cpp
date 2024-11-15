@@ -130,7 +130,6 @@ struct boss_nalorakk : public BossAI
                     _introScheduler.Schedule(5s, GROUP_CHECK_DEAD, [this](TaskContext context)
                     {
                         if (CheckFullyDeadGroup(_waveList))
-                        {
                             if (_phase == PHASE_SEND_GUARDS_1)
                             {
                                 _introScheduler.CancelGroup(GROUP_CHECK_DEAD);
@@ -144,7 +143,6 @@ struct boss_nalorakk : public BossAI
                                 });
                                 _phase = PHASE_SEND_GUARDS_2;
                             }
-                        }
                         context.Repeat(5s);
                     });
                     break;
@@ -157,7 +155,6 @@ struct boss_nalorakk : public BossAI
                     _introScheduler.Schedule(5s, GROUP_CHECK_DEAD, [this](TaskContext context)
                     {
                         if (CheckFullyDeadGroup(_waveList))
-                        {
                             if (_phase == PHASE_SEND_GUARDS_2)
                             {
                                 _introScheduler.CancelGroup(GROUP_CHECK_DEAD);
@@ -171,8 +168,6 @@ struct boss_nalorakk : public BossAI
                                 });
                                 _phase = PHASE_SEND_GUARDS_3;
                             }
-
-                        }
                         context.Repeat(5s);
                     });
                     break;
@@ -183,13 +178,12 @@ struct boss_nalorakk : public BossAI
                     _introScheduler.Schedule(5s, GROUP_CHECK_DEAD, [this](TaskContext context)
                     {
                         if (CheckFullyDeadGroup(_waveList))
-                        {
                             if (_phase == PHASE_SEND_GUARDS_3)
                             {
                                 _introScheduler.CancelGroup(GROUP_CHECK_DEAD);
                                 _waveList.clear();
                                 Talk(SAY_RUN_AWAY);
-                                me->GetMotionMaster()->MovePath(me->GetEntry()*100+3, false);
+                                me->GetMotionMaster()->MovePath(me->GetEntry() * 100 + 3, false);
                                 _introScheduler.Schedule(6s, [this](TaskContext)
                                 {
                                     me->SetFacingTo(1.54f);
@@ -197,7 +191,6 @@ struct boss_nalorakk : public BossAI
                                 });
                                 _phase = PHASE_SEND_GUARDS_4;
                             }
-                        }
                         context.Repeat(5s);
                     });
                     break;
@@ -209,7 +202,6 @@ struct boss_nalorakk : public BossAI
                     _introScheduler.Schedule(5s, GROUP_CHECK_DEAD, [this](TaskContext context)
                     {
                         if (CheckFullyDeadGroup(_waveList))
-                        {
                             if (_phase == PHASE_SEND_GUARDS_4)
                             {
                                 _introScheduler.CancelGroup(GROUP_CHECK_DEAD);
@@ -221,7 +213,6 @@ struct boss_nalorakk : public BossAI
                                 _phase = PHASE_START_COMBAT;
                                 _ranIntro = true;
                             }
-                        }
                         context.Repeat(5s);
                     });
                     break;
@@ -245,15 +236,13 @@ struct boss_nalorakk : public BossAI
             context.Repeat();
         }).Schedule(10s, 15s, GROUP_HUMAN, [this](TaskContext context)
         {
-            if (!me->GetVictim()->HasAura(SPELL_MANGLEEFFECT))
+            if (me->GetVictim() && !me->GetVictim()->HasAura(SPELL_MANGLEEFFECT))
             {
                 DoCastVictim(SPELL_MANGLE);
                 context.Repeat(1s);
             }
             else
-            {
                 context.Repeat();
-            }
         }).Schedule(10min, GROUP_BERSERK, [this](TaskContext)
         {
             Talk(SAY_BERSERK);

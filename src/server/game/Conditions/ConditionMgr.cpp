@@ -28,6 +28,7 @@
 #include "Spell.h"
 #include "SpellAuras.h"
 #include "SpellMgr.h"
+#include "WorldState.h"
 
 //npcbot
 #include "bot_ai.h"
@@ -617,6 +618,11 @@ bool Condition::Meets(ConditionSourceInfo& sourceInfo)
             condMeets = unit->IsCharmed();
         break;
     }
+    case CONDITION_WORLD_SCRIPT:
+    {
+        condMeets = sWorldState->IsConditionFulfilled(static_cast<WorldStateCondition>(ConditionValue1), static_cast<WorldStateConditionState>(ConditionValue2));
+        break;
+    }
     default:
         condMeets = false;
         break;
@@ -816,6 +822,9 @@ uint32 Condition::GetSearcherTypeMaskForCondition()
         break;
     case CONDITION_CHARMED:
         mask |= GRID_MAP_TYPE_MASK_CREATURE | GRID_MAP_TYPE_MASK_PLAYER;
+        break;
+    case CONDITION_WORLD_SCRIPT:
+        mask |= GRID_MAP_TYPE_MASK_ALL;
         break;
     default:
         ASSERT(false && "Condition::GetSearcherTypeMaskForCondition - missing condition handling!");
