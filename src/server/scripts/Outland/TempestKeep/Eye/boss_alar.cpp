@@ -172,11 +172,8 @@ struct boss_alar : public BossAI
     {
         if (why == EVADE_REASON_BOUNDARY)
             BossAI::EnterEvadeMode(why);
-        else
-        {
-            if (me->GetThreatMgr().GetThreatList().empty())
-                BossAI::EnterEvadeMode(why);
-        }
+        else if (me->GetThreatMgr().GetThreatList().empty())
+            BossAI::EnterEvadeMode(why);
     }
 
     void JustDied(Unit* killer) override
