@@ -18,7 +18,8 @@
 #ifndef _CHARMINFO_H
 #define _CHARMINFO_H
 
-#include "Object.h"
+#include "Define.h"
+#include "ObjectGuid.h"
 
 #define MAX_SPELL_CHARM         4
 #define MAX_SPELL_VEHICLE       6

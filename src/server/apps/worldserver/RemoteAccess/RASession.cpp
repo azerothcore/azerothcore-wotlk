@@ -22,6 +22,7 @@
 #include "Duration.h"
 #include "Log.h"
 #include "MotdMgr.h"
+#include "QueryResult.h"
 #include "SRP6.h"
 #include "Util.h"
 #include "World.h"
