@@ -72,11 +72,10 @@ enum Misc
 
     EVENT_RELOCATE_MIDDLE       = 1,
     EVENT_REBIRTH               = 2,
-    EVENT_SPELL_BERSERK         = 3,
 
-    EVENT_MOVE_TO_PHASE_2       = 4,
-    EVENT_FINISH_DIVE           = 5,
-    EVENT_INVISIBLE             = 6
+    EVENT_MOVE_TO_PHASE_2       = 3,
+    EVENT_FINISH_DIVE           = 4,
+    EVENT_INVISIBLE             = 5
 };
 
 enum GroupAlar
