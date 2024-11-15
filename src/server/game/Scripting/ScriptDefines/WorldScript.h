@@ -58,7 +58,7 @@ public:
     virtual void OnBeforeConfigLoad(bool /*reload*/) { }
 
     // Called before the message of the day is changed.
-    virtual void OnMotdChange(std::string& /*newMotd*/) { }
+    virtual void OnMotdChange(std::string& /*newMotd*/, LocaleConstant& /*locale*/) { }
 
     // Called when a world shutdown is initiated.
     virtual void OnShutdownInitiate(ShutdownExitCode /*code*/, ShutdownMask /*mask*/) { }
