@@ -3456,6 +3456,11 @@ bool Creature::CanSwim() const
     if (Unit::CanSwim() || (!Unit::CanSwim() && !CanFly()))
         return true;
 
+    //npcbot
+    if (IsNPCBotOrPet())
+        return true;
+    //end npcbot
+
     if (IsPet())
         return true;
 
