@@ -3,9 +3,11 @@ New routines around handling database squashes since https://github.com/azerothc
 > [!CAUTION]
 > These steps are only for project maintainers who intend to update base files.
 
-We ONLY squash into BASE files. We never move files.
-ARCHIVE dir is UNUSED.
-All update files ALWAYS exist in the updates dir.
+During the DB squash procedure, we do NOT move files.
+The archive dir is NO longer used as part of the DB squash procedure, 
+but simply as a place where to move update files when they get too many.
+
+Moving files to the archive folder is NOT part of the squash procedure anymore.
 
 as the `updates` table in base files always will contain the entries from the updates dir they will never be run again on a clean setup. 
 
