@@ -282,7 +282,7 @@ struct boss_kaelthas : public BossAI
             me->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_NOT_SELECTABLE | UNIT_FLAG_DISABLE_MOVE);
             Talk(SAY_INTRO);
             DoCastAOE(SPELL_REMOVE_ENCHANTED_WEAPONS, true);
-            ScheduleUniqueTimedEvent(21s, [&]
+            ScheduleUniqueTimedEvent(1s, [&]
             {
                 IntroduceNewAdvisor(SAY_INTRO_THALADRED, ACTION_START_THALADRED);
             }, EVENT_PREFIGHT_PHASE1_01);
@@ -559,19 +559,19 @@ struct boss_kaelthas : public BossAI
         switch (kaelAction)
         {
             case ACTION_START_THALADRED:
-                attackStartTimer = 7000ms;
+                attackStartTimer = 1s;
                 advisorNPCId = NPC_THALADRED;
                 break;
             case ACTION_START_SANGUINAR:
-                attackStartTimer = 14500ms;
+                attackStartTimer = 1s;
                 advisorNPCId = NPC_LORD_SANGUINAR;
                 break;
             case ACTION_START_CAPERNIAN:
-                attackStartTimer = 9000ms;
+                attackStartTimer = 1s;
                 advisorNPCId = NPC_CAPERNIAN;
                 break;
             case ACTION_START_TELONICUS:
-                attackStartTimer = 10400ms;
+                attackStartTimer = 1s;
                 advisorNPCId = NPC_TELONICUS;
                 break;
             default:
@@ -595,10 +595,10 @@ struct boss_kaelthas : public BossAI
     {
         ScheduleUniqueTimedEvent(3s, [&]{
             Talk(SAY_PHASE2_WEAPON);
-            DoCastSelf(SPELL_SUMMON_WEAPONS);
+            // DoCastSelf(SPELL_SUMMON_WEAPONS);
             _phase = PHASE_WEAPONS;
         }, EVENT_PREFIGHT_PHASE5_01);
-        ScheduleUniqueTimedEvent(9s, [&]{
+        ScheduleUniqueTimedEvent(5s, [&]{
             summons.DoForAllSummons([&](WorldObject* summon)
             {
                 if (Creature* summonedCreature = summon->ToCreature())
@@ -614,7 +614,7 @@ struct boss_kaelthas : public BossAI
                     }
                 }
             });
-            scheduler.Schedule(3min, GROUP_PROGRESS_PHASE, [this](TaskContext)
+            scheduler.Schedule(1s, GROUP_PROGRESS_PHASE, [this](TaskContext)
             {
                 PhaseAllAdvisorsExecute();
             });
@@ -630,7 +630,7 @@ struct boss_kaelthas : public BossAI
             DoCastSelf(SPELL_RESURRECTION);
             _phase = PHASE_ALL_ADVISORS;
         }, EVENT_PREFIGHT_PHASE6_02);
-        scheduler.Schedule(192s, GROUP_PROGRESS_PHASE, [this](TaskContext)
+        scheduler.Schedule(99999s, GROUP_PROGRESS_PHASE, [this](TaskContext)
         {
             PhaseKaelExecute();
         });
