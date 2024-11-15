@@ -294,7 +294,6 @@ struct boss_alar : public BossAI
                 SpawnPhoenixes(2, target);
         }).Schedule(6s, [this](TaskContext)
         {
-            DoCastSelf(SPELL_REBIRTH_DIVE);
             me->SetModelVisible(true);
             DoCastSelf(SPELL_REBIRTH_DIVE);
         }).Schedule(10s, [this](TaskContext)
