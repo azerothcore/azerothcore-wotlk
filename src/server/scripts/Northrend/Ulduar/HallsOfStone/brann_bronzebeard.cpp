@@ -71,16 +71,6 @@ enum Misc
     SPELL_IGC_GROUND_SMASH          = 12734,
     SPELL_IGC_GROUND_SMASH_H        = 59865,
 
-    // ACTIONS
-    ACTION_START_EVENT              = 0,
-    ACTION_START_TRIBUNAL           = 1,
-    ACTION_TRIBUNAL_WIPE_START      = 2,
-    ACTION_GO_TO_SJONNIR            = 3,
-    ACTION_OPEN_DOOR                = 4,
-    ACTION_START_SJONNIR_FIGHT      = 5,
-    ACTION_SJONNIR_DEAD             = 6,
-    ACTION_SJONNIR_WIPE_START       = 7,
-
     // QUESTS
     QUEST_HALLS_OF_STONE            = 13207,
 };
@@ -225,7 +215,7 @@ public:
             switch (action)
             {
                 case GOSSIP_ACTION_INFO_DEF+1:
-                    creature->AI()->DoAction(ACTION_START_EVENT);
+                    creature->AI()->DoAction(ACTION_START_ESCORT_EVENT);
                     CloseGossipMenuFor(player);
                     break;
                 case GOSSIP_ACTION_INFO_DEF+2:
@@ -391,10 +381,9 @@ public:
         {
             switch (action)
             {
-                case ACTION_START_EVENT:
+                case ACTION_START_ESCORT_EVENT:
                     Start(false, true, ObjectGuid::Empty, 0, true, false);
-                    me->Yell("Time to get some answers! Let's get this show on the road!", LANG_UNIVERSAL);
-                    me->PlayDirectSound(14259);
+                    Talk(SAY_BRANN_ESCORT_START);
                     me->SetFaction(FACTION_ESCORTEE_N_NEUTRAL_PASSIVE);
                     me->SetReactState(REACT_AGGRESSIVE);
                     me->SetRegeneratingHealth(false);
@@ -422,7 +411,7 @@ public:
                     me->ReplaceAllNpcFlags(UNIT_NPC_FLAG_NONE);
                     break;
                 case ACTION_GO_TO_SJONNIR:
-                    me->Yell("I think it's time to see what's behind the door near the entrance. I'm going to sneak over there, nice and quiet. Meet me at the door and I'll get us in.", LANG_UNIVERSAL);
+                    Talk(SAY_BRANN_ENTRANCE_MEET);
                     me->SetFaction(FACTION_FRIENDLY);
                     me->SetReactState(REACT_PASSIVE);
                     me->SetRegeneratingHealth(true);
@@ -747,16 +736,14 @@ public:
                     }
                     case EVENT_SJONNIR_END_BRANN_YELL:
                     {
-                        me->Yell("Loken? That's downright bothersome... We might've neutralized the iron dwarves, but I'd lay odds there's another machine somewhere else churnin' out a whole mess o' these iron vrykul!", LANG_UNIVERSAL);
-                        me->PlayDirectSound(14278);
+                        Talk(SAY_BRANN_VICTORY_SJONNIR_1);
                         break;
                     }
                     case EVENT_SJONNIR_END_BRANN_LAST_YELL:
                     {
                         events.Reset();
                         SetEscortPaused(false);
-                        me->Yell("I'll use the forge to make batches o' earthen to stand guard... But our greatest challenge still remains: find and stop Loken!", LANG_UNIVERSAL);
-                        me->PlayDirectSound(14279);
+                        Talk(SAY_BRANN_VICTORY_SJONNIR_2);
                         break;
                     }
                 }
@@ -898,8 +885,7 @@ void brann_bronzebeard::brann_bronzebeardAI::WaypointReached(uint32 id)
             if (pInstance)
             {
                 me->HandleEmoteCommand(EMOTE_ONESHOT_CHEER);
-                me->Yell("Take a moment and relish this with me.Soon... all will be revealed.Okay then, let's do this!", LANG_UNIVERSAL);
-                me->PlayDirectSound(14247);
+                Talk(SAY_BRANN_EVENT_INTRO_1);
                 me->ReplaceAllNpcFlags(UNIT_NPC_FLAG_GOSSIP | UNIT_NPC_FLAG_QUESTGIVER);
                 pInstance->SetData(BRANN_BRONZEBEARD, 2);
             }
@@ -957,8 +943,7 @@ void brann_bronzebeard::brann_bronzebeardAI::WaypointReached(uint32 id)
             SetEscortPaused(true);
             me->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_STATE_READY_UNARMED);
             me->SendMovementFlagUpdate();
-            me->Yell("Don't worry! Ol' Brann's got yer back! Keep that metal monstrosity busy, and I'll see if I can't sweet talk this machine into helping ye!", LANG_UNIVERSAL);
-            me->PlayDirectSound(14274);
+            Talk(SAY_BRANN_FRONT_OF_SJONNIR);
             break;
         //Brann steps back and uses the Sjonnir console.
         case 38:
@@ -1151,6 +1136,11 @@ public:
 class spell_hos_dark_matter : public AuraScript
 {
     PrepareAuraScript(spell_hos_dark_matter);
+
+    bool Validate(SpellInfo const* /*spellInfo*/) override
+    {
+        return ValidateSpellInfo({ SPELL_DARK_MATTER_H, SPELL_DARK_MATTER });
+    }
 
     void HandleEffectRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
     {
