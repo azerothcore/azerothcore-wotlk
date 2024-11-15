@@ -1,3 +1,4 @@
+-- DB update 2024_11_15_02 -> 2024_11_15_03
 -- Update gameobject 'The Dark Portal and the Fall of Stormwind' with sniffed values
 -- updated spawns
 DELETE FROM `gameobject` WHERE (`id` IN (175745))
