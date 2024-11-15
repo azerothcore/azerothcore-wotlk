@@ -240,17 +240,23 @@ struct boss_kiljaeden : public BossAI
         me->SetReactState(REACT_PASSIVE);
     }
 
-    EventMap events2;
-
     void InitializeAI() override
     {
         ScriptedAI::InitializeAI();
         me->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
         events.Reset();
-        events2.Reset();
-        events2.ScheduleEvent(EVENT_INIT_FIGHT, 11000);
-        events2.ScheduleEvent(EVENT_REBIRTH, 0);
         me->SetVisible(false);
+
+        me->m_Events.AddEventAtOffset([&] {
+            me->SetVisible(true);
+            DoCastSelf(SPELL_REBIRTH);
+        }, 1s);
+
+        me->m_Events.AddEventAtOffset([&] {
+            me->SetReactState(REACT_AGGRESSIVE);
+            me->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
+            me->SetInCombatWithZone();
+        }, 11s);
     }
 
     void Reset() override
@@ -258,6 +264,7 @@ struct boss_kiljaeden : public BossAI
         events.Reset();
 
         ScheduleHealthCheckEvent(85, [&]{
+            _phase = PHASE_DARKNESS;
             if (Creature* kalec = instance->GetCreature(DATA_KALECGOS_KJ))
                 kalec->AI()->Talk(SAY_KALECGOS_AWAKEN, 16s);
 
@@ -297,6 +304,7 @@ struct boss_kiljaeden : public BossAI
         });
 
         ScheduleHealthCheckEvent(55, [&] {
+            _phase = PHASE_ARMAGEDDON;
             if (Creature* kalec = instance->GetCreature(DATA_KALECGOS_KJ))
                 kalec->AI()->Talk(SAY_KALECGOS_LETGO, 16s);
 
@@ -336,6 +344,7 @@ struct boss_kiljaeden : public BossAI
         });
 
         ScheduleHealthCheckEvent(25, [&] {
+            _phase = PHASE_SACRIFICE;
             if (Creature* kalec = instance->GetCreature(DATA_KALECGOS_KJ))
             {
                 kalec->AI()->Talk(SAY_KALECGOS_FOCUS, 8s);
@@ -347,6 +356,8 @@ struct boss_kiljaeden : public BossAI
                 anveena->AI()->Talk(SAY_ANVEENA_KALEC, 18s);
                 anveena->AI()->Talk(SAY_ANVEENA_GOODBYE, 25s);
             }
+
+            scheduler.CancelAll();
 
             me->m_Events.AddEventAtOffset([&] {
                 if (Creature* anveena = instance->GetCreature(DATA_ANVEENA))
@@ -360,15 +371,23 @@ struct boss_kiljaeden : public BossAI
                 if (Creature* anveena = instance->GetCreature(DATA_ANVEENA))
                 {
                     anveena->CastSpell(anveena, SPELL_SACRIFICE_OF_ANVEENA, true);
-                    me->CastSpell(me, SPELL_CUSTOM_08_STATE, true);
+                    DoCastSelf(SPELL_CUSTOM_08_STATE, true);
                     me->SetUnitFlag(UNIT_FLAG_PACIFIED);
-                    events.DelayEvents(7001);
-                    events2.ScheduleEvent(EVENT_RESTORE_MELEE, 7000);
+                    scheduler.DelayAll(7100ms);
+
+                    me->m_Events.AddEventAtOffset([&] {
+                        me->RemoveAurasDueToSpell(SPELL_CUSTOM_08_STATE);
+                        me->RemoveUnitFlag(UNIT_FLAG_PACIFIED);
+                    }, 7s);
                 }
                 Talk(SAY_KJ_PHASE5);
             }, 30s);
 
-            events2.RescheduleEvent(EVENT_EMPOWER_ORBS3, 61000);
+            me->m_Events.AddEventAtOffset([&] {
+                if (Creature* kalec = instance->GetCreature(DATA_KALECGOS_KJ))
+                    kalec->AI()->Talk(SAY_KALECGOS_READY_ALL);
+                EmpowerOrb(true);
+            }, 61s);
 
             me->m_Events.AddEventAtOffset([&] {
                 Talk(SAY_KJ_REFLECTION);
@@ -391,10 +410,47 @@ struct boss_kiljaeden : public BossAI
 
     void ScheduleBasicAbilities()
     {
-        events.ScheduleEvent(EVENT_SPELL_SOUL_FLAY, 0);
-        events.ScheduleEvent(EVENT_SPELL_LEGION_LIGHTNING, 7000);
-        events.ScheduleEvent(EVENT_SPELL_FIRE_BLOOM, 9000);
-        events.ScheduleEvent(EVENT_SUMMON_ORBS, 10000);
+        ScheduleTimedEvent(1s, [&] {
+            DoCastVictim(SPELL_SOUL_FLAY);
+        }, 4s, 5s);
+
+        ScheduleTimedEvent(7s, [&] {
+            DoCastRandomTarget(SPELL_LEGION_LIGHTNING, 0, 40.0f);
+        }, 30s);
+
+        ScheduleTimedEvent(9s, [&] {
+            me->CastCustomSpell(SPELL_FIRE_BLOOM, SPELLVALUE_MAX_TARGETS, 5, me, TRIGGERED_NONE);
+            me->SetTarget(me->GetVictim()->GetGUID());
+        }, 40s);
+
+        if (_phase != PHASE_SACRIFICE)
+        {
+            ScheduleTimedEvent(10s, [&] {
+                for (uint8 i = 1; i < _phase; ++i)
+                {
+                    float x = me->GetPositionX() + 18.0f * cos((i * 2.0f - 1.0f) * M_PI / 3.0f);
+                    float y = me->GetPositionY() + 18.0f * std::sin((i * 2.0f - 1.0f) * M_PI / 3.0f);
+                    if (Creature* orb = me->SummonCreature(NPC_SHIELD_ORB, x, y, 40.0f, 0, TEMPSUMMON_CORPSE_DESPAWN))
+                    {
+                        Movement::PointsArray movementArray;
+                        movementArray.push_back(G3D::Vector3(x, y, 40.0f));
+
+                        // generate movement array
+                        for (uint8 j = 1; j < 20; ++j)
+                        {
+                            x = me->GetPositionX() + 18.0f * cos(((i * 2.0f - 1.0f) * M_PI / 3.0f) + (j / 20.0f * 2 * M_PI));
+                            y = me->GetPositionY() + 18.0f * std::sin(((i * 2.0f - 1.0f) * M_PI / 3.0f) + (j / 20.0f * 2 * M_PI));
+                            movementArray.push_back(G3D::Vector3(x, y, 40.0f));
+                        }
+
+                        Movement::MoveSplineInit init(orb);
+                        init.MovebyPath(movementArray);
+                        init.SetCyclic();
+                        init.Launch();
+                    }
+                }
+            }, 40s);
+        }
     }
 
     void EnterEvadeMode(EvadeReason why) override
@@ -426,8 +482,9 @@ struct boss_kiljaeden : public BossAI
             me->HandleEmoteCommand(EMOTE_ONESHOT_DROWN);
             me->resetAttackTimer();
             events.Reset();
-            events2.Reset();
-            events2.ScheduleEvent(EVENT_KILL_SELF, 500);
+            me->m_Events.AddEventAtOffset([&] {
+                me->KillSelf();
+            }, 1s);
             damage = 0;
         }
     }
@@ -479,89 +536,14 @@ struct boss_kiljaeden : public BossAI
 
     void UpdateAI(uint32 diff) override
     {
-        events2.Update(diff);
-        switch (events2.ExecuteEvent())
-        {
-        case EVENT_KILL_SELF:
-            me->KillSelf();
-            break;
-        case EVENT_REBIRTH:
-            me->SetVisible(true);
-            me->CastSpell(me, SPELL_REBIRTH, false);
-            break;
-        case EVENT_EMPOWER_ORBS3:
-            if (Creature* kalec = instance->GetCreature(DATA_KALECGOS_KJ))
-                kalec->AI()->Talk(SAY_KALECGOS_READY_ALL);
-            EmpowerOrb(true);
-            break;
-        case EVENT_INIT_FIGHT:
-            me->SetReactState(REACT_AGGRESSIVE);
-            me->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
-            me->SetInCombatWithZone();
-            return;
-        case EVENT_RESTORE_MELEE:
-            me->RemoveAurasDueToSpell(SPELL_CUSTOM_08_STATE);
-            me->RemoveUnitFlag(UNIT_FLAG_PACIFIED);
-            break;
-        }
-
         if (me->GetReactState() != REACT_AGGRESSIVE)
             return;
 
         if (!UpdateVictim())
             return;
 
-        events.Update(diff);
-        if (me->HasUnitState(UNIT_STATE_CASTING))
-            return;
-
-        switch (events.ExecuteEvent())
-        {
-        case EVENT_SPELL_SOUL_FLAY:
-            me->CastSpell(me->GetVictim(), SPELL_SOUL_FLAY, false);
-            events.ScheduleEvent(EVENT_SPELL_SOUL_FLAY, urand(4000, 5000));
-            break;
-        case EVENT_SPELL_LEGION_LIGHTNING:
-            if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 40.0f, true))
-                me->CastSpell(target, SPELL_LEGION_LIGHTNING, false);
-            events.ScheduleEvent(EVENT_SPELL_LEGION_LIGHTNING, phase == PHASE_SACRIFICE ? 15000 : 30000);
-            events.RescheduleEvent(EVENT_SPELL_SOUL_FLAY, 2000);
-            break;
-        case EVENT_SPELL_FIRE_BLOOM:
-            me->CastCustomSpell(SPELL_FIRE_BLOOM, SPELLVALUE_MAX_TARGETS, 5, me, TRIGGERED_NONE);
-            me->SetTarget(me->GetVictim()->GetGUID());
-            events.ScheduleEvent(EVENT_SPELL_FIRE_BLOOM, phase == PHASE_SACRIFICE ? 20000 : 40000);
-            events.RescheduleEvent(EVENT_SPELL_SOUL_FLAY, 1500);
-            break;
-        case EVENT_SUMMON_ORBS:
-            for (uint8 i = 1; i < phase; ++i)
-            {
-                float x = me->GetPositionX() + 18.0f * cos((i * 2.0f - 1.0f) * M_PI / 3.0f);
-                float y = me->GetPositionY() + 18.0f * std::sin((i * 2.0f - 1.0f) * M_PI / 3.0f);
-                if (Creature* orb = me->SummonCreature(NPC_SHIELD_ORB, x, y, 40.0f, 0, TEMPSUMMON_CORPSE_DESPAWN))
-                {
-                    Movement::PointsArray movementArray;
-                    movementArray.push_back(G3D::Vector3(x, y, 40.0f));
-
-                    // generate movement array
-                    for (uint8 j = 1; j < 20; ++j)
-                    {
-                        x = me->GetPositionX() + 18.0f * cos(((i * 2.0f - 1.0f) * M_PI / 3.0f) + (j / 20.0f * 2 * M_PI));
-                        y = me->GetPositionY() + 18.0f * std::sin(((i * 2.0f - 1.0f) * M_PI / 3.0f) + (j / 20.0f * 2 * M_PI));
-                        movementArray.push_back(G3D::Vector3(x, y, 40.0f));
-                    }
-
-                    Movement::MoveSplineInit init(orb);
-                    init.MovebyPath(movementArray);
-                    init.SetCyclic();
-                    init.Launch();
-                }
-            }
-            events.ScheduleEvent(EVENT_SUMMON_ORBS, 40000);
-            break;
-        }
-
-        DoMeleeAttackIfReady();
+        scheduler.Update(diff,
+            std::bind(&BossAI::DoMeleeAttackIfReady, this));
     }
 
     void EmpowerOrb(bool empowerAll)
@@ -586,6 +568,9 @@ struct boss_kiljaeden : public BossAI
             }
         }
     }
+
+    private:
+        uint8 _phase;
 };
 
 enum postEvent
