@@ -18,8 +18,6 @@
 #ifndef _INTERMEDIATE_VALUES_H
 #define _INTERMEDIATE_VALUES_H
 
-#include "DetourNavMesh.h"
-#include "PathCommon.h"
 #include "Recast.h"
 #include "TerrainBuilder.h"
 

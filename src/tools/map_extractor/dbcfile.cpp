@@ -20,7 +20,6 @@
 #include "dbcfile.h"
 
 #include "mpq_libmpq04.h"
-#include <utility>
 
 DBCFile::DBCFile(std::string  filename):
     filename(std::move(filename)), recordSize(0), recordCount(0), fieldCount(0), stringSize(0), data(nullptr), stringTable(nullptr)
