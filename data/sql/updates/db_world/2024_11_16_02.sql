@@ -1,3 +1,4 @@
+-- DB update 2024_11_16_01 -> 2024_11_16_02
 -- Update creature 'Lunar - Misc' with sniffed values
 -- updated spawns
 DELETE FROM `creature` WHERE (`id1` IN (15892, 15898, 15895, 15897, 15891, 15961, 15864, 15909))
