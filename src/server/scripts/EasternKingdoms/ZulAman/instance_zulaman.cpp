@@ -74,8 +74,8 @@ ObjectData const gameObjectData[] =
 
 ObjectData const summonData[] =
 {
-    { NPC_HATCHLING, DATA_JANALAI },
-    { 0,             0            }
+    { NPC_AMANI_HATCHLING, DATA_JANALAI },
+    { 0,                   0            }
 };
 
 BossBoundaryData const boundaries =

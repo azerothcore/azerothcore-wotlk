@@ -54,7 +54,7 @@ enum CreatureIds
     NPC_AMANISHI_TRIBESMAN              = 23582,
     NPC_AMANISHI_MEDICINE_MAN           = 23581,
     NPC_AMANISHI_AXE_THROWER            = 23542,
-    NPC_HATCHLING                       = 23598 // 42493
+    NPC_AMANI_HATCHLING                 = 23598 // 42493
 };
 
 enum GameobjectIds
