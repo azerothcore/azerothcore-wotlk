@@ -295,9 +295,10 @@ struct boss_kiljaeden : public BossAI
                 me->CastCustomSpell(SPELL_SINISTER_REFLECTION, SPELLVALUE_MAX_TARGETS, 1, me, TRIGGERED_NONE);
             }, 1s);
 
-            me->m_Events.AddEventAtOffset([&] {
+            scheduler.Schedule(1s+200ms, [this](TaskContext)
+            {
                 DoCastSelf(SPELL_SHADOW_SPIKE);
-            }, 1200ms);
+            });
 
             ScheduleTimedEvent(3s, [&] {
                 DoCastSelf(SPELL_FLAME_DART);
@@ -337,9 +338,10 @@ struct boss_kiljaeden : public BossAI
                 me->CastCustomSpell(SPELL_SINISTER_REFLECTION, SPELLVALUE_MAX_TARGETS, 1, me, TRIGGERED_NONE);
             }, 1s);
 
-            me->m_Events.AddEventAtOffset([&] {
+            scheduler.Schedule(1s + 200ms, [this](TaskContext)
+            {
                 DoCastSelf(SPELL_SHADOW_SPIKE);
-            }, 1200ms);
+            });
 
             ScheduleTimedEvent(15s, [&] {
                 Talk(EMOTE_KJ_DARKNESS);
