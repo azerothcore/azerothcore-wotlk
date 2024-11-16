@@ -140,6 +140,10 @@ struct npc_kiljaeden_controller : public NullCreatureAI
     npc_kiljaeden_controller(Creature* creature) : NullCreatureAI(creature), summons(me)
     {
         instance = creature->GetInstanceScript();
+        scheduler.SetValidator([this]
+        {
+            return !me->HasUnitState(UNIT_STATE_CASTING);
+        });
     }
 
     void ResetOrbs()
