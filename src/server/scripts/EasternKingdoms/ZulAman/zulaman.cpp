@@ -15,17 +15,6 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-/* ScriptData
-SDName: Zulaman
-SD%Complete: 90
-SDComment: Forest Frog will turn into different NPC's. Workaround to prevent new entry from running this script
-SDCategory: Zul'Aman
-EndScriptData */
-
-/* ContentData
-npc_forest_frog
-EndContentData */
-
 #include "zulaman.h"
 #include "CreatureScript.h"
 #include "Player.h"
@@ -422,6 +411,7 @@ struct npc_harrison_jones : public ScriptedAI
             me->SetDynamicFlag(UNIT_DYNFLAG_DEAD);
             _instance->StorePersistentData(DATA_TIMED_RUN, 21);
             _instance->DoAction(ACTION_START_TIMED_RUN);
+            me->DespawnOrUnsummon(3min+30s, 0s);
         }
     }
 
@@ -429,6 +419,7 @@ struct npc_harrison_jones : public ScriptedAI
     {
         if (action == ACTION_COMPLETE_EVENT_3)
         {
+            me->GetMap()->ToInstanceMap()->PermBindAllPlayers();
             _gongEvent = GONG_EVENT_4;
             _gongTimer = 0;
         }
@@ -510,7 +501,10 @@ struct npc_harrison_jones : public ScriptedAI
                     }
 
                     if (GameObject* gate = _instance->GetGameObject(DATA_MASSIVE_GATE))
+                    {
+                        gate->AllowSaveToDB(true);
                         gate->SetGoState(GO_STATE_ACTIVE);
+                    }
                     _gongTimer = 2000;
                     _gongEvent = GONG_EVENT_8;
                     break;
