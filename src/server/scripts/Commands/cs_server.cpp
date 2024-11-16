@@ -291,7 +291,7 @@ public:
         auto localeConstant = LOCALE_enUS;
         if (Player* player = handler->GetPlayer())
             localeConstant = player->GetSession()->GetSessionDbLocaleIndex();
-       
+
         handler->PSendSysMessage(LANG_MOTD_CURRENT, sMotdMgr->GetMotd(localeConstant));
         return true;
     }
