@@ -59,6 +59,20 @@ ObjectData const gameObjectData[] =
     { 0,                                0                                   }
 };
 
+ObjectData const summonData[] =
+{
+    { NPC_DEMONIC_VAPOR_TRAIL,    DATA_FELMYST       },
+    { NPC_UNYIELDING_DEAD,        DATA_FELMYST       },
+    { NPC_DARKNESS,               DATA_MURU          },
+    { NPC_VOID_SENTINEL,          DATA_MURU          },
+    { NPC_VOID_SPAWN,             DATA_MURU          },
+    { NPC_FELFIRE_PORTAL,         DATA_KJ_CONTROLLER },
+    { NPC_VOLATILE_FELFIRE_FIEND, DATA_KJ_CONTROLLER },
+    { NPC_SHIELD_ORB,             DATA_KJ_CONTROLLER },
+    { NPC_SINISTER_REFLECTION,    DATA_KJ_CONTROLLER },
+    { 0,                          0                  }
+};
+
 class instance_sunwell_plateau : public InstanceMapScript
 {
 public:
@@ -72,6 +86,7 @@ public:
             SetBossNumber(MAX_ENCOUNTERS);
             LoadDoorData(doorData);
             LoadObjectData(creatureData, gameObjectData);
+            LoadSummonData(summonData);
         }
 
         void OnPlayerEnter(Player* player) override
@@ -86,32 +101,6 @@ public:
         {
             if (creature->GetSpawnId() > 0 || !creature->GetOwnerGUID().IsPlayer())
                 creature->CastSpell(creature, SPELL_SUNWELL_RADIANCE, true);
-
-            switch (creature->GetEntry())
-            {
-                case NPC_DEMONIC_VAPOR_TRAIL:
-                case NPC_UNYIELDING_DEAD:
-                    if (Creature* felmyst = GetCreature(DATA_FELMYST))
-                        felmyst->AI()->JustSummoned(creature);
-                    break;
-
-                case NPC_DARKNESS:
-                case NPC_VOID_SENTINEL:
-                case NPC_VOID_SPAWN:
-                    if (Creature* muru = GetCreature(DATA_MURU))
-                        muru->AI()->JustSummoned(creature);
-                    break;
-
-                case NPC_FELFIRE_PORTAL:
-                case NPC_VOLATILE_FELFIRE_FIEND:
-                case NPC_SHIELD_ORB:
-                case NPC_SINISTER_REFLECTION:
-                    if (Creature* kiljaedenC = GetCreature(DATA_KJ_CONTROLLER))
-                        kiljaedenC->AI()->JustSummoned(creature);
-                    break;
-                default:
-                    break;
-            }
 
             InstanceScript::OnCreatureCreate(creature);
         }
