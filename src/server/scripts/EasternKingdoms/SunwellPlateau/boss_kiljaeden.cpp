@@ -275,6 +275,8 @@ struct boss_kiljaeden : public BossAI
 
             scheduler.CancelAll();
 
+            ScheduleBasicAbilities();
+
             me->m_Events.AddEventAtOffset([&] {
                 if (Creature* kalec = instance->GetCreature(DATA_KALECGOS_KJ))
                     kalec->AI()->Talk(SAY_KALECGOS_READY1);
@@ -314,6 +316,8 @@ struct boss_kiljaeden : public BossAI
             Talk(SAY_KJ_PHASE4, 28s);
 
             scheduler.CancelAll();
+
+            ScheduleBasicAbilities();
 
             me->m_Events.AddEventAtOffset([&] {
                 if (Creature* kalec = instance->GetCreature(DATA_KALECGOS_KJ))
@@ -378,6 +382,25 @@ struct boss_kiljaeden : public BossAI
                     me->m_Events.AddEventAtOffset([&] {
                         me->RemoveAurasDueToSpell(SPELL_CUSTOM_08_STATE);
                         me->RemoveUnitFlag(UNIT_FLAG_PACIFIED);
+
+                        ScheduleBasicAbilities();
+
+                        me->m_Events.AddEventAtOffset([&] {
+                            Talk(SAY_KJ_REFLECTION);
+                            me->CastCustomSpell(SPELL_SINISTER_REFLECTION, SPELLVALUE_MAX_TARGETS, 1, me, TRIGGERED_NONE);
+                            me->CastCustomSpell(SPELL_SINISTER_REFLECTION, SPELLVALUE_MAX_TARGETS, 1, me, TRIGGERED_NONE);
+                            me->CastCustomSpell(SPELL_SINISTER_REFLECTION, SPELLVALUE_MAX_TARGETS, 1, me, TRIGGERED_NONE);
+                            me->CastCustomSpell(SPELL_SINISTER_REFLECTION, SPELLVALUE_MAX_TARGETS, 1, me, TRIGGERED_NONE);
+                        }, 1s);
+
+                        ScheduleTimedEvent(15s, [&] {
+                            Talk(EMOTE_KJ_DARKNESS);
+                            DoCastAOE(SPELL_DARKNESS_OF_A_THOUSAND_SOULS);
+                        }, 25s);
+
+                        ScheduleTimedEvent(1500ms, [&] {
+                            DoCastSelf(SPELL_ARMAGEDDON_PERIODIC, true);
+                        }, 20s);
                     }, 7s);
                 }
                 Talk(SAY_KJ_PHASE5);
@@ -388,23 +411,6 @@ struct boss_kiljaeden : public BossAI
                     kalec->AI()->Talk(SAY_KALECGOS_READY_ALL);
                 EmpowerOrb(true);
             }, 61s);
-
-            me->m_Events.AddEventAtOffset([&] {
-                Talk(SAY_KJ_REFLECTION);
-                me->CastCustomSpell(SPELL_SINISTER_REFLECTION, SPELLVALUE_MAX_TARGETS, 1, me, TRIGGERED_NONE);
-                me->CastCustomSpell(SPELL_SINISTER_REFLECTION, SPELLVALUE_MAX_TARGETS, 1, me, TRIGGERED_NONE);
-                me->CastCustomSpell(SPELL_SINISTER_REFLECTION, SPELLVALUE_MAX_TARGETS, 1, me, TRIGGERED_NONE);
-                me->CastCustomSpell(SPELL_SINISTER_REFLECTION, SPELLVALUE_MAX_TARGETS, 1, me, TRIGGERED_NONE);
-            }, 1s);
-
-            ScheduleTimedEvent(15s, [&] {
-                Talk(EMOTE_KJ_DARKNESS);
-                DoCastAOE(SPELL_DARKNESS_OF_A_THOUSAND_SOULS);
-            }, 25s);
-
-            ScheduleTimedEvent(1500ms, [&] {
-                DoCastSelf(SPELL_ARMAGEDDON_PERIODIC, true);
-            }, 20s);
         });
     }
 
@@ -416,12 +422,12 @@ struct boss_kiljaeden : public BossAI
 
         ScheduleTimedEvent(7s, [&] {
             DoCastRandomTarget(SPELL_LEGION_LIGHTNING, 0, 40.0f);
-        }, 30s);
+        }, _phase == PHASE_SACRIFICE ? 15s : 30s);
 
         ScheduleTimedEvent(9s, [&] {
             me->CastCustomSpell(SPELL_FIRE_BLOOM, SPELLVALUE_MAX_TARGETS, 5, me, TRIGGERED_NONE);
             me->SetTarget(me->GetVictim()->GetGUID());
-        }, 40s);
+        }, _phase == PHASE_SACRIFICE ? 20s : 40s);
 
         if (_phase != PHASE_SACRIFICE)
         {
@@ -482,10 +488,10 @@ struct boss_kiljaeden : public BossAI
             me->HandleEmoteCommand(EMOTE_ONESHOT_DROWN);
             me->resetAttackTimer();
             events.Reset();
+            damage = 0;
             me->m_Events.AddEventAtOffset([&] {
                 me->KillSelf();
             }, 1s);
-            damage = 0;
         }
     }
 
@@ -500,15 +506,12 @@ struct boss_kiljaeden : public BossAI
     void DoAction(int32 param) override
     {
         if (param == ACTION_NO_KILL_TALK)
-        {
-            events.ScheduleEvent(EVENT_NO_KILL_TALK, 0);
             Talk(SAY_KJ_DARKNESS);
-        }
     }
 
     void KilledUnit(Unit* victim) override
     {
-        if (victim->IsPlayer() && events.GetNextEventTime(EVENT_NO_KILL_TALK) == 0)
+        if (victim->IsPlayer())
             Talk(SAY_KJ_SLAY);
     }
 
