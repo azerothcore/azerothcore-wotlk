@@ -223,11 +223,7 @@ struct boss_janalai : public BossAI
             for (Creature* egg : eggList)
                 egg->Respawn();
 
-            std::list<Creature* > hatchlingList;
-            me->GetCreaturesWithEntryInRange(hatchlingList, 100.0f, NPC_AMANI_HATCHLING);
-            for (Creature* hatchling : hatchlingList)
-                hatchling->DespawnOrUnsummon();
-            hatchlingList.clear();
+            summons.DespawnEntry(NPC_AMANI_HATCHLING);
         }
         else if (hatchAction == HATCH_ALL)
             DoCastSelf(SPELL_HATCH_EGG_ALL);
