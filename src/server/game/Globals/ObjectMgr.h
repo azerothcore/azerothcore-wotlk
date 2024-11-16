@@ -20,12 +20,9 @@
 
 #include "Bag.h"
 #include "ConditionMgr.h"
-#include "Corpse.h"
 #include "Creature.h"
 #include "DatabaseEnv.h"
-#include "DynamicObject.h"
 #include "GameObject.h"
-#include "GossipDef.h"
 #include "ItemTemplate.h"
 #include "Log.h"
 #include "Mail.h"
@@ -183,6 +180,7 @@ enum eScriptFlags
     // Playsound flags
     SF_PLAYSOUND_TARGET_PLAYER  = 0x1,
     SF_PLAYSOUND_DISTANCE_SOUND = 0x2,
+    SF_PLAYSOUND_DISTANCE_RADIUS = 0x4,
 
     // Orientation flags
     SF_ORIENTATION_FACE_TARGET  = 0x1,
@@ -310,6 +308,7 @@ struct ScriptInfo
         {
             uint32 SoundID;         // datalong
             uint32 Flags;           // datalong2
+            int32  Radius;          // dataint
         } Playsound;
 
         struct                      // SCRIPT_COMMAND_CREATE_ITEM (17)
@@ -520,6 +519,7 @@ typedef std::map<std::pair<std::string, uint32>, ModuleString> ModuleStringConta
 typedef std::unordered_map<int32, AcoreString> AcoreStringContainer;
 typedef std::unordered_map<uint32, GossipMenuItemsLocale> GossipMenuItemsLocaleContainer;
 typedef std::unordered_map<uint32, PointOfInterestLocale> PointOfInterestLocaleContainer;
+typedef std::unordered_map<uint32, VehicleSeatAddon> VehicleSeatAddonContainer;
 
 typedef std::multimap<uint32, uint32> QuestRelations;
 typedef std::pair<QuestRelations::const_iterator, QuestRelations::const_iterator> QuestRelationBounds;
@@ -1054,6 +1054,7 @@ public:
     void LoadMailServerTemplates();
     void LoadVehicleTemplateAccessories();
     void LoadVehicleAccessories();
+    void LoadVehicleSeatAddon();
 
     void LoadGossipText();
 
@@ -1431,6 +1432,15 @@ public:
 
     [[nodiscard]] bool IsTransportMap(uint32 mapId) const { return _transportMaps.count(mapId) != 0; }
 
+    VehicleSeatAddon const* GetVehicleSeatAddon(uint32 seatId) const
+    {
+        VehicleSeatAddonContainer::const_iterator itr = _vehicleSeatAddonStore.find(seatId);
+        if (itr == _vehicleSeatAddonStore.end())
+            return nullptr;
+
+        return &itr->second;
+    }
+
     [[nodiscard]] uint32 GetQuestMoneyReward(uint8 level, uint32 questMoneyDifficulty) const;
     void SendServerMail(Player* player, uint32 id, uint32 reqLevel, uint32 reqPlayTime, uint32 rewardMoneyA, uint32 rewardMoneyH, uint32 rewardItemA, uint32 rewardItemCountA, uint32 rewardItemH, uint32 rewardItemCountH, std::string subject, std::string body, uint8 active) const;
 private:
@@ -1508,6 +1518,7 @@ private:
 
     VehicleAccessoryContainer _vehicleTemplateAccessoryStore;
     VehicleAccessoryContainer _vehicleAccessoryStore;
+    VehicleSeatAddonContainer _vehicleSeatAddonStore;
 
     LocaleConstant DBCLocaleIndex;
 

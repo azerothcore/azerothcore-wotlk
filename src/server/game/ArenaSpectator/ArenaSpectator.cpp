@@ -23,7 +23,6 @@
 #include "Player.h"
 #include "SpellAuraEffects.h"
 #include "SpellAuras.h"
-#include "Types.h"
 #include "World.h"
 
 bool ArenaSpectator::HandleSpectatorSpectateCommand(ChatHandler* handler, std::string const& name)

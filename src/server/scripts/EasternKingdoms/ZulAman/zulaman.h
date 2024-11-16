@@ -25,17 +25,20 @@
 
 enum DataTypes
 {
-    DATA_GONGEVENT                      = 0,
-    DATA_NALORAKKEVENT                  = 1,
-    DATA_AKILZONEVENT                   = 2,
-    DATA_JANALAIEVENT                   = 3,
-    DATA_HALAZZIEVENT                   = 4,
-    DATA_HEXLORDEVENT                   = 5,
-    DATA_ZULJINEVENT                    = 6,
+    DATA_NALORAKK                       = 0,
+    DATA_AKILZON                        = 1,
+    DATA_JANALAI                        = 2,
+    DATA_HALAZZI                        = 3,
+    DATA_HEXLORD                        = 4,
+    DATA_ZULJIN                         = 5,
+    MAX_ENCOUNTER                       = 6,
     DATA_SPIRIT_LYNX                    = 7,
-    DATA_CHESTLOOTED                    = 8,
-    TYPE_RAND_VENDOR_1                  = 9,
-    TYPE_RAND_VENDOR_2                  = 10
+    TYPE_RAND_VENDOR_1                  = 8,
+    TYPE_RAND_VENDOR_2                  = 9,
+    DATA_STRANGE_GONG                   = 10,
+    DATA_MASSIVE_GATE                   = 11,
+    DATA_HEXLORD_GATE                   = 12,
+    DATA_HARRISON_JONES                 = 13
 };
 
 enum CreatureIds
@@ -60,13 +63,22 @@ enum GameobjectIds
     GO_GATE_HEXLORD                     = 186305,
     GO_MASSIVE_GATE                     = 186728,
     GO_DOOR_AKILZON                     = 186858,
-    GO_DOOR_ZULJIN                      = 186859,
+    GO_ZULJIN_FIREWALL                  = 186859,
     GO_HARKORS_SATCHEL                  = 187021,
     GO_TANZARS_TRUNK                    = 186648,
     GO_ASHLIS_BAG                       = 186672,
     GO_KRAZS_PACKAGE                    = 186667,
     GO_STRANGE_GONG                     = 187359
 };
+
+enum MiscIds
+{
+    DATA_TIMED_RUN                      = 0,
+    ACTION_START_TIMED_RUN              = 0,
+    GROUP_TIMED_RUN                     = 1
+};
+
+uint32 constexpr PersistentDataCount = 1;
 
 template <class AI, class T>
 inline AI* GetZulAmanAI(T* obj)

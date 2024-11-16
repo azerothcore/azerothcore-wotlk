@@ -2444,35 +2444,24 @@ public:
     };
 };
 
-class spell_faction_champion_warl_unstable_affliction : public SpellScriptLoader
+class spell_faction_champion_warl_unstable_affliction_aura : public AuraScript
 {
-public:
-    spell_faction_champion_warl_unstable_affliction() : SpellScriptLoader("spell_faction_champion_warl_unstable_affliction") { }
+    PrepareAuraScript(spell_faction_champion_warl_unstable_affliction_aura);
 
-    class spell_faction_champion_warl_unstable_affliction_AuraScript : public AuraScript
+    bool Validate(SpellInfo const* /*spell*/) override
     {
-        PrepareAuraScript(spell_faction_champion_warl_unstable_affliction_AuraScript);
+        return ValidateSpellInfo({ SPELL_UNSTABLE_AFFLICTION_DISPEL });
+    }
 
-        bool Validate(SpellInfo const* /*spell*/) override
-        {
-            return ValidateSpellInfo({ SPELL_UNSTABLE_AFFLICTION_DISPEL });
-        }
-
-        void HandleDispel(DispelInfo* dispelInfo)
-        {
-            if (Unit* caster = GetCaster())
-                caster->CastSpell(dispelInfo->GetDispeller(), SPELL_UNSTABLE_AFFLICTION_DISPEL, true, nullptr, GetEffect(EFFECT_0));
-        }
-
-        void Register() override
-        {
-            AfterDispel += AuraDispelFn(spell_faction_champion_warl_unstable_affliction_AuraScript::HandleDispel);
-        }
-    };
-
-    AuraScript* GetAuraScript() const override
+    void HandleDispel(DispelInfo* dispelInfo)
     {
-        return new spell_faction_champion_warl_unstable_affliction_AuraScript();
+        if (Unit* caster = GetCaster())
+            caster->CastSpell(dispelInfo->GetDispeller(), SPELL_UNSTABLE_AFFLICTION_DISPEL, true, nullptr, GetEffect(EFFECT_0));
+    }
+
+    void Register() override
+    {
+        AfterDispel += AuraDispelFn(spell_faction_champion_warl_unstable_affliction_aura::HandleDispel);
     }
 };
 
@@ -2494,5 +2483,5 @@ void AddSC_boss_faction_champions()
     new npc_toc_retro_paladin();
     new npc_toc_pet_warlock();
     new npc_toc_pet_hunter();
-    new spell_faction_champion_warl_unstable_affliction();
+    RegisterSpellScript(spell_faction_champion_warl_unstable_affliction_aura);
 }

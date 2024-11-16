@@ -22,11 +22,8 @@
 #include "CharmInfo.h"
 #include "Common.h"
 #include "CreatureData.h"
-#include "DatabaseEnv.h"
-#include "ItemTemplate.h"
 #include "LootMgr.h"
 #include "Unit.h"
-#include "World.h"
 #include <list>
 
 class SpellInfo;

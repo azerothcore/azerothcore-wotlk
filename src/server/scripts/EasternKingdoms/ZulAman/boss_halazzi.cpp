@@ -74,9 +74,14 @@ enum Groups
     GROUP_MERGE                 = 2
 };
 
+enum Actions
+{
+    ACTION_MERGE                = 0
+};
+
 struct boss_halazzi : public BossAI
 {
-    boss_halazzi(Creature* creature) : BossAI(creature, DATA_HALAZZIEVENT)
+    boss_halazzi(Creature* creature) : BossAI(creature, DATA_HALAZZI)
     {
         scheduler.SetValidator([this]
         {
@@ -118,33 +123,19 @@ struct boss_halazzi : public BossAI
     void DamageTaken(Unit* /*attacker*/, uint32& damage, DamageEffectType /*damagetype*/, SpellSchoolMask /*damageSchoolMask*/) override
     {
         if (damage >= me->GetHealth() && _phase != PHASE_ENRAGE)
-        {
             damage = 0;
-        }
         else
         {
             if (_phase == PHASE_LYNX || _phase == PHASE_ENRAGE)
             {
                 _healthCheckPercentage = 25 * (3 - _transformCount);
                 if (!HealthAbovePct(_healthCheckPercentage))
-                {
                     EnterPhase(PHASE_SPLIT);
-                }
             }
             else if (_phase == PHASE_HUMAN)
             {
-                if (Creature* lynx = instance->GetCreature(DATA_SPIRIT_LYNX))
-                {
-                    if (!HealthAbovePct(20) || !lynx->HealthAbovePct(20))
-                    {
-                        EnterPhase(PHASE_MERGE);
-                    }
-                }
-                else
-                {
-                    //should not really happen
-                    EnterEvadeMode();
-                }
+                if (!HealthAbovePct(20))
+                    EnterPhase(PHASE_MERGE);
             }
         }
     }
@@ -152,17 +143,13 @@ struct boss_halazzi : public BossAI
     void SpellHit(Unit*, SpellInfo const* spell) override
     {
         if (spell->Id == SPELL_TRANSFORM_SPLIT2)
-        {
             EnterPhase(PHASE_HUMAN);
-        }
     }
 
     void AttackStart(Unit* who) override
     {
         if (_phase != PHASE_MERGE)
-        {
             BossAI::AttackStart(who);
-        }
     }
 
     void EnterPhase(PhaseHalazzi nextPhase)
@@ -175,7 +162,7 @@ struct boss_halazzi : public BossAI
                 {
                     DoCastSelf(SPELL_TRANSFORM_MERGE, true);
                     me->RemoveAurasDueToSpell(SPELL_TRANSFORM_SPLIT2);
-                    me->GetMotionMaster()->MoveChase(me->GetVictim());
+                    me->ResumeChasingVictim();
                 }
                 summons.DespawnAll();
                 me->SetMaxHealth(_lynxFormHealth);
@@ -207,13 +194,9 @@ struct boss_halazzi : public BossAI
                     if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0))
                     {
                         if (target->IsNonMeleeSpellCast(false))
-                        {
                             DoCast(target, SPELL_EARTHSHOCK);
-                        }
                         else
-                        {
                             DoCast(target, SPELL_FLAMESHOCK);
-                        }
                     }
                     context.Repeat(10s, 15s);
                 }).Schedule(12s, GROUP_HUMAN, [this](TaskContext context)
@@ -236,19 +219,13 @@ struct boss_halazzi : public BossAI
                     scheduler.Schedule(2s, GROUP_MERGE, [this](TaskContext context)
                     {
                         if (Creature* lynx = instance->GetCreature(DATA_SPIRIT_LYNX))
-                        {
                             if (me->IsWithinDistInMap(lynx, 6.0f))
                             {
                                 if (_transformCount < 3)
-                                {
                                     EnterPhase(PHASE_LYNX);
-                                }
                                 else
-                                {
                                     EnterPhase(PHASE_ENRAGE);
-                                }
                             }
-                        }
                         context.Repeat(2s);
                     });
                 }
@@ -263,9 +240,13 @@ struct boss_halazzi : public BossAI
     {
         BossAI::KilledUnit(victim);
         if (victim->IsPlayer())
-        {
             Talk(SAY_KILL);
-        }
+    }
+
+    void DoAction(int32 actionId) override
+    {
+        if (actionId == ACTION_MERGE)
+            EnterPhase(PHASE_MERGE);
     }
 
     void JustDied(Unit* killer) override
@@ -281,60 +262,8 @@ private:
     uint32 _healthCheckPercentage;
     PhaseHalazzi _phase;
 };
-// Spirits Lynx AI
-struct npc_halazzi_lynx : public ScriptedAI
-{
-    npc_halazzi_lynx(Creature* creature) : ScriptedAI(creature) { }
-
-    void Reset() override
-    {
-        scheduler.CancelAll();
-    }
-
-    void DamageTaken(Unit* /*attacker*/, uint32& damage, DamageEffectType /*damagetype*/, SpellSchoolMask /*damageSchoolMask*/) override
-    {
-        if (damage >= me->GetHealth())
-        {
-            damage = 0;
-        }
-    }
-
-    void AttackStart(Unit* who) override
-    {
-        if (!me->HasUnitFlag(UNIT_FLAG_NON_ATTACKABLE))
-        {
-            ScriptedAI::AttackStart(who);
-        }
-    }
-
-    void JustEngagedWith(Unit* who) override
-    {
-        ScriptedAI::JustEngagedWith(who);
-
-        ScheduleTimedEvent(30s, 50s, [&]
-        {
-            DoCastSelf(SPELL_LYNX_FRENZY);
-        }, 30s, 50s);
-        ScheduleTimedEvent(4s, [&]{
-            DoCastVictim(SPELL_SHRED_ARMOR);
-        }, 4s);
-    }
-
-    void UpdateAI(uint32 diff) override
-    {
-        if (!UpdateVictim())
-        {
-            return;
-        }
-
-        scheduler.Update(diff);
-
-        DoMeleeAttackIfReady();
-    }
-};
 
 void AddSC_boss_halazzi()
 {
     RegisterZulAmanCreatureAI(boss_halazzi);
-    RegisterZulAmanCreatureAI(npc_halazzi_lynx);
 }

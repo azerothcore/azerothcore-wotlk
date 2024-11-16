@@ -19,6 +19,7 @@
 #include "DatabaseEnv.h"
 #include "GridDefines.h"
 #include "Log.h"
+#include "QueryResult.h"
 
 WaypointMgr::WaypointMgr()
 {

@@ -936,7 +936,7 @@ class spell_dru_starfall_dummy : public SpellScript
             return;
         }
 
-        // Any effect which causes you to lose control of your character will supress the starfall effect.
+        // Any effect which causes you to lose control of your character will suppress the starfall effect.
         if (caster->HasUnitState(UNIT_STATE_CONTROLLED))
             return;
 
@@ -1017,7 +1017,7 @@ class spell_dru_swift_flight_passive : public AuraScript
 
     void Register() override
     {
-        DoEffectCalcAmount += AuraEffectCalcAmountFn(spell_dru_swift_flight_passive::CalculateAmount, EFFECT_1, SPELL_AURA_MOD_INCREASE_VEHICLE_FLIGHT_SPEED);
+        DoEffectCalcAmount += AuraEffectCalcAmountFn(spell_dru_swift_flight_passive::CalculateAmount, EFFECT_1, SPELL_AURA_MOD_INCREASE_FLIGHT_SPEED);
     }
 };
 

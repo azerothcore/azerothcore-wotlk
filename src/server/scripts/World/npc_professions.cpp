@@ -21,6 +21,7 @@
 #include "ScriptedCreature.h"
 #include "ScriptedGossip.h"
 #include "SpellInfo.h"
+#include "SpellMgr.h"
 /* ScriptData
 SDName: Npc_Professions
 SD%Complete: 80

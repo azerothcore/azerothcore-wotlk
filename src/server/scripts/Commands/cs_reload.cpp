@@ -31,6 +31,7 @@ EndScriptData */
 #include "CreatureTextMgr.h"
 #include "DisableMgr.h"
 #include "GameGraveyard.h"
+#include "ItemEnchantmentMgr.h"
 #include "LFGMgr.h"
 #include "Language.h"
 #include "MapMgr.h"

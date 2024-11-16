@@ -18,8 +18,6 @@
 #ifndef _LFGQUEUE_H
 #define _LFGQUEUE_H
 
-#include <utility>
-
 #include "LFG.h"
 
 namespace lfg

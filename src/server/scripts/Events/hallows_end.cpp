@@ -1091,6 +1091,8 @@ struct boss_headless_horseman : public ScriptedAI
                 me->ReplaceAllUnitFlags(UNIT_FLAG_NONE);
                 me->StopMoving();
 
+                me->SetDisableGravity(false);
+
                 me->SetInCombatWithZone();
                 inFight = true;
                 events.ScheduleEvent(EVENT_HORSEMAN_FOLLOW, 500ms);
@@ -1187,6 +1189,7 @@ struct boss_headless_horseman : public ScriptedAI
                                 trigger->CastSpell(trigger, SPELL_EARTH_EXPLOSION, true);
                             break;
                         case 3:
+                            me->SetDisableGravity(true);
                             me->GetMotionMaster()->MovePath(236820, false);
                             me->CastSpell(me, SPELL_SHAKE_CAMERA_SMALL, true);
                             player->Say(TALK_PLAYER_FELT_DEATH);
