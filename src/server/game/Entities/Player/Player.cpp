@@ -2941,9 +2941,7 @@ bool Player::addTalent(uint32 spellId, uint8 addSpecMask, uint8 oldTalentRank)
             itr->second->State = PLAYERSPELL_CHANGED;
 
         if (GetActiveSpecMask() & addSpecMask)
-        {
             m_usedTalentCount += (talentPos->rank + 1) - oldTalentRank;
-        }
 
         return true;
     }
