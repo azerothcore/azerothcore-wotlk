@@ -82,6 +82,7 @@ public:
         {
             BossAI::Reset();
             SummonCryptGuards();
+            me->m_Events.KillAllEvents(false);
         }
 
         void JustSummoned(Creature* cr) override
