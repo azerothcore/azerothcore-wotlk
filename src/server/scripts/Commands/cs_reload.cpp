@@ -414,7 +414,10 @@ public:
         LOG_INFO("server.loading", "Reloading Motd...");
         sMotdMgr->LoadMotd();
         handler->SendGlobalGMSysMessage("DB table `motd` reloaded.");
-        handler->SendGlobalSysMessage(sMotdMgr->GetMotd(handler->GetPlayer()->GetSession()->GetSessionDbLocaleIndex()));
+        if(Player* player = handler->GetPlayer())
+            handler->SendGlobalSysMessage(sMotdMgr->GetMotd(handler->GetPlayer()->GetSession()->GetSessionDbLocaleIndex()));
+        else
+            handler->SendGlobalSysMessage(sMotdMgr->GetMotd(LOCALE_enUS));
         return true;
     }
 
