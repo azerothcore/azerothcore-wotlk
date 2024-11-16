@@ -153,6 +153,19 @@ struct boss_janalai : public BossAI
         BossAI::JustDied(killer);
     }
 
+    void JustSummoned(Creature* summon) override
+    {
+        if (summon->GetEntry() == NPC_HATCHLING)
+        {
+            if (summon->GetPositionY() > 1150)
+                summon->GetMotionMaster()->MovePoint(0, hatcherway[0][3].GetPositionX() + rand() % 4 - 2, 1150.0f + rand() % 4 - 2, hatcherway[0][3].GetPositionY());
+            else
+                summon->GetMotionMaster()->MovePoint(0, hatcherway[1][3].GetPositionX() + rand() % 4 - 2, 1150.0f + rand() % 4 - 2, hatcherway[1][3].GetPositionY());
+        }
+
+        BossAI::JustSummoned(summon);
+    }
+
     void DamageDealt(Unit* target, uint32& damage, DamageEffectType /*damagetype*/) override
     {
         if (_isFlameBreathing)
@@ -397,10 +410,7 @@ struct npc_janalai_hatchling : public ScriptedAI
     void Reset() override
     {
         scheduler.CancelAll();
-        if (me->GetPositionY() > 1150)
-            me->GetMotionMaster()->MovePoint(0, hatcherway[0][3].GetPositionX() + rand() % 4 - 2, 1150.0f + rand() % 4 - 2, hatcherway[0][3].GetPositionY());
-        else
-            me->GetMotionMaster()->MovePoint(0, hatcherway[1][3].GetPositionX() + rand() % 4 - 2, 1150.0f + rand() % 4 - 2, hatcherway[1][3].GetPositionY());
+
 
         me->SetInCombatWithZone();
     }
@@ -428,5 +438,4 @@ void AddSC_boss_janalai()
 {
     RegisterZulAmanCreatureAI(boss_janalai);
     RegisterZulAmanCreatureAI(npc_janalai_hatcher);
-    RegisterZulAmanCreatureAI(npc_janalai_hatchling);
 }
