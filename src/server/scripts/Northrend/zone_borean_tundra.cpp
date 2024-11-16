@@ -431,7 +431,7 @@ public:
 
                         case 6:
                             if (Player* player = GetPlayerForEscort())
-                                player->AreaExploredOrEventHappens(QUEST_ESCAPE_WINTERFIN_CAVERNS);
+                                player->GroupEventHappens(QUEST_ESCAPE_WINTERFIN_CAVERNS, me);
                             IntroPhase = 7;
                             IntroTimer = 2500;
                             break;

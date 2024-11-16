@@ -180,6 +180,7 @@ enum eScriptFlags
     // Playsound flags
     SF_PLAYSOUND_TARGET_PLAYER  = 0x1,
     SF_PLAYSOUND_DISTANCE_SOUND = 0x2,
+    SF_PLAYSOUND_DISTANCE_RADIUS = 0x4,
 
     // Orientation flags
     SF_ORIENTATION_FACE_TARGET  = 0x1,
@@ -307,6 +308,7 @@ struct ScriptInfo
         {
             uint32 SoundID;         // datalong
             uint32 Flags;           // datalong2
+            int32  Radius;          // dataint
         } Playsound;
 
         struct                      // SCRIPT_COMMAND_CREATE_ITEM (17)

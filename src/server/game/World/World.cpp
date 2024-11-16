@@ -93,6 +93,7 @@
 #include "WhoListCacheMgr.h"
 #include "WorldPacket.h"
 #include "WorldSession.h"
+#include "WorldState.h"
 #include <boost/asio/ip/address.hpp>
 #include <cmath>
 
@@ -2412,6 +2413,11 @@ void World::Update(uint32 diff)
     {
         METRIC_TIMER("world_update_time", METRIC_TAG("type", "Update outdoor pvp"));
         sOutdoorPvPMgr->Update(diff);
+    }
+
+    {
+        METRIC_TIMER("world_update_time", METRIC_TAG("type", "Update worldstate"));
+        sWorldState->Update(diff);
     }
 
     {

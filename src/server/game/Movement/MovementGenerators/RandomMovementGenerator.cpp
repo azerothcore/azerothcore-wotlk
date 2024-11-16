@@ -25,6 +25,7 @@
 #include "ObjectAccessor.h"
 #include "Spell.h"
 #include "Util.h"
+#include "World.h"
 
 template<class T>
 RandomMovementGenerator<T>::~RandomMovementGenerator() { }

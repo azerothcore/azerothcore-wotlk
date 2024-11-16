@@ -83,6 +83,7 @@
 #include "World.h"
 #include "WorldPacket.h"
 #include "WorldSession.h"
+#include "WorldState.h"
 #include <cmath>
 
 /// @todo: this import is not necessary for compilation and marked as unused by the IDE
@@ -1722,6 +1723,7 @@ void Player::RemoveFromWorld()
             m_session->DoLootRelease(lguid);
         sOutdoorPvPMgr->HandlePlayerLeaveZone(this, m_zoneUpdateId);
         sBattlefieldMgr->HandlePlayerLeaveZone(this, m_zoneUpdateId);
+        sWorldState->HandlePlayerLeaveZone(this, static_cast<WorldStateZoneId>(m_zoneUpdateId));
     }
 
     // Remove items from world before self - player must be found in Item::RemoveFromObjectUpdate
@@ -6930,7 +6932,7 @@ void Player::_ApplyWeaponDamage(uint8 slot, ItemTemplate const* proto, ScalingSt
         float maxDamage = proto->Damage[i].DamageMax;
 
         // If set dpsMod in ScalingStatValue use it for min (70% from average), max (130% from average) damage
-        if (ssv)
+        if (ssv && i == 0) // scaling stats only for first damage
         {
             int32 extraDPS = ssv->getDPSMod(ScalingStatValue);
             if (extraDPS)
@@ -6945,6 +6947,8 @@ void Player::_ApplyWeaponDamage(uint8 slot, ItemTemplate const* proto, ScalingSt
 
         if (apply)
         {
+            sScriptMgr->OnApplyWeaponDamage(this, slot, proto, minDamage, maxDamage, i);
+
             if (minDamage > 0.f)
             {
                 SetBaseWeaponDamage(WeaponAttackType(attType), MINDAMAGE, minDamage, i);

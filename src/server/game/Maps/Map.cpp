@@ -31,6 +31,7 @@
 #include "MapInstanced.h"
 #include "Metric.h"
 #include "MiscPackets.h"
+#include "MMapFactory.h"
 #include "Object.h"
 #include "ObjectAccessor.h"
 #include "ObjectGridLoader.h"

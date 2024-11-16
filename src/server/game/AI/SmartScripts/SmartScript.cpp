@@ -35,6 +35,7 @@
 #include "SmartAI.h"
 #include "SpellMgr.h"
 #include "Vehicle.h"
+#include "WorldState.h"
 
 /// @todo: this import is not necessary for compilation and marked as unused by the IDE
 //  however, for some reasons removing it would cause a damn linking issue
@@ -696,6 +697,10 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
                     if (isWithinLOSInMap && isWithinMeleeRange && isRangedAttack && isTargetRooted && canCastSpell && !me->IsVehicle())
                     {
                         failedSpellCast = true; // Mark spellcast as failed so we can retry it later
+
+                        if (me->IsRooted()) // Rooted inhabit type, never move/reposition
+                            continue;
+
                         float minDistance = std::max(meleeRange, spellMinRange) - distanceToTarget + NOMINAL_MELEE_RANGE;
                         CAST_AI(SmartAI, me->AI())->MoveAway(std::min(minDistance, spellMaxRange));
                         continue;
@@ -705,12 +710,20 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
                     if (distanceToTarget > spellMaxRange && isWithinLOSInMap)
                     {
                         failedSpellCast = true;
+
+                        if (me->IsRooted()) // Rooted inhabit type, never move/reposition
+                            continue;
+
                         CAST_AI(SmartAI, me->AI())->SetCombatMove(true, std::max(spellMaxRange - NOMINAL_MELEE_RANGE, 0.0f));
                         continue;
                     }
                     else if (distanceToTarget < spellMinRange || !(isWithinLOSInMap || isSpellIgnoreLOS))
                     {
                         failedSpellCast = true;
+
+                        if (me->IsRooted()) // Rooted inhabit type, never move/reposition
+                            continue;
+
                         CAST_AI(SmartAI, me->AI())->SetCombatMove(true);
                         continue;
                     }
@@ -3257,6 +3270,11 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
 
             break;
         }
+        case SMART_ACTION_WORLD_SCRIPT:
+        {
+            sWorldState->HandleExternalEvent(static_cast<WorldStateEvent>(e.action.worldStateScript.eventId), e.action.worldStateScript.param);
+            break;
+        }
         default:
             LOG_ERROR("sql.sql", "SmartScript::ProcessAction: Entry {} SourceType {}, Event {}, Unhandled Action type {}", e.entryOrGuid, e.GetScriptType(), e.event_id, e.GetActionType());
             break;
@@ -5061,7 +5079,7 @@ void SmartScript::GetScript()
 
         if (CreatureTemplate const* cInfo = me->GetCreatureTemplate())
         {
-            if (cInfo->HasFlagsExtra(CREATURE_FLAG_DONT_OVERRIDE_ENTRY_SAI))
+            if (cInfo->HasFlagsExtra(CREATURE_FLAG_EXTRA_DONT_OVERRIDE_ENTRY_SAI))
             {
                 e = sSmartScriptMgr->GetScript((int32)me->GetEntry(), mScriptType);
                 FillScript(e, me, nullptr);

@@ -19,7 +19,9 @@
 #define ACORE_MOTIONMASTER_H
 
 #include "Common.h"
-#include "Object.h"
+#include "ObjectGuid.h"
+#include "PathGenerator.h"
+#include "Position.h"
 #include "SharedDefines.h"
 #include "Spline/MoveSpline.h"
 #include <optional>
