@@ -98,25 +98,7 @@ enum Misc
     PHASE_SACRIFICE                 = 5,
 
     ACTION_START_POST_EVENT         = 1,
-    ACTION_NO_KILL_TALK             = 2,
-
-    // Controller events
-    EVENT_RANDOM_TALK               = 40,
-    EVENT_CHECK_PLAYERS             = 41,
-
-    // Misc fight events
-    EVENT_REBIRTH                   = 50,
-    EVENT_INIT_FIGHT                = 51,
-    EVENT_EMPOWER_ORBS3             = 57,
-    EVENT_RESTORE_MELEE             = 58,
-    EVENT_KILL_SELF                 = 59,
-    EVENT_NO_KILL_TALK              = 60,
-
-    // Abilities events
-    EVENT_SPELL_SOUL_FLAY           = 100,
-    EVENT_SPELL_LEGION_LIGHTNING    = 101,
-    EVENT_SPELL_FIRE_BLOOM          = 102,
-    EVENT_SUMMON_ORBS               = 103,
+    ACTION_NO_KILL_TALK             = 2
 };
 
 class CastArmageddon : public BasicEvent
@@ -203,7 +185,6 @@ struct npc_kiljaeden_controller : public NullCreatureAI
         if (summon->GetEntry() == NPC_HAND_OF_THE_DECEIVER)
         {
             instance->SetBossState(DATA_KILJAEDEN, IN_PROGRESS);
-            events.ScheduleEvent(EVENT_CHECK_PLAYERS, 1000);
 
             scheduler.Schedule(1s, [this](TaskContext context) {
                 auto const& playerList = me->GetMap()->GetPlayers();
@@ -248,7 +229,6 @@ struct boss_kiljaeden : public BossAI
     {
         ScriptedAI::InitializeAI();
         me->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
-        events.Reset();
         me->SetVisible(false);
 
         me->m_Events.AddEventAtOffset([&] {
