@@ -17,6 +17,7 @@
 #include "DatabaseEnv.h"
 #include "Log.h"
 #include "ObjectMgr.h"
+#include "QueryResult.h"
 
 #include <sstream>
 
