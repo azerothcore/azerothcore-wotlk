@@ -84,32 +84,6 @@ enum SWPActions
     ACTION_ENRAGE_OTHER                 = 5,
 };
 
-enum kalEvents
-{
-    EVENT_ARCANE_BUFFET                 = 1,
-    EVENT_FROST_BREATH                  = 2,
-    EVENT_WILD_MAGIC                    = 3,
-    EVENT_TAIL_LASH                     = 4,
-    EVENT_SPECTRAL_BLAST                = 5,
-    EVENT_CHECK_POS                     = 8,
-    EVENT_SPAWN_SPECTRALS               = 9,
-
-    EVENT_SPELL_REVITALIZE              = 10,
-    EVENT_SPELL_HEROIC_STRIKE           = 11,
-    EVENT_SHADOW_BOLT                   = 12,
-    EVENT_AGONY_CURSE                   = 13,
-    EVENT_CORRUPTION_STRIKE             = 14,
-
-    EVENT_TALK_GOOD_1                   = 20,
-    EVENT_TALK_GOOD_2                   = 21,
-    EVENT_TALK_GOOD_3                   = 22,
-    EVENT_TALK_GOOD_4                   = 23,
-    EVENT_TALK_GOOD_5                   = 24,
-    EVENT_TALK_BAD_1                    = 25,
-    EVENT_TALK_BAD_2                    = 26,
-    EVENT_TALK_BAD_3                    = 27
-};
-
 #define DRAGON_REALM_Z  53.079f
 
 struct boss_kalecgos : public BossAI
