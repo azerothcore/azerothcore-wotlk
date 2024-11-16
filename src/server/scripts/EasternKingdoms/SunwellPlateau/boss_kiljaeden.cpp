@@ -261,7 +261,7 @@ struct boss_kiljaeden : public BossAI
 
     void Reset() override
     {
-        events.Reset();
+        _phase = PHASE_NORMAL;
 
         ScheduleHealthCheckEvent(85, [&]{
             _phase = PHASE_DARKNESS;
