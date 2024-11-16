@@ -27,10 +27,11 @@
 
 namespace
 {
+    // Stores translated worldpackets
     std::unordered_map<LocaleConstant, WorldPacket> MotdPackets;
-    // Define a dictionary to store locale as the key and the message as the value
+    // Stores the localized motd to prevent database queries
     std::unordered_map<LocaleConstant, std::string> MotdMap;
-
+    // Dict to store all valid locales
     std::unordered_map<std::string, LocaleConstant> localeMap = {
         {"enUS", LOCALE_enUS},
         {"deDE", LOCALE_deDE},
@@ -65,7 +66,7 @@ void MotdMgr::SetMotd(std::string motd, std::string locale)
 
 void MotdMgr::CreateWorldPackages()
 {
-    for (const auto& [locale, motd] : MotdMap) // Ensure MotdMap is declared and in scope
+    for (const auto& [locale, motd] : MotdMap)
         // Store the constructed packet in MotdPackets with the locale as the key
         MotdPackets[locale] = CreateWorldPacket(motd);
 }
@@ -74,19 +75,19 @@ void MotdMgr::LoadMotd()
     uint32 oldMSTime = getMSTime();
     uint32 realmId = sConfigMgr->GetOption<int32>("RealmID", 0);
 
-    // Step 1: Load the main motd for the realm and assign it to enUS if available
+    // Load the main motd for the realm and assign it to enUS if available
     std::string motd = LoadDefaultMotd(realmId);
 
-    // Step 2: Check if motd was loaded; if not, set default only for enUS
+    // Check if motd was loaded; if not, set default only for enUS
     if (motd.empty())
         SetDefaultMotd(motd);  // Only sets enUS default if motd is empty
     else
         MotdMap[LOCALE_enUS] = motd;  // Assign the loaded motd to enUS
 
-    // Step 3: Load localized texts if available
+    // Load localized texts if available
     LoadLocalizedMotds(realmId);
 
-    // Step 4: Create all world packages after loading motd and localized texts
+    // Create all world packages after loading motd and localized texts
     CreateWorldPackages();
 }
 

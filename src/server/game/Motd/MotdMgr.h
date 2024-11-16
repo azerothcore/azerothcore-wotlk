@@ -40,6 +40,7 @@ public:
     /// Get the current Message of the Day
     char const* GetMotd(LocaleConstant locale);
 
+    // Checks if the provided locale is a supported locale
     bool IsValidLocale(const std::string& locale);
 
     /// Returns the current motd packet for the given locale
