@@ -768,7 +768,6 @@ struct advisor_baseAI : public ScriptedAI
         {
             me->RemoveAurasDueToSpell(SPELL_PERMANENT_FEIGN_DEATH);
             me->SetStandState(UNIT_STAND_STATE_STAND);
-            me->SetFullHealth();
             scheduler.Schedule(6s, [&](TaskContext /*context*/)
             {
                 _preventDeath = false;

@@ -20,6 +20,12 @@
 #include "SpellScript.h"
 #include "SpellScriptLoader.h"
 #include "zulgurub.h"
+/* ScriptData
+SDName: Boss_Gahz'ranka
+SD%Complete: 85
+SDComment: Massive Geyser with knockback not working. Spell buggy.
+SDCategory: Zul'Gurub
+EndScriptData */
 
 enum Spells
 {
@@ -30,39 +36,89 @@ enum Spells
     SPELL_SPLASH                    = 24593
 };
 
+enum Events
+{
+    EVENT_FROSTBREATH               = 1,
+    EVENT_MASSIVEGEYSER             = 2,
+    EVENT_SLAM                      = 3
+};
+
 enum Misc
 {
     GAMEOBJECT_MUDSKUNK_LURE        = 180346
 };
 
-struct boss_gahzranka : public BossAI
+class boss_gahzranka : public CreatureScript
 {
-    boss_gahzranka(Creature* creature) : BossAI(creature, DATA_GAHZRANKA) {}
+public:
+    boss_gahzranka() : CreatureScript("boss_gahzranka") { }
 
-    void IsSummonedBy(WorldObject* /*summoner*/) override
+    struct boss_gahzrankaAI : public BossAI
     {
-        me->GetMotionMaster()->MovePath(me->GetEntry() * 10, false);
-    }
+        boss_gahzrankaAI(Creature* creature) : BossAI(creature, DATA_GAHZRANKA) { }
 
-    void JustEngagedWith(Unit* /*who*/) override
+        void IsSummonedBy(WorldObject* /*summoner*/) override
+        {
+            me->GetMotionMaster()->MovePath(me->GetEntry() * 10, false);
+        }
+
+        void Reset() override
+        {
+            _Reset();
+        }
+
+        void JustDied(Unit* /*killer*/) override
+        {
+            _JustDied();
+        }
+
+        void JustEngagedWith(Unit* /*who*/) override
+        {
+            _JustEngagedWith();
+            me->AddAura(SPELL_THRASH, me);
+            events.ScheduleEvent(EVENT_FROSTBREATH, 8s);
+            events.ScheduleEvent(EVENT_MASSIVEGEYSER, 25s);
+            events.ScheduleEvent(EVENT_SLAM, 15s);
+        }
+
+        void UpdateAI(uint32 diff) override
+        {
+            if (!UpdateVictim())
+                return;
+
+            events.Update(diff);
+
+            if (me->HasUnitState(UNIT_STATE_CASTING))
+                return;
+
+            while (uint32 eventId = events.ExecuteEvent())
+            {
+                switch (eventId)
+                {
+                    case EVENT_FROSTBREATH:
+                        DoCastVictim(SPELL_FROSTBREATH);
+                        events.ScheduleEvent(EVENT_FROSTBREATH, 8s, 20s);
+                        break;
+                    case EVENT_MASSIVEGEYSER:
+                        DoCastVictim(SPELL_MASSIVEGEYSER);
+                        events.ScheduleEvent(EVENT_MASSIVEGEYSER, 22s, 32s);
+                        break;
+                    case EVENT_SLAM:
+                        DoCastVictim(SPELL_SLAM, true);
+                        events.ScheduleEvent(EVENT_SLAM, 12s, 20s);
+                        break;
+                    default:
+                        break;
+                }
+            }
+
+            DoMeleeAttackIfReady();
+        }
+    };
+
+    CreatureAI* GetAI(Creature* creature) const override
     {
-        _JustEngagedWith();
-        me->AddAura(SPELL_THRASH, me);
-
-        ScheduleTimedEvent(8s, [&]
-        {
-            DoCastVictim(SPELL_FROSTBREATH);
-        }, 8s, 20s);
-
-        ScheduleTimedEvent(25s, [&]
-        {
-            DoCastVictim(SPELL_MASSIVEGEYSER);
-        }, 22s, 32s);
-
-        ScheduleTimedEvent(15s, [&]
-        {
-            DoCastVictim(SPELL_SLAM, true);
-        }, 12s, 20s);
+        return GetZulGurubAI<boss_gahzrankaAI>(creature);
     }
 };
 
@@ -73,15 +129,23 @@ class spell_gahzranka_slam : public SpellScript
     void FilterTargets(std::list<WorldObject*>& targets)
     {
         if (Unit* caster = GetCaster())
+        {
             _wipeThreat = targets.size() < caster->GetThreatMgr().GetThreatListSize();
+        }
     }
 
     void HandleWipeThreat(SpellEffIndex /*effIndex*/)
     {
         if (_wipeThreat)
+        {
             if (Unit* caster = GetCaster())
+            {
                 if (Unit* target = GetHitUnit())
+                {
                     caster->GetThreatMgr().ModifyThreatByPercent(target, -100);
+                }
+            }
+        }
     }
 
     void Register() override
@@ -134,7 +198,7 @@ class spell_pagles_point_cast : public SpellScript
 
 void AddSC_boss_gahzranka()
 {
-    RegisterZulGurubCreatureAI(boss_gahzranka);
+    new boss_gahzranka();
     RegisterSpellScript(spell_gahzranka_slam);
     RegisterSpellScript(spell_pagles_point_cast);
 }
