@@ -500,6 +500,10 @@ int32 AuraEffect::CalculateAmount(Unit* caster)
                 break;
             if (!caster)
                 break;
+            // not impacted by gear
+            // not impacted by target level
+            // not impacted by rank
+            // asumption - depends on caster level
             amount = sObjectMgr->GetCreatureBaseStats(caster->GetLevel(), Classes::CLASS_WARRIOR)->BaseHealth[EXPANSION_WRATH_OF_THE_LICH_KING] / 4.75f;
             // Glyphs increasing damage cap
             Unit::AuraEffectList const& overrideClassScripts = caster->GetAuraEffectsByType(SPELL_AURA_OVERRIDE_CLASS_SCRIPTS);
