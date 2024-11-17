@@ -73,6 +73,7 @@ enum Misc
     POINT_AIR_BREATH_END2       = 6,
     POINT_MISC                  = 7,
 
+    GROUP_START_INTRO           = 0,
     GROUP_BREATH                = 1,
 
     NPC_FOG_TRIGGER             = 23472
@@ -81,9 +82,7 @@ enum Misc
 class CorruptTriggers : public BasicEvent
 {
 public:
-    CorruptTriggers(Unit* caster) : _caster(caster)
-    {
-    }
+    CorruptTriggers(Unit* caster) : _caster(caster) { }
 
     bool Execute(uint64 /*execTime*/, uint32 /*diff*/) override
     {
@@ -115,37 +114,7 @@ struct boss_felmyst : public BossAI
         {
             me->SetVisible(true);
             me->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
-
-            me->m_Events.AddEventAtOffset([&] {
-                me->SetStandState(UNIT_STAND_STATE_STAND);
-            }, 3s);
-
-            me->m_Events.AddEventAtOffset([&] {
-                Talk(YELL_BIRTH);
-                me->SetDisableGravity(true);
-                me->HandleEmoteCommand(EMOTE_ONESHOT_LIFTOFF);
-                me->SendMovementFlagUpdate();
-            }, 7s);
-
-            me->m_Events.AddEventAtOffset([&] {
-                me->GetMotionMaster()->MovePoint(POINT_AIR, me->GetPositionX(), me->GetPositionY(), me->GetPositionZ() + 10.0f, false, true);
-            }, 8500ms);
-
-            me->m_Events.AddEventAtOffset([&] {
-                me->SetInCombatWithZone();
-                me->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
-                me->CastSpell(me, SPELL_NOXIOUS_FUMES, true);
-                me->GetMotionMaster()->MovePoint(POINT_MISC, 1472.18f, 603.38f, 34.0f, false, true);
-
-                me->m_Events.AddEventAtOffset([&] {
-                    me->GetMotionMaster()->MovePoint(POINT_GROUND, me->GetPositionX(), me->GetPositionY(), me->GetMapHeight(me->GetPositionX(), me->GetPositionY(), me->GetPositionZ()), false, true);
-                }, 3s);
-
-                me->m_Events.AddEventAtOffset([&] {
-                    Talk(YELL_BERSERK);
-                    DoCastSelf(SPELL_BERSERK, true);
-                }, 10min);
-            }, 10500ms);
+            StartIntro();
         }
     }
 
@@ -162,6 +131,9 @@ struct boss_felmyst : public BossAI
     {
         BossAI::JustEngagedWith(who);
         me->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
+
+        if (!scheduler.IsGroupScheduled(GROUP_START_INTRO))
+            StartIntro();
     }
 
     void KilledUnit(Unit* victim) override
@@ -323,9 +295,39 @@ struct boss_felmyst : public BossAI
         }, 5s);
     }
 
-    void JustSummoned(Creature* summon) override
+    void StartIntro()
     {
-        summons.Summon(summon);
+        scheduler.Schedule(3s, GROUP_START_INTRO, [this](TaskContext /*context*/)
+        {
+            me->SetStandState(UNIT_STAND_STATE_STAND);
+
+            me->m_Events.AddEventAtOffset([&] {
+                Talk(YELL_BIRTH);
+                me->SetDisableGravity(true);
+                me->HandleEmoteCommand(EMOTE_ONESHOT_LIFTOFF);
+                me->SendMovementFlagUpdate();
+            }, 7s);
+
+            me->m_Events.AddEventAtOffset([&] {
+                me->GetMotionMaster()->MovePoint(POINT_AIR, me->GetPositionX(), me->GetPositionY(), me->GetPositionZ() + 10.0f, false, true);
+            }, 8500ms);
+
+            me->m_Events.AddEventAtOffset([&] {
+                me->SetInCombatWithZone();
+                me->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
+                me->CastSpell(me, SPELL_NOXIOUS_FUMES, true);
+                me->GetMotionMaster()->MovePoint(POINT_MISC, 1472.18f, 603.38f, 34.0f, false, true);
+
+                me->m_Events.AddEventAtOffset([&] {
+                    me->GetMotionMaster()->MovePoint(POINT_GROUND, me->GetPositionX(), me->GetPositionY(), me->GetMapHeight(me->GetPositionX(), me->GetPositionY(), me->GetPositionZ()), false, true);
+                }, 3s);
+
+                me->m_Events.AddEventAtOffset([&] {
+                    Talk(YELL_BERSERK);
+                    DoCastSelf(SPELL_BERSERK, true);
+                }, 10min);
+            }, 10500ms);
+        });
     }
 
     void UpdateAI(uint32 diff) override
