@@ -39,8 +39,8 @@ enum Spells
 
 enum Misc
 {
-    MAX_ACTIVE_HELPERS = 4,
-    MAX_HELPERS_COUNT  = 8
+    MAX_ACTIVE_HELPERS             = 4,
+    MAX_HELPERS_COUNT              = 8
 };
 
 const Position helpersLocations[MAX_ACTIVE_HELPERS] =
@@ -74,28 +74,27 @@ enum Events
     EVENT_SPELL_IMMUNITY   = 7,
 };
 
-struct boss_priestess_delrissa : public ScriptedAI
+struct boss_priestess_delrissa : public BossAI
 {
-    boss_priestess_delrissa(Creature* creature) : ScriptedAI(creature), summons(me)
-    {
-        instance = creature->GetInstanceScript();
-    }
-
-    InstanceScript* instance;
-    EventMap events;
-    SummonList summons;
+    boss_priestess_delrissa(Creature* creature) : BossAI(creature, DATA_DELRISSA) { }
 
     uint8 PlayersKilled;
     uint8 HelpersKilled;
 
     void Reset() override
     {
+        instance->SetBossState(DATA_DELRISSA, NOT_STARTED);
+        scheduler.CancelAll();
         PlayersKilled = SAY_PLAYER_KILLED;
         HelpersKilled = SAY_HELPER_DIED;
-        instance->SetBossState(DATA_DELRISSA, NOT_STARTED);
         summons.Respawn();
 
         me->SetLootMode(0);
+    }
+
+    bool CheckInRoom() override
+    {
+        return me->GetDistance(me->GetHomePosition()) < 75.0f;
     }
 
     void InitializeAI() override
@@ -137,17 +136,60 @@ struct boss_priestess_delrissa : public ScriptedAI
     void JustEngagedWith(Unit*  /*who*/) override
     {
         Talk(SAY_AGGRO);
-        summons.DoZoneInCombat();
-        instance->SetBossState(DATA_DELRISSA, IN_PROGRESS);
+        _JustEngagedWith();
 
-        events.ScheduleEvent(EVENT_SPELL_FLASH_HEAL, 15000);
-        events.ScheduleEvent(EVENT_SPELL_RENEW, 10000);
-        events.ScheduleEvent(EVENT_SPELL_PW_SHIELD, 2000);
-        events.ScheduleEvent(EVENT_SPELL_SW_PAIN, 5000);
-        events.ScheduleEvent(EVENT_SPELL_DISPEL, 7500);
-        events.ScheduleEvent(EVENT_CHECK_DIST, 5000);
+        ScheduleTimedEvent(15s, [&] {
+            if (Unit* target = DoSelectLowestHpFriendly(40.0f, 1000))
+                DoCast(target, SPELL_FLASH_HEAL);
+        }, 15s);
+
+        ScheduleTimedEvent(10s, [&] {
+            if (Unit* target = DoSelectLowestHpFriendly(40.0f, 1000))
+                DoCast(target, SPELL_RENEW);
+        }, 7s);
+
+        ScheduleTimedEvent(2s, [&] {
+            std::list<Creature*> cList = DoFindFriendlyMissingBuff(40.0f, SPELL_POWER_WORD_SHIELD);
+            if (Unit* target = Acore::Containers::SelectRandomContainerElement(cList))
+                DoCast(target, SPELL_POWER_WORD_SHIELD);
+        }, 10s);
+
+        ScheduleTimedEvent(5s, [&] {
+            DoCastRandomTarget(SPELL_SHADOW_WORD_PAIN, 0, 30.0f);
+        }, 10s);
+
+        ScheduleTimedEvent(7500ms, [&] {
+            Unit* target = nullptr;
+            switch (urand(0, 2))
+            {
+                case 0:
+                    target = SelectTarget(SelectTargetMethod::Random, 0, 30, true);
+                    break;
+                case 1:
+                    target = me;
+                    break;
+                case 2:
+                    target = ObjectAccessor::GetCreature(*me, Acore::Containers::SelectRandomContainerElement(summons));
+                    break;
+            }
+
+            if (target)
+                DoCast(target, SPELL_DISPEL_MAGIC);
+        }, 12s);
+
         if (IsHeroic())
-            events.ScheduleEvent(EVENT_SPELL_IMMUNITY, 4000);
+        {
+            scheduler.Schedule(4s, [this](TaskContext context)
+            {
+                if (me->HasUnitState(UNIT_STATE_LOST_CONTROL))
+                {
+                    DoCastSelf(SPELL_MEDALION_OF_IMMUNITY, false);
+                    context.Repeat(1min);
+                }
+                else
+                    context.Repeat(1s);
+            });
+        }
     }
 
     void KilledUnit(Unit* victim) override
@@ -165,83 +207,6 @@ struct boss_priestess_delrissa : public ScriptedAI
 
         if (HelpersKilled == MAX_ACTIVE_HELPERS + 1)
             instance->SetBossState(DATA_DELRISSA, DONE);
-    }
-
-    void UpdateAI(uint32 diff) override
-    {
-        if (!UpdateVictim())
-            return;
-
-        events.Update(diff);
-        if (me->HasUnitState(UNIT_STATE_CASTING))
-            return;
-
-        switch (events.ExecuteEvent())
-        {
-        case EVENT_CHECK_DIST:
-            if (me->GetDistance(me->GetHomePosition()) > 75.0f)
-            {
-                EnterEvadeMode(EVADE_REASON_OTHER);
-                return;
-            }
-            events.ScheduleEvent(EVENT_CHECK_DIST, 5000);
-            break;
-        case EVENT_SPELL_FLASH_HEAL:
-            if (Unit* target = DoSelectLowestHpFriendly(40.0f, 1000))
-                me->CastSpell(target, SPELL_FLASH_HEAL, false);
-            events.ScheduleEvent(EVENT_SPELL_FLASH_HEAL, 15000);
-            break;
-        case EVENT_SPELL_RENEW:
-            if (Unit* target = DoSelectLowestHpFriendly(40.0f, 1000))
-                me->CastSpell(target, SPELL_RENEW, false);
-            events.ScheduleEvent(EVENT_SPELL_RENEW, 7000);
-            break;
-        case EVENT_SPELL_PW_SHIELD:
-        {
-            std::list<Creature*> cList = DoFindFriendlyMissingBuff(40.0f, SPELL_POWER_WORD_SHIELD);
-            if (Unit* target = Acore::Containers::SelectRandomContainerElement(cList))
-                me->CastSpell(target, SPELL_POWER_WORD_SHIELD, false);
-            events.ScheduleEvent(EVENT_SPELL_PW_SHIELD, 10000);
-            break;
-        }
-        case EVENT_SPELL_DISPEL:
-        {
-            Unit* target = nullptr;
-            switch (urand(0, 2))
-            {
-            case 0:
-                target = SelectTarget(SelectTargetMethod::Random, 0, 30, true);
-                break;
-            case 1:
-                target = me;
-                break;
-            case 2:
-                target = ObjectAccessor::GetCreature(*me, Acore::Containers::SelectRandomContainerElement(summons));
-                break;
-            }
-
-            if (target)
-                me->CastSpell(target, SPELL_DISPEL_MAGIC, false);
-            events.ScheduleEvent(EVENT_SPELL_DISPEL, 12000);
-            break;
-        }
-        case EVENT_SPELL_IMMUNITY:
-            if (me->HasUnitState(UNIT_STATE_LOST_CONTROL))
-            {
-                me->CastSpell(me, SPELL_MEDALION_OF_IMMUNITY, false);
-                events.ScheduleEvent(EVENT_SPELL_IMMUNITY, 60000);
-            }
-            else
-                events.ScheduleEvent(EVENT_SPELL_IMMUNITY, 1000);
-            break;
-        case EVENT_SPELL_SW_PAIN:
-            if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 30.0f))
-                me->CastSpell(target, SPELL_SHADOW_WORD_PAIN, false);
-            events.ScheduleEvent(EVENT_SPELL_SW_PAIN, 10000);
-            break;
-        }
-
-        DoMeleeAttackIfReady();
     }
 };
 
