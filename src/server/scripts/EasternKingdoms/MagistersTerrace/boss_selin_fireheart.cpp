@@ -51,7 +51,7 @@ enum Events
     EVENT_RESTORE_COMBAT            = 6
 };
 
-const Position crystalSummons[5] = 
+const Position crystalSummons[5] =
 {
     {248.053f, 14.592f, 3.74882f, 3.94444f},
     {225.969f, -20.0775f, -2.9731f, 0.942478f},
