@@ -46,7 +46,7 @@ ObjectData const creatureData[] =
     { NPC_KILJAEDEN_CONTROLLER,   DATA_KJ_CONTROLLER },
     { NPC_ANVEENA,                DATA_ANVEENA       },
     { NPC_KALECGOS_KJ,            DATA_KALECGOS_KJ   },
-    { 0,                          0,                 }
+    { 0,                          0                  }
 };
 
 ObjectData const gameObjectData[] =
