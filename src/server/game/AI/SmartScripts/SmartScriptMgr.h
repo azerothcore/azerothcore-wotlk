@@ -1935,8 +1935,7 @@ enum SmartCastFlags
     SMARTCAST_COMBAT_MOVE            = 0x040,                     // Prevents combat movement if cast successful. Allows movement on range, OOM, LOS
     SMARTCAST_THREATLIST_NOT_SINGLE  = 0x080,                     // Only cast if the source's threatlist is higher than one. This includes pets (see Skeram's True Fulfillment)
     SMARTCAST_TARGET_POWER_MANA      = 0x100,                     // Only cast if the target has power type mana (e.g. Mana Drain)
-    SMARTCAST_NO_CAST_IN_MELEE       = 0x200,                     // Prevents non-instant spell casting if victim is in melee
-    SMARTCAST_CAST_IN_MELEE          = 0x400                      // Victim must be in melee range
+    SMARTCAST_NO_CAST_IN_MELEE       = 0x200                      // Prevents non-instant spell casting if victim is in melee
 };
 
 enum SmartFollowType
