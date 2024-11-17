@@ -689,7 +689,6 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
                     bool isWithinMeleeRange = distanceToTarget <= meleeRange;
                     bool isRangedAttack = spellMaxRange > NOMINAL_MELEE_RANGE;
                     bool isTargetRooted = target->ToUnit()->HasUnitState(UNIT_STATE_ROOT);
-                    bool isInstantCast = spellInfo->CalcCastTime() == 0;
                     // To prevent running back and forth when OOM, we must have more than 10% mana.
                     bool canCastSpell = me->GetPowerPct(POWER_MANA) > 10.0f && spellInfo->CalcPowerCost(me, spellInfo->GetSchoolMask()) < (int32)me->GetPower(POWER_MANA) && !me->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_SILENCED);
                     bool isSpellIgnoreLOS = spellInfo->HasAttribute(SPELL_ATTR2_IGNORE_LINE_OF_SIGHT);
@@ -719,16 +718,6 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
                         continue;
                     }
                     else if (distanceToTarget < spellMinRange || !(isWithinLOSInMap || isSpellIgnoreLOS))
-                    {
-                        failedSpellCast = true;
-
-                        if (me->IsRooted()) // Rooted inhabit type, never move/reposition
-                            continue;
-
-                        CAST_AI(SmartAI, me->AI())->SetCombatMove(true);
-                        continue;
-                    }
-                    else if ((e.action.cast.castFlags & SMARTCAST_NO_CAST_IN_MELEE) && isWithinMeleeRange && !isInstantCast)
                     {
                         failedSpellCast = true;
 
