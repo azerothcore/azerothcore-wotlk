@@ -267,6 +267,7 @@ struct boss_priestess_lackey_commonAI : public ScriptedAI
     void Reset() override
     {
         events.Reset();
+        scheduler.CancelAll();
         summons.DespawnAll();
         actualEventId = 0;
     }
@@ -322,6 +323,7 @@ struct boss_priestess_lackey_commonAI : public ScriptedAI
     {
         actualEventId = 0;
         events.Update(diff);
+        scheduler.Update(diff);
         if (me->HasUnitState(UNIT_STATE_CASTING))
             return;
 
@@ -569,15 +571,7 @@ enum MageEnum
     SPELL_ICE_LANCE      = 44176,
     SPELL_CONE_OF_COLD   = 12611,
     SPELL_FROSTBOLT      = 15043,
-    SPELL_BLINK          = 14514,
-
-    EVENT_SPELL_POLYMORPH = 1,
-    EVENT_SPELL_ICE_BLOCK = 2,
-    EVENT_SPELL_BLIZZARD  = 3,
-    EVENT_SPELL_ICE_LANCE = 4,
-    EVENT_SPELL_COC       = 5,
-    EVENT_SPELL_FROSTBOLT = 6,
-    EVENT_SPELL_BLINK     = 7
+    SPELL_BLINK          = 14514
 };
 
 struct boss_yazzai : public boss_priestess_lackey_commonAI
@@ -588,13 +582,38 @@ struct boss_yazzai : public boss_priestess_lackey_commonAI
     {
         boss_priestess_lackey_commonAI::JustEngagedWith(who);
 
-        events.ScheduleEvent(EVENT_SPELL_POLYMORPH, 1000);
-        events.ScheduleEvent(EVENT_SPELL_ICE_BLOCK, 1000);
-        events.ScheduleEvent(EVENT_SPELL_BLIZZARD, 8000);
-        events.ScheduleEvent(EVENT_SPELL_ICE_LANCE, 12000);
-        events.ScheduleEvent(EVENT_SPELL_COC, 10000);
-        events.ScheduleEvent(EVENT_SPELL_FROSTBOLT, 3000);
-        events.ScheduleEvent(EVENT_SPELL_BLINK, 5000);
+        ScheduleTimedEvent(1s, [&] {
+            DoCastRandomTarget(SPELL_POLYMORPH);
+        }, 20s);
+
+        ScheduleTimedEvent(8s, [&] {
+            DoCastRandomTarget(SPELL_BLIZZARD);
+        }, 20s);
+
+        ScheduleTimedEvent(12s, [&] {
+            DoCastVictim(SPELL_ICE_LANCE);
+        }, 12s);
+
+        ScheduleTimedEvent(10s, [&] {
+            DoCastVictim(SPELL_CONE_OF_COLD);
+        }, 10s);
+
+        ScheduleTimedEvent(3s, [&] {
+            DoCastVictim(SPELL_FROSTBOLT);
+        }, 8s);
+
+        ScheduleTimedEvent(5s, [&] {
+            if (me->SelectNearbyTarget())
+                DoCastAOE(SPELL_BLINK);
+        }, 15s);
+
+        scheduler.Schedule(1s, [this](TaskContext context)
+        {
+            if (me->HealthBelowPct(35))
+                DoCastSelf(SPELL_ICE_BLOCK, true);
+            else
+                context.Repeat();
+        });
     }
 
     void UpdateAI(uint32 diff) override
@@ -603,57 +622,6 @@ struct boss_yazzai : public boss_priestess_lackey_commonAI
             return;
 
         boss_priestess_lackey_commonAI::UpdateAI(diff);
-
-        switch (actualEventId)
-        {
-        case EVENT_SPELL_POLYMORPH:
-            if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0))
-                me->CastSpell(target, SPELL_POLYMORPH, false);
-            events.ScheduleEvent(EVENT_SPELL_POLYMORPH, 20000);
-            break;
-        case EVENT_SPELL_ICE_BLOCK:
-            if (HealthBelowPct(35))
-            {
-                me->CastSpell(me, SPELL_ICE_BLOCK, false);
-                return;
-            }
-            events.ScheduleEvent(EVENT_SPELL_ICE_BLOCK, 1000);
-            break;
-        case EVENT_SPELL_BLIZZARD:
-            if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0))
-                me->CastSpell(target, SPELL_BLIZZARD, false);
-            events.ScheduleEvent(EVENT_SPELL_BLIZZARD, 20000);
-            break;
-        case EVENT_SPELL_ICE_LANCE:
-            me->CastSpell(me->GetVictim(), SPELL_ICE_LANCE, false);
-            events.ScheduleEvent(EVENT_SPELL_ICE_LANCE, 12000);
-            break;
-        case EVENT_SPELL_COC:
-            me->CastSpell(me->GetVictim(), SPELL_CONE_OF_COLD, false);
-            events.ScheduleEvent(EVENT_SPELL_COC, 10000);
-            break;
-        case EVENT_SPELL_FROSTBOLT:
-            me->CastSpell(me->GetVictim(), SPELL_FROSTBOLT, false);
-            events.ScheduleEvent(EVENT_SPELL_FROSTBOLT, 8000);
-            break;
-        case EVENT_SPELL_BLINK:
-        {
-            bool InMeleeRange = false;
-            ThreatContainer::StorageType const& t_list = me->GetThreatMgr().GetThreatList();
-            for (ThreatContainer::StorageType::const_iterator itr = t_list.begin(); itr != t_list.end(); ++itr)
-                if (Unit* target = ObjectAccessor::GetUnit(*me, (*itr)->getUnitGuid()))
-                    if (target->IsWithinMeleeRange(me))
-                    {
-                        InMeleeRange = true;
-                        break;
-                    }
-
-            if (InMeleeRange)
-                me->CastSpell(me, SPELL_BLINK, false);
-            events.ScheduleEvent(EVENT_SPELL_BLINK, 15000);
-            break;
-        }
-        }
 
         DoMeleeAttackIfReady();
     }
@@ -711,8 +679,7 @@ struct boss_warlord_salaris : public boss_priestess_lackey_commonAI
 
         boss_priestess_lackey_commonAI::UpdateAI(diff);
 
-        scheduler.Update(diff,
-            std::bind(&BossAI::DoMeleeAttackIfReady, this));
+        DoMeleeAttackIfReady();
     }
 };
 
@@ -736,7 +703,6 @@ struct boss_garaxxas : public boss_priestess_lackey_commonAI
     {
         boss_priestess_lackey_commonAI::Reset();
         me->SummonCreature(NPC_SLIVER, 0.0f, 0.0f, 0.0f, 0.0f, TEMPSUMMON_CORPSE_DESPAWN, 0);
-        scheduler.CancelAll();
     }
 
     void JustEngagedWith(Unit* who) override
@@ -772,8 +738,7 @@ struct boss_garaxxas : public boss_priestess_lackey_commonAI
 
         boss_priestess_lackey_commonAI::UpdateAI(diff);
 
-        scheduler.Update(diff,
-            std::bind(&BossAI::DoMeleeAttackIfReady, this));
+        DoMeleeAttackIfReady();
     }
 };
 
@@ -799,13 +764,6 @@ enum ShamanEnum
 struct boss_apoko : public boss_priestess_lackey_commonAI
 {
     boss_apoko(Creature* creature) : boss_priestess_lackey_commonAI(creature, AI_TYPE_MELEE) { }
-
-    //        uint32 Totem_Timer;
-    uint8  Totem_Amount;
-    uint32 War_Stomp_Timer;
-    //        uint32 Purge_Timer;
-    uint32 Healing_Wave_Timer;
-    //        uint32 Frost_Shock_Timer;
 
     void JustEngagedWith(Unit* who) override
     {
