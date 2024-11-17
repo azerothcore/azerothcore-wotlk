@@ -261,7 +261,7 @@ struct boss_priestess_lackey_commonAI : public ScriptedAI
 
     void EnterEvadeMode(EvadeReason why) override
     {
-        if (Creature* delrissa = ObjectAccessor::GetCreature(*me, instance->GetGuidData(NPC_DELRISSA)))
+        if (Creature* delrissa = instance->GetCreature(DATA_DELRISSA))
             if (!delrissa->IsAlive())
             {
                 delrissa->Respawn();
@@ -272,7 +272,7 @@ struct boss_priestess_lackey_commonAI : public ScriptedAI
 
     void JustEngagedWith(Unit* who) override
     {
-        if (Creature* delrissa = ObjectAccessor::GetCreature(*me, instance->GetGuidData(NPC_DELRISSA)))
+        if (Creature* delrissa = instance->GetCreature(DATA_DELRISSA))
             if (delrissa->IsAlive() && !delrissa->IsEngaged())
                 delrissa->AI()->AttackStart(who);
 
@@ -312,7 +312,7 @@ struct boss_priestess_lackey_commonAI : public ScriptedAI
 
     void KilledUnit(Unit* victim) override
     {
-        if (Creature* delrissa = ObjectAccessor::GetCreature(*me, instance->GetGuidData(NPC_DELRISSA)))
+        if (Creature* delrissa = instance->GetCreature(DATA_DELRISSA))
             delrissa->AI()->KilledUnit(victim);
     }
 
@@ -324,11 +324,11 @@ struct boss_priestess_lackey_commonAI : public ScriptedAI
 
     void UpdateAI(uint32 diff) override
     {
-        scheduler.Update(diff);
         if (me->HasUnitState(UNIT_STATE_CASTING))
             return;
 
-        DoMeleeAttackIfReady();
+        scheduler.Update(diff,
+            std::bind(&BossAI::DoMeleeAttackIfReady, this));
     }
 };
 
@@ -411,7 +411,7 @@ struct boss_ellris_duskhallow : public boss_priestess_lackey_commonAI
 
     void JustEngagedWith(Unit* who) override
     {
-        me->CastSpell(me, SPELL_SUMMON_IMP, false);
+        DoCastAOE(SPELL_SUMMON_IMP);
         boss_priestess_lackey_commonAI::JustEngagedWith(who);
 
         ScheduleTimedEvent(3s, [&] {
