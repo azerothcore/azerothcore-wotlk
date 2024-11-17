@@ -91,8 +91,7 @@ struct boss_selin_fireheart : public BossAI
     void SummonedCreatureDies(Creature* summon, Unit* killer) override
     {
         BossAI::SummonedCreatureDies(summon, killer);
-        if (events.GetPhaseMask() & 0x01)
-            events.ScheduleEvent(EVENT_RESTORE_COMBAT, 0);
+        me->GetMotionMaster()->MoveChase(me->GetVictim());
     }
 
     void OnPowerUpdate(Powers /*power*/, int32 /*gain*/, int32 /*updateVal*/, uint32 currentPower) override
