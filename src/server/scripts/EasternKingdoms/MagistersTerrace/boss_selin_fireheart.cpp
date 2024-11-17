@@ -107,7 +107,7 @@ struct boss_selin_fireheart : public BossAI
         }
     }
 
-    void JustEngagedWith(Unit* who)
+    void JustEngagedWith(Unit* who) override
     {
         BossAI::JustEngagedWith(who);
         ScheduleTimedEvent(2500ms, [&]{
@@ -145,7 +145,7 @@ struct boss_selin_fireheart : public BossAI
     Creature* SelectNearestCrystal(bool performMovement)
     {
         if (summons.empty())
-            return;
+            return nullptr;
 
         float closestDistance = 1000.0f;
         Creature* chosenCrystal = nullptr;
