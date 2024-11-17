@@ -788,24 +788,39 @@ enum HunterEnum
 
 struct boss_garaxxas : public boss_priestess_lackey_commonAI
 {
-    boss_garaxxas(Creature* creature) : boss_priestess_lackey_commonAI(creature, AI_TYPE_RANGED) {}
+    boss_garaxxas(Creature* creature) : boss_priestess_lackey_commonAI(creature, AI_TYPE_RANGED) { }
 
     void Reset() override
     {
         boss_priestess_lackey_commonAI::Reset();
         me->SummonCreature(NPC_SLIVER, 0.0f, 0.0f, 0.0f, 0.0f, TEMPSUMMON_CORPSE_DESPAWN, 0);
+        scheduler.CancelAll();
     }
 
     void JustEngagedWith(Unit* who) override
     {
         boss_priestess_lackey_commonAI::JustEngagedWith(who);
-        me->CastSpell(me, SPELL_FREEZING_TRAP, true);
+        DoCastAOE(SPELL_FREEZING_TRAP, true);
 
-        events.ScheduleEvent(EVENT_SPELL_AIMED_SHOT, 8000);
-        events.ScheduleEvent(EVENT_SPELL_SHOOT, 0);
-        events.ScheduleEvent(EVENT_SPELL_CONCUSSIVE_SHOT, 6000);
-        events.ScheduleEvent(EVENT_SPELL_MULTI_SHOT, 10000);
-        events.ScheduleEvent(EVENT_SPELL_WING_CLIP, 4000);
+        ScheduleTimedEvent(8s, [&] {
+            DoCastVictim(SPELL_AIMED_SHOT);
+        }, 15s);
+
+        ScheduleTimedEvent(6s, [&] {
+            DoCastVictim(SPELL_CONCUSSIVE_SHOT);
+        }, 15s);
+
+        ScheduleTimedEvent(10s, [&] {
+            DoCastVictim(SPELL_MULTI_SHOT);
+        }, 10s);
+
+        ScheduleTimedEvent(1s, [&] {
+            DoCastVictim(SPELL_SHOOT);
+        }, 2500ms);
+
+        ScheduleTimedEvent(4s, [&] {
+            DoCastVictim(SPELL_WING_CLIP);
+        }, 4s);
     }
 
     void UpdateAI(uint32 diff) override
@@ -813,33 +828,8 @@ struct boss_garaxxas : public boss_priestess_lackey_commonAI
         if (!UpdateVictim())
             return;
 
-        boss_priestess_lackey_commonAI::UpdateAI(diff);
-
-        switch (actualEventId)
-        {
-        case EVENT_SPELL_WING_CLIP:
-            me->CastSpell(me->GetVictim(), SPELL_WING_CLIP, false);
-            events.ScheduleEvent(EVENT_SPELL_WING_CLIP, 4000);
-            break;
-        case EVENT_SPELL_AIMED_SHOT:
-            me->CastSpell(me->GetVictim(), SPELL_AIMED_SHOT, false);
-            events.ScheduleEvent(EVENT_SPELL_AIMED_SHOT, 15000);
-            break;
-        case EVENT_SPELL_CONCUSSIVE_SHOT:
-            me->CastSpell(me->GetVictim(), SPELL_CONCUSSIVE_SHOT, false);
-            events.ScheduleEvent(EVENT_SPELL_CONCUSSIVE_SHOT, 15000);
-            break;
-        case EVENT_SPELL_MULTI_SHOT:
-            me->CastSpell(me->GetVictim(), SPELL_MULTI_SHOT, false);
-            events.ScheduleEvent(EVENT_SPELL_MULTI_SHOT, 10000);
-            break;
-        case EVENT_SPELL_SHOOT:
-            me->CastSpell(me->GetVictim(), SPELL_SHOOT, false);
-            events.ScheduleEvent(EVENT_SPELL_SHOOT, 2500);
-            break;
-        }
-
-        DoMeleeAttackIfReady();
+        scheduler.Update(diff,
+            std::bind(&BossAI::DoMeleeAttackIfReady, this));
     }
 };
 
