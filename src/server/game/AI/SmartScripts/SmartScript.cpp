@@ -738,6 +738,17 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
                         CAST_AI(SmartAI, me->AI())->SetCombatMove(true);
                         continue;
                     }
+                    else if ((e.action.cast.castFlags & SMARTCAST_CAST_IN_MELEE) && !isWithinMeleeRange)
+                    {
+                        failedSpellCast = true;
+
+                        if (me->IsRooted()) // Rooted inhabit type, never move/reposition
+                            continue;
+
+                        CAST_AI(SmartAI, me->AI())->SetCombatMove(true);
+                        continue;
+                    }
+
 
                     TriggerCastFlags triggerFlags = TRIGGERED_NONE;
                     if (e.action.cast.castFlags & SMARTCAST_TRIGGERED)
