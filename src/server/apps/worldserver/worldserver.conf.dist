@@ -781,6 +781,7 @@ Logger.spells.scripts=2,Console Errors
 #Logger.spells=4,Console Server
 #Logger.sql.dev=4,Console Server
 #Logger.sql.driver=4,Console Server
+#Logger.sql.updates=4,Console Server
 #Logger.vehicles=4,Console Server
 #Logger.warden=4,Console Server
 #Logger.weather=4,Console Server
