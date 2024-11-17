@@ -110,9 +110,7 @@ enum Misc
 {
     MAX_BOMB_COUNT              = 40,
 
-    SCHEDULER_GROUP_HATCHING    = 1,
-
-    EVENT_BERSERK               = 0
+    SCHEDULER_GROUP_HATCHING    = 1
 };
 
 struct boss_janalai : public BossAI
@@ -144,6 +142,8 @@ struct boss_janalai : public BossAI
         ScheduleHealthCheckEvent(25, [&] {
             DoCastSelf(SPELL_ENRAGE, true);
         });
+
+        me->m_Events.KillAllEvents(false);
     }
 
     void JustDied(Unit* killer) override
@@ -205,10 +205,11 @@ struct boss_janalai : public BossAI
                 });
             }
         }, 8s);
-        ScheduleUniqueTimedEvent(5min, [&]{
+
+        me->m_Events.AddEventAtOffset([&] {
             Talk(SAY_BERSERK);
             DoCastSelf(SPELL_BERSERK);
-        }, EVENT_BERSERK);
+        }, 5min);
     }
 
     bool HatchAllEggs(uint32 hatchAction)
