@@ -124,6 +124,7 @@ struct boss_felmyst : public BossAI
         me->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
         me->SetReactState(REACT_PASSIVE);
         me->SetDisableGravity(false);
+        me->m_Events.KillAllEvents(false);
         instance->DoRemoveAurasDueToSpellOnPlayers(SPELL_FOG_OF_CORRUPTION_CHARM);
     }
 
