@@ -742,13 +742,7 @@ enum HunterEnum
     SPELL_WING_CLIP             = 44286,
     SPELL_FREEZING_TRAP         = 44136,
 
-    NPC_SLIVER                  = 24552,
-
-    EVENT_SPELL_AIMED_SHOT      = 1,
-    EVENT_SPELL_SHOOT           = 2,
-    EVENT_SPELL_CONCUSSIVE_SHOT = 3,
-    EVENT_SPELL_MULTI_SHOT      = 4,
-    EVENT_SPELL_WING_CLIP       = 5
+    NPC_SLIVER                  = 24552
 };
 
 struct boss_garaxxas : public boss_priestess_lackey_commonAI
