@@ -33,7 +33,6 @@
 #include "ScriptedCreature.h"
 #include "ScriptedGossip.h"
 #include "SmartAI.h"
-#include "SmartScriptMgr.h"
 #include "SpellMgr.h"
 #include "Vehicle.h"
 #include "WorldState.h"
