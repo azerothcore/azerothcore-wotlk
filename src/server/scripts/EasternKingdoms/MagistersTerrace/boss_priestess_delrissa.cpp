@@ -667,14 +667,7 @@ enum WarriorEnum
     SPELL_FRIGHTENING_SHOUT  = 19134,
     SPELL_HAMSTRING          = 27584,
     SPELL_BATTLE_SHOUT       = 27578,
-    SPELL_MORTAL_STRIKE      = 44268,
-
-    EVENT_SPELL_DISARM        = 1,
-    EVENT_SPELL_PIERCING_HOWL = 2,
-    EVENT_SPELL_SHOUT         = 3,
-    EVENT_SPELL_HAMSTRING     = 4,
-    EVENT_SPELL_MORTAL_STRIKE = 5,
-    EVENT_SPELL_INTERCEPT     = 6,
+    SPELL_MORTAL_STRIKE      = 44268
 };
 
 struct boss_warlord_salaris : public boss_priestess_lackey_commonAI
@@ -684,14 +677,31 @@ struct boss_warlord_salaris : public boss_priestess_lackey_commonAI
     void JustEngagedWith(Unit* who) override
     {
         boss_priestess_lackey_commonAI::JustEngagedWith(who);
-        me->CastSpell(me, SPELL_BATTLE_SHOUT, false);
+        DoCastAOE(SPELL_BATTLE_SHOUT);
 
-        events.ScheduleEvent(EVENT_SPELL_DISARM, 6000);
-        events.ScheduleEvent(EVENT_SPELL_PIERCING_HOWL, 10000);
-        events.ScheduleEvent(EVENT_SPELL_SHOUT, 18000);
-        events.ScheduleEvent(EVENT_SPELL_HAMSTRING, 4000);
-        events.ScheduleEvent(EVENT_SPELL_MORTAL_STRIKE, 8000);
-        events.ScheduleEvent(EVENT_SPELL_INTERCEPT, 1000);
+        ScheduleTimedEvent(6s, [&] {
+            DoCastVictim(SPELL_INTERCEPT);
+        }, 10s);
+
+        ScheduleTimedEvent(10s, [&] {
+            DoCastVictim(SPELL_DISARM);
+        }, 16s);
+
+        ScheduleTimedEvent(18s, [&] {
+            DoCastVictim(SPELL_HAMSTRING);
+        }, 15s);
+
+        ScheduleTimedEvent(4s, [&] {
+            DoCastVictim(SPELL_MORTAL_STRIKE);
+        }, 10s);
+
+        ScheduleTimedEvent(8s, [&] {
+            DoCastAOE(SPELL_PIERCING_HOWL);
+        }, 15s);
+
+        ScheduleTimedEvent(1s, [&] {
+            DoCastAOE(SPELL_FRIGHTENING_SHOUT);
+        }, 18s);
     }
 
     void UpdateAI(uint32 diff) override
@@ -701,35 +711,8 @@ struct boss_warlord_salaris : public boss_priestess_lackey_commonAI
 
         boss_priestess_lackey_commonAI::UpdateAI(diff);
 
-        switch (actualEventId)
-        {
-        case EVENT_SPELL_INTERCEPT:
-            me->CastSpell(me->GetVictim(), SPELL_INTERCEPT, false);
-            events.ScheduleEvent(EVENT_SPELL_INTERCEPT, 10000);
-            break;
-        case EVENT_SPELL_DISARM:
-            me->CastSpell(me->GetVictim(), SPELL_DISARM, false);
-            events.ScheduleEvent(EVENT_SPELL_DISARM, 16000);
-            break;
-        case EVENT_SPELL_HAMSTRING:
-            me->CastSpell(me->GetVictim(), SPELL_HAMSTRING, false);
-            events.ScheduleEvent(EVENT_SPELL_HAMSTRING, 15000);
-            break;
-        case EVENT_SPELL_MORTAL_STRIKE:
-            me->CastSpell(me->GetVictim(), SPELL_MORTAL_STRIKE, false);
-            events.ScheduleEvent(EVENT_SPELL_MORTAL_STRIKE, 10000);
-            break;
-        case EVENT_SPELL_PIERCING_HOWL:
-            me->CastSpell(me, SPELL_PIERCING_HOWL, false);
-            events.ScheduleEvent(EVENT_SPELL_PIERCING_HOWL, 15000);
-            break;
-        case EVENT_SPELL_SHOUT:
-            me->CastSpell(me, SPELL_FRIGHTENING_SHOUT, false);
-            events.ScheduleEvent(EVENT_SPELL_SHOUT, 18000);
-            break;
-        }
-
-        DoMeleeAttackIfReady();
+        scheduler.Update(diff,
+            std::bind(&BossAI::DoMeleeAttackIfReady, this));
     }
 };
 
@@ -786,6 +769,8 @@ struct boss_garaxxas : public boss_priestess_lackey_commonAI
     {
         if (!UpdateVictim())
             return;
+
+        boss_priestess_lackey_commonAI::UpdateAI(diff);
 
         scheduler.Update(diff,
             std::bind(&BossAI::DoMeleeAttackIfReady, this));
