@@ -1,3 +1,7 @@
+#!/usr/bin/env bash
+
+CURRENT_PATH="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+
 if ! command -v lsb_release &>/dev/null ; then
     sudo apt-get install -y lsb-release
 fi
@@ -36,9 +40,11 @@ else
   libboost-all-dev libbz2-dev libncurses-dev libreadline-dev \
   libssl-dev
 
+  VAR_PATH="$CURRENT_PATH/../../../../var"
+
   # run noninteractive install for MYSQL 8.4 LTS
-  wget https://dev.mysql.com/get/mysql-apt-config_0.8.32-1_all.deb
-  sudo DEBIAN_FRONTEND="noninteractive" dpkg -i ./mysql-apt-config_0.8.32-1_all.deb
+  wget https://dev.mysql.com/get/mysql-apt-config_0.8.32-1_all.deb -P "$VAR_PATH"
+  sudo DEBIAN_FRONTEND="noninteractive" dpkg -i "$VAR_PATH/mysql-apt-config_0.8.32-1_all.deb"
   sudo apt-get update
   sudo DEBIAN_FRONTEND="noninteractive" apt-get install -y mysql-server
 fi
