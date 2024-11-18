@@ -8,4 +8,4 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 (24972, 0, 2, 0, 0, 0, 100, 256, 3000, 7000, 3000, 7000, 0, 0, 11, 33688, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Erratic Sentry - Combat - Cast Crystal Strike'),
 (24972, 0, 3, 0, 0, 0, 100, 256, 8000, 15000, 8000, 15000, 0, 0, 11, 45336, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Erratic Sentry - Combat - Cast Electrical Overload'),
 (24972, 0, 4, 0, 0, 0, 100, 256, 12000, 20000, 12000, 20000, 0, 0, 11, 35892, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Erratic Sentry - Combat - Cast Suppression'),
-(24972, 0, 7, 0, 8, 0, 100, 512, 44997, 0, 0, 0, 0, 0, 41, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Erratic Sentry - On Spellhit (Converting Sentry) - Despawn');
+(24972, 0, 5, 0, 8, 0, 100, 512, 44997, 0, 0, 0, 0, 0, 41, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Erratic Sentry - On Spellhit (Converting Sentry) - Despawn');
