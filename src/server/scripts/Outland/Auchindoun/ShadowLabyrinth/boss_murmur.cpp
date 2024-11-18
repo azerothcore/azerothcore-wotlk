@@ -154,6 +154,19 @@ struct boss_murmur : public BossAI
             context.Repeat(34s, 40s);
         });
 
+        scheduler.Schedule(14600ms, 25500ms, [this](TaskContext context)
+        {
+            if (!me->HasUnitState(UNIT_STATE_CASTING))
+            {
+                DoCastRandomTarget(SPELL_MURMURS_TOUCH);
+                context.Repeat(14600ms, 25500ms);
+            }
+            else
+            {
+                context.Repeat(3s);
+            }
+        });
+
         scheduler.Schedule(15s, 30s, [this](TaskContext context)
         {
             if (!me->HasUnitState(UNIT_STATE_CASTING))
