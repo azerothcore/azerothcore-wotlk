@@ -416,7 +416,7 @@ public:
         handler->SendGlobalGMSysMessage("DB table `motd` reloaded.");
         auto locale = LOCALE_enUS;
         if (Player* player = handler->GetPlayer())
-            locale = handler->GetPlayer()->GetSession()->GetSessionDbLocaleIndex();
+            locale = player->GetSession()->GetSessionDbLocaleIndex();
 
         handler->SendGlobalSysMessage(sMotdMgr->GetMotd(locale));
         return true;

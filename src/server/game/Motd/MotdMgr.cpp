@@ -71,7 +71,6 @@ void MotdMgr::CreateWorldPackages()
 }
 void MotdMgr::LoadMotd()
 {
-    uint32 oldMSTime = getMSTime();
     uint32 realmId = sConfigMgr->GetOption<int32>("RealmID", 0);
 
     // Load the main motd for the realm and assign it to enUS if available
