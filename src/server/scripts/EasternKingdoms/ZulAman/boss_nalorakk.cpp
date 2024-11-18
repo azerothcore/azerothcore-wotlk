@@ -92,8 +92,6 @@ struct boss_nalorakk : public BossAI
         _phase = PHASE_SEND_GUARDS_1;
         _ranIntro = false;
         _active = true;
-        creature->SetReactState(REACT_PASSIVE);
-        me->SetImmuneToAll(true);
     }
 
     void Reset() override
@@ -109,7 +107,6 @@ struct boss_nalorakk : public BossAI
         if (_ranIntro)
         {
             _phase = PHASE_START_COMBAT;
-            me->SetReactState(REACT_AGGRESSIVE);
             _active = false;
 
         }
@@ -199,22 +196,10 @@ struct boss_nalorakk : public BossAI
                     me->GetCreaturesWithEntryInRange(_waveList, 25.0f, NPC_AMANISHI_MEDICINE_MAN);
                     GroupedAttack(_waveList);
                     Talk(SAY_WAVE4);
-                    _introScheduler.Schedule(5s, GROUP_CHECK_DEAD, [this](TaskContext context)
-                    {
-                        if (CheckFullyDeadGroup(_waveList))
-                            if (_phase == PHASE_SEND_GUARDS_4)
-                            {
-                                _introScheduler.CancelGroup(GROUP_CHECK_DEAD);
-                                me->SetHomePosition(me->GetPosition());
-                                me->SetImmuneToAll(false);
-                                me->SetReactState(REACT_AGGRESSIVE);
-                                me->SetInCombatWithZone();
-                                _waveList.clear();
-                                _phase = PHASE_START_COMBAT;
-                                _ranIntro = true;
-                            }
-                        context.Repeat(5s);
-                    });
+                    _waveList.clear();
+                    _phase = PHASE_START_COMBAT;
+                    _ranIntro = true;
+                    me->SetHomePosition(me->GetPosition());
                     break;
             }
         }
