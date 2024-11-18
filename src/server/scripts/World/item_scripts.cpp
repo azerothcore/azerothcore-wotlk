@@ -523,14 +523,14 @@ public:
             case 97:
             case 98:
             case 99:// 4% - 10 слитков по 20к опыта для ранга
-                pPlayer->AddItem(600014, 10);
+                pPlayer->AddItem(600014, 5);
                 rus << "Вы получили |cffffff4d10|cffff9933 слитка по 20 000 опыта для ранга.";
                 eng << "You got |cffffff4d10|cffff9933 1000 xp ingot per rank.";
                 break;            
-            case 100:// 1% - 10 слитков по 25к опыта для ранга
-                pPlayer->AddItem(600014, 10);
-                rus << "Вы получили |cffffff4d10|cffff9933 слитка по 25 000 опыта для ранга.";
-                eng << "You got |cffffff4d10|cffff9933 5 000 xp ingot per rank.";
+            case 100:// 1% - 10 слитков по 10к опыта для ранга
+                pPlayer->AddItem(600013, 5);
+                rus << "Вы получили |cffffff4d10|cffff9933 слитка по 10 000 опыта для ранга.";
+                eng << "You got |cffffff4d10|cffff9933 10 000 xp ingot per rank.";
                 break;                   
             default: 
                 rus << "Ошибка";
