@@ -20,6 +20,7 @@
 
 #include "Define.h"
 #include <string>
+#include "Common.h"
 
 class WorldPacket;
 
