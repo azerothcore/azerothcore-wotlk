@@ -200,7 +200,7 @@ std::string DBUpdater<PlayerbotsDatabaseConnection>::GetSourceDirectory()
 template<>
 std::string DBUpdater<PlayerbotsDatabaseConnection>::GetBaseFilesDirectory()
 {
-    return DBUpdater<PlayerbotsDatabaseConnection>::GetSourceDirectory() + "/sql/playerbots/base/";
+    return DBUpdater<PlayerbotsDatabaseConnection>::GetSourceDirectory() + "/data/sql/playerbots/base/";
 }
 
 template<>
