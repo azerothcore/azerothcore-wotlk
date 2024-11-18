@@ -92,6 +92,8 @@ struct boss_nalorakk : public BossAI
         _phase = PHASE_SEND_GUARDS_1;
         _ranIntro = false;
         _active = true;
+        creature->SetReactState(REACT_PASSIVE);
+        me->SetImmuneToAll(true);
     }
 
     void Reset() override
@@ -107,8 +109,8 @@ struct boss_nalorakk : public BossAI
         if (_ranIntro)
         {
             _phase = PHASE_START_COMBAT;
+            me->SetReactState(REACT_AGGRESSIVE);
             _active = false;
-
         }
     }
 
@@ -199,6 +201,8 @@ struct boss_nalorakk : public BossAI
                     _waveList.clear();
                     _phase = PHASE_START_COMBAT;
                     _ranIntro = true;
+                    me->SetImmuneToAll(false);
+                    me->SetReactState(REACT_AGGRESSIVE);
                     me->SetHomePosition(me->GetPosition());
                     break;
             }
