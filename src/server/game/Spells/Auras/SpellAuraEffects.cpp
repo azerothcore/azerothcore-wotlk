@@ -39,6 +39,10 @@
 #include "Vehicle.h"
 #include "WorldPacket.h"
 
+//npcbot
+#include "botmgr.h"
+//end npcbot
+
 /// @todo: this import is not necessary for compilation and marked as unused by the IDE
 //  however, for some reasons removing it would cause a damn linking issue
 //  there is probably some underlying problem with imports which should properly addressed
@@ -6777,6 +6781,20 @@ void AuraEffect::HandlePeriodicDamageAurasTick(Unit* target, Unit* caster) const
     bool crit = false;
     if ((crit = roll_chance_f(GetCritChance())))
         damage = Unit::SpellCriticalDamageBonus(caster, m_spellInfo, damage, target);
+
+    //NpcBot mod: apply bot damage mods
+    if (caster->IsNPCBotOrPet())
+    {
+        SpellNonMeleeDamage damageInfo(caster, target, m_spellInfo, m_spellInfo->GetSchoolMask());
+        int32 idamage = damage;
+        caster->ToCreature()->ApplyBotDamageMultiplierSpell(idamage, damageInfo, m_spellInfo, BASE_ATTACK, crit);
+        damage = std::max<int32>(idamage, 0);
+        if (GetSpellInfo()->GetSchoolMask() & SPELL_SCHOOL_MASK_NORMAL)
+            damage *= BotMgr::IsWanderingWorldBot(caster->ToCreature()) ? BotMgr::GetBotWandererDamageMod() : BotMgr::GetBotDamageModPhysical();
+        else if (GetSpellInfo()->GetSchoolMask() & SPELL_SCHOOL_MASK_MAGIC)
+            damage *= BotMgr::IsWanderingWorldBot(caster->ToCreature()) ? BotMgr::GetBotWandererDamageMod() : BotMgr::GetBotDamageModSpell();
+    }
+    //End NpcBot
 
     // Auras reducing damage from AOE spells
     if (GetSpellInfo()->Effects[GetEffIndex()].IsAreaAuraEffect() || GetSpellInfo()->Effects[GetEffIndex()].IsTargetingArea() || GetSpellInfo()->Effects[GetEffIndex()].Effect == SPELL_EFFECT_PERSISTENT_AREA_AURA) // some persistent area auras have targets like A=53 B=28
