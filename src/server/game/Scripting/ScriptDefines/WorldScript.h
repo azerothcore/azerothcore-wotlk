@@ -20,6 +20,7 @@
 
 #include "ScriptObject.h"
 #include <vector>
+#include "Common.h"
 
 enum WorldHook
 {
