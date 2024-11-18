@@ -1,3 +1,4 @@
+-- DB update 2024_11_18_00 -> 2024_11_18_01
 DELETE FROM `smart_scripts` WHERE `entryorguid` IN (-45537,-45570,-45571,-48394,-48400,-54994,-54996,-54999,-55062,-55064,-55065);
 
 DELETE FROM `smart_scripts` WHERE (`source_type` = 0 AND `entryorguid` = 25507);
