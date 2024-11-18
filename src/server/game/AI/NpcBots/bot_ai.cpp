@@ -9944,7 +9944,7 @@ bool bot_ai::OnGossipSelect(Player* player, Creature* creature/* == me*/, uint32
                             ItemTemplate const* set_item_proto = sObjectMgr->GetItemTemplate(itemset_items[i]); // validated at load
                             if (!available_items.contains(itemset_items[i]) || available_items.at(itemset_items[i]).empty())
                                 check_res = BotEquipResult::BOT_EQUIP_RESULT_FAIL_NO_ITEM;
-                            else if (!_canEquip(set_item_proto, i, true, *available_items.at(itemset_items[i]).cbegin()))
+                            else if (!_canEquip(set_item_proto, i, true, *available_items.at(itemset_items[i]).cbegin(), true))
                                 check_res = BotEquipResult::BOT_EQUIP_RESULT_FAIL_CANT_EQUIP;
                             else
                             {
@@ -9997,6 +9997,7 @@ bool bot_ai::OnGossipSelect(Player* player, Creature* creature/* == me*/, uint32
                         {
                             std::string err_code = Bcore::ToString(uint32(AsUnderlyingType(res)));
                             BotWhisper(LocalizedNpcText(player, BOT_TEXT_FAILED) + " -" + Bcore::ToString(uint32(i)) + " (" + err_code + ")");
+                            break;
                         }
                     }
                 }
@@ -12209,7 +12210,7 @@ void bot_ai::_autoLootCreature(Creature* creature)
 //////////
 //EQUIPS//
 //////////
-bool bot_ai::_canUseOffHand(ItemTemplate const* with/* = nullptr*/) const
+bool bot_ai::_canUseOffHand(ItemTemplate const* with/* = nullptr*/, bool ignore_mh/* = false*/) const
 {
     //bm can on only equip in main hand
     if (_botclass == BOT_CLASS_BM)
@@ -12226,6 +12227,9 @@ bool bot_ai::_canUseOffHand(ItemTemplate const* with/* = nullptr*/) const
 
     //warrior can wield any offhand with titan's grip
     if (_botclass == BOT_CLASS_WARRIOR && me->GetLevel() >= 60 && GetSpec() == BOT_SPEC_WARRIOR_FURY)
+        return true;
+
+    if (ignore_mh)
         return true;
 
     ItemTemplate const* protoMH = with ? with : _equips[BOT_SLOT_MAINHAND] ? _equips[BOT_SLOT_MAINHAND]->GetTemplate() : nullptr;
@@ -12262,10 +12266,10 @@ bool bot_ai::_canUseRelic() const
 
 bool bot_ai::_canCombineWeapons(ItemTemplate const* mh, ItemTemplate const* oh) const
 {
-    return _canEquip(mh, BOT_SLOT_MAINHAND, true) && _canEquip(oh, BOT_SLOT_OFFHAND, true) && _canUseOffHand(mh);
+    return _canEquip(mh, BOT_SLOT_MAINHAND, true, nullptr, true) && _canEquip(oh, BOT_SLOT_OFFHAND, true, nullptr, true) && _canUseOffHand(mh);
 }
 
-bool bot_ai::_canEquip(ItemTemplate const* newProto, uint8 slot, bool ignoreItemLevel, Item const* newItem) const
+bool bot_ai::_canEquip(ItemTemplate const* newProto, uint8 slot, bool ignoreItemLevel, Item const* newItem/* = nullptr*/, bool ignore_combine/* = false*/) const
 {
     EquipmentInfo const* einfo = BotDataMgr::GetBotEquipmentInfo(me->GetEntry());
 
@@ -12283,7 +12287,7 @@ bool bot_ai::_canEquip(ItemTemplate const* newProto, uint8 slot, bool ignoreItem
                         return false;
     }
 
-    if (slot == BOT_SLOT_OFFHAND && !_canUseOffHand())
+    if (slot == BOT_SLOT_OFFHAND && !_canUseOffHand(nullptr, ignore_combine))
         return false;
 
     //level requirements
