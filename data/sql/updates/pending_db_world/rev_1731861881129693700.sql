@@ -26,3 +26,10 @@ UPDATE `quest_template_addon` SET `NextQuestID` = 0 WHERE (`ID` = 10373);
 
 -- Malin's Request (1/2) requirement removed from Worth Its Weight in Gold
 UPDATE `quest_template_addon` SET `PrevQuestID` = 0 WHERE (`ID` = 691);
+
+-- Tran'rek requirement removed from Scarab Shells
+UPDATE `quest_template_addon` SET `PrevQuestID` = 0 WHERE (`ID` = 2865);
+
+-- Stoley's Debt requirement removed from Stoley's Shipment
+UPDATE `quest_template_addon` SET `PrevQuestID` = 0 WHERE (`ID` = 2873);
+
