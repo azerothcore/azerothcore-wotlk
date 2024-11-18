@@ -324,6 +324,9 @@ struct boss_priestess_lackey_commonAI : public ScriptedAI
 
     void UpdateAI(uint32 diff) override
     {
+        if (!UpdateVictim())
+            return;
+
         if (me->HasUnitState(UNIT_STATE_CASTING))
             return;
 
