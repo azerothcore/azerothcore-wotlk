@@ -639,11 +639,11 @@ class bot_ai : public CreatureAI
         void _autoLootCreatureItems(Player* receiver, Creature* creature, uint32 lootQualityMask, uint32 lootThreshold) const;
         void _autoLootCreature(Creature* creature);
 
-        bool _canUseOffHand(ItemTemplate const* with = nullptr) const;
+        bool _canUseOffHand(ItemTemplate const* with = nullptr, bool ignore_mh = false) const;
         bool _canUseRanged() const;
         bool _canUseRelic() const;
         bool _canCombineWeapons(ItemTemplate const* mh, ItemTemplate const* oh) const;
-        bool _canEquip(ItemTemplate const* newProto, uint8 slot, bool ignoreItemLevel, Item const* newItem = nullptr) const;
+        bool _canEquip(ItemTemplate const* newProto, uint8 slot, bool ignoreItemLevel, Item const* newItem = nullptr, bool ignore_combine = false) const;
         void _removeEquipment(uint8 slot);
         [[nodiscard]] BotEquipResult _unequip(uint8 slot, ObjectGuid receiver, bool store_to_bank, bool on_equip_from_bank = false);
         [[nodiscard]] BotEquipResult _equip(uint8 slot, Item* newItem, ObjectGuid receiver, bool store_to_bank, bool from_bank = false);
