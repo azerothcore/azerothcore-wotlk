@@ -593,7 +593,8 @@ void bot_ai::ResetBotAI(uint8 resetType)
     _botAwaitState = BOT_AWAIT_NONE;
     _reviveTimer = 0;
 
-    master = reinterpret_cast<Player*>(me);
+    if (resetType & BOTAI_RESET_MASK_RESET_MASTER)
+        master = reinterpret_cast<Player*>(me);
     if (resetType & BOTAI_RESET_MASK_ABANDON_MASTER)
         _ownerGuid = 0;
     if (resetType == BOTAI_RESET_INIT || resetType == BOTAI_RESET_LOGOUT)
@@ -3480,6 +3481,15 @@ void bot_ai::ReceiveEmote(Player* player, uint32 emote)
             std::ostringstream report;
             report << "Problems:";
 
+            if (_ownerGuid && !HasBotCommandState(BOT_COMMAND_UNBIND) && (master->ToUnit() == me->ToUnit() || _ownerGuid != master->GetGUID().GetRawValue()))
+            {
+                if (Player* real_owner = ObjectAccessor::FindPlayerByLowGUID(_ownerGuid))
+                {
+                    report << "\n  owner is in world by bot isn't owned by it";
+                    if (!SetBotOwner(real_owner))
+                        report << "\n    (failed to set owner to '" << real_owner->GetName() << "'!)";
+                }
+            }
             if ((me->HasUnitFlag(UNIT_FLAG_STUNNED) || me->HasUnitState(UNIT_STATE_STUNNED)) &&
                 !me->HasAuraType(SPELL_AURA_MOD_STUN))
             {
