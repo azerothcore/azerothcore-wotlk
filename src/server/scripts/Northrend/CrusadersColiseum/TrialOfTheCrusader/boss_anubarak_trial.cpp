@@ -635,7 +635,7 @@ public:
             events.Reset();
             events.RescheduleEvent(EVENT_SUBMERGE, 30s);
             if (IsHeroic())
-                events.RescheduleEvent(EVENT_SPELL_SHADOW_STRIKE, 30s, 45s);
+                events.RescheduleEvent(EVENT_SPELL_SHADOW_STRIKE, 30s);
             if (Unit* target = me->SelectNearestTarget(250.0f))
             {
                 AttackStart(target);
@@ -679,7 +679,7 @@ public:
                 case EVENT_SPELL_SHADOW_STRIKE:
                     if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 250.0f, true))
                         me->CastSpell(target, SPELL_SHADOW_STRIKE, false);
-                    events.Repeat(30s, 45s);
+                    events.Repeat(30s);
                     break;
                 case EVENT_SUBMERGE:
                     if (HealthBelowPct(85) && !me->HasAura(RAID_MODE(66193, 67855, 67856, 67857))) // not having permafrost - allow submerge
