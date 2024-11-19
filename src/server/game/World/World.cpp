@@ -24,7 +24,6 @@
 #include "AchievementMgr.h"
 #include "AddonMgr.h"
 #include "ArenaTeamMgr.h"
-#include "AsyncAuctionListing.h"
 #include "AuctionHouseMgr.h"
 #include "AutobroadcastMgr.h"
 #include "BattlefieldMgr.h"
@@ -2346,8 +2345,6 @@ void World::Update(uint32 diff)
         // pussywizard: handle expired auctions, auctions expired when realm was offline are also handled here (not during loading when many required things aren't loaded yet)
         sAuctionMgr->Update();
     }
-
-    AsyncAuctionListingMgr::Update(Milliseconds(diff));
 
     if (currentGameTime > _mail_expire_check_timer)
     {
