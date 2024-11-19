@@ -137,8 +137,6 @@ struct boss_murmur : public BossAI
         {
             Talk(EMOTE_SONIC_BOOM);
 
-            me->InterruptNonMeleeSpells(false);
-            me->AddUnitState(UNIT_STATE_CASTING);
             DoCastAOE(SPELL_SONIC_BOOM_CAST);
 
             scheduler.Schedule(1500ms, [this](TaskContext)
