@@ -1184,7 +1184,7 @@ void BotDataMgr::LoadNpcBotGearSets()
         }
     }
 
-    BOT_LOG_INFO("server.loading", ">> Loaded {} NPCBot item sets for {} bow owners in {} ms", uint32(set_guids.size()), uint32(player_guids.size()), GetMSTimeDiffToNow(oldMSTime));
+    BOT_LOG_INFO("server.loading", ">> Loaded {} NPCBot item sets for {} bot owners in {} ms", uint32(set_guids.size()), uint32(player_guids.size()), GetMSTimeDiffToNow(oldMSTime));
 }
 
 void BotDataMgr::LoadNpcBotMgrData()
