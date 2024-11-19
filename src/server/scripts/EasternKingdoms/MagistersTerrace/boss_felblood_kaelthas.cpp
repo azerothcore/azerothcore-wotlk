@@ -108,12 +108,7 @@ struct boss_felblood_kaelthas : public BossAI
                     finalPlayerList.emplace_front(player);
         if (!finalPlayerList.empty())
         {
-            Acore::Containers::RandomResize(finalPlayerList, 1);
-            if (Player* chosenPlayer = finalPlayerList.front())
-            {
-                finalPlayerList.clear();
-                return chosenPlayer;
-            }
+            return Acore::Containers::SelectRandomContainerElement(finalPlayerList);
         }
         return nullptr;
     }
