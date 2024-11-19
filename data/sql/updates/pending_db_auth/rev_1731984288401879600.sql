@@ -1,3 +1,4 @@
+--
 CREATE TABLE `motd_localized` (
   `realmid` INT,
   `locale` VARCHAR(5),
