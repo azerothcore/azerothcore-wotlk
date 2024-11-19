@@ -87,9 +87,35 @@ struct boss_felblood_kaelthas : public BossAI
             me->StopMoving();
             me->GetMotionMaster()->Clear();
             me->GetMotionMaster()->MoveIdle();
-
+            ScheduleTimedEvent(5s, [&]{
+                summons.DoForAllSummons([&](WorldObject* summon){
+                    if (Player* player = GetRandomEngagedPlayerFromParty())
+                        if (Creature* summonedCreature = summon->ToCreature())
+                            summonedCreature->GetMotionMaster()->MoveChase(player);
+                });
+            }, 10s, 15s);
             GravityLapseSequence(true);
         });
+    }
+
+    Player* GetRandomEngagedPlayerFromParty()
+    {
+        Map::PlayerList const& players = me->GetMap()->GetPlayers();
+        std::list<Player*> finalPlayerList;
+        for (Map::PlayerList::const_iterator i = players.begin(); i != players.end(); ++i)
+            if (Player* player = i->GetSource())
+                if (player->IsAlive() && player->IsInCombatWith(me))
+                    finalPlayerList.emplace_front(player);
+        if (!finalPlayerList.empty())
+        {
+            Acore::Containers::RandomResize(finalPlayerList, 1);
+            if (Player* chosenPlayer = finalPlayerList.front())
+            {
+                finalPlayerList.clear();
+                return chosenPlayer;
+            }
+        }
+        return nullptr;
     }
 
     void GravityLapseSequence(bool firstTime)
