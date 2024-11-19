@@ -1,3 +1,4 @@
+-- DB update 2024_11_19_00 -> 2024_11_19_01
 DELETE FROM `conditions` WHERE 
     `SourceTypeOrReferenceId` = 23 AND
     `SourceGroup` = 14522 AND
