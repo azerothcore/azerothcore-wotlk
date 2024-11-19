@@ -1,4 +1,4 @@
-a-- Sorrow Wing (5928)
+-- Sorrow Wing (5928)
 UPDATE `creature_template` SET `skinloot` = 5928 WHERE (`entry` = 5928);
 DELETE FROM `skinning_loot_template` WHERE (`Entry` = 5928);
 INSERT INTO `skinning_loot_template` (`Entry`, `Item`, `Reference`, `Chance`, `QuestRequired`, `LootMode`, `GroupId`, `MinCount`, `MaxCount`, `Comment`) VALUES
