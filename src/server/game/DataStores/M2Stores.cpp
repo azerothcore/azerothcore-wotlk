@@ -15,15 +15,14 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "DBCStores.h"
+#include "M2Stores.h"
 #include "Containers.h"
+#include "DBCStores.h"
 #include "Log.h"
 #include "M2Structure.h"
-#include "M2Stores.h"
 #include "World.h"
 #include <boost/filesystem/path.hpp>
 #include <fstream>
-#include <iostream>
 
 typedef std::vector<FlyByCamera> FlyByCameraCollection;
 std::unordered_map<uint32, FlyByCameraCollection> sFlyByCameraStore;

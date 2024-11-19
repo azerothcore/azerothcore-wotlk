@@ -15,9 +15,11 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "InstanceMapScript.h"
 #include "InstanceScript.h"
-#include "ScriptMgr.h"
+#include "SpellScriptLoader.h"
 #include "shadow_labyrinth.h"
+#include "SpellScript.h"
 
 DoorData const doorData[] =
 {
@@ -99,7 +101,40 @@ public:
     };
 };
 
+// 33493 - Mark of Malice
+enum MarkOfMalice
+{
+    SPELL_MARK_OF_MALICE_TRIGGERED = 33494
+};
+
+class spell_mark_of_malice : public AuraScript
+{
+    PrepareAuraScript(spell_mark_of_malice);
+
+    bool Validate(SpellInfo const* /*spellInfo*/) override
+    {
+        return ValidateSpellInfo({ SPELL_MARK_OF_MALICE_TRIGGERED });
+    }
+
+    void HandleProc(AuraEffect const* /*aurEff*/, ProcEventInfo& /*eventInfo*/)
+    {
+        PreventDefaultAction();
+        if (GetCharges() > 1)
+        {
+            return;
+        }
+
+        GetTarget()->CastSpell(GetTarget(), SPELL_MARK_OF_MALICE_TRIGGERED, true);
+    }
+
+    void Register() override
+    {
+        OnEffectProc += AuraEffectProcFn(spell_mark_of_malice::HandleProc, EFFECT_0, SPELL_AURA_DUMMY);
+    }
+};
+
 void AddSC_instance_shadow_labyrinth()
 {
     new instance_shadow_labyrinth();
+    RegisterSpellScript(spell_mark_of_malice);
 }

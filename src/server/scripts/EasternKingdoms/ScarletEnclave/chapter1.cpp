@@ -16,18 +16,19 @@
  */
 
 #include "CombatAI.h"
+#include "CreatureScript.h"
 #include "CreatureTextMgr.h"
+#include "GameObjectScript.h"
+#include "MoveSplineInit.h"
 #include "ObjectMgr.h"
 #include "PassiveAI.h"
 #include "Player.h"
-#include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 #include "ScriptedEscortAI.h"
 #include "ScriptedGossip.h"
 #include "SpellInfo.h"
 #include "SpellScript.h"
-#include "Vehicle.h"
-#include "MoveSplineInit.h"
+#include "SpellScriptLoader.h"
 
  /*######
  ## npc_eye_of_acherus
@@ -61,7 +62,7 @@ struct npc_eye_of_acherus : public ScriptedAI
 {
     npc_eye_of_acherus(Creature* creature) : ScriptedAI(creature)
     {
-        creature->SetDisplayId(creature->GetCreatureTemplate()->Modelid1);
+        creature->SetDisplayFromModel(0);
         creature->SetReactState(REACT_PASSIVE);
     }
 
@@ -156,31 +157,30 @@ private:
     EventMap _events;
 };
 
-class spell_q12641_death_comes_from_on_high_summon_ghouls : public SpellScriptLoader
+enum DeathComesFromOnHigh
 {
-public:
-    spell_q12641_death_comes_from_on_high_summon_ghouls() : SpellScriptLoader("spell_q12641_death_comes_from_on_high_summon_ghouls") { }
+    SUMMON_GHOULS_ON_SCARLET_CRUSADE = 54522
+};
 
-    class spell_q12641_death_comes_from_on_high_summon_ghouls_SpellScript : public SpellScript
+class spell_q12641_death_comes_from_on_high_summon_ghouls : public SpellScript
+{
+    PrepareSpellScript(spell_q12641_death_comes_from_on_high_summon_ghouls);
+
+    bool Validate(SpellInfo const* /*spellInfo*/) override
     {
-        PrepareSpellScript(spell_q12641_death_comes_from_on_high_summon_ghouls_SpellScript);
+        return ValidateSpellInfo({ SUMMON_GHOULS_ON_SCARLET_CRUSADE });
+    }
 
-        void HandleScriptEffect(SpellEffIndex effIndex)
-        {
-            PreventHitEffect(effIndex);
-            if (Unit* target = GetHitUnit())
-                GetCaster()->CastSpell(target->GetPositionX(), target->GetPositionY(), target->GetPositionZ(), 54522, true);
-        }
-
-        void Register() override
-        {
-            OnEffectHitTarget += SpellEffectFn(spell_q12641_death_comes_from_on_high_summon_ghouls_SpellScript::HandleScriptEffect, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
-        }
-    };
-
-    SpellScript* GetSpellScript() const override
+    void HandleScriptEffect(SpellEffIndex effIndex)
     {
-        return new spell_q12641_death_comes_from_on_high_summon_ghouls_SpellScript();
+        PreventHitEffect(effIndex);
+        if (Unit* target = GetHitUnit())
+            GetCaster()->CastSpell(target->GetPositionX(), target->GetPositionY(), target->GetPositionZ(), SUMMON_GHOULS_ON_SCARLET_CRUSADE, true);
+    }
+
+    void Register() override
+    {
+        OnEffectHitTarget += SpellEffectFn(spell_q12641_death_comes_from_on_high_summon_ghouls::HandleScriptEffect, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
     }
 };
 
@@ -288,7 +288,7 @@ public:
                 _duelInProgress = true;
 
                 timer = 600000; // clear playerGUIDs after 10 minutes if no one initiates a duel
-                me->GetMotionMaster()->MoveFollow(caster, 2.0f, 0.0f);
+                me->SetFacingToObject(caster);
 
                 events.ScheduleEvent(EVENT_SPEAK, 3s);
                 events.ScheduleEvent(EVENT_SPEAK + 1, 7s);
@@ -405,64 +405,47 @@ enum GiftOfTheHarvester
     SAY_GOTHIK_PIT              = 0
 };
 
-class spell_item_gift_of_the_harvester : public SpellScriptLoader
+class spell_item_gift_of_the_harvester : public SpellScript
 {
-public:
-    spell_item_gift_of_the_harvester() : SpellScriptLoader("spell_item_gift_of_the_harvester") { }
+    PrepareSpellScript(spell_item_gift_of_the_harvester);
 
-    class spell_item_gift_of_the_harvester_SpellScript : public SpellScript
+    SpellCastResult CheckRequirement()
     {
-        PrepareSpellScript(spell_item_gift_of_the_harvester_SpellScript);
-
-        SpellCastResult CheckRequirement()
+        std::list<Creature*> ghouls;
+        GetCaster()->GetAllMinionsByEntry(ghouls, NPC_GHOUL);
+        if (ghouls.size() >= MAX_GHOULS)
         {
-            std::list<Creature*> ghouls;
-            GetCaster()->GetAllMinionsByEntry(ghouls, NPC_GHOUL);
-            if (ghouls.size() >= MAX_GHOULS)
-            {
-                SetCustomCastResultMessage(SPELL_CUSTOM_ERROR_TOO_MANY_GHOULS);
-                return SPELL_FAILED_CUSTOM_ERROR;
-            }
-
-            return SPELL_CAST_OK;
+            SetCustomCastResultMessage(SPELL_CUSTOM_ERROR_TOO_MANY_GHOULS);
+            return SPELL_FAILED_CUSTOM_ERROR;
         }
 
-        void Register() override
-        {
-            OnCheckCast += SpellCheckCastFn(spell_item_gift_of_the_harvester_SpellScript::CheckRequirement);
-        }
-    };
+        return SPELL_CAST_OK;
+    }
 
-    SpellScript* GetSpellScript() const override
+    void Register() override
     {
-        return new spell_item_gift_of_the_harvester_SpellScript();
+        OnCheckCast += SpellCheckCastFn(spell_item_gift_of_the_harvester::CheckRequirement);
     }
 };
 
-class spell_q12698_the_gift_that_keeps_on_giving : public SpellScriptLoader
+class spell_q12698_the_gift_that_keeps_on_giving : public SpellScript
 {
-public:
-    spell_q12698_the_gift_that_keeps_on_giving() : SpellScriptLoader("spell_q12698_the_gift_that_keeps_on_giving") { }
+    PrepareSpellScript(spell_q12698_the_gift_that_keeps_on_giving);
 
-    class spell_q12698_the_gift_that_keeps_on_giving_SpellScript : public SpellScript
+    bool Validate(SpellInfo const* /*spellInfo*/) override
     {
-        PrepareSpellScript(spell_q12698_the_gift_that_keeps_on_giving_SpellScript);
+        return ValidateSpellInfo({ SPELL_SUMMON_SCARLET_GHOST });
+    }
 
-        void HandleScriptEffect(SpellEffIndex /*effIndex*/)
-        {
-            if (GetOriginalCaster() && GetHitUnit())
-                GetOriginalCaster()->CastSpell(GetHitUnit(), urand(0, 1) ? GetEffectValue() : SPELL_SUMMON_SCARLET_GHOST, true);
-        }
-
-        void Register() override
-        {
-            OnEffectHitTarget += SpellEffectFn(spell_q12698_the_gift_that_keeps_on_giving_SpellScript::HandleScriptEffect, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
-        }
-    };
-
-    SpellScript* GetSpellScript() const override
+    void HandleScriptEffect(SpellEffIndex /*effIndex*/)
     {
-        return new spell_q12698_the_gift_that_keeps_on_giving_SpellScript();
+        if (GetOriginalCaster() && GetHitUnit())
+            GetOriginalCaster()->CastSpell(GetHitUnit(), urand(0, 1) ? GetEffectValue() : SPELL_SUMMON_SCARLET_GHOST, true);
+    }
+
+    void Register() override
+    {
+        OnEffectHitTarget += SpellEffectFn(spell_q12698_the_gift_that_keeps_on_giving::HandleScriptEffect, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
     }
 };
 
@@ -966,7 +949,7 @@ public:
         {
             me->SetImmuneToAll(true);
             me->SetFaction(FACTION_FRIENDLY);
-            me->SetDisplayId(me->GetCreatureTemplate()->Modelid1); // Modelid2 is a horse.
+            me->SetDisplayFromModel(0); // Modelid2 is a horse.
         }
 
         ObjectGuid minerGUID;
@@ -1236,10 +1219,10 @@ void AddSC_the_scarlet_enclave_c1()
 {
     // Ours
     RegisterCreatureAI(npc_eye_of_acherus);
-    new spell_q12641_death_comes_from_on_high_summon_ghouls();
+    RegisterSpellScript(spell_q12641_death_comes_from_on_high_summon_ghouls);
     new npc_death_knight_initiate();
-    new spell_item_gift_of_the_harvester();
-    new spell_q12698_the_gift_that_keeps_on_giving();
+    RegisterSpellScript(spell_item_gift_of_the_harvester);
+    RegisterSpellScript(spell_q12698_the_gift_that_keeps_on_giving);
     new npc_scarlet_ghoul();
     new npc_dkc1_gothik();
     new npc_scarlet_cannon();

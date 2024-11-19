@@ -22,12 +22,12 @@ SDComment: Oz, Hood, and RAJ event implemented. RAJ event requires more testing.
 SDCategory: Karazhan
 EndScriptData */
 
+#include "CreatureScript.h"
 #include "Player.h"
-#include "ScriptMgr.h"
-#include "TaskScheduler.h"
 #include "ScriptedCreature.h"
 #include "ScriptedGossip.h"
 #include "SpellInfo.h"
+#include "TaskScheduler.h"
 #include "karazhan.h"
 
 /***********************************/
@@ -159,7 +159,7 @@ struct boss_dorothee : public ScriptedAI
 {
     boss_dorothee(Creature* creature) : ScriptedAI(creature)
     {
-        SetCombatMovement(false);
+        me->SetCombatMovement(false);
         //this is kinda a big no-no. but it will prevent her from moving to chase targets. she should just cast her spells. in this case, since there is not really something to LOS her with or get out of range this would work. but a more elegant solution would be better
 
         instance = creature->GetInstanceScript();
@@ -688,6 +688,7 @@ enum RedRidingHood
     SPELL_LITTLE_RED_RIDING_HOOD    = 30768,
     SPELL_TERRIFYING_HOWL           = 30752,
     SPELL_WIDE_SWIPE                = 30761,
+    SPELL_PICNIC_BASKET_SMELL       = 30755,
 
     CREATURE_BIG_BAD_WOLF           = 17521,
 
@@ -751,16 +752,6 @@ struct boss_bigbadwolf : public ScriptedAI
 
     InstanceScript* instance;
 
-    ObjectGuid HoodGUID;
-
-    void Reset() override
-    {
-        HoodGUID.Clear();
-        _tempThreat = 0;
-
-        _isChasing = false;
-    }
-
     void JustEngagedWith(Unit* /*who*/) override
     {
         instance->DoUseDoorOrButton(instance->GetGuidData(DATA_GO_STAGEDOORLEFT));
@@ -769,40 +760,14 @@ struct boss_bigbadwolf : public ScriptedAI
 
         _scheduler.Schedule(30s, [this](TaskContext context)
         {
-            if (!_isChasing)
+            if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 100, true))
             {
-                if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 100, true))
-                {
-                    Talk(SAY_WOLF_HOOD);
-                    DoCast(target, SPELL_LITTLE_RED_RIDING_HOOD, true);
-                    _tempThreat = DoGetThreat(target);
-                    if (_tempThreat)
-                    {
-                        DoModifyThreatByPercent(target, -100);
-                    }
-                    HoodGUID = target->GetGUID();
-                    me->AddThreat(target, 1000000.0f);
-                    _isChasing = true;
-                    context.Repeat(20s);
-                }
+                Talk(SAY_WOLF_HOOD);
+                DoCast(target, SPELL_LITTLE_RED_RIDING_HOOD, true);
+                target->CastSpell(me, SPELL_PICNIC_BASKET_SMELL, true);
             }
-            else
-            {
-                _isChasing = false;
 
-                if (Unit* target = ObjectAccessor::GetUnit(*me, HoodGUID))
-                {
-                    HoodGUID.Clear();
-                    if (DoGetThreat(target))
-                    {
-                        DoModifyThreatByPercent(target, -100);
-                    }
-                    me->AddThreat(target, _tempThreat);
-                    _tempThreat = 0;
-                }
-
-                context.Repeat(40s);
-            }
+            context.Repeat(40s);
         }).Schedule(25s, 35s, [this](TaskContext context)
         {
             DoCastAOE(SPELL_TERRIFYING_HOWL);
@@ -845,15 +810,10 @@ struct boss_bigbadwolf : public ScriptedAI
 
         DoMeleeAttackIfReady();
 
-        if (_isChasing)
-            return;
-
         _scheduler.Update(diff);
     }
 private:
     TaskScheduler _scheduler;
-    bool _isChasing;
-    float _tempThreat;
 };
 
 /**********************************************/
@@ -981,7 +941,7 @@ struct boss_julianne : public ScriptedAI
 
     void DoAction(int32 action) override
     {
-        switch(action)
+        switch (action)
         {
             case ACTION_FAKING_DEATH:
                 isFakingDeath = false;
@@ -1178,7 +1138,7 @@ struct boss_romulo : public ScriptedAI
 
     void DoAction(int32 action) override
     {
-        switch(action)
+        switch (action)
         {
             case ACTION_FAKING_DEATH:
                 isFakingDeath = false;

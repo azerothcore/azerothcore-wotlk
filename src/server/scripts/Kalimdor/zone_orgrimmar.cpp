@@ -27,8 +27,8 @@ npc_shenthul
 npc_thrall_warchief
 EndContentData */
 
+#include "CreatureScript.h"
 #include "Player.h"
-#include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 #include "ScriptedGossip.h"
 #include "TaskScheduler.h"
@@ -91,7 +91,7 @@ public:
                 {
                     if (Player* player = ObjectAccessor::GetPlayer(*me, PlayerGUID))
                     {
-                        if (player->GetTypeId() == TYPEID_PLAYER && player->GetQuestStatus(QUEST_SHATTERED_SALUTE) == QUEST_STATUS_INCOMPLETE)
+                        if (player->IsPlayer() && player->GetQuestStatus(QUEST_SHATTERED_SALUTE) == QUEST_STATUS_INCOMPLETE)
                             player->FailQuest(QUEST_SHATTERED_SALUTE);
                     }
                     Reset();
@@ -153,11 +153,12 @@ enum ThrallWarchief : uint32
     AREA_CAMP_TAURAJO              = 378,
     AREA_CROSSROADS                = 380,
 
+    GO_UNADORNED_SPIKE             = 175787,
+
     // What the Wind Carries (ID: 6566)
     QUEST_WHAT_THE_WIND_CARRIES     = 6566,
     GOSSIP_MENU_THRALL              = 3664,
     GOSSIP_RESPONSE_THRALL_FIRST    = 5733,
-    GOSSIP_OPTION_DEFAULT           = 0
 };
 
 const Position heraldOfThrallPos = { -462.404f, -2637.68f, 96.0656f, 5.8606f };
@@ -179,7 +180,7 @@ public:
             uint32 NextAction = GOSSIP_ACTION_INFO_DEF + DiscussionOrder + 1;
             uint32 GossipResponse = GOSSIP_RESPONSE_THRALL_FIRST + DiscussionOrder - 1;
 
-            AddGossipItemFor(player, GOSSIP_MENU_THRALL + DiscussionOrder, GOSSIP_OPTION_DEFAULT, GOSSIP_SENDER_MAIN, NextAction);
+            AddGossipItemFor(player, GOSSIP_MENU_THRALL + DiscussionOrder, 0, GOSSIP_SENDER_MAIN, NextAction);
             SendGossipMenuFor(player, GossipResponse, creature->GetGUID());
         }
         else if (DiscussionOrder == 7)
@@ -200,7 +201,7 @@ public:
 
         if (player->GetQuestStatus(QUEST_WHAT_THE_WIND_CARRIES) == QUEST_STATUS_INCOMPLETE)
         {
-            AddGossipItemFor(player, GOSSIP_MENU_THRALL, GOSSIP_OPTION_DEFAULT, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
+            AddGossipItemFor(player, GOSSIP_MENU_THRALL, 0, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
         }
 
         SendGossipMenuFor(player, player->GetGossipTextId(creature), creature->GetGUID());
@@ -247,35 +248,50 @@ public:
                 me->RemoveNpcFlag(UNIT_NPC_FLAG_GOSSIP);
                 me->GetMap()->LoadGrid(heraldOfThrallPos.GetPositionX(), heraldOfThrallPos.GetPositionY());
                 me->SummonCreature(NPC_HERALD_OF_THRALL, heraldOfThrallPos, TEMPSUMMON_TIMED_DESPAWN, 20 * IN_MILLISECONDS);
-                _scheduler.Schedule(2s, [this](TaskContext /*context*/)
+                me->HandleEmoteCommand(EMOTE_ONESHOT_ROAR);
+                scheduler.Schedule(1s, [this](TaskContext /*context*/)
+                {
+                    if (GameObject* spike = me->FindNearestGameObject(GO_UNADORNED_SPIKE, 10.0f))
                     {
-                        Talk(SAY_THRALL_ON_QUEST_REWARD_0);
-                    })
-                .Schedule(13s, [this](TaskContext /*context*/)
+                        spike->SetGoState(GO_STATE_ACTIVE);
+                    }
+                }).Schedule(2s, [this](TaskContext /*context*/)
+                {
+                    Talk(SAY_THRALL_ON_QUEST_REWARD_0);
+                }).Schedule(9s, [this](TaskContext /*context*/)
+                {
+                    Talk(SAY_THRALL_ON_QUEST_REWARD_1);
+                    DoCastAOE(SPELL_WARCHIEF_BLESSING, true);
+                    me->SetNpcFlag(UNIT_NPC_FLAG_GOSSIP);
+                    me->GetMap()->DoForAllPlayers([&](Player* player)
                     {
-                        Talk(SAY_THRALL_ON_QUEST_REWARD_1);
-                    })
-                .Schedule(15s, [this](TaskContext /*context*/)
-                    {
-                        DoCastAOE(SPELL_WARCHIEF_BLESSING, true);
-                        me->SetNpcFlag(UNIT_NPC_FLAG_GOSSIP);
-                        me->GetMap()->DoForAllPlayers([&](Player* p)
+                        if (player->IsAlive() && !player->IsGameMaster())
+                        {
+                            if (player->GetAreaId() == AREA_ORGRIMMAR)
                             {
-                                if (p->IsAlive() && !p->IsGameMaster())
-                                {
-                                    if (p->GetAreaId() == AREA_ORGRIMMAR || p->GetAreaId() == AREA_RAZOR_HILL || p->GetAreaId() == AREA_CROSSROADS || p->GetAreaId() == AREA_CAMP_TAURAJO)
-                                    {
-                                        p->CastSpell(p, SPELL_WARCHIEF_BLESSING, true);
-                                    }
-                                }
-                            });
+                                player->CastSpell(player, SPELL_WARCHIEF_BLESSING, true);
+                            }
+                        }
                     });
+                }).Schedule(19s, [this](TaskContext /*context*/)
+                {
+                    me->GetMap()->DoForAllPlayers([&](Player* player)
+                    {
+                        if (player->IsAlive() && !player->IsGameMaster())
+                        {
+                            if (player->GetAreaId() == AREA_CROSSROADS)
+                            {
+                                player->CastSpell(player, SPELL_WARCHIEF_BLESSING, true);
+                            }
+                        }
+                    });
+                });
             }
         }
 
         void UpdateAI(uint32 diff) override
         {
-            _scheduler.Update(diff);
+            scheduler.Update(diff);
 
             if (!UpdateVictim())
                 return;
@@ -296,9 +312,6 @@ public:
 
             DoMeleeAttackIfReady();
         }
-
-        protected:
-            TaskScheduler _scheduler;
     };
 };
 

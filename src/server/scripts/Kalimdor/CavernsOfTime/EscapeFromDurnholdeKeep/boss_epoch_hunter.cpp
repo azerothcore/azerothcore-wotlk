@@ -15,7 +15,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "ScriptMgr.h"
+#include "CreatureScript.h"
 #include "ScriptedCreature.h"
 #include "old_hillsbrad.h"
 
@@ -37,18 +37,7 @@ enum Spells
 
 struct boss_epoch_hunter : public BossAI
 {
-    boss_epoch_hunter(Creature* creature) : BossAI(creature, DATA_EPOCH_HUNTER)
-    {
-        scheduler.SetValidator([this]
-        {
-            return !me->HasUnitState(UNIT_STATE_CASTING);
-        });
-    }
-
-    void Reset() override
-    {
-        _Reset();
-    }
+    boss_epoch_hunter(Creature* creature) : BossAI(creature, DATA_EPOCH_HUNTER) { }
 
     void JustEngagedWith(Unit* /*who*/) override
     {
@@ -79,7 +68,7 @@ struct boss_epoch_hunter : public BossAI
 
     void KilledUnit(Unit* victim) override
     {
-        if (victim->GetTypeId() == TYPEID_PLAYER)
+        if (victim->IsPlayer())
             Talk(SAY_SLAY);
     }
 
@@ -95,18 +84,6 @@ struct boss_epoch_hunter : public BossAI
         {
             taretha->AI()->DoAction(me->GetEntry());
         }
-    }
-
-    void UpdateAI(uint32 diff) override
-    {
-        if (!UpdateVictim())
-            return;
-
-        scheduler.Update(diff);
-        if (me->HasUnitState(UNIT_STATE_CASTING))
-            return;
-
-        DoMeleeAttackIfReady();
     }
 };
 

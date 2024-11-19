@@ -20,6 +20,7 @@
 /// @todo: Add proper implement of achievement
 
 #include "BattlefieldWG.h"
+#include "Chat.h"
 #include "GameTime.h"
 #include "MapMgr.h"
 #include "Opcodes.h"
@@ -290,7 +291,7 @@ void BattlefieldWG::OnBattleStart()
     m_tenacityUpdateTimer = 20000;
 
     if (sWorld->getBoolConfig(CONFIG_BATTLEGROUND_QUEUE_ANNOUNCER_ENABLE))
-        sWorld->SendWorldText(BATTLEFIELD_WG_WORLD_START_MESSAGE);
+        ChatHandler(nullptr).SendWorldText(BATTLEFIELD_WG_WORLD_START_MESSAGE);
 }
 
 void BattlefieldWG::UpdateCounterVehicle(bool init)
@@ -719,9 +720,9 @@ void BattlefieldWG::HandleKill(Player* killer, Unit* victim)
     TeamId killerTeam = killer->GetTeamId();
 
     // xinef: tower cannons also grant rank
-    if (victim->GetTypeId() == TYPEID_PLAYER || IsKeepNpc(victim->GetEntry()) || victim->GetEntry() == NPC_WINTERGRASP_TOWER_CANNON)
+    if (victim->IsPlayer() || IsKeepNpc(victim->GetEntry()) || victim->GetEntry() == NPC_WINTERGRASP_TOWER_CANNON)
     {
-        if (victim->GetTypeId() == TYPEID_PLAYER && victim->HasAura(SPELL_LIEUTENANT))
+        if (victim->IsPlayer() && victim->HasAura(SPELL_LIEUTENANT))
         {
             // Quest - Wintergrasp - PvP Kill - Horde/Alliance
             for (auto& playerGuid : m_PlayersInWar[killerTeam])
@@ -748,7 +749,7 @@ void BattlefieldWG::HandleKill(Player* killer, Unit* victim)
         }
 
         // Xinef: Allow to Skin non-released corpse
-        if (victim->GetTypeId() == TYPEID_PLAYER)
+        if (victim->IsPlayer())
         {
             victim->SetUnitFlag(UNIT_FLAG_SKINNABLE);
         }

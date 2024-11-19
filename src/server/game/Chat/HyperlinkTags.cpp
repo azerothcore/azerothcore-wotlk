@@ -35,7 +35,7 @@ class HyperlinkDataTokenizer
             if (IsEmpty())
                 return false;
 
-            if (size_t off = _str.find(HYPERLINK_DATA_DELIMITER); off != std::string_view::npos)
+            if (std::size_t off = _str.find(HYPERLINK_DATA_DELIMITER); off != std::string_view::npos)
             {
                 if (!Acore::Hyperlinks::LinkTags::base_tag::StoreTo(val, _str.substr(0, off)))
                     return false;

@@ -15,12 +15,28 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "InstanceMapScript.h"
 #include "Player.h"
-#include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 #include "SpellScript.h"
+#include "SpellScriptLoader.h"
 #include "ahnkahet.h"
-#include <array>
+
+ObjectData const creatureData[] =
+{
+    { NPC_PRINCE_TALDARAM,     DATA_PRINCE_TALDARAM     },
+    { NPC_JEDOGA_SHADOWSEEKER, DATA_JEDOGA_SHADOWSEEKER },
+    { NPC_ELDER_NADOX,         DATA_ELDER_NADOX         },
+    { NPC_HERALD_VOLAZJ,       DATA_HERALD_VOLAZJ       },
+    { NPC_AMANITAR,            DATA_AMANITAR            },
+    { 0,                       0                        }
+};
+
+DoorData const doorData[] =
+{
+    { GO_TELDARAM_DOOR, DATA_PRINCE_TALDARAM, DOOR_TYPE_PASSAGE },
+    { 0,                0,                    DOOR_TYPE_ROOM    }
+};
 
 class instance_ahnkahet : public InstanceMapScript
 {
@@ -29,180 +45,78 @@ public:
 
     struct instance_ahnkahet_InstanceScript : public InstanceScript
     {
-        instance_ahnkahet_InstanceScript(Map* pMap) : InstanceScript(pMap), canSaveBossStates(false)
+        instance_ahnkahet_InstanceScript(Map* pMap) : InstanceScript(pMap)
         {
             SetHeaders(DataHeader);
             SetBossNumber(MAX_ENCOUNTER);
-            teldaramSpheres.fill(NOT_STARTED);
+            SetPersistentDataCount(MAX_PERSISTENT_DATA);
+            LoadObjectData(creatureData, nullptr);
+            LoadDoorData(doorData);
         }
 
-        void OnCreatureCreate(Creature* pCreature) override
+        void OnGameObjectCreate(GameObject* go) override
         {
-            switch (pCreature->GetEntry())
-            {
-                case NPC_ELDER_NADOX:
-                    elderNadox_GUID = pCreature->GetGUID();
-                    break;
-                case NPC_PRINCE_TALDARAM:
-                    princeTaldaram_GUID = pCreature->GetGUID();
-                    break;
-                case NPC_JEDOGA_SHADOWSEEKER:
-                    jedogaShadowseeker_GUID = pCreature->GetGUID();
-                    break;
-                case NPC_HERALD_JOLAZJ:
-                    heraldVolazj_GUID = pCreature->GetGUID();
-                    break;
-                case NPC_AMANITAR:
-                    amanitar_GUID = pCreature->GetGUID();
-                    break;
-            }
-        }
-
-        void OnGameObjectCreate(GameObject* pGo) override
-        {
-            switch (pGo->GetEntry())
+            switch (go->GetEntry())
             {
                 case GO_TELDARAM_PLATFORM:
                 {
-                    taldaramPlatform_GUID = pGo->GetGUID();
-                    if (IsAllSpheresActivated() || GetBossState(DATA_PRINCE_TALDARAM) == DONE)
-                    {
-                        HandleGameObject(ObjectGuid::Empty, true, pGo);
-                    }
-
+                    taldaramPlatform_GUID = go->GetGUID();
+                    HandleGameObject(ObjectGuid::Empty, IsAllSpheresActivated(), go);
                     break;
                 }
                 case GO_TELDARAM_SPHERE1:
                 case GO_TELDARAM_SPHERE2:
                 {
-                    if (teldaramSpheres.at(pGo->GetEntry() == GO_TELDARAM_SPHERE1 ? 0 : 1) == DONE || GetBossState(DATA_PRINCE_TALDARAM) == DONE)
+                    if (GetPersistentData(go->GetEntry() == GO_TELDARAM_SPHERE1 ? 0 : 1) == DONE || GetBossState(DATA_PRINCE_TALDARAM) == DONE)
                     {
-                        pGo->SetGoState(GO_STATE_ACTIVE);
-                        pGo->SetGameObjectFlag(GO_FLAG_NOT_SELECTABLE);
+                        go->SetGoState(GO_STATE_ACTIVE);
+                        go->SetGameObjectFlag(GO_FLAG_NOT_SELECTABLE);
                     }
                     else
                     {
-                        pGo->RemoveGameObjectFlag(GO_FLAG_NOT_SELECTABLE);
-                    }
-
-                    break;
-                }
-                case GO_TELDARAM_DOOR:
-                {
-                    taldaramGate_GUID = pGo->GetGUID(); // Web gate past Prince Taldaram
-                    if (GetBossState(DATA_PRINCE_TALDARAM) == DONE)
-                    {
-                        HandleGameObject(ObjectGuid::Empty, true, pGo);
+                        go->RemoveGameObjectFlag(GO_FLAG_NOT_SELECTABLE);
                     }
 
                     break;
                 }
             }
+
+            InstanceScript::OnGameObjectCreate(go);
         }
 
-        bool SetBossState(uint32 type, EncounterState state) override
+        void SetData(uint32 type, uint32 /*data*/) override
         {
-            if (!InstanceScript::SetBossState(type, state))
+            uint8 index = type == DATA_TELDRAM_SPHERE1 ? 0 : 1;
+
+            if ((type == DATA_TELDRAM_SPHERE1 || type == DATA_TELDRAM_SPHERE2) && GetPersistentData(index) != DONE)
             {
-                return false;
-            }
-
-            if (type == DATA_PRINCE_TALDARAM && state == DONE)
-            {
-                HandleGameObject(taldaramGate_GUID, true);
-            }
-
-            if (canSaveBossStates)
-            {
-                SaveToDB();
-            }
-
-            return true;
-        }
-
-        void SetData(uint32 type, uint32 data) override
-        {
-            if (type == DATA_TELDRAM_SPHERE1 || type == DATA_TELDRAM_SPHERE2)
-            {
-
-                teldaramSpheres[type == DATA_TELDRAM_SPHERE1 ? 0 : 1] = data;
+                StorePersistentData(index, DONE);
                 SaveToDB();
 
-                if (IsAllSpheresActivated())
+                if (Creature* taldaram = GetCreature(DATA_PRINCE_TALDARAM))
                 {
-                    HandleGameObject(taldaramPlatform_GUID, true, nullptr);
-
-                    Creature* teldaram = instance->GetCreature(princeTaldaram_GUID);
-                    if (teldaram && teldaram->IsAlive())
+                    if (taldaram->IsAlive())
                     {
-                        teldaram->AI()->DoAction(ACTION_REMOVE_PRISON);
+                        taldaram->AI()->Talk(SAY_SPHERE_ACTIVATED);
+
+                        if (IsAllSpheresActivated())
+                        {
+                            HandleGameObject(taldaramPlatform_GUID, true, nullptr);
+                            taldaram->AI()->DoAction(ACTION_REMOVE_PRISON);
+                        }
                     }
                 }
             }
-        }
-
-        uint32 GetData(uint32 type) const override
-        {
-            switch (type)
-            {
-                case DATA_TELDRAM_SPHERE1:
-                    return teldaramSpheres.at(0);
-                case DATA_TELDRAM_SPHERE2:
-                    return teldaramSpheres.at(1);
-            }
-
-            return 0;
-        }
-
-        ObjectGuid GetGuidData(uint32 type) const override
-        {
-            switch (type)
-            {
-                case DATA_ELDER_NADOX:
-                    return elderNadox_GUID;
-                case DATA_PRINCE_TALDARAM:
-                    return princeTaldaram_GUID;
-                case DATA_JEDOGA_SHADOWSEEKER:
-                    return jedogaShadowseeker_GUID;
-                case DATA_HERALD_VOLAZJ:
-                    return heraldVolazj_GUID;
-                case DATA_AMANITAR:
-                    return amanitar_GUID;
-            }
-
-            return ObjectGuid::Empty;
-        }
-
-        void ReadSaveDataMore(std::istringstream& data) override
-        {
-            data >> teldaramSpheres[0];
-            data >> teldaramSpheres[1];
-
-            canSaveBossStates = true;
-        }
-
-        void WriteSaveDataMore(std::ostringstream& data) override
-        {
-            data << teldaramSpheres[0] << ' '
-                << teldaramSpheres[1];
         }
 
     private:
-        ObjectGuid elderNadox_GUID;
-        ObjectGuid princeTaldaram_GUID;
-        ObjectGuid jedogaShadowseeker_GUID;
-        ObjectGuid heraldVolazj_GUID;
-        ObjectGuid amanitar_GUID;
-
         // Teldaram related
         ObjectGuid taldaramPlatform_GUID;
-        ObjectGuid taldaramGate_GUID;
-        std::array<uint32, 2> teldaramSpheres;  // Used to identify activation status for sphere activation
-        bool canSaveBossStates;     // Indicates that it is safe to trigger SaveToDB call in SetBossState
 
         bool IsAllSpheresActivated() const
         {
-            return teldaramSpheres.at(0) == DONE && teldaramSpheres.at(1) == DONE;
+            return GetBossState(DATA_PRINCE_TALDARAM) == DONE ||
+                (GetPersistentData(DATA_TELDRAM_SPHERE1) == DONE && GetPersistentData(DATA_TELDRAM_SPHERE2) == DONE);
         }
     };
 

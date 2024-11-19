@@ -18,11 +18,13 @@
 #ifndef __SPELL_H
 #define __SPELL_H
 
+#include "ConditionMgr.h"
 #include "GridDefines.h"
-#include "ObjectMgr.h"
+#include "LootMgr.h"
 #include "PathGenerator.h"
 #include "SharedDefines.h"
 #include "SpellInfo.h"
+#include "Unit.h"
 
 class Unit;
 class Player;
@@ -549,7 +551,8 @@ public:
     void SetAutoRepeat(bool rep) { m_autoRepeat = rep; }
     void ReSetTimer() { m_timer = m_casttime > 0 ? m_casttime : 0; }
     bool IsNextMeleeSwingSpell() const;
-    bool IsTriggered() const { return _triggeredCastFlags & TRIGGERED_FULL_MASK; };
+    bool IsTriggered() const { return HasTriggeredCastFlag(TRIGGERED_FULL_MASK); };
+    bool HasTriggeredCastFlag(TriggerCastFlags flag) const { return _triggeredCastFlags & flag; };
     bool IsChannelActive() const { return m_caster->GetUInt32Value(UNIT_CHANNEL_SPELL) != 0; }
     bool IsAutoActionResetSpell() const;
     bool IsIgnoringCooldowns() const;

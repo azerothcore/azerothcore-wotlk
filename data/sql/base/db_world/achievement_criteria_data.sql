@@ -1,8 +1,8 @@
 -- --------------------------------------------------------
 -- Host:                         127.0.0.1
--- Server version:               8.0.29 - MySQL Community Server - GPL
+-- Server version:               8.1.0 - MySQL Community Server - GPL
 -- Server OS:                    Win64
--- HeidiSQL Version:             12.0.0.6468
+-- HeidiSQL Version:             12.3.0.6589
 -- --------------------------------------------------------
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
@@ -21,11 +21,11 @@ CREATE TABLE IF NOT EXISTS `achievement_criteria_data` (
   `type` tinyint unsigned NOT NULL DEFAULT '0',
   `value1` int unsigned NOT NULL DEFAULT '0',
   `value2` int unsigned NOT NULL DEFAULT '0',
-  `ScriptName` char(64) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
+  `ScriptName` char(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
   PRIMARY KEY (`criteria_id`,`type`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='Achievment system';
 
--- Dumping data for table acore_world.achievement_criteria_data: ~2,787 rows (approximately)
+-- Dumping data for table acore_world.achievement_criteria_data: ~2 815 rows (approximately)
 DELETE FROM `achievement_criteria_data`;
 INSERT INTO `achievement_criteria_data` (`criteria_id`, `type`, `value1`, `value2`, `ScriptName`) VALUES
 	(100, 0, 0, 0, ''),
@@ -177,6 +177,34 @@ INSERT INTO `achievement_criteria_data` (`criteria_id`, `type`, `value1`, `value
 	(609, 9, 80, 0, ''),
 	(610, 9, 80, 0, ''),
 	(611, 24, 1600, 0, ''),
+	(707, 23, 14, 0, ''),
+	(708, 23, 13, 0, ''),
+	(709, 23, 12, 0, ''),
+	(710, 23, 11, 0, ''),
+	(711, 23, 10, 0, ''),
+	(712, 23, 9, 0, ''),
+	(713, 23, 8, 0, ''),
+	(714, 23, 7, 0, ''),
+	(721, 23, 6, 0, ''),
+	(722, 23, 5, 0, ''),
+	(723, 23, 4, 0, ''),
+	(724, 23, 3, 0, ''),
+	(725, 23, 2, 0, ''),
+	(726, 23, 1, 0, ''),
+	(727, 23, 28, 0, ''),
+	(728, 23, 27, 0, ''),
+	(729, 23, 26, 0, ''),
+	(730, 23, 25, 0, ''),
+	(731, 23, 24, 0, ''),
+	(732, 23, 23, 0, ''),
+	(733, 23, 22, 0, ''),
+	(734, 23, 21, 0, ''),
+	(735, 23, 20, 0, ''),
+	(736, 23, 19, 0, ''),
+	(737, 23, 18, 0, ''),
+	(738, 23, 17, 0, ''),
+	(739, 23, 16, 0, ''),
+	(740, 23, 15, 0, ''),
 	(758, 0, 0, 0, ''),
 	(1234, 11, 0, 0, 'achievement_bg_control_all_nodes'),
 	(1235, 24, 1600, 1590, ''),

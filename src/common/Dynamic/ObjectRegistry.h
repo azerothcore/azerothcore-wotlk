@@ -18,12 +18,9 @@
 #ifndef ACORE_OBJECTREGISTRY_H
 #define ACORE_OBJECTREGISTRY_H
 
-#include "Define.h"
 #include <map>
-#include <string>
-#include <unordered_map>
-#include <vector>
 #include <memory>
+#include <string>
 
 /** ObjectRegistry holds all registry item of the same type
  */

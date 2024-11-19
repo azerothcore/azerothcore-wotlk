@@ -15,8 +15,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "CreatureScript.h"
 #include "Player.h"
-#include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 #include "ScriptedGossip.h"
 #include "blackrock_depths.h"
@@ -218,7 +218,7 @@ public:
 
             _events.Update(diff);
 
-            switch(_events.ExecuteEvent())
+            switch (_events.ExecuteEvent())
             {
                 case EVENT_SPELL_SHADOWBOLTVOLLEY:
                     DoCastVictim(SPELL_SHADOWBOLTVOLLEY);

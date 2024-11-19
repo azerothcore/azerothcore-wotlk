@@ -345,6 +345,8 @@ void SmartAIMgr::LoadSmartAIFromDB()
         case SMART_EVENT_INSTANCE_PLAYER_ENTER:
         case SMART_EVENT_TRANSPORT_ADDCREATURE:
         case SMART_EVENT_NEAR_PLAYERS:
+        case SMART_EVENT_SUMMONED_UNIT_EVADE:
+        case SMART_EVENT_DATA_SET:
             return true;
         default:
             return false;
@@ -454,6 +456,7 @@ bool SmartAIMgr::IsTargetValid(SmartScriptHolder const& e)
         case SMART_TARGET_ROLE_SELECTION:
         case SMART_TARGET_LOOT_RECIPIENTS:
         case SMART_EVENT_SUMMONED_UNIT_DIES:
+        case SMART_EVENT_SUMMONED_UNIT_EVADE:
         case SMART_TARGET_PLAYER_RANGE:
         case SMART_TARGET_CLOSEST_GAMEOBJECT:
         case SMART_TARGET_SELF:
@@ -477,9 +480,9 @@ bool SmartAIMgr::IsTargetValid(SmartScriptHolder const& e)
 
 bool SmartAIMgr::CheckUnusedEventParams(SmartScriptHolder const& e)
 {
-    size_t paramsStructSize = [&]() -> size_t
+    std::size_t paramsStructSize = [&]() -> std::size_t
     {
-        constexpr size_t NO_PARAMS = size_t(0);
+        constexpr std::size_t NO_PARAMS = std::size_t(0);
         switch (e.event.type)
         {
             case SMART_EVENT_UPDATE_IC: return sizeof(SmartEvent::minMaxRepeat);
@@ -571,6 +574,9 @@ bool SmartAIMgr::CheckUnusedEventParams(SmartScriptHolder const& e)
             case SMART_EVENT_NEAR_UNIT_NEGATION: return sizeof(SmartEvent::nearUnitNegation);
             case SMART_EVENT_AREA_CASTING: return sizeof(SmartEvent::minMaxRepeat);
             case SMART_EVENT_AREA_RANGE: return sizeof(SmartEvent::minMaxRepeat);
+            case SMART_EVENT_SUMMONED_UNIT_EVADE: return sizeof(SmartEvent::summoned);
+            case SMART_EVENT_WAYPOINT_DATA_REACHED: return sizeof(SmartEvent::wpData);
+            case SMART_EVENT_WAYPOINT_DATA_ENDED: return sizeof(SmartEvent::wpData);
             default:
                 LOG_WARN("sql.sql", "SmartAIMgr: entryorguid {} source_type {} id {} action_type {} is using an event {} with no unused params specified in SmartAIMgr::CheckUnusedEventParams(), please report this.",
                             e.entryOrGuid, e.GetScriptType(), e.event_id, e.GetActionType(), e.GetEventType());
@@ -578,11 +584,11 @@ bool SmartAIMgr::CheckUnusedEventParams(SmartScriptHolder const& e)
         }
     }();
 
-    static size_t rawCount = sizeof(SmartEvent::raw) / sizeof(uint32);
-    size_t paramsCount = paramsStructSize / sizeof(uint32);
+    static std::size_t rawCount = sizeof(SmartEvent::raw) / sizeof(uint32);
+    std::size_t paramsCount = paramsStructSize / sizeof(uint32);
 
     bool valid = true;
-    for (size_t index = paramsCount; index < rawCount; index++)
+    for (std::size_t index = paramsCount; index < rawCount; index++)
     {
         uint32 value = ((uint32*)&e.event.raw)[index];
         if (value != 0)
@@ -598,9 +604,9 @@ bool SmartAIMgr::CheckUnusedEventParams(SmartScriptHolder const& e)
 
 bool SmartAIMgr::CheckUnusedActionParams(SmartScriptHolder const& e)
 {
-    size_t paramsStructSize = [&]() -> size_t
+    std::size_t paramsStructSize = [&]() -> std::size_t
     {
-        constexpr size_t NO_PARAMS = size_t(0);
+        constexpr std::size_t NO_PARAMS = std::size_t(0);
         switch (e.action.type)
         {
             case SMART_ACTION_NONE: return NO_PARAMS;
@@ -752,7 +758,6 @@ bool SmartAIMgr::CheckUnusedActionParams(SmartScriptHolder const& e)
             case SMART_ACTION_EXIT_VEHICLE: return NO_PARAMS;
             case SMART_ACTION_SET_UNIT_MOVEMENT_FLAGS: return sizeof(SmartAction::movementFlag);
             case SMART_ACTION_SET_COMBAT_DISTANCE: return sizeof(SmartAction::combatDistance);
-            case SMART_ACTION_SET_CASTER_COMBAT_DIST: return sizeof(SmartAction::casterDistance);
             case SMART_ACTION_FALL: return NO_PARAMS;
             case SMART_ACTION_SET_EVENT_FLAG_RESET: return sizeof(SmartAction::setActive);
             case SMART_ACTION_STOP_MOTION: return sizeof(SmartAction::stopMotion);
@@ -761,12 +766,18 @@ bool SmartAIMgr::CheckUnusedActionParams(SmartScriptHolder const& e)
             case SMART_ACTION_LOAD_GRID: return NO_PARAMS;
             case SMART_ACTION_MUSIC: return sizeof(SmartAction::music);
             case SMART_ACTION_SET_GUID: return sizeof(SmartAction::setGuid);
-            case SMART_ACTION_DISABLE: return sizeof(SmartAction::disable);
+            case SMART_ACTION_SCRIPTED_SPAWN: return sizeof(SmartAction::scriptSpawn);
             case SMART_ACTION_SET_SCALE: return sizeof(SmartAction::setScale);
             case SMART_ACTION_SUMMON_RADIAL: return sizeof(SmartAction::radialSummon);
             case SMART_ACTION_PLAY_SPELL_VISUAL: return sizeof(SmartAction::spellVisual);
             case SMART_ACTION_FOLLOW_GROUP: return sizeof(SmartAction::followGroup);
             case SMART_ACTION_SET_ORIENTATION_TARGET: return sizeof(SmartAction::orientationTarget);
+            case SMART_ACTION_WAYPOINT_DATA_START: return sizeof(SmartAction::wpData);
+            case SMART_ACTION_WAYPOINT_DATA_RANDOM: return sizeof(SmartAction::wpDataRandom);
+            case SMART_ACTION_MOVEMENT_STOP: return NO_PARAMS;
+            case SMART_ACTION_MOVEMENT_PAUSE: return sizeof(SmartAction::move);
+            case SMART_ACTION_MOVEMENT_RESUME: return sizeof(SmartAction::move);
+            case SMART_ACTION_WORLD_SCRIPT: return sizeof(SmartAction::worldStateScript);
             default:
                 LOG_WARN("sql.sql", "SmartAIMgr: entryorguid {} source_type {} id {} action_type {} is using an action with no unused params specified in SmartAIMgr::CheckUnusedActionParams(), please report this.",
                             e.entryOrGuid, e.GetScriptType(), e.event_id, e.GetActionType());
@@ -774,11 +785,11 @@ bool SmartAIMgr::CheckUnusedActionParams(SmartScriptHolder const& e)
         }
     }();
 
-    static size_t rawCount = sizeof(SmartAction::raw) / sizeof(uint32);
-    size_t paramsCount = paramsStructSize / sizeof(uint32);
+    static std::size_t rawCount = sizeof(SmartAction::raw) / sizeof(uint32);
+    std::size_t paramsCount = paramsStructSize / sizeof(uint32);
 
     bool valid = true;
-    for (size_t index = paramsCount; index < rawCount; index++)
+    for (std::size_t index = paramsCount; index < rawCount; index++)
     {
         uint32 value = ((uint32*)&e.action.raw)[index];
         if (value != 0)
@@ -794,9 +805,9 @@ bool SmartAIMgr::CheckUnusedActionParams(SmartScriptHolder const& e)
 
 bool SmartAIMgr::CheckUnusedTargetParams(SmartScriptHolder const& e)
 {
-    size_t paramsStructSize = [&]() -> size_t
+    std::size_t paramsStructSize = [&]() -> std::size_t
     {
-        constexpr size_t NO_PARAMS = size_t(0);
+        constexpr std::size_t NO_PARAMS = std::size_t(0);
         switch (e.target.type)
         {
             case SMART_TARGET_NONE: return NO_PARAMS;
@@ -838,11 +849,11 @@ bool SmartAIMgr::CheckUnusedTargetParams(SmartScriptHolder const& e)
         }
     }();
 
-    static size_t rawCount = sizeof(SmartTarget::raw) / sizeof(uint32);
-    size_t paramsCount = paramsStructSize / sizeof(uint32);
+    static std::size_t rawCount = sizeof(SmartTarget::raw) / sizeof(uint32);
+    std::size_t paramsCount = paramsStructSize / sizeof(uint32);
 
     bool valid = true;
-    for (size_t index = paramsCount; index < rawCount; index++)
+    for (std::size_t index = paramsCount; index < rawCount; index++)
     {
         uint32 value = ((uint32*)&e.target.raw)[index];
         if (value != 0)
@@ -1060,6 +1071,7 @@ bool SmartAIMgr::IsEventValid(SmartScriptHolder& e)
             case SMART_EVENT_SUMMON_DESPAWNED:
             case SMART_EVENT_SUMMONED_UNIT:
             case SMART_EVENT_SUMMONED_UNIT_DIES:
+            case SMART_EVENT_SUMMONED_UNIT_EVADE:
                 if (e.event.summoned.creature && !IsCreatureValid(e, e.event.summoned.creature))
                     return false;
 
@@ -1318,6 +1330,8 @@ bool SmartAIMgr::IsEventValid(SmartScriptHolder& e)
             case SMART_EVENT_JUST_CREATED:
             case SMART_EVENT_FOLLOW_COMPLETED:
             case SMART_EVENT_ON_SPELLCLICK:
+            case SMART_EVENT_WAYPOINT_DATA_REACHED:
+            case SMART_EVENT_WAYPOINT_DATA_ENDED:
                 break;
             default:
                 LOG_ERROR("sql.sql", "SmartAIMgr: Not handled event_type({}), Entry {} SourceType {} Event {} Action {}, skipped.", e.GetEventType(), e.entryOrGuid, e.GetScriptType(), e.event_id, e.GetActionType());
@@ -1914,7 +1928,6 @@ bool SmartAIMgr::IsEventValid(SmartScriptHolder& e)
         case SMART_ACTION_EXIT_VEHICLE:
         case SMART_ACTION_SET_UNIT_MOVEMENT_FLAGS:
         case SMART_ACTION_SET_COMBAT_DISTANCE:
-        case SMART_ACTION_SET_CASTER_COMBAT_DIST:
         case SMART_ACTION_SET_SIGHT_DIST:
         case SMART_ACTION_FLEE:
         case SMART_ACTION_ADD_THREAT:
@@ -1937,12 +1950,18 @@ bool SmartAIMgr::IsEventValid(SmartScriptHolder& e)
         case SMART_ACTION_ATTACK_STOP:
         case SMART_ACTION_PLAY_CINEMATIC:
         case SMART_ACTION_SET_GUID:
-        case SMART_ACTION_DISABLE:
+        case SMART_ACTION_SCRIPTED_SPAWN:
         case SMART_ACTION_SET_SCALE:
         case SMART_ACTION_SUMMON_RADIAL:
         case SMART_ACTION_PLAY_SPELL_VISUAL:
         case SMART_ACTION_FOLLOW_GROUP:
         case SMART_ACTION_SET_ORIENTATION_TARGET:
+        case SMART_ACTION_WAYPOINT_DATA_START:
+        case SMART_ACTION_WAYPOINT_DATA_RANDOM:
+        case SMART_ACTION_MOVEMENT_STOP:
+        case SMART_ACTION_MOVEMENT_PAUSE:
+        case SMART_ACTION_MOVEMENT_RESUME:
+        case SMART_ACTION_WORLD_SCRIPT:
             break;
         default:
             LOG_ERROR("sql.sql", "SmartAIMgr: Not handled action_type({}), event_type({}), Entry {} SourceType {} Event {}, skipped.", e.GetActionType(), e.GetEventType(), e.entryOrGuid, e.GetScriptType(), e.event_id);

@@ -15,9 +15,11 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "ScriptMgr.h"
+#include "CreatureScript.h"
 #include "ScriptedCreature.h"
+#include "SpellScriptLoader.h"
 #include "serpent_shrine.h"
+#include "SpellScript.h"
 
 enum Yells
 {
@@ -138,89 +140,85 @@ private:
     bool _recentlySpoken;
 };
 
-class spell_morogrim_tidewalker_watery_grave : public SpellScriptLoader
+class spell_morogrim_tidewalker_watery_grave : public SpellScript
 {
-public:
-    spell_morogrim_tidewalker_watery_grave() : SpellScriptLoader("spell_morogrim_tidewalker_watery_grave") { }
+    PrepareSpellScript(spell_morogrim_tidewalker_watery_grave);
 
-    class spell_morogrim_tidewalker_watery_grave_SpellScript : public SpellScript
+    bool Load() override
     {
-        PrepareSpellScript(spell_morogrim_tidewalker_watery_grave_SpellScript);
-
-        bool Load() override
-        {
-            _targetNumber = 0;
-            return true;
-        }
-
-        void HandleDummy(SpellEffIndex effIndex)
-        {
-            PreventHitDefaultEffect(effIndex);
-            if (Unit* target = GetHitUnit())
-                if (_targetNumber < 4)
-                    GetCaster()->CastSpell(target, wateryGraveIds[_targetNumber++], true);
-        }
-
-        void Register() override
-        {
-            OnEffectHitTarget += SpellEffectFn(spell_morogrim_tidewalker_watery_grave_SpellScript::HandleDummy, EFFECT_0, SPELL_EFFECT_DUMMY);
-        }
-
-    private:
-        uint8 _targetNumber;
-    };
-
-    SpellScript* GetSpellScript() const override
-    {
-        return new spell_morogrim_tidewalker_watery_grave_SpellScript();
+        _targetNumber = 0;
+        return true;
     }
+
+    void FilterTargets(std::list<WorldObject*>& targets)
+    {
+        uint8 maxSize = 4;
+        Unit* caster = GetCaster();
+
+        targets.remove_if([caster](WorldObject const* target) -> bool
+            {
+                // Should not target current victim.
+                return caster->GetVictim() == target;
+            });
+
+        if (targets.size() > maxSize)
+        {
+            Acore::Containers::RandomResize(targets, maxSize);
+        }
+    }
+
+    void HandleDummy(SpellEffIndex effIndex)
+    {
+        PreventHitDefaultEffect(effIndex);
+        if (Unit* target = GetHitUnit())
+            if (_targetNumber < 4)
+                GetCaster()->CastSpell(target, wateryGraveIds[_targetNumber++], true);
+    }
+
+    void Register() override
+    {
+        OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_morogrim_tidewalker_watery_grave::FilterTargets, EFFECT_ALL, TARGET_UNIT_SRC_AREA_ENEMY);
+        OnEffectHitTarget += SpellEffectFn(spell_morogrim_tidewalker_watery_grave::HandleDummy, EFFECT_0, SPELL_EFFECT_DUMMY);
+    }
+
+private:
+    uint8 _targetNumber;
 };
 
-class spell_morogrim_tidewalker_water_globule_new_target : public SpellScriptLoader
+class spell_morogrim_tidewalker_water_globule_new_target : public SpellScript
 {
-public:
-    spell_morogrim_tidewalker_water_globule_new_target() : SpellScriptLoader("spell_morogrim_tidewalker_water_globule_new_target") { }
+    PrepareSpellScript(spell_morogrim_tidewalker_water_globule_new_target);
 
-    class spell_morogrim_tidewalker_water_globule_new_target_SpellScript : public SpellScript
+    void FilterTargets(std::list<WorldObject*>& unitList)
     {
-        PrepareSpellScript(spell_morogrim_tidewalker_water_globule_new_target_SpellScript);
+        Acore::Containers::RandomResize(unitList, 1);
+    }
 
-        void FilterTargets(std::list<WorldObject*>& unitList)
-        {
-            Acore::Containers::RandomResize(unitList, 1);
-        }
-
-        void HandleDummy(SpellEffIndex effIndex)
-        {
-            PreventHitDefaultEffect(effIndex);
-
-            // Xinef: if we have target we currently follow, return
-            if (Unit* target = GetCaster()->GetVictim())
-                if (GetCaster()->GetThreatMgr().GetThreat(target) >= 100000.0f)
-                    return;
-
-            // Xinef: acquire new target
-            // TODO: sniffs to see how this actually happens
-            if (Unit* target = GetHitUnit())
-                GetCaster()->AddThreat(target, 1000000.0f);
-        }
-
-        void Register() override
-        {
-            OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_morogrim_tidewalker_water_globule_new_target_SpellScript::FilterTargets, EFFECT_0, TARGET_UNIT_SRC_AREA_ENEMY);
-            OnEffectHitTarget += SpellEffectFn(spell_morogrim_tidewalker_water_globule_new_target_SpellScript::HandleDummy, EFFECT_0, SPELL_EFFECT_DUMMY);
-        }
-    };
-
-    SpellScript* GetSpellScript() const override
+    void HandleDummy(SpellEffIndex effIndex)
     {
-        return new spell_morogrim_tidewalker_water_globule_new_target_SpellScript();
+        PreventHitDefaultEffect(effIndex);
+
+        // Xinef: if we have target we currently follow, return
+        if (Unit* target = GetCaster()->GetVictim())
+            if (GetCaster()->GetThreatMgr().GetThreat(target) >= 100000.0f)
+                return;
+
+        // Xinef: acquire new target
+        // TODO: sniffs to see how this actually happens
+        if (Unit* target = GetHitUnit())
+            GetCaster()->AddThreat(target, 1000000.0f);
+    }
+
+    void Register() override
+    {
+        OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_morogrim_tidewalker_water_globule_new_target::FilterTargets, EFFECT_0, TARGET_UNIT_SRC_AREA_ENEMY);
+        OnEffectHitTarget += SpellEffectFn(spell_morogrim_tidewalker_water_globule_new_target::HandleDummy, EFFECT_0, SPELL_EFFECT_DUMMY);
     }
 };
 
 void AddSC_boss_morogrim_tidewalker()
 {
     RegisterSerpentShrineAI(boss_morogrim_tidewalker);
-    new spell_morogrim_tidewalker_watery_grave();
-    new spell_morogrim_tidewalker_water_globule_new_target();
+    RegisterSpellScript(spell_morogrim_tidewalker_watery_grave);
+    RegisterSpellScript(spell_morogrim_tidewalker_water_globule_new_target);
 }

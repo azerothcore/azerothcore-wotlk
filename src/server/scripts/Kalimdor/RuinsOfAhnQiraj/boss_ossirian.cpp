@@ -15,16 +15,17 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "CreatureScript.h"
 #include "GameObjectAI.h"
+#include "GameObjectScript.h"
 #include "MiscPackets.h"
-#include "Opcodes.h"
 #include "Player.h"
-#include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 #include "SpellInfo.h"
 #include "SpellScript.h"
-#include "ruins_of_ahnqiraj.h"
+#include "SpellScriptLoader.h"
 #include "TaskScheduler.h"
+#include "ruins_of_ahnqiraj.h"
 
 enum Texts
 {

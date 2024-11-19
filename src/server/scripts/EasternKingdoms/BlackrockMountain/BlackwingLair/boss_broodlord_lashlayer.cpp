@@ -15,13 +15,15 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "CreatureScript.h"
 #include "GameObject.h"
 #include "GameObjectAI.h"
+#include "GameObjectScript.h"
 #include "InstanceScript.h"
-#include "ScriptMgr.h"
 #include "ScriptedCreature.h"
-#include "blackwing_lair.h"
 #include "SpellScript.h"
+#include "SpellScriptLoader.h"
+#include "blackwing_lair.h"
 
 enum Say
 {

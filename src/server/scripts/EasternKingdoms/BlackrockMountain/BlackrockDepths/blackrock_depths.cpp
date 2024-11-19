@@ -16,13 +16,14 @@
  */
 
 #include "blackrock_depths.h"
+#include "AreaTriggerScript.h"
+#include "CreatureScript.h"
+#include "GameObjectScript.h"
 #include "GameTime.h"
 #include "Player.h"
-#include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 #include "ScriptedEscortAI.h"
 #include "ScriptedGossip.h"
-#include "WorldSession.h"
 
 enum IronhandData
 {
@@ -302,7 +303,7 @@ public:
             bool doReset = false;
             if (resetTimer > 0)
             {
-                for (const auto& sum : summons)
+                for (auto const& sum : summons)
                 {
                     if (Creature* creature = ObjectAccessor::GetCreature(*me, sum))
                     {

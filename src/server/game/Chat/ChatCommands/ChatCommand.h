@@ -23,16 +23,12 @@
 #include "Define.h"
 #include "Errors.h"
 #include "Language.h"
-#include "ObjectGuid.h"
 #include "Optional.h"
 #include "StringFormat.h"
 #include "Util.h"
-#include "advstd.h"
 #include <cstddef>
 #include <map>
 #include <tuple>
-#include <type_traits>
-#include <utility>
 #include <variant>
 #include <vector>
 
@@ -56,10 +52,10 @@ namespace Acore::Impl::ChatCommands
     // ConsumeFromOffset contains the bounds check for offset, then hands off to MultiConsumer
     // the call stack is MultiConsumer -> ConsumeFromOffset -> MultiConsumer -> ConsumeFromOffset etc
     // MultiConsumer goes into ArgInfo for parsing on each iteration
-    template <typename Tuple, size_t offset>
+    template <typename Tuple, std::size_t offset>
     ChatCommandResult ConsumeFromOffset(Tuple&, ChatHandler const* handler, std::string_view args);
 
-    template <typename Tuple, typename NextType, size_t offset>
+    template <typename Tuple, typename NextType, std::size_t offset>
     struct MultiConsumer
     {
         static ChatCommandResult TryConsumeTo(Tuple& tuple, ChatHandler const* handler, std::string_view args)
@@ -72,7 +68,7 @@ namespace Acore::Impl::ChatCommands
         }
     };
 
-    template <typename Tuple, typename NestedNextType, size_t offset>
+    template <typename Tuple, typename NestedNextType, std::size_t offset>
     struct MultiConsumer<Tuple, Optional<NestedNextType>, offset>
     {
         static ChatCommandResult TryConsumeTo(Tuple& tuple, ChatHandler const* handler, std::string_view args)
@@ -92,7 +88,7 @@ namespace Acore::Impl::ChatCommands
                 return result2;
             if (result1.HasErrorMessage() && result2.HasErrorMessage())
             {
-                return Acore::StringFormatFmt("{} \"{}\"\n{} \"{}\"",
+                return Acore::StringFormat("{} \"{}\"\n{} \"{}\"",
                     GetAcoreString(handler, LANG_CMDPARSER_EITHER), result2.GetErrorMessage(),
                     GetAcoreString(handler, LANG_CMDPARSER_OR), result1.GetErrorMessage());
             }
@@ -103,7 +99,7 @@ namespace Acore::Impl::ChatCommands
         }
     };
 
-    template <typename Tuple, size_t offset>
+    template <typename Tuple, std::size_t offset>
     ChatCommandResult ConsumeFromOffset([[maybe_unused]] Tuple& tuple, [[maybe_unused]] ChatHandler const* handler, std::string_view args)
     {
         if constexpr (offset < std::tuple_size_v<Tuple>)
@@ -115,7 +111,7 @@ namespace Acore::Impl::ChatCommands
     }
 
     template <typename T> struct HandlerToTuple { static_assert(Acore::dependant_false_v<T>, "Invalid command handler signature"); };
-    template <typename... Ts> struct HandlerToTuple<bool(ChatHandler*, Ts...)> { using type = std::tuple<ChatHandler*, advstd::remove_cvref_t<Ts>...>; };
+    template <typename... Ts> struct HandlerToTuple<bool(ChatHandler*, Ts...)> { using type = std::tuple<ChatHandler*, std::remove_cvref_t<Ts>...>; };
     template <typename T> using TupleType = typename HandlerToTuple<T>::type;
 
     struct CommandInvoker
@@ -248,19 +244,6 @@ namespace Acore::ChatCommands
 
         ChatCommandBuilder(char const* name, std::vector<ChatCommandBuilder> const& subCommands)
             : _name{ ASSERT_NOTNULL(name) }, _data{ std::in_place_type<SubCommandEntry>, subCommands } { }
-
-        [[deprecated("char const* parameters to command handlers are deprecated; convert this to a typed argument handler instead")]]
-        ChatCommandBuilder(char const* name, bool(&handler)(ChatHandler*, char const*), uint32 securityLevel, Acore::ChatCommands::Console allowConsole)
-            : ChatCommandBuilder(name, handler, AcoreStrings(), securityLevel, allowConsole) { }
-
-        template <typename TypedHandler>
-        [[deprecated("you are using the old-style command format; convert this to the new format ({ name, handler (not a pointer!), permission, Console::(Yes/No) })")]]
-        ChatCommandBuilder(char const* name, uint32 securityLevel, bool console, TypedHandler* handler, char const*)
-            : ChatCommandBuilder(name, *handler, AcoreStrings(), securityLevel, static_cast<Acore::ChatCommands::Console>(console)) { }
-
-        [[deprecated("you are using the old-style command format; convert this to the new format ({ name, subCommands })")]]
-        ChatCommandBuilder(char const* name, uint32, bool, std::nullptr_t, char const*, std::vector <ChatCommandBuilder> const& sub)
-            : ChatCommandBuilder(name, sub) { }
 
     private:
         std::string_view _name;

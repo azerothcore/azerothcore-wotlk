@@ -139,13 +139,13 @@ CharacterDatabase.WorkerThreads = 1
 #    WorldDatabase.SynchThreads
 #    CharacterDatabase.SynchThreads
 #        Description: The amount of MySQL connections spawned to handle.
-#        Default:     1 - (LoginDatabase.WorkerThreads)
-#                     1 - (WorldDatabase.WorkerThreads)
-#                     2 - (CharacterDatabase.WorkerThreads)
+#        Default:     1 - (LoginDatabase.SynchThreads)
+#                     1 - (WorldDatabase.SynchThreads)
+#                     1 - (CharacterDatabase.SynchThreads)
 
 LoginDatabase.SynchThreads     = 1
 WorldDatabase.SynchThreads     = 1
-CharacterDatabase.SynchThreads = 2
+CharacterDatabase.SynchThreads = 1
 
 #
 #    MaxPingTime
@@ -364,11 +364,11 @@ Network.OutKBuff = -1
 
 #
 #    Network.OutUBuff
-#        Description: Amount of memory (in bytes) reserved in the user space per connection for
-#                     output buffering.
-#         Default:    65536
+#        Description: Amount of memory (in bytes) reserved initially in the user space per
+#                     connection for output buffering.
+#         Default:    4096
 
-Network.OutUBuff = 65536
+Network.OutUBuff = 4096
 
 #
 #    Network.TcpNoDelay:
@@ -377,6 +377,16 @@ Network.OutUBuff = 65536
 #                     1 - (Disabled, More traffic, Less latency, TCP_NO_DELAY)
 
 Network.TcpNodelay = 1
+
+#
+#    Network.EnableProxyProtocol
+#        Description: Enables Proxy Protocol v2. When your server is behind a proxy,
+#                     load balancer, or similar component, you need to enable Proxy Protocol v2 on both
+#                     this server and the proxy/load balancer to track the real IP address of players.
+#        Example:     1 - (Enabled)
+#        Default:     0 - (Disabled)
+
+Network.EnableProxyProtocol = 0
 
 #
 ###################################################################################################
@@ -667,7 +677,7 @@ Appender.Errors=2,5,0,Errors.log
 #
 
 Logger.root=2,Console Server
-Logger.commands.gm=4,Console GM
+#Logger.commands.gm=4,Console GM
 Logger.diff=3,Console Server
 Logger.mmaps=4,Server
 Logger.scripts.hotswap=4,Console Server
@@ -687,6 +697,26 @@ Logger.spells.scripts=2,Console Errors
 #Logger.bg.battleground=4,Console Server
 #Logger.bg.reportpvpafk=4,Console Server
 #Logger.calendar=4,Console Server
+#Logger.chat.say=4,Console Chat
+#Logger.chat.emote=4,Console Chat
+#Logger.chat.yell=4,Console Chat
+#Logger.chat.whisper=4,Console Chat
+#Logger.chat.party=4,Console Chat
+#Logger.chat.raid=4,Console Chat
+#Logger.chat.bg=4,Console Chat
+#Logger.chat.guild=4,Console Chat
+#Logger.chat.guild.officer=4,Console Chat
+#Logger.chat.channel=4,Console Chat
+#Logger.chat.addon.msg=4,Console Chat
+#Logger.chat.addon.emote=4,Console Chat
+#Logger.chat.addon.yell=4,Console Chat
+#Logger.chat.addon.whisper=4,Console Chat
+#Logger.chat.addon.party=4,Console Chat
+#Logger.chat.addon.raid=4,Console Chat
+#Logger.chat.addon.bg=4,Console Chat
+#Logger.chat.addon.guild=4,Console Chat
+#Logger.chat.addon.guild.officer=4,Console Chat
+#Logger.chat.addon.channel=4,Console Chat
 #Logger.chat.log=4,Console Server
 #Logger.chat.log.addon=4,Console Server
 #Logger.chat.system=4,Console Server
@@ -740,6 +770,7 @@ Logger.spells.scripts=2,Console Errors
 #Logger.scripts.ai.sai=4,Console Server
 #Logger.scripts.ai=4,Console Server
 #Logger.scripts.cos=4,Console Server
+#Logger.scripts.midsummer=4,Console Server
 #Logger.scripts=4,Console Server
 #Logger.server.authserver=4,Console Server
 #Logger.spells.aura.effect.nospell=4,Console Server
@@ -750,6 +781,7 @@ Logger.spells.scripts=2,Console Errors
 #Logger.spells=4,Console Server
 #Logger.sql.dev=4,Console Server
 #Logger.sql.driver=4,Console Server
+#Logger.sql.updates=4,Console Server
 #Logger.vehicles=4,Console Server
 #Logger.warden=4,Console Server
 #Logger.weather=4,Console Server
@@ -780,11 +812,13 @@ Metric.Enable = 0
 
 #
 #    Metric.Interval
-#        Description: Interval between every batch of data sent in seconds
-#        Default:     10 seconds
+#        Description: Interval between every batch of data sent in seconds.
+#                     Longer interval means larger batch of data. If the batch
+#                     is too big, it might get rejected.
+#        Default:     1 second
 #
 
-Metric.Interval = 10
+Metric.Interval = 1
 
 #
 #    Metric.ConnectionInfo
@@ -940,13 +974,6 @@ ClientCacheVersion = 0
 SessionAddDelay = 10000
 
 #
-#    GridCleanUpDelay
-#        Description: Time (in milliseconds) grid clean up delay.
-#        Default:     300000 - (5 minutes)
-
-GridCleanUpDelay = 300000
-
-#
 #    CloseIdleConnections
 #        Description: Automatically close idle connections.
 #                     SocketTimeOutTime and SocketTimeOutTimeActive determine when a connection is considered as idle.
@@ -1014,7 +1041,7 @@ MinWorldUpdateTime = 1
 #        Default:     10 - (10 minutes)
 #                     1+
 
-UpdateUptimeInterval = 1
+UpdateUptimeInterval = 10
 
 #
 #    MaxCoreStuckTime
@@ -1193,7 +1220,7 @@ Warden.ClientCheckFailAction = 0
 #        Default:     86400 - (24 hours)
 #                     0     - (Permanent ban)
 
-Warden.BanDuration = 259200
+Warden.BanDuration = 86400
 
 #
 ###################################################################################################
@@ -1251,31 +1278,17 @@ Visibility.GroupMode = 1
 #    Visibility.Distance.Instances
 #    Visibility.Distance.BGArenas
 #        Description: Visibility distance to see other players or gameobjects.
-#                     Visibility on continents on retail ~100 yards. In BG/Arenas ~533.
+#                     Visibility on continents on retail ~100 yards. In BG/Arenas ~250.
 #                     For instances default ~170.
-#                     Max limited by grid size: 533.33333
+#                     Max limited by active player zone: ~ 333
 #                     Min limit is max aggro radius (45) * Rate.Creature.Aggro
 #        Default:     100  - (Visibility.Distance.Continents)
 #                     170 - (Visibility.Distance.Instances)
-#                     533 - (Visibility.Distance.BGArenas)
+#                     250 - (Visibility.Distance.BGArenas)
 
 Visibility.Distance.Continents = 100
 Visibility.Distance.Instances = 170
-Visibility.Distance.BGArenas = 533
-
-#
-#    Visibility.Notify.Period.OnContinents
-#    Visibility.Notify.Period.InInstances
-#    Visibility.Notify.Period.InBGArenas
-#        Description: Time (in milliseconds) for visibility update period. Lower values may have
-#                     performance impact.
-#        Default:     1000 - (Visibility.Notify.Period.OnContinents)
-#                     1000 - (Visibility.Notify.Period.InInstances)
-#                     1000 - (Visibility.Notify.Period.InBGArenas)
-
-Visibility.Notify.Period.OnContinents = 1000
-Visibility.Notify.Period.InInstances  = 1000
-Visibility.Notify.Period.InBGArenas   = 1000
+Visibility.Distance.BGArenas = 250
 
 #
 #    Visibility.ObjectSparkles
@@ -1347,6 +1360,15 @@ vmap.petLOS = 1
 vmap.BlizzlikePvPLOS = 1
 
 #
+#   vmap.BlizzlikeLOSInOpenWorld
+#       Description: Check line of sight to see game objects in the open world.
+#       Default:    1 (Enabled, Players will be able to cast spells through tree stumps and other objects in the open world).
+#                   0 (Disabled, Players will not be able to cast spells through tree stumps and other objects in the open world).
+#
+
+vmap.BlizzlikeLOSInOpenWorld = 1
+
+#
 #    vmap.enableIndoorCheck
 #        Description: VMap based indoor check to remove outdoor-only auras (mounts etc.).
 #        Default:     1 - (Enabled)
@@ -1371,17 +1393,6 @@ DetectPosCollision = 1
 #                     0 - (Disabled, may break some boss encounters)
 
 CheckGameObjectLoS = 1
-
-#
-#    TargetPosRecalculateRange
-#        Description: Max distance from movement target point (+moving unit size) and targeted
-#                     object (+size) after that new target movement point calculated.
-#        Range:       0.5-5.0
-#        Default:     1.5
-#                     0.5 - (Minimum, Contact Range, More sensitive reaction to target movement)
-#                     5.0 - (Maximum, Melee attack range, Less CPU usage)
-
-TargetPosRecalculateRange = 1.5
 
 #
 #    PreloadAllNonInstancedMapGrids
@@ -1696,15 +1707,6 @@ PlayerStart.MapsExplored = 0
 #                     4  - (Disabled)
 
 InstantLogout = 1
-
-#
-#    CastUnstuck
-#        Description: Allow casting the Unstuck spell using .start or unstuck button in client
-#                     help options.
-#        Default:     1 - (Enabled)
-#                     0 - (Disabled)
-
-CastUnstuck = 1
 
 #
 ###################################################################################################
@@ -2064,6 +2066,13 @@ Rate.Damage.Fall = 1
 Rate.Talent = 1
 
 #
+#    Rate.Talent.Pet
+#        Description: Pet Talent point rate.
+#        Default:     1
+
+Rate.Talent.Pet = 1
+
+#
 #    Rate.Health
 #    Rate.Mana
 #    Rate.Rage.Income
@@ -2072,7 +2081,6 @@ Rate.Talent = 1
 #    Rate.RunicPower.Loss
 #    Rate.Focus
 #    Rate.Energy
-#    Rate.Loyalty
 #        Description: Multiplier to configure health, mana, incoming rage, loss of rage, focus
 #                     energy and loyalty increase or decrease.
 #        Default:     1 - (Rate.Health)
@@ -2083,7 +2091,6 @@ Rate.Talent = 1
 #                     1 - (Rate.RunicPower.Loss)
 #                     1 - (Rate.Focus)
 #                     1 - (Rate.Energy)
-#                     1 - (Rate.Loyalty)
 
 Rate.Health            = 1
 Rate.Mana              = 1
@@ -2534,7 +2541,7 @@ Death.SicknessLevel = 11
 #                     0 - (Disabled)
 
 Death.CorpseReclaimDelay.PvP = 1
-Death.CorpseReclaimDelay.PvE = 0
+Death.CorpseReclaimDelay.PvE = 1
 
 #
 #    Death.Bones.World
@@ -2609,6 +2616,14 @@ ItemDelete.Quality = 3
 #
 
 ItemDelete.ItemLevel = 80
+
+#
+#    ItemDelete.KeepDays
+#        Description: Time (in days)
+#        Default:     0  - (Disabled, Don't delete any it)
+#                     30 - (Enabled)
+
+ItemDelete.KeepDays = 0
 
 #
 ###################################################################################################
@@ -2749,10 +2764,16 @@ Quests.IgnoreAutoAccept = 0
 Quests.IgnoreAutoComplete = 0
 
 #
+#    Rate.RewardQuestMoney
+#        Description: Allows to tweak the amount of money rewarded by quests (does not affect RewardBonusMoney).
+#        Default:     1
+
+Rate.RewardQuestMoney = 1
+
+#
 #    Rate.RewardBonusMoney
 #        Description: Allows to further tweak the amount of extra money rewarded by quests when the player
-#                     is at MaxPlayerLevel (this amount is specified in quest_template.RewardBonusMoney).
-#                     NOTE: the final amount will also affected by Rate.Drop.Money
+#                     is at MaxPlayerLevel.
 #        Default:     1
 
 Rate.RewardBonusMoney = 1
@@ -2770,15 +2791,6 @@ Rate.RewardBonusMoney = 1
 #        Default:     50.000000
 
 MonsterSight = 50.000000
-
-#
-#    ThreatRadius
-#        Description: Distance for creatures to evade after being pulled away from the combat
-#                     starting point. If ThreatRadius is less than creature aggro radius then aggro
-#                     radius will be used.
-#        Default:     60
-
-ThreatRadius = 60
 
 #
 #    Rate.Creature.Aggro
@@ -3071,9 +3083,9 @@ Rate.RepairCost = 1
 #        Description: Should the player leave their group when they log out?
 #                     (It does not affect raids or dungeon finder groups)
 #
-#        Default:     1 - (Enabled)
+#        Default:     0 - (Disabled)
 
-LeaveGroupOnLogout.Enabled = 1
+LeaveGroupOnLogout.Enabled = 0
 
 #
 #    Group.Raid.LevelRestriction
@@ -3258,6 +3270,15 @@ LFG.KickPreventionTimer = 900
 DungeonAccessRequirements.LFGLevelDBCOverride = 0
 
 #
+#    DungeonFinder.CastDeserter
+#
+#        Description: Cast Deserter to player who leave a dungeon prematurely
+#        Default:     1 - (Enabled, Blizzlike)
+#                     0 - (Disabled)
+
+DungeonFinder.CastDeserter = 1
+
+#
 ###################################################################################################
 
 ###################################################################################################
@@ -3363,7 +3384,14 @@ Guild.BankTabCost1 = 2500000
 Guild.BankTabCost2 = 5000000
 Guild.BankTabCost3 = 10000000
 Guild.BankTabCost4 = 25000000
-Guild.BankTabCost5 = 50000000#
+Guild.BankTabCost5 = 50000000
+
+#
+#     Guild.MemberLimit
+#        Description: Do not allow inviting new players to the guild if the member limit is met or exceeded.
+#        Default:     0 - Disabled
+
+Guild.MemberLimit = 0
 
 #
 ###################################################################################################
@@ -3396,7 +3424,7 @@ Wintergrasp.Enable = 1
 #         Description: Maximum number of players allowed in Wintergrasp.
 #         Default:     100
 
-Wintergrasp.PlayerMax = 120
+Wintergrasp.PlayerMax = 100
 
 #
 #     Wintergrasp.PlayerMin
@@ -3547,14 +3575,14 @@ Battleground.Random.ResetHour = 6
 #        Default:     0 - (Disabled)
 #                     1 - (Enabled)
 
-Battleground.StoreStatistics.Enable = 1
+Battleground.StoreStatistics.Enable = 0
 
 #    Battleground.TrackDeserters.Enable
 #        Description: Track deserters of Battlegrounds.
 #        Default:     0 - (Disabled)
 #                     1 - (Enabled)
 
-Battleground.TrackDeserters.Enable = 1
+Battleground.TrackDeserters.Enable = 0
 
 #
 #    Battleground.InvitationType
@@ -3647,6 +3675,13 @@ Battleground.BerserkingBuffRespawn = 120
 #        Default:     150 (Recommended 10+)
 
 Battleground.SpeedBuffRespawn = 150
+
+#
+#    Battleground.Override.LowLevels.MinPlayers
+#        Description: Overrides the minimum number of required players per team for all levels < MaxPlayerLevel
+#        Default:     0 (Disabled)
+
+Battleground.Override.LowLevels.MinPlayers = 0
 
 #
 ###################################################################################################
@@ -4045,7 +4080,7 @@ PartyLevelReq = 1
 #        Default:     0 - (Disabled, Blizzlike, Channel settings are lost if last person left)
 #                     1 - (Enabled)
 
-PreserveCustomChannels = 1
+PreserveCustomChannels = 0
 
 #
 #    PreserveCustomChannelDuration
@@ -4321,6 +4356,13 @@ ICC.Buff.Horde    = 73822
 ICC.Buff.Alliance = 73828
 
 #
+#    WipeGunshipBlizzlike.Enable
+#       Description: Wipe the gunship fight if no player is on the deck.
+#       Default:     1 - (Blizzlike)
+
+WipeGunshipBlizzlike.Enable = 1
+
+#
 #     Minigob.Manabonk.Enable
 #        Description: Enable/ Disable Minigob Manabonk
 #        Default:     1
@@ -4356,6 +4398,27 @@ TeleportTimeoutNear = 25
 #       Default:  45
 
 TeleportTimeoutFar = 45
+
+#
+#    DailyRBGArenaPoints.MinLevel
+#        Description: Allows gaining arena points on the first RBG win at level 70.
+#        Default: 71 - (Blizzlike)
+
+DailyRBGArenaPoints.MinLevel = 71
+
+#
+#    MunchingBlizzlike.Enabled
+#        Description: Enable the Blizzlike implementation of munching with e.g. Warrior's Rend or Mage's Ignite
+#        Default: 1 - (Blizzlike)
+
+MunchingBlizzlike.Enabled = 1
+
+#
+#    Daze.Enabled
+#        Description: Enable or disable the chance for mob melee attacks to daze the victim.
+#        Default: 1 - (Blizzlike)
+
+Daze.Enabled = 1
 
 #
 ###################################################################################################

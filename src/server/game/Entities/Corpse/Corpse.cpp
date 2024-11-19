@@ -22,7 +22,6 @@
 #include "GameTime.h"
 #include "Log.h"
 #include "ObjectAccessor.h"
-#include "Opcodes.h"
 #include "Player.h"
 #include "UpdateMask.h"
 #include "World.h"
@@ -198,7 +197,7 @@ void Corpse::ResetGhostTime()
     m_time = GameTime::GetGameTime().count();
 }
 
-void Corpse::BuildValuesUpdate(uint8 updateType, ByteBuffer* data, Player* target) const
+void Corpse::BuildValuesUpdate(uint8 updateType, ByteBuffer* data, Player* target)
 {
     if (!target)
         return;

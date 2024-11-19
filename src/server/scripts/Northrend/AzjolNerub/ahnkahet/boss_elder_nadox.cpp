@@ -15,11 +15,13 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "AchievementCriteriaScript.h"
 #include "Containers.h"
-#include "ScriptMgr.h"
+#include "CreatureScript.h"
 #include "ScriptedCreature.h"
 #include "SpellAuras.h"
 #include "SpellScript.h"
+#include "SpellScriptLoader.h"
 #include "ahnkahet.h"
 
 enum Misc
@@ -71,7 +73,7 @@ enum Yells
 
 struct boss_elder_nadox : public BossAI
 {
-    boss_elder_nadox(Creature* creature) : BossAI(creature, DATA_PRINCE_TALDARAM),
+    boss_elder_nadox(Creature* creature) : BossAI(creature, DATA_ELDER_NADOX),
         guardianSummoned(false),
         respectYourElders(true)
     {
@@ -144,7 +146,7 @@ struct boss_elder_nadox : public BossAI
 
     void KilledUnit(Unit* victim) override
     {
-        if (victim->GetTypeId() == TYPEID_PLAYER)
+        if (victim->IsPlayer())
         {
             Talk(SAY_SLAY);
         }

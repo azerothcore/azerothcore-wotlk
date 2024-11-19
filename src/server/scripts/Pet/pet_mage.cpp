@@ -21,11 +21,12 @@
  */
 
 #include "CombatAI.h"
+#include "CreatureScript.h"
 #include "Pet.h"
 #include "Player.h"
-#include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 #include "SpellAuras.h"
+#include "SpellMgr.h"
 
 enum MageSpells
 {
@@ -158,7 +159,7 @@ struct npc_pet_mage_mirror_image : CasterAI
             _ebonGargoyleGUID.Clear();
         }
         Unit* owner = me->GetOwner();
-        if (owner && owner->GetTypeId() == TYPEID_PLAYER)
+        if (owner && owner->IsPlayer())
         {
             Unit* selection = owner->ToPlayer()->GetSelectedUnit();
 

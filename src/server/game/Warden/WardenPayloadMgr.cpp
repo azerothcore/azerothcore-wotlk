@@ -16,9 +16,9 @@
  */
 
 #include "WardenPayloadMgr.h"
-#include "StringFormat.h"
 #include "Errors.h"
 #include "Log.h"
+#include "StringFormat.h"
 
 WardenPayloadMgr::WardenPayloadMgr() { }
 
@@ -74,7 +74,7 @@ bool WardenPayloadMgr::RegisterPayload(std::string const& payload, uint16 payloa
     wCheck.Str = payload;
     wCheck.CheckId = payloadId;
 
-    std::string idStr = Acore::StringFormat("%04u", payloadId);
+    std::string idStr = Acore::StringFormat("{:04}", payloadId);
     ASSERT(idStr.size() == 4);
     std::copy(idStr.begin(), idStr.end(), wCheck.IdStr.begin());
 
@@ -128,7 +128,7 @@ void WardenPayloadMgr::QueuePayload(uint16 payloadId, bool pushToFront)
 
 bool WardenPayloadMgr::DequeuePayload(uint16 payloadId)
 {
-    size_t const queueSize = QueuedPayloads.size();
+    std::size_t const queueSize = QueuedPayloads.size();
     QueuedPayloads.remove(payloadId);
 
     return queueSize != QueuedPayloads.size();

@@ -15,6 +15,11 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "Group.h"
+#include "Player.h"
+#include "ScriptedCreature.h"
+#include "SpellScript.h"
+#include "SpellScriptLoader.h"
 /* ScriptData
 SDName: Feralas
 SD%Complete: 100
@@ -22,50 +27,32 @@ SDComment: Quest support: 3520 Special vendor Gregan Brewspewer
 SDCategory: Feralas
 EndScriptData */
 
-#include "Group.h"
-#include "Player.h"
-#include "ScriptMgr.h"
-#include "ScriptedCreature.h"
-#include "ScriptedGossip.h"
-#include "SpellScript.h"
-
 enum GordunniTrap
 {
     GO_GORDUNNI_DIRT_MOUND = 144064,
 };
 
-class spell_gordunni_trap : public SpellScriptLoader
+class spell_gordunni_trap : public SpellScript
 {
-public:
-    spell_gordunni_trap() : SpellScriptLoader("spell_gordunni_trap") { }
+    PrepareSpellScript(spell_gordunni_trap);
 
-    class spell_gordunni_trap_SpellScript : public SpellScript
+    void HandleDummy()
     {
-        PrepareSpellScript(spell_gordunni_trap_SpellScript);
+        if (Unit* caster = GetCaster())
+            if (GameObject* chest = caster->SummonGameObject(GO_GORDUNNI_DIRT_MOUND, caster->GetPositionX(), caster->GetPositionY(), caster->GetPositionZ(), 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0))
+            {
+                chest->SetSpellId(GetSpellInfo()->Id);
+                caster->RemoveGameObject(chest, false);
+            }
+    }
 
-        void HandleDummy()
-        {
-            if (Unit* caster = GetCaster())
-                if (GameObject* chest = caster->SummonGameObject(GO_GORDUNNI_DIRT_MOUND, caster->GetPositionX(), caster->GetPositionY(), caster->GetPositionZ(), 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0))
-                {
-                    chest->SetSpellId(GetSpellInfo()->Id);
-                    caster->RemoveGameObject(chest, false);
-                }
-        }
-
-        void Register() override
-        {
-            OnCast += SpellCastFn(spell_gordunni_trap_SpellScript::HandleDummy);
-        }
-    };
-
-    SpellScript* GetSpellScript() const override
+    void Register() override
     {
-        return new spell_gordunni_trap_SpellScript();
+        OnCast += SpellCastFn(spell_gordunni_trap::HandleDummy);
     }
 };
 
 void AddSC_feralas()
 {
-    new spell_gordunni_trap();
+    RegisterSpellScript(spell_gordunni_trap);
 }

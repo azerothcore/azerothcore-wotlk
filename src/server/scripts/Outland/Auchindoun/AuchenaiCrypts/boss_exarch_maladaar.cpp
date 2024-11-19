@@ -15,7 +15,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "ScriptMgr.h"
+#include "CreatureScript.h"
 #include "ScriptedCreature.h"
 #include "auchenai_crypts.h"
 
@@ -83,7 +83,7 @@ struct boss_exarch_maladaar : public BossAI
 
     void MoveInLineOfSight(Unit* who) override
     {
-        if (!_talked && who->GetTypeId() == TYPEID_PLAYER && me->IsWithinDistInMap(who, 150.0f))
+        if (!_talked && who->IsPlayer() && me->IsWithinDistInMap(who, 150.0f))
         {
             _talked = true;
             Talk(SAY_INTRO);

@@ -15,9 +15,10 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "ScriptMgr.h"
+#include "CreatureScript.h"
 #include "ScriptedCreature.h"
 #include "SpellScript.h"
+#include "SpellScriptLoader.h"
 #include "karazhan.h"
 
 enum Yells
@@ -177,7 +178,7 @@ struct boss_moroes : public BossAI
 
     void KilledUnit(Unit* victim) override
     {
-        if (!_recentlySpoken && victim->GetTypeId() == TYPEID_PLAYER)
+        if (!_recentlySpoken && victim->IsPlayer())
         {
             Talk(SAY_KILL);
             _recentlySpoken = true;

@@ -22,7 +22,6 @@
 #include "ModelInstance.h"
 #include "PathCommon.h"
 #include "StringFormat.h"
-#include "VMapFactory.h"
 #include "VMapMgr2.h"
 #include <DetourCommon.h>
 #include <DetourNavMesh.h>
@@ -112,7 +111,7 @@ namespace MMAP
             mapID = uint32(atoi(file.substr(0, file.size() - 8).c_str()));
             if (std::find(m_tiles.begin(), m_tiles.end(), mapID) == m_tiles.end())
             {
-                m_tiles.emplace_back(MapTiles(mapID, new std::set<uint32>));
+                m_tiles.emplace_back(mapID, new std::set<uint32>);
                 count++;
             }
         }
@@ -124,7 +123,7 @@ namespace MMAP
             mapID = uint32(atoi(file.substr(0, file.size() - 7).c_str()));
             if (std::find(m_tiles.begin(), m_tiles.end(), mapID) == m_tiles.end())
             {
-                m_tiles.emplace_back(MapTiles(mapID, new std::set<uint32>));
+                m_tiles.emplace_back(mapID, new std::set<uint32>);
                 count++;
             }
         }
@@ -199,7 +198,7 @@ namespace MMAP
             return (*itr).m_tiles;
 
         std::set<uint32>* tiles = new std::set<uint32>();
-        m_tiles.emplace_back(MapTiles(mapID, tiles));
+        m_tiles.emplace_back(mapID, tiles);
         return tiles;
     }
 
@@ -461,7 +460,7 @@ namespace MMAP
     /**************************************************************************/
     void TileBuilder::buildTile(uint32 mapID, uint32 tileX, uint32 tileY, dtNavMesh* navMesh)
     {
-        if(shouldSkipTile(mapID, tileX, tileY))
+        if (shouldSkipTile(mapID, tileX, tileY))
         {
             ++m_mapBuilder->m_totalTilesProcessed;
             return;

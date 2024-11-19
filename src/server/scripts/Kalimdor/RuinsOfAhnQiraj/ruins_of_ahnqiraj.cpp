@@ -15,11 +15,11 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "ScriptMgr.h"
+#include "ruins_of_ahnqiraj.h"
+#include "CreatureScript.h"
 #include "ScriptedCreature.h"
 #include "SpellScript.h"
-#include "ruins_of_ahnqiraj.h"
-#include "TaskScheduler.h"
+#include "SpellScriptLoader.h"
 
 enum Spells
 {
@@ -37,20 +37,18 @@ enum Spells
 
 struct npc_hivezara_stinger : public ScriptedAI
 {
-    npc_hivezara_stinger(Creature* creature) : ScriptedAI(creature)
-    {
-    }
+    npc_hivezara_stinger(Creature* creature) : ScriptedAI(creature) { }
 
     void Reset() override
     {
-        _scheduler.CancelAll();
+        scheduler.CancelAll();
     }
 
     void JustEngagedWith(Unit* who) override
     {
         DoCast(who ,who->HasAura(SPELL_HIVEZARA_CATALYST) ? SPELL_STINGER_CHARGE_BUFFED : SPELL_STINGER_CHARGE_NORMAL, true);
 
-        _scheduler.Schedule(5s, [this](TaskContext context)
+        scheduler.Schedule(5s, [this](TaskContext context)
         {
             Unit* target = SelectTarget(SelectTargetMethod::Random, 1, [&](Unit* u)
             {
@@ -80,29 +78,24 @@ struct npc_hivezara_stinger : public ScriptedAI
             return;
         }
 
-        _scheduler.Update(diff,
+        scheduler.Update(diff,
             std::bind(&ScriptedAI::DoMeleeAttackIfReady, this));
     }
-
-private:
-    TaskScheduler _scheduler;
 };
 
 struct npc_obsidian_destroyer : public ScriptedAI
 {
-    npc_obsidian_destroyer(Creature* creature) : ScriptedAI(creature)
-    {
-    }
+    npc_obsidian_destroyer(Creature* creature) : ScriptedAI(creature) { }
 
     void Reset() override
     {
-        _scheduler.CancelAll();
+        scheduler.CancelAll();
         me->SetPower(POWER_MANA, 0);
     }
 
     void JustEngagedWith(Unit* /*who*/) override
     {
-        _scheduler.Schedule(6s, [this](TaskContext context)
+        scheduler.Schedule(6s, [this](TaskContext context)
         {
             std::list<Unit*> targets;
             SelectTargetList(targets, 6, SelectTargetMethod::Random, 1, [&](Unit* target)
@@ -136,12 +129,9 @@ struct npc_obsidian_destroyer : public ScriptedAI
             return;
         }
 
-        _scheduler.Update(diff,
+        scheduler.Update(diff,
             std::bind(&ScriptedAI::DoMeleeAttackIfReady, this));
     }
-
-private:
-    TaskScheduler _scheduler;
 };
 
 class spell_drain_mana : public SpellScript

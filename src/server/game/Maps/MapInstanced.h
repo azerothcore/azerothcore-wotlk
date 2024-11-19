@@ -28,7 +28,7 @@ class MapInstanced : public Map
 public:
     using InstancedMaps = std::unordered_map<uint32, Map*>;
 
-    MapInstanced(uint32 id, std::chrono::seconds expiry);
+    MapInstanced(uint32 id);
     ~MapInstanced() override {}
 
     // functions overwrite Map versions
@@ -46,19 +46,6 @@ public:
     }
     bool DestroyInstance(InstancedMaps::iterator& itr);
 
-    void AddGridMapReference(GridCoord const& p)
-    {
-        ++GridMapReference[p.x_coord][p.y_coord];
-        SetUnloadReferenceLock(GridCoord((MAX_NUMBER_OF_GRIDS - 1) - p.x_coord, (MAX_NUMBER_OF_GRIDS - 1) - p.y_coord), true);
-    }
-
-    void RemoveGridMapReference(GridCoord const& p)
-    {
-        --GridMapReference[p.x_coord][p.y_coord];
-        if (!GridMapReference[p.x_coord][p.y_coord])
-            SetUnloadReferenceLock(GridCoord((MAX_NUMBER_OF_GRIDS - 1) - p.x_coord, (MAX_NUMBER_OF_GRIDS - 1) - p.y_coord), false);
-    }
-
     InstancedMaps& GetInstancedMaps() { return m_InstancedMaps; }
     void InitVisibilityDistance() override;
 
@@ -67,7 +54,5 @@ private:
     BattlegroundMap* CreateBattleground(uint32 InstanceId, Battleground* bg);
 
     InstancedMaps m_InstancedMaps;
-
-    uint16 GridMapReference[MAX_NUMBER_OF_GRIDS][MAX_NUMBER_OF_GRIDS];
 };
 #endif

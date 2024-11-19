@@ -34,7 +34,7 @@ namespace Acore
                 : _source(obj), _msgType(msgType), _textId(textId), _gender(gender), _target(target), _achievementId(achievementId) { }
 
             void operator()(WorldPacket& data, LocaleConstant locale) const;
-            size_t operator()(WorldPacket* data, LocaleConstant locale) const;
+            std::size_t operator()(WorldPacket* data, LocaleConstant locale) const;
 
         private:
             WorldObject const* _source;

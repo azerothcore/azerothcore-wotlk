@@ -18,6 +18,7 @@
 #include "CreatureAIRegistry.h"
 #include "CombatAI.h"
 #include "CreatureAIFactory.h"
+#include "GameObjectAIFactory.h"
 #include "GuardAI.h"
 #include "MovementGenerator.h"
 #include "PassiveAI.h"
@@ -27,7 +28,6 @@
 #include "SmartAI.h"
 #include "TotemAI.h"
 #include "WaypointMovementGenerator.h"
-#include "GameObjectAIFactory.h"
 
 namespace AIRegistry
 {

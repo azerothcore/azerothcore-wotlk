@@ -18,6 +18,7 @@
 #include "CellImpl.h"
 #include "Chat.h"
 #include "CombatAI.h"
+#include "CreatureScript.h"
 #include "CreatureTextMgr.h"
 #include "GameEventMgr.h"
 #include "GameTime.h"
@@ -25,7 +26,6 @@
 #include "ObjectMgr.h"
 #include "PassiveAI.h"
 #include "Pet.h"
-#include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 #include "ScriptedEscortAI.h"
 #include "ScriptedGossip.h"
@@ -334,7 +334,7 @@ public:
     {
         npc_training_dummyAI(Creature* creature) : ScriptedAI(creature)
         {
-            SetCombatMovement(false);
+            me->SetCombatMovement(false);
             me->ApplySpellImmune(0, IMMUNITY_EFFECT, SPELL_EFFECT_KNOCK_BACK, true); //imune to knock aways like blast wave
         }
 
@@ -392,7 +392,7 @@ public:
     {
         npc_target_dummyAI(Creature* creature) : ScriptedAI(creature)
         {
-            SetCombatMovement(false);
+            me->SetCombatMovement(false);
             deathTimer = 15000;
             me->ApplySpellImmune(0, IMMUNITY_EFFECT, SPELL_EFFECT_KNOCK_BACK, true); //imune to knock aways like blast wave
         }
@@ -570,6 +570,10 @@ public:
 
         {
             if (!SpawnAssoc)
+                return;
+
+            // check if they're hostile
+            if (!(me->IsHostileTo(who) || who->IsHostileTo(me)))
                 return;
 
             if (me->IsValidAttackTarget(who))
@@ -1006,7 +1010,7 @@ public:
                             {
                                 if (guid != savedPatient->GetGUID()) // Don't kill the last guy we just saved
                                     if (Creature* patient = ObjectAccessor::GetCreature(*me, guid))
-                                        patient->setDeathState(JUST_DIED);
+                                        patient->setDeathState(DeathState::JustDied);
                             }
                         }
 
@@ -1155,7 +1159,7 @@ public:
             {
                 me->RemoveUnitFlag(UNIT_FLAG_IN_COMBAT);
                 me->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
-                me->setDeathState(JUST_DIED);
+                me->setDeathState(DeathState::JustDied);
                 me->SetDynamicFlag(32);
 
                 if (DoctorGUID)
@@ -2506,9 +2510,9 @@ enum VenomhideHatchlingMisc
     ITEM_VENOMHIDE_BABY_TOOTH = 47196,
 
     MODEL_BABY_RAPTOR              = 29251,
-    MODEL_BABY_RAPTOR_REPTILE_EYES = 29809,
-    MODEL_ADOLESCENT_RAPTOR        = 29103,
-    MODEL_FULL_RAPTOR              = 5291,
+    MODEL_BABY_RAPTOR_REPTILE_EYES = 29274,
+    MODEL_ADOLESCENT_RAPTOR        = 29275,
+    MODEL_FULL_RAPTOR              = 29276,
 };
 
 enum VenomhideHatchlingTexts
@@ -2534,7 +2538,7 @@ public:
 
         void IsSummonedBy(WorldObject* summoner) override
         {
-            if (summoner->GetTypeId() != TYPEID_PLAYER)
+            if (!summoner->IsPlayer())
             {
                 return;
             }
@@ -2602,6 +2606,17 @@ public:
         events.Reset();
     }
 
+    bool CanAIAttack(Unit const* target) const override
+    {
+        if (Unit* summoner = me->GetCharmerOrOwner())
+        {
+            if (target->IsPlayer() && (!summoner->IsPvP() || !target->IsPvP()))
+                return false;
+        }
+
+        return true;
+    }
+
     void JustEngagedWith(Unit* /*who*/) override
     {
         events.ScheduleEvent(EVENT_FLAME_BUFFET, 4s);
@@ -2610,12 +2625,9 @@ public:
 
     void IsSummonedBy(WorldObject* summoner) override
     {
-        if (summoner->GetTypeId() != TYPEID_UNIT)
-        {
-            return;
-        }
+        if (summoner->IsCreature() || summoner->IsPlayer())
+            me->GetMotionMaster()->MoveFollow(summoner->ToUnit(), PET_FOLLOW_DIST, PET_FOLLOW_ANGLE);
 
-        me->GetMotionMaster()->MoveFollow(summoner->ToUnit(), PET_FOLLOW_DIST, PET_FOLLOW_ANGLE);
     }
 
     void UpdateAI(uint32 diff) override

@@ -15,9 +15,9 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "InstanceMapScript.h"
 #include "InstanceScript.h"
 #include "ObjectMgr.h"
-#include "ScriptMgr.h"
 #include "razorfen_downs.h"
 
 class instance_razorfen_downs : public InstanceMapScript

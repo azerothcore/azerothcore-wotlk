@@ -15,17 +15,17 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "ScriptMgr.h"
+#include "CreatureScript.h"
 #include "ScriptedCreature.h"
 #include "hyjal.h"
-#include "hyjal_trash.h"
 
 enum Spells
 {
     SPELL_FROST_ARMOR           = 31256,
     SPELL_DEATH_AND_DECAY       = 31258,
     SPELL_FROST_NOVA            = 31250,
-    SPELL_ICEBOLT               = 31249
+    SPELL_ICEBOLT               = 31249,
+    SPELL_ENRAGE                = 26662
 };
 
 enum Texts
@@ -34,134 +34,116 @@ enum Texts
     SAY_ONSLAY                  = 1,
     SAY_DECAY                   = 2,
     SAY_NOVA                    = 3,
-    SAY_ONAGGRO                 = 4
+    SAY_ONSPAWN                 = 4
 };
 
-class boss_rage_winterchill : public CreatureScript
+enum Misc
+{
+    GROUP_FROST                 = 1,
+    PATH_RAGE_WINTERCHILL       = 177670,
+    POINT_COMBAT_START          = 7
+};
+
+struct boss_rage_winterchill : public BossAI
 {
 public:
-    boss_rage_winterchill() : CreatureScript("boss_rage_winterchill") { }
-
-    CreatureAI* GetAI(Creature* creature) const override
+    boss_rage_winterchill(Creature* creature) : BossAI(creature, DATA_WINTERCHILL)
     {
-        return GetHyjalAI<boss_rage_winterchillAI>(creature);
+        _recentlySpoken = false;
+        scheduler.SetValidator([this]
+        {
+            return !me->HasUnitState(UNIT_STATE_CASTING);
+        });
     }
 
-    struct boss_rage_winterchillAI : public hyjal_trashAI
+    void JustEngagedWith(Unit* who) override
     {
-        boss_rage_winterchillAI(Creature* creature) : hyjal_trashAI(creature)
+        BossAI::JustEngagedWith(who);
+
+        scheduler.Schedule(18s, 24s, [this](TaskContext context)
         {
-            instance = creature->GetInstanceScript();
-            go = false;
-        }
+            context.SetGroup(GROUP_FROST);
 
-        uint32 FrostArmorTimer;
-        uint32 DecayTimer;
-        uint32 NovaTimer;
-        uint32 IceboltTimer;
-        bool go;
-
-        void Reset() override
+            DoCastSelf(SPELL_FROST_ARMOR);
+            context.Repeat(30s, 45s);
+        }).Schedule(5s, 9s, [this](TaskContext context)
         {
-            damageTaken = 0;
-            FrostArmorTimer = 37000;
-            DecayTimer = 45000;
-            NovaTimer = 15000;
-            IceboltTimer = 10000;
+            context.SetGroup(GROUP_FROST);
 
-            if (IsEvent)
-                instance->SetData(DATA_RAGEWINTERCHILLEVENT, NOT_STARTED);
-        }
-
-        void JustEngagedWith(Unit* /*who*/) override
+            DoCastRandomTarget(SPELL_ICEBOLT);
+            context.Repeat(9s, 15s);
+        }).Schedule(12s, 17s, [this](TaskContext context)
         {
-            if (IsEvent)
-                instance->SetData(DATA_RAGEWINTERCHILLEVENT, IN_PROGRESS);
-            Talk(SAY_ONAGGRO);
-        }
+            context.SetGroup(GROUP_FROST);
 
-        void KilledUnit(Unit* /*victim*/) override
+            if (DoCastRandomTarget(SPELL_FROST_NOVA, 0, 45.f) == SPELL_CAST_OK)
+                Talk(SAY_NOVA);
+
+            context.Repeat(25s, 30s);
+        }).Schedule(21s, 28s, [this](TaskContext context)
+        {
+            if (DoCastRandomTarget(SPELL_DEATH_AND_DECAY, 0, 40.f) == SPELL_CAST_OK)
+            {
+                Talk(SAY_DECAY);
+                context.DelayGroup(GROUP_FROST, 15s);
+            }
+
+            context.Repeat(45s);
+        }).Schedule(10min, [this](TaskContext context)
+        {
+            DoCastSelf(SPELL_ENRAGE);
+            context.Repeat(5min);
+        });
+    }
+
+    void DoAction(int32 action) override
+    {
+        Talk(SAY_ONSPAWN, 1200ms);
+
+        if (action == DATA_WINTERCHILL)
+            me->GetMotionMaster()->MovePath(urand(ALLIANCE_BASE_CHARGE_1, ALLIANCE_BASE_CHARGE_3), false);
+    }
+
+    void PathEndReached(uint32 pathId) override
+    {
+        switch (pathId)
+        {
+        case ALLIANCE_BASE_CHARGE_1:
+        case ALLIANCE_BASE_CHARGE_2:
+        case ALLIANCE_BASE_CHARGE_3:
+            me->m_Events.AddEventAtOffset([this]()
+            {
+                me->GetMotionMaster()->MovePath(urand(ALLIANCE_BASE_PATROL_1, ALLIANCE_BASE_PATROL_3), true);
+            }, 1s);
+            break;
+        }
+    }
+
+    void KilledUnit(Unit* victim) override
+    {
+        if (!_recentlySpoken && victim->IsPlayer())
         {
             Talk(SAY_ONSLAY);
+            _recentlySpoken = true;
+
+            scheduler.Schedule(6s, [this](TaskContext)
+            {
+                _recentlySpoken = false;
+            });
         }
+    }
 
-        void WaypointReached(uint32 waypointId) override
-        {
-            if (waypointId == 7 && instance)
-            {
-                Unit* target = ObjectAccessor::GetUnit(*me, instance->GetGuidData(DATA_JAINAPROUDMOORE));
-                if (target && target->IsAlive())
-                    me->AddThreat(target, 0.0f);
-            }
-        }
+    void JustDied(Unit* killer) override
+    {
+        Talk(SAY_ONDEATH);
+        BossAI::JustDied(killer);
+    }
 
-        void JustDied(Unit* killer) override
-        {
-            hyjal_trashAI::JustDied(killer);
-            if (IsEvent)
-                instance->SetData(DATA_RAGEWINTERCHILLEVENT, DONE);
-            Talk(SAY_ONDEATH);
-        }
-
-        void UpdateAI(uint32 diff) override
-        {
-            if (IsEvent)
-            {
-                //Must update npc_escortAI
-                npc_escortAI::UpdateAI(diff);
-                if (!go)
-                {
-                    go = true;
-                    AddWaypoint(0, 4896.08f,    -1576.35f,    1333.65f);
-                    AddWaypoint(1, 4898.68f,    -1615.02f,    1329.48f);
-                    AddWaypoint(2, 4907.12f,    -1667.08f,    1321.00f);
-                    AddWaypoint(3, 4963.18f,    -1699.35f,    1340.51f);
-                    AddWaypoint(4, 4989.16f,    -1716.67f,    1335.74f);
-                    AddWaypoint(5, 5026.27f,    -1736.89f,    1323.02f);
-                    AddWaypoint(6, 5037.77f,    -1770.56f,    1324.36f);
-                    AddWaypoint(7, 5067.23f,    -1789.95f,    1321.17f);
-                    Start(false, true);
-                    SetDespawnAtEnd(false);
-                }
-            }
-
-            //Return since we have no target
-            if (!UpdateVictim())
-                return;
-
-            if (FrostArmorTimer <= diff)
-            {
-                DoCast(me, SPELL_FROST_ARMOR);
-                FrostArmorTimer = 40000 + rand() % 20000;
-            }
-            else FrostArmorTimer -= diff;
-            if (DecayTimer <= diff)
-            {
-                DoCastVictim(SPELL_DEATH_AND_DECAY);
-                DecayTimer = 60000 + rand() % 20000;
-                Talk(SAY_DECAY);
-            }
-            else DecayTimer -= diff;
-            if (NovaTimer <= diff)
-            {
-                DoCastVictim(SPELL_FROST_NOVA);
-                NovaTimer = 30000 + rand() % 15000;
-                Talk(SAY_NOVA);
-            }
-            else NovaTimer -= diff;
-            if (IceboltTimer <= diff)
-            {
-                DoCast(SelectTarget(SelectTargetMethod::Random, 0, 40, true), SPELL_ICEBOLT);
-                IceboltTimer = 11000 + rand() % 20000;
-            }
-            else IceboltTimer -= diff;
-
-            DoMeleeAttackIfReady();
-        }
-    };
+private:
+    bool _recentlySpoken;
 };
 
 void AddSC_boss_rage_winterchill()
 {
-    new boss_rage_winterchill();
+    RegisterHyjalAI(boss_rage_winterchill);
 }

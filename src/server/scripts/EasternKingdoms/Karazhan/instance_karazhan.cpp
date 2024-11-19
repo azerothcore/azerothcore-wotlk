@@ -17,12 +17,13 @@
 
 #include "Creature.h"
 #include "GameObject.h"
+#include "InstanceMapScript.h"
 #include "InstanceScript.h"
 #include "Map.h"
 #include "Player.h"
-#include "ScriptMgr.h"
 #include "SpellAuraEffects.h"
 #include "SpellScript.h"
+#include "SpellScriptLoader.h"
 #include "karazhan.h"
 
 const Position OptionalSpawn[] =
@@ -35,6 +36,7 @@ const Position OptionalSpawn[] =
 ObjectData const creatureData[] =
 {
     { NPC_ATTUMEN_THE_HUNTSMAN, DATA_ATTUMEN   },
+    { NPC_SHADE_OF_ARAN,        DATA_ARAN      },
     { NPC_MIDNIGHT,             DATA_MIDNIGHT  },
     { NPC_DOROTHEE,             DATA_DOROTHEE  },
     { NPC_TITO,                 DATA_TITO      },
@@ -46,6 +48,20 @@ ObjectData const creatureData[] =
     { NPC_NIGHTBANE,            DATA_NIGHTBANE },
     { NPC_TERESTIAN_ILLHOOF,    DATA_TERESTIAN },
     { 0,                        0              }
+};
+
+ObjectData const gameObjectData[] =
+{
+    { GO_SIDE_ENTRANCE_DOOR, DATA_GO_SIDE_ENTRANCE_DOOR },
+    { 0,                     0                          }
+};
+
+DoorData const doorData[] =
+{
+    { GO_MASTERS_TERRACE_DOOR,  DATA_NIGHTBANE, DOOR_TYPE_ROOM  },
+    { GO_MASTERS_TERRACE_DOOR2, DATA_NIGHTBANE, DOOR_TYPE_ROOM  },
+    { GO_NETHERSPACE_DOOR,      DATA_MALCHEZAAR, DOOR_TYPE_ROOM },
+    { 0,                        0,              DOOR_TYPE_ROOM  }
 };
 
 class instance_karazhan : public InstanceMapScript
@@ -64,7 +80,8 @@ public:
         {
             SetHeaders(DataHeader);
             SetBossNumber(EncounterCount);
-            LoadObjectData(creatureData, nullptr);
+            LoadObjectData(creatureData, gameObjectData);
+            LoadDoorData(doorData);
 
             // 1 - OZ, 2 - HOOD, 3 - RAJ, this never gets altered.
             OperaEvent = urand(EVENT_OZ, EVENT_RAJ);
@@ -180,6 +197,7 @@ public:
                 case NPC_SHADIKITH_THE_GLIDER:
                 case NPC_ROKAD_THE_RAVAGER:
                     SetBossState(DATA_OPTIONAL_BOSS, DONE);
+                    instance->ToInstanceMap()->PermBindAllPlayers();
                     break;
                 default:
                     break;
@@ -242,6 +260,7 @@ public:
                             break;
                         case DONE:
                             HandleGameObject(m_uiGamesmansExitDoor, true);
+                            instance->ToInstanceMap()->PermBindAllPlayers();
                             break;
                         }
                         default:
@@ -259,7 +278,7 @@ public:
                         if (Creature* piece = instance->GetCreature(chessPieceGUID))
                         {
                             piece->RemoveAllAuras();
-                            piece->setDeathState(JUST_RESPAWNED);
+                            piece->setDeathState(DeathState::JustRespawned);
                             piece->SetHealth(piece->GetMaxHealth());
                             float x, y, z, o;
                             piece->GetHomePosition(x, y, z, o);
@@ -300,13 +319,11 @@ public:
                     {
                         HandleGameObject(m_uiStageDoorLeftGUID, true);
                         HandleGameObject(m_uiStageDoorRightGUID, true);
-                        if (GameObject* sideEntrance = instance->GetGameObject(m_uiSideEntranceDoor))
-                            sideEntrance->RemoveGameObjectFlag(GO_FLAG_LOCKED);
                         instance->UpdateEncounterState(ENCOUNTER_CREDIT_KILL_CREATURE, 16812, nullptr);
                     }
                     else if (state == FAIL)
                     {
-                        HandleGameObject(m_uiStageDoorLeftGUID, false);
+                        HandleGameObject(m_uiStageDoorLeftGUID, true);
                         HandleGameObject(m_uiStageDoorRightGUID, false);
                         HandleGameObject(m_uiCurtainGUID, false);
                         DoRespawnCreature(_barnesGUID, true);
@@ -358,25 +375,11 @@ public:
                 case GO_GAMESMAN_HALL_EXIT_DOOR:
                     m_uiGamesmansExitDoor = go->GetGUID();
                     break;
-                case GO_NETHERSPACE_DOOR:
-                    m_uiNetherspaceDoor = go->GetGUID();
-                    if (GetBossState(DATA_PRINCE) != IN_PROGRESS)
-                        go->SetGameObjectFlag(GO_FLAG_LOCKED);
-                    else
-                        go->RemoveGameObjectFlag(GO_FLAG_LOCKED);
-                    break;
-                case GO_MASTERS_TERRACE_DOOR:
-                    MastersTerraceDoor[0] = go->GetGUID();
-                    break;
-                case GO_MASTERS_TERRACE_DOOR2:
-                    MastersTerraceDoor[1] = go->GetGUID();
-                    break;
                 case GO_SIDE_ENTRANCE_DOOR:
-                    m_uiSideEntranceDoor = go->GetGUID();
                     if (GetBossState(DATA_OPERA_PERFORMANCE) == DONE)
-                        go->SetGameObjectFlag(GO_FLAG_LOCKED);
-                    else
                         go->RemoveGameObjectFlag(GO_FLAG_LOCKED);
+                    else
+                        go->SetGameObjectFlag(GO_FLAG_LOCKED);
                     break;
                 case GO_DUST_COVERED_CHEST:
                     DustCoveredChest = go->GetGUID();
@@ -477,18 +480,10 @@ public:
                     return m_uiLibraryDoor;
                 case DATA_GO_MASSIVE_DOOR:
                     return m_uiMassiveDoor;
-                case DATA_GO_SIDE_ENTRANCE_DOOR:
-                    return m_uiSideEntranceDoor;
                 case DATA_GO_GAME_DOOR:
                     return m_uiGamesmansDoor;
                 case DATA_GO_GAME_EXIT_DOOR:
                     return m_uiGamesmansExitDoor;
-                case DATA_GO_NETHER_DOOR:
-                    return m_uiNetherspaceDoor;
-                case DATA_MASTERS_TERRACE_DOOR_1:
-                    return MastersTerraceDoor[0];
-                case DATA_MASTERS_TERRACE_DOOR_2:
-                    return MastersTerraceDoor[1];
                 case DATA_IMAGE_OF_MEDIVH:
                     return ImageGUID;
                 case DATA_NIGHTBANE:
@@ -519,11 +514,8 @@ public:
         ObjectGuid m_uiNightBaneGUID;
         ObjectGuid m_uiLibraryDoor;                                 // Door at Shade of Aran
         ObjectGuid m_uiMassiveDoor;                                 // Door at Netherspite
-        ObjectGuid m_uiSideEntranceDoor;                            // Side Entrance
         ObjectGuid m_uiGamesmansDoor;                               // Door before Chess
         ObjectGuid m_uiGamesmansExitDoor;                           // Door after Chess
-        ObjectGuid m_uiNetherspaceDoor;                             // Door at Malchezaar
-        ObjectGuid MastersTerraceDoor[2];
         ObjectGuid ImageGUID;
         ObjectGuid DustCoveredChest;
         ObjectGuid m_uiRelayGUID;
@@ -536,102 +528,84 @@ public:
     };
 };
 
-class spell_karazhan_brittle_bones : public SpellScriptLoader
+class spell_karazhan_brittle_bones_aura : public AuraScript
 {
-public:
-    spell_karazhan_brittle_bones() : SpellScriptLoader("spell_karazhan_brittle_bones") { }
+    PrepareAuraScript(spell_karazhan_brittle_bones_aura);
 
-    class spell_karazhan_brittle_bones_AuraScript : public AuraScript
+    bool Validate(SpellInfo const* /*spellInfo*/) override
     {
-        PrepareAuraScript(spell_karazhan_brittle_bones_AuraScript);
+        return ValidateSpellInfo({ SPELL_RATTLED });
+    }
 
-        void CalcPeriodic(AuraEffect const* /*effect*/, bool& isPeriodic, int32& amplitude)
-        {
-            isPeriodic = true;
-            amplitude = 5000;
-        }
-
-        void Update(AuraEffect const*  /*effect*/)
-        {
-            PreventDefaultAction();
-            if (roll_chance_i(35))
-                GetUnitOwner()->CastSpell(GetUnitOwner(), SPELL_RATTLED, true);
-        }
-
-        void Register() override
-        {
-            DoEffectCalcPeriodic += AuraEffectCalcPeriodicFn(spell_karazhan_brittle_bones_AuraScript::CalcPeriodic, EFFECT_0, SPELL_AURA_DUMMY);
-            OnEffectPeriodic += AuraEffectPeriodicFn(spell_karazhan_brittle_bones_AuraScript::Update, EFFECT_0, SPELL_AURA_DUMMY);
-        }
-    };
-
-    AuraScript* GetAuraScript() const override
+    void CalcPeriodic(AuraEffect const* /*effect*/, bool& isPeriodic, int32& amplitude)
     {
-        return new spell_karazhan_brittle_bones_AuraScript();
+        isPeriodic = true;
+        amplitude = 5000;
+    }
+
+    void Update(AuraEffect const*  /*effect*/)
+    {
+        PreventDefaultAction();
+        if (roll_chance_i(35))
+            GetUnitOwner()->CastSpell(GetUnitOwner(), SPELL_RATTLED, true);
+    }
+
+    void Register() override
+    {
+        DoEffectCalcPeriodic += AuraEffectCalcPeriodicFn(spell_karazhan_brittle_bones_aura::CalcPeriodic, EFFECT_0, SPELL_AURA_DUMMY);
+        OnEffectPeriodic += AuraEffectPeriodicFn(spell_karazhan_brittle_bones_aura::Update, EFFECT_0, SPELL_AURA_DUMMY);
     }
 };
 
-class spell_karazhan_overload : public SpellScriptLoader
+class spell_karazhan_overload_aura : public AuraScript
 {
-public:
-    spell_karazhan_overload() : SpellScriptLoader("spell_karazhan_overload") { }
+    PrepareAuraScript(spell_karazhan_overload_aura);
 
-    class spell_karazhan_overload_AuraScript : public AuraScript
+    bool Validate(SpellInfo const* /*spellInfo*/) override
     {
-        PrepareAuraScript(spell_karazhan_overload_AuraScript);
+        return ValidateSpellInfo({ SPELL_OVERLOAD });
+    }
 
-        void PeriodicTick(AuraEffect const* auraEffect)
-        {
-            PreventDefaultAction();
-            //Should stop at 3200 damage, maybe check needed(?)
-            GetUnitOwner()->CastCustomSpell(SPELL_OVERLOAD, SPELLVALUE_BASE_POINT0, int32(auraEffect->GetAmount() * pow(2.0, auraEffect->GetTickNumber())), GetUnitOwner(), true);
-        }
-
-        void Register() override
-        {
-            OnEffectPeriodic += AuraEffectPeriodicFn(spell_karazhan_overload_AuraScript::PeriodicTick, EFFECT_0, SPELL_AURA_PERIODIC_TRIGGER_SPELL);
-        }
-    };
-
-    AuraScript* GetAuraScript() const override
+    void PeriodicTick(AuraEffect const* auraEffect)
     {
-        return new spell_karazhan_overload_AuraScript();
+        PreventDefaultAction();
+        //Should stop at 3200 damage, maybe check needed(?)
+        GetUnitOwner()->CastCustomSpell(SPELL_OVERLOAD, SPELLVALUE_BASE_POINT0, int32(auraEffect->GetAmount() * pow(2.0, auraEffect->GetTickNumber())), GetUnitOwner(), true);
+    }
+
+    void Register() override
+    {
+        OnEffectPeriodic += AuraEffectPeriodicFn(spell_karazhan_overload_aura::PeriodicTick, EFFECT_0, SPELL_AURA_PERIODIC_TRIGGER_SPELL);
     }
 };
 
-class spell_karazhan_blink : public SpellScriptLoader
+class spell_karazhan_blink : public SpellScript
 {
-public:
-    spell_karazhan_blink() : SpellScriptLoader("spell_karazhan_blink") { }
+    PrepareSpellScript(spell_karazhan_blink);
 
-    class spell_karazhan_blink_SpellScript : public SpellScript
+    bool Validate(SpellInfo const* /*spellInfo*/) override
     {
-        PrepareSpellScript(spell_karazhan_blink_SpellScript);
+        return ValidateSpellInfo({ SPELL_BLINK });
+    }
 
-        void HandleDummy(SpellEffIndex effIndex)
-        {
-            PreventHitDefaultEffect(effIndex);
-            GetCaster()->GetThreatMgr().ResetAllThreat();
-            if (Unit* target = GetHitUnit())
-                GetCaster()->CastSpell(target, SPELL_BLINK, true);
-        }
-
-        void Register() override
-        {
-            OnEffectHitTarget += SpellEffectFn(spell_karazhan_blink_SpellScript::HandleDummy, EFFECT_0, SPELL_EFFECT_DUMMY);
-        }
-    };
-
-    SpellScript* GetSpellScript() const override
+    void HandleDummy(SpellEffIndex effIndex)
     {
-        return new spell_karazhan_blink_SpellScript();
+        PreventHitDefaultEffect(effIndex);
+        GetCaster()->GetThreatMgr().ResetAllThreat();
+        if (Unit* target = GetHitUnit())
+            GetCaster()->CastSpell(target, SPELL_BLINK, true);
+    }
+
+    void Register() override
+    {
+        OnEffectHitTarget += SpellEffectFn(spell_karazhan_blink::HandleDummy, EFFECT_0, SPELL_EFFECT_DUMMY);
     }
 };
 
 void AddSC_instance_karazhan()
 {
     new instance_karazhan();
-    new spell_karazhan_brittle_bones();
-    new spell_karazhan_overload();
-    new spell_karazhan_blink();
+    RegisterSpellScript(spell_karazhan_brittle_bones_aura);
+    RegisterSpellScript(spell_karazhan_overload_aura);
+    RegisterSpellScript(spell_karazhan_blink);
 }

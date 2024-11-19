@@ -15,7 +15,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "ScriptMgr.h"
+#include "CreatureScript.h"
 #include "ScriptedCreature.h"
 #include "hellfire_ramparts.h"
 
@@ -41,7 +41,7 @@ struct boss_omor_the_unscarred : public BossAI
 {
     boss_omor_the_unscarred(Creature* creature) : BossAI(creature, DATA_OMOR_THE_UNSCARRED)
     {
-        SetCombatMovement(false);
+        me->SetCombatMovement(false);
         scheduler.SetValidator([this]
         {
             return !me->HasUnitState(UNIT_STATE_CASTING);
@@ -87,7 +87,7 @@ struct boss_omor_the_unscarred : public BossAI
 
     void KilledUnit(Unit*) override
     {
-        if(!_hasSpoken)
+        if (!_hasSpoken)
         {
             _hasSpoken = true;
             Talk(SAY_KILL);

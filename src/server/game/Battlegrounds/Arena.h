@@ -63,4 +63,4 @@ private:
     void EndBattleground(TeamId winnerTeamId) override;
 };
 
-#endif // WARHEAD_ARENA_H
+#endif // ACORE_ARENA_H

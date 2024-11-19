@@ -61,7 +61,9 @@ body:
     attributes:
       label: AC rev. hash/commit
       description: |
-        Copy the result of the `.server debug` command (if you need to run it from the client get a prat addon)
+        Paste the entire output result of the `.server debug` command. (If you need to run it from the client get a prat addon)
+      placeholder: |
+        Paste the entire output result of the `.server debug` command. (If you need to run it from the client get a prat addon)
     validations:
       required: true
   - type: input

@@ -1,12 +1,11 @@
 <!-- First of all, THANK YOU for your contribution. -->
 
 ## Changes Proposed:
+<!-- If your pull request promotes complex changes that require a detailed explanation, please describe them in detail specifying what your solution is and what is it meant to address. -->
 This PR proposes changes to:
 -  [ ] Core (units, players, creatures, game systems).
 -  [ ] Scripts (bosses, spell scripts, creature scripts).
 -  [ ] Database (SAI, creatures, etc).
-
-If your pull request promotes complex changes that require a detailed explanation, please describe them in detail specifying what your solution is and what is it meant to address.
 
 ## Issues Addressed:
 <!-- If your fix has a relating issue, link it below -->
@@ -44,7 +43,7 @@ This PR has been:
 - [ ]
 - [ ]
 
-<!-- If you intend to contribute repeatedly to our project, it is a good idea to join our discord channel. We set ranks for our contributors and give them access to special resources or knowledge: https://discord.com/invite/DasJqPba)
+<!-- If you intend to contribute repeatedly to our project, it is a good idea to join our discord channel. We set ranks for our contributors and give them access to special resources or knowledge: https://discord.com/invite/GyFvXpk7)
      Do not remove the instructions below about testing, they will help users to test your PR -->
 ## How to Test AzerothCore PRs
  

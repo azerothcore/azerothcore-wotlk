@@ -96,12 +96,6 @@ public:
         visitor.Visit(i_objects);
     }
 
-    template<class T>
-    uint32 GetWorldObjectCountInGrid() const
-    {
-        return i_objects.template Count<T>();
-    }
-
     /** Inserts a container type object into the grid.
      */
     template<class SPECIFIC_OBJECT> void AddGridObject(SPECIFIC_OBJECT* obj)

@@ -18,11 +18,11 @@
 #include "AccountMgr.h"
 #include "CreatureTextMgr.h"
 #include "Group.h"
+#include "InstanceMapScript.h"
 #include "InstanceScript.h"
 #include "Map.h"
 #include "ObjectMgr.h"
 #include "Player.h"
-#include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 #include "Transport.h"
 #include "WorldPacket.h"
@@ -62,6 +62,11 @@ enum Spells
     BLOOD_BEAM_VISUAL_LLEG  = 72302,
     BLOOD_BEAM_VISUAL_RLEG  = 72301,
     VOID_ZONE_VISUAL        = 69422
+};
+
+enum Say
+{
+    SAY_SOULS_LICH_KING_RAND_WHISPER = 5
 };
 
 BossBoundaryData const boundaries =
@@ -118,8 +123,10 @@ DoorData const doorData[] =
 
 ObjectData const creatureData[] =
 {
-    { NPC_SINDRAGOSA, DATA_SINDRAGOSA },
-    { 0,              0               }
+    { NPC_SINDRAGOSA,     DATA_SINDRAGOSA     },
+    { NPC_THE_SKYBREAKER, DATA_THE_SKYBREAKER },
+    { NPC_ORGRIMS_HAMMER, DATA_ORGRIMS_HAMMER },
+    { 0,                  0                   }
 };
 
 // this doesnt have to only store questgivers, also can be used for related quest spawns
@@ -394,7 +401,7 @@ public:
                 case NPC_SE_HIGH_OVERLORD_SAURFANG:
                     if (TeamIdInInstance == TEAM_ALLIANCE)
                     {
-                        creature->UpdateEntry(NPC_SE_MURADIN_BRONZEBEARD, creature->GetCreatureData());
+                        creature->UpdateEntry(NPC_SE_MURADIN_BRONZEBEARD, true);
                         creature->LoadEquipment();
                     }
                     DeathbringerSaurfangEventGUID = creature->GetGUID();
@@ -460,6 +467,9 @@ public:
                     break;
                 case NPC_THE_LICH_KING_VALITHRIA:
                     ValithriaLichKingGUID = creature->GetGUID();
+                    break;
+                case NPC_THE_LICH_KING_LH:
+                    TheLichKingLhGUID = creature->GetGUID();
                     break;
                 case NPC_GREEN_DRAGON_COMBAT_TRIGGER:
                     ValithriaTriggerGUID = creature->GetGUID();
@@ -727,7 +737,7 @@ public:
                 case GO_SINDRAGOSA_SHORTCUT_EXIT_DOOR:
                 case GO_ICE_WALL:
                 case GO_SINDRAGOSA_ENTRANCE_DOOR:
-                    AddDoor(go, true);
+                    AddDoor(go);
                     break;
                 case GO_SCIENTIST_ENTRANCE:
                     PutricideEnteranceDoorGUID = go->GetGUID();
@@ -737,7 +747,7 @@ public:
                 case GO_DOODAD_ICECROWN_ROOSTPORTCULLIS_01:
                 case GO_DOODAD_ICECROWN_ROOSTPORTCULLIS_04:
                     if (instance->Is25ManRaid())
-                        AddDoor(go, true);
+                        AddDoor(go);
                     break;
                 case GO_LADY_DEATHWHISPER_ELEVATOR:
                     LadyDeathwisperElevatorGUID = go->GetGUID();
@@ -758,7 +768,7 @@ public:
                     break;
                 case GO_SAURFANG_S_DOOR:
                     DeathbringerSaurfangDoorGUID = go->GetGUID();
-                    AddDoor(go, true);
+                    AddDoor(go);
                     break;
                 case GO_DEATHBRINGER_S_CACHE_10N:
                 case GO_DEATHBRINGER_S_CACHE_25N:
@@ -873,7 +883,7 @@ public:
                         go->SetRespawnTime(7 * DAY);
                     break;
                 case GO_SCOURGE_TRANSPORTER_FIRST:
-                    AddDoor(go, true);
+                    AddDoor(go);
                     ScourgeTransporterFirstGUID = go->GetGUID();
                     if (GetBossState(DATA_LORD_MARROWGAR) == DONE)
                         go->RemoveGameObjectFlag(GO_FLAG_NOT_SELECTABLE);
@@ -911,7 +921,7 @@ public:
                 case GO_SINDRAGOSA_SHORTCUT_EXIT_DOOR:
                 case GO_ICE_WALL:
                 case GO_SCOURGE_TRANSPORTER_FIRST:
-                    AddDoor(go, false);
+                    RemoveDoor(go);
                     break;
                 case GO_THE_SKYBREAKER_A:
                 case GO_ORGRIMS_HAMMER_H:
@@ -1665,8 +1675,8 @@ public:
             data >> LichKingHeroicAvailable;
             data >> BloodPrinceTrashCount;
             data >> IsBuffAvailable;
-            SetData(DATA_BUFF_AVAILABLE, IsBuffAvailable);
             data >> IsSindragosaIntroDone;
+            SetData(DATA_BUFF_AVAILABLE, IsBuffAvailable);
         }
 
         void WriteSaveDataMore(std::ostringstream& data) override
@@ -1694,12 +1704,10 @@ public:
                     if (Player* player = players.begin()->GetSource())
                         if (player->GetQuestStatus(QUEST_A_FEAST_OF_SOULS) == QUEST_STATUS_INCOMPLETE)
                         {
-                            uint8 id = urand(0, 15);
-                            std::string const& text = sCreatureTextMgr->GetLocalizedChatString(NPC_THE_LICH_KING_LH, 0, 20 + id, 0, LOCALE_enUS);
-                            WorldPacket data;
-                            ChatHandler::BuildChatPacket(data, CHAT_MSG_MONSTER_WHISPER, LANG_UNIVERSAL, ObjectGuid::Empty, player->GetGUID(), text, CHAT_TAG_NONE, "The Lich King");
-                            player->PlayDirectSound(17235 + id);
-                            player->SendDirectMessage(&data);
+                            if (Creature* theLichKing = instance->GetCreature(TheLichKingLhGUID))
+                            {
+                                theLichKing->AI()->Talk(SAY_SOULS_LICH_KING_RAND_WHISPER, player);
+                            }
                         }
             }
             else
@@ -1871,6 +1879,9 @@ public:
                 case EVENT_FESTERGUT_VALVE_USED:
                     if (!(PutricideEventProgress & PUTRICIDE_EVENT_FLAG_FESTERGUT_VALVE))
                     {
+                        if (GameObject* goGas = instance->GetGameObject(GasReleaseValveGUID))
+                            goGas->SetGameObjectFlag(GO_FLAG_INTERACT_COND | GO_FLAG_NOT_SELECTABLE);
+
                         PutricideEventProgress |= PUTRICIDE_EVENT_FLAG_FESTERGUT_VALVE;
                         if (PutricideEventProgress & PUTRICIDE_EVENT_FLAG_ROTFACE_VALVE)
                         {
@@ -1888,6 +1899,9 @@ public:
                 case EVENT_ROTFACE_VALVE_USED:
                     if (!(PutricideEventProgress & PUTRICIDE_EVENT_FLAG_ROTFACE_VALVE))
                     {
+                        if (GameObject* goOoze = instance->GetGameObject(OozeReleaseValveGUID))
+                            goOoze->SetGameObjectFlag(GO_FLAG_INTERACT_COND | GO_FLAG_NOT_SELECTABLE);
+
                         PutricideEventProgress |= PUTRICIDE_EVENT_FLAG_ROTFACE_VALVE;
                         if (PutricideEventProgress & PUTRICIDE_EVENT_FLAG_FESTERGUT_VALVE)
                         {
@@ -1981,6 +1995,7 @@ public:
         ObjectGuid RimefangGUID;
         ObjectGuid TheLichKingTeleportGUID;
         ObjectGuid TheLichKingGUID;
+        ObjectGuid TheLichKingLhGUID;
         ObjectGuid HighlordTirionFordringGUID;
         ObjectGuid TerenasMenethilGUID;
         ObjectGuid ArthasPlatformGUID;

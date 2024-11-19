@@ -35,13 +35,13 @@ void AuthCrypt::Init(SessionKey const& K)
     _initialized = true;
 }
 
-void AuthCrypt::DecryptRecv(uint8* data, size_t len)
+void AuthCrypt::DecryptRecv(uint8* data, std::size_t len)
 {
     ASSERT(_initialized);
     _clientDecrypt.UpdateData(data, len);
 }
 
-void AuthCrypt::EncryptSend(uint8* data, size_t len)
+void AuthCrypt::EncryptSend(uint8* data, std::size_t len)
 {
     ASSERT(_initialized);
     _serverEncrypt.UpdateData(data, len);

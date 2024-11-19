@@ -17,11 +17,12 @@
 
 #include "MotdMgr.h"
 #include "Config.h"
-#include "Opcodes.h"
+#include "DatabaseEnv.h"
+#include "Log.h"
 #include "ScriptMgr.h"
-#include "Util.h"
-#include "WorldPacket.h"
+#include "Timer.h"
 #include "Tokenize.h"
+#include "WorldPacket.h"
 #include <iterator>
 
 namespace

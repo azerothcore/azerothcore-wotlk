@@ -27,8 +27,8 @@ public:
     AuthCrypt() = default;
 
     void Init(SessionKey const& K);
-    void DecryptRecv(uint8* data, size_t len);
-    void EncryptSend(uint8* data, size_t len);
+    void DecryptRecv(uint8* data, std::size_t len);
+    void EncryptSend(uint8* data, std::size_t len);
 
     bool IsInitialized() const { return _initialized; }
 

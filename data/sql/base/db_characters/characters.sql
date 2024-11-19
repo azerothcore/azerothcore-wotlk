@@ -1,8 +1,8 @@
 -- --------------------------------------------------------
 -- Host:                         127.0.0.1
--- Server version:               8.0.29 - MySQL Community Server - GPL
+-- Server version:               8.1.0 - MySQL Community Server - GPL
 -- Server OS:                    Win64
--- HeidiSQL Version:             12.0.0.6468
+-- HeidiSQL Version:             12.3.0.6589
 -- --------------------------------------------------------
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
@@ -41,7 +41,7 @@ CREATE TABLE IF NOT EXISTS `characters` (
   `instance_id` int unsigned NOT NULL DEFAULT '0',
   `instance_mode_mask` tinyint unsigned NOT NULL DEFAULT '0',
   `orientation` float NOT NULL DEFAULT '0',
-  `taximask` text COLLATE utf8mb4_unicode_ci NOT NULL,
+  `taximask` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `online` tinyint unsigned NOT NULL DEFAULT '0',
   `cinematic` tinyint unsigned NOT NULL DEFAULT '0',
   `totaltime` int unsigned NOT NULL DEFAULT '0',
@@ -61,7 +61,7 @@ CREATE TABLE IF NOT EXISTS `characters` (
   `at_login` smallint unsigned NOT NULL DEFAULT '0',
   `zone` smallint unsigned NOT NULL DEFAULT '0',
   `death_expire_time` int unsigned NOT NULL DEFAULT '0',
-  `taxi_path` text COLLATE utf8mb4_unicode_ci,
+  `taxi_path` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
   `arenaPoints` int unsigned NOT NULL DEFAULT '0',
   `totalHonorPoints` int unsigned NOT NULL DEFAULT '0',
   `todayHonorPoints` int unsigned NOT NULL DEFAULT '0',
@@ -84,16 +84,16 @@ CREATE TABLE IF NOT EXISTS `characters` (
   `latency` int unsigned DEFAULT '0',
   `talentGroupsCount` tinyint unsigned NOT NULL DEFAULT '1',
   `activeTalentGroup` tinyint unsigned NOT NULL DEFAULT '0',
-  `exploredZones` longtext COLLATE utf8mb4_unicode_ci,
-  `equipmentCache` longtext COLLATE utf8mb4_unicode_ci,
+  `exploredZones` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
+  `equipmentCache` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
   `ammoId` int unsigned NOT NULL DEFAULT '0',
-  `knownTitles` longtext COLLATE utf8mb4_unicode_ci,
+  `knownTitles` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
   `actionBars` tinyint unsigned NOT NULL DEFAULT '0',
   `grantableLevels` tinyint unsigned NOT NULL DEFAULT '0',
   `order` tinyint DEFAULT NULL,
   `creation_date` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `deleteInfos_Account` int unsigned DEFAULT NULL,
-  `deleteInfos_Name` varchar(12) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `deleteInfos_Name` varchar(12) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `deleteDate` int unsigned DEFAULT NULL,
   `innTriggerId` int unsigned NOT NULL,
   `extraBonusTalentCount` int NOT NULL DEFAULT '0',

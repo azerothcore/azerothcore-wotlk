@@ -17,8 +17,8 @@
 
 #include "AreaBoundary.h"
 #include "CreatureAIImpl.h"
+#include "InstanceMapScript.h"
 #include "Player.h"
-#include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 #include "obsidian_sanctum.h"
 
@@ -46,20 +46,9 @@ public:
             LoadBossBoundaries(boundaries);
         }
 
-        bool IsEncounterInProgress() const override
-        {
-            for (uint8 i = 0; i < MAX_ENCOUNTERS; ++i)
-            {
-                if (GetBossState(i) == IN_PROGRESS)
-                    return true;
-            }
-
-            return false;
-        }
-
         void OnCreatureCreate(Creature* pCreature) override
         {
-            switch(pCreature->GetEntry())
+            switch (pCreature->GetEntry())
             {
                 case NPC_SARTHARION:
                     m_uiSartharionGUID = pCreature->GetGUID();
@@ -78,7 +67,7 @@ public:
 
         ObjectGuid GetGuidData(uint32 uiData) const override
         {
-            switch(uiData)
+            switch (uiData)
             {
                 case DATA_SARTHARION:
                     return m_uiSartharionGUID;
@@ -95,7 +84,7 @@ public:
 
         bool CheckAchievementCriteriaMeet(uint32 criteria_id, Player const* source, Unit const*  /*target*/, uint32  /*miscvalue1*/) override
         {
-            switch(criteria_id)
+            switch (criteria_id)
             {
                 // Gonna Go When the Volcano Blows (10 player) (2047)
                 case 7326:
@@ -148,20 +137,6 @@ public:
             }
 
             return false;
-        }
-
-        bool SetBossState(uint32 type, EncounterState state) override
-        {
-            if (InstanceScript::SetBossState(type, state))
-            {
-                return false;
-            }
-
-            if (state == DONE)
-            {
-                SaveToDB();
-            }
-            return true;
         }
 
         void DoAction(int32 action) override

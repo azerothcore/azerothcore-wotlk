@@ -165,4 +165,18 @@ class AC_GAME_API BoundaryUnionBoundary : public AreaBoundary
         AreaBoundary const* const _b2;
 };
 
+class AC_GAME_API BoundaryIntersectBoundary : public AreaBoundary
+{
+    public:
+        BoundaryIntersectBoundary(AreaBoundary const* b1, AreaBoundary const* b2, bool isInverted = false);
+
+    protected:
+        virtual ~BoundaryIntersectBoundary();
+        bool IsWithinBoundaryArea(Position const* pos) const override;
+
+    private:
+        AreaBoundary const* const _b1;
+        AreaBoundary const* const _b2;
+};
+
 #endif //ACORE_AREA_BOUNDARY_H

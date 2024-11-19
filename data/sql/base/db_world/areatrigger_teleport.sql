@@ -1,8 +1,8 @@
 -- --------------------------------------------------------
 -- Host:                         127.0.0.1
--- Server version:               8.0.29 - MySQL Community Server - GPL
+-- Server version:               8.1.0 - MySQL Community Server - GPL
 -- Server OS:                    Win64
--- HeidiSQL Version:             12.0.0.6468
+-- HeidiSQL Version:             12.3.0.6589
 -- --------------------------------------------------------
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
@@ -18,7 +18,7 @@
 DROP TABLE IF EXISTS `areatrigger_teleport`;
 CREATE TABLE IF NOT EXISTS `areatrigger_teleport` (
   `ID` int unsigned NOT NULL DEFAULT '0',
-  `Name` text COLLATE utf8mb4_unicode_ci,
+  `Name` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
   `target_map` smallint unsigned NOT NULL DEFAULT '0',
   `target_position_x` float NOT NULL DEFAULT '0',
   `target_position_y` float NOT NULL DEFAULT '0',
@@ -28,7 +28,7 @@ CREATE TABLE IF NOT EXISTS `areatrigger_teleport` (
   FULLTEXT KEY `name` (`Name`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='Trigger System';
 
--- Dumping data for table acore_world.areatrigger_teleport: ~273 rows (approximately)
+-- Dumping data for table acore_world.areatrigger_teleport: ~274 rows (approximately)
 DELETE FROM `areatrigger_teleport`;
 INSERT INTO `areatrigger_teleport` (`ID`, `Name`, `target_map`, `target_position_x`, `target_position_y`, `target_position_z`, `target_orientation`) VALUES
 	(45, 'Scarlet Monastery - Graveyard (Entrance)', 189, 1688.99, 1053.48, 18.6775, 0.00117),
@@ -78,6 +78,7 @@ INSERT INTO `areatrigger_teleport` (`ID`, `Name`, `target_map`, `target_position
 	(1468, 'Blackrock Spire - Searing Gorge Instance (Inside)', 229, 78.5083, -225.044, 49.839, 5.1),
 	(1470, 'Blackrock Spire - Searing Gorge Instance', 0, -7524.19, -1230.13, 285.743, 2.09544),
 	(1472, 'Blackrock Dephts - Searing Gorge Instance', 0, -7179.63, -923.667, 166.416, 1.84097),
+	(2068, 'Blackrock Spire - Jump Exit', 0, -7558.39, -1309.43, 248.454, 1.5708),
 	(2166, 'Deeprun Tram - Ironforge Instance (Inside)', 0, -4838.95, -1318.46, 501.868, 1.42372),
 	(2171, 'Deeprun Tram - Stormwind Instance (Inside)', 0, -8364.57, 535.981, 91.7969, 2.24619),
 	(2173, 'Deeprun Tram - Stormwind Instance', 369, 68.3006, 2490.91, -4.29647, 3.12192),
@@ -146,9 +147,9 @@ INSERT INTO `areatrigger_teleport` (`ID`, `Name`, `target_map`, `target_position
 	(4153, 'Magtheridon\'s Lair (Entrance)', 544, 187.843, 35.9232, 67.9252, 4.79879),
 	(4297, 'Hellfire Ramparts (Exit)', 530, -360.671, 3071.9, -15.0977, 5.14274),
 	(4304, 'Hellfire Ramparts - Omor Exit Target', 530, -233.33, 3199.71, -50, 0.785398),
-	(4311, 'Battle Of Mount Hyjal, Alliance Base (Entrance)', 534, 4954, -1886.2, 1326, 0.13),
-	(4312, 'Battle Of Mount Hyjal, Horde Base (Entrance)', 534, 5497.33, -2971.14, 1537.63, 2.832),
-	(4313, 'Battle Of Mount Hyjal, Night Elf Base (Entrance)', 534, 5152.33, -3364.4, 1644.74, 6.2),
+	(4311, 'Battle Of Mount Hyjal, Alliance Base (Entrance)', 534, 5066.79, -1791.9, 1321.65, 2.35619),
+	(4312, 'Battle Of Mount Hyjal, Horde Base (Entrance)', 534, 5499.96, -2756.8, 1488.96, 1.39626),
+	(4313, 'Battle Of Mount Hyjal, Night Elf Base (Entrance)', 534, 5163.02, -3428.31, 1627.61, 0.785398),
 	(4319, 'Caverns Of Time, Battle Of Mount Hyjal (Entrance) ', 534, 4259.61, -4233.77, 868.199, 2.53),
 	(4320, 'Caverns Of Time, Black Morass (Entrance)', 269, -1496.24, 7034.7, 32.5619, 1.75699),
 	(4321, 'Caverns Of Time, Old Hillsbrad Foothills (Entrance)', 560, 2741.87, 1315.25, 14.0423, 2.96016),

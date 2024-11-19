@@ -19,7 +19,6 @@
 #include "Log.h"
 #include "Opcodes.h"
 #include "Player.h"
-#include "UpdateData.h"
 #include "WorldPacket.h"
 #include "WorldSession.h"
 
@@ -52,7 +51,6 @@ void WorldSession::HandleDuelAcceptedOpcode(WorldPacket& recvPacket)
 
 void WorldSession::HandleDuelCancelledOpcode(WorldPacket& recvPacket)
 {
-    LOG_DEBUG("network", "WORLD: Received CMSG_DUEL_CANCELLED");
     Player* player = GetPlayer();
 
     ObjectGuid guid;

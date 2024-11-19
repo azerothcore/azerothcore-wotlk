@@ -29,9 +29,9 @@
 #include "ScriptMgr.h"
 #include "SpellInfo.h"
 #include "SpellMgr.h"
-#include "UpdateMask.h"
 #include "WorldPacket.h"
 #include "WorldSession.h"
+#include <cmath>
 
 enum StableResultCode
 {
@@ -124,7 +124,7 @@ void WorldSession::SendTrainerList(ObjectGuid guid, const std::string& strTitle)
     data << guid;
     data << uint32(trainer_spells->trainerType);
 
-    size_t count_pos = data.wpos();
+    std::size_t count_pos = data.wpos();
     data << uint32(trainer_spells->spellList.size());
 
     // reputation discount
@@ -164,7 +164,7 @@ void WorldSession::SendTrainerList(ObjectGuid guid, const std::string& strTitle)
 
         data << uint32(tSpell->spell);                      // learned spell (or cast-spell in profession case)
         data << uint8(state == TRAINER_SPELL_GREEN_DISABLED ? TRAINER_SPELL_GREEN : state);
-        data << uint32(floor(tSpell->spellCost * fDiscountMod));
+        data << uint32(std::floor(tSpell->spellCost * fDiscountMod));
 
         data << uint32(primary_prof_first_rank && can_learn_primary_prof ? 1 : 0);
         // primary prof. learn confirmation dialog
@@ -215,7 +215,6 @@ void WorldSession::HandleTrainerBuySpellOpcode(WorldPacket& recvData)
     uint32 spellId = 0;
 
     recvData >> guid >> spellId;
-    LOG_DEBUG("network", "WORLD: Received CMSG_TRAINER_BUY_SPELL Npc {}, learn spell id is: {}", guid.ToString(), spellId);
 
     Creature* unit = GetPlayer()->GetNPCIfCanInteractWith(guid, UNIT_NPC_FLAG_TRAINER);
     if (!unit)
@@ -248,7 +247,7 @@ void WorldSession::HandleTrainerBuySpellOpcode(WorldPacket& recvData)
         return;
 
     // apply reputation discount
-    uint32 nSpellCost = uint32(floor(trainer_spell->spellCost * _player->GetReputationPriceDiscount(unit)));
+    uint32 nSpellCost = uint32(std::floor(trainer_spell->spellCost * _player->GetReputationPriceDiscount(unit)));
 
     // check money requirement
     if (!_player->HasEnoughMoney(nSpellCost))
@@ -273,8 +272,6 @@ void WorldSession::HandleTrainerBuySpellOpcode(WorldPacket& recvData)
 
 void WorldSession::HandleGossipHelloOpcode(WorldPacket& recvData)
 {
-    LOG_DEBUG("network", "WORLD: Received CMSG_GOSSIP_HELLO");
-
     ObjectGuid guid;
     recvData >> guid;
 
@@ -486,7 +483,7 @@ void WorldSession::SendStablePet(ObjectGuid guid)
 
     WorldPacket data(MSG_LIST_STABLED_PETS, 200);           // guess size
     data << guid;
-    size_t wpos = data.wpos();
+    std::size_t wpos = data.wpos();
     data << uint8(0);                                       // place holder for slot show number
 
     PetStable* petStable = GetPlayer()->GetPetStable();

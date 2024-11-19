@@ -24,7 +24,8 @@
 /src/server/scripts/Custom/*
 !/src/server/scripts/Custom/README.md
 
-/docker-compose.override.yml
+/*.override.yml
+/*.override.yaml
 
 !.gitkeep
 

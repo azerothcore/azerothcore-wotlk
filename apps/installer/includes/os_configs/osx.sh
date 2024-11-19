@@ -3,18 +3,23 @@
 rm /usr/local/bin/2to3 || true
 rm /usr/local/bin/2to3-3.10 || true
 rm /usr/local/bin/2to3-3.11 || true
+rm /usr/local/bin/2to3-3.12 || true
 rm /usr/local/bin/idle3 || true
 rm /usr/local/bin/idle3.10 || true
 rm /usr/local/bin/idle3.11 || true
+rm /usr/local/bin/idle3.12 || true
 rm /usr/local/bin/pydoc3 || true
 rm /usr/local/bin/pydoc3.10 || true
 rm /usr/local/bin/pydoc3.11 || true
+rm /usr/local/bin/pydoc3.12 || true
 rm /usr/local/bin/python3 || true
 rm /usr/local/bin/python3.10 || true
 rm /usr/local/bin/python3.11 || true
+rm /usr/local/bin/python3.12 || true
 rm /usr/local/bin/python3-config || true
 rm /usr/local/bin/python3.10-config || true
 rm /usr/local/bin/python3.11-config || true
+rm /usr/local/bin/python3.12-config || true
 ##########################################
 
 brew update
@@ -26,4 +31,4 @@ if ! command -v cmake &>/dev/null ; then
 fi
 ##########################################
 
-brew install openssl@3 readline boost@1.82 bash-completion curl unzip mysql@8.1 ccache
+brew install openssl@3 readline boost bash-completion curl unzip mysql ccache

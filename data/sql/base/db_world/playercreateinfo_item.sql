@@ -1,8 +1,8 @@
 -- --------------------------------------------------------
 -- Host:                         127.0.0.1
--- Server version:               8.0.29 - MySQL Community Server - GPL
+-- Server version:               8.1.0 - MySQL Community Server - GPL
 -- Server OS:                    Win64
--- HeidiSQL Version:             12.0.0.6468
+-- HeidiSQL Version:             12.3.0.6589
 -- --------------------------------------------------------
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
@@ -21,12 +21,12 @@ CREATE TABLE IF NOT EXISTS `playercreateinfo_item` (
   `class` tinyint unsigned NOT NULL DEFAULT '0',
   `itemid` int unsigned NOT NULL DEFAULT '0',
   `amount` int NOT NULL DEFAULT '1',
-  `Note` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `Note` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   PRIMARY KEY (`race`,`class`,`itemid`),
   KEY `playercreateinfo_race_class_index` (`race`,`class`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- Dumping data for table acore_world.playercreateinfo_item: ~0 rows (approximately)
+-- Dumping data for table acore_world.playercreateinfo_item: ~1 rows (approximately)
 DELETE FROM `playercreateinfo_item`;
 INSERT INTO `playercreateinfo_item` (`race`, `class`, `itemid`, `amount`, `Note`) VALUES
 	(0, 6, 40582, -1, '[TDB PH] - unsused Scourgestone');

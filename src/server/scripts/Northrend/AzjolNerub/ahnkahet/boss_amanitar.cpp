@@ -15,10 +15,11 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "CreatureScript.h"
 #include "Player.h"
-#include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 #include "SpellScript.h"
+#include "SpellScriptLoader.h"
 #include "ahnkahet.h"
 
 enum Spells
@@ -234,7 +235,7 @@ struct npc_amanitar_mushrooms : public ScriptedAI
 {
     npc_amanitar_mushrooms(Creature* pCreature) : ScriptedAI(pCreature)
     {
-        SetCombatMovement(false);
+        me->SetCombatMovement(false);
 
         //TODO: this prolly needs to be done in database
         pCreature->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);

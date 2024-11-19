@@ -20,10 +20,10 @@
 #include "MapDefines.h"
 #include "MapTree.h"
 #include "VMapDefinitions.h"
+#include <boost/filesystem.hpp>
 #include <iomanip>
 #include <set>
 #include <sstream>
-#include <boost/filesystem.hpp>
 
 using G3D::Vector3;
 using G3D::AABox;
@@ -418,7 +418,7 @@ namespace VMAP
             std::string model_name(buff, name_length);
 
             WorldModel_Raw raw_model;
-            if ( !raw_model.Read((iSrcDir + "/" + model_name).c_str()) )
+            if (!raw_model.Read((iSrcDir + "/" + model_name).c_str()))
             {
                 continue;
             }
@@ -527,7 +527,7 @@ namespace VMAP
             READ_OR_RETURN_WITH_DELETE(vectorarray, nvectors * sizeof(float) * 3);
             for (uint32 i = 0; i < nvectors; ++i)
             {
-                vertexArray.push_back( Vector3(vectorarray + 3 * i) );
+                vertexArray.push_back( Vector3(vectorarray + 3 * i));
             }
 
             delete[] vectorarray;

@@ -15,6 +15,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "ConditionScript.h"
 #include "ScriptMgr.h"
 
 bool ScriptMgr::OnConditionCheck(Condition* condition, ConditionSourceInfo& sourceInfo)
@@ -24,3 +25,11 @@ bool ScriptMgr::OnConditionCheck(Condition* condition, ConditionSourceInfo& sour
     auto tempScript = ScriptRegistry<ConditionScript>::GetScriptById(condition->ScriptId);
     return tempScript ? tempScript->OnConditionCheck(condition, sourceInfo) : true;
 }
+
+ConditionScript::ConditionScript(const char* name)
+    : ScriptObject(name)
+{
+    ScriptRegistry<ConditionScript>::AddScript(this);
+}
+
+template class AC_GAME_API ScriptRegistry<ConditionScript>;

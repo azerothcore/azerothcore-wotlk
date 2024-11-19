@@ -17,8 +17,9 @@
 
 #include "Position.h"
 #include "ByteBuffer.h"
-#include "GridDefines.h"
 #include "Geometry.h"
+#include "GridDefines.h"
+#include "Random.h"
 #include <G3D/g3dmath.h>
 #include <sstream>
 

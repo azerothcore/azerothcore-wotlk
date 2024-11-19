@@ -15,10 +15,13 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "AreaTriggerScript.h"
+#include "CreatureScript.h"
 #include "Player.h"
-#include "ScriptMgr.h"
 #include "ScriptedCreature.h"
+#include "SpellScriptLoader.h"
 #include "shattered_halls.h"
+#include "SpellScript.h"
 
 enum Texts
 {
@@ -268,7 +271,7 @@ struct boss_grand_warlock_nethekurse : public BossAI
             {
                 // check if door is openened
                 //this should only happen before the intro, if the door is picked by someone
-                if(nethekursedoor->GetGoState() == 0)
+                if (nethekursedoor->GetGoState() == 0)
                 {
                     DoAction(ACTION_START_INTRO);
                 }

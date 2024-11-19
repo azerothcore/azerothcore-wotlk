@@ -19,10 +19,10 @@
 #define ACORE_CREATUREAI_H
 
 #include "AreaBoundary.h"
-#include "Common.h"
 #include "Creature.h"
-#include "UnitAI.h"
 #include "EventMap.h"
+#include "TaskScheduler.h"
+#include "UnitAI.h"
 
 class WorldObject;
 class Unit;
@@ -72,6 +72,7 @@ protected:
     Creature* const me;
 
     EventMap events;
+    TaskScheduler scheduler;
 
     bool UpdateVictim();
     bool UpdateVictimWithGaze();
@@ -134,6 +135,8 @@ public:
     virtual void SummonedCreatureDespawn(Creature* /*summon*/) {}
     virtual void SummonedCreatureDies(Creature* /*summon*/, Unit* /*killer*/) {}
     virtual void SummonedCreatureDespawnAll() {}
+
+    virtual void SummonedCreatureEvade(Creature* /*summon*/) {}
 
     // Called when hit by a spell
     virtual void SpellHit(Unit* /*caster*/, SpellInfo const* /*spell*/) {}
@@ -215,6 +218,9 @@ public:
     virtual void CalculateThreat(Unit* /*hatedUnit*/, float& /*threat*/, SpellInfo const* /*threatSpell*/) { }
 
     virtual bool OnTeleportUnreacheablePlayer(Player* /*player*/) { return false; }
+
+    // Called when an aura is removed or expires.
+    virtual void OnAuraRemove(AuraApplication* /*aurApp*/, AuraRemoveMode /*mode*/) { }
 
 protected:
     virtual void MoveInLineOfSight(Unit* /*who*/);

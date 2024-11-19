@@ -85,9 +85,9 @@ inline T RoundToInterval(T& num, T floor, T ceil)
 AC_COMMON_API bool Utf8toWStr(std::string_view utf8str, std::wstring& wstr);
 
 // in wsize==max size of buffer, out wsize==real string size
-AC_COMMON_API bool Utf8toWStr(char const* utf8str, size_t csize, wchar_t* wstr, size_t& wsize);
+AC_COMMON_API bool Utf8toWStr(char const* utf8str, std::size_t csize, wchar_t* wstr, std::size_t& wsize);
 
-inline bool Utf8toWStr(std::string_view utf8str, wchar_t* wstr, size_t& wsize)
+inline bool Utf8toWStr(std::string_view utf8str, wchar_t* wstr, std::size_t& wsize)
 {
     return Utf8toWStr(utf8str.data(), utf8str.size(), wstr, wsize);
 }
@@ -95,11 +95,11 @@ inline bool Utf8toWStr(std::string_view utf8str, wchar_t* wstr, size_t& wsize)
 AC_COMMON_API bool WStrToUtf8(std::wstring_view wstr, std::string& utf8str);
 
 // size==real string size
-AC_COMMON_API bool WStrToUtf8(wchar_t const* wstr, size_t size, std::string& utf8str);
+AC_COMMON_API bool WStrToUtf8(wchar_t const* wstr, std::size_t size, std::string& utf8str);
 
 // set string to "" if invalid utf8 sequence
-size_t utf8length(std::string& utf8str);
-void utf8truncate(std::string& utf8str, size_t len);
+std::size_t utf8length(std::string& utf8str);
+void utf8truncate(std::string& utf8str, std::size_t len);
 
 inline bool isBasicLatinCharacter(wchar_t wchar)
 {
@@ -373,8 +373,8 @@ uint32 GetPID();
 
 namespace Acore::Impl
 {
-    AC_COMMON_API std::string ByteArrayToHexStr(uint8 const* bytes, size_t length, bool reverse = false);
-    AC_COMMON_API void HexStrToByteArray(std::string_view str, uint8* out, size_t outlen, bool reverse = false);
+    AC_COMMON_API std::string ByteArrayToHexStr(uint8 const* bytes, std::size_t length, bool reverse = false);
+    AC_COMMON_API void HexStrToByteArray(std::string_view str, uint8* out, std::size_t outlen, bool reverse = false);
 }
 
 template<typename Container>
@@ -383,13 +383,13 @@ std::string ByteArrayToHexStr(Container const& c, bool reverse = false)
     return Acore::Impl::ByteArrayToHexStr(std::data(c), std::size(c), reverse);
 }
 
-template<size_t Size>
+template<std::size_t Size>
 void HexStrToByteArray(std::string_view str, std::array<uint8, Size>& buf, bool reverse = false)
 {
     Acore::Impl::HexStrToByteArray(str, buf.data(), Size, reverse);
 }
 
-template<size_t Size>
+template<std::size_t Size>
 std::array<uint8, Size> HexStrToByteArray(std::string_view str, bool reverse = false)
 {
     std::array<uint8, Size> arr;
@@ -433,7 +433,7 @@ public:
         m_list.remove(t);
         return *this;
     }
-    size_t size()
+    std::size_t size()
     {
         return m_list.size();
     }

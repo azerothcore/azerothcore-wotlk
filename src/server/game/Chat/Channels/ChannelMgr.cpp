@@ -18,9 +18,9 @@
 #include "ChannelMgr.h"
 #include "Log.h"
 #include "Player.h"
-#include "World.h"
-#include "Tokenize.h"
 #include "StringConvert.h"
+#include "Tokenize.h"
+#include "World.h"
 
 ChannelMgr::~ChannelMgr()
 {
@@ -74,7 +74,7 @@ void ChannelMgr::LoadChannels()
         if (!Utf8toWStr(channelName, channelWName))
         {
             LOG_ERROR("server.loading", "Failed to load channel '{}' from database - invalid utf8 sequence? Deleted.", channelName);
-            toDelete.push_back({ channelName, team });
+            toDelete.emplace_back(channelName, team);
             continue;
         }
 
@@ -82,7 +82,7 @@ void ChannelMgr::LoadChannels()
         if (!mgr)
         {
             LOG_ERROR("server.loading", "Failed to load custom chat channel '{}' from database - invalid team {}. Deleted.", channelName, team);
-            toDelete.push_back({ channelName, team });
+            toDelete.emplace_back(channelName, team);
             continue;
         }
 

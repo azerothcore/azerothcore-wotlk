@@ -40,7 +40,7 @@ void BattlegroundBE::StartingEventOpenDoors()
         DoorOpen(i);
 
     for (uint32 i = BG_BE_OBJECT_BUFF_1; i <= BG_BE_OBJECT_BUFF_2; ++i)
-        SpawnBGObject(i, 60);
+        SpawnBGObject(i, 90);
 }
 
 bool BattlegroundBE::HandlePlayerUnderMap(Player* player)

@@ -1,17 +1,31 @@
-name: check-codestyle
+name: Codestyle
 on:
   pull_request:
+    paths:
+      - src/**
+      - "!README.md"
+      - "!docs/**"
 
 jobs:
-  check-codestyle:
-    strategy:
-      fail-fast: false
-      matrix:
-        os: [ubuntu-20.04]
-    runs-on: ${{ matrix.os }}
+  triage:
+    runs-on: ubuntu-latest
+    name: C++
     if: github.repository == 'azerothcore/azerothcore-wotlk'
-    name: check codestyle
     steps:
       - uses: actions/checkout@v4
-      - name: Check core codestyle
-        run: source ./apps/ci/ci-codestyle.sh
+      - name: Setup python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+      - name: AzerothCore codestyle
+        run: python ./apps/codestyle/codestyle.py
+      - name: C++ Advanced
+        run: |
+          sudo apt update -y
+          sudo apt install -y cppcheck
+          cppcheck --force --inline-suppr --suppressions-list=./.suppress.cppcheck src/ --output-file=report.txt
+
+          if [ -s report.txt ]; then  # if file is not empty
+            cat report.txt
+            exit 1 # let github action fails
+          fi

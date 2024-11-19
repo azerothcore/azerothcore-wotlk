@@ -20,9 +20,8 @@
  * Scriptnames of files in this file should be prefixed with "npc_pet_pri_".
  */
 
-#include "PassiveAI.h"
+#include "CreatureScript.h"
 #include "PetAI.h"
-#include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 #include "TotemAI.h"
 
@@ -40,12 +39,15 @@ struct npc_pet_pri_lightwell : public TotemAI
 
     void InitializeAI() override
     {
-        if (Unit* owner = me->ToTempSummon()->GetSummonerUnit())
+        if (TempSummon* tempSummon = me->ToTempSummon())
         {
-            uint32 hp = uint32(owner->GetMaxHealth() * 0.3f);
-            me->SetMaxHealth(hp);
-            me->SetHealth(hp);
-            me->SetLevel(owner->GetLevel());
+            if (Unit* owner = tempSummon->GetSummonerUnit())
+            {
+                uint32 hp = uint32(owner->GetMaxHealth() * 0.3f);
+                me->SetMaxHealth(hp);
+                me->SetHealth(hp);
+                me->SetLevel(owner->GetLevel());
+            }
         }
 
         me->CastSpell(me, SPELL_PRIEST_LIGHTWELL_CHARGES, false); // Spell for Lightwell Charges

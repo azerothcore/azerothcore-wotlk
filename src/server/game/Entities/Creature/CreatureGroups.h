@@ -19,6 +19,7 @@
 #define _FORMATIONS_H
 
 #include "Define.h"
+#include "ObjectGuid.h"
 #include "Unit.h"
 #include <map>
 #include <unordered_map>
@@ -107,7 +108,7 @@ public:
     void RemoveMember(Creature* member);
     void FormationReset(bool dismiss, bool initMotionMaster);
 
-    void LeaderMoveTo(float x, float y, float z, bool run);
+    void LeaderMoveTo(float x, float y, float z, uint32 move_type);
     void MemberEngagingTarget(Creature* member, Unit* target);
     Unit* GetNewTargetForMember(Creature* member);
     void MemberEvaded(Creature* member);

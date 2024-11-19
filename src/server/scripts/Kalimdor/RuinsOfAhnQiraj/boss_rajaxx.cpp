@@ -15,12 +15,13 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "SmartAI.h"
-#include "ScriptMgr.h"
+#include "CreatureScript.h"
 #include "ScriptedCreature.h"
 #include "ScriptedEscortAI.h"
 #include "ScriptedGossip.h"
+#include "SmartAI.h"
 #include "SpellScript.h"
+#include "SpellScriptLoader.h"
 #include "ruins_of_ahnqiraj.h"
 
 enum Yells
@@ -132,9 +133,9 @@ class spell_rajaxx_thundercrash : public SpellScript
     void HandleDamageCalc(SpellEffIndex /*effIndex*/)
     {
         int32 damage = GetHitUnit()->GetHealth() / 2;
-        if (damage < 200)
+        if (damage < 100)
         {
-            damage = 200;
+            damage = 100;
         }
 
         SetHitDamage(damage);

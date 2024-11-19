@@ -20,14 +20,15 @@
 #include "GameEventMgr.h"
 #include "InstanceScript.h"
 #include "ObjectMgr.h"
-#include "Player.h"
 #include "Pet.h"
+#include "Player.h"
 #include "ReputationMgr.h"
 #include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 #include "Spell.h"
 #include "SpellAuras.h"
 #include "SpellMgr.h"
+#include "WorldState.h"
 
 // Checks if object meets the condition
 // Can have CONDITION_SOURCE_TYPE_NONE && !mReferenceId if called from a special event (ie: eventAI)
@@ -289,8 +290,22 @@ bool Condition::Meets(ConditionSourceInfo& sourceInfo)
     }
     case CONDITION_NEAR_GAMEOBJECT:
     {
-        condMeets = static_cast<bool>(GetClosestGameObjectWithEntry(object, ConditionValue1, static_cast<float>(ConditionValue2)));
-        break;
+        if (!ConditionValue3)
+        {
+            condMeets = static_cast<bool>(GetClosestGameObjectWithEntry(object, ConditionValue1, static_cast<float>(ConditionValue2)));
+            break;
+        }
+        else
+        {
+            if (GameObject* go = GetClosestGameObjectWithEntry(object, ConditionValue1, static_cast<float>(ConditionValue2)))
+            {
+                if ((go->GetGoState() == GO_STATE_READY && ConditionValue3 == 1) || (go->GetGoState() != GO_STATE_READY && ConditionValue3 == 2))
+                    condMeets = true;
+                else
+                    condMeets = false;
+            }
+            break;
+        }
     }
     case CONDITION_OBJECT_ENTRY_GUID:
     {
@@ -556,6 +571,11 @@ bool Condition::Meets(ConditionSourceInfo& sourceInfo)
             condMeets = unit->IsCharmed();
         break;
     }
+    case CONDITION_WORLD_SCRIPT:
+    {
+        condMeets = sWorldState->IsConditionFulfilled(static_cast<WorldStateCondition>(ConditionValue1), static_cast<WorldStateConditionState>(ConditionValue2));
+        break;
+    }
     default:
         condMeets = false;
         break;
@@ -755,6 +775,9 @@ uint32 Condition::GetSearcherTypeMaskForCondition()
         break;
     case CONDITION_CHARMED:
         mask |= GRID_MAP_TYPE_MASK_CREATURE | GRID_MAP_TYPE_MASK_PLAYER;
+        break;
+    case CONDITION_WORLD_SCRIPT:
+        mask |= GRID_MAP_TYPE_MASK_ALL;
         break;
     default:
         ASSERT(false && "Condition::GetSearcherTypeMaskForCondition - missing condition handling!");
@@ -1040,10 +1063,10 @@ void ConditionMgr::LoadConditions(bool isReload)
         LootTemplates_Spell.ResetConditions();
         LootTemplates_Player.ResetConditions();
 
-        LOG_INFO("server.loading", "Re-Loading `gossip_menu` Table for Conditions!");
+        LOG_INFO("server.loading", "Reloading `gossip_menu` Table for Conditions!");
         sObjectMgr->LoadGossipMenu();
 
-        LOG_INFO("server.loading", "Re-Loading `gossip_menu_option` Table for Conditions!");
+        LOG_INFO("server.loading", "Reloading `gossip_menu_option` Table for Conditions!");
         sObjectMgr->LoadGossipMenuItems();
         sSpellMgr->UnloadSpellInfoImplicitTargetConditionLists();
     }
@@ -2124,8 +2147,8 @@ bool ConditionMgr::isConditionTypeValid(Condition* cond)
             LOG_ERROR("sql.sql", "NearGameObject condition has non existing gameobject template entry ({}), skipped", cond->ConditionValue1);
             return false;
         }
-        if (cond->ConditionValue3)
-            LOG_ERROR("sql.sql", "NearGameObject condition has useless data in value3 ({})!", cond->ConditionValue3);
+        if (cond->ConditionValue3 > 2)
+            LOG_ERROR("sql.sql", "NearGameObject condition for gameobject ID ({}) has data over 2 for value3 ({})!", cond->ConditionValue1, cond->ConditionValue3);
         break;
     }
     case CONDITION_OBJECT_ENTRY_GUID:

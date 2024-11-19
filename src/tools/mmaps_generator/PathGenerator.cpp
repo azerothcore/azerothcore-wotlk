@@ -17,8 +17,8 @@
 
 #include "MapBuilder.h"
 #include "PathCommon.h"
-#include "Util.h"
 #include "Timer.h"
+#include "Util.h"
 #include <boost/filesystem.hpp>
 
 using namespace MMAP;

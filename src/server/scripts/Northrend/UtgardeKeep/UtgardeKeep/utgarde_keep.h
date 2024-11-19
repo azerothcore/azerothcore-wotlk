@@ -19,7 +19,6 @@
 #define DEF_UTGARDE_KEEP_H
 
 #include "CreatureAIImpl.h"
-#include "SpellScript.h"
 
 #define UtgardeKeepScriptName "instance_utgarde_keep"
 
@@ -32,6 +31,9 @@ enum eData
     DATA_FORGE_EVENT_MASK,
     DATA_DALRONN,
     DATA_SKARVALD,
+    DATA_DALRONN_GHOST,
+    DATA_SKARVALD_GHOST,
+    DATA_DARK_RANGER_MARRAH,
     DATA_ON_THE_ROCKS_ACHIEV,
 
     DATA_SPECIAL_DRAKE = 50,

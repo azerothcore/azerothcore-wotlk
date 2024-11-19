@@ -22,12 +22,12 @@ Comment: All learn related commands
 Category: commandscripts
 EndScriptData */
 
+#include "CommandScript.h"
 #include "Language.h"
 #include "ObjectMgr.h"
 #include "Pet.h"
 #include "Player.h"
 #include "PlayerCommand.h"
-#include "ScriptMgr.h"
 #include "SpellInfo.h"
 #include "SpellMgr.h"
 
@@ -50,7 +50,7 @@ public:
 
         static ChatCommandTable learnAllCommandTable =
         {
-            { "my", learnAllMyCommandTable },
+            { "my",        learnAllMyCommandTable },
             { "gm",        HandleLearnAllGMCommand,            SEC_GAMEMASTER, Console::No },
             { "crafts",    HandleLearnAllCraftsCommand,        SEC_GAMEMASTER, Console::No },
             { "default",   HandleLearnAllDefaultCommand,       SEC_GAMEMASTER, Console::No },
@@ -60,14 +60,14 @@ public:
 
         static ChatCommandTable learnCommandTable =
         {
-            { "all", learnAllCommandTable },
+            { "all",  learnAllCommandTable },
             { "",     HandleLearnCommand,                      SEC_GAMEMASTER, Console::No }
         };
 
         static ChatCommandTable commandTable =
         {
-            { "learn", learnCommandTable },
-            { "unlearn",     HandleUnLearnCommand,             SEC_GAMEMASTER, Console::No }
+            { "learn",   learnCommandTable },
+            { "unlearn", HandleUnLearnCommand,             SEC_GAMEMASTER, Console::No }
         };
         return commandTable;
     }
@@ -78,8 +78,7 @@ public:
 
         if (!targetPlayer)
         {
-            handler->SendSysMessage(LANG_PLAYER_NOT_FOUND);
-            handler->SetSentErrorMessage(true);
+            handler->SendErrorMessage(LANG_PLAYER_NOT_FOUND);
             return false;
         }
 
@@ -212,31 +211,27 @@ public:
         Pet* pet = player->GetPet();
         if (!pet)
         {
-            handler->SendSysMessage(LANG_NO_PET_FOUND);
-            handler->SetSentErrorMessage(true);
+            handler->SendErrorMessage(LANG_NO_PET_FOUND);
             return false;
         }
 
         CreatureTemplate const* creatureInfo = pet->GetCreatureTemplate();
         if (!creatureInfo)
         {
-            handler->SendSysMessage(LANG_WRONG_PET_TYPE);
-            handler->SetSentErrorMessage(true);
+            handler->SendErrorMessage(LANG_WRONG_PET_TYPE);
             return false;
         }
 
         CreatureFamilyEntry const* petFamily = sCreatureFamilyStore.LookupEntry(creatureInfo->family);
         if (!petFamily)
         {
-            handler->SendSysMessage(LANG_WRONG_PET_TYPE);
-            handler->SetSentErrorMessage(true);
+            handler->SendErrorMessage(LANG_WRONG_PET_TYPE);
             return false;
         }
 
         if (petFamily->petTalentType < 0)                       // not hunter pet
         {
-            handler->SendSysMessage(LANG_WRONG_PET_TYPE);
-            handler->SetSentErrorMessage(true);
+            handler->SendErrorMessage(LANG_WRONG_PET_TYPE);
             return false;
         }
 
@@ -285,9 +280,12 @@ public:
 
     static bool HandleLearnAllLangCommand(ChatHandler* handler)
     {
-        // skipping UNIVERSAL language (0)
-        for (uint8 i = 1; i < LANGUAGES_COUNT; ++i)
-            handler->GetSession()->GetPlayer()->learnSpell(lang_description[i].spell_id);
+        for (LanguageDesc const& langDesc : lang_description)
+            if (uint32 langSpellId = langDesc.spell_id)
+            {
+                handler->GetPlayer()->learnSpell(langSpellId);
+                handler->GetPlayer()->SetSkill(langDesc.skill_id, 0, 300, 300);
+            }
 
         handler->SendSysMessage(LANG_COMMAND_LEARN_ALL_LANG);
         return true;
@@ -305,7 +303,7 @@ public:
         target->LearnCustomSpells();
         target->learnQuestRewardedSpells();
 
-        handler->PSendSysMessage(LANG_COMMAND_LEARN_ALL_DEFAULT_AND_QUEST, handler->GetNameLink(target).c_str());
+        handler->PSendSysMessage(LANG_COMMAND_LEARN_ALL_DEFAULT_AND_QUEST, handler->GetNameLink(target));
         return true;
     }
 
@@ -392,16 +390,8 @@ public:
     {
         uint32 classmask = player->getClassMask();
 
-        for (uint32 j = 0; j < sSkillLineAbilityStore.GetNumRows(); ++j)
+        for (SkillLineAbilityEntry const* skillLine : GetSkillLineAbilitiesBySkillLine(skillId))
         {
-            SkillLineAbilityEntry const* skillLine = sSkillLineAbilityStore.LookupEntry(j);
-            if (!skillLine)
-                continue;
-
-            // wrong skill
-            if (skillLine->SkillLine != skillId)
-                continue;
-
             // not high rank
             if (skillLine->SupercededBySpell)
                 continue;
@@ -427,8 +417,7 @@ public:
         Player* target = handler->getSelectedPlayer();
         if (!target)
         {
-            handler->SendSysMessage(LANG_NO_CHAR_SELECTED);
-            handler->SetSentErrorMessage(true);
+            handler->SendErrorMessage(LANG_NO_CHAR_SELECTED);
             return false;
         }
 

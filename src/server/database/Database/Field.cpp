@@ -20,7 +20,6 @@
 #include "Log.h"
 #include "MySQLHacks.h"
 #include "StringConvert.h"
-#include "Types.h"
 
 Field::Field()
 {
@@ -144,7 +143,7 @@ namespace
     }
 }
 
-void Field::GetBinarySizeChecked(uint8* buf, size_t length) const
+void Field::GetBinarySizeChecked(uint8* buf, std::size_t length) const
 {
     ASSERT(data.value && (data.length == length), "Expected {}-byte binary blob, got {}data ({} bytes) instead", length, data.value ? "" : "no ", data.length);
     memcpy(buf, data.value, length);

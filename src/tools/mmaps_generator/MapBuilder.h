@@ -20,12 +20,10 @@
 
 #include <atomic>
 #include <list>
-#include <map>
 #include <set>
 #include <thread>
 #include <vector>
 
-#include "IntermediateValues.h"
 #include "Optional.h"
 #include "TerrainBuilder.h"
 
@@ -47,7 +45,7 @@ namespace MMAP
         uint32 m_mapId;
         std::set<uint32>* m_tiles{nullptr};
 
-        bool operator==(uint32 id)
+        bool operator==(uint32 id) const
         {
             return m_mapId == id;
         }

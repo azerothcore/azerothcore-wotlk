@@ -36,7 +36,6 @@
 
 MapMgr::MapMgr()
 {
-    i_gridCleanUpDelay = sWorld->getIntConfig(CONFIG_INTERVAL_GRIDCLEAN);
     i_timer[3].SetInterval(sWorld->getIntConfig(CONFIG_INTERVAL_MAPUPDATE));
     mapUpdateStep = 0;
     _nextInstanceId = 0;
@@ -54,8 +53,6 @@ MapMgr* MapMgr::instance()
 
 void MapMgr::Initialize()
 {
-    Map::InitStateMachine();
-
     int num_threads(sWorld->getIntConfig(CONFIG_NUMTHREADS));
 
     // Start mtmaps if needed
@@ -84,10 +81,10 @@ Map* MapMgr::CreateBaseMap(uint32 id)
             ASSERT(entry);
 
             if (entry->Instanceable())
-                map = new MapInstanced(id, std::chrono::seconds(i_gridCleanUpDelay));
+                map = new MapInstanced(id);
             else
             {
-                map = new Map(id, std::chrono::seconds(i_gridCleanUpDelay), 0, REGULAR_DIFFICULTY);
+                map = new Map(id, 0, REGULAR_DIFFICULTY);
                 map->LoadRespawnTimes();
                 map->LoadCorpseData();
             }
@@ -226,7 +223,7 @@ Map::EnterState MapMgr::PlayerCannotEnter(uint32 mapid, Player* player, bool log
     }
 
     // players are only allowed to enter 5 instances per hour
-    if (entry->IsDungeon() && (!group || !group->isLFGGroup() || !group->IsLfgRandomInstance()))
+    if (entry->IsNonRaidDungeon() && (!group || !group->isLFGGroup() || !group->IsLfgRandomInstance()))
     {
         uint32 instaceIdToCheck = 0;
         if (InstanceSave* save = sInstanceSaveMgr->PlayerGetInstanceSave(player->GetGUID(), mapid, player->GetDifficulty(entry->IsRaid())))
@@ -336,8 +333,6 @@ void MapMgr::UnloadAll()
 
     if (m_updater.activated())
         m_updater.deactivate();
-
-    Map::DeleteStateMachine();
 }
 
 void MapMgr::GetNumInstances(uint32& dungeons, uint32& battlegrounds, uint32& arenas)

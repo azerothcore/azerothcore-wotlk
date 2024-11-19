@@ -18,8 +18,6 @@
 #ifndef DEF_STRATHOLME_H
 #define DEF_STRATHOLME_H
 
-#include "SpellAuras.h"
-
 #define DataHeader "STR"
 #define StratholmeScriptName "instance_stratholme"
 
@@ -31,6 +29,7 @@ enum DataTypes
     TYPE_ZIGGURAT3                      = 3,
     TYPE_BARON_FIGHT                    = 4,
     TYPE_MALLOW                         = 5,
+    TYPE_BARTHILAS_RUN                  = 6,
 
     DATA_BARON_RUN_NONE                 = 0,
     DATA_BARON_RUN_GATE                 = 1,
@@ -40,6 +39,7 @@ enum DataTypes
 
 enum CreatureIds
 {
+    NPC_BARTHILAS                       = 10435,
     NPC_BARON_RIVENDARE                 = 10440,
     NPC_BILE_SPEWER                     = 10416,
     NPC_VENOM_BELCHER                   = 10417,

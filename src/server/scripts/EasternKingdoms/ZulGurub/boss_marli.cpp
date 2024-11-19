@@ -15,10 +15,11 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "CreatureScript.h"
 #include "GameObjectAI.h"
-#include "SpellScript.h"
-#include "ScriptMgr.h"
 #include "ScriptedCreature.h"
+#include "SpellScript.h"
+#include "SpellScriptLoader.h"
 #include "TaskScheduler.h"
 #include "zulgurub.h"
 
@@ -37,13 +38,13 @@ enum Says
 
 enum Spells
 {
-    // Spider form
+    // Spider Form
     SPELL_CHARGE              = 22911,
     SPELL_ENVELOPING_WEB      = 24110,
     SPELL_CORROSIVE_POISON    = 24111,
     SPELL_POISON_SHOCK        = 24112,
 
-    //Troll form
+    // Troll Form
     SPELL_POISON_VOLLEY       = 24099,
     SPELL_DRAIN_LIFE          = 24300,
     SPELL_ENLARGE             = 24109,
@@ -61,33 +62,10 @@ enum Spells
     SPELL_FULL_GROWN          = 24088
 };
 
-enum Events
-{
-    // Spider form
-    EVENT_CHARGE_PLAYER       = 7,
-    EVENT_ENVELOPING_WEB      = 8,
-    EVENT_CORROSIVE_POISON    = 9,
-    EVENT_POISON_SHOCK        = 10,
-
-    // Troll form
-    EVENT_POISON_VOLLEY       = 11,
-    EVENT_DRAIN_LIFE          = 12,
-    EVENT_ENLARGE             = 13,
-
-    // All
-    EVENT_SPAWN_START_SPIDERS = 1,
-    EVENT_TRANSFORM           = 2,
-    EVENT_TRANSFORM_BACK      = 3,
-    EVENT_HATCH_SPIDER_EGG    = 4,
-    EVENT_THRASH              = 5,
-    EVENT_TALK_FIRST_SPIDERS  = 6,
-};
-
 enum Phases
 {
-    PHASE_ONE                 = 1,
-    PHASE_TWO                 = 2,
-    PHASE_THREE               = 3
+    PHASE_TROLL               = 1,
+    PHASE_SPIDER              = 2
 };
 
 enum Misc
@@ -95,14 +73,20 @@ enum Misc
     GO_SPIDER_EGGS            = 179985,
 };
 
+// High Priestess Mar'li (14510)
 struct boss_marli : public BossAI
 {
+public:
     boss_marli(Creature* creature) : BossAI(creature, DATA_MARLI) { }
 
     void Reset() override
     {
-        if (events.IsInPhase(PHASE_THREE))
-            me->HandleStatModifier(UNIT_MOD_DAMAGE_MAINHAND, TOTAL_PCT, 35.0f, false); // hack
+        if (_phase == PHASE_SPIDER)
+        {
+            me->RemoveAura(SPELL_SPIDER_FORM);
+            me->HandleStatModifier(UNIT_MOD_DAMAGE_MAINHAND, TOTAL_PCT, 35.0f, false);
+            _phase = PHASE_TROLL;
+        }
 
         std::list<GameObject*> eggs;
         me->GetGameObjectListWithEntryInGrid(eggs, GO_SPIDER_EGGS, DEFAULT_VISIBILITY_INSTANCE);
@@ -116,134 +100,139 @@ struct boss_marli : public BossAI
         BossAI::Reset();
     }
 
+    void JustEngagedWith(Unit* who) override
+    {
+        BossAI::JustEngagedWith(who);
+
+        Talk(SAY_AGGRO);
+
+        scheduler.Schedule(1s, [this](TaskContext)
+        {
+            DoCastAOE(SPELL_HATCH_EGGS);
+
+            scheduler.Schedule(500ms, [this](TaskContext)
+            {
+                Talk(SAY_SPIDER_SPAWN);
+            });
+
+            // Both Forms
+            scheduler.Schedule(4s, 6s, [this](TaskContext context)
+            {
+                DoCastVictim(SPELL_THRASH);
+                context.Repeat(10s, 20s);
+            });
+
+            _schedulePhaseTroll();
+        });
+    }
+
     void JustDied(Unit* killer) override
     {
         BossAI::JustDied(killer);
         Talk(SAY_DEATH);
     }
 
-    void JustEngagedWith(Unit* who) override
+private:
+    Phases _phase = PHASE_TROLL;
+
+    void _schedulePhaseTroll()
     {
-        BossAI::JustEngagedWith(who);
-        events.ScheduleEvent(EVENT_SPAWN_START_SPIDERS, 1s, 0, PHASE_ONE);
-        Talk(SAY_AGGRO);
-    }
-
-    void UpdateAI(uint32 diff) override
-    {
-        if (!UpdateVictim())
-            return;
-
-        events.Update(diff);
-
-        if (me->HasUnitState(UNIT_STATE_CASTING))
-            return;
-
-        while (uint32 eventId = events.ExecuteEvent())
+        // only if switching back from spider form
+        if (_phase == PHASE_SPIDER)
         {
-            switch (eventId)
-            {
-                case EVENT_SPAWN_START_SPIDERS:
-                    events.ScheduleEvent(EVENT_TALK_FIRST_SPIDERS, 500ms, 0, PHASE_TWO);
-                    DoCastAOE(SPELL_HATCH_EGGS);
-                    events.ScheduleEvent(EVENT_TRANSFORM, 1min, 0, PHASE_TWO);
-                    events.ScheduleEvent(EVENT_POISON_VOLLEY, 15s, 0, PHASE_TWO);
-                    events.ScheduleEvent(EVENT_HATCH_SPIDER_EGG, 30s, 0, PHASE_TWO);
-                    events.ScheduleEvent(EVENT_DRAIN_LIFE, 30s, 0, PHASE_TWO);
-                    events.ScheduleEvent(EVENT_THRASH, 4s, 6s); // all phases
-                    events.ScheduleEvent(EVENT_ENLARGE, 10s, 20s, 0, PHASE_TWO);
-                    events.SetPhase(PHASE_TWO);
-                    break;
-                case EVENT_TALK_FIRST_SPIDERS:
-                    Talk(SAY_SPIDER_SPAWN);
-                    break;
-                case EVENT_POISON_VOLLEY:
-                    DoCastVictim(SPELL_POISON_VOLLEY, true);
-                    events.ScheduleEvent(EVENT_POISON_VOLLEY, 10s, 20s, 0, PHASE_TWO);
-                    break;
-                case EVENT_HATCH_SPIDER_EGG:
-                    DoCastSelf(SPELL_HATCH_SPIDER_EGG, true);
-                    events.ScheduleEvent(EVENT_HATCH_SPIDER_EGG, 20s, 0, PHASE_TWO);
-                    break;
-                case EVENT_DRAIN_LIFE:
-                    DoCastRandomTarget(SPELL_DRAIN_LIFE);
-                    events.ScheduleEvent(EVENT_DRAIN_LIFE, 20s, 50s, 0, PHASE_TWO);
-                    break;
-                case EVENT_ENLARGE:
-                {
-                    std::list<Creature*> targets = DoFindFriendlyMissingBuff(100.f, SPELL_ENLARGE);
-                    if (targets.size() > 0)
-                        DoCast(*(targets.begin()), SPELL_ENLARGE);
-                    events.ScheduleEvent(EVENT_ENLARGE, 20s, 40s, 0, PHASE_TWO);
-                    break;
-                }
-                case EVENT_TRANSFORM:
-                    Talk(SAY_TRANSFORM);
-                    DoCastSelf(SPELL_SPIDER_FORM, true);
-                    me->HandleStatModifier(UNIT_MOD_DAMAGE_MAINHAND, TOTAL_PCT, 35.0f, true); // hack
-                    events.ScheduleEvent(EVENT_ENVELOPING_WEB, 5s, 0, PHASE_THREE);
-                    events.ScheduleEvent(EVENT_CHARGE_PLAYER, 6s, 0, PHASE_THREE);
-                    events.ScheduleEvent(EVENT_CORROSIVE_POISON, 1s, 0, PHASE_THREE);
-                    events.ScheduleEvent(EVENT_POISON_SHOCK, 5s, 10s, 0, PHASE_THREE);
-                    events.ScheduleEvent(EVENT_TRANSFORM_BACK, 1min, 0, PHASE_THREE);
-                    events.SetPhase(PHASE_THREE);
-                    break;
-                case EVENT_ENVELOPING_WEB:
-                    DoCastAOE(SPELL_ENVELOPING_WEB);
-                    events.ScheduleEvent(EVENT_CHARGE_PLAYER, 500ms, 0, PHASE_THREE);
-                    events.ScheduleEvent(EVENT_ENVELOPING_WEB, 15s, 20s, 0, PHASE_THREE);
-                    break;
-                case EVENT_CHARGE_PLAYER:
-                {
-                    Unit* target = SelectTarget(SelectTargetMethod::Random, 0, [this](Unit* target) -> bool
-                        {
-                            if (target->GetTypeId() != TYPEID_PLAYER || target->getPowerType() != Powers::POWER_MANA)
-                                return false;
-                            if (me->IsWithinMeleeRange(target) || me->GetVictim() == target)
-                                return false;
-                            return true;
-                        });
-                    if (target)
-                    {
-                        DoCast(target, SPELL_CHARGE);
-                        AttackStart(target);
-                    }
-                    break;
-                }
-                case EVENT_CORROSIVE_POISON:
-                    DoCastVictim(SPELL_CORROSIVE_POISON);
-                    events.ScheduleEvent(EVENT_CORROSIVE_POISON, 25s, 35s, 0, PHASE_THREE);
-                    break;
-                case EVENT_POISON_SHOCK:
-                    DoCastRandomTarget(SPELL_POISON_SHOCK);
-                    events.ScheduleEvent(EVENT_POISON_SHOCK, 10s, 0, PHASE_THREE);
-                    break;
-                case EVENT_TRANSFORM_BACK:
-                    me->RemoveAura(SPELL_SPIDER_FORM);
-                    DoCastSelf(SPELL_TRANSFORM_BACK, true);
-                    Talk(SAY_TRANSFORM_BACK);
-                    me->HandleStatModifier(UNIT_MOD_DAMAGE_MAINHAND, TOTAL_PCT, 35.0f, false); // hack
-                    events.ScheduleEvent(EVENT_TRANSFORM, 1min, 0, PHASE_TWO);
-                    events.ScheduleEvent(EVENT_POISON_VOLLEY, 15s, 0, PHASE_TWO);
-                    events.ScheduleEvent(EVENT_HATCH_SPIDER_EGG, 30s, 0, PHASE_TWO);
-                    events.ScheduleEvent(EVENT_DRAIN_LIFE, 30s, 0, PHASE_TWO);
-                    events.ScheduleEvent(EVENT_ENLARGE, 10s, 20s, 0, PHASE_TWO);
-                    events.SetPhase(PHASE_TWO);
-                    break;
-                case EVENT_THRASH:
-                    DoCastVictim(SPELL_THRASH);
-                    events.ScheduleEvent(EVENT_THRASH, 10s, 20s);
-                    break;
-                default:
-                    break;
-            }
+            me->RemoveAura(SPELL_SPIDER_FORM);
+            DoCastSelf(SPELL_TRANSFORM_BACK, true);
+            Talk(SAY_TRANSFORM_BACK);
+            me->HandleStatModifier(UNIT_MOD_DAMAGE_MAINHAND, TOTAL_PCT, 35.0f, false);
+
+            scheduler.CancelGroup(PHASE_SPIDER);
         }
 
-        DoMeleeAttackIfReady();
+        _phase = PHASE_TROLL;
+
+        scheduler.Schedule(15s, PHASE_TROLL, [this](TaskContext context)
+        {
+            DoCastVictim(SPELL_POISON_VOLLEY, true);
+            context.Repeat(10s, 20s);
+        }).Schedule(30s, PHASE_TROLL, [this](TaskContext context)
+        {
+            DoCastRandomTarget(SPELL_DRAIN_LIFE);
+            context.Repeat(20s, 50s);
+        }).Schedule(30s, PHASE_TROLL, [this](TaskContext context)
+        {
+            DoCastSelf(SPELL_HATCH_SPIDER_EGG, true);
+            context.Repeat(20s);
+        }).Schedule(10s, 20s, PHASE_TROLL, [this](TaskContext context)
+        {
+            std::list<Creature*> targets = DoFindFriendlyMissingBuff(100.f, SPELL_ENLARGE);
+            for (auto const& target : targets)
+            {
+                DoCast(target, SPELL_ENLARGE);
+            }
+            context.Repeat(20s, 40s);
+        });
+
+        // Transition to PHASE_SPIDER
+        scheduler.Schedule(1min, PHASE_TROLL, [this](TaskContext)
+        {
+            _schedulePhaseSpider();
+        });
     }
+
+    void _schedulePhaseSpider()
+    {
+        scheduler.CancelGroup(PHASE_TROLL);
+        _phase = PHASE_SPIDER;
+
+        Talk(SAY_TRANSFORM);
+        DoCastSelf(SPELL_SPIDER_FORM, true);
+        me->HandleStatModifier(UNIT_MOD_DAMAGE_MAINHAND, TOTAL_PCT, 35.0f, true);
+
+        scheduler.Schedule(5s, PHASE_SPIDER, [this](TaskContext context)
+        {
+            DoCastAOE(SPELL_ENVELOPING_WEB);
+            scheduler.Schedule(500ms, PHASE_SPIDER, [this](TaskContext)
+            {
+                _chargePlayer();
+            });
+            context.Repeat(15s, 20s);
+        }).Schedule(1s, PHASE_SPIDER, [this](TaskContext context)
+        {
+            DoCastVictim(SPELL_CORROSIVE_POISON);
+            context.Repeat(25s, 35s);
+        }).Schedule(5s, 10s, PHASE_SPIDER, [this](TaskContext context)
+        {
+            DoCastRandomTarget(SPELL_POISON_SHOCK);
+            context.Repeat(10s);
+        });
+
+        // Transition to PHASE_TROLL
+        scheduler.Schedule(1min, PHASE_SPIDER, [this](TaskContext)
+        {
+            _schedulePhaseTroll();
+        });
+    }
+
+    void _chargePlayer()
+    {
+        Unit* target = SelectTarget(SelectTargetMethod::Random, 0, [this](Unit* target) -> bool
+            {
+                if (!target->IsPlayer() || target->getPowerType() != Powers::POWER_MANA)
+                    return false;
+                if (me->IsWithinMeleeRange(target) || me->GetVictim() == target)
+                    return false;
+                return true;
+            });
+        if (target)
+        {
+            DoCast(target, SPELL_CHARGE);
+            AttackStart(target);
+        }
+    }
+
 };
 
-// Spawn of Mar'li
+// Spawn of Mar'li (15041)
 struct npc_spawn_of_marli : public ScriptedAI
 {
     npc_spawn_of_marli(Creature* creature) : ScriptedAI(creature) { }
@@ -272,21 +261,19 @@ struct npc_spawn_of_marli : public ScriptedAI
 
     void UpdateAI(uint32 diff) override
     {
-        //Return since we have no target
         if (!UpdateVictim())
             return;
 
-        _scheduler.Update(diff, [this]
-        {
-            DoMeleeAttackIfReady();
-        });
+        _scheduler.Update(diff);
+
+        DoMeleeAttackIfReady();
     }
 
 private:
     TaskScheduler _scheduler;
 };
 
-// 24083 - Hatch Eggs
+// Hatch Eggs (24083)
 class spell_hatch_eggs : public SpellScript
 {
     PrepareSpellScript(spell_hatch_eggs);
@@ -303,7 +290,7 @@ class spell_hatch_eggs : public SpellScript
     }
 };
 
-// 24110 - Enveloping Webs
+// Enveloping Webs (24110)
 class spell_enveloping_webs : public SpellScript
 {
     PrepareSpellScript(spell_enveloping_webs);
@@ -312,7 +299,7 @@ class spell_enveloping_webs : public SpellScript
     {
         Unit* caster = GetCaster();
         Unit* hitUnit = GetHitUnit();
-        if (caster && hitUnit && hitUnit->GetTypeId() == TYPEID_PLAYER)
+        if (caster && hitUnit && hitUnit->IsPlayer())
         {
             caster->GetThreatMgr().ModifyThreatByPercent(hitUnit, -100);
         }
@@ -324,7 +311,7 @@ class spell_enveloping_webs : public SpellScript
     }
 };
 
-// 24084 - Mar'li Transform
+// Mar'li Transform (24084)
 class spell_marli_transform : public AuraScript
 {
     PrepareAuraScript(spell_marli_transform);

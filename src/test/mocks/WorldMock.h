@@ -19,8 +19,8 @@
 #define AZEROTHCORE_WORLDMOCK_H
 
 #include "ArenaSpectator.h"
-#include "IWorld.h"
 #include "Duration.h"
+#include "IWorld.h"
 #include "gmock/gmock.h"
 
 #pragma GCC diagnostic push
@@ -72,10 +72,6 @@ public:
     MOCK_METHOD(uint16, GetConfigMaxSkillValue, (), (const));
     MOCK_METHOD(void, SetInitialWorldSettings, ());
     MOCK_METHOD(void, LoadConfigSettings, (bool reload), ());
-    void SendWorldText(uint32 string_id, ...) override {}
-    void SendWorldTextOptional(uint32 string_id, uint32 flag, ...) override {}
-    MOCK_METHOD(void, SendGlobalText, (const char* text, WorldSession* self), ());
-    void SendGMText(uint32 string_id, ...) override {}
     MOCK_METHOD(void, SendGlobalMessage, (WorldPacket const* packet, WorldSession* self, TeamId teamId), ());
     MOCK_METHOD(void, SendGlobalGMMessage, (WorldPacket const* packet, WorldSession* self, TeamId teamId), ());
     MOCK_METHOD(bool, SendZoneMessage, (uint32 zone, WorldPacket const* packet, WorldSession* self, TeamId teamId), ());
@@ -120,6 +116,7 @@ public:
     MOCK_METHOD(std::string const&, GetRealmName, (), (const));
     MOCK_METHOD(void, SetRealmName, (std::string name), ());
     MOCK_METHOD(void, RemoveOldCorpses, ());
+    MOCK_METHOD(void, DoForAllOnlinePlayers, (std::function<void(Player*)> exec));
 };
 #pragma GCC diagnostic pop
 

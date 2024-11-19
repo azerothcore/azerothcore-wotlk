@@ -16,17 +16,19 @@
  */
 
 #include "CellImpl.h"
+#include "CreatureScript.h"
 #include "GameObjectAI.h"
+#include "GameObjectScript.h"
 #include "GossipDef.h"
 #include "GridNotifiers.h"
 #include "Group.h"
 #include "LFGMgr.h"
 #include "PassiveAI.h"
-#include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 #include "ScriptedGossip.h"
 #include "SpellAuraEffects.h"
 #include "SpellScript.h"
+#include "SpellScriptLoader.h"
 #include "TaskScheduler.h"
 
 /// @todo: this import is not necessary for compilation and marked as unused by the IDE
@@ -1089,6 +1091,8 @@ struct boss_headless_horseman : public ScriptedAI
                 me->ReplaceAllUnitFlags(UNIT_FLAG_NONE);
                 me->StopMoving();
 
+                me->SetDisableGravity(false);
+
                 me->SetInCombatWithZone();
                 inFight = true;
                 events.ScheduleEvent(EVENT_HORSEMAN_FOLLOW, 500ms);
@@ -1185,6 +1189,7 @@ struct boss_headless_horseman : public ScriptedAI
                                 trigger->CastSpell(trigger, SPELL_EARTH_EXPLOSION, true);
                             break;
                         case 3:
+                            me->SetDisableGravity(true);
                             me->GetMotionMaster()->MovePath(236820, false);
                             me->CastSpell(me, SPELL_SHAKE_CAMERA_SMALL, true);
                             player->Say(TALK_PLAYER_FELT_DEATH);

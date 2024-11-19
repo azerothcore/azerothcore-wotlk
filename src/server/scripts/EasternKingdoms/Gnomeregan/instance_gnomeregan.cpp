@@ -15,11 +15,13 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "CreatureScript.h"
+#include "InstanceMapScript.h"
 #include "InstanceScript.h"
 #include "PassiveAI.h"
 #include "Player.h"
-#include "ScriptMgr.h"
 #include "SpellScript.h"
+#include "SpellScriptLoader.h"
 #include "gnomeregan.h"
 
 class instance_gnomeregan : public InstanceMapScript
@@ -60,7 +62,7 @@ public:
                 case GO_CAVE_IN_2:
                 case GO_WORKSHOP_DOOR:
                 case GO_FINAL_CHAMBER_DOOR:
-                    gameobject->UpdateSaveToDb(true);
+                    gameobject->AllowSaveToDB(true);
                     break;
             }
         }
@@ -151,30 +153,19 @@ public:
     };
 };
 
-class spell_gnomeregan_radiation_bolt : public SpellScriptLoader
+class spell_gnomeregan_radiation_bolt : public SpellScript
 {
-public:
-    spell_gnomeregan_radiation_bolt() : SpellScriptLoader("spell_gnomeregan_radiation_bolt") { }
+    PrepareSpellScript(spell_gnomeregan_radiation_bolt);
 
-    class spell_gnomeregan_radiation_bolt_SpellScript : public SpellScript
+    void HandleTriggerSpell(SpellEffIndex effIndex)
     {
-        PrepareSpellScript(spell_gnomeregan_radiation_bolt_SpellScript);
+        if (roll_chance_i(80))
+            PreventHitDefaultEffect(effIndex);
+    }
 
-        void HandleTriggerSpell(SpellEffIndex effIndex)
-        {
-            if (roll_chance_i(80))
-                PreventHitDefaultEffect(effIndex);
-        }
-
-        void Register() override
-        {
-            OnEffectHit += SpellEffectFn(spell_gnomeregan_radiation_bolt_SpellScript::HandleTriggerSpell, EFFECT_1, SPELL_EFFECT_TRIGGER_SPELL);
-        }
-    };
-
-    SpellScript* GetSpellScript() const override
+    void Register() override
     {
-        return new spell_gnomeregan_radiation_bolt_SpellScript;
+        OnEffectHit += SpellEffectFn(spell_gnomeregan_radiation_bolt::HandleTriggerSpell, EFFECT_1, SPELL_EFFECT_TRIGGER_SPELL);
     }
 };
 
@@ -182,5 +173,5 @@ void AddSC_instance_gnomeregan()
 {
     new instance_gnomeregan();
     new npc_kernobee();
-    new spell_gnomeregan_radiation_bolt();
+    RegisterSpellScript(spell_gnomeregan_radiation_bolt);
 }

@@ -19,6 +19,7 @@
 #include "Define.h"
 #include "SmartEnum.h"
 #include <stdexcept>
+#include <vector>
 
 namespace Acore::Impl::EnumUtilsImpl
 {
@@ -46,10 +47,10 @@ AC_API_EXPORT EnumText EnumUtils<Races>::ToString(Races value)
 }
 
 template <>
-AC_API_EXPORT size_t EnumUtils<Races>::Count() { return 10; }
+AC_API_EXPORT std::size_t EnumUtils<Races>::Count() { return 10; }
 
 template <>
-AC_API_EXPORT Races EnumUtils<Races>::FromIndex(size_t index)
+AC_API_EXPORT Races EnumUtils<Races>::FromIndex(std::size_t index)
 {
     switch (index)
     {
@@ -68,7 +69,7 @@ AC_API_EXPORT Races EnumUtils<Races>::FromIndex(size_t index)
 }
 
 template <>
-AC_API_EXPORT size_t EnumUtils<Races>::ToIndex(Races value)
+AC_API_EXPORT std::size_t EnumUtils<Races>::ToIndex(Races value)
 {
     switch (value)
     {
@@ -109,10 +110,10 @@ AC_API_EXPORT EnumText EnumUtils<Classes>::ToString(Classes value)
 }
 
 template <>
-AC_API_EXPORT size_t EnumUtils<Classes>::Count() { return 10; }
+AC_API_EXPORT std::size_t EnumUtils<Classes>::Count() { return 10; }
 
 template <>
-AC_API_EXPORT Classes EnumUtils<Classes>::FromIndex(size_t index)
+AC_API_EXPORT Classes EnumUtils<Classes>::FromIndex(std::size_t index)
 {
     switch (index)
     {
@@ -131,7 +132,7 @@ AC_API_EXPORT Classes EnumUtils<Classes>::FromIndex(size_t index)
 }
 
 template <>
-AC_API_EXPORT size_t EnumUtils<Classes>::ToIndex(Classes value)
+AC_API_EXPORT std::size_t EnumUtils<Classes>::ToIndex(Classes value)
 {
     switch (value)
     {
@@ -194,10 +195,10 @@ AC_API_EXPORT EnumText EnumUtils<SpellAttr0>::ToString(SpellAttr0 value)
 }
 
 template <>
-AC_API_EXPORT size_t EnumUtils<SpellAttr0>::Count() { return 32; }
+AC_API_EXPORT std::size_t EnumUtils<SpellAttr0>::Count() { return 32; }
 
 template <>
-AC_API_EXPORT SpellAttr0 EnumUtils<SpellAttr0>::FromIndex(size_t index)
+AC_API_EXPORT SpellAttr0 EnumUtils<SpellAttr0>::FromIndex(std::size_t index)
 {
     switch (index)
     {
@@ -238,7 +239,7 @@ AC_API_EXPORT SpellAttr0 EnumUtils<SpellAttr0>::FromIndex(size_t index)
 }
 
 template <>
-AC_API_EXPORT size_t EnumUtils<SpellAttr0>::ToIndex(SpellAttr0 value)
+AC_API_EXPORT std::size_t EnumUtils<SpellAttr0>::ToIndex(SpellAttr0 value)
 {
     switch (value)
     {
@@ -311,7 +312,7 @@ AC_API_EXPORT EnumText EnumUtils<SpellAttr1>::ToString(SpellAttr1 value)
         case SPELL_ATTR1_FINISHING_MOVE_DURATION: return { "SPELL_ATTR1_FINISHING_MOVE_DURATION", "Requires combo points (type 2)", "" };
         case SPELL_ATTR1_IGNORE_OWNERS_DEATH: return { "SPELL_ATTR1_IGNORE_OWNERS_DEATH", "Unknwon attribute 23@Attr1", "" };
         case SPELL_ATTR1_SPECIAL_SKILLUP: return { "SPELL_ATTR1_SPECIAL_SKILLUP", "Fishing (client only)", "" };
-        case SPELL_ATTR1_AURA_STAYS_AFTER_COMBAT: return { "SPELL_ATTR1_AURA_STAYS_AFTER_COMBAT", "Unknown attribute 25@Attr1", "" };
+        case SPELL_ATTR1_AURA_STAYS_AFTER_COMBAT: return { "SPELL_ATTR1_AURA_STAYS_AFTER_COMBAT", "Aura stays after combat", "Aura will not be removed when the unit leaves combat" };
         case SPELL_ATTR1_REQUIRE_ALL_TARGETS: return { "SPELL_ATTR1_REQUIRE_ALL_TARGETS", "Unknown attribute 26@Attr1", "Related to [target=focus] and [target=mouseover] macros?" };
         case SPELL_ATTR1_DISCOUNT_POWER_ON_MISS: return { "SPELL_ATTR1_DISCOUNT_POWER_ON_MISS", "Unknown attribute 27@Attr1", "Melee spell?" };
         case SPELL_ATTR1_NO_AURA_ICON: return { "SPELL_ATTR1_NO_AURA_ICON", "Hide in aura bar (client only)", "" };
@@ -323,10 +324,10 @@ AC_API_EXPORT EnumText EnumUtils<SpellAttr1>::ToString(SpellAttr1 value)
 }
 
 template <>
-AC_API_EXPORT size_t EnumUtils<SpellAttr1>::Count() { return 32; }
+AC_API_EXPORT std::size_t EnumUtils<SpellAttr1>::Count() { return 32; }
 
 template <>
-AC_API_EXPORT SpellAttr1 EnumUtils<SpellAttr1>::FromIndex(size_t index)
+AC_API_EXPORT SpellAttr1 EnumUtils<SpellAttr1>::FromIndex(std::size_t index)
 {
     switch (index)
     {
@@ -367,7 +368,7 @@ AC_API_EXPORT SpellAttr1 EnumUtils<SpellAttr1>::FromIndex(size_t index)
 }
 
 template <>
-AC_API_EXPORT size_t EnumUtils<SpellAttr1>::ToIndex(SpellAttr1 value)
+AC_API_EXPORT std::size_t EnumUtils<SpellAttr1>::ToIndex(SpellAttr1 value)
 {
     switch (value)
     {
@@ -452,10 +453,10 @@ AC_API_EXPORT EnumText EnumUtils<SpellAttr2>::ToString(SpellAttr2 value)
 }
 
 template <>
-AC_API_EXPORT size_t EnumUtils<SpellAttr2>::Count() { return 32; }
+AC_API_EXPORT std::size_t EnumUtils<SpellAttr2>::Count() { return 32; }
 
 template <>
-AC_API_EXPORT SpellAttr2 EnumUtils<SpellAttr2>::FromIndex(size_t index)
+AC_API_EXPORT SpellAttr2 EnumUtils<SpellAttr2>::FromIndex(std::size_t index)
 {
     switch (index)
     {
@@ -496,7 +497,7 @@ AC_API_EXPORT SpellAttr2 EnumUtils<SpellAttr2>::FromIndex(size_t index)
 }
 
 template <>
-AC_API_EXPORT size_t EnumUtils<SpellAttr2>::ToIndex(SpellAttr2 value)
+AC_API_EXPORT std::size_t EnumUtils<SpellAttr2>::ToIndex(SpellAttr2 value)
 {
     switch (value)
     {
@@ -560,8 +561,8 @@ AC_API_EXPORT EnumText EnumUtils<SpellAttr3>::ToString(SpellAttr3 value)
         case SPELL_ATTR3_HIDE_CHANNEL_BAR: return { "SPELL_ATTR3_HIDE_CHANNEL_BAR", "Do not display channel bar (client only)", "" };
         case SPELL_ATTR3_HIDE_IN_RAID_FILTER: return { "SPELL_ATTR3_HIDE_IN_RAID_FILTER", "Honorless Target", "" };
         case SPELL_ATTR3_NORMAL_RANGED_ATTACK: return { "SPELL_ATTR3_NORMAL_RANGED_ATTACK", "Unknown attribute 15@Attr3", "Auto Shoot, Shoot, Throw - ranged normal attack attribute?" };
-        case SPELL_ATTR3_SUPRESS_CASTER_PROCS: return { "SPELL_ATTR3_SUPRESS_CASTER_PROCS", "Cannot trigger procs", "" };
-        case SPELL_ATTR3_SUPRESS_TARGET_PROCS: return { "SPELL_ATTR3_SUPRESS_TARGET_PROCS", "No initial aggro", "" };
+        case SPELL_ATTR3_SUPPRESS_CASTER_PROCS: return { "SPELL_ATTR3_SUPPRESS_CASTER_PROCS", "Cannot trigger procs", "" };
+        case SPELL_ATTR3_SUPPRESS_TARGET_PROCS: return { "SPELL_ATTR3_SUPPRESS_TARGET_PROCS", "No initial aggro", "" };
         case SPELL_ATTR3_ALWAYS_HIT: return { "SPELL_ATTR3_ALWAYS_HIT", "Ignore hit result", "Spell cannot miss, or be dodged/parried/blocked" };
         case SPELL_ATTR3_INSTANT_TARGET_PROCS: return { "SPELL_ATTR3_INSTANT_TARGET_PROCS", "Cannot trigger spells during aura proc", "" };
         case SPELL_ATTR3_ALLOW_AURA_WHILE_DEAD: return { "SPELL_ATTR3_ALLOW_AURA_WHILE_DEAD", "Persists through death", "" };
@@ -581,10 +582,10 @@ AC_API_EXPORT EnumText EnumUtils<SpellAttr3>::ToString(SpellAttr3 value)
 }
 
 template <>
-AC_API_EXPORT size_t EnumUtils<SpellAttr3>::Count() { return 32; }
+AC_API_EXPORT std::size_t EnumUtils<SpellAttr3>::Count() { return 32; }
 
 template <>
-AC_API_EXPORT SpellAttr3 EnumUtils<SpellAttr3>::FromIndex(size_t index)
+AC_API_EXPORT SpellAttr3 EnumUtils<SpellAttr3>::FromIndex(std::size_t index)
 {
     switch (index)
     {
@@ -604,8 +605,8 @@ AC_API_EXPORT SpellAttr3 EnumUtils<SpellAttr3>::FromIndex(size_t index)
         case 13: return SPELL_ATTR3_HIDE_CHANNEL_BAR;
         case 14: return SPELL_ATTR3_HIDE_IN_RAID_FILTER;
         case 15: return SPELL_ATTR3_NORMAL_RANGED_ATTACK;
-        case 16: return SPELL_ATTR3_SUPRESS_CASTER_PROCS;
-        case 17: return SPELL_ATTR3_SUPRESS_TARGET_PROCS;
+        case 16: return SPELL_ATTR3_SUPPRESS_CASTER_PROCS;
+        case 17: return SPELL_ATTR3_SUPPRESS_TARGET_PROCS;
         case 18: return SPELL_ATTR3_ALWAYS_HIT;
         case 19: return SPELL_ATTR3_INSTANT_TARGET_PROCS;
         case 20: return SPELL_ATTR3_ALLOW_AURA_WHILE_DEAD;
@@ -625,7 +626,7 @@ AC_API_EXPORT SpellAttr3 EnumUtils<SpellAttr3>::FromIndex(size_t index)
 }
 
 template <>
-AC_API_EXPORT size_t EnumUtils<SpellAttr3>::ToIndex(SpellAttr3 value)
+AC_API_EXPORT std::size_t EnumUtils<SpellAttr3>::ToIndex(SpellAttr3 value)
 {
     switch (value)
     {
@@ -645,8 +646,8 @@ AC_API_EXPORT size_t EnumUtils<SpellAttr3>::ToIndex(SpellAttr3 value)
         case SPELL_ATTR3_HIDE_CHANNEL_BAR: return 13;
         case SPELL_ATTR3_HIDE_IN_RAID_FILTER: return 14;
         case SPELL_ATTR3_NORMAL_RANGED_ATTACK: return 15;
-        case SPELL_ATTR3_SUPRESS_CASTER_PROCS: return 16;
-        case SPELL_ATTR3_SUPRESS_TARGET_PROCS: return 17;
+        case SPELL_ATTR3_SUPPRESS_CASTER_PROCS: return 16;
+        case SPELL_ATTR3_SUPPRESS_TARGET_PROCS: return 17;
         case SPELL_ATTR3_ALWAYS_HIT: return 18;
         case SPELL_ATTR3_INSTANT_TARGET_PROCS: return 19;
         case SPELL_ATTR3_ALLOW_AURA_WHILE_DEAD: return 20;
@@ -696,7 +697,7 @@ AC_API_EXPORT EnumText EnumUtils<SpellAttr4>::ToString(SpellAttr4 value)
         case SPELL_ATTR4_AURA_NEVER_BOUNCES: return { "SPELL_ATTR4_AURA_NEVER_BOUNCES", "Allow self-cast to override stronger aura (client only)", "" };
         case SPELL_ATTR4_ALLOW_ENETRING_ARENA: return { "SPELL_ATTR4_ALLOW_ENETRING_ARENA", "Keep when entering arena", "" };
         case SPELL_ATTR4_PROC_SUPPRESS_SWING_ANIM: return { "SPELL_ATTR4_PROC_SUPPRESS_SWING_ANIM", "Unknown attribute 22@Attr4", "Seal of Command (42058,57770) and Gymer's Smash 55426" };
-        case SPELL_ATTR4_SUPRESS_WEAPON_PROCS: return { "SPELL_ATTR4_SUPRESS_WEAPON_PROCS", "Cannot trigger item spells", "" };
+        case SPELL_ATTR4_SUPPRESS_WEAPON_PROCS: return { "SPELL_ATTR4_SUPPRESS_WEAPON_PROCS", "Cannot trigger item spells", "" };
         case SPELL_ATTR4_AUTO_RANGED_COMBAT: return { "SPELL_ATTR4_AUTO_RANGED_COMBAT", "Unknown attribute 24@Attr4", "Shoot-type spell?" };
         case SPELL_ATTR4_OWNER_POWER_SCALING: return { "SPELL_ATTR4_OWNER_POWER_SCALING", "Pet Scaling aura", "" };
         case SPELL_ATTR4_ONLY_FLYING_AREAS: return { "SPELL_ATTR4_ONLY_FLYING_AREAS", "Only in Outland/Northrend", "" };
@@ -710,10 +711,10 @@ AC_API_EXPORT EnumText EnumUtils<SpellAttr4>::ToString(SpellAttr4 value)
 }
 
 template <>
-AC_API_EXPORT size_t EnumUtils<SpellAttr4>::Count() { return 32; }
+AC_API_EXPORT std::size_t EnumUtils<SpellAttr4>::Count() { return 32; }
 
 template <>
-AC_API_EXPORT SpellAttr4 EnumUtils<SpellAttr4>::FromIndex(size_t index)
+AC_API_EXPORT SpellAttr4 EnumUtils<SpellAttr4>::FromIndex(std::size_t index)
 {
     switch (index)
     {
@@ -740,7 +741,7 @@ AC_API_EXPORT SpellAttr4 EnumUtils<SpellAttr4>::FromIndex(size_t index)
         case 20: return SPELL_ATTR4_AURA_NEVER_BOUNCES;
         case 21: return SPELL_ATTR4_ALLOW_ENETRING_ARENA;
         case 22: return SPELL_ATTR4_PROC_SUPPRESS_SWING_ANIM;
-        case 23: return SPELL_ATTR4_SUPRESS_WEAPON_PROCS;
+        case 23: return SPELL_ATTR4_SUPPRESS_WEAPON_PROCS;
         case 24: return SPELL_ATTR4_AUTO_RANGED_COMBAT;
         case 25: return SPELL_ATTR4_OWNER_POWER_SCALING;
         case 26: return SPELL_ATTR4_ONLY_FLYING_AREAS;
@@ -754,7 +755,7 @@ AC_API_EXPORT SpellAttr4 EnumUtils<SpellAttr4>::FromIndex(size_t index)
 }
 
 template <>
-AC_API_EXPORT size_t EnumUtils<SpellAttr4>::ToIndex(SpellAttr4 value)
+AC_API_EXPORT std::size_t EnumUtils<SpellAttr4>::ToIndex(SpellAttr4 value)
 {
     switch (value)
     {
@@ -781,7 +782,7 @@ AC_API_EXPORT size_t EnumUtils<SpellAttr4>::ToIndex(SpellAttr4 value)
         case SPELL_ATTR4_AURA_NEVER_BOUNCES: return 20;
         case SPELL_ATTR4_ALLOW_ENETRING_ARENA: return 21;
         case SPELL_ATTR4_PROC_SUPPRESS_SWING_ANIM: return 22;
-        case SPELL_ATTR4_SUPRESS_WEAPON_PROCS: return 23;
+        case SPELL_ATTR4_SUPPRESS_WEAPON_PROCS: return 23;
         case SPELL_ATTR4_AUTO_RANGED_COMBAT: return 24;
         case SPELL_ATTR4_OWNER_POWER_SCALING: return 25;
         case SPELL_ATTR4_ONLY_FLYING_AREAS: return 26;
@@ -818,7 +819,7 @@ AC_API_EXPORT EnumText EnumUtils<SpellAttr5>::ToString(SpellAttr5 value)
         case SPELL_ATTR5_SPELL_HASTE_AFFECTS_PERIODIC: return { "SPELL_ATTR5_SPELL_HASTE_AFFECTS_PERIODIC", "Duration scales with Haste Rating", "" };
         case SPELL_ATTR5_NOT_AVALIABLE_WHILE_CHARMED: return { "SPELL_ATTR5_NOT_AVALIABLE_WHILE_CHARMED", "Charmed units cannot cast this spell", "" };
         case SPELL_ATTR5_TREAT_AS_AREA_EFFECT: return { "SPELL_ATTR5_TREAT_AS_AREA_EFFECT", "Unknown attribute 15@Attr5", "Related to multi-target spells?" };
-        case SPELL_ATTR5_AURA_AFFECTS_NOT_JUST_REQ_EQUIPED_ITEM: return { "SPELL_ATTR5_AURA_AFFECTS_NOT_JUST_REQ_EQUIPED_ITEM", "DESCRIPTION this allows spells with EquippedItemClass to affect spells from other items if the required item is equipped", "" };
+        case SPELL_ATTR5_AURA_AFFECTS_NOT_JUST_REQ_EQUIPPED_ITEM: return { "SPELL_ATTR5_AURA_AFFECTS_NOT_JUST_REQ_EQUIPPED_ITEM", "DESCRIPTION this allows spells with EquippedItemClass to affect spells from other items if the required item is equipped", "" };
         case SPELL_ATTR5_ALLOW_WHILE_FLEEING: return { "SPELL_ATTR5_ALLOW_WHILE_FLEEING", "Usable while feared", "" };
         case SPELL_ATTR5_ALLOW_WHILE_CONFUSED: return { "SPELL_ATTR5_ALLOW_WHILE_CONFUSED", "Usable while confused", "" };
         case SPELL_ATTR5_AI_DOESNT_FACE_TARGET: return { "SPELL_ATTR5_AI_DOESNT_FACE_TARGET", "Do not auto-turn while casting", "" };
@@ -839,10 +840,10 @@ AC_API_EXPORT EnumText EnumUtils<SpellAttr5>::ToString(SpellAttr5 value)
 }
 
 template <>
-AC_API_EXPORT size_t EnumUtils<SpellAttr5>::Count() { return 32; }
+AC_API_EXPORT std::size_t EnumUtils<SpellAttr5>::Count() { return 32; }
 
 template <>
-AC_API_EXPORT SpellAttr5 EnumUtils<SpellAttr5>::FromIndex(size_t index)
+AC_API_EXPORT SpellAttr5 EnumUtils<SpellAttr5>::FromIndex(std::size_t index)
 {
     switch (index)
     {
@@ -862,7 +863,7 @@ AC_API_EXPORT SpellAttr5 EnumUtils<SpellAttr5>::FromIndex(size_t index)
         case 13: return SPELL_ATTR5_SPELL_HASTE_AFFECTS_PERIODIC;
         case 14: return SPELL_ATTR5_NOT_AVALIABLE_WHILE_CHARMED;
         case 15: return SPELL_ATTR5_TREAT_AS_AREA_EFFECT;
-        case 16: return SPELL_ATTR5_AURA_AFFECTS_NOT_JUST_REQ_EQUIPED_ITEM;
+        case 16: return SPELL_ATTR5_AURA_AFFECTS_NOT_JUST_REQ_EQUIPPED_ITEM;
         case 17: return SPELL_ATTR5_ALLOW_WHILE_FLEEING;
         case 18: return SPELL_ATTR5_ALLOW_WHILE_CONFUSED;
         case 19: return SPELL_ATTR5_AI_DOESNT_FACE_TARGET;
@@ -883,7 +884,7 @@ AC_API_EXPORT SpellAttr5 EnumUtils<SpellAttr5>::FromIndex(size_t index)
 }
 
 template <>
-AC_API_EXPORT size_t EnumUtils<SpellAttr5>::ToIndex(SpellAttr5 value)
+AC_API_EXPORT std::size_t EnumUtils<SpellAttr5>::ToIndex(SpellAttr5 value)
 {
     switch (value)
     {
@@ -903,7 +904,7 @@ AC_API_EXPORT size_t EnumUtils<SpellAttr5>::ToIndex(SpellAttr5 value)
         case SPELL_ATTR5_SPELL_HASTE_AFFECTS_PERIODIC: return 13;
         case SPELL_ATTR5_NOT_AVALIABLE_WHILE_CHARMED: return 14;
         case SPELL_ATTR5_TREAT_AS_AREA_EFFECT: return 15;
-        case SPELL_ATTR5_AURA_AFFECTS_NOT_JUST_REQ_EQUIPED_ITEM: return 16;
+        case SPELL_ATTR5_AURA_AFFECTS_NOT_JUST_REQ_EQUIPPED_ITEM: return 16;
         case SPELL_ATTR5_ALLOW_WHILE_FLEEING: return 17;
         case SPELL_ATTR5_ALLOW_WHILE_CONFUSED: return 18;
         case SPELL_ATTR5_AI_DOESNT_FACE_TARGET: return 19;
@@ -946,7 +947,7 @@ AC_API_EXPORT EnumText EnumUtils<SpellAttr6>::ToString(SpellAttr6 value)
         case SPELL_ATTR6_ALLOW_WHILE_RIDING_VEHICLE: return { "SPELL_ATTR6_ALLOW_WHILE_RIDING_VEHICLE", "Castable while caster is on vehicle", "" };
         case SPELL_ATTR6_IGNORE_PHASE_SHIFT: return { "SPELL_ATTR6_IGNORE_PHASE_SHIFT", "Can target invisible units", "" };
         case SPELL_ATTR6_AI_PRIMARY_RANGED_ATTACK: return { "SPELL_ATTR6_AI_PRIMARY_RANGED_ATTACK", "Unknown attribute 14@Attr6", "" };
-        case SPELL_ATTR6_NO_PUSHBACK: return { "SPELL_ATTR6_NO_PUSHBACK", "Unknown attribute 15@Attr6", "only 54368, 67892" };
+        case SPELL_ATTR6_NO_PUSHBACK: return { "SPELL_ATTR6_NO_PUSHBACK", "Not affected by pushback", "Casts/Channels will not affected by pushback" };
         case SPELL_ATTR6_NO_JUMP_PATHING: return { "SPELL_ATTR6_NO_JUMP_PATHING", "Unknown attribute 16@Attr6", "" };
         case SPELL_ATTR6_ALLOW_EQUIP_WHILE_CASTING: return { "SPELL_ATTR6_ALLOW_EQUIP_WHILE_CASTING", "Unknown attribute 17@Attr6", "Mount related?" };
         case SPELL_ATTR6_ORIGINATE_FROM_CONTROLLER: return { "SPELL_ATTR6_ORIGINATE_FROM_CONTROLLER", "Spell is cast by charmer", "Client will prevent casting if not possessed, charmer will be caster for all intents and purposes" };
@@ -968,10 +969,10 @@ AC_API_EXPORT EnumText EnumUtils<SpellAttr6>::ToString(SpellAttr6 value)
 }
 
 template <>
-AC_API_EXPORT size_t EnumUtils<SpellAttr6>::Count() { return 32; }
+AC_API_EXPORT std::size_t EnumUtils<SpellAttr6>::Count() { return 32; }
 
 template <>
-AC_API_EXPORT SpellAttr6 EnumUtils<SpellAttr6>::FromIndex(size_t index)
+AC_API_EXPORT SpellAttr6 EnumUtils<SpellAttr6>::FromIndex(std::size_t index)
 {
     switch (index)
     {
@@ -1012,7 +1013,7 @@ AC_API_EXPORT SpellAttr6 EnumUtils<SpellAttr6>::FromIndex(size_t index)
 }
 
 template <>
-AC_API_EXPORT size_t EnumUtils<SpellAttr6>::ToIndex(SpellAttr6 value)
+AC_API_EXPORT std::size_t EnumUtils<SpellAttr6>::ToIndex(SpellAttr6 value)
 {
     switch (value)
     {
@@ -1097,10 +1098,10 @@ AC_API_EXPORT EnumText EnumUtils<SpellAttr7>::ToString(SpellAttr7 value)
 }
 
 template <>
-AC_API_EXPORT size_t EnumUtils<SpellAttr7>::Count() { return 32; }
+AC_API_EXPORT std::size_t EnumUtils<SpellAttr7>::Count() { return 32; }
 
 template <>
-AC_API_EXPORT SpellAttr7 EnumUtils<SpellAttr7>::FromIndex(size_t index)
+AC_API_EXPORT SpellAttr7 EnumUtils<SpellAttr7>::FromIndex(std::size_t index)
 {
     switch (index)
     {
@@ -1141,7 +1142,7 @@ AC_API_EXPORT SpellAttr7 EnumUtils<SpellAttr7>::FromIndex(size_t index)
 }
 
 template <>
-AC_API_EXPORT size_t EnumUtils<SpellAttr7>::ToIndex(SpellAttr7 value)
+AC_API_EXPORT std::size_t EnumUtils<SpellAttr7>::ToIndex(SpellAttr7 value)
 {
     switch (value)
     {
@@ -1383,10 +1384,10 @@ AC_API_EXPORT EnumText EnumUtils<SpellCastResult>::ToString(SpellCastResult valu
 }
 
 template <>
-AC_API_EXPORT size_t EnumUtils<SpellCastResult>::Count() { return 189; }
+AC_API_EXPORT std::size_t EnumUtils<SpellCastResult>::Count() { return 189; }
 
 template <>
-AC_API_EXPORT SpellCastResult EnumUtils<SpellCastResult>::FromIndex(size_t index)
+AC_API_EXPORT SpellCastResult EnumUtils<SpellCastResult>::FromIndex(std::size_t index)
 {
     switch (index)
     {
@@ -1584,7 +1585,7 @@ AC_API_EXPORT SpellCastResult EnumUtils<SpellCastResult>::FromIndex(size_t index
 }
 
 template <>
-AC_API_EXPORT size_t EnumUtils<SpellCastResult>::ToIndex(SpellCastResult value)
+AC_API_EXPORT std::size_t EnumUtils<SpellCastResult>::ToIndex(SpellCastResult value)
 {
     switch (value)
     {
@@ -1812,10 +1813,10 @@ AC_API_EXPORT EnumText EnumUtils<AuraStateType>::ToString(AuraStateType value)
 }
 
 template <>
-AC_API_EXPORT size_t EnumUtils<AuraStateType>::Count() { return 18; }
+AC_API_EXPORT std::size_t EnumUtils<AuraStateType>::Count() { return 18; }
 
 template <>
-AC_API_EXPORT AuraStateType EnumUtils<AuraStateType>::FromIndex(size_t index)
+AC_API_EXPORT AuraStateType EnumUtils<AuraStateType>::FromIndex(std::size_t index)
 {
     switch (index)
     {
@@ -1842,7 +1843,7 @@ AC_API_EXPORT AuraStateType EnumUtils<AuraStateType>::FromIndex(size_t index)
 }
 
 template <>
-AC_API_EXPORT size_t EnumUtils<AuraStateType>::ToIndex(AuraStateType value)
+AC_API_EXPORT std::size_t EnumUtils<AuraStateType>::ToIndex(AuraStateType value)
 {
     switch (value)
     {
@@ -1913,10 +1914,10 @@ AC_API_EXPORT EnumText EnumUtils<Mechanics>::ToString(Mechanics value)
 }
 
 template <>
-AC_API_EXPORT size_t EnumUtils<Mechanics>::Count() { return 32; }
+AC_API_EXPORT std::size_t EnumUtils<Mechanics>::Count() { return 32; }
 
 template <>
-AC_API_EXPORT Mechanics EnumUtils<Mechanics>::FromIndex(size_t index)
+AC_API_EXPORT Mechanics EnumUtils<Mechanics>::FromIndex(std::size_t index)
 {
     switch (index)
     {
@@ -1957,7 +1958,7 @@ AC_API_EXPORT Mechanics EnumUtils<Mechanics>::FromIndex(size_t index)
 }
 
 template <>
-AC_API_EXPORT size_t EnumUtils<Mechanics>::ToIndex(Mechanics value)
+AC_API_EXPORT std::size_t EnumUtils<Mechanics>::ToIndex(Mechanics value)
 {
     switch (value)
     {
@@ -2184,10 +2185,10 @@ AC_API_EXPORT EnumText EnumUtils<Emote>::ToString(Emote value)
 }
 
 template <>
-AC_API_EXPORT size_t EnumUtils<Emote>::Count() { return 174; }
+AC_API_EXPORT std::size_t EnumUtils<Emote>::Count() { return 174; }
 
 template <>
-AC_API_EXPORT Emote EnumUtils<Emote>::FromIndex(size_t index)
+AC_API_EXPORT Emote EnumUtils<Emote>::FromIndex(std::size_t index)
 {
     switch (index)
     {
@@ -2370,7 +2371,7 @@ AC_API_EXPORT Emote EnumUtils<Emote>::FromIndex(size_t index)
 }
 
 template <>
-AC_API_EXPORT size_t EnumUtils<Emote>::ToIndex(Emote value)
+AC_API_EXPORT std::size_t EnumUtils<Emote>::ToIndex(Emote value)
 {
     switch (value)
     {
@@ -2618,10 +2619,10 @@ AC_API_EXPORT EnumText EnumUtils<ChatMsg>::ToString(ChatMsg value)
 }
 
 template <>
-AC_API_EXPORT size_t EnumUtils<ChatMsg>::Count() { return 53; }
+AC_API_EXPORT std::size_t EnumUtils<ChatMsg>::Count() { return 53; }
 
 template <>
-AC_API_EXPORT ChatMsg EnumUtils<ChatMsg>::FromIndex(size_t index)
+AC_API_EXPORT ChatMsg EnumUtils<ChatMsg>::FromIndex(std::size_t index)
 {
     switch (index)
     {
@@ -2683,7 +2684,7 @@ AC_API_EXPORT ChatMsg EnumUtils<ChatMsg>::FromIndex(size_t index)
 }
 
 template <>
-AC_API_EXPORT size_t EnumUtils<ChatMsg>::ToIndex(ChatMsg value)
+AC_API_EXPORT std::size_t EnumUtils<ChatMsg>::ToIndex(ChatMsg value)
 {
     switch (value)
     {

@@ -17,7 +17,6 @@
 
 #include "DBCFileLoader.h"
 #include "Errors.h"
-#include <stdio.h>
 #include <string.h>
 
 DBCFileLoader::DBCFileLoader() : recordSize(0), recordCount(0), fieldCount(0), stringSize(0), fieldsOffset(nullptr), data(nullptr), stringTable(nullptr) { }
@@ -120,7 +119,7 @@ DBCFileLoader::~DBCFileLoader()
     delete[] fieldsOffset;
 }
 
-DBCFileLoader::Record DBCFileLoader::getRecord(size_t id)
+DBCFileLoader::Record DBCFileLoader::getRecord(std::size_t id)
 {
     ASSERT(data);
     return Record(*this, data + id * recordSize);

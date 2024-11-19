@@ -16,6 +16,7 @@
  */
 
 #include "InstanceScript.h"
+#include "Chat.h"
 #include "Creature.h"
 #include "DatabaseEnv.h"
 #include "GameObject.h"
@@ -56,26 +57,30 @@ void InstanceScript::SaveToDB()
 
 void InstanceScript::OnCreatureCreate(Creature* creature)
 {
-    AddObject(creature, true);
-    AddMinion(creature, true);
+    AddObject(creature);
+    AddMinion(creature);
+
+    if (creature->IsSummon())
+        SetSummoner(creature);
 }
 
 void InstanceScript::OnCreatureRemove(Creature* creature)
 {
-    AddObject(creature, false);
-    AddMinion(creature, false);
+    RemoveObject(creature);
+    RemoveMinion(creature);
 }
 
 void InstanceScript::OnGameObjectCreate(GameObject* go)
 {
-    AddObject(go, true);
-    AddDoor(go, true);
+    AddObject(go);
+    AddDoor(go);
+    sScriptMgr->AfterInstanceGameObjectCreate(instance, go);
 }
 
 void InstanceScript::OnGameObjectRemove(GameObject* go)
 {
-    AddObject(go, false);
-    AddDoor(go, false);
+    RemoveObject(go);
+    RemoveDoor(go);
 }
 
 ObjectGuid InstanceScript::GetObjectGuid(uint32 type) const
@@ -192,6 +197,15 @@ void InstanceScript::LoadObjectData(ObjectData const* data, ObjectInfoMap& objec
     }
 }
 
+void InstanceScript::LoadSummonData(ObjectData const* data)
+{
+    while (data->entry)
+    {
+        _summonInfo[data->entry] = data->type;
+        ++data;
+    }
+}
+
 void InstanceScript::UpdateMinionState(Creature* minion, EncounterState state)
 {
     switch (state)
@@ -262,6 +276,11 @@ void InstanceScript::AddObject(Creature* obj, bool add)
     }
 }
 
+void InstanceScript::RemoveObject(Creature* obj)
+{
+    AddObject(obj, false);
+}
+
 void InstanceScript::AddObject(GameObject* obj, bool add)
 {
     ObjectInfoMap::const_iterator j = _gameObjectInfo.find(obj->GetEntry());
@@ -269,6 +288,11 @@ void InstanceScript::AddObject(GameObject* obj, bool add)
     {
         AddObject(obj, j->second, add);
     }
+}
+
+void InstanceScript::RemoveObject(GameObject* obj)
+{
+    AddObject(obj, false);
 }
 
 void InstanceScript::AddObject(WorldObject* obj, uint32 type, bool add)
@@ -285,6 +309,11 @@ void InstanceScript::AddObject(WorldObject* obj, uint32 type, bool add)
             _objectGuids.erase(i);
         }
     }
+}
+
+void InstanceScript::RemoveObject(WorldObject* obj, uint32 type)
+{
+    AddObject(obj, type, false);
 }
 
 void InstanceScript::AddDoor(GameObject* door, bool add)
@@ -309,6 +338,11 @@ void InstanceScript::AddDoor(GameObject* door, bool add)
         UpdateDoorState(door);
 }
 
+void InstanceScript::RemoveDoor(GameObject* door)
+{
+    AddDoor(door, false);
+}
+
 void InstanceScript::AddMinion(Creature* minion, bool add)
 {
     MinionInfoMap::iterator itr = minions.find(minion->GetEntry());
@@ -319,6 +353,21 @@ void InstanceScript::AddMinion(Creature* minion, bool add)
         itr->second.bossInfo->minion.insert(minion);
     else
         itr->second.bossInfo->minion.erase(minion);
+}
+
+void InstanceScript::RemoveMinion(Creature* minion)
+{
+    AddMinion(minion, false);
+}
+
+void InstanceScript::SetSummoner(Creature* creature)
+{
+    auto const& summonData = _summonInfo.find(creature->GetEntry());
+
+    if (summonData != _summonInfo.end())
+        if (Creature* summoner = GetCreature(summonData->second))
+            if (summoner->IsAIEnabled)
+                summoner->AI()->JustSummoned(creature);
 }
 
 bool InstanceScript::SetBossState(uint32 id, EncounterState state)
@@ -366,7 +415,11 @@ void InstanceScript::StorePersistentData(uint32 index, uint32 data)
         return;
     }
 
-    persistentData[index] = data;
+    if (persistentData[index] != data)
+    {
+        persistentData[index] = data;
+        SaveToDB();
+    }
 }
 
 void InstanceScript::DoForAllMinions(uint32 id, std::function<void(Creature*)> exec)
@@ -566,81 +619,66 @@ void InstanceScript::DoUpdateWorldState(uint32 uiStateId, uint32 uiStateData)
 // Send Notify to all players in instance
 void InstanceScript::DoSendNotifyToInstance(char const* format, ...)
 {
-    InstanceMap::PlayerList const& players = instance->GetPlayers();
-
-    if (!players.IsEmpty())
+    if (!instance->GetPlayers().IsEmpty())
     {
         va_list ap;
         va_start(ap, format);
         char buff[1024];
         vsnprintf(buff, 1024, format, ap);
         va_end(ap);
-        for (Map::PlayerList::const_iterator i = players.begin(); i != players.end(); ++i)
-            if (Player* player = i->GetSource())
-                player->GetSession()->SendNotification("%s", buff);
+
+        instance->DoForAllPlayers([&, buff](Player* player)
+        {
+            ChatHandler(player->GetSession()).SendNotification("{}", buff);
+        });
     }
 }
 
 // Update Achievement Criteria for all players in instance
 void InstanceScript::DoUpdateAchievementCriteria(AchievementCriteriaTypes type, uint32 miscValue1 /*= 0*/, uint32 miscValue2 /*= 0*/, Unit* unit /*= nullptr*/)
 {
-    Map::PlayerList const& PlayerList = instance->GetPlayers();
-
-    if (!PlayerList.IsEmpty())
-        for (Map::PlayerList::const_iterator i = PlayerList.begin(); i != PlayerList.end(); ++i)
-            if (Player* player = i->GetSource())
-                player->UpdateAchievementCriteria(type, miscValue1, miscValue2, unit);
+    instance->DoForAllPlayers([&](Player* player)
+    {
+        player->UpdateAchievementCriteria(type, miscValue1, miscValue2, unit);
+    });
 }
 
 // Start timed achievement for all players in instance
 void InstanceScript::DoStartTimedAchievement(AchievementCriteriaTimedTypes type, uint32 entry)
 {
-    Map::PlayerList const& PlayerList = instance->GetPlayers();
-
-    if (!PlayerList.IsEmpty())
-        for (Map::PlayerList::const_iterator i = PlayerList.begin(); i != PlayerList.end(); ++i)
-            if (Player* player = i->GetSource())
-                player->StartTimedAchievement(type, entry);
+    instance->DoForAllPlayers([&](Player* player)
+    {
+        player->StartTimedAchievement(type, entry);
+    });
 }
 
 // Stop timed achievement for all players in instance
 void InstanceScript::DoStopTimedAchievement(AchievementCriteriaTimedTypes type, uint32 entry)
 {
-    Map::PlayerList const& PlayerList = instance->GetPlayers();
-
-    if (!PlayerList.IsEmpty())
-        for (Map::PlayerList::const_iterator i = PlayerList.begin(); i != PlayerList.end(); ++i)
-            if (Player* player = i->GetSource())
-                player->RemoveTimedAchievement(type, entry);
+    instance->DoForAllPlayers([&](Player* player)
+    {
+        player->RemoveTimedAchievement(type, entry);
+    });
 }
 
 // Remove Auras due to Spell on all players in instance
 void InstanceScript::DoRemoveAurasDueToSpellOnPlayers(uint32 spell)
 {
-    Map::PlayerList const& PlayerList = instance->GetPlayers();
-    if (!PlayerList.IsEmpty())
+    instance->DoForAllPlayers([&](Player* player)
     {
-        for (Map::PlayerList::const_iterator itr = PlayerList.begin(); itr != PlayerList.end(); ++itr)
-        {
-            if (Player* player = itr->GetSource())
-            {
-                player->RemoveAurasDueToSpell(spell);
-                if (Pet* pet = player->GetPet())
-                    pet->RemoveAurasDueToSpell(spell);
-            }
-        }
-    }
+        player->RemoveAurasDueToSpell(spell);
+        if (Pet* pet = player->GetPet())
+            pet->RemoveAurasDueToSpell(spell);
+    });
 }
 
 // Cast spell on all players in instance
 void InstanceScript::DoCastSpellOnPlayers(uint32 spell)
 {
-    Map::PlayerList const& PlayerList = instance->GetPlayers();
-
-    if (!PlayerList.IsEmpty())
-        for (Map::PlayerList::const_iterator i = PlayerList.begin(); i != PlayerList.end(); ++i)
-            if (Player* player = i->GetSource())
-                player->CastSpell(player, spell, true);
+    instance->DoForAllPlayers([&](Player* player)
+    {
+        player->CastSpell(player, spell, true);
+    });
 }
 
 void InstanceScript::DoCastSpellOnPlayer(Player* player, uint32 spell, bool includePets /*= false*/, bool includeControlled /*= false*/)
@@ -667,7 +705,7 @@ void InstanceScript::DoCastSpellOnPlayer(Player* player, uint32 spell, bool incl
     for (auto itr2 = player->m_Controlled.begin(); itr2 != player->m_Controlled.end(); ++itr2)
     {
         if (Unit* controlled = *itr2)
-            if (controlled->IsInWorld() && controlled->GetTypeId() == TYPEID_UNIT)
+            if (controlled->IsInWorld() && controlled->IsCreature())
                 controlled->CastSpell(player, spell, true);
     }
 }
@@ -729,6 +767,44 @@ void InstanceScript::SendEncounterUnit(uint32 type, Unit* unit /*= nullptr*/, ui
     instance->SendToPlayers(&data);
 }
 
+void InstanceScript::LoadInstanceSavedGameobjectStateData()
+{
+    _objectStateMap.clear();
+
+    CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_SELECT_INSTANCE_SAVED_DATA);
+    stmt->SetData(0, instance->GetInstanceId());
+
+    if (PreparedQueryResult result = CharacterDatabase.Query(stmt))
+    {
+        Field* fields;
+
+        do
+        {
+            fields = result->Fetch();
+            StoreGameObjectState(fields[0].Get<uint32>(), fields[1].Get<uint8>());
+
+        } while (result->NextRow());
+    }
+}
+
+bool InstanceScript::AllBossesDone() const
+{
+    for (auto const& boss : bosses)
+        if (boss.state != DONE)
+            return false;
+
+    return true;
+}
+
+bool InstanceScript::AllBossesDone(std::initializer_list<uint32> bossIds) const
+{
+    for (auto const& bossId : bossIds)
+        if (!IsBossDone(bossId))
+            return false;
+
+    return true;
+}
+
 std::string InstanceScript::GetBossStateName(uint8 state)
 {
     // See enum EncounterState in InstanceScript.h
@@ -749,6 +825,18 @@ std::string InstanceScript::GetBossStateName(uint8 state)
         default:
             return "INVALID";
     }
+}
+
+uint8 InstanceScript::GetStoredGameObjectState(ObjectGuid::LowType spawnId) const
+{
+    auto i = _objectStateMap.find(spawnId);
+
+    if (i != _objectStateMap.end())
+    {
+        return i->second;
+    }
+
+    return 3; // Any state higher than 2 to get the default state for the object we are loading.
 }
 
 bool InstanceHasScript(WorldObject const* obj, char const* scriptName)

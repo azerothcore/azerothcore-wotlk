@@ -15,10 +15,11 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "CreatureScript.h"
 #include "Player.h"
-#include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 #include "SpellScript.h"
+#include "SpellScriptLoader.h"
 #include "naxxramas.h"
 
 enum Spells
@@ -28,6 +29,7 @@ enum Spells
     SPELL_ENRAGE_25                     = 54427,
     SPELL_DECIMATE_10                   = 28374,
     SPELL_DECIMATE_25                   = 54426,
+    SPELL_DECIMATE_DAMAGE               = 28375,
     SPELL_BERSERK                       = 26662,
     SPELL_INFECTED_WOUND                = 29306,
     SPELL_CHOW_SEARCHER                 = 28404
@@ -139,7 +141,7 @@ public:
             {
                 me->ModifyHealth(int32(me->GetMaxHealth() * 0.05f));
             }
-            if (who->GetTypeId() == TYPEID_PLAYER && pInstance)
+            if (who->IsPlayer() && pInstance)
             {
                 pInstance->SetData(DATA_IMMORTAL_FAIL, 0);
             }
@@ -157,7 +159,7 @@ public:
                 return false;
 
             Map::PlayerList const& pList = me->GetMap()->GetPlayers();
-            for (const auto& itr : pList)
+            for (auto const& itr : pList)
             {
                 Player* player = itr.GetSource();
                 if (!player || !player->IsAlive())
@@ -236,49 +238,43 @@ public:
     };
 };
 
-class spell_gluth_decimate : public SpellScriptLoader
+class spell_gluth_decimate : public SpellScript
 {
-public:
-    spell_gluth_decimate() : SpellScriptLoader("spell_gluth_decimate") { }
+    PrepareSpellScript(spell_gluth_decimate);
 
-    class spell_gluth_decimate_SpellScript : public SpellScript
+    bool Validate(SpellInfo const* /*spellInfo*/) override
     {
-        PrepareSpellScript(spell_gluth_decimate_SpellScript);
+        return ValidateSpellInfo({ SPELL_DECIMATE_DAMAGE });
+    }
 
-        void HandleScriptEffect(SpellEffIndex /*effIndex*/)
+    void HandleScriptEffect(SpellEffIndex /*effIndex*/)
+    {
+        if (Unit* unitTarget = GetHitUnit())
         {
-            if (Unit* unitTarget = GetHitUnit())
+            int32 damage = int32(unitTarget->GetHealth()) - int32(unitTarget->CountPctFromMaxHealth(5));
+            if (damage <= 0)
+                return;
+
+            if (Creature* cTarget = unitTarget->ToCreature())
             {
-                int32 damage = int32(unitTarget->GetHealth()) - int32(unitTarget->CountPctFromMaxHealth(5));
-                if (damage <= 0)
-                    return;
-
-                if (Creature* cTarget = unitTarget->ToCreature())
-                {
-                    cTarget->SetWalk(true);
-                    cTarget->GetMotionMaster()->MoveFollow(GetCaster(), 0.0f, 0.0f, MOTION_SLOT_CONTROLLED);
-                    cTarget->SetReactState(REACT_PASSIVE);
-                    Unit::DealDamage(GetCaster(), cTarget, damage);
-                    return;
-                }
-                GetCaster()->CastCustomSpell(28375, SPELLVALUE_BASE_POINT0, damage, unitTarget);
+                cTarget->SetWalk(true);
+                cTarget->GetMotionMaster()->MoveFollow(GetCaster(), 0.0f, 0.0f, MOTION_SLOT_CONTROLLED);
+                cTarget->SetReactState(REACT_PASSIVE);
+                Unit::DealDamage(GetCaster(), cTarget, damage);
+                return;
             }
+            GetCaster()->CastCustomSpell(SPELL_DECIMATE_DAMAGE, SPELLVALUE_BASE_POINT0, damage, unitTarget);
         }
+    }
 
-        void Register() override
-        {
-            OnEffectHitTarget += SpellEffectFn(spell_gluth_decimate_SpellScript::HandleScriptEffect, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
-        }
-    };
-
-    SpellScript* GetSpellScript() const override
+    void Register() override
     {
-        return new spell_gluth_decimate_SpellScript();
+        OnEffectHitTarget += SpellEffectFn(spell_gluth_decimate::HandleScriptEffect, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
     }
 };
 
 void AddSC_boss_gluth()
 {
     new boss_gluth();
-    new spell_gluth_decimate();
+    RegisterSpellScript(spell_gluth_decimate);
 }

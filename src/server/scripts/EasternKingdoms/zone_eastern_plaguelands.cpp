@@ -29,13 +29,12 @@ npc_darrowshire_spirit
 npc_tirion_fordring
 EndContentData */
 
+#include "CreatureScript.h"
 #include "PassiveAI.h"
 #include "Player.h"
-#include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 #include "ScriptedGossip.h"
 #include "SpellInfo.h"
-#include "WorldSession.h"
 
 // Ours
 

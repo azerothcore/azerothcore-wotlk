@@ -15,8 +15,9 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "AreaTriggerScript.h"
+#include "CreatureScript.h"
 #include "Player.h"
-#include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 #include "TaskScheduler.h"
 
@@ -74,7 +75,7 @@ struct boss_twilight_corrupter : public ScriptedAI
 
     void MoveInLineOfSight(Unit* who) override
     {
-        if (!_introSpoken && who->GetTypeId() == TYPEID_PLAYER)
+        if (!_introSpoken && who->IsPlayer())
         {
             _introSpoken = true;
             Talk(SAY_RESPAWN, who);
@@ -101,7 +102,7 @@ struct boss_twilight_corrupter : public ScriptedAI
 
     void KilledUnit(Unit* victim) override
     {
-        if (victim->GetTypeId() == TYPEID_PLAYER)
+        if (victim->IsPlayer())
         {
             Talk(SAY_KILL, victim);
             DoCastSelf(SPELL_SWELL_OF_SOULS);

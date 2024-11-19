@@ -18,8 +18,6 @@
 #ifndef __ACORE_VEHICLE_H
 #define __ACORE_VEHICLE_H
 
-#include "EventProcessor.h"
-#include "ObjectDefines.h"
 #include "Unit.h"
 #include "VehicleDefines.h"
 
@@ -43,6 +41,7 @@ public:
     bool HasEmptySeat(int8 seatId) const;
     Unit* GetPassenger(int8 seatId) const;
     int8 GetNextEmptySeat(int8 seatId, bool next) const;
+    VehicleSeatAddon const* GetSeatAddonForSeatOfPassenger(Unit const* passenger) const;
     uint8 GetAvailableSeatCount() const;
 
     bool AddPassenger(Unit* passenger, int8 seatId = -1);
@@ -96,6 +95,17 @@ private:
     uint32 _usableSeatNum;         // Number of seats that match VehicleSeatEntry::UsableByPlayer, used for proper display flags
     uint32 _creatureEntry;         // Can be different than me->GetBase()->GetEntry() in case of players
     Status _status;
+};
+
+class VehicleDespawnEvent : public BasicEvent
+{
+public:
+    VehicleDespawnEvent(Unit& self, uint32 duration) : _self(self), _duration(duration) { }
+    bool Execute(uint64 e_time, uint32 p_time) override;
+
+protected:
+    Unit& _self;
+    uint32 _duration;
 };
 
 #endif

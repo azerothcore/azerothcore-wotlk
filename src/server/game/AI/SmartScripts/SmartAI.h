@@ -18,7 +18,6 @@
 #ifndef ACORE_SMARTAI_H
 #define ACORE_SMARTAI_H
 
-#include "Common.h"
 #include "Creature.h"
 #include "CreatureAI.h"
 #include "GameObjectAI.h"
@@ -64,12 +63,13 @@ public:
     bool IsEscorted() override { return (mEscortState & SMART_ESCORT_ESCORTING); }
     void RemoveEscortState(uint32 uiEscortState) { mEscortState &= ~uiEscortState; }
     void SetAutoAttack(bool on) { mCanAutoAttack = on; }
-    void SetCombatMove(bool on);
+    void SetCombatMove(bool on, float chaseRange = 0.0f);
     bool CanCombatMove() { return mCanCombatMove; }
     void SetFollow(Unit* target, float dist = 0.0f, float angle = 0.0f, uint32 credit = 0, uint32 end = 0, uint32 creditType = 0, bool aliveState = true);
     void StopFollow(bool complete);
+    void MoveAway(float distance);
 
-    void SetScript9(SmartScriptHolder& e, uint32 entry, Unit* invoker);
+    void SetScript9(SmartScriptHolder& e, uint32 entry, WorldObject* invoker);
     SmartScript* GetScript() { return &mScript; }
     bool IsEscortInvokerInRange();
 
@@ -96,6 +96,9 @@ public:
 
     // Called when a summoned unit dies
     void SummonedCreatureDies(Creature* summon, Unit* killer) override;
+
+    // Called when a summoned unit evades
+    void SummonedCreatureEvade(Creature* summon) override;
 
     // Tell creature to attack and follow the victim
     void AttackStart(Unit* who) override;
@@ -155,7 +158,8 @@ public:
     uint32 GetData(uint32 id = 0) const override;
 
     // Used in scripts to share variables
-    void SetData(uint32 id, uint32 value) override;
+    void SetData(uint32 id, uint32 value) override { SetData(id, value, nullptr); }
+    void SetData(uint32 id, uint32 value, WorldObject* invoker);
 
     // Used in scripts to share variables
     void SetGUID(ObjectGuid guid, int32 id = 0) override;
@@ -200,9 +204,13 @@ public:
 
     void OnSpellClick(Unit* clicker, bool& result) override;
 
+    void PathEndReached(uint32 pathId) override;
+
+    bool CanRespawn() override { return mcanSpawn; };
+    void SetCanRespawn(bool canSpawn) { mcanSpawn = canSpawn; }
+
     // Xinef
     void SetWPPauseTimer(uint32 time) { mWPPauseTimer = time; }
-    void SetForcedCombatMove(float dist);
 
 private:
     bool mIsCharmed;
@@ -243,6 +251,8 @@ private:
     uint32 mEscortInvokerCheckTimer;
     bool mJustReset;
 
+    bool mcanSpawn;
+
     // Xinef: Vehicle conditions
     void CheckConditions(const uint32 diff);
     ConditionList conditions;
@@ -267,8 +277,9 @@ public:
     bool QuestAccept(Player* player, Quest const* quest) override;
     bool QuestReward(Player* player, Quest const* quest, uint32 opt) override;
     void Destroyed(Player* player, uint32 eventId) override;
-    void SetData(uint32 id, uint32 value) override;
-    void SetScript9(SmartScriptHolder& e, uint32 entry, Unit* invoker);
+    void SetData(uint32 id, uint32 value) override { SetData(id, value, nullptr); }
+    void SetData(uint32 id, uint32 value, WorldObject* invoker);
+    void SetScript9(SmartScriptHolder& e, uint32 entry, WorldObject* invoker);
     void OnGameEvent(bool start, uint16 eventId) override;
     void OnStateChanged(uint32 state, Unit* unit) override;
     void EventInform(uint32 eventId) override;
@@ -282,6 +293,9 @@ public:
 
     // Called when a summoned unit dies
     void SummonedCreatureDies(Creature* summon, Unit* killer) override;
+
+    // Called when a summoned unit evades
+    void SummonedCreatureEvade(Creature* summon) override;
 
 protected:
     SmartScript mScript;

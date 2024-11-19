@@ -22,14 +22,13 @@ Comment: All disable related commands
 Category: commandscripts
 EndScriptData */
 
-#include "AchievementMgr.h"
 #include "Chat.h"
+#include "CommandScript.h"
 #include "DisableMgr.h"
 #include "Language.h"
 #include "ObjectMgr.h"
 #include "OutdoorPvP.h"
 #include "Player.h"
-#include "ScriptMgr.h"
 #include "SpellMgr.h"
 
 using namespace Acore::ChatCommands;
@@ -81,8 +80,7 @@ public:
                 {
                     if (!sSpellMgr->GetSpellInfo(entry))
                     {
-                        handler->PSendSysMessage(LANG_COMMAND_NOSPELLFOUND);
-                        handler->SetSentErrorMessage(true);
+                        handler->SendErrorMessage(LANG_COMMAND_NOSPELLFOUND);
                         return false;
                     }
                     disableTypeStr = "spell";
@@ -92,8 +90,7 @@ public:
                 {
                     if (!sObjectMgr->GetQuestTemplate(entry))
                     {
-                        handler->PSendSysMessage(LANG_COMMAND_QUEST_NOTFOUND, entry);
-                        handler->SetSentErrorMessage(true);
+                        handler->SendErrorMessage(LANG_COMMAND_QUEST_NOTFOUND, entry);
                         return false;
                     }
                     disableTypeStr = "quest";
@@ -103,8 +100,7 @@ public:
                 {
                     if (!sMapStore.LookupEntry(entry))
                     {
-                        handler->PSendSysMessage(LANG_COMMAND_NOMAPFOUND);
-                        handler->SetSentErrorMessage(true);
+                        handler->SendErrorMessage(LANG_COMMAND_NOMAPFOUND);
                         return false;
                     }
                     disableTypeStr = "map";
@@ -114,8 +110,7 @@ public:
                 {
                     if (!sBattlemasterListStore.LookupEntry(entry))
                     {
-                        handler->PSendSysMessage(LANG_COMMAND_NO_BATTLEGROUND_FOUND);
-                        handler->SetSentErrorMessage(true);
+                        handler->SendErrorMessage(LANG_COMMAND_NO_BATTLEGROUND_FOUND);
                         return false;
                     }
                     disableTypeStr = "battleground";
@@ -125,8 +120,7 @@ public:
                 {
                     if (entry > MAX_OUTDOORPVP_TYPES)
                     {
-                        handler->PSendSysMessage(LANG_COMMAND_NO_OUTDOOR_PVP_FORUND);
-                        handler->SetSentErrorMessage(true);
+                        handler->SendErrorMessage(LANG_COMMAND_NO_OUTDOOR_PVP_FORUND);
                         return false;
                     }
                     disableTypeStr = "outdoorpvp";
@@ -136,8 +130,7 @@ public:
                 {
                     if (!sMapStore.LookupEntry(entry))
                     {
-                        handler->PSendSysMessage(LANG_COMMAND_NOMAPFOUND);
-                        handler->SetSentErrorMessage(true);
+                        handler->SendErrorMessage(LANG_COMMAND_NOMAPFOUND);
                         return false;
                     }
                     disableTypeStr = "vmap";
@@ -154,8 +147,7 @@ public:
         PreparedQueryResult result = WorldDatabase.Query(stmt);
         if (result)
         {
-            handler->PSendSysMessage("This %s (Id: %u) is already disabled.", disableTypeStr.c_str(), entry);
-            handler->SetSentErrorMessage(true);
+            handler->SendErrorMessage("This {} (Id: {}) is already disabled.", disableTypeStr, entry);
             return false;
         }
 
@@ -166,7 +158,7 @@ public:
         stmt->SetData(3, disableComment);
         WorldDatabase.Execute(stmt);
 
-        handler->PSendSysMessage("Add Disabled %s (Id: %u) for reason %s", disableTypeStr.c_str(), entry, disableComment.c_str());
+        handler->PSendSysMessage("Add Disabled {} (Id: {}) for reason {}", disableTypeStr, entry, disableComment);
         return true;
     }
 
@@ -242,8 +234,7 @@ public:
         PreparedQueryResult result = WorldDatabase.Query(stmt);
         if (!result)
         {
-            handler->PSendSysMessage("This %s (Id: %u) is not disabled.", disableTypeStr.c_str(), entry);
-            handler->SetSentErrorMessage(true);
+            handler->SendErrorMessage("This {} (Id: {}) is not disabled.", disableTypeStr, entry);
             return false;
         }
 
@@ -252,7 +243,7 @@ public:
         stmt->SetData(1, disableType);
         WorldDatabase.Execute(stmt);
 
-        handler->PSendSysMessage("Remove Disabled %s (Id: %u)", disableTypeStr.c_str(), entry);
+        handler->PSendSysMessage("Remove Disabled {} (Id: {})", disableTypeStr, entry);
         return true;
     }
 

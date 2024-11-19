@@ -15,19 +15,18 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "Group.h"
+#include "Player.h"
+#include "SpellAuraEffects.h"
+#include "SpellMgr.h"
+#include "SpellScript.h"
+#include "SpellScriptLoader.h"
+#include "UnitAI.h"
 /*
  * Scripts for spells with SPELLFAMILY_PALADIN and SPELLFAMILY_GENERIC spells used by paladin players.
  * Ordered alphabetically using scriptname.
  * Scriptnames of files in this file should be prefixed with "spell_pal_".
  */
-
-#include "Group.h"
-#include "Player.h"
-#include "ScriptMgr.h"
-#include "SpellAuraEffects.h"
-#include "SpellMgr.h"
-#include "SpellScript.h"
-#include "UnitAI.h"
 
 enum PaladinSpells
 {
@@ -80,8 +79,23 @@ enum PaladinSpells
     SPELL_PALADIN_SANCTIFIED_RETRIBUTION_AURA    = 63531,
     SPELL_PALADIN_AURA_MASTERY_IMMUNE            = 64364,
 
+    SPELL_JUDGEMENTS_OF_THE_JUST                 = 68055,
+    SPELL_JUDGEMENT_OF_VENGEANCE_EFFECT          = 31804,
+    SPELL_HOLY_VENGEANCE                         = 31803,
+    SPELL_JUDGEMENT_OF_CORRUPTION_EFFECT         = 53733,
+    SPELL_BLOOD_CORRUPTION                       = 53742,
+
     SPELL_GENERIC_ARENA_DAMPENING                = 74410,
-    SPELL_GENERIC_BATTLEGROUND_DAMPENING         = 74411
+    SPELL_GENERIC_BATTLEGROUND_DAMPENING         = 74411,
+
+    // Crystalforge Raiment - Tier 5 Holy 2 Set
+    SPELL_IMPROVED_JUDGEMENT                     = 37188,
+    SPELL_IMPROVED_JUDGEMENT_ENERGIZE            = 43838,
+
+    SPELL_PALADIN_HOLY_VENGEANCE                 = 31803,
+    SPELL_PALADIN_BLOOD_CORRUPTION               = 53742,
+    SPELL_PALADIN_SEAL_OF_VENGEANCE_EFFECT       = 42463,
+    SPELL_PALADIN_SEAL_OF_CORRUPTION_EFFECT      = 53739
 };
 
 enum PaladinSpellIcons
@@ -164,7 +178,7 @@ class spell_pal_divine_intervention : public AuraScript
 
     void HandleRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
     {
-        if (!GetTarget()->IsInCombat() && GetTarget()->GetTypeId() == TYPEID_PLAYER)
+        if (!GetTarget()->IsInCombat() && GetTarget()->IsPlayer())
             GetTarget()->RemoveAurasDueToSpell(GetTarget()->ToPlayer()->GetTeamId() == TEAM_ALLIANCE ? 57723 : 57724);
     }
 
@@ -315,7 +329,7 @@ private:
     {
         healPct = GetSpellInfo()->Effects[EFFECT_1].CalcValue();
         absorbPct = GetSpellInfo()->Effects[EFFECT_0].CalcValue();
-        return GetUnitOwner()->GetTypeId() == TYPEID_PLAYER;
+        return GetUnitOwner()->IsPlayer();
     }
 
     void CalculateAmount(AuraEffect const* /*aurEff*/, int32& amount, bool& /*canBeRecalculated*/)
@@ -474,7 +488,7 @@ class spell_pal_blessing_of_sanctuary : public AuraScript
 
     bool CheckProc(ProcEventInfo& /*eventInfo*/)
     {
-        return GetTarget()->getPowerType() == POWER_MANA;
+        return GetTarget()->HasActivePowerType(POWER_MANA);
     }
 
     void HandleProc(AuraEffect const* aurEff, ProcEventInfo& /*eventInfo*/)
@@ -504,7 +518,7 @@ class spell_pal_divine_sacrifice : public AuraScript
     {
         if (Unit* caster = GetCaster())
         {
-            if (caster->GetTypeId() == TYPEID_PLAYER)
+            if (caster->IsPlayer())
             {
                 if (caster->ToPlayer()->GetGroup())
                     groupSize = caster->ToPlayer()->GetGroup()->GetMembersCount();
@@ -872,9 +886,34 @@ public:
         GetCaster()->CastSpell(GetHitUnit(), _spellId, true);
         GetCaster()->CastSpell(GetHitUnit(), spellId2, true);
 
+        // Tier 5 Holy - 2 Set
+        if (GetCaster()->HasAura(SPELL_IMPROVED_JUDGEMENT))
+        {
+            GetCaster()->CastSpell(GetCaster(), SPELL_IMPROVED_JUDGEMENT_ENERGIZE, true);
+        }
+
         // Judgement of the Just
         if (GetCaster()->GetAuraEffect(SPELL_AURA_ADD_FLAT_MODIFIER, SPELLFAMILY_PALADIN, 3015, 0))
-            GetCaster()->CastSpell(GetHitUnit(), 68055, true);
+        {
+            if (GetCaster()->CastSpell(GetHitUnit(), SPELL_JUDGEMENTS_OF_THE_JUST, true) && (spellId2 == SPELL_JUDGEMENT_OF_VENGEANCE_EFFECT || spellId2 == SPELL_JUDGEMENT_OF_CORRUPTION_EFFECT))
+            {
+                //hidden effect only cast when spellcast of judgements of the just is succesful
+                GetCaster()->CastSpell(GetHitUnit(), SealApplication(spellId2), true); //add hidden seal apply effect for vengeance and corruption
+            }
+        }
+    }
+
+    uint32 SealApplication(uint32 correspondingSpellId)
+    {
+        switch (correspondingSpellId)
+        {
+            case SPELL_JUDGEMENT_OF_VENGEANCE_EFFECT:
+                return SPELL_HOLY_VENGEANCE;
+            case SPELL_JUDGEMENT_OF_CORRUPTION_EFFECT:
+                return SPELL_BLOOD_CORRUPTION;
+            default:
+                return 0;
+        }
     }
 
     void Register() override
@@ -935,7 +974,7 @@ class spell_pal_lay_on_hands : public SpellScript
 
         // Xinef: Glyph of Divinity
         if (Unit* target = GetExplTargetUnit())
-            if (target->getPowerType() == POWER_MANA)
+            if (target->HasActivePowerType(POWER_MANA))
                 _manaAmount = target->GetPower(POWER_MANA);
 
         return SPELL_CAST_OK;
@@ -982,7 +1021,7 @@ class spell_pal_righteous_defense : public SpellScript
     SpellCastResult CheckCast()
     {
         Unit* caster = GetCaster();
-        if (caster->GetTypeId() != TYPEID_PLAYER)
+        if (!caster->IsPlayer())
             return SPELL_FAILED_DONT_REPORT;
 
         if (Unit* target = GetExplTargetUnit())
@@ -1071,6 +1110,45 @@ class spell_pal_seal_of_righteousness : public AuraScript
     }
 };
 
+// 42463 - Seal of Vengeance
+// 53739 - Seal of Corruption
+class spell_pal_seal_of_vengeance : public SpellScript
+{
+    PrepareSpellScript(spell_pal_seal_of_vengeance);
+
+    bool Validate(SpellInfo const* /*spellInfo*/) override
+    {
+        return ValidateSpellInfo({ SPELL_PALADIN_SEAL_OF_VENGEANCE_EFFECT, SPELL_PALADIN_SEAL_OF_CORRUPTION_EFFECT });
+    }
+
+    void HandleScriptEffect(SpellEffIndex /*effIndex*/)
+    {
+        Unit* target = GetExplTargetUnit();
+        uint32 spellId = GetSpell()->GetSpellInfo()->Id;
+        uint32 auraId = (spellId == SPELL_PALADIN_SEAL_OF_VENGEANCE_EFFECT)
+            ? SPELL_PALADIN_HOLY_VENGEANCE
+            : SPELL_PALADIN_BLOOD_CORRUPTION;
+        int32 damage = GetHitDamage();
+        uint8 stacks = 0;
+
+        if (target)
+        {
+            Aura* aura = target->GetAura(auraId, GetCaster()->GetGUID());
+            if (aura)
+                stacks = aura->GetStackAmount();
+
+            damage = ((damage * stacks) / 5);
+
+            SetHitDamage(damage);
+        }
+    }
+
+    void Register() override
+    {
+        OnEffectHitTarget += SpellEffectFn(spell_pal_seal_of_vengeance::HandleScriptEffect, EFFECT_0, SPELL_EFFECT_WEAPON_PERCENT_DAMAGE);
+    }
+};
+
 void AddSC_paladin_spell_scripts()
 {
     RegisterSpellAndAuraScriptPair(spell_pal_seal_of_command, spell_pal_seal_of_command_aura);
@@ -1098,4 +1176,5 @@ void AddSC_paladin_spell_scripts()
     RegisterSpellScript(spell_pal_lay_on_hands);
     RegisterSpellScript(spell_pal_righteous_defense);
     RegisterSpellScript(spell_pal_seal_of_righteousness);
+    RegisterSpellScript(spell_pal_seal_of_vengeance);
 }

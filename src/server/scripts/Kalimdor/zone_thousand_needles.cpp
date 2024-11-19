@@ -15,6 +15,13 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "CreatureScript.h"
+#include "Player.h"
+#include "ScriptedCreature.h"
+#include "ScriptedEscortAI.h"
+#include "ScriptedGossip.h"
+#include "SpellScript.h"
+#include "SpellScriptLoader.h"
 /* ScriptData
 SDName: Thousand Needles
 SD%Complete: 100
@@ -29,12 +36,6 @@ npc_plucky
 npc_enraged_panther
 go_panther_cage
 EndContentData */
-
-#include "Player.h"
-#include "ScriptMgr.h"
-#include "ScriptedCreature.h"
-#include "ScriptedEscortAI.h"
-#include "ScriptedGossip.h"
 
 /*######
 # npc_lakota_windsong
@@ -322,59 +323,34 @@ public:
 
 enum PantherCage
 {
-    ENRAGED_PANTHER = 10992
+    NPC_ENRAGED_PANTHER        = 10992,
+    QUEST_HYPERCAPACITOR_GIZMO = 5151
 };
 
-class go_panther_cage : public GameObjectScript
+class spell_panther_cage_key : public SpellScript
 {
-public:
-    go_panther_cage() : GameObjectScript("go_panther_cage") { }
+    PrepareSpellScript(spell_panther_cage_key);
 
-    bool OnGossipHello(Player* player, GameObject* go) override
+    void HandleDummy()
     {
-        go->UseDoorOrButton();
-        if (player->GetQuestStatus(5151) == QUEST_STATUS_INCOMPLETE)
+        if (Player* player = GetCaster()->ToPlayer())
         {
-            if (Creature* panther = go->FindNearestCreature(ENRAGED_PANTHER, 5, true))
+            if (player->GetQuestStatus(QUEST_HYPERCAPACITOR_GIZMO) == QUEST_STATUS_INCOMPLETE)
             {
-                panther->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
-                panther->SetReactState(REACT_AGGRESSIVE);
-                panther->AI()->AttackStart(player);
+                if (Creature* panther = player->FindNearestCreature(NPC_ENRAGED_PANTHER, 5.0f, true))
+                {
+                    panther->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
+                    panther->SetReactState(REACT_AGGRESSIVE);
+                    panther->AI()->AttackStart(GetCaster());
+                }
             }
         }
-
-        return true;
-    }
-};
-
-class npc_enraged_panther : public CreatureScript
-{
-public:
-    npc_enraged_panther() : CreatureScript("npc_enraged_panther") { }
-
-    CreatureAI* GetAI(Creature* creature) const override
-    {
-        return new npc_enraged_pantherAI(creature);
     }
 
-    struct npc_enraged_pantherAI : public ScriptedAI
+    void Register() override
     {
-        npc_enraged_pantherAI(Creature* creature) : ScriptedAI(creature) { }
-
-        void Reset() override
-        {
-            me->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
-            me->SetReactState(REACT_PASSIVE);
-        }
-
-        void UpdateAI(uint32 /*diff*/) override
-        {
-            if (!UpdateVictim())
-                return;
-
-            DoMeleeAttackIfReady();
-        }
-    };
+        AfterCast += SpellCastFn(spell_panther_cage_key::HandleDummy);
+    }
 };
 
 void AddSC_thousand_needles()
@@ -382,6 +358,5 @@ void AddSC_thousand_needles()
     new npc_lakota_windsong();
     new npc_paoka_swiftmountain();
     new npc_plucky();
-    new npc_enraged_panther();
-    new go_panther_cage();
+    RegisterSpellScript(spell_panther_cage_key);
 }

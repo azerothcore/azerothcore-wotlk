@@ -26,8 +26,9 @@ EndScriptData */
 npcs_riverbreeze_and_silversky
 EndContentData */
 
+#include "AreaTriggerScript.h"
+#include "CreatureScript.h"
 #include "Player.h"
-#include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 #include "ScriptedGossip.h"
 

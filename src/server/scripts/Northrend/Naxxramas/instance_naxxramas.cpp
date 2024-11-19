@@ -15,11 +15,13 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "AreaTriggerScript.h"
 #include "CellImpl.h"
+#include "CreatureScript.h"
 #include "GridNotifiers.h"
 #include "GridNotifiersImpl.h"
+#include "InstanceMapScript.h"
 #include "PassiveAI.h"
-#include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 #include "naxxramas.h"
 
@@ -50,6 +52,23 @@ inline uint8 GetEruptionSection(float x, float y)
     return 3;
 }
 
+DoorData const doorData[] =
+{
+    { GO_ANUB_GATE,     BOSS_ANUB,       DOOR_TYPE_ROOM    },
+    { 0,                0,               DOOR_TYPE_ROOM    },
+};
+
+ObjectData const creatureData[] =
+{
+    { NPC_RAZUVIOUS, DATA_RAZUVIOUS },
+    { 0,             0              }
+};
+
+ObjectData const gameObjectData[] =
+{
+    { 0,             0              }
+};
+
 class instance_naxxramas : public InstanceMapScript
 {
 public:
@@ -66,6 +85,8 @@ public:
         {
             SetHeaders(DataHeader);
             SetBossNumber(MAX_ENCOUNTERS);
+            LoadDoorData(doorData);
+            LoadObjectData(creatureData, gameObjectData);
             for (auto& i : HeiganEruption)
                 i.clear();
 
@@ -101,7 +122,6 @@ public:
         ObjectGuid _heiganGateGUID;
         ObjectGuid _heiganGateExitGUID;
         ObjectGuid _loathebGateGUID;
-        ObjectGuid _anubGateGUID;
         ObjectGuid _anubNextGateGUID;
         ObjectGuid _faerlinaWebGUID;
         ObjectGuid _faerlinaGateGUID;
@@ -135,6 +155,7 @@ public:
         GuidList PatchwerkRoomTrash;
         ObjectGuid _patchwerkGUID;
         ObjectGuid _thaddiusGUID;
+        ObjectGuid _gothikGUID;
         ObjectGuid _stalaggGUID;
         ObjectGuid _feugenGUID;
         ObjectGuid _zeliekGUID;
@@ -191,7 +212,7 @@ public:
 
         void OnCreatureCreate(Creature* creature) override
         {
-            switch(creature->GetEntry())
+            switch (creature->GetEntry())
             {
                 case NPC_PATCHWERK:
                     _patchwerkGUID = creature->GetGUID();
@@ -225,6 +246,9 @@ public:
                 case NPC_FEUGEN:
                     _feugenGUID = creature->GetGUID();
                     return;
+                case NPC_GOTHIK:
+                    _gothikGUID = creature->GetGUID();
+                    return;
                 case NPC_LADY_BLAUMEUX:
                     _blaumeuxGUID = creature->GetGUID();
                     return;
@@ -247,6 +271,8 @@ public:
                     _lichkingGUID = creature->GetGUID();
                     return;
             }
+
+            InstanceScript::OnCreatureCreate(creature);
         }
 
         void OnGameObjectCreate(GameObject* pGo) override
@@ -257,7 +283,7 @@ public:
                 return;
             }
 
-            switch(pGo->GetEntry())
+            switch (pGo->GetEntry())
             {
                 case GO_PATCHWERK_GATE:
                     _patchwerkGateGUID = pGo->GetGUID();
@@ -304,13 +330,6 @@ public:
                 case GO_LOATHEB_GATE:
                     _loathebGateGUID = pGo->GetGUID();
                     if (GetBossState(BOSS_LOATHEB) == DONE)
-                    {
-                        pGo->SetGoState(GO_STATE_ACTIVE);
-                    }
-                    break;
-                case GO_ANUB_GATE:
-                    _anubGateGUID = pGo->GetGUID();
-                    if (GetBossState(BOSS_ANUB) == DONE)
                     {
                         pGo->SetGoState(GO_STATE_ACTIVE);
                     }
@@ -492,6 +511,8 @@ public:
                     }
                     break;
             }
+
+            InstanceScript::OnGameObjectCreate(pGo);
         }
 
         void OnGameObjectRemove(GameObject* pGo) override
@@ -599,7 +620,7 @@ public:
 
         void SetData(uint32 id, uint32 data) override
         {
-            switch(id)
+            switch (id)
             {
                 case DATA_ABOMINATION_KILLED:
                     abominationsKilled++;
@@ -746,7 +767,7 @@ public:
                 return false;
 
             // Bosses data
-            switch(bossId)
+            switch (bossId)
             {
                 case BOSS_KELTHUZAD:
                     if (state == NOT_STARTED)
@@ -858,10 +879,6 @@ public:
                         events.ScheduleEvent(EVENT_KELTHUZAD_WING_TAUNT, 6s);
                         break;
                     case BOSS_ANUB:
-                        if (GameObject* go = instance->GetGameObject(_anubGateGUID))
-                        {
-                            go->SetGoState(GO_STATE_ACTIVE);
-                        }
                         if (GameObject* go = instance->GetGameObject(_anubNextGateGUID))
                         {
                             go->SetGoState(GO_STATE_ACTIVE);
@@ -1052,8 +1069,6 @@ public:
                     return _heiganGateGUID;
                 case DATA_LOATHEB_GATE:
                     return _loathebGateGUID;
-                case DATA_ANUB_GATE:
-                    return _anubGateGUID;
                 case DATA_FAERLINA_WEB:
                     return _faerlinaWebGUID;
                 case DATA_MAEXXNA_GATE:
@@ -1090,6 +1105,8 @@ public:
                     return _stalaggGUID;
                 case DATA_FEUGEN_BOSS:
                     return _feugenGUID;
+                case DATA_GOTHIK_BOSS:
+                    return _gothikGUID;
                 case DATA_LICH_KING_BOSS:
                     return _lichkingGUID;
                 default:
@@ -1194,7 +1211,12 @@ public:
         {
             if (InstanceScript *instance = player->GetInstanceScript())
             {
-                if (instance->CheckRequiredBosses(BOSS_SAPPHIRON))
+                bool AreAllWingsCleared = instance->GetBossState(BOSS_MAEXXNA) == DONE
+                    && (instance->GetBossState(BOSS_LOATHEB) == DONE)
+                    && (instance->GetBossState(BOSS_THADDIUS) == DONE)
+                    && (instance->GetBossState(BOSS_HORSEMAN) == DONE);
+
+                if (AreAllWingsCleared)
                 {
                     player->TeleportTo(533, sapphironEntryTP.m_positionX, sapphironEntryTP.m_positionY, sapphironEntryTP.m_positionZ, sapphironEntryTP.m_orientation);
                     return true;

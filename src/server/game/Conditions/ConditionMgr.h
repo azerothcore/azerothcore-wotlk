@@ -19,7 +19,6 @@
 #define ACORE_CONDITIONMGR_H
 
 #include "Define.h"
-#include "Errors.h"
 #include <list>
 #include <map>
 
@@ -62,7 +61,7 @@ enum ConditionTypes
     CONDITION_LEVEL                     = 27,           // level            ComparisonType 0                  true if unit's level is equal to param1 (param2 can modify the statement)
     CONDITION_QUEST_COMPLETE            = 28,           // quest_id         0              0                  true if player has quest_id with all objectives complete, but not yet rewarded
     CONDITION_NEAR_CREATURE             = 29,           // creature entry   distance       dead               true if there is a creature of entry in range
-    CONDITION_NEAR_GAMEOBJECT           = 30,           // gameobject entry distance       0                  true if there is a gameobject of entry in range
+    CONDITION_NEAR_GAMEOBJECT           = 30,           // gameobject entry distance       GoState            true if there is a gameobject of entry in range (param3 can check for GoState, 0 = dont't check, 1 = Ready , 2 = Not Ready)
     CONDITION_OBJECT_ENTRY_GUID         = 31,           // TypeID           entry          guid/Attackable    true if object is type TypeID and the entry is 0 or matches entry of the object or matches guid of the object
     CONDITION_TYPE_MASK                 = 32,           // TypeMask         0              0                  true if object is type object's TypeMask matches provided TypeMask
     CONDITION_RELATION_TO               = 33,           // ConditionTarget  RelationType   0                  true if object is in given relation with object specified by ConditionTarget
@@ -87,7 +86,9 @@ enum ConditionTypes
     CONDITION_AC_START                 = 100,
     CONDITION_QUEST_SATISFY_EXCLUSIVE  = 101,           // quest_id         0              0                  true if satisfied exclusive group
     CONDITION_HAS_AURA_TYPE            = 102,           // aura_type        0              0                  true if has aura type
-    CONDITION_AC_END                   = 103            // placeholder
+    CONDITION_WORLD_SCRIPT             = 103,           // conditionId      state          0                  true if WorldState::IsConditionFulfilled returns true
+
+    CONDITION_AC_END                   = 104            // placeholder
 };
 
 /*! Documentation on implementing a new ConditionSourceType:

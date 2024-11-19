@@ -64,7 +64,7 @@ void npc_escortAI::AttackStart(Unit* who)
             me->StopMoving();
         }
 
-        if (IsCombatMovementAllowed())
+        if (me->IsCombatMovementAllowed())
             me->GetMotionMaster()->MoveChase(who);
     }
 }
@@ -111,7 +111,7 @@ bool npc_escortAI::AssistPlayerInCombatAgainst(Unit* who)
     }
 
     // or if enemy is in evade mode
-    if (who->GetTypeId() == TYPEID_UNIT && who->ToCreature()->IsInEvadeMode())
+    if (who->IsCreature() && who->ToCreature()->IsInEvadeMode())
     {
         return false;
     }
@@ -178,8 +178,8 @@ void npc_escortAI::JustRespawned()
 {
     RemoveEscortState(STATE_ESCORT_ESCORTING | STATE_ESCORT_RETURNING | STATE_ESCORT_PAUSED);
 
-    if (!IsCombatMovementAllowed())
-        SetCombatMovement(true);
+    if (!me->IsCombatMovementAllowed())
+        me->SetCombatMovement(true);
 
     //add a small delay before going to first waypoint, normal in near all cases
     m_uiWPWaitTimer = 1000;
@@ -200,7 +200,6 @@ void npc_escortAI::ReturnToLastPoint()
 
 void npc_escortAI::EnterEvadeMode(EvadeReason /*why*/)
 {
-    me->RemoveAllAuras();
     me->GetThreatMgr().ClearAllThreat();
     me->CombatStop(true);
     me->SetLootRecipient(nullptr);
@@ -260,7 +259,7 @@ void npc_escortAI::UpdateAI(uint32 diff)
 
                     if (m_bCanInstantRespawn)
                     {
-                        me->setDeathState(JUST_DIED);
+                        me->setDeathState(DeathState::JustDied);
                         me->Respawn();
                     }
                     else
@@ -300,7 +299,7 @@ void npc_escortAI::UpdateAI(uint32 diff)
             {
                 if (m_bCanInstantRespawn)
                 {
-                    me->setDeathState(JUST_DIED);
+                    me->setDeathState(DeathState::JustDied);
                     me->Respawn();
                 }
                 else

@@ -39,7 +39,7 @@ class OutdoorPvPMgr
 {
 private:
     OutdoorPvPMgr();
-    ~OutdoorPvPMgr() {};
+    ~OutdoorPvPMgr() = default;
 
 public:
     static OutdoorPvPMgr* instance();
@@ -80,24 +80,20 @@ public:
 
     void HandleDropFlag(Player* player, uint32 spellId);
 
-    // pussywizard: lock required because different functions affect m_players
+    // pussywizard: lock required because different functions affect _players
     std::mutex _lock;
 
 private:
-    typedef std::vector<OutdoorPvP*> OutdoorPvPSet;
-    typedef std::map<uint32 /* zoneid */, OutdoorPvP*> OutdoorPvPMap;
-    typedef std::map<OutdoorPvPTypes, OutdoorPvPData*> OutdoorPvPDataMap;
-
     // contains all initiated outdoor pvp events
     // used when initing / cleaning up
-    OutdoorPvPSet  m_OutdoorPvPSet;
+    std::vector<std::unique_ptr<OutdoorPvP>> m_OutdoorPvPSet;
 
     // maps the zone ids to an outdoor pvp event
     // used in player event handling
-    OutdoorPvPMap   m_OutdoorPvPMap;
+    std::map<uint32/*zoneid*/, OutdoorPvP*> m_OutdoorPvPMap;
 
     // Holds the outdoor PvP templates
-    OutdoorPvPDataMap m_OutdoorPvPDatas;
+    std::map<OutdoorPvPTypes, std::unique_ptr<OutdoorPvPData>> m_OutdoorPvPDatas;
 
     // update interval
     uint32 m_UpdateTimer;

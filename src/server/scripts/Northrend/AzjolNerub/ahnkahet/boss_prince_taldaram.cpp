@@ -15,12 +15,13 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "CreatureScript.h"
 #include "PassiveAI.h"
 #include "Player.h"
-#include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 #include "SpellInfo.h"
 #include "SpellScript.h"
+#include "SpellScriptLoader.h"
 #include "ahnkahet.h"
 
 enum Spells
@@ -74,7 +75,7 @@ enum Event
 
 enum Yells
 {
-    SAY_SPHERE_ACTIVATED                    = 0,
+    //SAY_SPHERE_ACTIVATED                    = 0,
     SAY_REMOVE_PRISON                       = 1,
     SAY_AGGRO                               = 2,
     SAY_SLAY                                = 3,
@@ -212,7 +213,7 @@ struct boss_taldaram : public BossAI
         BossAI::InitializeAI();
 
         // Event not started
-        if (instance->GetData(DATA_TELDRAM_SPHERE1) != DONE || instance->GetData(DATA_TELDRAM_SPHERE2) != DONE)
+        if (instance->GetPersistentData(DATA_TELDRAM_SPHERE1) != DONE || instance->GetPersistentData(DATA_TELDRAM_SPHERE2) != DONE)
         {
             me->SetImmuneToAll(true);
             me->SetDisableGravity(true);
@@ -226,7 +227,7 @@ struct boss_taldaram : public BossAI
             return;
         }
 
-        if (instance->GetData(DATA_TELDRAM_SPHERE1) == DONE && instance->GetData(DATA_TELDRAM_SPHERE2) == DONE)
+        if (instance->GetPersistentData(DATA_TELDRAM_SPHERE1) == DONE && instance->GetPersistentData(DATA_TELDRAM_SPHERE2) == DONE)
         {
             DoAction(ACTION_REMOVE_PRISON_AT_RESET);
         }
@@ -306,7 +307,7 @@ struct boss_taldaram : public BossAI
 
     void KilledUnit(Unit* victim) override
     {
-        if (victim->GetTypeId() != TYPEID_PLAYER)
+        if (!victim->IsPlayer())
         {
             return;
         }
@@ -419,7 +420,7 @@ struct boss_taldaram : public BossAI
                             if (reference)
                             {
                                 Unit const* pTarget = ObjectAccessor::GetUnit(*me, reference->getUnitGuid());
-                                if (pTarget && pTarget->GetTypeId() == TYPEID_PLAYER && pTarget->IsAlive())
+                                if (pTarget && pTarget->IsPlayer() && pTarget->IsAlive())
                                 {
                                     ++count;
                                 }
@@ -490,44 +491,6 @@ private:
     }
 };
 
-/// @todo: Turn into new script type when Gossips have been updated
-class go_prince_taldaram_sphere : public GameObjectScript
-{
-public:
-    go_prince_taldaram_sphere() : GameObjectScript("go_prince_taldaram_sphere") {}
-
-    bool OnGossipHello(Player* pPlayer, GameObject* go) override
-    {
-        if (pPlayer && pPlayer->IsInCombat())
-        {
-            return true;
-        }
-
-        InstanceScript* pInstance = go->GetInstanceScript();
-        if (!pInstance)
-        {
-            return true;
-        }
-
-        go->SetGameObjectFlag(GO_FLAG_NOT_SELECTABLE);
-        go->SetGoState(GO_STATE_ACTIVE);
-
-        uint32 const objectIndex = go->GetEntry() == GO_TELDARAM_SPHERE1 ? DATA_TELDRAM_SPHERE1 : DATA_TELDRAM_SPHERE2;
-        if (pInstance->GetData(objectIndex) == NOT_STARTED)
-        {
-            Creature* taldaram = ObjectAccessor::GetCreature(*go, pInstance->GetGuidData(DATA_PRINCE_TALDARAM));
-            if (taldaram && taldaram->IsAlive())
-            {
-                taldaram->AI()->Talk(SAY_SPHERE_ACTIVATED);
-            }
-
-            pInstance->SetData(objectIndex, DONE);
-        }
-
-        return true;
-    }
-};
-
 // 55931 - Conjure Flame Sphere
 class spell_prince_taldaram_conjure_flame_sphere : public SpellScript
 {
@@ -581,7 +544,6 @@ void AddSC_boss_taldaram()
 {
     RegisterAhnKahetCreatureAI(npc_taldaram_flamesphere);
     RegisterAhnKahetCreatureAI(boss_taldaram);
-    new go_prince_taldaram_sphere();
 
     // Spells
     RegisterSpellScript(spell_prince_taldaram_conjure_flame_sphere);

@@ -15,14 +15,15 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "AreaTriggerScript.h"
+#include "CreatureScript.h"
 #include "GameObjectAI.h"
 #include "Player.h"
-#include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 #include "ScriptedEscortAI.h"
 #include "ScriptedGossip.h"
-#include "SpellInfo.h"
 #include "SpellAuras.h"
+#include "SpellInfo.h"
 #include "SpellScript.h"
 
 // Ours
@@ -580,137 +581,6 @@ public:
 };
 
 /*######
-## npc_phase_hunter
-######*/
-
-enum PhaseHunterData
-{
-    QUEST_RECHARGING_THE_BATTERIES  = 10190,
-
-    NPC_PHASE_HUNTER_ENTRY          = 18879,
-    NPC_DRAINED_PHASE_HUNTER_ENTRY  = 19595,
-
-    EMOTE_WEAK                      = 0,
-
-    // Spells
-    SPELL_RECHARGING_BATTERY        = 34219,
-    SPELL_PHASE_SLIP                = 36574,
-    SPELL_MANA_BURN                 = 13321,
-    SPELL_MATERIALIZE               = 34804,
-    SPELL_DE_MATERIALIZE            = 34814,
-};
-
-class npc_phase_hunter : public CreatureScript
-{
-public:
-    npc_phase_hunter() : CreatureScript("npc_phase_hunter") { }
-
-    CreatureAI* GetAI(Creature* creature) const override
-    {
-        return new npc_phase_hunterAI(creature);
-    }
-
-    struct npc_phase_hunterAI : public ScriptedAI
-    {
-        npc_phase_hunterAI(Creature* creature) : ScriptedAI(creature) { }
-
-        bool Weak;
-        bool Materialize;
-        bool Drained;
-        uint8 WeakPercent;
-
-        ObjectGuid PlayerGUID;
-
-        uint32 ManaBurnTimer;
-
-        void Reset() override
-        {
-            Weak = false;
-            Materialize = false;
-            Drained = false;
-            WeakPercent = 25 + (rand() % 16); // 25-40
-
-            PlayerGUID.Clear();
-
-            ManaBurnTimer = 5000 + (rand() % 3 * 1000); // 5-8 sec cd
-
-            if (me->GetEntry() == NPC_DRAINED_PHASE_HUNTER_ENTRY)
-                me->UpdateEntry(NPC_PHASE_HUNTER_ENTRY);
-        }
-
-        void JustEngagedWith(Unit* who) override
-        {
-            if (who->GetTypeId() == TYPEID_PLAYER)
-                PlayerGUID = who->GetGUID();
-        }
-
-        //void SpellHit(Unit* /*caster*/, SpellInfo const* /*spell*/)
-        //{
-        //    DoCast(me, SPELL_DE_MATERIALIZE);
-        //}
-
-        void UpdateAI(uint32 diff) override
-        {
-            if (!Materialize)
-            {
-                DoCast(me, SPELL_MATERIALIZE);
-                Materialize = true;
-            }
-
-            if (me->HasAuraType(SPELL_AURA_MOD_DECREASE_SPEED) || me->HasUnitState(UNIT_STATE_ROOT)) // if the mob is rooted/slowed by spells eg.: Entangling Roots, Frost Nova, Hamstring, Crippling Poison, etc. => remove it
-                DoCast(me, SPELL_PHASE_SLIP);
-
-            if (!UpdateVictim())
-                return;
-
-            // some code to cast spell Mana Burn on random target which has mana
-            if (ManaBurnTimer <= diff)
-            {
-                std::list<HostileReference*> AggroList = me->GetThreatMgr().GetThreatList();
-                std::list<Unit*> UnitsWithMana;
-
-                for (std::list<HostileReference*>::const_iterator itr = AggroList.begin(); itr != AggroList.end(); ++itr)
-                {
-                    if (Unit* unit = ObjectAccessor::GetUnit(*me, (*itr)->getUnitGuid()))
-                    {
-                        if (unit->GetCreateMana() > 0)
-                            UnitsWithMana.push_back(unit);
-                    }
-                }
-                if (!UnitsWithMana.empty())
-                {
-                    DoCast(Acore::Containers::SelectRandomContainerElement(UnitsWithMana), SPELL_MANA_BURN);
-                    ManaBurnTimer = 8000 + (rand() % 10 * 1000); // 8-18 sec cd
-                }
-                else
-                    ManaBurnTimer = 3500;
-            }
-            else ManaBurnTimer -= diff;
-
-            if (Player* player = ObjectAccessor::GetPlayer(*me, PlayerGUID)) // start: support for quest 10190
-            {
-                if (!Weak && HealthBelowPct(WeakPercent)
-                        && player->GetQuestStatus(QUEST_RECHARGING_THE_BATTERIES) == QUEST_STATUS_INCOMPLETE)
-                {
-                    Talk(EMOTE_WEAK);
-                    Weak = true;
-                }
-                if (Weak && !Drained && me->HasAura(SPELL_RECHARGING_BATTERY))
-                {
-                    Drained = true;
-                    int32 uHpPct = int32(me->GetHealthPct());
-                    me->SetHealth(me->CountPctFromMaxHealth(uHpPct));
-                    me->LowerPlayerDamageReq(me->GetMaxHealth() - me->GetHealth());
-                    me->SetInCombatWith(player);
-                }
-            } // end: support for quest 10190
-
-            DoMeleeAttackIfReady();
-        }
-    };
-};
-
-/*######
 ## npc_bessy
 ######*/
 enum BessyData
@@ -861,7 +731,7 @@ public:
                     }
                     break;
                 case 36: //return and quest_complete
-                    player->CompleteQuest(QUEST_MARK_V_IS_ALIVE);
+                    player->GroupEventHappens(QUEST_MARK_V_IS_ALIVE, me);
                     break;
             }
         }
@@ -910,6 +780,12 @@ public:
     }
 };
 
+enum PhaseHunterData
+{
+    NPC_PHASE_HUNTER_ENTRY         = 18879,
+    NPC_DRAINED_PHASE_HUNTER_ENTRY = 19595
+};
+
 class spell_q10190_battery_recharging_blaster : public SpellScript
 {
     PrepareSpellScript(spell_q10190_battery_recharging_blaster);
@@ -917,7 +793,7 @@ class spell_q10190_battery_recharging_blaster : public SpellScript
     SpellCastResult CheckCast()
     {
         if (Unit* target = GetExplTargetUnit())
-            if (target->GetHealthPct() <= 25.0f)
+            if (target->GetHealthPct() <= 35.0f)
                 return SPELL_CAST_OK;
 
         return SPELL_FAILED_BAD_TARGETS;
@@ -940,12 +816,43 @@ class spell_q10190_battery_recharging_blaster_aura : public AuraScript
 
         if (Creature* phasehunter = GetTarget()->ToCreature())
             if (phasehunter->GetEntry() == NPC_PHASE_HUNTER_ENTRY)
-                phasehunter->UpdateEntry(NPC_DRAINED_PHASE_HUNTER_ENTRY);
+                phasehunter->UpdateEntry(NPC_DRAINED_PHASE_HUNTER_ENTRY, nullptr, false);
     }
 
     void Register() override
     {
         OnEffectRemove += AuraEffectRemoveFn(spell_q10190_battery_recharging_blaster_aura::HandleEffectRemove, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
+    }
+};
+
+enum Veraku
+{
+    NPC_VERAKU               = 18544,
+    SPELL_CHALLENGE_VERAKU   = 34895
+};
+
+class spell_challenge_veraku : public SpellScript
+{
+public:
+    PrepareSpellScript(spell_challenge_veraku);
+
+    bool Validate(SpellInfo const* /*SpellInfo*/) override
+    {
+        return ValidateSpellInfo({ SPELL_CHALLENGE_VERAKU });
+    }
+
+    SpellCastResult CheckRequirement()
+    {
+        if (Unit* caster = GetCaster())
+            if (Creature* veraku = caster->FindNearestCreature(NPC_VERAKU, 100.0f))
+                if (!veraku->HasAura(SPELL_CHALLENGE_VERAKU))
+                    return SPELL_FAILED_CASTER_AURASTATE;
+        return SPELL_CAST_OK;
+    }
+
+    void Register() override
+    {
+        OnCheckCast += SpellCheckCastFn(spell_challenge_veraku::CheckRequirement);
     }
 };
 
@@ -957,8 +864,8 @@ void AddSC_netherstorm()
     // Theirs
     new npc_commander_dawnforge();
     new at_commander_dawnforge();
-    new npc_phase_hunter();
     new npc_bessy();
     new npc_maxx_a_million_escort();
     RegisterSpellAndAuraScriptPair(spell_q10190_battery_recharging_blaster, spell_q10190_battery_recharging_blaster_aura);
+    RegisterSpellScript(spell_challenge_veraku);
 }

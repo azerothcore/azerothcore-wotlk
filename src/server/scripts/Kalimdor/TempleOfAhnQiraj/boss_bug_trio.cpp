@@ -15,11 +15,11 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "ScriptMgr.h"
+#include "CreatureScript.h"
 #include "ScriptedCreature.h"
 #include "SpellScript.h"
+#include "SpellScriptLoader.h"
 #include "temple_of_ahnqiraj.h"
-#include "TaskScheduler.h"
 
 enum Spells
 {
@@ -367,7 +367,7 @@ struct boss_vem : public boss_bug_trio
         {
             if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, [this](Unit* target) -> bool
                 {
-                    if (target->GetTypeId() != TYPEID_PLAYER)
+                    if (!target->IsPlayer())
                         return false;
                     if (me->IsWithinMeleeRange(target) || target == me->GetVictim())
                         return false;
@@ -390,6 +390,14 @@ struct boss_vem : public boss_bug_trio
         {
             DoCastVictim(SPELL_KNOCKDOWN);
             context.Repeat();
+        })
+        .Schedule(1s, [this](TaskContext context)
+        {
+            if (instance->GetData(DATA_BUG_TRIO_DEATH) == 2 && !me->HasAura(SPELL_VENGEANCE)) // Vem is the only one left.
+            {
+                DoCastSelf(SPELL_VENGEANCE, true);
+            }
+            context.Repeat(1s);
         });
     }
 };

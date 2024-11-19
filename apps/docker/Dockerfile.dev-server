@@ -1,0 +1,83 @@
+#syntax=docker/dockerfile:1.2
+
+#================================================================
+#
+# DEV: Stage used for the development environment
+#      and the locally built services
+#
+#=================================================================
+
+FROM ubuntu:22.04 as dev
+ARG USER_ID=1000
+ARG GROUP_ID=1000
+ARG DOCKER_USER=acore
+ARG TZ=Etc/UTC
+
+LABEL description="AC base image for dev containers"
+
+# List of timezones: http://en.wikipedia.org/wiki/List_of_tz_database_time_zones
+
+ENV DOCKER=1
+
+# Ensure ac-dev-server can properly pull versions
+ENV GIT_DISCOVERY_ACROSS_FILESYSTEM=1
+
+# set timezone environment variable
+ENV TZ=$TZ
+
+# set noninteractive mode so tzdata doesn't ask to set timezone on install
+ENV DEBIAN_FRONTEND=noninteractive
+
+RUN apt-get update \
+    && apt-get install -y \
+        gdb gdbserver git dos2unix lsb-core sudo curl unzip \
+        make cmake clang libmysqlclient-dev libboost-all-dev \
+        build-essential libtool cmake-data openssl libgoogle-perftools-dev google-perftools \
+        libssl-dev libmysql++-dev libreadline6-dev zlib1g-dev libbz2-dev mysql-client \
+        libncurses5-dev ccache tzdata \
+  && rm -rf /var/lib/apt/lists/*
+
+# Ensure git will work with the AzerothCore source directory
+RUN git config --global --add safe.directory /azerothcore
+
+# change timezone in container
+RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime \
+    && echo $TZ > /etc/timezone && dpkg-reconfigure --frontend noninteractive tzdata
+
+# Create a non-root user
+RUN addgroup --gid "$GROUP_ID" "$DOCKER_USER" && \
+    adduser --disabled-password --gecos '' --uid "$USER_ID" --gid "$GROUP_ID" "$DOCKER_USER" && \
+    passwd -d "$DOCKER_USER" && \
+    echo "$DOCKER_USER ALL=(ALL:ALL) NOPASSWD: ALL" >> /etc/sudoers
+
+# must be created to set the correct permissions on them
+RUN mkdir -p \
+    /azerothcore/env/dist/bin \
+    /azerothcore/env/dist/data/Cameras \
+    /azerothcore/env/dist/data/dbc \
+    /azerothcore/env/dist/data/maps \
+    /azerothcore/env/dist/data/mmaps \
+    /azerothcore/env/dist/data/vmaps \
+    /azerothcore/env/dist/logs \
+    /azerothcore/env/dist/temp \
+    /azerothcore/env/dist/etc \
+    /azerothcore/var/build/obj
+
+# Correct permissions for non-root operations
+RUN chown -R $DOCKER_USER:$DOCKER_USER /home/acore /run /opt /azerothcore
+
+USER $DOCKER_USER
+
+# copy only necessary files for the acore dashboard
+COPY --chown=$DOCKER_USER:$DOCKER_USER apps /azerothcore/apps
+COPY --chown=$DOCKER_USER:$DOCKER_USER bin /azerothcore/bin
+COPY --chown=$DOCKER_USER:$DOCKER_USER conf /azerothcore/conf
+COPY --chown=$DOCKER_USER:$DOCKER_USER data /azerothcore/data
+COPY --chown=$DOCKER_USER:$DOCKER_USER deps /azerothcore/deps
+COPY --chown=$DOCKER_USER:$DOCKER_USER acore.json /azerothcore/acore.json
+COPY --chown=$DOCKER_USER:$DOCKER_USER acore.sh /azerothcore/acore.sh
+
+# Download deno and make sure the dashboard works
+RUN bash /azerothcore/acore.sh quit
+
+WORKDIR /azerothcore

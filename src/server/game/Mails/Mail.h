@@ -22,7 +22,6 @@
 #include "DatabaseEnvFwd.h"
 #include "ObjectGuid.h"
 #include <map>
-#include <utility>
 
 struct AuctionEntry;
 struct CalendarEvent;
@@ -42,7 +41,7 @@ enum MailMessageType
     MAIL_CALENDAR       = 5
 };
 
-enum MailCheckMask
+enum MailCheckMask : uint8
 {
     MAIL_CHECK_MASK_NONE        = 0x00,
     MAIL_CHECK_MASK_READ        = 0x01,

@@ -20,7 +20,8 @@
  * Scriptnames of files in this file should be prefixed with "npc_pet_hun_".
  */
 
-#include "ScriptMgr.h"
+#include "CreatureScript.h"
+#include "PetDefines.h"
 #include "ScriptedCreature.h"
 
 enum HunterSpells
@@ -57,7 +58,7 @@ struct npc_pet_hunter_snake_trap : public ScriptedAI
         me->LoadCreaturesAddon(true);
         me->SetLootRecipient(nullptr);
         me->ResetPlayerDamageReq();
-        me->SetLastDamagedTime(0);
+        me->ClearLastLeashExtensionTimePtr();
 
         me->AddUnitState(UNIT_STATE_EVADE);
         me->GetMotionMaster()->MoveTargetedHome();

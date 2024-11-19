@@ -15,13 +15,11 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "AccountMgr.h"
 #include "ArenaSpectator.h"
 #include "BattlegroundMgr.h"
 #include "Chat.h"
+#include "CommandScript.h"
 #include "Player.h"
-#include "ScriptMgr.h"
-#include "World.h"
 
 using namespace Acore::ChatCommands;
 

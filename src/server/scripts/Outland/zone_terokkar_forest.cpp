@@ -15,14 +15,16 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "CreatureScript.h"
+#include "GameObjectScript.h"
 #include "Group.h"
 #include "Player.h"
-#include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 #include "ScriptedEscortAI.h"
 #include "ScriptedGossip.h"
 #include "SpellAuras.h"
 #include "SpellScript.h"
+#include "SpellScriptLoader.h"
 
 // Ours
 enum fumping
@@ -34,125 +36,82 @@ enum fumping
     SPELL_SUMMON_HAISHULUD              = 39248,
 };
 
-class spell_q10930_big_bone_worm : public SpellScriptLoader
+class spell_q10930_big_bone_worm : public SpellScript
 {
-public:
-    spell_q10930_big_bone_worm() : SpellScriptLoader("spell_q10930_big_bone_worm") { }
+    PrepareSpellScript(spell_q10930_big_bone_worm);
 
-    class spell_q10930_big_bone_worm_SpellScript : public SpellScript
+    void SetDest(SpellDestination& dest)
     {
-        PrepareSpellScript(spell_q10930_big_bone_worm_SpellScript);
-
-        void SetDest(SpellDestination& dest)
-        {
-            Position const offset = { 0.5f, 0.5f, 5.0f, 0.0f };
-            dest.RelocateOffset(offset);
-        }
-
-        void Register() override
-        {
-            OnDestinationTargetSelect += SpellDestinationTargetSelectFn(spell_q10930_big_bone_worm_SpellScript::SetDest, EFFECT_1, TARGET_DEST_CASTER);
-        }
-    };
-
-    SpellScript* GetSpellScript() const override
-    {
-        return new spell_q10930_big_bone_worm_SpellScript();
+        Position const offset = { 0.5f, 0.5f, 5.0f, 0.0f };
+        dest.RelocateOffset(offset);
     }
 
-    class spell_q10930_big_bone_worm_AuraScript : public AuraScript
+    void Register() override
     {
-        PrepareAuraScript(spell_q10930_big_bone_worm_AuraScript);
-
-        void HandleEffectRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
-        {
-            if (GetTargetApplication()->GetRemoveMode() != AURA_REMOVE_BY_EXPIRE)
-                return;
-
-            GetUnitOwner()->CastSpell(GetUnitOwner(), RAND(SPELL_SUMMON_HAISHULUD, SPELL_SUMMON_MATURE_BONE_SIFTER1, SPELL_SUMMON_MATURE_BONE_SIFTER3), true);
-        }
-
-        void Register() override
-        {
-            OnEffectRemove += AuraEffectRemoveFn(spell_q10930_big_bone_worm_AuraScript::HandleEffectRemove, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
-        }
-    };
-
-    AuraScript* GetAuraScript() const override
-    {
-        return new spell_q10930_big_bone_worm_AuraScript();
+        OnDestinationTargetSelect += SpellDestinationTargetSelectFn(spell_q10930_big_bone_worm::SetDest, EFFECT_1, TARGET_DEST_CASTER);
     }
 };
 
-class spell_q10929_fumping : SpellScriptLoader
+class spell_q10930_big_bone_worm_aura : public AuraScript
 {
-public:
-    spell_q10929_fumping() : SpellScriptLoader("spell_q10929_fumping") { }
+    PrepareAuraScript(spell_q10930_big_bone_worm_aura);
 
-    class spell_q10929_fumping_SpellScript : public SpellScript
+    bool Validate(SpellInfo const* /*spellInfo*/) override
     {
-        PrepareSpellScript(spell_q10929_fumping_SpellScript);
-
-        void SetDest(SpellDestination& dest)
-        {
-            Position const offset = { 0.5f, 0.5f, 5.0f, 0.0f };
-            dest.RelocateOffset(offset);
-        }
-
-        void Register() override
-        {
-            OnDestinationTargetSelect += SpellDestinationTargetSelectFn(spell_q10929_fumping_SpellScript::SetDest, EFFECT_1, TARGET_DEST_CASTER);
-        }
-    };
-
-    SpellScript* GetSpellScript() const override
-    {
-        return new spell_q10929_fumping_SpellScript();
+        return ValidateSpellInfo({ SPELL_SUMMON_HAISHULUD, SPELL_SUMMON_MATURE_BONE_SIFTER1, SPELL_SUMMON_MATURE_BONE_SIFTER3 });
     }
 
-    class spell_q10929_fumping_AuraScript : public AuraScript
+    void HandleEffectRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
     {
-        PrepareAuraScript(spell_q10929_fumping_AuraScript);
+        if (GetTargetApplication()->GetRemoveMode() != AURA_REMOVE_BY_EXPIRE)
+            return;
 
-        void HandleEffectRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
-        {
-            if (GetTargetApplication()->GetRemoveMode() != AURA_REMOVE_BY_EXPIRE)
-                return;
+        GetUnitOwner()->CastSpell(GetUnitOwner(), RAND(SPELL_SUMMON_HAISHULUD, SPELL_SUMMON_MATURE_BONE_SIFTER1, SPELL_SUMMON_MATURE_BONE_SIFTER3), true);
+    }
 
-            GetUnitOwner()->CastSpell(GetUnitOwner(), RAND(SPELL_SUMMON_SAND_GNOME1, SPELL_SUMMON_SAND_GNOME3, SPELL_SUMMON_MATURE_BONE_SIFTER1, SPELL_SUMMON_MATURE_BONE_SIFTER3), true);
-        }
-
-        void Register() override
-        {
-            OnEffectRemove += AuraEffectRemoveFn(spell_q10929_fumping_AuraScript::HandleEffectRemove, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
-        }
-    };
-
-    AuraScript* GetAuraScript() const override
+    void Register() override
     {
-        return new spell_q10929_fumping_AuraScript();
+        OnEffectRemove += AuraEffectRemoveFn(spell_q10930_big_bone_worm_aura::HandleEffectRemove, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
     }
 };
 
-class npc_greatfather_aldrimus : public CreatureScript
+class spell_q10929_fumping : public SpellScript
 {
-public:
-    npc_greatfather_aldrimus() : CreatureScript("npc_greatfather_aldrimus") { }
+    PrepareSpellScript(spell_q10929_fumping);
 
-    CreatureAI* GetAI(Creature* creature) const override
+    void SetDest(SpellDestination& dest)
     {
-        return new npc_greatfather_aldrimusAI(creature);
+        Position const offset = { 0.5f, 0.5f, 5.0f, 0.0f };
+        dest.RelocateOffset(offset);
     }
 
-    struct npc_greatfather_aldrimusAI : public ScriptedAI
+    void Register() override
     {
-        npc_greatfather_aldrimusAI(Creature* c) : ScriptedAI(c) {}
+        OnDestinationTargetSelect += SpellDestinationTargetSelectFn(spell_q10929_fumping::SetDest, EFFECT_1, TARGET_DEST_CASTER);
+    }
+};
 
-        bool CanBeSeen(Player const* player) override
-        {
-            return player->GetQuestStatus(10253) == QUEST_STATUS_REWARDED;
-        }
-    };
+class spell_q10929_fumping_aura : public AuraScript
+{
+    PrepareAuraScript(spell_q10929_fumping_aura);
+
+    bool Validate(SpellInfo const* /*spellInfo*/) override
+    {
+        return ValidateSpellInfo({ SPELL_SUMMON_SAND_GNOME1, SPELL_SUMMON_SAND_GNOME3, SPELL_SUMMON_MATURE_BONE_SIFTER1, SPELL_SUMMON_MATURE_BONE_SIFTER3 });
+    }
+
+    void HandleEffectRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
+    {
+        if (GetTargetApplication()->GetRemoveMode() != AURA_REMOVE_BY_EXPIRE)
+            return;
+
+        GetUnitOwner()->CastSpell(GetUnitOwner(), RAND(SPELL_SUMMON_SAND_GNOME1, SPELL_SUMMON_SAND_GNOME3, SPELL_SUMMON_MATURE_BONE_SIFTER1, SPELL_SUMMON_MATURE_BONE_SIFTER3), true);
+    }
+
+    void Register() override
+    {
+        OnEffectRemove += AuraEffectRemoveFn(spell_q10929_fumping_aura::HandleEffectRemove, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
+    }
 };
 
 enum q10036Torgos
@@ -160,30 +119,19 @@ enum q10036Torgos
     NPC_TORGOS                  = 18707
 };
 
-class spell_q10036_torgos : public SpellScriptLoader
+class spell_q10036_torgos : public SpellScript
 {
-public:
-    spell_q10036_torgos() : SpellScriptLoader("spell_q10036_torgos") { }
+    PrepareSpellScript(spell_q10036_torgos);
 
-    class spell_q10036_torgos_SpellScript : public SpellScript
+    void HandleSendEvent(SpellEffIndex  /*effIndex*/)
     {
-        PrepareSpellScript(spell_q10036_torgos_SpellScript);
+        if (Creature* torgos = GetCaster()->FindNearestCreature(NPC_TORGOS, 100.0f, true))
+            torgos->GetAI()->AttackStart(GetCaster());
+    }
 
-        void HandleSendEvent(SpellEffIndex  /*effIndex*/)
-        {
-            if (Creature* torgos = GetCaster()->FindNearestCreature(NPC_TORGOS, 100.0f, true))
-                torgos->GetAI()->AttackStart(GetCaster());
-        }
-
-        void Register() override
-        {
-            OnEffectLaunch += SpellEffectFn(spell_q10036_torgos_SpellScript::HandleSendEvent, EFFECT_0, SPELL_EFFECT_SEND_EVENT);
-        }
-    };
-
-    SpellScript* GetSpellScript() const override
+    void Register() override
     {
-        return new spell_q10036_torgos_SpellScript();
+        OnEffectLaunch += SpellEffectFn(spell_q10036_torgos::HandleSendEvent, EFFECT_0, SPELL_EFFECT_SEND_EVENT);
     }
 };
 
@@ -196,114 +144,80 @@ enum eQ10923EvilDrawsNear
     NPC_AUCHENAI_DEATH_SPIRIT               = 21967
 };
 
-class spell_q10923_evil_draws_near_summon : public SpellScriptLoader
+class spell_q10923_evil_draws_near_summon : public SpellScript
 {
-public:
-    spell_q10923_evil_draws_near_summon() : SpellScriptLoader("spell_q10923_evil_draws_near_summon") { }
+    PrepareSpellScript(spell_q10923_evil_draws_near_summon);
 
-    class spell_q10923_evil_draws_near_summon_SpellScript : public SpellScript
+    bool Validate(SpellInfo const* /*spellInfo*/) override
     {
-        PrepareSpellScript(spell_q10923_evil_draws_near_summon_SpellScript);
+        return ValidateSpellInfo({ SPELL_DUSTIN_UNDEAD_DRAGON_VISUAL_AURA });
+    }
 
-        void HandleSendEvent(SpellEffIndex  /*effIndex*/)
-        {
-            if (Creature* auchenai = GetCaster()->FindNearestCreature(NPC_AUCHENAI_DEATH_SPIRIT, 10.0f, true))
-                auchenai->CastSpell(auchenai, SPELL_DUSTIN_UNDEAD_DRAGON_VISUAL_AURA, true);
-        }
-
-        void Register() override
-        {
-            OnEffectLaunch += SpellEffectFn(spell_q10923_evil_draws_near_summon_SpellScript::HandleSendEvent, EFFECT_0, SPELL_EFFECT_SEND_EVENT);
-        }
-    };
-
-    SpellScript* GetSpellScript() const override
+    void HandleSendEvent(SpellEffIndex  /*effIndex*/)
     {
-        return new spell_q10923_evil_draws_near_summon_SpellScript();
+        if (Creature* auchenai = GetCaster()->FindNearestCreature(NPC_AUCHENAI_DEATH_SPIRIT, 10.0f, true))
+            auchenai->CastSpell(auchenai, SPELL_DUSTIN_UNDEAD_DRAGON_VISUAL_AURA, true);
+    }
+
+    void Register() override
+    {
+        OnEffectLaunch += SpellEffectFn(spell_q10923_evil_draws_near_summon::HandleSendEvent, EFFECT_0, SPELL_EFFECT_SEND_EVENT);
     }
 };
 
-class spell_q10923_evil_draws_near_periodic : public SpellScriptLoader
+class spell_q10923_evil_draws_near_periodic_aura : public AuraScript
 {
-public:
-    spell_q10923_evil_draws_near_periodic() : SpellScriptLoader("spell_q10923_evil_draws_near_periodic") { }
+    PrepareAuraScript(spell_q10923_evil_draws_near_periodic_aura);
 
-    class spell_q10923_evil_draws_near_periodic_AuraScript : public AuraScript
+    bool Validate(SpellInfo const* /*spellInfo*/) override
     {
-        PrepareAuraScript(spell_q10923_evil_draws_near_periodic_AuraScript);
+        return ValidateSpellInfo({ SPELL_DUSTIN_UNDEAD_DRAGON_VISUAL1, SPELL_DUSTIN_UNDEAD_DRAGON_VISUAL2 });
+    }
 
-        void HandlePeriodic(AuraEffect const*  /*aurEff*/)
-        {
-            PreventDefaultAction();
-            GetUnitOwner()->CastSpell(GetUnitOwner(), RAND(SPELL_DUSTIN_UNDEAD_DRAGON_VISUAL1, SPELL_DUSTIN_UNDEAD_DRAGON_VISUAL2), true);
-        }
-
-        void Register() override
-        {
-            OnEffectPeriodic += AuraEffectPeriodicFn(spell_q10923_evil_draws_near_periodic_AuraScript::HandlePeriodic, EFFECT_0, SPELL_AURA_PERIODIC_TRIGGER_SPELL);
-        }
-    };
-
-    AuraScript* GetAuraScript() const override
+    void HandlePeriodic(AuraEffect const*  /*aurEff*/)
     {
-        return new spell_q10923_evil_draws_near_periodic_AuraScript();
+        PreventDefaultAction();
+        GetUnitOwner()->CastSpell(GetUnitOwner(), RAND(SPELL_DUSTIN_UNDEAD_DRAGON_VISUAL1, SPELL_DUSTIN_UNDEAD_DRAGON_VISUAL2), true);
+    }
+
+    void Register() override
+    {
+        OnEffectPeriodic += AuraEffectPeriodicFn(spell_q10923_evil_draws_near_periodic_aura::HandlePeriodic, EFFECT_0, SPELL_AURA_PERIODIC_TRIGGER_SPELL);
     }
 };
 
-class spell_q10923_evil_draws_near_visual : public SpellScriptLoader
+class spell_q10923_evil_draws_near_visual : public SpellScript
 {
-public:
-    spell_q10923_evil_draws_near_visual() : SpellScriptLoader("spell_q10923_evil_draws_near_visual") { }
+    PrepareSpellScript(spell_q10923_evil_draws_near_visual);
 
-    class spell_q10923_evil_draws_near_visual_SpellScript : public SpellScript
+    void SetDest(SpellDestination& dest)
     {
-        PrepareSpellScript(spell_q10923_evil_draws_near_visual_SpellScript);
+        // Adjust effect summon position
+        Position const offset = { 0.0f, 0.0f, 20.0f, 0.0f };
+        dest.RelocateOffset(offset);
+    }
 
-        void SetDest(SpellDestination& dest)
-        {
-            // Adjust effect summon position
-            Position const offset = { 0.0f, 0.0f, 20.0f, 0.0f };
-            dest.RelocateOffset(offset);
-        }
-
-        void Register() override
-        {
-            OnDestinationTargetSelect += SpellDestinationTargetSelectFn(spell_q10923_evil_draws_near_visual_SpellScript::SetDest, EFFECT_0, TARGET_DEST_CASTER_RADIUS);
-        }
-    };
-
-    SpellScript* GetSpellScript() const override
+    void Register() override
     {
-        return new spell_q10923_evil_draws_near_visual_SpellScript();
+        OnDestinationTargetSelect += SpellDestinationTargetSelectFn(spell_q10923_evil_draws_near_visual::SetDest, EFFECT_0, TARGET_DEST_CASTER_RADIUS);
     }
 };
 
-class spell_q10898_skywing : public SpellScriptLoader
+class spell_q10898_skywing : public SpellScript
 {
-public:
-    spell_q10898_skywing() : SpellScriptLoader("spell_q10898_skywing") { }
+    PrepareSpellScript(spell_q10898_skywing);
 
-    class spell_q10898_skywing_SpellScript : public SpellScript
+    void SetDest(SpellDestination& dest)
     {
-        PrepareSpellScript(spell_q10898_skywing_SpellScript);
+        // Adjust effect summon position
+        Position const offset = { frand(-7.0f, 7.0f), frand(-7.0f, 7.0f), 11.0f, 0.0f };
+        dest.Relocate(*GetCaster());
+        dest.RelocateOffset(offset);
+    }
 
-        void SetDest(SpellDestination& dest)
-        {
-            // Adjust effect summon position
-            Position const offset = { frand(-7.0f, 7.0f), frand(-7.0f, 7.0f), 11.0f, 0.0f };
-            dest.Relocate(*GetCaster());
-            dest.RelocateOffset(offset);
-        }
-
-        void Register() override
-        {
-            OnDestinationTargetSelect += SpellDestinationTargetSelectFn(spell_q10898_skywing_SpellScript::SetDest, EFFECT_0, TARGET_DEST_CASTER_RANDOM);
-        }
-    };
-
-    SpellScript* GetSpellScript() const override
+    void Register() override
     {
-        return new spell_q10898_skywing_SpellScript();
+        OnDestinationTargetSelect += SpellDestinationTargetSelectFn(spell_q10898_skywing::SetDest, EFFECT_0, TARGET_DEST_CASTER_RANDOM);
     }
 };
 
@@ -472,7 +386,7 @@ public:
             {
                 case 0:
                     if (GameObject* Cage = me->FindNearestGameObject(GO_CAGE, 10))
-                        Cage->SetGoState(GO_STATE_ACTIVE);
+                        Cage->UseDoorOrButton();
                     break;
                 case 2:
                     Talk(SAY_PROGRESS_1, player);
@@ -501,9 +415,10 @@ public:
             }
         }
 
-        void Reset() override
+        void JustRespawned() override
         {
-            me->RestoreFaction();
+            me->SetImmuneToAll(true);
+            npc_escortAI::JustRespawned();
         }
 
         void JustDied(Unit* /*killer*/) override
@@ -575,10 +490,25 @@ public:
 /*######
 ## go_skull_pile
 ######*/
-#define GOSSIP_S_DARKSCREECHER_AKKARAI         "Summon Darkscreecher Akkarai"
-#define GOSSIP_S_KARROG         "Summon Karrog"
-#define GOSSIP_S_GEZZARAK_THE_HUNTRESS         "Summon Gezzarak the Huntress"
-#define GOSSIP_S_VAKKIZ_THE_WINDRAGER         "Summon Vakkiz the Windrager"
+
+enum SkullPile : uint32
+{
+    QUEST_ADVERSARIAL_BLOOD                     = 11885,
+
+    GOSSIP_MENU_SKULL_PILE                      = 8660,
+    GOSSIP_MENU_TEXT_SKULL_PILE                 = 10888,
+    GOSSIP_MENU_TEXT_SKULL_PILE_QUEST           = 11057,
+
+    GOSSIP_OPTION_SUMMON_GEZZARAK_THE_HUNTRESS  = 0,
+    GOSSIP_OPTION_SUMMON_DARKSCREECHER_AKKARAI  = 1,
+    GOSSIP_OPTION_SUMMON_KARROG                 = 2,
+    GOSSIP_OPTION_SUMMON_VAKKIZ_THE_WINDRAGER   = 3,
+
+    SPELL_SUMMON_GEZZARAK_THE_HUNTRESS          = 40632,
+    SPELL_SUMMON_DARKSCREECHER_AKKARAI          = 40642,
+    SPELL_SUMMON_KARROG                         = 40640,
+    SPELL_SUMMON_VAKKIZ_THE_WINDRAGER           = 40644,
+};
 
 class go_skull_pile : public GameObjectScript
 {
@@ -588,47 +518,59 @@ public:
     bool OnGossipSelect(Player* player, GameObject* go, uint32 sender, uint32 action) override
     {
         ClearGossipMenuFor(player);
-        switch (sender)
+
+        if (sender == GOSSIP_SENDER_MAIN)
         {
-            case GOSSIP_SENDER_MAIN:
-                SendActionMenu(player, go, action);
-                break;
+            SendActionMenu(player, go, action);
+            CloseGossipMenuFor(player);
         }
         return true;
     }
 
     bool OnGossipHello(Player* player, GameObject* go) override
     {
-        if ((player->GetQuestStatus(11885) == QUEST_STATUS_INCOMPLETE) || player->GetQuestRewardStatus(11885))
+        if ((player->GetQuestStatus(QUEST_ADVERSARIAL_BLOOD) == QUEST_STATUS_INCOMPLETE) || player->GetQuestRewardStatus(QUEST_ADVERSARIAL_BLOOD))
         {
-            AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_S_DARKSCREECHER_AKKARAI, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
-            AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_S_KARROG, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 2);
-            AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_S_GEZZARAK_THE_HUNTRESS, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 3);
-            AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_S_VAKKIZ_THE_WINDRAGER, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 4);
-        }
+            AddGossipItemFor(player, GOSSIP_MENU_SKULL_PILE, GOSSIP_OPTION_SUMMON_GEZZARAK_THE_HUNTRESS, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
+            AddGossipItemFor(player, GOSSIP_MENU_SKULL_PILE, GOSSIP_OPTION_SUMMON_DARKSCREECHER_AKKARAI, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 2);
+            AddGossipItemFor(player, GOSSIP_MENU_SKULL_PILE, GOSSIP_OPTION_SUMMON_KARROG, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 3);
+            AddGossipItemFor(player, GOSSIP_MENU_SKULL_PILE, GOSSIP_OPTION_SUMMON_VAKKIZ_THE_WINDRAGER, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 4);
 
-        SendGossipMenuFor(player, go->GetGOInfo()->questgiver.gossipID, go->GetGUID());
+            SendGossipMenuFor(player, GOSSIP_MENU_TEXT_SKULL_PILE_QUEST, go->GetGUID());
+        }
+        else
+            SendGossipMenuFor(player, GOSSIP_MENU_TEXT_SKULL_PILE, go->GetGUID());
+
         return true;
     }
 
-    void SendActionMenu(Player* player, GameObject* /*go*/, uint32 action)
+    void SendActionMenu(Player* player, GameObject* go, uint32 action)
     {
         switch (action)
         {
             case GOSSIP_ACTION_INFO_DEF + 1:
-                player->CastSpell(player, 40642, false);
+                _result = player->CastSpell(player, SPELL_SUMMON_GEZZARAK_THE_HUNTRESS, false);
                 break;
             case GOSSIP_ACTION_INFO_DEF + 2:
-                player->CastSpell(player, 40640, false);
+                _result = player->CastSpell(player, SPELL_SUMMON_DARKSCREECHER_AKKARAI, false);
                 break;
             case GOSSIP_ACTION_INFO_DEF + 3:
-                player->CastSpell(player, 40632, false);
+                _result = player->CastSpell(player, SPELL_SUMMON_KARROG, false);
                 break;
             case GOSSIP_ACTION_INFO_DEF + 4:
-                player->CastSpell(player, 40644, false);
+                _result = player->CastSpell(player, SPELL_SUMMON_VAKKIZ_THE_WINDRAGER, false);
+                break;
+            default:
+                _result = SPELL_CAST_OK;
                 break;
         }
+        if (_result == SPELL_CAST_OK)
+        {
+            go->DespawnOrUnsummon();
+        }
     }
+private:
+    SpellCastResult _result;
 };
 
 /*######
@@ -671,14 +613,13 @@ public:
 void AddSC_terokkar_forest()
 {
     // Ours
-    new spell_q10930_big_bone_worm();
-    new spell_q10929_fumping();
-    new npc_greatfather_aldrimus();
-    new spell_q10036_torgos();
-    new spell_q10923_evil_draws_near_summon();
-    new spell_q10923_evil_draws_near_periodic();
-    new spell_q10923_evil_draws_near_visual();
-    new spell_q10898_skywing();
+    RegisterSpellAndAuraScriptPair(spell_q10930_big_bone_worm, spell_q10930_big_bone_worm_aura);
+    RegisterSpellAndAuraScriptPair(spell_q10929_fumping, spell_q10929_fumping_aura);
+    RegisterSpellScript(spell_q10036_torgos);
+    RegisterSpellScript(spell_q10923_evil_draws_near_summon);
+    RegisterSpellScript(spell_q10923_evil_draws_near_periodic_aura);
+    RegisterSpellScript(spell_q10923_evil_draws_near_visual);
+    RegisterSpellScript(spell_q10898_skywing);
 
     // Theirs
     new npc_unkor_the_ruthless();

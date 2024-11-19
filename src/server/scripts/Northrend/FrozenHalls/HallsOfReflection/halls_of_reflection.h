@@ -19,14 +19,7 @@
 #define DEF_HALLS_OF_REFLECTION_H
 
 #include "CreatureAIImpl.h"
-#include "PassiveAI.h"
 #include "Player.h"
-#include "ScriptMgr.h"
-#include "ScriptedCreature.h"
-#include "ScriptedGossip.h"
-#include "SpellAuraEffects.h"
-#include "SpellAuras.h"
-#include "SpellScript.h"
 
 #define DataHeader "HOR"
 

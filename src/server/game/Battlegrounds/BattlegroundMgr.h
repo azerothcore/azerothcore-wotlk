@@ -20,11 +20,9 @@
 
 #include "Battleground.h"
 #include "BattlegroundQueue.h"
-#include "Common.h"
 #include "CreatureAIImpl.h"
 #include "DBCEnums.h"
 #include <unordered_map>
-#include <functional>
 
 typedef std::map<uint32, Battleground*> BattlegroundContainer;
 typedef std::set<uint32> BattlegroundClientIdsContainer;

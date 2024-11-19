@@ -16,8 +16,7 @@ jobs:
       fail-fast: false
       matrix:
         os:
-          - macos-11
-          - macos-12
+          - macos-14
     runs-on: ${{ matrix.os }}
     name: ${{ matrix.os }}
     if: |
@@ -27,7 +26,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Cache
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: ~/Library/Caches/ccache
           key: ccache:${{ matrix.os }}:${{ github.ref }}:${{ github.sha }}
@@ -40,5 +39,3 @@ jobs:
         run: source ./acore.sh install-deps
       - name: Build
         run: source ./apps/ci/mac/ci-compile.sh
-      - name: Run unit tests
-        run: source ./apps/ci/ci-run-unit-tests.sh

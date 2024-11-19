@@ -18,8 +18,7 @@
 #ifndef IteratorPair_h__
 #define IteratorPair_h__
 
-#include "Define.h"
-#include <utility>
+#include <vector> // NOTE: this import is NEEDED (even though some IDEs report it as unused)
 
 namespace Acore
 {
