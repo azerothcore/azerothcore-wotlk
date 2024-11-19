@@ -59,6 +59,9 @@ void InstanceScript::OnCreatureCreate(Creature* creature)
 {
     AddObject(creature);
     AddMinion(creature);
+
+    if (creature->IsSummon())
+        SetSummoner(creature);
 }
 
 void InstanceScript::OnCreatureRemove(Creature* creature)
@@ -190,6 +193,15 @@ void InstanceScript::LoadObjectData(ObjectData const* data, ObjectInfoMap& objec
     while (data->entry)
     {
         objectInfo[data->entry] = data->type;
+        ++data;
+    }
+}
+
+void InstanceScript::LoadSummonData(ObjectData const* data)
+{
+    while (data->entry)
+    {
+        _summonInfo[data->entry] = data->type;
         ++data;
     }
 }
@@ -346,6 +358,16 @@ void InstanceScript::AddMinion(Creature* minion, bool add)
 void InstanceScript::RemoveMinion(Creature* minion)
 {
     AddMinion(minion, false);
+}
+
+void InstanceScript::SetSummoner(Creature* creature)
+{
+    auto const& summonData = _summonInfo.find(creature->GetEntry());
+
+    if (summonData != _summonInfo.end())
+        if (Creature* summoner = GetCreature(summonData->second))
+            if (summoner->IsAIEnabled)
+                summoner->AI()->JustSummoned(creature);
 }
 
 bool InstanceScript::SetBossState(uint32 id, EncounterState state)
