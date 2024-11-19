@@ -1,3 +1,10 @@
+DELETE FROM `conditions` WHERE 
+    `SourceTypeOrReferenceId` = 23 AND
+    `SourceGroup` = 14522 AND
+    `SourceEntry` = 18687 AND
+    `ConditionTypeOrReference` = 9 AND
+    `ConditionValue1` = 7625;
+
 INSERT INTO `conditions` (
     `SourceTypeOrReferenceId`, `SourceGroup`, `SourceEntry`, `SourceId`,
     `ElseGroup`, `ConditionTypeOrReference`, `ConditionTarget`,
