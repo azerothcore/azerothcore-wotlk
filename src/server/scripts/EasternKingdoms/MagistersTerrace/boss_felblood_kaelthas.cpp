@@ -118,6 +118,12 @@ struct boss_felblood_kaelthas : public BossAI
         return nullptr;
     }
 
+    void JustSummoned(Creature* summon) override
+    {
+        BossAI::JustSummoned(summon);
+        summon->SetReactState(REACT_PASSIVE);
+    }
+
     void GravityLapseSequence(bool firstTime)
     {
         Talk(firstTime ? SAY_GRAVITY_LAPSE : SAY_RECAST_GRAVITY);
