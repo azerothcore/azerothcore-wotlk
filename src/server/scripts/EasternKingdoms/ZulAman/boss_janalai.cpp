@@ -363,6 +363,14 @@ struct npc_janalai_hatcher : public ScriptedAI
 
                 if (me->FindNearestCreature(NPC_EGG, 100.0f))
                     context.Repeat(4s);
+                else
+                {
+                    _side = _side ? 0 : 1;
+                    _isHatching = false;
+                    _waypoint = 3;
+                    MoveToNewWaypoint(_waypoint);
+                    context.CancelGroup(SCHEDULER_GROUP_HATCHING);
+                }
             });
         }
         else
