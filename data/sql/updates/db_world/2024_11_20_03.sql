@@ -1,3 +1,4 @@
+-- DB update 2024_11_20_02 -> 2024_11_20_03
 -- Rabbit (721)
 UPDATE `creature_template` SET `skinloot` = 721 WHERE (`entry` = 721);
 DELETE FROM `skinning_loot_template` WHERE (`Entry` = 721);

@@ -1,3 +1,4 @@
+-- DB update 2024_11_20_04 -> 2024_11_20_05
 -- Markaru (20775)
 UPDATE `creature_template` SET `skinloot` = 20775 WHERE (`entry` = 20775);
 DELETE FROM `skinning_loot_template` WHERE (`Entry` = 20775);

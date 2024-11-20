@@ -1,3 +1,4 @@
+-- DB update 2024_11_20_01 -> 2024_11_20_02
 -- Deer (883)
 UPDATE `creature_template` SET `skinloot` = 883 WHERE (`entry` = 883);
 DELETE FROM `skinning_loot_template` WHERE (`Entry` = 883);

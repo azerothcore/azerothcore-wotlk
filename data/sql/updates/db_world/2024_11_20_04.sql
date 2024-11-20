@@ -1,3 +1,4 @@
+-- DB update 2024_11_20_03 -> 2024_11_20_04
 -- Sorrow Wing (5928)
 UPDATE `creature_template` SET `skinloot` = 5928 WHERE (`entry` = 5928);
 DELETE FROM `skinning_loot_template` WHERE (`Entry` = 5928);
