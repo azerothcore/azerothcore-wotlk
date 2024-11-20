@@ -116,6 +116,18 @@ public:
                 if (!hostage)
                     break;
 
+                if (i == DATA_ASHLI && GetBossState(DATA_HALAZZI) == DONE)
+                    break;
+
+                if (i == DATA_TANZAR && GetBossState(DATA_NALORAKK) == DONE)
+                    break;
+
+                if (i == DATA_HARKOR && GetBossState(DATA_AKILZON) == DONE)
+                    break;
+
+                if (i == DATA_KRAZ && GetBossState(DATA_JANALAI) == DONE)
+                    break;
+
                 hostage->UpdateEntry(i + 24427);
                 hostage->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
                 hostage->CastSpell(hostage, SPELL_COSMETIC_IMMOLATION);
