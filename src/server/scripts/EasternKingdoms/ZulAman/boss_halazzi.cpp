@@ -35,7 +35,6 @@ enum Spells
     SPELL_TRANSFORM_DUMMY       = 43615, // Used by Spirit Lynx
 
     SPELL_TRANSFIGURE           = 44054,
-    SPELL_TRANSFORM_TO_ORIGINAL = 43311,
     SPELL_TRANSFORM_TO_LYNX_75  = 43145,
     SPELL_TRANSFORM_TO_LYNX_50  = 43271,
     SPELL_TRANSFORM_TO_LYNX_25  = 43272
@@ -98,7 +97,6 @@ struct boss_halazzi : public BossAI
     void Reset() override
     {
         me->UpdateEntry(NPC_HALAZZI);
-        DoCastSelf(SPELL_TRANSFORM_TO_ORIGINAL, true);
         BossAI::Reset();
         _transformCount = 0;
         _phase = PHASE_NONE;
