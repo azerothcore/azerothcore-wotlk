@@ -22,19 +22,30 @@
 
 enum Spells
 {
-    SPELL_DUAL_WIELD            = 29651,
-    SPELL_SABER_LASH            = 43267,
-    SPELL_FRENZY                = 43139,
-    SPELL_FLAMESHOCK            = 43303,
-    SPELL_EARTHSHOCK            = 43305,
-    SPELL_TRANSFORM_SPLIT       = 43142,
-    SPELL_TRANSFORM_SPLIT2      = 43573,
-    SPELL_TRANSFORM_MERGE       = 43271,
-    SPELL_SUMMON_LYNX           = 43143,
-    SPELL_SUMMON_TOTEM          = 43302,
-    SPELL_BERSERK               = 45078,
-    SPELL_LYNX_FRENZY           = 43290, // Used by Spirit Lynx
-    SPELL_SHRED_ARMOR           = 43243  // Used by Spirit Lynx
+    SPELL_DUAL_WIELD                = 29651,
+    SPELL_SABER_LASH                = 43267,
+    SPELL_FRENZY                    = 43139,
+    SPELL_FLAMESHOCK                = 43303,
+    SPELL_EARTHSHOCK                = 43305,
+    SPELL_SUMMON_LYNX               = 43143,
+    SPELL_SUMMON_TOTEM              = 43302,
+    SPELL_BERSERK                   = 45078,
+    // SPELL_LYNX_FRENZY               = 43290, // Used by Spirit Lynx
+    // SPELL_SHRED_ARMOR               = 43243, // Used by Spirit Lynx
+    SPELL_HALAZZI_TRANSFORM_DUMMY   = 43615, // Used by Spirit Lynx
+
+    // SPELL_TRANSFIGURE               = 43142, // AoE dmg, triggers 43573
+    // SPELL_TRANSFIGURE_TRIGGERED     = 43573, // transform + heal 100%
+    SPELL_TRANSFIGURE = 44054, // sniff
+
+    SPELL_TRANSFORM_TO_ORIGINAL     = 43311,
+
+    // unused
+    SPELL_TRANSFORM_TO_LYNX_75      = 43145,
+    SPELL_TRANSFORM_TO_LYNX_50      = 43271,
+    SPELL_TRANSFORM_TO_LYNX_25      = 43272,
+    // SPELL_HALAZZI_TRANSFORM_VISUAL= 43293,
+
 };
 
 enum UniqueEvents
@@ -44,7 +55,8 @@ enum UniqueEvents
 
 enum Hal_CreatureIds
 {
-    NPC_TOTEM                   = 24224
+    NPC_TOTEM                   = 24224,
+    NPC_HALAZZI_TROLL           = 24144,            // dummy creature - used to update model, stats
 };
 
 enum PhaseHalazzi
@@ -55,6 +67,10 @@ enum PhaseHalazzi
     PHASE_HUMAN                 = 3,
     PHASE_MERGE                 = 4,
     PHASE_ENRAGE                = 5
+    // TODO: rework into 3 phases
+    // PHASE_SINGLE        = 0, // lynx
+    // PHASE_TOTEM         = 1, // troll
+    // PHASE_FINAL         = 2 // lynx enrage
 };
 
 enum Yells
@@ -71,7 +87,8 @@ enum Groups
 {
     GROUP_LYNX                  = 0,
     GROUP_HUMAN                 = 1,
-    GROUP_MERGE                 = 2
+    GROUP_MERGE                 = 3,
+    GROUP_SPLIT                 = 4
 };
 
 enum Actions
@@ -91,15 +108,13 @@ struct boss_halazzi : public BossAI
 
     void Reset() override
     {
+        me->UpdateEntry(NPC_HALAZZI);
+        DoCastSelf(SPELL_TRANSFORM_TO_ORIGINAL, true);
         BossAI::Reset();
         _transformCount = 0;
-        _healthCheckPercentage = 0;
         _phase = PHASE_NONE;
-        _lynxFormHealth = me->GetMaxHealth();
-        _healthPortion = _lynxFormHealth/4;
-        _humanFormHealth = (me->GetMaxHealth())/0.66666666;
         EnterPhase(PHASE_LYNX);
-        DoCastSelf(SPELL_DUAL_WIELD, true);
+        SetInvincibility(true);
     }
 
     void JustSummoned(Creature* summon) override
@@ -123,27 +138,27 @@ struct boss_halazzi : public BossAI
     void DamageTaken(Unit* /*attacker*/, uint32& damage, DamageEffectType /*damagetype*/, SpellSchoolMask /*damageSchoolMask*/) override
     {
         if (damage >= me->GetHealth() && _phase != PHASE_ENRAGE)
-            damage = 0;
-        else
+            damage = me->GetHealth() - 1;
+
+        if (_phase == PHASE_LYNX || _phase == PHASE_ENRAGE)
         {
-            if (_phase == PHASE_LYNX || _phase == PHASE_ENRAGE)
-            {
-                _healthCheckPercentage = 25 * (3 - _transformCount);
-                if (!HealthAbovePct(_healthCheckPercentage))
-                    EnterPhase(PHASE_SPLIT);
-            }
-            else if (_phase == PHASE_HUMAN)
-            {
-                if (!HealthAbovePct(20))
-                    EnterPhase(PHASE_MERGE);
-            }
+            uint32 _healthCheckPercentage = 25 * (3 - _transformCount);
+            if (!HealthAbovePct(_healthCheckPercentage))
+                EnterPhase(PHASE_SPLIT);
+        }
+        else if (_phase == PHASE_HUMAN)
+        {
+            if (!HealthAbovePct(20))
+                EnterPhase(PHASE_MERGE);
         }
     }
 
     void SpellHit(Unit*, SpellInfo const* spell) override
     {
-        if (spell->Id == SPELL_TRANSFORM_SPLIT2)
-            EnterPhase(PHASE_HUMAN);
+        if (spell->Id == SPELL_HALAZZI_TRANSFORM_DUMMY)
+        {
+            me->UpdateEntry(NPC_HALAZZI_TROLL);
+        }
     }
 
     void AttackStart(Unit* who) override
@@ -156,38 +171,67 @@ struct boss_halazzi : public BossAI
     {
         switch (nextPhase)
         {
-            case PHASE_LYNX:
             case PHASE_ENRAGE:
+                SetInvincibility(false);
+                scheduler.Schedule(12s, GROUP_LYNX, [this](TaskContext context)
+                {
+                    // DoCastSelf(SPELL_SUMMON_TOTEM);
+                    context.Repeat(20s);
+                });
+                [[fallthrough]];
+            case PHASE_LYNX:
+            {
                 if (_phase == PHASE_MERGE)
                 {
-                    DoCastSelf(SPELL_TRANSFORM_MERGE, true);
-                    me->RemoveAurasDueToSpell(SPELL_TRANSFORM_SPLIT2);
+                    DoCastSelf(SPELL_TRANSFIGURE, true);
                     me->ResumeChasingVictim();
                 }
                 summons.DespawnAll();
-                me->SetMaxHealth(_lynxFormHealth);
-                me->SetHealth(_lynxFormHealth - _healthPortion * _transformCount);
+
+                if (_transformCount)
+                {
+                    me->UpdateEntry(NPC_HALAZZI);
+                    switch (_transformCount)
+                    {
+                        case 1:
+                            DoCastSelf(SPELL_TRANSFORM_TO_LYNX_75, true);
+                            break;
+                        case 2:
+                            DoCastSelf(SPELL_TRANSFORM_TO_LYNX_50, true);
+                            break;
+                        case 3:
+                            DoCastSelf(SPELL_TRANSFORM_TO_LYNX_25, true);
+                            break;
+                        default:
+                            break;
+                    }
+                }
+
                 scheduler.CancelGroup(GROUP_MERGE);
                 scheduler.Schedule(16s, GROUP_LYNX, [this](TaskContext context)
                 {
-                    DoCastSelf(SPELL_FRENZY);
+                    // DoCastSelf(SPELL_FRENZY);
                     context.Repeat(10s, 15s);
                 }).Schedule(20s, GROUP_LYNX, [this](TaskContext context)
                 {
-                    Talk(SAY_SABER);
-                    DoCastVictim(SPELL_SABER_LASH, true);
+                    // Talk(SAY_SABER);
+                    // DoCastVictim(SPELL_SABER_LASH, true);
                     context.Repeat(30s);
                 });
                 break;
+            }
             case PHASE_SPLIT:
                 Talk(SAY_SPLIT);
-                DoCastSelf(SPELL_TRANSFORM_SPLIT, true);
-                break;
+                DoCastSelf(SPELL_TRANSFIGURE, true);
+                scheduler.Schedule(3s, GROUP_SPLIT, [this](TaskContext context)
+                {
+                    DoCastSelf(SPELL_SUMMON_LYNX, true);
+                });
+                // set human phase
+                nextPhase = PHASE_HUMAN;
+                [[fallthrough]];
             case PHASE_HUMAN:
                 scheduler.CancelGroup(GROUP_MERGE);
-                DoCastSelf(SPELL_SUMMON_LYNX, true);
-                me->SetMaxHealth(_humanFormHealth);
-                me->SetHealth(_humanFormHealth);
                 scheduler.CancelGroup(GROUP_LYNX);
                 scheduler.Schedule(10s, GROUP_HUMAN, [this](TaskContext context)
                 {
@@ -201,7 +245,7 @@ struct boss_halazzi : public BossAI
                     context.Repeat(10s, 15s);
                 }).Schedule(12s, GROUP_HUMAN, [this](TaskContext context)
                 {
-                    DoCastSelf(SPELL_SUMMON_TOTEM);
+                    // DoCastSelf(SPELL_SUMMON_TOTEM);
                     context.Repeat(20s);
                 });
                 break;
@@ -255,11 +299,7 @@ struct boss_halazzi : public BossAI
         Talk(SAY_DEATH);
     }
 private:
-    uint32 _lynxFormHealth;
-    uint32 _humanFormHealth;
-    uint32 _healthPortion;
     uint8 _transformCount;
-    uint32 _healthCheckPercentage;
     PhaseHalazzi _phase;
 };
 
