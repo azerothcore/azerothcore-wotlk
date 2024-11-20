@@ -1887,25 +1887,28 @@ void Player::Regenerate(Powers power)
                 }
             }
             break;
-        case POWER_ENERGY: // Regenerate energy (rogue)
-        {
-            float baseRegenRate = 1.0f; // 1 energy per 0.1 seconds
-            float hasteMultiplier = 1.0f; // Start with no haste
+        case POWER_ENERGY:
+            {
+                float baseRegenRate = 10.0f * sWorld->getRate(RATE_POWER_ENERGY);
+                float hasteModifier = 1.0f;
 
-            // Apply haste effects from rogue talents
-            if (HasAuraEffect(13750, 0, ObjectGuid())) // Adrenaline Rush
-                hasteMultiplier *= 2.0f; // 100% faster regeneration
+                // Apply Vitality
+                if (HasAura(61329))
+                    hasteModifier += 0.25f;
 
-            if (HasAuraEffect(58426, 0, ObjectGuid())) // Overkill
-                hasteMultiplier *= 1.3f; // 30% faster regeneration
+                // Apply Overkill
+                if (HasAura(58426))
+                    hasteModifier += 0.30f;
 
-            if (HasAuraEffect(61329, 0, ObjectGuid())) // Vitality
-                hasteMultiplier *= 1.25f; // 25% faster regeneration
+                // Apply Adrenaline Rush
+                if (HasAura(13750))
+                    hasteModifier += 1.0f;
 
-            // Calculate the actual increment based on the haste multiplier
-            addvalue += baseRegenRate * hasteMultiplier * (m_regenTimer / 1000.0f); // Convert m_regenTimer to seconds
+                float adjustedRegenRate = baseRegenRate * hasteModifier;
+
+                addvalue += adjustedRegenRate * 0.001f * m_regenTimer;
+            }
             break;
-        }
         case POWER_RUNIC_POWER:
             {
                 if (!IsInCombat() && !HasAuraType(SPELL_AURA_INTERRUPT_REGEN))
