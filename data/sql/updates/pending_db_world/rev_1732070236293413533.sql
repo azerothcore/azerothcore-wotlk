@@ -5,8 +5,8 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 (24143, 0, 4, 0, 54, 0, 100, 0, 0, 0, 0, 0, 0, 0, 11, 43615, 2, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Spirit of the Lynx - On Just Summoned - Cast \'Halazzi Transform\''),
 (24143, 0, 5, 0, 0, 0, 100, 0, 2000, 5000, 0, 0, 0, 0, 11, 42466, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Spirit of the Lynx - In Combat - Cast \'Cosmetic - Zul`Aman Spirit Effect\'');
 
--- merge if lynx <10% hp
-UPDATE `smart_scripts` SET `event_param1` = 0, `event_param2` = 10, `comment` = 'Spirit of the Lynx - Between 0-10% Health - Do Action ID 0' WHERE (`entryorguid` = 24143) AND (`source_type` = 0) AND (`id` = 3);
+-- merge if lynx <20% hp
+UPDATE `smart_scripts` SET `event_param1` = 0, `comment` = 'Spirit of the Lynx - Between 0-20% Health - Do Action ID 0' WHERE (`entryorguid` = 24143) AND (`source_type` = 0) AND (`id` = 3);
 
 -- 43615 Halazzi Transform
 DELETE FROM `conditions` WHERE (`SourceTypeOrReferenceId` = 13) AND (`SourceGroup` = 1) AND (`SourceEntry` = 43615) AND (`ConditionTypeOrReference` = 31);
