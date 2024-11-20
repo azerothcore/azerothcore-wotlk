@@ -101,7 +101,6 @@ struct boss_halazzi : public BossAI
         _transformCount = 0;
         _phase = PHASE_NONE;
         EnterPhase(PHASE_LYNX);
-        SetInvincibility(true);
     }
 
     void JustSummoned(Creature* summon) override
@@ -157,7 +156,6 @@ struct boss_halazzi : public BossAI
         switch (nextPhase)
         {
             case PHASE_ENRAGE:
-                SetInvincibility(false);
                 scheduler.Schedule(12s, GROUP_LYNX, [this](TaskContext context)
                 {
                     DoCastSelf(SPELL_SUMMON_TOTEM);
