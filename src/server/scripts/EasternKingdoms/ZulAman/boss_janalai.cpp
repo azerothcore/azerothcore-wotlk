@@ -139,7 +139,7 @@ struct boss_janalai : public BossAI
             DoCastAOE(SPELL_HATCH_ALL);
         });
 
-        ScheduleHealthCheckEvent(25, [&] {
+        ScheduleHealthCheckEvent(20, [&] {
             if (!me->HasAura(SPELL_ENRAGE))
                 DoCastSelf(SPELL_ENRAGE, true);
             me->m_Events.CancelEventGroup(GROUP_ENRAGE);
