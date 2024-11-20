@@ -22,68 +22,68 @@
 
 enum Spells
 {
-    SPELL_DUAL_WIELD                = 29651,
-    SPELL_SABER_LASH                = 43267,
-    SPELL_FRENZY                    = 43139,
-    SPELL_FLAMESHOCK                = 43303,
-    SPELL_EARTHSHOCK                = 43305,
-    SPELL_SUMMON_LYNX               = 43143,
-    SPELL_SUMMON_TOTEM              = 43302,
-    SPELL_BERSERK                   = 45078,
-    SPELL_LYNX_FRENZY               = 43290, // Used by Spirit Lynx
-    SPELL_SHRED_ARMOR               = 43243, // Used by Spirit Lynx
-    SPELL_HALAZZI_TRANSFORM_DUMMY   = 43615, // Used by Spirit Lynx
+    SPELL_DUAL_WIELD            = 29651,
+    SPELL_SABER_LASH            = 43267,
+    SPELL_FRENZY                = 43139,
+    SPELL_FLAMESHOCK            = 43303,
+    SPELL_EARTHSHOCK            = 43305,
+    SPELL_SUMMON_LYNX           = 43143,
+    SPELL_SUMMON_TOTEM          = 43302,
+    SPELL_BERSERK               = 45078,
+    SPELL_LYNX_FRENZY           = 43290, // Used by Spirit Lynx
+    SPELL_SHRED_ARMOR           = 43243, // Used by Spirit Lynx
+    SPELL_TRANSFORM_DUMMY       = 43615, // Used by Spirit Lynx
 
-    SPELL_TRANSFIGURE               = 44054,
-    SPELL_TRANSFORM_TO_ORIGINAL     = 43311,
-    SPELL_TRANSFORM_TO_LYNX_75      = 43145,
-    SPELL_TRANSFORM_TO_LYNX_50      = 43271,
-    SPELL_TRANSFORM_TO_LYNX_25      = 43272,
+    SPELL_TRANSFIGURE           = 44054,
+    SPELL_TRANSFORM_TO_ORIGINAL = 43311,
+    SPELL_TRANSFORM_TO_LYNX_75  = 43145,
+    SPELL_TRANSFORM_TO_LYNX_50  = 43271,
+    SPELL_TRANSFORM_TO_LYNX_25  = 43272,
 
 };
 
 enum UniqueEvents
 {
-    EVENT_BERSERK               = 0
+    EVENT_BERSERK                = 0
 };
 
 enum Hal_CreatureIds
 {
-    NPC_TOTEM                   = 24224,
-    NPC_HALAZZI_TROLL           = 24144,            // dummy creature - used to update model, stats
+    NPC_TOTEM                    = 24224,
+    NPC_HALAZZI_TROLL            = 24144,            // dummy creature - used to update model, stats
 };
 
 enum PhaseHalazzi
 {
-    PHASE_NONE                  = 0,
-    PHASE_LYNX                  = 1,
-    PHASE_SPLIT                 = 2,
-    PHASE_HUMAN                 = 3,
-    PHASE_MERGE                 = 4,
-    PHASE_ENRAGE                = 5
+    PHASE_NONE                   = 0,
+    PHASE_LYNX                   = 1,
+    PHASE_SPLIT                  = 2,
+    PHASE_HUMAN                  = 3,
+    PHASE_MERGE                  = 4,
+    PHASE_ENRAGE                 = 5
 };
 
 enum Yells
 {
-    SAY_AGGRO                   = 0,
-    SAY_KILL                    = 1,
-    SAY_SABER                   = 2,
-    SAY_SPLIT                   = 3,
-    SAY_MERGE                   = 4,
-    SAY_DEATH                   = 5
+    SAY_AGGRO                    = 0,
+    SAY_KILL                     = 1,
+    SAY_SABER                    = 2,
+    SAY_SPLIT                    = 3,
+    SAY_MERGE                    = 4,
+    SAY_DEATH                    = 5
 };
 
 enum Groups
 {
-    GROUP_LYNX                  = 0,
-    GROUP_HUMAN                 = 1,
-    GROUP_MERGE                 = 3,
-    GROUP_SPLIT                 = 4
+    GROUP_LYNX                   = 0,
+    GROUP_HUMAN                  = 1,
+    GROUP_MERGE                  = 3,
+    GROUP_SPLIT                  = 4
 };
 
 enum Actions
 {
-    ACTION_MERGE                = 0
+    ACTION_MERGE                 = 0
 };
 
 struct boss_halazzi : public BossAI
