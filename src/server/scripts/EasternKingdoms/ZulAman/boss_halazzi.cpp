@@ -38,8 +38,7 @@ enum Spells
     SPELL_TRANSFORM_TO_ORIGINAL = 43311,
     SPELL_TRANSFORM_TO_LYNX_75  = 43145,
     SPELL_TRANSFORM_TO_LYNX_50  = 43271,
-    SPELL_TRANSFORM_TO_LYNX_25  = 43272,
-
+    SPELL_TRANSFORM_TO_LYNX_25  = 43272
 };
 
 enum UniqueEvents
@@ -49,8 +48,8 @@ enum UniqueEvents
 
 enum Hal_CreatureIds
 {
-    NPC_TOTEM                    = 24224,
-    NPC_HALAZZI_TROLL            = 24144,            // dummy creature - used to update model, stats
+    NPC_HALAZZI_TROLL            = 24144, // dummy creature - used to update model, stats
+    NPC_TOTEM                    = 24224
 };
 
 enum PhaseHalazzi
@@ -145,10 +144,8 @@ struct boss_halazzi : public BossAI
 
     void SpellHit(Unit*, SpellInfo const* spell) override
     {
-        if (spell->Id == SPELL_HALAZZI_TRANSFORM_DUMMY)
-        {
+        if (spell->Id == SPELL_TRANSFORM_DUMMY)
             me->UpdateEntry(NPC_HALAZZI_TROLL);
-        }
     }
 
     void AttackStart(Unit* who) override
