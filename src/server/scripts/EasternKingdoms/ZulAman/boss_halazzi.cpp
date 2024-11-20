@@ -208,7 +208,7 @@ struct boss_halazzi : public BossAI
             case PHASE_SPLIT:
                 Talk(SAY_SPLIT);
                 DoCastSelf(SPELL_TRANSFIGURE, true);
-                scheduler.Schedule(3s, GROUP_SPLIT, [this](TaskContext context)
+                scheduler.Schedule(3s, GROUP_SPLIT, [this](TaskContext /*context*/)
                 {
                     DoCastSelf(SPELL_SUMMON_LYNX, true);
                 });
