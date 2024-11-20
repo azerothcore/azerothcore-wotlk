@@ -116,7 +116,7 @@ public:
                 if (!hostage)
                     break;
 
-                hostage->UpdateEntry(i + 24428);
+                hostage->UpdateEntry(i + 24427);
                 hostage->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
                 hostage->CastSpell(hostage, SPELL_COSMETIC_IMMOLATION);
                 hostage->HandleEmoteCommand(EMOTE_STATE_DEAD); // Not confirmed
