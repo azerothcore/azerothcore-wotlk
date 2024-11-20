@@ -49,11 +49,12 @@ Position const HarrisonJonesLoc = {120.687f, 1674.0f, 42.0217f, 1.59044f};
 
 DoorData const doorData[] =
 {
-    { GO_ZULJIN_FIREWALL, DATA_ZULJIN,  DOOR_TYPE_ROOM    },
-    { GO_DOOR_HALAZZI,    DATA_HALAZZI, DOOR_TYPE_ROOM    },
-    { GO_DOOR_AKILZON,    DATA_AKILZON, DOOR_TYPE_ROOM    },
-    { GO_GATE_ZULJIN,     DATA_HEXLORD, DOOR_TYPE_PASSAGE },
-    { 0,                  0,            DOOR_TYPE_ROOM    } // END
+    { GO_ZULJIN_FIREWALL,      DATA_ZULJIN,  DOOR_TYPE_ROOM    },
+    { GO_DOOR_HALAZZI,         DATA_HALAZZI, DOOR_TYPE_PASSAGE },
+    { GO_LYNX_TEMPLE_ENTRANCE, DATA_HALAZZI, DOOR_TYPE_ROOM    },
+    { GO_DOOR_AKILZON,         DATA_AKILZON, DOOR_TYPE_ROOM    },
+    { GO_GATE_ZULJIN,          DATA_HEXLORD, DOOR_TYPE_PASSAGE },
+    { 0,                       0,            DOOR_TYPE_ROOM    } // END
 };
 
 ObjectData const creatureData[] =
