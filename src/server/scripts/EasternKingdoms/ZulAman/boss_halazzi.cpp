@@ -30,21 +30,15 @@ enum Spells
     SPELL_SUMMON_LYNX               = 43143,
     SPELL_SUMMON_TOTEM              = 43302,
     SPELL_BERSERK                   = 45078,
-    // SPELL_LYNX_FRENZY               = 43290, // Used by Spirit Lynx
-    // SPELL_SHRED_ARMOR               = 43243, // Used by Spirit Lynx
+    SPELL_LYNX_FRENZY               = 43290, // Used by Spirit Lynx
+    SPELL_SHRED_ARMOR               = 43243, // Used by Spirit Lynx
     SPELL_HALAZZI_TRANSFORM_DUMMY   = 43615, // Used by Spirit Lynx
 
-    // SPELL_TRANSFIGURE               = 43142, // AoE dmg, triggers 43573
-    // SPELL_TRANSFIGURE_TRIGGERED     = 43573, // transform + heal 100%
-    SPELL_TRANSFIGURE = 44054, // sniff
-
+    SPELL_TRANSFIGURE               = 44054,
     SPELL_TRANSFORM_TO_ORIGINAL     = 43311,
-
-    // unused
     SPELL_TRANSFORM_TO_LYNX_75      = 43145,
     SPELL_TRANSFORM_TO_LYNX_50      = 43271,
     SPELL_TRANSFORM_TO_LYNX_25      = 43272,
-    // SPELL_HALAZZI_TRANSFORM_VISUAL= 43293,
 
 };
 
@@ -67,10 +61,6 @@ enum PhaseHalazzi
     PHASE_HUMAN                 = 3,
     PHASE_MERGE                 = 4,
     PHASE_ENRAGE                = 5
-    // TODO: rework into 3 phases
-    // PHASE_SINGLE        = 0, // lynx
-    // PHASE_TOTEM         = 1, // troll
-    // PHASE_FINAL         = 2 // lynx enrage
 };
 
 enum Yells
@@ -175,7 +165,7 @@ struct boss_halazzi : public BossAI
                 SetInvincibility(false);
                 scheduler.Schedule(12s, GROUP_LYNX, [this](TaskContext context)
                 {
-                    // DoCastSelf(SPELL_SUMMON_TOTEM);
+                    DoCastSelf(SPELL_SUMMON_TOTEM);
                     context.Repeat(20s);
                 });
                 [[fallthrough]];
@@ -210,12 +200,12 @@ struct boss_halazzi : public BossAI
                 scheduler.CancelGroup(GROUP_MERGE);
                 scheduler.Schedule(16s, GROUP_LYNX, [this](TaskContext context)
                 {
-                    // DoCastSelf(SPELL_FRENZY);
+                    DoCastSelf(SPELL_FRENZY);
                     context.Repeat(10s, 15s);
                 }).Schedule(20s, GROUP_LYNX, [this](TaskContext context)
                 {
-                    // Talk(SAY_SABER);
-                    // DoCastVictim(SPELL_SABER_LASH, true);
+                    Talk(SAY_SABER);
+                    DoCastVictim(SPELL_SABER_LASH, true);
                     context.Repeat(30s);
                 });
                 break;
@@ -227,7 +217,6 @@ struct boss_halazzi : public BossAI
                 {
                     DoCastSelf(SPELL_SUMMON_LYNX, true);
                 });
-                // set human phase
                 nextPhase = PHASE_HUMAN;
                 [[fallthrough]];
             case PHASE_HUMAN:
@@ -245,7 +234,7 @@ struct boss_halazzi : public BossAI
                     context.Repeat(10s, 15s);
                 }).Schedule(12s, GROUP_HUMAN, [this](TaskContext context)
                 {
-                    // DoCastSelf(SPELL_SUMMON_TOTEM);
+                    DoCastSelf(SPELL_SUMMON_TOTEM);
                     context.Repeat(20s);
                 });
                 break;
