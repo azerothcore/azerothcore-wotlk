@@ -65,7 +65,6 @@ enum Spells
 enum Creatures
 {
     NPC_AMANI_HATCHER           = 23818,
-    NPC_HATCHLING               = 23598, // 42493
     NPC_EGG                     = 23817,
     NPC_FIRE_BOMB               = 23920
 };
@@ -111,9 +110,7 @@ enum Misc
 {
     MAX_BOMB_COUNT              = 40,
 
-    SCHEDULER_GROUP_HATCHING    = 1,
-
-    EVENT_BERSERK               = 0
+    SCHEDULER_GROUP_HATCHING    = 1
 };
 
 struct boss_janalai : public BossAI
@@ -145,12 +142,27 @@ struct boss_janalai : public BossAI
         ScheduleHealthCheckEvent(25, [&] {
             DoCastSelf(SPELL_ENRAGE, true);
         });
+
+        me->m_Events.KillAllEvents(false);
     }
 
     void JustDied(Unit* killer) override
     {
         Talk(SAY_DEATH);
         BossAI::JustDied(killer);
+    }
+
+    void JustSummoned(Creature* summon) override
+    {
+        if (summon->GetEntry() == NPC_AMANI_HATCHLING)
+        {
+            if (summon->GetPositionY() > 1150)
+                summon->GetMotionMaster()->MovePoint(0, hatcherway[0][3].GetPositionX() + rand() % 4 - 2, 1150.0f + rand() % 4 - 2, hatcherway[0][3].GetPositionY());
+            else
+                summon->GetMotionMaster()->MovePoint(0, hatcherway[1][3].GetPositionX() + rand() % 4 - 2, 1150.0f + rand() % 4 - 2, hatcherway[1][3].GetPositionY());
+        }
+
+        BossAI::JustSummoned(summon);
     }
 
     void DamageDealt(Unit* target, uint32& damage, DamageEffectType /*damagetype*/) override
@@ -193,10 +205,11 @@ struct boss_janalai : public BossAI
                 });
             }
         }, 8s);
-        ScheduleUniqueTimedEvent(5min, [&]{
+
+        me->m_Events.AddEventAtOffset([&] {
             Talk(SAY_BERSERK);
             DoCastSelf(SPELL_BERSERK);
-        }, EVENT_BERSERK);
+        }, 5min);
     }
 
     bool HatchAllEggs(uint32 hatchAction)
@@ -211,11 +224,7 @@ struct boss_janalai : public BossAI
             for (Creature* egg : eggList)
                 egg->Respawn();
 
-            std::list<Creature* > hatchlingList;
-            me->GetCreaturesWithEntryInRange(hatchlingList, 100.0f, NPC_HATCHLING);
-            for (Creature* hatchling : hatchlingList)
-                hatchling->DespawnOrUnsummon();
-            hatchlingList.clear();
+            summons.DespawnEntry(NPC_AMANI_HATCHLING);
         }
         else if (hatchAction == HATCH_ALL)
             DoCastSelf(SPELL_HATCH_EGG_ALL);
@@ -354,6 +363,14 @@ struct npc_janalai_hatcher : public ScriptedAI
 
                 if (me->FindNearestCreature(NPC_EGG, 100.0f))
                     context.Repeat(4s);
+                else
+                {
+                    _side = _side ? 0 : 1;
+                    _isHatching = false;
+                    _waypoint = 3;
+                    MoveToNewWaypoint(_waypoint);
+                    context.CancelGroup(SCHEDULER_GROUP_HATCHING);
+                }
             });
         }
         else
@@ -390,43 +407,8 @@ private:
     bool _isHatching;
 };
 
-struct npc_janalai_hatchling : public ScriptedAI
-{
-    npc_janalai_hatchling(Creature* creature) : ScriptedAI(creature) { }
-
-    void Reset() override
-    {
-        scheduler.CancelAll();
-        if (me->GetPositionY() > 1150)
-            me->GetMotionMaster()->MovePoint(0, hatcherway[0][3].GetPositionX() + rand() % 4 - 2, 1150.0f + rand() % 4 - 2, hatcherway[0][3].GetPositionY());
-        else
-            me->GetMotionMaster()->MovePoint(0, hatcherway[1][3].GetPositionX() + rand() % 4 - 2, 1150.0f + rand() % 4 - 2, hatcherway[1][3].GetPositionY());
-
-        me->SetInCombatWithZone();
-    }
-
-    void JustEngagedWith(Unit* who) override
-    {
-        ScriptedAI::JustEngagedWith(who);
-        ScheduleTimedEvent(7s, [&]{
-            DoCastVictim(SPELL_FLAMEBUFFET);
-        }, 10s);
-    }
-
-    void UpdateAI(uint32 diff) override
-    {
-        if (!UpdateVictim())
-            return;
-
-        scheduler.Update(diff);
-
-        DoMeleeAttackIfReady();
-    }
-};
-
 void AddSC_boss_janalai()
 {
     RegisterZulAmanCreatureAI(boss_janalai);
     RegisterZulAmanCreatureAI(npc_janalai_hatcher);
-    RegisterZulAmanCreatureAI(npc_janalai_hatchling);
 }

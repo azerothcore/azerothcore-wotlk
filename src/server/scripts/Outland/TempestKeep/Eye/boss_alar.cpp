@@ -72,11 +72,10 @@ enum Misc
 
     EVENT_RELOCATE_MIDDLE       = 1,
     EVENT_REBIRTH               = 2,
-    EVENT_SPELL_BERSERK         = 3,
 
-    EVENT_MOVE_TO_PHASE_2       = 4,
-    EVENT_FINISH_DIVE           = 5,
-    EVENT_INVISIBLE             = 6
+    EVENT_MOVE_TO_PHASE_2       = 3,
+    EVENT_FINISH_DIVE           = 4,
+    EVENT_INVISIBLE             = 5
 };
 
 enum GroupAlar
@@ -121,15 +120,14 @@ struct boss_alar : public BossAI
         me->SetModelVisible(true);
         me->SetReactState(REACT_AGGRESSIVE);
         ConstructWaypointsAndMove();
+        me->m_Events.KillAllEvents(false);
     }
 
     void JustReachedHome() override
     {
         BossAI::JustReachedHome();
         if (me->IsEngaged())
-        {
             ConstructWaypointsAndMove();
-        }
     }
 
     void JustEngagedWith(Unit* who) override
@@ -158,6 +156,7 @@ struct boss_alar : public BossAI
             }
             context.Repeat(_platformMoveRepeatTimer);
         });
+
         ScheduleMainSpellAttack(0s);
     }
 
@@ -172,16 +171,9 @@ struct boss_alar : public BossAI
     void EnterEvadeMode(EvadeReason why) override
     {
         if (why == EVADE_REASON_BOUNDARY)
-        {
             BossAI::EnterEvadeMode(why);
-        }
-        else
-        {
-            if (me->GetThreatMgr().GetThreatList().empty())
-            {
-                BossAI::EnterEvadeMode(why);
-            }
-        }
+        else if (me->GetThreatMgr().GetThreatList().empty())
+            BossAI::EnterEvadeMode(why);
     }
 
     void JustDied(Unit* killer) override
@@ -189,19 +181,11 @@ struct boss_alar : public BossAI
         BossAI::JustDied(killer);
         me->SetModelVisible(true);
 
-        if (Map* map = me->GetMap())
+        me->GetMap()->DoForAllPlayers([&](Player* player)
         {
-            map->DoForAllPlayers([&](Player* player)
-            {
-                if (player->GetQuestStatus(QUEST_RUSE_OF_THE_ASHTONGUE) == QUEST_STATUS_INCOMPLETE)
-                {
-                    if (player->HasAura(SPELL_ASHTONGUE_RUSE))
-                    {
-                        player->AreaExploredOrEventHappens(QUEST_RUSE_OF_THE_ASHTONGUE);
-                    }
-                }
-            });
-        }
+            if (player->GetQuestStatus(QUEST_RUSE_OF_THE_ASHTONGUE) == QUEST_STATUS_INCOMPLETE && player->HasAura(SPELL_ASHTONGUE_RUSE))
+                player->AreaExploredOrEventHappens(QUEST_RUSE_OF_THE_ASHTONGUE);
+        });
     }
 
     void MoveInLineOfSight(Unit* /*who*/) override { }
@@ -235,7 +219,7 @@ struct boss_alar : public BossAI
                     _noMelee = false;
                     me->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
                     _platform = POINT_MIDDLE;
-                    me->GetMotionMaster()->MoveChase(me->GetVictim());
+                    me->ResumeChasingVictim();
                     ScheduleAbilities();
                 });
             }
@@ -270,19 +254,18 @@ struct boss_alar : public BossAI
         {
             // find spell from sniffs?
             if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 50.0f, true))
-            {
                 me->SummonCreature(NPC_FLAME_PATCH, *target, TEMPSUMMON_TIMED_DESPAWN, 2 * MINUTE * IN_MILLISECONDS);
-            }
         }, 30s);
         ScheduleTimedEvent(34s, [&]
         {
             me->GetMotionMaster()->MovePoint(POINT_DIVE, alarPoints[POINT_DIVE], false, true);
             scheduler.DelayAll(15s);
         }, 57s);
-        ScheduleUniqueTimedEvent(10min, [&]
-        {
-            DoCastSelf(SPELL_BERSERK);
-        }, EVENT_SPELL_BERSERK);
+
+        me->m_Events.AddEventAtOffset([&] {
+            DoCastSelf(SPELL_BERSERK, true);
+        }, 10min);
+
         ScheduleMainSpellAttack(0s);
     }
 
@@ -304,16 +287,14 @@ struct boss_alar : public BossAI
         scheduler.Schedule(2s, [this](TaskContext)
         {
             if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 110.0f, true))
-            {
                 SpawnPhoenixes(2, target);
-            }
         }).Schedule(6s, [this](TaskContext)
         {
             me->SetModelVisible(true);
             DoCastSelf(SPELL_REBIRTH_DIVE);
         }).Schedule(10s, [this](TaskContext)
         {
-            me->GetMotionMaster()->MoveChase(me->GetVictim());
+            me->ResumeChasingVictim();
             _noMelee = false;
         });
         if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 90.0f, true))
@@ -331,9 +312,8 @@ struct boss_alar : public BossAI
         if (type != POINT_MOTION_TYPE)
         {
             if (type == ESCORT_MOTION_TYPE && me->movespline->Finalized() && !me->IsInCombat())
-            {
                 ConstructWaypointsAndMove();
-            }
+
             return;
         }
 
@@ -366,9 +346,8 @@ struct boss_alar : public BossAI
         scheduler.Schedule(timer, GROUP_FLAME_BUFFET, [this](TaskContext context)
         {
             if (!me->SelectNearestTarget(me->GetCombatReach()) && !me->isMoving())
-            {
                 DoCastVictim(SPELL_FLAME_BUFFET);
-            }
+
             context.Repeat(2s);
         });
     }
@@ -394,21 +373,15 @@ struct boss_alar : public BossAI
         _transitionScheduler.Update(diff);
 
         if (!UpdateVictim())
-        {
             return;
-        }
 
         scheduler.Update(diff);
 
         if (me->HasUnitState(UNIT_STATE_CASTING))
-        {
             return;
-        }
 
         if (!_noMelee)
-        {
             DoMeleeAttackIfReady();
-        }
     }
 
     Position DeterminePhoenixPosition(Position playerPosition)
@@ -498,13 +471,9 @@ class spell_alar_ember_blast : public SpellScript
     void HandleCast()
     {
         if (InstanceScript* instance = GetCaster()->GetInstanceScript())
-        {
             if (Creature* alar = instance->GetCreature(DATA_ALAR))
-            {
                 if (!alar->HasAura(SPELL_MODEL_VISIBILITY))
                     Unit::DealDamage(GetCaster(), alar, alar->CountPctFromMaxHealth(2));
-            }
-        }
     }
 
     void Register() override

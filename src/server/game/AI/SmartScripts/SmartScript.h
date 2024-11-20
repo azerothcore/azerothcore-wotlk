@@ -18,9 +18,7 @@
 #ifndef ACORE_SMARTSCRIPT_H
 #define ACORE_SMARTSCRIPT_H
 
-#include "Common.h"
 #include "Creature.h"
-#include "CreatureAI.h"
 #include "GridNotifiers.h"
 #include "SmartScriptMgr.h"
 #include "Spell.h"

@@ -39,12 +39,14 @@ DoorData const doorData[] =
 
 ObjectData const creatureData[] =
 {
-    { NPC_SPIRIT_LYNX, DATA_SPIRIT_LYNX },
-    { NPC_KRAZ,        DATA_KRAZ        },
-    { NPC_TANZAR,      DATA_TANZAR      },
-    { NPC_HARKOR,      DATA_HARKOR      },
-    { NPC_ASHLI,       DATA_ASHLI       },
-    { 0,               0                }
+    { NPC_JANALAI,        DATA_JANALAI        },
+    { NPC_SPIRIT_LYNX,    DATA_SPIRIT_LYNX    },
+    { NPC_HARRISON_JONES, DATA_HARRISON_JONES },
+    { NPC_KRAZ,           DATA_KRAZ           },
+    { NPC_TANZAR,         DATA_TANZAR         },
+    { NPC_HARKOR,         DATA_HARKOR         },
+    { NPC_ASHLI,          DATA_ASHLI          },
+    { 0,                  0                   }
 };
 
 ObjectData const gameObjectData[] =
@@ -53,6 +55,12 @@ ObjectData const gameObjectData[] =
     { GO_MASSIVE_GATE, DATA_MASSIVE_GATE },
     { GO_GATE_HEXLORD, DATA_HEXLORD_GATE },
     { 0,               0                 }
+};
+
+ObjectData const summonData[] =
+{
+    { NPC_AMANI_HATCHLING, DATA_JANALAI },
+    { 0,                   0            }
 };
 
 BossBoundaryData const boundaries =
@@ -77,6 +85,7 @@ public:
             LoadObjectData(creatureData, gameObjectData);
             LoadBossBoundaries(boundaries);
             LoadDoorData(doorData);
+            LoadSummonData(summonData);
 
             for (uint8 i = 0; i < RAND_VENDOR; ++i)
                 RandVendor[i] = NOT_STARTED;

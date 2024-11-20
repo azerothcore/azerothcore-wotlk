@@ -38,10 +38,11 @@ enum DataTypes
     DATA_STRANGE_GONG                   = 10,
     DATA_MASSIVE_GATE                   = 11,
     DATA_HEXLORD_GATE                   = 12,
-    DATA_ASHLI                          = 13,
-    DATA_TANZAR                         = 14,
-    DATA_HARKOR                         = 15,
-    DATA_KRAZ                           = 16,
+    DATA_HARRISON_JONES                 = 13,
+    DATA_ASHLI                          = 14,
+    DATA_TANZAR                         = 15,
+    DATA_HARKOR                         = 16,
+    DATA_KRAZ                           = 17
 };
 
 enum CreatureIds
@@ -57,10 +58,11 @@ enum CreatureIds
     NPC_AMANISHI_TRIBESMAN              = 23582,
     NPC_AMANISHI_MEDICINE_MAN           = 23581,
     NPC_AMANISHI_AXE_THROWER            = 23542,
+    NPC_AMANI_HATCHLING                 = 23598, // 42493
     NPC_ASHLI                           = 24001,
     NPC_TANZAR                          = 23790,
     NPC_HARKOR                          = 23999,
-    NPC_KRAZ                            = 24024,
+    NPC_KRAZ                            = 24024
 };
 
 enum GameobjectIds

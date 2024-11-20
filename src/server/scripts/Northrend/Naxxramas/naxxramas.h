@@ -50,7 +50,6 @@ enum NXData
     DATA_HEIGAN_ERUPTION            = 101,
     DATA_HEIGAN_ENTER_GATE          = 102,
     DATA_LOATHEB_GATE               = 103,
-    DATA_ANUB_GATE                  = 104,
     DATA_FAERLINA_WEB               = 105,
     DATA_MAEXXNA_GATE               = 106,
     DATA_THADDIUS_BOSS              = 107,
