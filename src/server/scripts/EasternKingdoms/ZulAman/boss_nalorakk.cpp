@@ -286,7 +286,6 @@ struct boss_nalorakk : public BossAI
             }).Schedule(30s, GROUP_BEAR, [this](TaskContext context)
             {
                 ShapeShift(_bearForm);
-                context.Repeat();
             });
         }
     }
