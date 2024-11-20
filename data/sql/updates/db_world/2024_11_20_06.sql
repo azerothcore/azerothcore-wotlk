@@ -1,3 +1,4 @@
+-- DB update 2024_11_20_05 -> 2024_11_20_06
 --
 -- NPC_LYNX
 DELETE FROM `smart_scripts` WHERE (`entryorguid` = 24143) AND (`source_type` = 0) AND (`id` IN (4,5));
