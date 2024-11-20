@@ -89,28 +89,13 @@ struct boss_felblood_kaelthas : public BossAI
             me->GetMotionMaster()->MoveIdle();
             ScheduleTimedEvent(5s, [&]{
                 summons.DoForAllSummons([&](WorldObject* summon){
-                    if (Player* player = GetRandomEngagedPlayerFromParty())
+                    if (Unit* player = SelectTarget(SelectTargetMethod::Random, 0, 0.0f, true))
                         if (Creature* summonedCreature = summon->ToCreature())
                             summonedCreature->GetMotionMaster()->MoveChase(player);
                 });
             }, 10s, 15s);
             GravityLapseSequence(true);
         });
-    }
-
-    Player* GetRandomEngagedPlayerFromParty()
-    {
-        Map::PlayerList const& players = me->GetMap()->GetPlayers();
-        std::list<Player*> finalPlayerList;
-        for (Map::PlayerList::const_iterator i = players.begin(); i != players.end(); ++i)
-            if (Player* player = i->GetSource())
-                if (player->IsAlive() && player->IsInCombatWith(me))
-                    finalPlayerList.emplace_front(player);
-        if (!finalPlayerList.empty())
-        {
-            return Acore::Containers::SelectRandomContainerElement(finalPlayerList);
-        }
-        return nullptr;
     }
 
     void JustSummoned(Creature* summon) override
