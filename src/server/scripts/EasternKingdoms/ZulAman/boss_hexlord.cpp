@@ -154,8 +154,14 @@ struct PlayerAbilityStruct
     std::chrono::milliseconds cooldown;
 };
 
-static PlayerAbilityStruct PlayerAbility[12][3] =
+static PlayerAbilityStruct PlayerAbility[13][3] =
 {
+    // 0 UNK class (should never be set)
+    {
+        { 0, ABILITY_TARGET_SELF, 0ms},
+        { 0, ABILITY_TARGET_SELF, 0ms},
+        { 0, ABILITY_TARGET_SELF, 0ms}
+    },
     // 1 warrior
     {   { SPELL_WR_SPELL_REFLECT, ABILITY_TARGET_SELF,   10000ms },
         { SPELL_WR_WHIRLWIND,     ABILITY_TARGET_SELF,   10000ms },

@@ -104,13 +104,6 @@ struct boss_halazzi : public BossAI
         SetInvincibility(true);
     }
 
-    void JustSummoned(Creature* summon) override
-    {
-        BossAI::JustSummoned(summon);
-        summon->Attack(me->GetVictim(), false);
-        summon->SetInCombatWithZone();
-    }
-
     void JustEngagedWith(Unit* who) override
     {
         BossAI::JustEngagedWith(who);

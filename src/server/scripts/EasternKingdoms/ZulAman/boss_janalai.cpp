@@ -109,8 +109,8 @@ enum HatchActions
 enum Misc
 {
     MAX_BOMB_COUNT              = 40,
-
-    SCHEDULER_GROUP_HATCHING    = 1
+    SCHEDULER_GROUP_HATCHING    = 1,
+    GROUP_ENRAGE                = 1
 };
 
 struct boss_janalai : public BossAI
@@ -139,8 +139,10 @@ struct boss_janalai : public BossAI
             DoCastAOE(SPELL_HATCH_ALL);
         });
 
-        ScheduleHealthCheckEvent(25, [&] {
-            DoCastSelf(SPELL_ENRAGE, true);
+        ScheduleHealthCheckEvent(20, [&] {
+            if (!me->HasAura(SPELL_ENRAGE))
+                DoCastSelf(SPELL_ENRAGE, true);
+            me->m_Events.CancelEventGroup(GROUP_ENRAGE);
         });
 
         me->m_Events.KillAllEvents(false);
@@ -207,9 +209,13 @@ struct boss_janalai : public BossAI
         }, 8s);
 
         me->m_Events.AddEventAtOffset([&] {
+            DoCastSelf(SPELL_ENRAGE, true);
+        }, 5min, 5min, GROUP_ENRAGE);
+
+        me->m_Events.AddEventAtOffset([&] {
             Talk(SAY_BERSERK);
             DoCastSelf(SPELL_BERSERK);
-        }, 5min);
+        }, 10min);
     }
 
     bool HatchAllEggs(uint32 hatchAction)
