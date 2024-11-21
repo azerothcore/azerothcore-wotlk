@@ -1,3 +1,4 @@
+-- DB update 2024_11_20_07 -> 2024_11_21_00
 --
 -- Akil'zon
 UPDATE `creature_loot_template` SET `MaxCount` = 1 WHERE `Entry` = 23574 AND `Reference` = 34150;
