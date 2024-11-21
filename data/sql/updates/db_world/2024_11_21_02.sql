@@ -1,3 +1,4 @@
+-- DB update 2024_11_21_01 -> 2024_11_21_02
 -- Eliza (314)
 UPDATE `creature_template` SET `pickpocketloot` = 314 WHERE (`entry` = 314);
 DELETE FROM `pickpocketing_loot_template` WHERE (`Entry` = 314);
