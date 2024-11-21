@@ -59,6 +59,7 @@ enum NpcBotDataUpdateType
     NPCBOT_UPDATE_ROLES,
     NPCBOT_UPDATE_SPEC,
     NPCBOT_UPDATE_DISABLED_SPELLS,
+    NPCBOT_UPDATE_MISCVALUES,
     NPCBOT_UPDATE_FACTION,
     NPCBOT_UPDATE_EQUIPS,
     NPCBOT_UPDATE_ERASE,
@@ -69,6 +70,7 @@ enum NpcBotDataUpdateType
 struct NpcBotData
 {
     typedef std::set<uint32> DisabledSpellsContainer;
+    typedef std::map<uint32, uint32> MiscValuesContainer;
 
     friend class BotDataMgr;
     friend struct WanderingBotsGenerator;
@@ -80,6 +82,7 @@ public:
     uint8 spec;
     uint32 equips[BOT_INVENTORY_SIZE];
     DisabledSpellsContainer disabled_spells;
+    MiscValuesContainer miscvalues;
 
 private:
     explicit NpcBotData(uint32 iroles, uint32 ifaction, uint8 ispec = 1) : owner(0), hire_time(0), roles(iroles), faction(ifaction), spec(ispec)

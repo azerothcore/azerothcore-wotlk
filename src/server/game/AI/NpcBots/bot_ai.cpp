@@ -240,6 +240,8 @@ bot_ai::bot_ai(Creature* creature) : CreatureAI(creature)
 
     _saveDisabledSpellsTimer = 0;
     _saveDisabledSpells = false;
+    _saveMiscValuesTimer = 0;
+    _saveMiscValues = false;
 
     _deathsCount = 0;
     _killsCount = 0;
@@ -615,6 +617,8 @@ void bot_ai::ResetBotAI(uint8 resetType)
 
     if ((resetType == BOTAI_RESET_DISMISS || resetType == BOTAI_RESET_LOGOUT) && !IsTempBot())
     {
+        if (resetType == BOTAI_RESET_DISMISS)
+            ResetAllMiscValues();
         EnableAllSpells(resetType == BOTAI_RESET_DISMISS);
         InitRoles();
     }
@@ -13137,13 +13141,13 @@ BotEquipResult bot_ai::_equip(uint8 slot, Item* newItem, ObjectGuid receiver, bo
         if (slot == BOT_SLOT_MAINHAND)
         {
             SetAIMiscValue(BOTAI_MISC_DAGGER_MAINHAND, proto->SubClass == ITEM_SUBCLASS_WEAPON_DAGGER);
-            SetAIMiscValue(BOTAI_MISC_ENCHANT_CAN_EXPIRE_MH, newItem->GetEnchantmentId(TEMP_ENCHANTMENT_SLOT));
+            SetAIMiscValue(BOTAI_MISC_ENCHANT_TIMER_MH, uint32(newItem->GetEnchantmentId(TEMP_ENCHANTMENT_SLOT) ? 0 : 1));
             SetAIMiscValue(BOTAI_MISC_WEAPON_SPEC, proto->SubClass);
         }
         if (slot == BOT_SLOT_OFFHAND)
         {
             SetAIMiscValue(BOTAI_MISC_DAGGER_OFFHAND, proto->SubClass == ITEM_SUBCLASS_WEAPON_DAGGER);
-            SetAIMiscValue(BOTAI_MISC_ENCHANT_CAN_EXPIRE_OH, newItem->GetEnchantmentId(TEMP_ENCHANTMENT_SLOT));
+            SetAIMiscValue(BOTAI_MISC_ENCHANT_TIMER_OH, uint32(newItem->GetEnchantmentId(TEMP_ENCHANTMENT_SLOT) ? 0 : 1));
         }
     }
 
@@ -13547,7 +13551,7 @@ void bot_ai::RemoveItemClassEnchantment(uint8 slot)
 {
     uint8 eslot = TEMP_ENCHANTMENT_SLOT;
 
-    if (!GetAIMiscValue(slot == BOT_SLOT_MAINHAND ? BOTAI_MISC_ENCHANT_CAN_EXPIRE_MH : BOTAI_MISC_ENCHANT_CAN_EXPIRE_OH))
+    if (!GetAIMiscValue(slot == BOT_SLOT_MAINHAND ? BOTAI_MISC_ENCHANT_TIMER_MH : BOTAI_MISC_ENCHANT_TIMER_OH))
         return;
 
     Item* weap = _equips[slot];
@@ -14806,6 +14810,7 @@ void bot_ai::DefaultInit()
             InitFaction();
             InitOwner();
             InitEquips();
+            InitMiscValues();
         }
 
         firstspawn = false;
@@ -17834,6 +17839,18 @@ bool bot_ai::GlobalUpdate(uint32 diff)
             BotDataMgr::UpdateNpcBotData(me->GetEntry(), NPCBOT_UPDATE_DISABLED_SPELLS, &npcBotData->disabled_spells);
         }
     }
+    //  2) miscavalues
+    if (_saveMiscValues && _saveMiscValuesTimer <= diff)
+    {
+        _saveMiscValues = false;
+        _saveMiscValuesTimer = 5000;
+
+        if (!IsTempBot())
+        {
+            NpcBotData* npcBotData = const_cast<NpcBotData*>(BotDataMgr::SelectNpcBotData(me->GetEntry()));
+            BotDataMgr::UpdateNpcBotData(me->GetEntry(), NPCBOT_UPDATE_MISCVALUES, &npcBotData->miscvalues);
+        }
+    }
 
     if (_updateTimerEx2 <= diff)
     {
@@ -18628,6 +18645,7 @@ void bot_ai::CommonTimers(uint32 diff)
     if (_updateTimerEx2 > diff)     _updateTimerEx2 -= diff;
 
     if (_saveDisabledSpellsTimer > diff) _saveDisabledSpellsTimer -= diff;
+    if (_saveMiscValuesTimer > diff)     _saveMiscValuesTimer -= diff;
 }
 
 void bot_ai::UpdateReviveTimer(uint32 diff)
@@ -20994,6 +21012,59 @@ uint8 bot_ai::GetPlayerRace() const
 uint8 bot_ai::GetBotComboPoints() const
 {
     return me->GetVehicle() ? vehcomboPoints : uint8(GetAIMiscValue(BOTAI_MISC_COMBO_POINTS));
+}
+
+void bot_ai::SetAIMiscValue(uint32 data, uint32 value)
+{
+    if (data >= BOT_MISCVALUE_SAVED_FIRST && data <= BOT_MISCVALUE_SAVED_LAST)
+    {
+        NpcBotData* npcBotData = const_cast<NpcBotData*>(BotDataMgr::SelectNpcBotData(me->GetEntry()));
+        if (auto it = npcBotData->miscvalues.find(data); it == npcBotData->miscvalues.end() || it->second != value)
+        {
+            npcBotData->miscvalues[data] = value;
+            _saveMiscValues = true;
+        }
+    }
+}
+
+void bot_ai::ResetAllMiscValues()
+{
+    NpcBotData* npcBotData = const_cast<NpcBotData*>(BotDataMgr::SelectNpcBotData(me->GetEntry()));
+
+    for (uint32 miscval = BOT_MISCVALUE_SAVED_FIRST; miscval <= BOT_MISCVALUE_SAVED_LAST; ++miscval)
+    {
+        switch (miscval)
+        {
+            case BOTAI_MISC_ENCHANT_IS_AUTO_MH:
+            case BOTAI_MISC_ENCHANT_IS_AUTO_OH:
+                SetAIMiscValue(miscval, uint32(true));
+                break;
+            case BOTAI_MISC_ENCHANT_TIMER_MH:
+            case BOTAI_MISC_ENCHANT_TIMER_OH:
+                SetAIMiscValue(miscval, uint32(1));
+                break;
+            case BOTAI_MISC_ENCHANT_CURRENT_MH:
+            case BOTAI_MISC_ENCHANT_CURRENT_OH:
+            case BOTAI_MISC_PET_TYPE:
+            case BOTAI_MISC_AURA_TYPE:
+                SetAIMiscValue(miscval, uint32(0));
+                break;
+            default:
+                BOT_LOG_ERROR("npcbots", "ResetMiscValues: unknown saved miscvalue {} reset for bot {} (current: {})!", miscval, me->GetEntry(), GetAIMiscValue(miscval));
+                SetAIMiscValue(miscval, uint32(0));
+                break;
+        }
+    }
+
+    npcBotData->miscvalues.clear();
+    _saveMiscValues = true;
+}
+
+void bot_ai::InitMiscValues()
+{
+    NpcBotData const* npcBotData = BotDataMgr::SelectNpcBotData(me->GetEntry());
+    for (auto const& p : npcBotData->miscvalues)
+        SetAIMiscValue(p.first, p.second);
 }
 
 float bot_ai::GetBotAmmoDPS() const
