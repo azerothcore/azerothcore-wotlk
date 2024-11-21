@@ -1345,7 +1345,7 @@ bool BotMgr::IsPartyInCombat(bool is_pvp) const
             members.push_back(itr->second);
     }
 
-    return std::ranges::any_of(members, [=](Unit const* unit) { return unit->IsInCombat() && (!is_pvp || unit->GetCombatManager().HasPvPCombat()); });
+    return std::ranges::any_of(members, [=](Unit const* unit) { return unit->IsInCombat() && (!is_pvp || unit->GetCombatTimer() > 0); });
 }
 
 bool BotMgr::HasBotClass(uint8 botclass) const
