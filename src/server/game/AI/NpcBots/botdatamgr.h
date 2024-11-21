@@ -6,9 +6,9 @@
 #include "DBCEnums.h"
 
 #include <functional>
+#include <map>
 #include <set>
 #include <shared_mutex>
-#include <vector>
 
 class BattlegroundQueue;
 class Creature;
