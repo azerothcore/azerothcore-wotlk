@@ -185,12 +185,9 @@ struct boss_janalai : public BossAI
             StartBombing();
         }, 20s, 40s);
         ScheduleTimedEvent(10s, [&]{
-            if (HatchAllEggs(HATCH_RESET))
-            {
-                Talk(SAY_SUMMON_HATCHER);
-                me->SummonCreature(NPC_AMANI_HATCHER, hatcherway[0][0], TEMPSUMMON_CORPSE_TIMED_DESPAWN, 10000);
-                me->SummonCreature(NPC_AMANI_HATCHER, hatcherway[1][0], TEMPSUMMON_CORPSE_TIMED_DESPAWN, 10000);
-            }
+            Talk(SAY_SUMMON_HATCHER);
+            me->SummonCreature(NPC_AMANI_HATCHER, hatcherway[0][0], TEMPSUMMON_CORPSE_TIMED_DESPAWN, 10000);
+            me->SummonCreature(NPC_AMANI_HATCHER, hatcherway[1][0], TEMPSUMMON_CORPSE_TIMED_DESPAWN, 10000);
         }, 90s);
         ScheduleTimedEvent(8s, [&]{
             if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0))
