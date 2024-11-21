@@ -14675,6 +14675,28 @@ bool bot_ai::IsTank(Unit const* unit) const
             if (gr->isLFGGroup() && sLFGMgr->GetRoles(unit->GetGUID()) & lfg::PLAYER_ROLE_TANK)
                 return true;
         }
+        switch (player->GetClass())
+        {
+            case CLASS_WARRIOR:
+                if (player->GetShield() && const_cast<Player*>(player)->GetSpec(player->GetActiveSpec()) == TALENT_TREE_WARRIOR_PROTECTION)
+                    return true;
+                break;
+            case CLASS_PALADIN:
+                if (player->GetShield() && const_cast<Player*>(player)->GetSpec(player->GetActiveSpec()) == TALENT_TREE_PALADIN_PROTECTION)
+                    return true;
+                break;
+            case CLASS_DRUID:
+                if ((player->GetShapeshiftForm() == FORM_BEAR || player->GetShapeshiftForm() == FORM_DIREBEAR) &&
+                    const_cast<Player*>(player)->GetSpec(player->GetActiveSpec()) == TALENT_TREE_DRUID_FERAL_COMBAT)
+                    return true;
+                break;
+            case CLASS_DEATH_KNIGHT:
+                if (player->GetAuraEffect(SPELL_AURA_MOD_THREAT, SPELLFAMILY_DEATHKNIGHT, 0x8000, 0x0, 0x0) && player->GetRatingBonusValue(CR_DEFENSE_SKILL) > 0.0f)
+                    return true;
+                break;
+            default:
+                break;
+        }
     }
 
     return false;
@@ -14699,6 +14721,28 @@ bool bot_ai::IsOffTank(Unit const* unit) const
                     if (itr->guid == unit->GetGUID())
                         return itr->flags & MEMBER_FLAG_MAINASSIST;
             }
+        }
+        switch (player->GetClass())
+        {
+            case CLASS_WARRIOR:
+                if (player->GetShield() && const_cast<Player*>(player)->GetSpec(player->GetActiveSpec()) == TALENT_TREE_WARRIOR_PROTECTION)
+                    return true;
+                break;
+            case CLASS_PALADIN:
+                if (player->GetShield() && const_cast<Player*>(player)->GetSpec(player->GetActiveSpec()) == TALENT_TREE_PALADIN_PROTECTION)
+                    return true;
+                break;
+            case CLASS_DRUID:
+                if ((player->GetShapeshiftForm() == FORM_BEAR || player->GetShapeshiftForm() == FORM_DIREBEAR) &&
+                    const_cast<Player*>(player)->GetSpec(player->GetActiveSpec()) == TALENT_TREE_DRUID_FERAL_COMBAT)
+                    return true;
+                break;
+            case CLASS_DEATH_KNIGHT:
+                if (player->GetAuraEffect(SPELL_AURA_MOD_THREAT, SPELLFAMILY_DEATHKNIGHT, 0x8000, 0x0, 0x0) && player->GetRatingBonusValue(CR_DEFENSE_SKILL) > 0.0f)
+                    return true;
+                break;
+            default:
+                break;
         }
     }
 
