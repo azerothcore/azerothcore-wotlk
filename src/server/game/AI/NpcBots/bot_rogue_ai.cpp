@@ -1798,8 +1798,8 @@ public:
             combopointsSpent = false;
             glyphSSProc = false;
 
-            mhEnchantExpireTimer = 1;
-            ohEnchantExpireTimer = 1;
+            mhEnchantExpireTimer = std::min<uint32>(mhEnchantExpireTimer, 1);
+            ohEnchantExpireTimer = std::min<uint32>(ohEnchantExpireTimer, 1);
 
             DefaultInit();
 
