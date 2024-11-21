@@ -1,3 +1,4 @@
+-- DB update 2024_11_21_00 -> 2024_11_21_01
 --
 -- James Hyal (1/2) requirement removed from James Hyal (2/2)
 UPDATE `quest_template_addon` SET `PrevQuestID` = 0 WHERE (`ID` = 1302);
