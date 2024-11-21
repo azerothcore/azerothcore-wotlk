@@ -19,8 +19,6 @@
 #define DEF_DRAK_THARON_H
 
 #include "CreatureAIImpl.h"
-#include "SpellAuraEffects.h"
-#include "SpellScript.h"
 
 #define DataHeader "DTK"
 

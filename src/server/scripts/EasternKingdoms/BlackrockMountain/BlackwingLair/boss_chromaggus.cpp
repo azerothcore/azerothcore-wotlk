@@ -19,7 +19,6 @@
 #include "GameObject.h"
 #include "GameObjectAI.h"
 #include "GameObjectScript.h"
-#include "InstanceMapScript.h"
 #include "InstanceScript.h"
 #include "Map.h"
 #include "Player.h"
@@ -366,4 +365,3 @@ void AddSC_boss_chromaggus()
     RegisterSpellScript(spell_gen_elemental_shield);
     RegisterSpellScript(spell_gen_brood_power);
 }
-

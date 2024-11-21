@@ -27,9 +27,9 @@ namespace Acore::Crypto
     class AC_COMMON_API AES
     {
     public:
-        static constexpr size_t IV_SIZE_BYTES = 12;
-        static constexpr size_t KEY_SIZE_BYTES = 16;
-        static constexpr size_t TAG_SIZE_BYTES = 12;
+        static constexpr std::size_t IV_SIZE_BYTES = 12;
+        static constexpr std::size_t KEY_SIZE_BYTES = 16;
+        static constexpr std::size_t TAG_SIZE_BYTES = 12;
 
         using IV = std::array<uint8, IV_SIZE_BYTES>;
         using Key = std::array<uint8, KEY_SIZE_BYTES>;
@@ -40,7 +40,7 @@ namespace Acore::Crypto
 
         void Init(Key const& key);
 
-        bool Process(IV const& iv, uint8* data, size_t length, Tag& tag);
+        bool Process(IV const& iv, uint8* data, std::size_t length, Tag& tag);
 
     private:
         EVP_CIPHER_CTX* _ctx;

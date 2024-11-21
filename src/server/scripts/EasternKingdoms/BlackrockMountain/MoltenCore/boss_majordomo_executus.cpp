@@ -587,7 +587,7 @@ class spell_hate_to_zero : public SpellScript
 
     bool Load() override
     {
-        return GetCaster()->GetTypeId() == TYPEID_UNIT;
+        return GetCaster()->IsCreature();
     }
 
     void HandleHit(SpellEffIndex /*effIndex*/)
@@ -661,4 +661,3 @@ void AddSC_boss_majordomo()
     RegisterSpellScript(spell_majordomo_separation_anxiety_aura);
     RegisterSpellScript(spell_summon_ragnaros);
 }
-

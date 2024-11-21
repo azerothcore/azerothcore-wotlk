@@ -30,7 +30,6 @@
 #include "SharedDefines.h"
 #include "Spell.h"
 #include "SpellAuraDefines.h"
-#include "SpellAuras.h"
 #include "SpellInfo.h"
 #include "World.h"
 
@@ -492,7 +491,7 @@ uint32 SpellMgr::GetSpellIdForDifficulty(uint32 spellId, Unit const* caster) con
     if (!GetSpellInfo(spellId))
         return spellId;
 
-    if (!caster || !caster->GetMap() || !caster->GetMap()->IsDungeon())
+    if (!caster || !caster->GetMap() || (!caster->GetMap()->IsDungeon() && !caster->GetMap()->IsBattleground()))
         return spellId;
 
     uint32 mode = uint32(caster->GetMap()->GetSpawnMode());
@@ -3038,7 +3037,7 @@ void SpellMgr::LoadSpellInfoCustomAttributes()
             {
                 if (spellInfo->Effects[j].Effect)
                 {
-                    switch(spellInfo->Effects[j].Effect)
+                    switch (spellInfo->Effects[j].Effect)
                     {
                         case SPELL_EFFECT_SCHOOL_DAMAGE:
                         case SPELL_EFFECT_WEAPON_DAMAGE:
@@ -3065,16 +3064,27 @@ void SpellMgr::LoadSpellInfoCustomAttributes()
                                 continue;
                             [[fallthrough]]; /// @todo: Not sure whether the fallthrough was a mistake (forgetting a break) or intended. This should be double-checked.
                         default:
-                            if (spellInfo->Effects[j].CalcValue() || ((spellInfo->Effects[j].Effect == SPELL_EFFECT_INTERRUPT_CAST || spellInfo->HasAttribute(SPELL_ATTR0_CU_DONT_BREAK_STEALTH)) && !spellInfo->HasAttribute(SPELL_ATTR0_NO_IMMUNITIES)))
-                                if (spellInfo->Id != 69649 && spellInfo->Id != 71056 && spellInfo->Id != 71057 && spellInfo->Id != 71058 && spellInfo->Id != 73061 && spellInfo->Id != 73062 && spellInfo->Id != 73063 && spellInfo->Id != 73064) // Sindragosa Frost Breath
-                                    if (spellInfo->SpellFamilyName != SPELLFAMILY_MAGE || !(spellInfo->SpellFamilyFlags[0] & 0x20)) // frostbolt
-                                        if (spellInfo->Id != 55095) // frost fever
-                                            if (spellInfo->SpellFamilyName != SPELLFAMILY_WARLOCK || !(spellInfo->SpellFamilyFlags[1] & 0x40000)) // Haunt
-                                            {
-                                                spellInfo->AttributesCu |= SPELL_ATTR0_CU_BINARY_SPELL;
-                                                break;
-                                            }
-                            continue;
+                            if (!(spellInfo->Effects[j].CalcValue() &&
+                                ((spellInfo->Effects[j].Effect == SPELL_EFFECT_INTERRUPT_CAST || spellInfo->HasAttribute(SPELL_ATTR0_CU_DONT_BREAK_STEALTH)) &&
+                                !spellInfo->HasAttribute(SPELL_ATTR0_NO_IMMUNITIES))))
+                                continue;
+
+                            if (spellInfo->Id == 69649 || spellInfo->Id == 71056 || spellInfo->Id == 71057 || spellInfo->Id == 71058 ||
+                                spellInfo->Id == 73061 || spellInfo->Id == 73062 || spellInfo->Id == 73063 || spellInfo->Id == 73064)
+                                continue;
+
+                            if (spellInfo->SpellFamilyName == SPELLFAMILY_MAGE && (spellInfo->SpellFamilyFlags[0] & 0x20)) // Frostbolt
+                                continue;
+
+                            if (spellInfo->Id == 55095) // Frost Fever
+                                continue;
+
+                            if (spellInfo->SpellFamilyName == SPELLFAMILY_WARLOCK &&
+                                ((spellInfo->SpellFamilyFlags[1] & 0x40000) || (spellInfo->SpellFamilyFlags[0] & 0x4000))) // Haunt/Drain Soul
+                                continue;
+
+                            spellInfo->AttributesCu |= SPELL_ATTR0_CU_BINARY_SPELL;
+                            break;
                     }
                 }
             }
@@ -3492,7 +3502,7 @@ void SpellMgr::LoadSpellInfoCustomAttributes()
         {
             if (spellInfo->Effects[j].ApplyAuraName && spellInfo->Effects[j].TriggerSpell)
             {
-                switch(spellInfo->Effects[j].ApplyAuraName)
+                switch (spellInfo->Effects[j].ApplyAuraName)
                 {
                     case SPELL_AURA_PERIODIC_TRIGGER_SPELL:
                     case SPELL_AURA_PERIODIC_TRIGGER_SPELL_FROM_CLIENT:

@@ -26,7 +26,7 @@ namespace Acore::Crypto
 {
     struct AC_COMMON_API TOTP
     {
-        static constexpr size_t RECOMMENDED_SECRET_LENGTH = 20;
+        static constexpr std::size_t RECOMMENDED_SECRET_LENGTH = 20;
         using Secret = std::vector<uint8>;
 
         static uint32 GenerateToken(Secret const& key, time_t timestamp);

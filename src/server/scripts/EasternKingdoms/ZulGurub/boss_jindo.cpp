@@ -322,4 +322,3 @@ void AddSC_boss_jindo()
     RegisterSpellScript(spell_random_aggro);
     RegisterSpellScript(spell_delusions_of_jindo);
 }
-

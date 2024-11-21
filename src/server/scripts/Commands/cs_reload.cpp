@@ -31,6 +31,7 @@ EndScriptData */
 #include "CreatureTextMgr.h"
 #include "DisableMgr.h"
 #include "GameGraveyard.h"
+#include "ItemEnchantmentMgr.h"
 #include "LFGMgr.h"
 #include "Language.h"
 #include "MapMgr.h"
@@ -139,7 +140,6 @@ public:
             { "points_of_interest",            HandleReloadPointsOfInterestCommand,           SEC_ADMINISTRATOR, Console::Yes },
             { "prospecting_loot_template",     HandleReloadLootTemplatesProspectingCommand,   SEC_ADMINISTRATOR, Console::Yes },
             { "quest_greeting",                HandleReloadQuestGreetingCommand,              SEC_ADMINISTRATOR, Console::Yes },
-            { "quest_greeting_locale",         HandleReloadLocalesQuestGreetingCommand,       SEC_ADMINISTRATOR, Console::Yes },
             { "quest_poi",                     HandleReloadQuestPOICommand,                   SEC_ADMINISTRATOR, Console::Yes },
             { "quest_template",                HandleReloadQuestTemplateCommand,              SEC_ADMINISTRATOR, Console::Yes },
             { "reference_loot_template",       HandleReloadLootTemplatesReferenceCommand,     SEC_ADMINISTRATOR, Console::Yes },
@@ -166,6 +166,7 @@ public:
             { "spell_threats",                 HandleReloadSpellThreatsCommand,               SEC_ADMINISTRATOR, Console::Yes },
             { "spell_group_stack_rules",       HandleReloadSpellGroupStackRulesCommand,       SEC_ADMINISTRATOR, Console::Yes },
             { "player_loot_template",          HandleReloadLootTemplatesPlayerCommand,        SEC_ADMINISTRATOR, Console::Yes },
+            { "module_string",                 HandleReloadModuleStringCommand,               SEC_ADMINISTRATOR, Console::Yes },
             { "acore_string",                  HandleReloadAcoreStringCommand,                SEC_ADMINISTRATOR, Console::Yes },
             { "warden_action",                 HandleReloadWardenactionCommand,               SEC_ADMINISTRATOR, Console::Yes },
             { "waypoint_scripts",              HandleReloadWpScriptsCommand,                  SEC_ADMINISTRATOR, Console::Yes },
@@ -269,7 +270,6 @@ public:
         HandleReloadQuestAreaTriggersCommand(handler);
         HandleReloadQuestPOICommand(handler);
         HandleReloadQuestTemplateCommand(handler);
-        HandleReloadLocalesQuestGreetingCommand(handler);
 
         LOG_INFO("server.loading", "Reloading Quests Relations...");
         sObjectMgr->LoadQuestStartersAndEnders();
@@ -555,13 +555,8 @@ public:
         LOG_INFO("server.loading", "Reloading Quest Greeting ...");
         sObjectMgr->LoadQuestGreetings();
         handler->SendGlobalGMSysMessage("DB table `quest_greeting` reloaded.");
-        return true;
-    }
-
-    static bool HandleReloadLocalesQuestGreetingCommand(ChatHandler* handler)
-    {
         LOG_INFO("server.loading", "Reloading Quest Greeting locales...");
-        sObjectMgr->LoadQuestGreetingsLocales();
+        sObjectMgr->LoadQuestGreetingsLocales(); // Must be after LoadQuestGreetings()
         handler->SendGlobalGMSysMessage("DB table `quest_greeting_locale` reloaded.");
         return true;
     }
@@ -716,6 +711,17 @@ public:
         return true;
     }
 
+    static bool HandleReloadModuleStringCommand(ChatHandler* handler)
+    {
+        LOG_INFO("server.loading", "Reloading module_string Table!");
+        sObjectMgr->LoadModuleStrings();
+        handler->SendGlobalGMSysMessage("DB table `module_string` reloaded.");
+        LOG_INFO("server.loading", "Reloading module_string_locale Table!");
+        sObjectMgr->LoadModuleStringsLocale();
+        handler->SendGlobalGMSysMessage("DB table `module_string_locale` reloaded.");
+        return true;
+    }
+
     static bool HandleReloadAcoreStringCommand(ChatHandler* handler)
     {
         LOG_INFO("server.loading", "Reloading acore_string Table!");
@@ -800,7 +806,7 @@ public:
     {
         LOG_INFO("server.loading", "Reloading `reputation_reward_rate` Table!" );
         sObjectMgr->LoadReputationRewardRate();
-        handler->SendGlobalSysMessage("DB table `reputation_reward_rate` reloaded.");
+        handler->SendGlobalGMSysMessage("DB table `reputation_reward_rate` reloaded.");
         return true;
     }
 
@@ -808,7 +814,7 @@ public:
     {
         LOG_INFO("server.loading", "Reloading `reputation_spillover_template` Table!" );
         sObjectMgr->LoadReputationSpilloverTemplate();
-        handler->SendGlobalSysMessage("DB table `reputation_spillover_template` reloaded.");
+        handler->SendGlobalGMSysMessage("DB table `reputation_spillover_template` reloaded.");
         return true;
     }
 

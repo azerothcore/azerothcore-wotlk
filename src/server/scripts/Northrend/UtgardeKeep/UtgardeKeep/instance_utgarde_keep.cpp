@@ -15,7 +15,6 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "CreatureScript.h"
 #include "InstanceMapScript.h"
 #include "Player.h"
 #include "ScriptedCreature.h"
@@ -108,7 +107,7 @@ public:
 
         void OnGameObjectCreate(GameObject* go) override
         {
-            switch(go->GetEntry())
+            switch (go->GetEntry())
             {
                 case GO_BELLOW_1:
                     GO_ForgeBellowGUID[0] = go->GetGUID();
@@ -159,7 +158,7 @@ public:
 
         void SetData(uint32 type, uint32 data) override
         {
-            switch(type)
+            switch (type)
             {
                 case DATA_KELESETH:
                     m_auiEncounter[0] = data;
@@ -308,7 +307,7 @@ public:
 
         bool CheckAchievementCriteriaMeet(uint32 criteria_id, Player const*  /*source*/, Unit const*  /*target*/, uint32  /*miscvalue1*/) override
         {
-            switch(criteria_id)
+            switch (criteria_id)
             {
                 case 7231: // On The Rocks
                     return bRocksAchiev;
@@ -322,4 +321,3 @@ void AddSC_instance_utgarde_keep()
 {
     new instance_utgarde_keep();
 }
-

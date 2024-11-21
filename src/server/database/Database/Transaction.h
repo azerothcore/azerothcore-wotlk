@@ -24,7 +24,6 @@
 #include "StringFormat.h"
 #include <functional>
 #include <mutex>
-#include <utility>
 #include <vector>
 
 /*! Transactions, high level class. */
@@ -45,7 +44,7 @@ public:
     template<typename... Args>
     void Append(std::string_view sql, Args&&... args)
     {
-        Append(Acore::StringFormatFmt(sql, std::forward<Args>(args)...));
+        Append(Acore::StringFormat(sql, std::forward<Args>(args)...));
     }
 
     [[nodiscard]] std::size_t GetSize() const { return m_queries.size(); }

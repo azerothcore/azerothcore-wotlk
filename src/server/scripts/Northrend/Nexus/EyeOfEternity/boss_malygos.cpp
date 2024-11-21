@@ -382,7 +382,7 @@ public:
             if (me->HasUnitState(UNIT_STATE_CASTING))
                 return;
 
-            switch(events.ExecuteEvent())
+            switch (events.ExecuteEvent())
             {
                 case 0:
                     break;
@@ -799,7 +799,7 @@ public:
             if (!summon)
                 return;
             summons.Summon(summon);
-            switch(summon->GetEntry())
+            switch (summon->GetEntry())
             {
                 case NPC_ARCANE_OVERLOAD:
                     summon->CastSpell(summon, SPELL_ARCANE_OVERLOAD_DMG, true);
@@ -894,7 +894,7 @@ public:
 
         void PassengerBoarded(Unit* pass, int8  /*seat*/, bool apply) override
         {
-            if (pass && !apply && pass->GetTypeId() == TYPEID_PLAYER)
+            if (pass && !apply && pass->IsPlayer())
             {
                 Player* plr = pass->ToPlayer();
                 float speed = plr->GetDistance(me->GetPositionX(), me->GetPositionY(), me->GetPositionZ()) / (1.0f * 0.001f);
@@ -989,7 +989,7 @@ public:
 
         void DoAction(int32 param) override
         {
-            switch(param)
+            switch (param)
             {
                 case 1:
                     MoveTimer = 1;
@@ -1123,7 +1123,7 @@ public:
             if (me->HasUnitState(UNIT_STATE_CASTING))
                 return;
 
-            switch(events.ExecuteEvent())
+            switch (events.ExecuteEvent())
             {
                 case 0:
                     break;
@@ -1183,7 +1183,7 @@ public:
             if (me->HasUnitState(UNIT_STATE_CASTING))
                 return;
 
-            switch(events.ExecuteEvent())
+            switch (events.ExecuteEvent())
             {
                 case 0:
                     break;
@@ -1258,7 +1258,7 @@ public:
                 return;
             if (apply)
             {
-                if (who->GetTypeId() == TYPEID_PLAYER)
+                if (who->IsPlayer())
                 {
                     who->ApplySpellImmune(0, IMMUNITY_ID, SPELL_ARCANE_OVERLOAD_DMG, true);
                     who->ApplySpellImmune(0, IMMUNITY_ID, SPELL_SURGE_OF_POWER_DMG, true);
@@ -1286,7 +1286,7 @@ public:
                 me->SetCanFly(false);
                 me->GetMotionMaster()->MoveLand(0, me->GetPositionX(), me->GetPositionY(), 267.24f, 10.0f);
 
-                if (who->GetTypeId() == TYPEID_PLAYER)
+                if (who->IsPlayer())
                 {
                     who->ApplySpellImmune(0, IMMUNITY_ID, SPELL_ARCANE_OVERLOAD_DMG, false);
                     who->ApplySpellImmune(0, IMMUNITY_ID, SPELL_SURGE_OF_POWER_DMG, false);
@@ -1321,12 +1321,12 @@ public:
 
         void DoAction(int32 param) override
         {
-            switch(param)
+            switch (param)
             {
                 case 1: // move to next point
                     if (Vehicle* v = me->GetVehicleKit())
                         if (Unit* pass = v->GetPassenger(0))
-                            switch(pass->GetEntry())
+                            switch (pass->GetEntry())
                             {
                                 case NPC_NEXUS_LORD:
                                     {
@@ -1357,7 +1357,7 @@ public:
         {
             events.Update(diff);
 
-            switch(events.ExecuteEvent())
+            switch (events.ExecuteEvent())
             {
                 case 0:
                     break;
@@ -1397,7 +1397,7 @@ public:
         void UpdateAI(uint32 diff) override
         {
             events.Update(diff);
-            switch(events.ExecuteEvent())
+            switch (events.ExecuteEvent())
             {
                 case 0:
                     break;
@@ -1456,7 +1456,7 @@ public:
                 me->SetDisableGravity(false);
                 me->SendMovementFlagUpdate();
             }
-            else if (pass && pass->GetTypeId() == TYPEID_PLAYER && me->IsAlive())
+            else if (pass && pass->IsPlayer() && me->IsAlive())
             {
                 me->SetDisplayId(11686); // prevents nasty falling animation at despawn
                 me->DespawnOrUnsummon(1);

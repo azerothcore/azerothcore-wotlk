@@ -18,7 +18,6 @@
 #include "GridNotifiers.h"
 #include "Map.h"
 #include "ObjectAccessor.h"
-#include "SpellMgr.h"
 #include "Transport.h"
 #include "UpdateData.h"
 #include "WorldPacket.h"
@@ -159,7 +158,7 @@ inline void CreatureUnitRelocationWorker(Creature* c, Unit* u)
         {
             c->AI()->MoveInLineOfSight_Safe(u);
         }
-        else if (u->GetTypeId() == TYPEID_PLAYER && u->HasStealthAura() && c->IsAIEnabled && c->CanSeeOrDetect(u, false, true, true))
+        else if (u->IsPlayer() && u->HasStealthAura() && c->IsAIEnabled && c->CanSeeOrDetect(u, false, true, true))
         {
             c->AI()->TriggerAlert(u);
         }

@@ -19,14 +19,11 @@
 #define _TASK_SCHEDULER_H_
 
 #include "Util.h"
-#include <algorithm>
 #include <chrono>
 #include <functional>
-#include <memory>
 #include <optional>
 #include <queue>
 #include <set>
-#include <utility>
 #include <vector>
 
 class TaskContext;
@@ -209,7 +206,7 @@ public:
 
     /// Update the scheduler with a difftime in ms.
     /// Calls the optional callback on successfully finish.
-    TaskScheduler& Update(size_t const milliseconds, success_t const& callback = EmptyCallback);
+    TaskScheduler& Update(std::size_t const milliseconds, success_t const& callback = EmptyCallback);
 
     /// Update the scheduler with a difftime.
     /// Calls the optional callback on successfully finish.

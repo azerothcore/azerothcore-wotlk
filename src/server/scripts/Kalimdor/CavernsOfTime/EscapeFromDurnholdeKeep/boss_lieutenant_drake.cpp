@@ -91,7 +91,7 @@ struct boss_lieutenant_drake : public BossAI
 
     void KilledUnit(Unit* victim) override
     {
-        if (victim->GetTypeId() == TYPEID_PLAYER)
+        if (victim->IsPlayer())
         {
             Talk(SAY_SLAY);
         }

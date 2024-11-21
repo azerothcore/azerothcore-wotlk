@@ -69,11 +69,11 @@ public:
 
             if (handler->GetSession())
             {
-                handler->PSendSysMessage(LANG_EVENT_ENTRY_LIST_CHAT, eventId, eventId, eventData.description.c_str(), active);
+                handler->PSendSysMessage(LANG_EVENT_ENTRY_LIST_CHAT, eventId, eventId, eventData.description, active);
             }
             else
             {
-                handler->PSendSysMessage(LANG_EVENT_ENTRY_LIST_CONSOLE, eventId, eventData.description.c_str(), active);
+                handler->PSendSysMessage(LANG_EVENT_ENTRY_LIST_CONSOLE, eventId, eventData.description, active);
             }
 
             ++counter;
@@ -120,9 +120,9 @@ public:
         std::string occurenceStr = secsToTimeString(eventData.occurence * MINUTE, true);
         std::string lengthStr = secsToTimeString(eventData.length * MINUTE, true);
 
-        handler->PSendSysMessage(LANG_EVENT_INFO, uint16(eventId), eventData.description.c_str(), activeStr,
-            startTimeStr.c_str(), endTimeStr.c_str(), occurenceStr.c_str(), lengthStr.c_str(),
-            nextStr.c_str());
+        handler->PSendSysMessage(LANG_EVENT_INFO, uint16(eventId), eventData.description, activeStr,
+            startTimeStr, endTimeStr, occurenceStr, lengthStr,
+            nextStr);
 
         return true;
     }
@@ -147,11 +147,11 @@ public:
         GameEventMgr::ActiveEvents const& activeEvents = sGameEventMgr->GetActiveEventList();
         if (activeEvents.find(eventId) != activeEvents.end())
         {
-            handler->SendErrorMessage(LANG_EVENT_ALREADY_ACTIVE, uint16(eventId), eventData.description.c_str());
+            handler->SendErrorMessage(LANG_EVENT_ALREADY_ACTIVE, uint16(eventId), eventData.description);
             return false;
         }
 
-        handler->PSendSysMessage(LANG_EVENT_STARTED, uint16(eventId), eventData.description.c_str());
+        handler->PSendSysMessage(LANG_EVENT_STARTED, uint16(eventId), eventData.description);
         sGameEventMgr->StartEvent(eventId, true);
         return true;
     }
@@ -177,11 +177,11 @@ public:
 
         if (activeEvents.find(eventId) == activeEvents.end())
         {
-            handler->SendErrorMessage(LANG_EVENT_NOT_ACTIVE, uint16(eventId), eventData.description.c_str());
+            handler->SendErrorMessage(LANG_EVENT_NOT_ACTIVE, uint16(eventId), eventData.description);
             return false;
         }
 
-        handler->PSendSysMessage(LANG_EVENT_STOPPED, uint16(eventId), eventData.description.c_str());
+        handler->PSendSysMessage(LANG_EVENT_STOPPED, uint16(eventId), eventData.description);
         sGameEventMgr->StopEvent(eventId, true);
         return true;
     }

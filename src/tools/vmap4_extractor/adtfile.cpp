@@ -17,7 +17,6 @@
 
 #include "adtfile.h"
 #include "vmapexport.h"
-#include <algorithm>
 #include <cstdio>
 
 #ifdef WIN32
@@ -42,12 +41,12 @@ char* GetPlainName(char* FileName)
     return FileName;
 }
 
-void fixnamen(char* name, size_t len)
+void fixnamen(char* name, std::size_t len)
 {
     if (len < 3)
         return;
 
-    for (size_t i = 0; i < len - 3; i++)
+    for (std::size_t i = 0; i < len - 3; i++)
     {
         if (i > 0 && name[i] >= 'A' && name[i] <= 'Z' && isalpha(name[i - 1]))
             name[i] |= 0x20;
@@ -56,16 +55,16 @@ void fixnamen(char* name, size_t len)
     }
 
     //extension in lowercase
-    for (size_t i = len - 3; i < len; i++)
+    for (std::size_t i = len - 3; i < len; i++)
         name[i] |= 0x20;
 }
 
-void fixname2(char* name, size_t len)
+void fixname2(char* name, std::size_t len)
 {
     if (len < 3)
         return;
 
-    for (size_t i = 0; i < len - 3; i++)
+    for (std::size_t i = 0; i < len - 3; i++)
         if (name[i] == ' ')
             name[i] = '_';
 }
@@ -105,7 +104,7 @@ bool ADTFile::init(uint32 map_num, uint32 tileX, uint32 tileY)
         flipcc(fourcc);
         fourcc[4] = 0;
 
-        size_t nextpos = _file.getPos() + size;
+        std::size_t nextpos = _file.getPos() + size;
 
         if (!strcmp(fourcc, "MCIN"))
         {

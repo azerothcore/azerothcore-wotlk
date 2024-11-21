@@ -111,7 +111,7 @@ bool npc_escortAI::AssistPlayerInCombatAgainst(Unit* who)
     }
 
     // or if enemy is in evade mode
-    if (who->GetTypeId() == TYPEID_UNIT && who->ToCreature()->IsInEvadeMode())
+    if (who->IsCreature() && who->ToCreature()->IsInEvadeMode())
     {
         return false;
     }

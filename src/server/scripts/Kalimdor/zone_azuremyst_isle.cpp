@@ -25,22 +25,6 @@
 #include "SpellAuras.h"
 #include "SpellScript.h"
 #include "SpellScriptLoader.h"
-/* ScriptData
-SDName: Azuremyst_Isle
-SD%Complete: 75
-SDComment: Quest support: 9283, 9537, 9582, 9554, 9531, ? (special flight path, proper model for mount missing). Injured Draenei cosmetic only, 9582.
-SDCategory: Azuremyst Isle
-EndScriptData */
-
-/* ContentData
-npc_draenei_survivor
-npc_injured_draenei
-npc_magwin
-npc_geezle
-go_ravager_cage
-npc_death_ravager
-EndContentData */
-
 #include "GridNotifiersImpl.h"
 
 /*######
@@ -94,7 +78,7 @@ public:
 
         void MoveInLineOfSight(Unit* who) override
         {
-            if (CanSayHelp && who->GetTypeId() == TYPEID_PLAYER && me->IsFriendlyTo(who) && me->IsWithinDistInMap(who, 25.0f))
+            if (CanSayHelp && who->IsPlayer() && me->IsFriendlyTo(who) && me->IsWithinDistInMap(who, 25.0f))
             {
                 //Random switch between 4 texts
                 Talk(SAY_HELP, who);
@@ -475,7 +459,7 @@ public:
                 return;
 
             if (Player* player = ObjectAccessor::GetPlayer(*me, _playerGUID))
-                player->KilledMonsterCredit(me->GetEntry(), me->GetGUID());
+                player->RewardPlayerAndGroupAtEvent(me->GetEntry(), player);
 
             _movementComplete = true;
             _events.ScheduleEvent(EVENT_DESPAWN, 3500ms);
@@ -585,4 +569,3 @@ void AddSC_azuremyst_isle()
     new go_bristlelimb_cage();
     RegisterSpellScript(spell_inoculate_nestlewood_owlkin);
 }
-

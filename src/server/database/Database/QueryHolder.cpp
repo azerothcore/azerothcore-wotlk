@@ -22,7 +22,7 @@
 #include "PreparedStatement.h"
 #include "QueryResult.h"
 
-bool SQLQueryHolderBase::SetPreparedQueryImpl(size_t index, PreparedStatementBase* stmt)
+bool SQLQueryHolderBase::SetPreparedQueryImpl(std::size_t index, PreparedStatementBase* stmt)
 {
     if (m_queries.size() <= index)
     {
@@ -34,7 +34,7 @@ bool SQLQueryHolderBase::SetPreparedQueryImpl(size_t index, PreparedStatementBas
     return true;
 }
 
-PreparedQueryResult SQLQueryHolderBase::GetPreparedResult(size_t index) const
+PreparedQueryResult SQLQueryHolderBase::GetPreparedResult(std::size_t index) const
 {
     // Don't call to this function if the index is of a prepared statement
     ASSERT(index < m_queries.size(), "Query holder result index out of range, tried to access index {} but there are only {} results",
@@ -43,7 +43,7 @@ PreparedQueryResult SQLQueryHolderBase::GetPreparedResult(size_t index) const
     return m_queries[index].second;
 }
 
-void SQLQueryHolderBase::SetPreparedResult(size_t index, PreparedResultSet* result)
+void SQLQueryHolderBase::SetPreparedResult(std::size_t index, PreparedResultSet* result)
 {
     if (result && !result->GetRowCount())
     {
@@ -66,7 +66,7 @@ SQLQueryHolderBase::~SQLQueryHolderBase()
     }
 }
 
-void SQLQueryHolderBase::SetSize(size_t size)
+void SQLQueryHolderBase::SetSize(std::size_t size)
 {
     /// to optimize push_back, reserve the number of queries about to be executed
     m_queries.resize(size);
@@ -77,7 +77,7 @@ SQLQueryHolderTask::~SQLQueryHolderTask() = default;
 bool SQLQueryHolderTask::Execute()
 {
     /// execute all queries in the holder and pass the results
-    for (size_t i = 0; i < m_holder->m_queries.size(); ++i)
+    for (std::size_t i = 0; i < m_holder->m_queries.size(); ++i)
         if (PreparedStatementBase* stmt = m_holder->m_queries[i].first)
             m_holder->SetPreparedResult(i, m_conn->Query(stmt));
 

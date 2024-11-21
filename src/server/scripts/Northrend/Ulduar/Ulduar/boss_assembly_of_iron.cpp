@@ -310,7 +310,7 @@ public:
 
         void KilledUnit(Unit* who) override
         {
-            if (who->GetTypeId() != TYPEID_PLAYER)
+            if (!who->IsPlayer())
                 return;
 
             if (_phase == 3)
@@ -340,7 +340,7 @@ public:
             if (me->HasUnitState(UNIT_STATE_CASTING))
                 return;
 
-            switch(events.ExecuteEvent())
+            switch (events.ExecuteEvent())
             {
                 case EVENT_FUSION_PUNCH:
                     me->CastSpell(me->GetVictim(), SPELL_FUSION_PUNCH, false);
@@ -488,7 +488,7 @@ public:
 
         void KilledUnit(Unit* who) override
         {
-            if (who->GetTypeId() != TYPEID_PLAYER)
+            if (!who->IsPlayer())
                 return;
 
             Talk(SAY_MOLGEIM_SLAY);
@@ -509,7 +509,7 @@ public:
             if (me->HasUnitState(UNIT_STATE_CASTING))
                 return;
 
-            switch(events.ExecuteEvent())
+            switch (events.ExecuteEvent())
             {
                 case EVENT_RUNE_OF_POWER:
                     {
@@ -706,7 +706,7 @@ public:
 
         void KilledUnit(Unit* who) override
         {
-            if (who->GetTypeId() != TYPEID_PLAYER || urand(0, 2))
+            if (!who->IsPlayer() || urand(0, 2))
                 return;
 
             Talk(SAY_BRUNDIR_SLAY);

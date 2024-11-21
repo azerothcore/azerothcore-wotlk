@@ -20,9 +20,15 @@
 #include "CellImpl.h"
 #include "CreatureScript.h"
 #include "GridNotifiers.h"
-#include "GridNotifiersImpl.h"
+#include "PassiveAI.h"
 #include "Player.h"
 #include "ScriptedCreature.h"
+
+/// @todo: this import is not necessary for compilation and marked as unused by the IDE
+//  however, for some reasons removing it would cause a damn linking issue
+//  there is probably some underlying problem with imports which should properly addressed
+//  see: https://github.com/azerothcore/azerothcore-wotlk/issues/9766
+#include "GridNotifiersImpl.h"
 
 /*######
 ## npc_belnistrasz for Quest 3525 "Extinguishing the Idol"

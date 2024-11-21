@@ -19,7 +19,6 @@
 #define DEF_STEAM_VAULT_H
 
 #include "CreatureAIImpl.h"
-#include "PassiveAI.h"
 
 #define DataHeaders "SV"
 

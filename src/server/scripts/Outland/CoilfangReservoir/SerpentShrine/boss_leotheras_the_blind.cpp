@@ -17,11 +17,14 @@
 
 #include "CreatureGroups.h"
 #include "CreatureScript.h"
+#include "GridNotifiers.h"
 #include "Player.h"
 #include "ScriptedCreature.h"
 #include "SpellScriptLoader.h"
 #include "TaskScheduler.h"
 #include "serpent_shrine.h"
+#include "SpellAuraEffects.h"
+#include "SpellScript.h"
 
 enum Talk
 {
@@ -125,6 +128,14 @@ struct boss_leotheras_the_blind : public BossAI
         });
     }
 
+    void AttackStart(Unit* who) override
+    {
+        if (me->HasAura(SPELL_METAMORPHOSIS))
+            AttackStartCaster(who, 40.0f);
+        else
+            ScriptedAI::AttackStart(who);
+    }
+
     void DoAction(int32 actionId) override
     {
         if (actionId == ACTION_CHECK_SPELLBINDERS)
@@ -169,15 +180,13 @@ struct boss_leotheras_the_blind : public BossAI
 
     void MoveToTargetIfOutOfRange(Unit* target)
     {
-        if (me->GetDistance2d(target) > 40.0f)
+        if (!me->IsWithinDistInMap(target, 40.0f))
         {
-            me->GetMotionMaster()->MoveChase(target, 5.0f, 0);
+            me->GetMotionMaster()->MoveChase(target, 40.0f, 0);
             me->AddThreat(target, 0.0f);
         }
         else
-        {
             me->GetMotionMaster()->Clear();
-        }
     }
 
     void DemonTime()
@@ -201,7 +210,7 @@ struct boss_leotheras_the_blind : public BossAI
         {
             DoResetThreatList();
             me->LoadEquipment();
-            me->GetMotionMaster()->MoveChase(me->GetVictim(), 0.0f);
+            me->ResumeChasingVictim();
             me->RemoveAurasDueToSpell(SPELL_METAMORPHOSIS);
             scheduler.CancelGroup(GROUP_DEMON);
             ElfTime();
@@ -220,9 +229,7 @@ struct boss_leotheras_the_blind : public BossAI
         if (me->GetDisplayId() == me->GetNativeDisplayId())
         {
             if (me->GetReactState() != REACT_PASSIVE)
-            {
                 DoMeleeAttackIfReady();
-            }
         }
         else if (me->isAttackReady(BASE_ATTACK))
         {
@@ -232,9 +239,7 @@ struct boss_leotheras_the_blind : public BossAI
                 DoMeleeAttackIfReady();
             }
             else
-            {
                 me->setAttackTimer(BASE_ATTACK, 2000);
-            }
         }
     }
 private:
@@ -457,4 +462,3 @@ void AddSC_boss_leotheras_the_blind()
     RegisterSpellScript(spell_leotheras_demon_link);
     RegisterSpellScript(spell_leotheras_clear_consuming_madness);
 }
-

@@ -65,8 +65,8 @@ public:
             return false;
         }
 
-        handler->PSendSysMessage(LANG_COMMAND_CACHE_INFO, cache->Name, cache->Guid.GetCounter(), cache->AccountId,
-            cache->Class, cache->Race, cache->Sex, cache->Level, cache->MailCount, cache->GuildId, cache->GroupGuid.GetCounter(),
+        handler->PSendSysMessage(LANG_COMMAND_CACHE_INFO, cache->Name, cache->Guid.ToString(), cache->AccountId,
+            cache->Class, cache->Race, cache->Sex, cache->Level, cache->MailCount, cache->GuildId, cache->GroupGuid.ToString(),
             cache->ArenaTeamId[ARENA_SLOT_2v2], cache->ArenaTeamId[ARENA_SLOT_3v3], cache->ArenaTeamId[ARENA_SLOT_5v5]);
 
         handler->SetSentErrorMessage(false);
@@ -87,7 +87,7 @@ public:
         }
 
         sCharacterCache->DeleteCharacterCacheEntry(player->GetGUID(), player->GetName());
-        handler->PSendSysMessage(LANG_COMMAND_CACHE_DELETE, player->GetName(), player->GetGUID().GetCounter());
+        handler->PSendSysMessage(LANG_COMMAND_CACHE_DELETE, player->GetName(), player->GetGUID().ToString());
         handler->SetSentErrorMessage(false);
         return true;
     }
@@ -141,7 +141,7 @@ public:
             sCharacterCache->RefreshCacheEntry(player->GetGUID().GetCounter());
         }
 
-        handler->PSendSysMessage(LANG_COMMAND_CACHE_REFRESH, player->GetName(), player->GetGUID().GetCounter());
+        handler->PSendSysMessage(LANG_COMMAND_CACHE_REFRESH, player->GetName(), player->GetGUID().ToString());
         handler->SetSentErrorMessage(false);
         return true;
     }

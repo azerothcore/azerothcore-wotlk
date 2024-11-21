@@ -62,13 +62,20 @@ public:
 
         void Reset() override
         {
-            _summonedRend = false;
             if (instance->GetBossState(DATA_GYTH) == IN_PROGRESS)
             {
                 instance->SetBossState(DATA_GYTH, NOT_STARTED);
                 summons.DespawnAll();
                 me->DespawnOrUnsummon();
             }
+
+            SetInvincibility(true); // Don't let boss die before summoning Rend.
+
+            ScheduleHealthCheckEvent(25, [&] {
+                DoCastAOE(SPELL_SUMMON_REND, true);
+                me->RemoveAura(SPELL_REND_MOUNTS);
+                SetInvincibility(false);
+            });
         }
 
         void JustEngagedWith(Unit* /*who*/) override
@@ -102,21 +109,6 @@ public:
         void JustDied(Unit* /*killer*/) override
         {
             instance->SetBossState(DATA_GYTH, DONE);
-        }
-
-        void DamageTaken(Unit* /*attacker*/, uint32& damage, DamageEffectType /*type*/, SpellSchoolMask /*school*/) override
-        {
-            if (!_summonedRend && me->HealthBelowPctDamaged(25, damage))
-            {
-                if (damage >= me->GetHealth())
-                {
-                    // Let creature fall to 1 HP but prevent it from dying before boss is summoned.
-                    damage = me->GetHealth() - 1;
-                }
-                DoCast(me, SPELL_SUMMON_REND, true);
-                me->RemoveAura(SPELL_REND_MOUNTS);
-                _summonedRend = true;
-            }
         }
 
         void UpdateAI(uint32 diff) override
@@ -173,9 +165,6 @@ public:
             }
             DoMeleeAttackIfReady();
         }
-
-        private:
-            bool _summonedRend;
     };
 
     CreatureAI* GetAI(Creature* creature) const override
@@ -245,4 +234,3 @@ void AddSC_boss_gyth()
     new boss_gyth();
     RegisterSpellScript(spell_gyth_chromatic_protection);
 }
-

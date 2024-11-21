@@ -174,7 +174,7 @@ public:
 
         void KilledUnit(Unit* who) override
         {
-            if (who->GetTypeId() == TYPEID_PLAYER && pInstance)
+            if (who->IsPlayer() && pInstance)
             {
                 pInstance->SetData(DATA_IMMORTAL_FAIL, 0);
             }

@@ -244,17 +244,17 @@ const Position SBSLeaderEndPos = {823.2f, -4.4497f, 509.49f, 0.86f};
 enum eSBSTexts // Ick outro
 {
     SAY_OUTRO_KRICK_1                           = 6,
-    SAY_JAINA_KRICK_1                           = 36,
-    SAY_SYLVANAS_KRICK_1                        = 37,
+    SAY_JAINA_KRICK_1                           = 0,
+    SAY_SYLVANAS_KRICK_1                        = 0,
     SAY_OUTRO_KRICK_2                           = 7,
-    SAY_JAINA_KRICK_2                           = 39,
-    SAY_SYLVANAS_KRICK_2                        = 40,
+    SAY_JAINA_KRICK_2                           = 1,
+    SAY_SYLVANAS_KRICK_2                        = 1,
     SAY_OUTRO_KRICK_3                           = 8,
     SAY_TYRANNUS_KRICK_1                        = 0,
     SAY_OUTRO_KRICK_4                           = 9,
     SAY_TYRANNUS_KRICK_2                        = 1,
     SAY_JAINA_KRICK_3                           = 45,
-    SAY_SYLVANAS_KRICK_3                        = 46,
+    SAY_SYLVANAS_KRICK_3                        = 2,
 };
 
 /************

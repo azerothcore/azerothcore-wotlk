@@ -29,7 +29,7 @@ CREATE TABLE IF NOT EXISTS `gameobject_template_addon` (
   PRIMARY KEY (`entry`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- Dumping data for table acore_world.gameobject_template_addon: ~21 255 rows (approximately)
+-- Dumping data for table acore_world.gameobject_template_addon: ~21 675 rows (approximately)
 DELETE FROM `gameobject_template_addon`;
 INSERT INTO `gameobject_template_addon` (`entry`, `faction`, `flags`, `mingold`, `maxgold`, `artkit0`, `artkit1`, `artkit2`, `artkit3`) VALUES
 	(31, 84, 4, 0, 0, 0, 0, 0, 0),
@@ -11160,8 +11160,8 @@ INSERT INTO `gameobject_template_addon` (`entry`, `faction`, `flags`, `mingold`,
 	(182057, 0, 0, 0, 0, 0, 0, 0, 0),
 	(182058, 0, 4, 0, 0, 0, 0, 0, 0),
 	(182059, 0, 0, 0, 0, 0, 0, 0, 0),
-	(182060, 0, 0, 0, 0, 0, 0, 0, 0),
-	(182061, 0, 0, 0, 0, 0, 0, 0, 0),
+	(182060, 0, 34, 0, 0, 0, 0, 0, 0),
+	(182061, 0, 34, 0, 0, 0, 0, 0, 0),
 	(182062, 35, 4, 0, 0, 0, 0, 0, 0),
 	(182063, 0, 4, 0, 0, 0, 0, 0, 0),
 	(182064, 0, 0, 0, 0, 0, 0, 0, 0),
@@ -20847,9 +20847,9 @@ INSERT INTO `gameobject_template_addon` (`entry`, `faction`, `flags`, `mingold`,
 	(194909, 1735, 0, 0, 0, 0, 0, 0, 0),
 	(194910, 0, 32, 0, 0, 0, 0, 0, 0),
 	(194911, 114, 32, 0, 0, 0, 0, 0, 0),
-	(194912, 0, 32, 0, 0, 0, 0, 0, 0),
+	(194912, 0, 48, 0, 0, 0, 0, 0, 0),
 	(194913, 1375, 32, 0, 0, 0, 0, 0, 0),
-	(194914, 0, 32, 0, 0, 0, 0, 0, 0),
+	(194914, 0, 48, 0, 0, 0, 0, 0, 0),
 	(194915, 1375, 32, 0, 0, 0, 0, 0, 0),
 	(194935, 0, 4, 0, 0, 0, 0, 0, 0),
 	(194937, 0, 0, 0, 0, 0, 0, 0, 0),

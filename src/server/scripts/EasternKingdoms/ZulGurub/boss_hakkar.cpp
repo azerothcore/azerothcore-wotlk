@@ -349,6 +349,7 @@ public:
     }
 };
 
+// 24324 - Blood Siphon (channel)
 class spell_blood_siphon : public SpellScript
 {
     PrepareSpellScript(spell_blood_siphon);
@@ -385,6 +386,32 @@ class spell_blood_siphon : public SpellScript
     }
 };
 
+// 24323 - Blood Siphon (aura) | Effects changed in SpellInfoCorrections
+class spell_blood_siphon_aura : public AuraScript
+{
+    PrepareAuraScript(spell_blood_siphon_aura);
+
+    bool Validate(SpellInfo const* /*spellInfo*/) override
+    {
+        return ValidateSpellInfo({ SPELL_POISONOUS_BLOOD });
+    }
+
+    void OnRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
+    {
+        if (Unit* target = GetTarget())
+        {
+            if (target->HasAura(SPELL_POISONOUS_BLOOD))
+                target->RemoveAurasDueToSpell(SPELL_POISONOUS_BLOOD);
+        }
+    }
+
+    void Register() override
+    {
+        AfterEffectRemove += AuraEffectRemoveFn(spell_blood_siphon_aura::OnRemove, EFFECT_1, SPELL_AURA_MOD_STUN, AURA_EFFECT_HANDLE_REAL);
+    }
+};
+
+// 24693 - Serverside - Hakkar Power Down
 class spell_hakkar_power_down : public SpellScript
 {
     PrepareSpellScript(spell_hakkar_power_down);
@@ -411,6 +438,6 @@ void AddSC_boss_hakkar()
     new at_zulgurub_bloodfire_pit_speech();
     new at_zulgurub_edge_of_madness_speech();
     RegisterSpellScript(spell_blood_siphon);
+    RegisterSpellScript(spell_blood_siphon_aura);
     RegisterSpellScript(spell_hakkar_power_down);
 }
-

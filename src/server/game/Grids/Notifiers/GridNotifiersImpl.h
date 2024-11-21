@@ -19,13 +19,9 @@
 #define ACORE_GRIDNOTIFIERSIMPL_H
 
 #include "Corpse.h"
-#include "CreatureAI.h"
 #include "GridNotifiers.h"
 #include "Object.h"
-#include "Opcodes.h"
 #include "Player.h"
-#include "SpellAuras.h"
-#include "UpdateData.h"
 #include "WorldPacket.h"
 #include "WorldSession.h"
 
@@ -580,7 +576,7 @@ void Acore::LocalizedPacketListDo<Builder>::operator()(Player* p)
     else
         data_list = &i_data_cache[cache_idx];
 
-    for (size_t i = 0; i < data_list->size(); ++i)
+    for (std::size_t i = 0; i < data_list->size(); ++i)
         p->SendDirectMessage((*data_list)[i]);
 }
 

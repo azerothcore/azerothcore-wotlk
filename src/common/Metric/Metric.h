@@ -22,11 +22,9 @@
 #include "Duration.h"
 #include "MPSCQueue.h"
 #include <functional>
-#include <iosfwd>
-#include <memory>
+#include <memory> // NOTE: this import is NEEDED (even though some IDEs report it as unused)
 #include <string>
 #include <unordered_map>
-#include <utility>
 #include <vector>
 
 namespace Acore::Asio

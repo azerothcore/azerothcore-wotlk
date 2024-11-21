@@ -19,6 +19,7 @@
 #include "InstanceMapScript.h"
 #include "ScriptedCreature.h"
 #include "nexus.h"
+#include "Player.h"
 
 DoorData const doorData[] =
 {
@@ -272,4 +273,3 @@ void AddSC_instance_nexus()
     new instance_nexus();
     new npc_crystalline_frayer();
 }
-

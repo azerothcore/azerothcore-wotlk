@@ -609,4 +609,3 @@ void AddSC_instance_karazhan()
     RegisterSpellScript(spell_karazhan_overload_aura);
     RegisterSpellScript(spell_karazhan_blink);
 }
-

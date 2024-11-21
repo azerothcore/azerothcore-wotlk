@@ -116,7 +116,7 @@ public:
         void Reset() override
         {
             events.Reset();
-            if( pInstance )
+            if (pInstance)
                 pInstance->SetData(TYPE_JARAXXUS, NOT_STARTED);
 
             std::list<Creature*> creatures;
@@ -135,34 +135,34 @@ public:
             events.RescheduleEvent(EVENT_SPELL_INCINERATE_FLESH, 24s, 26s);
             events.RescheduleEvent(EVENT_SPELL_NETHER_POWER, 25s, 45s);
             events.RescheduleEvent(EVENT_SPELL_LEGION_FLAME, 30s);
-            //if( GetDifficulty() == RAID_DIFFICULTY_25MAN_HEROIC )
+            //if (GetDifficulty() == RAID_DIFFICULTY_25MAN_HEROIC )
             //  events.RescheduleEvent(EVENT_SPELL_TOUCH_OF_JARAXXUS, 10s, 15s);
             events.RescheduleEvent(EVENT_SUMMON_NETHER_PORTAL, 20s); // it schedules EVENT_SUMMON_VOLCANO
 
             me->RemoveAura(SPELL_CHAINS);
             Talk(SAY_AGGRO);
             DoZoneInCombat();
-            if( pInstance )
+            if (pInstance)
                 pInstance->SetData(TYPE_JARAXXUS, IN_PROGRESS);
         }
 
         void SpellHit(Unit* caster, SpellInfo const* spell) override
         {
-            switch( spell->Id )
+            switch (spell->Id)
             {
                 case 66228:
                 case 67106:
                 case 67107:
                 case 67108:
-                    if( Aura* a = me->GetAura(spell->Id) )
+                    if (Aura* a = me->GetAura(spell->Id))
                         a->SetStackAmount(spell->StackAmount);
                     break;
                 case 30449:
                     {
-                        if( !caster )
+                        if (!caster)
                             return;
                         uint32 id = 0;
-                        switch( me->GetMap()->GetDifficulty() )
+                        switch (me->GetMap()->GetDifficulty())
                         {
                             case 0:
                                 id = 66228;
@@ -177,9 +177,9 @@ public:
                                 id = 67108;
                                 break;
                         }
-                        if( Aura* a = me->GetAura(id) )
+                        if (Aura* a = me->GetAura(id))
                         {
-                            if( a->GetStackAmount() > 1 )
+                            if (a->GetStackAmount() > 1 )
                                 a->ModStackAmount(-1);
                             else
                                 a->Remove();
@@ -194,30 +194,30 @@ public:
 
         void UpdateAI(uint32 diff) override
         {
-            if( !UpdateVictim() )
+            if (!UpdateVictim())
                 return;
 
             events.Update(diff);
 
-            if( me->HasUnitState(UNIT_STATE_CASTING) )
+            if (me->HasUnitState(UNIT_STATE_CASTING))
                 return;
 
-            switch( events.ExecuteEvent() )
+            switch (events.ExecuteEvent())
             {
                 case 0:
                     break;
                 case EVENT_SPELL_FEL_FIREBALL:
-                    if( me->GetVictim() )
+                    if (me->GetVictim())
                         me->CastSpell(me->GetVictim(), SPELL_FEL_FIREBALL, false);
                     events.Repeat(10s, 15s);
                     break;
                 case EVENT_SPELL_FEL_LIGHTNING:
-                    if( Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 0.0f, true, true) )
+                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 0.0f, true, true))
                         me->CastSpell(target, SPELL_FEL_LIGHTNING, false);
                     events.Repeat(10s, 15s);
                     break;
                 case EVENT_SPELL_INCINERATE_FLESH:
-                    if( Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 0.0f, true, true) )
+                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 0.0f, true, true))
                     {
                         Talk(EMOTE_INCINERATE, target);
                         Talk(SAY_INCINERATE);
@@ -231,7 +231,7 @@ public:
                     events.Repeat(25s, 45s);
                     break;
                 case EVENT_SPELL_LEGION_FLAME:
-                    if( Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 0.0f, true, true) )
+                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 0.0f, true, true))
                     {
                         Talk(EMOTE_LEGION_FLAME, target);
                         me->CastSpell(target, SPELL_LEGION_FLAME, false);
@@ -239,7 +239,7 @@ public:
                     events.Repeat(30s);
                     break;
                 case EVENT_SPELL_TOUCH_OF_JARAXXUS:
-                    if( Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 0.0f, true) )
+                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 0.0f, true))
                         me->CastSpell(target, SPELL_TOUCH_OF_JARAXXUS, false);
                     events.Repeat(10s, 15s);
                     break;
@@ -266,7 +266,7 @@ public:
         {
             summons.DespawnAll();
             Talk(SAY_DEATH);
-            if( pInstance )
+            if (pInstance)
                 pInstance->SetData(TYPE_JARAXXUS, DONE);
         }
 
@@ -285,7 +285,7 @@ public:
             events.Reset();
             summons.DespawnAll();
             me->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
-            if( pInstance )
+            if (pInstance)
                 pInstance->SetData(TYPE_FAILED, 1);
         }
 
@@ -311,7 +311,7 @@ public:
 
         void Reset() override
         {
-            if( Unit* target = me->SelectNearestTarget(200.0f) )
+            if (Unit* target = me->SelectNearestTarget(200.0f))
             {
                 AttackStart(target);
                 DoZoneInCombat();
@@ -322,20 +322,20 @@ public:
 
         void UpdateAI(uint32 diff) override
         {
-            if( !UpdateVictim() )
+            if (!UpdateVictim())
                 return;
 
             events.Update(diff);
 
-            if( me->HasUnitState(UNIT_STATE_CASTING) )
+            if (me->HasUnitState(UNIT_STATE_CASTING))
                 return;
 
-            switch( events.ExecuteEvent() )
+            switch (events.ExecuteEvent())
             {
                 case 0:
                     break;
                 case EVENT_SPELL_FEL_STEAK:
-                    if( Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 44.0f, true) )
+                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 44.0f, true))
                     {
                         DoResetThreatList();
                         me->AddThreat(target, 50000.0f);
@@ -381,7 +381,7 @@ public:
 
         void Reset() override
         {
-            if( Unit* target = me->SelectNearestTarget(200.0f) )
+            if (Unit* target = me->SelectNearestTarget(200.0f))
             {
                 AttackStart(target);
                 DoZoneInCombat();
@@ -389,7 +389,7 @@ public:
             events.Reset();
             events.RescheduleEvent(EVENT_SPELL_SHIVAN_SLASH, 10s, 20s);
             events.RescheduleEvent(EVENT_SPELL_SPINNING_PAIN_SPIKE, 22s, 30s);
-            if( IsHeroic() )
+            if (IsHeroic())
                 events.RescheduleEvent(EVENT_SPELL_MISTRESS_KISS, 10s, 15s);
         }
 
@@ -401,25 +401,25 @@ public:
 
         void UpdateAI(uint32 diff) override
         {
-            if( !UpdateVictim() )
+            if (!UpdateVictim())
                 return;
 
             events.Update(diff);
 
-            if( me->HasUnitState(UNIT_STATE_CASTING) )
+            if (me->HasUnitState(UNIT_STATE_CASTING))
                 return;
 
-            switch( events.ExecuteEvent() )
+            switch (events.ExecuteEvent())
             {
                 case 0:
                     break;
                 case EVENT_SPELL_SHIVAN_SLASH:
-                    if( me->GetVictim() )
+                    if (me->GetVictim())
                         me->CastSpell(me->GetVictim(), SPELL_SHIVAN_SLASH, false);
                     events.Repeat(15s, 25s);
                     break;
                 case EVENT_SPELL_SPINNING_PAIN_SPIKE:
-                    if( Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 140.0f, true) )
+                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 140.0f, true))
                         me->CastSpell(target, SPELL_SPINNING_PAIN_SPIKE, false);
                     events.Repeat(25s, 30s);
                     break;
@@ -444,75 +444,58 @@ public:
     };
 };
 
-class spell_toc25_mistress_kiss : public SpellScriptLoader
+class spell_toc25_mistress_kiss_aura : public AuraScript
 {
-public:
-    spell_toc25_mistress_kiss() : SpellScriptLoader("spell_toc25_mistress_kiss") { }
+    PrepareAuraScript(spell_toc25_mistress_kiss_aura);
 
-    class spell_toc25_mistress_kiss_AuraScript : public AuraScript
+    bool Validate(SpellInfo const* /*spellInfo*/) override
     {
-        PrepareAuraScript(spell_toc25_mistress_kiss_AuraScript)
+        return ValidateSpellInfo({ 66359 });
+    }
 
-        void HandleEffectPeriodic(AuraEffect const*   /*aurEff*/)
-        {
-            if (Unit* caster = GetCaster())
-                if (Unit* target = GetTarget())
-                    if( target->HasUnitState(UNIT_STATE_CASTING) )
-                    {
-                        caster->CastSpell(target, 66359, true);
-                        SetDuration(0);
-                    }
-        }
-
-        void Register() override
-        {
-            OnEffectPeriodic += AuraEffectPeriodicFn(spell_toc25_mistress_kiss_AuraScript::HandleEffectPeriodic, EFFECT_0, SPELL_AURA_PERIODIC_DUMMY);
-        }
-    };
-
-    AuraScript* GetAuraScript() const override
+    void HandleEffectPeriodic(AuraEffect const*   /*aurEff*/)
     {
-        return new spell_toc25_mistress_kiss_AuraScript();
+        if (Unit* caster = GetCaster())
+            if (Unit* target = GetTarget())
+                if (target->HasUnitState(UNIT_STATE_CASTING))
+                {
+                    caster->CastSpell(target, 66359, true);
+                    SetDuration(0);
+                }
+    }
+
+    void Register() override
+    {
+        OnEffectPeriodic += AuraEffectPeriodicFn(spell_toc25_mistress_kiss_aura::HandleEffectPeriodic, EFFECT_0, SPELL_AURA_PERIODIC_DUMMY);
     }
 };
 
-class spell_mistress_kiss_area : public SpellScriptLoader
+class spell_mistress_kiss_area : public SpellScript
 {
-public:
-    spell_mistress_kiss_area() : SpellScriptLoader("spell_mistress_kiss_area") {}
+    PrepareSpellScript(spell_mistress_kiss_area);
 
-    class spell_mistress_kiss_area_SpellScript : public SpellScript
+    void FilterTargets(std::list<WorldObject*>& targets)
     {
-        PrepareSpellScript(spell_mistress_kiss_area_SpellScript)
+        // get a list of players with mana
+        targets.remove_if(Acore::ObjectTypeIdCheck(TYPEID_PLAYER, false));
+        targets.remove_if(Acore::PowerCheck(POWER_MANA, false));
+        if (targets.empty())
+            return;
 
-        void FilterTargets(std::list<WorldObject*>& targets)
-        {
-            // get a list of players with mana
-            targets.remove_if(Acore::ObjectTypeIdCheck(TYPEID_PLAYER, false));
-            targets.remove_if(Acore::PowerCheck(POWER_MANA, false));
-            if (targets.empty())
-                return;
+        WorldObject* target = Acore::Containers::SelectRandomContainerElement(targets);
+        targets.clear();
+        targets.push_back(target);
+    }
 
-            WorldObject* target = Acore::Containers::SelectRandomContainerElement(targets);
-            targets.clear();
-            targets.push_back(target);
-        }
-
-        void HandleScript(SpellEffIndex /*effIndex*/)
-        {
-            GetCaster()->CastSpell(GetHitUnit(), uint32(GetEffectValue()), true);
-        }
-
-        void Register() override
-        {
-            OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_mistress_kiss_area_SpellScript::FilterTargets, EFFECT_0, TARGET_UNIT_SRC_AREA_ENEMY);
-            OnEffectHitTarget += SpellEffectFn(spell_mistress_kiss_area_SpellScript::HandleScript, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
-        }
-    };
-
-    SpellScript* GetSpellScript() const override
+    void HandleScript(SpellEffIndex /*effIndex*/)
     {
-        return new spell_mistress_kiss_area_SpellScript();
+        GetCaster()->CastSpell(GetHitUnit(), uint32(GetEffectValue()), true);
+    }
+
+    void Register() override
+    {
+        OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_mistress_kiss_area::FilterTargets, EFFECT_0, TARGET_UNIT_SRC_AREA_ENEMY);
+        OnEffectHitTarget += SpellEffectFn(spell_mistress_kiss_area::HandleScript, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
     }
 };
 
@@ -521,7 +504,6 @@ void AddSC_boss_jaraxxus()
     new boss_jaraxxus();
     new npc_fel_infernal();
     new npc_mistress_of_pain();
-    new spell_toc25_mistress_kiss();
-    new spell_mistress_kiss_area();
+    RegisterSpellScript(spell_toc25_mistress_kiss_aura);
+    RegisterSpellScript(spell_mistress_kiss_area);
 }
-

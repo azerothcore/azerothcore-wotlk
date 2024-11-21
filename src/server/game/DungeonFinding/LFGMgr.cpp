@@ -17,6 +17,7 @@
 
 #include "LFGMgr.h"
 #include "BattlegroundMgr.h"
+#include "Chat.h"
 #include "CharacterCache.h"
 #include "Common.h"
 #include "DBCStores.h"
@@ -29,7 +30,6 @@
 #include "LFGGroupData.h"
 #include "LFGPlayerData.h"
 #include "LFGQueue.h"
-#include "LFGScripts.h"
 #include "Language.h"
 #include "ObjectMgr.h"
 #include "Opcodes.h"
@@ -805,7 +805,7 @@ namespace lfg
     void LFGMgr::ToggleTesting()
     {
         m_Testing = !m_Testing;
-        sWorld->SendWorldText(m_Testing ? LANG_DEBUG_LFG_ON : LANG_DEBUG_LFG_OFF);
+        ChatHandler(nullptr).SendWorldText(m_Testing ? LANG_DEBUG_LFG_ON : LANG_DEBUG_LFG_OFF);
     }
 
     /**

@@ -20,6 +20,7 @@
 #include "SpellScriptLoader.h"
 #include "TaskScheduler.h"
 #include "hellfire_ramparts.h"
+#include "SpellScript.h"
 
 enum Says
 {
@@ -364,4 +365,3 @@ void AddSC_boss_vazruden_the_herald()
     RegisterSpellScript(spell_vazruden_fireball);
     RegisterSpellScript(spell_vazruden_call_nazan);
 }
-

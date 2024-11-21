@@ -54,6 +54,11 @@ void ScriptMgr::OnPlayerJustDied(Player* player)
     CALL_ENABLED_HOOKS(PlayerScript, PLAYERHOOK_ON_PLAYER_JUST_DIED, script->OnPlayerJustDied(player));
 }
 
+void ScriptMgr::OnCalculateTalentsPoints(Player const* player, uint32& talentPointsForLevel)
+{
+    CALL_ENABLED_HOOKS(PlayerScript, PLAYERHOOK_ON_CALCULATE_TALENTS_POINTS, script->OnCalculateTalentsPoints(player, talentPointsForLevel));
+}
+
 void ScriptMgr::OnPlayerReleasedGhost(Player* player)
 {
     CALL_ENABLED_HOOKS(PlayerScript, PLAYERHOOK_ON_PLAYER_RELEASED_GHOST, script->OnPlayerReleasedGhost(player));
@@ -354,16 +359,6 @@ void ScriptMgr::OnPlayerJoinArena(Player* player)
     CALL_ENABLED_HOOKS(PlayerScript, PLAYERHOOK_ON_PLAYER_JOIN_ARENA, script->OnPlayerJoinArena(player));
 }
 
-void ScriptMgr::GetCustomGetArenaTeamId(Player const* player, uint8 slot, uint32& teamID) const
-{
-    CALL_ENABLED_HOOKS(PlayerScript, PLAYERHOOK_GET_CUSTOM_GET_ARENA_TEAM_ID, script->GetCustomGetArenaTeamId(player, slot, teamID));
-}
-
-void ScriptMgr::GetCustomArenaPersonalRating(Player const* player, uint8 slot, uint32& rating) const
-{
-    CALL_ENABLED_HOOKS(PlayerScript, PLAYERHOOK_GET_CUSTOM_ARENA_PERSONAL_RATING, script->GetCustomArenaPersonalRating(player, slot, rating));
-}
-
 void ScriptMgr::OnGetMaxPersonalArenaRatingRequirement(Player const* player, uint32 minSlot, uint32& maxArenaRating) const
 {
     CALL_ENABLED_HOOKS(PlayerScript, PLAYERHOOK_ON_GET_MAX_PERSONAL_ARENA_RATING_REQUIREMENT, script->OnGetMaxPersonalArenaRatingRequirement(player, minSlot, maxArenaRating));
@@ -647,6 +642,11 @@ void ScriptMgr::OnApplyItemModsBefore(Player* player, uint8 slot, bool apply, ui
 void ScriptMgr::OnApplyEnchantmentItemModsBefore(Player* player, Item* item, EnchantmentSlot slot, bool apply, uint32 enchant_spell_id, uint32& enchant_amount)
 {
     CALL_ENABLED_HOOKS(PlayerScript, PLAYERHOOK_ON_APPLY_ENCHANTMENT_ITEM_MODS_BEFORE, script->OnApplyEnchantmentItemModsBefore(player, item, slot, apply, enchant_spell_id, enchant_amount));
+}
+
+void ScriptMgr::OnApplyWeaponDamage(Player* player, uint8 slot, ItemTemplate const* proto, float& minDamage, float& maxDamage, uint8 damageIndex)
+{
+    CALL_ENABLED_HOOKS(PlayerScript, PLAYERHOOK_ON_APPLY_WEAPON_DAMAGE, script->OnApplyWeaponDamage(player, slot, proto, minDamage, maxDamage, damageIndex));
 }
 
 bool ScriptMgr::CanArmorDamageModifier(Player* player)

@@ -323,7 +323,7 @@ public:
             if (bCanEat || bIsEating)
                 return;
 
-            if (pCaster->GetTypeId() == TYPEID_PLAYER && spell->Id == SPELL_PLACE_CARCASS && !me->HasAura(SPELL_JUST_EATEN))
+            if (pCaster->IsPlayer() && spell->Id == SPELL_PLACE_CARCASS && !me->HasAura(SPELL_JUST_EATEN))
             {
                 uiPlayerGUID = pCaster->GetGUID();
                 bCanEat = true;
@@ -599,7 +599,7 @@ public:
 
             PlayerGUID = caster->GetGUID();
 
-            if (caster->GetTypeId() == TYPEID_PLAYER && spell->Id == SPELL_POISON && !Tapped)
+            if (caster->IsPlayer() && spell->Id == SPELL_POISON && !Tapped)
             {
                 Tapped = true;
                 caster->GetClosePoint(x, y, z, me->GetObjectSize());
@@ -1278,7 +1278,7 @@ public:
                 {
                     if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0))
                     {
-                        if (target->GetTypeId() == TYPEID_PLAYER)
+                        if (target->IsPlayer())
                         {
                             DoCast(target, SpawnCast[1].SpellId); //Focused Bursts
                             SpellTimer1 = SpawnCast[1].Timer2 + (rand() % 5 * 1000);
@@ -1818,6 +1818,424 @@ public:
     }
 };
 
+/*
+######
+# Dragonmaw Races
+######
+*/
+
+enum DragonmawRaces
+{
+    QUEST_MUCKJAW           = 11064,
+    QUEST_TROPE             = 11067,
+    QUEST_CORLOK            = 11068,
+    QUEST_ICHMAN            = 11069,
+    QUEST_MULVERICK         = 11070,
+    QUEST_SKYSHATTER        = 11071,
+
+    NPC_MUCKJAW             = 23340,
+    NPC_TROPE               = 23342,
+    NPC_CORLOK              = 23344,
+    NPC_ICHMAN              = 23345,
+    NPC_MULVERICK           = 23346,
+    NPC_SKYSHATTER          = 23348,
+
+    PATH_MUCKJAW            = 233401,
+    PATH_TROPE              = 233421,
+    PATH_CORLOK             = 233441,
+    PATH_ICHMAN             = 233451,
+    PATH_MULVERICK          = 233461,
+    PATH_SKYSHATTER         = 233481,
+
+    NPC_TARGET_MUCKJAW      = 23356,
+    NPC_TARGET_TROPE        = 23357,
+    NPC_TARGET_CORLOK       = 23358,
+    NPC_TARGET_ICHMAN       = 23359,
+    NPC_TARGET_MULVERICK    = 23360,
+    NPC_TARGET_SKYSHATTER   = 23361,
+
+    SAY_START               = 0,
+    SAY_COMPLETE            = 1,
+    SAY_SKYSHATTER_SPECIAL  = 2,
+};
+
+struct dragonmaw_race_npc : public ScriptedAI
+{
+    dragonmaw_race_npc(Creature* creature) : ScriptedAI(creature)
+    {
+    }
+
+    void Reset() override
+    {
+        scheduler.CancelAll();
+        me->SetNpcFlag(UNIT_NPC_FLAG_QUESTGIVER);
+        me->SetWalk(true);
+        me->SetDisableGravity(false);
+        me->GetMotionMaster()->MoveIdle();
+        _playerGUID.Clear();
+    }
+
+    void sQuestAccept(Player* player, Quest const* /*quest*/) override
+    {
+        me->RemoveNpcFlag(UNIT_NPC_FLAG_QUESTGIVER);
+        if (player)
+        {
+            _playerGUID = player->GetGUID();
+            Talk(SAY_START, player);
+        }
+
+        switch (me->GetEntry())
+        {
+        case NPC_MUCKJAW:
+            me->GetMotionMaster()->MovePath(PATH_MUCKJAW, false);
+            break;
+        case NPC_TROPE:
+            me->GetMotionMaster()->MovePath(PATH_TROPE, false);
+            break;
+        case NPC_CORLOK:
+            me->GetMotionMaster()->MovePath(PATH_CORLOK, false);
+            break;
+        case NPC_ICHMAN:
+            me->GetMotionMaster()->MovePath(PATH_ICHMAN, false);
+            break;
+        case NPC_MULVERICK:
+            me->GetMotionMaster()->MovePath(PATH_MULVERICK, false);
+            break;
+        case NPC_SKYSHATTER:
+            me->GetMotionMaster()->MovePath(PATH_SKYSHATTER, false);
+            break;
+        default:
+            break;
+        }
+    }
+
+    void TakeOff()
+    {
+        me->SetDisableGravity(true);
+    }
+
+    void StartRace()
+    {
+        me->SetWalk(false);
+
+        ScheduleTimedEvent(5s, [&]
+        {
+            Player *player = ObjectAccessor::GetPlayer(me->GetMap(), _playerGUID);
+            if (!player || !me->IsWithinDist(player, 100.f))
+                FailQuest(player);
+        }, 5s);
+    }
+
+    void FailQuest(Player *player)
+    {
+        if (player)
+        {
+            switch (me->GetEntry())
+            {
+            case NPC_MUCKJAW:
+                player->FailQuest(QUEST_MUCKJAW);
+                break;
+            case NPC_TROPE:
+                player->FailQuest(QUEST_TROPE);
+                break;
+            case NPC_CORLOK:
+                player->FailQuest(QUEST_CORLOK);
+                break;
+            case NPC_ICHMAN:
+                player->FailQuest(QUEST_ICHMAN);
+                break;
+            case NPC_MULVERICK:
+                player->FailQuest(QUEST_MULVERICK);
+                break;
+            case NPC_SKYSHATTER:
+                player->FailQuest(QUEST_SKYSHATTER);
+                break;
+            default:
+                break;
+            }
+        }
+        scheduler.CancelAll();
+        me->DespawnOnEvade();
+    }
+
+    void StartRaceAttacks()
+    {
+        /*
+        * Timers are placeholders
+        * After spawned, the rest is done via SmartAI
+        */
+        if (_playerGUID.IsEmpty())
+            return;
+
+        Player *player = ObjectAccessor::GetPlayer(me->GetMap(), _playerGUID);
+        if (!player)
+            return;
+
+        switch (me->GetEntry())
+        {
+        case NPC_MUCKJAW:
+            ScheduleTimedEvent(4s, [&]
+            {
+                Player *player = ObjectAccessor::GetPlayer(me->GetMap(), _playerGUID);
+                if (!player)
+                    return;
+
+                Position summonPos;
+                summonPos = me->GetRandomPoint(player->GetPosition(), 15.f);
+                summonPos.m_positionZ = player->GetPositionZ();  // So they don't spawn at ground height
+                me->SummonCreature(NPC_TARGET_MUCKJAW, summonPos, TEMPSUMMON_TIMED_DESPAWN, 10000);
+            }, 4s, 8s);
+            break;
+        case NPC_TROPE:
+            ScheduleTimedEvent(4s, [&]
+            {
+                Player *player = ObjectAccessor::GetPlayer(me->GetMap(), _playerGUID);
+                if (!player)
+                    return;
+
+                Position summonPos;
+                summonPos = me->GetRandomPoint(player->GetPosition(), 10.f);
+                summonPos.m_positionZ = player->GetPositionZ();
+                me->SummonCreature(NPC_TARGET_TROPE, summonPos, TEMPSUMMON_TIMED_DESPAWN, 10000);
+            }, 1s, 3s);
+            break;
+        case NPC_CORLOK:
+            ScheduleTimedEvent(4s, [&]
+            {
+                Player *player = ObjectAccessor::GetPlayer(me->GetMap(), _playerGUID);
+                if (!player)
+                    return;
+
+                Position summonPos;
+                summonPos = me->GetRandomPoint(player->GetPosition(), 10.f);
+                summonPos.m_positionZ = player->GetPositionZ();
+                me->SummonCreature(NPC_TARGET_CORLOK, summonPos, TEMPSUMMON_TIMED_DESPAWN, 10000);
+            }, 1s, 3s);
+            break;
+        case NPC_ICHMAN:
+            ScheduleTimedEvent(4s, [&]
+            {
+                Player *player = ObjectAccessor::GetPlayer(me->GetMap(), _playerGUID);
+                if (!player)
+                    return;
+
+                Position summonPos;
+                summonPos = me->GetRandomPoint(player->GetPosition(), 10.f);
+                summonPos.m_positionZ = player->GetPositionZ();
+                me->SummonCreature(NPC_TARGET_ICHMAN, summonPos, TEMPSUMMON_TIMED_DESPAWN, 10000);
+            }, 1s, 3s);
+            break;
+        case NPC_MULVERICK:
+            ScheduleTimedEvent(4s, [&]
+            {
+                Player *player = ObjectAccessor::GetPlayer(me->GetMap(), _playerGUID);
+                if (!player)
+                    return;
+
+                Position summonPos;
+                summonPos = me->GetRandomPoint(player->GetPosition(), 10.f);
+                summonPos.m_positionZ = player->GetPositionZ();
+                me->SummonCreature(NPC_TARGET_MULVERICK, summonPos, TEMPSUMMON_TIMED_DESPAWN, 10000);
+            }, 1s, 3s);
+            break;
+        case NPC_SKYSHATTER:
+            ScheduleTimedEvent(4s, [&]
+            {
+                Player *player = ObjectAccessor::GetPlayer(me->GetMap(), _playerGUID);
+                if (!player)
+                    return;
+
+                Position summonPos;
+                summonPos = me->GetRandomPoint(player->GetPosition(), 7.f);
+                summonPos.m_positionZ = player->GetPositionZ();  // So they don't spawn at ground height
+                me->SummonCreature(NPC_TARGET_SKYSHATTER, summonPos, TEMPSUMMON_TIMED_DESPAWN, 10000);
+            }, 1s, 3s);
+            break;
+        default:
+            break;
+        }
+    }
+
+    void FinishRace()
+    {
+        scheduler.CancelAll();
+        me->SetHover(false);
+        me->SetDisableGravity(false);
+        me->SetWalk(true);
+
+        Player *player = ObjectAccessor::GetPlayer(me->GetMap(), _playerGUID);
+        if (!player)
+            return;
+
+        Talk(SAY_COMPLETE, player);
+        switch (me->GetEntry())
+        {
+        case NPC_MUCKJAW:
+            player->AreaExploredOrEventHappens(QUEST_MUCKJAW);
+            break;
+        case NPC_TROPE:
+            player->AreaExploredOrEventHappens(QUEST_TROPE);
+            break;
+        case NPC_CORLOK:
+            player->AreaExploredOrEventHappens(QUEST_CORLOK);
+            break;
+        case NPC_ICHMAN:
+            player->AreaExploredOrEventHappens(QUEST_ICHMAN);
+            break;
+        case NPC_MULVERICK:
+            player->AreaExploredOrEventHappens(QUEST_MULVERICK);
+            break;
+        case NPC_SKYSHATTER:
+            player->AreaExploredOrEventHappens(QUEST_SKYSHATTER);
+            break;
+        default:
+            break;
+        }
+    }
+
+    void MovementInform(uint32 /*type*/, uint32 id) override
+    {
+        switch (me->GetEntry())
+        {
+        case NPC_MUCKJAW:
+            switch (id)
+            {
+            case 4:
+                TakeOff();
+                break;
+            case 7:
+                StartRace();
+                break;
+            case 9:
+                StartRaceAttacks();
+                break;
+            case 35:
+                FinishRace();
+                break;
+            case 37:
+                Reset();
+                break;
+            }
+            break;
+        case NPC_TROPE:
+            switch (id)
+            {
+            case 5:
+                TakeOff();
+                break;
+            case 7:
+                StartRace();
+                break;
+            case 10:
+                StartRaceAttacks();
+                break;
+            case 53:
+                FinishRace();
+                break;
+            case 60:
+                Reset();
+                break;
+            }
+            break;
+        case NPC_CORLOK:
+            switch (id)
+            {
+            case 6:
+                TakeOff();
+                break;
+            case 9:
+                StartRace();
+                break;
+            case 12:
+                StartRaceAttacks();
+                break;
+            case 79:
+                FinishRace();
+                break;
+            case 89:
+                Reset();
+                break;
+            }
+            break;
+        case NPC_ICHMAN:
+            switch (id)
+            {
+            case 4:
+                TakeOff();
+                StartRace();
+                break;
+            case 12:
+                StartRaceAttacks();
+                break;
+            case 107:
+                FinishRace();
+                break;
+            case 111:
+                Reset();
+                break;
+            }
+            break;
+        case NPC_MULVERICK:
+            switch (id)
+            {
+            case 5:
+                TakeOff();
+                break;
+            case 9:
+                StartRace();
+                break;
+            case 12:
+                StartRaceAttacks();
+                break;
+            case 166:
+                FinishRace();
+                break;
+            case 172:
+                Reset();
+                break;
+            }
+            break;
+        case NPC_SKYSHATTER:
+            switch (id)
+            {
+            case 3:
+                TakeOff();
+                break;
+            case 7:
+                StartRace();
+                if (Player *player = ObjectAccessor::GetPlayer(me->GetMap(), _playerGUID))
+                    Talk(SAY_SKYSHATTER_SPECIAL, player);
+                break;
+            case 10:
+                StartRaceAttacks();
+                break;
+            case 140:
+                FinishRace();
+                break;
+            case 145:
+                Reset();
+                break;
+            }
+            break;
+        default:
+            break;
+        }
+    }
+
+    void PathEndReached(uint32 /*pathId*/) override
+    {
+        Reset();
+    }
+
+    void UpdateAI(uint32 diff) override
+    {
+        scheduler.Update(diff);
+    }
+
+    private:
+        ObjectGuid _playerGUID;
+};
+
 void AddSC_shadowmoon_valley()
 {
     // Ours
@@ -1825,6 +2243,7 @@ void AddSC_shadowmoon_valley()
     RegisterSpellScript(spell_q10563_q10596_to_legion_hold_aura);
 
     // Theirs
+    RegisterCreatureAI(dragonmaw_race_npc);
     new npc_invis_infernal_caster();
     new npc_infernal_attacker();
     new npc_mature_netherwing_drake();

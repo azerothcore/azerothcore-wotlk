@@ -28,6 +28,8 @@
 #include "karazhan.h"
 #include <array>
 
+#include "SpellMgr.h"
+
 enum EchoOfMedivhGossipOptions
 {
     MEDIVH_GOSSIP_START_PVE = 1,
@@ -2084,4 +2086,3 @@ void AddSC_boss_chess_event()
 
     RegisterSpellScript(spell_control_piece);
 }
-

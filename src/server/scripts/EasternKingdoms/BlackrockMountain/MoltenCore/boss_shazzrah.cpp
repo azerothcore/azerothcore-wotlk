@@ -187,4 +187,3 @@ void AddSC_boss_shazzrah()
     // Spells
     RegisterSpellScript(spell_shazzrah_gate_dummy);
 }
-

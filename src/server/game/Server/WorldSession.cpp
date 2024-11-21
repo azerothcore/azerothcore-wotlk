@@ -45,12 +45,14 @@
 #include "SocialMgr.h"
 #include "Transport.h"
 #include "Vehicle.h"
-#include "WardenMac.h"
 #include "WardenWin.h"
 #include "World.h"
 #include "WorldPacket.h"
 #include "WorldSocket.h"
+#include "WorldState.h"
 #include <zlib.h>
+
+#include "BanMgr.h"
 
 namespace
 {
@@ -616,6 +618,7 @@ void WorldSession::LogoutPlayer(bool save)
             _player->RepopAtGraveyard();
 
         sOutdoorPvPMgr->HandlePlayerLeaveZone(_player, _player->GetZoneId());
+        sWorldState->HandlePlayerLeaveZone(_player, static_cast<WorldStateZoneId>(_player->GetZoneId()));
 
         // pussywizard: remove from battleground queues on logout
         for (int i = 0; i < PLAYER_MAX_BATTLEGROUND_QUEUES; ++i)
@@ -634,6 +637,9 @@ void WorldSession::LogoutPlayer(bool save)
 
                     sScriptMgr->OnBattlegroundDesertion(_player, BG_DESERTION_TYPE_INVITE_LOGOUT);
                 }
+
+                if (bgQueueTypeId >= BATTLEGROUND_QUEUE_2v2 && bgQueueTypeId < MAX_BATTLEGROUND_QUEUE_TYPES && _player->IsInvitedForBattlegroundQueueType(bgQueueTypeId))
+                    sScriptMgr->OnBattlegroundDesertion(_player, ARENA_DESERTION_TYPE_INVITE_LOGOUT);
 
                 _player->RemoveBattlegroundQueueId(bgQueueTypeId);
                 sBattlegroundMgr->GetBattlegroundQueue(bgQueueTypeId).RemovePlayer(_player->GetGUID(), true);
@@ -785,44 +791,14 @@ bool WorldSession::DisallowHyperlinksAndMaybeKick(std::string_view str)
     return false;
 }
 
-void WorldSession::SendNotification(const char* format, ...)
-{
-    if (format)
-    {
-        va_list ap;
-        char szStr[1024];
-        szStr[0] = '\0';
-        va_start(ap, format);
-        vsnprintf(szStr, 1024, format, ap);
-        va_end(ap);
-
-        WorldPacket data(SMSG_NOTIFICATION, (strlen(szStr) + 1));
-        data << szStr;
-        SendPacket(&data);
-    }
-}
-
-void WorldSession::SendNotification(uint32 string_id, ...)
-{
-    char const* format = GetAcoreString(string_id);
-    if (format)
-    {
-        va_list ap;
-        char szStr[1024];
-        szStr[0] = '\0';
-        va_start(ap, string_id);
-        vsnprintf(szStr, 1024, format, ap);
-        va_end(ap);
-
-        WorldPacket data(SMSG_NOTIFICATION, (strlen(szStr) + 1));
-        data << szStr;
-        SendPacket(&data);
-    }
-}
-
 char const* WorldSession::GetAcoreString(uint32 entry) const
 {
     return sObjectMgr->GetAcoreString(entry, GetSessionDbLocaleIndex());
+}
+
+std::string const* WorldSession::GetModuleString(std::string module, uint32 id) const
+{
+    return sObjectMgr->GetModuleString(module, id, GetSessionDbLocaleIndex());
 }
 
 void WorldSession::Handle_NULL(WorldPacket& null)
@@ -1016,7 +992,7 @@ void WorldSession::ReadMovementInfo(WorldPacket& data, MovementInfo* mi)
     if (mi->HasMovementFlag(MOVEMENTFLAG_SPLINE_ELEVATION))
         data >> mi->splineElevation;
 
-    //! Anti-cheat checks. Please keep them in seperate if() blocks to maintain a clear overview.
+    //! Anti-cheat checks. Please keep them in seperate if () blocks to maintain a clear overview.
     //! Might be subject to latency, so just remove improper flags.
 #ifdef ACORE_DEBUG
 #define REMOVE_VIOLATING_FLAGS(check, maskToRemove) \

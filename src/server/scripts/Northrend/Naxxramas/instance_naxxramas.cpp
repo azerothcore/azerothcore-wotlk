@@ -52,6 +52,12 @@ inline uint8 GetEruptionSection(float x, float y)
     return 3;
 }
 
+DoorData const doorData[] =
+{
+    { GO_ANUB_GATE,     BOSS_ANUB,       DOOR_TYPE_ROOM    },
+    { 0,                0,               DOOR_TYPE_ROOM    },
+};
+
 ObjectData const creatureData[] =
 {
     { NPC_RAZUVIOUS, DATA_RAZUVIOUS },
@@ -79,6 +85,7 @@ public:
         {
             SetHeaders(DataHeader);
             SetBossNumber(MAX_ENCOUNTERS);
+            LoadDoorData(doorData);
             LoadObjectData(creatureData, gameObjectData);
             for (auto& i : HeiganEruption)
                 i.clear();
@@ -115,7 +122,6 @@ public:
         ObjectGuid _heiganGateGUID;
         ObjectGuid _heiganGateExitGUID;
         ObjectGuid _loathebGateGUID;
-        ObjectGuid _anubGateGUID;
         ObjectGuid _anubNextGateGUID;
         ObjectGuid _faerlinaWebGUID;
         ObjectGuid _faerlinaGateGUID;
@@ -206,7 +212,7 @@ public:
 
         void OnCreatureCreate(Creature* creature) override
         {
-            switch(creature->GetEntry())
+            switch (creature->GetEntry())
             {
                 case NPC_PATCHWERK:
                     _patchwerkGUID = creature->GetGUID();
@@ -277,7 +283,7 @@ public:
                 return;
             }
 
-            switch(pGo->GetEntry())
+            switch (pGo->GetEntry())
             {
                 case GO_PATCHWERK_GATE:
                     _patchwerkGateGUID = pGo->GetGUID();
@@ -324,13 +330,6 @@ public:
                 case GO_LOATHEB_GATE:
                     _loathebGateGUID = pGo->GetGUID();
                     if (GetBossState(BOSS_LOATHEB) == DONE)
-                    {
-                        pGo->SetGoState(GO_STATE_ACTIVE);
-                    }
-                    break;
-                case GO_ANUB_GATE:
-                    _anubGateGUID = pGo->GetGUID();
-                    if (GetBossState(BOSS_ANUB) == DONE)
                     {
                         pGo->SetGoState(GO_STATE_ACTIVE);
                     }
@@ -621,7 +620,7 @@ public:
 
         void SetData(uint32 id, uint32 data) override
         {
-            switch(id)
+            switch (id)
             {
                 case DATA_ABOMINATION_KILLED:
                     abominationsKilled++;
@@ -768,7 +767,7 @@ public:
                 return false;
 
             // Bosses data
-            switch(bossId)
+            switch (bossId)
             {
                 case BOSS_KELTHUZAD:
                     if (state == NOT_STARTED)
@@ -880,10 +879,6 @@ public:
                         events.ScheduleEvent(EVENT_KELTHUZAD_WING_TAUNT, 6s);
                         break;
                     case BOSS_ANUB:
-                        if (GameObject* go = instance->GetGameObject(_anubGateGUID))
-                        {
-                            go->SetGoState(GO_STATE_ACTIVE);
-                        }
                         if (GameObject* go = instance->GetGameObject(_anubNextGateGUID))
                         {
                             go->SetGoState(GO_STATE_ACTIVE);
@@ -1074,8 +1069,6 @@ public:
                     return _heiganGateGUID;
                 case DATA_LOATHEB_GATE:
                     return _loathebGateGUID;
-                case DATA_ANUB_GATE:
-                    return _anubGateGUID;
                 case DATA_FAERLINA_WEB:
                     return _faerlinaWebGUID;
                 case DATA_MAEXXNA_GATE:
@@ -1240,4 +1233,3 @@ void AddSC_instance_naxxramas()
     new boss_naxxramas_misc();
     new at_naxxramas_hub_portal();
 }
-

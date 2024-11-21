@@ -182,7 +182,7 @@ void CalendarMgr::RemoveEvent(CalendarEvent* calendarEvent, ObjectGuid remover)
     MailDraft mail(calendarEvent->BuildCalendarMailSubject(remover), calendarEvent->BuildCalendarMailBody());
 
     CalendarInviteStore& eventInvites = _invites[calendarEvent->GetEventId()];
-    for (size_t i = 0; i < eventInvites.size(); ++i)
+    for (std::size_t i = 0; i < eventInvites.size(); ++i)
     {
         CalendarInvite* invite = eventInvites[i];
         stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_CALENDAR_INVITE);

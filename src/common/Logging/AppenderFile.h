@@ -19,7 +19,8 @@
 #define APPENDERFILE_H
 
 #include "Appender.h"
-#include <atomic>
+#include <atomic> // NOTE: this import is NEEDED (even though some IDEs report it as unused)
+#include <vector>
 
 class AppenderFile : public Appender
 {

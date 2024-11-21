@@ -317,4 +317,3 @@ void AddSC_boss_porung()
     RegisterShatteredHallsCreatureAI(npc_shattered_hand_scout);
     RegisterSpellScript(spell_tsh_shoot_flame_arrow);
 }
-

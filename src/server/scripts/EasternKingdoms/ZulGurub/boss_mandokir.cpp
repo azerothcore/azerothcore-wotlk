@@ -209,7 +209,7 @@ public:
 
         void KilledUnit(Unit* victim) override
         {
-            if (victim->GetTypeId() != TYPEID_PLAYER)
+            if (!victim->IsPlayer())
                 return;
 
             reviveGUID = victim->GetGUID();
@@ -449,7 +449,7 @@ public:
                             {
                                 if (!me || !target)
                                     return false;
-                                if (target->GetTypeId() != TYPEID_PLAYER || !me->IsWithinLOSInMap(target))
+                                if (!target->IsPlayer() || !me->IsWithinLOSInMap(target))
                                     return false;
                                 return true;
                             }))
@@ -540,7 +540,7 @@ public:
 
         void JustEngagedWith(Unit* who) override
         {
-            if (who->GetTypeId() != TYPEID_PLAYER)
+            if (!who->IsPlayer())
                 return;
 
             _scheduler.Schedule(6s, 12s, [this](TaskContext context)
@@ -557,7 +557,7 @@ public:
 
         void KilledUnit(Unit* victim) override
         {
-            if (victim->GetTypeId() != TYPEID_PLAYER)
+            if (!victim->IsPlayer())
                 return;
 
             reviveGUID = victim->GetGUID();
@@ -710,44 +710,33 @@ private:
     InstanceScript* instance;
 };
 
-class spell_threatening_gaze : public SpellScriptLoader
+class spell_threatening_gaze_aura : public AuraScript
 {
-public:
-    spell_threatening_gaze() : SpellScriptLoader("spell_threatening_gaze") { }
+    PrepareAuraScript(spell_threatening_gaze_aura);
 
-    class spell_threatening_gaze_AuraScript : public AuraScript
+    void OnRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
     {
-        PrepareAuraScript(spell_threatening_gaze_AuraScript);
-
-        void OnRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
+        if (GetTargetApplication()->GetRemoveMode() == AURA_REMOVE_BY_EXPIRE)
         {
-            if (GetTargetApplication()->GetRemoveMode() == AURA_REMOVE_BY_EXPIRE)
+            if (Unit* target = GetTarget())
             {
-                if (Unit* target = GetTarget())
+                if (Unit* caster = GetCaster())
                 {
-                    if (Unit* caster = GetCaster())
+                    if (Creature* cCaster = caster->ToCreature())
                     {
-                        if (Creature* cCaster = caster->ToCreature())
+                        if (cCaster->IsAIEnabled)
                         {
-                            if (cCaster->IsAIEnabled)
-                            {
-                                cCaster->AI()->SetGUID(target->GetGUID(), ACTION_CHARGE);
-                            }
+                            cCaster->AI()->SetGUID(target->GetGUID(), ACTION_CHARGE);
                         }
                     }
                 }
             }
         }
+    }
 
-        void Register() override
-        {
-            OnEffectRemove += AuraEffectRemoveFn(spell_threatening_gaze_AuraScript::OnRemove, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
-        }
-    };
-
-    AuraScript* GetAuraScript() const override
+    void Register() override
     {
-        return new spell_threatening_gaze_AuraScript();
+        OnEffectRemove += AuraEffectRemoveFn(spell_threatening_gaze_aura::OnRemove, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
     }
 };
 
@@ -798,8 +787,7 @@ void AddSC_boss_mandokir()
     new npc_ohgan();
     RegisterZulGurubCreatureAI(npc_chained_spirit);
     RegisterZulGurubCreatureAI(npc_vilebranch_speaker);
-    new spell_threatening_gaze();
+    RegisterSpellScript(spell_threatening_gaze_aura);
     RegisterSpellScript(spell_mandokir_charge);
     RegisterSpellScript(spell_threatening_gaze_charge);
 }
-

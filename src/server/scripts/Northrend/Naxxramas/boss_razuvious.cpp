@@ -18,6 +18,7 @@
 #include "CreatureScript.h"
 #include "ScriptedCreature.h"
 #include "naxxramas.h"
+#include "SpellInfo.h"
 
 enum Says
 {
@@ -212,7 +213,7 @@ public:
             {
                 Talk(SAY_SLAY);
             }
-            if (who->GetTypeId() == TYPEID_PLAYER && pInstance)
+            if (who->IsPlayer() && pInstance)
             {
                 pInstance->SetData(DATA_IMMORTAL_FAIL, 0);
             }
@@ -221,7 +222,7 @@ public:
         void DamageTaken(Unit* who, uint32& damage, DamageEffectType, SpellSchoolMask) override
         {
             // Damage done by the controlled Death Knight understudies should also count toward damage done by players
-            if(who && who->GetTypeId() == TYPEID_UNIT && who->GetEntry() == NPC_DEATH_KNIGHT_UNDERSTUDY)
+            if (who && who->IsCreature() && who->GetEntry() == NPC_DEATH_KNIGHT_UNDERSTUDY)
             {
                 me->LowerPlayerDamageReq(damage);
             }
@@ -359,7 +360,7 @@ public:
 
         void KilledUnit(Unit* who) override
         {
-            if (who->GetTypeId() == TYPEID_PLAYER && me->GetInstanceScript())
+            if (who->IsPlayer() && me->GetInstanceScript())
             {
                 me->GetInstanceScript()->SetData(DATA_IMMORTAL_FAIL, 0);
             }

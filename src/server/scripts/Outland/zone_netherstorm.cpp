@@ -731,7 +731,7 @@ public:
                     }
                     break;
                 case 36: //return and quest_complete
-                    player->CompleteQuest(QUEST_MARK_V_IS_ALIVE);
+                    player->GroupEventHappens(QUEST_MARK_V_IS_ALIVE, me);
                     break;
             }
         }
@@ -869,4 +869,3 @@ void AddSC_netherstorm()
     RegisterSpellAndAuraScriptPair(spell_q10190_battery_recharging_blaster, spell_q10190_battery_recharging_blaster_aura);
     RegisterSpellScript(spell_challenge_veraku);
 }
-

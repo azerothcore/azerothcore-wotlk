@@ -54,6 +54,11 @@ void ScriptMgr::OnQueueUpdate(BattlegroundQueue* queue, uint32 diff, Battlegroun
     CALL_ENABLED_HOOKS(AllBattlegroundScript, ALLBATTLEGROUNDHOOK_ON_QUEUE_UPDATE, script->OnQueueUpdate(queue, diff, bgTypeId, bracket_id, arenaType, isRated, arenaRating));
 }
 
+bool ScriptMgr::OnQueueUpdateValidity(BattlegroundQueue* queue, uint32 diff, BattlegroundTypeId bgTypeId, BattlegroundBracketId bracket_id, uint8 arenaType, bool isRated, uint32 arenaRating)
+{
+    CALL_ENABLED_BOOLEAN_HOOKS(AllBattlegroundScript, ALLBATTLEGROUNDHOOK_ON_QUEUE_UPDATE_VALIDITY, !script->OnQueueUpdateValidity(queue, diff, bgTypeId, bracket_id, arenaType, isRated, arenaRating));
+}
+
 void ScriptMgr::OnAddGroup(BattlegroundQueue* queue, GroupQueueInfo* ginfo, uint32& index, Player* leader, Group* group, BattlegroundTypeId bgTypeId, PvPDifficultyEntry const* bracketEntry, uint8 arenaType, bool isRated, bool isPremade, uint32 arenaRating, uint32 matchmakerRating, uint32 arenaTeamId, uint32 opponentsArenaTeamId)
 {
     CALL_ENABLED_HOOKS(AllBattlegroundScript, ALLBATTLEGROUNDHOOK_ON_ADD_GROUP, script->OnAddGroup(queue, ginfo, index, leader, group, bgTypeId, bracketEntry, arenaType, isRated, isPremade, arenaRating, matchmakerRating, arenaTeamId, opponentsArenaTeamId));

@@ -25,6 +25,7 @@
 #include "SpellMgr.h"
 #include "StringConvert.h"
 #include "Tokenize.h"
+#include "VMapMgr2.h"
 #include "World.h"
 
 namespace DisableMgr
@@ -325,8 +326,8 @@ namespace DisableMgr
                     uint8 spellFlags = itr->second.flags;
                     if (unit)
                     {
-                        if ((spellFlags & SPELL_DISABLE_PLAYER && unit->GetTypeId() == TYPEID_PLAYER) ||
-                                (unit->GetTypeId() == TYPEID_UNIT && ((unit->IsPet() && spellFlags & SPELL_DISABLE_PET) || spellFlags & SPELL_DISABLE_CREATURE)))
+                        if ((spellFlags & SPELL_DISABLE_PLAYER && unit->IsPlayer()) ||
+                                (unit->IsCreature() && ((unit->IsPet() && spellFlags & SPELL_DISABLE_PET) || spellFlags & SPELL_DISABLE_CREATURE)))
                         {
                             if (spellFlags & SPELL_DISABLE_MAP)
                             {

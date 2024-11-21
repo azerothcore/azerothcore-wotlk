@@ -150,7 +150,7 @@ public:
             if (me->HasUnitState(UNIT_STATE_CASTING))
                 return;
 
-            switch(events.ExecuteEvent())
+            switch (events.ExecuteEvent())
             {
                 case 0:
                     break;
@@ -209,7 +209,7 @@ public:
 
         void KilledUnit(Unit* who) override
         {
-            if (who->GetTypeId() == TYPEID_PLAYER)
+            if (who->IsPlayer())
                 Talk(SAY_SLAY);
         }
 

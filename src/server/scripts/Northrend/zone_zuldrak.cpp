@@ -413,7 +413,7 @@ public:
 
         void MoveInLineOfSight(Unit* who) override
         {
-            if (who->GetTypeId() == TYPEID_PLAYER)
+            if (who->IsPlayer())
             {
                 if (playerGUID)
                 {

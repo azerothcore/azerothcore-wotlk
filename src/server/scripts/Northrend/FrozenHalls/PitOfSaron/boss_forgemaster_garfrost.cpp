@@ -17,7 +17,6 @@
 
 #include "CreatureGroups.h"
 #include "CreatureScript.h"
-#include "Opcodes.h"
 #include "Player.h"
 #include "ScriptedCreature.h"
 #include "SpellAuras.h"
@@ -234,7 +233,7 @@ public:
             if (me->HasUnitState(UNIT_STATE_CASTING))
                 return;
 
-            switch(events.ExecuteEvent())
+            switch (events.ExecuteEvent())
             {
                 case 0:
                     break;
@@ -281,7 +280,7 @@ public:
 
         void KilledUnit(Unit* who) override
         {
-            if (who->GetTypeId() == TYPEID_PLAYER)
+            if (who->IsPlayer())
                 Talk(SAY_SLAY);
         }
 
@@ -334,7 +333,7 @@ class spell_garfrost_permafrost : public SpellScript
                         if (valid)
                         {
                             if (Aura* aur = target->ToUnit()->GetAura(70336))
-                                if (aur->GetStackAmount() >= 10 && caster->GetTypeId() == TYPEID_UNIT)
+                                if (aur->GetStackAmount() >= 10 && caster->IsCreature())
                                     caster->ToCreature()->AI()->SetData(1, aur->GetStackAmount());
                             targetList.push_back(*itrU);
                         }
@@ -369,4 +368,3 @@ void AddSC_boss_garfrost()
 
     RegisterSpellScript(spell_garfrost_permafrost);
 }
-

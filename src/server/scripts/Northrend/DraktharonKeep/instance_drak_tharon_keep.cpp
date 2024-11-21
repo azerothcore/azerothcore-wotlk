@@ -20,6 +20,7 @@
 #include "ScriptedCreature.h"
 #include "SpellScriptLoader.h"
 #include "drak_tharon_keep.h"
+#include "SpellScript.h"
 
 DoorData const doorData[] =
 {
@@ -83,7 +84,7 @@ class spell_dtk_raise_dead_aura : public AuraScript
 
     bool Load() override
     {
-        return GetUnitOwner()->GetTypeId() == TYPEID_UNIT;
+        return GetUnitOwner()->IsCreature();
     }
 
     void HandleEffectRemove(AuraEffect const*  /*aurEff*/, AuraEffectHandleModes /*mode*/)

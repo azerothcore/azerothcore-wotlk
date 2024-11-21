@@ -28,7 +28,7 @@ CREATE TABLE IF NOT EXISTS `creature_template_movement` (
   PRIMARY KEY (`CreatureId`) USING BTREE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- Dumping data for table acore_world.creature_template_movement: ~4 474 rows (approximately)
+-- Dumping data for table acore_world.creature_template_movement: ~4 481 rows (approximately)
 DELETE FROM `creature_template_movement`;
 INSERT INTO `creature_template_movement` (`CreatureId`, `Ground`, `Swim`, `Flight`, `Rooted`, `Chase`, `Random`, `InteractionPauseTimer`) VALUES
 	(30, 1, 0, 0, 0, 0, 0, NULL),
@@ -2136,6 +2136,7 @@ INSERT INTO `creature_template_movement` (`CreatureId`, `Ground`, `Swim`, `Fligh
 	(17644, 0, 0, 1, 0, 0, 0, NULL),
 	(17645, 0, 0, 1, 0, 0, 0, NULL),
 	(17652, 0, 0, 1, 0, 0, 0, NULL),
+	(17660, 0, 0, 1, 0, 0, 0, NULL),
 	(17661, 1, 0, 0, 0, 0, 0, NULL),
 	(17669, 1, 0, 0, 0, 0, 0, NULL),
 	(17673, 0, 1, 0, 0, 0, 0, NULL),
@@ -2150,6 +2151,8 @@ INSERT INTO `creature_template_movement` (`CreatureId`, `Ground`, `Swim`, `Fligh
 	(17886, 0, 1, 1, 0, 0, 0, NULL),
 	(17888, 1, 1, 0, 0, 0, 0, NULL),
 	(17889, 0, 0, 1, 0, 0, 0, NULL),
+	(17906, 1, 0, 1, 0, 0, 0, 0),
+	(17907, 1, 0, 1, 0, 0, 0, 0),
 	(17915, 0, 1, 0, 0, 0, 0, NULL),
 	(17939, 1, 1, 0, 0, 0, 0, NULL),
 	(17947, 0, 0, 1, 0, 0, 0, NULL),
@@ -2178,6 +2181,7 @@ INSERT INTO `creature_template_movement` (`CreatureId`, `Ground`, `Swim`, `Fligh
 	(18264, 0, 0, 1, 0, 0, 0, NULL),
 	(18275, 0, 1, 0, 0, 0, 0, NULL),
 	(18284, 0, 1, 0, 0, 0, 0, NULL),
+	(18304, 0, 0, 1, 1, 0, 0, 0),
 	(18318, 1, 0, 0, 0, 0, 0, NULL),
 	(18319, 1, 0, 0, 0, 0, 0, NULL),
 	(18320, 1, 0, 0, 0, 0, 0, NULL),
@@ -2211,6 +2215,7 @@ INSERT INTO `creature_template_movement` (`CreatureId`, `Ground`, `Swim`, `Fligh
 	(18493, 1, 1, 0, 0, 0, 0, NULL),
 	(18495, 1, 1, 0, 0, 0, 0, NULL),
 	(18497, 1, 1, 0, 0, 0, 0, NULL),
+	(18502, 0, 0, 1, 0, 0, 0, 0),
 	(18521, 1, 1, 0, 0, 0, 0, NULL),
 	(18524, 1, 1, 0, 0, 0, 0, NULL),
 	(18532, 0, 0, 1, 0, 0, 0, NULL),
@@ -2336,7 +2341,7 @@ INSERT INTO `creature_template_movement` (`CreatureId`, `Ground`, `Swim`, `Fligh
 	(20055, 1, 1, 0, 0, 0, 0, NULL),
 	(20058, 1, 1, 0, 0, 0, 0, NULL),
 	(20061, 1, 1, 0, 1, NULL, NULL, NULL),
-	(20064, 1, 0, 0, 0, 0, 0, NULL),
+	(20064, 1, 0, 0, 0, 2, 0, NULL),
 	(20069, 1, 0, 0, 0, 0, 0, NULL),
 	(20075, 1, 1, 0, 0, 0, 0, NULL),
 	(20080, 1, 1, 0, 0, 0, 0, NULL),
@@ -2470,7 +2475,7 @@ INSERT INTO `creature_template_movement` (`CreatureId`, `Ground`, `Swim`, `Fligh
 	(21054, 0, 0, 1, 0, 0, 0, NULL),
 	(21064, 1, 0, 0, 0, 0, 0, NULL),
 	(21071, 1, 1, 0, 1, 0, 0, NULL),
-	(21075, 0, 0, 1, 0, 0, 0, NULL),
+	(21075, 1, 0, 0, 0, 0, 0, NULL),
 	(21090, 0, 0, 1, 0, 0, 0, NULL),
 	(21092, 0, 0, 1, 0, 0, 0, NULL),
 	(21094, 0, 0, 1, 0, 0, 0, NULL),
@@ -2841,6 +2846,7 @@ INSERT INTO `creature_template_movement` (`CreatureId`, `Ground`, `Swim`, `Fligh
 	(24221, 0, 1, 1, 0, 0, 0, NULL),
 	(24222, 1, 0, 1, 0, 0, 0, NULL),
 	(24223, 0, 0, 1, 0, 0, 0, NULL),
+	(24224, NULL, NULL, 1, 1, NULL, NULL, NULL),
 	(24235, 0, 1, 1, 0, 0, 0, NULL),
 	(24238, 1, 1, 2, 0, 0, 0, NULL),
 	(24258, 0, 1, 1, 0, 0, 0, NULL),
@@ -3375,7 +3381,7 @@ INSERT INTO `creature_template_movement` (`CreatureId`, `Ground`, `Swim`, `Fligh
 	(25948, 1, 1, 0, 0, 0, 0, NULL),
 	(25949, 1, 1, 0, 0, 0, 0, NULL),
 	(25951, 1, 1, 0, 0, 0, 0, NULL),
-	(25952, 1, 0, 0, 0, 0, 0, NULL),
+	(25952, 1, 0, 1, 0, 0, 0, NULL),
 	(25953, 0, 0, 1, 0, 0, 0, NULL),
 	(25954, 1, 1, 0, 0, 0, 0, NULL),
 	(25955, 1, 1, 0, 0, 0, 0, NULL),
@@ -3452,6 +3458,7 @@ INSERT INTO `creature_template_movement` (`CreatureId`, `Ground`, `Swim`, `Fligh
 	(26177, 1, 0, 0, 0, 0, 0, NULL),
 	(26178, 1, 0, 0, 0, 0, 0, NULL),
 	(26188, 0, 0, 1, 0, 0, 0, NULL),
+	(26190, 1, 1, 1, 0, 0, 0, NULL),
 	(26192, 1, 0, 0, 0, 0, 0, NULL),
 	(26204, 1, 1, 0, 0, 0, 0, NULL),
 	(26207, 1, 0, 0, 0, 0, 0, NULL),

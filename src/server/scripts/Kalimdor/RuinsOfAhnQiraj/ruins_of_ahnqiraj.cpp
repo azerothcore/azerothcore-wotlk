@@ -161,4 +161,3 @@ void AddSC_ruins_of_ahnqiraj()
     RegisterRuinsOfAhnQirajCreatureAI(npc_obsidian_destroyer);
     RegisterSpellScript(spell_drain_mana);
 }
-

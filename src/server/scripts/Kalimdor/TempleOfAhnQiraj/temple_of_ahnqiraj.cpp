@@ -575,4 +575,3 @@ void AddSC_temple_of_ahnqiraj()
     RegisterSpellScript(spell_nullify);
     new at_battleguard_sartura();
 }
-

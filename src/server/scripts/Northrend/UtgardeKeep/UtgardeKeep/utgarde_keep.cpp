@@ -19,6 +19,7 @@
 #include "CreatureScript.h"
 #include "GameObjectAI.h"
 #include "ScriptedCreature.h"
+#include "SpellScript.h"
 #include "SpellScriptLoader.h"
 #include "Vehicle.h"
 
@@ -238,4 +239,3 @@ void AddSC_utgarde_keep()
 
     RegisterSpellScript(spell_ticking_time_bomb_aura);
 }
-

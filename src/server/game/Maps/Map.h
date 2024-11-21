@@ -33,11 +33,9 @@
 #include "Position.h"
 #include "SharedDefines.h"
 #include "TaskScheduler.h"
-#include "Timer.h"
 #include <bitset>
 #include <list>
 #include <memory>
-#include <mutex>
 #include <shared_mutex>
 
 class Unit;
@@ -651,7 +649,7 @@ public:
         _updateObjects.erase(obj);
     }
 
-    size_t GetActiveNonPlayersCount() const
+    std::size_t GetActiveNonPlayersCount() const
     {
         return m_activeNonPlayers.size();
     }

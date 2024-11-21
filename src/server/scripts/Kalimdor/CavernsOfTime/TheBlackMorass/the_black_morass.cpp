@@ -18,8 +18,10 @@
 #include "the_black_morass.h"
 #include "CreatureScript.h"
 #include "MoveSplineInit.h"
+#include "PassiveAI.h"
 #include "ScriptedCreature.h"
 #include "SmartAI.h"
+#include "SpellScript.h"
 #include "SpellScriptLoader.h"
 
 enum medivhMisc
@@ -128,7 +130,7 @@ struct npc_medivh_bm : public ScriptedAI
             return;
         }
 
-        if (who->GetTypeId() == TYPEID_PLAYER && me->IsWithinDistInMap(who, 20.0f))
+        if (who->IsPlayer() && me->IsWithinDistInMap(who, 20.0f))
         {
             Talk(SAY_MEDIVH_ENTER);
             _instance->SetData(DATA_MEDIVH, 1);
@@ -473,4 +475,3 @@ void AddSC_the_black_morass()
 
     RegisterSpellScript(spell_black_morass_corrupt_medivh);
 }
-

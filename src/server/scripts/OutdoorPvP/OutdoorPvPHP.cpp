@@ -21,7 +21,6 @@
 #include "MapMgr.h"
 #include "ObjectMgr.h"
 #include "OutdoorPvP.h"
-#include "OutdoorPvPMgr.h"
 #include "OutdoorPvPScript.h"
 #include "Player.h"
 #include "World.h"
@@ -322,7 +321,7 @@ void OPvPCapturePointHP::HandlePlayerLeave(Player* player)
 
 void OutdoorPvPHP::HandleKillImpl(Player* player, Unit* killed)
 {
-    if (killed->GetTypeId() != TYPEID_PLAYER)
+    if (!killed->IsPlayer())
         return;
 
     if (player->GetTeamId() == TEAM_ALLIANCE && killed->ToPlayer()->GetTeamId() != TEAM_ALLIANCE)
@@ -369,4 +368,3 @@ void AddSC_outdoorpvp_hp()
 {
     new OutdoorPvP_hellfire_peninsula();
 }
-

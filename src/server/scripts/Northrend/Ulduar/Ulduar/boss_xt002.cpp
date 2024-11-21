@@ -225,7 +225,7 @@ public:
 
         void KilledUnit(Unit* victim) override
         {
-            if (victim->GetTypeId() == TYPEID_PLAYER && !urand(0, 2))
+            if (victim->IsPlayer() && !urand(0, 2))
             {
                 Talk(SAY_SLAY);
             }
@@ -308,7 +308,7 @@ public:
             if (me->HasUnitState(UNIT_STATE_CASTING))
                 return;
 
-            switch(events.ExecuteEvent())
+            switch (events.ExecuteEvent())
             {
                 // Control events
                 case EVENT_HEALTH_CHECK:
@@ -427,7 +427,7 @@ public:
         {
             summons.Summon(cr);
             if (Unit* owner = me->GetVehicleBase())
-                if (owner->GetTypeId() == TYPEID_UNIT)
+                if (owner->IsCreature())
                     owner->ToCreature()->AI()->JustSummoned(cr);
         }
         void DamageTaken(Unit*, uint32& damage, DamageEffectType, SpellSchoolMask) override
@@ -509,7 +509,7 @@ public:
                         _spawnSelection++;
                         break;
                     case 3:
-                        if(_pummelerCount < 2)
+                        if (_pummelerCount < 2)
                             me->SummonCreature(NPC_XM024_PUMMELLER, target->GetPositionX(), target->GetPositionY(), target->GetPositionZ() + 2, 0, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 5000);
 
                         _pummelerCount++;

@@ -35,11 +35,9 @@ enum Spells
     SPELL_ENERGY_FEEDBACK           = 44335,
 
     // Vexallus spell info
-    SPELL_CHAIN_LIGHTNING_N         = 44318,
-    SPELL_CHAIN_LIGHTNING_H         = 46380,
+    SPELL_CHAIN_LIGHTNING           = 44318,
     SPELL_OVERLOAD                  = 44352,
-    SPELL_ARCANE_SHOCK_N            = 44319,
-    SPELL_ARCANE_SHOCK_H            = 46381,
+    SPELL_ARCANE_SHOCK              = 44319,
 
     SPELL_SUMMON_PURE_ENERGY_N      = 44322,
     SPELL_SUMMON_PURE_ENERGY_H1     = 46154,
@@ -82,7 +80,7 @@ struct boss_vexallus : public BossAI
 
     void KilledUnit(Unit* victim) override
     {
-        if (victim->GetTypeId() == TYPEID_PLAYER)
+        if (victim->IsPlayer())
             Talk(SAY_KILL);
     }
 
@@ -93,12 +91,12 @@ struct boss_vexallus : public BossAI
 
         ScheduleTimedEvent(8s, [&]
         {
-            DoCastRandomTarget(DUNGEON_MODE(SPELL_CHAIN_LIGHTNING_N, SPELL_CHAIN_LIGHTNING_H));
+            DoCastRandomTarget(SPELL_CHAIN_LIGHTNING);
         }, 8s, 8s);
 
         ScheduleTimedEvent(5s, [&]
         {
-            DoCastRandomTarget(DUNGEON_MODE(SPELL_ARCANE_SHOCK_N, SPELL_ARCANE_SHOCK_H));
+            DoCastRandomTarget(SPELL_ARCANE_SHOCK);
         }, 8s, 8s);
     }
 

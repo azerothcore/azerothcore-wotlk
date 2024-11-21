@@ -18,8 +18,10 @@
 
 #include "AchievementCriteriaScript.h"
 #include "CreatureScript.h"
+#include "MapReference.h"
 #include "ScriptedCreature.h"
 #include "nexus.h"
+#include "Player.h"
 
 enum eEnums
 {
@@ -214,4 +216,3 @@ void AddSC_boss_keristrasza()
     new boss_keristrasza();
     new achievement_intense_cold();
 }
-

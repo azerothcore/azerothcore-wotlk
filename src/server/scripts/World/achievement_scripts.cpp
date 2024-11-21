@@ -23,7 +23,6 @@
 #include "BattlegroundWS.h"
 #include "Creature.h"
 #include "Player.h"
-#include "Vehicle.h"
 
 class achievement_resilient_victory : public AchievementCriteriaScript
 {

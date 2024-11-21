@@ -21,7 +21,6 @@
  */
 
 #include "CreatureScript.h"
-#include "PassiveAI.h"
 #include "PetAI.h"
 #include "ScriptedCreature.h"
 #include "TotemAI.h"

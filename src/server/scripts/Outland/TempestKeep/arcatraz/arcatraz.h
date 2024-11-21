@@ -18,10 +18,7 @@
 #ifndef ARCATRAZ_H
 #define ARCATRAZ_H
 
-#include "CreatureAI.h"
 #include "CreatureAIImpl.h"
-#include "Player.h"
-#include "SpellScript.h"
 
 #define DataHeader "AZ"
 

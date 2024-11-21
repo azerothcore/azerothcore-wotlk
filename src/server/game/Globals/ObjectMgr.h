@@ -20,12 +20,9 @@
 
 #include "Bag.h"
 #include "ConditionMgr.h"
-#include "Corpse.h"
 #include "Creature.h"
 #include "DatabaseEnv.h"
-#include "DynamicObject.h"
 #include "GameObject.h"
-#include "GossipDef.h"
 #include "ItemTemplate.h"
 #include "Log.h"
 #include "Mail.h"
@@ -183,6 +180,7 @@ enum eScriptFlags
     // Playsound flags
     SF_PLAYSOUND_TARGET_PLAYER  = 0x1,
     SF_PLAYSOUND_DISTANCE_SOUND = 0x2,
+    SF_PLAYSOUND_DISTANCE_RADIUS = 0x4,
 
     // Orientation flags
     SF_ORIENTATION_FACE_TARGET  = 0x1,
@@ -310,6 +308,7 @@ struct ScriptInfo
         {
             uint32 SoundID;         // datalong
             uint32 Flags;           // datalong2
+            int32  Radius;          // dataint
         } Playsound;
 
         struct                      // SCRIPT_COMMAND_CREATE_ITEM (17)
@@ -458,13 +457,13 @@ struct BroadcastText
     {
         if (gender == GENDER_FEMALE && (forceGender || !FemaleText[DEFAULT_LOCALE].empty()))
         {
-            if (FemaleText.size() > size_t(locale) && !FemaleText[locale].empty())
+            if (FemaleText.size() > std::size_t(locale) && !FemaleText[locale].empty())
                 return FemaleText[locale];
             return FemaleText[DEFAULT_LOCALE];
         }
         // else if (gender == GENDER_MALE)
         {
-            if (MaleText.size() > size_t(locale) && !MaleText[locale].empty())
+            if (MaleText.size() > std::size_t(locale) && !MaleText[locale].empty())
                 return MaleText[locale];
             return MaleText[DEFAULT_LOCALE];
         }
@@ -493,6 +492,11 @@ typedef std::unordered_map<uint32/*(mapid, spawnMode) pair*/, CellObjectGuidsMap
 // Acore Trainer Reference start range
 #define ACORE_TRAINER_START_REF      200000
 
+struct ModuleString
+{
+    std::vector<std::string> Content;
+};
+
 struct AcoreString
 {
     std::vector<std::string> Content;
@@ -511,9 +515,11 @@ typedef std::unordered_map<uint32, QuestOfferRewardLocale> QuestOfferRewardLocal
 typedef std::unordered_map<uint32, QuestRequestItemsLocale> QuestRequestItemsLocaleContainer;
 typedef std::unordered_map<uint32, NpcTextLocale> NpcTextLocaleContainer;
 typedef std::unordered_map<uint32, PageTextLocale> PageTextLocaleContainer;
+typedef std::map<std::pair<std::string, uint32>, ModuleString> ModuleStringContainer;
 typedef std::unordered_map<int32, AcoreString> AcoreStringContainer;
 typedef std::unordered_map<uint32, GossipMenuItemsLocale> GossipMenuItemsLocaleContainer;
 typedef std::unordered_map<uint32, PointOfInterestLocale> PointOfInterestLocaleContainer;
+typedef std::unordered_map<uint32, VehicleSeatAddon> VehicleSeatAddonContainer;
 
 typedef std::multimap<uint32, uint32> QuestRelations;
 typedef std::pair<QuestRelations::const_iterator, QuestRelations::const_iterator> QuestRelationBounds;
@@ -593,19 +599,8 @@ struct QuestGreeting
 {
     uint16 EmoteType;
     uint32 EmoteDelay;
-    std::string Text;
-
-    QuestGreeting() : EmoteType(0), EmoteDelay(0) { }
-    QuestGreeting(uint16 emoteType, uint32 emoteDelay, std::string text)
-        : EmoteType(emoteType), EmoteDelay(emoteDelay), Text(std::move(text)) { }
-};
-
-struct QuestGreetingLocale
-{
     std::vector<std::string> Greeting;
 };
-
-typedef std::unordered_map<uint32, QuestGreetingLocale> QuestGreetingLocaleContainer;
 
 struct GossipMenuItems
 {
@@ -666,7 +661,7 @@ struct QuestPOI
 typedef std::vector<QuestPOI> QuestPOIVector;
 typedef std::unordered_map<uint32, QuestPOIVector> QuestPOIContainer;
 
-typedef std::array<std::unordered_map<uint32, QuestGreeting>, 2> QuestGreetingContainer;
+typedef std::map<std::pair<uint32, uint8>, QuestGreeting> QuestGreetingContainer;
 
 typedef std::unordered_map<uint32, VendorItemData> CacheVendorItemContainer;
 typedef std::unordered_map<uint32, TrainerSpellData> CacheTrainerSpellContainer;
@@ -1012,6 +1007,8 @@ public:
     void ValidateSpellScripts();
     void InitializeSpellInfoPrecomputedData();
 
+    bool LoadModuleStrings();
+    bool LoadModuleStringsLocale();
     bool LoadAcoreStrings();
     void LoadBroadcastTexts();
     void LoadBroadcastTextLocales();
@@ -1057,6 +1054,7 @@ public:
     void LoadMailServerTemplates();
     void LoadVehicleTemplateAccessories();
     void LoadVehicleAccessories();
+    void LoadVehicleSeatAddon();
 
     void LoadGossipText();
 
@@ -1267,26 +1265,6 @@ public:
         if (itr == _pointOfInterestLocaleStore.end()) return nullptr;
         return &itr->second;
     }
-    [[nodiscard]] QuestGreetingLocale const* GetQuestGreetingLocale(TypeID type, uint32 id) const
-    {
-        uint32 typeIndex;
-        if (type == TYPEID_UNIT)
-        {
-            typeIndex = 0;
-        }
-        else if (type == TYPEID_GAMEOBJECT)
-        {
-            typeIndex = 1;
-        }
-        else
-        {
-            return nullptr;
-        }
-
-        QuestGreetingLocaleContainer::const_iterator itr = _questGreetingLocaleStore.find(MAKE_PAIR32(typeIndex, id));
-        if (itr == _questGreetingLocaleStore.end()) return nullptr;
-        return &itr->second;
-    }
     [[nodiscard]] QuestOfferRewardLocale const* GetQuestOfferRewardLocale(uint32 entry) const
     {
         auto itr = _questOfferRewardLocaleStore.find(entry);
@@ -1305,10 +1283,21 @@ public:
         if (itr == _npcTextLocaleStore.end()) return nullptr;
         return &itr->second;
     }
-    QuestGreeting const* GetQuestGreeting(TypeID type, uint32 id) const;
+    [[nodiscard]] QuestGreeting const* GetQuestGreeting(TypeID type, uint32 id) const;
 
     GameObjectData& NewGOData(ObjectGuid::LowType guid) { return _gameObjectDataStore[guid]; }
     void DeleteGOData(ObjectGuid::LowType guid);
+
+    [[nodiscard]] ModuleString const* GetModuleString(std::string module, uint32 id) const
+    {
+        std::pair<std::string, uint32> pairKey = std::make_pair(module, id);
+        ModuleStringContainer::const_iterator itr = _moduleStringStore.find(pairKey);
+        if (itr == _moduleStringStore.end())
+            return nullptr;
+
+        return &itr->second;
+    }
+    [[nodiscard]] std::string const* GetModuleString(std::string module, uint32 id, LocaleConstant locale) const;
 
     [[nodiscard]] AcoreString const* GetAcoreString(uint32 entry) const
     {
@@ -1414,7 +1403,7 @@ public:
     }
 
     static void AddLocaleString(std::string&& s, LocaleConstant locale, std::vector<std::string>& data);
-    static std::string_view GetLocaleString(std::vector<std::string> const& data, size_t locale)
+    static std::string_view GetLocaleString(std::vector<std::string> const& data, std::size_t locale)
     {
         if (locale < data.size())
             return data[locale];
@@ -1423,7 +1412,7 @@ public:
     }
     static inline void GetLocaleString(const std::vector<std::string>& data, int loc_idx, std::string& value)
     {
-        if (data.size() > size_t(loc_idx) && !data[loc_idx].empty())
+        if (data.size() > std::size_t(loc_idx) && !data[loc_idx].empty())
             value = data[loc_idx];
     }
 
@@ -1442,6 +1431,15 @@ public:
     void LoadFactionChangeTitles();
 
     [[nodiscard]] bool IsTransportMap(uint32 mapId) const { return _transportMaps.count(mapId) != 0; }
+
+    VehicleSeatAddon const* GetVehicleSeatAddon(uint32 seatId) const
+    {
+        VehicleSeatAddonContainer::const_iterator itr = _vehicleSeatAddonStore.find(seatId);
+        if (itr == _vehicleSeatAddonStore.end())
+            return nullptr;
+
+        return &itr->second;
+    }
 
     [[nodiscard]] uint32 GetQuestMoneyReward(uint8 level, uint32 questMoneyDifficulty) const;
     void SendServerMail(Player* player, uint32 id, uint32 reqLevel, uint32 reqPlayTime, uint32 rewardMoneyA, uint32 rewardMoneyH, uint32 rewardItemA, uint32 rewardItemCountA, uint32 rewardItemH, uint32 rewardItemCountH, std::string subject, std::string body, uint8 active) const;
@@ -1520,6 +1518,7 @@ private:
 
     VehicleAccessoryContainer _vehicleTemplateAccessoryStore;
     VehicleAccessoryContainer _vehicleAccessoryStore;
+    VehicleSeatAddonContainer _vehicleSeatAddonStore;
 
     LocaleConstant DBCLocaleIndex;
 
@@ -1598,10 +1597,10 @@ private:
     QuestRequestItemsLocaleContainer _questRequestItemsLocaleStore;
     NpcTextLocaleContainer _npcTextLocaleStore;
     PageTextLocaleContainer _pageTextLocaleStore;
+    ModuleStringContainer _moduleStringStore;
     AcoreStringContainer _acoreStringStore;
     GossipMenuItemsLocaleContainer _gossipMenuItemsLocaleStore;
     PointOfInterestLocaleContainer _pointOfInterestLocaleStore;
-    QuestGreetingLocaleContainer _questGreetingLocaleStore;
 
     CacheVendorItemContainer _cacheVendorItemStore;
     CacheTrainerSpellContainer _cacheTrainerSpellStore;

@@ -17,9 +17,13 @@
 
 #include "AchievementCriteriaScript.h"
 #include "CreatureScript.h"
+#include "GameEventMgr.h"
+#include "GridNotifiers.h"
 #include "ScriptedCreature.h"
 #include "SpellScriptLoader.h"
 #include "nexus.h"
+#include "SpellInfo.h"
+#include "SpellScript.h"
 
 enum Spells
 {
@@ -241,7 +245,7 @@ class spell_boss_magus_telestra_summon_telestra_clones_aura : public AuraScript
 
     bool Load() override
     {
-        return GetUnitOwner()->GetTypeId() == TYPEID_UNIT;
+        return GetUnitOwner()->IsCreature();
     }
 
     void HandleApply(AuraEffect const*  /*aurEff*/, AuraEffectHandleModes /*mode*/)

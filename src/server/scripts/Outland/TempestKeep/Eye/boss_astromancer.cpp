@@ -17,6 +17,8 @@
 
 #include "CreatureScript.h"
 #include "ScriptedCreature.h"
+#include "SpellAuras.h"
+#include "SpellScript.h"
 #include "SpellScriptLoader.h"
 #include "the_eye.h"
 
@@ -106,7 +108,7 @@ struct boss_high_astromancer_solarian : public BossAI
 
     void KilledUnit(Unit* victim) override
     {
-        if (victim->GetTypeId() == TYPEID_PLAYER && roll_chance_i(50))
+        if (victim->IsPlayer() && roll_chance_i(50))
         {
             Talk(SAY_KILL);
         }
@@ -254,7 +256,7 @@ class spell_astromancer_wrath_of_the_astromancer : public AuraScript
             return;
 
         Unit* target = GetUnitOwner();
-        target->CastSpell(target, GetSpellInfo()->Effects[EFFECT_1].CalcValue(), false);
+        target->CastSpell(target, GetSpellInfo()->Effects[EFFECT_1].CalcValue(), false, nullptr, nullptr, GetCaster () ? GetCaster()->GetGUID() : ObjectGuid::Empty);
     }
 
     void Register() override

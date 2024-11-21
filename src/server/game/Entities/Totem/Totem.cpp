@@ -51,7 +51,7 @@ void Totem::InitStats(uint32 duration)
     if (Unit* owner = ObjectAccessor::GetUnit(*this, m_owner))
     {
         uint32 slot = m_Properties->Slot;
-        if (owner->GetTypeId() == TYPEID_PLAYER && slot >= SUMMON_SLOT_TOTEM && slot < MAX_TOTEM_SLOT)
+        if (owner->IsPlayer() && slot >= SUMMON_SLOT_TOTEM && slot < MAX_TOTEM_SLOT)
         {
             WorldPackets::Totem::TotemCreated data;
             data.Totem = GetGUID();

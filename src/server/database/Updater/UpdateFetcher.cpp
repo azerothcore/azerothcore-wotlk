@@ -25,6 +25,8 @@
 #include <fstream>
 #include <sstream>
 
+#include "QueryResult.h"
+
 using namespace std::filesystem;
 
 struct UpdateFetcher::DirectoryEntry
@@ -240,8 +242,8 @@ UpdateResult UpdateFetcher::Update(bool const redundancyChecks,
 
     AppliedFileStorage applied = ReceiveAppliedFiles();
 
-    size_t countRecentUpdates = 0;
-    size_t countArchivedUpdates = 0;
+    std::size_t countRecentUpdates = 0;
+    std::size_t countArchivedUpdates = 0;
 
     // Count updates
     for (auto const& entry : applied)
@@ -255,7 +257,7 @@ UpdateResult UpdateFetcher::Update(bool const redundancyChecks,
     for (auto& entry : applied)
         hashToName.insert(std::make_pair(entry.second.hash, entry.first));
 
-    size_t importedUpdates = 0;
+    std::size_t importedUpdates = 0;
 
     auto ApplyUpdateFile = [&](LocaleFileEntry const& sqlFile)
     {
@@ -483,7 +485,7 @@ void UpdateFetcher::CleanUp(AppliedFileStorage const& storage) const
         return;
 
     std::stringstream update;
-    size_t remaining = storage.size();
+    std::size_t remaining = storage.size();
 
     update << "DELETE FROM `updates` WHERE `name` IN(";
 

@@ -19,12 +19,6 @@
 #define DEF_NEXUS_H
 
 #include "CreatureAIImpl.h"
-#include "GameEventMgr.h"
-#include "GridNotifiers.h"
-#include "PassiveAI.h"
-#include "Player.h"
-#include "SpellAuras.h"
-#include "SpellScript.h"
 
 #define DataHeader "NEX"
 

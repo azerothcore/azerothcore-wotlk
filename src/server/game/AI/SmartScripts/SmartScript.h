@@ -18,16 +18,26 @@
 #ifndef ACORE_SMARTSCRIPT_H
 #define ACORE_SMARTSCRIPT_H
 
-#include "Common.h"
 #include "Creature.h"
-#include "CreatureAI.h"
 #include "GridNotifiers.h"
 #include "SmartScriptMgr.h"
 #include "Spell.h"
 #include "Unit.h"
+#include <deque>
 
 class SmartScript
 {
+    struct SmartScriptFrame
+    {
+        SmartScriptHolder& holder;
+        Unit* unit;
+        uint32 var0;
+        uint32 var1;
+        bool bvar;
+        SpellInfo const* spell;
+        GameObject* gob;
+    };
+
 public:
     SmartScript();
     ~SmartScript();
@@ -44,7 +54,7 @@ public:
     static void InitTimer(SmartScriptHolder& e);
     void ProcessAction(SmartScriptHolder& e, Unit* unit = nullptr, uint32 var0 = 0, uint32 var1 = 0, bool bvar = false, SpellInfo const* spell = nullptr, GameObject* gob = nullptr);
     void ProcessTimedAction(SmartScriptHolder& e, uint32 const& min, uint32 const& max, Unit* unit = nullptr, uint32 var0 = 0, uint32 var1 = 0, bool bvar = false, SpellInfo const* spell = nullptr, GameObject* gob = nullptr);
-    void GetTargets(ObjectVector& targets, SmartScriptHolder const& e, Unit* invoker = nullptr) const;
+    void GetTargets(ObjectVector& targets, SmartScriptHolder const& e, WorldObject* invoker = nullptr) const;
     void GetWorldObjectsInDist(ObjectVector& objects, float dist) const;
     void InstallTemplate(SmartScriptHolder const& e);
     static SmartScriptHolder CreateSmartEvent(SMART_EVENT e, uint32 event_flags, uint32 event_param1, uint32 event_param2, uint32 event_param3, uint32 event_param4, uint32 event_param5, uint32 event_param6, SMART_ACTION action, uint32 action_param1, uint32 action_param2, uint32 action_param3, uint32 action_param4, uint32 action_param5, uint32 action_param6, SMARTAI_TARGETS t, uint32 target_param1, uint32 target_param2, uint32 target_param3, uint32 target_param4, uint32 phaseMask);
@@ -186,7 +196,7 @@ public:
 
     //TIMED_ACTIONLIST (script type 9 aka script9)
     void SetScript9(SmartScriptHolder& e, uint32 entry);
-    Unit* GetLastInvoker(Unit* invoker = nullptr) const;
+    WorldObject* GetLastInvoker(WorldObject* invoker = nullptr) const;
     ObjectGuid mLastInvoker;
     typedef std::unordered_map<uint32, uint32> CounterMap;
     CounterMap mCounterList;
@@ -253,7 +263,8 @@ private:
             }
         }
     }
-    SmartScriptHolder FindLinkedEvent (uint32 link)
+    std::optional<std::reference_wrapper<
+        SmartScriptHolder>> FindLinkedEvent(uint32 link)
     {
         if (!mEvents.empty())
         {
@@ -261,15 +272,16 @@ private:
             {
                 if (i->event_id == link)
                 {
-                    return (*i);
+                    return std::ref(*i);
                 }
             }
         }
-        SmartScriptHolder s;
-        return s;
+        return std::nullopt;
     }
 
     GuidUnorderedSet _summonList;
+
+    std::deque<SmartScriptFrame> executionStack;
 };
 
 #endif

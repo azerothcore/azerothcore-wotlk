@@ -192,4 +192,3 @@ void AddSC_boss_salramm()
     new boss_salramm();
     RegisterSpellScript(spell_boss_salramm_steal_flesh_aura);
 }
-

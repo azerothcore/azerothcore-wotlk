@@ -19,7 +19,6 @@
 #define DEF_HYJAL_H
 
 #include "CreatureAIImpl.h"
-#include "GridNotifiers.h"
 
 #define DataHeader "HY"
 

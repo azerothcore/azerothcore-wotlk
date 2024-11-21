@@ -19,7 +19,6 @@
 #include "CreatureAI.h"
 #include "Log.h"
 #include "ObjectAccessor.h"
-#include "ObjectDefines.h"
 #include "Opcodes.h"
 #include "Player.h"
 #include "Vehicle.h"
@@ -86,10 +85,11 @@ void WorldSession::SendAttackStop(Unit const* enemy)
 {
     WorldPacket data(SMSG_ATTACKSTOP, (8 + 8 + 4)); // we guess size
     data << GetPlayer()->GetPackGUID();
+
     if (enemy)
     {
         data << enemy->GetPackGUID();               // must be packed guid
-        data << enemy->isDead();
+        data << (uint32)enemy->isDead();
     }
     SendPacket(&data);
 }

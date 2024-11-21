@@ -23,7 +23,6 @@
 #include "ScriptedEscortAI.h"
 #include "ScriptedGossip.h"
 #include "SpellAuraEffects.h"
-#include "SpellAuras.h"
 #include "SpellScript.h"
 #include "SpellScriptLoader.h"
 /* ScriptData
@@ -457,7 +456,7 @@ public:
 
         uint32 NextStep(uint32 nextStep)
         {
-            switch(nextStep)
+            switch (nextStep)
             {
                 case 1:
                     Talk(SAY_DIALOG_MEDIVH_1);

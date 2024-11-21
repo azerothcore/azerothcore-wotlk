@@ -22,6 +22,7 @@
 #include "ScriptedGossip.h"
 #include "Spell.h"
 #include "icecrown_citadel.h"
+#include "SpellMgr.h"
 
 #define GOSSIP_SENDER_ICC_PORT 631
 
@@ -134,4 +135,3 @@ void AddSC_icecrown_citadel_teleport()
     new icecrown_citadel_teleport();
     new at_frozen_throne_teleport();
 }
-

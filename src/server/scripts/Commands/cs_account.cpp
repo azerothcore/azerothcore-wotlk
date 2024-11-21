@@ -52,46 +52,47 @@ public:
     {
         static ChatCommandTable accountSetCommandTable =
         {
-            { "addon",      SEC_GAMEMASTER,     true,   &HandleAccountSetAddonCommand,          "" },
-            { "gmlevel",    SEC_CONSOLE,        true,   &HandleAccountSetGmLevelCommand,        "" },
-            { "password",   SEC_CONSOLE,        true,   &HandleAccountSetPasswordCommand,       "" },
-            { "2fa",        SEC_PLAYER,         true,   &HandleAccountSet2FACommand,            "" }
+            { "addon",      HandleAccountSetAddonCommand,     SEC_GAMEMASTER, Console::Yes },
+            { "gmlevel",    HandleAccountSetGmLevelCommand,   SEC_ADMINISTRATOR, Console::Yes },
+            { "password",   HandleAccountSetPasswordCommand,  SEC_ADMINISTRATOR, Console::Yes },
+            { "2fa",        HandleAccountSet2FACommand,       SEC_PLAYER,    Console::Yes  },
+            { "email",      HandleAccountSetEmailCommand,     SEC_ADMINISTRATOR, Console::Yes }
         };
 
         static ChatCommandTable accountLockCommandTable
         {
-            { "country",    SEC_PLAYER,         true,   &HandleAccountLockCountryCommand,       "" },
-            { "ip",         SEC_PLAYER,         true,   &HandleAccountLockIpCommand,            "" }
+            { "country",    HandleAccountLockCountryCommand,  SEC_PLAYER,    Console::Yes  },
+            { "ip",         HandleAccountLockIpCommand,       SEC_PLAYER,    Console::Yes  }
         };
 
         static ChatCommandTable account2faCommandTable
         {
-            { "setup",      SEC_PLAYER,         false,  &HandleAccount2FASetupCommand,          "" },
-            { "remove",     SEC_PLAYER,         false,  &HandleAccount2FARemoveCommand,         "" },
+            { "setup",      HandleAccount2FASetupCommand,   SEC_PLAYER,    Console::No  },
+            { "remove",     HandleAccount2FARemoveCommand,  SEC_PLAYER,    Console::No  }
         };
 
         static ChatCommandTable accountRemoveCommandTable
         {
-            { "country",    SEC_ADMINISTRATOR,  true,  &HandleAccountRemoveLockCountryCommand,  "" }
+            { "country",    HandleAccountRemoveLockCountryCommand,  SEC_ADMINISTRATOR, Console::Yes },
         };
 
         static ChatCommandTable accountCommandTable =
         {
-            { "2fa",        SEC_PLAYER,         true,   nullptr, "", account2faCommandTable        },
-            { "addon",      SEC_MODERATOR,      false,  &HandleAccountAddonCommand,             "" },
-            { "create",     SEC_CONSOLE,        true,   &HandleAccountCreateCommand,            "" },
-            { "delete",     SEC_CONSOLE,        true,   &HandleAccountDeleteCommand,            "" },
-            { "onlinelist", SEC_CONSOLE,        true,   &HandleAccountOnlineListCommand,        "" },
-            { "lock",       SEC_PLAYER,         false,  nullptr, "", accountLockCommandTable       },
-            { "set",        SEC_ADMINISTRATOR,  true,   nullptr, "", accountSetCommandTable        },
-            { "password",   SEC_PLAYER,         false,  &HandleAccountPasswordCommand,          "" },
-            { "remove",     SEC_ADMINISTRATOR,  true,   nullptr, "", accountRemoveCommandTable     },
-            { "",           SEC_PLAYER,         false,  &HandleAccountCommand,                  "" }
+            { "2fa",        account2faCommandTable                                       },
+            { "addon",      HandleAccountAddonCommand,       SEC_MODERATOR, Console::No  },
+            { "create",     HandleAccountCreateCommand,      SEC_CONSOLE,   Console::Yes },
+            { "delete",     HandleAccountDeleteCommand,      SEC_CONSOLE,   Console::Yes },
+            { "onlinelist", HandleAccountOnlineListCommand,  SEC_CONSOLE,   Console::Yes },
+            { "lock",       accountLockCommandTable                                      },
+            { "set",        accountSetCommandTable                                       },
+            { "password",   HandleAccountPasswordCommand,    SEC_PLAYER,    Console::No  },
+            { "remove",     accountRemoveCommandTable                                    },
+            { "",           HandleAccountCommand,            SEC_PLAYER,    Console::No  }
         };
 
         static ChatCommandTable commandTable =
         {
-            { "account", SEC_PLAYER, true, nullptr, "", accountCommandTable }
+            { "account", accountCommandTable }
         };
 
         return commandTable;
@@ -137,7 +138,7 @@ public:
 
         // store random suggested secrets
         static std::unordered_map<uint32, Acore::Crypto::TOTP::Secret> suggestions;
-        auto pair = suggestions.emplace(std::piecewise_construct, std::make_tuple(accountId), std::make_tuple(Acore::Crypto::TOTP::RECOMMENDED_SECRET_LENGTH)); // std::vector 1-argument size_t constructor invokes resize
+        auto pair = suggestions.emplace(std::piecewise_construct, std::make_tuple(accountId), std::make_tuple(Acore::Crypto::TOTP::RECOMMENDED_SECRET_LENGTH)); // std::vector 1-argument std::size_t constructor invokes resize
 
         if (pair.second) // no suggestion yet, generate random secret
             Acore::Crypto::GetRandomBytes(pair.first->second);
@@ -348,7 +349,7 @@ public:
         switch (result)
         {
             case AOR_OK:
-                handler->PSendSysMessage(LANG_ACCOUNT_DELETED, accountName.c_str());
+                handler->PSendSysMessage(LANG_ACCOUNT_DELETED, accountName);
                 break;
             case AOR_NAME_NOT_EXIST:
                 handler->SendErrorMessage(LANG_ACCOUNT_NOT_EXIST, accountName.c_str());
@@ -400,12 +401,12 @@ public:
             {
                 Field* fieldsLogin = resultLogin->Fetch();
                 handler->PSendSysMessage(LANG_ACCOUNT_LIST_LINE,
-                                         fieldsLogin[0].Get<std::string>().c_str(), name.c_str(), fieldsLogin[1].Get<std::string>().c_str(),
+                                         fieldsLogin[0].Get<std::string>(), name, fieldsLogin[1].Get<std::string>(),
                                          fieldsDB[2].Get<uint16>(), fieldsDB[3].Get<uint16>(), fieldsLogin[3].Get<uint8>(),
                                          fieldsLogin[2].Get<uint8>());
             }
             else
-                handler->PSendSysMessage(LANG_ACCOUNT_LIST_ERROR, name.c_str());
+                handler->PSendSysMessage(LANG_ACCOUNT_LIST_ERROR, name);
         } while (result->NextRow());
 
         handler->SendSysMessage(LANG_ACCOUNT_LIST_BAR);
@@ -428,14 +429,14 @@ public:
         std::string accountName = _accountName;
         if (!Utf8ToUpperOnlyLatin(accountName))
         {
-            handler->SendErrorMessage(LANG_ACCOUNT_NOT_EXIST, accountName.c_str());
+            handler->SendErrorMessage(LANG_ACCOUNT_NOT_EXIST, accountName);
             return false;
         }
 
         uint32 accountId = AccountMgr::GetId(accountName);
         if (!accountId)
         {
-            handler->SendErrorMessage(LANG_ACCOUNT_NOT_EXIST, accountName.c_str());
+            handler->SendErrorMessage(LANG_ACCOUNT_NOT_EXIST, accountName);
             return false;
         }
 
@@ -599,14 +600,14 @@ public:
 
         if (!Utf8ToUpperOnlyLatin(accountName))
         {
-            handler->SendErrorMessage(LANG_ACCOUNT_NOT_EXIST, accountName.c_str());
+            handler->SendErrorMessage(LANG_ACCOUNT_NOT_EXIST, accountName);
             return false;
         }
 
         uint32 targetAccountId = AccountMgr::GetId(accountName);
         if (!targetAccountId)
         {
-            handler->SendErrorMessage(LANG_ACCOUNT_NOT_EXIST, accountName.c_str());
+            handler->SendErrorMessage(LANG_ACCOUNT_NOT_EXIST, accountName);
             return false;
         }
 
@@ -651,7 +652,7 @@ public:
         stmt->SetData(1, targetAccountId);
         LoginDatabase.Execute(stmt);
 
-        handler->PSendSysMessage(LANG_2FA_SECRET_SET_COMPLETE, accountName.c_str());
+        handler->PSendSysMessage(LANG_2FA_SECRET_SET_COMPLETE, accountName);
         return true;
     }
 
@@ -691,14 +692,14 @@ public:
             accountName = account;
             if (!Utf8ToUpperOnlyLatin(accountName))
             {
-                handler->SendErrorMessage(LANG_ACCOUNT_NOT_EXIST, accountName.c_str());
+                handler->SendErrorMessage(LANG_ACCOUNT_NOT_EXIST, accountName);
                 return false;
             }
 
             accountId = AccountMgr::GetId(accountName);
             if (!accountId)
             {
-                handler->SendErrorMessage(LANG_ACCOUNT_NOT_EXIST, accountName.c_str());
+                handler->SendErrorMessage(LANG_ACCOUNT_NOT_EXIST, accountName);
                 return false;
             }
         }
@@ -720,7 +721,7 @@ public:
 
         LoginDatabase.Execute(stmt);
 
-        handler->PSendSysMessage(LANG_ACCOUNT_SETADDON, accountName.c_str(), accountId, *expansion);
+        handler->PSendSysMessage(LANG_ACCOUNT_SETADDON, accountName, accountId, *expansion);
         return true;
     }
 
@@ -755,7 +756,7 @@ public:
             targetAccountName = arg1;
             if (!Utf8ToUpperOnlyLatin(targetAccountName))
             {
-                handler->SendErrorMessage(LANG_ACCOUNT_NOT_EXIST, targetAccountName.c_str());
+                handler->SendErrorMessage(LANG_ACCOUNT_NOT_EXIST, targetAccountName);
                 return false;
             }
         }
@@ -838,7 +839,7 @@ public:
             LoginDatabase.Execute(stmt);
         }
 
-        handler->PSendSysMessage(LANG_YOU_CHANGE_SECURITY, targetAccountName.c_str(), gm);
+        handler->PSendSysMessage(LANG_YOU_CHANGE_SECURITY, targetAccountName, gm);
         return true;
     }
 
@@ -859,14 +860,14 @@ public:
         std::string accountName = account;
         if (!Utf8ToUpperOnlyLatin(accountName))
         {
-            handler->SendErrorMessage(LANG_ACCOUNT_NOT_EXIST, accountName.c_str());
+            handler->SendErrorMessage(LANG_ACCOUNT_NOT_EXIST, accountName);
             return false;
         }
 
         uint32 targetAccountId = AccountMgr::GetId(accountName);
         if (!targetAccountId)
         {
-            handler->SendErrorMessage(LANG_ACCOUNT_NOT_EXIST, accountName.c_str());
+            handler->SendErrorMessage(LANG_ACCOUNT_NOT_EXIST, accountName);
             return false;
         }
 
@@ -889,13 +890,60 @@ public:
                 handler->SendSysMessage(LANG_COMMAND_PASSWORD);
                 break;
             case AOR_NAME_NOT_EXIST:
-                handler->SendErrorMessage(LANG_ACCOUNT_NOT_EXIST, accountName.c_str());
+                handler->SendErrorMessage(LANG_ACCOUNT_NOT_EXIST, accountName);
                 return false;
             case AOR_PASS_TOO_LONG:
                 handler->SendErrorMessage(LANG_PASSWORD_TOO_LONG);
                 return false;
             default:
                 handler->SendErrorMessage(LANG_COMMAND_NOTCHANGEPASSWORD);
+                return false;
+        }
+        return true;
+    }
+
+    /// Set email for account
+    static bool HandleAccountSetEmailCommand(ChatHandler* handler, AccountIdentifier account, std::string email, std::string emailConfirmation)
+
+    {
+        if (!account || !email.data() || !emailConfirmation.data())
+            return false;
+
+        std::string accountName = account.GetName();
+        if (!Utf8ToUpperOnlyLatin(accountName))
+        {
+            handler->SendErrorMessage(LANG_ACCOUNT_NOT_EXIST, accountName);
+            return false;
+        }
+
+        uint32 targetAccountId = account.GetID();
+        if (!targetAccountId)
+        {
+            handler->SendErrorMessage(LANG_ACCOUNT_NOT_EXIST, accountName);
+            return false;
+        }
+
+        if (email != emailConfirmation)
+        {
+            handler->SendErrorMessage(LANG_NEW_EMAILS_NOT_MATCH);
+            return false;
+        }
+
+        AccountOpResult result = AccountMgr::ChangeEmail(targetAccountId, email.data());
+
+        switch (result)
+        {
+            case AOR_OK:
+                handler->SendSysMessage(LANG_COMMAND_EMAIL);
+                break;
+            case AOR_NAME_NOT_EXIST:
+                handler->SendErrorMessage(LANG_ACCOUNT_NOT_EXIST, accountName);
+                return false;
+            case AOR_EMAIL_TOO_LONG:
+                handler->SendErrorMessage(LANG_EMAIL_TOO_LONG);
+                return false;
+            default:
+                handler->SendErrorMessage(LANG_COMMAND_NOTCHANGEEMAIL);
                 return false;
         }
         return true;

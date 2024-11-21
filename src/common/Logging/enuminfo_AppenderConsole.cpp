@@ -51,10 +51,10 @@ AC_API_EXPORT EnumText EnumUtils<ColorTypes>::ToString(ColorTypes value)
 }
 
 template <>
-AC_API_EXPORT size_t EnumUtils<ColorTypes>::Count() { return 15; }
+AC_API_EXPORT std::size_t EnumUtils<ColorTypes>::Count() { return 15; }
 
 template <>
-AC_API_EXPORT ColorTypes EnumUtils<ColorTypes>::FromIndex(size_t index)
+AC_API_EXPORT ColorTypes EnumUtils<ColorTypes>::FromIndex(std::size_t index)
 {
     switch (index)
     {
@@ -78,7 +78,7 @@ AC_API_EXPORT ColorTypes EnumUtils<ColorTypes>::FromIndex(size_t index)
 }
 
 template <>
-AC_API_EXPORT size_t EnumUtils<ColorTypes>::ToIndex(ColorTypes value)
+AC_API_EXPORT std::size_t EnumUtils<ColorTypes>::ToIndex(ColorTypes value)
 {
     switch (value)
     {

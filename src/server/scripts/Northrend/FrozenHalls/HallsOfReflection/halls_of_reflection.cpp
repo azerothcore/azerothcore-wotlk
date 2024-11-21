@@ -18,7 +18,12 @@
 #include "halls_of_reflection.h"
 #include "AreaTriggerScript.h"
 #include "CreatureScript.h"
+#include "InstanceScript.h"
 #include "MotionMaster.h"
+#include "PassiveAI.h"
+#include "ScriptedCreature.h"
+#include "ScriptedGossip.h"
+#include "SpellScript.h"
 #include "SpellScriptLoader.h"
 
 enum Events
@@ -240,7 +245,7 @@ public:
 
         void DoAction(int32 actionId) override
         {
-            switch(actionId)
+            switch (actionId)
             {
                 case ACTION_START_INTRO:
                     events.ScheduleEvent(EVENT_START_INTRO, 0ms);
@@ -1762,7 +1767,7 @@ public:
             if (me->IsNonMeleeSpellCast(false, true, true))
                 return;
 
-            switch(events.ExecuteEvent())
+            switch (events.ExecuteEvent())
             {
                 case EVENT_LK_CHECK_COMBAT:
                     if (me->isActiveObject()) // during fight
@@ -1948,7 +1953,7 @@ public:
         void DoAction(int32 actionId) override
 
         {
-            switch(actionId)
+            switch (actionId)
             {
                 case ACTION_START_INTRO:
                     events.ScheduleEvent(EVENT_LK_SAY_AGGRO, 0ms);
@@ -1996,7 +2001,7 @@ public:
         void UpdateAI(uint32 diff) override
         {
             events.Update(diff);
-            switch(events.ExecuteEvent())
+            switch (events.ExecuteEvent())
             {
                 case EVENT_LK_SAY_AGGRO:
                     if (Creature* lkboss = pInstance->instance->GetCreature(pInstance->GetGuidData(NPC_LICH_KING_BOSS)))

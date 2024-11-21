@@ -350,4 +350,3 @@ void AddSC_boss_amanitar()
     // Spells
     RegisterSpellScript(spell_amanitar_remove_mushroom_power);
 }
-

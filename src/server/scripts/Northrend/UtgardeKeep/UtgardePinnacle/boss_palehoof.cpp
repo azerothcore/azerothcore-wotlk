@@ -174,11 +174,11 @@ public:
                 // Reset mini bosses
                 for(uint8 i = 0; i < 4; ++i)
                 {
-                    if(Creature* Animal = ObjectAccessor::GetCreature(*me, m_pInstance->GetGuidData(DATA_NPC_FRENZIED_WORGEN + i)))
+                    if (Creature* Animal = ObjectAccessor::GetCreature(*me, m_pInstance->GetGuidData(DATA_NPC_FRENZIED_WORGEN + i)))
                     {
                         Animal->SetPosition(Animal->GetHomePosition());
                         Animal->StopMovingOnCurrentPos();
-                        if(Animal->isDead())
+                        if (Animal->isDead())
                             Animal->Respawn(true);
 
                         Animal->CastSpell(Animal, SPELL_FREEZE, true);
@@ -322,13 +322,13 @@ public:
         void JustDied(Unit*  /*pKiller*/) override
         {
             me->PlayDirectSound(SOUND_DEATH);
-            if(m_pInstance)
+            if (m_pInstance)
                 m_pInstance->SetData(DATA_GORTOK_PALEHOOF, DONE);
         }
 
         void KilledUnit(Unit* victim) override
         {
-            if (victim->GetTypeId() != TYPEID_PLAYER)
+            if (!victim->IsPlayer())
                 return;
 
             Talk(SAY_SLAY);
@@ -821,4 +821,3 @@ void AddSC_boss_palehoof()
     new npc_frenzied_worgen();
     new go_palehoof_sphere();
 }
-

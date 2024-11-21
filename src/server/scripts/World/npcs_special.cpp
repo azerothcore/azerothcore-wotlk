@@ -2538,7 +2538,7 @@ public:
 
         void IsSummonedBy(WorldObject* summoner) override
         {
-            if (summoner->GetTypeId() != TYPEID_PLAYER)
+            if (!summoner->IsPlayer())
             {
                 return;
             }
@@ -2625,7 +2625,7 @@ public:
 
     void IsSummonedBy(WorldObject* summoner) override
     {
-        if (summoner->GetTypeId() == TYPEID_UNIT || summoner->IsPlayer())
+        if (summoner->IsCreature() || summoner->IsPlayer())
             me->GetMotionMaster()->MoveFollow(summoner->ToUnit(), PET_FOLLOW_DIST, PET_FOLLOW_ANGLE);
 
     }

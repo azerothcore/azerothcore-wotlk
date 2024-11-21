@@ -226,7 +226,7 @@ struct boss_warbringer_omrogg : public BossAI
 
     void KilledUnit(Unit* victim) override
     {
-        if (victim && victim->GetTypeId() == TYPEID_PLAYER)
+        if (victim && victim->IsPlayer())
             HandleHeadTalk(SAY_ON_KILL);
     }
 
@@ -288,4 +288,3 @@ void AddSC_boss_warbringer_omrogg()
     RegisterShatteredHallsCreatureAI(boss_warbringer_omrogg);
     RegisterSpellScript(spell_burning_maul);
 }
-

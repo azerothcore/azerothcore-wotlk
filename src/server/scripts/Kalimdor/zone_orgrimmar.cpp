@@ -91,7 +91,7 @@ public:
                 {
                     if (Player* player = ObjectAccessor::GetPlayer(*me, PlayerGUID))
                     {
-                        if (player->GetTypeId() == TYPEID_PLAYER && player->GetQuestStatus(QUEST_SHATTERED_SALUTE) == QUEST_STATUS_INCOMPLETE)
+                        if (player->IsPlayer() && player->GetQuestStatus(QUEST_SHATTERED_SALUTE) == QUEST_STATUS_INCOMPLETE)
                             player->FailQuest(QUEST_SHATTERED_SALUTE);
                     }
                     Reset();

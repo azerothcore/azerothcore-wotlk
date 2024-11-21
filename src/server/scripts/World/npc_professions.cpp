@@ -21,6 +21,7 @@
 #include "ScriptedCreature.h"
 #include "ScriptedGossip.h"
 #include "SpellInfo.h"
+#include "SpellMgr.h"
 /* ScriptData
 SDName: Npc_Professions
 SD%Complete: 80
@@ -1283,7 +1284,7 @@ public:
 
     void SendActionMenu(Player* player, GameObject*  /*gameobject*/, uint32 uiAction)
     {
-        switch(uiAction)
+        switch (uiAction)
         {
             // Learn Goblin
             case GOSSIP_ACTION_INFO_DEF + 1:
@@ -1353,7 +1354,7 @@ public:
     bool OnGossipSelect(Player* player, GameObject* gameobject, uint32 uiSender, uint32 uiAction) override
     {
         ClearGossipMenuFor(player);
-        switch(uiSender)
+        switch (uiSender)
         {
             case GOSSIP_SENDER_LEARN:
                 SendActionMenu(player, gameobject, uiAction);
@@ -1375,4 +1376,3 @@ void AddSC_npc_professions()
     new npc_prof_tailor();
     new go_evil_book_for_dummies();
 }
-

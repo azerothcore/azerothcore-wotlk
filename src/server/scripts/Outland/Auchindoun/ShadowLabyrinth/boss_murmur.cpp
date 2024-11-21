@@ -20,6 +20,7 @@
 #include "SpellInfo.h"
 #include "SpellScriptLoader.h"
 #include "shadow_labyrinth.h"
+#include "SpellScript.h"
 
 enum Spells
 {
@@ -69,17 +70,17 @@ struct boss_murmur : public BossAI
         _Reset();
         me->SetHealth(me->CountPctFromMaxHealth(40));
         me->ResetPlayerDamageReq();
-        CastSupressionOOC();
+        CastSuppressionOOC();
     }
 
-    void CastSupressionOOC()
+    void CastSuppressionOOC()
     {
         me->m_Events.CancelEventGroup(GROUP_OOC_CAST);
         me->m_Events.AddEventAtOffset([this] {
             if (me->FindNearestCreature(NPC_CABAL_SPELLBINDER, 35.0f))
             {
                 me->CastCustomSpell(SPELL_SUPPRESSION, SPELLVALUE_MAX_TARGETS, 5, (Unit*)nullptr, false);
-                CastSupressionOOC();
+                CastSuppressionOOC();
             }
         }, 3600ms, 10900ms, GROUP_OOC_CAST);
     }
@@ -258,4 +259,3 @@ void AddSC_boss_murmur()
     RegisterSpellScript(spell_shockwave_knockback);
     RegisterSpellScript(spell_murmur_sonic_boom_effect);
 }
-

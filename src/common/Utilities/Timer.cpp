@@ -86,27 +86,27 @@ AC_COMMON_API std::string Acore::Time::ToTimeString<Microseconds>(uint64 duratio
     {
         if (days)
         {
-            return Acore::StringFormatFmt("{}:{:02}:{:02}:{:02}:{:02}:{:02}", days, hours, minutes, secs, millisecs);
+            return Acore::StringFormat("{}:{:02}:{:02}:{:02}:{:02}:{:02}", days, hours, minutes, secs, millisecs);
         }
         else if (hours)
         {
-            return Acore::StringFormatFmt("{}:{:02}:{:02}:{:02}:{:02}", hours, minutes, secs, millisecs);
+            return Acore::StringFormat("{}:{:02}:{:02}:{:02}:{:02}", hours, minutes, secs, millisecs);
         }
         else if (minutes)
         {
-            return Acore::StringFormatFmt("{}:{:02}:{:02}:{:02}", minutes, secs, millisecs);
+            return Acore::StringFormat("{}:{:02}:{:02}:{:02}", minutes, secs, millisecs);
         }
         else if (secs)
         {
-            return Acore::StringFormatFmt("{}:{:02}:{:02}", secs, millisecs);
+            return Acore::StringFormat("{}:{:02}:{:02}", secs, millisecs);
         }
         else if (millisecs)
         {
-            return Acore::StringFormatFmt("{}:{:02}", millisecs);
+            return Acore::StringFormat("{}:{:02}", millisecs);
         }
         else // microsecs
         {
-            return Acore::StringFormatFmt("{}", microsecs);
+            return Acore::StringFormat("{}", microsecs);
         }
     }
 

@@ -16,6 +16,7 @@
  */
 
 #include "ArenaTeamMgr.h"
+#include "Chat.h"
 #include "DatabaseEnv.h"
 #include "Define.h"
 #include "Language.h"
@@ -194,9 +195,9 @@ void ArenaTeamMgr::LoadArenaTeams()
 void ArenaTeamMgr::DistributeArenaPoints()
 {
     // Used to distribute arena points based on last week's stats
-    sWorld->SendWorldText(LANG_DIST_ARENA_POINTS_START);
+    ChatHandler(nullptr).SendWorldText(LANG_DIST_ARENA_POINTS_START);
 
-    sWorld->SendWorldText(LANG_DIST_ARENA_POINTS_ONLINE_START);
+    ChatHandler(nullptr).SendWorldText(LANG_DIST_ARENA_POINTS_ONLINE_START);
 
     // Temporary structure for storing maximum points to add values for all players
     std::map<ObjectGuid, uint32> PlayerPoints;
@@ -232,9 +233,9 @@ void ArenaTeamMgr::DistributeArenaPoints()
 
     PlayerPoints.clear();
 
-    sWorld->SendWorldText(LANG_DIST_ARENA_POINTS_ONLINE_END);
+    ChatHandler(nullptr).SendWorldText(LANG_DIST_ARENA_POINTS_ONLINE_END);
 
-    sWorld->SendWorldText(LANG_DIST_ARENA_POINTS_TEAM_START);
+    ChatHandler(nullptr).SendWorldText(LANG_DIST_ARENA_POINTS_TEAM_START);
     for (ArenaTeamContainer::iterator titr = GetArenaTeamMapBegin(); titr != GetArenaTeamMapEnd(); ++titr)
     {
         if (ArenaTeam* at = titr->second)
@@ -246,7 +247,7 @@ void ArenaTeamMgr::DistributeArenaPoints()
         }
     }
 
-    sWorld->SendWorldText(LANG_DIST_ARENA_POINTS_TEAM_END);
+    ChatHandler(nullptr).SendWorldText(LANG_DIST_ARENA_POINTS_TEAM_END);
 
-    sWorld->SendWorldText(LANG_DIST_ARENA_POINTS_END);
+    ChatHandler(nullptr).SendWorldText(LANG_DIST_ARENA_POINTS_END);
 }

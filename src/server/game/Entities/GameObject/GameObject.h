@@ -19,14 +19,12 @@
 #define AZEROTHCORE_GAMEOBJECT_H
 
 #include "Common.h"
-#include "DatabaseEnv.h"
 #include "G3D/Quat.h"
 #include "GameObjectData.h"
 #include "LootMgr.h"
 #include "Object.h"
 #include "SharedDefines.h"
 #include "Unit.h"
-#include <array>
 
 class GameObjectAI;
 class Transport;

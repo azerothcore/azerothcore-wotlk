@@ -21,6 +21,7 @@
 #include "ScriptedCreature.h"
 #include "SpellScriptLoader.h"
 #include "azjol_nerub.h"
+#include "SpellScript.h"
 
 DoorData const doorData[] =
 {

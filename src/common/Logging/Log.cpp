@@ -73,7 +73,7 @@ void Log::CreateAppenderFromConfig(std::string const& appenderName)
 
     std::vector<std::string_view> tokens = Acore::Tokenize(options, ',', true);
 
-    size_t const size = tokens.size();
+    std::size_t const size = tokens.size();
     std::string name = appenderName.substr(9);
 
     if (size < 2)
@@ -265,7 +265,7 @@ Logger const* Log::GetLoggerByType(std::string const& type) const
     }
 
     std::string parentLogger = LOGGER_ROOT;
-    size_t found = type.find_last_of('.');
+    std::size_t found = type.find_last_of('.');
     if (found != std::string::npos)
     {
         parentLogger = type.substr(0, found);

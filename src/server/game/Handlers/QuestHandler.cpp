@@ -17,6 +17,7 @@
 
 #include "Battleground.h"
 #include "BattlegroundAV.h"
+#include "Chat.h"
 #include "GameObjectAI.h"
 #include "Group.h"
 #include "Language.h"
@@ -37,14 +38,8 @@ void WorldSession::HandleQuestgiverStatusQueryOpcode(WorldPacket& recvData)
     recvData >> guid;
     uint32 questStatus = DIALOG_STATUS_NONE;
 
-    GossipMenu& gossipMenu = _player->PlayerTalkClass->GetGossipMenu();
-    // Did we already get a gossip menu with that NPC? if so no need to status query
-    if (gossipMenu.GetSenderGUID() == guid)
-    {
-        return;
-    }
-
     Object* questGiver = ObjectAccessor::GetObjectByTypeMask(*_player, guid, TYPEMASK_UNIT | TYPEMASK_GAMEOBJECT);
+
     if (!questGiver)
     {
         LOG_DEBUG("network.opcode", "Error in CMSG_QUESTGIVER_STATUS_QUERY, called for not found questgiver ({})", guid.ToString());
@@ -54,21 +49,23 @@ void WorldSession::HandleQuestgiverStatusQueryOpcode(WorldPacket& recvData)
     switch (questGiver->GetTypeId())
     {
         case TYPEID_UNIT:
-            {
-                LOG_DEBUG("network", "WORLD: Received CMSG_QUESTGIVER_STATUS_QUERY for npc {}", guid.ToString());
-                if (!questGiver->ToCreature()->IsHostileTo(_player)) // do not show quest status to enemies
-                    questStatus = _player->GetQuestDialogStatus(questGiver);
-                break;
-            }
+        {
+            LOG_DEBUG("network", "WORLD: Received CMSG_QUESTGIVER_STATUS_QUERY for npc {}", guid.ToString());
+            if (!questGiver->ToCreature()->IsHostileTo(_player)) // do not show quest status to enemies
+                questStatus = _player->GetQuestDialogStatus(questGiver);
+            break;
+        }
+
         case TYPEID_GAMEOBJECT:
+        {
+            LOG_DEBUG("network", "WORLD: Received CMSG_QUESTGIVER_STATUS_QUERY for GameObject {}", guid.ToString());
+            if (sWorld->getBoolConfig(CONFIG_OBJECT_QUEST_MARKERS))
             {
-                LOG_DEBUG("network", "WORLD: Received CMSG_QUESTGIVER_STATUS_QUERY for GameObject {}", guid.ToString());
-                if (sWorld->getBoolConfig(CONFIG_OBJECT_QUEST_MARKERS))
-                {
-                    questStatus = _player->GetQuestDialogStatus(questGiver);
-                }
-                break;
+                questStatus = _player->GetQuestDialogStatus(questGiver);
             }
+            break;
+        }
+
         default:
             LOG_ERROR("network.opcode", "QuestGiver called for unexpected type {}", questGiver->GetTypeId());
             break;
@@ -122,8 +119,8 @@ void WorldSession::HandleQuestgiverAcceptQuestOpcode(WorldPacket& recvData)
     Object* object = ObjectAccessor::GetObjectByTypeMask(*_player, guid, TYPEMASK_UNIT | TYPEMASK_GAMEOBJECT | TYPEMASK_ITEM | TYPEMASK_PLAYER);
 
     // no or incorrect quest giver
-    if (!object || object == _player || (object->GetTypeId() != TYPEID_PLAYER && !object->hasQuest(questId)) ||
-            (object->GetTypeId() == TYPEID_PLAYER && !object->ToPlayer()->CanShareQuest(questId)))
+    if (!object || object == _player || (!object->IsPlayer() && !object->hasQuest(questId)) ||
+            (object->IsPlayer() && !object->ToPlayer()->CanShareQuest(questId)))
     {
         _player->PlayerTalkClass->SendCloseGossip();
         _player->SetDivider();
@@ -137,7 +134,7 @@ void WorldSession::HandleQuestgiverAcceptQuestOpcode(WorldPacket& recvData)
     if (Quest const* quest = sObjectMgr->GetQuestTemplate(questId))
     {
         // pussywizard: exploit fix, can't share quests that give items to be sold
-        if (object->GetTypeId() == TYPEID_PLAYER)
+        if (object->IsPlayer())
             if (uint32 itemId = quest->GetSrcItemId())
                 if (ItemTemplate const* srcItem = sObjectMgr->GetItemTemplate(itemId))
                     if (srcItem->SellPrice > 0)
@@ -219,7 +216,7 @@ void WorldSession::HandleQuestgiverQueryQuestOpcode(WorldPacket& recvData)
     if (Quest const* quest = sObjectMgr->GetQuestTemplate(questId))
     {
         // not sure here what should happen to quests with QUEST_FLAGS_AUTOCOMPLETE
-        // if this breaks them, add && object->GetTypeId() == TYPEID_ITEM to this check
+        // if this breaks them, add && object->IsItem() to this check
         // item-started quests never have that flag
         if (!_player->CanTakeQuest(quest, true))
             return;
@@ -586,7 +583,7 @@ void WorldSession::HandlePushQuestToParty(WorldPacket& recvPacket)
                     // Check if player is in BG
                     if (_player->InBattleground())
                     {
-                        _player->GetSession()->SendNotification(LANG_BG_SHARE_QUEST_ERROR);
+                        ChatHandler(_player->GetSession()).SendNotification(LANG_BG_SHARE_QUEST_ERROR);
                         continue;
                     }
                 }
@@ -641,7 +638,7 @@ void WorldSession::HandleQuestgiverStatusMultipleQuery(WorldPacket& /*recvPacket
 
 void WorldSession::HandleQueryQuestsCompleted(WorldPacket& /*recvData*/)
 {
-    size_t rew_count = _player->GetRewardedQuestCount();
+    std::size_t rew_count = _player->GetRewardedQuestCount();
 
     WorldPacket data(SMSG_QUERY_QUESTS_COMPLETED_RESPONSE, 4 + 4 * rew_count);
     data << uint32(rew_count);

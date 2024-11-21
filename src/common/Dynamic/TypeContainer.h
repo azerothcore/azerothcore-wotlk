@@ -23,12 +23,9 @@
  * types of object at the same time.
  */
 
-#include "Define.h"
 #include "Dynamic/TypeList.h"
 #include "GridRefMgr.h"
-#include <map>
 #include <unordered_map>
-#include <vector>
 
 /*
  * @class ContainerMapList is a mulit-type container for map elements
@@ -102,7 +99,7 @@ template<class OBJECT_TYPES>
 class TypeMapContainer
 {
 public:
-    template<class SPECIFIC_TYPE> [[nodiscard]] size_t Count() const { return Acore::Count(i_elements, (SPECIFIC_TYPE*)nullptr); }
+    template<class SPECIFIC_TYPE> [[nodiscard]] std::size_t Count() const { return Acore::Count(i_elements, (SPECIFIC_TYPE*)nullptr); }
 
     /// inserts a specific object into the container
     template<class SPECIFIC_TYPE>

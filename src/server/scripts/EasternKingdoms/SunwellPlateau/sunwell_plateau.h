@@ -19,33 +19,41 @@
 #define SUNWELL_PLATEAU_H
 
 #include "CreatureAIImpl.h"
-#include "PassiveAI.h"
-#include "Player.h"
-#include "SpellAuraEffects.h"
-#include "SpellScript.h"
 
 #define DataHeader "SWP"
 
 #define SWPScriptName "instance_sunwell_plateau"
 
-enum DataTypes
+enum BossIds
 {
     DATA_KALECGOS                           = 0,
-    DATA_MADRIGOSA                          = 1,
-    DATA_BRUTALLUS                          = 2,
-    DATA_FELMYST                            = 3,
-    DATA_FELMYST_DOORS                      = 4,
-    DATA_EREDAR_TWINS_INTRO                 = 5,
-    DATA_EREDAR_TWINS                       = 6,
-    DATA_MURU                               = 7,
-    DATA_KILJAEDEN                          = 8,
-    MAX_ENCOUNTERS                          = 9,
+    DATA_BRUTALLUS                          = 1,
+    DATA_FELMYST                            = 2,
+    DATA_FELMYST_DOORS                      = 3,
+    DATA_EREDAR_TWINS                       = 4,
+    DATA_MURU                               = 5,
+    DATA_KILJAEDEN                          = 6,
+    MAX_ENCOUNTERS
+};
 
-    // GameObject GUIDs
-    DATA_ORB_OF_THE_BLUE_DRAGONFLIGHT_1     = 10,
-    DATA_ORB_OF_THE_BLUE_DRAGONFLIGHT_2     = 11,
-    DATA_ORB_OF_THE_BLUE_DRAGONFLIGHT_3     = 12,
-    DATA_ORB_OF_THE_BLUE_DRAGONFLIGHT_4     = 13
+enum DataTypes
+{
+    DATA_SACROLASH                          = 7,
+    DATA_ALYTHESS                           = 8,
+    DATA_MADRIGOSA                          = 9,
+    DATA_SATHROVARR                         = 10,
+    DATA_KJ_CONTROLLER                      = 11,
+    DATA_ANVEENA                            = 12,
+    DATA_KALECGOS_KJ                        = 13
+};
+
+enum DataTypesObjects
+{
+    DATA_ORB_OF_THE_BLUE_DRAGONFLIGHT_1     = 0,
+    DATA_ORB_OF_THE_BLUE_DRAGONFLIGHT_2     = 1,
+    DATA_ORB_OF_THE_BLUE_DRAGONFLIGHT_3     = 2,
+    DATA_ORB_OF_THE_BLUE_DRAGONFLIGHT_4     = 3,
+    DATA_ICEBARRIER                         = 4,
 };
 
 enum CreatureIds
@@ -108,5 +116,7 @@ inline AI* GetSunwellPlateauAI(T* obj)
 {
     return GetInstanceAI<AI>(obj, SWPScriptName);
 }
+
+#define RegisterSunwellPlateauCreatureAI(ai_name) RegisterCreatureAIWithFactory(ai_name, GetSunwellPlateauAI)
 
 #endif // SUNWELL_PLATEAU_H

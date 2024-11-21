@@ -20,12 +20,11 @@
 
 #include "Common.h"
 #include "Creature.h"
-#include "CreatureAI.h"
 #include "DBCStores.h"
+#include "ObjectAccessor.h"
+#include "ObjectMgr.h"
 #include "Optional.h"
-#include "Spell.h"
 #include "SpellMgr.h"
-#include "Unit.h"
 #include <limits>
 
 typedef uint32 SAIBool;
@@ -216,8 +215,9 @@ enum SMART_EVENT
     SMART_EVENT_SUMMONED_UNIT_EVADE      = 107,      // CreatureId(0 all), CooldownMin, CooldownMax
     SMART_EVENT_WAYPOINT_DATA_REACHED    = 108,      // PointId (0: any), pathId (0: any)
     SMART_EVENT_WAYPOINT_DATA_ENDED      = 109,      // PointId (0: any), pathId (0: any)
+    SMART_EVENT_IS_IN_MELEE_RANGE        = 110,      // min, max, repeatMin, repeatMax, dist, invert (0: false, 1: true)
 
-    SMART_EVENT_AC_END                   = 110
+    SMART_EVENT_AC_END                   = 111
 };
 
 struct SmartEvent
@@ -502,6 +502,16 @@ struct SmartEvent
 
         struct
         {
+            uint32 min;
+            uint32 max;
+            uint32 repeatMin;
+            uint32 repeatMax;
+            uint32 dist;
+            uint32 invert;
+        } meleeRange;
+
+        struct
+        {
             uint32 type;
             uint32 entry;
             uint32 count;
@@ -716,7 +726,7 @@ enum SMART_ACTION
     SMART_ACTION_DO_ACTION                          = 223,    // ActionId
     SMART_ACTION_ATTACK_STOP                        = 224,    //
     SMART_ACTION_SET_GUID                           = 225,    // Sends the invoker's or the base object's own ObjectGuid to target
-    SMART_ACTION_DISABLE                            = 226,    // state
+    SMART_ACTION_SCRIPTED_SPAWN                     = 226,    // state, spawnTimerMin, spawnTimerMax, respawnDelay, corpseDelay, dontDespawn
     SMART_ACTION_SET_SCALE                          = 227,    // scale
     SMART_ACTION_SUMMON_RADIAL                      = 228,    // summonEntry, summonDuration, repetitions, startAngle, stepAngle, dist
     SMART_ACTION_PLAY_SPELL_VISUAL                  = 229,    // visualId, visualIdImpact
@@ -727,8 +737,9 @@ enum SMART_ACTION
     SMART_ACTION_MOVEMENT_STOP                      = 234,    //
     SMART_ACTION_MOVEMENT_PAUSE                     = 235,    // timer
     SMART_ACTION_MOVEMENT_RESUME                    = 236,    // timerOverride
+    SMART_ACTION_WORLD_SCRIPT                       = 237,    // eventId, param
 
-    SMART_ACTION_AC_END                             = 237,    // placeholder
+    SMART_ACTION_AC_END                             = 238,    // placeholder
 };
 
 enum class SmartActionSummonCreatureFlags
@@ -1411,7 +1422,12 @@ struct SmartAction
         struct
         {
             SAIBool state;
-        } disable;
+            uint32 spawnTimerMin;
+            uint32 spawnTimerMax;
+            uint32 respawnDelay;
+            uint32 corpseDelay;
+            SAIBool dontDespawn;
+        } scriptSpawn;
 
         struct
         {
@@ -1467,6 +1483,12 @@ struct SmartAction
         {
             uint32 timer;
         } move;
+
+        struct
+        {
+            uint32 eventId;
+            uint32 param;
+        } worldStateScript;
         //! Note for any new future actions
         //! All parameters must have type uint32
 
@@ -1879,6 +1901,7 @@ const uint32 SmartAIEventMask[SMART_EVENT_AC_END][2] =
     {SMART_EVENT_SUMMONED_UNIT_EVADE,       SMART_SCRIPT_TYPE_MASK_CREATURE + SMART_SCRIPT_TYPE_MASK_GAMEOBJECT },
     {SMART_EVENT_WAYPOINT_DATA_REACHED,     SMART_SCRIPT_TYPE_MASK_CREATURE },
     {SMART_EVENT_WAYPOINT_DATA_ENDED,       SMART_SCRIPT_TYPE_MASK_CREATURE },
+    {SMART_EVENT_IS_IN_MELEE_RANGE,         SMART_SCRIPT_TYPE_MASK_CREATURE },
 };
 
 enum SmartEventFlags

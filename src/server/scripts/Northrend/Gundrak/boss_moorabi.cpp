@@ -20,6 +20,8 @@
 #include "ScriptedCreature.h"
 #include "SpellScriptLoader.h"
 #include "gundrak.h"
+#include "SpellInfo.h"
+#include "SpellScript.h"
 
 enum eSpells
 {
