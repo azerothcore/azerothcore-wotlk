@@ -848,12 +848,15 @@ void BotDataMgr::LoadNpcBots(bool spawn)
         BOT_LOG_INFO("server.loading", ">> Bots transmog data is not loaded. Table `characters_npcbot_transmog` is empty!");
 
     //                                       0      1      2      3     4        5
-    result = CharacterDatabase.Query("SELECT entry, owner, roles, spec, faction, UNIX_TIMESTAMP(hire_time),"
+    result = CharacterDatabase.Query("SELECT entry, owner, roles, spec, faction, UNIX_TIMESTAMP(hire_time), "
     //   6          7          8          9               10          11          12         13         14
-        "equipMhEx, equipOhEx, equipRhEx, equipHead, equipShoulders, equipChest, equipWaist, equipLegs, equipFeet,"
-    //   15          16          17         18         19            20            21             22             23         24
-        "equipWrist, equipHands, equipBack, equipBody, equipFinger1, equipFinger2, equipTrinket1, equipTrinket2, equipNeck, spells_disabled FROM characters_npcbot");
+        "equipMhEx, equipOhEx, equipRhEx, equipHead, equipShoulders, equipChest, equipWaist, equipLegs, equipFeet, "
+    //   15          16          17         18         19            20            21             22             23
+        "equipWrist, equipHands, equipBack, equipBody, equipFinger1, equipFinger2, equipTrinket1, equipTrinket2, equipNeck, "
+    //   24               25
+        "spells_disabled, miscvalues FROM characters_npcbot");
 
+    std::vector<uint32> entryList;
     if (result)
     {
         uint32 botcounter = 0;
@@ -862,7 +865,7 @@ void BotDataMgr::LoadNpcBots(bool spawn)
         QueryResult infores;
         CreatureTemplate const* proto;
         NpcBotData* botData;
-        std::list<uint32> entryList;
+        entryList.reserve(result->GetRowCount());
 
         do
         {
@@ -895,6 +898,17 @@ void BotDataMgr::LoadNpcBots(bool spawn)
                     botData->disabled_spells.insert(*(Bcore::StringTo<uint32>(tok[i])));
             }
 
+            std::string miscvalues_str = field[++index].Get<std::string>();
+            if (!miscvalues_str.empty())
+            {
+                std::vector<std::string_view> tok = Bcore::Tokenize(miscvalues_str, ' ', false);
+                for (std::vector<std::string_view>::size_type i = 0; i != tok.size(); ++i)
+                {
+                    std::vector<std::string_view> tok2 = Bcore::Tokenize(tok[i], ':', false);
+                    botData->miscvalues.emplace(*(Bcore::StringTo<uint32>(tok2[0])), *(Bcore::StringTo<uint32>(tok2[1])));
+                }
+            }
+
             entryList.push_back(entry);
             _botsData[entry] = botData;
             ++datacounter;
@@ -905,9 +919,8 @@ void BotDataMgr::LoadNpcBots(bool spawn)
 
         if (spawn)
         {
-            for (std::list<uint32>::const_iterator itr = entryList.cbegin(); itr != entryList.cend(); ++itr)
+            for (uint32 entry : entryList)
             {
-                uint32 entry = *itr;
                 proto = sObjectMgr->GetCreatureTemplate(entry);
                 //                                     1     2    3           4           5           6
                 infores = WorldDatabase.Query("SELECT guid, map, position_x, position_y, position_z, orientation FROM creature WHERE id1 = {}", entry);
@@ -962,6 +975,21 @@ void BotDataMgr::LoadNpcBots(bool spawn)
     }
     else
         BOT_LOG_INFO("server.loading", ">> Loaded 0 npcbots. Table `characters_npcbot` is empty!");
+
+    std::list<uint32> invalid_ids;
+    for (CreatureDataContainer::value_type const& kv : sObjectMgr->GetAllCreatureData())
+        if (kv.second.id1 >= BOT_ENTRY_BEGIN && sObjectMgr->GetCreatureTemplate(kv.second.id1)->IsNPCBot() && std::ranges::find(entryList, kv.second.id1) == entryList.cend())
+            invalid_ids.push_back(kv.second.id1);
+
+    if (!invalid_ids.empty())
+    {
+        std::ostringstream ss;
+        ss << "Invalid NPCBot spawns found in `creature` table which have no data in `characters_npcbot` table! IDs: ";
+        for (uint32 bot_id : invalid_ids)
+            ss << Bcore::ToString(bot_id) << ", ";
+        ss << "\nFix your DB contents and retry";
+        ASSERT(false, ss.str().c_str());
+    }
 
     allBotsLoaded = true;
 }
@@ -1184,7 +1212,7 @@ void BotDataMgr::LoadNpcBotGearSets()
         }
     }
 
-    BOT_LOG_INFO("server.loading", ">> Loaded {} NPCBot item sets for {} bow owners in {} ms", uint32(set_guids.size()), uint32(player_guids.size()), GetMSTimeDiffToNow(oldMSTime));
+    BOT_LOG_INFO("server.loading", ">> Loaded {} NPCBot item sets for {} bot owners in {} ms", uint32(set_guids.size()), uint32(player_guids.size()), GetMSTimeDiffToNow(oldMSTime));
 }
 
 void BotDataMgr::LoadNpcBotMgrData()
@@ -2686,6 +2714,20 @@ void BotDataMgr::UpdateNpcBotData(uint32 entry, NpcBotDataUpdateType updateType,
 
             bstmt = CharacterDatabase.GetPreparedStatement(CHAR_UPD_NPCBOT_DISABLED_SPELLS);
             //"UPDATE characters_npcbot SET spells_disabled = ? WHERE entry = ?", CONNECTION_ASYNCH
+            bstmt->SetData(0, ss.str());
+            bstmt->SetData(1, entry);
+            CharacterDatabase.Execute(bstmt);
+            break;
+        }
+        case NPCBOT_UPDATE_MISCVALUES:
+        {
+            NpcBotData::MiscValuesContainer const* miscvals = (NpcBotData::MiscValuesContainer const*)(data);
+            std::ostringstream ss;
+            for (NpcBotData::MiscValuesContainer::const_iterator citr = miscvals->cbegin(); citr != miscvals->cend(); ++citr)
+                ss << citr->first << ':' << citr->second << ' ';
+
+            bstmt = CharacterDatabase.GetPreparedStatement(CHAR_UPD_NPCBOT_MISCVALUES);
+            //"UPDATE characters_npcbot SET miscvalues = ? WHERE entry = ?", CONNECTION_ASYNCH
             bstmt->SetData(0, ss.str());
             bstmt->SetData(1, entry);
             CharacterDatabase.Execute(bstmt);

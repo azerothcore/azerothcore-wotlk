@@ -219,6 +219,13 @@ public:
         {
             _botclass = BOT_CLASS_ROGUE;
 
+            mhEnchantExpireTimer = 1;
+            ohEnchantExpireTimer = 1;
+            mhEnchant = 0;
+            ohEnchant = 0;
+            needChooseMHEnchant = true;
+            needChooseOHEnchant = true;
+
             InitUnitFlags();
         }
 
@@ -1735,9 +1742,9 @@ public:
                     return needChooseMHEnchant;
                 case BOTAI_MISC_ENCHANT_IS_AUTO_OH:
                     return needChooseOHEnchant;
-                case BOTAI_MISC_ENCHANT_CAN_EXPIRE_MH:
+                case BOTAI_MISC_ENCHANT_TIMER_MH:
                     return mhEnchantExpireTimer;
-                case BOTAI_MISC_ENCHANT_CAN_EXPIRE_OH:
+                case BOTAI_MISC_ENCHANT_TIMER_OH:
                     return ohEnchantExpireTimer;
                 case BOTAI_MISC_ENCHANT_CURRENT_MH:
                     return mhEnchant;
@@ -1770,25 +1777,33 @@ public:
                 case BOTAI_MISC_DAGGER_OFFHAND:
                     isdaggerOH = bool(value);
                     break;
-                case BOTAI_MISC_ENCHANT_CAN_EXPIRE_MH:
-                    if (value)
-                        mhEnchantExpireTimer = 0;
+                case BOTAI_MISC_ENCHANT_IS_AUTO_MH:
+                    needChooseMHEnchant = bool(value);
                     break;
-                case BOTAI_MISC_ENCHANT_CAN_EXPIRE_OH:
-                    if (value)
-                        ohEnchantExpireTimer = 0;
+                case BOTAI_MISC_ENCHANT_IS_AUTO_OH:
+                    needChooseOHEnchant = bool(value);
+                    break;
+                case BOTAI_MISC_ENCHANT_TIMER_MH:
+                    if (value == 0)
+                        mhEnchantExpireTimer = value;
+                    break;
+                case BOTAI_MISC_ENCHANT_TIMER_OH:
+                    if (value == 0)
+                        ohEnchantExpireTimer = value;
                     break;
                 case BOTAI_MISC_ENCHANT_CURRENT_MH:
                     mhEnchant = value;
-                    needChooseMHEnchant = value ? false : true;
+                    SetAIMiscValue(BOTAI_MISC_ENCHANT_IS_AUTO_MH, value ? false : true);
                     break;
                 case BOTAI_MISC_ENCHANT_CURRENT_OH:
                     ohEnchant = value;
-                    needChooseOHEnchant = value ? false : true;
+                    SetAIMiscValue(BOTAI_MISC_ENCHANT_IS_AUTO_OH, value ? false : true);
                     break;
                 default:
                     break;
             }
+
+            bot_ai::SetAIMiscValue(data, value);
         }
 
         void Reset() override
@@ -1798,15 +1813,10 @@ public:
             combopointsSpent = false;
             glyphSSProc = false;
 
-            mhEnchantExpireTimer = 1;
-            ohEnchantExpireTimer = 1;
+            mhEnchantExpireTimer = std::min<uint32>(mhEnchantExpireTimer, 1);
+            ohEnchantExpireTimer = std::min<uint32>(ohEnchantExpireTimer, 1);
 
             DefaultInit();
-
-            mhEnchant = 0;
-            ohEnchant = 0;
-            needChooseMHEnchant = true;
-            needChooseOHEnchant = true;
 
             //after InitEquips
             Item const* mh = GetEquips(BOT_SLOT_MAINHAND);
