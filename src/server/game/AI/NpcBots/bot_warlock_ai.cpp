@@ -607,7 +607,7 @@ public:
             //Hellfire interrupt
             Spell const* spell = me->GetCurrentSpell(CURRENT_CHANNELED_SPELL);
             if (spell && spell->GetSpellInfo()->GetFirstRankSpell()->Id == HELLFIRE_1 &&
-                ((!IAmFree() && !master->GetBotMgr()->IsPartyInCombat()) || GetHealthPCT(me) < 25))
+                ((!IAmFree() && !master->GetBotMgr()->IsPartyInCombat(false)) || GetHealthPCT(me) < 25))
                 me->InterruptSpell(CURRENT_CHANNELED_SPELL);
             else
             {

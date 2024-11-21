@@ -598,14 +598,11 @@ public:
                 return;
 
             //Glyph of Salvation
-            if (me->GetLevel() >= 26 && (IAmFree() || IsTank()))
+            if (me->GetLevel() >= 26 && me->GetVictim() && (!me->GetVictim()->CanHaveThreatList() || me->GetVictim()->IsControlledByPlayer()))
             {
                 if (!me->getAttackers().empty() && GetHealthPCT(me) < std::max<int32>(80 - 5 * me->getAttackers().size(), 25))
-                {
                     if (doCast(me, GetSpell(HAND_OF_SALVATION_1)))
-                    {}
-                }
-                return;
+                        return;
             }
 
             if (IAmFree())

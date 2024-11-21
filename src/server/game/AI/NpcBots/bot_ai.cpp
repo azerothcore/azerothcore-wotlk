@@ -17735,7 +17735,7 @@ void bot_ai::UpdateDeadAI(uint32 diff)
         SendUpdateToOutOfRangeBotGroupMembers();
 
     // soulstone
-    if (GetSelfRezSpell() && !GetBG() && (IAmFree() || !master->GetBotMgr()->IsPartyInCombat()) && Rand() < 15)
+    if (GetSelfRezSpell() && !GetBG() && (IAmFree() || !master->GetBotMgr()->IsPartyInCombat(false)) && Rand() < 15)
         me->CastSpell(me, GetSelfRezSpell());
 }
 //opponent unsafe

@@ -1178,7 +1178,7 @@ void BotMgr::Update(uint32 diff)
     //ObjectGuid guid;
     Creature* bot;
     bot_ai* ai;
-    bool partyCombat = IsPartyInCombat();
+    bool partyCombat = IsPartyInCombat(false);
     bool restrictBots = RestrictBots(_bots.begin()->second, false);
 
     _aoespots.clear();
@@ -1334,23 +1334,18 @@ bool BotMgr::RestrictBots(Creature const* bot, bool add) const
     return false;
 }
 
-bool BotMgr::IsPartyInCombat() const
+bool BotMgr::IsPartyInCombat(bool is_pvp) const
 {
-    if (_owner->IsInCombat())
-        return true;
-
-    for (BotMap::const_iterator itr = _bots.begin(); itr != _bots.end(); ++itr)
+    std::vector<Unit*> members = GetAllGroupMembers(_owner);
+    if (members.empty())
     {
-        if (!itr->second->IsInWorld())
-            continue;
-        if (itr->second->IsInCombat())
-            return true;
-        if (Unit const* pet = itr->second->GetBotsPet())
-            if (pet->IsInCombat())
-                return true;
+        members.reserve(_bots.size() + std::size_t(1));
+        members.push_back(_owner);
+        for (BotMap::const_iterator itr = _bots.begin(); itr != _bots.end(); ++itr)
+            members.push_back(itr->second);
     }
 
-    return false;
+    return std::ranges::any_of(members, [=](Unit const* unit) { return unit->IsInCombat() && (!is_pvp || unit->GetCombatManager().HasPvPCombat()); });
 }
 
 bool BotMgr::HasBotClass(uint8 botclass) const
@@ -3085,7 +3080,7 @@ void BotMgr::OnBotPartyEngage(Player const* owner)
                 !player->HaveBot())
                 continue;
 
-            if (player->GetBotMgr()->IsPartyInCombat())
+            if (player->GetBotMgr()->IsPartyInCombat(false))
                 return;
 
             affectedPlayers.push_back(player);

@@ -321,7 +321,7 @@ public:
             else
             {
                 //choose movement aspect first
-                if (!master->GetBotMgr()->IsPartyInCombat())
+                if (!master->GetBotMgr()->IsPartyInCombat(false))
                 {
                     if (!(mask & SPECIFIC_ASPECT_PACK))
                     {
