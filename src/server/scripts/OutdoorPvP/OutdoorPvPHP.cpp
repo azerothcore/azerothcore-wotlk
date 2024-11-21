@@ -21,7 +21,6 @@
 #include "MapMgr.h"
 #include "ObjectMgr.h"
 #include "OutdoorPvP.h"
-#include "OutdoorPvPMgr.h"
 #include "OutdoorPvPScript.h"
 #include "Player.h"
 #include "World.h"

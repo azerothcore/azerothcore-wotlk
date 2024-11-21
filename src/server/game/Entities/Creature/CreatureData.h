@@ -23,7 +23,6 @@
 #include "ItemTemplate.h"
 #include "LootMgr.h"
 #include "Unit.h"
-#include "World.h"
 #include <list>
 
 #define MAX_AGGRO_RESET_TIME 10 // in seconds
@@ -70,7 +69,7 @@ enum CreatureFlagsExtra : uint32
     CREATURE_FLAG_EXTRA_MODULE                          = 0x01000000,
     CREATURE_FLAG_EXTRA_DONT_CALL_ASSISTANCE            = 0x02000000,   // Prevent creatures from calling for assistance on initial aggro
     CREATURE_FLAG_EXTRA_IGNORE_ALL_ASSISTANCE_CALLS     = 0x04000000,   // Prevents creature from responding to assistance calls
-    CREATURE_FLAG_DONT_OVERRIDE_ENTRY_SAI               = 0x08000000,   // Load both ENTRY and GUID specific SAI
+    CREATURE_FLAG_EXTRA_DONT_OVERRIDE_ENTRY_SAI         = 0x08000000,   // Load both ENTRY and GUID specific SAI
     CREATURE_FLAG_EXTRA_DUNGEON_BOSS                    = 0x10000000,   // creature is a dungeon boss (SET DYNAMICALLY, DO NOT ADD IN DB)
     CREATURE_FLAG_EXTRA_IGNORE_PATHFINDING              = 0x20000000,   // creature ignore pathfinding
     CREATURE_FLAG_EXTRA_IMMUNITY_KNOCKBACK              = 0x40000000,   // creature is immune to knockback effects

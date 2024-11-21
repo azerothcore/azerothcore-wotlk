@@ -21,7 +21,6 @@
 #include "Map.h"
 #include "QueryResult.h"
 #include <list>
-#include <map>
 
 class WorldSession;
 class WorldPacket;

@@ -20,6 +20,7 @@
 
 #include "ScriptObject.h"
 #include <vector>
+#include <memory> // NOTE: this import is NEEDED (even though some IDEs report it as unused)
 
 enum ServerHook
 {

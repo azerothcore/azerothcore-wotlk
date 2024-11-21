@@ -32,7 +32,6 @@ EndScriptData */
 #include "MapMgr.h"
 #include "ObjectMgr.h"
 #include "Player.h"
-#include "Random.h"
 #include "SpellAuraEffects.h"
 
 using namespace Acore::ChatCommands;

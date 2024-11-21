@@ -18,7 +18,7 @@
 #ifndef __DYNAMICVISIBILITY_H
 #define __DYNAMICVISIBILITY_H
 
-#include "Common.h"
+#include "Define.h"
 
 struct VisibilitySettingData
 {

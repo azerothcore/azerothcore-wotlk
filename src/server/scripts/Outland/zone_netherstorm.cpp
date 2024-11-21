@@ -731,7 +731,7 @@ public:
                     }
                     break;
                 case 36: //return and quest_complete
-                    player->CompleteQuest(QUEST_MARK_V_IS_ALIVE);
+                    player->GroupEventHappens(QUEST_MARK_V_IS_ALIVE, me);
                     break;
             }
         }

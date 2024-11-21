@@ -18,10 +18,8 @@
 #ifndef _WARDEN_MAC_H
 #define _WARDEN_MAC_H
 
-#include "ARC4.h"
 #include "ByteBuffer.h"
 #include "Warden.h"
-#include <map>
 
 class WorldSession;
 class Warden;

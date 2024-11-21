@@ -109,7 +109,7 @@ void LoadSkillDiscoveryTable()
                 continue;
             }
 
-            SkillDiscoveryStore[reqSkillOrSpell].push_back(SkillDiscoveryEntry(spellId, reqSkillValue, chance));
+            SkillDiscoveryStore[reqSkillOrSpell].emplace_back(spellId, reqSkillValue, chance);
         }
         else if (reqSkillOrSpell == 0)                      // skill case
         {
@@ -122,7 +122,7 @@ void LoadSkillDiscoveryTable()
             }
 
             for (SkillLineAbilityMap::const_iterator _spell_idx = bounds.first; _spell_idx != bounds.second; ++_spell_idx)
-                SkillDiscoveryStore[-int32(_spell_idx->second->SkillLine)].push_back(SkillDiscoveryEntry(spellId, reqSkillValue, chance));
+                SkillDiscoveryStore[-int32(_spell_idx->second->SkillLine)].emplace_back(spellId, reqSkillValue, chance);
         }
         else
         {

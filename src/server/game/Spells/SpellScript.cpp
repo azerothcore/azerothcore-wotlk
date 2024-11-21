@@ -25,7 +25,7 @@ bool _SpellScript::_Validate(SpellInfo const* entry)
 {
     if (!Validate(entry))
     {
-        LOG_ERROR("scripts.spells", "_SpellScript::_Validate: Spell `{}` did not pass Validate() function of script `{}` - script will not be added to the spell", entry->Id, m_scriptName->c_str());
+        LOG_ERROR("spells.scripts", "_SpellScript::_Validate: Spell `{}` did not pass Validate() function of script `{}` - script will not be added to the spell", entry->Id, m_scriptName->c_str());
         return false;
     }
     return true;
@@ -35,7 +35,7 @@ bool _SpellScript::_ValidateSpellInfo(uint32 spellId)
 {
     if (!sSpellMgr->GetSpellInfo(spellId))
     {
-        LOG_ERROR("scripts.spells", "_SpellScript::ValidateSpellInfo: Spell {} does not exist.", spellId);
+        LOG_ERROR("spells.scripts", "_SpellScript::ValidateSpellInfo: Spell {} does not exist.", spellId);
         return false;
     }
 
