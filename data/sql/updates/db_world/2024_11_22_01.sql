@@ -1,3 +1,4 @@
+-- DB update 2024_11_22_00 -> 2024_11_22_01
 --
 -- fix (db/Quest) - Makes a bunch of "mandatory" quests into "optional" 2.0
 -- The Spirits of Stonetalon requirement removed from Goblin Invaders
