@@ -335,6 +335,7 @@ public:
     /// Send all worldstate data to all player in zone.
     virtual void SendInitWorldStatesToAll() = 0;
     virtual void FillInitialWorldStates(WorldPacket& /*data*/) = 0;
+    virtual void SendUpdateWorldStatesToWorld() = 0;
 
     /// Return if we can use mount in battlefield
     bool CanFlyIn() { return !m_isActive; }
