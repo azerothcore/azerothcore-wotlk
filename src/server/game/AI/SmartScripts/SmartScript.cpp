@@ -4233,6 +4233,18 @@ void SmartScript::ProcessEvent(SmartScriptHolder& e, Unit* unit, uint32 var0, ui
 
                 break;
             }
+        case SMART_EVENT_IS_IN_MELEE_RANGE:
+            {
+                if (!me)
+                    return;
+
+                if (Unit* victim = me->GetVictim())
+                    if ((!e.event.meleeRange.invert && me->IsWithinMeleeRange(victim, static_cast<float>(e.event.meleeRange.dist))) ||
+                        (e.event.meleeRange.invert && !me->IsWithinMeleeRange(victim, static_cast<float>(e.event.meleeRange.dist))))
+                        ProcessTimedAction(e, e.event.minMaxRepeat.repeatMin, e.event.minMaxRepeat.repeatMax, victim);
+
+                break;
+            }
         case SMART_EVENT_RECEIVE_EMOTE:
             if (e.event.emote.emote == var0)
             {
@@ -4793,6 +4805,7 @@ void SmartScript::InitTimer(SmartScriptHolder& e)
         case SMART_EVENT_AREA_CASTING:
         case SMART_EVENT_IS_BEHIND_TARGET:
         case SMART_EVENT_FRIENDLY_HEALTH_PCT:
+        case SMART_EVENT_IS_IN_MELEE_RANGE:
             RecalcTimer(e, e.event.minMaxRepeat.min, e.event.minMaxRepeat.max);
             break;
         case SMART_EVENT_DISTANCE_CREATURE:
@@ -4878,6 +4891,7 @@ void SmartScript::UpdateTimer(SmartScriptHolder& e, uint32 const diff)
             case SMART_EVENT_FRIENDLY_HEALTH_PCT:
             case SMART_EVENT_DISTANCE_CREATURE:
             case SMART_EVENT_DISTANCE_GAMEOBJECT:
+            case SMART_EVENT_IS_IN_MELEE_RANGE:
                 {
                     ASSERT(executionStack.empty());
                     executionStack.emplace_back(SmartScriptFrame{ e, nullptr, 0, 0, false, nullptr, nullptr });

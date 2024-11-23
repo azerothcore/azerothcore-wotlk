@@ -624,6 +624,9 @@ void BossAI::_Reset()
     if (!me->IsAlive())
         return;
 
+    if (me->IsEngaged())
+        return;
+
     me->SetCombatPulseDelay(0);
     me->ResetLootMode();
     events.Reset();

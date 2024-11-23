@@ -817,7 +817,12 @@ struct npc_lord_sanguinar : public advisor_baseAI
 {
     npc_lord_sanguinar(Creature* creature) : advisor_baseAI(creature) { };
 
-    void ScheduleEvents() override {}
+    void ScheduleEvents() override
+    {
+        ScheduleTimedEvent(0s, 2s, [&]{
+            DoCastSelf(SPELL_BELLOWING_ROAR);
+        }, 30s, 40s);
+    }
 };
 
 struct npc_capernian : public advisor_baseAI
