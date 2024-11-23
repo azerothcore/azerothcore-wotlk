@@ -310,29 +310,59 @@ void SmartAIMgr::CheckIfSmartAIInDatabaseExists()
         if (creatureTemplate.AIName != "SmartAI")
             continue;
 
-        bool smartAIEntryFound = false;
+        bool found = false;
 
-        for (uint8 i = 0; (i < SMART_SCRIPT_TYPE_MAX) && (!smartAIEntryFound); i++)
+        // check template SAI
+        for (uint8 i = 0; (i < SMART_SCRIPT_TYPE_MAX) && (!found); i++)
             if (mEventMap[uint32(i)].find(creatureTemplate.Entry) != mEventMap[uint32(i)].end())
-                smartAIEntryFound = true;
+                found = true;
 
-        if (!smartAIEntryFound)
+        // check GUID SAI
+        if (!found)
+        {
+            for (auto const& pair : sObjectMgr->GetAllCreatureData())
+            {
+                if (pair.second.id1 != creatureTemplate.Entry)
+                    continue;
+
+                for (uint8 i = 0; (i < SMART_SCRIPT_TYPE_MAX) && (!found); i++)
+                    if (mEventMap[uint32(i)].find((-1) * pair.first) != mEventMap[uint32(i)].end())
+                        found = true;
+            }
+        }
+
+        if (!found)
             LOG_ERROR("sql.sql", "Creature entry ({}) has SmartAI enabled but no SmartAI entries in the database.", creatureTemplate.Entry);
     }
 
     // check all gameobjects
     for (auto const& [entry, gameobjectTemplate] : *sObjectMgr->GetGameObjectTemplates())
     {
-        if (gameobjectTemplate.AIName != "SmartGameobjectAI")
+        if (gameobjectTemplate.AIName != "SmartGameObjectAI")
             continue;
 
-        bool smartAIEntryFound = false;
+        bool found = false;
 
-        for (uint8 i = 0; (i < SMART_SCRIPT_TYPE_MAX) && (!smartAIEntryFound); i++)
+        // check template SAI
+        for (uint8 i = 0; (i < SMART_SCRIPT_TYPE_MAX) && (!found); i++)
             if (mEventMap[uint32(i)].find(gameobjectTemplate.entry) != mEventMap[uint32(i)].end())
-                smartAIEntryFound = true;
+                found = true;
 
-        if (!smartAIEntryFound)
+        // check GUID SAI
+        if (!found)
+        {
+            for (auto const& pair : sObjectMgr->GetAllGOData())
+            {
+                if (pair.second.id != gameobjectTemplate.entry)
+                    continue;
+
+                for (uint8 i = 0; (i < SMART_SCRIPT_TYPE_MAX) && (!found); i++)
+                    if (mEventMap[uint32(i)].find((-1) * pair.first) != mEventMap[uint32(i)].end())
+                        found = true;
+            }
+        }
+
+        if (!found)
             LOG_ERROR("sql.sql", "Gameobject entry ({}) has SmartGameobjectAI enabled but no SmartAI entries in the database.", gameobjectTemplate.entry);
     }
 }
