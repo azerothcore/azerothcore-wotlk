@@ -296,8 +296,47 @@ void SmartAIMgr::LoadSmartAIFromDB()
         mEventMap[source_type][temp.entryOrGuid].push_back(temp);
     } while (result->NextRow());
 
+    CheckIfSmartAIInDatabaseExists();
+
     LOG_INFO("server.loading", ">> Loaded {} SmartAI scripts in {} ms", count, GetMSTimeDiffToNow(oldMSTime));
     LOG_INFO("server.loading", " ");
+}
+
+void SmartAIMgr::CheckIfSmartAIInDatabaseExists()
+{
+    // check all creatures
+    for (auto const& [entry, creatureTemplate] : *sObjectMgr->GetCreatureTemplates())
+    {
+        if (creatureTemplate.AIName != "SmartAI")
+            continue;
+
+        uint32 entry = creatureTemplate.Entry;
+        bool smartAIEntryFound = false;
+
+        for (uint8 i = 0; (i < SMART_SCRIPT_TYPE_MAX) && (!smartAIEntryFound); i++)
+            if (mEventMap[uint32(i)].find(entry) != mEventMap[uint32(i)].end())
+                smartAIEntryFound = true;
+
+        if (!smartAIEntryFound)
+            LOG_ERROR("sql.sql", "Creature entry ({}) has SmartAI enabled but no SmartAI entries in the database.", entry);
+    }
+
+    // check all gameobjects
+    for (auto const& [entry, gameobjectTemplate] : *sObjectMgr->GetGameObjectTemplates())
+    {
+        if (gameobjectTemplate.AIName != "SmartGameobjectAI")
+            continue;
+
+        uint32 entry = gameobjectTemplate.entry;
+        bool smartAIEntryFound = false;
+
+        for (uint8 i = 0; (i < SMART_SCRIPT_TYPE_MAX) && (!smartAIEntryFound); i++)
+            if (mEventMap[uint32(i)].find(entry) != mEventMap[uint32(i)].end())
+                smartAIEntryFound = true;
+
+        if (!smartAIEntryFound)
+            LOG_ERROR("sql.sql", "Gameobject entry ({}) has SmartGameobjectAI enabled but no SmartAI entries in the database.", entry);
+    }
 }
 
 /*static*/ bool SmartAIMgr::EventHasInvoker(SMART_EVENT event)
