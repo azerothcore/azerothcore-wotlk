@@ -8,7 +8,7 @@ DELETE FROM `creature_addon` WHERE `guid` IN (128860, 128861, 128862, 128863, 12
 
 -- Add Waypoints
 
-DELETE FROM `waypoint_data` WHERE `id` IN (12889500, 12890100, 12889300, 12889400, 12889200, 12889800, 12889900, 12889600);
+DELETE FROM `waypoint_data` WHERE `id` IN (12889500, 12890100, 12889300, 12889400, 12889200, 12889800, 12889900, 12889600, 12889800);
 INSERT INTO `waypoint_data` (`id`, `point`, `position_x`, `position_y`, `position_z`, `orientation`, `delay`, `move_type`, `action`, `action_chance`, `wpguid`) VALUES
 (12889500, 1, 2457.81, -5971.01, 94.5838, NULL, 0, 0, 0, 100, 0),
 (12889500, 2, 2468.17, -5975.07, 95.2765, NULL, 0, 0, 0, 100, 0),
