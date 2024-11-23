@@ -268,6 +268,7 @@ void SmartAIMgr::LoadSmartAIFromDB()
             case SMART_EVENT_AREA_RANGE:
             case SMART_EVENT_AREA_CASTING:
             case SMART_EVENT_IS_BEHIND_TARGET:
+            case SMART_EVENT_IS_IN_MELEE_RANGE:
                 if (temp.event.minMaxRepeat.repeatMin == 0 && temp.event.minMaxRepeat.repeatMax == 0)
                     temp.event.event_flags |= SMART_EVENT_FLAG_NOT_REPEATABLE;
                 break;
@@ -347,6 +348,7 @@ void SmartAIMgr::LoadSmartAIFromDB()
         case SMART_EVENT_NEAR_PLAYERS:
         case SMART_EVENT_SUMMONED_UNIT_EVADE:
         case SMART_EVENT_DATA_SET:
+        case SMART_EVENT_IS_IN_MELEE_RANGE:
             return true;
         default:
             return false;
@@ -553,6 +555,7 @@ bool SmartAIMgr::CheckUnusedEventParams(SmartScriptHolder const& e)
             case SMART_EVENT_FOLLOW_COMPLETED: return NO_PARAMS;
             case SMART_EVENT_EVENT_PHASE_CHANGE: return sizeof(SmartEvent::eventPhaseChange);
             case SMART_EVENT_IS_BEHIND_TARGET: return sizeof(SmartEvent::minMaxRepeat);
+            case SMART_EVENT_IS_IN_MELEE_RANGE: return sizeof(SmartEvent::meleeRange);
             case SMART_EVENT_GAME_EVENT_START: return sizeof(SmartEvent::gameEvent);
             case SMART_EVENT_GAME_EVENT_END: return sizeof(SmartEvent::gameEvent);
             case SMART_EVENT_GO_STATE_CHANGED: return sizeof(SmartEvent::goStateChanged);
@@ -964,6 +967,7 @@ bool SmartAIMgr::IsEventValid(SmartScriptHolder& e)
             case SMART_EVENT_AREA_CASTING:
             case SMART_EVENT_IS_BEHIND_TARGET:
             case SMART_EVENT_RANGE:
+            case SMART_EVENT_IS_IN_MELEE_RANGE:
                 if (!IsMinMaxValid(e, e.event.minMaxRepeat.min, e.event.minMaxRepeat.max))
                     return false;
 
