@@ -282,10 +282,22 @@ struct boss_janalai : public BossAI
 
         me->GetMap()->DoForAllPlayers([&](Player* player)
         {
-            float distanceToPlatform = me->GetDistance(player);
+            const float centerX = -34.585155f;
+            const float centerY = 1149.6436f;
 
-            if (distanceToPlatform > 15.0f && player->IsAlive())
-                player->NearTeleportTo(janalainPos.GetPositionX() - 5 + rand() % 10, janalainPos.GetPositionY() - 5 + rand() % 10, janalainPos.GetPositionZ(), 0.0f);
+            const float halfWidth = 48.6762f / 2.0f;
+            const float halfHeight = 52.3828f / 2.0f;
+
+            float playerX = player->GetPositionX();
+            float playerY = player->GetPositionY();
+
+            const float minX = centerX - halfWidth;
+            const float maxX = centerX + halfWidth;
+            const float minY = centerY - halfHeight;
+            const float maxY = centerY + halfHeight;
+
+            if ((playerX < minX || playerX > maxX || playerY < minY || playerY > maxY) && player->IsAlive())
+                player->NearTeleportTo(centerX + (rand() % 10 - 5), centerY + (rand() % 10 - 5), janalainPos.GetPositionZ(), 0.0f);
         });
         //DoCast(Temp, SPELL_SUMMON_PLAYERS, true) // core bug, spell does not work if too far
         ThrowBombs();
