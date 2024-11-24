@@ -361,6 +361,18 @@ void SmartAIMgr::CheckIfSmartAIInDatabaseExists()
         if (!found)
             LOG_ERROR("sql.sql", "Gameobject entry ({}) has SmartGameobjectAI enabled but no SmartAI entries in the database.", gameobjectTemplate.entry);
     }
+
+    // SMART_SCRIPT_TYPE_AREATRIGGER
+    uint32 scriptID = sObjectMgr->GetScriptId("SmartTrigger");
+
+    for (auto const& pair : sObjectMgr->GetAllAreaTriggerScriptData())
+    {
+        if (pair.second != scriptID)
+            continue;
+
+        if (mEventMap[uint32(SmartScriptType::SMART_SCRIPT_TYPE_AREATRIGGER)].find(pair.first) == mEventMap[uint32(SmartScriptType::SMART_SCRIPT_TYPE_AREATRIGGER)].end())
+            LOG_ERROR("sql.sql", "AreaTrigger entry ({}) has SmartTrigger enabled but no SmartAI entries in the database.", pair.first);
+    }
 }
 
 /*static*/ bool SmartAIMgr::EventHasInvoker(SMART_EVENT event)
