@@ -78,27 +78,40 @@ struct boss_akilzon : public BossAI
     {
         _JustEngagedWith();
 
-        ScheduleTimedEvent(10s, 20s, [&] {
-            Unit* target = SelectTarget(SelectTargetMethod::Random, 1);
-            if (!target)
-                target = me->GetVictim();
-            if (target)
+        _stormLock = false;
+
+        ScheduleTimedEvent(10s, 20s, [&]
+        {
+            if (!_stormLock)
             {
-                _targetGUID = target->GetGUID();
-                DoCast(target, SPELL_STATIC_DISRUPTION, false);
-                me->SetInFront(me->GetVictim());
+                Unit* target = SelectTarget(SelectTargetMethod::Random, 1);
+                if (!target)
+                    target = me->GetVictim();
+                if (target)
+                {
+                    _targetGUID = target->GetGUID();
+                    DoCast(target, SPELL_STATIC_DISRUPTION, false);
+                    me->SetInFront(me->GetVictim());
+                }
             }
         }, 10s, 18s);
 
-        ScheduleTimedEvent(20s, 30s, [&] {
-            DoCastRandomTarget(SPELL_GUST_OF_WIND, 1);
+        ScheduleTimedEvent(20s, 30s, [&]
+        {
+            if (!_stormLock)
+                DoCastRandomTarget(SPELL_GUST_OF_WIND, 1);
         }, 20s, 30s);
 
-        ScheduleTimedEvent(10s, 20s, [&] {
-            DoCastVictim(SPELL_CALL_LIGHTNING);
+        ScheduleTimedEvent(10s, 20s, [&]
+        {
+            if (!_stormLock)
+                DoCastVictim(SPELL_CALL_LIGHTNING);
         }, 12s, 17s);
 
-        ScheduleTimedEvent(1min, [&] {
+        ScheduleTimedEvent(1min, [&]
+        {
+            _stormLock = true;
+
             Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 50, true);
             if (!target)
             {
@@ -112,11 +125,18 @@ struct boss_akilzon : public BossAI
             target->GetPosition(x, y, z);
             target->GetMotionMaster()->MoveJump(x, y, target->GetPositionZ() + 16.0f, 1.0f, 1.0f);
 
-            me->m_Events.AddEventAtOffset([&] {
+            me->m_Events.AddEventAtOffset([&]
+            {
+                _stormLock = false;
+            }, 10s);
+
+            me->m_Events.AddEventAtOffset([&]
+            {
                 HandleStormSequence();
             }, 3s);
 
-            me->m_Events.AddEventAtOffset([&] {
+            me->m_Events.AddEventAtOffset([&]
+            {
                 if (!_isRaining)
                 {
                     SetWeather(WEATHER_STATE_HEAVY_RAIN, 0.9999f);
@@ -125,7 +145,8 @@ struct boss_akilzon : public BossAI
             }, Seconds(urand(47, 52)));
         }, 1min);
 
-        ScheduleTimedEvent(47s, 52s, [&] {
+        ScheduleTimedEvent(47s, 52s, [&]
+        {
             if (!_isRaining)
             {
                 SetWeather(WEATHER_STATE_HEAVY_RAIN, 0.9999f);
@@ -133,7 +154,8 @@ struct boss_akilzon : public BossAI
             }
         }, 47s, 52s);
 
-        me->m_Events.AddEventAtOffset([&] {
+        me->m_Events.AddEventAtOffset([&]
+        {
             Talk(SAY_ENRAGE);
             DoCastSelf(SPELL_BERSERK, true);
         }, 10min);
@@ -216,7 +238,8 @@ private:
     ObjectGuid _birdGUIDs[8];
     ObjectGuid _targetGUID;
     ObjectGuid _cycloneGUID;
-    bool   _isRaining;
+    bool _isRaining;
+    bool _stormLock;
 };
 
 struct npc_akilzon_eagle : public ScriptedAI
