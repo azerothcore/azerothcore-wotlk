@@ -271,6 +271,9 @@ struct boss_nalorakk : public BossAI
             DoCastSelf(SPELL_BEARFORM, true);
             scheduler.CancelGroup(GROUP_HUMAN);
             _bearForm = true;
+
+            me->SetAttackTime(OFF_ATTACK, 0);
+
             scheduler.Schedule(2s, GROUP_BEAR, [this](TaskContext context)
             {
                 DoCastVictim(SPELL_LACERATINGSLASH);
