@@ -265,15 +265,13 @@ struct boss_zuljin : public BossAI
 
     void JustDied(Unit* /*killer*/) override
     {
-        if (Creature* spirit = summons.GetCreatureWithEntry(Transform[_nextPhase].spiritEntry))
-        {
-            spirit->CastStop();
-            spirit->SetUInt32Value(UNIT_FIELD_BYTES_1, UNIT_STAND_STATE_DEAD);
-        }
-
         instance->SetBossState(DATA_ZULJIN, DONE);
         Talk(SAY_DEATH);
         summons.DespawnEntry(CREATURE_COLUMN_OF_FIRE);
+
+        me->m_Events.AddEventAtOffset( [this] {
+            summons.DespawnAll();
+        }, 3s);
     }
 
     void SpawnAdds()
