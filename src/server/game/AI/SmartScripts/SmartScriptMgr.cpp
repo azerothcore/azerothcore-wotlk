@@ -313,7 +313,7 @@ void SmartAIMgr::CheckIfSmartAIInDatabaseExists()
         bool found = false;
 
         // check template SAI
-        if (mEventMap[uint32(SmartScriptType::SMART_SCRIPT_TYPE_CREATURE)].find(creatureTemplate.Entry) == mEventMap[uint32(SmartScriptType::SMART_SCRIPT_TYPE_CREATURE)].end())
+        if (mEventMap[uint32(SmartScriptType::SMART_SCRIPT_TYPE_CREATURE)].find(creatureTemplate.Entry) != mEventMap[uint32(SmartScriptType::SMART_SCRIPT_TYPE_CREATURE)].end())
             found = true;
         else
         {
