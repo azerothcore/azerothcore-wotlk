@@ -124,6 +124,11 @@ bool TaskScheduler::IsGroupScheduled(group_t const group)
     return _task_holder.IsGroupQueued(group);
 }
 
+Milliseconds TaskScheduler::GetNextGroupOcurrence(group_t const group) const
+{
+    return std::chrono::duration_cast<std::chrono::milliseconds>(_task_holder.GetNextGroupOcurrence(group) - clock_t::now());
+}
+
 void TaskScheduler::TaskQueue::Push(TaskContainer&& task)
 {
     container.insert(task);
@@ -189,6 +194,18 @@ bool TaskScheduler::TaskQueue::IsGroupQueued(group_t const group)
     return false;
 }
 
+TaskScheduler::timepoint_t TaskScheduler::TaskQueue::GetNextGroupOcurrence(group_t const group) const
+{
+    TaskScheduler::timepoint_t next = TaskScheduler::timepoint_t::max();
+    for (auto const& task : container)
+    {
+        if (task->IsInGroup(group) && task->_end < next)
+            next = task->_end;
+    }
+
+    return next;
+}
+
 bool TaskScheduler::TaskQueue::IsEmpty() const
 {
     return container.empty();
@@ -229,6 +246,11 @@ TaskContext& TaskContext::ClearGroup()
 TaskScheduler::repeated_t TaskContext::GetRepeatCounter() const
 {
     return _task->_repeated;
+}
+
+TaskScheduler::timepoint_t TaskContext::GetNextOcurrence() const
+{
+    return _task->_end;
 }
 
 TaskContext& TaskContext::Async(std::function<void()> const& callable)
