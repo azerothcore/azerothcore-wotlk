@@ -148,7 +148,7 @@ class TaskScheduler
         /// Check if the group exists and is currently scheduled.
         bool IsGroupQueued(group_t const group);
 
-        // Get next group occurrence
+        // Returns the next group occurrence.
         TaskScheduler::timepoint_t GetNextGroupOcurrence(group_t const group) const;
 
         bool IsEmpty() const;
@@ -376,7 +376,7 @@ public:
         return RescheduleGroup(group, RandomDurationBetween(min, max));
     }
 
-    // Returns the next group occurrence
+    // Returns the next group occurrence.
     Milliseconds GetNextGroupOcurrence(group_t const group) const;
 
 private:
