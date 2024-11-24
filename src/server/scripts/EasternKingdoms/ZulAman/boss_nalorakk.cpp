@@ -242,6 +242,9 @@ struct boss_nalorakk : public BossAI
             Talk(SAY_SHIFTEDTOTROLL);
             scheduler.CancelGroup(GROUP_BEAR);
             _bearForm = false;
+
+            me->SetCanDualWield(true);
+
             scheduler.Schedule(15s, 20s, GROUP_HUMAN, [this](TaskContext context)
             {
                 Talk(SAY_SURGE);
@@ -271,6 +274,9 @@ struct boss_nalorakk : public BossAI
             DoCastSelf(SPELL_BEARFORM, true);
             scheduler.CancelGroup(GROUP_HUMAN);
             _bearForm = true;
+
+            me->SetCanDualWield(false);
+
             scheduler.Schedule(2s, GROUP_BEAR, [this](TaskContext context)
             {
                 DoCastVictim(SPELL_LACERATINGSLASH);
