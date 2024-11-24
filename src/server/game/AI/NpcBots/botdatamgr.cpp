@@ -977,19 +977,29 @@ void BotDataMgr::LoadNpcBots(bool spawn)
         BOT_LOG_INFO("server.loading", ">> Loaded 0 npcbots. Table `characters_npcbot` is empty!");
 
     std::list<uint32> invalid_ids;
+
+    auto report_inavlid_ids = [&invalid_ids](std::string_view error_msg) {
+        std::ostringstream ss;
+        ss << error_msg << " IDs: ";
+        for (uint32 bot_id : invalid_ids)
+            ss << Bcore::ToString(bot_id) << ", ";
+        ss << "\nFix your DB contents and retry";
+        ASSERT(false, ss.str().c_str());
+    };
+
     for (CreatureDataContainer::value_type const& kv : sObjectMgr->GetAllCreatureData())
         if (kv.second.id1 >= BOT_ENTRY_BEGIN && sObjectMgr->GetCreatureTemplate(kv.second.id1)->IsNPCBot() && std::ranges::find(entryList, kv.second.id1) == entryList.cend())
             invalid_ids.push_back(kv.second.id1);
 
     if (!invalid_ids.empty())
-    {
-        std::ostringstream ss;
-        ss << "Invalid NPCBot spawns found in `creature` table which have no data in `characters_npcbot` table! IDs: ";
-        for (uint32 bot_id : invalid_ids)
-            ss << Bcore::ToString(bot_id) << ", ";
-        ss << "\nFix your DB contents and retry";
-        ASSERT(false, ss.str().c_str());
-    }
+        report_inavlid_ids("Invalid NPCBot spawns found in `creature` table having no data in `characters_npcbot` table!");
+
+    for (uint32 bot_id : entryList)
+        if (!_botsExtras.contains(bot_id))
+            invalid_ids.push_back(bot_id);
+
+    if (!invalid_ids.empty())
+        report_inavlid_ids("Invalid NPCBots found in `characters_npcbot` table having no data in `creature_template_npcbot_extras` table!");
 
     allBotsLoaded = true;
 }
