@@ -1,3 +1,4 @@
+-- DB update 2024_11_23_01 -> 2024_11_24_00
 --
 -- not selectable
 UPDATE `creature_template` SET `unit_flags` = `unit_flags` | 33554432 WHERE (`entry` = 24223);
