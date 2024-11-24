@@ -884,6 +884,7 @@ public:
     [[nodiscard]] AreaTriggerTeleport const* GetGoBackTrigger(uint32 Map) const;
     [[nodiscard]] AreaTriggerTeleport const* GetMapEntranceTrigger(uint32 Map) const;
 
+    [[nodiscard]] AreaTriggerScriptContainer const& GetAllAreaTriggerScriptData() const { return _areaTriggerScriptStore; }
     uint32 GetAreaTriggerScriptId(uint32 trigger_id);
     SpellScriptsBounds GetSpellScriptsBounds(uint32 spell_id);
 
