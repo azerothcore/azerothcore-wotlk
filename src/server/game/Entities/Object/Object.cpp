@@ -1850,6 +1850,7 @@ bool WorldObject::CanSeeOrDetect(WorldObject const* obj, bool ignoreStealth, boo
             else
                 return false;
         }
+        else
             return false;
     }
 
