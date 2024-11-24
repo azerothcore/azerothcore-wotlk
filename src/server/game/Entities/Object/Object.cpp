@@ -1837,16 +1837,6 @@ bool WorldObject::CanSeeOrDetect(WorldObject const* obj, bool ignoreStealth, boo
         return m_serverSideVisibilityDetect.GetValue(SERVERSIDE_VISIBILITY_GM) >= obj->m_serverSideVisibility.GetValue(SERVERSIDE_VISIBILITY_GM);
 
     // Ghost players, Spirit Healers, and some other NPCs
-    auto check1 = corpseVisibility;
-    auto check2 = !check1;
-
-    auto check3 = obj->m_serverSideVisibility.GetValue(SERVERSIDE_VISIBILITY_GHOST);
-    auto check4 = m_serverSideVisibilityDetect.GetValue(SERVERSIDE_VISIBILITY_GHOST);
-    auto check5 = check3 & check4;
-    auto check6 = !check5;
-
-    auto check7 = check2 && check6;
-
     if (!corpseVisibility && !(obj->m_serverSideVisibility.GetValue(SERVERSIDE_VISIBILITY_GHOST) & m_serverSideVisibilityDetect.GetValue(SERVERSIDE_VISIBILITY_GHOST)))
     {
         // Alive players can see dead players in some cases, but other objects can't do that
