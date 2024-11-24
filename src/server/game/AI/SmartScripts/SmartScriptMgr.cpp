@@ -324,7 +324,10 @@ void SmartAIMgr::CheckIfSmartAIInDatabaseExists()
                     continue;
 
                 if (mEventMap[uint32(SmartScriptType::SMART_SCRIPT_TYPE_CREATURE)].find((-1) * pair.first) != mEventMap[uint32(SmartScriptType::SMART_SCRIPT_TYPE_CREATURE)].end())
+                {
                     found = true;
+                    break;
+                }
             }
         }
 
@@ -352,7 +355,10 @@ void SmartAIMgr::CheckIfSmartAIInDatabaseExists()
                     continue;
 
                 if (mEventMap[uint32(SmartScriptType::SMART_SCRIPT_TYPE_GAMEOBJECT)].find((-1) * pair.first) != mEventMap[uint32(SmartScriptType::SMART_SCRIPT_TYPE_GAMEOBJECT)].end())
+                {
                     found = true;
+                    break;
+                }
             }
         }
 
