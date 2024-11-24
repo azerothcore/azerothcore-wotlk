@@ -313,12 +313,11 @@ void SmartAIMgr::CheckIfSmartAIInDatabaseExists()
         bool found = false;
 
         // check template SAI
-        if (mEventMap[uint32(SmartScriptType::SMART_SCRIPT_TYPE_CREATURE)].find(creatureTemplate.Entry) != mEventMap[uint32(SmartScriptType::SMART_SCRIPT_TYPE_CREATURE)].end())
+        if (mEventMap[uint32(SmartScriptType::SMART_SCRIPT_TYPE_CREATURE)].find(creatureTemplate.Entry) == mEventMap[uint32(SmartScriptType::SMART_SCRIPT_TYPE_CREATURE)].end())
             found = true;
-
-        // check GUID SAI
-        if (!found)
+        else
         {
+            // check GUID SAI
             for (auto const& pair : sObjectMgr->GetAllCreatureData())
             {
                 if (pair.second.id1 != creatureTemplate.Entry)
@@ -344,10 +343,9 @@ void SmartAIMgr::CheckIfSmartAIInDatabaseExists()
         // check template SAI
         if (mEventMap[uint32(SmartScriptType::SMART_SCRIPT_TYPE_GAMEOBJECT)].find(gameobjectTemplate.entry) != mEventMap[uint32(SmartScriptType::SMART_SCRIPT_TYPE_GAMEOBJECT)].end())
             found = true;
-
-        // check GUID SAI
-        if (!found)
+        else
         {
+            // check GUID SAI
             for (auto const& pair : sObjectMgr->GetAllGOData())
             {
                 if (pair.second.id != gameobjectTemplate.entry)
