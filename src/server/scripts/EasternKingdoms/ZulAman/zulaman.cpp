@@ -326,13 +326,13 @@ enum Spells
 enum Phases
 {
     PHASE_GONG                         = 0,
-    PHASE_GATE_OPENED                  = 1,
-    PHASE_GATE_CLOSED                  = 2,
+    PHASE_GATE_CLOSED                  = 1,
+    PHASE_GATE_OPENED                  = 2
 };
 
 enum Actions
 {
-    ACTION_COMPLETE_GONG_RITUAL        = 0,
+    ACTION_COMPLETE_GONG_RITUAL        = 0
 };
 
 enum Waypoints
