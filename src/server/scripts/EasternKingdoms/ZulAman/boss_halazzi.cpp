@@ -42,7 +42,7 @@ enum Spells
 
 enum UniqueEvents
 {
-    EVENT_BERSERK                = 0
+    EVENT_BERSERK                = 1
 };
 
 enum Hal_CreatureIds
@@ -135,6 +135,14 @@ struct boss_halazzi : public BossAI
     {
         if (spell->Id == SPELL_TRANSFORM_DUMMY)
             me->UpdateEntry(NPC_HALAZZI_TROLL);
+    }
+
+    void JustSummoned(Creature* summon) override
+    {
+        BossAI::JustSummoned(summon);
+
+        if (summon->GetEntry() == NPC_TOTEM)
+            summon->Attack(me->GetVictim(), false);
     }
 
     void AttackStart(Unit* who) override
