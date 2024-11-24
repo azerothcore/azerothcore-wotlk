@@ -100,7 +100,6 @@ struct boss_halazzi : public BossAI
         BossAI::Reset();
         _transformCount = 0;
         _phase = PHASE_NONE;
-        EnterPhase(PHASE_LYNX);
         SetInvincibility(true);
     }
 
@@ -159,10 +158,7 @@ struct boss_halazzi : public BossAI
             case PHASE_LYNX:
             {
                 if (_phase == PHASE_MERGE)
-                {
-                    DoCastSelf(SPELL_TRANSFIGURE, true);
                     me->ResumeChasingVictim();
-                }
                 summons.DespawnAll();
 
                 if (_transformCount)
