@@ -3476,20 +3476,79 @@ void bot_ai::ReceiveEmote(Player* player, uint32 emote)
             break;
         case TEXT_EMOTE_TICKLE:
         {
-            if (master != player && !player->IsGameMaster())
+            if (!player->IsGameMaster())
                 break;
 
             std::ostringstream report;
-            report << "Problems:";
+            report << "Bot " << me->GetName() << " (" << me->GetEntry() << "), "
+                << "ai owner: " << _ownerGuid << ", data owner: " << _botData->owner << ", master guid: " << master->GetGUID().ToString() << ", "
+                << "command states: " << _botCommandState << ", await states: " << uint32(_botAwaitState);
 
-            if (_ownerGuid && !HasBotCommandState(BOT_COMMAND_UNBIND) && (master->ToUnit() == me->ToUnit() || _ownerGuid != master->GetGUID().GetRawValue()))
+            report << "\nunit flags:";
+            for (UnitFlags uf : EnumUtils::Iterate<UnitFlags>())
+                if (me->HasUnitFlag(uf))
+                    report << "\n  " << EnumUtils::ToString(uf).Title;
+            report << "\nunit states:";
+            uint32 counter = 1;
+            for (uint32 st = UNIT_STATE_DIED; st <= UNIT_STATE_NO_ENVIRONMENT_UPD; st <<= 1u, ++counter)
+                if (me->HasUnitState(st))
+                    report << "\n  UNIT_STATE_" << counter << " (" << st << ")";
+
+            report << "\nProblems:";
+
+            if (_ownerGuid)
             {
-                if (Player* real_owner = ObjectAccessor::FindPlayerByLowGUID(_ownerGuid))
+                if (HasBotCommandState(BOT_COMMAND_UNBIND))
                 {
-                    report << "\n  owner is in world by bot isn't owned by it";
-                    if (!SetBotOwner(real_owner))
-                        report << "\n    (failed to set owner to '" << real_owner->GetName() << "'!)";
+                    report << "\n  unbound, re-binding...";
+                    RemoveBotCommandState(BOT_COMMAND_UNBIND);
                 }
+                bool invalid_master = false;
+                if (master->GetGUID() == me->GetGUID())
+                {
+                    report << "\n  master->GetGUID() == me->GetGUID()";
+                    invalid_master = true;
+                }
+                if (_ownerGuid != _botData->owner)
+                {
+                    report << "\n  _ownerGuid != _botData->owner";
+                    invalid_master = true;
+                }
+                if (master->GetGUID() == me->GetGUID())
+                {
+                    report << "\n  _ownerGuid != master->GetGUID().GetRawValue()";
+                    invalid_master = true;
+                }
+                if (invalid_master)
+                {
+                    if (Player* real_owner = ObjectAccessor::FindPlayerByLowGUID(_ownerGuid))
+                    {
+                        report << "\n  owner is in world by bot isn't owned by it";
+                        if (!SetBotOwner(real_owner))
+                            report << "\n    (failed to set owner to '" << real_owner->GetName() << "'!)";
+                    }
+                    else
+                    {
+                        ObjectGuid owner_guid = ObjectGuid::Create<HighGuid::Player>(_ownerGuid);
+                        real_owner = ObjectAccessor::FindConnectedPlayer(owner_guid);
+                        if (real_owner)
+                            report << "\n  owner is found (connected) but not in world!";
+                        else if (sCharacterCache->HasCharacterCacheEntry(owner_guid))
+                            report << "\n  owner is found (logged out) but not in world!";
+                        else
+                            report << "\n  owner is not found!!!";
+                    }
+                }
+            }
+            if (!_atHome)
+            {
+                report << "\n  _atHome == false";
+                _atHome = true;
+            }
+            if (_evadeMode)
+            {
+                report << "\n  _evadeMode == true";
+                _evadeMode = false;
             }
             if ((me->HasUnitFlag(UNIT_FLAG_STUNNED) || me->HasUnitState(UNIT_STATE_STUNNED)) &&
                 !me->HasAuraType(SPELL_AURA_MOD_STUN))
