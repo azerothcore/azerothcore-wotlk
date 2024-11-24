@@ -304,7 +304,7 @@ void SmartAIMgr::LoadSmartAIFromDB()
 
 void SmartAIMgr::CheckIfSmartAIInDatabaseExists()
 {
-    // check all creatures
+    // SMART_SCRIPT_TYPE_CREATURE
     for (auto const& [entry, creatureTemplate] : *sObjectMgr->GetCreatureTemplates())
     {
         if (creatureTemplate.AIName != "SmartAI")
@@ -313,7 +313,7 @@ void SmartAIMgr::CheckIfSmartAIInDatabaseExists()
         bool found = false;
 
         // check template SAI
-        if (mEventMap[uint32(SMART_SCRIPT_TYPE_CREATURE)].find(creatureTemplate.Entry) != mEventMap[uint32(SMART_SCRIPT_TYPE_CREATURE)].end())
+        if (mEventMap[uint32(SmartScriptType::SMART_SCRIPT_TYPE_CREATURE)].find(creatureTemplate.Entry) != mEventMap[uint32(SmartScriptType::SMART_SCRIPT_TYPE_CREATURE)].end())
             found = true;
 
         // check GUID SAI
@@ -324,7 +324,7 @@ void SmartAIMgr::CheckIfSmartAIInDatabaseExists()
                 if (pair.second.id1 != creatureTemplate.Entry)
                     continue;
 
-                if (mEventMap[uint32(SMART_SCRIPT_TYPE_CREATURE)].find((-1) * pair.first) != mEventMap[uint32(SMART_SCRIPT_TYPE_CREATURE)].end())
+                if (mEventMap[uint32(SmartScriptType::SMART_SCRIPT_TYPE_CREATURE)].find((-1) * pair.first) != mEventMap[uint32(SmartScriptType::SMART_SCRIPT_TYPE_CREATURE)].end())
                     found = true;
             }
         }
@@ -333,7 +333,7 @@ void SmartAIMgr::CheckIfSmartAIInDatabaseExists()
             LOG_ERROR("sql.sql", "Creature entry ({}) has SmartAI enabled but no SmartAI entries in the database.", creatureTemplate.Entry);
     }
 
-    // check all gameobjects
+    // SMART_SCRIPT_TYPE_GAMEOBJECT
     for (auto const& [entry, gameobjectTemplate] : *sObjectMgr->GetGameObjectTemplates())
     {
         if (gameobjectTemplate.AIName != "SmartGameObjectAI")
@@ -342,7 +342,7 @@ void SmartAIMgr::CheckIfSmartAIInDatabaseExists()
         bool found = false;
 
         // check template SAI
-        if (mEventMap[uint32(SMART_SCRIPT_TYPE_GAMEOBJECT)].find(gameobjectTemplate.entry) != mEventMap[uint32(SMART_SCRIPT_TYPE_GAMEOBJECT)].end())
+        if (mEventMap[uint32(SmartScriptType::SMART_SCRIPT_TYPE_GAMEOBJECT)].find(gameobjectTemplate.entry) != mEventMap[uint32(SmartScriptType::SMART_SCRIPT_TYPE_GAMEOBJECT)].end())
             found = true;
 
         // check GUID SAI
@@ -353,7 +353,7 @@ void SmartAIMgr::CheckIfSmartAIInDatabaseExists()
                 if (pair.second.id != gameobjectTemplate.entry)
                     continue;
 
-                if (mEventMap[uint32(SMART_SCRIPT_TYPE_GAMEOBJECT)].find((-1) * pair.first) != mEventMap[uint32(SMART_SCRIPT_TYPE_GAMEOBJECT)].end())
+                if (mEventMap[uint32(SmartScriptType::SMART_SCRIPT_TYPE_GAMEOBJECT)].find((-1) * pair.first) != mEventMap[uint32(SmartScriptType::SMART_SCRIPT_TYPE_GAMEOBJECT)].end())
                     found = true;
             }
         }
