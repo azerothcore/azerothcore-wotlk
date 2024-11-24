@@ -685,37 +685,26 @@ public:
                 }
             }
 
-            //Main mode
-            //Choose form. Mode should be selected considering bot_ai::CheckAttackTarget() positioning selection
-            //1 Tanking mode
-            if ((IsTank() || (IsWanderer() && bot_ai::IsMelee() && !GetSpell(CAT_FORM_1))) && GetSpell(BEAR_FORM_1))
+            BotStances need_form = _selectShapeshift();
+            uint32 form_base_spellid = _baseSpellForShapeshift(need_form);
+            if (_form == need_form || !form_base_spellid || (IsSpellReady(form_base_spellid, diff, false) && doCast(me, GetSpell(form_base_spellid))))
             {
-                if (_form == DRUID_BEAR_FORM || (IsSpellReady(BEAR_FORM_1, diff, false) && doCast(me, GetSpell(BEAR_FORM_1))))
-                    doBearActions(mytar, diff);
-            }
-            //2 Melee (tanking cat impossible: cat lvl 20, bear lvl 10)
-            else if (bot_ai::IsMelee())
-            {
-                //if lvl < 20 then bot gonna just melee its targets
-                if (_form == DRUID_CAT_FORM || (IsSpellReady(CAT_FORM_1, diff, false) && doCast(me, GetSpell(CAT_FORM_1))))
-                    doCatActions(mytar, diff);
-            }
-            //3 Ranged dps
-            else if (HasRole(BOT_ROLE_DPS))
-            {
-                //pure dps goes moonkin
-                if (_form == DRUID_MOONKIN_FORM || HasRole(BOT_ROLE_HEAL) || !GetSpell(MOONKIN_FORM_1) ||
-                    (!HasRole(BOT_ROLE_HEAL) && IsSpellReady(MOONKIN_FORM_1, diff, false) && doCast(me, GetSpell(MOONKIN_FORM_1))))
-                    doBalanceActions(mytar, diff);
-            }
-            //4 Healer
-            else if (HasRole(BOT_ROLE_HEAL))
-            {
-                //pure healer goes tree
-                if (_form == DRUID_TREE_FORM ||
-                    ((!GetSpell(TREE_OF_LIFE_FORM_1) || HasRole(BOT_ROLE_DPS)) && (_form == BOT_STANCE_NONE || removeShapeshiftForm())) ||
-                    (!HasRole(BOT_ROLE_DPS) && IsSpellReady(TREE_OF_LIFE_FORM_1, diff) && doCast(me, GetSpell(TREE_OF_LIFE_FORM_1))))
-                {/*do nothing*/} //not a mistake
+                switch (need_form ? need_form : _form)
+                {
+                    case DRUID_BEAR_FORM:
+                        doBearActions(mytar, diff);
+                        break;
+                    case DRUID_CAT_FORM:
+                        doCatActions(mytar, diff);
+                        break;
+                    case DRUID_MOONKIN_FORM:
+                    case BOT_STANCE_NONE:
+                        if (HasRole(BOT_ROLE_DPS))
+                            doBalanceActions(mytar, diff);
+                        break;
+                    default:
+                        break;
+                }
             }
         }
 
@@ -2945,6 +2934,47 @@ public:
         }
 
     private:
+        static uint32 _baseSpellForShapeshift(BotStances form)
+        {
+            switch (form)
+            {
+                case DRUID_BEAR_FORM:
+                    return BEAR_FORM_1;
+                case DRUID_CAT_FORM:
+                    return CAT_FORM_1;
+                case DRUID_MOONKIN_FORM:
+                    return MOONKIN_FORM_1;
+                case DRUID_TREE_FORM:
+                    return TREE_OF_LIFE_FORM_1;
+                case DRUID_TRAVEL_FORM:
+                    return TRAVEL_FORM_1;
+                case DRUID_AQUATIC_FORM:
+                    return AQUATIC_FORM_1;
+                case DRUID_FLIGHT_FORM:
+                    return FLIGHT_FORM_1;
+                default:
+                    return 0;
+            }
+        }
+        BotStances _selectShapeshift() const
+        {
+            BotStances form = BOT_STANCE_NONE;
+            if (bot_ai::IsMelee())
+            {
+                bool has_cat_form_spell = !!GetSpell(_baseSpellForShapeshift(DRUID_CAT_FORM));
+                bool has_bear_form_spell = !!GetSpell(_baseSpellForShapeshift(DRUID_BEAR_FORM));
+                if ((IsTank() || (IsWanderer() && !has_cat_form_spell)) && has_bear_form_spell)
+                    form = DRUID_BEAR_FORM;
+                else if (HasRole(BOT_ROLE_DPS))
+                    form = has_cat_form_spell ? DRUID_CAT_FORM : has_bear_form_spell ? DRUID_BEAR_FORM : BOT_STANCE_NONE;
+            }
+            if (form == BOT_STANCE_NONE && HasRole(BOT_ROLE_DPS))
+                form = (!HasRole(BOT_ROLE_HEAL) && !!GetSpell(_baseSpellForShapeshift(DRUID_MOONKIN_FORM))) ? DRUID_MOONKIN_FORM : BOT_STANCE_NONE;
+            if (form == BOT_STANCE_NONE && HasRole(BOT_ROLE_HEAL))
+                form = !!GetSpell(_baseSpellForShapeshift(DRUID_TREE_FORM)) ? DRUID_TREE_FORM : BOT_STANCE_NONE;
+            return form;
+        }
+
         //Treants
         ObjectGuid _treants[MAX_TREANTS];
         //Timers/other
