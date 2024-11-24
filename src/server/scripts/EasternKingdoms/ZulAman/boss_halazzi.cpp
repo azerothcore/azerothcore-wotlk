@@ -100,7 +100,6 @@ struct boss_halazzi : public BossAI
         BossAI::Reset();
         _transformCount = 0;
         _phase = PHASE_NONE;
-        EnterPhase(PHASE_LYNX);
         SetInvincibility(true);
     }
 
