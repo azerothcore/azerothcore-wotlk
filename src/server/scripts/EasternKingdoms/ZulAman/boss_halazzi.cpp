@@ -158,10 +158,7 @@ struct boss_halazzi : public BossAI
             case PHASE_LYNX:
             {
                 if (_phase == PHASE_MERGE)
-                {
-                    DoCastSelf(SPELL_TRANSFIGURE, true);
                     me->ResumeChasingVictim();
-                }
                 summons.DespawnAll();
 
                 if (_transformCount)
