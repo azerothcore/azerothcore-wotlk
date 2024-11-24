@@ -1850,8 +1850,8 @@ bool WorldObject::CanSeeOrDetect(WorldObject const* obj, bool ignoreStealth, boo
             else
                 return false;
         }
-        else
-            return false;
+        //else Issue #20509, needs verification.
+            //return false; This will (incorrectly) return false for NPC ghosts that can see the player.
     }
 
     if (obj->IsInvisibleDueToDespawn())
