@@ -297,6 +297,11 @@ void LootStore::ReportNonExistingId(uint32 lootId, const char* ownerType, uint32
     LOG_ERROR("sql.sql", "Table '{}' Entry {} does not exist but it is used by {} {}", GetName(), lootId, ownerType, ownerId);
 }
 
+void LootStore::ReportInvalidCount(uint32 lootId, const char* ownerType, uint32 ownerId, uint8 minCount, uint8 maxCount) const
+{
+    LOG_ERROR("sql.sql", "Table '{}' Entry {} used by {} {} has minCount ( {} ) != maxCount ( {} ) which is not supported for this loot type.", GetName(), lootId, ownerType, ownerId, minCount, maxCount);
+}
+
 //
 // --------- LootStoreItem ---------
 //
@@ -1871,14 +1876,13 @@ void LootTemplate::CheckLootRefs(LootTemplateMap const& store, LootIdSet* ref_se
         LootStoreItem* item = *ieItr;
         if (item->reference)
         {
+            if (item->mincount != item->maxcount)
+                LootTemplates_Reference.ReportInvalidCount(std::abs(item->reference), "Reference", item->itemid, item->mincount, item->maxcount);
+
             if (!LootTemplates_Reference.GetLootFor(std::abs(item->reference)))
-            {
                 LootTemplates_Reference.ReportNonExistingId(std::abs(item->reference), "Reference", item->itemid);
-            }
             else if (ref_set)
-            {
                 ref_set->erase(std::abs(item->reference));
-            }
         }
     }
 

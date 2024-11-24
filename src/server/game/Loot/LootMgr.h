@@ -219,6 +219,7 @@ public:
     void ReportUnusedIds(LootIdSet const& ids_set) const;
     void ReportNonExistingId(uint32 lootId) const;
     void ReportNonExistingId(uint32 lootId, const char* ownerType, uint32 ownerId) const;
+    void ReportInvalidCount(uint32 lootId, const char* ownerType, uint32 ownerId, uint8 minCount, uint8 maxCount) const;
 
     [[nodiscard]] bool HaveLootFor(uint32 loot_id) const { return m_LootTemplates.find(loot_id) != m_LootTemplates.end(); }
     [[nodiscard]] bool HaveQuestLootFor(uint32 loot_id) const;
