@@ -1,3 +1,4 @@
+-- DB update 2024_11_24_02 -> 2024_11_24_03
 --
 -- IMMUNE_TO_PC
 UPDATE `creature_template` SET `unit_flags` = `unit_flags` | 256 WHERE (`entry` = 24358);
