@@ -313,9 +313,8 @@ void SmartAIMgr::CheckIfSmartAIInDatabaseExists()
         bool found = false;
 
         // check template SAI
-        for (uint8 i = 0; (i < SMART_SCRIPT_TYPE_MAX) && (!found); i++)
-            if (mEventMap[uint32(i)].find(creatureTemplate.Entry) != mEventMap[uint32(i)].end())
-                found = true;
+        if (mEventMap[uint32(SMART_SCRIPT_TYPE_CREATURE)].find(creatureTemplate.Entry) != mEventMap[uint32(SMART_SCRIPT_TYPE_CREATURE)].end())
+            found = true;
 
         // check GUID SAI
         if (!found)
@@ -325,9 +324,8 @@ void SmartAIMgr::CheckIfSmartAIInDatabaseExists()
                 if (pair.second.id1 != creatureTemplate.Entry)
                     continue;
 
-                for (uint8 i = 0; (i < SMART_SCRIPT_TYPE_MAX) && (!found); i++)
-                    if (mEventMap[uint32(i)].find((-1) * pair.first) != mEventMap[uint32(i)].end())
-                        found = true;
+                if (mEventMap[uint32(SMART_SCRIPT_TYPE_CREATURE)].find((-1) * pair.first) != mEventMap[uint32(SMART_SCRIPT_TYPE_CREATURE)].end())
+                    found = true;
             }
         }
 
@@ -344,9 +342,8 @@ void SmartAIMgr::CheckIfSmartAIInDatabaseExists()
         bool found = false;
 
         // check template SAI
-        for (uint8 i = 0; (i < SMART_SCRIPT_TYPE_MAX) && (!found); i++)
-            if (mEventMap[uint32(i)].find(gameobjectTemplate.entry) != mEventMap[uint32(i)].end())
-                found = true;
+        if (mEventMap[uint32(SMART_SCRIPT_TYPE_GAMEOBJECT)].find(gameobjectTemplate.entry) != mEventMap[uint32(SMART_SCRIPT_TYPE_GAMEOBJECT)].end())
+            found = true;
 
         // check GUID SAI
         if (!found)
@@ -356,9 +353,8 @@ void SmartAIMgr::CheckIfSmartAIInDatabaseExists()
                 if (pair.second.id != gameobjectTemplate.entry)
                     continue;
 
-                for (uint8 i = 0; (i < SMART_SCRIPT_TYPE_MAX) && (!found); i++)
-                    if (mEventMap[uint32(i)].find((-1) * pair.first) != mEventMap[uint32(i)].end())
-                        found = true;
+                if (mEventMap[uint32(SMART_SCRIPT_TYPE_GAMEOBJECT)].find((-1) * pair.first) != mEventMap[uint32(SMART_SCRIPT_TYPE_GAMEOBJECT)].end())
+                    found = true;
             }
         }
 
