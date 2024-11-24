@@ -160,7 +160,9 @@ static uint16 __rand; //calculated for each bot separately once every updateAI t
 
 static std::set<uint32> BotCustomSpells;
 
-bot_ai::bot_ai(Creature* creature) : CreatureAI(creature)
+bot_ai::bot_ai(Creature* creature) : CreatureAI(creature),
+    _botData(const_cast<NpcBotData*>(BotDataMgr::SelectNpcBotData(creature->GetEntry()))),
+    _botExtras(const_cast<NpcBotExtras*>(BotDataMgr::SelectNpcBotExtras(creature->GetEntry())))
 {
     //moved
     _potionTimer = 0;
@@ -469,13 +471,10 @@ void bot_ai::CheckOwnerExpiry()
     if (IsTempBot() || !IAmFree())
         return;
 
-    NpcBotData const* npcBotData = BotDataMgr::SelectNpcBotData(me->GetEntry());
-    NpcBotExtras const* npcBotExtra = BotDataMgr::SelectNpcBotExtras(me->GetEntry());
-
-    if (npcBotData->owner == 0)
+    if (_botData->owner == 0)
         return;
 
-    ObjectGuid ownerGuid = ObjectGuid(HighGuid::Player, 0, npcBotData->owner);
+    ObjectGuid ownerGuid = ObjectGuid(HighGuid::Player, 0, _botData->owner);
     time_t timeNow = time(0);
     time_t expireTime = time_t(BotMgr::GetOwnershipExpireTime());
     time_t baseTimeStamp;
@@ -491,7 +490,7 @@ void bot_ai::CheckOwnerExpiry()
     }
     else //if (BotMgr::GetOwnershipExpireMode() == BOT_OWNERSHIP_EXPIRE_HIRE)
     {
-        baseTimeStamp = time_t(npcBotData->hire_time);
+        baseTimeStamp = time_t(_botData->hire_time);
     }
 
     //either expired or owner does not exist
@@ -499,8 +498,7 @@ void bot_ai::CheckOwnerExpiry()
     {
         std::string name = "unknown";
         sCharacterCache->GetCharacterNameByGuid(ownerGuid, name);
-        BOT_LOG_DEBUG("npcbots", ">> {}'s (guid: {}) ownership over bot {} ({}) has expired!",
-            name.c_str(), npcBotData->owner, me->GetName().c_str(), me->GetEntry());
+        BOT_LOG_DEBUG("npcbots", "{}'s (guid: {}) ownership over bot {} ({}) has expired!", name, _botData->owner, me->GetName(), me->GetEntry());
 
         //send all items back
         CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_NPCBOT_EQUIP_BY_ITEM_INSTANCE);
@@ -509,7 +507,7 @@ void bot_ai::CheckOwnerExpiry()
         //  "FROM item_instance WHERE guid IN (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", CONNECTION_SYNCH
 
         for (uint8 i = 0; i != BOT_INVENTORY_SIZE; ++i)
-            stmt->SetData(i, npcBotData->equips[i] ? npcBotData->equips[i] : std::numeric_limits<uint32>::max());
+            stmt->SetData(i, _botData->equips[i] ? _botData->equips[i] : std::numeric_limits<uint32>::max());
 
         PreparedQueryResult iiresult = CharacterDatabase.Query(stmt);
         if (iiresult)
@@ -553,7 +551,7 @@ void bot_ai::CheckOwnerExpiry()
                     item->SaveToDB(trans);
                     draft.AddItem(item);
                 }
-                draft.SendMailTo(trans, MailReceiver(npcBotData->owner), MailSender(me, MAIL_STATIONERY_GM));
+                draft.SendMailTo(trans, MailReceiver(_botData->owner), MailSender(me, MAIL_STATIONERY_GM));
             }
             CharacterDatabase.CommitTransaction(trans);
 
@@ -568,10 +566,10 @@ void bot_ai::CheckOwnerExpiry()
         uint32 newOwner = 0;
         BotDataMgr::UpdateNpcBotData(me->GetEntry(), NPCBOT_UPDATE_OWNER, &newOwner);
         //...spec
-        uint8 spec = SelectSpecForClass(npcBotExtra->bclass);
+        uint8 spec = SelectSpecForClass(_botExtras->bclass);
         BotDataMgr::UpdateNpcBotData(me->GetEntry(), NPCBOT_UPDATE_SPEC, &spec);
         //...and roles
-        uint32 roleMask = DefaultRolesForClass(npcBotExtra->bclass, spec);
+        uint32 roleMask = DefaultRolesForClass(_botExtras->bclass, spec);
         BotDataMgr::UpdateNpcBotData(me->GetEntry(), NPCBOT_UPDATE_ROLES, &roleMask);
 
         if (Group* gr = GetGroup())
@@ -601,8 +599,7 @@ void bot_ai::ResetBotAI(uint8 resetType)
         _ownerGuid = 0;
     if (resetType == BOTAI_RESET_INIT || resetType == BOTAI_RESET_LOGOUT)
     {
-        NpcBotData const* npcBotData = BotDataMgr::SelectNpcBotData(me->GetEntry());
-        _checkOwershipTimer = (BotMgr::GetOwnershipExpireTime() && npcBotData->owner) ? (resetType == BOTAI_RESET_INIT) ? 1000 : CalculateOwnershipCheckTime() : 0;
+        _checkOwershipTimer = (BotMgr::GetOwnershipExpireTime() && _botData->owner) ? (resetType == BOTAI_RESET_INIT) ? 1000 : CalculateOwnershipCheckTime() : 0;
         if (resetType == BOTAI_RESET_INIT)
             homepos.Relocate(me);
         else //if (resetType == BOTAI_RESET_LOGOUT)
@@ -6853,8 +6850,7 @@ void bot_ai::InitSpellMap(uint32 basespell, bool forceadd, bool forwardRank)
 
     newSpell->spellId = spellId;
 
-    NpcBotData const* npcBotData = BotDataMgr::SelectNpcBotData(me->GetEntry());
-    if (npcBotData && npcBotData->disabled_spells.find(basespell) != npcBotData->disabled_spells.end())
+    if (_botData->disabled_spells.find(basespell) != _botData->disabled_spells.end())
     {
         newSpell->enabled = false;
         //BOT_LOG_ERROR("entities.player", "bot_ai::InitSpellMap(): %s (%u -> %u) is disabled for %s!",
@@ -7016,8 +7012,7 @@ void bot_ai::EnableAllSpells(bool save)
 {
     if (save)
     {
-        NpcBotData* npcBotData = const_cast<NpcBotData*>(BotDataMgr::SelectNpcBotData(me->GetEntry()));
-        npcBotData->disabled_spells.clear();
+        _botData->disabled_spells.clear();
         _saveDisabledSpells = true;
     }
 
@@ -10285,8 +10280,6 @@ bool bot_ai::OnGossipSelect(Player* player, Creature* creature/* == me*/, uint32
         case GOSSIP_SENDER_ABILITIES_USAGE_TOGGLE_HEAL:
         case GOSSIP_SENDER_ABILITIES_USAGE_TOGGLE_SUPPORT:
         {
-            NpcBotData* npcBotData = const_cast<NpcBotData*>(BotDataMgr::SelectNpcBotData(me->GetEntry()));
-
             uint32 basespell = action - GOSSIP_ACTION_INFO_DEF;
             BotSpellMap const& myspells = GetSpellMap();
             for (BotSpellMap::const_iterator itr = myspells.begin(); itr != myspells.end(); ++itr)
@@ -10295,9 +10288,9 @@ bool bot_ai::OnGossipSelect(Player* player, Creature* creature/* == me*/, uint32
                 {
                     itr->second->enabled = !itr->second->enabled;
                     if (itr->second->enabled)
-                        npcBotData->disabled_spells.erase(basespell);
+                        _botData->disabled_spells.erase(basespell);
                     else
-                        npcBotData->disabled_spells.insert(basespell);
+                        _botData->disabled_spells.insert(basespell);
 
                     _saveDisabledSpells = true;
                     break;
@@ -14895,10 +14888,7 @@ void bot_ai::ApplyRacials()
 
 void bot_ai::InitFaction()
 {
-    NpcBotData const* npcBotData = BotDataMgr::SelectNpcBotData(me->GetEntry());
-    ASSERT(npcBotData, "bot_ai::InitFaction(): data not found!");
-
-    uint32 faction = npcBotData->faction;
+    uint32 faction = _botData->faction;
 
     //if (faction == 14)
     //    faction = 35;
@@ -14911,16 +14901,12 @@ void bot_ai::InitFaction()
 
 void bot_ai::InitRace()
 {
-    NpcBotExtras const* npcBotExtras = BotDataMgr::SelectNpcBotExtras(me->GetEntry());
-    ASSERT(npcBotExtras, "bot_ai::InitRace: extra data not found!");
-
-    me->SetByteValue(UNIT_FIELD_BYTES_0, 0, npcBotExtras->race); //set race
+    me->SetByteValue(UNIT_FIELD_BYTES_0, 0, _botExtras->race); //set race
 }
 
 void bot_ai::InitOwner()
 {
-    NpcBotData const* npcBotData = BotDataMgr::SelectNpcBotData(me->GetEntry());
-    _ownerGuid = npcBotData->owner;
+    _ownerGuid = _botData->owner;
 }
 
 void bot_ai::InitRoles()
@@ -14937,10 +14923,7 @@ void bot_ai::InitRoles()
         return;
     }
 
-    NpcBotData const* npcBotData = BotDataMgr::SelectNpcBotData(me->GetEntry());
-    ASSERT(npcBotData, "bot_ai::InitRoles(): data not found!");
-
-    _roleMask = npcBotData->roles;
+    _roleMask = _botData->roles;
 }
 
 void bot_ai::InitSpec()
@@ -14950,10 +14933,7 @@ void bot_ai::InitSpec()
         spec = SelectSpecForClass(_botclass);
     else
     {
-        NpcBotData const* npcBotData = BotDataMgr::SelectNpcBotData(me->GetEntry());
-        ASSERT(npcBotData, "bot_ai::InitSpec(): data not found!");
-
-        spec = npcBotData->spec;
+        spec = _botData->spec;
     }
 
     //BOT_LOG_ERROR("entities.unit", "bot_ai::InitSpec(): bot %u class %u spec: %u", me->GetEntry(), uint32(_botclass), uint32(spec));
@@ -15232,8 +15212,6 @@ void bot_ai::InitEquips()
 {
     EquipmentInfo const* einfo = BotDataMgr::GetBotEquipmentInfo(me->GetEntry());
     ASSERT(einfo, "Trying to spawn bot with no equip info!");
-
-    NpcBotData const* npcBotData = BotDataMgr::SelectNpcBotData(me->GetEntry());
 
     if (IsWanderer())
     {
@@ -15519,8 +15497,8 @@ void bot_ai::InitEquips()
         std::array<uint32, BOT_INVENTORY_SIZE> assigned_item_guids{};
         for (uint8 i = 0; i != BOT_INVENTORY_SIZE; ++i)
         {
-            stmt->SetData(i, npcBotData->equips[i]);
-            assigned_item_guids[i] = npcBotData->equips[i];
+            stmt->SetData(i, _botData->equips[i]);
+            assigned_item_guids[i] = _botData->equips[i];
         }
 
         PreparedQueryResult iiresult = CharacterDatabase.Query(stmt);
@@ -15552,7 +15530,7 @@ void bot_ai::InitEquips()
                 bool found = false;
                 for (uint8 i = BOT_SLOT_MAINHAND; i != BOT_INVENTORY_SIZE; ++i)
                 {
-                    if (npcBotData->equips[i] == itemGuidLow && !_equips[i])
+                    if (_botData->equips[i] == itemGuidLow && !_equips[i])
                     {
                         _equips[i] = item;
                         found = true;
@@ -15733,14 +15711,13 @@ void bot_ai::FindMaster()
 
 uint32 bot_ai::CalculateOwnershipCheckTime()
 {
-    NpcBotData const* npcBotData = BotDataMgr::SelectNpcBotData(me->GetEntry());
-    if (!npcBotData->owner)
+    if (!_botData->owner)
         return 0;
 
     if (!IAmFree() || BotMgr::GetOwnershipExpireMode() == BOT_OWNERSHIP_EXPIRE_OFFLINE)
         return static_cast<uint32>(std::min<uint32>(BotMgr::GetOwnershipExpireTime(), urand(3 * MINUTE, 7 * MINUTE)) * IN_MILLISECONDS);
 
-    return static_cast<uint32>(std::max<time_t>(time_t(npcBotData->hire_time + BotMgr::GetOwnershipExpireTime() + 1) - time(0), 5) * IN_MILLISECONDS);
+    return static_cast<uint32>(std::max<time_t>(time_t(_botData->hire_time + BotMgr::GetOwnershipExpireTime() + 1) - time(0), 5) * IN_MILLISECONDS);
 }
 
 bool bot_ai::IAmFree() const
@@ -17811,11 +17788,10 @@ bool bot_ai::GlobalUpdate(uint32 diff)
         {
             if (IAmFree())
             {
-                NpcBotData const* npcBotData = BotDataMgr::SelectNpcBotData(me->GetEntry());
-                if (npcBotData->owner != 0)
+                if (_botData->owner != 0)
                 {
                     CheckOwnerExpiry();
-                    if (npcBotData->owner == 0)
+                    if (_botData->owner == 0)
                     {
                         _checkOwershipTimer = 0;
                         return false;
@@ -17834,10 +17810,7 @@ bool bot_ai::GlobalUpdate(uint32 diff)
         _saveDisabledSpellsTimer = 5000;
 
         if (!IsTempBot())
-        {
-            NpcBotData* npcBotData = const_cast<NpcBotData*>(BotDataMgr::SelectNpcBotData(me->GetEntry()));
-            BotDataMgr::UpdateNpcBotData(me->GetEntry(), NPCBOT_UPDATE_DISABLED_SPELLS, &npcBotData->disabled_spells);
-        }
+            BotDataMgr::UpdateNpcBotData(me->GetEntry(), NPCBOT_UPDATE_DISABLED_SPELLS, &_botData->disabled_spells);
     }
     //  2) miscavalues
     if (_saveMiscValues && _saveMiscValuesTimer <= diff)
@@ -17846,10 +17819,7 @@ bool bot_ai::GlobalUpdate(uint32 diff)
         _saveMiscValuesTimer = 5000;
 
         if (!IsTempBot())
-        {
-            NpcBotData* npcBotData = const_cast<NpcBotData*>(BotDataMgr::SelectNpcBotData(me->GetEntry()));
-            BotDataMgr::UpdateNpcBotData(me->GetEntry(), NPCBOT_UPDATE_MISCVALUES, &npcBotData->miscvalues);
-        }
+            BotDataMgr::UpdateNpcBotData(me->GetEntry(), NPCBOT_UPDATE_MISCVALUES, &_botData->miscvalues);
     }
 
     if (_updateTimerEx2 <= diff)
@@ -21018,10 +20988,9 @@ void bot_ai::SetAIMiscValue(uint32 data, uint32 value)
 {
     if (data >= BOT_MISCVALUE_SAVED_FIRST && data <= BOT_MISCVALUE_SAVED_LAST)
     {
-        NpcBotData* npcBotData = const_cast<NpcBotData*>(BotDataMgr::SelectNpcBotData(me->GetEntry()));
-        if (auto it = npcBotData->miscvalues.find(data); it == npcBotData->miscvalues.end() || it->second != value)
+        if (auto it = _botData->miscvalues.find(data); it == _botData->miscvalues.end() || it->second != value)
         {
-            npcBotData->miscvalues[data] = value;
+            _botData->miscvalues[data] = value;
             _saveMiscValues = true;
         }
     }
@@ -21029,8 +20998,6 @@ void bot_ai::SetAIMiscValue(uint32 data, uint32 value)
 
 void bot_ai::ResetAllMiscValues()
 {
-    NpcBotData* npcBotData = const_cast<NpcBotData*>(BotDataMgr::SelectNpcBotData(me->GetEntry()));
-
     for (uint32 miscval = BOT_MISCVALUE_SAVED_FIRST; miscval <= BOT_MISCVALUE_SAVED_LAST; ++miscval)
     {
         switch (miscval)
@@ -21056,14 +21023,13 @@ void bot_ai::ResetAllMiscValues()
         }
     }
 
-    npcBotData->miscvalues.clear();
+    _botData->miscvalues.clear();
     _saveMiscValues = true;
 }
 
 void bot_ai::InitMiscValues()
 {
-    NpcBotData const* npcBotData = BotDataMgr::SelectNpcBotData(me->GetEntry());
-    for (auto const& p : npcBotData->miscvalues)
+    for (auto const& p : _botData->miscvalues)
         SetAIMiscValue(p.first, p.second);
 }
 
