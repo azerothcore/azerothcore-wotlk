@@ -2691,9 +2691,9 @@ public:
         Player* owner = !bot->IsFreeBot() ? bot->GetBotOwner() : nullptr;
         Player* tickler = handler->GetPlayer();
 
-        if (tickler != owner && !tickler->IsGameMaster())
+        if (!tickler->IsGameMaster())
         {
-            handler->SendSysMessage("Must be in GM mode to fix other player's bot!");
+            handler->SendSysMessage("Must be in GM mode to use this command!");
             handler->SetSentErrorMessage(true);
             return false;
         }
