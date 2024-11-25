@@ -8313,7 +8313,7 @@ bool bot_ai::OnGossipSelect(Player* player, Creature* creature/* == me*/, uint32
                         LockEntry const* lockInfo;
 
                         //backpack
-                        for (uint8 i = INVENTORY_SLOT_ITEM_START; i != INVENTORY_SLOT_ITEM_END; ++i)
+                        for (uint8 i = INVENTORY_SLOT_ITEM_START; i != INVENTORY_SLOT_ITEM_END && count < maxcounter; ++i)
                         {
                             item = player->GetItemByPos(INVENTORY_SLOT_BAG_0, i);
                             if (item && item->IsLocked() && item->GetTemplate()->LockID)
@@ -8330,6 +8330,7 @@ bool bot_ai::OnGossipSelect(Player* player, Creature* creature/* == me*/, uint32
                                         std::ostringstream name;
                                         _AddItemLink(player, item, name, false);
                                         AddGossipItemFor(player, GOSSIP_ICON_CHAT, name.str(), GOSSIP_SENDER_CLASS_ACTION1, GOSSIP_ACTION_INFO_DEF + item->GetGUID().GetCounter());
+                                        ++count;
                                         break;
                                     }
                                 }
@@ -8340,7 +8341,7 @@ bool bot_ai::OnGossipSelect(Player* player, Creature* creature/* == me*/, uint32
                         {
                             if (Bag const* bag = player->GetBagByPos(i))
                             {
-                                for (uint32 j = 0; j != bag->GetBagSize() && count <= maxcounter; ++j)
+                                for (uint32 j = 0; j != bag->GetBagSize() && count < maxcounter; ++j)
                                 {
                                     item = player->GetItemByPos(i, j);
                                     if (item && item->IsLocked() && item->GetTemplate()->LockID)
