@@ -2060,6 +2060,7 @@ public:
     static SmartAIMgr* instance();
 
     void LoadSmartAIFromDB();
+    void CheckIfSmartAIInDatabaseExists();
 
     SmartAIEventList GetScript(int32 entry, SmartScriptType type)
     {

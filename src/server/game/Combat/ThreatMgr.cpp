@@ -217,7 +217,7 @@ void HostileReference::setOnlineOfflineState(bool isOnline)
     {
         iOnline = isOnline;
 
-        ThreatRefStatusChangeEvent event(UEV_THREAT_REF_ONLINE_STATUS, this);
+        ThreatRefStatusChangeEvent event(UEV_THREAT_REF_ONLINE_STATUS, this, isOnline);
         fireStatusChanged(event);
     }
 }
@@ -230,7 +230,7 @@ void HostileReference::removeReference()
 {
     invalidate();
 
-    ThreatRefStatusChangeEvent event(UEV_THREAT_REF_REMOVE_FROM_LIST, this);
+    ThreatRefStatusChangeEvent event(UEV_THREAT_REF_REMOVE_FROM_LIST, this, false);
     fireStatusChanged(event);
 }
 
