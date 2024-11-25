@@ -689,7 +689,7 @@ public:
             uint32 form_base_spellid = _baseSpellForShapeshift(need_form);
             if (_form == need_form || !form_base_spellid || (IsSpellReady(form_base_spellid, diff, false) && doCast(me, GetSpell(form_base_spellid))))
             {
-                switch (need_form ? need_form : _form)
+                switch (need_form)
                 {
                     case DRUID_BEAR_FORM:
                         doBearActions(mytar, diff);
