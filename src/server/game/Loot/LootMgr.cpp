@@ -1518,13 +1518,9 @@ void LootTemplate::LootGroup::CheckLootRefs(LootStore const& lootstore, uint32 I
                 LootTemplates_Reference.ReportInvalidCount(std::abs(item->reference), lootstore.GetName(), Id, item->itemid, item->mincount, item->maxcount);
 
             if (!LootTemplates_Reference.GetLootFor(std::abs(item->reference)))
-            {
                 LootTemplates_Reference.ReportNonExistingId(std::abs(item->reference), lootstore.GetName(), item->itemid);
-            }
             else if (ref_set)
-            {
                 ref_set->erase(std::abs(item->reference));
-            }
         }
     }
 
@@ -1537,13 +1533,9 @@ void LootTemplate::LootGroup::CheckLootRefs(LootStore const& lootstore, uint32 I
                 LootTemplates_Reference.ReportInvalidCount(std::abs(item->reference), lootstore.GetName(), Id, item->itemid, item->mincount, item->maxcount);
 
             if (!LootTemplates_Reference.GetLootFor(std::abs(item->reference)))
-            {
                 LootTemplates_Reference.ReportNonExistingId(std::abs(item->reference), lootstore.GetName(), item->itemid);
-            }
             else if (ref_set)
-            {
                 ref_set->erase(std::abs(item->reference));
-            }
         }
     }
 }
