@@ -16834,13 +16834,13 @@ void bot_ai::_ProcessOrders()
             break;
     }
 
+    if (_orders.empty())
+        return;
+
     if (HasBotCommandState(BOT_COMMAND_ISSUED_ORDER))
         return;
 
     if (JumpingOrFalling())
-        return;
-
-    if (_orders.empty())
         return;
 
     BotOrder const& order = _orders.front();
@@ -20973,11 +20973,11 @@ bool bot_ai::IsCasting(Unit const* u/* = nullptr*/) const
 }
 bool bot_ai::JumpingFlyingOrFalling() const
 {
-    return Jumping() || JumpingOrFalling() || me->HasUnitMovementFlag(MOVEMENTFLAG_SPLINE_ELEVATION);
+    return JumpingOrFalling() || me->HasUnitMovementFlag(MOVEMENTFLAG_SPLINE_ELEVATION);
 }
 bool bot_ai::JumpingOrFalling() const
 {
-    return Jumping() || me->IsFalling() || me->HasUnitMovementFlag(MOVEMENTFLAG_PITCH_UP|MOVEMENTFLAG_PITCH_DOWN|MOVEMENTFLAG_FALLING_SLOW);
+    return Jumping() || me->IsFalling() || me->HasUnitMovementFlag(MOVEMENTFLAG_PITCH_UP|MOVEMENTFLAG_PITCH_DOWN);
 }
 bool bot_ai::Jumping() const
 {
