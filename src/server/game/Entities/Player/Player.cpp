@@ -2928,8 +2928,11 @@ bool Player::addTalent(uint32 spellId, uint8 addSpecMask, uint8 oldTalentRank)
         newTalent->specMask = addSpecMask;
         newTalent->talentID = talentInfo->TalentID;
         newTalent->inSpellBook = talentInfo->addToSpellBook && !spellInfo->HasAttribute(SPELL_ATTR0_PASSIVE) && !spellInfo->HasEffect(SPELL_EFFECT_LEARN_SPELL);
-
         m_talents[spellId] = newTalent;
+
+        if (GetActiveSpecMask() & addSpecMask)
+            m_usedTalentCount += (talentPos->rank + 1) - oldTalentRank;
+
         return true;
     }
     // xinef: if current mask does not cover addMask, add it to iterator and save changes to DB
@@ -2938,6 +2941,9 @@ bool Player::addTalent(uint32 spellId, uint8 addSpecMask, uint8 oldTalentRank)
         itr->second->specMask |= addSpecMask;
         if (itr->second->State != PLAYERSPELL_NEW)
             itr->second->State = PLAYERSPELL_CHANGED;
+
+        if (GetActiveSpecMask() & addSpecMask)
+            m_usedTalentCount += (talentPos->rank + 1) - oldTalentRank;
 
         return true;
     }
@@ -14078,9 +14084,6 @@ void Player::LearnTalent(uint32 talentId, uint32 talentRank, bool command /*= fa
 
     addTalent(spellId, GetActiveSpecMask(), currentTalentRank);
 
-    // xinef: update free talent points count
-    m_usedTalentCount += talentPointsChange;
-
     if (!command)
     {
         SetFreeTalentPoints(CurTalentPoints - talentPointsChange);
@@ -15032,9 +15035,6 @@ void Player::_LoadTalents(PreparedQueryResult result)
             TalentSpellPos const* talentPos = GetTalentSpellPos(spellId);
             ASSERT(talentPos);
 
-            // xinef: increase used talent points count
-            if (GetActiveSpecMask() & specMask)
-                m_usedTalentCount += talentPos->rank + 1;
         } while (result->NextRow());
     }
 }

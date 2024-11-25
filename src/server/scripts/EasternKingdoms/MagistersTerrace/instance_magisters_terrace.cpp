@@ -23,6 +23,7 @@
 
 ObjectData const creatureData[] =
 {
+    { NPC_DELRISSA,        DATA_DELRISSA         },
     { NPC_KAEL_THAS,       DATA_KAELTHAS         },
     { NPC_KALECGOS,        DATA_KALECGOS         },
     { 0,                   0                     }
@@ -32,6 +33,13 @@ ObjectData const gameobjectData[] =
 {
     { GO_ESCAPE_ORB, DATA_ESCAPE_ORB },
     { 0,             0,              }
+};
+
+ObjectData const summonerData[] =
+{
+    { NPC_PHOENIX,       DATA_KAELTHAS },
+    { NPC_PHOENIX_EGG,   DATA_KAELTHAS },
+    { 0,                 0             }
 };
 
 DoorData const doorData[] =
@@ -58,9 +66,8 @@ public:
             SetBossNumber(MAX_ENCOUNTER);
             LoadObjectData(creatureData, gameobjectData);
             LoadDoorData(doorData);
+            LoadSummonData(summonerData);
         }
-
-        ObjectGuid DelrissaGUID;
 
         void ProcessEvent(WorldObject* /*obj*/, uint32 eventId) override
         {
@@ -73,31 +80,6 @@ public:
                             kalecgos->GetMotionMaster()->MovePath(PATH_KALECGOS_FLIGHT, false);
                     });
                 }
-        }
-
-        void OnCreatureCreate(Creature* creature) override
-        {
-            switch (creature->GetEntry())
-            {
-                case NPC_DELRISSA:
-                    DelrissaGUID = creature->GetGUID();
-                    break;
-                case NPC_PHOENIX:
-                case NPC_PHOENIX_EGG:
-                    if (Creature* kael = GetCreature(DATA_KAELTHAS))
-                        kael->AI()->JustSummoned(creature);
-                    break;
-            }
-
-            InstanceScript::OnCreatureCreate(creature);
-        }
-
-        ObjectGuid GetGuidData(uint32 identifier) const override
-        {
-            if (identifier == NPC_DELRISSA)
-                return DelrissaGUID;
-
-            return ObjectGuid::Empty;
         }
     };
 

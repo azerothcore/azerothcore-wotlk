@@ -52,24 +52,22 @@ enum Says
 
 enum Misc
 {
-    ACTION_INCREASE_STORM_COUNT = 1
+    ACTION_STORM_EXPIRE         = 1,
+    GROUP_ELECTRICAL_STORM      = 1
 };
 
 constexpr auto NPC_SOARING_EAGLE = 24858;
 
 struct boss_akilzon : public BossAI
 {
-    boss_akilzon(Creature* creature) : BossAI(creature, DATA_AKILZON), _stormCount(0), _isRaining(false) { }
+    boss_akilzon(Creature* creature) : BossAI(creature, DATA_AKILZON), _isRaining(false) { }
 
     void Reset() override
     {
         _Reset();
 
         _targetGUID.Clear();
-        _cloudGUID.Clear();
         _cycloneGUID.Clear();
-
-        _stormCount = 0;
         _isRaining = false;
 
         SetWeather(WEATHER_STATE_FINE, 0.0f);
@@ -94,18 +92,16 @@ struct boss_akilzon : public BossAI
         }, 10s, 18s);
 
         ScheduleTimedEvent(20s, 30s, [&] {
-            Unit* target = SelectTarget(SelectTargetMethod::Random, 1);
-            if (!target)
-                target = me->GetVictim();
-            if (target)
-                DoCast(target, SPELL_GUST_OF_WIND);
+            if (scheduler.GetNextGroupOcurrence(GROUP_ELECTRICAL_STORM) > 5s)
+                DoCastRandomTarget(SPELL_GUST_OF_WIND, 1);
         }, 20s, 30s);
 
         ScheduleTimedEvent(10s, 20s, [&] {
             DoCastVictim(SPELL_CALL_LIGHTNING);
         }, 12s, 17s);
 
-        ScheduleTimedEvent(1min, [&] {
+        scheduler.Schedule(1min, GROUP_ELECTRICAL_STORM, [this](TaskContext context)
+        {
             Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 50, true);
             if (!target)
             {
@@ -114,29 +110,14 @@ struct boss_akilzon : public BossAI
             }
             target->CastSpell(target, SPELL_ELECTRICAL_STORM_AREA, true); // cloud visual
             DoCast(target, SPELL_ELECTRICAL_STORM); // storm cyclon + visual
+
             float x, y, z;
             target->GetPosition(x, y, z);
+            target->GetMotionMaster()->MoveJump(x, y, target->GetPositionZ() + 16.0f, 1.0f, 1.0f);
 
-            Unit* Cloud = me->SummonTrigger(x, y, me->GetPositionZ() + 16, 0, 15000);
-            if (Cloud)
-            {
-                target->GetMotionMaster()->MoveJump(Cloud->GetPosition(), 1.0f, 1.0f);
-
-                _cloudGUID = Cloud->GetGUID();
-                Cloud->SetDisableGravity(true);
-                Cloud->StopMoving();
-                Cloud->SetObjectScale(1.0f);
-                Cloud->SetFaction(FACTION_FRIENDLY);
-                Cloud->SetMaxHealth(9999999);
-                Cloud->SetHealth(9999999);
-                Cloud->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
-
-                me->m_Events.AddEventAtOffset([&] {
-                    HandleStormSequence();
-                }, 3s);
-            }
-
-            _stormCount = 1;
+            me->m_Events.AddEventAtOffset([&] {
+                HandleStormSequence();
+            }, 3s);
 
             me->m_Events.AddEventAtOffset([&] {
                 if (!_isRaining)
@@ -145,7 +126,9 @@ struct boss_akilzon : public BossAI
                     _isRaining = true;
                 }
             }, Seconds(urand(47, 52)));
-        }, 1min);
+
+            context.Repeat();
+        });
 
         ScheduleTimedEvent(47s, 52s, [&] {
             if (!_isRaining)
@@ -181,42 +164,26 @@ struct boss_akilzon : public BossAI
         me->GetMap()->SetZoneWeather(me->GetZoneId(), WeatherState(weather), grade);
     }
 
-    void HandleStormSequence() // 1: begin, 2-9: tick, 10: end
+    void HandleStormSequence()
     {
-        Creature* Cloud = ObjectAccessor::GetCreature(*me, _cloudGUID);
-        if (!Cloud)
-            return;
-
-        if (_stormCount > 10)
-        {
-            _stormCount = 0; // finish
-
-            me->m_Events.AddEventAtOffset([&] {
-                SummonEagles();
-            }, 5s);
-
-            me->InterruptNonMeleeSpells(false);
-            _cloudGUID.Clear();
-            if (Cloud)
-                Cloud->KillSelf();
-            SetWeather(WEATHER_STATE_FINE, 0.0f);
-            _isRaining = false;
-        }
-
         me->m_Events.AddEventAtOffset([&] {
-            Unit* target = ObjectAccessor::GetUnit(*me, _cloudGUID);
-            if (!target || !target->IsAlive())
-                return;
-            else if (Unit* Cyclone = ObjectAccessor::GetUnit(*me, _cycloneGUID))
-                Cyclone->CastSpell(target, SPELL_SAND_STORM, true); // keep casting or...
             HandleStormSequence();
         }, 1s);
     }
 
     void DoAction(int32 actionId) override
     {
-        if (actionId == ACTION_INCREASE_STORM_COUNT)
-            ++_stormCount;
+        if (actionId == ACTION_STORM_EXPIRE)
+        {
+            me->m_Events.AddEventAtOffset([&] {
+                SummonEagles();
+            }, 5s);
+
+            me->InterruptNonMeleeSpells(false);
+
+            SetWeather(WEATHER_STATE_FINE, 0.0f);
+            _isRaining = false;
+        }
     }
 
     void SummonEagles()
@@ -254,8 +221,6 @@ private:
     ObjectGuid _birdGUIDs[8];
     ObjectGuid _targetGUID;
     ObjectGuid _cycloneGUID;
-    ObjectGuid _cloudGUID;
-    uint8  _stormCount;
     bool   _isRaining;
 };
 
@@ -339,15 +304,15 @@ class spell_electrial_storm : public AuraScript
         return GetCaster() && GetCaster()->IsCreature();
     }
 
-    void OnPeriodic(AuraEffect const* /*aurEff*/)
+    void OnRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
     {
-        if (GetCaster())
-            GetCaster()->ToCreature()->AI()->DoAction(ACTION_INCREASE_STORM_COUNT);
+        if (GetTargetApplication()->GetRemoveMode() == AURA_REMOVE_BY_EXPIRE)
+            GetCaster()->ToCreature()->AI()->DoAction(ACTION_STORM_EXPIRE);
     }
 
     void Register() override
     {
-        OnEffectPeriodic += AuraEffectPeriodicFn(spell_electrial_storm::OnPeriodic, EFFECT_1, SPELL_AURA_PERIODIC_TRIGGER_SPELL);
+        AfterEffectRemove += AuraEffectRemoveFn(spell_electrial_storm::OnRemove, EFFECT_0, SPELL_AURA_MOD_STUN, AURA_EFFECT_HANDLE_REAL);
     }
 };
 

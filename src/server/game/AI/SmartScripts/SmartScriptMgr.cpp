@@ -268,6 +268,7 @@ void SmartAIMgr::LoadSmartAIFromDB()
             case SMART_EVENT_AREA_RANGE:
             case SMART_EVENT_AREA_CASTING:
             case SMART_EVENT_IS_BEHIND_TARGET:
+            case SMART_EVENT_IS_IN_MELEE_RANGE:
                 if (temp.event.minMaxRepeat.repeatMin == 0 && temp.event.minMaxRepeat.repeatMax == 0)
                     temp.event.event_flags |= SMART_EVENT_FLAG_NOT_REPEATABLE;
                 break;
@@ -295,8 +296,87 @@ void SmartAIMgr::LoadSmartAIFromDB()
         mEventMap[source_type][temp.entryOrGuid].push_back(temp);
     } while (result->NextRow());
 
+    CheckIfSmartAIInDatabaseExists();
+
     LOG_INFO("server.loading", ">> Loaded {} SmartAI scripts in {} ms", count, GetMSTimeDiffToNow(oldMSTime));
     LOG_INFO("server.loading", " ");
+}
+
+void SmartAIMgr::CheckIfSmartAIInDatabaseExists()
+{
+    // SMART_SCRIPT_TYPE_CREATURE
+    for (auto const& [entry, creatureTemplate] : *sObjectMgr->GetCreatureTemplates())
+    {
+        if (creatureTemplate.AIName != "SmartAI")
+            continue;
+
+        bool found = false;
+
+        // check template SAI
+        if (mEventMap[uint32(SmartScriptType::SMART_SCRIPT_TYPE_CREATURE)].find(creatureTemplate.Entry) != mEventMap[uint32(SmartScriptType::SMART_SCRIPT_TYPE_CREATURE)].end())
+            found = true;
+        else
+        {
+            // check GUID SAI
+            for (auto const& pair : sObjectMgr->GetAllCreatureData())
+            {
+                if (pair.second.id1 != creatureTemplate.Entry)
+                    continue;
+
+                if (mEventMap[uint32(SmartScriptType::SMART_SCRIPT_TYPE_CREATURE)].find((-1) * pair.first) != mEventMap[uint32(SmartScriptType::SMART_SCRIPT_TYPE_CREATURE)].end())
+                {
+                    found = true;
+                    break;
+                }
+            }
+        }
+
+        if (!found)
+            LOG_ERROR("sql.sql", "Creature entry ({}) has SmartAI enabled but no SmartAI entries in the database.", creatureTemplate.Entry);
+    }
+
+    // SMART_SCRIPT_TYPE_GAMEOBJECT
+    for (auto const& [entry, gameobjectTemplate] : *sObjectMgr->GetGameObjectTemplates())
+    {
+        if (gameobjectTemplate.AIName != "SmartGameObjectAI")
+            continue;
+
+        bool found = false;
+
+        // check template SAI
+        if (mEventMap[uint32(SmartScriptType::SMART_SCRIPT_TYPE_GAMEOBJECT)].find(gameobjectTemplate.entry) != mEventMap[uint32(SmartScriptType::SMART_SCRIPT_TYPE_GAMEOBJECT)].end())
+            found = true;
+        else
+        {
+            // check GUID SAI
+            for (auto const& pair : sObjectMgr->GetAllGOData())
+            {
+                if (pair.second.id != gameobjectTemplate.entry)
+                    continue;
+
+                if (mEventMap[uint32(SmartScriptType::SMART_SCRIPT_TYPE_GAMEOBJECT)].find((-1) * pair.first) != mEventMap[uint32(SmartScriptType::SMART_SCRIPT_TYPE_GAMEOBJECT)].end())
+                {
+                    found = true;
+                    break;
+                }
+            }
+        }
+
+        if (!found)
+            LOG_ERROR("sql.sql", "Gameobject entry ({}) has SmartGameobjectAI enabled but no SmartAI entries in the database.", gameobjectTemplate.entry);
+    }
+
+    // SMART_SCRIPT_TYPE_AREATRIGGER
+    uint32 scriptID = sObjectMgr->GetScriptId("SmartTrigger");
+
+    for (auto const& pair : sObjectMgr->GetAllAreaTriggerScriptData())
+    {
+        if (pair.second != scriptID)
+            continue;
+
+        if (mEventMap[uint32(SmartScriptType::SMART_SCRIPT_TYPE_AREATRIGGER)].find(pair.first) == mEventMap[uint32(SmartScriptType::SMART_SCRIPT_TYPE_AREATRIGGER)].end())
+            LOG_ERROR("sql.sql", "AreaTrigger entry ({}) has SmartTrigger enabled but no SmartAI entries in the database.", pair.first);
+    }
 }
 
 /*static*/ bool SmartAIMgr::EventHasInvoker(SMART_EVENT event)
@@ -347,6 +427,7 @@ void SmartAIMgr::LoadSmartAIFromDB()
         case SMART_EVENT_NEAR_PLAYERS:
         case SMART_EVENT_SUMMONED_UNIT_EVADE:
         case SMART_EVENT_DATA_SET:
+        case SMART_EVENT_IS_IN_MELEE_RANGE:
             return true;
         default:
             return false;
@@ -553,6 +634,7 @@ bool SmartAIMgr::CheckUnusedEventParams(SmartScriptHolder const& e)
             case SMART_EVENT_FOLLOW_COMPLETED: return NO_PARAMS;
             case SMART_EVENT_EVENT_PHASE_CHANGE: return sizeof(SmartEvent::eventPhaseChange);
             case SMART_EVENT_IS_BEHIND_TARGET: return sizeof(SmartEvent::minMaxRepeat);
+            case SMART_EVENT_IS_IN_MELEE_RANGE: return sizeof(SmartEvent::meleeRange);
             case SMART_EVENT_GAME_EVENT_START: return sizeof(SmartEvent::gameEvent);
             case SMART_EVENT_GAME_EVENT_END: return sizeof(SmartEvent::gameEvent);
             case SMART_EVENT_GO_STATE_CHANGED: return sizeof(SmartEvent::goStateChanged);
@@ -964,6 +1046,7 @@ bool SmartAIMgr::IsEventValid(SmartScriptHolder& e)
             case SMART_EVENT_AREA_CASTING:
             case SMART_EVENT_IS_BEHIND_TARGET:
             case SMART_EVENT_RANGE:
+            case SMART_EVENT_IS_IN_MELEE_RANGE:
                 if (!IsMinMaxValid(e, e.event.minMaxRepeat.min, e.event.minMaxRepeat.max))
                     return false;
 

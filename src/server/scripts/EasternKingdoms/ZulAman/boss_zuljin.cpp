@@ -201,7 +201,7 @@ struct boss_zuljin : public BossAI
         ScheduleHealthCheckEvent({ 40 }, [&] {
             EnterPhase(PHASE_LYNX);
             me->RemoveAurasDueToSpell(SPELL_ENERGY_STORM);
-            instance->DoRemoveAurasDueToSpellOnPlayers(SPELL_ENERGY_STORM);
+            me->RemoveOwnedAura(SPELL_ENERGY_STORM);
             summons.DespawnEntry(CREATURE_FEATHER_VORTEX);
             me->ResumeChasingVictim();
 
@@ -268,6 +268,10 @@ struct boss_zuljin : public BossAI
         instance->SetBossState(DATA_ZULJIN, DONE);
         Talk(SAY_DEATH);
         summons.DespawnEntry(CREATURE_COLUMN_OF_FIRE);
+
+        me->m_Events.AddEventAtOffset( [this] {
+            summons.DespawnAll();
+        }, 3s);
     }
 
     void SpawnAdds()

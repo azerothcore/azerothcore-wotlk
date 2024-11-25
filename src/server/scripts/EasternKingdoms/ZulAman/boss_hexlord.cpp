@@ -89,7 +89,7 @@ enum Spells
 
     // Rogue
     SPELL_RO_BLIND                  = 43433,
-    SPELL_RO_SLICE_DICE             = 43457,
+    SPELL_RO_SLICE_DICE             = 43547,
     SPELL_RO_WOUND_POISON           = 43461,
 
     // Shaman
@@ -154,8 +154,14 @@ struct PlayerAbilityStruct
     std::chrono::milliseconds cooldown;
 };
 
-static PlayerAbilityStruct PlayerAbility[12][3] =
+static PlayerAbilityStruct PlayerAbility[13][3] =
 {
+    // 0 UNK class (should never be set)
+    {
+        { 0, ABILITY_TARGET_SELF, 0ms},
+        { 0, ABILITY_TARGET_SELF, 0ms},
+        { 0, ABILITY_TARGET_SELF, 0ms}
+    },
     // 1 warrior
     {   { SPELL_WR_SPELL_REFLECT, ABILITY_TARGET_SELF,   10000ms },
         { SPELL_WR_WHIRLWIND,     ABILITY_TARGET_SELF,   10000ms },
@@ -268,7 +274,7 @@ struct boss_hexlord_malacrass : public BossAI
                         siphonTrigger->AI()->DoCast(target, SPELL_SIPHON_SOUL, true);
                         siphonTrigger->GetMotionMaster()->MoveChase(me);
                         if (Player* player = target->ToPlayer())
-                            _currentClass = player->HasAura(AURA_SHADOW_FORM) ? ADDITIONAL_CLASS_SPRIEST : player->getClass() - 1;
+                            _currentClass = player->HasAura(AURA_SHADOW_FORM) ? uint8(ADDITIONAL_CLASS_SPRIEST) : player->getClass();
                     }
                 }
             });

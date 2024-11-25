@@ -49,15 +49,17 @@ Position const HarrisonJonesLoc = {120.687f, 1674.0f, 42.0217f, 1.59044f};
 
 DoorData const doorData[] =
 {
-    { GO_ZULJIN_FIREWALL, DATA_ZULJIN,  DOOR_TYPE_ROOM    },
-    { GO_DOOR_HALAZZI,    DATA_HALAZZI, DOOR_TYPE_ROOM    },
-    { GO_DOOR_AKILZON,    DATA_AKILZON, DOOR_TYPE_ROOM    },
-    { GO_GATE_ZULJIN,     DATA_HEXLORD, DOOR_TYPE_PASSAGE },
-    { 0,                  0,            DOOR_TYPE_ROOM    } // END
+    { GO_ZULJIN_FIREWALL,      DATA_ZULJIN,  DOOR_TYPE_ROOM    },
+    { GO_DOOR_HALAZZI,         DATA_HALAZZI, DOOR_TYPE_PASSAGE },
+    { GO_LYNX_TEMPLE_ENTRANCE, DATA_HALAZZI, DOOR_TYPE_ROOM    },
+    { GO_DOOR_AKILZON,         DATA_AKILZON, DOOR_TYPE_ROOM    },
+    { GO_GATE_ZULJIN,          DATA_HEXLORD, DOOR_TYPE_PASSAGE },
+    { 0,                       0,            DOOR_TYPE_ROOM    } // END
 };
 
 ObjectData const creatureData[] =
 {
+    { NPC_JANALAI,        DATA_JANALAI        },
     { NPC_SPIRIT_LYNX,    DATA_SPIRIT_LYNX    },
     { NPC_HARRISON_JONES, DATA_HARRISON_JONES },
     { 0,                  0                   }
@@ -69,6 +71,12 @@ ObjectData const gameObjectData[] =
     { GO_MASSIVE_GATE, DATA_MASSIVE_GATE },
     { GO_GATE_HEXLORD, DATA_HEXLORD_GATE },
     { 0,               0                 }
+};
+
+ObjectData const summonData[] =
+{
+    { NPC_AMANI_HATCHLING, DATA_JANALAI },
+    { 0,                   0            }
 };
 
 BossBoundaryData const boundaries =
@@ -93,6 +101,7 @@ public:
             LoadObjectData(creatureData, gameObjectData);
             LoadBossBoundaries(boundaries);
             LoadDoorData(doorData);
+            LoadSummonData(summonData);
 
             for (uint8 i = 0; i < RAND_VENDOR; ++i)
                 RandVendor[i] = NOT_STARTED;
