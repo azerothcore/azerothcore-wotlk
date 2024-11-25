@@ -3493,6 +3493,11 @@ void bot_ai::ReceiveEmote(Player* player, uint32 emote)
             for (uint32 st = UNIT_STATE_DIED; st <= UNIT_STATE_NO_ENVIRONMENT_UPD; st <<= 1u, ++counter)
                 if (me->HasUnitState(st))
                     report << "\n  UNIT_STATE_" << counter << " (" << st << ")";
+            report << "\nmovement flags:";
+            counter = 1;
+            for (uint32 st = MOVEMENTFLAG_FORWARD; st <= MOVEMENTFLAG_HOVER; st <<= 1u, ++counter)
+                if (me->HasUnitState(st))
+                    report << "\n  MOVEMENTFLAG_" << counter << " (" << st << ")";
 
             report << "\nProblems:";
 
@@ -11754,7 +11759,8 @@ void bot_ai::OnAttackStop(Unit const* target)
 //////////
 void bot_ai::SpawnKillReward(Player* looter) const
 {
-    ASSERT(IsWanderer());
+    if (!BotMgr::GetBotWandererKillRewardMoney() && !BotMgr::GetBotWandererKillRewardItemMaxCount())
+        return;
 
     if (!me->GetMap()->GetEntry()->IsContinent())
         return;
@@ -11764,12 +11770,6 @@ void bot_ai::SpawnKillReward(Player* looter) const
 }
 void bot_ai::FillKillReward(GameObject* go) const
 {
-    static const uint32 MAX_KILL_REWARD_ITEMS = 2;
-
-    ASSERT(IsWanderer());
-    ASSERT(go->GetEntry() == GO_BOT_MONEY_BAG);
-    ASSERT((go->GetSpellId() - go->GetEntry()) == me->GetEntry());
-
     go->SetObjectScale(0.875f);
 
     Loot& loot = go->loot;
@@ -11777,41 +11777,45 @@ void bot_ai::FillKillReward(GameObject* go) const
     loot.clear();
     loot.loot_type = LOOT_CORPSE;
 
-    //gold
-    float lvl = float(std::min<uint8>(me->GetLevel(), DEFAULT_MAX_LEVEL));
-    float gold = 125.0f;
-    switch (me->GetLevel() / 10)
+    uint32 basegold = BotMgr::GetBotWandererKillRewardMoney();
+    uint32 maxitems = BotMgr::GetBotWandererKillRewardItemMaxCount();
+    uint32 maxquality = BotMgr::GetBotWandererKillRewardItemMaxQuality();
+
+    if (!basegold && !maxitems)
+        return;
+
+    if (basegold)
     {
-        case 0: gold *= 0.100f; break;
-        case 1: gold *= 0.125f; break;
-        case 2: gold *= 0.175f; break;
-        case 3: gold *= 0.225f; break;
-        case 4: gold *= 0.300f; break;
-        case 5: gold *= 0.400f; break;
-        case 6: gold *= 0.550f; break;
-        case 7: gold *= 0.750f; break;
-        default:gold *= 1.000f; break;
+        float lvl = float(std::min<uint8>(me->GetLevel(), DEFAULT_MAX_LEVEL));
+        float gold = basegold;
+        switch (me->GetLevel() / 10)
+        {
+            case 0: gold *= 0.100f; break;
+            case 1: gold *= 0.125f; break;
+            case 2: gold *= 0.175f; break;
+            case 3: gold *= 0.225f; break;
+            case 4: gold *= 0.300f; break;
+            case 5: gold *= 0.400f; break;
+            case 6: gold *= 0.550f; break;
+            case 7: gold *= 0.750f; break;
+            default:                break;
+        }
+        gold = std::min<float>(std::max<float>(gold + _killsCount * gold * 0.04f - _deathsCount * gold * 0.4f, gold), gold * 10.0f) / float(DEFAULT_MAX_LEVEL) * lvl;
     }
 
-    loot.gold = uint32(lvl * std::min<float>(std::max<float>(gold + _killsCount * gold * 0.04f - _deathsCount * gold * 0.4f, gold), gold * 10.0f));
-
-    //items
-    uint32 loot_items_count = 0;
-    for (Item const* item : _equips)
+    if (maxitems)
     {
-        if (item)
+        std::list<uint32> random_items;
+        for (Item const* item : _equips)
         {
-            ItemTemplate const* proto = item->GetTemplate();
-            if (proto->Quality == ITEM_QUALITY_UNCOMMON || proto->Quality == ITEM_QUALITY_RARE)
-            {
-                if (roll_chance_f(5.0f))
-                {
-                    loot.AddItem(LootStoreItem(proto->ItemId, 0, 100.0f, false, 0, 0, 1, 1));
-
-                    if (++loot_items_count >= std::min<uint32>(MAX_KILL_REWARD_ITEMS, MAX_NR_LOOT_ITEMS))
-                        break;
-                }
-            }
+            if (item && item->GetTemplate()->Quality <= maxquality)
+                random_items.push_back(item->GetEntry());
+        }
+        if (!random_items.empty())
+        {
+            Bcore::Containers::RandomResize(random_items, maxitems);
+            for (uint32 itemd_id : random_items)
+                loot.AddItem(LootStoreItem(itemd_id, 0, 100.0f, false, 0, 0, 1, 1));
         }
     }
 }
