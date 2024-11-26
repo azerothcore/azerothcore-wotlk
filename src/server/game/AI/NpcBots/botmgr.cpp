@@ -85,6 +85,8 @@ uint32 _targetBGPlayersPerTeamCount_SA;
 uint32 _targetBGPlayersPerTeamCount_IC;
 bool _enableNpcBots;
 bool _logToDB;
+bool _xpReductionBlizzlikeEnable;
+bool _xpReductionBlizzlikeGroupOnly;
 bool _enableNpcBotsDungeons;
 bool _enableNpcBotsRaids;
 bool _enableNpcBotsBGs;
@@ -332,6 +334,8 @@ void BotMgr::LoadConfig(bool reload)
     _basefollowdist                 = sConfigMgr->GetIntDefault("NpcBot.BaseFollowDistance", 30);
     _xpReductionAmount              = sConfigMgr->GetIntDefault("NpcBot.XpReduction.Amount", 0);
     _xpReductionStartingNumber      = sConfigMgr->GetIntDefault("NpcBot.XpReduction.StartingNumber", 2);
+    _xpReductionBlizzlikeEnable     = sConfigMgr->GetBoolDefault("NpcBot.XpReduction.Blizzlike.Enable", true);
+    _xpReductionBlizzlikeGroupOnly  = sConfigMgr->GetBoolDefault("NpcBot.XpReduction.Blizzlike.GroupOnly", false);
     _mountLevel60                   = sConfigMgr->GetIntDefault("NpcBot.MountLevel.60", 20);
     _mountLevel100                  = sConfigMgr->GetIntDefault("NpcBot.MountLevel.100", 40);
     _healTargetIconFlags            = sConfigMgr->GetIntDefault("NpcBot.HealTargetIconMask", 0);
@@ -1104,6 +1108,14 @@ uint8 BotMgr::GetNpcBotXpReduction()
 uint8 BotMgr::GetNpcBotXpReductionStartingNumber()
 {
     return _xpReductionStartingNumber;
+}
+bool BotMgr::GetNpcBotXpReductionBlizzlikeEnabled()
+{
+    return _xpReductionBlizzlikeEnable;
+}
+bool BotMgr::GetNpcBotXpReductionBlizzlikeGroupOnly()
+{
+    return _xpReductionBlizzlikeGroupOnly;
 }
 
 uint8 BotMgr::GetNpcBotMountLevel60()

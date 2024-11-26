@@ -119,6 +119,34 @@ void KillRewarder::_InitGroupData()
                     // 2.5. _sumLevel - sum of levels of group members within reward distance;
                     _sumLevel += lvl;
                 }
+
+        //npcbot
+        if (BotMgr::GetNpcBotXpReductionBlizzlikeEnabled())
+        {
+            for (GroupReference* itr = _group->GetFirstMember(); itr != nullptr; itr = itr->next())
+            {
+                Player* member = itr->GetSource();
+                if (!member || !member->IsInMap(_victim) || !member->HaveBot())
+                    continue;
+
+                BotMap const* botMap = member->GetBotMgr()->GetBotMap();
+                for (auto const& kv : *botMap)
+                {
+                    Creature const* bot = kv.second;
+                    if (bot && bot->IsAlive() && bot->IsInMap(_victim) && (_group->IsMember(kv.first) || !BotMgr::GetNpcBotXpReductionBlizzlikeGroupOnly()) &&
+                        (member->GetMap()->IsDungeon() || _victim->GetDistance(bot) <= sWorld->getFloatConfig(CONFIG_GROUP_XP_DISTANCE)))
+                    {
+                        const uint8 lvl = bot->GetLevel();
+                        ++_count;
+                        _sumLevel += lvl;
+                        if (_maxLevel < lvl)
+                            _maxLevel = lvl;
+                    }
+                }
+            }
+        }
+        //end npcbot
+
         // 2.6. _isFullXP - flag identifying that for all group members victim is not gray,
         //      so 100% XP will be rewarded (50% otherwise).
         _isFullXP = _maxNotGrayMember && (_maxLevel == _maxNotGrayMember->GetLevel());

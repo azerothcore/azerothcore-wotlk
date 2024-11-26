@@ -4509,14 +4509,23 @@ NpcBot.BaseFollowDistance = 30
 #
 #    NpcBot.XpReduction.Amount
 #    NpcBot.XpReduction.StartingNumber
+#    NpcBot.XpReduction.Blizzlike.Enable
+#    NpcBot.XpReduction.Blizzlike.GroupOnly
 #        Description: XP percent penalty for each bot used starting with <StartingNumber>.
-#        Example:     3 bots, reduction is 20, start is 2: ((3-(2-1))*20) = 40%, 60% exp gained.
+#                     <Blizzlike> enables group size based XP reduction counting either any bots
+#                     or bots in group only, combines multiplicatively
+#        Example:     Group of 4, 3 bots, reduction is 20, start is 2, blizzlike enabled:
+#                     (100 - ((3-(2-1))*20)) * 1.3 / 4 = 19.5% exp gained.
 #        Note:        Maximum overall xp reduction is 90%.
 #        Default:     0 - (NpcBot.XpReduction.Amount)
 #                     2 - (NpcBot.XpReduction.StartingNumber)
+#                     1 - (NpcBot.XpReduction.Blizzlike.Enable)
+#                     0 - (NpcBot.XpReduction.Blizzlike.GroupOnly)
 
-NpcBot.XpReduction.Amount         = 0
-NpcBot.XpReduction.StartingNumber = 2
+NpcBot.XpReduction.Amount              = 0
+NpcBot.XpReduction.StartingNumber      = 2
+NpcBot.XpReduction.Blizzlike.Enable    = 1
+NpcBot.XpReduction.Blizzlike.GroupOnly = 0
 
 #
 #    NpcBot.MountLevel.60
