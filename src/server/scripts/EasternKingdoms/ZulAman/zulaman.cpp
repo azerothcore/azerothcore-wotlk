@@ -684,7 +684,6 @@ private:
     InstanceScript* _instance;
 };
 
-
 void AddSC_zulaman()
 {
     RegisterZulAmanCreatureAI(npc_forest_frog);

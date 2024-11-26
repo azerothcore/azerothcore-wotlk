@@ -137,7 +137,6 @@ public:
             InstanceScript::OnCreatureCreate(creature);
         }
 
-
         void OnGameObjectCreate(GameObject* go) override
         {
             if (go->GetEntry() == GO_GATE_HEXLORD)
