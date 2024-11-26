@@ -411,6 +411,7 @@ public:
     void SendUpdateWorldStateMessage(uint32 variable, uint32 value, Player* player = nullptr);
     void SendUpdateWorldStatesTo(Player* player);
     void SendUpdateWorldStatesToWorld() override;
+    void SendUpdateWorldStates(Player* player = nullptr);
 
     void HandleKill(Player* killer, Unit* victim) override;
     void OnUnitDeath(Unit* unit) override;

@@ -936,16 +936,18 @@ uint32 BattlefieldWG::GetData(uint32 data) const
 
 void BattlefieldWG::FillInitialWorldStates(WorldPacket& data)
 {
+    uint32 timer = GetTimer() / 1000;
+    bool iconActive = timer < 15 * MINUTE || IsWarTime();
+
     data << uint32(BATTLEFIELD_WG_WORLD_STATE_ATTACKER) << uint32(GetAttackerTeam());
     data << uint32(BATTLEFIELD_WG_WORLD_STATE_DEFENDER) << uint32(GetDefenderTeam());
     data << uint32(BATTLEFIELD_WG_WORLD_STATE_ACTIVE) << uint32(IsWarTime() ? 0 : 1); // Note: cleanup these two, their names look awkward
     data << uint32(BATTLEFIELD_WG_WORLD_STATE_SHOW_WORLDSTATE) << uint32(IsWarTime() ? 1 : 0);
     data << uint32(BATTLEFIELD_WG_WORLD_STATE_CONTROL) << uint32(m_DefenderTeam == TEAM_ALLIANCE ? 2 : 1); // Alliance 2, Hord 1
-    uint32 timer = GetTimer() / 1000;
-    data << uint32(BATTLEFIELD_WG_WORLD_STATE_ICON_ACTIVE) << uint32(timer > 15 * MINUTE ? 0 : 1);
+    data << uint32(BATTLEFIELD_WG_WORLD_STATE_ICON_ACTIVE) << uint32(iconActive ? 1 : 0);
 
     for (uint32 i = 0; i < 2; ++i)
-        data << ClockWorldState[i] << uint32(GameTime::GetGameTime().count() + (m_Timer / 1000));
+        data << ClockWorldState[i] << uint32(GameTime::GetGameTime().count() + timer);
 
     data << uint32(BATTLEFIELD_WG_WORLD_STATE_VEHICLE_H) << uint32(GetData(BATTLEFIELD_WG_DATA_VEHICLE_H));
     data << uint32(BATTLEFIELD_WG_WORLD_STATE_MAX_VEHICLE_H) << uint32(GetData(BATTLEFIELD_WG_DATA_MAX_VEHICLE_H));
@@ -988,31 +990,26 @@ void BattlefieldWG::SendInitWorldStatesToAll()
 }
 
 void BattlefieldWG::SendUpdateWorldStatesTo(Player* player) {
+    SendUpdateWorldStates(player);
+}
+
+void BattlefieldWG::SendUpdateWorldStatesToWorld() {
+    SendUpdateWorldStates();
+}
+
+void BattlefieldWG::SendUpdateWorldStates(Player* player) {
     uint32 timer = GetTimer() / 1000;
+    bool iconActive = timer < 15 * MINUTE || IsWarTime();
 
     SendUpdateWorldStateMessage(BATTLEFIELD_WG_WORLD_STATE_ATTACKER, GetAttackerTeam(), player);
     SendUpdateWorldStateMessage(BATTLEFIELD_WG_WORLD_STATE_DEFENDER, GetDefenderTeam(), player);
     SendUpdateWorldStateMessage(BATTLEFIELD_WG_WORLD_STATE_ACTIVE, IsWarTime() ? 0 : 1, player);
     SendUpdateWorldStateMessage(BATTLEFIELD_WG_WORLD_STATE_SHOW_WORLDSTATE, IsWarTime() ? 1 : 0, player);
     SendUpdateWorldStateMessage(BATTLEFIELD_WG_WORLD_STATE_CONTROL, GetDefenderTeam() == TEAM_ALLIANCE ? 2 : 1, player);
-    SendUpdateWorldStateMessage(BATTLEFIELD_WG_WORLD_STATE_ICON_ACTIVE, timer > 15 * MINUTE ? 0 : 1, player);
+    SendUpdateWorldStateMessage(BATTLEFIELD_WG_WORLD_STATE_ICON_ACTIVE, iconActive ? 1 : 0, player);
 
     for (uint32 i = 0; i < 2; ++i)
         SendUpdateWorldStateMessage(ClockWorldState[i], uint32(GameTime::GetGameTime().count() + timer), player);
-}
-
-void BattlefieldWG::SendUpdateWorldStatesToWorld() {
-    uint32 timer = GetTimer() / 1000;
-
-    SendUpdateWorldStateMessage(BATTLEFIELD_WG_WORLD_STATE_ATTACKER, GetAttackerTeam());
-    SendUpdateWorldStateMessage(BATTLEFIELD_WG_WORLD_STATE_DEFENDER, GetDefenderTeam());
-    SendUpdateWorldStateMessage(BATTLEFIELD_WG_WORLD_STATE_ACTIVE, IsWarTime() ? 0 : 1);
-    SendUpdateWorldStateMessage(BATTLEFIELD_WG_WORLD_STATE_SHOW_WORLDSTATE, IsWarTime() ? 1 : 0);
-    SendUpdateWorldStateMessage(BATTLEFIELD_WG_WORLD_STATE_CONTROL, GetDefenderTeam() == TEAM_ALLIANCE ? 2 : 1);
-    SendUpdateWorldStateMessage(BATTLEFIELD_WG_WORLD_STATE_ICON_ACTIVE, timer > 15 * MINUTE ? 0 : 1);
-
-    for (uint32 i = 0; i < 2; ++i)
-        SendUpdateWorldStateMessage(ClockWorldState[i], uint32(GameTime::GetGameTime().count() + timer));
 }
 
 void BattlefieldWG::SendUpdateWorldStateMessage(uint32 variable, uint32 value, Player* player) {
