@@ -4964,6 +4964,25 @@ NpcBot.WanderingBots.Continents.Maps = 0,1,530,571
 NpcBot.WanderingBots.Continents.XPGain = 1.0
 
 #
+#    NpcBot.WanderingBots.KillReward.Money
+#    NpcBot.WanderingBots.KillReward.ItemCount
+#    NpcBot.WanderingBots.KillReward.ItemQuality
+#        Description: Wandering bot kill loot reward. World maps only.
+#                     Money: Amount of money (in copper) to drop at level 80,
+#                       before level and kill count vs death count normalization.
+#                     ItemCount: Maximum number of items to drop, item ids are taken from
+#                       bot equipment. Range: 0..18.
+#                     ItemQuality: Maximum quality of dropped items. Most bots are equipped
+#                       with 2/3/4 (uncommon/rare/epic) Range: 0..7.
+#        Default:     0 - (NpcBot.WanderingBots.KillReward.Money)
+#                     0 - (NpcBot.WanderingBots.KillReward.ItemCount)
+#                     0 - (NpcBot.WanderingBots.KillReward.ItemQuality)
+
+NpcBot.WanderingBots.KillReward.Money       = 0
+NpcBot.WanderingBots.KillReward.ItemCount   = 0
+NpcBot.WanderingBots.KillReward.ItemQuality = 0
+
+#
 #    NpcBot.WanderingBots.MaxItemLevel.Levels
 #        Description: Maximum item ilevel to generate for wandering bots per level bracket:
 #                     0-9, 10-19, 20,29, ... , 70-79, 80+.
