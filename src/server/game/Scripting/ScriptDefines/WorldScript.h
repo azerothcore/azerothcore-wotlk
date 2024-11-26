@@ -18,9 +18,10 @@
 #ifndef SCRIPT_OBJECT_WORLD_SCRIPT_H_
 #define SCRIPT_OBJECT_WORLD_SCRIPT_H_
 
+#include "Common.h"
 #include "ScriptObject.h"
 #include <vector>
-#include "Common.h"
+
 
 enum WorldHook
 {
