@@ -59,7 +59,10 @@ constexpr auto NPC_SOARING_EAGLE = 24858;
 
 struct boss_akilzon : public BossAI
 {
-    boss_akilzon(Creature* creature) : BossAI(creature, DATA_AKILZON), _isRaining(false) { }
+    boss_akilzon(Creature* creature) : BossAI(creature, DATA_AKILZON), _isRaining(false)
+    {
+        callForHelpRange = 105.0f;
+    }
 
     void Reset() override
     {
