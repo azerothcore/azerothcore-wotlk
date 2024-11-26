@@ -1391,11 +1391,15 @@ public:
                     return;
             }
             //Consecration
-            if (IsSpellReady(CONSECRATION_1, diff) && can_do_holy && HasRole(BOT_ROLE_DPS) && dist < 5 &&
-                !mytar->isMoving() && Rand() < 50)
+            if (IsSpellReady(CONSECRATION_1, diff) && can_do_holy && HasRole(BOT_ROLE_DPS) && dist < 5 && !mytar->isMoving() && Rand() < 20)
             {
-                if (doCast(me, GetSpell(CONSECRATION_1)))
-                    return;
+                std::list<Unit*> targets;
+                GetNearbyTargetsList(targets, 8.f, 0);
+                if (targets.size() >= 2)
+                {
+                    if (doCast(me, GetSpell(CONSECRATION_1)))
+                        return;
+                }
             }
             //Hammer of the Righteous (1h only)
             if (IsSpellReady(HAMMER_OF_THE_RIGHTEOUS_1, diff) && can_do_holy && HasRole(BOT_ROLE_DPS) &&
