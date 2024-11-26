@@ -22,7 +22,6 @@
 #include "ScriptObject.h"
 #include <vector>
 
-
 enum WorldHook
 {
     WORLDHOOK_ON_OPEN_STATE_CHANGE,
