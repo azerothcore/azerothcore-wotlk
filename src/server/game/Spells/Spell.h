@@ -218,6 +218,7 @@ struct SpellValue
     uint8     AuraStackAmount;
     int32     AuraDuration;
     bool      ForcedCritResult;
+    uint32    MiscVal[MAX_SPELL_EFFECTS];
 };
 
 enum SpellState
