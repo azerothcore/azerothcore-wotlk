@@ -109,8 +109,9 @@ enum HatchActions
 enum Misc
 {
     MAX_BOMB_COUNT              = 40,
-    SCHEDULER_GROUP_HATCHING    = 1,
-    GROUP_ENRAGE                = 1
+    GROUP_ENRAGE                = 1,
+    GROUP_HATCHING              = 2,
+    DATA_ALL_EGGS_HATCHED       = 0
 };
 
 struct boss_janalai : public BossAI
@@ -146,6 +147,8 @@ struct boss_janalai : public BossAI
         });
 
         me->m_Events.KillAllEvents(false);
+        _sideHatched[0] = false;
+        _sideHatched[1] = false;
     }
 
     void JustDied(Unit* killer) override
@@ -184,11 +187,33 @@ struct boss_janalai : public BossAI
         ScheduleTimedEvent(30s, [&]{
             StartBombing();
         }, 20s, 40s);
-        ScheduleTimedEvent(10s, [&]{
+
+        scheduler.Schedule(10s, GROUP_HATCHING, [this](TaskContext context)
+        {
+            if (_sideHatched[0] && _sideHatched[1])
+                return;
+
             Talk(SAY_SUMMON_HATCHER);
-            me->SummonCreature(NPC_AMANI_HATCHER, hatcherway[0][0], TEMPSUMMON_CORPSE_TIMED_DESPAWN, 10000);
-            me->SummonCreature(NPC_AMANI_HATCHER, hatcherway[1][0], TEMPSUMMON_CORPSE_TIMED_DESPAWN, 10000);
-        }, 90s);
+
+            if (_sideHatched[0] && !_sideHatched[1])
+            {
+                me->SummonCreature(NPC_AMANI_HATCHER, hatcherway[1][0], TEMPSUMMON_CORPSE_TIMED_DESPAWN, 10000);
+                me->SummonCreature(NPC_AMANI_HATCHER, hatcherway[1][0], TEMPSUMMON_CORPSE_TIMED_DESPAWN, 10000);
+            }
+            else if (!_sideHatched[0] && _sideHatched[1])
+            {
+                me->SummonCreature(NPC_AMANI_HATCHER, hatcherway[0][0], TEMPSUMMON_CORPSE_TIMED_DESPAWN, 10000);
+                me->SummonCreature(NPC_AMANI_HATCHER, hatcherway[0][0], TEMPSUMMON_CORPSE_TIMED_DESPAWN, 10000);
+            }
+            else
+            {
+                me->SummonCreature(NPC_AMANI_HATCHER, hatcherway[0][0], TEMPSUMMON_CORPSE_TIMED_DESPAWN, 10000);
+                me->SummonCreature(NPC_AMANI_HATCHER, hatcherway[1][0], TEMPSUMMON_CORPSE_TIMED_DESPAWN, 10000);
+            }
+
+            context.Repeat(90s);
+        });
+
         ScheduleTimedEvent(8s, [&]{
             if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0))
             {
@@ -213,6 +238,12 @@ struct boss_janalai : public BossAI
             Talk(SAY_BERSERK);
             DoCastSelf(SPELL_BERSERK);
         }, 10min);
+    }
+
+    void SetData(uint32 index, uint32 data) override
+    {
+        if (index == DATA_ALL_EGGS_HATCHED)
+            _sideHatched[data] = true;
     }
 
     bool HatchAllEggs(uint32 hatchAction)
@@ -337,6 +368,7 @@ struct boss_janalai : public BossAI
 private:
     bool _isBombing;
     bool _isFlameBreathing;
+    bool _sideHatched[2];
 };
 
 struct npc_janalai_hatcher : public ScriptedAI
@@ -349,6 +381,7 @@ struct npc_janalai_hatcher : public ScriptedAI
         scheduler.CancelAll();
         _side = (me->GetPositionY() < 1150);
         _waypoint = 0;
+        _repeatCount = 1;
         _isHatching = false;
         me->GetMotionMaster()->Clear();
         me->GetMotionMaster()->MovePoint(0, hatcherway[_side][0]);
@@ -360,19 +393,24 @@ struct npc_janalai_hatcher : public ScriptedAI
         {
             _isHatching = true;
 
-            scheduler.Schedule(1500ms, SCHEDULER_GROUP_HATCHING, [this](TaskContext context)
+            scheduler.Schedule(1500ms, [this](TaskContext context)
             {
-                me->CastCustomSpell(SPELL_HATCH_EGG_ALL, SPELLVALUE_MAX_TARGETS, context.GetRepeatCounter() + 1);
+                me->CastCustomSpell(SPELL_HATCH_EGG_ALL, SPELLVALUE_MAX_TARGETS, _repeatCount);
+
+                ++_repeatCount;
 
                 if (me->FindNearestCreature(NPC_EGG, 100.0f))
                     context.Repeat(4s);
                 else
                 {
+                    if (WorldObject* summoner = GetSummoner())
+                        if (Creature* janalai = summoner->ToCreature())
+                            janalai->AI()->SetData(DATA_ALL_EGGS_HATCHED, _side);
+
                     _side = _side ? 0 : 1;
                     _isHatching = false;
                     _waypoint = 3;
                     MoveToNewWaypoint(_waypoint);
-                    context.CancelGroup(SCHEDULER_GROUP_HATCHING);
                 }
             });
         }
@@ -407,6 +445,7 @@ struct npc_janalai_hatcher : public ScriptedAI
 private:
     uint8 _side;
     uint8 _waypoint;
+    uint32 _repeatCount;
     bool _isHatching;
 };
 
