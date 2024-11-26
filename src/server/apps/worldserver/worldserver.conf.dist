@@ -4528,6 +4528,17 @@ NpcBot.XpReduction.Blizzlike.Enable    = 1
 NpcBot.XpReduction.Blizzlike.GroupOnly = 0
 
 #
+#    NpcBot.MoneyShare.Enable
+#    NpcBot.MoneyShare.GroupOnly
+#        Description: Share money loot with bots, effectively reducing money amount players receive.
+#        Example:     Group of 5, 3 bots, looting 100 copper, players receive 20 copper each.
+#        Default:     0 - (NpcBot.MoneyShare.Enable)
+#                     0 - (NpcBot.MoneyShare.GroupOnly)
+
+NpcBot.MoneyShare.Enable    = 0
+NpcBot.MoneyShare.GroupOnly = 0
+
+#
 #    NpcBot.MountLevel.60
 #    NpcBot.MountLevel.100
 #        Description: Minimum level for bots to be able to use ground mounts

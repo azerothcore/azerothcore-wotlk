@@ -244,6 +244,8 @@ class AC_GAME_API BotMgr
         static uint8 GetNpcBotXpReductionStartingNumber();
         static bool GetNpcBotXpReductionBlizzlikeEnabled();
         static bool GetNpcBotXpReductionBlizzlikeGroupOnly();
+        static bool GetNpcBotMoneyShareEnabled();
+        static bool GetNpcBotMoneyShareGroupOnly();
         static uint8 GetNpcBotMountLevel60();
         static uint8 GetNpcBotMountLevel100();
         static int32 GetBotInfoPacketsLimit();

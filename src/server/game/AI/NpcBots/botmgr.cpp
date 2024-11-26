@@ -87,6 +87,8 @@ bool _enableNpcBots;
 bool _logToDB;
 bool _xpReductionBlizzlikeEnable;
 bool _xpReductionBlizzlikeGroupOnly;
+bool _moneyLootShareEnable;
+bool _moneyLootShareGroupOnly;
 bool _enableNpcBotsDungeons;
 bool _enableNpcBotsRaids;
 bool _enableNpcBotsBGs;
@@ -336,6 +338,8 @@ void BotMgr::LoadConfig(bool reload)
     _xpReductionStartingNumber      = sConfigMgr->GetIntDefault("NpcBot.XpReduction.StartingNumber", 2);
     _xpReductionBlizzlikeEnable     = sConfigMgr->GetBoolDefault("NpcBot.XpReduction.Blizzlike.Enable", true);
     _xpReductionBlizzlikeGroupOnly  = sConfigMgr->GetBoolDefault("NpcBot.XpReduction.Blizzlike.GroupOnly", false);
+    _moneyLootShareEnable           = sConfigMgr->GetBoolDefault("NpcBot.MoneyShare.Enable", false);
+    _moneyLootShareGroupOnly        = sConfigMgr->GetBoolDefault("NpcBot.MoneyShare.GroupOnly", false);
     _mountLevel60                   = sConfigMgr->GetIntDefault("NpcBot.MountLevel.60", 20);
     _mountLevel100                  = sConfigMgr->GetIntDefault("NpcBot.MountLevel.100", 40);
     _healTargetIconFlags            = sConfigMgr->GetIntDefault("NpcBot.HealTargetIconMask", 0);
@@ -1116,6 +1120,15 @@ bool BotMgr::GetNpcBotXpReductionBlizzlikeEnabled()
 bool BotMgr::GetNpcBotXpReductionBlizzlikeGroupOnly()
 {
     return _xpReductionBlizzlikeGroupOnly;
+}
+
+bool BotMgr::GetNpcBotMoneyShareEnabled()
+{
+    return _moneyLootShareEnable;
+}
+bool BotMgr::GetNpcBotMoneyShareGroupOnly()
+{
+    return _moneyLootShareGroupOnly;
 }
 
 uint8 BotMgr::GetNpcBotMountLevel60()
