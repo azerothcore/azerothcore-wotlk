@@ -12104,7 +12104,28 @@ void bot_ai::_autoLootCreatureGold(Creature* creature) const
                 players.push_back(p);
         }
 
-        uint32 goldPerPlayer = uint32(loot->gold / uint32(players.size()));
+        uint32 bots_count = 0;
+        if (BotMgr::GetNpcBotMoneyShareEnabled())
+        {
+            for (GroupReference const* itr = gr->GetFirstMember(); itr != nullptr; itr = itr->next())
+            {
+                Player const* member = itr->GetSource();
+                if (!member || !member->IsInMap(creature) || !member->HaveBot())
+                    continue;
+
+                BotMap const* botMap = member->GetBotMgr()->GetBotMap();
+                for (auto const& kv : *botMap)
+                {
+                    Creature const* bot = kv.second;
+                    if (bot && bot->IsAlive() && bot->IsInMap(creature) && (gr->IsMember(kv.first) || !BotMgr::GetNpcBotMoneyShareGroupOnly()) &&
+                        (member->GetMap()->IsDungeon() || creature->GetDistance(bot) <= sWorld->getFloatConfig(CONFIG_GROUP_XP_DISTANCE)))
+                        ++bots_count;
+                }
+            }
+        }
+
+        uint32 sharers_count = uint32(players.size()) + bots_count;
+        uint32 goldPerPlayer = uint32(loot->gold / sharers_count);
 
         for (std::vector<Player*>::const_iterator i = players.begin(); i != players.end(); ++i)
         {
@@ -12113,7 +12134,7 @@ void bot_ai::_autoLootCreatureGold(Creature* creature) const
 
             WorldPacket data(SMSG_LOOT_MONEY_NOTIFY, 4 + 1);
             data << uint32(goldPerPlayer);
-            data << uint8(players.size() <= 1); // Controls the text displayed in chat. 0 is "Your share is..." and 1 is "You loot..."
+            data << uint8(sharers_count <= 1); // Controls the text displayed in chat. 0 is "Your share is..." and 1 is "You loot..."
             (*i)->SendDirectMessage(&data);
         }
     }
