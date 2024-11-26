@@ -1,3 +1,4 @@
+-- DB update 2024_11_26_01 -> 2024_11_26_02
 
 -- Remove Wrong Guids
 
