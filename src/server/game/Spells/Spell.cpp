@@ -556,7 +556,11 @@ void SpellCastTargets::OutDebug() const
 SpellValue::SpellValue(SpellInfo const* proto)
 {
     for (uint32 i = 0; i < MAX_SPELL_EFFECTS; ++i)
+    {
         EffectBasePoints[i] = proto->Effects[i].BasePoints;
+        MiscVal[i] = 0;
+    }
+
     MaxAffectedTargets = proto->MaxAffectedTargets;
     RadiusMod = 1.0f;
     AuraStackAmount = 1;
@@ -8457,6 +8461,15 @@ void Spell::SetSpellValue(SpellValueMod mod, int32 value)
             break;
         case SPELLVALUE_FORCED_CRIT_RESULT:
             m_spellValue->ForcedCritResult = (bool)value;
+            break;
+        case SPELLVALUE_MISCVALUE0:
+            m_spellValue->MiscVal[0] = value;
+            break;
+        case SPELLVALUE_MISCVALUE1:
+            m_spellValue->MiscVal[1] = value;
+            break;
+        case SPELLVALUE_MISCVALUE2:
+            m_spellValue->MiscVal[2] = value;
             break;
     }
 }
