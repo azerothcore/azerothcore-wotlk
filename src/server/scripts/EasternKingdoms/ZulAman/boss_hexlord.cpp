@@ -247,6 +247,20 @@ struct boss_hexlord_malacrass : public BossAI
         }
     }
 
+    void CastDrainPower()
+    {
+        DoCastSelf(SPELL_DRAIN_POWER, true);
+        Talk(SAY_DRAIN_POWER);
+    }
+
+    void BeginCastingDrainPower()
+    {
+        CastDrainPower();
+        ScheduleTimedEvent(30s,[&] {
+            CastDrainPower();
+        }, 30s, 40s);
+    }
+
     void JustEngagedWith(Unit* who) override
     {
         BossAI::JustEngagedWith(who);
@@ -257,10 +271,10 @@ struct boss_hexlord_malacrass : public BossAI
                 add->SetInCombatWithZone();
         });
 
-        ScheduleTimedEvent(60s, [&]{
-            DoCastSelf(SPELL_DRAIN_POWER, true);
-            Talk(SAY_DRAIN_POWER);
-        }, 40s, 55s);
+        ScheduleHealthCheckEvent(80, [&]{
+            BeginCastingDrainPower();
+        });
+
         ScheduleTimedEvent(30s, [&]{
             DoCastSelf(SPELL_SPIRIT_BOLTS);
             scheduler.Schedule(10s, [this](TaskContext)
