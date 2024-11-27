@@ -247,20 +247,6 @@ struct boss_hexlord_malacrass : public BossAI
         }
     }
 
-    void CastDrainPower()
-    {
-        DoCastSelf(SPELL_DRAIN_POWER, true);
-        Talk(SAY_DRAIN_POWER);
-    }
-
-    void BeginCastingDrainPower()
-    {
-        CastDrainPower();
-        ScheduleTimedEvent(30s,[&] {
-            CastDrainPower();
-        }, 30s, 30s);
-    }
-
     void JustEngagedWith(Unit* who) override
     {
         BossAI::JustEngagedWith(who);
@@ -272,7 +258,10 @@ struct boss_hexlord_malacrass : public BossAI
         });
 
         ScheduleHealthCheckEvent(80, [&]{
-            BeginCastingDrainPower();
+            ScheduleTimedEvent(0s, [&] {
+                DoCastSelf(SPELL_DRAIN_POWER, true);
+                Talk(SAY_DRAIN_POWER);
+            }, 30s, 30s);
         });
 
         ScheduleTimedEvent(30s, [&]{
