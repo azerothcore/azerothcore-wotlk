@@ -87,6 +87,9 @@ struct AuctionEntry
 {
     uint32 Id;
     AuctionHouseId houseId;
+    ObjectGuid item_guid;
+    uint32 item_template;
+    uint32 itemCount;
     ObjectGuid owner;
     uint32 startbid;                                        //maybe useless
     uint32 bid;
@@ -95,7 +98,6 @@ struct AuctionEntry
     ObjectGuid bidder;
     uint32 deposit;                                         //deposit can be calculated only when creating auction
     AuctionHouseEntry const* auctionHouseEntry;             // in AuctionHouse.dbc
-    Item* item;
 
     // helpers
     [[nodiscard]] AuctionHouseId GetHouseId() const { return houseId; }

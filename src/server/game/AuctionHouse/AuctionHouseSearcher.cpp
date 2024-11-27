@@ -253,6 +253,10 @@ void AuctionHouseSearcher::AddSearchRequest(AuctionSearchRequest* searchRequestI
 
 void AuctionHouseSearcher::AddAuction(AuctionEntry const* auctionEntry)
 {
+    Item* item = sAuctionMgr->GetAItem(auctionEntry->item_guid);
+    if (!item)
+        return;
+
     // SearchableAuctionEntry is a shared_ptr as it will be shared among all the worker threads and needs to be self-managed
     std::shared_ptr<SearchableAuctionEntry> searchableAuctionEntry = std::make_shared<SearchableAuctionEntry>();
     searchableAuctionEntry->Id = auctionEntry->Id;
@@ -269,20 +273,20 @@ void AuctionHouseSearcher::AddAuction(AuctionEntry const* auctionEntry)
     searchableAuctionEntry->bidderGuid = ObjectGuid::Empty;
 
     // Item info
-    searchableAuctionEntry->item.entry = auctionEntry->item->GetEntry();
+    searchableAuctionEntry->item.entry = item->GetEntry();
 
     for (uint8 i = 0; i < MAX_INSPECTED_ENCHANTMENT_SLOT; ++i)
     {
-        searchableAuctionEntry->item.enchants[i].id = auctionEntry->item->GetEnchantmentId(EnchantmentSlot(i));
-        searchableAuctionEntry->item.enchants[i].duration = auctionEntry->item->GetEnchantmentDuration(EnchantmentSlot(i));
-        searchableAuctionEntry->item.enchants[i].charges = auctionEntry->item->GetEnchantmentCharges(EnchantmentSlot(i));
+        searchableAuctionEntry->item.enchants[i].id = item->GetEnchantmentId(EnchantmentSlot(i));
+        searchableAuctionEntry->item.enchants[i].duration = item->GetEnchantmentDuration(EnchantmentSlot(i));
+        searchableAuctionEntry->item.enchants[i].charges = item->GetEnchantmentCharges(EnchantmentSlot(i));
     }
 
-    searchableAuctionEntry->item.randomPropertyId = auctionEntry->item->GetItemRandomPropertyId();
-    searchableAuctionEntry->item.suffixFactor = auctionEntry->item->GetItemSuffixFactor();
-    searchableAuctionEntry->item.count = auctionEntry->item->GetCount();
-    searchableAuctionEntry->item.spellCharges = auctionEntry->item->GetSpellCharges();
-    searchableAuctionEntry->item.itemTemplate = auctionEntry->item->GetTemplate();
+    searchableAuctionEntry->item.randomPropertyId = item->GetItemRandomPropertyId();
+    searchableAuctionEntry->item.suffixFactor = item->GetItemSuffixFactor();
+    searchableAuctionEntry->item.count = item->GetCount();
+    searchableAuctionEntry->item.spellCharges = item->GetSpellCharges();
+    searchableAuctionEntry->item.itemTemplate = item->GetTemplate();
 
     searchableAuctionEntry->SetItemNames();
 

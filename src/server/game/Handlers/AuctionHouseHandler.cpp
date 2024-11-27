@@ -106,7 +106,7 @@ void WorldSession::SendAuctionOwnerNotification(AuctionEntry* auction)
     data << uint32(auction->bid);
     data << uint32(0);                                      //unk
     data << uint64(0);                                      //unk (bidder guid?)
-    data << uint32(auction->item->GetEntry());
+    data << uint32(auction->item_template);
     data << uint32(0);                                      //unk
     data << float(0);                                       //unk (time?)
     SendPacket(&data);
@@ -293,6 +293,9 @@ void WorldSession::HandleAuctionSellItem(WorldPacket& recvData)
         // Required stack size of auction matches to current item stack size, just move item to auctionhouse
         if (itemsCount == 1 && item->GetCount() == count[i])
         {
+            AH->item_guid = item->GetGUID();
+            AH->item_template = item->GetEntry();
+            AH->itemCount = item->GetCount();
             AH->owner = _player->GetGUID();
             AH->startbid = bid;
             AH->bidder = ObjectGuid::Empty;
@@ -301,7 +304,6 @@ void WorldSession::HandleAuctionSellItem(WorldPacket& recvData)
             AH->expire_time = GameTime::GetGameTime().count() + auctionTime;
             AH->deposit = deposit;
             AH->auctionHouseEntry = auctionHouseEntry;
-            AH->item = item;
 
             LOG_DEBUG("network.opcode", "CMSG_AUCTION_SELL_ITEM: Player {} ({}) is selling item {} entry {} ({}) with count {} with initial bid {} with buyout {} and with time {} (in sec) in auctionhouse {}",
                 _player->GetName(), _player->GetGUID().ToString(), item->GetTemplate()->Name1, item->GetEntry(), item->GetGUID().ToString(), item->GetCount(), bid, buyout, auctionTime, AH->GetHouseId());
@@ -332,6 +334,9 @@ void WorldSession::HandleAuctionSellItem(WorldPacket& recvData)
                 return;
             }
 
+            AH->item_guid = newItem->GetGUID();
+            AH->item_template = newItem->GetEntry();
+            AH->itemCount = newItem->GetCount();
             AH->owner = _player->GetGUID();
             AH->startbid = bid;
             AH->bidder = ObjectGuid::Empty;
@@ -340,7 +345,6 @@ void WorldSession::HandleAuctionSellItem(WorldPacket& recvData)
             AH->expire_time = GameTime::GetGameTime().count() + auctionTime;
             AH->deposit = deposit;
             AH->auctionHouseEntry = auctionHouseEntry;
-            AH->item = newItem;
 
             LOG_DEBUG("network.opcode", "CMSG_AUCTION_SELL_ITEM: Player {} ({}) is selling item {} entry {} ({}) with count {} with initial bid {} with buyout {} and with time {} (in sec) in auctionhouse {}",
                 _player->GetName(), _player->GetGUID().ToString(), newItem->GetTemplate()->Name1, newItem->GetEntry(), newItem->GetGUID().ToString(), newItem->GetCount(), bid, buyout, auctionTime, AH->GetHouseId());
@@ -512,6 +516,7 @@ void WorldSession::HandleAuctionPlaceBid(WorldPacket& recvData)
 
         auction->DeleteFromDB(trans);
 
+        sAuctionMgr->RemoveAItem(auction->item_guid);
         auctionHouse->RemoveAuction(auction);
     }
     player->SaveInventoryAndGoldToDB(trans);
@@ -545,8 +550,9 @@ void WorldSession::HandleAuctionRemoveItem(WorldPacket& recvData)
     CharacterDatabaseTransaction trans = CharacterDatabase.BeginTransaction();
     if (auction && auction->owner == player->GetGUID())
     {
-        Item* pItem = auction->item;
-        ASSERT(pItem);
+        Item* pItem = sAuctionMgr->GetAItem(auction->item_guid);
+        if (!pItem)
+            return;
 
         if (auction->bidder)                        // If we have a bidder, we have to send him the money he paid
         {
@@ -562,9 +568,6 @@ void WorldSession::HandleAuctionRemoveItem(WorldPacket& recvData)
         MailDraft(auction->BuildAuctionMailSubject(AUCTION_CANCELED), AuctionEntry::BuildAuctionMailBody(ObjectGuid::Empty, 0, auction->buyout, auction->deposit))
         .AddItem(pItem)
         .SendMailTo(trans, player, auction, MAIL_CHECK_MASK_COPIED);
-
-        // Item is no longer valid
-        auction->item = nullptr;
     }
     else
     {
@@ -583,6 +586,7 @@ void WorldSession::HandleAuctionRemoveItem(WorldPacket& recvData)
     auction->DeleteFromDB(trans);
     CharacterDatabase.CommitTransaction(trans);
 
+    sAuctionMgr->RemoveAItem(auction->item_guid);
     auctionHouse->RemoveAuction(auction);
 }
 
