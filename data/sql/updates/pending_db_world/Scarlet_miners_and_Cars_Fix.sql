@@ -174,7 +174,9 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 (28821, 0, 0, 0, 11, 0, 100, 0, 0, 0, 0, 0, 0, 0, 29, 1, 180, 0, 0, 0, 0, 23, 0, 0, 0, 0, 0, 0, 0, 0, 'Mine Car - On Respawn - Start Follow Owner Or Summoner');
 
 
--- Scarlet Miners (specific Guid Sai)
+-- Scarlet Miners
+
+UPDATE `creature` SET `Comment` = "has guid specific SAI" WHERE (`id1` = 28822) AND (`guid` IN (128895, 128901, 128893, 128894, 128892, 128899, 128896, 128898));
 
 -- Miners inside the Mine
 
