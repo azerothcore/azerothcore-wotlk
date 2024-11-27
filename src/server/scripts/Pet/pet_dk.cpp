@@ -349,7 +349,8 @@ class spell_pet_dk_gargoyle_strike : public SpellScript
     void HandleDamageCalc(SpellEffIndex /*effIndex*/)
     {
         int32 damage = 60;
-        if (Unit* caster = GetCaster())
+        Unit* caster = GetCaster();
+        if (caster)
         {
             if (caster->GetLevel() >= 60)
             {
@@ -358,6 +359,8 @@ class spell_pet_dk_gargoyle_strike : public SpellScript
         }
 
         SetEffectValue(damage);
+        //每次石像鬼打击的时候，设置天鬼的急速为玩家的急速
+        caster->SetFloatValue(UNIT_MOD_CAST_SPEED, caster->GetOwner()->GetFloatValue(UNIT_MOD_CAST_SPEED));
     }
 
     void Register() override
