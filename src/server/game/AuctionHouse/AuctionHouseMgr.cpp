@@ -604,6 +604,11 @@ bool AuctionEntry::BuildAuctionInfo(WorldPacket& data) const
     return true;
 }
 
+AuctionHouseFaction AuctionEntry::GetFactionId() const
+{
+    return AuctionHouseMgr::GetAuctionHouseFactionFromHouseId(houseId);
+}
+
 uint32 AuctionEntry::GetAuctionCut() const
 {
     int32 cut = int32(CalculatePct(bid, auctionHouseEntry->cutPercent) * sWorld->getRate(RATE_AUCTION_CUT));

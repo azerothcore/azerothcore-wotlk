@@ -34,7 +34,7 @@ void AuctionHouseWorkerThread::Stop()
     _workerThread.join();
 }
 
-void AuctionHouseWorkerThread::AddAuctionSearchUpdateToQueue(AuctionSearchUpdate const& auctionSearchUpdate)
+void AuctionHouseWorkerThread::AddAuctionSearchUpdateToQueue(std::shared_ptr<AuctionSearchUpdate> const auctionSearchUpdate)
 {
     _auctionUpdatesQueue.add(auctionSearchUpdate);
 }
@@ -42,23 +42,46 @@ void AuctionHouseWorkerThread::AddAuctionSearchUpdateToQueue(AuctionSearchUpdate
 void AuctionHouseWorkerThread::Run()
 {
     while (!World::IsStopped())
+    {
+        std::this_thread::sleep_for(Milliseconds(25));
+
+        ProcessSearchUpdates();
         ProcessSearchRequests();
+    }
 }
 
 void AuctionHouseWorkerThread::ProcessSearchUpdates()
 {
-    AuctionSearchUpdate auctionSearchUpdate;
+    std::shared_ptr<AuctionSearchUpdate> auctionSearchUpdate;
     while (_auctionUpdatesQueue.next(auctionSearchUpdate))
     {
-        SearchableAuctionEntriesMap& searchableAuctionMap = GetSearchableAuctionMap(auctionSearchUpdate.searchableAuctionEntry->listFaction);
-        switch (auctionSearchUpdate.updateType)
+        SearchableAuctionEntriesMap& searchableAuctionMap = GetSearchableAuctionMap(auctionSearchUpdate->listFaction);
+
+        switch (auctionSearchUpdate->updateType)
         {
         case AuctionSearchUpdate::Type::ADD:
-            searchableAuctionMap.insert(std::make_pair(auctionSearchUpdate.searchableAuctionEntry->Id, auctionSearchUpdate.searchableAuctionEntry));
+        {
+            std::shared_ptr<AuctionSearchAdd> const auctionAdd = std::static_pointer_cast<AuctionSearchAdd>(auctionSearchUpdate);
+            searchableAuctionMap.insert(std::make_pair(auctionAdd->searchableAuctionEntry->Id, auctionAdd->searchableAuctionEntry));
             break;
+        }
         case AuctionSearchUpdate::Type::REMOVE:
-            searchableAuctionMap.erase(auctionSearchUpdate.searchableAuctionEntry->Id);
+        {
+            std::shared_ptr<AuctionSearchRemove> const auctionRemove = std::static_pointer_cast<AuctionSearchRemove>(auctionSearchUpdate);
+            searchableAuctionMap.erase(auctionRemove->auctionId);
             break;
+        }
+        case AuctionSearchUpdate::Type::UPDATE_BID:
+        {
+            std::shared_ptr<AuctionSearchUpdateBid> const auctionUpdateBid = std::static_pointer_cast<AuctionSearchUpdateBid>(auctionSearchUpdate);
+            SearchableAuctionEntriesMap::const_iterator itr = searchableAuctionMap.find(auctionUpdateBid->auctionId);
+            if (itr != searchableAuctionMap.end())
+            {
+                itr->second->bid = auctionUpdateBid->bid;
+                itr->second->bidderGuid = auctionUpdateBid->bidderGuid;
+            }
+            break;
+        }
         default:
             break;
         }
@@ -68,78 +91,72 @@ void AuctionHouseWorkerThread::ProcessSearchUpdates()
 void AuctionHouseWorkerThread::ProcessSearchRequests()
 {
     AuctionSearchRequest* searchRequest = nullptr;
-    _requestQueue->WaitAndPop(searchRequest);
-
-    if (!searchRequest)
-        return;
-
-    // WaitAndPop will block the current thread until we have something to process, as a
-    // result we should process the search updates first before processing this request
-    ProcessSearchUpdates();
-
-    SearchableAuctionEntriesMap const& searchableAuctionMap = GetSearchableAuctionMap(searchRequest->searchInfo.listFaction);
-
-    AuctionSearchResponse* searchResponse = new AuctionSearchResponse();
-    searchResponse->playerGuid = searchRequest->playerInfo.playerGuid;
-
-    uint32 count = 0, totalCount = 0;
-
-    searchResponse->packet.Initialize(SMSG_AUCTION_LIST_RESULT, (4 + 4 + 4));
-    searchResponse->packet << (uint32)0;
-
-    if (!searchRequest->searchInfo.getAll)
+    while (_requestQueue->Pop(searchRequest))
     {
-        SortableAuctionEntriesList auctionEntries;
-        BuildListAuctionItems(searchRequest, auctionEntries, searchableAuctionMap);
+        SearchableAuctionEntriesMap const& searchableAuctionMap = GetSearchableAuctionMap(searchRequest->searchInfo.listFaction);
 
-        if (!searchRequest->searchInfo.sorting.empty() && auctionEntries.size() > MAX_AUCTIONS_PER_PAGE)
+        AuctionSearchResponse* searchResponse = new AuctionSearchResponse();
+        searchResponse->playerGuid = searchRequest->playerInfo.playerGuid;
+
+        uint32 count = 0, totalCount = 0;
+
+        searchResponse->packet.Initialize(SMSG_AUCTION_LIST_RESULT, (4 + 4 + 4));
+        searchResponse->packet << (uint32)0;
+
+        if (!searchRequest->searchInfo.getAll)
         {
-            AuctionSorter sorter(&searchRequest->searchInfo.sorting, searchRequest->playerInfo.locdbc_idx);
-            std::sort(auctionEntries.begin(), auctionEntries.end(), sorter);
+            SortableAuctionEntriesList auctionEntries;
+            BuildListAuctionItems(searchRequest, auctionEntries, searchableAuctionMap);
+
+            if (!searchRequest->searchInfo.sorting.empty() && auctionEntries.size() > MAX_AUCTIONS_PER_PAGE)
+            {
+                AuctionSorter sorter(&searchRequest->searchInfo.sorting, searchRequest->playerInfo.locdbc_idx);
+                std::sort(auctionEntries.begin(), auctionEntries.end(), sorter);
+            }
+
+            SortableAuctionEntriesList::const_iterator itr = auctionEntries.begin();
+            if (searchRequest->searchInfo.listfrom)
+            {
+                if (searchRequest->searchInfo.listfrom > auctionEntries.size())
+                    itr = auctionEntries.end();
+                else
+                    itr += searchRequest->searchInfo.listfrom;
+            }
+
+            for (; itr != auctionEntries.end(); ++itr)
+            {
+                (*itr)->BuildAuctionInfo(searchResponse->packet);
+
+                if (++count >= MAX_AUCTIONS_PER_PAGE)
+                    break;
+            }
+
+            totalCount = auctionEntries.size();
+        }
+        else
+        {
+            // getAll handling
+            for (auto const& pair : searchableAuctionMap)
+            {
+                std::shared_ptr<SearchableAuctionEntry> const Aentry = pair.second;
+                ++count;
+                Aentry->BuildAuctionInfo(searchResponse->packet);
+
+                if (count >= MAX_GETALL_RETURN)
+                    break;
+            }
+
+            totalCount = searchableAuctionMap.size();
         }
 
-        SortableAuctionEntriesList::const_iterator itr = auctionEntries.begin();
-        if (searchRequest->searchInfo.listfrom)
-        {
-            if (searchRequest->searchInfo.listfrom > auctionEntries.size())
-                itr = auctionEntries.end();
-            else
-                itr += searchRequest->searchInfo.listfrom;
-        }
+        searchResponse->packet.put<uint32>(0, count);
+        searchResponse->packet << totalCount;
+        searchResponse->packet << uint32(AUCTION_SEARCH_DELAY);
 
-        for (; itr != auctionEntries.end(); ++itr)
-        {
-            (*itr)->BuildAuctionInfo(searchResponse->packet);
+        _responseQueue->Enqueue(searchResponse);
 
-            if (++count >= MAX_AUCTIONS_PER_PAGE)
-                break;
-        }
-
-        totalCount = auctionEntries.size();
+        delete searchRequest;
     }
-    else
-    {
-        // getAll handling
-        for (auto const& pair : searchableAuctionMap)
-        {
-            std::shared_ptr<SearchableAuctionEntry> const Aentry = pair.second;
-            ++count;
-            Aentry->BuildAuctionInfo(searchResponse->packet);
-
-            if (count >= MAX_GETALL_RETURN)
-                break;
-        }
-
-        totalCount = searchableAuctionMap.size();
-    }
-
-    searchResponse->packet.put<uint32>(0, count);
-    searchResponse->packet << totalCount;
-    searchResponse->packet << uint32(AUCTION_SEARCH_DELAY);
-
-    _responseQueue->Enqueue(searchResponse);
-
-    delete searchRequest;
 }
 
 void AuctionHouseWorkerThread::BuildListAuctionItems(AuctionSearchRequest const* searchRequest, SortableAuctionEntriesList& auctionEntries, SearchableAuctionEntriesMap const& auctionMap) const
@@ -246,7 +263,7 @@ void AuctionHouseSearcher::AddAuction(AuctionEntry const* auctionEntry)
     searchableAuctionEntry->startbid = auctionEntry->startbid;
     searchableAuctionEntry->buyout = auctionEntry->buyout;
     searchableAuctionEntry->expire_time = auctionEntry->expire_time;
-    searchableAuctionEntry->listFaction = AuctionHouseMgr::GetAuctionHouseFactionFromHouseId(auctionEntry->houseId);
+    searchableAuctionEntry->listFaction = auctionEntry->GetFactionId();
 
     searchableAuctionEntry->bid = 0;
     searchableAuctionEntry->bidderGuid = ObjectGuid::Empty;
@@ -269,42 +286,32 @@ void AuctionHouseSearcher::AddAuction(AuctionEntry const* auctionEntry)
 
     searchableAuctionEntry->SetItemNames();
 
-    // Ensure we have always inserted the auction, if not we have a fundamental mistake somewhere
-    ASSERT(GetSearchableAuctionMap(searchableAuctionEntry->listFaction).insert(std::make_pair(searchableAuctionEntry->Id, searchableAuctionEntry)).second);
-
     // Let the worker threads know we have a new auction
-    NotifyWorkers(AuctionSearchUpdate::Type::ADD, searchableAuctionEntry);
+    NotifyAllWorkers(std::make_shared<AuctionSearchAdd>(searchableAuctionEntry));
 }
 
 void AuctionHouseSearcher::RemoveAuction(AuctionEntry const* auctionEntry)
 {
-    std::shared_ptr<SearchableAuctionEntry> searchableAuctionEntry = GetSearchableAuctionEntry(AuctionHouseMgr::GetAuctionHouseFactionFromHouseId(auctionEntry->houseId), auctionEntry->Id);
-    ASSERT(searchableAuctionEntry); // If we are unable to find, something has gone very wrong else where
-    NotifyWorkers(AuctionSearchUpdate::Type::REMOVE, searchableAuctionEntry);
+    NotifyAllWorkers(std::make_shared<AuctionSearchRemove>(auctionEntry->Id, auctionEntry->GetFactionId()));
 }
 
 void AuctionHouseSearcher::UpdateBid(AuctionEntry const* auctionEntry)
 {
-    std::shared_ptr<SearchableAuctionEntry> searchableAuctionEntry = GetSearchableAuctionEntry(AuctionHouseMgr::GetAuctionHouseFactionFromHouseId(auctionEntry->houseId), auctionEntry->Id);
-    ASSERT(searchableAuctionEntry); // If we are unable to find, something has gone very wrong else where
-    searchableAuctionEntry->bid = auctionEntry->bid;
-    searchableAuctionEntry->bidderGuid = auctionEntry->bidder;
+    // Updating bids is a bit unique, we really only need to update a single worker as every worker thread contains
+    // a map of shared pointers to the same SearchableAuctionEntry's, so updating one will update them all.
+    NotifyOneWorker(std::make_shared<AuctionSearchUpdateBid>(auctionEntry->Id, auctionEntry->GetFactionId(), auctionEntry->bid, auctionEntry->bidder));
 }
 
-void AuctionHouseSearcher::NotifyWorkers(AuctionSearchUpdate::Type const type, std::shared_ptr<SearchableAuctionEntry> const auctionEntry)
+void AuctionHouseSearcher::NotifyAllWorkers(std::shared_ptr<AuctionSearchUpdate> const auctionSearchUpdate)
 {
     for (AuctionHouseWorkerThread* workerThread : _workerThreads)
-        workerThread->AddAuctionSearchUpdateToQueue(AuctionSearchUpdate(type, auctionEntry));
+        workerThread->AddAuctionSearchUpdateToQueue(auctionSearchUpdate);
 }
 
-std::shared_ptr<SearchableAuctionEntry> AuctionHouseSearcher::GetSearchableAuctionEntry(AuctionHouseFaction faction, uint32 Id)
+void AuctionHouseSearcher::NotifyOneWorker(std::shared_ptr<AuctionSearchUpdate> const auctionSearchUpdate)
 {
-    SearchableAuctionEntriesMap const& searchableAuctionMap = GetSearchableAuctionMap(faction);
-    SearchableAuctionEntriesMap::const_iterator itr = searchableAuctionMap.find(Id);
-    if (itr == searchableAuctionMap.end())
-        return nullptr;
-
-    return itr->second;
+    // Just notify the first worker in the list, no big deal which
+    (*_workerThreads.begin())->AddAuctionSearchUpdateToQueue(auctionSearchUpdate);
 }
 
 void SearchableAuctionEntry::BuildAuctionInfo(WorldPacket& data) const

@@ -99,6 +99,7 @@ struct AuctionEntry
 
     // helpers
     [[nodiscard]] AuctionHouseId GetHouseId() const { return houseId; }
+    [[nodiscard]] AuctionHouseFaction GetFactionId() const;
     [[nodiscard]] uint32 GetAuctionCut() const;
     [[nodiscard]] static uint32 CalculateAuctionOutBid(uint32 bid);
     bool BuildAuctionInfo(WorldPacket& data) const;

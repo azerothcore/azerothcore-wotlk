@@ -101,12 +101,12 @@ struct AuctionHouseSearchInfo
     uint32 listfrom;
     uint8 levelmin;
     uint8 levelmax;
-    uint8 usable;
+    bool usable;
     uint32 inventoryType;
     uint32 itemClass;
     uint32 itemSubClass;
     uint32 quality;
-    uint8 getAll;
+    bool getAll;
     AuctionHouseFaction listFaction;
     AuctionSortOrderVector sorting;
 };
@@ -154,18 +154,43 @@ struct AuctionSearchResponse
 
 struct AuctionSearchUpdate
 {
-    enum class Type : bool
+    enum class Type : uint8
     {
         ADD,
-        REMOVE
+        REMOVE,
+        UPDATE_BID
     };
 
-    AuctionSearchUpdate() : updateType(Type::ADD) { }
-    AuctionSearchUpdate(Type type, std::shared_ptr<SearchableAuctionEntry> const auctionEntry)
-        : updateType(type), searchableAuctionEntry(auctionEntry) { }
+    AuctionSearchUpdate(Type _updateType, AuctionHouseFaction _listFaction) : updateType(_updateType), listFaction(_listFaction) { }
 
     Type updateType;
+    AuctionHouseFaction listFaction;
+};
+
+struct AuctionSearchAdd : AuctionSearchUpdate
+{
+    AuctionSearchAdd(std::shared_ptr<SearchableAuctionEntry> _searchableAuctionEntry)
+        : AuctionSearchUpdate(AuctionSearchUpdate::Type::ADD, _searchableAuctionEntry->listFaction), searchableAuctionEntry(_searchableAuctionEntry) { }
+
     std::shared_ptr<SearchableAuctionEntry> searchableAuctionEntry;
+};
+
+struct AuctionSearchRemove : AuctionSearchUpdate
+{
+    AuctionSearchRemove(uint32 _auctionId, AuctionHouseFaction _listFaction)
+        : AuctionSearchUpdate(AuctionSearchUpdate::Type::REMOVE, _listFaction), auctionId(_auctionId) { }
+
+    uint32 auctionId;
+};
+
+struct AuctionSearchUpdateBid : AuctionSearchUpdate
+{
+    AuctionSearchUpdateBid(uint32 _auctionId, AuctionHouseFaction _listFaction, uint32 _bid, ObjectGuid _bidderGuid)
+        : AuctionSearchUpdate(AuctionSearchUpdate::Type::UPDATE_BID, _listFaction), auctionId(_auctionId), bid(_bid), bidderGuid(_bidderGuid) { }
+
+    uint32 auctionId;
+    uint32 bid;
+    ObjectGuid bidderGuid;
 };
 
 typedef std::unordered_map<uint32, std::shared_ptr<SearchableAuctionEntry>> SearchableAuctionEntriesMap;
@@ -189,7 +214,7 @@ public:
 
     void Stop();
 
-    void AddAuctionSearchUpdateToQueue(AuctionSearchUpdate const& auctionSearchUpdate);
+    void AddAuctionSearchUpdateToQueue(std::shared_ptr<AuctionSearchUpdate> const auctionSearchUpdate);
 
 private:
     void Run();
@@ -202,7 +227,7 @@ private:
     SearchableAuctionEntriesMap& GetSearchableAuctionMap(AuctionHouseFaction faction) { return _searchableAuctionMap[static_cast<uint8>(faction)]; };
 
     SearchableAuctionEntriesMap _searchableAuctionMap[MAX_AUCTION_HOUSE_FACTIONS];
-    LockedQueue<AuctionSearchUpdate> _auctionUpdatesQueue;
+    LockedQueue<std::shared_ptr<AuctionSearchUpdate>> _auctionUpdatesQueue;
 
     ProducerConsumerQueue<AuctionSearchRequest*>* _requestQueue;
     MPSCQueue<AuctionSearchResponse>* _responseQueue;
@@ -224,16 +249,10 @@ public:
     void RemoveAuction(AuctionEntry const* auctionEntry);
     void UpdateBid(AuctionEntry const* auctionEntry);
 
-    void NotifyWorkers(AuctionSearchUpdate::Type const type, std::shared_ptr<SearchableAuctionEntry> const auctionEntry);
+    void NotifyAllWorkers(std::shared_ptr<AuctionSearchUpdate> const auctionSearchUpdate);
+    void NotifyOneWorker(std::shared_ptr<AuctionSearchUpdate> const auctionSearchUpdate);
 
 private:
-    SearchableAuctionEntriesMap& GetSearchableAuctionMap(AuctionHouseFaction faction) { return _searchableAuctionEntriesMap[static_cast<uint8>(faction)]; };
-    SearchableAuctionEntriesMap const& GetSearchableAuctionMap(AuctionHouseFaction faction) const { return _searchableAuctionEntriesMap[static_cast<uint8>(faction)]; };
-
-    std::shared_ptr<SearchableAuctionEntry> GetSearchableAuctionEntry(AuctionHouseFaction faction, uint32 Id);
-
-    SearchableAuctionEntriesMap _searchableAuctionEntriesMap[MAX_AUCTION_HOUSE_FACTIONS];
-
     ProducerConsumerQueue<AuctionSearchRequest*> _requestQueue;
     MPSCQueue<AuctionSearchResponse> _responseQueue;
     std::vector<AuctionHouseWorkerThread*> _workerThreads;
