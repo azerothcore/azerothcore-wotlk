@@ -16,3 +16,6 @@ UPDATE `item_template` SET `flagsCustom` = (`flagsCustom` | 1) WHERE (`entry` = 
 -- Recipe: Pumpkin Pie
 UPDATE `item_template` SET `flagsCustom` = (`flagsCustom` | 1) WHERE (`entry` = 44862);
 UPDATE `item_template` SET `flagsCustom` = (`flagsCustom` | 1) WHERE (`entry` = 46804);
+
+-- set duration to 7 days
+UPDATE `item_template` SET `duration` = 604800 WHERE (`entry` IN (44858, 46805, 44859, 46806, 44860, 46803, 44861, 46807, 44862, 46804));
