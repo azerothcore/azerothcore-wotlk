@@ -1,3 +1,4 @@
+-- DB update 2024_11_27_01 -> 2024_11_27_02
 -- add flag CU_DURATION_REAL_TIME to Pilgrim's Bounty items
 -- Wild Turkey
 UPDATE `item_template` SET `flagsCustom` = (`flagsCustom` | 1) WHERE (`entry` = 44834);
