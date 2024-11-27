@@ -258,7 +258,7 @@ struct boss_hexlord_malacrass : public BossAI
         CastDrainPower();
         ScheduleTimedEvent(30s,[&] {
             CastDrainPower();
-        }, 30s, 40s);
+        }, 30s, 30s);
     }
 
     void JustEngagedWith(Unit* who) override
