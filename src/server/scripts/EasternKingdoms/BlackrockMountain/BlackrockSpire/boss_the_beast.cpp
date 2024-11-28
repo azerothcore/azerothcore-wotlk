@@ -39,7 +39,8 @@ enum Events
     EVENT_TERRIFYING_ROAR           = 3,
     EVENT_BERSERKER_CHARGE          = 4,
     EVENT_FIREBALL                  = 5,
-    EVENT_FIREBLAST                 = 6
+    EVENT_FIREBLAST                 = 6,
+    EVENT_EMOTE                     = 7  // Lanny
 };
 
 enum BeastMisc
@@ -49,7 +50,7 @@ enum BeastMisc
     BEAST_MOVEMENT_ID               = 1379690,
 
     NPC_BLACKHAND_ELITE             = 10317,
-
+    SOUND_BEAST_ROAR                = 6818, // Lanny
     SAY_BLACKHAND_DOOMED            = 0
 };
 
@@ -86,6 +87,23 @@ public:
 private:
     Creature* _me;
 };
+
+// Lanny
+class OrcSayEvent : public BasicEvent
+{
+public:
+    OrcSayEvent(Creature* me) : _me(me) { }
+
+    bool Execute(uint64 /*time*/, uint32 /*diff*/) override
+    {
+        _me->AI()->Talk(SAY_BLACKHAND_DOOMED);
+        return true;
+    }
+
+private:
+    Creature* _me;
+};
+// End Lanny NPCBot
 
 // Used to make Hodir disengage whenever he leaves his room
 constexpr static float FirewalPositionY = -505.f;
@@ -145,6 +163,7 @@ public:
                         }
 
                         _orcYelled = true;
+                        _PreEvent = true; // Lanny
 
                         bool yelled = false;
                         for (ObjectGuid guid : _nearbyOrcsGUIDs)
@@ -154,7 +173,11 @@ public:
                                 if (!yelled)
                                 {
                                     yelled = true;
-                                    orc->AI()->Talk(SAY_BLACKHAND_DOOMED);
+                                    // Lanny
+                                    // orc->AI()->Talk(SAY_BLACKHAND_DOOMED);
+                                    orc->m_Events.AddEvent(new OrcSayEvent(orc), me->m_Events.CalculateTime(6 * IN_MILLISECONDS));
+                                    events.ScheduleEvent(EVENT_EMOTE, 8s);
+                                    // End Lanny
                                 }
 
                                 orc->m_Events.AddEvent(new OrcMoveEvent(orc), me->m_Events.CalculateTime(3 * IN_MILLISECONDS));
@@ -183,6 +206,25 @@ public:
 
         void UpdateAI(uint32 diff) override
         {
+            // Lanny
+            if (_PreEvent)
+            {			
+                events.Update(diff);
+
+                while (uint32 eventId = events.ExecuteEvent())
+                {
+                    switch (eventId)
+                    {
+                        case EVENT_EMOTE:
+                            me->HandleEmoteCommand(EMOTE_ONESHOT_ROAR);
+                            me->PlayDirectSound(SOUND_BEAST_ROAR, 0);
+							_PreEvent = false;
+                            break;
+                    }
+                }
+            }
+            // End Lanny NPCBot
+
             if (!UpdateVictim())
             {
                 return;
@@ -265,6 +307,7 @@ public:
         }
 
     private:
+        bool _PreEvent; // Lanny
         bool _beastReached;
         bool _orcYelled;
         GuidVector _nearbyOrcsGUIDs;

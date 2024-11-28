@@ -36,8 +36,19 @@ enum EventIds
     EVENT_DRAGONSPIRE_ROOM_STORE           = 1,
     EVENT_DRAGONSPIRE_ROOM_CHECK           = 2,
 
-    EVENT_SOLAKAR_WAVE                     = 3
+    EVENT_SOLAKAR_WAVE                     = 3,
+    //Lanny NPCBot
+    EVENT_NEFARIUS_REND_SAY                = 4,
+    EVENT_NEFARIUS_TELEPORT                = 5
+    //End Lanny NPCBot
 };
+
+//Lanny
+enum NPC_Spells
+{
+    SPELL_TELEPORT_EFFECT             = 52096
+};
+//End Lanny NPCBot
 
 enum Timers
 {
@@ -55,6 +66,7 @@ Position SolakarPosBoss  = Position(80.0f, -280.0f, 93.0f, 3.0f * M_PI / 2.0);
 
 enum Texts
 {
+    SAY_NEFARIUS_REND_DONE      = 10,
     SAY_NEFARIUS_REND_WIPE      = 11,
     SAY_SOLAKAR_FIRST_HATCHER   = 0,
     SAY_SCARSHIELD_INF_WHISPER  = 0
@@ -312,6 +324,16 @@ public:
                             nefarius->AI()->Talk(SAY_NEFARIUS_REND_WIPE);
                         }
                     }
+                    //Lanny
+                    if (state == DONE)
+                    {
+                        if (Creature* nefarius = instance->GetCreature(LordVictorNefarius))
+                        {
+                            nefarius->DespawnOrUnsummon(12s,0s);
+                            Events.ScheduleEvent(EVENT_NEFARIUS_REND_SAY, 5s);
+                        }
+                    }
+                    //End Lanny NPCBots					
                     break;
                 default:
                     break;
@@ -574,6 +596,21 @@ public:
                             CurrentSolakarWave++;
                         }
                         break;
+                    //Lanny
+                    case EVENT_NEFARIUS_REND_SAY:
+                        if (Creature* nefarius = instance->GetCreature(LordVictorNefarius))
+                        {
+                            nefarius->AI()->Talk(SAY_NEFARIUS_REND_DONE);
+                            if (Unit* player = nefarius->SelectNearestPlayer(60.0f))
+                                nefarius->SetFacingToObject(player);
+                        }
+                        Events.ScheduleEvent(EVENT_NEFARIUS_TELEPORT, 5s);						
+                        break;
+                    case EVENT_NEFARIUS_TELEPORT:
+                        if (Creature* nefarius = instance->GetCreature(LordVictorNefarius))
+                            nefarius->CastSpell(nefarius, SPELL_TELEPORT_EFFECT, true);
+                        break;
+                    //End Lanny NPCbot
                     default:
                         break;
                 }
