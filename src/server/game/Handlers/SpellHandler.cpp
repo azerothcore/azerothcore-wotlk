@@ -100,43 +100,35 @@ void WorldSession::HandleUseItemOpcode(WorldPacket& recvPacket)
     // fail if we are cancelling pending request
     if (_player->SpellQueue.size())
     {
-        // PendingSpellCastRequest* request = _player->GetCastRequest(spellInfo->StartRecoveryCategory);
-        // if (request && request->cancel_in_progress && request->spellId == spellId)
-        // {
-            // LOG_ERROR("sql.sql", "HandleUseItemCode: send equip error");
-            // pUser->SendEquipError(EQUIP_ERR_NONE, pItem, nullptr);
-            // Spell *spell = new Spell(_player, spellInfo, TRIGGERED_NONE);
-            // spell->m_cast_count = castCount; // set count of casts
-            // spell->m_glyphIndex = glyphIndex;
-            // spell->SendCastResult(SPELL_FAILED_DONT_REPORT);
-            // spell->finish(false);
-            // recvPacket.rfinish();
-            // return;
-        // }
+        PendingSpellCastRequest& request = _player->SpellQueue.front(); // Peek at the first spell
+        if (request.cancel_in_progress)
+        {
+            LOG_ERROR("sql.sql", "HandleUseItemCode: send equip error");
+            pUser->SendEquipError(EQUIP_ERR_NONE, pItem, nullptr);
+            recvPacket.rfinish();
+            return;
+        }
     }
 
-    PendingSpellCastRequest newRequest
-    {
-        spellId,
-        spellInfo->GetCategory(),
-        recvPacket.ReadPackedTime(),
-        true,
-        {copy_packet},
-        false,
-        castCount,
-        true,
-    };
-
     // try queue spell if it can't be executed right now
-    // if (!_player->CanExecutePendingSpellCastRequest(&newRequest, true))
-    // {
-        // if (_player->CanRequestSpellCast(spellInfo))
-        // {
-            // _player->RequestSpellCast(newRequest);
-            // LOG_ERROR("sql.sql", "Add item to queue with spellId {} cat {}", spellInfo->Id, spellInfo->GetCategory());
-            // return;
-        // }
-    // }
+    if (!_player->CanExecutePendingSpellCastRequest(spellInfo, true))
+        if (_player->CanRequestSpellCast(spellInfo))
+        {
+            PendingSpellCastRequest newRequest
+            {
+                spellId,
+                spellInfo->GetCategory(),
+                recvPacket.ReadPackedTime(),
+                true,
+                {copy_packet},
+                false,
+                castCount,
+                true,
+            };
+            _player->RequestSpellCast(&newRequest);
+            LOG_ERROR("sql.sql", "Add item to queue with spellId {} cat {}", spellInfo->Id, spellInfo->GetCategory());
+            return;
+        }
 
     if (pItem->GetGUID() != itemGUID)
     {
@@ -398,7 +390,7 @@ void WorldSession::HandleCastSpellOpcode(WorldPacket& recvPacket)
     if (recvPacket.empty())
         return;
 
-    WorldPacket copyPacket = recvPacket;
+    WorldPacket const copyPacket = recvPacket;
 
     recvPacket >> castCount >> spellId >> castFlags;
     TriggerCastFlags triggerFlag = TRIGGERED_NONE;

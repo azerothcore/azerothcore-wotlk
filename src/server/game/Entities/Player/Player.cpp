@@ -16545,7 +16545,7 @@ void Player::ProcessPendingSpellCastRequest(PendingSpellCastRequest* request)
     if (WorldSession* session = GetSession())
     {
         uint32 category = sSpellMgr->GetSpellInfo(request->spellId)->StartRecoveryCategory;
-        AddSameTickQueueBlock(category);
+        // AddSameTickQueueBlock(category);
         if (request->is_item)
             session->HandleUseItemOpcode(packet);
         else
