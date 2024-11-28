@@ -236,6 +236,12 @@ struct boss_hexlord_malacrass : public BossAI
         _currentClass = CLASS_NONE;
         _classAbilityTimer = 10000ms;
         SpawnAdds();
+        ScheduleHealthCheckEvent(80, [&] {
+            ScheduleTimedEvent(0s, [&] {
+                DoCastSelf(SPELL_DRAIN_POWER, true);
+                Talk(SAY_DRAIN_POWER);
+            }, 30s, 30s);
+        });
     }
 
     void SpawnAdds()
@@ -255,13 +261,6 @@ struct boss_hexlord_malacrass : public BossAI
         {
             if (Creature* add = summon->ToCreature())
                 add->SetInCombatWithZone();
-        });
-
-        ScheduleHealthCheckEvent(80, [&]{
-            ScheduleTimedEvent(0s, [&] {
-                DoCastSelf(SPELL_DRAIN_POWER, true);
-                Talk(SAY_DRAIN_POWER);
-            }, 30s, 30s);
         });
 
         ScheduleTimedEvent(30s, [&]{
