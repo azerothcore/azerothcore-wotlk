@@ -87,49 +87,6 @@ UPDATE `creature_addon` SET `path_id` = 12928400 WHERE (`guid` IN (129284));
 UPDATE `creature_addon` SET `bytes1` = 131072 WHERE (`guid` IN (129272, 129282, 129283, 129284));
 
 
--- Add Comments in creature Database
+-- Set Aura
 
-UPDATE `creature` SET `Comment` = "has guid specific SAI" WHERE (`id1` = 28609) AND (`guid` IN (129272, 129282, 129283, 129284));
-
-
--- SmartAI
-
-
-DELETE FROM `smart_scripts` WHERE (`source_type` = 0 AND `entryorguid` = -129272);
-INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `event_param6`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
-(-129272, 0, 0, 0, 1, 0, 100, 0, 1000, 1000, 1000, 1000, 0, 0, 47, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Scarlet Infantryman - Out of Combat - Set Visibility Off'),
-(-129272, 0, 1, 0, 101, 0, 100, 0, 1, 15, 2000, 0, 0, 0, 47, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Scarlet Infantryman - On 1 or More Players in Range - Set Visibility On'),
-(-129272, 0, 2, 0, 4, 0, 100, 0, 0, 0, 0, 0, 0, 0, 47, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Scarlet Infantryman - On Aggro - Set Visibility On'),
-(-129272, 0, 3, 0, 9, 0, 100, 0, 0, 0, 6000, 9000, 0, 5, 11, 25710, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Scarlet Infantryman - Within 0-5 Range - Cast \'Heroic Strike\''),
-(-129272, 0, 4, 0, 0, 0, 100, 0, 9000, 15000, 16000, 19000, 0, 0, 11, 53399, 1, 1, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Scarlet Infantryman - In Combat - Cast \'Sweeping Slam\''),
-(-129272, 0, 5, 0, 23, 0, 100, 0, 48356, 0, 0, 0, 0, 0, 11, 48356, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Scarlet Infantryman - On Aura \'See Wintergarde Invisibility\' - Cast \'See Wintergarde Invisibility\'');
-
-
-DELETE FROM `smart_scripts` WHERE (`source_type` = 0 AND `entryorguid` = -129282);
-INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `event_param6`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
-(-129282, 0, 0, 0, 1, 0, 100, 0, 1000, 1000, 1000, 1000, 0, 0, 47, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Scarlet Infantryman - Out of Combat - Set Visibility Off'),
-(-129282, 0, 1, 0, 101, 0, 100, 0, 1, 15, 2000, 0, 0, 0, 47, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Scarlet Infantryman - On 1 or More Players in Range - Set Visibility On'),
-(-129282, 0, 2, 0, 4, 0, 100, 0, 0, 0, 0, 0, 0, 0, 47, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Scarlet Infantryman - On Aggro - Set Visibility On'),
-(-129282, 0, 3, 0, 9, 0, 100, 0, 0, 0, 6000, 9000, 0, 5, 11, 25710, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Scarlet Infantryman - Within 0-5 Range - Cast \'Heroic Strike\''),
-(-129282, 0, 4, 0, 0, 0, 100, 0, 9000, 15000, 16000, 19000, 0, 0, 11, 53399, 1, 1, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Scarlet Infantryman - In Combat - Cast \'Sweeping Slam\''),
-(-129282, 0, 5, 0, 23, 0, 100, 0, 48356, 0, 0, 0, 0, 0, 11, 48356, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Scarlet Infantryman - On Aura \'See Wintergarde Invisibility\' - Cast \'See Wintergarde Invisibility\'');
-
-
-DELETE FROM `smart_scripts` WHERE (`source_type` = 0 AND `entryorguid` = -129283);
-INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `event_param6`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
-(-129283, 0, 0, 0, 1, 0, 100, 0, 1000, 1000, 1000, 1000, 0, 0, 47, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Scarlet Infantryman - Out of Combat - Set Visibility Off'),
-(-129283, 0, 1, 0, 101, 0, 100, 0, 1, 15, 2000, 0, 0, 0, 47, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Scarlet Infantryman - On 1 or More Players in Range - Set Visibility On'),
-(-129283, 0, 2, 0, 4, 0, 100, 0, 0, 0, 0, 0, 0, 0, 47, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Scarlet Infantryman - On Aggro - Set Visibility On'),
-(-129283, 0, 3, 0, 9, 0, 100, 0, 0, 0, 6000, 9000, 0, 5, 11, 25710, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Scarlet Infantryman - Within 0-5 Range - Cast \'Heroic Strike\''),
-(-129283, 0, 4, 0, 0, 0, 100, 0, 9000, 15000, 16000, 19000, 0, 0, 11, 53399, 1, 1, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Scarlet Infantryman - In Combat - Cast \'Sweeping Slam\''),
-(-129283, 0, 5, 0, 23, 0, 100, 0, 48356, 0, 0, 0, 0, 0, 11, 48356, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Scarlet Infantryman - On Aura \'See Wintergarde Invisibility\' - Cast \'See Wintergarde Invisibility\'');
-
-
-DELETE FROM `smart_scripts` WHERE (`source_type` = 0 AND `entryorguid` = -129284);
-INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `event_param6`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
-(-129284, 0, 0, 0, 1, 0, 100, 0, 1000, 1000, 1000, 1000, 0, 0, 47, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Scarlet Infantryman - Out of Combat - Set Visibility Off'),
-(-129284, 0, 1, 0, 101, 0, 100, 0, 1, 15, 2000, 0, 0, 0, 47, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Scarlet Infantryman - On 1 or More Players in Range - Set Visibility On'),
-(-129284, 0, 2, 0, 4, 0, 100, 0, 0, 0, 0, 0, 0, 0, 47, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Scarlet Infantryman - On Aggro - Set Visibility On'),
-(-129284, 0, 3, 0, 9, 0, 100, 0, 0, 0, 6000, 9000, 0, 5, 11, 25710, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Scarlet Infantryman - Within 0-5 Range - Cast \'Heroic Strike\''),
-(-129284, 0, 4, 0, 0, 0, 100, 0, 9000, 15000, 16000, 19000, 0, 0, 11, 53399, 1, 1, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Scarlet Infantryman - In Combat - Cast \'Sweeping Slam\''),
-(-129284, 0, 5, 0, 23, 0, 100, 0, 48356, 0, 0, 0, 0, 0, 11, 48356, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Scarlet Infantryman - On Aura \'See Wintergarde Invisibility\' - Cast \'See Wintergarde Invisibility\'');
+UPDATE `creature_addon` SET `auras` = 52103 WHERE (`guid` IN (129272, 129282, 129283, 129284));
