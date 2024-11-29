@@ -9,6 +9,8 @@ INSERT INTO `reference_loot_template` (`Entry`, `Item`, `Reference`, `Chance`, `
 (@TOKENENTRY, 31090, 0, 0, 0, 1, 1, 1, 1, 'Chestguard of the Forgotten Vanquisher'),
 (@TOKENENTRY, 31091, 0, 0, 0, 1, 1, 1, 1, 'Chestguard of the Forgotten Protector');
 
+UPDATE `reference_loot_template` SET `GroupId` = 1 WHERE `Entry` = 34077;
+
 INSERT INTO `creature_loot_template` (`Entry`, `Item`, `Reference`, `Chance`, `QuestRequired`, `LootMode`, `GroupId`, `MinCount`, `MaxCount`, `Comment`) VALUES
 (22917, 29434, 0, 100, 0, 1, 0, 2, 2, 'Illidan Stormrage - Badge of Justice'),
 (22917, 32837, 0, 5, 0, 1, 1, 1, 1, 'Illidan Stormrage - Warglaive of Azzinoth'),
