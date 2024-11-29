@@ -360,7 +360,9 @@ class spell_pet_dk_gargoyle_strike : public SpellScript
 
         SetEffectValue(damage);
         //每次石像鬼打击的时候，设置天鬼的急速为玩家的急速
-        caster->SetFloatValue(UNIT_MOD_CAST_SPEED, caster->GetOwner()->GetFloatValue(UNIT_MOD_CAST_SPEED));
+        if (caster && caster->GetOwner()) {
+            caster->SetFloatValue(UNIT_MOD_CAST_SPEED, caster->GetOwner()->GetFloatValue(UNIT_MOD_CAST_SPEED));
+        }
     }
 
     void Register() override
