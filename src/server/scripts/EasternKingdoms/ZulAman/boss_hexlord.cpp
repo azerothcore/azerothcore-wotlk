@@ -274,7 +274,7 @@ struct boss_hexlord_malacrass : public BossAI
                         siphonTrigger->SetDisplayId(11686);
                         siphonTrigger->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
                         siphonTrigger->AI()->DoCast(target, SPELL_SIPHON_SOUL, true);
-                        siphonTrigger->GetMotionMaster()->MoveChase(me);
+                        siphonTrigger->GetMotionMaster()->MoveFollow(me, 0.0f, 0.0f);
                         if (Player* player = target->ToPlayer())
                             _currentClass = player->HasAura(AURA_SHADOW_FORM) ? uint8(ADDITIONAL_CLASS_SPRIEST) : player->getClass();
                     }
