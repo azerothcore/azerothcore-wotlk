@@ -294,7 +294,7 @@ bot_ai::bot_ai(Creature* creature) : CreatureAI(creature),
 }
 bot_ai::~bot_ai()
 {
-    BOT_LOG_INFO("scripts", "bot_ai destructor call for {} ({})", me->GetName().c_str(), me->GetEntry());
+    BOT_LOG_INFO("npcbots", "bot_ai destructor call for {} ({})", me->GetName(), me->GetEntry());
 
     while (!_spells.empty())
     {
@@ -3501,6 +3501,12 @@ void bot_ai::ReceiveEmote(Player* player, uint32 emote)
 
             report << "\nProblems:";
 
+            if (!me->IsNPCBot())
+            {
+                CreatureTemplate* ct = const_cast<CreatureTemplate*>(me->GetCreatureTemplate());
+                report << "\n  npcbot flags missing (current: " << ct->flags_extra << ", missing: " << (CREATURE_FLAG_EXTRA_NPCBOT & ~ct->flags_extra) << ")! Forcing flags...";
+                ct->flags_extra |= CREATURE_FLAG_EXTRA_NPCBOT;
+            }
             if (_ownerGuid)
             {
                 if (HasBotCommandState(BOT_COMMAND_UNBIND))
