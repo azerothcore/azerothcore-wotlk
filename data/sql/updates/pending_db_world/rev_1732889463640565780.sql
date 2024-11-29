@@ -2,7 +2,7 @@ SET @TOKENENTRY := 1276883;
 
 DELETE FROM `creature_loot_template` WHERE (`Entry` = 22917);
 
-DELETE FROM `reference_loot_template` WHERE (`Entry` = 34077 AND `Item` IN (31089,31090,31091));
+DELETE FROM `reference_loot_template` WHERE (`Entry` = 34077 AND `Item` IN (31089,31090,31091)) OR `Entry` = @TOKENENTRY;
 
 INSERT INTO `reference_loot_template` (`Entry`, `Item`, `Reference`, `Chance`, `QuestRequired`, `LootMode`, `GroupId`, `MinCount`, `MaxCount`, `Comment`) VALUES
 (@TOKENENTRY, 31089, 0, 0, 0, 1, 1, 1, 1, 'Chestguard of the Forgotten Conqueror'),
