@@ -3501,6 +3501,12 @@ void bot_ai::ReceiveEmote(Player* player, uint32 emote)
 
             report << "\nProblems:";
 
+            if (!me->IsNPCBot())
+            {
+                CreatureTemplate* ct = const_cast<CreatureTemplate*>(me->GetCreatureTemplate());
+                report << "\n  npcbot flags missing (current: " << ct->flags_extra << ", missing: " << (CREATURE_FLAG_EXTRA_NPCBOT & ~ct->flags_extra) << ")! Forcing flags...";
+                ct->flags_extra |= CREATURE_FLAG_EXTRA_NPCBOT;
+            }
             if (_ownerGuid)
             {
                 if (HasBotCommandState(BOT_COMMAND_UNBIND))
