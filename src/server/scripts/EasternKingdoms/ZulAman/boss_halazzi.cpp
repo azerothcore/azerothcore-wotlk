@@ -189,15 +189,15 @@ struct boss_halazzi : public BossAI
                 }
 
                 scheduler.CancelGroup(GROUP_MERGE);
-                scheduler.Schedule(16s, GROUP_LYNX, [this](TaskContext context)
-                {
-                    DoCastSelf(SPELL_FRENZY);
-                    context.Repeat(10s, 15s);
-                }).Schedule(20s, GROUP_LYNX, [this](TaskContext context)
+                scheduler.Schedule(5s, 15s, GROUP_LYNX, [this](TaskContext context)
                 {
                     Talk(SAY_SABER);
                     DoCastVictim(SPELL_SABER_LASH, true);
-                    context.Repeat(30s);
+                    context.Repeat();
+                }).Schedule(20s, 35s, GROUP_LYNX, [this](TaskContext context)
+                {
+                    DoCastSelf(SPELL_FRENZY);
+                    context.Repeat();
                 });
                 break;
             }
