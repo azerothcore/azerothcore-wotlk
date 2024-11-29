@@ -82,9 +82,9 @@ UPDATE `creature_addon` SET `path_id` = 12928300 WHERE (`guid` IN (129283));
 UPDATE `creature_addon` SET `path_id` = 12928400 WHERE (`guid` IN (129284));
 
 
--- Set Stealth Movement (already present in one of these Guids)
+-- Set bytes1 to 0
 
-UPDATE `creature_addon` SET `bytes1` = 131072 WHERE (`guid` IN (129272, 129282, 129283, 129284));
+UPDATE `creature_addon` SET `bytes1` = 0 WHERE (`guid` IN (129272, 129282, 129283, 129284));
 
 
 -- Set Aura
