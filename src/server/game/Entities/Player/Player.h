@@ -1067,9 +1067,9 @@ struct PendingSpellCastRequest
     uint32      category;
     WorldPacket requestPacket;
     bool        cancelInProgress = false;
-    uint32      cast_count;
     bool        isItem = false;
 };
+
 
 class Player : public Unit, public GridObject<Player>
 {
@@ -2626,57 +2626,26 @@ public:
 
     std::string GetDebugInfo() const override;
 
+    bool HandleProcTriggerSpell(Unit* victim, uint32 damage, uint32 absorbed, uint32 resisted, uint32 blocked, uint32 armorMitigated, AuraEffect* triggeredByAura, SpellInfo const* procSpell, uint32 procFlag, uint32 procEx, uint32 cooldown, const uint8 effectMask = MAX_EFFECT_MASK);
+
     /*********************************************************/
     /***               SPELL QUEUE SYSTEM                  ***/
     /*********************************************************/
 
-    // Queues up a spell cast request that has been received via packet and processes it whenever possible.
-    // void RequestSpellCast(std::unique_ptr<SpellCastRequest> castRequest);
-    // void CancelSpellCastRequest();
+    // constexpr static uint32 SPELL_QUEUE_TIME_WINDOW = 1000; // testing
+    constexpr static uint32 SPELL_QUEUE_TIME_WINDOW = 400; // ms
+    [[nodiscard]] uint32 GetSpellQueueWindow(bool withPadding = false) const { return withPadding ? SPELL_QUEUE_TIME_WINDOW : SPELL_QUEUE_TIME_WINDOW + 100; };
 
-    //SPELL QUEUEING
-    // A spell can be queued up within 400 milliseconds before global cooldown expires or the cast finishes
-    constexpr static uint16 SPELL_QUEUE_TIME_WINDOW = 1000; // testing
-    // static constexpr uint16 SPELL_QUEUE_TIME_WINDOW = 5000;
-
-    // PendingSpellCastRequest* GetCastRequest(SpellInfo const* spellInfo) const;
     const PendingSpellCastRequest* GetCastRequest(uint32 category) const;
-    void ClearSpellRequestByCategory(uint32 category);
-    void ClearCastRequest(SpellInfo const* info);
-    void ClearCastRequest(uint32 category);
 
-    // typedef std::map<uint32 /*category*/, PendingSpellCastRequest> PendingCastList;
-    typedef std::deque<PendingSpellCastRequest> PendingCastList;
-    PendingCastList SpellQueue;
+    std::deque<PendingSpellCastRequest> SpellQueue;
 
-    // unused
-    // multi-threading safety
-    // world session and player::update
-    typedef std::map<uint32 /*category*/, uint32 /*time which block was set*/> SameTickQueueBlockList;
-    SameTickQueueBlockList SameTickBlocks;
-    void RemoveSameTickQueueBlock(uint32 category);
-    void AddSameTickQueueBlock(uint32 category);
-    bool HasSameTickQueueBlock(uint32 category, bool ignore_time) const;
-
-    void ExecuteSortedCastRequests();
-
-    uint16 GetSpellQueueWindow(bool gcd = false) const;
-    bool IsSpellQueueEnabled() const;
-    void RequestSpellCast(PendingSpellCastRequest* castRequest);
-    void CancelSpellCastRequest(PendingSpellCastRequest* castRequest);
-    void ClearSpellQueue();
-    bool CanRequestSpellCast(SpellInfo const* spellInfo) const;
-    void ProcessPendingSpellCastRequest(PendingSpellCastRequest* request);
+    void ProcessSpellQueue();
     bool CanExecutePendingSpellCastRequest(SpellInfo const* spellInfo, bool withoutQueue = false);
-    void ExecutePendingSpellCastRequest();
+    void ExecuteOrCancelSpellCastRequest(PendingSpellCastRequest* castRequest, bool isCancel = false);
 
-
-    bool HandleProcTriggerSpell(Unit* victim, uint32 damage, uint32 absorbed, uint32 resisted, uint32 blocked, uint32 armorMitigated, AuraEffect* triggeredByAura, SpellInfo const* procSpell, uint32 procFlag, uint32 procEx, uint32 cooldown, const uint8 effectMask = MAX_EFFECT_MASK);
-
-    // private:
-    // std::unique_ptr<SpellCastRequest> _pendingSpellCastRequest;
-    // bool ProcessItemCast(SpellCastRequest& castRequest, SpellCastTargets const& targets);
-    // bool CanExecutePendingSpellCastRequest();
+    bool CanRequestSpellCast(SpellInfo const* spellInfo) const;
+    void RequestSpellCast(PendingSpellCastRequest* castRequest);
 
  protected:
     // Gamemaster whisper whitelist

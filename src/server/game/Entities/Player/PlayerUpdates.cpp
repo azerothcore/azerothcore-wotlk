@@ -79,7 +79,7 @@ void Player::Update(uint32 p_time)
 
     // used to implement delayed far teleports
     SetMustDelayTeleport(true);
-    ExecuteSortedCastRequests();
+    ProcessSpellQueue();
     Unit::Update(p_time);
     SetMustDelayTeleport(false);
 
@@ -2255,4 +2255,111 @@ void Player::ProcessTerrainStatusUpdate()
     }
     else
         m_MirrorTimerFlags &= ~(UNDERWATER_INWATER | UNDERWATER_INLAVA | UNDERWATER_INSLIME | UNDERWATER_INDARKWATER);
+}
+
+bool Player::CanExecutePendingSpellCastRequest(SpellInfo const* spellInfo, bool withoutQueue /* = false*/)
+{
+    // Check gcd
+    uint32 remainingGlobalCooldown = GetGlobalCooldownMgr().GetGlobalCooldown(spellInfo);
+    if (remainingGlobalCooldown > 0)
+    {
+        if (!SpellQueue.empty())
+        {
+            PendingSpellCastRequest request = SpellQueue.front();
+            if (!withoutQueue && remainingGlobalCooldown > GetSpellQueueWindow())
+                ExecuteOrCancelSpellCastRequest(&request, true);
+        }
+        return false;
+    }
+
+    // Check spell cooldown
+    if (GetSpellCooldownDelay(spellInfo->Id) > (withoutQueue ? 0 : GetSpellQueueWindow()))
+        return false;
+
+    // Check spell in progress
+    for (CurrentSpellTypes spellSlot : {CURRENT_MELEE_SPELL, CURRENT_GENERIC_SPELL})
+        if (Spell* spell = GetCurrentSpell(spellSlot))
+        {
+            bool autoshot = spell->m_spellInfo->IsAutoRepeatRangedSpell();
+            if (IsNonMeleeSpellCast(false, true, true, autoshot))
+                return false;
+        }
+    return true;
+}
+
+/**
+ * @brief Gets the next cast request with a matching category.
+ *
+ * @param category The category to search for.
+ * @return A pointer to the next cast request with the given category, or
+ *         nullptr if no such request exists.
+ */
+const PendingSpellCastRequest* Player::GetCastRequest(uint32 category) const
+{
+    for (const PendingSpellCastRequest& request : SpellQueue)
+        if (request.category == category)
+            return &request;
+    return nullptr;
+}
+
+bool Player::CanRequestSpellCast(SpellInfo const* spellInfo) const
+{
+    if (!sWorld->getBoolConfig(CONFIG_SPELL_QUEUE_ENABLED))
+        return false;
+
+    // Check for existing cast request with the same category
+    if (PendingSpellCastRequest const* castRequest = GetCastRequest(spellInfo->StartRecoveryCategory))
+        return false;
+
+    // Check if the global cooldown for the spell exceeds the allowable spell queue window
+    if (m_GlobalCooldownMgr.GetGlobalCooldown(spellInfo) > GetSpellQueueWindow(true))
+        return false;
+
+    // Check if the spell cooldown exceeds the allowable spell queue window
+    if (GetSpellCooldownDelay(spellInfo->Id) > GetSpellQueueWindow())
+        return false;
+
+    // If there is an existing cast that will last longer than the allowable
+    // spell queue window, then we can't request a new spell cast
+    for (CurrentSpellTypes spellSlot : { CURRENT_MELEE_SPELL, CURRENT_GENERIC_SPELL })
+        if (Spell* spell = GetCurrentSpell(spellSlot))
+            if (spell->GetCastTimeRemaining() > static_cast<float>(GetSpellQueueWindow()))
+                return false;
+
+    return true;
+}
+
+void Player::ExecuteOrCancelSpellCastRequest(PendingSpellCastRequest* request, bool isCancel /* = false*/)
+{
+    WorldPacket packet = request->requestPacket;
+    if (packet.empty())
+        return;
+
+    if (isCancel)
+        request->cancelInProgress = true;
+
+    if (WorldSession* session = GetSession())
+    {
+        if (request->isItem)
+            session->HandleUseItemOpcode(packet);
+        else
+            session->HandleCastSpellOpcode(packet);
+
+    }
+}
+
+void Player::ProcessSpellQueue()
+{
+    while (!SpellQueue.empty())
+    {
+        auto& request = SpellQueue.front(); // Peek at the first spell
+        SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(request.spellId);
+        if (CanExecutePendingSpellCastRequest(spellInfo))
+        {
+            ExecuteOrCancelSpellCastRequest(&request);
+            SpellQueue.pop_front(); // Remove from the queue
+        }
+        else // If the first spell can't execute, stop processing
+            break;
+    }
 }

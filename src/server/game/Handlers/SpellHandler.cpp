@@ -119,7 +119,6 @@ void WorldSession::HandleUseItemOpcode(WorldPacket& recvPacket)
                 spellInfo->GetCategory(),
                 copyPacket,
                 false,
-                castCount,
                 true,
             };
             _player->SpellQueue.push_back(request);
@@ -432,14 +431,23 @@ void WorldSession::HandleCastSpellOpcode(WorldPacket& recvPacket)
     {
         if (_player->CanRequestSpellCast(spellInfo))
         {
+
+
+
+
             PendingSpellCastRequest request
             {
                 spellId,
                 spellInfo->GetCategory(),
                 copyPacket,
                 false,
-                castCount
             };
+
+            Spell* spell = new Spell(_player, spellInfo, TRIGGERED_NONE);
+            spell->m_cast_count = castCount;
+            spell->SendCastResult(SPELL_CAST_OK);
+            spell->finish(false);
+            recvPacket.rfinish(); // prevent spam at ignore packet
 
             _player->SpellQueue.push_back(request);
             return;
@@ -564,7 +572,7 @@ void WorldSession::HandleCancelCastOpcode(WorldPacket& recvPacket)
     recvPacket.read_skip<uint8>();                          // counter, increments with every CANCEL packet, don't use for now
     recvPacket >> spellId;
 
-    _player->ClearSpellQueue();
+    _player->SpellQueue.clear();
 
     _player->InterruptSpell(CURRENT_MELEE_SPELL);
     if (_player->IsNonMeleeSpellCast(false))
