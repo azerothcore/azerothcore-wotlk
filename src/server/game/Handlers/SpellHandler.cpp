@@ -108,7 +108,7 @@ void WorldSession::HandleUseItemOpcode(WorldPacket& recvPacket)
     }
 
     // try queue spell if it can't be executed right now
-    if (!_player->CanExecutePendingSpellCastRequest(spellInfo, true))
+    if (!_player->CanExecutePendingSpellCastRequest(spellInfo))
         if (_player->CanRequestSpellCast(spellInfo))
         {
             recvPacket.rpos(0); // Reset read position to the start of the buffer.
@@ -421,7 +421,7 @@ void WorldSession::HandleCastSpellOpcode(WorldPacket& recvPacket)
     }
 
     // try queue spell if it can't be executed right now
-    if (!_player->CanExecutePendingSpellCastRequest(spellInfo, true))
+    if (!_player->CanExecutePendingSpellCastRequest(spellInfo))
     {
         if (_player->CanRequestSpellCast(spellInfo))
         {

@@ -2257,23 +2257,20 @@ void Player::ProcessTerrainStatusUpdate()
         m_MirrorTimerFlags &= ~(UNDERWATER_INWATER | UNDERWATER_INLAVA | UNDERWATER_INSLIME | UNDERWATER_INDARKWATER);
 }
 
-bool Player::CanExecutePendingSpellCastRequest(SpellInfo const* spellInfo, bool withoutQueue /* = false*/)
+uint32 Player::GetSpellQueueWindow() const
+{
+    return sWorld->getIntConfig(CONFIG_SPELL_QUEUE_WINDOW);
+}
+
+bool Player::CanExecutePendingSpellCastRequest(SpellInfo const* spellInfo)
 {
     // Check gcd
     uint32 remainingGlobalCooldown = GetGlobalCooldownMgr().GetGlobalCooldown(spellInfo);
     if (remainingGlobalCooldown > 0)
-    {
-        if (!SpellQueue.empty())
-        {
-            PendingSpellCastRequest request = SpellQueue.front();
-                ExecuteOrCancelSpellCastRequest(&request, true);
-            if (!withoutQueue && remainingGlobalCooldown > SPELL_QUEUE_TIME_WINDOW)
-        }
         return false;
-    }
 
     // Check spell cooldown
-    if (GetSpellCooldownDelay(spellInfo->Id) > (withoutQueue ? 0 : SPELL_QUEUE_TIME_WINDOW))
+    if (GetSpellCooldownDelay(spellInfo->Id) > GetSpellQueueWindow())
         return false;
 
     // Check spell in progress
@@ -2304,19 +2301,15 @@ bool Player::CanRequestSpellCast(SpellInfo const* spellInfo) const
     if (PendingSpellCastRequest const* castRequest = GetCastRequest(spellInfo->StartRecoveryCategory))
         return false;
 
-    // Check if the global cooldown for the spell exceeds the allowable spell queue window
-    if (m_GlobalCooldownMgr.GetGlobalCooldown(spellInfo) > SPELL_QUEUE_TIME_WINDOW_PADDED)
-        return false;
-
     // Check if the spell cooldown exceeds the allowable spell queue window
-    if (GetSpellCooldownDelay(spellInfo->Id) > SPELL_QUEUE_TIME_WINDOW)
+    if (GetSpellCooldownDelay(spellInfo->Id) > GetSpellQueueWindow())
         return false;
 
     // If there is an existing cast that will last longer than the allowable
     // spell queue window, then we can't request a new spell cast
     for (CurrentSpellTypes spellSlot : { CURRENT_MELEE_SPELL, CURRENT_GENERIC_SPELL })
         if (Spell* spell = GetCurrentSpell(spellSlot))
-            if (spell->GetCastTimeRemaining() > static_cast<float>(SPELL_QUEUE_TIME_WINDOW))
+            if (spell->GetCastTimeRemaining() > static_cast<float>(GetSpellQueueWindow()))
                 return false;
 
     return true;

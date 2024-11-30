@@ -2635,15 +2635,14 @@ public:
     /***               SPELL QUEUE SYSTEM                  ***/
     /*********************************************************/
 
-    static constexpr uint32 SPELL_QUEUE_TIME_WINDOW = 400; // ms
-    static constexpr uint32 SPELL_QUEUE_TIME_WINDOW_PADDED = 450; // ms
+    uint32 GetSpellQueueWindow() const;
 
     const PendingSpellCastRequest* GetCastRequest(uint32 category) const;
 
     std::deque<PendingSpellCastRequest> SpellQueue;
 
     void ProcessSpellQueue();
-    bool CanExecutePendingSpellCastRequest(SpellInfo const* spellInfo, bool withoutQueue = false);
+    bool CanExecutePendingSpellCastRequest(SpellInfo const* spellInfo);
     void ExecuteOrCancelSpellCastRequest(PendingSpellCastRequest* castRequest, bool isCancel = false);
 
     bool CanRequestSpellCast(SpellInfo const* spellInfo) const;
