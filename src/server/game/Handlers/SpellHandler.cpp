@@ -71,7 +71,7 @@ void WorldSession::HandleUseItemOpcode(WorldPacket& recvPacket)
     uint32 glyphIndex;                                      // something to do with glyphs?
     uint32 spellId;                                         // casted spell id
 
-    WorldPacket const copy_packet = recvPacket;
+    WorldPacket const copyPacket = recvPacket;
 
     recvPacket >> bagIndex >> slot >> castCount >> spellId >> itemGUID >> glyphIndex >> castFlags;
 
@@ -101,11 +101,10 @@ void WorldSession::HandleUseItemOpcode(WorldPacket& recvPacket)
     if (_player->SpellQueue.size())
     {
         PendingSpellCastRequest& request = _player->SpellQueue.front(); // Peek at the first spell
-        if (request.cancel_in_progress)
+        if (request.cancelInProgress)
         {
-            LOG_ERROR("sql.sql", "HandleUseItemCode: send equip error");
             pUser->SendEquipError(EQUIP_ERR_NONE, pItem, nullptr);
-            recvPacket.rfinish();
+            recvPacket.rfinish(); // prevent spam at ignore packet
             return;
         }
     }
@@ -114,19 +113,16 @@ void WorldSession::HandleUseItemOpcode(WorldPacket& recvPacket)
     if (!_player->CanExecutePendingSpellCastRequest(spellInfo, true))
         if (_player->CanRequestSpellCast(spellInfo))
         {
-            PendingSpellCastRequest newRequest
+            PendingSpellCastRequest request
             {
                 spellId,
                 spellInfo->GetCategory(),
-                recvPacket.ReadPackedTime(),
-                true,
-                {copy_packet},
+                copyPacket,
                 false,
                 castCount,
                 true,
             };
-            _player->RequestSpellCast(&newRequest);
-            LOG_ERROR("sql.sql", "Add item to queue with spellId {} cat {}", spellInfo->Id, spellInfo->GetCategory());
+            _player->SpellQueue.push_back(request);
             return;
         }
 
@@ -420,13 +416,13 @@ void WorldSession::HandleCastSpellOpcode(WorldPacket& recvPacket)
     if (_player->SpellQueue.size())
     {
         PendingSpellCastRequest& request = _player->SpellQueue.front(); // Peek at the first spell
-        if (request.cancel_in_progress)
+        if (request.cancelInProgress)
         {
-            Spell *spell = new Spell(_player, spellInfo, TRIGGERED_NONE);
-            spell->m_cast_count = castCount; // set count of casts
+            Spell* spell = new Spell(_player, spellInfo, TRIGGERED_NONE);
+            spell->m_cast_count = castCount;
             spell->SendCastResult(SPELL_FAILED_DONT_REPORT);
             spell->finish(false);
-            recvPacket.rfinish();
+            recvPacket.rfinish(); // prevent spam at ignore packet
             return;
         }
     }
@@ -440,14 +436,12 @@ void WorldSession::HandleCastSpellOpcode(WorldPacket& recvPacket)
             {
                 spellId,
                 spellInfo->GetCategory(),
-                recvPacket.ReadPackedTime(),
-                true,
                 copyPacket,
                 false,
                 castCount
             };
 
-            _player->RequestSpellCast(&request);
+            _player->SpellQueue.push_back(request);
             return;
         }
     }

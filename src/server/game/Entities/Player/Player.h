@@ -1065,12 +1065,10 @@ struct PendingSpellCastRequest
 {
     uint32      spellId;
     uint32      category;
-    uint32      time_requested;
-    bool        active;
-    WorldPacket request_packet;
-    bool        cancel_in_progress = false;
+    WorldPacket requestPacket;
+    bool        cancelInProgress = false;
     uint32      cast_count;
-    bool        is_item = false;
+    bool        isItem = false;
 };
 
 class Player : public Unit, public GridObject<Player>

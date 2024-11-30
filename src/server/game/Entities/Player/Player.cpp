@@ -16382,7 +16382,6 @@ bool Player::CanExecutePendingSpellCastRequest(SpellInfo const* spellInfo, bool 
                 if (globalCooldownMgr.GetGlobalCooldown(spellInfo) > uint32(SPELL_QUEUE_TIME_WINDOW))
                     CancelSpellCastRequest(&request);
         }
-        LOG_ERROR("sql.sql", "global cooldown for {} is {}", spellInfo->Id, globalCooldownMgr.GetGlobalCooldown(spellInfo));
         return false;
     }
 
@@ -16399,7 +16398,6 @@ bool Player::CanExecutePendingSpellCastRequest(SpellInfo const* spellInfo, bool 
             if (IsNonMeleeSpellCast(false, true, true, autoshot))
                 return false;
         }
-    LOG_ERROR("sql.sql", "CanExecutePendingSpellCastRequest {}) returns true", !withoutQueue);
     return true;
 }
 
@@ -16411,29 +16409,17 @@ bool Player::IsSpellQueueEnabled() const
 
 void Player::RequestSpellCast(PendingSpellCastRequest* castRequest)
 {
-    // Remove any existing request of the same category
-    // auto itr = std::find_if(
-        // SpellQueue.begin(), SpellQueue.end(),
-        // [&](const PendingSpellCastRequest& request) {
-            // return request.category == castRequest.category;
-        // });
-
-    // if (itr != SpellQueue.end())
-        // SpellQueue.erase(itr);
-
-    // Add the new request to the end of the queue
-    SpellQueue.push_back(*castRequest);
 }
 
 void Player::CancelSpellCastRequest(PendingSpellCastRequest* request)
 {
     if (WorldSession* session = GetSession())
     {
-        request->cancel_in_progress = true;
-        if (request->is_item)
-            session->HandleUseItemOpcode(request->request_packet);
+        request->cancelInProgress = true;
+        if (request->isItem)
+            session->HandleUseItemOpcode(request->requestPacket);
         else
-            session->HandleCastSpellOpcode(request->request_packet);
+            session->HandleCastSpellOpcode(request->requestPacket);
     }
 }
 
@@ -16538,13 +16524,13 @@ bool Player::CanRequestSpellCast(SpellInfo const* spellInfo) const
 
 void Player::ProcessPendingSpellCastRequest(PendingSpellCastRequest* request)
 {
-    WorldPacket packet = request->request_packet;
+    WorldPacket packet = request->requestPacket;
     if (packet.empty())
         return;
 
     if (WorldSession* session = GetSession())
     {
-        if (request->is_item)
+        if (request->isItem)
             session->HandleUseItemOpcode(packet);
         else
             session->HandleCastSpellOpcode(packet);
@@ -16555,21 +16541,14 @@ void Player::ExecuteSortedCastRequests()
 {
     while (!SpellQueue.empty())
     {
-        // PendingSpellCastRequest request = SpellQueue.front();
         auto& request = SpellQueue.front(); // Peek at the first spell
         SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(request.spellId);
         if (CanExecutePendingSpellCastRequest(spellInfo))
         {
-            LOG_ERROR("sql.sql", "Player::ExecuteSortedCastRequests: CanExecute Success");
             ProcessPendingSpellCastRequest(&request);
             SpellQueue.pop_front(); // Remove from the queue
-            LOG_ERROR("sql.sql", "Player::ExecuteSortedCastRequests: Processed {}", request.spellId);
         }
-        else
-        {
-            LOG_ERROR("sql.sql", "Player::ExecuteSortedCastRequests: CanExecute Fail");
-            // If the first spell can't execute, stop processing
+        else // If the first spell can't execute, stop processing
             break;
-        }
     }
 }
