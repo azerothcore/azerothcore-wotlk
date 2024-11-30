@@ -1778,7 +1778,7 @@ SpellCastResult SpellInfo::CheckTarget(Unit const* caster, WorldObject const* ta
         if (IsRequiringDeadTarget() && !unitTarget->HasAuraType(SPELL_AURA_GHOST))
             return SPELL_FAILED_TARGET_NOT_GHOST;
 
-        if (IsDeathPersistent() && IsAllowingDeadTarget())
+        if (!IsDeathPersistent() && !IsAllowingDeadTarget())
             return SPELL_FAILED_BAD_TARGETS;
 
         if (caster != unitTarget)
