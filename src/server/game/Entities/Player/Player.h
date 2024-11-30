@@ -2630,21 +2630,18 @@ public:
     /*********************************************************/
     /***               SPELL QUEUE SYSTEM                  ***/
     /*********************************************************/
-
+protected:
     uint32 GetSpellQueueWindow() const;
-
-    const PendingSpellCastRequest* GetCastRequest(uint32 category) const;
-
-    std::deque<PendingSpellCastRequest> SpellQueue;
-
     void ProcessSpellQueue();
+
+public:
+    std::deque<PendingSpellCastRequest> SpellQueue;
+    const PendingSpellCastRequest* GetCastRequest(uint32 category) const;
     bool CanExecutePendingSpellCastRequest(SpellInfo const* spellInfo);
     void ExecuteOrCancelSpellCastRequest(PendingSpellCastRequest* castRequest, bool isCancel = false);
-
     bool CanRequestSpellCast(SpellInfo const* spellInfo) const;
-    void RequestSpellCast(PendingSpellCastRequest* castRequest);
 
- protected:
+protected:
     // Gamemaster whisper whitelist
     WhisperListContainer WhisperList;
 
