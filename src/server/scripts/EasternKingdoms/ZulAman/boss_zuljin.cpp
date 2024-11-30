@@ -313,7 +313,6 @@ struct boss_zuljin : public BossAI
                 if (_nextPhase == PHASE_EAGLE)
                 {
                     me->SetCombatMovement(false);
-                    me->ClearTarget();
                     DoCastSelf(SPELL_ENERGY_STORM, true); // enemy aura
                     DoCastAOE(SPELL_SUMMON_CYCLONE, true);
                 }
@@ -362,6 +361,7 @@ struct npc_zuljin_vortex : public ScriptedAI
         DoCastSelf(SPELL_CYCLONE_PASSIVE, true);
         DoCastSelf(SPELL_CYCLONE_VISUAL, true);
         me->SetSpeed(MOVE_RUN, 1.0f);
+        me->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
         DoZoneInCombat();
     }
 
