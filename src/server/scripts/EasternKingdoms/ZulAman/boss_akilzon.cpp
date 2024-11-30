@@ -52,7 +52,8 @@ enum Says
 
 enum Misc
 {
-    ACTION_STORM_EXPIRE         = 1
+    ACTION_STORM_EXPIRE         = 1,
+    GROUP_ELECTRICAL_STORM      = 1
 };
 
 constexpr auto NPC_SOARING_EAGLE = 24858;
@@ -91,14 +92,16 @@ struct boss_akilzon : public BossAI
         }, 10s, 18s);
 
         ScheduleTimedEvent(20s, 30s, [&] {
-            DoCastRandomTarget(SPELL_GUST_OF_WIND, 1);
+            if (scheduler.GetNextGroupOcurrence(GROUP_ELECTRICAL_STORM) > 5s)
+                DoCastRandomTarget(SPELL_GUST_OF_WIND, 1);
         }, 20s, 30s);
 
         ScheduleTimedEvent(10s, 20s, [&] {
             DoCastVictim(SPELL_CALL_LIGHTNING);
         }, 12s, 17s);
 
-        ScheduleTimedEvent(1min, [&] {
+        scheduler.Schedule(1min, GROUP_ELECTRICAL_STORM, [this](TaskContext context)
+        {
             Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 50, true);
             if (!target)
             {
@@ -123,7 +126,9 @@ struct boss_akilzon : public BossAI
                     _isRaining = true;
                 }
             }, Seconds(urand(47, 52)));
-        }, 1min);
+
+            context.Repeat();
+        });
 
         ScheduleTimedEvent(47s, 52s, [&] {
             if (!_isRaining)

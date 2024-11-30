@@ -89,7 +89,7 @@ enum Spells
 
     // Rogue
     SPELL_RO_BLIND                  = 43433,
-    SPELL_RO_SLICE_DICE             = 43457,
+    SPELL_RO_SLICE_DICE             = 43547,
     SPELL_RO_WOUND_POISON           = 43461,
 
     // Shaman
@@ -236,6 +236,12 @@ struct boss_hexlord_malacrass : public BossAI
         _currentClass = CLASS_NONE;
         _classAbilityTimer = 10000ms;
         SpawnAdds();
+        ScheduleHealthCheckEvent(80, [&] {
+            ScheduleTimedEvent(0s, [&] {
+                DoCastSelf(SPELL_DRAIN_POWER, true);
+                Talk(SAY_DRAIN_POWER);
+            }, 30s, 30s);
+        });
     }
 
     void SpawnAdds()
@@ -257,10 +263,6 @@ struct boss_hexlord_malacrass : public BossAI
                 add->SetInCombatWithZone();
         });
 
-        ScheduleTimedEvent(60s, [&]{
-            DoCastSelf(SPELL_DRAIN_POWER, true);
-            Talk(SAY_DRAIN_POWER);
-        }, 40s, 55s);
         ScheduleTimedEvent(30s, [&]{
             DoCastSelf(SPELL_SPIRIT_BOLTS);
             scheduler.Schedule(10s, [this](TaskContext)
@@ -272,7 +274,7 @@ struct boss_hexlord_malacrass : public BossAI
                         siphonTrigger->SetDisplayId(11686);
                         siphonTrigger->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
                         siphonTrigger->AI()->DoCast(target, SPELL_SIPHON_SOUL, true);
-                        siphonTrigger->GetMotionMaster()->MoveChase(me);
+                        siphonTrigger->GetMotionMaster()->MoveFollow(me, 0.0f, 0.0f);
                         if (Player* player = target->ToPlayer())
                             _currentClass = player->HasAura(AURA_SHADOW_FORM) ? uint8(ADDITIONAL_CLASS_SPRIEST) : player->getClass();
                     }
