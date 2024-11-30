@@ -1,3 +1,4 @@
+-- DB update 2024_11_30_02 -> 2024_11_30_03
 -- Update gameobject 'Dwarf Hero / Gnome Hero' with sniffed values
 -- new spawns
 DELETE FROM `gameobject` WHERE (`id` IN (180755, 180756))
