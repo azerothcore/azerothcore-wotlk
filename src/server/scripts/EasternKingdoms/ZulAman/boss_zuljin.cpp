@@ -314,17 +314,7 @@ struct boss_zuljin : public BossAI
                 {
                     me->SetCombatMovement(false);
                     DoCastSelf(SPELL_ENERGY_STORM, true); // enemy aura
-                    for (uint8 i = 0; i < 4; ++i)
-                    {
-                        if (Creature* vortex = DoSpawnCreature(CREATURE_FEATHER_VORTEX, 0, 0, 0, 0, TEMPSUMMON_CORPSE_DESPAWN, 0))
-                        {
-                            vortex->CastSpell(vortex, SPELL_CYCLONE_PASSIVE, true);
-                            vortex->CastSpell(vortex, SPELL_CYCLONE_VISUAL, true);
-                            vortex->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
-                            vortex->SetSpeed(MOVE_RUN, 1.0f);
-                            DoZoneInCombat(vortex);
-                        }
-                    }
+                    DoCastAOE(SPELL_SUMMON_CYCLONE, true);
                 }
                 else
                 {
@@ -362,9 +352,18 @@ struct npc_zuljin_vortex : public ScriptedAI
 {
     npc_zuljin_vortex(Creature* creature) : ScriptedAI(creature) { }
 
-    void Reset() override { }
+    void Reset() override
+    {
+        if (WorldObject* summoner = GetSummoner())
+            if (Creature* zuljin = summoner->ToCreature())
+                me->SetLevel(zuljin->GetLevel());
 
-    void JustEngagedWith(Unit* /*target*/) override { }
+        DoCastSelf(SPELL_CYCLONE_PASSIVE, true);
+        DoCastSelf(SPELL_CYCLONE_VISUAL, true);
+        me->SetSpeed(MOVE_RUN, 1.0f);
+        me->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
+        DoZoneInCombat();
+    }
 
     void SpellHit(Unit* caster, SpellInfo const* spell) override
     {
@@ -374,6 +373,8 @@ struct npc_zuljin_vortex : public ScriptedAI
 
     void UpdateAI(uint32 /*diff*/) override
     {
+        UpdateVictim();
+
         //if the vortex reach the target, it change his target to another player
         if (me->IsWithinMeleeRange(me->GetVictim()))
             AttackStart(SelectTarget(SelectTargetMethod::Random, 0));
