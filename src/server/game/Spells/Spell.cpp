@@ -4413,7 +4413,6 @@ void Spell::update(uint32 difftime)
         return;
     }
 
-
     if (m_targets.GetUnitTargetGUID() && !m_targets.GetUnitTarget())
     {
         LOG_DEBUG("spells.aura", "Spell {} is cancelled due to removal of target.", m_spellInfo->Id);

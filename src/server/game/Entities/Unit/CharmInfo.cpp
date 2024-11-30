@@ -400,6 +400,7 @@ bool GlobalCooldownMgr::HasGlobalCooldown(SpellInfo const* spellInfo) const
     return itr != m_GlobalCooldowns.end() && itr->second.duration && getMSTimeDiff(itr->second.cast_time, GameTime::GetGameTimeMS().count()) < itr->second.duration;
 }
 
+
 uint32 GlobalCooldownMgr::GetGlobalCooldown(SpellInfo const* spellInfo) const
 {
     uint32 return_gcd = 0;
@@ -412,12 +413,11 @@ uint32 GlobalCooldownMgr::GetGlobalCooldown(SpellInfo const* spellInfo) const
         if (itr->second.duration)
         {
 
-            auto start = itr->second.cast_time;
-            auto delay = itr->second.duration;
-            auto now = getMSTime();
+            uint32 start = itr->second.cast_time;
+            uint32 delay = itr->second.duration;
+            uint32 now = getMSTime();
             return_gcd = (start + delay > now ? (start + delay) - now : 0);
         }
-
     return return_gcd;
 }
 

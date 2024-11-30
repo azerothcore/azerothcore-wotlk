@@ -1044,7 +1044,6 @@ struct BGData
     time_t             bgAfkReportedTimer{0};
 };
 
-
 // holder for Entry Point data (pussywizard: stored in db)
 struct EntryPointData
 {
@@ -1065,11 +1064,10 @@ struct PendingSpellCastRequest
 {
     uint32 spellId;
     uint32 category;
-    WorldPacket requestPacket; // Ownership transferred with std::move
+    WorldPacket requestPacket;
     bool isItem = false;
     bool cancelInProgress = false;
 
-    // Custom constructor for move semantics
     PendingSpellCastRequest(uint32 spellId, uint32 category, WorldPacket&& packet, bool item = false, bool cancel = false)
         : spellId(spellId), category(category), requestPacket(std::move(packet)), isItem(item) , cancelInProgress(cancel) {}
 };
@@ -1799,7 +1797,7 @@ public:
     void RemoveSpellCooldown(uint32 spell_id, bool update = false);
     void SendClearCooldown(uint32 spell_id, Unit* target);
 
-    GlobalCooldownMgr& GetGlobalCooldownMgr() { return m_GlobalCooldownMgr; };
+    GlobalCooldownMgr& GetGlobalCooldownMgr() { return m_GlobalCooldownMgr; }
 
     void RemoveCategoryCooldown(uint32 cat);
     void RemoveArenaSpellCooldowns(bool removeActivePetCooldowns = false);
@@ -2629,8 +2627,6 @@ public:
 
     std::string GetDebugInfo() const override;
 
-    bool HandleProcTriggerSpell(Unit* victim, uint32 damage, uint32 absorbed, uint32 resisted, uint32 blocked, uint32 armorMitigated, AuraEffect* triggeredByAura, SpellInfo const* procSpell, uint32 procFlag, uint32 procEx, uint32 cooldown, const uint8 effectMask = MAX_EFFECT_MASK);
-
     /*********************************************************/
     /***               SPELL QUEUE SYSTEM                  ***/
     /*********************************************************/
@@ -2768,8 +2764,6 @@ public:
     void StopMirrorTimer(MirrorTimerType Type);
     void HandleDrowning(uint32 time_diff);
     int32 getMaxTimer(MirrorTimerType timer);
-
-
 
     /*********************************************************/
     /***                  HONOR SYSTEM                     ***/
@@ -3011,7 +3005,6 @@ private:
     PlayerSettingMap m_charSettingsMap;
 
     Seconds m_creationTime;
-
 };
 
 void AddItemsSetItem(Player* player, Item* item);

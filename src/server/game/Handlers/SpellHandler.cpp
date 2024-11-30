@@ -17,7 +17,6 @@
 
 #include "DBCStores.h"
 #include "GameObjectAI.h"
-#include "Item.h"
 #include "Log.h"
 #include "ObjectMgr.h"
 #include "Opcodes.h"
@@ -116,7 +115,7 @@ void WorldSession::HandleUseItemOpcode(WorldPacket& recvPacket)
                 spellId,
                 spellInfo->GetCategory(),
                 std::move(recvPacket), // Move ownership of recvPacket
-                true
+                true // itemCast
             );
             return;
         }

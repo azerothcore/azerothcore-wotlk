@@ -2264,16 +2264,12 @@ uint32 Player::GetSpellQueueWindow() const
 
 bool Player::CanExecutePendingSpellCastRequest(SpellInfo const* spellInfo)
 {
-    // Check gcd
-    uint32 remainingGlobalCooldown = GetGlobalCooldownMgr().GetGlobalCooldown(spellInfo);
-    if (remainingGlobalCooldown > 0)
+    if (GetGlobalCooldownMgr().GetGlobalCooldown(spellInfo) > 0)
         return false;
 
-    // Check spell cooldown
     if (GetSpellCooldownDelay(spellInfo->Id) > GetSpellQueueWindow())
         return false;
 
-    // Check spell in progress
     for (CurrentSpellTypes spellSlot : {CURRENT_MELEE_SPELL, CURRENT_GENERIC_SPELL})
         if (Spell* spell = GetCurrentSpell(spellSlot))
         {
@@ -2301,7 +2297,6 @@ bool Player::CanRequestSpellCast(SpellInfo const* spellInfo) const
     if (PendingSpellCastRequest const* castRequest = GetCastRequest(spellInfo->StartRecoveryCategory))
         return false;
 
-    // Check if the spell cooldown exceeds the allowable spell queue window
     if (GetSpellCooldownDelay(spellInfo->Id) > GetSpellQueueWindow())
         return false;
 
