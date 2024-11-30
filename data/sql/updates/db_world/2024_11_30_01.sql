@@ -1,3 +1,4 @@
+-- DB update 2024_11_30_00 -> 2024_11_30_01
 -- enforce minCnt == macCnt for reference loot entries
 
 -- creature loot
