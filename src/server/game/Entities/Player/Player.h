@@ -2635,9 +2635,8 @@ public:
     /***               SPELL QUEUE SYSTEM                  ***/
     /*********************************************************/
 
-    // constexpr static uint32 SPELL_QUEUE_TIME_WINDOW = 1000; // testing
-    constexpr static uint32 SPELL_QUEUE_TIME_WINDOW = 400; // ms
-    [[nodiscard]] uint32 GetSpellQueueWindow(bool withPadding = false) const { return withPadding ? SPELL_QUEUE_TIME_WINDOW : SPELL_QUEUE_TIME_WINDOW + 100; };
+    static constexpr uint32 SPELL_QUEUE_TIME_WINDOW = 400; // ms
+    static constexpr uint32 SPELL_QUEUE_TIME_WINDOW_PADDED = 450; // ms
 
     const PendingSpellCastRequest* GetCastRequest(uint32 category) const;
 

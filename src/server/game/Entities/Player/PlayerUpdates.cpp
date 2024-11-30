@@ -2266,14 +2266,14 @@ bool Player::CanExecutePendingSpellCastRequest(SpellInfo const* spellInfo, bool 
         if (!SpellQueue.empty())
         {
             PendingSpellCastRequest request = SpellQueue.front();
-            if (!withoutQueue && remainingGlobalCooldown > GetSpellQueueWindow())
                 ExecuteOrCancelSpellCastRequest(&request, true);
+            if (!withoutQueue && remainingGlobalCooldown > SPELL_QUEUE_TIME_WINDOW)
         }
         return false;
     }
 
     // Check spell cooldown
-    if (GetSpellCooldownDelay(spellInfo->Id) > (withoutQueue ? 0 : GetSpellQueueWindow()))
+    if (GetSpellCooldownDelay(spellInfo->Id) > (withoutQueue ? 0 : SPELL_QUEUE_TIME_WINDOW))
         return false;
 
     // Check spell in progress
@@ -2287,13 +2287,6 @@ bool Player::CanExecutePendingSpellCastRequest(SpellInfo const* spellInfo, bool 
     return true;
 }
 
-/**
- * @brief Gets the next cast request with a matching category.
- *
- * @param category The category to search for.
- * @return A pointer to the next cast request with the given category, or
- *         nullptr if no such request exists.
- */
 const PendingSpellCastRequest* Player::GetCastRequest(uint32 category) const
 {
     for (const PendingSpellCastRequest& request : SpellQueue)
@@ -2312,18 +2305,18 @@ bool Player::CanRequestSpellCast(SpellInfo const* spellInfo) const
         return false;
 
     // Check if the global cooldown for the spell exceeds the allowable spell queue window
-    if (m_GlobalCooldownMgr.GetGlobalCooldown(spellInfo) > GetSpellQueueWindow(true))
+    if (m_GlobalCooldownMgr.GetGlobalCooldown(spellInfo) > SPELL_QUEUE_TIME_WINDOW_PADDED)
         return false;
 
     // Check if the spell cooldown exceeds the allowable spell queue window
-    if (GetSpellCooldownDelay(spellInfo->Id) > GetSpellQueueWindow())
+    if (GetSpellCooldownDelay(spellInfo->Id) > SPELL_QUEUE_TIME_WINDOW)
         return false;
 
     // If there is an existing cast that will last longer than the allowable
     // spell queue window, then we can't request a new spell cast
     for (CurrentSpellTypes spellSlot : { CURRENT_MELEE_SPELL, CURRENT_GENERIC_SPELL })
         if (Spell* spell = GetCurrentSpell(spellSlot))
-            if (spell->GetCastTimeRemaining() > static_cast<float>(GetSpellQueueWindow()))
+            if (spell->GetCastTimeRemaining() > static_cast<float>(SPELL_QUEUE_TIME_WINDOW))
                 return false;
 
     return true;
