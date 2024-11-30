@@ -309,6 +309,7 @@ struct boss_zuljin : public BossAI
             me->m_Events.AddEventAtOffset([&] {
                 me->SetReactState(REACT_AGGRESSIVE);
                 DoCastSelf(Transform[_nextPhase].spell);
+                DoResetThreatList();
 
                 if (_nextPhase == PHASE_EAGLE)
                 {
@@ -331,7 +332,6 @@ struct boss_zuljin : public BossAI
         me->SetReactState(REACT_PASSIVE);
         DoStopAttack();
         me->GetMotionMaster()->Clear();
-        DoResetThreatList();
 
         me->SetUInt32Value(UNIT_VIRTUAL_ITEM_SLOT_ID, 0);
         me->RemoveAurasDueToSpell(Transform[NextPhase].unaura);
