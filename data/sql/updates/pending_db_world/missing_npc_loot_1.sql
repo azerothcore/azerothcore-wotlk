@@ -5,13 +5,6 @@ DELETE FROM `creature_loot_template` WHERE (`Entry` = 2396);
 INSERT INTO `creature_loot_template` (`Entry`, `Item`, `Reference`, `Chance`, `QuestRequired`, `LootMode`, `GroupId`, `MinCount`, `MaxCount`, `Comment`) VALUES
 (2396, 4306, 0, 75.0, 0, 1, 0, 2, 2, 'Hans Zandin - Silk Cloth');
 
--- Fawn (890)
-UPDATE `creature_template` SET `lootid` = 890 WHERE (`entry` = 890);
-DELETE FROM `creature_loot_template` WHERE (`Entry` = 890);
-INSERT INTO `creature_loot_template` (`Entry`, `Item`, `Reference`, `Chance`, `QuestRequired`, `LootMode`, `GroupId`, `MinCount`, `MaxCount`, `Comment`) VALUES
-(890, 2318, 0, 13.33, 0, 1, 0, 1, 1, 'Fawn - Light Leather'),
-(890, 2934, 0, 86.67, 0, 1, 0, 1, 1, 'Fawn - Ruined Leather Scraps');
-
 -- Tamara Armstrong (2361)
 UPDATE `creature_template` SET `lootid` = 2361 WHERE (`entry` = 2361);
 DELETE FROM `creature_loot_template` WHERE (`Entry` = 2361);
