@@ -4413,11 +4413,6 @@ void Spell::update(uint32 difftime)
         return;
     }
 
-    if (const SpellInfo* info = GetSpellInfo())
-      if (Unit* caster = GetCaster())
-        if (Player* player = caster->ToPlayer())
-          if (player->HasSameTickQueueBlock(info->StartRecoveryCategory, true))
-            player->RemoveSameTickQueueBlock(info->StartRecoveryCategory);
 
     if (m_targets.GetUnitTargetGUID() && !m_targets.GetUnitTarget())
     {

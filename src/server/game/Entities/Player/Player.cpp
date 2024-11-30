@@ -16544,44 +16544,11 @@ void Player::ProcessPendingSpellCastRequest(PendingSpellCastRequest* request)
 
     if (WorldSession* session = GetSession())
     {
-        uint32 category = sSpellMgr->GetSpellInfo(request->spellId)->StartRecoveryCategory;
-        // AddSameTickQueueBlock(category);
         if (request->is_item)
             session->HandleUseItemOpcode(packet);
         else
             session->HandleCastSpellOpcode(packet);
     }
-}
-
-void Player::RemoveSameTickQueueBlock(uint32 category)
-{
-    if (!SameTickBlocks.size())
-        return;
-    if (SameTickBlocks.find(category) != SameTickBlocks.end())
-    {
-        SameTickBlocks.erase(category);
-        LOG_ERROR("sql.sql", "removing same tick block from category {} at {}", category, getMSTime());
-    }
-}
-
-void Player::AddSameTickQueueBlock(uint32 category)
-{
-    LOG_ERROR("sql.sql", "adding same tick block to category {} at {}", category, getMSTime());
-    SameTickBlocks[category] = getMSTime();
-}
-
-bool Player::HasSameTickQueueBlock(uint32 category, bool ignore_time) const
-{
-    if (!SameTickBlocks.size())
-        return false;
-    if (SameTickBlocks.find(category) != SameTickBlocks.end())
-    {
-        auto block = SameTickBlocks.find(category);
-        uint32 time = block->second;
-        if (ignore_time || (GetMSTimeDiffToNow(time) < 140))
-            return true;
-    }
-    return false;
 }
 
 void Player::ExecuteSortedCastRequests()
