@@ -71,8 +71,6 @@ void WorldSession::HandleUseItemOpcode(WorldPacket& recvPacket)
     uint32 glyphIndex;                                      // something to do with glyphs?
     uint32 spellId;                                         // casted spell id
 
-    WorldPacket const copyPacket = recvPacket;
-
     recvPacket >> bagIndex >> slot >> castCount >> spellId >> itemGUID >> glyphIndex >> castFlags;
 
     if (glyphIndex >= MAX_GLYPH_SLOT_INDEX)
@@ -113,15 +111,13 @@ void WorldSession::HandleUseItemOpcode(WorldPacket& recvPacket)
     if (!_player->CanExecutePendingSpellCastRequest(spellInfo, true))
         if (_player->CanRequestSpellCast(spellInfo))
         {
-            PendingSpellCastRequest request
-            {
+            recvPacket.rpos(0); // Reset read position to the start of the buffer.
+            _player->SpellQueue.emplace_back(
                 spellId,
                 spellInfo->GetCategory(),
-                copyPacket,
-                false,
-                true,
-            };
-            _player->SpellQueue.push_back(request);
+                std::move(recvPacket), // Move ownership of recvPacket
+                true
+            );
             return;
         }
 
@@ -385,8 +381,6 @@ void WorldSession::HandleCastSpellOpcode(WorldPacket& recvPacket)
     if (recvPacket.empty())
         return;
 
-    WorldPacket const copyPacket = recvPacket;
-
     recvPacket >> castCount >> spellId >> castFlags;
     TriggerCastFlags triggerFlag = TRIGGERED_NONE;
 
@@ -431,25 +425,12 @@ void WorldSession::HandleCastSpellOpcode(WorldPacket& recvPacket)
     {
         if (_player->CanRequestSpellCast(spellInfo))
         {
-
-
-
-
-            PendingSpellCastRequest request
-            {
+            recvPacket.rpos(0); // Reset read position to the start of the buffer.
+            _player->SpellQueue.emplace_back(
                 spellId,
                 spellInfo->GetCategory(),
-                copyPacket,
-                false,
-            };
-
-            Spell* spell = new Spell(_player, spellInfo, TRIGGERED_NONE);
-            spell->m_cast_count = castCount;
-            spell->SendCastResult(SPELL_CAST_OK);
-            spell->finish(false);
-            recvPacket.rfinish(); // prevent spam at ignore packet
-
-            _player->SpellQueue.push_back(request);
+                std::move(recvPacket) // Move ownership of recvPacket
+            );
             return;
         }
     }

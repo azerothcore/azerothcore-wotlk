@@ -1063,13 +1063,16 @@ struct EntryPointData
 
 struct PendingSpellCastRequest
 {
-    uint32      spellId;
-    uint32      category;
-    WorldPacket requestPacket;
-    bool        cancelInProgress = false;
-    bool        isItem = false;
-};
+    uint32 spellId;
+    uint32 category;
+    WorldPacket requestPacket; // Ownership transferred with std::move
+    bool isItem = false;
+    bool cancelInProgress = false;
 
+    // Custom constructor for move semantics
+    PendingSpellCastRequest(uint32 spellId, uint32 category, WorldPacket&& packet, bool item = false, bool cancel = false)
+        : spellId(spellId), category(category), requestPacket(std::move(packet)), isItem(item) , cancelInProgress(cancel) {}
+};
 
 class Player : public Unit, public GridObject<Player>
 {
