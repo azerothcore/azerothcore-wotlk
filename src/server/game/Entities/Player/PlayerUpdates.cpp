@@ -2324,20 +2324,15 @@ bool Player::CanRequestSpellCast(SpellInfo const* spellInfo) const
 
 void Player::ExecuteOrCancelSpellCastRequest(PendingSpellCastRequest* request, bool isCancel /* = false*/)
 {
-    WorldPacket packet = request->requestPacket;
-    if (packet.empty())
-        return;
-
     if (isCancel)
         request->cancelInProgress = true;
 
     if (WorldSession* session = GetSession())
     {
         if (request->isItem)
-            session->HandleUseItemOpcode(packet);
+            session->HandleUseItemOpcode(request->requestPacket);
         else
-            session->HandleCastSpellOpcode(packet);
-
+            session->HandleCastSpellOpcode(request->requestPacket);
     }
 }
 
