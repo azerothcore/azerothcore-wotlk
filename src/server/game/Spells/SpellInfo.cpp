@@ -1775,11 +1775,13 @@ SpellCastResult SpellInfo::CheckTarget(Unit const* caster, WorldObject const* ta
             return SPELL_FAILED_TARGET_AFFECTING_COMBAT;
 
         // only spells with SPELL_ATTR3_ONLY_ON_GHOSTS can target ghosts
-        if (IsRequiringDeadTarget() && !unitTarget->HasAuraType(SPELL_AURA_GHOST))
-            return SPELL_FAILED_TARGET_NOT_GHOST;
-
-        if (!IsDeathPersistent() && !IsAllowingDeadTarget())
-            return SPELL_FAILED_BAD_TARGETS;
+        if (IsRequiringDeadTarget())
+        {
+            if (!unitTarget->HasAuraType(SPELL_AURA_GHOST))
+                return SPELL_FAILED_TARGET_NOT_GHOST;
+            if (!IsDeathPersistent() && !IsAllowingDeadTarget())
+                return SPELL_FAILED_BAD_TARGETS;
+        }
 
         if (caster != unitTarget)
         {
