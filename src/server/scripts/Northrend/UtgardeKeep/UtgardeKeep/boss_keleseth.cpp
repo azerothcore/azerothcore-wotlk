@@ -139,7 +139,7 @@ struct boss_keleseth : public BossAI
             }
         }, 15s);
 
-        me->m_Events.AddEventAtOffset([&] {
+        me->m_Events.AddEventAtOffset([this]() {
             Talk(SAY_SUMMON_SKELETONS);
             for (uint8 i = 0; i < 5; ++i)
             {
