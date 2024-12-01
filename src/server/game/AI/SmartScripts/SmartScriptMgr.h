@@ -1740,7 +1740,7 @@ struct SmartTarget
         struct
         {
             SAIBool includePets;
-        } pets;
+        } invokerParty;
     };
 };
 

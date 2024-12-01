@@ -3515,7 +3515,7 @@ void SmartScript::GetTargets(ObjectVector& targets, SmartScriptHolder const& e, 
                                 if (member->IsInMap(player))
                                     targets.push_back(member);
 
-                                if (e.target.pets.includePets)
+                                if (e.target.invokerParty.includePets)
                                     if (Creature* pet = ObjectAccessor::GetCreatureOrPetOrVehicle(*member, member->GetPetGUID()))
                                         if (pet->IsPet() && pet->IsInMap(player))
                                             targets.push_back(pet);
