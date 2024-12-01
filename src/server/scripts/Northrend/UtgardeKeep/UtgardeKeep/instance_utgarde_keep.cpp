@@ -87,6 +87,8 @@ public:
 
             if (type == DATA_KELESETH && state == NOT_STARTED)
                 bRocksAchiev = true;
+
+            return true;
         }
 
         void OnPlayerEnter(Player* plr) override
