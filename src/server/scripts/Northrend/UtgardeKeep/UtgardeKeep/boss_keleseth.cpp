@@ -51,13 +51,6 @@ enum eSpells
 
 #define SPELL_SHADOWBOLT                DUNGEON_MODE(SPELL_SHADOWBOLT_N, SPELL_SHADOWBOLT_H)
 
-enum eEvents
-{
-    EVENT_SPELL_SHADOWBOLT = 1,
-    EVENT_FROST_TOMB,
-    EVENT_SUMMON_SKELETONS,
-};
-
 struct npc_frost_tomb : public NullCreatureAI
 {
     npc_frost_tomb(Creature* c) : NullCreatureAI(c)
