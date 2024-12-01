@@ -23,6 +23,7 @@
 #include "ItemTemplate.h"
 #include "LootMgr.h"
 #include "Object.h"
+#include <memory>
 
 class SpellInfo;
 class Bag;
@@ -216,7 +217,7 @@ enum ItemUpdateState
 
 bool ItemCanGoIntoBag(ItemTemplate const* proto, ItemTemplate const* pBagProto);
 
-class Item : public Object
+class Item : public Object, public std::enable_shared_from_this<Item>
 {
 public:
     static Item* CreateItem(uint32 item, uint32 count, Player const* player = nullptr, bool clone = false, uint32 randomPropertyId = 0);
@@ -247,8 +248,24 @@ public:
     void SaveRefundDataToDB();
     void DeleteRefundDataFromDB(CharacterDatabaseTransaction* trans);
 
-    Bag* ToBag() { if (IsBag()) return reinterpret_cast<Bag*>(this); else return nullptr; }
-    [[nodiscard]] const Bag* ToBag() const { if (IsBag()) return reinterpret_cast<const Bag*>(this); else return nullptr; }
+    [[nodiscard]] std::shared_ptr<Bag> ToBag()
+    {
+        if (IsBag())
+        {
+            return std::reinterpret_pointer_cast<Bag>(shared_from_this());
+        }
+
+        return nullptr;
+    }
+    [[nodiscard]] std::shared_ptr<const Bag> ToBag() const
+    {
+        if (IsBag())
+        {
+            return std::reinterpret_pointer_cast<const Bag>(shared_from_this());
+        }
+
+        return nullptr;
+    }
 
     [[nodiscard]] bool IsLocked() const { return !HasFlag(ITEM_FIELD_FLAGS, ITEM_FIELD_FLAG_UNLOCKED); }
     [[nodiscard]] bool IsBag() const { return GetTemplate()->InventoryType == INVTYPE_BAG; }
@@ -279,11 +296,11 @@ public:
     InventoryResult CanBeMergedPartlyWith(ItemTemplate const* proto) const;
 
     [[nodiscard]] uint8 GetSlot() const {return m_slot;}
-    Bag* GetContainer() { return m_container; }
+    std::shared_ptr<Bag> GetContainer() { return m_container; }
     [[nodiscard]] uint8 GetBagSlot() const;
     void SetSlot(uint8 slot) { m_slot = slot; }
     [[nodiscard]] uint16 GetPos() const { return uint16(GetBagSlot()) << 8 | GetSlot(); }
-    void SetContainer(Bag* container) { m_container = container; }
+    void SetContainer(std::shared_ptr<Bag> container) { m_container = std::move(container); }
 
     [[nodiscard]] bool IsInBag() const { return m_container != nullptr; }
     [[nodiscard]] bool IsEquipped() const;
@@ -367,7 +384,7 @@ public:
 private:
     std::string m_text;
     uint8 m_slot;
-    Bag* m_container;
+    std::shared_ptr<Bag> m_container;
     ItemUpdateState uState;
     int32 uQueuePos;
     bool mb_in_trade;                                   // true if item is currently in trade-window
