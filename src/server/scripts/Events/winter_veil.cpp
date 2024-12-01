@@ -82,7 +82,7 @@ class spell_winter_wondervolt_trap : public SpellScript
         if (Player* target = GetHitPlayer())
         {
             // check presence
-            if (target->HasAuraType(SPELL_AURA_TRANSFORM))
+            if (target->HasTransformAura())
                 return;
 
             uint32 spellId = 0;
