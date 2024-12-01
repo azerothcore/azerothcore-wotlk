@@ -68,10 +68,7 @@ INSERT INTO `waypoint_data` (`id`, `point`, `position_x`, `position_y`, `positio
 
 -- Change movement type and wander distance
 
-UPDATE `creature` SET `wander_distance` = 0, `MovementType` = 2 WHERE `guid` = 129272 AND `id1` = 28609;
-UPDATE `creature` SET `wander_distance` = 0, `MovementType` = 2 WHERE `guid` = 129282 AND `id1` = 28609;
-UPDATE `creature` SET `wander_distance` = 0, `MovementType` = 2 WHERE `guid` = 129283 AND `id1` = 28609;
-UPDATE `creature` SET `wander_distance` = 0, `MovementType` = 2 WHERE `guid` = 129284 AND `id1` = 28609;
+UPDATE `creature` SET `wander_distance` = 0, `MovementType` = 2 WHERE `guid` IN (129272, 129282, 129283, 129284) AND `id1` = 28609;
 
 
 -- Set path id
