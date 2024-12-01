@@ -1,3 +1,4 @@
+-- DB update 2024_11_30_04 -> 2024_12_01_00
 
 -- Delete Wrong npc (not found on official servers)
 
