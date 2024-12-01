@@ -1,3 +1,4 @@
+-- DB update 2024_12_01_01 -> 2024_12_01_02
 --
 -- lookout
 -- spawn coords, hp 58682 from 75449
