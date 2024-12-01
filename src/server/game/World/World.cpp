@@ -2059,8 +2059,11 @@ void World::SetInitialWorldSettings()
     LOG_INFO("server.loading", "Initialize Game Time and Timers");
     LOG_INFO("server.loading", " ");
 
-    LoginDatabase.Execute("INSERT INTO uptime (realmid, starttime, uptime, revision) VALUES ({}, {}, 0, '{}')",
-                           realm.Id.Realm, uint32(GameTime::GetStartTime().count()), GitRevision::GetFullVersion());       // One-time query
+    LoginDatabasePreparedStatement* stmt = LoginDatabase.GetPreparedStatement(LOGIN_INS_UPTIME);
+    stmt->SetData(0, realm.Id.Realm);
+    stmt->SetData(1, uint32(GameTime::GetStartTime().count()));
+    stmt->SetData(2, GitRevision::GetFullVersion());
+    LoginDatabase.Execute(stmt);
 
     _timers[WUPDATE_WEATHERS].SetInterval(1 * IN_MILLISECONDS);
     _timers[WUPDATE_AUCTIONS].SetInterval(MINUTE * IN_MILLISECONDS);

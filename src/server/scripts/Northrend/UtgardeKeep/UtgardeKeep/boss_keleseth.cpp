@@ -58,176 +58,154 @@ enum eEvents
     EVENT_SUMMON_SKELETONS,
 };
 
-class npc_frost_tomb : public CreatureScript
+struct npc_frost_tomb : public NullCreatureAI
 {
-public:
-    npc_frost_tomb() : CreatureScript("npc_frost_tomb") { }
-
-    CreatureAI* GetAI(Creature* pCreature) const override
+    npc_frost_tomb(Creature* c) : NullCreatureAI(c)
     {
-        return GetUtgardeKeepAI<npc_frost_tombAI>(pCreature);
-    }
-
-    struct npc_frost_tombAI : public NullCreatureAI
-    {
-        npc_frost_tombAI(Creature* c) : NullCreatureAI(c)
-        {
-            if (TempSummon* t = c->ToTempSummon())
-                if (Unit* s = t->GetSummonerUnit())
-                {
-                    PrisonerGUID = s->GetGUID();
-                    if (me->GetInstanceScript() && me->GetInstanceScript()->instance->IsHeroic())
-                    {
-                        const int32 dmg = 2000;
-                        c->CastCustomSpell(s, SPELL_FROST_TOMB_AURA, nullptr, &dmg, nullptr, true);
-                    }
-                    else
-                        c->CastSpell(s, SPELL_FROST_TOMB_AURA, true);
-                }
-        }
-        ObjectGuid PrisonerGUID;
-
-        void JustDied(Unit* killer) override
-        {
-            if (killer && killer->GetGUID() != me->GetGUID())
-                if (InstanceScript* pInstance = me->GetInstanceScript())
-                    pInstance->SetData(DATA_ON_THE_ROCKS_ACHIEV, 0);
-
-            if (PrisonerGUID)
-                if (Unit* p = ObjectAccessor::GetUnit(*me, PrisonerGUID))
-                    p->RemoveAurasDueToSpell(SPELL_FROST_TOMB_AURA);
-            me->DespawnOrUnsummon(5000);
-        }
-
-        void UpdateAI(uint32  /*diff*/) override
-        {
-            if (PrisonerGUID)
+        if (TempSummon* t = c->ToTempSummon())
+            if (Unit* s = t->GetSummonerUnit())
             {
-                if (Unit* p = ObjectAccessor::GetUnit(*me, PrisonerGUID))
+                PrisonerGUID = s->GetGUID();
+                if (me->GetInstanceScript() && me->GetInstanceScript()->instance->IsHeroic())
                 {
-                    if (!p->HasAura(SPELL_FROST_TOMB_AURA))
-                        me->KillSelf();
+                    const int32 dmg = 2000;
+                    c->CastCustomSpell(s, SPELL_FROST_TOMB_AURA, nullptr, &dmg, nullptr, true);
                 }
                 else
-                    me->KillSelf();
+                    c->CastSpell(s, SPELL_FROST_TOMB_AURA, true);
             }
-        }
-    };
-};
+    }
+    ObjectGuid PrisonerGUID;
 
-class boss_keleseth : public CreatureScript
-{
-public:
-    boss_keleseth() : CreatureScript("boss_keleseth") { }
-
-    CreatureAI* GetAI(Creature* pCreature) const override
+    void JustDied(Unit* killer) override
     {
-        return GetUtgardeKeepAI<boss_kelesethAI>(pCreature);
+        if (killer && killer->GetGUID() != me->GetGUID())
+            if (InstanceScript* pInstance = me->GetInstanceScript())
+                pInstance->SetData(DATA_ON_THE_ROCKS_ACHIEV, 0);
+
+        if (PrisonerGUID)
+            if (Unit* p = ObjectAccessor::GetUnit(*me, PrisonerGUID))
+                p->RemoveAurasDueToSpell(SPELL_FROST_TOMB_AURA);
+        me->DespawnOrUnsummon(5000);
     }
 
-    struct boss_kelesethAI : public ScriptedAI
+    void UpdateAI(uint32  /*diff*/) override
     {
-        boss_kelesethAI(Creature* c) : ScriptedAI(c)
+        if (PrisonerGUID)
         {
-            pInstance = c->GetInstanceScript();
-        }
-
-        InstanceScript* pInstance;
-        EventMap events;
-
-        void Reset() override
-        {
-            events.Reset();
-            if (pInstance)
-                pInstance->SetData(DATA_KELESETH, NOT_STARTED);
-        }
-
-        void KilledUnit(Unit* victim) override
-        {
-            if (victim->IsPlayer())
+            if (Unit* p = ObjectAccessor::GetUnit(*me, PrisonerGUID))
             {
-                Talk(SAY_KILL);
+                if (!p->HasAura(SPELL_FROST_TOMB_AURA))
+                    me->KillSelf();
             }
+            else
+                me->KillSelf();
         }
+    }
+};
 
-        void JustDied(Unit* /*killer*/) override
+struct boss_keleseth : public ScriptedAI
+{
+    boss_keleseth(Creature* c) : ScriptedAI(c)
+    {
+        pInstance = c->GetInstanceScript();
+    }
+
+    InstanceScript* pInstance;
+    EventMap events;
+
+    void Reset() override
+    {
+        events.Reset();
+        if (pInstance)
+            pInstance->SetData(DATA_KELESETH, NOT_STARTED);
+    }
+
+    void KilledUnit(Unit* victim) override
+    {
+        if (victim->IsPlayer())
         {
-            Talk(SAY_DEATH);
-            if (pInstance)
-                pInstance->SetData(DATA_KELESETH, DONE);
+            Talk(SAY_KILL);
         }
+    }
 
-        void JustEngagedWith(Unit* /*who*/) override
+    void JustDied(Unit* /*killer*/) override
+    {
+        Talk(SAY_DEATH);
+        if (pInstance)
+            pInstance->SetData(DATA_KELESETH, DONE);
+    }
+
+    void JustEngagedWith(Unit* /*who*/) override
+    {
+        events.Reset();
+        events.RescheduleEvent(EVENT_SPELL_SHADOWBOLT, 0ms);
+        events.RescheduleEvent(EVENT_FROST_TOMB, 28s);
+        events.RescheduleEvent(EVENT_SUMMON_SKELETONS, 4s);
+
+        Talk(SAY_START_COMBAT);
+        DoZoneInCombat();
+
+        if (pInstance)
+            pInstance->SetData(DATA_KELESETH, IN_PROGRESS);
+    }
+
+    void AttackStart(Unit* who) override
+    {
+        if (!who)
+            return;
+
+        UnitAI::AttackStartCaster(who, 12.0f);
+    }
+
+    void UpdateAI(uint32 diff) override
+    {
+        if (!UpdateVictim())
+            return;
+
+        events.Update(diff);
+
+        if (me->HasUnitState(UNIT_STATE_CASTING))
+            return;
+
+        switch (events.ExecuteEvent())
         {
-            events.Reset();
-            events.RescheduleEvent(EVENT_SPELL_SHADOWBOLT, 0ms);
-            events.RescheduleEvent(EVENT_FROST_TOMB, 28s);
-            events.RescheduleEvent(EVENT_SUMMON_SKELETONS, 4s);
-
-            Talk(SAY_START_COMBAT);
-            DoZoneInCombat();
-
-            if (pInstance)
-                pInstance->SetData(DATA_KELESETH, IN_PROGRESS);
-        }
-
-        void AttackStart(Unit* who) override
-        {
-            if (!who)
-                return;
-
-            UnitAI::AttackStartCaster(who, 12.0f);
-        }
-
-        void UpdateAI(uint32 diff) override
-        {
-            if (!UpdateVictim())
-                return;
-
-            events.Update(diff);
-
-            if (me->HasUnitState(UNIT_STATE_CASTING))
-                return;
-
-            switch (events.ExecuteEvent())
+        case 0:
+            break;
+        case EVENT_SPELL_SHADOWBOLT:
+            me->CastSpell(me->GetVictim(), SPELL_SHADOWBOLT, false);
+            events.Repeat(4s, 5s);
+            break;
+        case EVENT_FROST_TOMB:
+            if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 0.0f, true, true))
+                if (!target->HasAura(SPELL_FROST_TOMB_AURA))
+                {
+                    Talk(SAY_FROST_TOMB_EMOTE, target);
+                    Talk(SAY_FROST_TOMB);
+                    me->CastSpell(target, SPELL_FROST_TOMB, false);
+                    events.Repeat(15s);
+                    break;
+                }
+            events.Repeat(1s);
+            break;
+        case EVENT_SUMMON_SKELETONS:
+            Talk(SAY_SUMMON_SKELETONS);
+            for (uint8 i = 0; i < 5; ++i)
             {
-                case 0:
-                    break;
-                case EVENT_SPELL_SHADOWBOLT:
-                    me->CastSpell(me->GetVictim(), SPELL_SHADOWBOLT, false);
-                    events.Repeat(4s, 5s);
-                    break;
-                case EVENT_FROST_TOMB:
-                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 0.0f, true, true))
-                        if (!target->HasAura(SPELL_FROST_TOMB_AURA))
-                        {
-                            Talk(SAY_FROST_TOMB_EMOTE, target);
-                            Talk(SAY_FROST_TOMB);
-                            me->CastSpell(target, SPELL_FROST_TOMB, false);
-                            events.Repeat(15s);
-                            break;
-                        }
-                    events.Repeat(1s);
-                    break;
-                case EVENT_SUMMON_SKELETONS:
-                    Talk(SAY_SUMMON_SKELETONS);
-                    for (uint8 i = 0; i < 5; ++i)
+                float dist = rand_norm() * 4 + 3.0f;
+                float angle = rand_norm() * 2 * M_PI;
+                if (Creature* c = me->SummonCreature(NPC_SKELETON, 156.2f + cos(angle) * dist, 259.1f + std::sin(angle) * dist, 42.9f, 0, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 20000))
+                    if (Unit* target = c->SelectNearestTarget(250.0f))
                     {
-                        float dist = rand_norm() * 4 + 3.0f;
-                        float angle = rand_norm() * 2 * M_PI;
-                        if (Creature* c = me->SummonCreature(NPC_SKELETON, 156.2f + cos(angle) * dist, 259.1f + std::sin(angle) * dist, 42.9f, 0, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 20000))
-                            if (Unit* target = c->SelectNearestTarget(250.0f))
-                            {
-                                c->AddThreat(target, 5.0f);
-                                DoZoneInCombat(c);
-                            }
+                        c->AddThreat(target, 5.0f);
+                        DoZoneInCombat(c);
                     }
-                    break;
             }
-
-            DoMeleeAttackIfReady();
+            break;
         }
-    };
+
+        DoMeleeAttackIfReady();
+    }
 };
 
 enum eSkeletonEnum
@@ -242,105 +220,94 @@ enum eSkeletonEnum
     EVENT_RESURRECT_2,
 };
 
-class npc_vrykul_skeleton : public CreatureScript
+struct npc_vrykul_skeleton : public ScriptedAI
 {
-public:
-    npc_vrykul_skeleton() : CreatureScript("npc_vrykul_skeleton") { }
-
-    CreatureAI* GetAI(Creature* pCreature) const override
+    npc_vrykul_skeleton(Creature* c) : ScriptedAI(c)
     {
-        return GetUtgardeKeepAI<npc_vrykul_skeletonAI>(pCreature);
+        pInstance = c->GetInstanceScript();
     }
 
-    struct npc_vrykul_skeletonAI : public ScriptedAI
+    InstanceScript* pInstance;
+    EventMap events;
+
+    void Reset() override
     {
-        npc_vrykul_skeletonAI(Creature* c) : ScriptedAI(c)
+        events.Reset();
+        events.RescheduleEvent(EVENT_SPELL_DECREPIFY, 10s, 20s);
+        if (IsHeroic())
+            events.RescheduleEvent(EVENT_SPELL_BONE_ARMOR, 25s, 120s);
+    }
+
+    void DamageTaken(Unit*, uint32& damage, DamageEffectType, SpellSchoolMask) override
+    {
+        if (damage >= me->GetHealth())
         {
-            pInstance = c->GetInstanceScript();
+            damage = 0;
+            me->InterruptNonMeleeSpells(true);
+            me->RemoveAllAuras();
+            me->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
+            me->SetControlled(true, UNIT_STATE_ROOT);
+            me->GetMotionMaster()->MovementExpired();
+            me->GetMotionMaster()->MoveIdle();
+            me->StopMoving();
+            me->SetStandState(UNIT_STAND_STATE_DEAD);
+            me->SetUnitFlag(UNIT_FLAG_PREVENT_EMOTES_FROM_CHAT_TEXT);
+            me->SetUnitFlag2(UNIT_FLAG2_FEIGN_DEATH);
+            me->SetDynamicFlag(UNIT_DYNFLAG_DEAD);
+            events.RescheduleEvent(EVENT_RESURRECT, 12s);
+        }
+    }
+
+    void UpdateAI(uint32 diff) override
+    {
+        if (pInstance && pInstance->GetData(DATA_KELESETH) != IN_PROGRESS)
+        {
+            if (me->IsAlive())
+                me->KillSelf();
+            return;
         }
 
-        InstanceScript* pInstance;
-        EventMap events;
+        if (!UpdateVictim())
+            return;
 
-        void Reset() override
+        events.Update(diff);
+
+        if (me->HasUnitState(UNIT_STATE_CASTING))
+            return;
+
+        switch (events.ExecuteEvent())
         {
-            events.Reset();
-            events.RescheduleEvent(EVENT_SPELL_DECREPIFY, 10s, 20s);
-            if (IsHeroic())
-                events.RescheduleEvent(EVENT_SPELL_BONE_ARMOR, 25s, 120s);
-        }
-
-        void DamageTaken(Unit*, uint32& damage, DamageEffectType, SpellSchoolMask) override
-        {
-            if (damage >= me->GetHealth())
-            {
-                damage = 0;
-                me->InterruptNonMeleeSpells(true);
-                me->RemoveAllAuras();
-                me->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
-                me->SetControlled(true, UNIT_STATE_ROOT);
-                me->GetMotionMaster()->MovementExpired();
-                me->GetMotionMaster()->MoveIdle();
-                me->StopMoving();
-                me->SetStandState(UNIT_STAND_STATE_DEAD);
-                me->SetUnitFlag(UNIT_FLAG_PREVENT_EMOTES_FROM_CHAT_TEXT);
-                me->SetUnitFlag2(UNIT_FLAG2_FEIGN_DEATH);
-                me->SetDynamicFlag(UNIT_DYNFLAG_DEAD);
-                events.RescheduleEvent(EVENT_RESURRECT, 12s);
-            }
-        }
-
-        void UpdateAI(uint32 diff) override
-        {
-            if (pInstance && pInstance->GetData(DATA_KELESETH) != IN_PROGRESS )
-            {
-                if (me->IsAlive())
-                    me->KillSelf();
-                return;
-            }
-
-            if (!UpdateVictim())
-                return;
-
-            events.Update(diff);
-
-            if (me->HasUnitState(UNIT_STATE_CASTING))
-                return;
-
-            switch (events.ExecuteEvent())
-            {
-                case 0:
-                    break;
-                case EVENT_SPELL_DECREPIFY:
-                    if (!me->HasUnitFlag(UNIT_FLAG_NON_ATTACKABLE))
-                        me->CastSpell(me->GetVictim(), SPELL_DECREPIFY, false);
-                    events.Repeat(15s, 25s);
-                    break;
-                case EVENT_SPELL_BONE_ARMOR:
-                    if (!me->HasUnitFlag(UNIT_FLAG_NON_ATTACKABLE))
-                        me->CastSpell((Unit*)nullptr, SPELL_BONE_ARMOR, false);
-                    events.Repeat(40s, 120s);
-                    break;
-                case EVENT_RESURRECT:
-                    events.DelayEvents(3500ms);
-                    DoCast(me, SPELL_SCOURGE_RESURRECTION, true);
-                    me->SetStandState(UNIT_STAND_STATE_STAND);
-                    me->RemoveUnitFlag(UNIT_FLAG_PREVENT_EMOTES_FROM_CHAT_TEXT);
-                    me->RemoveUnitFlag2(UNIT_FLAG2_FEIGN_DEATH);
-                    me->RemoveDynamicFlag(UNIT_DYNFLAG_DEAD);
-                    events.RescheduleEvent(EVENT_RESURRECT_2, 3s);
-                    break;
-                case EVENT_RESURRECT_2:
-                    me->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
-                    me->SetControlled(false, UNIT_STATE_ROOT);
-                    me->GetMotionMaster()->MoveChase(me->GetVictim());
-                    break;
-            }
-
+        case 0:
+            break;
+        case EVENT_SPELL_DECREPIFY:
             if (!me->HasUnitFlag(UNIT_FLAG_NON_ATTACKABLE))
-                DoMeleeAttackIfReady();
+                me->CastSpell(me->GetVictim(), SPELL_DECREPIFY, false);
+            events.Repeat(15s, 25s);
+            break;
+        case EVENT_SPELL_BONE_ARMOR:
+            if (!me->HasUnitFlag(UNIT_FLAG_NON_ATTACKABLE))
+                me->CastSpell((Unit*)nullptr, SPELL_BONE_ARMOR, false);
+            events.Repeat(40s, 120s);
+            break;
+        case EVENT_RESURRECT:
+            events.DelayEvents(3500ms);
+            DoCast(me, SPELL_SCOURGE_RESURRECTION, true);
+            me->SetStandState(UNIT_STAND_STATE_STAND);
+            me->RemoveUnitFlag(UNIT_FLAG_PREVENT_EMOTES_FROM_CHAT_TEXT);
+            me->RemoveUnitFlag2(UNIT_FLAG2_FEIGN_DEATH);
+            me->RemoveDynamicFlag(UNIT_DYNFLAG_DEAD);
+            events.RescheduleEvent(EVENT_RESURRECT_2, 3s);
+            break;
+        case EVENT_RESURRECT_2:
+            me->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
+            me->SetControlled(false, UNIT_STATE_ROOT);
+            me->GetMotionMaster()->MoveChase(me->GetVictim());
+            break;
         }
-    };
+
+        if (!me->HasUnitFlag(UNIT_FLAG_NON_ATTACKABLE))
+            DoMeleeAttackIfReady();
+    }
 };
 
 class spell_frost_tomb_aura : public AuraScript
@@ -368,8 +335,8 @@ class spell_frost_tomb_aura : public AuraScript
 
 void AddSC_boss_keleseth()
 {
-    new boss_keleseth();
-    new npc_frost_tomb();
-    new npc_vrykul_skeleton();
+    RegisterUtgardeKeepCreatureAI(boss_keleseth);
+    RegisterUtgardeKeepCreatureAI(npc_frost_tomb);
+    RegisterUtgardeKeepCreatureAI(npc_vrykul_skeleton);
     RegisterSpellScript(spell_frost_tomb_aura);
 }

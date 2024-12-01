@@ -467,7 +467,10 @@ bool StartDB()
     ClearOnlineAccounts();
 
     ///- Insert version info into DB
-    WorldDatabase.Execute("UPDATE version SET core_version = '{}', core_revision = '{}'", GitRevision::GetFullVersion(), GitRevision::GetHash());        // One-time query
+    WorldDatabasePreparedStatement* stmt = WorldDatabase.GetPreparedStatement(WORLD_UPD_VERSION);
+    stmt->SetData(0, GitRevision::GetFullVersion());
+    stmt->SetData(1, GitRevision::GetHash());
+    WorldDatabase.Execute(stmt);
 
     sWorld->LoadDBVersion();
 
