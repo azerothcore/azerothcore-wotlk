@@ -119,15 +119,13 @@ public:
         // Check bags
         for (uint8 i = INVENTORY_SLOT_BAG_START; i < INVENTORY_SLOT_BAG_END; i++)
         {
-            if (Bag* bag = target->GetBagByPos(i))
+            if (const auto bag = target->GetBagByPos(i))
             {
-                if (ItemTemplate const* bagTemplate = bag->GetTemplate())
+                const auto* bagTemplate = bag->GetTemplate();
+                if (bagTemplate->Class == ITEM_CLASS_CONTAINER || bagTemplate->Class == ITEM_CLASS_QUIVER)
                 {
-                    if (bagTemplate->Class == ITEM_CLASS_CONTAINER || bagTemplate->Class == ITEM_CLASS_QUIVER)
-                    {
-                        haveFreeSlot = true;
-                        freeSlotsInBags[bagTemplate->SubClass] += bag->GetFreeSlots();
-                    }
+                    haveFreeSlot = true;
+                    freeSlotsInBags[bagTemplate->SubClass] += bag->GetFreeSlots();
                 }
             }
             else

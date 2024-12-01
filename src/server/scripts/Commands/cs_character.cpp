@@ -936,33 +936,36 @@ public:
 
         if (BagSlot == 1)
         {
-            for (uint32 i = 23; i < 39; i++)
+            for (uint8 i = INVENTORY_SLOT_ITEM_START; i < INVENTORY_SLOT_ITEM_END; i++)
             {
-                if (Item* item = target->GetItemByPos(INVENTORY_SLOT_BAG_0, i))
+                const auto item = target->GetItemByPos(INVENTORY_SLOT_BAG_0, i);
+                if (item == nullptr)
                 {
-                    Counter++;
-                    std::ostringstream ItemString;
-                    ItemString << std::hex << ItemQualityColors[item->GetTemplate()->Quality];
-
-                    handler->PSendSysMessage("{} - |c{}|Hitem:{}:0:0:0:0:0:0:0:0:0|h[{}]|h|r - {}", Counter, ItemString.str(), item->GetEntry(), item->GetTemplate()->Name1, item->GetCount());
+                    continue;
                 }
+
+                ++Counter;
+                std::ostringstream ItemString;
+                ItemString << std::hex << ItemQualityColors[item->GetTemplate()->Quality];
+
+                handler->PSendSysMessage("{} - |c{}|Hitem:{}:0:0:0:0:0:0:0:0:0|h[{}]|h|r - {}", Counter, ItemString.str(), item->GetEntry(), item->GetTemplate()->Name1, item->GetCount());
             }
         }
-        else
+        else if (const auto bag = target->GetBagByPos(BagSlot))
         {
-            if (Bag* bag = target->GetBagByPos(BagSlot))
+            for (uint32 i = 0; i < bag->GetBagSize(); i++)
             {
-                for (uint32 i = 0; i < bag->GetBagSize(); i++)
+                auto item = target->GetItemByPos(BagSlot, i);
+                if (item == nullptr)
                 {
-                    if (Item* item = target->GetItemByPos(BagSlot, i))
-                    {
-                        Counter++;
-                        std::ostringstream ItemString;
-                        ItemString << std::hex << ItemQualityColors[item->GetTemplate()->Quality];
-
-                        handler->PSendSysMessage("{} - |c{}|Hitem:{}:0:0:0:0:0:0:0:0:0|h[{}]|h|r - {}", Counter, ItemString.str(), item->GetEntry(), item->GetTemplate()->Name1, item->GetCount());
-                    }
+                    continue;
                 }
+
+                ++Counter;
+                std::ostringstream ItemString;
+                ItemString << std::hex << ItemQualityColors[item->GetTemplate()->Quality];
+
+                handler->PSendSysMessage("{} - |c{}|Hitem:{}:0:0:0:0:0:0:0:0:0|h[{}]|h|r - {}", Counter, ItemString.str(), item->GetEntry(), item->GetTemplate()->Name1, item->GetCount());
             }
         }
 

@@ -541,18 +541,23 @@ public:
                 if (i >= BUYBACK_SLOT_START && i < BUYBACK_SLOT_END)
                     continue;
 
-                if (Item* item = player->GetItemByPos(INVENTORY_SLOT_BAG_0, i))
+                auto item = player->GetItemByPos(INVENTORY_SLOT_BAG_0, i);
+                if (item == nullptr)
                 {
-                    if (Bag* bag = item->ToBag())
-                    {
-                        for (uint8 j = 0; j < bag->GetBagSize(); ++j)
-                            if (Item* item2 = bag->GetItemByPos(j))
-                                if (item2->GetState() == state)
-                                    handler->PSendSysMessage("bag: 255 slot: {} {} owner: {}", item2->GetSlot(), item2->GetGUID().ToString(), item2->GetOwnerGUID().ToString());
-                    }
-                    else if (item->GetState() == state)
-                        handler->PSendSysMessage("bag: 255 slot: {} {} owner: {}", item->GetSlot(), item->GetGUID().ToString(), item->GetOwnerGUID().ToString());
+                    continue;
                 }
+
+                if (auto bag = item->ToBag())
+                {
+                    for (uint8 j = 0; j < bag->GetBagSize(); ++j)
+                    {
+                        auto item2 = bag->GetItemByPos(j);
+                        if (item2 != nullptr && item2->GetState() == state)
+                            handler->PSendSysMessage("bag: 255 slot: {} {} owner: {}", item2->GetSlot(), item2->GetGUID().ToString(), item2->GetOwnerGUID().ToString());
+                    }
+                }
+                else if (item->GetState() == state)
+                    handler->PSendSysMessage("bag: 255 slot: {} {} owner: {}", item->GetSlot(), item->GetGUID().ToString(), item->GetOwnerGUID().ToString());
             }
         }
 
@@ -562,7 +567,7 @@ public:
 
             for (auto const& item : updateQueue)
             {
-                Bag* container = item->GetContainer();
+                const auto container = item->GetContainer();
                 uint8 bagSlot = container ? container->GetSlot() : uint8(INVENTORY_SLOT_BAG_0);
 
                 std::string st;
@@ -598,8 +603,8 @@ public:
                 if (i >= BUYBACK_SLOT_START && i < BUYBACK_SLOT_END)
                     continue;
 
-                Item* item = player->GetItemByPos(INVENTORY_SLOT_BAG_0, i);
-                if (!item)
+                auto item = player->GetItemByPos(INVENTORY_SLOT_BAG_0, i);
+                if (item == nullptr)
                     continue;
 
                 if (item->GetSlot() != i)
@@ -616,7 +621,7 @@ public:
                     continue;
                 }
 
-                if (Bag* container = item->GetContainer())
+                if (const auto container = item->GetContainer())
                 {
                     handler->PSendSysMessage("The item with slot {} {} has a container (slot: {}, {}) but shouldn't!", item->GetSlot(), item->GetGUID().ToString(), container->GetSlot(), container->GetGUID().ToString());
                     error = true;
@@ -654,73 +659,76 @@ public:
                     continue;
                 }
 
-                if (Bag* bag = item->ToBag())
+                auto bag = item->ToBag();
+                if (bag == nullptr)
                 {
-                    for (uint8 j = 0; j < bag->GetBagSize(); ++j)
+                    continue;
+                }
+
+                for (uint8 j = 0; j < bag->GetBagSize(); ++j)
+                {
+                    auto item2 = bag->GetItemByPos(j);
+                    if (item2 == nullptr)
+                        continue;
+
+                    if (item2->GetSlot() != j)
                     {
-                        Item* item2 = bag->GetItemByPos(j);
-                        if (!item2)
-                            continue;
+                        handler->PSendSysMessage("The item in bag {} and slot {} (guid: {}) has an incorrect slot value: {}", bag->GetSlot(), j, item2->GetGUID().ToString(), item2->GetSlot());
+                        error = true;
+                        continue;
+                    }
 
-                        if (item2->GetSlot() != j)
+                    if (item2->GetOwnerGUID() != player->GetGUID())
+                    {
+                        handler->PSendSysMessage("The item in bag {} at slot {} and {}, the owner ({}) and the player ({}) don't match!", bag->GetSlot(), item2->GetSlot(), item2->GetGUID().ToString(), item2->GetOwnerGUID().ToString(), player->GetGUID().ToString());
+                        error = true;
+                        continue;
+                    }
+
+                    auto container = item2->GetContainer();
+                    if (!container)
+                    {
+                        handler->PSendSysMessage("The item in bag {} at slot {} {} has no container!", bag->GetSlot(), item2->GetSlot(), item2->GetGUID().ToString());
+                        error = true;
+                        continue;
+                    }
+
+                    if (container != bag)
+                    {
+                        handler->PSendSysMessage("The item in bag {} at slot {} {} has a different container(slot {} {})!", bag->GetSlot(), item2->GetSlot(), item2->GetGUID().ToString(), container->GetSlot(), container->GetGUID().ToString());
+                        error = true;
+                        continue;
+                    }
+
+                    if (item2->IsInUpdateQueue())
+                    {
+                        uint16 qp = item2->GetQueuePos();
+                        if (qp > updateQueue.size())
                         {
-                            handler->PSendSysMessage("The item in bag {} and slot {} (guid: {}) has an incorrect slot value: {}", bag->GetSlot(), j, item2->GetGUID().ToString(), item2->GetSlot());
+                            handler->PSendSysMessage("The item in bag {} at slot {} having guid {} has a queuepos ({}) larger than the update queue size! ", bag->GetSlot(), item2->GetSlot(), item2->GetGUID().ToString(), qp);
                             error = true;
                             continue;
                         }
 
-                        if (item2->GetOwnerGUID() != player->GetGUID())
+                        if (!updateQueue[qp])
                         {
-                            handler->PSendSysMessage("The item in bag {} at slot {} and {}, the owner ({}) and the player ({}) don't match!", bag->GetSlot(), item2->GetSlot(), item2->GetGUID().ToString(), item2->GetOwnerGUID().ToString(), player->GetGUID().ToString());
+                            handler->PSendSysMessage("The item in bag {} at slot {} having guid {} has a queuepos ({}) that points to NULL in the queue!", bag->GetSlot(), item2->GetSlot(), item2->GetGUID().ToString(), qp);
                             error = true;
                             continue;
                         }
 
-                        Bag* container = item2->GetContainer();
-                        if (!container)
+                        if (updateQueue[qp] != item2)
                         {
-                            handler->PSendSysMessage("The item in bag {} at slot {} {} has no container!", bag->GetSlot(), item2->GetSlot(), item2->GetGUID().ToString());
+                            handler->PSendSysMessage("The item in bag {} at slot {} having guid {} has a queuepos ({}) that points to another item in the queue (bag: {}, slot: {}, guid: {})", bag->GetSlot(), item2->GetSlot(), item2->GetGUID().ToString(), qp, updateQueue[qp]->GetBagSlot(), updateQueue[qp]->GetSlot(), updateQueue[qp]->GetGUID().ToString());
                             error = true;
                             continue;
                         }
-
-                        if (container != bag)
-                        {
-                            handler->PSendSysMessage("The item in bag {} at slot {} {} has a different container(slot {} {})!", bag->GetSlot(), item2->GetSlot(), item2->GetGUID().ToString(), container->GetSlot(), container->GetGUID().ToString());
-                            error = true;
-                            continue;
-                        }
-
-                        if (item2->IsInUpdateQueue())
-                        {
-                            uint16 qp = item2->GetQueuePos();
-                            if (qp > updateQueue.size())
-                            {
-                                handler->PSendSysMessage("The item in bag {} at slot {} having guid {} has a queuepos ({}) larger than the update queue size! ", bag->GetSlot(), item2->GetSlot(), item2->GetGUID().ToString(), qp);
-                                error = true;
-                                continue;
-                            }
-
-                            if (!updateQueue[qp])
-                            {
-                                handler->PSendSysMessage("The item in bag {} at slot {} having guid {} has a queuepos ({}) that points to NULL in the queue!", bag->GetSlot(), item2->GetSlot(), item2->GetGUID().ToString(), qp);
-                                error = true;
-                                continue;
-                            }
-
-                            if (updateQueue[qp] != item2)
-                            {
-                                handler->PSendSysMessage("The item in bag {} at slot {} having guid {} has a queuepos ({}) that points to another item in the queue (bag: {}, slot: {}, guid: {})", bag->GetSlot(), item2->GetSlot(), item2->GetGUID().ToString(), qp, updateQueue[qp]->GetBagSlot(), updateQueue[qp]->GetSlot(), updateQueue[qp]->GetGUID().ToString());
-                                error = true;
-                                continue;
-                            }
-                        }
-                        else if (item2->GetState() != ITEM_UNCHANGED)
-                        {
-                            handler->PSendSysMessage("The item in bag {} at slot {} having guid {} is not in queue but should be (state: {})!", bag->GetSlot(), item2->GetSlot(), item2->GetGUID().ToString(), item2->GetState());
-                            error = true;
-                            continue;
-                        }
+                    }
+                    else if (item2->GetState() != ITEM_UNCHANGED)
+                    {
+                        handler->PSendSysMessage("The item in bag {} at slot {} having guid {} is not in queue but should be (state: {})!", bag->GetSlot(), item2->GetSlot(), item2->GetGUID().ToString(), item2->GetState());
+                        error = true;
+                        continue;
                     }
                 }
             }
@@ -748,9 +756,9 @@ public:
                 if (item->GetState() == ITEM_REMOVED)
                     continue;
 
-                Item* test = player->GetItemByPos(item->GetBagSlot(), item->GetSlot());
+                auto test = player->GetItemByPos(item->GetBagSlot(), item->GetSlot());
 
-                if (!test)
+                if (test == nullptr)
                 {
                     handler->SendSysMessage(Acore::StringFormat("queue({}): The bag({}) and slot({}) values for {} are incorrect, the player doesn't have any item at that position!", index, item->GetBagSlot(), item->GetSlot(), item->GetGUID().ToString()));
                     error = true;

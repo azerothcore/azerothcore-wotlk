@@ -522,8 +522,7 @@ private:
         int16 count = 0;
         for (uint8 i = EQUIPMENT_SLOT_START; i < EQUIPMENT_SLOT_END; ++i)
         {
-            Item* pItem = playerTarget->GetItemByPos(INVENTORY_SLOT_BAG_0, i);
-            if (pItem)
+            if (playerTarget->GetItemByPos(INVENTORY_SLOT_BAG_0, i) != nullptr)
             {
                 playerTarget->DestroyItem(INVENTORY_SLOT_BAG_0, i, true);
                 ++count;
@@ -544,8 +543,7 @@ private:
         // Default bagpack :
         for (uint8 i = INVENTORY_SLOT_ITEM_START; i < INVENTORY_SLOT_ITEM_END; ++i)
         {
-            Item* pItem = playerTarget->GetItemByPos(INVENTORY_SLOT_BAG_0, i);
-            if (pItem)
+            if (playerTarget->GetItemByPos(INVENTORY_SLOT_BAG_0, i) != nullptr)
             {
                 playerTarget->DestroyItem(INVENTORY_SLOT_BAG_0, i, true);
                 ++count;
@@ -555,17 +553,24 @@ private:
         // Bag slots
         for (uint8 i = INVENTORY_SLOT_BAG_START; i < INVENTORY_SLOT_BAG_END; ++i)
         {
-            Bag* pBag = (Bag*)playerTarget->GetItemByPos(INVENTORY_SLOT_BAG_0, i);
-            if (pBag)
+            std::shared_ptr<Bag> pBag = nullptr;
+
+            if (auto item = playerTarget->GetItemByPos(INVENTORY_SLOT_BAG_0, i))
             {
-                for (uint8 j = 0; j < pBag->GetBagSize(); ++j)
+                pBag = item->ToBag();
+            }
+
+            if (pBag == nullptr)
+            {
+                continue;
+            }
+
+            for (uint8 j = 0; j < pBag->GetBagSize(); ++j)
+            {
+                if (pBag->GetItemByPos(j) != nullptr)
                 {
-                    Item* pItem = pBag->GetItemByPos(j);
-                    if (pItem)
-                    {
-                        playerTarget->DestroyItem(i, j, true);
-                        ++count;
-                    }
+                    playerTarget->DestroyItem(i, j, true);
+                    ++count;
                 }
             }
         }
@@ -584,8 +589,7 @@ private:
         // Normal bank slot
         for (uint8 i = BANK_SLOT_ITEM_START; i < BANK_SLOT_ITEM_END; ++i)
         {
-            Item* pItem = playerTarget->GetItemByPos(INVENTORY_SLOT_BAG_0, i);
-            if (pItem)
+            if (playerTarget->GetItemByPos(INVENTORY_SLOT_BAG_0, i) != nullptr)
             {
                 playerTarget->DestroyItem(INVENTORY_SLOT_BAG_0, i, true);
                 ++count;
@@ -595,17 +599,23 @@ private:
         // Bank bagslots
         for (uint8 i = BANK_SLOT_BAG_START; i < BANK_SLOT_BAG_END; ++i)
         {
-            Bag* pBag = (Bag*)playerTarget->GetItemByPos(INVENTORY_SLOT_BAG_0, i);
-            if (pBag)
+            std::shared_ptr<Bag> pBag = nullptr;
+            if (auto item = playerTarget->GetItemByPos(INVENTORY_SLOT_BAG_0, i))
             {
-                for (uint8 j = 0; j < pBag->GetBagSize(); ++j)
+                pBag = item->ToBag();
+            }
+
+            if (pBag == nullptr)
+            {
+                continue;
+            }
+
+            for (uint8 j = 0; j < pBag->GetBagSize(); ++j)
+            {
+                if (pBag->GetItemByPos(j) != nullptr)
                 {
-                    Item* pItem = pBag->GetItemByPos(j);
-                    if (pItem)
-                    {
-                        playerTarget->DestroyItem(i, j, true);
-                        ++count;
-                    }
+                    playerTarget->DestroyItem(i, j, true);
+                    ++count;
                 }
             }
         }
@@ -623,8 +633,7 @@ private:
         int16 count = 0;
         for (uint8 i = KEYRING_SLOT_START; i < KEYRING_SLOT_END; ++i)
         {
-            Item* pItem = playerTarget->GetItemByPos(INVENTORY_SLOT_BAG_0, i);
-            if (pItem)
+            if (playerTarget->GetItemByPos(INVENTORY_SLOT_BAG_0, i) != nullptr)
             {
                 playerTarget->DestroyItem(INVENTORY_SLOT_BAG_0, i, true);
                 ++count;
@@ -644,8 +653,7 @@ private:
         int16 count = 0;
         for (uint8 i = CURRENCYTOKEN_SLOT_START; i < CURRENCYTOKEN_SLOT_END; ++i)
         {
-            Item* pItem = playerTarget->GetItemByPos(INVENTORY_SLOT_BAG_0, i);
-            if (pItem)
+            if (playerTarget->GetItemByPos(INVENTORY_SLOT_BAG_0, i) != nullptr)
             {
                 playerTarget->DestroyItem(INVENTORY_SLOT_BAG_0, i, true);
                 ++count;
@@ -687,8 +695,13 @@ private:
         // Standard bag slots
         for (uint8 i = INVENTORY_SLOT_BAG_START; i < INVENTORY_SLOT_BAG_END; ++i)
         {
-            Bag* pBag = (Bag*)playerTarget->GetItemByPos(INVENTORY_SLOT_BAG_0, i);
-            if (pBag)
+            std::shared_ptr<Bag> pBag = nullptr;
+            if (auto item = playerTarget->GetItemByPos(INVENTORY_SLOT_BAG_0, i))
+            {
+                pBag = item->ToBag();
+            }
+
+            if (pBag != nullptr)
             {
                 playerTarget->DestroyItem(INVENTORY_SLOT_BAG_0, i, true);
                 ++count;
@@ -709,8 +722,13 @@ private:
         // Bank bags
         for (uint8 i = BANK_SLOT_BAG_START; i < BANK_SLOT_BAG_END; ++i)
         {
-            Bag* pBag = (Bag*)playerTarget->GetItemByPos(INVENTORY_SLOT_BAG_0, i);
-            if (pBag)
+            std::shared_ptr<Bag> pBag = nullptr;
+            if (auto item = playerTarget->GetItemByPos(INVENTORY_SLOT_BAG_0, i))
+            {
+                pBag = item->ToBag();
+            }
+
+            if (pBag != nullptr)
             {
                 // prevent no empty ?
                 playerTarget->DestroyItem(INVENTORY_SLOT_BAG_0, i, true);

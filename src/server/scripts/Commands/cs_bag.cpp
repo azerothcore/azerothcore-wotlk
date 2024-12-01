@@ -82,37 +82,42 @@ public:
         // in inventory
         for (uint8 i = INVENTORY_SLOT_ITEM_START; i < INVENTORY_SLOT_ITEM_END; ++i)
         {
-            if (Item* item = player->GetItemByPos(INVENTORY_SLOT_BAG_0, i))
+            auto item = player->GetItemByPos(INVENTORY_SLOT_BAG_0, i);
+            if (item == nullptr)
             {
-                if (ItemTemplate const* itemTemplate = item->GetTemplate())
-                {
-                    if (itemTemplate->Quality <= itemQuality)
-                    {
-                        player->DestroyItem(INVENTORY_SLOT_BAG_0, i, true);
-                        ++removedItems[itemTemplate->Quality];
-                    }
-                }
+                continue;
+            }
+
+            ItemTemplate const* itemTemplate = item->GetTemplate();
+            if (itemTemplate != nullptr && itemTemplate->Quality <= itemQuality)
+            {
+                player->DestroyItem(INVENTORY_SLOT_BAG_0, i, true);
+                ++removedItems[itemTemplate->Quality];
             }
         }
 
         // in inventory bags
         for (uint8 i = INVENTORY_SLOT_BAG_START; i < INVENTORY_SLOT_BAG_END; i++)
         {
-            if (Bag* bag = player->GetBagByPos(i))
+            auto bag = player->GetBagByPos(i);
+            if (bag == nullptr)
             {
-                for (uint32 j = 0; j < bag->GetBagSize(); j++)
+                continue;
+            }
+
+            for (uint32 j = 0; j < bag->GetBagSize(); j++)
+            {
+                auto item = bag->GetItemByPos(j);
+                if (item == nullptr)
                 {
-                    if (Item* item = bag->GetItemByPos(j))
-                    {
-                        if (ItemTemplate const* itemTemplate = item->GetTemplate())
-                        {
-                            if (itemTemplate->Quality <= itemQuality)
-                            {
-                                player->DestroyItem(i, j, true);
-                                ++removedItems[itemTemplate->Quality];
-                            }
-                        }
-                    }
+                    continue;
+                }
+
+                const auto* itemTemplate = item->GetTemplate();
+                if (itemTemplate->Quality <= itemQuality)
+                {
+                    player->DestroyItem(i, j, true);
+                    ++removedItems[itemTemplate->Quality];
                 }
             }
         }
