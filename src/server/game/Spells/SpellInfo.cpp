@@ -1783,6 +1783,7 @@ SpellCastResult SpellInfo::CheckTarget(Unit const* caster, WorldObject const* ta
                 return SPELL_FAILED_BAD_TARGETS;
         }
 
+
         if (caster != unitTarget)
         {
             if (caster->IsPlayer())

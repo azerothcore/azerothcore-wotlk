@@ -1659,9 +1659,6 @@ public:
     [[nodiscard]] bool isDying() const { return (m_deathState == DeathState::JustDied); };
     [[nodiscard]] bool isDead() const { return (m_deathState == DeathState::Dead || m_deathState == DeathState::Corpse); };
 
-    // Spell Aura helpers
-    [[nodiscard]] bool IsGhost() const { return HasAuraType(SPELL_AURA_GHOST); };
-
     // React methods
     bool IsHostileTo(Unit const* unit) const;
     [[nodiscard]] bool IsHostileToPlayers() const;
