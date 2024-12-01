@@ -19,6 +19,7 @@
 #define ACORE_BAG_H
 
 // Maximum 36 Slots ((CONTAINER_END - CONTAINER_FIELD_SLOT_1)/2
+#include <memory>
 #define MAX_BAG_SIZE 36                                     // 2.0.12
 
 #include "Item.h"
@@ -35,15 +36,18 @@ public:
 
     bool Create(ObjectGuid::LowType guidlow, uint32 itemid, Player const* owner) override;
 
-    void StoreItem(uint8 slot, Item* pItem, bool update);
+    void StoreItem(uint8 slot, std::shared_ptr<Item> pItem, bool update);
     void RemoveItem(uint8 slot, bool update);
 
-    [[nodiscard]] Item* GetItemByPos(uint8 slot) const;
-    uint32 GetItemCount(uint32 item, Item* eItem = nullptr) const;
-    uint32 GetItemCountWithLimitCategory(uint32 limitCategory, Item* skipItem = nullptr) const;
+    [[nodiscard]] std::shared_ptr<Item> GetItemByPos(uint8 slot) const;
+    uint32 GetItemCount(uint32 item, const std::shared_ptr<Item> ignoreItem = nullptr) const;
+    uint32 GetItemCountWithLimitCategory(uint32 limitCategory, const std::shared_ptr<Item> ignoreItem = nullptr) const;
 
     [[nodiscard]] uint8 GetSlotByItemGUID(ObjectGuid guid) const;
+
+    // If the bag is empty returns true
     [[nodiscard]] bool IsEmpty() const;
+
     [[nodiscard]] uint32 GetFreeSlots() const;
     [[nodiscard]] uint32 GetBagSize() const { return GetUInt32Value(CONTAINER_FIELD_NUM_SLOTS); }
 
@@ -59,9 +63,14 @@ public:
 
     std::string GetDebugInfo() const override;
 
+    // Returns current bag object (this) as shared_ptr
+    std::shared_ptr<Bag> GetSharedPtr() const
+    {
+        return std::static_pointer_cast<Bag>(shared_from_this());
+    }
 protected:
     // Bag Storage space
-    Item* m_bagslot[MAX_BAG_SIZE];
+    std::array<std::shared_ptr<Item>, MAX_BAG_SIZE> m_bagslot;
 };
 
 inline Item* NewItemOrBag(ItemTemplate const* proto)
