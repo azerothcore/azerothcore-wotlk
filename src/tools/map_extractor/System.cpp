@@ -1144,15 +1144,17 @@ void LoadLocaleMPQFiles(int const locale)
     sprintf(filename, "%s/Data/%s/locale-%s.MPQ", input_path, langs[locale], langs[locale]);
     new MPQArchive(filename);
 
-    for (int i = 1; i < 5; ++i)
+    for (int i = 1; i <= 9; ++i)
     {
         char ext[3] = "";
         if (i > 1)
             sprintf(ext, "-%i", i);
 
-        sprintf(filename, "%s/Data/%s/patch-%s%s.MPQ", input_path, langs[locale], langs[locale], ext);
         if (FileExists(filename))
+        {
+            sprintf(filename, "%s/Data/%s/patch-%s%s.MPQ", input_path, langs[locale], langs[locale], ext);
             new MPQArchive(filename);
+        }
     }
 }
 
