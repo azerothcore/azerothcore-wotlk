@@ -1775,11 +1775,13 @@ SpellCastResult SpellInfo::CheckTarget(Unit const* caster, WorldObject const* ta
             return SPELL_FAILED_TARGET_AFFECTING_COMBAT;
 
         // only spells with SPELL_ATTR3_ONLY_ON_GHOSTS can target ghosts
-        if (IsRequiringDeadTarget() && !unitTarget->HasAuraType(SPELL_AURA_GHOST))
-            return SPELL_FAILED_TARGET_NOT_GHOST;
-
-        if (!IsDeathPersistent() && !IsAllowingDeadTarget())
-            return SPELL_FAILED_BAD_TARGETS;
+        if (IsRequiringDeadTarget())
+        {
+            if (!unitTarget->HasGhostAura())
+                return SPELL_FAILED_TARGET_NOT_GHOST;
+            if (!IsDeathPersistent() && !IsAllowingDeadTarget())
+                return SPELL_FAILED_BAD_TARGETS;
+        }
 
         if (caster != unitTarget)
         {
@@ -1921,7 +1923,7 @@ SpellCastResult SpellInfo::CheckTarget(Unit const* caster, WorldObject const* ta
     if (ExcludeTargetAuraSpell && unitTarget->HasAura(sSpellMgr->GetSpellIdForDifficulty(ExcludeTargetAuraSpell, caster)))
         return SPELL_FAILED_TARGET_AURASTATE;
 
-    if (unitTarget->HasAuraType(SPELL_AURA_PREVENT_RESURRECTION) && !HasAttribute(SPELL_ATTR7_BYPASS_NO_RESURRECTION_AURA))
+    if (unitTarget->HasPreventResurectionAura() && !HasAttribute(SPELL_ATTR7_BYPASS_NO_RESURRECTION_AURA))
         if (HasEffect(SPELL_EFFECT_SELF_RESURRECT) || HasEffect(SPELL_EFFECT_RESURRECT) || HasEffect(SPELL_EFFECT_RESURRECT_NEW))
             return SPELL_FAILED_TARGET_CANNOT_BE_RESURRECTED;
 
