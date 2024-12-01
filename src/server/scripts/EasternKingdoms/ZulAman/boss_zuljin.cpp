@@ -15,12 +15,6 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-/* ScriptData
-SDName: Boss_ZulJin
-SD%Complete: 85%
-SDComment:
-EndScriptData */
-
 #include "CreatureScript.h"
 #include "Player.h"
 #include "ScriptedCreature.h"
@@ -307,7 +301,6 @@ struct boss_zuljin : public BossAI
             Talk(Transform[_nextPhase].text);
 
             me->m_Events.AddEventAtOffset([&] {
-                me->SetReactState(REACT_AGGRESSIVE);
                 DoCastSelf(Transform[_nextPhase].spell);
                 DoResetThreatList();
 
@@ -316,9 +309,11 @@ struct boss_zuljin : public BossAI
                     me->SetCombatMovement(false);
                     DoCastSelf(SPELL_ENERGY_STORM, true); // enemy aura
                     DoCastAOE(SPELL_SUMMON_CYCLONE, true);
+                    me->SetFacingTo(me->GetHomePosition().GetOrientation());
                 }
                 else
                 {
+                    me->SetReactState(REACT_AGGRESSIVE);
                     me->SetCombatMovement(true);
                     me->ResumeChasingVictim();
                 }
