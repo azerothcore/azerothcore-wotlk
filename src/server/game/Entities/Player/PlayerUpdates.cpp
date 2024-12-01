@@ -2294,7 +2294,7 @@ bool Player::CanRequestSpellCast(SpellInfo const* spellInfo) const
         return false;
 
     // Check for existing cast request with the same category
-    if (PendingSpellCastRequest const* castRequest = GetCastRequest(spellInfo->StartRecoveryCategory))
+    if (GetCastRequest(spellInfo->StartRecoveryCategory))
         return false;
 
     if (GetSpellCooldownDelay(spellInfo->Id) > GetSpellQueueWindow())
