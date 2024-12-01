@@ -313,12 +313,14 @@ struct boss_zuljin : public BossAI
 
                 if (_nextPhase == PHASE_EAGLE)
                 {
+                    SetAutoAttackAllowed(false);
                     me->SetCombatMovement(false);
                     DoCastSelf(SPELL_ENERGY_STORM, true); // enemy aura
                     DoCastAOE(SPELL_SUMMON_CYCLONE, true);
                 }
                 else
                 {
+                    SetAutoAttackAllowed(true);
                     me->SetCombatMovement(true);
                     me->ResumeChasingVictim();
                 }
