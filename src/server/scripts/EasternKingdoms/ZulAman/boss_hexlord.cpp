@@ -134,7 +134,8 @@ enum Misc
 {
     MAX_ADD_COUNT               = 4,
     ADDITIONAL_CLASS_SPRIEST    = 11,
-    AURA_SHADOW_FORM            = 15473
+    AURA_SHADOW_FORM            = 15473,
+    GROUP_CLASS_ABILITY         = 1
 };
 
 enum AbilityTarget
@@ -264,6 +265,7 @@ struct boss_hexlord_malacrass : public BossAI
         });
 
         ScheduleTimedEvent(30s, [&]{
+            scheduler.CancelGroup(GROUP_CLASS_ABILITY);
             DoCastSelf(SPELL_SPIRIT_BOLTS);
             scheduler.Schedule(10s, [this](TaskContext)
             {
@@ -277,14 +279,12 @@ struct boss_hexlord_malacrass : public BossAI
                         siphonTrigger->GetMotionMaster()->MoveFollow(me, 0.0f, 0.0f);
                         if (Player* player = target->ToPlayer())
                             _currentClass = player->HasAura(AURA_SHADOW_FORM) ? uint8(ADDITIONAL_CLASS_SPRIEST) : player->getClass();
+
+                        ScheduleClassAbility();
                     }
                 }
             });
         }, 40s);
-        ScheduleTimedEvent(_classAbilityTimer, [&]{
-            if (_currentClass)
-                UseAbility();
-        }, _classAbilityTimer);
     }
 
     void UseAbility()
@@ -317,6 +317,15 @@ struct boss_hexlord_malacrass : public BossAI
         if (target)
             DoCast(target, PlayerAbility[_currentClass][random].spell, false);
         _classAbilityTimer = PlayerAbility[_currentClass][random].cooldown;
+    }
+
+    void ScheduleClassAbility()
+    {
+        scheduler.Schedule(_classAbilityTimer, GROUP_CLASS_ABILITY, [this](TaskContext context)
+        {
+            UseAbility();
+            context.Repeat(_classAbilityTimer);
+        });
     }
 
     void KilledUnit(Unit* victim) override

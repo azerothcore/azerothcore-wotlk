@@ -1578,7 +1578,7 @@ void AuraEffect::HandleModInvisibilityDetect(AuraApplication const* aurApp, uint
     }
     else
     {
-        if (!target->HasAuraType(SPELL_AURA_MOD_INVISIBILITY_DETECT))
+        if (!target->HasInvisibilityDetectAura())
             target->m_invisibilityDetect.DelFlag(type);
 
         target->m_invisibilityDetect.AddValue(type, -GetAmount());
@@ -1607,7 +1607,7 @@ void AuraEffect::HandleModInvisibility(AuraApplication const* aurApp, uint8 mode
     }
     else
     {
-        if (!target->HasAuraType(SPELL_AURA_MOD_INVISIBILITY))
+        if (!target->HasInvisibilityAura())
         {
             // if not have different invisibility auras.
             // always remove glow vision
@@ -1670,7 +1670,7 @@ void AuraEffect::HandleModStealthDetect(AuraApplication const* aurApp, uint8 mod
     }
     else
     {
-        if (!target->HasAuraType(SPELL_AURA_MOD_STEALTH_DETECT))
+        if (!target->HasStealthDetectAura())
             target->m_stealthDetect.DelFlag(type);
 
         target->m_stealthDetect.AddValue(type, -GetAmount());
@@ -1711,7 +1711,7 @@ void AuraEffect::HandleModStealth(AuraApplication const* aurApp, uint8 mode, boo
     {
         target->m_stealth.AddValue(type, -GetAmount());
 
-        if (!target->HasAuraType(SPELL_AURA_MOD_STEALTH)) // if last SPELL_AURA_MOD_STEALTH
+        if (!target->HasStealthAura()) // if last SPELL_AURA_MOD_STEALTH
         {
             target->m_stealth.DelFlag(type);
 
@@ -1768,7 +1768,7 @@ void AuraEffect::HandleDetectAmore(AuraApplication const* aurApp, uint8 mode, bo
     }
     else
     {
-        if (target->HasAuraType(SPELL_AURA_DETECT_AMORE))
+        if (target->HasDetectAmoreAura())
         {
             Unit::AuraEffectList const& amoreAuras = target->GetAuraEffectsByType(SPELL_AURA_DETECT_AMORE);
             for (AuraEffect const* aurEff : amoreAuras)
@@ -1835,7 +1835,7 @@ void AuraEffect::HandleAuraGhost(AuraApplication const* aurApp, uint8 mode, bool
     }
     else
     {
-        if (target->HasAuraType(SPELL_AURA_GHOST))
+        if (target->HasGhostAura())
             return;
 
         target->ToPlayer()->RemovePlayerFlag(PLAYER_FLAGS_GHOST);
@@ -2070,7 +2070,7 @@ void AuraEffect::HandleAuraModShapeshift(AuraApplication const* aurApp, uint8 mo
     {
         // reset model id if no other auras present
         // may happen when aura is applied on linked event on aura removal
-        if (!target->HasAuraType(SPELL_AURA_MOD_SHAPESHIFT))
+        if (!target->HasShapeshiftAura())
         {
             target->SetShapeshiftForm(FORM_NONE);
             if (target->IsClass(CLASS_DRUID, CLASS_CONTEXT_ABILITY))
@@ -2992,7 +2992,7 @@ void AuraEffect::HandleModUnattackable(AuraApplication const* aurApp, uint8 mode
     Unit* target = aurApp->GetTarget();
 
     // do not remove unit flag if there are more than this auraEffect of that kind on unit on unit
-    if (!apply && target->HasAuraType(SPELL_AURA_MOD_UNATTACKABLE))
+    if (!apply && target->HasUnattackableAura())
         return;
 
     target->ApplyModFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE, apply);
@@ -3094,7 +3094,7 @@ void AuraEffect::HandleAuraModSilence(AuraApplication const* aurApp, uint8 mode,
     else
     {
         // do not remove unit flag if there are more than this auraEffect of that kind on unit on unit
-        if (target->HasAuraType(SPELL_AURA_MOD_SILENCE) || target->HasAuraType(SPELL_AURA_MOD_PACIFY_SILENCE))
+        if (target->HasSilenceAura() || target->HasPacifySilenceAura())
             return;
 
         target->RemoveUnitFlag(UNIT_FLAG_SILENCED);
@@ -3116,7 +3116,7 @@ void AuraEffect::HandleAuraModPacify(AuraApplication const* aurApp, uint8 mode, 
     else
     {
         // do not remove unit flag if there are more than this auraEffect of that kind on unit on unit
-        if (target->HasAuraType(SPELL_AURA_MOD_PACIFY) || target->HasAuraType(SPELL_AURA_MOD_PACIFY_SILENCE))
+        if (target->HasPacifyAura() || target->HasPacifySilenceAura())
             return;
         target->RemoveUnitFlag(UNIT_FLAG_PACIFIED);
     }
@@ -3132,7 +3132,7 @@ void AuraEffect::HandleAuraModPacifyAndSilence(AuraApplication const* aurApp, ui
     if (!(apply))
     {
         // do not remove unit flag if there are more than this auraEffect of that kind on unit on unit
-        if (target->HasAuraType(SPELL_AURA_MOD_PACIFY_SILENCE))
+        if (target->HasPacifySilenceAura())
             return;
     }
     HandleAuraModPacify(aurApp, mode, apply);
@@ -3153,7 +3153,7 @@ void AuraEffect::HandleAuraAllowOnlyAbility(AuraApplication const* aurApp, uint8
         else
         {
             // do not remove unit flag if there are more than this auraEffect of that kind on unit on unit
-            if (target->HasAuraType(SPELL_AURA_ALLOW_ONLY_ABILITY))
+            if (target->HasAllowOnlyAbilityAura())
                 return;
             target->ToPlayer()->RemovePlayerFlag(PLAYER_ALLOW_ONLY_ABILITY);
         }
@@ -3371,7 +3371,7 @@ void AuraEffect::HandleAuraAllowFlight(AuraApplication const* aurApp, uint8 mode
     if (!apply)
     {
         // do not remove unit flag if there are more than this auraEffect of that kind on unit on unit
-        if (target->HasAuraType(GetAuraType()) || target->HasAuraType(SPELL_AURA_MOD_INCREASE_MOUNTED_FLIGHT_SPEED))
+        if (target->HasAuraType(GetAuraType()) || target->HasIncreaseMountedFlightSpeedAura())
             return;
     }
 
@@ -3595,7 +3595,7 @@ void AuraEffect::HandlePreventFleeing(AuraApplication const* aurApp, uint8 mode,
 
     Unit* target = aurApp->GetTarget();
     // Since patch 3.0.2 this mechanic no longer affects fear effects. It will ONLY prevent humanoids from fleeing due to low health.
-    if (target->IsPlayer() || !apply || target->HasAuraType(SPELL_AURA_MOD_FEAR))
+    if (target->IsPlayer() || !apply || target->HasFearAura())
         return;
     /// @todo: find a way to cancel fleeing for assistance.
     /// Currently this will only stop creatures fleeing due to low health that could not find nearby allies to flee towards.
@@ -3790,7 +3790,7 @@ void AuraEffect::HandleAuraModIncreaseFlightSpeed(AuraApplication const* aurApp,
     if (GetAuraType() == SPELL_AURA_MOD_INCREASE_MOUNTED_FLIGHT_SPEED)
     {
         // do not remove unit flag if there are more than this auraEffect of that kind on unit on unit
-        if (mode & AURA_EFFECT_HANDLE_SEND_FOR_CLIENT_MASK && (apply || (!target->HasAuraType(SPELL_AURA_MOD_INCREASE_MOUNTED_FLIGHT_SPEED) && !target->HasAuraType(SPELL_AURA_FLY))))
+        if (mode & AURA_EFFECT_HANDLE_SEND_FOR_CLIENT_MASK && (apply || (!target->HasIncreaseMountedFlightSpeedAura() && !target->HasFlyAura())))
         {
             target->SetCanFly(apply);
 
@@ -5847,12 +5847,12 @@ void AuraEffect::HandleAuraDummy(AuraApplication const* aurApp, uint8 mode, bool
                         }
                         break;
                     case 62061: // Festive Holiday Mount
-                        if (target->HasAuraType(SPELL_AURA_MOUNTED))
+                        if (target->HasMountedAura())
                         {
                             uint32 creatureEntry = 0;
                             if (apply)
                             {
-                                if (target->HasAuraType(SPELL_AURA_MOD_INCREASE_MOUNTED_FLIGHT_SPEED))
+                                if (target->HasIncreaseMountedFlightSpeedAura())
                                     creatureEntry = 24906;
                                 else
                                     creatureEntry = 15665;
@@ -5870,7 +5870,7 @@ void AuraEffect::HandleAuraDummy(AuraApplication const* aurApp, uint8 mode, bool
                         }
                         break;
                     case FRESH_BREWFEST_HOPS: // Festive Brewfest Mount
-                        if (target->HasAuraType(SPELL_AURA_MOUNTED) && !target->HasAuraType(SPELL_AURA_MOD_INCREASE_MOUNTED_FLIGHT_SPEED))
+                        if (target->HasMountedAura() && !target->HasIncreaseMountedFlightSpeedAura())
                         {
                             uint32 creatureEntry = 0;
 

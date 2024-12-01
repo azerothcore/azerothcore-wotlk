@@ -83,4 +83,6 @@ inline AI* GetUtgardeKeepAI(T* obj)
     return GetInstanceAI<AI>(obj, UtgardeKeepScriptName);
 }
 
+#define RegisterUtgardeKeepCreatureAI(ai_name) RegisterCreatureAIWithFactory(ai_name, GetUtgardeKeepAI)
+
 #endif
