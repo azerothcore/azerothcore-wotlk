@@ -334,8 +334,7 @@ void AuctionHouseWorkerThread::BuildListAuctionItems(AuctionSearchListRequest co
 
 AuctionHouseSearcher::AuctionHouseSearcher()
 {
-    //@TODO: Config
-    for (uint32 i = 0; i < 1; ++i)
+    for (uint32 i = 0; i < sWorld->getIntConfig(CONFIG_AUCTIONHOUSE_WORKERTHREADS); ++i)
         _workerThreads.push_back(std::make_unique<AuctionHouseWorkerThread>(&_requestQueue, &_responseQueue));
 }
 
