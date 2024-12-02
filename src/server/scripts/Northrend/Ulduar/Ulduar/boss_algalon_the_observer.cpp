@@ -309,7 +309,7 @@ public:
                     if (!plr->IsGameMaster() && plr->IsInCombat() /*performance*/)
                     {
                         for (uint8 i = EQUIPMENT_SLOT_START; i < EQUIPMENT_SLOT_END; ++i) // loop through equipped items
-                            if (Item* item = plr->GetItemByPos(INVENTORY_SLOT_BAG_0, i))
+                            if (auto item = plr->GetItemByPos(INVENTORY_SLOT_BAG_0, i))
                                 if (!IsValidHeraldItem(item->GetTemplate()))
                                 {
                                     _heraldOfTheTitans = false;

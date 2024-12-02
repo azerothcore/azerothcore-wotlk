@@ -503,10 +503,10 @@ void Player::SendItemRetrievalMail(std::vector<std::pair<uint32, uint32>> mailIt
 
         for (auto const& [itemEntry, itemCount] : items)
         {
-            if (Item* mailItem = Item::CreateItem(itemEntry, itemCount))
+            if (auto mailItem = Item::CreateItem(itemEntry, itemCount))
             {
                 mailItem->SaveToDB(trans);
-                draft.AddItem(mailItem);
+                draft.AddItem(std::move(mailItem));
             }
         }
 

@@ -776,9 +776,11 @@ void PlayerMenu::SendQuestGiverRequestItems(Quest const* quest, ObjectGuid npcGU
     if (qsitr != _player->getQuestStatusMap().end() && qsitr->second.Status == QUEST_STATUS_INCOMPLETE)
     {
         for (uint8 i = 0; i < 6; ++i)
+        {
             if (quest->RequiredItemId[i] && qsitr->second.ItemCount[i] < quest->RequiredItemCount[i])
                 if (_player->GetItemCount(quest->RequiredItemId[i], false) >= quest->RequiredItemCount[i])
                     qsitr->second.ItemCount[i] = quest->RequiredItemCount[i];
+        }
 
         if (_player->CanCompleteQuest(quest->GetQuestId()))
         {

@@ -179,9 +179,11 @@ void WorldSession::HandlePetitionBuyOpcode(WorldPacket& recvData)
     }
 
     _player->ModifyMoney(-(int32)cost);
-    Item* charter = _player->StoreNewItem(dest, charterid, true);
-    if (!charter)
+    auto charter = _player->StoreNewItem(dest, charterid, true);
+    if (charter == nullptr)
+    {
         return;
+    }
 
     charter->SetUInt32Value(ITEM_FIELD_ENCHANTMENT_1_1, charter->GetGUID().GetCounter());
     // ITEM_FIELD_ENCHANTMENT_1_1 is guild/arenateam id
@@ -332,9 +334,11 @@ void WorldSession::HandlePetitionRenameOpcode(WorldPacket& recvData)
     recvData >> petitionGuid;                              // guid
     recvData >> newName;                                   // new name
 
-    Item* item = _player->GetItemByGuid(petitionGuid);
-    if (!item)
+    auto item = _player->GetItemByGuid(petitionGuid);
+    if (item == nullptr)
+    {
         return;
+    }
 
     Petition const* petition = sPetitionMgr->GetPetition(petitionGuid);
     if (!petition)
@@ -649,9 +653,11 @@ void WorldSession::HandleTurnInPetitionOpcode(WorldPacket& recvData)
     recvData >> petitionGuid;
 
     // Check if player really has the required petition charter
-    Item* item = _player->GetItemByGuid(petitionGuid);
-    if (!item)
+    auto item = _player->GetItemByGuid(petitionGuid);
+    if (item == nullptr)
+    {
         return;
+    }
 
     LOG_DEBUG("network", "Petition {} turned in by {}", petitionGuid.ToString(), _player->GetGUID().ToString());
 

@@ -71,9 +71,11 @@ void WorldSession::HandleAutoBankItemOpcode(WorldPackets::Bank::AutoBankItem& pa
         return;
     }
 
-    Item* item = _player->GetItemByPos(packet.Bag, packet.Slot);
-    if (!item)
+    auto item = _player->GetItemByPos(packet.Bag, packet.Slot);
+    if (item == nullptr)
+    {
         return;
+    }
 
     ItemPosCountVec dest;
     InventoryResult msg = _player->CanBankItem(NULL_BAG, NULL_SLOT, dest, item, false);
@@ -105,9 +107,11 @@ void WorldSession::HandleAutoStoreBankItemOpcode(WorldPackets::Bank::AutoStoreBa
         return;
     }
 
-    Item* item = _player->GetItemByPos(packet.Bag, packet.Slot);
-    if (!item)
+    auto item = _player->GetItemByPos(packet.Bag, packet.Slot);
+    if (item == nullptr)
+    {
         return;
+    }
 
     if (_player->IsBankPos(packet.Bag, packet.Slot))                    // moving from bank to inventory
     {
@@ -120,8 +124,10 @@ void WorldSession::HandleAutoStoreBankItemOpcode(WorldPackets::Bank::AutoStoreBa
         }
 
         _player->RemoveItem(packet.Bag, packet.Slot, true);
-        if (Item const* storedItem = _player->StoreItem(dest, item, true))
+        if (const auto storedItem = _player->StoreItem(dest, item, true))
+        {
             _player->ItemAddedQuestCheck(storedItem->GetEntry(), storedItem->GetCount());
+        }
     }
     else                                                    // moving from inventory to bank
     {

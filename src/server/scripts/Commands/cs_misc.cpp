@@ -1753,7 +1753,7 @@ public:
             return false;
         }
 
-        Item* item = playerTarget->StoreNewItem(dest, itemId, true);
+        auto item = playerTarget->StoreNewItem(dest, itemId, true);
 
         Player* p = handler->GetSession() ? handler->GetSession()->GetPlayer() : nullptr;
         // remove binding (let GM give it to another player later)
@@ -1761,7 +1761,7 @@ public:
         {
             for (auto const& itemPos : dest)
             {
-                if (Item* item1 = p->GetItemByPos(itemPos.pos))
+                if (auto item1 = p->GetItemByPos(itemPos.pos))
                 {
                     item1->SetBinding(false);
                 }
@@ -1813,7 +1813,7 @@ public:
 
                 if (msg == EQUIP_ERR_OK)
                 {
-                    Item* item = playerTarget->StoreNewItem(dest, itemTemplate.ItemId, true);
+                    auto item = playerTarget->StoreNewItem(dest, itemTemplate.ItemId, true);
 
                     // remove binding (let GM give it to another player later)
                     if (player == playerTarget)

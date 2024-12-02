@@ -21,7 +21,7 @@
 #include "ScriptMgrMacros.h"
 #include "ScriptedGossip.h"
 
-bool ScriptMgr::OnQuestAccept(Player* player, Item* item, Quest const* quest)
+bool ScriptMgr::OnQuestAccept(Player* player, std::shared_ptr<Item> item, Quest const* quest)
 {
     ASSERT(player);
     ASSERT(item);
@@ -42,7 +42,7 @@ bool ScriptMgr::OnQuestAccept(Player* player, Item* item, Quest const* quest)
     return tempScript ? tempScript->OnQuestAccept(player, item, quest) : false;
 }
 
-bool ScriptMgr::OnItemUse(Player* player, Item* item, SpellCastTargets const& targets)
+bool ScriptMgr::OnItemUse(Player* player, std::shared_ptr<Item> item, SpellCastTargets const& targets)
 {
     ASSERT(player);
     ASSERT(item);
@@ -80,7 +80,7 @@ bool ScriptMgr::OnItemExpire(Player* player, ItemTemplate const* proto)
     return tempScript ? tempScript->OnExpire(player, proto) : false;
 }
 
-bool ScriptMgr::OnItemRemove(Player* player, Item* item)
+bool ScriptMgr::OnItemRemove(Player* player, std::shared_ptr<Item> item)
 {
     ASSERT(player);
     ASSERT(item);
@@ -99,7 +99,7 @@ bool ScriptMgr::OnItemRemove(Player* player, Item* item)
     return tempScript ? tempScript->OnRemove(player, item) : false;
 }
 
-bool ScriptMgr::OnCastItemCombatSpell(Player* player, Unit* victim, SpellInfo const* spellInfo, Item* item)
+bool ScriptMgr::OnCastItemCombatSpell(Player* player, Unit* victim, SpellInfo const* spellInfo, std::shared_ptr<Item> item)
 {
     ASSERT(player);
     ASSERT(victim);
@@ -110,7 +110,7 @@ bool ScriptMgr::OnCastItemCombatSpell(Player* player, Unit* victim, SpellInfo co
     return tempScript ? tempScript->OnCastItemCombatSpell(player, victim, spellInfo, item) : true;
 }
 
-void ScriptMgr::OnGossipSelect(Player* player, Item* item, uint32 sender, uint32 action)
+void ScriptMgr::OnGossipSelect(Player* player, std::shared_ptr<Item> item, uint32 sender, uint32 action)
 {
     ASSERT(player);
     ASSERT(item);
@@ -126,7 +126,7 @@ void ScriptMgr::OnGossipSelect(Player* player, Item* item, uint32 sender, uint32
     }
 }
 
-void ScriptMgr::OnGossipSelectCode(Player* player, Item* item, uint32 sender, uint32 action, const char* code)
+void ScriptMgr::OnGossipSelectCode(Player* player, std::shared_ptr<Item> item, uint32 sender, uint32 action, const char* code)
 {
     ASSERT(player);
     ASSERT(item);

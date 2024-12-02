@@ -90,9 +90,9 @@ MailReceiver::MailReceiver(Player* receiver, ObjectGuid::LowType receiver_lowgui
     ASSERT(!receiver || receiver->GetGUID().GetCounter() == receiver_lowguid);
 }
 
-MailDraft& MailDraft::AddItem(Item* item)
+MailDraft& MailDraft::AddItem(std::shared_ptr<Item> item)
 {
-    m_items[item->GetGUID()] = item;
+    m_items[item->GetGUID()] = std::move(item);
     return *this;
 }
 
@@ -120,10 +120,10 @@ void MailDraft::prepareItems(Player* receiver, CharacterDatabaseTransaction tran
     {
         if (LootItem* lootitem = mailLoot.LootItemInSlot(i, receiver))
         {
-            if (Item* item = Item::CreateItem(lootitem->itemid, lootitem->count, receiver))
+            if (auto item = Item::CreateItem(lootitem->itemid, lootitem->count, receiver))
             {
                 item->SaveToDB(trans);                           // save for prevent lost at next mail load, if send fail then item will deleted
-                AddItem(item);
+                AddItem(std::move(item));
             }
         }
     }
@@ -133,7 +133,7 @@ void MailDraft::deleteIncludedItems(CharacterDatabaseTransaction trans, bool inD
 {
     for (MailItemMap::iterator mailItemIter = m_items.begin(); mailItemIter != m_items.end(); ++mailItemIter)
     {
-        Item* item = mailItemIter->second;
+        auto item = mailItemIter->second;
 
         if (inDB)
         {
@@ -141,8 +141,6 @@ void MailDraft::deleteIncludedItems(CharacterDatabaseTransaction trans, bool inD
             stmt->SetData(0, item->GetGUID().GetCounter());
             trans->Append(stmt);
         }
-
-        delete item;
     }
 
     m_items.clear();
@@ -166,7 +164,7 @@ void MailDraft::SendReturnToSender(uint32 /*sender_acc*/, ObjectGuid::LowType se
         // set owner to new receiver (to prevent delete item with sender char deleting)
         for (MailItemMap::iterator mailItemIter = m_items.begin(); mailItemIter != m_items.end(); ++mailItemIter)
         {
-            Item* item = mailItemIter->second;
+            auto item = mailItemIter->second;
             item->SaveToDB(trans);                      // item not in inventory and can be save standalone
             // owner in data will set at mail receive and item extracting
             CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_UPD_ITEM_OWNER);
@@ -268,7 +266,7 @@ void MailDraft::SendMailTo(CharacterDatabaseTransaction trans, MailReceiver cons
 
         for (MailItemMap::const_iterator mailItemIter = m_items.begin(); mailItemIter != m_items.end(); ++mailItemIter)
         {
-            Item* item = mailItemIter->second;
+            auto item = mailItemIter->second;
             m->AddItem(item->GetGUID().GetCounter(), item->GetEntry());
         }
 

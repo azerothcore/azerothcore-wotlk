@@ -134,6 +134,17 @@ void Player::SendPreparedQuest(ObjectGuid guid)
             else
             {
                 Object* object = ObjectAccessor::GetObjectByTypeMask(*this, guid, TYPEMASK_UNIT | TYPEMASK_GAMEOBJECT | TYPEMASK_ITEM);
+                std::shared_ptr<Item> plrItem;
+                if (object == nullptr && guid.IsItem())
+                {
+                    // Hold pointer to ensure item lifetime
+                    plrItem = GetItemByGuid(guid);
+                    if (plrItem != nullptr)
+                    {
+                        object = plrItem.get();
+                    }
+                }
+
                 if (!object || (!object->hasQuest(questId) && !object->hasInvolvedQuest(questId)))
                 {
                     PlayerTalkClass->SendCloseGossip();
@@ -437,7 +448,7 @@ void Player::AddQuestAndCheckCompletion(Quest const* quest, Object* questGiver)
         case TYPEID_CONTAINER:
         {
             Item* item = (Item*)questGiver;
-            sScriptMgr->OnQuestAccept(this, item, quest);
+            sScriptMgr->OnQuestAccept(this, item->shared_from_this(), quest);
 
             // destroy not required for quest finish quest starting item
             bool destroyItem = true;
@@ -695,10 +706,10 @@ void Player::RewardQuest(Quest const* quest, uint32 reward, Object* questGiver, 
             ItemPosCountVec dest;
             if (CanStoreNewItem(NULL_BAG, NULL_SLOT, dest, itemId, quest->RewardChoiceItemCount[reward]) == EQUIP_ERR_OK)
             {
-                Item* item = StoreNewItem(dest, itemId, true);
+                auto item = StoreNewItem(dest, itemId, true);
                 SendNewItem(item, quest->RewardChoiceItemCount[reward], true, false, false, false);
 
-                sScriptMgr->OnQuestRewardItem(this, item, quest->RewardChoiceItemCount[reward]);
+                sScriptMgr->OnQuestRewardItem(this, std::move(item), quest->RewardChoiceItemCount[reward]);
             }
             else
             {
@@ -716,10 +727,10 @@ void Player::RewardQuest(Quest const* quest, uint32 reward, Object* questGiver, 
                 ItemPosCountVec dest;
                 if (CanStoreNewItem(NULL_BAG, NULL_SLOT, dest, itemId, quest->RewardItemIdCount[i]) == EQUIP_ERR_OK)
                 {
-                    Item* item = StoreNewItem(dest, itemId, true);
+                    auto item = StoreNewItem(dest, itemId, true);
                     SendNewItem(item, quest->RewardItemIdCount[i], true, false, false, false);
 
-                    sScriptMgr->OnQuestRewardItem(this, item, quest->RewardItemIdCount[i]);
+                    sScriptMgr->OnQuestRewardItem(this, std::move(item), quest->RewardItemIdCount[i]);
                 }
                 else
                     problematicItems.emplace_back(itemId, quest->RewardItemIdCount[i]);
@@ -1344,7 +1355,7 @@ bool Player::GiveQuestSourceItem(Quest const* quest)
         InventoryResult msg = CanStoreNewItem(NULL_BAG, NULL_SLOT, dest, srcitem, count);
         if (msg == EQUIP_ERR_OK)
         {
-            Item* item = StoreNewItem(dest, srcitem, true);
+            auto item = StoreNewItem(dest, srcitem, true);
             SendNewItem(item, count, true, false);
             return true;
         }

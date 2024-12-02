@@ -29,25 +29,25 @@ public:
     [[nodiscard]] bool IsDatabaseBound() const override { return true; }
 
     // Called when a player accepts a quest from the item.
-    [[nodiscard]] virtual bool OnQuestAccept(Player* /*player*/, Item* /*item*/, Quest const* /*quest*/) { return false; }
+    [[nodiscard]] virtual bool OnQuestAccept(Player* /*player*/, std::shared_ptr<Item> /*item*/, Quest const* /*quest*/) { return false; }
 
     // Called when a player uses the item.
-    [[nodiscard]] virtual bool OnUse(Player* /*player*/, Item* /*item*/, SpellCastTargets const& /*targets*/) { return false; }
+    [[nodiscard]] virtual bool OnUse(Player* /*player*/, std::shared_ptr<Item> /*item*/, SpellCastTargets const& /*targets*/) { return false; }
 
     // Called when the item is destroyed.
-    [[nodiscard]] virtual bool OnRemove(Player* /*player*/, Item* /*item*/) { return false; }
+    [[nodiscard]] virtual bool OnRemove(Player* /*player*/, std::shared_ptr<Item> /*item*/) { return false; }
 
     // Called before casting a combat spell from this item (chance on hit spells of item template, can be used to prevent cast if returning false)
-    [[nodiscard]] virtual bool OnCastItemCombatSpell(Player* /*player*/, Unit* /*victim*/, SpellInfo const* /*spellInfo*/, Item* /*item*/) { return true; }
+    [[nodiscard]] virtual bool OnCastItemCombatSpell(Player* /*player*/, Unit* /*victim*/, SpellInfo const* /*spellInfo*/, std::shared_ptr<Item> /*item*/) { return true; }
 
     // Called when the item expires (is destroyed).
     [[nodiscard]] virtual bool OnExpire(Player* /*player*/, ItemTemplate const* /*proto*/) { return false; }
 
     // Called when a player selects an option in an item gossip window
-    virtual void OnGossipSelect(Player* /*player*/, Item* /*item*/, uint32 /*sender*/, uint32 /*action*/) { }
+    virtual void OnGossipSelect(Player* /*player*/, std::shared_ptr<Item> /*item*/, uint32 /*sender*/, uint32 /*action*/) { }
 
     // Called when a player selects an option in an item gossip window
-    virtual void OnGossipSelectCode(Player* /*player*/, Item* /*item*/, uint32 /*sender*/, uint32 /*action*/, const char* /*code*/) { }
+    virtual void OnGossipSelectCode(Player* /*player*/, std::shared_ptr<Item> /*item*/, uint32 /*sender*/, uint32 /*action*/, const char* /*code*/) { }
 };
 
 #endif

@@ -2364,8 +2364,8 @@ void AchievementMgr::CompletedAchievement(AchievementEntry const* achievement)
 
         CharacterDatabaseTransaction trans = CharacterDatabase.BeginTransaction();
 
-        Item* item = reward->itemId ? Item::CreateItem(reward->itemId, 1, GetPlayer()) : nullptr;
-        if (item)
+        auto item = reward->itemId ? Item::CreateItem(reward->itemId, 1, GetPlayer()) : nullptr;
+        if (item != nullptr)
         {
             // save new item before send
             item->SaveToDB(trans);                               // save for prevent lost at next mail load, if send fail then item will deleted

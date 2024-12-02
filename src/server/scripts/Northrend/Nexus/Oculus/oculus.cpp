@@ -236,7 +236,7 @@ public:
         uint8 msg = player->CanStoreNewItem(NULL_BAG, NULL_SLOT, dest, itemId, 1);
         if (msg == EQUIP_ERR_OK)
         {
-            if (Item* item = player->StoreNewItem(dest, itemId, true))
+            if (auto item = player->StoreNewItem(dest, itemId, true))
             {
                 player->SendNewItem(item, 1, true, true);
             }

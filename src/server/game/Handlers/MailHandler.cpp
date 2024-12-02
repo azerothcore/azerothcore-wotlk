@@ -219,7 +219,7 @@ void WorldSession::HandleSendMail(WorldPacket& recvData)
         return;
     }
 
-    Item* items[MAX_MAIL_ITEMS];
+    std::array<std::shared_ptr<Item>, MAX_MAIL_ITEMS> items;
 
     for (uint8 i = 0; i < items_count; ++i)
     {
@@ -229,10 +229,10 @@ void WorldSession::HandleSendMail(WorldPacket& recvData)
             return;
         }
 
-        Item* item = player->GetItemByGuid(itemGUIDs[i]);
+        auto item = player->GetItemByGuid(itemGUIDs[i]);
 
         // prevent sending bag with items (cheat: can be placed in bag after adding equipped empty bag to mail)
-        if (!item)
+        if (item == nullptr)
         {
             player->SendMailResult(0, MAIL_SEND, MAIL_ERR_MAIL_ATTACHMENT_INVALID);
             return;
@@ -299,12 +299,10 @@ void WorldSession::HandleSendMail(WorldPacket& recvData)
     {
         if (items_count > 0)
         {
-            for (uint8 i = 0; i < items_count; ++i)
+            for (auto item : items)
             {
-                Item* item = items[i];
-
                 item->SetNotRefundable(GetPlayer()); // makes the item no longer refundable
-                player->MoveItemFromInventory(items[i]->GetBagSlot(), item->GetSlot(), true);
+                player->MoveItemFromInventory(item->GetBagSlot(), item->GetSlot(), true);
 
                 item->DeleteFromInventoryDB(trans);     // deletes item from character's inventory
                 if (item->GetState() == ITEM_UNCHANGED)
@@ -421,8 +419,8 @@ void WorldSession::HandleMailReturnToSender(WorldPacket& recvData)
     {
         for (MailItemInfoVec::iterator itr = m->items.begin(); itr != m->items.end(); ++itr)
         {
-            Item* item = player->GetMItem(itr->item_guid);
-            if (item && !sScriptMgr->CanSendMail(player, ObjectGuid(HighGuid::Player, m->sender), mailbox, m->subject, m->body, m->money, m->COD, item))
+            auto item = player->GetMItem(itr->item_guid);
+            if (item != nullptr && !sScriptMgr->CanSendMail(player, ObjectGuid(HighGuid::Player, m->sender), mailbox, m->subject, m->body, m->money, m->COD, item))
             {
                 player->SendMailResult(mailId, MAIL_RETURNED_TO_SENDER, MAIL_ERR_INTERNAL_ERROR);
                 return;
@@ -460,9 +458,8 @@ void WorldSession::HandleMailReturnToSender(WorldPacket& recvData)
         {
             for (MailItemInfoVec::iterator itr2 = m->items.begin(); itr2 != m->items.end(); ++itr2)
             {
-                Item* item = player->GetMItem(itr2->item_guid);
-                if (item)
-                    draft.AddItem(item);
+                if (auto item = player->GetMItem(itr2->item_guid))
+                    draft.AddItem(std::move(item));
 
                 player->RemoveMItem(itr2->item_guid);
             }
@@ -521,7 +518,7 @@ void WorldSession::HandleMailTakeItem(WorldPacket& recvData)
         return;
     }
 
-    Item* it = player->GetMItem(itemLowGuid);
+    auto it = player->GetMItem(itemLowGuid);
 
     ItemPosCountVec dest;
     uint8 msg = _player->CanStoreItem(NULL_BAG, NULL_SLOT, dest, it, false);
@@ -712,7 +709,7 @@ void WorldSession::HandleGetMailList(WorldPacket& recvData)
 
         for (uint8 i = 0; i < item_count; ++i)
         {
-            Item* item = player->GetMItem(mail->items[i].item_guid);
+            auto item = player->GetMItem(mail->items[i].item_guid);
             // item index (0-6?)
             data << uint8(i);
             // item guid low?
@@ -774,10 +771,9 @@ void WorldSession::HandleMailCreateTextItem(WorldPacket& recvData)
         return;
     }
 
-    Item* bodyItem = new Item;                              // This is not bag and then can be used new Item.
+    std::shared_ptr<Item> bodyItem = std::make_shared<Item>();                              // This is not bag and then can be used new Item.
     if (!bodyItem->Create(sObjectMgr->GetGenerator<HighGuid::Item>().Generate(), MAIL_BODY_ITEM_TEMPLATE, player))
     {
-        delete bodyItem;
         return;
     }
 
@@ -788,7 +784,6 @@ void WorldSession::HandleMailCreateTextItem(WorldPacket& recvData)
         if (!mailTemplateEntry)
         {
             player->SendMailResult(mailId, MAIL_MADE_PERMANENT, MAIL_ERR_INTERNAL_ERROR);
-            delete bodyItem;
             return;
         }
 
@@ -816,7 +811,6 @@ void WorldSession::HandleMailCreateTextItem(WorldPacket& recvData)
     else
     {
         player->SendMailResult(mailId, MAIL_MADE_PERMANENT, MAIL_ERR_EQUIP_ERROR, msg);
-        delete bodyItem;
     }
 }
 

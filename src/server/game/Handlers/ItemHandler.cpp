@@ -110,13 +110,17 @@ void WorldSession::HandleAutoEquipItemSlotOpcode(WorldPacket& recvData)
 
     // cheating attempt, client should never send opcode in that case
     if (!Player::IsEquipmentPos(INVENTORY_SLOT_BAG_0, dstslot))
+    {
         return;
+    }
 
-    Item* item = _player->GetItemByGuid(itemguid);
+    const auto item = _player->GetItemByGuid(itemguid);
     uint16 dstpos = dstslot | (INVENTORY_SLOT_BAG_0 << 8);
 
-    if (!item || item->GetPos() == dstpos)
+    if (item == nullptr || item->GetPos() == dstpos)
+    {
         return;
+    }
 
     _player->SwapItem(item->GetPos(), dstpos);
 }
@@ -169,9 +173,11 @@ void WorldSession::HandleAutoEquipItemOpcode(WorldPacket& recvData)
 
     recvData >> srcbag >> srcslot;
 
-    Item* pSrcItem  = _player->GetItemByPos(srcbag, srcslot);
-    if (!pSrcItem)
+    auto pSrcItem  = _player->GetItemByPos(srcbag, srcslot);
+    if (pSrcItem == nullptr)
+    {
         return;                                             // only at cheat
+    }
 
     ItemTemplate const* pProto = pSrcItem->GetTemplate();
     if (!pProto)
@@ -195,11 +201,11 @@ void WorldSession::HandleAutoEquipItemOpcode(WorldPacket& recvData)
         return;
     }
 
-    Item* pDstItem = _player->GetItemByPos(dest);
+    auto pDstItem = _player->GetItemByPos(dest);
 
     // Remove item enchantments for now and restore it later
     // Needed for swap sanity checks
-    if (pDstItem)
+    if (pDstItem != nullptr)
     {
         _player->ApplyEnchantment(pDstItem, false);
     }
@@ -208,7 +214,7 @@ void WorldSession::HandleAutoEquipItemOpcode(WorldPacket& recvData)
     if (msg != EQUIP_ERR_OK)
     {
         // Restore enchantments
-        if (pDstItem)
+        if (pDstItem != nullptr)
         {
             _player->ApplyEnchantment(pDstItem, true);
         }
@@ -288,7 +294,7 @@ void WorldSession::HandleAutoEquipItemOpcode(WorldPacket& recvData)
         _player->AutoUnequipOffhandIfNeed();
 
         // Xinef: Call this here after all needed items are equipped
-        _player->RemoveItemDependentAurasAndCasts((Item*)nullptr);
+        _player->RemoveItemDependentAurasAndCasts(nullptr);
     }
 }
 
@@ -312,8 +318,8 @@ void WorldSession::HandleDestroyItemOpcode(WorldPacket& recvData)
         }
     }
 
-    Item* pItem  = _player->GetItemByPos(bag, slot);
-    if (!pItem)
+    auto pItem  = _player->GetItemByPos(bag, slot);
+    if (pItem == nullptr)
     {
         _player->SendEquipError(EQUIP_ERR_ITEM_NOT_FOUND, nullptr, nullptr);
         return;
@@ -700,9 +706,9 @@ void WorldSession::HandleReadItem(WorldPacket& recvData)
     recvData >> bag >> slot;
 
     //LOG_DEBUG("network.opcode", "STORAGE: Read bag = {}, slot = {}", bag, slot);
-    Item* pItem = _player->GetItemByPos(bag, slot);
+    auto pItem = _player->GetItemByPos(bag, slot);
 
-    if (pItem && pItem->GetTemplate()->PageText)
+    if (pItem != nullptr && pItem->GetTemplate()->PageText)
     {
         WorldPacket data;
 
@@ -753,8 +759,8 @@ void WorldSession::HandleSellItemOpcode(WorldPacket& recvData)
     if (GetPlayer()->HasUnitState(UNIT_STATE_DIED))
         GetPlayer()->RemoveAurasByType(SPELL_AURA_FEIGN_DEATH);
 
-    Item* pItem = _player->GetItemByGuid(itemguid);
-    if (pItem)
+    auto pItem = _player->GetItemByGuid(itemguid);
+    if (pItem != nullptr)
     {
         if (!sScriptMgr->CanSellItem(_player, pItem, creature))
             return;
@@ -864,8 +870,8 @@ void WorldSession::HandleSellItemOpcode(WorldPacket& recvData)
 
                 if (count < pItem->GetCount())               // need split items
                 {
-                    Item* pNewItem = pItem->CloneItem(count, _player);
-                    if (!pNewItem)
+                    auto pNewItem = pItem->CloneItem(count, _player);
+                    if (pNewItem == nullptr)
                     {
                         LOG_ERROR("network.opcode", "WORLD: HandleSellItemOpcode - could not create clone of item {}; count = {}", pItem->GetEntry(), count);
                         _player->SendSellError(SELL_ERR_CANT_SELL_ITEM, creature, itemguid, 0);
@@ -924,8 +930,8 @@ void WorldSession::HandleBuybackItem(WorldPacket& recvData)
     if (GetPlayer()->HasUnitState(UNIT_STATE_DIED))
         GetPlayer()->RemoveAurasByType(SPELL_AURA_FEIGN_DEATH);
 
-    Item* pItem = _player->GetItemFromBuyBackSlot(slot);
-    if (pItem)
+    auto pItem = _player->GetItemFromBuyBackSlot(slot);
+    if (pItem != nullptr)
     {
         uint32 price = _player->GetUInt32Value(PLAYER_FIELD_BUYBACK_PRICE_1 + slot - BUYBACK_SLOT_START);
         if (!_player->HasEnoughMoney(price))
@@ -981,9 +987,9 @@ void WorldSession::HandleBuyItemInSlotOpcode(WorldPacket& recvData)
         bag = INVENTORY_SLOT_BAG_0;
     else
     {
-        for (int i = INVENTORY_SLOT_BAG_START; i < INVENTORY_SLOT_BAG_END; ++i)
+        for (uint8 i = INVENTORY_SLOT_BAG_START; i < INVENTORY_SLOT_BAG_END; ++i)
         {
-            if (Bag* pBag = _player->GetBagByPos(i))
+            if (auto pBag = _player->GetBagByPos(i))
             {
                 if (bagguid == pBag->GetGUID())
                 {
@@ -1148,9 +1154,11 @@ void WorldSession::HandleAutoStoreBagItemOpcode(WorldPacket& recvData)
 
     recvData >> srcbag >> srcslot >> dstbag;
 
-    Item* pItem = _player->GetItemByPos(srcbag, srcslot);
-    if (!pItem)
+    auto pItem = _player->GetItemByPos(srcbag, srcslot);
+    if (pItem == nullptr)
+    {
         return;
+    }
 
     if (!_player->IsValidPos(dstbag, NULL_SLOT, false))      // can be autostore pos
     {
@@ -1275,8 +1283,8 @@ void WorldSession::HandleWrapItemOpcode(WorldPacket& recvData)
 
     LOG_DEBUG("network", "WRAP: receive gift_bag = {}, gift_slot = {}, item_bag = {}, item_slot = {}", gift_bag, gift_slot, item_bag, item_slot);
 
-    Item* gift = _player->GetItemByPos(gift_bag, gift_slot);
-    if (!gift)
+    auto gift = _player->GetItemByPos(gift_bag, gift_slot);
+    if (gift == nullptr)
     {
         _player->SendEquipError(EQUIP_ERR_ITEM_NOT_FOUND, gift, nullptr);
         return;
@@ -1288,9 +1296,9 @@ void WorldSession::HandleWrapItemOpcode(WorldPacket& recvData)
         return;
     }
 
-    Item* item = _player->GetItemByPos(item_bag, item_slot);
+    auto item = _player->GetItemByPos(item_bag, item_slot);
 
-    if (!item)
+    if (item == nullptr)
     {
         _player->SendEquipError(EQUIP_ERR_ITEM_NOT_FOUND, item, nullptr);
         return;
@@ -1416,9 +1424,12 @@ void WorldSession::HandleSocketOpcode(WorldPacket& recvData)
             (gem_guids[1] && (gem_guids[1] == gem_guids[2])))
         return;
 
-    Item* itemTarget = _player->GetItemByGuid(item_guid);
-    if (!itemTarget)                                         //missing item to socket
+    auto itemTarget = _player->GetItemByGuid(item_guid);
+    //missing item to socket
+    if (!itemTarget)
+    {
         return;
+    }
 
     ItemTemplate const* itemProto = itemTarget->GetTemplate();
     if (!itemProto)
@@ -1427,9 +1438,11 @@ void WorldSession::HandleSocketOpcode(WorldPacket& recvData)
     //this slot is excepted when applying / removing meta gem bonus
     uint8 slot = itemTarget->IsEquipped() ? itemTarget->GetSlot() : uint8(NULL_SLOT);
 
-    Item* Gems[MAX_GEM_SOCKETS];
+    std::array<std::shared_ptr<Item>, MAX_GEM_SOCKETS> Gems;
     for (int i = 0; i < MAX_GEM_SOCKETS; ++i)
+    {
         Gems[i] = gem_guids[i] ? _player->GetItemByGuid(gem_guids[i]) : nullptr;
+    }
 
     GemPropertiesEntry const* GemProps[MAX_GEM_SOCKETS];
     for (int i = 0; i < MAX_GEM_SOCKETS; ++i)                //get geminfo from dbc storage
@@ -1570,8 +1583,10 @@ void WorldSession::HandleSocketOpcode(WorldPacket& recvData)
         if (GemEnchants[i])
         {
             itemTarget->SetEnchantment(EnchantmentSlot(SOCK_ENCHANTMENT_SLOT + i), GemEnchants[i], 0, 0, _player->GetGUID());
-            if (Item* guidItem = _player->GetItemByGuid(gem_guids[i]))
+            if (auto guidItem = _player->GetItemByGuid(gem_guids[i]))
+            {
                 _player->DestroyItem(guidItem->GetBagSlot(), guidItem->GetSlot(), true);
+            }
         }
     }
 
@@ -1607,13 +1622,12 @@ void WorldSession::HandleCancelTempEnchantmentOpcode(WorldPacket& recvData)
     if (!Player::IsEquipmentPos(INVENTORY_SLOT_BAG_0, eslot))
         return;
 
-    Item* item = GetPlayer()->GetItemByPos(INVENTORY_SLOT_BAG_0, eslot);
+    auto item = GetPlayer()->GetItemByPos(INVENTORY_SLOT_BAG_0, eslot);
 
-    if (!item)
+    if (item == nullptr || !item->GetEnchantmentId(TEMP_ENCHANTMENT_SLOT))
+    {
         return;
-
-    if (!item->GetEnchantmentId(TEMP_ENCHANTMENT_SLOT))
-        return;
+    }
 
     GetPlayer()->ApplyEnchantment(item, TEMP_ENCHANTMENT_SLOT, false);
     item->ClearEnchantment(TEMP_ENCHANTMENT_SLOT);
@@ -1626,14 +1640,14 @@ void WorldSession::HandleItemRefundInfoRequest(WorldPacket& recvData)
     ObjectGuid guid;
     recvData >> guid;                                      // item guid
 
-    Item* item = _player->GetItemByGuid(guid);
-    if (!item)
+    auto item = _player->GetItemByGuid(guid);
+    if (item == nullptr)
     {
         LOG_DEBUG("network", "Item refund: item not found!");
         return;
     }
 
-    GetPlayer()->SendRefundInfo(item);
+    GetPlayer()->SendRefundInfo(std::move(item));
 }
 
 void WorldSession::HandleItemRefund(WorldPacket& recvData)
@@ -1642,8 +1656,8 @@ void WorldSession::HandleItemRefund(WorldPacket& recvData)
     ObjectGuid guid;
     recvData >> guid;                                      // item guid
 
-    Item* item = _player->GetItemByGuid(guid);
-    if (!item)
+    auto item = _player->GetItemByGuid(guid);
+    if (item == nullptr)
     {
         LOG_DEBUG("network", "Item refund: item not found!");
         return;
@@ -1653,7 +1667,7 @@ void WorldSession::HandleItemRefund(WorldPacket& recvData)
     if (_player->GetLootGUID() == guid)
         return;
 
-    GetPlayer()->RefundItem(item);
+    GetPlayer()->RefundItem(std::move(item));
 }
 
 /**
@@ -1670,7 +1684,7 @@ void WorldSession::HandleItemTextQuery(WorldPacket& recvData )
 
     WorldPacket data(SMSG_ITEM_TEXT_QUERY_RESPONSE, 50);        // guess size
 
-    if (Item* item = _player->GetItemByGuid(itemGuid))
+    if (const auto item = _player->GetItemByGuid(itemGuid))
     {
         data << uint8(0);                                       // has text
         data << itemGuid;                                       // item guid
@@ -1684,7 +1698,7 @@ void WorldSession::HandleItemTextQuery(WorldPacket& recvData )
     SendPacket(&data);
 }
 
-bool WorldSession::recoveryItem(Item* pItem)
+bool WorldSession::recoveryItem(std::shared_ptr<Item> pItem)
 {
     if (sWorld->getBoolConfig(CONFIG_ITEMDELETE_METHOD)
             && pItem->GetTemplate()->Quality >= sWorld->getIntConfig(CONFIG_ITEMDELETE_QUALITY)

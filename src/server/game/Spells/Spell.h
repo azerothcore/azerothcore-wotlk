@@ -138,9 +138,9 @@ public:
     void RemoveObjectTarget();
 
     ObjectGuid GetItemTargetGUID() const { return m_itemTargetGUID; }
-    Item* GetItemTarget() const { return m_itemTarget; }
+    std::shared_ptr<Item> GetItemTarget() const { return m_itemTarget; }
     uint32 GetItemTargetEntry() const { return m_itemTargetEntry; }
-    void SetItemTarget(Item* item);
+    void SetItemTarget(std::shared_ptr<Item> item);
     void SetTradeItemTarget(Player* caster);
     void UpdateTradeSlotItem();
 
@@ -191,7 +191,7 @@ private:
 
     // objects (can be used at spell creating and after Update at casting)
     WorldObject* m_objectTarget;
-    Item* m_itemTarget;
+    std::shared_ptr<Item> m_itemTarget;
 
     // object GUID/etc, can be used always
     ObjectGuid m_objectTargetGUID;
@@ -517,12 +517,12 @@ public:
     void SendChannelStart(uint32 duration);
     void SendResurrectRequest(Player* target);
 
-    void HandleEffects(Unit* pUnitTarget, Item* pItemTarget, GameObject* pGOTarget, uint32 i, SpellEffectHandleMode mode);
+    void HandleEffects(Unit* pUnitTarget, std::shared_ptr<Item> pItemTarget, GameObject* pGOTarget, uint32 i, SpellEffectHandleMode mode);
     void HandleThreatSpells();
 
     SpellInfo const* const m_spellInfo;
-    Item* m_CastItem;
-    Item* m_weaponItem;
+    std::shared_ptr<Item> m_CastItem;
+    std::shared_ptr<Item> m_weaponItem;
     ObjectGuid m_castItemGUID;
     uint8 m_cast_count;
     uint32 m_glyphIndex;
@@ -653,7 +653,7 @@ public:
 
     // Current targets, to be used in SpellEffects (MUST BE USED ONLY IN SPELL EFFECTS)
     Unit* unitTarget;
-    Item* itemTarget;
+    std::shared_ptr<Item> itemTarget;
     GameObject* gameObjTarget;
     WorldLocation* destTarget;
     int32 damage;
@@ -697,7 +697,7 @@ public:
 
     struct ItemTargetInfo
     {
-        Item*  item;
+        std::shared_ptr<Item> item;
         uint8 effectMask;
     };
     std::list<ItemTargetInfo> m_UniqueItemInfo;
@@ -706,7 +706,7 @@ public:
 
     void AddUnitTarget(Unit* target, uint32 effectMask, bool checkIfValid = true, bool implicit = true);
     void AddGOTarget(GameObject* target, uint32 effectMask);
-    void AddItemTarget(Item* item, uint32 effectMask);
+    void AddItemTarget(std::shared_ptr<Item> item, uint32 effectMask);
     void AddDestTarget(SpellDestination const& dest, uint32 effIndex);
 
     void DoAllEffectOnTarget(TargetInfo* target);

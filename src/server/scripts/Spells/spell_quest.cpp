@@ -807,7 +807,7 @@ class spell_q1846_bending_shinbone : public SpellScript
 
     void HandleScriptEffect(SpellEffIndex /* effIndex */)
     {
-        Item* target = GetHitItem();
+        auto target = GetHitItem();
         Unit* caster = GetCaster();
         if (!target && !caster->IsPlayer())
             return;
@@ -1126,7 +1126,7 @@ class spell_q11730_ultrasonic_screwdriver : public SpellScript
 
     void HandleDummy(SpellEffIndex /*effIndex*/)
     {
-        Item* castItem = GetCastItem();
+        auto castItem = GetCastItem();
         Unit* caster = GetCaster();
         if (Creature* target = GetHitCreature())
         {

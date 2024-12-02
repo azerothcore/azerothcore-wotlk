@@ -199,13 +199,13 @@ public: /* InstanceMapScript */
     InstanceScript* CreateInstanceScript(InstanceMap* map);
 
 public: /* ItemScript */
-    bool OnQuestAccept(Player* player, Item* item, Quest const* quest);
-    bool OnItemUse(Player* player, Item* item, SpellCastTargets const& targets);
+    bool OnQuestAccept(Player* player, std::shared_ptr<Item> item, Quest const* quest);
+    bool OnItemUse(Player* player, std::shared_ptr<Item> item, SpellCastTargets const& targets);
     bool OnItemExpire(Player* player, ItemTemplate const* proto);
-    bool OnItemRemove(Player* player, Item* item);
-    bool OnCastItemCombatSpell(Player* player, Unit* victim, SpellInfo const* spellInfo, Item* item);
-    void OnGossipSelect(Player* player, Item* item, uint32 sender, uint32 action);
-    void OnGossipSelectCode(Player* player, Item* item, uint32 sender, uint32 action, const char* code);
+    bool OnItemRemove(Player* player, std::shared_ptr<Item> item);
+    bool OnCastItemCombatSpell(Player* player, Unit* victim, SpellInfo const* spellInfo, std::shared_ptr<Item> item);
+    void OnGossipSelect(Player* player, std::shared_ptr<Item>item, uint32 sender, uint32 action);
+    void OnGossipSelectCode(Player* player, std::shared_ptr<Item> item, uint32 sender, uint32 action, const char* code);
 
 public: /* CreatureScript */
     bool OnGossipHello(Player* player, Creature* creature);
@@ -352,26 +352,26 @@ public: /* PlayerScript */
     void OnGossipSelect(Player* player, uint32 menu_id, uint32 sender, uint32 action);
     void OnGossipSelectCode(Player* player, uint32 menu_id, uint32 sender, uint32 action, const char* code);
     void OnPlayerBeingCharmed(Player* player, Unit* charmer, uint32 oldFactionId, uint32 newFactionId);
-    void OnAfterPlayerSetVisibleItemSlot(Player* player, uint8 slot, Item* item);
-    void OnAfterPlayerMoveItemFromInventory(Player* player, Item* it, uint8 bag, uint8 slot, bool update);
-    void OnEquip(Player* player, Item* it, uint8 bag, uint8 slot, bool update);
+    void OnAfterPlayerSetVisibleItemSlot(Player* player, uint8 slot, std::shared_ptr<Item> item);
+    void OnAfterPlayerMoveItemFromInventory(Player* player, std::shared_ptr<Item> it, uint8 bag, uint8 slot, bool update);
+    void OnEquip(Player* player, std::shared_ptr<Item> it, uint8 bag, uint8 slot, bool update);
     void OnPlayerJoinBG(Player* player);
     void OnPlayerJoinArena(Player* player);
     void OnGetMaxPersonalArenaRatingRequirement(Player const* player, uint32 minSlot, uint32& maxArenaRating) const;
-    void OnLootItem(Player* player, Item* item, uint32 count, ObjectGuid lootguid);
+    void OnLootItem(Player* player, std::shared_ptr<Item> item, uint32 count, ObjectGuid lootguid);
     void OnBeforeFillQuestLootItem(Player* player, LootItem& item);
-    void OnStoreNewItem(Player* player, Item* item, uint32 count);
-    void OnCreateItem(Player* player, Item* item, uint32 count);
-    void OnQuestRewardItem(Player* player, Item* item, uint32 count);
+    void OnStoreNewItem(Player* player, std::shared_ptr<Item> item, uint32 count);
+    void OnCreateItem(Player* player, std::shared_ptr<Item> item, uint32 count);
+    void OnQuestRewardItem(Player* player, std::shared_ptr<Item> item, uint32 count);
     bool CanPlaceAuctionBid(Player* player, AuctionEntry* auction);
-    void OnGroupRollRewardItem(Player* player, Item* item, uint32 count, RollVote voteType, Roll* roll);
-    bool OnBeforeOpenItem(Player* player, Item* item);
+    void OnGroupRollRewardItem(Player* player, std::shared_ptr<Item> item, uint32 count, RollVote voteType, Roll* roll);
+    bool OnBeforeOpenItem(Player* player, std::shared_ptr<Item> item);
     bool OnBeforePlayerQuestComplete(Player* player, uint32 quest_id);
     void OnQuestComputeXP(Player* player, Quest const* quest, uint32& xpValue);
     void OnBeforePlayerDurabilityRepair(Player* player, ObjectGuid npcGUID, ObjectGuid itemGUID, float& discountMod, uint8 guildBank);
     void OnBeforeBuyItemFromVendor(Player* player, ObjectGuid vendorguid, uint32 vendorslot, uint32& item, uint8 count, uint8 bag, uint8 slot);
     void OnBeforeStoreOrEquipNewItem(Player* player, uint32 vendorslot, uint32& item, uint8 count, uint8 bag, uint8 slot, ItemTemplate const* pProto, Creature* pVendor, VendorItem const* crItem, bool bStore);
-    void OnAfterStoreOrEquipNewItem(Player* player, uint32 vendorslot, Item* item, uint8 count, uint8 bag, uint8 slot, ItemTemplate const* pProto, Creature* pVendor, VendorItem const* crItem, bool bStore);
+    void OnAfterStoreOrEquipNewItem(Player* player, uint32 vendorslot, std::shared_ptr<Item> item, uint8 count, uint8 bag, uint8 slot, ItemTemplate const* pProto, Creature* pVendor, VendorItem const* crItem, bool bStore);
     void OnAfterUpdateMaxPower(Player* player, Powers& power, float& value);
     void OnAfterUpdateMaxHealth(Player* player, float& value);
     void OnBeforeUpdateAttackPowerAndDamage(Player* player, float& level, float& val2, bool ranged);
@@ -391,8 +391,8 @@ public: /* PlayerScript */
     bool CanBattleFieldPort(Player* player, uint8 arenaType, BattlegroundTypeId BGTypeID, uint8 action);
     bool CanGroupInvite(Player* player, std::string& membername);
     bool CanGroupAccept(Player* player, Group* group);
-    bool CanSellItem(Player* player, Item* item, Creature* creature);
-    bool CanSendMail(Player* player, ObjectGuid receiverGuid, ObjectGuid mailbox, std::string& subject, std::string& body, uint32 money, uint32 COD, Item* item);
+    bool CanSellItem(Player* player, std::shared_ptr<Item> item, Creature* creature);
+    bool CanSendMail(Player* player, ObjectGuid receiverGuid, ObjectGuid mailbox, std::string& subject, std::string& body, uint32 money, uint32 COD, std::shared_ptr<Item> item);
     void PetitionBuy(Player* player, Creature* creature, uint32& charterid, uint32& cost, uint32& type);
     void PetitionShowList(Player* player, Creature* creature, uint32& CharterEntry, uint32& CharterDispayID, uint32& CharterCost);
     void OnRewardKillRewarder(Player* player, KillRewarder* rewarder, bool isDungeon, float& rate);
@@ -411,24 +411,24 @@ public: /* PlayerScript */
     void OnCustomScalingStatValueBefore(Player* player, ItemTemplate const* proto, uint8 slot, bool apply, uint32& CustomScalingStatValue);
     void OnCustomScalingStatValue(Player* player, ItemTemplate const* proto, uint32& statType, int32& val, uint8 itemProtoStatNumber, uint32 ScalingStatValue, ScalingStatValuesEntry const* ssv);
     void OnApplyItemModsBefore(Player* player, uint8 slot, bool apply, uint8 itemProtoStatNumber, uint32 statType, int32& val);
-    void OnApplyEnchantmentItemModsBefore(Player* player, Item* item, EnchantmentSlot slot, bool apply, uint32 enchant_spell_id, uint32& enchant_amount);
+    void OnApplyEnchantmentItemModsBefore(Player* player, std::shared_ptr<Item> item, EnchantmentSlot slot, bool apply, uint32 enchant_spell_id, uint32& enchant_amount);
     void OnApplyWeaponDamage(Player* player, uint8 slot, ItemTemplate const* proto, float& minDamage, float& maxDamage, uint8 damageIndex);
     bool CanArmorDamageModifier(Player* player);
     void OnGetFeralApBonus(Player* player, int32& feral_bonus, int32 dpsMod, ItemTemplate const* proto, ScalingStatValuesEntry const* ssv);
-    bool CanApplyWeaponDependentAuraDamageMod(Player* player, Item* item, WeaponAttackType attackType, AuraEffect const* aura, bool apply);
-    bool CanApplyEquipSpell(Player* player, SpellInfo const* spellInfo, Item* item, bool apply, bool form_change);
+    bool CanApplyWeaponDependentAuraDamageMod(Player* player, std::shared_ptr<Item> item, WeaponAttackType attackType, AuraEffect const* aura, bool apply);
+    bool CanApplyEquipSpell(Player* player, SpellInfo const* spellInfo, std::shared_ptr<Item> item, bool apply, bool form_change);
     bool CanApplyEquipSpellsItemSet(Player* player, ItemSetEffect* eff);
-    bool CanCastItemCombatSpell(Player* player, Unit* target, WeaponAttackType attType, uint32 procVictim, uint32 procEx, Item* item, ItemTemplate const* proto);
-    bool CanCastItemUseSpell(Player* player, Item* item, SpellCastTargets const& targets, uint8 cast_count, uint32 glyphIndex);
+    bool CanCastItemCombatSpell(Player* player, Unit* target, WeaponAttackType attType, uint32 procVictim, uint32 procEx, std::shared_ptr<Item> item, ItemTemplate const* proto);
+    bool CanCastItemUseSpell(Player* player, std::shared_ptr<Item> item, SpellCastTargets const& targets, uint8 cast_count, uint32 glyphIndex);
     void OnApplyAmmoBonuses(Player* player, ItemTemplate const* proto, float& currentAmmoDPS);
-    bool CanEquipItem(Player* player, uint8 slot, uint16& dest, Item* pItem, bool swap, bool not_loading);
+    bool CanEquipItem(Player* player, uint8 slot, uint16& dest, std::shared_ptr<Item> pItem, bool swap, bool not_loading);
     bool CanUnequipItem(Player* player, uint16 pos, bool swap);
     bool CanUseItem(Player* player, ItemTemplate const* proto, InventoryResult& result);
-    bool CanSaveEquipNewItem(Player* player, Item* item, uint16 pos, bool update);
-    bool CanApplyEnchantment(Player* player, Item* item, EnchantmentSlot slot, bool apply, bool apply_dur, bool ignore_condition);
+    bool CanSaveEquipNewItem(Player* player, std::shared_ptr<Item> item, uint16 pos, bool update);
+    bool CanApplyEnchantment(Player* player, std::shared_ptr<Item> item, EnchantmentSlot slot, bool apply, bool apply_dur, bool ignore_condition);
     void OnGetQuestRate(Player* player, float& result);
     bool PassedQuestKilledMonsterCredit(Player* player, Quest const* qinfo, uint32 entry, uint32 real_entry, ObjectGuid guid);
-    bool CheckItemInSlotAtLoadInventory(Player* player, Item* item, uint8 slot, uint8& err, uint16& dest);
+    bool CheckItemInSlotAtLoadInventory(Player* player, std::shared_ptr<Item> item, uint8 slot, uint8& err, uint16& dest);
     bool NotAvoidSatisfy(Player* player, DungeonProgressionRequirements const* ar, uint32 target_map, bool report);
     bool NotVisibleGloballyFor(Player* player, Player const* u);
     void OnGetArenaPersonalRating(Player* player, uint8 slot, uint32& result);
@@ -441,7 +441,7 @@ public: /* PlayerScript */
     bool CanJoinLfg(Player* player, uint8 roles, lfg::LfgDungeonSet& dungeons, const std::string& comment);
     bool CanEnterMap(Player* player, MapEntry const* entry, InstanceTemplate const* instance, MapDifficulty const* mapDiff, bool loginCheck);
     bool CanInitTrade(Player* player, Player* target);
-    bool CanSetTradeItem(Player* player, Item* tradedItem, uint8 tradeSlot);
+    bool CanSetTradeItem(Player* player, std::shared_ptr<Item> tradedItem, uint8 tradeSlot);
     void OnSetServerSideVisibility(Player* player, ServerSideVisibilityType& type, AccountTypes& sec);
     void OnSetServerSideVisibilityDetect(Player* player, ServerSideVisibilityType& type, AccountTypes& sec);
     void OnPlayerResurrect(Player* player, float restore_percent, bool applySickness);
@@ -489,7 +489,7 @@ public: /* GuildScript */
     void OnGuildDisband(Guild* guild);
     void OnGuildMemberWitdrawMoney(Guild* guild, Player* player, uint32& amount, bool isRepair);
     void OnGuildMemberDepositMoney(Guild* guild, Player* player, uint32& amount);
-    void OnGuildItemMove(Guild* guild, Player* player, Item* pItem, bool isSrcBank, uint8 srcContainer, uint8 srcSlotId,
+    void OnGuildItemMove(Guild* guild, Player* player, std::shared_ptr<Item> pItem, bool isSrcBank, uint8 srcContainer, uint8 srcSlotId,
                          bool isDestBank, uint8 destContainer, uint8 destSlotId);
     void OnGuildEvent(Guild* guild, uint8 eventType, ObjectGuid::LowType playerGuid1, ObjectGuid::LowType playerGuid2, uint8 newRank);
     void OnGuildBankEvent(Guild* guild, uint8 eventType, uint8 tabId, ObjectGuid::LowType playerGuid, uint32 itemOrMoney, uint16 itemStackCount, uint8 destTabId);
@@ -614,7 +614,7 @@ public: /* SpellSC */
     void OnBeforeAuraRankForLevel(SpellInfo const* spellInfo, SpellInfo const* latestSpellInfo, uint8 level);
     void OnDummyEffect(WorldObject* caster, uint32 spellID, SpellEffIndex effIndex, GameObject* gameObjTarget);
     void OnDummyEffect(WorldObject* caster, uint32 spellID, SpellEffIndex effIndex, Creature* creatureTarget);
-    void OnDummyEffect(WorldObject* caster, uint32 spellID, SpellEffIndex effIndex, Item* itemTarget);
+    void OnDummyEffect(WorldObject* caster, uint32 spellID, SpellEffIndex effIndex, std::shared_ptr<Item> itemTarget);
 
 public: /* GameEventScript */
     void OnGameEventStart(uint16 EventID);
@@ -658,9 +658,9 @@ public: /* MiscScript */
     void OnDestructGroup(Group* origin);
     void OnConstructInstanceSave(InstanceSave* origin);
     void OnDestructInstanceSave(InstanceSave* origin);
-    void OnItemCreate(Item* item, ItemTemplate const* itemProto, Player const* owner);
-    bool CanApplySoulboundFlag(Item* item, ItemTemplate const* proto);
-    bool CanItemApplyEquipSpell(Player* player, Item* item);
+    void OnItemCreate(std::shared_ptr<Item> item, ItemTemplate const* itemProto, Player const* owner);
+    bool CanApplySoulboundFlag(std::shared_ptr<Item> item, ItemTemplate const* proto);
+    bool CanItemApplyEquipSpell(Player* player, std::shared_ptr<Item> item);
     bool CanSendAuctionHello(WorldSession const* session, ObjectGuid guid, Creature* creature);
     void ValidateSpellAtCastSpell(Player* player, uint32& oldSpellId, uint32& spellId, uint8& castCount, uint8& castFlags);
     void OnPlayerSetPhase(const AuraEffect* auraEff, AuraApplication const* aurApp, uint8 mode, bool apply, uint32& newPhase);

@@ -1749,10 +1749,10 @@ void Spell::DoCreateItem(uint8 /*effIndex*/, uint32 itemId)
     if (addNumber)
     {
         // create the new item and store it
-        Item* pItem = player->StoreNewItem(dest, newitemid, true);
+        auto pItem = player->StoreNewItem(dest, newitemid, true);
 
         // was it successful? return error if not
-        if (!pItem)
+        if (pItem == nullptr)
         {
             player->SendEquipError(EQUIP_ERR_ITEM_NOT_FOUND, nullptr, nullptr);
             return;
@@ -1760,7 +1760,9 @@ void Spell::DoCreateItem(uint8 /*effIndex*/, uint32 itemId)
 
         // set the "Crafted by ..." property of the item
         if (pItem->GetTemplate()->HasSignature())
+        {
             pItem->SetGuidValue(ITEM_FIELD_CREATOR, player->GetGUID());
+        }
 
         // send info to the client
         player->SendNewItem(pItem, addNumber, true, SelfCast);
@@ -2192,7 +2194,7 @@ void Spell::EffectOpenLock(SpellEffIndex effIndex)
             }
         }
     }
-    ExecuteLogEffectOpenLock(effIndex, gameObjTarget ? (Object*)gameObjTarget : (Object*)itemTarget);
+    ExecuteLogEffectOpenLock(effIndex, gameObjTarget ? (Object*)gameObjTarget : (Object*)itemTarget.get());
 }
 
 void Spell::EffectSummonChangeItem(SpellEffIndex effIndex)
@@ -2219,9 +2221,11 @@ void Spell::EffectSummonChangeItem(SpellEffIndex effIndex)
 
     uint16 pos = m_CastItem->GetPos();
 
-    Item* pNewItem = Item::CreateItem(newitemid, 1, player);
-    if (!pNewItem)
+    auto pNewItem = Item::CreateItem(newitemid, 1, player);
+    if (pNewItem == nullptr)
+    {
         return;
+    }
 
     // Client-side enchantment durations update
     player->UpdateEnchantmentDurations();
@@ -2299,9 +2303,6 @@ void Spell::EffectSummonChangeItem(SpellEffIndex effIndex)
             return;
         }
     }
-
-    // fail
-    delete pNewItem;
 }
 
 void Spell::EffectProficiency(SpellEffIndex /*effIndex*/)
@@ -3004,13 +3005,13 @@ void Spell::EffectEnchantItemTmp(SpellEffIndex effIndex)
 
         for (int j = BASE_ATTACK; j <= OFF_ATTACK; ++j)
         {
-            if (Item* item = p_caster->GetWeaponForAttack(WeaponAttackType(j)))
+            if (auto item = p_caster->GetWeaponForAttack(WeaponAttackType(j)))
             {
                 if (item->IsFitToSpellRequirements(m_spellInfo))
                 {
                     Spell* spell = new Spell(m_caster, spellInfo, TRIGGERED_FULL_MASK);
                     SpellCastTargets targets;
-                    targets.SetItemTarget(item);
+                    targets.SetItemTarget(std::move(item));
                     spell->prepare(&targets);
                 }
             }
@@ -3390,9 +3391,13 @@ void Spell::EffectWeaponDmg(SpellEffIndex effIndex)
                     }
                     // 50% more damage with daggers
                     if (m_caster->IsPlayer())
-                        if (Item* item = m_caster->ToPlayer()->GetWeaponForAttack(m_attackType, true))
-                            if (item->GetTemplate()->SubClass == ITEM_SUBCLASS_WEAPON_DAGGER)
-                                AddPct(totalDamagePercentMod, 50.0f);
+                    {
+                        auto item = m_caster->ToPlayer()->GetWeaponForAttack(m_attackType, true);
+                        if (item != nullptr && item->GetTemplate()->SubClass == ITEM_SUBCLASS_WEAPON_DAGGER)
+                        {
+                            AddPct(totalDamagePercentMod, 50.0f);
+                        }
+                    }
                 }
                 // Mutilate (for each hand)
                 else if (m_spellInfo->SpellFamilyFlags[1] & 0x6)
@@ -4210,7 +4215,7 @@ void Spell::EffectStuck(SpellEffIndex /*effIndex*/)
     }
 
     // xinef: no hearthstone in bag or on cooldown
-    Item* hearthStone = target->GetItemByEntry(6948);
+    auto hearthStone = target->GetItemByEntry(6948);
     if (!hearthStone || target->HasSpellCooldown(8690))
     {
         float o = rand_norm() * 2 * M_PI;
@@ -4433,13 +4438,17 @@ void Spell::EffectEnchantHeldItem(SpellEffIndex effIndex)
         return;
     }
 
-    Item* item = item_owner->GetItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_MAINHAND);
-    if (!item)
+    auto item = item_owner->GetItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_MAINHAND);
+    if (item == nullptr)
+    {
         return;
+    }
 
     // must be equipped
     if (!item->IsEquipped())
+    {
         return;
+    }
 
     if (m_spellInfo->Effects[effIndex].MiscValue)
     {
@@ -4533,9 +4542,11 @@ void Spell::EffectFeedPet(SpellEffIndex effIndex)
     if (!player)
         return;
 
-    Item* foodItem = itemTarget;
-    if (!foodItem)
+    auto foodItem = itemTarget;
+    if (foodItem == nullptr)
+    {
         return;
+    }
 
     Pet* pet = player->GetPet();
     if (!pet)
@@ -5311,7 +5322,7 @@ void Spell::EffectDurabilityDamage(SpellEffIndex effIndex)
     if (slot >= INVENTORY_SLOT_BAG_END)
         return;
 
-    if (Item* item = player->GetItemByPos(INVENTORY_SLOT_BAG_0, slot))
+    if (auto item = player->GetItemByPos(INVENTORY_SLOT_BAG_0, slot))
     {
         player->DurabilityPointsLoss(item, damage);
         ExecuteLogEffectDurabilityDamage(effIndex, unitTarget, item->GetEntry(), slot);
@@ -5349,8 +5360,10 @@ void Spell::EffectDurabilityDamagePCT(SpellEffIndex effIndex)
     if (damage <= 0)
         return;
 
-    if (Item* item = player->GetItemByPos(INVENTORY_SLOT_BAG_0, slot))
-        player->DurabilityLoss(item, float(damage) / 100.0f);
+    if (auto item = player->GetItemByPos(INVENTORY_SLOT_BAG_0, slot))
+    {
+        player->DurabilityLoss(std::move(item), float(damage) / 100.0f);
+    }
 }
 
 void Spell::EffectModifyThreatPercent(SpellEffIndex /*effIndex*/)
@@ -6270,10 +6283,13 @@ void Spell::EffectRechargeManaGem(SpellEffIndex /*effIndex*/)
         return;
     }
 
-    if (Item* pItem = player->GetItemByEntry(item_id))
+    if (auto pItem = player->GetItemByEntry(item_id))
     {
-        for (int x = 0; x < MAX_ITEM_PROTO_SPELLS; ++x)
+        for (uint8 x = 0; x < MAX_ITEM_PROTO_SPELLS; ++x)
+        {
             pItem->SetSpellCharges(x, pProto->Spells[x].SpellCharges);
+        }
+
         pItem->SetState(ITEM_CHANGED, player);
     }
 }

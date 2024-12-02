@@ -459,7 +459,7 @@ int32 AuraEffect::CalculateAmount(Unit* caster)
     if (!amount && caster)
         if (ObjectGuid itemGUID = GetBase()->GetCastItemGUID())
             if (Player* playerCaster = caster->ToPlayer())
-                if (Item* castItem = playerCaster->GetItemByGuid(itemGUID))
+                if (auto castItem = playerCaster->GetItemByGuid(itemGUID))
                     if (castItem->GetItemSuffixFactor())
                     {
                         ItemRandomSuffixEntry const* item_rand_suffix = sItemRandomSuffixStore.LookupEntry(std::abs(castItem->GetItemRandomPropertyId()));
@@ -531,13 +531,15 @@ int32 AuraEffect::CalculateAmount(Unit* caster)
                 break;
             if (GetId() == 49152 && caster->ToPlayer())
             {
-                Item* item1 = caster->ToPlayer()->GetWeaponForAttack(BASE_ATTACK);
-                Item* item2 = caster->ToPlayer()->GetWeaponForAttack(OFF_ATTACK);
+                auto item1 = caster->ToPlayer()->GetWeaponForAttack(BASE_ATTACK);
+                auto item2 = caster->ToPlayer()->GetWeaponForAttack(OFF_ATTACK);
 
-                if (!item2)
+                if (item2 == nullptr)
+                {
                     item2 = caster->ToPlayer()->GetShield();
+                }
 
-                if (item1 && item2
+                if (item1 != nullptr && item2 != nullptr
                     && (item1->GetTemplate()->InventoryType == INVTYPE_2HWEAPON || item2->GetTemplate()->InventoryType == INVTYPE_2HWEAPON))
                 {
                     amount = -10;
@@ -2123,7 +2125,7 @@ void AuraEffect::HandleAuraModShapeshift(AuraApplication const* aurApp, uint8 mo
         // and also HandleAuraModDisarm is not triggered
         if (!target->CanUseAttackType(BASE_ATTACK))
         {
-            if (Item* pItem = target->ToPlayer()->GetItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_MAINHAND))
+            if (auto pItem = target->ToPlayer()->GetItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_MAINHAND))
             {
                 target->ToPlayer()->_ApplyWeaponDamage(EQUIPMENT_SLOT_MAINHAND, pItem->GetTemplate(), nullptr, apply);
             }
@@ -2998,14 +3000,14 @@ void AuraEffect::HandleAuraModDisarm(AuraApplication const* aurApp, uint8 mode, 
     // Handle damage modification, shapeshifted druids are not affected
     if (target->IsPlayer() && (!target->IsInFeralForm() || target->GetShapeshiftForm() == FORM_GHOSTWOLF))
     {
-        if (Item* pItem = target->ToPlayer()->GetItemByPos(INVENTORY_SLOT_BAG_0, slot))
+        if (auto pItem = target->ToPlayer()->GetItemByPos(INVENTORY_SLOT_BAG_0, slot))
         {
             uint8 attacktype = Player::GetAttackBySlot(slot);
 
             if (attacktype < MAX_ATTACK)
             {
                 target->ToPlayer()->_ApplyWeaponDamage(slot, pItem->GetTemplate(), nullptr, !apply);
-                target->ToPlayer()->_ApplyWeaponDependentAuraMods(pItem, WeaponAttackType(attacktype), !apply);
+                target->ToPlayer()->_ApplyWeaponDependentAuraMods(std::move(pItem), WeaponAttackType(attacktype), !apply);
             }
         }
     }
@@ -4870,9 +4872,13 @@ void AuraEffect::HandleAuraModWeaponCritPercent(AuraApplication const* aurApp, u
     if (!target->IsPlayer())
         return;
 
-    for (int i = 0; i < MAX_ATTACK; ++i)
-        if (Item* pItem = target->ToPlayer()->GetWeaponForAttack(WeaponAttackType(i), true))
+    for (uint8 i = 0; i < MAX_ATTACK; ++i)
+    {
+        if (auto pItem = target->ToPlayer()->GetWeaponForAttack(WeaponAttackType(i), true))
+        {
             target->ToPlayer()->_ApplyWeaponDependentAuraCritMod(pItem, WeaponAttackType(i), this, apply);
+        }
+    }
 
     // mods must be applied base at equipped weapon class and subclass comparison
     // with spell->EquippedItemClass and  EquippedItemSubClassMask and EquippedItemInventoryTypeMask
@@ -5190,9 +5196,13 @@ void AuraEffect::HandleModDamageDone(AuraApplication const* aurApp, uint8 mode, 
     // apply item specific bonuses for already equipped weapon
     if (target->IsPlayer())
     {
-        for (int i = 0; i < MAX_ATTACK; ++i)
-            if (Item* pItem = target->ToPlayer()->GetWeaponForAttack(WeaponAttackType(i), true))
+        for (uint8 i = 0; i < MAX_ATTACK; ++i)
+        {
+            if (auto pItem = target->ToPlayer()->GetWeaponForAttack(WeaponAttackType(i), true))
+            {
                 target->ToPlayer()->_ApplyWeaponDependentAuraDamageMod(pItem, WeaponAttackType(i), this, apply);
+            }
+        }
     }
 
     // GetMiscValue() is bitmask of spell schools
@@ -5279,9 +5289,13 @@ void AuraEffect::HandleModDamagePercentDone(AuraApplication const* aurApp, uint8
 
     if (target->IsPlayer())
     {
-        for (int i = 0; i < MAX_ATTACK; ++i)
-            if (Item* item = target->ToPlayer()->GetWeaponForAttack(WeaponAttackType(i), false))
+        for (uint8 i = 0; i < MAX_ATTACK; ++i)
+        {
+            if (auto item = target->ToPlayer()->GetWeaponForAttack(WeaponAttackType(i), false))
+            {
                 target->ToPlayer()->_ApplyWeaponDependentAuraDamageMod(item, WeaponAttackType(i), this, apply);
+            }
+        }
     }
 
     if ((GetMiscValue() & SPELL_SCHOOL_MASK_NORMAL) && (GetSpellInfo()->EquippedItemClass == -1 || !target->IsPlayer()))
@@ -5891,13 +5905,14 @@ void AuraEffect::HandleChannelDeathItem(AuraApplication const* aurApp, uint8 mod
             return;
     }
 
-    Item* newitem = plCaster->StoreNewItem(dest, GetSpellInfo()->Effects[m_effIndex].ItemType, true);
-    if (!newitem)
+    auto newitem = plCaster->StoreNewItem(dest, GetSpellInfo()->Effects[m_effIndex].ItemType, true);
+    if (newitem == nullptr)
     {
         plCaster->SendEquipError(EQUIP_ERR_ITEM_NOT_FOUND, nullptr, nullptr);
         return;
     }
-    plCaster->SendNewItem(newitem, count, true, true);
+
+    plCaster->SendNewItem(std::move(newitem), count, true, true);
 }
 
 void AuraEffect::HandleBindSight(AuraApplication const* aurApp, uint8 mode, bool apply) const

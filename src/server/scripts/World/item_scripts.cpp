@@ -36,7 +36,7 @@ class item_only_for_flight : public ItemScript
 public:
     item_only_for_flight() : ItemScript("item_only_for_flight") { }
 
-    bool OnUse(Player* player, Item* item, SpellCastTargets const& /*targets*/) override
+    bool OnUse(Player* player, std::shared_ptr<Item> item, SpellCastTargets const& /*targets*/) override
     {
         uint32 itemId = item->GetEntry();
         bool disabled = false;
@@ -77,7 +77,7 @@ class item_incendiary_explosives : public ItemScript
 public:
     item_incendiary_explosives() : ItemScript("item_incendiary_explosives") { }
 
-    bool OnUse(Player* player, Item* item, SpellCastTargets const& /*targets*/) override
+    bool OnUse(Player* player, std::shared_ptr<Item> item, SpellCastTargets const& /*targets*/) override
     {
         if (player->FindNearestCreature(26248, 15) || player->FindNearestCreature(26249, 15))
             return false;
@@ -145,7 +145,7 @@ class item_petrov_cluster_bombs : public ItemScript
 public:
     item_petrov_cluster_bombs() : ItemScript("item_petrov_cluster_bombs") { }
 
-    bool OnUse(Player* player, Item* item, const SpellCastTargets& /*targets*/) override
+    bool OnUse(Player* player, std::shared_ptr<Item> item, const SpellCastTargets& /*targets*/) override
     {
         if (player->GetZoneId() != ZONE_ID_HOWLING)
             return false;
@@ -175,7 +175,7 @@ class item_captured_frog : public ItemScript
 public:
     item_captured_frog() : ItemScript("item_captured_frog") { }
 
-    bool OnUse(Player* player, Item* item, SpellCastTargets const& /*targets*/) override
+    bool OnUse(Player* player, std::shared_ptr<Item> item, SpellCastTargets const& /*targets*/) override
     {
         if (player->GetQuestStatus(QUEST_THE_PERFECT_SPIES) == QUEST_STATUS_INCOMPLETE)
         {
@@ -197,7 +197,7 @@ class item_generic_limit_chance_above_60 : public ItemScript
 public:
     item_generic_limit_chance_above_60() : ItemScript("item_generic_limit_chance_above_60") { }
 
-    bool OnCastItemCombatSpell(Player* /*player*/, Unit* victim, SpellInfo const* /*spellInfo*/, Item* /*item*/) override
+    bool OnCastItemCombatSpell(Player* /*player*/, Unit* victim, SpellInfo const* /*spellInfo*/, std::shared_ptr<Item> /*item*/) override
     {
         // spell proc chance gets severely reduced on victims > 60 (formula unknown)
         if (victim->GetLevel() > 60)

@@ -178,20 +178,17 @@ private:
     ~AuctionHouseMgr();
 
 public:
-    typedef std::unordered_map<ObjectGuid, Item*> ItemMap;
+    typedef std::unordered_map<ObjectGuid, std::shared_ptr<Item>> ItemMap;
 
     static AuctionHouseMgr* instance();
 
     AuctionHouseObject* GetAuctionsMap(uint32 factionTemplateId);
     AuctionHouseObject* GetAuctionsMapByHouseId(uint8 auctionHouseId);
 
-    Item* GetAItem(ObjectGuid itemGuid)
+    std::shared_ptr<Item> GetAItem(ObjectGuid itemGuid)
     {
-        ItemMap::const_iterator itr = _mAitems.find(itemGuid);
-        if (itr != _mAitems.end())
-            return itr->second;
-
-        return nullptr;
+        const auto itr = _mAitems.find(itemGuid);
+        return itr != _mAitems.end() ? itr->second : nullptr;
     }
 
     //auction messages
@@ -202,7 +199,7 @@ public:
     void SendAuctionOutbiddedMail(AuctionEntry* auction, uint32 newPrice, Player* newBidder, CharacterDatabaseTransaction trans, bool sendNotification = true, bool sendMail = true);
     void SendAuctionCancelledToBidderMail(AuctionEntry* auction, CharacterDatabaseTransaction trans, bool sendMail = true);
 
-    static uint32 GetAuctionDeposit(AuctionHouseEntry const* entry, uint32 time, Item* pItem, uint32 count);
+    static uint32 GetAuctionDeposit(AuctionHouseEntry const* entry, uint32 time, std::shared_ptr<Item> pItem, uint32 count);
     static AuctionHouseEntry const* GetAuctionHouseEntry(uint32 factionTemplateId);
     static AuctionHouseEntry const* GetAuctionHouseEntryFromHouse(uint8 houseId);
 
@@ -211,7 +208,7 @@ public:
     void LoadAuctionItems();
     void LoadAuctions();
 
-    void AddAItem(Item* it);
+    void AddAItem(std::shared_ptr<Item> it);
     bool RemoveAItem(ObjectGuid itemGuid, bool deleteFromDB = false, CharacterDatabaseTransaction* trans = nullptr);
 
     void Update();

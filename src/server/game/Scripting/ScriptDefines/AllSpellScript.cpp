@@ -79,7 +79,7 @@ void ScriptMgr::OnDummyEffect(WorldObject* caster, uint32 spellID, SpellEffIndex
     CALL_ENABLED_HOOKS(AllSpellScript, ALLSPELLHOOK_ON_DUMMY_EFFECT_CREATURE, script->OnDummyEffect(caster, spellID, effIndex, creatureTarget));
 }
 
-void ScriptMgr::OnDummyEffect(WorldObject* caster, uint32 spellID, SpellEffIndex effIndex, Item* itemTarget)
+void ScriptMgr::OnDummyEffect(WorldObject* caster, uint32 spellID, SpellEffIndex effIndex, std::shared_ptr<Item> itemTarget)
 {
     CALL_ENABLED_HOOKS(AllSpellScript, ALLSPELLHOOK_ON_DUMMY_EFFECT_ITEM, script->OnDummyEffect(caster, spellID, effIndex, itemTarget));
 }

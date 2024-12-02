@@ -29,7 +29,7 @@
 #include "Tokenize.h"
 #include "WorldPacket.h"
 
-void AddItemsSetItem(Player* player, Item* item)
+void AddItemsSetItem(Player* player, std::shared_ptr<Item> item)
 {
     ItemTemplate const* proto = item->GetTemplate();
     uint32 setid = proto->ItemSet;
@@ -302,7 +302,7 @@ bool Item::Create(ObjectGuid::LowType guidlow, uint32 itemid, Player const* owne
 
     SetUInt32Value(ITEM_FIELD_DURATION, itemProto->Duration);
     SetUInt32Value(ITEM_FIELD_CREATE_PLAYED_TIME, 0);
-    sScriptMgr->OnItemCreate(this, itemProto, owner);
+    sScriptMgr->OnItemCreate(shared_from_this(), itemProto, owner);
     return true;
 }
 
@@ -310,7 +310,7 @@ bool Item::Create(ObjectGuid::LowType guidlow, uint32 itemid, Player const* owne
 // Returns false if Item is not a bag OR it is an empty bag.
 bool Item::IsNotEmptyBag() const
 {
-    if (Bag const* bag = ToBag())
+    if (const auto bag = ToBag())
         return !bag->IsEmpty();
     return false;
 }
@@ -403,7 +403,6 @@ void Item::SaveToDB(CharacterDatabaseTransaction trans)
                 if (!isInTransaction)
                     CharacterDatabase.CommitTransaction(trans);
 
-                delete this;
                 return;
             }
         case ITEM_UNCHANGED:
@@ -416,7 +415,7 @@ void Item::SaveToDB(CharacterDatabaseTransaction trans)
         CharacterDatabase.CommitTransaction(trans);
 }
 
-bool Item::LoadFromDB(ObjectGuid::LowType guid, ObjectGuid owner_guid, Field* fields, uint32 entry)
+bool Item::LoadFromDB(ObjectGuid::LowType guid, ObjectGuid owner_guid, const Field* fields, uint32 entry)
 {
     //                                                    0                1      2         3        4      5             6                 7           8           9    10
     //result = CharacterDatabase.Query("SELECT creatorGuid, giftCreatorGuid, count, duration, charges, flags, enchantments, randomPropertyId, durability, playedTime, text FROM item_instance WHERE guid = '{}'", guid);
@@ -468,7 +467,7 @@ bool Item::LoadFromDB(ObjectGuid::LowType guid, ObjectGuid owner_guid, Field* fi
 
     SetUInt32Value(ITEM_FIELD_FLAGS, fields[5].Get<uint32>());
     // Remove bind flag for items vs NO_BIND set
-    if (IsSoulBound() && proto->Bonding == NO_BIND && sScriptMgr->CanApplySoulboundFlag(this, proto))
+    if (IsSoulBound() && proto->Bonding == NO_BIND && sScriptMgr->CanApplySoulboundFlag(shared_from_this(), proto))
     {
         ApplyModFlag(ITEM_FIELD_FLAGS, ITEM_FIELD_FLAG_SOULBOUND, false);
         need_save = true;
@@ -721,7 +720,6 @@ void Item::SetState(ItemUpdateState state, Player* forplayer)
             RemoveFromUpdateQueueOf(forplayer);
             forplayer->DeleteRefundReference(GetGUID());
         }
-        delete this;
         return;
     }
     if (state != ITEM_UNCHANGED)
@@ -757,7 +755,7 @@ void Item::AddToUpdateQueueOf(Player* player)
     if (player->m_itemUpdateQueueBlocked)
         return;
 
-    player->m_itemUpdateQueue.push_back(this);
+    player->m_itemUpdateQueue.push_back(shared_from_this());
     uQueuePos = player->m_itemUpdateQueue.size() - 1;
 }
 
@@ -1084,43 +1082,46 @@ void Item::SendTimeUpdate(Player* owner)
     owner->GetSession()->SendPacket(&data);
 }
 
-Item* Item::CreateItem(uint32 item, uint32 count, Player const* player, bool clone, uint32 randomPropertyId)
+std::shared_ptr<Item> Item::CreateItem(uint32 item, uint32 count, Player const* player /*= nullptr*/, bool clone /*= false*/, uint32 randomPropertyId /*= 0*/)
 {
     if (count < 1)
+    {
         return nullptr;                                        //don't create item at zero count
+    }
 
     ItemTemplate const* pProto = sObjectMgr->GetItemTemplate(item);
-    if (pProto)
+    if (pProto == nullptr)
     {
-        if (count > pProto->GetMaxStackSize())
-            count = pProto->GetMaxStackSize();
-
-        ASSERT_NODEBUGINFO(count != 0 && "pProto->Stackable == 0 but checked at loading already");
-
-        Item* pItem = NewItemOrBag(pProto);
-        if (pItem->Create(sObjectMgr->GetGenerator<HighGuid::Item>().Generate(), item, player))
-        {
-            pItem->SetCount(count);
-            if (!clone)
-                pItem->SetItemRandomProperties(randomPropertyId ? randomPropertyId : Item::GenerateItemRandomPropertyId(item));
-            else if (randomPropertyId)
-                pItem->SetItemRandomProperties(randomPropertyId);
-            return pItem;
-        }
-        else
-            delete pItem;
-    }
-    else
         ABORT();
+    }
+
+    if (count > pProto->GetMaxStackSize())
+        count = pProto->GetMaxStackSize();
+
+    ASSERT_NODEBUGINFO(count != 0 && "pProto->Stackable == 0 but checked at loading already");
+
+    auto pItem = NewItemOrBag(pProto);
+    if (pItem->Create(sObjectMgr->GetGenerator<HighGuid::Item>().Generate(), item, player))
+    {
+        pItem->SetCount(count);
+        if (!clone)
+            pItem->SetItemRandomProperties(randomPropertyId ? randomPropertyId : Item::GenerateItemRandomPropertyId(item));
+        else if (randomPropertyId)
+            pItem->SetItemRandomProperties(randomPropertyId);
+        return pItem;
+    }
+
     return nullptr;
 }
 
-Item* Item::CloneItem(uint32 count, Player const* player) const
+std::shared_ptr<Item> Item::CloneItem(uint32 count, Player const* player) const
 {
     // player CAN be nullptr in which case we must not update random properties because that accesses player's item update queue
-    Item* newItem = CreateItem(GetEntry(), count, player, true, player ? GetItemRandomPropertyId() : 0);
-    if (!newItem)
+    auto newItem = CreateItem(GetEntry(), count, player, true, player ? GetItemRandomPropertyId() : 0);
+    if (newItem == nullptr)
+    {
         return nullptr;
+    }
 
     newItem->SetUInt32Value(ITEM_FIELD_CREATOR,      GetUInt32Value(ITEM_FIELD_CREATOR));
     newItem->SetUInt32Value(ITEM_FIELD_GIFTCREATOR,  GetUInt32Value(ITEM_FIELD_GIFTCREATOR));

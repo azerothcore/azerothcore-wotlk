@@ -69,11 +69,11 @@ public:
 
     virtual void OnDestructInstanceSave(InstanceSave* /*origin*/) { }
 
-    virtual void OnItemCreate(Item* /*item*/, ItemTemplate const* /*itemProto*/, Player const* /*owner*/) { }
+    virtual void OnItemCreate(std::shared_ptr<Item> /*item*/, ItemTemplate const* /*itemProto*/, Player const* /*owner*/) { }
 
-    [[nodiscard]] virtual bool CanApplySoulboundFlag(Item* /*item*/, ItemTemplate const* /*proto*/) { return true; }
+    [[nodiscard]] virtual bool CanApplySoulboundFlag(std::shared_ptr<Item> /*item*/, ItemTemplate const* /*proto*/) { return true; }
 
-    [[nodiscard]] virtual bool CanItemApplyEquipSpell(Player* /*player*/, Item* /*item*/) { return true; }
+    [[nodiscard]] virtual bool CanItemApplyEquipSpell(Player* /*player*/, std::shared_ptr<Item> /*item*/) { return true; }
 
     [[nodiscard]] virtual bool CanSendAuctionHello(WorldSession const* /*session*/, ObjectGuid /*guid*/, Creature* /*creature*/) { return true; }
 

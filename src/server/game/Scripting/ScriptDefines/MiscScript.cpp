@@ -59,17 +59,17 @@ void ScriptMgr::OnDestructInstanceSave(InstanceSave* origin)
     CALL_ENABLED_HOOKS(MiscScript, MISCHOOK_ON_DESTRUCT_INSTANCE_SAVE, script->OnDestructInstanceSave(origin));
 }
 
-void ScriptMgr::OnItemCreate(Item* item, ItemTemplate const* itemProto, Player const* owner)
+void ScriptMgr::OnItemCreate(std::shared_ptr<Item> item, ItemTemplate const* itemProto, Player const* owner)
 {
     CALL_ENABLED_HOOKS(MiscScript, MISCHOOK_ON_ITEM_CREATE, script->OnItemCreate(item, itemProto, owner));
 }
 
-bool ScriptMgr::CanApplySoulboundFlag(Item* item, ItemTemplate const* proto)
+bool ScriptMgr::CanApplySoulboundFlag(std::shared_ptr<Item> item, ItemTemplate const* proto)
 {
     CALL_ENABLED_BOOLEAN_HOOKS(MiscScript, MISCHOOK_CAN_APPLY_SOULBOUND_FLAG, !script->CanApplySoulboundFlag(item, proto));
 }
 
-bool ScriptMgr::CanItemApplyEquipSpell(Player* player, Item* item)
+bool ScriptMgr::CanItemApplyEquipSpell(Player* player, std::shared_ptr<Item> item)
 {
     CALL_ENABLED_BOOLEAN_HOOKS(MiscScript, MISCHOOK_CAN_ITEM_APPLY_EQUIP_SPELL, !script->CanItemApplyEquipSpell(player, item));
 }

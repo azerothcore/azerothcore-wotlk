@@ -909,10 +909,10 @@ void WorldSession::HandleRepairItemOpcode(WorldPacket& recvData)
     if (itemGUID)
     {
         LOG_DEBUG("network", "ITEM: Repair item, item {}, npc {}", itemGUID.ToString(), npcGUID.ToString());
-
-        Item* item = _player->GetItemByGuid(itemGUID);
-        if (item)
+        if (auto item = _player->GetItemByGuid(itemGUID))
+        {
             _player->DurabilityRepair(item->GetPos(), true, discountMod, guildBank);
+        }
     }
     else
     {

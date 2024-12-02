@@ -96,7 +96,7 @@ void WorldSession::SendUpdateTrade(bool trader_data /*= true*/)
     {
         data << uint8(i);                                  // trade slot number, if not specified, then end of packet
 
-        if (Item* item = view_trade->GetItem(TradeSlots(i)))
+        if (auto item = view_trade->GetItem(TradeSlots(i)))
         {
             data << uint32(item->GetTemplate()->ItemId);       // entry
             data << uint32(item->GetTemplate()->DisplayInfoID);// display id
@@ -131,7 +131,7 @@ void WorldSession::SendUpdateTrade(bool trader_data /*= true*/)
 //==============================================================
 // transfer the items to the players
 
-void WorldSession::moveItems(Item* myItems[], Item* hisItems[])
+void WorldSession::moveItems(const std::array<std::shared_ptr<Item>, TRADE_SLOT_TRADED_COUNT>& myItems, const std::array<std::shared_ptr<Item>, TRADE_SLOT_TRADED_COUNT>& hisItems)
 {
     Player* trader = _player->GetTrader();
     if (!trader)
@@ -141,58 +141,82 @@ void WorldSession::moveItems(Item* myItems[], Item* hisItems[])
     {
         ItemPosCountVec traderDst;
         ItemPosCountVec playerDst;
-        bool traderCanTrade = (!myItems[i] || trader->CanStoreItem(NULL_BAG, NULL_SLOT, traderDst, myItems[i], false) == EQUIP_ERR_OK);
-        bool playerCanTrade = (!hisItems[i] || _player->CanStoreItem(NULL_BAG, NULL_SLOT, playerDst, hisItems[i], false) == EQUIP_ERR_OK);
+
+        //InventoryResult CanStoreItem(uint8 bag, uint8 slot, ItemPosCountVec& dest, const std::shared_ptr<Item> pItem, bool swap = false) const
+        std::shared_ptr<Item> myItem = myItems[i];
+        std::shared_ptr<Item> hisItem = hisItems[i];
+        bool traderCanTrade = (myItems[i] == nullptr || trader->CanStoreItem(NULL_BAG, NULL_SLOT, traderDst, myItem, false) == EQUIP_ERR_OK);
+        bool playerCanTrade = (hisItems[i] == nullptr || _player->CanStoreItem(NULL_BAG, NULL_SLOT, playerDst, hisItem, false) == EQUIP_ERR_OK);
         if (traderCanTrade && playerCanTrade)
         {
             // Ok, if trade item exists and can be stored
             // If we trade in both directions we had to check, if the trade will work before we actually do it
             // A roll back is not possible after we stored it
-            if (myItems[i])
+            if (myItem != nullptr)
             {
                 // logging
-                LOG_DEBUG("network", "partner storing: {}", myItems[i]->GetGUID().ToString());
+                LOG_DEBUG("network", "partner storing: {}", myItem->GetGUID().ToString());
 
                 // adjust time (depends on /played)
-                if (myItems[i]->IsBOPTradable())
-                    myItems[i]->SetUInt32Value(ITEM_FIELD_CREATE_PLAYED_TIME, trader->GetTotalPlayedTime() - (_player->GetTotalPlayedTime() - myItems[i]->GetUInt32Value(ITEM_FIELD_CREATE_PLAYED_TIME)));
+                if (myItem->IsBOPTradable())
+                {
+                    myItem->SetUInt32Value(ITEM_FIELD_CREATE_PLAYED_TIME, trader->GetTotalPlayedTime() - (_player->GetTotalPlayedTime() - myItems[i]->GetUInt32Value(ITEM_FIELD_CREATE_PLAYED_TIME)));
+                }
                 // store
-                trader->MoveItemToInventory(traderDst, myItems[i], true, true);
+                trader->MoveItemToInventory(traderDst, myItem, true, true);
             }
-            if (hisItems[i])
+
+            if (hisItem != nullptr)
             {
                 // logging
-                LOG_DEBUG("network", "player storing: {}", hisItems[i]->GetGUID().ToString());
+                LOG_DEBUG("network", "player storing: {}", hisItem->GetGUID().ToString());
 
                 // adjust time (depends on /played)
-                if (hisItems[i]->IsBOPTradable())
-                    hisItems[i]->SetUInt32Value(ITEM_FIELD_CREATE_PLAYED_TIME, _player->GetTotalPlayedTime() - (trader->GetTotalPlayedTime() - hisItems[i]->GetUInt32Value(ITEM_FIELD_CREATE_PLAYED_TIME)));
+                if (hisItem->IsBOPTradable())
+                {
+                    hisItem->SetUInt32Value(ITEM_FIELD_CREATE_PLAYED_TIME, _player->GetTotalPlayedTime() - (trader->GetTotalPlayedTime() - hisItem->GetUInt32Value(ITEM_FIELD_CREATE_PLAYED_TIME)));
+                }
                 // store
-                _player->MoveItemToInventory(playerDst, hisItems[i], true, true);
+                _player->MoveItemToInventory(playerDst, hisItem, true, true);
             }
         }
         else
         {
             // in case of fatal error log error message
             // return the already removed items to the original owner
-            if (myItems[i])
+            if (myItem != nullptr)
             {
                 if (!traderCanTrade)
-                    LOG_ERROR("network.opcode", "trader can't store item: {}", myItems[i]->GetGUID().ToString());
-                if (_player->CanStoreItem(NULL_BAG, NULL_SLOT, playerDst, myItems[i], false) == EQUIP_ERR_OK)
-                    _player->MoveItemToInventory(playerDst, myItems[i], true, true);
+                {
+                    LOG_ERROR("network.opcode", "trader can't store item: {}", myItem->GetGUID().ToString());
+                }
+
+                if (_player->CanStoreItem(NULL_BAG, NULL_SLOT, playerDst, myItem, false) == EQUIP_ERR_OK)
+                {
+                    _player->MoveItemToInventory(playerDst, myItem, true, true);
+                }
                 else
-                    LOG_ERROR("network.opcode", "player can't take item back: {}", myItems[i]->GetGUID().ToString());
+                {
+                    LOG_ERROR("network.opcode", "player can't take item back: {}", myItem->GetGUID().ToString());
+                }
             }
+
             // return the already removed items to the original owner
-            if (hisItems[i])
+            if (hisItem != nullptr)
             {
                 if (!playerCanTrade)
-                    LOG_ERROR("network.opcode", "player can't store item: {}", hisItems[i]->GetGUID().ToString());
-                if (trader->CanStoreItem(NULL_BAG, NULL_SLOT, traderDst, hisItems[i], false) == EQUIP_ERR_OK)
-                    trader->MoveItemToInventory(traderDst, hisItems[i], true, true);
+                {
+                    LOG_ERROR("network.opcode", "player can't store item: {}", hisItem->GetGUID().ToString());
+                }
+
+                if (trader->CanStoreItem(NULL_BAG, NULL_SLOT, traderDst, hisItem, false) == EQUIP_ERR_OK)
+                {
+                    trader->MoveItemToInventory(traderDst, hisItem, true, true);
+                }
                 else
-                    LOG_ERROR("network.opcode", "trader can't take item back: {}", hisItems[i]->GetGUID().ToString());
+                {
+                    LOG_ERROR("network.opcode", "trader can't take item back: {}", hisItem->GetGUID().ToString());
+                }
             }
         }
     }
@@ -200,7 +224,7 @@ void WorldSession::moveItems(Item* myItems[], Item* hisItems[])
 
 //==============================================================
 
-static void setAcceptTradeMode(TradeData* myTrade, TradeData* hisTrade, Item * *myItems, Item * *hisItems)
+static void setAcceptTradeMode(TradeData* myTrade, TradeData* hisTrade, std::array<std::shared_ptr<Item>, TRADE_SLOT_TRADED_COUNT>& myItems, std::array<std::shared_ptr<Item>, TRADE_SLOT_TRADED_COUNT>& hisItems)
 {
     myTrade->SetInAcceptProcess(true);
     hisTrade->SetInAcceptProcess(true);
@@ -208,15 +232,15 @@ static void setAcceptTradeMode(TradeData* myTrade, TradeData* hisTrade, Item * *
     // store items in local list and set 'in-trade' flag
     for (uint8 i = 0; i < TRADE_SLOT_TRADED_COUNT; ++i)
     {
-        if (Item* item = myTrade->GetItem(TradeSlots(i)))
+        if (auto item = myTrade->GetItem(TradeSlots(i)))
         {
             LOG_DEBUG("network.opcode", "player trade item {} bag: {} slot: {}", item->GetGUID().ToString(), item->GetBagSlot(), item->GetSlot());
             //Can return nullptr
-            myItems[i] = item;
+            myItems[i] = std::move(item);
             myItems[i]->SetInTrade();
         }
 
-        if (Item* item = hisTrade->GetItem(TradeSlots(i)))
+        if (auto item = hisTrade->GetItem(TradeSlots(i)))
         {
             LOG_DEBUG("network.opcode", "partner trade item {} bag: {} slot: {}", item->GetGUID().ToString(), item->GetBagSlot(), item->GetSlot());
             hisItems[i] = item;
@@ -231,15 +255,19 @@ static void clearAcceptTradeMode(TradeData* myTrade, TradeData* hisTrade)
     hisTrade->SetInAcceptProcess(false);
 }
 
-static void clearAcceptTradeMode(Item * *myItems, Item * *hisItems)
+static void clearAcceptTradeMode(std::array<std::shared_ptr<Item>, TRADE_SLOT_TRADED_COUNT>& myItems, std::array<std::shared_ptr<Item>, TRADE_SLOT_TRADED_COUNT>& hisItems)
 {
     // clear 'in-trade' flag
     for (uint8 i = 0; i < TRADE_SLOT_TRADED_COUNT; ++i)
     {
-        if (myItems[i])
-            myItems[i]->SetInTrade(false);
-        if (hisItems[i])
-            hisItems[i]->SetInTrade(false);
+        if (auto myItem = myItems[i])
+        {
+            myItem->SetInTrade(false);
+        }
+        if (auto hisItem = hisItems[i])
+        {
+            hisItem->SetInTrade(false);
+        }
     }
 }
 
@@ -255,9 +283,10 @@ void WorldSession::HandleAcceptTradeOpcode(WorldPacket& /*recvPacket*/)
     if (!his_trade)
         return;
 
-    Item* myItems[TRADE_SLOT_TRADED_COUNT]  = { nullptr, nullptr, nullptr, nullptr, nullptr, nullptr };
-    Item* hisItems[TRADE_SLOT_TRADED_COUNT] = { nullptr, nullptr, nullptr, nullptr, nullptr, nullptr };
-    bool myCanCompleteTrade = true, hisCanCompleteTrade = true;
+    std::array<std::shared_ptr<Item>, TRADE_SLOT_TRADED_COUNT> myItems{};
+    std::array<std::shared_ptr<Item>, TRADE_SLOT_TRADED_COUNT> hisItems{};
+    bool myCanCompleteTrade = true;
+    bool hisCanCompleteTrade = true;
 
     // set before checks for propertly undo at problems (it already set in to client)
     my_trade->SetAccepted(true);
@@ -295,7 +324,7 @@ void WorldSession::HandleAcceptTradeOpcode(WorldPacket& /*recvPacket*/)
     // not accept if some items now can't be trade (cheating)
     for (uint8 i = 0; i < TRADE_SLOT_TRADED_COUNT; ++i)
     {
-        if (Item* item = my_trade->GetItem(TradeSlots(i)))
+        if (auto item = my_trade->GetItem(TradeSlots(i)))
         {
             if (!item->CanBeTraded(false, true))
             {
@@ -311,7 +340,7 @@ void WorldSession::HandleAcceptTradeOpcode(WorldPacket& /*recvPacket*/)
             }
         }
 
-        if (Item* item = his_trade->GetItem(TradeSlots(i)))
+        if (auto item = his_trade->GetItem(TradeSlots(i)))
         {
             if (!item->CanBeTraded(false, true))
             {
@@ -341,10 +370,10 @@ void WorldSession::HandleAcceptTradeOpcode(WorldPacket& /*recvPacket*/)
         if (uint32 my_spell_id = my_trade->GetSpell())
         {
             SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(my_spell_id);
-            Item* castItem = my_trade->GetSpellCastItem();
+            auto castItem = my_trade->GetSpellCastItem();
 
             if (!spellInfo || !his_trade->GetItem(TRADE_SLOT_NONTRADED) ||
-                    (my_trade->HasSpellCastItem() && !castItem))
+                (my_trade->HasSpellCastItem() && castItem == nullptr))
             {
                 clearAcceptTradeMode(my_trade, his_trade);
                 clearAcceptTradeMode(myItems, hisItems);
@@ -376,9 +405,9 @@ void WorldSession::HandleAcceptTradeOpcode(WorldPacket& /*recvPacket*/)
         if (uint32 his_spell_id = his_trade->GetSpell())
         {
             SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(his_spell_id);
-            Item* castItem = his_trade->GetSpellCastItem();
+            auto castItem = his_trade->GetSpellCastItem();
 
-            if (!spellInfo || !my_trade->GetItem(TRADE_SLOT_NONTRADED) || (his_trade->HasSpellCastItem() && !castItem))
+            if (!spellInfo || !my_trade->GetItem(TRADE_SLOT_NONTRADED) || (his_trade->HasSpellCastItem() && castItem == nullptr))
             {
                 delete my_spell;
                 his_trade->SetSpell(0);
@@ -413,8 +442,8 @@ void WorldSession::HandleAcceptTradeOpcode(WorldPacket& /*recvPacket*/)
         trader->GetSession()->SendTradeStatus(TRADE_STATUS_TRADE_ACCEPT);
 
         // test if item will fit in each inventory
-        hisCanCompleteTrade = (trader->CanStoreItems(myItems, TRADE_SLOT_TRADED_COUNT) == EQUIP_ERR_OK);
-        myCanCompleteTrade = (_player->CanStoreItems(hisItems, TRADE_SLOT_TRADED_COUNT) == EQUIP_ERR_OK);
+        hisCanCompleteTrade = (trader->CanStoreItems(myItems) == EQUIP_ERR_OK);
+        myCanCompleteTrade = (_player->CanStoreItems(hisItems) == EQUIP_ERR_OK);
 
         clearAcceptTradeMode(myItems, hisItems);
 
@@ -692,8 +721,8 @@ void WorldSession::HandleSetTradeItemOpcode(WorldPacket& recvPacket)
     }
 
     // check cheating, can't fail with correct client operations
-    Item* item = _player->GetItemByPos(bag, slot);
-    if (!item || (tradeSlot != TRADE_SLOT_NONTRADED && !item->CanBeTraded(false, true)))
+    auto item = _player->GetItemByPos(bag, slot);
+    if (item == nullptr || (tradeSlot != TRADE_SLOT_NONTRADED && !item->CanBeTraded(false, true)))
     {
         SendTradeStatus(TRADE_STATUS_TRADE_CANCELED);
         return;

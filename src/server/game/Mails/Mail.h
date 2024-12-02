@@ -117,7 +117,7 @@ private:
 
 class MailDraft
 {
-    typedef std::map<ObjectGuid, Item*> MailItemMap;
+    typedef std::map<ObjectGuid, std::shared_ptr<Item>> MailItemMap;
 
 public:                                                 // Constructors
     explicit MailDraft(uint16 mailTemplateId, bool need_items = true)
@@ -133,7 +133,7 @@ public:                                                 // Accessors
     [[nodiscard]] std::string const& GetBody() const { return m_body; }
 
 public:                                                 // modifiers
-    MailDraft& AddItem(Item* item);
+    MailDraft& AddItem(std::shared_ptr<Item> item);
     MailDraft& AddMoney(uint32 money) { m_money = money; return *this; }
     MailDraft& AddCOD(uint32 COD) { m_COD = COD; return *this; }
 

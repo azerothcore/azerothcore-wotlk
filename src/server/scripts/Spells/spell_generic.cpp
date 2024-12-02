@@ -2245,8 +2245,10 @@ class spell_gen_clone_weapon_aura : public AuraScript
 
                     if (Player* player = caster->ToPlayer())
                     {
-                        if (Item* mainItem = player->GetItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_MAINHAND))
+                        if (auto mainItem = player->GetItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_MAINHAND))
+                        {
                             target->SetUInt32Value(UNIT_VIRTUAL_ITEM_SLOT_ID, mainItem->GetEntry());
+                        }
                     }
                     else
                         target->SetUInt32Value(UNIT_VIRTUAL_ITEM_SLOT_ID, caster->GetUInt32Value(UNIT_VIRTUAL_ITEM_SLOT_ID));
@@ -2259,8 +2261,10 @@ class spell_gen_clone_weapon_aura : public AuraScript
 
                     if (Player* player = caster->ToPlayer())
                     {
-                        if (Item* offItem = player->GetItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_OFFHAND))
+                        if (auto offItem = player->GetItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_OFFHAND))
+                        {
                             target->SetUInt32Value(UNIT_VIRTUAL_ITEM_SLOT_ID + 1, offItem->GetEntry());
+                        }
                     }
                     else
                         target->SetUInt32Value(UNIT_VIRTUAL_ITEM_SLOT_ID + 1, caster->GetUInt32Value(UNIT_VIRTUAL_ITEM_SLOT_ID + 1));
@@ -2272,8 +2276,10 @@ class spell_gen_clone_weapon_aura : public AuraScript
 
                     if (Player* player = caster->ToPlayer())
                     {
-                        if (Item* rangedItem = player->GetItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_RANGED))
+                        if (auto rangedItem = player->GetItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_RANGED))
+                        {
                             target->SetUInt32Value(UNIT_VIRTUAL_ITEM_SLOT_ID + 2, rangedItem->GetEntry());
+                        }
                     }
                     else
                         target->SetUInt32Value(UNIT_VIRTUAL_ITEM_SLOT_ID + 2, caster->GetUInt32Value(UNIT_VIRTUAL_ITEM_SLOT_ID + 2));
@@ -4185,7 +4191,7 @@ class spell_gen_bonked : public SpellScript
 
             if (Aura const* onGuardAura = target->GetAura(SPELL_ON_GUARD))
             {
-                if (Item* item = target->GetItemByGuid(onGuardAura->GetCastItemGUID()))
+                if (auto item = target->GetItemByGuid(onGuardAura->GetCastItemGUID()))
                 {
                     target->DestroyItemCount(item->GetEntry(), 1, true);
                 }
@@ -4947,13 +4953,15 @@ class spell_gen_spirit_of_competition_participant : public SpellScript
         {
             player->CastSpell(player, SPELL_SPIRIT_OF_COMPETITION_PARTICIPANT_EFFECT, true);
 
-            Item* item = Item::CreateItem(ITEM_COMPETITORS_TABARD, 1);
-            if (!item)
+            auto item = Item::CreateItem(ITEM_COMPETITORS_TABARD, 1);
+            if (item == nullptr)
+            {
                 return;
+            }
 
             CharacterDatabaseTransaction trans = CharacterDatabase.BeginTransaction();
             MailDraft(MAIL_THE_COMPETITIORS_TABARD)
-                .AddItem(item)
+                .AddItem(std::move(item))
                 .SendMailTo(trans, player, MailSender(NPC_SPIRIT_OF_COMPETITION), MAIL_CHECK_MASK_HAS_BODY);
             CharacterDatabase.CommitTransaction(trans);
         }
@@ -4980,13 +4988,15 @@ class spell_gen_spirit_of_competition_winner : public SpellScript
         {
             player->CastSpell(player, SPELL_SPIRIT_OF_COMPETITION_WINNER_EFFECT, true);
 
-            Item* item = Item::CreateItem(ITEM_GOLD_MEDALLION, 1);
-            if (!item)
+            auto item = Item::CreateItem(ITEM_GOLD_MEDALLION, 1);
+            if (item == nullptr)
+            {
                 return;
+            }
 
             CharacterDatabaseTransaction trans = CharacterDatabase.BeginTransaction();
             MailDraft(MAIL_A_GOLD_MEDALLION)
-                .AddItem(item)
+                .AddItem(std::move(item))
                 .SendMailTo(trans, player, MailSender(NPC_SPIRIT_OF_COMPETITION), MAIL_CHECK_MASK_HAS_BODY);
             CharacterDatabase.CommitTransaction(trans);
         }
@@ -5255,7 +5265,7 @@ class spell_gen_steal_weapon : public AuraScript
         {
             if (Player* player = target->ToPlayer())
             {
-                if (Item* mainItem = player->GetItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_MAINHAND))
+                if (auto mainItem = player->GetItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_MAINHAND))
                 {
                     stealer->SetUInt32Value(UNIT_VIRTUAL_ITEM_SLOT_ID, mainItem->GetEntry());
                     stealer->CastSpell(stealer, SPELL_STEAL_WEAPON, true);

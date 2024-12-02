@@ -445,16 +445,16 @@ struct Runes
 struct EnchantDuration
 {
     EnchantDuration()  = default;;
-    EnchantDuration(Item* _item, EnchantmentSlot _slot, uint32 _leftduration) : item(_item), slot(_slot),
+    EnchantDuration(std::shared_ptr<Item> _item, EnchantmentSlot _slot, uint32 _leftduration) : item(std::move(_item)), slot(_slot),
         leftduration(_leftduration) { ASSERT(item); };
 
-    Item* item{nullptr};
+    std::shared_ptr<Item> item;
     EnchantmentSlot slot{MAX_ENCHANTMENT_SLOT};
     uint32 leftduration{0};
 };
 
 typedef std::list<EnchantDuration> EnchantDurationList;
-typedef std::list<Item*> ItemDurationList;
+typedef std::list<std::shared_ptr<Item>> ItemDurationList;
 
 enum PlayerMovementType
 {
@@ -777,10 +777,10 @@ typedef std::vector<ItemPosCount> ItemPosCountVec;
 
 struct SavedItem
 {
-    Item* item;
+    std::shared_ptr<Item> item;
     uint16 dstpos;
 
-    SavedItem(Item* _item, uint16 dstpos) : item(_item), dstpos(dstpos) {}
+    SavedItem(std::shared_ptr<Item> _item, uint16 dstpos) : item(std::move(_item)), dstpos(dstpos) {}
 };
 
 enum TransferAbortReason
@@ -1247,29 +1247,30 @@ public:
     /***                    STORAGE SYSTEM                 ***/
     /*********************************************************/
 
-    void SetVirtualItemSlot(uint8 i, Item* item);
+    void SetVirtualItemSlot(uint8 i, std::shared_ptr<Item> item);
     void SetSheath(SheathState sheathed) override;             // overwrite Unit version
     uint8 FindEquipSlot(ItemTemplate const* proto, uint32 slot, bool swap) const;
-    uint32 GetItemCount(uint32 item, bool inBankAlso = false, Item* skipItem = nullptr) const;
-    uint32 GetItemCountWithLimitCategory(uint32 limitCategory, Item* skipItem = nullptr) const;
-    [[nodiscard]] Item* GetItemByGuid(ObjectGuid guid) const;
-    [[nodiscard]] Item* GetItemByEntry(uint32 entry) const;
-    [[nodiscard]] Item* GetItemByPos(uint16 pos) const;
-    [[nodiscard]] Item* GetItemByPos(uint8 bag, uint8 slot) const;
-    [[nodiscard]] Bag*  GetBagByPos(uint8 slot) const;
+    uint32 GetItemCount(uint32 item, bool inBankAlso = false, const std::shared_ptr<Item> skipItem = nullptr) const;
+    uint32 GetItemCountWithLimitCategory(uint32 limitCategory, const std::shared_ptr<Item> skipItem = nullptr) const;
+    [[nodiscard]] std::shared_ptr<Item> GetItemByGuid(ObjectGuid guid) const;
+    [[nodiscard]] std::shared_ptr<Item> GetItemByEntry(uint32 entry) const;
+    [[nodiscard]] std::shared_ptr<Item> GetItemByPos(uint16 pos) const;
+    [[nodiscard]] std::shared_ptr<Item> GetItemByPos(uint8 bag, uint8 slot) const;
+    [[nodiscard]] std::shared_ptr<Bag>  GetBagByPos(uint8 slot) const;
     [[nodiscard]] uint32 GetFreeInventorySpace() const;
-    [[nodiscard]] inline Item* GetUseableItemByPos(uint8 bag, uint8 slot) const //Does additional check for disarmed weapons
+    [[nodiscard]] inline std::shared_ptr<Item> GetUseableItemByPos(uint8 bag, uint8 slot) const //Does additional check for disarmed weapons
     {
         if (!CanUseAttackType(GetAttackBySlot(slot)))
             return nullptr;
+
         return GetItemByPos(bag, slot);
     }
-    [[nodiscard]] Item* GetWeaponForAttack(WeaponAttackType attackType, bool useable = false) const;
-    bool HasWeapon(WeaponAttackType type) const override { return GetWeaponForAttack(type, false); }
+    [[nodiscard]] std::shared_ptr<Item> GetWeaponForAttack(WeaponAttackType attackType, bool useable = false) const;
+    bool HasWeapon(WeaponAttackType type) const override { return GetWeaponForAttack(type, false) != nullptr; }
     bool HasWeaponForAttack(WeaponAttackType type) const override { return (Unit::HasWeaponForAttack(type) && GetWeaponForAttack(type, true)); }
-    [[nodiscard]] Item* GetShield(bool useable = false) const;
+    [[nodiscard]] std::shared_ptr<Item> GetShield(bool useable = false) const;
     static uint8 GetAttackBySlot(uint8 slot);        // MAX_ATTACK if not weapon slot
-    std::vector<Item*>& GetItemUpdateQueue() { return m_itemUpdateQueue; }
+    std::vector<std::shared_ptr<Item>>& GetItemUpdateQueue() { return m_itemUpdateQueue; }
     static bool IsInventoryPos(uint16 pos) { return IsInventoryPos(pos >> 8, pos & 255); }
     static bool IsInventoryPos(uint8 bag, uint8 slot);
     static bool IsEquipmentPos(uint16 pos) { return IsEquipmentPos(pos >> 8, pos & 255); }
@@ -1282,43 +1283,43 @@ public:
     [[nodiscard]] uint8 GetBankBagSlotCount() const { return GetByteValue(PLAYER_BYTES_2, 2); }
     void SetBankBagSlotCount(uint8 count) { SetByteValue(PLAYER_BYTES_2, 2, count); }
     [[nodiscard]] bool HasItemCount(uint32 item, uint32 count = 1, bool inBankAlso = false) const;
-    bool HasItemFitToSpellRequirements(SpellInfo const* spellInfo, Item const* ignoreItem = nullptr) const;
+    bool HasItemFitToSpellRequirements(SpellInfo const* spellInfo, const std::shared_ptr<Item> ignoreItem = nullptr) const;
     bool CanNoReagentCast(SpellInfo const* spellInfo) const;
     [[nodiscard]] bool HasItemOrGemWithIdEquipped(uint32 item, uint32 count, uint8 except_slot = NULL_SLOT) const;
     [[nodiscard]] bool HasItemOrGemWithLimitCategoryEquipped(uint32 limitCategory, uint32 count, uint8 except_slot = NULL_SLOT) const;
-    InventoryResult CanTakeMoreSimilarItems(Item* pItem) const { return CanTakeMoreSimilarItems(pItem->GetEntry(), pItem->GetCount(), pItem); }
+    InventoryResult CanTakeMoreSimilarItems(const std::shared_ptr<Item>& pItem) const { return CanTakeMoreSimilarItems(pItem->GetEntry(), pItem->GetCount(), pItem); }
     [[nodiscard]] InventoryResult CanTakeMoreSimilarItems(uint32 entry, uint32 count) const { return CanTakeMoreSimilarItems(entry, count, nullptr); }
     InventoryResult CanStoreNewItem(uint8 bag, uint8 slot, ItemPosCountVec& dest, uint32 item, uint32 count, uint32* no_space_count = nullptr) const
     {
         return CanStoreItem(bag, slot, dest, item, count, nullptr, false, no_space_count);
     }
-    InventoryResult CanStoreItem(uint8 bag, uint8 slot, ItemPosCountVec& dest, Item* pItem, bool swap = false) const
+    InventoryResult CanStoreItem(uint8 bag, uint8 slot, ItemPosCountVec& dest, const std::shared_ptr<Item> pItem, bool swap = false) const
     {
         if (!pItem)
             return EQUIP_ERR_ITEM_NOT_FOUND;
         uint32 count = pItem->GetCount();
         return CanStoreItem(bag, slot, dest, pItem->GetEntry(), count, pItem, swap, nullptr);
     }
-    InventoryResult CanStoreItems(Item** pItem, int32 count) const;
-    InventoryResult CanEquipNewItem(uint8 slot, uint16& dest, uint32 item, bool swap) const;
-    InventoryResult CanEquipItem(uint8 slot, uint16& dest, Item* pItem, bool swap, bool not_loading = true) const;
+    InventoryResult CanStoreItems(const std::array<std::shared_ptr<Item>, TRADE_SLOT_TRADED_COUNT>& pItems) const;
+    InventoryResult CanEquipNewItem(uint8 slot, uint16& dest, uint32 item, bool swap);
+    InventoryResult CanEquipItem(uint8 slot, uint16& dest, std::shared_ptr<Item> pItem, bool swap, bool not_loading = true);
 
-    InventoryResult CanEquipUniqueItem(Item* pItem, uint8 except_slot = NULL_SLOT, uint32 limit_count = 1) const;
+    InventoryResult CanEquipUniqueItem(const std::shared_ptr<Item> pItem, uint8 except_slot = NULL_SLOT, uint32 limit_count = 1) const;
     InventoryResult CanEquipUniqueItem(ItemTemplate const* itemProto, uint8 except_slot = NULL_SLOT, uint32 limit_count = 1) const;
     [[nodiscard]] InventoryResult CanUnequipItems(uint32 item, uint32 count) const;
     [[nodiscard]] InventoryResult CanUnequipItem(uint16 src, bool swap) const;
-    InventoryResult CanBankItem(uint8 bag, uint8 slot, ItemPosCountVec& dest, Item* pItem, bool swap, bool not_loading = true) const;
-    InventoryResult CanUseItem(Item* pItem, bool not_loading = true) const;
+    InventoryResult CanBankItem(uint8 bag, uint8 slot, ItemPosCountVec& dest, std::shared_ptr<Item> pItem, bool swap, bool not_loading = true) const;
+    InventoryResult CanUseItem(const std::shared_ptr<Item> pItem, bool not_loading = true) const;
     [[nodiscard]] bool HasItemTotemCategory(uint32 TotemCategory) const;
     bool IsTotemCategoryCompatiableWith(ItemTemplate const* pProto, uint32 requiredTotemCategoryId) const;
     InventoryResult CanUseItem(ItemTemplate const* pItem) const;
     [[nodiscard]] InventoryResult CanUseAmmo(uint32 item) const;
     InventoryResult CanRollForItemInLFG(ItemTemplate const* item, WorldObject const* lootedObject) const;
-    Item* StoreNewItem(ItemPosCountVec const& pos, uint32 item, bool update, int32 randomPropertyId = 0);
-    Item* StoreNewItem(ItemPosCountVec const& pos, uint32 item, bool update, int32 randomPropertyId, AllowedLooterSet& allowedLooters);
-    Item* StoreItem(ItemPosCountVec const& pos, Item* pItem, bool update);
-    Item* EquipNewItem(uint16 pos, uint32 item, bool update);
-    Item* EquipItem(uint16 pos, Item* pItem, bool update);
+    std::shared_ptr<Item> StoreNewItem(ItemPosCountVec const& pos, uint32 item, bool update, int32 randomPropertyId = 0);
+    std::shared_ptr<Item> StoreNewItem(ItemPosCountVec const& pos, uint32 item, bool update, int32 randomPropertyId, AllowedLooterSet& allowedLooters);
+    std::shared_ptr<Item> StoreItem(ItemPosCountVec const& pos, std::shared_ptr<Item> pItem, bool update);
+    std::shared_ptr<Item> EquipNewItem(uint16 pos, uint32 item, bool update);
+    std::shared_ptr<Item> EquipItem(uint16 pos, std::shared_ptr<Item> pItem, bool update);
     void AutoUnequipOffhandIfNeed(bool force = false);
     bool StoreNewItemInBestSlots(uint32 item_id, uint32 item_count);
     void AutoStoreLoot(uint8 bag, uint8 slot, uint32 loot_id, LootStore const& store, bool broadcast = false);
@@ -1327,43 +1328,42 @@ public:
     void UpdateLootAchievements(LootItem* item, Loot* loot);
     void UpdateTitansGrip();
 
-    InventoryResult CanTakeMoreSimilarItems(uint32 entry, uint32 count, Item* pItem, uint32* no_space_count = nullptr) const;
-    InventoryResult CanStoreItem(uint8 bag, uint8 slot, ItemPosCountVec& dest, uint32 entry, uint32 count, Item* pItem = nullptr, bool swap = false, uint32* no_space_count = nullptr) const;
+    InventoryResult CanTakeMoreSimilarItems(uint32 entry, uint32 count, std::shared_ptr<Item> pItem, uint32* no_space_count = nullptr) const;
+    InventoryResult CanStoreItem(uint8 bag, uint8 slot, ItemPosCountVec& dest, uint32 entry, uint32 count, const std::shared_ptr<Item> pItem = nullptr, bool swap = false, uint32* no_space_count = nullptr) const;
 
     void AddRefundReference(ObjectGuid itemGUID);
     void DeleteRefundReference(ObjectGuid itemGUID);
 
-    void ApplyEquipCooldown(Item* pItem);
+    void ApplyEquipCooldown(std::shared_ptr<Item> pItem);
     void SetAmmo(uint32 item);
     void RemoveAmmo();
     [[nodiscard]] float GetAmmoDPS() const { return m_ammoDPS; }
     bool CheckAmmoCompatibility(ItemTemplate const* ammo_proto) const;
-    void QuickEquipItem(uint16 pos, Item* pItem);
-    void VisualizeItem(uint8 slot, Item* pItem);
-    void SetVisibleItemSlot(uint8 slot, Item* pItem);
-    Item* BankItem(ItemPosCountVec const& dest, Item* pItem, bool update)
+    void QuickEquipItem(uint16 pos, std::shared_ptr<Item> pItem);
+    void VisualizeItem(uint8 slot, std::shared_ptr<Item> pItem);
+    void SetVisibleItemSlot(uint8 slot, std::shared_ptr<Item> pItem);
+    std::shared_ptr<Item> BankItem(ItemPosCountVec const& dest, std::shared_ptr<Item> pItem, bool update)
     {
-        return StoreItem(dest, pItem, update);
+        return StoreItem(dest, std::move(pItem), update);
     }
-    Item* BankItem(uint16 pos, Item* pItem, bool update);
     void RemoveItem(uint8 bag, uint8 slot, bool update, bool swap = false);
     void MoveItemFromInventory(uint8 bag, uint8 slot, bool update);
     // in trade, auction, guild bank, mail....
-    void MoveItemToInventory(ItemPosCountVec const& dest, Item* pItem, bool update, bool in_characterInventoryDB = false);
+    void MoveItemToInventory(ItemPosCountVec const& dest, std::shared_ptr<Item> pItem, bool update, bool in_characterInventoryDB = false);
     // in trade, guild bank, mail....
-    void RemoveItemDependentAurasAndCasts(Item* pItem);
+    void RemoveItemDependentAurasAndCasts(std::shared_ptr<Item> pItem);
     void DestroyItem(uint8 bag, uint8 slot, bool update);
     void DestroyItemCount(uint32 item, uint32 count, bool update, bool unequip_check = false);
-    void DestroyItemCount(Item* item, uint32& count, bool update);
+    void DestroyItemCount(std::shared_ptr<Item> item, uint32& count, bool update);
     void DestroyConjuredItems(bool update);
     void DestroyZoneLimitedItem(bool update, uint32 new_zone);
     void SplitItem(uint16 src, uint16 dst, uint32 count);
     void SwapItem(uint16 src, uint16 dst);
-    void AddItemToBuyBackSlot(Item* pItem, uint32 money);
-    Item* GetItemFromBuyBackSlot(uint32 slot);
+    void AddItemToBuyBackSlot(std::shared_ptr<Item> pItem, uint32 money);
+    std::shared_ptr<Item> GetItemFromBuyBackSlot(uint32 slot);
     void RemoveItemFromBuyBackSlot(uint32 slot, bool del);
     [[nodiscard]] uint32 GetMaxKeyringSize() const { return KEYRING_SLOT_END - KEYRING_SLOT_START; }
-    void SendEquipError(InventoryResult msg, Item* pItem, Item* pItem2 = nullptr, uint32 itemid = 0);
+    void SendEquipError(InventoryResult msg, const std::shared_ptr<Item> pItem, const std::shared_ptr<Item> pItem2 = nullptr, uint32 itemid = 0);
     void SendBuyError(BuyResult msg, Creature* creature, uint32 item, uint32 param);
     void SendSellError(SellResult msg, Creature* creature, ObjectGuid guid, uint32 param);
     void AddWeaponProficiency(uint32 newflag) { m_WeaponProficiency |= newflag; }
@@ -1373,10 +1373,10 @@ public:
 
     [[nodiscard]] bool IsTwoHandUsed() const
     {
-        Item* mainItem = GetItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_MAINHAND);
-        return mainItem && mainItem->GetTemplate()->InventoryType == INVTYPE_2HWEAPON && !CanTitanGrip();
+        const auto mainItem = GetItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_MAINHAND);
+        return mainItem != nullptr && mainItem->GetTemplate()->InventoryType == INVTYPE_2HWEAPON && !CanTitanGrip();
     }
-    void SendNewItem(Item* item, uint32 count, bool received, bool created, bool broadcast = false, bool sendChatMessage = true);
+    void SendNewItem(const std::shared_ptr<Item> item, uint32 count, bool received, bool created, bool broadcast = false, bool sendChatMessage = true);
     bool BuyItemFromVendorSlot(ObjectGuid vendorguid, uint32 vendorslot, uint32 item, uint8 count, uint8 bag, uint8 slot);
     bool _StoreOrEquipNewItem(uint32 vendorslot, uint32 item, uint8 count, uint8 bag, uint8 slot, int32 price, ItemTemplate const* pProto, Creature* pVendor, VendorItem const* crItem, bool bStore);
 
@@ -1391,22 +1391,22 @@ public:
 
     void UpdateEnchantTime(uint32 time);
     void UpdateSoulboundTradeItems();
-    void AddTradeableItem(Item* item);
-    void RemoveTradeableItem(Item* item);
+    void AddTradeableItem(std::shared_ptr<Item> item);
+    void RemoveTradeableItem(std::shared_ptr<Item> item);
     void UpdateItemDuration(uint32 time, bool realtimeonly = false);
-    void AddEnchantmentDurations(Item* item);
-    void RemoveEnchantmentDurations(Item* item);
-    void RemoveEnchantmentDurationsReferences(Item* item); // pussywizard
+    void AddEnchantmentDurations(std::shared_ptr<Item> item);
+    void RemoveEnchantmentDurations(std::shared_ptr<Item> item);
+    void RemoveEnchantmentDurationsReferences(std::shared_ptr<Item> item); // pussywizard
     void RemoveArenaEnchantments(EnchantmentSlot slot);
-    void AddEnchantmentDuration(Item* item, EnchantmentSlot slot, uint32 duration);
-    void ApplyEnchantment(Item* item, EnchantmentSlot slot, bool apply, bool apply_dur = true, bool ignore_condition = false);
-    void ApplyEnchantment(Item* item, bool apply);
+    void AddEnchantmentDuration(std::shared_ptr<Item> item, EnchantmentSlot slot, uint32 duration);
+    void ApplyEnchantment(std::shared_ptr<Item> item, EnchantmentSlot slot, bool apply, bool apply_dur = true, bool ignore_condition = false);
+    void ApplyEnchantment(std::shared_ptr<Item> item, bool apply);
     void UpdateSkillEnchantments(uint16 skill_id, uint16 curr_value, uint16 new_value);
     void SendEnchantmentDurations();
     void UpdateEnchantmentDurations();
     void BuildEnchantmentsInfoData(WorldPacket* data);
-    void AddItemDurations(Item* item);
-    void RemoveItemDurations(Item* item);
+    void AddItemDurations(std::shared_ptr<Item> item);
+    void RemoveItemDurations(std::shared_ptr<Item> item);
     void SendItemDurations();
     void LoadCorpse(PreparedQueryResult result);
     void LoadPet();
@@ -1668,21 +1668,21 @@ public:
     uint8 unReadMails;
     time_t m_nextMailDelivereTime;
 
-    typedef std::unordered_map<ObjectGuid::LowType, Item*> ItemMap;
+    typedef std::unordered_map<ObjectGuid::LowType, std::shared_ptr<Item>> ItemMap;
 
     ItemMap mMitems;                                    //template defined in objectmgr.cpp
 
-    Item* GetMItem(ObjectGuid::LowType itemLowGuid)
+    std::shared_ptr<Item> GetMItem(ObjectGuid::LowType itemLowGuid)
     {
-        ItemMap::const_iterator itr = mMitems.find(itemLowGuid);
+        const auto itr = mMitems.find(itemLowGuid);
         return itr != mMitems.end() ? itr->second : nullptr;
     }
 
-    void AddMItem(Item* it)
+    void AddMItem(std::shared_ptr<Item> it)
     {
         ASSERT(it);
         //ASSERT deleted, because items can be added before loading
-        mMitems[it->GetGUID().GetCounter()] = it;
+        mMitems[it->GetGUID().GetCounter()] = std::move(it);
     }
 
     bool RemoveMItem(ObjectGuid::LowType itemLowGuid)
@@ -2044,12 +2044,22 @@ public:
 
     void SendDurabilityLoss();
     void DurabilityLossAll(double percent, bool inventory);
-    void DurabilityLoss(Item* item, double percent);
+    void DurabilityLoss(std::shared_ptr<Item> item, double percent);
     void DurabilityPointsLossAll(int32 points, bool inventory);
-    void DurabilityPointsLoss(Item* item, int32 points);
+    void DurabilityPointsLoss(std::shared_ptr<Item> item, int32 points);
     void DurabilityPointLossForEquipSlot(EquipmentSlots slot);
     uint32 DurabilityRepairAll(bool cost, float discountMod, bool guildBank);
-    uint32 DurabilityRepair(uint16 pos, bool cost, float discountMod, bool guildBank);
+
+    /**
+     * @brief repairs item durability by given item position in inventory position
+     *
+     * @param pos - item inventory slot position
+     * @param calcCost - if set to true, function will calculate repair cost and will take money from owner
+     * @param discountMod - discount mod
+     * @param useGuildBankMoney - use guild bank money
+     * @return uint32 - total repair cost, if non zero, then money is already extracted
+     */
+    uint32 DurabilityRepair(uint16 pos, bool calcCost, float discountMod, bool useGuildBankMoney);
 
     void UpdateMirrorTimers();
     void StopMirrorTimers()
@@ -2071,8 +2081,8 @@ public:
     void UpdateLocalChannels(uint32 newZone);
 
     void UpdateDefense();
-    void UpdateWeaponSkill(Unit* victim, WeaponAttackType attType, Item* item = nullptr);
-    void UpdateCombatSkills(Unit* victim, WeaponAttackType attType, bool defence, Item* item = nullptr);
+    void UpdateWeaponSkill(Unit* victim, WeaponAttackType attType, std::shared_ptr<Item> item = nullptr);
+    void UpdateCombatSkills(Unit* victim, WeaponAttackType attType, bool defence, std::shared_ptr<Item> item = nullptr);
 
     void SetSkill(uint16 id, uint16 step, uint16 currVal, uint16 maxVal);
     [[nodiscard]] uint16 GetMaxSkillValue(uint32 skill) const;        // max + perm. bonus + temp bonus
@@ -2201,11 +2211,11 @@ public:
 
     SpellSchoolMask GetMeleeDamageSchoolMask(WeaponAttackType attackType = BASE_ATTACK, uint8 damageIndex = 0) const override;
 
-    void _ApplyWeaponDependentAuraMods(Item* item, WeaponAttackType attackType, bool apply);
-    void _ApplyWeaponDependentAuraCritMod(Item* item, WeaponAttackType attackType, AuraEffect const* aura, bool apply);
-    void _ApplyWeaponDependentAuraDamageMod(Item* item, WeaponAttackType attackType, AuraEffect const* aura, bool apply);
+    void _ApplyWeaponDependentAuraMods(std::shared_ptr<Item> item, WeaponAttackType attackType, bool apply);
+    void _ApplyWeaponDependentAuraCritMod(std::shared_ptr<Item> item, WeaponAttackType attackType, AuraEffect const* aura, bool apply);
+    void _ApplyWeaponDependentAuraDamageMod(std::shared_ptr<Item> item, WeaponAttackType attackType, AuraEffect const* aura, bool apply);
 
-    void _ApplyItemMods(Item* item, uint8 slot, bool apply);
+    void _ApplyItemMods(std::shared_ptr<Item> item, uint8 slot, bool apply);
     void _RemoveAllItemMods();
     void _ApplyAllItemMods();
     void _ApplyAllLevelScaleItemMods(bool apply);
@@ -2217,12 +2227,12 @@ public:
     void CorrectMetaGemEnchants(uint8 slot, bool apply);
     void InitDataForForm(bool reapplyMods = false);
 
-    void ApplyItemEquipSpell(Item* item, bool apply, bool form_change = false);
-    void ApplyEquipSpell(SpellInfo const* spellInfo, Item* item, bool apply, bool form_change = false);
+    void ApplyItemEquipSpell(std::shared_ptr<Item> item, bool apply, bool form_change = false);
+    void ApplyEquipSpell(SpellInfo const* spellInfo, std::shared_ptr<Item> item, bool apply, bool form_change = false);
     void UpdateEquipSpellsAtFormChange();
     void CastItemCombatSpell(Unit* target, WeaponAttackType attType, uint32 procVictim, uint32 procEx);
-    void CastItemUseSpell(Item* item, SpellCastTargets const& targets, uint8 cast_count, uint32 glyphIndex);
-    void CastItemCombatSpell(Unit* target, WeaponAttackType attType, uint32 procVictim, uint32 procEx, Item* item, ItemTemplate const* proto);
+    void CastItemUseSpell(std::shared_ptr<Item> item, SpellCastTargets const& targets, uint8 cast_count, uint32 glyphIndex);
+    void CastItemCombatSpell(Unit* target, WeaponAttackType attType, uint32 procVictim, uint32 procEx, std::shared_ptr<Item> item, ItemTemplate const* proto);
 
     void SendEquipmentSetList();
     void SetEquipmentSet(uint32 index, EquipmentSet eqset);
@@ -2711,7 +2721,7 @@ protected:
     void _LoadGlyphAuras();
     void _LoadInventory(PreparedQueryResult result, uint32 timeDiff);
     void _LoadMail(PreparedQueryResult mailsResult, PreparedQueryResult mailItemsResult);
-    static Item* _LoadMailedItem(ObjectGuid const& playerGuid, Player* player, uint32 mailId, Mail* mail, Field* fields);
+    static std::shared_ptr<Item> _LoadMailedItem(ObjectGuid const& playerGuid, Player* player, uint32 mailId, Mail* mail, const Field* fields);
     void _LoadQuestStatus(PreparedQueryResult result);
     void _LoadQuestStatusRewarded(PreparedQueryResult result);
     void _LoadDailyQuestStatus(PreparedQueryResult result);
@@ -2787,10 +2797,10 @@ protected:
 
     uint32 m_atLoginFlags;
 
-    Item* m_items[PLAYER_SLOTS_COUNT];
+    std::array<std::shared_ptr<Item>, PLAYER_SLOTS_COUNT> m_items;
     uint32 m_currentBuybackSlot;
 
-    std::vector<Item*> m_itemUpdateQueue;
+    std::vector<std::shared_ptr<Item>> m_itemUpdateQueue;
     bool m_itemUpdateQueueBlocked;
 
     uint32 m_ExtraFlags;
@@ -2924,18 +2934,18 @@ protected:
 
 private:
     // internal common parts for CanStore/StoreItem functions
-    InventoryResult CanStoreItem_InSpecificSlot(uint8 bag, uint8 slot, ItemPosCountVec& dest, ItemTemplate const* pProto, uint32& count, bool swap, Item* pSrcItem) const;
-    InventoryResult CanStoreItem_InBag(uint8 bag, ItemPosCountVec& dest, ItemTemplate const* pProto, uint32& count, bool merge, bool non_specialized, Item* pSrcItem, uint8 skip_bag, uint8 skip_slot) const;
-    InventoryResult CanStoreItem_InInventorySlots(uint8 slot_begin, uint8 slot_end, ItemPosCountVec& dest, ItemTemplate const* pProto, uint32& count, bool merge, Item* pSrcItem, uint8 skip_bag, uint8 skip_slot) const;
-    Item* _StoreItem(uint16 pos, Item* pItem, uint32 count, bool clone, bool update);
-    Item* _LoadItem(CharacterDatabaseTransaction trans, uint32 zoneId, uint32 timeDiff, Field* fields);
+    InventoryResult CanStoreItem_InSpecificSlot(uint8 bag, uint8 slot, ItemPosCountVec& dest, ItemTemplate const* pProto, uint32& count, bool swap, const std::shared_ptr<Item> pSrcItem) const;
+    InventoryResult CanStoreItem_InBag(uint8 bag, ItemPosCountVec& dest, ItemTemplate const* pProto, uint32& count, bool merge, bool non_specialized, const std::shared_ptr<Item> pSrcItem, uint8 skip_bag, uint8 skip_slot) const;
+    InventoryResult CanStoreItem_InInventorySlots(uint8 slot_begin, uint8 slot_end, ItemPosCountVec& dest, ItemTemplate const* pProto, uint32& count, bool merge, const std::shared_ptr<Item> pSrcItem, uint8 skip_bag, uint8 skip_slot) const;
+    std::shared_ptr<Item> _StoreItem(uint16 pos, std::shared_ptr<Item> pItem, uint32 count, bool clone, bool update);
+    std::shared_ptr<Item> _LoadItem(CharacterDatabaseTransaction trans, uint32 zoneId, uint32 timeDiff, const Field* fields);
 
     CinematicMgr* _cinematicMgr;
 
     typedef GuidSet RefundableItemsSet;
     RefundableItemsSet m_refundableItems;
-    void SendRefundInfo(Item* item);
-    void RefundItem(Item* item);
+    void SendRefundInfo(std::shared_ptr<Item> item);
+    void RefundItem(std::shared_ptr<Item> item);
 
     // know currencies are not removed at any point (0 displayed)
     void AddKnownCurrency(uint32 itemId);
@@ -3009,7 +3019,7 @@ private:
     Seconds m_creationTime;
 };
 
-void AddItemsSetItem(Player* player, Item* item);
+void AddItemsSetItem(Player* player, std::shared_ptr<Item> item);
 void RemoveItemsSetItem(Player* player, ItemTemplate const* proto);
 
 #endif

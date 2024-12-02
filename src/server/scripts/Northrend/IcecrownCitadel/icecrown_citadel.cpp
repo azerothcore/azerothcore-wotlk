@@ -2739,12 +2739,18 @@ public:
                     if (!target->IsClass(CLASS_DRUID))
                         if (Player* p = target->ToPlayer())
                         {
-                            if (Item* i = p->GetWeaponForAttack(BASE_ATTACK))
+                            if (auto i = p->GetWeaponForAttack(BASE_ATTACK))
+                            {
                                 me->SetUInt32Value(UNIT_VIRTUAL_ITEM_SLOT_ID + 0, i->GetEntry());
-                            if (Item* i = p->GetWeaponForAttack(OFF_ATTACK))
+                            }
+                            if (auto i = p->GetWeaponForAttack(OFF_ATTACK))
+                            {
                                 me->SetUInt32Value(UNIT_VIRTUAL_ITEM_SLOT_ID + 1, i->GetEntry());
-                            if (Item* i = p->GetWeaponForAttack(RANGED_ATTACK))
+                            }
+                            if (auto i = p->GetWeaponForAttack(RANGED_ATTACK))
+                            {
                                 me->SetUInt32Value(UNIT_VIRTUAL_ITEM_SLOT_ID + 2, i->GetEntry());
+                            }
 
                             target->CastSpell(c, 60352, true); // Mirror Image, clone visual appearance
                         }

@@ -414,7 +414,7 @@ public:
     GameObject* GetExplTargetGObj();
 
     // returns: Item which was selected as an explicit spell target or nullptr if there's no target
-    Item* GetExplTargetItem();
+    std::shared_ptr<Item> GetExplTargetItem();
 
     // methods useable only during spell hit on target, or during spell launch on target:
     // returns: target of current effect if it was Unit otherwise nullptr
@@ -424,7 +424,7 @@ public:
     // returns: target of current effect if it was Player otherwise nullptr
     Player* GetHitPlayer();
     // returns: target of current effect if it was Item otherwise nullptr
-    Item* GetHitItem();
+    std::shared_ptr<Item> GetHitItem();
     // returns: target of current effect if it was GameObject otherwise nullptr
     GameObject* GetHitGObj();
     // returns: destination of current effect
@@ -461,7 +461,7 @@ public:
     void SetEffectValue(int32 value);
 
     // returns: cast item if present.
-    Item* GetCastItem();
+    std::shared_ptr<Item> GetCastItem();
 
     // Creates item. Calls Spell::DoCreateItem method.
     void CreateItem(uint32 effIndex, uint32 itemId);

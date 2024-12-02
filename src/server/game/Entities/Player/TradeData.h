@@ -41,15 +41,15 @@ public:                                                 // constructors
     [[nodiscard]] Player* GetTrader() const { return m_trader; }
     [[nodiscard]] TradeData* GetTraderData() const;
 
-    [[nodiscard]] Item* GetItem(TradeSlots slot) const;
+    [[nodiscard]] std::shared_ptr<Item> GetItem(TradeSlots slot) const;
     [[nodiscard]] bool HasItem(ObjectGuid itemGuid) const;
     [[nodiscard]] TradeSlots GetTradeSlotForItem(ObjectGuid itemGuid) const;
-    void SetItem(TradeSlots slot, Item* item);
+    void SetItem(TradeSlots slot, std::shared_ptr<Item> item);
 
     [[nodiscard]] uint32 GetSpell() const { return m_spell; }
-    void SetSpell(uint32 spell_id, Item* castItem = nullptr);
+    void SetSpell(uint32 spell_id, std::shared_ptr<Item> castItem = nullptr);
 
-    [[nodiscard]] Item*  GetSpellCastItem() const;
+    [[nodiscard]] std::shared_ptr<Item> GetSpellCastItem() const;
     [[nodiscard]] bool HasSpellCastItem() const { return m_spellCastItem; }
 
     [[nodiscard]] uint32 GetMoney() const { return m_money; }

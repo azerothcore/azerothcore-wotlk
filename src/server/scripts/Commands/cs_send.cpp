@@ -123,10 +123,10 @@ public:
 
         for (auto const& [itemID, itemCount] : itemList)
         {
-            if (Item* item = Item::CreateItem(itemID, itemCount, handler->GetSession() ? handler->GetSession()->GetPlayer() : 0))
+            if (auto item = Item::CreateItem(itemID, itemCount, handler->GetSession() ? handler->GetSession()->GetPlayer() : 0))
             {
                 item->SaveToDB(trans); // save for prevent lost at next mail load, if send fail then item will deleted
-                draft.AddItem(item);
+                draft.AddItem(std::move(item));
             }
         }
 

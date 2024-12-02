@@ -31,6 +31,7 @@
 #include "GossipDef.h"
 #include "Packet.h"
 #include "SharedDefines.h"
+#include "TradeData.h"
 #include "World.h"
 #include <map>
 #include <memory>
@@ -1120,11 +1121,11 @@ protected:
 
 private:
     // private trade methods
-    void moveItems(Item* myItems[], Item* hisItems[]);
+    void moveItems(const std::array<std::shared_ptr<Item>, TRADE_SLOT_TRADED_COUNT>& myItems, const std::array<std::shared_ptr<Item>, TRADE_SLOT_TRADED_COUNT>& hisItems);
 
     bool CanUseBank(ObjectGuid bankerGUID = ObjectGuid::Empty) const;
 
-    bool recoveryItem(Item* pItem);
+    bool recoveryItem(std::shared_ptr<Item> pItem);
 
     // logging helper
     void LogUnexpectedOpcode(WorldPacket* packet, char const* status, const char* reason);

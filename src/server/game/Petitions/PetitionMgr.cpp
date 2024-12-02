@@ -119,7 +119,7 @@ void PetitionMgr::RemovePetitionByOwnerAndType(ObjectGuid ownerGuid, uint8 type)
             {
                 if (Player* owner = ObjectAccessor::FindConnectedPlayer(ownerGuid))
                 {
-                    if (Item* item = owner->GetItemByGuid(itr->first))
+                    if (auto item = owner->GetItemByGuid(itr->first))
                     {
                         owner->DestroyItem(item->GetBagSlot(), item->GetSlot(), true);
                     }

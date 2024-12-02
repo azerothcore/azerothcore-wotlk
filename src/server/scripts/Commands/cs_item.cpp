@@ -98,10 +98,10 @@ public:
             CharacterDatabaseTransaction trans = CharacterDatabase.BeginTransaction();
 
             // Save to prevent loss at next mail load. Item deletes on fail
-            if (Item* item = Item::CreateItem(itemEntry, itemCount, 0))
+            if (auto item = Item::CreateItem(itemEntry, itemCount, nullptr))
             {
                 item->SaveToDB(trans);
-                draft.AddItem(item);
+                draft.AddItem(std::move(item));
             }
 
             draft.SendMailTo(trans, MailReceiver(player.GetGUID().GetCounter()), sender);
@@ -328,10 +328,10 @@ public:
                             continue;
                         }
 
-                        if (Item* item = Item::CreateItem(reqItem, iece->reqitemcount[count]))
+                        if (auto item = Item::CreateItem(reqItem, iece->reqitemcount[count]))
                         {
                             item->SaveToDB(trans);
-                            draft.AddItem(item);
+                            draft.AddItem(std::move(item));
                             foundItems = true;
                         }
                     }

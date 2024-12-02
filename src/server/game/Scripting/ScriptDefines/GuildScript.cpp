@@ -59,7 +59,7 @@ void ScriptMgr::OnGuildMemberDepositMoney(Guild* guild, Player* player, uint32& 
     CALL_ENABLED_HOOKS(GuildScript, GUILDHOOK_ON_MEMBER_DEPOSIT_MONEY, script->OnMemberDepositMoney(guild, player, amount));
 }
 
-void ScriptMgr::OnGuildItemMove(Guild* guild, Player* player, Item* pItem, bool isSrcBank, uint8 srcContainer, uint8 srcSlotId, bool isDestBank, uint8 destContainer, uint8 destSlotId)
+void ScriptMgr::OnGuildItemMove(Guild* guild, Player* player, std::shared_ptr<Item> pItem, bool isSrcBank, uint8 srcContainer, uint8 srcSlotId, bool isDestBank, uint8 destContainer, uint8 destSlotId)
 {
     CALL_ENABLED_HOOKS(GuildScript, GUILDHOOK_ON_ITEM_MOVE, script->OnItemMove(guild, player, pItem, isSrcBank, srcContainer, srcSlotId, isDestBank, destContainer, destSlotId));
 }

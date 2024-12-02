@@ -572,14 +572,14 @@ private:
         std::string const& GetIcon() const { return m_icon; }
         std::string const& GetText() const { return m_text; }
 
-        inline Item* GetItem(uint8 slotId) const { return slotId < GUILD_BANK_MAX_SLOTS ?  m_items[slotId] : nullptr; }
-        bool SetItem(CharacterDatabaseTransaction trans, uint8 slotId, Item* pItem);
+        inline std::shared_ptr<Item> GetItem(uint8 slotId) const { return slotId < GUILD_BANK_MAX_SLOTS ?  m_items[slotId] : nullptr; }
+        bool SetItem(CharacterDatabaseTransaction trans, uint8 slotId, std::shared_ptr<Item> pItem);
 
     private:
         uint32 m_guildId;
         uint8 m_tabId;
 
-        std::array<Item*, GUILD_BANK_MAX_SLOTS> m_items = {};
+        std::array<std::shared_ptr<Item>, GUILD_BANK_MAX_SLOTS> m_items;
         std::string m_name;
         std::string m_icon;
         std::string m_text;
@@ -603,13 +603,13 @@ private:
         // Defines if player has rights to withdraw item from container
         virtual bool HasWithdrawRights(MoveItemData* /*pOther*/) const { return true; }
         // Checks if container can store specified item
-        bool CanStore(Item* pItem, bool swap, bool sendError);
+        bool CanStore(std::shared_ptr<Item> pItem, bool swap, bool sendError);
         // Clones stored item
         bool CloneItem(uint32 count);
         // Remove item from container (if splited update items fields)
         virtual void RemoveItem(CharacterDatabaseTransaction trans, MoveItemData* pOther, uint32 splitedAmount = 0) = 0;
         // Saves item to container
-        virtual Item* StoreItem(CharacterDatabaseTransaction trans, Item* pItem) = 0;
+        virtual std::shared_ptr<Item> StoreItem(CharacterDatabaseTransaction trans, std::shared_ptr<Item> pItem) = 0;
         // Log bank event
         virtual void LogBankEvent(CharacterDatabaseTransaction trans, MoveItemData* pFrom, uint32 count) const = 0;
         // Log GM action
@@ -617,19 +617,19 @@ private:
         // Copy slots id from position vector
         void CopySlots(SlotIds& ids) const;
 
-        Item* GetItem(bool isCloned = false) const { return isCloned ? m_pClonedItem : m_pItem; }
+        std::shared_ptr<Item> GetItem(bool isCloned = false) const { return isCloned ? m_pClonedItem : m_pItem; }
         uint8 GetContainer() const { return m_container; }
         uint8 GetSlotId() const { return m_slotId; }
 
     protected:
-        virtual InventoryResult CanStore(Item* pItem, bool swap) = 0;
+        virtual InventoryResult CanStore(std::shared_ptr<Item> pItem, bool swap) = 0;
 
         Guild* m_pGuild;
         Player* m_pPlayer;
         uint8 m_container;
         uint8 m_slotId;
-        Item* m_pItem;
-        Item* m_pClonedItem;
+        std::shared_ptr<Item> m_pItem;
+        std::shared_ptr<Item> m_pClonedItem;
         ItemPosCountVec m_vec;
     };
 
@@ -642,10 +642,10 @@ private:
         bool IsBank() const override { return false; }
         bool InitItem() override;
         void RemoveItem(CharacterDatabaseTransaction trans, MoveItemData* pOther, uint32 splitedAmount = 0) override;
-        Item* StoreItem(CharacterDatabaseTransaction trans, Item* pItem) override;
+        std::shared_ptr<Item> StoreItem(CharacterDatabaseTransaction trans, std::shared_ptr<Item> pItem) override;
         void LogBankEvent(CharacterDatabaseTransaction trans, MoveItemData* pFrom, uint32 count) const override;
     protected:
-        InventoryResult CanStore(Item* pItem, bool swap) override;
+        InventoryResult CanStore(std::shared_ptr<Item> pItem, bool swap) override;
     };
 
     class BankMoveItemData : public MoveItemData
@@ -659,17 +659,17 @@ private:
         bool HasStoreRights(MoveItemData* pOther) const override;
         bool HasWithdrawRights(MoveItemData* pOther) const override;
         void RemoveItem(CharacterDatabaseTransaction trans, MoveItemData* pOther, uint32 splitedAmount) override;
-        Item* StoreItem(CharacterDatabaseTransaction trans, Item* pItem) override;
+        std::shared_ptr<Item> StoreItem(CharacterDatabaseTransaction trans, std::shared_ptr<Item> pItem) override;
         void LogBankEvent(CharacterDatabaseTransaction trans, MoveItemData* pFrom, uint32 count) const override;
         void LogAction(MoveItemData* pFrom) const override;
 
     protected:
-        InventoryResult CanStore(Item* pItem, bool swap) override;
+        InventoryResult CanStore(std::shared_ptr<Item> pItem, bool swap) override;
 
     private:
-        Item* _StoreItem(CharacterDatabaseTransaction trans, BankTab* pTab, Item* pItem, ItemPosCount& pos, bool clone) const;
-        bool _ReserveSpace(uint8 slotId, Item* pItem, Item* pItemDest, uint32& count);
-        void CanStoreItemInTab(Item* pItem, uint8 skipSlotId, bool merge, uint32& count);
+        std::shared_ptr<Item> _StoreItem(CharacterDatabaseTransaction trans, BankTab* pTab, std::shared_ptr<Item> pItem, ItemPosCount& pos, bool clone) const;
+        bool _ReserveSpace(uint8 slotId, std::shared_ptr<Item> pItem, std::shared_ptr<Item> pItemDest, uint32& count);
+        void CanStoreItemInTab(std::shared_ptr<Item> pItem, uint8 skipSlotId, bool merge, uint32& count);
     };
 
 public:
@@ -853,7 +853,7 @@ private:
     void _LogEvent(GuildEventLogTypes eventType, ObjectGuid playerGuid1, ObjectGuid playerGuid2 = ObjectGuid::Empty, uint8 newRank = 0);
     void _LogBankEvent(CharacterDatabaseTransaction trans, GuildBankEventLogTypes eventType, uint8 tabId, ObjectGuid playerGuid, uint32 itemOrMoney, uint16 itemStackCount = 0, uint8 destTabId = 0);
 
-    Item* _GetItem(uint8 tabId, uint8 slotId) const;
+    std::shared_ptr<Item> _GetItem(uint8 tabId, uint8 slotId) const;
     void _RemoveItem(CharacterDatabaseTransaction trans, uint8 tabId, uint8 slotId);
     void _MoveItems(MoveItemData* pSrc, MoveItemData* pDest, uint32 splitedAmount);
     bool _DoItemsMove(MoveItemData* pSrc, MoveItemData* pDest, bool sendError, uint32 splitedAmount = 0);

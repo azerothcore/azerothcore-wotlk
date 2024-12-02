@@ -325,10 +325,12 @@ void SpellCastTargets::RemoveObjectTarget()
     m_targetMask &= ~(TARGET_FLAG_UNIT_MASK | TARGET_FLAG_CORPSE_MASK | TARGET_FLAG_GAMEOBJECT_MASK);
 }
 
-void SpellCastTargets::SetItemTarget(Item* item)
+void SpellCastTargets::SetItemTarget(std::shared_ptr<Item> item)
 {
-    if (!item)
+    if (item == nullptr)
+    {
         return;
+    }
 
     m_itemTarget = item;
     m_itemTargetGUID = item->GetGUID();
@@ -612,10 +614,16 @@ Spell::Spell(Unit* caster, SpellInfo const* info, TriggerCastFlags triggerFlags,
     m_spellSchoolMask = info->GetSchoolMask();           // Can be override for some spell (wand shoot for example)
 
     if (m_attackType == RANGED_ATTACK)
+    {
         // wand case
         if ((m_caster->getClassMask() & CLASSMASK_WAND_USERS) != 0 && m_caster->IsPlayer())
-            if (Item* pItem = m_caster->ToPlayer()->GetWeaponForAttack(RANGED_ATTACK))
+        {
+            if (auto pItem = m_caster->ToPlayer()->GetWeaponForAttack(RANGED_ATTACK))
+            {
                 m_spellSchoolMask = SpellSchoolMask(1 << pItem->GetTemplate()->Damage[0].DamageType);
+            }
+        }
+    }
 
     if (originalCasterGUID)
         m_originalCasterGUID = originalCasterGUID;
@@ -1822,8 +1830,10 @@ void Spell::SelectImplicitTargetObjectTargets(SpellEffIndex effIndex, SpellImpli
         SelectImplicitChainTargets(effIndex, targetType, target, 1 << effIndex);
     }
     // Script hook can remove object target and we would wrongly land here
-    else if (Item* item = m_targets.GetItemTarget())
+    else if (auto item = m_targets.GetItemTarget())
+    {
         AddItemTarget(item, 1 << effIndex);
+    }
 }
 
 void Spell::SelectImplicitChainTargets(SpellEffIndex effIndex, SpellImplicitTargetInfo const& targetType, WorldObject* target, uint32 effMask)
@@ -2083,8 +2093,10 @@ void Spell::SelectEffectTypeImplicitTargets(uint8 effIndex)
             }
             if (targetMask & TARGET_FLAG_ITEM_MASK)
             {
-                if (Item* itemTarget = m_targets.GetItemTarget())
+                if (auto itemTarget = m_targets.GetItemTarget())
+                {
                     AddItemTarget(itemTarget, 1 << effIndex);
+                }
                 return;
             }
             if (targetMask & TARGET_FLAG_GAMEOBJECT_MASK)
@@ -2576,7 +2588,7 @@ void Spell::AddGOTarget(GameObject* go, uint32 effectMask)
     m_UniqueGOTargetInfo.push_back(target);
 }
 
-void Spell::AddItemTarget(Item* item, uint32 effectMask)
+void Spell::AddItemTarget(std::shared_ptr<Item> item, uint32 effectMask)
 {
     for (uint32 effIndex = 0; effIndex < MAX_SPELL_EFFECTS; ++effIndex)
         if (!m_spellInfo->Effects[effIndex].IsEffect())
@@ -3950,7 +3962,7 @@ void Spell::_cast(bool skipCheck)
         TakePower();
         TakeReagents();                                         // we must remove reagents before HandleEffects to allow place crafted item in same slot
     }
-    else if (Item* targetItem = m_targets.GetItemTarget())
+    else if (auto targetItem = m_targets.GetItemTarget())
     {
         /// Not own traded item (in trader trade slot) req. reagents including triggered spell case
         if (targetItem->GetOwnerGUID() != m_caster->GetGUID())
@@ -4937,7 +4949,7 @@ void Spell::WriteAmmoToPacket(WorldPacket* data)
 
     if (m_caster->IsPlayer())
     {
-        Item* pItem = m_caster->ToPlayer()->GetWeaponForAttack(RANGED_ATTACK);
+        auto pItem = m_caster->ToPlayer()->GetWeaponForAttack(RANGED_ATTACK);
         if (pItem)
         {
             ammoInventoryType = pItem->GetTemplate()->InventoryType;
@@ -5385,7 +5397,7 @@ void Spell::TakeAmmo()
 {
     if (m_attackType == RANGED_ATTACK && m_caster->IsPlayer())
     {
-        Item* pItem = m_caster->ToPlayer()->GetWeaponForAttack(RANGED_ATTACK);
+        auto pItem = m_caster->ToPlayer()->GetWeaponForAttack(RANGED_ATTACK);
 
         // wands don't have ammo
         if (!pItem  || pItem->IsBroken() || pItem->GetTemplate()->SubClass == ITEM_SUBCLASS_WEAPON_WAND)
@@ -5629,14 +5641,14 @@ void Spell::HandleThreatSpells()
     LOG_DEBUG("spells.aura", "Spell {}, added an additional {} threat for {} {} target(s)", m_spellInfo->Id, threat, m_spellInfo->_IsPositiveSpell() ? "assisting" : "harming", uint32(m_UniqueTargetInfo.size()));
 }
 
-void Spell::HandleEffects(Unit* pUnitTarget, Item* pItemTarget, GameObject* pGOTarget, uint32 i, SpellEffectHandleMode mode)
+void Spell::HandleEffects(Unit* pUnitTarget, std::shared_ptr<Item> pItemTarget, GameObject* pGOTarget, uint32 i, SpellEffectHandleMode mode)
 {
     if (HasTriggeredCastFlag(TRIGGERED_IGNORE_EFFECTS))
         return;
 
     effectHandleMode = mode;
     unitTarget = pUnitTarget;
-    itemTarget = pItemTarget;
+    itemTarget = std::move(pItemTarget);
     gameObjTarget = pGOTarget;
     destTarget = &m_destTargets[i]._position;
 
@@ -6184,9 +6196,11 @@ SpellCastResult Spell::CheckCast(bool strict)
                     if (!m_caster->IsPlayer())
                         return SPELL_FAILED_BAD_TARGETS;
 
-                    Item* foodItem = m_targets.GetItemTarget();
-                    if (!foodItem)
+                    auto foodItem = m_targets.GetItemTarget();
+                    if (foodItem == nullptr)
+                    {
                         return SPELL_FAILED_BAD_TARGETS;
+                    }
 
                     Pet* pet = m_caster->ToPlayer()->GetPet();
 
@@ -6305,7 +6319,7 @@ SpellCastResult Spell::CheckCast(bool strict)
                             || (m_spellInfo->Effects[i].TargetA.GetTarget() == TARGET_GAMEOBJECT_TARGET && !m_targets.GetGOTarget()))
                         return SPELL_FAILED_BAD_TARGETS;
 
-                    Item* pTempItem = nullptr;
+                    std::shared_ptr<Item> pTempItem = nullptr;
                     if (m_targets.GetTargetMask() & TARGET_FLAG_TRADE_ITEM)
                     {
                         if (TradeData* pTrade = m_caster->ToPlayer()->GetTradeData())
@@ -6349,7 +6363,7 @@ SpellCastResult Spell::CheckCast(bool strict)
                         if (!lockId)
                             return SPELL_FAILED_BAD_TARGETS;
                     }
-                    else if (Item* itm = m_targets.GetItemTarget())
+                    else if (auto itm = m_targets.GetItemTarget())
                         lockId = itm->GetTemplate()->LockID;
 
                     SkillType skillId = SKILL_NONE;
@@ -7293,9 +7307,15 @@ SpellCastResult Spell::CheckItems()
         bool checkReagents = !HasTriggeredCastFlag(TRIGGERED_IGNORE_POWER_AND_REAGENT_COST) && !player->CanNoReagentCast(m_spellInfo);
         // Not own traded item (in trader trade slot) requires reagents even if triggered spell
         if (!checkReagents)
-            if (Item* targetItem = m_targets.GetItemTarget())
+        {
+            if (auto targetItem = m_targets.GetItemTarget())
+            {
                 if (targetItem->GetOwnerGUID() != m_caster->GetGUID())
+                {
                     checkReagents = true;
+                }
+            }
+        }
 
         // check reagents (ignore triggered spells with reagents processed by original spell) and special reagent ignore case.
         if (checkReagents)
@@ -7455,9 +7475,11 @@ SpellCastResult Spell::CheckItems()
                 [[fallthrough]]; /// @todo: Not sure whether the fallthrough was a mistake (forgetting a break) or intended. This should be double-checked.
             case SPELL_EFFECT_ENCHANT_ITEM_PRISMATIC:
                 {
-                    Item* targetItem = m_targets.GetItemTarget();
-                    if (!targetItem)
+                    auto targetItem = m_targets.GetItemTarget();
+                    if (targetItem == nullptr)
+                    {
                         return SPELL_FAILED_ITEM_NOT_FOUND;
+                    }
 
                     // xinef: required level has to be checked also! Exploit fix
                     if (targetItem->GetTemplate()->ItemLevel < m_spellInfo->BaseLevel || (targetItem->GetTemplate()->RequiredLevel && targetItem->GetTemplate()->RequiredLevel < m_spellInfo->BaseLevel))
@@ -7515,8 +7537,8 @@ SpellCastResult Spell::CheckItems()
                 }
             case SPELL_EFFECT_ENCHANT_ITEM_TEMPORARY:
                 {
-                    Item* item = m_targets.GetItemTarget();
-                    if (!item)
+                    auto item = m_targets.GetItemTarget();
+                    if (item == nullptr)
                         return SPELL_FAILED_ITEM_NOT_FOUND;
                     // Not allow enchant in trade slot for some enchant type
                     if (item->GetOwner() != m_caster)
@@ -7626,8 +7648,8 @@ SpellCastResult Spell::CheckItems()
                     if (m_attackType != RANGED_ATTACK)
                         break;
 
-                    Item* pItem = m_caster->ToPlayer()->GetWeaponForAttack(m_attackType);
-                    if (!pItem || pItem->IsBroken())
+                    auto pItem = m_caster->ToPlayer()->GetWeaponForAttack(m_attackType);
+                    if (pItem == nullptr || pItem->IsBroken())
                         return SPELL_FAILED_EQUIPPED_ITEM;
 
                     switch (pItem->GetTemplate()->SubClass)
@@ -7698,7 +7720,7 @@ SpellCastResult Spell::CheckItems()
                     if (!pProto)
                         return SPELL_FAILED_ITEM_AT_MAX_CHARGES;
 
-                    if (Item* pitem = player->GetItemByEntry(item_id))
+                    if (auto pitem = player->GetItemByEntry(item_id))
                     {
                         for (int x = 0; x < MAX_ITEM_PROTO_SPELLS; ++x)
                             if (pProto->Spells[x].SpellCharges != 0 && pitem->GetSpellCharges(x) == pProto->Spells[x].SpellCharges)
@@ -7717,11 +7739,13 @@ SpellCastResult Spell::CheckItems()
         // main hand weapon required
         if (m_spellInfo->HasAttribute(SPELL_ATTR3_REQUIRES_MAIN_HAND_WEAPON))
         {
-            Item* item = m_caster->ToPlayer()->GetWeaponForAttack(BASE_ATTACK);
+            auto item = m_caster->ToPlayer()->GetWeaponForAttack(BASE_ATTACK);
 
             // skip spell if no weapon in slot or broken
-            if (!item || item->IsBroken())
+            if (item == nullptr || item->IsBroken())
+            {
                 return SPELL_FAILED_EQUIPPED_ITEM_CLASS_MAINHAND;
+            }
 
             // skip spell if weapon not fit to triggered spell
             if (!item->IsFitToSpellRequirements(m_spellInfo))
@@ -7731,15 +7755,19 @@ SpellCastResult Spell::CheckItems()
         // offhand hand weapon required
         if (m_spellInfo->HasAttribute(SPELL_ATTR3_REQUIRES_OFF_HAND_WEAPON))
         {
-            Item* item = m_caster->ToPlayer()->GetWeaponForAttack(OFF_ATTACK);
+            auto item = m_caster->ToPlayer()->GetWeaponForAttack(OFF_ATTACK);
 
             // skip spell if no weapon in slot or broken
-            if (!item || item->IsBroken())
+            if (item == nullptr || item->IsBroken())
+            {
                 return SPELL_FAILED_EQUIPPED_ITEM_CLASS_OFFHAND;
+            }
 
             // skip spell if weapon not fit to triggered spell
             if (!item->IsFitToSpellRequirements(m_spellInfo))
+            {
                 return SPELL_FAILED_EQUIPPED_ITEM_CLASS_OFFHAND;
+            }
         }
 
         m_weaponItem = m_caster->ToPlayer()->GetWeaponForAttack(m_attackType, true);

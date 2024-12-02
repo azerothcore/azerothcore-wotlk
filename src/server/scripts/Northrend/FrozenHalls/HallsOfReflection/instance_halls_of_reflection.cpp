@@ -485,13 +485,21 @@ public:
                                         c->SetDisableGravity(true);
                                         c->SetVisible(true);
 
-                                        Item* i;
-                                        i = p->GetWeaponForAttack(BASE_ATTACK);
-                                        c->SetUInt32Value(UNIT_VIRTUAL_ITEM_SLOT_ID + 0, i ? i->GetEntry() : 0);
-                                        i = p->GetWeaponForAttack(OFF_ATTACK);
-                                        c->SetUInt32Value(UNIT_VIRTUAL_ITEM_SLOT_ID + 1, i ? i->GetEntry() : 0);
-                                        i = p->GetWeaponForAttack(RANGED_ATTACK);
-                                        c->SetUInt32Value(UNIT_VIRTUAL_ITEM_SLOT_ID + 2, i ? i->GetEntry() : 0);
+                                        if (auto i = p->GetWeaponForAttack(BASE_ATTACK))
+                                        {
+                                            c->SetUInt32Value(UNIT_VIRTUAL_ITEM_SLOT_ID + 0, i ? i->GetEntry() : 0);
+                                        }
+
+                                        if (auto i = p->GetWeaponForAttack(OFF_ATTACK))
+                                        {
+                                            c->SetUInt32Value(UNIT_VIRTUAL_ITEM_SLOT_ID + 1, i ? i->GetEntry() : 0);
+                                        }
+
+                                        if (auto i = p->GetWeaponForAttack(RANGED_ATTACK))
+                                        {
+                                            c->SetUInt32Value(UNIT_VIRTUAL_ITEM_SLOT_ID + 2, i ? i->GetEntry() : 0);
+                                        }
+
                                         p->CastSpell(c, SPELL_HOR_CLONE, true);
                                         p->CastSpell(c, SPELL_HOR_CLONE_NAME, true);
                                     }

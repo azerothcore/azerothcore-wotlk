@@ -220,8 +220,8 @@ bool ItemCanGoIntoBag(ItemTemplate const* proto, ItemTemplate const* pBagProto);
 class Item : public Object, public std::enable_shared_from_this<Item>
 {
 public:
-    static Item* CreateItem(uint32 item, uint32 count, Player const* player = nullptr, bool clone = false, uint32 randomPropertyId = 0);
-    Item* CloneItem(uint32 count, Player const* player = nullptr) const;
+    static std::shared_ptr<Item> CreateItem(uint32 item, uint32 count, Player const* player = nullptr, bool clone = false, uint32 randomPropertyId = 0);
+    std::shared_ptr<Item> CloneItem(uint32 count, Player const* player = nullptr) const;
 
     Item();
 
@@ -240,7 +240,7 @@ public:
     [[nodiscard]] bool IsBoundByEnchant() const;
     [[nodiscard]] bool IsBoundByTempEnchant() const;
     virtual void SaveToDB(CharacterDatabaseTransaction trans);
-    virtual bool LoadFromDB(ObjectGuid::LowType guid, ObjectGuid owner_guid, Field* fields, uint32 entry);
+    virtual bool LoadFromDB(ObjectGuid::LowType guid, ObjectGuid owner_guid, const Field* fields, uint32 entry);
     static void DeleteFromDB(CharacterDatabaseTransaction trans, ObjectGuid::LowType itemGuid);
     virtual void DeleteFromDB(CharacterDatabaseTransaction trans);
     static void DeleteFromInventoryDB(CharacterDatabaseTransaction trans, ObjectGuid::LowType itemGuid);

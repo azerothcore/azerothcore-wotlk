@@ -392,13 +392,13 @@ public:
     virtual void OnBeingCharmed(Player* /*player*/, Unit* /*charmer*/, uint32 /*oldFactionId*/, uint32 /*newFactionId*/) { }
 
     // To change behaviour of set visible item slot
-    virtual void OnAfterSetVisibleItemSlot(Player* /*player*/, uint8 /*slot*/, Item* /*item*/) { }
+    virtual void OnAfterSetVisibleItemSlot(Player* /*player*/, uint8 /*slot*/, std::shared_ptr<Item> /*item*/) { }
 
     // After an item has been moved from inventory
-    virtual void OnAfterMoveItemFromInventory(Player* /*player*/, Item* /*it*/, uint8 /*bag*/, uint8 /*slot*/, bool /*update*/) { }
+    virtual void OnAfterMoveItemFromInventory(Player* /*player*/, std::shared_ptr<Item> /*it*/, uint8 /*bag*/, uint8 /*slot*/, bool /*update*/) { }
 
     // After an item has been equipped
-    virtual void OnEquip(Player* /*player*/, Item* /*it*/, uint8 /*bag*/, uint8 /*slot*/, bool /*update*/) { }
+    virtual void OnEquip(Player* /*player*/, std::shared_ptr<Item> /*it*/, uint8 /*bag*/, uint8 /*slot*/, bool /*update*/) { }
 
     // After player enters queue for BG
     virtual void OnPlayerJoinBG(Player* /*player*/) { }
@@ -410,28 +410,28 @@ public:
     virtual void OnGetMaxPersonalArenaRatingRequirement(Player const* /*player*/, uint32 /*minSlot*/, uint32& /*maxArenaRating*/) const {}
 
     //After looting item
-    virtual void OnLootItem(Player* /*player*/, Item* /*item*/, uint32 /*count*/, ObjectGuid /*lootguid*/) { }
+    virtual void OnLootItem(Player* /*player*/, std::shared_ptr<Item> /*item*/, uint32 /*count*/, ObjectGuid /*lootguid*/) { }
 
     //Before looting item
     virtual void OnBeforeFillQuestLootItem(Player* /*player*/, LootItem& /*item*/) { }
 
     //After looting item (includes master loot).
-    virtual void OnStoreNewItem(Player* /*player*/, Item* /*item*/, uint32 /*count*/) { }
+    virtual void OnStoreNewItem(Player* /*player*/, std::shared_ptr<Item> /*item*/, uint32 /*count*/) { }
 
     //After creating item (eg profession item creation)
-    virtual void OnCreateItem(Player* /*player*/, Item* /*item*/, uint32 /*count*/) { }
+    virtual void OnCreateItem(Player* /*player*/, std::shared_ptr<Item> /*item*/, uint32 /*count*/) { }
 
     // After receiving item as a quest reward
-    virtual void OnQuestRewardItem(Player* /*player*/, Item* /*item*/, uint32 /*count*/) { }
+    virtual void OnQuestRewardItem(Player* /*player*/, std::shared_ptr<Item> /*item*/, uint32 /*count*/) { }
 
     // When placing a bid or buying out an auction
     [[nodiscard]] virtual bool CanPlaceAuctionBid(Player* /*player*/, AuctionEntry* /*auction*/) { return true; }
 
     // After receiving item as a group roll reward
-    virtual void OnGroupRollRewardItem(Player* /*player*/, Item* /*item*/, uint32 /*count*/, RollVote /*voteType*/, Roll* /*roll*/) { }
+    virtual void OnGroupRollRewardItem(Player* /*player*/, std::shared_ptr<Item> /*item*/, uint32 /*count*/, RollVote /*voteType*/, Roll* /*roll*/) { }
 
     //Before opening an item
-    [[nodiscard]] virtual bool OnBeforeOpenItem(Player* /*player*/, Item* /*item*/) { return true; }
+    [[nodiscard]] virtual bool OnBeforeOpenItem(Player* /*player*/, std::shared_ptr<Item> /*item*/) { return true; }
 
     // After completed a quest
     [[nodiscard]] virtual bool OnBeforeQuestComplete(Player* /*player*/, uint32 /*quest_id*/) { return true; }
@@ -449,7 +449,7 @@ public:
     virtual void OnBeforeStoreOrEquipNewItem(Player* /*player*/, uint32 /*vendorslot*/, uint32& /*item*/, uint8 /*count*/, uint8 /*bag*/, uint8 /*slot*/, ItemTemplate const* /*pProto*/, Creature* /*pVendor*/, VendorItem const* /*crItem*/, bool /*bStore*/) { };
 
     //After buying something from any vendor
-    virtual void OnAfterStoreOrEquipNewItem(Player* /*player*/, uint32 /*vendorslot*/, Item* /*item*/, uint8 /*count*/, uint8 /*bag*/, uint8 /*slot*/, ItemTemplate const* /*pProto*/, Creature* /*pVendor*/, VendorItem const* /*crItem*/, bool /*bStore*/) { };
+    virtual void OnAfterStoreOrEquipNewItem(Player* /*player*/, uint32 /*vendorslot*/, std::shared_ptr<Item> /*item*/, uint8 /*count*/, uint8 /*bag*/, uint8 /*slot*/, ItemTemplate const* /*pProto*/, Creature* /*pVendor*/, VendorItem const* /*crItem*/, bool /*bStore*/) { };
 
     virtual void OnAfterUpdateMaxPower(Player* /*player*/, Powers& /*power*/, float& /*value*/) { }
 
@@ -487,9 +487,9 @@ public:
 
     [[nodiscard]] virtual bool CanGroupAccept(Player* /*player*/, Group* /*group*/) { return true; }
 
-    [[nodiscard]] virtual bool CanSellItem(Player* /*player*/, Item* /*item*/, Creature* /*creature*/) { return true; }
+    [[nodiscard]] virtual bool CanSellItem(Player* /*player*/, std::shared_ptr<Item> /*item*/, Creature* /*creature*/) { return true; }
 
-    [[nodiscard]] virtual bool CanSendMail(Player* /*player*/, ObjectGuid /*receiverGuid*/, ObjectGuid /*mailbox*/, std::string& /*subject*/, std::string& /*body*/, uint32 /*money*/, uint32 /*COD*/, Item* /*item*/) { return true; }
+    [[nodiscard]] virtual bool CanSendMail(Player* /*player*/, ObjectGuid /*receiverGuid*/, ObjectGuid /*mailbox*/, std::string& /*subject*/, std::string& /*body*/, uint32 /*money*/, uint32 /*COD*/, std::shared_ptr<Item> /*item*/) { return true; }
 
     virtual void PetitionBuy(Player* /*player*/, Creature* /*creature*/, uint32& /*charterid*/, uint32& /*cost*/, uint32& /*type*/) { }
 
@@ -546,7 +546,7 @@ public:
 
     virtual void OnApplyItemModsBefore(Player* /*player*/, uint8 /*slot*/, bool /*apply*/, uint8 /*itemProtoStatNumber*/, uint32 /*statType*/, int32& /*val*/) { }
 
-    virtual void OnApplyEnchantmentItemModsBefore(Player* /*player*/, Item* /*item*/, EnchantmentSlot /*slot*/, bool /*apply*/, uint32 /*enchant_spell_id*/, uint32& /*enchant_amount*/) { }
+    virtual void OnApplyEnchantmentItemModsBefore(Player* /*player*/, std::shared_ptr<Item> /*item*/, EnchantmentSlot /*slot*/, bool /*apply*/, uint32 /*enchant_spell_id*/, uint32& /*enchant_amount*/) { }
 
     virtual void OnApplyWeaponDamage(Player* /*player*/, uint8 /*slot*/, ItemTemplate const* /*proto*/, float& /*minDamage*/, float& /*maxDamage*/, uint8 /*damageIndex*/) { }
 
@@ -554,33 +554,33 @@ public:
 
     virtual void OnGetFeralApBonus(Player* /*player*/, int32& /*feral_bonus*/, int32 /*dpsMod*/, ItemTemplate const* /*proto*/, ScalingStatValuesEntry const* /*ssv*/) { }
 
-    [[nodiscard]] virtual bool CanApplyWeaponDependentAuraDamageMod(Player* /*player*/, Item* /*item*/, WeaponAttackType /*attackType*/, AuraEffect const* /*aura*/, bool /*apply*/) { return true; }
+    [[nodiscard]] virtual bool CanApplyWeaponDependentAuraDamageMod(Player* /*player*/, std::shared_ptr<Item> /*item*/, WeaponAttackType /*attackType*/, AuraEffect const* /*aura*/, bool /*apply*/) { return true; }
 
-    [[nodiscard]] virtual bool CanApplyEquipSpell(Player* /*player*/, SpellInfo const* /*spellInfo*/, Item* /*item*/, bool /*apply*/, bool /*form_change*/) { return true; }
+    [[nodiscard]] virtual bool CanApplyEquipSpell(Player* /*player*/, SpellInfo const* /*spellInfo*/, std::shared_ptr<Item> /*item*/, bool /*apply*/, bool /*form_change*/) { return true; }
 
     [[nodiscard]] virtual bool CanApplyEquipSpellsItemSet(Player* /*player*/, ItemSetEffect* /*eff*/) { return true; }
 
-    [[nodiscard]] virtual bool CanCastItemCombatSpell(Player* /*player*/, Unit* /*target*/, WeaponAttackType /*attType*/, uint32 /*procVictim*/, uint32 /*procEx*/, Item* /*item*/, ItemTemplate const* /*proto*/) { return true; }
+    [[nodiscard]] virtual bool CanCastItemCombatSpell(Player* /*player*/, Unit* /*target*/, WeaponAttackType /*attType*/, uint32 /*procVictim*/, uint32 /*procEx*/, std::shared_ptr<Item> /*item*/, ItemTemplate const* /*proto*/) { return true; }
 
-    [[nodiscard]] virtual bool CanCastItemUseSpell(Player* /*player*/, Item* /*item*/, SpellCastTargets const& /*targets*/, uint8 /*cast_count*/, uint32 /*glyphIndex*/) { return true; }
+    [[nodiscard]] virtual bool CanCastItemUseSpell(Player* /*player*/, std::shared_ptr<Item> /*item*/, SpellCastTargets const& /*targets*/, uint8 /*cast_count*/, uint32 /*glyphIndex*/) { return true; }
 
     virtual void OnApplyAmmoBonuses(Player* /*player*/, ItemTemplate const* /*proto*/, float& /*currentAmmoDPS*/) { }
 
-    [[nodiscard]] virtual bool CanEquipItem(Player* /*player*/, uint8 /*slot*/, uint16& /*dest*/, Item* /*pItem*/, bool /*swap*/, bool /*not_loading*/) { return true; }
+    [[nodiscard]] virtual bool CanEquipItem(Player* /*player*/, uint8 /*slot*/, uint16& /*dest*/, std::shared_ptr<Item> /*pItem*/, bool /*swap*/, bool /*not_loading*/) { return true; }
 
     [[nodiscard]] virtual bool CanUnequipItem(Player* /*player*/, uint16 /*pos*/, bool /*swap*/) { return true; }
 
     [[nodiscard]] virtual bool CanUseItem(Player* /*player*/, ItemTemplate const* /*proto*/, InventoryResult& /*result*/) { return true; }
 
-    [[nodiscard]] virtual bool CanSaveEquipNewItem(Player* /*player*/, Item* /*item*/, uint16 /*pos*/, bool /*update*/) { return true; }
+    [[nodiscard]] virtual bool CanSaveEquipNewItem(Player* /*player*/, std::shared_ptr<Item> /*item*/, uint16 /*pos*/, bool /*update*/) { return true; }
 
-    [[nodiscard]] virtual bool CanApplyEnchantment(Player* /*player*/, Item* /*item*/, EnchantmentSlot /*slot*/, bool /*apply*/, bool /*apply_dur*/, bool /*ignore_condition*/) { return true; }
+    [[nodiscard]] virtual bool CanApplyEnchantment(Player* /*player*/, std::shared_ptr<Item> /*item*/, EnchantmentSlot /*slot*/, bool /*apply*/, bool /*apply_dur*/, bool /*ignore_condition*/) { return true; }
 
     virtual void OnGetQuestRate(Player* /*player*/, float& /*result*/) { }
 
     [[nodiscard]] virtual bool PassedQuestKilledMonsterCredit(Player* /*player*/, Quest const* /*qinfo*/, uint32 /*entry*/, uint32 /*real_entry*/, ObjectGuid /*guid*/) { return true; }
 
-    [[nodiscard]] virtual bool CheckItemInSlotAtLoadInventory(Player* /*player*/, Item* /*item*/, uint8 /*slot*/, uint8& /*err*/, uint16& /*dest*/) { return true; }
+    [[nodiscard]] virtual bool CheckItemInSlotAtLoadInventory(Player* /*player*/, std::shared_ptr<Item> /*item*/, uint8 /*slot*/, uint8& /*err*/, uint16& /*dest*/) { return true; }
 
     [[nodiscard]] virtual bool NotAvoidSatisfy(Player* /*player*/, DungeonProgressionRequirements const* /*ar*/, uint32 /*target_map*/, bool /*report*/) { return true; }
 
@@ -615,7 +615,7 @@ public:
      *
      * @return True if you want to continue setting the item in the trade slot, false if you want to cancel the trade
      */
-    [[nodiscard]] virtual bool CanSetTradeItem(Player* /*player*/, Item* /*tradedItem*/, uint8 /*tradeSlot*/) { return true; }
+    [[nodiscard]] virtual bool CanSetTradeItem(Player* /*player*/, std::shared_ptr<Item> /*tradedItem*/, uint8 /*tradeSlot*/) { return true; }
 
     virtual void OnSetServerSideVisibility(Player* /*player*/, ServerSideVisibilityType& /*type*/, AccountTypes& /*sec*/) { }
 

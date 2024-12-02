@@ -55,7 +55,7 @@ public:
     // overwrite virtual Item::SaveToDB
     void SaveToDB(CharacterDatabaseTransaction trans) override;
     // overwrite virtual Item::LoadFromDB
-    bool LoadFromDB(ObjectGuid::LowType guid, ObjectGuid owner_guid, Field* fields, uint32 entry) override;
+    bool LoadFromDB(ObjectGuid::LowType guid, ObjectGuid owner_guid, const Field* fields, uint32 entry) override;
     // overwrite virtual Item::DeleteFromDB
     void DeleteFromDB(CharacterDatabaseTransaction trans) override;
 
@@ -64,7 +64,7 @@ public:
     std::string GetDebugInfo() const override;
 
     // Returns current bag object (this) as shared_ptr
-    std::shared_ptr<Bag> GetSharedPtr() const
+    std::shared_ptr<Bag> GetSharedPtr()
     {
         return std::static_pointer_cast<Bag>(shared_from_this());
     }
@@ -73,8 +73,8 @@ protected:
     std::array<std::shared_ptr<Item>, MAX_BAG_SIZE> m_bagslot;
 };
 
-inline Item* NewItemOrBag(ItemTemplate const* proto)
+inline std::shared_ptr<Item> NewItemOrBag(ItemTemplate const* proto)
 {
-    return (proto->InventoryType == INVTYPE_BAG) ? new Bag : new Item;
+    return (proto->InventoryType == INVTYPE_BAG) ? std::make_shared<Bag>() : std::make_shared<Item>();
 }
 #endif

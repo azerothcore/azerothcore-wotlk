@@ -520,8 +520,10 @@ void Unit::Update(uint32 p_time)
 
 bool Unit::haveOffhandWeapon() const
 {
-    if (Player const* player = ToPlayer())
-        return player->GetWeaponForAttack(OFF_ATTACK, true);
+    if (const auto* player = ToPlayer())
+    {
+        return player->GetWeaponForAttack(OFF_ATTACK, true) != nullptr;
+    }
 
     return CanDualWield();
 }
@@ -1164,7 +1166,7 @@ void Unit::CastStop(uint32 except_spellid, bool withInstant)
             InterruptSpell(CurrentSpellTypes(i), false, withInstant);
 }
 
-SpellCastResult Unit::CastSpell(SpellCastTargets const& targets, SpellInfo const* spellInfo, CustomSpellValues const* value, TriggerCastFlags triggerFlags, Item* castItem, AuraEffect const* triggeredByAura, ObjectGuid originalCaster)
+SpellCastResult Unit::CastSpell(SpellCastTargets const& targets, SpellInfo const* spellInfo, CustomSpellValues const* value, TriggerCastFlags triggerFlags /*= TRIGGERED_NONE*/, std::shared_ptr<Item> castItem /*= nullptr*/, AuraEffect const* triggeredByAura /*= nullptr*/, ObjectGuid originalCaster /*= ObjectGuid::Empty*/)
 {
     if (!spellInfo)
     {
@@ -1188,16 +1190,16 @@ SpellCastResult Unit::CastSpell(SpellCastTargets const& targets, SpellInfo const
         }
     }
 
-    spell->m_CastItem = castItem;
+    spell->m_CastItem = std::move(castItem);
     return spell->prepare(&targets, triggeredByAura);
 }
 
-SpellCastResult Unit::CastSpell(Unit* victim, uint32 spellId, bool triggered, Item* castItem, AuraEffect const* triggeredByAura, ObjectGuid originalCaster)
+SpellCastResult Unit::CastSpell(Unit* victim, uint32 spellId, bool triggered, std::shared_ptr<Item> castItem /*= nullptr*/, AuraEffect const* triggeredByAura /*= nullptr*/, ObjectGuid originalCaster /*= ObjectGuid::Empty*/)
 {
-    return CastSpell(victim, spellId, triggered ? TRIGGERED_FULL_MASK : TRIGGERED_NONE, castItem, triggeredByAura, originalCaster);
+    return CastSpell(victim, spellId, triggered ? TRIGGERED_FULL_MASK : TRIGGERED_NONE, std::move(castItem), triggeredByAura, originalCaster);
 }
 
-SpellCastResult Unit::CastSpell(Unit* victim, uint32 spellId, TriggerCastFlags triggerFlags /*= TRIGGER_NONE*/, Item* castItem /*= nullptr*/, AuraEffect const* triggeredByAura /*= nullptr*/, ObjectGuid originalCaster /*= ObjectGuid::Empty*/)
+SpellCastResult Unit::CastSpell(Unit* victim, uint32 spellId, TriggerCastFlags triggerFlags /*= TRIGGER_NONE*/, std::shared_ptr<Item> castItem /*= nullptr*/, AuraEffect const* triggeredByAura /*= nullptr*/, ObjectGuid originalCaster /*= ObjectGuid::Empty*/)
 {
     SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(spellId);
     if (!spellInfo)
@@ -1206,22 +1208,22 @@ SpellCastResult Unit::CastSpell(Unit* victim, uint32 spellId, TriggerCastFlags t
         return SPELL_FAILED_SPELL_UNAVAILABLE;
     }
 
-    return CastSpell(victim, spellInfo, triggerFlags, castItem, triggeredByAura, originalCaster);
+    return CastSpell(victim, spellInfo, triggerFlags, std::move(castItem), triggeredByAura, originalCaster);
 }
 
-SpellCastResult Unit::CastSpell(Unit* victim, SpellInfo const* spellInfo, bool triggered, Item* castItem/*= nullptr*/, AuraEffect const* triggeredByAura /*= nullptr*/, ObjectGuid originalCaster /*= ObjectGuid::Empty*/)
+SpellCastResult Unit::CastSpell(Unit* victim, SpellInfo const* spellInfo, bool triggered, std::shared_ptr<Item> castItem/*= nullptr*/, AuraEffect const* triggeredByAura /*= nullptr*/, ObjectGuid originalCaster /*= ObjectGuid::Empty*/)
 {
-    return CastSpell(victim, spellInfo, triggered ? TRIGGERED_FULL_MASK : TRIGGERED_NONE, castItem, triggeredByAura, originalCaster);
+    return CastSpell(victim, spellInfo, triggered ? TRIGGERED_FULL_MASK : TRIGGERED_NONE, std::move(castItem), triggeredByAura, originalCaster);
 }
 
-SpellCastResult  Unit::CastSpell(Unit* victim, SpellInfo const* spellInfo, TriggerCastFlags triggerFlags, Item* castItem, AuraEffect const* triggeredByAura, ObjectGuid originalCaster)
+SpellCastResult Unit::CastSpell(Unit* victim, SpellInfo const* spellInfo, TriggerCastFlags triggerFlags /*= TRIGGERED_NONE*/, std::shared_ptr<Item> castItem /*= nullptr*/, AuraEffect const* triggeredByAura /*= nullptr*/, ObjectGuid originalCaster /*= ObjectGuid::Empty*/)
 {
     SpellCastTargets targets;
     targets.SetUnitTarget(victim);
-    return CastSpell(targets, spellInfo, nullptr, triggerFlags, castItem, triggeredByAura, originalCaster);
+    return CastSpell(targets, spellInfo, nullptr, triggerFlags, std::move(castItem), triggeredByAura, originalCaster);
 }
 
-SpellCastResult Unit::CastCustomSpell(Unit* target, uint32 spellId, int32 const* bp0, int32 const* bp1, int32 const* bp2, bool triggered, Item* castItem, AuraEffect const* triggeredByAura, ObjectGuid originalCaster)
+SpellCastResult Unit::CastCustomSpell(Unit* victim, uint32 spellId, int32 const* bp0, int32 const* bp1, int32 const* bp2, bool triggered, std::shared_ptr<Item> castItem /*= nullptr*/, AuraEffect const* triggeredByAura /*= nullptr*/, ObjectGuid originalCaster /*= ObjectGuid::Empty*/)
 {
     CustomSpellValues values;
     if (bp0)
@@ -1230,24 +1232,24 @@ SpellCastResult Unit::CastCustomSpell(Unit* target, uint32 spellId, int32 const*
         values.AddSpellMod(SPELLVALUE_BASE_POINT1, *bp1);
     if (bp2)
         values.AddSpellMod(SPELLVALUE_BASE_POINT2, *bp2);
-    return CastCustomSpell(spellId, values, target, triggered ? TRIGGERED_FULL_MASK : TRIGGERED_NONE, castItem, triggeredByAura, originalCaster);
+    return CastCustomSpell(spellId, values, victim, triggered ? TRIGGERED_FULL_MASK : TRIGGERED_NONE, std::move(castItem), triggeredByAura, originalCaster);
 }
 
-SpellCastResult Unit::CastCustomSpell(uint32 spellId, SpellValueMod mod, int32 value, Unit* target, bool triggered, Item* castItem, AuraEffect const* triggeredByAura, ObjectGuid originalCaster)
+SpellCastResult Unit::CastCustomSpell(uint32 spellId, SpellValueMod mod, int32 value, Unit* victim, bool triggered, std::shared_ptr<Item> castItem /*= nullptr*/, AuraEffect const* triggeredByAura /*= nullptr*/, ObjectGuid originalCaster /*= ObjectGuid::Empty*/)
 {
     CustomSpellValues values;
     values.AddSpellMod(mod, value);
-    return CastCustomSpell(spellId, values, target, triggered ? TRIGGERED_FULL_MASK : TRIGGERED_NONE, castItem, triggeredByAura, originalCaster);
+    return CastCustomSpell(spellId, values, victim, triggered ? TRIGGERED_FULL_MASK : TRIGGERED_NONE, std::move(castItem), triggeredByAura, originalCaster);
 }
 
-SpellCastResult Unit::CastCustomSpell(uint32 spellId, SpellValueMod mod, int32 value, Unit* target, TriggerCastFlags triggerFlags, Item* castItem, AuraEffect const* triggeredByAura, ObjectGuid originalCaster)
+SpellCastResult Unit::CastCustomSpell(uint32 spellId, SpellValueMod mod, int32 value, Unit* victim /*= nullptr*/, TriggerCastFlags triggerFlags /*= TRIGGERED_NONE*/, std::shared_ptr<Item> castItem /*= nullptr*/, AuraEffect const* triggeredByAura /*= nullptr*/, ObjectGuid originalCaster /*= ObjectGuid::Empty*/)
 {
     CustomSpellValues values;
     values.AddSpellMod(mod, value);
-    return CastCustomSpell(spellId, values, target, triggerFlags, castItem, triggeredByAura, originalCaster);
+    return CastCustomSpell(spellId, values, victim, triggerFlags, castItem, triggeredByAura, originalCaster);
 }
 
-SpellCastResult Unit::CastCustomSpell(uint32 spellId, CustomSpellValues const& value, Unit* victim, TriggerCastFlags triggerFlags, Item* castItem, AuraEffect const* triggeredByAura, ObjectGuid originalCaster)
+SpellCastResult Unit::CastCustomSpell(uint32 spellId, CustomSpellValues const& value, Unit* victim /*= nullptr*/, TriggerCastFlags triggerFlags /*= TRIGGERED_NONE*/, std::shared_ptr<Item> castItem /*= nullptr*/, AuraEffect const* triggeredByAura /*= nullptr*/, ObjectGuid originalCaster /*= ObjectGuid::Empty*/)
 {
     SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(spellId);
     if (!spellInfo)
@@ -1262,7 +1264,7 @@ SpellCastResult Unit::CastCustomSpell(uint32 spellId, CustomSpellValues const& v
     return CastSpell(targets, spellInfo, &value, triggerFlags, castItem, triggeredByAura, originalCaster);
 }
 
-SpellCastResult Unit::CastSpell(float x, float y, float z, uint32 spellId, bool triggered, Item* castItem, AuraEffect const* triggeredByAura, ObjectGuid originalCaster)
+SpellCastResult Unit::CastSpell(float x, float y, float z, uint32 spellId, bool triggered, std::shared_ptr<Item> castItem /*= nullptr*/, AuraEffect const* triggeredByAura /*= nullptr*/, ObjectGuid originalCaster /*= ObjectGuid::Empty*/)
 {
     SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(spellId);
     if (!spellInfo)
@@ -1277,7 +1279,7 @@ SpellCastResult Unit::CastSpell(float x, float y, float z, uint32 spellId, bool 
     return CastSpell(targets, spellInfo, nullptr, triggered ? TRIGGERED_FULL_MASK : TRIGGERED_NONE, castItem, triggeredByAura, originalCaster);
 }
 
-SpellCastResult Unit::CastSpell(GameObject* go, uint32 spellId, bool triggered, Item* castItem, AuraEffect* triggeredByAura, ObjectGuid originalCaster)
+SpellCastResult Unit::CastSpell(GameObject* go, uint32 spellId, bool triggered, std::shared_ptr<Item> castItem /*= nullptr*/, AuraEffect* triggeredByAura /*= nullptr*/, ObjectGuid originalCaster /*= ObjectGuid::Empty*/)
 {
     SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(spellId);
     if (!spellInfo)
@@ -3662,12 +3664,16 @@ float Unit::GetUnitParryChance() const
     {
         if (player->CanParry())
         {
-            Item* tmpitem = player->GetWeaponForAttack(BASE_ATTACK, true);
-            if (!tmpitem)
+            auto tmpitem = player->GetWeaponForAttack(BASE_ATTACK, true);
+            if (tmpitem == nullptr)
+            {
                 tmpitem = player->GetWeaponForAttack(OFF_ATTACK, true);
+            }
 
-            if (tmpitem)
+            if (tmpitem != nullptr)
+            {
                 chance = player->GetRealParry(); //GetFloatValue(PLAYER_PARRY_PERCENTAGE);
+            }
         }
     }
     else if (IsCreature())
@@ -3705,9 +3711,11 @@ float Unit::GetUnitBlockChance() const
     {
         if (player->CanBlock())
         {
-            Item* tmpitem = player->GetUseableItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_OFFHAND);
-            if (tmpitem && !tmpitem->IsBroken() && tmpitem->GetTemplate()->Block)
+            auto tmpitem = player->GetUseableItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_OFFHAND);
+            if (tmpitem != nullptr && !tmpitem->IsBroken() && tmpitem->GetTemplate()->Block)
+            {
                 return GetFloatValue(PLAYER_BLOCK_PERCENTAGE);
+            }
         }
         // is player but has no block ability or no not broken shield equipped
         return 0.0f;
@@ -3792,7 +3800,7 @@ uint32 Unit::GetWeaponSkillValue (WeaponAttackType attType, Unit const* target) 
     uint32 value = 0;
     if (Player const* player = ToPlayer())
     {
-        Item* item = player->GetWeaponForAttack(attType, true);
+        auto item = player->GetWeaponForAttack(attType, true);
 
         // feral or unarmed skill only for base attack
         if (attType != BASE_ATTACK && !item)
@@ -4351,7 +4359,7 @@ void Unit::DeMorph()
     SetDisplayId(GetNativeDisplayId());
 }
 
-Aura* Unit::_TryStackingOrRefreshingExistingAura(SpellInfo const* newAura, uint8 effMask, Unit* caster, int32* baseAmount /*= nullptr*/, Item* castItem /*= nullptr*/, ObjectGuid casterGUID /*= ObjectGuid::Empty*/, bool periodicReset /*= false*/)
+Aura* Unit::_TryStackingOrRefreshingExistingAura(SpellInfo const* newAura, uint8 effMask, Unit* caster, int32* baseAmount /*= nullptr*/, std::shared_ptr<Item> castItem /*= nullptr*/, ObjectGuid casterGUID /*= ObjectGuid::Empty*/, bool periodicReset /*= false*/)
 {
     ASSERT(casterGUID || caster);
     if (!casterGUID)
@@ -6593,7 +6601,7 @@ bool Unit::HandleDummyAuraProc(Unit* victim, uint32 damage, AuraEffect* triggere
     int32  triggerAmount = triggeredByAura->GetAmount();
     Spell const* spellProc = eventInfo.GetProcSpell();
 
-    Item* castItem = triggeredByAura->GetBase()->GetCastItemGUID() && IsPlayer()
+    auto castItem = triggeredByAura->GetBase()->GetCastItemGUID() && IsPlayer()
                      ? ToPlayer()->GetItemByGuid(triggeredByAura->GetBase()->GetCastItemGUID()) : nullptr;
 
     uint32 triggered_spell_id = 0;
@@ -8948,7 +8956,7 @@ bool Unit::HandleProcTriggerSpell(Unit* victim, uint32 damage, AuraEffect* trigg
     if (triggeredByAura->GetAuraType() == SPELL_AURA_PROC_TRIGGER_SPELL_WITH_VALUE)
         basepoints0 = triggerAmount;
 
-    Item* castItem = triggeredByAura->GetBase()->GetCastItemGUID() && IsPlayer()
+    std::shared_ptr<Item> castItem = triggeredByAura->GetBase()->GetCastItemGUID() && IsPlayer()
                      ? ToPlayer()->GetItemByGuid(triggeredByAura->GetBase()->GetCastItemGUID()) : nullptr;
 
     // Try handle unknown trigger spells
@@ -9865,7 +9873,7 @@ bool Unit::HandleOverrideClassScriptAuraProc(Unit* victim, uint32 /*damage*/, Au
     if (!victim || !victim->IsAlive())
         return false;
 
-    Item* castItem = triggeredByAura->GetBase()->GetCastItemGUID() && IsPlayer()
+    std::shared_ptr<Item> castItem = triggeredByAura->GetBase()->GetCastItemGUID() && IsPlayer()
                      ? ToPlayer()->GetItemByGuid(triggeredByAura->GetBase()->GetCastItemGUID()) : nullptr;
 
     uint32 triggered_spell_id = 0;
@@ -17220,8 +17228,8 @@ float Unit::GetAPMultiplier(WeaponAttackType attType, bool normalized)
     if (!normalized || !IsPlayer())
         return float(GetAttackTime(attType)) / 1000.0f;
 
-    Item* Weapon = ToPlayer()->GetWeaponForAttack(attType, true);
-    if (!Weapon)
+    auto Weapon = ToPlayer()->GetWeaponForAttack(attType, true);
+    if (Weapon == nullptr)
         return 2.4f;                                         // fist attack
 
     switch (Weapon->GetTemplate()->InventoryType)
@@ -17492,7 +17500,7 @@ bool Unit::IsTriggeredAtSpellProcEvent(Unit* victim, Aura* aura, WeaponAttackTyp
         Player* player = ToPlayer();
         if (spellProto->EquippedItemClass == ITEM_CLASS_WEAPON)
         {
-            Item* item = nullptr;
+            std::shared_ptr<Item> item = nullptr;
             if (attType == BASE_ATTACK)
                 item = player->GetUseableItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_MAINHAND);
             else if (attType == OFF_ATTACK)
@@ -17503,14 +17511,14 @@ bool Unit::IsTriggeredAtSpellProcEvent(Unit* victim, Aura* aura, WeaponAttackTyp
             if (player->IsInFeralForm())
                 return false;
 
-            if (!item || item->IsBroken() || item->GetTemplate()->Class != ITEM_CLASS_WEAPON || !((1 << item->GetTemplate()->SubClass) & spellProto->EquippedItemSubClassMask))
+            if (item == nullptr || item->IsBroken() || item->GetTemplate()->Class != ITEM_CLASS_WEAPON || !((1 << item->GetTemplate()->SubClass) & spellProto->EquippedItemSubClassMask))
                 return false;
         }
         else if (spellProto->EquippedItemClass == ITEM_CLASS_ARMOR)
         {
             // Check if player is wearing shield
-            Item* item = player->GetUseableItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_OFFHAND);
-            if (!item || item->IsBroken() || item->GetTemplate()->Class != ITEM_CLASS_ARMOR || !((1 << item->GetTemplate()->SubClass) & spellProto->EquippedItemSubClassMask))
+            auto item = player->GetUseableItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_OFFHAND);
+            if (item == nullptr || item->IsBroken() || item->GetTemplate()->Class != ITEM_CLASS_ARMOR || !((1 << item->GetTemplate()->SubClass) & spellProto->EquippedItemSubClassMask))
                 return false;
         }
     }

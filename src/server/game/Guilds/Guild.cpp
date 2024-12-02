@@ -402,7 +402,7 @@ bool Guild::BankTab::LoadItemFromDB(Field* fields)
         return false;
     }
 
-    Item* pItem = NewItemOrBag(proto);
+    auto pItem = NewItemOrBag(proto);
     if (!pItem->LoadFromDB(itemGuid, ObjectGuid::Empty, fields, itemEntry))
     {
         LOG_ERROR("guild", "Item (GUID {}, id: {}) not found in item_instance, deleting from guild bank!", itemGuid, itemEntry);
@@ -413,7 +413,6 @@ bool Guild::BankTab::LoadItemFromDB(Field* fields)
         stmt->SetData (2, slotId);
         CharacterDatabase.Execute(stmt);
 
-        delete pItem;
         return false;
     }
 
@@ -426,14 +425,16 @@ bool Guild::BankTab::LoadItemFromDB(Field* fields)
 void Guild::BankTab::Delete(CharacterDatabaseTransaction trans, bool removeItemsFromDB)
 {
     for (uint8 slotId = 0; slotId < GUILD_BANK_MAX_SLOTS; ++slotId)
-        if (Item* pItem = m_items[slotId])
+    {
+        if (auto pItem = m_items[slotId])
         {
             pItem->RemoveFromWorld();
             if (removeItemsFromDB)
                 pItem->DeleteFromDB(trans);
-            delete pItem;
-            pItem = nullptr;
         }
+    }
+
+    m_items.fill(nullptr);
 }
 
 void Guild::BankTab::SetInfo(std::string_view name, std::string_view icon)
@@ -469,7 +470,7 @@ void Guild::BankTab::SetText(std::string_view text)
 
 // Sets/removes contents of specified slot.
 // If pItem == nullptr contents are removed.
-bool Guild::BankTab::SetItem(CharacterDatabaseTransaction trans, uint8 slotId, Item* item)
+bool Guild::BankTab::SetItem(CharacterDatabaseTransaction trans, uint8 slotId, std::shared_ptr<Item> item)
 {
     if (slotId >= GUILD_BANK_MAX_SLOTS)
         return false;
@@ -482,7 +483,7 @@ bool Guild::BankTab::SetItem(CharacterDatabaseTransaction trans, uint8 slotId, I
     stmt->SetData (2, slotId);
     CharacterDatabase.ExecuteOrAppend(trans, stmt);
 
-    if (item)
+    if (item != nullptr)
     {
         stmt = CharacterDatabase.GetPreparedStatement(CHAR_INS_GUILD_BANK_ITEM);
         stmt->SetData(0, m_guildId);
@@ -721,7 +722,7 @@ bool Guild::MoveItemData::CheckItem(uint32& splitedAmount)
     return true;
 }
 
-bool Guild::MoveItemData::CanStore(Item* pItem, bool swap, bool sendError)
+bool Guild::MoveItemData::CanStore(std::shared_ptr<Item> pItem, bool swap, bool sendError)
 {
     m_vec.clear();
     InventoryResult msg = CanStore(pItem, swap);
@@ -795,7 +796,7 @@ void Guild::PlayerMoveItemData::RemoveItem(CharacterDatabaseTransaction trans, M
     }
 }
 
-Item* Guild::PlayerMoveItemData::StoreItem(CharacterDatabaseTransaction trans, Item* pItem)
+std::shared_ptr<Item> Guild::PlayerMoveItemData::StoreItem(CharacterDatabaseTransaction trans, std::shared_ptr<Item> pItem)
 {
     ASSERT(pItem);
     m_pPlayer->MoveItemToInventory(m_vec, pItem, true);
@@ -811,7 +812,7 @@ void Guild::PlayerMoveItemData::LogBankEvent(CharacterDatabaseTransaction trans,
                             pFrom->GetItem()->GetEntry(), count);
 }
 
-inline InventoryResult Guild::PlayerMoveItemData::CanStore(Item* pItem, bool swap)
+inline InventoryResult Guild::PlayerMoveItemData::CanStore(std::shared_ptr<Item> pItem, bool swap)
 {
     return m_pPlayer->CanStoreItem(m_container, m_slotId, m_vec, pItem, swap);
 }
@@ -865,7 +866,7 @@ void Guild::BankMoveItemData::RemoveItem(CharacterDatabaseTransaction trans, Mov
         m_pGuild->_UpdateMemberWithdrawSlots(trans, m_pPlayer->GetGUID(), m_container);
 }
 
-Item* Guild::BankMoveItemData::StoreItem(CharacterDatabaseTransaction trans, Item* pItem)
+std::shared_ptr<Item> Guild::BankMoveItemData::StoreItem(CharacterDatabaseTransaction trans, std::shared_ptr<Item> pItem)
 {
     if (!pItem)
         return nullptr;
@@ -874,7 +875,7 @@ Item* Guild::BankMoveItemData::StoreItem(CharacterDatabaseTransaction trans, Ite
     if (!pTab)
         return nullptr;
 
-    Item* pLastItem = pItem;
+    std::shared_ptr<Item> pLastItem = pItem;
     for (ItemPosCountVec::const_iterator itr = m_vec.begin(); itr != m_vec.end(); )
     {
         ItemPosCount pos(*itr);
@@ -905,11 +906,11 @@ void Guild::BankMoveItemData::LogAction(MoveItemData* pFrom) const
     MoveItemData::LogAction(pFrom);
 }
 
-Item* Guild::BankMoveItemData::_StoreItem(CharacterDatabaseTransaction trans, BankTab* pTab, Item* pItem, ItemPosCount& pos, bool clone) const
+std::shared_ptr<Item> Guild::BankMoveItemData::_StoreItem(CharacterDatabaseTransaction trans, BankTab* pTab, std::shared_ptr<Item> pItem, ItemPosCount& pos, bool clone) const
 {
     uint8 slotId = uint8(pos.pos);
     uint32 count = pos.count;
-    if (Item* pItemDest = pTab->GetItem(slotId))
+    if (auto pItemDest = pTab->GetItem(slotId))
     {
         pItemDest->SetCount(pItemDest->GetCount() + count);
         pItemDest->FSetState(ITEM_CHANGED);
@@ -918,18 +919,23 @@ Item* Guild::BankMoveItemData::_StoreItem(CharacterDatabaseTransaction trans, Ba
         {
             pItem->RemoveFromWorld();
             pItem->DeleteFromDB(trans);
-            delete pItem;
         }
         return pItemDest;
     }
 
     if (clone)
+    {
         pItem = pItem->CloneItem(count);
+    }
     else
+    {
         pItem->SetCount(count);
+    }
 
-    if (pItem && pTab->SetItem(trans, slotId, pItem))
+    if (pItem != nullptr && pTab->SetItem(trans, slotId, pItem))
+    {
         return pItem;
+    }
 
     return nullptr;
 }
@@ -938,7 +944,7 @@ Item* Guild::BankMoveItemData::_StoreItem(CharacterDatabaseTransaction trans, Ba
 // If item in destination slot exists it must be the item of the same entry
 // and stack must have enough space to take at least one item.
 // Returns false if destination item specified and it cannot be used to reserve space.
-bool Guild::BankMoveItemData::_ReserveSpace(uint8 slotId, Item* pItem, Item* pItemDest, uint32& count)
+bool Guild::BankMoveItemData::_ReserveSpace(uint8 slotId, std::shared_ptr<Item> pItem, std::shared_ptr<Item> pItemDest, uint32& count)
 {
     uint32 requiredSpace = pItem->GetMaxStackCount();
     if (pItemDest)
@@ -961,7 +967,7 @@ bool Guild::BankMoveItemData::_ReserveSpace(uint8 slotId, Item* pItem, Item* pIt
     return true;
 }
 
-void Guild::BankMoveItemData::CanStoreItemInTab(Item* pItem, uint8 skipSlotId, bool merge, uint32& count)
+void Guild::BankMoveItemData::CanStoreItemInTab(std::shared_ptr<Item> pItem, uint8 skipSlotId, bool merge, uint32& count)
 {
     for (uint8 slotId = 0; (slotId < GUILD_BANK_MAX_SLOTS) && (count > 0); ++slotId)
     {
@@ -969,9 +975,11 @@ void Guild::BankMoveItemData::CanStoreItemInTab(Item* pItem, uint8 skipSlotId, b
         if (slotId == skipSlotId)
             continue;
 
-        Item* pItemDest = m_pGuild->_GetItem(m_container, slotId);
+        std::shared_ptr<Item> pItemDest = m_pGuild->_GetItem(m_container, slotId);
         if (pItemDest == pItem)
+        {
             pItemDest = nullptr;
+        }
 
         // If merge skip empty, if not merge skip non-empty
         if ((pItemDest != nullptr) != merge)
@@ -981,7 +989,7 @@ void Guild::BankMoveItemData::CanStoreItemInTab(Item* pItem, uint8 skipSlotId, b
     }
 }
 
-InventoryResult Guild::BankMoveItemData::CanStore(Item* pItem, bool swap)
+InventoryResult Guild::BankMoveItemData::CanStore(std::shared_ptr<Item> pItem, bool swap)
 {
     LOG_DEBUG("guild", "GUILD STORAGE: CanStore() tab = {}, slot = {}, item = {}, count = {}",
                    m_container, m_slotId, pItem->GetEntry(), pItem->GetCount());
@@ -1001,7 +1009,7 @@ InventoryResult Guild::BankMoveItemData::CanStore(Item* pItem, bool swap)
     // Slot explicitely specified. Check it.
     if (m_slotId != NULL_SLOT)
     {
-        Item* pItemDest = m_pGuild->_GetItem(m_container, m_slotId);
+        std::shared_ptr<Item> pItemDest = m_pGuild->_GetItem(m_container, m_slotId);
         // Ignore swapped item (this slot will be empty after move)
         if ((pItemDest == pItem) || swap)
             pItemDest = nullptr;
@@ -2635,7 +2643,7 @@ void Guild::_LogBankEvent(CharacterDatabaseTransaction trans, GuildBankEventLogT
     sScriptMgr->OnGuildBankEvent(this, uint8(eventType), tabId, guid.GetCounter(), itemOrMoney, itemStackCount, destTabId);
 }
 
-inline Item* Guild::_GetItem(uint8 tabId, uint8 slotId) const
+inline std::shared_ptr<Item> Guild::_GetItem(uint8 tabId, uint8 slotId) const
 {
     if (const BankTab* tab = GetBankTab(tabId))
         return tab->GetItem(slotId);
@@ -2703,10 +2711,10 @@ void Guild::_MoveItems(MoveItemData* pSrc, MoveItemData* pDest, uint32 splitedAm
 
 bool Guild::_DoItemsMove(MoveItemData* pSrc, MoveItemData* pDest, bool sendError, uint32 splitedAmount)
 {
-    Item* pDestItem = pDest->GetItem();
+    auto pDestItem = pDest->GetItem();
     bool swap = (pDestItem != nullptr);
 
-    Item* pSrcItem = pSrc->GetItem(splitedAmount);
+    auto pSrcItem = pSrc->GetItem(splitedAmount);
     // 1. Can store source item in destination
     if (!pDest->CanStore(pSrcItem, swap, sendError))
         return false;
@@ -2849,7 +2857,7 @@ void Guild::_SendBankList(WorldSession* session /* = nullptr*/, uint8 tabId /*= 
         {
             for (auto itr = begin; itr != end; ++itr)
             {
-                if (Item* tabItem = tab->GetItem(*itr))
+                if (auto tabItem = tab->GetItem(*itr))
                 {
                     WorldPackets::Guild::GuildBankItemInfo itemInfo;
 

@@ -334,17 +334,17 @@ void ScriptMgr::OnPlayerBeingCharmed(Player* player, Unit* charmer, uint32 oldFa
     CALL_ENABLED_HOOKS(PlayerScript, PLAYERHOOK_ON_BEING_CHARMED, script->OnBeingCharmed(player, charmer, oldFactionId, newFactionId));
 }
 
-void ScriptMgr::OnAfterPlayerSetVisibleItemSlot(Player* player, uint8 slot, Item* item)
+void ScriptMgr::OnAfterPlayerSetVisibleItemSlot(Player* player, uint8 slot, std::shared_ptr<Item> item)
 {
     CALL_ENABLED_HOOKS(PlayerScript, PLAYERHOOK_ON_AFTER_SET_VISIBLE_ITEM_SLOT, script->OnAfterSetVisibleItemSlot(player, slot, item));
 }
 
-void ScriptMgr::OnAfterPlayerMoveItemFromInventory(Player* player, Item* it, uint8 bag, uint8 slot, bool update)
+void ScriptMgr::OnAfterPlayerMoveItemFromInventory(Player* player, std::shared_ptr<Item> it, uint8 bag, uint8 slot, bool update)
 {
     CALL_ENABLED_HOOKS(PlayerScript, PLAYERHOOK_ON_AFTER_MOVE_ITEM_FROM_INVENTORY, script->OnAfterMoveItemFromInventory(player, it, bag, slot, update));
 }
 
-void ScriptMgr::OnEquip(Player* player, Item* it, uint8 bag, uint8 slot, bool update)
+void ScriptMgr::OnEquip(Player* player, std::shared_ptr<Item> it, uint8 bag, uint8 slot, bool update)
 {
     CALL_ENABLED_HOOKS(PlayerScript, PLAYERHOOK_ON_EQUIP, script->OnEquip(player, it, bag, slot, update));
 }
@@ -364,7 +364,7 @@ void ScriptMgr::OnGetMaxPersonalArenaRatingRequirement(Player const* player, uin
     CALL_ENABLED_HOOKS(PlayerScript, PLAYERHOOK_ON_GET_MAX_PERSONAL_ARENA_RATING_REQUIREMENT, script->OnGetMaxPersonalArenaRatingRequirement(player, minSlot, maxArenaRating));
 }
 
-void ScriptMgr::OnLootItem(Player* player, Item* item, uint32 count, ObjectGuid lootguid)
+void ScriptMgr::OnLootItem(Player* player, std::shared_ptr<Item> item, uint32 count, ObjectGuid lootguid)
 {
     CALL_ENABLED_HOOKS(PlayerScript, PLAYERHOOK_ON_LOOT_ITEM, script->OnLootItem(player, item, count, lootguid));
 }
@@ -374,17 +374,17 @@ void ScriptMgr::OnBeforeFillQuestLootItem(Player* player, LootItem& item)
     CALL_ENABLED_HOOKS(PlayerScript, PLAYERHOOK_ON_BEFORE_FILL_QUEST_LOOT_ITEM, script->OnBeforeFillQuestLootItem(player, item));
 }
 
-void ScriptMgr::OnStoreNewItem(Player* player, Item* item, uint32 count)
+void ScriptMgr::OnStoreNewItem(Player* player, std::shared_ptr<Item> item, uint32 count)
 {
     CALL_ENABLED_HOOKS(PlayerScript, PLAYERHOOK_ON_STORE_NEW_ITEM, script->OnStoreNewItem(player, item, count));
 }
 
-void ScriptMgr::OnCreateItem(Player* player, Item* item, uint32 count)
+void ScriptMgr::OnCreateItem(Player* player, std::shared_ptr<Item> item, uint32 count)
 {
     CALL_ENABLED_HOOKS(PlayerScript, PLAYERHOOK_ON_CREATE_ITEM, script->OnCreateItem(player, item, count));
 }
 
-void ScriptMgr::OnQuestRewardItem(Player* player, Item* item, uint32 count)
+void ScriptMgr::OnQuestRewardItem(Player* player, std::shared_ptr<Item> item, uint32 count)
 {
     CALL_ENABLED_HOOKS(PlayerScript, PLAYERHOOK_ON_QUEST_REWARD_ITEM, script->OnQuestRewardItem(player, item, count));
 }
@@ -394,12 +394,12 @@ bool ScriptMgr::CanPlaceAuctionBid(Player* player, AuctionEntry* auction)
     CALL_ENABLED_BOOLEAN_HOOKS(PlayerScript, PLAYERHOOK_CAN_PLACE_AUCTION_BID, !script->CanPlaceAuctionBid(player, auction));
 }
 
-void ScriptMgr::OnGroupRollRewardItem(Player* player, Item* item, uint32 count, RollVote voteType, Roll* roll)
+void ScriptMgr::OnGroupRollRewardItem(Player* player, std::shared_ptr<Item> item, uint32 count, RollVote voteType, Roll* roll)
 {
     CALL_ENABLED_HOOKS(PlayerScript, PLAYERHOOK_ON_GROUP_ROLL_REWARD_ITEM, script->OnGroupRollRewardItem(player, item, count, voteType, roll));
 }
 
-bool ScriptMgr::OnBeforeOpenItem(Player* player, Item* item)
+bool ScriptMgr::OnBeforeOpenItem(Player* player, std::shared_ptr<Item> item)
 {
     CALL_ENABLED_BOOLEAN_HOOKS(PlayerScript, PLAYERHOOK_ON_BEFORE_OPEN_ITEM, !script->OnBeforeOpenItem(player, item));
 }
@@ -449,7 +449,7 @@ void ScriptMgr::OnBeforeBuyItemFromVendor(Player* player, ObjectGuid vendorguid,
     CALL_ENABLED_HOOKS(PlayerScript, PLAYERHOOK_ON_BEFORE_BUY_ITEM_FROM_VENDOR, script->OnBeforeBuyItemFromVendor(player, vendorguid, vendorslot, item, count, bag, slot));
 }
 
-void ScriptMgr::OnAfterStoreOrEquipNewItem(Player* player, uint32 vendorslot, Item* item, uint8 count, uint8 bag, uint8 slot, ItemTemplate const* pProto, Creature* pVendor, VendorItem const* crItem, bool bStore)
+void ScriptMgr::OnAfterStoreOrEquipNewItem(Player* player, uint32 vendorslot, std::shared_ptr<Item> item, uint8 count, uint8 bag, uint8 slot, ItemTemplate const* pProto, Creature* pVendor, VendorItem const* crItem, bool bStore)
 {
     CALL_ENABLED_HOOKS(PlayerScript, PLAYERHOOK_ON_AFTER_STORE_OR_EQUIP_NEW_ITEM, script->OnAfterStoreOrEquipNewItem(player, vendorslot, item, count, bag, slot, pProto, pVendor, crItem, bStore));
 }
@@ -514,12 +514,12 @@ bool ScriptMgr::CanGroupAccept(Player* player, Group* group)
     CALL_ENABLED_BOOLEAN_HOOKS(PlayerScript, PLAYERHOOK_CAN_GROUP_ACCEPT, !script->CanGroupAccept(player, group));
 }
 
-bool ScriptMgr::CanSellItem(Player* player, Item* item, Creature* creature)
+bool ScriptMgr::CanSellItem(Player* player, std::shared_ptr<Item> item, Creature* creature)
 {
     CALL_ENABLED_BOOLEAN_HOOKS(PlayerScript, PLAYERHOOK_CAN_SELL_ITEM, !script->CanSellItem(player, item, creature));
 }
 
-bool ScriptMgr::CanSendMail(Player* player, ObjectGuid receiverGuid, ObjectGuid mailbox, std::string& subject, std::string& body, uint32 money, uint32 COD, Item* item)
+bool ScriptMgr::CanSendMail(Player* player, ObjectGuid receiverGuid, ObjectGuid mailbox, std::string& subject, std::string& body, uint32 money, uint32 COD, std::shared_ptr<Item> item)
 {
     CALL_ENABLED_BOOLEAN_HOOKS(PlayerScript, PLAYERHOOK_CAN_SEND_MAIL, !script->CanSendMail(player, receiverGuid, mailbox, subject, body, money, COD, item));
 }
@@ -639,7 +639,7 @@ void ScriptMgr::OnApplyItemModsBefore(Player* player, uint8 slot, bool apply, ui
     CALL_ENABLED_HOOKS(PlayerScript, PLAYERHOOK_ON_APPLY_ITEM_MODS_BEFORE, script->OnApplyItemModsBefore(player, slot, apply, itemProtoStatNumber, statType, val));
 }
 
-void ScriptMgr::OnApplyEnchantmentItemModsBefore(Player* player, Item* item, EnchantmentSlot slot, bool apply, uint32 enchant_spell_id, uint32& enchant_amount)
+void ScriptMgr::OnApplyEnchantmentItemModsBefore(Player* player, std::shared_ptr<Item> item, EnchantmentSlot slot, bool apply, uint32 enchant_spell_id, uint32& enchant_amount)
 {
     CALL_ENABLED_HOOKS(PlayerScript, PLAYERHOOK_ON_APPLY_ENCHANTMENT_ITEM_MODS_BEFORE, script->OnApplyEnchantmentItemModsBefore(player, item, slot, apply, enchant_spell_id, enchant_amount));
 }
@@ -659,12 +659,12 @@ void ScriptMgr::OnGetFeralApBonus(Player* player, int32& feral_bonus, int32 dpsM
     CALL_ENABLED_HOOKS(PlayerScript, PLAYERHOOK_ON_GET_FERAL_AP_BONUS, script->OnGetFeralApBonus(player, feral_bonus, dpsMod, proto, ssv));
 }
 
-bool ScriptMgr::CanApplyWeaponDependentAuraDamageMod(Player* player, Item* item, WeaponAttackType attackType, AuraEffect const* aura, bool apply)
+bool ScriptMgr::CanApplyWeaponDependentAuraDamageMod(Player* player, std::shared_ptr<Item> item, WeaponAttackType attackType, AuraEffect const* aura, bool apply)
 {
     CALL_ENABLED_BOOLEAN_HOOKS(PlayerScript, PLAYERHOOK_CAN_APPLY_WEAPON_DEPENDENT_AURA_DAMAGE_MOD, !script->CanApplyWeaponDependentAuraDamageMod(player, item, attackType, aura, apply));
 }
 
-bool ScriptMgr::CanApplyEquipSpell(Player* player, SpellInfo const* spellInfo, Item* item, bool apply, bool form_change)
+bool ScriptMgr::CanApplyEquipSpell(Player* player, SpellInfo const* spellInfo, std::shared_ptr<Item> item, bool apply, bool form_change)
 {
     CALL_ENABLED_BOOLEAN_HOOKS(PlayerScript, PLAYERHOOK_CAN_APPLY_EQUIP_SPELL, !script->CanApplyEquipSpell(player, spellInfo, item, apply, form_change));
 }
@@ -674,12 +674,12 @@ bool ScriptMgr::CanApplyEquipSpellsItemSet(Player* player, ItemSetEffect* eff)
     CALL_ENABLED_BOOLEAN_HOOKS(PlayerScript, PLAYERHOOK_CAN_APPLY_EQUIP_SPELLS_ITEM_SET, !script->CanApplyEquipSpellsItemSet(player, eff));
 }
 
-bool ScriptMgr::CanCastItemCombatSpell(Player* player, Unit* target, WeaponAttackType attType, uint32 procVictim, uint32 procEx, Item* item, ItemTemplate const* proto)
+bool ScriptMgr::CanCastItemCombatSpell(Player* player, Unit* target, WeaponAttackType attType, uint32 procVictim, uint32 procEx, std::shared_ptr<Item> item, ItemTemplate const* proto)
 {
     CALL_ENABLED_BOOLEAN_HOOKS(PlayerScript, PLAYERHOOK_CAN_CAST_ITEM_COMBAT_SPELL, !script->CanCastItemCombatSpell(player, target, attType, procVictim, procEx, item, proto));
 }
 
-bool ScriptMgr::CanCastItemUseSpell(Player* player, Item* item, SpellCastTargets const& targets, uint8 cast_count, uint32 glyphIndex)
+bool ScriptMgr::CanCastItemUseSpell(Player* player, std::shared_ptr<Item> item, SpellCastTargets const& targets, uint8 cast_count, uint32 glyphIndex)
 {
     CALL_ENABLED_BOOLEAN_HOOKS(PlayerScript, PLAYERHOOK_CAN_CAST_ITEM_USE_SPELL, !script->CanCastItemUseSpell(player, item, targets, cast_count, glyphIndex));
 }
@@ -689,7 +689,7 @@ void ScriptMgr::OnApplyAmmoBonuses(Player* player, ItemTemplate const* proto, fl
     CALL_ENABLED_HOOKS(PlayerScript, PLAYERHOOK_ON_APPLY_AMMO_BONUSES, script->OnApplyAmmoBonuses(player, proto, currentAmmoDPS));
 }
 
-bool ScriptMgr::CanEquipItem(Player* player, uint8 slot, uint16& dest, Item* pItem, bool swap, bool not_loading)
+bool ScriptMgr::CanEquipItem(Player* player, uint8 slot, uint16& dest, std::shared_ptr<Item> pItem, bool swap, bool not_loading)
 {
     CALL_ENABLED_BOOLEAN_HOOKS(PlayerScript, PLAYERHOOK_CAN_EQUIP_ITEM, !script->CanEquipItem(player, slot, dest, pItem, swap, not_loading));
 }
@@ -704,12 +704,12 @@ bool ScriptMgr::CanUseItem(Player* player, ItemTemplate const* proto, InventoryR
     CALL_ENABLED_BOOLEAN_HOOKS(PlayerScript, PLAYERHOOK_CAN_USE_ITEM, !script->CanUseItem(player, proto, result));
 }
 
-bool ScriptMgr::CanSaveEquipNewItem(Player* player, Item* item, uint16 pos, bool update)
+bool ScriptMgr::CanSaveEquipNewItem(Player* player, std::shared_ptr<Item> item, uint16 pos, bool update)
 {
     CALL_ENABLED_BOOLEAN_HOOKS(PlayerScript, PLAYERHOOK_CAN_SAVE_EQUIP_NEW_ITEM, !script->CanSaveEquipNewItem(player, item, pos, update));
 }
 
-bool ScriptMgr::CanApplyEnchantment(Player* player, Item* item, EnchantmentSlot slot, bool apply, bool apply_dur, bool ignore_condition)
+bool ScriptMgr::CanApplyEnchantment(Player* player, std::shared_ptr<Item> item, EnchantmentSlot slot, bool apply, bool apply_dur, bool ignore_condition)
 {
     CALL_ENABLED_BOOLEAN_HOOKS(PlayerScript, PLAYERHOOK_CAN_APPLY_ENCHANTMENT, !script->CanApplyEnchantment(player, item, slot, apply, apply_dur, ignore_condition));
 }
@@ -724,7 +724,7 @@ bool ScriptMgr::PassedQuestKilledMonsterCredit(Player* player, Quest const* qinf
     CALL_ENABLED_BOOLEAN_HOOKS(PlayerScript, PLAYERHOOK_PASSED_QUEST_KILLED_MONSTER_CREDIT, !script->PassedQuestKilledMonsterCredit(player, qinfo, entry, real_entry, guid));
 }
 
-bool ScriptMgr::CheckItemInSlotAtLoadInventory(Player* player, Item* item, uint8 slot, uint8& err, uint16& dest)
+bool ScriptMgr::CheckItemInSlotAtLoadInventory(Player* player, std::shared_ptr<Item> item, uint8 slot, uint8& err, uint16& dest)
 {
     CALL_ENABLED_BOOLEAN_HOOKS(PlayerScript, PLAYERHOOK_CHECK_ITEM_IN_SLOT_AT_LOAD_INVENTORY, !script->CheckItemInSlotAtLoadInventory(player, item, slot, err, dest));
 }
@@ -789,7 +789,7 @@ bool ScriptMgr::CanInitTrade(Player* player, Player* target)
     CALL_ENABLED_BOOLEAN_HOOKS(PlayerScript, PLAYERHOOK_CAN_INIT_TRADE, !script->CanInitTrade(player, target));
 }
 
-bool ScriptMgr::CanSetTradeItem(Player* player, Item* tradedItem, uint8 tradeSlot)
+bool ScriptMgr::CanSetTradeItem(Player* player, std::shared_ptr<Item> tradedItem, uint8 tradeSlot)
 {
     CALL_ENABLED_BOOLEAN_HOOKS(PlayerScript, PLAYERHOOK_CAN_SET_TRADE_ITEM, !script->CanSetTradeItem(player, tradedItem, tradeSlot));
 }

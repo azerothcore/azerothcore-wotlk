@@ -78,8 +78,8 @@ void WorldSession::HandleUseItemOpcode(WorldPacket& recvPacket)
         return;
     }
 
-    Item* pItem = pUser->GetUseableItemByPos(bagIndex, slot);
-    if (!pItem)
+    auto pItem = pUser->GetUseableItemByPos(bagIndex, slot);
+    if (pItem == nullptr)
     {
         pUser->SendEquipError(EQUIP_ERR_ITEM_NOT_FOUND, nullptr, nullptr);
         return;
@@ -223,7 +223,7 @@ void WorldSession::HandleOpenItemOpcode(WorldPacket& recvPacket)
 
     LOG_DEBUG("network.opcode", "bagIndex: {}, slot: {}", bagIndex, slot);
 
-    Item* item = pUser->GetItemByPos(bagIndex, slot);
+    auto item = pUser->GetItemByPos(bagIndex, slot);
     if (!item)
     {
         pUser->SendEquipError(EQUIP_ERR_ITEM_NOT_FOUND, nullptr, nullptr);
@@ -288,9 +288,11 @@ void WorldSession::HandleOpenWrappedItemCallback(uint8 bagIndex, uint8 slot, Obj
     if (!GetPlayer())
         return;
 
-    Item* item = GetPlayer()->GetItemByPos(bagIndex, slot);
-    if (!item)
+    auto item = GetPlayer()->GetItemByPos(bagIndex, slot);
+    if (item == nullptr)
+    {
         return;
+    }
 
     if (item->GetGUID().GetCounter() != itemLowGUID || !item->IsWrapped()) // during getting result, gift was swapped with another item
         return;
@@ -788,14 +790,18 @@ void WorldSession::HandleMirrorImageDataRequest(WorldPacket& recvData)
         for (EquipmentSlots const* itr = &itemSlots[0]; *itr != EQUIPMENT_SLOT_END; ++itr)
         {
             if (*itr == EQUIPMENT_SLOT_HEAD && player->HasPlayerFlag(PLAYER_FLAGS_HIDE_HELM))
+            {
                 data << uint32(0);
+            }
             else if (*itr == EQUIPMENT_SLOT_BACK && player->HasPlayerFlag(PLAYER_FLAGS_HIDE_CLOAK))
+            {
                 data << uint32(0);
-            else if (Item const* item = player->GetItemByPos(INVENTORY_SLOT_BAG_0, *itr))
+            }
+            else if (const auto item = player->GetItemByPos(INVENTORY_SLOT_BAG_0, *itr))
             {
                 uint32 displayInfoId = item->GetTemplate()->DisplayInfoID;
 
-                sScriptMgr->OnGlobalMirrorImageDisplayItem(item, displayInfoId);
+                sScriptMgr->OnGlobalMirrorImageDisplayItem(item.get(), displayInfoId);
 
                 data << uint32(displayInfoId);
             }

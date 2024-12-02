@@ -99,7 +99,7 @@ public:
      * @param effIndex Contains information about the SpellEffIndex
      * @param itemTarget Contains information about the Item
      */
-    virtual void OnDummyEffect(WorldObject* /*caster*/, uint32 /*spellID*/, SpellEffIndex /*effIndex*/, Item* /*itemTarget*/) { }
+    virtual void OnDummyEffect(WorldObject* /*caster*/, uint32 /*spellID*/, SpellEffIndex /*effIndex*/, std::shared_ptr<Item> /*itemTarget*/) { }
 };
 
 // Compatibility for old scripts

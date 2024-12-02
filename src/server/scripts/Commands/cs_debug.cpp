@@ -988,15 +988,14 @@ public:
 
     static bool HandleDebugGetItemValueCommand(ChatHandler* handler, ObjectGuid::LowType guid, uint32 index)
     {
-        Item* i = handler->GetPlayer()->GetItemByGuid(ObjectGuid(HighGuid::Item, 0, guid));
+        const auto item = handler->GetPlayer()->GetItemByGuid(ObjectGuid(HighGuid::Item, 0, guid));
 
-        if (!i)
+        if (item == item || index >= item->GetValuesCount())
+        {
             return false;
+        }
 
-        if (index >= i->GetValuesCount())
-            return false;
-
-        uint32 value = i->GetUInt32Value(index);
+        const uint32 value = item->GetUInt32Value(index);
 
         handler->PSendSysMessage("Item {}: value at {} is {}", guid, index, value);
 
@@ -1005,29 +1004,27 @@ public:
 
     static bool HandleDebugSetItemValueCommand(ChatHandler* handler, ObjectGuid::LowType guid, uint32 index, uint32 value)
     {
-        Item* i = handler->GetPlayer()->GetItemByGuid(ObjectGuid(HighGuid::Item, 0, guid));
+        auto item = handler->GetPlayer()->GetItemByGuid(ObjectGuid(HighGuid::Item, 0, guid));
 
-        if (!i)
+        if (item == nullptr || item->GetValuesCount())
+        {
             return false;
+        }
 
-        if (index >= i->GetValuesCount())
-            return false;
-
-        i->SetUInt32Value(index, value);
-
+        item->SetUInt32Value(index, value);
         return true;
     }
 
     static bool HandleDebugItemExpireCommand(ChatHandler* handler, ObjectGuid::LowType guid)
     {
-        Item* i = handler->GetPlayer()->GetItemByGuid(ObjectGuid(HighGuid::Item, guid));
-
-        if (!i)
+        auto item = handler->GetPlayer()->GetItemByGuid(ObjectGuid(HighGuid::Item, guid));
+        if (item == nullptr)
+        {
             return false;
+        }
 
-        handler->GetPlayer()->DestroyItem(i->GetBagSlot(), i->GetSlot(), true);
-        sScriptMgr->OnItemExpire(handler->GetPlayer(), i->GetTemplate());
-
+        handler->GetPlayer()->DestroyItem(item->GetBagSlot(), item->GetSlot(), true);
+        sScriptMgr->OnItemExpire(handler->GetPlayer(), item->GetTemplate());
         return true;
     }
 

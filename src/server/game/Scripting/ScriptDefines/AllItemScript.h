@@ -27,22 +27,22 @@ protected:
 
 public:
     // Called when a player accepts a quest from the item.
-    [[nodiscard]] virtual bool CanItemQuestAccept(Player* /*player*/, Item* /*item*/, Quest const* /*quest*/) { return true; }
+    [[nodiscard]] virtual bool CanItemQuestAccept(Player* /*player*/, std::shared_ptr<Item> /*item*/, Quest const* /*quest*/) { return true; }
 
     // Called when a player uses the item.
-    [[nodiscard]] virtual bool CanItemUse(Player* /*player*/, Item* /*item*/, SpellCastTargets const& /*targets*/) { return false; }
+    [[nodiscard]] virtual bool CanItemUse(Player* /*player*/, std::shared_ptr<Item> /*item*/, SpellCastTargets const& /*targets*/) { return false; }
 
     // Called when the item is destroyed.
-    [[nodiscard]] virtual bool CanItemRemove(Player* /*player*/, Item* /*item*/) { return true; }
+    [[nodiscard]] virtual bool CanItemRemove(Player* /*player*/, std::shared_ptr<Item> /*item*/) { return true; }
 
     // Called when the item expires (is destroyed).
     [[nodiscard]] virtual bool CanItemExpire(Player* /*player*/, ItemTemplate const* /*proto*/) { return true; }
 
     // Called when a player selects an option in an item gossip window
-    virtual void OnItemGossipSelect(Player* /*player*/, Item* /*item*/, uint32 /*sender*/, uint32 /*action*/) { }
+    virtual void OnItemGossipSelect(Player* /*player*/, std::shared_ptr<Item> /*item*/, uint32 /*sender*/, uint32 /*action*/) { }
 
     // Called when a player selects an option in an item gossip window
-    virtual void OnItemGossipSelectCode(Player* /*player*/, Item* /*item*/, uint32 /*sender*/, uint32 /*action*/, const char* /*code*/) { }
+    virtual void OnItemGossipSelectCode(Player* /*player*/, std::shared_ptr<Item> /*item*/, uint32 /*sender*/, uint32 /*action*/, const char* /*code*/) { }
 };
 
 #endif

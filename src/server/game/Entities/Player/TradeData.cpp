@@ -23,7 +23,7 @@ TradeData* TradeData::GetTraderData() const
     return m_trader->GetTradeData();
 }
 
-Item* TradeData::GetItem(TradeSlots slot) const
+std::shared_ptr<Item> TradeData::GetItem(TradeSlots slot) const
 {
     return m_items[slot] ? m_player->GetItemByGuid(m_items[slot]) : nullptr;
 }
@@ -46,17 +46,19 @@ TradeSlots TradeData::GetTradeSlotForItem(ObjectGuid itemGuid) const
     return TRADE_SLOT_INVALID;
 }
 
-Item* TradeData::GetSpellCastItem() const
+std::shared_ptr<Item> TradeData::GetSpellCastItem() const
 {
     return m_spellCastItem ? m_player->GetItemByGuid(m_spellCastItem) : nullptr;
 }
 
-void TradeData::SetItem(TradeSlots slot, Item* item)
+void TradeData::SetItem(TradeSlots slot, std::shared_ptr<Item> item)
 {
     ObjectGuid itemGuid = item ? item->GetGUID() : ObjectGuid::Empty;
 
     if (m_items[slot] == itemGuid)
+    {
         return;
+    }
 
     m_items[slot] = itemGuid;
 
@@ -73,12 +75,14 @@ void TradeData::SetItem(TradeSlots slot, Item* item)
     SetSpell(0);
 }
 
-void TradeData::SetSpell(uint32 spell_id, Item* castItem /*= nullptr*/)
+void TradeData::SetSpell(uint32 spell_id, std::shared_ptr<Item> castItem /*= nullptr*/)
 {
     ObjectGuid itemGuid = castItem ? castItem->GetGUID() : ObjectGuid::Empty;
 
     if (m_spell == spell_id && m_spellCastItem == itemGuid)
+    {
         return;
+    }
 
     m_spell = spell_id;
     m_spellCastItem = itemGuid;

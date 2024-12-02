@@ -1348,8 +1348,10 @@ public:
     void HandleDummy(SpellEffIndex /*effIndex*/)
     {
         Unit* caster = GetCaster();
-        if (Item* item = GetCastItem())
+        if (auto item = GetCastItem())
+        {
             caster->CastSpell(caster, _triggeredSpellId, true, item);
+        }
     }
 
     void Register() override
@@ -2931,12 +2933,16 @@ class spell_item_nigh_invulnerability : public SpellScript
     void HandleDummy(SpellEffIndex /* effIndex */)
     {
         Unit* caster = GetCaster();
-        if (Item* castItem = GetCastItem())
+        if (auto castItem = GetCastItem())
         {
             if (roll_chance_i(86))                  // Nigh-Invulnerability   - success
+            {
                 caster->CastSpell(caster, SPELL_NIGH_INVULNERABILITY, true, castItem);
+            }
             else                                    // Complete Vulnerability - backfire in 14% casts
+            {
                 caster->CastSpell(caster, SPELL_COMPLETE_VULNERABILITY, true, castItem);
+            }
         }
     }
 
@@ -3538,7 +3544,9 @@ class spell_item_eggnog : public SpellScript
     void HandleScript(SpellEffIndex /* effIndex */)
     {
         if (roll_chance_i(40))
-            GetCaster()->CastSpell(GetHitUnit(), roll_chance_i(50) ? SPELL_EGG_NOG_REINDEER : SPELL_EGG_NOG_SNOWMAN, GetCastItem());
+        {
+            GetCaster()->CastSpell(GetHitUnit(), roll_chance_i(50) ? SPELL_EGG_NOG_REINDEER : SPELL_EGG_NOG_SNOWMAN, false, GetCastItem());
+        }
     }
 
     void Register() override

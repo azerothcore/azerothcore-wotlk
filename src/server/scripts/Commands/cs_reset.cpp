@@ -673,8 +673,7 @@ private:
         int16 count = 0;
         for (uint8 i = BUYBACK_SLOT_START; i < BUYBACK_SLOT_END; ++i)
         {
-            Item* pItem = playerTarget->GetItemFromBuyBackSlot(i);
-            if (pItem)
+            if (playerTarget->GetItemFromBuyBackSlot(i) != nullptr)
             {
                 playerTarget->RemoveItemFromBuyBackSlot(i, true);
                 ++count;

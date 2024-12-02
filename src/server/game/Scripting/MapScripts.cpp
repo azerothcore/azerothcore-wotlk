@@ -287,13 +287,20 @@ void Map::ScriptsProcess()
         ScriptAction const& step = iter->second;
 
         Object* source = nullptr;
+
+        // TODO: replace this with better solution
+        // Assign item to keep pointer active
+        std::shared_ptr<Item> item;
         if (step.sourceGUID)
         {
             switch (step.sourceGUID.GetHigh())
             {
                 case HighGuid::Item: // as well as HIGHGUID_CONTAINER
                     if (Player* player = ObjectAccessor::GetPlayer(this, step.ownerGUID))
-                        source = player->GetItemByGuid(step.sourceGUID);
+                    {
+                        item = player->GetItemByGuid(step.sourceGUID);
+                        source = item.get();
+                    }
                     break;
                 case HighGuid::Unit:
                 case HighGuid::Vehicle:
@@ -746,7 +753,7 @@ void Map::ScriptsProcess()
                     InventoryResult msg = pReceiver->CanStoreNewItem(NULL_BAG, NULL_SLOT, dest, step.script->CreateItem.ItemEntry, step.script->CreateItem.Amount);
                     if (msg == EQUIP_ERR_OK)
                     {
-                        if (Item* item = pReceiver->StoreNewItem(dest, step.script->CreateItem.ItemEntry, true))
+                        if (auto item = pReceiver->StoreNewItem(dest, step.script->CreateItem.ItemEntry, true))
                             pReceiver->SendNewItem(item, step.script->CreateItem.Amount, false, true);
                     }
                     else

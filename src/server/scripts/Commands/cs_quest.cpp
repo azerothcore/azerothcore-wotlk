@@ -261,7 +261,7 @@ public:
                 uint8           msg = player->CanStoreNewItem(NULL_BAG, NULL_SLOT, dest, id, count - curItemCount);
                 if (msg == EQUIP_ERR_OK)
                 {
-                    Item* item = player->StoreNewItem(dest, id, true);
+                    const auto item = player->StoreNewItem(dest, id, true);
                     player->SendNewItem(item, count - curItemCount, true, false);
                 }
             }
@@ -373,10 +373,10 @@ public:
 
                 for (auto const& itr : questItems)
                 {
-                    if (Item* item = Item::CreateItem(itr.first, itr.second))
+                    if (auto item = Item::CreateItem(itr.first, itr.second))
                     {
                         item->SaveToDB(trans);
-                        draft.AddItem(item);
+                        draft.AddItem(std::move(item));
                     }
                 }
 
@@ -617,10 +617,10 @@ public:
                         continue;
                     }
 
-                    if (Item* item = Item::CreateItem(itr.first, itr.second))
+                    if (auto item = Item::CreateItem(itr.first, itr.second))
                     {
                         item->SaveToDB(trans);
-                        draft.AddItem(item);
+                        draft.AddItem(std::move(item));
                     }
                 }
 

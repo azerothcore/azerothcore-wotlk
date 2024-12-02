@@ -1787,8 +1787,8 @@ void WorldSession::HandleEquipmentSetSave(WorldPacket& recvData)
         }
 
         // xinef: some cheating checks
-        Item* item = _player->GetItemByPos(INVENTORY_SLOT_BAG_0, i);
-        if (!item || item->GetGUID() != itemGuid)
+        auto item = _player->GetItemByPos(INVENTORY_SLOT_BAG_0, i);
+        if (item == nullptr || item->GetGUID() != itemGuid)
         {
             eqSet.Items[i].Clear();
             continue;
@@ -1834,15 +1834,17 @@ void WorldSession::HandleEquipmentSetUse(WorldPacket& recvData)
         if (_player->IsInCombat() && i != EQUIPMENT_SLOT_MAINHAND && i != EQUIPMENT_SLOT_OFFHAND && i != EQUIPMENT_SLOT_RANGED)
             continue;
 
-        Item* item = nullptr;
+        std::shared_ptr<Item> item = nullptr;
         if (itemGuid)
+        {
             item = _player->GetItemByGuid(itemGuid);
+        }
 
         uint16 dstpos = i | (INVENTORY_SLOT_BAG_0 << 8);
 
         InventoryResult msg;
-        Item* uItem = _player->GetItemByPos(INVENTORY_SLOT_BAG_0, i);
-        if (uItem)
+        std::shared_ptr<Item> uItem = _player->GetItemByPos(INVENTORY_SLOT_BAG_0, i);
+        if (uItem != nullptr)
         {
             if (uItem->IsEquipped())
             {
@@ -1854,7 +1856,7 @@ void WorldSession::HandleEquipmentSetUse(WorldPacket& recvData)
                 }
             }
 
-            if (!item)
+            if (item == nullptr)
             {
                 ItemPosCountVec sDest;
                 msg = _player->CanStoreItem(NULL_BAG, NULL_SLOT, sDest, uItem, false);

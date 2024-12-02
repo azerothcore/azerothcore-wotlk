@@ -1077,7 +1077,7 @@ class spell_brewfest_fill_keg : public SpellScript
     {
         if (GetCaster() && GetCaster()->ToPlayer())
         {
-            if (Item* itemCaster = GetCastItem())
+            if (auto itemCaster = GetCastItem())
             {
                 Player* player = GetCaster()->ToPlayer();
                 uint32 item = 0;
@@ -1146,7 +1146,7 @@ class spell_brewfest_unfill_keg : public SpellScript
     {
         if (GetCaster() && GetCaster()->ToPlayer())
         {
-            if (Item* itemCaster = GetCastItem())
+            if (auto itemCaster = GetCastItem())
             {
                 uint32 item = GetEmptyEntry(itemCaster->GetEntry());
                 Player* player = GetCaster()->ToPlayer();

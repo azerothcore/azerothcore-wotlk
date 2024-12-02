@@ -16,7 +16,6 @@
  */
 
 #include "Bag.h"
-#include "DatabaseEnv.h"
 #include "Log.h"
 #include "ObjectMgr.h"
 #include "Player.h"
@@ -58,7 +57,7 @@ void Bag::AddToWorld()
 {
     Item::AddToWorld();
 
-    for (auto item : m_bagslot)
+    for (const auto item : m_bagslot)
     {
         if (item != nullptr)
             item->AddToWorld();
@@ -67,7 +66,7 @@ void Bag::AddToWorld()
 
 void Bag::RemoveFromWorld()
 {
-    for (auto item : m_bagslot)
+    for (const auto item : m_bagslot)
     {
         if (item != nullptr)
             item->RemoveFromWorld();
@@ -102,8 +101,8 @@ bool Bag::Create(ObjectGuid::LowType guidlow, uint32 itemid, Player const* owner
     for (uint8 i = 0; i < MAX_BAG_SIZE; ++i)
     {
         SetGuidValue(CONTAINER_FIELD_SLOT_1 + (i * 2), ObjectGuid::Empty);
-        m_bagslot[i] = nullptr;
     }
+    m_bagslot.fill(nullptr);
 
     return true;
 }
@@ -113,7 +112,7 @@ void Bag::SaveToDB(CharacterDatabaseTransaction trans)
     Item::SaveToDB(trans);
 }
 
-bool Bag::LoadFromDB(ObjectGuid::LowType guid, ObjectGuid owner_guid, Field* fields, uint32 entry)
+bool Bag::LoadFromDB(ObjectGuid::LowType guid, ObjectGuid owner_guid, const Field* fields, uint32 entry)
 {
     if (!Item::LoadFromDB(guid, owner_guid, fields, entry))
         return false;
