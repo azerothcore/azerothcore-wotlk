@@ -1698,7 +1698,8 @@ void BotMgr::_teleportBot(Creature* bot, Map* newMap, float x, float y, float z,
                 if (newMap != mymap)
                 {
                     //we teleport from base non-instanced map which normally doesn't exist
-                    ASSERT(mymap->GetPlayersCountExceptGMs() == 0);
+                    if (mymap)
+                        ASSERT(mymap->GetPlayersCountExceptGMs() == 0);
 
                     bg->AddBot(bot);
                 }
