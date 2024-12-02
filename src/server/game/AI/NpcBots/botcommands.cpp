@@ -2609,8 +2609,11 @@ public:
             return false;
         }
 
-        owner->GetBotMgr()->SetBotsHidden(true);
-        handler->SendSysMessage("Bots hidden");
+        if (!owner->GetBotMgr()->GetBotsHidden())
+        {
+            owner->GetBotMgr()->SetBotsHidden(true);
+            handler->SendSysMessage("Bots hidden");
+        }
         return true;
     }
 
@@ -2638,8 +2641,11 @@ public:
             return false;
         }
 
-        owner->GetBotMgr()->SetBotsHidden(false);
-        handler->SendSysMessage("Bots unhidden");
+        if (owner->GetBotMgr()->GetBotsHidden())
+        {
+            owner->GetBotMgr()->SetBotsHidden(false);
+            handler->SendSysMessage("Bots unhidden");
+        }
         return true;
     }
 
