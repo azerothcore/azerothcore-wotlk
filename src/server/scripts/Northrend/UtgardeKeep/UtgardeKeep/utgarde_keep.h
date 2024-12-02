@@ -22,6 +22,10 @@
 
 #define UtgardeKeepScriptName "instance_utgarde_keep"
 
+#define DataHeader "UK"
+
+uint32 const EncounterCount = 3;
+
 enum eData
 {
     DATA_KELESETH,
