@@ -1,3 +1,4 @@
+-- DB update 2024_12_01_03 -> 2024_12_02_00
 -- Update gameobject 'Log Pile' with sniffed values
 -- new spawns
 DELETE FROM `gameobject` WHERE (`id` IN (194393))
