@@ -9028,7 +9028,7 @@ bool Unit::HandleProcTriggerSpell(Unit* victim, uint32 damage, AuraEffect* trigg
                             if (!victim)
                                 return false;
 
-                            if (Creature* cr = ObjectAccessor::GetCreature(*this, m_SummonSlot[SUMMON_SLOT_MINIPET]))
+                            if (Creature* cr = GetCompanionPet())
                                 cr->CastSpell(victim, 50101, true);
 
                             return false;
@@ -10661,6 +10661,11 @@ Guardian* Unit::GetGuardianPet() const
     }
 
     return nullptr;
+}
+
+Creature* Unit::GetCompanionPet() const
+{
+    return ObjectAccessor::GetCreature(*this, m_SummonSlot[SUMMON_SLOT_MINIPET]);
 }
 
 Unit* Unit::GetCharm() const
