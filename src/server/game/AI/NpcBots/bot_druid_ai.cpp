@@ -360,7 +360,7 @@ public:
             if (Rand() > 30 + 50 * (me->GetMap()->IsRaid())) return false;
             if (!gPlayer->GetGroup()) return false;
 
-            bool tranq = IsSpellReady(TRANQUILITY_1, diff, false);
+            bool tranq = IsSpellReady(TRANQUILITY_1, diff, false) && master->GetBotMgr()->IsPartyInCombat(false);
             bool growt = IsSpellReady(WILD_GROWTH_1, diff, false) && !HasRole(BOT_ROLE_DPS);
             if (!tranq && !growt)
                 return false;
