@@ -53,7 +53,8 @@ enum Says
 enum Misc
 {
     ACTION_STORM_EXPIRE         = 1,
-    GROUP_ELECTRICAL_STORM      = 1
+    GROUP_ELECTRICAL_STORM      = 1,
+    GROUP_STATIC_DISRUPTION     = 2
 };
 
 constexpr auto NPC_SOARING_EAGLE = 24858;
@@ -79,7 +80,8 @@ struct boss_akilzon : public BossAI
     {
         _JustEngagedWith();
 
-        ScheduleTimedEvent(10s, 20s, [&] {
+        scheduler.Schedule(10s, 20s, GROUP_STATIC_DISRUPTION, [this](TaskContext context)
+        {
             Unit* target = SelectTarget(SelectTargetMethod::Random, 1);
             if (!target)
                 target = me->GetVictim();
@@ -89,7 +91,9 @@ struct boss_akilzon : public BossAI
                 DoCast(target, SPELL_STATIC_DISRUPTION, false);
                 me->SetInFront(me->GetVictim());
             }
-        }, 10s, 18s);
+
+            context.Repeat(10s, 18s);
+        });
 
         ScheduleTimedEvent(20s, 30s, [&] {
             if (scheduler.GetNextGroupOcurrence(GROUP_ELECTRICAL_STORM) > 5s)
@@ -175,6 +179,7 @@ struct boss_akilzon : public BossAI
     {
         if (actionId == ACTION_STORM_EXPIRE)
         {
+            scheduler.DelayGroup(GROUP_STATIC_DISRUPTION, 3s);
             me->m_Events.AddEventAtOffset([&] {
                 SummonEagles();
             }, 5s);

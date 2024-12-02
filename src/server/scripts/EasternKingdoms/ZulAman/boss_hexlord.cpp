@@ -134,7 +134,8 @@ enum Misc
 {
     MAX_ADD_COUNT               = 4,
     ADDITIONAL_CLASS_SPRIEST    = 11,
-    AURA_SHADOW_FORM            = 15473
+    AURA_SHADOW_FORM            = 15473,
+    GROUP_CLASS_ABILITY         = 1
 };
 
 enum AbilityTarget
@@ -236,6 +237,12 @@ struct boss_hexlord_malacrass : public BossAI
         _currentClass = CLASS_NONE;
         _classAbilityTimer = 10000ms;
         SpawnAdds();
+        ScheduleHealthCheckEvent(80, [&] {
+            ScheduleTimedEvent(0s, [&] {
+                DoCastSelf(SPELL_DRAIN_POWER, true);
+                Talk(SAY_DRAIN_POWER);
+            }, 30s, 30s);
+        });
     }
 
     void SpawnAdds()
@@ -257,11 +264,8 @@ struct boss_hexlord_malacrass : public BossAI
                 add->SetInCombatWithZone();
         });
 
-        ScheduleTimedEvent(60s, [&]{
-            DoCastSelf(SPELL_DRAIN_POWER, true);
-            Talk(SAY_DRAIN_POWER);
-        }, 40s, 55s);
         ScheduleTimedEvent(30s, [&]{
+            scheduler.CancelGroup(GROUP_CLASS_ABILITY);
             DoCastSelf(SPELL_SPIRIT_BOLTS);
             scheduler.Schedule(10s, [this](TaskContext)
             {
@@ -272,17 +276,15 @@ struct boss_hexlord_malacrass : public BossAI
                         siphonTrigger->SetDisplayId(11686);
                         siphonTrigger->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
                         siphonTrigger->AI()->DoCast(target, SPELL_SIPHON_SOUL, true);
-                        siphonTrigger->GetMotionMaster()->MoveChase(me);
+                        siphonTrigger->GetMotionMaster()->MoveFollow(me, 0.0f, 0.0f);
                         if (Player* player = target->ToPlayer())
                             _currentClass = player->HasAura(AURA_SHADOW_FORM) ? uint8(ADDITIONAL_CLASS_SPRIEST) : player->getClass();
+
+                        ScheduleClassAbility();
                     }
                 }
             });
         }, 40s);
-        ScheduleTimedEvent(_classAbilityTimer, [&]{
-            if (_currentClass)
-                UseAbility();
-        }, _classAbilityTimer);
     }
 
     void UseAbility()
@@ -315,6 +317,15 @@ struct boss_hexlord_malacrass : public BossAI
         if (target)
             DoCast(target, PlayerAbility[_currentClass][random].spell, false);
         _classAbilityTimer = PlayerAbility[_currentClass][random].cooldown;
+    }
+
+    void ScheduleClassAbility()
+    {
+        scheduler.Schedule(_classAbilityTimer, GROUP_CLASS_ABILITY, [this](TaskContext context)
+        {
+            UseAbility();
+            context.Repeat(_classAbilityTimer);
+        });
     }
 
     void KilledUnit(Unit* victim) override
