@@ -2602,14 +2602,17 @@ void Player::GiveLevel(uint8 level)
 
     _ApplyAllLevelScaleItemMods(true);
 
-    // set current level health and mana/energy to maximum after applying all mods.
-    SetFullHealth();
-    SetPower(POWER_MANA, GetMaxPower(POWER_MANA));
-    SetPower(POWER_ENERGY, GetMaxPower(POWER_ENERGY));
-    if (GetPower(POWER_RAGE) > GetMaxPower(POWER_RAGE))
-        SetPower(POWER_RAGE, GetMaxPower(POWER_RAGE));
-    SetPower(POWER_FOCUS, 0);
-    SetPower(POWER_HAPPINESS, 0);
+    if (!isDead())
+    {
+        // set current level health and mana/energy to maximum after applying all mods.
+        SetFullHealth();
+        SetPower(POWER_MANA, GetMaxPower(POWER_MANA));
+        SetPower(POWER_ENERGY, GetMaxPower(POWER_ENERGY));
+        if (GetPower(POWER_RAGE) > GetMaxPower(POWER_RAGE))
+            SetPower(POWER_RAGE, GetMaxPower(POWER_RAGE));
+        SetPower(POWER_FOCUS, 0);
+        SetPower(POWER_HAPPINESS, 0);
+    }
 
     // update level to hunter/summon pet
     if (Pet* pet = GetPet())
@@ -9172,7 +9175,6 @@ Pet* Player::SummonPet(uint32 entry, float x, float y, float z, float ang, PetTy
             pet->GetCharmInfo()->SetPetNumber(pet_number, false);
         }
 
-        pet->SetUInt32Value(UNIT_FIELD_BYTES_0, 2048);
         pet->SetUInt32Value(UNIT_FIELD_PETEXPERIENCE, 0);
         pet->SetUInt32Value(UNIT_FIELD_PETNEXTLEVELEXP, 1000);
         pet->SetFullHealth();
