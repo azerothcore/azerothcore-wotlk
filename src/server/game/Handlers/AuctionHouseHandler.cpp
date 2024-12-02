@@ -614,35 +614,32 @@ void WorldSession::HandleAuctionListBidderItems(WorldPacket& recvData)
         return;
     }
 
+    // Arbitrary cap, can be adjusted if needed
+    if (outbiddedCount > 1000)
+        return;
+
     // remove fake death
     if (GetPlayer()->HasUnitState(UNIT_STATE_DIED))
         GetPlayer()->RemoveAurasByType(SPELL_AURA_FEIGN_DEATH);
 
-    AuctionHouseObject* auctionHouse = sAuctionMgr->GetAuctionsMap(creature->GetFaction());
+    AuctionHouseEntry const* ahEntry = AuctionHouseMgr::GetAuctionHouseEntryFromFactionTemplate(creature->GetFaction());
+    if (!ahEntry)
+        return;
 
-    WorldPacket data(SMSG_AUCTION_BIDDER_LIST_RESULT, (4 + 4 + 4) + 30000); // pussywizard: ensure there is enough memory
-    Player* player = GetPlayer();
-    data << (uint32) 0;                                     //add 0 as count
-    uint32 count = 0;
-    uint32 totalcount = 0;
-    while (outbiddedCount > 0)                             //add all data, which client requires
+    AuctionHouseFaction auctionHouseFaction = AuctionHouseMgr::GetAuctionHouseFactionFromHouseId(AuctionHouseId(ahEntry->houseId));
+
+    // Client sends this list, which I'm honestly not entirely sure why?
+    std::vector<uint32> auctionIds;
+    auctionIds.reserve(outbiddedCount);
+    while (outbiddedCount > 0) // add all data, which client requires
     {
         --outbiddedCount;
         uint32 outbiddedAuctionId;
         recvData >> outbiddedAuctionId;
-        AuctionEntry* auction = auctionHouse->GetAuction(outbiddedAuctionId);
-        if (auction && auction->BuildAuctionInfo(data))
-        {
-            ++totalcount;
-            ++count;
-        }
+        auctionIds.push_back(outbiddedAuctionId);
     }
 
-    auctionHouse->BuildListBidderItems(data, player, count, totalcount);
-    data.put<uint32>(0, count);                           // add count to placeholder
-    data << totalcount;
-    data << uint32(AUCTION_SEARCH_DELAY);
-    SendPacket(&data);
+    sAuctionMgr->GetAuctionHouseSearcher()->QueueSearchRequest(new AuctionSearchBidderListRequest(auctionHouseFaction, std::move(auctionIds), GetPlayer()->GetGUID()));
 }
 
 //this void sends player info about his auctions
@@ -662,7 +659,13 @@ void WorldSession::HandleAuctionListOwnerItems(WorldPacket& recvData)
     if (GetPlayer()->HasUnitState(UNIT_STATE_DIED))
         GetPlayer()->RemoveAurasByType(SPELL_AURA_FEIGN_DEATH);
 
+    AuctionHouseEntry const* ahEntry = AuctionHouseMgr::GetAuctionHouseEntryFromFactionTemplate(creature->GetFaction());
+    if (!ahEntry)
+        return;
 
+    AuctionHouseFaction auctionHouseFaction = AuctionHouseMgr::GetAuctionHouseFactionFromHouseId(AuctionHouseId(ahEntry->houseId));
+
+    sAuctionMgr->GetAuctionHouseSearcher()->QueueSearchRequest(new AuctionSearchOwnerListRequest(auctionHouseFaction, GetPlayer()->GetGUID()));
 }
 
 //this void is called when player clicks on search button
@@ -736,7 +739,6 @@ void WorldSession::HandleAuctionListItems(WorldPacket& recvData)
     ahSearchInfo.itemSubClass = auctionSubCategory;
     ahSearchInfo.quality = quality;
     ahSearchInfo.getAll = getAll;
-    ahSearchInfo.listFaction = auctionHouseFaction;
     ahSearchInfo.sorting = std::move(sortOrder);
 
     AuctionHousePlayerInfo ahPlayerInfo;
@@ -761,7 +763,7 @@ void WorldSession::HandleAuctionListItems(WorldPacket& recvData)
         ahPlayerInfo.usablePlayerInfo.value() = std::move(usablePlayerInfo);
     }
 
-    sAuctionMgr->GetAuctionHouseSearcher()->AddSearchRequest(new AuctionSearchRequest(std::move(ahSearchInfo), std::move(ahPlayerInfo)));
+    sAuctionMgr->GetAuctionHouseSearcher()->QueueSearchRequest(new AuctionSearchListRequest(auctionHouseFaction, std::move(ahSearchInfo), std::move(ahPlayerInfo)));
 }
 
 void WorldSession::HandleAuctionListPendingSales(WorldPacket& recvData)

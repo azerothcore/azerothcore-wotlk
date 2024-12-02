@@ -104,7 +104,6 @@ struct AuctionEntry
     [[nodiscard]] AuctionHouseFaction GetFactionId() const;
     [[nodiscard]] uint32 GetAuctionCut() const;
     [[nodiscard]] static uint32 CalculateAuctionOutBid(uint32 bid);
-    bool BuildAuctionInfo(WorldPacket& data) const;
     void DeleteFromDB(CharacterDatabaseTransaction trans) const;
     void SaveToDB(CharacterDatabaseTransaction trans) const;
     bool LoadFromDB(Field* fields);
@@ -143,9 +142,6 @@ public:
     bool RemoveAuction(AuctionEntry* auction);
 
     void Update();
-
-    void BuildListBidderItems(WorldPacket& data, Player* player, uint32& count, uint32& totalcount);
-    void BuildListOwnerItems(WorldPacket& data, Player* player, uint32& count, uint32& totalcount);
 
 private:
     AuctionEntryMap _auctionsMap;

@@ -22,7 +22,7 @@
 #include "GameTime.h"
 #include "Player.h"
 
-AuctionHouseWorkerThread::AuctionHouseWorkerThread(ProducerConsumerQueue<AuctionSearchRequest*>* requestQueue, MPSCQueue<AuctionSearchResponse>* responseQueue)
+AuctionHouseWorkerThread::AuctionHouseWorkerThread(ProducerConsumerQueue<AuctionSearcherRequest*>* requestQueue, MPSCQueue<AuctionSearcherResponse>* responseQueue)
 {
     _workerThread = std::thread(&AuctionHouseWorkerThread::Run, this);
     _requestQueue = requestQueue;
@@ -34,7 +34,7 @@ void AuctionHouseWorkerThread::Stop()
     _workerThread.join();
 }
 
-void AuctionHouseWorkerThread::AddAuctionSearchUpdateToQueue(std::shared_ptr<AuctionSearchUpdate> const auctionSearchUpdate)
+void AuctionHouseWorkerThread::AddAuctionSearchUpdateToQueue(std::shared_ptr<AuctionSearcherUpdate> const auctionSearchUpdate)
 {
     _auctionUpdatesQueue.add(auctionSearchUpdate);
 }
@@ -52,34 +52,27 @@ void AuctionHouseWorkerThread::Run()
 
 void AuctionHouseWorkerThread::ProcessSearchUpdates()
 {
-    std::shared_ptr<AuctionSearchUpdate> auctionSearchUpdate;
+    std::shared_ptr<AuctionSearcherUpdate> auctionSearchUpdate;
     while (_auctionUpdatesQueue.next(auctionSearchUpdate))
     {
-        SearchableAuctionEntriesMap& searchableAuctionMap = GetSearchableAuctionMap(auctionSearchUpdate->listFaction);
-
         switch (auctionSearchUpdate->updateType)
         {
-        case AuctionSearchUpdate::Type::ADD:
+        case AuctionSearcherUpdate::Type::ADD:
         {
             std::shared_ptr<AuctionSearchAdd> const auctionAdd = std::static_pointer_cast<AuctionSearchAdd>(auctionSearchUpdate);
-            searchableAuctionMap.insert(std::make_pair(auctionAdd->searchableAuctionEntry->Id, auctionAdd->searchableAuctionEntry));
+            SearchUpdateAdd(*auctionAdd);
             break;
         }
-        case AuctionSearchUpdate::Type::REMOVE:
+        case AuctionSearcherUpdate::Type::REMOVE:
         {
             std::shared_ptr<AuctionSearchRemove> const auctionRemove = std::static_pointer_cast<AuctionSearchRemove>(auctionSearchUpdate);
-            searchableAuctionMap.erase(auctionRemove->auctionId);
+            SearchUpdateRemove(*auctionRemove);
             break;
         }
-        case AuctionSearchUpdate::Type::UPDATE_BID:
+        case AuctionSearcherUpdate::Type::UPDATE_BID:
         {
             std::shared_ptr<AuctionSearchUpdateBid> const auctionUpdateBid = std::static_pointer_cast<AuctionSearchUpdateBid>(auctionSearchUpdate);
-            SearchableAuctionEntriesMap::const_iterator itr = searchableAuctionMap.find(auctionUpdateBid->auctionId);
-            if (itr != searchableAuctionMap.end())
-            {
-                itr->second->bid = auctionUpdateBid->bid;
-                itr->second->bidderGuid = auctionUpdateBid->bidderGuid;
-            }
+            SearchUpdateBid(*auctionUpdateBid);
             break;
         }
         default:
@@ -88,133 +81,253 @@ void AuctionHouseWorkerThread::ProcessSearchUpdates()
     }
 }
 
+void AuctionHouseWorkerThread::SearchUpdateAdd(AuctionSearchAdd const& auctionAdd)
+{
+    SearchableAuctionEntriesMap& searchableAuctionMap = GetSearchableAuctionMap(auctionAdd.listFaction);
+    searchableAuctionMap.insert(std::make_pair(auctionAdd.searchableAuctionEntry->Id, auctionAdd.searchableAuctionEntry));
+}
+
+void AuctionHouseWorkerThread::SearchUpdateRemove(AuctionSearchRemove const& auctionRemove)
+{
+    SearchableAuctionEntriesMap& searchableAuctionMap = GetSearchableAuctionMap(auctionRemove.listFaction);
+    searchableAuctionMap.erase(auctionRemove.auctionId);
+}
+
+void AuctionHouseWorkerThread::SearchUpdateBid(AuctionSearchUpdateBid const& auctionUpdateBid)
+{
+    SearchableAuctionEntriesMap const& searchableAuctionMap = GetSearchableAuctionMap(auctionUpdateBid.listFaction);
+    SearchableAuctionEntriesMap::const_iterator itr = searchableAuctionMap.find(auctionUpdateBid.auctionId);
+    if (itr != searchableAuctionMap.end())
+    {
+        itr->second->bid = auctionUpdateBid.bid;
+        itr->second->bidderGuid = auctionUpdateBid.bidderGuid;
+    }
+}
+
 void AuctionHouseWorkerThread::ProcessSearchRequests()
 {
-    AuctionSearchRequest* searchRequest = nullptr;
+    AuctionSearcherRequest* searchRequest;
     while (_requestQueue->Pop(searchRequest))
     {
-        SearchableAuctionEntriesMap const& searchableAuctionMap = GetSearchableAuctionMap(searchRequest->searchInfo.listFaction);
-
-        AuctionSearchResponse* searchResponse = new AuctionSearchResponse();
-        searchResponse->playerGuid = searchRequest->playerInfo.playerGuid;
-
-        uint32 count = 0, totalCount = 0;
-
-        searchResponse->packet.Initialize(SMSG_AUCTION_LIST_RESULT, (4 + 4 + 4));
-        searchResponse->packet << (uint32)0;
-
-        if (!searchRequest->searchInfo.getAll)
+        switch (searchRequest->requestType)
         {
-            SortableAuctionEntriesList auctionEntries;
-            BuildListAuctionItems(searchRequest, auctionEntries, searchableAuctionMap);
-
-            if (!searchRequest->searchInfo.sorting.empty() && auctionEntries.size() > MAX_AUCTIONS_PER_PAGE)
-            {
-                AuctionSorter sorter(&searchRequest->searchInfo.sorting, searchRequest->playerInfo.locdbc_idx);
-                std::sort(auctionEntries.begin(), auctionEntries.end(), sorter);
-            }
-
-            SortableAuctionEntriesList::const_iterator itr = auctionEntries.begin();
-            if (searchRequest->searchInfo.listfrom)
-            {
-                if (searchRequest->searchInfo.listfrom > auctionEntries.size())
-                    itr = auctionEntries.end();
-                else
-                    itr += searchRequest->searchInfo.listfrom;
-            }
-
-            for (; itr != auctionEntries.end(); ++itr)
-            {
-                (*itr)->BuildAuctionInfo(searchResponse->packet);
-
-                if (++count >= MAX_AUCTIONS_PER_PAGE)
-                    break;
-            }
-
-            totalCount = auctionEntries.size();
-        }
-        else
+        case AuctionSearcherRequest::Type::LIST:
         {
-            // getAll handling
-            for (auto const& pair : searchableAuctionMap)
-            {
-                std::shared_ptr<SearchableAuctionEntry> const Aentry = pair.second;
-                ++count;
-                Aentry->BuildAuctionInfo(searchResponse->packet);
-
-                if (count >= MAX_GETALL_RETURN)
-                    break;
-            }
-
-            totalCount = searchableAuctionMap.size();
+            AuctionSearchListRequest const* searchListRequest = static_cast<AuctionSearchListRequest*>(searchRequest);
+            SearchListRequest(*searchListRequest);
+            break;
         }
-
-        searchResponse->packet.put<uint32>(0, count);
-        searchResponse->packet << totalCount;
-        searchResponse->packet << uint32(AUCTION_SEARCH_DELAY);
-
-        _responseQueue->Enqueue(searchResponse);
+        case AuctionSearcherRequest::Type::OWNER_LIST:
+        {
+            AuctionSearchOwnerListRequest const* searchOwnerListRequest = static_cast<AuctionSearchOwnerListRequest*>(searchRequest);
+            SearchOwnerListRequest(*searchOwnerListRequest);
+            break;
+        }
+        case AuctionSearcherRequest::Type::BIDDER_LIST:
+        {
+            AuctionSearchBidderListRequest const* searchBidderListRequest = static_cast<AuctionSearchBidderListRequest*>(searchRequest);
+            SearchBidderListRequest(*searchBidderListRequest);
+            break;
+        }
+        default:
+            break;
+        }
 
         delete searchRequest;
     }
 }
 
-void AuctionHouseWorkerThread::BuildListAuctionItems(AuctionSearchRequest const* searchRequest, SortableAuctionEntriesList& auctionEntries, SearchableAuctionEntriesMap const& auctionMap) const
+void AuctionHouseWorkerThread::SearchListRequest(AuctionSearchListRequest const& searchListRequest)
+{
+    SearchableAuctionEntriesMap const& searchableAuctionMap = GetSearchableAuctionMap(searchListRequest.listFaction);
+    uint32 count = 0, totalCount = 0;
+
+    AuctionSearcherResponse* searchResponse = new AuctionSearcherResponse();
+    searchResponse->playerGuid = searchListRequest.playerInfo.playerGuid;
+    searchResponse->packet.Initialize(SMSG_AUCTION_LIST_RESULT, (4 + 4 + 4));
+    searchResponse->packet << (uint32)0;
+
+    if (!searchListRequest.searchInfo.getAll)
+    {
+        SortableAuctionEntriesList auctionEntries;
+        BuildListAuctionItems(searchListRequest, auctionEntries, searchableAuctionMap);
+
+        if (!searchListRequest.searchInfo.sorting.empty() && auctionEntries.size() > MAX_AUCTIONS_PER_PAGE)
+        {
+            AuctionSorter sorter(&searchListRequest.searchInfo.sorting, searchListRequest.playerInfo.locdbc_idx);
+            std::sort(auctionEntries.begin(), auctionEntries.end(), sorter);
+        }
+
+        SortableAuctionEntriesList::const_iterator itr = auctionEntries.begin();
+        if (searchListRequest.searchInfo.listfrom)
+        {
+            if (searchListRequest.searchInfo.listfrom > auctionEntries.size())
+                itr = auctionEntries.end();
+            else
+                itr += searchListRequest.searchInfo.listfrom;
+        }
+
+        for (; itr != auctionEntries.end(); ++itr)
+        {
+            (*itr)->BuildAuctionInfo(searchResponse->packet);
+
+            if (++count >= MAX_AUCTIONS_PER_PAGE)
+                break;
+        }
+
+        totalCount = auctionEntries.size();
+    }
+    else
+    {
+        // getAll handling
+        for (auto const& pair : searchableAuctionMap)
+        {
+            std::shared_ptr<SearchableAuctionEntry> const& Aentry = pair.second;
+            ++count;
+            Aentry->BuildAuctionInfo(searchResponse->packet);
+
+            if (count >= MAX_GETALL_RETURN)
+                break;
+        }
+
+        totalCount = searchableAuctionMap.size();
+    }
+
+    searchResponse->packet.put<uint32>(0, count);
+    searchResponse->packet << totalCount;
+    searchResponse->packet << uint32(AUCTION_SEARCH_DELAY);
+
+    _responseQueue->Enqueue(searchResponse);
+}
+
+void AuctionHouseWorkerThread::SearchOwnerListRequest(AuctionSearchOwnerListRequest const& searchOwnerListRequest)
+{
+    SearchableAuctionEntriesMap const& searchableAuctionMap = GetSearchableAuctionMap(searchOwnerListRequest.listFaction);
+
+    AuctionSearcherResponse* searchResponse = new AuctionSearcherResponse();
+    searchResponse->playerGuid = searchOwnerListRequest.ownerGuid;
+    searchResponse->packet.Initialize(SMSG_AUCTION_OWNER_LIST_RESULT, (4 + 4 + 4));
+    searchResponse->packet << (uint32)0;                                     // amount place holder
+
+    uint32 count = 0;
+    uint32 totalcount = 0;
+
+    for (auto const& pair : searchableAuctionMap)
+    {
+        if (pair.second->ownerGuid != searchOwnerListRequest.ownerGuid)
+            continue;
+
+        std::shared_ptr<SearchableAuctionEntry> const& auctionEntry = pair.second;
+        auctionEntry->BuildAuctionInfo(searchResponse->packet);
+        ++count;
+        ++totalcount;
+    }
+
+    searchResponse->packet.put<uint32>(0, count);
+    searchResponse->packet << (uint32)totalcount;
+    searchResponse->packet << uint32(AUCTION_SEARCH_DELAY);
+
+    _responseQueue->Enqueue(searchResponse);
+}
+
+void AuctionHouseWorkerThread::SearchBidderListRequest(AuctionSearchBidderListRequest const& searchBidderListRequest)
+{
+    SearchableAuctionEntriesMap const& searchableAuctionMap = GetSearchableAuctionMap(searchBidderListRequest.listFaction);
+
+    AuctionSearcherResponse* searchResponse = new AuctionSearcherResponse();
+    searchResponse->playerGuid = searchBidderListRequest.ownerGuid;
+    searchResponse->packet.Initialize(SMSG_AUCTION_BIDDER_LIST_RESULT, (4 + 4 + 4) + 30000); // pussywizard: ensure there is enough memory
+    searchResponse->packet << (uint32)0;                                     //add 0 as count
+
+    uint32 count = 0;
+    uint32 totalcount = 0;
+
+    for (uint32 const auctionId : searchBidderListRequest.outbiddedAuctionIds)
+    {
+        SearchableAuctionEntriesMap::const_iterator itr = searchableAuctionMap.find(auctionId);
+        if (itr == searchableAuctionMap.end())
+            continue;
+
+        std::shared_ptr<SearchableAuctionEntry> const& auctionEntry = itr->second;
+        auctionEntry->BuildAuctionInfo(searchResponse->packet);
+        ++count;
+        ++totalcount;
+    }
+
+    for (auto const& pair : searchableAuctionMap)
+    {
+        if (pair.second->bidderGuid != searchBidderListRequest.ownerGuid)
+            continue;
+
+        std::shared_ptr<SearchableAuctionEntry> const& auctionEntry = pair.second;
+        auctionEntry->BuildAuctionInfo(searchResponse->packet);
+        ++count;
+        ++totalcount;
+    }
+
+    searchResponse->packet.put<uint32>(0, count);                           // add count to placeholder
+    searchResponse->packet << totalcount;
+    searchResponse->packet << uint32(AUCTION_SEARCH_DELAY);
+
+    _responseQueue->Enqueue(searchResponse);
+}
+
+void AuctionHouseWorkerThread::BuildListAuctionItems(AuctionSearchListRequest const& searchRequest, SortableAuctionEntriesList& auctionEntries, SearchableAuctionEntriesMap const& auctionMap) const
 {
     // pussywizard: optimization, this is a simplified case
-    if (searchRequest->searchInfo.itemClass == 0xffffffff && searchRequest->searchInfo.itemSubClass == 0xffffffff
-        && searchRequest->searchInfo.inventoryType == 0xffffffff && searchRequest->searchInfo.quality == 0xffffffff
-        && searchRequest->searchInfo.levelmin == 0x00 && searchRequest->searchInfo.levelmax == 0x00
-        && searchRequest->searchInfo.usable == 0x00 && searchRequest->searchInfo.wsearchedname.empty())
+    if (searchRequest.searchInfo.itemClass == 0xffffffff && searchRequest.searchInfo.itemSubClass == 0xffffffff
+        && searchRequest.searchInfo.inventoryType == 0xffffffff && searchRequest.searchInfo.quality == 0xffffffff
+        && searchRequest.searchInfo.levelmin == 0x00 && searchRequest.searchInfo.levelmax == 0x00
+        && searchRequest.searchInfo.usable == 0x00 && searchRequest.searchInfo.wsearchedname.empty())
     {
         for (auto const& pair : auctionMap)
-            auctionEntries.push_back(pair.second);
+            auctionEntries.push_back(pair.second.get());
     }
     else
     {
         for (auto const& pair : auctionMap)
         {
-            std::shared_ptr<SearchableAuctionEntry> const Aentry = pair.second;
+            std::shared_ptr<SearchableAuctionEntry> const& Aentry = pair.second;
             SearchableAuctionEntryItem const& Aitem = Aentry->item;
             ItemTemplate const* proto = Aitem.itemTemplate;
 
-            if (searchRequest->searchInfo.itemClass != 0xffffffff && proto->Class != searchRequest->searchInfo.itemClass)
+            if (searchRequest.searchInfo.itemClass != 0xffffffff && proto->Class != searchRequest.searchInfo.itemClass)
                 continue;
 
-            if (searchRequest->searchInfo.itemSubClass != 0xffffffff && proto->SubClass != searchRequest->searchInfo.itemSubClass)
+            if (searchRequest.searchInfo.itemSubClass != 0xffffffff && proto->SubClass != searchRequest.searchInfo.itemSubClass)
                 continue;
 
-            if (searchRequest->searchInfo.inventoryType != 0xffffffff && proto->InventoryType != searchRequest->searchInfo.inventoryType)
+            if (searchRequest.searchInfo.inventoryType != 0xffffffff && proto->InventoryType != searchRequest.searchInfo.inventoryType)
             {
                 // xinef: exception, robes are counted as chests
-                if (searchRequest->searchInfo.inventoryType != INVTYPE_CHEST || proto->InventoryType != INVTYPE_ROBE)
+                if (searchRequest.searchInfo.inventoryType != INVTYPE_CHEST || proto->InventoryType != INVTYPE_ROBE)
                     continue;
             }
 
-            if (searchRequest->searchInfo.quality != 0xffffffff && proto->Quality < searchRequest->searchInfo.quality)
+            if (searchRequest.searchInfo.quality != 0xffffffff && proto->Quality < searchRequest.searchInfo.quality)
                 continue;
 
-            if (searchRequest->searchInfo.levelmin != 0x00 && (proto->RequiredLevel < searchRequest->searchInfo.levelmin
-                || (searchRequest->searchInfo.levelmax != 0x00 && proto->RequiredLevel > searchRequest->searchInfo.levelmax)))
+            if (searchRequest.searchInfo.levelmin != 0x00 && (proto->RequiredLevel < searchRequest.searchInfo.levelmin
+                || (searchRequest.searchInfo.levelmax != 0x00 && proto->RequiredLevel > searchRequest.searchInfo.levelmax)))
             {
                 continue;
             }
 
-            if (searchRequest->searchInfo.usable != 0x00)
+            if (searchRequest.searchInfo.usable != 0x00)
             {
-                if (!searchRequest->playerInfo.usablePlayerInfo.value().PlayerCanUseItem(proto))
+                if (!searchRequest.playerInfo.usablePlayerInfo.value().PlayerCanUseItem(proto))
                     continue;
             }
 
             // Allow search by suffix (ie: of the Monkey) or partial name (ie: Monkey)
             // No need to do any of this if no search term was entered
-            if (!searchRequest->searchInfo.wsearchedname.empty())
+            if (!searchRequest.searchInfo.wsearchedname.empty())
             {
-                if (Aitem.itemName[searchRequest->playerInfo.locdbc_idx].find(searchRequest->searchInfo.wsearchedname) == std::wstring::npos)
+                if (Aitem.itemName[searchRequest.playerInfo.locdbc_idx].find(searchRequest.searchInfo.wsearchedname) == std::wstring::npos)
                     continue;
             }
 
-            auctionEntries.push_back(Aentry);
+            auctionEntries.push_back(Aentry.get());
         }
     }
 }
@@ -223,19 +336,19 @@ AuctionHouseSearcher::AuctionHouseSearcher()
 {
     //@TODO: Config
     for (uint32 i = 0; i < 1; ++i)
-        _workerThreads.push_back(new AuctionHouseWorkerThread(&_requestQueue, &_responseQueue));
+        _workerThreads.push_back(std::make_unique<AuctionHouseWorkerThread>(&_requestQueue, &_responseQueue));
 }
 
 AuctionHouseSearcher::~AuctionHouseSearcher()
 {
     _requestQueue.Cancel();
-    for (AuctionHouseWorkerThread* workerThread : _workerThreads)
+    for (std::unique_ptr<AuctionHouseWorkerThread> const& workerThread : _workerThreads)
         workerThread->Stop();
 }
 
 void AuctionHouseSearcher::Update()
 {
-    AuctionSearchResponse* response = nullptr;
+    AuctionSearcherResponse* response = nullptr;
     while (_responseQueue.Dequeue(response))
     {
         Player* player = ObjectAccessor::FindConnectedPlayer(response->playerGuid);
@@ -246,7 +359,7 @@ void AuctionHouseSearcher::Update()
     }
 }
 
-void AuctionHouseSearcher::AddSearchRequest(AuctionSearchRequest* searchRequestInfo)
+void AuctionHouseSearcher::QueueSearchRequest(AuctionSearcherRequest* searchRequestInfo)
 {
     _requestQueue.Push(searchRequestInfo);
 }
@@ -306,13 +419,13 @@ void AuctionHouseSearcher::UpdateBid(AuctionEntry const* auctionEntry)
     NotifyOneWorker(std::make_shared<AuctionSearchUpdateBid>(auctionEntry->Id, auctionEntry->GetFactionId(), auctionEntry->bid, auctionEntry->bidder));
 }
 
-void AuctionHouseSearcher::NotifyAllWorkers(std::shared_ptr<AuctionSearchUpdate> const auctionSearchUpdate)
+void AuctionHouseSearcher::NotifyAllWorkers(std::shared_ptr<AuctionSearcherUpdate> const auctionSearchUpdate)
 {
-    for (AuctionHouseWorkerThread* workerThread : _workerThreads)
+    for (std::unique_ptr<AuctionHouseWorkerThread> const& workerThread : _workerThreads)
         workerThread->AddAuctionSearchUpdateToQueue(auctionSearchUpdate);
 }
 
-void AuctionHouseSearcher::NotifyOneWorker(std::shared_ptr<AuctionSearchUpdate> const auctionSearchUpdate)
+void AuctionHouseSearcher::NotifyOneWorker(std::shared_ptr<AuctionSearcherUpdate> const auctionSearchUpdate)
 {
     // Just notify the first worker in the list, no big deal which
     (*_workerThreads.begin())->AddAuctionSearchUpdateToQueue(auctionSearchUpdate);
@@ -404,14 +517,14 @@ void SearchableAuctionEntry::SetItemNames()
     }
 }
 
-int SearchableAuctionEntry::CompareAuctionEntry(uint32 column, std::shared_ptr<SearchableAuctionEntry> const auc, int loc_idx) const
+int SearchableAuctionEntry::CompareAuctionEntry(uint32 column, SearchableAuctionEntry const& auc, int loc_idx) const
 {
     switch (column)
     {
     case AUCTION_SORT_MINLEVEL:                                             // level = 0
     {
         ItemTemplate const* itemProto1 = item.itemTemplate;
-        ItemTemplate const* itemProto2 = auc->item.itemTemplate;
+        ItemTemplate const* itemProto2 = auc.item.itemTemplate;
 
         if (itemProto1->RequiredLevel > itemProto2->RequiredLevel)
             return -1;
@@ -422,7 +535,7 @@ int SearchableAuctionEntry::CompareAuctionEntry(uint32 column, std::shared_ptr<S
     case AUCTION_SORT_RARITY:                                             // quality = 1
     {
         ItemTemplate const* itemProto1 = item.itemTemplate;
-        ItemTemplate const* itemProto2 = auc->item.itemTemplate;
+        ItemTemplate const* itemProto2 = auc.item.itemTemplate;
 
         if (itemProto1->Quality < itemProto2->Quality)
             return -1;
@@ -431,36 +544,36 @@ int SearchableAuctionEntry::CompareAuctionEntry(uint32 column, std::shared_ptr<S
         break;
     }
     case AUCTION_SORT_BUYOUT:                                             // buyoutthenbid = 2 (UNUSED?)
-        if (buyout != auc->buyout)
+        if (buyout != auc.buyout)
         {
-            if (buyout < auc->buyout)
+            if (buyout < auc.buyout)
                 return -1;
-            else if (buyout > auc->buyout)
+            else if (buyout > auc.buyout)
                 return +1;
         }
         else
         {
-            if (bid < auc->bid)
+            if (bid < auc.bid)
                 return -1;
-            else if (bid > auc->bid)
+            else if (bid > auc.bid)
                 return +1;
         }
         break;
     case AUCTION_SORT_TIMELEFT:                                             // duration = 3
-        if (expire_time < auc->expire_time)
+        if (expire_time < auc.expire_time)
             return -1;
-        else if (expire_time > auc->expire_time)
+        else if (expire_time > auc.expire_time)
             return +1;
         break;
     case AUCTION_SORT_UNK4:                                             // status = 4 (WRONG)
-        if (bidderGuid.GetCounter() < auc->bidderGuid.GetCounter())
+        if (bidderGuid.GetCounter() < auc.bidderGuid.GetCounter())
             return -1;
-        else if (bidderGuid.GetCounter() > auc->bidderGuid.GetCounter())
+        else if (bidderGuid.GetCounter() > auc.bidderGuid.GetCounter())
             return +1;
         break;
     case AUCTION_SORT_ITEM:                                             // name = 5
     {
-        int comparison = item.itemName[loc_idx].compare(auc->item.itemName[loc_idx]);
+        int comparison = item.itemName[loc_idx].compare(auc.item.itemName[loc_idx]);
         if (comparison > 0)
             return -1;
         else if (comparison < 0)
@@ -470,25 +583,25 @@ int SearchableAuctionEntry::CompareAuctionEntry(uint32 column, std::shared_ptr<S
     }
     case AUCTION_SORT_MINBIDBUY:                                             // minbidbuyout = 6
     {
-        if (buyout != auc->buyout)
+        if (buyout != auc.buyout)
         {
-            if (buyout > auc->buyout)
+            if (buyout > auc.buyout)
                 return -1;
-            else if (buyout < auc->buyout)
+            else if (buyout < auc.buyout)
                 return +1;
         }
         else
         {
-            if (bid < auc->bid)
+            if (bid < auc.bid)
                 return -1;
-            else if (bid > auc->bid)
+            else if (bid > auc.bid)
                 return +1;
         }
         break;
     }
     case AUCTION_SORT_OWNER:                                             // seller = 7
     {
-        int comparison = ownerName.compare(auc->ownerName);
+        int comparison = ownerName.compare(auc.ownerName);
         if (comparison > 0)
             return -1;
         else if (comparison < 0)
@@ -499,7 +612,7 @@ int SearchableAuctionEntry::CompareAuctionEntry(uint32 column, std::shared_ptr<S
     case AUCTION_SORT_BID:                                             // bid = 8
     {
         uint32 bid1 = bid ? bid : startbid;
-        uint32 bid2 = auc->bid ? auc->bid : auc->startbid;
+        uint32 bid2 = auc.bid ? auc.bid : auc.startbid;
 
         if (bid1 > bid2)
             return -1;
@@ -509,16 +622,16 @@ int SearchableAuctionEntry::CompareAuctionEntry(uint32 column, std::shared_ptr<S
     }
     case AUCTION_SORT_STACK:                                             // quantity = 9
     {
-        if (item.count < auc->item.count)
+        if (item.count < auc.item.count)
             return -1;
-        else if (item.count > auc->item.count)
+        else if (item.count > auc.item.count)
             return +1;
         break;
     }
     case AUCTION_SORT_BUYOUT_2:                                            // buyout = 10 (UNUSED?)
-        if (buyout < auc->buyout)
+        if (buyout < auc.buyout)
             return -1;
-        else if (buyout > auc->buyout)
+        else if (buyout > auc.buyout)
             return +1;
         break;
     default:
@@ -528,14 +641,14 @@ int SearchableAuctionEntry::CompareAuctionEntry(uint32 column, std::shared_ptr<S
     return 0;
 }
 
-bool AuctionSorter::operator()(std::shared_ptr<SearchableAuctionEntry> const auc1, std::shared_ptr<SearchableAuctionEntry> const auc2) const
+bool AuctionSorter::operator()(SearchableAuctionEntry const* auc1, SearchableAuctionEntry const* auc2) const
 {
-    if (m_sort->empty())                      // not sorted
+    if (_sort->empty())                      // not sorted
         return false;
 
-    for (AuctionSortOrderVector::iterator itr = m_sort->begin(); itr != m_sort->end(); ++itr)
+    for (AuctionSortOrderVector::const_iterator itr = _sort->begin(); itr != _sort->end(); ++itr)
     {
-        int res = auc1->CompareAuctionEntry(itr->sortOrder, auc2, m_loc_idx);
+        int res = auc1->CompareAuctionEntry(itr->sortOrder, *auc2, _loc_idx);
         // "equal" by used column
         if (res == 0)
             continue;

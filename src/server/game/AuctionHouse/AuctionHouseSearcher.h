@@ -90,7 +90,7 @@ struct SearchableAuctionEntry
     void BuildAuctionInfo(WorldPacket& data) const;
     void SetItemNames();
 
-    int CompareAuctionEntry(uint32 column, std::shared_ptr<SearchableAuctionEntry> const auc, int loc_idx) const;
+    int CompareAuctionEntry(uint32 column, SearchableAuctionEntry const& auc, int loc_idx) const;
 };
 
 typedef std::vector<AuctionSortInfo> AuctionSortOrderVector;
@@ -107,7 +107,6 @@ struct AuctionHouseSearchInfo
     uint32 itemSubClass;
     uint32 quality;
     bool getAll;
-    AuctionHouseFaction listFaction;
     AuctionSortOrderVector sorting;
 };
 
@@ -136,23 +135,54 @@ struct AuctionHousePlayerInfo
     std::optional<AuctionHouseUsablePlayerInfo> usablePlayerInfo;
 };
 
-struct AuctionSearchRequest
+struct AuctionSearcherRequest
 {
-public:
-    AuctionSearchRequest(AuctionHouseSearchInfo const&& _searchInfo, AuctionHousePlayerInfo const&& _playerInfo)
-        : searchInfo(_searchInfo), playerInfo(_playerInfo) { }
+    enum class Type : uint8
+    {
+        LIST,
+        OWNER_LIST,
+        BIDDER_LIST
+    };
+
+    AuctionSearcherRequest(Type const _requestType, AuctionHouseFaction _listFaction) : requestType(_requestType), listFaction(_listFaction) { }
+
+    Type requestType;
+    AuctionHouseFaction listFaction;
+};
+
+struct AuctionSearchListRequest : AuctionSearcherRequest
+{
+    AuctionSearchListRequest(AuctionHouseFaction _listFaction, AuctionHouseSearchInfo const&& _searchInfo, AuctionHousePlayerInfo const&& _playerInfo)
+        : AuctionSearcherRequest(AuctionSearcherRequest::Type::LIST, _listFaction), searchInfo(_searchInfo), playerInfo(_playerInfo) { }
 
     AuctionHouseSearchInfo searchInfo;
     AuctionHousePlayerInfo playerInfo;
 };
 
-struct AuctionSearchResponse
+struct AuctionSearchOwnerListRequest : AuctionSearcherRequest
+{
+    AuctionSearchOwnerListRequest(AuctionHouseFaction _listFaction, ObjectGuid _ownerGuid)
+        : AuctionSearcherRequest(AuctionSearcherRequest::Type::OWNER_LIST, _listFaction), ownerGuid(_ownerGuid) { }
+
+    ObjectGuid ownerGuid;
+};
+
+struct AuctionSearchBidderListRequest : AuctionSearcherRequest
+{
+    AuctionSearchBidderListRequest(AuctionHouseFaction _listFaction, std::vector<uint32> const&& _outbiddedAuctionIds, ObjectGuid _ownerGuid)
+        : AuctionSearcherRequest(AuctionSearcherRequest::Type::BIDDER_LIST, _listFaction), outbiddedAuctionIds(_outbiddedAuctionIds), ownerGuid(_ownerGuid) { }
+
+    std::vector<uint32> outbiddedAuctionIds;
+    ObjectGuid ownerGuid;
+};
+
+struct AuctionSearcherResponse
 {
     ObjectGuid playerGuid;
     WorldPacket packet;
 };
 
-struct AuctionSearchUpdate
+struct AuctionSearcherUpdate
 {
     enum class Type : uint8
     {
@@ -161,32 +191,32 @@ struct AuctionSearchUpdate
         UPDATE_BID
     };
 
-    AuctionSearchUpdate(Type _updateType, AuctionHouseFaction _listFaction) : updateType(_updateType), listFaction(_listFaction) { }
+    AuctionSearcherUpdate(Type const _updateType, AuctionHouseFaction _listFaction) : updateType(_updateType), listFaction(_listFaction) { }
 
     Type updateType;
     AuctionHouseFaction listFaction;
 };
 
-struct AuctionSearchAdd : AuctionSearchUpdate
+struct AuctionSearchAdd : AuctionSearcherUpdate
 {
     AuctionSearchAdd(std::shared_ptr<SearchableAuctionEntry> _searchableAuctionEntry)
-        : AuctionSearchUpdate(AuctionSearchUpdate::Type::ADD, _searchableAuctionEntry->listFaction), searchableAuctionEntry(_searchableAuctionEntry) { }
+        : AuctionSearcherUpdate(AuctionSearcherUpdate::Type::ADD, _searchableAuctionEntry->listFaction), searchableAuctionEntry(_searchableAuctionEntry) { }
 
     std::shared_ptr<SearchableAuctionEntry> searchableAuctionEntry;
 };
 
-struct AuctionSearchRemove : AuctionSearchUpdate
+struct AuctionSearchRemove : AuctionSearcherUpdate
 {
     AuctionSearchRemove(uint32 _auctionId, AuctionHouseFaction _listFaction)
-        : AuctionSearchUpdate(AuctionSearchUpdate::Type::REMOVE, _listFaction), auctionId(_auctionId) { }
+        : AuctionSearcherUpdate(AuctionSearcherUpdate::Type::REMOVE, _listFaction), auctionId(_auctionId) { }
 
     uint32 auctionId;
 };
 
-struct AuctionSearchUpdateBid : AuctionSearchUpdate
+struct AuctionSearchUpdateBid : AuctionSearcherUpdate
 {
     AuctionSearchUpdateBid(uint32 _auctionId, AuctionHouseFaction _listFaction, uint32 _bid, ObjectGuid _bidderGuid)
-        : AuctionSearchUpdate(AuctionSearchUpdate::Type::UPDATE_BID, _listFaction), auctionId(_auctionId), bid(_bid), bidderGuid(_bidderGuid) { }
+        : AuctionSearcherUpdate(AuctionSearcherUpdate::Type::UPDATE_BID, _listFaction), auctionId(_auctionId), bid(_bid), bidderGuid(_bidderGuid) { }
 
     uint32 auctionId;
     uint32 bid;
@@ -194,43 +224,50 @@ struct AuctionSearchUpdateBid : AuctionSearchUpdate
 };
 
 typedef std::unordered_map<uint32, std::shared_ptr<SearchableAuctionEntry>> SearchableAuctionEntriesMap;
-typedef std::vector<std::shared_ptr<SearchableAuctionEntry>> SortableAuctionEntriesList;
+typedef std::vector<SearchableAuctionEntry*> SortableAuctionEntriesList;
 
 class AuctionSorter
 {
 public:
-    AuctionSorter(AuctionSortOrderVector* sort, int loc_idx) : m_sort(sort), m_loc_idx(loc_idx) {}
-    bool operator()(std::shared_ptr<SearchableAuctionEntry> const auc1, std::shared_ptr<SearchableAuctionEntry> const auc2) const;
+    AuctionSorter(AuctionSortOrderVector const* sort, int loc_idx) : _sort(sort), _loc_idx(loc_idx) {}
+    bool operator()(SearchableAuctionEntry const* auc1, SearchableAuctionEntry const* auc2) const;
 
 private:
-    AuctionSortOrderVector* m_sort;
-    int m_loc_idx;
+    AuctionSortOrderVector const* _sort;
+    int _loc_idx;
 };
 
 class AuctionHouseWorkerThread
 {
 public:
-    AuctionHouseWorkerThread(ProducerConsumerQueue<AuctionSearchRequest*>* requestQueue, MPSCQueue<AuctionSearchResponse>* responseQueue);
+    AuctionHouseWorkerThread(ProducerConsumerQueue<AuctionSearcherRequest*>* requestQueue, MPSCQueue<AuctionSearcherResponse>* responseQueue);
 
     void Stop();
 
-    void AddAuctionSearchUpdateToQueue(std::shared_ptr<AuctionSearchUpdate> const auctionSearchUpdate);
+    void AddAuctionSearchUpdateToQueue(std::shared_ptr<AuctionSearcherUpdate> const auctionSearchUpdate);
 
 private:
     void Run();
 
     void ProcessSearchUpdates();
-    void ProcessSearchRequests();
+    void SearchUpdateAdd(AuctionSearchAdd const& auctionAdd);
+    void SearchUpdateRemove(AuctionSearchRemove const& auctionRemove);
+    void SearchUpdateBid(AuctionSearchUpdateBid const& auctionUpdateBid);
 
-    void BuildListAuctionItems(AuctionSearchRequest const* searchRequest, SortableAuctionEntriesList& auctionEntries, SearchableAuctionEntriesMap const& auctionMap) const;
+    void ProcessSearchRequests();
+    void SearchListRequest(AuctionSearchListRequest const& searchListRequest);
+    void SearchOwnerListRequest(AuctionSearchOwnerListRequest const& searchOwnerListRequest);
+    void SearchBidderListRequest(AuctionSearchBidderListRequest const& searchBidderListRequest);
+
+    void BuildListAuctionItems(AuctionSearchListRequest const& searchRequest, SortableAuctionEntriesList& auctionEntries, SearchableAuctionEntriesMap const& auctionMap) const;
 
     SearchableAuctionEntriesMap& GetSearchableAuctionMap(AuctionHouseFaction faction) { return _searchableAuctionMap[static_cast<uint8>(faction)]; };
 
     SearchableAuctionEntriesMap _searchableAuctionMap[MAX_AUCTION_HOUSE_FACTIONS];
-    LockedQueue<std::shared_ptr<AuctionSearchUpdate>> _auctionUpdatesQueue;
+    LockedQueue<std::shared_ptr<AuctionSearcherUpdate>> _auctionUpdatesQueue;
 
-    ProducerConsumerQueue<AuctionSearchRequest*>* _requestQueue;
-    MPSCQueue<AuctionSearchResponse>* _responseQueue;
+    ProducerConsumerQueue<AuctionSearcherRequest*>* _requestQueue;
+    MPSCQueue<AuctionSearcherResponse>* _responseQueue;
 
     std::thread _workerThread;
 };
@@ -243,19 +280,19 @@ public:
 
     void Update();
 
-    void AddSearchRequest(AuctionSearchRequest* searchRequestInfo);
+    void QueueSearchRequest(AuctionSearcherRequest* searchRequestInfo);
 
     void AddAuction(AuctionEntry const* auctionEntry);
     void RemoveAuction(AuctionEntry const* auctionEntry);
     void UpdateBid(AuctionEntry const* auctionEntry);
 
-    void NotifyAllWorkers(std::shared_ptr<AuctionSearchUpdate> const auctionSearchUpdate);
-    void NotifyOneWorker(std::shared_ptr<AuctionSearchUpdate> const auctionSearchUpdate);
+    void NotifyAllWorkers(std::shared_ptr<AuctionSearcherUpdate> const auctionSearchUpdate);
+    void NotifyOneWorker(std::shared_ptr<AuctionSearcherUpdate> const auctionSearchUpdate);
 
 private:
-    ProducerConsumerQueue<AuctionSearchRequest*> _requestQueue;
-    MPSCQueue<AuctionSearchResponse> _responseQueue;
-    std::vector<AuctionHouseWorkerThread*> _workerThreads;
+    ProducerConsumerQueue<AuctionSearcherRequest*> _requestQueue;
+    MPSCQueue<AuctionSearcherResponse> _responseQueue;
+    std::vector<std::unique_ptr<AuctionHouseWorkerThread>> _workerThreads;
 };
 
 #endif
