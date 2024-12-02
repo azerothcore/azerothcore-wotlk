@@ -279,6 +279,16 @@ struct boss_twin_valkyrAI : public ScriptedAI
                 }
     }
 
+    void SummonBalls(uint8 count){
+        for (uint8 i = 0; i < count; ++i){
+            float angle = rand_norm() * 2 * M_PI;
+            if (Creature* ball = me->SummonCreature((i % 2) ? NPC_CONCENTRATED_DARK : NPC_CONCENTRATED_LIGHT, Locs[LOC_CENTER].GetPositionX() + cos(angle) * 47.0f, Locs[LOC_CENTER].GetPositionY() + std::sin(angle) * 47.0f, Locs[LOC_CENTER].GetPositionZ() + 1.5f, 0.0f, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 1500))
+            {
+                boss_twin_valkyrAI::JustSummoned(ball);
+            }
+        }
+    }
+
     void UpdateAI(uint32 diff) override
     {
         if (!UpdateVictim())
@@ -307,34 +317,16 @@ struct boss_twin_valkyrAI : public ScriptedAI
 
                 break;
             case EVENT_SUMMON_BALLS_1:
+                SummonBalls(7);
+                events.RescheduleEvent(EVENT_SUMMON_BALLS_2, 3s);
+                break;
             case EVENT_SUMMON_BALLS_2:
+                SummonBalls(8);
+                events.RescheduleEvent(EVENT_SUMMON_BALLS_3, 3s);
+                break;
             case EVENT_SUMMON_BALLS_3:
-                {
-                    uint8 count = 0;
-                    if (IsHeroic())
-                        count = eventId == EVENT_SUMMON_BALLS_3 ? 36 : 6;
-                    else
-                        count = eventId == EVENT_SUMMON_BALLS_3 ? 24 : 4;
-                    for( uint8 i = 0; i < count; ++i )
-                    {
-                        float angle = rand_norm() * 2 * M_PI;
-                        if (Creature* ball = me->SummonCreature((i % 2) ? NPC_CONCENTRATED_DARK : NPC_CONCENTRATED_LIGHT, Locs[LOC_CENTER].GetPositionX() + cos(angle) * 47.0f, Locs[LOC_CENTER].GetPositionY() + std::sin(angle) * 47.0f, Locs[LOC_CENTER].GetPositionZ() + 1.5f, 0.0f, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 1500))
-                            boss_twin_valkyrAI::JustSummoned(ball);
-                    }
-
-                    switch (eventId)
-                    {
-                        case EVENT_SUMMON_BALLS_1:
-                            events.RescheduleEvent(EVENT_SUMMON_BALLS_2, 8s);
-                            break;
-                        case EVENT_SUMMON_BALLS_2:
-                            events.RescheduleEvent(EVENT_SUMMON_BALLS_3, 8s);
-                            break;
-                        case EVENT_SUMMON_BALLS_3:
-                            events.RescheduleEvent(EVENT_SUMMON_BALLS_1, 15s);
-                            break;
-                    }
-                }
+                SummonBalls(9);
+                events.RescheduleEvent(EVENT_SUMMON_BALLS_3, 3s);
                 break;
             case EVENT_SPELL_SPIKE:
                 me->CastSpell(me->GetVictim(), me->GetEntry() == NPC_LIGHTBANE ? SPELL_LIGHT_TWIN_SPIKE : SPELL_DARK_TWIN_SPIKE, false);
@@ -709,8 +701,9 @@ public:
             if (type != POINT_MOTION_TYPE || id != 0)
                 return;
 
-            if (urand(0, 2))
+            if (urand(0, 2)){
                 me->DespawnOrUnsummon(0);
+            }
         }
 
         void MoveToNextPoint()
