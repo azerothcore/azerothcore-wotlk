@@ -627,7 +627,7 @@ public:
                         return;
                 }
 
-                if (IsSpellReady(FROSTBOLT_1, diff) && can_do_frost && GetSpec() != BOT_SPEC_MAGE_FIRE && dist < CalcSpellMaxRange(FROSTBOLT_1))
+                if (IsSpellReady(FROSTBOLT_1, diff) && can_do_frost && (GetSpec() != BOT_SPEC_MAGE_FIRE || !can_do_fire) && dist < CalcSpellMaxRange(FROSTBOLT_1))
                 {
                     if (doCast(mytar, GetSpell(FROSTBOLT_1)))
                         return;
