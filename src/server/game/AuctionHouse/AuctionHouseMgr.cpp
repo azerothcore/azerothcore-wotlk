@@ -556,6 +556,11 @@ uint32 AuctionEntry::GetAuctionCut() const
     return std::max(cut, 0);
 }
 
+uint32 AuctionEntry::GetAuctionOutBid() const
+{
+    return CalculateAuctionOutBid(bid);
+}
+
 /// the sum of outbid is (1% from current bid)*5, if bid is very small, it is 1c
 uint32 AuctionEntry::CalculateAuctionOutBid(uint32 bid)
 {
