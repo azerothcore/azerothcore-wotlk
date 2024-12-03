@@ -517,7 +517,7 @@ class spell_gen_grow_flower_patch : public SpellScript
 
     SpellCastResult CheckCast()
     {
-        if (GetCaster()->HasAuraType(SPELL_AURA_MOD_STEALTH) || GetCaster()->HasAuraType(SPELL_AURA_MOD_INVISIBILITY))
+        if (GetCaster()->HasStealthAura() || GetCaster()->HasInvisibilityAura())
             return SPELL_FAILED_DONT_REPORT;
 
         return SPELL_CAST_OK;
@@ -5298,6 +5298,28 @@ class spell_gen_steal_weapon : public AuraScript
     }
 };
 
+// 43536 - Serverside - SetHealth (75%)
+// 43537 - Serverside - SetHealth (50%)
+// 43538 - Serverside - SetHealth (25%)
+class spell_gen_set_health : public SpellScript
+{
+    PrepareSpellScript(spell_gen_set_health);
+
+    void HandleScript(SpellEffIndex /*effIndex*/)
+    {
+        if (Unit* target = GetHitUnit())
+        {
+            uint32 value = GetSpellInfo()->Effects[EFFECT_0].CalcValue();
+            target->SetHealth(target->CountPctFromMaxHealth(value));
+        }
+    }
+
+    void Register() override
+    {
+        OnEffectHitTarget += SpellEffectFn(spell_gen_set_health::HandleScript, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
+    }
+};
+
 void AddSC_generic_spell_scripts()
 {
     RegisterSpellScript(spell_silithyst);
@@ -5455,4 +5477,5 @@ void AddSC_generic_spell_scripts()
     RegisterSpellScript(spell_gen_consumption);
     RegisterSpellScript(spell_gen_sober_up);
     RegisterSpellScript(spell_gen_steal_weapon);
+    RegisterSpellScript(spell_gen_set_health);
 }

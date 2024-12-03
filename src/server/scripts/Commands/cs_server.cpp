@@ -137,7 +137,7 @@ public:
 
         handler->PSendSysMessage("Compiled on: {}", GitRevision::GetHostOSVersion());
 
-        handler->PSendSysMessage("Worldserver listening connections on port %" PRIu16, worldPort);
+        handler->PSendSysMessage("Worldserver listening connections on port {}", worldPort);
         handler->PSendSysMessage("{}", dbPortOutput);
 
         bool vmapIndoorCheck = sWorld->getBoolConfig(CONFIG_VMAP_INDOOR_CHECK);

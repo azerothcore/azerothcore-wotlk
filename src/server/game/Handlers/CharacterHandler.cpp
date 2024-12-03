@@ -1068,7 +1068,7 @@ void WorldSession::HandlePlayerLoginFromDB(LoginQueryHolder const& holder)
     // Xinef: fix vendors falling of player vehicle, due to isBeingLoaded checks
     if (pCurrChar->IsInWorld())
     {
-        if (pCurrChar->GetMountBlockId() && !pCurrChar->HasAuraType(SPELL_AURA_MOUNTED))
+        if (pCurrChar->GetMountBlockId() && !pCurrChar->HasMountedAura())
         {
             pCurrChar->CastSpell(pCurrChar, pCurrChar->GetMountBlockId(), true);
             pCurrChar->SetMountBlockId(0);
