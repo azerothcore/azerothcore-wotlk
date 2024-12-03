@@ -595,7 +595,7 @@ void World::LoadConfigSettings(bool reload)
     {
         LOG_ERROR("server.loading", "Rate.MoveSpeed.NPC ({}) must be > 0. Using 1 instead.", _rate_values[RATE_MOVESPEED_NPC]);
         _rate_values[RATE_MOVESPEED_NPC] = 1.0f;
-    }   
+    }
     for (uint8 i = 0; i < MAX_MOVE_TYPE; ++i) baseMoveSpeed[i] *= _rate_values[RATE_MOVESPEED_NPC];
 
     _rate_values[RATE_CORPSE_DECAY_LOOTED] = sConfigMgr->GetOption<float>("Rate.Corpse.Decay.Looted", 0.5f);
