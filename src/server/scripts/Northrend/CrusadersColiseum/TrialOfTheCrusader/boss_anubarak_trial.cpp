@@ -325,7 +325,7 @@ public:
                         me->CastSpell(me, SPELL_SUBMERGE, false);
                         events.CancelEvent(EVENT_SUMMON_NERUBIAN);
                         events.CancelEvent(EVENT_SPELL_FREEZING_SLASH);
-                        events.CancelEvent(EVENT_SPELL_PENETRATING_COLD);
+                        //events.CancelEvent(EVENT_SPELL_PENETRATING_COLD);
                         events.RescheduleEvent(EVENT_EMERGE, 1min);
                         events.RescheduleEvent(EVENT_SPELL_SUMMON_SPIKE, 2500ms);
                         events.RescheduleEvent(EVENT_SUMMON_SCARAB, 3s);
@@ -357,7 +357,7 @@ public:
                         //events.RescheduleEvent(EVENT_SUMMON_NERUBIAN, 5s, 8s);
                         events.RescheduleEvent(EVENT_SUMMON_NERUBIAN, 10s);
                         events.RescheduleEvent(EVENT_SPELL_FREEZING_SLASH, 7s, 15s);
-                        events.RescheduleEvent(EVENT_SPELL_PENETRATING_COLD, 15s, 20s);
+                        //events.RescheduleEvent(EVENT_SPELL_PENETRATING_COLD, 15s, 20s);
                         events.RescheduleEvent(EVENT_SUBMERGE, 80s);
                     }
                     break;
@@ -885,6 +885,9 @@ class spell_gen_leeching_swarm_aura : public AuraScript
     {
         if (Unit* caster = GetCaster())
         {
+            if (!GetTarget()->GetGUID().IsPlayer()) {
+                return;
+            }			
             int32 lifeLeeched = GetTarget()->CountPctFromCurHealth(aurEff->GetAmount());
             if (lifeLeeched < 250)
                 lifeLeeched = 250;
@@ -914,7 +917,7 @@ class spell_gen_leeching_swarm_dmg : public SpellScript
         if (Unit* caster = GetCaster())
             if (GetHitDamage() > 0)
             {
-                int32 damage = GetHitDamage();
+                int32 damage = GetHitDamage() * 2;
                 caster->CastCustomSpell(caster, SPELL_LEECHING_SWARM_HEAL, &damage, 0, 0, true);
             }
     }
