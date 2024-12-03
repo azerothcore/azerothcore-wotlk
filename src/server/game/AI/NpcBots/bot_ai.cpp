@@ -4750,6 +4750,7 @@ bool bot_ai::CheckAttackTarget()
                 Evade();
         }
 
+        _lastTargetGuid = ObjectGuid::Empty;
         return false;
     }
 
@@ -18515,7 +18516,7 @@ bool bot_ai::GlobalUpdate(uint32 diff)
         return false;
 
     //opponent unsafe
-    if ((IsWanderer() || (!IAmFree() && (!opponent || !master->GetBotMgr()->GetBotAllowCombatPositioning()))) &&
+    if ((IsWanderer() || (!IAmFree() && (!_lastTargetGuid || !master->GetBotMgr()->GetBotAllowCombatPositioning()))) &&
         !HasBotCommandState(BOT_COMMAND_STAY) &&
         (!me->GetVehicle() || (!CCed(me->GetVehicleBase(), true) && !me->GetVehicleBase()->GetTarget())))
     {
