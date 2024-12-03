@@ -1347,7 +1347,7 @@ public:
         if (itr == _gameTeleStore.end()) return nullptr;
         return &itr->second;
     }
-    [[nodiscard]] GameTele const* GetGameTele(std::string_view name) const;
+    [[nodiscard]] GameTele const* GetGameTele(std::string_view name, bool exactSearch = false) const;
     [[nodiscard]] GameTeleContainer const& GetGameTeleMap() const { return _gameTeleStore; }
     bool AddGameTele(GameTele& data);
     bool DeleteGameTele(std::string_view name);

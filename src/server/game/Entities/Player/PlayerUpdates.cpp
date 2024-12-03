@@ -356,7 +356,7 @@ void Player::Update(uint32 p_time)
 
     // not auto-free ghost from body in instances
     if (m_deathTimer > 0 && !GetMap()->Instanceable() &&
-        !HasAuraType(SPELL_AURA_PREVENT_RESURRECTION))
+        !HasPreventResurectionAura())
     {
         if (p_time >= m_deathTimer)
         {
@@ -1715,7 +1715,7 @@ void Player::UpdateTriggerVisibility()
             // Update fields of triggers, transformed units or unselectable
             // units (values dependent on GM state)
             if (!creature || (!creature->IsTrigger() &&
-                              !creature->HasAuraType(SPELL_AURA_TRANSFORM) &&
+                              !creature->HasTransformAura() &&
                               !creature->HasUnitFlag(UNIT_FLAG_NOT_SELECTABLE)))
                 continue;
 
