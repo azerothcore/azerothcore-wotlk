@@ -81,6 +81,8 @@ AuctionHouseObject* AuctionHouseMgr::GetAuctionsMapByHouseId(AuctionHouseId auct
             return &_allianceAuctions;
         case AuctionHouseId::Horde:
             return &_hordeAuctions;
+        case AuctionHouseId::Neutral:
+        default:
             break;
     }
 
