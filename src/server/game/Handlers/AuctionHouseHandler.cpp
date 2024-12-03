@@ -760,7 +760,7 @@ void WorldSession::HandleAuctionListItems(WorldPacket& recvData)
             if (pair.second->State != PLAYERSPELL_REMOVED && pair.second->IsInSpec(GetPlayer()->GetActiveSpec()))
                 usablePlayerInfo.spells.insert(pair.first);
         }
-        ahPlayerInfo.usablePlayerInfo.value() = std::move(usablePlayerInfo);
+        ahPlayerInfo.usablePlayerInfo = std::move(usablePlayerInfo);
     }
 
     sAuctionMgr->GetAuctionHouseSearcher()->QueueSearchRequest(new AuctionSearchListRequest(auctionHouseFaction, std::move(ahSearchInfo), std::move(ahPlayerInfo)));
