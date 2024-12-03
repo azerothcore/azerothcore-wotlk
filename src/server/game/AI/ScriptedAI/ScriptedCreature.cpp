@@ -195,6 +195,7 @@ ScriptedAI::ScriptedAI(Creature* creature) : CreatureAI(creature),
     _isHeroic = me->GetMap()->IsHeroic();
     _difficulty = Difficulty(me->GetMap()->GetSpawnMode());
     _invincible = false;
+    _canAutoAttack = true;
 }
 
 void ScriptedAI::AttackStartNoMove(Unit* who)
@@ -220,7 +221,8 @@ void ScriptedAI::UpdateAI(uint32 /*diff*/)
     if (!UpdateVictim())
         return;
 
-    DoMeleeAttackIfReady();
+    if (IsAutoAttackAllowed())
+        DoMeleeAttackIfReady();
 }
 
 void ScriptedAI::DamageTaken(Unit* /*attacker*/, uint32& damage, DamageEffectType /*damagetype*/, SpellSchoolMask /*damageSchoolMask*/)
@@ -624,6 +626,9 @@ void BossAI::_Reset()
     if (!me->IsAlive())
         return;
 
+    if (me->IsEngaged())
+        return;
+
     me->SetCombatPulseDelay(0);
     me->ResetLootMode();
     events.Reset();
@@ -736,7 +741,8 @@ void BossAI::UpdateAI(uint32 diff)
         }
     }
 
-    DoMeleeAttackIfReady();
+    if (IsAutoAttackAllowed())
+        DoMeleeAttackIfReady();
 }
 
 void BossAI::DamageTaken(Unit* attacker, uint32& damage, DamageEffectType damagetype, SpellSchoolMask damageSchoolMask)

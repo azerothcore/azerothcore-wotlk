@@ -15,14 +15,15 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "zulaman.h"
 #include "CreatureScript.h"
+#include "PassiveAI.h"
 #include "Player.h"
 #include "ScriptedCreature.h"
 #include "ScriptedGossip.h"
 #include "SpellInfo.h"
 #include "SpellScript.h"
 #include "SpellScriptLoader.h"
+#include "zulaman.h"
 
 /*######
 ## npc_forest_frog
@@ -323,31 +324,23 @@ enum Spells
     SPELL_COSMETIC_SPEAR_THROW        = 43647
 };
 
-enum Events
+enum Phases
 {
-    GONG_EVENT_1                      = 1,
-    GONG_EVENT_2                      = 2,
-    GONG_EVENT_3                      = 3,
-    GONG_EVENT_4                      = 4,
-    GONG_EVENT_5                      = 5,
-    GONG_EVENT_6                      = 6,
-    GONG_EVENT_7                      = 7,
-    GONG_EVENT_8                      = 8,
-    GONG_EVENT_9                      = 9,
-    GONG_EVENT_10                     = 10,
-    GONG_EVENT_11                     = 11
+    PHASE_GONG                         = 0,
+    PHASE_GATE_CLOSED                  = 1,
+    PHASE_GATE_OPENED                  = 2
 };
 
 enum Actions
 {
-    ACTION_COMPLETE_EVENT_3           = 0,
+    ACTION_COMPLETE_GONG_RITUAL        = 0
 };
 
 enum Waypoints
 {
-    HARRISON_MOVE_1                   = 860440,
-    HARRISON_MOVE_2                   = 860441,
-    HARRISON_MOVE_3                   = 860442
+    HARRISON_MOVE_1                     = 2435800,
+    HARRISON_MOVE_2                     = 2435801,
+    HARRISON_MOVE_3                     = 2435802
 };
 
 enum DisplayIds
@@ -379,9 +372,8 @@ struct npc_harrison_jones : public ScriptedAI
 
     void Reset() override
     {
-        _gongEvent = 0;
-        _gongTimer = 0;
-        uiTargetGUID.Clear();
+        _phase = PHASE_GONG;
+        me->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
     }
 
     void JustEngagedWith(Unit* /*who*/) override { }
@@ -394,8 +386,10 @@ struct npc_harrison_jones : public ScriptedAI
             me->SetFacingToObject(player);
             me->RemoveNpcFlag(UNIT_NPC_FLAG_GOSSIP);
             Talk(SAY_HARRISON_0);
-            _gongEvent = GONG_EVENT_1;
-            _gongTimer = 4000;
+            scheduler.Schedule(2s, [this](TaskContext /*task*/)
+            {
+                me->GetMotionMaster()->MovePath(HARRISON_MOVE_1, false);
+            });
         }
     }
 
@@ -403,12 +397,16 @@ struct npc_harrison_jones : public ScriptedAI
     {
         if (spell->Id == SPELL_COSMETIC_SPEAR_THROW)
         {
-            me->RemoveAllAuras();
+            me->RemoveAllAuras(); // remove stealth
             me->SetEntry(NPC_HARRISON_JONES_2);
-            me->SetDisplayId(MODEL_HARRISON_JONES_2);
-            me->SetTarget();
-            me->SetByteValue(UNIT_FIELD_BYTES_1, UNIT_BYTES_1_OFFSET_STAND_STATE, UNIT_STAND_STATE_DEAD);
-            me->SetDynamicFlag(UNIT_DYNFLAG_DEAD);
+            me->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
+            me->PlayDistanceSound(1332); // human male death
+            me->HandleEmoteCommand(EMOTE_ONESHOT_WOUND_CRITICAL);
+            me->StopMoving();
+            scheduler.Schedule(1s, [this](TaskContext /*task*/)
+            {
+                me->SetStandState(UNIT_STAND_STATE_DEAD);
+            });
             _instance->StorePersistentData(DATA_TIMED_RUN, 21);
             _instance->DoAction(ACTION_START_TIMED_RUN);
             me->DespawnOrUnsummon(3min+30s, 0s);
@@ -417,132 +415,103 @@ struct npc_harrison_jones : public ScriptedAI
 
     void DoAction(int32 action) override
     {
-        if (action == ACTION_COMPLETE_EVENT_3)
+        if (action == ACTION_COMPLETE_GONG_RITUAL)
         {
             me->GetMap()->ToInstanceMap()->PermBindAllPlayers();
-            _gongEvent = GONG_EVENT_4;
-            _gongTimer = 0;
+            _phase = PHASE_GATE_CLOSED;
+            me->RemoveAura(SPELL_BANGING_THE_GONG);
+            me->SetUInt32Value(UNIT_VIRTUAL_ITEM_SLOT_ID + 0, uint32(0));
+            if (GameObject* gong = _instance->GetGameObject(DATA_STRANGE_GONG))
+                gong->SetGameObjectFlag(GO_FLAG_NOT_SELECTABLE);
+            // Players are Now Saved to instance at SPECIAL (Player should be notified?)
+            scheduler.Schedule(500ms, [this](TaskContext /*task*/)
+            {
+                me->GetMotionMaster()->MovePath(HARRISON_MOVE_2, false);
+            });
+        }
+    }
+
+    void OpenMassiveGateAndCallGuards()
+    {
+        if (GameObject* gate = _instance->GetGameObject(DATA_MASSIVE_GATE))
+        {
+            gate->AllowSaveToDB(true);
+            gate->SetGoState(GO_STATE_ACTIVE);
+        }
+        std::list<Creature*> targetList;
+        GetCreatureListWithEntryInGrid(targetList, me, NPC_AMANISHI_GUARDIAN, 26.0f);
+        if (!targetList.empty())
+        {
+            for (auto const& creature : targetList)
+            {
+                if (creature)
+                {
+                    creature->SetImmuneToPC(true);
+                    creature->SetReactState(REACT_PASSIVE);
+
+                    if (creature->GetPositionX() > 120)
+                    {
+                        creature->SetUInt32Value(UNIT_VIRTUAL_ITEM_SLOT_ID + 0, uint32(WEAPON_SPEAR));
+                        creature->AI()->SetData(0, 1);
+                    }
+                    else
+                        creature->AI()->SetData(0, 2);
+                }
+            }
+        }
+    }
+
+    void MovementInform(uint32 type, uint32 id) override
+    {
+        // at gong
+        if (type == WAYPOINT_MOTION_TYPE && id == 2 && _phase == PHASE_GONG)
+        {
+            if (GameObject* gong = _instance->GetGameObject(DATA_STRANGE_GONG))
+                me->SetFacingToObject(gong);
+            scheduler.Schedule(2s, [this](TaskContext /*task*/)
+            {
+                Talk(SAY_HARRISON_1);
+            }).Schedule(7s, [this](TaskContext /*task*/)
+            {
+                DoCastSelf(SPELL_BANGING_THE_GONG);
+                me->SetUInt32Value(UNIT_VIRTUAL_ITEM_SLOT_ID + 0, uint32(WEAPON_MACE));
+                me->SetFacingTo(5.9696f);
+                if (GameObject* gong = _instance->GetGameObject(DATA_STRANGE_GONG))
+                    gong->RemoveGameObjectFlag(GO_FLAG_NOT_SELECTABLE);
+            });
+        }
+        // to the massive gate
+        else if (type == WAYPOINT_MOTION_TYPE && id == 1 && _phase == PHASE_GATE_CLOSED)
+        {
+            me->SetEntry(NPC_HARRISON_JONES_1);
+            Talk(SAY_HARRISON_2);
+        }
+        // at massive gate
+        else if (type == WAYPOINT_MOTION_TYPE && id == 2 && _phase == PHASE_GATE_CLOSED)
+        {
+            me->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_STATE_USE_STANDING);
+            Talk(SAY_HARRISON_3);
+            scheduler.Schedule(8s, [this](TaskContext /*task*/)
+            {
+                OpenMassiveGateAndCallGuards();
+                _phase = PHASE_GATE_OPENED;
+            }).Schedule(10s, [this](TaskContext /*task*/)
+            {
+                DoCastSelf(SPELL_STEALTH);
+                me->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_ONESHOT_NONE);
+                me->GetMotionMaster()->MovePath(HARRISON_MOVE_3, false);
+            });
         }
     }
 
     void UpdateAI(uint32 diff) override
     {
-        if (_gongEvent)
-        {
-            if (_gongTimer <= diff)
-            {
-                switch (_gongEvent)
-                {
-                case GONG_EVENT_1:
-                    me->GetMotionMaster()->MovePath(HARRISON_MOVE_1, false);
-                    _gongEvent = GONG_EVENT_2;
-                    _gongTimer = 12000;
-                    break;
-                case GONG_EVENT_2:
-                    me->SetFacingTo(6.235659f);
-                    Talk(SAY_HARRISON_1);
-                    DoCastSelf(SPELL_BANGING_THE_GONG);
-                    me->SetUInt32Value(UNIT_VIRTUAL_ITEM_SLOT_ID + 0, uint32(WEAPON_MACE));
-                    me->SetSheath(SHEATH_STATE_MELEE);
-                    _gongEvent = GONG_EVENT_3;
-                    _gongTimer = 4000;
-                    break;
-                case GONG_EVENT_3:
-                    if (GameObject* gong = _instance->GetGameObject(DATA_STRANGE_GONG))
-                        gong->RemoveGameObjectFlag(GO_FLAG_NOT_SELECTABLE);
-                    break;
-                case GONG_EVENT_4:
-                    me->RemoveAura(SPELL_BANGING_THE_GONG);
-                    if (GameObject* gong = _instance->GetGameObject(DATA_STRANGE_GONG))
-                        gong->SetGameObjectFlag(GO_FLAG_NOT_SELECTABLE);
-
-                    // Players are Now Saved to instance at SPECIAL (Player should be notified?)
-                    me->GetMotionMaster()->MovePath(HARRISON_MOVE_2, false);
-                    _gongEvent = GONG_EVENT_5;
-                    _gongTimer = 5000;
-                    break;
-                case GONG_EVENT_5:
-                    me->SetEntry(NPC_HARRISON_JONES_1);
-                    me->SetDisplayId(MODEL_HARRISON_JONES_1);
-                    Talk(SAY_HARRISON_2);
-                    _gongTimer = 12000;
-                    _gongEvent = GONG_EVENT_6;
-                    break;
-                case GONG_EVENT_6:
-                    me->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_STATE_USE_STANDING);
-                    Talk(SAY_HARRISON_3);
-                    _gongTimer = 7000;
-                    _gongEvent = GONG_EVENT_7;
-                    break;
-                case GONG_EVENT_7:
-                    if (!uiTargetGUID)
-                    {
-                        std::list<Creature*> targetList;
-                        GetCreatureListWithEntryInGrid(targetList, me, NPC_AMANISHI_GUARDIAN, 26.0f);
-                        if (!targetList.empty())
-                        {
-                            for (auto const& creature : targetList)
-                            {
-                                if (creature)
-                                {
-                                    creature->SetImmuneToPC(true);
-                                    creature->SetReactState(REACT_PASSIVE);
-
-                                    if (creature->GetPositionX() > 120)
-                                    {
-                                        creature->SetUInt32Value(UNIT_VIRTUAL_ITEM_SLOT_ID + 0, uint32(WEAPON_SPEAR));
-                                        creature->AI()->SetData(0, 1);
-                                    }
-                                    else
-                                        creature->AI()->SetData(0, 2);
-                                }
-                            }
-                        }
-                    }
-
-                    if (GameObject* gate = _instance->GetGameObject(DATA_MASSIVE_GATE))
-                    {
-                        gate->AllowSaveToDB(true);
-                        gate->SetGoState(GO_STATE_ACTIVE);
-                    }
-                    _gongTimer = 2000;
-                    _gongEvent = GONG_EVENT_8;
-                    break;
-                case GONG_EVENT_8:
-                    DoCastSelf(SPELL_STEALTH);
-                    me->SetUInt32Value(UNIT_VIRTUAL_ITEM_SLOT_ID + 0, uint32(0));
-                    me->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_ONESHOT_NONE);
-                    me->GetMotionMaster()->MovePath(HARRISON_MOVE_3, false);
-                    _gongTimer = 1000;
-                    _gongEvent = 0;
-                    break;
-                case GONG_EVENT_9:
-                    me->GetMotionMaster()->MovePoint(0, 120.687f, 1674.0f, 42.0217f);
-                    _gongTimer = 12000;
-                    _gongEvent = GONG_EVENT_10;
-                    break;
-                case GONG_EVENT_10:
-                    me->SetFacingTo(1.59044f);
-                    _gongEvent = 11;
-                    _gongTimer = 6000;
-                    break;
-                case GONG_EVENT_11:
-                    me->SetNpcFlag(UNIT_NPC_FLAG_GOSSIP);
-                    _gongEvent = 0;
-                    _gongTimer = 1000;
-                    break;
-                }
-            }
-            else
-                _gongTimer -= diff;
-        }
+        scheduler.Update(diff);
     }
 
     private:
         InstanceScript* _instance;
-        uint8 _gongEvent;
-        uint32 _gongTimer;
-        ObjectGuid uiTargetGUID;
+        uint32 _phase;
 };
 
 class spell_ritual_of_power : public SpellScript
@@ -553,7 +522,7 @@ class spell_ritual_of_power : public SpellScript
     {
         if (InstanceScript* instance = GetCaster()->GetInstanceScript())
             if (Creature* creature = instance->GetCreature(DATA_HARRISON_JONES))
-                creature->AI()->DoAction(ACTION_COMPLETE_EVENT_3);
+                creature->AI()->DoAction(ACTION_COMPLETE_GONG_RITUAL);
     }
 
     void Register() override
@@ -562,10 +531,167 @@ class spell_ritual_of_power : public SpellScript
     }
 };
 
+enum AmanishiLookout
+{
+    PATH_LOOKOUT       = 2417500,
+    SAY_INVADERS       = 0,
+};
+
+struct npc_amanishi_lookout : public NullCreatureAI
+{
+    npc_amanishi_lookout(Creature* creature) : NullCreatureAI(creature), _instance(creature->GetInstanceScript()) {}
+
+    void Reset() override
+    {
+        me->RemoveUnitFlag(UNIT_FLAG_IMMUNE_TO_PC);
+        me->RemoveUnitFlag(UNIT_FLAG_RENAME);
+    }
+
+    void MoveInLineOfSight(Unit* who) override
+    {
+        if (!me->IsWithinDist(who, 25.0f, false)) // distance not confirmed
+                return;
+
+        Player* player = who->GetCharmerOrOwnerPlayerOrPlayerItself();
+        if (!player || player->IsGameMaster())
+            return;
+
+        if (!who->IsWithinLOSInMap(me))
+            return;
+
+        if (_instance->GetData(TYPE_AKILZON_GAUNTLET) == NOT_STARTED)
+            _instance->SetData(TYPE_AKILZON_GAUNTLET, IN_PROGRESS);
+    }
+
+    void DoAction(int32 action) override
+    {
+        if (action == ACTION_START_AKILZON_GAUNTLET)
+        {
+            Talk(SAY_INVADERS);
+            me->SetUnitFlag(UNIT_FLAG_IMMUNE_TO_PC);
+            me->SetUnitFlag(UNIT_FLAG_RENAME);
+            me->GetMotionMaster()->MovePath(PATH_LOOKOUT, false);
+        }
+    }
+
+    void MovementInform(uint32 type, uint32 id) override
+    {
+        // at boss
+        if (type == WAYPOINT_MOTION_TYPE && id == 8) // should despawn with waypoint script
+            me->DespawnOrUnsummon(0s, 0s);
+    }
+private:
+    InstanceScript* _instance;
+};
+
+enum AmanishiTempest
+{
+    ACTION_START_GAUNTLET   = 1,
+    GROUP_AKILZON_GAUNTLET  = 1,
+    SPELL_SUMMON_EAGLE      = 43487,
+    SPELL_SUMMON_WARRIOR    = 43486,
+    SPELL_THUNDERCLAP       = 44033,
+};
+
+struct npc_amanishi_tempest : public ScriptedAI
+{
+    npc_amanishi_tempest(Creature* creature) : ScriptedAI(creature), _instance(creature->GetInstanceScript()), _summons(creature) { }
+
+    void Reset() override
+    {
+        _summons.DespawnAll();
+        scheduler.CancelAll();
+        scheduler.Schedule(9s, 11s, [this](TaskContext context)
+        {
+            DoCastVictim(SPELL_THUNDERCLAP);
+            context.Repeat();
+        });
+    }
+
+    void JustSummoned(Creature* summon) override
+    {
+        _summons.Summon(summon);
+        summon->SetNoCallAssistance(true); // prevent eagles from pulling boss
+        summon->SetInCombatWithZone();
+    }
+
+    void JustDied(Unit* killer) override
+    {
+        ScriptedAI::JustDied(killer);
+        _instance->SetData(TYPE_AKILZON_GAUNTLET, DONE);
+    }
+
+    void DoAction(int32 action) override
+    {
+        if (action == ACTION_START_GAUNTLET)
+            ScheduleEvents();
+    }
+
+    void EnterEvadeMode(EvadeReason why) override
+    {
+        ScriptedAI::EnterEvadeMode(why);
+        scheduler.CancelAll();
+    }
+
+    void ScheduleEvents()
+    {
+        me->SetInCombatWithZone();
+        scheduler.Schedule(29s, 53s, GROUP_AKILZON_GAUNTLET, [this](TaskContext context)
+        {
+            for (uint8 i = 0; i < 5; ++i)
+                DoCastAOE(SPELL_SUMMON_EAGLE, true);
+            context.Repeat();
+        }).Schedule(40s, GROUP_AKILZON_GAUNTLET, [this](TaskContext context)
+        {
+            for (uint8 i = 0; i < 2; ++i)
+                DoCastAOE(SPELL_SUMMON_WARRIOR, true);
+            context.Repeat();
+        });
+    }
+
+    void UpdateAI(uint32 diff) override
+    {
+        scheduler.Update(diff);
+        if (!me->IsEngaged())
+            return;
+        Unit* victim = me->SelectVictim();
+        if (!victim || me->GetExactDist(victim) > me->GetAggroRange(victim))
+            return;
+        ScriptedAI::UpdateAI(diff);
+    }
+
+private:
+    InstanceScript* _instance;
+    SummonList _summons;
+};
+
+struct npc_eagle_trash_aggro_trigger : public ScriptedAI
+{
+    npc_eagle_trash_aggro_trigger(Creature* creature) : ScriptedAI(creature), _instance(creature->GetInstanceScript()) {}
+
+    void MoveInLineOfSight(Unit* who) override
+    {
+        if (!me->IsWithinDist(who, 10.0f, false)) // distance not confirmed
+            return;
+
+        Player* player = who->GetCharmerOrOwnerPlayerOrPlayerItself();
+        if (!player || player->IsGameMaster())
+            return;
+
+        if (_instance->GetData(TYPE_AKILZON_GAUNTLET) == NOT_STARTED)
+            _instance->SetData(TYPE_AKILZON_GAUNTLET, IN_PROGRESS);
+    }
+private:
+    InstanceScript* _instance;
+};
+
 void AddSC_zulaman()
 {
     RegisterZulAmanCreatureAI(npc_forest_frog);
     new npc_zulaman_hostage();
     RegisterZulAmanCreatureAI(npc_harrison_jones);
     RegisterSpellScript(spell_ritual_of_power);
+    RegisterZulAmanCreatureAI(npc_amanishi_lookout);
+    RegisterZulAmanCreatureAI(npc_amanishi_tempest);
+    RegisterZulAmanCreatureAI(npc_eagle_trash_aggro_trigger);
 }

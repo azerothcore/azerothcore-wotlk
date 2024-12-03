@@ -2881,7 +2881,7 @@ class spell_item_reindeer_transformation : public SpellScript
     void HandleDummy(SpellEffIndex /* effIndex */)
     {
         Unit* caster = GetCaster();
-        if (caster->HasAuraType(SPELL_AURA_MOUNTED))
+        if (caster->HasMountedAura())
         {
             float flyspeed = caster->GetSpeedRate(MOVE_FLIGHT);
             float speed = caster->GetSpeedRate(MOVE_RUN);
@@ -3172,7 +3172,7 @@ class spell_item_brewfest_mount_transformation : public SpellScript
             return;
         }
 
-        if (caster->HasAuraType(SPELL_AURA_MOUNTED))
+        if (caster->HasMountedAura())
         {
             caster->RemoveAurasByType(SPELL_AURA_MOUNTED);
             uint32 spell_id;
@@ -4162,6 +4162,30 @@ class spell_item_spell_reflectors: public AuraScript
     }
 };
 
+// 46273 - Multiphase Goggles
+class spell_item_multiphase_goggles : public AuraScript
+{
+    PrepareAuraScript(spell_item_multiphase_goggles);
+
+    void OnApply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
+    {
+        if (Player* player = GetTarget()->ToPlayer())
+            player->SetFlag(PLAYER_TRACK_CREATURES, uint32(1) << (CREATURE_TYPE_GAS_CLOUD - 1));
+    }
+
+    void OnRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
+    {
+        if (Player* player = GetTarget()->ToPlayer())
+            player->RemoveFlag(PLAYER_TRACK_CREATURES, uint32(1) << (CREATURE_TYPE_GAS_CLOUD - 1));
+    }
+
+    void Register() override
+    {
+        OnEffectApply += AuraEffectApplyFn(spell_item_multiphase_goggles::OnApply, EFFECT_0, SPELL_AURA_MOD_INVISIBILITY_DETECT , AURA_EFFECT_HANDLE_REAL);
+        OnEffectRemove += AuraEffectRemoveFn(spell_item_multiphase_goggles::OnRemove, EFFECT_0, SPELL_AURA_MOD_INVISIBILITY_DETECT , AURA_EFFECT_HANDLE_REAL);
+    }
+};
+
 void AddSC_item_spell_scripts()
 {
     RegisterSpellScript(spell_item_massive_seaforium_charge);
@@ -4289,4 +4313,5 @@ void AddSC_item_spell_scripts()
     RegisterSpellScript(spell_item_skyguard_blasting_charges);
     RegisterSpellScript(spell_item_luffa);
     RegisterSpellScript(spell_item_spell_reflectors);
+    RegisterSpellScript(spell_item_multiphase_goggles);
 }

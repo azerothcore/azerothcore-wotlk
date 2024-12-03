@@ -215,8 +215,9 @@ enum SMART_EVENT
     SMART_EVENT_SUMMONED_UNIT_EVADE      = 107,      // CreatureId(0 all), CooldownMin, CooldownMax
     SMART_EVENT_WAYPOINT_DATA_REACHED    = 108,      // PointId (0: any), pathId (0: any)
     SMART_EVENT_WAYPOINT_DATA_ENDED      = 109,      // PointId (0: any), pathId (0: any)
+    SMART_EVENT_IS_IN_MELEE_RANGE        = 110,      // min, max, repeatMin, repeatMax, dist, invert (0: false, 1: true)
 
-    SMART_EVENT_AC_END                   = 110
+    SMART_EVENT_AC_END                   = 111
 };
 
 struct SmartEvent
@@ -498,6 +499,16 @@ struct SmartEvent
             uint32 range;
             uint32 timer;
         } nearUnit;
+
+        struct
+        {
+            uint32 min;
+            uint32 max;
+            uint32 repeatMin;
+            uint32 repeatMax;
+            uint32 dist;
+            uint32 invert;
+        } meleeRange;
 
         struct
         {
@@ -1522,7 +1533,7 @@ enum SMARTAI_TARGETS
     SMART_TARGET_GAMEOBJECT_RANGE               = 13,   // entry(0any), min, max
     SMART_TARGET_GAMEOBJECT_GUID                = 14,   // guid, entry
     SMART_TARGET_GAMEOBJECT_DISTANCE            = 15,   // entry(0any), maxDist
-    SMART_TARGET_INVOKER_PARTY                  = 16,   // invoker's party members
+    SMART_TARGET_INVOKER_PARTY                  = 16,   // includePets(0 - false, 1 - true)
     SMART_TARGET_PLAYER_RANGE                   = 17,   // min, max, maxCount (maxCount by pussywizard), set target.o to 1 if u want to search for all in range if min, max fails
     SMART_TARGET_PLAYER_DISTANCE                = 18,   // maxDist
     SMART_TARGET_CLOSEST_CREATURE               = 19,   // CreatureEntry(0any), maxDist, dead?
@@ -1725,6 +1736,11 @@ struct SmartTarget
             uint32 index;
             uint32 type;
         } instanceStorage;
+
+        struct
+        {
+            SAIBool includePets;
+        } invokerParty;
     };
 };
 
@@ -1890,6 +1906,7 @@ const uint32 SmartAIEventMask[SMART_EVENT_AC_END][2] =
     {SMART_EVENT_SUMMONED_UNIT_EVADE,       SMART_SCRIPT_TYPE_MASK_CREATURE + SMART_SCRIPT_TYPE_MASK_GAMEOBJECT },
     {SMART_EVENT_WAYPOINT_DATA_REACHED,     SMART_SCRIPT_TYPE_MASK_CREATURE },
     {SMART_EVENT_WAYPOINT_DATA_ENDED,       SMART_SCRIPT_TYPE_MASK_CREATURE },
+    {SMART_EVENT_IS_IN_MELEE_RANGE,         SMART_SCRIPT_TYPE_MASK_CREATURE },
 };
 
 enum SmartEventFlags
@@ -2048,6 +2065,7 @@ public:
     static SmartAIMgr* instance();
 
     void LoadSmartAIFromDB();
+    void CheckIfSmartAIInDatabaseExists();
 
     SmartAIEventList GetScript(int32 entry, SmartScriptType type)
     {
