@@ -284,7 +284,7 @@ public:
                     {
                         go->SendCustomAnim(0);
                     }
-                    else 
+                    else
                     {
                         go->SendCustomAnim(1);
                         if (go->GetGoState() == GO_STATE_ACTIVE)
