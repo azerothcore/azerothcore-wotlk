@@ -584,7 +584,7 @@ void World::LoadConfigSettings(bool reload)
     _rate_values[RATE_MOVESPEED_PLAYER] = sConfigMgr->GetOption<float>("Rate.MoveSpeed.Player", 1.0f);
     if (_rate_values[RATE_MOVESPEED_PLAYER] < 0)
     {
-        LOG_ERROR("server.loading", "Rate.MoveSpeedPlayer ({}) must be > 0. Using 1 instead.", _rate_values[RATE_MOVESPEED_PLAYER]);
+        LOG_ERROR("server.loading", "Rate.MoveSpeed.Player ({}) must be > 0. Using 1 instead.", _rate_values[RATE_MOVESPEED_PLAYER]);
         _rate_values[RATE_MOVESPEED_PLAYER] = 1.0f;
     }
     for (uint8 i = 0; i < MAX_MOVE_TYPE; ++i) playerBaseMoveSpeed[i] = baseMoveSpeed[i] * _rate_values[RATE_MOVESPEED_PLAYER];
@@ -593,9 +593,9 @@ void World::LoadConfigSettings(bool reload)
     _rate_values[RATE_MOVESPEED_NPC] = sConfigMgr->GetOption<float>("Rate.MoveSpeed.NPC", 1.0f);
     if (_rate_values[RATE_MOVESPEED_NPC] < 0)
     {
-        LOG_ERROR("server.loading", "Rate.MoveSpeedOther ({}) must be > 0. Using 1 instead.", _rate_values[RATE_MOVESPEED_NPC]);
+        LOG_ERROR("server.loading", "Rate.MoveSpeed.NPC ({}) must be > 0. Using 1 instead.", _rate_values[RATE_MOVESPEED_NPC]);
         _rate_values[RATE_MOVESPEED_NPC] = 1.0f;
-    }
+    }   
     for (uint8 i = 0; i < MAX_MOVE_TYPE; ++i) baseMoveSpeed[i] *= _rate_values[RATE_MOVESPEED_NPC];
 
     _rate_values[RATE_CORPSE_DECAY_LOOTED] = sConfigMgr->GetOption<float>("Rate.Corpse.Decay.Looted", 0.5f);
