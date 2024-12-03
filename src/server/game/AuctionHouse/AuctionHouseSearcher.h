@@ -20,6 +20,7 @@
 
 #include "AuctionHouseMgr.h"
 #include "Common.h"
+#include "Item.h"
 #include "LockedQueue.h"
 #include "MPSCQueue.h"
 #include "PCQueue.h"
@@ -145,6 +146,7 @@ struct AuctionSearcherRequest
     };
 
     AuctionSearcherRequest(Type const _requestType, AuctionHouseFaction _listFaction) : requestType(_requestType), listFaction(_listFaction) { }
+    virtual ~AuctionSearcherRequest() = default;
 
     Type requestType;
     AuctionHouseFaction listFaction;
@@ -192,6 +194,7 @@ struct AuctionSearcherUpdate
     };
 
     AuctionSearcherUpdate(Type const _updateType, AuctionHouseFaction _listFaction) : updateType(_updateType), listFaction(_listFaction) { }
+    virtual ~AuctionSearcherUpdate() = default;
 
     Type updateType;
     AuctionHouseFaction listFaction;

@@ -60,19 +60,19 @@ void AuctionHouseWorkerThread::ProcessSearchUpdates()
         case AuctionSearcherUpdate::Type::ADD:
         {
             std::shared_ptr<AuctionSearchAdd> const auctionAdd = std::static_pointer_cast<AuctionSearchAdd>(auctionSearchUpdate);
-            SearchUpdateAdd(*auctionAdd);
+            SearchUpdateAdd(*auctionAdd.get());
             break;
         }
         case AuctionSearcherUpdate::Type::REMOVE:
         {
             std::shared_ptr<AuctionSearchRemove> const auctionRemove = std::static_pointer_cast<AuctionSearchRemove>(auctionSearchUpdate);
-            SearchUpdateRemove(*auctionRemove);
+            SearchUpdateRemove(*auctionRemove.get());
             break;
         }
         case AuctionSearcherUpdate::Type::UPDATE_BID:
         {
             std::shared_ptr<AuctionSearchUpdateBid> const auctionUpdateBid = std::static_pointer_cast<AuctionSearchUpdateBid>(auctionSearchUpdate);
-            SearchUpdateBid(*auctionUpdateBid);
+            SearchUpdateBid(*auctionUpdateBid.get());
             break;
         }
         default:
