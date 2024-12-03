@@ -156,15 +156,6 @@ bool Group::Create(Player* leader)
     if (m_groupType & GROUPTYPE_RAID)
         _initRaidSubGroupsCounter();
 
-    //npcbot - set loot mode on create
-    //TC_LOG_ERROR("entities.player", "Group::Create(): new group with leader %s", leader->GetName().c_str());
-    if (leader->HaveBot()) //player + npcbot so set to free-for-all on create
-    {
-        if (!isLFGGroup())
-            m_lootMethod = FREE_FOR_ALL;
-    }
-    else
-    //end npcbot
     if (!isLFGGroup())
         m_lootMethod = GROUP_LOOT;
 
@@ -1239,6 +1230,11 @@ bool CanRollOnItem(LootItem const& item, Player const* player, Loot* loot)
 
 void Group::GroupLoot(Loot* loot, WorldObject* pLootedObject)
 {
+    //npcbot
+    if (m_memberMgr.getSize() <= 1)
+        return;
+    //end npcbot
+
     std::vector<LootItem>::iterator i;
     ItemTemplate const* item;
     uint8 itemSlot = 0;
@@ -1393,6 +1389,11 @@ void Group::GroupLoot(Loot* loot, WorldObject* pLootedObject)
 
 void Group::NeedBeforeGreed(Loot* loot, WorldObject* lootedObject)
 {
+    //npcbot
+    if (m_memberMgr.getSize() <= 1)
+        return;
+    //end npcbot
+
     ItemTemplate const* item;
     uint8 itemSlot = 0;
     for (std::vector<LootItem>::iterator i = loot->items.begin(); i != loot->items.end(); ++i, ++itemSlot)
