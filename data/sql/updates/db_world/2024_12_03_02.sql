@@ -1,3 +1,4 @@
+-- DB update 2024_12_03_01 -> 2024_12_03_02
 --
 -- delete unused waypoint_data for swiftmane
 DELETE FROM `waypoint_data` WHERE `id` = 204330;
