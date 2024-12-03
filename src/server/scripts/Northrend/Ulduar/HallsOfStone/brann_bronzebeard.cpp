@@ -278,33 +278,42 @@ public:
 
             GameObject* go = nullptr;
             if (headMask & 0x1) // Kaddrak
-                if ((go = me->GetMap()->GetGameObject(pInstance->GetGuidData(GO_KADDRAK)))) {
-                    if (activate) {
+                if ((go = me->GetMap()->GetGameObject(pInstance->GetGuidData(GO_KADDRAK)))) 
+                {
+                    if (activate) 
+                    {
                         go->SendCustomAnim(0);
                     }
-                    else {
+                    else 
+                    {
                         go->SendCustomAnim(1);
                         if (go->GetGoState() == GO_STATE_ACTIVE)
                             go->SetGoState(GO_STATE_READY);
                     }
                 }
             if (headMask & 0x2) // Marnak
-                if ((go = me->GetMap()->GetGameObject(pInstance->GetGuidData(GO_MARNAK)))) {
-                    if (activate) {
+                if ((go = me->GetMap()->GetGameObject(pInstance->GetGuidData(GO_MARNAK)))) 
+                {
+                    if (activate) 
+                    {
                         go->SendCustomAnim(0);
                     }
-                    else {
+                    else 
+                    {
                         go->SendCustomAnim(1);
                         if (go->GetGoState() == GO_STATE_ACTIVE)
                             go->SetGoState(GO_STATE_READY);
                     }
                 }
             if (headMask & 0x4) // Abedneum
-                if ((go = me->GetMap()->GetGameObject(pInstance->GetGuidData(GO_ABEDNEUM)))) {
-                    if (activate) {
+                if ((go = me->GetMap()->GetGameObject(pInstance->GetGuidData(GO_ABEDNEUM)))) 
+                {
+                    if (activate) 
+                    {
                         go->SendCustomAnim(0);
                     }
-                    else {
+                    else 
+                    {
                         go->SendCustomAnim(1);
                         if (go->GetGoState() == GO_STATE_ACTIVE)
                             go->SetGoState(GO_STATE_READY);
@@ -533,14 +542,12 @@ public:
 
                                 //right eye
                                 if (Creature* cra = me->SummonCreature(NPC_DARK_MATTER, marnak->GetPositionX(), marnak->GetPositionY(), marnak->GetPositionZ(), 0.0f, TEMPSUMMON_TIMED_DESPAWN, 5000))
-                                {
                                     cra->CastSpell(cra, SPELL_DARK_MATTER_VISUAL_CHANNEL, false);
-                                }
+                                
                                 //left eye
                                 if (Creature* crb = me->SummonCreature(NPC_DARK_MATTER, 891.543f, 359.5252f, 219.338f, 0.0f, TEMPSUMMON_TIMED_DESPAWN, 5000))
-                                {
                                     crb->CastSpell(crb, SPELL_DARK_MATTER_VISUAL_CHANNEL, false);
-                                }
+                                
                                 darkMatterTargetGUID = cr->GetGUID();
 
                                 events.RescheduleEvent(EVENT_DARK_MATTER_START, 5000ms);
@@ -557,16 +564,13 @@ public:
                             if (Player* plr = SelectTargetFromPlayerList(100.0f))
                             {
                                 if (!plr)
-                                {
-                                    return; //no target
-                                }
+                                    return; //no target                              
 
                                 float speed = 10.0f;
                                 float tooFarAwaySpeed = me->GetDistance(plr->GetPositionX(), plr->GetPositionY(), plr->GetPositionZ()) / (5000.0f * 0.001f);
                                 if (speed < tooFarAwaySpeed)
-                                {
                                     speed = tooFarAwaySpeed;
-                                }
+                                
                                 darkMatterTarget->MonsterMoveWithSpeed(plr->GetPositionX(), plr->GetPositionY(), plr->GetPositionZ(), speed);
 
                                 if (darkMatterTarget->GetDistance(plr) < 15.0f)
@@ -793,15 +797,9 @@ public:
             for (int i = 0; i < count; ++i)
             {
                 if (pos == 0)
-                {
-                    //left
-                    cr = me->SummonCreature(entry, 943.088f + urand(0, 5), 401.378f + urand(0, 5), 206.078f, 3.8f, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 20000);
-                }
+                    cr = me->SummonCreature(entry, 943.088f + urand(0, 5), 401.378f + urand(0, 5), 206.078f, 3.8f, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 20000);     //left               
                 else
-                {
-                    //right
-                    cr = me->SummonCreature(entry, 964.302f + urand(0, 4), 378.942f + urand(0, 4), 206.078f, 3.85f, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 20000);
-                }
+                    cr = me->SummonCreature(entry, 964.302f + urand(0, 4), 378.942f + urand(0, 4), 206.078f, 3.85f, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 20000);    //right
 
                 if (cr)
                 {
@@ -950,8 +948,10 @@ void brann_bronzebeard::brann_bronzebeardAI::WaypointReached(uint32 id)
             SetEscortPaused(true);
             me->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_STATE_USE_STANDING);
             if (pInstance)
+            {
                 if (GameObject* console = ObjectAccessor::GetGameObject(*me, pInstance->GetGuidData(GO_SJONNIR_CONSOLE)))
                     console->SetGoState(GO_STATE_ACTIVE);
+            }
             break;
         //After Sjonnir's death, Brann steps away from the console and talk.
         case 39:
@@ -1161,9 +1161,7 @@ class spell_hos_dark_matter_size : public SpellScript
     void HandleApplyTouch()
     {
         if (Unit* target = GetHitUnit())
-        {
-            target->SetObjectScale(0.35f);
-        }
+            target->SetObjectScale(0.35f);        
     }
 
     void Register() override
