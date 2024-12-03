@@ -182,7 +182,7 @@ public:
     void SendAuctionCancelledToBidderMail(AuctionEntry* auction, CharacterDatabaseTransaction trans, bool sendMail = true);
 
     static uint32 GetAuctionDeposit(AuctionHouseEntry const* entry, uint32 time, Item* pItem, uint32 count);
-    static AuctionHouseFaction const GetAuctionHouseFactionFromHouseId(AuctionHouseId ahHouseId);
+    static AuctionHouseFaction GetAuctionHouseFactionFromHouseId(AuctionHouseId ahHouseId);
     static AuctionHouseEntry const* GetAuctionHouseEntryFromFactionTemplate(uint32 factionTemplateId);
     static AuctionHouseEntry const* GetAuctionHouseEntryFromHouse(AuctionHouseId ahHouseId);
 

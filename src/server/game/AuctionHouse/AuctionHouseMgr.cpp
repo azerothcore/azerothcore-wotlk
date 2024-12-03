@@ -438,7 +438,7 @@ void AuctionHouseMgr::Update(uint32 const diff)
     _auctionHouseSearcher->Update();
 }
 
-AuctionHouseFaction const AuctionHouseMgr::GetAuctionHouseFactionFromHouseId(AuctionHouseId ahHouseId)
+AuctionHouseFaction AuctionHouseMgr::GetAuctionHouseFactionFromHouseId(AuctionHouseId ahHouseId)
 {
     switch (ahHouseId)
     {
