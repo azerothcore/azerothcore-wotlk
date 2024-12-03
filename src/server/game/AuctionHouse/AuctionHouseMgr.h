@@ -23,6 +23,7 @@
 #include "DatabaseEnv.h"
 #include "EventProcessor.h"
 #include "ObjectGuid.h"
+#include "Timer.h"
 #include "WorldPacket.h"
 #include <unordered_map>
 
