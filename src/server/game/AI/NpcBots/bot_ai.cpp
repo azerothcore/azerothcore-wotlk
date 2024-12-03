@@ -3787,6 +3787,14 @@ bool bot_ai::CanBotAttack(Unit const* target, int8 byspell, bool secondary) cons
         return false;
     //if (target->IsCombatDisallowed())
     //    return false;
+    if (!target->IsVisible())
+        return false;
+    if (!target->isTargetableForAttack(false))
+        return false;
+    if (!target->InSamePhase(me) && !CanSeeEveryone())
+        return false;
+    if (byspell != -1 && target->IsTotem())
+        return false;
     if (target->CanHaveThreatList() && GetEngageTimer() > lastdiff)
         return false;
     if (!BotMgr::IsPvPEnabled() && me->IsPvP() && target->IsControlledByPlayer())
@@ -3855,16 +3863,37 @@ bool bot_ai::CanBotAttack(Unit const* target, int8 byspell, bool secondary) cons
         }
     }
 
-    return
-        ((master->IsInCombat() || target->IsInCombat() || IsWanderer() || (IAmFree() && me->GetFaction() == 14) || pulling) &&
-        target->IsVisible() && target->isTargetableForAttack(false) && me->IsValidAttackTarget(target) &&
-        (!master->IsAlive() || target->IsControlledByPlayer() || pulling ||
-        (followdist > 0 && (master->GetDistance(target) <= foldist || HasBotCommandState(BOT_COMMAND_STAY)))) &&//if master is killed pursue to the end
-        !IsInBotParty(target) && (target->InSamePhase(me) || CanSeeEveryone()) &&
-        (!HasBotCommandState(BOT_COMMAND_STAY) ||
-        ((!IsRanged() && !secondary) ? me->IsWithinMeleeRange(target) : me->GetDistance(target) <= foldist)) &&//if stationery check own distance
-        (byspell == -1 || !target->IsTotem()) &&
-        (byspell == -1 || !mainMask || !target->IsImmunedToDamage(SpellSchoolMask(mainMask))));
+    if (master->IsInCombat() || target->IsInCombat() || IsWanderer() || (IAmFree() && me->GetFaction() == 14) || pulling)
+    {
+        //if master is killed pursue to the end)
+        if (!master->IsAlive() || target->IsControlledByPlayer() || pulling || (followdist > 0 && (master->GetDistance(target) <= foldist || HasBotCommandState(BOT_COMMAND_STAY))))
+        {
+            //if stationery check own distance
+            if (!HasBotCommandState(BOT_COMMAND_STAY) || ((!IsRanged() && !secondary) ? me->IsWithinMeleeRange(target) : me->GetDistance(target) <= foldist))
+            {
+                if (byspell == -1 || !mainMask || !target->IsImmunedToDamage(SpellSchoolMask(mainMask)))
+                {
+                    if (me->IsValidAttackTarget(target))
+                    {
+                        if (!IsInBotParty(target))
+                            return true;
+
+                        //some friends need to be attacked when charmed
+                        switch (target->HasAuraType(SPELL_AURA_MOD_CHARM) ? target->GetAuraEffectsByType(SPELL_AURA_MOD_CHARM).front()->GetId() : 0)
+                        {
+                            case 17244:
+                            case 17246: //Possess (Baroness Anastari, Stratholme, 17244 -> 17246)
+                                return true;
+                            default:
+                                break;
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    return false;
 }
 bool bot_ai::CanBotAttackOnVehicle() const
 {
@@ -4033,6 +4062,20 @@ std::tuple<Unit*, Unit*> bot_ai::_getTargets(bool byspell, bool ranged, bool &re
             }
         }
     }
+
+    //check charmed master
+    if (!IAmFree() && master->HasAuraType(SPELL_AURA_MOD_CHARM))
+    {
+        switch (master->GetAuraEffectsByType(SPELL_AURA_MOD_CHARM).front()->GetId())
+        {
+            case 17244:
+            case 17246: //Possess (Baroness Anastari, Stratholme, 17244 -> 17246)
+                return { master, master };
+            default:
+                break;
+        }
+    }
+
     //maps
     if (!IAmFree() && me->GetMap()->GetEntry() && !me->GetMap()->GetEntry()->IsWorldMap())
     {
@@ -4478,7 +4521,7 @@ std::tuple<Unit*, Unit*> bot_ai::_getTargets(bool byspell, bool ranged, bool &re
     }
 
     bool canAttack = mytar && CanBotAttack(mytar, byspell);
-    if (mytar && (!IAmFree() || me->GetDistance(mytar) < float(BOT_MAX_CHASE_RANGE)) && canAttack &&/* !InDuel(mytar) &&*/
+    if (canAttack && (!IAmFree() || me->GetDistance(mytar) < float(BOT_MAX_CHASE_RANGE)) &&/* !InDuel(mytar) &&*/
         !(mytar->GetVictim() != nullptr && IsTank() && IsTank(mytar->GetVictim())))
     {
         //BOT_LOG_ERROR("entities.player", "bot %s continues attack its target %s", me->GetName().c_str(), mytar->GetName().c_str());
