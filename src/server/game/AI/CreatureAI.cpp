@@ -62,6 +62,17 @@ void CreatureAI::Talk(uint8 id, WorldObject const* target /*= nullptr*/, Millise
     }
 }
 
+/**
+ * @brief Returns the summoner creature/object, if the creature is a temporary summon.
+ */
+WorldObject* CreatureAI::GetSummoner() const
+{
+    if (TempSummon* summon = me->ToTempSummon())
+        return summon->GetSummoner();
+
+    return nullptr;
+}
+
 inline bool IsValidCombatTarget(Creature* source, Player* target)
 {
     if (target->IsGameMaster())

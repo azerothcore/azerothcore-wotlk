@@ -146,7 +146,7 @@ struct boss_faction_championsAI : public ScriptedAI
     {
         // check for stun, fear, etc.
         // for casting, silence, disarm check individually in the ai
-        if (me->isFeared() || me->isFrozen() || me->HasUnitState(UNIT_STATE_STUNNED) || me->HasUnitState(UNIT_STATE_CONFUSED))
+        if (me->HasFearAura() || me->isFrozen() || me->HasUnitState(UNIT_STATE_STUNNED) || me->HasUnitState(UNIT_STATE_CONFUSED))
         {
             if (!IsHeroic())
                 return true;

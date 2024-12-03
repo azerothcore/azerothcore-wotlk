@@ -148,6 +148,9 @@ class TaskScheduler
         /// Check if the group exists and is currently scheduled.
         bool IsGroupQueued(group_t const group);
 
+        // Returns the next group occurrence.
+        TaskScheduler::timepoint_t GetNextGroupOcurrence(group_t const group) const;
+
         bool IsEmpty() const;
     };
 
@@ -373,6 +376,9 @@ public:
         return RescheduleGroup(group, RandomDurationBetween(min, max));
     }
 
+    // Returns the next group occurrence.
+    Milliseconds GetNextGroupOcurrence(group_t const group) const;
+
 private:
     /// Insert a new task to the enqueued tasks.
     TaskScheduler& InsertTask(TaskContainer task);
@@ -476,6 +482,8 @@ public:
 
     /// Returns the repeat counter which increases every time the task is repeated.
     TaskScheduler::repeated_t GetRepeatCounter() const;
+
+    TaskScheduler::timepoint_t GetNextOcurrence() const;
 
     /// Repeats the event and sets a new duration.
     /// std::chrono::seconds(5) for example.
