@@ -17,3 +17,5 @@ INSERT INTO `conditions` (`SourceTypeOrReferenceId`, `SourceGroup`, `SourceEntry
 (13, 1, 38054, 0, 0, 31, 0, 5, 184979, 0, 0, 0, 0, '', 'Random Rocket Missile only target Deathforged Infernal');
 
 UPDATE `gameobject_template_addon` SET `faction`=114 WHERE `entry`=184979;
+UPDATE `creature_template_spell` SET `Spell` = 38488 WHERE `CreatureID` = 21949 AND `Index` = 1;
+UPDATE `spell_cooldown_overrides` SET `Id`=38488 WHERE `Id`= 38052;
