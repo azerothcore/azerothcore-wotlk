@@ -551,6 +551,7 @@ class spell_pal_divine_sacrifice : public AuraScript
 };
 
 // 53385 - Divine Storm
+// 增加神圣风暴叠层圣印效果
 class spell_pal_divine_storm : public SpellScript
 {
     PrepareSpellScript(spell_pal_divine_storm);
@@ -573,6 +574,7 @@ class spell_pal_divine_storm : public SpellScript
         Unit* caster = GetCaster();
         if (GetHitUnit() != caster)
             caster->CastCustomSpell(SPELL_PALADIN_DIVINE_STORM_DUMMY, SPELLVALUE_BASE_POINT0, (GetHitDamage() * healPct) / 100, caster, true);
+            GetCaster()->CastSpell(GetHitUnit(), SPELL_PALADIN_HOLY_VENGEANCE, true);
     }
 
     void Register() override
