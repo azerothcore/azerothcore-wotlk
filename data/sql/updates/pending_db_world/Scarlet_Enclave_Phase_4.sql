@@ -7,8 +7,8 @@ DELETE FROM `creature_addon` WHERE (`guid` IN (129709, 129724, 129726));
 DELETE FROM `creature` WHERE (`id1` = 28610) AND (`guid` IN (130036, 130015));
 DELETE FROM `creature_addon` WHERE (`guid` IN (130036, 130015));
 
-DELETE FROM `creature` WHERE (`id1` = 28936) AND (`guid` IN (129644));
-DELETE FROM `creature_addon` WHERE (`guid` IN (129644));
+DELETE FROM `creature` WHERE (`id1` = 28936) AND (`guid` IN (129644, 129652));
+DELETE FROM `creature_addon` WHERE (`guid` IN (129644, 129652));
 
 
 -- Adding Waypoints
