@@ -27,10 +27,12 @@ AuctionHouseWorkerThread::AuctionHouseWorkerThread(ProducerConsumerQueue<Auction
     _workerThread = std::thread(&AuctionHouseWorkerThread::Run, this);
     _requestQueue = requestQueue;
     _responseQueue = responseQueue;
+    _stopped = false;
 }
 
 void AuctionHouseWorkerThread::Stop()
 {
+    _stopped = true;
     _workerThread.join();
 }
 
@@ -41,7 +43,7 @@ void AuctionHouseWorkerThread::AddAuctionSearchUpdateToQueue(std::shared_ptr<Auc
 
 void AuctionHouseWorkerThread::Run()
 {
-    while (!World::IsStopped())
+    while (!_stopped)
     {
         std::this_thread::sleep_for(Milliseconds(25));
 

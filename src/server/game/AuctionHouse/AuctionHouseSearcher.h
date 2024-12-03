@@ -273,6 +273,7 @@ private:
     MPSCQueue<AuctionSearcherResponse>* _responseQueue;
 
     std::thread _workerThread;
+    std::atomic<bool> _stopped;
 };
 
 class AuctionHouseSearcher
