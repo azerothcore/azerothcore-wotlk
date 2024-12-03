@@ -196,7 +196,7 @@ public:
     void AddAItem(Item* it);
     bool RemoveAItem(ObjectGuid itemGuid, bool deleteFromDB = false, CharacterDatabaseTransaction* trans = nullptr);
 
-    void Update();
+    void Update(uint32 const diff);
 
 private:
     AuctionHouseObject _hordeAuctions;
@@ -206,6 +206,8 @@ private:
     ItemMap _mAitems;
 
     AuctionHouseSearcher* _auctionHouseSearcher;
+
+    IntervalTimer _updateIntervalTimer;
 };
 
 #define sAuctionMgr AuctionHouseMgr::instance()

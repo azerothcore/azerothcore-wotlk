@@ -35,6 +35,8 @@ constexpr auto AH_MINIMUM_DEPOSIT = 100;
 
 AuctionHouseMgr::AuctionHouseMgr() : _auctionHouseSearcher(new AuctionHouseSearcher())
 {
+    _updateIntervalTimer.SetInterval(MINUTE * IN_MILLISECONDS);
+    _updateIntervalTimer.SetCurrent(MINUTE * IN_MILLISECONDS);
 }
 
 AuctionHouseMgr::~AuctionHouseMgr()
@@ -419,13 +421,19 @@ bool AuctionHouseMgr::RemoveAItem(ObjectGuid itemGuid, bool deleteFromDB, Charac
     return true;
 }
 
-void AuctionHouseMgr::Update()
+void AuctionHouseMgr::Update(uint32 const diff)
 {
-    sScriptMgr->OnBeforeAuctionHouseMgrUpdate();
+    _updateIntervalTimer.Update(diff);
+    if (_updateIntervalTimer.Passed())
+    {
+        sScriptMgr->OnBeforeAuctionHouseMgrUpdate();
 
-    _hordeAuctions.Update();
-    _allianceAuctions.Update();
-    _neutralAuctions.Update();
+        _hordeAuctions.Update();
+        _allianceAuctions.Update();
+        _neutralAuctions.Update();
+
+        _updateIntervalTimer.Reset();
+    }
 
     _auctionHouseSearcher->Update();
 }

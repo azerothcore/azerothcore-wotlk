@@ -2063,8 +2063,6 @@ void World::SetInitialWorldSettings()
                            realm.Id.Realm, uint32(GameTime::GetStartTime().count()), GitRevision::GetFullVersion());       // One-time query
 
     _timers[WUPDATE_WEATHERS].SetInterval(1 * IN_MILLISECONDS);
-    _timers[WUPDATE_AUCTIONS].SetInterval(MINUTE * IN_MILLISECONDS);
-    _timers[WUPDATE_AUCTIONS].SetCurrent(MINUTE * IN_MILLISECONDS);
     _timers[WUPDATE_UPTIME].SetInterval(_int_configs[CONFIG_UPTIME_UPDATE]*MINUTE * IN_MILLISECONDS);
     //Update "uptime" table based on configuration entry in minutes.
 
@@ -2336,16 +2334,9 @@ void World::Update(uint32 diff)
         ResetGuildCap();
     }
 
-    // pussywizard: handle auctions when the timer has passed
-    if (_timers[WUPDATE_AUCTIONS].Passed())
-    {
-        METRIC_TIMER("world_update_time", METRIC_TAG("type", "Update expired auctions"));
-
-        _timers[WUPDATE_AUCTIONS].Reset();
-
-        // pussywizard: handle expired auctions, auctions expired when realm was offline are also handled here (not during loading when many required things aren't loaded yet)
-        sAuctionMgr->Update();
-    }
+    // pussywizard: handle expired auctions, auctions expired when realm was offline are also handled here (not during loading when many required things aren't loaded yet)
+    METRIC_TIMER("world_update_time", METRIC_TAG("type", "Update expired auctions"));
+    sAuctionMgr->Update(diff);
 
     if (currentGameTime > _mail_expire_check_timer)
     {
