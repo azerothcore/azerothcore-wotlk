@@ -1,3 +1,4 @@
+-- DB update 2024_12_02_05 -> 2024_12_03_00
 DELETE FROM `spell_script_names` WHERE `spell_id`=51000;
 INSERT INTO `spell_script_names` (`spell_id`, `ScriptName`) VALUES (51000, 'spell_hos_dark_matter_size');
 
