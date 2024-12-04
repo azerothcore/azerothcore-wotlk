@@ -276,7 +276,7 @@ void AuctionHouseWorkerThread::SearchBidderListRequest(AuctionSearchBidderListRe
 
 void AuctionHouseWorkerThread::BuildListAuctionItems(AuctionSearchListRequest const& searchRequest, SortableAuctionEntriesList& auctionEntries, SearchableAuctionEntriesMap const& auctionMap) const
 {
-    // pussywizard: optimization, this is a simplified case
+    // pussywizard: optimization, this is a simplified case for the default search state (no filters)
     if (searchRequest.searchInfo.itemClass == 0xffffffff && searchRequest.searchInfo.itemSubClass == 0xffffffff
         && searchRequest.searchInfo.inventoryType == 0xffffffff && searchRequest.searchInfo.quality == 0xffffffff
         && searchRequest.searchInfo.levelmin == 0x00 && searchRequest.searchInfo.levelmax == 0x00
@@ -284,53 +284,53 @@ void AuctionHouseWorkerThread::BuildListAuctionItems(AuctionSearchListRequest co
     {
         for (auto const& pair : auctionMap)
             auctionEntries.push_back(pair.second.get());
+
+        return;
     }
-    else
+
+    for (auto const& pair : auctionMap)
     {
-        for (auto const& pair : auctionMap)
+        std::shared_ptr<SearchableAuctionEntry> const& Aentry = pair.second;
+        SearchableAuctionEntryItem const& Aitem = Aentry->item;
+        ItemTemplate const* proto = Aitem.itemTemplate;
+
+        if (searchRequest.searchInfo.itemClass != 0xffffffff && proto->Class != searchRequest.searchInfo.itemClass)
+            continue;
+
+        if (searchRequest.searchInfo.itemSubClass != 0xffffffff && proto->SubClass != searchRequest.searchInfo.itemSubClass)
+            continue;
+
+        if (searchRequest.searchInfo.inventoryType != 0xffffffff && proto->InventoryType != searchRequest.searchInfo.inventoryType)
         {
-            std::shared_ptr<SearchableAuctionEntry> const& Aentry = pair.second;
-            SearchableAuctionEntryItem const& Aitem = Aentry->item;
-            ItemTemplate const* proto = Aitem.itemTemplate;
-
-            if (searchRequest.searchInfo.itemClass != 0xffffffff && proto->Class != searchRequest.searchInfo.itemClass)
+            // xinef: exception, robes are counted as chests
+            if (searchRequest.searchInfo.inventoryType != INVTYPE_CHEST || proto->InventoryType != INVTYPE_ROBE)
                 continue;
-
-            if (searchRequest.searchInfo.itemSubClass != 0xffffffff && proto->SubClass != searchRequest.searchInfo.itemSubClass)
-                continue;
-
-            if (searchRequest.searchInfo.inventoryType != 0xffffffff && proto->InventoryType != searchRequest.searchInfo.inventoryType)
-            {
-                // xinef: exception, robes are counted as chests
-                if (searchRequest.searchInfo.inventoryType != INVTYPE_CHEST || proto->InventoryType != INVTYPE_ROBE)
-                    continue;
-            }
-
-            if (searchRequest.searchInfo.quality != 0xffffffff && proto->Quality < searchRequest.searchInfo.quality)
-                continue;
-
-            if (searchRequest.searchInfo.levelmin != 0x00 && (proto->RequiredLevel < searchRequest.searchInfo.levelmin
-                || (searchRequest.searchInfo.levelmax != 0x00 && proto->RequiredLevel > searchRequest.searchInfo.levelmax)))
-            {
-                continue;
-            }
-
-            if (searchRequest.searchInfo.usable != 0x00)
-            {
-                if (!searchRequest.playerInfo.usablePlayerInfo.value().PlayerCanUseItem(proto))
-                    continue;
-            }
-
-            // Allow search by suffix (ie: of the Monkey) or partial name (ie: Monkey)
-            // No need to do any of this if no search term was entered
-            if (!searchRequest.searchInfo.wsearchedname.empty())
-            {
-                if (Aitem.itemName[searchRequest.playerInfo.locdbc_idx].find(searchRequest.searchInfo.wsearchedname) == std::wstring::npos)
-                    continue;
-            }
-
-            auctionEntries.push_back(Aentry.get());
         }
+
+        if (searchRequest.searchInfo.quality != 0xffffffff && proto->Quality < searchRequest.searchInfo.quality)
+            continue;
+
+        if (searchRequest.searchInfo.levelmin != 0x00 && (proto->RequiredLevel < searchRequest.searchInfo.levelmin
+            || (searchRequest.searchInfo.levelmax != 0x00 && proto->RequiredLevel > searchRequest.searchInfo.levelmax)))
+        {
+            continue;
+        }
+
+        if (searchRequest.searchInfo.usable != 0x00)
+        {
+            if (!searchRequest.playerInfo.usablePlayerInfo.value().PlayerCanUseItem(proto))
+                continue;
+        }
+
+        // Allow search by suffix (ie: of the Monkey) or partial name (ie: Monkey)
+        // No need to do any of this if no search term was entered
+        if (!searchRequest.searchInfo.wsearchedname.empty())
+        {
+            if (Aitem.itemName[searchRequest.playerInfo.locdbc_idx].find(searchRequest.searchInfo.wsearchedname) == std::wstring::npos)
+                continue;
+        }
+
+        auctionEntries.push_back(Aentry.get());
     }
 }
 
