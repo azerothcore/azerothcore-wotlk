@@ -2264,17 +2264,10 @@ uint32 Player::GetSpellQueueWindow() const
 
 bool Player::CanExecutePendingSpellCastRequest(SpellInfo const* spellInfo)
 {
-    uint32 remainingGlobalCooldown = GetGlobalCooldownMgr().GetGlobalCooldown(spellInfo);
-    LOG_ERROR("sql.sql", "Player::CanExecutePendingSpellCastRequest id: {} remainingGlobalCooldown: {}", spellInfo->Id, remainingGlobalCooldown);
-    uint32 spellCooldownDelay = GetSpellCooldownDelay(spellInfo->Id);
-    LOG_ERROR("sql.sql", "Player::CanExecutePendingSpellCastRequest id: {} spellCooldownDelay: {}", spellInfo->Id, spellCooldownDelay);
-
-    bool hasGlobalCooldown = GetGlobalCooldownMgr().HasGlobalCooldown(spellInfo);
-    LOG_ERROR("sql.sql", "Player::CanExecutePendingSpellCastRequest id: {} hasGlobalCooldown: {}", spellInfo->Id, hasGlobalCooldown);
-    if (hasGlobalCooldown > 0)
+    if (GetGlobalCooldownMgr().HasGlobalCooldown(spellInfo))
         return false;
 
-    if (spellCooldownDelay > GetSpellQueueWindow())
+    if (GetSpellCooldownDelay(spellInfo->Id) > GetSpellQueueWindow())
         return false;
 
     for (CurrentSpellTypes spellSlot : {CURRENT_MELEE_SPELL, CURRENT_GENERIC_SPELL})
@@ -2304,14 +2297,10 @@ bool Player::CanRequestSpellCast(SpellInfo const* spellInfo)
     if (GetCastRequest(spellInfo->StartRecoveryCategory))
         return false;
 
-    uint32 remainingGlobalCooldown = GetGlobalCooldownMgr().GetGlobalCooldown(spellInfo);
-    LOG_ERROR("sql.sql", "CanRequestSpellCast id: {} remainingGlobalCooldown: {}", spellInfo->Id, remainingGlobalCooldown);
-    uint32 spellCooldownDelay = GetSpellCooldownDelay(spellInfo->Id);
-    LOG_ERROR("sql.sql", "CanRequestSpellCast id: {} spellCooldownDelay: {}", spellInfo->Id, spellCooldownDelay);
-    if (remainingGlobalCooldown > GetSpellQueueWindow()) // default: 400, change for smoothenss?
+    if (GetGlobalCooldownMgr().GetGlobalCooldown(spellInfo) > GetSpellQueueWindow())
         return false;
 
-    if (spellCooldownDelay > GetSpellQueueWindow())
+    if (GetSpellCooldownDelay(spellInfo->Id) > GetSpellQueueWindow())
         return false;
 
     // If there is an existing cast that will last longer than the allowable
