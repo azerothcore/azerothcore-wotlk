@@ -178,11 +178,9 @@ struct boss_zuljin : public BossAI
             }, 20s);
 
             ScheduleTimedEvent(1s, [&] {
-                if (!me->HasSpellCooldown(SPELL_OVERPOWER))
-                {
-                    if (me->GetVictim() && me->GetComboPoints())
-                        DoCastVictim(SPELL_OVERPOWER);
-                }
+                if (!me->HasSpellCooldown(SPELL_OVERPOWER) && me->GetVictim() && me->GetComboPoints())
+                    if (DoCastVictim(SPELL_OVERPOWER) == SPELL_CAST_OK)
+                        me->AddSpellCooldown(SPELL_OVERPOWER, 0, 5000);
             }, 1s);
         });
 
