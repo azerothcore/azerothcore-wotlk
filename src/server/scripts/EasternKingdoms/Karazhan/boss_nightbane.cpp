@@ -124,7 +124,7 @@ struct boss_nightbane : public BossAI
         _triggerCountTakeOffWhileFlying = 0;
         _airPhasesCompleted = 0;
 
-        me->SetSpeed(MOVE_RUN, me->GetCreatureTemplate()->speed_run);
+        me->SetSpeed(MOVE_RUN, 2.0f);
         me->SetCanFly(true);
         me->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
         me->SetReactState(REACT_PASSIVE);
@@ -300,7 +300,6 @@ struct boss_nightbane : public BossAI
             {
                 me->ClearUnitState(UNIT_STATE_IGNORE_PATHFINDING);
                 me->GetMotionMaster()->MovePoint(POINT_INTRO_LAND, introLandPos);
-                me->SetSpeed(MOVE_RUN, 2.0f);
             }).Schedule(3s, [this](TaskContext /*context*/)
             {
                 me->SetDisableGravity(false);
