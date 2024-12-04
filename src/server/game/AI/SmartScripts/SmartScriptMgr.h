@@ -1533,7 +1533,7 @@ enum SMARTAI_TARGETS
     SMART_TARGET_GAMEOBJECT_RANGE               = 13,   // entry(0any), min, max
     SMART_TARGET_GAMEOBJECT_GUID                = 14,   // guid, entry
     SMART_TARGET_GAMEOBJECT_DISTANCE            = 15,   // entry(0any), maxDist
-    SMART_TARGET_INVOKER_PARTY                  = 16,   // invoker's party members
+    SMART_TARGET_INVOKER_PARTY                  = 16,   // includePets(0 - false, 1 - true)
     SMART_TARGET_PLAYER_RANGE                   = 17,   // min, max, maxCount (maxCount by pussywizard), set target.o to 1 if u want to search for all in range if min, max fails
     SMART_TARGET_PLAYER_DISTANCE                = 18,   // maxDist
     SMART_TARGET_CLOSEST_CREATURE               = 19,   // CreatureEntry(0any), maxDist, dead?
@@ -1736,6 +1736,11 @@ struct SmartTarget
             uint32 index;
             uint32 type;
         } instanceStorage;
+
+        struct
+        {
+            SAIBool includePets;
+        } invokerParty;
     };
 };
 

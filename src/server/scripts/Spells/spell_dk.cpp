@@ -1373,7 +1373,7 @@ class spell_dk_death_grip : public SpellScript
         float casterZ = GetCaster()->GetPositionZ(); // for Ring of Valor
         WorldLocation gripPos = *GetExplTargetDest();
         if (Unit* target = GetHitUnit())
-            if (!target->HasAuraType(SPELL_AURA_DEFLECT_SPELLS) || target->HasUnitState(UNIT_STATE_STUNNED)) // Deterrence
+            if (!target->HasDetectSpellsAura() || target->HasUnitState(UNIT_STATE_STUNNED)) // Deterrence
             {
                 if (target != GetCaster())
                 {

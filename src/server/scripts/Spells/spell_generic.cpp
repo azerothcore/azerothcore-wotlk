@@ -517,7 +517,7 @@ class spell_gen_grow_flower_patch : public SpellScript
 
     SpellCastResult CheckCast()
     {
-        if (GetCaster()->HasAuraType(SPELL_AURA_MOD_STEALTH) || GetCaster()->HasAuraType(SPELL_AURA_MOD_INVISIBILITY))
+        if (GetCaster()->HasStealthAura() || GetCaster()->HasInvisibilityAura())
             return SPELL_FAILED_DONT_REPORT;
 
         return SPELL_CAST_OK;

@@ -1830,7 +1830,7 @@ class spell_q11010_q11102_q11023_aggro_check : public SpellScript
     {
         if (Player* playerTarget = GetHitPlayer())
             // Check if found player target is on fly mount or using flying form
-            if (playerTarget->HasAuraType(SPELL_AURA_FLY) || playerTarget->HasAuraType(SPELL_AURA_MOD_INCREASE_MOUNTED_FLIGHT_SPEED))
+            if (playerTarget->HasFlyAura() || playerTarget->HasIncreaseMountedFlightSpeedAura())
                 playerTarget->CastSpell(playerTarget, SPELL_FLAK_CANNON_TRIGGER, TRIGGERED_FULL_MASK);
     }
 
@@ -1873,7 +1873,7 @@ class spell_q11010_q11102_q11023_choose_loc : public SpellScript
         Cell::VisitWorldObjects(caster, searcher, 65.0f);
         for (std::list<Player*>::const_iterator itr = playerList.begin(); itr != playerList.end(); ++itr)
             // Check if found player target is on fly mount or using flying form
-            if ((*itr)->HasAuraType(SPELL_AURA_FLY) || (*itr)->HasAuraType(SPELL_AURA_MOD_INCREASE_MOUNTED_FLIGHT_SPEED))
+            if ((*itr)->HasFlyAura() || (*itr)->HasIncreaseMountedFlightSpeedAura())
                 // Summom Fel Cannon (bunny version) at found player
                 caster->SummonCreature(NPC_FEL_CANNON2, (*itr)->GetPositionX(), (*itr)->GetPositionY(), (*itr)->GetPositionZ());
     }
@@ -1894,7 +1894,7 @@ class spell_q11010_q11102_q11023_q11008_check_fly_mount : public SpellScript
     {
         Unit* caster = GetCaster();
         // This spell will be cast only if caster has one of these auras
-        if (!(caster->HasAuraType(SPELL_AURA_FLY) || caster->HasAuraType(SPELL_AURA_MOD_INCREASE_MOUNTED_FLIGHT_SPEED)))
+        if (!(caster->HasFlyAura() || caster->HasIncreaseMountedFlightSpeedAura()))
             return SPELL_FAILED_CANT_DO_THAT_RIGHT_NOW;
         return SPELL_CAST_OK;
     }
