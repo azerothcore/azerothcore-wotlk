@@ -514,46 +514,46 @@ UPDATE `creature_addon` SET `path_id` = 13001400, `auras` = 52103 WHERE (`guid` 
 
 DELETE FROM `pool_template` WHERE (`entry` IN (22346, 22347, 22348, 22349, 22350, 22351, 22352, 22353, 22354, 22355));
 INSERT INTO `pool_template` (`entry`, `max_limit`, `description`) VALUES 
-('22346', '1', 'Scarlet Commander/Preacher Spawn (1 out 10)'),
-('22347', '1', 'Scarlet Commander/Preacher Spawn (2 out 10)'),
-('22348', '1', 'Scarlet Commander/Preacher Spawn (3 out 10)'),
-('22349', '1', 'Scarlet Commander/Preacher Spawn (4 out 10)'),
-('22350', '1', 'Scarlet Commander/Preacher Spawn (5 out 10)'),
-('22351', '1', 'Scarlet Commander/Preacher Spawn (6 out 10)'),
-('22352', '1', 'Scarlet Commander/Preacher Spawn (7 out 10)'),
-('22353', '1', 'Scarlet Commander/Preacher Spawn (8 out 10)'),
-('22354', '1', 'Scarlet Commander/Preacher Spawn (9 out 10)'),
-('22355', '1', 'Scarlet Commander/Preacher Spawn (10 out 10)');
+(22346, 1, 'Scarlet Commander/Preacher Spawn (1 out 10)'),
+(22347, 1, 'Scarlet Commander/Preacher Spawn (2 out 10)'),
+(22348, 1, 'Scarlet Commander/Preacher Spawn (3 out 10)'),
+(22349, 1, 'Scarlet Commander/Preacher Spawn (4 out 10)'),
+(22350, 1, 'Scarlet Commander/Preacher Spawn (5 out 10)'),
+(22351, 1, 'Scarlet Commander/Preacher Spawn (6 out 10)'),
+(22352, 1, 'Scarlet Commander/Preacher Spawn (7 out 10)'),
+(22353, 1, 'Scarlet Commander/Preacher Spawn (8 out 10)'),
+(22354, 1, 'Scarlet Commander/Preacher Spawn (9 out 10)'),
+(22355, 1, 'Scarlet Commander/Preacher Spawn (10 out 10)');
 
 
 DELETE FROM `pool_creature` WHERE (`guid` IN (129656, 129678, 129655, 129673, 129639, 129674, 129646, 129677, 129651, 129675, 129648, 129672, 129638, 129679, 129640, 129671, 129653, 129681, 129643, 129667));
 INSERT INTO `pool_creature` (`guid`, `pool_entry`, `chance`, `description`) VALUES 
-('129656', '22346', '0', 'Scarlet Commander (28936) (1 out 10)'),
-('129678', '22346', '0', 'Scarlet Preacher (28939) (1 out 10)'),
+(129656, 22346, 0, 'Scarlet Commander (28936) (1 out 10)'),
+(129678, 22346, 0, 'Scarlet Preacher (28939) (1 out 10)'),
 
-('129655', '22347', '0', 'Scarlet Commander (28936) (2 out 10)'),
-('129673', '22347', '0', 'Scarlet Preacher (28939) (2 out 10)'),
+(129655, 22347, 0, 'Scarlet Commander (28936) (2 out 10)'),
+(129673, 22347, 0, 'Scarlet Preacher (28939) (2 out 10)'),
 
-('129639', '22348', '0', 'Scarlet Commander (28936) (3 out 10)'),
-('129674', '22348', '0', 'Scarlet Preacher (28939) (3 out 10)'),
+(129639, 22348, 0, 'Scarlet Commander (28936) (3 out 10)'),
+(129674, 22348, 0, 'Scarlet Preacher (28939) (3 out 10)'),
 
-('129646', '22349', '0', 'Scarlet Commander (28936) (4 out 10)'),
-('129677', '22349', '0', 'Scarlet Preacher (28939) (4 out 10)'),
+(129646, 22349, 0, 'Scarlet Commander (28936) (4 out 10)'),
+(129677, 22349, 0, 'Scarlet Preacher (28939) (4 out 10)'),
 
-('129651', '22350', '0', 'Scarlet Commander (28936) (5 out 10)'),
-('129675', '22350', '0', 'Scarlet Preacher (28939) (5 out 10)'),
+(129651, 22350, 0, 'Scarlet Commander (28936) (5 out 10)'),
+(129675, 22350, 0, 'Scarlet Preacher (28939) (5 out 10)'),
 
-('129648', '22351', '0', 'Scarlet Commander (28936) (6 out 10)'),
-('129672', '22351', '0', 'Scarlet Preacher (28939) (6 out 10)'),
+(129648, 22351, 0, 'Scarlet Commander (28936) (6 out 10)'),
+(129672, 22351, 0, 'Scarlet Preacher (28939) (6 out 10)'),
 
-('129638', '22352', '0', 'Scarlet Commander (28936) (7 out 10)'),
-('129679', '22352', '0', 'Scarlet Preacher (28939) (7 out 10)'),
+(129638, 22352, 0, 'Scarlet Commander (28936) (7 out 10)'),
+(129679, 22352, 0, 'Scarlet Preacher (28939) (7 out 10)'),
 
-('129640', '22353', '0', 'Scarlet Commander (28936) (8 out 10)'),
-('129671', '22353', '0', 'Scarlet Preacher (28939) (8 out 10)'),
+(129640, 22353, 0, 'Scarlet Commander (28936) (8 out 10)'),
+(129671, 22353, 0, 'Scarlet Preacher (28939) (8 out 10)'),
 
-('129653', '22354', '0', 'Scarlet Commander (28936) (9 out 10)'),
-('129681', '22354', '0', 'Scarlet Preacher (28939) (9 out 10)'),
+(129653, 22354, 0, 'Scarlet Commander (28936) (9 out 10)'),
+(129681, 22354, 0, 'Scarlet Preacher (28939) (9 out 10)'),
 
-('129643', '22355', '0', 'Scarlet Commander (28936) (10 out 10)'),
-('129667', '22355', '0', 'Scarlet Preacher (28939) (10 out 10)');
+(129643, 22355, 0, 'Scarlet Commander (28936) (10 out 10)'),
+(129667, 22355, 0, 'Scarlet Preacher (28939) (10 out 10)');
