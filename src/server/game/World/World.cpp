@@ -96,7 +96,6 @@
 #include <boost/asio/ip/address.hpp>
 #include <cmath>
 
-
 namespace
 {
     TaskScheduler playersSaveScheduler;
