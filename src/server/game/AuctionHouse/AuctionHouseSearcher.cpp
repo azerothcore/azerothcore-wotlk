@@ -238,7 +238,7 @@ void AuctionHouseWorkerThread::SearchBidderListRequest(AuctionSearchBidderListRe
 
     AuctionSearcherResponse* searchResponse = new AuctionSearcherResponse();
     searchResponse->playerGuid = searchBidderListRequest.ownerGuid;
-    searchResponse->packet.Initialize(SMSG_AUCTION_BIDDER_LIST_RESULT, (4 + 4 + 4) + 30000); // pussywizard: ensure there is enough memory
+    searchResponse->packet.Initialize(SMSG_AUCTION_BIDDER_LIST_RESULT, (4 + 4 + 4));
     searchResponse->packet << (uint32)0;                                     //add 0 as count
 
     uint32 count = 0;
