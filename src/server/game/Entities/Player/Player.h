@@ -2639,7 +2639,7 @@ public:
     const PendingSpellCastRequest* GetCastRequest(uint32 category) const;
     bool CanExecutePendingSpellCastRequest(SpellInfo const* spellInfo);
     void ExecuteOrCancelSpellCastRequest(PendingSpellCastRequest* castRequest, bool isCancel = false);
-    bool CanRequestSpellCast(SpellInfo const* spellInfo) const;
+    bool CanRequestSpellCast(SpellInfo const* spellInfo);
 
 protected:
     // Gamemaster whisper whitelist

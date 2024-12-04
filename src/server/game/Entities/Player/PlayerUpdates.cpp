@@ -2264,10 +2264,17 @@ uint32 Player::GetSpellQueueWindow() const
 
 bool Player::CanExecutePendingSpellCastRequest(SpellInfo const* spellInfo)
 {
-    if (GetGlobalCooldownMgr().GetGlobalCooldown(spellInfo) > 0)
+    uint32 remainingGlobalCooldown = GetGlobalCooldownMgr().GetGlobalCooldown(spellInfo);
+    LOG_ERROR("sql.sql", "Player::CanExecutePendingSpellCastRequest id: {} remainingGlobalCooldown: {}", spellInfo->Id, remainingGlobalCooldown);
+    uint32 spellCooldownDelay = GetSpellCooldownDelay(spellInfo->Id);
+    LOG_ERROR("sql.sql", "Player::CanExecutePendingSpellCastRequest id: {} spellCooldownDelay: {}", spellInfo->Id, spellCooldownDelay);
+
+    bool hasGlobalCooldown = GetGlobalCooldownMgr().HasGlobalCooldown(spellInfo);
+    LOG_ERROR("sql.sql", "Player::CanExecutePendingSpellCastRequest id: {} hasGlobalCooldown: {}", spellInfo->Id, hasGlobalCooldown);
+    if (hasGlobalCooldown > 0)
         return false;
 
-    if (GetSpellCooldownDelay(spellInfo->Id) > GetSpellQueueWindow())
+    if (spellCooldownDelay > GetSpellQueueWindow())
         return false;
 
     for (CurrentSpellTypes spellSlot : {CURRENT_MELEE_SPELL, CURRENT_GENERIC_SPELL})
@@ -2288,7 +2295,7 @@ const PendingSpellCastRequest* Player::GetCastRequest(uint32 category) const
     return nullptr;
 }
 
-bool Player::CanRequestSpellCast(SpellInfo const* spellInfo) const
+bool Player::CanRequestSpellCast(SpellInfo const* spellInfo)
 {
     if (!sWorld->getBoolConfig(CONFIG_SPELL_QUEUE_ENABLED))
         return false;
@@ -2297,7 +2304,14 @@ bool Player::CanRequestSpellCast(SpellInfo const* spellInfo) const
     if (GetCastRequest(spellInfo->StartRecoveryCategory))
         return false;
 
-    if (GetSpellCooldownDelay(spellInfo->Id) > GetSpellQueueWindow())
+    uint32 remainingGlobalCooldown = GetGlobalCooldownMgr().GetGlobalCooldown(spellInfo);
+    LOG_ERROR("sql.sql", "CanRequestSpellCast id: {} remainingGlobalCooldown: {}", spellInfo->Id, remainingGlobalCooldown);
+    uint32 spellCooldownDelay = GetSpellCooldownDelay(spellInfo->Id);
+    LOG_ERROR("sql.sql", "CanRequestSpellCast id: {} spellCooldownDelay: {}", spellInfo->Id, spellCooldownDelay);
+    if (remainingGlobalCooldown > GetSpellQueueWindow()) // default: 400, change for smoothenss?
+        return false;
+
+    if (spellCooldownDelay > GetSpellQueueWindow())
         return false;
 
     // If there is an existing cast that will last longer than the allowable
