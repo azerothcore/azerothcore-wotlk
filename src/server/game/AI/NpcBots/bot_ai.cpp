@@ -1406,7 +1406,7 @@ void bot_ai::BuffAndHealGroup(uint32 diff)
         if (HealTarget(me, diff))
             return;
 
-        if (me->GetFaction() == 14 || me->HasAura(BERSERK))
+        if (me->GetFaction() == FACTION_TEMPLATE_NEUTRAL_HOSTILE || me->HasAura(BERSERK))
             return;
 
         std::list<Unit*> targets2;
@@ -1661,7 +1661,7 @@ void bot_ai::ResurrectGroup(uint32 spell_id)
 
     if (IAmFree())
     {
-        if (me->GetFaction() == 14 || me->HasAura(BERSERK))
+        if (me->GetFaction() == FACTION_TEMPLATE_NEUTRAL_HOSTILE || me->HasAura(BERSERK))
             return;
 
         WorldObject* playerOrCorpse = GetNearbyRezTarget();
@@ -1827,7 +1827,7 @@ void bot_ai::CureGroup(uint32 cureSpell, uint32 diff)
         if (botPet && !me->IsInCombat() && _canCureTarget(botPet, cureSpell))
             targets.push_back(botPet);
 
-        if (!(me->GetFaction() == 14 || me->HasAura(BERSERK)))
+        if (!(me->GetFaction() == FACTION_TEMPLATE_NEUTRAL_HOSTILE || me->HasAura(BERSERK)))
         {
             std::list<Unit*> targets1;
             GetNearbyFriendlyTargetsList(targets1, 30);
@@ -3632,7 +3632,7 @@ bool bot_ai::IsInBotParty(Unit const* unit) const
 
     if (IAmFree())
     {
-        if (me->GetFaction() == 14 || unit->GetFaction() == 14)
+        if (me->GetFaction() == FACTION_TEMPLATE_NEUTRAL_HOSTILE || unit->GetFaction() == FACTION_TEMPLATE_NEUTRAL_HOSTILE)
             return false;
 
         if (me->HasByteFlag(UNIT_FIELD_BYTES_2, 1, UNIT_BYTE2_FLAG_FFA_PVP) ||
@@ -3803,7 +3803,7 @@ bool bot_ai::CanBotAttack(Unit const* target, int8 byspell, bool secondary) cons
         return false;
     if (me->GetFaction() == 35 && IAmFree() && target->GetTypeId() == TYPEID_UNIT && target->GetVictim() != me)
         return false;
-    if ((target->GetFaction() == 35 || target->GetFaction() == me->GetFaction()) && me->GetFaction() != 14)
+    if ((target->GetFaction() == 35 || target->GetFaction() == me->GetFaction()) && me->GetFaction() != FACTION_TEMPLATE_NEUTRAL_HOSTILE)
         return false;
     if (!CanBotAttackOnVehicle())
         return false;
@@ -3816,6 +3816,13 @@ bool bot_ai::CanBotAttack(Unit const* target, int8 byspell, bool secondary) cons
             return false;
         if (BotMgr::EnableWanderingUntargetNpcFlightmaster() && target->IsTaxi())
             return false;
+        //do not attack friendly targets in FFAPvP mode
+        if (me->IsFFAPvP() && me->GetFaction() == FACTION_TEMPLATE_NEUTRAL_HOSTILE)
+        {
+            uint32 base_faction = BotDataMgr::GetDefaultFactionForBotRace(me->GetRace());
+            if (me->GetFaction() != base_faction && me->GetFactionReactionTo(sFactionTemplateStore.LookupEntry(base_faction), target) >= REP_FRIENDLY)
+                return false;
+        }
     }
 
     if (IAmFree())
@@ -3865,7 +3872,7 @@ bool bot_ai::CanBotAttack(Unit const* target, int8 byspell, bool secondary) cons
         }
     }
 
-    if (master->IsInCombat() || target->IsInCombat() || IsWanderer() || (IAmFree() && me->GetFaction() == 14) || pulling)
+    if (master->IsInCombat() || target->IsInCombat() || IsWanderer() || (IAmFree() && me->GetFaction() == FACTION_TEMPLATE_NEUTRAL_HOSTILE) || pulling)
     {
         //if master is killed pursue to the end)
         if (!master->IsAlive() || target->IsControlledByPlayer() || pulling || (followdist > 0 && (master->GetDistance(target) <= foldist || HasBotCommandState(BOT_COMMAND_STAY))))
@@ -10772,9 +10779,9 @@ bool bot_ai::OnGossipSelect(Player* player, Creature* creature/* == me*/, uint32
             }
             else if (reason == -1)
             {
-                me->SetFaction(14);
+                me->SetFaction(FACTION_TEMPLATE_NEUTRAL_HOSTILE);
                 if (botPet)
-                    botPet->SetFaction(14);
+                    botPet->SetFaction(FACTION_TEMPLATE_NEUTRAL_HOSTILE);
                 BotYell(LocalizedNpcText(player, BOT_TEXT_DIE), player);
                 me->Attack(player, true);
                 break;
@@ -10861,9 +10868,9 @@ bool bot_ai::OnGossipSelect(Player* player, Creature* creature/* == me*/, uint32
             }
             //if (urand(1,100) <= 25)
             //{
-            //    me->SetFaction(14);
+            //    me->SetFaction(FACTION_TEMPLATE_HATES_EVERYTHING_1);
             //    if (Creature* pet = GetBotsPet())
-            //        pet->SetFaction(14);
+            //        pet->SetFaction(FACTION_TEMPLATE_HATES_EVERYTHING_1);
             //    BotSay("Fool...", player);
             //    me->Attack(player, true);
             //}
@@ -15029,7 +15036,7 @@ void bot_ai::InitFaction()
 {
     uint32 faction = _botData->faction;
 
-    //if (faction == 14)
+    //if (faction == FACTION_TEMPLATE_HATES_EVERYTHING_1)
     //    faction = 35;
 
     me->SetFaction(faction);
@@ -16395,6 +16402,9 @@ void bot_ai::OnDeath([[maybe_unused]] Unit* attacker/* = nullptr*/)
 
 void bot_ai::KilledUnit(Unit* u)
 {
+    if (u->GetOwnerGUID() == me->GetGUID() || u->GetGUID() == me->GetGUID())
+        return;
+
     ++_killsCount;
     if (u->IsControlledByPlayer() || u->IsPvP() || u->IsNPCBotOrPet())
     {
@@ -19347,6 +19357,11 @@ WanderNode const* bot_ai::GetNextWanderNode(Position const* fromPos, uint8 lvl, 
     };
 
     uint32 faction = me->GetFaction();
+    if (me->IsFFAPvP())
+    {
+        ChrRacesEntry const* rentry = sChrRacesStore.LookupEntry(me->GetRace());
+        faction = (_botclass >= BOT_CLASS_EX_START) ? FACTION_TEMPLATE_NEUTRAL_HOSTILE : rentry ? rentry->FactionID : FACTION_TEMPLATE_NEUTRAL_HOSTILE;
+    }
 
     //Node got deleted (or forced)! Select close point and go from there
     NodeList nlinks;

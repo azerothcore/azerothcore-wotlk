@@ -1414,7 +1414,7 @@ bool bot_pet_ai::IsInBotParty(Unit const* unit) const
 
     if (IAmFree())
     {
-        if (me->GetFaction() == 14 || unit->GetFaction() == 14)
+        if (me->GetFaction() == FACTION_TEMPLATE_NEUTRAL_HOSTILE || unit->GetFaction() == FACTION_TEMPLATE_NEUTRAL_HOSTILE)
             return false;
 
         if (me->HasByteFlag(UNIT_FIELD_BYTES_2, 1, UNIT_BYTE2_FLAG_FFA_PVP) ||

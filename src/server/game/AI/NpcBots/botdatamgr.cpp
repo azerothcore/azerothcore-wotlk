@@ -234,15 +234,15 @@ private:
     using NodeVec = std::vector<WanderNode const*>;
 
     const std::map<uint8, uint32> wbot_faction_for_ex_class = {
-        {BOT_CLASS_BM, 14u/*2u*/},
-        {BOT_CLASS_SPHYNX, 14u},
-        {BOT_CLASS_ARCHMAGE, 14u/*1u*/},
-        {BOT_CLASS_DREADLORD, 14u},
-        {BOT_CLASS_SPELLBREAKER, 14u/*1610u*/},
-        {BOT_CLASS_DARK_RANGER, 14u},
-        {BOT_CLASS_NECROMANCER, 14u},
-        {BOT_CLASS_SEA_WITCH, 14u},
-        {BOT_CLASS_CRYPT_LORD, 14u}
+        {BOT_CLASS_BM, FACTION_TEMPLATE_NEUTRAL_HOSTILE/*2u*/},
+        {BOT_CLASS_SPHYNX, FACTION_TEMPLATE_NEUTRAL_HOSTILE},
+        {BOT_CLASS_ARCHMAGE, FACTION_TEMPLATE_NEUTRAL_HOSTILE/*1u*/},
+        {BOT_CLASS_DREADLORD, FACTION_TEMPLATE_NEUTRAL_HOSTILE},
+        {BOT_CLASS_SPELLBREAKER, FACTION_TEMPLATE_NEUTRAL_HOSTILE/*1610u*/},
+        {BOT_CLASS_DARK_RANGER, FACTION_TEMPLATE_NEUTRAL_HOSTILE},
+        {BOT_CLASS_NECROMANCER, FACTION_TEMPLATE_NEUTRAL_HOSTILE},
+        {BOT_CLASS_SEA_WITCH, FACTION_TEMPLATE_NEUTRAL_HOSTILE},
+        {BOT_CLASS_CRYPT_LORD, FACTION_TEMPLATE_NEUTRAL_HOSTILE}
     };
 
     uint32 next_bot_id;
@@ -289,12 +289,6 @@ private:
                 _spareBotIdsPerClassMap.erase(c);
     }
 
-    uint32 GetDefaultFactionForRaceClass(uint8 bot_class, uint8 bot_race) const
-    {
-        ChrRacesEntry const* rentry = sChrRacesStore.LookupEntry(bot_race);
-        return (bot_class >= BOT_CLASS_EX_START) ? wbot_faction_for_ex_class.find(bot_class)->second : rentry ? rentry->FactionID : 14u;
-    }
-
     bool GenerateWanderingBotToSpawn(std::pair<uint8, uint32> const& spareBotPair, uint8 desired_bracket,
         NodeVec const& spawns_a, NodeVec const& spawns_h, NodeVec const& spawns_n,
         bool immediate, PvPDifficultyEntry const* bracketEntry, NpcBotRegistry* registry)
@@ -307,7 +301,7 @@ private:
         const uint32 orig_entry = spareBotPair.second;
         CreatureTemplate const* orig_template = ASSERT_NOTNULL(sObjectMgr->GetCreatureTemplate(orig_entry));
         NpcBotExtras const* orig_extras = ASSERT_NOTNULL(BotDataMgr::SelectNpcBotExtras(orig_entry));
-        uint32 bot_faction = GetDefaultFactionForRaceClass(bot_class, orig_extras->race);
+        uint32 bot_faction = BotDataMgr::GetDefaultFactionForBotRace(orig_extras->race);
 
         NodeVec const* bot_spawn_nodes;
         TeamId bot_team = BotDataMgr::GetTeamIdForFaction(bot_faction);
@@ -372,6 +366,12 @@ private:
             bot_template.minlevel = std::min<uint32>(std::max<uint32>(desired_bracket * 10, spawnLoc->GetLevels().first), max_level);
             bot_template.maxlevel = std::min<uint32>(std::min<uint32>(desired_bracket * 10 + 9, spawnLoc->GetLevels().second), max_level);
             bot_template.flags_extra &= ~(CREATURE_FLAG_EXTRA_NO_XP);
+
+            if (sWorld->IsFFAPvPRealm())
+            {
+                bot_template.faction = FACTION_TEMPLATE_NEUTRAL_HOSTILE;
+                bot_faction = FACTION_TEMPLATE_NEUTRAL_HOSTILE;
+            }
         }
 
         bot_template.InitializeQueryData();
@@ -433,14 +433,14 @@ public:
                 if (kv.first >= BOT_CLASS_EX_START)
                 {
                     auto cit = wbot_faction_for_ex_class.find(kv.first);
-                    if (cit != wbot_faction_for_ex_class.cend() && cit->second == FACTION_MONSTER)
+                    if (cit != wbot_faction_for_ex_class.cend() && cit->second == FACTION_TEMPLATE_NEUTRAL_HOSTILE)
                         continue;
                 }
 
                 for (uint32 entry : kv.second)
                 {
                     NpcBotExtras const* extras = ASSERT_NOTNULL(BotDataMgr::SelectNpcBotExtras(entry));
-                    uint32 bot_faction = GetDefaultFactionForRaceClass(kv.first, extras->race);
+                    uint32 bot_faction = BotDataMgr::GetDefaultFactionForBotRace(extras->race);
                     TeamId bot_team = BotDataMgr::GetTeamIdForFaction(bot_faction);
                     if (teamId == bot_team)
                         ++count;
@@ -553,7 +553,7 @@ public:
                 for (uint32 spareBotId : kv.second)
                 {
                     NpcBotExtras const* orig_extras = ASSERT_NOTNULL(BotDataMgr::SelectNpcBotExtras(spareBotId));
-                    uint32 bot_faction = GetDefaultFactionForRaceClass(kv.first, orig_extras->race);
+                    uint32 bot_faction = BotDataMgr::GetDefaultFactionForBotRace(orig_extras->race);
                     uint32 botTeam = BotDataMgr::GetTeamForFaction(bot_faction);
 
                     if (int32(botTeam) != team)
@@ -3205,7 +3205,7 @@ int32 BotDataMgr::GetBotBaseReputation(Creature const* bot, FactionEntry const* 
     if (bot->IsNPCBotPet())
         bot = bot->GetBotPetAI()->GetPetsOwner();
 
-    uint32 raceMask = bot->GetFaction() == 14 ? 0 : bot->GetRaceMask();
+    uint32 raceMask = GetDefaultFactionForBotRace(bot->GetRace()) == FACTION_TEMPLATE_NEUTRAL_HOSTILE ? 0 : bot->GetRaceMask();
     uint32 classMask = bot->GetClassMask();
 
     int32 minRep = 42999;
@@ -3221,6 +3221,12 @@ int32 BotDataMgr::GetBotBaseReputation(Creature const* bot, FactionEntry const* 
     }
 
     return std::min<int32>(minRep, 0);
+}
+
+uint32 BotDataMgr::GetDefaultFactionForBotRace(uint8 bot_race)
+{
+    ChrRacesEntry const* rentry = sChrRacesStore.LookupEntry(bot_race);
+    return rentry ? rentry->FactionID : FACTION_TEMPLATE_NEUTRAL_HOSTILE;
 }
 
 TeamId BotDataMgr::GetTeamIdForFaction(uint32 factionTemplateId)

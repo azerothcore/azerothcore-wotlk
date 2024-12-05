@@ -3185,7 +3185,7 @@ public:
         else if ((*factionStr)[0] == 'h')
             factionId = 1801; //Horde
         else if ((*factionStr)[0] == 'm')
-            factionId = 14; //Monsters
+            factionId = FACTION_TEMPLATE_NEUTRAL_HOSTILE; //Monsters
         else if ((*factionStr)[0] == 'f')
             factionId = 35; //Friendly to all
 
@@ -3372,7 +3372,7 @@ public:
             if (teamid)
             {
                 ChrRacesEntry const* rentry = sChrRacesStore.LookupEntry(race);
-                uint32 faction = rentry ? rentry->FactionID : 14;
+                uint32 faction = rentry ? rentry->FactionID : FACTION_TEMPLATE_NEUTRAL_HOSTILE;
                 TeamId team = BotDataMgr::GetTeamIdForFaction(faction);
 
                 if (*teamid != uint8(team))
