@@ -68,7 +68,8 @@ uint8 _npcBotOwnerExpireMode;
 int32 _botInfoPacketsLimit;
 uint32 _gearBankCapacity;
 uint32 _gearBankEquipmentSetsCount;
-uint32 _npcBotsCost;
+uint32 _npcBotsCostHire;
+uint32 _npcBotsCostRent;
 uint32 _npcBotUpdateDelayBase;
 uint32 _npcBotEngageDelayDPS_default;
 uint32 _npcBotEngageDelayHeal_default;
@@ -282,6 +283,7 @@ void AddNpcBotScripts()
 BotMgr::BotMgr(Player* const master) : _owner(master), _dpstracker(new DPSTracker())
 {
     _quickrecall = false;
+    _update_lock = false;
     _data = nullptr;
 }
 BotMgr::~BotMgr()
@@ -385,7 +387,8 @@ void BotMgr::LoadConfig(bool reload)
     _limitNpcBotsRaids              = sConfigMgr->GetBoolDefault("NpcBot.Limit.Raid", true);
     _hideSpawns                     = sConfigMgr->GetBoolDefault("NpcBot.HideSpawns", false);
     _botInfoPacketsLimit            = sConfigMgr->GetIntDefault("NpcBot.InfoPacketsLimit", -1);
-    _npcBotsCost                    = sConfigMgr->GetIntDefault("NpcBot.Cost", 1000000);
+    _npcBotsCostHire                = sConfigMgr->GetIntDefault("NpcBot.Cost.Hire", 1000000);
+    _npcBotsCostRent                = sConfigMgr->GetIntDefault("NpcBot.Cost.Rent", 0);
     _npcBotUpdateDelayBase          = sConfigMgr->GetIntDefault("NpcBot.UpdateDelay.Base", 0);
     _npcBotEngageDelayDPS_default   = sConfigMgr->GetIntDefault("NpcBot.EngageDelay.DPS", 0);
     _npcBotEngageDelayHeal_default  = sConfigMgr->GetIntDefault("NpcBot.EngageDelay.Heal", 0);
@@ -1191,6 +1194,12 @@ bool BotMgr::IsWanderingWorldBot(Creature const* bot)
 
 void BotMgr::Update(uint32 diff)
 {
+    while (!_delayedRemoveList.empty())
+    {
+        decltype(_delayedRemoveList)::iterator itr = _delayedRemoveList.begin();
+        RemoveBot(itr->first, itr->second);
+    }
+
     //remove temp bots from bot map before updating it
     while (!_removeList.empty())
     {
@@ -1217,6 +1226,8 @@ void BotMgr::Update(uint32 diff)
     _aoespots.clear();
     if (partyCombat)
         bot_ai::CalculateAoeSpots(_owner, _aoespots);
+
+    _update_lock = true;
 
     for (BotMap::const_iterator itr = _bots.begin(); itr != _bots.end(); ++itr)
     {
@@ -1264,6 +1275,8 @@ void BotMgr::Update(uint32 diff)
         bot->Update(diff);
         ai->canUpdate = false;
     }
+
+    _update_lock = false;
 
     if (_quickrecall)
     {
@@ -1806,6 +1819,14 @@ void BotMgr::RemoveAllBots(uint8 removetype)
 //Bot is being abandoned by player
 void BotMgr::RemoveBot(ObjectGuid guid, uint8 removetype)
 {
+    if (_update_lock)
+    {
+        _delayedRemoveList.emplace_back(guid, BotRemoveType(removetype));
+        return;
+    }
+    else if (!_delayedRemoveList.empty())
+        _delayedRemoveList.remove_if([=](decltype(_delayedRemoveList)::value_type const& p) { return p.first == guid; });
+
     BotMap::const_iterator itr = _bots.find(guid);
     ASSERT(itr != _bots.end(), "Trying to remove bot which does not belong to this botmgr(a)!!");
     //ASSERT(_owner->IsInWorld(), "Trying to remove bot while not in world(a)!!");
@@ -1844,16 +1865,16 @@ void BotMgr::RemoveBot(ObjectGuid guid, uint8 removetype)
     BotAIResetType resetType;
     switch (removetype)
     {
-        case BOT_REMOVE_DISMISS: resetType = BOTAI_RESET_DISMISS; break;
-        case BOT_REMOVE_UNBIND:  resetType = BOTAI_RESET_UNBIND;    break;
-        default:                 resetType = BOTAI_RESET_LOGOUT;  break;
+        case BOT_REMOVE_DISMISS: case BOT_REMOVE_UNAFFORD: resetType = BOTAI_RESET_DISMISS; break;
+        case BOT_REMOVE_UNBIND:                            resetType = BOTAI_RESET_UNBIND;  break;
+        default:                                           resetType = BOTAI_RESET_LOGOUT;  break;
     }
     bot->GetBotAI()->ResetBotAI(resetType);
 
     bot->SetFaction(bot->GetCreatureTemplate()->faction);
     bot->SetLevel(bot->GetCreatureTemplate()->minlevel);
 
-    if (removetype == BOT_REMOVE_DISMISS)
+    if (resetType == BOTAI_RESET_DISMISS)
     {
         BotDataMgr::ResetNpcBotTransmogData(bot->GetEntry(), false);
         uint32 newOwner = 0;
@@ -1926,7 +1947,7 @@ BotAddResult BotMgr::AddBot(Creature* bot)
     //}
     if (!owned)
     {
-        uint32 cost = GetNpcBotCost(_owner->GetLevel(), bot->GetBotClass());
+        uint32 cost = GetNpcBotCostHire(_owner->GetLevel(), bot->GetBotClass());
         if (!_owner->HasEnoughMoney(cost))
         {
             ChatHandler ch(_owner->GetSession());
@@ -2068,7 +2089,12 @@ bool BotMgr::RemoveAllBotsFromGroup()
     return true;
 }
 
-uint32 BotMgr::GetNpcBotCost(uint8 level, uint8 botclass)
+uint32 BotMgr::GetNpcBotCostRent()
+{
+    return _npcBotsCostRent;
+}
+
+uint32 BotMgr::GetNpcBotCostHire(uint8 level, uint8 botclass)
 {
     //assuming default 1000000
     //level 1: 500  //5  silver
@@ -2079,11 +2105,11 @@ uint32 BotMgr::GetNpcBotCost(uint8 level, uint8 botclass)
     //rest is linear
     //rare / rareelite bots have their cost adjusted
     uint32 cost =
-        level < 10 ? _npcBotsCost / 2000 : //5 silver
-        level < 20 ? _npcBotsCost / 100 :  //1 gold
-        level < 30 ? _npcBotsCost / 20 :   //5 gold
-        level < 40 ? _npcBotsCost / 5 :    //20 gold
-        (_npcBotsCost * (level - (level % 10))) / DEFAULT_MAX_LEVEL; //50 - 100 gold
+        level < 10 ? _npcBotsCostHire / 2000 : //5 silver
+        level < 20 ? _npcBotsCostHire / 100 :  //1 gold
+        level < 30 ? _npcBotsCostHire / 20 :   //5 gold
+        level < 40 ? _npcBotsCostHire / 5 :    //20 gold
+        (_npcBotsCostHire * (level - (level % 10))) / DEFAULT_MAX_LEVEL; //50 - 100 gold
 
     switch (botclass)
     {
@@ -2111,7 +2137,7 @@ std::string BotMgr::GetNpcBotCostStr(uint8 level, uint8 botclass)
 {
     std::ostringstream money;
 
-    if (uint32 cost = GetNpcBotCost(level, botclass))
+    if (uint32 cost = GetNpcBotCostHire(level, botclass))
     {
         uint32 gold = uint32(cost / GOLD);
         cost -= (gold * GOLD);
@@ -2124,6 +2150,23 @@ std::string BotMgr::GetNpcBotCostStr(uint8 level, uint8 botclass)
             money << silver << " |TInterface\\Icons\\INV_Misc_Coin_03:8|t";
         if (cost)
             money << cost << " |TInterface\\Icons\\INV_Misc_Coin_05:8|t";
+    }
+
+    if (uint32 rcost = GetNpcBotCostRent())
+    {
+        uint32 gold = uint32(rcost / GOLD);
+        rcost -= (gold * GOLD);
+        uint32 silver = uint32(rcost / SILVER);
+        rcost -= (silver * SILVER);
+
+        money << " + |TInterface\\Icons\\INV_Misc_PocketWatch_01:16|t";
+
+        if (gold != 0)
+            money << gold << " |TInterface\\Icons\\INV_Misc_Coin_01:8|t";
+        if (silver != 0)
+            money << silver << " |TInterface\\Icons\\INV_Misc_Coin_03:8|t";
+        if (rcost)
+            money << rcost << " |TInterface\\Icons\\INV_Misc_Coin_05:8|t";
     }
 
     return money.str();

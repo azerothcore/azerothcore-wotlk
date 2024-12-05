@@ -158,8 +158,6 @@ static void ApplyBotPercentModFloatVar(float &var, float val, bool apply)
 
 static uint16 __rand; //calculated for each bot separately once every updateAI tick
 
-static std::set<uint32> BotCustomSpells;
-
 bot_ai::bot_ai(Creature* creature) : CreatureAI(creature),
     _botData(const_cast<NpcBotData*>(BotDataMgr::SelectNpcBotData(creature->GetEntry()))),
     _botExtras(const_cast<NpcBotExtras*>(BotDataMgr::SelectNpcBotExtras(creature->GetEntry())))
@@ -270,6 +268,8 @@ bot_ai::bot_ai(Creature* creature) : CreatureAI(creature),
 
     _wmoAreaUpdateTimer = 0;
 
+    _rentTimer = 0;
+
     _contestedPvPTimer = 0;
     _groupUpdateTimer = BOT_GROUP_UPDATE_TIMER;
 
@@ -341,8 +341,7 @@ const std::string& bot_ai::LocalizedNpcText(Player const* forPlayer, uint32 text
 
         if (!unk_botstrings.contains(textId))
         {
-            BOT_LOG_ERROR("entities.player", "NPCBots: bot text string #{} is not localized, at least for {}",
-                textId, localeNames[loc]);
+            BOT_LOG_ERROR("entities.player", "NPCBots: bot text string #{} is not localized, at least for {}", textId, localeNames[loc]);
 
             std::ostringstream msg;
             msg << (loc == DEFAULT_LOCALE ? "<undefined string " : "<unlocalized string ") << textId << ">";
@@ -596,7 +595,10 @@ void bot_ai::ResetBotAI(uint8 resetType)
     if (resetType & BOTAI_RESET_MASK_RESET_MASTER)
         master = reinterpret_cast<Player*>(me);
     if (resetType & BOTAI_RESET_MASK_ABANDON_MASTER)
+    {
         _ownerGuid = 0;
+        _rentTimer = 0;
+    }
     if (resetType == BOTAI_RESET_INIT || resetType == BOTAI_RESET_LOGOUT)
     {
         _checkOwershipTimer = (BotMgr::GetOwnershipExpireTime() && _botData->owner) ? (resetType == BOTAI_RESET_INIT) ? 1000 : CalculateOwnershipCheckTime() : 0;
@@ -7931,7 +7933,7 @@ bool bot_ai::OnGossipHello(Player* player, uint32 /*option*/)
     {
         if (IAmFree() && !IsWanderer())
         {
-            uint32 cost = BotMgr::GetNpcBotCost(player->GetLevel(), _botclass);
+            uint32 cost = BotMgr::GetNpcBotCostHire(player->GetLevel(), _botclass);
 
             int8 reason = 0;
             if (me->HasAura(BERSERK))
@@ -7972,6 +7974,8 @@ bool bot_ai::OnGossipHello(Player* player, uint32 /*option*/)
                 message1 << LocalizedNpcText(player, BOT_TEXT_HIREWARN_DEFAULT) << me->GetName() << '?';
                 message2 << LocalizedNpcText(player, BOT_TEXT_HIREOPTION_DEFAULT);
             }
+
+            message1 << "\n(" << BotMgr::GetNpcBotCostStr(player->GetLevel(), _botclass) << ")";
 
             if (!reason)
                 player->PlayerTalkClass->GetGossipMenu().AddMenuItem(-1, GOSSIP_ICON_TAXI, message2.str(), GOSSIP_SENDER_HIRE, GOSSIP_ACTION_INFO_DEF + 0, message1.str(), cost, false);
@@ -17961,6 +17965,26 @@ bool bot_ai::GlobalUpdate(uint32 diff)
     {
         _updateTimerEx2 = urand(2000, 4000);
 
+        //Rent Collecting
+        if (_rentTimer >= RENT_COLLECT_TIMER && BotMgr::GetNpcBotCostRent() && !HasBotCommandState(BOT_COMMAND_UNBIND) && !IAmFree())
+        {
+            uint32 rent_money = 0;
+            while (_rentTimer >= RENT_COLLECT_TIMER)
+            {
+                rent_money += uint32(uint64(BotMgr::GetNpcBotCostRent()) * (RENT_COLLECT_TIMER / 1000) / (RENT_TIMER / 1000));
+                _rentTimer -= RENT_COLLECT_TIMER;
+            }
+
+            rent_money = std::max<uint32>(rent_money, 1);
+            if (!master->HasEnoughMoney(rent_money))
+            {
+                ChatHandler(master->GetSession()).SendNotification(LocalizedNpcText(master, BOT_TEXT_HIREFAIL_COST).c_str());
+                master->GetBotMgr()->RemoveBot(me->GetGUID(), BOT_REMOVE_UNAFFORD);
+                return false;
+            }
+            master->ModifyMoney(-int32(rent_money));
+        }
+
         if (BotMgr::HideBotSpawns() && IAmFree() && !IsWanderer())
         {
             // !!bot may be out of world!!
@@ -18721,6 +18745,11 @@ void bot_ai::CommonTimers(uint32 diff)
 
     if (IAmFree())
         UpdateReviveTimer(diff);
+    else
+    {
+        if (BotMgr::GetNpcBotCostRent() && me->IsInWorld() && !HasBotCommandState(BOT_COMMAND_UNBIND))
+            _rentTimer += diff;
+    }
 
     if (me->IsInWorld())
     {

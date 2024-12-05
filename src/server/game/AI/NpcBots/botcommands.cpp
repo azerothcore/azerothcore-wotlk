@@ -3103,7 +3103,7 @@ public:
         }
         if (owner->GetBotMgr()->GetBotsHidden())
         {
-            handler->GetSession()->SendNotification("You can't do that while bots are hidden");
+            handler->SendNotification("You can't do that while bots are hidden");
             handler->SetSentErrorMessage(true);
             return false;
         }

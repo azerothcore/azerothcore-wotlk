@@ -53,6 +53,8 @@ enum BotCommonValues
     REVIVE_TIMER_SHORT                  = 60000, //1 Minute
     INOUTDOORS_ENSURE_TIMER             = 1500,
     BOT_GROUP_UPDATE_TIMER              = 2000,
+    RENT_TIMER                          = 3600000, //1 Hour
+    RENT_COLLECT_TIMER                  = 600000, //10 Minutes
 //VEHICLE CREATURES
     CREATURE_NEXUS_SKYTALON_1           = 32535, // [Q] Aces High
     CREATURE_EOE_SKYTALON_N             = 30161, // Eye of Eternity

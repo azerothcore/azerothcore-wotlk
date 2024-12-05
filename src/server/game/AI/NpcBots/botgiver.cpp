@@ -179,7 +179,7 @@ public:
 
                     uint8 botclass = action - GOSSIP_ACTION_INFO_DEF;
 
-                    uint32 cost = BotMgr::GetNpcBotCost(player->GetLevel(), botclass);
+                    uint32 cost = BotMgr::GetNpcBotCostHire(player->GetLevel(), botclass);
                     if (!player->HasEnoughMoney(cost))
                     {
                         WhisperTo(player, me, bot_ai::LocalizedNpcText(player, BOT_TEXT_HIREFAIL_COST).c_str());
