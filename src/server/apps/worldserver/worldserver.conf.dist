@@ -4704,12 +4704,19 @@ NpcBot.Limit.Raid    = 1
 NpcBot.HideSpawns = 1
 
 #
-#    NpcBot.Cost
-#        Description: Bot recruitment cost (in copper).
-#        Note:        This value is for level 80 characters, for lower levels cost is reduced.
-#        Default:     1000000 (100 gold)
+#    NpcBot.Cost.Hire
+#    NpcBot.Cost.Rent
+#        Description: Bot recruitment cost (in copper). Hire cost is the amount player has to pay
+#                     to recruit a bot. Rent cost is the amount player has to pay per 1 hour
+#                     to keep a bot with them, bot is automatically removed if player doesn't have
+#                     enough money to pay the rent cost.
+#        Note1:       Hire cost is for level 80 characters, for lower levels cost is reduced greatly
+#        Note2:       Rent is collected every 10 minutes so at least 6 copper per hour is taken
+#        Default:     1000000 - (NpcBot.Cost.Hire, 100 gold)
+#                     0       - (NpcBot.Cost.Rent)
 
-NpcBot.Cost = 1000000
+NpcBot.Cost.Hire = 1000000
+NpcBot.Cost.Rent = 0
 
 #
 #    NpcBot.UpdateDelay.Base

@@ -3101,6 +3101,12 @@ public:
             handler->SetSentErrorMessage(true);
             return false;
         }
+        if (owner->GetBotMgr()->GetBotsHidden())
+        {
+            handler->SendNotification("You can't do that while bots are hidden");
+            handler->SetSentErrorMessage(true);
+            return false;
+        }
         if (owner->GetBotMgr()->IsPartyInCombat(true))
         {
             handler->SendNotification("You can't do that while in PvP combat");
@@ -3179,7 +3185,7 @@ public:
         else if ((*factionStr)[0] == 'h')
             factionId = 1801; //Horde
         else if ((*factionStr)[0] == 'm')
-            factionId = 14; //Monsters
+            factionId = FACTION_TEMPLATE_NEUTRAL_HOSTILE; //Monsters
         else if ((*factionStr)[0] == 'f')
             factionId = 35; //Friendly to all
 
@@ -3365,8 +3371,7 @@ public:
 
             if (teamid)
             {
-                ChrRacesEntry const* rentry = sChrRacesStore.LookupEntry(race);
-                uint32 faction = rentry ? rentry->FactionID : 14;
+                uint32 faction = BotDataMgr::GetDefaultFactionForBotRace(race);
                 TeamId team = BotDataMgr::GetTeamIdForFaction(faction);
 
                 if (*teamid != uint8(team))

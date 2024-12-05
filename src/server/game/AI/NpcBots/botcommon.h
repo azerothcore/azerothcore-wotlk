@@ -53,6 +53,8 @@ enum BotCommonValues
     REVIVE_TIMER_SHORT                  = 60000, //1 Minute
     INOUTDOORS_ENSURE_TIMER             = 1500,
     BOT_GROUP_UPDATE_TIMER              = 2000,
+    RENT_TIMER                          = 3600000, //1 Hour
+    RENT_COLLECT_TIMER                  = 600000, //10 Minutes
 //VEHICLE CREATURES
     CREATURE_NEXUS_SKYTALON_1           = 32535, // [Q] Aces High
     CREATURE_EOE_SKYTALON_N             = 30161, // Eye of Eternity
@@ -132,7 +134,7 @@ enum BotCommonValues
 //COMMON GAMEEVENTS
     GAME_EVENT_WINTER_VEIL              = 2,
 //COMMON FACTIONS
-    FACTION_TEMPLATE_HATES_EVERYTHING_1 = 2150, //faction 966 - Monster spar buddy
+    FACTION_TEMPLATE_NEUTRAL_HOSTILE    = FACTION_CREATURE, // 2150 //Hates players and other bots, not attacked by guards
   //SOUNDS
     SOUND_FREEZE_IMPACT_WINDWALK        = 29,
     SOUND_AXE_2H_IMPACT_FLESH_CRIT      = 158,

@@ -111,7 +111,7 @@ class NearestHostileUnitCheck
         NearestHostileUnitCheck(NearestHostileUnitCheck const&) = delete;
         explicit NearestHostileUnitCheck(Unit const* unit, float dist, bool magic, bot_ai const* m_ai, bool targetCCed, bool withSecondary) :
         me(unit), m_range(dist), byspell(magic), ai(m_ai), AttackCCed(targetCCed), checkSecondary(withSecondary)
-        { free = ai->IAmFree(); berserk = free && (ai->IsWanderer() || unit->GetFaction() == 14); }
+        { free = ai->IAmFree(); berserk = free && (ai->IsWanderer() || unit->GetFaction() == FACTION_TEMPLATE_NEUTRAL_HOSTILE); }
         explicit NearestHostileUnitCheck(Unit const* unit, float dist, bool magic, bot_ai const* m_ai) :
         NearestHostileUnitCheck(unit, dist, magic, m_ai, true, false)
         {}
