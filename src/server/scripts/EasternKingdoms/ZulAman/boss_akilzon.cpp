@@ -21,6 +21,7 @@
 #include "GridNotifiersImpl.h"
 #include "ScriptedCreature.h"
 #include "SpellAuras.h"
+#include "SpellAuraEffects.h"
 #include "SpellScript.h"
 #include "SpellScriptLoader.h"
 #include "Weather.h"
