@@ -3371,8 +3371,7 @@ public:
 
             if (teamid)
             {
-                ChrRacesEntry const* rentry = sChrRacesStore.LookupEntry(race);
-                uint32 faction = rentry ? rentry->FactionID : FACTION_TEMPLATE_NEUTRAL_HOSTILE;
+                uint32 faction = BotDataMgr::GetDefaultFactionForBotRace(race);
                 TeamId team = BotDataMgr::GetTeamIdForFaction(faction);
 
                 if (*teamid != uint8(team))

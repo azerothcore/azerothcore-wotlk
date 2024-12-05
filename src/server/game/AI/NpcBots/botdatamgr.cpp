@@ -3226,7 +3226,7 @@ int32 BotDataMgr::GetBotBaseReputation(Creature const* bot, FactionEntry const* 
 uint32 BotDataMgr::GetDefaultFactionForBotRace(uint8 bot_race)
 {
     ChrRacesEntry const* rentry = sChrRacesStore.LookupEntry(bot_race);
-    return rentry ? rentry->FactionID : FACTION_TEMPLATE_NEUTRAL_HOSTILE;
+    return rentry ? rentry->FactionID : uint32(FACTION_TEMPLATE_NEUTRAL_HOSTILE);
 }
 
 TeamId BotDataMgr::GetTeamIdForFaction(uint32 factionTemplateId)

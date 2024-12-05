@@ -19360,7 +19360,7 @@ WanderNode const* bot_ai::GetNextWanderNode(Position const* fromPos, uint8 lvl, 
     if (me->IsFFAPvP())
     {
         ChrRacesEntry const* rentry = sChrRacesStore.LookupEntry(me->GetRace());
-        faction = (_botclass >= BOT_CLASS_EX_START) ? FACTION_TEMPLATE_NEUTRAL_HOSTILE : rentry ? rentry->FactionID : FACTION_TEMPLATE_NEUTRAL_HOSTILE;
+        faction = (_botclass >= BOT_CLASS_EX_START) ? uint32(FACTION_TEMPLATE_NEUTRAL_HOSTILE) : rentry ? rentry->FactionID : uint32(FACTION_TEMPLATE_NEUTRAL_HOSTILE);
     }
 
     //Node got deleted (or forced)! Select close point and go from there
