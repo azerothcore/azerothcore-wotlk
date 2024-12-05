@@ -2307,7 +2307,7 @@ bool Player::CanRequestSpellCast(SpellInfo const* spellInfo)
     // spell queue window, then we can't request a new spell cast
     for (CurrentSpellTypes spellSlot : { CURRENT_MELEE_SPELL, CURRENT_GENERIC_SPELL })
         if (Spell* spell = GetCurrentSpell(spellSlot))
-            if (spell->GetCastTimeRemaining() > static_cast<float>(GetSpellQueueWindow()))
+            if (spell->GetCastTimeRemaining() > static_cast<int32>(GetSpellQueueWindow()))
                 return false;
 
     return true;
