@@ -1369,16 +1369,12 @@ bool BotMgr::RestrictBots(Creature const* bot, bool add) const
 
 bool BotMgr::IsPartyInCombat(bool is_pvp) const
 {
-    std::vector<Unit*> members = GetAllGroupMembers(_owner);
-    if (members.empty())
-    {
-        members.reserve(_bots.size() + std::size_t(1));
-        members.push_back(_owner);
-        for (BotMap::const_iterator itr = _bots.begin(); itr != _bots.end(); ++itr)
-            members.push_back(itr->second);
-    }
-
-    return std::ranges::any_of(members, [=](Unit const* unit) { return unit->IsInCombat() && (!is_pvp || unit->GetCombatTimer() > 0); });
+    if (_owner->IsInCombat() && (!is_pvp || _owner->GetCombatTimer() > 0))
+        return true;
+    for (BotMap::const_iterator citr = _bots.cbegin(); citr != _bots.cend(); ++citr)
+        if (citr->second->IsInCombat() && (!is_pvp || citr->second->GetCombatTimer() > 0))
+            return true;
+    return false;
 }
 
 bool BotMgr::HasBotClass(uint8 botclass) const
