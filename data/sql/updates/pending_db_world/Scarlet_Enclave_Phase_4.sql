@@ -7,13 +7,13 @@ DELETE FROM `creature_addon` WHERE (`guid` IN (129709, 129724, 129726));
 DELETE FROM `creature` WHERE (`id1` = 28610) AND (`guid` IN (130036, 130015));
 DELETE FROM `creature_addon` WHERE (`guid` IN (130036, 130015));
 
-DELETE FROM `creature` WHERE (`id1` = 28936) AND (`guid` IN (129644, 129652));
-DELETE FROM `creature_addon` WHERE (`guid` IN (129644, 129652));
+DELETE FROM `creature` WHERE (`id1` = 28936) AND (`guid` IN (129644));
+DELETE FROM `creature_addon` WHERE (`guid` IN (129644));
 
 
 -- Adding Waypoints
 
-DELETE FROM `waypoint_data` WHERE `id` IN (12964600, 12965500, 12963900, 12964800, 12965100, 12965600, 12963800, 12964000, 12964900, 12965300, 12964300, 12965700, 12965400, 13000900, 12970200, 13001400, 12972200);
+DELETE FROM `waypoint_data` WHERE `id` IN (12964600, 12965500, 12963900, 12964800, 12965100, 12965600, 12963800, 12964000, 12964900, 12965300, 12964300, 12965700, 12965400, 13000900, 12970200, 13001400, 12972200, 12965200);
 INSERT INTO `waypoint_data` (`id`, `point`, `position_x`, `position_y`, `position_z`, `orientation`, `delay`, `move_type`, `action`, `action_chance`, `wpguid`) VALUES
 
 (12964600, 1, 1732.11, -5776.87, 115.589, NULL, 0, 0, 0, 100, 0),
@@ -401,7 +401,26 @@ INSERT INTO `waypoint_data` (`id`, `point`, `position_x`, `position_y`, `positio
 (12972200, 14, 1447.34, -5872.19, 131.214, NULL, 0, 0, 0, 100, 0),
 (12972200, 15, 1453.71, -5868.07, 131.214, NULL, 0, 0, 0, 100, 0),
 (12972200, 16, 1460.86, -5863.47, 131.254, NULL, 0, 0, 0, 100, 0),
-(12972200, 17, 1463.84, -5865.97, 131.358, NULL, 0, 0, 0, 100, 0);
+(12972200, 17, 1463.84, -5865.97, 131.358, NULL, 0, 0, 0, 100, 0),
+
+(12965200, 1, 1750.42, -5952.79, 116.165, NULL, 0, 0, 0, 100, 0),
+(12965200, 2, 1752.08, -5949.71, 116.137, NULL, 0, 0, 0, 100, 0),
+(12965200, 3, 1757.09, -5940.48, 116.12, NULL, 0, 0, 0, 100, 0),
+(12965200, 4, 1760.35, -5934.29, 116.119, NULL, 0, 0, 0, 100, 0),
+(12965200, 5, 1766.73, -5921.46, 116.12, NULL, 0, 0, 0, 100, 0),
+(12965200, 6, 1772.87, -5923.81, 116.113, NULL, 0, 0, 0, 100, 0),
+(12965200, 7, 1779.4, -5926.32, 116.119, NULL, 0, 0, 0, 100, 0),
+(12965200, 8, 1785.94, -5928.83, 116.123, NULL, 0, 0, 0, 100, 0),
+(12965200, 9, 1797.67, -5933.39, 115.997, NULL, 0, 0, 0, 100, 0),
+(12965200, 10, 1785.94, -5928.83, 116.123, NULL, 0, 0, 0, 100, 0),
+(12965200, 11, 1779.4, -5926.32, 116.119, NULL, 0, 0, 0, 100, 0),
+(12965200, 12, 1772.87, -5923.81, 116.113, NULL, 0, 0, 0, 100, 0),
+(12965200, 13, 1766.73, -5921.46, 116.12, NULL, 0, 0, 0, 100, 0),
+(12965200, 14, 1760.35, -5934.29, 116.119, NULL, 0, 0, 0, 100, 0),
+(12965200, 15, 1757.09, -5940.48, 116.12, NULL, 0, 0, 0, 100, 0),
+(12965200, 16, 1752.08, -5949.71, 116.137, NULL, 0, 0, 0, 100, 0),
+(12965200, 17, 1750.42, -5952.79, 116.165, NULL, 0, 0, 0, 100, 0),
+(12965200, 18, 1747.20, -5958.90, 116.26, NULL, 0, 0, 0, 100, 0);
 
 
 -- SCARLET COMMANDERS
@@ -420,15 +439,16 @@ UPDATE `creature` SET `position_x` = 1573.61, `position_y` = -5933.74, `position
 UPDATE `creature` SET `position_x` = 1475.07, `position_y` = -6122.79, `position_z` = 116.27, `orientation` = 1.8018 WHERE `guid` = 129643 AND `id1` = 28936;
 UPDATE `creature` SET `position_x` = 1652.36, `position_y` = -5975.49, `position_z` = 132.70, `orientation` = 1.5437 WHERE `guid` = 129656 AND `id1` = 28936;
 UPDATE `creature` SET `position_x` = 1570.41, `position_y` = -5776.94, `position_z` = 117.86, `orientation` = 3.2414 WHERE `guid` = 129638 AND `id1` = 28936;
+UPDATE `creature` SET `position_x` = 1747.20, `position_y` = -5958.90, `position_z` = 116.26, `orientation` = 0.9770 WHERE `guid` = 129652 AND `id1` = 28936;
 
 -- Wander Distance and Movement Type
 
-UPDATE `creature` SET `wander_distance` = 0, `MovementType` = 2 WHERE `guid` IN (129646, 129648, 129651, 129640, 129657, 129654, 129655, 129639, 129649, 129653, 129643, 129656, 129638, 129649) AND `id1` = 28936;
+UPDATE `creature` SET `wander_distance` = 0, `MovementType` = 2 WHERE `guid` IN (129646, 129648, 129651, 129640, 129657, 129654, 129655, 129639, 129649, 129653, 129643, 129656, 129638, 129649, 129652) AND `id1` = 28936;
 UPDATE `creature` SET `wander_distance` = 0, `MovementType` = 0 WHERE `guid` = 129645 AND `id1` = 28936;
 
 -- Paths
 
-DELETE FROM `creature_addon` WHERE (`guid` IN (129646, 129655, 129639, 129648, 129651, 129656, 129638, 129640, 129649, 129653, 129657, 129643, 129654));
+DELETE FROM `creature_addon` WHERE (`guid` IN (129646, 129655, 129639, 129648, 129651, 129656, 129638, 129640, 129649, 129653, 129657, 129643, 129654, 129652));
 INSERT INTO `creature_addon` (`guid`, `path_id`, `mount`, `bytes1`, `bytes2`, `emote`, `visibilityDistanceType`, `auras`) VALUES
 (129646, 12964600, 2404, 0, 1, 0, 0, ''),
 (129655, 12965500, 2404, 0, 1, 0, 0, ''),
@@ -442,7 +462,8 @@ INSERT INTO `creature_addon` (`guid`, `path_id`, `mount`, `bytes1`, `bytes2`, `e
 (129653, 12965300, 2404, 0, 1, 0, 0, ''),
 (129643, 12964300, 2404, 0, 1, 0, 0, ''),
 (129657, 12965700, 2404, 0, 1, 0, 0, ''),
-(129654, 12965400, 2404, 0, 1, 0, 0, '');
+(129654, 12965400, 2404, 0, 1, 0, 0, ''),
+(129652, 12965200, 2404, 0, 1, 0, 0, '');
 
 
 -- SCARLET PREACHERS
@@ -457,17 +478,18 @@ UPDATE `creature` SET `position_x` = 1726.44, `position_y` = -5871.98, `position
 UPDATE `creature` SET `position_x` = 1573.61, `position_y` = -5933.74, `position_z` = 119.60, `orientation` = 3.9996 WHERE `guid` = 129681 AND `id1` = 28939;
 UPDATE `creature` SET `position_x` = 1475.07, `position_y` = -6122.79, `position_z` = 116.27, `orientation` = 1.8018 WHERE `guid` = 129667 AND `id1` = 28939;
 UPDATE `creature` SET `position_x` = 1652.36, `position_y` = -5975.49, `position_z` = 132.70, `orientation` = 1.5437 WHERE `guid` = 129678 AND `id1` = 28939;
-UPDATE `creature` SET `position_x` = 1608.16, `position_y` = -5911.04, `position_z` = 116.14, `orientation` = 2.9603 WHERE `guid` = 129671 AND `id1` = 28939;
 UPDATE `creature` SET `position_x` = 1570.41, `position_y` = -5776.94, `position_z` = 117.86, `orientation` = 3.2414 WHERE `guid` = 129679 AND `id1` = 28939;
+UPDATE `creature` SET `position_x` = 1747.20, `position_y` = -5958.90, `position_z` = 116.26, `orientation` = 0.9770 WHERE `guid` = 129680 AND `id1` = 28939;
+UPDATE `creature` SET `position_x` = 1608.16, `position_y` = -5911.04, `position_z` = 116.14, `orientation` = 2.9603 WHERE `guid` = 129671 AND `id1` = 28939;
 
 -- Wander Distance and Movement Type
 
-UPDATE `creature` SET `wander_distance` = 0, `MovementType` = 2 WHERE `guid` IN (129674, 129675, 129672, 129677, 129673, 129681, 129667, 129678, 129671, 129679) AND `id1` = 28939;
+UPDATE `creature` SET `wander_distance` = 0, `MovementType` = 2 WHERE `guid` IN (129674, 129675, 129672, 129677, 129673, 129681, 129667, 129678, 129671, 129679, 129680) AND `id1` = 28939;
 
 
 -- Paths
 
-DELETE FROM `creature_addon` WHERE (`guid` IN (129677, 129673, 129674, 129672, 129675, 129678, 129679, 129671, 129681, 129667));
+DELETE FROM `creature_addon` WHERE (`guid` IN (129677, 129673, 129674, 129672, 129675, 129678, 129679, 129671, 129681, 129667, 129680));
 INSERT INTO `creature_addon` (`guid`, `path_id`, `mount`, `bytes1`, `bytes2`, `emote`, `visibilityDistanceType`, `auras`) VALUES
 (129677, 12964600, 0, 0, 1, 0, 0, ''),
 (129673, 12965500, 0, 0, 1, 0, 0, ''),
@@ -478,7 +500,8 @@ INSERT INTO `creature_addon` (`guid`, `path_id`, `mount`, `bytes1`, `bytes2`, `e
 (129679, 12963800, 0, 0, 1, 0, 0, ''),
 (129671, 12964000, 0, 0, 1, 0, 0, ''),
 (129681, 12965300, 0, 0, 1, 0, 0, ''),
-(129667, 12964300, 0, 0, 1, 0, 0, '');
+(129667, 12964300, 0, 0, 1, 0, 0, ''),
+(129680, 12965200, 0, 0, 1, 0, 0, '');
 
 
 -- SCARLET CRUSADERS
@@ -512,48 +535,52 @@ UPDATE `creature_addon` SET `path_id` = 13001400, `auras` = 52103 WHERE (`guid` 
 
 -- Random Spawn for Scarlet Commanders/Preachers with Waypoints
 
-DELETE FROM `pool_template` WHERE (`entry` IN (22346, 22347, 22348, 22349, 22350, 22351, 22352, 22353, 22354, 22355));
+DELETE FROM `pool_template` WHERE (`entry` IN (22346, 22347, 22348, 22349, 22350, 22351, 22352, 22353, 22354, 22355, 22356));
 INSERT INTO `pool_template` (`entry`, `max_limit`, `description`) VALUES 
-(22346, 1, 'Scarlet Commander/Preacher Spawn (1 out 10)'),
-(22347, 1, 'Scarlet Commander/Preacher Spawn (2 out 10)'),
-(22348, 1, 'Scarlet Commander/Preacher Spawn (3 out 10)'),
-(22349, 1, 'Scarlet Commander/Preacher Spawn (4 out 10)'),
-(22350, 1, 'Scarlet Commander/Preacher Spawn (5 out 10)'),
-(22351, 1, 'Scarlet Commander/Preacher Spawn (6 out 10)'),
-(22352, 1, 'Scarlet Commander/Preacher Spawn (7 out 10)'),
-(22353, 1, 'Scarlet Commander/Preacher Spawn (8 out 10)'),
-(22354, 1, 'Scarlet Commander/Preacher Spawn (9 out 10)'),
-(22355, 1, 'Scarlet Commander/Preacher Spawn (10 out 10)');
+(22346, 1, 'Scarlet Commander/Preacher Spawn (1 out 11)'),
+(22347, 1, 'Scarlet Commander/Preacher Spawn (2 out 11)'),
+(22348, 1, 'Scarlet Commander/Preacher Spawn (3 out 11)'),
+(22349, 1, 'Scarlet Commander/Preacher Spawn (4 out 11)'),
+(22350, 1, 'Scarlet Commander/Preacher Spawn (5 out 11)'),
+(22351, 1, 'Scarlet Commander/Preacher Spawn (6 out 11)'),
+(22352, 1, 'Scarlet Commander/Preacher Spawn (7 out 11)'),
+(22353, 1, 'Scarlet Commander/Preacher Spawn (8 out 11)'),
+(22354, 1, 'Scarlet Commander/Preacher Spawn (9 out 11)'),
+(22355, 1, 'Scarlet Commander/Preacher Spawn (10 out 11)'),
+(22356, 1, 'Scarlet Commander/Preacher Spawn (11 out 11)');
 
 
-DELETE FROM `pool_creature` WHERE (`guid` IN (129656, 129678, 129655, 129673, 129639, 129674, 129646, 129677, 129651, 129675, 129648, 129672, 129638, 129679, 129640, 129671, 129653, 129681, 129643, 129667));
+DELETE FROM `pool_creature` WHERE (`guid` IN (129656, 129678, 129655, 129673, 129639, 129674, 129646, 129677, 129651, 129675, 129648, 129672, 129638, 129679, 129640, 129671, 129653, 129681, 129643, 129667, 129652, 129680));
 INSERT INTO `pool_creature` (`guid`, `pool_entry`, `chance`, `description`) VALUES 
-(129656, 22346, 0, 'Scarlet Commander (28936) (1 out 10)'),
-(129678, 22346, 0, 'Scarlet Preacher (28939) (1 out 10)'),
+(129656, 22346, 0, 'Scarlet Commander (28936) (1 out 11)'),
+(129678, 22346, 0, 'Scarlet Preacher (28939) (1 out 11)'),
 
-(129655, 22347, 0, 'Scarlet Commander (28936) (2 out 10)'),
-(129673, 22347, 0, 'Scarlet Preacher (28939) (2 out 10)'),
+(129655, 22347, 0, 'Scarlet Commander (28936) (2 out 11)'),
+(129673, 22347, 0, 'Scarlet Preacher (28939) (2 out 11)'),
 
-(129639, 22348, 0, 'Scarlet Commander (28936) (3 out 10)'),
-(129674, 22348, 0, 'Scarlet Preacher (28939) (3 out 10)'),
+(129639, 22348, 0, 'Scarlet Commander (28936) (3 out 11)'),
+(129674, 22348, 0, 'Scarlet Preacher (28939) (3 out 11)'),
 
-(129646, 22349, 0, 'Scarlet Commander (28936) (4 out 10)'),
-(129677, 22349, 0, 'Scarlet Preacher (28939) (4 out 10)'),
+(129646, 22349, 0, 'Scarlet Commander (28936) (4 out 11)'),
+(129677, 22349, 0, 'Scarlet Preacher (28939) (4 out 11)'),
 
-(129651, 22350, 0, 'Scarlet Commander (28936) (5 out 10)'),
-(129675, 22350, 0, 'Scarlet Preacher (28939) (5 out 10)'),
+(129651, 22350, 0, 'Scarlet Commander (28936) (5 out 11)'),
+(129675, 22350, 0, 'Scarlet Preacher (28939) (5 out 11)'),
 
-(129648, 22351, 0, 'Scarlet Commander (28936) (6 out 10)'),
-(129672, 22351, 0, 'Scarlet Preacher (28939) (6 out 10)'),
+(129648, 22351, 0, 'Scarlet Commander (28936) (6 out 11)'),
+(129672, 22351, 0, 'Scarlet Preacher (28939) (6 out 11)'),
 
-(129638, 22352, 0, 'Scarlet Commander (28936) (7 out 10)'),
-(129679, 22352, 0, 'Scarlet Preacher (28939) (7 out 10)'),
+(129638, 22352, 0, 'Scarlet Commander (28936) (7 out 11)'),
+(129679, 22352, 0, 'Scarlet Preacher (28939) (7 out 11)'),
 
-(129640, 22353, 0, 'Scarlet Commander (28936) (8 out 10)'),
-(129671, 22353, 0, 'Scarlet Preacher (28939) (8 out 10)'),
+(129640, 22353, 0, 'Scarlet Commander (28936) (8 out 11)'),
+(129671, 22353, 0, 'Scarlet Preacher (28939) (8 out 11)'),
 
-(129653, 22354, 0, 'Scarlet Commander (28936) (9 out 10)'),
-(129681, 22354, 0, 'Scarlet Preacher (28939) (9 out 10)'),
+(129653, 22354, 0, 'Scarlet Commander (28936) (9 out 11)'),
+(129681, 22354, 0, 'Scarlet Preacher (28939) (9 out 11)'),
 
-(129643, 22355, 0, 'Scarlet Commander (28936) (10 out 10)'),
-(129667, 22355, 0, 'Scarlet Preacher (28939) (10 out 10)');
+(129643, 22355, 0, 'Scarlet Commander (28936) (10 out 11)'),
+(129667, 22355, 0, 'Scarlet Preacher (28939) (10 out 11)'),
+
+(129652, 22356, 0, 'Scarlet Commander (28936) (11 out 11)'),
+(129680, 22356, 0, 'Scarlet Preacher (28939) (11 out 11)');
