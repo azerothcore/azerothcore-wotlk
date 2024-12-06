@@ -1,3 +1,4 @@
+-- DB update 2024_12_05_00 -> 2024_12_06_00
 
 -- Delete unofficial npcs
 
