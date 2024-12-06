@@ -20,6 +20,8 @@
 #include "GridNotifiers.h"
 #include "GridNotifiersImpl.h"
 #include "ScriptedCreature.h"
+#include "SpellAuras.h"
+#include "SpellAuraEffects.h"
 #include "SpellScript.h"
 #include "SpellScriptLoader.h"
 #include "Weather.h"
@@ -53,7 +55,8 @@ enum Says
 enum Misc
 {
     ACTION_STORM_EXPIRE         = 1,
-    GROUP_ELECTRICAL_STORM      = 1
+    GROUP_ELECTRICAL_STORM      = 1,
+    GROUP_STATIC_DISRUPTION     = 2
 };
 
 constexpr auto NPC_SOARING_EAGLE = 24858;
@@ -79,7 +82,8 @@ struct boss_akilzon : public BossAI
     {
         _JustEngagedWith();
 
-        ScheduleTimedEvent(10s, 20s, [&] {
+        scheduler.Schedule(10s, 20s, GROUP_STATIC_DISRUPTION, [this](TaskContext context)
+        {
             Unit* target = SelectTarget(SelectTargetMethod::Random, 1);
             if (!target)
                 target = me->GetVictim();
@@ -89,7 +93,9 @@ struct boss_akilzon : public BossAI
                 DoCast(target, SPELL_STATIC_DISRUPTION, false);
                 me->SetInFront(me->GetVictim());
             }
-        }, 10s, 18s);
+
+            context.Repeat(10s, 18s);
+        });
 
         ScheduleTimedEvent(20s, 30s, [&] {
             if (scheduler.GetNextGroupOcurrence(GROUP_ELECTRICAL_STORM) > 5s)
@@ -175,6 +181,7 @@ struct boss_akilzon : public BossAI
     {
         if (actionId == ACTION_STORM_EXPIRE)
         {
+            scheduler.DelayGroup(GROUP_STATIC_DISRUPTION, 3s);
             me->m_Events.AddEventAtOffset([&] {
                 SummonEagles();
             }, 5s);
@@ -316,9 +323,30 @@ class spell_electrial_storm : public AuraScript
     }
 };
 
+// 43657 - Electrical Storm
+class spell_electrical_storm_proc : public SpellScript
+{
+    PrepareSpellScript(spell_electrical_storm_proc);
+
+    void HandleDamageCalc(SpellEffIndex /*effIndex*/)
+    {
+        if (Aura* aura = GetCaster()->GetAura(SPELL_ELECTRICAL_STORM))
+        {
+            uint8 multiplier = aura->GetEffect(EFFECT_1)->GetTickNumber();
+            SetHitDamage(GetHitDamage() * multiplier);
+        }
+    }
+
+    void Register() override
+    {
+        OnEffectHitTarget += SpellEffectFn(spell_electrical_storm_proc::HandleDamageCalc, EFFECT_0, SPELL_EFFECT_SCHOOL_DAMAGE);
+    }
+};
+
 void AddSC_boss_akilzon()
 {
     RegisterZulAmanCreatureAI(boss_akilzon);
     RegisterZulAmanCreatureAI(npc_akilzon_eagle);
     RegisterSpellScript(spell_electrial_storm);
+    RegisterSpellScript(spell_electrical_storm_proc);
 }

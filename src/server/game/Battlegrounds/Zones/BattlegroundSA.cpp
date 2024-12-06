@@ -534,7 +534,7 @@ void BattlegroundSA::TeleportPlayers()
         if (Player* player = itr->second)
         {
             // should remove spirit of redemption
-            if (player->HasAuraType(SPELL_AURA_SPIRIT_OF_REDEMPTION))
+            if (player->HasSpiritOfRedemptionAura())
                 player->RemoveAurasByType(SPELL_AURA_MOD_SHAPESHIFT);
 
             if (!player->IsAlive())

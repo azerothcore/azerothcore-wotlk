@@ -66,182 +66,161 @@ enum eEvents
     EVENT_MATE_DIED
 };
 
-class boss_skarvald_the_constructor : public CreatureScript
+struct boss_skarvald_the_constructor : public ScriptedAI
 {
-public:
-    boss_skarvald_the_constructor() : CreatureScript("boss_skarvald_the_constructor") { }
-
-    CreatureAI* GetAI(Creature* pCreature) const override
+    boss_skarvald_the_constructor(Creature* c) : ScriptedAI(c)
     {
-        return GetUtgardeKeepAI<boss_skarvald_the_constructorAI>(pCreature);
+        pInstance = c->GetInstanceScript();
     }
 
-    struct boss_skarvald_the_constructorAI : public ScriptedAI
+    InstanceScript* pInstance;
+    EventMap events;
+
+    void Reset() override
     {
-        boss_skarvald_the_constructorAI(Creature* c) : ScriptedAI(c)
+        me->SetLootMode(0);
+        events.Reset();
+        if (me->GetEntry() == NPC_SKARVALD)
         {
-            pInstance = c->GetInstanceScript();
-        }
-
-        InstanceScript* pInstance;
-        EventMap events;
-
-        void Reset() override
-        {
-            me->SetLootMode(0);
-            events.Reset();
-            if (me->GetEntry() == NPC_SKARVALD)
-            {
-                if (pInstance)
-                {
-                    pInstance->SetData(DATA_DALRONN_AND_SKARVALD, NOT_STARTED);
-                }
-            }
-            else // NPC_SKARVALD_GHOST
-            {
-                if (Unit* target = me->SelectNearestTarget(50.0f))
-                {
-                    me->AddThreat(target, 0.0f);
-                    AttackStart(target);
-                }
-            }
-        }
-
-        void DoAction(int32 param) override
-        {
-            switch (param)
-            {
-                case 1:
-                    events.RescheduleEvent(EVENT_MATE_DIED, 3500ms);
-                    break;
-            }
-        }
-
-        void JustEngagedWith(Unit* who) override
-        {
-            events.Reset();
-            events.RescheduleEvent(EVENT_SHARVALD_CHARGE, 5s);
-            events.RescheduleEvent(EVENT_STONE_STRIKE, 10s);
-            if (me->GetEntry() == NPC_SKARVALD)
-            {
-                Talk(YELL_SKARVALD_AGGRO);
-                if (IsHeroic())
-                {
-                    events.ScheduleEvent(EVENT_ENRAGE, 1s);
-                }
-            }
             if (pInstance)
             {
-                pInstance->SetData(DATA_DALRONN_AND_SKARVALD, IN_PROGRESS);
-                if (Creature* dalronn = pInstance->instance->GetCreature(pInstance->GetGuidData(DATA_DALRONN)))
+                pInstance->SetData(DATA_DALRONN_AND_SKARVALD, NOT_STARTED);
+            }
+        }
+        else // NPC_SKARVALD_GHOST
+        {
+            if (Unit* target = me->SelectNearestTarget(50.0f))
+            {
+                me->AddThreat(target, 0.0f);
+                AttackStart(target);
+            }
+        }
+    }
+
+    void DoAction(int32 param) override
+    {
+        switch (param)
+        {
+        case 1:
+            events.RescheduleEvent(EVENT_MATE_DIED, 3500ms);
+            break;
+        }
+    }
+
+    void JustEngagedWith(Unit* who) override
+    {
+        events.Reset();
+        events.RescheduleEvent(EVENT_SHARVALD_CHARGE, 5s);
+        events.RescheduleEvent(EVENT_STONE_STRIKE, 10s);
+        if (me->GetEntry() == NPC_SKARVALD)
+        {
+            Talk(YELL_SKARVALD_AGGRO);
+            if (IsHeroic())
+            {
+                events.ScheduleEvent(EVENT_ENRAGE, 1s);
+            }
+        }
+        if (pInstance)
+        {
+            pInstance->SetData(DATA_DALRONN_AND_SKARVALD, IN_PROGRESS);
+            if (Creature* dalronn = pInstance->instance->GetCreature(pInstance->GetGuidData(DATA_DALRONN)))
+            {
+                if (!dalronn->IsInCombat() && who)
                 {
-                    if (!dalronn->IsInCombat() && who)
-                    {
-                        dalronn->AddThreat(who, 0.0f);
-                        dalronn->AI()->AttackStart(who);
-                    }
+                    dalronn->AddThreat(who, 0.0f);
+                    dalronn->AI()->AttackStart(who);
                 }
             }
         }
+    }
 
-        void KilledUnit(Unit* /*victim*/) override
+    void KilledUnit(Unit* /*victim*/) override
+    {
+        if (me->GetEntry() == NPC_SKARVALD)
         {
-            if (me->GetEntry() == NPC_SKARVALD)
-            {
-                Talk(YELL_SKARVALD_KILL);
-            }
+            Talk(YELL_SKARVALD_KILL);
         }
+    }
 
-        void JustDied(Unit*  /*Killer*/) override
+    void JustDied(Unit*  /*Killer*/) override
+    {
+        if (me->GetEntry() != NPC_SKARVALD)
+            return;
+
+        if (pInstance)
         {
-            if (me->GetEntry() != NPC_SKARVALD)
-                return;
-
-            if (pInstance)
+            if (Creature* dalronn = pInstance->instance->GetCreature(pInstance->GetGuidData(DATA_DALRONN)))
             {
-                if (Creature* dalronn = pInstance->instance->GetCreature(pInstance->GetGuidData(DATA_DALRONN)))
+                if (dalronn->isDead())
                 {
-                    if (dalronn->isDead())
-                    {
-                        Talk(YELL_SKARVALD_SKA_DIEDFIRST);
-                        pInstance->SetData(DATA_DALRONN_AND_SKARVALD, DONE);
-                        pInstance->SetData(DATA_UNLOCK_SKARVALD_LOOT, 0);
-                        return;
-                    }
-                    else
-                    {
-                        Talk(YELL_SKARVALD_DAL_DIED);
-                        dalronn->AI()->DoAction(1);
-                    }
+                    Talk(YELL_SKARVALD_SKA_DIEDFIRST);
+                    pInstance->SetData(DATA_DALRONN_AND_SKARVALD, DONE);
+                    pInstance->SetData(DATA_UNLOCK_SKARVALD_LOOT, 0);
+                    return;
+                }
+                else
+                {
+                    Talk(YELL_SKARVALD_DAL_DIED);
+                    dalronn->AI()->DoAction(1);
                 }
             }
-            me->CastSpell((Unit*)nullptr, SPELL_SUMMON_SKARVALD_GHOST, true);
         }
+        me->CastSpell((Unit*)nullptr, SPELL_SUMMON_SKARVALD_GHOST, true);
+    }
 
-        void UpdateAI(uint32 diff) override
+    void UpdateAI(uint32 diff) override
+    {
+        if (!UpdateVictim())
+            return;
+
+        events.Update(diff);
+
+        if (me->HasUnitState(UNIT_STATE_CASTING))
+            return;
+
+        switch (events.ExecuteEvent())
         {
-            if (!UpdateVictim())
-                return;
-
-            events.Update(diff);
-
-            if (me->HasUnitState(UNIT_STATE_CASTING))
-                return;
-
-            switch (events.ExecuteEvent())
+        case 0:
+            break;
+        case EVENT_MATE_DIED:
+            Talk(YELL_SKARVALD_DAL_DIEDFIRST);
+            break;
+        case EVENT_SHARVALD_CHARGE:
+            if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, (IsHeroic() ? 100.0f : 30.0f), true))
             {
-                case 0:
-                    break;
-                case EVENT_MATE_DIED:
-                    Talk(YELL_SKARVALD_DAL_DIEDFIRST);
-                    break;
-                case EVENT_SHARVALD_CHARGE:
-                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, (IsHeroic() ? 100.0f : 30.0f), true))
-                    {
-                        DoResetThreatList();
-                        me->AddThreat(target, 10000.0f);
-                        me->CastSpell(target, SPELL_CHARGE, false);
-                    }
-                    events.Repeat(5s, 10s);
-                    break;
-                case EVENT_STONE_STRIKE:
-                    if (me->GetVictim() && me->IsWithinMeleeRange(me->GetVictim()))
-                    {
-                        me->CastSpell(me->GetVictim(), SPELL_STONE_STRIKE, false);
-                        events.Repeat(5s, 10s);
-                    }
-                    else
-                    {
-                        events.Repeat(3s);
-                    }
-                    break;
-                case EVENT_ENRAGE:
-                    if (me->GetHealthPct() <= 60)
-                    {
-                        me->CastSpell(me, SPELL_ENRAGE, true);
-                        break;
-                    }
-                    events.Repeat(1s);
-                    break;
+                DoResetThreatList();
+                me->AddThreat(target, 10000.0f);
+                me->CastSpell(target, SPELL_CHARGE, false);
             }
-            DoMeleeAttackIfReady();
+            events.Repeat(5s, 10s);
+            break;
+        case EVENT_STONE_STRIKE:
+            if (me->GetVictim() && me->IsWithinMeleeRange(me->GetVictim()))
+            {
+                me->CastSpell(me->GetVictim(), SPELL_STONE_STRIKE, false);
+                events.Repeat(5s, 10s);
+            }
+            else
+            {
+                events.Repeat(3s);
+            }
+            break;
+        case EVENT_ENRAGE:
+            if (me->GetHealthPct() <= 60)
+            {
+                me->CastSpell(me, SPELL_ENRAGE, true);
+                break;
+            }
+            events.Repeat(1s);
+            break;
         }
-    };
+        DoMeleeAttackIfReady();
+    }
 };
 
-class boss_dalronn_the_controller : public CreatureScript
-{
-public:
-    boss_dalronn_the_controller() : CreatureScript("boss_dalronn_the_controller") { }
-
-    CreatureAI* GetAI(Creature* pCreature) const override
+struct boss_dalronn_the_controller : public ScriptedAI
     {
-        return GetUtgardeKeepAI<boss_dalronn_the_controllerAI>(pCreature);
-    }
-
-    struct boss_dalronn_the_controllerAI : public ScriptedAI
-    {
-        boss_dalronn_the_controllerAI(Creature* c) : ScriptedAI(c), summons(me)
+        boss_dalronn_the_controller(Creature* c) : ScriptedAI(c), summons(me)
         {
             pInstance = c->GetInstanceScript();
         }
@@ -397,10 +376,9 @@ public:
             DoMeleeAttackIfReady();
         }
     };
-};
 
 void AddSC_boss_skarvald_dalronn()
 {
-    new boss_skarvald_the_constructor();
-    new boss_dalronn_the_controller();
+    RegisterUtgardeKeepCreatureAI(boss_skarvald_the_constructor);
+    RegisterUtgardeKeepCreatureAI(boss_dalronn_the_controller);
 }
