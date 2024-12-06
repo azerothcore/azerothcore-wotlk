@@ -95,7 +95,7 @@ void WorldSession::HandleUseItemOpcode(WorldPacket& recvPacket)
     }
 
     // fail if we are cancelling pending request
-    if (_player->SpellQueue.size())
+    if (!_player->SpellQueue.empty())
     {
         PendingSpellCastRequest& request = _player->SpellQueue.front(); // Peek at the first spell
         if (request.cancelInProgress)
@@ -405,7 +405,7 @@ void WorldSession::HandleCastSpellOpcode(WorldPacket& recvPacket)
     }
 
     // fail if we are cancelling pending request
-    if (_player->SpellQueue.size())
+    if (!_player->SpellQueue.empty())
     {
         PendingSpellCastRequest& request = _player->SpellQueue.front(); // Peek at the first spell
         if (request.cancelInProgress)
