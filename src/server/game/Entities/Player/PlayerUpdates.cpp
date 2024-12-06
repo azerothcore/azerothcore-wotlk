@@ -2331,7 +2331,7 @@ void Player::ProcessSpellQueue()
 {
     while (!SpellQueue.empty())
     {
-        auto& request = SpellQueue.front(); // Peek at the first spell
+        PendingSpellCastRequest& request = SpellQueue.front(); // Peek at the first spell
         SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(request.spellId);
         if (CanExecutePendingSpellCastRequest(spellInfo))
         {
