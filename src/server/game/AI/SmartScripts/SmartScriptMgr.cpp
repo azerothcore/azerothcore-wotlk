@@ -908,7 +908,7 @@ bool SmartAIMgr::CheckUnusedTargetParams(SmartScriptHolder const& e)
             case SMART_TARGET_GAMEOBJECT_RANGE: return sizeof(SmartTarget::goRange);
             case SMART_TARGET_GAMEOBJECT_GUID: return sizeof(SmartTarget::goGUID);
             case SMART_TARGET_GAMEOBJECT_DISTANCE: return sizeof(SmartTarget::goDistance);
-            case SMART_TARGET_INVOKER_PARTY: return NO_PARAMS;
+            case SMART_TARGET_INVOKER_PARTY: return sizeof(SmartTarget::invokerParty);
             case SMART_TARGET_PLAYER_RANGE: return sizeof(SmartTarget::playerRange);
             case SMART_TARGET_PLAYER_DISTANCE: return sizeof(SmartTarget::playerDistance);
             case SMART_TARGET_CLOSEST_CREATURE: return sizeof(SmartTarget::unitClosest);

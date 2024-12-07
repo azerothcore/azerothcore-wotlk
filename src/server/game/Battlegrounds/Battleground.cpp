@@ -951,7 +951,7 @@ void Battleground::EndBattleground(PvPTeamId winnerTeamId)
         TeamId bgTeamId = player->GetBgTeamId();
 
         // should remove spirit of redemption
-        if (player->HasAuraType(SPELL_AURA_SPIRIT_OF_REDEMPTION))
+        if (player->HasSpiritOfRedemptionAura())
             player->RemoveAurasByType(SPELL_AURA_MOD_SHAPESHIFT);
 
         if (!player->IsAlive())
@@ -1124,7 +1124,7 @@ void Battleground::RemovePlayerAtLeave(Player* player)
     RemovePlayer(player);
 
     // should remove spirit of redemption
-    if (player->HasAuraType(SPELL_AURA_SPIRIT_OF_REDEMPTION))
+    if (player->HasSpiritOfRedemptionAura())
         player->RemoveAurasByType(SPELL_AURA_MOD_SHAPESHIFT);
 
     // if the player was a match participant

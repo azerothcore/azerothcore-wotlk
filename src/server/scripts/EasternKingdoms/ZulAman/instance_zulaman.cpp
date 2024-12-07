@@ -53,16 +53,16 @@ DoorData const doorData[] =
     { GO_DOOR_HALAZZI,         DATA_HALAZZI, DOOR_TYPE_PASSAGE },
     { GO_LYNX_TEMPLE_ENTRANCE, DATA_HALAZZI, DOOR_TYPE_ROOM    },
     { GO_DOOR_AKILZON,         DATA_AKILZON, DOOR_TYPE_ROOM    },
-    { GO_GATE_ZULJIN,          DATA_HEXLORD, DOOR_TYPE_PASSAGE },
     { 0,                       0,            DOOR_TYPE_ROOM    } // END
 };
 
 ObjectData const creatureData[] =
 {
-    { NPC_JANALAI,        DATA_JANALAI        },
-    { NPC_SPIRIT_LYNX,    DATA_SPIRIT_LYNX    },
-    { NPC_HARRISON_JONES, DATA_HARRISON_JONES },
-    { 0,                  0                   }
+    { NPC_JANALAI,          DATA_JANALAI        },
+    { NPC_SPIRIT_LYNX,      DATA_SPIRIT_LYNX    },
+    { NPC_HARRISON_JONES,   DATA_HARRISON_JONES },
+    { NPC_AMINISHI_LOOKOUT, DATA_LOOKOUT        },
+    { 0,                    0                   }
 };
 
 ObjectData const gameObjectData[] =
@@ -70,6 +70,7 @@ ObjectData const gameObjectData[] =
     { GO_STRANGE_GONG, DATA_STRANGE_GONG },
     { GO_MASSIVE_GATE, DATA_MASSIVE_GATE },
     { GO_GATE_HEXLORD, DATA_HEXLORD_GATE },
+    { GO_GATE_ZULJIN,  DATA_ZULJIN_GATE  },
     { 0,               0                 }
 };
 
@@ -111,6 +112,29 @@ public:
         {
             if (!scheduler.IsGroupScheduled(GROUP_TIMED_RUN))
                 DoAction(ACTION_START_TIMED_RUN);
+        }
+
+        void OnCreatureCreate(Creature* creature) override
+        {
+            switch (creature->GetEntry())
+            {
+                // Akil'zon gauntlet
+                case NPC_AMINISHI_TEMPEST:
+                    if (creature->GetPositionZ() >= 50.0f) // excludes Tempest in Hexlord Malacrass' trash
+                        AkilzonTrash.insert(creature->GetGUID());
+                    break;
+                case NPC_AMINISHI_LOOKOUT:
+                case NPC_AMINISHI_PROTECTOR:
+                case NPC_EAGLE_TRASH_AGGRO_TRIGGER:
+                    AkilzonTrash.insert(creature->GetGUID());
+                    break;
+                case NPC_AMANISHI_WIND_WALKER:
+                    if (creature->GetPositionZ() >= 26.0f) // excludes Wind Walker in first patrol
+                        AkilzonTrash.insert(creature->GetGUID());
+                    break;
+            }
+
+            InstanceScript::OnCreatureCreate(creature);
         }
 
         void OnGameObjectCreate(GameObject* go) override
@@ -167,6 +191,61 @@ public:
                 RandVendor[0] = data;
             else if (type == TYPE_RAND_VENDOR_2)
                 RandVendor[1] = data;
+            else if (type == TYPE_AKILZON_GAUNTLET)
+            {
+                if (data == IN_PROGRESS)
+                    StartAkilzonGauntlet();
+                else if (data == NOT_STARTED)
+                    ResetAkilzonGauntlet();
+                else if (data == DONE)
+                    _akilzonGauntlet = DONE;
+            }
+        }
+
+        void StartAkilzonGauntlet()
+        {
+            _akilzonGauntlet = IN_PROGRESS;
+            for (ObjectGuid const& guid : AkilzonTrash)
+                if (Creature* creature = instance->GetCreature(guid))
+                    switch (creature->GetEntry())
+                    {
+                        case NPC_EAGLE_TRASH_AGGRO_TRIGGER:
+                            creature->DisappearAndDie();
+                            break;
+                        case NPC_AMINISHI_LOOKOUT:
+                        case NPC_AMINISHI_TEMPEST:
+                            creature->AI()->DoAction(ACTION_START_AKILZON_GAUNTLET);
+                            break;
+                        default:
+                            break;
+                    }
+        }
+
+        void ResetAkilzonGauntlet()
+        {
+            _akilzonGauntlet = NOT_STARTED;
+            for (ObjectGuid guid : AkilzonTrash)
+                if (Creature* creature = instance->GetCreature(guid))
+                    if (!creature->IsAlive())
+                        creature->Respawn();
+            if (Creature* creature = GetCreature(DATA_LOOKOUT))
+                if (creature->isMoving())
+                    creature->Respawn(true);
+        }
+
+        void OnCreatureEvade(Creature* creature) override
+        {
+            switch (creature->GetEntry())
+            {
+                case NPC_AMINISHI_TEMPEST:
+                case NPC_AMINISHI_PROTECTOR:
+                case NPC_AMANISHI_WIND_WALKER:
+                    if (AkilzonTrash.contains(creature->GetGUID()))
+                        ResetAkilzonGauntlet();
+                    break;
+                default:
+                    break;
+            }
         }
 
         bool SetBossState(uint32 type, EncounterState state) override
@@ -211,6 +290,11 @@ public:
                         HandleGameObject(ObjectGuid::Empty, false, GetGameObject(DATA_HEXLORD_GATE));
                     else if (state == NOT_STARTED)
                         CheckInstanceStatus();
+                    else if (state == DONE)
+                    {
+                        if (GameObject* zuljinGate = GetGameObject(DATA_ZULJIN_GATE))
+                            zuljinGate->RemoveGameObjectFlag(GO_FLAG_LOCKED);
+                    }
                     break;
             }
 
@@ -234,6 +318,8 @@ public:
                 return RandVendor[0];
             else if (type == TYPE_RAND_VENDOR_2)
                 return RandVendor[1];
+            else if (type == TYPE_AKILZON_GAUNTLET)
+                return _akilzonGauntlet;
 
             return 0;
         }
@@ -245,6 +331,8 @@ public:
 
         private:
             uint32 RandVendor[RAND_VENDOR];
+            GuidSet AkilzonTrash;
+            EncounterState _akilzonGauntlet = NOT_STARTED;
     };
 
     InstanceScript* GetInstanceScript(InstanceMap* map) const override

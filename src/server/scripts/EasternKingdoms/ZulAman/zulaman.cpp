@@ -15,14 +15,15 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "zulaman.h"
 #include "CreatureScript.h"
+#include "PassiveAI.h"
 #include "Player.h"
 #include "ScriptedCreature.h"
 #include "ScriptedGossip.h"
 #include "SpellInfo.h"
 #include "SpellScript.h"
 #include "SpellScriptLoader.h"
+#include "zulaman.h"
 
 /*######
 ## npc_forest_frog
@@ -530,10 +531,167 @@ class spell_ritual_of_power : public SpellScript
     }
 };
 
+enum AmanishiLookout
+{
+    PATH_LOOKOUT       = 2417500,
+    SAY_INVADERS       = 0,
+};
+
+struct npc_amanishi_lookout : public NullCreatureAI
+{
+    npc_amanishi_lookout(Creature* creature) : NullCreatureAI(creature), _instance(creature->GetInstanceScript()) {}
+
+    void Reset() override
+    {
+        me->RemoveUnitFlag(UNIT_FLAG_IMMUNE_TO_PC);
+        me->RemoveUnitFlag(UNIT_FLAG_RENAME);
+    }
+
+    void MoveInLineOfSight(Unit* who) override
+    {
+        if (!me->IsWithinDist(who, 25.0f, false)) // distance not confirmed
+                return;
+
+        Player* player = who->GetCharmerOrOwnerPlayerOrPlayerItself();
+        if (!player || player->IsGameMaster())
+            return;
+
+        if (!who->IsWithinLOSInMap(me))
+            return;
+
+        if (_instance->GetData(TYPE_AKILZON_GAUNTLET) == NOT_STARTED)
+            _instance->SetData(TYPE_AKILZON_GAUNTLET, IN_PROGRESS);
+    }
+
+    void DoAction(int32 action) override
+    {
+        if (action == ACTION_START_AKILZON_GAUNTLET)
+        {
+            Talk(SAY_INVADERS);
+            me->SetUnitFlag(UNIT_FLAG_IMMUNE_TO_PC);
+            me->SetUnitFlag(UNIT_FLAG_RENAME);
+            me->GetMotionMaster()->MovePath(PATH_LOOKOUT, false);
+        }
+    }
+
+    void MovementInform(uint32 type, uint32 id) override
+    {
+        // at boss
+        if (type == WAYPOINT_MOTION_TYPE && id == 8) // should despawn with waypoint script
+            me->DespawnOrUnsummon(0s, 0s);
+    }
+private:
+    InstanceScript* _instance;
+};
+
+enum AmanishiTempest
+{
+    ACTION_START_GAUNTLET   = 1,
+    GROUP_AKILZON_GAUNTLET  = 1,
+    SPELL_SUMMON_EAGLE      = 43487,
+    SPELL_SUMMON_WARRIOR    = 43486,
+    SPELL_THUNDERCLAP       = 44033,
+};
+
+struct npc_amanishi_tempest : public ScriptedAI
+{
+    npc_amanishi_tempest(Creature* creature) : ScriptedAI(creature), _instance(creature->GetInstanceScript()), _summons(creature) { }
+
+    void Reset() override
+    {
+        _summons.DespawnAll();
+        scheduler.CancelAll();
+        scheduler.Schedule(9s, 11s, [this](TaskContext context)
+        {
+            DoCastVictim(SPELL_THUNDERCLAP);
+            context.Repeat();
+        });
+    }
+
+    void JustSummoned(Creature* summon) override
+    {
+        _summons.Summon(summon);
+        summon->SetNoCallAssistance(true); // prevent eagles from pulling boss
+        summon->SetInCombatWithZone();
+    }
+
+    void JustDied(Unit* killer) override
+    {
+        ScriptedAI::JustDied(killer);
+        _instance->SetData(TYPE_AKILZON_GAUNTLET, DONE);
+    }
+
+    void DoAction(int32 action) override
+    {
+        if (action == ACTION_START_GAUNTLET)
+            ScheduleEvents();
+    }
+
+    void EnterEvadeMode(EvadeReason why) override
+    {
+        ScriptedAI::EnterEvadeMode(why);
+        scheduler.CancelAll();
+    }
+
+    void ScheduleEvents()
+    {
+        me->SetInCombatWithZone();
+        scheduler.Schedule(29s, 53s, GROUP_AKILZON_GAUNTLET, [this](TaskContext context)
+        {
+            for (uint8 i = 0; i < 5; ++i)
+                DoCastAOE(SPELL_SUMMON_EAGLE, true);
+            context.Repeat();
+        }).Schedule(40s, GROUP_AKILZON_GAUNTLET, [this](TaskContext context)
+        {
+            for (uint8 i = 0; i < 2; ++i)
+                DoCastAOE(SPELL_SUMMON_WARRIOR, true);
+            context.Repeat();
+        });
+    }
+
+    void UpdateAI(uint32 diff) override
+    {
+        scheduler.Update(diff);
+        if (!me->IsEngaged())
+            return;
+        Unit* victim = me->SelectVictim();
+        if (!victim || me->GetExactDist(victim) > me->GetAggroRange(victim))
+            return;
+        ScriptedAI::UpdateAI(diff);
+    }
+
+private:
+    InstanceScript* _instance;
+    SummonList _summons;
+};
+
+struct npc_eagle_trash_aggro_trigger : public ScriptedAI
+{
+    npc_eagle_trash_aggro_trigger(Creature* creature) : ScriptedAI(creature), _instance(creature->GetInstanceScript()) {}
+
+    void MoveInLineOfSight(Unit* who) override
+    {
+        if (!me->IsWithinDist(who, 10.0f, false)) // distance not confirmed
+            return;
+
+        Player* player = who->GetCharmerOrOwnerPlayerOrPlayerItself();
+        if (!player || player->IsGameMaster())
+            return;
+
+        if (_instance->GetData(TYPE_AKILZON_GAUNTLET) == NOT_STARTED)
+            _instance->SetData(TYPE_AKILZON_GAUNTLET, IN_PROGRESS);
+    }
+private:
+    InstanceScript* _instance;
+};
+
 void AddSC_zulaman()
 {
     RegisterZulAmanCreatureAI(npc_forest_frog);
     new npc_zulaman_hostage();
     RegisterZulAmanCreatureAI(npc_harrison_jones);
     RegisterSpellScript(spell_ritual_of_power);
+    RegisterZulAmanCreatureAI(npc_amanishi_lookout);
+    RegisterZulAmanCreatureAI(npc_amanishi_tempest);
+    RegisterZulAmanCreatureAI(npc_eagle_trash_aggro_trigger);
 }

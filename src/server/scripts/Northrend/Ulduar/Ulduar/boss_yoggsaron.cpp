@@ -2603,7 +2603,7 @@ class spell_yogg_saron_insane_periodic_trigger : public SpellScript
     {
         std::list<WorldObject*> tmplist;
         for (std::list<WorldObject*>::iterator itr = targets.begin(); itr != targets.end(); ++itr)
-            if ((*itr)->IsPlayer() && !(*itr)->ToPlayer()->HasAuraType(SPELL_AURA_AOE_CHARM) && !(*itr)->ToPlayer()->HasAura(SPELL_SANITY))
+            if ((*itr)->IsPlayer() && !(*itr)->ToPlayer()->HasAOECharmAura() && !(*itr)->ToPlayer()->HasAura(SPELL_SANITY))
                 tmplist.push_back(*itr);
 
         targets.clear();
