@@ -2111,7 +2111,7 @@ Rate.Loyalty           = 1
 #        Default:     1 - (Rate.Rest.InGame)
 #                     1 - (Rate.Rest.Offline.InTavernOrCity)
 #                     1 - (Rate.Rest.Offline.InWilderness)
-#                     1.5 - (Rate.Rest.MaxLimit.Multiplier)
+#                     1.5 - (Rate.Rest.MaxBonus)
 
 Rate.Rest.InGame                 = 1
 Rate.Rest.Offline.InTavernOrCity = 1
