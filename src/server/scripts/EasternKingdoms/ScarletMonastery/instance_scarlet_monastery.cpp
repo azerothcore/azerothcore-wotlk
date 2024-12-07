@@ -42,6 +42,17 @@ enum AshbringerEventMisc
     DOOR_HIGH_INQUISITOR_ID        = 104600,
 };
 
+enum AshbringerSpell
+{
+    //Highlord Mograine Spells
+    //This spell lacks the lightning visual effect after hitting the target
+    SPELL_FORGIVENESS               = 28697,
+
+    //High Inquisitor Fairbanks
+    //This spell lacks the visual effect after hitting the target
+    SPELL_TRANSFORM_GHOST           = 28443
+};
+
 enum DataTypes
 {
     TYPE_MOGRAINE_AND_WHITE_EVENT = 1,
@@ -127,8 +138,7 @@ public:
             {
                 case TYPE_MOGRAINE_AND_WHITE_EVENT:
                     if (data == IN_PROGRESS)
-                    {
-                        
+                    {                        
                         if (Creature* Mograine = instance->GetCreature(_mograineGUID))
                         {
                             std::list<Creature*> creatureList;
@@ -262,18 +272,6 @@ public:
         uint32 _ashencounter{};
         GuidSet _ashbringerNpcGUID;
     };
-};
-
-
-enum Speel
-{
-    //Highlord Mograine Spells
-    //This spell lacks the lightning visual effect after hitting the target
-    SPELL_FORGIVENESS               = 28697,
-
-    //High Inquisitor Fairbanks
-    //This spell lacks the visual effect after hitting the target
-    SPELL_TRANSFORM_GHOST           = 28443
 };
 
 void AddSC_instance_scarlet_monastery()
