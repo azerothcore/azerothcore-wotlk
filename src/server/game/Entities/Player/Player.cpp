@@ -10211,21 +10211,20 @@ void Player::SetRestBonus(float restBonusNew)
     // Prevent resting on max level
     if (GetLevel() >= sWorld->getIntConfig(CONFIG_MAX_PLAYER_LEVEL))
         restBonusNew = 0;
-    
+
     if (restBonusNew < 0)
         restBonusNew = 0;
-    
+
     // Fetch rest bonus multiplier from cached configuration
     float restBonusMultiplier = sWorld->getRate(RATE_REST_MAX_MULTIPLIER);
-    
+
     // Calculate rest bonus max using the multiplier
     float restBonusMax = (float)GetUInt32Value(PLAYER_NEXT_LEVEL_XP) * rest_bonus_multiplier / 2;
-    
+
     if (restBonusNew > restBonusMax)
         _restBonus = restBonusMax;
     else
         _restBonus = restBonusNew;
-    
     // update data for client
     if ((GetsRecruitAFriendBonus(true) && (GetSession()->IsARecruiter() || GetSession()->GetRecruiterId() != 0)))
         SetByteValue(PLAYER_BYTES_2, 3, REST_STATE_RAF_LINKED);
@@ -10236,7 +10235,7 @@ void Player::SetRestBonus(float restBonusNew)
         else if (_restBonus <= 1)
             SetByteValue(PLAYER_BYTES_2, 3, REST_STATE_NOT_RAF_LINKED);
     }
-    
+
     //RestTickUpdate
     SetUInt32Value(PLAYER_REST_STATE_EXPERIENCE, uint32(_restBonus));
 }
