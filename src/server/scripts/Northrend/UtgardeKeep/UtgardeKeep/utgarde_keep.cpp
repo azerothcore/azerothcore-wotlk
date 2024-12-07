@@ -23,72 +23,61 @@
 #include "SpellScriptLoader.h"
 #include "Vehicle.h"
 
-class npc_dragonflayer_forge_master : public CreatureScript
+struct npc_dragonflayer_forge_master : public ScriptedAI
 {
-public:
-    npc_dragonflayer_forge_master() : CreatureScript("npc_dragonflayer_forge_master") { }
-
-    CreatureAI* GetAI(Creature* pCreature) const override
+    npc_dragonflayer_forge_master(Creature* c) : ScriptedAI(c)
     {
-        return GetUtgardeKeepAI<npc_dragonflayer_forge_masterAI>(pCreature);
+        pInstance = c->GetInstanceScript();
+
+        float x = me->GetHomePosition().GetPositionX();
+        float y = me->GetHomePosition().GetPositionY();
+        if (x > 344.0f && x < 357.0f && y < -35.0f && y > -44.0f)
+        {
+            dataId = DATA_FORGE_1;
+            prevDataId = 0;
+        }
+        else if (x > 380.0f && x < 389.0f && y < -12.0f && y > -21.0f)
+        {
+            dataId = DATA_FORGE_2;
+            prevDataId = DATA_FORGE_1;
+        }
+        else
+        {
+            dataId = DATA_FORGE_3;
+            prevDataId = DATA_FORGE_2;
+        }
     }
 
-    struct npc_dragonflayer_forge_masterAI : public ScriptedAI
+    InstanceScript* pInstance;
+    uint32 dataId;
+    uint32 prevDataId;
+
+    void Reset() override
     {
-        npc_dragonflayer_forge_masterAI(Creature* c) : ScriptedAI(c)
+        if (pInstance)
+            pInstance->SetData(dataId, NOT_STARTED);
+    }
+
+    void JustDied(Unit* /*killer*/) override
+    {
+        if (pInstance)
+            pInstance->SetData(dataId, DONE);
+        me->SaveRespawnTime();
+    }
+
+    void JustEngagedWith(Unit* /*who*/) override
+    {
+        if (pInstance)
         {
-            pInstance = c->GetInstanceScript();
-
-            float x = me->GetHomePosition().GetPositionX();
-            float y = me->GetHomePosition().GetPositionY();
-            if (x > 344.0f && x < 357.0f && y < -35.0f && y > -44.0f)
+            if (prevDataId && !pInstance->GetData(prevDataId))
             {
-                dataId = DATA_FORGE_1;
-                prevDataId = 0;
+                EnterEvadeMode();
+                return;
             }
-            else if (x > 380.0f && x < 389.0f && y < -12.0f && y > -21.0f)
-            {
-                dataId = DATA_FORGE_2;
-                prevDataId = DATA_FORGE_1;
-            }
-            else
-            {
-                dataId = DATA_FORGE_3;
-                prevDataId = DATA_FORGE_2;
-            }
+            pInstance->SetData(dataId, IN_PROGRESS);
         }
-
-        InstanceScript* pInstance;
-        uint32 dataId;
-        uint32 prevDataId;
-
-        void Reset() override
-        {
-            if (pInstance)
-                pInstance->SetData(dataId, NOT_STARTED);
-        }
-
-        void JustDied(Unit* /*killer*/) override
-        {
-            if (pInstance)
-                pInstance->SetData(dataId, DONE);
-            me->SaveRespawnTime();
-        }
-
-        void JustEngagedWith(Unit* /*who*/) override
-        {
-            if (pInstance)
-            {
-                if (prevDataId && !pInstance->GetData(prevDataId))
-                {
-                    EnterEvadeMode();
-                    return;
-                }
-                pInstance->SetData(dataId, IN_PROGRESS);
-            }
-            me->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_ONESHOT_NONE);
-        }
-    };
+        me->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_ONESHOT_NONE);
+    }
 };
 
 enum EnslavedProtoDrake
@@ -111,97 +100,86 @@ enum EnslavedProtoDrake
 
 const Position protodrakeCheckPos = {206.24f, -190.28f, 200.11f, 0.f};
 
-class npc_enslaved_proto_drake : public CreatureScript
+struct npc_enslaved_proto_drake : public ScriptedAI
 {
-public:
-    npc_enslaved_proto_drake() : CreatureScript("npc_enslaved_proto_drake") { }
-
-    struct npc_enslaved_proto_drakeAI : public ScriptedAI
+    npc_enslaved_proto_drake(Creature* creature) : ScriptedAI(creature)
     {
-        npc_enslaved_proto_drakeAI(Creature* creature) : ScriptedAI(creature)
-        {
-            _setData = false;
-        }
-
-        void Reset() override
-        {
-            _events.Reset();
-            _events.ScheduleEvent(EVENT_REND, 2s, 3s);
-            _events.ScheduleEvent(EVENT_FLAME_BREATH, 5500ms, 7000ms);
-            _events.ScheduleEvent(EVENT_KNOCKAWAY, 3500ms, 6000ms);
-        }
-
-        void MovementInform(uint32 type, uint32 id) override
-        {
-            if (type == WAYPOINT_MOTION_TYPE && id == POINT_LAST)
-            {
-                me->SetHomePosition(me->GetPositionX(), me->GetPositionY(), me->GetPositionZ(), 0.25f);
-                if (Vehicle* v = me->GetVehicleKit())
-                    if (Unit* p = v->GetPassenger(0))
-                        if (Creature* rider = p->ToCreature())
-                            rider->SetHomePosition(me->GetPositionX(), me->GetPositionY(), me->GetPositionZ(), 0.25f);
-
-                me->SetCanFly(false);
-                me->SetDisableGravity(false);
-                me->SetFacingTo(0.25f);
-                me->SetImmuneToAll(false);
-            }
-        }
-
-        void SetData(uint32 type, uint32 data) override
-        {
-            if (type == TYPE_PROTODRAKE_AT && data == DATA_PROTODRAKE_MOVE && !_setData && me->IsAlive() && me->GetDistance(protodrakeCheckPos) < 10.0f)
-            {
-                _setData = true;
-                me->SetCanFly(true);
-                me->SetDisableGravity(true);
-                me->GetMotionMaster()->MovePath(PATH_PROTODRAKE, false);
-            }
-        }
-
-        void UpdateAI(uint32 diff) override
-        {
-            if (!UpdateVictim())
-                return;
-
-            _events.Update(diff);
-
-            if (me->HasUnitState(UNIT_STATE_CASTING))
-                return;
-
-            while (uint32 eventid = _events.ExecuteEvent())
-            {
-                switch (eventid)
-                {
-                    case EVENT_REND:
-                        DoCast(SPELL_REND);
-                        _events.ScheduleEvent(EVENT_REND, 15s, 20s);
-                        break;
-                    case EVENT_FLAME_BREATH:
-                        DoCast(SPELL_FLAME_BREATH);
-                        _events.ScheduleEvent(EVENT_FLAME_BREATH, 11s, 12s);
-                        break;
-                    case EVENT_KNOCKAWAY:
-                        DoCast(SPELL_KNOCK_AWAY);
-                        _events.ScheduleEvent(EVENT_KNOCKAWAY, 7000ms, 8500ms);
-                        break;
-                    default:
-                        break;
-                }
-            }
-
-            DoMeleeAttackIfReady();
-        }
-
-    private:
-        bool _setData;
-        EventMap _events;
-    };
-
-    CreatureAI* GetAI(Creature* creature) const override
-    {
-        return GetUtgardeKeepAI<npc_enslaved_proto_drakeAI>(creature);
+        _setData = false;
     }
+
+    void Reset() override
+    {
+        _events.Reset();
+        _events.ScheduleEvent(EVENT_REND, 2s, 3s);
+        _events.ScheduleEvent(EVENT_FLAME_BREATH, 5500ms, 7000ms);
+        _events.ScheduleEvent(EVENT_KNOCKAWAY, 3500ms, 6000ms);
+    }
+
+    void MovementInform(uint32 type, uint32 id) override
+    {
+        if (type == WAYPOINT_MOTION_TYPE && id == POINT_LAST)
+        {
+            me->SetHomePosition(me->GetPositionX(), me->GetPositionY(), me->GetPositionZ(), 0.25f);
+            if (Vehicle* v = me->GetVehicleKit())
+                if (Unit* p = v->GetPassenger(0))
+                    if (Creature* rider = p->ToCreature())
+                        rider->SetHomePosition(me->GetPositionX(), me->GetPositionY(), me->GetPositionZ(), 0.25f);
+
+            me->SetCanFly(false);
+            me->SetDisableGravity(false);
+            me->SetFacingTo(0.25f);
+            me->SetImmuneToAll(false);
+        }
+    }
+
+    void SetData(uint32 type, uint32 data) override
+    {
+        if (type == TYPE_PROTODRAKE_AT && data == DATA_PROTODRAKE_MOVE && !_setData && me->IsAlive() && me->GetDistance(protodrakeCheckPos) < 10.0f)
+        {
+            _setData = true;
+            me->SetCanFly(true);
+            me->SetDisableGravity(true);
+            me->GetMotionMaster()->MovePath(PATH_PROTODRAKE, false);
+        }
+    }
+
+    void UpdateAI(uint32 diff) override
+    {
+        if (!UpdateVictim())
+            return;
+
+        _events.Update(diff);
+
+        if (me->HasUnitState(UNIT_STATE_CASTING))
+            return;
+
+        while (uint32 eventid = _events.ExecuteEvent())
+        {
+            switch (eventid)
+            {
+            case EVENT_REND:
+                DoCast(SPELL_REND);
+                _events.ScheduleEvent(EVENT_REND, 15s, 20s);
+                break;
+            case EVENT_FLAME_BREATH:
+                DoCast(SPELL_FLAME_BREATH);
+                _events.ScheduleEvent(EVENT_FLAME_BREATH, 11s, 12s);
+                break;
+            case EVENT_KNOCKAWAY:
+                DoCast(SPELL_KNOCK_AWAY);
+                _events.ScheduleEvent(EVENT_KNOCKAWAY, 7000ms, 8500ms);
+                break;
+            default:
+                break;
+            }
+        }
+
+        DoMeleeAttackIfReady();
+    }
+
+private:
+    bool _setData;
+    EventMap _events;
 };
 
 enum TickingTimeBomb
@@ -234,8 +212,8 @@ class spell_ticking_time_bomb_aura : public AuraScript
 
 void AddSC_utgarde_keep()
 {
-    new npc_dragonflayer_forge_master();
-    new npc_enslaved_proto_drake();
+    RegisterUtgardeKeepCreatureAI(npc_dragonflayer_forge_master);
+    RegisterUtgardeKeepCreatureAI(npc_enslaved_proto_drake);
 
     RegisterSpellScript(spell_ticking_time_bomb_aura);
 }

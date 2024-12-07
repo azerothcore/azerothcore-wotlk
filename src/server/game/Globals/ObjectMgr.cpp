@@ -8945,7 +8945,7 @@ void ObjectMgr::LoadGameTele()
     LOG_INFO("server.loading", " ");
 }
 
-GameTele const* ObjectMgr::GetGameTele(std::string_view name) const
+GameTele const* ObjectMgr::GetGameTele(std::string_view name, bool exactSearch) const
 {
     // explicit name case
     std::wstring wname;
@@ -8961,7 +8961,7 @@ GameTele const* ObjectMgr::GetGameTele(std::string_view name) const
     {
         if (itr->second.wnameLow == wname)
             return &itr->second;
-        else if (!alt && itr->second.wnameLow.find(wname) != std::wstring::npos)
+        else if (!exactSearch && !alt && itr->second.wnameLow.find(wname) != std::wstring::npos)
             alt = &itr->second;
     }
 

@@ -42,7 +42,7 @@ enum Spells
 
 enum UniqueEvents
 {
-    EVENT_BERSERK                = 0
+    EVENT_BERSERK                = 1
 };
 
 enum Hal_CreatureIds
@@ -100,7 +100,6 @@ struct boss_halazzi : public BossAI
         BossAI::Reset();
         _transformCount = 0;
         _phase = PHASE_NONE;
-        EnterPhase(PHASE_LYNX);
         SetInvincibility(true);
     }
 
@@ -138,6 +137,14 @@ struct boss_halazzi : public BossAI
             me->UpdateEntry(NPC_HALAZZI_TROLL);
     }
 
+    void JustSummoned(Creature* summon) override
+    {
+        BossAI::JustSummoned(summon);
+
+        if (summon->GetEntry() == NPC_TOTEM)
+            summon->Attack(me->GetVictim(), false);
+    }
+
     void AttackStart(Unit* who) override
     {
         if (_phase != PHASE_MERGE)
@@ -159,10 +166,7 @@ struct boss_halazzi : public BossAI
             case PHASE_LYNX:
             {
                 if (_phase == PHASE_MERGE)
-                {
-                    DoCastSelf(SPELL_TRANSFIGURE, true);
                     me->ResumeChasingVictim();
-                }
                 summons.DespawnAll();
 
                 if (_transformCount)
@@ -185,15 +189,15 @@ struct boss_halazzi : public BossAI
                 }
 
                 scheduler.CancelGroup(GROUP_MERGE);
-                scheduler.Schedule(16s, GROUP_LYNX, [this](TaskContext context)
-                {
-                    DoCastSelf(SPELL_FRENZY);
-                    context.Repeat(10s, 15s);
-                }).Schedule(20s, GROUP_LYNX, [this](TaskContext context)
+                scheduler.Schedule(5s, 15s, GROUP_LYNX, [this](TaskContext context)
                 {
                     Talk(SAY_SABER);
                     DoCastVictim(SPELL_SABER_LASH, true);
-                    context.Repeat(30s);
+                    context.Repeat();
+                }).Schedule(20s, 35s, GROUP_LYNX, [this](TaskContext context)
+                {
+                    DoCastSelf(SPELL_FRENZY);
+                    context.Repeat();
                 });
                 break;
             }

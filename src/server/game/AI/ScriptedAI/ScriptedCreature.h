@@ -442,10 +442,15 @@ struct ScriptedAI : public CreatureAI
     void SetInvincibility(bool apply) { _invincible = apply; };
     [[nodiscard]] bool IsInvincible() const { return _invincible; };
 
+    // Disables creature auto attacks.
+    void SetAutoAttackAllowed(bool allow) { _canAutoAttack = allow; };
+    [[nodiscard]] bool IsAutoAttackAllowed() const { return _canAutoAttack; };
+
 private:
     Difficulty _difficulty;
     bool _isHeroic;
     bool _invincible;
+    bool _canAutoAttack;
     std::unordered_set<uint32> _uniqueTimedEvents;
 };
 

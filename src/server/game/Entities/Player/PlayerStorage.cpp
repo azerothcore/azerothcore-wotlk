@@ -5132,7 +5132,7 @@ bool Player::LoadFromDB(ObjectGuid playerGuid, CharacterDatabaseQueryHolder cons
     {
         // xinef: resurrect player, cant log in dead without corpse
         {
-            if (HasAuraType(SPELL_AURA_SPIRIT_OF_REDEMPTION))
+            if (HasSpiritOfRedemptionAura())
                 RemoveAurasByType(SPELL_AURA_MOD_SHAPESHIFT);
             if (!IsAlive())
                 ResurrectPlayer(1.0f);
