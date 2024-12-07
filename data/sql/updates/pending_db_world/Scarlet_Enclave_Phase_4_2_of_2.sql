@@ -151,10 +151,10 @@ UPDATE `creature_addon` SET `path_id` = 12981400 WHERE (`guid` IN (129814));
 
 DELETE FROM `pool_template` WHERE (`entry` IN (22357, 22358, 22359, 22360, 22361, 22362, 22363, 22364, 22365, 22366, 22367, 22368, 22369, 22370, 22371, 22372, 22373, 22374, 22375, 22376, 22377, 22378, 22379, 22380, 22381, 22382));
 INSERT INTO `pool_template` (`entry`, `max_limit`, `description`) VALUES 
-(22357, 1, 'Scarlet Crusader/Preacher/Marksman (1 out 26)'),
-(22358, 1, 'Scarlet Crusader/Preacher/Marksman (2 out 26)'),
-(22359, 1, 'Scarlet Crusader/Preacher/Marksman (3 out 26)'),
-(22360, 1, 'Scarlet Crusader/Preacher/Marksman (4 out 26)'),
+(22357, 1, 'Scarlet Crusader/Preacher/Marksman Spawn (1 out 26)'),
+(22358, 1, 'Scarlet Crusader/Preacher/Marksman Spawn (2 out 26)'),
+(22359, 1, 'Scarlet Crusader/Preacher/Marksman Spawn (3 out 26)'),
+(22360, 1, 'Scarlet Crusader/Preacher/Marksman Spawn (4 out 26)'),
 (22361, 1, 'Scarlet Crusader/Preacher/Marksman Spawn (5 out 26)'),
 (22362, 1, 'Scarlet Crusader/Preacher/Marksman Spawn (6 out 26)'),
 (22363, 1, 'Scarlet Crusader/Preacher/Marksman Spawn (7 out 26)'),
