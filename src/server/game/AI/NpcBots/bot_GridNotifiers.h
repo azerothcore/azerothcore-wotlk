@@ -360,7 +360,7 @@ class PolyUnitCheck
                 return false;
             if (u->IsPolymorphed() ||
                 u->isFrozen() ||
-                u->isInRoots() ||
+                u->HasRootAura() ||
                 u->HasAuraType(SPELL_AURA_PERIODIC_DAMAGE) ||
                 u->HasAuraType(SPELL_AURA_MOD_PACIFY) ||
                 u->HasAuraType(SPELL_AURA_MOD_PACIFY_SILENCE) ||
@@ -396,7 +396,7 @@ class FearUnitCheck
                 return false;
             if (u->HasUnitState(UNIT_STATE_CONFUSED | UNIT_STATE_STUNNED | UNIT_STATE_FLEEING | UNIT_STATE_DISTRACTED | UNIT_STATE_CONFUSED_MOVE | UNIT_STATE_FLEEING_MOVE))
                 return false;
-            if (u->isFeared())
+            if (u->HasFearAura())
                 return false;
             if (u->HasAuraType(SPELL_AURA_MOD_PACIFY) || u->HasAuraType(SPELL_AURA_MOD_PACIFY_SILENCE))
                 return false;
@@ -597,7 +597,7 @@ class RootUnitCheck
                 return false;
             if (!u->isTargetableForAttack(false))
                 return false;
-            if (u->isFrozen() || u->isInRoots())
+            if (u->isFrozen() || u->HasRootAura())
                 return false;
             if (!u->getAttackers().empty())
                 return false;
