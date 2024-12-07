@@ -138,7 +138,7 @@ public:
             {
                 case TYPE_MOGRAINE_AND_WHITE_EVENT:
                     if (data == IN_PROGRESS)
-                    {                        
+                    {
                         if (Creature* Mograine = instance->GetCreature(_mograineGUID))
                         {
                             std::list<Creature*> creatureList;
