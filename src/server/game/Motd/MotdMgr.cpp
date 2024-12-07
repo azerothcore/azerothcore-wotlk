@@ -54,10 +54,11 @@ void MotdMgr::CreateWorldPackages()
         // Store the constructed packet in MotdPackets with the locale as the key
         MotdPackets[locale] = CreateWorldPacket(motd);
 }
+
 void MotdMgr::LoadMotd()
 {
     uint32 realmId = sConfigMgr->GetOption<int32>("RealmID", 0);
-    
+
     // Load the main motd for the realm and assign it to enUS if available
     std::string motd = LoadDefaultMotd(realmId);
 
