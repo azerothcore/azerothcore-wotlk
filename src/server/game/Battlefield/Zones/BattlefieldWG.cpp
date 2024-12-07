@@ -46,7 +46,7 @@ bool BattlefieldWG::SetupBattlefield()
     m_ZoneId = BATTLEFIELD_WG_ZONEID;
     m_MapId = BATTLEFIELD_WG_MAPID;
     m_Map = sMapMgr->FindMap(m_MapId, 0);
-    m_TugOfWar = new TugOfWarWG(this);
+    m_TugOfWar = std::make_unique<TugOfWarWG>(this);
 
     // init stalker AFTER setting map id... we spawn it at map=random memory value?...
     InitStalker(BATTLEFIELD_WG_NPC_STALKER, WintergraspStalkerPos[0], WintergraspStalkerPos[1], WintergraspStalkerPos[2], WintergraspStalkerPos[3]);
@@ -1268,10 +1268,10 @@ TugOfWarWG::~TugOfWarWG()
 {
 }
 
-TugOfWarWG::TugOfWarWG(BattlefieldWG* battlefield)
+TugOfWarWG::TugOfWarWG(BattlefieldWG* WG)
 {
-    m_Bf = battlefield;
-    TeamId team = m_Bf->GetDefenderTeam();
+    m_WG = WG;
+    TeamId team = m_WG->GetDefenderTeam();
 
     if (!sWorld->getWorldState(TUG_OF_WAR_SCALE))
     {
@@ -1286,20 +1286,17 @@ TugOfWarWG::TugOfWarWG(BattlefieldWG* battlefield)
     m_DefenseStreak = sWorld->getWorldState(TUG_OF_WAR_DEFENSE_STREAK);
     m_FastCorporal = false;
     m_FastLieutenant = false;
-
-    LOG_WARN("server.loading", "TugOfWarWG: {}, {}. Def: {}", m_Scale, m_DefenseStreak, team);
 }
 
 void TugOfWarWG::OnBattleStart()
 {
-    TeamId attackerTeam = m_Bf->GetAttackerTeam();
-    int16 scale = (attackerTeam == TEAM_ALLIANCE) ? m_Scale : -m_Scale;
+    TeamId attackerTeam = m_WG->GetAttackerTeam();
 
-    if (scale >= 700)
+    if ((attackerTeam == TEAM_ALLIANCE && m_Scale >= 700) || (attackerTeam == TEAM_HORDE && m_Scale <= -700))
     {
         m_FastLieutenant = true;
     }
-    else if (scale >= 600)
+    else if ((attackerTeam == TEAM_ALLIANCE && m_Scale >= 600) || (attackerTeam == TEAM_HORDE && m_Scale <= -600))
     {
         m_FastCorporal = true;
     }
@@ -1307,7 +1304,7 @@ void TugOfWarWG::OnBattleStart()
 
 void TugOfWarWG::OnBattleEnd(bool endByTimer)
 {
-    TeamId team = m_Bf->GetDefenderTeam();
+    TeamId team = m_WG->GetDefenderTeam();
 
     if (endByTimer)
     {
