@@ -1,3 +1,4 @@
+-- DB update 2024_12_07_02 -> 2024_12_07_03
 -- Update gameobject 'Boss Fight Altar' with sniffed values
 -- new spawns
 DELETE FROM `gameobject` WHERE (`id` IN (180875))

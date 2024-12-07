@@ -1,3 +1,4 @@
+-- DB update 2024_12_07_00 -> 2024_12_07_01
 -- Update gameobject 'Starsong Scroll' with sniffed values
 -- new spawns
 DELETE FROM `gameobject` WHERE (`id` IN (180910))

@@ -1,3 +1,4 @@
+-- DB update 2024_12_07_01 -> 2024_12_07_02
 -- Update gameobject 'DwarvenTableSmall' with sniffed values
 -- new spawns
 DELETE FROM `gameobject` WHERE (`id` IN (180884))

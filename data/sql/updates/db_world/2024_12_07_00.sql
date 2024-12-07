@@ -1,3 +1,4 @@
+-- DB update 2024_12_06_00 -> 2024_12_07_00
 -- Update gameobject 'Lucky Red Envelope' with sniffed values
 -- new spawns
 DELETE FROM `gameobject` WHERE (`id` IN (180909))
