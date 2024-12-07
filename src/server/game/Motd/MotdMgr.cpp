@@ -31,18 +31,6 @@ namespace
     std::unordered_map<LocaleConstant, WorldPacket> MotdPackets;
     // Stores the localized motd to prevent database queries
     std::unordered_map<LocaleConstant, std::string> MotdMap;
-    // Dict to store all valid locales
-    std::unordered_map<std::string, LocaleConstant> localeMap = {
-        {"enUS", LOCALE_enUS},
-        {"deDE", LOCALE_deDE},
-        {"frFR", LOCALE_frFR},
-        {"koKR", LOCALE_koKR},
-        {"zhCN", LOCALE_zhCN},
-        {"zhTW", LOCALE_zhTW},
-        {"esES", LOCALE_esES},
-        {"esMX", LOCALE_esMX},
-        {"ruRU", LOCALE_ruRU}
-    };
 }
 
 MotdMgr* MotdMgr::instance()
@@ -51,16 +39,13 @@ MotdMgr* MotdMgr::instance()
     return &instance;
 }
 
-void MotdMgr::SetMotd(std::string motd, std::string locale)
+void MotdMgr::SetMotd(std::string motd, LocaleConstant locale)
 {
-    // Convert string locale to locale constant
-    LocaleConstant localeConstant = ConvertStringToLocaleConstant(locale);
-
     // scripts may change motd
-    sScriptMgr->OnMotdChange(motd, localeConstant);
+    sScriptMgr->OnMotdChange(motd, locale);
 
-    MotdMap[localeConstant] = motd;
-    MotdPackets[localeConstant] = CreateWorldPacket(motd);
+    MotdMap[locale] = motd;
+    MotdPackets[locale] = CreateWorldPacket(motd);
 }
 
 void MotdMgr::CreateWorldPackages()
@@ -72,7 +57,7 @@ void MotdMgr::CreateWorldPackages()
 void MotdMgr::LoadMotd()
 {
     uint32 realmId = sConfigMgr->GetOption<int32>("RealmID", 0);
-
+    
     // Load the main motd for the realm and assign it to enUS if available
     std::string motd = LoadDefaultMotd(realmId);
 
@@ -107,18 +92,6 @@ WorldPacket const* MotdMgr::GetMotdPacket(LocaleConstant locale)
         return &it->second;
 
     return &MotdPackets[LOCALE_enUS];  // Fallback to enUS if locale is not found
-}
-
-LocaleConstant MotdMgr::ConvertStringToLocaleConstant(const std::string& locale)
-{
-    auto it = localeMap.find(locale);
-    return (it != localeMap.end()) ? it->second : LOCALE_enUS; // Default fallback
-}
-
-bool MotdMgr::IsValidLocale(const std::string& locale)
-{
-    // Check if the locale exists in the keys of localeMap
-    return localeMap.find(locale) != localeMap.end();
 }
 
 std::string MotdMgr::LoadDefaultMotd(uint32 realmId)
@@ -158,12 +131,11 @@ void MotdMgr::LoadLocalizedMotds(uint32 realmId) {
             Field* fields = result->Fetch();
 
             // fields[0] is the locale string and fields[1] is the localized motd text
-            std::string locale = fields[0].Get<std::string>();
             std::string localizedText = fields[1].Get<std::string>();
-
             // Convert locale string to LocaleConstant
-            LocaleConstant localeId = ConvertStringToLocaleConstant(locale);
-
+            LocaleConstant localeId = GetLocaleByName(fields[0].Get<std::string>());
+            if (localeId == LOCALE_enUS)
+                continue;
             // Insert the localeId and localizedText into MotdMap only for specific locales
             MotdMap[localeId] = localizedText;
 

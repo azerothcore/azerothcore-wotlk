@@ -33,7 +33,7 @@ public:
     void CreateWorldPackages();
 
     /// Set a new Message of the Day
-    void SetMotd(std::string motd, std::string locale);
+    void SetMotd(std::string motd, LocaleConstant locale);
 
     /// Load Message of the Day
     void LoadMotd();
@@ -41,15 +41,10 @@ public:
     /// Get the current Message of the Day
     char const* GetMotd(LocaleConstant locale);
 
-    // Checks if the provided locale is a supported locale
-    bool IsValidLocale(const std::string& locale);
-
     /// Returns the current motd packet for the given locale
     WorldPacket const* GetMotdPacket(LocaleConstant locale);
 
 private:
-    // Converts the db string to the enum locale
-    LocaleConstant ConvertStringToLocaleConstant(const std::string& locale);
     // Loads the default motd from the motd table
     std::string LoadDefaultMotd(uint32 realmId);
     // Loads all available localized motd for the realm

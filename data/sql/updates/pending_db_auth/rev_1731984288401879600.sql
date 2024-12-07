@@ -1,8 +1,10 @@
---
-CREATE TABLE `motd_localized` (
+CREATE TABLE IF NOT EXISTS `motd_localized` (
   `realmid` INT,
-  `locale` VARCHAR(5),
-  `localized_text` LONGTEXT,
-  PRIMARY KEY (`realmid`, `locale`),
-  FOREIGN KEY (`realmid`) REFERENCES `motd`(`realmid`)
-);
+  `locale` VARCHAR(4) NOT NULL COLLATE 'utf8mb4_unicode_ci',
+  `text` LONGTEXT NULL DEFAULT NULL COLLATE 'utf8mb4_unicode_ci',
+  PRIMARY KEY (`realmid`, `locale`)
+)
+CHARSET = utf8mb4
+COLLATE = utf8mb4_unicode_ci
+ENGINE = InnoDB
+;

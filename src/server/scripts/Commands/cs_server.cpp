@@ -24,6 +24,7 @@
 
 #include "Chat.h"
 #include "CommandScript.h"
+#include "Common.h"
 #include "GameTime.h"
 #include "GitRevision.h"
 #include "Log.h"
@@ -542,16 +543,12 @@ public:
         std::string motdString = motdStream.str(); // Convert Tail to std::string
 
         // Determine the locale; default to "enUS" if not provided or invalid
-        std::string resolvedLocale = "enUS";
-        if (locale.has_value()) {
-            if (sMotdMgr->IsValidLocale(*locale)) {
-                resolvedLocale = *locale; // Use the provided valid locale
-            }
-            else {
-                // Prepend invalid locale to the motd string
-                motdString = *locale + " " + motdString;
-            }
-        }
+        LocaleConstant localeConstant = LOCALE_enUS;
+        if (locale.has_value())
+            localeConstant = GetLocaleByName(locale.value());
+        else
+            // Set to default locale string
+            locale = "en_US";
 
         // Convert the concatenated motdString to UTF-8 and ensure encoding consistency
         if (!Utf8toWStr(motdString, wMotd))
@@ -563,7 +560,7 @@ public:
         // Start a transaction for the database operations
         LoginDatabaseTransaction trans = LoginDatabase.BeginTransaction();
 
-        if (resolvedLocale == "enUS") {
+        if (localeConstant == LOCALE_enUS) {
             // Insert or update in the main motd table for enUS
             LoginDatabasePreparedStatement* stmt = LoginDatabase.GetPreparedStatement(LOGIN_INS_MOTD);
             stmt->SetData(0, realmId.value());  // realmId for insertion
@@ -575,7 +572,7 @@ public:
             // Insert or update in the motd_localized table for other locales
             LoginDatabasePreparedStatement* stmt = LoginDatabase.GetPreparedStatement(LOGIN_INS_MOTD_LOCALE);
             stmt->SetData(0, realmId.value());  // realmId for insertion
-            stmt->SetData(1, resolvedLocale);   // locale for insertion
+            stmt->SetData(1, locale.value());           // locale for insertion
             stmt->SetData(2, strMotd);          // motd text for insertion
             stmt->SetData(3, strMotd);          // motd text for ON DUPLICATE KEY UPDATE
             trans->Append(stmt);
@@ -586,9 +583,12 @@ public:
 
         // Update the in-memory maps for the current realm. Otherwise, do not update
         if (realmId == -1 || realmId == static_cast<int32>(realm.Id.Realm))
-            sMotdMgr->SetMotd(strMotd, resolvedLocale);
+            sMotdMgr->SetMotd(strMotd, localeConstant);
 
-        handler->PSendSysMessage(LANG_MOTD_NEW, realmId.value(), resolvedLocale, strMotd);
+        handler->PSendSysMessage(LANG_MOTD_NEW,
+                                 realmId.value(),
+                                 locale.value(),
+                                 strMotd);
         return true;
     }
 
