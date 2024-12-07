@@ -10216,10 +10216,10 @@ void Player::SetRestBonus(float restBonusNew)
         restBonusNew = 0;
 
     // Fetch rest bonus multiplier from cached configuration
-    float restBonusMultiplier = sWorld->getRate(RATE_REST_MAX_MULTIPLIER);
+    float restBonusMultiplier = sWorld->getRate(RATE_REST_MAX_BONUS);
 
     // Calculate rest bonus max using the multiplier
-    float restBonusMax = (float)GetUInt32Value(PLAYER_NEXT_LEVEL_XP) * rest_bonus_multiplier / 2;
+    float restBonusMax = (float)GetUInt32Value(PLAYER_NEXT_LEVEL_XP) * restBonusMultiplier / 2;
 
     if (restBonusNew > restBonusMax)
         _restBonus = restBonusMax;
