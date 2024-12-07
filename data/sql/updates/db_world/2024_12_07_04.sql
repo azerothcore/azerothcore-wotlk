@@ -1,3 +1,4 @@
+-- DB update 2024_12_07_03 -> 2024_12_07_04
 -- improve spawns positions of 180867 `Greater Moonlight Spell Focus`
 -- sync these with sniffed spawns of creature 15897 `Large Spotlight`
 UPDATE `gameobject` SET `position_x` = 1642.070556640625, `position_y` = 239.8388671875, `position_z` = 62.67490386962890625 WHERE `guid` = 241003 AND `id` = 180867;
