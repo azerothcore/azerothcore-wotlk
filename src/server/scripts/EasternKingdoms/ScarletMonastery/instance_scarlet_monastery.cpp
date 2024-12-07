@@ -24,9 +24,6 @@
 
 enum AshbringerEventMisc
 {
-    AB_EFFECT_000                  = 28441,
-    AURA_OF_ASHBRINGER             = 28282,
-
     NPC_COMMANDER_MOGRAINE         = 3976,
     NPC_INQUISITOR_WHITEMANE       = 3977,
     NPC_SCARLET_SORCERER           = 4294,
@@ -43,11 +40,6 @@ enum AshbringerEventMisc
 
     DOOR_CHAPEL                    = 104591,
     DOOR_HIGH_INQUISITOR_ID        = 104600,
-
-    MODEL_HIGHLORD_MOGRAINE        = 16180,
-    MODEL_FAIRBANKS                = 16179,
-
-    SAY_MOGRAINE_ASHBRBINGER_INTRO = 6
 };
 
 enum DataTypes
@@ -136,8 +128,8 @@ public:
                 case TYPE_MOGRAINE_AND_WHITE_EVENT:
                     if (data == IN_PROGRESS)
                     {
-                        Creature* Mograine = instance->GetCreature(_mograineGUID);
-                        if (Mograine)
+                        
+                        if (Creature* Mograine = instance->GetCreature(_mograineGUID))
                         {
                             std::list<Creature*> creatureList;
                             GetCreatureListWithEntryInGrid(creatureList, Mograine, NPC_SCARLET_MONK, CATHEDRAL_PULL_RANGE);
@@ -276,7 +268,7 @@ public:
 enum Speel
 {
     //Highlord Mograine Spells
-    //This spell lacks the visual effect after hitting the target
+    //This spell lacks the lightning visual effect after hitting the target
     SPELL_FORGIVENESS               = 28697,
 
     //High Inquisitor Fairbanks

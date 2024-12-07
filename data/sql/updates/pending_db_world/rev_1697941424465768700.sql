@@ -82,7 +82,7 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 (397601, 9, 3, 0, 0, 0, 100, 0, 1000, 1000, 0, 0, 0, 0, 1, 2, 0, 1, 0, 0, 0, 10, 39946, 3977, 0, 0, 0, 0, 0, 0, 'Scarlet Commander Mograine - Actionlist - Say Line 2'),
 (397601, 9, 4, 0, 0, 0, 100, 0, 2000, 2000, 0, 0, 0, 0, 69, 1, 0, 0, 0, 0, 0, 10, 39946, 3977, 0, 0, 0, 0, 0, 0, 'Scarlet Commander Mograine - Actionlist - Move To Closest Creature \'High Inquisitor Whitemane\'');
 
--- Scarlet Commander Mograine Ashbringer_Event
+-- Scarlet Commander Mograine Ashbringer Event
 DELETE FROM `smart_scripts` WHERE (`source_type` = 9 AND `entryorguid` = 397602);
 INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `event_param6`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
 (397602, 9, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 48, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Scarlet Commander Mograine - Actionlist - Set Active On'),
@@ -173,7 +173,7 @@ INSERT INTO `waypoints` (`entry`, `pointid`, `position_x`, `position_y`, `positi
 (16062, 11, 1149.4045, 1399.0231, 32.528877, NULL, 0, 'Ashbringer Event Move Points'),
 (16062, 12, 1150.3911, 1398.723, 32.54613, NULL, 0, 'Ashbringer Event Move Points');
 
---
+-- Highlord Mograine Conditions
 DELETE FROM `conditions` WHERE (`SourceTypeOrReferenceId` = 13) AND (`SourceEntry` IN (8990));
 INSERT INTO `conditions` (`SourceTypeOrReferenceId`, `SourceGroup`, `SourceEntry`, `SourceId`, `ElseGroup`, `ConditionTypeOrReference`, `ConditionTarget`, `ConditionValue1`, `ConditionValue2`, `ConditionValue3`, `NegativeCondition`, `Comment`) VALUES 
 (13, 1, 8990, 0, 0, 31, 0, 3, 16062, 0, 1, 'Potential target of the spell is not creature, entry is 16062');
@@ -188,22 +188,21 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 (3977, 0, 2, 0, 61, 0, 100, 0, 0, 0, 0, 0, 0, 0, 69, 1, 0, 0, 0, 0, 0, 10, 40029, 3976, 0, 0, 0, 0, 0, 0, 'High Inquisitor Whitemane - On Data Set 0 1 - Move To Closest Creature \'Scarlet Commander Mograine\''),
 (3977, 0, 3, 4, 4, 0, 100, 0, 0, 0, 0, 0, 0, 0, 42, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'High Inquisitor Whitemane - On Aggro - Set Invincibility Hp 1'),
 (3977, 0, 4, 0, 61, 0, 100, 0, 0, 0, 0, 0, 0, 0, 22, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'High Inquisitor Whitemane - On Aggro - Set Event Phase 1'),
-(3977, 0, 5, 0, 0, 0, 100, 0, 1000, 1000, 2600, 4000, 0, 0, 11, 9481, 64, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'High Inquisitor Whitemane - In Combat - Cast \'Holy Smite\''),
-(3977, 0, 6, 0, 0, 1, 100, 0, 1000, 1000, 5000, 10000, 0, 0, 11, 22187, 32, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'High Inquisitor Whitemane - In Combat - Cast \'Power Word: Shield\' (Phase 1)'),
-(3977, 0, 7, 0, 14, 0, 100, 0, 1, 40, 5000, 10000, 0, 0, 11, 22187, 32, 0, 0, 0, 0, 7, 0, 0, 0, 0, 0, 0, 0, 0, 'High Inquisitor Whitemane - Friendly At 1 Health - Cast \'Power Word: Shield\''),
-(3977, 0, 8, 0, 0, 2, 100, 0, 45000, 45000, 20000, 30000, 0, 0, 11, 14515, 64, 0, 0, 0, 0, 6, 0, 0, 0, 0, 0, 0, 0, 0, 'High Inquisitor Whitemane - In Combat - Cast \'Dominate Mind\' (Phase 2)'),
-(3977, 0, 9, 0, 14, 2, 100, 0, 590, 40, 5000, 15000, 0, 0, 11, 12039, 0, 0, 0, 0, 0, 7, 0, 0, 0, 0, 0, 0, 0, 0, 'High Inquisitor Whitemane - Friendly At 590 Health - Cast \'Heal\' (Phase 2)'),
-(3977, 0, 10, 0, 5, 0, 100, 0, 0, 0, 1, 0, 0, 0, 1, 1, 0, 1, 0, 0, 0, 7, 0, 0, 0, 0, 0, 0, 0, 0, 'High Inquisitor Whitemane - On Killed Unit - Say Line 1'),
-(3977, 0, 11, 0, 21, 0, 100, 0, 0, 0, 0, 0, 0, 0, 118, 1, 0, 0, 0, 0, 0, 14, 11877, 104600, 0, 0, 0, 0, 0, 0, 'High Inquisitor Whitemane - On Reached Home - Set GO State To 1'),
-(3977, 0, 12, 0, 11, 0, 100, 0, 0, 0, 0, 0, 0, 0, 118, 1, 0, 0, 0, 0, 0, 14, 11877, 104600, 0, 0, 0, 0, 0, 0, 'High Inquisitor Whitemane - On Respawn - Set GO State To 1'),
-(3977, 0, 13, 14, 7, 0, 100, 0, 0, 0, 0, 0, 0, 0, 8, 2, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'High Inquisitor Whitemane - On Evade - Set Reactstate Aggressive'),
-(3977, 0, 14, 0, 61, 0, 100, 0, 0, 0, 0, 0, 0, 0, 34, 1, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'High Inquisitor Whitemane - On Evade - Set Instance Data 1 to 2'),
-(3977, 0, 15, 0, 6, 0, 100, 0, 0, 0, 0, 0, 0, 0, 34, 1, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'High Inquisitor Whitemane - On Just Died - Set Instance Data 1 to 3'),
-(3977, 0, 16, 0, 2, 0, 100, 513, 0, 50, 0, 0, 0, 0, 80, 397700, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'High Inquisitor Whitemane - Between 0-50% Health - Run Script (No Repeat)'),
-(3977, 0, 17, 0, 38, 0, 100, 0, 1, 1, 0, 0, 0, 0, 67, 1, 200, 200, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'High Inquisitor Whitemane - On Data Set 1 1 - Create Timed Event'),
-(3977, 0, 18, 0, 59, 0, 100, 0, 1, 0, 0, 0, 0, 0, 80, 397701, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'High Inquisitor Whitemane - On Timed Event 1 Triggered - Run Script'),
-(3977, 0, 19, 0, 38, 0, 100, 0, 1, 1, 0, 0, 0, 0, 69, 2, 0, 0, 2, 0, 0, 10, 40029, 3976, 0, 0, 0, 0, 0, 0, 'High Inquisitor Whitemane - On Data Set 1 1 - Move To Closest Creature \'Scarlet Commander Mograine\''),
-(3977, 0, 20, 0, 34, 0, 100, 512, 8, 2, 0, 0, 0, 0, 80, 397701, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'High Inquisitor Whitemane - On Reached Point 2 - Run Script');
+(3977, 0, 5, 0, 0, 3, 100, 0, 1000, 1000, 2600, 4000, 0, 0, 11, 9481, 64, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'High Inquisitor Whitemane - In Combat - Cast \'Holy Smite\' (Phases 1 & 2)'),
+(3977, 0, 6, 0, 16, 3, 100, 0, 22187, 40, 5000, 10000, 1, 0, 11, 22187, 32, 0, 0, 0, 0, 7, 0, 0, 0, 0, 0, 0, 0, 0, 'High Inquisitor Whitemane - On Friendly Unit Missing Buff \'Power Word: Shield\' - Cast \'Power Word: Shield\' (Phases 1 & 2)'),
+(3977, 0, 7, 0, 0, 2, 100, 0, 45000, 45000, 20000, 30000, 0, 0, 11, 14515, 64, 0, 0, 0, 0, 6, 20, 1, 0, 0, 0, 0, 0, 0, 'High Inquisitor Whitemane - In Combat - Cast \'Dominate Mind\' (Phase 2)'),
+(3977, 0, 8, 0, 74, 2, 100, 0, 5000, 15000, 5000, 15000, 75, 40, 11, 12039, 0, 0, 0, 0, 0, 7, 0, 0, 0, 0, 0, 0, 0, 0, 'High Inquisitor Whitemane - On Friendly Below 75% Health - Cast \'Heal\' (Phase 2)'),
+(3977, 0, 9, 0, 5, 0, 100, 0, 0, 0, 1, 0, 0, 0, 1, 1, 0, 1, 0, 0, 0, 7, 0, 0, 0, 0, 0, 0, 0, 0, 'High Inquisitor Whitemane - On Killed Unit - Say Line 1'),
+(3977, 0, 10, 0, 11, 0, 100, 0, 0, 0, 0, 0, 0, 0, 118, 1, 0, 0, 0, 0, 0, 14, 11877, 104600, 0, 0, 0, 0, 0, 0, 'High Inquisitor Whitemane - On Respawn - Set GO State To 1'),
+(3977, 0, 11, 12, 7, 0, 100, 0, 0, 0, 0, 0, 0, 0, 8, 2, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'High Inquisitor Whitemane - On Evade - Set Reactstate Aggressive'),
+(3977, 0, 12, 0, 61, 0, 100, 0, 0, 0, 0, 0, 0, 0, 34, 1, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'High Inquisitor Whitemane - On Evade - Set Instance Data 1 to 2'),
+(3977, 0, 13, 0, 6, 0, 100, 0, 0, 0, 0, 0, 0, 0, 34, 1, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'High Inquisitor Whitemane - On Just Died - Set Instance Data 1 to 3'),
+(3977, 0, 14, 15, 2, 0, 100, 513, 0, 50, 0, 0, 0, 0, 80, 397700, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'High Inquisitor Whitemane - Between 0-50% Health - Run Script (No Repeat)'),
+(3977, 0, 15, 0, 61, 0, 100, 0, 0, 0, 0, 0, 0, 0, 22, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'High Inquisitor Whitemane - Between 0-50% Health - Set Event Phase 1 (No Repeat)'),
+(3977, 0, 16, 0, 38, 0, 100, 0, 1, 1, 0, 0, 0, 0, 67, 1, 200, 200, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'High Inquisitor Whitemane - On Data Set 1 1 - Create Timed Event'),
+(3977, 0, 17, 0, 59, 0, 100, 0, 1, 0, 0, 0, 0, 0, 80, 397701, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'High Inquisitor Whitemane - On Timed Event 1 Triggered - Run Script'),
+(3977, 0, 18, 0, 38, 0, 100, 0, 1, 1, 0, 0, 0, 0, 69, 2, 0, 0, 2, 0, 0, 10, 40029, 3976, 0, 0, 0, 0, 0, 0, 'High Inquisitor Whitemane - On Data Set 1 1 - Move To Closest Creature \'Scarlet Commander Mograine\''),
+(3977, 0, 19, 0, 34, 0, 100, 512, 8, 2, 0, 0, 0, 0, 80, 397701, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'High Inquisitor Whitemane - On Reached Point 2 - Run Script');
 
 -- Health less than 50% Hypnotize the player
 DELETE FROM `smart_scripts` WHERE (`source_type` = 9 AND `entryorguid` = 397700);
@@ -215,7 +214,6 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 (397700, 9, 4, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 45, 1, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'After 0 seconds - Self: Set data[1] to 1');
 
 -- Resurrect Mograini
-
 DELETE FROM `smart_scripts` WHERE (`source_type` = 9 AND `entryorguid` = 397701);
 INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `event_param6`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
 (397701, 9, 0, 0, 0, 0, 100, 0, 4500, 4500, 0, 0, 0, 0, 11, 9232, 0, 0, 0, 0, 0, 19, 3976, 50, 0, 0, 0, 0, 0, 0, 'High Inquisitor Whitemane - Actionlist - Cast \'Scarlet Resurrection\''),
@@ -235,15 +233,15 @@ INSERT INTO `creature_text` (`CreatureID`, `GroupID`, `ID`, `Text`, `Type`, `Lan
 (3977, 1, 0, 'The Light has spoken!', 14, 0, 100, 0, 0, 5839, 6198, 0, 'High Inquisitor Whitemane // whitemane SAY_WH_KILL'),
 (3977, 2, 0, 'Arise, my champion!', 14, 0, 100, 0, 0, 5840, 6532, 0, 'High Inquisitor Whitemane // whitemane SAY_WH_RESSURECT');
 
+-- High Inquisitor Whitemane Conditions
 DELETE FROM `conditions` WHERE `SourceTypeOrReferenceId` = 22 AND `SourceEntry` = 3977 AND `SourceId` = 0;
 INSERT INTO `conditions` (`SourceTypeOrReferenceId`, `SourceGroup`, `SourceEntry`, `SourceId`, `ElseGroup`, `ConditionTypeOrReference`, `ConditionTarget`, `ConditionValue1`, `ConditionValue2`, `ConditionValue3`, `NegativeCondition`, `Comment`) VALUES 
-(22, 18, 3977, 0, 0, 29, 1, 3976, 5, 0, 0, 'There is creature Scarlet Commander Mograine (3976) within range 5 yards to Object'),
-(22, 20, 3977, 0, 0, 29, 1, 3976, 5, 0, 1, 'There is no creature Scarlet Commander Mograine (3976) within range 5 yards to Object');
+(22, 17, 3977, 0, 0, 29, 1, 3976, 5, 0, 0, 'There is creature Scarlet Commander Mograine (3976) within range 5 yards to Object'),
+(22, 19, 3977, 0, 0, 29, 1, 3976, 5, 0, 1, 'There is no creature Scarlet Commander Mograine (3976) within range 5 yards to Object');
 
 -- High Inquisitor Fairbanks smart ai
 
-UPDATE `creature_template` SET `AIName` = 'SmartAI' WHERE `entry` = 4542;
-
+UPDATE `creature_template` SET `AIName` = 'SmartAI', `ScriptName` = '' WHERE `entry` = 4542;
 DELETE FROM `smart_scripts` WHERE (`entryorguid` = 4542) AND (`source_type` = 0) AND (`id` IN (11));
 INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `event_param6`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
 (4542, 0, 11, 0, 8, 0, 100, 1, 28441, 0, 0, 0, 0, 0, 80, 454205, 2, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'High Inquisitor Fairbanks - On Spellhit \'AB Effect 000\' - Run Script (No Repeat)');
