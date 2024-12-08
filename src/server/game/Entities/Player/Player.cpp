@@ -4467,13 +4467,13 @@ void Player::BuildPlayerRepop()
     sScriptMgr->OnPlayerReleasedGhost(this);
 }
 
-void Player::ResurrectPlayer(float restore_percent, bool applySickness)
+void Player::ResurrectPlayer(float restorePercent, bool applySickness)
 {
     LOG_DEBUG("entities.player", "Player::ResurrectPlayer: enter Resurrecting player {} ({})", GetName(), GetGUID().ToString());
 
     // call the beforePlayerResurrect script first
     // if false is returned, no resurrection will occur
-    if (!sScriptMgr->OnBeforePlayerResurrect(this, restore_percent, applySickness))
+    if (!sScriptMgr->OnBeforePlayerResurrect(this, restorePercent, applySickness))
     {
         LOG_DEBUG("entities.player", "Player::ResurrectPlayer: OnBeforePlayerResurrect returned false for player {} ({})", GetName(), GetGUID().ToString());
         return;
@@ -4505,12 +4505,12 @@ void Player::ResurrectPlayer(float restore_percent, bool applySickness)
     m_deathTimer = 0;
 
     // set health/powers (0- will be set in caller)
-    if (restore_percent > 0.0f)
+    if (restorePercent > 0.0f)
     {
-        SetHealth(uint32(GetMaxHealth()*restore_percent));
-        SetPower(POWER_MANA, uint32(GetMaxPower(POWER_MANA)*restore_percent));
+        SetHealth(uint32(GetMaxHealth()*restorePercent));
+        SetPower(POWER_MANA, uint32(GetMaxPower(POWER_MANA)*restorePercent));
         SetPower(POWER_RAGE, 0);
-        SetPower(POWER_ENERGY, uint32(GetMaxPower(POWER_ENERGY)*restore_percent));
+        SetPower(POWER_ENERGY, uint32(GetMaxPower(POWER_ENERGY)*restorePercent));
     }
 
     // trigger update zone for alive state zone updates
@@ -4525,7 +4525,7 @@ void Player::ResurrectPlayer(float restore_percent, bool applySickness)
     // update visibility
     UpdateObjectVisibility();
 
-    sScriptMgr->OnPlayerResurrect(this, restore_percent, applySickness);
+    sScriptMgr->OnPlayerResurrect(this, restorePercent, applySickness);
 
     if (!applySickness)
     {
