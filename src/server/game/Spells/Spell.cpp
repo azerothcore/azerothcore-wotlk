@@ -5234,6 +5234,13 @@ void Spell::SendChannelStart(uint32 duration)
 
 void Spell::SendResurrectRequest(Player* target)
 {
+    // Check if player should receive resurrect button op code
+    if (!sScriptMgr->OnBeforePlayerResurrect(this, restorePercent, applySickness))
+    {
+        LOG_DEBUG("entities.player", "Player::ResurrectPlayer: OnBeforePlayerResurrect returned false in SendResurrectRequest for player {} ({})", GetName(), GetGUID().ToString());
+        return;
+    }
+    
     // get resurrector name for creature resurrections, otherwise packet will be not accepted
     // for player resurrections the name is looked up by guid
     std::string const sentName(m_caster->IsPlayer()
