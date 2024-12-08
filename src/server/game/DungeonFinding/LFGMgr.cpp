@@ -1789,21 +1789,6 @@ namespace lfg
                     grp->SetLfgRoles(bguid, proposal.players.find(bguid)->second.role);
                 }
 
-                if (grp->GetMembersCount() >= 5)
-                {
-                    uint8 pcount = 0;
-                    for (GroupReference const* gitr = grp->GetFirstMember(); gitr != nullptr; gitr = gitr->next())
-                        if (gitr->GetSource())
-                            ++pcount;
-                    if (pcount <= 1)
-                    {
-                        //only one player in group
-                        ChatHandler ch(player->GetSession());
-                        ch.SendSysMessage("You are the only player in your group, loot method set to Free For All");
-                        grp->SetLootMethod(FREE_FOR_ALL);
-                    }
-                }
-
                 continue;
             }
             //end npcbot
