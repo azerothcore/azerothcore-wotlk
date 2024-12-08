@@ -204,6 +204,7 @@ enum PlayerHook
     PLAYERHOOK_CAN_SEND_ERROR_ALREADY_LOOTED,
     PLAYERHOOK_ON_AFTER_CREATURE_LOOT,
     PLAYERHOOK_ON_AFTER_CREATURE_LOOT_MONEY,
+    PLAYERHOOK_ON_BEFORE_PLAYER_RESURRCECT,
     PLAYERHOOK_END
 };
 
@@ -765,6 +766,15 @@ public:
      * @param player Contains information about the Player
      */
     virtual void OnAfterCreatureLootMoney(Player* /*player*/) { }
+    
+    /**
+     * @brief Called when a player is about to be resurrected, if false is returned the player will not be resurrected
+     *
+     * @param player Contains information about the player
+     * @param restorePercent
+     * @param applySickness
+     */
+    [[nodiscard]] virtual bool OnBeforePlayerResurrect(Player* /*player*/, float /*restorePercent*/, bool /*applySickness*/) { return true; }
 };
 
 #endif
