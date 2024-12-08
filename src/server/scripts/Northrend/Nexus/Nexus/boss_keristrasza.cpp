@@ -55,152 +55,137 @@ enum Events
     EVENT_KILL_TALK                 = 6
 };
 
-class boss_keristrasza : public CreatureScript
+struct boss_keristrasza : public BossAI
 {
-public:
-    boss_keristrasza() : CreatureScript("boss_keristrasza") { }
+    boss_keristrasza(Creature* creature) : BossAI(creature, DATA_KERISTRASZA_EVENT) {}
 
-    CreatureAI* GetAI(Creature* creature) const override
+    std::set<uint32> aGuids;
+
+    void Reset() override
     {
-        return GetNexusAI<boss_keristraszaAI>(creature);
+        BossAI::Reset();
+        RemovePrison(CanRemovePrison());
+        aGuids.clear();
     }
 
-    struct boss_keristraszaAI : public BossAI
+    void JustEngagedWith(Unit* who) override
     {
-        boss_keristraszaAI(Creature* creature) : BossAI(creature, DATA_KERISTRASZA_EVENT)
+        Talk(SAY_AGGRO);
+        BossAI::JustEngagedWith(who);
+
+        me->CastSpell(me, SPELL_INTENSE_COLD, true);
+        events.ScheduleEvent(EVENT_CRYSTALFIRE_BREATH, 14s);
+        events.ScheduleEvent(EVENT_CRYSTAL_CHAINS, DUNGEON_MODE(20000, 11000));
+        events.ScheduleEvent(EVENT_TAIL_SWEEP, 5s);
+        events.ScheduleEvent(EVENT_HEALTH_CHECK, 1s);
+        events.ScheduleEvent(EVENT_ACHIEVEMENT_CHECK, 1s);
+    }
+
+    void JustDied(Unit* killer) override
+    {
+        Talk(SAY_DEATH);
+        BossAI::JustDied(killer);
+    }
+
+    void KilledUnit(Unit*) override
+    {
+        if (events.GetNextEventTime(EVENT_KILL_TALK) == 0)
         {
+            Talk(SAY_SLAY);
+            events.ScheduleEvent(EVENT_KILL_TALK, 6s);
         }
+    }
 
-        std::set<uint32> aGuids;
+    void SetData(uint32 type, uint32) override
+    {
+        if (type == me->GetEntry() && CanRemovePrison())
+            RemovePrison(true);
+    }
 
-        void Reset() override
+    bool CanRemovePrison()
+    {
+        for (uint8 i = DATA_TELESTRA_ORB; i <= DATA_ORMOROK_ORB; ++i)
+            if (instance->GetBossState(i) != DONE)
+                return false;
+        return true;
+    }
+
+    void RemovePrison(bool remove)
+    {
+        if (remove)
         {
-            BossAI::Reset();
-            RemovePrison(CanRemovePrison());
-            aGuids.clear();
+            me->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
+            me->RemoveAurasDueToSpell(SPELL_FROZEN_PRISON);
         }
-
-        void JustEngagedWith(Unit* who) override
+        else
         {
-            Talk(SAY_AGGRO);
-            BossAI::JustEngagedWith(who);
+            me->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
+            me->CastSpell(me, SPELL_FROZEN_PRISON, true);
+        }
+    }
 
-            me->CastSpell(me, SPELL_INTENSE_COLD, true);
-            events.ScheduleEvent(EVENT_CRYSTALFIRE_BREATH, 14s);
-            events.ScheduleEvent(EVENT_CRYSTAL_CHAINS, DUNGEON_MODE(20000, 11000));
-            events.ScheduleEvent(EVENT_TAIL_SWEEP, 5s);
+    uint32 GetData(uint32 guid) const override
+    {
+        return aGuids.find(guid) == aGuids.end();
+    }
+
+    void UpdateAI(uint32 diff) override
+    {
+        if (!UpdateVictim())
+            return;
+
+        events.Update(diff);
+        if (me->HasUnitState(UNIT_STATE_CASTING))
+            return;
+
+        switch (events.ExecuteEvent())
+        {
+        case EVENT_HEALTH_CHECK:
+            if (me->HealthBelowPct(26))
+            {
+                Talk(SAY_ENRAGE);
+                Talk(EMOTE_FRENZY);
+                me->CastSpell(me, SPELL_ENRAGE, true);
+                break;
+            }
             events.ScheduleEvent(EVENT_HEALTH_CHECK, 1s);
-            events.ScheduleEvent(EVENT_ACHIEVEMENT_CHECK, 1s);
-        }
-
-        void JustDied(Unit* killer) override
+            break;
+        case EVENT_ACHIEVEMENT_CHECK:
         {
-            Talk(SAY_DEATH);
-            BossAI::JustDied(killer);
+            Map::PlayerList const& pList = me->GetMap()->GetPlayers();
+            for (Map::PlayerList::const_iterator itr = pList.begin(); itr != pList.end(); ++itr)
+                if (Aura* aur = itr->GetSource()->GetAura(SPELL_INTENSE_COLD_TRIGGER))
+                    if (aur->GetStackAmount() > 2)
+                        aGuids.insert(itr->GetSource()->GetGUID().GetCounter());
+            events.ScheduleEvent(EVENT_ACHIEVEMENT_CHECK, 500ms);
+            break;
+        }
+        case EVENT_CRYSTALFIRE_BREATH:
+            me->CastSpell(me->GetVictim(), SPELL_CRYSTALFIRE_BREATH, false);
+            events.ScheduleEvent(EVENT_CRYSTALFIRE_BREATH, 14s);
+            break;
+        case EVENT_TAIL_SWEEP:
+            me->CastSpell(me, SPELL_TAIL_SWEEP, false);
+            events.ScheduleEvent(EVENT_TAIL_SWEEP, 5s);
+            break;
+        case EVENT_CRYSTAL_CHAINS:
+            Talk(SAY_CRYSTAL_NOVA);
+            if (IsHeroic())
+                me->CastSpell(me, SPELL_CRYSTALIZE, false);
+            else if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 40.0f, true))
+                me->CastSpell(target, SPELL_CRYSTAL_CHAINS, false);
+            events.ScheduleEvent(EVENT_CRYSTAL_CHAINS, DUNGEON_MODE(20000, 11000));
+            break;
         }
 
-        void KilledUnit(Unit*) override
-        {
-            if (events.GetNextEventTime(EVENT_KILL_TALK) == 0)
-            {
-                Talk(SAY_SLAY);
-                events.ScheduleEvent(EVENT_KILL_TALK, 6s);
-            }
-        }
-
-        void SetData(uint32 type, uint32) override
-        {
-            if (type == me->GetEntry() && CanRemovePrison())
-                RemovePrison(true);
-        }
-
-        bool CanRemovePrison()
-        {
-            for (uint8 i = DATA_TELESTRA_ORB; i <= DATA_ORMOROK_ORB; ++i)
-                if (instance->GetBossState(i) != DONE)
-                    return false;
-            return true;
-        }
-
-        void RemovePrison(bool remove)
-        {
-            if (remove)
-            {
-                me->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
-                me->RemoveAurasDueToSpell(SPELL_FROZEN_PRISON);
-            }
-            else
-            {
-                me->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
-                me->CastSpell(me, SPELL_FROZEN_PRISON, true);
-            }
-        }
-
-        uint32 GetData(uint32 guid) const override
-        {
-            return aGuids.find(guid) == aGuids.end();
-        }
-
-        void UpdateAI(uint32 diff) override
-        {
-            if (!UpdateVictim())
-                return;
-
-            events.Update(diff);
-            if (me->HasUnitState(UNIT_STATE_CASTING))
-                return;
-
-            switch (events.ExecuteEvent())
-            {
-                case EVENT_HEALTH_CHECK:
-                    if (me->HealthBelowPct(26))
-                    {
-                        Talk(SAY_ENRAGE);
-                        Talk(EMOTE_FRENZY);
-                        me->CastSpell(me, SPELL_ENRAGE, true);
-                        break;
-                    }
-                    events.ScheduleEvent(EVENT_HEALTH_CHECK, 1s);
-                    break;
-                case EVENT_ACHIEVEMENT_CHECK:
-                    {
-                        Map::PlayerList const& pList = me->GetMap()->GetPlayers();
-                        for(Map::PlayerList::const_iterator itr = pList.begin(); itr != pList.end(); ++itr)
-                            if (Aura* aur = itr->GetSource()->GetAura(SPELL_INTENSE_COLD_TRIGGER))
-                                if (aur->GetStackAmount() > 2)
-                                    aGuids.insert(itr->GetSource()->GetGUID().GetCounter());
-                        events.ScheduleEvent(EVENT_ACHIEVEMENT_CHECK, 500ms);
-                        break;
-                    }
-                case EVENT_CRYSTALFIRE_BREATH:
-                    me->CastSpell(me->GetVictim(), SPELL_CRYSTALFIRE_BREATH, false);
-                    events.ScheduleEvent(EVENT_CRYSTALFIRE_BREATH, 14s);
-                    break;
-                case EVENT_TAIL_SWEEP:
-                    me->CastSpell(me, SPELL_TAIL_SWEEP, false);
-                    events.ScheduleEvent(EVENT_TAIL_SWEEP, 5s);
-                    break;
-                case EVENT_CRYSTAL_CHAINS:
-                    Talk(SAY_CRYSTAL_NOVA);
-                    if (IsHeroic())
-                        me->CastSpell(me, SPELL_CRYSTALIZE, false);
-                    else if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 40.0f, true))
-                        me->CastSpell(target, SPELL_CRYSTAL_CHAINS, false);
-                    events.ScheduleEvent(EVENT_CRYSTAL_CHAINS, DUNGEON_MODE(20000, 11000));
-                    break;
-            }
-
-            DoMeleeAttackIfReady();
-        }
-    };
+        DoMeleeAttackIfReady();
+    }
 };
 
 class achievement_intense_cold : public AchievementCriteriaScript
 {
 public:
-    achievement_intense_cold() : AchievementCriteriaScript("achievement_intense_cold")
-    {
-    }
+    achievement_intense_cold() : AchievementCriteriaScript("achievement_intense_cold") { }
 
     bool OnCheck(Player* player, Unit* target, uint32 /*criteria_id*/) override
     {
@@ -213,6 +198,6 @@ public:
 
 void AddSC_boss_keristrasza()
 {
-    new boss_keristrasza();
+    RegisterNexusCreatureAI(boss_keristrasza);
     new achievement_intense_cold();
 }

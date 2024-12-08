@@ -306,12 +306,6 @@ bool Pet::LoadPetFromDB(Player* owner, uint32 petEntry, uint32 petnumber, bool c
     {
         case SUMMON_PET:
             petlevel = owner->GetLevel();
-
-            if (IsPetGhoul())
-                SetUInt32Value(UNIT_FIELD_BYTES_0, 0x400); // class = rogue
-            else
-                SetUInt32Value(UNIT_FIELD_BYTES_0, 0x800); // class = mage
-
             ReplaceAllUnitFlags(UNIT_FLAG_PLAYER_CONTROLLED); // this enables popup window (pet dismiss, cancel)
             break;
         case HUNTER_PET:

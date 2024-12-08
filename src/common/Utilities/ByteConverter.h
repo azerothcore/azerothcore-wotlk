@@ -23,7 +23,7 @@
  */
 
 #include "Define.h"
-#include <algorithm>
+#include <vector>
 
 namespace ByteConverter
 {

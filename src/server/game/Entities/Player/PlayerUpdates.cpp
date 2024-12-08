@@ -38,6 +38,7 @@
 #include "Vehicle.h"
 #include "Weather.h"
 #include "WeatherMgr.h"
+#include "WorldState.h"
 #include "WorldStatePackets.h"
 
 /// @todo: this import is not necessary for compilation and marked as unused by the IDE
@@ -355,7 +356,7 @@ void Player::Update(uint32 p_time)
 
     // not auto-free ghost from body in instances
     if (m_deathTimer > 0 && !GetMap()->Instanceable() &&
-        !HasAuraType(SPELL_AURA_PREVENT_RESURRECTION))
+        !HasPreventResurectionAura())
     {
         if (p_time >= m_deathTimer)
         {
@@ -1215,6 +1216,8 @@ void Player::UpdateZone(uint32 newZone, uint32 newArea)
     {
         sOutdoorPvPMgr->HandlePlayerLeaveZone(this, m_zoneUpdateId);
         sOutdoorPvPMgr->HandlePlayerEnterZone(this, newZone);
+        sWorldState->HandlePlayerLeaveZone(this, static_cast<WorldStateZoneId>(m_zoneUpdateId));
+        sWorldState->HandlePlayerEnterZone(this, static_cast<WorldStateZoneId>(newZone));
         sBattlefieldMgr->HandlePlayerLeaveZone(this, m_zoneUpdateId);
         sBattlefieldMgr->HandlePlayerEnterZone(this, newZone);
         SendInitWorldStates(newZone,
@@ -1712,7 +1715,7 @@ void Player::UpdateTriggerVisibility()
             // Update fields of triggers, transformed units or unselectable
             // units (values dependent on GM state)
             if (!creature || (!creature->IsTrigger() &&
-                              !creature->HasAuraType(SPELL_AURA_TRANSFORM) &&
+                              !creature->HasTransformAura() &&
                               !creature->HasUnitFlag(UNIT_FLAG_NOT_SELECTABLE)))
                 continue;
 

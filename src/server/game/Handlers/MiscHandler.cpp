@@ -45,13 +45,14 @@
 #include "ScriptMgr.h"
 #include "SocialMgr.h"
 #include "Spell.h"
-#include "UpdateData.h"
 #include "Vehicle.h"
 #include "WhoListCacheMgr.h"
 #include "World.h"
 #include "WorldPacket.h"
 #include "WorldSession.h"
 #include <zlib.h>
+
+#include "Corpse.h"
 
 void WorldSession::HandleRepopRequestOpcode(WorldPacket& recv_data)
 {
@@ -62,7 +63,7 @@ void WorldSession::HandleRepopRequestOpcode(WorldPacket& recv_data)
     if (GetPlayer()->IsAlive() || GetPlayer()->HasPlayerFlag(PLAYER_FLAGS_GHOST))
         return;
 
-    if (GetPlayer()->HasAuraType(SPELL_AURA_PREVENT_RESURRECTION))
+    if (GetPlayer()->HasPreventResurectionAura())
         return; // silently return, client should display the error by itself
 
     // the world update order is sessions, players, creatures
@@ -673,7 +674,7 @@ void WorldSession::HandleResurrectResponseOpcode(WorldPacket& recv_data)
     recv_data >> status;
 
     // Xinef: Prevent resurrect with prevent resurrection aura
-    if (GetPlayer()->IsAlive() || GetPlayer()->HasAuraType(SPELL_AURA_PREVENT_RESURRECTION))
+    if (GetPlayer()->IsAlive() || GetPlayer()->HasPreventResurectionAura())
         return;
 
     if (status == 0)

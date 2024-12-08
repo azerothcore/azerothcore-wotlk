@@ -19,12 +19,14 @@
 #define SCRIPT_OBJECT_ALL_COMMAND_SCRIPT_H_
 
 #include "ScriptObject.h"
+#include "ChatCommand.h"
 #include <vector>
 
 enum AllCommandHook
 {
     ALLCOMMANDHOOK_ON_HANDLE_DEV_COMMAND,
     ALLCOMMANDHOOK_ON_TRY_EXECUTE_COMMAND,
+    ALLCOMMANDHOOK_ON_BEFORE_IS_INVOKER_VISIBLE,
     ALLCOMMANDHOOK_END
 };
 
@@ -45,6 +47,8 @@ public:
      * @param cmdStr Contains information about the command name
      */
     [[nodiscard]] virtual bool OnTryExecuteCommand(ChatHandler& /*handler*/, std::string_view /*cmdStr*/) { return true; }
+
+    [[nodiscard]] virtual bool OnBeforeIsInvokerVisible(std::string /*name*/, Acore::Impl::ChatCommands::CommandPermissions /*permissions*/, ChatHandler const& /*who*/) { return true; }
 };
 
 // Compatibility for old scripts

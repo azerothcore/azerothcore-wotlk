@@ -22,6 +22,10 @@
 
 #define UtgardeKeepScriptName "instance_utgarde_keep"
 
+#define DataHeader "UK"
+
+uint32 const EncounterCount = 3;
+
 enum eData
 {
     DATA_KELESETH,
@@ -82,5 +86,7 @@ inline AI* GetUtgardeKeepAI(T* obj)
 {
     return GetInstanceAI<AI>(obj, UtgardeKeepScriptName);
 }
+
+#define RegisterUtgardeKeepCreatureAI(ai_name) RegisterCreatureAIWithFactory(ai_name, GetUtgardeKeepAI)
 
 #endif

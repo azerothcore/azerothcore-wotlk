@@ -20,7 +20,6 @@
 
 #include <cassert>
 #include <string>
-#include <utility>
 
 class DBCFile
 {
