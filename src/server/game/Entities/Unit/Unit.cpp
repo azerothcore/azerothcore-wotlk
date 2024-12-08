@@ -3982,8 +3982,8 @@ bool Unit::CanSparringWith(Unit const* attacker) const
     if (attacker->GetTypeId() != TYPEID_UNIT || attacker->IsCharmedOwnedByPlayerOrPlayer())
         return false;
 
-    if (Creature const* me = ToCreature())
-        if (me->GetSparringPct() == 0.0f)
+    if (Creature const* creature = ToCreature())
+        if (!creature->GetSparringPct())
             return false;
 
     return true;
