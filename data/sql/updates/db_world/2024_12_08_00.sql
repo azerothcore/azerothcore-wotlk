@@ -1,3 +1,4 @@
+-- DB update 2024_12_07_04 -> 2024_12_08_00
 
 -- Delete Unofficial Npcs
 
