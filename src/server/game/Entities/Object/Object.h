@@ -20,6 +20,7 @@
 
 #include "Common.h"
 #include "DataMap.h"
+#include "EventProcessor.h"
 #include "G3D/Vector3.h"
 #include "GridDefines.h"
 #include "GridReference.h"
@@ -39,7 +40,6 @@
 #include "UpdateFields.h"
 
 class ElunaEventProcessor;
-class EventProcessor;
 
 enum TempSummonType
 {
