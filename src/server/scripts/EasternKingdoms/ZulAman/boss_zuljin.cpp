@@ -198,10 +198,16 @@ struct boss_zuljin : public BossAI
             me->ResumeChasingVictim();
 
             ScheduleTimedEvent(5s, [&] {
-                DoCastRandomTarget(SPELL_CLAW_RAGE_CHARGE);
+                if (me->HasAura(SPELL_LYNX_RUSH_HASTE))
+                    return;
+
+                DoCastRandomTarget(SPELL_CLAW_RAGE_CHARGE, 1);
             }, 15s, 20s);
 
             ScheduleTimedEvent(14s, [&] {
+                if (me->HasAura(SPELL_CLAW_RAGE_AURA))
+                    return;
+
                 DoCastSelf(SPELL_LYNX_RUSH_HASTE);
 
                 for (int8 count = 0; count <= 8; ++count)

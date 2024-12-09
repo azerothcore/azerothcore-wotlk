@@ -83,6 +83,14 @@ struct boss_muru : public BossAI
         }, 10min);
     }
 
+    void JustSummoned(Creature* creature) override
+    {
+        if (creature->GetEntry() == NPC_ENTROPIUS)
+            creature->SetInCombatWithZone();
+        else
+            BossAI::JustSummoned(creature);
+    }
+
     void DamageTaken(Unit*, uint32& damage, DamageEffectType, SpellSchoolMask) override
     {
         if (damage >= me->GetHealth())
