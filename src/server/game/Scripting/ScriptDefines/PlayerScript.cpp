@@ -896,10 +896,18 @@ bool ScriptMgr::AnticheatCheckMovementInfo(Player* player, MovementInfo const& m
 }
 
 
-bool ScriptMgr::OnBeforePlayerResurrect(Player *player, float restorePercent, bool applySickness)
+bool ScriptMgr::OnBeforePlayerResurrect(Player* player, float restorePercent, bool applySickness)
 {
-    CALL_ENABLED_BOOLEAN_HOOKS(PlayerScript, PLAYERHOOK_ON_BEFORE_PLAYER_RESURRCECT,
-                               script->OnBeforePlayerResurrect(player, restorePercent, applySickness));
+    auto ret = IsValidBoolScript<PlayerScript>([&](PlayerScript* script)
+    {
+        LOG_DEBUG("scripts.hook", "ScriptMgr - OnBeforePlayerResurrect begin");
+        bool scriptRet = script->OnBeforePlayerResurrect(player, restorePercent, applySickness);
+        //print script name and scriptRet to logs
+        LOG_DEBUG("scripts.hook", "ScriptMgr - OnBeforePlayerResurrect - Script: {} , scriptRet: {} ", script->GetName(), scriptRet ? "true" : "false");
+        return !scriptRet;
+    });
+
+    return ret && *ret;
 }
 
 PlayerScript::PlayerScript(const char* name, std::vector<uint16> enabledHooks)

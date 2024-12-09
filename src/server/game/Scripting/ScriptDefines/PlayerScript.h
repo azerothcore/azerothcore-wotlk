@@ -774,7 +774,7 @@ public:
      * @param restorePercent
      * @param applySickness
      */
-    [[nodiscard]] virtual bool OnBeforePlayerResurrect(Player* /*player*/, float /*restorePercent*/, bool /*applySickness*/) { return true; }
+    [[nodiscard]] virtual bool OnBeforePlayerResurrect(Player* /*player*/, float /*restorePercent*/, bool /*applySickness*/) { return false; }
 };
 
 #endif
