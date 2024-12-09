@@ -1271,7 +1271,6 @@ TugOfWarWG::~TugOfWarWG()
 TugOfWarWG::TugOfWarWG(BattlefieldWG* WG)
 {
     m_WG = WG;
-    TeamId team = m_WG->GetDefenderTeam();
 
     if (!sWorld->getWorldState(TUG_OF_WAR_SCALE))
     {
