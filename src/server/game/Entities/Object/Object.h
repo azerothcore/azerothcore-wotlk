@@ -39,6 +39,7 @@
 #include "UpdateFields.h"
 
 class ElunaEventProcessor;
+class EventProcessor;
 
 enum TempSummonType
 {
