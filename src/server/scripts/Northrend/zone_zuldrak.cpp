@@ -23,6 +23,7 @@
 #include "ScriptedGossip.h"
 #include "SpellAuras.h"
 #include "SpellInfo.h"
+#include "SpellScriptLoader.h"
 #include "Vehicle.h"
 
 // Ours
@@ -322,6 +323,7 @@ enum overlordDrakuru
     SPELL_THROW_BRIGHT_CRYSTAL          = 54087,
     SPELL_TELEPORT_EFFECT               = 52096,
     SPELL_SCOURGE_DISGUISE              = 51966,
+    SPELL_SCOURGE_DISGUISE_INSTANT_CAST = 52192,
     SPELL_BLIGHT_FOG                    = 54104,
     SPELL_THROW_PORTAL_CRYSTAL          = 54209,
     SPELL_ARTHAS_PORTAL                 = 51807,
@@ -948,6 +950,39 @@ public:
     }
 };
 
+class spell_scourge_disguise_instability : public AuraScript
+{
+    PrepareAuraScript(spell_scourge_disguise_instability)
+
+    void HandleApply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
+    {
+        SetDuration(urand(3*60*1000, 5*60*1000));
+    }
+
+    void HandleRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
+    {
+        Unit* caster = GetCaster();
+        if (caster && caster->IsPlayer())
+        {
+            Player* player = caster->ToPlayer();
+            if (player->HasAura(SPELL_SCOURGE_DISGUISE) || player->HasAura(SPELL_SCOURGE_DISGUISE_INSTANT_CAST))
+            {
+                WorldPacket data;
+                ChatHandler::BuildChatPacket(data, CHAT_MSG_RAID_BOSS_EMOTE, LANG_UNIVERSAL, player, player, "Scourge Disguise Failing! Find a safeplace!");
+                player->GetSession()->SendPacket(&data);
+
+                player->CastSpell(GetUnitOwner(), SPELL_SCOURGE_DISGUISE_EXPIRING, true);
+            }
+        }
+    }
+
+    void Register() override
+    {
+        OnEffectApply += AuraEffectApplyFn(spell_scourge_disguise_instability::HandleApply, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
+        OnEffectRemove += AuraEffectRemoveFn(spell_scourge_disguise_instability::HandleRemove, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
+    }
+};
+
 void AddSC_zuldrak()
 {
     // Ours
@@ -963,4 +998,6 @@ void AddSC_zuldrak()
     new npc_crusade_recruit();
     new go_scourge_enclosure();
     new npc_storm_cloud();
+
+    RegisterSpellScript(spell_scourge_disguise_instability);
 }
