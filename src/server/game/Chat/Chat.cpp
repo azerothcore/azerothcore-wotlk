@@ -370,6 +370,78 @@ std::size_t ChatHandler::BuildChatPacket(WorldPacket& data, ChatMsg chatType, La
     return BuildChatPacket(data, chatType, language, senderGUID, receiverGUID, message, chatTag, senderName, receiverName, achievementId, gmMessage, channelName);
 }
 
+void ChatHandler::BuildChatPacket(WorldPacket& data, ChatMsg msgtype, std::string_view message, Language language /*= LANG_UNIVERSAL*/, PlayerChatTag chatTag /*= CHAT_TAG_NONE*/,
+                                  ObjectGuid const& senderGuid /*= ObjectGuid()*/, std::string_view senderName /*= nullptr*/,
+                                  ObjectGuid const& targetGuid /*= ObjectGuid()*/, std::string_view targetName /*= nullptr*/,
+                                  std::string_view channelName /*= nullptr*/, uint32 achievementId /*= 0*/)
+{
+    const bool isGM = (chatTag & CHAT_TAG_GM) != 0;
+    bool isAchievement = false;
+
+    data.Initialize((isGM && language != LANG_ADDON) ? SMSG_GM_MESSAGECHAT : SMSG_MESSAGECHAT);
+    data << uint8(msgtype);
+    data << uint32(language);
+    data << ObjectGuid(senderGuid);
+    data << uint32(0);                                              // 2.1.0
+
+    switch (msgtype)
+    {
+        case CHAT_MSG_MONSTER_SAY:
+        case CHAT_MSG_MONSTER_PARTY:
+        case CHAT_MSG_MONSTER_YELL:
+        case CHAT_MSG_MONSTER_WHISPER:
+        case CHAT_MSG_MONSTER_EMOTE:
+        case CHAT_MSG_RAID_BOSS_WHISPER:
+        case CHAT_MSG_RAID_BOSS_EMOTE:
+        case CHAT_MSG_BATTLENET:
+        case CHAT_MSG_WHISPER_FOREIGN:
+            data << uint32(senderName.size() + 1);
+            data << senderName;
+            data << ObjectGuid(targetGuid);                         // Unit Target
+            if (targetGuid && !targetGuid.IsPlayer() && !targetGuid.IsPet() && (msgtype != CHAT_MSG_WHISPER_FOREIGN))
+            {
+                data << uint32(targetName.size() + 1);              // target name length
+                data << targetName;                                 // target name
+            }
+            break;
+        case CHAT_MSG_BG_SYSTEM_NEUTRAL:
+        case CHAT_MSG_BG_SYSTEM_ALLIANCE:
+        case CHAT_MSG_BG_SYSTEM_HORDE:
+            data << ObjectGuid(targetGuid);                         // Unit Target
+            if (targetGuid && !targetGuid.IsPlayer())
+            {
+                data << uint32(targetName.size() + 1);              // target name length
+                data << targetName;                                 // target name
+            }
+            break;
+        case CHAT_MSG_ACHIEVEMENT:
+        case CHAT_MSG_GUILD_ACHIEVEMENT:
+            data << ObjectGuid(targetGuid);                         // Unit Target
+            isAchievement = true;
+            break;
+        default:
+            if (isGM)
+            {
+                data << uint32(senderName.size() + 1);
+                data << senderName;
+            }
+
+            if (msgtype == CHAT_MSG_CHANNEL)
+            {
+                data << channelName;
+            }
+            data << ObjectGuid(targetGuid);
+            break;
+    }
+    data << uint32(message.size() + 1);
+    data << message;
+    data << uint8(chatTag);
+
+    if (isAchievement)
+        data << uint32(achievementId);
+}
+
+
 Player* ChatHandler::getSelectedPlayer() const
 {
     if (!m_session)

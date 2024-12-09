@@ -29,6 +29,7 @@
 #include "Common.h"
 #include "DatabaseEnv.h"
 #include "GossipDef.h"
+#include "QueryHolder.h"
 #include "Packet.h"
 #include "SharedDefines.h"
 #include "World.h"
@@ -40,7 +41,6 @@ class Creature;
 class GameObject;
 class InstanceSave;
 class Item;
-class LoginQueryHolder;
 class LoadPetFromDBQueryHolder;
 class Object;
 class Pet;
@@ -225,6 +225,20 @@ enum CharterTypes
     ARENA_TEAM_CHARTER_5v5_TYPE                   = 5
 };
 
+class LoginQueryHolder : public CharacterDatabaseQueryHolder
+{
+    private:
+        uint32 m_accountId;
+        ObjectGuid m_guid;
+
+    public:
+        LoginQueryHolder(uint32 accountId, ObjectGuid guid);
+
+        ObjectGuid GetGuid() const { return m_guid; }
+        uint32 GetAccountId() const { return m_accountId; }
+        bool Initialize();
+};
+
 //class to deal with packet processing
 //allows to determine if next packet is safe to be processed
 class PacketFilter
@@ -268,6 +282,11 @@ class CharacterCreateInfo
 {
     friend class WorldSession;
     friend class Player;
+
+public:
+    CharacterCreateInfo(std::string const name = "", uint8 _race = 0, uint8 _class = 0, uint8 gender = 0, uint8 skin = 0, uint8 face = 0,
+        uint8 hairStyle = 0, uint8 hairColor = 0, uint8 facialHair = 0)
+        : Name(name), Race(_race), Class(_class), Gender(gender), Skin(skin), Face(face), HairStyle(hairStyle), HairColor(hairColor), FacialHair(facialHair) { }
 
 protected:
     /// User specified variables
@@ -329,7 +348,8 @@ struct PacketCounter
 class WorldSession
 {
 public:
-    WorldSession(uint32 id, std::string&& name, std::shared_ptr<WorldSocket> sock, AccountTypes sec, uint8 expansion, time_t mute_time, LocaleConstant locale, uint32 recruiter, bool isARecruiter, bool skipQueue, uint32 TotalTime);
+    WorldSession(uint32 id, std::string&& name, std::shared_ptr<WorldSocket> sock, AccountTypes sec, uint8 expansion, time_t mute_time, LocaleConstant locale,
+        uint32 recruiter, bool isARecruiter, bool skipQueue, uint32 TotalTime, bool isBot = false);
     ~WorldSession();
 
     bool IsGMAccount() const;
@@ -494,8 +514,8 @@ public:
     time_t m_muteTime;
 
     // Locales
-    LocaleConstant GetSessionDbcLocale() const { return m_sessionDbcLocale; }
-    LocaleConstant GetSessionDbLocaleIndex() const { return m_sessionDbLocaleIndex; }
+    LocaleConstant GetSessionDbcLocale() const { return /*_isBot? LOCALE_enUS : */m_sessionDbcLocale; }
+    LocaleConstant GetSessionDbLocaleIndex() const { return /*_isBot? LOCALE_enUS : */m_sessionDbLocaleIndex; }
     char const* GetAcoreString(uint32 entry) const;
     std::string const* GetModuleString(std::string module, uint32 id) const;
 
@@ -533,6 +553,7 @@ public:
     // Time Synchronisation
     void ResetTimeSync();
     void SendTimeSync();
+
 public:                                                 // opcodes handlers
     void Handle_NULL(WorldPacket& null);                // not used
     void Handle_EarlyProccess(WorldPacket& recvPacket); // just mark packets processed in WorldSocket::OnRead
@@ -1070,6 +1091,8 @@ public:                                                 // opcodes handlers
     void SetKicked(bool val) { _kicked = val; }
     bool IsSocketClosed() const;
 
+    void SetAddress(std::string const& address) { m_Address = address; }
+
     /*
      * CALLBACKS
      */
@@ -1080,6 +1103,13 @@ public:                                                 // opcodes handlers
 
     void InitializeSession();
     void InitializeSessionCallback(CharacterDatabaseQueryHolder const& realmHolder, uint32 clientCacheVersion);
+
+    LockedQueue<WorldPacket*>& GetPacketQueue();
+
+    [[nodiscard]] bool IsBot() const
+    {
+        return _isBot;
+    }
 
 private:
     void ProcessQueryCallbacks();
@@ -1190,6 +1220,8 @@ private:
     std::map<uint32, uint32> _pendingTimeSyncRequests; // key: counter. value: server time when packet with that counter was sent.
     uint32 _timeSyncNextCounter;
     uint32 _timeSyncTimer;
+
+    bool _isBot;
 
     WorldSession(WorldSession const& right) = delete;
     WorldSession& operator=(WorldSession const& right) = delete;

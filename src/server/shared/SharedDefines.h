@@ -1367,7 +1367,7 @@ enum Mechanics : uint32
     (1<<MECHANIC_SAPPED))
 
 // Spell dispel type
-enum DispelType
+enum DispelType : uint8
 {
     DISPEL_NONE         = 0,
     DISPEL_MAGIC        = 1,
@@ -1631,7 +1631,7 @@ enum GameObjectDestructibleState
 };
 
 // EmotesText.dbc
-enum TextEmotes
+enum TextEmotes : uint32
 {
     TEXT_EMOTE_AGREE                = 1,
     TEXT_EMOTE_AMAZE                = 2,
@@ -3146,7 +3146,7 @@ enum WeatherType
 #define MAX_WEATHER_TYPE 4
 
 // EnumUtils: DESCRIBE THIS
-enum ChatMsg
+enum ChatMsg : uint32
 {
     CHAT_MSG_ADDON                  = 0xFFFFFFFF,
     CHAT_MSG_SYSTEM                 = 0x00,

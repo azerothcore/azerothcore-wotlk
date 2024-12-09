@@ -10,7 +10,7 @@ jobs:
   triage:
     runs-on: ubuntu-latest
     name: C++
-    if: github.repository == 'azerothcore/azerothcore-wotlk'
+    if: github.repository == 'liyunfan1223/azerothcore-wotlk'
     steps:
       - uses: actions/checkout@v4
       - name: Setup python

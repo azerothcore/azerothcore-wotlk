@@ -654,6 +654,7 @@ Allow.IP.Based.Action.Logging = 0
 
 Appender.Console=1,4,0,"1 9 3 6 5 8"
 Appender.Server=2,5,0,Server.log,w
+Appender.Playerbots=2,5,0,Playerbots.log,w
 # Appender.GM=2,5,15,gm_%s.log
 Appender.Errors=2,5,0,Errors.log
 # Appender.DB=3,5,0
@@ -687,6 +688,7 @@ Logger.sql=4,Console Server
 Logger.time.update=4,Console Server
 Logger.module=4,Console Server
 Logger.spells.scripts=2,Console Errors
+Logger.playerbots=5,Console Playerbots
 #Logger.achievement=4,Console Server
 #Logger.addon=4,Console Server
 #Logger.ahbot=4,Console Server

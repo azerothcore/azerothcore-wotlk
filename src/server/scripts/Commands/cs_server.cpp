@@ -214,6 +214,10 @@ public:
         handler->PSendSysMessage("Default DBC locale: {}.\nAll available DBC locales: {}", localeNames[defaultLocale], availableLocales);
 
         handler->PSendSysMessage("Using World DB: {}", sWorld->GetDBVersion());
+#ifdef MOD_PLAYERBOTS
+        handler->PSendSysMessage("Using Playerbots DB Revision: {}", sWorld->GetPlayerbotsDBRevision());
+#endif
+        
 
         std::string lldb = "No updates found!";
         if (QueryResult resL = LoginDatabase.Query("SELECT name FROM updates ORDER BY name DESC LIMIT 1"))
@@ -241,6 +245,10 @@ public:
         handler->PSendSysMessage("LoginDatabase queue size: {}", LoginDatabase.QueueSize());
         handler->PSendSysMessage("CharacterDatabase queue size: {}", CharacterDatabase.QueueSize());
         handler->PSendSysMessage("WorldDatabase queue size: {}", WorldDatabase.QueueSize());
+#ifdef MOD_PLAYERBOTS
+        handler->PSendSysMessage("PlayerbotsDatabase queue size: {}", PlayerbotsDatabase.QueueSize());
+#endif
+        
 
         if (Acore::Module::GetEnableModulesList().empty())
             handler->PSendSysMessage("No modules are enabled");

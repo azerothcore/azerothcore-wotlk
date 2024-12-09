@@ -1,0 +1,99 @@
+# This starter workflow is for a CMake project running on multiple platforms. There is a different starter workflow if you just want a single platform.
+# See: https://github.com/actions/starter-workflows/blob/main/ci/cmake-single-platform.yml
+name: ubuntu-build
+
+on:
+  push:
+    branches: [ "Playerbot" ]
+  pull_request:
+    branches: [ "Playerbot" ]
+
+jobs:
+  build:
+    strategy:
+      # Set fail-fast to false to ensure that feedback is delivered for all matrix combinations. Consider changing this to true when your workflow is stable.
+      fail-fast: false
+      matrix:
+        # the result of the matrix will be the combination of all attributes, so we get os*compiler builds
+        include:
+          - os: ubuntu-22.04
+            c_compiler: clang
+            cpp_compiler: clang++
+            build_type: Release
+          - os: ubuntu-22.04
+            c_compiler: gcc
+            cpp_compiler: g++
+            build_type: Release
+          - os: ubuntu-24.04
+            c_compiler: gcc
+            cpp_compiler: g++
+            build_type: Release
+            
+    runs-on: ${{ matrix.os }}
+    name: ${{ matrix.os }}-${{ matrix.cpp_compiler }}
+
+    steps:
+    - name: Checkout AzerothCore
+      uses: actions/checkout@v3
+
+    - name: Set reusable strings
+      # Turn repeated input strings (such as the build output directory) into step outputs. These step outputs can be used throughout the workflow file.
+      id: strings
+      shell: bash
+      run: |
+        echo "build-output-dir=${{ github.workspace }}/build" >> "$GITHUB_OUTPUT"
+        
+    # - name: Clone Playerbot Module
+    #   run: git clone --depth=1 --branch=master https://github.com/liyunfan1223/mod-playerbots.git modules/mod-playerbots
+
+    # - name: Checkout Playerbot Module
+    #   uses: actions/checkout@v3
+    #   with:
+    #     repository: 'liyunfan1223/mod-playerbots'
+    #     path: 'modules/mod-playerbots'
+    
+    - name: Install Requirements
+      run: sudo apt-get update && sudo apt-get install git cmake make gcc g++ clang libmysqlclient-dev libssl-dev libbz2-dev libreadline-dev libncurses-dev mysql-server libboost-all-dev
+      
+    # - name: Cache
+    #   uses: actions/cache@v3
+    #   with:
+    #     path: var/ccache
+    #     key: ccache:${{ matrix.os }}:${{ matrix.compiler }}:${{ matrix.modules }}-modules:${{ github.ref }}:${{ github.sha }}
+    #     restore-keys: |
+    #       ccache:${{ matrix.os }}:${{ matrix.compiler }}:${{ matrix.modules }}-modules:${{ github.ref }}
+    #       ccache:${{ matrix.os }}:${{ matrix.compiler }}:${{ matrix.modules }}-modules
+            
+    # - name: Configure OS
+    #   run: source ./acore.sh install-deps
+    #   env:
+    #     CONTINUOUS_INTEGRATION: true
+        
+    # - name: Create conf/config.sh
+    #   run: source ./apps/ci/ci-conf-core.sh
+      
+    # - name: Process pending sql
+    #   run: bash bin/acore-db-pendings
+      
+    # - name: Build
+    #   run: source ./apps/ci/ci-compile.sh
+        
+    - name: Configure CMake
+      # Configure CMake in a 'build' subdirectory. `CMAKE_BUILD_TYPE` is only required if you are using a single-configuration generator such as make.
+      # See https://cmake.org/cmake/help/latest/variable/CMAKE_BUILD_TYPE.html?highlight=cmake_build_type
+      run: >
+        cmake -B ${{ steps.strings.outputs.build-output-dir }}
+        -DCMAKE_CXX_COMPILER=${{ matrix.cpp_compiler }}
+        -DCMAKE_C_COMPILER=${{ matrix.c_compiler }}
+        -DCMAKE_BUILD_TYPE=${{ matrix.build_type }}
+        -S ${{ github.workspace }}
+
+    - name: Build
+      # Build your program with the given configuration. Note that --config is needed because the default Windows generator is a multi-config generator (Visual Studio generator).
+      run: cmake --build ${{ steps.strings.outputs.build-output-dir }} --config ${{ matrix.build_type }}
+
+    # - name: Test
+    #   working-directory: ${{ steps.strings.outputs.build-output-dir }}
+    #   # Execute tests defined by the CMake configuration. Note that --build-config is needed because the default Windows generator is a multi-config generator (Visual Studio generator).
+    #   # See https://cmake.org/cmake/help/latest/manual/ctest.1.html for more detail
+    #   run: ctest --build-config ${{ matrix.build_type }}

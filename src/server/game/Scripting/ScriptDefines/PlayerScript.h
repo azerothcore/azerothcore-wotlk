@@ -260,7 +260,8 @@ public:
 
     // Called for player::update
     virtual void OnBeforeUpdate(Player* /*player*/, uint32 /*p_time*/) { }
-    virtual void OnUpdate(Player* /*player*/, uint32 /*p_time*/) { }
+    virtual void OnUpdate(Player* /*player*/, uint32 /*p_time*/) {}
+    virtual void OnAfterUpdate(Player* /*player*/, uint32 /*diff*/) {}
 
     // Called when a player's money is modified (before the modification is done)
     virtual void OnMoneyChanged(Player* /*player*/, int32& /*amount*/) { }

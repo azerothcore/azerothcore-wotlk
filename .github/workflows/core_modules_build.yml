@@ -26,7 +26,7 @@ jobs:
               CXX: clang++-18
     runs-on: ${{ matrix.os }}
     name: ${{ matrix.os }}-${{ matrix.compiler.CC }}-nopch-modules
-    if: github.repository == 'azerothcore/azerothcore-wotlk'
+    if: github.repository == 'liyunfan1223/azerothcore-wotlk'
       && !github.event.pull_request.draft
       && (
         github.ref_name == 'master'

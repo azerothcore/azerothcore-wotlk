@@ -1,10 +1,9 @@
 name: macos-build
 on:
   push:
-    branches:
-      - 'master'
+    branches: [ "Playerbot" ]
   pull_request:
-    types: ['labeled', 'opened', 'synchronize', 'reopened']
+    branches: [ "Playerbot" ]
 
 concurrency:
   group: ${{ github.head_ref }} || concat(${{ github.ref }}, ${{ github.workflow }})
@@ -19,10 +18,6 @@ jobs:
           - macos-14
     runs-on: ${{ matrix.os }}
     name: ${{ matrix.os }}
-    if: |
-      github.repository == 'azerothcore/azerothcore-wotlk'
-      && !github.event.pull_request.draft
-      && (github.ref == 'refs/heads/master' || contains(github.event.pull_request.labels.*.name, 'run-build') || github.event.label.name == 'run-build')
     steps:
       - uses: actions/checkout@v4
       - name: Cache

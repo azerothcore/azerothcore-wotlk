@@ -118,5 +118,7 @@
     },
     "deno.enable": true,
     "deno.path": "deps/deno/bin/deno",
-    "deno.lint": true
+    "deno.lint": true,
+    "search.useIgnoreFiles": false,
+    "clangd.onConfigChanged": "restart"
 }
