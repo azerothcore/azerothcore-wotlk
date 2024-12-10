@@ -1111,10 +1111,10 @@ bool SpellArea::IsFitToRequirements(Player const* player, uint32 newZone, uint32
                 AreaTableEntry const* pArea = sAreaTableStore.LookupEntry(player->GetAreaId());
                 if (!(pArea && pArea->flags & AREA_FLAG_NO_FLY_ZONE))
                     return false;
-                if (!player->HasAuraType(SPELL_AURA_MOD_INCREASE_MOUNTED_FLIGHT_SPEED) && !player->HasAuraType(SPELL_AURA_FLY))
+                if (!player->HasIncreaseMountedFlightSpeedAura() && !player->HasFlyAura())
                     return false;
                 // Xinef: Underbelly elixir
-                if (player->GetPositionZ() < 637.0f && player->HasAuraType(SPELL_AURA_TRANSFORM))
+                if (player->GetPositionZ() < 637.0f && player->HasTransformAura())
                     return false;
                 break;
             }
@@ -1124,7 +1124,7 @@ bool SpellArea::IsFitToRequirements(Player const* player, uint32 newZone, uint32
                     return false;
 
                 Battlefield* Bf = sBattlefieldMgr->GetBattlefieldToZoneId(player->GetZoneId());
-                if (!Bf || Bf->CanFlyIn() || (!player->HasAuraType(SPELL_AURA_MOD_INCREASE_MOUNTED_FLIGHT_SPEED) && !player->HasAuraType(SPELL_AURA_FLY)))
+                if (!Bf || Bf->CanFlyIn() || (!player->HasIncreaseMountedFlightSpeedAura() && !player->HasFlyAura()))
                     return false;
                 break;
             }

@@ -22,6 +22,7 @@
 #include "ArenaTeam.h"
 #include "AuctionHouseMgr.h"
 #include "Battleground.h"
+#include "ChatCommand.h"
 #include "Common.h"
 #include "DBCStores.h"
 #include "DynamicObject.h"
@@ -31,10 +32,8 @@
 #include "LFGMgr.h"
 #include "ObjectMgr.h"
 #include "PetDefines.h"
-#include "QuestDef.h"
 #include "SharedDefines.h"
 #include "Tuples.h"
-#include "Types.h"
 #include "Weather.h"
 #include "World.h"
 #include <atomic>
@@ -413,6 +412,7 @@ public: /* PlayerScript */
     void OnCustomScalingStatValue(Player* player, ItemTemplate const* proto, uint32& statType, int32& val, uint8 itemProtoStatNumber, uint32 ScalingStatValue, ScalingStatValuesEntry const* ssv);
     void OnApplyItemModsBefore(Player* player, uint8 slot, bool apply, uint8 itemProtoStatNumber, uint32 statType, int32& val);
     void OnApplyEnchantmentItemModsBefore(Player* player, Item* item, EnchantmentSlot slot, bool apply, uint32 enchant_spell_id, uint32& enchant_amount);
+    void OnApplyWeaponDamage(Player* player, uint8 slot, ItemTemplate const* proto, float& minDamage, float& maxDamage, uint8 damageIndex);
     bool CanArmorDamageModifier(Player* player);
     void OnGetFeralApBonus(Player* player, int32& feral_bonus, int32 dpsMod, ItemTemplate const* proto, ScalingStatValuesEntry const* ssv);
     bool CanApplyWeaponDependentAuraDamageMod(Player* player, Item* item, WeaponAttackType attackType, AuraEffect const* aura, bool apply);
@@ -673,6 +673,7 @@ public: /* CommandSC */
 
     void OnHandleDevCommand(Player* player, bool& enable);
     bool OnTryExecuteCommand(ChatHandler& handler, std::string_view cmdStr);
+    bool OnBeforeIsInvokerVisible(std::string name, Acore::Impl::ChatCommands::CommandPermissions permissions, ChatHandler const& who);
 
 public: /* DatabaseScript */
 

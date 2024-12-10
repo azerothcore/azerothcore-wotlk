@@ -369,7 +369,7 @@ void ObjectUpdater::Visit(GridRefMgr<T>& m)
 
 bool AnyDeadUnitObjectInRangeCheck::operator()(Player* u)
 {
-    return !u->IsAlive() && !u->HasAuraType(SPELL_AURA_GHOST) && i_searchObj->IsWithinDistInMap(u, i_range);
+    return !u->IsAlive() && !u->HasGhostAura() && i_searchObj->IsWithinDistInMap(u, i_range);
 }
 
 bool AnyDeadUnitObjectInRangeCheck::operator()(Corpse* u)

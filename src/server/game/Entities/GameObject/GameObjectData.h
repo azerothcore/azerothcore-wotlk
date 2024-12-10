@@ -19,9 +19,9 @@
 #define GAMEOBJECTDATA_H
 
 #include "SharedDefines.h"
-#include "WorldPacket.h"
-#include <string>
+#include <array>
 #include <vector>
+#include <string>
 
 #define MAX_GAMEOBJECT_QUEST_ITEMS 6
 #define MAX_GO_STATE               3

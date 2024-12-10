@@ -18,7 +18,6 @@
 #ifndef ZONE_SCRIPT_H_
 #define ZONE_SCRIPT_H_
 
-#include "Common.h"
 #include "Creature.h"
 
 class GameObject;

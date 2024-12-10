@@ -19,6 +19,7 @@
 #include "Containers.h"
 #include "DisableMgr.h"
 #include "Group.h"
+#include "ItemEnchantmentMgr.h"
 #include "Log.h"
 #include "ObjectMgr.h"
 #include "Player.h"
@@ -106,7 +107,7 @@ public:
 
     void Verify(LootStore const& lootstore, uint32 id, uint8 group_id) const;
     void CollectLootIds(LootIdSet& set) const;
-    void CheckLootRefs(LootTemplateMap const& store, LootIdSet* ref_set) const;
+    void CheckLootRefs(LootStore const& lootstore, uint32 Id, LootIdSet* ref_set) const;
     LootStoreItemList* GetExplicitlyChancedItemList() { return &ExplicitlyChanced; }
     LootStoreItemList* GetEqualChancedItemList() { return &EqualChanced; }
     void CopyConditions(ConditionList conditions);
@@ -276,7 +277,7 @@ uint32 LootStore::LoadAndCollectLootIds(LootIdSet& lootIdSet)
 void LootStore::CheckLootRefs(LootIdSet* ref_set) const
 {
     for (LootTemplateMap::const_iterator ltItr = m_LootTemplates.begin(); ltItr != m_LootTemplates.end(); ++ltItr)
-        ltItr->second->CheckLootRefs(m_LootTemplates, ref_set);
+        ltItr->second->CheckLootRefs(*this, ltItr->first, ref_set);
 }
 
 void LootStore::ReportUnusedIds(LootIdSet const& lootIdSet) const
@@ -294,6 +295,11 @@ void LootStore::ReportNonExistingId(uint32 lootId) const
 void LootStore::ReportNonExistingId(uint32 lootId, const char* ownerType, uint32 ownerId) const
 {
     LOG_ERROR("sql.sql", "Table '{}' Entry {} does not exist but it is used by {} {}", GetName(), lootId, ownerType, ownerId);
+}
+
+void LootStore::ReportInvalidCount(uint32 lootId, const char* ownerType, uint32 ownerId, uint32 itemId, uint8 minCount, uint8 maxCount) const
+{
+    LOG_ERROR("sql.sql", "Table '{}' Entry {} used by {} entry {} item {} has minCount ( {} ) != maxCount ( {} ) which is not supported for this loot type.", GetName(), lootId, ownerType, ownerId, itemId, minCount, maxCount);
 }
 
 //
@@ -1501,21 +1507,20 @@ void LootTemplate::LootGroup::Verify(LootStore const& lootstore, uint32 id, uint
     }
 }
 
-void LootTemplate::LootGroup::CheckLootRefs(LootTemplateMap const& /*store*/, LootIdSet* ref_set) const
+void LootTemplate::LootGroup::CheckLootRefs(LootStore const& lootstore, uint32 Id, LootIdSet* ref_set) const
 {
     for (LootStoreItemList::const_iterator ieItr = ExplicitlyChanced.begin(); ieItr != ExplicitlyChanced.end(); ++ieItr)
     {
         LootStoreItem* item = *ieItr;
         if (item->reference)
         {
+            if (item->mincount != item->maxcount)
+                LootTemplates_Reference.ReportInvalidCount(std::abs(item->reference), lootstore.GetName(), Id, item->itemid, item->mincount, item->maxcount);
+
             if (!LootTemplates_Reference.GetLootFor(std::abs(item->reference)))
-            {
-                LootTemplates_Reference.ReportNonExistingId(std::abs(item->reference), "Reference", item->itemid);
-            }
+                LootTemplates_Reference.ReportNonExistingId(std::abs(item->reference), lootstore.GetName(), item->itemid);
             else if (ref_set)
-            {
                 ref_set->erase(std::abs(item->reference));
-            }
         }
     }
 
@@ -1524,14 +1529,13 @@ void LootTemplate::LootGroup::CheckLootRefs(LootTemplateMap const& /*store*/, Lo
         LootStoreItem* item = *ieItr;
         if (item->reference)
         {
+            if (item->mincount != item->maxcount)
+                LootTemplates_Reference.ReportInvalidCount(std::abs(item->reference), lootstore.GetName(), Id, item->itemid, item->mincount, item->maxcount);
+
             if (!LootTemplates_Reference.GetLootFor(std::abs(item->reference)))
-            {
-                LootTemplates_Reference.ReportNonExistingId(std::abs(item->reference), "Reference", item->itemid);
-            }
+                LootTemplates_Reference.ReportNonExistingId(std::abs(item->reference), lootstore.GetName(), item->itemid);
             else if (ref_set)
-            {
                 ref_set->erase(std::abs(item->reference));
-            }
         }
     }
 }
@@ -1863,27 +1867,26 @@ void LootTemplate::Verify(LootStore const& lootstore, uint32 id) const
     /// @todo: References validity checks
 }
 
-void LootTemplate::CheckLootRefs(LootTemplateMap const& store, LootIdSet* ref_set) const
+void LootTemplate::CheckLootRefs(LootStore const& lootstore, uint32 Id, LootIdSet* ref_set) const
 {
     for (LootStoreItemList::const_iterator ieItr = Entries.begin(); ieItr != Entries.end(); ++ieItr)
     {
         LootStoreItem* item = *ieItr;
         if (item->reference)
         {
+            if (item->mincount != item->maxcount)
+                LootTemplates_Reference.ReportInvalidCount(std::abs(item->reference), lootstore.GetName(), Id, item->itemid, item->mincount, item->maxcount);
+
             if (!LootTemplates_Reference.GetLootFor(std::abs(item->reference)))
-            {
-                LootTemplates_Reference.ReportNonExistingId(std::abs(item->reference), "Reference", item->itemid);
-            }
+                LootTemplates_Reference.ReportNonExistingId(std::abs(item->reference), lootstore.GetName(), item->itemid);
             else if (ref_set)
-            {
                 ref_set->erase(std::abs(item->reference));
-            }
         }
     }
 
     for (LootGroups::const_iterator grItr = Groups.begin(); grItr != Groups.end(); ++grItr)
         if (LootGroup* group = *grItr)
-            group->CheckLootRefs(store, ref_set);
+            group->CheckLootRefs(lootstore, Id, ref_set);
 }
 
 bool LootTemplate::addConditionItem(Condition* cond)

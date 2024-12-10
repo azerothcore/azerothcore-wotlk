@@ -819,8 +819,7 @@ void Player::RewardQuest(Quest const* quest, uint32 reward, Object* questGiver, 
         SetSeasonalQuestStatus(quest_id);
 
     RemoveActiveQuest(quest_id, false);
-    m_RewardedQuests.insert(quest_id);
-    m_RewardedQuestsSave[quest_id] = true;
+    SetRewardedQuest(quest_id);
 
     if (announce)
         SendQuestReward(quest, XP);
@@ -875,6 +874,12 @@ void Player::RewardQuest(Quest const* quest, uint32 reward, Object* questGiver, 
     UpdateAreaDependentAuras(GetAreaId());
 
     sScriptMgr->OnPlayerCompleteQuest(this, quest);
+}
+
+void Player::SetRewardedQuest(uint32 quest_id)
+{
+    m_RewardedQuests.insert(quest_id);
+    m_RewardedQuestsSave[quest_id] = true;
 }
 
 void Player::FailQuest(uint32 questId)

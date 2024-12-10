@@ -20,14 +20,12 @@
 #include "GridNotifiers.h"
 #include "Map.h"
 #include "MapMgr.h"
-#include "MapRefMgr.h"
 #include "ObjectMgr.h"
 #include "Pet.h"
 #include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 #include "Transport.h"
 #include "WaypointMgr.h"
-#include "World.h"
 
 /// Put scripts in the execution queue
 void Map::ScriptsStart(ScriptMapMap const& scripts, uint32 id, Object* source, Object* target)
@@ -730,8 +728,10 @@ void Map::ScriptsProcess()
                             break;
                     }
 
-                    // Playsound.Flags bitmask: 0/2=without/with distance dependent
-                    if (step.script->Playsound.Flags & SF_PLAYSOUND_DISTANCE_SOUND)
+                    // Playsound.Flags bitmask: 0/2/4=without/with distance dependent/radius
+                    if (step.script->Playsound.Flags & SF_PLAYSOUND_DISTANCE_RADIUS)
+                        object->PlayRadiusSound(step.script->Playsound.SoundID, step.script->Playsound.Radius);
+                    else if (step.script->Playsound.Flags & SF_PLAYSOUND_DISTANCE_SOUND)
                         object->PlayDistanceSound(step.script->Playsound.SoundID, player);
                     else
                         object->PlayDirectSound(step.script->Playsound.SoundID, player);

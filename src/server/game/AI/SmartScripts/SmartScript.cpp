@@ -35,6 +35,7 @@
 #include "SmartAI.h"
 #include "SpellMgr.h"
 #include "Vehicle.h"
+#include "WorldState.h"
 
 /// @todo: this import is not necessary for compilation and marked as unused by the IDE
 //  however, for some reasons removing it would cause a damn linking issue
@@ -145,7 +146,16 @@ void SmartScript::ProcessEventsFor(SMART_EVENT e, Unit* unit, uint32 var0, uint3
             ConditionSourceInfo info = ConditionSourceInfo(unit, GetBaseObject(), me ? me->GetVictim() : nullptr);
 
             if (sConditionMgr->IsObjectMeetToConditions(info, conds))
-                ProcessEvent(*i, unit, var0, var1, bvar, spell, gob);
+            {
+                ASSERT(executionStack.empty());
+                executionStack.emplace_back(SmartScriptFrame{ *i, unit, var0, var1, bvar, spell, gob });
+                while (!executionStack.empty())
+                {
+                    auto [stack_holder , stack_unit, stack_var0, stack_var1, stack_bvar, stack_spell, stack_gob] = executionStack.back();
+                    executionStack.pop_back();
+                    ProcessEvent(stack_holder, stack_unit, stack_var0, stack_var1, stack_bvar, stack_spell, stack_gob);
+                }
+            }
         }
     }
 }
@@ -684,9 +694,13 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
                     bool isSpellIgnoreLOS = spellInfo->HasAttribute(SPELL_ATTR2_IGNORE_LINE_OF_SIGHT);
 
                     // If target is rooted we move out of melee range before casting, but not further than spell max range.
-                    if (isWithinLOSInMap && isWithinMeleeRange && isRangedAttack && isTargetRooted && canCastSpell)
+                    if (isWithinLOSInMap && isWithinMeleeRange && isRangedAttack && isTargetRooted && canCastSpell && !me->IsVehicle())
                     {
                         failedSpellCast = true; // Mark spellcast as failed so we can retry it later
+
+                        if (me->IsRooted()) // Rooted inhabit type, never move/reposition
+                            continue;
+
                         float minDistance = std::max(meleeRange, spellMinRange) - distanceToTarget + NOMINAL_MELEE_RANGE;
                         CAST_AI(SmartAI, me->AI())->MoveAway(std::min(minDistance, spellMaxRange));
                         continue;
@@ -696,12 +710,20 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
                     if (distanceToTarget > spellMaxRange && isWithinLOSInMap)
                     {
                         failedSpellCast = true;
+
+                        if (me->IsRooted()) // Rooted inhabit type, never move/reposition
+                            continue;
+
                         CAST_AI(SmartAI, me->AI())->SetCombatMove(true, std::max(spellMaxRange - NOMINAL_MELEE_RANGE, 0.0f));
                         continue;
                     }
                     else if (distanceToTarget < spellMinRange || !(isWithinLOSInMap || isSpellIgnoreLOS))
                     {
                         failedSpellCast = true;
+
+                        if (me->IsRooted()) // Rooted inhabit type, never move/reposition
+                            continue;
+
                         CAST_AI(SmartAI, me->AI())->SetCombatMove(true);
                         continue;
                     }
@@ -3248,6 +3270,11 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
 
             break;
         }
+        case SMART_ACTION_WORLD_SCRIPT:
+        {
+            sWorldState->HandleExternalEvent(static_cast<WorldStateEvent>(e.action.worldStateScript.eventId), e.action.worldStateScript.param);
+            break;
+        }
         default:
             LOG_ERROR("sql.sql", "SmartScript::ProcessAction: Entry {} SourceType {}, Event {}, Unhandled Action type {}", e.entryOrGuid, e.GetScriptType(), e.event_id, e.GetActionType());
             break;
@@ -3255,9 +3282,9 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
 
     if (e.link && e.link != e.event_id)
     {
-        SmartScriptHolder linked = FindLinkedEvent(e.link);
-        if (linked.GetActionType() && linked.GetEventType() == SMART_EVENT_LINK)
-            ProcessEvent(linked, unit, var0, var1, bvar, spell, gob);
+        auto linked = FindLinkedEvent(e.link);
+        if (linked.has_value() && linked.value().get().GetEventType() == SMART_EVENT_LINK)
+            executionStack.emplace_back(SmartScriptFrame{ linked.value(), unit, var0, var1, bvar, spell, gob });
         else
             LOG_ERROR("sql.sql", "SmartScript::ProcessAction: Entry {} SourceType {}, Event {}, Link Event {} not found or invalid, skipped.", e.entryOrGuid, e.GetScriptType(), e.event_id, e.link);
     }
@@ -3484,8 +3511,15 @@ void SmartScript::GetTargets(ObjectVector& targets, SmartScriptHolder const& e, 
                     {
                         for (GroupReference* groupRef = group->GetFirstMember(); groupRef != nullptr; groupRef = groupRef->next())
                             if (Player* member = groupRef->GetSource())
+                            {
                                 if (member->IsInMap(player))
                                     targets.push_back(member);
+
+                                if (e.target.invokerParty.includePets)
+                                    if (Creature* pet = ObjectAccessor::GetCreatureOrPetOrVehicle(*member, member->GetPetGUID()))
+                                        if (pet->IsPet() && pet->IsInMap(player))
+                                            targets.push_back(pet);
+                            }
                     }
                     // We still add the player to the list if there is no group. If we do
                     // this even if there is a group (thus the else-check), it will add the
@@ -4206,6 +4240,18 @@ void SmartScript::ProcessEvent(SmartScriptHolder& e, Unit* unit, uint32 var0, ui
 
                 break;
             }
+        case SMART_EVENT_IS_IN_MELEE_RANGE:
+            {
+                if (!me)
+                    return;
+
+                if (Unit* victim = me->GetVictim())
+                    if ((!e.event.meleeRange.invert && me->IsWithinMeleeRange(victim, static_cast<float>(e.event.meleeRange.dist))) ||
+                        (e.event.meleeRange.invert && !me->IsWithinMeleeRange(victim, static_cast<float>(e.event.meleeRange.dist))))
+                        ProcessTimedAction(e, e.event.minMaxRepeat.repeatMin, e.event.minMaxRepeat.repeatMax, victim);
+
+                break;
+            }
         case SMART_EVENT_RECEIVE_EMOTE:
             if (e.event.emote.emote == var0)
             {
@@ -4766,6 +4812,7 @@ void SmartScript::InitTimer(SmartScriptHolder& e)
         case SMART_EVENT_AREA_CASTING:
         case SMART_EVENT_IS_BEHIND_TARGET:
         case SMART_EVENT_FRIENDLY_HEALTH_PCT:
+        case SMART_EVENT_IS_IN_MELEE_RANGE:
             RecalcTimer(e, e.event.minMaxRepeat.min, e.event.minMaxRepeat.max);
             break;
         case SMART_EVENT_DISTANCE_CREATURE:
@@ -4851,8 +4898,16 @@ void SmartScript::UpdateTimer(SmartScriptHolder& e, uint32 const diff)
             case SMART_EVENT_FRIENDLY_HEALTH_PCT:
             case SMART_EVENT_DISTANCE_CREATURE:
             case SMART_EVENT_DISTANCE_GAMEOBJECT:
+            case SMART_EVENT_IS_IN_MELEE_RANGE:
                 {
-                    ProcessEvent(e);
+                    ASSERT(executionStack.empty());
+                    executionStack.emplace_back(SmartScriptFrame{ e, nullptr, 0, 0, false, nullptr, nullptr });
+                    while (!executionStack.empty())
+                    {
+                        auto [stack_holder, stack_unit, stack_var0, stack_var1, stack_bvar, stack_spell, stack_gob] = executionStack.back();
+                        executionStack.pop_back();
+                        ProcessEvent(stack_holder, stack_unit, stack_var0, stack_var1, stack_bvar, stack_spell, stack_gob);
+                    }
                     if (e.GetScriptType() == SMART_SCRIPT_TYPE_TIMED_ACTIONLIST)
                     {
                         e.enableTimed = false;//disable event if it is in an ActionList and was processed once
@@ -5045,7 +5100,7 @@ void SmartScript::GetScript()
 
         if (CreatureTemplate const* cInfo = me->GetCreatureTemplate())
         {
-            if (cInfo->HasFlagsExtra(CREATURE_FLAG_DONT_OVERRIDE_ENTRY_SAI))
+            if (cInfo->HasFlagsExtra(CREATURE_FLAG_EXTRA_DONT_OVERRIDE_ENTRY_SAI))
             {
                 e = sSmartScriptMgr->GetScript((int32)me->GetEntry(), mScriptType);
                 FillScript(e, me, nullptr);
