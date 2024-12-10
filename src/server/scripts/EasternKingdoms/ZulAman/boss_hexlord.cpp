@@ -229,7 +229,13 @@ static PlayerAbilityStruct PlayerAbility[13][3] =
 
 struct boss_hexlord_malacrass : public BossAI
 {
-    boss_hexlord_malacrass(Creature* creature) : BossAI(creature, DATA_HEXLORD) { }
+    boss_hexlord_malacrass(Creature* creature) : BossAI(creature, DATA_HEXLORD)
+    {
+        scheduler.SetValidator([this]
+        {
+            return !me->HasUnitState(UNIT_STATE_CASTING);
+        });
+    }
 
     void Reset() override
     {
@@ -238,10 +244,10 @@ struct boss_hexlord_malacrass : public BossAI
         _classAbilityTimer = 10000ms;
         SpawnAdds();
         ScheduleHealthCheckEvent(80, [&] {
-            ScheduleTimedEvent(0s, [&] {
+            ScheduleTimedEvent(1s, [&] {
                 DoCastSelf(SPELL_DRAIN_POWER, true);
                 Talk(SAY_DRAIN_POWER);
-            }, 30s, 30s);
+            }, 30s);
         });
     }
 
