@@ -1,3 +1,4 @@
+-- DB update 2024_12_10_00 -> 2024_12_10_01
 SET @TOKENENTRY := 1276883;
 
 DELETE FROM `creature_loot_template` WHERE (`Entry` = 22917);
