@@ -253,10 +253,19 @@ struct boss_hexlord_malacrass : public BossAI
 
     void SpawnAdds()
     {
-        for (uint8 i = 0; i < MAX_ADD_COUNT; ++i)
+        if (_creatureIndex.empty())
         {
-            uint8 flip = urand(0, 1);
-            me->SummonCreature(AddEntrySets[i][flip], AddPosition[i], TEMPSUMMON_DEAD_DESPAWN, 0);
+            for (uint8 i = 0; i < MAX_ADD_COUNT; ++i)
+            {
+                uint8 flip = urand(0, 1);
+                me->SummonCreature(AddEntrySets[i][flip], AddPosition[i], TEMPSUMMON_DEAD_DESPAWN, 0);
+                _creatureIndex.push_back(flip);
+            }
+        }
+        else
+        {
+            for (uint8 i = 0; i < MAX_ADD_COUNT; ++i)
+                me->SummonCreature(AddEntrySets[i][_creatureIndex[i]], AddPosition[i], TEMPSUMMON_DEAD_DESPAWN, 0);
         }
     }
 
@@ -345,6 +354,7 @@ struct boss_hexlord_malacrass : public BossAI
 private:
     uint8 _currentClass;
     std::chrono::milliseconds _classAbilityTimer;
+    std::vector<uint8> _creatureIndex;
 };
 
 struct boss_alyson_antille : public ScriptedAI
