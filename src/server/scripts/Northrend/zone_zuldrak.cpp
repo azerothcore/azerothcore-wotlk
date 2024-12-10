@@ -956,6 +956,7 @@ enum ScourgeDisguiseInstability
     SCOURGE_DISGUISE_FAILING_MESSAGE_2       = 28758, // Scourge Disguise Failing! Run for cover!
     SCOURGE_DISGUISE_FAILING_MESSAGE_3       = 28759, // Scourge Disguise Failing! Hide quickly!
 };
+const std::vector<uint32> scourgeDisguiseTextIDs = { SCOURGE_DISGUISE_FAILING_MESSAGE_1, SCOURGE_DISGUISE_FAILING_MESSAGE_2, SCOURGE_DISGUISE_FAILING_MESSAGE_3 };
 
 class spell_scourge_disguise_instability : public AuraScript
 {
@@ -974,12 +975,9 @@ class spell_scourge_disguise_instability : public AuraScript
             Player* player = caster->ToPlayer();
             if (player->HasAura(SPELL_SCOURGE_DISGUISE) || player->HasAura(SPELL_SCOURGE_DISGUISE_INSTANT_CAST))
             {
-                player->Talk(
-                    RAND(SCOURGE_DISGUISE_FAILING_MESSAGE_1, SCOURGE_DISGUISE_FAILING_MESSAGE_2, SCOURGE_DISGUISE_FAILING_MESSAGE_3),
-                    CHAT_MSG_RAID_BOSS_EMOTE,
-                    0,
-                    player
-                );
+                uint32 textId = Acore::Containers::SelectRandomContainerElement(scourgeDisguiseTextIDs);
+                player->Talk(textId, CHAT_MSG_RAID_BOSS_EMOTE, 0, player);
+
                 player->CastSpell(player, SPELL_SCOURGE_DISGUISE_EXPIRING, true);
             }
         }
