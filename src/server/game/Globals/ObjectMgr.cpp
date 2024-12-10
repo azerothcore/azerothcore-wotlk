@@ -2306,7 +2306,7 @@ void ObjectMgr::LoadCreatureSparring()
 
     if (!result)
     {
-        LOG_WARN("server.loading", ">> Loaded 0 creatures. DB table `creature_sparring` is empty.");
+        LOG_WARN("server.loading", ">> Loaded 0 sparring data. DB table `creature_sparring` is empty.");
         LOG_INFO("server.loading", " ");
         return;
     }
@@ -2321,7 +2321,7 @@ void ObjectMgr::LoadCreatureSparring()
 
         if (!sObjectMgr->GetCreatureData(spawnId))
         {
-            LOG_ERROR("sql.sql", "Entry {} has a record in `creature_sparring` but doesn't exist in 'creatures' table");
+            LOG_ERROR("sql.sql", "Entry {} has a record in `creature_sparring` but doesn't exist in `creatures` table");
             continue;
         }
 
@@ -2330,7 +2330,7 @@ void ObjectMgr::LoadCreatureSparring()
         ++count;
     } while (result->NextRow());
 
-    LOG_INFO("server.loading", ">> Loaded {} Creatures in {} ms", count, GetMSTimeDiffToNow(oldMSTime));
+    LOG_INFO("server.loading", ">> Loaded {} sparring data in {} ms", count, GetMSTimeDiffToNow(oldMSTime));
     LOG_INFO("server.loading", " ");
 }
 
