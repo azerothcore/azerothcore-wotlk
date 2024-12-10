@@ -1,3 +1,4 @@
+-- DB update 2024_12_10_01 -> 2024_12_10_02
 
 -- Delete/Cleaning Npcs
 
