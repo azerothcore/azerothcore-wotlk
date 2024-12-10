@@ -950,13 +950,20 @@ public:
     }
 };
 
+enum ScourgeDisguiseInstability
+{
+    SCOURGE_DISGUISE_FAILING_MESSAGE_1       = 28552, // Scourge Disguise Failing! Find a safe place!
+    SCOURGE_DISGUISE_FAILING_MESSAGE_2       = 28758, // Scourge Disguise Failing! Run for cover!
+    SCOURGE_DISGUISE_FAILING_MESSAGE_3       = 28759, // Scourge Disguise Failing! Hide quickly!
+};
+
 class spell_scourge_disguise_instability : public AuraScript
 {
     PrepareAuraScript(spell_scourge_disguise_instability)
 
     void HandleApply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
     {
-        SetDuration(urand(3*60*1000, 5*60*1000));
+        SetDuration(urand(3 * MINUTE * IN_MILLISECONDS, 5 * MINUTE * IN_MILLISECONDS));
     }
 
     void HandleRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
@@ -967,11 +974,13 @@ class spell_scourge_disguise_instability : public AuraScript
             Player* player = caster->ToPlayer();
             if (player->HasAura(SPELL_SCOURGE_DISGUISE) || player->HasAura(SPELL_SCOURGE_DISGUISE_INSTANT_CAST))
             {
-                WorldPacket data;
-                ChatHandler::BuildChatPacket(data, CHAT_MSG_RAID_BOSS_EMOTE, LANG_UNIVERSAL, player, player, "Scourge Disguise Failing! Find a safeplace!");
-                player->GetSession()->SendPacket(&data);
-
-                player->CastSpell(GetUnitOwner(), SPELL_SCOURGE_DISGUISE_EXPIRING, true);
+                player->Talk(
+                    RAND(SCOURGE_DISGUISE_FAILING_MESSAGE_1, SCOURGE_DISGUISE_FAILING_MESSAGE_2, SCOURGE_DISGUISE_FAILING_MESSAGE_3),
+                    CHAT_MSG_RAID_BOSS_EMOTE,
+                    0,
+                    player
+                );
+                player->CastSpell(player, SPELL_SCOURGE_DISGUISE_EXPIRING, true);
             }
         }
     }
