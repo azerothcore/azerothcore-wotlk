@@ -67,7 +67,6 @@ INSERT INTO `pool_template` (`entry`, `max_limit`, `description`) VALUES
 
 DELETE FROM `pool_creature` WHERE (`pool_entry` IN (22383));
 INSERT INTO `pool_creature` (`guid`, `pool_entry`, `chance`, `description`) VALUES 
-
 (129214, 22383, 0, 'Havenshire Stallion (28605)'),
 (129236, 22383, 0, 'Havenshire Mare (28606)'),
 (129235, 22383, 0, 'Havenshire Mare (28606)'),
