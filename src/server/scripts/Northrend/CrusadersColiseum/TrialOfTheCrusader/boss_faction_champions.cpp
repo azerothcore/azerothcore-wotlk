@@ -107,7 +107,7 @@ struct boss_faction_championsAI : public ScriptedAI
         const float dist_factor = (mAIType == AI_MELEE || mAIType == AI_PET ? 15.0f : 25.0f);
         float mod_dist = dist_factor / (dist_factor + dist); // 0.2 .. 1.0
         float mod_health = ((float)health) / maxhealth;
-        return mod_dist * mod_health;
+        return mod_health;
     }
 
     void RecalculateThreat()
