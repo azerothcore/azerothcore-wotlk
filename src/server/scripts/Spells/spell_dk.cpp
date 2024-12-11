@@ -771,17 +771,19 @@ class spell_dk_pet_scaling : public AuraScript
 
         if (Unit* owner = GetUnitOwner()->GetOwner())
         {
-            int32 modifier = 33;
+            int32 modifier = 70;
 
             // xinef: impurity
             if (owner->GetDummyAuraEffect(SPELLFAMILY_DEATHKNIGHT, 1986, 0))
-                modifier = 40;
+                modifier = 88;
 
             amount = CalculatePct(std::max<int32>(0, owner->GetTotalAttackPowerValue(BASE_ATTACK)), modifier);
 
             // xinef: Update appropriate player field
             if (owner->IsPlayer())
                 owner->SetUInt32Value(PLAYER_PET_SPELL_POWER, (uint32)amount);
+            //set gargoyle criti to zero;
+            GetUnitOwner()->m_baseSpellCritChance = 0;
         }
     }
 
