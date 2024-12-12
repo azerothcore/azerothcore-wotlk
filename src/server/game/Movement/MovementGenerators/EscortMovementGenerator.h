@@ -30,6 +30,8 @@ public:
             m_precomputedPath = *_path;
     }
 
+    ~EscortMovementGenerator() = default;
+
     void DoInitialize(T*);
     void DoFinalize(T*);
     void DoReset(T*);

@@ -459,18 +459,18 @@ void MotionMaster::MoveSplinePath(Movement::PointsArray* path)
 
     if (_owner->IsPlayer())
     {
-        Mutate(new EscortMovementGenerator<Player>(path), MOTION_SLOT_ACTIVE);
+        Mutate(new EscortMovementGenerator<Player>(std::move(path)), MOTION_SLOT_ACTIVE);
     }
     else
     {
-        Mutate(new EscortMovementGenerator<Creature>(path), MOTION_SLOT_ACTIVE);
+        Mutate(new EscortMovementGenerator<Creature>(std::move(path)), MOTION_SLOT_ACTIVE);
     }
 }
 
 void MotionMaster::MoveSplinePath(uint32 path_id)
 {
     // convert the path id to a Movement::PointsArray*
-    Movement::PointsArray* points = new Movement::PointsArray();
+    auto points = std::make_unique<Movement::PointsArray>();
     WaypointPath const* path = sWaypointMgr->GetPath(path_id);
     for (uint8 i = 0; i < path->size(); ++i)
     {
@@ -479,7 +479,7 @@ void MotionMaster::MoveSplinePath(uint32 path_id)
     }
 
     // pass the new PointsArray* to the appropriate MoveSplinePath function
-    MoveSplinePath(points);
+    MoveSplinePath(std::move(points));
 }
 
 /**
