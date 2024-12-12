@@ -2015,6 +2015,7 @@ bool SmartAIMgr::IsEventValid(SmartScriptHolder& e)
         case SMART_ACTION_FLEE:
         case SMART_ACTION_ADD_THREAT:
         case SMART_ACTION_TRIGGER_RANDOM_TIMED_EVENT:
+        case SMART_ACTION_DISMOUNT:
         case SMART_ACTION_SET_HOVER:
         case SMART_ACTION_ADD_IMMUNITY:
         case SMART_ACTION_REMOVE_IMMUNITY:
