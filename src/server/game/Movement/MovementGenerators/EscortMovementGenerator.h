@@ -30,10 +30,7 @@ public:
             m_precomputedPath = std::move(*_path);
     }
 
-    ~EscortMovementGenerator()
-    {
-        delete m_precomputedPath;
-    }
+    ~EscortMovementGenerator() = default;
 
     void DoInitialize(T*);
     void DoFinalize(T*);
