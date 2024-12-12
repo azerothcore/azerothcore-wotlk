@@ -2169,7 +2169,7 @@ ToggleXP.Cost = 100000
 #        Default:     0 - (Disabled)
 #                     1 - (Enabled)
 
-SpellQueue.Enabled = 0
+SpellQueue.Enabled = 1
 
 #
 #    SpellQueue.Window
