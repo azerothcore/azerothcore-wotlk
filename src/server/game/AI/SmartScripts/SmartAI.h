@@ -18,7 +18,6 @@
 #ifndef ACORE_SMARTAI_H
 #define ACORE_SMARTAI_H
 
-#include "Common.h"
 #include "Creature.h"
 #include "CreatureAI.h"
 #include "GameObjectAI.h"
@@ -207,6 +206,9 @@ public:
 
     void PathEndReached(uint32 pathId) override;
 
+    bool CanRespawn() override { return mcanSpawn; };
+    void SetCanRespawn(bool canSpawn) { mcanSpawn = canSpawn; }
+
     // Xinef
     void SetWPPauseTimer(uint32 time) { mWPPauseTimer = time; }
 
@@ -248,6 +250,8 @@ private:
     void UpdateDespawn(const uint32 diff);
     uint32 mEscortInvokerCheckTimer;
     bool mJustReset;
+
+    bool mcanSpawn;
 
     // Xinef: Vehicle conditions
     void CheckConditions(const uint32 diff);

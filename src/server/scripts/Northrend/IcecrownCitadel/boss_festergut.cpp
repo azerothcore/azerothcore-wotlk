@@ -22,6 +22,8 @@
 #include "SpellAuras.h"
 #include "SpellScriptLoader.h"
 #include "icecrown_citadel.h"
+#include "SpellAuraEffects.h"
+#include "SpellMgr.h"
 
 enum ScriptTexts
 {
@@ -290,13 +292,13 @@ class spell_festergut_pungent_blight : public SpellScript
 
     bool Load() override
     {
-        return GetCaster()->GetTypeId() == TYPEID_UNIT;
+        return GetCaster()->IsCreature();
     }
 
     void HandleScript(SpellEffIndex /*effIndex*/)
     {
         Unit* caster = GetCaster();
-        if (caster->GetTypeId() != TYPEID_UNIT)
+        if (!caster->IsCreature())
             return;
 
         // Get Inhaled Blight id for our difficulty
@@ -383,7 +385,7 @@ public:
 
     bool OnCheck(Player* /*source*/, Unit* target, uint32 /*criteria_id*/) override
     {
-        if (target && target->GetTypeId() == TYPEID_UNIT)
+        if (target && target->IsCreature())
             return target->ToCreature()->AI()->GetData(DATA_INOCULATED_STACK) < 3;
 
         return false;

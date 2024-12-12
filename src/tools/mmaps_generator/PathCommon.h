@@ -18,7 +18,6 @@
 #ifndef _MMAP_COMMON_H
 #define _MMAP_COMMON_H
 
-#include "Common.h"
 #include <string>
 #include <vector>
 
@@ -90,7 +89,7 @@ namespace MMAP
         do
         {
             if ((findFileInfo.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) == 0)
-                fileList.push_back(std::string(findFileInfo.cFileName));
+                fileList.emplace_back(findFileInfo.cFileName);
         } while (FindNextFile(hFind, &findFileInfo));
 
         FindClose(hFind);

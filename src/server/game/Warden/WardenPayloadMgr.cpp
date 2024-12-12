@@ -74,7 +74,7 @@ bool WardenPayloadMgr::RegisterPayload(std::string const& payload, uint16 payloa
     wCheck.Str = payload;
     wCheck.CheckId = payloadId;
 
-    std::string idStr = Acore::StringFormat("%04u", payloadId);
+    std::string idStr = Acore::StringFormat("{:04}", payloadId);
     ASSERT(idStr.size() == 4);
     std::copy(idStr.begin(), idStr.end(), wCheck.IdStr.begin());
 

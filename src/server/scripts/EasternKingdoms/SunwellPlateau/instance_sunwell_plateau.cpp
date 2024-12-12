@@ -33,6 +33,46 @@ DoorData const doorData[] =
     { 0,                   0,             DOOR_TYPE_ROOM   } // END
 };
 
+ObjectData const creatureData[] =
+{
+    { NPC_KALECGOS,               DATA_KALECGOS      },
+    { NPC_BRUTALLUS,              DATA_BRUTALLUS     },
+    { NPC_FELMYST,                DATA_FELMYST       },
+    { NPC_MURU,                   DATA_MURU          },
+    { NPC_LADY_SACROLASH,         DATA_SACROLASH     },
+    { NPC_GRAND_WARLOCK_ALYTHESS, DATA_ALYTHESS      },
+    { NPC_MADRIGOSA,              DATA_MADRIGOSA     },
+    { NPC_SATHROVARR,             DATA_SATHROVARR    },
+    { NPC_KILJAEDEN_CONTROLLER,   DATA_KJ_CONTROLLER },
+    { NPC_ANVEENA,                DATA_ANVEENA       },
+    { NPC_KALECGOS_KJ,            DATA_KALECGOS_KJ   },
+    { 0,                          0                  }
+};
+
+ObjectData const gameObjectData[] =
+{
+    { GO_ICE_BARRIER,                   DATA_ICEBARRIER                     },
+    { GO_ORB_OF_THE_BLUE_DRAGONFLIGHT1, DATA_ORB_OF_THE_BLUE_DRAGONFLIGHT_1 },
+    { GO_ORB_OF_THE_BLUE_DRAGONFLIGHT2, DATA_ORB_OF_THE_BLUE_DRAGONFLIGHT_2 },
+    { GO_ORB_OF_THE_BLUE_DRAGONFLIGHT3, DATA_ORB_OF_THE_BLUE_DRAGONFLIGHT_3 },
+    { GO_ORB_OF_THE_BLUE_DRAGONFLIGHT4, DATA_ORB_OF_THE_BLUE_DRAGONFLIGHT_4 },
+    { 0,                                0                                   }
+};
+
+ObjectData const summonData[] =
+{
+    { NPC_DEMONIC_VAPOR_TRAIL,    DATA_FELMYST       },
+    { NPC_UNYIELDING_DEAD,        DATA_FELMYST       },
+    { NPC_DARKNESS,               DATA_MURU          },
+    { NPC_VOID_SENTINEL,          DATA_MURU          },
+    { NPC_VOID_SPAWN,             DATA_MURU          },
+    { NPC_FELFIRE_PORTAL,         DATA_KJ_CONTROLLER },
+    { NPC_VOLATILE_FELFIRE_FIEND, DATA_KJ_CONTROLLER },
+    { NPC_SHIELD_ORB,             DATA_KJ_CONTROLLER },
+    { NPC_SINISTER_REFLECTION,    DATA_KJ_CONTROLLER },
+    { 0,                          0                  }
+};
+
 class instance_sunwell_plateau : public InstanceMapScript
 {
 public:
@@ -45,33 +85,16 @@ public:
             SetHeaders(DataHeader);
             SetBossNumber(MAX_ENCOUNTERS);
             LoadDoorData(doorData);
+            LoadObjectData(creatureData, gameObjectData);
+            LoadSummonData(summonData);
         }
 
         void OnPlayerEnter(Player* player) override
         {
             instance->LoadGrid(1477.94f, 643.22f);
             instance->LoadGrid(1641.45f, 988.08f);
-            if (GameObject* gobj = instance->GetGameObject(IceBarrierGUID))
+            if (GameObject* gobj = GetGameObject(DATA_ICEBARRIER))
                 gobj->SendUpdateToPlayer(player);
-        }
-
-        Player const* GetPlayerInMap() const
-        {
-            Map::PlayerList const& players = instance->GetPlayers();
-
-            if (!players.IsEmpty())
-            {
-                for (Map::PlayerList::const_iterator itr = players.begin(); itr != players.end(); ++itr)
-                {
-                    Player* player = itr->GetSource();
-                    if (player && !player->HasAura(45839))
-                        return player;
-                }
-            }
-            //else
-            //    LOG_DEBUG("scripts", "Instance Sunwell Plateau: GetPlayerInMap, but PlayerList is empty!");
-
-            return nullptr;
         }
 
         void OnCreatureCreate(Creature* creature) override
@@ -79,179 +102,8 @@ public:
             if (creature->GetSpawnId() > 0 || !creature->GetOwnerGUID().IsPlayer())
                 creature->CastSpell(creature, SPELL_SUNWELL_RADIANCE, true);
 
-            switch (creature->GetEntry())
-            {
-                case NPC_KALECGOS:
-                    KalecgosDragonGUID = creature->GetGUID();
-                    break;
-                case NPC_SATHROVARR:
-                    SathrovarrGUID = creature->GetGUID();
-                    break;
-                case NPC_BRUTALLUS:
-                    BrutallusGUID = creature->GetGUID();
-                    break;
-                case NPC_MADRIGOSA:
-                    MadrigosaGUID = creature->GetGUID();
-                    break;
-                case NPC_FELMYST:
-                    FelmystGUID = creature->GetGUID();
-                    break;
-                case NPC_GRAND_WARLOCK_ALYTHESS:
-                    AlythessGUID = creature->GetGUID();
-                    break;
-                case NPC_LADY_SACROLASH:
-                    SacrolashGUID = creature->GetGUID();
-                    break;
-                case NPC_MURU:
-                    MuruGUID = creature->GetGUID();
-                    break;
-                case NPC_KILJAEDEN:
-                    KilJaedenGUID = creature->GetGUID();
-                    break;
-                case NPC_KILJAEDEN_CONTROLLER:
-                    KilJaedenControllerGUID = creature->GetGUID();
-                    break;
-                case NPC_ANVEENA:
-                    AnveenaGUID = creature->GetGUID();
-                    break;
-                case NPC_KALECGOS_KJ:
-                    KalecgosKjGUID = creature->GetGUID();
-                    break;
-
-                // Xinef: Felmyst encounter
-                case NPC_DEMONIC_VAPOR_TRAIL:
-                case NPC_UNYIELDING_DEAD:
-                    if (Creature* felmyst = instance->GetCreature(FelmystGUID))
-                        felmyst->AI()->JustSummoned(creature);
-                    break;
-
-                // Xinef: M'uru encounter
-                case NPC_DARKNESS:
-                case NPC_VOID_SENTINEL:
-                case NPC_VOID_SPAWN:
-                    if (Creature* muru = instance->GetCreature(MuruGUID))
-                        muru->AI()->JustSummoned(creature);
-                    break;
-
-                // Xinef: Kil'jaeden encounter
-                case NPC_FELFIRE_PORTAL:
-                case NPC_VOLATILE_FELFIRE_FIEND:
-                case NPC_SHIELD_ORB:
-                case NPC_SINISTER_REFLECTION:
-                    if (Creature* kiljaedenC = instance->GetCreature(KilJaedenControllerGUID))
-                        kiljaedenC->AI()->JustSummoned(creature);
-                    break;
-                default:
-                    break;
-            }
+            InstanceScript::OnCreatureCreate(creature);
         }
-
-        void OnGameObjectCreate(GameObject* go) override
-        {
-            switch (go->GetEntry())
-            {
-                case GO_FORCE_FIELD:
-                case GO_BOSS_COLLISION_1:
-                case GO_BOSS_COLLISION_2:
-                case GO_FIRE_BARRIER:
-                case GO_MURUS_GATE_1:
-                case GO_MURUS_GATE_2:
-                    AddDoor(go);
-                    break;
-                case GO_ICE_BARRIER:
-                    IceBarrierGUID = go->GetGUID();
-                    go->setActive(true);
-                    break;
-                case GO_ORB_OF_THE_BLUE_DRAGONFLIGHT1:
-                    blueFlightOrbGUID[0] = go->GetGUID();
-                    break;
-                case GO_ORB_OF_THE_BLUE_DRAGONFLIGHT2:
-                    blueFlightOrbGUID[1] = go->GetGUID();
-                    break;
-                case GO_ORB_OF_THE_BLUE_DRAGONFLIGHT3:
-                    blueFlightOrbGUID[2] = go->GetGUID();
-                    break;
-                case GO_ORB_OF_THE_BLUE_DRAGONFLIGHT4:
-                    blueFlightOrbGUID[3] = go->GetGUID();
-                    break;
-                default:
-                    break;
-            }
-        }
-
-        void OnGameObjectRemove(GameObject* go) override
-        {
-            switch (go->GetEntry())
-            {
-                case GO_FIRE_BARRIER:
-                case GO_MURUS_GATE_1:
-                case GO_MURUS_GATE_2:
-                case GO_BOSS_COLLISION_1:
-                case GO_BOSS_COLLISION_2:
-                case GO_FORCE_FIELD:
-                    RemoveDoor(go);
-                    break;
-                default:
-                    break;
-            }
-        }
-
-        ObjectGuid GetGuidData(uint32 id) const override
-        {
-            switch (id)
-            {
-                case NPC_KALECGOS:
-                    return KalecgosDragonGUID;
-                case NPC_SATHROVARR:
-                    return SathrovarrGUID;
-                case NPC_BRUTALLUS:
-                    return BrutallusGUID;
-                case NPC_MADRIGOSA:
-                    return MadrigosaGUID;
-                case NPC_FELMYST:
-                    return FelmystGUID;
-                case NPC_GRAND_WARLOCK_ALYTHESS:
-                    return AlythessGUID;
-                case NPC_LADY_SACROLASH:
-                    return SacrolashGUID;
-                case NPC_MURU:
-                    return MuruGUID;
-                case NPC_ANVEENA:
-                    return AnveenaGUID;
-                case NPC_KALECGOS_KJ:
-                    return KalecgosKjGUID;
-                case NPC_KILJAEDEN_CONTROLLER:
-                    return KilJaedenControllerGUID;
-                case NPC_KILJAEDEN:
-                    return KilJaedenGUID;
-
-                // Orbs
-                case DATA_ORB_OF_THE_BLUE_DRAGONFLIGHT_1:
-                case DATA_ORB_OF_THE_BLUE_DRAGONFLIGHT_2:
-                case DATA_ORB_OF_THE_BLUE_DRAGONFLIGHT_3:
-                case DATA_ORB_OF_THE_BLUE_DRAGONFLIGHT_4:
-                    return blueFlightOrbGUID[id - DATA_ORB_OF_THE_BLUE_DRAGONFLIGHT_1];
-            }
-
-            return ObjectGuid::Empty;
-        }
-
-    protected:
-        ObjectGuid KalecgosDragonGUID;
-        ObjectGuid SathrovarrGUID;
-        ObjectGuid BrutallusGUID;
-        ObjectGuid MadrigosaGUID;
-        ObjectGuid FelmystGUID;
-        ObjectGuid AlythessGUID;
-        ObjectGuid SacrolashGUID;
-        ObjectGuid MuruGUID;
-        ObjectGuid KilJaedenGUID;
-        ObjectGuid KilJaedenControllerGUID;
-        ObjectGuid AnveenaGUID;
-        ObjectGuid KalecgosKjGUID;
-
-        ObjectGuid IceBarrierGUID;
-        ObjectGuid blueFlightOrbGUID[4];
     };
 
     InstanceScript* GetInstanceScript(InstanceMap* map) const override

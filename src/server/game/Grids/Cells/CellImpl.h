@@ -21,7 +21,6 @@
 #include "Cell.h"
 #include "Map.h"
 #include "Object.h"
-#include <cmath>
 
 inline Cell::Cell(CellCoord const& p)
 {

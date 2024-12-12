@@ -323,7 +323,7 @@ public:
 
         void KilledUnit(Unit* who) override
         {
-            if (who->GetTypeId() != TYPEID_PLAYER)
+            if (!who->IsPlayer())
                 return;
 
             Talk(SAY_KILL);
@@ -357,7 +357,7 @@ public:
 
         void SummonHelpers(uint32 entry)
         {
-            switch(entry)
+            switch (entry)
             {
                 case NPC_LIVING_TRAINEE:
                     me->SummonCreature(NPC_LIVING_TRAINEE, PosSummonLiving[0].GetPositionX(), PosSummonLiving[0].GetPositionY(), PosSummonLiving[0].GetPositionZ(), PosSummonLiving[0].GetOrientation());
@@ -387,7 +387,7 @@ public:
             {
                 bool checklife = false;
                 bool checkdead = false;
-                for (const auto& i : PlayerList)
+                for (auto const& i : PlayerList)
                 {
                     Player* player = i.GetSource();
                     if (player->IsAlive() &&

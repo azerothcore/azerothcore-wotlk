@@ -52,7 +52,7 @@ void UnitAI::DoMeleeAttackIfReady()
     if (me->isAttackReady())
     {
         // xinef: prevent base and off attack in same time, delay attack at 0.2 sec
-        if (me->haveOffhandWeapon())
+        if (me->HasOffhandWeaponForAttack())
             if (me->getAttackTimer(OFF_ATTACK) < ATTACK_DISPLAY_DELAY)
                 me->setAttackTimer(OFF_ATTACK, ATTACK_DISPLAY_DELAY);
 
@@ -60,7 +60,7 @@ void UnitAI::DoMeleeAttackIfReady()
         me->resetAttackTimer();
     }
 
-    if (me->haveOffhandWeapon() && me->isAttackReady(OFF_ATTACK))
+    if (me->HasOffhandWeaponForAttack() && me->isAttackReady(OFF_ATTACK))
     {
         // xinef: delay main hand attack if both will hit at the same time (players code)
         if (me->getAttackTimer(BASE_ATTACK) < ATTACK_DISPLAY_DELAY)
@@ -253,6 +253,9 @@ SpellCastResult UnitAI::DoCastAOE(uint32 spellId, bool triggered)
     return me->CastSpell((Unit*)nullptr, spellId, triggered);
 }
 
+/**
+ * @brief Cast the spell on a random unit from the threat list
+ */
 SpellCastResult UnitAI::DoCastRandomTarget(uint32 spellId, uint32 threatTablePosition, float dist, bool playerOnly, bool triggered, bool withTank)
 {
     if (Unit* target = SelectTarget(SelectTargetMethod::Random, threatTablePosition, dist, playerOnly, withTank))
@@ -424,7 +427,7 @@ bool NonTankTargetSelector::operator()(Unit const* target) const
     if (!target)
         return false;
 
-    if (_playerOnly && target->GetTypeId() != TYPEID_PLAYER)
+    if (_playerOnly && !target->IsPlayer())
         return false;
 
     if (Unit* currentVictim = _source->GetThreatMgr().GetCurrentVictim())

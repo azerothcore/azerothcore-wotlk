@@ -139,7 +139,7 @@ public:
         void setphase(short newPhase)
         {
             Unit* summoner = me->ToTempSummon() ? me->ToTempSummon()->GetSummonerUnit() : nullptr;
-            if (!summoner || summoner->GetTypeId() != TYPEID_PLAYER)
+            if (!summoner || !summoner->IsPlayer())
                 return;
 
             switch (newPhase)

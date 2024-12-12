@@ -304,7 +304,7 @@ void PlayerDump::InitializeTables()
             // item0 - item18
             for (uint32 j = 0; j < EQUIPMENT_SLOT_END; ++j)
             {
-                std::string itColumn = Acore::StringFormat("item%u", j);
+                std::string itColumn = Acore::StringFormat("item{}", j);
                 MarkDependentColumn(t, itColumn, GUID_TYPE_ITEM);
             }
             break;
@@ -923,7 +923,7 @@ DumpReturn PlayerDumpReader::LoadDump(std::istream& input, uint32 account, std::
             if (name.empty())
             {
                 // generate a temporary name
-                std::string guidPart = Acore::StringFormat("%X", guid);
+                std::string guidPart = Acore::StringFormat("{:X}", guid);
                 std::size_t maxCharsFromOriginalName = MAX_PLAYER_NAME - guidPart.length();
 
                 name = GetColumn(ts, line, "name").substr(0, maxCharsFromOriginalName) + guidPart;

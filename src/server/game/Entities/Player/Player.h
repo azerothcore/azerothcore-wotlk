@@ -861,39 +861,40 @@ enum PlayedTimeIndex
 // used at player loading query list preparing, and later result selection
 enum PlayerLoginQueryIndex
 {
-    PLAYER_LOGIN_QUERY_LOAD_FROM                    = 0,
-    PLAYER_LOGIN_QUERY_LOAD_AURAS                   = 3,
-    PLAYER_LOGIN_QUERY_LOAD_SPELLS                  = 4,
-    PLAYER_LOGIN_QUERY_LOAD_QUEST_STATUS            = 5,
-    PLAYER_LOGIN_QUERY_LOAD_DAILY_QUEST_STATUS      = 6,
-    PLAYER_LOGIN_QUERY_LOAD_REPUTATION              = 7,
-    PLAYER_LOGIN_QUERY_LOAD_INVENTORY               = 8,
-    PLAYER_LOGIN_QUERY_LOAD_ACTIONS                 = 9,
-    PLAYER_LOGIN_QUERY_LOAD_MAILS                   = 10,
-    PLAYER_LOGIN_QUERY_LOAD_MAIL_ITEMS              = 11,
-    PLAYER_LOGIN_QUERY_LOAD_SOCIAL_LIST             = 13,
-    PLAYER_LOGIN_QUERY_LOAD_HOME_BIND               = 14,
-    PLAYER_LOGIN_QUERY_LOAD_SPELL_COOLDOWNS         = 15,
-    PLAYER_LOGIN_QUERY_LOAD_DECLINED_NAMES          = 16,
-    PLAYER_LOGIN_QUERY_LOAD_ACHIEVEMENTS            = 18,
-    PLAYER_LOGIN_QUERY_LOAD_CRITERIA_PROGRESS       = 19,
-    PLAYER_LOGIN_QUERY_LOAD_EQUIPMENT_SETS          = 20,
-    PLAYER_LOGIN_QUERY_LOAD_ENTRY_POINT             = 21,
-    PLAYER_LOGIN_QUERY_LOAD_GLYPHS                  = 22,
-    PLAYER_LOGIN_QUERY_LOAD_TALENTS                 = 23,
-    PLAYER_LOGIN_QUERY_LOAD_ACCOUNT_DATA            = 24,
-    PLAYER_LOGIN_QUERY_LOAD_SKILLS                  = 25,
-    PLAYER_LOGIN_QUERY_LOAD_WEEKLY_QUEST_STATUS     = 26,
-    PLAYER_LOGIN_QUERY_LOAD_RANDOM_BG               = 27,
-    PLAYER_LOGIN_QUERY_LOAD_BANNED                  = 28,
-    PLAYER_LOGIN_QUERY_LOAD_QUEST_STATUS_REW        = 29,
-    PLAYER_LOGIN_QUERY_LOAD_INSTANCE_LOCK_TIMES     = 30,
-    PLAYER_LOGIN_QUERY_LOAD_SEASONAL_QUEST_STATUS   = 31,
-    PLAYER_LOGIN_QUERY_LOAD_MONTHLY_QUEST_STATUS    = 32,
-    PLAYER_LOGIN_QUERY_LOAD_BREW_OF_THE_MONTH       = 34,
-    PLAYER_LOGIN_QUERY_LOAD_CORPSE_LOCATION         = 35,
-    PLAYER_LOGIN_QUERY_LOAD_CHARACTER_SETTINGS      = 36,
-    PLAYER_LOGIN_QUERY_LOAD_PET_SLOTS               = 37,
+    PLAYER_LOGIN_QUERY_LOAD_FROM                         = 0,
+    PLAYER_LOGIN_QUERY_LOAD_AURAS                        = 3,
+    PLAYER_LOGIN_QUERY_LOAD_SPELLS                       = 4,
+    PLAYER_LOGIN_QUERY_LOAD_QUEST_STATUS                 = 5,
+    PLAYER_LOGIN_QUERY_LOAD_DAILY_QUEST_STATUS           = 6,
+    PLAYER_LOGIN_QUERY_LOAD_REPUTATION                   = 7,
+    PLAYER_LOGIN_QUERY_LOAD_INVENTORY                    = 8,
+    PLAYER_LOGIN_QUERY_LOAD_ACTIONS                      = 9,
+    PLAYER_LOGIN_QUERY_LOAD_MAILS                        = 10,
+    PLAYER_LOGIN_QUERY_LOAD_MAIL_ITEMS                   = 11,
+    PLAYER_LOGIN_QUERY_LOAD_SOCIAL_LIST                  = 13,
+    PLAYER_LOGIN_QUERY_LOAD_HOME_BIND                    = 14,
+    PLAYER_LOGIN_QUERY_LOAD_SPELL_COOLDOWNS              = 15,
+    PLAYER_LOGIN_QUERY_LOAD_DECLINED_NAMES               = 16,
+    PLAYER_LOGIN_QUERY_LOAD_ACHIEVEMENTS                 = 18,
+    PLAYER_LOGIN_QUERY_LOAD_CRITERIA_PROGRESS            = 19,
+    PLAYER_LOGIN_QUERY_LOAD_EQUIPMENT_SETS               = 20,
+    PLAYER_LOGIN_QUERY_LOAD_ENTRY_POINT                  = 21,
+    PLAYER_LOGIN_QUERY_LOAD_GLYPHS                       = 22,
+    PLAYER_LOGIN_QUERY_LOAD_TALENTS                      = 23,
+    PLAYER_LOGIN_QUERY_LOAD_ACCOUNT_DATA                 = 24,
+    PLAYER_LOGIN_QUERY_LOAD_SKILLS                       = 25,
+    PLAYER_LOGIN_QUERY_LOAD_WEEKLY_QUEST_STATUS          = 26,
+    PLAYER_LOGIN_QUERY_LOAD_RANDOM_BG                    = 27,
+    PLAYER_LOGIN_QUERY_LOAD_BANNED                       = 28,
+    PLAYER_LOGIN_QUERY_LOAD_QUEST_STATUS_REW             = 29,
+    PLAYER_LOGIN_QUERY_LOAD_INSTANCE_LOCK_TIMES          = 30,
+    PLAYER_LOGIN_QUERY_LOAD_SEASONAL_QUEST_STATUS        = 31,
+    PLAYER_LOGIN_QUERY_LOAD_MONTHLY_QUEST_STATUS         = 32,
+    PLAYER_LOGIN_QUERY_LOAD_BREW_OF_THE_MONTH            = 34,
+    PLAYER_LOGIN_QUERY_LOAD_CORPSE_LOCATION              = 35,
+    PLAYER_LOGIN_QUERY_LOAD_CHARACTER_SETTINGS           = 36,
+    PLAYER_LOGIN_QUERY_LOAD_PET_SLOTS                    = 37,
+    PLAYER_LOGIN_QUERY_LOAD_OFFLINE_ACHIEVEMENTS_UPDATES = 38,
     MAX_PLAYER_LOGIN_QUERY
 };
 
@@ -1057,6 +1058,18 @@ struct EntryPointData
 
     void ClearTaxiPath() { taxiPath.fill(0); }
     [[nodiscard]] bool HasTaxiPath() const { return taxiPath[0] && taxiPath[1]; }
+};
+
+struct PendingSpellCastRequest
+{
+    uint32 spellId;
+    uint32 category;
+    WorldPacket requestPacket;
+    bool isItem = false;
+    bool cancelInProgress = false;
+
+    PendingSpellCastRequest(uint32 spellId, uint32 category, WorldPacket&& packet, bool item = false, bool cancel = false)
+        : spellId(spellId), category(category), requestPacket(std::move(packet)), isItem(item) , cancelInProgress(cancel) {}
 };
 
 class Player : public Unit, public GridObject<Player>
@@ -1247,6 +1260,8 @@ public:
         return GetItemByPos(bag, slot);
     }
     [[nodiscard]] Item* GetWeaponForAttack(WeaponAttackType attackType, bool useable = false) const;
+    bool HasWeapon(WeaponAttackType type) const override { return GetWeaponForAttack(type, false); }
+    bool HasWeaponForAttack(WeaponAttackType type) const override { return (Unit::HasWeaponForAttack(type) && GetWeaponForAttack(type, true)); }
     [[nodiscard]] Item* GetShield(bool useable = false) const;
     static uint8 GetAttackBySlot(uint8 slot);        // MAX_ATTACK if not weapon slot
     std::vector<Item*>& GetItemUpdateQueue() { return m_itemUpdateQueue; }
@@ -1430,6 +1445,7 @@ public:
     void CompleteQuest(uint32 quest_id);
     void IncompleteQuest(uint32 quest_id);
     void RewardQuest(Quest const* quest, uint32 reward, Object* questGiver, bool announce = true, bool isLFGReward = false);
+    void SetRewardedQuest(uint32 quest_id);
     void FailQuest(uint32 quest_id);
     bool SatisfyQuestSkill(Quest const* qInfo, bool msg) const;
     bool SatisfyQuestLevel(Quest const* qInfo, bool msg) const;
@@ -1576,6 +1592,9 @@ public:
     static void DeleteFromDB(ObjectGuid::LowType lowGuid, uint32 accountId, bool updateRealmChars, bool deleteFinally);
     static void DeleteOldCharacters();
     static void DeleteOldCharacters(uint32 keepDays);
+
+    static void DeleteOldRecoveryItems();
+    static void DeleteOldRecoveryItems(uint32 keepDays);
 
     bool m_mailsUpdated;
 
@@ -2608,7 +2627,21 @@ public:
 
     std::string GetDebugInfo() const override;
 
- protected:
+    /*********************************************************/
+    /***               SPELL QUEUE SYSTEM                  ***/
+    /*********************************************************/
+protected:
+    uint32 GetSpellQueueWindow() const;
+    void ProcessSpellQueue();
+
+public:
+    std::deque<PendingSpellCastRequest> SpellQueue;
+    const PendingSpellCastRequest* GetCastRequest(uint32 category) const;
+    bool CanExecutePendingSpellCastRequest(SpellInfo const* spellInfo);
+    void ExecuteOrCancelSpellCastRequest(PendingSpellCastRequest* castRequest, bool isCancel = false);
+    bool CanRequestSpellCast(SpellInfo const* spellInfo);
+
+protected:
     // Gamemaster whisper whitelist
     WhisperListContainer WhisperList;
 

@@ -52,7 +52,7 @@ void AppenderConsole::InitColors(std::string const& name, std::string_view str)
     std::vector<std::string_view> colorStrs = Acore::Tokenize(str, ' ', false);
     if (colorStrs.size() != NUM_ENABLED_LOG_LEVELS)
     {
-        throw InvalidAppenderArgsException(Acore::StringFormatFmt("Log::CreateAppenderFromConfig: Invalid color data '{}' for console appender {} (expected {} entries, got {})",
+        throw InvalidAppenderArgsException(Acore::StringFormat("Log::CreateAppenderFromConfig: Invalid color data '{}' for console appender {} (expected {} entries, got {})",
             str, name, NUM_ENABLED_LOG_LEVELS, colorStrs.size()));
     }
 
@@ -64,7 +64,7 @@ void AppenderConsole::InitColors(std::string const& name, std::string_view str)
         }
         else
         {
-            throw InvalidAppenderArgsException(Acore::StringFormatFmt("Log::CreateAppenderFromConfig: Invalid color '{}' for log level {} on console appender {}",
+            throw InvalidAppenderArgsException(Acore::StringFormat("Log::CreateAppenderFromConfig: Invalid color '{}' for log level {} on console appender {}",
                 colorStrs[i], EnumUtils::ToTitle(static_cast<LogLevel>(i)), name));
         }
     }

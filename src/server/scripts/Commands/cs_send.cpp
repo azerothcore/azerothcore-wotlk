@@ -79,7 +79,7 @@ public:
                     itemCount = *Acore::StringTo<uint32>(itemTokens.at(1));
                     break;
                 default:
-                    handler->SendSysMessage(Acore::StringFormatFmt("> Incorrect item list format for '{}'", itemString));
+                    handler->SendSysMessage(Acore::StringFormat("> Incorrect item list format for '{}'", itemString));
                     continue;
             }
 

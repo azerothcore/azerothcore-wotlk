@@ -19,7 +19,6 @@
 #define ACORE_CREATUREAI_H
 
 #include "AreaBoundary.h"
-#include "Common.h"
 #include "Creature.h"
 #include "EventMap.h"
 #include "TaskScheduler.h"
@@ -96,6 +95,8 @@ public:
 
     void Talk(uint8 id, WorldObject const* whisperTarget = nullptr, Milliseconds delay = 0s);
     void Talk(uint8 id, Milliseconds delay) { Talk(id, nullptr, delay); }
+
+    WorldObject* GetSummoner() const;
 
     explicit CreatureAI(Creature* creature) : UnitAI(creature), me(creature), _boundary(nullptr), _negateBoundary(false), m_MoveInLineOfSight_locked(false) { }
 
@@ -219,6 +220,9 @@ public:
     virtual void CalculateThreat(Unit* /*hatedUnit*/, float& /*threat*/, SpellInfo const* /*threatSpell*/) { }
 
     virtual bool OnTeleportUnreacheablePlayer(Player* /*player*/) { return false; }
+
+    // Called when an aura is removed or expires.
+    virtual void OnAuraRemove(AuraApplication* /*aurApp*/, AuraRemoveMode /*mode*/) { }
 
 protected:
     virtual void MoveInLineOfSight(Unit* /*who*/);

@@ -30,7 +30,6 @@
 #include "SharedDefines.h"
 #include "Spell.h"
 #include "SpellAuraDefines.h"
-#include "SpellAuras.h"
 #include "SpellInfo.h"
 #include "World.h"
 
@@ -1112,10 +1111,10 @@ bool SpellArea::IsFitToRequirements(Player const* player, uint32 newZone, uint32
                 AreaTableEntry const* pArea = sAreaTableStore.LookupEntry(player->GetAreaId());
                 if (!(pArea && pArea->flags & AREA_FLAG_NO_FLY_ZONE))
                     return false;
-                if (!player->HasAuraType(SPELL_AURA_MOD_INCREASE_MOUNTED_FLIGHT_SPEED) && !player->HasAuraType(SPELL_AURA_FLY))
+                if (!player->HasIncreaseMountedFlightSpeedAura() && !player->HasFlyAura())
                     return false;
                 // Xinef: Underbelly elixir
-                if (player->GetPositionZ() < 637.0f && player->HasAuraType(SPELL_AURA_TRANSFORM))
+                if (player->GetPositionZ() < 637.0f && player->HasTransformAura())
                     return false;
                 break;
             }
@@ -1125,7 +1124,7 @@ bool SpellArea::IsFitToRequirements(Player const* player, uint32 newZone, uint32
                     return false;
 
                 Battlefield* Bf = sBattlefieldMgr->GetBattlefieldToZoneId(player->GetZoneId());
-                if (!Bf || Bf->CanFlyIn() || (!player->HasAuraType(SPELL_AURA_MOD_INCREASE_MOUNTED_FLIGHT_SPEED) && !player->HasAuraType(SPELL_AURA_FLY)))
+                if (!Bf || Bf->CanFlyIn() || (!player->HasIncreaseMountedFlightSpeedAura() && !player->HasFlyAura()))
                     return false;
                 break;
             }
@@ -3038,7 +3037,7 @@ void SpellMgr::LoadSpellInfoCustomAttributes()
             {
                 if (spellInfo->Effects[j].Effect)
                 {
-                    switch(spellInfo->Effects[j].Effect)
+                    switch (spellInfo->Effects[j].Effect)
                     {
                         case SPELL_EFFECT_SCHOOL_DAMAGE:
                         case SPELL_EFFECT_WEAPON_DAMAGE:
@@ -3065,16 +3064,27 @@ void SpellMgr::LoadSpellInfoCustomAttributes()
                                 continue;
                             [[fallthrough]]; /// @todo: Not sure whether the fallthrough was a mistake (forgetting a break) or intended. This should be double-checked.
                         default:
-                            if (spellInfo->Effects[j].CalcValue() || ((spellInfo->Effects[j].Effect == SPELL_EFFECT_INTERRUPT_CAST || spellInfo->HasAttribute(SPELL_ATTR0_CU_DONT_BREAK_STEALTH)) && !spellInfo->HasAttribute(SPELL_ATTR0_NO_IMMUNITIES)))
-                                if (spellInfo->Id != 69649 && spellInfo->Id != 71056 && spellInfo->Id != 71057 && spellInfo->Id != 71058 && spellInfo->Id != 73061 && spellInfo->Id != 73062 && spellInfo->Id != 73063 && spellInfo->Id != 73064) // Sindragosa Frost Breath
-                                    if (spellInfo->SpellFamilyName != SPELLFAMILY_MAGE || !(spellInfo->SpellFamilyFlags[0] & 0x20)) // frostbolt
-                                        if (spellInfo->Id != 55095) // frost fever
-                                            if (spellInfo->SpellFamilyName != SPELLFAMILY_WARLOCK || !(spellInfo->SpellFamilyFlags[1] & 0x40000)) // Haunt
-                                            {
-                                                spellInfo->AttributesCu |= SPELL_ATTR0_CU_BINARY_SPELL;
-                                                break;
-                                            }
-                            continue;
+                            if (!(spellInfo->Effects[j].CalcValue() &&
+                                ((spellInfo->Effects[j].Effect == SPELL_EFFECT_INTERRUPT_CAST || spellInfo->HasAttribute(SPELL_ATTR0_CU_DONT_BREAK_STEALTH)) &&
+                                !spellInfo->HasAttribute(SPELL_ATTR0_NO_IMMUNITIES))))
+                                continue;
+
+                            if (spellInfo->Id == 69649 || spellInfo->Id == 71056 || spellInfo->Id == 71057 || spellInfo->Id == 71058 ||
+                                spellInfo->Id == 73061 || spellInfo->Id == 73062 || spellInfo->Id == 73063 || spellInfo->Id == 73064)
+                                continue;
+
+                            if (spellInfo->SpellFamilyName == SPELLFAMILY_MAGE && (spellInfo->SpellFamilyFlags[0] & 0x20)) // Frostbolt
+                                continue;
+
+                            if (spellInfo->Id == 55095) // Frost Fever
+                                continue;
+
+                            if (spellInfo->SpellFamilyName == SPELLFAMILY_WARLOCK &&
+                                ((spellInfo->SpellFamilyFlags[1] & 0x40000) || (spellInfo->SpellFamilyFlags[0] & 0x4000))) // Haunt/Drain Soul
+                                continue;
+
+                            spellInfo->AttributesCu |= SPELL_ATTR0_CU_BINARY_SPELL;
+                            break;
                     }
                 }
             }
@@ -3492,7 +3502,7 @@ void SpellMgr::LoadSpellInfoCustomAttributes()
         {
             if (spellInfo->Effects[j].ApplyAuraName && spellInfo->Effects[j].TriggerSpell)
             {
-                switch(spellInfo->Effects[j].ApplyAuraName)
+                switch (spellInfo->Effects[j].ApplyAuraName)
                 {
                     case SPELL_AURA_PERIODIC_TRIGGER_SPELL:
                     case SPELL_AURA_PERIODIC_TRIGGER_SPELL_FROM_CLIENT:

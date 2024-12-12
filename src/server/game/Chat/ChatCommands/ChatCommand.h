@@ -23,15 +23,12 @@
 #include "Define.h"
 #include "Errors.h"
 #include "Language.h"
-#include "ObjectGuid.h"
 #include "Optional.h"
 #include "StringFormat.h"
 #include "Util.h"
 #include <cstddef>
 #include <map>
 #include <tuple>
-#include <type_traits>
-#include <utility>
 #include <variant>
 #include <vector>
 
@@ -91,7 +88,7 @@ namespace Acore::Impl::ChatCommands
                 return result2;
             if (result1.HasErrorMessage() && result2.HasErrorMessage())
             {
-                return Acore::StringFormatFmt("{} \"{}\"\n{} \"{}\"",
+                return Acore::StringFormat("{} \"{}\"\n{} \"{}\"",
                     GetAcoreString(handler, LANG_CMDPARSER_EITHER), result2.GetErrorMessage(),
                     GetAcoreString(handler, LANG_CMDPARSER_OR), result1.GetErrorMessage());
             }

@@ -28,7 +28,6 @@
 #include "Pet.h"
 #include "PetPackets.h"
 #include "Player.h"
-#include "QueryHolder.h"
 #include "Spell.h"
 #include "SpellInfo.h"
 #include "SpellMgr.h"
@@ -50,7 +49,7 @@ void WorldSession::HandleDismissCritter(WorldPackets::Pet::DismissCritter& packe
 
     if (_player->GetCritterGUID() == pet->GetGUID())
     {
-        if (pet->GetTypeId() == TYPEID_UNIT && pet->ToCreature()->IsSummon())
+        if (pet->IsCreature() && pet->ToCreature()->IsSummon())
             pet->ToTempSummon()->UnSummon();
     }
 }
@@ -210,7 +209,7 @@ void WorldSession::HandlePetActionHelper(Unit* pet, ObjectGuid guid1, uint32 spe
                 case COMMAND_ATTACK:                        //spellId=1792  //ATTACK
                     {
                         // Can't attack if owner is pacified
-                        if (_player->HasAuraType(SPELL_AURA_MOD_PACIFY))
+                        if (_player->HasPacifyAura())
                         {
                             //pet->SendPetCastFail(spellId, SPELL_FAILED_PACIFIED);
                             //TODO: Send proper error message to client
@@ -234,7 +233,7 @@ void WorldSession::HandlePetActionHelper(Unit* pet, ObjectGuid guid1, uint32 spe
 
                         // Not let attack through obstructions
                         bool checkLos = !DisableMgr::IsPathfindingEnabled(pet->GetMap()) ||
-                                        (TargetUnit->GetTypeId() == TYPEID_UNIT && (TargetUnit->ToCreature()->isWorldBoss() || TargetUnit->ToCreature()->IsDungeonBoss()));
+                                        (TargetUnit->IsCreature() && (TargetUnit->ToCreature()->isWorldBoss() || TargetUnit->ToCreature()->IsDungeonBoss()));
 
                         if (checkLos && !pet->IsWithinLOSInMap(TargetUnit))
                         {
@@ -252,7 +251,7 @@ void WorldSession::HandlePetActionHelper(Unit* pet, ObjectGuid guid1, uint32 spe
                         {
                             pet->AttackStop();
 
-                            if (pet->GetTypeId() != TYPEID_PLAYER && pet->ToCreature()->IsAIEnabled)
+                            if (!pet->IsPlayer() && pet->ToCreature()->IsAIEnabled)
                             {
                                 charmInfo->SetIsCommandAttack(true);
                                 charmInfo->SetIsAtStay(false);
@@ -292,7 +291,7 @@ void WorldSession::HandlePetActionHelper(Unit* pet, ObjectGuid guid1, uint32 spe
                     }
                     else if (pet->GetOwnerGUID() == GetPlayer()->GetGUID())
                     {
-                        ASSERT(pet->GetTypeId() == TYPEID_UNIT);
+                        ASSERT(pet->IsCreature());
                         if (pet->IsPet())
                         {
                             if (pet->ToPet()->getPetType() == HUNTER_PET)
@@ -323,7 +322,7 @@ void WorldSession::HandlePetActionHelper(Unit* pet, ObjectGuid guid1, uint32 spe
 
                 case REACT_DEFENSIVE:                       //recovery
                 case REACT_AGGRESSIVE:                      //activete
-                    if (pet->GetTypeId() == TYPEID_UNIT)
+                    if (pet->IsCreature())
                         pet->ToCreature()->SetReactState(ReactStates(spellId));
                     else
                         charmInfo->SetPlayerReactState(ReactStates(spellId));
@@ -462,13 +461,13 @@ void WorldSession::HandlePetActionHelper(Unit* pet, ObjectGuid guid1, uint32 spe
                         spell->SendPetCastResult(SPELL_FAILED_DONT_REPORT);
 
                     if (!pet->HasSpellCooldown(spellId))
-                        if(pet->ToPet())
+                        if (pet->ToPet())
                             pet->ToPet()->RemoveSpellCooldown(spellId, true);
 
                     spell->finish(false);
                     delete spell;
 
-                    if (_player->HasAuraType(SPELL_AURA_MOD_PACIFY))
+                    if (_player->HasPacifyAura())
                         return;
 
                     bool tempspellIsPositive = false;
@@ -491,7 +490,7 @@ void WorldSession::HandlePetActionHelper(Unit* pet, ObjectGuid guid1, uint32 spe
                             if (pet->GetVictim())
                                 pet->AttackStop();
 
-                            if (pet->GetTypeId() != TYPEID_PLAYER && pet->ToCreature() && pet->ToCreature()->IsAIEnabled)
+                            if (!pet->IsPlayer() && pet->ToCreature() && pet->ToCreature()->IsAIEnabled)
                             {
                                 charmInfo->SetIsCommandAttack(true);
                                 charmInfo->SetIsAtStay(false);
@@ -537,7 +536,7 @@ void WorldSession::HandlePetActionHelper(Unit* pet, ObjectGuid guid1, uint32 spe
                         else
                             victim = nullptr;
 
-                        if (pet->GetTypeId() != TYPEID_PLAYER && pet->ToCreature() && pet->ToCreature()->IsAIEnabled)
+                        if (!pet->IsPlayer() && pet->ToCreature() && pet->ToCreature()->IsAIEnabled)
                         {
                             pet->StopMoving();
                             pet->GetMotionMaster()->Clear();
@@ -654,7 +653,7 @@ bool WorldSession::CheckStableMaster(ObjectGuid guid)
     // spell case or GM
     if (guid == GetPlayer()->GetGUID())
     {
-        if (!GetPlayer()->IsGameMaster() && !GetPlayer()->HasAuraType(SPELL_AURA_OPEN_STABLE))
+        if (!GetPlayer()->IsGameMaster() && !GetPlayer()->HasOpenStableAura())
         {
             LOG_DEBUG("network.opcode", "Player ({}) attempt open stable in cheating way.", guid.ToString());
             return false;
@@ -775,7 +774,7 @@ void WorldSession::HandlePetSetAction(WorldPacket& recvData)
                     //sign for autocast
                     if (act_state == ACT_ENABLED)
                     {
-                        if (pet->GetTypeId() == TYPEID_UNIT && pet->IsPet())
+                        if (pet->IsCreature() && pet->IsPet())
                         {
                             ((Pet*)pet)->ToggleAutocast(spellInfo, true);
                         }
@@ -793,7 +792,7 @@ void WorldSession::HandlePetSetAction(WorldPacket& recvData)
                     //sign for no/turn off autocast
                     else if (act_state == ACT_DISABLED)
                     {
-                        if (pet->GetTypeId() == TYPEID_UNIT && pet->IsPet())
+                        if (pet->IsCreature() && pet->IsPet())
                         {
                             ((Pet*)pet)->ToggleAutocast(spellInfo, false);
                         }

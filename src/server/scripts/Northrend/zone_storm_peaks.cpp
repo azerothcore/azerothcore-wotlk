@@ -350,7 +350,7 @@ public:
 
         void EnterEvadeMode(EvadeReason why) override
         {
-            if (switching || me->HasAuraType(SPELL_AURA_CONTROL_VEHICLE))
+            if (switching || me->HasControlVehicleAura())
                 return;
             ScriptedAI::EnterEvadeMode(why);
         }
@@ -700,11 +700,11 @@ public:
             player->PrepareQuestMenu(creature->GetGUID());
 
         //Trainer Menu
-        if ( creature->IsTrainer() )
+        if (creature->IsTrainer())
             AddGossipItemFor(player, GOSSIP_ICON_TRAINER, GOSSIP_TEXT_TRAIN, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_TRAIN);
 
         //Vendor Menu
-        if ( creature->IsVendor() )
+        if (creature->IsVendor())
             if (player->HasSpell(SPELL_MECHANO_HOG) || player->HasSpell(SPELL_MEKGINEERS_CHOPPER))
                 AddGossipItemFor(player, GOSSIP_ICON_VENDOR, GOSSIP_TEXT_BROWSE_GOODS, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_TRADE);
 
@@ -875,7 +875,7 @@ public:
                                 for (uint8 i = 1; i < 4; ++i)
                                     if (Unit* prisoner = me->GetVehicleKit()->GetPassenger(i))
                                     {
-                                        if (prisoner->GetTypeId() != TYPEID_UNIT)
+                                        if (!prisoner->IsCreature())
                                             return;
                                         prisoner->CastSpell(player, SPELL_KILL_CREDIT_PRISONER, true);
                                         prisoner->CastSpell(prisoner, SPELL_SUMMON_LIBERATED, true);

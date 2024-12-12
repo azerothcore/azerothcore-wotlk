@@ -81,7 +81,7 @@ bool ThreatCalcHelper::isValidProcess(Unit* hatedUnit, Unit* hatingUnit, SpellIn
     if (threatSpell && threatSpell->HasAttribute(SPELL_ATTR1_NO_THREAT))
         return false;
 
-    ASSERT(hatingUnit->GetTypeId() == TYPEID_UNIT);
+    ASSERT(hatingUnit->IsCreature());
 
     return true;
 }
@@ -190,7 +190,7 @@ void HostileReference::updateOnlineStatus()
     // target is no player or not gamemaster
     // target is not in flight
     if (isValid()
-            && (getTarget()->GetTypeId() != TYPEID_PLAYER || !getTarget()->ToPlayer()->IsGameMaster())
+            && (!getTarget()->IsPlayer() || !getTarget()->ToPlayer()->IsGameMaster())
             && !getTarget()->IsInFlight()
             && getTarget()->IsInMap(GetSourceUnit())
             && getTarget()->InSamePhase(GetSourceUnit())
@@ -217,7 +217,7 @@ void HostileReference::setOnlineOfflineState(bool isOnline)
     {
         iOnline = isOnline;
 
-        ThreatRefStatusChangeEvent event(UEV_THREAT_REF_ONLINE_STATUS, this);
+        ThreatRefStatusChangeEvent event(UEV_THREAT_REF_ONLINE_STATUS, this, isOnline);
         fireStatusChanged(event);
     }
 }
@@ -230,7 +230,7 @@ void HostileReference::removeReference()
 {
     invalidate();
 
-    ThreatRefStatusChangeEvent event(UEV_THREAT_REF_REMOVE_FROM_LIST, this);
+    ThreatRefStatusChangeEvent event(UEV_THREAT_REF_REMOVE_FROM_LIST, this, false);
     fireStatusChanged(event);
 }
 
@@ -416,7 +416,7 @@ ThreatMgr::ThreatMgr(Unit* owner) : iCurrentVictim(nullptr), iOwner(owner), iUpd
 
 void ThreatMgr::ClearAllThreat()
 {
-    if (iOwner->CanHaveThreatList() && !isThreatListEmpty())
+    if (iOwner->CanHaveThreatList(true) && !isThreatListEmpty())
         iOwner->SendClearThreatListOpcode();
     clearReferences();
 }

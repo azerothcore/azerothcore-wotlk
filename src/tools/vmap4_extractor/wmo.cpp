@@ -23,7 +23,6 @@
 #include <cstdio>
 #include <cstdlib>
 #include <map>
-#include <utility>
 #undef min
 #undef max
 #include "mpq_libmpq04.h"
@@ -568,5 +567,4 @@ void MapObject::Extract(ADT::MODF const& mapObjDef, char const* WmoInstName, uin
     uint32 nlen = strlen(WmoInstName);
     fwrite(&nlen, sizeof(uint32), 1, pDirfile);
     fwrite(WmoInstName, sizeof(char), nlen, pDirfile);
-
 }

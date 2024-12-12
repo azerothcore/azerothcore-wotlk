@@ -18,13 +18,8 @@
 #ifndef CREATUREAIIMPL_H
 #define CREATUREAIIMPL_H
 
-#include "Common.h"
-#include "CreatureAI.h"
 #include "Define.h"
-#include "SpellMgr.h"
 #include "TemporarySummon.h"
-#include <functional>
-#include <type_traits>
 
 template<typename First, typename Second, typename... Rest>
 static inline First const& RAND(First const& first, Second const& second, Rest const& ... rest)

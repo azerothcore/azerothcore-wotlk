@@ -386,7 +386,7 @@ struct boss_cthun : public BossAI
             }, 500ms);
 
             //Spawn flesh tentacle
-            for (const auto& position : FleshTentaclePos)
+            for (auto const& position : FleshTentaclePos)
                 me->SummonCreature(NPC_FLESH_TENTACLE, position, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 5000);
 
             ScheduleTasks();
@@ -501,7 +501,7 @@ struct boss_cthun : public BossAI
                     me->RemoveAurasDueToSpell(SPELL_PURPLE_COLORATION);
                     DoCastSelf(SPELL_CARAPACE_CTHUN, true);
                     //Spawn flesh tentacle
-                    for (const auto& position : FleshTentaclePos)
+                    for (auto const& position : FleshTentaclePos)
                         me->SummonCreature(NPC_FLESH_TENTACLE, position, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 5000);
                 });
             }

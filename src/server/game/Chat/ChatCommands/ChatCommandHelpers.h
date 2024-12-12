@@ -24,7 +24,6 @@
 #include <optional>
 #include <string>
 #include <string_view>
-#include <type_traits>
 #include <variant>
 
 class ChatHandler;
@@ -125,7 +124,7 @@ namespace Acore::Impl::ChatCommands
     template <typename... Ts>
     std::string FormatAcoreString(ChatHandler const* handler, AcoreStrings which, Ts&&... args)
     {
-        return Acore::StringFormatFmt(GetAcoreString(handler, which), std::forward<Ts>(args)...);
+        return Acore::StringFormat(GetAcoreString(handler, which), std::forward<Ts>(args)...);
     }
 }
 

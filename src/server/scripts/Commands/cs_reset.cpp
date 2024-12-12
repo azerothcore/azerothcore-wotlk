@@ -117,7 +117,7 @@ public:
         uint8 powerType = classEntry->powerType;
 
         // reset m_form if no aura
-        if (!player->HasAuraType(SPELL_AURA_MOD_SHAPESHIFT))
+        if (!player->HasShapeshiftAura())
             player->SetShapeshiftForm(FORM_NONE);
 
         player->SetFactionForRace(player->getRace());

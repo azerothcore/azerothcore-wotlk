@@ -534,7 +534,7 @@ void BattlegroundSA::TeleportPlayers()
         if (Player* player = itr->second)
         {
             // should remove spirit of redemption
-            if (player->HasAuraType(SPELL_AURA_SPIRIT_OF_REDEMPTION))
+            if (player->HasSpiritOfRedemptionAura())
                 player->RemoveAurasByType(SPELL_AURA_MOD_SHAPESHIFT);
 
             if (!player->IsAlive())
@@ -589,7 +589,7 @@ void BattlegroundSA::DefendersPortalTeleport(GameObject* portal, Player* plr)
 
     uint32 portal_num = 0;
     //get it via X
-    switch( (uint32)portal->GetPositionX() )
+    switch ((uint32)portal->GetPositionX())
     {
         case 1394:
             portal_num = 0;
@@ -947,7 +947,7 @@ void BattlegroundSA::CaptureGraveyard(BG_SA_Graveyards i, Player* Source)
     uint32 npc = 0;
     uint32 flag = 0;
 
-    switch(i)
+    switch (i)
     {
         case BG_SA_LEFT_CAPTURABLE_GY:
             flag = BG_SA_LEFT_FLAG;

@@ -231,7 +231,7 @@ public:
             }
             if (GameObject* go = me->GetMap()->GetGameObject(pInstance->GetGuidData(DATA_KELTHUZAD_GATE)))
             {
-                if(!_justSpawned) // Don't open the door if we just spawned and are still doing the conversation
+                if (!_justSpawned) // Don't open the door if we just spawned and are still doing the conversation
                 {
                     go->SetGoState(GO_STATE_ACTIVE);
                 }
@@ -263,7 +263,7 @@ public:
 
         void KilledUnit(Unit* who) override
         {
-            if (who->GetTypeId() != TYPEID_PLAYER)
+            if (!who->IsPlayer())
                 return;
 
             Talk(SAY_SLAY);
@@ -565,7 +565,7 @@ public:
 
         void MoveInLineOfSight(Unit* who) override
         {
-            if (who->GetTypeId() != TYPEID_PLAYER && !who->IsPet())
+            if (!who->IsPlayer() && !who->IsPet())
                 return;
 
             ScriptedAI::MoveInLineOfSight(who);

@@ -62,6 +62,17 @@ void CreatureAI::Talk(uint8 id, WorldObject const* target /*= nullptr*/, Millise
     }
 }
 
+/**
+ * @brief Returns the summoner creature/object, if the creature is a temporary summon.
+ */
+WorldObject* CreatureAI::GetSummoner() const
+{
+    if (TempSummon* summon = me->ToTempSummon())
+        return summon->GetSummoner();
+
+    return nullptr;
+}
+
 inline bool IsValidCombatTarget(Creature* source, Player* target)
 {
     if (target->IsGameMaster())
@@ -107,7 +118,7 @@ void CreatureAI::DoZoneInCombat(Creature* creature /*= nullptr*/, float maxRange
     Map* map = creature->GetMap();
     if (!map->IsDungeon())                                  //use IsDungeon instead of Instanceable, in case battlegrounds will be instantiated
     {
-        LOG_ERROR("entities.unit.ai", "DoZoneInCombat call for map {} that isn't a dungeon (creature entry = {})", map->GetId(), creature->GetTypeId() == TYPEID_UNIT ? creature->ToCreature()->GetEntry() : 0);
+        LOG_ERROR("entities.unit.ai", "DoZoneInCombat call for map {} that isn't a dungeon (creature entry = {})", map->GetId(), creature->IsCreature() ? creature->ToCreature()->GetEntry() : 0);
         return;
     }
 
@@ -175,10 +186,10 @@ void CreatureAI::MoveInLineOfSight(Unit* who)
 void CreatureAI::TriggerAlert(Unit const* who) const
 {
     // If there's no target, or target isn't a player do nothing
-    if (!who || who->GetTypeId() != TYPEID_PLAYER)
+    if (!who || !who->IsPlayer())
         return;
     // If this unit isn't an NPC, is already distracted, is in combat, is confused, stunned or fleeing, do nothing
-    if (me->GetTypeId() != TYPEID_UNIT || me->IsEngaged() || me->HasUnitState(UNIT_STATE_CONFUSED | UNIT_STATE_STUNNED | UNIT_STATE_FLEEING | UNIT_STATE_DISTRACTED))
+    if (!me->IsCreature() || me->IsEngaged() || me->HasUnitState(UNIT_STATE_CONFUSED | UNIT_STATE_STUNNED | UNIT_STATE_FLEEING | UNIT_STATE_DISTRACTED))
         return;
     // Only alert for hostiles!
     if (me->IsCivilian() || me->HasReactState(REACT_PASSIVE) || !me->IsHostileTo(who) || !me->_IsTargetAcceptable(who))
@@ -307,7 +318,7 @@ bool CreatureAI::_EnterEvadeMode(EvadeReason /*why*/)
     me->LoadCreaturesAddon(true);
     me->SetLootRecipient(nullptr);
     me->ResetPlayerDamageReq();
-    me->SetLastDamagedTime(0);
+    me->ClearLastLeashExtensionTimePtr();
     me->SetCannotReachTarget();
 
     if (ZoneScript* zoneScript = me->GetZoneScript() ? me->GetZoneScript() : (ZoneScript*)me->GetInstanceScript())

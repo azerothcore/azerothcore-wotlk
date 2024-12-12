@@ -19,7 +19,6 @@
 #include "Errors.h"
 #include "Log.h"
 #include "MySQLConnection.h"
-#include "MySQLPreparedStatement.h"
 #include "MySQLWorkaround.h"
 #include "QueryResult.h"
 
@@ -104,7 +103,7 @@ bool PreparedStatementTask::Execute()
 template<typename T>
 std::string PreparedStatementData::ToString(T value)
 {
-    return Acore::StringFormatFmt("{}", value);
+    return Acore::StringFormat("{}", value);
 }
 
 template<>

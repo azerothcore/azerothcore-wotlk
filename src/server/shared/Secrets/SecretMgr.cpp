@@ -23,6 +23,7 @@
 #include "DatabaseEnv.h"
 #include "Errors.h"
 #include "Log.h"
+#include "QueryResult.h"
 #include "SharedDefines.h"
 
 #define SECRET_FLAG_FOR(key, val, server) server ## _ ## key = (val ## ull << (16*SERVER_PROCESS_ ## server))
@@ -188,11 +189,11 @@ Optional<std::string> SecretMgr::AttemptTransition(Secrets i, Optional<BigNumber
                 if (hadOldSecret)
                 {
                     if (!oldSecret)
-                        return Acore::StringFormat("Cannot decrypt old TOTP tokens - add config key '%s' to authserver.conf!", secret_info[i].oldKey);
+                        return Acore::StringFormat("Cannot decrypt old TOTP tokens - add config key '{}' to authserver.conf!", secret_info[i].oldKey);
 
                     bool success = Acore::Crypto::AEDecrypt<Acore::Crypto::AES>(totpSecret, oldSecret->ToByteArray<Acore::Crypto::AES::KEY_SIZE_BYTES>());
                     if (!success)
-                        return Acore::StringFormat("Cannot decrypt old TOTP tokens - value of '%s' is incorrect for some users!", secret_info[i].oldKey);
+                        return Acore::StringFormat("Cannot decrypt old TOTP tokens - value of '{}' is incorrect for some users!", secret_info[i].oldKey);
                 }
 
                 if (newSecret)

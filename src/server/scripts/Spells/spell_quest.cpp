@@ -623,9 +623,9 @@ class spell_q12274_a_fall_from_grace_costume : public SpellScript
 
     void HandleScript(SpellEffIndex  /*effIndex*/)
     {
-        if(Unit* target = GetHitUnit())
+        if (Unit* target = GetHitUnit())
         {
-            if(Player* p = target->ToPlayer())
+            if (Player* p = target->ToPlayer())
             {
                 p->CastSpell(p, p->getGender() == GENDER_FEMALE ? SPELL_SCARLET_RAVEN_PRIEST_IMAGE_FEMALE : SPELL_SCARLET_RAVEN_PRIEST_IMAGE_MALE, false);
             }
@@ -691,7 +691,7 @@ class spell_q11653_youre_not_so_big_now : public SpellScript
     {
         PreventHitDefaultEffect(effIndex);
         Unit* target = GetHitUnit();
-        if (!target || target->GetTypeId() != TYPEID_UNIT)
+        if (!target || !target->IsCreature())
             return;
 
         static uint32 const spellPlayer[5] =
@@ -809,7 +809,7 @@ class spell_q1846_bending_shinbone : public SpellScript
     {
         Item* target = GetHitItem();
         Unit* caster = GetCaster();
-        if (!target && caster->GetTypeId() != TYPEID_PLAYER)
+        if (!target && !caster->IsPlayer())
             return;
 
         uint32 const spellId = roll_chance_i(20) ? SPELL_BENDING_SHINBONE1 : SPELL_BENDING_SHINBONE2;
@@ -1014,7 +1014,7 @@ class spell_q11396_11399_scourging_crystal_controller_dummy : public SpellScript
     void HandleDummy(SpellEffIndex /*effIndex*/)
     {
         if (Unit* target = GetHitUnit())
-            if (target->GetTypeId() == TYPEID_UNIT)
+            if (target->IsCreature())
                 target->RemoveAurasDueToSpell(SPELL_FORCE_SHIELD_ARCANE_PURPLE_X3);
     }
 
@@ -1704,7 +1704,7 @@ class spell_q12277_wintergarde_mine_explosion : public SpellScript
         {
             if (Unit* caster = GetCaster())
             {
-                if (caster->GetTypeId() == TYPEID_UNIT)
+                if (caster->IsCreature())
                 {
                     if (Unit* owner = caster->GetOwner())
                     {
@@ -1830,7 +1830,7 @@ class spell_q11010_q11102_q11023_aggro_check : public SpellScript
     {
         if (Player* playerTarget = GetHitPlayer())
             // Check if found player target is on fly mount or using flying form
-            if (playerTarget->HasAuraType(SPELL_AURA_FLY) || playerTarget->HasAuraType(SPELL_AURA_MOD_INCREASE_MOUNTED_FLIGHT_SPEED))
+            if (playerTarget->HasFlyAura() || playerTarget->HasIncreaseMountedFlightSpeedAura())
                 playerTarget->CastSpell(playerTarget, SPELL_FLAK_CANNON_TRIGGER, TRIGGERED_FULL_MASK);
     }
 
@@ -1873,7 +1873,7 @@ class spell_q11010_q11102_q11023_choose_loc : public SpellScript
         Cell::VisitWorldObjects(caster, searcher, 65.0f);
         for (std::list<Player*>::const_iterator itr = playerList.begin(); itr != playerList.end(); ++itr)
             // Check if found player target is on fly mount or using flying form
-            if ((*itr)->HasAuraType(SPELL_AURA_FLY) || (*itr)->HasAuraType(SPELL_AURA_MOD_INCREASE_MOUNTED_FLIGHT_SPEED))
+            if ((*itr)->HasFlyAura() || (*itr)->HasIncreaseMountedFlightSpeedAura())
                 // Summom Fel Cannon (bunny version) at found player
                 caster->SummonCreature(NPC_FEL_CANNON2, (*itr)->GetPositionX(), (*itr)->GetPositionY(), (*itr)->GetPositionZ());
     }
@@ -1894,7 +1894,7 @@ class spell_q11010_q11102_q11023_q11008_check_fly_mount : public SpellScript
     {
         Unit* caster = GetCaster();
         // This spell will be cast only if caster has one of these auras
-        if (!(caster->HasAuraType(SPELL_AURA_FLY) || caster->HasAuraType(SPELL_AURA_MOD_INCREASE_MOUNTED_FLIGHT_SPEED)))
+        if (!(caster->HasFlyAura() || caster->HasIncreaseMountedFlightSpeedAura()))
             return SPELL_FAILED_CANT_DO_THAT_RIGHT_NOW;
         return SPELL_CAST_OK;
     }
@@ -2018,7 +2018,7 @@ enum BearFlankMaster
 
         bool Load() override
         {
-            return GetCaster()->GetTypeId() == TYPEID_UNIT;
+            return GetCaster()->IsCreature();
         }
 
         void HandleScript(SpellEffIndex /*effIndex*/)
@@ -2079,7 +2079,7 @@ class spell_q12690_burst_at_the_seams : public SpellScript
 
     bool Load() override
     {
-        return GetCaster()->GetTypeId() == TYPEID_UNIT;
+        return GetCaster()->IsCreature();
     }
 
     void HandleKnockBack(SpellEffIndex /*effIndex*/)
@@ -2325,8 +2325,8 @@ class spell_q12919_gymers_throw : public SpellScript
 
         void HandleEffectRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
         {
-            if(GetOwner())
-                if(Player* player = GetOwner()->ToPlayer())
+            if (GetOwner())
+                if (Player* player = GetOwner()->ToPlayer())
                     player->CompleteQuest(QUEST_CROW_TRANSFORM);
         }
 

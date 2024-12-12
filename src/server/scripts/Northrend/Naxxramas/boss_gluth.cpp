@@ -159,7 +159,7 @@ public:
                 return false;
 
             Map::PlayerList const& pList = me->GetMap()->GetPlayers();
-            for (const auto& itr : pList)
+            for (auto const& itr : pList)
             {
                 Player* player = itr.GetSource();
                 if (!player || !player->IsAlive())

@@ -178,7 +178,7 @@ class PlayerOrPetCheck
 public:
     bool operator() (WorldObject* unit) const
     {
-        if (unit->GetTypeId() != TYPEID_PLAYER)
+        if (!unit->IsPlayer())
             if (!unit->ToUnit()->GetOwnerGUID().IsPlayer())
                 return true;
 
@@ -198,7 +198,7 @@ struct ScriptedAI : public CreatureAI
     void AttackStartNoMove(Unit* target);
 
     // Called at any Damage from any attacker (before damage apply)
-    void DamageTaken(Unit* /*attacker*/, uint32& /*damage*/, DamageEffectType /*damagetype*/, SpellSchoolMask /*damageSchoolMask*/) override {}
+    void DamageTaken(Unit* /*attacker*/, uint32& /*damage*/, DamageEffectType /*damagetype*/, SpellSchoolMask /*damageSchoolMask*/) override;
 
     //Called at World update tick
     void UpdateAI(uint32 diff) override;
@@ -278,9 +278,6 @@ struct ScriptedAI : public CreatureAI
 
     //Pointer to creature we are manipulating
     Creature* me;
-
-    //For fleeing
-    bool IsFleeing;
 
     // *************
     //Pure virtual functions
@@ -441,18 +438,29 @@ struct ScriptedAI : public CreatureAI
 
     Player* SelectTargetFromPlayerList(float maxdist, uint32 excludeAura = 0, bool mustBeInLOS = false) const;
 
+    // Allows dropping to 1 HP but prevents creature from dying.
+    void SetInvincibility(bool apply) { _invincible = apply; };
+    [[nodiscard]] bool IsInvincible() const { return _invincible; };
+
+    // Disables creature auto attacks.
+    void SetAutoAttackAllowed(bool allow) { _canAutoAttack = allow; };
+    [[nodiscard]] bool IsAutoAttackAllowed() const { return _canAutoAttack; };
+
 private:
     Difficulty _difficulty;
     bool _isHeroic;
+    bool _invincible;
+    bool _canAutoAttack;
     std::unordered_set<uint32> _uniqueTimedEvents;
 };
 
 struct HealthCheckEventData
 {
-    HealthCheckEventData(uint8 healthPct, std::function<void()> exec) : _healthPct(healthPct), _exec(exec) { };
+    HealthCheckEventData(uint8 healthPct, std::function<void()> exec, bool valid = true) : _healthPct(healthPct), _exec(exec), _valid(valid) { };
 
     uint8 _healthPct;
     std::function<void()> _exec;
+    bool _valid;
 };
 
 class BossAI : public ScriptedAI
@@ -497,7 +505,6 @@ protected:
     void _JustDied();
     void _JustReachedHome() { me->setActive(false); }
     void _EnterEvadeMode(EvadeReason why = EVADE_REASON_OTHER);
-    [[nodiscard]] bool _ProccessHealthCheckEvent(uint8 healthPct, uint32 damage, std::function<void()> exec) const;
 
     void TeleportCheaters();
 
@@ -506,6 +513,7 @@ protected:
 private:
     uint32 const _bossId;
     std::list<HealthCheckEventData> _healthCheckEvents;
+    HealthCheckEventData _nextHealthCheck;
 };
 
 class WorldBossAI : public ScriptedAI

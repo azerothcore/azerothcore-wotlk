@@ -19,6 +19,7 @@
 #include "Containers.h"
 #include "DisableMgr.h"
 #include "Group.h"
+#include "ItemEnchantmentMgr.h"
 #include "Log.h"
 #include "ObjectMgr.h"
 #include "Player.h"
@@ -106,7 +107,7 @@ public:
 
     void Verify(LootStore const& lootstore, uint32 id, uint8 group_id) const;
     void CollectLootIds(LootIdSet& set) const;
-    void CheckLootRefs(LootTemplateMap const& store, LootIdSet* ref_set) const;
+    void CheckLootRefs(LootStore const& lootstore, uint32 Id, LootIdSet* ref_set) const;
     LootStoreItemList* GetExplicitlyChancedItemList() { return &ExplicitlyChanced; }
     LootStoreItemList* GetEqualChancedItemList() { return &EqualChanced; }
     void CopyConditions(ConditionList conditions);
@@ -276,7 +277,7 @@ uint32 LootStore::LoadAndCollectLootIds(LootIdSet& lootIdSet)
 void LootStore::CheckLootRefs(LootIdSet* ref_set) const
 {
     for (LootTemplateMap::const_iterator ltItr = m_LootTemplates.begin(); ltItr != m_LootTemplates.end(); ++ltItr)
-        ltItr->second->CheckLootRefs(m_LootTemplates, ref_set);
+        ltItr->second->CheckLootRefs(*this, ltItr->first, ref_set);
 }
 
 void LootStore::ReportUnusedIds(LootIdSet const& lootIdSet) const
@@ -294,6 +295,11 @@ void LootStore::ReportNonExistingId(uint32 lootId) const
 void LootStore::ReportNonExistingId(uint32 lootId, const char* ownerType, uint32 ownerId) const
 {
     LOG_ERROR("sql.sql", "Table '{}' Entry {} does not exist but it is used by {} {}", GetName(), lootId, ownerType, ownerId);
+}
+
+void LootStore::ReportInvalidCount(uint32 lootId, const char* ownerType, uint32 ownerId, uint32 itemId, uint8 minCount, uint8 maxCount) const
+{
+    LOG_ERROR("sql.sql", "Table '{}' Entry {} used by {} entry {} item {} has minCount ( {} ) != maxCount ( {} ) which is not supported for this loot type.", GetName(), lootId, ownerType, ownerId, itemId, minCount, maxCount);
 }
 
 //
@@ -390,8 +396,8 @@ LootItem::LootItem(LootStoreItem const& li)
     conditions   = li.conditions;
 
     ItemTemplate const* proto = sObjectMgr->GetItemTemplate(itemid);
-    freeforall  = proto && (proto->Flags & ITEM_FLAG_MULTI_DROP);
-    follow_loot_rules = proto && (proto->FlagsCu & ITEM_FLAGS_CU_FOLLOW_LOOT_RULES);
+    freeforall  = proto && proto->HasFlag(ITEM_FLAG_MULTI_DROP);
+    follow_loot_rules = proto && proto->HasFlagCu(ITEM_FLAGS_CU_FOLLOW_LOOT_RULES);
 
     needs_quest = li.needs_quest;
 
@@ -429,7 +435,7 @@ bool LootItem::AllowedForPlayer(Player const* player, ObjectGuid source) const
         // Master Looter can see conditioned recipes
         if (isMasterLooter && itemVisibleForMasterLooter)
         {
-            if ((pProto->Flags & ITEM_FLAG_HIDE_UNUSABLE_RECIPE) || (pProto->Class == ITEM_CLASS_RECIPE && pProto->Bonding == BIND_WHEN_PICKED_UP && pProto->Spells[1].SpellId != 0))
+            if (pProto->HasFlag(ITEM_FLAG_HIDE_UNUSABLE_RECIPE) || (pProto->Class == ITEM_CLASS_RECIPE && pProto->Bonding == BIND_WHEN_PICKED_UP && pProto->Spells[1].SpellId != 0))
             {
                 return true;
             }
@@ -439,12 +445,12 @@ bool LootItem::AllowedForPlayer(Player const* player, ObjectGuid source) const
     }
 
     // not show loot for not own team
-    if ((pProto->Flags2 & ITEM_FLAGS_EXTRA_HORDE_ONLY) && player->GetTeamId(true) != TEAM_HORDE)
+    if (pProto->HasFlag2(ITEM_FLAG2_FACTION_HORDE) && player->GetTeamId(true) != TEAM_HORDE)
     {
         return false;
     }
 
-    if ((pProto->Flags2 & ITEM_FLAGS_EXTRA_ALLIANCE_ONLY) && player->GetTeamId(true) != TEAM_ALLIANCE)
+    if (pProto->HasFlag2(ITEM_FLAG2_FACTION_ALLIANCE) && player->GetTeamId(true) != TEAM_ALLIANCE)
     {
         return false;
     }
@@ -456,7 +462,7 @@ bool LootItem::AllowedForPlayer(Player const* player, ObjectGuid source) const
     }
 
     // Don't allow loot for players without profession or those who already know the recipe
-    if ((pProto->Flags & ITEM_FLAG_HIDE_UNUSABLE_RECIPE) && (!player->HasSkill(pProto->RequiredSkill) || player->HasSpell(pProto->Spells[1].SpellId)))
+    if (pProto->HasFlag(ITEM_FLAG_HIDE_UNUSABLE_RECIPE) && (!player->HasSkill(pProto->RequiredSkill) || player->HasSpell(pProto->Spells[1].SpellId)))
     {
         return false;
     }
@@ -468,7 +474,7 @@ bool LootItem::AllowedForPlayer(Player const* player, ObjectGuid source) const
     }
 
     // check quest requirements
-    if (!(pProto->FlagsCu & ITEM_FLAGS_CU_IGNORE_QUEST_STATUS))
+    if (!pProto->HasFlagCu(ITEM_FLAGS_CU_IGNORE_QUEST_STATUS))
     {
         //  Don't drop quest items if the player is missing the relevant quest
         if (needs_quest && !player->HasQuestForItem(itemid))
@@ -555,7 +561,7 @@ void Loot::AddItem(LootStoreItem const& item)
         // non-conditional one-player only items are counted here,
         // free for all items are counted in FillFFALoot(),
         // non-ffa conditionals are counted in FillNonQuestNonFFAConditionalLoot()
-        if (!item.needs_quest && item.conditions.empty() && !(proto->Flags & ITEM_FLAG_MULTI_DROP))
+        if (!item.needs_quest && item.conditions.empty() && !proto->HasFlag(ITEM_FLAG_MULTI_DROP))
             ++unlootedCount;
     }
 }
@@ -700,7 +706,9 @@ QuestItemList* Loot::FillQuestLoot(Player* player)
         }
 
         // Player is not the loot owner, and loot owner still needs this quest item
-        if (!item.freeforall && lootOwner != player && item.AllowedForPlayer(lootOwner, sourceWorldObjectGUID))
+        if (!item.freeforall &&
+            lootOwner && lootOwner != player &&
+            item.AllowedForPlayer(lootOwner, sourceWorldObjectGUID))
         {
             continue;
         }
@@ -1499,21 +1507,20 @@ void LootTemplate::LootGroup::Verify(LootStore const& lootstore, uint32 id, uint
     }
 }
 
-void LootTemplate::LootGroup::CheckLootRefs(LootTemplateMap const& /*store*/, LootIdSet* ref_set) const
+void LootTemplate::LootGroup::CheckLootRefs(LootStore const& lootstore, uint32 Id, LootIdSet* ref_set) const
 {
     for (LootStoreItemList::const_iterator ieItr = ExplicitlyChanced.begin(); ieItr != ExplicitlyChanced.end(); ++ieItr)
     {
         LootStoreItem* item = *ieItr;
         if (item->reference)
         {
+            if (item->mincount != item->maxcount)
+                LootTemplates_Reference.ReportInvalidCount(std::abs(item->reference), lootstore.GetName(), Id, item->itemid, item->mincount, item->maxcount);
+
             if (!LootTemplates_Reference.GetLootFor(std::abs(item->reference)))
-            {
-                LootTemplates_Reference.ReportNonExistingId(std::abs(item->reference), "Reference", item->itemid);
-            }
+                LootTemplates_Reference.ReportNonExistingId(std::abs(item->reference), lootstore.GetName(), item->itemid);
             else if (ref_set)
-            {
                 ref_set->erase(std::abs(item->reference));
-            }
         }
     }
 
@@ -1522,14 +1529,13 @@ void LootTemplate::LootGroup::CheckLootRefs(LootTemplateMap const& /*store*/, Lo
         LootStoreItem* item = *ieItr;
         if (item->reference)
         {
+            if (item->mincount != item->maxcount)
+                LootTemplates_Reference.ReportInvalidCount(std::abs(item->reference), lootstore.GetName(), Id, item->itemid, item->mincount, item->maxcount);
+
             if (!LootTemplates_Reference.GetLootFor(std::abs(item->reference)))
-            {
-                LootTemplates_Reference.ReportNonExistingId(std::abs(item->reference), "Reference", item->itemid);
-            }
+                LootTemplates_Reference.ReportNonExistingId(std::abs(item->reference), lootstore.GetName(), item->itemid);
             else if (ref_set)
-            {
                 ref_set->erase(std::abs(item->reference));
-            }
         }
     }
 }
@@ -1861,27 +1867,26 @@ void LootTemplate::Verify(LootStore const& lootstore, uint32 id) const
     /// @todo: References validity checks
 }
 
-void LootTemplate::CheckLootRefs(LootTemplateMap const& store, LootIdSet* ref_set) const
+void LootTemplate::CheckLootRefs(LootStore const& lootstore, uint32 Id, LootIdSet* ref_set) const
 {
     for (LootStoreItemList::const_iterator ieItr = Entries.begin(); ieItr != Entries.end(); ++ieItr)
     {
         LootStoreItem* item = *ieItr;
         if (item->reference)
         {
+            if (item->mincount != item->maxcount)
+                LootTemplates_Reference.ReportInvalidCount(std::abs(item->reference), lootstore.GetName(), Id, item->itemid, item->mincount, item->maxcount);
+
             if (!LootTemplates_Reference.GetLootFor(std::abs(item->reference)))
-            {
-                LootTemplates_Reference.ReportNonExistingId(std::abs(item->reference), "Reference", item->itemid);
-            }
+                LootTemplates_Reference.ReportNonExistingId(std::abs(item->reference), lootstore.GetName(), item->itemid);
             else if (ref_set)
-            {
                 ref_set->erase(std::abs(item->reference));
-            }
         }
     }
 
     for (LootGroups::const_iterator grItr = Groups.begin(); grItr != Groups.end(); ++grItr)
         if (LootGroup* group = *grItr)
-            group->CheckLootRefs(store, ref_set);
+            group->CheckLootRefs(lootstore, Id, ref_set);
 }
 
 bool LootTemplate::addConditionItem(Condition* cond)
@@ -2099,7 +2104,7 @@ void LoadLootTemplates_Item()
     // remove real entries and check existence loot
     ItemTemplateContainer const* its = sObjectMgr->GetItemTemplateStore();
     for (ItemTemplateContainer::const_iterator itr = its->begin(); itr != its->end(); ++itr)
-        if (lootIdSet.find(itr->second.ItemId) != lootIdSet.end() && itr->second.Flags & ITEM_FLAG_HAS_LOOT)
+        if (lootIdSet.find(itr->second.ItemId) != lootIdSet.end() && itr->second.HasFlag(ITEM_FLAG_HAS_LOOT))
             lootIdSet.erase(itr->second.ItemId);
 
     // output error for any still listed (not referenced from appropriate table) ids
@@ -2126,7 +2131,7 @@ void LoadLootTemplates_Milling()
     ItemTemplateContainer const* its = sObjectMgr->GetItemTemplateStore();
     for (ItemTemplateContainer::const_iterator itr = its->begin(); itr != its->end(); ++itr)
     {
-        if (!(itr->second.Flags & ITEM_FLAG_IS_MILLABLE))
+        if (!itr->second.HasFlag(ITEM_FLAG_IS_MILLABLE))
             continue;
 
         if (lootIdSet.find(itr->second.ItemId) != lootIdSet.end())
@@ -2193,7 +2198,7 @@ void LoadLootTemplates_Prospecting()
     ItemTemplateContainer const* its = sObjectMgr->GetItemTemplateStore();
     for (ItemTemplateContainer::const_iterator itr = its->begin(); itr != its->end(); ++itr)
     {
-        if (!(itr->second.Flags & ITEM_FLAG_IS_PROSPECTABLE))
+        if (!itr->second.HasFlag(ITEM_FLAG_IS_PROSPECTABLE))
             continue;
 
         if (lootIdSet.find(itr->second.ItemId) != lootIdSet.end())

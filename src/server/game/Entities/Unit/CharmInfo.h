@@ -18,7 +18,8 @@
 #ifndef _CHARMINFO_H
 #define _CHARMINFO_H
 
-#include "Object.h"
+#include "Define.h"
+#include "ObjectGuid.h"
 
 #define MAX_SPELL_CHARM         4
 #define MAX_SPELL_VEHICLE       6
@@ -82,6 +83,7 @@ public:
 
 public:
     bool HasGlobalCooldown(SpellInfo const* spellInfo) const;
+    uint32 GetGlobalCooldown(SpellInfo const* spellInfo) const;
     void AddGlobalCooldown(SpellInfo const* spellInfo, uint32 gcd);
     void CancelGlobalCooldown(SpellInfo const* spellInfo);
 
@@ -140,7 +142,7 @@ public:
     void InitEmptyActionBar(bool withAttack = true);
 
     //return true if successful
-    bool AddSpellToActionBar(SpellInfo const* spellInfo, ActiveStates newstate = ACT_DECIDE);
+    bool AddSpellToActionBar(SpellInfo const* spellInfo, ActiveStates newstate = ACT_DECIDE, uint32 index = MAX_UNIT_ACTION_BAR_INDEX + 1);
     bool RemoveSpellFromActionBar(uint32 spell_id);
     void LoadPetActionBar(const std::string& data);
     void BuildActionBar(WorldPacket* data);

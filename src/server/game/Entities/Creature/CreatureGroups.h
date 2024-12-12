@@ -19,6 +19,7 @@
 #define _FORMATIONS_H
 
 #include "Define.h"
+#include "ObjectGuid.h"
 #include "Unit.h"
 #include <map>
 #include <unordered_map>
