@@ -85,6 +85,41 @@ void WorldSession::HandleUseItemOpcode(WorldPacket& recvPacket)
         return;
     }
 
+    SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(spellId);
+
+    if (!spellInfo)
+    {
+        LOG_ERROR("network.opcode", "WORLD: unknown spell id {}", spellId);
+        recvPacket.rfinish(); // prevent spam at ignore packet
+        return;
+    }
+
+    // fail if we are cancelling pending request
+    if (!_player->SpellQueue.empty())
+    {
+        PendingSpellCastRequest& request = _player->SpellQueue.front(); // Peek at the first spell
+        if (request.cancelInProgress)
+        {
+            pUser->SendEquipError(EQUIP_ERR_NONE, pItem, nullptr);
+            recvPacket.rfinish(); // prevent spam at ignore packet
+            return;
+        }
+    }
+
+    // try queue spell if it can't be executed right now
+    if (!_player->CanExecutePendingSpellCastRequest(spellInfo))
+        if (_player->CanRequestSpellCast(spellInfo))
+        {
+            recvPacket.rpos(0); // Reset read position to the start of the buffer.
+            _player->SpellQueue.emplace_back(
+                spellId,
+                spellInfo->GetCategory(),
+                std::move(recvPacket), // Move ownership of recvPacket
+                true // itemCast
+            );
+            return;
+        }
+
     if (pItem->GetGUID() != itemGUID)
     {
         pUser->SendEquipError(EQUIP_ERR_ITEM_NOT_FOUND, nullptr, nullptr);
@@ -341,6 +376,10 @@ void WorldSession::HandleCastSpellOpcode(WorldPacket& recvPacket)
 {
     uint32 spellId;
     uint8  castCount, castFlags;
+
+    if (recvPacket.empty())
+        return;
+
     recvPacket >> castCount >> spellId >> castFlags;
     TriggerCastFlags triggerFlag = TRIGGERED_NONE;
 
@@ -363,6 +402,36 @@ void WorldSession::HandleCastSpellOpcode(WorldPacket& recvPacket)
         LOG_ERROR("network.opcode", "WORLD: unknown spell id {}", spellId);
         recvPacket.rfinish(); // prevent spam at ignore packet
         return;
+    }
+
+    // fail if we are cancelling pending request
+    if (!_player->SpellQueue.empty())
+    {
+        PendingSpellCastRequest& request = _player->SpellQueue.front(); // Peek at the first spell
+        if (request.cancelInProgress)
+        {
+            Spell* spell = new Spell(_player, spellInfo, TRIGGERED_NONE);
+            spell->m_cast_count = castCount;
+            spell->SendCastResult(SPELL_FAILED_DONT_REPORT);
+            spell->finish(false);
+            recvPacket.rfinish(); // prevent spam at ignore packet
+            return;
+        }
+    }
+
+    // try queue spell if it can't be executed right now
+    if (!_player->CanExecutePendingSpellCastRequest(spellInfo))
+    {
+        if (_player->CanRequestSpellCast(spellInfo))
+        {
+            recvPacket.rpos(0); // Reset read position to the start of the buffer.
+            _player->SpellQueue.emplace_back(
+                spellId,
+                spellInfo->GetCategory(),
+                std::move(recvPacket) // Move ownership of recvPacket
+            );
+            return;
+        }
     }
 
     // client provided targets
@@ -482,6 +551,8 @@ void WorldSession::HandleCancelCastOpcode(WorldPacket& recvPacket)
 
     recvPacket.read_skip<uint8>();                          // counter, increments with every CANCEL packet, don't use for now
     recvPacket >> spellId;
+
+    _player->SpellQueue.clear();
 
     _player->InterruptSpell(CURRENT_MELEE_SPELL);
     if (_player->IsNonMeleeSpellCast(false))

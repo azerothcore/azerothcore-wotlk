@@ -551,6 +551,7 @@ public:
     bool IsAutoRepeat() const { return m_autoRepeat; }
     void SetAutoRepeat(bool rep) { m_autoRepeat = rep; }
     void ReSetTimer() { m_timer = m_casttime > 0 ? m_casttime : 0; }
+    int32 GetCastTimeRemaining() { return m_timer;}
     bool IsNextMeleeSwingSpell() const;
     bool IsTriggered() const { return HasTriggeredCastFlag(TRIGGERED_FULL_MASK); };
     bool HasTriggeredCastFlag(TriggerCastFlags flag) const { return _triggeredCastFlags & flag; };
