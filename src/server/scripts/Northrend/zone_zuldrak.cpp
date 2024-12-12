@@ -976,7 +976,7 @@ class spell_scourge_disguise_instability : public AuraScript
             if (player->HasAura(SPELL_SCOURGE_DISGUISE) || player->HasAura(SPELL_SCOURGE_DISGUISE_INSTANT_CAST))
             {
                 uint32 textId = Acore::Containers::SelectRandomContainerElement(scourgeDisguiseTextIDs);
-                player->Talk(textId, CHAT_MSG_RAID_BOSS_EMOTE, 0, player);
+                player->Unit::Whisper(textId, player, true);
 
                 player->CastSpell(player, SPELL_SCOURGE_DISGUISE_EXPIRING, true);
             }
