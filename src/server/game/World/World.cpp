@@ -1484,6 +1484,9 @@ void World::LoadConfigSettings(bool reload)
     // Realm Availability
     _bool_configs[CONFIG_REALM_LOGIN_ENABLED] = sConfigMgr->GetOption<bool>("World.RealmAvailability", true);
 
+    // AH Worker threads
+    _int_configs[CONFIG_AUCTIONHOUSE_WORKERTHREADS] = sConfigMgr->GetOption<int32>("AuctionHouse.WorkerThreads", 1);
+
     // SpellQueue
     _bool_configs[CONFIG_SPELL_QUEUE_ENABLED] = sConfigMgr->GetOption<bool>("SpellQueue.Enabled", true);
     _int_configs[CONFIG_SPELL_QUEUE_WINDOW] = sConfigMgr->GetOption<uint32>("SpellQueue.Window", 400);
