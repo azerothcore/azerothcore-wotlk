@@ -470,7 +470,7 @@ void MotionMaster::MoveSplinePath(Movement::PointsArray* path)
 void MotionMaster::MoveSplinePath(uint32 path_id)
 {
     // convert the path id to a Movement::PointsArray*
-    auto points = std::make_unique<Movement::PointsArray>();
+    Movement::PointsArray* points = new Movement::PointsArray();
     WaypointPath const* path = sWaypointMgr->GetPath(path_id);
     for (uint8 i = 0; i < path->size(); ++i)
     {

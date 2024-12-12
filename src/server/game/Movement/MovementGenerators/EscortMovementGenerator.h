@@ -27,10 +27,13 @@ public:
     EscortMovementGenerator(Movement::PointsArray* _path = nullptr) : i_recalculateSpeed(false)
     {
         if (_path)
-            m_precomputedPath = *_path;
+            m_precomputedPath = std::move(_path);
     }
 
-    ~EscortMovementGenerator() = default;
+    ~EscortMovementGenerator()
+    {
+        delete m_precomputedPath;
+    }
 
     void DoInitialize(T*);
     void DoFinalize(T*);
