@@ -41,6 +41,7 @@ enum DataTypes
     DATA_HARRISON_JONES                 = 13,
     TYPE_AKILZON_GAUNTLET               = 14,
     DATA_LOOKOUT                        = 15,
+    DATA_ZULJIN_GATE                    = 16
 };
 
 enum CreatureIds
