@@ -149,18 +149,6 @@ std::string Object::_ConcatFields(uint16 startIndex, uint16 size) const
     return ss.str();
 }
 
-void WorldObject::Update(uint32 diff)
-{
-    m_Events.Update(diff);
-
-    _heartbeatTimer -= Milliseconds(diff);
-    while (_heartbeatTimer <= 0ms)
-    {
-        _heartbeatTimer += HEARTBEAT_INTERVAL;
-        Heartbeat();
-    }
-}
-
 void Object::AddToWorld()
 {
     if (m_inWorld)
@@ -1070,9 +1058,18 @@ WorldObject::WorldObject(bool isWorldObject) : WorldLocation(),
     sScriptMgr->OnWorldObjectCreate(this);
 }
 
-void WorldObject::Update(uint32 time_diff)
+void WorldObject::Update(uint32 diff)
 {
-    sScriptMgr->OnWorldObjectUpdate(this, time_diff);
+    m_Events.Update(diff);
+
+    _heartbeatTimer -= Milliseconds(diff);
+    while (_heartbeatTimer <= 0ms)
+    {
+        _heartbeatTimer += HEARTBEAT_INTERVAL;
+        Heartbeat();
+    }
+
+    sScriptMgr->OnWorldObjectUpdate(this, diff);
 }
 
 void WorldObject::SetWorldObject(bool on)
