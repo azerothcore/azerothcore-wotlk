@@ -637,7 +637,9 @@ public:
 
     std::string GetDebugInfo() const override;
 
+    // Event handler
     ElunaEventProcessor* elunaEvents;
+    EventProcessor m_Events;
 
 protected:
     std::string m_name;
@@ -657,9 +659,6 @@ protected:
 
     // transports
     Transport* m_transport;
-
-    // Event handler
-    EventProcessor m_Events;
 
     //these functions are used mostly for Relocate() and Corpse/Player specific stuff...
     //use them ONLY in LoadFromDB()/Create() funcs and nowhere else!
