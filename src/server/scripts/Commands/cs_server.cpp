@@ -289,7 +289,7 @@ public:
     // Display the 'Message of the day' for the realm
     static bool HandleServerMotdCommand(ChatHandler* handler)
     {
-        auto localeConstant = LOCALE_enUS;
+        LocaleConstant localeConstant = LOCALE_enUS;
         if (Player* player = handler->GetPlayer())
             localeConstant = player->GetSession()->GetSessionDbLocaleIndex();
 
@@ -543,7 +543,7 @@ public:
         std::string motdString = motdStream.str(); // Convert Tail to std::string
 
         // Determine the locale; default to "enUS" if not provided or invalid
-        LocaleConstant localeConstant = LOCALE_enUS;
+        LocaleConstant localeConstant = DEFAULT_LOCALE;
         if (locale.has_value())
             localeConstant = GetLocaleByName(locale.value());
         else
@@ -560,7 +560,8 @@ public:
         // Start a transaction for the database operations
         LoginDatabaseTransaction trans = LoginDatabase.BeginTransaction();
 
-        if (localeConstant == LOCALE_enUS) {
+        if (localeConstant == DEFAULT_LOCALE)
+        {
             // Insert or update in the main motd table for enUS
             LoginDatabasePreparedStatement* stmt = LoginDatabase.GetPreparedStatement(LOGIN_INS_MOTD);
             stmt->SetData(0, realmId.value());  // realmId for insertion
@@ -585,10 +586,7 @@ public:
         if (realmId == -1 || realmId == static_cast<int32>(realm.Id.Realm))
             sMotdMgr->SetMotd(strMotd, localeConstant);
 
-        handler->PSendSysMessage(LANG_MOTD_NEW,
-                                 realmId.value(),
-                                 locale.value(),
-                                 strMotd);
+        handler->PSendSysMessage(LANG_MOTD_NEW, realmId.value(), locale.value(), strMotd);
         return true;
     }
 

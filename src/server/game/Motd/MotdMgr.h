@@ -52,7 +52,7 @@ private:
     // Sets the default mode if none is found in the database
     void SetDefaultMotd(std::string& motd);
     // Create a worldpacket for a given motd localization
-    WorldPacket CreateWorldPacket(const std::string& motd);
+    WorldPacket CreateWorldPacket(std::string const& motd);
 };
 
 #define sMotdMgr MotdMgr::instance()

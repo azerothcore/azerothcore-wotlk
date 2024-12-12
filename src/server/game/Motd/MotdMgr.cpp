@@ -66,7 +66,7 @@ void MotdMgr::LoadMotd()
     if (motd.empty())
         SetDefaultMotd(motd);  // Only sets enUS default if motd is empty
     else
-        MotdMap[LOCALE_enUS] = motd;  // Assign the loaded motd to enUS
+        MotdMap[DEFAULT_LOCALE] = motd;  // Assign the loaded motd to enUS
 
     // Load localized texts if available
     LoadLocalizedMotds(realmId);
@@ -82,7 +82,7 @@ char const* MotdMgr::GetMotd(LocaleConstant locale)
     if (it != MotdMap.end())
         return it->second.c_str();
 
-    return MotdMap[LOCALE_enUS].c_str();  // Fallback to enUS if locale is not found
+    return MotdMap[DEFAULT_LOCALE].c_str();  // Fallback to enUS if locale is not found
 }
 
 WorldPacket const* MotdMgr::GetMotdPacket(LocaleConstant locale)
@@ -92,7 +92,7 @@ WorldPacket const* MotdMgr::GetMotdPacket(LocaleConstant locale)
     if (it != MotdPackets.end())
         return &it->second;
 
-    return &MotdPackets[LOCALE_enUS];  // Fallback to enUS if locale is not found
+    return &MotdPackets[DEFAULT_LOCALE];  // Fallback to enUS if locale is not found
 }
 
 std::string MotdMgr::LoadDefaultMotd(uint32 realmId)
@@ -114,7 +114,7 @@ void MotdMgr::SetDefaultMotd(std::string& motd)
 {
     // Set a default motd text only for enUS if no motd is found
     motd = "@|cffF4A2DThi server runs on Azeroth Core|cff3CE7FFwww.azerothcore.org|r";
-    MotdMap[LOCALE_enUS] = motd;
+    MotdMap[DEFAULT_LOCALE] = motd;
 
     // Log that no motd was found and a default is being used for enUS
     LOG_WARN("server.loading", ">> Loaded 0 motd definitions. DB table `motd` is empty for this realm!");
@@ -122,6 +122,18 @@ void MotdMgr::SetDefaultMotd(std::string& motd)
 }
 
 void MotdMgr::LoadLocalizedMotds(uint32 realmId) {
+    // First, check if base MOTD exists
+    LoginDatabasePreparedStatement* baseStmt = LoginDatabase.GetPreparedStatement(LOGIN_SEL_MOTD);
+    baseStmt->SetData(0, realmId);
+    PreparedQueryResult baseResult = LoginDatabase.Query(baseStmt);
+
+    if (!baseResult)
+    {
+        LOG_ERROR("server.loading", "No base MOTD found for realm %u. Localized MOTDs will not be loaded.", realmId);
+        return;
+    }
+
+    // Now load localized versions
     LoginDatabasePreparedStatement* stmt = LoginDatabase.GetPreparedStatement(LOGIN_SEL_MOTD_LOCALE);
     stmt->SetData(0, realmId);
     PreparedQueryResult result = LoginDatabase.Query(stmt);
@@ -130,21 +142,18 @@ void MotdMgr::LoadLocalizedMotds(uint32 realmId) {
     {
         do {
             Field* fields = result->Fetch();
-
-            // fields[0] is the locale string and fields[1] is the localized motd text
             std::string localizedText = fields[1].Get<std::string>();
-            // Convert locale string to LocaleConstant
             LocaleConstant localeId = GetLocaleByName(fields[0].Get<std::string>());
-            if (localeId == LOCALE_enUS)
-                continue;
-            // Insert the localeId and localizedText into MotdMap only for specific locales
-            MotdMap[localeId] = localizedText;
 
-        } while (result->NextRow()); // Move to the next row if available
+            if (localeId == DEFAULT_LOCALE)
+                continue;
+
+            MotdMap[localeId] = localizedText;
+        } while (result->NextRow());
     }
 }
 
-WorldPacket MotdMgr::CreateWorldPacket(const std::string& motd)
+WorldPacket MotdMgr::CreateWorldPacket(std::string const& motd)
 {
     // Create a new WorldPacket for this locale
     WorldPacket data(SMSG_MOTD); // new in 2.0.1
