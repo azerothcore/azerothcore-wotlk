@@ -142,14 +142,17 @@ void MotdMgr::LoadLocalizedMotds(uint32 realmId) {
     {
         do {
             Field* fields = result->Fetch();
+            // fields[0] is the locale string and fields[1] is the localized motd text
             std::string localizedText = fields[1].Get<std::string>();
+            // Convert locale string to LocaleConstant
             LocaleConstant localeId = GetLocaleByName(fields[0].Get<std::string>());
 
             if (localeId == DEFAULT_LOCALE)
                 continue;
 
+            // Insert the localeId and localizedText into MotdMap only for specific locales
             MotdMap[localeId] = localizedText;
-        } while (result->NextRow());
+        } while (result->NextRow());  // Move to the next row if available
     }
 }
 
