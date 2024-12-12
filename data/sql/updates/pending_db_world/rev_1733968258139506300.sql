@@ -1,6 +1,6 @@
 --
 -- Adds if missing SAI to Deadwood Warrior, Gardener and Pathfinder
-UPDATE `creature_template` SET `AIName` = 'SmartAI' WHERE `entry` in (7153, 7154, 7155)
+UPDATE `creature_template` SET `AIName` = 'SmartAI' WHERE `entry` in (7153, 7154, 7155);
 
 
 -- Deadwood Warrior
