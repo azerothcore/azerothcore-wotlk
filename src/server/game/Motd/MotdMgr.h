@@ -50,7 +50,7 @@ private:
     // Loads all available localized motd for the realm
     void LoadLocalizedMotds(uint32 realmId);
     // Sets the default mode if none is found in the database
-    void SetDefaultMotd(std::string& motd);
+    void SetDefaultMotd();
     // Create a worldpacket for a given motd localization
     WorldPacket CreateWorldPacket(std::string const& motd);
 };

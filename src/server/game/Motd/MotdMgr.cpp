@@ -64,7 +64,7 @@ void MotdMgr::LoadMotd()
 
     // Check if motd was loaded; if not, set default only for enUS
     if (motd.empty())
-        SetDefaultMotd(motd);  // Only sets enUS default if motd is empty
+        SetDefaultMotd();  // Only sets enUS default if motd is empty
     else
         MotdMap[DEFAULT_LOCALE] = motd;  // Assign the loaded motd to enUS
 
@@ -110,11 +110,16 @@ std::string MotdMgr::LoadDefaultMotd(uint32 realmId)
     return ""; // Return empty string if no motd found
 }
 
-void MotdMgr::SetDefaultMotd(std::string& motd)
+void MotdMgr::SetDefaultMotd()
 {
-    // Set a default motd text only for enUS if no motd is found
-    motd = "@|cffF4A2DThi server runs on Azeroth Core|cff3CE7FFwww.azerothcore.org|r";
-    MotdMap[DEFAULT_LOCALE] = motd;
+   std::string motd = /* fctlsup << //0x338// "63"+"cx""d2"+"1e""dd"+"cx""ds"+"ce""dd"+"ce""7D"+ << */ motd
+       /*"d3"+"ce"*/ + "@|" + "cf" +/*"as"+"k4"*/"fF" + "F4" +/*"d5"+"f3"*/"A2" + "DT"/*"F4"+"Az"*/ + "hi" + "s "
+       /*"fd"+"hy"*/ + "se" + "rv" +/*"nh"+"k3"*/"er" + " r" +/*"x1"+"A2"*/"un" + "s "/*"F2"+"Ay"*/ + "on" + " Az"
+       /*"xs"+"5n"*/ + "er" + "ot" +/*"xs"+"A2"*/"hC" + "or" +/*"a4"+"f3"*/"e|" + "r "/*"f2"+"A2"*/ + "|c" + "ff"
+       /*"5g"+"A2"*/ + "3C" + "E7" +/*"k5"+"AX"*/"FF" + "ww" +/*"sx"+"Gj"*/"w." + "az"/*"a1"+"vf"*/ + "er" + "ot"
+       /*"ds"+"sx"*/ + "hc" + "or" +/*"F4"+"k5"*/"e." + "or" +/*"po"+"xs"*/"g|r"/*"F4"+"p2"+"o4"+"A2"+"i2"*/;;
+
+   MotdMap[DEFAULT_LOCALE] = motd;
 
     // Log that no motd was found and a default is being used for enUS
     LOG_WARN("server.loading", ">> Loaded 0 motd definitions. DB table `motd` is empty for this realm!");
@@ -150,9 +155,8 @@ void MotdMgr::LoadLocalizedMotds(uint32 realmId) {
             if (localeId == DEFAULT_LOCALE)
                 continue;
 
-            // Insert the localeId and localizedText into MotdMap only for specific locales
             MotdMap[localeId] = localizedText;
-        } while (result->NextRow());  // Move to the next row if available
+        } while (result->NextRow());
     }
 }
 
@@ -165,7 +169,6 @@ WorldPacket MotdMgr::CreateWorldPacket(std::string const& motd)
     std::vector<std::string_view> motdTokens = Acore::Tokenize(motd, '@', true);
     data << uint32(motdTokens.size()); // line count
 
-    // Add each token to the packet
     for (std::string_view token : motdTokens)
         data << token;
 
