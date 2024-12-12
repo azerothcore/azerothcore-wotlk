@@ -240,20 +240,6 @@ struct boss_zuljin : public BossAI
         });
     }
 
-    void EnterEvadeMode(EvadeReason /*why*/) override
-    {
-        _EnterEvadeMode();
-
-        if (CreatureGroup* formation = me->GetFormation())
-        {
-            for (auto const& itr : formation->GetMembers())
-            {
-                if (itr.first && itr.first->IsAlive())
-                    itr.first->DespawnOnEvade(2min);
-            }
-        }
-    }
-
     void SpellHitTarget(Unit* target, SpellInfo const* spellInfo) override
     {
         if (spellInfo->Id == SPELL_CLAW_RAGE_CHARGE && target != me)
