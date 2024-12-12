@@ -15,6 +15,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "CreatureGroups.h"
 #include "CreatureScript.h"
 #include "Player.h"
 #include "ScriptedCreature.h"
@@ -237,6 +238,20 @@ struct boss_zuljin : public BossAI
                 DoCastAOE(SPELL_FLAME_BREATH);
             }, 10s);
         });
+    }
+
+    void EnterEvadeMode(EvadeReason /*why*/) override
+    {
+        _EnterEvadeMode();
+
+        if (CreatureGroup* formation = me->GetFormation())
+        {
+            for (auto const& itr : formation->GetMembers())
+            {
+                if (itr.first && itr.first->IsAlive())
+                    itr.first->DespawnOnEvade(2min);
+            }
+        }
     }
 
     void SpellHitTarget(Unit* target, SpellInfo const* spellInfo) override
