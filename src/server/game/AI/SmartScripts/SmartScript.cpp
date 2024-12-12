@@ -2605,6 +2605,13 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
             ProcessEventsFor((SMART_EVENT)SMART_EVENT_TIMED_EVENT_TRIGGERED, nullptr, eventId);
             break;
         }
+        case SMART_ACTION_DISMOUNT:
+        {
+            for (WorldObject* const target : targets)
+                if (IsUnit(target))
+                    target->ToUnit()->Dismount();
+            break;
+        }
         case SMART_ACTION_SET_HOVER:
         {
             for (WorldObject* target : targets)

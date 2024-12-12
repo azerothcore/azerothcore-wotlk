@@ -53,7 +53,6 @@ DoorData const doorData[] =
     { GO_DOOR_HALAZZI,         DATA_HALAZZI, DOOR_TYPE_PASSAGE },
     { GO_LYNX_TEMPLE_ENTRANCE, DATA_HALAZZI, DOOR_TYPE_ROOM    },
     { GO_DOOR_AKILZON,         DATA_AKILZON, DOOR_TYPE_ROOM    },
-    { GO_GATE_ZULJIN,          DATA_HEXLORD, DOOR_TYPE_PASSAGE },
     { 0,                       0,            DOOR_TYPE_ROOM    } // END
 };
 
@@ -71,6 +70,7 @@ ObjectData const gameObjectData[] =
     { GO_STRANGE_GONG, DATA_STRANGE_GONG },
     { GO_MASSIVE_GATE, DATA_MASSIVE_GATE },
     { GO_GATE_HEXLORD, DATA_HEXLORD_GATE },
+    { GO_GATE_ZULJIN,  DATA_ZULJIN_GATE  },
     { 0,               0                 }
 };
 
@@ -290,6 +290,11 @@ public:
                         HandleGameObject(ObjectGuid::Empty, false, GetGameObject(DATA_HEXLORD_GATE));
                     else if (state == NOT_STARTED)
                         CheckInstanceStatus();
+                    else if (state == DONE)
+                    {
+                        if (GameObject* zuljinGate = GetGameObject(DATA_ZULJIN_GATE))
+                            zuljinGate->RemoveGameObjectFlag(GO_FLAG_LOCKED);
+                    }
                     break;
             }
 
