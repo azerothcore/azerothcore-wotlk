@@ -106,7 +106,10 @@ struct boss_faction_championsAI : public ScriptedAI
         else dist = 0.0f;
         const float dist_factor = (mAIType == AI_MELEE || mAIType == AI_PET ? 15.0f : 25.0f);
         float mod_dist = dist_factor / (dist_factor + dist); // 0.2 .. 1.0
-        float mod_health = ((float)health) / maxhealth;
+        float mod_health = 0.0f;
+        if (maxhealth > 35000) {
+            mod_health = ((float)maxhealth - (float)health) / 1000.0f + 1.0f;
+        }
         return mod_health;
     }
 
