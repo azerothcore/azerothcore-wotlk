@@ -494,28 +494,33 @@ int32 AuraEffect::CalculateAmount(Unit* caster)
         case SPELL_AURA_MOD_STUN:
         case SPELL_AURA_MOD_ROOT:
         case SPELL_AURA_TRANSFORM:
+        {
             m_canBeRecalculated = false;
             if (!m_spellInfo->ProcFlags || m_spellInfo->HasAura(SPELL_AURA_PROC_TRIGGER_SPELL)) // xinef: skip auras with proctriggerspell, they must have procflags...
                 break;
-            amount = int32(GetBase()->GetUnitOwner()->CountPctFromMaxHealth(10));
-            if (caster)
+            if (!caster)
+                break;
+            // not impacted by gear
+            // not impacted by target level
+            // not impacted by rank
+            // asumption - depends on caster level
+            amount = sObjectMgr->GetCreatureBaseStats(caster->GetLevel(), Classes::CLASS_WARRIOR)->BaseHealth[EXPANSION_WRATH_OF_THE_LICH_KING] / 4.75f;
+            // Glyphs increasing damage cap
+            Unit::AuraEffectList const& overrideClassScripts = caster->GetAuraEffectsByType(SPELL_AURA_OVERRIDE_CLASS_SCRIPTS);
+            for (Unit::AuraEffectList::const_iterator itr = overrideClassScripts.begin(); itr != overrideClassScripts.end(); ++itr)
             {
-                // Glyphs increasing damage cap
-                Unit::AuraEffectList const& overrideClassScripts = caster->GetAuraEffectsByType(SPELL_AURA_OVERRIDE_CLASS_SCRIPTS);
-                for (Unit::AuraEffectList::const_iterator itr = overrideClassScripts.begin(); itr != overrideClassScripts.end(); ++itr)
+                if ((*itr)->IsAffectedOnSpell(m_spellInfo))
                 {
-                    if ((*itr)->IsAffectedOnSpell(m_spellInfo))
+                    // Glyph of Fear, Glyph of Frost nova and similar auras
+                    if ((*itr)->GetMiscValue() == 7801)
                     {
-                        // Glyph of Fear, Glyph of Frost nova and similar auras
-                        if ((*itr)->GetMiscValue() == 7801)
-                        {
-                            AddPct(amount, (*itr)->GetAmount());
-                            break;
-                        }
+                        AddPct(amount, (*itr)->GetAmount());
+                        break;
                     }
                 }
             }
             break;
+        }
         case SPELL_AURA_SCHOOL_ABSORB:
         case SPELL_AURA_MANA_SHIELD:
             m_canBeRecalculated = false;
