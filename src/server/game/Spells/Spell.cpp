@@ -2204,11 +2204,11 @@ void Spell::SearchChainTargets(std::list<WorldObject*>& targets, uint32 chainTar
     {
         case SPELL_DAMAGE_CLASS_RANGED:
             // 7.5y for multi shot
-            jumpRadius = 10.0f;
+            jumpRadius = 7.5f;
             break;
         case SPELL_DAMAGE_CLASS_MELEE:
             // 5y for swipe, cleave and similar
-            jumpRadius = 10.0f;
+            jumpRadius = 5.0f;
             break;
         case SPELL_DAMAGE_CLASS_NONE:
         case SPELL_DAMAGE_CLASS_MAGIC:
@@ -2230,6 +2230,17 @@ void Spell::SearchChainTargets(std::list<WorldObject*>& targets, uint32 chainTar
     float searchRadius = jumpRadius;
     if (isBouncingFar)
         searchRadius *= chainTargets;
+
+    //paladin skill range
+    if (m_spellInfo->Id == 31935 || m_spellInfo->Id == 53595 || m_spellInfo->Id == 20424) {
+        searchRadius = 25.0f;
+        jumpRadius = 12.0f;
+    }
+    //dk pestilence
+    if (m_spellInfo->Id == 50842) {
+        searchRadius = 30.0f;
+        jumpRadius = 15.0f;
+    }
 
     std::list<WorldObject*> tempTargets;
     SearchAreaTargets(tempTargets, searchRadius, target, m_caster, objectType, selectType, condList);
