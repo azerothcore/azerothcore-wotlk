@@ -1415,18 +1415,14 @@ public:
         {
             if (!IsSpellReady(INNERVATE_1, diff) || Rand() > 25)
                 return;
-            if (_form != BOT_STANCE_NONE && _form != DRUID_MOONKIN_FORM && _form != DRUID_TREE_FORM &&
-                (IsTank() || me->getAttackers().size() > 3))
+            if (_form != BOT_STANCE_NONE && _form != DRUID_MOONKIN_FORM && _form != DRUID_TREE_FORM && (IsTank() || me->getAttackers().size() > 3))
                 return;
 
-            static const uint8 minmanaval = 30;
             Unit* iTarget = nullptr;
 
-            if (master->IsInCombat() && master->GetPowerType() == POWER_MANA &&
-                GetManaPCT(master) < minmanaval && !master->GetAuraEffect(SPELL_AURA_PERIODIC_ENERGIZE, SPELLFAMILY_DRUID, 0x0, 0x1000, 0x0))
+            if (_isValidInnervateTarget(master))
                 iTarget = master;
-            else if (me->IsInCombat() && me->GetPowerType() == POWER_MANA &&
-                GetManaPCT(me) < minmanaval && !me->GetAuraEffect(SPELL_AURA_PERIODIC_ENERGIZE, SPELLFAMILY_DRUID, 0x0, 0x1000, 0x0))
+            else if (_isValidInnervateTarget(me))
                 iTarget = me;
 
             if (!IAmFree())
@@ -1438,13 +1434,7 @@ public:
                     for (BotMap::const_iterator itr = map->begin(); itr != map->end(); ++itr)
                     {
                         Creature* bot = itr->second;
-                        if (!bot || !bot->IsInCombat() || !bot->IsAlive() || bot->IsTempBot()) continue;
-                        if (bot->GetPowerType() != POWER_MANA) continue;
-                        if (bot->GetBotClass() == BOT_CLASS_HUNTER || bot->GetBotClass() == BOT_CLASS_WARLOCK ||
-                            bot->GetBotClass() == BOT_CLASS_SPHYNX || bot->GetBotClass() == BOT_CLASS_SPELLBREAKER ||
-                            bot->GetBotClass() == BOT_CLASS_NECROMANCER) continue;
-                        if (me->GetExactDist(bot) > 30) continue;
-                        if (GetManaPCT(bot) < minmanaval && !bot->GetAuraEffect(SPELL_AURA_PERIODIC_ENERGIZE, SPELLFAMILY_DRUID, 0x0, 0x1000, 0x0))
+                        if (bot && !bot->IsTempBot() && _isValidInnervateTarget(bot))
                         {
                             iTarget = bot;
                             break;
@@ -1458,19 +1448,10 @@ public:
                     {
                         for (Unit* member : members)
                         {
-                            if (!(i == 0 ? member->IsPlayer() : member->IsNPCBot()) || !member->IsInWorld() || !member->IsInCombat() ||
-                                !member->IsAlive() || me->GetExactDist(member) > 30 || GetManaPCT(member) > minmanaval ||
-                                member->GetAuraEffect(SPELL_AURA_PERIODIC_ENERGIZE, SPELLFAMILY_DRUID, 0x0, 0x1000, 0x0))
+                            if (!(i == 0 ? member->IsPlayer() : member->IsNPCBot()) || !_isValidInnervateTarget(member))
                                 continue;
-                            if (i == 1)
-                            {
-                                Creature const* bot = member->ToCreature();
-                                if (bot->IsTempBot() || bot->GetPowerType() != POWER_MANA ||
-                                    bot->GetBotClass() == BOT_CLASS_HUNTER || bot->GetBotClass() == BOT_CLASS_WARLOCK ||
-                                    bot->GetBotClass() == BOT_CLASS_SPHYNX || bot->GetBotClass() == BOT_CLASS_SPELLBREAKER ||
-                                    bot->GetBotClass() == BOT_CLASS_NECROMANCER)
-                                    continue;
-                            }
+                            if (i == 1 && member->ToCreature()->IsTempBot())
+                                continue;
                             iTarget = member;
                             break;
                         }
@@ -2932,6 +2913,29 @@ public:
         }
 
     private:
+        bool _isValidInnervateTarget(Unit const* unit) const
+        {
+            if (!unit || unit->GetPowerType() != POWER_MANA || !unit->IsInCombat() || !unit->IsInMap(me) || me->GetExactDist(unit) > 30.f ||
+                unit->GetAuraEffect(SPELL_AURA_PERIODIC_ENERGIZE, SPELLFAMILY_DRUID, 0x0, 0x1000, 0x0))
+                return false;
+
+            if (unit->IsNPCBot())
+            {
+                switch (unit->ToCreature()->GetBotClass())
+                {
+                    case BOT_CLASS_HUNTER: case BOT_CLASS_WARLOCK: case BOT_CLASS_SPHYNX: case BOT_CLASS_SPELLBREAKER: case BOT_CLASS_NECROMANCER:
+                        return false;
+                    default:
+                        break;
+                }
+            }
+
+            uint8 mpct = (unit->GetMaxPower(POWER_MANA) - unit->GetPower(POWER_MANA) > me->GetCreateMana() * 2) ? 30 : 3;
+            if (GetManaPCT(unit) >= mpct)
+                return false;
+
+            return true;
+        }
         static uint32 _baseSpellForShapeshift(BotStances form)
         {
             switch (form)
@@ -2969,7 +2973,7 @@ public:
             if (form == BOT_STANCE_NONE && HasRole(BOT_ROLE_DPS))
                 form = (!HasRole(BOT_ROLE_HEAL) && !!GetSpell(_baseSpellForShapeshift(DRUID_MOONKIN_FORM))) ? DRUID_MOONKIN_FORM : BOT_STANCE_NONE;
             if (form == BOT_STANCE_NONE && HasRole(BOT_ROLE_HEAL))
-                form = !!GetSpell(_baseSpellForShapeshift(DRUID_TREE_FORM)) ? DRUID_TREE_FORM : BOT_STANCE_NONE;
+                form = (!HasRole(BOT_ROLE_DPS) && !!GetSpell(_baseSpellForShapeshift(DRUID_TREE_FORM))) ? DRUID_TREE_FORM : BOT_STANCE_NONE;
             return form;
         }
 
