@@ -825,7 +825,7 @@ class spell_valkyr_touch_aura : public AuraScript
             Map::PlayerList const& pl = caster->GetMap()->GetPlayers();
             for( Map::PlayerList::const_iterator itr = pl.begin(); itr != pl.end(); ++itr )
                 if (Player* plr = itr->GetSource())
-                    if (plr->IsAlive() && !plr->HasAura(excludedID) && !plr->HasSpiritOfRedemptionAura() && plr->HasAura(spellID))
+                    if (plr->IsAlive() && !plr->HasAura(excludedID) && !plr->HasSpiritOfRedemptionAura() && plr->HasAura(GetSpellInfo()->Id))
                     {
                         uint32 absorb = 0;
                         uint32 resist = 0;
