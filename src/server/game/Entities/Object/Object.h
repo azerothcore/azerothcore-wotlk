@@ -97,7 +97,7 @@ struct PositionFullTerrainStatus;
 typedef std::unordered_map<Player*, UpdateData> UpdateDataMapType;
 typedef GuidUnorderedSet UpdatePlayerSet;
 
-static constexpr Milliseconds const HEARTBEAT_INTERVAL = 5s + 200ms;
+static constexpr Milliseconds HEARTBEAT_INTERVAL = 5s + 200ms;
 
 class Object
 {
