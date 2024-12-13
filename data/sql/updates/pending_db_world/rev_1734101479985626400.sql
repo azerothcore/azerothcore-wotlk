@@ -1,4 +1,4 @@
- -- Archmage Mordent Evenshade smart ai
+-- Archmage Mordent Evenshade smart ai
 
 SET @ENTRY := 36479;
 UPDATE `creature_template` SET `AIName` = 'SmartAI', `ScriptName` = '' WHERE `entry` = @ENTRY;
