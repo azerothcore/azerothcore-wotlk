@@ -309,8 +309,9 @@ void GameEventMgr::LoadNPCVendor()
             }
 
             // Add the item to the vendor if event is active
-            if(IsEventActive(eventId))
+            if (IsEventActive(eventId)) {
                 sObjectMgr->AddVendorItem(newEntry.entry, newEntry.item, newEntry.maxcount, newEntry.incrtime, newEntry.ExtendedCost, false);
+            }
 
             vendors.push_back(newEntry);
 
