@@ -597,6 +597,10 @@ struct boss_kaelthas : public BossAI
             Talk(SAY_PHASE2_WEAPON);
             DoCastSelf(SPELL_SUMMON_WEAPONS);
             _phase = PHASE_WEAPONS;
+            scheduler.Schedule(95s, GROUP_PROGRESS_PHASE, [this](TaskContext)
+            {
+                PhaseAllAdvisorsExecute();
+            });
         }, EVENT_PREFIGHT_PHASE5_01);
         ScheduleUniqueTimedEvent(9s, [&]{
             summons.DoForAllSummons([&](WorldObject* summon)
@@ -613,10 +617,6 @@ struct boss_kaelthas : public BossAI
                         }
                     }
                 }
-            });
-            scheduler.Schedule(3min, GROUP_PROGRESS_PHASE, [this](TaskContext)
-            {
-                PhaseAllAdvisorsExecute();
             });
         }, EVENT_PREFIGHT_PHASE5_02);
     }
