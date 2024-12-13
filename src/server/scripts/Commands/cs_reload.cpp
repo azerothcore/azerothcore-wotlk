@@ -769,7 +769,6 @@ public:
         return true;
     }
 
-
     static bool HandleReloadPointsOfInterestCommand(ChatHandler* handler)
     {
         LOG_INFO("server.loading", "Reloading `points_of_interest` Table!");
