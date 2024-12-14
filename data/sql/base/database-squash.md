@@ -1,15 +1,7 @@
-New routines around handling database squashes since https://github.com/azerothcore/azerothcore-wotlk/pull/18197
+New process around handling database squashes since https://github.com/azerothcore/azerothcore-wotlk/pull/18197
 
 > [!CAUTION]
 > These steps are only for project maintainers who intend to update base files.
-
-During the DB squash procedure, we do NOT move files.
-The archive dir is NO longer used as part of the DB squash procedure, 
-but simply as a place where to move update files when they get too many.
-
-Moving files to the archive folder is NOT part of the squash procedure anymore.
-
-as the `updates` table in base files always will contain the entries from the updates dir they will never be run again on a clean setup. 
 
 How to do the squash.
 
@@ -29,14 +21,15 @@ UPDATE `version` SET `db_version`='ACDB 335.11-dev', `cache_id`=11 LIMIT 1;
 > Remember to increment the db_version and cache_id the same as acore.json
 
 4. Drop all your databases, and run Worldserver to populate a clean database.
-5. Export the databases using i.e HeidiSQL
+5. Export the databases using the DatabaseExporter.ps1 (Located in ..\apps\DatabaseExporter\)
 
-> [!IMPORTANT]
-> Set the following values
-> Tables -> DROP + CREATE
-> Data -> Delete + insert (truncate existing data)
-> Max INSERT size -> 1024
-> This is so that no unexpected issues occur.
+> [!NOTE]
+> Read the databaseexporter.md file to use it properly.
 
-6. Move the exported table files into the base directory to update the existing files.
-7. Make a PR
+6. Make a PR
+
+> [!NOTE]
+> During the DB squash procedure, we do NOT move files.
+> The archive dir is NO longer used as part of the DB squash procedure, 
+> but simply as a place where to move update files when they get too many
+> as the `updates` table in base files always will contain the entries from the updates dir they will never be run again on a clean setup.
