@@ -219,8 +219,34 @@ public:
 
         void DoAction(int32 param) override
         {
-            if (param == 1 && !TargetGUID)
-                me->DespawnOrUnsummon();
+            if (param == 1 && !TargetGUID) {
+                //me->DespawnOrUnsummon();
+                GuidVector validPlayers;
+                Map::PlayerList const& pl = me->GetMap()->GetPlayers();
+                for( Map::PlayerList::const_iterator itr = pl.begin(); itr != pl.end(); ++itr )
+                {
+                    if (Player* p = itr->GetSource())
+                        if (p->IsAlive() && !p->GetVehicleKit() && !p->IsMounted() && !p->GetVehicle() && !p->IsGameMaster())
+                            validPlayers.push_back(p->GetGUID());
+                }
+
+                if (!validPlayers.empty()) {
+                    if (Player* p = ObjectAccessor::GetPlayer(*me, validPlayers.at(urand(0, validPlayers.size() - 1))))
+                    {
+                        if (p && p->IsAlive() && !p->GetVehicleKit() && !p->IsMounted() && !p->GetVehicle())
+                        {                                    
+                            me->setAttackTimer(BASE_ATTACK, 3000);
+                            AttackStart(p);
+                            p->CastSpell(p, SPELL_CHANGE_VEHICLE, true);
+                            me->EnterVehicle(p, 0);
+                            TargetGUID = p->GetGUID();
+                        }
+                    }
+                
+                } else {
+                    me->DespawnOrUnsummon();
+                }
+            }
         }
     };
 };
