@@ -95,13 +95,9 @@ if (-not (Test-Path -Path $output_directory_world)) {
 }
 
 # Fix for dumping TIMESTAMP data
-# Set the timezone
 $timezone = "+01:00"
-# MySQL command to set the timezone for the session or global
 $mysqlCommand = "SET time_zone = '$timezone';"
-# Build the full MySQL command line (Ensure mysql.exe is in your PATH)
 $mysqlExec = "mysql -h $mysql_host -u $mysql_user -p$mysql_password -e `"$mysqlCommand`""
-# Run the MySQL command using PowerShell
 Invoke-Expression -Command $mysqlExec
 
 Write-Host ""
