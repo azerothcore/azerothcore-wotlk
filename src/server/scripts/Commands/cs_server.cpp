@@ -541,7 +541,6 @@ public:
         std::ostringstream motdStream;
         motdStream << motd;
         std::string motdString = motdStream.str(); // Convert Tail to std::string
-
         // Determine the locale; default to "enUS" if not provided
         LocaleConstant localeConstant = DEFAULT_LOCALE;
         if (locale.has_value())

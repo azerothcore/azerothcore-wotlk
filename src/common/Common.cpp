@@ -41,7 +41,7 @@ LocaleConstant GetLocaleByName(const std::string& name)
     return LOCALE_enUS;                                     // including enGB case
 }
 
-const std::string& GetNameByLocaleConstant(LocaleConstant localeConstant)
+const std::string GetNameByLocaleConstant(LocaleConstant localeConstant)
 {
     if (localeConstant < TOTAL_LOCALES)
     {
