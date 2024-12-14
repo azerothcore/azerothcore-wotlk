@@ -125,7 +125,7 @@ foreach ($table in $tables_auth) {
     }
 
     # Export the table structure (CREATE TABLE) and table data (INSERT) to the SQL file
-    $create_table_command = "mysqldump -h $mysql_host -u $mysql_user $mysql_database_auth $table"
+    $create_table_command = "mysqldump -h $mysql_host -u $mysql_user --skip-tz-utc $mysql_database_auth $table"
     $create_table_output = Invoke-Expression -Command $create_table_command
     Add-Content -Path $output_file -Value $create_table_output
     Write-Host "Exported structure and data for table $table to $output_file"
@@ -156,7 +156,7 @@ foreach ($table in $tables_characters) {
     }
 
     # Export the table structure (CREATE TABLE) and table data (INSERT) to the SQL file
-    $create_table_command = "mysqldump -h $mysql_host -u $mysql_user $mysql_database_characters $table"
+    $create_table_command = "mysqldump -h $mysql_host -u $mysql_user --skip-tz-utc $mysql_database_characters $table"
     $create_table_output = Invoke-Expression -Command $create_table_command
     Add-Content -Path $output_file -Value $create_table_output
     Write-Host "Exported structure and data for table $table to $output_file"
