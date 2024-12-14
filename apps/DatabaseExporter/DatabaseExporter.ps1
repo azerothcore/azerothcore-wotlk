@@ -124,6 +124,13 @@ foreach ($table in $tables_auth) {
     $create_table_command = "mysqldump -h $mysql_host -u $mysql_user --skip-tz-utc $mysql_database_auth $table"
     $create_table_output = Invoke-Expression -Command $create_table_command
     Add-Content -Path $output_file -Value $create_table_output
+
+    # Format the INSERT values to be on seperate lines.
+    $content = Get-Content $output_file
+    $formattedContent = $content -replace 'VALUES \(', "VALUES`r`n("
+    $formattedContent = $formattedContent -replace '\),', "),`r`n"
+    $formattedContent | Set-Content $output_file
+
     Write-Host "Exported structure and data for table $table to $output_file"
 }
 
@@ -155,6 +162,13 @@ foreach ($table in $tables_characters) {
     $create_table_command = "mysqldump -h $mysql_host -u $mysql_user --skip-tz-utc $mysql_database_characters $table"
     $create_table_output = Invoke-Expression -Command $create_table_command
     Add-Content -Path $output_file -Value $create_table_output
+
+    # Format the INSERT values to be on seperate lines.
+    $content = Get-Content $output_file
+    $formattedContent = $content -replace 'VALUES \(', "VALUES`r`n("
+    $formattedContent = $formattedContent -replace '\),', "),`r`n"
+    $formattedContent | Set-Content $output_file
+
     Write-Host "Exported structure and data for table $table to $output_file"
 }
 
@@ -186,6 +200,13 @@ foreach ($table in $tables_world) {
     $create_table_command = "mysqldump -h $mysql_host -u $mysql_user --skip-tz-utc $mysql_database_world $table"
     $create_table_output = Invoke-Expression -Command $create_table_command
     Add-Content -Path $output_file -Value $create_table_output
+
+    # Format the INSERT values to be on seperate lines.
+    $content = Get-Content $output_file
+    $formattedContent = $content -replace 'VALUES \(', "VALUES`r`n("
+    $formattedContent = $formattedContent -replace '\),', "),`r`n"
+    $formattedContent | Set-Content $output_file
+
     Write-Host "Exported structure and data for table $table to $output_file"
 }
 
