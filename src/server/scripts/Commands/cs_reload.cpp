@@ -764,7 +764,7 @@ public:
     static bool HandleReloadGameEventNPCVendorCommand(ChatHandler* handler)
     {
         LOG_INFO("server.loading", "Reloading `game_event_npc_vendor` Table!");
-        sGameEventMgr->LoadNPCVendor();
+        sGameEventMgr->LoadEventVendors();
         handler->SendGlobalGMSysMessage("DB table `game_event_npc_vendor` reloaded.");
         return true;
     }

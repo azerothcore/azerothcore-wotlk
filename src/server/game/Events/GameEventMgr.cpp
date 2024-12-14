@@ -236,7 +236,7 @@ void GameEventMgr::StopEvent(uint16 event_id, bool overwrite)
         sScriptMgr->OnGameEventStop(event_id);
 }
 
-void GameEventMgr::LoadNPCVendor()
+void GameEventMgr::LoadEventVendors()
 {
     uint32 oldMSTime = getMSTime();
     WorldDatabasePreparedStatement* stmt = WorldDatabase.GetPreparedStatement(WORLD_SEL_GAME_EVENT_NPC_VENDOR);
@@ -309,9 +309,8 @@ void GameEventMgr::LoadNPCVendor()
             }
 
             // Add the item to the vendor if event is active
-            if (IsEventActive(eventId)) {
+            if (IsEventActive(eventId))
                 sObjectMgr->AddVendorItem(newEntry.entry, newEntry.item, newEntry.maxcount, newEntry.incrtime, newEntry.ExtendedCost, false);
-            }
 
             vendors.push_back(newEntry);
 
@@ -939,9 +938,7 @@ void GameEventMgr::LoadFromDB()
     }
 
     LOG_INFO("server.loading", "Loading Game Event Vendor Additions Data...");
-    {
-        LoadNPCVendor();
-    }
+    LoadEventVendors();
 
     LOG_INFO("server.loading", "Loading Game Event Battleground Data...");
     {
