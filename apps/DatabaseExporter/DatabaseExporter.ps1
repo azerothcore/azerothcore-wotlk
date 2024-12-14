@@ -11,6 +11,9 @@ $mysql_database_world = "acore_world"
 # SETTINGS END                                                                         #
 ########################################################################################
 
+# Set MySQL password as temporary env var
+$env:MYSQL_PWD = $mysql_password
+
 # Get the directory to sql\base directory
 $scriptDirectory = $PSScriptRoot
 $relativePath = "..\..\data\sql\base"
@@ -91,6 +94,16 @@ if (-not (Test-Path -Path $output_directory_world)) {
     Write-Host "Created directory $output_directory_world"
 }
 
+# Fix for dumping TIMESTAMP data
+# Set the timezone
+$timezone = "+01:00"
+# MySQL command to set the timezone for the session or global
+$mysqlCommand = "SET time_zone = '$timezone';"
+# Build the full MySQL command line (Ensure mysql.exe is in your PATH)
+$mysqlExec = "mysql -h $mysql_host -u $mysql_user -p$mysql_password -e `"$mysqlCommand`""
+# Run the MySQL command using PowerShell
+Invoke-Expression -Command $mysqlExec
+
 Write-Host ""
 Write-Host "#########################################################"
 Write-Host "EXPORT AUTH DATABASE START"
@@ -100,7 +113,7 @@ Write-Host "Please enter your password for user '$mysql_user'"
 
 # Export Auth Database
 # Connect to MySQL and get all the tables
-$tables_auth = mysql -h $mysql_host -u $mysql_user -p -D $mysql_database_auth -e "SHOW TABLES;" | Select-Object -Skip 1
+$tables_auth = mysql -h $mysql_host -u $mysql_user -D $mysql_database_auth -e "SHOW TABLES;" | Select-Object -Skip 1
 # Iterate through each table and export both the structure and contents into the same SQL file
 foreach ($table in $tables_auth) {
     # Define the output file path for this table
@@ -112,7 +125,7 @@ foreach ($table in $tables_auth) {
     }
 
     # Export the table structure (CREATE TABLE) and table data (INSERT) to the SQL file
-    $create_table_command = "mysqldump -h $mysql_host -u $mysql_user -p$mysql_password $mysql_database_auth $table"
+    $create_table_command = "mysqldump -h $mysql_host -u $mysql_user $mysql_database_auth $table"
     $create_table_output = Invoke-Expression -Command $create_table_command
     Add-Content -Path $output_file -Value $create_table_output
     Write-Host "Exported structure and data for table $table to $output_file"
@@ -131,7 +144,7 @@ Write-Host "Please enter your password for user '$mysql_user'"
 
 # Export Characters Database
 # Connect to MySQL and get all the tables
-$tables_characters = mysql -h $mysql_host -u $mysql_user -p -D $mysql_database_characters -e "SHOW TABLES;" | Select-Object -Skip 1
+$tables_characters = mysql -h $mysql_host -u $mysql_user -D $mysql_database_characters -e "SHOW TABLES;" | Select-Object -Skip 1
 # Iterate through each table and export both the structure and contents into the same SQL file
 foreach ($table in $tables_characters) {
     # Define the output file path for this table
@@ -143,7 +156,7 @@ foreach ($table in $tables_characters) {
     }
 
     # Export the table structure (CREATE TABLE) and table data (INSERT) to the SQL file
-    $create_table_command = "mysqldump -h $mysql_host -u $mysql_user -p$mysql_password $mysql_database_characters $table"
+    $create_table_command = "mysqldump -h $mysql_host -u $mysql_user $mysql_database_characters $table"
     $create_table_output = Invoke-Expression -Command $create_table_command
     Add-Content -Path $output_file -Value $create_table_output
     Write-Host "Exported structure and data for table $table to $output_file"
@@ -162,7 +175,7 @@ Write-Host "Please enter your password for user '$mysql_user'"
 
 # Export World Database
 # Connect to MySQL and get all the tables
-$tables_world = mysql -h $mysql_host -u $mysql_user -p -D $mysql_database_world -e "SHOW TABLES;" | Select-Object -Skip 1
+$tables_world = mysql -h $mysql_host -u $mysql_user -D $mysql_database_world -e "SHOW TABLES;" | Select-Object -Skip 1
 # Iterate through each table and export both the structure and contents into the same SQL file
 foreach ($table in $tables_world) {
     # Define the output file path for this table
@@ -174,7 +187,7 @@ foreach ($table in $tables_world) {
     }
 
     # Export the table structure (CREATE TABLE) and table data (INSERT) to the SQL file
-    $create_table_command = "mysqldump -h $mysql_host -u $mysql_user -p$mysql_password $mysql_database_world $table"
+    $create_table_command = "mysqldump -h $mysql_host -u $mysql_user --skip-tz-utc $mysql_database_world $table"
     $create_table_output = Invoke-Expression -Command $create_table_command
     Add-Content -Path $output_file -Value $create_table_output
     Write-Host "Exported structure and data for table $table to $output_file"

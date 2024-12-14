@@ -36,12 +36,9 @@ This is how it works step-by-step:
 2. Accept to continue using the tool.
 3. The tool will delete the `db_auth` `db_characters` `db_world` directories in `..\..\data\sql\base\`
 4. The tool will create the `db_auth` `db_characters` `db_world` directories in `..\..\data\sql\base\`
-5. Enter your database password
-6. The tool will export the `db_auth` table into `..\..\data\sql\base\db_auth\`
-7. Enter your database password
-8. The tool will export the `db_characters` table into `..\..\data\sql\base\db_characters\`
-9. Enter your database password
-10. The tool will export the `db_world` table into `..\..\data\sql\base\db_world\`
+5. The tool will export the `db_auth` table into `..\..\data\sql\base\db_auth\`
+6. The tool will export the `db_characters` table into `..\..\data\sql\base\db_characters\`
+7. The tool will export the `db_world` table into `..\..\data\sql\base\db_world\`
 
 ## Run the tool
 
