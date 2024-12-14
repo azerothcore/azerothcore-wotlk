@@ -21,6 +21,9 @@ How to do the squash.
 
 6. Make a PR
 
+> [!IMPORTANT]
+> No DB PRs should be merged during this process!
+
 > [!NOTE]
 > During the DB squash procedure, we do NOT move files.
 > The archive dir is NO longer used as part of the DB squash procedure, 
