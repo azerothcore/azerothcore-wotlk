@@ -556,6 +556,7 @@ void World::LoadConfigSettings(bool reload)
     _rate_values[RATE_REST_INGAME]                          = sConfigMgr->GetOption<float>("Rate.Rest.InGame", 1.0f);
     _rate_values[RATE_REST_OFFLINE_IN_TAVERN_OR_CITY]       = sConfigMgr->GetOption<float>("Rate.Rest.Offline.InTavernOrCity", 1.0f);
     _rate_values[RATE_REST_OFFLINE_IN_WILDERNESS]           = sConfigMgr->GetOption<float>("Rate.Rest.Offline.InWilderness", 1.0f);
+    _rate_values[RATE_REST_MAX_BONUS]                       = sConfigMgr->GetOption<float>("Rate.Rest.MaxBonus", 1.5f);
     _rate_values[RATE_DAMAGE_FALL]                          = sConfigMgr->GetOption<float>("Rate.Damage.Fall", 1.0f);
     _rate_values[RATE_AUCTION_TIME]                         = sConfigMgr->GetOption<float>("Rate.Auction.Time", 1.0f);
     _rate_values[RATE_AUCTION_DEPOSIT]                      = sConfigMgr->GetOption<float>("Rate.Auction.Deposit", 1.0f);
