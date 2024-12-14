@@ -21,6 +21,10 @@ Write-Host "You have configured:"
 Write-Host "acore.json Path: '$jsonFilePath'"
 Write-Host "World SQL Updates path: '$fullPathDbWorldUpdate'"
 Write-Host ""
+Write-Host "Make sure you read the entire process before you continue."
+Write-Host "https://github.com/azerothcore/azerothcore-wotlk/blob/master/data/sql/base/database-squash.md"
+Write-Host "https://github.com/azerothcore/azerothcore-wotlk/blob/master/apps/VersionUpdater/versionupdater.md"
+Write-Host ""
 
 # Check if the user wants to continue using the tool
 do {
