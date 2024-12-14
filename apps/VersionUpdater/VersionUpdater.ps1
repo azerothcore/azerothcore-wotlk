@@ -29,6 +29,7 @@ do {
     if ($confirmation -eq 'Y' -or $confirmation -eq 'y') {
         # Continue the script
         Write-Host "AzerothCore Version Updater starts."
+        Write-Host ""
         $continue = $true
     }
     elseif ($confirmation -eq 'N' -or $confirmation -eq 'n') {
@@ -120,3 +121,8 @@ $sqlContent = "UPDATE $tableName SET $db_version=$db_version_content, $cache_id=
 $sqlContent | Set-Content -Path $newFilePath
 
 Write-Host "SQL file created: $newFilePath"
+Write-Host "SQL content: $sqlContent"
+
+Write-Host ""
+Write-Host "Version Updater completed."
+Write-Host "Have a nice day :)"
