@@ -550,7 +550,7 @@ public:
                 localeConstant = GetLocaleByName(locale.value());
             }
             else
-            {  
+            {
                 motdStream.str("");
                 motdStream << locale.value() << " " << motd;
                 motdString = motdStream.str();
