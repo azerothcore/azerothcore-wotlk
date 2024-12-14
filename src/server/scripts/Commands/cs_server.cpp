@@ -289,7 +289,7 @@ public:
     // Display the 'Message of the day' for the realm
     static bool HandleServerMotdCommand(ChatHandler* handler)
     {
-        LocaleConstant localeConstant = LOCALE_enUS;
+        LocaleConstant localeConstant = DEFAULT_LOCALE;
         if (Player* player = handler->GetPlayer())
             localeConstant = player->GetSession()->GetSessionDbLocaleIndex();
 
@@ -548,7 +548,7 @@ public:
             localeConstant = GetLocaleByName(locale.value());
         else
             // Set to default locale string
-            locale = "en_US";
+            locale = "enUS";
 
         // Convert the concatenated motdString to UTF-8 and ensure encoding consistency
         if (!Utf8toWStr(motdString, wMotd))
@@ -569,7 +569,8 @@ public:
             stmt->SetData(2, strMotd);          // motd text for ON DUPLICATE KEY UPDATE
             trans->Append(stmt);
         }
-        else {
+        else
+        {
             // Insert or update in the motd_localized table for other locales
             LoginDatabasePreparedStatement* stmt = LoginDatabase.GetPreparedStatement(LOGIN_INS_MOTD_LOCALE);
             stmt->SetData(0, realmId.value());  // realmId for insertion
