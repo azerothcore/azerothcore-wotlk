@@ -39,6 +39,11 @@ MotdMgr* MotdMgr::instance()
     return &instance;
 }
 
+bool MotdMgr::IsValidLocale(std::string const& locale) {
+    // Use std::find to search for the locale in the array
+    return std::find(std::begin(localeNames), std::end(localeNames), locale) != std::end(localeNames);
+}
+
 void MotdMgr::SetMotd(std::string motd, LocaleConstant locale)
 {
     // scripts may change motd

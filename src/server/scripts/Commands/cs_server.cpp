@@ -542,13 +542,29 @@ public:
         motdStream << motd;
         std::string motdString = motdStream.str(); // Convert Tail to std::string
 
-        // Determine the locale; default to "enUS" if not provided or invalid
+        // Determine the locale; default to "enUS" if not provided
         LocaleConstant localeConstant = DEFAULT_LOCALE;
         if (locale.has_value())
-            localeConstant = GetLocaleByName(locale.value());
+        {
+            if (sMotdMgr->IsValidLocale(locale.value()))
+            {
+                localeConstant = GetLocaleByName(locale.value());
+            }
+            else
+            {  
+                motdStream.str("");
+                motdStream << locale.value() << " " << motd;
+                motdString = motdStream.str();
+                localeConstant = DEFAULT_LOCALE;
+                locale = GetNameByLocaleConstant(localeConstant);
+            }
+        }
         else
+        {
             // Set to default locale string
-            locale = "enUS";
+            localeConstant = DEFAULT_LOCALE;
+            locale = GetNameByLocaleConstant(localeConstant);
+        }
 
         // Convert the concatenated motdString to UTF-8 and ensure encoding consistency
         if (!Utf8toWStr(motdString, wMotd))
