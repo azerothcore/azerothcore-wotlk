@@ -66,23 +66,29 @@ do {
 # Remove the output directory if it exist
 if (Test-Path $output_directory_auth) {
     Remove-Item -Path $output_directory_auth -Recurse -Force
+    Write-Host "Deleted directory $output_directory_auth"
 }
 if (Test-Path $output_directory_characters) {
     Remove-Item -Path $output_directory_characters -Recurse -Force
+    Write-Host "Deleted directory $output_directory_characters"
 }
 if (Test-Path $output_directory_world) {
     Remove-Item -Path $output_directory_world -Recurse -Force
+    Write-Host "Deleted directory $output_directory_world"
 }
 
 # Create the output directory if it doesn't exist
 if (-not (Test-Path -Path $output_directory_auth)) {
     New-Item -ItemType Directory -Force -Path $output_directory_auth
+    Write-Host "Created directory $output_directory_auth"
 }
 if (-not (Test-Path -Path $output_directory_characters)) {
     New-Item -ItemType Directory -Force -Path $output_directory_characters
+    Write-Host "Created directory $output_directory_characters"
 }
 if (-not (Test-Path -Path $output_directory_world)) {
     New-Item -ItemType Directory -Force -Path $output_directory_world
+    Write-Host "Created directory $output_directory_world"
 }
 
 Write-Host ""
