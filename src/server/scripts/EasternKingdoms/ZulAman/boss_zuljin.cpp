@@ -163,11 +163,11 @@ struct boss_zuljin : public BossAI
         // Phase 1: Default (troll)
         ScheduleTimedEvent(7s, [&] {
             DoCastAOE(SPELL_WHIRLWIND);
-        }, 15s, 20s);
+        }, 12s, 29s);
 
         ScheduleTimedEvent(8s, [&] {
             DoCastRandomTarget(SPELL_GRIEVOUS_THROW, 0, 100.0f);
-        }, 10s);
+        }, 7s, 23s);
 
         me->m_Events.AddEventAtOffset([&]() {
             DoCastSelf(SPELL_BERSERK, true);
@@ -177,9 +177,9 @@ struct boss_zuljin : public BossAI
         // Phase 2: Bear Form.
         ScheduleHealthCheckEvent({ 80 }, [&] {
             EnterPhase(PHASE_BEAR);
-            ScheduleTimedEvent(7s, [&] {
+            ScheduleTimedEvent(8s, [&] {
                 DoCastAOE(SPELL_CREEPING_PARALYSIS);
-            }, 20s);
+            }, 26s, 30s);
 
             ScheduleTimedEvent(1s, [&] {
                 if (!me->HasSpellCooldown(SPELL_OVERPOWER) && me->GetVictim() && me->GetComboPoints())
@@ -231,13 +231,13 @@ struct boss_zuljin : public BossAI
 
             ScheduleTimedEvent(5s, [&] {
                 DoCastSelf(SPELL_FLAME_WHIRL);
-            }, 12s);
+            }, 12s, 26s);
 
-            ScheduleTimedEvent(6s, [&] {
+            ScheduleTimedEvent(11s, 42s, [&] {
                 DoCastRandomTarget(SPELL_SUMMON_PILLAR);
-            }, 10s);
+            }, 5s, 25s);
 
-            ScheduleTimedEvent(7s, [&] {
+            ScheduleTimedEvent(16s, 26s, [&] {
                 DoCastAOE(SPELL_FLAME_BREATH);
             }, 10s);
         });
