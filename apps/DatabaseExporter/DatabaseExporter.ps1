@@ -42,6 +42,8 @@ Write-Host "Make sure you read the entire process before you continue."
 Write-Host "https://github.com/azerothcore/azerothcore-wotlk/blob/master/data/sql/base/database-squash.md"
 Write-Host "https://github.com/azerothcore/azerothcore-wotlk/blob/master/apps/DatabaseExporter/databaseexporter.md"
 Write-Host ""
+
+# Check if the user wants to continue using the tool
 do {
     $confirmation = Read-Host "Do you want to continue using the tool? (Y/N)"
     

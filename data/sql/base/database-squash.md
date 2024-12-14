@@ -8,20 +8,13 @@ How to do the squash.
 > [!IMPORTANT]
 > A squash needs to be done on a clean database. Drop all tables in Auth, Characters and World.
 
-1. Update the acore.json file. Increment version by one
-2. Create a new file in the updates/db_world/ dir, the file should be incremented containing
+1. Update the acore.json and DB version by running VersionUpdater.ps1 (Located in ..\apps\VersionUpdater\)
 
 > [!NOTE]
-> It should NOT be placed as a pending update and should only be done on world db. This is because we want the updated DB version to follow into the base files
+> Read the versionupdater.md file to use it properly.
 
-```sql
-UPDATE `version` SET `db_version`='ACDB 335.11-dev', `cache_id`=11 LIMIT 1;
-```
-> [!NOTE]
-> Remember to increment the db_version and cache_id the same as acore.json
-
-4. Drop all your databases, and run Worldserver to populate a clean database.
-5. Export the databases using the DatabaseExporter.ps1 (Located in ..\apps\DatabaseExporter\)
+2. Drop all your databases, and run Worldserver to populate a clean database.
+3. Export the databases using the DatabaseExporter.ps1 (Located in ..\apps\DatabaseExporter\)
 
 > [!NOTE]
 > Read the databaseexporter.md file to use it properly.
