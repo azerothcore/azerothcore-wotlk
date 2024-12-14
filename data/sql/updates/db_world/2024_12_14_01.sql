@@ -1,3 +1,4 @@
+-- DB update 2024_12_14_00 -> 2024_12_14_01
 -- Amani'shi Tempest - Thunderclap ability missing (timers based on timers for same spell)
 UPDATE `creature_template` SET `AIName` = 'SmartAI' WHERE `entry` = 24549;
 
