@@ -2014,9 +2014,6 @@ public:
     float m_threatModifier[MAX_SPELL_SCHOOL];
     float m_modAttackSpeedPct[3];
 
-    // Event handler
-    EventProcessor m_Events;
-
     SpellImmuneList m_spellImmune[MAX_SPELL_IMMUNITY];
     uint32 m_lastSanctuaryTime;
 
