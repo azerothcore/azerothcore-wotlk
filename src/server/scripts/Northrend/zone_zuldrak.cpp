@@ -23,6 +23,7 @@
 #include "ScriptedGossip.h"
 #include "SpellAuras.h"
 #include "SpellInfo.h"
+#include "SpellScript.h"
 #include "SpellScriptLoader.h"
 #include "Vehicle.h"
 
@@ -956,7 +957,7 @@ enum ScourgeDisguiseInstability
     SCOURGE_DISGUISE_FAILING_MESSAGE_2       = 28758, // Scourge Disguise Failing! Run for cover!
     SCOURGE_DISGUISE_FAILING_MESSAGE_3       = 28759, // Scourge Disguise Failing! Hide quickly!
 };
-const std::vector<uint32> scourgeDisguiseTextIDs = { SCOURGE_DISGUISE_FAILING_MESSAGE_1, SCOURGE_DISGUISE_FAILING_MESSAGE_2, SCOURGE_DISGUISE_FAILING_MESSAGE_3 };
+std::vector<uint32> const scourgeDisguiseTextIDs = { SCOURGE_DISGUISE_FAILING_MESSAGE_1, SCOURGE_DISGUISE_FAILING_MESSAGE_2, SCOURGE_DISGUISE_FAILING_MESSAGE_3 };
 
 class spell_scourge_disguise_instability : public AuraScript
 {
