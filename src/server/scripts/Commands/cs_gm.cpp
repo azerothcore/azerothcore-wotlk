@@ -101,11 +101,13 @@ public:
         WorldPacket data(12);
 
         bool canFly = false;
-        if (enable.has_value()) {
+        if (enable.has_value())
+        {
             data.SetOpcode(*enable ? SMSG_MOVE_SET_CAN_FLY : SMSG_MOVE_UNSET_CAN_FLY);
             canFly = *enable;
         }
-        else {
+        else
+        {
             canFly = handler->GetSession()->GetPlayer()->CanFly();
             data.SetOpcode(canFly ? SMSG_MOVE_UNSET_CAN_FLY : SMSG_MOVE_SET_CAN_FLY);
             canFly = !canFly;
