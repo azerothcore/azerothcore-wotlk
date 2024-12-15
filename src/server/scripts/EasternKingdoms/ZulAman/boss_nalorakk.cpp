@@ -213,7 +213,7 @@ struct boss_nalorakk : public BossAI
             DoCastRandomTarget(SPELL_SURGE, 0, 45.0f, false, false, false);
             context.Repeat();
         }).Schedule(15s, 25s, GROUP_HUMAN, [this](TaskContext context)
-        {
+            {
             DoCastVictim(SPELL_BRUTALSWIPE);
             context.Repeat();
         }).Schedule(6s, 34s, GROUP_HUMAN, [this](TaskContext context)
@@ -275,15 +275,15 @@ struct boss_nalorakk : public BossAI
             {
                 DoCastVictim(SPELL_LACERATINGSLASH);
                 context.Repeat(4s, 26s);
-            }).Schedule(4s, 26s, GROUP_BEAR, [this](TaskContext context)
+            }).Schedule(3s, GROUP_BEAR, [this](TaskContext context)
             {
                 DoCastVictim(SPELL_RENDFLESH);
                 context.Repeat(6s, 21s);
-            }).Schedule(6s, 21s, GROUP_BEAR, [this](TaskContext context)
+            }).Schedule(5s, 10s, GROUP_BEAR, [this](TaskContext context)
             {
                 DoCastSelf(SPELL_DEAFENINGROAR);
                 context.Repeat(11s, 24s);
-            }).Schedule(11s, 24s, GROUP_BEAR, [this](TaskContext)
+            }).Schedule(30s, GROUP_BEAR, [this](TaskContext)
             {
                 ShapeShift(_bearForm);
             });
