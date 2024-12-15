@@ -424,7 +424,8 @@ void WorldSession::HandleCastSpellOpcode(WorldPacket& recvPacket)
     {
         if (_player->CanRequestSpellCast(spellInfo))
         {
-            _player->SpellQueue.pop_front();
+            if (!_player->SpellQueue.empty())
+                _player->SpellQueue.pop_front();
             recvPacket.rpos(0); // Reset read position to the start of the buffer.
             _player->SpellQueue.emplace_back(
                 spellId,
