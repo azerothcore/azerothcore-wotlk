@@ -436,6 +436,7 @@ uint32 DatabaseWorkerPool<T>::OpenConnections(InternalIndex type, uint8 numConne
         if (uint32 error = connection->Open())
         {
             // Failed to open a connection or invalid version, abort and cleanup
+            _queue->Cancel();
             _connections[type].clear();
             return error;
         }
