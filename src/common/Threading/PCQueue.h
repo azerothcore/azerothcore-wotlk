@@ -32,7 +32,7 @@ private:
     std::atomic<bool> _shutdown;
 
 public:
-    ProducerConsumerQueue() : _shutdown(false), _cancel(false) { }
+    ProducerConsumerQueue() : _cancel(false), _shutdown(false) { }
 
     void Push(const T& value)
     {
