@@ -260,7 +260,7 @@ class BotDataMgr
         static uint8 GetMaxLevelForMapId(uint32 mapId);
         static uint8 GetMinLevelForBotClass(uint8 m_class);
         static int32 GetBotBaseReputation(Creature const* bot, FactionEntry const* factionEntry);
-        static uint32 GetDefaultFactionForBotRace(uint8 bot_race);
+        static uint32 GetDefaultFactionForBotRaceClass(uint8 bot_class, uint8 bot_race);
         static TeamId GetTeamIdForFaction(uint32 factionTemplateId);
         static uint32 GetTeamForFaction(uint32 factionTemplateId);
 

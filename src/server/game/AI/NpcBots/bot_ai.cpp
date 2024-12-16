@@ -3819,7 +3819,7 @@ bool bot_ai::CanBotAttack(Unit const* target, int8 byspell, bool secondary) cons
         //do not attack friendly targets in FFAPvP mode
         if (me->IsFFAPvP() && me->GetFaction() == FACTION_TEMPLATE_NEUTRAL_HOSTILE)
         {
-            uint32 base_faction = BotDataMgr::GetDefaultFactionForBotRace(me->GetRace());
+            uint32 base_faction = BotDataMgr::GetDefaultFactionForBotRaceClass(GetBotClass(), me->GetRace());
             if (me->GetFaction() != base_faction && me->GetFactionReactionTo(sFactionTemplateStore.LookupEntry(base_faction), target) >= REP_FRIENDLY)
                 return false;
         }
