@@ -2259,10 +2259,7 @@ void Player::ProcessTerrainStatusUpdate()
 
 uint32 Player::GetSpellQueueWindow() const
 {
-    uint32 baseWindow = sWorld->getIntConfig(CONFIG_SPELL_QUEUE_WINDOW);
-    uint32 latency = GetSession()->GetLatency();
-    uint32 adjustedWindow = baseWindow + latency;
-    return std::min(adjustedWindow, uint32(400));
+    return std::min(sWorld->getIntConfig(CONFIG_SPELL_QUEUE_WINDOW) + GetSession()->GetLatency(), uint32(400));
 }
 
 bool Player::CanExecutePendingSpellCastRequest(SpellInfo const* spellInfo)
