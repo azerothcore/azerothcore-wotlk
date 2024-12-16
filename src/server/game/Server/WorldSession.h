@@ -348,8 +348,57 @@ public:
     void SendPacket(WorldPacket const* packet);
     void SendPetNameInvalid(uint32 error, std::string const& name, DeclinedName* declinedName);
     void SendPartyResult(PartyOperation operation, std::string const& member, PartyResult res, uint32 val = 0);
-    void SendAreaTriggerMessage(const char* Text, ...) ATTR_PRINTF(2, 3);
-    void SendAreaTriggerMessage(uint32 entry, ...);
+
+    template<typename... Args>
+    void SendAreaTriggerMessage(char const* Text, Args&&... args)
+    {
+        char szStr[1024];
+        szStr[0] = '\0'; // Initialize the string buffer
+
+        // Use Acore::StringFormat to generate the formatted string
+        std::string formattedStr = Acore::StringFormat(Text, std::forward<Args>(args)...);
+
+        // Copy the formatted string into szStr, ensuring it fits within the buffer
+        strncpy(szStr, formattedStr.c_str(), sizeof(szStr) - 1);
+        szStr[sizeof(szStr) - 1] = '\0'; // Null-terminate to avoid overflow
+
+        // Calculate the length of the formatted string
+        uint32 length = strlen(szStr) + 1;
+
+        // Create the packet and send it
+        WorldPacket data(SMSG_AREA_TRIGGER_MESSAGE, 4 + length);
+        data << length;
+        data << szStr;
+        SendPacket(&data);
+    }
+
+    template<typename... Args>
+    void SendAreaTriggerMessage(uint32 entry, Args&&... args)
+    {
+        char const* format = GetAcoreString(entry);
+        if (format)
+        {
+            va_list ap;
+            char szStr[1024];
+            szStr[0] = '\0';
+
+            // Use Acore::StringFormat to generate the formatted string
+            std::string formattedStr = Acore::StringFormat(format, std::forward<Args>(args)...);
+
+            // Copy the formatted string into szStr, ensuring it fits within the buffer
+            strncpy(szStr, formattedStr.c_str(), sizeof(szStr) - 1);
+            szStr[sizeof(szStr) - 1] = '\0'; // Null-terminate to avoid overflow
+
+            // Calculate the length of the formatted string
+            uint32 length = strlen(szStr) + 1;
+
+            WorldPacket data(SMSG_AREA_TRIGGER_MESSAGE, 4 + length);
+            data << length;
+            data << szStr;
+            SendPacket(&data);
+        }
+    }
+
     void SendSetPhaseShift(uint32 phaseShift);
     void SendQueryTimeResponse();
 

@@ -768,8 +768,8 @@ bool WorldSession::ValidateHyperlinksAndMaybeKick(std::string_view str)
     if (Acore::Hyperlinks::CheckAllLinks(str))
         return true;
 
-    LOG_ERROR("network", "Player {} {} sent a message with an invalid link:\n%.*s", GetPlayer()->GetName(),
-        GetPlayer()->GetGUID().ToString(), STRING_VIEW_FMT_ARG(str));
+    LOG_ERROR("network", "Player {} {} sent a message with an invalid link:\n{}", GetPlayer()->GetName(),
+        GetPlayer()->GetGUID().ToString(), str);
 
     if (sWorld->getIntConfig(CONFIG_CHAT_STRICT_LINK_CHECKING_KICK))
         KickPlayer("WorldSession::ValidateHyperlinksAndMaybeKick Invalid chat link");
@@ -782,8 +782,8 @@ bool WorldSession::DisallowHyperlinksAndMaybeKick(std::string_view str)
     if (str.find('|') == std::string_view::npos)
         return true;
 
-    LOG_ERROR("network", "Player {} {} sent a message which illegally contained a hyperlink:\n%.*s", GetPlayer()->GetName(),
-        GetPlayer()->GetGUID().ToString(), STRING_VIEW_FMT_ARG(str));
+    LOG_ERROR("network", "Player {} {} sent a message which illegally contained a hyperlink:\n{}", GetPlayer()->GetName(),
+        GetPlayer()->GetGUID().ToString(), str);
 
     if (sWorld->getIntConfig(CONFIG_CHAT_STRICT_LINK_CHECKING_KICK))
         KickPlayer("WorldSession::DisallowHyperlinksAndMaybeKick Illegal chat link");
