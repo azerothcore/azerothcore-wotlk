@@ -2169,17 +2169,17 @@ ToggleXP.Cost = 100000
 #
 #    SpellQueue.Enabled
 #        Description: Enable SpellQueue.
-#        Default:     0 - (Disabled)
-#                     1 - (Enabled)
+#        Default:     1 - (Enabled)
+#                     0 - (Disabled)
 
 SpellQueue.Enabled = 1
 
 #
 #    SpellQueue.Window
 #        Description: Time (in milliseconds) for spells to be queued.
-#        Default:     400 - (400ms)
+#        Default:     200 - (200ms + Player Ping)
 
-SpellQueue.Window = 400
+SpellQueue.Window = 200
 
 #
 ###################################################################################################
