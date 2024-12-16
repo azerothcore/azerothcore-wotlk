@@ -139,6 +139,7 @@ void KillRewarder::_InitGroupData()
                         const uint8 lvl = bot->GetLevel();
                         ++_count;
                         _sumLevel += lvl;
+                        _aliveSumLevel += lvl;
                         if (_maxLevel < lvl)
                             _maxLevel = lvl;
                     }

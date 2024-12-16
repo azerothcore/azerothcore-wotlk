@@ -3371,7 +3371,7 @@ public:
 
             if (teamid)
             {
-                uint32 faction = BotDataMgr::GetDefaultFactionForBotRace(race);
+                uint32 faction = BotDataMgr::GetDefaultFactionForBotRaceClass(_botExtras->bclass, race);
                 TeamId team = BotDataMgr::GetTeamIdForFaction(faction);
 
                 if (*teamid != uint8(team))

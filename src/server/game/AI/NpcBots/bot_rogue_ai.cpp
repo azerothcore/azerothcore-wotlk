@@ -599,8 +599,7 @@ public:
             {
                 //Kidney Shot
                 if (GetSpell(KIDNEY_SHOT_1) && !stealthed && stunDivider < DIMINISHING_LEVEL_4 &&
-                    Rand() < 80 && !CCed(mytar) &&
-                    !IsImmunedToMySpellEffect(mytar, sSpellMgr->GetSpellInfo(KIDNEY_SHOT_1), EFFECT_0) &&
+                    Rand() < 80 && !CCed(mytar) && !mytar->IsImmunedToSpell(sSpellMgr->GetSpellInfo(KIDNEY_SHOT_1)) &&
                     ((comboPoints >= 4 && stunDivider < DIMINISHING_LEVEL_3 &&
                     (mytar->GetHealth() > me->GetMaxHealth() / 2 || mytar->GetTypeId() == TYPEID_PLAYER)) ||
                     mytar->IsNonMeleeSpellCast(false,false,true)) &&

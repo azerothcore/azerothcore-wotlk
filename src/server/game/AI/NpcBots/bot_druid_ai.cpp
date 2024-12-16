@@ -2930,7 +2930,7 @@ public:
                 }
             }
 
-            uint8 mpct = (unit->GetMaxPower(POWER_MANA) - unit->GetPower(POWER_MANA) > me->GetCreateMana() * 2) ? 30 : 3;
+            uint8 mpct = (unit->GetMaxPower(POWER_MANA) - unit->GetPower(POWER_MANA) > me->GetCreateMana() * 2) ? 15 : 3;
             if (GetManaPCT(unit) >= mpct)
                 return false;
 

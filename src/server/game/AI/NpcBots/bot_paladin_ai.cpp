@@ -1212,7 +1212,8 @@ public:
             }
 
             //Holy shield
-            if (IsSpellReady(HOLY_SHIELD_1, diff) && HasRole(BOT_ROLE_DPS) && CanBlock() && !me->getAttackers().empty() &&
+            if (IsSpellReady(HOLY_SHIELD_1, diff) && HasRole(BOT_ROLE_DPS) && CanBlock() && !me->getAttackers().empty() && GetManaPCT(me) > 25 &&
+                (GetManaPCT(me) > 80 || me->getAttackers().size() > 3 || ((*me->getAttackers().cbegin())->IsCreature() && (*me->getAttackers().cbegin())->ToCreature()->isWorldBoss())) &&
                 !me->HasAuraTypeWithMiscvalue(SPELL_AURA_SCHOOL_IMMUNITY, 127))
             {
                 if (doCast(me, GetSpell(HOLY_SHIELD_1)))

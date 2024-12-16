@@ -301,7 +301,7 @@ private:
         const uint32 orig_entry = spareBotPair.second;
         CreatureTemplate const* orig_template = ASSERT_NOTNULL(sObjectMgr->GetCreatureTemplate(orig_entry));
         NpcBotExtras const* orig_extras = ASSERT_NOTNULL(BotDataMgr::SelectNpcBotExtras(orig_entry));
-        uint32 bot_faction = BotDataMgr::GetDefaultFactionForBotRace(orig_extras->race);
+        uint32 bot_faction = BotDataMgr::GetDefaultFactionForBotRaceClass(bot_class, orig_extras->race);
 
         NodeVec const* bot_spawn_nodes;
         TeamId bot_team = BotDataMgr::GetTeamIdForFaction(bot_faction);
@@ -440,7 +440,7 @@ public:
                 for (uint32 entry : kv.second)
                 {
                     NpcBotExtras const* extras = ASSERT_NOTNULL(BotDataMgr::SelectNpcBotExtras(entry));
-                    uint32 bot_faction = BotDataMgr::GetDefaultFactionForBotRace(extras->race);
+                    uint32 bot_faction = BotDataMgr::GetDefaultFactionForBotRaceClass(extras->bclass, extras->race);
                     TeamId bot_team = BotDataMgr::GetTeamIdForFaction(bot_faction);
                     if (teamId == bot_team)
                         ++count;
@@ -553,7 +553,7 @@ public:
                 for (uint32 spareBotId : kv.second)
                 {
                     NpcBotExtras const* orig_extras = ASSERT_NOTNULL(BotDataMgr::SelectNpcBotExtras(spareBotId));
-                    uint32 bot_faction = BotDataMgr::GetDefaultFactionForBotRace(orig_extras->race);
+                    uint32 bot_faction = BotDataMgr::GetDefaultFactionForBotRaceClass(orig_extras->bclass, orig_extras->race);
                     uint32 botTeam = BotDataMgr::GetTeamForFaction(bot_faction);
 
                     if (int32(botTeam) != team)
@@ -3205,7 +3205,7 @@ int32 BotDataMgr::GetBotBaseReputation(Creature const* bot, FactionEntry const* 
     if (bot->IsNPCBotPet())
         bot = bot->GetBotPetAI()->GetPetsOwner();
 
-    uint32 raceMask = GetDefaultFactionForBotRace(bot->GetRace()) == FACTION_TEMPLATE_NEUTRAL_HOSTILE ? 0 : bot->GetRaceMask();
+    uint32 raceMask = GetDefaultFactionForBotRaceClass(bot->GetBotClass(), bot->GetRace()) == FACTION_TEMPLATE_NEUTRAL_HOSTILE ? 0 : bot->GetRaceMask();
     uint32 classMask = bot->GetClassMask();
 
     int32 minRep = 42999;
@@ -3223,8 +3223,11 @@ int32 BotDataMgr::GetBotBaseReputation(Creature const* bot, FactionEntry const* 
     return std::min<int32>(minRep, 0);
 }
 
-uint32 BotDataMgr::GetDefaultFactionForBotRace(uint8 bot_race)
+uint32 BotDataMgr::GetDefaultFactionForBotRaceClass(uint8 bot_class, uint8 bot_race)
 {
+    if (bot_class >= BOT_CLASS_EX_START)
+        return uint32(FACTION_TEMPLATE_NEUTRAL_HOSTILE);
+
     ChrRacesEntry const* rentry = sChrRacesStore.LookupEntry(bot_race);
     return rentry ? rentry->FactionID : uint32(FACTION_TEMPLATE_NEUTRAL_HOSTILE);
 }
