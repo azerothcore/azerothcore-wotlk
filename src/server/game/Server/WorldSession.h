@@ -378,7 +378,6 @@ public:
         char const* format = GetAcoreString(entry);
         if (format)
         {
-            va_list ap;
             char szStr[1024];
             szStr[0] = '\0';
 
