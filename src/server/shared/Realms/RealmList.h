@@ -25,6 +25,17 @@
 #include <memory> // NOTE: this import is NEEDED (even though some IDEs report it as unused)
 #include <vector>
 
+namespace Acore::Asio
+{
+    class IoContext;
+    class SteadyTimer;
+}
+
+namespace boost::system
+{
+    class error_code;
+}
+
 struct RealmBuildInfo
 {
     uint32 Build;
@@ -35,11 +46,6 @@ struct RealmBuildInfo
     std::array<uint8, 20> WindowsHash;
     std::array<uint8, 20> MacHash;
 };
-
-namespace boost::system
-{
-    class error_code;
-}
 
 /// Storage object for the list of realms on the server
 class AC_SHARED_API RealmList
@@ -70,7 +76,7 @@ private:
     std::vector<RealmBuildInfo> _builds;
     RealmMap _realms;
     uint32 _updateInterval{0};
-    std::unique_ptr<Acore::Asio::DeadlineTimer> _updateTimer;
+    std::unique_ptr<Acore::Asio::SteadyTimer> _updateTimer;
     std::unique_ptr<Acore::Asio::Resolver> _resolver;
 };
 

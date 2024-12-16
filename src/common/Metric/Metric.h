@@ -30,7 +30,7 @@
 namespace Acore::Asio
 {
     class IoContext;
-    class DeadlineTimer;
+    class SteadyTimer;
 }
 
 enum MetricDataType
@@ -62,8 +62,8 @@ private:
     std::iostream& GetDataStream() { return *_dataStream; }
     std::unique_ptr<std::iostream> _dataStream;
     MPSCQueue<MetricData> _queuedData;
-    std::unique_ptr<Acore::Asio::DeadlineTimer> _batchTimer;
-    std::unique_ptr<Acore::Asio::DeadlineTimer> _overallStatusTimer;
+    std::unique_ptr<Acore::Asio::SteadyTimer> _batchTimer;
+    std::unique_ptr<Acore::Asio::SteadyTimer> _overallStatusTimer;
     int32 _updateInterval = 0;
     int32 _overallStatusTimerInterval = 0;
     bool _enabled = false;

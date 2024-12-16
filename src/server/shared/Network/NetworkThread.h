@@ -18,7 +18,7 @@
 #ifndef NetworkThread_h__
 #define NetworkThread_h__
 
-#include "DeadlineTimer.h"
+#include "SteadyTimer.h"
 #include "Define.h"
 #include "Errors.h"
 #include "IoContext.h"
@@ -179,7 +179,7 @@ protected:
     {
         LOG_DEBUG("misc", "Network Thread Starting");
 
-        _updateTimer.expires_from_now(boost::posix_time::milliseconds(1));
+        _updateTimer.expires_at(std::chrono::steady_clock::now());
         _updateTimer.async_wait([this](boost::system::error_code const&) { Update(); });
         _ioContext.run();
 
@@ -193,7 +193,7 @@ protected:
         if (_stopped)
             return;
 
-        _updateTimer.expires_from_now(boost::posix_time::milliseconds(1));
+        _updateTimer.expires_at(std::chrono::steady_clock::now());
         _updateTimer.async_wait([this](boost::system::error_code const&) { Update(); });
 
         AddNewSockets();
@@ -230,7 +230,7 @@ private:
 
     Acore::Asio::IoContext _ioContext;
     tcp::socket _acceptSocket;
-    Acore::Asio::DeadlineTimer _updateTimer;
+    Acore::Asio::SteadyTimer _updateTimer;
 
     bool _proxyHeaderReadingEnabled;
 };

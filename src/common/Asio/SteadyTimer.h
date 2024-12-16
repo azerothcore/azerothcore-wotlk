@@ -15,20 +15,23 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef DeadlineTimer_h__
-#define DeadlineTimer_h__
+#ifndef steadytimer_h
+#define steadytimer_h
+/*
+#include <boost/asio/steady_timer.hpp>
+#include <chrono>
 
-#include <boost/asio/deadline_timer.hpp>
-
-#define DeadlineTimerBase boost::asio::basic_deadline_timer<boost::posix_time::ptime, boost::asio::time_traits<boost::posix_time::ptime>, boost::asio::io_context::executor_type>
+#define SteadyTimerBase boost::asio::steady_timer
 
 namespace Acore::Asio
 {
-    class DeadlineTimer : public DeadlineTimerBase
+    class SteadyTimer : public SteadyTimerBase
     {
     public:
-        using DeadlineTimerBase::basic_deadline_timer;
+        // Using the constructor of steady_timer
+        using SteadyTimerBase::steady_timer;
     };
-}
+}*/
 
-#endif // DeadlineTimer_h__
+#endif // steadytimer_h
+
