@@ -83,7 +83,6 @@ public:
 
 public:
     bool HasGlobalCooldown(SpellInfo const* spellInfo) const;
-    uint32 GetGlobalCooldown(SpellInfo const* spellInfo) const;
     void AddGlobalCooldown(SpellInfo const* spellInfo, uint32 gcd);
     void CancelGlobalCooldown(SpellInfo const* spellInfo);
 
