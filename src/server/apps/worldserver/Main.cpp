@@ -31,7 +31,6 @@
 #include "Config.h"
 #include "DatabaseEnv.h"
 #include "DatabaseLoader.h"
-#include "SteadyTimer.h"
 #include "GitRevision.h"
 #include "IoContext.h"
 #include "MapMgr.h"
@@ -101,7 +100,7 @@ public:
     static void Handler(std::weak_ptr<FreezeDetector> freezeDetectorRef, boost::system::error_code const& error);
 
 private:
-    Acore::Asio::SteadyTimer _timer;
+    boost::asio::steady_timer _timer;
     uint32 _worldLoopCounter;
     uint32 _lastChangeMsTime;
     uint32 _maxCoreStuckTimeInMs;

@@ -18,14 +18,14 @@
 #ifndef NetworkThread_h__
 #define NetworkThread_h__
 
-#include "SteadyTimer.h"
 #include "Define.h"
 #include "Errors.h"
 #include "IoContext.h"
 #include "Log.h"
 #include "Socket.h"
-#include <atomic>
 #include <boost/asio/ip/tcp.hpp>
+#include <boost/asio/steady_timer.hpp>
+#include <atomic>
 #include <memory>
 #include <mutex>
 #include <set>
@@ -230,7 +230,7 @@ private:
 
     Acore::Asio::IoContext _ioContext;
     tcp::socket _acceptSocket;
-    Acore::Asio::SteadyTimer _updateTimer;
+    boost::asio::steady_timer _updateTimer;
 
     bool _proxyHeaderReadingEnabled;
 };

@@ -20,6 +20,7 @@
 
 #include "Define.h"
 #include "Realm.h"
+#include <boost/asio/steady_timer.hpp>
 #include <array>
 #include <map>
 #include <memory> // NOTE: this import is NEEDED (even though some IDEs report it as unused)
@@ -28,7 +29,6 @@
 namespace Acore::Asio
 {
     class IoContext;
-    class SteadyTimer;
 }
 
 namespace boost::system
@@ -76,7 +76,7 @@ private:
     std::vector<RealmBuildInfo> _builds;
     RealmMap _realms;
     uint32 _updateInterval{0};
-    std::unique_ptr<Acore::Asio::SteadyTimer> _updateTimer;
+    std::unique_ptr<boost::asio::steady_timer> _updateTimer;
     std::unique_ptr<Acore::Asio::Resolver> _resolver;
 };
 

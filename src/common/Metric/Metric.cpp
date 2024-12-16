@@ -17,7 +17,6 @@
 
 #include "Metric.h"
 #include "Config.h"
-#include "SteadyTimer.h"
 #include "Log.h"
 #include "Strand.h"
 #include "Tokenize.h"
@@ -42,8 +41,8 @@ void Metric::Initialize(std::string const& realmName, Acore::Asio::IoContext& io
 {
     _dataStream = std::make_unique<boost::asio::ip::tcp::iostream>();
     _realmName = FormatInfluxDBTagValue(realmName);
-    _batchTimer = std::make_unique<Acore::Asio::SteadyTimer>(ioContext);
-    _overallStatusTimer = std::make_unique<Acore::Asio::SteadyTimer>(ioContext);
+    _batchTimer = std::make_unique<boost::asio::steady_timer>(ioContext);
+    _overallStatusTimer = std::make_unique<boost::asio::steady_timer>(ioContext);
     _overallStatusLogger = overallStatusLogger;
     LoadFromConfigs();
 }

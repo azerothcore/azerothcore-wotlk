@@ -17,7 +17,6 @@
 
 #include "RealmList.h"
 #include "DatabaseEnv.h"
-#include "SteadyTimer.h"
 #include "Log.h"
 #include "Resolver.h"
 #include "QueryResult.h"
@@ -37,7 +36,7 @@ RealmList* RealmList::Instance()
 void RealmList::Initialize(Acore::Asio::IoContext& ioContext, uint32 updateInterval)
 {
     _updateInterval = updateInterval;
-    _updateTimer = std::make_unique<Acore::Asio::SteadyTimer>(ioContext);
+    _updateTimer = std::make_unique<boost::asio::steady_timer>(ioContext);
     _resolver = std::make_unique<Acore::Asio::Resolver>(ioContext);
 
     LoadBuildInfo();

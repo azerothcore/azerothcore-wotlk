@@ -29,7 +29,6 @@
 #include "Config.h"
 #include "DatabaseEnv.h"
 #include "DatabaseLoader.h"
-#include "SteadyTimer.h"
 #include "IPLocation.h"
 #include "IoContext.h"
 #include "Log.h"
@@ -60,8 +59,8 @@ namespace fs = std::filesystem;
 bool StartDB();
 void StopDB();
 void SignalHandler(std::weak_ptr<Acore::Asio::IoContext> ioContextRef, boost::system::error_code const& error, int signalNumber);
-void KeepDatabaseAliveHandler(std::weak_ptr<Acore::Asio::SteadyTimer> dbPingTimerRef, int32 dbPingInterval, boost::system::error_code const& error);
-void BanExpiryHandler(std::weak_ptr<Acore::Asio::SteadyTimer> banExpiryCheckTimerRef, int32 banExpiryCheckInterval, boost::system::error_code const& error);
+void KeepDatabaseAliveHandler(std::weak_ptr<boost::asio::steady_timer> dbPingTimerRef, int32 dbPingInterval, boost::system::error_code const& error);
+void BanExpiryHandler(std::weak_ptr<boost::asio::steady_timer> banExpiryCheckTimerRef, int32 banExpiryCheckInterval, boost::system::error_code const& error);
 variables_map GetConsoleArguments(int argc, char** argv, fs::path& configFile);
 
 /// Launch the auth server
@@ -178,20 +177,20 @@ int main(int argc, char** argv)
 
     // Enabled a timed callback for handling the database keep alive ping
     int32 dbPingInterval = sConfigMgr->GetOption<int32>("MaxPingTime", 30);
-    std::shared_ptr<Acore::Asio::SteadyTimer> dbPingTimer = std::make_shared<Acore::Asio::SteadyTimer>(*ioContext);
+    std::shared_ptr<boost::asio::steady_timer> dbPingTimer = std::make_shared<boost::asio::steady_timer>(*ioContext);
 
     // Calculate the expiration time
     auto expirationTime = std::chrono::steady_clock::now() + std::chrono::seconds(dbPingInterval);
     dbPingTimer->expires_at(expirationTime);
-    dbPingTimer->async_wait(std::bind(&KeepDatabaseAliveHandler, std::weak_ptr<Acore::Asio::SteadyTimer>(dbPingTimer), dbPingInterval, std::placeholders::_1));
+    dbPingTimer->async_wait(std::bind(&KeepDatabaseAliveHandler, std::weak_ptr<boost::asio::steady_timer>(dbPingTimer), dbPingInterval, std::placeholders::_1));
 
     int32 banExpiryCheckInterval = sConfigMgr->GetOption<int32>("BanExpiryCheckInterval", 60);
-    std::shared_ptr<Acore::Asio::SteadyTimer> banExpiryCheckTimer = std::make_shared<Acore::Asio::SteadyTimer>(*ioContext);
+    std::shared_ptr<boost::asio::steady_timer> banExpiryCheckTimer = std::make_shared<boost::asio::steady_timer>(*ioContext);
 
     // Calculate the expiration time
     auto expirationTimeBanExpiry = std::chrono::steady_clock::now() + std::chrono::seconds(banExpiryCheckInterval);
     banExpiryCheckTimer->expires_at(expirationTimeBanExpiry);
-    banExpiryCheckTimer->async_wait(std::bind(&BanExpiryHandler, std::weak_ptr<Acore::Asio::SteadyTimer>(banExpiryCheckTimer), banExpiryCheckInterval, std::placeholders::_1));
+    banExpiryCheckTimer->async_wait(std::bind(&BanExpiryHandler, std::weak_ptr<boost::asio::steady_timer>(banExpiryCheckTimer), banExpiryCheckInterval, std::placeholders::_1));
 
     // Start the io service worker loop
     ioContext->run();
@@ -244,11 +243,11 @@ void SignalHandler(std::weak_ptr<Acore::Asio::IoContext> ioContextRef, boost::sy
     }
 }
 
-void KeepDatabaseAliveHandler(std::weak_ptr<Acore::Asio::SteadyTimer> dbPingTimerRef, int32 dbPingInterval, boost::system::error_code const& error)
+void KeepDatabaseAliveHandler(std::weak_ptr<boost::asio::steady_timer> dbPingTimerRef, int32 dbPingInterval, boost::system::error_code const& error)
 {
     if (!error)
     {
-        if (std::shared_ptr<Acore::Asio::SteadyTimer> dbPingTimer = dbPingTimerRef.lock())
+        if (std::shared_ptr<boost::asio::steady_timer> dbPingTimer = dbPingTimerRef.lock())
         {
             LOG_INFO("server.authserver", "Ping MySQL to keep connection alive");
             LoginDatabase.KeepAlive();
@@ -261,11 +260,11 @@ void KeepDatabaseAliveHandler(std::weak_ptr<Acore::Asio::SteadyTimer> dbPingTime
     }
 }
 
-void BanExpiryHandler(std::weak_ptr<Acore::Asio::SteadyTimer> banExpiryCheckTimerRef, int32 banExpiryCheckInterval, boost::system::error_code const& error)
+void BanExpiryHandler(std::weak_ptr<boost::asio::steady_timer> banExpiryCheckTimerRef, int32 banExpiryCheckInterval, boost::system::error_code const& error)
 {
     if (!error)
     {
-        if (std::shared_ptr<Acore::Asio::SteadyTimer> banExpiryCheckTimer = banExpiryCheckTimerRef.lock())
+        if (std::shared_ptr<boost::asio::steady_timer> banExpiryCheckTimer = banExpiryCheckTimerRef.lock())
         {
             LoginDatabase.Execute(LoginDatabase.GetPreparedStatement(LOGIN_DEL_EXPIRED_IP_BANS));
             LoginDatabase.Execute(LoginDatabase.GetPreparedStatement(LOGIN_UPD_EXPIRED_ACCOUNT_BANS));

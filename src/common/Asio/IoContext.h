@@ -19,7 +19,6 @@
 #define IoContext_h__
 
 #include <boost/version.hpp>
-
 #include <boost/asio/io_context.hpp>
 #include <boost/asio/post.hpp>
 #define IoContextBaseNamespace boost::asio
