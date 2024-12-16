@@ -1117,6 +1117,37 @@ public:
         float ox, oy, oz;
         _caster->GetPosition(ox, oy, oz);
         DynamicMapTree const& dTree = unit->GetMap()->GetDynamicMapTree();
+
+        // Check if Sindragosa is nearby
+        bool sindragosaNearby = false;
+        std::list<Creature*> creatures;
+        _caster->GetCreatureListWithEntryInGrid(creatures, NPC_SINDRAGOSA, 5.0f);
+        for (Creature* creature : creatures)
+        {
+            if (creature->IsAlive() && creature->IsWithinDistInMap(unit, 5.0f))
+            {
+                sindragosaNearby = true;
+                break;
+            }
+        }
+        
+        // Check if Ice Blocks are nearby
+        bool iceBlockNearby = false;
+        std::list<GameObject*> iceBlocks;
+        _caster->GetGameObjectListWithEntryInGrid(iceBlocks, GO_ICE_BLOCK, 5.0f);
+        for (GameObject* iceBlock : iceBlocks)
+        {
+            if (iceBlock->IsWithinDistInMap(unit, 5.0f))
+            {
+                iceBlockNearby = true;
+                break;
+            }
+        }
+
+        // If both Sindragosa and Ice Block are nearby, target can take damage
+        if (sindragosaNearby && iceBlockNearby)
+            return false;
+        
         return !dTree.isInLineOfSight(unit->GetPositionX(), unit->GetPositionY(), unit->GetPositionZ() + 2.f, ox, oy, oz + 2.f, unit->GetPhaseMask(), VMAP::ModelIgnoreFlags::Nothing);
     }
 
