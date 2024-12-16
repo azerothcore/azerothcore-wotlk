@@ -41,6 +41,16 @@ LocaleConstant GetLocaleByName(const std::string& name)
     return LOCALE_enUS;                                     // including enGB case
 }
 
+const std::string GetNameByLocaleConstant(LocaleConstant localeConstant)
+{
+    if (localeConstant < TOTAL_LOCALES)
+    {
+        return localeNames[localeConstant];
+    }
+
+    return "enUS"; // Default value for unsupported or invalid LocaleConstant
+}
+
 void CleanStringForMysqlQuery(std::string& str)
 {
     std::string::size_type n = 0;
