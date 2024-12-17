@@ -310,6 +310,7 @@ enum EncounterCreditType : uint8
 class Map : public GridRefMgr<NGridType>
 {
     friend class MapReference;
+    friend class ObjectGridLoader;
 public:
     Map(uint32 id, uint32 InstanceId, uint8 SpawnMode, Map* _parent = nullptr);
     ~Map() override;
@@ -699,6 +700,10 @@ private:
     void SendObjectUpdates();
 
 protected:
+    // Type specific code for add/remove to/from grid
+    template<class T>
+    void AddToGrid(T* object, Cell const& cell);
+
     std::mutex Lock;
     std::mutex GridLock;
     std::shared_mutex MMapLock;
@@ -748,10 +753,6 @@ private:
 
     typedef std::multimap<time_t, ScriptAction> ScriptScheduleMap;
     ScriptScheduleMap m_scriptSchedule;
-
-    // Type specific code for add/remove to/from grid
-    template<class T>
-    void AddToGrid(T* object, Cell const& cell);
 
     template<class T>
     void DeleteFromWorld(T*);

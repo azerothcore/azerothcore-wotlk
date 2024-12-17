@@ -22,33 +22,24 @@
 #include "Define.h"
 #include "GridDefines.h"
 
-class ObjectWorldLoader;
-
 class ObjectGridLoader
 {
-    friend class ObjectWorldLoader;
-
 public:
-    ObjectGridLoader(NGridType& grid, Map* map, const Cell& cell)
-        : i_cell(cell), i_grid(grid), i_map(map), i_gameObjects(0), i_creatures(0), i_corpses (0)
+    ObjectGridLoader(NGridType& grid, Map* map)
+        : i_grid(grid), i_map(map)
     {}
 
-    void Visit(GameObjectMapType& m);
-    void Visit(CreatureMapType& m);
-    void Visit(CorpseMapType&) const {}
-    void Visit(DynamicObjectMapType&) const {}
-
-    void LoadN(void);
-
-    template<class T> static void SetObjectCell(T* obj, CellCoord const& cellCoord);
+    void LoadAllCellsInGrid();
 
 private:
-    Cell i_cell;
+    template<class T>
+    void AddObjectHelper(Map*, T* obj);
+
+    void LoadCreatures(CellGuidSet const& guid_set, Map* map);
+    void LoadGameObjects(CellGuidSet const& guid_set, Map* map);
+
     NGridType& i_grid;
     Map* i_map;
-    uint32 i_gameObjects;
-    uint32 i_creatures;
-    uint32 i_corpses;
 };
 
 //Clean up and remove from world

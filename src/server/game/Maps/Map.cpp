@@ -280,9 +280,9 @@ void Map::AddToGrid(T* obj, Cell const& cell)
 {
     NGridType* grid = getNGrid(cell.GridX(), cell.GridY());
     if (obj->IsWorldObject())
-        grid->GetGridType(cell.CellX(), cell.CellY()).template AddWorldObject<T>(obj);
+        grid->AddWorldObject<T>(cell.CellX(), cell.CellY(), obj);
     else
-        grid->GetGridType(cell.CellX(), cell.CellY()).template AddGridObject<T>(obj);
+        grid->AddGridObject<T>(cell.CellX(), cell.CellY(), obj);
 }
 
 template<>
@@ -290,9 +290,9 @@ void Map::AddToGrid(Creature* obj, Cell const& cell)
 {
     NGridType* grid = getNGrid(cell.GridX(), cell.GridY());
     if (obj->IsWorldObject())
-        grid->GetGridType(cell.CellX(), cell.CellY()).AddWorldObject(obj);
+        grid->AddWorldObject(cell.CellX(), cell.CellY(), obj);
     else
-        grid->GetGridType(cell.CellX(), cell.CellY()).AddGridObject(obj);
+        grid->AddGridObject(cell.CellX(), cell.CellY(), obj);
 
     obj->SetCurrentCell(cell);
 }
@@ -301,7 +301,7 @@ template<>
 void Map::AddToGrid(GameObject* obj, Cell const& cell)
 {
     NGridType* grid = getNGrid(cell.GridX(), cell.GridY());
-    grid->GetGridType(cell.CellX(), cell.CellY()).AddGridObject(obj);
+    grid->AddGridObject(cell.CellX(), cell.CellY(), obj);
 
     obj->SetCurrentCell(cell);
 }
@@ -311,9 +311,9 @@ void Map::AddToGrid(DynamicObject* obj, Cell const& cell)
 {
     NGridType* grid = getNGrid(cell.GridX(), cell.GridY());
     if (obj->IsWorldObject())
-        grid->GetGridType(cell.CellX(), cell.CellY()).AddWorldObject(obj);
+        grid->AddWorldObject(cell.CellX(), cell.CellY(), obj);
     else
-        grid->GetGridType(cell.CellX(), cell.CellY()).AddGridObject(obj);
+        grid->AddGridObject(cell.CellX(), cell.CellY(), obj);
 
     obj->SetCurrentCell(cell);
 }
@@ -331,9 +331,9 @@ void Map::AddToGrid(Corpse* obj, Cell const& cell)
     if (grid->isGridObjectDataLoaded())
     {
         if (obj->IsWorldObject())
-            grid->GetGridType(cell.CellX(), cell.CellY()).AddWorldObject(obj);
+            grid->AddWorldObject(cell.CellX(), cell.CellY(), obj);
         else
-            grid->GetGridType(cell.CellX(), cell.CellY()).AddGridObject(obj);
+            grid->AddGridObject(cell.CellX(), cell.CellY(), obj);
     }
 }
 
@@ -362,18 +362,16 @@ void Map::SwitchGridContainers(Creature* obj, bool on)
     NGridType* ngrid = getNGrid(cell.GridX(), cell.GridY());
     ASSERT(ngrid);
 
-    GridType& grid = ngrid->GetGridType(cell.CellX(), cell.CellY());
-
     obj->RemoveFromGrid(); //This step is not really necessary but we want to do ASSERT in remove/add
 
     if (on)
     {
-        grid.AddWorldObject(obj);
+        ngrid->AddWorldObject(cell.CellX(), cell.CellY(), obj);
         AddWorldObject(obj);
     }
     else
     {
-        grid.AddGridObject(obj);
+        ngrid->AddGridObject(cell.CellX(), cell.CellY(), obj);
         RemoveWorldObject(obj);
     }
 
@@ -400,18 +398,16 @@ void Map::SwitchGridContainers(GameObject* obj, bool on)
     NGridType* ngrid = getNGrid(cell.GridX(), cell.GridY());
     ASSERT(ngrid);
 
-    GridType& grid = ngrid->GetGridType(cell.CellX(), cell.CellY());
-
     obj->RemoveFromGrid(); //This step is not really necessary but we want to do ASSERT in remove/add
 
     if (on)
     {
-        grid.AddWorldObject(obj);
+        ngrid->AddWorldObject(cell.CellX(), cell.CellY(), obj);
         AddWorldObject(obj);
     }
     else
     {
-        grid.AddGridObject(obj);
+        ngrid->AddGridObject(cell.CellX(), cell.CellY(), obj);
         RemoveWorldObject(obj);
     }
 }
@@ -447,7 +443,7 @@ void Map::EnsureGridCreated_i(const GridCoord& p)
     if (!getNGrid(p.x_coord, p.y_coord))
     {
         // pussywizard: moved setNGrid to the end of the function
-        NGridType* ngt = new NGridType(p.x_coord * MAX_NUMBER_OF_GRIDS + p.y_coord, p.x_coord, p.y_coord);
+        NGridType* ngt = new NGridType(p.y_coord * MAX_NUMBER_OF_GRIDS + p.x_coord, p.x_coord, p.y_coord);
 
         // build a linkage between this map and NGridType
         buildNGridLinkage(ngt); // pussywizard: getNGrid(x, y) changed to: ngt
@@ -475,18 +471,15 @@ bool Map::EnsureGridLoaded(const Cell& cell)
     ASSERT(grid);
     if (!isGridObjectDataLoaded(cell.GridX(), cell.GridY()))
     {
-        //if (!isGridObjectDataLoaded(cell.GridX(), cell.GridY()))
-        //{
         LOG_DEBUG("maps", "Loading grid[{}, {}] for map {} instance {}", cell.GridX(), cell.GridY(), GetId(), i_InstanceId);
 
         setGridObjectDataLoaded(true, cell.GridX(), cell.GridY());
 
-        ObjectGridLoader loader(*grid, this, cell);
-        loader.LoadN();
+        ObjectGridLoader loader(*grid, this);
+        loader.LoadAllCellsInGrid();
 
         Balance();
         return true;
-        //}
     }
 
     return false;
