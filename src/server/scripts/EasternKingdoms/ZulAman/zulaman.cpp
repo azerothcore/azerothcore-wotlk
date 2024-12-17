@@ -586,7 +586,6 @@ private:
 
 enum AmanishiTempest
 {
-    ACTION_START_GAUNTLET   = 1,
     GROUP_AKILZON_GAUNTLET  = 1,
     SPELL_SUMMON_EAGLE      = 43487,
     SPELL_SUMMON_WARRIOR    = 43486,
@@ -601,16 +600,16 @@ struct npc_amanishi_tempest : public ScriptedAI
     {
         _summons.DespawnAll();
         scheduler.CancelAll();
-        scheduler.Schedule(9s, 11s, [this](TaskContext context)
-        {
-            DoCastVictim(SPELL_THUNDERCLAP);
-            context.Repeat();
-        });
     }
 
     void JustEngagedWith(Unit* /*who*/) override
     {
         scheduler.CancelGroup(GROUP_AKILZON_GAUNTLET);
+        scheduler.Schedule(9s, 11s, [this](TaskContext context)
+        {
+            DoCastVictim(SPELL_THUNDERCLAP);
+            context.Repeat();
+        });
     }
 
     void JustSummoned(Creature* summon) override
@@ -628,8 +627,15 @@ struct npc_amanishi_tempest : public ScriptedAI
 
     void DoAction(int32 action) override
     {
-        if (action == ACTION_START_GAUNTLET)
+        if (action == ACTION_START_AKILZON_GAUNTLET)
             ScheduleEvents();
+        else if (action == ACTION_RESET_AKILZON_GAUNTLET)
+            Reset();
+    }
+
+    void SummonedCreatureEvade(Creature* /*summon*/) override
+    {
+        EnterEvadeMode(EVADE_REASON_OTHER);
     }
 
     void EnterEvadeMode(EvadeReason why) override
@@ -656,11 +662,6 @@ struct npc_amanishi_tempest : public ScriptedAI
     void UpdateAI(uint32 diff) override
     {
         scheduler.Update(diff);
-        if (!me->IsEngaged())
-            return;
-        Unit* victim = me->SelectVictim();
-        if (!victim || me->GetExactDist(victim) > me->GetAggroRange(victim))
-            return;
         ScriptedAI::UpdateAI(diff);
     }
 
