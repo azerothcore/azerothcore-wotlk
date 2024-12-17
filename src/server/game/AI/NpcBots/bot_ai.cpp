@@ -223,6 +223,7 @@ bot_ai::bot_ai(Creature* creature) : CreatureAI(creature),
     lastdiff = 0;
     _energyFraction = 0.f;
     _updateTimerMedium = 0;
+    _updateTimerLong = urand(15000, 25000);
     _updateTimerEx1 = urand(12000, 15000);
     _updateTimerEx2 = urand(8000, 12000);
     checkAurasTimer = 0;
@@ -18030,6 +18031,16 @@ bool bot_ai::GlobalUpdate(uint32 diff)
     if (IsDuringTeleport())
         return false;
 
+    if (_updateTimerLong <= diff)
+    {
+        _updateTimerLong = urand(15000, 25000);
+
+        //Long-timed updates
+
+        if (me->IsInWorld() && me->IsAlive() && me->IsInCombat() && !me->GetMap()->IsDungeon() && (IAmFree() || !master->IsInCombat()))
+            me->getHostileRefMgr().deleteReferencesOutOfRange(me->GetMap()->GetVisibilityRange());
+    }
+
     if (_updateTimerMedium <= diff)
     {
         _updateTimerMedium = 500;
@@ -18785,6 +18796,7 @@ void bot_ai::CommonTimers(uint32 diff)
     else if (_groupUpdateTimer)     _groupUpdateTimer = 0;
 
     if (_updateTimerMedium > diff)  _updateTimerMedium -= diff;
+    if (_updateTimerLong > diff)    _updateTimerLong -= diff;
     if (_updateTimerEx1 > diff)     _updateTimerEx1 -= diff;
     if (_updateTimerEx2 > diff)     _updateTimerEx2 -= diff;
 
