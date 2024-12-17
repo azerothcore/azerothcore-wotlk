@@ -118,6 +118,9 @@ struct boss_akilzon : public BossAI
             DoCast(target, SPELL_ELECTRICAL_STORM); // storm cyclon + visual
             target->CastSpell(target, SPELL_ELECTRICAL_STORM_AREA, true); // cloud visual
 
+            if (DynamicObject* dynObj = target->GetDynObject(SPELL_ELECTRICAL_STORM_AREA))
+                dynObj->SetDuration(8500);
+
             float x, y, z;
             target->GetPosition(x, y, z);
             target->GetMotionMaster()->MoveJump(x, y, target->GetPositionZ() + 16.0f, 1.0f, 1.0f);
