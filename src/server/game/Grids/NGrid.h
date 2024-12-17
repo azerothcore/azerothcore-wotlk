@@ -39,19 +39,18 @@ public:
     NGrid(uint32 id, int32 x, int32 y)
         : i_gridId(id), i_x(x), i_y(y), i_GridObjectDataLoaded(false)
     {
-        i_cells.resize(N * N);
     }
 
     GridType* GetGridType(const uint32 x, const uint32 y)
     {
         ASSERT(x < N && y < N);
-        return i_cells[x + y].get();
+        return i_cells[x][y].get();
     }
 
     [[nodiscard]] GridType const* GetGridType(const uint32 x, const uint32 y) const
     {
         ASSERT(x < N && y < N);
-        return i_cells[x + y].get();
+        return i_cells[x][y].get();
     }
 
     [[nodiscard]] uint32 GetGridId() const { return i_gridId; }
@@ -89,8 +88,9 @@ public:
     template<class T, class TT>
     void VisitAllGrids(TypeContainerVisitor<T, TypeMapContainer<TT> >& visitor)
     {
-        for (auto& cell : i_cells)
-            cell->Visit(visitor);
+        for (auto& cellX : i_cells)
+            for (auto& cellY : cellX)
+                cellY->Visit(visitor);
     }
 
     // Visit a single Grid (cell) in NGrid (grid)
@@ -110,9 +110,9 @@ private:
     {
         GridType* cell = GetGridType(x, y);
         if (!cell)
-            i_cells[x + y] = std::make_unique<GridType>();
+            i_cells[x][y] = std::make_unique<GridType>();
 
-        return *i_cells[x + y];
+        return *i_cells[x][y];
     }
 
     uint32 i_gridId;
@@ -120,6 +120,6 @@ private:
     int32 i_x;
     int32 i_y;
     bool i_GridObjectDataLoaded;
-    std::vector<std::unique_ptr<GridType>> i_cells;
+    std::array<std::array<std::unique_ptr<GridType>, N>, N> i_cells; // N * N array
 };
 #endif

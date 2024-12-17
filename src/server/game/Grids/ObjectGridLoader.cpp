@@ -37,7 +37,6 @@ void ObjectGridLoader::AddObjectHelper(Map* map, Creature* obj)
     Cell cell(cellCoord);
 
     map->AddToGrid(obj, cell);
-    obj->SetCurrentCell(cell);
     obj->AddToWorld();
     if (obj->isActiveObject())
         map->AddToActive(obj);
@@ -50,7 +49,6 @@ void ObjectGridLoader::AddObjectHelper(Map* map, GameObject* obj)
     Cell cell(cellCoord);
 
     map->AddToGrid(obj, cell);
-    obj->SetCurrentCell(cell);
     obj->AddToWorld();
     if (obj->isActiveObject())
         map->AddToActive(obj);
