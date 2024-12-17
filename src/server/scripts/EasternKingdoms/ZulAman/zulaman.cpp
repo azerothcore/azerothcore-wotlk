@@ -608,6 +608,11 @@ struct npc_amanishi_tempest : public ScriptedAI
         });
     }
 
+    void JustEngagedWith(Unit* /*who*/) override
+    {
+        scheduler.CancelGroup(GROUP_AKILZON_GAUNTLET);
+    }
+
     void JustSummoned(Creature* summon) override
     {
         _summons.Summon(summon);
@@ -635,7 +640,6 @@ struct npc_amanishi_tempest : public ScriptedAI
 
     void ScheduleEvents()
     {
-        me->SetInCombatWithZone();
         scheduler.Schedule(29s, 53s, GROUP_AKILZON_GAUNTLET, [this](TaskContext context)
         {
             for (uint8 i = 0; i < 5; ++i)
