@@ -77,7 +77,7 @@ void AutobroadcastMgr::LoadAutobroadcastsLocalized()
     uint32 realmId = sConfigMgr->GetOption<int32>("RealmID", 0);
 
     if (_autobroadcasts.size() == 0)
-        return;     
+        return;
 
     LoginDatabasePreparedStatement* stmt = LoginDatabase.GetPreparedStatement(LOGIN_SEL_AUTOBROADCAST_LOCALIZED);
     stmt->SetData(0, realmId);
@@ -198,7 +198,7 @@ void AutobroadcastMgr::SendWorldAnnouncement(uint8 textId)
 
 void AutobroadcastMgr::SendNotificationAnnouncement(uint8 textId)
 {
-    for (const auto& sessionPair : sWorld->GetAllSessions())
+    for (auto const& sessionPair : sWorld->GetAllSessions())
     {
         WorldSession* session = sessionPair.second;
 
@@ -236,4 +236,3 @@ void AutobroadcastMgr::SendNotificationAnnouncement(uint8 textId)
         }
     }
 }
-
