@@ -113,8 +113,7 @@ void AutobroadcastMgr::SendAutobroadcasts()
 
     uint32 weight = 0;
     AutobroadcastsWeightMap selectionWeights;
-
-    int textId;
+    uint8 textId = 0;;
 
     for (AutobroadcastsWeightMap::const_iterator it = _autobroadcastsWeights.begin(); it != _autobroadcastsWeights.end(); ++it)
     {
