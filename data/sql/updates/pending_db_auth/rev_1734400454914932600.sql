@@ -1,5 +1,5 @@
-DROP TABLE IF EXISTS `autobroadcast_localized`;
-CREATE TABLE `autobroadcast_localized` (
+DROP TABLE IF EXISTS `autobroadcast_locale`;
+CREATE TABLE `autobroadcast_locale` (
   `realmid` INT NOT NULL,
   `id` INT NOT NULL,
   `locale` VARCHAR(4) NOT NULL,
