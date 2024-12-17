@@ -34,17 +34,23 @@ public:
     static AutobroadcastMgr* instance();
 
     void LoadAutobroadcasts();
+    void LoadAutobroadcastsLocalized();
     void SendAutobroadcasts();
 
 private:
-    void SendWorldAnnouncement(std::string msg);
-    void SendNotificationAnnouncement(std::string msg);
+    void SendWorldAnnouncement(uint8 textId);
+    void SendNotificationAnnouncement(uint8 textId);
 
     typedef std::map<uint8, std::string> AutobroadcastsMap;
     typedef std::map<uint8, uint8> AutobroadcastsWeightMap;
 
-    AutobroadcastsMap _autobroadcasts;
-    AutobroadcastsWeightMap _autobroadcastsWeights;
+    // New typedef for localized autobroadcasts
+    typedef std::map<LocaleConstant, std::string> LocalizedMessagesMap;
+    typedef std::map<uint8, LocalizedMessagesMap> LocalizedAutobroadcastsMap;
+
+    AutobroadcastsMap _autobroadcasts;                  // Default messages
+    AutobroadcastsWeightMap _autobroadcastsWeights;    // Weights for each message
+    LocalizedAutobroadcastsMap _localizedAutobroadcasts; // Localized messages
 
     AnnounceType _announceType;
 };
