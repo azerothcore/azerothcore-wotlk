@@ -35,6 +35,15 @@ class AuctionHouseSearcher;
 #define MAX_AUCTION_ITEMS 160
 #define MAX_AUCTIONS_PER_PAGE 50
 #define AUCTION_SEARCH_DELAY 300
+
+/*
+    The max allowable single packet size in 3.3.5 client protocol is 0x7FFFFF. A single BuildAuctionInfo structure
+    has a size of 148 bytes. 148 * 55000 = 8140000 which gives us just under the max size of 8388607 with a little
+    bit of margin.
+
+    Reference: https://wowpedia.fandom.com/wiki/API_QueryAuctionItems
+    "In 4.0.1, getAll mode only fetches up to 42554 items. This is usually adequate, but high-population realms might have more."
+*/
 #define MAX_GETALL_RETURN 55000
 
 enum AuctionError
