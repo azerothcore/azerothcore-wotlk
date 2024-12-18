@@ -992,6 +992,7 @@ public:
                                 c->AI()->Talk(SAY_STAGE_2_02a);
                             events.RescheduleEvent(EVENT_SCENE_203, 18000);
                         }
+                        events.RescheduleEvent(EVENT_SUMMON_CHAMPIONS, 2500);
                         break;
                     }
                 case EVENT_SCENE_203:
@@ -1017,7 +1018,6 @@ public:
                             events.RescheduleEvent(EVENT_SCENE_205, 5000);
                         }
 
-                        events.RescheduleEvent(EVENT_SUMMON_CHAMPIONS, 2500);
                         break;
                     }
                 case EVENT_SCENE_205:
@@ -1093,26 +1093,30 @@ public:
                             {
                                 NPC_ChampionGUIDs.push_back(pTemp->GetGUID());
                                 pTemp->SetHomePosition((TeamIdInInstance == TEAM_ALLIANCE ? FactionChampionLoc[pos2].GetPositionX() : (Locs[LOC_CENTER].GetPositionX() * 2 - FactionChampionLoc[pos2].GetPositionX())), FactionChampionLoc[pos2].GetPositionY(), FactionChampionLoc[pos2].GetPositionZ(), 0.0f);
-                                pTemp->GetMotionMaster()->MoveJump((TeamIdInInstance == TEAM_ALLIANCE ? FactionChampionLoc[pos2].GetPositionX() : (Locs[LOC_CENTER].GetPositionX() * 2 - FactionChampionLoc[pos2].GetPositionX())), FactionChampionLoc[pos2].GetPositionY(), FactionChampionLoc[pos2].GetPositionZ(), 20.0f, 20.0f);
+                                //pTemp->GetMotionMaster()->MoveJump((TeamIdInInstance == TEAM_ALLIANCE ? FactionChampionLoc[pos2].GetPositionX() : (Locs[LOC_CENTER].GetPositionX() * 2 - FactionChampionLoc[pos2].GetPositionX())), FactionChampionLoc[pos2].GetPositionY(), FactionChampionLoc[pos2].GetPositionZ(), 20.0f, 20.0f);
                             }
                             ++pos2;
                         }
 
                         HandleGameObject(GO_EnterGateGUID, false);
-                        events.RescheduleEvent(EVENT_CHAMPIONS_ATTACK, 4000);
+                        events.RescheduleEvent(EVENT_CHAMPIONS_ATTACK, 24000);
                         break;
                     }
                 case EVENT_CHAMPIONS_ATTACK:
                     {
-                        for (ObjectGuid const& guid : NPC_ChampionGUIDs)
+                        uint8 pos2 = 10;
+                        for (ObjectGuid const& guid : NPC_ChampionGUIDs) {
                             if (Creature* c = instance->GetCreature(guid))
                             {
                                 c->SetReactState(REACT_AGGRESSIVE);
                                 c->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
                                 c->RemoveUnitMovementFlag(MOVEMENTFLAG_WALKING);
+                                c->GetMotionMaster()->MoveJump((TeamIdInInstance == TEAM_ALLIANCE ? FactionChampionLoc[pos2].GetPositionX() : (Locs[LOC_CENTER].GetPositionX() * 2 - FactionChampionLoc[pos2].GetPositionX())), FactionChampionLoc[pos2].GetPositionY(), FactionChampionLoc[pos2].GetPositionZ(), 20.0f, 20.0f);
                                 //if (Unit* target = c->SelectNearestTarget(200.0f))
                                 //  c->AI()->AttackStart(target);
                             }
+                            ++pos2;
+                        }
                         Map::PlayerList const& pl = instance->GetPlayers();
                         for (Map::PlayerList::const_iterator itr = pl.begin(); itr != pl.end(); ++itr)
                             itr->GetSource()->AddToNotify(NOTIFY_AI_RELOCATION);
