@@ -23,16 +23,11 @@ DatabaseWorker::DatabaseWorker(ProducerConsumerQueue<SQLOperation*>* newQueue, M
 {
     _connection = connection;
     _queue = newQueue;
-    _cancelationToken = false;
     _workerThread = std::thread(&DatabaseWorker::WorkerThread, this);
 }
 
 DatabaseWorker::~DatabaseWorker()
 {
-    _cancelationToken = true;
-
-    _queue->Cancel();
-
     _workerThread.join();
 }
 
@@ -47,7 +42,7 @@ void DatabaseWorker::WorkerThread()
 
         _queue->WaitAndPop(operation);
 
-        if (_cancelationToken || !operation)
+        if (!operation)
             return;
 
         operation->SetConnection(_connection);
