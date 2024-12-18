@@ -25,24 +25,7 @@
 #include "Transport.h"
 
 template <class T>
-void ObjectGridLoader::AddObjectHelper(Map* /*map*/, T* obj)
-{
-}
-
-template <>
-void ObjectGridLoader::AddObjectHelper(Map* map, Creature* obj)
-{
-    CellCoord cellCoord = Acore::ComputeCellCoord(obj->GetPositionX(), obj->GetPositionY());
-    Cell cell(cellCoord);
-
-    map->AddToGrid(obj, cell);
-    obj->AddToWorld();
-    if (obj->isActiveObject())
-        map->AddToActive(obj);
-}
-
-template <>
-void ObjectGridLoader::AddObjectHelper(Map* map, GameObject* obj)
+void ObjectGridLoader::AddObjectHelper(Map* map, T* obj)
 {
     CellCoord cellCoord = Acore::ComputeCellCoord(obj->GetPositionX(), obj->GetPositionY());
     Cell cell(cellCoord);

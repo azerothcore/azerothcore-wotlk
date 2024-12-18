@@ -34,7 +34,7 @@ public:
 
 private:
     template<class T>
-    void AddObjectHelper(Map*, T* obj);
+    void AddObjectHelper(Map* map, T* obj);
 
     void LoadCreatures(CellGuidSet const& guid_set, Map* map);
     void LoadGameObjects(CellGuidSet const& guid_set, Map* map);
