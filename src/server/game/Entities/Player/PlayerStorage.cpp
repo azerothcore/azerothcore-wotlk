@@ -4059,7 +4059,6 @@ void Player::SendEquipError(InventoryResult msg, Item* pItem, Item* pItem2, uint
         }
     }
     GetSession()->SendPacket(&data);
-    PlayDirectSound(QUEST_SOUND_FAILURE); // Play failure sound
 }
 
 void Player::SendBuyError(BuyResult msg, Creature* creature, uint32 item, uint32 param)
