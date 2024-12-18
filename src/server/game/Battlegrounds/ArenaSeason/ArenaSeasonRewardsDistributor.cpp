@@ -52,7 +52,7 @@ void ArenaSeasonTeamRewarderImpl::RewardWithMail(ArenaTeam* arenaTeam, ArenaSeas
         Player* player = ObjectAccessor::FindPlayer(member.Guid);
 
         auto draft = rewardGroup.rewardMailTemplateID > 0 ?
-            MailDraft(rewardGroup.rewardMailTemplateID) :
+            MailDraft(rewardGroup.rewardMailTemplateID, false) :
             MailDraft(rewardGroup.rewardMailSubject, rewardGroup.rewardMailBody);
 
         if (rewardGroup.goldReward > 0)
