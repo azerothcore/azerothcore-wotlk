@@ -247,7 +247,7 @@ void Metric::ScheduleSend()
 {
     if (_enabled)
     {
-        _batchTimer->expires_from_now(boost::posix_time::seconds(_updateInterval));
+        _batchTimer->expires_after(std::chrono::seconds(_updateInterval));
         _batchTimer->async_wait(std::bind(&Metric::SendBatch, this));
     }
     else
@@ -266,7 +266,7 @@ void Metric::ScheduleSend()
 void Metric::Unload()
 {
     // Send what's queued only if IoContext is stopped (so only on shutdown)
-    if (_enabled && Acore::Asio::get_io_context(*_batchTimer).stopped())
+    if (_enabled && Acore::Asio::get_io_context(_batchTimer).stopped())
     {
         _enabled = false;
         SendBatch();
@@ -280,7 +280,7 @@ void Metric::ScheduleOverallStatusLog()
 {
     if (_enabled)
     {
-        _overallStatusTimer->expires_from_now(boost::posix_time::seconds(_overallStatusTimerInterval));
+        _overallStatusTimer->expires_after(std::chrono::seconds(_overallStatusTimerInterval));
         _overallStatusTimer->async_wait([this](const boost::system::error_code&)
         {
             _overallStatusTimerTriggered = true;

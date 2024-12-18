@@ -180,12 +180,12 @@ int main(int argc, char** argv)
     // Enabled a timed callback for handling the database keep alive ping
     int32 dbPingInterval = sConfigMgr->GetOption<int32>("MaxPingTime", 30);
     std::shared_ptr<Acore::Asio::DeadlineTimer> dbPingTimer = std::make_shared<Acore::Asio::DeadlineTimer>(*ioContext);
-    dbPingTimer->expires_from_now(boost::posix_time::minutes(dbPingInterval));
+    dbPingTimer->expires_after(std::chrono::minutes(dbPingInterval));
     dbPingTimer->async_wait(std::bind(&KeepDatabaseAliveHandler, std::weak_ptr<Acore::Asio::DeadlineTimer>(dbPingTimer), dbPingInterval, std::placeholders::_1));
 
     int32 banExpiryCheckInterval = sConfigMgr->GetOption<int32>("BanExpiryCheckInterval", 60);
     std::shared_ptr<Acore::Asio::DeadlineTimer> banExpiryCheckTimer = std::make_shared<Acore::Asio::DeadlineTimer>(*ioContext);
-    banExpiryCheckTimer->expires_from_now(boost::posix_time::seconds(banExpiryCheckInterval));
+    banExpiryCheckTimer->expires_after(std::chrono::seconds(banExpiryCheckInterval));
     banExpiryCheckTimer->async_wait(std::bind(&BanExpiryHandler, std::weak_ptr<Acore::Asio::DeadlineTimer>(banExpiryCheckTimer), banExpiryCheckInterval, std::placeholders::_1));
 
     // Start the io service worker loop
@@ -247,7 +247,7 @@ void KeepDatabaseAliveHandler(std::weak_ptr<Acore::Asio::DeadlineTimer> dbPingTi
         {
             LoginDatabase.KeepAlive();
 
-            dbPingTimer->expires_from_now(boost::posix_time::minutes(dbPingInterval));
+            dbPingTimer->expires_after(std::chrono::minutes(dbPingInterval));
             dbPingTimer->async_wait(std::bind(&KeepDatabaseAliveHandler, dbPingTimerRef, dbPingInterval, std::placeholders::_1));
         }
     }
@@ -262,7 +262,7 @@ void BanExpiryHandler(std::weak_ptr<Acore::Asio::DeadlineTimer> banExpiryCheckTi
             LoginDatabase.Execute(LoginDatabase.GetPreparedStatement(LOGIN_DEL_EXPIRED_IP_BANS));
             LoginDatabase.Execute(LoginDatabase.GetPreparedStatement(LOGIN_UPD_EXPIRED_ACCOUNT_BANS));
 
-            banExpiryCheckTimer->expires_from_now(boost::posix_time::seconds(banExpiryCheckInterval));
+            banExpiryCheckTimer->expires_after(std::chrono::seconds(banExpiryCheckInterval));
             banExpiryCheckTimer->async_wait(std::bind(&BanExpiryHandler, banExpiryCheckTimerRef, banExpiryCheckInterval, std::placeholders::_1));
         }
     }

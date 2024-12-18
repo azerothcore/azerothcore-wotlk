@@ -19,21 +19,22 @@
 #define Strand_h__
 
 #include "IoContext.h"
-#include <boost/asio/bind_executor.hpp>
 #include <boost/asio/strand.hpp>
+#include <boost/asio/bind_executor.hpp>
 
 namespace Acore::Asio
 {
-    /**
-        Hack to make it possible to forward declare strand (which is a inner class)
-    */
-    class Strand : public IoContextBaseNamespace::IoContextBase::strand
-    {
-    public:
-        Strand(IoContext& ioContext) : IoContextBaseNamespace::IoContextBase::strand(ioContext) { }
-    };
+  /**
+      Wrapper for boost::asio::strand to make it possible to forward declare it.
+  */
+  class Strand : public boost::asio::strand<boost::asio::io_context::executor_type>
+  {
+  public:
+    Strand(IoContext& ioContext) : boost::asio::strand<boost::asio::io_context::executor_type>(ioContext.get_executor()) { }
+  };
 
-    using boost::asio::bind_executor;
+  // Using the actual boost::asio::bind_executor
+  using boost::asio::bind_executor;
 }
 
 #endif // Strand_h__
