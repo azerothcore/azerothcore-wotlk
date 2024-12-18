@@ -1237,7 +1237,7 @@ class spell_hun_lock_and_load : public AuraScript
             return;
         }
 
-        if (!roll_chance_i(aurEff->GetAmount()))
+        if (!roll_chance_i(aurEff->GetAmount() * 5))
         {
             return;
         }
