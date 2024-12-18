@@ -4810,7 +4810,7 @@ void Player::DurabilityPointsLossAll(int32 points, bool inventory)
             std::shared_ptr<Bag> pBag = nullptr;
             if (auto item = GetItemByPos(INVENTORY_SLOT_BAG_0, i))
             {
-                pBag = std::move(item->ToBag());
+                pBag = item->ToBag();
             }
 
             if (pBag == nullptr)

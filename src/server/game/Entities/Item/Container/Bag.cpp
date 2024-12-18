@@ -34,7 +34,7 @@ Bag::~Bag()
 {
     for (uint32 i = 0; i < MAX_BAG_SIZE; ++i)
     {
-        auto item = m_bagslot[i];
+        auto item = m_bagslot.at(i);
         if (item == nullptr || !item->IsInWorld())
         {
             continue;
@@ -57,19 +57,23 @@ void Bag::AddToWorld()
 {
     Item::AddToWorld();
 
-    for (const auto item : m_bagslot)
+    for (uint32 i = 0; i < GetBagSize(); ++i)
     {
-        if (item != nullptr)
+        if (const auto item = m_bagslot.at(i))
+        {
             item->AddToWorld();
+        }
     }
 }
 
 void Bag::RemoveFromWorld()
 {
-    for (const auto item : m_bagslot)
+    for (uint32 i = 0; i < GetBagSize(); ++i)
     {
-        if (item != nullptr)
+        if (const auto item = m_bagslot.at(i))
+        {
             item->RemoveFromWorld();
+        }
     }
 
     Item::RemoveFromWorld();
@@ -123,7 +127,7 @@ bool Bag::LoadFromDB(ObjectGuid::LowType guid, ObjectGuid owner_guid, const Fiel
     for (uint8 i = 0; i < MAX_BAG_SIZE; ++i)
     {
         SetGuidValue(CONTAINER_FIELD_SLOT_1 + (i * 2), ObjectGuid::Empty);
-        m_bagslot[i].reset();
+        m_bagslot.at(i).reset();
     }
 
     return true;
@@ -178,8 +182,10 @@ void Bag::BuildCreateUpdateBlockForPlayer(UpdateData* data, Player* target)
     Item::BuildCreateUpdateBlockForPlayer(data, target);
 
     for (uint32 i = 0; i < GetBagSize(); ++i)
-        if (m_bagslot[i])
-            m_bagslot[i]->BuildCreateUpdateBlockForPlayer(data, target);
+    {
+        if (const auto pItem = m_bagslot.at(i))
+            pItem->BuildCreateUpdateBlockForPlayer(data, target);
+    }
 }
 
 bool Bag::IsEmpty() const
@@ -192,7 +198,7 @@ uint32 Bag::GetItemCount(uint32 item, const std::shared_ptr<Item> ignoreItem /*=
     uint32 count = 0;
     for (uint32 i = 0; i < GetBagSize(); ++i)
     {
-        const auto pItem = m_bagslot[i];
+        const auto pItem = m_bagslot.at(i);
         if (pItem && pItem != ignoreItem && pItem->GetEntry() == item)
             count += pItem->GetCount();
     }
@@ -201,7 +207,7 @@ uint32 Bag::GetItemCount(uint32 item, const std::shared_ptr<Item> ignoreItem /*=
     {
         for (uint32 i = 0; i < GetBagSize(); ++i)
         {
-            const auto pItem = m_bagslot[i];
+            const auto pItem = m_bagslot.at(i);
             if (pItem != nullptr && pItem != ignoreItem && pItem->GetTemplate()->Socket[0].Color)
                 count += pItem->GetGemCountWithID(item);
         }
@@ -213,8 +219,9 @@ uint32 Bag::GetItemCount(uint32 item, const std::shared_ptr<Item> ignoreItem /*=
 uint32 Bag::GetItemCountWithLimitCategory(uint32 limitCategory, const std::shared_ptr<Item> ignoreItem /*= nullptr*/) const
 {
     uint32 count = 0;
-    for (const auto pItem : m_bagslot)
+    for (uint32 i = 0; i < GetBagSize(); ++i)
     {
+        const auto pItem = m_bagslot.at(i);
         if (pItem == nullptr || pItem == ignoreItem)
         {
             continue;
@@ -230,9 +237,11 @@ uint32 Bag::GetItemCountWithLimitCategory(uint32 limitCategory, const std::share
 uint8 Bag::GetSlotByItemGUID(ObjectGuid guid) const
 {
     for (uint32 i = 0; i < GetBagSize(); ++i)
-        if (m_bagslot[i] != 0)
-            if (m_bagslot[i]->GetGUID() == guid)
-                return i;
+    {
+        const auto pItem = m_bagslot.at(i);
+        if (pItem != nullptr && pItem->GetGUID() == guid)
+            return i;
+    }
 
     return NULL_SLOT;
 }
