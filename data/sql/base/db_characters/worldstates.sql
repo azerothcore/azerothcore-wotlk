@@ -1,8 +1,8 @@
--- MySQL dump 10.13  Distrib 8.4.1, for Win64 (x86_64)
+-- MySQL dump 10.13  Distrib 8.0.34, for Win64 (x86_64)
 --
 -- Host: 127.0.0.1    Database: acore_characters
 -- ------------------------------------------------------
--- Server version	8.4.1
+-- Server version	8.0.34
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
 /*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
@@ -36,7 +36,7 @@ LOCK TABLES `worldstates` WRITE;
 /*!40000 ALTER TABLE `worldstates` DISABLE KEYS */;
 INSERT INTO `worldstates` VALUES
 (1,0,NULL),
-(2,0,NULL),
+(2,1734471110,NULL),
 (3,0,NULL),
 (4,0,NULL),
 (5,0,NULL),
@@ -129,17 +129,17 @@ INSERT INTO `worldstates` VALUES
 (198,0,'Fishing Extravaganza - STV_FISHING_HAS_WINNER'),
 (199,0,'Fishing Extravaganza - STV_FISHING_ANNOUNCE_EVENT_BEGIN'),
 (200,0,'Fishing Extravaganza - STV_FISHING_ANNOUNCE_POOLS_DESPAN'),
-(3781,8639101,NULL),
+(3781,8939814,NULL),
 (3801,0,NULL),
 (3802,1,NULL),
 (20001,1454691600,'NextArenaPointDistributionTime'),
 (20002,1734584400,'NextWeeklyQuestResetTime'),
-(20003,1734238800,'NextBGRandomDailyResetTime'),
+(20003,1734498000,'NextBGRandomDailyResetTime'),
 (20004,0,'cleaning_flags'),
-(20005,1734238800,'NextDailyQuestResetTime'),
-(20006,1734238800,'NextGuildDailyResetTime'),
+(20005,1734498000,'NextDailyQuestResetTime'),
+(20006,1734498000,'NextGuildDailyResetTime'),
 (20007,1735707600,'NextMonthlyQuestResetTime'),
-(20008,1734238800,NULL);
+(20008,1734498000,NULL);
 /*!40000 ALTER TABLE `worldstates` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -151,4 +151,5 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2024-12-14 18:04:09
+-- Dump completed on 2024-12-17 22:33:13
+
