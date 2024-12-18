@@ -547,7 +547,7 @@ class spell_warr_intimidating_shout : public SpellScript
         targets.remove(GetExplTargetWorldObject());
         uint32 maxTargets = GetSpellInfo()->MaxAffectedTargets;
         if (targets.size() > maxTargets)
-        targets.resize(maxTargets);
+            targets.resize(maxTargets);
     }
 
     void Register() override
