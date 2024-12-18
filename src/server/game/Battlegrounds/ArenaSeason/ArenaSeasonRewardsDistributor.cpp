@@ -22,7 +22,7 @@
 #include "Player.h"
 #include <algorithm>
 
-const float minPctTeamGamesForMemberToGetReward = 30;
+constexpr float minPctTeamGamesForMemberToGetReward = 30;
 
 void ArenaSeasonTeamRewarderImpl::RewardTeamWithRewardGroup(ArenaTeam *arenaTeam, const ArenaSeasonRewardGroup &rewardGroup)
 {
@@ -35,7 +35,7 @@ void ArenaSeasonTeamRewarderImpl::RewardWithMail(ArenaTeam* arenaTeam, ArenaSeas
     if (rewardGroup.itemRewards.empty() && rewardGroup.goldReward == 0)
         return;
 
-    const int npcKingDondSender = 18897;
+    const uint32 npcKingDondSender = 18897;
 
     CharacterDatabaseTransaction trans = CharacterDatabase.BeginTransaction();
     for (auto const& member : arenaTeam->GetMembers())
@@ -51,7 +51,7 @@ void ArenaSeasonTeamRewarderImpl::RewardWithMail(ArenaTeam* arenaTeam, ArenaSeas
 
         Player* player = ObjectAccessor::FindPlayer(member.Guid);
 
-        auto draft = (rewardGroup.rewardMailTemplateID > 0) ?
+        auto draft = rewardGroup.rewardMailTemplateID > 0 ?
             MailDraft(rewardGroup.rewardMailTemplateID) :
             MailDraft(rewardGroup.rewardMailSubject, rewardGroup.rewardMailBody);
 
@@ -111,7 +111,7 @@ void ArenaSeasonRewardDistributor::DistributeRewards(ArenaTeamMgr::ArenaTeamCont
     std::vector<ArenaTeam*> sortedTeams;
     sortedTeams.reserve(arenaTeams.size());
 
-    const uint minRequiredGames = 30;
+    static constexpr uint16 minRequiredGames = 30;
 
     for (auto const& [id, team] : arenaTeams)
         if (team->GetStats().SeasonGames >= minRequiredGames)

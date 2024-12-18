@@ -97,7 +97,7 @@ public:
     }
 
 private:
-    std::vector<uint8> ParseTypes(const std::string& userInput)
+    std::vector<uint8> ParseTypes(std::string_view userInput)
     {
         std::vector<uint8> validTypes;
         auto tokens = Acore::Tokenize(userInput, ',', false);

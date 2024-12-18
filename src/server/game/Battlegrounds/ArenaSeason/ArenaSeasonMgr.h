@@ -47,7 +47,7 @@ struct ArenaSeasonReward
     ArenaSeasonReward() = default;
 
     // Item or acheivement entry.
-    uint32 entry{0};
+    uint32 entry{};
 
     ArenaSeasonRewardType type{ARENA_SEASON_REWARD_TYPE_ITEM};
 
@@ -62,20 +62,20 @@ struct ArenaSeasonRewardGroup
 {
     ArenaSeasonRewardGroup() = default;
 
-    uint8 season{0};
+    uint8 season{};
 
     ArenaSeasonRewardGroupCriteriaType criteriaType;
 
-    float minCriteria{0};
-    float maxCriteria{0};
+    float minCriteria{};
+    float maxCriteria{};
 
-    uint32 rewardMailTemplateID{0};
-    std::string rewardMailSubject{""};
-    std::string rewardMailBody{""};
-    uint32 goldReward{0};
+    uint32 rewardMailTemplateID{};
+    std::string rewardMailSubject{};
+    std::string rewardMailBody{};
+    uint32 goldReward{};
 
-    std::vector<ArenaSeasonReward> itemRewards{};
-    std::vector<ArenaSeasonReward> achievementRewards{};
+    std::vector<ArenaSeasonReward> itemRewards;
+    std::vector<ArenaSeasonReward> achievementRewards;
 
     // Used in unit tests.
     bool operator==(const ArenaSeasonRewardGroup& other) const
@@ -93,7 +93,7 @@ class ArenaSeasonMgr
 public:
     static ArenaSeasonMgr* instance();
 
-    typedef std::unordered_map<uint8, std::vector<ArenaSeasonRewardGroup>> ArenaSeasonRewardGroupsBySeasonContainer;
+    using ArenaSeasonRewardGroupsBySeasonContainer = std::unordered_map<uint8, std::vector<ArenaSeasonRewardGroup>>;
 
     // Loading functions
     void LoadRewards();
@@ -117,8 +117,8 @@ private:
 
     ArenaSeasonRewardGroupsBySeasonContainer _arenaSeasonRewardGroupsStore;
 
-    uint8 _currentSeason;
-    ArenaSeasonState _currentSeasonState;
+    uint8 _currentSeason{};
+    ArenaSeasonState _currentSeasonState{};
 };
 
 #define sArenaSeasonMgr ArenaSeasonMgr::instance()
