@@ -1,8 +1,8 @@
--- MySQL dump 10.13  Distrib 8.4.1, for Win64 (x86_64)
+-- MySQL dump 10.13  Distrib 8.0.34, for Win64 (x86_64)
 --
 -- Host: 127.0.0.1    Database: acore_world
 -- ------------------------------------------------------
--- Server version	8.4.1
+-- Server version	8.0.34
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
 /*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
@@ -47,18 +47,18 @@ INSERT INTO `pet_name_generation_locale` VALUES
 (264,'esMX','tierra',26125,1),
 (265,'esES','sepulcros',26125,1),
 (265,'esMX','sepulcros',26125,1),
-(266,'esES','murci+Ælagos',26125,1),
-(266,'esMX','murci+Ælagos',26125,1),
+(266,'esES','murci√©lagos',26125,1),
+(266,'esMX','murci√©lagos',26125,1),
 (267,'esES','ratas',26125,1),
 (267,'esMX','ratas',26125,1),
 (268,'esES','cuerpos',26125,1),
 (268,'esMX','cuerpos',26125,1),
 (269,'esES','tumbas',26125,1),
 (269,'esMX','tumbas',26125,1),
-(270,'esES','carro+¶a',26125,1),
-(270,'esMX','carro+¶a',26125,1),
-(271,'esES','cr+Ìneos',26125,1),
-(271,'esMX','cr+Ìneos',26125,1),
+(270,'esES','carro√±a',26125,1),
+(270,'esMX','carro√±a',26125,1),
+(271,'esES','cr√°neos',26125,1),
+(271,'esMX','cr√°neos',26125,1),
 (272,'esES','huesos',26125,1),
 (272,'esMX','huesos',26125,1),
 (273,'esES','criptas',26125,1),
@@ -67,16 +67,16 @@ INSERT INTO `pet_name_generation_locale` VALUES
 (274,'esMX','costillas',26125,1),
 (275,'esES','cerebros',26125,1),
 (275,'esMX','cerebros',26125,1),
-(276,'esES','sarc+¶fagos',26125,1),
-(276,'esMX','sarc+¶fagos',26125,1),
+(276,'esES','sarc√≥fagos',26125,1),
+(276,'esMX','sarc√≥fagos',26125,1),
 (277,'esES','podredumbre',26125,1),
 (277,'esMX','podredumbre',26125,1),
 (278,'esES','gravilla',26125,1),
 (278,'esMX','gravilla',26125,1),
 (279,'esES','plaga',26125,1),
 (279,'esMX','plaga',26125,1),
-(280,'esES','ata+¶des',26125,1),
-(280,'esMX','ata+¶des',26125,1),
+(280,'esES','ata√∫des',26125,1),
+(280,'esMX','ata√∫des',26125,1),
 (281,'esES','miembros',26125,1),
 (281,'esMX','miembros',26125,1),
 (282,'esES','gusanos',26125,1),
@@ -87,10 +87,10 @@ INSERT INTO `pet_name_generation_locale` VALUES
 (284,'esMX','espinas',26125,1),
 (285,'esES','guijarros',26125,1),
 (285,'esMX','guijarros',26125,1),
-(286,'esES','ra+°ces',26125,1),
-(286,'esMX','ra+°ces',26125,1),
-(287,'esES','m+Ædulas',26125,1),
-(287,'esMX','m+Ædulas',26125,1),
+(286,'esES','ra√≠ces',26125,1),
+(286,'esMX','ra√≠ces',26125,1),
+(287,'esES','m√©dulas',26125,1),
+(287,'esMX','m√©dulas',26125,1),
 (288,'esES','martillos',26125,1),
 (288,'esMX','martillos',26125,1),
 (289,'esES','Devasta',26125,0),
@@ -154,4 +154,5 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2024-12-14 18:04:27
+-- Dump completed on 2024-12-17 22:34:15
+
