@@ -1209,7 +1209,7 @@ public:
     void RemoveRestState();
     uint32 GetXPRestBonus(uint32 xp);
     [[nodiscard]] float GetRestBonus() const { return _restBonus; }
-    void SetRestBonus(float rest_bonus_new);
+    void SetRestBonus(float restBonusNew);
 
     [[nodiscard]] bool HasRestFlag(RestFlag restFlag) const { return (_restFlagMask & restFlag) != 0; }
     void SetRestFlag(RestFlag restFlag, uint32 triggerId = 0);
@@ -1778,6 +1778,9 @@ public:
 
     [[nodiscard]] SpellCooldowns const& GetSpellCooldownMap() const { return m_spellCooldowns; }
     SpellCooldowns&       GetSpellCooldownMap()       { return m_spellCooldowns; }
+
+    SkillStatusMap const& GetSkillStatusMap() const { return mSkillStatus; }
+    SkillStatusMap& GetSkillStatusMap() { return mSkillStatus; }
 
     void AddSpellMod(SpellModifier* mod, bool apply);
     bool IsAffectedBySpellmod(SpellInfo const* spellInfo, SpellModifier* mod, Spell* spell = nullptr);
