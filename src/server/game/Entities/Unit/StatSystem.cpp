@@ -445,7 +445,7 @@ void Player::UpdateAttackPowerAndDamage(bool ranged)
                                     continue;
                                 }
 
-                                for (const auto& effInfo : spellproto->Effects)
+                                for (auto const& effInfo : spellproto->Effects)
                                 {
                                     if (effInfo.ApplyAuraName == SPELL_AURA_MOD_ATTACK_POWER)
                                     {
