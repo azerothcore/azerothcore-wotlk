@@ -1679,7 +1679,6 @@ public:
     void StopMovingOnCurrentPos();   /// @brief Disable the unit movement by clearing UNIT_STATE_MOVING and stopping the spline.
     virtual void PauseMovement(uint32 timer = 0, uint8 slot = 0); // timer in ms
     void ResumeMovement(uint32 timer = 0, uint8 slot = 0);
-    void StartMovement(uint32 timer = 0, uint8 slot = 0); // Lanny
 
     void SetControlled(bool apply, UnitState state, Unit* source = nullptr, bool isFear = false);
     void DisableRotate(bool apply);
@@ -2003,12 +2002,6 @@ public:
     //end npcbot
 
     //----------- Public variables ----------//
-    //Lanny
-    bool MovementPaused;
-    uint32 PauseTimer;
-    uint8 MoveSlot;
-    //End Lanny
-
     uint32 m_extraAttacks;
     bool m_canDualWield;
 

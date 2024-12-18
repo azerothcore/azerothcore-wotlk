@@ -348,13 +348,6 @@ Unit::Unit(bool isWorldObject) : WorldObject(isWorldObject),
     _isWalkingBeforeCharm = false;
 
     _lastExtraAttackSpell = 0;
-
-    //Lanny
-    MovementPaused = false;
-    PauseTimer = 0;
-    MoveSlot = 0;
-    //End Lanny
-	
 }
 
 ////////////////////////////////////////////////////////////
@@ -559,22 +552,6 @@ void Unit::Update(uint32 p_time)
     GetMotionMaster()->UpdateMotion(p_time);
 
     InvalidateValuesUpdateCache();
-	
-	// Lanny
-    if (!IsInCombat() && MovementPaused) //Pause/Resume Waypoint Delay and Start
-    {
-        if (PauseTimer < p_time)
-        {
-            StartMovement(0,MoveSlot);
-		    MovementPaused = false;
-	        PauseTimer = 0;
-        }
-        else
-        {
-            PauseTimer -= p_time;
-        }
-    }
-    // End Lanny
 }
 
 bool Unit::haveOffhandWeapon() const
@@ -17825,18 +17802,6 @@ void Unit::PauseMovement(uint32 timer /* = 0*/, uint8 slot /* = 0*/)
         movementGenerator->Pause(timer);
 
     StopMoving();
-
-    //Lanny	
-	if (timer == 0)
-    {
-		timer = sWorld->getIntConfig(CONFIG_WAYPOINT_MOVEMENT_STOP_TIME_FOR_PLAYER) * IN_MILLISECONDS;
-		ResumeMovement(timer,slot);
-    }
-	else 
-    {
-        ResumeMovement(timer,slot);
-    }
-    // End Lanny
 }
 
 void Unit::ResumeMovement(uint32 timer /* = 0*/, uint8 slot /* = 0*/)
@@ -17845,27 +17810,8 @@ void Unit::ResumeMovement(uint32 timer /* = 0*/, uint8 slot /* = 0*/)
         return;
 
     if (MovementGenerator* movementGenerator = GetMotionMaster()->GetMotionSlot(slot))
-//Lanny
-//      movementGenerator->Resume(timer);
-    {
-        MoveSlot = slot;
-        PauseTimer = timer;
-        MovementPaused = true;
-    }
-// End Lanny
-}
-
-//Lanny
-void Unit::StartMovement(uint32 timer /* = 0*/, uint8 slot /* = 0*/)
-{
-    if (slot >= MAX_MOTION_SLOT)
-        return;
-
-    if (MovementGenerator* movementGenerator = GetMotionMaster()->GetMotionSlot(slot))
         movementGenerator->Resume(timer);
-
 }
-//End Lanny
 
 void Unit::StopMovingOnCurrentPos()
 {
