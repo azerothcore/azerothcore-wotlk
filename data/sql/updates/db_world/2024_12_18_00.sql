@@ -1,3 +1,4 @@
+-- DB update 2024_12_17_18 -> 2024_12_18_00
 
 -- Set Flight to Disable Gravity and Rooted on 1
 
