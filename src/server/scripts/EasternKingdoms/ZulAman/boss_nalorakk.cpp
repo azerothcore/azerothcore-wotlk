@@ -288,7 +288,7 @@ struct boss_nalorakk : public BossAI
             }).Schedule(11s, 24s, GROUP_BEAR, [this](TaskContext context)
             {
                 DoCastSelf(SPELL_DEAFENINGROAR);
-                context.Repeat(11s, 24s); 
+                context.Repeat(11s, 24s);
             }).Schedule(30s, GROUP_BEAR, [this](TaskContext)
             {
                 ShapeShift(_bearForm);
