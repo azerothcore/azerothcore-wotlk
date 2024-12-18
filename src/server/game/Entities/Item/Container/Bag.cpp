@@ -122,9 +122,8 @@ bool Bag::LoadFromDB(ObjectGuid::LowType guid, ObjectGuid owner_guid, const Fiel
     // cleanup bag content related item value fields (its will be filled correctly from `character_inventory`)
     for (uint8 i = 0; i < MAX_BAG_SIZE; ++i)
     {
-        auto item = m_bagslot[i];
         SetGuidValue(CONTAINER_FIELD_SLOT_1 + (i * 2), ObjectGuid::Empty);
-        item.reset();
+        m_bagslot[i].reset();
     }
 
     return true;
@@ -151,7 +150,6 @@ uint32 Bag::GetFreeSlots() const
 void Bag::RemoveItem(uint8 slot, bool /*update*/)
 {
     ASSERT(slot < MAX_BAG_SIZE);
-
 
     if (auto pItem = m_bagslot.at(slot))
         pItem->SetContainer(nullptr);
