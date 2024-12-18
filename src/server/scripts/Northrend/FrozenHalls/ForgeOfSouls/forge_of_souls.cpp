@@ -81,7 +81,7 @@ public:
         void UpdateAI(uint32 diff) override
         {
             events.Update(diff);
-            switch(events.ExecuteEvent())
+            switch (events.ExecuteEvent())
             {
                 case 0:
                     break;
@@ -206,7 +206,7 @@ public:
     bool OnGossipSelect(Player* player, Creature* creature, uint32 /*uiSender*/, uint32 uiAction) override
     {
         ClearGossipMenuFor(player);
-        switch(uiAction)
+        switch (uiAction)
         {
             case GOSSIP_ACTION_INFO_DEF+1:
                 CloseGossipMenuFor(player);

@@ -31,7 +31,8 @@ def parsing_file(directory: str) -> None:
                         multiple_blank_lines_check(file, file_path)
                         trailing_whitespace_check(file, file_path)
                         get_counter_check(file, file_path)
-                        misc_codestyle_check(file, file_path)
+                        if not file_name.endswith('.cmake') and file_name != 'CMakeLists.txt':
+                            misc_codestyle_check(file, file_path)
                         if file_name != 'Object.h':
                             get_typeid_check(file, file_path)
                         if file_name != 'Unit.h':
@@ -108,14 +109,20 @@ def get_typeid_check(file: io, file_path: str) -> None:
     check_failed = False
     # Parse all the file
     for line_number, line in enumerate(file, start = 1):
-        if 'GetTypeId() == TYPEID_PLAYER' in line:
-            print(f"Please use IsPlayer() instead GetTypeId(): {file_path} at line {line_number}")
+        if 'GetTypeId() == TYPEID_ITEM' in line or 'GetTypeId() != TYPEID_ITEM' in line:
+            print(f"Please use IsItem() instead of GetTypeId(): {file_path} at line {line_number}")
             check_failed = True
-        if 'GetTypeId() == TYPEID_ITEM' in line:
-            print(f"Please use IsItem() instead GetTypeId(): {file_path} at line {line_number}")
+        if 'GetTypeId() == TYPEID_UNIT' in line or 'GetTypeId() != TYPEID_UNIT' in line:
+            print(f"Please use IsCreature() instead of GetTypeId(): {file_path} at line {line_number}")
             check_failed = True
-        if 'GetTypeId() == TYPEID_DYNOBJECT' in line:
-            print(f"Please use IsDynamicObject() instead GetTypeId(): {file_path} at line {line_number}")
+        if 'GetTypeId() == TYPEID_PLAYER' in line or 'GetTypeId() != TYPEID_PLAYER' in line:
+            print(f"Please use IsPlayer() instead of GetTypeId(): {file_path} at line {line_number}")
+            check_failed = True
+        if 'GetTypeId() == TYPEID_GAMEOBJECT' in line or 'GetTypeId() != TYPEID_GAMEOBJECT' in line:
+            print(f"Please use IsGameObject() instead of GetTypeId(): {file_path} at line {line_number}")
+            check_failed = True
+        if 'GetTypeId() == TYPEID_DYNOBJECT' in line or 'GetTypeId() != TYPEID_DYNOBJECT' in line:
+            print(f"Please use IsDynamicObject() instead of GetTypeId(): {file_path} at line {line_number}")
             check_failed = True
     # Handle the script error and update the result output
     if check_failed:
@@ -216,6 +223,10 @@ def misc_codestyle_check(file: io, file_path: str) -> None:
         if re.search(r'\bconst\s+\w+\s*\*\b', line):
             print(
                 f"Please use the syntax 'Class/ObjectType const*' instead of 'const Class/ObjectType*': {file_path} at line {line_number}")
+            check_failed = True
+        if [match for match in [' if(', ' if ( '] if match in line]:
+            print(
+                f"AC have as standard: if (XXXX). Please check spaces in your condition': {file_path} at line {line_number}")
             check_failed = True
     # Handle the script error and update the result output
     if check_failed:

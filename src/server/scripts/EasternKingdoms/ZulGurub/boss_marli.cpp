@@ -217,7 +217,7 @@ private:
     {
         Unit* target = SelectTarget(SelectTargetMethod::Random, 0, [this](Unit* target) -> bool
             {
-                if (target->GetTypeId() != TYPEID_PLAYER || target->getPowerType() != Powers::POWER_MANA)
+                if (!target->IsPlayer() || target->getPowerType() != Powers::POWER_MANA)
                     return false;
                 if (me->IsWithinMeleeRange(target) || me->GetVictim() == target)
                     return false;

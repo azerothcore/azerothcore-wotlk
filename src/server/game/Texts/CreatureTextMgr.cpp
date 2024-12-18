@@ -343,9 +343,9 @@ void CreatureTextMgr::SendNonChatPacket(WorldObject* source, WorldPacket const* 
         case CHAT_MSG_MONSTER_WHISPER:
         case CHAT_MSG_RAID_BOSS_WHISPER:
             {
-                if (range == TEXT_RANGE_NORMAL)//ignores team and gmOnly
+                if (range == TEXT_RANGE_NORMAL) // ignores team and GM only
                 {
-                    if (!target || target->GetTypeId() != TYPEID_PLAYER)
+                    if (!target || !target->IsPlayer())
                         return;
 
                     target->ToPlayer()->GetSession()->SendPacket(data);

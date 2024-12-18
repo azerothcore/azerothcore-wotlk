@@ -29,15 +29,11 @@
 #include "MapMgr.h"
 #include "ObjectMgr.h"
 #include "Opcodes.h"
-#include "Pet.h"
 #include "Player.h"
 #include "ScriptMgr.h"
 #include "SharedDefines.h"
-#include "SocialMgr.h"
-#include "SpellAuras.h"
 #include "UpdateFieldFlags.h"
 #include "Util.h"
-#include "Vehicle.h"
 #include "World.h"
 #include "WorldPacket.h"
 #include "WorldSession.h"
@@ -994,7 +990,7 @@ bool CanRollOnItem(LootItem const& item, Player const* player, Loot* loot)
         return false;
 
     uint32 itemCount = player->GetItemCount(item.itemid);
-    if ((proto->MaxCount > 0 && static_cast<int32>(itemCount) >= proto->MaxCount) || (player->CanEquipUniqueItem(proto) != EQUIP_ERR_OK))
+    if ((proto->MaxCount > 0 && static_cast<int32>(itemCount) >= proto->MaxCount))
         return false;
 
     if (!item.AllowedForPlayer(player, loot->sourceWorldObjectGUID))
@@ -1573,7 +1569,7 @@ void Group::CountTheRoll(Rolls::iterator rollI, Map* allowedMap)
                         ItemPosCountVec dest;
                         InventoryResult msg = player->CanStoreNewItem(NULL_BAG, NULL_SLOT, dest, roll->itemid, item->count);
 
-                        if(msg == EQUIP_ERR_OK)
+                        if (msg == EQUIP_ERR_OK)
                         {
                             player->AutoStoreLoot(pProto->DisenchantID, LootTemplates_Disenchant, true);
                         }

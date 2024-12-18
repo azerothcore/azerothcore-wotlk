@@ -33,6 +33,8 @@
 #include "zlib.h"
 #include <memory>
 
+#include "ServerPktHeader.h"
+
 using boost::asio::ip::tcp;
 
 void compressBuff(void* dst, uint32* dst_size, void* src, int src_size)
@@ -474,7 +476,7 @@ WorldSocket::ReadDataHandlerResult WorldSocket::ReadDataHandler()
     OpcodeHandler const* handler = opcodeTable[opcode];
     if (!handler)
     {
-        LOG_ERROR("network.opcode", "No defined handler for opcode {} sent by {}", GetOpcodeNameForLogging(static_cast<OpcodeClient>(packet.GetOpcode())), _worldSession->GetPlayerInfo());
+        LOG_ERROR("network.opcode", "No defined handler for opcode {} sent by {}", GetOpcodeNameForLogging(static_cast<OpcodeClient>(packetToQueue->GetOpcode())), _worldSession->GetPlayerInfo());
         delete packetToQueue;
         return ReadDataHandlerResult::Error;
     }

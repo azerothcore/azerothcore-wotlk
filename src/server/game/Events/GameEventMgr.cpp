@@ -21,7 +21,6 @@
 #include "DisableMgr.h"
 #include "GameObjectAI.h"
 #include "GameTime.h"
-#include "GossipDef.h"
 #include "Language.h"
 #include "Log.h"
 #include "MapMgr.h"

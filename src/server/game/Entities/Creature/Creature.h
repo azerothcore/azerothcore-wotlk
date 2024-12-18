@@ -22,11 +22,8 @@
 #include "CharmInfo.h"
 #include "Common.h"
 #include "CreatureData.h"
-#include "DatabaseEnv.h"
-#include "ItemTemplate.h"
 #include "LootMgr.h"
 #include "Unit.h"
-#include "World.h"
 #include <list>
 
 class SpellInfo;
@@ -190,6 +187,8 @@ public:
     void UpdateAttackPowerAndDamage(bool ranged = false) override;
     void CalculateMinMaxDamage(WeaponAttackType attType, bool normalized, bool addTotalPct, float& minDamage, float& maxDamage, uint8 damageIndex) override;
 
+    bool HasWeapon(WeaponAttackType type) const override;
+    bool HasWeaponForAttack(WeaponAttackType type) const override { return (Unit::HasWeaponForAttack(type) && HasWeapon(type)); }
     void SetCanDualWield(bool value) override;
     [[nodiscard]] int8 GetOriginalEquipmentId() const { return m_originalEquipmentId; }
     uint8 GetCurrentEquipmentId() { return m_equipmentId; }
@@ -381,10 +380,11 @@ public:
     [[nodiscard]] bool IsMovementPreventedByCasting() const override;
 
     // Part of Evade mechanics
-    [[nodiscard]] time_t GetLastDamagedTime() const;
-    [[nodiscard]] std::shared_ptr<time_t> const& GetLastDamagedTimePtr() const;
-    void SetLastDamagedTime(time_t val);
-    void SetLastDamagedTimePtr(std::shared_ptr<time_t> const& val);
+    std::shared_ptr<time_t> const& GetLastLeashExtensionTimePtr() const;
+    void SetLastLeashExtensionTimePtr(std::shared_ptr<time_t> const& timer);
+    void ClearLastLeashExtensionTimePtr();
+    time_t GetLastLeashExtensionTime() const;
+    void UpdateLeashExtensionTime();
 
     bool IsFreeToMove();
     static constexpr uint32 MOVE_CIRCLE_CHECK_INTERVAL = 3000;
@@ -500,7 +500,9 @@ private:
     CreatureGroup* m_formation;
     bool TriggerJustRespawned;
 
-    mutable std::shared_ptr<time_t> _lastDamagedTime; // Part of Evade mechanics
+    // Shared timer between mobs who assist another.
+    // Damaging one extends leash range on all of them.
+    mutable std::shared_ptr<time_t> m_lastLeashExtensionTime;
 
     ObjectGuid m_cannotReachTarget;
     uint32 m_cannotReachTimer;

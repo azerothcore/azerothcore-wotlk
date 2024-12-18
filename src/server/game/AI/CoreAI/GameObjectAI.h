@@ -23,7 +23,6 @@
 #include "GameObject.h"
 #include "Object.h"
 #include "QuestDef.h"
-#include <list>
 
 class Creature;
 class GameObject;

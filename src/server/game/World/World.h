@@ -22,16 +22,15 @@
 #ifndef __WORLD_H
 #define __WORLD_H
 
+#include "DatabaseEnvFwd.h"
 #include "IWorld.h"
 #include "LockedQueue.h"
 #include "ObjectGuid.h"
-#include "QueryResult.h"
 #include "SharedDefines.h"
 #include "Timer.h"
 #include <atomic>
 #include <list>
 #include <map>
-#include <set>
 #include <unordered_map>
 
 class Object;
@@ -59,7 +58,6 @@ enum ShutdownExitCode : uint8
 /// Timers for different object refresh rates
 enum WorldTimers
 {
-    WUPDATE_AUCTIONS,
     WUPDATE_WEATHERS,
     WUPDATE_UPTIME,
     WUPDATE_CORPSES,

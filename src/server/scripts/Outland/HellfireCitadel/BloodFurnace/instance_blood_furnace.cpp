@@ -82,7 +82,7 @@ public:
 
         void OnUnitDeath(Unit* unit) override
         {
-            if (unit && unit->GetTypeId() == TYPEID_UNIT && unit->GetEntry() == NPC_NASCENT_FEL_ORC)
+            if (unit && unit->IsCreature() && unit->GetEntry() == NPC_NASCENT_FEL_ORC)
                 PrisonerDied(unit->GetGUID());
         }
 

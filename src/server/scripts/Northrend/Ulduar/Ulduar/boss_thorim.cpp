@@ -1416,14 +1416,14 @@ public:
 
         void RunRunicSmash(bool cast)
         {
-            if (Creature* cr = ObjectAccessor::GetCreature(*me, _leftHand ? _triggerLeftGUID[0] : _triggerRightGUID[0]) )
+            if (Creature* cr = ObjectAccessor::GetCreature(*me, _leftHand ? _triggerLeftGUID[0] : _triggerRightGUID[0]))
             {
                 if (cast)
                     cr->CastSpell(cr, SPELL_RUNIC_SMASH_DAMAGE, true);
                 cr->SetPosition(_leftHand ? 2235.0f : 2221.0f, _nextTriggerPos, cr->GetPositionZ(), 0.0f);
                 cr->StopMovingOnCurrentPos();
             }
-            if( Creature* cr = ObjectAccessor::GetCreature(*me, _leftHand ? _triggerLeftGUID[1] : _triggerRightGUID[1]) )
+            if (Creature* cr = ObjectAccessor::GetCreature(*me, _leftHand ? _triggerLeftGUID[1] : _triggerRightGUID[1]))
             {
                 if (cast)
                     cr->CastSpell(cr, SPELL_RUNIC_SMASH_DAMAGE, true);

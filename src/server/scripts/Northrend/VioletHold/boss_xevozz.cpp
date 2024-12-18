@@ -32,23 +32,16 @@ enum Yells
 
 enum eSpells
 {
-    SPELL_ARCANE_BARRAGE_VOLLEY_N               = 54202,
-    SPELL_ARCANE_BARRAGE_VOLLEY_H               = 59483,
-    SPELL_ARCANE_BUFFET_N                       = 54226,
-    SPELL_ARCANE_BUFFET_H                       = 59485,
+    SPELL_ARCANE_BARRAGE_VOLLEY                 = 54202,
+    SPELL_ARCANE_BUFFET                         = 54226,
     SPELL_SUMMON_ETHEREAL_SPHERE_1              = 54102,
     SPELL_SUMMON_ETHEREAL_SPHERE_2              = 54137,
     SPELL_SUMMON_ETHEREAL_SPHERE_3              = 54138,
 
-    SPELL_ARCANE_POWER_N                        = 54160,
-    SPELL_ARCANE_POWER_H                        = 59474,
+    SPELL_ARCANE_POWER                          = 54160
     //SPELL_SUMMON_PLAYERS                      = 54164, // not used
     //SPELL_POWER_BALL_VISUAL                   = 54141,
 };
-
-#define SPELL_ARCANE_BARRAGE_VOLLEY             DUNGEON_MODE(SPELL_ARCANE_BARRAGE_VOLLEY_N, SPELL_ARCANE_BARRAGE_VOLLEY_H)
-#define SPELL_ARCANE_BUFFET                     DUNGEON_MODE(SPELL_ARCANE_BUFFET_N, SPELL_ARCANE_BUFFET_H)
-#define SPELL_ARCANE_POWER                      DUNGEON_MODE(SPELL_ARCANE_POWER_N, SPELL_ARCANE_POWER_H)
 
 enum eEvents
 {
@@ -104,7 +97,7 @@ public:
             if (me->HasUnitState(UNIT_STATE_CASTING))
                 return;
 
-            switch(events.ExecuteEvent())
+            switch (events.ExecuteEvent())
             {
                 case 0:
                     break;

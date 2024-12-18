@@ -123,7 +123,7 @@ public:
             me->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
             me->SetImmuneToAll(true);
             me->SetReactState(REACT_PASSIVE);
-            if( pInstance )
+            if (pInstance)
                 pInstance->SetData(BOSS_BLACK_KNIGHT, NOT_STARTED);
 
             //me->SetLootMode(0); // [LOOT]
@@ -143,7 +143,7 @@ public:
                 return;
             }
 
-            if( Phase < 3 && damage >= me->GetHealth() )
+            if (Phase < 3 && damage >= me->GetHealth())
             {
                 damage = 0;
                 me->SetHealth(me->GetMaxHealth());
@@ -164,19 +164,19 @@ public:
 
         void DoAction(int32 param) override
         {
-            if( param == -1 )
+            if (param == -1)
             {
                 summons.DespawnAll();
             }
-            else if( param == 1 )
+            else if (param == 1)
             {
-                if( !pInstance )
+                if (!pInstance)
                     return;
 
                 pInstance->SetData(BOSS_BLACK_KNIGHT, IN_PROGRESS);
                 Talk(SAY_BK_AGGRO);
                 me->CastSpell((Unit*)nullptr, (pInstance->GetData(DATA_TEAMID_IN_INSTANCE) == TEAM_HORDE ? SPELL_RAISE_DEAD_JAEREN : SPELL_RAISE_DEAD_ARELAS), false);
-                if( Creature* announcer = pInstance->instance->GetCreature(pInstance->GetGuidData(DATA_ANNOUNCER)) )
+                if (Creature* announcer = pInstance->instance->GetCreature(pInstance->GetGuidData(DATA_ANNOUNCER)))
                     announcer->DespawnOrUnsummon();
 
                 events.Reset();
@@ -190,7 +190,7 @@ public:
 
         void SpellHitTarget(Unit*  /*target*/, SpellInfo const* spell) override
         {
-            switch( spell->Id )
+            switch (spell->Id)
             {
                 case SPELL_BLACK_KNIGHT_RES:
                     me->SetHealth(me->GetMaxHealth());
@@ -205,7 +205,7 @@ public:
 
                     ++Phase;
 
-                    switch( Phase )
+                    switch (Phase)
                     {
                         case 2:
                             me->SetDisplayId(MODEL_SKELETON);
@@ -236,46 +236,46 @@ public:
 
         void UpdateAI(uint32 diff) override
         {
-            if( !UpdateVictim() )
+            if (!UpdateVictim())
                 return;
 
             events.Update(diff);
 
-            if( me->HasUnitState(UNIT_STATE_CASTING) )
+            if (me->HasUnitState(UNIT_STATE_CASTING))
                 return;
 
-            switch( events.ExecuteEvent() )
+            switch (events.ExecuteEvent())
             {
                 case 0:
                     break;
                 case EVENT_ANNOUNCER_SAY_ZOMBIE:
-                    if( pInstance && !summons.empty() )
-                        if( Creature* ghoul = pInstance->instance->GetCreature(*summons.begin()) )
+                    if (pInstance && !summons.empty())
+                        if (Creature* ghoul = pInstance->instance->GetCreature(*summons.begin()))
                             if (urand(0, 1))
                                 ghoul->Yell("[Zombie] .... . Brains ....", LANG_UNIVERSAL); /// @todo: Multiple variations + not always happening, from video sources, needs sniff to transition from DB.
                     break;
                 case EVENT_SPELL_PLAGUE_STRIKE:
-                    if( me->GetVictim() )
+                    if (me->GetVictim())
                         me->CastSpell(me->GetVictim(), SPELL_PLAGUE_STRIKE, false);
                     events.Repeat(10s, 12s);
                     break;
                 case EVENT_SPELL_ICY_TOUCH:
-                    if( me->GetVictim() )
+                    if (me->GetVictim())
                         me->CastSpell(me->GetVictim(), SPELL_ICY_TOUCH, false);
                     events.Repeat(5s, 6s);
                     break;
                 case EVENT_SPELL_DEATH_RESPITE:
-                    if( Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 50.0f, true) )
+                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 50.0f, true))
                         me->CastSpell(target, SPELL_DEATH_RESPITE, false);
                     events.Repeat(13s, 15s);
                     break;
                 case EVENT_SPELL_OBLITERATE:
-                    if( me->GetVictim() )
+                    if (me->GetVictim())
                         me->CastSpell(me->GetVictim(), SPELL_OBLITERATE, false);
                     events.Repeat(15s, 17s);
                     break;
                 case EVENT_SPELL_DESECRATION:
-                    if( Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 50.0f, true) )
+                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 50.0f, true))
                         me->CastSpell(target, SPELL_DESECRATION, false);
                     events.Repeat(14s, 17s);
                     break;
@@ -284,7 +284,7 @@ public:
                     events.Repeat(2s, 4s);
                     break;
                 case EVENT_SPELL_MARKED_DEATH:
-                    if( Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 0.000000f, true) )
+                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 0.000000f, true))
                         me->CastSpell(target, SPELL_MARKED_DEATH, false);
                     events.Repeat(9s);
                     break;
@@ -296,7 +296,7 @@ public:
         void JustSummoned(Creature* summon) override
         {
             summons.Summon(summon);
-            if( Unit* target = summon->SelectNearestTarget(200.0f) )
+            if (Unit* target = summon->SelectNearestTarget(200.0f))
             {
                 summon->AI()->AttackStart(target);
                 DoZoneInCombat(summon);
@@ -305,7 +305,7 @@ public:
 
         void KilledUnit(Unit* victim) override
         {
-            if( victim->IsPlayer() )
+            if (victim->IsPlayer())
             {
                 Talk(SAY_BK_KILL_PLAYER);
             }
@@ -315,9 +315,9 @@ public:
         {
             me->CastSpell((Unit*)nullptr, SPELL_BK_KILL_CREDIT, true);
             Talk(SAY_BK_DEATH);
-            if( pInstance )
+            if (pInstance)
                 pInstance->SetData(BOSS_BLACK_KNIGHT, DONE);
-            if( me->ToTempSummon() )
+            if (me->ToTempSummon())
                 me->ToTempSummon()->SetTempSummonType(TEMPSUMMON_MANUAL_DESPAWN);
         }
     };
@@ -347,7 +347,7 @@ public:
 
         void DoAction(int32 param) override
         {
-            if( param == 1 )
+            if (param == 1)
             {
                 me->SetControlled(false, UNIT_STATE_ROOT);
                 me->DisableRotate(false);
@@ -358,7 +358,7 @@ public:
 
         void WaypointReached(uint32 i) override
         {
-            if( i == 12 )
+            if (i == 12)
             {
                 SetEscortPaused(true);
                 me->SetOrientation(3.62f);
@@ -366,7 +366,7 @@ public:
                 me->DisableRotate(true);
                 me->SetFacingTo(3.62f);
                 me->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_ONESHOT_MOUNT_SPECIAL);
-                if( InstanceScript* pInstance = me->GetInstanceScript() )
+                if (InstanceScript* pInstance = me->GetInstanceScript())
                     pInstance->SetData(DATA_SKELETAL_GRYPHON_LANDED, 0);
             }
         }
@@ -422,7 +422,7 @@ public:
 
         void SpellHitTarget(Unit* target, SpellInfo const* spell) override
         {
-            switch(spell->Id)
+            switch (spell->Id)
             {
                 case SPELL_CLAW_N:
                 case SPELL_CLAW_H:
@@ -443,15 +443,15 @@ public:
 
         void UpdateAI(uint32 diff) override
         {
-            if( !UpdateVictim() )
+            if (!UpdateVictim())
                 return;
 
             events.Update(diff);
 
-            if( me->HasUnitState(UNIT_STATE_CASTING) )
+            if (me->HasUnitState(UNIT_STATE_CASTING))
                 return;
 
-            switch( events.ExecuteEvent() )
+            switch (events.ExecuteEvent())
             {
                 case 0:
                     break;

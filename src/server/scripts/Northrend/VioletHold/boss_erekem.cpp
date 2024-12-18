@@ -23,19 +23,14 @@ enum eSpells
 {
     SPELL_BLOODLUST                             = 54516,
     SPELL_BREAK_BONDS                           = 59463,
-    SPELL_CHAIN_HEAL_N                          = 54481,
-    SPELL_CHAIN_HEAL_H                          = 59473,
-    SPELL_EARTH_SHIELD_N                        = 54479,
-    SPELL_EARTH_SHIELD_H                        = 59471,
+    SPELL_CHAIN_HEAL                            = 54481,
+    SPELL_EARTH_SHIELD                          = 54479,
     //SPELL_EARTH_SHIELD_TRIGGERED_N            = 54480,
     //SPELL_EARTH_SHIELD_TRIGGERED_H            = 59472,
     SPELL_EARTH_SHOCK                           = 54511,
     SPELL_LIGHTNING_BOLT                        = 53044,
     SPELL_STORMSTRIKE                           = 51876,
 };
-
-#define SPELL_CHAIN_HEAL                        DUNGEON_MODE(SPELL_CHAIN_HEAL_N, SPELL_CHAIN_HEAL_H)
-#define SPELL_EARTH_SHIELD                      DUNGEON_MODE(SPELL_EARTH_SHIELD_N, SPELL_EARTH_SHIELD_H)
 
 enum Yells
 {
@@ -116,7 +111,7 @@ public:
             if (me->HasUnitState(UNIT_STATE_CASTING))
                 return;
 
-            switch(events.ExecuteEvent())
+            switch (events.ExecuteEvent())
             {
                 case 0:
                     break;
@@ -280,7 +275,7 @@ public:
             if (me->HasUnitState(UNIT_STATE_CASTING))
                 return;
 
-            switch(events.ExecuteEvent())
+            switch (events.ExecuteEvent())
             {
                 case 0:
                     break;

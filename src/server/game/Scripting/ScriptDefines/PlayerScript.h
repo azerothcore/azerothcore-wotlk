@@ -19,6 +19,7 @@
 #define SCRIPT_OBJECT_PLAYER_SCRIPT_H_
 
 #include "ScriptObject.h"
+#include "SharedDefines.h"
 #include <vector>
 
 // TODO to remove
@@ -149,6 +150,7 @@ enum PlayerHook
     PLAYERHOOK_ON_CUSTOM_SCALING_STAT_VALUE,
     PLAYERHOOK_ON_APPLY_ITEM_MODS_BEFORE,
     PLAYERHOOK_ON_APPLY_ENCHANTMENT_ITEM_MODS_BEFORE,
+    PLAYERHOOK_ON_APPLY_WEAPON_DAMAGE,
     PLAYERHOOK_CAN_ARMOR_DAMAGE_MODIFIER,
     PLAYERHOOK_ON_GET_FERAL_AP_BONUS,
     PLAYERHOOK_CAN_APPLY_WEAPON_DEPENDENT_AURA_DAMAGE_MOD,
@@ -404,12 +406,6 @@ public:
     // After player enters queue for Arena
     virtual void OnPlayerJoinArena(Player* /*player*/) { }
 
-    //Called when trying to get a team ID of a slot > 2 (This is for custom teams created by modules)
-    virtual void GetCustomGetArenaTeamId(Player const* /*player*/, uint8 /*slot*/, uint32& /*teamID*/) const { }
-
-    //Called when trying to get players personal rating of an arena slot > 2 (This is for custom teams created by modules)
-    virtual void GetCustomArenaPersonalRating(Player const* /*player*/, uint8 /*slot*/, uint32& /*rating*/) const { }
-
     //Called after the normal slots (0..2) for arena have been evaluated so that custom arena teams could modify it if nececasry
     virtual void OnGetMaxPersonalArenaRatingRequirement(Player const* /*player*/, uint32 /*minSlot*/, uint32& /*maxArenaRating*/) const {}
 
@@ -551,6 +547,8 @@ public:
     virtual void OnApplyItemModsBefore(Player* /*player*/, uint8 /*slot*/, bool /*apply*/, uint8 /*itemProtoStatNumber*/, uint32 /*statType*/, int32& /*val*/) { }
 
     virtual void OnApplyEnchantmentItemModsBefore(Player* /*player*/, Item* /*item*/, EnchantmentSlot /*slot*/, bool /*apply*/, uint32 /*enchant_spell_id*/, uint32& /*enchant_amount*/) { }
+
+    virtual void OnApplyWeaponDamage(Player* /*player*/, uint8 /*slot*/, ItemTemplate const* /*proto*/, float& /*minDamage*/, float& /*maxDamage*/, uint8 /*damageIndex*/) { }
 
     [[nodiscard]] virtual bool CanArmorDamageModifier(Player* /*player*/) { return true; }
 

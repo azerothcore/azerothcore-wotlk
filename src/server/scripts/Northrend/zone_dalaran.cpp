@@ -148,7 +148,7 @@ public:
 
         void SetData(uint32 type, uint32 /*data*/) override
         {
-            switch(type)
+            switch (type)
             {
                 case ACTION_SHANDY_INTRO:
                     if (Creature* aquanos = me->FindNearestCreature(NPC_AQUANOS_ENTRY, 30, true))
@@ -163,7 +163,7 @@ public:
                     _events.ScheduleEvent(EVENT_OUTRO_DH, 10min);
                     break;
                 default:
-                    if(_lSource == type && _canWash)
+                    if (_lSource == type && _canWash)
                     {
                         _canWash = false;
                         _events.ScheduleEvent(EVENT_INTRO_DH2, type == ACTION_UNMENTIONABLES ? 4s : 10s);
@@ -243,7 +243,7 @@ public:
         if (player->GetQuestStatus(QUEST_SUITABLE_DISGUISE_A) == QUEST_STATUS_INCOMPLETE ||
                 player->GetQuestStatus(QUEST_SUITABLE_DISGUISE_H) == QUEST_STATUS_INCOMPLETE)
         {
-            if(player->GetTeamId() == TEAM_ALLIANCE)
+            if (player->GetTeamId() == TEAM_ALLIANCE)
                 AddGossipItemFor(player, GOSSIP_MENU_AQUANOS, GOSSIP_AQUANOS_ALLIANCE, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF);
             else
                 AddGossipItemFor(player, GOSSIP_MENU_AQUANOS, GOSSIP_AQUANOS_HORDE, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF);

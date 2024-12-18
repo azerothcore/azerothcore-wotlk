@@ -20,7 +20,6 @@
 
 #include "ByteBuffer.h"
 #include "ConditionMgr.h"
-#include "ItemEnchantmentMgr.h"
 #include "ObjectGuid.h"
 #include "RefMgr.h"
 #include "SharedDefines.h"
@@ -220,6 +219,7 @@ public:
     void ReportUnusedIds(LootIdSet const& ids_set) const;
     void ReportNonExistingId(uint32 lootId) const;
     void ReportNonExistingId(uint32 lootId, const char* ownerType, uint32 ownerId) const;
+    void ReportInvalidCount(uint32 lootId, const char* ownerType, uint32 ownerId, uint32 itemId, uint8 minCount, uint8 maxCount) const;
 
     [[nodiscard]] bool HaveLootFor(uint32 loot_id) const { return m_LootTemplates.find(loot_id) != m_LootTemplates.end(); }
     [[nodiscard]] bool HaveQuestLootFor(uint32 loot_id) const;
@@ -264,7 +264,7 @@ public:
 
     // Checks integrity of the template
     void Verify(LootStore const& store, uint32 Id) const;
-    void CheckLootRefs(LootTemplateMap const& store, LootIdSet* ref_set) const;
+    void CheckLootRefs(LootStore const& lootstore, uint32 Id, LootIdSet* ref_set) const;
     bool addConditionItem(Condition* cond);
     [[nodiscard]] bool isReference(uint32 id) const;
 

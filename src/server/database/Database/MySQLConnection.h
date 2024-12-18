@@ -21,7 +21,6 @@
 #include "DatabaseEnvFwd.h"
 #include "Define.h"
 #include <map>
-#include <memory>
 #include <mutex>
 #include <string>
 #include <vector>
@@ -99,7 +98,7 @@ protected:
     void PrepareStatement(uint32 index, std::string_view sql, ConnectionFlags flags);
 
     virtual void DoPrepareStatements() = 0;
-    virtual bool _HandleMySQLErrno(uint32 errNo, uint8 attempts = 5);
+    virtual bool _HandleMySQLErrno(uint32 errNo, char const* err = "", uint8 attempts = 5);
 
     typedef std::vector<std::unique_ptr<MySQLPreparedStatement>> PreparedStatementContainer;
 

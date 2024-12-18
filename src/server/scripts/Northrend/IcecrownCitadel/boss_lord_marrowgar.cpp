@@ -84,7 +84,7 @@ public:
         if (target->GetExactDist(_source) > 175.0f)
             return false;
 
-        if (target->GetTypeId() != TYPEID_PLAYER)
+        if (!target->IsPlayer())
             return false;
 
         if (target->GetPositionX() > -337.0f)
@@ -415,7 +415,7 @@ public:
                 {
                     if (Unit* u = v->GetBase())
                     {
-                        if (u->GetEntry() == NPC_BONE_SPIKE && u->GetTypeId() == TYPEID_UNIT)
+                        if (u->GetEntry() == NPC_BONE_SPIKE && u->IsCreature())
                         {
                             u->ToCreature()->AI()->DoAction(-1337);
                         }
@@ -443,7 +443,7 @@ public:
             {
                 if (Unit* trapped = summ->GetSummonerUnit())
                 {
-                    if (!trapped->IsOnVehicle(me) || !trapped->IsAlive() || !me->GetInstanceScript() || me->GetInstanceScript()->GetBossState(DATA_LORD_MARROWGAR) != IN_PROGRESS || trapped->HasAuraType(SPELL_AURA_SPIRIT_OF_REDEMPTION))
+                    if (!trapped->IsOnVehicle(me) || !trapped->IsAlive() || !me->GetInstanceScript() || me->GetInstanceScript()->GetBossState(DATA_LORD_MARROWGAR) != IN_PROGRESS || trapped->HasSpiritOfRedemptionAura())
                     {
                         DoAction(-1337);
                         return;

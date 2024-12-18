@@ -127,6 +127,7 @@ struct boss_mother_shahraz : public BossAI
     void JustDied(Unit* killer) override
     {
         BossAI::JustDied(killer);
+        me->m_Events.CancelEventGroup(GROUP_ENRAGE);
         Talk(SAY_DEATH);
     }
 
@@ -196,6 +197,27 @@ class spell_mother_shahraz_saber_lash_aura : public AuraScript
     }
 };
 
+const Position validTeleportStairsPos[9] =
+{
+    //Platform teleports
+
+    {945.00f, 149.17f, 197.07483},
+    {956.92f, 153.20f, 197.07483},
+    {933.69f, 154.15f, 197.07483},
+
+    //Floor teleports
+
+    {966.87f, 184.45f, 192.84f},
+    {927.22f, 187.04f, 192.84f},
+    {922.54f, 110.09f, 192.84f},
+    {958.01f, 110.47f, 192.84f},
+    {939.95f, 108.29f, 192.84f},
+    {945.68f, 205.74f, 192.84f}
+};
+
+constexpr float minTeleportDist = 30.f;
+constexpr float maxTeleportDist = 50.f;
+
 class spell_mother_shahraz_fatal_attraction : public SpellScript
 {
     PrepareSpellScript(spell_mother_shahraz_fatal_attraction);
@@ -212,7 +234,44 @@ class spell_mother_shahraz_fatal_attraction : public SpellScript
 
     void SetDest(SpellDestination& dest)
     {
-        dest.Relocate(GetCaster()->GetRandomNearPosition(50.0f));
+        Position finalDest;
+
+        // Check if the boss is near stairs to avoid players falling through the platform with random teleports.
+        if (GetCaster()->GetPositionY() < 194.f)
+            finalDest = validTeleportStairsPos[urand(0, 8)];
+        else
+        {
+            finalDest = GetCaster()->GetNearPosition(frand(minTeleportDist, maxTeleportDist), static_cast<float>(rand_norm()) * static_cast<float>(2 * M_PI), true);
+
+            // Maybe not necessary but just in case to avoid LOS issues with an object
+            if (!GetCaster()->IsWithinLOS(finalDest.GetPositionX(), finalDest.GetPositionY(), finalDest.GetPositionZ()))
+                finalDest = GetCaster()->GetNearPosition(frand(minTeleportDist, maxTeleportDist), static_cast<float>(rand_norm()) * static_cast<float>(2 * M_PI), true);
+
+            /* @note: To avoid teleporting players near a walls, we will define a safe area.
+             * As the boss have an area boudary around y: 320.f. We will limit the safe area to this value, avoiding wird issues.
+             * x limit: 932.f/960.f | y limit: 224.f/320.f
+             */
+            if (finalDest.m_positionX < 932.f)
+                finalDest.m_positionX = 932.f;
+            else if (finalDest.m_positionX > 960.f)
+                finalDest.m_positionX = 960.f;
+
+            if (finalDest.m_positionY < 224.f)
+                finalDest.m_positionY = 224.f;
+            else if (finalDest.m_positionY > 320.f)
+                finalDest.m_positionY = 320.f;
+
+            // After relocate a finalDest outside the safe area, we need to recheck the distance with the boss
+            if (GetCaster()->GetExactDist2d(finalDest) < minTeleportDist)
+            {
+                if (finalDest.m_positionX == 932.f || finalDest.m_positionX == 960.f)
+                    finalDest.m_positionY = finalDest.m_positionY + (minTeleportDist - GetCaster()->GetExactDist2d(finalDest));
+                else if (finalDest.m_positionY == 224.f || finalDest.m_positionY == 320.f)
+                    finalDest.m_positionX = finalDest.m_positionX + (minTeleportDist - GetCaster()->GetExactDist2d(finalDest));
+            }
+        }
+
+        dest.Relocate(finalDest);
     }
 
     void HandleTeleportUnits(SpellEffIndex  /*effIndex*/)
@@ -235,7 +294,13 @@ class spell_mother_shahraz_fatal_attraction_dummy : public SpellScript
 
     bool Validate(SpellInfo const* /*spellInfo*/) override
     {
-        return ValidateSpellInfo({ SPELL_FATAL_ATTRACTION_DAMAGE });
+        return ValidateSpellInfo({ SPELL_FATAL_ATTRACTION_DAMAGE, SPELL_FATAL_ATTRACTION_AURA });
+    }
+
+    void FilterTargets(std::list<WorldObject*>& targets)
+    {
+        if (targets.empty())
+            GetCaster()->RemoveAurasDueToSpell(SPELL_FATAL_ATTRACTION_AURA);
     }
 
     void HandleDummy(SpellEffIndex  /*effIndex*/)
@@ -255,6 +320,7 @@ class spell_mother_shahraz_fatal_attraction_dummy : public SpellScript
 
     void Register() override
     {
+        OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_mother_shahraz_fatal_attraction_dummy::FilterTargets, EFFECT_ALL, TARGET_UNIT_SRC_AREA_ALLY);
         OnEffectHitTarget += SpellEffectFn(spell_mother_shahraz_fatal_attraction_dummy::HandleDummy, EFFECT_0, SPELL_EFFECT_DUMMY);
     }
 };

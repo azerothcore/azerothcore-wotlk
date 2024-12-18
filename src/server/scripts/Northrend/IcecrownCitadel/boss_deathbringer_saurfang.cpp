@@ -24,6 +24,7 @@
 #include "SpellAuras.h"
 #include "SpellScriptLoader.h"
 #include "icecrown_citadel.h"
+#include "SpellMgr.h"
 
 enum ScriptTexts
 {
@@ -1259,7 +1260,7 @@ class spell_deathbringer_boiling_blood : public SpellScript
 
     bool Load() override
     {
-        return GetCaster()->GetTypeId() == TYPEID_UNIT;
+        return GetCaster()->IsCreature();
     }
 
     void FilterTargets(std::list<WorldObject*>& targets)

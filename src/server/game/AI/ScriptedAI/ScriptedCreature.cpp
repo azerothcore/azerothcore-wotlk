@@ -194,6 +194,8 @@ ScriptedAI::ScriptedAI(Creature* creature) : CreatureAI(creature),
 {
     _isHeroic = me->GetMap()->IsHeroic();
     _difficulty = Difficulty(me->GetMap()->GetSpawnMode());
+    _invincible = false;
+    _canAutoAttack = true;
 }
 
 void ScriptedAI::AttackStartNoMove(Unit* who)
@@ -219,7 +221,14 @@ void ScriptedAI::UpdateAI(uint32 /*diff*/)
     if (!UpdateVictim())
         return;
 
-    DoMeleeAttackIfReady();
+    if (IsAutoAttackAllowed())
+        DoMeleeAttackIfReady();
+}
+
+void ScriptedAI::DamageTaken(Unit* /*attacker*/, uint32& damage, DamageEffectType /*damagetype*/, SpellSchoolMask /*damageSchoolMask*/)
+{
+    if (IsInvincible() && damage >= me->GetHealth())
+        damage = me->GetHealth() - 1;
 }
 
 void ScriptedAI::DoStartMovement(Unit* victim, float distance, float angle)
@@ -522,17 +531,33 @@ void ScriptedAI::SetEquipmentSlots(bool loadDefault, int32 mainHand /*= EQUIP_NO
     if (loadDefault)
     {
         me->LoadEquipment(me->GetOriginalEquipmentId(), true);
+        if (me->HasWeapon(OFF_ATTACK))
+            me->SetCanDualWield(true);
+        else
+            me->SetCanDualWield(false);
         return;
     }
 
     if (mainHand >= 0)
-        me->SetUInt32Value(UNIT_VIRTUAL_ITEM_SLOT_ID + 0, uint32(mainHand));
+    {
+        me->SetVirtualItem(0, uint32(mainHand));
+        me->UpdateDamagePhysical(BASE_ATTACK);
+    }
 
     if (offHand >= 0)
-        me->SetUInt32Value(UNIT_VIRTUAL_ITEM_SLOT_ID + 1, uint32(offHand));
+    {
+        me->SetVirtualItem(1, uint32(offHand));
+        if (offHand >= 1)
+            me->SetCanDualWield(true);
+        else
+            me->SetCanDualWield(false);
+    }
 
     if (ranged >= 0)
-        me->SetUInt32Value(UNIT_VIRTUAL_ITEM_SLOT_ID + 2, uint32(ranged));
+    {
+        me->SetVirtualItem(2, uint32(ranged));
+        me->UpdateDamagePhysical(RANGED_ATTACK);
+    }
 }
 
 enum eNPCs
@@ -568,7 +593,8 @@ Player* ScriptedAI::SelectTargetFromPlayerList(float maxdist, uint32 excludeAura
 BossAI::BossAI(Creature* creature, uint32 bossId) : ScriptedAI(creature),
     instance(creature->GetInstanceScript()),
     summons(creature),
-    _bossId(bossId)
+    _bossId(bossId),
+    _nextHealthCheck(0, { }, false)
 {
     callForHelpRange = 0.0f;
     if (instance)
@@ -598,6 +624,9 @@ bool BossAI::CanRespawn()
 void BossAI::_Reset()
 {
     if (!me->IsAlive())
+        return;
+
+    if (me->IsEngaged())
         return;
 
     me->SetCombatPulseDelay(0);
@@ -712,27 +741,28 @@ void BossAI::UpdateAI(uint32 diff)
         }
     }
 
-    DoMeleeAttackIfReady();
+    if (IsAutoAttackAllowed())
+        DoMeleeAttackIfReady();
 }
 
-void BossAI::DamageTaken(Unit* /*attacker*/, uint32& damage, DamageEffectType /*damagetype*/, SpellSchoolMask /*damageSchoolMask*/)
+void BossAI::DamageTaken(Unit* attacker, uint32& damage, DamageEffectType damagetype, SpellSchoolMask damageSchoolMask)
 {
-    if (!_healthCheckEvents.empty())
-    {
-        for (auto& check : _healthCheckEvents)
-        {
-            if (check._valid && me->HealthBelowPctDamaged(check._healthPct, damage))
-            {
-                check._exec();
-                check._valid = false;
-            }
-        }
+    ScriptedAI::DamageTaken(attacker, damage, damagetype, damageSchoolMask);
 
-        _healthCheckEvents.remove_if([&](HealthCheckEventData data) -> bool
+    if (_nextHealthCheck._valid)
+        if (me->HealthBelowPctDamaged(_nextHealthCheck._healthPct, damage))
         {
-            return !data._valid;
-        });
-    }
+            _nextHealthCheck._exec();
+            _nextHealthCheck._valid = false;
+
+            _healthCheckEvents.remove_if([&](HealthCheckEventData data) -> bool
+            {
+                return data._healthPct == _nextHealthCheck._healthPct;
+            });
+
+            if (!_healthCheckEvents.empty())
+                _nextHealthCheck = _healthCheckEvents.front();
+        }
 }
 
 /**
@@ -744,6 +774,7 @@ void BossAI::DamageTaken(Unit* /*attacker*/, uint32& damage, DamageEffectType /*
 void BossAI::ScheduleHealthCheckEvent(uint32 healthPct, std::function<void()> exec)
 {
     _healthCheckEvents.push_back(HealthCheckEventData(healthPct, exec));
+    _nextHealthCheck = _healthCheckEvents.front();
 };
 
 void BossAI::ScheduleHealthCheckEvent(std::initializer_list<uint8> healthPct, std::function<void()> exec)
@@ -752,6 +783,8 @@ void BossAI::ScheduleHealthCheckEvent(std::initializer_list<uint8> healthPct, st
     {
         _healthCheckEvents.push_back(HealthCheckEventData(checks, exec));
     }
+
+    _nextHealthCheck = _healthCheckEvents.front();
 }
 
 // WorldBossAI - for non-instanced bosses

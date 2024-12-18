@@ -73,7 +73,7 @@ public:
         void UpdateAI(uint32 diff) override
         {
             events.Update(diff);
-            switch(events.ExecuteEvent())
+            switch (events.ExecuteEvent())
             {
                 case 0:
                     break;
@@ -469,7 +469,7 @@ public:
             if (me->HasUnitState(UNIT_STATE_CASTING))
                 return;
 
-            switch(events.ExecuteEvent())
+            switch (events.ExecuteEvent())
             {
                 case 0:
                     break;
@@ -521,7 +521,7 @@ public:
         {
             if (type != POINT_MOTION_TYPE)
                 return;
-            switch(id)
+            switch (id)
             {
                 case 1:
                     events.RescheduleEvent(id, 0ms);
@@ -532,7 +532,7 @@ public:
         void UpdateAI(uint32 diff) override
         {
             events.Update(diff);
-            switch(events.ExecuteEvent())
+            switch (events.ExecuteEvent())
             {
                 case 0:
                     break;
@@ -1013,7 +1013,7 @@ public:
         {
             events.Update(diff);
 
-            switch(events.ExecuteEvent())
+            switch (events.ExecuteEvent())
             {
                 case 0:
                     break;
@@ -1130,7 +1130,7 @@ public:
             me->LoadCreaturesAddon(true);
             me->SetLootRecipient(nullptr);
             me->ResetPlayerDamageReq();
-            me->SetLastDamagedTime(0);
+            me->ClearLastLeashExtensionTimePtr();
         }
     };
 
@@ -1198,7 +1198,7 @@ public:
             if (type != WAYPOINT_MOTION_TYPE)
                 return;
 
-            switch(id)
+            switch (id)
             {
                 case 0:
                     Talk(me->GetEntry() == NPC_JAINA_PART2 ? SAY_JAINA_OUTRO_2 : SAY_SYLVANAS_OUTRO_2);
@@ -1221,7 +1221,7 @@ public:
         {
             events.Update(diff);
 
-            switch(events.ExecuteEvent())
+            switch (events.ExecuteEvent())
             {
                 case 0:
                     break;
@@ -1405,7 +1405,7 @@ class spell_pos_rimefang_frost_nova : public SpellScript
             if (Unit* caster = GetCaster())
             {
                 Unit::Kill(caster, target);
-                if (target->GetTypeId() == TYPEID_UNIT)
+                if (target->IsCreature())
                     target->ToCreature()->DespawnOrUnsummon(30000);
             }
     }

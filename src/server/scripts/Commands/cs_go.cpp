@@ -123,7 +123,14 @@ public:
         if (!name.data())
             return false;
 
-        QueryResult result = WorldDatabase.Query("SELECT entry FROM creature_template WHERE name = \"{}\" LIMIT 1" , name.data());
+        // Make sure we don't pass double quotes into the SQL query. Otherwise it causes a MySQL error
+        std::string str = name.data(); // Making subtractions to the last character does not with in string_view
+        if (str.front() == '"')
+            str = str.substr(1);
+        if (str.back() == '"')
+            str = str.substr(0, str.size() - 1);
+
+        QueryResult result = WorldDatabase.Query("SELECT entry FROM creature_template WHERE name = \"{}\" LIMIT 1", str);
         if (!result)
         {
             handler->SendErrorMessage(LANG_COMMAND_GOCREATNOTFOUND);

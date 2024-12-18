@@ -21,7 +21,6 @@
 #include "Creature.h"
 #include "GridNotifiers.h"
 #include "ObjectAccessor.h"
-#include "Opcodes.h"
 #include "SharedDefines.h"
 #include "WorldSession.h"
 
@@ -189,9 +188,9 @@ void CreatureTextMgr::SendChatPacket(WorldObject* source, Builder const& builder
         case CHAT_MSG_MONSTER_WHISPER:
         case CHAT_MSG_RAID_BOSS_WHISPER:
             {
-                if (range == TEXT_RANGE_NORMAL) //ignores team and gmOnly
+                if (range == TEXT_RANGE_NORMAL) // ignores team and GM only
                 {
-                    if (!target || target->GetTypeId() != TYPEID_PLAYER)
+                    if (!target || !target->IsPlayer())
                         return;
 
                     localizer(const_cast<Player*>(target->ToPlayer()));

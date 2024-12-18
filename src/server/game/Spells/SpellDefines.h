@@ -19,7 +19,6 @@
 #define SPELLDEFINES_H
 
 #include "Define.h"
-#include "ObjectGuid.h"
 #include <vector>
 
 enum SpellInterruptFlags
@@ -118,7 +117,10 @@ enum SpellValueMod
     SPELLVALUE_MAX_TARGETS,
     SPELLVALUE_AURA_STACK,
     SPELLVALUE_AURA_DURATION,
-    SPELLVALUE_FORCED_CRIT_RESULT
+    SPELLVALUE_FORCED_CRIT_RESULT,
+    SPELLVALUE_MISCVALUE0,
+    SPELLVALUE_MISCVALUE1,
+    SPELLVALUE_MISCVALUE2,
 };
 
 enum SpellFacingFlags

@@ -606,7 +606,7 @@ class spell_dk_dancing_rune_weapon : public AuraScript
 
     bool CheckProc(ProcEventInfo& eventInfo)
     {
-        if (!eventInfo.GetActor() || !eventInfo.GetActionTarget() || !eventInfo.GetActionTarget()->IsAlive() || eventInfo.GetActor()->GetTypeId() != TYPEID_PLAYER)
+        if (!eventInfo.GetActor() || !eventInfo.GetActionTarget() || !eventInfo.GetActionTarget()->IsAlive() || !eventInfo.GetActor()->IsPlayer())
             return false;
 
         SpellInfo const* spellInfo = eventInfo.GetSpellInfo();
@@ -1373,7 +1373,7 @@ class spell_dk_death_grip : public SpellScript
         float casterZ = GetCaster()->GetPositionZ(); // for Ring of Valor
         WorldLocation gripPos = *GetExplTargetDest();
         if (Unit* target = GetHitUnit())
-            if (!target->HasAuraType(SPELL_AURA_DEFLECT_SPELLS) || target->HasUnitState(UNIT_STATE_STUNNED)) // Deterrence
+            if (!target->HasDetectSpellsAura() || target->HasUnitState(UNIT_STATE_STUNNED)) // Deterrence
             {
                 if (target != GetCaster())
                 {

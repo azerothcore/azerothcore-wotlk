@@ -25,7 +25,6 @@
 #include "AddonMgr.h"
 #include "ArenaTeamMgr.h"
 #include "ArenaSeasonMgr.h"
-#include "AsyncAuctionListing.h"
 #include "AuctionHouseMgr.h"
 #include "AutobroadcastMgr.h"
 #include "BattlefieldMgr.h"
@@ -86,7 +85,6 @@
 #include "Util.h"
 #include "VMapFactory.h"
 #include "VMapMgr2.h"
-#include "Vehicle.h"
 #include "Warden.h"
 #include "WardenCheckMgr.h"
 #include "WaypointMovementGenerator.h"
@@ -94,13 +92,9 @@
 #include "WhoListCacheMgr.h"
 #include "WorldPacket.h"
 #include "WorldSession.h"
+#include "WorldState.h"
 #include <boost/asio/ip/address.hpp>
 #include <cmath>
-
-namespace
-{
-    TaskScheduler playersSaveScheduler;
-}
 
 std::atomic_long World::_stopEvent = false;
 uint8 World::_exitCode = SHUTDOWN_EXIT_CODE;
@@ -557,6 +551,7 @@ void World::LoadConfigSettings(bool reload)
     _rate_values[RATE_REST_INGAME]                          = sConfigMgr->GetOption<float>("Rate.Rest.InGame", 1.0f);
     _rate_values[RATE_REST_OFFLINE_IN_TAVERN_OR_CITY]       = sConfigMgr->GetOption<float>("Rate.Rest.Offline.InTavernOrCity", 1.0f);
     _rate_values[RATE_REST_OFFLINE_IN_WILDERNESS]           = sConfigMgr->GetOption<float>("Rate.Rest.Offline.InWilderness", 1.0f);
+    _rate_values[RATE_REST_MAX_BONUS]                       = sConfigMgr->GetOption<float>("Rate.Rest.MaxBonus", 1.5f);
     _rate_values[RATE_DAMAGE_FALL]                          = sConfigMgr->GetOption<float>("Rate.Damage.Fall", 1.0f);
     _rate_values[RATE_AUCTION_TIME]                         = sConfigMgr->GetOption<float>("Rate.Auction.Time", 1.0f);
     _rate_values[RATE_AUCTION_DEPOSIT]                      = sConfigMgr->GetOption<float>("Rate.Auction.Deposit", 1.0f);
@@ -1113,6 +1108,7 @@ void World::LoadConfigSettings(bool reload)
     _float_configs[CONFIG_LISTEN_RANGE_TEXTEMOTE] = sConfigMgr->GetOption<float>("ListenRange.TextEmote", 25.0f);
     _float_configs[CONFIG_LISTEN_RANGE_YELL]      = sConfigMgr->GetOption<float>("ListenRange.Yell", 300.0f);
 
+    _int_configs[CONFIG_BATTLEGROUND_OVERRIDE_LOWLEVELS_MINPLAYERS]        = sConfigMgr->GetOption<uint32>("Battleground.Override.LowLevels.MinPlayers", 0);
     _bool_configs[CONFIG_BATTLEGROUND_DISABLE_QUEST_SHARE_IN_BG]           = sConfigMgr->GetOption<bool>("Battleground.DisableQuestShareInBG", false);
     _bool_configs[CONFIG_BATTLEGROUND_DISABLE_READY_CHECK_IN_BG]           = sConfigMgr->GetOption<bool>("Battleground.DisableReadyCheckInBG", false);
     _bool_configs[CONFIG_BATTLEGROUND_CAST_DESERTER]                       = sConfigMgr->GetOption<bool>("Battleground.CastDeserter", true);
@@ -1264,6 +1260,7 @@ void World::LoadConfigSettings(bool reload)
     _bool_configs[CONFIG_ITEMDELETE_VENDOR]    = sConfigMgr->GetOption<bool>("ItemDelete.Vendor", 0);
     _int_configs[CONFIG_ITEMDELETE_QUALITY]    = sConfigMgr->GetOption<int32>("ItemDelete.Quality", 3);
     _int_configs[CONFIG_ITEMDELETE_ITEM_LEVEL] = sConfigMgr->GetOption<int32>("ItemDelete.ItemLevel", 80);
+    _int_configs[CONFIG_ITEMDELETE_KEEP_DAYS]  = sConfigMgr->GetOption<int32>("ItemDelete.KeepDays", 0);
 
     _int_configs[CONFIG_FFA_PVP_TIMER] = sConfigMgr->GetOption<int32>("FFAPvPTimer", 30);
 
@@ -1286,8 +1283,6 @@ void World::LoadConfigSettings(bool reload)
     _bool_configs[CONFIG_ENABLE_DAZE] = sConfigMgr->GetOption<bool>("Daze.Enabled", true);
 
     _int_configs[CONFIG_DAILY_RBG_MIN_LEVEL_AP_REWARD] = sConfigMgr->GetOption<uint32>("DailyRBGArenaPoints.MinLevel", 71);
-
-    _int_configs[CONFIG_AUCTION_HOUSE_SEARCH_TIMEOUT] = sConfigMgr->GetOption<uint32>("AuctionHouse.SearchTimeout", 1000);
 
     ///- Read the "Data" directory from the config file
     std::string dataPath = sConfigMgr->GetOption<std::string>("DataDir", "./");
@@ -1483,6 +1478,13 @@ void World::LoadConfigSettings(bool reload)
 
     // Realm Availability
     _bool_configs[CONFIG_REALM_LOGIN_ENABLED] = sConfigMgr->GetOption<bool>("World.RealmAvailability", true);
+
+    // AH Worker threads
+    _int_configs[CONFIG_AUCTIONHOUSE_WORKERTHREADS] = sConfigMgr->GetOption<int32>("AuctionHouse.WorkerThreads", 1);
+
+    // SpellQueue
+    _bool_configs[CONFIG_SPELL_QUEUE_ENABLED] = sConfigMgr->GetOption<bool>("SpellQueue.Enabled", true);
+    _int_configs[CONFIG_SPELL_QUEUE_WINDOW] = sConfigMgr->GetOption<uint32>("SpellQueue.Window", 400);
 
     // call ScriptMgr if we're reloading the configuration
     sScriptMgr->OnAfterConfigLoad(reload);
@@ -1815,6 +1817,9 @@ void World::SetInitialWorldSettings()
     LOG_INFO("server.loading", "Loading Vehicle Accessories...");
     sObjectMgr->LoadVehicleAccessories();                       // must be after LoadCreatureTemplates() and LoadNPCSpellClickSpells()
 
+    LOG_INFO("server.loading", "Loading Vehicle Seat Addon Data...");
+    sObjectMgr->LoadVehicleSeatAddon();                         // must be after loading DBC
+
     LOG_INFO("server.loading", "Loading SpellArea Data...");                // must be after quest load
     sSpellMgr->LoadSpellAreas();
 
@@ -2053,12 +2058,13 @@ void World::SetInitialWorldSettings()
     LOG_INFO("server.loading", "Initialize Game Time and Timers");
     LOG_INFO("server.loading", " ");
 
-    LoginDatabase.Execute("INSERT INTO uptime (realmid, starttime, uptime, revision) VALUES ({}, {}, 0, '{}')",
-                           realm.Id.Realm, uint32(GameTime::GetStartTime().count()), GitRevision::GetFullVersion());       // One-time query
+    LoginDatabasePreparedStatement* stmt = LoginDatabase.GetPreparedStatement(LOGIN_INS_UPTIME);
+    stmt->SetData(0, realm.Id.Realm);
+    stmt->SetData(1, uint32(GameTime::GetStartTime().count()));
+    stmt->SetData(2, GitRevision::GetFullVersion());
+    LoginDatabase.Execute(stmt);
 
     _timers[WUPDATE_WEATHERS].SetInterval(1 * IN_MILLISECONDS);
-    _timers[WUPDATE_AUCTIONS].SetInterval(MINUTE * IN_MILLISECONDS);
-    _timers[WUPDATE_AUCTIONS].SetCurrent(MINUTE * IN_MILLISECONDS);
     _timers[WUPDATE_UPTIME].SetInterval(_int_configs[CONFIG_UPTIME_UPDATE]*MINUTE * IN_MILLISECONDS);
     //Update "uptime" table based on configuration entry in minutes.
 
@@ -2089,6 +2095,9 @@ void World::SetInitialWorldSettings()
 
     // Delete all characters which have been deleted X days before
     Player::DeleteOldCharacters();
+
+    // Delete all items which have been deleted X days before
+    Player::DeleteOldRecoveryItems();
 
     // Delete all custom channels which haven't been used for PreserveCustomChannelDuration days.
     Channel::CleanOldChannelsInDB();
@@ -2328,18 +2337,11 @@ void World::Update(uint32 diff)
         ResetGuildCap();
     }
 
-    // pussywizard: handle auctions when the timer has passed
-    if (_timers[WUPDATE_AUCTIONS].Passed())
     {
-        METRIC_TIMER("world_update_time", METRIC_TAG("type", "Update expired auctions"));
-
-        _timers[WUPDATE_AUCTIONS].Reset();
-
         // pussywizard: handle expired auctions, auctions expired when realm was offline are also handled here (not during loading when many required things aren't loaded yet)
-        sAuctionMgr->Update();
+        METRIC_TIMER("world_update_time", METRIC_TAG("type", "Update expired auctions"));
+        sAuctionMgr->Update(diff);
     }
-
-    AsyncAuctionListingMgr::Update(Milliseconds(diff));
 
     if (currentGameTime > _mail_expire_check_timer)
     {
@@ -2402,6 +2404,11 @@ void World::Update(uint32 diff)
     {
         METRIC_TIMER("world_update_time", METRIC_TAG("type", "Update outdoor pvp"));
         sOutdoorPvPMgr->Update(diff);
+    }
+
+    {
+        METRIC_TIMER("world_update_time", METRIC_TAG("type", "Update worldstate"));
+        sWorldState->Update(diff);
     }
 
     {
@@ -2483,11 +2490,6 @@ void World::Update(uint32 diff)
     {
         METRIC_TIMER("world_update_time", METRIC_TAG("type", "Update world scripts"));
         sScriptMgr->OnWorldUpdate(diff);
-    }
-
-    {
-        METRIC_TIMER("world_update_time", METRIC_TAG("type", "Update playersSaveScheduler"));
-        playersSaveScheduler.Update(diff);
     }
 
     {
@@ -2678,31 +2680,6 @@ void World::ShutdownServ(uint32 time, uint32 options, uint8 exitcode, const std:
 
     _shutdownMask = options;
     _exitCode = exitcode;
-
-    auto const& playersOnline = GetActiveSessionCount();
-
-    if (time < 5 && playersOnline)
-    {
-        // Set time to 5s for save all players
-        time = 5;
-    }
-
-    playersSaveScheduler.CancelAll();
-
-    if (time >= 5)
-    {
-        playersSaveScheduler.Schedule(Seconds(time - 5), [this](TaskContext /*context*/)
-        {
-            if (!GetActiveSessionCount())
-            {
-                LOG_INFO("server", "> No players online. Skip save before shutdown");
-                return;
-            }
-
-            LOG_INFO("server", "> Save players before shutdown server");
-            ObjectAccessor::SaveAllPlayers();
-        });
-    }
 
     LOG_WARN("server", "Time left until shutdown/restart: {}", time);
 

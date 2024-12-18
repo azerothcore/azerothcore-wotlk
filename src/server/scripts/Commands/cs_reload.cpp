@@ -31,6 +31,7 @@ EndScriptData */
 #include "CreatureTextMgr.h"
 #include "DisableMgr.h"
 #include "GameGraveyard.h"
+#include "ItemEnchantmentMgr.h"
 #include "LFGMgr.h"
 #include "Language.h"
 #include "MapMgr.h"
@@ -413,7 +414,12 @@ public:
         LOG_INFO("server.loading", "Reloading Motd...");
         sMotdMgr->LoadMotd();
         handler->SendGlobalGMSysMessage("DB table `motd` reloaded.");
-        handler->SendGlobalSysMessage(sMotdMgr->GetMotd());
+        LocaleConstant locale = DEFAULT_LOCALE;
+
+        if (Player* player = handler->GetPlayer())
+            locale = player->GetSession()->GetSessionDbLocaleIndex();
+
+        handler->SendGlobalSysMessage(sMotdMgr->GetMotd(locale));
         return true;
     }
 

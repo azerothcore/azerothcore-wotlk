@@ -44,13 +44,13 @@ void Player::PrepareGossipMenu(WorldObject* source, uint32 menuId /*= 0*/, bool 
 
     uint32 npcflags = 0;
 
-    if (source->GetTypeId() == TYPEID_UNIT)
+    if (source->IsCreature())
     {
         npcflags = source->ToUnit()->GetNpcFlags();
         if (showQuests && npcflags & UNIT_NPC_FLAG_QUESTGIVER)
             PrepareQuestMenu(source->GetGUID());
     }
-    else if (source->GetTypeId() == TYPEID_GAMEOBJECT)
+    else if (source->IsGameObject())
         if (showQuests && source->ToGameObject()->GetGoType() == GAMEOBJECT_TYPE_QUESTGIVER)
             PrepareQuestMenu(source->GetGUID());
 
@@ -211,7 +211,7 @@ void Player::SendPreparedGossip(WorldObject* source)
     if (!source)
         return;
 
-    if (source->GetTypeId() == TYPEID_UNIT)
+    if (source->IsCreature())
     {
         // in case no gossip flag and quest menu not empty, open quest menu (client expect gossip menu with this flag)
         if (!source->ToCreature()->HasNpcFlag(UNIT_NPC_FLAG_GOSSIP) && !PlayerTalkClass->GetQuestMenu().Empty())
@@ -220,7 +220,7 @@ void Player::SendPreparedGossip(WorldObject* source)
             return;
         }
     }
-    else if (source->GetTypeId() == TYPEID_GAMEOBJECT)
+    else if (source->IsGameObject())
     {
         // probably need to find a better way here
         if (!PlayerTalkClass->GetGossipMenu().GetMenuId() && !PlayerTalkClass->GetQuestMenu().Empty())
@@ -256,7 +256,7 @@ void Player::OnGossipSelect(WorldObject* source, uint32 gossipListId, uint32 men
     uint32 gossipOptionId = item->OptionType;
     ObjectGuid guid = source->GetGUID();
 
-    if (sWorld->getIntConfig(CONFIG_INSTANT_TAXI) == 2 && source->GetTypeId() == TYPEID_UNIT)
+    if (sWorld->getIntConfig(CONFIG_INSTANT_TAXI) == 2 && source->IsCreature())
     {
         if (gossipOptionId == GOSSIP_ACTION_TOGGLE_INSTANT_FLIGHT && source->ToUnit()->GetNpcFlags() & UNIT_NPC_FLAG_FLIGHTMASTER)
         {
@@ -272,7 +272,7 @@ void Player::OnGossipSelect(WorldObject* source, uint32 gossipListId, uint32 men
         }
     }
 
-    if (source->GetTypeId() == TYPEID_GAMEOBJECT)
+    if (source->IsGameObject())
     {
         if (gossipOptionId > GOSSIP_OPTION_QUESTGIVER)
         {

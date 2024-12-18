@@ -22,6 +22,7 @@
 #include "Duration.h"
 #include "Log.h"
 #include "MotdMgr.h"
+#include "QueryResult.h"
 #include "SRP6.h"
 #include "Util.h"
 #include "World.h"
@@ -75,7 +76,7 @@ void RASession::Start()
     LOG_INFO("commands.ra", "User {} (IP: {}) authenticated correctly to RA", username, GetRemoteIpAddress());
 
     // Authentication successful, send the motd
-    Send(std::string(std::string(sMotdMgr->GetMotd()) + "\r\n").c_str());
+    Send(std::string(std::string(sMotdMgr->GetMotd(DEFAULT_LOCALE)) + "\r\n").c_str());
 
     // Read commands
     for (;;)

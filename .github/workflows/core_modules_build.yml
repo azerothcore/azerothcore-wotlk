@@ -4,7 +4,11 @@ on:
     branches:
       - 'master'
   pull_request:
-    types: ['labeled', 'opened', 'synchronize', 'reopened']
+    types:
+      - labeled
+      - opened
+      - reopened
+      - synchronize
 
 concurrency:
   group: ${{ github.head_ref }} || concat(${{ github.ref }}, ${{ github.workflow }})
@@ -12,10 +16,17 @@ concurrency:
 
 jobs:
   build-modules:
-    runs-on: ubuntu-latest
-    name: modules build on latest ubuntu
-    if: |
-      github.repository == 'azerothcore/azerothcore-wotlk'
+    strategy:
+      fail-fast: true
+      matrix:
+        include:
+          - os: ubuntu-24.04
+            compiler:
+              CC: clang-18
+              CXX: clang++-18
+    runs-on: ${{ matrix.os }}
+    name: ${{ matrix.os }}-${{ matrix.compiler.CC }}-nopch-modules
+    if: github.repository == 'azerothcore/azerothcore-wotlk'
       && !github.event.pull_request.draft
       && (
         github.ref_name == 'master'
@@ -33,7 +44,7 @@ jobs:
         run: bash -x ./apps/ci/ci-install-modules.sh
       - uses: ./.github/actions/linux-build
         with:
-          CC: clang-15
-          CXX: clang++-15
+          CC: ${{ matrix.compiler.CC }}
+          CXX: ${{ matrix.compiler.CXX }}
           modules: true
           pch: false

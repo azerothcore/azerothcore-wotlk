@@ -20,10 +20,10 @@
 #include "Config.h"
 #include "DatabaseEnv.h"
 #include "DatabaseLoader.h"
-#include "GitRevision.h"
 #include "Log.h"
 #include "StartProcess.h"
 #include "UpdateFetcher.h"
+#include "QueryResult.h"
 #include <filesystem>
 #include <fstream>
 #include <iostream>
@@ -493,17 +493,8 @@ void DBUpdater<T>::ApplyFile(DatabaseWorkerPool<T>& pool, std::string const& hos
     // Set max allowed packet to 1 GB
     args.emplace_back("--max-allowed-packet=1GB");
 
-#if !defined(MARIADB_VERSION_ID) && MYSQL_VERSION_ID >= 80000
-
     if (ssl == "ssl")
         args.emplace_back("--ssl-mode=REQUIRED");
-
-#else
-
-    if (ssl == "ssl")
-        args.emplace_back("--ssl");
-
-#endif
 
     // Execute sql file
     args.emplace_back("-e");

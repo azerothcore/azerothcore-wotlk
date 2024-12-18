@@ -20,7 +20,6 @@
 #include "ScriptedCreature.h"
 #include "SpellScript.h"
 #include "SpellScriptLoader.h"
-#include "temple_of_ahnqiraj.h"
 
 enum Spells
 {

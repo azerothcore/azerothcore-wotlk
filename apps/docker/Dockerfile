@@ -199,6 +199,9 @@ ENV ACORE_COMPONENT=dbimport
 COPY --chown=$DOCKER_USER:$DOCKER_USER \
     data data
 
+COPY --chown=$DOCKER_USER:$DOCKER_USER \
+    modules modules
+
 COPY --chown=$DOCKER_USER:$DOCKER_USER\
      --from=build \
      /azerothcore/env/dist/bin/dbimport /azerothcore/env/dist/bin/dbimport

@@ -17,7 +17,6 @@
 
 #include "PassiveAI.h"
 #include "Creature.h"
-#include "TemporarySummon.h"
 
 PassiveAI::PassiveAI(Creature* c) : CreatureAI(c) { me->SetReactState(REACT_PASSIVE); }
 PossessedAI::PossessedAI(Creature* c) : CreatureAI(c) { me->SetReactState(REACT_PASSIVE); }
@@ -65,7 +64,7 @@ void PossessedAI::JustDied(Unit* /*u*/)
 void PossessedAI::KilledUnit(Unit*  /*victim*/)
 {
     // We killed a creature, disable victim's loot
-    //if (victim->GetTypeId() == TYPEID_UNIT)
+    //if (victim->IsCreature())
     //    victim->RemoveDynamicFlag(UNIT_DYNFLAG_LOOTABLE);
 }
 

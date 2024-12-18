@@ -380,7 +380,7 @@ Aura* Aura::Create(SpellInfo const* spellproto, uint8 effMask, WorldObject* owne
         casterGUID = caster->GetGUID();
 
     // check if aura can be owned by owner
-    if (owner->isType(TYPEMASK_UNIT))
+    if (owner->IsUnit())
         if (!owner->IsInWorld() || ((Unit*)owner)->IsDuringRemoveFromWorld())
             // owner not in world so don't allow to own not self casted single target auras
             if (casterGUID != owner->GetGUID() && spellproto->IsSingleTarget())
@@ -1276,7 +1276,7 @@ void Aura::HandleAuraSpecificMods(AuraApplication const* aurApp, Unit* caster, b
         for (SpellAreaForAreaMap::const_iterator itr = saBounds.first; itr != saBounds.second; ++itr)
         {
             // some auras remove at aura remove
-            if (!itr->second->IsFitToRequirements(target->ToPlayer(), zone, area))
+            if (!itr->second->IsFitToRequirements(target->ToPlayer(), zone, area) && !apply)
                 target->RemoveAurasDueToSpell(itr->second->spellId);
             // some auras applied at aura apply
             else if (itr->second->autocast)
@@ -1613,7 +1613,7 @@ void Aura::HandleAuraSpecificMods(AuraApplication const* aurApp, Unit* caster, b
             case SPELLFAMILY_GENERIC:
                 if (!caster)
                     break;
-                switch(GetId())
+                switch (GetId())
                 {
                     case 61987: // Avenging Wrath
                         // Remove the immunity shield marker on Avenging Wrath removal if Forbearance is not present
@@ -1789,7 +1789,7 @@ void Aura::HandleAuraSpecificMods(AuraApplication const* aurApp, Unit* caster, b
                     {
                         if (removeMode != AURA_REMOVE_BY_EXPIRE)
                             break;
-                        if (caster->GetTypeId() != TYPEID_PLAYER)
+                        if (!caster->IsPlayer())
                             break;
 
                         Player* player = caster->ToPlayer();
@@ -1860,7 +1860,7 @@ void Aura::HandleAuraSpecificMods(AuraApplication const* aurApp, Unit* caster, b
                 {
                     if (!GetEffect(0) || GetEffect(0)->GetAuraType() != SPELL_AURA_PERIODIC_DUMMY)
                         break;
-                    if (target->GetTypeId() != TYPEID_PLAYER)
+                    if (!target->IsPlayer())
                         break;
                     if (!target->ToPlayer()->IsClass(CLASS_DEATH_KNIGHT, CLASS_CONTEXT_ABILITY))
                         break;
@@ -2010,7 +2010,7 @@ bool Aura::IsAuraStronger(Aura const* newAura) const
                 return true;
 
             if (curValue == std::abs(newEffect->GetAmount()))
-                if(!IsPassive() && !IsPermanent() && GetDuration() < newAura->GetDuration())
+                if (!IsPassive() && !IsPermanent() && GetDuration() < newAura->GetDuration())
                     return true;
         }
     }

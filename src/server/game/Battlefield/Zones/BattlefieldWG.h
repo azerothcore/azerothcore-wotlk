@@ -20,9 +20,7 @@
 
 #include "Battlefield.h"
 #include "Log.h"
-#include "ObjectAccessor.h"
 #include "World.h"
-#include "WorldPacket.h"
 
 class Group;
 class BattlefieldWG;
