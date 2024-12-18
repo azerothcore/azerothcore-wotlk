@@ -20,6 +20,7 @@
 
 #include "Common.h"
 #include "DataMap.h"
+#include "EventProcessor.h"
 #include "G3D/Vector3.h"
 #include "GridDefines.h"
 #include "GridReference.h"
@@ -95,6 +96,8 @@ struct PositionFullTerrainStatus;
 
 typedef std::unordered_map<Player*, UpdateData> UpdateDataMapType;
 typedef GuidUnorderedSet UpdatePlayerSet;
+
+static constexpr Milliseconds HEARTBEAT_INTERVAL = 5s + 200ms;
 
 class Object
 {
@@ -219,6 +222,8 @@ public:
     [[nodiscard]] DynamicObject const* ToDynObject() const { if (IsDynamicObject()) return reinterpret_cast<DynamicObject const*>(this); else return nullptr; }
 
     [[nodiscard]] inline bool IsItem() const { return GetTypeId() == TYPEID_ITEM; }
+
+    virtual void Heartbeat() {}
 
     virtual std::string GetDebugInfo() const;
 
@@ -408,7 +413,7 @@ protected:
 public:
     ~WorldObject() override;
 
-    virtual void Update(uint32 /*time_diff*/);
+    virtual void Update(uint32 diff);
 
     void _Create(ObjectGuid::LowType guidlow, HighGuid guidhigh, uint32 phaseMask);
 
@@ -632,7 +637,9 @@ public:
 
     std::string GetDebugInfo() const override;
 
+    // Event handler
     ElunaEventProcessor* elunaEvents;
+    EventProcessor m_Events;
 
 protected:
     std::string m_name;
@@ -666,7 +673,7 @@ protected:
     virtual bool IsAlwaysDetectableFor(WorldObject const* /*seer*/) const { return false; }
 private:
     Map* m_currMap;                                    //current object's Map location
-
+    Milliseconds _heartbeatTimer;
     //uint32 m_mapId;                                     // object at map with map_id
     uint32 m_InstanceId;                                // in map copy with instance id
     uint32 m_phaseMask;                                 // in area phase state

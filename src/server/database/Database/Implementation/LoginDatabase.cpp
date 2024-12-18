@@ -116,7 +116,9 @@ void LoginDatabaseConnection::DoPrepareStatements()
     PrepareStatement(LOGIN_DEL_ACCOUNT, "DELETE FROM account WHERE id = ?", CONNECTION_ASYNC);
     PrepareStatement(LOGIN_SEL_AUTOBROADCAST, "SELECT id, weight, text FROM autobroadcast WHERE realmid = ? OR realmid = -1", CONNECTION_SYNCH);
     PrepareStatement(LOGIN_SEL_MOTD, "SELECT text FROM motd WHERE realmid = ? OR realmid = -1 ORDER BY realmid DESC", CONNECTION_SYNCH);
-    PrepareStatement(LOGIN_REP_MOTD, "REPLACE INTO motd (realmid, text) VALUES (?, ?)", CONNECTION_ASYNC);
+    PrepareStatement(LOGIN_SEL_MOTD_LOCALE, "SELECT locale, text FROM motd_localized WHERE realmid = ? OR realmid = -1 ORDER BY realmid DESC", CONNECTION_SYNCH);
+    PrepareStatement(LOGIN_INS_MOTD, "INSERT INTO motd (realmid, text) VALUES (?, ?) ON DUPLICATE KEY UPDATE text = ?", CONNECTION_ASYNC);
+    PrepareStatement(LOGIN_INS_MOTD_LOCALE, "INSERT INTO motd_localized (realmid, locale, text) VALUES(?, ?, ?) ON DUPLICATE KEY UPDATE text = ?;", CONNECTION_ASYNC);
     PrepareStatement(LOGIN_INS_ACCOUNT_MUTE, "INSERT INTO account_muted VALUES (?, UNIX_TIMESTAMP(), ?, ?, ?)", CONNECTION_ASYNC);
     PrepareStatement(LOGIN_SEL_ACCOUNT_MUTE_INFO, "SELECT mutedate, mutetime, mutereason, mutedby FROM account_muted WHERE guid = ? ORDER BY mutedate ASC", CONNECTION_SYNCH);
     PrepareStatement(LOGIN_DEL_ACCOUNT_MUTED, "DELETE FROM account_muted WHERE guid = ?", CONNECTION_ASYNC);
