@@ -21,6 +21,7 @@
 #include "Cell.h"
 #include "Define.h"
 #include "GridDefines.h"
+#include "ObjectMgr.h"
 
 class ObjectGridLoader
 {

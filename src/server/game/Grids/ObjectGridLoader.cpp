@@ -22,7 +22,6 @@
 #include "DynamicObject.h"
 #include "GameObject.h"
 #include "GridNotifiers.h"
-#include "ObjectMgr.h"
 #include "Transport.h"
 
 template <class T>
