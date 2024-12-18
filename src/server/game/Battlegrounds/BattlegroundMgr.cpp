@@ -334,9 +334,9 @@ Battleground* BattlegroundMgr::GetBattlegroundTemplate(BattlegroundTypeId bgType
     return bgs.empty() ? nullptr : bgs.begin()->second;
 }
 
-std::vector<const Battleground *> BattlegroundMgr::GetActiveBattlegrounds()
+std::vector<Battleground const*> BattlegroundMgr::GetActiveBattlegrounds()
 {
-    std::vector<const Battleground *> result;
+    std::vector<Battleground const*> result;
 
     for (auto const& [bgType, bgData] : bgDataStore)
         for (auto const& [id, bg] : bgData._Battlegrounds)
