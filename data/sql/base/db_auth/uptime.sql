@@ -1,8 +1,8 @@
--- MySQL dump 10.13  Distrib 8.4.1, for Win64 (x86_64)
+-- MySQL dump 10.13  Distrib 8.0.34, for Win64 (x86_64)
 --
 -- Host: 127.0.0.1    Database: acore_auth
 -- ------------------------------------------------------
--- Server version	8.4.1
+-- Server version	8.0.34
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
 /*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
@@ -37,7 +37,10 @@ CREATE TABLE `uptime` (
 LOCK TABLES `uptime` WRITE;
 /*!40000 ALTER TABLE `uptime` DISABLE KEYS */;
 INSERT INTO `uptime` VALUES
-(1,1734195784,0,0,'AzerothCore rev. 71644228836e 2024-12-14 14:52:53 +0000 (master branch) (Win64, RelWithDebInfo, Static)');
+(1,1721169877,0,0,'AzerothCore rev. bdf204f1eb0c 2024-07-16 16:28:59 +0000 (time-for-A-SQUASH branch) (Win64, RelWithDebInfo, Static)'),
+(1,1734468956,0,0,'AzerothCore rev. 2923a4aa43d0 2024-12-17 12:28:46 -0300 (master branch) (Win64, RelWithDebInfo, Static)'),
+(1,1734470333,0,0,'AzerothCore rev. 2923a4aa43d0 2024-12-17 12:28:46 -0300 (master branch) (Win64, RelWithDebInfo, Static)'),
+(1,1734471110,0,0,'AzerothCore rev. 2923a4aa43d0 2024-12-17 12:28:46 -0300 (master branch) (Win64, RelWithDebInfo, Static)');
 /*!40000 ALTER TABLE `uptime` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -49,4 +52,5 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2024-12-14 18:04:05
+-- Dump completed on 2024-12-17 22:32:57
+
