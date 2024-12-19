@@ -1,3 +1,4 @@
+-- DB update 2024_12_18_00 -> 2024_12_19_00
  -- Archmage Mordent Evenshade smart ai
 SET @ENTRY := 36479;
 UPDATE `creature_template` SET `AIName` = 'SmartAI', `ScriptName` = '' WHERE `entry` = @ENTRY;
