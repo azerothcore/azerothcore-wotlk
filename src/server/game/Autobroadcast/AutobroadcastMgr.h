@@ -47,7 +47,6 @@ private:
     AutobroadcastsMap _autobroadcasts;                  // autobroadcast messages
     AutobroadcastsWeightMap _autobroadcastsWeights;    // Weights for each message
 
-
     AnnounceType _announceType;
 };
 

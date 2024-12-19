@@ -104,7 +104,6 @@ void AutobroadcastMgr::LoadAutobroadcastsLocalized()
     LOG_INFO("server.loading", ">> Loaded {} Localized Autobroadcast Definitions in {} ms", count, GetMSTimeDiffToNow(oldMSTime));
 }
 
-
 void AutobroadcastMgr::SendAutobroadcasts()
 {
     if (_autobroadcasts.empty())
@@ -170,9 +169,8 @@ void AutobroadcastMgr::SendWorldAnnouncement(uint8 textId)
         // Get player's locale
         LocaleConstant locale = player->GetSession()->GetSessionDbLocaleIndex();
 
-        if (!_autobroadcasts.count(textId) ) {
+        if (!_autobroadcasts.count(textId))
             return;
-        }
 
         std::string_view localizedMessage = ObjectMgr::GetLocaleString(_autobroadcasts[textId], locale);
 
