@@ -2184,7 +2184,7 @@ namespace lfg
                 ChatHandler(player->GetSession()).PSendSysMessage(ss.str());
                 return;
             }
-               
+
             uint32 mapid = dungeon->map;
             float x = dungeon->x;
             float y = dungeon->y;
