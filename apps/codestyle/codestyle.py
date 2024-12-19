@@ -220,8 +220,8 @@ def misc_codestyle_check(file: io, file_path: str) -> None:
     file.seek(0)  # Reset file pointer to the beginning
     check_failed = False
 
-    # used to check for "if/else (...) {" "} else" ignores "if/else (...) {...}"
-    ifelsecurlyregex = r"^[^#define].*\s+(if|else)(\s*\(.*\))?\s*{[^}]*$|}\s*else(\s*{[^}]*$)"
+    # used to check for "if/else (...) {" "} else" ignores "if/else (...) {...}" "#define ... if/else (...) {"
+    ifelse_curlyregex = r"^[^#define].*\s+(if|else)(\s*\(.*\))?\s*{[^}]*$|}\s*else(\s*{[^}]*$)"
     # Parse all the file
     for line_number, line in enumerate(file, start = 1):
         if 'const auto&' in line:
@@ -236,7 +236,7 @@ def misc_codestyle_check(file: io, file_path: str) -> None:
             print(
                 f"Please use the 'if (XXXX)' syntax instead of 'if(XXXX)': {file_path} at line {line_number}")
             check_failed = True
-        if re.match(ifelsecurlyregex, line):
+        if re.match(ifelse_curlyregex, line):
             print(
                 f"Curly brackets are not allowed to be leading or trailing if/else statements. Place it on a new line: {file_path} at line {line_number}")
             check_failed = True
