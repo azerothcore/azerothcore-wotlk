@@ -54,21 +54,18 @@ void AutobroadcastMgr::LoadAutobroadcasts()
         _announceType = AnnounceType::World;
     }
 
-    uint32 count = 0;
-
     do
     {
         Field* fields = result->Fetch();
         uint8 id = fields[0].Get<uint8>();
 
-        _autobroadcasts[id] = fields[2].Get<std::string>();
+        ObjectMgr::AddLocaleString(fields[2].Get<std::string>(), DEFAULT_LOCALE, _autobroadcasts[id]);
         _autobroadcastsWeights[id] = fields[1].Get<uint8>();
 
-        ++count;
     } while (result->NextRow());
 
-    LOG_INFO("autobroadcast", ">> Loaded {} Autobroadcast Definitions in {} ms", count, GetMSTimeDiffToNow(oldMSTime));
-    LOG_INFO("autobroadcast", " ");
+    LOG_INFO("server.loading", ">> Loaded {} Autobroadcast Definitions in {} ms", _autobroadcasts.size(), GetMSTimeDiffToNow(oldMSTime));
+    LOG_INFO("server.loading", " ");
 }
 
 void AutobroadcastMgr::LoadAutobroadcastsLocalized()
@@ -85,22 +82,28 @@ void AutobroadcastMgr::LoadAutobroadcastsLocalized()
 
     if (!result)
     {
-        LOG_WARN("autobroadcast", ">> Loaded 0 localized autobroadcasts definitions. DB table `autobroadcast_localized` is empty for this realm!");
+        LOG_WARN("server.loading", ">> Loaded 0 localized autobroadcasts definitions. DB table `autobroadcast_localized` is empty for this realm!");
         return;
     }
+
+    uint8 count = 0;
 
     do
     {
         Field* fields = result->Fetch();
         uint8 id = fields[0].Get<uint8>();
         LocaleConstant locale = GetLocaleByName(fields[1].Get<std::string>());
-        std::string message = fields[2].Get<std::string>();
 
-        _localizedAutobroadcasts[id][locale] = message;
+        if (locale == DEFAULT_LOCALE)
+            continue;
+
+        ObjectMgr::AddLocaleString(fields[2].Get<std::string>(), locale, _autobroadcasts[id]);
+        count++;
     } while (result->NextRow());
 
-    LOG_INFO("autobroadcast", ">> Loaded {} Localized Autobroadcast Definitions in {} ms", _localizedAutobroadcasts.size(), GetMSTimeDiffToNow(oldMSTime));
+    LOG_INFO("server.loading", ">> Loaded {} Localized Autobroadcast Definitions in {} ms", count, GetMSTimeDiffToNow(oldMSTime));
 }
+
 
 void AutobroadcastMgr::SendAutobroadcasts()
 {
@@ -164,29 +167,18 @@ void AutobroadcastMgr::SendWorldAnnouncement(uint8 textId)
     // Send localized messages to all sessions
     ChatHandler(nullptr).DoForAllValidSessions([&](Player* player)
     {
-        if (!player || !player->GetSession())
-            return;
-
         // Get player's locale
         LocaleConstant locale = player->GetSession()->GetSessionDbLocaleIndex();
 
-        std::string localizedMessage;
+        if (!_autobroadcasts.count(textId) ) {
+            return;
+        }
 
-        if (_localizedAutobroadcasts.count(textId) && _localizedAutobroadcasts[textId].count(locale))
-        {
-            // Use the localized message if available
-            localizedMessage = _localizedAutobroadcasts[textId][locale];
-        }
-        else if (_autobroadcasts.count(textId))
-        {
-            // Fallback to the default message if localization is unavailable
-            localizedMessage = _autobroadcasts[textId];
-        }
-        else
-        {
-            // Fallback message if textId doesn't exist
-            localizedMessage = "Broadcast Message Not Found";
-        }
+        std::string_view localizedMessage = ObjectMgr::GetLocaleString(_autobroadcasts[textId], locale);
+
+        // Check if there is a localized message if not use default one.
+        if (localizedMessage.empty())
+            localizedMessage = ObjectMgr::GetLocaleString(_autobroadcasts[textId], DEFAULT_LOCALE);
 
         // Send the localized or fallback message
         ChatHandler(player->GetSession()).SendWorldTextOptional(localizedMessage, ANNOUNCER_FLAG_DISABLE_AUTOBROADCAST);
@@ -200,23 +192,17 @@ void AutobroadcastMgr::SendNotificationAnnouncement(uint8 textId)
         // Retrieve player's locale
         LocaleConstant locale = player->GetSession()->GetSessionDbLocaleIndex();
 
-        // Lookup the localized message based on textId and locale
-        std::string localizedMessage;
+        if (!_autobroadcasts.count(textId))
+        {
+            return;
+        }
 
-        if (_localizedAutobroadcasts.count(textId) &&
-            _localizedAutobroadcasts[textId].count(locale))
-        {
-            // Use localized message
-            localizedMessage = _localizedAutobroadcasts[textId][locale];
-        }
-        else
-        {
-            // Fallback to default locale or placeholder text
-            if (_autobroadcasts.count(textId))
-                localizedMessage = _autobroadcasts[textId];
-            else
-                localizedMessage = "Broadcast Message Not Found";
-        }
+        // Get localized message
+        std::string_view localizedMessage = ObjectMgr::GetLocaleString(_autobroadcasts[textId], locale);
+
+        // Check if there is a localized message if not use default one.
+        if (localizedMessage.empty())
+            localizedMessage = ObjectMgr::GetLocaleString(_autobroadcasts[textId], DEFAULT_LOCALE);
 
         // Prepare the WorldPacket
         WorldPacket data(SMSG_NOTIFICATION, (localizedMessage.size() + 1));
