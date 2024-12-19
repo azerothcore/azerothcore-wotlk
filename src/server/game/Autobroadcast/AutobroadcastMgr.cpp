@@ -89,7 +89,6 @@ void AutobroadcastMgr::LoadAutobroadcastsLocalized()
         return;
     }
 
-    uint32 count = 0;
     do
     {
         Field* fields = result->Fetch();
@@ -98,7 +97,6 @@ void AutobroadcastMgr::LoadAutobroadcastsLocalized()
         std::string message = fields[2].Get<std::string>();
 
         _localizedAutobroadcasts[id][locale] = message;
-        ++count;
     } while (result->NextRow());
 
     LOG_INFO("autobroadcast", ">> Loaded {} Localized Autobroadcast Definitions in {} ms", _localizedAutobroadcasts.size(), GetMSTimeDiffToNow(oldMSTime));
