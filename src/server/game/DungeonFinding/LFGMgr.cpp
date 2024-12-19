@@ -1724,6 +1724,11 @@ namespace lfg
 
         bool randomDungeon = false;
         std::vector<Player*> playersTeleported;
+
+        // clear list of players to be teleported if config option is disabled
+        if (!sWorld->getBoolConfig(CONFIG_LFG_TELEPORT))
+            playersToTeleport.clear();
+
         // Teleport Player
         for (GuidUnorderedSet::const_iterator it = playersToTeleport.begin(); it != playersToTeleport.end(); ++it)
         {
@@ -2150,6 +2155,13 @@ namespace lfg
         }
         else if (out && error == LFG_TELEPORTERROR_OK)
         {
+            // No dungon teleport allowed
+            if (!sWorld->getBoolConfig(CONFIG_LFG_TELEPORT))
+            {
+                ChatHandler(nullptr).PSendSysMessage("Teleportation to dungeons is deactivated.");
+                return;
+            }
+
             if (player->GetMapId() == uint32(dungeon->map))
                 player->TeleportToEntryPoint();
 
@@ -2157,6 +2169,12 @@ namespace lfg
         }
         else
         {
+            // No dungon teleport allowed
+            if (!sWorld->getBoolConfig(CONFIG_LFG_TELEPORT)) {
+                ChatHandler(player->GetSession()).PSendSysMessage("Teleportation to dungeons is deactivated.");
+                return;
+            }
+               
             uint32 mapid = dungeon->map;
             float x = dungeon->x;
             float y = dungeon->y;

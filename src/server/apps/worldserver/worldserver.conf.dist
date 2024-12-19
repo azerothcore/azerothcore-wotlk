@@ -3279,6 +3279,14 @@ LFG.MaxKickCount = 2
 LFG.KickPreventionTimer = 900
 
 #
+#     LFG.Teleport
+#        Description: Specify whether player are teleported to the dungeon after forming a group
+#        Default:     1 (default)
+#                     0 - Disabled (Players are not teleported but have to walk to dungeon)
+
+LFG.Teleport = 1
+
+#
 #    DungeonAccessRequirements.LFGLevelDBCOverride
 #
 #        Description: If enabled, use `min_level` and `max_level` values from table `dungeon_access_requirements` to list or to hide a dungeon from the LFG window.
