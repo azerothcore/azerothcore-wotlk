@@ -579,6 +579,8 @@ namespace lfg
         [[nodiscard]] bool IsTesting() const { return m_Testing; }
 
         void SetDungeon(ObjectGuid guid, uint32 dungeon);
+        // Sends a message to all players in a set
+        void SendMessageToAllPlayers(GuidUnorderedSet players, LfgProposal const& proposal);
 
     private:
         TeamId GetTeam(ObjectGuid guid);

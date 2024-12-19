@@ -1727,7 +1727,12 @@ namespace lfg
 
         // clear list of players to be teleported if config option is disabled
         if (!sWorld->getBoolConfig(CONFIG_LFG_TELEPORT))
+        {
+            // Send message to all players in newly formed group
+            SendMessageToAllPlayers(playersToTeleport, proposal);
+            // clearn the player list
             playersToTeleport.clear();
+        }
 
         // Teleport Player
         for (GuidUnorderedSet::const_iterator it = playersToTeleport.begin(); it != playersToTeleport.end(); ++it)
@@ -2158,7 +2163,9 @@ namespace lfg
             // No dungon teleport allowed
             if (!sWorld->getBoolConfig(CONFIG_LFG_TELEPORT))
             {
-                ChatHandler(nullptr).PSendSysMessage("Teleportation to dungeons is deactivated.");
+                std::ostringstream ss;
+                ss << "Please move to the Dungeon: " << dungeon->name;
+                ChatHandler(player->GetSession()).PSendSysMessage(ss.str());
                 return;
             }
 
@@ -2170,8 +2177,11 @@ namespace lfg
         else
         {
             // No dungon teleport allowed
-            if (!sWorld->getBoolConfig(CONFIG_LFG_TELEPORT)) {
-                ChatHandler(player->GetSession()).PSendSysMessage("Teleportation to dungeons is deactivated.");
+            if (!sWorld->getBoolConfig(CONFIG_LFG_TELEPORT))
+            {
+                std::ostringstream ss;
+                ss << "Please move to the Dungeon: " << dungeon->name;
+                ChatHandler(player->GetSession()).PSendSysMessage(ss.str());
                 return;
             }
                
@@ -2507,6 +2517,29 @@ namespace lfg
     {
         LOG_DEBUG("lfg", "LFGMgr::SetDungeon: [{}] dungeon {}", guid.ToString(), dungeon);
         GroupsStore[guid].SetDungeon(dungeon);
+    }
+
+    void LFGMgr::SendMessageToAllPlayers(GuidUnorderedSet players, LfgProposal const& proposal)
+    {
+        // Send a message to the players
+        for (GuidUnorderedSet::const_iterator it = players.begin(); it != players.end(); ++it)
+        {
+            if (Player* player = ObjectAccessor::FindPlayer(*it))
+            {
+                LFGDungeonEntry const* dungeon = sLFGDungeonStore.LookupEntry(proposal.dungeonId);
+                if (dungeon) {
+                    std::ostringstream ss;
+                    ss << "Please move to the Dungeon: " << dungeon->Name[0];
+                    ChatHandler(player->GetSession()).PSendSysMessage(ss.str());
+
+                }
+                else {
+                    std::ostringstream ss;
+                    ss << "No Dungeon name found. You are on your own.";
+                    ChatHandler(player->GetSession()).PSendSysMessage(ss.str());
+                }
+            }
+        }
     }
 
     void LFGMgr::SetRoles(ObjectGuid guid, uint8 roles)
