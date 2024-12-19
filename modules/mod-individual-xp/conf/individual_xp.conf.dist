@@ -1,0 +1,63 @@
+[worldserver]
+
+#
+#   IndividualXp.Enabled
+#
+#   Description: Enable or Disable the IndividualXP Module.
+#   Example:
+#       true (The module is active for use)
+#       false (No one can use the commands)
+#
+#   Default: true
+#
+
+IndividualXp.Enabled = true
+
+#
+#   IndividualXp.Announce
+#
+#   Description: Announce the IndividualXP Module at logon.
+#   Example:
+#           true (The message is displayed in the chat when the player enters)
+#           false (The message does not appear)
+#
+#   Default: true
+#
+
+IndividualXp.Announce = true
+
+#
+#   IndividualXp.AnnounceRatesOnLogin
+#
+#   Description: The player is shown the rates he has and the maximum value when he enters the chat
+#   Example:
+#           true (The message is displayed in the chat when the player enters)
+#           false (The message does not appear)
+#
+#   Default: true
+#
+
+IndividualXp.AnnounceRatesOnLogin = true
+
+#
+#   IndividualXp.MaxXPRate
+#
+#   Description: This is the max amount a player can set their xp to.
+#   Example: 1 or 2 or 3 or 4 (Any positive integer you want)
+#
+#   Default: 10
+#
+
+IndividualXp.MaxXPRate = 10
+
+#
+#   DefaultXPRate
+#
+#   Description: This is the default rate players start with.
+#   Recommendation: It might be a good idea to set the default value to the maximum.
+#   Then each player can choose whether to lower it or not. Although it could also be 1.
+#
+#   Default: 1
+#
+
+IndividualXp.DefaultXPRate = 1
