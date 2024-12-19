@@ -93,7 +93,7 @@ public:
                 resetPosition = true;
                 moved = true;
             }
-            else 
+            else
             {
                 moved = false;
                 resetPosition = false;
