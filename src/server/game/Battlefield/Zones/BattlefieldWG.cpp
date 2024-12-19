@@ -268,7 +268,17 @@ void BattlefieldWG::OnBattleStart()
 
     // Set Sliders capture points data to his owners when battle start
     for (BfCapturePointVector::const_iterator itr = m_capturePoints.begin(); itr != m_capturePoints.end(); ++itr)
-        (*itr)->SetCapturePointData((*itr)->GetCapturePointGo(), (*itr)->GetTeamId());
+    {
+        int8 workshopId = GetRelatedWorkshopId((*itr)->GetCapturePointGo()->GetEntry());
+        if (workshopId < 0)
+        {
+            LOG_ERROR("bg.battlefield", "WG: Failed to find related workshop for a capture point {}.", (*itr)->GetCapturePointGo()->GetEntry());
+            continue;
+        }
+
+        TeamId controlTeam = DetermineWorkshopControl(workshopId);
+        (*itr)->SetCapturePointData((*itr)->GetCapturePointGo(), controlTeam);
+    }
 
     for (uint8 team = 0; team < 2; ++team)
         for (GuidUnorderedSet::const_iterator itr = m_players[team].begin(); itr != m_players[team].end(); ++itr)
@@ -706,11 +716,10 @@ void BattlefieldWG::OnCreatureRemove(Creature*  /*creature*/)
         }*/
 }
 
-void BattlefieldWG::OnGameObjectCreate(GameObject* go)
+int8 BattlefieldWG::GetRelatedWorkshopId(uint32 GoEntry)
 {
-    uint8 workshopId = 0;
-
-    switch (go->GetEntry())
+    int8 workshopId = -1;
+    switch (GoEntry)
     {
         case GO_WINTERGRASP_FACTORY_BANNER_NE:
             workshopId = BATTLEFIELD_WG_WORKSHOP_NE;
@@ -725,8 +734,17 @@ void BattlefieldWG::OnGameObjectCreate(GameObject* go)
             workshopId = BATTLEFIELD_WG_WORKSHOP_SW;
             break;
         default:
-            return;
+            break;
     }
+
+    return workshopId;
+}
+
+void BattlefieldWG::OnGameObjectCreate(GameObject* go)
+{
+    int8 workshopId = GetRelatedWorkshopId(go->GetEntry());
+    if (workshopId < 0)
+        return;
 
     for (Workshop::const_iterator itr = WorkshopsList.begin(); itr != WorkshopsList.end(); ++itr)
     {
@@ -735,7 +753,7 @@ void BattlefieldWG::OnGameObjectCreate(GameObject* go)
             if (workshop->workshopId == workshopId)
             {
                 WintergraspCapturePoint* capturePoint = new WintergraspCapturePoint(this, workshop->teamControl);
-                capturePoint->SetCapturePointData(go, workshop->teamControl);
+                capturePoint->SetCapturePointData(go, TEAM_NEUTRAL);
                 capturePoint->LinkToWorkshop(workshop);
                 AddCapturePoint(capturePoint);
                 break;

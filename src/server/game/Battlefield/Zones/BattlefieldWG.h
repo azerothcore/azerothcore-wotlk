@@ -381,6 +381,7 @@ public:
      */
     void OnCreatureRemove(Creature* creature) override;
 
+    int8 GetRelatedWorkshopId(uint32 GoEntry);
     /**
      * \brief Called when a gameobject is created
      */
