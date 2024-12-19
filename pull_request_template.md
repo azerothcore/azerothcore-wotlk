@@ -1,8 +1,7 @@
 <!-- First of all, THANK YOU for your contribution. -->
 
 ## licence consent:
-In the spirit of collaboration with other projects in the emulation scene, Azerothcore is planning a return to a GLP2+ license. 
-Until this process is complete, we encourage all new PRs to authorize sharing on GPL-v2-based-projects.
+In the spirit of collaboration with other projects in the emulation scene, we encourage all new PRs to authorize sharing on GPL-v2-based-projects.
 
 - [X] I agree with sharing my contributions with GPL-v2-based-projects.
 
