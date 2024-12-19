@@ -54,7 +54,6 @@
 #include "WorldState.h"
 #include <zlib.h>
 
-
 namespace
 {
     std::string const DefaultPlayerName = "<none>";
