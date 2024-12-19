@@ -24,7 +24,6 @@
 #include "AchievementMgr.h"
 #include "AddonMgr.h"
 #include "ArenaTeamMgr.h"
-#include "AsyncAuctionListing.h"
 #include "AuctionHouseMgr.h"
 #include "AutobroadcastMgr.h"
 #include "BattlefieldMgr.h"
@@ -95,11 +94,6 @@
 #include "WorldState.h"
 #include <boost/asio/ip/address.hpp>
 #include <cmath>
-
-namespace
-{
-    TaskScheduler playersSaveScheduler;
-}
 
 std::atomic_long World::_stopEvent = false;
 uint8 World::_exitCode = SHUTDOWN_EXIT_CODE;
@@ -1291,8 +1285,6 @@ void World::LoadConfigSettings(bool reload)
 
     _int_configs[CONFIG_DAILY_RBG_MIN_LEVEL_AP_REWARD] = sConfigMgr->GetOption<uint32>("DailyRBGArenaPoints.MinLevel", 71);
 
-    _int_configs[CONFIG_AUCTION_HOUSE_SEARCH_TIMEOUT] = sConfigMgr->GetOption<uint32>("AuctionHouse.SearchTimeout", 1000);
-
     ///- Read the "Data" directory from the config file
     std::string dataPath = sConfigMgr->GetOption<std::string>("DataDir", "./");
     if (dataPath.empty() || (dataPath.at(dataPath.length() - 1) != '/' && dataPath.at(dataPath.length() - 1) != '\\'))
@@ -1487,6 +1479,9 @@ void World::LoadConfigSettings(bool reload)
 
     // Realm Availability
     _bool_configs[CONFIG_REALM_LOGIN_ENABLED] = sConfigMgr->GetOption<bool>("World.RealmAvailability", true);
+
+    // AH Worker threads
+    _int_configs[CONFIG_AUCTIONHOUSE_WORKERTHREADS] = sConfigMgr->GetOption<int32>("AuctionHouse.WorkerThreads", 1);
 
     // SpellQueue
     _bool_configs[CONFIG_SPELL_QUEUE_ENABLED] = sConfigMgr->GetOption<bool>("SpellQueue.Enabled", true);
@@ -2071,8 +2066,6 @@ void World::SetInitialWorldSettings()
     LoginDatabase.Execute(stmt);
 
     _timers[WUPDATE_WEATHERS].SetInterval(1 * IN_MILLISECONDS);
-    _timers[WUPDATE_AUCTIONS].SetInterval(MINUTE * IN_MILLISECONDS);
-    _timers[WUPDATE_AUCTIONS].SetCurrent(MINUTE * IN_MILLISECONDS);
     _timers[WUPDATE_UPTIME].SetInterval(_int_configs[CONFIG_UPTIME_UPDATE]*MINUTE * IN_MILLISECONDS);
     //Update "uptime" table based on configuration entry in minutes.
 
@@ -2344,18 +2337,11 @@ void World::Update(uint32 diff)
         ResetGuildCap();
     }
 
-    // pussywizard: handle auctions when the timer has passed
-    if (_timers[WUPDATE_AUCTIONS].Passed())
     {
-        METRIC_TIMER("world_update_time", METRIC_TAG("type", "Update expired auctions"));
-
-        _timers[WUPDATE_AUCTIONS].Reset();
-
         // pussywizard: handle expired auctions, auctions expired when realm was offline are also handled here (not during loading when many required things aren't loaded yet)
-        sAuctionMgr->Update();
+        METRIC_TIMER("world_update_time", METRIC_TAG("type", "Update expired auctions"));
+        sAuctionMgr->Update(diff);
     }
-
-    AsyncAuctionListingMgr::Update(Milliseconds(diff));
 
     if (currentGameTime > _mail_expire_check_timer)
     {
@@ -2504,11 +2490,6 @@ void World::Update(uint32 diff)
     {
         METRIC_TIMER("world_update_time", METRIC_TAG("type", "Update world scripts"));
         sScriptMgr->OnWorldUpdate(diff);
-    }
-
-    {
-        METRIC_TIMER("world_update_time", METRIC_TAG("type", "Update playersSaveScheduler"));
-        playersSaveScheduler.Update(diff);
     }
 
     {
@@ -2699,31 +2680,6 @@ void World::ShutdownServ(uint32 time, uint32 options, uint8 exitcode, const std:
 
     _shutdownMask = options;
     _exitCode = exitcode;
-
-    auto const& playersOnline = GetActiveSessionCount();
-
-    if (time < 5 && playersOnline)
-    {
-        // Set time to 5s for save all players
-        time = 5;
-    }
-
-    playersSaveScheduler.CancelAll();
-
-    if (time >= 5)
-    {
-        playersSaveScheduler.Schedule(Seconds(time - 5), [this](TaskContext /*context*/)
-        {
-            if (!GetActiveSessionCount())
-            {
-                LOG_INFO("server", "> No players online. Skip save before shutdown");
-                return;
-            }
-
-            LOG_INFO("server", "> Save players before shutdown server");
-            ObjectAccessor::SaveAllPlayers();
-        });
-    }
 
     LOG_WARN("server", "Time left until shutdown/restart: {}", time);
 
