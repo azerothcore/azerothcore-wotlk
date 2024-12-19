@@ -1,8 +1,8 @@
--- MySQL dump 10.13  Distrib 8.4.1, for Win64 (x86_64)
+-- MySQL dump 10.13  Distrib 8.0.34, for Win64 (x86_64)
 --
 -- Host: 127.0.0.1    Database: acore_world
 -- ------------------------------------------------------
--- Server version	8.4.1
+-- Server version	8.0.34
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
 /*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
@@ -3780,7 +3780,7 @@ INSERT INTO `conditions` VALUES
 (13,1,17652,0,0,33,0,1,3,0,0,0,0,'','Owned by caster'),
 (13,1,17698,0,0,31,0,3,11197,0,0,0,0,'',NULL),
 (13,1,17748,0,0,31,0,3,10556,0,0,0,0,'',NULL),
-(13,1,18655,0,0,31,0,5,176557,0,0,0,0,'','M+Ârser - M+Ârser'),
+(13,1,18655,0,0,31,0,5,176557,0,0,0,0,'','MÃ¶rser - MÃ¶rser'),
 (13,1,18666,0,0,31,0,3,10937,0,0,0,0,'',NULL),
 (13,1,18969,0,0,31,0,3,1842,0,0,0,0,'','Taelan Death Spell - Target Taelan'),
 (13,1,19032,0,0,31,0,3,12202,0,0,0,0,'',NULL),
@@ -15490,4 +15490,5 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2024-12-14 18:04:14
+-- Dump completed on 2024-12-17 22:33:29
+

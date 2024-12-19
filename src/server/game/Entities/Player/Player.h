@@ -1779,6 +1779,9 @@ public:
     [[nodiscard]] SpellCooldowns const& GetSpellCooldownMap() const { return m_spellCooldowns; }
     SpellCooldowns&       GetSpellCooldownMap()       { return m_spellCooldowns; }
 
+    SkillStatusMap const& GetSkillStatusMap() const { return mSkillStatus; }
+    SkillStatusMap& GetSkillStatusMap() { return mSkillStatus; }
+
     void AddSpellMod(SpellModifier* mod, bool apply);
     bool IsAffectedBySpellmod(SpellInfo const* spellInfo, SpellModifier* mod, Spell* spell = nullptr);
     bool HasSpellMod(SpellModifier* mod, Spell* spell);

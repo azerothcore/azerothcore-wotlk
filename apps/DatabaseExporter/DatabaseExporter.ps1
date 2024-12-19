@@ -100,6 +100,12 @@ $mysqlCommand = "SET time_zone = '$timezone';"
 $mysqlExec = "mysql -h $mysql_host -u $mysql_user -p$mysql_password -e `"$mysqlCommand`""
 Invoke-Expression -Command $mysqlExec
 
+# PS script uses non-utf-8 encoding by default
+# https://stackoverflow.com/a/58438716
+# Save the current encoding and switch to UTF-8.
+$prev = [Console]::OutputEncoding
+[Console]::OutputEncoding = [System.Text.UTF8Encoding]::new()
+
 Write-Host ""
 Write-Host "#########################################################"
 Write-Host "EXPORT AUTH DATABASE START"
@@ -123,10 +129,12 @@ foreach ($table in $tables_auth) {
     # Export the table structure (CREATE TABLE) and table data (INSERT) to the SQL file
     $create_table_command = "mysqldump -h $mysql_host -u $mysql_user --skip-tz-utc $mysql_database_auth $table"
     $create_table_output = Invoke-Expression -Command $create_table_command
-    Add-Content -Path $output_file -Value $create_table_output
+    # write file with utf-8 encoding
+    # https://stackoverflow.com/a/32951824
+    [IO.File]::WriteAllLines($output_file, $create_table_output)
 
     # Format the INSERT values to be on seperate lines.
-    $content = Get-Content $output_file
+    $content = Get-Content -Raw $output_file
     $formattedContent = $content -replace 'VALUES \(', "VALUES`r`n("
     $formattedContent = $formattedContent -replace '\),', "),`r`n"
     $formattedContent | Set-Content $output_file
@@ -161,10 +169,12 @@ foreach ($table in $tables_characters) {
     # Export the table structure (CREATE TABLE) and table data (INSERT) to the SQL file
     $create_table_command = "mysqldump -h $mysql_host -u $mysql_user --skip-tz-utc $mysql_database_characters $table"
     $create_table_output = Invoke-Expression -Command $create_table_command
-    Add-Content -Path $output_file -Value $create_table_output
+    # write file with utf-8 encoding
+    # https://stackoverflow.com/a/32951824
+    [IO.File]::WriteAllLines($output_file, $create_table_output)
 
     # Format the INSERT values to be on seperate lines.
-    $content = Get-Content $output_file
+    $content = Get-Content -Raw $output_file
     $formattedContent = $content -replace 'VALUES \(', "VALUES`r`n("
     $formattedContent = $formattedContent -replace '\),', "),`r`n"
     $formattedContent | Set-Content $output_file
@@ -199,10 +209,12 @@ foreach ($table in $tables_world) {
     # Export the table structure (CREATE TABLE) and table data (INSERT) to the SQL file
     $create_table_command = "mysqldump -h $mysql_host -u $mysql_user --skip-tz-utc $mysql_database_world $table"
     $create_table_output = Invoke-Expression -Command $create_table_command
-    Add-Content -Path $output_file -Value $create_table_output
+    # write file with utf-8 encoding
+    # https://stackoverflow.com/a/32951824
+    [IO.File]::WriteAllLines($output_file, $create_table_output)
 
     # Format the INSERT values to be on seperate lines.
-    $content = Get-Content $output_file
+    $content = Get-Content -Raw $output_file
     $formattedContent = $content -replace 'VALUES \(', "VALUES`r`n("
     $formattedContent = $formattedContent -replace '\),', "),`r`n"
     $formattedContent | Set-Content $output_file
@@ -217,3 +229,6 @@ Write-Host "#########################################################"
 Write-Host ""
 Write-Host "Database Exporter completed."
 Write-Host "Have a nice day :)"
+
+# Restore the previous encoding.
+[Console]::OutputEncoding = $prev
