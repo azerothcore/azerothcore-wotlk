@@ -9796,7 +9796,7 @@ void Player::ApplySpellMod(uint32 spellId, SpellModOp op, T& basevalue, Spell* s
             totalflat += flatValue;
 
             // special case for Mutilate, do not consume crit mod if main hand
-            if (mod->op == SPELLMOD_CRITICAL_CHANCE && spellInfo->GetFirstRankSpell()->Id == 5374)
+            if (mod->op == SPELLMOD_CRITICAL_CHANCE && spellInfo->GetFirstRankSpell()->Id == 5374) // Mutilate (Rank 1)
                 return;
         }
         else if (mod->type == SPELLMOD_PCT)
