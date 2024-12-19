@@ -2,9 +2,9 @@
 
 ## licence consent:
 In the spirit of collaboration with other projects in the emulation scene, Azerothcore is planning a return to a GLP2+ license. 
-To do this, we need the agreement of all authors to relicense all commits since the switch to AGLP.
+Until this process is complete, we encourage all new PRs to authorize sharing on GPL-v2-based-projects.
 
-- [X] I give my full agreement to the AC team to relicense this PR in GLP2+ when possible
+- [X] I agree with sharing my contributions with GPL-v2-based-projects.
 
 Further information, here : https://github.com/azerothcore/azerothcore-wotlk/discussions/19868
 
