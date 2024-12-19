@@ -22,6 +22,7 @@
 #include "WorldSession.h"
 #include "AccountMgr.h"
 #include "BattlegroundMgr.h"
+#include "BanMgr.h"
 #include "CharacterPackets.h"
 #include "Common.h"
 #include "DatabaseEnv.h"
@@ -44,6 +45,7 @@
 #include "ScriptMgr.h"
 #include "SocialMgr.h"
 #include "Transport.h"
+#include "Tokenize.h"
 #include "Vehicle.h"
 #include "WardenWin.h"
 #include "World.h"
@@ -52,7 +54,6 @@
 #include "WorldState.h"
 #include <zlib.h>
 
-#include "BanMgr.h"
 
 namespace
 {
@@ -200,6 +201,19 @@ std::string WorldSession::GetPlayerInfo() const
     ss << "Account: " << GetAccountId() << "]";
 
     return ss.str();
+}
+
+void WorldSession::SendAreaTriggerMessage(std::string_view str)
+{
+    std::vector<std::string_view> lines = Acore::Tokenize(str, '\n', true);
+    for (std::string_view line : lines)
+    {
+        uint32 length = line.size() + 1;
+        WorldPacket data(SMSG_AREA_TRIGGER_MESSAGE, 4 + length);
+        data << length;
+        data << line.data();
+        SendPacket(&data);
+    }
 }
 
 /// Get player guid if available. Use for logging purposes only

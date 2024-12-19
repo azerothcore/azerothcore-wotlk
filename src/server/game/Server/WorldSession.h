@@ -349,37 +349,19 @@ public:
     void SendPetNameInvalid(uint32 error, std::string const& name, DeclinedName* declinedName);
     void SendPartyResult(PartyOperation operation, std::string const& member, PartyResult res, uint32 val = 0);
 
-    template<typename... Args>
-    void SendAreaTriggerMessage(char const* Text, Args&&... args)
-    {
-        // Use Acore::StringFormat to generate the formatted string
-        std::string formattedStr = Acore::StringFormat(Text, std::forward<Args>(args)...);
-        uint32 length = formattedStr.size() + 1;
+    void SendAreaTriggerMessage(std::string_view str);
 
-        // Create the packet and send it
-        WorldPacket data(SMSG_AREA_TRIGGER_MESSAGE, 4 + length);
-        data << length;
-        data << formattedStr;
-        SendPacket(&data);
+    template<typename... Args>
+    void SendAreaTriggerMessage(char const* fmt, Args&&... args)
+    {
+        if (!m_playerLoading)
+            SendAreaTriggerMessage(Acore::StringFormat(fmt, std::forward<Args>(args)...));
     }
-
     template<typename... Args>
-    void SendAreaTriggerMessage(uint32 entry, Args&&... args)
+    void SendAreaTriggerMessage(uint32 strId, Args&&... args)
     {
-        // Retrieve the format string using the entry
-        char const* format = GetAcoreString(entry);
-        if (format)
-        {
-            // Use Acore::StringFormat to generate the formatted string
-            std::string formattedStr = Acore::StringFormat(format, std::forward<Args>(args)...);
-            uint32 length = formattedStr.size() + 1;
-
-            // Create the packet and send it
-            WorldPacket data(SMSG_AREA_TRIGGER_MESSAGE, 4 + length);
-            data << length;
-            data << formattedStr;
-            SendPacket(&data);
-        }
+        if (!m_playerLoading)
+            SendAreaTriggerMessage(Acore::StringFormat(GetAcoreString(strId), std::forward<Args>(args)...));
     }
 
     void SendSetPhaseShift(uint32 phaseShift);
