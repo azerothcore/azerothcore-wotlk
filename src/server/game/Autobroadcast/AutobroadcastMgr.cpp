@@ -76,7 +76,7 @@ void AutobroadcastMgr::LoadAutobroadcastsLocalized()
     uint32 oldMSTime = getMSTime();
     uint32 realmId = sConfigMgr->GetOption<int32>("RealmID", 0);
 
-    if (_autobroadcasts.size() == 0)
+    if (_autobroadcasts.empty())
         return;
 
     LoginDatabasePreparedStatement* stmt = LoginDatabase.GetPreparedStatement(LOGIN_SEL_AUTOBROADCAST_LOCALIZED);
@@ -101,7 +101,7 @@ void AutobroadcastMgr::LoadAutobroadcastsLocalized()
         ++count;
     } while (result->NextRow());
 
-    LOG_INFO("autobroadcast", ">> Loaded {} Localized Autobroadcast Definitions in {} ms", count, GetMSTimeDiffToNow(oldMSTime));
+    LOG_INFO("autobroadcast", ">> Loaded {} Localized Autobroadcast Definitions in {} ms", _localizedAutobroadcasts.size(), GetMSTimeDiffToNow(oldMSTime));
 }
 
 void AutobroadcastMgr::SendAutobroadcasts()
@@ -165,73 +165,66 @@ void AutobroadcastMgr::SendWorldAnnouncement(uint8 textId)
 {
     // Send localized messages to all sessions
     ChatHandler(nullptr).DoForAllValidSessions([&](Player* player)
-        {
-            if (!player || !player->GetSession())
+    {
+        if (!player || !player->GetSession())
             return;
 
-    // Get player's locale
-    LocaleConstant locale = player->GetSession()->GetSessionDbLocaleIndex();
+        // Get player's locale
+        LocaleConstant locale = player->GetSession()->GetSessionDbLocaleIndex();
 
-    std::string localizedMessage;
+        std::string localizedMessage;
 
-    if (_localizedAutobroadcasts.count(textId) && _localizedAutobroadcasts[textId].count(locale))
-    {
-        // Use the localized message if available
-        localizedMessage = _localizedAutobroadcasts[textId][locale];
-    }
-    else if (_autobroadcasts.count(textId))
-    {
-        // Fallback to the default message if localization is unavailable
-        localizedMessage = _autobroadcasts[textId];
-    }
-    else
-    {
-        // Fallback message if textId doesn't exist
-        localizedMessage = "Broadcast Message Not Found";
-    }
+        if (_localizedAutobroadcasts.count(textId) && _localizedAutobroadcasts[textId].count(locale))
+        {
+            // Use the localized message if available
+            localizedMessage = _localizedAutobroadcasts[textId][locale];
+        }
+        else if (_autobroadcasts.count(textId))
+        {
+            // Fallback to the default message if localization is unavailable
+            localizedMessage = _autobroadcasts[textId];
+        }
+        else
+        {
+            // Fallback message if textId doesn't exist
+            localizedMessage = "Broadcast Message Not Found";
+        }
 
-    // Send the localized or fallback message
-    ChatHandler(player->GetSession()).SendWorldTextOptional(localizedMessage, ANNOUNCER_FLAG_DISABLE_AUTOBROADCAST);
-        });
+        // Send the localized or fallback message
+        ChatHandler(player->GetSession()).SendWorldTextOptional(localizedMessage, ANNOUNCER_FLAG_DISABLE_AUTOBROADCAST);
+    });
 }
 
 void AutobroadcastMgr::SendNotificationAnnouncement(uint8 textId)
 {
-    for (auto const& sessionPair : sWorld->GetAllSessions())
+    ChatHandler(nullptr).DoForAllValidSessions([&](Player* player)
     {
-        WorldSession* session = sessionPair.second;
+        // Retrieve player's locale
+        LocaleConstant locale = player->GetSession()->GetSessionDbLocaleIndex();
 
-        if (session &&
-            session->GetPlayer() &&
-            session->GetPlayer()->IsInWorld())
+        // Lookup the localized message based on textId and locale
+        std::string localizedMessage;
+
+        if (_localizedAutobroadcasts.count(textId) &&
+            _localizedAutobroadcasts[textId].count(locale))
         {
-            // Retrieve player's locale
-            LocaleConstant locale = session->GetSessionDbLocaleIndex();
-
-            // Lookup the localized message based on textId and locale
-            std::string localizedMessage;
-
-            if (_localizedAutobroadcasts.count(textId) &&
-                _localizedAutobroadcasts[textId].count(locale))
-            {
-                // Use localized message
-                localizedMessage = _localizedAutobroadcasts[textId][locale];
-            }
-            else
-            {
-                // Fallback to default locale or placeholder text
-                if (_autobroadcasts.count(textId))
-                    localizedMessage = _autobroadcasts[textId];
-                else
-                    localizedMessage = "Broadcast Message Not Found";
-            }
-
-            // Prepare the WorldPacket
-            WorldPacket data(SMSG_NOTIFICATION, (localizedMessage.size() + 1));
-            data << localizedMessage;
-
-            // Send packet to the player
-            session->SendPacket(&data);
+            // Use localized message
+            localizedMessage = _localizedAutobroadcasts[textId][locale];
         }
-    }
+        else
+        {
+            // Fallback to default locale or placeholder text
+            if (_autobroadcasts.count(textId))
+                localizedMessage = _autobroadcasts[textId];
+            else
+                localizedMessage = "Broadcast Message Not Found";
+        }
+
+        // Prepare the WorldPacket
+        WorldPacket data(SMSG_NOTIFICATION, (localizedMessage.size() + 1));
+        data << localizedMessage;
+
+        // Send packet to the player
+        player->GetSession()->SendPacket(&data);
+    });
 }
