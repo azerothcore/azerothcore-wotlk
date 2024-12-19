@@ -1,8 +1,8 @@
--- MySQL dump 10.13  Distrib 8.4.1, for Win64 (x86_64)
+-- MySQL dump 10.13  Distrib 8.0.34, for Win64 (x86_64)
 --
 -- Host: 127.0.0.1    Database: acore_world
 -- ------------------------------------------------------
--- Server version	8.4.1
+-- Server version	8.0.34
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
 /*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
@@ -572,7 +572,7 @@ INSERT INTO `command` VALUES
  info (3),
  warn (4),
  error (5) or fatal (6)'),
-('server set motd',3,'Syntax: .server set motd Optional($realmId) $MOTD\r\n\r\nSet server Message of the day for the specified $realmId.\r\nIf $realmId is not provided it will update for the current realm.\r\nUse $realmId -1 to set motd for all realms.'),
+('server set motd',3,'Syntax: .server set motd Optional($realmId) Optional($locale) $MOTD\r \r Set server Message of the day for the specified $realmId.\r If $realmId is not provided it will update for the current realm. \r Use $realmId -1 to set motd for all realms. If $locale is not provided enUS will be used.'),
 ('server shutdown',3,'Syntax: .server shutdown #delay [#exit_code]\r\nShut the server down after #delay. Use #exit_code or 0 as program exit code.\n#delay: use a timestring like \"1h15m30s\".'),
 ('server shutdown cancel',3,'Syntax: .server shutdown cancel\r\n\r\nCancel the restart/shutdown timer if any.'),
 ('setskill',2,'Syntax: .setskill #skill #level [#max]\r\n\r\nSet a skill of id #skill with a current skill value of #level and a maximum value of #max (or equal current maximum if not provide) for the selected character. If no character is selected, you learn the skill.'),
@@ -657,4 +657,5 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2024-12-14 18:04:14
+-- Dump completed on 2024-12-17 22:33:29
+

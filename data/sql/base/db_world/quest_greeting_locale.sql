@@ -1,8 +1,8 @@
--- MySQL dump 10.13  Distrib 8.4.1, for Win64 (x86_64)
+-- MySQL dump 10.13  Distrib 8.0.34, for Win64 (x86_64)
 --
 -- Host: 127.0.0.1    Database: acore_world
 -- ------------------------------------------------------
--- Server version	8.4.1
+-- Server version	8.0.34
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
 /*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
@@ -37,11 +37,11 @@ CREATE TABLE `quest_greeting_locale` (
 LOCK TABLES `quest_greeting_locale` WRITE;
 /*!40000 ALTER TABLE `quest_greeting_locale` DISABLE KEYS */;
 INSERT INTO `quest_greeting_locale` VALUES
-(3390,0,'esES','Los Bald+°os cuentan con una gran riqueza de sustancias de las que nosotros, los boticarios de Lordaeron, podemos aprovecharnos.',47014),
-(3390,0,'esMX','Los Bald+°os cuentan con una gran riqueza de sustancias de las que nosotros, los boticarios de Lordaeron, podemos aprovecharnos.',47014),
-(5638,0,'esES','Tengo muchas cosas que hacer por aqu+° en Desolace, $N. Roetten quiere que recojamos algunos componentes para uno de nuestros clientes y buscar alguno de esos objetos perdidos.$b$bVi+Ændote que est+Ìs aqu+° para ayudar. -+Por qu+Æ no empezamos?',NULL),
-(5638,0,'esMX','Tengo muchas cosas que hacer por aqu+° en Desolace, $N. Roetten quiere que recojamos algunos componentes para uno de nuestros clientes y buscar alguno de esos objetos perdidos.$b$bVi+Ændote que est+Ìs aqu+° para ayudar. -+Por qu+Æ no empezamos?',NULL),
-(22292,0,'ruRU','Ì¶¡–È ¡–Î–Ê ¢¡ ¶•–¸–¸©–≈+ ¢¶¶ Ì¶¡–È–È©–¸•+.',0);
+(3390,0,'esES','Los Bald√≠os cuentan con una gran riqueza de sustancias de las que nosotros, los boticarios de Lordaeron, podemos aprovecharnos.',47014),
+(3390,0,'esMX','Los Bald√≠os cuentan con una gran riqueza de sustancias de las que nosotros, los boticarios de Lordaeron, podemos aprovecharnos.',47014),
+(5638,0,'esES','Tengo muchas cosas que hacer por aqu√≠ en Desolace, $N. Roetten quiere que recojamos algunos componentes para uno de nuestros clientes y buscar alguno de esos objetos perdidos.$b$bVi√©ndote que est√°s aqu√≠ para ayudar. ¬øPor qu√© no empezamos?',NULL),
+(5638,0,'esMX','Tengo muchas cosas que hacer por aqu√≠ en Desolace, $N. Roetten quiere que recojamos algunos componentes para uno de nuestros clientes y buscar alguno de esos objetos perdidos.$b$bVi√©ndote que est√°s aqu√≠ para ayudar. ¬øPor qu√© no empezamos?',NULL),
+(22292,0,'ruRU','–°–≤–µ—Ç –µ—â—ë –Ω–µ –≤–æ—Å—Å–∏—è–ª –Ω–∞–¥ –°–∫–µ—Ç—Ç–∏—Å–æ–º.',0);
 /*!40000 ALTER TABLE `quest_greeting_locale` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -53,4 +53,5 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2024-12-14 18:04:29
+-- Dump completed on 2024-12-17 22:34:21
+
