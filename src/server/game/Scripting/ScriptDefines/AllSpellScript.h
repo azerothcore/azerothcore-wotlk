@@ -19,6 +19,7 @@
 #define SCRIPT_OBJECT_ALL_SPELL_SCRIPT_H_
 
 #include "ScriptObject.h"
+#include <memory>
 #include <vector>
 
 enum AllSpellHook

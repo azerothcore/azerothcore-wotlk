@@ -19,6 +19,7 @@
 #define SCRIPT_OBJECT_ALL_ITEM_SCRIPT_H_
 
 #include "ScriptObject.h"
+#include <memory>
 
 class AllItemScript : public ScriptObject
 {
