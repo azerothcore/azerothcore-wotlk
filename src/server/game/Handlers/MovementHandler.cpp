@@ -928,7 +928,7 @@ void WorldSession::ComputeNewClockDelta()
 
     uint32 latencyMedian = median(latencies);
     uint32 latencyStandardDeviation = standard_deviation(latencies);
-    // comment
+
     uint32 sampleSizeAfterFiltering = 0;
     for (auto& pair : _timeSyncClockDeltaQueue.content())
     {
