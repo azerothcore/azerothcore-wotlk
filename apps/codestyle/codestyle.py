@@ -22,9 +22,10 @@ results = {
 # Main function to parse all the files of the project
 def parsing_file(directory: str) -> None:
     print("Starting AzerothCore CPP Codestyle check...")
+    print(" ")
     print("Please read the C++ Code Standards for AzerothCore:")
     print("https://www.azerothcore.org/wiki/cpp-code-standards")
-    print("")
+    print(" ")
     for root, _, files in os.walk(directory):
         for file in files:
             if not file.endswith('.ico'):                                   # Skip .ico files that cannot be read
