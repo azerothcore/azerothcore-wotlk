@@ -214,6 +214,9 @@ def misc_codestyle_check(file: io, file_path: str) -> None:
     global error_handler, results
     file.seek(0)  # Reset file pointer to the beginning
     check_failed = False
+
+    # used to check for "if/else (...) {" "} else" ignores "if/else (...) {...}"
+    ifelsecurlyregex = r"^[^#define].*\s+(if|else)(\s*\(.*\))?\s*{[^}]*$|}\s*else(\s*{[^}]*$)"
     # Parse all the file
     for line_number, line in enumerate(file, start = 1):
         if 'const auto&' in line:
@@ -227,6 +230,10 @@ def misc_codestyle_check(file: io, file_path: str) -> None:
         if [match for match in [' if(', ' if ( '] if match in line]:
             print(
                 f"AC have as standard: if (XXXX). Please check spaces in your condition': {file_path} at line {line_number}")
+            check_failed = True
+        if re.match(ifelsecurlyregex, line):
+            print(
+                f"You are not allowed to have a curly bracket before or after an if/else statement, place them on a new line: {file_path} at line {line_number}")
             check_failed = True
     # Handle the script error and update the result output
     if check_failed:
