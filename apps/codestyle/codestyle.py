@@ -21,6 +21,10 @@ results = {
 
 # Main function to parse all the files of the project
 def parsing_file(directory: str) -> None:
+    print("Starting AzerothCore CPP Codestyle check...")
+    print("Please read the C++ Code Standards for AzerothCore:")
+    print("https://www.azerothcore.org/wiki/cpp-code-standards")
+    print("")
     for root, _, files in os.walk(directory):
         for file in files:
             if not file.endswith('.ico'):                                   # Skip .ico files that cannot be read
@@ -229,7 +233,7 @@ def misc_codestyle_check(file: io, file_path: str) -> None:
             check_failed = True
         if [match for match in [' if(', ' if ( '] if match in line]:
             print(
-                f"AC have as standard: if (XXXX). Please check spaces in your condition': {file_path} at line {line_number}")
+                f"You need to have a space between the if and bracket. if (XXXX). Please check spaces in your condition': {file_path} at line {line_number}")
             check_failed = True
         if re.match(ifelsecurlyregex, line):
             print(
