@@ -3281,7 +3281,7 @@ LFG.KickPreventionTimer = 900
 #
 #     LFG.Teleport
 #        Description: Specify whether player are teleported to the dungeon after forming a group
-#        Default:     1 (default)
+#        Default:     1 - Enabled
 #                     0 - Disabled (Players are not teleported but have to walk to dungeon)
 
 LFG.Teleport = 1
