@@ -2903,36 +2903,22 @@ void World::UpdateRealmCharCount(uint32 accountId)
 
 void World::_UpdateRealmCharCount(PreparedQueryResult resultCharCount,uint32 accountId)
 {
+    uint8 charCount{0};
     if (resultCharCount)
     {
         Field* fields = resultCharCount->Fetch();
-        uint32 accountId = fields[0].Get<uint32>();
-        uint8 charCount = uint8(fields[1].Get<uint64>());
-
-        LoginDatabaseTransaction trans = LoginDatabase.BeginTransaction();
-
-        LoginDatabasePreparedStatement* stmt = LoginDatabase.GetPreparedStatement(LOGIN_REP_REALM_CHARACTERS);
-        stmt->SetData(0, charCount);
-        stmt->SetData(1, accountId);
-        stmt->SetData(2, realm.Id.Realm);
-        trans->Append(stmt);
-
-        LoginDatabase.CommitTransaction(trans);
+        charCount = uint8(fields[1].Get<uint64>());
     }
-    else //in this case resultCharCount is empty (happens when the last char of the realm is deleted)
-    {
-        uint8 charCount{0};
 
-        LoginDatabaseTransaction trans = LoginDatabase.BeginTransaction();
-        LoginDatabasePreparedStatement* stmt = LoginDatabase.GetPreparedStatement(LOGIN_REP_REALM_CHARACTERS);
+    LoginDatabaseTransaction trans = LoginDatabase.BeginTransaction();
 
-        stmt->SetData(0, charCount);
-        stmt->SetData(1, accountId);
-        stmt->SetData(2, realm.Id.Realm);
-        trans->Append(stmt);
+    LoginDatabasePreparedStatement* stmt = LoginDatabase.GetPreparedStatement(LOGIN_REP_REALM_CHARACTERS);
+    stmt->SetData(0, charCount);
+    stmt->SetData(1, accountId);
+    stmt->SetData(2, realm.Id.Realm);
+    trans->Append(stmt);
 
-        LoginDatabase.CommitTransaction(trans);
-    }
+    LoginDatabase.CommitTransaction(trans);
 }
 
 void World::InitWeeklyQuestResetTime()
