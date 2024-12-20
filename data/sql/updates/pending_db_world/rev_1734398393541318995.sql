@@ -7,3 +7,5 @@ UPDATE `creature` SET `spawntimesecs` = 1800 WHERE (`id1` = 24549) AND (`guid` I
 DELETE FROM `creature` WHERE (`id1` = 24179) AND (`guid` IN (1107));
 -- delete Amani'shi Protector #5 next to Tempest
 DELETE FROM `creature` WHERE (`id1` = 24180) AND (`guid` IN (89311));
+DELETE FROM `creature_addon` WHERE `guid` IN (1107, 89311);
+DELETE FROM `linked_respawn` WHERE `guid` IN (1107, 89311);
