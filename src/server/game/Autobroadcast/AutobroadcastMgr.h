@@ -20,6 +20,7 @@
 
 #include "Common.h"
 #include <map>
+#include <vector>
 
 enum class AnnounceType : uint8
 {
