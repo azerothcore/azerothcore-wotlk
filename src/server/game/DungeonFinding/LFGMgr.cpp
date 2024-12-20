@@ -2163,9 +2163,8 @@ namespace lfg
             // No dungon teleport allowed
             if (!sWorld->getBoolConfig(CONFIG_LFG_TELEPORT))
             {
-                std::ostringstream ss;
-                ss << "Please move to the Dungeon: " << dungeon->name;
-                ChatHandler(player->GetSession()).PSendSysMessage(ss.str());
+                ChatHandler handler = ChatHandler(player->GetSession());
+                handler.PSendSysMessage(handler.GetAcoreString(LANG_LFG_TELEPORT_DUNGEON), dungeon->name.c_str());
                 return;
             }
 
@@ -2179,9 +2178,8 @@ namespace lfg
             // No dungon teleport allowed
             if (!sWorld->getBoolConfig(CONFIG_LFG_TELEPORT))
             {
-                std::ostringstream ss;
-                ss << "Please move to the Dungeon: " << dungeon->name;
-                ChatHandler(player->GetSession()).PSendSysMessage(ss.str());
+                ChatHandler handler = ChatHandler(player->GetSession());
+                handler.PSendSysMessage(handler.GetAcoreString(LANG_LFG_TELEPORT_DUNGEON), dungeon->name.c_str());
                 return;
             }
 
@@ -2526,17 +2524,15 @@ namespace lfg
         {
             if (Player* player = ObjectAccessor::FindPlayer(*it))
             {
+                ChatHandler handler = ChatHandler(player->GetSession());
                 LFGDungeonEntry const* dungeon = sLFGDungeonStore.LookupEntry(proposal.dungeonId);
-                if (dungeon) {
-                    std::ostringstream ss;
-                    ss << "Please move to the Dungeon: " << dungeon->Name[0];
-                    ChatHandler(player->GetSession()).PSendSysMessage(ss.str());
-
+                if (dungeon)
+                {
+                    handler.PSendSysMessage(handler.GetAcoreString(LANG_LFG_TELEPORT_DUNGEON), dungeon->Name[0]);
                 }
-                else {
-                    std::ostringstream ss;
-                    ss << "No Dungeon name found. You are on your own.";
-                    ChatHandler(player->GetSession()).PSendSysMessage(ss.str());
+                else
+                {
+                    handler.PSendSysMessage(handler.GetAcoreString(LANG_LFG_TELEPORT_NO_DUNGEON));
                 }
             }
         }

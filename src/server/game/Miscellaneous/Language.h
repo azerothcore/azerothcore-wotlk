@@ -1329,6 +1329,9 @@ enum AcoreStrings
     // 30087-30095 reserved for passive anticheat
 
     LANG_DEBUG_LFG_ON                             = 30096,
-    LANG_DEBUG_LFG_OFF                            = 30097
+    LANG_DEBUG_LFG_OFF                            = 30097,
+    LANG_LFG_TELEPORT_DUNGEON                     = 35410, // Dungeon found
+    LANG_LFG_TELEPORT_NO_DUNGEON                  = 35411  // No Dungeon found
+
 };
 #endif
