@@ -1,6 +1,5 @@
 --
 DELETE FROM `creature_loot_template` WHERE (`Entry` IN (2359, 4120, 6073, 4499, 824, 624, 2450, 4113, 2269, 4844, 4846, 623, 674, 1094, 4849, 3586, 1167, 1393, 14427)) AND (`Item` IN (283));
-
 INSERT INTO `creature_loot_template` (`Entry`, `Item`, `Reference`, `Chance`, `QuestRequired`, `LootMode`, `GroupId`, `MinCount`, `MaxCount`, `Comment`) VALUES
 (2359, 2838, 0, 25, 0, 1, 0, 1, 2, 'Heavy Stone -- Elemental Slave'),
 (4120, 2838, 0, 25, 0, 1, 0, 1, 2, 'Heavy Stone -- Thundering Boulderkin'),
@@ -21,6 +20,3 @@ INSERT INTO `creature_loot_template` (`Entry`, `Item`, `Reference`, `Chance`, `Q
 (1167, 2838, 0, 0.8, 0, 1, 0, 1, 1, 'Heavy Stone -- Stonesplinter Digger'),
 (1393, 2838, 0, 0.6, 0, 1, 0, 1, 1, 'Heavy Stone -- Beserk Trogg'),
 (14427, 2838, 0, 0.4, 0, 1, 0, 3, 3, 'Heavy Stone -- Gibblesnik');
-
-
-
