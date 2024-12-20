@@ -21,6 +21,11 @@ results = {
 
 # Main function to parse all the files of the project
 def parsing_file(directory: str) -> None:
+    print("Starting AzerothCore CPP Codestyle check...")
+    print(" ")
+    print("Please read the C++ Code Standards for AzerothCore:")
+    print("https://www.azerothcore.org/wiki/cpp-code-standards")
+    print(" ")
     for root, _, files in os.walk(directory):
         for file in files:
             if not file.endswith('.ico'):                                   # Skip .ico files that cannot be read
@@ -138,23 +143,23 @@ def npcflags_helpers_check(file: io, file_path: str) -> None:
     for line_number, line in enumerate(file, start = 1):
         if 'GetUInt32Value(UNIT_NPC_FLAGS)' in line:
             print(
-                f"Please use GetNpcFlags() instead GetUInt32Value(UNIT_NPC_FLAGS): {file_path} at line {line_number}")
+                f"Please use GetNpcFlags() instead of GetUInt32Value(UNIT_NPC_FLAGS): {file_path} at line {line_number}")
             check_failed = True
         if 'HasFlag(UNIT_NPC_FLAGS,' in line:
             print(
-                f"Please use HasNpcFlag() instead HasFlag(UNIT_NPC_FLAGS, ...): {file_path} at line {line_number}")
+                f"Please use HasNpcFlag() instead of HasFlag(UNIT_NPC_FLAGS, ...): {file_path} at line {line_number}")
             check_failed = True
         if 'SetUInt32Value(UNIT_NPC_FLAGS,' in line:
             print(
-                f"Please use ReplaceAllNpcFlags() instead SetUInt32Value(UNIT_NPC_FLAGS, ...): {file_path} at line {line_number}")
+                f"Please use ReplaceAllNpcFlags() instead of SetUInt32Value(UNIT_NPC_FLAGS, ...): {file_path} at line {line_number}")
             check_failed = True
         if 'SetFlag(UNIT_NPC_FLAGS,' in line:
             print(
-                f"Please use SetNpcFlag() instead SetFlag(UNIT_NPC_FLAGS, ...): {file_path} at line {line_number}")
+                f"Please use SetNpcFlag() instead of SetFlag(UNIT_NPC_FLAGS, ...): {file_path} at line {line_number}")
             check_failed = True
         if 'RemoveFlag(UNIT_NPC_FLAGS,' in line:
             print(
-                f"Please use RemoveNpcFlag() instead RemoveFlag(UNIT_NPC_FLAGS, ...): {file_path} at line {line_number}")
+                f"Please use RemoveNpcFlag() instead of RemoveFlag(UNIT_NPC_FLAGS, ...): {file_path} at line {line_number}")
             check_failed = True
     # Handle the script error and update the result output
     if check_failed:
@@ -214,19 +219,26 @@ def misc_codestyle_check(file: io, file_path: str) -> None:
     global error_handler, results
     file.seek(0)  # Reset file pointer to the beginning
     check_failed = False
+
+    # used to check for "if/else (...) {" "} else" ignores "if/else (...) {...}" "#define ... if/else (...) {"
+    ifelse_curlyregex = r"^[^#define].*\s+(if|else)(\s*\(.*\))?\s*{[^}]*$|}\s*else(\s*{[^}]*$)"
     # Parse all the file
     for line_number, line in enumerate(file, start = 1):
         if 'const auto&' in line:
             print(
-                f"Please use 'auto const&' syntax instead of 'const auto&': {file_path} at line {line_number}")
+                f"Please use the 'auto const&' syntax instead of 'const auto&': {file_path} at line {line_number}")
             check_failed = True
         if re.search(r'\bconst\s+\w+\s*\*\b', line):
             print(
-                f"Please use the syntax 'Class/ObjectType const*' instead of 'const Class/ObjectType*': {file_path} at line {line_number}")
+                f"Please use the 'Class/ObjectType const*' syntax instead of 'const Class/ObjectType*': {file_path} at line {line_number}")
             check_failed = True
         if [match for match in [' if(', ' if ( '] if match in line]:
             print(
-                f"AC have as standard: if (XXXX). Please check spaces in your condition': {file_path} at line {line_number}")
+                f"Please use the 'if (XXXX)' syntax instead of 'if(XXXX)': {file_path} at line {line_number}")
+            check_failed = True
+        if re.match(ifelse_curlyregex, line):
+            print(
+                f"Curly brackets are not allowed to be leading or trailing if/else statements. Place it on a new line: {file_path} at line {line_number}")
             check_failed = True
     # Handle the script error and update the result output
     if check_failed:
