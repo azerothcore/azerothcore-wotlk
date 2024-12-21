@@ -279,6 +279,7 @@ bool Player::CanAddQuest(Quest const* quest, bool msg)
         else if (msg2 != EQUIP_ERR_OK)
         {
             SendEquipError(msg2, nullptr, nullptr, srcitem);
+            PlayDirectSound(QUEST_SOUND_FAILURE, this); // Play failure sound
             return false;
         }
     }

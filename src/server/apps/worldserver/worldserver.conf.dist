@@ -2108,14 +2108,17 @@ Rate.Loyalty           = 1
 #    Rate.Rest.InGame
 #    Rate.Rest.Offline.InTavernOrCity
 #    Rate.Rest.Offline.InWilderness
+#    Rate.Rest.MaxBonus
 #        Description: Resting points grow rates.
 #        Default:     1 - (Rate.Rest.InGame)
 #                     1 - (Rate.Rest.Offline.InTavernOrCity)
 #                     1 - (Rate.Rest.Offline.InWilderness)
+#                     1.5 - (Rate.Rest.MaxBonus)
 
 Rate.Rest.InGame                 = 1
 Rate.Rest.Offline.InTavernOrCity = 1
 Rate.Rest.Offline.InWilderness   = 1
+Rate.Rest.MaxBonus               = 1.5
 
 #
 #    Rate.MissChanceMultiplier.Creature
@@ -4297,11 +4300,11 @@ Event.Announce = 0
 ###################################################################################################
 # AUCTION HOUSE
 #
-#     AuctionHouse.SearchTimeout
-#        Description: Time (in milliseconds) after which an auction house search is discarded.
-#        Default:     1000 - (1 second)
+#     AuctionHouse.WorkerThreads
+#        Description: Count of auctionhouse searcher worker threads to spawn
+#        Default:     1
 
-AuctionHouse.SearchTimeout = 1000
+AuctionHouse.WorkerThreads = 1
 
 #
 #     LevelReq.Auction
