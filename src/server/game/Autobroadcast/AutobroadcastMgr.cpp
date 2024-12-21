@@ -57,10 +57,10 @@ void AutobroadcastMgr::LoadAutobroadcasts()
     do
     {
         Field* fields = result->Fetch();
-        uint8 id = fields[0].Get<uint8>();
+        uint8 textId = fields[0].Get<uint8>();
 
-        ObjectMgr::AddLocaleString(fields[2].Get<std::string>(), DEFAULT_LOCALE, _autobroadcasts[id]);
-        _autobroadcastsWeights[id] = fields[1].Get<uint8>();
+        ObjectMgr::AddLocaleString(fields[2].Get<std::string>(), DEFAULT_LOCALE, _autobroadcasts[textId]);
+        _autobroadcastsWeights[textId] = fields[1].Get<uint8>();
 
     } while (result->NextRow());
 
@@ -91,13 +91,13 @@ void AutobroadcastMgr::LoadAutobroadcastsLocalized()
     do
     {
         Field* fields = result->Fetch();
-        uint8 id = fields[0].Get<uint8>();
+        uint8 textId = fields[0].Get<uint8>();
         LocaleConstant locale = GetLocaleByName(fields[1].Get<std::string>());
 
-        if (locale == DEFAULT_LOCALE)
+        if (locale == DEFAULT_LOCALE || ObjectMgr::GetLocaleString(_autobroadcasts[textId], DEFAULT_LOCALE).empty())
             continue;
 
-        ObjectMgr::AddLocaleString(fields[2].Get<std::string>(), locale, _autobroadcasts[id]);
+        ObjectMgr::AddLocaleString(fields[2].Get<std::string>(), locale, _autobroadcasts[textId]);
         count++;
     } while (result->NextRow());
 
@@ -107,13 +107,11 @@ void AutobroadcastMgr::LoadAutobroadcastsLocalized()
 void AutobroadcastMgr::SendAutobroadcasts()
 {
     if (_autobroadcasts.empty())
-    {
         return;
-    }
 
     uint32 weight = 0;
+    uint8 textId = 0;
     AutobroadcastsWeightMap selectionWeights;
-    uint8 textId = 0;;
 
     for (AutobroadcastsWeightMap::const_iterator it = _autobroadcastsWeights.begin(); it != _autobroadcastsWeights.end(); ++it)
     {
@@ -169,7 +167,7 @@ void AutobroadcastMgr::SendWorldAnnouncement(uint8 textId)
         // Get player's locale
         LocaleConstant locale = player->GetSession()->GetSessionDbLocaleIndex();
 
-        if (!_autobroadcasts.count(textId))
+        if (!_autobroadcasts.empty())
             return;
 
         std::string_view localizedMessage = ObjectMgr::GetLocaleString(_autobroadcasts[textId], locale);
@@ -191,9 +189,7 @@ void AutobroadcastMgr::SendNotificationAnnouncement(uint8 textId)
         LocaleConstant locale = player->GetSession()->GetSessionDbLocaleIndex();
 
         if (!_autobroadcasts.count(textId))
-        {
             return;
-        }
 
         // Get localized message
         std::string_view localizedMessage = ObjectMgr::GetLocaleString(_autobroadcasts[textId], locale);
