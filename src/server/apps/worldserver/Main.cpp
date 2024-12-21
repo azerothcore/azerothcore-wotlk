@@ -30,7 +30,6 @@
 #include "Config.h"
 #include "DatabaseEnv.h"
 #include "DatabaseLoader.h"
-#include "DeadlineTimer.h"
 #include "GitRevision.h"
 #include "IoContext.h"
 #include "MapMgr.h"
@@ -91,14 +90,16 @@ public:
 
     static void Start(std::shared_ptr<FreezeDetector> const& freezeDetector)
     {
-        freezeDetector->_timer.expires_from_now(boost::posix_time::seconds(5));
+        // Calculate the expiration time 5seconds from now
+        auto expirationTime = std::chrono::steady_clock::now() + std::chrono::seconds(5);
+        freezeDetector->_timer.expires_at(expirationTime);
         freezeDetector->_timer.async_wait(std::bind(&FreezeDetector::Handler, std::weak_ptr<FreezeDetector>(freezeDetector), std::placeholders::_1));
     }
 
     static void Handler(std::weak_ptr<FreezeDetector> freezeDetectorRef, boost::system::error_code const& error);
 
 private:
-    Acore::Asio::DeadlineTimer _timer;
+    boost::asio::steady_timer _timer;
     uint32 _worldLoopCounter;
     uint32 _lastChangeMsTime;
     uint32 _maxCoreStuckTimeInMs;
@@ -631,7 +632,9 @@ void FreezeDetector::Handler(std::weak_ptr<FreezeDetector> freezeDetectorRef, bo
                 }
             }
 
-            freezeDetector->_timer.expires_from_now(boost::posix_time::seconds(1));
+            // Calculate the expiration time
+            auto expirationTime = std::chrono::steady_clock::now() + std::chrono::seconds(1);
+            freezeDetector->_timer.expires_at(expirationTime);
             freezeDetector->_timer.async_wait(std::bind(&FreezeDetector::Handler, freezeDetectorRef, std::placeholders::_1));
         }
     }
