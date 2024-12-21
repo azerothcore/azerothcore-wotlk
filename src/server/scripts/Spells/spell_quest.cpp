@@ -37,12 +37,11 @@ class spell_q11065_wrangle_some_aether_rays : public SpellScript
 
     SpellCastResult CheckCast()
     {
-        // if thane is present and not in combat - allow cast
         if (Unit* target = GetExplTargetUnit())
             if (target->GetHealthPct() < 40.0f)
                 return SPELL_CAST_OK;
 
-        return SPELL_FAILED_CASTER_AURASTATE;
+        return SPELL_FAILED_BAD_TARGETS;
     }
 
     void Register() override
@@ -77,6 +76,13 @@ class spell_q11065_wrangle_some_aether_rays_aura : public AuraScript
     void HandleEffectApply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
     {
         SetDuration(5000);
+
+        if (GetTarget() && GetTarget()->ToCreature())
+            if (Creature* ar = GetTarget()->ToCreature())
+            {
+                ar->AttackStop();
+                ar->SetReactState(REACT_PASSIVE);
+            }
     }
 
     void Register() override
