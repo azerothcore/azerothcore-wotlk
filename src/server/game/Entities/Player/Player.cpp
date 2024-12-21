@@ -10228,22 +10228,25 @@ void Player::LeaveAllArenaTeams(ObjectGuid guid)
     } while (result->NextRow());
 }
 
-void Player::SetRestBonus(float rest_bonus_new)
+void Player::SetRestBonus(float restBonusNew)
 {
     // Prevent resting on max level
     if (GetLevel() >= sWorld->getIntConfig(CONFIG_MAX_PLAYER_LEVEL))
-        rest_bonus_new = 0;
+        restBonusNew = 0;
 
-    if (rest_bonus_new < 0)
-        rest_bonus_new = 0;
+    if (restBonusNew < 0)
+        restBonusNew = 0;
 
-    float rest_bonus_max = (float)GetUInt32Value(PLAYER_NEXT_LEVEL_XP) * 1.5f / 2;
+    // Fetch rest bonus multiplier from cached configuration
+    float restBonusMultiplier = sWorld->getRate(RATE_REST_MAX_BONUS);
 
-    if (rest_bonus_new > rest_bonus_max)
-        _restBonus = rest_bonus_max;
+    // Calculate rest bonus max using the multiplier
+    float restBonusMax = (float)GetUInt32Value(PLAYER_NEXT_LEVEL_XP) * restBonusMultiplier / 2;
+
+    if (restBonusNew > restBonusMax)
+        _restBonus = restBonusMax;
     else
-        _restBonus = rest_bonus_new;
-
+        _restBonus = restBonusNew;
     // update data for client
     if ((GetsRecruitAFriendBonus(true) && (GetSession()->IsARecruiter() || GetSession()->GetRecruiterId() != 0)))
         SetByteValue(PLAYER_BYTES_2, 3, REST_STATE_RAF_LINKED);
