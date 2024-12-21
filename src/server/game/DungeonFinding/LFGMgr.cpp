@@ -2527,10 +2527,9 @@ namespace lfg
                 ChatHandler handler = ChatHandler(player->GetSession());
                 LFGDungeonEntry const* dungeon = sLFGDungeonStore.LookupEntry(proposal.dungeonId);
                 if (dungeon)
-                    handler.PSendSysMessage(handler.GetAcoreString(LANG_LFG_TELEPORT_DUNGEON), dungeon->Name[0]);
+                    handler.PSendSysMessage(LANG_LFG_TELEPORT_DUNGEON, dungeon->Name[0]);
                 else
-                    handler.PSendSysMessage(handler.GetAcoreString(LANG_LFG_TELEPORT_NO_DUNGEON));
-
+                    handler.PSendSysMessage(LANG_LFG_TELEPORT_NO_DUNGEON);
             }
         }
     }
