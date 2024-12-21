@@ -21,11 +21,6 @@
 #include "MoveSplineInit.h"
 #include "Player.h"
 
-#ifdef MAP_BASED_RAND_GEN
-#define rand_norm() unit.rand_norm()
-#define urand(a, b) unit.urand(a, b)
-#endif
-
 template<class T>
 void ConfusedMovementGenerator<T>::DoInitialize(T* unit)
 {

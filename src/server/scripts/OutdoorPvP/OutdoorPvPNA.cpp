@@ -147,7 +147,8 @@ void OPvPCapturePointNA::SpawnNPCsForTeam(HalaaNPCS teamNPC)
     {
         ObjectGuid::LowType spawnId = teamNPC[i];
         const CreatureData* data = sObjectMgr->GetCreatureData(spawnId);
-        if (data) {
+        if (data)
+        {
             UpdateCreatureHalaa(spawnId, _pvp->GetMap(), data->posX, data->posY);
             _creatures[i] = spawnId;
             _creatureTypes[_creatures[i]] = i;
@@ -650,12 +651,14 @@ bool OPvPCapturePointNA::Update(uint32 diff)
     }
     else m_GuardCheckTimer -= diff;
 
-    if (m_capturable) {
+    if (m_capturable)
+    {
         if (m_RespawnTimer < diff)
         {
             // if the guards have been killed, then the challenger has one hour to take over halaa.
             // in case they fail to do it, the guards are respawned, and they have to start again.
-            if (GetControllingFaction() == TEAM_ALLIANCE) {
+            if (GetControllingFaction() == TEAM_ALLIANCE)
+            {
                 _state = OBJECTIVESTATE_ALLIANCE;
                 _value = _maxValue;
             }
