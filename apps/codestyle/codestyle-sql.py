@@ -126,7 +126,7 @@ def sql_check(file: io, file_path: str) -> None:
         last_line = line[-1].strip()
         if last_line:
             print(
-                f"The last line is not a newline. Please add a newline.")
+                f"The last line is not a newline. Please add a newline: {file_path}")
             check_failed = True
 
     # Handle the script error and update the result output
