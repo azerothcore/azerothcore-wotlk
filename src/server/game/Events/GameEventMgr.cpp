@@ -283,8 +283,6 @@ void GameEventMgr::LoadEventVendors()
         newEntry.incrtime = fields[4].Get<uint32>();
         newEntry.ExtendedCost = fields[5].Get<uint32>();
 
-   
-
         // Get the event NPC flag for validity check
         uint32 event_npc_flag = 0;
         NPCFlagList& flist = mGameEventNPCFlags[eventId];
