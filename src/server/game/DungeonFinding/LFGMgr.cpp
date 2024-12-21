@@ -2163,7 +2163,7 @@ namespace lfg
             // No dungon teleport allowed
             if (!sWorld->getBoolConfig(CONFIG_LFG_TELEPORT))
             {
-                ChatHandler(player->GetSession()).PSendSysMessage(LANG_LFG_TELEPORT_DUNGEON, dungeon->name.c_str());
+                ChatHandler(player->GetSession()).PSendSysMessage(LANG_LFG_TELEPORT_DUNGEON, dungeon->name);
                 return;
             }
 
@@ -2177,7 +2177,7 @@ namespace lfg
             // No dungon teleport allowed
             if (!sWorld->getBoolConfig(CONFIG_LFG_TELEPORT))
             {
-                ChatHandler(player->GetSession()).PSendSysMessage(LANG_LFG_TELEPORT_DUNGEON, dungeon->name.c_str());
+                ChatHandler(player->GetSession()).PSendSysMessage(LANG_LFG_TELEPORT_DUNGEON, dungeon->name);
                 return;
             }
 
