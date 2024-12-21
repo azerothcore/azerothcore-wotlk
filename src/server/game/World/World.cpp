@@ -1271,7 +1271,7 @@ void World::LoadConfigSettings(bool reload)
 
     _bool_configs[CONFIG_ALLOW_JOIN_BG_AND_LFG] = sConfigMgr->GetOption<bool>("JoinBGAndLFG.Enable", false);
 
-    _bool_configs[CONFIG_LFG_TELEPORT] = sConfigMgr->GetOption<bool>("LFG.Teleport", 1);
+    _bool_configs[CONFIG_LFG_TELEPORT] = sConfigMgr->GetOption<bool>("LFG.Teleport", true);
 
     _bool_configs[CONFIG_LEAVE_GROUP_ON_LOGOUT] = sConfigMgr->GetOption<bool>("LeaveGroupOnLogout.Enabled", false);
 
