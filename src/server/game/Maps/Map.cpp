@@ -601,7 +601,7 @@ bool Map::AddToMap(T* obj, bool checkTransport)
 
     //something, such as vehicle, needs to be update immediately
     //also, trigger needs to cast spell, if not update, cannot see visual
-    obj->UpdateObjectVisibility(true);
+    obj->UpdateObjectVisibilityOnCreate();
 
     // Xinef: little hack for vehicles, accessories have to be added after visibility update so they wont fall off the vehicle, moved from Creature::AIM_Initialize
     // Initialize vehicle, this is done only for summoned npcs, DB creatures are handled by grid loaders
