@@ -1,3 +1,4 @@
+-- DB update 2024_12_20_02 -> 2024_12_22_00
 
 -- Remove Black Pearl Item from all creature loot tables.
 
