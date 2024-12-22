@@ -80,18 +80,11 @@ enum Shadowmourne
     SPELL_THIRST_QUENCHED                   = 72154,
 };
 
-uint32 const vampireAuras[3][MAX_DIFFICULTY] =
-{
-    {70867, 71473, 71532, 71533},
-    {70879, 71525, 71530, 71531},
-    {70877, 71474, 70877, 71474},
-};
-
 bool IsVampire(Unit const* unit)
 {
     uint8 spawnMode = unit->GetMap()->GetSpawnMode();
     for (uint8 i = 0; i < 3; ++i)
-        if (unit->HasAura(vampireAuras[i][spawnMode]))
+        if (unit->HasAura(SPELL_ESSENCE_OF_BLOOD_QUEEN) || unit->HasAura(SPELL_ESSENCE_OF_THE_BLOOD_QUEEN_PLR) || unit->HasAura(SPELL_FRENZIED_BLOODTHIRST))
             return true;
     return false;
 }
