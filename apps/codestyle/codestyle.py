@@ -222,6 +222,11 @@ def misc_codestyle_check(file: io, file_path: str) -> None:
 
     # used to check for "if/else (...) {" "} else" ignores "if/else (...) {...}" "#define ... if/else (...) {"
     ifelse_curlyregex = r"^[^#define].*\s+(if|else)(\s*\(.*\))?\s*{[^}]*$|}\s*else(\s*{[^}]*$)"
+    # used to catch double semicolons ";;" ignores "(;;)"
+    double_semiregex = r"[^(];;[^)]"
+    # used to catch tabs
+    tab_regex = r"\t"
+
     # Parse all the file
     for line_number, line in enumerate(file, start = 1):
         if 'const auto&' in line:
@@ -240,6 +245,15 @@ def misc_codestyle_check(file: io, file_path: str) -> None:
             print(
                 f"Curly brackets are not allowed to be leading or trailing if/else statements. Place it on a new line: {file_path} at line {line_number}")
             check_failed = True
+        if re.match(double_semiregex, line):
+            print(
+                f"Double semicolon (;;) found in {file_path} at line {line_number}")
+            check_failed = True
+        if re.match(tab_regex, line):
+            print(
+                f"Tab found! Replace it to 4 spaces: {file_path} at line {line_number}")
+            check_failed = True
+
     # Handle the script error and update the result output
     if check_failed:
         error_handler = True
