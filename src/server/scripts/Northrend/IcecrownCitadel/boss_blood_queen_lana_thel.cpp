@@ -332,7 +332,7 @@ public:
                                 if (!pUnit->HasAura(SPELL_BLOOD_MIRROR_DAMAGE) && !pUnit->HasAura(SPELL_ESSENCE_OF_THE_BLOOD_QUEEN_PLR))
                                 {
                                     float threatValue = me->GetThreatMgr().GetThreat(pUnit);
-                                    if (threatValue > 0.0f && threatValue > highestThreatValue)
+                                    if (threatValue && threatValue > highestThreatValue)
                                     {
                                         target = pUnit->ToPlayer();
                                         highestThreatValue = threatValue;
