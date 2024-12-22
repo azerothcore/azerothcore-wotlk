@@ -1,7 +1,7 @@
 name: Codestyle
 on:
   pull_request:
-      types:
+    types:
       - opened
       - reopened
       - synchronize
