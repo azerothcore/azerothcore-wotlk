@@ -540,13 +540,13 @@ struct boss_jormungarAI : public ScriptedAI
         if (me->GetDisplayId() == _MODEL_STATIONARY )
         {
             me->SetAttackTime(BASE_ATTACK, 1500);
-            events.RescheduleEvent(EVENT_SPELL_SPRAY, (me->GetEntry() == NPC_ACIDMAW ? 20s : 15s));
+            events.RescheduleEvent(EVENT_SPELL_SPRAY, 10s);
             events.RescheduleEvent(EVENT_SPELL_SWEEP, 15s, 30s);
         }
         else
         {
             me->SetAttackTime(BASE_ATTACK, 2000);
-            events.RescheduleEvent(EVENT_SPELL_BITE, (me->GetEntry() == NPC_ACIDMAW ? 20s : 15s));
+            events.RescheduleEvent(EVENT_SPELL_BITE, 10s);
             events.RescheduleEvent(EVENT_SPELL_SPEW, 15s, 30s);
             events.RescheduleEvent(EVENT_SPELL_SLIME_POOL, 15s);
         }
@@ -652,7 +652,7 @@ struct boss_jormungarAI : public ScriptedAI
             case EVENT_SPELL_SPRAY:
                 if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 100.0f, true))
                     me->CastSpell(target, _SPELL_SPRAY, false);
-                events.Repeat(20s);
+                events.Repeat(15s);
                 break;
             case EVENT_SPELL_SWEEP:
                 me->CastSpell((Unit*)nullptr, SPELL_SWEEP_0, false);
@@ -661,7 +661,7 @@ struct boss_jormungarAI : public ScriptedAI
             case EVENT_SPELL_BITE:
                 if (Unit* victim = me->GetVictim())
                     me->CastSpell(victim, _SPELL_BITE, false);
-                events.Repeat(20s);
+                events.Repeat(15s);
                 break;
             case EVENT_SPELL_SPEW:
                 me->CastSpell(me->GetVictim(), _SPELL_SPEW, false);
