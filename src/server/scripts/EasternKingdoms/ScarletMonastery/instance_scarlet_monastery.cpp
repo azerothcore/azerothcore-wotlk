@@ -139,55 +139,55 @@ public:
                 case TYPE_MOGRAINE_AND_WHITE_EVENT:
                     if (data == IN_PROGRESS)
                     {
-                        if (Creature* Mograine = instance->GetCreature(_mograineGUID))
+                        if (Creature* mograine = instance->GetCreature(_mograineGUID))
                         {
                             std::list<Creature*> creatureList;
-                            GetCreatureListWithEntryInGrid(creatureList, Mograine, NPC_SCARLET_MONK, CATHEDRAL_PULL_RANGE);
-                            GetCreatureListWithEntryInGrid(creatureList, Mograine, NPC_SCARLET_ABBOT, CATHEDRAL_PULL_RANGE);
-                            GetCreatureListWithEntryInGrid(creatureList, Mograine, NPC_SCARLET_CHAMPION, CATHEDRAL_PULL_RANGE);
-                            GetCreatureListWithEntryInGrid(creatureList, Mograine, NPC_SCARLET_CENTURION, CATHEDRAL_PULL_RANGE);
-                            GetCreatureListWithEntryInGrid(creatureList, Mograine, NPC_SCARLET_WIZARD, CATHEDRAL_PULL_RANGE);
-                            GetCreatureListWithEntryInGrid(creatureList, Mograine, NPC_SCARLET_CHAPLAIN, CATHEDRAL_PULL_RANGE);
+                            GetCreatureListWithEntryInGrid(creatureList, mograine, NPC_SCARLET_MONK, CATHEDRAL_PULL_RANGE);
+                            GetCreatureListWithEntryInGrid(creatureList, mograine, NPC_SCARLET_ABBOT, CATHEDRAL_PULL_RANGE);
+                            GetCreatureListWithEntryInGrid(creatureList, mograine, NPC_SCARLET_CHAMPION, CATHEDRAL_PULL_RANGE);
+                            GetCreatureListWithEntryInGrid(creatureList, mograine, NPC_SCARLET_CENTURION, CATHEDRAL_PULL_RANGE);
+                            GetCreatureListWithEntryInGrid(creatureList, mograine, NPC_SCARLET_WIZARD, CATHEDRAL_PULL_RANGE);
+                            GetCreatureListWithEntryInGrid(creatureList, mograine, NPC_SCARLET_CHAPLAIN, CATHEDRAL_PULL_RANGE);
                             for (std::list<Creature*>::iterator itr = creatureList.begin(); itr != creatureList.end(); ++itr)
                             {
                                 if (Creature* creature = *itr)
-                                    creature->AI()->AttackStart(Mograine->GetVictim());
+                                    creature->AI()->AttackStart(mograine->GetVictim());
                             }
                         }
                         _encounter = IN_PROGRESS;
                     }
                     if (data == FAIL)
                     {
-                        Creature* Whitemane = instance->GetCreature(_whitemaneGUID);
-                        if (!Whitemane)
+                        Creature* whitemane = instance->GetCreature(_whitemaneGUID);
+                        if (!whitemane)
                             return;
 
-                        Creature* Mograine = instance->GetCreature(_mograineGUID);
-                        if (!Mograine)
+                        Creature* mograine = instance->GetCreature(_mograineGUID);
+                        if (!mograine)
                             return;
 
-                        if (Whitemane->IsAlive() && Mograine->IsAlive())
+                        if (whitemane->IsAlive() && mograine->IsAlive())
                         {
                             // When Whitemane emerges from the main gate, Whitemane will stand next to Mograine's corpse and will not reset Whitemane
-                            if (Whitemane->IsInCombat()||Whitemane->IsInEvadeMode())
-                                Whitemane->DespawnOnEvade(30s);
+                            if (whitemane->IsEngaged()||whitemane->IsInEvadeMode())
+                                whitemane->DespawnOnEvade(20s);
 
-                            Mograine->DespawnOnEvade(30s);
+                            mograine->DespawnOnEvade(20s);
                             _encounter = NOT_STARTED;
                             return;
                         }
 
                         // Whitemane will not be able to fight Mograine again when he dies
-                        if (!Whitemane->IsAlive())
+                        if (!whitemane->IsAlive())
                         {
-                            Mograine->DespawnOrUnsummon();
+                            mograine->DespawnOrUnsummon();
                             _encounter = data;
                             return;
                         }
 
-                        if (Whitemane->IsAlive() && !Mograine->IsAlive())
+                        if (whitemane->IsAlive() && !mograine->IsAlive())
                         {
-                            Whitemane->DespawnOnEvade(30s);
+                            whitemane->DespawnOnEvade(20s);
                             _encounter = data;
                             return;
                         }
@@ -202,7 +202,7 @@ public:
                     {
                         // the ashbringer incident did not sniff out any data from whitemane
                         if (Creature* whitemane = instance->GetCreature(_whitemaneGUID))
-                            if (whitemane->IsAlive() && !whitemane->IsInCombat())
+                            if (whitemane->IsAlive() && !whitemane->IsEngaged())
                                 whitemane->DespawnOrUnsummon();
 
                         if (GameObject* go = instance->GetGameObject(_doorChapelGUID))
@@ -214,7 +214,7 @@ public:
 
                         for (auto const& scarletCathedralNpcGuid : _ashbringerNpcGUID)
                             if (Creature* scarletNpc = instance->GetCreature(scarletCathedralNpcGuid))
-                                if (scarletNpc->IsAlive() && !scarletNpc->IsInCombat())
+                                if (scarletNpc->IsAlive() && !scarletNpc->IsEngaged())
                                     scarletNpc->SetFaction(FACTION_FRIENDLY);
                     }
                     _ashencounter = data;
