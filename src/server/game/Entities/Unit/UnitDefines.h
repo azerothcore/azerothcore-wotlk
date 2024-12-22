@@ -99,6 +99,27 @@ enum ShapeshiftForm
     FORM_SPIRITOFREDEMPTION             = 0x20
 };
 
+enum ShapeshiftFlags
+{
+    SHAPESHIFT_FLAG_STANCE                          = 0x00000001,   // Form allows various player activities, which normally cause "You can't X while shapeshifted." errors (npc/go interaction, item use, etc)
+    SHAPESHIFT_FLAG_NOT_TOGGLEABLE                  = 0x00000002,   // NYI
+    SHAPESHIFT_FLAG_PERSIST_ON_DEATH                = 0x00000004,   // NYI
+    SHAPESHIFT_FLAG_CAN_NPC_INTERACT                = 0x00000008,   // Form unconditionally allows talking to NPCs while shapeshifted (even if other activities are disabled)
+    SHAPESHIFT_FLAG_DONT_USE_WEAPON                 = 0x00000010,   // NYI
+    SHAPESHIFT_FLAG_AGILITY_ATTACK_BONUS            = 0x00000020,   // Druid Cat form
+    SHAPESHIFT_FLAG_CAN_USE_EQUIPPED_ITEMS          = 0x00000040,   // NYI
+    SHAPESHIFT_FLAG_CAN_USE_ITEMS                   = 0x00000080,   // NYI
+    SHAPESHIFT_FLAG_DONT_AUTO_UNSHIFT               = 0x00000100,   // Handled at client side
+    SHAPESHIFT_FLAG_CONSIDERED_DEAD                 = 0x00000200,   // NYI
+    SHAPESHIFT_FLAG_CAN_ONLY_CAST_SHAPESHIFT_SPELLS = 0x00000400,   // NYI
+    SHAPESHIFT_FLAG_STANCE_CANCEL_AT_FLIGHTMASTER   = 0x00000800,   // NYI
+    SHAPESHIFT_FLAG_NO_EMOTE_SOUNDS                 = 0x00001000,   // NYI
+    SHAPESHIFT_FLAG_NO_TRIGGER_TELEPORT             = 0x00002000,   // NYI
+    SHAPESHIFT_FLAG_CANNOT_CHANGE_EQUIPPED_ITEMS    = 0x00004000,   // NYI
+    SHAPESHIFT_FLAG_RESUMMON_PETS_ON_UNSHIFT        = 0x00008000,   // NYI
+    SHAPESHIFT_FLAG_CANNOT_USE_GAME_OBJECTS         = 0x00010000,   // NYI
+};
+
 // low byte (0 from 0..3) of UNIT_FIELD_BYTES_2
 enum SheathState
 {
