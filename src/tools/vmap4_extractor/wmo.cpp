@@ -395,8 +395,10 @@ int WMOGroup::ConvertToVMAPGroupWmo(FILE* output, bool preciseVectorData)
         for (int i = 0; i < nTriangles; ++i)
         {
             // Skip no collision triangles
+            // TODO: Update to use MOBR in the future to catch any possibly missed edge cases
             bool isRenderFace = (MOPY[2 * i] & WMO_MATERIAL_RENDER) && !(MOPY[2 * i] & WMO_MATERIAL_DETAIL);
-            bool isCollision = MOPY[2 * i] & WMO_MATERIAL_COLLISION || isRenderFace;
+            bool isCollisionOnlyFace = static_cast<unsigned char>(MOPY[(2 * i) + 1]) == 0xFF; // 255 is a collision-only material id
+            bool isCollision = MOPY[2 * i] & WMO_MATERIAL_COLLISION || isRenderFace || isCollisionOnlyFace;
             if (!isCollision)
                 continue;
             // Use this triangle
