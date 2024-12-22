@@ -328,7 +328,7 @@ public:
                         for (ThreatContainer::StorageType::const_iterator i = threatList.begin(); i != threatList.end(); ++i)
                         {
                             Unit* pUnit = ObjectAccessor::GetUnit(*me, (*i)->getUnitGuid());
-                            if (pUnit && pUnit->IsPlayer() && me->GetThreatMgr().GetThreat(pUnit))
+                            if (pUnit && pUnit->IsPlayer())
                                 if (!pUnit->HasAura(SPELL_BLOOD_MIRROR_DAMAGE) && !pUnit->HasAura(SPELL_ESSENCE_OF_THE_BLOOD_QUEEN_PLR))
                                 {
                                     float threatValue = me->GetThreatMgr().GetThreat(pUnit);
