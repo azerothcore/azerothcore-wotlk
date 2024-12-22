@@ -328,19 +328,22 @@ public:
                 case EVENT_VAMPIRIC_BITE:
                     {
                         Player* target = nullptr;
-                        float maxThreat = 0.0f;
-                        const Map::PlayerList& pl = me->GetMap()->GetPlayers();
-                        for (Map::PlayerList::const_iterator itr = pl.begin(); itr != pl.end(); ++itr)
-                            if (Player* p = itr->GetSource())
-                                if (p->IsAlive() && p->GetDistance(me) < 70.0f)
+                        float highestThreatValue = 0.0f;
+                        ThreatContainer::StorageType const& threatList = me->GetThreatMgr().GetThreatList();
+                        for (ThreatContainer::StorageType::const_iterator i = threatList.begin(); i != threatList.end(); ++i)
+                        {
+                            Unit* pUnit = ObjectAccessor::GetUnit(*me, (*i)->getUnitGuid());
+                            if (pUnit && pUnit->IsPlayer() && me->GetThreatMgr().GetThreat(pUnit))
+                                if (!pUnit->HasAura(SPELL_BLOOD_MIRROR_DAMAGE) && !pUnit->HasAura(SPELL_VAMPIRIC_BITE))
                                 {
-                                    float th = me->GetThreatMgr().getThreatWithoutTemp(p);
-                                    if (!target || th > maxThreat)
+                                    float threatValue = me->GetThreatMgr().GetThreat(pUnit);
+                                    if (threatValue > 0.0f && threatValue > highestThreatValue)
                                     {
-                                        target = p;
-                                        maxThreat = th;
+                                        target = pUnit->ToPlayer();
+                                        highestThreatValue = threatValue;
                                     }
                                 }
+                        }
 
                         if (target)
                         {
