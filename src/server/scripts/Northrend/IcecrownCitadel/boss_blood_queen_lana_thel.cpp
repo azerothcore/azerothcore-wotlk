@@ -82,10 +82,8 @@ enum Shadowmourne
 
 bool IsVampire(Unit const* unit)
 {
-    uint8 spawnMode = unit->GetMap()->GetSpawnMode();
-    for (uint8 i = 0; i < 3; ++i)
-        if (unit->HasAura(SPELL_ESSENCE_OF_BLOOD_QUEEN) || unit->HasAura(SPELL_ESSENCE_OF_THE_BLOOD_QUEEN_PLR) || unit->HasAura(SPELL_FRENZIED_BLOODTHIRST))
-            return true;
+    if (unit->HasAura(SPELL_ESSENCE_OF_BLOOD_QUEEN) || unit->HasAura(SPELL_ESSENCE_OF_THE_BLOOD_QUEEN_PLR) || unit->HasAura(SPELL_FRENZIED_BLOODTHIRST))
+        return true;
     return false;
 }
 
