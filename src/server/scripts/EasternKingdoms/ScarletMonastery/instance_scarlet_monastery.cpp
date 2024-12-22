@@ -15,12 +15,10 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "AreaTriggerScript.h"
 #include "CreatureScript.h"
 #include "InstanceMapScript.h"
 #include "scarletmonastery.h"
 #include "ScriptedCreature.h"
-#include "SmartAI.h"
 
 enum AshbringerEventMisc
 {
@@ -45,11 +43,11 @@ enum AshbringerEventMisc
 enum AshbringerSpell
 {
     //Highlord Mograine Spells
-    //This spell lacks the lightning visual effect after hitting the target
+    //Needs Fix: Increased the visual effect of spells on hit
     SPELL_FORGIVENESS               = 28697,
 
     //High Inquisitor Fairbanks
-    //This spell lacks the visual effect after hitting the target
+    //Needs Fix: Increased the visual effect of spells on hit
     SPELL_TRANSFORM_GHOST           = 28443
 };
 
