@@ -39,9 +39,9 @@ void ScriptMgr::OnBeforeConfigLoad(bool reload)
     CALL_ENABLED_HOOKS(WorldScript, WORLDHOOK_ON_BEFORE_CONFIG_LOAD, script->OnBeforeConfigLoad(reload));
 }
 
-void ScriptMgr::OnMotdChange(std::string& newMotd)
+void ScriptMgr::OnMotdChange(std::string& newMotd, LocaleConstant& locale)
 {
-    CALL_ENABLED_HOOKS(WorldScript, WORLDHOOK_ON_MOTD_CHANGE, script->OnMotdChange(newMotd));
+    CALL_ENABLED_HOOKS(WorldScript, WORLDHOOK_ON_MOTD_CHANGE, script->OnMotdChange(newMotd, locale));
 }
 
 void ScriptMgr::OnShutdownInitiate(ShutdownExitCode code, ShutdownMask mask)

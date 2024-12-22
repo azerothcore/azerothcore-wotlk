@@ -551,6 +551,7 @@ public:
     bool IsAutoRepeat() const { return m_autoRepeat; }
     void SetAutoRepeat(bool rep) { m_autoRepeat = rep; }
     void ReSetTimer() { m_timer = m_casttime > 0 ? m_casttime : 0; }
+    int32 GetCastTimeRemaining() { return m_timer;}
     bool IsNextMeleeSwingSpell() const;
     bool IsTriggered() const { return HasTriggeredCastFlag(TRIGGERED_FULL_MASK); };
     bool HasTriggeredCastFlag(TriggerCastFlags flag) const { return _triggeredCastFlags & flag; };
@@ -782,14 +783,6 @@ public:
     bool _spellTargetsSelected;
 
     ByteBuffer* m_effectExecuteData[MAX_SPELL_EFFECTS];
-
-#ifdef MAP_BASED_RAND_GEN
-    int32 irand(int32 min, int32 max)       { return int32 (m_caster->GetMap()->mtRand.randInt(max - min)) + min; }
-    uint32 urand(uint32 min, uint32 max)    { return m_caster->GetMap()->mtRand.randInt(max - min) + min; }
-    int32 rand32()                          { return m_caster->GetMap()->mtRand.randInt(); }
-    double rand_norm()                      { return m_caster->GetMap()->mtRand.randExc(); }
-    double rand_chance()                    { return m_caster->GetMap()->mtRand.randExc(100.0); }
-#endif
 };
 
 namespace Acore

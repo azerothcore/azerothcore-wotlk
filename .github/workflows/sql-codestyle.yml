@@ -10,7 +10,7 @@ jobs:
   triage:
     runs-on: ubuntu-latest
     name: SQL
-    if: github.repository == 'azerothcore/azerothcore-wotlk'
+    if: github.repository == 'azerothcore/azerothcore-wotlk' && !github.event.pull_request.draft
     steps:
       - uses: actions/checkout@v4
       - name: Check pending SQL

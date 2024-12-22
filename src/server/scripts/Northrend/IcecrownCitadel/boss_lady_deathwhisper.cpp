@@ -912,7 +912,7 @@ public:
         npc_vengeful_shadeAI(Creature* creature) : ScriptedAI(creature)
         {
             me->SetControlled(true, UNIT_STATE_ROOT);
-            unroot_timer = 500;
+            unroot_timer = 2000;
             targetGUID.Clear();
         }
 

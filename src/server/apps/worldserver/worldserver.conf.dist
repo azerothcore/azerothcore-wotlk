@@ -2045,11 +2045,18 @@ WaterBreath.Timer = 180000
 EnableLowLevelRegenBoost = 1
 
 #
-#    Rate.MoveSpeed
-#        Description: Movement speed rate.
+#    Rate.MoveSpeed.Player
+#        Description: Movement speed rate for players.
 #        Default:     1
 
-Rate.MoveSpeed = 1
+Rate.MoveSpeed.Player = 1
+
+#
+#    Rate.MoveSpeed.NPC
+#        Description: Movement speed rate for NPCs.
+#        Default:     1
+
+Rate.MoveSpeed.NPC = 1
 
 #
 #    Rate.Damage.Fall
@@ -2106,14 +2113,17 @@ Rate.Loyalty           = 1
 #    Rate.Rest.InGame
 #    Rate.Rest.Offline.InTavernOrCity
 #    Rate.Rest.Offline.InWilderness
+#    Rate.Rest.MaxBonus
 #        Description: Resting points grow rates.
 #        Default:     1 - (Rate.Rest.InGame)
 #                     1 - (Rate.Rest.Offline.InTavernOrCity)
 #                     1 - (Rate.Rest.Offline.InWilderness)
+#                     1.5 - (Rate.Rest.MaxBonus)
 
 Rate.Rest.InGame                 = 1
 Rate.Rest.Offline.InTavernOrCity = 1
 Rate.Rest.Offline.InWilderness   = 1
+Rate.Rest.MaxBonus               = 1.5
 
 #
 #    Rate.MissChanceMultiplier.Creature
@@ -2162,6 +2172,21 @@ NoResetTalentsCost = 0
 #
 
 ToggleXP.Cost = 100000
+
+#
+#    SpellQueue.Enabled
+#        Description: Enable SpellQueue.
+#        Default:     0 - (Disabled)
+#                     1 - (Enabled)
+
+SpellQueue.Enabled = 1
+
+#
+#    SpellQueue.Window
+#        Description: Time (in milliseconds) for spells to be queued.
+#        Default:     400 - (400ms)
+
+SpellQueue.Window = 400
 
 #
 ###################################################################################################
@@ -4280,11 +4305,11 @@ Event.Announce = 0
 ###################################################################################################
 # AUCTION HOUSE
 #
-#     AuctionHouse.SearchTimeout
-#        Description: Time (in milliseconds) after which an auction house search is discarded.
-#        Default:     1000 - (1 second)
+#     AuctionHouse.WorkerThreads
+#        Description: Count of auctionhouse searcher worker threads to spawn
+#        Default:     1
 
-AuctionHouse.SearchTimeout = 1000
+AuctionHouse.WorkerThreads = 1
 
 #
 #     LevelReq.Auction
