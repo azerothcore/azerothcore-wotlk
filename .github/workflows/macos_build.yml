@@ -6,6 +6,7 @@ on:
   pull_request:
     types:
       - labeled
+      - synchronize
 
 concurrency:
   group: ${{ github.head_ref }} || concat(${{ github.ref }}, ${{ github.workflow }})
