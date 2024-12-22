@@ -212,11 +212,11 @@ struct boss_nalorakk : public BossAI
             Talk(SAY_SURGE);
             DoCastRandomTarget(SPELL_SURGE, 0, 45.0f, false, false, false);
             context.Repeat();
-        }).Schedule(7s, 12s, GROUP_HUMAN, [this](TaskContext context)
+        }).Schedule(15s, 25s, GROUP_HUMAN, [this](TaskContext context)
         {
             DoCastVictim(SPELL_BRUTALSWIPE);
             context.Repeat();
-        }).Schedule(10s, 15s, GROUP_HUMAN, [this](TaskContext context)
+        }).Schedule(6s, 34s, GROUP_HUMAN, [this](TaskContext context)
         {
             if (me->GetVictim() && !me->GetVictim()->HasAura(SPELL_MANGLE))
             {
@@ -250,11 +250,11 @@ struct boss_nalorakk : public BossAI
                 Talk(SAY_SURGE);
                 DoCastRandomTarget(SPELL_SURGE, 0, 45.0f, false, false, false);
                 context.Repeat();
-            }).Schedule(7s, 12s, GROUP_HUMAN, [this](TaskContext context)
+            }).Schedule(15s, 25s, GROUP_HUMAN, [this](TaskContext context)
             {
                 DoCastVictim(SPELL_BRUTALSWIPE);
                 context.Repeat();
-            }).Schedule(10s, 15s, GROUP_HUMAN, [this](TaskContext context)
+            }).Schedule(6s, 34s, GROUP_HUMAN, [this](TaskContext context)
             {
                 DoCastVictim(SPELL_MANGLE);
                 context.Repeat();
@@ -277,18 +277,18 @@ struct boss_nalorakk : public BossAI
 
             me->SetCanDualWield(false);
 
-            scheduler.Schedule(2s, GROUP_BEAR, [this](TaskContext context)
+            scheduler.Schedule(4s, 26s, GROUP_BEAR, [this](TaskContext context)
             {
                 DoCastVictim(SPELL_LACERATINGSLASH);
-                context.Repeat(18s, 23s);
-            }).Schedule(3s, GROUP_BEAR, [this](TaskContext context)
+                context.Repeat(4s, 26s);
+            }).Schedule(6s, 21s, GROUP_BEAR, [this](TaskContext context)
             {
                 DoCastVictim(SPELL_RENDFLESH);
-                context.Repeat(5s, 10s);
-            }).Schedule(5s, 10s, GROUP_BEAR, [this](TaskContext context)
+                context.Repeat(6s, 21s);
+            }).Schedule(11s, 24s, GROUP_BEAR, [this](TaskContext context)
             {
                 DoCastSelf(SPELL_DEAFENINGROAR);
-                context.Repeat(15s, 20s);
+                context.Repeat(11s, 24s);
             }).Schedule(30s, GROUP_BEAR, [this](TaskContext)
             {
                 ShapeShift(_bearForm);
