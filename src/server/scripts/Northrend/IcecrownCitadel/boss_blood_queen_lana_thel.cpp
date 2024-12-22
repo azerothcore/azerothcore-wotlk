@@ -48,6 +48,7 @@ enum Spells
     SPELL_FRENZIED_BLOODTHIRST_VISUAL       = 71949,
     SPELL_VAMPIRIC_BITE                     = 71726,
     SPELL_VAMPIRIC_BITE_DUMMY               = 71837,
+    SPELL_ESSENCE_OF_BLOOD_QUEEN            = 70867,
     SPELL_ESSENCE_OF_THE_BLOOD_QUEEN_PLR    = 70879,
     SPELL_ESSENCE_OF_THE_BLOOD_QUEEN_HEAL   = 70872,
     SPELL_FRENZIED_BLOODTHIRST              = 70877,
@@ -78,12 +79,6 @@ enum Shadowmourne
     SPELL_GUSHING_WOUND                     = 72132,
     SPELL_THIRST_QUENCHED                   = 72154,
 };
-
-#define ESSENCE_OF_BLOOD_QUEEN     RAID_MODE<uint32>(70867, 71473, 71532, 71533)
-#define ESSENCE_OF_BLOOD_QUEEN_PLR RAID_MODE<uint32>(70879, 71525, 71530, 71531)
-#define FRENZIED_BLOODTHIRST       RAID_MODE<uint32>(70877, 71474, 70877, 71474)
-#define DELIRIOUS_SLASH            RAID_MODE<uint32>(71623, 71624, 71625, 71626)
-#define PRESENCE_OF_THE_DARKFALLEN RAID_MODE<uint32>(70994, 71962, 71963, 71964)
 
 uint32 const vampireAuras[3][MAX_DIFFICULTY] =
 {
@@ -334,7 +329,7 @@ public:
                         {
                             Unit* pUnit = ObjectAccessor::GetUnit(*me, (*i)->getUnitGuid());
                             if (pUnit && pUnit->IsPlayer() && me->GetThreatMgr().GetThreat(pUnit))
-                                if (!pUnit->HasAura(SPELL_BLOOD_MIRROR_DAMAGE) && !pUnit->HasAura(SPELL_VAMPIRIC_BITE))
+                                if (!pUnit->HasAura(SPELL_BLOOD_MIRROR_DAMAGE) && !pUnit->HasAura(SPELL_ESSENCE_OF_THE_BLOOD_QUEEN_PLR))
                                 {
                                     float threatValue = me->GetThreatMgr().GetThreat(pUnit);
                                     if (threatValue > 0.0f && threatValue > highestThreatValue)
@@ -516,17 +511,17 @@ public:
 
         void CleanAuras()
         {
-            instance->DoRemoveAurasDueToSpellOnPlayers(ESSENCE_OF_BLOOD_QUEEN);
-            instance->DoRemoveAurasDueToSpellOnPlayers(ESSENCE_OF_BLOOD_QUEEN_PLR);
-            instance->DoRemoveAurasDueToSpellOnPlayers(FRENZIED_BLOODTHIRST);
+            instance->DoRemoveAurasDueToSpellOnPlayers(SPELL_ESSENCE_OF_BLOOD_QUEEN);
+            instance->DoRemoveAurasDueToSpellOnPlayers(SPELL_ESSENCE_OF_THE_BLOOD_QUEEN_PLR);
+            instance->DoRemoveAurasDueToSpellOnPlayers(SPELL_FRENZIED_BLOODTHIRST);
             instance->DoRemoveAurasDueToSpellOnPlayers(SPELL_FRENZIED_BLOODTHIRST_VISUAL);
             instance->DoRemoveAurasDueToSpellOnPlayers(SPELL_UNCONTROLLABLE_FRENZY);
             instance->DoRemoveAurasDueToSpellOnPlayers(SPELL_BLOOD_MIRROR_DAMAGE);
             instance->DoRemoveAurasDueToSpellOnPlayers(SPELL_BLOOD_MIRROR_VISUAL);
             instance->DoRemoveAurasDueToSpellOnPlayers(SPELL_BLOOD_MIRROR_DUMMY);
-            instance->DoRemoveAurasDueToSpellOnPlayers(DELIRIOUS_SLASH);
+            instance->DoRemoveAurasDueToSpellOnPlayers(SPELL_DELIRIOUS_SLASH);
             instance->DoRemoveAurasDueToSpellOnPlayers(SPELL_PACT_OF_THE_DARKFALLEN);
-            instance->DoRemoveAurasDueToSpellOnPlayers(PRESENCE_OF_THE_DARKFALLEN);
+            instance->DoRemoveAurasDueToSpellOnPlayers(SPELL_PRESENCE_OF_THE_DARKFALLEN_DUMMY);
         }
 
         bool WasVampire(ObjectGuid guid)
