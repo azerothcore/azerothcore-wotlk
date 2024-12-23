@@ -15,6 +15,7 @@ results = {
     "Multiple blank lines check": "Passed",
     "Trailing whitespace check": "Passed",
     "SQL codestyle check": "Passed",
+    "INSERT safety usage check": "Passed",
 }
 
 # Collect all files in all directories
@@ -42,6 +43,7 @@ def parsing_file(files: list) -> None:
                 multiple_blank_lines_check(file, file_path)
                 trailing_whitespace_check(file, file_path)
                 sql_check(file, file_path)
+                insert_safety_check(file, file_path)
         except UnicodeDecodeError:
             print(f"\nCould not decode file {file_path}")
             sys.exit(1)
@@ -106,6 +108,10 @@ def sql_check(file: io, file_path: str) -> None:
             print(
                 f"DON'T EDIT broadcast_text TABLE UNLESS YOU KNOW WHAT YOU ARE DOING!\nThis error can safely be ignored if the changes are approved to be sniffed: {file_path} at line {line_number}")
             check_failed = True
+        if "EntryOrGuid" in line:
+            print(
+                f"Please use entryorguid syntax instead of EntryOrgGuid in {file_path} at line {line_number}\nWe recommend to use keira to have the right syntax in auto-query generation")
+            check_failed = True
         if [match for match in [';;'] if match in line]:
             print(
                 f"Double semicolon (;;) found in {file_path} at line {line_number}")
@@ -114,7 +120,7 @@ def sql_check(file: io, file_path: str) -> None:
             print(
                 f"Tab found! Replace it to 4 spaces: {file_path} at line {line_number}")
             check_failed = True
-        
+
         # Ignore comments (remove content after --)
         line_without_comment = re.sub(r'--.*', '', line).strip()
         # Check if the last non-empty line ends with a semicolon
@@ -133,6 +139,24 @@ def sql_check(file: io, file_path: str) -> None:
     if check_failed:
         error_handler = True
         results["SQL codestyle check"] = "Failed"
+
+def insert_safety_check(file: io, file_path: str) -> None:
+    global error_handler, results
+    file.seek(0)  # Reset file pointer to the beginning
+    check_failed = False
+    previous_line = ""
+
+    # Parse all the file
+    for line_number, line in enumerate(file, start = 1):
+        if "INSERT" in line and "DELETE" not in previous_line:
+            print(f"No DELETE keyword found after the INSERT in {file_path} at line {line_number}\nIf this error is intended, please advert a maintainer")
+            check_failed = True
+        previous_line = line
+
+    # Handle the script error and update the result output
+    if check_failed:
+        error_handler = True
+        results["INSERT safety usage check"] = "Failed"
 
 # Collect all files from matching directories
 all_files = collect_files_from_directories(src_directory)
