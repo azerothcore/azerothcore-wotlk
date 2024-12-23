@@ -93,7 +93,7 @@ public:
             for (auto& cell : cellX)
             {
                 if (!cell)
-                    return;
+                    continue;
 
                 cell->Visit(visitor);
             }
