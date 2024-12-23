@@ -114,14 +114,6 @@ def sql_check(file: io, file_path: str) -> None:
             print(
                 f"Tab found! Replace it to 4 spaces: {file_path} at line {line_number}")
             check_failed = True
-        
-        # Ignore comments (remove content after --)
-        line_without_comment = re.sub(r'--.*', '', line).strip()
-        # Check if the last non-empty line ends with a semicolon
-        if not line_without_comment.endswith(';'):
-            print(
-                f"The last non-empty line does not end with a semicolon: {file_path}")
-            check_failed = True
 
         last_line = line[-1].strip()
         if last_line:
