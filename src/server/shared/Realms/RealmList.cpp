@@ -18,8 +18,9 @@
 #include "RealmList.h"
 #include "DatabaseEnv.h"
 #include "Log.h"
-#include "Resolver.h"
 #include "QueryResult.h"
+#include "Resolver.h"
+#include "SteadyTimer.h"
 #include "Util.h"
 #include <boost/asio/ip/tcp.hpp>
 #include <memory>
@@ -227,9 +228,7 @@ void RealmList::UpdateRealms(boost::system::error_code const& error)
 
     if (_updateInterval)
     {
-        // Calculate the expiration time _updateInterval from now
-        auto expiration_time = std::chrono::steady_clock::now() + std::chrono::seconds(_updateInterval);
-        _updateTimer->expires_at(expiration_time);
+        _updateTimer->expires_at(Acore::Asio::SteadyTimer::GetExpirationTime(_updateInterval));
         _updateTimer->async_wait([this](boost::system::error_code const& errorCode){ UpdateRealms(errorCode); });
     }
 }
