@@ -22,7 +22,6 @@
 #include "ACSoap.h"
 #include "AppenderDB.h"
 #include "AsyncAcceptor.h"
-#include "AsyncAuctionListing.h"
 #include "Banner.h"
 #include "BattlegroundMgr.h"
 #include "BigNumber.h"
@@ -31,7 +30,6 @@
 #include "Config.h"
 #include "DatabaseEnv.h"
 #include "DatabaseLoader.h"
-#include "DeadlineTimer.h"
 #include "GitRevision.h"
 #include "IoContext.h"
 #include "MapMgr.h"
@@ -49,6 +47,7 @@
 #include "ScriptMgr.h"
 #include "SecretMgr.h"
 #include "SharedDefines.h"
+#include "SteadyTimer.h"
 #include "World.h"
 #include "WorldSocket.h"
 #include "WorldSocketMgr.h"
@@ -92,14 +91,14 @@ public:
 
     static void Start(std::shared_ptr<FreezeDetector> const& freezeDetector)
     {
-        freezeDetector->_timer.expires_from_now(boost::posix_time::seconds(5));
+        freezeDetector->_timer.expires_at(Acore::Asio::SteadyTimer::GetExpirationTime(5));
         freezeDetector->_timer.async_wait(std::bind(&FreezeDetector::Handler, std::weak_ptr<FreezeDetector>(freezeDetector), std::placeholders::_1));
     }
 
     static void Handler(std::weak_ptr<FreezeDetector> freezeDetectorRef, boost::system::error_code const& error);
 
 private:
-    Acore::Asio::DeadlineTimer _timer;
+    boost::asio::steady_timer _timer;
     uint32 _worldLoopCounter;
     uint32 _lastChangeMsTime;
     uint32 _maxCoreStuckTimeInMs;
@@ -112,7 +111,6 @@ void StopDB();
 bool LoadRealmInfo(Acore::Asio::IoContext& ioContext);
 AsyncAcceptor* StartRaSocketAcceptor(Acore::Asio::IoContext& ioContext);
 void ShutdownCLIThread(std::thread* cliThread);
-void AuctionListingRunnable();
 void WorldUpdateLoop();
 variables_map GetConsoleArguments(int argc, char** argv, fs::path& configFile, [[maybe_unused]] std::string& cfg_service);
 
@@ -397,15 +395,6 @@ int main(int argc, char** argv)
         cliThread.reset(new std::thread(CliThread), &ShutdownCLIThread);
     }
 
-    // Launch auction listing thread
-    std::shared_ptr<std::thread> auctionListingThread;
-    auctionListingThread.reset(new std::thread(AuctionListingRunnable),
-        [](std::thread* thr)
-    {
-        thr->join();
-        delete thr;
-    });
-
     WorldUpdateLoop();
 
     // Shutdown starts here
@@ -642,7 +631,7 @@ void FreezeDetector::Handler(std::weak_ptr<FreezeDetector> freezeDetectorRef, bo
                 }
             }
 
-            freezeDetector->_timer.expires_from_now(boost::posix_time::seconds(1));
+            freezeDetector->_timer.expires_at(Acore::Asio::SteadyTimer::GetExpirationTime(1));
             freezeDetector->_timer.async_wait(std::bind(&FreezeDetector::Handler, freezeDetectorRef, std::placeholders::_1));
         }
     }
@@ -711,55 +700,6 @@ bool LoadRealmInfo(Acore::Asio::IoContext& ioContext)
     realm.PopulationLevel = fields[10].Get<float>();
     realm.Build = fields[11].Get<uint32>();
     return true;
-}
-
-void AuctionListingRunnable()
-{
-    LOG_INFO("server", "Starting up Auction House Listing thread...");
-
-    while (!World::IsStopped())
-    {
-        Milliseconds diff = AsyncAuctionListingMgr::GetDiff();
-        AsyncAuctionListingMgr::ResetDiff();
-
-        if (!AsyncAuctionListingMgr::GetTempList().empty() || !AsyncAuctionListingMgr::GetList().empty())
-        {
-            {
-                std::lock_guard<std::mutex> guard(AsyncAuctionListingMgr::GetTempLock());
-
-                for (auto const& delayEvent: AsyncAuctionListingMgr::GetTempList())
-                    AsyncAuctionListingMgr::GetList().emplace_back(delayEvent);
-
-                AsyncAuctionListingMgr::GetTempList().clear();
-            }
-
-            for (auto& itr: AsyncAuctionListingMgr::GetList())
-            {
-                if (itr._pickupTimer <= diff)
-                {
-                    itr._pickupTimer = Milliseconds::zero();
-                }
-                else
-                {
-                    itr._pickupTimer -= diff;
-                }
-            }
-
-            for (auto itr = AsyncAuctionListingMgr::GetList().begin(); itr != AsyncAuctionListingMgr::GetList().end(); ++itr)
-            {
-                if ((*itr)._pickupTimer != Milliseconds::zero())
-                    continue;
-
-                if ((*itr).Execute())
-                    AsyncAuctionListingMgr::GetList().erase(itr);
-
-                break;
-            }
-        }
-        std::this_thread::sleep_for(1ms);
-    }
-
-    LOG_INFO("server", "Auction House Listing thread exiting without problems.");
 }
 
 variables_map GetConsoleArguments(int argc, char** argv, fs::path& configFile, [[maybe_unused]] std::string& configService)

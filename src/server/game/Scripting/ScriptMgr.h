@@ -166,7 +166,7 @@ public: /* WorldScript */
     void OnBeforeConfigLoad(bool reload);
     void OnAfterConfigLoad(bool reload);
     void OnBeforeFinalizePlayerWorldSession(uint32& cacheVersion);
-    void OnMotdChange(std::string& newMotd);
+    void OnMotdChange(std::string& newMotd, LocaleConstant& locale);
     void OnShutdownInitiate(ShutdownExitCode code, ShutdownMask mask);
     void OnShutdownCancel();
     void OnWorldUpdate(uint32 diff);
