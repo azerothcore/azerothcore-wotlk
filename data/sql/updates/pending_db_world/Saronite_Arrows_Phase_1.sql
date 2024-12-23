@@ -73,10 +73,10 @@ INSERT INTO `gameobject` (`guid`, `id`, `map`, `zoneId`, `areaId`, `spawnMask`, 
 (66181, 190691, 609, 0, 0, 1, 1, 1691.6239 , -5878.599 , 116.16513, 2.6345763, 0, 0, 0, 1, 180, 0, 1, '', 58238, NULL);
 -- Setup object groups
 DELETE FROM `pool_template` WHERE (`entry` IN (22385));
-INSERT INTO `pool_template` (`entry`, `max_limit`, `description`) VALUES 
+INSERT INTO `pool_template` (`entry`, `max_limit`, `description`) VALUES
 (22385, 40, 'Saronite Arrows (Phase 1)');
 DELETE FROM `pool_gameobject` WHERE (`pool_entry` IN (22385));
-INSERT INTO `pool_gameobject` (`guid`, `pool_entry`, `chance`, `description`) VALUES 
+INSERT INTO `pool_gameobject` (`guid`, `pool_entry`, `chance`, `description`) VALUES
 (66111, 22385, 0, 'Saronite Arrow (190691)'),
 (66112, 22385, 0, 'Saronite Arrow (190691)'),
 (66113, 22385, 0, 'Saronite Arrow (190691)'),
