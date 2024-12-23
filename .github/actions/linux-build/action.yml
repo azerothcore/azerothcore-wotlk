@@ -107,7 +107,7 @@ runs:
           -DCMAKE_CXX_COMPILER_LAUNCHER="ccache" \
           -DCMAKE_C_COMPILER_LAUNCHER="ccache" \
           -DCMAKE_C_FLAGS="-Werror" ${{ inputs.cc == 'clang-15' && '-ferror-limit=420' || '-fmax-errors=420' }} \
-          -DCMAKE_CXX_FLAGS="-Werror" ${{ inputs.cxx == 'clang-15' && '-ferror-limit=420' || '-fmax-errors=420' }} \
+          -DCMAKE_CXX_FLAGS="-Werror" ${{ inputs.cxx == 'clang++-15' && '-ferror-limit=420' || '-fmax-errors=420' }} \
           -DBUILD_TESTING="ON" \
           -DUSE_SCRIPTPCH=${{ inputs.pch == 'true' && 'ON' || '' }} \
           -DUSE_COREPCH=${{ inputs.pch == 'true' && 'ON' || '' }} \
