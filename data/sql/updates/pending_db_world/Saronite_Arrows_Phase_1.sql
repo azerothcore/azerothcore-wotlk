@@ -1,6 +1,5 @@
 
 -- Remove unofficial DBGuids and adds official spawn points (Sniffed Values)
-
 DELETE FROM `gameobject` WHERE (`id` = 190691) AND (`guid` IN (66111, 66112, 66113, 66114, 66115, 66116, 66117, 66118, 66119, 66120, 66121, 66122, 66123, 66124, 66125, 66127, 66128, 66129, 66130, 66131, 66132, 66133, 66134, 66135, 66136, 66137, 66138, 66139, 66140, 66141, 66143, 66144, 66145, 66146, 66147, 66148, 66149, 66150, 66151, 66152, 66153, 66154, 66155, 66156, 66157, 66158, 66159, 66160, 66161, 66162, 66163, 66164, 66165, 66166, 66167, 66168, 66169, 66170, 66171, 66172, 66173, 66174, 66175, 66176, 66177, 66178, 66179, 66180, 66181, 66182, 66183, 66184, 66185, 66186, 66187, 66188, 66189, 66190, 66192, 66193, 66194, 66195, 66196, 66197, 66198, 66199, 66200, 66201, 66202, 66203, 66204, 66205, 66206, 66207, 66208, 66209, 66210, 66211, 66212, 66213, 66214, 66215, 66216, 66217, 66219, 66220, 66221, 66222, 66223, 66224, 66225, 66226, 66227, 66228, 66229, 66231, 66232, 66233));
 INSERT INTO `gameobject` (`guid`, `id`, `map`, `zoneId`, `areaId`, `spawnMask`, `phaseMask`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecs`, `animprogress`, `state`, `ScriptName`, `VerifiedBuild`, `Comment`) VALUES
 (66111, 190691, 609, 0, 0, 1, 1, 2220.6106 , -5782.374 , 101.817215, 4.8694706, 0, 0, 0, 1, 180, 0, 1, '', 58238, NULL),
@@ -72,14 +71,10 @@ INSERT INTO `gameobject` (`guid`, `id`, `map`, `zoneId`, `areaId`, `spawnMask`, 
 (66179, 190691, 609, 0, 0, 1, 1, 1678.9017 , -5833.643 , 116.258026, 2.9541461, 0, 0, 0, 1, 180, 0, 1, '', 58238, NULL),
 (66180, 190691, 609, 0, 0, 1, 1, 1695.6592 , -5877.316 , 116.16627, 1.9197153, 0, 0, 0, 1, 180, 0, 1, '', 58238, NULL),
 (66181, 190691, 609, 0, 0, 1, 1, 1691.6239 , -5878.599 , 116.16513, 2.6345763, 0, 0, 0, 1, 180, 0, 1, '', 58238, NULL);
-
-
 -- Setup object groups
-
 DELETE FROM `pool_template` WHERE (`entry` IN (22385));
 INSERT INTO `pool_template` (`entry`, `max_limit`, `description`) VALUES 
 (22385, 40, 'Saronite Arrows (Phase 1)');
-
 DELETE FROM `pool_gameobject` WHERE (`pool_entry` IN (22385));
 INSERT INTO `pool_gameobject` (`guid`, `pool_entry`, `chance`, `description`) VALUES 
 (66111, 22385, 0, 'Saronite Arrow (190691)'),
