@@ -89,8 +89,15 @@ public:
     void VisitAllGrids(TypeContainerVisitor<T, TypeMapContainer<TT> >& visitor)
     {
         for (auto& cellX : i_cells)
-            for (auto& cellY : cellX)
-                cellY->Visit(visitor);
+        {
+            for (auto& cell : cellX)
+            {
+                if (!cell)
+                    return;
+
+                cell->Visit(visitor);
+            }
+        }
     }
 
     // Visit a single Grid (cell) in NGrid (grid)
