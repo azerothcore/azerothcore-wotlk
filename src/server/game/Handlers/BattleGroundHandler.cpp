@@ -139,7 +139,7 @@ void WorldSession::HandleBattlemasterJoinOpcode(WorldPacket& recvData)
     // queue result (default ok)
     GroupJoinBattlegroundResult err = GroupJoinBattlegroundResult(bg->GetBgTypeID());
 
-    if (!sScriptMgr->CanJoinInBattlegroundQueue(_player, guid, bgTypeId, joinAsGroup, err) && err <= 0)
+    if (!sScriptMgr->OnPlayerCanJoinInBattlegroundQueue(_player, guid, bgTypeId, joinAsGroup, err) && err <= 0)
     {
         WorldPacket data;
         sBattlegroundMgr->BuildGroupJoinedBattlegroundPacket(&data, err);
@@ -423,7 +423,7 @@ void WorldSession::HandleBattleFieldPortOpcode(WorldPacket& recvData)
     BattlegroundQueueTypeId bgQueueTypeId = BattlegroundMgr::BGQueueTypeId(bgTypeId, arenaType);
     BattlegroundQueue& bgQueue = sBattlegroundMgr->GetBattlegroundQueue(bgQueueTypeId);
 
-    if (!sScriptMgr->CanBattleFieldPort(_player, arenaType, bgTypeId, action))
+    if (!sScriptMgr->OnPlayerCanBattleFieldPort(_player, arenaType, bgTypeId, action))
         return;
 
     // get group info from queue
@@ -578,11 +578,11 @@ void WorldSession::HandleBattleFieldPortOpcode(WorldPacket& recvData)
                 CharacterDatabase.Execute(stmt);
             }
 
-            sScriptMgr->OnBattlegroundDesertion(_player, BG_DESERTION_TYPE_LEAVE_QUEUE);
+            sScriptMgr->OnPlayerBattlegroundDesertion(_player, BG_DESERTION_TYPE_LEAVE_QUEUE);
         }
 
         if (bg->isArena() && (bg->GetStatus() == STATUS_IN_PROGRESS || bg->GetStatus() == STATUS_WAIT_JOIN))
-            sScriptMgr->OnBattlegroundDesertion(_player, ARENA_DESERTION_TYPE_LEAVE_QUEUE);
+            sScriptMgr->OnPlayerBattlegroundDesertion(_player, ARENA_DESERTION_TYPE_LEAVE_QUEUE);
     }
 }
 
@@ -747,7 +747,7 @@ void WorldSession::HandleBattlemasterJoinArena(WorldPacket& recvData)
     // queue result (default ok)
     GroupJoinBattlegroundResult err = GroupJoinBattlegroundResult(bgt->GetBgTypeID());
 
-    if (!sScriptMgr->CanJoinInArenaQueue(_player, guid, arenaslot, bgTypeId, asGroup, isRated, err) && err <= 0)
+    if (!sScriptMgr->OnPlayerCanJoinInArenaQueue(_player, guid, arenaslot, bgTypeId, asGroup, isRated, err) && err <= 0)
     {
         WorldPacket data;
         sBattlegroundMgr->BuildGroupJoinedBattlegroundPacket(&data, err);
