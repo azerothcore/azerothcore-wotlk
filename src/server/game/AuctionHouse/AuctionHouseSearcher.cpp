@@ -156,7 +156,7 @@ void AuctionHouseWorkerThread::SearchListRequest(AuctionSearchListRequest const&
 
         if (!searchListRequest.searchInfo.sorting.empty() && auctionEntries.size() > MAX_AUCTIONS_PER_PAGE)
         {
-            AuctionSorter sorter(&searchListRequest.searchInfo.sorting, searchListRequest.playerInfo.locdbc_idx);
+            AuctionSorter sorter(&searchListRequest.searchInfo.sorting, searchListRequest.playerInfo.loc_idx);
             std::sort(auctionEntries.begin(), auctionEntries.end(), sorter);
         }
 
@@ -326,7 +326,7 @@ void AuctionHouseWorkerThread::BuildListAuctionItems(AuctionSearchListRequest co
         // No need to do any of this if no search term was entered
         if (!searchRequest.searchInfo.wsearchedname.empty())
         {
-            if (Aitem.itemName[searchRequest.playerInfo.locdbc_idx].find(searchRequest.searchInfo.wsearchedname) == std::wstring::npos)
+            if (Aitem.itemName[searchRequest.playerInfo.loc_idx].find(searchRequest.searchInfo.wsearchedname) == std::wstring::npos)
                 continue;
         }
 
