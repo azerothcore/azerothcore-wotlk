@@ -27,7 +27,7 @@ inputs:
     required: false
     type: boolean
   maxerrors:
-    default: 0
+    default: 1
     description: Max allowed error count before compilation stops
     required: false
     type: number
@@ -107,7 +107,6 @@ runs:
           -DTOOLS_BUILD=${{ inputs.tools }} \
           -DSCRIPTS="static" \
           -DMODULES="static" \
-          -DWITH_WARNINGS="ON" \
           -DCMAKE_BUILD_TYPE="Release" \
           -DCMAKE_CXX_COMPILER_LAUNCHER="ccache" \
           -DCMAKE_C_COMPILER_LAUNCHER="ccache" \
