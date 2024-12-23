@@ -1,6 +1,10 @@
 name: Codestyle
 on:
   pull_request:
+    types:
+      - opened
+      - reopened
+      - synchronize
     paths:
       - src/**
       - "!README.md"
