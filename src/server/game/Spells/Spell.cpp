@@ -5832,7 +5832,7 @@ SpellCastResult Spell::CheckCast(bool strict)
             if (effInfo->ApplyAuraName == SPELL_AURA_MOD_SHAPESHIFT)
             {
                 SpellShapeshiftFormEntry const* shapeShiftEntry = sSpellShapeshiftFormStore.LookupEntry(effInfo->MiscValue);
-                if (shapeShiftEntry && (shapeShiftEntry->flags1 & 1) == 0)  // unk flag
+                if (shapeShiftEntry && (shapeShiftEntry->flags1 & SHAPESHIFT_FLAG_STANCE) == 0)
                     checkMask |= VEHICLE_SEAT_FLAG_UNCONTROLLED;
                 break;
             }
