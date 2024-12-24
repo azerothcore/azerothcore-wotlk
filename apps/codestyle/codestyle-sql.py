@@ -149,10 +149,12 @@ def semicolon_check(file: io, file_path: str) -> None:
             if stripped_line == '':
                 print(f"Missing semicolon in {file_path} at line {line_number - 1}")
                 check_failed = True
+                query_open = False
             elif line_number == total_lines:
                 if not stripped_line.endswith(';'):
                     print(f"Missing semicolon in {file_path} at the last line {line_number}")
                     check_failed = True
+                    query_open = False
             elif stripped_line.endswith(';'):
                 query_open = False
 
