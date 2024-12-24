@@ -20,7 +20,7 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 (@ENTRY, 2, 3, 0, 61, 0, 100, 0, 0, 0, 0, 0, 0, 0, 45, 0, 1, 0, 0, 0, 0, 10, 40029, 3976, 0, 0, 0, 0, 0, 'On trigger - Creature Scarlet Commander Mograine (3976) with guid 40029 (fetching): Set creature data #0 to 1');
 -- smart conditions
 DELETE FROM `conditions` WHERE `SourceTypeOrReferenceId` = 22 AND `SourceEntry` = 4089 AND `SourceId` = 2;
-INSERT INTO `conditions` (`SourceTypeOrReferenceId`, `SourceGroup`, `SourceEntry`, `SourceId`, `ElseGroup`, `ConditionTypeOrReference`, `ConditionTarget`, `ConditionValue1`, `ConditionValue2`, `ConditionValue3`, `NegativeCondition`, `Comment`) VALUES 
+INSERT INTO `conditions` (`SourceTypeOrReferenceId`, `SourceGroup`, `SourceEntry`, `SourceId`, `ElseGroup`, `ConditionTypeOrReference`, `ConditionTarget`, `ConditionValue1`, `ConditionValue2`, `ConditionValue3`, `NegativeCondition`, `Comment`) VALUES
 (22, 1, 4089, 2, 0, 1, 0, 28282, 0, 0, 0, 'Action invoker has aura of spell Ashbringer (28282), effect EFFECT_0'),
 (22, 1, 4089, 2, 0, 13, 0, 2, 0, 0, 0, 'instance data 2 equals 0');
 
@@ -93,7 +93,7 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 (397602, 9, 5, 0, 0, 0, 100, 0, 1000, 2000, 0, 0, 0, 0, 1, 3, 0, 1, 0, 0, 0, 7, 0, 0, 0, 0, 0, 0, 0, 0, 'Scarlet Commander Mograine - Actionlist - Say Line 3');
 
 DELETE FROM `conditions` WHERE `SourceTypeOrReferenceId` = 22 AND `SourceEntry` = 3976 AND `SourceId` = 0;
-INSERT INTO `conditions` (`SourceTypeOrReferenceId`, `SourceGroup`, `SourceEntry`, `SourceId`, `ElseGroup`, `ConditionTypeOrReference`, `ConditionTarget`, `ConditionValue1`, `ConditionValue2`, `ConditionValue3`, `NegativeCondition`, `Comment`) VALUES 
+INSERT INTO `conditions` (`SourceTypeOrReferenceId`, `SourceGroup`, `SourceEntry`, `SourceId`, `ElseGroup`, `ConditionTypeOrReference`, `ConditionTarget`, `ConditionValue1`, `ConditionValue2`, `ConditionValue3`, `NegativeCondition`, `Comment`) VALUES
 (22, 1, 3976, 0, 0, 21, 1, 16384, 0, 0, 1, 'Object doesn\'t have unit state UNIT_STATE_ATTACK_PLAYER'),
 (22, 1, 3976, 0, 0, 36, 1, 0, 0, 0, 0, 'Object is alive'),
 (22, 3, 3976, 0, 0, 4, 1, 796, 0, 0, 0, 'Object in zone  (796)'),
@@ -114,7 +114,6 @@ INSERT INTO `creature_text` (`CreatureID`, `GroupID`, `ID`, `Text`, `Type`, `Lan
 (3976, 4, 0, 'Father... But... How?', 12, 0, 100, 6, 0, 0, 12470, 0, 'Scarlet Commander Mograine // mograine SAY_ASHBRINGER_TWO'),
 (3976, 5, 0, 'Forgive me, father! Please...', 12, 0, 100, 20, 0, 0, 12472, 0, 'Scarlet Commander Mograine // mograine SAY_ASHBRINGER_THREE'),
 (3976, 6, 0, 'Bow down! Kneel BEFORE the Ashbringer! A NEW dawn approaches, brothers AND sisters! Our message will be delivered TO the filth of this world through the chosen one!', 14, 0, 100, 0, 0, 0, 12389, 3, 'Scarlet Commander Mograine // Ashbringer EVENT intro yell');
-
 
 -- Highlord Mograine smart_scripts---
 
@@ -175,7 +174,7 @@ INSERT INTO `waypoints` (`entry`, `pointid`, `position_x`, `position_y`, `positi
 
 -- Highlord Mograine Conditions
 DELETE FROM `conditions` WHERE (`SourceTypeOrReferenceId` = 13) AND (`SourceEntry` IN (8990));
-INSERT INTO `conditions` (`SourceTypeOrReferenceId`, `SourceGroup`, `SourceEntry`, `SourceId`, `ElseGroup`, `ConditionTypeOrReference`, `ConditionTarget`, `ConditionValue1`, `ConditionValue2`, `ConditionValue3`, `NegativeCondition`, `Comment`) VALUES 
+INSERT INTO `conditions` (`SourceTypeOrReferenceId`, `SourceGroup`, `SourceEntry`, `SourceId`, `ElseGroup`, `ConditionTypeOrReference`, `ConditionTarget`, `ConditionValue1`, `ConditionValue2`, `ConditionValue3`, `NegativeCondition`, `Comment`) VALUES
 (13, 1, 8990, 0, 0, 31, 0, 3, 16062, 0, 1, 'Potential target of the spell is not creature, entry is 16062');
 
 -- High Inquisitor Whitemane Smart ai
@@ -235,7 +234,7 @@ INSERT INTO `creature_text` (`CreatureID`, `GroupID`, `ID`, `Text`, `Type`, `Lan
 
 -- High Inquisitor Whitemane Conditions
 DELETE FROM `conditions` WHERE `SourceTypeOrReferenceId` = 22 AND `SourceEntry` = 3977 AND `SourceId` = 0;
-INSERT INTO `conditions` (`SourceTypeOrReferenceId`, `SourceGroup`, `SourceEntry`, `SourceId`, `ElseGroup`, `ConditionTypeOrReference`, `ConditionTarget`, `ConditionValue1`, `ConditionValue2`, `ConditionValue3`, `NegativeCondition`, `Comment`) VALUES 
+INSERT INTO `conditions` (`SourceTypeOrReferenceId`, `SourceGroup`, `SourceEntry`, `SourceId`, `ElseGroup`, `ConditionTypeOrReference`, `ConditionTarget`, `ConditionValue1`, `ConditionValue2`, `ConditionValue3`, `NegativeCondition`, `Comment`) VALUES
 (22, 17, 3977, 0, 0, 29, 1, 3976, 5, 0, 0, 'There is creature Scarlet Commander Mograine (3976) within range 5 yards to Object'),
 (22, 19, 3977, 0, 0, 29, 1, 3976, 5, 0, 1, 'There is no creature Scarlet Commander Mograine (3976) within range 5 yards to Object');
 
