@@ -8,7 +8,7 @@ INSERT INTO `spell_custom_attr` (`spell_id`, `attributes`) VALUES (28282, 671088
 UPDATE `gameobject_template_addon` SET `flags` = 34
 WHERE (`entry` = 104591);
 
- -- Clientside area trigger 4089 smart ai
+-- Clientside area trigger 4089 smart ai
 SET @ENTRY := 4089;
 DELETE FROM `areatrigger_scripts` WHERE `entry` = @ENTRY;
 INSERT INTO `areatrigger_scripts` (`entry`, `ScriptName`) VALUES (@ENTRY, 'SmartTrigger');
