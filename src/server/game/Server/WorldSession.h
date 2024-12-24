@@ -348,8 +348,22 @@ public:
     void SendPacket(WorldPacket const* packet);
     void SendPetNameInvalid(uint32 error, std::string const& name, DeclinedName* declinedName);
     void SendPartyResult(PartyOperation operation, std::string const& member, PartyResult res, uint32 val = 0);
-    void SendAreaTriggerMessage(const char* Text, ...) ATTR_PRINTF(2, 3);
-    void SendAreaTriggerMessage(uint32 entry, ...);
+
+    void SendAreaTriggerMessage(std::string_view str);
+
+    template<typename... Args>
+    void SendAreaTriggerMessage(char const* fmt, Args&&... args)
+    {
+        if (!m_playerLoading)
+            SendAreaTriggerMessage(Acore::StringFormat(fmt, std::forward<Args>(args)...));
+    }
+    template<typename... Args>
+    void SendAreaTriggerMessage(uint32 strId, Args&&... args)
+    {
+        if (!m_playerLoading)
+            SendAreaTriggerMessage(Acore::StringFormat(GetAcoreString(strId), std::forward<Args>(args)...));
+    }
+
     void SendSetPhaseShift(uint32 phaseShift);
     void SendQueryTimeResponse();
 
