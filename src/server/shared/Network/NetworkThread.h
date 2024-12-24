@@ -179,7 +179,7 @@ protected:
     {
         LOG_DEBUG("misc", "Network Thread Starting");
 
-        _updateTimer.expires_at(std::chrono::steady_clock::now());
+        _updateTimer.expires_at(std::chrono::steady_clock::now() + std::chrono::milliseconds(1));
         _updateTimer.async_wait([this](boost::system::error_code const&) { Update(); });
         _ioContext.run();
 
@@ -193,7 +193,7 @@ protected:
         if (_stopped)
             return;
 
-        _updateTimer.expires_at(std::chrono::steady_clock::now());
+        _updateTimer.expires_at(std::chrono::steady_clock::now() + std::chrono::milliseconds(1));
         _updateTimer.async_wait([this](boost::system::error_code const&) { Update(); });
 
         AddNewSockets();
