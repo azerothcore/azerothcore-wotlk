@@ -18,7 +18,7 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 (@ENTRY, 2, 1, 2, 61, 0, 100, 0, 0, 0, 0, 0, 0, 0, 34, 2, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'On trigger - Set instance data #2 to 1'),
 (@ENTRY, 2, 2, 3, 61, 0, 100, 0, 0, 0, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 10, 40029, 3976, 0, 0, 0, 0, 0, 'On trigger - Send stored target storedTarget[0] to Creature Scarlet Commander Mograine (3976) with guid 40029 (fetching)'),
 (@ENTRY, 2, 3, 0, 61, 0, 100, 0, 0, 0, 0, 0, 0, 0, 45, 0, 1, 0, 0, 0, 0, 10, 40029, 3976, 0, 0, 0, 0, 0, 'On trigger - Creature Scarlet Commander Mograine (3976) with guid 40029 (fetching): Set creature data #0 to 1');
--- 
+-- smart conditions
 DELETE FROM `conditions` WHERE `SourceTypeOrReferenceId` = 22 AND `SourceEntry` = 4089 AND `SourceId` = 2;
 INSERT INTO `conditions` (`SourceTypeOrReferenceId`, `SourceGroup`, `SourceEntry`, `SourceId`, `ElseGroup`, `ConditionTypeOrReference`, `ConditionTarget`, `ConditionValue1`, `ConditionValue2`, `ConditionValue3`, `NegativeCondition`, `Comment`) VALUES 
 (22, 1, 4089, 2, 0, 1, 0, 28282, 0, 0, 0, 'Action invoker has aura of spell Ashbringer (28282), effect EFFECT_0'),
