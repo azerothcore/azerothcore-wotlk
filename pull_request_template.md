@@ -56,10 +56,3 @@ http://www.azerothcore.org/wiki/How-to-test-a-PR
 **REMEMBER**: when testing a PR that changes something **generic** (i.e. a part of code that handles more than one specific thing), the tester should not only check that the PR does its job (e.g. fixing spell XXX) but **especially** check that the PR does not cause any regression (i.e. introducing new bugs).
 
 **For example**: if a PR fixes spell X by changing a part of code that handles spells X, Y, and Z, we should not only test X, but **we should test Y and Z as well**.
-
-## Licence consent:
-In the spirit of collaboration with other projects in the emulation scene, we encourage all new PRs to authorize sharing on GPLv2- based projects.
-
-- [X] I agree with sharing my contributions with GPLv2-based projects.
-
-Further information, here: https://github.com/azerothcore/azerothcore-wotlk/discussions/19868
