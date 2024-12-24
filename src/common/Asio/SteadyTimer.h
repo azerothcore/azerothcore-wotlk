@@ -15,20 +15,17 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef DeadlineTimer_h__
-#define DeadlineTimer_h__
+#ifndef _STEADYTIMER_H
+#define _STEADYTIMER_H
 
-#include <boost/asio/deadline_timer.hpp>
+#include <chrono>
 
-#define DeadlineTimerBase boost::asio::basic_deadline_timer<boost::posix_time::ptime, boost::asio::time_traits<boost::posix_time::ptime>, boost::asio::io_context::executor_type>
-
-namespace Acore::Asio
+namespace Acore::Asio::SteadyTimer
 {
-    class DeadlineTimer : public DeadlineTimerBase
+    inline auto GetExpirationTime(int32 seconds)
     {
-    public:
-        using DeadlineTimerBase::basic_deadline_timer;
-    };
+        return std::chrono::steady_clock::now() + std::chrono::seconds(seconds);
+    }
 }
 
-#endif // DeadlineTimer_h__
+#endif // _STEADYTIMER_H
