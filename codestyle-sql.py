@@ -134,15 +134,20 @@ def semicolon_check(file: io, file_path: str) -> None:
     check_failed = False
     sql_keywords = ["SELECT", "INSERT", "UPDATE", "DELETE"]
     query_open = False
+    first_keyword_line = True
 
     for line_number, line in enumerate(file, start=1):
+        stripped_line = line.rstrip()  # Remove trailing whitespace including newline
+
         # Check if one keyword is in the line
-        if not query_open and any(keyword in line for keyword in sql_keywords):
+        if not query_open and any(keyword in stripped_line for keyword in sql_keywords):
             query_open = True
+            first_keyword_line = True
 
         if query_open:
-            stripped_line = line.rstrip()  # Remove trailing whitespace including newline
-            if stripped_line == '':
+            if first_keyword_line:
+                first_keyword_line = False
+            elif stripped_line == '':
                 print(f"Missing semicolon in {file_path} at line {line_number - 1}")
                 check_failed = True
             elif not stripped_line.endswith(';') and not stripped_line.endswith(','):
