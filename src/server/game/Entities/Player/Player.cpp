@@ -9780,9 +9780,49 @@ void Player::ApplySpellMod(uint32 spellId, SpellModOp op, T& basevalue, Spell* s
         if (mod->type == SPELLMOD_FLAT)
         {
             // xinef: do not allow to consume more than one 100% crit increasing spell
-            if (mod->op == SPELLMOD_CRITICAL_CHANCE && totalflat >= 100)
+            if (mod->op == SPELLMOD_CRITICAL_CHANCE)
             {
-                return;
+                // Checks if the Juggernaut and Recklessness buffs are active
+                bool hasJuggernaut = HasAura(65156); // Buff Juggernaut
+                bool hasRecklessness = HasAura(1719); // Buff Recklessness
+
+                // Lista de IDs para Mortal Strike e Slam (Incluindo múltiplos ranks)
+                uint32 mortalStrikeRanks[] = { 12294, 21551, 21552, 21553, 25248, 30330, 47485, 47486 };  // Mortal Strike Rank IDs
+                uint32 slamRanks[] = { 1464, 8820, 11604, 11605, 25241, 25242, 47474, 47475 }; // Slam Rank IDs
+
+                // Identifies the ID of the spell being processed
+                uint32 spellId = spellInfo->Id;
+
+                // Checks if the spell is Mortal Strike or Slam
+                bool isMortalStrike = std::find(std::begin(mortalStrikeRanks), std::end(mortalStrikeRanks), spellId) != std::end(mortalStrikeRanks);
+                bool isSlam = std::find(std::begin(slamRanks), std::end(slamRanks), spellId) != std::end(slamRanks);
+
+                // Check if it is Mortal Strike or Slam
+                bool isMortalStrikeOrSlam = isMortalStrike || isSlam;
+
+                // Critical chance adjustment
+                if (hasJuggernaut && hasRecklessness)
+                {
+                    // Combines effects: 25% (Juggernaut) + 100% (Recklessness)
+                    totalflat = 125; // Sets final crit chance to 125%
+                }
+                else if (hasJuggernaut)
+                {
+                    totalflat = std::max(totalflat, 25); // Only Juggernaut active
+                }
+                else if (hasRecklessness)
+                {
+                    totalflat = std::max(totalflat, 100); // Only Recklessness active
+                }
+
+                // Limits the maximum critical value to 100%
+                totalflat = std::min(totalflat, 100);
+
+                // Removes Juggernaut buff only after critical from Slam or Mortal Strike
+                if (isMortalStrikeOrSlam && roll_chance_i(totalflat))
+                {
+                    RemoveAurasDueToSpell(65156);
+                }
             }
 
             int32 flatValue = mod->value;
