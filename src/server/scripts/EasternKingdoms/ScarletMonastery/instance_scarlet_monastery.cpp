@@ -15,7 +15,6 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "CreatureScript.h"
 #include "InstanceMapScript.h"
 #include "scarletmonastery.h"
 #include "ScriptedCreature.h"
@@ -37,7 +36,7 @@ enum AshbringerEventMisc
     NPC_HIGHLORD_MOGRAINE          = 16062,
 
     DOOR_CHAPEL                    = 104591,
-    DOOR_HIGH_INQUISITOR_ID        = 104600,
+    DOOR_HIGH_INQUISITOR_ID        = 104600
 };
 
 enum AshbringerSpell
@@ -198,17 +197,23 @@ public:
                 case TYPE_ASHBRINGER_EVENT:
                     if (data == IN_PROGRESS)
                     {
-                        // the ashbringer incident did not sniff out any data from whitemane
-                        if (Creature* whitemane = instance->GetCreature(_whitemaneGUID))
-                            if (whitemane->IsAlive() && !whitemane->IsEngaged())
-                                whitemane->DespawnOrUnsummon();
-
+                        instance->LoadGrid(1069.949951f, 1399.140015f);
                         if (GameObject* go = instance->GetGameObject(_doorChapelGUID))
                         {
                             go->SetGoState(GO_STATE_ACTIVE);
                             go->SetLootState(GO_ACTIVATED);
                             go->SetGameObjectFlag(GO_FLAG_IN_USE);
+                            go->AllowSaveToDB(true);
                         }
+
+                        // the ashbringer incident did not sniff out any data from whitemane
+                        if (Creature* whitemane = instance->GetCreature(_whitemaneGUID))
+                            if (whitemane->IsAlive() && !whitemane->IsEngaged())
+                                whitemane->DespawnOrUnsummon();
+
+                        if (Creature* mograine = instance->GetCreature(_mograineGUID))
+                            if (!mograine->IsAlive())
+                                SetData(TYPE_ASHBRINGER_EVENT, DONE);
 
                         for (auto const& scarletCathedralNpcGuid : _ashbringerNpcGUID)
                             if (Creature* scarletNpc = instance->GetCreature(scarletCathedralNpcGuid))
@@ -223,6 +228,8 @@ public:
                 default:
                     break;
             }
+
+            SaveToDB();
         }
 
         ObjectGuid GetGuidData(uint32 type) const override
@@ -261,6 +268,36 @@ public:
                     break;
             }
         }
+
+        void OnPlayerEnter(Player* /*player*/) override
+        {
+            switch (_ashencounter)
+            {
+                case IN_PROGRESS:
+                    SetData(TYPE_ASHBRINGER_EVENT, IN_PROGRESS);
+                    break;
+                case DONE:
+                    SetData(TYPE_ASHBRINGER_EVENT, IN_PROGRESS);
+                    if (Creature* mograine = instance->GetCreature(_mograineGUID))
+                        mograine->DespawnOrUnsummon();
+                    break;
+                default:
+                    break;
+            }
+        }
+
+        void ReadSaveDataMore(std::istringstream& data) override
+        {
+            data >> _encounter;
+            data >> _ashencounter;
+        }
+
+        void WriteSaveDataMore(std::ostringstream& data) override
+        {
+            data << _encounter << ' '
+                << _ashencounter;
+        }
+
     private:
         ObjectGuid _doorHighInquisitorGUID;
         ObjectGuid _doorChapelGUID;
