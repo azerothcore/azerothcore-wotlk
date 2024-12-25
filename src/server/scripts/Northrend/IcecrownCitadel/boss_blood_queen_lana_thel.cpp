@@ -338,8 +338,7 @@ public:
                     break;
                 case EVENT_VAMPIRIC_BITE:
                     {
-                        Unit* target = SelectTarget(SelectTargetMethod::MaxThreat, 0, VampiricBiteTargetSelector(me));
-                        if (target)
+                        if (Unit* target = SelectTarget(SelectTargetMethod::MaxThreat, 0, VampiricBiteTargetSelector(me)))
                         {
                             me->CastSpell(target, SPELL_VAMPIRIC_BITE, false);
                             me->CastSpell((Unit*)nullptr, SPELL_VAMPIRIC_BITE_DUMMY, true);
