@@ -4,6 +4,10 @@ on:
     branches:
       - 'master'
   pull_request:
+    types:
+      - opened
+      - reopened
+      - synchronize
     paths:
       - 'src/*'
       - 'src/common/**/*'
