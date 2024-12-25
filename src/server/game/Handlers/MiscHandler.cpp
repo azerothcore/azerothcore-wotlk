@@ -268,7 +268,7 @@ void WorldSession::HandleWhoOpcode(WorldPacket& recvData)
         return;
 
     wstrToLower(wpacketPlayerName);
-    wstrToLower(wpacketGuildName);;
+    wstrToLower(wpacketGuildName);
 
     // client send in case not set max level value 100 but Acore supports 255 max level,
     // update it to show GMs with characters after 100 level
@@ -687,44 +687,6 @@ void WorldSession::HandleResurrectResponseOpcode(WorldPacket& recv_data)
         return;
 
     GetPlayer()->ResurectUsingRequestData();
-}
-
-void WorldSession::SendAreaTriggerMessage(const char* Text, ...)
-{
-    va_list ap;
-    char szStr [1024];
-    szStr[0] = '\0';
-
-    va_start(ap, Text);
-    vsnprintf(szStr, 1024, Text, ap);
-    va_end(ap);
-
-    uint32 length = strlen(szStr) + 1;
-    WorldPacket data(SMSG_AREA_TRIGGER_MESSAGE, 4 + length);
-    data << length;
-    data << szStr;
-    SendPacket(&data);
-}
-
-void WorldSession::SendAreaTriggerMessage(uint32 entry, ...)
-{
-    char const* format = GetAcoreString(entry);
-    if (format)
-    {
-        va_list ap;
-        char szStr[1024];
-        szStr[0] = '\0';
-
-        va_start(ap, entry);
-        vsnprintf(szStr, 1024, format, ap);
-        va_end(ap);
-
-        uint32 length = strlen(szStr) + 1;
-        WorldPacket data(SMSG_AREA_TRIGGER_MESSAGE, 4 + length);
-        data << length;
-        data << szStr;
-        SendPacket(&data);
-    }
 }
 
 void WorldSession::HandleAreaTriggerOpcode(WorldPacket& recv_data)
