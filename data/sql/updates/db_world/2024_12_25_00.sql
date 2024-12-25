@@ -1,3 +1,4 @@
+-- DB update 2024_12_24_00 -> 2024_12_25_00
 DELETE FROM `page_text_locale` WHERE `ID` IN (74, 77, 81, 2436, 2437, 2438, 2439, 2440, 2441, 2442, 2443, 2450, 2455, 2460, 2463, 2464, 2466, 2467) AND `locale` = 'deDE';
 INSERT INTO `page_text_locale` (`ID`, `locale`, `Text`, `VerifiedBuild`) VALUES
 (74,'deDE','TAG 1:$B$BDer Lehrling und ich sind heute im Eisklammtal angekommen. Die Reise durch die Höhle verlief ohne besondere Vorkommnisse. Wir schlugen unser Lager in sicherer Entfernung von der Höhle auf, in der sich die Trolle eingenistet haben sollen.$B$BTAG 2:$B$BDas verdammte Wolfsgeheul ließ mich fast die ganze Nacht kein Auge zutun.$B$BIn ein paar Tagen werde ich wohl neue Kleider aus Wolfsbalg haben.$B$BDer Bursche hat sich heute ausgerechnet mit einem Trogg eingelassen. Es kam zum Kampf und',0),
