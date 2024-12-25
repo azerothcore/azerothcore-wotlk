@@ -45,6 +45,7 @@ if( WITH_WARNINGS )
     -Wextra
     -Winit-self
     -Winvalid-pch
+    -Wfatal-errors
     -Woverloaded-virtual)
   message(STATUS "GCC: All warnings enabled")
 endif()

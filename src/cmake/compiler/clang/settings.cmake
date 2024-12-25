@@ -53,6 +53,7 @@ if(WITH_WARNINGS)
       -Wall
       -Wextra
       -Winit-self
+      -Wfatal-errors
       -Wno-mismatched-tags
       -Woverloaded-virtual)
   message(STATUS "Clang: All warnings enabled")
