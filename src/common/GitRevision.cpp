@@ -81,7 +81,7 @@ char const* GitRevision::GetMySQLExecutable()
 
 char const* GitRevision::GetFullVersion()
 {
-    return VER_COMPANYNAME_STR " rev. " VER_PRODUCTVERSION_STR " (" AZEROTH_PLATFORM_STR ", " _BUILD_DIRECTIVE ", " ACORE_LINKAGE_TYPE_STR ")";
+    return VER_COMPANYNAME_STR " rev. " VER_PRODUCTVERSION_STR " (" AZEROTH_PLATFORM_STR ", " _BUILD_DIRECTIVE ", " ACORE_LINKAGE_TYPE_STR ")"; // cppcheck-suppress unknownMacro
 }
 
 char const* GitRevision::GetCompanyNameStr()
