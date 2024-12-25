@@ -16,9 +16,6 @@
  */
 
 /*For memory wiping*/
-
-second build error here
-
 #ifdef _MSC_VER
 #include <windows.h>
 #include <winbase.h> /* For SecureZeroMemory */
