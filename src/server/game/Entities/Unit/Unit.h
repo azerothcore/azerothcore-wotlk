@@ -1390,7 +1390,6 @@ public:
     bool HasAuras(SearchMethod sm, Auras... spellIds) const
     {
         std::vector<uint32> spellList = { static_cast<uint32>(spellIds)...};
-
         switch (sm)
         {
             case SearchMethod::MatchAll:
