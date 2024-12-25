@@ -120,6 +120,31 @@ Position const centerPos  = {4595.7090f, 2769.4190f, 400.6368f, 0.000000f};
 Position const airPos     = {4595.7090f, 2769.4190f, 422.3893f, 0.000000f};
 Position const mincharPos = {4629.3711f, 2782.6089f, 424.6390f, 0.000000f};
 
+struct VampiricBiteTargetSelector
+{
+public:
+    VampiricBiteTargetSelector(Creature* source) : _source(source) { }
+    bool operator()(Unit const* target) const
+    {
+        if (!target)
+            return false;
+
+        if (!target->IsPlayer())
+            return false;
+
+        if (target->HasAura(SPELL_BLOOD_MIRROR_DAMAGE))
+            return false;
+
+        if (IsVampire(target))
+            return false;
+
+        return target != _source->GetVictim();
+    }
+
+private:
+    Creature const* _source;
+};
+
 class boss_blood_queen_lana_thel : public CreatureScript
 {
 public:
@@ -313,24 +338,7 @@ public:
                     break;
                 case EVENT_VAMPIRIC_BITE:
                     {
-                        Player* target = nullptr;
-                        float highestThreatValue = 0.0f;
-                        ThreatContainer::StorageType const& threatList = me->GetThreatMgr().GetThreatList();
-                        for (ThreatContainer::StorageType::const_iterator i = threatList.begin(); i != threatList.end(); ++i)
-                        {
-                            Unit* pUnit = ObjectAccessor::GetUnit(*me, (*i)->getUnitGuid());
-                            if (pUnit && pUnit->IsPlayer())
-                                if (!pUnit->HasAura(SPELL_BLOOD_MIRROR_DAMAGE) && !IsVampire(pUnit))
-                                {
-                                    float threatValue = me->GetThreatMgr().GetThreat(pUnit);
-                                    if (threatValue && threatValue > highestThreatValue)
-                                    {
-                                        target = pUnit->ToPlayer();
-                                        highestThreatValue = threatValue;
-                                    }
-                                }
-                        }
-
+                        Unit* target = SelectTarget(SelectTargetMethod::MaxThreat, 0, VampiricBiteTargetSelector(me));
                         if (target)
                         {
                             me->CastSpell(target, SPELL_VAMPIRIC_BITE, false);
