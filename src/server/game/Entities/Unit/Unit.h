@@ -1369,9 +1369,17 @@ public:
     [[nodiscard]] uint32 GetAuraCount(uint32 spellId) const;
 
     /**
-    * @brief Check if unit has any or all auras
+    * @brief Check if unit has ANY or ALL specified auras.
     *
-    * @param matchAll Unit must have all auras to return true
+    * @param matchAll If true, the function checks if the unit has all specified auras.
+    *                 If false, the function checks if the unit has any of the specified auras.
+    *
+    * @param spellIds List of spell id's to check for on the unit.
+    *
+    * @return Returns true if:
+    *         - matchAll is true and all of the spellIds are found on the unit.
+    *         - matchAll is false and any of the spellIds are found on the unit.
+    *         Returns false otherwise.
     */
     template <typename... Auras>
     bool HasAuras(bool matchAll, Auras... spellIds) const
