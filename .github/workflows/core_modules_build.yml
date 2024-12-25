@@ -49,3 +49,4 @@ jobs:
           CXX: ${{ matrix.compiler.CXX }}
           modules: true
           pch: false
+          maxerrors: 0
