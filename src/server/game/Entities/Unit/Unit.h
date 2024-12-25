@@ -24,7 +24,6 @@
 #include "FollowerReference.h"
 #include "HostileRefMgr.h"
 #include "ItemTemplate.h"
-#include "Log.h"
 #include "MotionMaster.h"
 #include "Object.h"
 #include "SpellAuraDefines.h"
