@@ -20,6 +20,7 @@
 
 #include "Define.h"
 #include <string>
+#include "Common.h"
 
 class WorldPacket;
 
@@ -28,17 +29,33 @@ class AC_GAME_API MotdMgr
 public:
     static MotdMgr* instance();
 
+    /// Converts the localized string to world packages
+    void CreateWorldPackages();
+
     /// Set a new Message of the Day
-    void SetMotd(std::string motd);
+    void SetMotd(std::string motd, LocaleConstant locale);
 
     /// Load Message of the Day
     void LoadMotd();
 
     /// Get the current Message of the Day
-    char const* GetMotd();
+    char const* GetMotd(LocaleConstant locale);
 
-    /// Get the motd packet to send at login
-    WorldPacket const* GetMotdPacket();
+    /// Returns the current motd packet for the given locale
+    WorldPacket const* GetMotdPacket(LocaleConstant locale);
+
+    // Checks if string is valid locale
+    bool IsValidLocale(std::string const& locale);
+
+private:
+    // Loads the default motd from the motd table
+    std::string LoadDefaultMotd(uint32 realmId);
+    // Loads all available localized motd for the realm
+    void LoadLocalizedMotds(uint32 realmId);
+    // Sets the default mode if none is found in the database
+    void SetDefaultMotd();
+    // Create a worldpacket for a given motd localization
+    WorldPacket CreateWorldPacket(std::string const& motd);
 };
 
 #define sMotdMgr MotdMgr::instance()
