@@ -161,11 +161,11 @@ struct boss_zuljin : public BossAI
         Talk(SAY_AGGRO, 37s);
 
         // Phase 1: Default (troll)
-        ScheduleTimedEvent(7s, [&] {
+        ScheduleTimedEvent(12s, 29s, [&] {
             DoCastAOE(SPELL_WHIRLWIND);
         }, 12s, 29s);
 
-        ScheduleTimedEvent(8s, [&] {
+        ScheduleTimedEvent(7s, 23s, [&] {
             DoCastRandomTarget(SPELL_GRIEVOUS_THROW, 0, 100.0f);
         }, 7s, 23s);
 
@@ -229,7 +229,7 @@ struct boss_zuljin : public BossAI
             me->m_Events.CancelEventGroup(GROUP_LYNX);
             EnterPhase(PHASE_DRAGONHAWK);
 
-            ScheduleTimedEvent(5s, [&] {
+            ScheduleTimedEvent(12s, 26s, [&] {
                 DoCastSelf(SPELL_FLAME_WHIRL);
             }, 12s, 26s);
 
@@ -239,7 +239,7 @@ struct boss_zuljin : public BossAI
 
             ScheduleTimedEvent(16s, 26s, [&] {
                 DoCastAOE(SPELL_FLAME_BREATH);
-            }, 10s);
+            }, 6s, 25s);
         });
     }
 
