@@ -1367,6 +1367,21 @@ public:
 
     [[nodiscard]] bool HasAuraEffect(uint32 spellId, uint8 effIndex, ObjectGuid caster = ObjectGuid::Empty) const;
     [[nodiscard]] uint32 GetAuraCount(uint32 spellId) const;
+
+    /**
+    * @brief Check if unit has any or all auras
+    *
+    * @param matchAll Unit must have all auras to return true
+    */
+    template <typename... Auras>
+    bool HasAuras(bool matchAll, Auras... spellIds) const
+    {
+        if (matchAll)
+            return (HasAura(spellIds) && ...);
+        else
+            return (HasAura(spellIds) || ...);
+    }
+
     [[nodiscard]] bool HasAura(uint32 spellId, ObjectGuid casterGUID = ObjectGuid::Empty, ObjectGuid itemCasterGUID = ObjectGuid::Empty, uint8 reqEffMask = 0) const;
     [[nodiscard]] bool HasAuraType(AuraType auraType) const;
     [[nodiscard]] bool HasAuraTypeWithCaster(AuraType auratype, ObjectGuid caster) const;
