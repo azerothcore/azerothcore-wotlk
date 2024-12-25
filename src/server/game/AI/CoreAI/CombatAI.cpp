@@ -26,8 +26,6 @@
 // AggressorAI
 /////////////////
 
-- bug 1 -
-
 int32 AggressorAI::Permissible(Creature const* creature)
 {
     // have some hostile factions, it will be selected by IsHostileTo check at MoveInLineOfSight

@@ -31,8 +31,6 @@ EndScriptData */
 #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
 #endif
 
-- bug 2 -
-
 using namespace Acore::ChatCommands;
 
 class wp_commandscript : public CommandScript
