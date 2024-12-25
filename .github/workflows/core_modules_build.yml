@@ -4,6 +4,10 @@ on:
     branches:
       - 'master'
   pull_request:
+    types:
+      - opened
+      - reopened
+      - synchronize
     paths:
       - 'src/*'
       - 'src/common/**/*'
@@ -31,7 +35,7 @@ jobs:
               CXX: clang++-18
     runs-on: ${{ matrix.os }}
     name: ${{ matrix.os }}-${{ matrix.compiler.CC }}-nopch-modules
-    if: github.repository == 'azerothcore/azerothcore-wotlk'
+    if: github.repository == 'azerothcore/azerothcore-wotlk' && !github.event.pull_request.draft
     steps:
       - uses: actions/checkout@v4
         # This script installs a general list of modules to compile with
