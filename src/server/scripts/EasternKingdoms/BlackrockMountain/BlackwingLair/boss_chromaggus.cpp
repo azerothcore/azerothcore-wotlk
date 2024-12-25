@@ -188,7 +188,7 @@ public:
                             {
                                 DoCast(player, afflictionSpellID, true);
 
-                                if (player->HasAuras(SearchMethod::MatchAll, SPELL_BROODAF_BLUE, SPELL_BROODAF_BLACK, SPELL_BROODAF_RED, SPELL_BROODAF_BRONZE, SPELL_BROODAF_GREEN))
+                                if (player->HasAllAuras(SPELL_BROODAF_BLUE, SPELL_BROODAF_BLACK, SPELL_BROODAF_RED, SPELL_BROODAF_BRONZE, SPELL_BROODAF_GREEN))
                                     DoCast(player, SPELL_CHROMATIC_MUT_1);
                             }
                         }

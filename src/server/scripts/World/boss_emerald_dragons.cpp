@@ -774,7 +774,7 @@ public:
     {
         // return those not tagged or already under the influence of Aura of Nature
         if (Unit* unit = object->ToUnit())
-            return !unit->HasAuras(SearchMethod::MatchAll, SPELL_MARK_OF_NATURE, SPELL_AURA_OF_NATURE);
+            return !unit->HasAllAuras(SPELL_MARK_OF_NATURE, SPELL_AURA_OF_NATURE);
         return true;
     }
 };

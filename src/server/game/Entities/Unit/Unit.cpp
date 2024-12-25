@@ -5695,6 +5695,30 @@ uint32 Unit::GetAuraCount(uint32 spellId) const
     return count;
 }
 
+bool Unit::HasAuras(SearchMethod sm, std::vector<uint32>& spellIds) const
+{
+    switch (sm)
+    {
+    case SearchMethod::MatchAll:
+    {
+        for (auto const& spellId : spellIds)
+            if (!HasAura(spellId))
+                return false;
+        return true;
+    }
+    case SearchMethod::MatchAny:
+    {
+        for (auto const& spellId : spellIds)
+            if (HasAura(spellId))
+                return true;
+        return false;
+    }
+    default:
+        LOG_ERROR("entities.unit", "Unit::HasAuras using non-supported SearchMethod {}", sm);
+        return false;
+    }
+}
+
 bool Unit::HasAura(uint32 spellId, ObjectGuid casterGUID, ObjectGuid itemCasterGUID, uint8 reqEffMask) const
 {
     if (GetAuraApplication(spellId, casterGUID, itemCasterGUID, reqEffMask))
