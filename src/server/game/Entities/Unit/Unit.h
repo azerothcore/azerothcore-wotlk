@@ -24,6 +24,7 @@
 #include "FollowerReference.h"
 #include "HostileRefMgr.h"
 #include "ItemTemplate.h"
+#include "Log.h"
 #include "MotionMaster.h"
 #include "Object.h"
 #include "SpellAuraDefines.h"
@@ -556,6 +557,12 @@ enum CommandStates : uint8
     COMMAND_FOLLOW  = 1,
     COMMAND_ATTACK  = 2,
     COMMAND_ABANDON = 3
+};
+
+enum class SearchMethod
+{
+    MatchAll,
+    MatchAny
 };
 
 typedef std::list<Player*> SharedVisionList;
@@ -1371,34 +1378,38 @@ public:
     /**
     * @brief Check if unit has ANY or ALL specified auras.
     *
-    * @param matchAll If true, the function checks if the unit has all specified auras.
-    *                 If false, the function checks if the unit has any of the specified auras.
+    * @param sm The search method to use
+    *           - SearchMethod::MatchAll : The function checks for all of the spell id's on the unit.
+    *           - SearchMethod::MatchAny : The function checks for any of the spell id's on the unit.
     *
     * @param spellIds List of spell id's to check for on the unit.
     *
-    * @return Returns true if:
-    *         - matchAll is true and all of the spellIds are found on the unit.
-    *         - matchAll is false and any of the spellIds are found on the unit.
-    *         Returns false otherwise.
+    * @return Returns true if the search method condition is met. Otherwise false.
     */
     template <typename... Auras>
-    bool HasAuras(bool matchAll, Auras... spellIds) const
+    bool HasAuras(SearchMethod sm, Auras... spellIds) const
     {
         std::vector<uint32> spellList = { static_cast<uint32>(spellIds)...};
 
-        if (matchAll)
+        switch (sm)
         {
-            for (auto const& spellId : spellList)
-                if (!HasAura(spellId))
-                    return false;
-            return true;
-        }
-        else
-        {
-            for (auto const& spellId : spellList)
-                if (HasAura(spellId))
-                    return true;
-            return false;
+            case SearchMethod::MatchAll:
+            {
+                for (auto const& spellId : spellList)
+                    if (!HasAura(spellId))
+                        return false;
+                return true;
+            }
+            case SearchMethod::MatchAny:
+            {
+                for (auto const& spellId : spellList)
+                    if (HasAura(spellId))
+                        return true;
+                return false;
+            }
+            default:
+                LOG_ERROR("entities.unit", "Unit::HasAuras using non-supported SearchMethod {}", sm);
+                return false;
         }
     }
 

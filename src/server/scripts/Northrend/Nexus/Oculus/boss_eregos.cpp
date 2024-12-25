@@ -178,7 +178,7 @@ public:
             if (!UpdateVictim())
                 return;
 
-            if (me->HasAuras(false, SPELL_PLANAR_SHIFT, SPELL_DRAKE_STOP_TIME))
+            if (me->HasAuras(SearchMethod::MatchAny, SPELL_PLANAR_SHIFT, SPELL_DRAKE_STOP_TIME))
                 return;
 
             events.Update(diff);

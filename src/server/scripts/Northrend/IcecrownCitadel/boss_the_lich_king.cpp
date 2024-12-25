@@ -451,7 +451,7 @@ public:
             return false;
         if (_source->GetExactDist(target) > 100.0f)
             return false;
-        if (target->HasAuras(false, SPELL_HARVEST_SOUL_VALKYR, SPELL_VALKYR_TARGET_SEARCH))
+        if (target->HasAuras(SearchMethod::MatchAny, SPELL_HARVEST_SOUL_VALKYR, SPELL_VALKYR_TARGET_SEARCH))
             return false;
         if (!_source->IsWithinLOSInMap(target))
             return false;
@@ -603,7 +603,7 @@ public:
     {
         if (!unit || !unit->IsPlayer() || unit == _sourceObj || _sourceObj->GetVictim() == unit || !unit->isTargetableForAttack())
             return false;
-        if (unit->HasAuras(false, SPELL_PLAGUE_AVOIDANCE, SPELL_BOSS_HITTIN_YA_AURA, _notAura1, _notAura2))
+        if (unit->HasAuras(SearchMethod::MatchAny, SPELL_PLAGUE_AVOIDANCE, SPELL_BOSS_HITTIN_YA_AURA, _notAura1, _notAura2))
             return false;
         if (!_sourceObj->IsWithinLOSInMap(unit))
             return false;

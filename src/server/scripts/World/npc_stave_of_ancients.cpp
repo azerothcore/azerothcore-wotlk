@@ -1001,7 +1001,7 @@ public:
             if (InNormalForm())
                 return;
 
-            if (me->HasAuras(true, NELSON_SPELL_SOUL_FLAME, NELSON_WEAKNESS_FROST_TRAP))
+            if (me->HasAuras(SearchMethod::MatchAll, NELSON_SPELL_SOUL_FLAME, NELSON_WEAKNESS_FROST_TRAP))
                 me->RemoveAura(NELSON_SPELL_SOUL_FLAME);
 
             if (!me->HasAura(NELSON_SPELL_CRIPPLING_CLIP) && Spell->Id == NELSON_WEAKNESS_WING_CLIP)

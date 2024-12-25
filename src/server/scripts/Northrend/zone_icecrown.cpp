@@ -1496,7 +1496,7 @@ public:
             if (!who || !who->IsPlayer() || !me->IsHostileTo(who) || !me->isInBackInMap(who, 5.0f))
                 return;
 
-            if (who->HasAuras(false, SPELL_TRESPASSER_H, SPELL_TRESPASSER_A))
+            if (who->HasAuras(SearchMethod::MatchAny, SPELL_TRESPASSER_H, SPELL_TRESPASSER_A))
                 return;
 
             if (who->ToPlayer()->GetTeamId() == TEAM_ALLIANCE)
