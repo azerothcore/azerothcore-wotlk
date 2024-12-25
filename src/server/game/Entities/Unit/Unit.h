@@ -1376,10 +1376,22 @@ public:
     template <typename... Auras>
     bool HasAuras(bool matchAll, Auras... spellIds) const
     {
+        std::vector<uint32> spellList = { static_cast<uint32>(spellIds)...};
+
         if (matchAll)
-            return (HasAura(spellIds) && ...);
+        {
+            for (auto const& spellId : spellList)
+                if (!HasAura(spellId))
+                    return false;
+            return true;
+        }
         else
-            return (HasAura(spellIds) || ...);
+        {
+            for (auto const& spellId : spellList)
+                if (HasAura(spellId))
+                    return true;
+            return false;
+        }
     }
 
     [[nodiscard]] bool HasAura(uint32 spellId, ObjectGuid casterGUID = ObjectGuid::Empty, ObjectGuid itemCasterGUID = ObjectGuid::Empty, uint8 reqEffMask = 0) const;
