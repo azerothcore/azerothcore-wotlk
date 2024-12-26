@@ -9786,7 +9786,7 @@ void Player::ApplySpellMod(uint32 spellId, SpellModOp op, T& basevalue, Spell* s
                 bool hasJuggernaut = HasAura(65156); // Buff Juggernaut
                 bool hasRecklessness = HasAura(1719); // Buff Recklessness
 
-                // Lista de IDs para Mortal Strike e Slam (Incluindo múltiplos ranks)
+                // List of IDs for Mortal Strike and Slam (Including multiple ranks)
                 uint32 mortalStrikeRanks[] = { 12294, 21551, 21552, 21553, 25248, 30330, 47485, 47486 };  // Mortal Strike Rank IDs
                 uint32 slamRanks[] = { 1464, 8820, 11604, 11605, 25241, 25242, 47474, 47475 }; // Slam Rank IDs
 
