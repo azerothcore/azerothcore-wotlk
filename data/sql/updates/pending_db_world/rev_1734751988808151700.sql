@@ -1,4 +1,4 @@
--- Angered, Suffering & Hungering Sould Fragment respawn
+-- Angered, Suffering & Hungering Soul Fragment respawn
 UPDATE `creature` SET `spawntimesecs` = 15 WHERE guid IN (    
 	148424, 148425, 148426, 148427, 148428, 148429,    
 	148430, 148431, 148432, 148433, 148434, 148435,   
@@ -11,4 +11,4 @@ UPDATE `creature` SET `spawntimesecs` = 15 WHERE guid IN (
     148472, 148473, 148474, 148475, 148476, 148477, 
     148478, 148479, 148480, 148481, 148482, 148483, 
     148484, 148485, 148486, 148487, 148488
-);
+) and id1 in (23398, 23399, 23401);
