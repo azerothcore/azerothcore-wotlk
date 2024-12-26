@@ -1,75 +1,63 @@
 
 -- Remove Guids
-
+--
 DELETE FROM `creature` WHERE (`id1` = 28576) AND (`guid` IN (128910, 128911, 128912, 128913, 128914, 128915, 128917, 128918, 128919, 128921, 128923, 128925, 128931, 128932, 128933, 128936, 128937, 128938, 128939, 128940, 128941, 128942, 128943, 128944, 128945, 128946, 128947, 128949, 128950, 128951, 128952, 128953, 128955, 128956, 128957));
 DELETE FROM `creature_addon` WHERE (`guid` IN (128910, 128911, 128912, 128913, 128914, 128915, 128917, 128918, 128919, 128921, 128923, 128925, 128931, 128932, 128933, 128936, 128937, 128938, 128939, 128940, 128941, 128942, 128943, 128944, 128945, 128946, 128947, 128949, 128950, 128951, 128952, 128953, 128955, 128956, 128957));
-
+--
 DELETE FROM `creature` WHERE (`id1` = 28577) AND (`guid` IN (128958, 128959, 128960, 128961, 128962, 128963, 128964, 128965, 128967, 128969, 128971, 128972, 128974, 128975, 128977, 128982, 128983, 128984, 128985, 128987, 128988, 128989, 128990, 128994, 128995, 128996, 128997, 128998, 128999, 129000, 129001));
 DELETE FROM `creature_addon` WHERE (`guid` IN (128958, 128959, 128960, 128961, 128962, 128963, 128964, 128965, 128967, 128969, 128971, 128972, 128974, 128975, 128977, 128982, 128983, 128984, 128985, 128987, 128988, 128989, 128990, 128994, 128995, 128996, 128997, 128998, 128999, 129000, 129001));
-
-
+--
+--
 -- Set Run Speed
-
+--
 UPDATE `creature_template` SET `speed_run` = 1.05 WHERE (`entry` = 28576);
 UPDATE `creature_template` SET `speed_run` = 1.05 WHERE (`entry` = 28577);
-
-
+--
+--
 -- Remove Wrong Auras
 
 UPDATE `creature_addon` SET `auras` = '' WHERE (`guid` IN (128916, 128921, 128925, 128927));
 UPDATE `creature_addon` SET `auras` = '' WHERE (`guid` IN (128966, 128969, 128972, 128975, 128980));
-
-
+--
+--
 -- Change Wander Distance and Movement Type
 
 UPDATE `creature` SET `wander_distance` = 0, `MovementType` = 0 WHERE `guid` IN (128927, 128928, 128930, 128922, 128924, 128954, 128929, 128934, 128926, 128920, 128916, 128935, 128948) AND `id1` = 28576;
 UPDATE `creature` SET `wander_distance` = 0, `MovementType` = 0 WHERE `guid` IN (128973, 128980, 128976, 128978, 128981, 128968, 128993, 128979, 128986, 128970, 128966, 128991, 128992) AND `id1` = 28577;
-
-
+--
+--
 -- Change Positions (sniffed values)
-
+--
 UPDATE `creature` SET `position_x` = 2083.5244, `position_y` = -5713.8477, `position_z` = 100.62685, `orientation` = 5.6665 WHERE `guid` = 128922 AND `id1` = 28576;
 UPDATE `creature` SET `position_x` = 2083.5244, `position_y` = -5713.8477, `position_z` = 100.62685, `orientation` = 5.6665 WHERE `guid` = 128979 AND `id1` = 28577;
-
 UPDATE `creature` SET `position_x` = 1959.51, `position_y` = -5809.41, `position_z` = 101.222, `orientation` = 1.48353 WHERE `guid` = 128927 AND `id1` = 28576;
 UPDATE `creature` SET `position_x` = 1959.51, `position_y` = -5809.41, `position_z` = 101.222, `orientation` = 1.48353 WHERE `guid` = 128986 AND `id1` = 28577;
-
 UPDATE `creature` SET `position_x` = 2104.597, `position_y` = -5852.6714, `position_z` = 102.65492, `orientation` = 3.7433 WHERE `guid` = 128928 AND `id1` = 28576;
 UPDATE `creature` SET `position_x` = 2104.597, `position_y` = -5852.6714, `position_z` = 102.65492, `orientation` = 3.7433 WHERE `guid` = 128970 AND `id1` = 28577;
-
 UPDATE `creature` SET `position_x` = 2092.7227, `position_y` = -5778.4004, `position_z` = 99.17004, `orientation` = 2.3495708 WHERE `guid` = 128930 AND `id1` = 28576;
 UPDATE `creature` SET `position_x` = 2092.7227, `position_y` = -5778.4004, `position_z` = 99.17004, `orientation` = 2.3495708 WHERE `guid` = 128966 AND `id1` = 28577;
-
 UPDATE `creature` SET `position_x` = 1965.97, `position_y` = -5833.76, `position_z` = 100.843, `orientation` = 4.08407 WHERE `guid` = 128973 AND `id1` = 28577;
 UPDATE `creature` SET `position_x` = 1965.97, `position_y` = -5833.76, `position_z` = 100.843, `orientation` = 4.08407 WHERE `guid` = 128924 AND `id1` = 28576;
-
 UPDATE `creature` SET `position_x` = 2126.9946, `position_y` = -5881.348, `position_z` = 102.23642, `orientation` = 2.1005676 WHERE `guid` = 128976 AND `id1` = 28577;
 UPDATE `creature` SET `position_x` = 2126.9946, `position_y` = -5881.348, `position_z` = 102.23642, `orientation` = 2.1005676 WHERE `guid` = 128954 AND `id1` = 28576;
-
 UPDATE `creature` SET `position_x` = 2056.6086, `position_y` = -5754.899, `position_z` = 98.03694, `orientation` = 3.0397918 WHERE `guid` = 128978 AND `id1` = 28577;
 UPDATE `creature` SET `position_x` = 2056.6086, `position_y` = -5754.899, `position_z` = 98.03694, `orientation` = 3.0397918 WHERE `guid` = 128929 AND `id1` = 28576;
-
 UPDATE `creature` SET `position_x` = 2067.315, `position_y` = -5915.171, `position_z` = 106.67783, `orientation` = 3.5101542 WHERE `guid` = 128980 AND `id1` = 28577;
 UPDATE `creature` SET `position_x` = 2067.315, `position_y` = -5915.171, `position_z` = 106.67783, `orientation` = 3.5101542 WHERE `guid` = 128934 AND `id1` = 28576;
-
 UPDATE `creature` SET `position_x` = 1927.4072, `position_y` = -5807.218, `position_z` = 100.20784, `orientation` = 5.9593172 WHERE `guid` = 128981 AND `id1` = 28577;
 UPDATE `creature` SET `position_x` = 1927.4072, `position_y` = -5807.218, `position_z` = 100.20784, `orientation` = 5.9593172 WHERE `guid` = 128926 AND `id1` = 28576;
-
 UPDATE `creature` SET `position_x` = 2160.4504, `position_y` = -5793.529, `position_z` = 100.928505, `orientation` = 2.87087 WHERE `guid` = 128968 AND `id1` = 28577;
 UPDATE `creature` SET `position_x` = 2160.4504, `position_y` = -5793.529, `position_z` = 100.928505, `orientation` = 2.87087 WHERE `guid` = 128920 AND `id1` = 28576;
-
 UPDATE `creature` SET `position_x` = 2144.6318, `position_y` = -5754.6543, `position_z` = 99.69839, `orientation` = 5.02815 WHERE `guid` = 128993 AND `id1` = 28577;
 UPDATE `creature` SET `position_x` = 2144.6318, `position_y` = -5754.6543, `position_z` = 99.69839, `orientation` = 5.02815 WHERE `guid` = 128916 AND `id1` = 28576;
-
 UPDATE `creature` SET `position_x` = 2145.1165, `position_y` = -5919.1206, `position_z` = 98.640945, `orientation` = 1.53392 WHERE `guid` = 128991 AND `id1` = 28577;
 UPDATE `creature` SET `position_x` = 2145.1165, `position_y` = -5919.1206, `position_z` = 98.640945, `orientation` = 1.53392 WHERE `guid` = 128935 AND `id1` = 28576;
-
 UPDATE `creature` SET `position_x` = 2254.762, `position_y` = -5809.216, `position_z` = 101.03145, `orientation` = 2.50164 WHERE `guid` = 128992 AND `id1` = 28577;
 UPDATE `creature` SET `position_x` = 2254.762, `position_y` = -5809.216, `position_z` = 101.03145, `orientation` = 2.50164 WHERE `guid` = 128948 AND `id1` = 28576;
-
-
+--
+--
 -- Waypoints
-
+--
 DELETE FROM `waypoint_data` WHERE `id` IN (12897300);
 INSERT INTO `waypoint_data` (`id`, `point`, `position_x`, `position_y`, `position_z`, `orientation`, `delay`, `move_type`, `action`, `action_chance`, `wpguid`) VALUES
 (12897300, 1, 1944.7305 , -5843.9497 , 100.4848, NULL, 0, 1, 0, 100, 0),
@@ -88,7 +76,7 @@ INSERT INTO `waypoint_data` (`id`, `point`, `position_x`, `position_y`, `positio
 (12897300, 14, 1588.4744 , -5725.8613 , 121.6682, NULL, 0, 1, 0, 100, 0),
 (12897300, 15, 1586.0789 , -5721.0986 , 121.72284, NULL, 0, 1, 0, 100, 0),
 (12897300, 16, 1576.3289 , -5724.8486 , 121.22284, NULL, 0, 1, 0, 100, 0);
-
+--
 DELETE FROM `waypoint_data` WHERE `id` IN (12892700);
 INSERT INTO `waypoint_data` (`id`, `point`, `position_x`, `position_y`, `position_z`, `orientation`, `delay`, `move_type`, `action`, `action_chance`, `wpguid`) VALUES
 (12892700, 1, 1969.4949 , -5841.5913 , 100.70409, NULL, 0, 1, 0, 100, 0),
@@ -98,7 +86,7 @@ INSERT INTO `waypoint_data` (`id`, `point`, `position_x`, `position_y`, `positio
 (12892700, 5, 1867.1259 , -5916.288 , 104.24944, NULL, 0, 1, 0, 100, 0),
 (12892700, 6, 1830.589 , -5926.684 , 110.515434, NULL, 0, 1, 0, 100, 0),
 (12892700, 7, 1797.2595 , -5929.0654 , 116.07023, NULL, 0, 1, 0, 100, 0);
-
+--
 DELETE FROM `waypoint_data` WHERE `id` IN (12898000);
 INSERT INTO `waypoint_data` (`id`, `point`, `position_x`, `position_y`, `position_z`, `orientation`, `delay`, `move_type`, `action`, `action_chance`, `wpguid`) VALUES
 (12898000, 1, 2040.1895, -5908.4395, 105.352394, NULL, 0, 1, 0, 100, 0),
@@ -120,7 +108,7 @@ INSERT INTO `waypoint_data` (`id`, `point`, `position_x`, `position_y`, `positio
 (12898000, 17, 1643.0146, -5856.5806, 117.29288, NULL, 0, 1, 0, 100, 0),
 (12898000, 18, 1644.2047, -5856.674, 117.29288, NULL, 0, 1, 0, 100, 0),
 (12898000, 19, 1646.0004, -5846.99, 122.09402, NULL, 0, 1, 0, 100, 0);
-
+--
 DELETE FROM `waypoint_data` WHERE `id` IN (12892800);
 INSERT INTO `waypoint_data` (`id`, `point`, `position_x`, `position_y`, `position_z`, `orientation`, `delay`, `move_type`, `action`, `action_chance`, `wpguid`) VALUES
 (12892800, 1, 2066.441, -5892.1685, 104.63345, NULL, 0, 1, 0, 100, 0),
@@ -139,7 +127,7 @@ INSERT INTO `waypoint_data` (`id`, `point`, `position_x`, `position_y`, `positio
 (12892800, 14, 1690.5028, -5875.701, 116.15037, NULL, 0, 1, 0, 100, 0),
 (12892800, 15, 1672.8468, -5874.1313, 116.15768, NULL, 0, 1, 0, 100, 0),
 (12892800, 16, 1656.9258, -5879.2573, 117.14002, NULL, 0, 1, 0, 100, 0);
-
+--
 DELETE FROM `waypoint_data` WHERE `id` IN (12897600);
 INSERT INTO `waypoint_data` (`id`, `point`, `position_x`, `position_y`, `position_z`, `orientation`, `delay`, `move_type`, `action`, `action_chance`, `wpguid`) VALUES
 (12897600, 1, 2111.3591, -5871.938, 102.830246, NULL, 0, 1, 0, 100, 0),
@@ -159,7 +147,7 @@ INSERT INTO `waypoint_data` (`id`, `point`, `position_x`, `position_y`, `positio
 (12897600, 15, 1676.5111, -5873.307, 116.164276, NULL, 0, 1, 0, 100, 0),
 (12897600, 16, 1676.5111, -5873.307, 116.164276, NULL, 0, 1, 0, 100, 0),
 (12897600, 17, 1657.8718, -5880.3726, 117.14161, NULL, 0, 1, 0, 100, 0);
-
+--
 DELETE FROM `waypoint_data` WHERE `id` IN (12893000);
 INSERT INTO `waypoint_data` (`id`, `point`, `position_x`, `position_y`, `position_z`, `orientation`, `delay`, `move_type`, `action`, `action_chance`, `wpguid`) VALUES
 (12893000, 1, 2070.2095, -5762.7603, 99.81166, NULL, 0, 1, 0, 100, 0),
@@ -179,7 +167,7 @@ INSERT INTO `waypoint_data` (`id`, `point`, `position_x`, `position_y`, `positio
 (12893000, 15, 1677.6709, -5833.4097, 116.27008, NULL, 0, 1, 0, 100, 0),
 (12893000, 16, 1664.9114, -5810.619, 116.269135, NULL, 0, 1, 0, 100, 0),
 (12893000, 17, 1651.6998, -5803.006, 117.191055, NULL, 0, 1, 0, 100, 0);
-
+--
 DELETE FROM `waypoint_data` WHERE `id` IN (12897800);
 INSERT INTO `waypoint_data` (`id`, `point`, `position_x`, `position_y`, `position_z`, `orientation`, `delay`, `move_type`, `action`, `action_chance`, `wpguid`) VALUES
 (12897800, 1, 2023.7551, -5751.5454, 99.346756, NULL, 0, 1, 0, 100, 0),
@@ -195,7 +183,7 @@ INSERT INTO `waypoint_data` (`id`, `point`, `position_x`, `position_y`, `positio
 (12897800, 11, 1783.5422, -5928.593, 116.11073, NULL, 0, 1, 0, 100, 0),
 (12897800, 12, 1766.4922, -5933.464, 116.12873, NULL, 0, 1, 0, 100, 0),
 (12897800, 13, 1742.8866, -5964.3276, 117.121796, NULL, 0, 1, 0, 100, 0);
-
+--
 DELETE FROM `waypoint_data` WHERE `id` IN (12898100);
 INSERT INTO `waypoint_data` (`id`, `point`, `position_x`, `position_y`, `position_z`, `orientation`, `delay`, `move_type`, `action`, `action_chance`, `wpguid`) VALUES
 (12898100, 1, 1951.9263, -5815.4497, 101.04118, NULL, 0, 1, 0, 100, 0),
@@ -206,7 +194,7 @@ INSERT INTO `waypoint_data` (`id`, `point`, `position_x`, `position_y`, `positio
 (12898100, 6, 1864.4154, -5916.9707, 104.330055, NULL, 0, 1, 0, 100, 0),
 (12898100, 7, 1828.0709, -5927.4385, 111.26059, NULL, 0, 1, 0, 100, 0),
 (12898100, 8, 1797.2505, -5929.193, 116.19281, NULL, 0, 1, 0, 100, 0);
-
+--
 DELETE FROM `waypoint_data` WHERE `id` IN (12892200);
 INSERT INTO `waypoint_data` (`id`, `point`, `position_x`, `position_y`, `position_z`, `orientation`, `delay`, `move_type`, `action`, `action_chance`, `wpguid`) VALUES
 (12892200, 1, 2094.0906, -5834.092, 102.69047, NULL, 0, 1, 0, 100, 0),
@@ -221,8 +209,7 @@ INSERT INTO `waypoint_data` (`id`, `point`, `position_x`, `position_y`, `positio
 (12892200, 10, 1791.5347, -5817.185, 111.733925, NULL, 0, 1, 0, 100, 0),
 (12892200, 11, 1754.2554, -5817.1816, 116.08976, NULL, 0, 1, 0, 100, 0),
 (12892200, 12, 1748.3037, -5806.4995, 117.35039, NULL, 0, 1, 0, 100, 0);
-
-
+--
 DELETE FROM `waypoint_data` WHERE `id` IN (12896800);
 INSERT INTO `waypoint_data` (`id`, `point`, `position_x`, `position_y`, `position_z`, `orientation`, `delay`, `move_type`, `action`, `action_chance`, `wpguid`) VALUES
 (12896800, 1, 2013.9696, -5750.505, 99.70143, NULL, 0, 1, 0, 100, 0),
@@ -237,8 +224,7 @@ INSERT INTO `waypoint_data` (`id`, `point`, `position_x`, `position_y`, `positio
 (12896800, 10, 1806.9615, -5933.51, 115.49063, NULL, 0, 1, 0, 100, 0),
 (12896800, 11, 1775.8497, -5926.973, 116.12056, NULL, 0, 1, 0, 100, 0),
 (12896800, 12, 1743.2236, -5964.2686, 117.110565, NULL, 0, 1, 0, 100, 0);
-
-
+--
 DELETE FROM `waypoint_data` WHERE `id` IN (12899300);
 INSERT INTO `waypoint_data` (`id`, `point`, `position_x`, `position_y`, `position_z`, `orientation`, `delay`, `move_type`, `action`, `action_chance`, `wpguid`) VALUES
 (12899300, 1, 2076.472, -5888.584, 104.19423, NULL, 0, 1, 0, 100, 0),
@@ -257,8 +243,7 @@ INSERT INTO `waypoint_data` (`id`, `point`, `position_x`, `position_y`, `positio
 (12899300, 14, 1716.3547, -5893.5947, 116.14236, NULL, 0, 1, 0, 100, 0),
 (12899300, 15, 1682.9327, -5873.7715, 116.17101, NULL, 0, 1, 0, 100, 0),
 (12899300, 16, 1663.3423, -5876.8574, 117.09895, NULL, 0, 1, 0, 100, 0);
-
-
+--
 DELETE FROM `waypoint_data` WHERE `id` IN (12899100);
 INSERT INTO `waypoint_data` (`id`, `point`, `position_x`, `position_y`, `position_z`, `orientation`, `delay`, `move_type`, `action`, `action_chance`, `wpguid`) VALUES
 (12899100, 1, 2133.4194, -5890.052, 102.231575, NULL, 0, 1, 0, 100, 0),
@@ -282,8 +267,7 @@ INSERT INTO `waypoint_data` (`id`, `point`, `position_x`, `position_y`, `positio
 (12899100, 19, 1671.5693, -5832.2524, 116.32982, NULL, 0, 1, 0, 100, 0),
 (12899100, 20, 1663.0612, -5804.608, 116.12191, NULL, 0, 1, 0, 100, 0),
 (12899100, 21, 1650.4883, -5802.892, 117.11298, NULL, 0, 1, 0, 100, 0);
-
-
+--
 DELETE FROM `waypoint_data` WHERE `id` IN (12899200);
 INSERT INTO `waypoint_data` (`id`, `point`, `position_x`, `position_y`, `position_z`, `orientation`, `delay`, `move_type`, `action`, `action_chance`, `wpguid`) VALUES
 (12899200, 1, 2208.9922, -5774.83, 101.751114, NULL, 0, 1, 0, 100, 0),
@@ -308,25 +292,21 @@ INSERT INTO `waypoint_data` (`id`, `point`, `position_x`, `position_y`, `positio
 (12899200, 20, 1739.6682, -5873.1895, 116.643486, NULL, 0, 1, 0, 100, 0),
 (12899200, 21, 1739.8035, -5879.1963, 116.66808, NULL, 0, 1, 0, 100, 0),
 (12899200, 22, 1750.481, -5878.4556, 116.03192, NULL, 0, 1, 0, 100, 0);
-
-
+--
 -- Set Comment
-
+--
 UPDATE `creature` SET `Comment` = "has guid specific SAI" WHERE (`id1` = 28576) AND (`guid` IN (128922, 128927, 128928, 128930, 128924, 128954, 128929, 128934, 128926, 128920, 128916, 128935, 128948));
 UPDATE `creature` SET `Comment` = "has guid specific SAI" WHERE (`id1` = 28577) AND (`guid` IN (128979, 128986, 128970, 128966, 128973, 128976, 128978, 128980, 128981, 128968, 128993, 128991, 128992));
-
-
+--
 -- Remove Generic SmartAI
-
+--
 UPDATE `creature_template` SET `AIName` = 'SmartAI' WHERE `entry` = 28576;
 DELETE FROM `smart_scripts` WHERE (`entryorguid` = 28576) AND (`source_type` = 0);
-
 UPDATE `creature_template` SET `AIName` = 'SmartAI' WHERE `entry` = 28577;
 DELETE FROM `smart_scripts` WHERE (`entryorguid` = 28577) AND (`source_type` = 0);
-
-
+--
 -- Set SmartAI
-
+--
 DELETE FROM `smart_scripts` WHERE (`source_type` = 0 AND `entryorguid` = -128922);
 INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `event_param6`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
 (-128922, 0, 0, 1, 25, 0, 100, 0, 0, 0, 0, 0, 0, 0, 22, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Citizen of Havenshire - On Reset - Set Event Phase 1'),
@@ -343,7 +323,7 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 (-128922, 0, 11, 0, 11, 0, 100, 0, 0, 0, 0, 0, 0, 0, 232, 12892200, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Citizen of Havenshire - On Respawn - Start Path 12892200'),
 (-128922, 0, 12, 0, 109, 0, 100, 0, 0, 12892200, 0, 0, 0, 0, 41, 2000, 120, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Citizen of Havenshire - On Path 12892200 Finished - Despawn In 2000 ms'),
 (-128922, 0, 13, 0, 4, 0, 50, 0, 0, 0, 0, 0, 0, 0, 86, 58207, 0, 10, 128581, 28765, 0, 7, 0, 0, 0, 0, 0, 0, 0, 0, 'Citizen of Havenshire - On Aggro - Cross Cast \'Lich King VO Blocker\'');
-
+--
 DELETE FROM `smart_scripts` WHERE (`source_type` = 0 AND `entryorguid` = -128979);
 INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `event_param6`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
 (-128979, 0, 0, 1, 25, 0, 100, 0, 0, 0, 0, 0, 0, 0, 22, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Citizen of Havenshire - On Reset - Set Event Phase 1'),
@@ -360,8 +340,7 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 (-128979, 0, 11, 0, 11, 0, 100, 0, 0, 0, 0, 0, 0, 0, 232, 12892200, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Citizen of Havenshire - On Respawn - Start Path 12892200'),
 (-128979, 0, 12, 0, 109, 0, 100, 0, 0, 12892200, 0, 0, 0, 0, 41, 2000, 120, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Citizen of Havenshire - On Path 12892200 Finished - Despawn In 2000 ms'),
 (-128979, 0, 13, 0, 4, 0, 50, 0, 0, 0, 0, 0, 0, 0, 86, 58207, 0, 10, 128581, 28765, 0, 7, 0, 0, 0, 0, 0, 0, 0, 0, 'Citizen of Havenshire - On Aggro - Cross Cast \'Lich King VO Blocker\'');
-
-
+--
 DELETE FROM `smart_scripts` WHERE (`source_type` = 0 AND `entryorguid` = -128927);
 INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `event_param6`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
 (-128927, 0, 0, 1, 25, 0, 100, 0, 0, 0, 0, 0, 0, 0, 22, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Citizen of Havenshire - On Reset - Set Event Phase 1'),
@@ -378,7 +357,7 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 (-128927, 0, 11, 0, 11, 0, 100, 0, 0, 0, 0, 0, 0, 0, 232, 12892700, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Citizen of Havenshire - On Respawn - Start Path 12892700'),
 (-128927, 0, 12, 0, 109, 0, 100, 0, 0, 12892700, 0, 0, 0, 0, 41, 2000, 120, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Citizen of Havenshire - On Path 12892700 Finished - Despawn In 2000 ms'),
 (-128927, 0, 13, 0, 4, 0, 50, 0, 0, 0, 0, 0, 0, 0, 86, 58207, 0, 10, 128581, 28765, 0, 7, 0, 0, 0, 0, 0, 0, 0, 0, 'Citizen of Havenshire - On Aggro - Cross Cast \'Lich King VO Blocker\'');
-
+--
 DELETE FROM `smart_scripts` WHERE (`source_type` = 0 AND `entryorguid` = -128986);
 INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `event_param6`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
 (-128986, 0, 0, 1, 25, 0, 100, 0, 0, 0, 0, 0, 0, 0, 22, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Citizen of Havenshire - On Reset - Set Event Phase 1'),
@@ -395,8 +374,7 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 (-128986, 0, 11, 0, 11, 0, 100, 0, 0, 0, 0, 0, 0, 0, 232, 12892700, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Citizen of Havenshire - On Respawn - Start Path 12892700'),
 (-128986, 0, 12, 0, 109, 0, 100, 0, 0, 12892700, 0, 0, 0, 0, 41, 2000, 120, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Citizen of Havenshire - On Path 12892700 Finished - Despawn In 2000 ms'),
 (-128986, 0, 13, 0, 4, 0, 50, 0, 0, 0, 0, 0, 0, 0, 86, 58207, 0, 10, 128581, 28765, 0, 7, 0, 0, 0, 0, 0, 0, 0, 0, 'Citizen of Havenshire - On Aggro - Cross Cast \'Lich King VO Blocker\'');
-
-
+--
 DELETE FROM `smart_scripts` WHERE (`source_type` = 0 AND `entryorguid` = -128928);
 INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `event_param6`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
 (-128928, 0, 0, 1, 25, 0, 100, 0, 0, 0, 0, 0, 0, 0, 22, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Citizen of Havenshire - On Reset - Set Event Phase 1'),
@@ -413,7 +391,7 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 (-128928, 0, 11, 0, 11, 0, 100, 0, 0, 0, 0, 0, 0, 0, 232, 12892800, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Citizen of Havenshire - On Respawn - Start Path 12892800'),
 (-128928, 0, 12, 0, 109, 0, 100, 0, 0, 12892800, 0, 0, 0, 0, 41, 2000, 120, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Citizen of Havenshire - On Path 12892800 Finished - Despawn In 2000 ms'),
 (-128928, 0, 13, 0, 4, 0, 50, 0, 0, 0, 0, 0, 0, 0, 86, 58207, 0, 10, 128581, 28765, 0, 7, 0, 0, 0, 0, 0, 0, 0, 0, 'Citizen of Havenshire - On Aggro - Cross Cast \'Lich King VO Blocker\'');
-
+--
 DELETE FROM `smart_scripts` WHERE (`source_type` = 0 AND `entryorguid` = -128970);
 INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `event_param6`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
 (-128970, 0, 0, 1, 25, 0, 100, 0, 0, 0, 0, 0, 0, 0, 22, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Citizen of Havenshire - On Reset - Set Event Phase 1'),
@@ -430,8 +408,7 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 (-128970, 0, 11, 0, 11, 0, 100, 0, 0, 0, 0, 0, 0, 0, 232, 12892800, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Citizen of Havenshire - On Respawn - Start Path 12892800'),
 (-128970, 0, 12, 0, 109, 0, 100, 0, 0, 12892800, 0, 0, 0, 0, 41, 2000, 120, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Citizen of Havenshire - On Path 12892800 Finished - Despawn In 2000 ms'),
 (-128970, 0, 13, 0, 4, 0, 50, 0, 0, 0, 0, 0, 0, 0, 86, 58207, 0, 10, 128581, 28765, 0, 7, 0, 0, 0, 0, 0, 0, 0, 0, 'Citizen of Havenshire - On Aggro - Cross Cast \'Lich King VO Blocker\'');
-
-
+--
 DELETE FROM `smart_scripts` WHERE (`source_type` = 0 AND `entryorguid` = -128930);
 INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `event_param6`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
 (-128930, 0, 0, 1, 25, 0, 100, 0, 0, 0, 0, 0, 0, 0, 22, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Citizen of Havenshire - On Reset - Set Event Phase 1'),
@@ -448,7 +425,7 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 (-128930, 0, 11, 0, 11, 0, 100, 0, 0, 0, 0, 0, 0, 0, 232, 12893000, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Citizen of Havenshire - On Respawn - Start Path 12893000'),
 (-128930, 0, 12, 0, 109, 0, 100, 0, 0, 12893000, 0, 0, 0, 0, 41, 2000, 120, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Citizen of Havenshire - On Path 12893000 Finished - Despawn In 2000 ms'),
 (-128930, 0, 13, 0, 4, 0, 50, 0, 0, 0, 0, 0, 0, 0, 86, 58207, 0, 10, 128581, 28765, 0, 7, 0, 0, 0, 0, 0, 0, 0, 0, 'Citizen of Havenshire - On Aggro - Cross Cast \'Lich King VO Blocker\'');
-
+--
 DELETE FROM `smart_scripts` WHERE (`source_type` = 0 AND `entryorguid` = -128966);
 INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `event_param6`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
 (-128966, 0, 0, 1, 25, 0, 100, 0, 0, 0, 0, 0, 0, 0, 22, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Citizen of Havenshire - On Reset - Set Event Phase 1'),
@@ -465,8 +442,7 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 (-128966, 0, 11, 0, 11, 0, 100, 0, 0, 0, 0, 0, 0, 0, 232, 12893000, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Citizen of Havenshire - On Respawn - Start Path 12893000'),
 (-128966, 0, 12, 0, 109, 0, 100, 0, 0, 12893000, 0, 0, 0, 0, 41, 2000, 120, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Citizen of Havenshire - On Path 12893000 Finished - Despawn In 2000 ms'),
 (-128966, 0, 13, 0, 4, 0, 50, 0, 0, 0, 0, 0, 0, 0, 86, 58207, 0, 10, 128581, 28765, 0, 7, 0, 0, 0, 0, 0, 0, 0, 0, 'Citizen of Havenshire - On Aggro - Cross Cast \'Lich King VO Blocker\'');
-
-
+--
 DELETE FROM `smart_scripts` WHERE (`source_type` = 0 AND `entryorguid` = -128973);
 INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `event_param6`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
 (-128973, 0, 0, 1, 25, 0, 100, 0, 0, 0, 0, 0, 0, 0, 22, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Citizen of Havenshire - On Reset - Set Event Phase 1'),
@@ -483,7 +459,7 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 (-128973, 0, 11, 0, 11, 0, 100, 0, 0, 0, 0, 0, 0, 0, 232, 12897300, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Citizen of Havenshire - On Respawn - Start Path 12897300'),
 (-128973, 0, 12, 0, 109, 0, 100, 0, 0, 12897300, 0, 0, 0, 0, 41, 2000, 120, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Citizen of Havenshire - On Path 12897300 Finished - Despawn In 2000 ms'),
 (-128973, 0, 13, 0, 4, 0, 50, 0, 0, 0, 0, 0, 0, 0, 86, 58207, 0, 10, 128581, 28765, 0, 7, 0, 0, 0, 0, 0, 0, 0, 0, 'Citizen of Havenshire - On Aggro - Cross Cast \'Lich King VO Blocker\'');
-
+--
 DELETE FROM `smart_scripts` WHERE (`source_type` = 0 AND `entryorguid` = -128924);
 INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `event_param6`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
 (-128924, 0, 0, 1, 25, 0, 100, 0, 0, 0, 0, 0, 0, 0, 22, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Citizen of Havenshire - On Reset - Set Event Phase 1'),
@@ -500,8 +476,7 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 (-128924, 0, 11, 0, 11, 0, 100, 0, 0, 0, 0, 0, 0, 0, 232, 12897300, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Citizen of Havenshire - On Respawn - Start Path 12897300'),
 (-128924, 0, 12, 0, 109, 0, 100, 0, 0, 12897300, 0, 0, 0, 0, 41, 2000, 120, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Citizen of Havenshire - On Path 12897300 Finished - Despawn In 2000 ms'),
 (-128924, 0, 13, 0, 4, 0, 50, 0, 0, 0, 0, 0, 0, 0, 86, 58207, 0, 10, 128581, 28765, 0, 7, 0, 0, 0, 0, 0, 0, 0, 0, 'Citizen of Havenshire - On Aggro - Cross Cast \'Lich King VO Blocker\'');
-
-
+--
 DELETE FROM `smart_scripts` WHERE (`source_type` = 0 AND `entryorguid` = -128976);
 INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `event_param6`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
 (-128976, 0, 0, 1, 25, 0, 100, 0, 0, 0, 0, 0, 0, 0, 22, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Citizen of Havenshire - On Reset - Set Event Phase 1'),
@@ -518,7 +493,7 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 (-128976, 0, 11, 0, 11, 0, 100, 0, 0, 0, 0, 0, 0, 0, 232, 12897600, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Citizen of Havenshire - On Respawn - Start Path 12897600'),
 (-128976, 0, 12, 0, 109, 0, 100, 0, 0, 12897600, 0, 0, 0, 0, 41, 2000, 120, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Citizen of Havenshire - On Path 12897600 Finished - Despawn In 2000 ms'),
 (-128976, 0, 13, 0, 4, 0, 50, 0, 0, 0, 0, 0, 0, 0, 86, 58207, 0, 10, 128581, 28765, 0, 7, 0, 0, 0, 0, 0, 0, 0, 0, 'Citizen of Havenshire - On Aggro - Cross Cast \'Lich King VO Blocker\'');
-
+--
 DELETE FROM `smart_scripts` WHERE (`source_type` = 0 AND `entryorguid` = -128954);
 INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `event_param6`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
 (-128954, 0, 0, 1, 25, 0, 100, 0, 0, 0, 0, 0, 0, 0, 22, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Citizen of Havenshire - On Reset - Set Event Phase 1'),
@@ -535,8 +510,7 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 (-128954, 0, 11, 0, 11, 0, 100, 0, 0, 0, 0, 0, 0, 0, 232, 12897600, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Citizen of Havenshire - On Respawn - Start Path 12897600'),
 (-128954, 0, 12, 0, 109, 0, 100, 0, 0, 12897600, 0, 0, 0, 0, 41, 2000, 120, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Citizen of Havenshire - On Path 12897600 Finished - Despawn In 2000 ms'),
 (-128954, 0, 13, 0, 4, 0, 50, 0, 0, 0, 0, 0, 0, 0, 86, 58207, 0, 10, 128581, 28765, 0, 7, 0, 0, 0, 0, 0, 0, 0, 0, 'Citizen of Havenshire - On Aggro - Cross Cast \'Lich King VO Blocker\'');
-
-
+--
 DELETE FROM `smart_scripts` WHERE (`source_type` = 0 AND `entryorguid` = -128978);
 INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `event_param6`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
 (-128978, 0, 0, 1, 25, 0, 100, 0, 0, 0, 0, 0, 0, 0, 22, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Citizen of Havenshire - On Reset - Set Event Phase 1'),
@@ -553,7 +527,7 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 (-128978, 0, 11, 0, 11, 0, 100, 0, 0, 0, 0, 0, 0, 0, 232, 12897800, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Citizen of Havenshire - On Respawn - Start Path 12897800'),
 (-128978, 0, 12, 0, 109, 0, 100, 0, 0, 12897800, 0, 0, 0, 0, 41, 2000, 120, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Citizen of Havenshire - On Path 12897800 Finished - Despawn In 2000 ms'),
 (-128978, 0, 13, 0, 4, 0, 50, 0, 0, 0, 0, 0, 0, 0, 86, 58207, 0, 10, 128581, 28765, 0, 7, 0, 0, 0, 0, 0, 0, 0, 0, 'Citizen of Havenshire - On Aggro - Cross Cast \'Lich King VO Blocker\'');
-
+--
 DELETE FROM `smart_scripts` WHERE (`source_type` = 0 AND `entryorguid` = -128929);
 INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `event_param6`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
 (-128929, 0, 0, 1, 25, 0, 100, 0, 0, 0, 0, 0, 0, 0, 22, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Citizen of Havenshire - On Reset - Set Event Phase 1'),
@@ -570,8 +544,7 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 (-128929, 0, 11, 0, 11, 0, 100, 0, 0, 0, 0, 0, 0, 0, 232, 12897800, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Citizen of Havenshire - On Respawn - Start Path 12897800'),
 (-128929, 0, 12, 0, 109, 0, 100, 0, 0, 12897800, 0, 0, 0, 0, 41, 2000, 120, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Citizen of Havenshire - On Path 12897800 Finished - Despawn In 2000 ms'),
 (-128929, 0, 13, 0, 4, 0, 50, 0, 0, 0, 0, 0, 0, 0, 86, 58207, 0, 10, 128581, 28765, 0, 7, 0, 0, 0, 0, 0, 0, 0, 0, 'Citizen of Havenshire - On Aggro - Cross Cast \'Lich King VO Blocker\'');
-
-
+--
 DELETE FROM `smart_scripts` WHERE (`source_type` = 0 AND `entryorguid` = -128980);
 INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `event_param6`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
 (-128980, 0, 0, 1, 25, 0, 100, 0, 0, 0, 0, 0, 0, 0, 22, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Citizen of Havenshire - On Reset - Set Event Phase 1'),
@@ -588,7 +561,7 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 (-128980, 0, 11, 0, 11, 0, 100, 0, 0, 0, 0, 0, 0, 0, 232, 12898000, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Citizen of Havenshire - On Respawn - Start Path 12898000'),
 (-128980, 0, 12, 0, 109, 0, 100, 0, 0, 12898000, 0, 0, 0, 0, 41, 2000, 120, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Citizen of Havenshire - On Path 12898000 Finished - Despawn In 2000 ms'),
 (-128980, 0, 13, 0, 4, 0, 50, 0, 0, 0, 0, 0, 0, 0, 86, 58207, 0, 10, 128581, 28765, 0, 7, 0, 0, 0, 0, 0, 0, 0, 0, 'Citizen of Havenshire - On Aggro - Cross Cast \'Lich King VO Blocker\'');
-
+--
 DELETE FROM `smart_scripts` WHERE (`source_type` = 0 AND `entryorguid` = -128934);
 INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `event_param6`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
 (-128934, 0, 0, 1, 25, 0, 100, 0, 0, 0, 0, 0, 0, 0, 22, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Citizen of Havenshire - On Reset - Set Event Phase 1'),
@@ -605,8 +578,7 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 (-128934, 0, 11, 0, 11, 0, 100, 0, 0, 0, 0, 0, 0, 0, 232, 12898000, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Citizen of Havenshire - On Respawn - Start Path 12898000'),
 (-128934, 0, 12, 0, 109, 0, 100, 0, 0, 12898000, 0, 0, 0, 0, 41, 2000, 120, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Citizen of Havenshire - On Path 12898000 Finished - Despawn In 2000 ms'),
 (-128934, 0, 13, 0, 4, 0, 50, 0, 0, 0, 0, 0, 0, 0, 86, 58207, 0, 10, 128581, 28765, 0, 7, 0, 0, 0, 0, 0, 0, 0, 0, 'Citizen of Havenshire - On Aggro - Cross Cast \'Lich King VO Blocker\'');
-
-
+--
 DELETE FROM `smart_scripts` WHERE (`source_type` = 0 AND `entryorguid` = -128981);
 INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `event_param6`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
 (-128981, 0, 0, 1, 25, 0, 100, 0, 0, 0, 0, 0, 0, 0, 22, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Citizen of Havenshire - On Reset - Set Event Phase 1'),
@@ -623,7 +595,7 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 (-128981, 0, 11, 0, 11, 0, 100, 0, 0, 0, 0, 0, 0, 0, 232, 12898100, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Citizen of Havenshire - On Respawn - Start Path 12898100'),
 (-128981, 0, 12, 0, 109, 0, 100, 0, 0, 12898100, 0, 0, 0, 0, 41, 2000, 120, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Citizen of Havenshire - On Path 12898100 Finished - Despawn In 2000 ms'),
 (-128981, 0, 13, 0, 4, 0, 50, 0, 0, 0, 0, 0, 0, 0, 86, 58207, 0, 10, 128581, 28765, 0, 7, 0, 0, 0, 0, 0, 0, 0, 0, 'Citizen of Havenshire - On Aggro - Cross Cast \'Lich King VO Blocker\'');
-
+--
 DELETE FROM `smart_scripts` WHERE (`source_type` = 0 AND `entryorguid` = -128926);
 INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `event_param6`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
 (-128926, 0, 0, 1, 25, 0, 100, 0, 0, 0, 0, 0, 0, 0, 22, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Citizen of Havenshire - On Reset - Set Event Phase 1'),
@@ -640,8 +612,7 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 (-128926, 0, 11, 0, 11, 0, 100, 0, 0, 0, 0, 0, 0, 0, 232, 12898100, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Citizen of Havenshire - On Respawn - Start Path 12898100'),
 (-128926, 0, 12, 0, 109, 0, 100, 0, 0, 12898100, 0, 0, 0, 0, 41, 2000, 120, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Citizen of Havenshire - On Path 12898100 Finished - Despawn In 2000 ms'),
 (-128926, 0, 13, 0, 4, 0, 50, 0, 0, 0, 0, 0, 0, 0, 86, 58207, 0, 10, 128581, 28765, 0, 7, 0, 0, 0, 0, 0, 0, 0, 0, 'Citizen of Havenshire - On Aggro - Cross Cast \'Lich King VO Blocker\'');
-
-
+--
 DELETE FROM `smart_scripts` WHERE (`source_type` = 0 AND `entryorguid` = -128968);
 INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `event_param6`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
 (-128968, 0, 0, 1, 25, 0, 100, 0, 0, 0, 0, 0, 0, 0, 22, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Citizen of Havenshire - On Reset - Set Event Phase 1'),
@@ -658,7 +629,7 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 (-128968, 0, 11, 0, 11, 0, 100, 0, 0, 0, 0, 0, 0, 0, 232, 12896800, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Citizen of Havenshire - On Respawn - Start Path 12896800'),
 (-128968, 0, 12, 0, 109, 0, 100, 0, 0, 12896800, 0, 0, 0, 0, 41, 2000, 120, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Citizen of Havenshire - On Path 12896800 Finished - Despawn In 2000 ms'),
 (-128968, 0, 13, 0, 4, 0, 50, 0, 0, 0, 0, 0, 0, 0, 86, 58207, 0, 10, 128581, 28765, 0, 7, 0, 0, 0, 0, 0, 0, 0, 0, 'Citizen of Havenshire - On Aggro - Cross Cast \'Lich King VO Blocker\'');
-
+--
 DELETE FROM `smart_scripts` WHERE (`source_type` = 0 AND `entryorguid` = -128920);
 INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `event_param6`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
 (-128920, 0, 0, 1, 25, 0, 100, 0, 0, 0, 0, 0, 0, 0, 22, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Citizen of Havenshire - On Reset - Set Event Phase 1'),
@@ -675,8 +646,7 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 (-128920, 0, 11, 0, 11, 0, 100, 0, 0, 0, 0, 0, 0, 0, 232, 12896800, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Citizen of Havenshire - On Respawn - Start Path 12896800'),
 (-128920, 0, 12, 0, 109, 0, 100, 0, 0, 12896800, 0, 0, 0, 0, 41, 2000, 120, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Citizen of Havenshire - On Path 12896800 Finished - Despawn In 2000 ms'),
 (-128920, 0, 13, 0, 4, 0, 50, 0, 0, 0, 0, 0, 0, 0, 86, 58207, 0, 10, 128581, 28765, 0, 7, 0, 0, 0, 0, 0, 0, 0, 0, 'Citizen of Havenshire - On Aggro - Cross Cast \'Lich King VO Blocker\'');
-
-
+--
 DELETE FROM `smart_scripts` WHERE (`source_type` = 0 AND `entryorguid` = -128993);
 INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `event_param6`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
 (-128993, 0, 0, 1, 25, 0, 100, 0, 0, 0, 0, 0, 0, 0, 22, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Citizen of Havenshire - On Reset - Set Event Phase 1'),
@@ -693,7 +663,7 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 (-128993, 0, 11, 0, 11, 0, 100, 0, 0, 0, 0, 0, 0, 0, 232, 12899300, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Citizen of Havenshire - On Respawn - Start Path 12899300'),
 (-128993, 0, 12, 0, 109, 0, 100, 0, 0, 12899300, 0, 0, 0, 0, 41, 2000, 120, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Citizen of Havenshire - On Path 12899300 Finished - Despawn In 2000 ms'),
 (-128993, 0, 13, 0, 4, 0, 50, 0, 0, 0, 0, 0, 0, 0, 86, 58207, 0, 10, 128581, 28765, 0, 7, 0, 0, 0, 0, 0, 0, 0, 0, 'Citizen of Havenshire - On Aggro - Cross Cast \'Lich King VO Blocker\'');
-
+--
 DELETE FROM `smart_scripts` WHERE (`source_type` = 0 AND `entryorguid` = -128916);
 INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `event_param6`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
 (-128916, 0, 0, 1, 25, 0, 100, 0, 0, 0, 0, 0, 0, 0, 22, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Citizen of Havenshire - On Reset - Set Event Phase 1'),
@@ -710,8 +680,7 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 (-128916, 0, 11, 0, 11, 0, 100, 0, 0, 0, 0, 0, 0, 0, 232, 12899300, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Citizen of Havenshire - On Respawn - Start Path 12899300'),
 (-128916, 0, 12, 0, 109, 0, 100, 0, 0, 12899300, 0, 0, 0, 0, 41, 2000, 120, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Citizen of Havenshire - On Path 12899300 Finished - Despawn In 2000 ms'),
 (-128916, 0, 13, 0, 4, 0, 50, 0, 0, 0, 0, 0, 0, 0, 86, 58207, 0, 10, 128581, 28765, 0, 7, 0, 0, 0, 0, 0, 0, 0, 0, 'Citizen of Havenshire - On Aggro - Cross Cast \'Lich King VO Blocker\'');
-
-
+--
 DELETE FROM `smart_scripts` WHERE (`source_type` = 0 AND `entryorguid` = -128991);
 INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `event_param6`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
 (-128991, 0, 0, 1, 25, 0, 100, 0, 0, 0, 0, 0, 0, 0, 22, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Citizen of Havenshire - On Reset - Set Event Phase 1'),
@@ -728,7 +697,7 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 (-128991, 0, 11, 0, 11, 0, 100, 0, 0, 0, 0, 0, 0, 0, 232, 12899100, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Citizen of Havenshire - On Respawn - Start Path 12899100'),
 (-128991, 0, 12, 0, 109, 0, 100, 0, 0, 12899100, 0, 0, 0, 0, 41, 2000, 120, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Citizen of Havenshire - On Path 12899100 Finished - Despawn In 2000 ms'),
 (-128991, 0, 13, 0, 4, 0, 50, 0, 0, 0, 0, 0, 0, 0, 86, 58207, 0, 10, 128581, 28765, 0, 7, 0, 0, 0, 0, 0, 0, 0, 0, 'Citizen of Havenshire - On Aggro - Cross Cast \'Lich King VO Blocker\'');
-
+--
 DELETE FROM `smart_scripts` WHERE (`source_type` = 0 AND `entryorguid` = -128935);
 INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `event_param6`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
 (-128935, 0, 0, 1, 25, 0, 100, 0, 0, 0, 0, 0, 0, 0, 22, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Citizen of Havenshire - On Reset - Set Event Phase 1'),
@@ -745,8 +714,7 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 (-128935, 0, 11, 0, 11, 0, 100, 0, 0, 0, 0, 0, 0, 0, 232, 12899100, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Citizen of Havenshire - On Respawn - Start Path 12899100'),
 (-128935, 0, 12, 0, 109, 0, 100, 0, 0, 12899100, 0, 0, 0, 0, 41, 2000, 120, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Citizen of Havenshire - On Path 12899100 Finished - Despawn In 2000 ms'),
 (-128935, 0, 13, 0, 4, 0, 50, 0, 0, 0, 0, 0, 0, 0, 86, 58207, 0, 10, 128581, 28765, 0, 7, 0, 0, 0, 0, 0, 0, 0, 0, 'Citizen of Havenshire - On Aggro - Cross Cast \'Lich King VO Blocker\'');
-
-
+--
 DELETE FROM `smart_scripts` WHERE (`source_type` = 0 AND `entryorguid` = -128992);
 INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `event_param6`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
 (-128992, 0, 0, 1, 25, 0, 100, 0, 0, 0, 0, 0, 0, 0, 22, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Citizen of Havenshire - On Reset - Set Event Phase 1'),
@@ -763,7 +731,7 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 (-128992, 0, 11, 0, 11, 0, 100, 0, 0, 0, 0, 0, 0, 0, 232, 12899200, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Citizen of Havenshire - On Respawn - Start Path 12899200'),
 (-128992, 0, 12, 0, 109, 0, 100, 0, 0, 12899200, 0, 0, 0, 0, 41, 2000, 120, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Citizen of Havenshire - On Path 12899200 Finished - Despawn In 2000 ms'),
 (-128992, 0, 13, 0, 4, 0, 50, 0, 0, 0, 0, 0, 0, 0, 86, 58207, 0, 10, 128581, 28765, 0, 7, 0, 0, 0, 0, 0, 0, 0, 0, 'Citizen of Havenshire - On Aggro - Cross Cast \'Lich King VO Blocker\'');
-
+--
 DELETE FROM `smart_scripts` WHERE (`source_type` = 0 AND `entryorguid` = -128948);
 INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `event_param6`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
 (-128948, 0, 0, 1, 25, 0, 100, 0, 0, 0, 0, 0, 0, 0, 22, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Citizen of Havenshire - On Reset - Set Event Phase 1'),
@@ -780,9 +748,9 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 (-128948, 0, 11, 0, 11, 0, 100, 0, 0, 0, 0, 0, 0, 0, 232, 12899200, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Citizen of Havenshire - On Respawn - Start Path 12899200'),
 (-128948, 0, 12, 0, 109, 0, 100, 0, 0, 12899200, 0, 0, 0, 0, 41, 2000, 120, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Citizen of Havenshire - On Path 12899200 Finished - Despawn In 2000 ms'),
 (-128948, 0, 13, 0, 4, 0, 50, 0, 0, 0, 0, 0, 0, 0, 86, 58207, 0, 10, 128581, 28765, 0, 7, 0, 0, 0, 0, 0, 0, 0, 0, 'Citizen of Havenshire - On Aggro - Cross Cast \'Lich King VO Blocker\'');
-
+--
 -- Set Groups
-
+--
 DELETE FROM `pool_template` WHERE (`entry` IN (22386, 22387, 22388, 22389, 22390, 22391, 22392, 22393, 22394, 22395, 22396, 22397, 22398));
 INSERT INTO `pool_template` (`entry`, `max_limit`, `description`) VALUES
 (22386, 1, 'Citizen of Havenshire random spawn 1'),
@@ -798,8 +766,7 @@ INSERT INTO `pool_template` (`entry`, `max_limit`, `description`) VALUES
 (22396, 1, 'Citizen of Havenshire random spawn 11'),
 (22397, 1, 'Citizen of Havenshire random spawn 12'),
 (22398, 1, 'Citizen of Havenshire random spawn 13');
-
-
+--
 DELETE FROM `pool_creature` WHERE (`pool_entry` IN (22386, 22387, 22388, 22389, 22390, 22391, 22392, 22393, 22394, 22395, 22396, 22397, 22398));
 INSERT INTO `pool_creature` (`guid`, `pool_entry`, `chance`, `description`) VALUES
 (128922, 22386, 0, 'Citizen of Havenshire (1/2)'),
