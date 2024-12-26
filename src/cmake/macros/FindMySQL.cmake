@@ -161,7 +161,7 @@ if(WIN32)
 
   set(_MYSQL_ROOT_PATHS
     ${_MYSQL_ROOT_PATHS}
-	${_MYSQL_ROOT_PATHS_VERSION_SUBDIRECTORIES}
+    ${_MYSQL_ROOT_PATHS_VERSION_SUBDIRECTORIES}
     "${PROGRAM_FILES_64}/MySQL"
     "${PROGRAM_FILES_32}/MySQL"
     "$ENV{SystemDrive}/MySQL"
@@ -180,7 +180,7 @@ find_path(MYSQL_INCLUDE_DIR
     /usr/local/include
     /usr/local/include/mysql
     /usr/local/mysql/include
-	${_MYSQL_ROOT_PATHS}
+    ${_MYSQL_ROOT_PATHS}
   PATH_SUFFIXES
     include
     include/mysql
@@ -270,10 +270,10 @@ set(MYSQL_REQUIRED_VARS "")
 foreach(_comp IN LISTS MySQL_FIND_COMPONENTS)
   if(_comp STREQUAL "lib")
     set(MySQL_${_comp}_WANTED TRUE)
-	if(MySQL_FIND_REQUIRED_${_comp})
-	  list(APPEND MYSQL_REQUIRED_VARS "MYSQL_LIBRARY")
-	  list(APPEND MYSQL_REQUIRED_VARS "MYSQL_INCLUDE_DIR")
-	endif()
+    if(MySQL_FIND_REQUIRED_${_comp})
+      list(APPEND MYSQL_REQUIRED_VARS "MYSQL_LIBRARY")
+      list(APPEND MYSQL_REQUIRED_VARS "MYSQL_INCLUDE_DIR")
+    endif()
     if(EXISTS "${MYSQL_LIBRARY}" AND EXISTS "${MYSQL_INCLUDE_DIR}")
       set(MySQL_${_comp}_FOUND TRUE)
     else()
@@ -281,9 +281,9 @@ foreach(_comp IN LISTS MySQL_FIND_COMPONENTS)
     endif()
   elseif(_comp STREQUAL "binary")
     set(MySQL_${_comp}_WANTED TRUE)
-	if(MySQL_FIND_REQUIRED_${_comp})
-	  list(APPEND MYSQL_REQUIRED_VARS "MYSQL_EXECUTABLE")
-	endif()
+    if(MySQL_FIND_REQUIRED_${_comp})
+      list(APPEND MYSQL_REQUIRED_VARS "MYSQL_EXECUTABLE")
+    endif()
     if(EXISTS "${MYSQL_EXECUTABLE}" )
       set(MySQL_${_comp}_FOUND TRUE)
     else()
