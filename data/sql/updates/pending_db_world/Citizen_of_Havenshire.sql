@@ -8,7 +8,7 @@ DELETE FROM `creature` WHERE (`id1` = 28577) AND (`guid` IN (128958, 128959, 128
 DELETE FROM `creature_addon` WHERE (`guid` IN (128958, 128959, 128960, 128961, 128962, 128963, 128964, 128965, 128967, 128969, 128971, 128972, 128974, 128975, 128977, 128982, 128983, 128984, 128985, 128987, 128988, 128989, 128990, 128994, 128995, 128996, 128997, 128998, 128999, 129000, 129001));
 
 
--- Set Run Speed 
+-- Set Run Speed
 
 UPDATE `creature_template` SET `speed_run` = 1.05 WHERE (`entry` = 28576);
 UPDATE `creature_template` SET `speed_run` = 1.05 WHERE (`entry` = 28577);
@@ -184,7 +184,7 @@ DELETE FROM `waypoint_data` WHERE `id` IN (12897800);
 INSERT INTO `waypoint_data` (`id`, `point`, `position_x`, `position_y`, `position_z`, `orientation`, `delay`, `move_type`, `action`, `action_chance`, `wpguid`) VALUES
 (12897800, 1, 2023.7551, -5751.5454, 99.346756, NULL, 0, 1, 0, 100, 0),
 (12897800, 2, 1976.9875, -5752.822, 99.495636, NULL, 0, 1, 0, 100, 0),
-(12897800, 3, 1939.8892, -5760.4897, 104.04903, NULL, 0, 1, 0, 100, 0), 
+(12897800, 3, 1939.8892, -5760.4897, 104.04903, NULL, 0, 1, 0, 100, 0),
 (12897800, 4, 1921.4534, -5766.0054, 103.05617, NULL, 0, 1, 0, 100, 0),
 (12897800, 5, 1902.7848, -5806.5317, 100.9096, NULL, 0, 1, 0, 100, 0),
 (12897800, 6, 1871.4408, -5841.7896, 101.79826, NULL, 0, 1, 0, 100, 0),
@@ -784,7 +784,7 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 -- Set Groups
 
 DELETE FROM `pool_template` WHERE (`entry` IN (22386, 22387, 22388, 22389, 22390, 22391, 22392, 22393, 22394, 22395, 22396, 22397, 22398));
-INSERT INTO `pool_template` (`entry`, `max_limit`, `description`) VALUES 
+INSERT INTO `pool_template` (`entry`, `max_limit`, `description`) VALUES
 (22386, 1, 'Citizen of Havenshire random spawn 1'),
 (22387, 1, 'Citizen of Havenshire random spawn 2'),
 (22388, 1, 'Citizen of Havenshire random spawn 3'),
