@@ -26,14 +26,6 @@
 #include "SpellAuraEffects.h"
 #include "SpellScript.h"
 
-DoorData const doorData[] =
-{
-    { GO_LADY_VASHJ_BRIDGE_CONSOLE, DATA_BRIDGE_EMERGED, DOOR_TYPE_PASSAGE },
-    { GO_COILFANG_BRIDGE1,          DATA_BRIDGE_EMERGED, DOOR_TYPE_PASSAGE },
-    { GO_COILFANG_BRIDGE2,          DATA_BRIDGE_EMERGED, DOOR_TYPE_PASSAGE },
-    { GO_COILFANG_BRIDGE3,          DATA_BRIDGE_EMERGED, DOOR_TYPE_PASSAGE }
-};
-
 ObjectData const creatureData[] =
 {
     { NPC_LEOTHERAS_THE_BLIND,    DATA_LEOTHERAS_THE_BLIND    },
@@ -45,8 +37,12 @@ ObjectData const creatureData[] =
 
 ObjectData const gameObjectData[] =
 {
-    { GO_STRANGE_POOL, DATA_STRANGE_POOL },
-    { 0,               0                 }
+    { GO_STRANGE_POOL,              DATA_STRANGE_POOL },
+    { GO_LADY_VASHJ_BRIDGE_CONSOLE, DATA_CONSOLE      },
+    { GO_COILFANG_BRIDGE1,          DATA_BRIDGE_PART1 },
+    { GO_COILFANG_BRIDGE2,          DATA_BRIDGE_PART2 },
+    { GO_COILFANG_BRIDGE3,          DATA_BRIDGE_PART3 },
+    { 0,                            0                 }
 };
 
 MinionData const minionData[] =
@@ -86,7 +82,6 @@ public:
         {
             SetHeaders(DataHeader);
             SetBossNumber(MAX_ENCOUNTERS);
-            LoadDoorData(doorData);
             LoadObjectData(creatureData, gameObjectData);
             LoadMinionData(minionData);
             LoadBossBoundaries(boundaries);
@@ -117,6 +112,12 @@ public:
                 case GO_SHIELD_GENERATOR3:
                 case GO_SHIELD_GENERATOR4:
                     _shieldGeneratorGUID[go->GetEntry() - GO_SHIELD_GENERATOR1] = go->GetGUID();
+                    break;
+                case GO_LADY_VASHJ_BRIDGE_CONSOLE:
+                case GO_COILFANG_BRIDGE1:
+                case GO_COILFANG_BRIDGE2:
+                case GO_COILFANG_BRIDGE3:
+                    go->AllowSaveToDB(true);
                     break;
             }
 
@@ -156,10 +157,6 @@ public:
                 case DATA_PLATFORM_KEEPER_DIED:
                     if (_aliveKeepersCount > MIN_KEEPER_COUNT)
                         --_aliveKeepersCount;
-                    break;
-                case DATA_BRIDGE_ACTIVATED:
-                    SetBossState(DATA_BRIDGE_EMERGED, NOT_STARTED);
-                    SetBossState(DATA_BRIDGE_EMERGED, DONE);
                     break;
                 case DATA_ACTIVATE_SHIELD:
                     if (Creature* vashj = GetCreature(DATA_LADY_VASHJ))
