@@ -68,12 +68,11 @@ RUN git config --global --add safe.directory /azerothcore
 RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime \
     && echo $TZ > /etc/timezone && dpkg-reconfigure --frontend noninteractive tzdata
 
-# Modify the default user and group (ubuntu:x:1000:1000)
-RUN usermod -l $DOCKER_USER -d /home/$DOCKER_USER -m ubuntu \
-    && groupmod -n $DOCKER_USER ubuntu \
-    && usermod -u $USER_ID $DOCKER_USER \
-    && groupmod -g $GROUP_ID $DOCKER_USER \
-    && echo "$DOCKER_USER:$DOCKER_USER" | chpasswd \
+# Create a non-root user
+RUN userdel --remove ubuntu \
+    && addgroup --gid "$GROUP_ID" "$DOCKER_USER" \
+    && adduser --disabled-password --gecos '' --uid "$USER_ID" --gid "$GROUP_ID" "$DOCKER_USER" \
+    && passwd -d "$DOCKER_USER" \
     && echo "$DOCKER_USER ALL=(ALL:ALL) NOPASSWD: ALL" >> /etc/sudoers
 
 # must be created to set the correct permissions on them
@@ -90,7 +89,7 @@ RUN mkdir -p \
     /azerothcore/var/build/obj
 
 # Correct permissions for non-root operations
-RUN chown -R $DOCKER_USER:$DOCKER_USER /run /opt /azerothcore
+RUN chown -R $DOCKER_USER:$DOCKER_USER /home/acore /run /opt /azerothcore
 
 USER $DOCKER_USER
 
