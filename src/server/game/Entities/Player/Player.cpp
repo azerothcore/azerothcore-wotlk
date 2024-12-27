@@ -9845,10 +9845,8 @@ template AC_GAME_API void Player::ApplySpellMod(uint32 spellId, SpellModOp op, u
 template AC_GAME_API void Player::ApplySpellMod(uint32 spellId, SpellModOp op, float& basevalue, Spell* spell, bool temporaryPet);
 
 // Binary predicate for sorting SpellModifiers
-class SpellModPred
+struct SpellModPred
 {
-public:
-    SpellModPred() {}
     bool operator() (SpellModifier const* a, SpellModifier const* b) const
     {
         if (a->type != b->type)
