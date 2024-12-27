@@ -82,7 +82,7 @@ enum Shadowmourne
 
 bool IsVampire(Unit const* unit)
 {
-    if (unit->HasAura(SPELL_ESSENCE_OF_BLOOD_QUEEN) || unit->HasAura(SPELL_ESSENCE_OF_THE_BLOOD_QUEEN_PLR) || unit->HasAura(SPELL_FRENZIED_BLOODTHIRST))
+    if (unit->HasAnyAuras(SPELL_ESSENCE_OF_BLOOD_QUEEN, SPELL_ESSENCE_OF_THE_BLOOD_QUEEN_PLR, SPELL_FRENZIED_BLOODTHIRST))
         return true;
     return false;
 }
