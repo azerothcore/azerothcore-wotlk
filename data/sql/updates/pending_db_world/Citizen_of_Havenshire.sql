@@ -1107,7 +1107,7 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 
 -- Set Groups
 DELETE FROM `pool_template` WHERE (`entry` IN (22386, 22387, 22388, 22389, 22390, 22391, 22392, 22393, 22394, 22395, 22396, 22397, 22398, 22399, 22400, 22401, 22402, 22403, 22404, 22405));
-INSERT INTO `pool_template` (`entry`, `max_limit`, `description`) VALUES 
+INSERT INTO `pool_template` (`entry`, `max_limit`, `description`) VALUES
 (22386, 1, 'Citizen of Havenshire random spawn 1'),
 (22387, 1, 'Citizen of Havenshire random spawn 2'),
 (22388, 1, 'Citizen of Havenshire random spawn 3'),
@@ -1130,7 +1130,7 @@ INSERT INTO `pool_template` (`entry`, `max_limit`, `description`) VALUES
 (22405, 1, 'Citizen of Havenshire random spawn 20');
 
 DELETE FROM `pool_creature` WHERE (`pool_entry` IN (22386, 22387, 22388, 22389, 22390, 22391, 22392, 22393, 22394, 22395, 22396, 22397, 22398, 22399, 22400, 22401, 22402, 22403, 22404, 22405));
-INSERT INTO `pool_creature` (`guid`, `pool_entry`, `chance`, `description`) VALUES 
+INSERT INTO `pool_creature` (`guid`, `pool_entry`, `chance`, `description`) VALUES
 (128922, 22386, 0, 'Citizen of Havenshire (1/2)'),
 (128979, 22386, 0, 'Citizen of Havenshire (2/2)'),
 (128927, 22387, 0, 'Citizen of Havenshire (1/2)'),
