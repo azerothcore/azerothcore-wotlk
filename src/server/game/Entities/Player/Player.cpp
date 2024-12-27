@@ -9773,6 +9773,11 @@ void Player::ApplySpellMod(uint32 spellId, SpellModOp op, T& basevalue, Spell* s
         if (temporaryPet && mod->charges != 0)
             return;
 
+        // skip if already instant or cost is free
+        if (mod->op == SPELLMOD_CASTING_TIME || mod->op == SPELLMOD_COST)
+            if (((float)basevalue + (float)basevalue * (totalmul - 1.0f) + (float)totalflat) <= 0)
+                return;
+
         if (mod->type == SPELLMOD_FLAT)
         {
             // xinef: do not allow to consume more than one 100% crit increasing spell
