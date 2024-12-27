@@ -57,6 +57,11 @@ void SpellMgr::LoadSpellInfoCorrections()
         spellInfo->AttributesEx3 |= SPELL_ATTR3_ALWAYS_HIT;
     });
 
+    ApplySpellFix({ 44401 }, [](SpellInfo* spellInfo)
+    {
+        spellInfo->SpellPriority = 100;
+    });
+
     // Scarlet Raven Priest Image
     ApplySpellFix({ 48763, 48761 }, [](SpellInfo* spellInfo)
     {
@@ -273,17 +278,11 @@ void SpellMgr::LoadSpellInfoCorrections()
         64823,  // Item - Druid T8 Balance 4P Bonus
         34477,  // Misdirection
         44401,  // Missile Barrage
-        18820   // Insight
+        18820,  // Insight
+        57761   // Fireball!
         }, [](SpellInfo* spellInfo)
     {
         spellInfo->ProcCharges = 1;
-    });
-
-    // Fireball
-    ApplySpellFix({ 57761 }, [](SpellInfo* spellInfo)
-    {
-        spellInfo->ProcCharges = 1;
-        spellInfo->SpellPriority = 50;
     });
 
     // Tidal Wave
