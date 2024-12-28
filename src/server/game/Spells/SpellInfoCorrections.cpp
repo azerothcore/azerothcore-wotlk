@@ -57,12 +57,6 @@ void SpellMgr::LoadSpellInfoCorrections()
         spellInfo->AttributesEx3 |= SPELL_ATTR3_ALWAYS_HIT;
     });
 
-    // Missile Barrage
-    ApplySpellFix({ 44401 }, [](SpellInfo* spellInfo)
-    {
-        spellInfo->SpellPriority = 100;
-    });
-
     // Scarlet Raven Priest Image
     ApplySpellFix({ 48763, 48761 }, [](SpellInfo* spellInfo)
     {
@@ -278,7 +272,6 @@ void SpellMgr::LoadSpellInfoCorrections()
         54741,  // Firestarter
         64823,  // Item - Druid T8 Balance 4P Bonus
         34477,  // Misdirection
-        44401,  // Missile Barrage
         18820,  // Insight
         57761   // Fireball!
         }, [](SpellInfo* spellInfo)
@@ -4860,6 +4853,13 @@ void SpellMgr::LoadSpellInfoCorrections()
     ApplySpellFix({ 43112 }, [](SpellInfo* spellInfo)
     {
         spellInfo->RequiresSpellFocus = 0;
+    });
+
+    // Missile Barrage
+    ApplySpellFix({ 44401 }, [](SpellInfo* spellInfo)
+    {
+        spellInfo->ProcCharges = 1;
+        spellInfo->SpellPriority = 100;
     });
 
     for (uint32 i = 0; i < GetSpellInfoStoreSize(); ++i)
