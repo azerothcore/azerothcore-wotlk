@@ -17,76 +17,66 @@
 
 ## Introduction
 
-AzerothCore is an open-source game server application and framework designed for hosting massively multiplayer online role-playing games (MMORPGs). It is based on the popular MMORPG World of Warcraft (WoW) and seeks to recreate the gameplay experience of the original game from patch 3.3.5a.
+AzerothCore is a community-driven, open-source game server framework designed to host massive multiplayer online role-playing games (MMORPGs). This project is based on World of Warcraft (WoW) and aims to recreate the gameplay experience of the Wrath of the Lich King (WotLK) expansion, specifically patch 3.3.5a.
 
-The original code is based on MaNGOS, TrinityCore, and SunwellCore and has since then had extensive development to improve stability, in-game mechanics, and modularity to the game. AC has also grown into a community-driven project with a significant number of contributors and developers. It is written in C++ and provides a solid foundation for creating private servers that mimic the mechanics and behavior of the official WoW servers.
+Originally derived from MaNGOS, TrinityCore, and SunwellCore, AzerothCore has developed extensively to improve stability, in-game mechanics, and modularity. The project has become a reliable foundation for creating private servers replicating the official WoW experience while fostering a collaborative environment for developers and enthusiasts.
 
 ## Philosophy
 
-Our main goal is to create a playable game server, offering a fully working in-game experience.
+Our objective is to deliver a high-quality, fully functional game server emulator that provides a seamless in-game experience.
 
-Here are the main points we focus on:
+Key objectives include:
 
-* Stability
-  * We make sure all changes pass the CIs before being merged into the master branch.
+- **Stability**: We ensure all pull requests pass the CI checks before being pushed into the master branch.
+- **Blizzlike content**: We strive to replicate the authentic WoW experience with a high standard for bug fixes, gameplay mechanics, and content accuracy.
+- **Customization**: AzerothCore’s modular design makes it easy to customize gameplay experiences using different community-made modules.
+- **Community-driven**: AzerothCore is supported by an active community of developers, contributors, and players who collaborate to enhance the project and provide support through different platforms.
 
-* Blizzlike content
-  * We strive to make all in-game content to be blizzlike. Therefore we have a high standard for fixes being made.
+### Modular Design
 
-* Customization
-  * It is easy to customize your experience using [modules](#modules).
-
-* Community driven
-  * AzerothCore has an active community of developers, contributors, and users who collaborate, share knowledge, and provide support through forums, Discord channels, and other communication platforms. 
-
-### Modules
-
-AzerothCore is designed to be highly modular, allowing developers to extend and customize the game to suit their preferences or create unique gameplay experiences. This flexibility enables the addition of custom features, content, and modifications.
-
-We have a lot of modules already made by the community, many of which can be found in the [Module Catalogue](https://www.azerothcore.org/catalogue.html#/).
+AzerothCore is built with a highly modular structure, allowing developers to extend and customize the game to meet specific needs or create unique new gameplay experiences. Numerous modules, many created by the community, are available and can be found in the [Module Catalogue](https://www.azerothcore.org/catalogue.html#/).
 
 ## Installation
 
-Detailed installation instructions are available [here](http://www.azerothcore.org/wiki/installation).
+For detailed installation instructions please see our [installation guide](http://www.azerothcore.org/wiki/installation).
 
 ## Contributing
 
-AzerothCore can also serve as a learning resource for aspiring developers who want to understand how WoW servers work, how MMORPGs are structured, how game server emulators are created, or to improve their C++ and SQL knowledge.
+AzerothCore is an excellent resource for developers seeking to learn about MMORPG server architecture, game server emulation, C++, and SQL. If you're interested in contributing to the project, we encourage you to explore our [contribution guide](https://www.azerothcore.org/wiki/contribute).
 
-If you want to contribute to the project, you will find a lot of resources that will guide you in our [wiki](https://www.azerothcore.org/wiki/contribute).
+We also encourage you to review the [Contributor Covenant Code of Conduct](https://github.com/azerothcore/azerothcore-wotlk/blob/master/.github/CODE_OF_CONDUCT.md) before getting involved.
 
-We also recommend you read our [Contributor Covenant Code of Conduct](https://github.com/azerothcore/azerothcore-wotlk/blob/master/.github/CODE_OF_CONDUCT.md).
+Join our [Discord community](https://discord.gg/gkt4y2x) for real-time discussions and support.
 
-Feel free to join our [Discord server](https://discord.gg/gkt4y2x).
+Show your support by clicking the "⭐ Star" button to help us gain more visibility on GitHub!
 
-Click on the "⭐ Star" button to help us gain more visibility on Github!
+## Documentation
+
+- [Doxygen documentation](https://www.azerothcore.org/pages/doxygen/index.html) - Up-to-date API and source code documentation.
+- [Official Wiki](http://www.azerothcore.org/wiki) - In-depth resources, guides, and database documentation developed by the AzerothCore contributors.
+
+## Useful Links
+
+- [Official Website](http://www.azerothcore.org/) - Learn more about AzerothCore and its features.
+- [AzerothCore Catalogue](http://www.azerothcore.org/catalogue.html) - Modules, tools, and additional resources for AzerothCore.
+- [Discord Community](https://discord.gg/gkt4y2x) - Join us for support and discussion.
+- [GitHub Discussions](https://github.com/azerothcore/azerothcore-wotlk/discussions/) – Ask questions and engage with the community.
+- [LinkedIn](https://www.linkedin.com/company/azerothcore/)
 
 ## Authors & Contributors
 
-The project was born in 2016 based on SunwellCore. Unfortunately, SunwellCore was published without any git history, so on git there are no credits for all the contributors before 2016.
-
-You can check the [authors](https://github.com/azerothcore/azerothcore-wotlk/blob/master/AUTHORS) file for more details.
-
-## Important Links
-
-- [Doxygen documentation](https://www.azerothcore.org/pages/doxygen/index.html)
-- [Website](http://www.azerothcore.org/)
-- [AzerothCore catalogue](http://www.azerothcore.org/catalogue.html  "Modules, tools, and other stuff for AzerothCore") (modules, tools, etc...)
-- [Our Discord server](https://discord.gg/gkt4y2x)
-- [Our wiki](http://www.azerothcore.org/wiki "Easy to use and developed by AzerothCore founder")
-- [Our forum](https://github.com/azerothcore/azerothcore-wotlk/discussions/)
-- [Our Facebook page](https://www.facebook.com/AzerothCore/)
-- [Our LinkedIn page](https://www.linkedin.com/company/azerothcore/)
+AzerothCore was initially created in 2016 based on SunwellCore. Unfortunately, SunwellCore did not have a Git history, so earlier contributors are not listed in the repository. However, you can find a list of authors and contributors in the [AUTHORS](https://github.com/azerothcore/azerothcore-wotlk/blob/master/AUTHORS) file.
 
 ## License
 
-- The new AzerothCore source components are released under the [GNU AGPL v3](https://www.gnu.org/licenses/agpl-3.0.en.html)
-- The old sources based on MaNGOS/TrinityCore are released under the [GNU GPL v2](https://www.gnu.org/licenses/old-licenses/gpl-2.0.en.html)
+- **AzerothCore** is released under the [GNU AGPL v3](https://www.gnu.org/licenses/agpl-3.0.en.html)
+- The original sources from MaNGOS/TrinityCore are released under the [GNU GPL v2](https://www.gnu.org/licenses/old-licenses/gpl-2.0.en.html)
 
-It's important to note that AzerothCore is not an official Blizzard Entertainment product, and it is not affiliated with or endorsed by World of Warcraft or Blizzard Entertainment. AzerothCore does not in any case sponsor nor support illegal public servers. If you use this project to run an illegal public server and not for testing and learning it is your own personal choice.
+Please note, **AzerothCore is not affiliated with Blizzard Entertainment** and is not endorsed by World of Warcraft. It is intended solely for personal use, testing, and educational purposes. Running illegal public servers is not supported by the project.
+
 
 ## Special thanks
 
-[JetBrains](https://www.jetbrains.com/?from=AzerothCore) is providing free [open-source licenses](https://www.jetbrains.com/community/opensource/) to the AzerothCore developers.
+We would like to thank [JetBrains](https://www.jetbrains.com/?from=AzerothCore) for providing free [open-source licenses](https://www.jetbrains.com/community/opensource/) to the AzerothCore developers.
 
 [![JetBrains](https://user-images.githubusercontent.com/75517/51205146-7f225c80-1905-11e9-82e0-835627be170d.png)](https://www.jetbrains.com/?from=AzerothCore)
