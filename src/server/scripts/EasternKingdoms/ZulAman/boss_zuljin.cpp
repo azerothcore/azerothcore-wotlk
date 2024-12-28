@@ -15,12 +15,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-/* ScriptData
-SDName: Boss_ZulJin
-SD%Complete: 85%
-SDComment:
-EndScriptData */
-
+#include "CreatureGroups.h"
 #include "CreatureScript.h"
 #include "Player.h"
 #include "ScriptedCreature.h"
@@ -150,6 +145,9 @@ struct boss_zuljin : public BossAI
         me->SetCombatMovement(true);
         me->m_Events.KillAllEvents(false);
         _nextPhase = 0;
+
+        if (CreatureGroup* formation = me->GetFormation())
+            formation->RespawnFormation(true);
     }
 
     void JustEngagedWith(Unit* /*who*/) override
@@ -163,13 +161,13 @@ struct boss_zuljin : public BossAI
         Talk(SAY_AGGRO, 37s);
 
         // Phase 1: Default (troll)
-        ScheduleTimedEvent(7s, [&] {
+        ScheduleTimedEvent(12s, 29s, [&] {
             DoCastAOE(SPELL_WHIRLWIND);
-        }, 15s, 20s);
+        }, 12s, 29s);
 
-        ScheduleTimedEvent(8s, [&] {
+        ScheduleTimedEvent(7s, 23s, [&] {
             DoCastRandomTarget(SPELL_GRIEVOUS_THROW, 0, 100.0f);
-        }, 10s);
+        }, 7s, 23s);
 
         me->m_Events.AddEventAtOffset([&]() {
             DoCastSelf(SPELL_BERSERK, true);
@@ -179,16 +177,14 @@ struct boss_zuljin : public BossAI
         // Phase 2: Bear Form.
         ScheduleHealthCheckEvent({ 80 }, [&] {
             EnterPhase(PHASE_BEAR);
-            ScheduleTimedEvent(7s, [&] {
+            ScheduleTimedEvent(8s, [&] {
                 DoCastAOE(SPELL_CREEPING_PARALYSIS);
-            }, 20s);
+            }, 26s, 30s);
 
             ScheduleTimedEvent(1s, [&] {
-                if (!me->HasSpellCooldown(SPELL_OVERPOWER))
-                {
-                    if (me->GetVictim() && me->GetComboPoints())
-                        DoCastVictim(SPELL_OVERPOWER);
-                }
+                if (!me->HasSpellCooldown(SPELL_OVERPOWER) && me->GetVictim() && me->GetComboPoints())
+                    if (DoCastVictim(SPELL_OVERPOWER) == SPELL_CAST_OK)
+                        me->AddSpellCooldown(SPELL_OVERPOWER, 0, 5000);
             }, 1s);
         });
 
@@ -201,15 +197,21 @@ struct boss_zuljin : public BossAI
         ScheduleHealthCheckEvent({ 40 }, [&] {
             EnterPhase(PHASE_LYNX);
             me->RemoveAurasDueToSpell(SPELL_ENERGY_STORM);
-            instance->DoRemoveAurasDueToSpellOnPlayers(SPELL_ENERGY_STORM);
+            me->RemoveOwnedAura(SPELL_ENERGY_STORM);
             summons.DespawnEntry(CREATURE_FEATHER_VORTEX);
             me->ResumeChasingVictim();
 
             ScheduleTimedEvent(5s, [&] {
-                DoCastRandomTarget(SPELL_CLAW_RAGE_CHARGE);
+                if (me->HasAura(SPELL_LYNX_RUSH_HASTE))
+                    return;
+
+                DoCastRandomTarget(SPELL_CLAW_RAGE_CHARGE, 1);
             }, 15s, 20s);
 
             ScheduleTimedEvent(14s, [&] {
+                if (me->HasAura(SPELL_CLAW_RAGE_AURA))
+                    return;
+
                 DoCastSelf(SPELL_LYNX_RUSH_HASTE);
 
                 for (int8 count = 0; count <= 8; ++count)
@@ -227,18 +229,33 @@ struct boss_zuljin : public BossAI
             me->m_Events.CancelEventGroup(GROUP_LYNX);
             EnterPhase(PHASE_DRAGONHAWK);
 
-            ScheduleTimedEvent(5s, [&] {
+            ScheduleTimedEvent(12s, 26s, [&] {
                 DoCastSelf(SPELL_FLAME_WHIRL);
-            }, 12s);
+            }, 12s, 26s);
 
-            ScheduleTimedEvent(6s, [&] {
+            ScheduleTimedEvent(11s, 42s, [&] {
                 DoCastRandomTarget(SPELL_SUMMON_PILLAR);
-            }, 10s);
+            }, 5s, 25s);
 
-            ScheduleTimedEvent(7s, [&] {
+            ScheduleTimedEvent(16s, 26s, [&] {
                 DoCastAOE(SPELL_FLAME_BREATH);
-            }, 10s);
+            }, 6s, 25s);
         });
+    }
+
+    void EnterEvadeMode(EvadeReason /*why*/) override
+    {
+        if (CreatureGroup* formation = me->GetFormation())
+        {
+            for (auto const& itr : formation->GetMembers())
+            {
+                if (itr.first && itr.first != me)
+                    itr.first->DespawnOnEvade(2min);
+            }
+        }
+
+        me->DespawnOnEvade(2min);
+        _EnterEvadeMode();
     }
 
     void SpellHitTarget(Unit* target, SpellInfo const* spellInfo) override
@@ -268,6 +285,10 @@ struct boss_zuljin : public BossAI
         instance->SetBossState(DATA_ZULJIN, DONE);
         Talk(SAY_DEATH);
         summons.DespawnEntry(CREATURE_COLUMN_OF_FIRE);
+
+        me->m_Events.AddEventAtOffset( [this] {
+            summons.DespawnAll();
+        }, 3s);
     }
 
     void SpawnAdds()
@@ -303,27 +324,19 @@ struct boss_zuljin : public BossAI
             Talk(Transform[_nextPhase].text);
 
             me->m_Events.AddEventAtOffset([&] {
-                me->SetReactState(REACT_AGGRESSIVE);
                 DoCastSelf(Transform[_nextPhase].spell);
+                DoResetThreatList();
 
                 if (_nextPhase == PHASE_EAGLE)
                 {
                     me->SetCombatMovement(false);
                     DoCastSelf(SPELL_ENERGY_STORM, true); // enemy aura
-                    for (uint8 i = 0; i < 4; ++i)
-                    {
-                        if (Creature* vortex = DoSpawnCreature(CREATURE_FEATHER_VORTEX, 0, 0, 0, 0, TEMPSUMMON_CORPSE_DESPAWN, 0))
-                        {
-                            vortex->CastSpell(vortex, SPELL_CYCLONE_PASSIVE, true);
-                            vortex->CastSpell(vortex, SPELL_CYCLONE_VISUAL, true);
-                            vortex->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
-                            vortex->SetSpeed(MOVE_RUN, 1.0f);
-                            DoZoneInCombat(vortex);
-                        }
-                    }
+                    DoCastAOE(SPELL_SUMMON_CYCLONE, true);
+                    me->SetFacingTo(me->GetHomePosition().GetOrientation());
                 }
                 else
                 {
+                    me->SetReactState(REACT_AGGRESSIVE);
                     me->SetCombatMovement(true);
                     me->ResumeChasingVictim();
                 }
@@ -337,7 +350,6 @@ struct boss_zuljin : public BossAI
         me->SetReactState(REACT_PASSIVE);
         DoStopAttack();
         me->GetMotionMaster()->Clear();
-        DoResetThreatList();
 
         me->SetUInt32Value(UNIT_VIRTUAL_ITEM_SLOT_ID, 0);
         me->RemoveAurasDueToSpell(Transform[NextPhase].unaura);
@@ -358,9 +370,18 @@ struct npc_zuljin_vortex : public ScriptedAI
 {
     npc_zuljin_vortex(Creature* creature) : ScriptedAI(creature) { }
 
-    void Reset() override { }
+    void Reset() override
+    {
+        if (WorldObject* summoner = GetSummoner())
+            if (Creature* zuljin = summoner->ToCreature())
+                me->SetLevel(zuljin->GetLevel());
 
-    void JustEngagedWith(Unit* /*target*/) override { }
+        DoCastSelf(SPELL_CYCLONE_PASSIVE, true);
+        DoCastSelf(SPELL_CYCLONE_VISUAL, true);
+        me->SetSpeed(MOVE_RUN, 1.0f);
+        me->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
+        DoZoneInCombat();
+    }
 
     void SpellHit(Unit* caster, SpellInfo const* spell) override
     {
@@ -370,6 +391,8 @@ struct npc_zuljin_vortex : public ScriptedAI
 
     void UpdateAI(uint32 /*diff*/) override
     {
+        UpdateVictim();
+
         //if the vortex reach the target, it change his target to another player
         if (me->IsWithinMeleeRange(me->GetVictim()))
             AttackStart(SelectTarget(SelectTargetMethod::Random, 0));

@@ -60,173 +60,147 @@ enum Misc
     GO_CRYSTAL_SPIKE                        = 188537
 };
 
-class boss_ormorok : public CreatureScript
+struct boss_ormorok : public BossAI
 {
-public:
-    boss_ormorok() : CreatureScript("boss_ormorok") { }
+    boss_ormorok(Creature* creature) : BossAI(creature, DATA_ORMOROK_EVENT) {}
 
-    CreatureAI* GetAI(Creature* creature) const override
+    uint8 _spikesCount;
+
+    void Reset() override
     {
-        return GetNexusAI<boss_ormorokAI>(creature);
+        _spikesCount = 0;
+        BossAI::Reset();
     }
 
-    struct boss_ormorokAI : public BossAI
+    void JustEngagedWith(Unit* who) override
     {
-        boss_ormorokAI(Creature* creature) : BossAI(creature, DATA_ORMOROK_EVENT)
+        Talk(SAY_AGGRO);
+        BossAI::JustEngagedWith(who);
+
+        events.ScheduleEvent(EVENT_ORMOROK_CRYSTAL_SPIKES, 12s);
+        events.ScheduleEvent(EVENT_ORMOROK_TRAMPLE, 10s);
+        events.ScheduleEvent(EVENT_ORMOROK_SPELL_REFLECTION, 30s);
+        events.ScheduleEvent(EVENT_ORMOROK_HEALTH, 1s);
+        if (IsHeroic())
+            events.ScheduleEvent(EVENT_ORMOROK_SUMMON, 17s);
+    }
+
+    void JustDied(Unit* killer) override
+    {
+        Talk(SAY_DEATH);
+        BossAI::JustDied(killer);
+    }
+
+    void KilledUnit(Unit* /*victim*/) override
+    {
+        if (events.GetNextEventTime(EVENT_KILL_TALK) == 0)
         {
+            Talk(SAY_KILL);
+            events.ScheduleEvent(EVENT_KILL_TALK, 6s);
         }
+    }
 
-        uint8 _spikesCount;
+    void JustSummoned(Creature* summon) override
+    {
+        summons.Summon(summon);
+    }
 
-        void Reset() override
+    void UpdateAI(uint32 diff) override
+    {
+        if (!UpdateVictim())
+            return;
+
+        events.Update(diff);
+        if (me->HasUnitState(UNIT_STATE_CASTING))
+            return;
+
+        switch (events.ExecuteEvent())
         {
-            _spikesCount = 0;
-            BossAI::Reset();
-        }
-
-        void JustEngagedWith(Unit* who) override
-        {
-            Talk(SAY_AGGRO);
-            BossAI::JustEngagedWith(who);
-
-            events.ScheduleEvent(EVENT_ORMOROK_CRYSTAL_SPIKES, 12s);
-            events.ScheduleEvent(EVENT_ORMOROK_TRAMPLE, 10s);
-            events.ScheduleEvent(EVENT_ORMOROK_SPELL_REFLECTION, 30s);
+        case EVENT_ORMOROK_HEALTH:
+            if (me->HealthBelowPct(26))
+            {
+                me->CastSpell(me, SPELL_FRENZY, true);
+                Talk(EMOTE_FRENZY);
+                break;
+            }
             events.ScheduleEvent(EVENT_ORMOROK_HEALTH, 1s);
-            if (IsHeroic())
-                events.ScheduleEvent(EVENT_ORMOROK_SUMMON, 17s);
-        }
-
-        void JustDied(Unit* killer) override
-        {
-            Talk(SAY_DEATH);
-            BossAI::JustDied(killer);
-        }
-
-        void KilledUnit(Unit* /*victim*/) override
-        {
-            if (events.GetNextEventTime(EVENT_KILL_TALK) == 0)
+            break;
+        case EVENT_ORMOROK_TRAMPLE:
+            me->CastSpell(me, SPELL_TRAMPLE, false);
+            events.ScheduleEvent(EVENT_ORMOROK_TRAMPLE, 10s);
+            break;
+        case EVENT_ORMOROK_SPELL_REFLECTION:
+            Talk(SAY_REFLECT);
+            me->CastSpell(me, SPELL_SPELL_REFLECTION, false);
+            events.ScheduleEvent(EVENT_ORMOROK_SPELL_REFLECTION, 30s);
+            break;
+        case EVENT_ORMOROK_SUMMON:
+            if (Unit* target = SelectTarget(SelectTargetMethod::MinDistance, 0, 50.0f, true))
+                me->CastSpell(target, SPELL_SUMMON_CRYSTALLINE_TANGLER, true);
+            events.ScheduleEvent(EVENT_ORMOROK_SUMMON, 17s);
+            break;
+        case EVENT_ORMOROK_CRYSTAL_SPIKES:
+            Talk(SAY_CRYSTAL_SPIKES);
+            me->CastSpell(me, SPELL_CRYSTAL_SPIKES, false);
+            _spikesCount = 0;
+            events.ScheduleEvent(EVENT_ORMOROK_SUMMON_SPIKES, 300ms);
+            events.ScheduleEvent(EVENT_ORMOROK_CRYSTAL_SPIKES, 20s);
+            break;
+        case EVENT_ORMOROK_SUMMON_SPIKES:
+            if (++_spikesCount > 9)
+                break;
+            for (uint8 i = 0; i < 4; ++i)
             {
-                Talk(SAY_KILL);
-                events.ScheduleEvent(EVENT_KILL_TALK, 6s);
+                float o = rand_norm() * 2.0f * M_PI;
+                float x = me->GetPositionX() + 5.0f * _spikesCount * cos(o);
+                float y = me->GetPositionY() + 5.0f * _spikesCount * std::sin(o);
+                float h = me->GetMapHeight(x, y, me->GetPositionZ());
+
+                if (h != INVALID_HEIGHT)
+                    me->SummonCreature(NPC_CRYSTAL_SPIKE, x, y, h, 0, TEMPSUMMON_TIMED_DESPAWN, 7000);
             }
+            events.ScheduleEvent(EVENT_ORMOROK_SUMMON_SPIKES, 200ms);
+            break;
         }
 
-        void JustSummoned(Creature* summon) override
-        {
-            summons.Summon(summon);
-        }
-
-        void UpdateAI(uint32 diff) override
-        {
-            if (!UpdateVictim())
-                return;
-
-            events.Update(diff);
-            if (me->HasUnitState(UNIT_STATE_CASTING))
-                return;
-
-            switch (events.ExecuteEvent())
-            {
-                case EVENT_ORMOROK_HEALTH:
-                    if (me->HealthBelowPct(26))
-                    {
-                        me->CastSpell(me, SPELL_FRENZY, true);
-                        Talk(EMOTE_FRENZY);
-                        break;
-                    }
-                    events.ScheduleEvent(EVENT_ORMOROK_HEALTH, 1s);
-                    break;
-                case EVENT_ORMOROK_TRAMPLE:
-                    me->CastSpell(me, SPELL_TRAMPLE, false);
-                    events.ScheduleEvent(EVENT_ORMOROK_TRAMPLE, 10s);
-                    break;
-                case EVENT_ORMOROK_SPELL_REFLECTION:
-                    Talk(SAY_REFLECT);
-                    me->CastSpell(me, SPELL_SPELL_REFLECTION, false);
-                    events.ScheduleEvent(EVENT_ORMOROK_SPELL_REFLECTION, 30s);
-                    break;
-                case EVENT_ORMOROK_SUMMON:
-                    if (Unit* target = SelectTarget(SelectTargetMethod::MinDistance, 0, 50.0f, true))
-                        me->CastSpell(target, SPELL_SUMMON_CRYSTALLINE_TANGLER, true);
-                    events.ScheduleEvent(EVENT_ORMOROK_SUMMON, 17s);
-                    break;
-                case EVENT_ORMOROK_CRYSTAL_SPIKES:
-                    Talk(SAY_CRYSTAL_SPIKES);
-                    me->CastSpell(me, SPELL_CRYSTAL_SPIKES, false);
-                    _spikesCount = 0;
-                    events.ScheduleEvent(EVENT_ORMOROK_SUMMON_SPIKES, 300ms);
-                    events.ScheduleEvent(EVENT_ORMOROK_CRYSTAL_SPIKES, 20s);
-                    break;
-                case EVENT_ORMOROK_SUMMON_SPIKES:
-                    if (++_spikesCount > 9)
-                        break;
-                    for (uint8 i = 0; i < 4; ++i)
-                    {
-                        float o = rand_norm() * 2.0f * M_PI;
-                        float x = me->GetPositionX() + 5.0f * _spikesCount * cos(o);
-                        float y = me->GetPositionY() + 5.0f * _spikesCount * std::sin(o);
-                        float h = me->GetMapHeight(x, y, me->GetPositionZ());
-
-                        if (h != INVALID_HEIGHT)
-                            me->SummonCreature(NPC_CRYSTAL_SPIKE, x, y, h, 0, TEMPSUMMON_TIMED_DESPAWN, 7000);
-                    }
-                    events.ScheduleEvent(EVENT_ORMOROK_SUMMON_SPIKES, 200ms);
-                    break;
-            }
-
-            DoMeleeAttackIfReady();
-        }
-    };
+        DoMeleeAttackIfReady();
+    }
 };
 
-class npc_crystal_spike : public CreatureScript
+struct npc_crystal_spike : public NullCreatureAI
 {
-public:
-    npc_crystal_spike() : CreatureScript("npc_crystal_spike") { }
+    npc_crystal_spike(Creature* c) : NullCreatureAI(c) { }
 
-    CreatureAI* GetAI(Creature* pCreature) const override
+    int32 _damageTimer;
+    ObjectGuid _gameObjectGUID;
+
+    void Reset() override
     {
-        return GetNexusAI<npc_crystal_spikeAI>(pCreature);
+        if (GameObject* gameobject = me->SummonGameObject(GO_CRYSTAL_SPIKE, me->GetPositionX(), me->GetPositionY(), me->GetPositionZ(), 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 3500))
+            _gameObjectGUID = gameobject->GetGUID();
+
+        _damageTimer = 1;
     }
 
-    struct npc_crystal_spikeAI : public NullCreatureAI
+    void UpdateAI(uint32 diff) override
     {
-        npc_crystal_spikeAI(Creature* c) : NullCreatureAI(c)
+        if (_damageTimer)
         {
-        }
-
-        int32 _damageTimer;
-        ObjectGuid _gameObjectGUID;
-
-        void Reset() override
-        {
-            if (GameObject* gameobject = me->SummonGameObject(GO_CRYSTAL_SPIKE, me->GetPositionX(), me->GetPositionY(), me->GetPositionZ(), 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 3500))
-                _gameObjectGUID = gameobject->GetGUID();
-
-            _damageTimer = 1;
-        }
-
-        void UpdateAI(uint32 diff) override
-        {
-            if (_damageTimer)
+            _damageTimer += diff;
+            if (_damageTimer >= 2000)
             {
-                _damageTimer += diff;
-                if (_damageTimer >= 2000)
-                {
-                    if (GameObject* gameobject = ObjectAccessor::GetGameObject(*me, _gameObjectGUID))
-                        gameobject->SetGoState(GO_STATE_ACTIVE);
+                if (GameObject* gameobject = ObjectAccessor::GetGameObject(*me, _gameObjectGUID))
+                    gameobject->SetGoState(GO_STATE_ACTIVE);
 
-                    me->CastSpell(me, SPELL_CRYSTAL_SPIKE_DAMAGE, false);
-                    _damageTimer = 0;
-                }
+                me->CastSpell(me, SPELL_CRYSTAL_SPIKE_DAMAGE, false);
+                _damageTimer = 0;
             }
         }
-    };
+    }
 };
 
 void AddSC_boss_ormorok()
 {
-    new boss_ormorok();
-    new npc_crystal_spike();
+    RegisterNexusCreatureAI(boss_ormorok);
+    RegisterNexusCreatureAI(npc_crystal_spike);
 }

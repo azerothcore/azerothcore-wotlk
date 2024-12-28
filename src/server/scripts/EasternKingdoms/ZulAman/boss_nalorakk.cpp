@@ -15,13 +15,6 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-/* ScriptData
-SDName: Boss_Nalorakk
-SD%Complete: 100
-SDComment:
-SDCategory: Zul'Aman
-EndScriptData */
-
 #include "CellImpl.h"
 #include "CreatureScript.h"
 #include "GridNotifiers.h"
@@ -111,7 +104,6 @@ struct boss_nalorakk : public BossAI
             _phase = PHASE_START_COMBAT;
             me->SetReactState(REACT_AGGRESSIVE);
             _active = false;
-
         }
     }
 
@@ -199,22 +191,12 @@ struct boss_nalorakk : public BossAI
                     me->GetCreaturesWithEntryInRange(_waveList, 25.0f, NPC_AMANISHI_MEDICINE_MAN);
                     GroupedAttack(_waveList);
                     Talk(SAY_WAVE4);
-                    _introScheduler.Schedule(5s, GROUP_CHECK_DEAD, [this](TaskContext context)
-                    {
-                        if (CheckFullyDeadGroup(_waveList))
-                            if (_phase == PHASE_SEND_GUARDS_4)
-                            {
-                                _introScheduler.CancelGroup(GROUP_CHECK_DEAD);
-                                me->SetHomePosition(me->GetPosition());
-                                me->SetImmuneToAll(false);
-                                me->SetReactState(REACT_AGGRESSIVE);
-                                me->SetInCombatWithZone();
-                                _waveList.clear();
-                                _phase = PHASE_START_COMBAT;
-                                _ranIntro = true;
-                            }
-                        context.Repeat(5s);
-                    });
+                    _waveList.clear();
+                    _phase = PHASE_START_COMBAT;
+                    _ranIntro = true;
+                    me->SetImmuneToAll(false);
+                    me->SetReactState(REACT_AGGRESSIVE);
+                    me->SetHomePosition(me->GetPosition());
                     break;
             }
         }
@@ -230,13 +212,13 @@ struct boss_nalorakk : public BossAI
             Talk(SAY_SURGE);
             DoCastRandomTarget(SPELL_SURGE, 0, 45.0f, false, false, false);
             context.Repeat();
-        }).Schedule(7s, 12s, GROUP_HUMAN, [this](TaskContext context)
+        }).Schedule(15s, 25s, GROUP_HUMAN, [this](TaskContext context)
         {
             DoCastVictim(SPELL_BRUTALSWIPE);
             context.Repeat();
-        }).Schedule(10s, 15s, GROUP_HUMAN, [this](TaskContext context)
+        }).Schedule(6s, 34s, GROUP_HUMAN, [this](TaskContext context)
         {
-            if (me->GetVictim() && !me->GetVictim()->HasAura(SPELL_MANGLEEFFECT))
+            if (me->GetVictim() && !me->GetVictim()->HasAura(SPELL_MANGLE))
             {
                 DoCastVictim(SPELL_MANGLE);
                 context.Repeat(1s);
@@ -258,19 +240,21 @@ struct boss_nalorakk : public BossAI
         if (currentlyInBearForm)
         {
             Talk(SAY_SHIFTEDTOTROLL);
-            me->RemoveAurasDueToSpell(SPELL_BEARFORM);
             scheduler.CancelGroup(GROUP_BEAR);
             _bearForm = false;
+
+            me->SetCanDualWield(true);
+
             scheduler.Schedule(15s, 20s, GROUP_HUMAN, [this](TaskContext context)
             {
                 Talk(SAY_SURGE);
                 DoCastRandomTarget(SPELL_SURGE, 0, 45.0f, false, false, false);
                 context.Repeat();
-            }).Schedule(7s, 12s, GROUP_HUMAN, [this](TaskContext context)
+            }).Schedule(15s, 25s, GROUP_HUMAN, [this](TaskContext context)
             {
                 DoCastVictim(SPELL_BRUTALSWIPE);
                 context.Repeat();
-            }).Schedule(10s, 15s, GROUP_HUMAN, [this](TaskContext context)
+            }).Schedule(6s, 34s, GROUP_HUMAN, [this](TaskContext context)
             {
                 DoCastVictim(SPELL_MANGLE);
                 context.Repeat();
@@ -290,22 +274,24 @@ struct boss_nalorakk : public BossAI
             DoCastSelf(SPELL_BEARFORM, true);
             scheduler.CancelGroup(GROUP_HUMAN);
             _bearForm = true;
-            scheduler.Schedule(2s, GROUP_BEAR, [this](TaskContext context)
+
+            me->SetCanDualWield(false);
+
+            scheduler.Schedule(4s, 26s, GROUP_BEAR, [this](TaskContext context)
             {
                 DoCastVictim(SPELL_LACERATINGSLASH);
-                context.Repeat(18s, 23s);
-            }).Schedule(3s, GROUP_BEAR, [this](TaskContext context)
+                context.Repeat(4s, 26s);
+            }).Schedule(6s, 21s, GROUP_BEAR, [this](TaskContext context)
             {
                 DoCastVictim(SPELL_RENDFLESH);
-                context.Repeat(5s, 10s);
-            }).Schedule(5s, 10s, GROUP_BEAR, [this](TaskContext context)
+                context.Repeat(6s, 21s);
+            }).Schedule(11s, 24s, GROUP_BEAR, [this](TaskContext context)
             {
                 DoCastSelf(SPELL_DEAFENINGROAR);
-                context.Repeat(15s, 20s);
-            }).Schedule(25s, 30s, GROUP_BEAR, [this](TaskContext context)
+                context.Repeat(11s, 24s);
+            }).Schedule(30s, GROUP_BEAR, [this](TaskContext)
             {
                 ShapeShift(_bearForm);
-                context.Repeat();
             });
         }
     }

@@ -2605,6 +2605,13 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
             ProcessEventsFor((SMART_EVENT)SMART_EVENT_TIMED_EVENT_TRIGGERED, nullptr, eventId);
             break;
         }
+        case SMART_ACTION_DISMOUNT:
+        {
+            for (WorldObject* const target : targets)
+                if (IsUnit(target))
+                    target->ToUnit()->Dismount();
+            break;
+        }
         case SMART_ACTION_SET_HOVER:
         {
             for (WorldObject* target : targets)
@@ -3511,8 +3518,15 @@ void SmartScript::GetTargets(ObjectVector& targets, SmartScriptHolder const& e, 
                     {
                         for (GroupReference* groupRef = group->GetFirstMember(); groupRef != nullptr; groupRef = groupRef->next())
                             if (Player* member = groupRef->GetSource())
+                            {
                                 if (member->IsInMap(player))
                                     targets.push_back(member);
+
+                                if (e.target.invokerParty.includePets)
+                                    if (Creature* pet = ObjectAccessor::GetCreatureOrPetOrVehicle(*member, member->GetPetGUID()))
+                                        if (pet->IsPet() && pet->IsInMap(player))
+                                            targets.push_back(pet);
+                            }
                     }
                     // We still add the player to the list if there is no group. If we do
                     // this even if there is a group (thus the else-check), it will add the
@@ -4233,6 +4247,18 @@ void SmartScript::ProcessEvent(SmartScriptHolder& e, Unit* unit, uint32 var0, ui
 
                 break;
             }
+        case SMART_EVENT_IS_IN_MELEE_RANGE:
+            {
+                if (!me)
+                    return;
+
+                if (Unit* victim = me->GetVictim())
+                    if ((!e.event.meleeRange.invert && me->IsWithinMeleeRange(victim, static_cast<float>(e.event.meleeRange.dist))) ||
+                        (e.event.meleeRange.invert && !me->IsWithinMeleeRange(victim, static_cast<float>(e.event.meleeRange.dist))))
+                        ProcessTimedAction(e, e.event.minMaxRepeat.repeatMin, e.event.minMaxRepeat.repeatMax, victim);
+
+                break;
+            }
         case SMART_EVENT_RECEIVE_EMOTE:
             if (e.event.emote.emote == var0)
             {
@@ -4793,6 +4819,7 @@ void SmartScript::InitTimer(SmartScriptHolder& e)
         case SMART_EVENT_AREA_CASTING:
         case SMART_EVENT_IS_BEHIND_TARGET:
         case SMART_EVENT_FRIENDLY_HEALTH_PCT:
+        case SMART_EVENT_IS_IN_MELEE_RANGE:
             RecalcTimer(e, e.event.minMaxRepeat.min, e.event.minMaxRepeat.max);
             break;
         case SMART_EVENT_DISTANCE_CREATURE:
@@ -4878,6 +4905,7 @@ void SmartScript::UpdateTimer(SmartScriptHolder& e, uint32 const diff)
             case SMART_EVENT_FRIENDLY_HEALTH_PCT:
             case SMART_EVENT_DISTANCE_CREATURE:
             case SMART_EVENT_DISTANCE_GAMEOBJECT:
+            case SMART_EVENT_IS_IN_MELEE_RANGE:
                 {
                     ASSERT(executionStack.empty());
                     executionStack.emplace_back(SmartScriptFrame{ e, nullptr, 0, 0, false, nullptr, nullptr });

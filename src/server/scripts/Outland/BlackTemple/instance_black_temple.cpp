@@ -66,8 +66,13 @@ ObjectData const creatureData[] =
     { 0,                             0                              }
 };
 
-ObjectData const objectData[] =
+ObjectData const summonData[] =
 {
+    { NPC_BLADE_OF_AZZINOTH,     DATA_ILLIDAN_STORMRAGE  },
+    { NPC_FLAME_OF_AZZINOTH,     DATA_ILLIDAN_STORMRAGE  },
+    { NPC_PARASITIC_SHADOWFIEND, DATA_ILLIDAN_STORMRAGE  },
+    { NPC_SHADOWY_CONSTRUCT,     DATA_TERON_GOREFIEND    },
+    { NPC_ENSLAVED_SOUL,         DATA_RELIQUARY_OF_SOULS },
     { 0, 0 }
 };
 
@@ -82,7 +87,7 @@ BossBoundaryData const boundaries =
     { DATA_RELIQUARY_OF_SOULS,    new RectangleBoundary(435.9f, 660.3f, 21.2f, 229.6f)       },
     { DATA_RELIQUARY_OF_SOULS,    new ZRangeBoundary(81.8f, 148.0f)                          },
     { DATA_MOTHER_SHAHRAZ,        new RectangleBoundary(903.4f, 982.1f, 92.4f, 313.2f)       },
-    { DATA_ILLIDARI_COUNCIL,      new EllipseBoundary(Position(696.6f, 305.0f), 70.0 , 85.0) },
+    { DATA_ILLIDARI_COUNCIL,      new EllipseBoundary(Position(696.6f, 305.0f), 80.0 , 95.0) },
     { DATA_ILLIDAN_STORMRAGE,     new EllipseBoundary(Position(694.8f, 309.0f), 80.0 , 95.0) }
 };
 
@@ -99,7 +104,8 @@ public:
             SetBossNumber(MAX_ENCOUNTERS);
             LoadDoorData(doorData);
             LoadBossBoundaries(boundaries);
-            LoadObjectData(creatureData, objectData);
+            LoadObjectData(creatureData, nullptr);
+            LoadSummonData(summonData);
 
             ashtongueGUIDs.clear();
         }
@@ -108,20 +114,6 @@ public:
         {
             switch (creature->GetEntry())
             {
-                case NPC_SHADOWY_CONSTRUCT:
-                    if (Creature* teron = GetCreature(DATA_TERON_GOREFIEND))
-                        teron->AI()->JustSummoned(creature);
-                    break;
-                case NPC_ENSLAVED_SOUL:
-                    if (Creature* reliquary = GetCreature(DATA_RELIQUARY_OF_SOULS))
-                        reliquary->AI()->JustSummoned(creature);
-                    break;
-                case NPC_PARASITIC_SHADOWFIEND:
-                case NPC_BLADE_OF_AZZINOTH:
-                case NPC_FLAME_OF_AZZINOTH:
-                    if (Creature* illidan = GetCreature(DATA_ILLIDAN_STORMRAGE))
-                        illidan->AI()->JustSummoned(creature);
-                    break;
                 case NPC_ANGERED_SOUL_FRAGMENT:
                 case NPC_HUNGERING_SOUL_FRAGMENT:
                 case NPC_SUFFERING_SOUL_FRAGMENT:
