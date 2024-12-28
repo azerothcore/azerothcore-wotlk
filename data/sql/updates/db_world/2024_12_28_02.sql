@@ -1,3 +1,4 @@
+-- DB update 2024_12_28_01 -> 2024_12_28_02
 --
 -- Adds if missing SAI to Deadwood Warrior, Gardener and Pathfinder
 UPDATE `creature_template` SET `AIName` = 'SmartAI' WHERE `entry` in (7153, 7154, 7155);
