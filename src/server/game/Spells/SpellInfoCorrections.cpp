@@ -57,6 +57,7 @@ void SpellMgr::LoadSpellInfoCorrections()
         spellInfo->AttributesEx3 |= SPELL_ATTR3_ALWAYS_HIT;
     });
 
+    // Missile Barrage
     ApplySpellFix({ 44401 }, [](SpellInfo* spellInfo)
     {
         spellInfo->SpellPriority = 100;
