@@ -8,16 +8,16 @@ UPDATE `creature_addon` SET `auras` = '' WHERE (`guid` IN (128916, 128921, 12892
 UPDATE `creature_addon` SET `auras` = '' WHERE (`guid` IN (128966, 128969, 128972, 128975, 128980));
 
 -- Remove Guids
-DELETE FROM `creature` WHERE (`id1` = 28576) AND (`guid` IN (128918, 128919, 128921, 128923, 128925, 128931, 128932, 128933, 128936, 128937, 128938, 128939, 128940, 128941, 128942, 128943, 128944, 128945, 128946, 128947, 128949, 128950, 128951, 128952, 128953, 128955, 128956, 128957));
-DELETE FROM `creature_addon` WHERE (`guid` IN (128918, 128919, 128921, 128923, 128925, 128931, 128932, 128933, 128936, 128937, 128938, 128939, 128940, 128941, 128942, 128943, 128944, 128945, 128946, 128947, 128949, 128950, 128951, 128952, 128953, 128955, 128956, 128957));
-DELETE FROM `creature` WHERE (`id1` = 28577) AND (`guid` IN (128965, 128967, 128969, 128971, 128972, 128974, 128975, 128977, 128982, 128983, 128984, 128985, 128987, 128988, 128989, 128990, 128994, 128995, 128996, 128997, 128998, 128999, 129000, 129001));
-DELETE FROM `creature_addon` WHERE (`guid` IN (128965, 128967, 128969, 128971, 128972, 128974, 128975, 128977, 128982, 128983, 128984, 128985, 128987, 128988, 128989, 128990, 128994, 128995, 128996, 128997, 128998, 128999, 129000, 129001));
+DELETE FROM `creature` WHERE (`id1` = 28576) AND (`guid` IN (128921, 128923, 128925, 128931, 128932, 128933, 128936, 128937, 128938, 128939, 128940, 128941, 128942, 128943, 128944, 128945, 128946, 128947, 128949, 128950, 128951, 128952, 128953, 128955, 128956, 128957));
+DELETE FROM `creature_addon` WHERE (`guid` IN (128921, 128923, 128925, 128931, 128932, 128933, 128936, 128937, 128938, 128939, 128940, 128941, 128942, 128943, 128944, 128945, 128946, 128947, 128949, 128950, 128951, 128952, 128953, 128955, 128956, 128957));
+DELETE FROM `creature` WHERE (`id1` = 28577) AND (`guid` IN (128969, 128971, 128972, 128974, 128975, 128977, 128982, 128983, 128984, 128985, 128987, 128988, 128989, 128990, 128994, 128995, 128996, 128997, 128998, 128999, 129000, 129001));
+DELETE FROM `creature_addon` WHERE (`guid` IN (128969, 128971, 128972, 128974, 128975, 128977, 128982, 128983, 128984, 128985, 128987, 128988, 128989, 128990, 128994, 128995, 128996, 128997, 128998, 128999, 129000, 129001));
 
 -- Change Wander Distance and Movement Type
-UPDATE `creature` SET `wander_distance` = 0, `MovementType` = 0 WHERE `guid` IN (128927, 128928, 128930, 128922, 128924, 128954, 128929, 128934, 128926, 128920, 128916, 128935, 128948, 128910, 128911, 128912, 128913, 128914, 128915, 128917) AND `id1` = 28576;
-UPDATE `creature` SET `wander_distance` = 0, `MovementType` = 0 WHERE `guid` IN (128973, 128980, 128976, 128978, 128981, 128968, 128993, 128979, 128986, 128970, 128966, 128991, 128992, 128958, 128959, 128960, 128961, 128962, 128963, 128964) AND `id1` = 28577;
+UPDATE `creature` SET `wander_distance` = 0, `MovementType` = 0 WHERE `guid` IN (128927, 128928, 128930, 128922, 128924, 128954, 128929, 128934, 128926, 128920, 128916, 128935, 128948, 128910, 128911, 128912, 128913, 128914, 128915, 128917, 128918, 128919) AND `id1` = 28576;
+UPDATE `creature` SET `wander_distance` = 0, `MovementType` = 0 WHERE `guid` IN (128973, 128980, 128976, 128978, 128981, 128968, 128993, 128979, 128986, 128970, 128966, 128991, 128992, 128958, 128959, 128960, 128961, 128962, 128963, 128964, 128965, 128967) AND `id1` = 28577;
 
--- Change Positions and spawninsec (sniffed values)
+-- Change Positions (sniffed values)
 UPDATE `creature` SET `position_x` = 2083.5244, `position_y` = -5713.8477, `position_z` = 100.62685, `orientation` = 5.6665, `spawntimesecs` = 120 WHERE `guid` = 128922 AND `id1` = 28576;
 UPDATE `creature` SET `position_x` = 2083.5244, `position_y` = -5713.8477, `position_z` = 100.62685, `orientation` = 5.6665, `spawntimesecs` = 120 WHERE `guid` = 128979 AND `id1` = 28577;
 UPDATE `creature` SET `position_x` = 1959.51, `position_y` = -5809.41, `position_z` = 101.222, `orientation` = 1.48353, `spawntimesecs` = 120 WHERE `guid` = 128927 AND `id1` = 28576;
@@ -58,6 +58,10 @@ UPDATE `creature` SET `position_x` = 2286.7288, `position_y` = -5786.4834, `posi
 UPDATE `creature` SET `position_x` = 2286.7288, `position_y` = -5786.4834, `position_z` = 101.393166, `orientation` = 2.39381, `spawntimesecs` = 120 WHERE `guid` = 128915 AND `id1` = 28576;
 UPDATE `creature` SET `position_x` = 2316.1199, `position_y` = -5880.3145, `position_z` = 100.80853, `orientation` = 2.82385, `spawntimesecs` = 120 WHERE `guid` = 128964 AND `id1` = 28577;
 UPDATE `creature` SET `position_x` = 2316.1199, `position_y` = -5880.3145, `position_z` = 100.80853, `orientation` = 2.82385, `spawntimesecs` = 120 WHERE `guid` = 128917 AND `id1` = 28576;
+UPDATE `creature` SET `position_x` = 2172.77, `position_y` = -5739.8115, `position_z` = 101.75742, `orientation` = 4.92786, `spawntimesecs` = 120 WHERE `guid` = 128965 AND `id1` = 28577;
+UPDATE `creature` SET `position_x` = 2172.77, `position_y` = -5739.8115, `position_z` = 101.75742, `orientation` = 4.92786, `spawntimesecs` = 120 WHERE `guid` = 128918 AND `id1` = 28576;
+UPDATE `creature` SET `position_x` = 1959.3444, `position_y` = -5881.302, `position_z` = 101.192764, `orientation` = 2.11768, `spawntimesecs` = 120 WHERE `guid` = 128967 AND `id1` = 28577;
+UPDATE `creature` SET `position_x` = 1959.3444, `position_y` = -5881.302, `position_z` = 101.192764, `orientation` = 2.11768, `spawntimesecs` = 120 WHERE `guid` = 128919 AND `id1` = 28576;
 
 -- Waypoints
 DELETE FROM `waypoint_data` WHERE `id` IN (12897300);
@@ -413,9 +417,44 @@ INSERT INTO `waypoint_data` (`id`, `point`, `position_x`, `position_y`, `positio
 (12896400, 12, 1682.9327, -5873.7715, 116.17101, NULL, 0, 1, 0, 100, 0),
 (12896400, 13, 1663.3423, -5876.8574, 117.27307, NULL, 0, 1, 0, 100, 0);
 
+DELETE FROM `waypoint_data` WHERE `id` IN (12896500);
+INSERT INTO `waypoint_data` (`id`, `point`, `position_x`, `position_y`, `position_z`, `orientation`, `delay`, `move_type`, `action`, `action_chance`, `wpguid`) VALUES
+(12896500, 1, 2152.1838, -5846.8916, 101.93773, NULL, 0, 1, 0, 100, 0),
+(12896500, 2, 2112.2366, -5870.4365, 102.70522, NULL, 0, 1, 0, 100, 0),
+(12896500, 3, 2076.472, -5888.584, 104.19423, NULL, 0, 1, 0, 100, 0),
+(12896500, 4, 2041.5881, -5906.801, 105.34805, NULL, 0, 1, 0, 100, 0),
+(12896500, 5, 2022.9102, -5905.6533, 104.899635, NULL, 0, 1, 0, 100, 0),
+(12896500, 6, 2004.056, -5904.8228, 103.98675, NULL, 0, 1, 0, 100, 0),
+(12896500, 7, 1960.9049, -5902.596, 102.14691, NULL, 0, 1, 0, 100, 0),
+(12896500, 8, 1920.0485, -5909.797, 101.558655, NULL, 0, 1, 0, 100, 0),
+(12896500, 9, 1871.5569, -5910.3486, 104.01594, NULL, 0, 1, 0, 100, 0),
+(12896500, 10, 1828.5173, -5925.0347, 110.76521, NULL, 0, 1, 0, 100, 0),
+(12896500, 11, 1796.468, -5930.4634, 116.01326, NULL, 0, 1, 0, 100, 0),
+(12896500, 12, 1756.4623, -5915.221, 116.10086, NULL, 0, 1, 0, 100, 0),
+(12896500, 13, 1716.3547, -5893.5947, 116.14236, NULL, 0, 1, 0, 100, 0),
+(12896500, 14, 1682.9327, -5873.7715, 116.17101, NULL, 0, 1, 0, 100, 0),
+(12896500, 15, 1663.3423, -5876.8574, 117.27307, NULL, 0, 1, 0, 100, 0);
+
+DELETE FROM `waypoint_data` WHERE `id` IN (12896700);
+INSERT INTO `waypoint_data` (`id`, `point`, `position_x`, `position_y`, `position_z`, `orientation`, `delay`, `move_type`, `action`, `action_chance`, `wpguid`) VALUES
+(12896700, 1, 1924.832, -5845.7256, 100.16112, NULL, 0, 1, 0, 100, 0),
+(12896700, 2, 1895.1543, -5841.2715, 101.08778, NULL, 0, 1, 0, 100, 0),
+(12896700, 3, 1878.0494, -5832.7056, 101.27008, NULL, 0, 1, 0, 100, 0),
+(12896700, 4, 1835.2166, -5819.3623, 100.88735, NULL, 0, 1, 0, 100, 0),
+(12896700, 5, 1796.6736, -5819.528, 110.19136, NULL, 0, 1, 0, 100, 0),
+(12896700, 6, 1763.368, -5820.3086, 116.104294, NULL, 0, 1, 0, 100, 0),
+(12896700, 7, 1724.2448, -5821.062, 116.12348, NULL, 0, 1, 0, 100, 0),
+(12896700, 8, 1711.1307, -5820.6772, 116.12192, NULL, 0, 1, 0, 100, 0),
+(12896700, 9, 1698.2572, -5809.4565, 115.92327, NULL, 0, 1, 0, 100, 0),
+(12896700, 10, 1664.177, -5784.301, 116.112946, NULL, 0, 1, 0, 100, 0),
+(12896700, 11, 1621.61, -5777.791, 116.11258, NULL, 0, 1, 0, 100, 0),
+(12896700, 12, 1602.2942, -5754.3105, 119.27875, NULL, 0, 1, 0, 100, 0),
+(12896700, 13, 1586.1525, -5721.0815, 121.68814, NULL, 0, 1, 0, 100, 0),
+(12896700, 14, 1575.1832, -5725.3354, 120.891266, NULL, 0, 1, 0, 100, 0);
+
 -- Set Comment
-UPDATE `creature` SET `Comment` = "has guid specific SAI" WHERE (`id1` = 28576) AND (`guid` IN (128922, 128927, 128928, 128930, 128924, 128954, 128929, 128934, 128926, 128920, 128916, 128935, 128948, 128910, 128911, 128912, 128913, 128914, 128915, 128917));
-UPDATE `creature` SET `Comment` = "has guid specific SAI" WHERE (`id1` = 28577) AND (`guid` IN (128979, 128986, 128970, 128966, 128973, 128976, 128978, 128980, 128981, 128968, 128993, 128991, 128992, 128958, 128959, 128960, 128961, 128962, 128963, 128964));
+UPDATE `creature` SET `Comment` = "has guid specific SAI" WHERE (`id1` = 28576) AND (`guid` IN (128922, 128927, 128928, 128930, 128924, 128954, 128929, 128934, 128926, 128920, 128916, 128935, 128948, 128910, 128911, 128912, 128913, 128914, 128915, 128917, 128918, 128919));
+UPDATE `creature` SET `Comment` = "has guid specific SAI" WHERE (`id1` = 28577) AND (`guid` IN (128979, 128986, 128970, 128966, 128973, 128976, 128978, 128980, 128981, 128968, 128993, 128991, 128992, 128958, 128959, 128960, 128961, 128962, 128963, 128964, 128965, 128967));
 
 -- Remove Generic SmartAI
 UPDATE `creature_template` SET `AIName` = 'SmartAI' WHERE `entry` = 28576;
@@ -425,6 +464,74 @@ UPDATE `creature_template` SET `AIName` = 'SmartAI' WHERE `entry` = 28577;
 DELETE FROM `smart_scripts` WHERE (`entryorguid` = 28577) AND (`source_type` = 0);
 
 -- Set SmartAI
+DELETE FROM `smart_scripts` WHERE (`source_type` = 0 AND `entryorguid` = -128919);
+INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `event_param6`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
+(-128919, 0, 0, 1, 25, 0, 100, 0, 0, 0, 0, 0, 0, 0, 22, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Citizen of Havenshire - On Reset - Set Event Phase 1'),
+(-128919, 0, 1, 0, 61, 0, 100, 0, 0, 0, 0, 0, 0, 0, 8, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Citizen of Havenshire - On Reset - Set Reactstate Passive'),
+(-128919, 0, 2, 0, 4, 0, 50, 0, 0, 0, 0, 0, 0, 0, 22, 2, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Citizen of Havenshire - On Aggro - Set Event Phase 2'),
+(-128919, 0, 3, 4, 0, 1, 100, 0, 0, 0, 0, 0, 0, 0, 11, 51604, 2, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Citizen of Havenshire - In Combat - Cast \'Serverside - Stun Self\' (Phase 1)'),
+(-128919, 0, 4, 5, 61, 0, 100, 0, 0, 0, 0, 0, 0, 0, 4, 14561, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Citizen of Havenshire - In Combat - Play Sound 14561 (Phase 1)'),
+(-128919, 0, 5, 6, 61, 0, 100, 0, 0, 0, 0, 0, 0, 0, 17, 431, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Citizen of Havenshire - In Combat - Set Emote State 431 (Phase 1)'),
+(-128919, 0, 6, 0, 61, 0, 100, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Citizen of Havenshire - In Combat - Say Line 1 (Phase 1)'),
+(-128919, 0, 7, 8, 0, 2, 100, 0, 0, 0, 0, 0, 0, 0, 8, 2, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Citizen of Havenshire - In Combat - Set Reactstate Aggressive (Phase 2)'),
+(-128919, 0, 8, 9, 61, 0, 100, 0, 0, 0, 0, 0, 0, 0, 11, 52262, 2, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Citizen of Havenshire - In Combat - Cast \'Cornered and Enraged!\' (Phase 2)'),
+(-128919, 0, 9, 0, 61, 0, 100, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Citizen of Havenshire - In Combat - Say Line 0 (Phase 2)'),
+(-128919, 0, 10, 0, 6, 0, 100, 0, 0, 0, 0, 0, 0, 0, 1, 2, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Citizen of Havenshire - On Just Died - Say Line 2'),
+(-128919, 0, 11, 0, 11, 0, 100, 0, 0, 0, 0, 0, 0, 0, 232, 12896700, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Citizen of Havenshire - On Respawn - Start Path 12896700'),
+(-128919, 0, 12, 0, 109, 0, 100, 0, 0, 12896700, 0, 0, 0, 0, 41, 2000, 120, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Citizen of Havenshire - On Path 12896700 Finished - Despawn In 2000 ms'),
+(-128919, 0, 13, 0, 4, 0, 50, 0, 0, 0, 0, 0, 0, 0, 86, 58207, 0, 10, 128581, 28765, 0, 7, 0, 0, 0, 0, 0, 0, 0, 0, 'Citizen of Havenshire - On Aggro - Cross Cast \'Lich King VO Blocker\'');
+
+DELETE FROM `smart_scripts` WHERE (`source_type` = 0 AND `entryorguid` = -128967);
+INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `event_param6`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
+(-128967, 0, 0, 1, 25, 0, 100, 0, 0, 0, 0, 0, 0, 0, 22, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Citizen of Havenshire - On Reset - Set Event Phase 1'),
+(-128967, 0, 1, 0, 61, 0, 100, 0, 0, 0, 0, 0, 0, 0, 8, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Citizen of Havenshire - On Reset - Set Reactstate Passive'),
+(-128967, 0, 2, 0, 4, 0, 50, 0, 0, 0, 0, 0, 0, 0, 22, 2, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Citizen of Havenshire - On Aggro - Set Event Phase 2'),
+(-128967, 0, 3, 4, 0, 1, 100, 0, 0, 0, 0, 0, 0, 0, 11, 51604, 2, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Citizen of Havenshire - In Combat - Cast \'Serverside - Stun Self\' (Phase 1)'),
+(-128967, 0, 4, 5, 61, 0, 100, 0, 0, 0, 0, 0, 0, 0, 4, 14561, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Citizen of Havenshire - In Combat - Play Sound 14561 (Phase 1)'),
+(-128967, 0, 5, 6, 61, 0, 100, 0, 0, 0, 0, 0, 0, 0, 17, 431, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Citizen of Havenshire - In Combat - Set Emote State 431 (Phase 1)'),
+(-128967, 0, 6, 0, 61, 0, 100, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Citizen of Havenshire - In Combat - Say Line 1 (Phase 1)'),
+(-128967, 0, 7, 8, 0, 2, 100, 0, 0, 0, 0, 0, 0, 0, 8, 2, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Citizen of Havenshire - In Combat - Set Reactstate Aggressive (Phase 2)'),
+(-128967, 0, 8, 9, 61, 0, 100, 0, 0, 0, 0, 0, 0, 0, 11, 52262, 2, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Citizen of Havenshire - In Combat - Cast \'Cornered and Enraged!\' (Phase 2)'),
+(-128967, 0, 9, 0, 61, 0, 100, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Citizen of Havenshire - In Combat - Say Line 0 (Phase 2)'),
+(-128967, 0, 10, 0, 6, 0, 100, 0, 0, 0, 0, 0, 0, 0, 1, 2, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Citizen of Havenshire - On Just Died - Say Line 2'),
+(-128967, 0, 11, 0, 11, 0, 100, 0, 0, 0, 0, 0, 0, 0, 232, 12896700, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Citizen of Havenshire - On Respawn - Start Path 12896700'),
+(-128967, 0, 12, 0, 109, 0, 100, 0, 0, 12896700, 0, 0, 0, 0, 41, 2000, 120, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Citizen of Havenshire - On Path 12896700 Finished - Despawn In 2000 ms'),
+(-128967, 0, 13, 0, 4, 0, 50, 0, 0, 0, 0, 0, 0, 0, 86, 58207, 0, 10, 128581, 28765, 0, 7, 0, 0, 0, 0, 0, 0, 0, 0, 'Citizen of Havenshire - On Aggro - Cross Cast \'Lich King VO Blocker\'');
+
+DELETE FROM `smart_scripts` WHERE (`source_type` = 0 AND `entryorguid` = -128918);
+INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `event_param6`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
+(-128918, 0, 0, 1, 25, 0, 100, 0, 0, 0, 0, 0, 0, 0, 22, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Citizen of Havenshire - On Reset - Set Event Phase 1'),
+(-128918, 0, 1, 0, 61, 0, 100, 0, 0, 0, 0, 0, 0, 0, 8, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Citizen of Havenshire - On Reset - Set Reactstate Passive'),
+(-128918, 0, 2, 0, 4, 0, 50, 0, 0, 0, 0, 0, 0, 0, 22, 2, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Citizen of Havenshire - On Aggro - Set Event Phase 2'),
+(-128918, 0, 3, 4, 0, 1, 100, 0, 0, 0, 0, 0, 0, 0, 11, 51604, 2, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Citizen of Havenshire - In Combat - Cast \'Serverside - Stun Self\' (Phase 1)'),
+(-128918, 0, 4, 5, 61, 0, 100, 0, 0, 0, 0, 0, 0, 0, 4, 14561, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Citizen of Havenshire - In Combat - Play Sound 14561 (Phase 1)'),
+(-128918, 0, 5, 6, 61, 0, 100, 0, 0, 0, 0, 0, 0, 0, 17, 431, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Citizen of Havenshire - In Combat - Set Emote State 431 (Phase 1)'),
+(-128918, 0, 6, 0, 61, 0, 100, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Citizen of Havenshire - In Combat - Say Line 1 (Phase 1)'),
+(-128918, 0, 7, 8, 0, 2, 100, 0, 0, 0, 0, 0, 0, 0, 8, 2, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Citizen of Havenshire - In Combat - Set Reactstate Aggressive (Phase 2)'),
+(-128918, 0, 8, 9, 61, 0, 100, 0, 0, 0, 0, 0, 0, 0, 11, 52262, 2, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Citizen of Havenshire - In Combat - Cast \'Cornered and Enraged!\' (Phase 2)'),
+(-128918, 0, 9, 0, 61, 0, 100, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Citizen of Havenshire - In Combat - Say Line 0 (Phase 2)'),
+(-128918, 0, 10, 0, 6, 0, 100, 0, 0, 0, 0, 0, 0, 0, 1, 2, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Citizen of Havenshire - On Just Died - Say Line 2'),
+(-128918, 0, 11, 0, 11, 0, 100, 0, 0, 0, 0, 0, 0, 0, 232, 12896500, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Citizen of Havenshire - On Respawn - Start Path 12896500'),
+(-128918, 0, 12, 0, 109, 0, 100, 0, 0, 12896500, 0, 0, 0, 0, 41, 2000, 120, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Citizen of Havenshire - On Path 12896500 Finished - Despawn In 2000 ms'),
+(-128918, 0, 13, 0, 4, 0, 50, 0, 0, 0, 0, 0, 0, 0, 86, 58207, 0, 10, 128581, 28765, 0, 7, 0, 0, 0, 0, 0, 0, 0, 0, 'Citizen of Havenshire - On Aggro - Cross Cast \'Lich King VO Blocker\'');
+
+DELETE FROM `smart_scripts` WHERE (`source_type` = 0 AND `entryorguid` = -128965);
+INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `event_param6`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
+(-128965, 0, 0, 1, 25, 0, 100, 0, 0, 0, 0, 0, 0, 0, 22, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Citizen of Havenshire - On Reset - Set Event Phase 1'),
+(-128965, 0, 1, 0, 61, 0, 100, 0, 0, 0, 0, 0, 0, 0, 8, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Citizen of Havenshire - On Reset - Set Reactstate Passive'),
+(-128965, 0, 2, 0, 4, 0, 50, 0, 0, 0, 0, 0, 0, 0, 22, 2, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Citizen of Havenshire - On Aggro - Set Event Phase 2'),
+(-128965, 0, 3, 4, 0, 1, 100, 0, 0, 0, 0, 0, 0, 0, 11, 51604, 2, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Citizen of Havenshire - In Combat - Cast \'Serverside - Stun Self\' (Phase 1)'),
+(-128965, 0, 4, 5, 61, 0, 100, 0, 0, 0, 0, 0, 0, 0, 4, 14561, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Citizen of Havenshire - In Combat - Play Sound 14561 (Phase 1)'),
+(-128965, 0, 5, 6, 61, 0, 100, 0, 0, 0, 0, 0, 0, 0, 17, 431, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Citizen of Havenshire - In Combat - Set Emote State 431 (Phase 1)'),
+(-128965, 0, 6, 0, 61, 0, 100, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Citizen of Havenshire - In Combat - Say Line 1 (Phase 1)'),
+(-128965, 0, 7, 8, 0, 2, 100, 0, 0, 0, 0, 0, 0, 0, 8, 2, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Citizen of Havenshire - In Combat - Set Reactstate Aggressive (Phase 2)'),
+(-128965, 0, 8, 9, 61, 0, 100, 0, 0, 0, 0, 0, 0, 0, 11, 52262, 2, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Citizen of Havenshire - In Combat - Cast \'Cornered and Enraged!\' (Phase 2)'),
+(-128965, 0, 9, 0, 61, 0, 100, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Citizen of Havenshire - In Combat - Say Line 0 (Phase 2)'),
+(-128965, 0, 10, 0, 6, 0, 100, 0, 0, 0, 0, 0, 0, 0, 1, 2, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Citizen of Havenshire - On Just Died - Say Line 2'),
+(-128965, 0, 11, 0, 11, 0, 100, 0, 0, 0, 0, 0, 0, 0, 232, 12896500, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Citizen of Havenshire - On Respawn - Start Path 12896500'),
+(-128965, 0, 12, 0, 109, 0, 100, 0, 0, 12896500, 0, 0, 0, 0, 41, 2000, 120, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Citizen of Havenshire - On Path 12896500 Finished - Despawn In 2000 ms'),
+(-128965, 0, 13, 0, 4, 0, 50, 0, 0, 0, 0, 0, 0, 0, 86, 58207, 0, 10, 128581, 28765, 0, 7, 0, 0, 0, 0, 0, 0, 0, 0, 'Citizen of Havenshire - On Aggro - Cross Cast \'Lich King VO Blocker\'');
+
 DELETE FROM `smart_scripts` WHERE (`source_type` = 0 AND `entryorguid` = -128917);
 INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `event_param6`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
 (-128917, 0, 0, 1, 25, 0, 100, 0, 0, 0, 0, 0, 0, 0, 22, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Citizen of Havenshire - On Reset - Set Event Phase 1'),
@@ -1106,7 +1213,7 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 (-128910, 0, 13, 0, 4, 0, 50, 0, 0, 0, 0, 0, 0, 0, 86, 58207, 0, 10, 128581, 28765, 0, 7, 0, 0, 0, 0, 0, 0, 0, 0, 'Citizen of Havenshire - On Aggro - Cross Cast \'Lich King VO Blocker\'');
 
 -- Set Groups
-DELETE FROM `pool_template` WHERE (`entry` IN (22386, 22387, 22388, 22389, 22390, 22391, 22392, 22393, 22394, 22395, 22396, 22397, 22398, 22399, 22400, 22401, 22402, 22403, 22404, 22405));
+DELETE FROM `pool_template` WHERE (`entry` IN (22386, 22387, 22388, 22389, 22390, 22391, 22392, 22393, 22394, 22395, 22396, 22397, 22398, 22399, 22400, 22401, 22402, 22403, 22404, 22405, 22406, 22407));
 INSERT INTO `pool_template` (`entry`, `max_limit`, `description`) VALUES
 (22386, 1, 'Citizen of Havenshire random spawn 1'),
 (22387, 1, 'Citizen of Havenshire random spawn 2'),
@@ -1127,9 +1234,11 @@ INSERT INTO `pool_template` (`entry`, `max_limit`, `description`) VALUES
 (22402, 1, 'Citizen of Havenshire random spawn 17'),
 (22403, 1, 'Citizen of Havenshire random spawn 18'),
 (22404, 1, 'Citizen of Havenshire random spawn 19'),
-(22405, 1, 'Citizen of Havenshire random spawn 20');
+(22405, 1, 'Citizen of Havenshire random spawn 20'),
+(22406, 1, 'Citizen of Havenshire random spawn 21'),
+(22407, 1, 'Citizen of Havenshire random spawn 22');
 
-DELETE FROM `pool_creature` WHERE (`pool_entry` IN (22386, 22387, 22388, 22389, 22390, 22391, 22392, 22393, 22394, 22395, 22396, 22397, 22398, 22399, 22400, 22401, 22402, 22403, 22404, 22405));
+DELETE FROM `pool_creature` WHERE (`pool_entry` IN (22386, 22387, 22388, 22389, 22390, 22391, 22392, 22393, 22394, 22395, 22396, 22397, 22398, 22399, 22400, 22401, 22402, 22403, 22404, 22405, 22406, 22407));
 INSERT INTO `pool_creature` (`guid`, `pool_entry`, `chance`, `description`) VALUES
 (128922, 22386, 0, 'Citizen of Havenshire (1/2)'),
 (128979, 22386, 0, 'Citizen of Havenshire (2/2)'),
@@ -1170,4 +1279,8 @@ INSERT INTO `pool_creature` (`guid`, `pool_entry`, `chance`, `description`) VALU
 (128963, 22404, 0, 'Citizen of Havenshire (1/2)'),
 (128915, 22404, 0, 'Citizen of Havenshire (2/2)'),
 (128964, 22405, 0, 'Citizen of Havenshire (1/2)'),
-(128917, 22405, 0, 'Citizen of Havenshire (2/2)');
+(128917, 22405, 0, 'Citizen of Havenshire (2/2)'),
+(128965, 22406, 0, 'Citizen of Havenshire (1/2)'),
+(128918, 22406, 0, 'Citizen of Havenshire (2/2)'),
+(128967, 22407, 0, 'Citizen of Havenshire (1/2)'),
+(128919, 22407, 0, 'Citizen of Havenshire (2/2)');
