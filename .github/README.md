@@ -19,7 +19,7 @@
 
 AzerothCore is a community-driven, open-source game server framework designed to host massive multiplayer online role-playing games (MMORPGs). This project is based on World of Warcraft (WoW) and aims to recreate the gameplay experience of the Wrath of the Lich King (WotLK) expansion, specifically patch 3.3.5a.
 
-Originally derived from MaNGOS, TrinityCore, and SunwellCore, AzerothCore has developed extensively to improve stability, in-game mechanics, and modularity. The project has become a reliable foundation for creating private servers replicating the official WoW experience while fostering a collaborative environment for developers and enthusiasts.
+Originally derived from MaNGOS, TrinityCore, and SunwellCore, AzerothCore has developed extensively to improve stability, in-game mechanics, and modularity. The project has become a reliable foundation for for creating MMORPG servers that mimic the mechanics and behavior of the WotLK experience while fostering a collaborative environment for developers and enthusiasts.
 
 ## Philosophy
 
