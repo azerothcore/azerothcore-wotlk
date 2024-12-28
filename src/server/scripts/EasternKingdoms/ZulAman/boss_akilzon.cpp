@@ -20,6 +20,8 @@
 #include "GridNotifiers.h"
 #include "GridNotifiersImpl.h"
 #include "ScriptedCreature.h"
+#include "SpellAuras.h"
+#include "SpellAuraEffects.h"
 #include "SpellScript.h"
 #include "SpellScriptLoader.h"
 #include "Weather.h"
@@ -112,8 +114,12 @@ struct boss_akilzon : public BossAI
                 EnterEvadeMode();
                 return;
             }
-            target->CastSpell(target, SPELL_ELECTRICAL_STORM_AREA, true); // cloud visual
+
             DoCast(target, SPELL_ELECTRICAL_STORM); // storm cyclon + visual
+            target->CastSpell(target, SPELL_ELECTRICAL_STORM_AREA, true); // cloud visual
+
+            if (DynamicObject* dynObj = target->GetDynObject(SPELL_ELECTRICAL_STORM_AREA))
+                dynObj->SetDuration(8500);
 
             float x, y, z;
             target->GetPosition(x, y, z);
@@ -321,9 +327,36 @@ class spell_electrial_storm : public AuraScript
     }
 };
 
+// 43657 - Electrical Storm
+class spell_electrical_storm_proc : public SpellScript
+{
+    PrepareSpellScript(spell_electrical_storm_proc);
+
+    void FilterTargets(std::list<WorldObject*>& targets)
+    {
+        targets.remove_if(Acore::UnitAuraCheck(true, SPELL_ELECTRICAL_STORM_AREA));
+    }
+
+    void HandleDamageCalc(SpellEffIndex /*effIndex*/)
+    {
+        if (Aura* aura = GetCaster()->GetAura(SPELL_ELECTRICAL_STORM))
+        {
+            uint8 multiplier = aura->GetEffect(EFFECT_1)->GetTickNumber();
+            SetHitDamage(GetHitDamage() * multiplier);
+        }
+    }
+
+    void Register() override
+    {
+        OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_electrical_storm_proc::FilterTargets, EFFECT_0, TARGET_UNIT_SRC_AREA_ALLY);
+        OnEffectHitTarget += SpellEffectFn(spell_electrical_storm_proc::HandleDamageCalc, EFFECT_0, SPELL_EFFECT_SCHOOL_DAMAGE);
+    }
+};
+
 void AddSC_boss_akilzon()
 {
     RegisterZulAmanCreatureAI(boss_akilzon);
     RegisterZulAmanCreatureAI(npc_akilzon_eagle);
     RegisterSpellScript(spell_electrial_storm);
+    RegisterSpellScript(spell_electrical_storm_proc);
 }

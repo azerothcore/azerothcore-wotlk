@@ -373,20 +373,24 @@ public:
         return true;
     }
 
-    static bool HandleNpcDeleteCommand(ChatHandler* handler)
+    static bool HandleNpcDeleteCommand(ChatHandler* handler, Optional<ObjectGuid::LowType> lowGuid)
     {
-        Creature* unit = handler->getSelectedCreature();
+        Creature* creature;
+        if (lowGuid.has_value())
+            creature = handler->GetCreatureFromPlayerMapByDbGuid(*lowGuid);
+        else
+            creature = handler->getSelectedCreature();
 
-        if (!unit || unit->IsPet() || unit->IsTotem())
+        if (!creature || creature->IsPet() || creature->IsTotem())
         {
             handler->SendErrorMessage(LANG_SELECT_CREATURE);
             return false;
         }
 
         // Delete the creature
-        unit->CombatStop();
-        unit->DeleteFromDB();
-        unit->AddObjectToRemoveList();
+        creature->CombatStop();
+        creature->DeleteFromDB();
+        creature->AddObjectToRemoveList();
 
         handler->SendSysMessage(LANG_COMMAND_DELCREATMESSAGE);
 
@@ -711,25 +715,33 @@ public:
     }
 
     //move selected creature
-    static bool HandleNpcMoveCommand(ChatHandler* handler)
+    static bool HandleNpcMoveCommand(ChatHandler* handler, Optional<ObjectGuid::LowType> guid)
     {
-        Creature* creature = handler->getSelectedCreature();
+        Creature* creature;
+        if (guid.has_value())
+            creature = handler->GetCreatureFromPlayerMapByDbGuid(*guid);
+        else
+            creature = handler->getSelectedCreature();
 
         if (!creature)
             return false;
 
-        ObjectGuid::LowType lowguid = creature->GetSpawnId();
+        ObjectGuid::LowType lowGuid;
+        if (guid.has_value())
+            lowGuid = *guid;
+        else
+            lowGuid = creature->GetSpawnId();
 
-        CreatureData const* data = sObjectMgr->GetCreatureData(lowguid);
+        CreatureData const* data = sObjectMgr->GetCreatureData(lowGuid);
         if (!data)
         {
-            handler->SendErrorMessage(LANG_COMMAND_CREATGUIDNOTFOUND, lowguid);
+            handler->SendErrorMessage(LANG_COMMAND_CREATGUIDNOTFOUND, lowGuid);
             return false;
         }
 
         if (handler->GetSession()->GetPlayer()->GetMapId() != data->mapid)
         {
-            handler->SendErrorMessage(LANG_COMMAND_CREATUREATSAMEMAP, lowguid);
+            handler->SendErrorMessage(LANG_COMMAND_CREATUREATSAMEMAP, lowGuid);
             return false;
         }
 
@@ -763,7 +775,7 @@ public:
         stmt->SetData(1, y);
         stmt->SetData(2, z);
         stmt->SetData(3, o);
-        stmt->SetData(4, lowguid);
+        stmt->SetData(4, lowGuid);
 
         WorldDatabase.Execute(stmt);
 

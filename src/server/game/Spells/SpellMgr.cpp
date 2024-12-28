@@ -2913,16 +2913,6 @@ void SpellMgr::LoadSpellInfoCustomAttributes()
                     }
                 }
                 break;
-                case SPELL_AURA_PERIODIC_HEAL:
-                case SPELL_AURA_PERIODIC_DAMAGE:
-                case SPELL_AURA_PERIODIC_DAMAGE_PERCENT:
-                case SPELL_AURA_PERIODIC_LEECH:
-                case SPELL_AURA_PERIODIC_MANA_LEECH:
-                case SPELL_AURA_PERIODIC_HEALTH_FUNNEL:
-                case SPELL_AURA_PERIODIC_ENERGIZE:
-                case SPELL_AURA_OBS_MOD_HEALTH:
-                case SPELL_AURA_OBS_MOD_POWER:
-                case SPELL_AURA_POWER_BURN:
                 case SPELL_AURA_TRACK_CREATURES:
                 case SPELL_AURA_MOD_RANGED_HASTE:
                 case SPELL_AURA_MOD_POSSESS_PET:
