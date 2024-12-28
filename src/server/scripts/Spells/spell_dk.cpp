@@ -2212,33 +2212,28 @@ class spell_dk_army_of_the_dead_passive : public AuraScript
     {
         // army ghoul inherits 6.5% of AP
         if (Unit* owner = GetUnitOwner()->GetOwner())
-        {
             amount = CalculatePct(std::max<int32>(0, owner->GetTotalAttackPowerValue(BASE_ATTACK)), 6.5f);
-        }
     }
 
     void CalculateHealthAmount(AuraEffect const* /*aurEff*/, int32& amount, bool& /*canBeRecalculated*/)
     {
         // army ghoul inherits 20% of health
         if (Unit* owner = GetUnitOwner()->GetOwner())
-        {
             amount = owner->CountPctFromMaxHealth(20);
-        }
     }
 
     void CalculateSPAmount(AuraEffect const* /*aurEff*/, int32& amount, bool& /*canBeRecalculated*/)
     {
         // army ghoul inherits 6.5% of AP
         if (Unit* owner = GetUnitOwner()->GetOwner())
-        {
             amount = CalculatePct(std::max<int32>(0, owner->GetTotalAttackPowerValue(BASE_ATTACK)), 6.5f);
-        }
     }
 
     void HandleEffectApply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
     {
         if (GetUnitOwner()->IsPet())
             return;
+
         GetUnitOwner()->ApplySpellImmune(0, IMMUNITY_STATE, SPELL_AURA_MOD_STAT, true, SPELL_BLOCK_TYPE_POSITIVE);
         GetUnitOwner()->ApplySpellImmune(0, IMMUNITY_STATE, SPELL_AURA_MOD_TOTAL_STAT_PERCENTAGE, true, SPELL_BLOCK_TYPE_POSITIVE);
         GetUnitOwner()->ApplySpellImmune(0, IMMUNITY_STATE, SPELL_AURA_MOD_ATTACK_POWER, true, SPELL_BLOCK_TYPE_POSITIVE);

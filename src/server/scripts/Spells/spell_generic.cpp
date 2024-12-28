@@ -5333,25 +5333,19 @@ class spell_pet_spellhit_expertise_spellpen_scaling : public AuraScript
     void CalculateSpellHitAmount(AuraEffect const* /*aurEff*/, int32& amount, bool& /*canBeRecalculated*/)
     {
         if (Player* modOwner = GetUnitOwner()->GetSpellModOwner())
-        {
             amount = CalculatePercent(modOwner->m_modMeleeHitChance, 8.0f, 17.0f);
-        }
     }
 
     void CalculateExpertiseAmount(AuraEffect const* /*aurEff*/, int32& amount, bool& /*canBeRecalculated*/)
     {
         if (Player* modOwner = GetUnitOwner()->GetSpellModOwner())
-        {
             amount = CalculatePercent(modOwner->m_modMeleeHitChance, 8.0f, 26.0f);
-        }
     }
 
     void CalculateSpellPenAmount(AuraEffect const* /*aurEff*/, int32& amount, bool& /*canBeRecalculated*/)
     {
         if (Player* modOwner = GetUnitOwner()->GetSpellModOwner())
-        {
             amount = modOwner->GetTotalAuraModifierByMiscMask(SPELL_AURA_MOD_TARGET_RESISTANCE, SPELL_SCHOOL_MASK_SPELL);
-        }
     }
 
     void HandleEffectApply(AuraEffect const* aurEff, AuraEffectHandleModes /*mode*/)
