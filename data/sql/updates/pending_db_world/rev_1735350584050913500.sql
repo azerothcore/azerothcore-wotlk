@@ -1,5 +1,5 @@
 --
--- Removes `NOT_REPEATABLE` and `WHILE_CHARMED` event_flag, allowing to always drop the flag no matter if it's CC'd or not.
+-- Removes NOT_REPEATABL` and WHILE_CHARMED event_flag, allowing to always drop the flag no matter if it's CC'd or not.
 UPDATE smart_scripts SET `event_flags` = `event_flags` &~1 &~512 WHERE `entryorguid` = 23576 AND ´source_type` = 0 AND `id` = 1;
 
 -- Adds `Strike` sniffed from: 4.4.1.58158 and 1.15.5.57979
