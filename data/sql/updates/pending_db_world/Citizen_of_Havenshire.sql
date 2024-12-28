@@ -1,11 +1,9 @@
 
 -- Set Run Speed
-UPDATE `creature_template` SET `speed_run` = 1.05 WHERE (`entry` = 28576);
-UPDATE `creature_template` SET `speed_run` = 1.05 WHERE (`entry` = 28577);
+UPDATE `creature_template` SET `speed_run` = 1.05 WHERE `entry` IN (28576, 28577);
 
 -- Remove Wrong Auras
-UPDATE `creature_addon` SET `auras` = '' WHERE (`guid` IN (128916, 128921, 128925, 128927));
-UPDATE `creature_addon` SET `auras` = '' WHERE (`guid` IN (128966, 128969, 128972, 128975, 128980));
+UPDATE `creature_addon` SET `auras` = '' WHERE (`guid` IN (128916, 128921, 128925, 128927, 128966, 128969, 128972, 128975, 128980));
 
 -- Remove Guids
 DELETE FROM `creature` WHERE (`id1` = 28576) AND (`guid` IN (128921, 128923, 128925, 128931, 128932, 128933, 128936, 128937, 128938, 128939, 128940, 128941, 128942, 128943, 128944, 128945, 128946, 128947, 128949, 128950, 128951, 128952, 128953, 128955, 128956, 128957));
