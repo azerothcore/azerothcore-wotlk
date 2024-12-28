@@ -75,9 +75,6 @@ enum Misc
 
 enum FourHorsemen
 {
-    // SAY_AGGRO                           = 0,
-    // SAY_TAUNT                           = 1,
-    // SAY_SPECIAL                         = 2,
     SAY_SLAY                            = 3,
     SAY_DEATH                           = 4,
     EMOTE_RAGECAST                      = 7
