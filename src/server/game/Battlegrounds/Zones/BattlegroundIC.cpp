@@ -384,6 +384,7 @@ bool BattlegroundIC::UpdatePlayerScore(Player* player, uint32 type, uint32 value
 
 void BattlegroundIC::FillInitialWorldStates(WorldPackets::WorldState::InitWorldStates& packet)
 {
+    packet.Worldstates.reserve(4+MAX_FORTRESS_GATES_SPAWNS+MAX_NODE_TYPES+1);
     packet.Worldstates.emplace_back(BG_IC_ALLIANCE_RENFORT_SET, 1);
     packet.Worldstates.emplace_back(BG_IC_HORDE_RENFORT_SET, 1);
     packet.Worldstates.emplace_back(BG_IC_ALLIANCE_RENFORT, factionReinforcements[TEAM_ALLIANCE]);

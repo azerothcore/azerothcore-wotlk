@@ -8256,6 +8256,7 @@ void Player::SendInitWorldStates(uint32 zoneId, uint32 areaId)
 
     if (mapId == 530) // Outland
     {
+        packet.Worldstates.reserve(3);
         packet.Worldstates.emplace_back(0x9bf, 0);  // NA_UI_OUTLAND_01 "Progress: %2494w"
         packet.Worldstates.emplace_back(0x9bd, 15); // NA_UI_GUARDS_MAX
         packet.Worldstates.emplace_back(0x9bb, 15); // NA_UI_GUARDS_LEFT
@@ -8327,11 +8328,13 @@ void Player::SendInitWorldStates(uint32 zoneId, uint32 areaId)
                     outdoorPvP->FillInitialWorldStates(packet);
                 else
                 {
+                    packet.Worldstates.reserve(3);
                     packet.Worldstates.emplace_back(0x909, 0); // SI_GATHERED_A
                     packet.Worldstates.emplace_back(0x90a, 0); // SI_GATHERED_H
                     packet.Worldstates.emplace_back(0x90d, 0); // SI_SILITHYST_MAX
                 }
                 // unknown, aq opening?
+                packet.Worldstates.reserve(4);
                 packet.Worldstates.emplace_back(0x912, 0); // AQ_SANDWORM_N
                 packet.Worldstates.emplace_back(0x913, 0); // AQ_SANDWORM_S
                 packet.Worldstates.emplace_back(0x914, 0); // AQ_SANDWORM_SW
@@ -8654,6 +8657,7 @@ void Player::SendInitWorldStates(uint32 zoneId, uint32 areaId)
                     battleground->FillInitialWorldStates(packet);
                 else
                 {
+                    packet.Worldstates.reserve(3);
                     packet.Worldstates.emplace_back(0xa0f, 0); // BATTLEGROUND_NAGRAND_ARENA_GOLD
                     packet.Worldstates.emplace_back(0xa10, 0); // BATTLEGROUND_NAGRAND_ARENA_GREEN
                     packet.Worldstates.emplace_back(0xa11, 0); // BATTLEGROUND_NAGRAND_ARENA_SHOW
@@ -8664,6 +8668,7 @@ void Player::SendInitWorldStates(uint32 zoneId, uint32 areaId)
                     battleground->FillInitialWorldStates(packet);
                 else
                 {
+                    packet.Worldstates.reserve(3);
                     packet.Worldstates.emplace_back(0x9f0, 0); // BATTLEGROUND_BLADES_EDGE_ARENA_GOLD
                     packet.Worldstates.emplace_back(0x9f1, 0); // BATTLEGROUND_BLADES_EDGE_ARENA_GREEN
                     packet.Worldstates.emplace_back(0x9f3, 0); // BATTLEGROUND_BLADES_EDGE_ARENA_SHOW
@@ -8674,6 +8679,7 @@ void Player::SendInitWorldStates(uint32 zoneId, uint32 areaId)
                     battleground->FillInitialWorldStates(packet);
                 else
                 {
+                    packet.Worldstates.reserve(3);
                     packet.Worldstates.emplace_back(0xbb8, 0); // BATTELGROUND_RUINS_OF_LORDAERNON_GOLD
                     packet.Worldstates.emplace_back(0xbb9, 0); // BATTELGROUND_RUINS_OF_LORDAERNON_GREEN
                     packet.Worldstates.emplace_back(0xbba, 0); // BATTELGROUND_RUINS_OF_LORDAERNON_SHOW
@@ -8684,6 +8690,7 @@ void Player::SendInitWorldStates(uint32 zoneId, uint32 areaId)
                     battleground->FillInitialWorldStates(packet);
                 else
                 {
+                    packet.Worldstates.reserve(3);
                     packet.Worldstates.emplace_back(0xe11, 0); // ARENA_WORLD_STATE_ALIVE_PLAYERS_GOLD
                     packet.Worldstates.emplace_back(0xe10, 0); // ARENA_WORLD_STATE_ALIVE_PLAYERS_GREEN
                     packet.Worldstates.emplace_back(0xe1a, 0); // ARENA_WORLD_STATE_ALIVE_PLAYERS_SHOW
@@ -8731,9 +8738,10 @@ void Player::SendInitWorldStates(uint32 zoneId, uint32 areaId)
                     battleground->FillInitialWorldStates(packet);
                 else
                 {
-                packet.Worldstates.emplace_back(0xe10, 0); // ARENA_WORLD_STATE_ALIVE_PLAYERS_GREEN
-                packet.Worldstates.emplace_back(0xe11, 0); // ARENA_WORLD_STATE_ALIVE_PLAYERS_GOLD
-                packet.Worldstates.emplace_back(0xe1a, 0); // ARENA_WORLD_STATE_ALIVE_PLAYERS_SHOW
+                    packet.Worldstates.reserve(3);
+                    packet.Worldstates.emplace_back(0xe10, 0); // ARENA_WORLD_STATE_ALIVE_PLAYERS_GREEN
+                    packet.Worldstates.emplace_back(0xe11, 0); // ARENA_WORLD_STATE_ALIVE_PLAYERS_GOLD
+                    packet.Worldstates.emplace_back(0xe1a, 0); // ARENA_WORLD_STATE_ALIVE_PLAYERS_SHOW
                 }
                 break;
             case 4710: // Isle of Conquest
@@ -8767,6 +8775,7 @@ void Player::SendInitWorldStates(uint32 zoneId, uint32 areaId)
                     instance->FillInitialWorldStates(packet);
                 else
                 {
+                    packet.Worldstates.reserve(3);
                     packet.Worldstates.emplace_back(0x13b9, 50); // WORLDSTATE_CORPOREALITY_MATERIAL
                     packet.Worldstates.emplace_back(0x13ba, 50); // WORLDSTATE_CORPOREALITY_TWILIGHT
                     packet.Worldstates.emplace_back(0x13bb, 0);  // WORLDSTATE_CORPOREALITY_TOGGLE
@@ -8803,6 +8812,7 @@ void Player::SendInitWorldStates(uint32 zoneId, uint32 areaId)
                     instance->FillInitialWorldStates(packet);
                 else
                 {
+                    packet.Worldstates.reserve(2);
                     packet.Worldstates.emplace_back(0xdc4, 0); // WORLD_STATE_CENTRIFUGE_CONSTRUCT_SHOW
                     packet.Worldstates.emplace_back(0xd9e, 0); // WORLD_STATE_CENTRIFUGE_CONSTRUCT_AMOUNT
                 }
@@ -8812,6 +8822,7 @@ void Player::SendInitWorldStates(uint32 zoneId, uint32 areaId)
                     instance->FillInitialWorldStates(packet);
                 else
                 {
+                    packet.Worldstates.reserve(2);
                     packet.Worldstates.emplace_back(0x1024, 0); // WORLDSTATE_ALGALON_TIMER_ENABLED
                     packet.Worldstates.emplace_back(0x1023, 0); // WORLDSTATE_ALGALON_DESPAWN_TIMER
                 }
@@ -8821,6 +8832,7 @@ void Player::SendInitWorldStates(uint32 zoneId, uint32 areaId)
                     instance->FillInitialWorldStates(packet);
                 else
                 {
+                    packet.Worldstates.reserve(3);
                     packet.Worldstates.emplace_back(0xee8, 0);   // WORLD_STATE_VH_SHOW
                     packet.Worldstates.emplace_back(0xee7, 100); // WORLD_STATE_VH_PRISON_STATE
                     packet.Worldstates.emplace_back(0xee2, 0);   // WORLD_STATE_VH_WAVE_COUNT
@@ -8831,6 +8843,7 @@ void Player::SendInitWorldStates(uint32 zoneId, uint32 areaId)
                     instance->FillInitialWorldStates(packet);
                 else
                 {
+                    packet.Worldstates.reserve(2);
                     packet.Worldstates.emplace_back(0x1314, 0); // WORLD_STATE_HOR_WAVES_ENABLED
                     packet.Worldstates.emplace_back(0x1312, 0); // WORLD_STATE_HOR_WAVE_COUNT
                 }
@@ -8859,6 +8872,7 @@ void Player::SendInitWorldStates(uint32 zoneId, uint32 areaId)
                 }
                 [[fallthrough]];
             default:
+                packet.Worldstates.reserve(4);
                 packet.Worldstates.emplace_back(0x914, 0);
                 packet.Worldstates.emplace_back(0x913, 0);
                 packet.Worldstates.emplace_back(0x912, 0);

@@ -172,6 +172,7 @@ public:
 
         void FillInitialWorldStates(WorldPackets::WorldState::InitWorldStates& packet) override
         {
+            packet.Worldstates.reserve(2);
             packet.Worldstates.emplace_back(WORLD_STATE_ALGALON_TIMER_ENABLED, (m_algalonTimer && m_algalonTimer <= 60) ? 1 : 0);
             packet.Worldstates.emplace_back(WORLD_STATE_ALGALON_DESPAWN_TIMER, std::min<int32>(m_algalonTimer, 60));
         }

@@ -53,6 +53,7 @@ OPvPCapturePointTF::OPvPCapturePointTF(OutdoorPvP* pvp, OutdoorPvPTF_TowerType t
 
 void OPvPCapturePointTF::FillInitialWorldStates(WorldPackets::WorldState::InitWorldStates& packet)
 {
+    packet.Worldstates.reserve(3);
     packet.Worldstates.emplace_back(TFTowerWorldStates[m_TowerType].n, (m_TowerState & TF_TOWERSTATE_N) != 0 ? 1 : 0);
     packet.Worldstates.emplace_back(TFTowerWorldStates[m_TowerType].h, (m_TowerState & TF_TOWERSTATE_H) != 0 ? 1 : 0);
     packet.Worldstates.emplace_back(TFTowerWorldStates[m_TowerType].a, (m_TowerState & TF_TOWERSTATE_A) != 0 ? 1 : 0);

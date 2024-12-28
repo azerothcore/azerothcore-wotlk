@@ -1088,6 +1088,7 @@ void BattlegroundAV::EventPlayerAssaultsPoint(Player* player, uint32 object)
 void BattlegroundAV::FillInitialWorldStates(WorldPackets::WorldState::InitWorldStates& packet)
 {
     bool stateok;
+    packet.Worldstates.reserve(2);
     //graveyards
     for (uint8 i = BG_AV_NODES_FIRSTAID_STATION; i <= BG_AV_NODES_FROSTWOLF_HUT; i++)
     {

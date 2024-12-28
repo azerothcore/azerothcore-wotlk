@@ -221,6 +221,7 @@ public:
 
         void FillInitialWorldStates(WorldPackets::WorldState::InitWorldStates& packet) override
         {
+            packet.Worldstates.reserve(3);
             packet.Worldstates.emplace_back(WORLDSTATE_CORPOREALITY_MATERIAL, 50);
             packet.Worldstates.emplace_back(WORLDSTATE_CORPOREALITY_TWILIGHT, 50);
             packet.Worldstates.emplace_back(WORLDSTATE_CORPOREALITY_TOGGLE, 0);

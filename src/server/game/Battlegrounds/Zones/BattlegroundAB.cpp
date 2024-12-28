@@ -237,7 +237,7 @@ void BattlegroundAB::DeleteBanner(uint8 node)
 
 void BattlegroundAB::FillInitialWorldStates(WorldPackets::WorldState::InitWorldStates& packet)
 {
-    packet.Worldstates.reserve(27);
+    packet.Worldstates.reserve(BG_AB_DYNAMIC_NODES_COUNT+7);
     for (auto& node : _capturePointInfo)
     {
         if (node._state == BG_AB_NODE_STATE_NEUTRAL)

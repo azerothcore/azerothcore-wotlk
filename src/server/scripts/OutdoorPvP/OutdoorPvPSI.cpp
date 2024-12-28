@@ -40,6 +40,7 @@ OutdoorPvPSI::OutdoorPvPSI()
 
 void OutdoorPvPSI::FillInitialWorldStates(WorldPackets::WorldState::InitWorldStates& packet)
 {
+    packet.Worldstates.reserve(3);
     packet.Worldstates.emplace_back(SI_GATHERED_A, m_Gathered_A);
     packet.Worldstates.emplace_back(SI_GATHERED_H, m_Gathered_H);
     packet.Worldstates.emplace_back(SI_SILITHYST_MAX, SI_MAX_RESOURCES);

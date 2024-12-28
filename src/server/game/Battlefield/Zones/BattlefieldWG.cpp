@@ -936,6 +936,7 @@ uint32 BattlefieldWG::GetData(uint32 data) const
 
 void BattlefieldWG::FillInitialWorldStates(WorldPackets::WorldState::InitWorldStates& packet)
 {
+    packet.Worldstates.reserve(4+2+WG_MAX_OBJ+WG_MAX_WORKSHOP);
     packet.Worldstates.emplace_back(BATTLEFIELD_WG_WORLD_STATE_ATTACKER, GetAttackerTeam());
     packet.Worldstates.emplace_back(BATTLEFIELD_WG_WORLD_STATE_DEFENDER, GetDefenderTeam());
 

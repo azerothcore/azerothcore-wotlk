@@ -155,6 +155,7 @@ void OutdoorPvPHP::SendRemoveWorldStates(Player* player)
 
 void OutdoorPvPHP::FillInitialWorldStates(WorldPackets::WorldState::InitWorldStates& packet)
 {
+    packet.Worldstates.reserve(8);
     packet.Worldstates.emplace_back(HP_UI_TOWER_DISPLAY_A, 1);
     packet.Worldstates.emplace_back(HP_UI_TOWER_DISPLAY_H, 1);
     packet.Worldstates.emplace_back(HP_UI_TOWER_COUNT_A, m_AllianceTowersControlled);
@@ -281,12 +282,14 @@ void OPvPCapturePointHP::FillInitialWorldStates(WorldPackets::WorldState::InitWo
     {
         case OBJECTIVESTATE_ALLIANCE:
         case OBJECTIVESTATE_ALLIANCE_HORDE_CHALLENGE:
+            packet.Worldstates.reserve(3);
             packet.Worldstates.emplace_back(HP_MAP_N[m_TowerType], 0);
             packet.Worldstates.emplace_back(HP_MAP_A[m_TowerType], 1);
             packet.Worldstates.emplace_back(HP_MAP_H[m_TowerType], 0);
             break;
         case OBJECTIVESTATE_HORDE:
         case OBJECTIVESTATE_HORDE_ALLIANCE_CHALLENGE:
+            packet.Worldstates.reserve(3);
             packet.Worldstates.emplace_back(HP_MAP_N[m_TowerType], 0);
             packet.Worldstates.emplace_back(HP_MAP_A[m_TowerType], 0);
             packet.Worldstates.emplace_back(HP_MAP_H[m_TowerType], 1);
@@ -295,6 +298,7 @@ void OPvPCapturePointHP::FillInitialWorldStates(WorldPackets::WorldState::InitWo
         case OBJECTIVESTATE_NEUTRAL_ALLIANCE_CHALLENGE:
         case OBJECTIVESTATE_NEUTRAL_HORDE_CHALLENGE:
         default:
+            packet.Worldstates.reserve(3);
             packet.Worldstates.emplace_back(HP_MAP_N[m_TowerType], 1);
             packet.Worldstates.emplace_back(HP_MAP_A[m_TowerType], 0);
             packet.Worldstates.emplace_back(HP_MAP_H[m_TowerType], 0);
