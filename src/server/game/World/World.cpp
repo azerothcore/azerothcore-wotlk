@@ -576,13 +576,24 @@ void World::LoadConfigSettings(bool reload)
         LOG_ERROR("server.loading", "Rate.Talent.Pet ({}) must be > 0. Using 1 instead.", _rate_values[RATE_TALENT_PET]);
         _rate_values[RATE_TALENT_PET] = 1.0f;
     }
-    _rate_values[RATE_MOVESPEED] = sConfigMgr->GetOption<float>("Rate.MoveSpeed", 1.0f);
-    if (_rate_values[RATE_MOVESPEED] < 0)
+    // Controls Player movespeed rate.
+    _rate_values[RATE_MOVESPEED_PLAYER] = sConfigMgr->GetOption<float>("Rate.MoveSpeed.Player", 1.0f);
+    if (_rate_values[RATE_MOVESPEED_PLAYER] < 0)
     {
-        LOG_ERROR("server.loading", "Rate.MoveSpeed ({}) must be > 0. Using 1 instead.", _rate_values[RATE_MOVESPEED]);
-        _rate_values[RATE_MOVESPEED] = 1.0f;
+        LOG_ERROR("server.loading", "Rate.MoveSpeed.Player ({}) must be > 0. Using 1 instead.", _rate_values[RATE_MOVESPEED_PLAYER]);
+        _rate_values[RATE_MOVESPEED_PLAYER] = 1.0f;
     }
-    for (uint8 i = 0; i < MAX_MOVE_TYPE; ++i) playerBaseMoveSpeed[i] = baseMoveSpeed[i] * _rate_values[RATE_MOVESPEED];
+    for (uint8 i = 0; i < MAX_MOVE_TYPE; ++i) playerBaseMoveSpeed[i] = baseMoveSpeed[i] * _rate_values[RATE_MOVESPEED_PLAYER];
+
+    // Controls all npc movespeed rate.
+    _rate_values[RATE_MOVESPEED_NPC] = sConfigMgr->GetOption<float>("Rate.MoveSpeed.NPC", 1.0f);
+    if (_rate_values[RATE_MOVESPEED_NPC] < 0)
+    {
+        LOG_ERROR("server.loading", "Rate.MoveSpeed.NPC ({}) must be > 0. Using 1 instead.", _rate_values[RATE_MOVESPEED_NPC]);
+        _rate_values[RATE_MOVESPEED_NPC] = 1.0f;
+    }
+    for (uint8 i = 0; i < MAX_MOVE_TYPE; ++i) baseMoveSpeed[i] *= _rate_values[RATE_MOVESPEED_NPC];
+
     _rate_values[RATE_CORPSE_DECAY_LOOTED] = sConfigMgr->GetOption<float>("Rate.Corpse.Decay.Looted", 0.5f);
 
     _rate_values[RATE_DURABILITY_LOSS_ON_DEATH]  = sConfigMgr->GetOption<float>("DurabilityLoss.OnDeath", 10.0f);

@@ -447,7 +447,7 @@ class spell_mutate_explode_bug : public SpellScript
                 if (target->GetEntry() != NPC_QIRAJI_SCARAB && target->GetEntry() != NPC_QIRAJI_SCORPION)
                     return true;
                 if (Creature const* creature = target->ToCreature())
-                    if (creature->HasAura(SPELL_EXPLODE_BUG) || creature->HasAura(SPELL_MUTATE_BUG))
+                    if (creature->HasAnyAuras(SPELL_EXPLODE_BUG, SPELL_MUTATE_BUG))
                         return true;
 
                 return false;
