@@ -72,8 +72,7 @@ AzerothCore was initially created in 2016 based on SunwellCore. Unfortunately, S
 - **AzerothCore** is released under the [GNU AGPL v3](https://www.gnu.org/licenses/agpl-3.0.en.html)
 - The original sources from MaNGOS/TrinityCore are released under the [GNU GPL v2](https://www.gnu.org/licenses/old-licenses/gpl-2.0.en.html)
 
-Please note, **AzerothCore is not affiliated with Blizzard Entertainment** and is not endorsed by World of Warcraft. It is intended solely for personal use, testing, and educational purposes. Running illegal public servers is not supported by the project.
-
+It's important to note that AzerothCore is not an official Blizzard Entertainment product, and it is not affiliated with or endorsed by World of Warcraft or Blizzard Entertainment. AzerothCore does not in any case sponsor nor support illegal public servers. If you use this project to run an illegal public server and not for testing and learning it is your own personal choice.
 
 ## Special thanks
 
