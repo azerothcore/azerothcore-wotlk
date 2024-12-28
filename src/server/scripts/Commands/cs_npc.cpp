@@ -398,7 +398,7 @@ public:
         }
 
         //npcbot
-        if (unit->IsNPCBotOrPet())
+        if (creature->IsNPCBotOrPet())
         {
             handler->SendSysMessage("Selected creature has botAI assigned, use '.npcbot delete' instead");
             handler->SetSentErrorMessage(true);
@@ -765,11 +765,9 @@ public:
         }
 
         //npcbot
-        CreatureTemplate const* ct = sObjectMgr->GetCreatureTemplate(creature->GetEntry());
-        ASSERT(ct);
-        if (ct->IsNPCBotOrPet())
+        if (creature->GetCreatureTemplate()->IsNPCBotOrPet())
         {
-            handler->PSendSysMessage("creature {} (id {}) is a part of NPCBots mod. Use '.npcbot move' instead", lowguid, creature->GetEntry());
+            handler->PSendSysMessage("creature {} (id {}) is a part of NPCBots mod. Use '.npcbot move' instead", lowGuid, creature->GetEntry());
             handler->SetSentErrorMessage(true);
             return false;
         }
