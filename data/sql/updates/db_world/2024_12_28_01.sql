@@ -1,3 +1,4 @@
+-- DB update 2024_12_28_00 -> 2024_12_28_01
 --
 UPDATE `spell_dbc`
 SET `Attributes`=`Attributes`|64, `AttributesEx4`=34603008, `ProcChance`=101, `DurationIndex`=21,
