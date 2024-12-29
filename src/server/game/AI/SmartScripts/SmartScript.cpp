@@ -2605,6 +2605,13 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
             ProcessEventsFor((SMART_EVENT)SMART_EVENT_TIMED_EVENT_TRIGGERED, nullptr, eventId);
             break;
         }
+        case SMART_ACTION_DISMOUNT:
+        {
+            for (WorldObject* const target : targets)
+                if (IsUnit(target))
+                    target->ToUnit()->Dismount();
+            break;
+        }
         case SMART_ACTION_SET_HOVER:
         {
             for (WorldObject* target : targets)
@@ -3511,8 +3518,15 @@ void SmartScript::GetTargets(ObjectVector& targets, SmartScriptHolder const& e, 
                     {
                         for (GroupReference* groupRef = group->GetFirstMember(); groupRef != nullptr; groupRef = groupRef->next())
                             if (Player* member = groupRef->GetSource())
+                            {
                                 if (member->IsInMap(player))
                                     targets.push_back(member);
+
+                                if (e.target.invokerParty.includePets)
+                                    if (Creature* pet = ObjectAccessor::GetCreatureOrPetOrVehicle(*member, member->GetPetGUID()))
+                                        if (pet->IsPet() && pet->IsInMap(player))
+                                            targets.push_back(pet);
+                            }
                     }
                     // We still add the player to the list if there is no group. If we do
                     // this even if there is a group (thus the else-check), it will add the

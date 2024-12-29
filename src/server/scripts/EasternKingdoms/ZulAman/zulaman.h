@@ -39,10 +39,13 @@ enum DataTypes
     DATA_MASSIVE_GATE                   = 11,
     DATA_HEXLORD_GATE                   = 12,
     DATA_HARRISON_JONES                 = 13,
-    DATA_ASHLI                          = 14,
-    DATA_TANZAR                         = 15,
-    DATA_HARKOR                         = 16,
-    DATA_KRAZ                           = 17
+    TYPE_AKILZON_GAUNTLET               = 14,
+    DATA_LOOKOUT                        = 15,
+    DATA_ZULJIN_GATE                    = 16,
+    DATA_ASHLI                          = 17,
+    DATA_TANZAR                         = 18,
+    DATA_HARKOR                         = 19,
+    DATA_KRAZ                           = 20
 };
 
 enum CreatureIds
@@ -62,14 +65,21 @@ enum CreatureIds
     NPC_ASHLI                           = 24001,
     NPC_TANZAR                          = 23790,
     NPC_HARKOR                          = 23999,
-    NPC_KRAZ                            = 24024
+    NPC_KRAZ                            = 24024,
+    // Akil'zon gauntlet
+    NPC_AMANISHI_WIND_WALKER            = 24179,
+    NPC_AMINISHI_LOOKOUT                = 24175,
+    NPC_AMINISHI_PROTECTOR              = 24180,
+    NPC_AMINISHI_TEMPEST                = 24549,
+    NPC_EAGLE_TRASH_AGGRO_TRIGGER       = 24223
 };
 
 enum GameobjectIds
 {
     GO_DOOR_HALAZZI                     = 186303,
-    GO_GATE_ZULJIN                      = 186304,
+    GO_LYNX_TEMPLE_ENTRANCE             = 186304,
     GO_GATE_HEXLORD                     = 186305,
+    GO_GATE_ZULJIN                      = 186306,
     GO_MASSIVE_GATE                     = 186728,
     GO_DOOR_AKILZON                     = 186858,
     GO_ZULJIN_FIREWALL                  = 186859,
@@ -80,6 +90,7 @@ enum MiscIds
 {
     DATA_TIMED_RUN                      = 0,
     ACTION_START_TIMED_RUN              = 0,
+    ACTION_START_AKILZON_GAUNTLET       = 1,
     GROUP_TIMED_RUN                     = 1,
     SPELL_COSMETIC_IMMOLATION           = 42726
 };
