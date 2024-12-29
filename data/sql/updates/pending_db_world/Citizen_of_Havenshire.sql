@@ -761,3 +761,15 @@ INSERT INTO `pool_creature` (`guid`, `pool_entry`, `chance`, `description`) VALU
 (128918, 22406, 0, 'Citizen of Havenshire (2/2)'),
 (128967, 22407, 0, 'Citizen of Havenshire (1/2)'),
 (128919, 22407, 0, 'Citizen of Havenshire (2/2)');
+
+-- FOR FUTURE FIXES
+-- Set Disable Gravity for Sky Darkener Target (Sniffed Flag)
+DELETE FROM `creature_template_movement` WHERE (`CreatureId` = 28655);
+INSERT INTO `creature_template_movement` (`CreatureId`, `Ground`, `Swim`, `Flight`, `Rooted`, `Chase`, `Random`, `InteractionPauseTimer`) VALUES
+(28655, 0, 0, 1, 0, 0, 0, 0);
+
+-- Change Wander Distance and Movement Type
+UPDATE `creature` SET `wander_distance` = 0, `MovementType` = 0 WHERE `guid` IN (129464, 129465, 129466, 129467, 129468, 129469, 129470, 129471, 129472) AND `id1` = 28655;
+
+-- Scourge Sky Darkener Remove wrong aura
+UPDATE `creature_template_addon` SET `auras` = '' WHERE (`entry` = 28642);
