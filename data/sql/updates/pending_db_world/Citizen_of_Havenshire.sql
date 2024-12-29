@@ -770,6 +770,3 @@ INSERT INTO `creature_template_movement` (`CreatureId`, `Ground`, `Swim`, `Fligh
 
 -- Change Wander Distance and Movement Type
 UPDATE `creature` SET `wander_distance` = 0, `MovementType` = 0 WHERE `guid` IN (129464, 129465, 129466, 129467, 129468, 129469, 129470, 129471, 129472) AND `id1` = 28655;
-
--- Scourge Sky Darkener Remove wrong aura
-UPDATE `creature_template_addon` SET `auras` = '' WHERE (`entry` = 28642);
