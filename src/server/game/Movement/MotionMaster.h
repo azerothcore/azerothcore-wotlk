@@ -239,6 +239,7 @@ public:
     void MoveRotate(uint32 time, RotateDirection direction);
 #ifdef MOD_PLAYERBOTS
     void MoveKnockbackFromForPlayer(float srcX, float srcY, float speedXY, float speedZ);
+    void MovePointBackwards(uint32 id, float x, float y, float z, bool generatePath = true, bool forceDestination = true, MovementSlot slot = MOTION_SLOT_ACTIVE, float orientation = 0.0f);
 #endif
     [[nodiscard]] MovementGeneratorType GetCurrentMovementGeneratorType() const;
     [[nodiscard]] MovementGeneratorType GetMotionSlotType(int slot) const;
