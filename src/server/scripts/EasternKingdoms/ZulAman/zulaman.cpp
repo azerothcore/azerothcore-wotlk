@@ -299,7 +299,8 @@ public:
             if (HostageEntry[i] == creature->GetEntry())
             {
                 GameObject* obj = creature->SummonGameObject(ChestEntry[i], x - 2, y, z, 0, 0, 0, 0, 0, 0);
-                obj->RemoveFlag(GAMEOBJECT_FLAGS, GO_FLAG_LOCKED);
+                if (obj)
+                    obj->RemoveFlag(GAMEOBJECT_FLAGS, GO_FLAG_LOCKED);
                 break;
             }
         }
