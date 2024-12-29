@@ -26,9 +26,9 @@ class PointMovementGenerator : public MovementGeneratorMedium< T, PointMovementG
 {
 public:
     PointMovementGenerator(uint32 _id, float _x, float _y, float _z, float _speed = 0.0f, float orientation = 0.0f, const Movement::PointsArray* _path = nullptr,
-        bool generatePath = false, bool forceDestination = false, ObjectGuid chargeTargetGUID = ObjectGuid::Empty)
+        bool generatePath = false, bool forceDestination = false, ObjectGuid chargeTargetGUID = ObjectGuid::Empty, bool orientationInversed = false)
         : id(_id), i_x(_x), i_y(_y), i_z(_z), speed(_speed), i_orientation(orientation), _generatePath(generatePath), _forceDestination(forceDestination),
-        _chargeTargetGUID(chargeTargetGUID)
+        _chargeTargetGUID(chargeTargetGUID), _orientationInversed(orientationInversed)
     {
         if (_path)
             m_precomputedPath = *_path;
@@ -56,6 +56,9 @@ private:
     bool _generatePath;
     bool _forceDestination;
     ObjectGuid _chargeTargetGUID;
+    /// Added by mod-playerbots
+    bool _orientationInversed;
+    /// End added
 };
 
 class AssistanceMovementGenerator : public PointMovementGenerator<Creature>
