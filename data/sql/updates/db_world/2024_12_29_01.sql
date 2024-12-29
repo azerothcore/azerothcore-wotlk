@@ -1,3 +1,4 @@
+-- DB update 2024_12_29_00 -> 2024_12_29_01
 --
 DELETE FROM `gameobject_template_locale` WHERE `name` = '';
 DELETE FROM `gameobject_template_locale` WHERE `name` = 'NULL';
