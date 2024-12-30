@@ -81,13 +81,6 @@ public:
 
         void EnterEvadeMode(EvadeReason /*why*/) override
         {
-            // Tyrannus is temporarily spawned as Rimefang's rider. If he evades, despawn Rimefang.
-            // Tyrannus will be respawned once Rimefang respawns.
-            if (Creature* rimefang = pInstance->instance->GetCreature(pInstance->GetGuidData(DATA_RIMEFANG_GUID)))
-                rimefang->DespawnOnEvade();
-
-            me->DespawnOrUnsummon();
-
             if (!pInstance)
                 return;
 
@@ -97,6 +90,13 @@ public:
                 creature->DespawnOrUnsummon();
                 pInstance->SetGuidData(DATA_MARTIN_OR_GORKUN_GUID, ObjectGuid::Empty);
             }
+
+            // Tyrannus is temporarily spawned as Rimefang's rider. If he evades, despawn Rimefang.
+            // Tyrannus will be respawned once Rimefang respawns.
+            if (Creature* rimefang = pInstance->instance->GetCreature(pInstance->GetGuidData(DATA_RIMEFANG_GUID)))
+                rimefang->DespawnOnEvade();
+
+            me->DespawnOrUnsummon();
         }
 
         void DoAction(int32 param) override
