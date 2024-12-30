@@ -16,28 +16,28 @@ UPDATE `creature` SET `wander_distance` = 0, `MovementType` = 0 WHERE `guid` IN 
 UPDATE `creature` SET `wander_distance` = 0, `MovementType` = 0 WHERE `guid` IN (128973, 128980, 128976, 128978, 128981, 128968, 128993, 128979, 128986, 128970, 128966, 128991, 128992, 128958, 128959, 128960, 128961, 128962, 128963, 128964, 128965, 128967) AND `id1` = 28577;
 
 -- Change Positions (sniffed values)
-UPDATE `creature` SET `position_x` = 2083.5244, `position_y` = -5713.8477, `position_z` = 100.62685, `orientation` = 5.6665, `spawntimesecs` = 120 WHERE (`guid`, `id1`) IN ((128922, 28576), (128979, 28577));
-UPDATE `creature` SET `position_x` = 1959.51, `position_y` = -5809.41, `position_z` = 101.222, `orientation` = 1.48353, `spawntimesecs` = 120 WHERE (`guid`, `id1`) IN ((128927, 28576), (128986, 28577));
-UPDATE `creature` SET `position_x` = 2104.597, `position_y` = -5852.6714, `position_z` = 102.65492, `orientation` = 3.7433, `spawntimesecs` = 120 WHERE (`guid`, `id1`) IN ((128928, 28576), (128970, 28577));
-UPDATE `creature` SET `position_x` = 2092.7227, `position_y` = -5778.4004, `position_z` = 99.17004, `orientation` = 2.3495708, `spawntimesecs` = 120 WHERE (`guid`, `id1`) IN ((128930, 28576), (128966, 28577));
-UPDATE `creature` SET `position_x` = 1965.97, `position_y` = -5833.76, `position_z` = 100.843, `orientation` = 4.08407, `spawntimesecs` = 120 WHERE (`guid`, `id1`) IN ((128973, 28577), (128924, 28576));
-UPDATE `creature` SET `position_x` = 2126.9946, `position_y` = -5881.348, `position_z` = 102.23642, `orientation` = 2.1005676, `spawntimesecs` = 120 WHERE (`guid`, `id1`) IN ((128976, 28577), (128954, 28576));
-UPDATE `creature` SET `position_x` = 2056.6086, `position_y` = -5754.899, `position_z` = 98.03694, `orientation` = 3.0397918, `spawntimesecs` = 120 WHERE (`guid`, `id1`) IN ((128978, 28577), (128929, 28576));
-UPDATE `creature` SET `position_x` = 2067.315, `position_y` = -5915.171, `position_z` = 106.67783, `orientation` = 3.5101542, `spawntimesecs` = 120 WHERE (`guid`, `id1`) IN ((128980, 28577), (128934, 28576));
-UPDATE `creature` SET `position_x` = 1927.4072, `position_y` = -5807.218, `position_z` = 100.20784, `orientation` = 5.9593172, `spawntimesecs` = 120 WHERE (`guid`, `id1`) IN ((128981, 28577), (128926, 28576));
-UPDATE `creature` SET `position_x` = 2160.4504, `position_y` = -5793.529, `position_z` = 100.928505, `orientation` = 2.87087, `spawntimesecs` = 120 WHERE (`guid`, `id1`) IN ((128968, 28577), (128920, 28576));
-UPDATE `creature` SET `position_x` = 2144.6318, `position_y` = -5754.6543, `position_z` = 99.69839, `orientation` = 5.02815, `spawntimesecs` = 120 WHERE (`guid`, `id1`) IN ((128993, 28577), (128916, 28576));
-UPDATE `creature` SET `position_x` = 2145.1165, `position_y` = -5919.1206, `position_z` = 98.640945, `orientation` = 1.53392, `spawntimesecs` = 120 WHERE (`guid`, `id1`) IN ((128991, 28577), (128935, 28576));
-UPDATE `creature` SET `position_x` = 2254.762, `position_y` = -5809.216, `position_z` = 101.03145, `orientation` = 2.50164, `spawntimesecs` = 120 WHERE (`guid`, `id1`) IN ((128992, 28577), (128948, 28576));
-UPDATE `creature` SET `position_x` = 2182.8823, `position_y` = -5747.591, `position_z` = 101.89203, `orientation` = 4.89732, `spawntimesecs` = 120 WHERE (`guid`, `id1`) IN ((128958, 28577), (128910, 28576));
-UPDATE `creature` SET `position_x` = 2220.754, `position_y` = -5868.3633, `position_z` = 101.3891, `orientation` = 3.23552, `spawntimesecs` = 120 WHERE (`guid`, `id1`) IN ((128959, 28577), (128911, 28576));
-UPDATE `creature` SET `position_x` = 2221.779, `position_y` = -5904.03, `position_z` = 101.254715, `orientation` = 1.18682, `spawntimesecs` = 120 WHERE (`guid`, `id1`) IN ((128960, 28577), (128912, 28576));
-UPDATE `creature` SET `position_x` = 2197.7969, `position_y` = -5908.8823, `position_z` = 100.96651, `orientation` = 2.43027, `spawntimesecs` = 120 WHERE (`guid`, `id1`) IN ((128961, 28577), (128913, 28576));
-UPDATE `creature` SET `position_x` = 2272.2073, `position_y` = -5888.6865, `position_z` = 100.51772, `orientation` = 3.63413, `spawntimesecs` = 120 WHERE (`guid`, `id1`) IN ((128962, 28577), (128914, 28576));
-UPDATE `creature` SET `position_x` = 2286.7288, `position_y` = -5786.4834, `position_z` = 101.393166, `orientation` = 2.39381, `spawntimesecs` = 120 WHERE (`guid`, `id1`) IN ((128963, 28577), (128915, 28576));
-UPDATE `creature` SET `position_x` = 2316.1199, `position_y` = -5880.3145, `position_z` = 100.80853, `orientation` = 2.82385, `spawntimesecs` = 120 WHERE (`guid`, `id1`) IN ((128964, 28577), (128917, 28576));
-UPDATE `creature` SET `position_x` = 2172.77, `position_y` = -5739.8115, `position_z` = 101.75742, `orientation` = 4.92786, `spawntimesecs` = 120 WHERE (`guid`, `id1`) IN ((128965, 28577), (128918, 28576));
-UPDATE `creature` SET `position_x` = 1959.3444, `position_y` = -5881.302, `position_z` = 101.192764, `orientation` = 2.11768, `spawntimesecs` = 120 WHERE (`guid`, `id1`) IN ((128967, 28577), (128919, 28576));
+UPDATE `creature` SET `position_x` = 2083.5244, `position_y` = -5713.8477, `position_z` = 100.62685, `orientation` = 5.6665, `spawntimesecs` = 120, `VerifiedBuild` = 58158 WHERE (`guid`, `id1`) IN ((128922, 28576), (128979, 28577));
+UPDATE `creature` SET `position_x` = 1959.51, `position_y` = -5809.41, `position_z` = 101.222, `orientation` = 1.48353, `spawntimesecs` = 120, `VerifiedBuild` = 58158 WHERE (`guid`, `id1`) IN ((128927, 28576), (128986, 28577));
+UPDATE `creature` SET `position_x` = 2104.597, `position_y` = -5852.6714, `position_z` = 102.65492, `orientation` = 3.7433, `spawntimesecs` = 120, `VerifiedBuild` = 58158 WHERE (`guid`, `id1`) IN ((128928, 28576), (128970, 28577));
+UPDATE `creature` SET `position_x` = 2092.7227, `position_y` = -5778.4004, `position_z` = 99.17004, `orientation` = 2.3495708, `spawntimesecs` = 120, `VerifiedBuild` = 58158 WHERE (`guid`, `id1`) IN ((128930, 28576), (128966, 28577));
+UPDATE `creature` SET `position_x` = 1965.97, `position_y` = -5833.76, `position_z` = 100.843, `orientation` = 4.08407, `spawntimesecs` = 120, `VerifiedBuild` = 58158 WHERE (`guid`, `id1`) IN ((128973, 28577), (128924, 28576));
+UPDATE `creature` SET `position_x` = 2126.9946, `position_y` = -5881.348, `position_z` = 102.23642, `orientation` = 2.1005676, `spawntimesecs` = 120, `VerifiedBuild` = 58158 WHERE (`guid`, `id1`) IN ((128976, 28577), (128954, 28576));
+UPDATE `creature` SET `position_x` = 2056.6086, `position_y` = -5754.899, `position_z` = 98.03694, `orientation` = 3.0397918, `spawntimesecs` = 120, `VerifiedBuild` = 58158 WHERE (`guid`, `id1`) IN ((128978, 28577), (128929, 28576));
+UPDATE `creature` SET `position_x` = 2067.315, `position_y` = -5915.171, `position_z` = 106.67783, `orientation` = 3.5101542, `spawntimesecs` = 120, `VerifiedBuild` = 58158 WHERE (`guid`, `id1`) IN ((128980, 28577), (128934, 28576));
+UPDATE `creature` SET `position_x` = 1927.4072, `position_y` = -5807.218, `position_z` = 100.20784, `orientation` = 5.9593172, `spawntimesecs` = 120, `VerifiedBuild` = 58158 WHERE (`guid`, `id1`) IN ((128981, 28577), (128926, 28576));
+UPDATE `creature` SET `position_x` = 2160.4504, `position_y` = -5793.529, `position_z` = 100.928505, `orientation` = 2.87087, `spawntimesecs` = 120, `VerifiedBuild` = 58158 WHERE (`guid`, `id1`) IN ((128968, 28577), (128920, 28576));
+UPDATE `creature` SET `position_x` = 2144.6318, `position_y` = -5754.6543, `position_z` = 99.69839, `orientation` = 5.02815, `spawntimesecs` = 120, `VerifiedBuild` = 58158 WHERE (`guid`, `id1`) IN ((128993, 28577), (128916, 28576));
+UPDATE `creature` SET `position_x` = 2145.1165, `position_y` = -5919.1206, `position_z` = 98.640945, `orientation` = 1.53392, `spawntimesecs` = 120, `VerifiedBuild` = 58158 WHERE (`guid`, `id1`) IN ((128991, 28577), (128935, 28576));
+UPDATE `creature` SET `position_x` = 2254.762, `position_y` = -5809.216, `position_z` = 101.03145, `orientation` = 2.50164, `spawntimesecs` = 120, `VerifiedBuild` = 58158 WHERE (`guid`, `id1`) IN ((128992, 28577), (128948, 28576));
+UPDATE `creature` SET `position_x` = 2182.8823, `position_y` = -5747.591, `position_z` = 101.89203, `orientation` = 4.89732, `spawntimesecs` = 120, `VerifiedBuild` = 58158 WHERE (`guid`, `id1`) IN ((128958, 28577), (128910, 28576));
+UPDATE `creature` SET `position_x` = 2220.754, `position_y` = -5868.3633, `position_z` = 101.3891, `orientation` = 3.23552, `spawntimesecs` = 120, `VerifiedBuild` = 58158 WHERE (`guid`, `id1`) IN ((128959, 28577), (128911, 28576));
+UPDATE `creature` SET `position_x` = 2221.779, `position_y` = -5904.03, `position_z` = 101.254715, `orientation` = 1.18682, `spawntimesecs` = 120, `VerifiedBuild` = 58158 WHERE (`guid`, `id1`) IN ((128960, 28577), (128912, 28576));
+UPDATE `creature` SET `position_x` = 2197.7969, `position_y` = -5908.8823, `position_z` = 100.96651, `orientation` = 2.43027, `spawntimesecs` = 120, `VerifiedBuild` = 58158 WHERE (`guid`, `id1`) IN ((128961, 28577), (128913, 28576));
+UPDATE `creature` SET `position_x` = 2272.2073, `position_y` = -5888.6865, `position_z` = 100.51772, `orientation` = 3.63413, `spawntimesecs` = 120, `VerifiedBuild` = 58158 WHERE (`guid`, `id1`) IN ((128962, 28577), (128914, 28576));
+UPDATE `creature` SET `position_x` = 2286.7288, `position_y` = -5786.4834, `position_z` = 101.393166, `orientation` = 2.39381, `spawntimesecs` = 120, `VerifiedBuild` = 58158 WHERE (`guid`, `id1`) IN ((128963, 28577), (128915, 28576));
+UPDATE `creature` SET `position_x` = 2316.1199, `position_y` = -5880.3145, `position_z` = 100.80853, `orientation` = 2.82385, `spawntimesecs` = 120, `VerifiedBuild` = 58158 WHERE (`guid`, `id1`) IN ((128964, 28577), (128917, 28576));
+UPDATE `creature` SET `position_x` = 2172.77, `position_y` = -5739.8115, `position_z` = 101.75742, `orientation` = 4.92786, `spawntimesecs` = 120, `VerifiedBuild` = 58158 WHERE (`guid`, `id1`) IN ((128965, 28577), (128918, 28576));
+UPDATE `creature` SET `position_x` = 1959.3444, `position_y` = -5881.302, `position_z` = 101.192764, `orientation` = 2.11768, `spawntimesecs` = 120, `VerifiedBuild` = 58158 WHERE (`guid`, `id1`) IN ((128967, 28577), (128919, 28576));
 
 -- Waypoints
 DELETE FROM `waypoint_data` WHERE `id` IN (12897300);
@@ -433,10 +433,10 @@ UPDATE `creature` SET `Comment` = "has guid specific SAI" WHERE (`id1` = 28576) 
 UPDATE `creature` SET `Comment` = "has guid specific SAI" WHERE (`id1` = 28577) AND (`guid` IN (128979, 128986, 128970, 128966, 128973, 128976, 128978, 128980, 128981, 128968, 128993, 128991, 128992, 128958, 128959, 128960, 128961, 128962, 128963, 128964, 128965, 128967));
 
 -- Add Extra Flag (DONT_OVERRIDE_SAI_ENTRY). This is not a sniff, it is usefull to lighten the fix.
-UPDATE `creature_template` SET `flags_extra` = 134217728 WHERE `entry` IN (28576, 28577);
+UPDATE `creature_template` SET `flags_extra` = `flags_extra`|134217728 WHERE `entry` IN (28576, 28577);
 
 -- Change General SmartAI
-UPDATE `creature_template` SET `AIName` = 'SmartAI' WHERE `entry` = 28576;
+UPDATE `creature_template` SET `AIName` = 'SmartAI', `ScriptName` = '' WHERE `entry` = 28576;
 DELETE FROM `smart_scripts` WHERE (`entryorguid` = 28576) AND (`source_type` = 0);
 INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `event_param6`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
 (28576, 0, 0, 1, 25, 0, 100, 0, 0, 0, 0, 0, 0, 0, 22, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Citizen of Havenshire - On Reset - Set Event Phase 1'),
@@ -452,7 +452,7 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 (28576, 0, 10, 0, 6, 0, 100, 0, 0, 0, 0, 0, 0, 0, 1, 2, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Citizen of Havenshire - On Just Died - Say Line 2'),
 (28576, 0, 11, 0, 4, 0, 50, 0, 0, 0, 0, 0, 0, 0, 86, 58207, 0, 10, 128581, 28765, 0, 7, 0, 0, 0, 0, 0, 0, 0, 0, 'Citizen of Havenshire - On Aggro - Cross Cast \'Lich King VO Blocker\'');
 
-UPDATE `creature_template` SET `AIName` = 'SmartAI' WHERE `entry` = 28577;
+UPDATE `creature_template` SET `AIName` = 'SmartAI', `ScriptName` = '' WHERE `entry` = 28577;
 DELETE FROM `smart_scripts` WHERE (`entryorguid` = 28577) AND (`source_type` = 0);
 INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `event_param6`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
 (28577, 0, 0, 1, 25, 0, 100, 0, 0, 0, 0, 0, 0, 0, 22, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Citizen of Havenshire - On Reset - Set Event Phase 1'),
@@ -715,7 +715,7 @@ INSERT INTO `pool_template` (`entry`, `max_limit`, `description`) VALUES
 (22406, 1, 'Citizen of Havenshire random spawn 21'),
 (22407, 1, 'Citizen of Havenshire random spawn 22');
 
-DELETE FROM `pool_creature` WHERE (`pool_entry` IN (22386, 22387, 22388, 22389, 22390, 22391, 22392, 22393, 22394, 22395, 22396, 22397, 22398, 22399, 22400, 22401, 22402, 22403, 22404, 22405, 22406, 22407));
+DELETE FROM `pool_creature` WHERE (`pool_entry` IN (22386, 22387, 22388, 22389, 22390, 22391, 22392, 22393, 22394, 22395, 22396, 22397, 22398, 22399, 22400, 22401, 22402, 22403, 22404, 22405, 22406, 22407)) AND (`guid` IN (128922, 128979, 128927, 128986, 128928, 128970, 128930, 128966, 128973, 128924, 128976, 128954, 128978, 128929, 128980, 128934, 128981, 128926, 128968, 128920, 128993, 128916, 128991, 128935, 128992, 128948, 128958, 128910, 128959, 128911, 128960, 128912, 128961, 128913, 128962, 128914, 128963, 128915, 128964, 128917, 128965, 128918, 128967, 128919));
 INSERT INTO `pool_creature` (`guid`, `pool_entry`, `chance`, `description`) VALUES
 (128922, 22386, 0, 'Citizen of Havenshire (1/2)'),
 (128979, 22386, 0, 'Citizen of Havenshire (2/2)'),
