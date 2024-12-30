@@ -92,6 +92,7 @@ enum MiscIds
     DATA_TIMED_RUN                      = 0,
     ACTION_START_TIMED_RUN              = 0,
     ACTION_START_AKILZON_GAUNTLET       = 1,
+    ACTION_RESET_AKILZON_GAUNTLET       = 2,
     GROUP_TIMED_RUN                     = 1
 };
 
