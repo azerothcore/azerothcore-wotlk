@@ -97,8 +97,19 @@ public:
                     if (Vehicle* v = c->GetVehicleKit())
                         v->InstallAllAccessories(false);
                 }
-                pInstance->SetData(DATA_TYRANNUS, NOT_STARTED);
             }
+
+            pInstance->SetData(DATA_TYRANNUS, NOT_STARTED);
+        }
+
+        void EnterEvadeMode(EvadeReason why) override
+        {
+            // Tyrannus is temporarily spawned as Rimefang's rider. If he evades, despawn Rimefang.
+            // Tyrannus will be respawned once Rimefang respawns.
+            if (Creature* rimefang = pInstance->instance->GetCreature(pInstance->GetGuidData(DATA_RIMEFANG_GUID)))
+                rimefang->DespawnOnEvade();
+
+            me->DespawnOrUnsummon();
         }
 
         void DoAction(int32 param) override
@@ -141,7 +152,7 @@ public:
                 if (TSDistCheckPos.GetExactDist(x, y, z) > 100.0f || z > TSDistCheckPos.GetPositionZ() + 20.0f || z < TSDistCheckPos.GetPositionZ() - 20.0f)
                 {
                     me->SetHealth(me->GetMaxHealth());
-                    EnterEvadeMode();
+                    EnterEvadeMode(EVADE_REASON_OTHER);
                     return;
                 }
             }
