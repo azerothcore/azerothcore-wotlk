@@ -290,13 +290,17 @@ public:
 
         creature->RemoveNpcFlag(UNIT_NPC_FLAG_GOSSIP);
 
+        creature->GetInstanceScript()->SetData(DATA_CHEST_LOOTED, 0);
+
         float x, y, z;
         creature->GetPosition(x, y, z);
         for (uint8 i = 0; i < 4; ++i)
         {
             if (HostageEntry[i] == creature->GetEntry())
             {
-                creature->SummonGameObject(ChestEntry[i], x - 2, y, z, 0, 0, 0, 0, 0, 0);
+                GameObject* obj = creature->SummonGameObject(ChestEntry[i], x - 2, y, z, 0, 0, 0, 0, 0, 0);
+                if (obj)
+                    obj->RemoveFlag(GAMEOBJECT_FLAGS, GO_FLAG_LOCKED);
                 break;
             }
         }
