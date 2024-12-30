@@ -63,9 +63,9 @@ public:
         {
             pInstance = me->GetInstanceScript();
             me->SetReactState(REACT_PASSIVE);
-            if (Creature* c = pInstance->instance->GetCreature(pInstance->GetGuidData(DATA_RIMEFANG_GUID)))
+            if (Creature* rimefang = pInstance->instance->GetCreature(pInstance->GetGuidData(DATA_RIMEFANG_GUID)))
             {
-                c->SetCanFly(true);
+                rimefang->SetCanFly(true);
             }
         }
 
@@ -76,29 +76,6 @@ public:
         {
             me->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
             events.Reset();
-            if (me->HasReactState(REACT_AGGRESSIVE)) // Reset() called by EnterEvadeMode()
-            {
-                if (!pInstance)
-                    return;
-                if (Creature* c = pInstance->instance->GetCreature(pInstance->GetGuidData(DATA_MARTIN_OR_GORKUN_GUID)))
-                {
-                    c->AI()->DoAction(1);
-                    c->DespawnOrUnsummon();
-                    pInstance->SetGuidData(DATA_MARTIN_OR_GORKUN_GUID, ObjectGuid::Empty);
-                }
-                if (Creature* c = pInstance->instance->GetCreature(pInstance->GetGuidData(DATA_RIMEFANG_GUID)))
-                {
-                    c->GetMotionMaster()->Clear();
-                    c->GetMotionMaster()->MoveIdle();
-
-                    c->RemoveAllAuras();
-                    c->UpdatePosition(1017.3f, 168.974f, 642.926f, 5.2709f, true);
-                    c->StopMovingOnCurrentPos();
-                    if (Vehicle* v = c->GetVehicleKit())
-                        v->InstallAllAccessories(false);
-                }
-            }
-
             pInstance->SetData(DATA_TYRANNUS, NOT_STARTED);
         }
 
@@ -110,6 +87,16 @@ public:
                 rimefang->DespawnOnEvade();
 
             me->DespawnOrUnsummon();
+
+            if (!pInstance)
+                return;
+
+            if (Creature* creature = pInstance->instance->GetCreature(pInstance->GetGuidData(DATA_MARTIN_OR_GORKUN_GUID)))
+            {
+                creature->AI()->DoAction(1);
+                creature->DespawnOrUnsummon();
+                pInstance->SetGuidData(DATA_MARTIN_OR_GORKUN_GUID, ObjectGuid::Empty);
+            }
         }
 
         void DoAction(int32 param) override
