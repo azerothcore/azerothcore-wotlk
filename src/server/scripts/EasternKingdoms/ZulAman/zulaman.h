@@ -80,7 +80,11 @@ enum GameobjectIds
     GO_TANZARS_TRUNK                    = 186648,
     GO_ASHLIS_BAG                       = 186672,
     GO_KRAZS_PACKAGE                    = 186667,
-    GO_STRANGE_GONG                     = 187359
+    GO_STRANGE_GONG                     = 187359,
+    GO_ALTAR_TORCH_EAGLE_GOD            = 187035,
+    GO_ALTAR_TORCH_DRAGONHAWK_GOD       = 187036,
+    GO_ALTAR_TORCH_LYNX_GOD             = 187037,
+    GO_ALTAR_TORCH_BEAR_GOD             = 186860
 };
 
 enum MiscIds
