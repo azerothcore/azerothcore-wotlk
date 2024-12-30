@@ -204,8 +204,17 @@ struct boss_nalorakk : public BossAI
             {
                 if (CheckEvade(_waveList))
                 {
-                    _active = true; // do not call Reset()
                     _introScheduler.CancelGroup(GROUP_CHECK_DEAD);
+                    _introScheduler.Schedule(5s, GROUP_CHECK_EVADE, [this](TaskContext context)
+                    {
+                        for (Creature* member : _waveList)
+                            if (member->isMoving())
+                            {
+                                context.Repeat(1s);
+                                return;
+                            }
+                        _active = true;
+                    });
                 }
                 else
                     context.Repeat(10s);
