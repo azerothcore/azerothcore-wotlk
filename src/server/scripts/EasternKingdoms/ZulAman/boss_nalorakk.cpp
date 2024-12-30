@@ -202,7 +202,7 @@ struct boss_nalorakk : public BossAI
             }
             _introScheduler.Schedule(10s, GROUP_CHECK_EVADE, [this](TaskContext context)
             {
-                if (CheckEvade(_waveList))
+                if (CheckAnyEvadeGroup(_waveList))
                 {
                     _introScheduler.CancelGroup(GROUP_CHECK_DEAD);
                     _introScheduler.Schedule(5s, GROUP_CHECK_EVADE, [this](TaskContext context)
@@ -330,7 +330,7 @@ struct boss_nalorakk : public BossAI
         BossAI::UpdateAI(diff);
     }
 
-    bool CheckFullyDeadGroup(std::list<Creature* > groupToCheck)
+    bool CheckFullyDeadGroup(std::list<Creature*> groupToCheck)
     {
         for (Creature* member : groupToCheck)
         {
@@ -342,7 +342,7 @@ struct boss_nalorakk : public BossAI
         return true;
     }
 
-    bool CheckEvade(std::list<Creature* > groupToCheck)
+    bool CheckAnyEvadeGroup(std::list<Creature*> groupToCheck)
     {
         for (Creature* member : groupToCheck)
             if (member->IsAlive() && !member->IsInCombat())
