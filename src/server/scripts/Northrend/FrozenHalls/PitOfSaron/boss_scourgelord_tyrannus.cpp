@@ -79,7 +79,7 @@ public:
             pInstance->SetData(DATA_TYRANNUS, NOT_STARTED);
         }
 
-        void EnterEvadeMode(EvadeReason why) override
+        void EnterEvadeMode(EvadeReason /*why*/) override
         {
             // Tyrannus is temporarily spawned as Rimefang's rider. If he evades, despawn Rimefang.
             // Tyrannus will be respawned once Rimefang respawns.
