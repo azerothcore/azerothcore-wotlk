@@ -97,6 +97,7 @@ public:
                     if (Vehicle* v = c->GetVehicleKit())
                         v->InstallAllAccessories(false);
                 }
+                pInstance->SetData(DATA_TYRANNUS, NOT_STARTED);
             }
         }
 
