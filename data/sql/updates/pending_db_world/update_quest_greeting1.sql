@@ -8,7 +8,7 @@ INSERT INTO `quest_greeting_locale` (`ID`, `type`, `locale`, `Greeting`, `Verifi
 (241,0,'deDE','He, mein Freund. Man nennt mich Remy. Ich komme aus dem Rotkammgebirge im Osten und bin auf der Suche nach interessanten... Geschäften, interessanten... Geschäften. Habt ihr vielleicht welche... vielleicht welche?',0),
 (261,0,'deDE','Seid gegrüßt. Ihr seht aus wie $Gein Mann:eine Frau; $Gder:die; weiß, was $Ger:sie; will... habt Ihr mit der Armee von Sturmwind zu tun?',0),
 (265,0,'deDE','Ich spürte schon seit geraumer Zeit, dass Ihr kommen würdet, $N. Es stand in den Sternen geschrieben.',0),
-(272,0,'deDE','Hallo, hallo! Willkommen in meiner Küche, $Gmein Herr:meine Dame;! Hier werden all die köstlichen Delikatessen der Taverne Zum roten Raben zubereitet. Ah, riecht nur das wunderbare Aroma!',0), 
+(272,0,'deDE','Hallo, hallo! Willkommen in meiner Küche, $Gmein Herr:meine Dame;! Hier werden all die köstlichen Delikatessen der Taverne Zum roten Raben zubereitet. Ah, riecht nur das wunderbare Aroma!',0),
 (278,0,'deDE','Hallo, $Gwerter Herr:werte Dame;. Nehmt Platz und esst etwas, wenn ihr Hunger habt. Und keine Sorge, ich bin zwar mit meiner Handarbeit beschäftigt, aber ich höre Euch gut zu...',0),
 (342,0,'deDE','Seid gegrüßt, $N! Willkommen in meinem bescheidenen Garten. Das Wetter ist in letzter Zeit wirklich vorzüglich. Lasst uns hoffen, dass es bis zur Ernte anhält.',0),
 (344,0,'deDE','Wer ist $Gdieser:diese; $C, $Gder:die; sich vor das Gericht von Seenhain im Königreich Sturmwind begibt? Sagt, was Euer Anliegen in dieser Stadt ist, $R. Die Bedrohung des Königreichs durch die Orcs ist zu groß, um Zeit mit einem Geplänkel zu vergeuden.',0),
