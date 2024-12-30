@@ -72,10 +72,11 @@ enum Phases
 enum NalorakkGroups
 {
     GROUP_CHECK_DEAD            = 1,
-    GROUP_MOVE                  = 2,
-    GROUP_BERSERK               = 3,
-    GROUP_HUMAN                 = 4,
-    GROUP_BEAR                  = 5
+    GROUP_CHECK_EVADE           = 2,
+    GROUP_MOVE                  = 3,
+    GROUP_BERSERK               = 4,
+    GROUP_HUMAN                 = 5,
+    GROUP_BEAR                  = 6
 };
 
 struct boss_nalorakk : public BossAI
@@ -199,6 +200,16 @@ struct boss_nalorakk : public BossAI
                     me->SetHomePosition(me->GetPosition());
                     break;
             }
+            _introScheduler.Schedule(10s, GROUP_CHECK_EVADE, [this](TaskContext context)
+            {
+                if (CheckEvade(_waveList))
+                {
+                    _active = true; // do not call Reset()
+                    _introScheduler.CancelGroup(GROUP_CHECK_DEAD);
+                }
+                else
+                    context.Repeat(10s);
+            });
         }
         BossAI::MoveInLineOfSight(who);
     }
@@ -320,6 +331,14 @@ struct boss_nalorakk : public BossAI
             }
         }
         return true;
+    }
+
+    bool CheckEvade(std::list<Creature* > groupToCheck)
+    {
+        for (Creature* member : groupToCheck)
+            if (member->IsAlive() && !member->IsInCombat())
+                return true;
+        return false;
     }
 
     void JustDied(Unit* killer) override
