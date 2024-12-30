@@ -1,3 +1,4 @@
+-- DB update 2024_12_30_01 -> 2024_12_30_02
 --
 -- Eagle Trash Aggro Trigger
 UPDATE `creature_template` SET `ScriptName` = '' WHERE (`entry` = 24223);
