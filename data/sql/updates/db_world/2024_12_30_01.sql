@@ -1,3 +1,4 @@
+-- DB update 2024_12_30_00 -> 2024_12_30_01
 DELETE FROM `quest_greeting_locale` WHERE `ID` IN (234, 235, 238, 239, 240, 241, 261, 265, 272, 278, 342, 344, 381, 382, 392, 415, 464, 633, 656, 661, 714, 733, 737, 773, 786, 823, 1071, 1092, 1105, 1239, 1284, 1343, 1344, 1356, 1374, 1377, 1428, 1495, 1499, 1500, 1515, 1518, 1646, 1719, 1738, 1748, 1937, 1938, 1950, 1952, 2080, 2086, 2094, 2121, 2215, 2216, 2263, 2498, 2501, 2700, 2706, 2713, 2785, 2786, 2817, 2860, 2910, 2920, 2921) AND `locale` = 'deDE';
 INSERT INTO `quest_greeting_locale` (`ID`, `type`, `locale`, `Greeting`, `VerifiedBuild`) VALUES
 (234,0,'deDE','In Westfall hat sich üble Verderbnis eingeschlichen. Während ich auf dem Schlachtfeld von Lordaeron meine Pflicht tat, wurden diese anständig geführten Höfe überfallen und zu Schlupfwinkeln für Schläger und Mörder umfunktioniert. Die Volksmiliz ist auf Eure Hilfe angewiesen.',0),
