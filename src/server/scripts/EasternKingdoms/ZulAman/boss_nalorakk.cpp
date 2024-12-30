@@ -110,7 +110,7 @@ struct boss_nalorakk : public BossAI
 
     void MoveInLineOfSight(Unit* who) override
     {
-        if (who->IsPlayer() && _phase < PHASE_START_COMBAT && _active)
+        if (who->IsPlayer() && !who->ToPlayer()->IsGameMaster() && _phase < PHASE_START_COMBAT && _active)
         {
             _active = false;
             switch (_phase)
