@@ -1,3 +1,4 @@
+
 UPDATE `creature_template` SET `AIName` = 'SmartAI', `ScriptName` = '' WHERE `entry` = 28557;
 
 DELETE FROM `smart_scripts` WHERE (`source_type` = 0 AND `entryorguid` = 28557);
@@ -8,4 +9,4 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 (28557, 0, 3, 4, 61, 0, 100, 0, 0, 0, 0, 0, 0, 0, 17, 431, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Scarlet Peasant - On 1 or More Players in Range - Set Emote State 431'),
 (28557, 0, 4, 5, 61, 0, 100, 0, 0, 0, 0, 0, 0, 0, 66, 0, 0, 0, 0, 0, 0, 17, 0, 3, 1, 0, 0, 0, 0, 0, 'Scarlet Peasant - On 1 or More Players in Range - Set Orientation Players in Range'),
 (28557, 0, 5, 0, 61, 0, 100, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Scarlet Peasant - On 1 or More Players in Range - Say Line 0'),
-(28557, 0, 6, 0, 102, 0, 100, 0, 1, 3, 30000, 30000, 30000, 0, 24, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Scarlet Peasant - On Less Than 1 Players in Range - Evade')
+(28557, 0, 6, 0, 102, 0, 100, 0, 1, 3, 30000, 30000, 30000, 0, 24, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Scarlet Peasant - On Less Than 1 Players in Range - Evade');
