@@ -561,7 +561,7 @@ bool Map::AddToMap(T* obj, bool checkTransport)
     if (obj->IsInWorld())
     {
         ASSERT(obj->IsInGrid());
-        obj->UpdateObjectVisibility(true);
+        obj->UpdateObjectVisibilityOnCreate();
         return true;
     }
 

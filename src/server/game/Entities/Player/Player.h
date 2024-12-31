@@ -444,7 +444,7 @@ struct Runes
 
 struct EnchantDuration
 {
-    EnchantDuration()  = default;;
+    EnchantDuration()  = default;
     EnchantDuration(Item* _item, EnchantmentSlot _slot, uint32 _leftduration) : item(_item), slot(_slot),
         leftduration(_leftduration) { ASSERT(item); };
 

@@ -49,11 +49,15 @@ Position const HarrisonJonesLoc = {120.687f, 1674.0f, 42.0217f, 1.59044f};
 
 DoorData const doorData[] =
 {
-    { GO_ZULJIN_FIREWALL,      DATA_ZULJIN,  DOOR_TYPE_ROOM    },
-    { GO_DOOR_HALAZZI,         DATA_HALAZZI, DOOR_TYPE_PASSAGE },
-    { GO_LYNX_TEMPLE_ENTRANCE, DATA_HALAZZI, DOOR_TYPE_ROOM    },
-    { GO_DOOR_AKILZON,         DATA_AKILZON, DOOR_TYPE_ROOM    },
-    { 0,                       0,            DOOR_TYPE_ROOM    } // END
+    { GO_ZULJIN_FIREWALL,            DATA_ZULJIN,   DOOR_TYPE_ROOM    },
+    { GO_DOOR_HALAZZI,               DATA_HALAZZI,  DOOR_TYPE_PASSAGE },
+    { GO_LYNX_TEMPLE_ENTRANCE,       DATA_HALAZZI,  DOOR_TYPE_ROOM    },
+    { GO_DOOR_AKILZON,               DATA_AKILZON,  DOOR_TYPE_ROOM    },
+    { GO_ALTAR_TORCH_EAGLE_GOD,      DATA_AKILZON,  DOOR_TYPE_PASSAGE },
+    { GO_ALTAR_TORCH_DRAGONHAWK_GOD, DATA_JANALAI,  DOOR_TYPE_PASSAGE },
+    { GO_ALTAR_TORCH_LYNX_GOD,       DATA_HALAZZI,  DOOR_TYPE_PASSAGE },
+    { GO_ALTAR_TORCH_BEAR_GOD,       DATA_NALORAKK, DOOR_TYPE_PASSAGE },
+    { 0,                             0,             DOOR_TYPE_ROOM    } // END
 };
 
 ObjectData const creatureData[] =
@@ -82,7 +86,12 @@ ObjectData const summonData[] =
 
 BossBoundaryData const boundaries =
 {
-    { DATA_HEXLORD,    new RectangleBoundary(80.50557f, 920.9858f, 155.88986f, 1015.27563f)}
+    { DATA_AKILZON,  new ZRangeBoundary(72.0f, 100.0f)},
+    { DATA_HALAZZI,  new RectangleBoundary(304.0f, 432.0f, 1052.0f, 1156.0f)},
+    { DATA_HEXLORD,  new RectangleBoundary(80.50557f, 920.9858f, 155.88986f, 1015.27563f)},
+    { DATA_JANALAI,  new ZRangeBoundary(16.0f, 46.0f)},
+    { DATA_NALORAKK, new ZRangeBoundary(38.0f, 68.0f)},
+    { DATA_ZULJIN,   new ZRangeBoundary(43.0f, 73.0f)}
 };
 
 class instance_zulaman : public InstanceMapScript
@@ -103,6 +112,7 @@ public:
             LoadBossBoundaries(boundaries);
             LoadDoorData(doorData);
             LoadSummonData(summonData);
+            _chestLooted = 0;
 
             for (uint8 i = 0; i < RAND_VENDOR; ++i)
                 RandVendor[i] = NOT_STARTED;
@@ -200,6 +210,8 @@ public:
                 else if (data == DONE)
                     _akilzonGauntlet = DONE;
             }
+            else if (type == DATA_CHEST_LOOTED)
+                ++_chestLooted;
         }
 
         void StartAkilzonGauntlet()
@@ -226,8 +238,12 @@ public:
             _akilzonGauntlet = NOT_STARTED;
             for (ObjectGuid guid : AkilzonTrash)
                 if (Creature* creature = instance->GetCreature(guid))
+                {
                     if (!creature->IsAlive())
                         creature->Respawn();
+                    else if (creature->GetEntry() == NPC_AMINISHI_TEMPEST)
+                        creature->AI()->DoAction(ACTION_RESET_AKILZON_GAUNTLET);
+                }
             if (Creature* creature = GetCreature(DATA_LOOKOUT))
                 if (creature->isMoving())
                     creature->Respawn(true);
@@ -320,6 +336,8 @@ public:
                 return RandVendor[1];
             else if (type == TYPE_AKILZON_GAUNTLET)
                 return _akilzonGauntlet;
+            else if (type == DATA_CHEST_LOOTED)
+                return _chestLooted;
 
             return 0;
         }
@@ -330,6 +348,7 @@ public:
         }
 
         private:
+            uint16 _chestLooted;
             uint32 RandVendor[RAND_VENDOR];
             GuidSet AkilzonTrash;
             EncounterState _akilzonGauntlet = NOT_STARTED;
