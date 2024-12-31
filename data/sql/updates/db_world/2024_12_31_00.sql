@@ -1,3 +1,4 @@
+-- DB update 2024_12_30_02 -> 2024_12_31_00
 
 -- Set Run Speed
 UPDATE `creature_template` SET `speed_run` = 1.05 WHERE `entry` IN (28576, 28577);
