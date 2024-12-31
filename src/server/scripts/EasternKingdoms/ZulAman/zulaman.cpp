@@ -290,13 +290,17 @@ public:
 
         creature->RemoveNpcFlag(UNIT_NPC_FLAG_GOSSIP);
 
+        creature->GetInstanceScript()->SetData(DATA_CHEST_LOOTED, 0);
+
         float x, y, z;
         creature->GetPosition(x, y, z);
         for (uint8 i = 0; i < 4; ++i)
         {
             if (HostageEntry[i] == creature->GetEntry())
             {
-                creature->SummonGameObject(ChestEntry[i], x - 2, y, z, 0, 0, 0, 0, 0, 0);
+                GameObject* obj = creature->SummonGameObject(ChestEntry[i], x - 2, y, z, 0, 0, 0, 0, 0, 0);
+                if (obj)
+                    obj->RemoveFlag(GAMEOBJECT_FLAGS, GO_FLAG_LOCKED);
                 break;
             }
         }
@@ -586,7 +590,6 @@ private:
 
 enum AmanishiTempest
 {
-    ACTION_START_GAUNTLET   = 1,
     GROUP_AKILZON_GAUNTLET  = 1,
     SPELL_SUMMON_EAGLE      = 43487,
     SPELL_SUMMON_WARRIOR    = 43486,
@@ -601,6 +604,11 @@ struct npc_amanishi_tempest : public ScriptedAI
     {
         _summons.DespawnAll();
         scheduler.CancelAll();
+    }
+
+    void JustEngagedWith(Unit* /*who*/) override
+    {
+        scheduler.CancelGroup(GROUP_AKILZON_GAUNTLET);
         scheduler.Schedule(9s, 11s, [this](TaskContext context)
         {
             DoCastVictim(SPELL_THUNDERCLAP);
@@ -623,8 +631,15 @@ struct npc_amanishi_tempest : public ScriptedAI
 
     void DoAction(int32 action) override
     {
-        if (action == ACTION_START_GAUNTLET)
+        if (action == ACTION_START_AKILZON_GAUNTLET)
             ScheduleEvents();
+        else if (action == ACTION_RESET_AKILZON_GAUNTLET)
+            Reset();
+    }
+
+    void SummonedCreatureEvade(Creature* /*summon*/) override
+    {
+        EnterEvadeMode(EVADE_REASON_OTHER);
     }
 
     void EnterEvadeMode(EvadeReason why) override
@@ -635,7 +650,6 @@ struct npc_amanishi_tempest : public ScriptedAI
 
     void ScheduleEvents()
     {
-        me->SetInCombatWithZone();
         scheduler.Schedule(29s, 53s, GROUP_AKILZON_GAUNTLET, [this](TaskContext context)
         {
             for (uint8 i = 0; i < 5; ++i)
@@ -652,37 +666,12 @@ struct npc_amanishi_tempest : public ScriptedAI
     void UpdateAI(uint32 diff) override
     {
         scheduler.Update(diff);
-        if (!me->IsEngaged())
-            return;
-        Unit* victim = me->SelectVictim();
-        if (!victim || me->GetExactDist(victim) > me->GetAggroRange(victim))
-            return;
         ScriptedAI::UpdateAI(diff);
     }
 
 private:
     InstanceScript* _instance;
     SummonList _summons;
-};
-
-struct npc_eagle_trash_aggro_trigger : public ScriptedAI
-{
-    npc_eagle_trash_aggro_trigger(Creature* creature) : ScriptedAI(creature), _instance(creature->GetInstanceScript()) {}
-
-    void MoveInLineOfSight(Unit* who) override
-    {
-        if (!me->IsWithinDist(who, 10.0f, false)) // distance not confirmed
-            return;
-
-        Player* player = who->GetCharmerOrOwnerPlayerOrPlayerItself();
-        if (!player || player->IsGameMaster())
-            return;
-
-        if (_instance->GetData(TYPE_AKILZON_GAUNTLET) == NOT_STARTED)
-            _instance->SetData(TYPE_AKILZON_GAUNTLET, IN_PROGRESS);
-    }
-private:
-    InstanceScript* _instance;
 };
 
 void AddSC_zulaman()
@@ -693,5 +682,4 @@ void AddSC_zulaman()
     RegisterSpellScript(spell_ritual_of_power);
     RegisterZulAmanCreatureAI(npc_amanishi_lookout);
     RegisterZulAmanCreatureAI(npc_amanishi_tempest);
-    RegisterZulAmanCreatureAI(npc_eagle_trash_aggro_trigger);
 }

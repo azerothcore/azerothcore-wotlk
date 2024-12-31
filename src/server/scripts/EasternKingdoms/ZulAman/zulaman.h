@@ -41,7 +41,8 @@ enum DataTypes
     DATA_HARRISON_JONES                 = 13,
     TYPE_AKILZON_GAUNTLET               = 14,
     DATA_LOOKOUT                        = 15,
-    DATA_ZULJIN_GATE                    = 16
+    DATA_ZULJIN_GATE                    = 16,
+    DATA_CHEST_LOOTED                   = 17 // Used for hostage loot DB conditions
 };
 
 enum CreatureIds
@@ -79,7 +80,11 @@ enum GameobjectIds
     GO_TANZARS_TRUNK                    = 186648,
     GO_ASHLIS_BAG                       = 186672,
     GO_KRAZS_PACKAGE                    = 186667,
-    GO_STRANGE_GONG                     = 187359
+    GO_STRANGE_GONG                     = 187359,
+    GO_ALTAR_TORCH_EAGLE_GOD            = 187035,
+    GO_ALTAR_TORCH_DRAGONHAWK_GOD       = 187036,
+    GO_ALTAR_TORCH_LYNX_GOD             = 187037,
+    GO_ALTAR_TORCH_BEAR_GOD             = 186860
 };
 
 enum MiscIds
@@ -87,6 +92,7 @@ enum MiscIds
     DATA_TIMED_RUN                      = 0,
     ACTION_START_TIMED_RUN              = 0,
     ACTION_START_AKILZON_GAUNTLET       = 1,
+    ACTION_RESET_AKILZON_GAUNTLET       = 2,
     GROUP_TIMED_RUN                     = 1
 };
 
