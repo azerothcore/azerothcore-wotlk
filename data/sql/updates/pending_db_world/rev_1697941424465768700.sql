@@ -5,7 +5,7 @@ WHERE `spell_id` = 28282;
 INSERT INTO `spell_custom_attr` (`spell_id`, `attributes`) VALUES (28282, `attributes`|67108864);
 
 -- It takes time to open the door with a key in Blizzard servers
-UPDATE `gameobject_template_addon` SET `flags` = `flags|2|32
+UPDATE `gameobject_template_addon` SET `flags` = `flags`|2|32
 WHERE (`entry` = 104591);
 
 -- Clientside area trigger 4089 smart ai
