@@ -86,7 +86,12 @@ ObjectData const summonData[] =
 
 BossBoundaryData const boundaries =
 {
-    { DATA_HEXLORD,    new RectangleBoundary(80.50557f, 920.9858f, 155.88986f, 1015.27563f)}
+    { DATA_AKILZON,  new ZRangeBoundary(72.0f, 100.0f)},
+    { DATA_HALAZZI,  new RectangleBoundary(304.0f, 432.0f, 1052.0f, 1156.0f)},
+    { DATA_HEXLORD,  new RectangleBoundary(80.50557f, 920.9858f, 155.88986f, 1015.27563f)},
+    { DATA_JANALAI,  new ZRangeBoundary(16.0f, 46.0f)},
+    { DATA_NALORAKK, new ZRangeBoundary(38.0f, 68.0f)},
+    { DATA_ZULJIN,   new ZRangeBoundary(43.0f, 73.0f)}
 };
 
 class instance_zulaman : public InstanceMapScript
@@ -233,8 +238,12 @@ public:
             _akilzonGauntlet = NOT_STARTED;
             for (ObjectGuid guid : AkilzonTrash)
                 if (Creature* creature = instance->GetCreature(guid))
+                {
                     if (!creature->IsAlive())
                         creature->Respawn();
+                    else if (creature->GetEntry() == NPC_AMINISHI_TEMPEST)
+                        creature->AI()->DoAction(ACTION_RESET_AKILZON_GAUNTLET);
+                }
             if (Creature* creature = GetCreature(DATA_LOOKOUT))
                 if (creature->isMoving())
                     creature->Respawn(true);
