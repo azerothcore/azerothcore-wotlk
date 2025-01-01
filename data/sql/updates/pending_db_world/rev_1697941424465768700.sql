@@ -2,10 +2,10 @@
 DELETE
 FROM `spell_custom_attr`
 WHERE `spell_id` = 28282;
-INSERT INTO `spell_custom_attr` (`spell_id`, `attributes`) VALUES (28282, 67108864);
+INSERT INTO `spell_custom_attr` (`spell_id`, `attributes`) VALUES (28282, `attributes`|67108864);
 
 -- It takes time to open the door with a key in Blizzard servers
-UPDATE `gameobject_template_addon` SET `flags` = 34
+UPDATE `gameobject_template_addon` SET `flags` = `flags|2|32
 WHERE (`entry` = 104591);
 
 -- Clientside area trigger 4089 smart ai
@@ -19,10 +19,10 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 (@ENTRY, 2, 2, 3, 61, 0, 100, 0, 0, 0, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 10, 40029, 3976, 0, 0, 0, 0, 0, 'On trigger - Send stored target storedTarget[0] to Creature Scarlet Commander Mograine (3976) with guid 40029 (fetching)'),
 (@ENTRY, 2, 3, 0, 61, 0, 100, 0, 0, 0, 0, 0, 0, 0, 45, 0, 1, 0, 0, 0, 0, 10, 40029, 3976, 0, 0, 0, 0, 0, 'On trigger - Creature Scarlet Commander Mograine (3976) with guid 40029 (fetching): Set creature data #0 to 1');
 -- smart conditions
-DELETE FROM `conditions` WHERE `SourceTypeOrReferenceId` = 22 AND `SourceEntry` = 4089 AND `SourceId` = 2;
+DELETE FROM `conditions` WHERE `SourceTypeOrReferenceId` = 22 AND `SourceEntry` = @ENTRY AND `SourceId` = 2;
 INSERT INTO `conditions` (`SourceTypeOrReferenceId`, `SourceGroup`, `SourceEntry`, `SourceId`, `ElseGroup`, `ConditionTypeOrReference`, `ConditionTarget`, `ConditionValue1`, `ConditionValue2`, `ConditionValue3`, `NegativeCondition`, `Comment`) VALUES
-(22, 1, 4089, 2, 0, 1, 0, 28282, 0, 0, 0, 'Action invoker has aura of spell Ashbringer (28282), effect EFFECT_0'),
-(22, 1, 4089, 2, 0, 13, 0, 2, 0, 0, 0, 'instance data 2 equals 0');
+(22, 1, @ENTRY, 2, 0, 1, 0, 28282, 0, 0, 0, 'Action invoker has aura of spell Ashbringer (28282), effect EFFECT_0'),
+(22, 1, @ENTRY, 2, 0, 13, 0, 2, 0, 0, 0, 'instance data 2 equals 0');
 
 -- Scarlet Commander Mograine smart ai
 
@@ -96,15 +96,15 @@ DELETE FROM `conditions` WHERE `SourceTypeOrReferenceId` = 22 AND `SourceEntry` 
 INSERT INTO `conditions` (`SourceTypeOrReferenceId`, `SourceGroup`, `SourceEntry`, `SourceId`, `ElseGroup`, `ConditionTypeOrReference`, `ConditionTarget`, `ConditionValue1`, `ConditionValue2`, `ConditionValue3`, `NegativeCondition`, `Comment`) VALUES
 (22, 1, 3976, 0, 0, 21, 1, 16384, 0, 0, 1, 'Object doesn\'t have unit state UNIT_STATE_ATTACK_PLAYER'),
 (22, 1, 3976, 0, 0, 36, 1, 0, 0, 0, 0, 'Object is alive'),
-(22, 3, 3976, 0, 0, 4, 1, 796, 0, 0, 0, 'Object in zone  (796)'),
-(22, 18, 3976, 0, 0, 4, 1, 796, 0, 0, 0, 'Object in zone  (796)'),
-(22, 19, 3976, 0, 0, 4, 1, 796, 0, 0, 0, 'Object in zone  (796)'),
-(22, 26, 3976, 0, 0, 4, 1, 796, 0, 0, 0, 'Object in zone  (796)'),
+(22, 3, 3976, 0, 0, 4, 1, 796, 0, 0, 0, 'Object in zone (796)'),
+(22, 18, 3976, 0, 0, 4, 1, 796, 0, 0, 0, 'Object in zone (796)'),
+(22, 19, 3976, 0, 0, 4, 1, 796, 0, 0, 0, 'Object in zone (796)'),
+(22, 26, 3976, 0, 0, 4, 1, 796, 0, 0, 0, 'Object in zone (796)'),
 (22, 26, 3976, 0, 0, 36, 1, 0, 0, 0, 0, 'Object is alive'),
-(22, 27, 3976, 0, 0, 4, 1, 796, 0, 0, 0, 'Object in zone  (796)'),
+(22, 27, 3976, 0, 0, 4, 1, 796, 0, 0, 0, 'Object in zone (796)'),
 (22, 27, 3976, 0, 0, 36, 1, 0, 0, 0, 0, 'Object is alive');
 
--- Scarlet Commander Mograine say--
+-- Scarlet Commander Mograine say
 DELETE FROM `creature_text` WHERE `CreatureID` = 3976;
 INSERT INTO `creature_text` (`CreatureID`, `GroupID`, `ID`, `Text`, `Type`, `Language`, `Probability`, `Emote`, `Duration`, `Sound`, `BroadcastTextId`, `TextRange`, `comment`) VALUES
 (3976, 0, 0, 'Infidels! They must be purified!', 14, 0, 100, 0, 0, 5835, 2847, 0, 'Scarlet Commander Mograine // mograine SAY_MO_AGGRO'),
@@ -115,7 +115,7 @@ INSERT INTO `creature_text` (`CreatureID`, `GroupID`, `ID`, `Text`, `Type`, `Lan
 (3976, 5, 0, 'Forgive me, father! Please...', 12, 0, 100, 20, 0, 0, 12472, 0, 'Scarlet Commander Mograine // mograine SAY_ASHBRINGER_THREE'),
 (3976, 6, 0, 'Bow down! Kneel BEFORE the Ashbringer! A NEW dawn approaches, brothers AND sisters! Our message will be delivered TO the filth of this world through the chosen one!', 14, 0, 100, 0, 0, 0, 12389, 3, 'Scarlet Commander Mograine // Ashbringer EVENT intro yell');
 
--- Highlord Mograine smart_scripts---
+-- Highlord Mograine smart_scripts
 
 UPDATE `creature_template` SET `AIName` = 'SmartAI', `ScriptName` = '' WHERE `entry` = 16062;
 
@@ -130,7 +130,7 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 (16062, 0, 6, 7, 40, 0, 100, 0, 12, 0, 0, 0, 0, 0, 66, 0, 0, 0, 0, 0, 0, 19, 3976, 0, 0, 0, 0, 0, 0, 0, 'Highlord Mograine - On Point 12 of Path Any Reached - Set Orientation Closest Creature \'Scarlet Commander Mograine\''),
 (16062, 0, 7, 0, 61, 0, 100, 0, 0, 0, 0, 0, 0, 0, 80, 1606200, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Highlord Mograine - On Point 12 of Path Any Reached - Run Script');
 
--- Highlord Mograine Ashbringer_Event
+-- Highlord Mograine Ashbringer Event
 
 DELETE FROM `smart_scripts` WHERE (`source_type` = 9 AND `entryorguid` = 1606200);
 INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `event_param6`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
@@ -151,9 +151,9 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 -- Highlord Mograine Say
 DELETE FROM `creature_text` WHERE `CreatureID`=16062;
 INSERT INTO `creature_text` (`CreatureID`, `GroupID`, `ID`, `Text`, `Language`, `Probability`, `Emote`, `Duration`, `Sound`, `Type`, `BroadcastTextId`, `TextRange`, `comment`) VALUES
- (16062, 0, 0, 'Renault...', 0, 100, 25, 0, 0, 12, 12469, 0, 'mograine MOGRAINE_ONE'),
- (16062, 1, 0, 'Did you think that your betrayal would be forgotten? Lost in the carefully planned cover up of my death? Blood of my blood, the blade felt your cruelty long after my heart had stopped beating. And in death, I knew what you had done. But now, the chains of Kel\'thuzad hold me NO more. I come TO serve justice. I AM ASHBRINGER.', 0, 100, 6, 0, 0, 12, 12471, 0, 'mograine MOGRAINE_TWO'),
- (16062, 2, 0, 'You are forgiven...', 0, 100, 0, 0, 0, 12, 12473, 0, 'mograine MOGRAINE_THREE');
+(16062, 0, 0, 'Renault...', 0, 100, 25, 0, 0, 12, 12469, 0, 'mograine MOGRAINE_ONE'),
+(16062, 1, 0, 'Did you think that your betrayal would be forgotten? Lost in the carefully planned cover up of my death? Blood of my blood, the blade felt your cruelty long after my heart had stopped beating. And in death, I knew what you had done. But now, the chains of Kel\'thuzad hold me NO more. I come TO serve justice. I AM ASHBRINGER.', 0, 100, 6, 0, 0, 12, 12471, 0, 'mograine MOGRAINE_TWO'),
+(16062, 2, 0, 'You are forgiven...', 0, 100, 0, 0, 0, 12, 12473, 0, 'mograine MOGRAINE_THREE');
 
 DELETE
 FROM `waypoints`
@@ -172,10 +172,14 @@ INSERT INTO `waypoints` (`entry`, `pointid`, `position_x`, `position_y`, `positi
 (16062, 11, 1149.4045, 1399.0231, 32.528877, NULL, 0, 'Ashbringer Event Move Points'),
 (16062, 12, 1150.3911, 1398.723, 32.54613, NULL, 0, 'Ashbringer Event Move Points');
 
--- Highlord Mograine Conditions
-DELETE FROM `conditions` WHERE (`SourceTypeOrReferenceId` = 13) AND (`SourceEntry` IN (8990));
-INSERT INTO `conditions` (`SourceTypeOrReferenceId`, `SourceGroup`, `SourceEntry`, `SourceId`, `ElseGroup`, `ConditionTypeOrReference`, `ConditionTarget`, `ConditionValue1`, `ConditionValue2`, `ConditionValue3`, `NegativeCondition`, `Comment`) VALUES
-(13, 1, 8990, 0, 0, 31, 0, 3, 16062, 0, 1, 'Potential target of the spell is not creature, entry is 16062');
+-- Highlord Mograine Condition
+DELETE FROM `conditions` WHERE (`SourceTypeOrReferenceId` = 13) AND (`SourceGroup` = 1) AND (`SourceEntry` = 8990) AND (`SourceId` = 0) AND (`ElseGroup` = 0) AND (`ConditionTypeOrReference` = 31) AND (`ConditionTarget` = 0) AND (`ConditionValue1` = 3) AND (`ConditionValue2` = 16062) AND (`ConditionValue3` = 0);
+INSERT INTO `conditions` (`SourceTypeOrReferenceId`, `SourceGroup`, `SourceEntry`, `SourceId`, `ElseGroup`, `ConditionTypeOrReference`, `ConditionTarget`, `ConditionValue1`, `ConditionValue2`, `ConditionValue3`, `NegativeCondition`, `ErrorType`, `ErrorTextId`, `ScriptName`, `Comment`) VALUES
+(13, 1, 8990, 0, 0, 31, 0, 3, 16062, 0, 1, 0, 0, '', 'Potential target of the spell is not creature, entry is 16062');
+
+DELETE FROM `conditions` WHERE (`SourceTypeOrReferenceId` = 22) AND (`SourceGroup` = 1) AND (`SourceEntry` = 16062) AND (`SourceId` = 0) AND (`ElseGroup` = 0) AND (`ConditionTypeOrReference` = 4) AND (`ConditionTarget` = 1) AND (`ConditionValue1` = 796) AND (`ConditionValue2` = 0) AND (`ConditionValue3` = 0);
+INSERT INTO `conditions` (`SourceTypeOrReferenceId`, `SourceGroup`, `SourceEntry`, `SourceId`, `ElseGroup`, `ConditionTypeOrReference`, `ConditionTarget`, `ConditionValue1`, `ConditionValue2`, `ConditionValue3`, `NegativeCondition`, `ErrorType`, `ErrorTextId`, `ScriptName`, `Comment`) VALUES
+(22, 1, 16062, 0, 0, 4, 1, 796, 0, 0, 0, 0, 0, '', 'Object in zone (796)');
 
 -- High Inquisitor Whitemane Smart ai
 UPDATE `creature_template` SET `AIName` = 'SmartAI', `ScriptName` = '' WHERE `entry` = 3977;

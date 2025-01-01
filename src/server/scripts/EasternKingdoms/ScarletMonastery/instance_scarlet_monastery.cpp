@@ -35,8 +35,8 @@ enum AshbringerEventMisc
     NPC_FAIRBANKS                  = 4542,
     NPC_HIGHLORD_MOGRAINE          = 16062,
 
-    DOOR_CHAPEL                    = 104591,
-    DOOR_HIGH_INQUISITOR_ID        = 104600
+    GO_CHAPEL_DOOR                 = 104591,
+    GO_HIGH_INQUISITOR_DOOR        = 104600
 };
 
 enum AshbringerSpell
@@ -90,10 +90,10 @@ public:
             switch (go->GetEntry())
             {
                 // case ENTRY_PUMPKIN_SHRINE: PumpkinShrineGUID = go->GetGUID(); break;
-                case DOOR_HIGH_INQUISITOR_ID:
+                case GO_HIGH_INQUISITOR_DOOR:
                     _doorHighInquisitorGUID = go->GetGUID();
                     break;
-                case DOOR_CHAPEL:
+                case GO_CHAPEL_DOOR:
                     _doorChapelGUID = go->GetGUID();
                     break;
                 default:
