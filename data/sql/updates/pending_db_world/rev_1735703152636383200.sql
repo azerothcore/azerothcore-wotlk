@@ -25,4 +25,3 @@ INSERT INTO `creature_text` (`CreatureID`, `GroupID`, `ID`, `Text`, `Type`, `Lan
 (27441, 0, 0, 'Yah. It be dem sinkholes. You see dem? Dere be talk of blowin\' dem up, cavin\' dem in.', 12, 0, 100, 1, 0, 0, 26619, 0, 'Currency Token Test Wizard'),
 (27441, 1, 0, 'You got dat right.', 12, 0, 100, 1, 0, 0, 26622, 0, 'Currency Token Test Wizard'),
 (27441, 2, 0, 'Yah. Hellscream, he be a fierce one, but too eager to prove himself, I be thinkin\'. It be good Saurfang be here, for sure.', 12, 0, 100, 1, 0, 0, 26688, 0, 'Currency Token Test Wizard');
-
