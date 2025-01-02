@@ -4,7 +4,20 @@ on:
     branches:
       - 'master'
   pull_request:
-    types: ['labeled', 'opened', 'synchronize', 'reopened']
+    types:
+      - opened
+      - reopened
+      - synchronize
+    paths:
+      - 'src/*'
+      - 'src/common/**/*'
+      - 'src/genrev/**/*'
+      - 'src/server/*'
+      - 'src/server/apps/**/*'
+      - 'src/server/database/**/*'
+      - 'src/server/game/**/*'
+      - 'src/server/shared/**/*'
+      - 'src/tools/**/*'
 
 concurrency:
   group: ${{ github.head_ref }} || concat(${{ github.ref }}, ${{ github.workflow }})
@@ -12,18 +25,17 @@ concurrency:
 
 jobs:
   build-modules:
-    runs-on: ubuntu-latest
-    name: modules build on latest ubuntu
-    if: |
-      github.repository == 'azerothcore/azerothcore-wotlk'
-      && !github.event.pull_request.draft
-      && (
-        github.ref_name == 'master'
-        || contains(github.event.pull_request.labels.*.name, 'file-cpp'
-        || github.event.label.name == 'file-cpp'
-        || contains(github.event.pull_request.labels.*.name, 'run-build')
-        || github.event.label.name == 'run-build')
-      )
+    strategy:
+      fail-fast: true
+      matrix:
+        include:
+          - os: ubuntu-24.04
+            compiler:
+              CC: clang-18
+              CXX: clang++-18
+    runs-on: ${{ matrix.os }}
+    name: ${{ matrix.os }}-${{ matrix.compiler.CC }}-nopch-modules
+    if: github.repository == 'azerothcore/azerothcore-wotlk' && !github.event.pull_request.draft
     steps:
       - uses: actions/checkout@v4
         # This script installs a general list of modules to compile with
@@ -33,7 +45,8 @@ jobs:
         run: bash -x ./apps/ci/ci-install-modules.sh
       - uses: ./.github/actions/linux-build
         with:
-          CC: clang-15
-          CXX: clang++-15
+          CC: ${{ matrix.compiler.CC }}
+          CXX: ${{ matrix.compiler.CXX }}
           modules: true
           pch: false
+          maxerrors: 0

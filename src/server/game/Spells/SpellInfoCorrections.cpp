@@ -1389,18 +1389,6 @@ void SpellMgr::LoadSpellInfoCorrections()
         spellInfo->RangeEntry = sSpellRangeStore.LookupEntry(13); // 50000yd
     });
 
-    // A'dal's Song of Battle
-    ApplySpellFix({ 39953 }, [](SpellInfo* spellInfo)
-    {
-        spellInfo->Effects[EFFECT_0].TargetA = SpellImplicitTargetInfo(TARGET_SRC_CASTER);
-        spellInfo->Effects[EFFECT_1].TargetA = SpellImplicitTargetInfo(TARGET_SRC_CASTER);
-        spellInfo->Effects[EFFECT_2].TargetA = SpellImplicitTargetInfo(TARGET_SRC_CASTER);
-        spellInfo->Effects[EFFECT_0].TargetB = SpellImplicitTargetInfo(TARGET_UNIT_SRC_AREA_ALLY);
-        spellInfo->Effects[EFFECT_1].TargetB = SpellImplicitTargetInfo(TARGET_UNIT_SRC_AREA_ALLY);
-        spellInfo->Effects[EFFECT_2].TargetB = SpellImplicitTargetInfo(TARGET_UNIT_SRC_AREA_ALLY);
-        spellInfo->DurationEntry = sSpellDurationStore.LookupEntry(367); // 2 Hours
-    });
-
     ApplySpellFix({
         57607,  // WintergraspCatapult - Spell Plague Barrel - EffectRadiusIndex
         57619,  // WintergraspDemolisher - Spell Hourl Boulder - EffectRadiusIndex
@@ -4000,12 +3988,6 @@ void SpellMgr::LoadSpellInfoCorrections()
         spellInfo->Effects[EFFECT_0].TargetB = SpellImplicitTargetInfo();
     });
 
-    // Luffa
-    ApplySpellFix({ 23595 }, [](SpellInfo* spellInfo)
-    {
-        spellInfo->Effects[EFFECT_0].BasePoints = 1; // Remove only 1 bleed effect
-    });
-
     // Eye of Kilrogg Passive (DND)
     ApplySpellFix({ 2585 }, [](SpellInfo* spellInfo)
     {
@@ -4854,6 +4836,36 @@ void SpellMgr::LoadSpellInfoCorrections()
     ApplySpellFix({ 63106 }, [](SpellInfo* spellInfo)
     {
         spellInfo->AttributesEx3 |= SPELL_ATTR3_SUPPRESS_CASTER_PROCS;
+    });
+
+    // Fury
+    ApplySpellFix({ 40601 }, [](SpellInfo* spellInfo)
+    {
+        spellInfo->AttributesEx3 |= SPELL_ATTR3_SUPPRESS_CASTER_PROCS;
+    });
+
+    // Claw Rage
+    ApplySpellFix({ 43149 }, [](SpellInfo* spellInfo)
+    {
+        spellInfo->Effects[EFFECT_0].TriggerSpell = 0;
+    });
+
+    // Black Qiraji Battle Tank
+    ApplySpellFix({ 26655, 26656 }, [](SpellInfo* spellInfo)
+    {
+        spellInfo->AuraInterruptFlags &= ~(AURA_INTERRUPT_FLAG_CHANGE_MAP | AURA_INTERRUPT_FLAG_TELEPORTED);
+    });
+
+    // Summon Cyclone
+    ApplySpellFix({ 43112 }, [](SpellInfo* spellInfo)
+    {
+        spellInfo->RequiresSpellFocus = 0;
+    });
+
+    // Booming Voice
+    ApplySpellFix({ 40080 }, [](SpellInfo* spellInfo)
+    {
+        spellInfo->Effects[EFFECT_0].RealPointsPerLevel = 0;
     });
 
     for (uint32 i = 0; i < GetSpellInfoStoreSize(); ++i)

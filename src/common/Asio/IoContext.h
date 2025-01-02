@@ -19,17 +19,10 @@
 #define IoContext_h__
 
 #include <boost/version.hpp>
-
-#if BOOST_VERSION >= 106600
 #include <boost/asio/io_context.hpp>
 #include <boost/asio/post.hpp>
 #define IoContextBaseNamespace boost::asio
 #define IoContextBase io_context
-#else
-#include <boost/asio/io_service.hpp>
-#define IoContextBaseNamespace boost::asio
-#define IoContextBase io_service
-#endif
 
 namespace Acore::Asio
 {
@@ -45,9 +38,7 @@ namespace Acore::Asio
         std::size_t run() { return _impl.run(); }
         void stop() { _impl.stop(); }
 
-#if BOOST_VERSION >= 106600
         boost::asio::io_context::executor_type get_executor() noexcept { return _impl.get_executor(); }
-#endif
 
     private:
         IoContextBaseNamespace::IoContextBase _impl;
@@ -56,21 +47,13 @@ namespace Acore::Asio
     template<typename T>
     inline decltype(auto) post(IoContextBaseNamespace::IoContextBase& ioContext, T&& t)
     {
-#if BOOST_VERSION >= 106600
         return boost::asio::post(ioContext, std::forward<T>(t));
-#else
-        return ioContext.post(std::forward<T>(t));
-#endif
     }
 
     template<typename T>
-    inline decltype(auto) get_io_context(T&& ioObject)
+    inline boost::asio::io_context& get_io_context(T&& ioObject)
     {
-#if BOOST_VERSION >= 106600
-        return ioObject.get_executor().context();
-#else
-        return ioObject.get_io_service();
-#endif
+        return static_cast<boost::asio::io_context&>(ioObject.get_executor().context());
     }
 }
 

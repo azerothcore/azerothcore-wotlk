@@ -256,7 +256,7 @@ class spell_astromancer_wrath_of_the_astromancer : public AuraScript
             return;
 
         Unit* target = GetUnitOwner();
-        target->CastSpell(target, GetSpellInfo()->Effects[EFFECT_1].CalcValue(), false);
+        target->CastSpell(target, GetSpellInfo()->Effects[EFFECT_1].CalcValue(), false, nullptr, nullptr, GetCaster () ? GetCaster()->GetGUID() : ObjectGuid::Empty);
     }
 
     void Register() override

@@ -23,6 +23,8 @@
 
 ObjectData const creatureData[] =
 {
+    { NPC_DELRISSA,        DATA_DELRISSA         },
+    { NPC_KAEL_THAS,       DATA_KAELTHAS         },
     { NPC_KALECGOS,        DATA_KALECGOS         },
     { 0,                   0                     }
 };
@@ -31,6 +33,13 @@ ObjectData const gameobjectData[] =
 {
     { GO_ESCAPE_ORB, DATA_ESCAPE_ORB },
     { 0,             0,              }
+};
+
+ObjectData const summonerData[] =
+{
+    { NPC_PHOENIX,       DATA_KAELTHAS },
+    { NPC_PHOENIX_EGG,   DATA_KAELTHAS },
+    { 0,                 0             }
 };
 
 DoorData const doorData[] =
@@ -57,59 +66,20 @@ public:
             SetBossNumber(MAX_ENCOUNTER);
             LoadObjectData(creatureData, gameobjectData);
             LoadDoorData(doorData);
+            LoadSummonData(summonerData);
         }
-
-        ObjectGuid EscapeOrbGUID;
-
-        ObjectGuid DelrissaGUID;
-        ObjectGuid KaelGUID;
 
         void ProcessEvent(WorldObject* /*obj*/, uint32 eventId) override
         {
             if (eventId == EVENT_SPAWN_KALECGOS)
-            {
                 if (!GetCreature(DATA_KALECGOS) && !scheduler.IsGroupScheduled(DATA_KALECGOS))
                 {
                     scheduler.Schedule(1min, 1min, DATA_KALECGOS,[this](TaskContext)
                     {
                         if (Creature* kalecgos = instance->SummonCreature(NPC_KALECGOS, KalecgosSpawnPos))
-                        {
                             kalecgos->GetMotionMaster()->MovePath(PATH_KALECGOS_FLIGHT, false);
-                            kalecgos->AI()->Talk(SAY_KALECGOS_SPAWN);
-                        }
                     });
                 }
-            }
-        }
-
-        void OnCreatureCreate(Creature* creature) override
-        {
-            switch (creature->GetEntry())
-            {
-                case NPC_DELRISSA:
-                    DelrissaGUID = creature->GetGUID();
-                    break;
-                case NPC_KAEL_THAS:
-                    KaelGUID = creature->GetGUID();
-                    break;
-                case NPC_PHOENIX:
-                case NPC_PHOENIX_EGG:
-                    if (Creature* kael = instance->GetCreature(KaelGUID))
-                        kael->AI()->JustSummoned(creature);
-                    break;
-            }
-
-            InstanceScript::OnCreatureCreate(creature);
-        }
-
-        ObjectGuid GetGuidData(uint32 identifier) const override
-        {
-            if (identifier == NPC_DELRISSA)
-            {
-                return DelrissaGUID;
-            }
-
-            return ObjectGuid::Empty;
         }
     };
 
@@ -119,53 +89,7 @@ public:
     }
 };
 
-enum Spells
-{
-    SPELL_KALECGOS_TRANSFORM = 44670,
-    SPELL_TRANSFORM_VISUAL   = 24085,
-    SPELL_CAMERA_SHAKE       = 44762,
-    SPELL_ORB_KILL_CREDIT    = 46307
-};
-
-enum MovementPoints
-{
-    POINT_ID_PREPARE_LANDING = 6
-};
-
-struct npc_kalecgos : public ScriptedAI
-{
-    npc_kalecgos(Creature* creature) : ScriptedAI(creature) { }
-
-    void MovementInform(uint32 type, uint32 pointId) override
-    {
-        if (type != WAYPOINT_MOTION_TYPE)
-            return;
-
-        if (pointId == POINT_ID_PREPARE_LANDING)
-        {
-            me->HandleEmoteCommand(EMOTE_ONESHOT_LAND);
-            me->SetDisableGravity(false);
-            me->SetHover(false);
-
-            me->m_Events.AddEventAtOffset([this]()
-            {
-                DoCastAOE(SPELL_CAMERA_SHAKE);
-                me->SetObjectScale(0.6f);
-
-                me->m_Events.AddEventAtOffset([this]()
-                {
-                    DoCastSelf(SPELL_ORB_KILL_CREDIT, true);
-                    DoCastSelf(SPELL_TRANSFORM_VISUAL);
-                    DoCastSelf(SPELL_KALECGOS_TRANSFORM);
-                    me->UpdateEntry(NPC_HUMAN_KALECGOS);
-                }, 1s);
-            }, 2s);
-        }
-    }
-};
-
 void AddSC_instance_magisters_terrace()
 {
     new instance_magisters_terrace();
-    RegisterMagistersTerraceCreatureAI(npc_kalecgos);
 }
