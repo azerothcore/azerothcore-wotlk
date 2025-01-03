@@ -111,7 +111,7 @@ void MapUpdater::wait()
 void MapUpdater::schedule_task(UpdateRequest* request)
 {
     // Atomic increment for pending_requests
-    pending_requests.fetch_add(1, std::memory_order_acquire);
+    pending_requests.fetch_add(1, std::memory_order_release);
 
     // Push the task into the lock-free queue
     _queue.Push(request);
