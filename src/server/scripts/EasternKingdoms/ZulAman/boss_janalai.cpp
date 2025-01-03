@@ -21,6 +21,7 @@
 #include "GridNotifiersImpl.h"
 #include "PassiveAI.h"
 #include "ScriptedCreature.h"
+#include "SpellScript.h"
 #include "SpellScriptLoader.h"
 #include "zulaman.h"
 
