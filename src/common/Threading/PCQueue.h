@@ -59,9 +59,8 @@ public:
 
     bool Pop(T& value)
     {
-        if (_queue.empty() || _cancel) {
+        if (_queue.empty() || _cancel)
             return false;
-        }
 
         std::lock_guard<std::mutex> lock(_queueLock);
         value = std::move(_queue.front());
@@ -76,9 +75,8 @@ public:
         // Wait for the queue to have an element or the cancel/shutdown flag
         _condition.wait(lock, [this] { return !_queue.empty() || _cancel || _shutdown; });
 
-        if (_queue.empty() || _cancel) {
+        if (_queue.empty() || _cancel)
             return;
-        }
 
         value = std::move(_queue.front());
         _queue.pop();
