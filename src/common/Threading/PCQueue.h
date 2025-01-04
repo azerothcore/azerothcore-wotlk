@@ -30,8 +30,8 @@ private:
     mutable std::mutex _queueLock;
     std::queue<T> _queue;
     std::condition_variable _condition;
-    std::atomic<bool> _cancel{false};
-    std::atomic<bool> _shutdown{false};
+    std::atomic<bool> _cancel{};
+    std::atomic<bool> _shutdown{};
 
 public:
     ProducerConsumerQueue() = default;
