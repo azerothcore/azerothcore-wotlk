@@ -24,7 +24,6 @@
 #include "AchievementMgr.h"
 #include "AddonMgr.h"
 #include "ArenaTeamMgr.h"
-#include "AsyncAuctionListing.h"
 #include "AuctionHouseMgr.h"
 #include "AutobroadcastMgr.h"
 #include "BattlefieldMgr.h"
@@ -95,11 +94,6 @@
 #include "WorldState.h"
 #include <boost/asio/ip/address.hpp>
 #include <cmath>
-
-namespace
-{
-    TaskScheduler playersSaveScheduler;
-}
 
 std::atomic_long World::_stopEvent = false;
 uint8 World::_exitCode = SHUTDOWN_EXIT_CODE;
@@ -581,13 +575,24 @@ void World::LoadConfigSettings(bool reload)
         LOG_ERROR("server.loading", "Rate.Talent.Pet ({}) must be > 0. Using 1 instead.", _rate_values[RATE_TALENT_PET]);
         _rate_values[RATE_TALENT_PET] = 1.0f;
     }
-    _rate_values[RATE_MOVESPEED] = sConfigMgr->GetOption<float>("Rate.MoveSpeed", 1.0f);
-    if (_rate_values[RATE_MOVESPEED] < 0)
+    // Controls Player movespeed rate.
+    _rate_values[RATE_MOVESPEED_PLAYER] = sConfigMgr->GetOption<float>("Rate.MoveSpeed.Player", 1.0f);
+    if (_rate_values[RATE_MOVESPEED_PLAYER] < 0)
     {
-        LOG_ERROR("server.loading", "Rate.MoveSpeed ({}) must be > 0. Using 1 instead.", _rate_values[RATE_MOVESPEED]);
-        _rate_values[RATE_MOVESPEED] = 1.0f;
+        LOG_ERROR("server.loading", "Rate.MoveSpeed.Player ({}) must be > 0. Using 1 instead.", _rate_values[RATE_MOVESPEED_PLAYER]);
+        _rate_values[RATE_MOVESPEED_PLAYER] = 1.0f;
     }
-    for (uint8 i = 0; i < MAX_MOVE_TYPE; ++i) playerBaseMoveSpeed[i] = baseMoveSpeed[i] * _rate_values[RATE_MOVESPEED];
+    for (uint8 i = 0; i < MAX_MOVE_TYPE; ++i) playerBaseMoveSpeed[i] = baseMoveSpeed[i] * _rate_values[RATE_MOVESPEED_PLAYER];
+
+    // Controls all npc movespeed rate.
+    _rate_values[RATE_MOVESPEED_NPC] = sConfigMgr->GetOption<float>("Rate.MoveSpeed.NPC", 1.0f);
+    if (_rate_values[RATE_MOVESPEED_NPC] < 0)
+    {
+        LOG_ERROR("server.loading", "Rate.MoveSpeed.NPC ({}) must be > 0. Using 1 instead.", _rate_values[RATE_MOVESPEED_NPC]);
+        _rate_values[RATE_MOVESPEED_NPC] = 1.0f;
+    }
+    for (uint8 i = 0; i < MAX_MOVE_TYPE; ++i) baseMoveSpeed[i] *= _rate_values[RATE_MOVESPEED_NPC];
+
     _rate_values[RATE_CORPSE_DECAY_LOOTED] = sConfigMgr->GetOption<float>("Rate.Corpse.Decay.Looted", 0.5f);
 
     _rate_values[RATE_DURABILITY_LOSS_ON_DEATH]  = sConfigMgr->GetOption<float>("DurabilityLoss.OnDeath", 10.0f);
@@ -1291,8 +1296,6 @@ void World::LoadConfigSettings(bool reload)
 
     _int_configs[CONFIG_DAILY_RBG_MIN_LEVEL_AP_REWARD] = sConfigMgr->GetOption<uint32>("DailyRBGArenaPoints.MinLevel", 71);
 
-    _int_configs[CONFIG_AUCTION_HOUSE_SEARCH_TIMEOUT] = sConfigMgr->GetOption<uint32>("AuctionHouse.SearchTimeout", 1000);
-
     ///- Read the "Data" directory from the config file
     std::string dataPath = sConfigMgr->GetOption<std::string>("DataDir", "./");
     if (dataPath.empty() || (dataPath.at(dataPath.length() - 1) != '/' && dataPath.at(dataPath.length() - 1) != '\\'))
@@ -1487,6 +1490,9 @@ void World::LoadConfigSettings(bool reload)
 
     // Realm Availability
     _bool_configs[CONFIG_REALM_LOGIN_ENABLED] = sConfigMgr->GetOption<bool>("World.RealmAvailability", true);
+
+    // AH Worker threads
+    _int_configs[CONFIG_AUCTIONHOUSE_WORKERTHREADS] = sConfigMgr->GetOption<int32>("AuctionHouse.WorkerThreads", 1);
 
     // SpellQueue
     _bool_configs[CONFIG_SPELL_QUEUE_ENABLED] = sConfigMgr->GetOption<bool>("SpellQueue.Enabled", true);
@@ -2071,8 +2077,6 @@ void World::SetInitialWorldSettings()
     LoginDatabase.Execute(stmt);
 
     _timers[WUPDATE_WEATHERS].SetInterval(1 * IN_MILLISECONDS);
-    _timers[WUPDATE_AUCTIONS].SetInterval(MINUTE * IN_MILLISECONDS);
-    _timers[WUPDATE_AUCTIONS].SetCurrent(MINUTE * IN_MILLISECONDS);
     _timers[WUPDATE_UPTIME].SetInterval(_int_configs[CONFIG_UPTIME_UPDATE]*MINUTE * IN_MILLISECONDS);
     //Update "uptime" table based on configuration entry in minutes.
 
@@ -2344,18 +2348,11 @@ void World::Update(uint32 diff)
         ResetGuildCap();
     }
 
-    // pussywizard: handle auctions when the timer has passed
-    if (_timers[WUPDATE_AUCTIONS].Passed())
     {
-        METRIC_TIMER("world_update_time", METRIC_TAG("type", "Update expired auctions"));
-
-        _timers[WUPDATE_AUCTIONS].Reset();
-
         // pussywizard: handle expired auctions, auctions expired when realm was offline are also handled here (not during loading when many required things aren't loaded yet)
-        sAuctionMgr->Update();
+        METRIC_TIMER("world_update_time", METRIC_TAG("type", "Update expired auctions"));
+        sAuctionMgr->Update(diff);
     }
-
-    AsyncAuctionListingMgr::Update(Milliseconds(diff));
 
     if (currentGameTime > _mail_expire_check_timer)
     {
@@ -2504,11 +2501,6 @@ void World::Update(uint32 diff)
     {
         METRIC_TIMER("world_update_time", METRIC_TAG("type", "Update world scripts"));
         sScriptMgr->OnWorldUpdate(diff);
-    }
-
-    {
-        METRIC_TIMER("world_update_time", METRIC_TAG("type", "Update playersSaveScheduler"));
-        playersSaveScheduler.Update(diff);
     }
 
     {
@@ -2691,7 +2683,7 @@ void World::_UpdateGameTime()
 }
 
 /// Shutdown the server
-void World::ShutdownServ(uint32 time, uint32 options, uint8 exitcode, const std::string& reason)
+void World::ShutdownServ(uint32 time, uint32 options, uint8 exitcode, std::string const& reason)
 {
     // ignore if server shutdown at next tick
     if (IsStopped())
@@ -2699,33 +2691,9 @@ void World::ShutdownServ(uint32 time, uint32 options, uint8 exitcode, const std:
 
     _shutdownMask = options;
     _exitCode = exitcode;
+    _shutdownReason = reason;
 
-    auto const& playersOnline = GetActiveSessionCount();
-
-    if (time < 5 && playersOnline)
-    {
-        // Set time to 5s for save all players
-        time = 5;
-    }
-
-    playersSaveScheduler.CancelAll();
-
-    if (time >= 5)
-    {
-        playersSaveScheduler.Schedule(Seconds(time - 5), [this](TaskContext /*context*/)
-        {
-            if (!GetActiveSessionCount())
-            {
-                LOG_INFO("server", "> No players online. Skip save before shutdown");
-                return;
-            }
-
-            LOG_INFO("server", "> Save players before shutdown server");
-            ObjectAccessor::SaveAllPlayers();
-        });
-    }
-
-    LOG_WARN("server", "Time left until shutdown/restart: {}", time);
+    LOG_DEBUG("server.worldserver", "Server shutdown called with ShutdownMask {}, ExitCode {}, Time {}, Reason {}", ShutdownMask(options), ShutdownExitCode(exitcode), secsToTimeString(time), reason);
 
     ///- If the shutdown time is 0, set m_stopEvent (except if shutdown is 'idle' with remaining sessions)
     if (time == 0)
@@ -2745,32 +2713,45 @@ void World::ShutdownServ(uint32 time, uint32 options, uint8 exitcode, const std:
     sScriptMgr->OnShutdownInitiate(ShutdownExitCode(exitcode), ShutdownMask(options));
 }
 
-/// Display a shutdown message to the user(s)
-void World::ShutdownMsg(bool show, Player* player, const std::string& reason)
+/**
+ * @brief Displays a shutdown message at specific intervals or immediately if required.
+ *
+ * Show the time remaining for a server shutdown/restart with a reason appended if one is provided.
+ * Messages are displayed at regular intervals such as every
+ * 12 hours, 1 hour, 5 minutes, 1 minute, 30 seconds, 10 seconds,
+ * and every second in the last 10 seconds.
+ *
+ * @param show   Forces the message to be displayed immediately.
+ * @param player The player who should recieve the message (can be nullptr for global messages).
+ * @param reason The reason for the shutdown, appended to the message if provided.
+ */
+void World::ShutdownMsg(bool show, Player* player, std::string const& reason)
 {
-    // not show messages for idle shutdown mode
+    // Do not show a message for idle shutdown
     if (_shutdownMask & SHUTDOWN_MASK_IDLE)
         return;
 
-    ///- Display a message every 12 hours, hours, 5 minutes, minute, 5 seconds and finally seconds
-    if (show ||
-            (_shutdownTimer < 5 * MINUTE && (_shutdownTimer % 15) == 0) || // < 5 min; every 15 sec
-            (_shutdownTimer < 15 * MINUTE && (_shutdownTimer % MINUTE) == 0) || // < 15 min ; every 1 min
-            (_shutdownTimer < 30 * MINUTE && (_shutdownTimer % (5 * MINUTE)) == 0) || // < 30 min ; every 5 min
-            (_shutdownTimer < 12 * HOUR && (_shutdownTimer % HOUR) == 0) || // < 12 h ; every 1 h
-            (_shutdownTimer > 12 * HOUR && (_shutdownTimer % (12 * HOUR)) == 0)) // > 12 h ; every 12 h
+    bool twelveHours = (_shutdownTimer > 12 * HOUR && (_shutdownTimer % (12 * HOUR)) == 0); // > 12 h ; every 12 h
+    bool oneHour = (_shutdownTimer < 12 * HOUR && (_shutdownTimer % HOUR) == 0); // < 12 h ; every 1 h
+    bool fiveMin = (_shutdownTimer < 30 * MINUTE && (_shutdownTimer % (5 * MINUTE)) == 0); // < 30 min ; every 5 min
+    bool oneMin = (_shutdownTimer < 15 * MINUTE && (_shutdownTimer % MINUTE) == 0); // < 15 min ; every 1 min
+    bool thirtySec = (_shutdownTimer < 5 * MINUTE && (_shutdownTimer % 30) == 0); // < 5 min; every 30 sec
+    bool tenSec = (_shutdownTimer < 1 * MINUTE && (_shutdownTimer % 10) == 0); // < 1 min; every 10 sec
+    bool oneSec = (_shutdownTimer < 10 * SECOND && (_shutdownTimer % 1) == 0); // < 10 sec; every 1 sec
+
+    ///- Display a message every 12 hours, hour, 5 minutes, minute, 30 seconds, 10 seconds and finally seconds
+    if (show || twelveHours || oneHour || fiveMin || oneMin || thirtySec || tenSec || oneSec)
     {
         std::string str = secsToTimeString(_shutdownTimer).append(".");
-
         if (!reason.empty())
-        {
             str += " - " + reason;
-        }
+        // Display the reason every 12 hours, hour, 5 minutes, minute. At 60 seconds and at 10 seconds
+        else if (!_shutdownReason.empty() && (twelveHours || oneHour || fiveMin || oneMin || _shutdownTimer == 60 || _shutdownTimer == 10))
+            str += " - " + _shutdownReason;
 
         ServerMessageType msgid = (_shutdownMask & SHUTDOWN_MASK_RESTART) ? SERVER_MSG_RESTART_TIME : SERVER_MSG_SHUTDOWN_TIME;
-
         SendServerMessage(msgid, str, player);
-        LOG_DEBUG("server.worldserver", "Server is {} in {}", (_shutdownMask & SHUTDOWN_MASK_RESTART ? "restart" : "shuttingdown"), str);
+        LOG_WARN("server.worldserver", "Server {} in {}", (_shutdownMask & SHUTDOWN_MASK_RESTART ? "restarting" : "shutdown"), str);
     }
 }
 

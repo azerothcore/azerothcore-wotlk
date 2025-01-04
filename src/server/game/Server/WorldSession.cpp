@@ -22,6 +22,7 @@
 #include "WorldSession.h"
 #include "AccountMgr.h"
 #include "BattlegroundMgr.h"
+#include "BanMgr.h"
 #include "CharacterPackets.h"
 #include "Common.h"
 #include "DatabaseEnv.h"
@@ -44,6 +45,7 @@
 #include "ScriptMgr.h"
 #include "SocialMgr.h"
 #include "Transport.h"
+#include "Tokenize.h"
 #include "Vehicle.h"
 #include "WardenWin.h"
 #include "World.h"
@@ -51,8 +53,6 @@
 #include "WorldSocket.h"
 #include "WorldState.h"
 #include <zlib.h>
-
-#include "BanMgr.h"
 
 namespace
 {
@@ -107,8 +107,6 @@ WorldSession::WorldSession(uint32 id, std::string&& name, std::shared_ptr<WorldS
     time_t mute_time, LocaleConstant locale, uint32 recruiter, bool isARecruiter, bool skipQueue, uint32 TotalTime) :
     m_muteTime(mute_time),
     m_timeOutTime(0),
-    _lastAuctionListItemsMSTime(0),
-    _lastAuctionListOwnerItemsMSTime(0),
     AntiDOS(this),
     m_GUIDLow(0),
     _player(nullptr),
@@ -202,6 +200,19 @@ std::string WorldSession::GetPlayerInfo() const
     ss << "Account: " << GetAccountId() << "]";
 
     return ss.str();
+}
+
+void WorldSession::SendAreaTriggerMessage(std::string_view str)
+{
+    std::vector<std::string_view> lines = Acore::Tokenize(str, '\n', true);
+    for (std::string_view line : lines)
+    {
+        uint32 length = line.size() + 1;
+        WorldPacket data(SMSG_AREA_TRIGGER_MESSAGE, 4 + length);
+        data << length;
+        data << line.data();
+        SendPacket(&data);
+    }
 }
 
 /// Get player guid if available. Use for logging purposes only
@@ -768,8 +779,8 @@ bool WorldSession::ValidateHyperlinksAndMaybeKick(std::string_view str)
     if (Acore::Hyperlinks::CheckAllLinks(str))
         return true;
 
-    LOG_ERROR("network", "Player {} {} sent a message with an invalid link:\n%.*s", GetPlayer()->GetName(),
-        GetPlayer()->GetGUID().ToString(), STRING_VIEW_FMT_ARG(str));
+    LOG_ERROR("network", "Player {} {} sent a message with an invalid link:\n{}", GetPlayer()->GetName(),
+        GetPlayer()->GetGUID().ToString(), str);
 
     if (sWorld->getIntConfig(CONFIG_CHAT_STRICT_LINK_CHECKING_KICK))
         KickPlayer("WorldSession::ValidateHyperlinksAndMaybeKick Invalid chat link");
@@ -782,8 +793,8 @@ bool WorldSession::DisallowHyperlinksAndMaybeKick(std::string_view str)
     if (str.find('|') == std::string_view::npos)
         return true;
 
-    LOG_ERROR("network", "Player {} {} sent a message which illegally contained a hyperlink:\n%.*s", GetPlayer()->GetName(),
-        GetPlayer()->GetGUID().ToString(), STRING_VIEW_FMT_ARG(str));
+    LOG_ERROR("network", "Player {} {} sent a message which illegally contained a hyperlink:\n{}", GetPlayer()->GetName(),
+        GetPlayer()->GetGUID().ToString(), str);
 
     if (sWorld->getIntConfig(CONFIG_CHAT_STRICT_LINK_CHECKING_KICK))
         KickPlayer("WorldSession::DisallowHyperlinksAndMaybeKick Illegal chat link");
@@ -1537,6 +1548,9 @@ uint32 WorldSession::DosProtection::GetMaxPacketCounterAllowed(uint16 opcode) co
         case CMSG_SOCKET_GEMS:                          // not profiled
         case CMSG_WRAP_ITEM:                            // not profiled
         case CMSG_REPORT_PVP_AFK:                       // not profiled
+        case CMSG_AUCTION_LIST_ITEMS:                   // not profiled
+        case CMSG_AUCTION_LIST_BIDDER_ITEMS:            // not profiled
+        case CMSG_AUCTION_LIST_OWNER_ITEMS:             // not profiled
             {
                 maxPacketCounterAllowed = 10;
                 break;
