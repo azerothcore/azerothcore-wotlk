@@ -49,7 +49,7 @@ INSERT INTO `waypoint_data` (`id`, `point`, `position_x`, `position_y`, `positio
 (8928900, 13, -215.36795, 1135.6195, -1.8750997, NULL, 0, 0, 0, 100, 0),
 (8928900, 14, -215.95822, 1155.653, -1.9799352, NULL, 0, 0, 0, 100, 0);
 
---Load WPs to the Patrols
+-- Load WPs to the Patrols
 UPDATE `creature` SET `wander_distance` = 0, `MovementType` = 2 WHERE `guid` IN (89278, 89289) AND `id1` = 23586;
 UPDATE `creature_addon` SET `path_id` = 8927800 WHERE (`guid` IN (89278));
 UPDATE `creature_addon` SET `path_id` = 8928900 WHERE (`guid` IN (89289));
