@@ -1,2 +1,2 @@
 -- loot table for item 22568 Sealed Craftsman's Writ
-UPDATE `item_template` SET `flagsCustom` = `flagsCustom` | 2 WHERE `entry` IN (22600, 22601, 22602, 22603, 22604, 22605, 22606, 22607, 22608, 22609, 22610, 22611, 22612, 22613, 22614, 22615, 22616, 22617, 22618, 22620, 22621, 22622, 22623, 22624);
+UPDATE `item_template` SET `flagsCustom` = `flagsCustom` | 2 WHERE `entry` BETWEEN 22600 AND 22626;
