@@ -2683,7 +2683,7 @@ void World::_UpdateGameTime()
 }
 
 /// Shutdown the server
-void World::ShutdownServ(uint32 time, uint32 options, uint8 exitcode, const std::string& reason)
+void World::ShutdownServ(uint32 time, uint32 options, uint8 exitcode, std::string const& reason)
 {
     // ignore if server shutdown at next tick
     if (IsStopped())
@@ -2691,8 +2691,9 @@ void World::ShutdownServ(uint32 time, uint32 options, uint8 exitcode, const std:
 
     _shutdownMask = options;
     _exitCode = exitcode;
+    _shutdownReason = reason;
 
-    LOG_WARN("server", "Time left until shutdown/restart: {}", time);
+    LOG_DEBUG("server.worldserver", "Server shutdown called with ShutdownMask {}, ExitCode {}, Time {}, Reason {}", ShutdownMask(options), ShutdownExitCode(exitcode), secsToTimeString(time), reason);
 
     ///- If the shutdown time is 0, set m_stopEvent (except if shutdown is 'idle' with remaining sessions)
     if (time == 0)
@@ -2712,32 +2713,45 @@ void World::ShutdownServ(uint32 time, uint32 options, uint8 exitcode, const std:
     sScriptMgr->OnShutdownInitiate(ShutdownExitCode(exitcode), ShutdownMask(options));
 }
 
-/// Display a shutdown message to the user(s)
-void World::ShutdownMsg(bool show, Player* player, const std::string& reason)
+/**
+ * @brief Displays a shutdown message at specific intervals or immediately if required.
+ *
+ * Show the time remaining for a server shutdown/restart with a reason appended if one is provided.
+ * Messages are displayed at regular intervals such as every
+ * 12 hours, 1 hour, 5 minutes, 1 minute, 30 seconds, 10 seconds,
+ * and every second in the last 10 seconds.
+ *
+ * @param show   Forces the message to be displayed immediately.
+ * @param player The player who should recieve the message (can be nullptr for global messages).
+ * @param reason The reason for the shutdown, appended to the message if provided.
+ */
+void World::ShutdownMsg(bool show, Player* player, std::string const& reason)
 {
-    // not show messages for idle shutdown mode
+    // Do not show a message for idle shutdown
     if (_shutdownMask & SHUTDOWN_MASK_IDLE)
         return;
 
-    ///- Display a message every 12 hours, hours, 5 minutes, minute, 5 seconds and finally seconds
-    if (show ||
-            (_shutdownTimer < 5 * MINUTE && (_shutdownTimer % 15) == 0) || // < 5 min; every 15 sec
-            (_shutdownTimer < 15 * MINUTE && (_shutdownTimer % MINUTE) == 0) || // < 15 min ; every 1 min
-            (_shutdownTimer < 30 * MINUTE && (_shutdownTimer % (5 * MINUTE)) == 0) || // < 30 min ; every 5 min
-            (_shutdownTimer < 12 * HOUR && (_shutdownTimer % HOUR) == 0) || // < 12 h ; every 1 h
-            (_shutdownTimer > 12 * HOUR && (_shutdownTimer % (12 * HOUR)) == 0)) // > 12 h ; every 12 h
+    bool twelveHours = (_shutdownTimer > 12 * HOUR && (_shutdownTimer % (12 * HOUR)) == 0); // > 12 h ; every 12 h
+    bool oneHour = (_shutdownTimer < 12 * HOUR && (_shutdownTimer % HOUR) == 0); // < 12 h ; every 1 h
+    bool fiveMin = (_shutdownTimer < 30 * MINUTE && (_shutdownTimer % (5 * MINUTE)) == 0); // < 30 min ; every 5 min
+    bool oneMin = (_shutdownTimer < 15 * MINUTE && (_shutdownTimer % MINUTE) == 0); // < 15 min ; every 1 min
+    bool thirtySec = (_shutdownTimer < 5 * MINUTE && (_shutdownTimer % 30) == 0); // < 5 min; every 30 sec
+    bool tenSec = (_shutdownTimer < 1 * MINUTE && (_shutdownTimer % 10) == 0); // < 1 min; every 10 sec
+    bool oneSec = (_shutdownTimer < 10 * SECOND && (_shutdownTimer % 1) == 0); // < 10 sec; every 1 sec
+
+    ///- Display a message every 12 hours, hour, 5 minutes, minute, 30 seconds, 10 seconds and finally seconds
+    if (show || twelveHours || oneHour || fiveMin || oneMin || thirtySec || tenSec || oneSec)
     {
         std::string str = secsToTimeString(_shutdownTimer).append(".");
-
         if (!reason.empty())
-        {
             str += " - " + reason;
-        }
+        // Display the reason every 12 hours, hour, 5 minutes, minute. At 60 seconds and at 10 seconds
+        else if (!_shutdownReason.empty() && (twelveHours || oneHour || fiveMin || oneMin || _shutdownTimer == 60 || _shutdownTimer == 10))
+            str += " - " + _shutdownReason;
 
         ServerMessageType msgid = (_shutdownMask & SHUTDOWN_MASK_RESTART) ? SERVER_MSG_RESTART_TIME : SERVER_MSG_SHUTDOWN_TIME;
-
         SendServerMessage(msgid, str, player);
-        LOG_DEBUG("server.worldserver", "Server is {} in {}", (_shutdownMask & SHUTDOWN_MASK_RESTART ? "restart" : "shuttingdown"), str);
+        LOG_WARN("server.worldserver", "Server {} in {}", (_shutdownMask & SHUTDOWN_MASK_RESTART ? "restarting" : "shutdown"), str);
     }
 }
 
