@@ -238,8 +238,12 @@ public:
             _akilzonGauntlet = NOT_STARTED;
             for (ObjectGuid guid : AkilzonTrash)
                 if (Creature* creature = instance->GetCreature(guid))
+                {
                     if (!creature->IsAlive())
                         creature->Respawn();
+                    else if (creature->GetEntry() == NPC_AMINISHI_TEMPEST)
+                        creature->AI()->DoAction(ACTION_RESET_AKILZON_GAUNTLET);
+                }
             if (Creature* creature = GetCreature(DATA_LOOKOUT))
                 if (creature->isMoving())
                     creature->Respawn(true);
