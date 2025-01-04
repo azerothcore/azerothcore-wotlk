@@ -114,10 +114,12 @@ BindIP = "0.0.0.0"
 #        Default:     "127.0.0.1;3306;acore;acore;acore_auth"       - (LoginDatabaseInfo)
 #                     "127.0.0.1;3306;acore;acore;acore_world"      - (WorldDatabaseInfo)
 #                     "127.0.0.1;3306;acore;acore;acore_characters" - (CharacterDatabaseInfo)
+#                     "127.0.0.1;3306;acore;acore;acore_dbc"        - (DbcDatabaseInfo)
 
 LoginDatabaseInfo     = "127.0.0.1;3306;acore;acore;acore_auth"
 WorldDatabaseInfo     = "127.0.0.1;3306;acore;acore;acore_world"
 CharacterDatabaseInfo = "127.0.0.1;3306;acore;acore;acore_characters"
+DbcDatabaseInfo       = "127.0.0.1;3306;acore;acore;acore_dbc"
 
 #
 #    LoginDatabase.WorkerThreads
@@ -133,6 +135,7 @@ CharacterDatabaseInfo = "127.0.0.1;3306;acore;acore;acore_characters"
 LoginDatabase.WorkerThreads     = 1
 WorldDatabase.WorkerThreads     = 1
 CharacterDatabase.WorkerThreads = 1
+DbcDatabase.WorkerThreads = 1
 
 #
 #    LoginDatabase.SynchThreads
@@ -146,6 +149,7 @@ CharacterDatabase.WorkerThreads = 1
 LoginDatabase.SynchThreads     = 1
 WorldDatabase.SynchThreads     = 1
 CharacterDatabase.SynchThreads = 1
+DbcDatabase.SynchThreads = 1
 
 #
 #    MaxPingTime
@@ -289,12 +293,13 @@ FlashAtStart = 1
 #           DATABASE_LOGIN     = 1, // Auth database
 #           DATABASE_CHARACTER = 2, // Character database
 #           DATABASE_WORLD     = 4, // World database
+#           DATABASE_DBC       = 8, // DBC database
 #
-#        Default:     7 - (All enabled)
+#        Default:     15 - (All enabled)
 #                     4  - (Enable world only)
 #                     0  - (All disabled)
 
-Updates.EnableDatabases = 7
+Updates.EnableDatabases = 15
 
 #
 #    Updates.AutoSetup

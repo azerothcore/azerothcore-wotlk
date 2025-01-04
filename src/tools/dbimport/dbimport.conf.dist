@@ -152,12 +152,13 @@ CharacterDatabase.SynchThreads = 1
 #           DATABASE_LOGIN     = 1, // Auth database
 #           DATABASE_CHARACTER = 2, // Character database
 #           DATABASE_WORLD     = 4, // World database
+#           DATABASE_DBC       = 8, // DBC database
 #
-#        Default:     7  - (All enabled)
+#        Default:     15 - (All enabled)
 #                     4  - (Enable world only)
 #                     0  - (All disabled)
 
-Updates.EnableDatabases = 7
+Updates.EnableDatabases = 15
 
 #
 #   Updates.AllowedModules
