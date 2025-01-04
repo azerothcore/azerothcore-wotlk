@@ -1,3 +1,4 @@
+-- DB update 2025_01_04_00 -> 2025_01_04_01
 -- Argah smart ai
 SET @ENTRY := 27440;
 UPDATE `creature_template` SET `AIName` = 'SmartAI', `ScriptName` = '' WHERE `entry` = @ENTRY;
