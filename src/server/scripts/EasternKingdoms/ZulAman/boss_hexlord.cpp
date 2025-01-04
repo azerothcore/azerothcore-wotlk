@@ -149,8 +149,6 @@ enum AbilityTarget
     ABILITY_TARGET_SPECIAL = 5
 };
 
-constexpr std::chrono::milliseconds DELAYMARGIN(1000);
-
 struct PlayerAbilityStruct
 {
     uint32 spell;
@@ -245,7 +243,7 @@ struct boss_hexlord_malacrass : public BossAI
         BossAI::Reset();
         _currentClass = CLASS_NONE;
         _classAbilityTimer = 10000ms;
-        _timeUntilNextDrainPower = 0ms;
+        _timeUntilNextDrainPower = 0s;
         SpawnAdds();
         ScheduleHealthCheckEvent(80, [&] {
             scheduler.Schedule(1s, GROUP_DRAIN_POWER, [this](TaskContext context)
@@ -291,9 +289,9 @@ struct boss_hexlord_malacrass : public BossAI
             // Delay Drain Power if it's currently within 10s of being cast
             // TODO: see what is wrong with GetNextGroupOccurrence as the timers don't seem correct on resets
             _timeUntilNextDrainPower = scheduler.GetNextGroupOccurrence(GROUP_DRAIN_POWER);
-            if (_timeUntilNextDrainPower > 0ms && _timeUntilNextDrainPower < 10000ms)
+            if (_timeUntilNextDrainPower > 0s && _timeUntilNextDrainPower < 10s)
             {
-                std::chrono::milliseconds delayTime = 10000ms - _timeUntilNextDrainPower + DELAYMARGIN;
+                std::chrono::seconds delayTime = 10s - _timeUntilNextDrainPower + 1s;
                 scheduler.DelayGroup(GROUP_DRAIN_POWER, delayTime);
             }
             scheduler.Schedule(10s, [this](TaskContext)
@@ -368,7 +366,7 @@ struct boss_hexlord_malacrass : public BossAI
 private:
     uint8 _currentClass;
     std::chrono::milliseconds _classAbilityTimer;
-    std::chrono::milliseconds _timeUntilNextDrainPower;
+    std::chrono::seconds _timeUntilNextDrainPower;
     std::vector<uint8> _creatureIndex;
 };
 
