@@ -303,10 +303,6 @@ public:
         {
             CombatAI::InitializeAI();
             ((Minion*)me)->SetFollowAngle(rand_norm() * 2 * M_PI);
-
-            // Heroism / Bloodlust immunity
-            me->ApplySpellImmune(0, IMMUNITY_ID, 32182, true);
-            me->ApplySpellImmune(0, IMMUNITY_ID, 2825, true);
         }
     };
 

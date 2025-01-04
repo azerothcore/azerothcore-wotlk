@@ -236,6 +236,92 @@ void GameEventMgr::StopEvent(uint16 event_id, bool overwrite)
         sScriptMgr->OnGameEventStop(event_id);
 }
 
+void GameEventMgr::LoadEventVendors()
+{
+    uint32 oldMSTime = getMSTime();
+    WorldDatabasePreparedStatement* stmt = WorldDatabase.GetPreparedStatement(WORLD_SEL_GAME_EVENT_NPC_VENDOR);
+    PreparedQueryResult result = WorldDatabase.Query(stmt);
+
+    if (!result)
+    {
+        LOG_WARN("server.loading", ">> Loaded 0 Vendor Additions In Game Events. DB Table `game_event_npc_vendor` Is Empty.");
+        LOG_INFO("server.loading", " ");
+        return;
+    }
+
+    uint32 count = 0;
+    std::unordered_set<uint8> processedEvents;
+
+    do
+    {
+        Field* fields = result->Fetch();
+        uint8 eventId = fields[0].Get<uint8>();
+        ObjectGuid::LowType guid = fields[1].Get<uint32>();
+
+        if (eventId >= mGameEventVendors.size())
+        {
+            LOG_ERROR("sql.sql", "Table `game_event_npc_vendor` has invalid eventEntry ({}) for GUID ({}), skipped.", eventId, guid);
+            continue;
+        }
+
+        // Clear existing vendors for this event only once
+        if (processedEvents.find(eventId) == processedEvents.end())
+        {
+            // Remove vendor items from in-memory data
+            for (auto& entry : mGameEventVendors[eventId])
+            {
+                sObjectMgr->RemoveVendorItem(entry.entry, entry.item, false);
+            }
+            mGameEventVendors[eventId].clear();
+            processedEvents.insert(eventId);
+        }
+
+        NPCVendorList& vendors = mGameEventVendors[eventId];
+        NPCVendorEntry newEntry;
+        newEntry.item = fields[2].Get<uint32>();
+        newEntry.maxcount = fields[3].Get<uint32>();
+        newEntry.incrtime = fields[4].Get<uint32>();
+        newEntry.ExtendedCost = fields[5].Get<uint32>();
+
+        // Get the event NPC flag for validity check
+        uint32 event_npc_flag = 0;
+        NPCFlagList& flist = mGameEventNPCFlags[eventId];
+        for (NPCFlagList::const_iterator itr = flist.begin(); itr != flist.end(); ++itr)
+        {
+            if (itr->first == guid)
+            {
+                event_npc_flag = itr->second;
+                break;
+            }
+        }
+
+        // Get creature entry
+        newEntry.entry = 0;
+        if (CreatureData const* data = sObjectMgr->GetCreatureData(guid))
+            newEntry.entry = data->id1;
+
+        // Validate vendor item
+        if (!sObjectMgr->IsVendorItemValid(newEntry.entry, newEntry.item, newEntry.maxcount, newEntry.incrtime, newEntry.ExtendedCost, nullptr, nullptr, event_npc_flag))
+        {
+            LOG_ERROR("sql.sql", "Table `game_event_npc_vendor` has invalid item ({}) for guid ({}) for event ({}), skipped.",
+                newEntry.item, newEntry.entry, eventId);
+            continue;
+        }
+
+        // Add the item to the vendor if event is active
+        if (IsEventActive(eventId))
+            sObjectMgr->AddVendorItem(newEntry.entry, newEntry.item, newEntry.maxcount, newEntry.incrtime, newEntry.ExtendedCost, false);
+
+        vendors.push_back(newEntry);
+
+        ++count;
+    } while (result->NextRow());
+
+    LOG_INFO("server.loading", ">> Loaded {} Vendor Additions In Game Events in {} ms", count, GetMSTimeDiffToNow(oldMSTime));
+    LOG_INFO("server.loading", " ");
+
+}
+
 void GameEventMgr::LoadFromDB()
 {
     {
@@ -852,69 +938,7 @@ void GameEventMgr::LoadFromDB()
     }
 
     LOG_INFO("server.loading", "Loading Game Event Vendor Additions Data...");
-    {
-        uint32 oldMSTime = getMSTime();
-
-        //                                                    0        1    2       3         4          5
-        QueryResult result = WorldDatabase.Query("SELECT eventEntry, guid, item, maxcount, incrtime, ExtendedCost FROM game_event_npc_vendor ORDER BY guid, slot ASC");
-
-        if (!result)
-        {
-            LOG_WARN("server.loading", ">> Loaded 0 Vendor Additions In Game Events. DB Table `game_event_npc_vendor` Is Empty.");
-            LOG_INFO("server.loading", " ");
-        }
-        else
-        {
-            uint32 count = 0;
-            do
-            {
-                Field* fields = result->Fetch();
-
-                uint8 event_id  = fields[0].Get<uint8>();
-
-                if (event_id >= mGameEventVendors.size())
-                {
-                    LOG_ERROR("sql.sql", "`game_event_npc_vendor` game event id ({}) is out of range compared to max event id in `game_event`", event_id);
-                    continue;
-                }
-
-                NPCVendorList& vendors = mGameEventVendors[event_id];
-                NPCVendorEntry newEntry;
-                ObjectGuid::LowType guid = fields[1].Get<uint32>();
-                newEntry.item = fields[2].Get<uint32>();
-                newEntry.maxcount = fields[3].Get<uint32>();
-                newEntry.incrtime = fields[4].Get<uint32>();
-                newEntry.ExtendedCost = fields[5].Get<uint32>();
-                // get the event npc flag for checking if the npc will be vendor during the event or not
-                uint32 event_npc_flag = 0;
-                NPCFlagList& flist = mGameEventNPCFlags[event_id];
-                for (NPCFlagList::const_iterator itr = flist.begin(); itr != flist.end(); ++itr)
-                {
-                    if (itr->first == guid)
-                    {
-                        event_npc_flag = itr->second;
-                        break;
-                    }
-                }
-                // get creature entry
-                newEntry.entry = 0;
-
-                if (CreatureData const* data = sObjectMgr->GetCreatureData(guid))
-                    newEntry.entry = data->id1;
-
-                // check validity with event's npcflag
-                if (!sObjectMgr->IsVendorItemValid(newEntry.entry, newEntry.item, newEntry.maxcount, newEntry.incrtime, newEntry.ExtendedCost, nullptr, nullptr, event_npc_flag))
-                    continue;
-
-                vendors.push_back(newEntry);
-
-                ++count;
-            } while (result->NextRow());
-
-            LOG_INFO("server.loading", ">> Loaded {} Vendor Additions In Game Events in {} ms", count, GetMSTimeDiffToNow(oldMSTime));
-            LOG_INFO("server.loading", " ");
-        }
-    }
+    LoadEventVendors();
 
     LOG_INFO("server.loading", "Loading Game Event Battleground Data...");
     {
