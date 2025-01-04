@@ -475,9 +475,7 @@ bool LootItem::AllowedForPlayer(Player const* player, ObjectGuid source) const
 
     // Always allows the Master Looter to see the item
     if (isMasterLooter)
-    {
         return true;
-    }
 
     // check quest requirements
     if (!pProto->HasFlagCu(ITEM_FLAGS_CU_IGNORE_QUEST_STATUS))
