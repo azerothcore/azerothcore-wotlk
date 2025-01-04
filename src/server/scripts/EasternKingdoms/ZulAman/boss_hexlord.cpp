@@ -243,7 +243,7 @@ struct boss_hexlord_malacrass : public BossAI
         BossAI::Reset();
         _currentClass = CLASS_NONE;
         _classAbilityTimer = 10000ms;
-        _timeUntilNextDrainPower = 0s;
+        _timeUntilNextDrainPower = 0ms;
         SpawnAdds();
         ScheduleHealthCheckEvent(80, [&] {
             scheduler.Schedule(1s, GROUP_DRAIN_POWER, [this](TaskContext context)
@@ -291,7 +291,7 @@ struct boss_hexlord_malacrass : public BossAI
             _timeUntilNextDrainPower = scheduler.GetNextGroupOccurrence(GROUP_DRAIN_POWER);
             if (_timeUntilNextDrainPower > 0s && _timeUntilNextDrainPower < 10s)
             {
-                std::chrono::seconds delayTime = 10s - _timeUntilNextDrainPower + 1s;
+                std::chrono::milliseconds delayTime = 10s - _timeUntilNextDrainPower + 1s;
                 scheduler.DelayGroup(GROUP_DRAIN_POWER, delayTime);
             }
             scheduler.Schedule(10s, [this](TaskContext)
@@ -366,7 +366,7 @@ struct boss_hexlord_malacrass : public BossAI
 private:
     uint8 _currentClass;
     std::chrono::milliseconds _classAbilityTimer;
-    std::chrono::seconds _timeUntilNextDrainPower;
+    std::chrono::milliseconds _timeUntilNextDrainPower;
     std::vector<uint8> _creatureIndex;
 };
 
