@@ -410,6 +410,13 @@ struct npc_harrison_jones : public ScriptedAI
             scheduler.Schedule(1s, [this](TaskContext /*task*/)
             {
                 me->SetStandState(UNIT_STAND_STATE_DEAD);
+            }).Schedule(2s, [this](TaskContext /*task*/)
+            {
+                // Send savages to attack players
+                std::list<Creature*> creatures;
+                me->GetCreatureListWithEntryInGrid(creatures, NPC_AMANISHI_SAVAGE, 100.0f);
+                for (Creature* creature : creatures)
+                    creature->AI()->SetData(0, 0);
             });
             _instance->StorePersistentData(DATA_TIMED_RUN, 21);
             _instance->DoAction(ACTION_START_TIMED_RUN);
