@@ -278,7 +278,6 @@ struct boss_hexlord_malacrass : public BossAI
     void JustEngagedWith(Unit* who) override
     {
         BossAI::JustEngagedWith(who);
-        LOG_ERROR("server", "Begin: Is drain power group scheduled {}", std::to_string(scheduler.IsGroupScheduled(GROUP_DRAIN_POWER)));
         Talk(SAY_AGGRO);
         summons.DoForAllSummons([&](WorldObject* summon)
         {
