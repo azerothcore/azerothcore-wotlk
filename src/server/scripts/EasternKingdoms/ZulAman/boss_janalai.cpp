@@ -401,7 +401,7 @@ struct npc_janalai_hatcher : public ScriptedAI
                 ++_repeatCount;
 
                 if (me->FindNearestCreature(NPC_EGG, 100.0f))
-                    context.Repeat(4s);
+                    context.Repeat(5s);
                 else
                 {
                     if (WorldObject* summoner = GetSummoner())
