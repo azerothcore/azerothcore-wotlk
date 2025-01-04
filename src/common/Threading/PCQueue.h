@@ -59,10 +59,10 @@ public:
 
     bool Pop(T& value)
     {
+        std::lock_guard<std::mutex> lock(_queueLock);
         if (_queue.empty() || _cancel)
             return false;
 
-        std::lock_guard<std::mutex> lock(_queueLock);
         value = std::move(_queue.front());
         _queue.pop();
         return true;
@@ -85,13 +85,11 @@ public:
     // Clears the queue and immediately stops any consumers.
     void Cancel()
     {
-        {
-            std::lock_guard<std::mutex> lock(_queueLock);
-            while (!_queue.empty()) {
-                T& value = _queue.front();
-                DeleteQueuedObject(value);
-                _queue.pop();
-            }
+        std::lock_guard<std::mutex> lock(_queueLock);
+        while (!_queue.empty()) {
+            T& value = _queue.front();
+            DeleteQueuedObject(value);
+            _queue.pop();
         }
         _cancel = true;
         _condition.notify_all();
