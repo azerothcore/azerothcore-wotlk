@@ -1,3 +1,4 @@
+-- DB update 2025_01_05_02 -> 2025_01_05_03
 --
 -- Amani'shi Warbringer: Set MinHealth% to 0 for HEALTH_PCT
 DELETE FROM `smart_scripts` WHERE (`entryorguid` = 23580) AND (`source_type` = 0) AND (`id` IN (0, 1, 2, 3));
