@@ -121,12 +121,12 @@ struct boss_halazzi : public BossAI
         if (_phase == PHASE_LYNX || _phase == PHASE_ENRAGE)
         {
             uint32 _healthCheckPercentage = 25 * (3 - _transformCount);
-            if (!HealthAbovePct(_healthCheckPercentage))
+            if (me->HealthBelowPctDamaged(_healthCheckPercentage, damage))
                 EnterPhase(PHASE_SPLIT);
         }
         else if (_phase == PHASE_HUMAN)
         {
-            if (!HealthAbovePct(20))
+            if (me->HealthBelowPctDamaged(20, damage))
                 EnterPhase(PHASE_MERGE);
         }
     }
