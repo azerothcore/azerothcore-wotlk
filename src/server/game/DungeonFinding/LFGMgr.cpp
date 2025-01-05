@@ -1725,15 +1725,6 @@ namespace lfg
         bool randomDungeon = false;
         std::vector<Player*> playersTeleported;
 
-        // clear list of players to be teleported if config option is disabled
-        if (!sWorld->getBoolConfig(CONFIG_LFG_TELEPORT))
-        {
-            // Send message to all players in newly formed group
-            SendMessageToAllPlayers(playersToTeleport, proposal);
-            // clearn the player list
-            playersToTeleport.clear();
-        }
-
         // Teleport Player
         for (GuidUnorderedSet::const_iterator it = playersToTeleport.begin(); it != playersToTeleport.end(); ++it)
         {
@@ -2158,29 +2149,18 @@ namespace lfg
         {
             error = LFG_TELEPORTERROR_COMBAT;
         }
+        else if (!sWorld->getBoolConfig(CONFIG_LFG_TELEPORT) && !m_Testing)
+        {
+            ChatHandler(player->GetSession()).PSendSysMessage(LANG_LFG_TELEPORT_DUNGEON, dungeon->name);
+            error = LFG_TELEPORTERROR_YOU_CANT_DO_THAT_RIGHT_NOW;
+        }
         else if (out && error == LFG_TELEPORTERROR_OK)
         {
-            // No dungon teleport allowed
-            if (!sWorld->getBoolConfig(CONFIG_LFG_TELEPORT))
-            {
-                ChatHandler(player->GetSession()).PSendSysMessage(LANG_LFG_TELEPORT_DUNGEON, dungeon->name);
-                return;
-            }
-
             if (player->GetMapId() == uint32(dungeon->map))
                 player->TeleportToEntryPoint();
-
-            return;
         }
         else
         {
-            // No dungon teleport allowed
-            if (!sWorld->getBoolConfig(CONFIG_LFG_TELEPORT))
-            {
-                ChatHandler(player->GetSession()).PSendSysMessage(LANG_LFG_TELEPORT_DUNGEON, dungeon->name);
-                return;
-            }
-
             uint32 mapid = dungeon->map;
             float x = dungeon->x;
             float y = dungeon->y;
