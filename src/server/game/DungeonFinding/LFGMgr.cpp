@@ -1724,7 +1724,6 @@ namespace lfg
 
         bool randomDungeon = false;
         std::vector<Player*> playersTeleported;
-
         // Teleport Player
         for (GuidUnorderedSet::const_iterator it = playersToTeleport.begin(); it != playersToTeleport.end(); ++it)
         {
