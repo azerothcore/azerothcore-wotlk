@@ -1,3 +1,4 @@
+-- DB update 2025_01_05_01 -> 2025_01_05_02
 
 DELETE FROM `creature_template_movement` WHERE `CreatureId` IN (25817, 25748);
 
