@@ -200,7 +200,7 @@ struct boss_halazzi : public BossAI
                 {
                     DoCastSelf(SPELL_SUMMON_LYNX, true);
                 });
-                nextPhase = PHASE_HUMAN;
+                _phase = PHASE_HUMAN;
                 [[fallthrough]];
             case PHASE_HUMAN:
                 scheduler.CancelGroup(GROUP_MERGE);
