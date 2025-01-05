@@ -417,7 +417,7 @@ struct npc_harrison_jones : public ScriptedAI
                 std::list<Creature*> creatures;
                 me->GetCreatureListWithEntryInGrid(creatures, NPC_AMANISHI_SAVAGE, 100.0f);
                 for (Creature* creature : creatures)
-                    creature->AI()->SetData(0, 0);
+                    creature->SetInCombatWithZone();
             });
             _instance->StorePersistentData(DATA_TIMED_RUN, 21);
             _instance->DoAction(ACTION_START_TIMED_RUN);
