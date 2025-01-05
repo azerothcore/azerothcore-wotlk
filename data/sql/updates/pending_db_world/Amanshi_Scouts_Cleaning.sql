@@ -5,7 +5,7 @@ DELETE FROM `creature_addon` WHERE (`guid` IN (89274, 89287, 89288, 89293, 89303
 DELETE FROM `linked_respawn` WHERE (`guid` IN (89274, 89287, 89288, 89293, 89303, 89308, 89312, 89313, 89329));
 
 -- Set Wander Distance and Movement Type (for stay in place Scouts)
-UPDATE `creature` SET `wander_distance` = 0, `MovementType` = 0 WHERE `guid` IN (89278, 89280, 89284) AND `id1` = 23586;
+UPDATE `creature` SET `wander_distance` = 0, `MovementType` = 0 WHERE `guid` IN (89280, 89284) AND `id1` = 23586;
 
 -- Update Positions and pose for 89280 (sit).
 UPDATE `creature` SET `position_x` = -138.5746, `position_y` = 1164.1141, `position_z` = 3.0369, `orientation` = 1.3761 WHERE `guid` = 89284 AND `id1` = 23586;
