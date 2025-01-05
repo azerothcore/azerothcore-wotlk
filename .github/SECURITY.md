@@ -4,28 +4,25 @@
 
 We support the following versions of dependencies.
 
-| Icon                   |             Meaning             |
-| :--------------------- | :-----------------------------: |
-| :white_check_mark:     |          **Supported**          |
-| :red_circle:           |        **NOT** Supported        |
-| :large_blue_diamond:   |         **Recommended**         |
-| :large_orange_diamond: | **MIGHT** work but no guarantee |
+| Icon                 |      Meaning      |
+| :------------------- | :---------------: |
+| :white_check_mark:   |   **Supported**   |
+| :red_circle:         | **NOT** Supported |
+| :large_blue_diamond: |  **Recommended**  |
 
 ### Versions of AzerothCore:
 
-| AzerothCore Branch             |         Status         |     Recommended      |
-| ------------------------------ | :--------------------: | :------------------: |
-| **master**                     |   :white_check_mark:   | :large_blue_diamond: |
-| bg-arena-modules-compatibility | :large_orange_diamond: |                      |
-| Any non-official fork          | :large_orange_diamond: |                      |
-| Any Playerbots fork            |      :red_circle:      |                      |
-| Any NPCBots fork               |      :red_circle:      |                      |
-| Any AC (non-official) repack   |      :red_circle:      |                      |
+| AzerothCore Branch           |       Status       |     Recommended      |
+| ---------------------------- | :----------------: | :------------------: |
+| **master**                   | :white_check_mark: | :large_blue_diamond: |
+| Any non-official fork        |    :red_circle:    |                      |
+| Any Playerbots fork          |    :red_circle:    |                      |
+| Any NPCBots fork             |    :red_circle:    |                      |
+| Any AC (non-official) repack |    :red_circle:    |                      |
+
 
 ### Supported Operating Systems
 
-<details>
-    <summary> [Click the arrow to see]</summary>
 
 | Linux (Ubuntu) |       Status       |     Recommended      |
 | :------------- | :----------------: | :------------------: |
@@ -33,16 +30,10 @@ We support the following versions of dependencies.
 | 22.04          | :white_check_mark: |                      |
 | 20.04 ≤        |    :red_circle:    |                      |
 
-| Linux (Debian) |         Status         | Recommended |
-| :------------- | :--------------------: | :---------: |
-| 12             | :large_orange_diamond: |             |
-| 11             | :large_orange_diamond: |             |
-
-| macOS |         Status         |     Recommended      |
-| :---- | :--------------------: | :------------------: |
-| 14    |   :white_check_mark:   | :large_blue_diamond: |
-| 13    | :large_orange_diamond: |                      |
-| 12 ≤  |      :red_circle:      |                      |
+| macOS |       Status       |     Recommended      |
+| :---- | :----------------: | :------------------: |
+| 14    | :white_check_mark: | :large_blue_diamond: |
+| 12 ≤  |    :red_circle:    |                      |
 
 | Windows       |       Status       | Recommended |
 | :------------ | :----------------: | :---------: |
@@ -50,7 +41,6 @@ We support the following versions of dependencies.
 | Windows 11    | :white_check_mark: |
 | Windows 8.1 ≤ |    :red_circle:    |
 
-</details>
 <br>
 
 ### Supported Boost Versions:
@@ -99,7 +89,7 @@ We support the following versions of dependencies.
 > [!NOTE]
 > We do **NOT** support any repacks that may or may not have been made based on AzerothCore. This is because they are usually based on older versions and there is no way to know what is in the precompiled binaries. Instead, you should compile your binaries from the AzerothCore source. To get started, read the [Installation Guide](https://www.azerothcore.org/wiki/installation).
 
-> [!CAUTION] 
+> [!CAUTION]
 > [Why you should not use repacks to run your WoW server](https://www.mangosrumors.org/why-you-should-not-use-repacks-to-run-your-wow-server/)
 
 ## Reporting a Vulnerability
