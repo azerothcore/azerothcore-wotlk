@@ -1,3 +1,4 @@
+-- DB update 2025_01_05_05 -> 2025_01_05_06
 --
 -- Scarlet Medic
 DELETE FROM `smart_scripts` WHERE (`entryorguid` = 28608) AND (`source_type` = 0) AND (`id` IN (3, 4));
