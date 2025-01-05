@@ -1,3 +1,4 @@
+-- DB update 2025_01_04_02 -> 2025_01_05_00
 
 -- Remove unofficial Npcs
 DELETE FROM `creature` WHERE (`id1` = 23586) AND (`guid` IN (89274, 89287, 89288, 89293, 89303, 89308, 89312, 89313, 89329));
