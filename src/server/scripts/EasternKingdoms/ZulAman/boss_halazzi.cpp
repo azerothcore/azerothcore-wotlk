@@ -153,20 +153,12 @@ struct boss_halazzi : public BossAI
 
     void EnterPhase(PhaseHalazzi nextPhase)
     {
+        _phase = nextPhase;
+
         switch (nextPhase)
         {
-            case PHASE_ENRAGE:
-                SetInvincibility(false);
-                scheduler.Schedule(12s, GROUP_LYNX, [this](TaskContext context)
-                {
-                    DoCastSelf(SPELL_SUMMON_TOTEM);
-                    context.Repeat(20s);
-                });
-                [[fallthrough]];
             case PHASE_LYNX:
             {
-                if (_phase == PHASE_MERGE)
-                    me->ResumeChasingVictim();
                 summons.DespawnAll();
 
                 if (_transformCount)
@@ -240,24 +232,35 @@ struct boss_halazzi : public BossAI
                     me->GetMotionMaster()->Clear();
                     me->GetMotionMaster()->MoveFollow(lynx, 0, 0);
                     ++_transformCount;
-                    scheduler.Schedule(2s, GROUP_MERGE, [this](TaskContext context)
+                    scheduler.Schedule(2s, GROUP_MERGE, [this, lynx](TaskContext context)
                     {
-                        if (Creature* lynx = instance->GetCreature(DATA_SPIRIT_LYNX))
+                        if (lynx)
+                        {
                             if (me->IsWithinDistInMap(lynx, 6.0f))
                             {
-                                if (_transformCount < 3)
-                                    EnterPhase(PHASE_LYNX);
-                                else
-                                    EnterPhase(PHASE_ENRAGE);
+                                EnterPhase(PHASE_LYNX);
+                                me->ResumeChasingVictim();
+
+                                // Enrage phase
+                                if (_transformCount == 2)
+                                {
+                                    SetInvincibility(false);
+                                    scheduler.Schedule(12s, GROUP_LYNX, [this](TaskContext context)
+                                    {
+                                        DoCastSelf(SPELL_SUMMON_TOTEM);
+                                        context.Repeat(20s);
+                                    });
+                                }
                             }
-                        context.Repeat(2s);
+                            else
+                                context.Repeat(2s);
+                        }
                     });
                 }
                 break;
             default:
                 break;
         }
-        _phase = nextPhase;
     }
 
     void KilledUnit(Unit* victim) override
