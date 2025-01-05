@@ -1,3 +1,4 @@
+-- DB update 2025_01_05_04 -> 2025_01_05_05
 --
 DELETE FROM `smart_scripts` WHERE (`entryorguid` = 23586) AND (`source_type` = 0);
 UPDATE `creature_template` SET `AIName` = '', `ScriptName` = 'npc_amanishi_scout' WHERE (`entry` = 23586);

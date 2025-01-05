@@ -1,3 +1,4 @@
+-- DB update 2025_01_05_03 -> 2025_01_05_04
 
 -- Remove unit flag "stunned" from Citizen of Havenshire
 UPDATE `creature_template` SET `unit_flags`=`unit_flags`& ~262144 WHERE (`entry` = 28576);
