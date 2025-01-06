@@ -3287,8 +3287,8 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
             for (WorldObject* target : targets)
                 if (IsCreature(target))
                 {
-                    target->ToCreature()->SetReputationRewardDisabled(e.action.reward.reputation);
-                    target->ToCreature()->SetLootRewardDisabled(e.action.reward.loot);
+                    target->ToCreature()->SetReputationRewardDisabled(static_cast<bool>(e.action.reward.reputation));
+                    target->ToCreature()->SetLootRewardDisabled(static_cast<bool>(e.action.reward.loot));
                 }
             break;
         }
