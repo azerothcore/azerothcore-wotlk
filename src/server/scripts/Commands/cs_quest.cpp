@@ -66,12 +66,6 @@ public:
             return false;
         }
 
-        if (sDisableMgr->IsDisabledFor(DISABLE_TYPE_QUEST, quest->GetQuestId(), nullptr))
-        {
-            handler->PSendSysMessage("disabled - not added");
-            return false;
-        }
-
         uint32 entry = quest->GetQuestId();
 
         // check item starting quest (it can work incorrectly if added without item in inventory)

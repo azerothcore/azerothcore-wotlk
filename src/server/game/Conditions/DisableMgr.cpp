@@ -87,8 +87,6 @@ void DisableMgr::LoadDisables()
         ++total_count;
     } while (result->NextRow());
 
-    AddDisable(DISABLE_TYPE_QUEST, 260, 0, "", "");
-
     LOG_INFO("server.loading", ">> Loaded {} Disables in {} ms", total_count, GetMSTimeDiffToNow(oldMSTime));
     LOG_INFO("server.loading", " ");
 }
