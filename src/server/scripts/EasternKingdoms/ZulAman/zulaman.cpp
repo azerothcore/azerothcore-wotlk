@@ -20,6 +20,7 @@
 #include "Player.h"
 #include "ScriptedCreature.h"
 #include "ScriptedGossip.h"
+#include "SpellAuraEffects.h"
 #include "SpellInfo.h"
 #include "SpellScript.h"
 #include "SpellScriptLoader.h"
@@ -410,6 +411,13 @@ struct npc_harrison_jones : public ScriptedAI
             scheduler.Schedule(1s, [this](TaskContext /*task*/)
             {
                 me->SetStandState(UNIT_STAND_STATE_DEAD);
+            }).Schedule(2s, [this](TaskContext /*task*/)
+            {
+                // Send savages to attack players
+                std::list<Creature*> creatures;
+                me->GetCreatureListWithEntryInGrid(creatures, NPC_AMANISHI_SAVAGE, 100.0f);
+                for (Creature* creature : creatures)
+                    creature->SetInCombatWithZone();
             });
             _instance->StorePersistentData(DATA_TIMED_RUN, 21);
             _instance->DoAction(ACTION_START_TIMED_RUN);
@@ -674,6 +682,166 @@ private:
     SummonList _summons;
 };
 
+struct WorldTriggerHutPred
+{
+    bool operator()(Creature* trigger) const
+    {
+        return trigger->GetOrientation() > 2.7f || (trigger->GetOrientation() < 2.7f && 1270.0f < trigger->GetPositionY() && trigger->GetPositionY() < 1280.0f);
+    }
+};
+
+struct WorldTriggerDrumPred
+{
+    bool operator()(Creature* trigger) const
+    {
+        return !WorldTriggerHutPred()(trigger);
+    }
+};
+
+enum AmanishiScout
+{
+    NPC_WORLD_TRIGGER               = 22515,
+    POINT_DRUM                      = 0,
+    SAY_AGGRO                       = 0,
+    SPELL_ALERT_DRUMS               = 42177,
+    SPELL_MULTI_SHOT                = 43205,
+    SPELL_SHOOT                     = 16496
+};
+
+struct npc_amanishi_scout : public ScriptedAI
+{
+    npc_amanishi_scout(Creature* creature) : ScriptedAI(creature) { }
+
+    void Reset() override
+    {
+        scheduler.CancelAll();
+        me->SetCombatMovement(false);
+    }
+
+    void JustEngagedWith(Unit* /*who*/) override
+    {
+        me->SetInCombatWithZone();
+        Talk(SAY_AGGRO);
+        // Move to Drum
+        std::list<Creature*> triggers;
+        GetCreatureListWithEntryInGrid(triggers, me, NPC_WORLD_TRIGGER, 50.0f);
+        triggers.remove_if(WorldTriggerHutPred());
+        triggers.sort(Acore::ObjectDistanceOrderPred(me));
+        if (!triggers.empty())
+        {
+            me->ClearTarget();
+            Creature* closestDrum = triggers.front();
+            me->GetMotionMaster()->MovePoint(POINT_DRUM, closestDrum->GetPositionX(), closestDrum->GetPositionY(), closestDrum->GetPositionZ());
+        }
+        else
+            ScheduleCombat();
+    }
+
+    void MovementInform(uint32 type, uint32 id) override
+    {
+        if (type == POINT_MOTION_TYPE && id == POINT_DRUM)
+        {
+            DoCastSelf(SPELL_ALERT_DRUMS);
+            scheduler.Schedule(5s, [this](TaskContext /*context*/)
+            {
+                ScheduleCombat();
+            });
+        }
+    }
+
+    void ScheduleCombat()
+    {
+        me->SetCombatMovement(true);
+        if (Unit* victim = me->GetVictim())
+            me->GetMotionMaster()->MoveChase(victim);
+        scheduler.Schedule(2s, [this](TaskContext context)
+        {
+            DoCastVictim(SPELL_SHOOT);
+            context.Repeat(4s, 5s);
+        }).Schedule(6s, [this](TaskContext context)
+        {
+            DoCastAOE(SPELL_MULTI_SHOT);
+            context.Repeat(20s, 24s);
+        });
+    }
+
+    void UpdateAI(uint32 diff) override
+    {
+        scheduler.Update(diff);
+
+        if (!UpdateVictim())
+            return;
+
+        DoMeleeAttackIfReady();
+    }
+};
+
+enum SpellAlertDrums
+{
+    SPELL_SUMMON_AMANISHI_SENTRIES  = 42179
+};
+
+class spell_alert_drums : public AuraScript
+{
+    PrepareAuraScript(spell_alert_drums);
+
+    bool Validate(SpellInfo const* /*spellInfo*/) override
+    {
+        return ValidateSpellInfo({ SPELL_SUMMON_AMANISHI_SENTRIES });
+    }
+
+    void HandleTriggerSpell(AuraEffect const* aurEff)
+    {
+        PreventDefaultAction();
+        if (aurEff->GetTickNumber() == 1)
+            GetCaster()->CastSpell(GetCaster(), SPELL_SUMMON_AMANISHI_SENTRIES, true);
+    }
+
+    void Register() override
+    {
+        OnEffectPeriodic += AuraEffectPeriodicFn(spell_alert_drums::HandleTriggerSpell, EFFECT_0, SPELL_AURA_PERIODIC_TRIGGER_SPELL);
+    }
+};
+
+enum AmanishiSentries
+{
+    SUMMON_AMANISHI_SENTRIES_1 = 42180,
+    SUMMON_AMANISHI_SENTRIES_2 = 42181,
+    SUMMON_AMANISHI_SENTRIES_3 = 42182,
+    SUMMON_AMANISHI_SENTRIES_4 = 42183,
+};
+
+class spell_summon_amanishi_sentries : public SpellScript
+{
+    PrepareSpellScript(spell_summon_amanishi_sentries);
+
+    constexpr static uint32 spells[4] = { SUMMON_AMANISHI_SENTRIES_1, SUMMON_AMANISHI_SENTRIES_2, SUMMON_AMANISHI_SENTRIES_3, SUMMON_AMANISHI_SENTRIES_4 };
+
+    bool Validate(SpellInfo const* /*spellInfo*/) override
+    {
+        return ValidateSpellInfo(spells);
+    }
+
+    void HandleScriptEffect(SpellEffIndex /*effIndex*/)
+    {
+        std::list<Creature*> triggers;
+        GetCreatureListWithEntryInGrid(triggers, GetHitUnit(), NPC_WORLD_TRIGGER, 50.0f);
+        triggers.remove_if(WorldTriggerDrumPred());
+        if (triggers.empty())
+            return;
+        Creature* trigger = Acore::Containers::SelectRandomContainerElement(triggers);
+        uint8 index_1 = urand(0, 3);
+        uint8 index_2 = (index_1 + 1) % 4;
+        trigger->CastSpell(trigger, spells[index_1], true);
+        trigger->CastSpell(trigger, spells[index_2], true);
+    }
+
+    void Register() override
+    {
+        OnEffectHitTarget += SpellEffectFn(spell_summon_amanishi_sentries::HandleScriptEffect, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
+    }
+};
+
 void AddSC_zulaman()
 {
     RegisterZulAmanCreatureAI(npc_forest_frog);
@@ -682,4 +850,7 @@ void AddSC_zulaman()
     RegisterSpellScript(spell_ritual_of_power);
     RegisterZulAmanCreatureAI(npc_amanishi_lookout);
     RegisterZulAmanCreatureAI(npc_amanishi_tempest);
+    RegisterZulAmanCreatureAI(npc_amanishi_scout);
+    RegisterSpellScript(spell_alert_drums);
+    RegisterSpellScript(spell_summon_amanishi_sentries);
 }
