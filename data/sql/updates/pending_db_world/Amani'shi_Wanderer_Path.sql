@@ -32,3 +32,12 @@ DELETE FROM `creature_formations` WHERE `leaderGUID` = 86210;
 INSERT INTO `creature_formations` (`leaderGUID`, `memberGUID`, `dist`, `angle`, `groupAI`, `point_1`, `point_2`) VALUES
 (86210, 86210, 0, 0, 515, 0, 0),
 (86210, 86209, 3, 270, 515, 0, 0);
+
+-- Remove other two Wrong Npcs (and set WD and MT for another).
+DELETE FROM `creature` WHERE (`id1` = 24059) AND (`guid` IN (86211));
+DELETE FROM `creature` WHERE (`id1` = 23596) AND (`guid` IN (86212));
+DELETE FROM `creature_addon` WHERE (`guid` IN (86211 ,86212));
+DELETE FROM `linked_respawn` WHERE (`guid` IN (86211 ,86212));
+
+-- This npc and an Amani'shi Flame Caster should be in formation and one of them have a waypoint, but I cannot sniff it (it was changed during cataclysm).
+UPDATE `creature` SET `wander_distance` = 0, `MovementType` = 0 WHERE `guid` IN (89326) AND `id1` = 24059;
