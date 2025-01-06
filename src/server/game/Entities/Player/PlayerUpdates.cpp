@@ -2335,7 +2335,7 @@ void Player::ProcessSpellQueue()
         SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(request.spellId);
         if (!spellInfo)
         {
-            LOG_ERROR("entities.player", "Player::ProcessSpellQueue: Invalid request");
+            LOG_ERROR("entities.player", "Player::ProcessSpellQueue: Invalid spell {}", request.spellId);
             SpellQueue.clear();
             break;
         }
