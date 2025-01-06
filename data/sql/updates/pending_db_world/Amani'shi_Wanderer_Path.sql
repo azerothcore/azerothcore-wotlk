@@ -7,7 +7,7 @@ DELETE FROM `linked_respawn` WHERE (`guid` IN (89310));
 -- Set WD and MT for Amani'shi Medicine Man
 UPDATE `creature` SET `wander_distance` = 0, `MovementType` = 0 WHERE `guid` IN (86209) AND `id1` = 23581;
 
--- Waypoint 
+-- Waypoint
 DELETE FROM `waypoint_data` WHERE `id` IN (8621000);
 INSERT INTO `waypoint_data` (`id`, `point`, `position_x`, `position_y`, `position_z`, `orientation`, `delay`, `move_type`, `action`, `action_chance`, `wpguid`) VALUES
 (8621000, 1, 97.787, 1411.9034, -3.8629317, NULL, 0, 0, 0, 100, 0),
