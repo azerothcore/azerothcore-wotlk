@@ -28,6 +28,7 @@ EndScriptData */
 #include "ObjectMgr.h"
 #include "Player.h"
 #include "ReputationMgr.h"
+#include "DisableMgr.h"
 
 using namespace Acore::ChatCommands;
 
@@ -62,6 +63,12 @@ public:
         if (!playerTarget)
         {
             handler->SendErrorMessage(LANG_PLAYER_NOT_FOUND);
+            return false;
+        }
+
+        if (sDisableMgr->IsDisabledFor(DISABLE_TYPE_QUEST, quest->GetQuestId(), nullptr))
+        {
+            handler->PSendSysMessage("disabled - not added");
             return false;
         }
 
