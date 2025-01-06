@@ -55,10 +55,9 @@ enum PhaseHalazzi
 {
     PHASE_NONE                   = 0,
     PHASE_LYNX                   = 1,
-    PHASE_SPLIT                  = 2,
-    PHASE_HUMAN                  = 3,
-    PHASE_MERGE                  = 4,
-    PHASE_ENRAGE                 = 5
+    PHASE_HUMAN                  = 2,
+    PHASE_MERGE                  = 3,
+    PHASE_ENRAGE                 = 4
 };
 
 enum Yells
@@ -118,11 +117,11 @@ struct boss_halazzi : public BossAI
     {
         BossAI::DamageTaken(attacker, damage, damagetype, damageSchoolMask);
 
-        if (_phase == PHASE_LYNX || _phase == PHASE_ENRAGE)
+        if (_phase == PHASE_LYNX)
         {
             uint32 _healthCheckPercentage = 25 * (3 - _transformCount);
             if (me->HealthBelowPctDamaged(_healthCheckPercentage, damage))
-                EnterPhase(PHASE_SPLIT);
+                EnterPhase(PHASE_HUMAN);
         }
         else if (_phase == PHASE_HUMAN)
         {
@@ -193,7 +192,7 @@ struct boss_halazzi : public BossAI
                 });
                 break;
             }
-            case PHASE_SPLIT:
+            case PHASE_HUMAN:
                 Talk(SAY_SPLIT);
                 DoCastSelf(SPELL_TRANSFIGURE, true);
                 scheduler.Schedule(3s, GROUP_SPLIT, [this](TaskContext /*context*/)
@@ -201,8 +200,7 @@ struct boss_halazzi : public BossAI
                     DoCastSelf(SPELL_SUMMON_LYNX, true);
                 });
                 _phase = PHASE_HUMAN;
-                [[fallthrough]];
-            case PHASE_HUMAN:
+
                 scheduler.CancelGroup(GROUP_MERGE);
                 scheduler.CancelGroup(GROUP_LYNX);
                 scheduler.Schedule(10s, GROUP_HUMAN, [this](TaskContext context)
@@ -244,6 +242,7 @@ struct boss_halazzi : public BossAI
                                 // Enrage phase
                                 if (_transformCount == 2)
                                 {
+                                    _phase = PHASE_ENRAGE;
                                     SetInvincibility(false);
                                     scheduler.Schedule(12s, GROUP_LYNX, [this](TaskContext context)
                                     {
