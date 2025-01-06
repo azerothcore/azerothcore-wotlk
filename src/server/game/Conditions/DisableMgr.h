@@ -35,7 +35,7 @@ enum DisableType
     DISABLE_TYPE_LFG_MAP                = 8,
     DISABLE_TYPE_GAME_EVENT             = 9,
     DISABLE_TYPE_LOOT                   = 10,
-    MAX_DISABLE_TYPES                   = 11
+    MAX_DISABLE_TYPES
 };
 
 enum SpellDisableTypes

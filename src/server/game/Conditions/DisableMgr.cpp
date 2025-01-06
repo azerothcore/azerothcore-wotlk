@@ -291,6 +291,11 @@ bool DisableMgr::HandleDisableType(DisableType type, uint32 entry, uint8 flags, 
     }
     case DISABLE_TYPE_LOOT:
         break;
+    case MAX_DISABLE_TYPES:
+    {
+        LOG_ERROR("disable", "SourceType out of range for entry {}, skipped", entry);
+        return false;
+    }
     default:
         return false;
     }
