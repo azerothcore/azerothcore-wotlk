@@ -28,7 +28,6 @@ EndScriptData */
 #include "ObjectMgr.h"
 #include "Player.h"
 #include "ReputationMgr.h"
-#include "DisableMgr.h"
 
 using namespace Acore::ChatCommands;
 
