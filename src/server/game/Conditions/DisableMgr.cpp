@@ -39,7 +39,6 @@ DisableMgr* DisableMgr::instance()
     return &instance;
 }
 
-
 void DisableMgr::LoadDisables()
 {
     uint32 oldMSTime = getMSTime();
