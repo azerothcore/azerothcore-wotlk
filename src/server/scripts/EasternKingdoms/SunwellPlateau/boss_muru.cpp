@@ -342,7 +342,7 @@ class spell_entropius_negative_energy_periodic : public AuraScript
     void PeriodicTick(AuraEffect const* aurEff)
     {
         PreventDefaultAction();
-        uint32 targetCount = aurEff->GetTickNumber() / 10 + 1;
+        uint32 targetCount = (aurEff->GetTickNumber() + 11) / 12;
         GetTarget()->CastCustomSpell(aurEff->GetSpellInfo()->Effects[EFFECT_0].TriggerSpell, SPELLVALUE_MAX_TARGETS, targetCount);
     }
 
