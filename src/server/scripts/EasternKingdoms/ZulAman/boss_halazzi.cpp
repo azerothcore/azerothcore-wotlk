@@ -179,6 +179,8 @@ struct boss_halazzi : public BossAI
                     }
                 }
 
+                me->ResumeChasingVictim();
+
                 scheduler.CancelGroup(GROUP_MERGE);
                 scheduler.Schedule(5s, 15s, GROUP_LYNX, [this](TaskContext context)
                 {
@@ -237,10 +239,9 @@ struct boss_halazzi : public BossAI
                             if (me->IsWithinDistInMap(lynx, 6.0f))
                             {
                                 EnterPhase(PHASE_LYNX);
-                                me->ResumeChasingVictim();
 
                                 // Enrage phase
-                                if (_transformCount == 2)
+                                if (_transformCount == 3)
                                 {
                                     _phase = PHASE_ENRAGE;
                                     SetInvincibility(false);
