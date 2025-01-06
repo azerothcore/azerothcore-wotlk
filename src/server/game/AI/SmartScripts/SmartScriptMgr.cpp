@@ -860,6 +860,7 @@ bool SmartAIMgr::CheckUnusedActionParams(SmartScriptHolder const& e)
             case SMART_ACTION_MOVEMENT_PAUSE: return sizeof(SmartAction::move);
             case SMART_ACTION_MOVEMENT_RESUME: return sizeof(SmartAction::move);
             case SMART_ACTION_WORLD_SCRIPT: return sizeof(SmartAction::worldStateScript);
+            case SMART_ACTION_DISABLE_REWARD: return sizeof(SmartAction::reward);
             default:
                 LOG_WARN("sql.sql", "SmartAIMgr: entryorguid {} source_type {} id {} action_type {} is using an action with no unused params specified in SmartAIMgr::CheckUnusedActionParams(), please report this.",
                             e.entryOrGuid, e.GetScriptType(), e.event_id, e.GetActionType());
@@ -1949,6 +1950,12 @@ bool SmartAIMgr::IsEventValid(SmartScriptHolder& e)
         case SMART_ACTION_CALL_TIMED_ACTIONLIST:
         {
             AC_SAI_IS_BOOLEAN_VALID(e, e.action.timedActionList.allowOverride);
+            break;
+        }
+        case SMART_ACTION_DISABLE_REWARD:
+        {
+            AC_SAI_IS_BOOLEAN_VALID(e, e.action.reward.reputation);
+            AC_SAI_IS_BOOLEAN_VALID(e, e.action.reward.loot);
             break;
         }
         case SMART_ACTION_FLEE_FOR_ASSIST:
