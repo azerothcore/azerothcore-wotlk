@@ -1,3 +1,4 @@
+-- DB update 2025_01_07_00 -> 2025_01_07_01
 
 -- Delete Wrong Amani'shi Medicine Man
 DELETE FROM `creature` WHERE (`id1` = 23581) AND (`guid` IN (89310));
