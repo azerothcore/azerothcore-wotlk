@@ -100,77 +100,78 @@ UPDATE `creature_template` SET `flags_extra` = `flags_extra`|134217728 WHERE `en
 UPDATE `creature_template` SET `AIName` = 'SmartAI' WHERE `entry` = 24064;
 DELETE FROM `smart_scripts` WHERE (`source_type` = 0 AND `entryorguid` = 24064);
 INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `event_param6`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
-(24064, 0, 0, 0, 4, 0, 100, 512, 0, 0, 0, 0, 0, 0, 11, 43317, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Amani Lynx Cub - On Aggro - Cast \'Dash\''),
-(24064, 0, 1, 0, 0, 0, 100, 2, 5000, 5000, 35000, 35000, 0, 0, 11, 43358, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Amani Lynx Cub - In Combat - Cast \'Gut Rip\' (Normal Dungeon)');
+(24064, 0, 0, 1, 4, 0, 100, 0, 0, 0, 0, 0, 0, 0, 28, 42943, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Amani Lynx Cub - On Aggro - Remove Aura \'Stealth\''),
+(24064, 0, 1, 0, 61, 0, 100, 512, 0, 0, 0, 0, 0, 0, 11, 43317, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Amani Lynx Cub - On Aggro - Cast \'Dash\''),
+(24064, 0, 2, 0, 0, 0, 100, 2, 5000, 5000, 35000, 35000, 0, 0, 11, 43358, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Amani Lynx Cub - In Combat - Cast \'Gut Rip\' (Normal Dungeon)');
 
 -- First on/off invisibility pack
 DELETE FROM `smart_scripts` WHERE (`source_type` = 0 AND `entryorguid` = -89177);
 INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `event_param6`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
-(-89177, 0, 2, 0, 1, 0, 100, 0, 30000, 35000, 30000, 35000, 0, 0, 11, 42943, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Amani Lynx Cub - Out of Combat - Cast \'Stealth\''),
-(-89177, 0, 3, 0, 1, 0, 100, 0, 40000, 40000, 40000, 40000, 0, 0, 28, 42943, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Amani Lynx Cub - Out of Combat - Remove Aura \'Stealth\'');
+(-89177, 0, 3, 0, 1, 0, 100, 0, 30000, 35000, 30000, 35000, 0, 0, 11, 42943, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Amani Lynx Cub - Out of Combat - Cast \'Stealth\''),
+(-89177, 0, 4, 0, 1, 0, 100, 0, 40000, 40000, 40000, 40000, 0, 0, 28, 42943, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Amani Lynx Cub - Out of Combat - Remove Aura \'Stealth\'');
 
 DELETE FROM `smart_scripts` WHERE (`source_type` = 0 AND `entryorguid` = -86922);
 INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `event_param6`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
-(-86922, 0, 2, 0, 1, 0, 100, 0, 50000, 55000, 50000, 55000, 0, 0, 11, 42943, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Amani Lynx Cub - Out of Combat - Cast \'Stealth\''),
-(-86922, 0, 3, 0, 1, 0, 100, 0, 60000, 60000, 60000, 60000, 0, 0, 28, 42943, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Amani Lynx Cub - Out of Combat - Remove Aura \'Stealth\'');
+(-86922, 0, 3, 0, 1, 0, 100, 0, 50000, 55000, 50000, 55000, 0, 0, 11, 42943, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Amani Lynx Cub - Out of Combat - Cast \'Stealth\''),
+(-86922, 0, 4, 0, 1, 0, 100, 0, 60000, 60000, 60000, 60000, 0, 0, 28, 42943, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Amani Lynx Cub - Out of Combat - Remove Aura \'Stealth\'');
 
 DELETE FROM `smart_scripts` WHERE (`source_type` = 0 AND `entryorguid` = -89172);
 INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `event_param6`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
-(-89172, 0, 2, 0, 1, 0, 100, 0, 60000, 65000, 60000, 65000, 0, 0, 11, 42943, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Amani Lynx Cub - Out of Combat - Cast \'Stealth\''),
-(-89172, 0, 3, 0, 1, 0, 100, 0, 70000, 70000, 70000, 70000, 0, 0, 28, 42943, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Amani Lynx Cub - Out of Combat - Remove Aura \'Stealth\'');
+(-89172, 0, 3, 0, 1, 0, 100, 0, 60000, 65000, 60000, 65000, 0, 0, 11, 42943, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Amani Lynx Cub - Out of Combat - Cast \'Stealth\''),
+(-89172, 0, 4, 0, 1, 0, 100, 0, 70000, 70000, 70000, 70000, 0, 0, 28, 42943, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Amani Lynx Cub - Out of Combat - Remove Aura \'Stealth\'');
 
 DELETE FROM `smart_scripts` WHERE (`source_type` = 0 AND `entryorguid` = -89173);
 INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `event_param6`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
-(-89173, 0, 2, 0, 1, 0, 100, 0, 80000, 85000, 80000, 85000, 0, 0, 11, 42943, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Amani Lynx Cub - Out of Combat - Cast \'Stealth\''),
-(-89173, 0, 3, 0, 1, 0, 100, 0, 90000, 90000, 90000, 90000, 0, 0, 28, 42943, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Amani Lynx Cub - Out of Combat - Remove Aura \'Stealth\'');
+(-89173, 0, 3, 0, 1, 0, 100, 0, 80000, 85000, 80000, 85000, 0, 0, 11, 42943, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Amani Lynx Cub - Out of Combat - Cast \'Stealth\''),
+(-89173, 0, 4, 0, 1, 0, 100, 0, 90000, 90000, 90000, 90000, 0, 0, 28, 42943, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Amani Lynx Cub - Out of Combat - Remove Aura \'Stealth\'');
 
 DELETE FROM `smart_scripts` WHERE (`source_type` = 0 AND `entryorguid` = -89145);
 INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `event_param6`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
-(-89145, 0, 2, 0, 1, 0, 100, 0, 100000, 105000, 100000, 105000, 0, 0, 11, 42943, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Amani Lynx Cub - Out of Combat - Cast \'Stealth\''),
-(-89145, 0, 3, 0, 1, 0, 100, 0, 110000, 110000, 110000, 110000, 0, 0, 28, 42943, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Amani Lynx Cub - Out of Combat - Remove Aura \'Stealth\'');
+(-89145, 0, 3, 0, 1, 0, 100, 0, 100000, 105000, 100000, 105000, 0, 0, 11, 42943, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Amani Lynx Cub - Out of Combat - Cast \'Stealth\''),
+(-89145, 0, 4, 0, 1, 0, 100, 0, 110000, 110000, 110000, 110000, 0, 0, 28, 42943, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Amani Lynx Cub - Out of Combat - Remove Aura \'Stealth\'');
 
 DELETE FROM `smart_scripts` WHERE (`source_type` = 0 AND `entryorguid` = -89175);
 INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `event_param6`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
-(-89175, 0, 2, 0, 1, 0, 100, 0, 20000, 25000, 20000, 25000, 0, 0, 11, 42943, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Amani Lynx Cub - Out of Combat - Cast \'Stealth\''),
-(-89175, 0, 3, 0, 1, 0, 100, 0, 30000, 30000, 30000, 30000, 0, 0, 28, 42943, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Amani Lynx Cub - Out of Combat - Remove Aura \'Stealth\'');
+(-89175, 0, 3, 0, 1, 0, 100, 0, 20000, 25000, 20000, 25000, 0, 0, 11, 42943, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Amani Lynx Cub - Out of Combat - Cast \'Stealth\''),
+(-89175, 0, 4, 0, 1, 0, 100, 0, 30000, 30000, 30000, 30000, 0, 0, 28, 42943, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Amani Lynx Cub - Out of Combat - Remove Aura \'Stealth\'');
 
 DELETE FROM `smart_scripts` WHERE (`source_type` = 0 AND `entryorguid` = -86921);
 INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `event_param6`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
-(-86921, 0, 2, 0, 1, 0, 100, 0, 120000, 125000, 120000, 125000, 0, 0, 11, 42943, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Amani Lynx Cub - Out of Combat - Cast \'Stealth\''),
-(-86921, 0, 3, 0, 1, 0, 100, 0, 130000, 130000, 130000, 130000, 0, 0, 28, 42943, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Amani Lynx Cub - Out of Combat - Remove Aura \'Stealth\'');
+(-86921, 0, 3, 0, 1, 0, 100, 0, 120000, 125000, 120000, 125000, 0, 0, 11, 42943, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Amani Lynx Cub - Out of Combat - Cast \'Stealth\''),
+(-86921, 0, 4, 0, 1, 0, 100, 0, 130000, 130000, 130000, 130000, 0, 0, 28, 42943, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Amani Lynx Cub - Out of Combat - Remove Aura \'Stealth\'');
 
 -- Second on/off invisibility pack
 DELETE FROM `smart_scripts` WHERE (`source_type` = 0 AND `entryorguid` = -87043);
 INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `event_param6`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
-(-87043, 0, 2, 0, 1, 0, 100, 0, 30000, 35000, 30000, 35000, 0, 0, 11, 42943, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Amani Lynx Cub - Out of Combat - Cast \'Stealth\''),
-(-87043, 0, 3, 0, 1, 0, 100, 0, 40000, 40000, 40000, 40000, 0, 0, 28, 42943, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Amani Lynx Cub - Out of Combat - Remove Aura \'Stealth\'');
+(-87043, 0, 3, 0, 1, 0, 100, 0, 30000, 35000, 30000, 35000, 0, 0, 11, 42943, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Amani Lynx Cub - Out of Combat - Cast \'Stealth\''),
+(-87043, 0, 4, 0, 1, 0, 100, 0, 40000, 40000, 40000, 40000, 0, 0, 28, 42943, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Amani Lynx Cub - Out of Combat - Remove Aura \'Stealth\'');
 
 DELETE FROM `smart_scripts` WHERE (`source_type` = 0 AND `entryorguid` = -86198);
 INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `event_param6`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
-(-86198, 0, 2, 0, 1, 0, 100, 0, 50000, 55000, 50000, 55000, 0, 0, 11, 42943, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Amani Lynx Cub - Out of Combat - Cast \'Stealth\''),
-(-86198, 0, 3, 0, 1, 0, 100, 0, 60000, 60000, 60000, 60000, 0, 0, 28, 42943, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Amani Lynx Cub - Out of Combat - Remove Aura \'Stealth\'');
+(-86198, 0, 3, 0, 1, 0, 100, 0, 50000, 55000, 50000, 55000, 0, 0, 11, 42943, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Amani Lynx Cub - Out of Combat - Cast \'Stealth\''),
+(-86198, 0, 4, 0, 1, 0, 100, 0, 60000, 60000, 60000, 60000, 0, 0, 28, 42943, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Amani Lynx Cub - Out of Combat - Remove Aura \'Stealth\'');
 
 DELETE FROM `smart_scripts` WHERE (`source_type` = 0 AND `entryorguid` = -89141);
 INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `event_param6`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
-(-89141, 0, 2, 0, 1, 0, 100, 0, 60000, 65000, 60000, 65000, 0, 0, 11, 42943, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Amani Lynx Cub - Out of Combat - Cast \'Stealth\''),
-(-89141, 0, 3, 0, 1, 0, 100, 0, 70000, 70000, 70000, 70000, 0, 0, 28, 42943, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Amani Lynx Cub - Out of Combat - Remove Aura \'Stealth\'');
+(-89141, 0, 3, 0, 1, 0, 100, 0, 60000, 65000, 60000, 65000, 0, 0, 11, 42943, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Amani Lynx Cub - Out of Combat - Cast \'Stealth\''),
+(-89141, 0, 4, 0, 1, 0, 100, 0, 70000, 70000, 70000, 70000, 0, 0, 28, 42943, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Amani Lynx Cub - Out of Combat - Remove Aura \'Stealth\'');
 
 DELETE FROM `smart_scripts` WHERE (`source_type` = 0 AND `entryorguid` = -89176);
 INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `event_param6`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
-(-89176, 0, 2, 0, 1, 0, 100, 0, 80000, 85000, 80000, 85000, 0, 0, 11, 42943, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Amani Lynx Cub - Out of Combat - Cast \'Stealth\''),
-(-89176, 0, 3, 0, 1, 0, 100, 0, 90000, 90000, 90000, 90000, 0, 0, 28, 42943, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Amani Lynx Cub - Out of Combat - Remove Aura \'Stealth\'');
+(-89176, 0, 3, 0, 1, 0, 100, 0, 80000, 85000, 80000, 85000, 0, 0, 11, 42943, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Amani Lynx Cub - Out of Combat - Cast \'Stealth\''),
+(-89176, 0, 4, 0, 1, 0, 100, 0, 90000, 90000, 90000, 90000, 0, 0, 28, 42943, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Amani Lynx Cub - Out of Combat - Remove Aura \'Stealth\'');
 
 DELETE FROM `smart_scripts` WHERE (`source_type` = 0 AND `entryorguid` = -88652);
 INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `event_param6`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
-(-88652, 0, 2, 0, 1, 0, 100, 0, 100000, 105000, 100000, 105000, 0, 0, 11, 42943, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Amani Lynx Cub - Out of Combat - Cast \'Stealth\''),
-(-88652, 0, 3, 0, 1, 0, 100, 0, 110000, 110000, 110000, 110000, 0, 0, 28, 42943, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Amani Lynx Cub - Out of Combat - Remove Aura \'Stealth\'');
+(-88652, 0, 3, 0, 1, 0, 100, 0, 100000, 105000, 100000, 105000, 0, 0, 11, 42943, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Amani Lynx Cub - Out of Combat - Cast \'Stealth\''),
+(-88652, 0, 4, 0, 1, 0, 100, 0, 110000, 110000, 110000, 110000, 0, 0, 28, 42943, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Amani Lynx Cub - Out of Combat - Remove Aura \'Stealth\'');
 
 DELETE FROM `smart_scripts` WHERE (`source_type` = 0 AND `entryorguid` = -89135);
 INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `event_param6`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
-(-89135, 0, 2, 0, 1, 0, 100, 0, 20000, 25000, 20000, 25000, 0, 0, 11, 42943, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Amani Lynx Cub - Out of Combat - Cast \'Stealth\''),
-(-89135, 0, 3, 0, 1, 0, 100, 0, 30000, 30000, 30000, 30000, 0, 0, 28, 42943, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Amani Lynx Cub - Out of Combat - Remove Aura \'Stealth\'');
+(-89135, 0, 3, 0, 1, 0, 100, 0, 20000, 25000, 20000, 25000, 0, 0, 11, 42943, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Amani Lynx Cub - Out of Combat - Cast \'Stealth\''),
+(-89135, 0, 4, 0, 1, 0, 100, 0, 30000, 30000, 30000, 30000, 0, 0, 28, 42943, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Amani Lynx Cub - Out of Combat - Remove Aura \'Stealth\'');
 
 DELETE FROM `smart_scripts` WHERE (`source_type` = 0 AND `entryorguid` = -89200);
 INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `event_param6`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
-(-89200, 0, 2, 0, 1, 0, 100, 0, 120000, 125000, 120000, 125000, 0, 0, 11, 42943, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Amani Lynx Cub - Out of Combat - Cast \'Stealth\''),
-(-89200, 0, 3, 0, 1, 0, 100, 0, 130000, 130000, 130000, 130000, 0, 0, 28, 42943, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Amani Lynx Cub - Out of Combat - Remove Aura \'Stealth\'');
+(-89200, 0, 3, 0, 1, 0, 100, 0, 120000, 125000, 120000, 125000, 0, 0, 11, 42943, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Amani Lynx Cub - Out of Combat - Cast \'Stealth\''),
+(-89200, 0, 4, 0, 1, 0, 100, 0, 130000, 130000, 130000, 130000, 0, 0, 28, 42943, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Amani Lynx Cub - Out of Combat - Remove Aura \'Stealth\'');
