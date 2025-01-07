@@ -335,7 +335,7 @@ void DisableMgr::CheckQuestDisables()
 
 bool DisableMgr::IsDisabledFor(DisableType type, uint32 entry, Unit const* unit, uint8 flags)
 {
-    if (type > MAX_DISABLE_TYPES)
+    if (type >= MAX_DISABLE_TYPES)
     {
         LOG_ERROR("server", "Disables::IsDisabledFor() called with unknown disable type {}!  (entry {}, flags {}).", type, entry, flags);
         return false;
@@ -414,20 +414,18 @@ bool DisableMgr::IsDisabledFor(DisableType type, uint32 entry, Unit const* unit,
                     return true;
             }
             return false;
+        case DISABLE_TYPE_VMAP:
+            return flags & itr->second.flags;
         case DISABLE_TYPE_QUEST:
-            return true;
         case DISABLE_TYPE_BATTLEGROUND:
         case DISABLE_TYPE_OUTDOORPVP:
         case DISABLE_TYPE_ACHIEVEMENT_CRITERIA:
-            return true;
-        case DISABLE_TYPE_VMAP:
-            return flags & itr->second.flags;
         case DISABLE_TYPE_GO_LOS:
-            return true;
         case DISABLE_TYPE_GAME_EVENT:
-            return true;
         case DISABLE_TYPE_LOOT:
             return true;
+        default:
+            break;
     }
 
     return false;
