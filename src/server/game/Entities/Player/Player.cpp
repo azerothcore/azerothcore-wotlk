@@ -2419,7 +2419,7 @@ void Player::GiveXP(uint32 xp, Unit* victim, float group_rate, bool isLFGReward)
     // Favored experience increase START
     uint32 zone = GetZoneId();
     float favored_exp_mult = 0;
-    if ((zone == 3483 || zone == 3562 || zone == 3836 || zone == 3713 || zone == 3714) && (HasAura(32096) || HasAura(32098)))
+    if ((zone == 3483 || zone == 3562 || zone == 3836 || zone == 3713 || zone == 3714) && HasAnyAuras(32096 /*Thrallmar's Favor*/, 32098 /*Honor Hold's Favor*/))
         favored_exp_mult = 0.05f; // Thrallmar's Favor and Honor Hold's Favor
 
     xp = uint32(xp * (1 + favored_exp_mult));

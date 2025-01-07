@@ -21,6 +21,8 @@
 #include "GridNotifiersImpl.h"
 #include "PassiveAI.h"
 #include "ScriptedCreature.h"
+#include "SpellScript.h"
+#include "SpellScriptLoader.h"
 #include "zulaman.h"
 
 enum Yells
@@ -42,6 +44,7 @@ enum Spells
     SPELL_FLAME_BREATH          = 43140,
     SPELL_FIRE_WALL             = 43113,
     SPELL_ENRAGE                = 44779,
+    SPELL_SUMMON_PLAYERS_DUMMY  = 43096,
     SPELL_SUMMON_PLAYERS        = 43097,
     SPELL_TELE_TO_CENTER        = 43098, // coord
     SPELL_HATCH_ALL             = 43144,
@@ -323,11 +326,9 @@ struct boss_janalai : public BossAI
         SpawnBombs();
         _isBombing = true;
 
-        me->GetMap()->DoForAllPlayers([&](Player* player)
-        {
-            if (player->IsAlive())
-                DoTeleportPlayer(player, janalainPos.GetPositionX() - 5 + rand() % 10, janalainPos.GetPositionY() - 5 + rand() % 10, janalainPos.GetPositionZ(), 0.0f);
-        });
+        DoCastSelf(SPELL_TELE_TO_CENTER);
+        DoCastAOE(SPELL_SUMMON_PLAYERS_DUMMY, true);
+
         //DoCast(Temp, SPELL_SUMMON_PLAYERS, true) // core bug, spell does not work if too far
         ThrowBombs();
 
@@ -400,7 +401,7 @@ struct npc_janalai_hatcher : public ScriptedAI
                 ++_repeatCount;
 
                 if (me->FindNearestCreature(NPC_EGG, 100.0f))
-                    context.Repeat(4s);
+                    context.Repeat(5s);
                 else
                 {
                     if (WorldObject* summoner = GetSummoner())
@@ -449,8 +450,39 @@ private:
     bool _isHatching;
 };
 
+class spell_summon_all_players_dummy: public SpellScript
+{
+    PrepareSpellScript(spell_summon_all_players_dummy);
+
+    bool Validate(SpellInfo const* /*spell*/) override
+    {
+        return ValidateSpellInfo({ SPELL_SUMMON_PLAYERS });
+    }
+
+    void FilterTargets(std::list<WorldObject*>& targets)
+    {
+        Position pos = GetCaster()->GetPosition();
+        targets.remove_if([&, pos](WorldObject* target) -> bool
+        {
+            return target->IsWithinBox(pos, 18.0f, 18.0f, 18.0f);
+        });
+    }
+
+    void OnHit(SpellEffIndex /*effIndex*/)
+    {
+        GetCaster()->CastSpell(GetHitUnit(), SPELL_SUMMON_PLAYERS, true);
+    }
+
+    void Register() override
+    {
+        OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_summon_all_players_dummy::FilterTargets, EFFECT_0, TARGET_UNIT_SRC_AREA_ENEMY);
+        OnEffectHitTarget += SpellEffectFn(spell_summon_all_players_dummy::OnHit, EFFECT_0, SPELL_EFFECT_DUMMY);
+    }
+};
+
 void AddSC_boss_janalai()
 {
     RegisterZulAmanCreatureAI(boss_janalai);
     RegisterZulAmanCreatureAI(npc_janalai_hatcher);
+    RegisterSpellScript(spell_summon_all_players_dummy);
 }

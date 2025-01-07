@@ -4855,6 +4855,12 @@ void SpellMgr::LoadSpellInfoCorrections()
         spellInfo->RequiresSpellFocus = 0;
     });
 
+    // Booming Voice
+    ApplySpellFix({ 40080 }, [](SpellInfo* spellInfo)
+    {
+        spellInfo->Effects[EFFECT_0].RealPointsPerLevel = 0;
+    });
+
     // Missile Barrage
     ApplySpellFix({ 44401 }, [](SpellInfo* spellInfo)
     {
