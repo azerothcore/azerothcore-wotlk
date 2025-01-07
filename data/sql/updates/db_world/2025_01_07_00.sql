@@ -1,3 +1,4 @@
+-- DB update 2025_01_05_07 -> 2025_01_07_00
 
 -- Remove Wrong WP for Tamed Amani Crocolisk
 DELETE FROM `waypoint_data` WHERE `id` IN (176360, 201960);
