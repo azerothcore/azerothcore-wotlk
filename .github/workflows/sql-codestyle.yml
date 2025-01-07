@@ -1,6 +1,10 @@
 name: Codestyle
 on:
   pull_request:
+    types:
+      - opened
+      - reopened
+      - synchronize
     paths:
       - data/**
       - "!README.md"
@@ -10,8 +14,12 @@ jobs:
   triage:
     runs-on: ubuntu-latest
     name: SQL
-    if: github.repository == 'azerothcore/azerothcore-wotlk'
+    if: github.repository == 'azerothcore/azerothcore-wotlk' && !github.event.pull_request.draft
     steps:
       - uses: actions/checkout@v4
-      - name: Check pending SQL
-        run: source ./apps/ci/ci-pending.sh
+      - name: Setup python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+      - name: AzerothCore codestyle
+        run: python ./apps/codestyle/codestyle-sql.py
