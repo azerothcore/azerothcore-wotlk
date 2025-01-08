@@ -202,10 +202,10 @@ public:
     }
 };
 
-class npc_drisella : public ScriptedAI
+struct npc_drisella : public ScriptedAI
 {
 public:
-    npc_drisella(Creature* creature) : ScriptedAI(creature) {}
+    npc_drisella(Creature* creature) : ScriptedAI(creature) { }
 
     bool CanBeSeen(Player const* seer) override
     {
@@ -214,10 +214,10 @@ public:
 
 };
 
-class npc_randy_whizzlesprocket : public ScriptedAI
+struct npc_randy_whizzlesprocket : public ScriptedAI
 {
 public:
-    npc_randy_whizzlesprocket(Creature* creature) : ScriptedAI(creature) {}
+    npc_randy_whizzlesprocket(Creature* creature) : ScriptedAI(creature) { }
 
     bool CanBeSeen(Player const* seer) override
     {
