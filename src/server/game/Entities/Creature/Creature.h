@@ -356,10 +356,10 @@ public:
 
     Unit* SelectVictim();
 
-    void SetReputationRewardDisabled(bool disable) { m_disableReputationReward = disable; }
-    [[nodiscard]] bool IsReputationRewardDisabled() const { return m_disableReputationReward; }
-    void SetLootRewardDisabled(bool disable) { m_disableLootReward = disable; }
-    [[nodiscard]] bool IsLootRewardDisabled() const { return m_disableLootReward; }
+    void SetReputationRewardDisabled(bool disable) { DisableReputationReward = disable; }
+    [[nodiscard]] bool IsReputationRewardDisabled() const { return DisableReputationReward; }
+    void SetLootRewardDisabled(bool disable) { DisableLootReward = disable; }
+    [[nodiscard]] bool IsLootRewardDisabled() const { return DisableLootReward; }
     [[nodiscard]] bool IsDamageEnoughForLootingAndReward() const;
     void LowerPlayerDamageReq(uint32 unDamage, bool damagedByPlayer = true);
     void ResetPlayerDamageReq();
@@ -477,8 +477,8 @@ protected:
     Position m_homePosition;
     Position m_transportHomePosition;
 
-    bool m_disableReputationReward;
-    bool m_disableLootReward;
+    bool DisableReputationReward;
+    bool DisableLootReward;
 
     CreatureTemplate const* m_creatureInfo;   // in difficulty mode > 0 can different from sObjectMgr->GetCreatureTemplate(GetEntry())
     CreatureData const* m_creatureData;
