@@ -5385,7 +5385,7 @@ class spell_gen_proc_on_victim : public AuraScript
 {
     PrepareAuraScript(spell_gen_proc_on_victim);
 
-    void OnProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
+    void OnProc(AuraEffect const* /*aurEff*/, ProcEventInfo& eventInfo)
     {
         PreventDefaultAction();
 
