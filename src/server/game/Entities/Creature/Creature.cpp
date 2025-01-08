@@ -287,8 +287,8 @@ Creature::Creature(bool isWorldObject): Unit(isWorldObject), MovableMapObject(),
 
     m_CreatureSpellCooldowns.clear();
 
-    m_disableReputationReward = false;
-    m_disableLootReward = false;
+    DisableReputationReward = false;
+    DisableLootReward = false;
 
     m_SightDistance = sWorld->getFloatConfig(CONFIG_SIGHT_MONSTER);
     m_CombatDistance = 0.0f;
