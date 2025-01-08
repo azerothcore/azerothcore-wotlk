@@ -286,6 +286,10 @@ public:
                         }
                     }
                 }
+            } else {
+                if (sWorld->getBoolConfig(CONFIG_ALLOW_TWO_SIDE_INTERACTION_GROUP)) {
+                    player->SetFaction(TeamIdInInstance);
+                }
             }
 
             // for professor putricide hc
