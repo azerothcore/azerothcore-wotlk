@@ -20,6 +20,7 @@
 #include "CreatureTextMgr.h"
 #include "InstanceMapScript.h"
 #include "InstanceScript.h"
+#include "ScriptedCreature.h"
 #include "shattered_halls.h"
 
 ObjectData const creatureData[] =
@@ -202,7 +203,7 @@ public:
     }
 };
 
-struct npc_drisella : public ScriptedAI
+class npc_drisella : public ScriptedAI
 {
 public:
     npc_drisella(Creature* creature) : ScriptedAI(creature) { }
@@ -214,7 +215,7 @@ public:
 
 };
 
-struct npc_randy_whizzlesprocket : public ScriptedAI
+class npc_randy_whizzlesprocket : public ScriptedAI
 {
 public:
     npc_randy_whizzlesprocket(Creature* creature) : ScriptedAI(creature) { }
