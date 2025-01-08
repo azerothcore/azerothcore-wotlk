@@ -67,7 +67,6 @@ enum CreatureIds
     NPC_CAPTAIN_BONESHATTER         = 17296,
     NPC_SCOUT_ORGARR                = 17297,
 
-
     //Drisella
     NPC_DRISELLA                    = 17294,
     // Randy Whizzlesprocket
