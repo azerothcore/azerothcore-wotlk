@@ -261,8 +261,19 @@ public:
 
         void OnPlayerEnter(Player* player) override
         {
-            if (TeamIdInInstance == TEAM_NEUTRAL)
+            if (TeamIdInInstance == TEAM_NEUTRAL && !player->GetGroup()) {
                 TeamIdInInstance = player->GetTeamId();
+            }
+            else {
+                Player* leader = ObjectAccessor::FindPlayer(player->GetGroup()->GetLeaderGUID());
+                if (leader) {
+                    TeamIdInInstance = leader->GetTeamId();
+                }
+                else {
+                    TeamIdInInstance = player->GetTeamId();
+                }
+            }
+
 
             // for professor putricide hc
             DoRemoveAurasDueToSpellOnPlayers(SPELL_GAS_VARIABLE);
@@ -299,8 +310,20 @@ public:
             {
                 Map::PlayerList const& players = instance->GetPlayers();
                 if (!players.IsEmpty())
-                    if (Player* player = players.begin()->GetSource())
-                        TeamIdInInstance = player->GetTeamId();
+                    if (Player* player = players.begin()->GetSource()) {
+                        if (!player->GetGroup()) {
+                            TeamIdInInstance = player->GetTeamId();
+                        }
+                        else {
+                            Player* leader = ObjectAccessor::FindPlayer(player->GetGroup()->GetLeaderGUID());
+                            if (leader) {
+                                TeamIdInInstance = leader->GetTeamId();
+                            }
+                            else {
+                                TeamIdInInstance = player->GetTeamId();
+                            }
+                        }
+                    }
             }
 
             // apply ICC buff to pets/summons
@@ -553,8 +576,20 @@ public:
             {
                 Map::PlayerList const& players = instance->GetPlayers();
                 if (!players.IsEmpty())
-                    if (Player* player = players.begin()->GetSource())
-                        TeamIdInInstance = player->GetTeamId();
+                    if (Player* player = players.begin()->GetSource()) {
+                        if (!player->GetGroup()) {
+                            TeamIdInInstance = player->GetTeamId();
+                        }
+                        else {
+                            Player* leader = ObjectAccessor::FindPlayer(player->GetGroup()->GetLeaderGUID());
+                            if (leader) {
+                                TeamIdInInstance = leader->GetTeamId();
+                            }
+                            else {
+                                TeamIdInInstance = player->GetTeamId();
+                            }
+                        }
+                    }
             }
 
             uint32 entry = data->id1;
@@ -598,8 +633,20 @@ public:
             {
                 Map::PlayerList const& players = instance->GetPlayers();
                 if (!players.IsEmpty())
-                    if (Player* player = players.begin()->GetSource())
-                        TeamIdInInstance = player->GetTeamId();
+                    if (Player* player = players.begin()->GetSource()) {
+                        if (!player->GetGroup()) {
+                            TeamIdInInstance = player->GetTeamId();
+                        }
+                        else {
+                            Player* leader = ObjectAccessor::FindPlayer(player->GetGroup()->GetLeaderGUID());
+                            if (leader) {
+                                TeamIdInInstance = leader->GetTeamId();
+                            }
+                            else {
+                                TeamIdInInstance = player->GetTeamId();
+                            }
+                        }
+                    }
             }
 
             switch (entry)
@@ -702,8 +749,20 @@ public:
             {
                 Map::PlayerList const& players = instance->GetPlayers();
                 if (!players.IsEmpty())
-                    if (Player* player = players.begin()->GetSource())
-                        TeamIdInInstance = player->GetTeamId();
+                    if (Player* player = players.begin()->GetSource()) {
+                        if (!player->GetGroup()) {
+                            TeamIdInInstance = player->GetTeamId();
+                        }
+                        else {
+                            Player* leader = ObjectAccessor::FindPlayer(player->GetGroup()->GetLeaderGUID());
+                            if (leader) {
+                                TeamIdInInstance = leader->GetTeamId();
+                            }
+                            else {
+                                TeamIdInInstance = player->GetTeamId();
+                            }
+                        }
+                    }
             }
 
             switch (go->GetEntry())
