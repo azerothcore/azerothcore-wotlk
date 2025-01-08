@@ -261,19 +261,32 @@ public:
 
         void OnPlayerEnter(Player* player) override
         {
-            if (TeamIdInInstance == TEAM_NEUTRAL && !player->GetGroup()) {
-                TeamIdInInstance = player->GetTeamId();
-            }
-            else {
-                Player* leader = ObjectAccessor::FindPlayer(player->GetGroup()->GetLeaderGUID());
-                if (leader) {
-                    TeamIdInInstance = leader->GetTeamId();
-                }
-                else {
+            if (TeamIdInInstance == TEAM_NEUTRAL) {
+                if (!player->GetGroup()) {
                     TeamIdInInstance = player->GetTeamId();
+                    if (sWorld->getBoolConfig(CONFIG_ALLOW_TWO_SIDE_INTERACTION_GROUP)) {
+                        player->SetFactionForRace(player->getRace());
+                    }
+                } else {
+                    // Handle group logic
+                    Player* leader = ObjectAccessor::FindPlayer(player->GetGroup()->GetLeaderGUID());
+                    if (leader) {
+                        TeamIdInInstance = leader->GetTeamId();
+                        if (sWorld->getBoolConfig(CONFIG_ALLOW_TWO_SIDE_INTERACTION_GROUP)) {
+                            player->SetFaction(leader->GetFaction());
+                        }
+                    } else {
+                        // Fallback to character cache if leader is not online
+                        CharacterCacheEntry const* playerData = sCharacterCache->GetCharacterCacheByGuid(player->GetGroup()->GetLeaderGUID());
+                        if (playerData) {
+                            TeamIdInInstance = Player::TeamIdForRace(playerData->Race);
+                            if (sWorld->getBoolConfig(CONFIG_ALLOW_TWO_SIDE_INTERACTION_GROUP)) {
+                                player->SetFaction(Player::TeamIdForRace(playerData->Race));
+                            }
+                        }
+                    }
                 }
             }
-
 
             // for professor putricide hc
             DoRemoveAurasDueToSpellOnPlayers(SPELL_GAS_VARIABLE);
@@ -313,14 +326,26 @@ public:
                     if (Player* player = players.begin()->GetSource()) {
                         if (!player->GetGroup()) {
                             TeamIdInInstance = player->GetTeamId();
-                        }
-                        else {
+                            if (sWorld->getBoolConfig(CONFIG_ALLOW_TWO_SIDE_INTERACTION_GROUP)) {
+                                player->SetFactionForRace(player->getRace());
+                            }
+                        } else {
+                            // Handle group logic
                             Player* leader = ObjectAccessor::FindPlayer(player->GetGroup()->GetLeaderGUID());
                             if (leader) {
                                 TeamIdInInstance = leader->GetTeamId();
-                            }
-                            else {
-                                TeamIdInInstance = player->GetTeamId();
+                                if (sWorld->getBoolConfig(CONFIG_ALLOW_TWO_SIDE_INTERACTION_GROUP)) {
+                                    player->SetFaction(leader->GetFaction());
+                                }
+                            } else {
+                                // Fallback to character cache if leader is not online
+                                CharacterCacheEntry const* playerData = sCharacterCache->GetCharacterCacheByGuid(player->GetGroup()->GetLeaderGUID());
+                                if (playerData) {
+                                    TeamIdInInstance = Player::TeamIdForRace(playerData->Race);
+                                    if (sWorld->getBoolConfig(CONFIG_ALLOW_TWO_SIDE_INTERACTION_GROUP)) {
+                                        player->SetFaction(Player::TeamIdForRace(playerData->Race));
+                                    }
+                                }
                             }
                         }
                     }
@@ -560,6 +585,7 @@ public:
             }
 
             InstanceScript::OnCreatureCreate(creature);
+
         }
 
         void OnCreatureRemove(Creature* creature) override
@@ -579,14 +605,26 @@ public:
                     if (Player* player = players.begin()->GetSource()) {
                         if (!player->GetGroup()) {
                             TeamIdInInstance = player->GetTeamId();
-                        }
-                        else {
+                            if (sWorld->getBoolConfig(CONFIG_ALLOW_TWO_SIDE_INTERACTION_GROUP)) {
+                                player->SetFactionForRace(player->getRace());
+                            }
+                        } else {
+                            // Handle group logic
                             Player* leader = ObjectAccessor::FindPlayer(player->GetGroup()->GetLeaderGUID());
                             if (leader) {
                                 TeamIdInInstance = leader->GetTeamId();
-                            }
-                            else {
-                                TeamIdInInstance = player->GetTeamId();
+                                if (sWorld->getBoolConfig(CONFIG_ALLOW_TWO_SIDE_INTERACTION_GROUP)) {
+                                    player->SetFaction(leader->GetFaction());
+                                }
+                            } else {
+                                // Fallback to character cache if leader is not online
+                                CharacterCacheEntry const* playerData = sCharacterCache->GetCharacterCacheByGuid(player->GetGroup()->GetLeaderGUID());
+                                if (playerData) {
+                                    TeamIdInInstance = Player::TeamIdForRace(playerData->Race);
+                                    if (sWorld->getBoolConfig(CONFIG_ALLOW_TWO_SIDE_INTERACTION_GROUP)) {
+                                        player->SetFaction(Player::TeamIdForRace(playerData->Race));
+                                    }
+                                }
                             }
                         }
                     }
@@ -636,14 +674,26 @@ public:
                     if (Player* player = players.begin()->GetSource()) {
                         if (!player->GetGroup()) {
                             TeamIdInInstance = player->GetTeamId();
-                        }
-                        else {
+                            if (sWorld->getBoolConfig(CONFIG_ALLOW_TWO_SIDE_INTERACTION_GROUP)) {
+                                player->SetFactionForRace(player->getRace());
+                            }
+                        } else {
+                            // Handle group logic
                             Player* leader = ObjectAccessor::FindPlayer(player->GetGroup()->GetLeaderGUID());
                             if (leader) {
                                 TeamIdInInstance = leader->GetTeamId();
-                            }
-                            else {
-                                TeamIdInInstance = player->GetTeamId();
+                                if (sWorld->getBoolConfig(CONFIG_ALLOW_TWO_SIDE_INTERACTION_GROUP)) {
+                                    player->SetFaction(leader->GetFaction());
+                                }
+                            } else {
+                                // Fallback to character cache if leader is not online
+                                CharacterCacheEntry const* playerData = sCharacterCache->GetCharacterCacheByGuid(player->GetGroup()->GetLeaderGUID());
+                                if (playerData) {
+                                    TeamIdInInstance = Player::TeamIdForRace(playerData->Race);
+                                    if (sWorld->getBoolConfig(CONFIG_ALLOW_TWO_SIDE_INTERACTION_GROUP)) {
+                                        player->SetFaction(Player::TeamIdForRace(playerData->Race));
+                                    }
+                                }
                             }
                         }
                     }
@@ -752,14 +802,26 @@ public:
                     if (Player* player = players.begin()->GetSource()) {
                         if (!player->GetGroup()) {
                             TeamIdInInstance = player->GetTeamId();
-                        }
-                        else {
+                            if (sWorld->getBoolConfig(CONFIG_ALLOW_TWO_SIDE_INTERACTION_GROUP)) {
+                                player->SetFactionForRace(player->getRace());
+                            }
+                        } else {
+                            // Handle group logic
                             Player* leader = ObjectAccessor::FindPlayer(player->GetGroup()->GetLeaderGUID());
                             if (leader) {
                                 TeamIdInInstance = leader->GetTeamId();
-                            }
-                            else {
-                                TeamIdInInstance = player->GetTeamId();
+                                if (sWorld->getBoolConfig(CONFIG_ALLOW_TWO_SIDE_INTERACTION_GROUP)) {
+                                    player->SetFaction(leader->GetFaction());
+                                }
+                            } else {
+                                // Fallback to character cache if leader is not online
+                                CharacterCacheEntry const* playerData = sCharacterCache->GetCharacterCacheByGuid(player->GetGroup()->GetLeaderGUID());
+                                if (playerData) {
+                                    TeamIdInInstance = Player::TeamIdForRace(playerData->Race);
+                                    if (sWorld->getBoolConfig(CONFIG_ALLOW_TWO_SIDE_INTERACTION_GROUP)) {
+                                        player->SetFaction(Player::TeamIdForRace(playerData->Race));
+                                    }
+                                }
                             }
                         }
                     }
