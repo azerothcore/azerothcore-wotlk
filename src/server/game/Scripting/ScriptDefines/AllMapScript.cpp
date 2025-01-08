@@ -211,6 +211,11 @@ void ScriptMgr::OnPlayerEnterMap(Map* map, Player* player)
     {
         script->OnPlayerEnter((BattlegroundMap*)map, player);
     });
+
+    if (sWorld->getBoolConfig(CONFIG_ALLOW_TWO_SIDE_INTERACTION_GROUP) && map->GetInstanceId() == 0)
+    {
+        player->SetFactionForRace(player->getRace());
+    }
 }
 
 void ScriptMgr::OnPlayerLeaveMap(Map* map, Player* player)
