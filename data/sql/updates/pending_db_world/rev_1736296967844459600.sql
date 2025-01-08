@@ -1,0 +1,8 @@
+-- Spawn horde and alliance quest giver for Shattered Halls Imprisoned in the Citadel quest
+DELETE FROM `creature` WHERE (`id1` = 17294) AND (`guid` IN (151300,151301));
+INSERT INTO `creature` (`guid`, `id1`, `id2`, `id3`, `map`, `zoneId`, `areaId`, `spawnMask`, `phaseMask`, `equipment_id`, `position_x`, `position_y`, `position_z`, `orientation`, `spawntimesecs`, `wander_distance`, `currentwaypoint`, `curhealth`, `curmana`, `MovementType`, `npcflag`, `unit_flags`, `dynamicflags`, `ScriptName`, `VerifiedBuild`) VALUES
+(151300, 17294, 0, 0, 540, 37114, 3714, 2, 1, 0, 120.88, 252.78, -14.57, 0.82, 7200, 0, 0, 6104, 0, 0, 2, 0, 0, '', 0),
+(151301, 17288, 0, 0, 540, 37114, 3714, 2, 1, 0, 120.88, 252.78, -14.57, 0.82, 7200, 0, 0, 6104, 0, 0, 2, 0, 0, '', 0);
+
+UPDATE `creature_template` SET `ScriptName` = 'npc_drisella' WHERE (`entry` = 17294);
+UPDATE `creature_template` SET `ScriptName` = 'npc_randy_whizzlesprocket' WHERE (`entry` = 17288);

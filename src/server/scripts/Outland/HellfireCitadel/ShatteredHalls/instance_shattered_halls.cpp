@@ -202,8 +202,34 @@ public:
     }
 };
 
+class npc_drisella : public ScriptedAI
+{
+public:
+    npc_drisella(Creature* creature) : ScriptedAI(creature) {}
+
+    bool CanBeSeen(Player const* seer) override
+    {
+        return seer->GetTeamId() == TEAM_HORDE;
+    }
+
+};
+
+class npc_randy_whizzlesprocket : public ScriptedAI
+{
+public:
+    npc_randy_whizzlesprocket(Creature* creature) : ScriptedAI(creature) {}
+
+    bool CanBeSeen(Player const* seer) override
+    {
+        return seer->GetTeamId() == TEAM_ALLIANCE;
+    }
+
+};
+
 void AddSC_instance_shattered_halls()
 {
     new instance_shattered_halls();
     new at_shattered_halls_execution();
+    RegisterShatteredHallsCreatureAI(npc_drisella);
+    RegisterShatteredHallsCreatureAI(npc_randy_whizzlesprocket);
 }
