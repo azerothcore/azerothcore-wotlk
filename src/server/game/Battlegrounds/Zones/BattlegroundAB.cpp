@@ -107,7 +107,7 @@ void BattlegroundAB::PostUpdateImpl(uint32 diff)
                         auto reputationRewards = uint8(m_TeamScores[teamId] / _reputationTics);
                         auto information = uint8(m_TeamScores[teamId] / BG_AB_WARNING_NEAR_VICTORY_SCORE);
                         m_TeamScores[teamId] += BG_AB_TickPoints[controlledPoints];
-                        if (m_TeamScores[teamId] > _configurableMaxTeamScore)
+                        if (m_TeamScores[teamId] > static_cast<int32>(_configurableMaxTeamScore))
                             m_TeamScores[teamId] = _configurableMaxTeamScore;
 
                         if (honorRewards < uint8(m_TeamScores[teamId] / _honorTics))

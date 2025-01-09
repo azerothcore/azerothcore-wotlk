@@ -113,7 +113,7 @@ void BattlegroundEY::AddPoints(TeamId teamId, uint32 points)
 {
     uint8 honorRewards = uint8(m_TeamScores[teamId] / _honorTics);
     m_TeamScores[teamId] += points;
-    if (m_TeamScores[teamId] > _configurableMaxTeamScore)
+    if (m_TeamScores[teamId] > static_cast<int32>(_configurableMaxTeamScore))
         m_TeamScores[teamId] = _configurableMaxTeamScore;
 
     for (; honorRewards < uint8(m_TeamScores[teamId] / _honorTics); ++honorRewards)

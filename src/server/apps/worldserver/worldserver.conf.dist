@@ -3711,7 +3711,7 @@ Battleground.Override.LowLevels.MinPlayers = 0
 #
 #    Battleground.Warsong.Flags
 #        Description: Set the number of flags required for a team to win in Warsong battleground
-#        Default:     3 (Blizzlike)
+#        Default:     3 (WotLK)
 #                     1 (Minimum)
 
 Battleground.Warsong.Flags = 3
@@ -3719,8 +3719,8 @@ Battleground.Warsong.Flags = 3
 #
 #    Battleground.Arathi.CapturePoints
 #        Description: Set the number of capture points required for a team to win in Arathi battleground
-#        Default:     1600 (Blizzlike)
-#                     2000 (Vanilla like)
+#        Default:     1600 (WotLK)
+#                     2000 (Vanilla)
 
 Battleground.Arathi.CapturePoints = 1600
 
@@ -3728,9 +3728,9 @@ Battleground.Arathi.CapturePoints = 1600
 #    Battleground.Alterac.Reinforcements
 #        Description: Set the number of total reinforcements for each teams in Alterac battleground
 #                     (It is necessary to restart the server after changing the Reinforcements value)
-#        Default:     600 (Enabled, Blizzlike)
-#                     500 (Enabled, MoP like)
-#                     0   (Disabled, early vanilla like, victory only on boss death)
+#        Default:     600 (Enabled, WotLK)
+#                     500 (Enabled, MoP)
+#                     0   (Disabled, early Vanilla, victory only on boss death)
 
 Battleground.Alterac.Reinforcements = 600
 
@@ -3738,8 +3738,8 @@ Battleground.Alterac.Reinforcements = 600
 #    Battleground.Alterac.ReputationOnBossDeath
 #        Description: Set the number of rep point given for a boss killed in Alterac battleground
 #                     (It is necessary to restart the server after changing the ReputationOnBossDeath value)
-#        Default:     350 (Blizzlike)
-#                     389 (Vanilla like)
+#        Default:     350 (WotLK)
+#                     389 (Vanilla)
 
 Battleground.Alterac.ReputationOnBossDeath = 350
 
@@ -3747,8 +3747,8 @@ Battleground.Alterac.ReputationOnBossDeath = 350
 #    Battleground.EyeOfTheStorm.CapturePoints
 #        Description: Set the number of capture points required for a team to win in Eye of the Storm battleground
 #                     (The UI part of the max team score will not be compliant with this parameter without client modification)
-#        Default:     1600 (Blizzlike, UI compliant)
-#                     2000 (TBC like)
+#        Default:     1600 (WotLK, UI compliant)
+#                     2000 (TBC)
 
 Battleground.EyeOfTheStorm.CapturePoints = 1600
 
