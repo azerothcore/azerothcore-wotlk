@@ -1203,8 +1203,12 @@ public:
                                 if (Player* plr = itr->GetSource())
                                     if (!plr->IsGameMaster())
                                     {
-                                        TeamIdInInstance = plr->GetTeamId();
-                                        break;
+                                        if (Player* gLeader = ObjectAccessor::FindPlayer(plr->GetGroup()->GetLeaderGUID()))
+                                            TeamIdInInstance = Player::TeamIdForRace(gLeader->getRace());
+                                            break;
+                                        else
+                                            TeamIdInInstance = plr->GetTeamId();
+                                            break;
                                     }
                         }
                         if (Creature* c = instance->GetCreature(TeamIdInInstance == TEAM_ALLIANCE ? NPC_VarianGUID : NPC_GarroshGUID))
