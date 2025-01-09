@@ -1,6 +1,6 @@
 
 -- Delete Tanzar
-DELETE FROM `creature` WHERE `id1` = 23790;
+DELETE FROM `creature` WHERE `id1` = 23790 AND (`guid` IN (89157));
 DELETE FROM `creature_addon` WHERE (`guid` IN (89157));
 
 -- Set use group loot rules
