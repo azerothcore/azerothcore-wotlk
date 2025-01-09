@@ -3738,8 +3738,8 @@ Battleground.Alterac.Reinforcements = 600
 #    Battleground.Alterac.ReputationOnBossDeath
 #        Description: Set the number of rep point given for a boss killed in Alterac battleground
 #                     (It is necessary to restart the server after changing the ReputationOnBossDeath value)
-#        Default:     350 (Enabled, Blizzlike)
-#                     389 (Enabled, Vanilla like)
+#        Default:     350 (Blizzlike)
+#                     389 (Vanilla like)
 
 Battleground.Alterac.ReputationOnBossDeath = 350
 

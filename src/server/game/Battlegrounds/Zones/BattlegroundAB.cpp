@@ -479,7 +479,7 @@ void BattlegroundAB::Init()
     _capturePointInfo[BG_AB_NODE_LUMBER_MILL]._iconCapture = BG_AB_OP_LUMBERMILL_STATE_ALIENCE;
     _capturePointInfo[BG_AB_NODE_GOLD_MINE]._iconCapture = BG_AB_OP_GOLDMINE_STATE_ALIENCE;
 
-    int bgArathiCapturePointsConfig = sWorld->getIntConfig(CONFIG_BATTLEGROUND_ARATHI_CAPTUREPOINTS);
+    uint32 bgArathiCapturePointsConfig = sWorld->getIntConfig(CONFIG_BATTLEGROUND_ARATHI_CAPTUREPOINTS);
     _configurableMaxTeamScore = bgArathiCapturePointsConfig > 0
         ? bgArathiCapturePointsConfig
         : BG_AB_MAX_TEAM_SCORE;

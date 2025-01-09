@@ -498,7 +498,7 @@ void BattlegroundWS::Init()
         _honorEndKills = 2;
     }
 
-    int bgWarsongFlagsConfig = sWorld->getIntConfig(CONFIG_BATTLEGROUND_WARSONG_FLAGS);
+    uint32 bgWarsongFlagsConfig = sWorld->getIntConfig(CONFIG_BATTLEGROUND_WARSONG_FLAGS);
     _configurableMaxTeamScore = bgWarsongFlagsConfig > 0
         ? bgWarsongFlagsConfig
         : BG_WS_MAX_TEAM_SCORE;

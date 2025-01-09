@@ -1174,8 +1174,8 @@ void World::LoadConfigSettings(bool reload)
 
     _int_configs[CONFIG_BATTLEGROUND_WARSONG_FLAGS]                        = sConfigMgr->GetOption<uint32>("Battleground.Warsong.Flags", 3);
     _int_configs[CONFIG_BATTLEGROUND_ARATHI_CAPTUREPOINTS]                 = sConfigMgr->GetOption<uint32>("Battleground.Arathi.CapturePoints", 1600);
-    _int_configs[CONFIG_BATTLEGROUND_ALTERAC_REINFORCEMENTS]               = sConfigMgr->GetOption<int32>("Battleground.Alterac.Reinforcements", 600);
-    _int_configs[CONFIG_BATTLEGROUND_ALTERAC_REP_ONBOSSDEATH]              = sConfigMgr->GetOption<int32>("Battleground.Alterac.ReputationOnBossDeath", 350);
+    _int_configs[CONFIG_BATTLEGROUND_ALTERAC_REINFORCEMENTS]               = sConfigMgr->GetOption<uint32>("Battleground.Alterac.Reinforcements", 600);
+    _int_configs[CONFIG_BATTLEGROUND_ALTERAC_REP_ONBOSSDEATH]              = sConfigMgr->GetOption<uint32>("Battleground.Alterac.ReputationOnBossDeath", 350);
     _int_configs[CONFIG_BATTLEGROUND_EYEOFTHESTORM_CAPTUREPOINTS]          = sConfigMgr->GetOption<uint32>("Battleground.EyeOfTheStorm.CapturePoints", 1600);
 
     _int_configs[CONFIG_ARENA_MAX_RATING_DIFFERENCE]                = sConfigMgr->GetOption<uint32>("Arena.MaxRatingDifference", 150);
