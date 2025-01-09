@@ -75,11 +75,28 @@ public:
             return false;
         }
 
-        void OnPlayerEnter(Player*  /*plr*/) override
+        void OnPlayerEnter(Player* player) override
         {
+          if (TeamIdInInstance == TEAM_NEUTRAL)
+            {
+                if (Player* gleader = ObjectAccessor::FindPlayer(player->GetGroup()->GetLeaderGUID()))
+                    TeamIdInInstance = Player::TeamIdForRace(gleader->getRace());
+                else
+                    TeamIdInInstance = player->GetTeamId();
+            }
+
+            if (sWorld->getBoolConfig(CONFIG_ALLOW_TWO_SIDE_INTERACTION_GROUP))
+                player->SetFaction((TeamIdInInstance == TEAM_HORDE) ? 1610 : 1);
+            
             instance->LoadGrid(LeaderIntroPos.GetPositionX(), LeaderIntroPos.GetPositionY());
             if (Creature* c = instance->GetCreature(GetGuidData(DATA_LEADER_FIRST_GUID)))
                 c->AI()->SetData(DATA_START_INTRO, 0);
+        }
+
+        void OnPlayerLeave(Player* player) override
+        {
+            if (sWorld->getBoolConfig(CONFIG_ALLOW_TWO_SIDE_INTERACTION_GROUP))
+                player->SetFactionForRace(player->getRace());
         }
 
         uint32 GetCreatureEntry(ObjectGuid::LowType /*guidLow*/, CreatureData const* data) override
@@ -111,12 +128,6 @@ public:
             }
 
             return entry;
-        }
-
-        void OnPlayerLeave(Player* player) override
-        {
-            if (sWorld->getBoolConfig(CONFIG_ALLOW_TWO_SIDE_INTERACTION_GROUP))
-                player->SetFactionForRace(player->getRace());
         }
 
         void OnCreatureCreate(Creature* creature) override
