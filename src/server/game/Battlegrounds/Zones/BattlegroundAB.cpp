@@ -131,7 +131,7 @@ void BattlegroundAB::PostUpdateImpl(uint32 diff)
                         UpdateWorldState(teamId == TEAM_ALLIANCE ? BG_AB_OP_RESOURCES_ALLY : BG_AB_OP_RESOURCES_HORDE, m_TeamScores[teamId]);
                         if (m_TeamScores[teamId] > m_TeamScores[GetOtherTeamId(teamId)] + 500)
                             _teamScores500Disadvantage[GetOtherTeamId(teamId)] = true;
-                        if (m_TeamScores[teamId] >= _configurableMaxTeamScore)
+                        if (m_TeamScores[teamId] >= static_cast<int32>(_configurableMaxTeamScore))
                             EndBattleground(teamId);
 
                         _bgEvents.ScheduleEvent(eventId, BG_AB_TickIntervals[controlledPoints]);

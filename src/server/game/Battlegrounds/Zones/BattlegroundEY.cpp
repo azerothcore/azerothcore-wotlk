@@ -120,7 +120,7 @@ void BattlegroundEY::AddPoints(TeamId teamId, uint32 points)
         RewardHonorToTeam(GetBonusHonorFromKill(1), teamId);
 
     UpdateWorldState(teamId == TEAM_ALLIANCE ? EY_ALLIANCE_RESOURCES : EY_HORDE_RESOURCES, std::min<uint32>(m_TeamScores[teamId], _configurableMaxTeamScore));
-    if (m_TeamScores[teamId] >= _configurableMaxTeamScore)
+    if (m_TeamScores[teamId] >= static_cast<int32>(_configurableMaxTeamScore))
         EndBattleground(teamId);
 }
 
