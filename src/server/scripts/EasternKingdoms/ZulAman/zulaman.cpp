@@ -682,22 +682,6 @@ private:
     SummonList _summons;
 };
 
-struct WorldTriggerHutPred
-{
-    bool operator()(Creature* trigger) const
-    {
-        return trigger->GetOrientation() > 2.7f || (trigger->GetOrientation() < 2.7f && 1270.0f < trigger->GetPositionY() && trigger->GetPositionY() < 1280.0f);
-    }
-};
-
-struct WorldTriggerDrumPred
-{
-    bool operator()(Creature* trigger) const
-    {
-        return !WorldTriggerHutPred()(trigger);
-    }
-};
-
 enum AmanishiScout
 {
     NPC_WORLD_TRIGGER               = 22515,
@@ -707,6 +691,18 @@ enum AmanishiScout
     SPELL_MULTI_SHOT                = 43205,
     SPELL_SHOOT                     = 16496
 };
+
+inline bool IsHut(Creature* trigger)
+{
+    return trigger->GetPositionX() < -90.0f // South of Jan'alai area
+        && ((trigger->GetOrientation() > 2.7f) || (trigger->GetOrientation() < 2.7f && 1270.0f < trigger->GetPositionY() && trigger->GetPositionY() < 1280.0f));
+}
+
+inline bool IsDrum(Creature* trigger)
+{
+    return trigger->GetPositionX() < -90.0f // South of Jan'alai area
+        && !IsHut(trigger);
+}
 
 struct npc_amanishi_scout : public ScriptedAI
 {
@@ -725,7 +721,7 @@ struct npc_amanishi_scout : public ScriptedAI
         // Move to Drum
         std::list<Creature*> triggers;
         GetCreatureListWithEntryInGrid(triggers, me, NPC_WORLD_TRIGGER, 50.0f);
-        triggers.remove_if(WorldTriggerHutPred());
+        triggers.remove_if([](Creature* trigger) {return !IsDrum(trigger);});
         triggers.sort(Acore::ObjectDistanceOrderPred(me));
         if (!triggers.empty())
         {
@@ -826,7 +822,7 @@ class spell_summon_amanishi_sentries : public SpellScript
     {
         std::list<Creature*> triggers;
         GetCreatureListWithEntryInGrid(triggers, GetHitUnit(), NPC_WORLD_TRIGGER, 50.0f);
-        triggers.remove_if(WorldTriggerDrumPred());
+        triggers.remove_if([](Creature* trigger) {return !IsHut(trigger);});
         if (triggers.empty())
             return;
         Creature* trigger = Acore::Containers::SelectRandomContainerElement(triggers);
