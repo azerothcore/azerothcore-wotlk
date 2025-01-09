@@ -56,7 +56,12 @@ public:
             TeamId TeamIdInInstance = TEAM_NEUTRAL;
             if (!players.IsEmpty())
                 if (Player* pPlayer = players.begin()->GetSource())
-                    TeamIdInInstance = pPlayer->GetTeamId();
+                {
+                    if (Player* gLeader = ObjectAccessor::FindPlayer(pPlayer->GetGroup()->GetLeaderGUID()))
+                        TeamIdInInstance = Player::TeamIdForRace(gLeader->getRace());
+                    else
+                        TeamIdInInstance = pPlayer->GetTeamId();
+                }
 
             switch (creature->GetEntry())
             {
