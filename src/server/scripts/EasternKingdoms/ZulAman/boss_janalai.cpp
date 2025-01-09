@@ -464,7 +464,7 @@ class spell_summon_all_players_dummy: public SpellScript
         Position pos = GetCaster()->GetPosition();
         targets.remove_if([&, pos](WorldObject* target) -> bool
         {
-            return target->IsWithinBox(pos, 18.0f, 18.0f, 18.0f);
+            return target->IsWithinBox(pos, 22.0f, 28.0f, 28.0f);
         });
     }
 

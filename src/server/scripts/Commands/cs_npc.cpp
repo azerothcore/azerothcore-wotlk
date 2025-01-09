@@ -1275,7 +1275,7 @@ public:
 
         if (!sObjectMgr->SetCreatureLinkedRespawn(creature->GetSpawnId(), linkguid))
         {
-            handler->SendErrorMessage("Selected creature can't link with guid '%u'", linkguid);
+            handler->SendErrorMessage("Selected creature can't link with guid '{}'", linkguid);
             return false;
         }
 
