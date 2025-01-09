@@ -1,3 +1,4 @@
+-- DB update 2025_01_07_03 -> 2025_01_09_00
 
 -- Delete Tanzar
 DELETE FROM `creature` WHERE `id1` = 23790 AND (`guid` IN (89157));
