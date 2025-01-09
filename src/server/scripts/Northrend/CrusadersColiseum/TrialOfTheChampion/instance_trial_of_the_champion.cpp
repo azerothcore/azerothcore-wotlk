@@ -281,7 +281,7 @@ public:
 
         // EVENT STUFF BELOW:
 
-        void OnPlayerEnter(Player* plr) override
+        void OnPlayerEnter(Player* player) override
         {
             if (TeamIdInInstance == TEAM_NEUTRAL)
             {
@@ -299,7 +299,7 @@ public:
             if (sWorld->getBoolConfig(CONFIG_ALLOW_TWO_SIDE_INTERACTION_GROUP))
                 player->SetFaction((TeamIdInInstance == TEAM_HORDE) ? 1610 : 1);
             
-            if (DoNeedCleanup(plr))
+            if (DoNeedCleanup(player))
             {
                 InstanceCleanup();
             }
