@@ -114,7 +114,12 @@ public:
                 Map::PlayerList const& players = instance->GetPlayers();
                 if (!players.IsEmpty())
                     if (Player* pPlayer = players.begin()->GetSource())
-                        TeamIdInInstance = pPlayer->GetTeamId();
+                    {
+                        if (Player* gLeader = ObjectAccessor::FindPlayer(pPlayer->GetGroup()->GetLeaderGUID()))
+                            TeamIdInInstance = Player::TeamIdForRace(gLeader->getRace());
+                        else
+                            TeamIdInInstance = pPlayer->GetTeamId();
+                    }
             }
 
             switch (creature->GetEntry())
@@ -273,12 +278,29 @@ public:
 
         void OnPlayerEnter(Player* plr) override
         {
+            if (TeamIdInInstance == TEAM_NEUTRAL)
+            {
+                if (Player* gleader = ObjectAccessor::FindPlayer(player->GetGroup()->GetLeaderGUID()))
+                    TeamIdInInstance = Player::TeamIdForRace(gleader->getRace());
+                else
+                    TeamIdInInstance = player->GetTeamId();
+            }
+
+            if (sWorld->getBoolConfig(CONFIG_ALLOW_TWO_SIDE_INTERACTION_GROUP))
+                player->SetFaction((TeamIdInInstance == TEAM_HORDE) ? 1610 : 1);
+            
             if (DoNeedCleanup(plr))
             {
                 InstanceCleanup();
             }
 
             events.RescheduleEvent(EVENT_CHECK_PLAYERS, CLEANUP_CHECK_INTERVAL);
+        }
+
+        void OnPlayerLeave(Player* player) override
+        {
+            if (sWorld->getBoolConfig(CONFIG_ALLOW_TWO_SIDE_INTERACTION_GROUP))
+                player->SetFactionForRace(player->getRace());
         }
 
         bool DoNeedCleanup(Player* ignoredPlayer = nullptr)
