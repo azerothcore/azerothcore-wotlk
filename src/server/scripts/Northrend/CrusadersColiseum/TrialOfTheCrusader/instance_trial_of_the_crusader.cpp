@@ -1401,6 +1401,17 @@ public:
 
         void OnPlayerEnter(Player* plr) override
         {
+            if (TeamIdInInstance == TEAM_NEUTRAL)
+            {
+                if (Player* gLeader = ObjectAccessor::FindPlayer(plr->GetGroup()->GetLeaderGUID()))
+                    TeamIdInInstance = Player::TeamIdForRace(gLeader->getRace());
+                else
+                    TeamIdInInstance = plr->GetTeamId();
+            }
+
+            if (sWorld->getBoolConfig(CONFIG_ALLOW_TWO_SIDE_INTERACTION_GROUP))
+                plr->SetFaction((TeamIdInInstance == TEAM_HORDE) ? 1610 : 1);
+            
             if (instance->IsHeroic())
             {
                 plr->SendUpdateWorldState(UPDATE_STATE_UI_SHOW, 1);
@@ -1418,6 +1429,12 @@ public:
             SpawnAnubArak();
 
             events.RescheduleEvent(EVENT_CHECK_PLAYERS, 5s);
+        }
+
+        void OnPlayerLeave(Player* player) override
+        {
+            if (sWorld->getBoolConfig(CONFIG_ALLOW_TWO_SIDE_INTERACTION_GROUP))
+                player->SetFactionForRace(player->getRace());
         }
 
         bool DoNeedCleanup(Player* ignoredPlayer = nullptr)
