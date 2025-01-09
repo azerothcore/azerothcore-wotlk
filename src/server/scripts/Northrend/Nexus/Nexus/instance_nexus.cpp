@@ -93,6 +93,12 @@ public:
             }
         }
 
+        void OnPlayerLeave(Player* player) override
+        {
+            if (sWorld->getBoolConfig(CONFIG_ALLOW_TWO_SIDE_INTERACTION_GROUP))
+                player->SetFactionForRace(player->getRace());
+        }
+
         void OnGameObjectCreate(GameObject* gameObject) override
         {
             switch (gameObject->GetEntry())
