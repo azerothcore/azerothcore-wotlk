@@ -67,8 +67,13 @@ public:
         {
             if (TeamIdInInstance == TEAM_NEUTRAL)
             {
-                if (Player* gleader = ObjectAccessor::FindPlayer(player->GetGroup()->GetLeaderGUID()))
-                    TeamIdInInstance = Player::TeamIdForRace(gleader->getRace());
+                if (Group* group = player->GetGroup())
+                {
+                    if (Player* gLeader = ObjectAccessor::FindPlayer(player->GetGroup()->GetLeaderGUID()))
+                        TeamIdInInstance = Player::TeamIdForRace(gLeader->getRace());
+                    else
+                        TeamIdInInstance = player->GetTeamId();
+                }
                 else
                     TeamIdInInstance = player->GetTeamId();
             }
@@ -91,8 +96,13 @@ public:
                 if (!players.IsEmpty())
                     if (Player* player = players.begin()->GetSource())
                     {
-                        if (Player* gLeader = ObjectAccessor::FindPlayer(player->GetGroup()->GetLeaderGUID()))
-                            TeamIdInInstance = Player::TeamIdForRace(gLeader->getRace());
+                        if (Group* group = player->GetGroup())
+                        {
+                            if (Player* gLeader = ObjectAccessor::FindPlayer(player->GetGroup()->GetLeaderGUID()))
+                                TeamIdInInstance = Player::TeamIdForRace(gLeader->getRace());
+                            else
+                                TeamIdInInstance = player->GetTeamId();
+                        }
                         else
                             TeamIdInInstance = player->GetTeamId();
                     }
