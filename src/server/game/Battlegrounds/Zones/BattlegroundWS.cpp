@@ -501,7 +501,7 @@ void BattlegroundWS::Init()
     uint32 bgWarsongFlagsConfig = sWorld->getIntConfig(CONFIG_BATTLEGROUND_WARSONG_FLAGS);
     _configurableMaxTeamScore = bgWarsongFlagsConfig > 0
         ? bgWarsongFlagsConfig
-        : BG_WS_MAX_TEAM_SCORE;
+        : static_cast<uint32>(BG_WS_MAX_TEAM_SCORE);
 }
 
 void BattlegroundWS::EndBattleground(TeamId winnerTeamId)

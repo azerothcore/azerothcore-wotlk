@@ -365,7 +365,7 @@ void BattlegroundEY::Init()
     uint32 bgEyCapturePointsConfig = sWorld->getIntConfig(CONFIG_BATTLEGROUND_EYEOFTHESTORM_CAPTUREPOINTS);
     _configurableMaxTeamScore = bgEyCapturePointsConfig > 0
         ? bgEyCapturePointsConfig
-        : BG_EY_MAX_TEAM_SCORE;
+        : static_cast<uint32>(BG_EY_MAX_TEAM_SCORE);
 }
 
 void BattlegroundEY::RespawnFlag()

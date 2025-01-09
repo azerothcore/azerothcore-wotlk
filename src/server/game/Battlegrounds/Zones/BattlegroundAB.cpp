@@ -482,7 +482,7 @@ void BattlegroundAB::Init()
     uint32 bgArathiCapturePointsConfig = sWorld->getIntConfig(CONFIG_BATTLEGROUND_ARATHI_CAPTUREPOINTS);
     _configurableMaxTeamScore = bgArathiCapturePointsConfig > 0
         ? bgArathiCapturePointsConfig
-        : BG_AB_MAX_TEAM_SCORE;
+        : static_cast<uint32>(BG_AB_MAX_TEAM_SCORE);
 }
 
 void BattlegroundAB::EndBattleground(TeamId winnerTeamId)
