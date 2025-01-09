@@ -89,7 +89,12 @@ public:
                 Map::PlayerList const& players = instance->GetPlayers();
                 if (!players.IsEmpty())
                     if (Player* player = players.begin()->GetSource())
-                        teamIdInInstance = player->GetTeamId();
+                    {
+                        if (Player* gLeader = ObjectAccessor::FindPlayer(player->GetGroup()->GetLeaderGUID()))
+                            TeamIdInInstance = Player::TeamIdForRace(gLeader->getRace());
+                        else
+                            TeamIdInInstance = player->GetTeamId();
+                    }
             }
 
             uint32 entry = data->id1;
@@ -108,6 +113,12 @@ public:
             return entry;
         }
 
+        void OnPlayerLeave(Player* player) override
+        {
+            if (sWorld->getBoolConfig(CONFIG_ALLOW_TWO_SIDE_INTERACTION_GROUP))
+                player->SetFactionForRace(player->getRace());
+        }
+
         void OnCreatureCreate(Creature* creature) override
         {
             if (teamIdInInstance == TEAM_NEUTRAL)
@@ -115,7 +126,12 @@ public:
                 Map::PlayerList const& players = instance->GetPlayers();
                 if (!players.IsEmpty())
                     if (Player* player = players.begin()->GetSource())
-                        teamIdInInstance = player->GetTeamId();
+                    {
+                        if (Player* gLeader = ObjectAccessor::FindPlayer(player->GetGroup()->GetLeaderGUID()))
+                            TeamIdInInstance = Player::TeamIdForRace(gLeader->getRace());
+                        else
+                            TeamIdInInstance = player->GetTeamId();
+                    }
             }
 
             switch (creature->GetEntry())
