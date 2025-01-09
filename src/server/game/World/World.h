@@ -347,7 +347,7 @@ public:
 protected:
     void _UpdateGameTime();
     // callback for UpdateRealmCharacters
-    void _UpdateRealmCharCount(PreparedQueryResult resultCharCount);
+    void _UpdateRealmCharCount(PreparedQueryResult resultCharCount,uint32 accountId);
 
     void InitDailyQuestResetTime();
     void InitWeeklyQuestResetTime();
