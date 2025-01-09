@@ -57,8 +57,13 @@ public:
             if (!players.IsEmpty())
                 if (Player* pPlayer = players.begin()->GetSource())
                 {
-                    if (Player* gLeader = ObjectAccessor::FindPlayer(pPlayer->GetGroup()->GetLeaderGUID()))
-                        TeamIdInInstance = Player::TeamIdForRace(gLeader->getRace());
+                    if (Group* group = pPlayer->GetGroup())
+                    {
+                        if (Player* gLeader = ObjectAccessor::FindPlayer(pPlayer->GetGroup()->GetLeaderGUID()))
+                            TeamIdInInstance = Player::TeamIdForRace(gLeader->getRace());
+                        else
+                            TeamIdInInstance = pPlayer->GetTeamId();
+                    }
                     else
                         TeamIdInInstance = pPlayer->GetTeamId();
                 }
@@ -91,6 +96,25 @@ public:
                         creature->UpdateEntry(NPC_COMMANDER_KOLURG);
                     break;
             }
+        }
+
+        void OnPlayerEnter(Player* player) override
+        {
+            if (TeamIdInInstance == TEAM_NEUTRAL)
+            {
+                if (Group* group = player->GetGroup())
+                {
+                    if (Player* gLeader = ObjectAccessor::FindPlayer(player->GetGroup()->GetLeaderGUID()))
+                        TeamIdInInstance = Player::TeamIdForRace(gLeader->getRace());
+                    else
+                        TeamIdInInstance = player->GetTeamId();
+                }
+                else
+                    TeamIdInInstance = player->GetTeamId();
+            }
+
+            if (sWorld->getBoolConfig(CONFIG_ALLOW_TWO_SIDE_INTERACTION_GROUP))
+                player->SetFaction((TeamIdInInstance == TEAM_HORDE) ? 1610 : 1);
         }
 
         void OnPlayerLeave(Player* player) override
