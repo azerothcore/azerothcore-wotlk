@@ -66,7 +66,21 @@ public:
         void OnPlayerEnter(Player* player) override
         {
             if (TeamIdInInstance == TEAM_NEUTRAL)
-                TeamIdInInstance = player->GetTeamId();
+            {
+                if (Player* gleader = ObjectAccessor::FindPlayer(player->GetGroup()->GetLeaderGUID()))
+                    TeamIdInInstance = Player::TeamIdForRace(gleader->getRace());
+                else
+                    TeamIdInInstance = player->GetTeamId();
+            }
+
+            if (sWorld->getBoolConfig(CONFIG_ALLOW_TWO_SIDE_INTERACTION_GROUP))
+                player->SetFaction((TeamIdInInstance == TEAM_HORDE) ? 1610 : 1);
+        }
+
+        void OnPlayerLeave(Player* player) override
+        {
+            if (sWorld->getBoolConfig(CONFIG_ALLOW_TWO_SIDE_INTERACTION_GROUP))
+                player->SetFactionForRace(player->getRace());
         }
 
         void OnCreatureCreate(Creature* creature) override
@@ -76,7 +90,12 @@ public:
                 Map::PlayerList const& players = instance->GetPlayers();
                 if (!players.IsEmpty())
                     if (Player* player = players.begin()->GetSource())
-                        TeamIdInInstance = player->GetTeamId();
+                    {
+                        if (Player* gLeader = ObjectAccessor::FindPlayer(player->GetGroup()->GetLeaderGUID()))
+                            TeamIdInInstance = Player::TeamIdForRace(gLeader->getRace());
+                        else
+                            TeamIdInInstance = player->GetTeamId();
+                    }
             }
 
             switch (creature->GetEntry())
