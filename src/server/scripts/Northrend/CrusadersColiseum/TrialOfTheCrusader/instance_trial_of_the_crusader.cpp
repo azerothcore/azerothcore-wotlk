@@ -1203,9 +1203,15 @@ public:
                                 if (Player* plr = itr->GetSource())
                                     if (!plr->IsGameMaster())
                                     {
-                                        if (Player* gLeader = ObjectAccessor::FindPlayer(plr->GetGroup()->GetLeaderGUID()))
-                                            TeamIdInInstance = Player::TeamIdForRace(gLeader->getRace());
-                                            break;
+                                        if (Group* group = plr->GetGroup())
+                                        {
+                                            if (Player* gLeader = ObjectAccessor::FindPlayer(plr->GetGroup()->GetLeaderGUID()))
+                                                TeamIdInInstance = Player::TeamIdForRace(gLeader->getRace());
+                                                break;
+                                            else
+                                                TeamIdInInstance = plr->GetTeamId();
+                                                break;
+                                        }
                                         else
                                             TeamIdInInstance = plr->GetTeamId();
                                             break;
@@ -1403,8 +1409,13 @@ public:
         {
             if (TeamIdInInstance == TEAM_NEUTRAL)
             {
-                if (Player* gLeader = ObjectAccessor::FindPlayer(plr->GetGroup()->GetLeaderGUID()))
-                    TeamIdInInstance = Player::TeamIdForRace(gLeader->getRace());
+                if (Group* group = plr->GetGroup())
+                {
+                    if (Player* gLeader = ObjectAccessor::FindPlayer(plr->GetGroup()->GetLeaderGUID()))
+                        TeamIdInInstance = Player::TeamIdForRace(gLeader->getRace());
+                    else
+                        TeamIdInInstance = plr->GetTeamId();
+                }
                 else
                     TeamIdInInstance = plr->GetTeamId();
             }
