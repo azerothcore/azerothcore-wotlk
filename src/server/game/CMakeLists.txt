@@ -33,16 +33,9 @@ CollectIncludeDirectories(
   # Exclude
   ${CMAKE_CURRENT_SOURCE_DIR}/PrecompiledHeaders)
 
-if (MOD_ELUNA_FOUND)
-    target_include_directories(game-interface
-      INTERFACE
-        ${PUBLIC_INCLUDES}
-        ${CMAKE_SOURCE_DIR}/modules/mod-eluna/src/LuaEngine)
-else()
-    target_include_directories(game-interface
-      INTERFACE
-        ${PUBLIC_INCLUDES})
-endif()
+target_include_directories(game-interface
+  INTERFACE
+    ${PUBLIC_INCLUDES})
 
 target_link_libraries(game-interface
   INTERFACE
