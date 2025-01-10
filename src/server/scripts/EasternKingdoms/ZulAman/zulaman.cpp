@@ -596,6 +596,29 @@ private:
     InstanceScript* _instance;
 };
 
+struct npc_eagle_trash_aggro_trigger : public ScriptedAI
+{
+    npc_eagle_trash_aggro_trigger(Creature* creature) : ScriptedAI(creature), _instance(creature->GetInstanceScript()) {}
+
+    void MoveInLineOfSight(Unit* who) override
+    {
+        if (who->GetLevel() > 70)
+            return;
+
+        if (!me->IsWithinDist(who, me->GetAggroRange(who), false))
+            return;
+
+        Player* player = who->GetCharmerOrOwnerPlayerOrPlayerItself();
+        if (!player || player->IsGameMaster())
+            return;
+
+        if (_instance->GetData(TYPE_AKILZON_GAUNTLET) == NOT_STARTED)
+            _instance->SetData(TYPE_AKILZON_GAUNTLET, IN_PROGRESS);
+    }
+private:
+    InstanceScript* _instance;
+};
+
 enum AmanishiTempest
 {
     GROUP_AKILZON_GAUNTLET  = 1,
@@ -845,6 +868,7 @@ void AddSC_zulaman()
     RegisterZulAmanCreatureAI(npc_harrison_jones);
     RegisterSpellScript(spell_ritual_of_power);
     RegisterZulAmanCreatureAI(npc_amanishi_lookout);
+    RegisterZulAmanCreatureAI(npc_eagle_trash_aggro_trigger);
     RegisterZulAmanCreatureAI(npc_amanishi_tempest);
     RegisterZulAmanCreatureAI(npc_amanishi_scout);
     RegisterSpellScript(spell_alert_drums);
