@@ -561,7 +561,7 @@ struct npc_amanishi_lookout : public NullCreatureAI
 
     void MoveInLineOfSight(Unit* who) override
     {
-        if (!me->IsWithinDist(who, 25.0f, false)) // distance not confirmed
+        if (!me->IsWithinDist(who, me->GetAggroRange(who), false))
                 return;
 
         Player* player = who->GetCharmerOrOwnerPlayerOrPlayerItself();
