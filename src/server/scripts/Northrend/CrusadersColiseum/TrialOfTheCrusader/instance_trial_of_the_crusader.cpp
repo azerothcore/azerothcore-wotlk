@@ -1206,15 +1206,21 @@ public:
                                         if (Group* group = plr->GetGroup())
                                         {
                                             if (Player* gLeader = ObjectAccessor::FindPlayer(group->GetLeaderGUID()))
+                                            {
                                                 TeamIdInInstance = Player::TeamIdForRace(gLeader->getRace());
                                                 break;
+                                            }
                                             else
+                                            {
                                                 TeamIdInInstance = plr->GetTeamId();
                                                 break;
+                                            }
                                         }
                                         else
+                                        {
                                             TeamIdInInstance = plr->GetTeamId();
                                             break;
+                                        }
                                     }
                         }
                         if (Creature* c = instance->GetCreature(TeamIdInInstance == TEAM_ALLIANCE ? NPC_VarianGUID : NPC_GarroshGUID))
