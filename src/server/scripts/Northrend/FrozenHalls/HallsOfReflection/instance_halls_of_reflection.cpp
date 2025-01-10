@@ -20,6 +20,7 @@
 #include "Transport.h"
 #include "halls_of_reflection.h"
 #include "InstanceScript.h"
+#include "Group.h"
 
 class UtherBatteredHiltEvent : public BasicEvent
 {
@@ -217,9 +218,9 @@ public:
         {
             if (TeamIdInInstance == TEAM_NEUTRAL)
             {
-                if (Group* pGroup = player->GetGroup())
+                if (Group* group = player->GetGroup())
                 {
-                    if (Player* gLeader = ObjectAccessor::FindPlayer(pGroup->GetLeaderGUID()))
+                    if (Player* gLeader = ObjectAccessor::FindPlayer(group->GetLeaderGUID()))
                         TeamIdInInstance = Player::TeamIdForRace(gLeader->getRace());
                     else
                         TeamIdInInstance = player->GetTeamId();
@@ -248,9 +249,9 @@ public:
                         if (Player* p = itr->GetSource())
                             if (!p->IsGameMaster())
                             {
-                                if (Group* pGroup = p->GetGroup())
+                                if (Group* group = p->GetGroup())
                                 {
-                                    if (Player* gLeader = ObjectAccessor::FindPlayer(pGroup->GetLeaderGUID()))
+                                    if (Player* gLeader = ObjectAccessor::FindPlayer(group->GetLeaderGUID()))
                                         TeamIdInInstance = Player::TeamIdForRace(gLeader->getRace());
                                         break;
                                     else
