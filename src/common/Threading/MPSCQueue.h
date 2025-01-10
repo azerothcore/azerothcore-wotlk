@@ -19,19 +19,20 @@
 #define MPSCQueue_h__
 
 #include <atomic>
+#include <memory>
 
 namespace Acore::Impl
 {
-    // C++ implementation of Dmitry Vyukov's lock free MPSC queue
-    // http://www.1024cores.net/home/lock-free-algorithms/queues/non-intrusive-mpsc-node-based-queue
+    // C++ implementation of Dmitry Vyukov's lock free MPSC queue (Non-Intrusive)
     template<typename T>
     class MPSCQueueNonIntrusive
     {
     public:
-        MPSCQueueNonIntrusive() : _head(new Node()), _tail(_head.load(std::memory_order_relaxed))
+        MPSCQueueNonIntrusive()
+            : _head(new Node(nullptr)), _tail(_head.load(std::memory_order_acquire))
         {
-            Node* front = _head.load(std::memory_order_relaxed);
-            front->Next.store(nullptr, std::memory_order_relaxed);
+            Node* front = _head.load(std::memory_order_acquire);
+            front->Next.store(nullptr, std::memory_order_release);  // store with release to ensure visibility
         }
 
         ~MPSCQueueNonIntrusive()
@@ -40,20 +41,26 @@ namespace Acore::Impl
             while (Dequeue(output))
                 delete output;
 
-            Node* front = _head.load(std::memory_order_relaxed);
-            delete front;
+            // Properly delete remaining nodes
+            Node* front = _head.load(std::memory_order_acquire);
+            while (front)
+            {
+                Node* next = front->Next.load(std::memory_order_acquire);
+                delete front;
+                front = next;
+            }
         }
 
         void Enqueue(T* input)
         {
             Node* node = new Node(input);
-            Node* prevHead = _head.exchange(node, std::memory_order_acq_rel);
+            Node* prevHead = _head.exchange(node, std::memory_order_acq_rel);  // exchange with acquire-release semantics
             prevHead->Next.store(node, std::memory_order_release);
         }
 
         bool Dequeue(T*& result)
         {
-            Node* tail = _tail.load(std::memory_order_relaxed);
+            Node* tail = _tail.load(std::memory_order_acquire);
             Node* next = tail->Next.load(std::memory_order_acquire);
             if (!next)
                 return false;
@@ -67,11 +74,9 @@ namespace Acore::Impl
     private:
         struct Node
         {
-            Node() = default;
-            explicit Node(T* data) : Data(data)
-            {
-                Next.store(nullptr, std::memory_order_relaxed);
-            }
+            explicit Node(T* data)
+                : Data(data), Next(nullptr)
+            {}
 
             T* Data;
             std::atomic<Node*> Next;
@@ -84,18 +89,17 @@ namespace Acore::Impl
         MPSCQueueNonIntrusive& operator=(MPSCQueueNonIntrusive const&) = delete;
     };
 
-    // C++ implementation of Dmitry Vyukov's lock free MPSC queue
-    // http://www.1024cores.net/home/lock-free-algorithms/queues/intrusive-mpsc-node-based-queue
+    // C++ implementation of Dmitry Vyukov's lock free MPSC queue (Intrusive)
     template<typename T, std::atomic<T*> T::* IntrusiveLink>
     class MPSCQueueIntrusive
     {
     public:
-        MPSCQueueIntrusive() : _dummyPtr(reinterpret_cast<T*>(std::addressof(_dummy))), _head(_dummyPtr), _tail(_dummyPtr)
+        MPSCQueueIntrusive()
+            : _dummyPtr(reinterpret_cast<T*>(std::addressof(_dummy))), _head(_dummyPtr), _tail(_dummyPtr)
         {
-            // _dummy is constructed from aligned_storage and is intentionally left uninitialized (it might not be default constructible)
-            // so we init only its IntrusiveLink here
+            // Initialize the intrusive link in the dummy node
             std::atomic<T*>* dummyNext = new (&(_dummyPtr->*IntrusiveLink)) std::atomic<T*>();
-            dummyNext->store(nullptr, std::memory_order_relaxed);
+            dummyNext->store(nullptr, std::memory_order_release);
         }
 
         ~MPSCQueueIntrusive()
@@ -107,14 +111,15 @@ namespace Acore::Impl
 
         void Enqueue(T* input)
         {
+            // Set the next link to nullptr initially
             (input->*IntrusiveLink).store(nullptr, std::memory_order_release);
-            T* prevHead = _head.exchange(input, std::memory_order_acq_rel);
+            T* prevHead = _head.exchange(input, std::memory_order_acq_rel);  // exchange with acquire-release semantics
             (prevHead->*IntrusiveLink).store(input, std::memory_order_release);
         }
 
         bool Dequeue(T*& result)
         {
-            T* tail = _tail.load(std::memory_order_relaxed);
+            T* tail = _tail.load(std::memory_order_acquire);
             T* next = (tail->*IntrusiveLink).load(std::memory_order_acquire);
             if (tail == _dummyPtr)
             {
@@ -137,6 +142,7 @@ namespace Acore::Impl
             if (tail != head)
                 return false;
 
+            // If the queue is empty, re-enqueue the dummy node to allow new enqueue operations
             Enqueue(_dummyPtr);
             next = (tail->*IntrusiveLink).load(std::memory_order_acquire);
             if (next)
@@ -149,7 +155,7 @@ namespace Acore::Impl
         }
 
     private:
-        std::aligned_storage_t<sizeof(T), alignof(T)> _dummy;
+        std::aligned_storage_t<sizeof(T), alignof(T)> _dummy;  // Used to store the dummy object
         T* _dummyPtr;
         std::atomic<T*> _head;
         std::atomic<T*> _tail;
@@ -159,6 +165,7 @@ namespace Acore::Impl
     };
 }
 
+// Conditional type alias for MPSCQueue
 template<typename T, std::atomic<T*> T::* IntrusiveLink = nullptr>
 using MPSCQueue = std::conditional_t<IntrusiveLink != nullptr, Acore::Impl::MPSCQueueIntrusive<T, IntrusiveLink>, Acore::Impl::MPSCQueueNonIntrusive<T>>;
 
