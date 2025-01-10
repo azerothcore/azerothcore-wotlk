@@ -217,9 +217,9 @@ public:
         {
             if (TeamIdInInstance == TEAM_NEUTRAL)
             {
-                if (Group* group = player->GetGroup())
+                if (Group* pGroup = player->GetGroup())
                 {
-                    if (Player* gLeader = ObjectAccessor::FindPlayer(group->GetLeaderGUID()))
+                    if (Player* gLeader = ObjectAccessor::FindPlayer(pGroup->GetLeaderGUID()))
                         TeamIdInInstance = Player::TeamIdForRace(gLeader->getRace());
                     else
                         TeamIdInInstance = player->GetTeamId();
@@ -248,9 +248,9 @@ public:
                         if (Player* p = itr->GetSource())
                             if (!p->IsGameMaster())
                             {
-                                if (Group* group = p->GetGroup())
+                                if (Group* pGroup = p->GetGroup())
                                 {
-                                    if (Player* gLeader = ObjectAccessor::FindPlayer(group->GetLeaderGUID()))
+                                    if (Player* gLeader = ObjectAccessor::FindPlayer(pGroup->GetLeaderGUID()))
                                         TeamIdInInstance = Player::TeamIdForRace(gLeader->getRace());
                                         break;
                                     else
