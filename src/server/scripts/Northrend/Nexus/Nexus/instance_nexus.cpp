@@ -49,25 +49,29 @@ public:
             SetHeaders(DataHeader);
             SetBossNumber(MAX_ENCOUNTERS);
             LoadDoorData(doorData);
+
+            TeamIdInInstance = TEAM_NEUTRAL;
         }
 
         void OnCreatureCreate(Creature* creature) override
         {
-            Map::PlayerList const& players = instance->GetPlayers();
-            TeamId TeamIdInInstance = TEAM_NEUTRAL;
-            if (!players.IsEmpty())
-                if (Player* pPlayer = players.begin()->GetSource())
-                {
-                    if (Group* group = pPlayer->GetGroup())
+            if (TeamIdInInstance = TEAM_NEUTRAL)
+            {
+                Map::PlayerList const& players = instance->GetPlayers();
+                if (!players.IsEmpty())
+                    if (Player* pPlayer = players.begin()->GetSource())
                     {
-                        if (Player* gLeader = ObjectAccessor::FindPlayer(group->GetLeaderGUID()))
-                            TeamIdInInstance = Player::TeamIdForRace(gLeader->getRace());
+                        if (Group* group = pPlayer->GetGroup())
+                        {
+                            if (Player* gLeader = ObjectAccessor::FindPlayer(group->GetLeaderGUID()))
+                                TeamIdInInstance = Player::TeamIdForRace(gLeader->getRace());
+                            else
+                                TeamIdInInstance = pPlayer->GetTeamId();
+                        }
                         else
                             TeamIdInInstance = pPlayer->GetTeamId();
                     }
-                    else
-                        TeamIdInInstance = pPlayer->GetTeamId();
-                }
+            }
 
             switch (creature->GetEntry())
             {
@@ -190,6 +194,8 @@ public:
                 (*i)->RemoveGameObjectFlag(GO_FLAG_NOT_SELECTABLE);
             return true;
         }
+    protected:
+        TeamId TeamIdInInstance;
     };
 };
 
