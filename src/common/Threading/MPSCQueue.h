@@ -74,9 +74,11 @@ namespace Acore::Impl
     private:
         struct Node
         {
-            explicit Node(T* data)
-                : Data(data), Next(nullptr)
-            {}
+            Node() = default;
+            explicit Node(T* data) : Data(data)
+            {
+                Next.store(nullptr, std::memory_order_release);
+            }
 
             T* Data;
             std::atomic<Node*> Next;
