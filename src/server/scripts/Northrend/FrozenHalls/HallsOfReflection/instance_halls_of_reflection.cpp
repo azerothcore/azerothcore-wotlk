@@ -252,15 +252,21 @@ public:
                                 if (Group* group = p->GetGroup())
                                 {
                                     if (Player* gLeader = ObjectAccessor::FindPlayer(group->GetLeaderGUID()))
+                                    {
                                         TeamIdInInstance = Player::TeamIdForRace(gLeader->getRace());
                                         break;
+                                    }
                                     else
+                                    {
                                         TeamIdInInstance = p->GetTeamId();
                                         break;
+                                    }
                                 }
                                 else
+                                {
                                     TeamIdInInstance = p->GetTeamId();
                                     break;
+                                }
                             }
             }
 
