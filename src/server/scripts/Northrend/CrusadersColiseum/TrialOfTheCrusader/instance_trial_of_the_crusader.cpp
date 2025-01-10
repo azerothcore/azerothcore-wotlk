@@ -1205,7 +1205,7 @@ public:
                                     {
                                         if (Group* group = plr->GetGroup())
                                         {
-                                            if (Player* gLeader = ObjectAccessor::FindPlayer(plr->GetGroup()->GetLeaderGUID()))
+                                            if (Player* gLeader = ObjectAccessor::FindPlayer(group->GetLeaderGUID()))
                                                 TeamIdInInstance = Player::TeamIdForRace(gLeader->getRace());
                                                 break;
                                             else
@@ -1411,7 +1411,7 @@ public:
             {
                 if (Group* group = plr->GetGroup())
                 {
-                    if (Player* gLeader = ObjectAccessor::FindPlayer(plr->GetGroup()->GetLeaderGUID()))
+                    if (Player* gLeader = ObjectAccessor::FindPlayer(group->GetLeaderGUID()))
                         TeamIdInInstance = Player::TeamIdForRace(gLeader->getRace());
                     else
                         TeamIdInInstance = plr->GetTeamId();
