@@ -20,6 +20,7 @@
 #include "ScriptedCreature.h"
 #include "nexus.h"
 #include "Player.h"
+#include "Group.h"
 
 DoorData const doorData[] =
 {
