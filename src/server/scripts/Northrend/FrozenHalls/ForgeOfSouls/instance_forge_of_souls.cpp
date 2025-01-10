@@ -19,6 +19,8 @@
 #include "Player.h"
 #include "ScriptedCreature.h"
 #include "forge_of_souls.h"
+#include "Group.h"
+
 
 BossBoundaryData const boundaries =
 {
