@@ -21,6 +21,7 @@
 #include "InstanceMapScript.h"
 #include "InstanceScript.h"
 #include "shattered_halls.h"
+#include "Group.h"
 
 ObjectData const creatureData[] =
 {
