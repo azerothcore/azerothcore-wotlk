@@ -21,7 +21,6 @@
 #include "forge_of_souls.h"
 #include "Group.h"
 
-
 BossBoundaryData const boundaries =
 {
     { DATA_BRONJAHM,    new CircleBoundary(Position(5297.3f, 2506.45f), 100.96)                                                                                   },
