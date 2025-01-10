@@ -55,7 +55,7 @@ public:
 
         void OnCreatureCreate(Creature* creature) override
         {
-            if (TeamIdInInstance = TEAM_NEUTRAL)
+            if (TeamIdInInstance == TEAM_NEUTRAL)
             {
                 Map::PlayerList const& players = instance->GetPlayers();
                 if (!players.IsEmpty())
