@@ -71,21 +71,21 @@ public:
 
         void OnPlayerEnter(Player* player) override
         {
-            if (TeamIdInInstance == TEAM_NEUTRAL)
+            if (teamIdInInstance == TEAM_NEUTRAL)
             {
                 if (Group* group = player->GetGroup())
                 {
                     if (Player* gLeader = ObjectAccessor::FindPlayer(group->GetLeaderGUID()))
-                        TeamIdInInstance = Player::TeamIdForRace(gLeader->getRace());
+                        teamIdInInstance = Player::TeamIdForRace(gLeader->getRace());
                     else
-                        TeamIdInInstance = player->GetTeamId();
+                        teamIdInInstance = player->GetTeamId();
                 }
                 else
-                    TeamIdInInstance = player->GetTeamId();
+                    teamIdInInstance = player->GetTeamId();
             }
             
             if (sWorld->getBoolConfig(CONFIG_ALLOW_TWO_SIDE_INTERACTION_GROUP))
-                player->SetFaction((TeamIdInInstance == TEAM_HORDE) ? 1610 : 1);
+                player->SetFaction((teamIdInInstance == TEAM_HORDE) ? 1610 : 1);
             
             // this will happen only after crash and loading the instance from db
             if (m_auiEncounter[0] == DONE && m_auiEncounter[1] == DONE && (!NPC_LeaderSecondGUID || !instance->GetCreature(NPC_LeaderSecondGUID)))
@@ -112,12 +112,12 @@ public:
                         if (Group* group = player->GetGroup())
                         {
                             if (Player* gLeader = ObjectAccessor::FindPlayer(group->GetLeaderGUID()))
-                                TeamIdInInstance = Player::TeamIdForRace(gLeader->getRace());
+                                teamIdInInstance = Player::TeamIdForRace(gLeader->getRace());
                             else
-                                TeamIdInInstance = player->GetTeamId();
+                                teamIdInInstance = player->GetTeamId();
                         }
                         else
-                            TeamIdInInstance = player->GetTeamId();
+                            teamIdInInstance = player->GetTeamId();
                     }
             }
 
