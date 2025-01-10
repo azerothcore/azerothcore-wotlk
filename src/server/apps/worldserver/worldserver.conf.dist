@@ -3744,15 +3744,6 @@ Battleground.Alterac.Reinforcements = 600
 Battleground.Alterac.ReputationOnBossDeath = 350
 
 #
-#    Battleground.EyeOfTheStorm.CapturePoints
-#        Description: Set the number of capture points required for a team to win in Eye of the Storm battleground
-#                     (The UI part of the max team score will not be compliant with this parameter without client modification)
-#        Default:     1600 (WotLK, UI compliant)
-#                     2000 (TBC)
-
-Battleground.EyeOfTheStorm.CapturePoints = 1600
-
-#
 ###################################################################################################
 
 ###################################################################################################
