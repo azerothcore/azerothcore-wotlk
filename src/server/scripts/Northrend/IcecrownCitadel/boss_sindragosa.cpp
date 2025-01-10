@@ -1116,7 +1116,7 @@ public:
         // for players and pets check only dynamic los (ice block gameobjects)
         if (unit->IsUnit() && unit->ToUnit()->HasUnitState(UNIT_STATE_MELEE_ATTACKING) && unit->ToUnit()->IsWithinMeleeRange(_caster))
             return false;
-        return !_caster->IsWithinLOSInMap(unit, VMAP::ModelIgnoreFlags::Nothing, LINEOFSIGHT_CHECK_GOBJECT_ALL);
+        return !_caster->IsWithinLOSInMap(unit, VMAP::ModelIgnoreFlags::Nothing, LINEOFSIGHT_CHECK_GOBJECT_M2, 0, _caster->GetCombatReach() * 0.7);
     }
 
 private:
