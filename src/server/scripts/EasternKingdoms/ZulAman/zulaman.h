@@ -54,6 +54,7 @@ enum CreatureIds
     NPC_HALAZZI                         = 23577,
     NPC_NALORAKK                        = 23576,
     NPC_SPIRIT_LYNX                     = 24143,
+    NPC_AMANISHI_SAVAGE                 = 23889,
     NPC_AMANISHI_WARBRINGER             = 23580,
     NPC_AMANISHI_TRIBESMAN              = 23582,
     NPC_AMANISHI_MEDICINE_MAN           = 23581,
