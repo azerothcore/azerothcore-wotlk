@@ -1,3 +1,4 @@
+-- DB update 2025_01_10_00 -> 2025_01_10_01
 --
 DELETE FROM `spell_script_names` WHERE `spell_id`=42577 AND `ScriptName`='spell_zuljin_zap';
 INSERT INTO `spell_script_names` (`spell_id`, `ScriptName`) VALUES(42577, 'spell_zuljin_zap');
