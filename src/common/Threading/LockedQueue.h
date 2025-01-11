@@ -46,7 +46,7 @@ public:
 
     /**
      * @brief Adds an item to the back of the queue.
-     * 
+     *
      * @param item The item to be added to the queue.
      */
     void add(const T& item)
@@ -57,7 +57,7 @@ public:
 
     /**
      * @brief Adds a range of items to the front of the queue.
-     * 
+     *
      * @param begin Iterator pointing to the beginning of the range of items to be added.
      * @param end Iterator pointing to the end of the range of items to be added.
      */
@@ -70,7 +70,7 @@ public:
 
     /**
      * @brief Gets the next item in the queue and removes it.
-     * 
+     *
      * @param result The variable where the next item will be stored.
      * @return true if an item was retrieved and removed, false if the queue is empty.
      */
@@ -89,7 +89,7 @@ public:
 
     /**
      * @brief Retrieves the next item from the queue if it satisfies the provided checker.
-     * 
+     *
      * @param result The variable where the next item will be stored.
      * @param check A checker object that will be used to validate the item.
      * @return true if an item was retrieved, checked, and removed; false otherwise.
@@ -115,7 +115,7 @@ public:
 
     /**
      * @brief Peeks at the top of the queue without removing it.
-     * 
+     *
      * @return A reference to the item at the front of the queue, assuming there's an item in the queue (as per previous implementation)
      */
     T& peek()
@@ -134,7 +134,7 @@ public:
 
     /**
      * @brief Checks if the queue has been canceled.
-     * 
+     *
      * @return true if the queue is canceled, false otherwise.
      */
     bool cancelled() const
@@ -144,7 +144,7 @@ public:
 
     /**
      * @brief Checks if the queue is empty.
-     * 
+     *
      * @return true if the queue is empty, false otherwise.
      */
     bool empty() const
