@@ -26,28 +26,41 @@
 template <class T, typename StorageType = std::deque<T>>
 class LockedQueue
 {
-    mutable std::mutex _lock;
+    mutable std::mutex _lock; ///< Mutex to protect access to the queue
 
-    std::atomic<bool> _canceled{false};
+    std::atomic<bool> _canceled{false}; ///< Flag indicating if the queue is canceled
 
-    StorageType _queue;
+    StorageType _queue; ///< Storage container for the queue
 
 public:
 
-    // Create a LockedQueue.
+    /**
+     * @brief Default constructor to create an empty LockedQueue.
+     */
     LockedQueue() = default;
 
-    // Destroy a LockedQueue.
+    /**
+     * @brief Destructor for LockedQueue.
+     */
     virtual ~LockedQueue() = default;
 
-    // Adds an item to the queue.
+    /**
+     * @brief Adds an item to the back of the queue.
+     * 
+     * @param item The item to be added to the queue.
+     */
     void add(const T& item)
     {
         std::lock_guard<std::mutex> lock(_lock);
         _queue.push_back(std::move(item));
     }
 
-    // Adds items back to front of the queue
+    /**
+     * @brief Adds a range of items to the front of the queue.
+     * 
+     * @param begin Iterator pointing to the beginning of the range of items to be added.
+     * @param end Iterator pointing to the end of the range of items to be added.
+     */
     template<class Iterator>
     void readd(Iterator begin, Iterator end)
     {
@@ -55,7 +68,12 @@ public:
         _queue.insert(_queue.begin(), begin, end);
     }
 
-    // Gets the next result in the queue, if any.
+    /**
+     * @brief Gets the next item in the queue and removes it.
+     * 
+     * @param result The variable where the next item will be stored.
+     * @return true if an item was retrieved and removed, false if the queue is empty.
+     */
     bool next(T& result)
     {
         std::lock_guard<std::mutex> lock(_lock);
@@ -69,6 +87,13 @@ public:
         return true;
     }
 
+    /**
+     * @brief Retrieves the next item from the queue if it satisfies the provided checker.
+     * 
+     * @param result The variable where the next item will be stored.
+     * @param check A checker object that will be used to validate the item.
+     * @return true if an item was retrieved, checked, and removed; false otherwise.
+     */
     template<class Checker>
     bool next(T& result, Checker& check)
     {
@@ -88,33 +113,49 @@ public:
         return true;
     }
 
-    // Peeks at the top of the queue.
+    /**
+     * @brief Peeks at the top of the queue without removing it.
+     * 
+     * @return A reference to the item at the front of the queue, assuming there's an item in the queue (as per previous implementation)
+     */
     T& peek()
     {
         std::lock_guard<std::mutex> lock(_lock);
-        return std::move(_queue.front());
+        return _queue.front();
     }
 
-    // Cancels the queue.
+    /**
+     * @brief Cancels the queue, preventing further processing of items.
+     */
     void cancel()
     {
         _canceled.store(true, std::memory_order_release);
     }
 
-    // Checks if the queue is cancelled.
+    /**
+     * @brief Checks if the queue has been canceled.
+     * 
+     * @return true if the queue is canceled, false otherwise.
+     */
     bool cancelled() const
     {
         return _canceled.load(std::memory_order_acquire);
     }
 
-    // Checks if the queue is empty.
+    /**
+     * @brief Checks if the queue is empty.
+     * 
+     * @return true if the queue is empty, false otherwise.
+     */
     bool empty() const
     {
         std::lock_guard<std::mutex> lock(_lock);
         return _queue.empty();
     }
 
-    // Calls pop_front of the queue.
+    /**
+     * @brief Removes the item at the front of the queue.
+     */
     void pop_front()
     {
         std::lock_guard<std::mutex> lock(_lock);
