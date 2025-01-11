@@ -84,10 +84,10 @@ public:
                 else
                     teamIdInInstance = player->GetTeamId();
             }
-            
+
             if (sWorld->getBoolConfig(CONFIG_ALLOW_TWO_SIDE_INTERACTION_GROUP))
                 player->SetFaction((teamIdInInstance == TEAM_HORDE) ? 1610 : 1);
-            
+
             // this will happen only after crash and loading the instance from db
             if (m_auiEncounter[0] == DONE && m_auiEncounter[1] == DONE && (!NPC_LeaderSecondGUID || !instance->GetCreature(NPC_LeaderSecondGUID)))
             {

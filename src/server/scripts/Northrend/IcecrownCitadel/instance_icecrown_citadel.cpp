@@ -273,7 +273,7 @@ public:
                 else
                     TeamIdInInstance = player->GetTeamId();
             }
-            
+
             if (sWorld->getBoolConfig(CONFIG_ALLOW_TWO_SIDE_INTERACTION_GROUP))
                 player->SetFaction((TeamIdInInstance == TEAM_HORDE) ? 1610 : 1);
 

@@ -1428,7 +1428,7 @@ public:
 
             if (sWorld->getBoolConfig(CONFIG_ALLOW_TWO_SIDE_INTERACTION_GROUP))
                 plr->SetFaction((TeamIdInInstance == TEAM_HORDE) ? 1610 : 1);
-            
+
             if (instance->IsHeroic())
             {
                 plr->SendUpdateWorldState(UPDATE_STATE_UI_SHOW, 1);
