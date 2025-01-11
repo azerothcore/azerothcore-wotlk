@@ -25,7 +25,7 @@ namespace Acore::Impl
 {
     /**
      * @brief C++ implementation of Dmitry Vyukov's lock-free MPSC queue (Non-Intrusive).
-     * 
+     *
      * This queue allows multiple producers to enqueue items concurrently, but only one consumer
      * can dequeue items. The queue is lock-free and non-intrusive, meaning it does not modify
      * the data types that are enqueued.
