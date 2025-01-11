@@ -456,7 +456,7 @@ bool LootItem::AllowedForPlayer(Player const* player, ObjectGuid source) const
     }
 
     // Master looter can see all items even if the character can't loot them
-    if (isMasterLooter && itemVisibleForMasterLooter)
+    if (isMasterLooter || itemVisibleForMasterLooter)
     {
         return true;
     }
