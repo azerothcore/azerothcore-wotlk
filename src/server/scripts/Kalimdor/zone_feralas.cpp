@@ -76,10 +76,9 @@ class spell_transmogrify : public SpellScript
         // Validate the target
         if (!target || validCreatureIds.find(target->GetEntry()) == validCreatureIds.end())
             return SPELL_FAILED_BAD_TARGETS; // Prevent the spell cast with an error
-      
+
         return SPELL_CAST_OK; // Allow the spell cast
     }
-
 
     void Register() override
     {
