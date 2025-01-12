@@ -105,14 +105,14 @@ public:
 
     typedef std::set<uint16> ActiveEvents;
     typedef std::vector<GameEventData> GameEventDataMap;
-    [[nodiscard]] ActiveEvents const& GetActiveEventList() const { return m_ActiveEvents; }
-    [[nodiscard]] GameEventDataMap const& GetEventMap() const { return mGameEvent; }
+    [[nodiscard]] ActiveEvents const& GetActiveEventList() const { return _activeEvents; }
+    [[nodiscard]] GameEventDataMap const& GetEventMap() const { return _gameEvent; }
     [[nodiscard]] bool CheckOneGameEvent(uint16 entry) const;
     [[nodiscard]] uint32 NextCheck(uint16 entry) const;
     void LoadFromDB();
     void LoadHolidayDates();
     uint32 Update();
-    bool IsActiveEvent(uint16 event_id) { return (m_ActiveEvents.find(event_id) != m_ActiveEvents.end()); }
+    bool IsActiveEvent(uint16 event_id) { return (_activeEvents.find(event_id) != _activeEvents.end()); }
     uint32 StartSystem();
     void Initialize();
     void StartArenaSeason();
@@ -126,8 +126,8 @@ public:
     [[nodiscard]] uint32 GetHolidayEventId(uint32 holidayId) const;
 private:
     void SendWorldStateUpdate(Player* player, uint16 event_id);
-    void AddActiveEvent(uint16 event_id) { m_ActiveEvents.insert(event_id); }
-    void RemoveActiveEvent(uint16 event_id) { m_ActiveEvents.erase(event_id); }
+    void AddActiveEvent(uint16 event_id) { _activeEvents.insert(event_id); }
+    void RemoveActiveEvent(uint16 event_id) { _activeEvents.erase(event_id); }
     void ApplyNewEvent(uint16 event_id);
     void UnApplyEvent(uint16 event_id);
     void GameEventSpawn(int16 event_id);
@@ -141,10 +141,10 @@ private:
     void RunSmartAIScripts(uint16 event_id, bool activate);    //! Runs SMART_EVENT_GAME_EVENT_START/_END SAI
     bool CheckOneGameEventConditions(uint16 event_id);
     void SaveWorldEventStateToDB(uint16 event_id);
-    bool hasCreatureQuestActiveEventExcept(uint32 quest_id, uint16 event_id);
-    bool hasGameObjectQuestActiveEventExcept(uint32 quest_id, uint16 event_id);
-    bool hasCreatureActiveEventExcept(ObjectGuid::LowType creature_guid, uint16 event_id);
-    bool hasGameObjectActiveEventExcept(ObjectGuid::LowType go_guid, uint16 event_id);
+    bool HasCreatureQuestActiveEventExcept(uint32 quest_id, uint16 event_id);
+    bool HasGameObjectQuestActiveEventExcept(uint32 quest_id, uint16 event_id);
+    bool HasCreatureActiveEventExcept(ObjectGuid::LowType creature_guid, uint16 event_id);
+    bool HasGameObjectActiveEventExcept(ObjectGuid::LowType go_guid, uint16 event_id);
     void SetHolidayEventTime(GameEventData& event);
 
     typedef std::list<ObjectGuid::LowType> GuidLowList;
@@ -165,24 +165,24 @@ private:
     typedef std::vector<NPCFlagList> GameEventNPCFlagMap;
     typedef std::vector<uint32> GameEventBitmask;
     typedef std::unordered_map<uint32, std::vector<uint32>> GameEventSeasonalQuestsMap;
-    GameEventQuestMap mGameEventCreatureQuests;
-    GameEventQuestMap mGameEventGameObjectQuests;
-    GameEventNPCVendorMap mGameEventVendors;
-    GameEventModelEquipMap mGameEventModelEquip;
+    GameEventQuestMap _gameEventCreatureQuests;
+    GameEventQuestMap _gameEventGameObjectQuests;
+    GameEventNPCVendorMap _gameEventVendors;
+    GameEventModelEquipMap _gameEventModelEquip;
     //GameEventGuidMap  mGameEventCreatureGuids;
     //GameEventGuidMap  mGameEventGameobjectGuids;
-    GameEventIdMap    mGameEventPoolIds;
-    GameEventDataMap  mGameEvent;
-    GameEventBitmask  mGameEventBattlegroundHolidays;
-    QuestIdToEventConditionMap mQuestToEventConditions;
-    GameEventNPCFlagMap mGameEventNPCFlags;
-    ActiveEvents m_ActiveEvents;
-    bool isSystemInit;
+    GameEventIdMap    _gameEventPoolIds;
+    GameEventDataMap  _gameEvent;
+    GameEventBitmask  _gameEventBattlegroundHolidays;
+    QuestIdToEventConditionMap _questToEventConditions;
+    GameEventNPCFlagMap _gameEventNPCFlags;
+    ActiveEvents _activeEvents;
+    bool _isSystemInit;
     GameEventSeasonalQuestsMap _gameEventSeasonalQuestsMap;
 public:
-    GameEventGuidMap  mGameEventCreatureGuids;
-    GameEventGuidMap  mGameEventGameobjectGuids;
-    std::vector<uint32> modifiedHolidays;
+    GameEventGuidMap  GameEventCreatureGuids;
+    GameEventGuidMap  GameEventGameobjectGuids;
+    std::vector<uint32> ModifiedHolidays;
 };
 
 #define sGameEventMgr GameEventMgr::instance()
