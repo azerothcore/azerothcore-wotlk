@@ -52,6 +52,15 @@ class spell_gordunni_trap : public SpellScript
     }
 };
 
+enum ZAPPED_GIANTS
+{
+    NPC_SHORE_STRIDER = 5359,
+    NPC_DEEP_STRIDER = 5360,
+    NPC_LAND_WALKER = 5357,
+    NPC_WAVE_STRIDER = 5361,
+    NPC_CLIFF_GIANT = 5358
+};
+
 class spell_transmogrify : public SpellScript
 {
     PrepareSpellScript(spell_transmogrify);
@@ -62,7 +71,7 @@ class spell_transmogrify : public SpellScript
         Unit* target = GetExplTargetUnit(); // Explicit target selected by the caster
 
         // List of valid creature IDs
-        std::set<uint32> validCreatureIds = { 5357, 5358, 5359, 5360, 5361 };
+        std::set<uint32> validCreatureIds = { NPC_SHORE_STRIDER, NPC_DEEP_STRIDER, NPC_LAND_WALKER, NPC_WAVE_STRIDER, NPC_CLIFF_GIANT };
 
         // Validate the target
         if (!target || validCreatureIds.find(target->GetEntry()) == validCreatureIds.end())
