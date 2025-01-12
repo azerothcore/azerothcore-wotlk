@@ -150,5 +150,19 @@ public:
         std::lock_guard<std::mutex> lock(_lock);
         return _queue.empty();
     }
+
+    template<class Predicate>
+    bool contains(Predicate pred)
+    {
+        std::lock_guard<std::mutex> lock(_lock);
+        return std::any_of(_queue.begin(), _queue.end(), pred);
+    }
+
+    // Clears the queue.
+    void clear()
+    {
+        std::lock_guard<std::mutex> lock(_lock);
+        _queue.clear();
+    }
 };
 #endif

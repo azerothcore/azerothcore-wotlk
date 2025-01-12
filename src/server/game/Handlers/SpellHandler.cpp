@@ -97,8 +97,10 @@ void WorldSession::HandleUseItemOpcode(WorldPacket& recvPacket)
     // fail if we are cancelling pending request
     if (!_player->SpellQueue.empty())
     {
-        PendingSpellCastRequest& request = _player->SpellQueue.front(); // Peek at the first spell
-        if (request.cancelInProgress)
+        PendingSpellCastRequest& request = _player->SpellQueue.peek(); // Peek at the first spell
+        bool cancelInProgress = request.cancelInProgress;
+        _player->SpellQueue.unlock();
+        if (cancelInProgress)
         {
             pUser->SendEquipError(EQUIP_ERR_NONE, pItem, nullptr);
             recvPacket.rfinish(); // prevent spam at ignore packet
@@ -111,12 +113,12 @@ void WorldSession::HandleUseItemOpcode(WorldPacket& recvPacket)
         if (_player->CanRequestSpellCast(spellInfo))
         {
             recvPacket.rpos(0); // Reset read position to the start of the buffer.
-            _player->SpellQueue.emplace_back(
+            _player->SpellQueue.add({
                 spellId,
                 spellInfo->GetCategory(),
-                std::move(recvPacket), // Move ownership of recvPacket
-                true // itemCast
-            );
+                recvPacket,
+                true // isItem
+            });
             return;
         }
 
@@ -407,8 +409,10 @@ void WorldSession::HandleCastSpellOpcode(WorldPacket& recvPacket)
     // fail if we are cancelling pending request
     if (!_player->SpellQueue.empty())
     {
-        PendingSpellCastRequest& request = _player->SpellQueue.front(); // Peek at the first spell
-        if (request.cancelInProgress)
+        PendingSpellCastRequest& request = _player->SpellQueue.peek(); // Peek at the first spell
+        bool cancelInProgress = request.cancelInProgress;
+        _player->SpellQueue.unlock();
+        if (cancelInProgress)
         {
             Spell* spell = new Spell(_player, spellInfo, TRIGGERED_NONE);
             spell->m_cast_count = castCount;
@@ -425,11 +429,12 @@ void WorldSession::HandleCastSpellOpcode(WorldPacket& recvPacket)
         if (_player->CanRequestSpellCast(spellInfo))
         {
             recvPacket.rpos(0); // Reset read position to the start of the buffer.
-            _player->SpellQueue.emplace_back(
+            _player->SpellQueue.add({
                 spellId,
                 spellInfo->GetCategory(),
-                std::move(recvPacket) // Move ownership of recvPacket
-            );
+                recvPacket,
+                false // isItem
+            });
             return;
         }
     }

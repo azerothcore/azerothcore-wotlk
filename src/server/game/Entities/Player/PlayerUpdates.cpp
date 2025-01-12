@@ -2280,12 +2280,11 @@ bool Player::CanExecutePendingSpellCastRequest(SpellInfo const* spellInfo)
     return true;
 }
 
-const PendingSpellCastRequest* Player::GetCastRequest(uint32 category) const
+bool Player::CheckSpellRequestCategory(uint32 category)
 {
-    for (const PendingSpellCastRequest& request : SpellQueue)
-        if (request.category == category)
-            return &request;
-    return nullptr;
+    return SpellQueue.contains([category](const PendingSpellCastRequest& request) {
+        return request.category == category;
+    });
 }
 
 bool Player::CanRequestSpellCast(SpellInfo const* spellInfo)
@@ -2294,7 +2293,7 @@ bool Player::CanRequestSpellCast(SpellInfo const* spellInfo)
         return false;
 
     // Check for existing cast request with the same category
-    if (GetCastRequest(spellInfo->GetCategory()))
+    if (CheckSpellRequestCategory(spellInfo->GetCategory()))
         return false;
 
     if (GetGlobalCooldownMgr().GetGlobalCooldown(spellInfo) > GetSpellQueueWindow())
@@ -2327,24 +2326,25 @@ void Player::ExecuteOrCancelSpellCastRequest(PendingSpellCastRequest* request, b
     }
 }
 
+class SpellQueueChecker
+{
+public:
+    explicit SpellQueueChecker(Player* player) : _player(player) {}
+
+    bool Process(PendingSpellCastRequest request)
+    {
+        SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(request.spellId);
+        return _player->CanExecutePendingSpellCastRequest(spellInfo);
+    }
+
+private:
+    Player* _player;
+};
+
 void Player::ProcessSpellQueue()
 {
-    while (!SpellQueue.empty())
-    {
-        PendingSpellCastRequest& request = SpellQueue.front(); // Peek at the first spell
-        SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(request.spellId);
-        if (!spellInfo)
-        {
-            LOG_ERROR("entities.player", "Player::ProcessSpellQueue: Invalid spell {}", request.spellId);
-            SpellQueue.clear();
-            break;
-        }
-        if (CanExecutePendingSpellCastRequest(spellInfo))
-        {
-            ExecuteOrCancelSpellCastRequest(&request);
-            SpellQueue.pop_front(); // Remove from the queue
-        }
-        else // If the first spell can't execute, stop processing
-            break;
-    }
+    PendingSpellCastRequest request;
+    SpellQueueChecker check(this);
+    while (SpellQueue.next(request, check))
+        ExecuteOrCancelSpellCastRequest(&request);
 }

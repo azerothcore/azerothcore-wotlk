@@ -29,6 +29,7 @@
 #include "GroupReference.h"
 #include "InstanceSaveMgr.h"
 #include "Item.h"
+#include "LockedQueue.h"
 #include "MapReference.h"
 #include "ObjectMgr.h"
 #include "Optional.h"
@@ -1073,8 +1074,9 @@ struct PendingSpellCastRequest
     bool isItem = false;
     bool cancelInProgress = false;
 
-    PendingSpellCastRequest(uint32 spellId, uint32 category, WorldPacket&& packet, bool item = false, bool cancel = false)
-        : spellId(spellId), category(category), requestPacket(std::move(packet)), isItem(item) , cancelInProgress(cancel) {}
+    PendingSpellCastRequest() : spellId(0), category(0), requestPacket(), isItem(false), cancelInProgress(false) {}
+    PendingSpellCastRequest(uint32 spellId, uint32 category, WorldPacket& packet, bool item = false, bool cancel = false)
+        : spellId(spellId), category(category), requestPacket(packet), isItem(item) , cancelInProgress(cancel) {}
 };
 
 class Player : public Unit, public GridObject<Player>
@@ -2643,8 +2645,8 @@ protected:
     void ProcessSpellQueue();
 
 public:
-    std::deque<PendingSpellCastRequest> SpellQueue;
-    const PendingSpellCastRequest* GetCastRequest(uint32 category) const;
+    LockedQueue<PendingSpellCastRequest> SpellQueue;
+    bool CheckSpellRequestCategory(uint32 category);
     bool CanExecutePendingSpellCastRequest(SpellInfo const* spellInfo);
     void ExecuteOrCancelSpellCastRequest(PendingSpellCastRequest* castRequest, bool isCancel = false);
     bool CanRequestSpellCast(SpellInfo const* spellInfo);
