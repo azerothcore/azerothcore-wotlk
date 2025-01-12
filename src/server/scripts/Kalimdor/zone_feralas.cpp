@@ -52,7 +52,35 @@ class spell_gordunni_trap : public SpellScript
     }
 };
 
+class spell_transmogrify : public SpellScript
+{
+    PrepareSpellScript(spell_transmogrify);
+
+    SpellCastResult CheckTarget()
+    {
+        Unit* caster = GetCaster();
+        Unit* target = GetExplTargetUnit(); // Explicit target selected by the caster
+
+        // List of valid creature IDs
+        std::set<uint32> validCreatureIds = { 5357, 5358, 5359, 5360, 5361 };
+
+        // Validate the target
+        if (!target || validCreatureIds.find(target->GetEntry()) == validCreatureIds.end())
+            return SPELL_FAILED_BAD_TARGETS; // Prevent the spell cast with an error
+      
+        return SPELL_CAST_OK; // Allow the spell cast
+    }
+
+
+    void Register() override
+    {
+        // Register the check cast hook
+        OnCheckCast += SpellCheckCastFn(spell_transmogrify::CheckTarget);
+    }
+};
+
 void AddSC_feralas()
 {
     RegisterSpellScript(spell_gordunni_trap);
+    RegisterSpellScript(spell_transmogrify);
 }
