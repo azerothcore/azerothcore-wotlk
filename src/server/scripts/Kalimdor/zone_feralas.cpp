@@ -67,7 +67,6 @@ class spell_transmogrify : public SpellScript
 
     SpellCastResult CheckTarget()
     {
-        Unit* caster = GetCaster();
         Unit* target = GetExplTargetUnit(); // Explicit target selected by the caster
 
         // List of valid creature IDs
