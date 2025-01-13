@@ -5379,6 +5379,26 @@ class spell_pet_spellhit_expertise_spellpen_scaling : public AuraScript
     }
 };
 
+// 7098 - Curse of Mending
+// 39647 - Curse of Mending
+class spell_gen_proc_on_victim : public AuraScript
+{
+    PrepareAuraScript(spell_gen_proc_on_victim);
+
+    void OnProc(AuraEffect const* /*aurEff*/, ProcEventInfo& eventInfo)
+    {
+        PreventDefaultAction();
+
+        if (Unit* target = eventInfo.GetActionTarget())
+            GetUnitOwner()->CastSpell(target, GetSpellInfo()->Effects[EFFECT_0].TriggerSpell, true);
+    }
+
+    void Register() override
+    {
+        OnEffectProc += AuraEffectProcFn(spell_gen_proc_on_victim::OnProc, EFFECT_0, SPELL_AURA_PROC_TRIGGER_SPELL);
+    }
+};
+
 void AddSC_generic_spell_scripts()
 {
     RegisterSpellScript(spell_silithyst);
@@ -5538,4 +5558,5 @@ void AddSC_generic_spell_scripts()
     RegisterSpellScript(spell_gen_steal_weapon);
     RegisterSpellScript(spell_gen_set_health);
     RegisterSpellScript(spell_pet_spellhit_expertise_spellpen_scaling);
+    RegisterSpellScript(spell_gen_proc_on_victim);
 }

@@ -149,10 +149,10 @@ public:
 
         void OnGameObjectCreate(GameObject* go) override
         {
-            if (go->GetEntry() == GO_GATE_HEXLORD)
-                CheckInstanceStatus();
-
             InstanceScript::OnGameObjectCreate(go);
+
+            if (go->GetEntry() == GO_GATE_HEXLORD)
+                CheckInstanceStatus(go);
         }
 
         void SummonHostage(uint8 num)
@@ -189,10 +189,10 @@ public:
             }
         }
 
-        void CheckInstanceStatus()
+        void CheckInstanceStatus(GameObject* gate = nullptr)
         {
             if (AllBossesDone({ DATA_NALORAKK, DATA_AKILZON, DATA_JANALAI, DATA_HALAZZI }))
-                HandleGameObject(ObjectGuid::Empty, true, GetGameObject(DATA_HEXLORD_GATE));
+                HandleGameObject(ObjectGuid::Empty, true, gate ? gate : GetGameObject(DATA_HEXLORD_GATE));
         }
 
         void SetData(uint32 type, uint32 data) override
