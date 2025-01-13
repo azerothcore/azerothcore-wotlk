@@ -19,6 +19,7 @@
 #include "Player.h"
 #include "ScriptedCreature.h"
 #include "forge_of_souls.h"
+#include "Group.h"
 
 BossBoundaryData const boundaries =
 {
@@ -69,14 +70,36 @@ public:
             return false;
         }
 
-        void OnPlayerEnter(Player* /*plr*/) override
+        void OnPlayerEnter(Player* player) override
         {
+            if (teamIdInInstance == TEAM_NEUTRAL)
+            {
+                if (Group* group = player->GetGroup())
+                {
+                    if (Player* gLeader = ObjectAccessor::FindPlayer(group->GetLeaderGUID()))
+                        teamIdInInstance = Player::TeamIdForRace(gLeader->getRace());
+                    else
+                        teamIdInInstance = player->GetTeamId();
+                }
+                else
+                    teamIdInInstance = player->GetTeamId();
+            }
+
+            if (sWorld->getBoolConfig(CONFIG_ALLOW_TWO_SIDE_INTERACTION_GROUP))
+                player->SetFaction((teamIdInInstance == TEAM_HORDE) ? 1610 : 1);
+
             // this will happen only after crash and loading the instance from db
             if (m_auiEncounter[0] == DONE && m_auiEncounter[1] == DONE && (!NPC_LeaderSecondGUID || !instance->GetCreature(NPC_LeaderSecondGUID)))
             {
                 Position pos = {5658.15f, 2502.564f, 708.83f, 0.885207f};
                 instance->SummonCreature(NPC_SYLVANAS_PART2, pos);
             }
+        }
+
+        void OnPlayerLeave(Player* player) override
+        {
+            if (sWorld->getBoolConfig(CONFIG_ALLOW_TWO_SIDE_INTERACTION_GROUP))
+                player->SetFactionForRace(player->getRace());
         }
 
         void OnCreatureCreate(Creature* creature) override
@@ -86,7 +109,17 @@ public:
                 Map::PlayerList const& players = instance->GetPlayers();
                 if (!players.IsEmpty())
                     if (Player* player = players.begin()->GetSource())
-                        teamIdInInstance = player->GetTeamId();
+                    {
+                        if (Group* group = player->GetGroup())
+                        {
+                            if (Player* gLeader = ObjectAccessor::FindPlayer(group->GetLeaderGUID()))
+                                teamIdInInstance = Player::TeamIdForRace(gLeader->getRace());
+                            else
+                                teamIdInInstance = player->GetTeamId();
+                        }
+                        else
+                            teamIdInInstance = player->GetTeamId();
+                    }
             }
 
             switch (creature->GetEntry())
