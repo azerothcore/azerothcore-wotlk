@@ -20,6 +20,7 @@
 #include "Player.h"
 #include "ScriptedCreature.h"
 #include "pit_of_saron.h"
+#include "Group.h"
 
 class instance_pit_of_saron : public InstanceMapScript
 {
@@ -75,11 +76,33 @@ public:
             return false;
         }
 
-        void OnPlayerEnter(Player*  /*plr*/) override
+        void OnPlayerEnter(Player* player) override
         {
+            if (teamIdInInstance == TEAM_NEUTRAL)
+            {
+                if (Group* group = player->GetGroup())
+                {
+                    if (Player* gLeader = ObjectAccessor::FindPlayer(group->GetLeaderGUID()))
+                        teamIdInInstance = Player::TeamIdForRace(gLeader->getRace());
+                    else
+                        teamIdInInstance = player->GetTeamId();
+                }
+                else
+                    teamIdInInstance = player->GetTeamId();
+            }
+
+            if (sWorld->getBoolConfig(CONFIG_ALLOW_TWO_SIDE_INTERACTION_GROUP))
+                player->SetFaction((teamIdInInstance == TEAM_HORDE) ? 1610 : 1);
+
             instance->LoadGrid(LeaderIntroPos.GetPositionX(), LeaderIntroPos.GetPositionY());
             if (Creature* c = instance->GetCreature(GetGuidData(DATA_LEADER_FIRST_GUID)))
                 c->AI()->SetData(DATA_START_INTRO, 0);
+        }
+
+        void OnPlayerLeave(Player* player) override
+        {
+            if (sWorld->getBoolConfig(CONFIG_ALLOW_TWO_SIDE_INTERACTION_GROUP))
+                player->SetFactionForRace(player->getRace());
         }
 
         uint32 GetCreatureEntry(ObjectGuid::LowType /*guidLow*/, CreatureData const* data) override
@@ -89,7 +112,17 @@ public:
                 Map::PlayerList const& players = instance->GetPlayers();
                 if (!players.IsEmpty())
                     if (Player* player = players.begin()->GetSource())
-                        teamIdInInstance = player->GetTeamId();
+                    {
+                        if (Group* group = player->GetGroup())
+                        {
+                            if (Player* gLeader = ObjectAccessor::FindPlayer(group->GetLeaderGUID()))
+                                teamIdInInstance = Player::TeamIdForRace(gLeader->getRace());
+                            else
+                                teamIdInInstance = player->GetTeamId();
+                        }
+                        else
+                            teamIdInInstance = player->GetTeamId();
+                    }
             }
 
             uint32 entry = data->id1;
@@ -115,7 +148,17 @@ public:
                 Map::PlayerList const& players = instance->GetPlayers();
                 if (!players.IsEmpty())
                     if (Player* player = players.begin()->GetSource())
-                        teamIdInInstance = player->GetTeamId();
+                    {
+                        if (Group* group = player->GetGroup())
+                        {
+                            if (Player* gLeader = ObjectAccessor::FindPlayer(group->GetLeaderGUID()))
+                                teamIdInInstance = Player::TeamIdForRace(gLeader->getRace());
+                            else
+                                teamIdInInstance = player->GetTeamId();
+                        }
+                        else
+                            teamIdInInstance = player->GetTeamId();
+                    }
             }
 
             switch (creature->GetEntry())
