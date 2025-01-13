@@ -125,6 +125,22 @@ public:
     void LoadEventVendors();
     [[nodiscard]] uint32 GetHolidayEventId(uint32 holidayId) const;
 private:
+    void LoadEvents();
+    void LoadEventSaveData();
+    void LoadEventPrerequisiteData();
+    void LoadEventCreatureData();
+    void LoadEventGameObjectData();
+    void LoadEventModelEquipmentChangeData();
+    void LoadEventQuestData();
+    void LoadEventGameObjectQuestData();
+    void LoadEventQuestConditionData();
+    void LoadEventConditionData();
+    void LoadEventConditionSaveData();
+    void LoadEventNPCFlags();
+    void LoadEventSeasonalQuestRelations();
+    void LoadEventBattlegroundData();
+    void LoadEventPoolData();
+    
     void SendWorldStateUpdate(Player* player, uint16 event_id);
     void AddActiveEvent(uint16 event_id) { _activeEvents.insert(event_id); }
     void RemoveActiveEvent(uint16 event_id) { _activeEvents.erase(event_id); }
