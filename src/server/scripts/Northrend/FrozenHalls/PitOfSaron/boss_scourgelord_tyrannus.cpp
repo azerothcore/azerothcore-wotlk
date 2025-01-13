@@ -63,9 +63,9 @@ public:
         {
             pInstance = me->GetInstanceScript();
             me->SetReactState(REACT_PASSIVE);
-            if (Creature* c = pInstance->instance->GetCreature(pInstance->GetGuidData(DATA_RIMEFANG_GUID)))
+            if (Creature* rimefang = pInstance->instance->GetCreature(pInstance->GetGuidData(DATA_RIMEFANG_GUID)))
             {
-                c->SetCanFly(true);
+                rimefang->SetCanFly(true);
             }
         }
 
@@ -76,28 +76,27 @@ public:
         {
             me->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
             events.Reset();
-            if (me->HasReactState(REACT_AGGRESSIVE)) // Reset() called by EnterEvadeMode()
-            {
-                if (!pInstance)
-                    return;
-                if (Creature* c = pInstance->instance->GetCreature(pInstance->GetGuidData(DATA_MARTIN_OR_GORKUN_GUID)))
-                {
-                    c->AI()->DoAction(1);
-                    c->DespawnOrUnsummon();
-                    pInstance->SetGuidData(DATA_MARTIN_OR_GORKUN_GUID, ObjectGuid::Empty);
-                }
-                if (Creature* c = pInstance->instance->GetCreature(pInstance->GetGuidData(DATA_RIMEFANG_GUID)))
-                {
-                    c->GetMotionMaster()->Clear();
-                    c->GetMotionMaster()->MoveIdle();
+            pInstance->SetData(DATA_TYRANNUS, NOT_STARTED);
+        }
 
-                    c->RemoveAllAuras();
-                    c->UpdatePosition(1017.3f, 168.974f, 642.926f, 5.2709f, true);
-                    c->StopMovingOnCurrentPos();
-                    if (Vehicle* v = c->GetVehicleKit())
-                        v->InstallAllAccessories(false);
-                }
+        void EnterEvadeMode(EvadeReason /*why*/) override
+        {
+            if (!pInstance)
+                return;
+
+            if (Creature* creature = pInstance->instance->GetCreature(pInstance->GetGuidData(DATA_MARTIN_OR_GORKUN_GUID)))
+            {
+                creature->AI()->DoAction(1);
+                creature->DespawnOrUnsummon();
+                pInstance->SetGuidData(DATA_MARTIN_OR_GORKUN_GUID, ObjectGuid::Empty);
             }
+
+            // Tyrannus is temporarily spawned as Rimefang's rider. If he evades, despawn Rimefang.
+            // Tyrannus will be respawned once Rimefang respawns.
+            if (Creature* rimefang = pInstance->instance->GetCreature(pInstance->GetGuidData(DATA_RIMEFANG_GUID)))
+                rimefang->DespawnOnEvade();
+
+            me->DespawnOrUnsummon();
         }
 
         void DoAction(int32 param) override
@@ -140,7 +139,7 @@ public:
                 if (TSDistCheckPos.GetExactDist(x, y, z) > 100.0f || z > TSDistCheckPos.GetPositionZ() + 20.0f || z < TSDistCheckPos.GetPositionZ() - 20.0f)
                 {
                     me->SetHealth(me->GetMaxHealth());
-                    EnterEvadeMode();
+                    EnterEvadeMode(EVADE_REASON_OTHER);
                     return;
                 }
             }

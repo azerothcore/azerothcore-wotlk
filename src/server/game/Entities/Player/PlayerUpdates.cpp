@@ -2333,6 +2333,12 @@ void Player::ProcessSpellQueue()
     {
         PendingSpellCastRequest& request = SpellQueue.front(); // Peek at the first spell
         SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(request.spellId);
+        if (!spellInfo)
+        {
+            LOG_ERROR("entities.player", "Player::ProcessSpellQueue: Invalid spell {}", request.spellId);
+            SpellQueue.clear();
+            break;
+        }
         if (CanExecutePendingSpellCastRequest(spellInfo))
         {
             ExecuteOrCancelSpellCastRequest(&request);
