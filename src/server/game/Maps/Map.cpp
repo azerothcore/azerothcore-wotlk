@@ -3089,6 +3089,9 @@ void InstanceMap::RemovePlayerFromMap(Player* player, bool remove)
     // If remove == true - player already deleted.
     if (!remove)
         player->SetPendingBind(0, 0);
+
+    if (instance_data)
+        instance_data->OnPlayerLeave(player);
 }
 
 void InstanceMap::AfterPlayerUnlinkFromMap()

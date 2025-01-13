@@ -20,6 +20,7 @@
 #include "Transport.h"
 #include "halls_of_reflection.h"
 #include "InstanceScript.h"
+#include "Group.h"
 
 class UtherBatteredHiltEvent : public BasicEvent
 {
@@ -213,6 +214,31 @@ public:
             return (instance->HavePlayers() && WaveNumber)  || IsDuringLKFight; // during LK fight npcs are active and will unset this variable
         }
 
+        void OnPlayerEnter(Player* player) override
+        {
+            if (TeamIdInInstance == TEAM_NEUTRAL)
+            {
+                if (Group* group = player->GetGroup())
+                {
+                    if (Player* gLeader = ObjectAccessor::FindPlayer(group->GetLeaderGUID()))
+                        TeamIdInInstance = Player::TeamIdForRace(gLeader->getRace());
+                    else
+                        TeamIdInInstance = player->GetTeamId();
+                }
+                else
+                    TeamIdInInstance = player->GetTeamId();
+            }
+
+            if (sWorld->getBoolConfig(CONFIG_ALLOW_TWO_SIDE_INTERACTION_GROUP))
+                player->SetFaction((TeamIdInInstance == TEAM_HORDE) ? 1610 : 1);
+        }
+
+        void OnPlayerLeave(Player* player) override
+        {
+            if (sWorld->getBoolConfig(CONFIG_ALLOW_TWO_SIDE_INTERACTION_GROUP))
+                player->SetFactionForRace(player->getRace());
+        }
+
         void OnCreatureCreate(Creature* creature) override
         {
             if (TeamIdInInstance == TEAM_NEUTRAL)
@@ -223,8 +249,24 @@ public:
                         if (Player* p = itr->GetSource())
                             if (!p->IsGameMaster())
                             {
-                                TeamIdInInstance = p->GetTeamId();
-                                break;
+                                if (Group* group = p->GetGroup())
+                                {
+                                    if (Player* gLeader = ObjectAccessor::FindPlayer(group->GetLeaderGUID()))
+                                    {
+                                        TeamIdInInstance = Player::TeamIdForRace(gLeader->getRace());
+                                        break;
+                                    }
+                                    else
+                                    {
+                                        TeamIdInInstance = p->GetTeamId();
+                                        break;
+                                    }
+                                }
+                                else
+                                {
+                                    TeamIdInInstance = p->GetTeamId();
+                                    break;
+                                }
                             }
             }
 
