@@ -15,7 +15,7 @@ INSERT INTO `waypoint_data` (`id`, `point`, `position_x`, `position_y`, `positio
 (10041400, 11, 1142.7643, 977.347, 361.2085, NULL, 0, 0, 0, 100, 0),
 (10041400, 12, 1123.0382, 971.89996, 361.30014, NULL, 0, 0, 0, 100, 0);
 
---Change WD, MT, Position for an Azure Inquisitor.
+-- Change WD, MT, Position for an Azure Inquisitor.
 UPDATE `creature` SET `wander_distance` = 0, `MovementType` = 2, `position_x` = 1123.0382, `position_y` = 971.89996, `position_z` = 361.30014, `orientation` = 3.4109 WHERE `guid` IN (100414) AND `id1` = 27633;
 
 -- Create new Azure Spellbinders.
