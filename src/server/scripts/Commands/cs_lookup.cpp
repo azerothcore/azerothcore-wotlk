@@ -294,7 +294,7 @@ public:
         {
             GameEventData const& eventData = events[id];
 
-            std::string descr = eventData.description;
+            std::string descr = eventData.Description;
             if (descr.empty())
             {
                 continue;
@@ -312,11 +312,11 @@ public:
 
                 if (handler->GetSession())
                 {
-                    handler->PSendSysMessage(LANG_EVENT_ENTRY_LIST_CHAT, id, id, eventData.description, active);
+                    handler->PSendSysMessage(LANG_EVENT_ENTRY_LIST_CHAT, id, id, eventData.Description, active);
                 }
                 else
                 {
-                    handler->PSendSysMessage(LANG_EVENT_ENTRY_LIST_CONSOLE, id, eventData.description, active);
+                    handler->PSendSysMessage(LANG_EVENT_ENTRY_LIST_CONSOLE, id, eventData.Description, active);
                 }
 
                 if (!found)
