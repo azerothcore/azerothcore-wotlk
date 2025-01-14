@@ -1,3 +1,4 @@
+-- DB update 2025_01_14_00 -> 2025_01_14_01
 --
 -- Removes all the plaque texts.
 DELETE FROM `page_text` WHERE `id` IN (2151, 2152, 2153, 2171, 2172, 2173, 2174, 2175, 2176, 2177, 2178);
