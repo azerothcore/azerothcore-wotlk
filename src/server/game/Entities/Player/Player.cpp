@@ -4493,7 +4493,7 @@ void Player::ResurrectPlayer(float restorePercent, bool applySickness)
 {
     LOG_DEBUG("entities.player", "Player::ResurrectPlayer: enter Resurrecting player {} ({})", GetName(), GetGUID().ToString());
 
-    if (!sScriptMgr->OnBeforePlayerResurrect(this, restorePercent, applySickness);)
+    if (!sScriptMgr->OnBeforePlayerResurrect(this, restorePercent, applySickness))
     {
         LOG_DEBUG("entities.player", "Player::ResurrectPlayer: OnBeforePlayerResurrect returned false for player {} ({})", GetName(), GetGUID().ToString());
         return;
