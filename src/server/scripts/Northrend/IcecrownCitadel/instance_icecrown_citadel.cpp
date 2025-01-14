@@ -262,7 +262,20 @@ public:
         void OnPlayerEnter(Player* player) override
         {
             if (TeamIdInInstance == TEAM_NEUTRAL)
-                TeamIdInInstance = player->GetTeamId();
+            {
+                if (Group* group = player->GetGroup())
+                {
+                    if (Player* gLeader = ObjectAccessor::FindPlayer(group->GetLeaderGUID()))
+                        TeamIdInInstance = Player::TeamIdForRace(gLeader->getRace());
+                    else
+                        TeamIdInInstance = player->GetTeamId();
+                }
+                else
+                    TeamIdInInstance = player->GetTeamId();
+            }
+
+            if (sWorld->getBoolConfig(CONFIG_ALLOW_TWO_SIDE_INTERACTION_GROUP))
+                player->SetFaction((TeamIdInInstance == TEAM_HORDE) ? 1610 : 1);
 
             // for professor putricide hc
             DoRemoveAurasDueToSpellOnPlayers(SPELL_GAS_VARIABLE);
@@ -293,6 +306,12 @@ public:
             }
         }
 
+        void OnPlayerLeave(Player* player) override
+        {
+            if (sWorld->getBoolConfig(CONFIG_ALLOW_TWO_SIDE_INTERACTION_GROUP))
+                player->SetFactionForRace(player->getRace());
+        }
+
         void OnCreatureCreate(Creature* creature) override
         {
             if (TeamIdInInstance == TEAM_NEUTRAL)
@@ -300,7 +319,17 @@ public:
                 Map::PlayerList const& players = instance->GetPlayers();
                 if (!players.IsEmpty())
                     if (Player* player = players.begin()->GetSource())
-                        TeamIdInInstance = player->GetTeamId();
+                    {
+                        if (Group* group = player->GetGroup())
+                        {
+                            if (Player* gLeader = ObjectAccessor::FindPlayer(group->GetLeaderGUID()))
+                                TeamIdInInstance = Player::TeamIdForRace(gLeader->getRace());
+                            else
+                                TeamIdInInstance = player->GetTeamId();
+                        }
+                        else
+                            TeamIdInInstance = player->GetTeamId();
+                    }
             }
 
             // apply ICC buff to pets/summons
@@ -537,6 +566,7 @@ public:
             }
 
             InstanceScript::OnCreatureCreate(creature);
+
         }
 
         void OnCreatureRemove(Creature* creature) override
@@ -554,7 +584,17 @@ public:
                 Map::PlayerList const& players = instance->GetPlayers();
                 if (!players.IsEmpty())
                     if (Player* player = players.begin()->GetSource())
-                        TeamIdInInstance = player->GetTeamId();
+                    {
+                        if (Group* group = player->GetGroup())
+                        {
+                            if (Player* gLeader = ObjectAccessor::FindPlayer(group->GetLeaderGUID()))
+                                TeamIdInInstance = Player::TeamIdForRace(gLeader->getRace());
+                            else
+                                TeamIdInInstance = player->GetTeamId();
+                        }
+                        else
+                            TeamIdInInstance = player->GetTeamId();
+                    }
             }
 
             uint32 entry = data->id1;
@@ -599,7 +639,17 @@ public:
                 Map::PlayerList const& players = instance->GetPlayers();
                 if (!players.IsEmpty())
                     if (Player* player = players.begin()->GetSource())
-                        TeamIdInInstance = player->GetTeamId();
+                    {
+                        if (Group* group = player->GetGroup())
+                        {
+                            if (Player* gLeader = ObjectAccessor::FindPlayer(group->GetLeaderGUID()))
+                                TeamIdInInstance = Player::TeamIdForRace(gLeader->getRace());
+                            else
+                                TeamIdInInstance = player->GetTeamId();
+                        }
+                        else
+                            TeamIdInInstance = player->GetTeamId();
+                    }
             }
 
             switch (entry)
@@ -703,7 +753,17 @@ public:
                 Map::PlayerList const& players = instance->GetPlayers();
                 if (!players.IsEmpty())
                     if (Player* player = players.begin()->GetSource())
-                        TeamIdInInstance = player->GetTeamId();
+                    {
+                        if (Group* group = player->GetGroup())
+                        {
+                            if (Player* gLeader = ObjectAccessor::FindPlayer(group->GetLeaderGUID()))
+                                TeamIdInInstance = Player::TeamIdForRace(gLeader->getRace());
+                            else
+                                TeamIdInInstance = player->GetTeamId();
+                        }
+                        else
+                            TeamIdInInstance = player->GetTeamId();
+                    }
             }
 
             switch (go->GetEntry())
