@@ -90,14 +90,17 @@ enum GameobjectIds
 
 enum MiscIds
 {
+    // Persistent data
     DATA_TIMED_RUN                      = 0,
+    DATA_CHEST_COUNT                    = 1,
+
     ACTION_START_TIMED_RUN              = 0,
     ACTION_START_AKILZON_GAUNTLET       = 1,
     ACTION_RESET_AKILZON_GAUNTLET       = 2,
     GROUP_TIMED_RUN                     = 1
 };
 
-uint32 constexpr PersistentDataCount = 1;
+uint32 constexpr PersistentDataCount = 2;
 
 template <class AI, class T>
 inline AI* GetZulAmanAI(T* obj)
