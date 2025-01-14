@@ -1,3 +1,4 @@
+-- DB update 2025_01_14_04 -> 2025_01_14_05
 --
 UPDATE `creature_template` SET `flags_extra` = `flags_extra`|256,  `AIName` = 'SmartAI' WHERE `entry` = 24374;
 DELETE FROM `smart_scripts` WHERE (`entryorguid` = 24374) AND (`source_type` = 0) AND (`id` IN (0, 1));
