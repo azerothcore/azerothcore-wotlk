@@ -459,40 +459,10 @@ class spell_zuljin_zap : public SpellScript
     }
 };
 
-// 43983 Energy Storm
-class spell_energy_storm_aura : public AuraScript
-{
-    PrepareAuraScript(spell_energy_storm_aura);
-
-    bool AfterCheckProc(ProcEventInfo& eventInfo, bool isTriggeredAtSpellProcEvent)
-    {
-        if (!isTriggeredAtSpellProcEvent)
-            return false;
-
-        SpellInfo const* spellInfo = eventInfo.GetSpellInfo();
-        if (!spellInfo)
-            return true;
-
-        if (spellInfo->SchoolMask == SPELL_SCHOOL_MASK_NORMAL)
-            return false;
-
-        if (eventInfo.GetProcSpell() && eventInfo.GetProcSpell()->IsTriggered())
-            return false;
-
-        return true;
-    }
-
-    void Register() override
-    {
-        DoAfterCheckProc += AuraAfterCheckProcFn(spell_energy_storm_aura::AfterCheckProc);
-    }
-};
-
 void AddSC_boss_zuljin()
 {
     RegisterZulAmanCreatureAI(boss_zuljin);
     RegisterZulAmanCreatureAI(npc_zuljin_vortex);
     RegisterSpellScript(spell_claw_rage_aura);
     RegisterSpellScript(spell_zuljin_zap);
-    RegisterSpellScript(spell_energy_storm_aura);
 }
