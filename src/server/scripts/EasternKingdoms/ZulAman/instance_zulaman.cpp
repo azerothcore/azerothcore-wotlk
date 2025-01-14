@@ -251,6 +251,23 @@ public:
                     creature->Respawn(true);
         }
 
+        void OnUnitDeath(Unit* unit) override
+        {
+            Creature* creature = unit->ToCreature();
+            if (!creature)
+                return;
+
+            switch (creature->GetEntry())
+            {
+                case NPC_AMINISHI_PROTECTOR:
+                case NPC_AMANISHI_WIND_WALKER:
+                    if (_akilzonGauntlet == NOT_STARTED && AkilzonTrash.contains(creature->GetGUID()))
+                        creature->DespawnOrUnsummon(30s, 1s);
+                default:
+                    break;
+            }
+        }
+
         void OnCreatureEvade(Creature* creature) override
         {
             switch (creature->GetEntry())

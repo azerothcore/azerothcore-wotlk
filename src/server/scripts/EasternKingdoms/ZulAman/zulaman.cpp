@@ -561,7 +561,7 @@ struct npc_amanishi_lookout : public NullCreatureAI
 
     void MoveInLineOfSight(Unit* who) override
     {
-        if (!me->IsWithinDist(who, 25.0f, false)) // distance not confirmed
+        if (!me->IsWithinDist(who, me->GetAggroRange(who), false))
                 return;
 
         Player* player = who->GetCharmerOrOwnerPlayerOrPlayerItself();
@@ -591,6 +591,29 @@ struct npc_amanishi_lookout : public NullCreatureAI
         // at boss
         if (type == WAYPOINT_MOTION_TYPE && id == 8) // should despawn with waypoint script
             me->DespawnOrUnsummon(0s, 0s);
+    }
+private:
+    InstanceScript* _instance;
+};
+
+struct npc_eagle_trash_aggro_trigger : public ScriptedAI
+{
+    npc_eagle_trash_aggro_trigger(Creature* creature) : ScriptedAI(creature), _instance(creature->GetInstanceScript()) {}
+
+    void MoveInLineOfSight(Unit* who) override
+    {
+        if (who->GetLevel() > 70)
+            return;
+
+        if (!me->IsWithinDist(who, me->GetAggroRange(who), false))
+            return;
+
+        Player* player = who->GetCharmerOrOwnerPlayerOrPlayerItself();
+        if (!player || player->IsGameMaster())
+            return;
+
+        if (_instance->GetData(TYPE_AKILZON_GAUNTLET) == NOT_STARTED)
+            _instance->SetData(TYPE_AKILZON_GAUNTLET, IN_PROGRESS);
     }
 private:
     InstanceScript* _instance;
@@ -845,6 +868,7 @@ void AddSC_zulaman()
     RegisterZulAmanCreatureAI(npc_harrison_jones);
     RegisterSpellScript(spell_ritual_of_power);
     RegisterZulAmanCreatureAI(npc_amanishi_lookout);
+    RegisterZulAmanCreatureAI(npc_eagle_trash_aggro_trigger);
     RegisterZulAmanCreatureAI(npc_amanishi_tempest);
     RegisterZulAmanCreatureAI(npc_amanishi_scout);
     RegisterSpellScript(spell_alert_drums);
