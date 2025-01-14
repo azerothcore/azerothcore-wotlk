@@ -1,5 +1,4 @@
 
-
 -- Nerub'ar Corpse Harvester
 UPDATE `creature_template` SET `AIName` = 'SmartAI' WHERE `entry` = 25445;
 
