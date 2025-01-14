@@ -140,7 +140,7 @@ private:
     void LoadEventSeasonalQuestRelations();
     void LoadEventBattlegroundData();
     void LoadEventPoolData();
-    
+
     void SendWorldStateUpdate(Player* player, uint16 eventId);
     void AddActiveEvent(uint16 eventId) { _activeEvents.insert(eventId); }
     void RemoveActiveEvent(uint16 eventId) { _activeEvents.erase(eventId); }

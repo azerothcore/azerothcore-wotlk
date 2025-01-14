@@ -359,9 +359,8 @@ void GameEventMgr::LoadEvents()
             endtime = GameTime::GetGameTime().count() + 63072000; // add 2 years to current date
         pGameEvent.End = time_t(endtime);
         pGameEvent.Occurence = fields[3].Get<uint64>();
-        pGameEvent.Length = fields[4].Get<uint64>(); 
+        pGameEvent.Length = fields[4].Get<uint64>();
         pGameEvent.HolidayId = HolidayIds(fields[5].Get<uint32>());
-
         pGameEvent.HolidayStage = fields[6].Get<uint8>();
         pGameEvent.Description = fields[7].Get<std::string>();
         pGameEvent.State = (GameEventState)(fields[8].Get<uint8>());
@@ -1169,7 +1168,7 @@ uint32 GameEventMgr::StartSystem()                           // return the next 
 void GameEventMgr::StartArenaSeason()
 {
     uint8 season = sWorld->getIntConfig(CONFIG_ARENA_SEASON_ID);
- 
+
     WorldDatabasePreparedStatement* stmt = WorldDatabase.GetPreparedStatement(WORLD_SEL_GAME_EVENT_ARENA_SEASON);
     stmt->SetData(0, season);
     PreparedQueryResult result = WorldDatabase.Query(stmt);
