@@ -112,7 +112,6 @@ public:
             LoadBossBoundaries(boundaries);
             LoadDoorData(doorData);
             LoadSummonData(summonData);
-            _chestLooted = 0;
 
             for (uint8 i = 0; i < RAND_VENDOR; ++i)
                 RandVendor[i] = NOT_STARTED;
@@ -211,7 +210,10 @@ public:
                     _akilzonGauntlet = DONE;
             }
             else if (type == DATA_CHEST_LOOTED)
-                ++_chestLooted;
+            {
+                uint8 chestCount = GetPersistentData(DATA_CHEST_COUNT);
+                StorePersistentData(DATA_CHEST_COUNT, ++chestCount);
+            }
         }
 
         void StartAkilzonGauntlet()
@@ -337,7 +339,7 @@ public:
             else if (type == TYPE_AKILZON_GAUNTLET)
                 return _akilzonGauntlet;
             else if (type == DATA_CHEST_LOOTED)
-                return _chestLooted;
+                return GetPersistentData(DATA_CHEST_COUNT);
 
             return 0;
         }
@@ -348,7 +350,6 @@ public:
         }
 
         private:
-            uint16 _chestLooted;
             uint32 RandVendor[RAND_VENDOR];
             GuidSet AkilzonTrash;
             EncounterState _akilzonGauntlet = NOT_STARTED;
