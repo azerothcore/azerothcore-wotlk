@@ -1332,6 +1332,50 @@ enum AcoreStrings
     // 30087-30095 reserved for passive anticheat
 
     LANG_DEBUG_LFG_ON                             = 30096,
-    LANG_DEBUG_LFG_OFF                            = 30097
+    LANG_DEBUG_LFG_OFF                            = 30097,
+
+    // NPC Proffessions
+    LANG_TALK_MUST_UNLEARN_WEAPON                 = 35008,
+    LANG_TALK_HAMMER_LEARN                        = 35009,
+    LANG_TALK_AXE_LEARN                           = 35010,
+    LANG_TALK_SWORD_LEARN                         = 35011,
+    LANG_TALK_HAMMER_UNLEARN                      = 35012,
+    LANG_TALK_AXE_UNLEARN                         = 35013,
+    LANG_TALK_SWORD_UNLEARN                       = 35014,
+    LANG_GOSSIP_LEARN_POTION                      = 35015,
+    LANG_GOSSIP_UNLEARN_POTION                    = 35016,
+    LANG_GOSSIP_LEARN_TRANSMUTE                   = 35017,
+    LANG_GOSSIP_UNLEARN_TRANSMUTE                 = 35018,
+    LANG_GOSSIP_LEARN_ELIXIR                      = 35019,
+    LANG_GOSSIP_UNLEARN_ELIXIR                    = 35020,
+    LANG_BOX_UNLEARN_ALCHEMY_SPEC                 = 35021,
+    LANG_GOSSIP_WEAPON_LEARN                      = 35022,
+    LANG_GOSSIP_WEAPON_UNLEARN                    = 35023,
+    LANG_GOSSIP_ARMOR_LEARN                       = 35024,
+    LANG_GOSSIP_ARMOR_UNLEARN                     = 35025,
+    LANG_GOSSIP_UNLEARN_SMITH_SPEC                = 35026,
+    LANG_BOX_UNLEARN_ARMORORWEAPON                = 35027,
+    LANG_GOSSIP_LEARN_HAMMER                      = 35028,
+    LANG_GOSSIP_UNLEARN_HAMMER                    = 35029,
+    LANG_GOSSIP_LEARN_AXE                         = 35030,
+    LANG_GOSSIP_UNLEARN_AXE                       = 35031,
+    LANG_GOSSIP_LEARN_SWORD                       = 35032,
+    LANG_GOSSIP_UNLEARN_SWORD                     = 35033,
+    LANG_BOX_UNLEARN_WEAPON_SPEC                  = 35034,
+    LANG_GOSSIP_LEARN_SPELLFIRE                   = 35035,
+    LANG_GOSSIP_UNLEARN_SPELLFIRE                 = 35036,
+    LANG_GOSSIP_LEARN_MOONCLOTH                   = 35037,
+    LANG_GOSSIP_UNLEARN_MOONCLOTH                 = 35038,
+    LANG_GOSSIP_LEARN_SHADOWEAVE                  = 35039,
+    LANG_GOSSIP_UNLEARN_SHADOWEAVE                = 35040,
+    LANG_BOX_UNLEARN_TAILOR_SPEC                  = 35041,
+    LANG_GOSSIP_LEARN_GOBLIN                      = 35042,
+    LANG_GOSSIP_LEARN_GNOMISH                     = 35043,
+    LANG_GOSSIP_UNLEARN_GOBLIN                    = 35044,
+    LANG_GOSSIP_UNLEARN_GNOMISH                   = 35045,
+    LANG_BOX_UNLEARN_ENGIN_SPEC                   = 35046,
+    LANG_BOX_LEARN_ENGIN_SPEC                     = 35047
+
+
 };
 #endif
