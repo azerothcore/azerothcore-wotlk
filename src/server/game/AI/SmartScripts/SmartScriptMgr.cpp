@@ -27,7 +27,7 @@
 #include "ScriptedCreature.h"
 #include "SpellMgr.h"
 
-static bool IsSAIBoolValid(SmartScriptHolder const& e, SAIBool value)
+bool SmartAIMgr::IsSAIBoolValid(SmartScriptHolder const& e, SAIBool value)
 {
     if (value != 0 && value != 1)
     {
