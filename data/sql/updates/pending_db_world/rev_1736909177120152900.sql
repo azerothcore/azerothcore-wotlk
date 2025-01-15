@@ -1,7 +1,7 @@
 --
 DELETE FROM `acore_string` WHERE `entry` BETWEEN 35500 AND 35507;
 
-INSERT INTO `acore_string` (`entry`, `content_default`) VALUES 
+INSERT INTO `acore_string` (`entry`, `content_default`) VALUES
 (35500, 'This teleport crystal cannot be used until the teleport crystal in Dalaran has been used at least once.'),
 (35501, 'Purchase 1 Unstable Flask of the Beast for the cost of 10 Apexis Shards'),
 (35502, 'Purchase 5 Unstable Flask of the Beast for the cost of 50 Apexis Shards'),
