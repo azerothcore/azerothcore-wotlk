@@ -1120,7 +1120,6 @@ enum DalaranCrystal
     QUEST_TELE_CRYSTAL_FLAG     = 12845
 };
 
-
 class go_tele_to_dalaran_crystal : public GameObjectScript
 {
 public:
@@ -1237,7 +1236,7 @@ public:
             player->PrepareQuestMenu(go->GetGUID()); /* return true*/
 
         WorldSession* session = player->GetSession();
-        
+
         AddGossipItemFor(player, GOSSIP_ICON_CHAT, session->GetAcoreString(LANG_GOSSIP_BASHIR_CRYSTALFORGE_ITEM_1), GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF);
         AddGossipItemFor(player, GOSSIP_ICON_CHAT, session->GetAcoreString(LANG_GOSSIP_BASHIR_CRYSTALFORGE_ITEM_5), GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
 
