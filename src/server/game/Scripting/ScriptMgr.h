@@ -189,8 +189,8 @@ public: /* FormulaScript */
 public: /* MapScript */
     void OnCreateMap(Map* map);
     void OnDestroyMap(Map* map);
-    void OnLoadGridMap(Map* map, GridMap* gmap, uint32 gx, uint32 gy);
-    void OnUnloadGridMap(Map* map, GridMap* gmap, uint32 gx, uint32 gy);
+    void OnLoadGridMap(Map* map, GridTerrainData* gmap, uint32 gx, uint32 gy);
+    void OnUnloadGridMap(Map* map, GridTerrainData* gmap, uint32 gx, uint32 gy);
     void OnPlayerEnterMap(Map* map, Player* player);
     void OnPlayerLeaveMap(Map* map, Player* player);
     void OnMapUpdate(Map* map, uint32 diff);
