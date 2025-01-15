@@ -67,21 +67,19 @@ class spell_transmogrify : public SpellScript
 
     SpellCastResult CheckTarget()
     {
-        Unit* target = GetExplTargetUnit(); // Explicit target selected by the caster
+        Unit* target = GetExplTargetUnit();
 
-        // List of valid creature IDs
-        std::set<uint32> validCreatureIds = { NPC_SHORE_STRIDER, NPC_DEEP_STRIDER, NPC_LAND_WALKER, NPC_WAVE_STRIDER, NPC_CLIFF_GIANT };
+        std::unordered_set<uint32> validCreatureIds = { NPC_SHORE_STRIDER, NPC_DEEP_STRIDER, NPC_LAND_WALKER, NPC_WAVE_STRIDER, NPC_CLIFF_GIANT };
 
         // Validate the target
-        if (!target || validCreatureIds.find(target->GetEntry()) == validCreatureIds.end())
-            return SPELL_FAILED_BAD_TARGETS; // Prevent the spell cast with an error
+        if (!target || !validCreatureIds.contains(target->GetEntry()))
+            return SPELL_FAILED_BAD_TARGETS;
 
-        return SPELL_CAST_OK; // Allow the spell cast
+        return SPELL_CAST_OK;
     }
 
     void Register() override
     {
-        // Register the check cast hook
         OnCheckCast += SpellCheckCastFn(spell_transmogrify::CheckTarget);
     }
 };
