@@ -128,8 +128,9 @@ public:
             switch (creature->GetEntry())
             {
                 case NPC_AMANISHI_GUARDIAN:
-                    if (creature->GetPositionZ() >= 43.0f) // gate guardians
-                        creature->SetImmuneToPC(true);
+                case NPC_AMANISHI_SAVAGE:
+                    if (creature->GetPositionY() >= 1500.0f) // gate
+                        creature->SetImmuneToAll(true);
                     break;
                 // Akil'zon gauntlet
                 case NPC_AMANISHI_TEMPEST:
