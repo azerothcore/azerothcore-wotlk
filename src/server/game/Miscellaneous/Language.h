@@ -1332,6 +1332,16 @@ enum AcoreStrings
     // 30087-30095 reserved for passive anticheat
 
     LANG_DEBUG_LFG_ON                             = 30096,
-    LANG_DEBUG_LFG_OFF                            = 30097
+    LANG_DEBUG_LFG_OFF                            = 30097,
+
+    // Go Scripts
+    LANG_GO_TELE_TO_DALARAN_CRYSTAL_FAILED        = 35500,
+    LANG_GOSSIP_FEL_CRYSTALFORGE_ITEM_1           = 35501,
+    LANG_GOSSIP_FEL_CRYSTALFORGE_ITEM_5           = 35502,
+    LANG_GOSSIP_FEL_CRYSTALFORGE_ITEM_RETURN      = 35503,
+    LANG_GOSSIP_BASHIR_CRYSTALFORGE_ITEM_1        = 35504,
+    LANG_GOSSIP_BASHIR_CRYSTALFORGE_ITEM_5        = 35505,
+    LANG_GOSSIP_BASHIR_CRYSTALFORGE_ITEM_RETURN   = 35506,
+    LANG_GO_ANDERHOLS_SLIDER_CIDER_NOT_FOUND      = 35507,
 };
 #endif
