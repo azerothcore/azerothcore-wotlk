@@ -60,6 +60,7 @@ enum CreatureIds
     NPC_AMANISHI_MEDICINE_MAN           = 23581,
     NPC_AMANISHI_AXE_THROWER            = 23542,
     NPC_AMANI_HATCHLING                 = 23598, // 42493
+    NPC_AMANISHI_GUARDIAN               = 23597,
     // Akil'zon gauntlet
     NPC_AMANISHI_WIND_WALKER            = 24179,
     NPC_AMANISHI_LOOKOUT                = 24175,

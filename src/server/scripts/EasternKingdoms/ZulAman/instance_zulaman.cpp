@@ -127,6 +127,10 @@ public:
         {
             switch (creature->GetEntry())
             {
+                case NPC_AMANISHI_GUARDIAN:
+                    if (creature->GetPositionZ() >= 43.0f) // gate guardians
+                        creature->SetImmuneToPC(true);
+                    break;
                 // Akil'zon gauntlet
                 case NPC_AMANISHI_TEMPEST:
                     if (creature->GetPositionZ() >= 50.0f) // excludes Tempest in Hexlord Malacrass' trash

@@ -358,8 +358,7 @@ enum DisplayIds
 enum EntryIds
 {
     NPC_HARRISON_JONES_1                = 24375,
-    NPC_HARRISON_JONES_2                = 24365,
-    NPC_AMANISHI_GUARDIAN               = 23597,
+    NPC_HARRISON_JONES_2                = 24365
 };
 
 enum Weapons
