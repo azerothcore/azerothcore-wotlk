@@ -340,7 +340,8 @@ private:
 /* 55640 - Lightweave Embroidery
    67698 - Item - Coliseum 25 Normal Healer Trinket
    67752 - Item - Coliseum 25 Heroic Healer Trinket
-   69762 - Unchained Magic */
+   69762 - Unchained Magic
+   43983 - Energy Storm */
 class spell_gen_allow_proc_from_spells_with_cost : public AuraScript
 {
     PrepareAuraScript(spell_gen_allow_proc_from_spells_with_cost);
