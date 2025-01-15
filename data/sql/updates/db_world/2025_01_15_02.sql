@@ -1,3 +1,4 @@
+-- DB update 2025_01_15_01 -> 2025_01_15_02
 
 -- Nerub'ar Corpse Harvester
 UPDATE `creature_template` SET `AIName` = 'SmartAI' WHERE `entry` = 25445;
