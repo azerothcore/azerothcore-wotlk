@@ -358,8 +358,7 @@ enum DisplayIds
 enum EntryIds
 {
     NPC_HARRISON_JONES_1                = 24375,
-    NPC_HARRISON_JONES_2                = 24365,
-    NPC_AMANISHI_GUARDIAN               = 23597,
+    NPC_HARRISON_JONES_2                = 24365
 };
 
 enum Weapons
@@ -417,7 +416,10 @@ struct npc_harrison_jones : public ScriptedAI
                 std::list<Creature*> creatures;
                 me->GetCreatureListWithEntryInGrid(creatures, NPC_AMANISHI_SAVAGE, 100.0f);
                 for (Creature* creature : creatures)
+                {
+                    creature->SetImmuneToAll(false);
                     creature->SetInCombatWithZone();
+                }
             });
             _instance->StorePersistentData(DATA_TIMED_RUN, 21);
             _instance->DoAction(ACTION_START_TIMED_RUN);
