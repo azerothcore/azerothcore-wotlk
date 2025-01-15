@@ -20,6 +20,7 @@
 #include "ScriptedCreature.h"
 #include "nexus.h"
 #include "Player.h"
+#include "Group.h"
 
 DoorData const doorData[] =
 {
@@ -48,15 +49,29 @@ public:
             SetHeaders(DataHeader);
             SetBossNumber(MAX_ENCOUNTERS);
             LoadDoorData(doorData);
+
+            TeamIdInInstance = TEAM_NEUTRAL;
         }
 
         void OnCreatureCreate(Creature* creature) override
         {
-            Map::PlayerList const& players = instance->GetPlayers();
-            TeamId TeamIdInInstance = TEAM_NEUTRAL;
-            if (!players.IsEmpty())
-                if (Player* pPlayer = players.begin()->GetSource())
-                    TeamIdInInstance = pPlayer->GetTeamId();
+            if (TeamIdInInstance == TEAM_NEUTRAL)
+            {
+                Map::PlayerList const& players = instance->GetPlayers();
+                if (!players.IsEmpty())
+                    if (Player* pPlayer = players.begin()->GetSource())
+                    {
+                        if (Group* group = pPlayer->GetGroup())
+                        {
+                            if (Player* gLeader = ObjectAccessor::FindPlayer(group->GetLeaderGUID()))
+                                TeamIdInInstance = Player::TeamIdForRace(gLeader->getRace());
+                            else
+                                TeamIdInInstance = pPlayer->GetTeamId();
+                        }
+                        else
+                            TeamIdInInstance = pPlayer->GetTeamId();
+                    }
+            }
 
             switch (creature->GetEntry())
             {
@@ -86,6 +101,31 @@ public:
                         creature->UpdateEntry(NPC_COMMANDER_KOLURG);
                     break;
             }
+        }
+
+        void OnPlayerEnter(Player* player) override
+        {
+            if (TeamIdInInstance == TEAM_NEUTRAL)
+            {
+                if (Group* group = player->GetGroup())
+                {
+                    if (Player* gLeader = ObjectAccessor::FindPlayer(group->GetLeaderGUID()))
+                        TeamIdInInstance = Player::TeamIdForRace(gLeader->getRace());
+                    else
+                        TeamIdInInstance = player->GetTeamId();
+                }
+                else
+                    TeamIdInInstance = player->GetTeamId();
+            }
+
+            if (sWorld->getBoolConfig(CONFIG_ALLOW_TWO_SIDE_INTERACTION_GROUP))
+                player->SetFaction((TeamIdInInstance == TEAM_HORDE) ? 1610 : 1);
+        }
+
+        void OnPlayerLeave(Player* player) override
+        {
+            if (sWorld->getBoolConfig(CONFIG_ALLOW_TWO_SIDE_INTERACTION_GROUP))
+                player->SetFactionForRace(player->getRace());
         }
 
         void OnGameObjectCreate(GameObject* gameObject) override
@@ -154,6 +194,8 @@ public:
                 (*i)->RemoveGameObjectFlag(GO_FLAG_NOT_SELECTABLE);
             return true;
         }
+    protected:
+        TeamId TeamIdInInstance;
     };
 };
 

@@ -288,6 +288,10 @@ add_library(modules STATIC
     ${SCRIPT_MODULE_PRIVATE_SCRIPTLOADER}
     ${PRIVATE_SOURCES_MODULES})
 
+if (MOD_ELUNA_FOUND)
+    target_link_libraries(modules PUBLIC lualib)
+endif()
+
 target_link_libraries(modules
   PRIVATE
     acore-core-interface
