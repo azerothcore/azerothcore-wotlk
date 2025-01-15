@@ -1376,6 +1376,5 @@ enum AcoreStrings
     LANG_BOX_UNLEARN_ENGIN_SPEC                   = 35046,
     LANG_BOX_LEARN_ENGIN_SPEC                     = 35047
 
-
 };
 #endif
