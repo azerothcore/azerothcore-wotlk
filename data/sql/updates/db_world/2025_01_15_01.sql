@@ -1,3 +1,4 @@
+-- DB update 2025_01_15_00 -> 2025_01_15_01
 --
 DELETE FROM `spell_target_position` WHERE `ID` = 41234 AND `EffectIndex` = 0;
 
