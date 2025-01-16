@@ -41,7 +41,8 @@ enum DataTypes
     DATA_HARRISON_JONES                 = 13,
     TYPE_AKILZON_GAUNTLET               = 14,
     DATA_LOOKOUT                        = 15,
-    DATA_ZULJIN_GATE                    = 16
+    DATA_ZULJIN_GATE                    = 16,
+    DATA_CHEST_LOOTED                   = 17 // Used for hostage loot DB conditions
 };
 
 enum CreatureIds
@@ -53,16 +54,18 @@ enum CreatureIds
     NPC_HALAZZI                         = 23577,
     NPC_NALORAKK                        = 23576,
     NPC_SPIRIT_LYNX                     = 24143,
+    NPC_AMANISHI_SAVAGE                 = 23889,
     NPC_AMANISHI_WARBRINGER             = 23580,
     NPC_AMANISHI_TRIBESMAN              = 23582,
     NPC_AMANISHI_MEDICINE_MAN           = 23581,
     NPC_AMANISHI_AXE_THROWER            = 23542,
     NPC_AMANI_HATCHLING                 = 23598, // 42493
+    NPC_AMANISHI_GUARDIAN               = 23597,
     // Akil'zon gauntlet
     NPC_AMANISHI_WIND_WALKER            = 24179,
-    NPC_AMINISHI_LOOKOUT                = 24175,
-    NPC_AMINISHI_PROTECTOR              = 24180,
-    NPC_AMINISHI_TEMPEST                = 24549,
+    NPC_AMANISHI_LOOKOUT                = 24175,
+    NPC_AMANISHI_PROTECTOR              = 24180,
+    NPC_AMANISHI_TEMPEST                = 24549,
     NPC_EAGLE_TRASH_AGGRO_TRIGGER       = 24223
 };
 
@@ -79,18 +82,26 @@ enum GameobjectIds
     GO_TANZARS_TRUNK                    = 186648,
     GO_ASHLIS_BAG                       = 186672,
     GO_KRAZS_PACKAGE                    = 186667,
-    GO_STRANGE_GONG                     = 187359
+    GO_STRANGE_GONG                     = 187359,
+    GO_ALTAR_TORCH_EAGLE_GOD            = 187035,
+    GO_ALTAR_TORCH_DRAGONHAWK_GOD       = 187036,
+    GO_ALTAR_TORCH_LYNX_GOD             = 187037,
+    GO_ALTAR_TORCH_BEAR_GOD             = 186860
 };
 
 enum MiscIds
 {
+    // Persistent data
     DATA_TIMED_RUN                      = 0,
+    DATA_CHEST_COUNT                    = 1,
+
     ACTION_START_TIMED_RUN              = 0,
     ACTION_START_AKILZON_GAUNTLET       = 1,
+    ACTION_RESET_AKILZON_GAUNTLET       = 2,
     GROUP_TIMED_RUN                     = 1
 };
 
-uint32 constexpr PersistentDataCount = 1;
+uint32 constexpr PersistentDataCount = 2;
 
 template <class AI, class T>
 inline AI* GetZulAmanAI(T* obj)
