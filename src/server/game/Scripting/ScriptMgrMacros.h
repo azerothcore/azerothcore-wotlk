@@ -26,13 +26,18 @@ inline Optional<bool> IsValidBoolScript(std::function<bool(ScriptName*)> execute
     if (ScriptRegistry<ScriptName>::ScriptPointerList.empty())
         return {};
 
+    bool ret = false;
     for (auto const& [scriptID, script] : ScriptRegistry<ScriptName>::ScriptPointerList)
     {
         if (executeHook(script))
-            return true;
+        {
+            LOG_DEBUG("scripts.execute", "IsValidBoolScript - Script executed return true");
+            ret = true;
+        }
+        else
+            LOG_DEBUG("scripts.execute", "IsValidBoolScript - Script executed return false");
     }
-
-    return false;
+    return ret;
 }
 
 template<typename ScriptName, class T>

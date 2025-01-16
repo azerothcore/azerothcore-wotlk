@@ -4489,8 +4489,18 @@ void Player::BuildPlayerRepop()
     sScriptMgr->OnPlayerReleasedGhost(this);
 }
 
-void Player::ResurrectPlayer(float restore_percent, bool applySickness)
+void Player::ResurrectPlayer(float restorePercent, bool applySickness)
 {
+    LOG_DEBUG("entities.player", "Player::ResurrectPlayer: enter Resurrecting player {} ({})", GetName(), GetGUID().ToString());
+
+    if (!sScriptMgr->OnBeforePlayerResurrect(this, restorePercent, applySickness))
+    {
+        LOG_DEBUG("entities.player", "Player::ResurrectPlayer: OnBeforePlayerResurrect returned false for player {} ({})", GetName(), GetGUID().ToString());
+        return;
+    }
+
+    LOG_DEBUG("entities.player", "Player::ResurrectPlayer: begin Resurrecting player {} ({})", GetName(), GetGUID().ToString());
+
     WorldPacket data(SMSG_DEATH_RELEASE_LOC, 4 * 4);        // remove spirit healer position
     data << uint32(-1);
     data << float(0);
@@ -4515,12 +4525,12 @@ void Player::ResurrectPlayer(float restore_percent, bool applySickness)
     m_deathTimer = 0;
 
     // set health/powers (0- will be set in caller)
-    if (restore_percent > 0.0f)
+    if (restorePercent > 0.0f)
     {
-        SetHealth(uint32(GetMaxHealth()*restore_percent));
-        SetPower(POWER_MANA, uint32(GetMaxPower(POWER_MANA)*restore_percent));
+        SetHealth(uint32(GetMaxHealth()*restorePercent));
+        SetPower(POWER_MANA, uint32(GetMaxPower(POWER_MANA)*restorePercent));
         SetPower(POWER_RAGE, 0);
-        SetPower(POWER_ENERGY, uint32(GetMaxPower(POWER_ENERGY)*restore_percent));
+        SetPower(POWER_ENERGY, uint32(GetMaxPower(POWER_ENERGY)*restorePercent));
     }
 
     // trigger update zone for alive state zone updates
@@ -4535,7 +4545,7 @@ void Player::ResurrectPlayer(float restore_percent, bool applySickness)
     // update visibility
     UpdateObjectVisibility();
 
-    sScriptMgr->OnPlayerResurrect(this, restore_percent, applySickness);
+    sScriptMgr->OnPlayerResurrect(this, restorePercent, applySickness);
 
     if (!applySickness)
     {
