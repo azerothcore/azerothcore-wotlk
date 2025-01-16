@@ -193,7 +193,6 @@ public:
                     {
                         if (_currentWave == 0 && InitialWaves)
                             creature->SetDisableReputationGain(true);
-
                         DoUpdateWorldState(WORLD_STATE_ENEMYCOUNT, ++trash);    // Update the instance wave count on new trash spawn
                         _encounterNPCs.insert(creature->GetGUID());             // Used for despawning on wipe
                     }
