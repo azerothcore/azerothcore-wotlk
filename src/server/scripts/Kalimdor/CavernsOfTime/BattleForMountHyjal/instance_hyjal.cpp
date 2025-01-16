@@ -587,7 +587,6 @@ public:
         GuidSet _roaringFlameHorde;
         bool InitialWaves;
 
-
       private:
           void ResetWaves()
           {
