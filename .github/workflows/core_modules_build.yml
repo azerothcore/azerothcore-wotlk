@@ -5,10 +5,19 @@ on:
       - 'master'
   pull_request:
     types:
-      - labeled
       - opened
       - reopened
       - synchronize
+    paths:
+      - 'src/*'
+      - 'src/common/**/*'
+      - 'src/genrev/**/*'
+      - 'src/server/*'
+      - 'src/server/apps/**/*'
+      - 'src/server/database/**/*'
+      - 'src/server/game/**/*'
+      - 'src/server/shared/**/*'
+      - 'src/tools/**/*'
 
 concurrency:
   group: ${{ github.head_ref }} || concat(${{ github.ref }}, ${{ github.workflow }})
@@ -26,15 +35,7 @@ jobs:
               CXX: clang++-18
     runs-on: ${{ matrix.os }}
     name: ${{ matrix.os }}-${{ matrix.compiler.CC }}-nopch-modules
-    if: github.repository == 'azerothcore/azerothcore-wotlk'
-      && !github.event.pull_request.draft
-      && (
-        github.ref_name == 'master'
-        || contains(github.event.pull_request.labels.*.name, 'file-cpp'
-        || github.event.label.name == 'file-cpp'
-        || contains(github.event.pull_request.labels.*.name, 'run-build')
-        || github.event.label.name == 'run-build')
-      )
+    if: github.repository == 'azerothcore/azerothcore-wotlk' && !github.event.pull_request.draft
     steps:
       - uses: actions/checkout@v4
         # This script installs a general list of modules to compile with
@@ -48,3 +49,4 @@ jobs:
           CXX: ${{ matrix.compiler.CXX }}
           modules: true
           pch: false
+          maxerrors: 0

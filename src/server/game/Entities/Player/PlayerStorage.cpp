@@ -4059,7 +4059,6 @@ void Player::SendEquipError(InventoryResult msg, Item* pItem, Item* pItem2, uint
         }
     }
     GetSession()->SendPacket(&data);
-    PlayDirectSound(QUEST_SOUND_FAILURE); // Play failure sound
 }
 
 void Player::SendBuyError(BuyResult msg, Creature* creature, uint32 item, uint32 param)
@@ -6724,7 +6723,7 @@ bool Player::Satisfy(DungeonProgressionRequirements const* ar, uint32 target_map
 
         if (DisableMgr::IsDisabledFor(DISABLE_TYPE_MAP, target_map, this))
         {
-            GetSession()->SendAreaTriggerMessage("%s", GetSession()->GetAcoreString(LANG_INSTANCE_CLOSED));
+            GetSession()->SendAreaTriggerMessage("{}", GetSession()->GetAcoreString(LANG_INSTANCE_CLOSED));
             return false;
         }
 
