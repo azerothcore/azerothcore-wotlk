@@ -76,11 +76,7 @@ enum NXData
     DATA_KELTHUZAD_PORTAL_1         = 128,
     DATA_KELTHUZAD_PORTAL_2         = 129,
     DATA_KELTHUZAD_PORTAL_3         = 130,
-    DATA_KELTHUZAD_PORTAL_4         = 131,
-    DATA_THANE_KORTHAZZ             = 132,
-    DATA_SIR_ZELIEK                 = 133,
-    DATA_BARON_RIVENDARE            = 134,
-    DATA_LADY_BLAUMEUX              = 135
+    DATA_KELTHUZAD_PORTAL_4         = 131
 };
 
 enum NXGOs
@@ -194,11 +190,7 @@ enum NXSays
     SAY_SAPP_DIALOG5                = 4,
     SAY_SAPP_DIALOG6                = 20,
     SAY_CAT_DIED                    = 5,
-    SAY_FIRST_WING_TAUNT            = 16,
-    SAY_HORSEMEN_DIALOG_1           = 5,
-    SAY_HORSEMEN_DIALOG_2           = 6,
-    SAY_ZELIEK_INTRO_1              = 8,
-    SAY_ZELIEK_INTRO_2              = 9
+    SAY_FIRST_WING_TAUNT            = 16
 };
 
 enum NXEvents
@@ -206,7 +198,7 @@ enum NXEvents
     EVENT_THADDIUS_SCREAMS          = 0,
     EVENT_KELTHUZAD_WING_TAUNT      = 1,
     EVENT_FROSTWYRM_WATERFALL_DOOR  = 2,
-    EVENT_HORSEMEN_DIALOG           = 3
+    EVENT_HORSEMEN_INTRO            = 3
 };
 
 template <class AI, class T>

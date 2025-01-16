@@ -15,7 +15,6 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "AreaTriggerScript.h"
 #include "CombatAI.h"
 #include "CreatureScript.h"
 #include "GridNotifiers.h"
@@ -803,33 +802,10 @@ class spell_gothik_shadow_bolt_volley : public SpellScript
     }
 };
 
-class at_gothik_entrance : public OnlyOnceAreaTriggerScript
-{
-public:
-    at_gothik_entrance() : OnlyOnceAreaTriggerScript("at_gothik_entrance") { }
-
-    bool _OnTrigger(Player* player, AreaTrigger const* /*at*/) override
-    {
-        if (InstanceScript* instance = player->GetInstanceScript())
-        {
-            if (instance->GetBossState(BOSS_HORSEMAN) == DONE)
-                return false;
-
-            // Do not continue! Turn back while there's still time!
-            if (Creature* zeliek = instance->GetCreature(DATA_SIR_ZELIEK))
-                zeliek->AI()->Talk(SAY_ZELIEK_INTRO_2, 30s);
-
-            return true;
-        }
-        return false;
-    }
-};
-
 void AddSC_boss_gothik()
 {
     new boss_gothik();
     new npc_boss_gothik_minion();
     new npc_gothik_trigger();
     RegisterSpellScript(spell_gothik_shadow_bolt_volley);
-    new at_gothik_entrance();
 }
