@@ -1,3 +1,4 @@
+-- DB update 2025_01_16_01 -> 2025_01_16_02
 --
 UPDATE `creature_template` SET `AIName` = 'SmartAI' WHERE `entry` = 24138;
 
