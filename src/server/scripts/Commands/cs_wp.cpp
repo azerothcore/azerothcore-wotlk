@@ -617,7 +617,7 @@ public:
 
             if (!result)
             {
-                handler->PSendSysMessage(LANG_WAYPOINT_NOTFOUNDDBPROBLEM, wpSpawnId);
+                handler->PSendSysMessage(LANG_WAYPOINT_NOTFOUNDDBPROBLEM, wpSpawnId.ToString());
                 return true;
             }
         }
@@ -807,7 +807,7 @@ public:
 
             if (!result)
             {
-                handler->SendSysMessage(LANG_WAYPOINT_NOTFOUNDDBPROBLEM);
+                handler->SendSysMessage(LANG_WAYPOINT_NOTFOUNDDBPROBLEM, target->GetSpawnId().ToString());
                 return true;
             }
 
