@@ -21,6 +21,7 @@
 #include "InstanceMapScript.h"
 #include "InstanceScript.h"
 #include "shattered_halls.h"
+#include "Group.h"
 
 ObjectData const creatureData[] =
 {
@@ -66,7 +67,26 @@ public:
         void OnPlayerEnter(Player* player) override
         {
             if (TeamIdInInstance == TEAM_NEUTRAL)
-                TeamIdInInstance = player->GetTeamId();
+            {
+                if (Group* group = player->GetGroup())
+                {
+                    if (Player* gLeader = ObjectAccessor::FindPlayer(group->GetLeaderGUID()))
+                        TeamIdInInstance = Player::TeamIdForRace(gLeader->getRace());
+                    else
+                        TeamIdInInstance = player->GetTeamId();
+                }
+                else
+                    TeamIdInInstance = player->GetTeamId();
+            }
+
+            if (sWorld->getBoolConfig(CONFIG_ALLOW_TWO_SIDE_INTERACTION_GROUP))
+                player->SetFaction((TeamIdInInstance == TEAM_HORDE) ? 1610 : 1);
+        }
+
+        void OnPlayerLeave(Player* player) override
+        {
+            if (sWorld->getBoolConfig(CONFIG_ALLOW_TWO_SIDE_INTERACTION_GROUP))
+                player->SetFactionForRace(player->getRace());
         }
 
         void OnCreatureCreate(Creature* creature) override
@@ -76,7 +96,17 @@ public:
                 Map::PlayerList const& players = instance->GetPlayers();
                 if (!players.IsEmpty())
                     if (Player* player = players.begin()->GetSource())
-                        TeamIdInInstance = player->GetTeamId();
+                    {
+                        if (Group* group = player->GetGroup())
+                        {
+                            if (Player* gLeader = ObjectAccessor::FindPlayer(group->GetLeaderGUID()))
+                                TeamIdInInstance = Player::TeamIdForRace(gLeader->getRace());
+                            else
+                                TeamIdInInstance = player->GetTeamId();
+                        }
+                        else
+                            TeamIdInInstance = player->GetTeamId();
+                    }
             }
 
             switch (creature->GetEntry())
@@ -84,22 +114,26 @@ public:
                 case NPC_SHATTERED_EXECUTIONER:
                     if (RescueTimer > 25 * MINUTE * IN_MILLISECONDS)
                         creature->AddLootMode(2);
-                    executionerGUID = creature->GetGUID();
+                    ExecutionerGUID = creature->GetGUID();
                     break;
                 case NPC_RIFLEMAN_BROWNBEARD:
                     if (TeamIdInInstance == TEAM_HORDE)
                         creature->UpdateEntry(NPC_KORAG_PROUDMANE);
-                    prisonerGUID[0] = creature->GetGUID();
+                    PrisonerGUID[0] = creature->GetGUID();
                     break;
                 case NPC_CAPTAIN_ALINA:
                     if (TeamIdInInstance == TEAM_HORDE)
                         creature->UpdateEntry(NPC_CAPTAIN_BONESHATTER);
-                    prisonerGUID[1] = creature->GetGUID();
+                    PrisonerGUID[1] = creature->GetGUID();
                     break;
                 case NPC_PRIVATE_JACINT:
                     if (TeamIdInInstance == TEAM_HORDE)
                         creature->UpdateEntry(NPC_SCOUT_ORGARR);
-                    prisonerGUID[2] = creature->GetGUID();
+                    PrisonerGUID[2] = creature->GetGUID();
+                    break;
+                case NPC_RANDY_WHIZZLESPROCKET:
+                    if (TeamIdInInstance == TEAM_HORDE)
+                        creature->UpdateEntry(NPC_DRISELLA);
                     break;
             }
             InstanceScript::OnCreatureCreate(creature);
@@ -126,9 +160,9 @@ public:
                 case DATA_PRISONER_1:
                 case DATA_PRISONER_2:
                 case DATA_PRISONER_3:
-                    return prisonerGUID[data - DATA_PRISONER_1];
+                    return PrisonerGUID[data - DATA_PRISONER_1];
                 case DATA_EXECUTIONER:
-                    return executionerGUID;
+                    return ExecutionerGUID;
             }
 
             return ObjectGuid::Empty;
@@ -144,22 +178,22 @@ public:
                 {
                     DoRemoveAurasDueToSpellOnPlayers(SPELL_KARGATHS_EXECUTIONER_1);
                     DoCastSpellOnPlayers(SPELL_KARGATHS_EXECUTIONER_2);
-                    if (Creature* prisoner = instance->GetCreature(prisonerGUID[0]))
+                    if (Creature* prisoner = instance->GetCreature(PrisonerGUID[0]))
                         Unit::Kill(prisoner, prisoner);
-                    if (Creature* executioner = instance->GetCreature(executionerGUID))
+                    if (Creature* executioner = instance->GetCreature(ExecutionerGUID))
                         executioner->RemoveLootMode(2);
                 }
                 else if ((RescueTimer / IN_MILLISECONDS) == 15 * MINUTE)
                 {
                     DoRemoveAurasDueToSpellOnPlayers(SPELL_KARGATHS_EXECUTIONER_2);
                     DoCastSpellOnPlayers(SPELL_KARGATHS_EXECUTIONER_3);
-                    if (Creature* prisoner = instance->GetCreature(prisonerGUID[1]))
+                    if (Creature* prisoner = instance->GetCreature(PrisonerGUID[1]))
                         Unit::Kill(prisoner, prisoner);
                 }
                 else if ((RescueTimer / IN_MILLISECONDS) == 0)
                 {
                     DoRemoveAurasDueToSpellOnPlayers(SPELL_KARGATHS_EXECUTIONER_3);
-                    if (Creature* prisoner = instance->GetCreature(prisonerGUID[2]))
+                    if (Creature* prisoner = instance->GetCreature(PrisonerGUID[2]))
                         Unit::Kill(prisoner, prisoner);
                 }
             }
@@ -176,8 +210,8 @@ public:
         }
 
     protected:
-        ObjectGuid executionerGUID;
-        ObjectGuid prisonerGUID[3];
+        ObjectGuid ExecutionerGUID;
+        ObjectGuid PrisonerGUID[3];
         uint32 RescueTimer;
         TeamId TeamIdInInstance;
     };
