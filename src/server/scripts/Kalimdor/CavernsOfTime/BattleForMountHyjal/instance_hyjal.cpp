@@ -94,6 +94,7 @@ public:
             _retreat = 0;
             trash = 0;
             _currentWave = 0;
+            InitialWaves = false;
             _encounterNPCs.clear();
             _summonedNPCs.clear();
             _baseAlliance.clear();
@@ -190,8 +191,9 @@ public:
 
                     if (creature->IsSummon() && _bossWave != TO_BE_DECIDED)
                     {
-                        if (_currentWave == 0)
+                        if (_currentWave == 0 && InitialWaves)
                             creature->SetDisableReputationGain(true);
+                          
                         DoUpdateWorldState(WORLD_STATE_ENEMYCOUNT, ++trash);    // Update the instance wave count on new trash spawn
                         _encounterNPCs.insert(creature->GetGUID());             // Used for despawning on wipe
                     }
@@ -245,6 +247,7 @@ public:
                         _summonedNPCs.erase(creature->GetGUID());
                         break;
                     case NPC_WINTERCHILL:
+                        InitialWaves = false;
                     case NPC_ANETHERON:
                     case NPC_KAZROGAL:
                     case NPC_AZGALOR:
@@ -364,6 +367,7 @@ public:
                     _retreat = 0;
                     if (GetBossState(DATA_WINTERCHILL) != DONE)
                     {
+                        InitialWaves = true;
                         if (_bossWave == TO_BE_DECIDED)
                             for (ObjectGuid const& guid : _baseAlliance)
                                 if (Creature* creature = instance->GetCreature(guid))
@@ -481,6 +485,9 @@ public:
                     SetData(DATA_RESET_WAVES, 0);
                     break;
                 case DATA_RESET_WAVES:
+                    if (GetBossState(DATA_WINTERCHILL) != DONE)
+                        InitialWaves = true;
+
                     scheduler.CancelGroup(CONTEXT_GROUP_WAVES);
                     _encounterNPCs.clear();
                     _summonedNPCs.clear();
@@ -581,6 +588,7 @@ public:
         GuidSet _ancientGemHorde;
         GuidSet _roaringFlameAlliance;
         GuidSet _roaringFlameHorde;
+        bool InitialWaves;
     };
 };
 
