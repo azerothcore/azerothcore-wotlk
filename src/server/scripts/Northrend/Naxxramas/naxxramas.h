@@ -190,7 +190,9 @@ enum NXSays
     SAY_SAPP_DIALOG5                = 4,
     SAY_SAPP_DIALOG6                = 20,
     SAY_CAT_DIED                    = 5,
-    SAY_FIRST_WING_TAUNT            = 16
+    SAY_FIRST_WING_TAUNT            = 16,
+    SAY_HORSEMEN_DIALOG1            = 5,
+    SAY_HORSEMEN_DIALOG2            = 6
 };
 
 enum NXEvents
