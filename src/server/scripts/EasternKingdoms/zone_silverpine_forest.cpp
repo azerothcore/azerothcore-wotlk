@@ -161,136 +161,37 @@ static float PyrewoodSpawnPoints[3][4] =
     {-397.018219f, 1510.208740f, 18.868748f, 4.731330f},
 };
 
-#define WAIT_SECS 6000
-
-class pyrewood_ambush : public CreatureScript
+struct npc_deathstalker_fearleia : public ScriptedAI
 {
-public:
-    pyrewood_ambush() : CreatureScript("pyrewood_ambush") { }
-
-    bool OnQuestAccept(Player* player, Creature* creature, const Quest* quest) override
+    npc_deathstalker_fearleia(Creature* creature) : ScriptedAI(creature), _summons(me)
     {
-        if (quest->GetQuestId() == QUEST_PYREWOOD_AMBUSH && !CAST_AI(pyrewood_ambush::pyrewood_ambushAI, creature->AI())->QuestInProgress)
-        {
-            CAST_AI(pyrewood_ambush::pyrewood_ambushAI, creature->AI())->QuestInProgress = true;
-            CAST_AI(pyrewood_ambush::pyrewood_ambushAI, creature->AI())->Phase = 0;
-            CAST_AI(pyrewood_ambush::pyrewood_ambushAI, creature->AI())->KillCount = 0;
-            CAST_AI(pyrewood_ambush::pyrewood_ambushAI, creature->AI())->PlayerGUID = player->GetGUID();
-        }
-
-        return true;
+        _questInProgress = false;
     }
 
-    CreatureAI* GetAI(Creature* creature) const override
+    void Reset() override
     {
-        return new pyrewood_ambushAI(creature);
+        if (!_questInProgress)
+        {
+            _playerGUID.Clear();
+            _summons.DespawnAll();
+        }
     }
 
-    struct pyrewood_ambushAI : public ScriptedAI
+    void sQuestAccept(Player* player, Quest const* quest) override
     {
-        pyrewood_ambushAI(Creature* creature) : ScriptedAI(creature), Summons(me)
+        if (quest->GetQuestId() == QUEST_PYREWOOD_AMBUSH && !_questInProgress)
         {
-            QuestInProgress = false;
+            _questInProgress = true;
+            _playerGUID = player->GetGUID();
         }
 
-        uint32 Phase;
-        int8 KillCount;
-        uint32 WaitTimer;
-        ObjectGuid PlayerGUID;
-        SummonList Summons;
+        Talk(NPCSAY_INIT, player);
 
-        bool QuestInProgress;
-
-        void Reset() override
+        scheduler.Schedule(6s, [this](TaskContext context)
         {
-            WaitTimer = WAIT_SECS;
-
-            if (!QuestInProgress) //fix reset values (see UpdateVictim)
-            {
-                Phase = 0;
-                KillCount = 0;
-                PlayerGUID.Clear();
-                Summons.DespawnAll();
-            }
-        }
-
-        void JustEngagedWith(Unit* /*who*/) override { }
-
-        void JustSummoned(Creature* summoned) override
-        {
-            Summons.Summon(summoned);
-            ++KillCount;
-        }
-
-        void SummonedCreatureDespawn(Creature* summoned) override
-        {
-            Summons.Despawn(summoned);
-            --KillCount;
-        }
-
-        void SummonCreatureWithRandomTarget(uint32 creatureId, int position)
-        {
-            if (Creature* summoned = me->SummonCreature(creatureId, PyrewoodSpawnPoints[position][0], PyrewoodSpawnPoints[position][1], PyrewoodSpawnPoints[position][2], PyrewoodSpawnPoints[position][3], TEMPSUMMON_CORPSE_TIMED_DESPAWN, 15000))
-            {
-                Unit* target = nullptr;
-                if (PlayerGUID)
-                    if (Player* player = ObjectAccessor::GetPlayer(*me, PlayerGUID))
-                        if (player->IsAlive() && RAND(0, 1))
-                            target = player;
-
-                if (!target)
-                    target = me;
-
-                summoned->SetFaction(FACTION_STORMWIND);
-                summoned->AddThreat(target, 32.0f);
-                summoned->AI()->AttackStart(target);
-            }
-        }
-
-        void JustDied(Unit* /*killer*/) override
-        {
-            if (PlayerGUID)
-                if (Player* player = ObjectAccessor::GetPlayer(*me, PlayerGUID))
-                    if (player->GetQuestStatus(QUEST_PYREWOOD_AMBUSH) == QUEST_STATUS_INCOMPLETE)
-                        player->FailQuest(QUEST_PYREWOOD_AMBUSH);
-        }
-
-        void UpdateAI(uint32 diff) override
-        {
-            //LOG_INFO("scripts", "DEBUG: p({}) k({}) d({}) W({})", Phase, KillCount, diff, WaitTimer);
-
-            if (!QuestInProgress)
-                return;
-
-            if (KillCount && Phase < 6)
-            {
-                if (!UpdateVictim()) //reset() on target Despawn...
-                    return;
-
-                DoMeleeAttackIfReady();
-                return;
-            }
-
-            switch (Phase)
+            switch (context.GetRepeatCounter())
             {
                 case 0:
-                    if (WaitTimer == WAIT_SECS)
-                    {
-                        if (PlayerGUID)
-                        {
-                            if (Player* player = ObjectAccessor::GetPlayer(*me, PlayerGUID))
-                            {
-                                me->AI()->Talk(NPCSAY_INIT, player);
-                            }
-                        }
-                    }
-                    if (WaitTimer <= diff)
-                    {
-                        WaitTimer -= diff;
-                        return;
-                    }
-                    break;
-                case 1:
                     SummonCreatureWithRandomTarget(2060, 1);
                     break;
                 case 2:
@@ -309,21 +210,73 @@ public:
                     SummonCreatureWithRandomTarget(2068, 2);
                     break;
                 case 5: //end
-                    if (PlayerGUID)
+                    if (Player* player = ObjectAccessor::GetPlayer(*me, _playerGUID))
                     {
-                        if (Player* player = ObjectAccessor::GetPlayer(*me, PlayerGUID))
-                        {
-                            me->AI()->Talk(NPCSAY_END, player);
-                            player->GroupEventHappens(QUEST_PYREWOOD_AMBUSH, me);
-                        }
+                        Talk(NPCSAY_END, player);
+                        player->GroupEventHappens(QUEST_PYREWOOD_AMBUSH, me);
                     }
-                    QuestInProgress = false;
+                    _questInProgress = false;
                     Reset();
                     break;
             }
-            ++Phase; //prepare next phase
+
+            if (context.GetRepeatCounter() < 5)
+                context.Repeat();
+        });
+    }
+
+    void JustEngagedWith(Unit* /*who*/) override {}
+
+    void JustSummoned(Creature* summoned) override
+    {
+        _summons.Summon(summoned);
+    }
+
+    void SummonedCreatureDespawn(Creature* summoned) override
+    {
+        _summons.Despawn(summoned);
+    }
+
+    void SummonCreatureWithRandomTarget(uint32 creatureId, int position)
+    {
+        if (Creature* summoned = me->SummonCreature(creatureId, PyrewoodSpawnPoints[position][0], PyrewoodSpawnPoints[position][1], PyrewoodSpawnPoints[position][2], PyrewoodSpawnPoints[position][3], TEMPSUMMON_CORPSE_TIMED_DESPAWN, 15000))
+        {
+            Unit* target = nullptr;
+            if (Player* player = ObjectAccessor::GetPlayer(*me, _playerGUID))
+                if (player->IsAlive() && RAND(0, 1))
+                    target = player;
+
+            if (!target)
+                target = me;
+
+            summoned->SetFaction(FACTION_STORMWIND);
+            summoned->AddThreat(target, 32.0f);
+            summoned->AI()->AttackStart(target);
         }
-    };
+    }
+
+    void JustDied(Unit* /*killer*/) override
+    {
+        if (Player* player = ObjectAccessor::GetPlayer(*me, _playerGUID))
+            if (player->GetQuestStatus(QUEST_PYREWOOD_AMBUSH) == QUEST_STATUS_INCOMPLETE)
+                player->FailQuest(QUEST_PYREWOOD_AMBUSH);
+    }
+
+    void UpdateAI(uint32 diff) override
+    {
+        if (_questInProgress && !_summons.IsAnyCreatureAlive())
+            scheduler.Update(diff);
+
+        if (!UpdateVictim())
+            return;
+
+        DoMeleeAttackIfReady();
+    }
+
+private:
+    ObjectGuid _playerGUID;
+    SummonList _summons;
+    bool _questInProgress;
 };
 
 /**
@@ -485,6 +438,6 @@ public:
 void AddSC_silverpine_forest()
 {
     new npc_deathstalker_erland();
-    new pyrewood_ambush();
+    RegisterCreatureAI(npc_deathstalker_fearleia);
     new npc_ravenclaw_apparition();
 }
