@@ -467,7 +467,7 @@ void BattlegroundMgr::LoadBattlegroundTemplates()
 
         BattlegroundTypeId bgTypeId = static_cast<BattlegroundTypeId>(fields[0].Get<uint32>());
 
-        if (DisableMgr::IsDisabledFor(DISABLE_TYPE_BATTLEGROUND, bgTypeId, nullptr))
+        if (sDisableMgr->IsDisabledFor(DISABLE_TYPE_BATTLEGROUND, bgTypeId, nullptr))
             continue;
 
         // can be overwrite by values from DB

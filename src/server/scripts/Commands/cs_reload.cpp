@@ -1063,9 +1063,9 @@ public:
     static bool HandleReloadDisablesCommand(ChatHandler* handler)
     {
         LOG_INFO("server.loading", "Reloading disables table...");
-        DisableMgr::LoadDisables();
+        sDisableMgr->LoadDisables();
         LOG_INFO("server.loading", "Checking quest disables...");
-        DisableMgr::CheckQuestDisables();
+        sDisableMgr->CheckQuestDisables();
         handler->SendGlobalGMSysMessage("DB table `disables` reloaded.");
         return true;
     }

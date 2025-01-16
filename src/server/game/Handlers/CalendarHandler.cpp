@@ -158,7 +158,7 @@ void WorldSession::HandleCalendarGetCalendar(WorldPacket& /*recvData*/)
     {
         HolidaysEntry const* holiday = sHolidaysStore.LookupEntry(entry);
 
-        if (DisableMgr::IsDisabledFor(DISABLE_TYPE_GAME_EVENT, sGameEventMgr->GetHolidayEventId(holiday->Id), nullptr))
+        if (sDisableMgr->IsDisabledFor(DISABLE_TYPE_GAME_EVENT, sGameEventMgr->GetHolidayEventId(holiday->Id), nullptr))
         {
             continue;
         }
