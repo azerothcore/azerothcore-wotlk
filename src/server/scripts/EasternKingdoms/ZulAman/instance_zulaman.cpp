@@ -49,11 +49,15 @@ Position const HarrisonJonesLoc = {120.687f, 1674.0f, 42.0217f, 1.59044f};
 
 DoorData const doorData[] =
 {
-    { GO_ZULJIN_FIREWALL,      DATA_ZULJIN,  DOOR_TYPE_ROOM    },
-    { GO_DOOR_HALAZZI,         DATA_HALAZZI, DOOR_TYPE_PASSAGE },
-    { GO_LYNX_TEMPLE_ENTRANCE, DATA_HALAZZI, DOOR_TYPE_ROOM    },
-    { GO_DOOR_AKILZON,         DATA_AKILZON, DOOR_TYPE_ROOM    },
-    { 0,                       0,            DOOR_TYPE_ROOM    } // END
+    { GO_ZULJIN_FIREWALL,            DATA_ZULJIN,   DOOR_TYPE_ROOM    },
+    { GO_DOOR_HALAZZI,               DATA_HALAZZI,  DOOR_TYPE_PASSAGE },
+    { GO_LYNX_TEMPLE_ENTRANCE,       DATA_HALAZZI,  DOOR_TYPE_ROOM    },
+    { GO_DOOR_AKILZON,               DATA_AKILZON,  DOOR_TYPE_ROOM    },
+    { GO_ALTAR_TORCH_EAGLE_GOD,      DATA_AKILZON,  DOOR_TYPE_PASSAGE },
+    { GO_ALTAR_TORCH_DRAGONHAWK_GOD, DATA_JANALAI,  DOOR_TYPE_PASSAGE },
+    { GO_ALTAR_TORCH_LYNX_GOD,       DATA_HALAZZI,  DOOR_TYPE_PASSAGE },
+    { GO_ALTAR_TORCH_BEAR_GOD,       DATA_NALORAKK, DOOR_TYPE_PASSAGE },
+    { 0,                             0,             DOOR_TYPE_ROOM    } // END
 };
 
 ObjectData const creatureData[] =
@@ -82,7 +86,12 @@ ObjectData const summonData[] =
 
 BossBoundaryData const boundaries =
 {
-    { DATA_HEXLORD,    new RectangleBoundary(80.50557f, 920.9858f, 155.88986f, 1015.27563f)}
+    { DATA_AKILZON,  new ZRangeBoundary(72.0f, 100.0f)},
+    { DATA_HALAZZI,  new RectangleBoundary(304.0f, 432.0f, 1052.0f, 1156.0f)},
+    { DATA_HEXLORD,  new RectangleBoundary(80.50557f, 920.9858f, 155.88986f, 1015.27563f)},
+    { DATA_JANALAI,  new ZRangeBoundary(16.0f, 46.0f)},
+    { DATA_NALORAKK, new ZRangeBoundary(38.0f, 68.0f)},
+    { DATA_ZULJIN,   new ZRangeBoundary(43.0f, 73.0f)}
 };
 
 class instance_zulaman : public InstanceMapScript
@@ -139,10 +148,10 @@ public:
 
         void OnGameObjectCreate(GameObject* go) override
         {
-            if (go->GetEntry() == GO_GATE_HEXLORD)
-                CheckInstanceStatus();
-
             InstanceScript::OnGameObjectCreate(go);
+
+            if (go->GetEntry() == GO_GATE_HEXLORD)
+                CheckInstanceStatus(go);
         }
 
         void SummonHostage(uint8 num)
@@ -179,10 +188,10 @@ public:
             }
         }
 
-        void CheckInstanceStatus()
+        void CheckInstanceStatus(GameObject* gate = nullptr)
         {
             if (AllBossesDone({ DATA_NALORAKK, DATA_AKILZON, DATA_JANALAI, DATA_HALAZZI }))
-                HandleGameObject(ObjectGuid::Empty, true, GetGameObject(DATA_HEXLORD_GATE));
+                HandleGameObject(ObjectGuid::Empty, true, gate ? gate : GetGameObject(DATA_HEXLORD_GATE));
         }
 
         void SetData(uint32 type, uint32 data) override
@@ -199,6 +208,11 @@ public:
                     ResetAkilzonGauntlet();
                 else if (data == DONE)
                     _akilzonGauntlet = DONE;
+            }
+            else if (type == DATA_CHEST_LOOTED)
+            {
+                uint8 chestCount = GetPersistentData(DATA_CHEST_COUNT);
+                StorePersistentData(DATA_CHEST_COUNT, ++chestCount);
             }
         }
 
@@ -226,11 +240,32 @@ public:
             _akilzonGauntlet = NOT_STARTED;
             for (ObjectGuid guid : AkilzonTrash)
                 if (Creature* creature = instance->GetCreature(guid))
+                {
                     if (!creature->IsAlive())
                         creature->Respawn();
+                    else if (creature->GetEntry() == NPC_AMINISHI_TEMPEST)
+                        creature->AI()->DoAction(ACTION_RESET_AKILZON_GAUNTLET);
+                }
             if (Creature* creature = GetCreature(DATA_LOOKOUT))
                 if (creature->isMoving())
                     creature->Respawn(true);
+        }
+
+        void OnUnitDeath(Unit* unit) override
+        {
+            Creature* creature = unit->ToCreature();
+            if (!creature)
+                return;
+
+            switch (creature->GetEntry())
+            {
+                case NPC_AMINISHI_PROTECTOR:
+                case NPC_AMANISHI_WIND_WALKER:
+                    if (_akilzonGauntlet == NOT_STARTED && AkilzonTrash.contains(creature->GetGUID()))
+                        creature->DespawnOrUnsummon(30s, 1s);
+                default:
+                    break;
+            }
         }
 
         void OnCreatureEvade(Creature* creature) override
@@ -320,6 +355,8 @@ public:
                 return RandVendor[1];
             else if (type == TYPE_AKILZON_GAUNTLET)
                 return _akilzonGauntlet;
+            else if (type == DATA_CHEST_LOOTED)
+                return GetPersistentData(DATA_CHEST_COUNT);
 
             return 0;
         }
