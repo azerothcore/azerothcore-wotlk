@@ -1,3 +1,4 @@
+-- DB update 2025_01_16_03 -> 2025_01_16_04
 
 -- Bloodscalp Witch Doctor SmartAI
 UPDATE `creature_template` SET `AIName` = 'SmartAI' WHERE `entry` = 660;
