@@ -3516,20 +3516,20 @@ void ObjectMgr::LoadVehicleSeatAddon()
 
         if (!sVehicleSeatStore.LookupEntry(seatID))
         {
-            LOG_ERROR("sql.sql", "Table `vehicle_seat_addon`: SeatID: %u does not exist in VehicleSeat.dbc. Skipping entry.", seatID);
+            LOG_ERROR("sql.sql", "Table `vehicle_seat_addon`: SeatID: {} does not exist in VehicleSeat.dbc. Skipping entry.", seatID);
             continue;
         }
 
         // Sanitizing values
         if (orientation > float(M_PI * 2))
         {
-            LOG_ERROR("sql.sql", "Table `vehicle_seat_addon`: SeatID: %u is using invalid angle offset value (%f). Set Value to 0.", seatID, orientation);
+            LOG_ERROR("sql.sql", "Table `vehicle_seat_addon`: SeatID: {} is using invalid angle offset value ({}). Set Value to 0.", seatID, orientation);
             orientation = 0.0f;
         }
 
         if (exitParam >= AsUnderlyingType(VehicleExitParameters::VehicleExitParamMax))
         {
-            LOG_ERROR("sql.sql", "Table `vehicle_seat_addon`: SeatID: %u is using invalid exit parameter value (%u). Setting to 0 (none).", seatID, exitParam);
+            LOG_ERROR("sql.sql", "Table `vehicle_seat_addon`: SeatID: {} is using invalid exit parameter value ({}). Setting to 0 (none).", seatID, exitParam);
             continue;
         }
 
@@ -3538,7 +3538,7 @@ void ObjectMgr::LoadVehicleSeatAddon()
         ++count;
     } while (result->NextRow());
 
-    LOG_INFO("server.loading", ">> Loaded %u Vehicle Seat Addon entries in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
+    LOG_INFO("server.loading", ">> Loaded {} Vehicle Seat Addon entries in {} ms", count, GetMSTimeDiffToNow(oldMSTime));
 }
 
 void ObjectMgr::LoadPetLevelInfo()

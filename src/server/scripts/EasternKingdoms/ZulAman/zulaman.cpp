@@ -358,8 +358,7 @@ enum DisplayIds
 enum EntryIds
 {
     NPC_HARRISON_JONES_1                = 24375,
-    NPC_HARRISON_JONES_2                = 24365,
-    NPC_AMANISHI_GUARDIAN               = 23597,
+    NPC_HARRISON_JONES_2                = 24365
 };
 
 enum Weapons
@@ -417,7 +416,10 @@ struct npc_harrison_jones : public ScriptedAI
                 std::list<Creature*> creatures;
                 me->GetCreatureListWithEntryInGrid(creatures, NPC_AMANISHI_SAVAGE, 100.0f);
                 for (Creature* creature : creatures)
+                {
+                    creature->SetImmuneToAll(false);
                     creature->SetInCombatWithZone();
+                }
             });
             _instance->StorePersistentData(DATA_TIMED_RUN, 21);
             _instance->DoAction(ACTION_START_TIMED_RUN);
@@ -561,7 +563,7 @@ struct npc_amanishi_lookout : public NullCreatureAI
 
     void MoveInLineOfSight(Unit* who) override
     {
-        if (!me->IsWithinDist(who, 25.0f, false)) // distance not confirmed
+        if (!me->IsWithinDist(who, me->GetAggroRange(who), false))
                 return;
 
         Player* player = who->GetCharmerOrOwnerPlayerOrPlayerItself();
@@ -591,6 +593,29 @@ struct npc_amanishi_lookout : public NullCreatureAI
         // at boss
         if (type == WAYPOINT_MOTION_TYPE && id == 8) // should despawn with waypoint script
             me->DespawnOrUnsummon(0s, 0s);
+    }
+private:
+    InstanceScript* _instance;
+};
+
+struct npc_eagle_trash_aggro_trigger : public ScriptedAI
+{
+    npc_eagle_trash_aggro_trigger(Creature* creature) : ScriptedAI(creature), _instance(creature->GetInstanceScript()) {}
+
+    void MoveInLineOfSight(Unit* who) override
+    {
+        if (who->GetLevel() > 70)
+            return;
+
+        if (!me->IsWithinDist(who, me->GetAggroRange(who), false))
+            return;
+
+        Player* player = who->GetCharmerOrOwnerPlayerOrPlayerItself();
+        if (!player || player->IsGameMaster())
+            return;
+
+        if (_instance->GetData(TYPE_AKILZON_GAUNTLET) == NOT_STARTED)
+            _instance->SetData(TYPE_AKILZON_GAUNTLET, IN_PROGRESS);
     }
 private:
     InstanceScript* _instance;
@@ -682,22 +707,6 @@ private:
     SummonList _summons;
 };
 
-struct WorldTriggerHutPred
-{
-    bool operator()(Creature* trigger) const
-    {
-        return trigger->GetOrientation() > 2.7f || (trigger->GetOrientation() < 2.7f && 1270.0f < trigger->GetPositionY() && trigger->GetPositionY() < 1280.0f);
-    }
-};
-
-struct WorldTriggerDrumPred
-{
-    bool operator()(Creature* trigger) const
-    {
-        return !WorldTriggerHutPred()(trigger);
-    }
-};
-
 enum AmanishiScout
 {
     NPC_WORLD_TRIGGER               = 22515,
@@ -707,6 +716,18 @@ enum AmanishiScout
     SPELL_MULTI_SHOT                = 43205,
     SPELL_SHOOT                     = 16496
 };
+
+inline bool IsHut(Creature* trigger)
+{
+    return trigger->GetPositionX() < -90.0f // South of Jan'alai area
+        && ((trigger->GetOrientation() > 2.7f) || (trigger->GetOrientation() < 2.7f && 1270.0f < trigger->GetPositionY() && trigger->GetPositionY() < 1280.0f));
+}
+
+inline bool IsDrum(Creature* trigger)
+{
+    return trigger->GetPositionX() < -90.0f // South of Jan'alai area
+        && !IsHut(trigger);
+}
 
 struct npc_amanishi_scout : public ScriptedAI
 {
@@ -725,7 +746,7 @@ struct npc_amanishi_scout : public ScriptedAI
         // Move to Drum
         std::list<Creature*> triggers;
         GetCreatureListWithEntryInGrid(triggers, me, NPC_WORLD_TRIGGER, 50.0f);
-        triggers.remove_if(WorldTriggerHutPred());
+        triggers.remove_if([](Creature* trigger) {return !IsDrum(trigger);});
         triggers.sort(Acore::ObjectDistanceOrderPred(me));
         if (!triggers.empty())
         {
@@ -826,7 +847,7 @@ class spell_summon_amanishi_sentries : public SpellScript
     {
         std::list<Creature*> triggers;
         GetCreatureListWithEntryInGrid(triggers, GetHitUnit(), NPC_WORLD_TRIGGER, 50.0f);
-        triggers.remove_if(WorldTriggerDrumPred());
+        triggers.remove_if([](Creature* trigger) {return !IsHut(trigger);});
         if (triggers.empty())
             return;
         Creature* trigger = Acore::Containers::SelectRandomContainerElement(triggers);
@@ -849,6 +870,7 @@ void AddSC_zulaman()
     RegisterZulAmanCreatureAI(npc_harrison_jones);
     RegisterSpellScript(spell_ritual_of_power);
     RegisterZulAmanCreatureAI(npc_amanishi_lookout);
+    RegisterZulAmanCreatureAI(npc_eagle_trash_aggro_trigger);
     RegisterZulAmanCreatureAI(npc_amanishi_tempest);
     RegisterZulAmanCreatureAI(npc_amanishi_scout);
     RegisterSpellScript(spell_alert_drums);
