@@ -1,3 +1,4 @@
+-- DB update 2025_01_17_00 -> 2025_01_17_01
 --
 UPDATE `acore_string` SET
 `content_default` = "No waypoint information was found for Creature (GUID: {}). Make sure 'wp show on' command was properly executed.",
