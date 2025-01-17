@@ -107,7 +107,7 @@ bool Map::ExistMap(uint32 mapid, int gx, int gy)
         {
             if (header.mapMagic != MapMagic.asUInt || header.versionMagic != MapVersionMagic)
             {
-                LOG_ERROR("maps", "Map file '{}' is from an incompatible map version (%.*u v{}), %.*s v{} is expected. Please pull your source, recompile tools and recreate maps using the updated mapextractor, then replace your old map files with new files.",
+                LOG_ERROR("maps", "Map file '{}' is from an incompatible map version ({:.4u} v{}), {:.4s} v{} is expected. Please pull your source, recompile tools and recreate maps using the updated mapextractor, then replace your old map files with new files.",
                     tmp, 4, header.mapMagic, header.versionMagic, 4, MapMagic.asChar, MapVersionMagic);
             }
 
@@ -3081,6 +3081,8 @@ void InstanceMap::Update(const uint32 t_diff, const uint32 s_diff, bool /*thread
 
 void InstanceMap::RemovePlayerFromMap(Player* player, bool remove)
 {
+    if (instance_data)
+        instance_data->OnPlayerLeave(player);
     // pussywizard: moved m_unloadTimer to InstanceMap::AfterPlayerUnlinkFromMap(), in this function if 2 players run out at the same time the instance won't close
     //if (!m_unloadTimer && m_mapRefMgr.getSize() == 1)
     //    m_unloadTimer = m_unloadWhenEmpty ? MIN_UNLOAD_DELAY : std::max(sWorld->getIntConfig(CONFIG_INSTANCE_UNLOAD_DELAY), (uint32)MIN_UNLOAD_DELAY);

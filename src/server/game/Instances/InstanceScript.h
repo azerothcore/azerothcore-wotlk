@@ -184,6 +184,9 @@ public:
     //Called when a player successfully enters the instance.
     virtual void OnPlayerEnter(Player* /*player*/) {}
 
+    //Called when a player successfully leaves the instance.
+    virtual void OnPlayerLeave(Player* /*player*/) {}
+
     virtual void OnPlayerAreaUpdate(Player* /*player*/, uint32 /*oldArea*/, uint32 /*newArea*/) {}
 
     //Called when a player enters/leaves water bodies.
