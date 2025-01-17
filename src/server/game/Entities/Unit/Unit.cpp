@@ -13746,6 +13746,8 @@ void Unit::CombatStartOnCast(Unit* target, bool initialAggro, uint32 duration)
         // Update leash timer when attacking creatures
         if (target->IsCreature())
             target->ToCreature()->UpdateLeashExtensionTime();
+        else if (ToCreature()) // Reset leash if it is a spell caster, else it may evade inbetween casts
+            ToCreature()->UpdateLeashExtensionTime();
     }
 
     Unit* who = target->GetCharmerOrOwnerOrSelf();
