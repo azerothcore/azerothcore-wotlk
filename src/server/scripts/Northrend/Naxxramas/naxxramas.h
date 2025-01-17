@@ -190,14 +190,17 @@ enum NXSays
     SAY_SAPP_DIALOG5                = 4,
     SAY_SAPP_DIALOG6                = 20,
     SAY_CAT_DIED                    = 5,
-    SAY_FIRST_WING_TAUNT            = 16
+    SAY_FIRST_WING_TAUNT            = 16,
+    SAY_HORSEMEN_DIALOG1            = 5,
+    SAY_HORSEMEN_DIALOG2            = 6
 };
 
 enum NXEvents
 {
     EVENT_THADDIUS_SCREAMS          = 0,
     EVENT_KELTHUZAD_WING_TAUNT      = 1,
-    EVENT_FROSTWYRM_WATERFALL_DOOR  = 2
+    EVENT_FROSTWYRM_WATERFALL_DOOR  = 2,
+    EVENT_HORSEMEN_INTRO            = 3
 };
 
 template <class AI, class T>
