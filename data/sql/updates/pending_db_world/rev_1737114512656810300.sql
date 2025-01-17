@@ -72,7 +72,7 @@ INSERT INTO `gameobject` (`guid`, `id`, `map`, `zoneId`, `areaId`, `spawnMask`, 
 -- the spawn count for each pool has been estimated from the currently available sniffs
 DELETE FROM `pool_template` WHERE (`entry` IN (139, 140, 141));
 INSERT INTO `pool_template` (`entry`, `max_limit`, `description`) VALUES
-(139,  6, 'Eastern Kingdoms - Giant Clam - 6/32'),
+(139, 10, 'Eastern Kingdoms - Giant Clam - 10/32'),
 (140,  2, 'Kalimdor - Giant Clam - 2/4'),
 (141, 12, 'Blackfathom Deeps - Giant Clam - 12/27');
 
