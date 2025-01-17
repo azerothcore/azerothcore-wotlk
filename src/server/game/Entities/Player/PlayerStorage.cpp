@@ -5688,7 +5688,7 @@ void Player::_LoadActions(PreparedQueryResult result)
             else
             {
 
-                LOG_ERROR("entities.player", "ActionButton loading problem, will be deleted from db... from player ({] button:{}, action:{}, type:{}", button, action, type);
+                LOG_ERROR("entities.player", "ActionButton loading problem, will be deleted from db... button:{}, action:{}, type:{}", button, action, type);
 
                 // Will deleted in DB at next save (it can create data until save but marked as deleted)
                 m_actionButtons[button].uState = ACTIONBUTTON_DELETED;
