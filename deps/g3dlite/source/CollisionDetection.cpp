@@ -1998,7 +1998,7 @@ bool CollisionDetection::isPointInsideTriangle(
         break;
 
     default:
-        // This case is here to supress a warning on Linux
+        // This case is here to suppress a warning on Linux
         i = j = 0;
         debugAssertM(false, "Should not get here.");
         break;

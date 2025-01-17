@@ -1050,7 +1050,7 @@ void MovementInfo::OutDebug()
 WorldObject::WorldObject(bool isWorldObject) : WorldLocation(),
     LastUsedScriptID(0), m_name(""), m_isActive(false), m_visibilityDistanceOverride(), m_isWorldObject(isWorldObject), m_zoneScript(nullptr),
     _zoneId(0), _areaId(0), _floorZ(INVALID_HEIGHT), _outdoors(false), _liquidData(), _updatePositionData(false), m_transport(nullptr),
-    m_currMap(nullptr), m_InstanceId(0), m_phaseMask(PHASEMASK_NORMAL), m_useCombinedPhases(true), m_notifyflags(0), m_executed_notifies(0)
+    m_currMap(nullptr), _heartbeatTimer(HEARTBEAT_INTERVAL), m_InstanceId(0), m_phaseMask(PHASEMASK_NORMAL), m_useCombinedPhases(true), m_notifyflags(0), m_executed_notifies(0)
 {
     m_serverSideVisibility.SetValue(SERVERSIDE_VISIBILITY_GHOST, GHOST_VISIBILITY_ALIVE | GHOST_VISIBILITY_GHOST);
     m_serverSideVisibilityDetect.SetValue(SERVERSIDE_VISIBILITY_GHOST, GHOST_VISIBILITY_ALIVE);
@@ -1058,9 +1058,18 @@ WorldObject::WorldObject(bool isWorldObject) : WorldLocation(),
     sScriptMgr->OnWorldObjectCreate(this);
 }
 
-void WorldObject::Update(uint32 time_diff)
+void WorldObject::Update(uint32 diff)
 {
-    sScriptMgr->OnWorldObjectUpdate(this, time_diff);
+    m_Events.Update(diff);
+
+    _heartbeatTimer -= Milliseconds(diff);
+    while (_heartbeatTimer <= 0ms)
+    {
+        _heartbeatTimer += HEARTBEAT_INTERVAL;
+        Heartbeat();
+    }
+
+    sScriptMgr->OnWorldObjectUpdate(this, diff);
 }
 
 void WorldObject::SetWorldObject(bool on)
@@ -1134,6 +1143,8 @@ void WorldObject::CleanupsBeforeDelete(bool /*finalCleanup*/)
 {
     if (IsInWorld())
         RemoveFromWorld();
+
+    m_Events.KillAllEvents(false);                      // non-delatable (currently cast spells) will not deleted now but it will deleted at call in Map::RemoveAllObjectsInRemoveList
 }
 
 void WorldObject::_Create(ObjectGuid::LowType guidlow, HighGuid guidhigh, uint32 phaseMask)
@@ -2252,7 +2263,10 @@ TempSummon* Map::SummonCreature(uint32 entry, Position const& pos, SummonPropert
 
     summon->SetVisibleBySummonerOnly(visibleBySummonerOnly);
 
-    if (!AddToMap(summon->ToCreature(), summon->GetOwnerGUID().IsPlayer() || (summoner && summoner->GetTransport())))
+    bool summonerHasTransport = summoner && summoner->GetTransport();
+    bool summonerIsVehicle = summoner && summoner->IsUnit() && summoner->ToUnit()->IsVehicle();
+    bool checkTransport = summon->GetOwnerGUID().IsPlayer() || (summonerHasTransport && !summonerIsVehicle);
+    if (!AddToMap(summon->ToCreature(), checkTransport))
     {
         delete summon;
         return nullptr;
@@ -2260,7 +2274,9 @@ TempSummon* Map::SummonCreature(uint32 entry, Position const& pos, SummonPropert
 
     summon->InitSummon();
 
-    //ObjectAccessor::UpdateObjectVisibility(summon);
+    // call MoveInLineOfSight for nearby creatures
+    Acore::AIRelocationNotifier notifier(*summon);
+    Cell::VisitAllObjects(summon, notifier, GetVisibilityRange());
 
     return summon;
 }
@@ -2722,17 +2738,17 @@ bool WorldObject::GetClosePoint(float& x, float& y, float& z, float size, float 
     return true;
 }
 
-Position WorldObject::GetNearPosition(float dist, float angle)
+Position WorldObject::GetNearPosition(float dist, float angle, bool disableWarning)
 {
     Position pos = GetPosition();
-    MovePosition(pos, dist, angle);
+    MovePosition(pos, dist, angle, disableWarning);
     return pos;
 }
 
-Position WorldObject::GetRandomNearPosition(float radius)
+Position WorldObject::GetRandomNearPosition(float radius, bool disableWarning)
 {
     Position pos = GetPosition();
-    MovePosition(pos, radius * (float) rand_norm(), (float) rand_norm() * static_cast<float>(2 * M_PI));
+    MovePosition(pos, radius * (float) rand_norm(), (float) rand_norm() * static_cast<float>(2 * M_PI), disableWarning);
     return pos;
 }
 
@@ -2770,7 +2786,7 @@ void WorldObject::GetChargeContactPoint(WorldObject const* obj, float& x, float&
     return (m_valuesCount > UNIT_FIELD_COMBATREACH) ? m_floatValues[UNIT_FIELD_COMBATREACH] : DEFAULT_WORLD_OBJECT_SIZE * GetObjectScale();
 }
 
-void WorldObject::MovePosition(Position& pos, float dist, float angle)
+void WorldObject::MovePosition(Position& pos, float dist, float angle, bool disableWarning)
 {
     angle += GetOrientation();
     float destx, desty, destz, ground, floor;
@@ -2780,7 +2796,9 @@ void WorldObject::MovePosition(Position& pos, float dist, float angle)
     // Prevent invalid coordinates here, position is unchanged
     if (!Acore::IsValidMapCoord(destx, desty))
     {
-        LOG_FATAL("entities.object", "WorldObject::MovePosition invalid coordinates X: {} and Y: {} were passed!", destx, desty);
+        if (!disableWarning)
+            LOG_FATAL("entities.object", "WorldObject::MovePosition invalid coordinates X: {} and Y: {} were passed!", destx, desty);
+
         return;
     }
 
@@ -3123,7 +3141,7 @@ float WorldObject::GetMapHeight(float x, float y, float z, bool vmap/* = true*/,
 float WorldObject::GetMapWaterOrGroundLevel(float x, float y, float z, float* ground/* = nullptr*/) const
 {
     return GetMap()->GetWaterOrGroundLevel(GetPhaseMask(), x, y, z, ground,
-        IsUnit() ? !static_cast<Unit const*>(this)->HasAuraType(SPELL_AURA_WATER_WALK) : false,
+        IsUnit() ? !static_cast<Unit const*>(this)->HasWaterWalkAura() : false,
         std::max(GetCollisionHeight(),  Z_OFFSET_FIND_HEIGHT));
 }
 

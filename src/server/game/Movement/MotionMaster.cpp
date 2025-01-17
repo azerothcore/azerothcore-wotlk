@@ -520,7 +520,7 @@ void MotionMaster::MoveLand(uint32 id, float x, float y, float z, float speed /*
 /**
  * @brief Use to move the unit from the ground to the air. Doesn't work with UNIT_FLAG_DISABLE_MOVE
  */
-void MotionMaster::MoveTakeoff(uint32 id, Position const& pos, float speed /* = 0.0f*/)
+void MotionMaster::MoveTakeoff(uint32 id, Position const& pos, float speed /* = 0.0f*/, bool skipAnimation)
 {
     if (_owner->HasUnitFlag(UNIT_FLAG_DISABLE_MOVE))
         return;
@@ -538,7 +538,10 @@ void MotionMaster::MoveTakeoff(uint32 id, Position const& pos, float speed /* = 
         init.SetVelocity(speed);
     }
 
-    init.SetAnimation(Movement::ToFly);
+    if (!skipAnimation)
+    {
+        init.SetAnimation(Movement::ToFly);
+    }
     init.Launch();
     Mutate(new EffectMovementGenerator(id), MOTION_SLOT_ACTIVE);
 }
@@ -546,10 +549,10 @@ void MotionMaster::MoveTakeoff(uint32 id, Position const& pos, float speed /* = 
 /**
  * @brief Use to move the unit from the air to the ground. Doesn't work with UNIT_FLAG_DISABLE_MOVE
  */
-void MotionMaster::MoveTakeoff(uint32 id, float x, float y, float z, float speed /* = 0.0f*/)
+void MotionMaster::MoveTakeoff(uint32 id, float x, float y, float z, float speed /* = 0.0f*/, bool skipAnimation)
 {
     Position pos = {x, y, z, 0.0f};
-    MoveTakeoff(id, pos, speed);
+    MoveTakeoff(id, pos, speed, skipAnimation);
 }
 
 void MotionMaster::MoveKnockbackFrom(float srcX, float srcY, float speedXY, float speedZ)

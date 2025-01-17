@@ -18,11 +18,9 @@
 #ifndef __RASESSION_H__
 #define __RASESSION_H__
 
-#include "Common.h"
 #include <boost/asio/ip/tcp.hpp>
 #include <boost/asio/streambuf.hpp>
 #include <future>
-#include <memory>
 
 using boost::asio::ip::tcp;
 

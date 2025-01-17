@@ -28,7 +28,6 @@
 #include "Pet.h"
 #include "PetPackets.h"
 #include "Player.h"
-#include "QueryHolder.h"
 #include "Spell.h"
 #include "SpellInfo.h"
 #include "SpellMgr.h"
@@ -210,7 +209,7 @@ void WorldSession::HandlePetActionHelper(Unit* pet, ObjectGuid guid1, uint32 spe
                 case COMMAND_ATTACK:                        //spellId=1792  //ATTACK
                     {
                         // Can't attack if owner is pacified
-                        if (_player->HasAuraType(SPELL_AURA_MOD_PACIFY))
+                        if (_player->HasPacifyAura())
                         {
                             //pet->SendPetCastFail(spellId, SPELL_FAILED_PACIFIED);
                             //TODO: Send proper error message to client
@@ -462,13 +461,13 @@ void WorldSession::HandlePetActionHelper(Unit* pet, ObjectGuid guid1, uint32 spe
                         spell->SendPetCastResult(SPELL_FAILED_DONT_REPORT);
 
                     if (!pet->HasSpellCooldown(spellId))
-                        if(pet->ToPet())
+                        if (pet->ToPet())
                             pet->ToPet()->RemoveSpellCooldown(spellId, true);
 
                     spell->finish(false);
                     delete spell;
 
-                    if (_player->HasAuraType(SPELL_AURA_MOD_PACIFY))
+                    if (_player->HasPacifyAura())
                         return;
 
                     bool tempspellIsPositive = false;
@@ -654,7 +653,7 @@ bool WorldSession::CheckStableMaster(ObjectGuid guid)
     // spell case or GM
     if (guid == GetPlayer()->GetGUID())
     {
-        if (!GetPlayer()->IsGameMaster() && !GetPlayer()->HasAuraType(SPELL_AURA_OPEN_STABLE))
+        if (!GetPlayer()->IsGameMaster() && !GetPlayer()->HasOpenStableAura())
         {
             LOG_DEBUG("network.opcode", "Player ({}) attempt open stable in cheating way.", guid.ToString());
             return false;

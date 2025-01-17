@@ -261,7 +261,7 @@ public:
 
         void SetData(uint32 type, uint32 data) override
         {
-            switch(type)
+            switch (type)
             {
                 case DATA_INSTANCE_PROGRESS:
                     if (InstanceProgress < data)
@@ -306,7 +306,7 @@ public:
 
         void SetGuidData(uint32 type, ObjectGuid data) override
         {
-            switch(type)
+            switch (type)
             {
                 case DATA_NECROLYTE_1_GUID:
                     NPC_Necrolyte1GUID = data;
@@ -374,7 +374,7 @@ public:
 
         bool CheckAchievementCriteriaMeet(uint32 criteria_id, Player const*  /*source*/, Unit const*  /*target*/, uint32  /*miscvalue1*/) override
         {
-            switch(criteria_id)
+            switch (criteria_id)
             {
                 case 12993: // Doesn't Go to Eleven (4524)
                     return bAchievEleven;

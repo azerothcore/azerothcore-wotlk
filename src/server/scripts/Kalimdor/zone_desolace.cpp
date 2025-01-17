@@ -473,7 +473,7 @@ public:
         {
             if (spell->Id == SPELL_KODO_KOMBO_ITEM)
             {
-                if (!(caster->HasAura(SPELL_KODO_KOMBO_PLAYER_BUFF) || me->HasAura(SPELL_KODO_KOMBO_DESPAWN_BUFF))
+                if (!caster->HasAnyAuras(SPELL_KODO_KOMBO_PLAYER_BUFF, SPELL_KODO_KOMBO_DESPAWN_BUFF)
                         && (me->GetEntry() == NPC_AGED_KODO || me->GetEntry() == NPC_DYING_KODO || me->GetEntry() == NPC_ANCIENT_KODO))
                 {
                     me->UpdateEntry(NPC_TAMED_KODO, nullptr, false);
@@ -494,7 +494,7 @@ public:
 
     bool OnGossipHello(Player* player, Creature* creature) override
     {
-        if (player->HasAura(SPELL_KODO_KOMBO_PLAYER_BUFF) && creature->HasAura(SPELL_KODO_KOMBO_DESPAWN_BUFF))
+        if (player->HasAllAuras(SPELL_KODO_KOMBO_PLAYER_BUFF, SPELL_KODO_KOMBO_DESPAWN_BUFF))
         {
             player->TalkedToCreature(creature->GetEntry(), ObjectGuid::Empty);
             player->RemoveAurasDueToSpell(SPELL_KODO_KOMBO_PLAYER_BUFF);

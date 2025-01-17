@@ -193,7 +193,7 @@ public:
                 {
                     me->RemoveAurasDueToSpell(67541);
                     me->GetMotionMaster()->MoveCharge(11779.30f, -7065.43f, 24.92f, me->GetSpeed(MOVE_RUN), EVENT_CHARGE);
-                    switch(summon->GetEntry())
+                    switch (summon->GetEntry())
                     {
                         case NPC_SCOURGE_ZOMBIE:
                             events.ScheduleEvent(EVENT_SPAWN_WAVE_2, 3000);

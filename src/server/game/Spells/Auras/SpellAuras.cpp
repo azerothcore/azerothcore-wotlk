@@ -1276,7 +1276,7 @@ void Aura::HandleAuraSpecificMods(AuraApplication const* aurApp, Unit* caster, b
         for (SpellAreaForAreaMap::const_iterator itr = saBounds.first; itr != saBounds.second; ++itr)
         {
             // some auras remove at aura remove
-            if (!itr->second->IsFitToRequirements(target->ToPlayer(), zone, area))
+            if (!itr->second->IsFitToRequirements(target->ToPlayer(), zone, area) && !apply)
                 target->RemoveAurasDueToSpell(itr->second->spellId);
             // some auras applied at aura apply
             else if (itr->second->autocast)
@@ -1613,7 +1613,7 @@ void Aura::HandleAuraSpecificMods(AuraApplication const* aurApp, Unit* caster, b
             case SPELLFAMILY_GENERIC:
                 if (!caster)
                     break;
-                switch(GetId())
+                switch (GetId())
                 {
                     case 61987: // Avenging Wrath
                         // Remove the immunity shield marker on Avenging Wrath removal if Forbearance is not present
@@ -2010,7 +2010,7 @@ bool Aura::IsAuraStronger(Aura const* newAura) const
                 return true;
 
             if (curValue == std::abs(newEffect->GetAmount()))
-                if(!IsPassive() && !IsPermanent() && GetDuration() < newAura->GetDuration())
+                if (!IsPassive() && !IsPermanent() && GetDuration() < newAura->GetDuration())
                     return true;
         }
     }

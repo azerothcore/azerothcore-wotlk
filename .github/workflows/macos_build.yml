@@ -4,7 +4,9 @@ on:
     branches:
       - 'master'
   pull_request:
-    types: ['labeled', 'opened', 'synchronize', 'reopened']
+    types:
+      - labeled
+      - synchronize
 
 concurrency:
   group: ${{ github.head_ref }} || concat(${{ github.ref }}, ${{ github.workflow }})
@@ -16,7 +18,7 @@ jobs:
       fail-fast: false
       matrix:
         os:
-          - macos-12
+          - macos-14
     runs-on: ${{ matrix.os }}
     name: ${{ matrix.os }}
     if: |

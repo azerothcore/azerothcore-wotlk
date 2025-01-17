@@ -932,7 +932,8 @@ void WorldSession::ComputeNewClockDelta()
     uint32 sampleSizeAfterFiltering = 0;
     for (auto& pair : _timeSyncClockDeltaQueue.content())
     {
-        if (pair.second <= latencyMedian + latencyStandardDeviation) {
+        if (pair.second <= latencyMedian + latencyStandardDeviation)
+        {
             clockDeltasAfterFiltering.push_back(pair.first);
             sampleSizeAfterFiltering++;
         }
@@ -986,9 +987,6 @@ void WorldSession::HandleMoveRootAck(WorldPacket& recvData)
     mover->m_movementInfo = movementInfo;
     mover->UpdatePosition(movementInfo.pos);
 
-    WorldPacket data(MSG_MOVE_ROOT, 64);
-    WriteMovementInfo(&data, &movementInfo);
-    mover->SendMessageToSet(&data, _player);
 }
 
 void WorldSession::HandleMoveUnRootAck(WorldPacket& recvData)
@@ -1031,7 +1029,4 @@ void WorldSession::HandleMoveUnRootAck(WorldPacket& recvData)
     mover->m_movementInfo = movementInfo;
     mover->UpdatePosition(movementInfo.pos);
 
-    WorldPacket data(MSG_MOVE_UNROOT, 64);
-    WriteMovementInfo(&data, &movementInfo);
-    mover->SendMessageToSet(&data, _player);
 }

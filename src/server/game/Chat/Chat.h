@@ -19,11 +19,9 @@
 #define AZEROTHCORE_CHAT_H
 
 #include "ChatCommand.h"
-#include "Errors.h"
 #include "Player.h"
 #include "SharedDefines.h"
 #include "WorldSession.h"
-#include <vector>
 
 class ChatHandler;
 class Creature;

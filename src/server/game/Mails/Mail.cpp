@@ -27,7 +27,6 @@
 #include "ObjectMgr.h"
 #include "Player.h"
 #include "ScriptMgr.h"
-#include "Unit.h"
 #include "World.h"
 
 MailSender::MailSender(Object* sender, MailStationery stationery) : m_stationery(stationery)
@@ -64,7 +63,7 @@ MailSender::MailSender(CalendarEvent* sender)
 }
 
 MailSender::MailSender(AuctionEntry* sender)
-    : m_messageType(MAIL_AUCTION), m_senderId(sender->GetHouseId()), m_stationery(MAIL_STATIONERY_AUCTION)
+    : m_messageType(MAIL_AUCTION), m_senderId(uint32(sender->GetHouseId())), m_stationery(MAIL_STATIONERY_AUCTION)
 {
 }
 

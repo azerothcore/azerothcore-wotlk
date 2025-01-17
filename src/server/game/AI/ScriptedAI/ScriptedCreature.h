@@ -198,7 +198,7 @@ struct ScriptedAI : public CreatureAI
     void AttackStartNoMove(Unit* target);
 
     // Called at any Damage from any attacker (before damage apply)
-    void DamageTaken(Unit* /*attacker*/, uint32& /*damage*/, DamageEffectType /*damagetype*/, SpellSchoolMask /*damageSchoolMask*/) override {}
+    void DamageTaken(Unit* /*attacker*/, uint32& /*damage*/, DamageEffectType /*damagetype*/, SpellSchoolMask /*damageSchoolMask*/) override;
 
     //Called at World update tick
     void UpdateAI(uint32 diff) override;
@@ -438,9 +438,19 @@ struct ScriptedAI : public CreatureAI
 
     Player* SelectTargetFromPlayerList(float maxdist, uint32 excludeAura = 0, bool mustBeInLOS = false) const;
 
+    // Allows dropping to 1 HP but prevents creature from dying.
+    void SetInvincibility(bool apply) { _invincible = apply; };
+    [[nodiscard]] bool IsInvincible() const { return _invincible; };
+
+    // Disables creature auto attacks.
+    void SetAutoAttackAllowed(bool allow) { _canAutoAttack = allow; };
+    [[nodiscard]] bool IsAutoAttackAllowed() const { return _canAutoAttack; };
+
 private:
     Difficulty _difficulty;
     bool _isHeroic;
+    bool _invincible;
+    bool _canAutoAttack;
     std::unordered_set<uint32> _uniqueTimedEvents;
 };
 
@@ -503,6 +513,7 @@ protected:
 private:
     uint32 const _bossId;
     std::list<HealthCheckEventData> _healthCheckEvents;
+    HealthCheckEventData _nextHealthCheck;
 };
 
 class WorldBossAI : public ScriptedAI

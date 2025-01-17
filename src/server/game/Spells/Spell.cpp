@@ -46,10 +46,7 @@
 #include "SpellMgr.h"
 #include "SpellScript.h"
 #include "TemporarySummon.h"
-#include "Totem.h"
 #include "Unit.h"
-#include "UpdateData.h"
-#include "UpdateMask.h"
 #include "Util.h"
 #include "VMapFactory.h"
 #include "Vehicle.h"
@@ -62,6 +59,8 @@
 //  there is probably some underlying problem with imports which should properly addressed
 //  see: https://github.com/azerothcore/azerothcore-wotlk/issues/9766
 #include "GridNotifiersImpl.h"
+#include "IVMapMgr.h"
+#include "VMapMgr2.h"
 
 extern pEffect SpellEffects[TOTAL_SPELL_EFFECTS];
 
@@ -557,7 +556,11 @@ void SpellCastTargets::OutDebug() const
 SpellValue::SpellValue(SpellInfo const* proto)
 {
     for (uint32 i = 0; i < MAX_SPELL_EFFECTS; ++i)
+    {
         EffectBasePoints[i] = proto->Effects[i].BasePoints;
+        MiscVal[i] = 0;
+    }
+
     MaxAffectedTargets = proto->MaxAffectedTargets;
     RadiusMod = 1.0f;
     AuraStackAmount = 1;
@@ -2679,7 +2682,7 @@ void Spell::DoAllEffectOnTarget(TargetInfo* target)
     CallScriptBeforeHitHandlers(missInfo);
 
     //Spells with this flag cannot trigger if effect is casted on self
-    bool canEffectTrigger = !m_spellInfo->HasAttribute(SPELL_ATTR3_SUPRESS_CASTER_PROCS) && unitTarget->CanProc() && (CanExecuteTriggersOnHit(mask) || missInfo == SPELL_MISS_IMMUNE2);
+    bool canEffectTrigger = !m_spellInfo->HasAttribute(SPELL_ATTR3_SUPPRESS_CASTER_PROCS) && unitTarget->CanProc() && (CanExecuteTriggersOnHit(mask) || missInfo == SPELL_MISS_IMMUNE2);
     bool reflectedSpell = missInfo == SPELL_MISS_REFLECT;
     Unit* spellHitTarget = nullptr;
 
@@ -2892,7 +2895,7 @@ void Spell::DoAllEffectOnTarget(TargetInfo* target)
                 m_triggeredByAuraSpell.effectIndex, this, &dmgInfo);
 
             if (caster->IsPlayer() && m_spellInfo->HasAttribute(SPELL_ATTR0_CANCELS_AUTO_ATTACK_COMBAT) == 0 &&
-                    m_spellInfo->HasAttribute(SPELL_ATTR4_SUPRESS_WEAPON_PROCS) == 0 && (m_spellInfo->DmgClass == SPELL_DAMAGE_CLASS_MELEE || m_spellInfo->DmgClass == SPELL_DAMAGE_CLASS_RANGED))
+                    m_spellInfo->HasAttribute(SPELL_ATTR4_SUPPRESS_WEAPON_PROCS) == 0 && (m_spellInfo->DmgClass == SPELL_DAMAGE_CLASS_MELEE || m_spellInfo->DmgClass == SPELL_DAMAGE_CLASS_RANGED))
                 caster->ToPlayer()->CastItemCombatSpell(unitTarget, m_attackType, procVictim, procEx);
         }
 
@@ -2914,7 +2917,7 @@ void Spell::DoAllEffectOnTarget(TargetInfo* target)
             // Xinef: eg. rogue poisons can proc off cheap shot, etc. so this block should be here also
             // Xinef: ofc count only spells that HIT the target, little hack used to fool the system
             if ((procEx & PROC_EX_NORMAL_HIT || procEx & PROC_EX_CRITICAL_HIT) && caster->IsPlayer() && m_spellInfo->HasAttribute(SPELL_ATTR0_CANCELS_AUTO_ATTACK_COMBAT) == 0 &&
-                    m_spellInfo->HasAttribute(SPELL_ATTR4_SUPRESS_WEAPON_PROCS) == 0 && (m_spellInfo->DmgClass == SPELL_DAMAGE_CLASS_MELEE || m_spellInfo->DmgClass == SPELL_DAMAGE_CLASS_RANGED))
+                    m_spellInfo->HasAttribute(SPELL_ATTR4_SUPPRESS_WEAPON_PROCS) == 0 && (m_spellInfo->DmgClass == SPELL_DAMAGE_CLASS_MELEE || m_spellInfo->DmgClass == SPELL_DAMAGE_CLASS_RANGED))
                 caster->ToPlayer()->CastItemCombatSpell(unitTarget, m_attackType, procVictim | PROC_FLAG_TAKEN_DAMAGE, procEx);
         }
 
@@ -2931,8 +2934,8 @@ void Spell::DoAllEffectOnTarget(TargetInfo* target)
     {
         if (missInfo != SPELL_MISS_EVADE && !m_caster->IsFriendlyTo(effectUnit) && (!m_spellInfo->IsPositive() || m_spellInfo->HasEffect(SPELL_EFFECT_DISPEL)))
         {
-            if (!m_triggeredByAuraSpell.spellInfo || (!(m_triggeredByAuraSpell.spellInfo->Effects[m_triggeredByAuraSpell.effectIndex].TriggerSpell == m_spellInfo->Id) && !(m_triggeredByAuraSpell.spellInfo->IsAuraEffectEqual(m_spellInfo))))
-                m_caster->CombatStart(effectUnit, !(m_spellInfo->AttributesEx3 & SPELL_ATTR3_SUPRESS_TARGET_PROCS));
+            if (!m_triggeredByAuraSpell.spellInfo || m_damage || (!(m_triggeredByAuraSpell.spellInfo->Effects[m_triggeredByAuraSpell.effectIndex].TriggerSpell == m_spellInfo->Id) && !(m_triggeredByAuraSpell.spellInfo->IsAuraEffectEqual(m_spellInfo))))
+                m_caster->CombatStart(effectUnit, !(m_spellInfo->AttributesEx3 & SPELL_ATTR3_SUPPRESS_TARGET_PROCS));
 
             // Patch 3.0.8: All player spells which cause a creature to become aggressive to you will now also immediately cause the creature to be tapped.
             if (effectUnit->IsInCombatWith(m_caster))
@@ -3069,7 +3072,7 @@ SpellMissInfo Spell::DoSpellHitOnUnit(Unit* unit, uint32 effectMask, bool scaleA
         {
             // for delayed spells ignore negative spells (after duel end) for friendly targets
             /// @todo: this cause soul transfer bugged
-            if(!IsTriggered() && m_spellInfo->Speed > 0.0f && unit->IsPlayer() && !m_spellInfo->IsPositive())
+            if (!IsTriggered() && m_spellInfo->Speed > 0.0f && unit->IsPlayer() && !m_spellInfo->IsPositive())
                 return SPELL_MISS_EVADE;
 
             // assisting case, healing and resurrection
@@ -3081,7 +3084,7 @@ SpellMissInfo Spell::DoSpellHitOnUnit(Unit* unit, uint32 effectMask, bool scaleA
             }
 
             // xinef: triggered spells should not prolong combat
-            if (unit->IsInCombat() && !m_spellInfo->HasAttribute(SPELL_ATTR3_SUPRESS_TARGET_PROCS) && !m_triggeredByAuraSpell)
+            if (unit->IsInCombat() && !m_spellInfo->HasAttribute(SPELL_ATTR3_SUPPRESS_TARGET_PROCS) && !m_triggeredByAuraSpell)
             {
                 m_caster->SetInCombatState(unit->GetCombatTimer() > 0, unit);
                 unit->getHostileRefMgr().threatAssist(m_caster, 0.0f);
@@ -3102,7 +3105,7 @@ SpellMissInfo Spell::DoSpellHitOnUnit(Unit* unit, uint32 effectMask, bool scaleA
     // Xinef: Do not increase diminishing level for self cast
     m_diminishGroup = GetDiminishingReturnsGroupForSpell(m_spellInfo, m_triggeredByAuraSpell.spellInfo);
     // xinef: do not increase diminish level for bosses (eg. Void Reaver silence is never diminished)
-    if (((m_spellFlags & SPELL_FLAG_REFLECTED) && !(unit->HasAuraType(SPELL_AURA_REFLECT_SPELLS))) || (aura_effmask && m_diminishGroup && unit != m_caster && (!m_caster->IsCreature() || !m_caster->ToCreature()->isWorldBoss())))
+    if (((m_spellFlags & SPELL_FLAG_REFLECTED) && !(unit->HasReflectSpellsAura())) || (aura_effmask && m_diminishGroup && unit != m_caster && (!m_caster->IsCreature() || !m_caster->ToCreature()->isWorldBoss())))
     {
         m_diminishLevel = unit->GetDiminishing(m_diminishGroup);
         DiminishingReturnsType type = GetDiminishingReturnsGroupType(m_diminishGroup);
@@ -3160,6 +3163,14 @@ SpellMissInfo Spell::DoSpellHitOnUnit(Unit* unit, uint32 effectMask, bool scaleA
 
             if (m_spellAura)
             {
+                // Prevent aura application if target is banished and immuned
+                if (m_targets.GetUnitTarget() && m_targets.GetUnitTarget()->IsImmunedToDamageOrSchool(m_spellAura->GetSpellInfo())
+                    && m_targets.GetUnitTarget()->HasUnitState(UNIT_STATE_ISOLATED))
+                {
+                    m_spellAura->Remove();
+                    return SPELL_MISS_IMMUNE;
+                }
+
                 // Set aura stack amount to desired value
                 if (m_spellValue->AuraStackAmount > 1)
                 {
@@ -3248,7 +3259,7 @@ SpellMissInfo Spell::DoSpellHitOnUnit(Unit* unit, uint32 effectMask, bool scaleA
             HandleEffects(unit, nullptr, nullptr, effectNumber, SPELL_EFFECT_HANDLE_HIT_TARGET);
     }
 
-    if( sanct_effect >= 0 && (effectMask & (1 << sanct_effect)) )
+    if (sanct_effect >= 0 && (effectMask & (1 << sanct_effect)))
         HandleEffects(unit, nullptr, nullptr, sanct_effect, SPELL_EFFECT_HANDLE_HIT_TARGET);
 
     return SPELL_MISS_NONE;
@@ -3275,7 +3286,7 @@ void Spell::DoTriggersOnSpellHit(Unit* unit, uint8 effMask)
             m_caster->CastSpell(unit, 61988, true);
 
         // Fearie Fire (Feral) - damage
-        if( m_preCastSpell == 60089 )
+        if (m_preCastSpell == 60089)
             m_caster->CastSpell(unit, m_preCastSpell, true);
         else if (sSpellMgr->GetSpellInfo(m_preCastSpell))
             // Blizz seems to just apply aura without bothering to cast
@@ -3834,8 +3845,8 @@ void Spell::_cast(bool skipCheck)
         // As of 3.0.2 pets begin attacking their owner's target immediately
         // Let any pets know we've attacked something. Check DmgClass for harmful spells only
         // This prevents spells such as Hunter's Mark from triggering pet attack
-        // xinef: take into account SPELL_ATTR3_SUPRESS_TARGET_PROCS
-        if ((m_targets.GetTargetMask() & TARGET_FLAG_UNIT) && GetSpellInfo()->DmgClass != SPELL_DAMAGE_CLASS_NONE && !GetSpellInfo()->HasAttribute(SPELL_ATTR3_SUPRESS_TARGET_PROCS))
+        // xinef: take into account SPELL_ATTR3_SUPPRESS_TARGET_PROCS
+        if ((m_targets.GetTargetMask() & TARGET_FLAG_UNIT) && GetSpellInfo()->DmgClass != SPELL_DAMAGE_CLASS_NONE && !GetSpellInfo()->HasAttribute(SPELL_ATTR3_SUPPRESS_TARGET_PROCS))
             if (!playerCaster->m_Controlled.empty())
                 for (Unit::ControlSet::iterator itr = playerCaster->m_Controlled.begin(); itr != playerCaster->m_Controlled.end(); ++itr)
                     if (Unit* pet = *itr)
@@ -4061,7 +4072,7 @@ void Spell::_cast(bool skipCheck)
         {
             m_caster->resetAttackTimer(BASE_ATTACK);
 
-            if (m_caster->haveOffhandWeapon())
+            if (m_caster->HasOffhandWeaponForAttack())
             {
                 m_caster->resetAttackTimer(OFF_ATTACK);
             }
@@ -4075,13 +4086,15 @@ void Spell::_cast(bool skipCheck)
     if (modOwner)
         modOwner->SetSpellModTakingSpell(this, false);
 
-    if (const std::vector<int32>* spell_triggered = sSpellMgr->GetSpellLinked(m_spellInfo->Id))
+    if (std::vector<int32> const* spell_triggered = sSpellMgr->GetSpellLinked(m_spellInfo->Id))
     {
-        for (std::vector<int32>::const_iterator i = spell_triggered->begin(); i != spell_triggered->end(); ++i)
-            if (*i < 0)
-                m_caster->RemoveAurasDueToSpell(-(*i));
+        for (int32 id : *spell_triggered)
+        {
+            if (id < 0)
+                m_caster->RemoveAurasDueToSpell(-id);
             else
-                m_caster->CastSpell(m_targets.GetUnitTarget() ? m_targets.GetUnitTarget() : m_caster, *i, true);
+                m_caster->CastSpell(m_targets.GetUnitTarget() ? m_targets.GetUnitTarget() : m_caster, id, true);
+        }
     }
 
     // Interrupt Spell casting
@@ -4095,7 +4108,7 @@ void Spell::_cast(bool skipCheck)
     if (Unit* target = m_targets.GetUnitTarget())
         if (m_caster->IsPlayer() || (m_caster->IsPet() && m_caster->IsControlledByPlayer()))
             if (GetDelayMoment() > 0 && !m_caster->IsFriendlyTo(target) && !m_spellInfo->HasAura(SPELL_AURA_BIND_SIGHT) && (!m_spellInfo->IsPositive() || m_spellInfo->HasEffect(SPELL_EFFECT_DISPEL)))
-                m_caster->CombatStartOnCast(target, !m_spellInfo->HasAttribute(SPELL_ATTR3_SUPRESS_TARGET_PROCS), GetDelayMoment() + 500); // xinef: increase this time so we dont leave and enter combat in a moment
+                m_caster->CombatStartOnCast(target, !m_spellInfo->HasAttribute(SPELL_ATTR3_SUPPRESS_TARGET_PROCS), GetDelayMoment() + 500); // xinef: increase this time so we dont leave and enter combat in a moment
 
     if (m_caster->IsPlayer())
         if (m_caster->ToPlayer()->GetCommandStatus(CHEAT_COOLDOWN))
@@ -5574,7 +5587,7 @@ void Spell::HandleThreatSpells()
     if (m_UniqueTargetInfo.empty())
         return;
 
-    if (m_spellInfo->HasAttribute(SPELL_ATTR1_NO_THREAT) || m_spellInfo->HasAttribute(SPELL_ATTR3_SUPRESS_TARGET_PROCS))
+    if (m_spellInfo->HasAttribute(SPELL_ATTR1_NO_THREAT) || m_spellInfo->HasAttribute(SPELL_ATTR3_SUPPRESS_TARGET_PROCS))
         return;
 
     float threat = 0.0f;
@@ -5819,7 +5832,7 @@ SpellCastResult Spell::CheckCast(bool strict)
             if (effInfo->ApplyAuraName == SPELL_AURA_MOD_SHAPESHIFT)
             {
                 SpellShapeshiftFormEntry const* shapeShiftEntry = sSpellShapeshiftFormStore.LookupEntry(effInfo->MiscValue);
-                if (shapeShiftEntry && (shapeShiftEntry->flags1 & 1) == 0)  // unk flag
+                if (shapeShiftEntry && (shapeShiftEntry->flags1 & SHAPESHIFT_FLAG_STANCE) == 0)
                     checkMask |= VEHICLE_SEAT_FLAG_UNCONTROLLED;
                 break;
             }
@@ -6540,24 +6553,24 @@ SpellCastResult Spell::CheckCast(bool strict)
                 }
             case SPELL_EFFECT_STEAL_BENEFICIAL_BUFF:
                 {
-                    if( !m_targets.GetUnitTarget() || m_targets.GetUnitTarget() == m_caster)
+                    if (!m_targets.GetUnitTarget() || m_targets.GetUnitTarget() == m_caster)
                         return SPELL_FAILED_BAD_TARGETS;
 
                     bool found = false;
                     Unit::VisibleAuraMap const* visibleAuras = m_targets.GetUnitTarget()->GetVisibleAuras();
                     for(Unit::VisibleAuraMap::const_iterator itr = visibleAuras->begin(); itr != visibleAuras->end(); ++itr)
                     {
-                        if( itr->second->GetBase()->IsPassive() )
+                        if (itr->second->GetBase()->IsPassive())
                             continue;
 
-                        if( !itr->second->IsPositive() )
+                        if (!itr->second->IsPositive())
                             continue;
 
                         found = true;
                         break;
                     }
 
-                    if( !found )
+                    if (!found)
                         return SPELL_FAILED_NOTHING_TO_STEAL;
 
                     break;
@@ -8449,6 +8462,15 @@ void Spell::SetSpellValue(SpellValueMod mod, int32 value)
         case SPELLVALUE_FORCED_CRIT_RESULT:
             m_spellValue->ForcedCritResult = (bool)value;
             break;
+        case SPELLVALUE_MISCVALUE0:
+            m_spellValue->MiscVal[0] = value;
+            break;
+        case SPELLVALUE_MISCVALUE1:
+            m_spellValue->MiscVal[1] = value;
+            break;
+        case SPELLVALUE_MISCVALUE2:
+            m_spellValue->MiscVal[2] = value;
+            break;
     }
 }
 
@@ -8757,17 +8779,17 @@ void Spell::PrepareTriggersExecutedOnHit()
     {
         case SPELLFAMILY_PALADIN:
             {
-                if( m_spellInfo->SpellFamilyFlags[1] & 0x40000000 )
+                if (m_spellInfo->SpellFamilyFlags[1] & 0x40000000)
                 {
                     Unit::AuraEffectList const& mVindication = m_caster->GetAuraEffectsByType(SPELL_AURA_PROC_TRIGGER_SPELL);
                     for(Unit::AuraEffectList::const_iterator itr = mVindication.begin(); itr != mVindication.end(); ++itr)
                     {
-                        if( (*itr)->GetSpellInfo()->Effects[EFFECT_0].TriggerSpell == 26017 )
+                        if ((*itr)->GetSpellInfo()->Effects[EFFECT_0].TriggerSpell == 26017 )
                         {
                             m_preCastSpell = 26017;
                             break;
                         }
-                        else if( (*itr)->GetSpellInfo()->Effects[EFFECT_0].TriggerSpell == 67 )
+                        else if ((*itr)->GetSpellInfo()->Effects[EFFECT_0].TriggerSpell == 67 )
                             m_preCastSpell = 67;
                     }
                 }
@@ -8776,7 +8798,7 @@ void Spell::PrepareTriggersExecutedOnHit()
         case SPELLFAMILY_DRUID:
             {
                 // Faerie Fire (Feral)
-                if( m_spellInfo->Id == 16857 && (m_caster->GetShapeshiftForm() == FORM_BEAR || m_caster->GetShapeshiftForm() == FORM_DIREBEAR) )
+                if (m_spellInfo->Id == 16857 && (m_caster->GetShapeshiftForm() == FORM_BEAR || m_caster->GetShapeshiftForm() == FORM_DIREBEAR))
                     m_preCastSpell = 60089;
 
                 break;

@@ -23,6 +23,7 @@
 #include "PathCommon.h"
 #include "VMapMgr2.h"
 #include <vector>
+#include <map>
 
 // ******************************************
 // Map file format defines

@@ -20,7 +20,6 @@
 
 #include "mpq_libmpq04.h"
 #include "wmo.h"
-#include <cstdlib>
 #include <string>
 
 class ADTFile;

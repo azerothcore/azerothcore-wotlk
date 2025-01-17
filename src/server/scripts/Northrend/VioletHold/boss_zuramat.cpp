@@ -32,10 +32,8 @@ enum Yells
 
 enum eSpells
 {
-    SPELL_SHROUD_OF_DARKNESS_N                      = 54524,
-    SPELL_SHROUD_OF_DARKNESS_H                      = 59745,
-    SPELL_VOID_SHIFT_N                              = 54361,
-    SPELL_VOID_SHIFT_H                              = 59743,
+    SPELL_SHROUD_OF_DARKNESS                        = 54524,
+    SPELL_VOID_SHIFT                                = 54361,
     SPELL_SUMMON_VOID_SENTRY                        = 54369,
     SPELL_SUMMON_VOID_SENTRY_BALL                   = 58650,
 
@@ -44,8 +42,6 @@ enum eSpells
 };
 
 #define NPC_VOID_SENTRY_BALL                        29365
-#define SPELL_SHROUD_OF_DARKNESS                    DUNGEON_MODE(SPELL_SHROUD_OF_DARKNESS_N, SPELL_SHROUD_OF_DARKNESS_H)
-#define SPELL_VOID_SHIFT                            DUNGEON_MODE(SPELL_VOID_SHIFT_N, SPELL_VOID_SHIFT_H)
 
 enum eEvents
 {
@@ -103,7 +99,7 @@ public:
             if (me->HasUnitState(UNIT_STATE_CASTING))
                 return;
 
-            switch(events.ExecuteEvent())
+            switch (events.ExecuteEvent())
             {
                 case 0:
                     break;

@@ -23,7 +23,6 @@
 #include <cstdio>
 #include <cstdlib>
 #include <map>
-#include <utility>
 #undef min
 #undef max
 #include "mpq_libmpq04.h"
@@ -396,8 +395,10 @@ int WMOGroup::ConvertToVMAPGroupWmo(FILE* output, bool preciseVectorData)
         for (int i = 0; i < nTriangles; ++i)
         {
             // Skip no collision triangles
+            // TODO: Update to use MOBR in the future to catch any possibly missed edge cases
             bool isRenderFace = (MOPY[2 * i] & WMO_MATERIAL_RENDER) && !(MOPY[2 * i] & WMO_MATERIAL_DETAIL);
-            bool isCollision = MOPY[2 * i] & WMO_MATERIAL_COLLISION || isRenderFace;
+            bool isCollisionOnlyFace = static_cast<unsigned char>(MOPY[(2 * i) + 1]) == 0xFF; // 255 is a collision-only material id
+            bool isCollision = MOPY[2 * i] & WMO_MATERIAL_COLLISION || isRenderFace || isCollisionOnlyFace;
             if (!isCollision)
                 continue;
             // Use this triangle
@@ -568,5 +569,4 @@ void MapObject::Extract(ADT::MODF const& mapObjDef, char const* WmoInstName, uin
     uint32 nlen = strlen(WmoInstName);
     fwrite(&nlen, sizeof(uint32), 1, pDirfile);
     fwrite(WmoInstName, sizeof(char), nlen, pDirfile);
-
 }

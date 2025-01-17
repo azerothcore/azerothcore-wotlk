@@ -78,20 +78,7 @@ void CharmInfo::InitPossessCreateSpells()
 {
     if (_unit->IsCreature())
     {
-        // Adding switch until better way is found. Malcrom
-        // Adding entrys to this switch will prevent COMMAND_ATTACK being added to pet bar.
-        switch (_unit->GetEntry())
-        {
-            case 23575: // Mindless Abomination
-            case 24783: // Trained Rock Falcon
-            case 27664: // Crashin' Thrashin' Racer
-            case 40281: // Crashin' Thrashin' Racer
-            case 23109: // Vengeful Spirit
-                break;
-            default:
-                InitEmptyActionBar();
-                break;
-        }
+        InitEmptyActionBar(false);
 
         for (uint32 i = 0; i < MAX_CREATURE_SPELLS; ++i)
         {
@@ -159,11 +146,14 @@ bool CharmInfo::AddSpellToActionBar(SpellInfo const* spellInfo, ActiveStates new
 {
     uint32 spell_id = 0;
     uint32 first_id = 0;
+    bool autocastable = false;
 
     if (spellInfo)
     {
         spell_id = spellInfo->Id;
         first_id = spellInfo->GetFirstRankSpell()->Id;
+        if (spellInfo->IsAutocastable())
+            autocastable = true;
     }
 
     // new spell rank can be already listed
@@ -187,7 +177,10 @@ bool CharmInfo::AddSpellToActionBar(SpellInfo const* spellInfo, ActiveStates new
             if (i != index && index <= MAX_UNIT_ACTION_BAR_INDEX)
                 continue;
 
-            SetActionBar(i, spell_id, newstate == ACT_DECIDE ? spellInfo->IsAutocastable() ? ACT_DISABLED : ACT_PASSIVE : newstate);
+            if (!spell_id && index == ACTION_BAR_INDEX_START)
+                SetActionBar(ACTION_BAR_INDEX_START, COMMAND_ATTACK, ACT_COMMAND);
+            else
+                SetActionBar(i, spell_id, newstate == ACT_DECIDE ? autocastable ? ACT_DISABLED : ACT_PASSIVE : newstate);
 
             if (_unit->GetCharmer() && _unit->GetCharmer()->IsPlayer())
             {
@@ -405,6 +398,22 @@ bool GlobalCooldownMgr::HasGlobalCooldown(SpellInfo const* spellInfo) const
 {
     GlobalCooldownList::const_iterator itr = m_GlobalCooldowns.find(spellInfo->StartRecoveryCategory);
     return itr != m_GlobalCooldowns.end() && itr->second.duration && getMSTimeDiff(itr->second.cast_time, GameTime::GetGameTimeMS().count()) < itr->second.duration;
+}
+
+uint32 GlobalCooldownMgr::GetGlobalCooldown(SpellInfo const* spellInfo) const
+{
+    if (!spellInfo)
+        return 0;
+
+    auto itr = m_GlobalCooldowns.find(spellInfo->StartRecoveryCategory);
+    if (itr == m_GlobalCooldowns.end() || itr->second.duration == 0)
+        return 0;
+
+    uint32 start = itr->second.cast_time;
+    uint32 delay = itr->second.duration;
+    uint32 now = getMSTime();
+
+    return (start + delay > now) ? (start + delay) - now : 0;
 }
 
 void GlobalCooldownMgr::AddGlobalCooldown(SpellInfo const* spellInfo, uint32 gcd)

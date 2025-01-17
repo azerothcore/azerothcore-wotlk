@@ -44,6 +44,8 @@ public:
     {
         instance_utgarde_keep_InstanceMapScript(Map* pMap) : InstanceScript(pMap)
         {
+            SetHeaders(DataHeader);
+            SetBossNumber(EncounterCount);
             LoadObjectData(creatureData, nullptr);
         }
 
@@ -69,10 +71,24 @@ public:
 
         bool IsEncounterInProgress() const override
         {
+            if (InstanceScript::IsEncounterInProgress())
+                return true;
+
             for (uint8 i = 0; i < MAX_ENCOUNTER; ++i)
                 if (m_auiEncounter[i] == IN_PROGRESS) return true;
 
             return false;
+        }
+
+        bool SetBossState(uint32 type, EncounterState state) override
+        {
+            if (!InstanceScript::SetBossState(type, state))
+                return false;
+
+            if (type == DATA_KELESETH && state == NOT_STARTED)
+                bRocksAchiev = true;
+
+            return true;
         }
 
         void OnPlayerEnter(Player* plr) override
@@ -107,7 +123,7 @@ public:
 
         void OnGameObjectCreate(GameObject* go) override
         {
-            switch(go->GetEntry())
+            switch (go->GetEntry())
             {
                 case GO_BELLOW_1:
                     GO_ForgeBellowGUID[0] = go->GetGUID();
@@ -158,13 +174,8 @@ public:
 
         void SetData(uint32 type, uint32 data) override
         {
-            switch(type)
+            switch (type)
             {
-                case DATA_KELESETH:
-                    m_auiEncounter[0] = data;
-                    if (data == NOT_STARTED)
-                        bRocksAchiev = true;
-                    break;
                 case DATA_ON_THE_ROCKS_ACHIEV:
                     bRocksAchiev = false;
                     break;
@@ -307,7 +318,7 @@ public:
 
         bool CheckAchievementCriteriaMeet(uint32 criteria_id, Player const*  /*source*/, Unit const*  /*target*/, uint32  /*miscvalue1*/) override
         {
-            switch(criteria_id)
+            switch (criteria_id)
             {
                 case 7231: // On The Rocks
                     return bRocksAchiev;

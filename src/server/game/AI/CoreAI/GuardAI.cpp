@@ -16,7 +16,6 @@
  */
 
 #include "GuardAI.h"
-#include "CreatureAIImpl.h"
 #include "Player.h"
 
 int32 GuardAI::Permissible(Creature const* creature)
@@ -60,6 +59,9 @@ void GuardAI::EnterEvadeMode(EvadeReason /*why*/)
 
 void GuardAI::JustDied(Unit* killer)
 {
+    if (!killer)
+        return;
+
     if (Player* player = killer->GetCharmerOrOwnerPlayerOrPlayerItself())
         me->SendZoneUnderAttackMessage(player);
 }

@@ -22,17 +22,10 @@
 enum eSpells
 {
     SPELL_CAUTERIZING_FLAMES                  = 59466,
-    SPELL_FIREBOLT_N                          = 54235,
-    SPELL_FIREBOLT_H                          = 59468,
-    SPELL_FLAME_BREATH_N                      = 54282,
-    SPELL_FLAME_BREATH_H                      = 59469,
-    SPELL_LAVA_BURN_N                         = 54249,
-    SPELL_LAVA_BURN_H                         = 59594,
+    SPELL_FIREBOLT                            = 54235,
+    SPELL_FLAME_BREATH                        = 54282,
+    SPELL_LAVA_BURN                           = 54249
 };
-
-#define SPELL_FIREBOLT                      DUNGEON_MODE(SPELL_FIREBOLT_N, SPELL_FIREBOLT_H)
-#define SPELL_FLAME_BREATH                  DUNGEON_MODE(SPELL_FLAME_BREATH_N, SPELL_FLAME_BREATH_H)
-#define SPELL_LAVA_BURN                     DUNGEON_MODE(SPELL_LAVA_BURN_N, SPELL_LAVA_BURN_H)
 
 enum eEvents
 {
@@ -88,7 +81,7 @@ public:
             if (me->HasUnitState(UNIT_STATE_CASTING))
                 return;
 
-            switch(events.ExecuteEvent())
+            switch (events.ExecuteEvent())
             {
                 case 0:
                     break;

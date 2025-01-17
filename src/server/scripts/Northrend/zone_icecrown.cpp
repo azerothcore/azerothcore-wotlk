@@ -138,7 +138,7 @@ public:
 
         void PrepareSummons()
         {
-            switch(currentQuest)
+            switch (currentQuest)
             {
                 case QUEST_BFV_FALLEN_HEROES:
                     me->SummonCreature(NPC_ELDRETH, 8245.5f, 3522.7f, 627.67f, 3.11f, TEMPSUMMON_MANUAL_DESPAWN, 30000);
@@ -1496,7 +1496,7 @@ public:
             if (!who || !who->IsPlayer() || !me->IsHostileTo(who) || !me->isInBackInMap(who, 5.0f))
                 return;
 
-            if (who->HasAura(SPELL_TRESPASSER_H) || who->HasAura(SPELL_TRESPASSER_A))
+            if (who->HasAnyAuras(SPELL_TRESPASSER_H, SPELL_TRESPASSER_A))
                 return;
 
             if (who->ToPlayer()->GetTeamId() == TEAM_ALLIANCE)

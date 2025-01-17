@@ -24,21 +24,16 @@
 
 enum eSpells
 {
-    SPELL_RAY_OF_SUFFERING_N                = 54442,
-    SPELL_RAY_OF_SUFFERING_H                = 59524,
+    SPELL_RAY_OF_SUFFERING                  = 54442,
     //SPELL_RAY_OF_SUFFERING_TRIGGERED      = 54417,
 
-    SPELL_RAY_OF_PAIN_N                     = 54438,
-    SPELL_RAY_OF_PAIN_H                     = 59523,
+    SPELL_RAY_OF_PAIN                       = 54438,
     //SPELL_RAY_OF_PAIN_TRIGGERED_N         = 54416,
     //SPELL_RAY_OF_PAIN_TRIGGERED_H         = 59525,
 
     SPELL_CORROSIVE_SALIVA                  = 54527,
     SPELL_OPTIC_LINK                        = 54396,
 };
-
-#define SPELL_RAY_OF_SUFFERING              DUNGEON_MODE(SPELL_RAY_OF_SUFFERING_N, SPELL_RAY_OF_SUFFERING_H)
-#define SPELL_RAY_OF_PAIN                   DUNGEON_MODE(SPELL_RAY_OF_PAIN_N, SPELL_RAY_OF_PAIN_H)
 
 enum eEvents
 {
@@ -91,7 +86,7 @@ public:
             if (me->HasUnitState(UNIT_STATE_CASTING))
                 return;
 
-            switch(events.ExecuteEvent())
+            switch (events.ExecuteEvent())
             {
                 case 0:
                     break;

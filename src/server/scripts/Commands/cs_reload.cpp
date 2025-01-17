@@ -31,6 +31,7 @@ EndScriptData */
 #include "CreatureTextMgr.h"
 #include "DisableMgr.h"
 #include "GameGraveyard.h"
+#include "ItemEnchantmentMgr.h"
 #include "LFGMgr.h"
 #include "Language.h"
 #include "MapMgr.h"
@@ -134,6 +135,7 @@ public:
             { "npc_spellclick_spells",         HandleReloadSpellClickSpellsCommand,           SEC_ADMINISTRATOR, Console::Yes },
             { "npc_trainer",                   HandleReloadNpcTrainerCommand,                 SEC_ADMINISTRATOR, Console::Yes },
             { "npc_vendor",                    HandleReloadNpcVendorCommand,                  SEC_ADMINISTRATOR, Console::Yes },
+            { "game_event_npc_vendor",         HandleReloadGameEventNPCVendorCommand,         SEC_ADMINISTRATOR, Console::Yes },
             { "page_text",                     HandleReloadPageTextsCommand,                  SEC_ADMINISTRATOR, Console::Yes },
             { "pickpocketing_loot_template",   HandleReloadLootTemplatesPickpocketingCommand, SEC_ADMINISTRATOR, Console::Yes },
             { "points_of_interest",            HandleReloadPointsOfInterestCommand,           SEC_ADMINISTRATOR, Console::Yes },
@@ -413,7 +415,12 @@ public:
         LOG_INFO("server.loading", "Reloading Motd...");
         sMotdMgr->LoadMotd();
         handler->SendGlobalGMSysMessage("DB table `motd` reloaded.");
-        handler->SendGlobalSysMessage(sMotdMgr->GetMotd());
+        LocaleConstant locale = DEFAULT_LOCALE;
+
+        if (Player* player = handler->GetPlayer())
+            locale = player->GetSession()->GetSessionDbLocaleIndex();
+
+        handler->SendGlobalSysMessage(sMotdMgr->GetMotd(locale));
         return true;
     }
 
@@ -756,6 +763,14 @@ public:
         LOG_INFO("server.loading", "Reloading `npc_vendor` Table!");
         sObjectMgr->LoadVendors();
         handler->SendGlobalGMSysMessage("DB table `npc_vendor` reloaded.");
+        return true;
+    }
+
+    static bool HandleReloadGameEventNPCVendorCommand(ChatHandler* handler)
+    {
+        LOG_INFO("server.loading", "Reloading `game_event_npc_vendor` Table!");
+        sGameEventMgr->LoadEventVendors();
+        handler->SendGlobalGMSysMessage("DB table `game_event_npc_vendor` reloaded.");
         return true;
     }
 

@@ -53,22 +53,15 @@ enum eCreatures
 enum eSpells
 {
     SPELL_DRAINED                           = 59820,
-    SPELL_FRENZY_N                          = 54312,
-    SPELL_FRENZY_H                          = 59522,
+    SPELL_FRENZY                            = 54312,
     SPELL_PROTECTIVE_BUBBLE                 = 54306,
-    SPELL_WATER_BLAST_N                     = 54237,
-    SPELL_WATER_BLAST_H                     = 59520,
-    SPELL_WATER_BOLT_VOLLEY_N               = 54241,
-    SPELL_WATER_BOLT_VOLLEY_H               = 59521,
+    SPELL_WATER_BLAST                       = 54237,
+    SPELL_WATER_BOLT_VOLLEY                 = 54241,
 
     SPELL_SPLASH                            = 59516, // casted by globule upon death
     SPELL_WATER_GLOBULE                     = 54268, // casted when hit by visual
     SPELL_CREATE_GLOBULE_VISUAL             = 54260, // tar 25
 };
-
-#define SPELL_WATER_BLAST                   DUNGEON_MODE(SPELL_WATER_BLAST_N, SPELL_WATER_BLAST_H)
-#define SPELL_WATER_BOLT_VOLLEY             DUNGEON_MODE(SPELL_WATER_BOLT_VOLLEY_N, SPELL_WATER_BOLT_VOLLEY_H)
-#define SPELL_FRENZY                        DUNGEON_MODE(SPELL_FRENZY_N, SPELL_FRENZY_H)
 
 class boss_ichoron : public CreatureScript
 {
@@ -110,7 +103,7 @@ public:
             if (!me->IsAlive())
                 return;
 
-            switch(param)
+            switch (param)
             {
                 case ACTION_WATER_ELEMENT_HIT:
                     if (pInstance)

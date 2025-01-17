@@ -22,16 +22,13 @@
 #include "Battlefield.h"
 #include "Battleground.h"
 #include "BattlegroundMgr.h"
-#include "Channel.h"
 #include "CharacterDatabaseCleaner.h"
 #include "Chat.h"
 #include "Common.h"
-#include "ConditionMgr.h"
 #include "Config.h"
 #include "DatabaseEnv.h"
 #include "DisableMgr.h"
 #include "GameEventMgr.h"
-#include "GameGraveyard.h"
 #include "GameObjectAI.h"
 #include "GameTime.h"
 #include "GridNotifiers.h"
@@ -48,7 +45,6 @@
 #include "ObjectMgr.h"
 #include "Opcodes.h"
 #include "OutdoorPvP.h"
-#include "OutdoorPvPMgr.h"
 #include "Pet.h"
 #include "Player.h"
 #include "QueryHolder.h"
@@ -63,10 +59,8 @@
 #include "StringConvert.h"
 #include "Tokenize.h"
 #include "Transport.h"
-#include "UpdateData.h"
 #include "UpdateFieldFlags.h"
 #include "Util.h"
-#include "Vehicle.h"
 #include "World.h"
 #include "WorldPacket.h"
 
@@ -991,7 +985,7 @@ InventoryResult Player::CanStoreItem_InBag(uint8 bag, ItemPosCountVec& dest, Ite
 
     // skip not existed bag or self targeted bag
     Bag* pBag = GetBagByPos(bag);
-    if (!pBag || pBag == pSrcItem || (pSrcItem && (pSrcItem->GetGUID() == pBag->GetGUID())) )
+    if (!pBag || pBag == pSrcItem || (pSrcItem && (pSrcItem->GetGUID() == pBag->GetGUID())))
         return EQUIP_ERR_ITEM_DOESNT_GO_INTO_BAG;
 
     if (pSrcItem && pSrcItem->IsNotEmptyBag())
@@ -1119,8 +1113,8 @@ InventoryResult Player::CanStoreItem(uint8 bag, uint8 slot, ItemPosCountVec& des
     if (pItem)
     {
         // you bad chet0rz, wpe pro
-        if( bag == NULL_BAG && slot == NULL_SLOT )
-            if( pItem->IsBag() && pItem->IsNotEmptyBag() )
+        if (bag == NULL_BAG && slot == NULL_SLOT)
+            if (pItem->IsBag() && pItem->IsNotEmptyBag())
                 return EQUIP_ERR_CAN_ONLY_DO_WITH_EMPTY_BAGS;
 
         // Xinef: Removed next loot generated check
@@ -5138,7 +5132,7 @@ bool Player::LoadFromDB(ObjectGuid playerGuid, CharacterDatabaseQueryHolder cons
     {
         // xinef: resurrect player, cant log in dead without corpse
         {
-            if (HasAuraType(SPELL_AURA_SPIRIT_OF_REDEMPTION))
+            if (HasSpiritOfRedemptionAura())
                 RemoveAurasByType(SPELL_AURA_MOD_SHAPESHIFT);
             if (!IsAlive())
                 ResurrectPlayer(1.0f);
@@ -6729,7 +6723,7 @@ bool Player::Satisfy(DungeonProgressionRequirements const* ar, uint32 target_map
 
         if (DisableMgr::IsDisabledFor(DISABLE_TYPE_MAP, target_map, this))
         {
-            GetSession()->SendAreaTriggerMessage("%s", GetSession()->GetAcoreString(LANG_INSTANCE_CLOSED));
+            GetSession()->SendAreaTriggerMessage("{}", GetSession()->GetAcoreString(LANG_INSTANCE_CLOSED));
             return false;
         }
 
@@ -7197,7 +7191,7 @@ void Player::_SaveAuras(CharacterDatabaseTransaction trans, bool logout)
             continue;
 
         Aura* aura = itr->second;
-        if( !logout && aura->GetDuration() < 60 * IN_MILLISECONDS )
+        if (!logout && aura->GetDuration() < 60 * IN_MILLISECONDS )
             continue;
 
         int32 damage[MAX_SPELL_EFFECTS];

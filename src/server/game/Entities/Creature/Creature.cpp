@@ -33,7 +33,6 @@
 #include "LootMgr.h"
 #include "ObjectMgr.h"
 #include "Opcodes.h"
-#include "OutdoorPvPMgr.h"
 #include "Pet.h"
 #include "Player.h"
 #include "PoolMgr.h"
@@ -524,6 +523,8 @@ bool Creature::InitEntry(uint32 Entry, const CreatureData* data)
 
     SetFloatValue(UNIT_FIELD_HOVERHEIGHT, cinfo->HoverHeight);
 
+    SetCanDualWield(cinfo->flags_extra & CREATURE_FLAG_EXTRA_USE_OFFHAND_ATTACK);
+
     // checked at loading
     m_defaultMovementType = MovementGeneratorType(cinfo->MovementType);
     if (!m_wanderDistance && m_defaultMovementType == RANDOM_MOTION_TYPE)
@@ -567,6 +568,8 @@ bool Creature::UpdateEntry(uint32 Entry, const CreatureData* data, bool changele
     ReplaceAllUnitFlags2(UnitFlags2(cInfo->unit_flags2));
 
     ReplaceAllDynamicFlags(dynamicflags);
+
+    SetCanDualWield(cInfo->flags_extra & CREATURE_FLAG_EXTRA_USE_OFFHAND_ATTACK);
 
     SetAttackTime(BASE_ATTACK,   cInfo->BaseAttackTime);
     SetAttackTime(OFF_ATTACK,    cInfo->BaseAttackTime);
@@ -1055,7 +1058,7 @@ void Creature::DoFleeToGetAssistance()
     if (!GetVictim())
         return;
 
-    if (HasAuraType(SPELL_AURA_PREVENTS_FLEEING))
+    if (HasPreventsFleeingAura())
         return;
 
     float radius = sWorld->getFloatConfig(CONFIG_CREATURE_FAMILY_FLEE_ASSISTANCE_RADIUS);
@@ -1198,8 +1201,10 @@ bool Creature::Create(ObjectGuid::LowType guidlow, Map* map, uint32 phaseMask, u
         m_serverSideVisibilityDetect.SetValue(SERVERSIDE_VISIBILITY_GHOST, GHOST_VISIBILITY_GHOST);
     }
     else if (cinfo->type_flags & CREATURE_TYPE_FLAG_VISIBLE_TO_GHOSTS) // Xinef: Add ghost visibility for ghost units
+    {
         m_serverSideVisibility.SetValue(SERVERSIDE_VISIBILITY_GHOST, GHOST_VISIBILITY_ALIVE | GHOST_VISIBILITY_GHOST);
-
+        m_serverSideVisibilityDetect.SetValue(SERVERSIDE_VISIBILITY_GHOST, GHOST_VISIBILITY_ALIVE | GHOST_VISIBILITY_GHOST);
+    }
     if (Entry == VISUAL_WAYPOINT)
         SetVisible(false);
 
@@ -1871,7 +1876,7 @@ bool Creature::IsInvisibleDueToDespawn() const
     if (Unit::IsInvisibleDueToDespawn())
         return true;
 
-    if (IsAlive() || m_corpseRemoveTime > GameTime::GetGameTime().count())
+    if (IsAlive() || isDying() || m_corpseRemoveTime > GameTime::GetGameTime().count())
         return false;
 
     return true;
@@ -2091,6 +2096,7 @@ void Creature::Respawn(bool force)
             loot.clear();
             SelectLevel();
 
+            m_respawnedTime = GameTime::GetGameTime().count();
             setDeathState(DeathState::JustRespawned);
 
             // MDic - Acidmanifesto: Do not override transform auras
@@ -2122,7 +2128,6 @@ void Creature::Respawn(bool force)
             //Re-initialize reactstate that could be altered by movementgenerators
             InitializeReactState();
 
-            m_respawnedTime = GameTime::GetGameTime().count();
         }
         m_respawnedTime = GameTime::GetGameTime().count();
         // xinef: relocate notifier, fixes npc appearing in corpse position after forced respawn (instead of spawn)
@@ -2664,7 +2669,7 @@ bool Creature::CanCreatureAttack(Unit const* victim, bool skipDistCheck) const
 
         // pussywizard: don't check distance to home position if recently damaged (allow kiting away from spawnpoint!)
         // xinef: this should include taunt auras
-        if (!isWorldBoss() && (GetLastLeashExtensionTime() + 12 > GameTime::GetGameTime().count() || HasAuraType(SPELL_AURA_MOD_TAUNT)))
+        if (!isWorldBoss() && (GetLastLeashExtensionTime() + 12 > GameTime::GetGameTime().count() || HasTauntAura()))
             return true;
     }
 
@@ -3172,6 +3177,14 @@ bool Creature::IsImmuneToKnockback() const
     return cinfo && (cinfo->flags_extra & CREATURE_FLAG_EXTRA_IMMUNITY_KNOCKBACK);
 }
 
+bool Creature::HasWeapon(WeaponAttackType type) const
+{
+    const uint8 slot = uint8(type);
+    ItemEntry const* item = sItemStore.LookupEntry(GetUInt32Value(UNIT_VIRTUAL_ITEM_SLOT_ID + slot));
+
+    return ((item && item->ClassID == ITEM_CLASS_WEAPON) || (type == OFF_ATTACK && CanDualWield()));
+}
+
 /**
  * @brief Enable or disable the creature's walk mode by removing: MOVEMENTFLAG_WALKING. Infom also the client
  */
@@ -3446,14 +3459,14 @@ void Creature::UpdateMovementFlags()
         else
             SetDisableGravity(true);
 
-        if (!HasAuraType(SPELL_AURA_HOVER))
+        if (!HasHoverAura())
             SetHover(false);
     }
     else
     {
         SetCanFly(false);
         SetDisableGravity(false);
-        if (IsAlive() && (CanHover() || HasAuraType(SPELL_AURA_HOVER)))
+        if (IsAlive() && (CanHover() || HasHoverAura()))
             SetHover(true);
     }
 
@@ -3609,10 +3622,10 @@ float Creature::GetAttackDistance(Unit const* player) const
     if (creatureLevel + 5 <= sWorld->getIntConfig(CONFIG_MAX_PLAYER_LEVEL))
     {
         // detect range auras
-        retDistance += static_cast<float>( GetTotalAuraModifier(SPELL_AURA_MOD_DETECT_RANGE) );
+        retDistance += static_cast<float>( GetTotalAuraModifier(SPELL_AURA_MOD_DETECT_RANGE));
 
         // detected range auras
-        retDistance += static_cast<float>( player->GetTotalAuraModifier(SPELL_AURA_MOD_DETECTED_RANGE) );
+        retDistance += static_cast<float>( player->GetTotalAuraModifier(SPELL_AURA_MOD_DETECTED_RANGE));
     }
 
     // "Minimum Aggro Radius for a mob seems to be combat range (5 yards)"

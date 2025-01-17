@@ -821,7 +821,7 @@ namespace Acore
         bool operator()(Unit* u)
         {
             if (u->IsAlive() && u->IsInCombat() && !i_obj->IsHostileTo(u) && i_obj->IsWithinDistInMap(u, i_range) &&
-                    (u->isFeared() || u->IsCharmed() || u->isFrozen() || u->HasUnitState(UNIT_STATE_STUNNED) || u->HasUnitState(UNIT_STATE_CONFUSED)))
+                    (u->HasFearAura() || u->IsCharmed() || u->isFrozen() || u->HasUnitState(UNIT_STATE_STUNNED) || u->HasUnitState(UNIT_STATE_CONFUSED)))
             {
                 return true;
             }
@@ -838,8 +838,8 @@ namespace Acore
         FriendlyMissingBuffInRange(Unit const* obj, float range, uint32 spellid) : i_obj(obj), i_range(range)
         {
             i_spell = spellid;
-            if( SpellInfo const* spell = sSpellMgr->GetSpellInfo(spellid) )
-                if( SpellInfo const* newSpell = sSpellMgr->GetSpellForDifficultyFromSpell(spell, const_cast<Unit*>(obj)) )
+            if (SpellInfo const* spell = sSpellMgr->GetSpellInfo(spellid))
+                if (SpellInfo const* newSpell = sSpellMgr->GetSpellForDifficultyFromSpell(spell, const_cast<Unit*>(obj)))
                     i_spell = newSpell->Id;
         }
         bool operator()(Unit* u)

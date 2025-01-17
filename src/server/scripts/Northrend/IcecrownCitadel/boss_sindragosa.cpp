@@ -25,6 +25,8 @@
 #include "ScriptedCreature.h"
 #include "SpellScriptLoader.h"
 #include "icecrown_citadel.h"
+#include "PassiveAI.h"
+#include "SpellAuraEffects.h"
 
 enum Texts
 {
@@ -258,7 +260,7 @@ public:
         if (target->HasAura(SPELL_FROST_IMBUED_BLADE))
             return false;
 
-        if (target->IsImmunedToDamageOrSchool(SPELL_SCHOOL_MASK_ALL) || target->HasAura(SPELL_ICE_TOMB_UNTARGETABLE) || target->HasAura(SPELL_ICE_TOMB_DAMAGE) || target->HasAura(SPELL_TANK_MARKER_AURA) || target->HasAuraType(SPELL_AURA_SPIRIT_OF_REDEMPTION))
+        if (target->IsImmunedToDamageOrSchool(SPELL_SCHOOL_MASK_ALL) || target->HasAnyAuras(SPELL_ICE_TOMB_UNTARGETABLE, SPELL_ICE_TOMB_DAMAGE, SPELL_TANK_MARKER_AURA) || target->HasSpiritOfRedemptionAura())
             return false;
 
         return target != _source->GetVictim();
@@ -813,7 +815,7 @@ class spell_sindragosa_s_fury : public SpellScript
         if (ResistFactor > 0.9f)
             ResistFactor = 0.9f;
 
-        uint32 damage = uint32( (GetEffectValue() / _targetCount) * (1.0f - ResistFactor) );
+        uint32 damage = uint32( (GetEffectValue() / _targetCount) * (1.0f - ResistFactor));
 
         SpellNonMeleeDamage damageInfo(GetCaster(), GetHitUnit(), GetSpellInfo(), GetSpellInfo()->SchoolMask);
         damageInfo.damage = damage;

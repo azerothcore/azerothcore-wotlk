@@ -2352,7 +2352,7 @@ void AchievementMgr::CompletedAchievement(AchievementEntry const* achievement)
             LocaleConstant localeConstant = GetPlayer()->GetSession()->GetSessionDbLocaleIndex();
             if (localeConstant != LOCALE_enUS)
             {
-                if(AchievementRewardLocale const* loc = sAchievementMgr->GetAchievementRewardLocale(achievement))
+                if (AchievementRewardLocale const* loc = sAchievementMgr->GetAchievementRewardLocale(achievement))
                 {
                     ObjectMgr::GetLocaleString(loc->Subject, localeConstant, subject);
                     ObjectMgr::GetLocaleString(loc->Text, localeConstant, text);
@@ -2539,7 +2539,7 @@ bool AchievementGlobalMgr::IsStatisticAchievement(AchievementEntry const* achiev
     AchievementCategoryEntry const* cat = sAchievementCategoryStore.LookupEntry(achievement->categoryId);
     do
     {
-        switch(cat->ID)
+        switch (cat->ID)
         {
             case ACHIEVEMENT_CATEGORY_STATISTICS:
                 return true;

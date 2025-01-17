@@ -108,7 +108,7 @@ class InstanceSaveMgr
     friend class InstanceSave;
 
 private:
-    InstanceSaveMgr()  = default;;
+    InstanceSaveMgr()  = default;
     ~InstanceSaveMgr();
 
 public:

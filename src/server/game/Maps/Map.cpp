@@ -26,10 +26,12 @@
 #include "GridNotifiers.h"
 #include "Group.h"
 #include "InstanceScript.h"
+#include "IVMapMgr.h"
 #include "LFGMgr.h"
 #include "MapInstanced.h"
 #include "Metric.h"
 #include "MiscPackets.h"
+#include "MMapFactory.h"
 #include "Object.h"
 #include "ObjectAccessor.h"
 #include "ObjectGridLoader.h"
@@ -39,6 +41,7 @@
 #include "Transport.h"
 #include "VMapFactory.h"
 #include "Vehicle.h"
+#include "VMapMgr2.h"
 #include "Weather.h"
 
 union u_map_magic
@@ -558,7 +561,7 @@ bool Map::AddToMap(T* obj, bool checkTransport)
     if (obj->IsInWorld())
     {
         ASSERT(obj->IsInGrid());
-        obj->UpdateObjectVisibility(true);
+        obj->UpdateObjectVisibilityOnCreate();
         return true;
     }
 
