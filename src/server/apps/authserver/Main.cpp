@@ -118,8 +118,14 @@ int main(int argc, char** argv)
     }
 
     // Initialize the database connection
+   try {
     if (!StartDB())
         return 1;
+} catch (const std::exception& ex) {
+    LOG_ERROR("server.authserver", "Database initialization failed: {}", ex.what());
+    return 1;
+}
+
 
     sSecretMgr->Initialize();
 
