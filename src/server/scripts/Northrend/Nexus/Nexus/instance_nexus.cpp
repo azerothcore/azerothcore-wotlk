@@ -49,83 +49,38 @@ public:
             SetHeaders(DataHeader);
             SetBossNumber(MAX_ENCOUNTERS);
             LoadDoorData(doorData);
-
-            TeamIdInInstance = TEAM_NEUTRAL;
         }
 
         void OnCreatureCreate(Creature* creature) override
         {
-            if (TeamIdInInstance == TEAM_NEUTRAL)
-            {
-                Map::PlayerList const& players = instance->GetPlayers();
-                if (!players.IsEmpty())
-                    if (Player* pPlayer = players.begin()->GetSource())
-                    {
-                        if (Group* group = pPlayer->GetGroup())
-                        {
-                            if (Player* gLeader = ObjectAccessor::FindPlayer(group->GetLeaderGUID()))
-                                TeamIdInInstance = Player::TeamIdForRace(gLeader->getRace());
-                            else
-                                TeamIdInInstance = pPlayer->GetTeamId();
-                        }
-                        else
-                            TeamIdInInstance = pPlayer->GetTeamId();
-                    }
-            }
-
             switch (creature->GetEntry())
             {
                 case NPC_ALLIANCE_RANGER:
                     creature->SetFaction(FACTION_MONSTER_2);
-                    if (TeamIdInInstance == TEAM_ALLIANCE)
+                    if (GetTeamIdInInstance() == TEAM_ALLIANCE)
                         creature->UpdateEntry(NPC_HORDE_RANGER);
                     break;
                 case NPC_ALLIANCE_BERSERKER:
                     creature->SetFaction(FACTION_MONSTER_2);
-                    if (TeamIdInInstance == TEAM_ALLIANCE)
+                    if (GetTeamIdInInstance() == TEAM_ALLIANCE)
                         creature->UpdateEntry(NPC_HORDE_BERSERKER);
                     break;
                 case NPC_ALLIANCE_COMMANDER:
                     creature->SetFaction(FACTION_MONSTER_2);
-                    if (TeamIdInInstance == TEAM_ALLIANCE)
+                    if (GetTeamIdInInstance() == TEAM_ALLIANCE)
                         creature->UpdateEntry(NPC_HORDE_COMMANDER);
                     break;
                 case NPC_ALLIANCE_CLERIC:
                     creature->SetFaction(FACTION_MONSTER_2);
-                    if (TeamIdInInstance == TEAM_ALLIANCE)
+                    if (GetTeamIdInInstance() == TEAM_ALLIANCE)
                         creature->UpdateEntry(NPC_HORDE_CLERIC);
                     break;
                 case NPC_COMMANDER_STOUTBEARD:
                     creature->SetFaction(FACTION_MONSTER_2);
-                    if (TeamIdInInstance == TEAM_ALLIANCE)
+                    if (GetTeamIdInInstance() == TEAM_ALLIANCE)
                         creature->UpdateEntry(NPC_COMMANDER_KOLURG);
                     break;
             }
-        }
-
-        void OnPlayerEnter(Player* player) override
-        {
-            if (TeamIdInInstance == TEAM_NEUTRAL)
-            {
-                if (Group* group = player->GetGroup())
-                {
-                    if (Player* gLeader = ObjectAccessor::FindPlayer(group->GetLeaderGUID()))
-                        TeamIdInInstance = Player::TeamIdForRace(gLeader->getRace());
-                    else
-                        TeamIdInInstance = player->GetTeamId();
-                }
-                else
-                    TeamIdInInstance = player->GetTeamId();
-            }
-
-            if (sWorld->getBoolConfig(CONFIG_ALLOW_TWO_SIDE_INTERACTION_GROUP))
-                player->SetFaction((TeamIdInInstance == TEAM_HORDE) ? 1610 : 1);
-        }
-
-        void OnPlayerLeave(Player* player) override
-        {
-            if (sWorld->getBoolConfig(CONFIG_ALLOW_TWO_SIDE_INTERACTION_GROUP))
-                player->SetFactionForRace(player->getRace());
         }
 
         void OnGameObjectCreate(GameObject* gameObject) override
@@ -194,8 +149,6 @@ public:
                 (*i)->RemoveGameObjectFlag(GO_FLAG_NOT_SELECTABLE);
             return true;
         }
-    protected:
-        TeamId TeamIdInInstance;
     };
 };
 
