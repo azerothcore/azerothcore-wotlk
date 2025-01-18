@@ -80,7 +80,8 @@ struct boss_gurtogg_bloodboil : public BossAI
         BossAI::JustEngagedWith(who);
         Talk(SAY_AGGRO);
 
-        DoCastSelf(SPELL_ACIDIC_WOUND, true);
+        if (!me->HasAura(SPELL_FEL_RAGE_SELF))
+            DoCastSelf(SPELL_ACIDIC_WOUND, true);
 
         ScheduleTimedEvent(10s, [&] {
             if (!me->HasAura(SPELL_FEL_RAGE_SELF))
