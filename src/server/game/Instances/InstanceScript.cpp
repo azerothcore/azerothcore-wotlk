@@ -55,6 +55,34 @@ void InstanceScript::SaveToDB()
     CharacterDatabase.Execute(stmt);
 }
 
+void InstanceScript::OnPlayerEnter(Player* player)
+{
+    if (!IsTwoFactionInstance())
+        return;
+
+    if (GetTeamIdInInstance() == TEAM_NEUTRAL)
+    {
+        if (Group* group = player->GetGroup())
+        {
+            if (Player* leader = ObjectAccessor::FindConnectedPlayer(group->GetLeaderGUID()))
+                _teamIdInInstance = leader->GetTeamId();
+            else
+                _teamIdInInstance = player->GetTeamId();
+        }
+        else
+            _teamIdInInstance = player->GetTeamId();
+    }
+
+    if (sWorld->getBoolConfig(CONFIG_ALLOW_TWO_SIDE_INTERACTION_GROUP))
+        player->SetFaction((_teamIdInInstance == TEAM_HORDE) ? 1610 /*FACTION_HORDE*/ : 1 /*FACTION_ALLIANCE*/);
+}
+
+void InstanceScript::OnPlayerLeave(Player* player)
+{
+    if (sWorld->getBoolConfig(CONFIG_ALLOW_TWO_SIDE_INTERACTION_GROUP) && IsTwoFactionInstance())
+        player->SetFactionForRace(player->getRace());
+}
+
 void InstanceScript::OnCreatureCreate(Creature* creature)
 {
     AddObject(creature);
@@ -844,6 +872,24 @@ bool InstanceHasScript(WorldObject const* obj, char const* scriptName)
     if (InstanceMap* instance = obj->GetMap()->ToInstanceMap())
     {
         return instance->GetScriptName() == scriptName;
+    }
+
+    return false;
+}
+
+bool InstanceScript::IsTwoFactionInstance() const
+{
+    switch (instance->GetId())
+    {
+        case 540: // Shattered Halls
+        case 576: // Nexus
+        case 631: // Icecrown Citadel
+        case 632: // Forge of Souls
+        case 649: // Trial of the Champion
+        case 650: // Trial of the Crusader
+        case 658: // Pit of Saron
+        case 668: // Halls of Reflection
+            return true;
     }
 
     return false;
