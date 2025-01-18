@@ -80,20 +80,21 @@ struct npc_forest_frog : public ScriptedAI
             me->DespawnOrUnsummon(1000);
     }
 
+    Player* PlayerCaster() { return ObjectAccessor::GetPlayer(me->GetMap(), PlayerGUID); }
+
     void UpdateAI(uint32 diff) override
     {
         events.Update(diff);
         if (eventTimer)
         {
-            Player* player = ObjectAccessor::GetPlayer(me->GetMap(), PlayerGUID);
             switch (events.ExecuteEvent())
             {
             case 1:
 
                 if (me->GetEntry() == NPC_ADARRAH)
-                    Talk(SAY_THANKS_FREED + 1, player);
+                    Talk(SAY_THANKS_FREED + 1, PlayerCaster());
                 else
-                    Talk(SAY_THANKS_FREED, player);
+                    Talk(SAY_THANKS_FREED, PlayerCaster());
 
                 eventTimer = 2;
                 events.ScheduleEvent(eventTimer, urand(4000, 5000));
@@ -108,28 +109,28 @@ struct npc_forest_frog : public ScriptedAI
                 case NPC_DEEZ:
                 case NPC_GALATHRYN:
                     DoCastSelf(SPELL_SUMMON_AMANI_CHARM_CHEST_2, true);
-                    Talk(SAY_CHEST_SPAWN, player);
+                    Talk(SAY_CHEST_SPAWN, PlayerCaster());
                     break;
                 case NPC_ADARRAH:
                     DoCastSelf(SPELL_SUMMON_AMANI_CHARM_CHEST_2, true);
-                    Talk(SAY_CHEST_SPAWN + 1, player);
+                    Talk(SAY_CHEST_SPAWN + 1, PlayerCaster());
                     break;
                 case NPC_DARWEN:
                 case NPC_FUDGERICK:
                     DoCastSelf(SPELL_SUMMON_MONEY_BAG, true);
                     me->LoadEquipment(0, true);
-                    Talk(SAY_CHEST_SPAWN, player);
+                    Talk(SAY_CHEST_SPAWN, PlayerCaster());
                     break;
                 case NPC_KYREN:
                 case NPC_GUNTER:
-                    Talk(SAY_CHEST_SPAWN, player);
+                    Talk(SAY_CHEST_SPAWN, PlayerCaster());
                     break;
                 case NPC_MITZI:
                 case NPC_CHRISTIAN:
                 case NPC_BRENNAN:
                 case NPC_HOLLEE:
                     DoCastSelf(SPELL_SUMMON_AMANI_CHARM_CHEST_1, true);
-                    Talk(SAY_CHEST_SPAWN, player);
+                    Talk(SAY_CHEST_SPAWN, PlayerCaster());
                     break;
                 }
                 eventTimer = 3;
@@ -139,9 +140,9 @@ struct npc_forest_frog : public ScriptedAI
                 me->SetStandState(EMOTE_ONESHOT_NONE);
 
                 if (me->GetEntry() == NPC_ADARRAH)
-                    Talk(SAY_CHEST_TALK + 1, player);
+                    Talk(SAY_CHEST_TALK + 1, PlayerCaster());
                 else
-                    Talk(SAY_CHEST_TALK);
+                    Talk(SAY_CHEST_TALK, PlayerCaster());
 
                 eventTimer = 4;
                 if (me->GetEntry() == NPC_GUNTER || me->GetEntry() == NPC_KYREN)
@@ -153,9 +154,9 @@ struct npc_forest_frog : public ScriptedAI
                 me->HandleEmoteCommand(EMOTE_ONESHOT_WAVE);
 
                 if (me->GetEntry() == NPC_ADARRAH)
-                    Talk(SAY_GOODBYE + 1, player);
+                    Talk(SAY_GOODBYE + 1, PlayerCaster());
                 else
-                    Talk(SAY_GOODBYE);
+                    Talk(SAY_GOODBYE, PlayerCaster());
 
                 eventTimer = 5;
                 events.ScheduleEvent(eventTimer, 2000);
@@ -201,6 +202,7 @@ struct npc_forest_frog : public ScriptedAI
         events.ScheduleEvent(eventTimer, 3000);
 
         me->UpdateEntry(cEntry);
+        me->SetFacingToObject(PlayerCaster());
     }
 
     void SpellHit(Unit* caster, SpellInfo const* spell) override
@@ -208,7 +210,6 @@ struct npc_forest_frog : public ScriptedAI
         if (spell->Id == SPELL_REMOVE_AMANI_CURSE && caster->IsPlayer() && me->GetEntry() == NPC_FOREST_FROG)
         {
             me->GetMotionMaster()->MoveIdle();
-            me->SetFacingToObject(caster);
             PlayerGUID = caster->GetGUID();
 
             if (roll_chance_i(2))
@@ -223,7 +224,6 @@ struct npc_forest_frog : public ScriptedAI
 
     private:
         InstanceScript* instance;
-        EventMap events;
         uint8 eventTimer;
         ObjectGuid PlayerGUID;
 };
