@@ -35,7 +35,6 @@ public:
         }
 
         uint32 m_auiEncounter[MAX_ENCOUNTER];
-        TeamId teamIdInInstance;
         uint32 InstanceProgress;
         std::string str_data;
 
@@ -61,7 +60,6 @@ public:
         void Initialize() override
         {
             memset(&m_auiEncounter, 0, sizeof(m_auiEncounter));
-            teamIdInInstance = TEAM_NEUTRAL;
             InstanceProgress = INSTANCE_PROGRESS_NONE;
 
             bAchievEleven = true;
@@ -78,62 +76,24 @@ public:
 
         void OnPlayerEnter(Player* player) override
         {
-            if (teamIdInInstance == TEAM_NEUTRAL)
-            {
-                if (Group* group = player->GetGroup())
-                {
-                    if (Player* gLeader = ObjectAccessor::FindPlayer(group->GetLeaderGUID()))
-                        teamIdInInstance = Player::TeamIdForRace(gLeader->getRace());
-                    else
-                        teamIdInInstance = player->GetTeamId();
-                }
-                else
-                    teamIdInInstance = player->GetTeamId();
-            }
-
-            if (sWorld->getBoolConfig(CONFIG_ALLOW_TWO_SIDE_INTERACTION_GROUP))
-                player->SetFaction((teamIdInInstance == TEAM_HORDE) ? 1610 : 1);
+            InstanceScript::OnPlayerEnter(player);
 
             instance->LoadGrid(LeaderIntroPos.GetPositionX(), LeaderIntroPos.GetPositionY());
             if (Creature* c = instance->GetCreature(GetGuidData(DATA_LEADER_FIRST_GUID)))
                 c->AI()->SetData(DATA_START_INTRO, 0);
         }
 
-        void OnPlayerLeave(Player* player) override
-        {
-            if (sWorld->getBoolConfig(CONFIG_ALLOW_TWO_SIDE_INTERACTION_GROUP))
-                player->SetFactionForRace(player->getRace());
-        }
-
         uint32 GetCreatureEntry(ObjectGuid::LowType /*guidLow*/, CreatureData const* data) override
         {
-            if (teamIdInInstance == TEAM_NEUTRAL)
-            {
-                Map::PlayerList const& players = instance->GetPlayers();
-                if (!players.IsEmpty())
-                    if (Player* player = players.begin()->GetSource())
-                    {
-                        if (Group* group = player->GetGroup())
-                        {
-                            if (Player* gLeader = ObjectAccessor::FindPlayer(group->GetLeaderGUID()))
-                                teamIdInInstance = Player::TeamIdForRace(gLeader->getRace());
-                            else
-                                teamIdInInstance = player->GetTeamId();
-                        }
-                        else
-                            teamIdInInstance = player->GetTeamId();
-                    }
-            }
-
             uint32 entry = data->id1;
             switch (entry)
             {
                 case NPC_RESCUED_ALLIANCE_SLAVE:
-                    if (teamIdInInstance == TEAM_HORDE)
+                    if (GetTeamIdInInstance() == TEAM_HORDE)
                         return 0;
                     break;
                 case NPC_RESCUED_HORDE_SLAVE:
-                    if (teamIdInInstance == TEAM_ALLIANCE)
+                    if (GetTeamIdInInstance() == TEAM_ALLIANCE)
                         return 0;
                     break;
             }
@@ -143,28 +103,10 @@ public:
 
         void OnCreatureCreate(Creature* creature) override
         {
-            if (teamIdInInstance == TEAM_NEUTRAL)
-            {
-                Map::PlayerList const& players = instance->GetPlayers();
-                if (!players.IsEmpty())
-                    if (Player* player = players.begin()->GetSource())
-                    {
-                        if (Group* group = player->GetGroup())
-                        {
-                            if (Player* gLeader = ObjectAccessor::FindPlayer(group->GetLeaderGUID()))
-                                teamIdInInstance = Player::TeamIdForRace(gLeader->getRace());
-                            else
-                                teamIdInInstance = player->GetTeamId();
-                        }
-                        else
-                            teamIdInInstance = player->GetTeamId();
-                    }
-            }
-
             switch (creature->GetEntry())
             {
                 case NPC_SYLVANAS_PART1:
-                    if (teamIdInInstance == TEAM_ALLIANCE)
+                    if (GetTeamIdInInstance() == TEAM_ALLIANCE)
                         creature->UpdateEntry(NPC_JAINA_PART1);
                     NPC_LeaderFirstGUID = creature->GetGUID();
 
@@ -183,7 +125,7 @@ public:
                     }
                     break;
                 case NPC_SYLVANAS_PART2:
-                    if (teamIdInInstance == TEAM_ALLIANCE)
+                    if (GetTeamIdInInstance() == TEAM_ALLIANCE)
                         creature->UpdateEntry(NPC_JAINA_PART2);
                     NPC_LeaderSecondGUID = creature->GetGUID();
                     break;
@@ -213,50 +155,50 @@ public:
                     }
                     break;
                 case NPC_LORALEN:
-                    if (teamIdInInstance == TEAM_ALLIANCE)
+                    if (GetTeamIdInInstance() == TEAM_ALLIANCE)
                         creature->UpdateEntry(NPC_ELANDRA);
                     if (!NPC_GuardFirstGUID)
                         NPC_GuardFirstGUID = creature->GetGUID();
                     break;
                 case NPC_KALIRA:
-                    if (teamIdInInstance == TEAM_ALLIANCE)
+                    if (GetTeamIdInInstance() == TEAM_ALLIANCE)
                         creature->UpdateEntry(NPC_KORELN);
                     if (!NPC_GuardSecondGUID)
                         NPC_GuardSecondGUID = creature->GetGUID();
                     break;
                 case NPC_HORDE_SLAVE_1:
-                    if (teamIdInInstance == TEAM_ALLIANCE)
+                    if (GetTeamIdInInstance() == TEAM_ALLIANCE)
                         creature->UpdateEntry(NPC_ALLIANCE_SLAVE_1);
                     break;
                 case NPC_HORDE_SLAVE_2:
-                    if (teamIdInInstance == TEAM_ALLIANCE)
+                    if (GetTeamIdInInstance() == TEAM_ALLIANCE)
                         creature->UpdateEntry(NPC_ALLIANCE_SLAVE_2);
                     break;
                 case NPC_HORDE_SLAVE_3:
-                    if (teamIdInInstance == TEAM_ALLIANCE)
+                    if (GetTeamIdInInstance() == TEAM_ALLIANCE)
                         creature->UpdateEntry(NPC_ALLIANCE_SLAVE_3);
                     break;
                 case NPC_HORDE_SLAVE_4:
-                    if (teamIdInInstance == TEAM_ALLIANCE)
+                    if (GetTeamIdInInstance() == TEAM_ALLIANCE)
                         creature->UpdateEntry(NPC_ALLIANCE_SLAVE_4);
                     break;
                 case NPC_GORKUN_IRONSKULL_1:
-                    if (teamIdInInstance == TEAM_ALLIANCE)
+                    if (GetTeamIdInInstance() == TEAM_ALLIANCE)
                         creature->UpdateEntry(NPC_MARTIN_VICTUS_1);
                     break;
                 case NPC_GARFROST:
                     NPC_GarfrostGUID = creature->GetGUID();
                     break;
                 case NPC_FREED_SLAVE_1_HORDE:
-                    if (teamIdInInstance == TEAM_ALLIANCE)
+                    if (GetTeamIdInInstance() == TEAM_ALLIANCE)
                         creature->UpdateEntry(NPC_FREED_SLAVE_1_ALLIANCE);
                     break;
                 case NPC_FREED_SLAVE_2_HORDE:
-                    if (teamIdInInstance == TEAM_ALLIANCE)
+                    if (GetTeamIdInInstance() == TEAM_ALLIANCE)
                         creature->UpdateEntry(NPC_FREED_SLAVE_2_ALLIANCE);
                     break;
                 case NPC_FREED_SLAVE_3_HORDE:
-                    if (teamIdInInstance == TEAM_ALLIANCE)
+                    if (GetTeamIdInInstance() == TEAM_ALLIANCE)
                         creature->UpdateEntry(NPC_FREED_SLAVE_3_ALLIANCE);
                     break;
                 case NPC_GORKUN_IRONSKULL_2:
@@ -266,7 +208,7 @@ public:
                             c->AI()->DoAction(1); // despawn summons
                             c->DespawnOrUnsummon();
                         }
-                    if (teamIdInInstance == TEAM_ALLIANCE)
+                    if (GetTeamIdInInstance() == TEAM_ALLIANCE)
                         creature->UpdateEntry(NPC_MARTIN_VICTUS_2);
                     NPC_MartinOrGorkunGUID = creature->GetGUID();
                     break;
@@ -370,7 +312,7 @@ public:
                 case DATA_INSTANCE_PROGRESS:
                     return InstanceProgress;
                 case DATA_TEAMID_IN_INSTANCE:
-                    return teamIdInInstance;
+                    return GetTeamIdInInstance();
                 case DATA_GARFROST:
                     return m_auiEncounter[0];
                 case DATA_ICK:
