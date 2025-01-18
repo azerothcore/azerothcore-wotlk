@@ -1,3 +1,4 @@
+-- DB update 2025_01_17_01 -> 2025_01_18_00
 -- Update gameobject 'Giant Clam' with sniffed values and add pooling
 -- updated spawns
 DELETE FROM `gameobject` WHERE (`id` IN (19018))
