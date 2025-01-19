@@ -8747,7 +8747,6 @@ std::string ObjectMgr::GetAcoreString(uint32 entry, LocaleConstant locale) const
 
     std::string msg = Acore::StringFormat("No entry for acore_string ({}) in DB.", entry);
     LOG_ERROR("sql.sql", msg);
-
     return msg;
 }
 
