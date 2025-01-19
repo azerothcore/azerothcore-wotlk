@@ -16,24 +16,8 @@
  */
 
 #include "CreatureScript.h"
-#include "PlayerScript.h"
 #include "WorldState.h"
 
-// TODO: Move to player_scripts.cpp ?
-//class SunsReachQuestTracker : public PlayerScript
-//{
-//public:
-//    SunsReachQuestTracker() : PlayerScript("SunsReachQuestTracker") { }
-//
-//    void OnPlayerCompleteQuest(Player* /*player*/, Quest const* quest) override
-//    {
-//        sWorldState->AddSunsReachProgress(quest->GetQuestId());
-//        sWorldState->AddSunwellGateProgress(quest->GetQuestId());
-//        return true;
-//    }
-//};
-
-// UPDATE `creature_template` SET `ScriptName`='npc_suns_reach_reclamation' WHERE `entry` IN (24965,24967,25061,25057,24932,25108,25069,25046,24975,25112,25163);
 class npc_suns_reach_reclamation : public CreatureScript
 {
 public:

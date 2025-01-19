@@ -94,21 +94,21 @@ enum WorldStateSaveIds
 enum WorldStateGameEvents
 {
    // Isle phases
-    GAME_EVENT_QUEL_DANAS_PHASE_1               = 301,
-    GAME_EVENT_QUEL_DANAS_PHASE_2_ONLY          = 302,
-    GAME_EVENT_QUEL_DANAS_PHASE_2_PERMANENT     = 303,
-    GAME_EVENT_QUEL_DANAS_PHASE_2_NO_PORTAL     = 304,
-    GAME_EVENT_QUEL_DANAS_PHASE_2_PORTAL        = 305,
-    GAME_EVENT_QUEL_DANAS_PHASE_3_ONLY          = 306,
-    GAME_EVENT_QUEL_DANAS_PHASE_3_PERMANENT     = 307,
-    GAME_EVENT_QUEL_DANAS_PHASE_3_NO_ANVIL      = 308,
-    GAME_EVENT_QUEL_DANAS_PHASE_3_ANVIL         = 309,
-    GAME_EVENT_QUEL_DANAS_PHASE_4               = 310,
-    GAME_EVENT_QUEL_DANAS_PHASE_4_NO_MONUMENT   = 311,
-    GAME_EVENT_QUEL_DANAS_PHASE_4_MONUMENT      = 312,
-    GAME_EVENT_QUEL_DANAS_PHASE_4_NO_ALCHEMY_LAB= 313,
-    GAME_EVENT_QUEL_DANAS_PHASE_4_ALCHEMY_LAB   = 314,
-    GAME_EVENT_QUEL_DANAS_PHASE_4_KIRU          = 315,
+    GAME_EVENT_QUEL_DANAS_PHASE_1               = 101,
+    GAME_EVENT_QUEL_DANAS_PHASE_2_ONLY          = 102,
+    GAME_EVENT_QUEL_DANAS_PHASE_2_PERMANENT     = 103,
+    GAME_EVENT_QUEL_DANAS_PHASE_2_NO_PORTAL     = 104,
+    GAME_EVENT_QUEL_DANAS_PHASE_2_PORTAL        = 105,
+    GAME_EVENT_QUEL_DANAS_PHASE_3_ONLY          = 106,
+    GAME_EVENT_QUEL_DANAS_PHASE_3_PERMANENT     = 107,
+    GAME_EVENT_QUEL_DANAS_PHASE_3_NO_ANVIL      = 108,
+    GAME_EVENT_QUEL_DANAS_PHASE_3_ANVIL         = 109,
+    GAME_EVENT_QUEL_DANAS_PHASE_4               = 110,
+    GAME_EVENT_QUEL_DANAS_PHASE_4_NO_MONUMENT   = 111,
+    GAME_EVENT_QUEL_DANAS_PHASE_4_MONUMENT      = 112,
+    GAME_EVENT_QUEL_DANAS_PHASE_4_NO_ALCHEMY_LAB= 113,
+    GAME_EVENT_QUEL_DANAS_PHASE_4_ALCHEMY_LAB   = 114,
+    GAME_EVENT_QUEL_DANAS_PHASE_4_KIRU          = 115,
 };
 
 enum SunsReachPhases
@@ -175,6 +175,7 @@ class WorldState
         void HandleConditionStateChange(WorldStateCondition conditionId, WorldStateConditionState state);
         void HandleExternalEvent(WorldStateEvent eventId, uint32 param);
         void Update(uint32 diff);
+        void SendWorldstateUpdate(std::mutex& mutex, GuidVector const& guids, uint32 value, uint32 worldStateId);
         // Sun's Reach Reclamation
         void AddSunsReachProgress(uint32 questId);
         void HandleSunsReachPhaseTransition(uint32 newPhase);

@@ -62,7 +62,7 @@ void AddSC_wp_commandscript();
 void AddSC_cache_commandscript();
 void AddSC_item_commandscript();
 void AddSC_player_settings_commandscript();
-void AddSC_sunsreach_commandscript();
+void AddSC_worldstate_commandscript();
 
 // The name of this function should match:
 // void Add${NameOfDirectory}Scripts()
@@ -114,5 +114,5 @@ void AddCommandsScripts()
     AddSC_cache_commandscript();
     AddSC_item_commandscript();
     AddSC_player_settings_commandscript();
-    AddSC_sunsreach_commandscript();
+    AddSC_worldstate_commandscript();
 }

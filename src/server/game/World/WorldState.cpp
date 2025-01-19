@@ -15,9 +15,11 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "GameEventMgr.h"
 #include "MapMgr.h"
 #include "Player.h"
 #include "SharedDefines.h"
+#include "Weather.h"
 #include "WorldState.h"
 
 WorldState* WorldState::instance()
@@ -101,8 +103,8 @@ void WorldState::Save(WorldStateSaveIds saveId)
 
 void WorldState::SaveHelper(std::string& stringToSave, WorldStateSaveIds saveId)
 {
-    CharacterDatabase.Execute("DELETE FROM world_state WHERE Id='%u'", saveId);
-    CharacterDatabase.Execute("INSERT INTO world_state(Id,Data) VALUES('%u','%s')", saveId, stringToSave.data());
+    CharacterDatabase.Execute("DELETE FROM world_state WHERE Id='{}'", saveId);
+    CharacterDatabase.Execute("INSERT INTO world_state(Id,Data) VALUES('{}','{}')", saveId, stringToSave.data());
 }
 
 bool WorldState::IsConditionFulfilled(WorldStateCondition conditionId, WorldStateConditionState state) const
@@ -211,9 +213,13 @@ void WorldState::HandlePlayerEnterZone(Player* player, WorldStateZoneId zoneId)
         case ZONEID_ISLE_OF_QUEL_DANAS:
         case ZONEID_MAGISTERS_TERRACE:
         case ZONEID_SUNWELL_PLATEAU:
-            if (zoneId != ZONEID_SUNWELL_PLATEAU && m_sunsReachData.m_subphaseMask == SUBPHASE_ALL)
+        {
+            std::lock_guard<std::mutex> guard(m_sunsReachData.m_sunsReachReclamationMutex);
+            m_sunsReachData.m_sunsReachReclamationPlayers.push_back(player->GetGUID());
+            if (m_sunsReachData.m_subphaseMask == SUBPHASE_ALL)
                 player->CastSpell(player, SPELL_KIRU_SONG_OF_VICTORY, true);
             break;
+        }
         default:
             break;
     }
@@ -244,8 +250,14 @@ void WorldState::HandlePlayerLeaveZone(Player* player, WorldStateZoneId zoneId)
         case ZONEID_ISLE_OF_QUEL_DANAS:
         case ZONEID_MAGISTERS_TERRACE:
         case ZONEID_SUNWELL_PLATEAU:
+        {
+            std::lock_guard<std::mutex> guard(m_sunsReachData.m_sunsReachReclamationMutex);
             player->RemoveAurasDueToSpell(SPELL_KIRU_SONG_OF_VICTORY);
+            auto position = std::find(m_sunsReachData.m_sunsReachReclamationPlayers.begin(), m_sunsReachData.m_sunsReachReclamationPlayers.end(), player->GetGUID());
+            if (position != m_sunsReachData.m_sunsReachReclamationPlayers.end())
+                m_sunsReachData.m_sunsReachReclamationPlayers.erase(position);
             break;
+        }
         default:
             break;
     }
@@ -371,6 +383,14 @@ void WorldState::DispelAdalsSongOfBattle()
     });
 }
 
+void WorldState::SendWorldstateUpdate(std::mutex& mutex, GuidVector const& guids, uint32 value, uint32 worldStateId)
+{
+    std::lock_guard<std::mutex> guard(mutex);
+    for (ObjectGuid const& guid : guids)
+        if (Player* player = ObjectAccessor::FindPlayer(guid))
+            player->SendUpdateWorldState(worldStateId, value);
+}
+
 enum WorldStateSunsReachQuests
 {
     QUEST_ERRATIC_BEHAVIOR                  = 11524,
@@ -396,21 +416,69 @@ void WorldState::AddSunsReachProgress(uint32 questId)
     uint32 addedValue = 1;
     switch (questId)
     {
-        case QUEST_ERRATIC_BEHAVIOR: counter = COUNTER_ERRATIC_BEHAVIOR; otherCounter = COUNTER_SANCTUM_WARDS; worldState = WORLD_STATE_QUEL_DANAS_SANCTUM; break;
-        case QUEST_SANCTUM_WARDS: counter = COUNTER_SANCTUM_WARDS; otherCounter = COUNTER_SANCTUM_WARDS; worldState = WORLD_STATE_QUEL_DANAS_SANCTUM; break;
-        case QUEST_BATTLE_FOR_THE_SUNS_REACH_ARMORY: counter = COUNTER_BATTLE_FOR_THE_SUNS_REACH_ARMORY; otherCounter = COUNTER_DISTRACTION_AT_THE_DEAD_SCAR; worldState = WORLD_STATE_QUEL_DANAS_ARMORY; break;
-        case QUEST_DISTRACTION_AT_THE_DEAD_SCAR: counter = COUNTER_DISTRACTION_AT_THE_DEAD_SCAR; otherCounter = COUNTER_BATTLE_FOR_THE_SUNS_REACH_ARMORY; worldState = WORLD_STATE_QUEL_DANAS_ARMORY; break;
-        case QUEST_INTERCEPTING_THE_MANA_CELLS: counter = COUNTER_INTERCEPTING_THE_MANA_CELLS; subPhaseMask = SUBPHASE_PORTAL; worldState = WORLD_STATE_QUEL_DANAS_PORTAL; break;
-        case QUEST_INTERCEPT_THE_REINFORCEMENTS: counter = COUNTER_INTERCEPT_THE_REINFORCEMENTS; otherCounter = COUNTER_TAKING_THE_HARBOR; worldState = WORLD_STATE_QUEL_DANAS_HARBOR; break;
-        case QUEST_TAKING_THE_HARBOR: counter = COUNTER_TAKING_THE_HARBOR; otherCounter = COUNTER_INTERCEPT_THE_REINFORCEMENTS; worldState = WORLD_STATE_QUEL_DANAS_HARBOR; break;
-        case QUEST_MAKING_READY: counter = COUNTER_MAKING_READY; subPhaseMask = SUBPHASE_ANVIL; worldState = WORLD_STATE_QUEL_DANAS_ANVIL; break;
-        case QUEST_DISCOVERING_YOUR_ROOTS: counter = COUNTER_DISCOVERING_YOUR_ROOTS; subPhaseMask = SUBPHASE_ALCHEMY_LAB; worldState = WORLD_STATE_QUEL_DANAS_ALCHEMY_LAB; break;
-        case QUEST_A_CHARITABLE_DONATION: counter = COUNTER_A_CHARITABLE_DONATION; subPhaseMask = SUBPHASE_MONUMENT; worldState = WORLD_STATE_QUEL_DANAS_MONUMENT; break;
-        case QUEST_A_MAGNANIMOUS_BENEFACTOR: counter = COUNTER_A_CHARITABLE_DONATION; subPhaseMask = SUBPHASE_MONUMENT; worldState = WORLD_STATE_QUEL_DANAS_MONUMENT; addedValue = 150; break;
-        default: return;
+        case QUEST_ERRATIC_BEHAVIOR:
+            counter = COUNTER_ERRATIC_BEHAVIOR;
+            otherCounter = COUNTER_SANCTUM_WARDS;
+            worldState = WORLD_STATE_QUEL_DANAS_SANCTUM;
+            break;
+        case QUEST_SANCTUM_WARDS:
+            counter = COUNTER_SANCTUM_WARDS;
+            otherCounter = COUNTER_SANCTUM_WARDS;
+            worldState = WORLD_STATE_QUEL_DANAS_SANCTUM;
+            break;
+        case QUEST_BATTLE_FOR_THE_SUNS_REACH_ARMORY:
+            counter = COUNTER_BATTLE_FOR_THE_SUNS_REACH_ARMORY;
+            otherCounter = COUNTER_DISTRACTION_AT_THE_DEAD_SCAR;
+            worldState = WORLD_STATE_QUEL_DANAS_ARMORY;
+            break;
+        case QUEST_DISTRACTION_AT_THE_DEAD_SCAR:
+            counter = COUNTER_DISTRACTION_AT_THE_DEAD_SCAR;
+            otherCounter = COUNTER_BATTLE_FOR_THE_SUNS_REACH_ARMORY;
+            worldState = WORLD_STATE_QUEL_DANAS_ARMORY;
+            break;
+        case QUEST_INTERCEPTING_THE_MANA_CELLS:
+            counter = COUNTER_INTERCEPTING_THE_MANA_CELLS;
+            subPhaseMask = SUBPHASE_PORTAL;
+            worldState = WORLD_STATE_QUEL_DANAS_PORTAL;
+            break;
+        case QUEST_INTERCEPT_THE_REINFORCEMENTS:
+            counter = COUNTER_INTERCEPT_THE_REINFORCEMENTS;
+            otherCounter = COUNTER_TAKING_THE_HARBOR;
+            worldState = WORLD_STATE_QUEL_DANAS_HARBOR;
+            break;
+        case QUEST_TAKING_THE_HARBOR:
+            counter = COUNTER_TAKING_THE_HARBOR;
+            otherCounter = COUNTER_INTERCEPT_THE_REINFORCEMENTS;
+            worldState = WORLD_STATE_QUEL_DANAS_HARBOR;
+            break;
+        case QUEST_MAKING_READY:
+            counter = COUNTER_MAKING_READY;
+            subPhaseMask = SUBPHASE_ANVIL;
+            worldState = WORLD_STATE_QUEL_DANAS_ANVIL;
+            break;
+        case QUEST_DISCOVERING_YOUR_ROOTS:
+            counter = COUNTER_DISCOVERING_YOUR_ROOTS;
+            subPhaseMask = SUBPHASE_ALCHEMY_LAB;
+            worldState = WORLD_STATE_QUEL_DANAS_ALCHEMY_LAB;
+            break;
+        case QUEST_A_CHARITABLE_DONATION:
+            counter = COUNTER_A_CHARITABLE_DONATION;
+            subPhaseMask = SUBPHASE_MONUMENT;
+            worldState = WORLD_STATE_QUEL_DANAS_MONUMENT;
+            break;
+        case QUEST_A_MAGNANIMOUS_BENEFACTOR:
+            counter = COUNTER_A_CHARITABLE_DONATION;
+            subPhaseMask = SUBPHASE_MONUMENT;
+            worldState = WORLD_STATE_QUEL_DANAS_MONUMENT;
+            addedValue = 150;
+            break;
+        default:
+            return;
     }
+
     uint32 previousValue = 0;
     uint32 newValue = 0;
+
     if (!subPhaseMask)
         previousValue = m_sunsReachData.GetPhasePercentage(m_sunsReachData.m_phase);
     else
@@ -421,67 +489,73 @@ void WorldState::AddSunsReachProgress(uint32 questId)
     else
         newValue = m_sunsReachData.GetSubPhasePercentage(subPhaseMask);
     if (previousValue != newValue)
-        SendWorldstateUpdate(m_sunsReachData.m_sunsReachReclamationMutex, newValue, worldState);
+        SendWorldstateUpdate(m_sunsReachData.m_sunsReachReclamationMutex, m_sunsReachData.m_sunsReachReclamationPlayers, newValue, worldState);
+
     bool save = true;
-    if (m_sunsReachData.m_sunsReachReclamationCounters[counter] >= COUNTER_MAX_VAL_REQ)
+    uint32 counterValue = m_sunsReachData.m_sunsReachReclamationCounters[counter];
+    uint32 modifier = 1;
+    if (otherCounter != -1)
     {
-        if (otherCounter == -1 || m_sunsReachData.m_sunsReachReclamationCounters[otherCounter] >= COUNTER_MAX_VAL_REQ)
+        modifier = 2;
+        counterValue += m_sunsReachData.m_sunsReachReclamationCounters[otherCounter];
+    }
+    if (counterValue >= sWorld->getIntConfig(CONFIG_SUNSREACH_COUNTER_MAX) * modifier)
+    {
+        save = false;
+        switch (questId)
         {
-            save = false;
-            switch (questId)
+            case QUEST_ERRATIC_BEHAVIOR:
+            case QUEST_SANCTUM_WARDS:
             {
-                case QUEST_ERRATIC_BEHAVIOR:
-                case QUEST_SANCTUM_WARDS:
-                {
-                    if (m_sunsReachData.m_phase == SUNS_REACH_PHASE_1_STAGING_AREA)
-                        HandleSunsReachPhaseTransition(SUNS_REACH_PHASE_2_SANCTUM);
-                    break;
-                }
-                case QUEST_BATTLE_FOR_THE_SUNS_REACH_ARMORY:
-                case QUEST_DISTRACTION_AT_THE_DEAD_SCAR:
-                {
-                    if (m_sunsReachData.m_phase == SUNS_REACH_PHASE_2_SANCTUM)
-                        HandleSunsReachPhaseTransition(SUNS_REACH_PHASE_3_ARMORY);
-                    break;
-                }
-                case QUEST_INTERCEPTING_THE_MANA_CELLS:
-                {
-                    if ((m_sunsReachData.m_subphaseMask & SUBPHASE_PORTAL) == 0)
-                        HandleSunsReachSubPhaseTransition(SUBPHASE_PORTAL);
-                    break;
-                }
-                case QUEST_INTERCEPT_THE_REINFORCEMENTS:
-                case QUEST_TAKING_THE_HARBOR:
-                {
-                    if (m_sunsReachData.m_phase == SUNS_REACH_PHASE_3_ARMORY)
-                        HandleSunsReachPhaseTransition(SUNS_REACH_PHASE_4_HARBOR);
-                    break;
-                }
-                case QUEST_MAKING_READY:
-                {
-                    if ((m_sunsReachData.m_subphaseMask & SUBPHASE_ANVIL) == 0)
-                        HandleSunsReachSubPhaseTransition(SUBPHASE_ANVIL);
-                    break;
-                }
-                case QUEST_DISCOVERING_YOUR_ROOTS:
-                {
-                    if ((m_sunsReachData.m_subphaseMask & SUBPHASE_ALCHEMY_LAB) == 0)
-                        HandleSunsReachSubPhaseTransition(SUBPHASE_ALCHEMY_LAB);
-                    break;
-                }
-                case QUEST_A_CHARITABLE_DONATION:
-                case QUEST_A_MAGNANIMOUS_BENEFACTOR:
-                {
-                    if ((m_sunsReachData.m_subphaseMask & SUBPHASE_MONUMENT) == 0)
-                        HandleSunsReachSubPhaseTransition(SUBPHASE_MONUMENT);
-                    break;
-                }
+                if (m_sunsReachData.m_phase == SUNS_REACH_PHASE_1_STAGING_AREA)
+                    HandleSunsReachPhaseTransition(SUNS_REACH_PHASE_2_SANCTUM);
+                break;
+            }
+            case QUEST_BATTLE_FOR_THE_SUNS_REACH_ARMORY:
+            case QUEST_DISTRACTION_AT_THE_DEAD_SCAR:
+            {
+                if (m_sunsReachData.m_phase == SUNS_REACH_PHASE_2_SANCTUM)
+                    HandleSunsReachPhaseTransition(SUNS_REACH_PHASE_3_ARMORY);
+                break;
+            }
+            case QUEST_INTERCEPTING_THE_MANA_CELLS:
+            {
+                if ((m_sunsReachData.m_subphaseMask & SUBPHASE_PORTAL) == 0)
+                    HandleSunsReachSubPhaseTransition(SUBPHASE_PORTAL);
+                break;
+            }
+            case QUEST_INTERCEPT_THE_REINFORCEMENTS:
+            case QUEST_TAKING_THE_HARBOR:
+            {
+                if (m_sunsReachData.m_phase == SUNS_REACH_PHASE_3_ARMORY)
+                    HandleSunsReachPhaseTransition(SUNS_REACH_PHASE_4_HARBOR);
+                break;
+            }
+            case QUEST_MAKING_READY:
+            {
+                if ((m_sunsReachData.m_subphaseMask & SUBPHASE_ANVIL) == 0)
+                    HandleSunsReachSubPhaseTransition(SUBPHASE_ANVIL);
+                break;
+            }
+            case QUEST_DISCOVERING_YOUR_ROOTS:
+            {
+                if ((m_sunsReachData.m_subphaseMask & SUBPHASE_ALCHEMY_LAB) == 0)
+                    HandleSunsReachSubPhaseTransition(SUBPHASE_ALCHEMY_LAB);
+                break;
+            }
+            case QUEST_A_CHARITABLE_DONATION:
+            case QUEST_A_MAGNANIMOUS_BENEFACTOR:
+            {
+                if ((m_sunsReachData.m_subphaseMask & SUBPHASE_MONUMENT) == 0)
+                    HandleSunsReachSubPhaseTransition(SUBPHASE_MONUMENT);
+                break;
             }
         }
     }
     if (save)
         Save(SAVE_ID_QUEL_DANAS);
 }
+
 void WorldState::HandleSunsReachPhaseTransition(uint32 newPhase)
 {
     if (newPhase < m_sunsReachData.m_phase)
@@ -502,15 +576,16 @@ void WorldState::HandleSunsReachPhaseTransition(uint32 newPhase)
     }
     switch (m_sunsReachData.m_phase)
     {
-        case SUNS_REACH_PHASE_2_SANCTUM: if ((m_sunsReachData.m_subphaseMask & SUBPHASE_PORTAL) == 0) sGameEventMgr.StartEvent(GAME_EVENT_QUEL_DANAS_PHASE_2_NO_PORTAL); break;
-        case SUNS_REACH_PHASE_3_ARMORY: if ((m_sunsReachData.m_subphaseMask & SUBPHASE_ANVIL) == 0) sGameEventMgr.StartEvent(GAME_EVENT_QUEL_DANAS_PHASE_3_NO_ANVIL); break;
+        case SUNS_REACH_PHASE_2_SANCTUM: if ((m_sunsReachData.m_subphaseMask & SUBPHASE_PORTAL) == 0) sGameEventMgr->StartEvent(GAME_EVENT_QUEL_DANAS_PHASE_2_NO_PORTAL); break;
+        case SUNS_REACH_PHASE_3_ARMORY: if ((m_sunsReachData.m_subphaseMask & SUBPHASE_ANVIL) == 0) sGameEventMgr->StartEvent(GAME_EVENT_QUEL_DANAS_PHASE_3_NO_ANVIL); break;
         case SUNS_REACH_PHASE_4_HARBOR:
-            if ((m_sunsReachData.m_subphaseMask & SUBPHASE_ALCHEMY_LAB) == 0) sGameEventMgr.StartEvent(GAME_EVENT_QUEL_DANAS_PHASE_4_NO_MONUMENT);
-            if ((m_sunsReachData.m_subphaseMask & SUBPHASE_MONUMENT) == 0) sGameEventMgr.StartEvent(GAME_EVENT_QUEL_DANAS_PHASE_4_NO_ALCHEMY_LAB);
+            if ((m_sunsReachData.m_subphaseMask & SUBPHASE_ALCHEMY_LAB) == 0) sGameEventMgr->StartEvent(GAME_EVENT_QUEL_DANAS_PHASE_4_NO_MONUMENT);
+            if ((m_sunsReachData.m_subphaseMask & SUBPHASE_MONUMENT) == 0) sGameEventMgr->StartEvent(GAME_EVENT_QUEL_DANAS_PHASE_4_NO_ALCHEMY_LAB);
             break;
         default: break;
     }
-    SendWorldstateUpdate(m_sunsReachData.m_sunsReachReclamationMutex, m_sunsReachData.m_phase, WORLD_STATE_QUEL_DANAS_MUSIC);
+    SendWorldstateUpdate(m_sunsReachData.m_sunsReachReclamationMutex, m_sunsReachData.m_sunsReachReclamationPlayers, m_sunsReachData.m_phase, WORLD_STATE_QUEL_DANAS_MUSIC);
+    Save(SAVE_ID_QUEL_DANAS);
 }
 
 void WorldState::HandleSunsReachSubPhaseTransition(int32 subPhaseMask, bool initial)
@@ -534,14 +609,20 @@ void WorldState::HandleSunsReachSubPhaseTransition(int32 subPhaseMask, bool init
             all = true;
         m_sunsReachData.m_subphaseMask &= ~subPhaseMask;
     }
-    if (initial && subPhaseMask == 0)
+    if (initial)
     {
-        switch (m_sunsReachData.m_phase)
+        if (m_sunsReachData.m_phase >= SUNS_REACH_PHASE_2_SANCTUM)
+            if ((subPhaseMask & SUBPHASE_PORTAL) == 0)
+                sGameEventMgr->StartEvent(GAME_EVENT_QUEL_DANAS_PHASE_2_NO_PORTAL);
+        if (m_sunsReachData.m_phase >= SUNS_REACH_PHASE_3_ARMORY)
+            if ((subPhaseMask & SUBPHASE_ANVIL) == 0)
+                sGameEventMgr->StartEvent(GAME_EVENT_QUEL_DANAS_PHASE_3_NO_ANVIL);
+        if (m_sunsReachData.m_phase >= SUNS_REACH_PHASE_4_HARBOR)
         {
-            case SUNS_REACH_PHASE_2_SANCTUM: sGameEventMgr.StartEvent(GAME_EVENT_QUEL_DANAS_PHASE_2_NO_PORTAL); break;
-            case SUNS_REACH_PHASE_3_ARMORY: sGameEventMgr.StartEvent(GAME_EVENT_QUEL_DANAS_PHASE_3_NO_ANVIL); break;
-            case SUNS_REACH_PHASE_4_HARBOR: sGameEventMgr.StartEvent(GAME_EVENT_QUEL_DANAS_PHASE_4_NO_MONUMENT); sGameEventMgr.StartEvent(GAME_EVENT_QUEL_DANAS_PHASE_4_NO_ALCHEMY_LAB); break;
-            default: break;
+            if ((subPhaseMask & SUBPHASE_ALCHEMY_LAB) == 0)
+                sGameEventMgr->StartEvent(GAME_EVENT_QUEL_DANAS_PHASE_4_NO_ALCHEMY_LAB);
+            if ((subPhaseMask & SUBPHASE_MONUMENT) == 0)
+                sGameEventMgr->StartEvent(GAME_EVENT_QUEL_DANAS_PHASE_4_NO_MONUMENT);
         }
     }
     if ((subPhaseMask & SUBPHASE_PORTAL))
@@ -550,13 +631,13 @@ void WorldState::HandleSunsReachSubPhaseTransition(int32 subPhaseMask, bool init
         uint32 second = GAME_EVENT_QUEL_DANAS_PHASE_2_PORTAL;
         if (start)
         {
-            sGameEventMgr.StopEvent(first);
-            sGameEventMgr.StartEvent(second);
+            sGameEventMgr->StopEvent(first);
+            sGameEventMgr->StartEvent(second);
         }
         else
         {
-            sGameEventMgr.StopEvent(second);
-            sGameEventMgr.StartEvent(first);
+            sGameEventMgr->StopEvent(second);
+            sGameEventMgr->StartEvent(first);
         }
     }
     if ((subPhaseMask & SUBPHASE_ANVIL))
@@ -565,13 +646,13 @@ void WorldState::HandleSunsReachSubPhaseTransition(int32 subPhaseMask, bool init
         uint32 second = GAME_EVENT_QUEL_DANAS_PHASE_3_ANVIL;
         if (start)
         {
-            sGameEventMgr.StopEvent(first);
-            sGameEventMgr.StartEvent(second);
+            sGameEventMgr->StopEvent(first);
+            sGameEventMgr->StartEvent(second);
         }
         else
         {
-            sGameEventMgr.StopEvent(second);
-            sGameEventMgr.StartEvent(first);
+            sGameEventMgr->StopEvent(second);
+            sGameEventMgr->StartEvent(first);
         }
     }
     if ((subPhaseMask & SUBPHASE_ALCHEMY_LAB))
@@ -580,13 +661,13 @@ void WorldState::HandleSunsReachSubPhaseTransition(int32 subPhaseMask, bool init
         uint32 second = GAME_EVENT_QUEL_DANAS_PHASE_4_ALCHEMY_LAB;
         if (start)
         {
-            sGameEventMgr.StopEvent(first);
-            sGameEventMgr.StartEvent(second);
+            sGameEventMgr->StopEvent(first);
+            sGameEventMgr->StartEvent(second);
         }
         else
         {
-            sGameEventMgr.StopEvent(second);
-            sGameEventMgr.StartEvent(first);
+            sGameEventMgr->StopEvent(second);
+            sGameEventMgr->StartEvent(first);
         }
     }
     if ((subPhaseMask & SUBPHASE_MONUMENT))
@@ -595,48 +676,33 @@ void WorldState::HandleSunsReachSubPhaseTransition(int32 subPhaseMask, bool init
         uint32 second = GAME_EVENT_QUEL_DANAS_PHASE_4_MONUMENT;
         if (start)
         {
-            sGameEventMgr.StopEvent(first);
-            sGameEventMgr.StartEvent(second);
+            sGameEventMgr->StopEvent(first);
+            sGameEventMgr->StartEvent(second);
         }
         else
         {
-            sGameEventMgr.StopEvent(second);
-            sGameEventMgr.StartEvent(first);
+            sGameEventMgr->StopEvent(second);
+            sGameEventMgr->StartEvent(first);
         }
     }
     if (all)
     {
         if (start)
-            sGameEventMgr.StartEvent(GAME_EVENT_QUEL_DANAS_PHASE_4_KIRU);
+            sGameEventMgr->StartEvent(GAME_EVENT_QUEL_DANAS_PHASE_4_KIRU);
         else
-            sGameEventMgr.StopEvent(GAME_EVENT_QUEL_DANAS_PHASE_4_KIRU);
+            sGameEventMgr->StopEvent(GAME_EVENT_QUEL_DANAS_PHASE_4_KIRU);
+
         if (!initial)
         {
             std::lock_guard<std::mutex> guard(m_sunsReachData.m_sunsReachReclamationMutex);
             for (ObjectGuid& guid : m_sunsReachData.m_sunsReachReclamationPlayers)
-            {
-                if (Player* player = sObjectMgr.GetPlayer(guid))
+                if (Player* player = ObjectAccessor::FindPlayer(guid))
                 {
-                    if (player->GetZoneId() == ZONEID_SUNWELL_PLATEAU)
-                        continue;
                     if (start)
-                    {
-                        player->GetMap()->GetMessager().AddMessage([guid](Map* map) -> void
-                        {
-                            if (Player* player = map->GetPlayer(guid))
-                                player->CastSpell(nullptr, SPELL_KIRU_SONG_OF_VICTORY, TRIGGERED_OLD_TRIGGERED);
-                        });
-                    }
+                        player->CastSpell(player, SPELL_KIRU_SONG_OF_VICTORY, true);
                     else
-                    {
-                        player->GetMap()->GetMessager().AddMessage([guid](Map* map) -> void
-                        {
-                            if (Player* player = map->GetPlayer(guid))
-                                player->RemoveAurasDueToSpell(SPELL_KIRU_SONG_OF_VICTORY);
-                        });
-                    }
+                        player->RemoveAurasDueToSpell(SPELL_KIRU_SONG_OF_VICTORY);
                 }
-            }
         }
     }
     if (!initial)
@@ -652,10 +718,10 @@ void WorldState::StopSunsReachPhase(bool forward)
 {
     switch (m_sunsReachData.m_phase)
     {
-        case SUNS_REACH_PHASE_1_STAGING_AREA: sGameEventMgr.StopEvent(GAME_EVENT_QUEL_DANAS_PHASE_1); break;
-        case SUNS_REACH_PHASE_2_SANCTUM: sGameEventMgr.StopEvent(GAME_EVENT_QUEL_DANAS_PHASE_2_ONLY); if (!forward) sGameEventMgr.StopEvent(GAME_EVENT_QUEL_DANAS_PHASE_2_PERMANENT); break;
-        case SUNS_REACH_PHASE_3_ARMORY: sGameEventMgr.StopEvent(GAME_EVENT_QUEL_DANAS_PHASE_3_ONLY); if (!forward) sGameEventMgr.StopEvent(GAME_EVENT_QUEL_DANAS_PHASE_3_PERMANENT); break;
-        case SUNS_REACH_PHASE_4_HARBOR: sGameEventMgr.StopEvent(GAME_EVENT_QUEL_DANAS_PHASE_4); break;
+        case SUNS_REACH_PHASE_1_STAGING_AREA: sGameEventMgr->StopEvent(GAME_EVENT_QUEL_DANAS_PHASE_1); break;
+        case SUNS_REACH_PHASE_2_SANCTUM: sGameEventMgr->StopEvent(GAME_EVENT_QUEL_DANAS_PHASE_2_ONLY); if (!forward) sGameEventMgr->StopEvent(GAME_EVENT_QUEL_DANAS_PHASE_2_PERMANENT); break;
+        case SUNS_REACH_PHASE_3_ARMORY: sGameEventMgr->StopEvent(GAME_EVENT_QUEL_DANAS_PHASE_3_ONLY); if (!forward) sGameEventMgr->StopEvent(GAME_EVENT_QUEL_DANAS_PHASE_3_PERMANENT); break;
+        case SUNS_REACH_PHASE_4_HARBOR: sGameEventMgr->StopEvent(GAME_EVENT_QUEL_DANAS_PHASE_4); break;
         default: break;
     }
 }
@@ -664,20 +730,34 @@ void WorldState::StartSunsReachPhase(bool initial)
 {
     switch (m_sunsReachData.m_phase)
     {
-        case SUNS_REACH_PHASE_1_STAGING_AREA: sGameEventMgr.StartEvent(GAME_EVENT_QUEL_DANAS_PHASE_1); break;
-        case SUNS_REACH_PHASE_2_SANCTUM: sGameEventMgr.StartEvent(GAME_EVENT_QUEL_DANAS_PHASE_2_ONLY); sGameEventMgr.StartEvent(GAME_EVENT_QUEL_DANAS_PHASE_2_PERMANENT); break;
+        case SUNS_REACH_PHASE_1_STAGING_AREA:
+            sGameEventMgr->StartEvent(GAME_EVENT_QUEL_DANAS_PHASE_1);
+            if (Map* map = sMapMgr->FindBaseNonInstanceMap(530))
+                map->SetZoneWeather(ZONEID_ISLE_OF_QUEL_DANAS, WEATHER_STATE_MEDIUM_RAIN, 0.75f);
+            break;
+        case SUNS_REACH_PHASE_2_SANCTUM:
+            sGameEventMgr->StartEvent(GAME_EVENT_QUEL_DANAS_PHASE_2_ONLY);
+            sGameEventMgr->StartEvent(GAME_EVENT_QUEL_DANAS_PHASE_2_PERMANENT);
+            if (Map* map = sMapMgr->FindBaseNonInstanceMap(530))
+                map->SetZoneWeather(ZONEID_ISLE_OF_QUEL_DANAS, WEATHER_STATE_LIGHT_RAIN, 0.5f);
+            break;
         case SUNS_REACH_PHASE_3_ARMORY:
             if (initial)
-                sGameEventMgr.StartEvent(GAME_EVENT_QUEL_DANAS_PHASE_2_PERMANENT);
-            sGameEventMgr.StartEvent(GAME_EVENT_QUEL_DANAS_PHASE_3_ONLY); sGameEventMgr.StartEvent(GAME_EVENT_QUEL_DANAS_PHASE_3_PERMANENT);
+                sGameEventMgr->StartEvent(GAME_EVENT_QUEL_DANAS_PHASE_2_PERMANENT);
+            sGameEventMgr->StartEvent(GAME_EVENT_QUEL_DANAS_PHASE_3_ONLY); sGameEventMgr->StartEvent(GAME_EVENT_QUEL_DANAS_PHASE_3_PERMANENT);
+            // TODO: Should be id 2 0.25f?
+            if (Map* map = sMapMgr->FindBaseNonInstanceMap(530))
+                map->SetZoneWeather(ZONEID_ISLE_OF_QUEL_DANAS, WEATHER_STATE_LIGHT_RAIN, 0.25f);
             break;
         case SUNS_REACH_PHASE_4_HARBOR:
             if (initial)
             {
-                sGameEventMgr.StartEvent(GAME_EVENT_QUEL_DANAS_PHASE_2_PERMANENT);
-                sGameEventMgr.StartEvent(GAME_EVENT_QUEL_DANAS_PHASE_3_PERMANENT);
+                sGameEventMgr->StartEvent(GAME_EVENT_QUEL_DANAS_PHASE_2_PERMANENT);
+                sGameEventMgr->StartEvent(GAME_EVENT_QUEL_DANAS_PHASE_3_PERMANENT);
             }
-            sGameEventMgr.StartEvent(GAME_EVENT_QUEL_DANAS_PHASE_4);
+            sGameEventMgr->StartEvent(GAME_EVENT_QUEL_DANAS_PHASE_4);
+            if (Map* map = sMapMgr->FindBaseNonInstanceMap(530))
+                map->SetZoneWeather(ZONEID_ISLE_OF_QUEL_DANAS, WEATHER_STATE_FINE, 0.0f);
             break;
         default: break;
     }
@@ -703,9 +783,9 @@ uint32 SunsReachReclamationData::GetPhasePercentage(uint32 phase)
 {
     switch (phase)
     {
-        case SUNS_REACH_PHASE_1_STAGING_AREA: return uint32((m_sunsReachReclamationCounters[COUNTER_ERRATIC_BEHAVIOR] + m_sunsReachReclamationCounters[COUNTER_SANCTUM_WARDS]) * 100 / (2 * COUNTER_MAX_VAL_REQ));
-        case SUNS_REACH_PHASE_2_SANCTUM: return uint32((m_sunsReachReclamationCounters[COUNTER_BATTLE_FOR_THE_SUNS_REACH_ARMORY] + m_sunsReachReclamationCounters[COUNTER_DISTRACTION_AT_THE_DEAD_SCAR]) * 100 / (2 * COUNTER_MAX_VAL_REQ));
-        case SUNS_REACH_PHASE_3_ARMORY: return uint32((m_sunsReachReclamationCounters[COUNTER_INTERCEPT_THE_REINFORCEMENTS] + m_sunsReachReclamationCounters[COUNTER_TAKING_THE_HARBOR]) * 100 / (2 * COUNTER_MAX_VAL_REQ));
+        case SUNS_REACH_PHASE_1_STAGING_AREA: return uint32((m_sunsReachReclamationCounters[COUNTER_ERRATIC_BEHAVIOR] + m_sunsReachReclamationCounters[COUNTER_SANCTUM_WARDS]) * 100 / (2 * sWorld->getIntConfig(CONFIG_SUNSREACH_COUNTER_MAX)));
+        case SUNS_REACH_PHASE_2_SANCTUM: return uint32((m_sunsReachReclamationCounters[COUNTER_BATTLE_FOR_THE_SUNS_REACH_ARMORY] + m_sunsReachReclamationCounters[COUNTER_DISTRACTION_AT_THE_DEAD_SCAR]) * 100 / (2 * sWorld->getIntConfig(CONFIG_SUNSREACH_COUNTER_MAX)));
+        case SUNS_REACH_PHASE_3_ARMORY: return uint32((m_sunsReachReclamationCounters[COUNTER_INTERCEPT_THE_REINFORCEMENTS] + m_sunsReachReclamationCounters[COUNTER_TAKING_THE_HARBOR]) * 100 / (2 * sWorld->getIntConfig(CONFIG_SUNSREACH_COUNTER_MAX)));
         default: return 0;
     }
 }
@@ -714,15 +794,15 @@ uint32 SunsReachReclamationData::GetSubPhasePercentage(uint32 subPhase)
 {
     switch (subPhase)
     {
-        case SUBPHASE_PORTAL: return uint32(m_sunsReachReclamationCounters[COUNTER_INTERCEPTING_THE_MANA_CELLS] * 100 / COUNTER_MAX_VAL_REQ);
-        case SUBPHASE_ANVIL: return uint32(m_sunsReachReclamationCounters[COUNTER_MAKING_READY] * 100 / COUNTER_MAX_VAL_REQ);
-        case SUBPHASE_ALCHEMY_LAB: return uint32(m_sunsReachReclamationCounters[COUNTER_DISCOVERING_YOUR_ROOTS] * 100 / COUNTER_MAX_VAL_REQ);
-        case SUBPHASE_MONUMENT: return uint32(m_sunsReachReclamationCounters[COUNTER_A_CHARITABLE_DONATION] * 100 / COUNTER_MAX_VAL_REQ);
+        case SUBPHASE_PORTAL: return uint32(m_sunsReachReclamationCounters[COUNTER_INTERCEPTING_THE_MANA_CELLS] * 100 / sWorld->getIntConfig(CONFIG_SUNSREACH_COUNTER_MAX));
+        case SUBPHASE_ANVIL: return uint32(m_sunsReachReclamationCounters[COUNTER_MAKING_READY] * 100 / sWorld->getIntConfig(CONFIG_SUNSREACH_COUNTER_MAX));
+        case SUBPHASE_ALCHEMY_LAB: return uint32(m_sunsReachReclamationCounters[COUNTER_DISCOVERING_YOUR_ROOTS] * 100 / sWorld->getIntConfig(CONFIG_SUNSREACH_COUNTER_MAX));
+        case SUBPHASE_MONUMENT: return uint32(m_sunsReachReclamationCounters[COUNTER_A_CHARITABLE_DONATION] * 100 / sWorld->getIntConfig(CONFIG_SUNSREACH_COUNTER_MAX));
         default: return 0;
     }
 }
 
-void WorldState::FillInitialWorldStates(ByteBuffer& data, uint32& count, uint32 zoneId, uint32 areaId)
+void WorldState::FillInitialWorldStates(ByteBuffer& data, uint32& count, uint32 zoneId, uint32 /*areaId*/)
 {
     switch (zoneId)
     {
