@@ -58,7 +58,7 @@ namespace Acore
 
         void operator()(WorldPacket& data, LocaleConstant loc_idx)
         {
-            char const* text = sObjectMgr->GetAcoreString(_textId, loc_idx);
+            char const* text = sObjectMgr->GetAcoreString(_textId, loc_idx).c_str();
             if (_args)
             {
                 // we need copy va_list before use or original va_list will corrupted
@@ -95,9 +95,9 @@ namespace Acore
 
         void operator()(WorldPacket& data, LocaleConstant loc_idx)
         {
-            char const* text = sObjectMgr->GetAcoreString(_textId, loc_idx);
-            char const* arg1str = _arg1 ? sObjectMgr->GetAcoreString(_arg1, loc_idx) : "";
-            char const* arg2str = _arg2 ? sObjectMgr->GetAcoreString(_arg2, loc_idx) : "";
+            char const* text = sObjectMgr->GetAcoreString(_textId, loc_idx).c_str();
+            char const* arg1str = _arg1 ? sObjectMgr->GetAcoreString(_arg1, loc_idx).c_str() : "";
+            char const* arg2str = _arg2 ? sObjectMgr->GetAcoreString(_arg2, loc_idx).c_str() : "";
 
             char str[2048];
             snprintf(str, 2048, text, arg1str, arg2str);
@@ -1660,7 +1660,7 @@ void Battleground::EndNow()
 }
 
 // To be removed
-char const* Battleground::GetAcoreString(int32 entry)
+std::string Battleground::GetAcoreString(int32 entry)
 {
     // FIXME: now we have different DBC locales and need localized message for each target client
     return sObjectMgr->GetAcoreStringForDBCLocale(entry);
