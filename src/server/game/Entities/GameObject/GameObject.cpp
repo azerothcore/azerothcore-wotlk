@@ -1011,12 +1011,15 @@ void GameObject::GetFishLoot(Loot* fishloot, Player* loot_owner)
 
     // if subzone loot exist use it
     fishloot->FillLoot(subzone, LootTemplates_Fishing, loot_owner, true, true);
-    if (fishloot->empty())  //use this becase if zone or subzone has set LOOT_MODE_JUNK_FISH,Even if no normal drop, fishloot->FillLoot return true. it wrong.
+
+    // isLooted() returns true here if player is e.g. not eligible for any loot due to conditions
+    if (fishloot->empty() || fishloot->isLooted())  //use this becase if zone or subzone has set LOOT_MODE_JUNK_FISH,Even if no normal drop, fishloot->FillLoot return true. it wrong.
     {
         //subzone no result,use zone loot
         fishloot->FillLoot(zone, LootTemplates_Fishing, loot_owner, true, true);
         //use zone 1 as default, somewhere fishing got nothing,becase subzone and zone not set, like Off the coast of Storm Peaks.
-        if (fishloot->empty())
+        // isLooted() returns true here if player is e.g. not eligible for any loot due to conditions
+        if (fishloot->empty() || fishloot->isLooted())
             fishloot->FillLoot(defaultzone, LootTemplates_Fishing, loot_owner, true, true);
     }
 }
@@ -1031,11 +1034,15 @@ void GameObject::GetFishLootJunk(Loot* fishloot, Player* loot_owner)
 
     // if subzone loot exist use it
     fishloot->FillLoot(subzone, LootTemplates_Fishing, loot_owner, true, true, LOOT_MODE_JUNK_FISH);
-    if (fishloot->empty())  //use this becase if zone or subzone has normal mask drop, then fishloot->FillLoot return true.
+
+    // isLooted() returns true here if player is e.g. not eligible for any loot due to conditions
+    if (fishloot->empty() || fishloot->isLooted())  //use this becase if zone or subzone has normal mask drop, then fishloot->FillLoot return true.
     {
         //use zone loot
         fishloot->FillLoot(zone, LootTemplates_Fishing, loot_owner, true, true, LOOT_MODE_JUNK_FISH);
-        if (fishloot->empty())
+
+        // isLooted() returns true here if player is e.g. not eligible for any loot due to conditions
+        if (fishloot->empty() || fishloot->isLooted())
             //use zone 1 as default
             fishloot->FillLoot(defaultzone, LootTemplates_Fishing, loot_owner, true, true, LOOT_MODE_JUNK_FISH);
     }
