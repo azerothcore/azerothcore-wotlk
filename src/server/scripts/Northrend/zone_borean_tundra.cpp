@@ -2147,5 +2147,5 @@ void AddSC_borean_tundra()
     new npc_hidden_cultist();
     RegisterSpellScript(spell_q11719_bloodspore_ruination_45997);
     new npc_bloodmage_laurith();
-    RegisterCreatureAI(npc_jenny)
+    RegisterCreatureAI(npc_jenny);
 }
