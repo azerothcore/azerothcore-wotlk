@@ -8746,7 +8746,7 @@ char const* ObjectMgr::GetAcoreString(uint32 entry, LocaleConstant locale) const
 
     LOG_ERROR("sql.sql", "Acore string entry {} not found in DB.", entry);
 
-    return "<error>";
+    return Acore::StringFormat("Acore string entry {} not found in DB.", entry).c_str();
 }
 
 void ObjectMgr::LoadFishingBaseSkillLevel()
