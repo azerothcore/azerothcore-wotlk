@@ -202,7 +202,9 @@ struct npc_forest_frog : public ScriptedAI
         events.ScheduleEvent(eventTimer, 3000);
 
         me->UpdateEntry(cEntry);
-        me->SetFacingToObject(PlayerCaster());
+
+        if (Player* player = PlayerCaster())
+            me->SetFacingToObject(player);
     }
 
     void SpellHit(Unit* caster, SpellInfo const* spell) override
