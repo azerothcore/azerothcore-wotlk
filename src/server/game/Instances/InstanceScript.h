@@ -203,6 +203,9 @@ public:
     //Respawns a GO having negative spawntimesecs in gameobject-table
     void DoRespawnGameObject(ObjectGuid guid, uint32 timeToDespawn = MINUTE);
 
+    // Respawns a GO by instance storage index
+    void DoRespawnGameObject(uint32 type);
+
     // Respawns a creature.
     void DoRespawnCreature(ObjectGuid guid, bool force = false);
 
