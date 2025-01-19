@@ -1010,6 +1010,8 @@ void GameObject::GetFishLoot(Loot* fishLoot, Player* lootOwner, bool junk)
     GetZoneAndAreaId(zone, area);
 
     uint16 lootMode = junk ? LOOT_MODE_JUNK_FISH : LOOT_MODE_DEFAULT;
+    // Check to fill loot in the order area - zone - defaultZone.
+    // This is because area and zone is not set in some places, like Off the coast of Storm Peaks.
     uint32 lootZones[] = { area, zone, defaultZone };
     for (uint32 fillZone : lootZones)
     {
