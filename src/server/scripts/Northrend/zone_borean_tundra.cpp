@@ -2129,7 +2129,6 @@ void AddSC_borean_tundra()
     new npc_thassarian2();
     new npc_leryssa();
     new npc_counselor_talbot();
-    new npc_jenny();
 
     // Theirs
     new npc_sinkhole_kill_credit();
@@ -2148,4 +2147,5 @@ void AddSC_borean_tundra()
     new npc_hidden_cultist();
     RegisterSpellScript(spell_q11719_bloodspore_ruination_45997);
     new npc_bloodmage_laurith();
+    RegisterCreatureAI(npc_jenny)
 }
