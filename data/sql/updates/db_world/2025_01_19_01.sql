@@ -1,3 +1,4 @@
+-- DB update 2025_01_19_00 -> 2025_01_19_01
 --
 -- Deletes `LANG_PASSWORD_TOO_LONG` and `LANG_ACCOUNT_TOO_LONG`.
 DELETE FROM `acore_string` WHERE `entry` IN (55, 1005);
