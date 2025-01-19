@@ -2563,7 +2563,8 @@ namespace Acore
         explicit WorldWorldTextBuilder(uint32 textId, va_list* args = nullptr) : i_textId(textId), i_args(args) {}
         void operator()(WorldPacketList& data_list, LocaleConstant loc_idx)
         {
-            char const* text = sObjectMgr->GetAcoreString(i_textId, loc_idx).c_str();
+            std::string strtext = sObjectMgr->GetAcoreString(i_textId, loc_idx);
+            char const* text = strtext.c_str();
 
             if (i_args)
             {
