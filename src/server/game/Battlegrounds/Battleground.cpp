@@ -1659,13 +1659,6 @@ void Battleground::EndNow()
     SetEndTime(0);
 }
 
-// To be removed
-std::string Battleground::GetAcoreString(int32 entry)
-{
-    // FIXME: now we have different DBC locales and need localized message for each target client
-    return sObjectMgr->GetAcoreStringForDBCLocale(entry);
-}
-
 void Battleground::HandleTriggerBuff(GameObject* gameObject)
 {
     // Xinef: crash fix?
