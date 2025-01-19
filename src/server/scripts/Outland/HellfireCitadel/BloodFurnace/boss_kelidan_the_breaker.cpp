@@ -110,7 +110,7 @@ struct boss_kelidan_the_breaker : public BossAI
     {
         if (param == ACTION_CHANNELER_DIED)
         {
-            if (me->FindNearestCreature(NPC_SHADOWMOON_CHANNELER, 100.0f))
+            if (!me->FindNearestCreature(NPC_SHADOWMOON_CHANNELER, 100.0f))
             {
                 me->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
                 me->SetReactState(REACT_AGGRESSIVE);
