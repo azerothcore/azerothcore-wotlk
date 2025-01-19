@@ -1001,7 +1001,7 @@ void GameObject::Delete()
         AddObjectToRemoveList();
 }
 
-void GameObject::GetFishLoot(Loot* fishLoot, Player* lootOwner, bool junk)
+void GameObject::GetFishLoot(Loot* fishLoot, Player* lootOwner, bool junk /*= false*/)
 {
     fishLoot->clear();
 
