@@ -42,22 +42,10 @@ struct boss_the_maker : public BossAI
         });
     }
 
-    void Reset() override
-    {
-        _Reset();
-        if (instance)
-        {
-            instance->SetData(DATA_THE_MAKER, NOT_STARTED);
-            instance->HandleGameObject(instance->GetGuidData(DATA_DOOR2), true);
-        }
-    }
-
     void JustEngagedWith(Unit* /*who*/) override
     {
         Talk(SAY_AGGRO);
         _JustEngagedWith();
-        instance->SetData(DATA_THE_MAKER, IN_PROGRESS);
-        instance->HandleGameObject(instance->GetGuidData(DATA_DOOR2), false);
         scheduler.Schedule(6s, [this](TaskContext context)
         {
             DoCastRandomTarget(SPELL_EXPLODING_BEAKER);
@@ -72,30 +60,13 @@ struct boss_the_maker : public BossAI
     void KilledUnit(Unit* victim) override
     {
         if (victim->IsPlayer() && urand(0, 1))
-        {
             Talk(SAY_KILL);
-        }
     }
 
     void JustDied(Unit* /*killer*/) override
     {
         Talk(SAY_DIE);
         _JustDied();
-        instance->SetData(DATA_THE_MAKER, DONE);
-        instance->HandleGameObject(instance->GetGuidData(DATA_DOOR2), true);
-        instance->HandleGameObject(instance->GetGuidData(DATA_DOOR3), true);
-    }
-
-    void UpdateAI(uint32 diff) override
-    {
-        if (!UpdateVictim())
-            return;
-
-        scheduler.Update(diff);
-        if (me->HasUnitState(UNIT_STATE_CASTING))
-            return;
-
-        DoMeleeAttackIfReady();
     }
 };
 
