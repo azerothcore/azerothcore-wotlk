@@ -21,6 +21,20 @@
 #include "Player.h"
 #include <atomic>
 
+// TODO: Move these to WorldStateDefines.h
+enum WorldStateWorldStates
+{
+    // Suns Reach Reclamation
+    WORLD_STATE_QUEL_DANAS_MUSIC        = 3426,
+    WORLD_STATE_QUEL_DANAS_HARBOR       = 3238,
+    WORLD_STATE_QUEL_DANAS_ALCHEMY_LAB  = 3223,
+    WORLD_STATE_QUEL_DANAS_ARMORY       = 3233,
+    WORLD_STATE_QUEL_DANAS_SANCTUM      = 3244,
+    WORLD_STATE_QUEL_DANAS_PORTAL       = 3269,
+    WORLD_STATE_QUEL_DANAS_ANVIL        = 3228,
+    WORLD_STATE_QUEL_DANAS_MONUMENT     = 3275,
+};
+
 enum WorldStateCondition
 {
     WORLD_STATE_CONDITION_TROLLBANES_COMMAND  = 39911,
@@ -56,6 +70,10 @@ enum WorldStateZoneId
     ZONEID_BLOOD_FURNACE        = 3713,
     ZONEID_SHATTERED_HALLS      = 3714,
     ZONEID_MAGTHERIDON_LAIR     = 3836,
+
+    ZONEID_ISLE_OF_QUEL_DANAS   = 4080,
+    ZONEID_MAGISTERS_TERRACE    = 4131,
+    ZONEID_SUNWELL_PLATEAU      = 4075,
 };
 
 enum WorldStateSpells
@@ -64,6 +82,81 @@ enum WorldStateSpells
 
     SPELL_TROLLBANES_COMMAND    = 39911,
     SPELL_NAZGRELS_FAVOR        = 39913,
+
+    SPELL_KIRU_SONG_OF_VICTORY  = 46302,
+};
+
+enum WorldStateSaveIds
+{
+    SAVE_ID_QUEL_DANAS = 20,
+};
+
+enum WorldStateGameEvents
+{
+   // Isle phases
+    GAME_EVENT_QUEL_DANAS_PHASE_1               = 301,
+    GAME_EVENT_QUEL_DANAS_PHASE_2_ONLY          = 302,
+    GAME_EVENT_QUEL_DANAS_PHASE_2_PERMANENT     = 303,
+    GAME_EVENT_QUEL_DANAS_PHASE_2_NO_PORTAL     = 304,
+    GAME_EVENT_QUEL_DANAS_PHASE_2_PORTAL        = 305,
+    GAME_EVENT_QUEL_DANAS_PHASE_3_ONLY          = 306,
+    GAME_EVENT_QUEL_DANAS_PHASE_3_PERMANENT     = 307,
+    GAME_EVENT_QUEL_DANAS_PHASE_3_NO_ANVIL      = 308,
+    GAME_EVENT_QUEL_DANAS_PHASE_3_ANVIL         = 309,
+    GAME_EVENT_QUEL_DANAS_PHASE_4               = 310,
+    GAME_EVENT_QUEL_DANAS_PHASE_4_NO_MONUMENT   = 311,
+    GAME_EVENT_QUEL_DANAS_PHASE_4_MONUMENT      = 312,
+    GAME_EVENT_QUEL_DANAS_PHASE_4_NO_ALCHEMY_LAB= 313,
+    GAME_EVENT_QUEL_DANAS_PHASE_4_ALCHEMY_LAB   = 314,
+    GAME_EVENT_QUEL_DANAS_PHASE_4_KIRU          = 315,
+};
+
+enum SunsReachPhases
+{
+    SUNS_REACH_PHASE_1_STAGING_AREA,
+    SUNS_REACH_PHASE_2_SANCTUM,
+    SUNS_REACH_PHASE_3_ARMORY,
+    SUNS_REACH_PHASE_4_HARBOR,
+};
+
+enum SunsReachSubPhases
+{
+    SUBPHASE_PORTAL         = 0x01,
+    SUBPHASE_ANVIL          = 0x02,
+    SUBPHASE_ALCHEMY_LAB    = 0x04,
+    SUBPHASE_MONUMENT       = 0x08,
+    SUBPHASE_ALL = SUBPHASE_PORTAL | SUBPHASE_ANVIL | SUBPHASE_ALCHEMY_LAB | SUBPHASE_MONUMENT,
+};
+
+enum SunsReachCounters
+{
+    COUNTER_ERRATIC_BEHAVIOR,
+    COUNTER_SANCTUM_WARDS,
+    COUNTER_BATTLE_FOR_THE_SUNS_REACH_ARMORY,
+    COUNTER_DISTRACTION_AT_THE_DEAD_SCAR,
+    COUNTER_INTERCEPTING_THE_MANA_CELLS,
+    COUNTER_INTERCEPT_THE_REINFORCEMENTS,
+    COUNTER_TAKING_THE_HARBOR,
+    COUNTER_MAKING_READY,
+    COUNTER_DISCOVERING_YOUR_ROOTS,
+    COUNTER_A_CHARITABLE_DONATION,
+    COUNTERS_MAX,
+};
+
+struct SunsReachReclamationData
+{
+    uint32 m_phase;
+    uint32 m_subphaseMask;
+    uint32 m_sunsReachReclamationCounters[COUNTERS_MAX];
+    GuidVector m_sunsReachReclamationPlayers;
+    std::mutex m_sunsReachReclamationMutex;
+    SunsReachReclamationData() : m_phase(SUNS_REACH_PHASE_1_STAGING_AREA), m_subphaseMask(0)
+    {
+        memset(m_sunsReachReclamationCounters, 0, sizeof(m_sunsReachReclamationCounters));
+    }
+    std::string GetData();
+    uint32 GetPhasePercentage(uint32 phase);
+    uint32 GetSubPhasePercentage(uint32 subPhase);
 };
 
 // Intended for implementing server wide scripts, note: all behaviour must be safeguarded towards multithreading
@@ -73,12 +166,39 @@ class WorldState
         WorldState();
         virtual ~WorldState();
         static WorldState* instance();
+        void Load();
+        void Save(WorldStateSaveIds saveId);
+        void SaveHelper(std::string& stringToSave, WorldStateSaveIds saveId);
         void HandlePlayerEnterZone(Player* player, WorldStateZoneId zoneId);
         void HandlePlayerLeaveZone(Player* player, WorldStateZoneId zoneId);
         bool IsConditionFulfilled(WorldStateCondition conditionId, WorldStateConditionState state = WORLD_STATE_CONDITION_STATE_NONE) const;
         void HandleConditionStateChange(WorldStateCondition conditionId, WorldStateConditionState state);
         void HandleExternalEvent(WorldStateEvent eventId, uint32 param);
         void Update(uint32 diff);
+        // Sun's Reach Reclamation
+        void AddSunsReachProgress(uint32 questId);
+        void HandleSunsReachPhaseTransition(uint32 newPhase);
+        void HandleSunsReachSubPhaseTransition(int32 subPhaseMask, bool initial = false);
+        void SetSunsReachCounter(SunsReachCounters index, uint32 value);
+        void StopSunsReachPhase(bool forward);
+        void StartSunsReachPhase(bool initial = false);
+        std::string GetSunsReachPrintout();
+
+        void FillInitialWorldStates(ByteBuffer& data, uint32& count, uint32 zoneId, uint32 areaId);
+        // helper functions for world state list fill
+        inline void FillInitialWorldStateData(ByteBuffer& data, uint32& count, uint32 state, uint32 value)
+        {
+            data << uint32(state);
+            data << uint32(value);
+            ++count;
+        }
+
+        inline void FillInitialWorldStateData(ByteBuffer& data, uint32& count, uint32 state, int32 value)
+        {
+            data << uint32(state);
+            data << int32(value);
+            ++count;
+        }
     private:
         void BuffAdalsSongOfBattle();
         void DispelAdalsSongOfBattle();
@@ -87,6 +207,7 @@ class WorldState
         void DispelMagtheridonTeam(TeamId team);
         bool _isMagtheridonHeadSpawnedHorde;
         bool _isMagtheridonHeadSpawnedAlliance;
+        SunsReachReclamationData m_sunsReachData;
         std::map<WorldStateCondition, std::atomic<WorldStateConditionState>> _transportStates; // atomic to avoid having to lock
         std::mutex _mutex; // all World State operations are threat unsafe
 };
