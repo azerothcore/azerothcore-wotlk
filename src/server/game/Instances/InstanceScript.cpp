@@ -612,6 +612,12 @@ void InstanceScript::DoRespawnGameObject(ObjectGuid uiGuid, uint32 uiTimeToDespa
         LOG_DEBUG("scripts", "InstanceScript: DoRespawnGameObject failed");
 }
 
+void InstanceScript::DoRespawnGameObject(uint32 type)
+{
+    if (GameObject* go = instance->GetGameObject(GetObjectGuid(type)))
+        go->Respawn();
+}
+
 void InstanceScript::DoRespawnCreature(ObjectGuid guid, bool force)
 {
     if (Creature* creature = instance->GetCreature(guid))
