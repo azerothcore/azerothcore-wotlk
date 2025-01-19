@@ -1,3 +1,4 @@
+-- DB update 2025_01_19_01 -> 2025_01_19_02
 -- Ashbringer is buff
 DELETE
 FROM `spell_custom_attr`
