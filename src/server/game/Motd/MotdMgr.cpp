@@ -139,7 +139,7 @@ void MotdMgr::LoadLocalizedMotds(uint32 realmId) {
 
     if (!baseResult)
     {
-        LOG_ERROR("server.loading", "No base MOTD found for realm %u. Localized MOTDs will not be loaded.", realmId);
+        LOG_ERROR("server.loading", "No base MOTD found for realm {}. Localized MOTDs will not be loaded.", realmId);
         return;
     }
 
