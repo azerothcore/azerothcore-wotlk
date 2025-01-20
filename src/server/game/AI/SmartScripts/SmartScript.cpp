@@ -3282,6 +3282,16 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
             sWorldState->HandleExternalEvent(static_cast<WorldStateEvent>(e.action.worldStateScript.eventId), e.action.worldStateScript.param);
             break;
         }
+        case SMART_ACTION_DISABLE_REWARD:
+        {
+            for (WorldObject* target : targets)
+                if (IsCreature(target))
+                {
+                    target->ToCreature()->SetReputationRewardDisabled(static_cast<bool>(e.action.reward.reputation));
+                    target->ToCreature()->SetLootRewardDisabled(static_cast<bool>(e.action.reward.loot));
+                }
+            break;
+        }
         default:
             LOG_ERROR("sql.sql", "SmartScript::ProcessAction: Entry {} SourceType {}, Event {}, Unhandled Action type {}", e.entryOrGuid, e.GetScriptType(), e.event_id, e.GetActionType());
             break;
