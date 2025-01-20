@@ -191,7 +191,7 @@ void ScriptMgr::OnPlayerEnterMap(Map* map, Player* player)
 
     ExecuteScript<PlayerScript>([=](PlayerScript* script)
     {
-        script->OnMapChanged(player);
+        script->OnPlayerMapChanged(player);
     });
 
     ForeachMaps<WorldMapScript>(map,

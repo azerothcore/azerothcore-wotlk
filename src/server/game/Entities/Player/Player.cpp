@@ -1428,7 +1428,7 @@ bool Player::TeleportTo(uint32 mapid, float x, float y, float z, float orientati
     if (duel && GetMapId() != mapid && GetMap()->GetGameObject(GetGuidValue(PLAYER_DUEL_ARBITER)))
         DuelComplete(DUEL_FLED);
 
-    if (!sScriptMgr->OnBeforePlayerTeleport(this, mapid, x, y, z, orientation, options, target))
+    if (!sScriptMgr->OnPlayerBeforeTeleport(this, mapid, x, y, z, orientation, options, target))
         return false;
 
     if (GetMapId() == mapid && !newInstance)
@@ -2245,7 +2245,7 @@ void Player::SetGameMaster(bool on)
         if (HasByteFlag(UNIT_FIELD_BYTES_2, 1, UNIT_BYTE2_FLAG_FFA_PVP))
         {
             RemoveByteFlag(UNIT_FIELD_BYTES_2, 1, UNIT_BYTE2_FLAG_FFA_PVP);
-            sScriptMgr->OnFfaPvpStateUpdate(this, false);
+            sScriptMgr->OnPlayerFfaPvpStateUpdate(this, false);
         }
         ResetContestedPvP();
 
@@ -2282,7 +2282,7 @@ void Player::SetGameMaster(bool on)
             if (!HasByteFlag(UNIT_FIELD_BYTES_2, 1, UNIT_BYTE2_FLAG_FFA_PVP))
             {
                 SetByteFlag(UNIT_FIELD_BYTES_2, 1, UNIT_BYTE2_FLAG_FFA_PVP);
-                sScriptMgr->OnFfaPvpStateUpdate(this, true);
+                sScriptMgr->OnPlayerFfaPvpStateUpdate(this, true);
             }
         }
         // restore FFA PvP area state, remove not allowed for GM mounts
@@ -2546,7 +2546,7 @@ void Player::GiveLevel(uint8 level)
         pet->SynchronizeLevelWithOwner();
 
     MailLevelReward const* mailReward = sObjectMgr->GetMailLevelReward(level, getRaceMask());
-    if (mailReward && sScriptMgr->CanGiveMailRewardAtGiveLevel(this, level))
+    if (mailReward && sScriptMgr->OnPlayerCanGiveMailRewardAtGiveLevel(this, level))
     {
         //- TODO: Poor design of mail system
         CharacterDatabaseTransaction trans = CharacterDatabase.BeginTransaction();
@@ -2604,7 +2604,7 @@ void Player::InitStatsForLevel(bool reapplyMods)
     sObjectMgr->GetPlayerLevelInfo(getRace(true), getClass(), GetLevel(), &info);
 
     uint32 maxPlayerLevel = sWorld->getIntConfig(CONFIG_MAX_PLAYER_LEVEL);
-    sScriptMgr->OnSetMaxLevel(this, maxPlayerLevel);
+    sScriptMgr->OnPlayerSetMaxLevel(this, maxPlayerLevel);
     SetUInt32Value(PLAYER_FIELD_MAX_LEVEL, maxPlayerLevel);
     SetUInt32Value(PLAYER_NEXT_LEVEL_XP, sObjectMgr->GetXPForLevel(GetLevel()));
 
@@ -2736,7 +2736,7 @@ void Player::InitStatsForLevel(bool reapplyMods)
     if (HasByteFlag(UNIT_FIELD_BYTES_2, 1, UNIT_BYTE2_FLAG_FFA_PVP))
     {
         RemoveByteFlag(UNIT_FIELD_BYTES_2, 1, UNIT_BYTE2_FLAG_FFA_PVP | UNIT_BYTE2_FLAG_SANCTUARY);
-        sScriptMgr->OnFfaPvpStateUpdate(this, false);
+        sScriptMgr->OnPlayerFfaPvpStateUpdate(this, false);
 
     }
     // restore if need some important flags
@@ -4300,7 +4300,7 @@ void Player::DeleteFromDB(ObjectGuid::LowType lowGuid, uint32 accountId, bool up
 
                 Corpse::DeleteFromDB(playerGuid, trans);
 
-                sScriptMgr->OnDeleteFromDB(trans, lowGuid);
+                sScriptMgr->OnPlayerDeleteFromDB(trans, lowGuid);
 
                 CharacterDatabase.CommitTransaction(trans);
                 break;
@@ -4941,7 +4941,7 @@ void Player::RepopAtGraveyard()
 
     AreaTableEntry const* zone = sAreaTableStore.LookupEntry(GetAreaId());
 
-    if (!sScriptMgr->CanRepopAtGraveyard(this))
+    if (!sScriptMgr->OnPlayerCanRepopAtGraveyard(this))
         return;
 
     // Such zones are considered unreachable as a ghost and the player must be automatically revived
@@ -5494,7 +5494,7 @@ uint16 Player::GetMaxSkillValue(uint32 skill) const
     uint32 bonus = GetUInt32Value(PLAYER_SKILL_BONUS_INDEX(itr->second.pos));
 
     int32 result = int32(SKILL_MAX(GetUInt32Value(PLAYER_SKILL_VALUE_INDEX(itr->second.pos))));
-    sScriptMgr->OnGetMaxSkillValue(const_cast<Player*>(this), skill, result, false);
+    sScriptMgr->OnPlayerGetMaxSkillValue(const_cast<Player*>(this), skill, result, false);
     result += SKILL_TEMP_BONUS(bonus);
     result += SKILL_PERM_BONUS(bonus);
     return result < 0 ? 0 : result;
@@ -5511,7 +5511,7 @@ uint16 Player::GetPureMaxSkillValue(uint32 skill) const
 
     int32 result = int32(SKILL_MAX(GetUInt32Value(PLAYER_SKILL_VALUE_INDEX(itr->second.pos))));
 
-    sScriptMgr->OnGetMaxSkillValue(const_cast<Player*>(this), skill, result, true);
+    sScriptMgr->OnPlayerGetMaxSkillValue(const_cast<Player*>(this), skill, result, true);
 
     return result < 0 ? 0 : result;
 }
@@ -5790,7 +5790,7 @@ void Player::CheckAreaExploreAndOutdoor()
         }
     }
 
-    if (!sScriptMgr->CanAreaExploreAndOutdoor(this))
+    if (!sScriptMgr->OnPlayerCanAreaExploreAndOutdoor(this))
         return;
 
     if (!areaId)
@@ -5849,7 +5849,7 @@ void Player::CheckAreaExploreAndOutdoor()
                     XP = uint32(sObjectMgr->GetBaseXP(areaEntry->area_level) * sWorld->getRate(RATE_XP_EXPLORE));
                 }
 
-                sScriptMgr->OnGivePlayerXP(this, XP, nullptr, PlayerXPSource::XPSOURCE_EXPLORE);
+                sScriptMgr->OnPlayerGiveXP(this, XP, nullptr, PlayerXPSource::XPSOURCE_EXPLORE);
                 GiveXP(XP, nullptr);
                 SendExplorationExperience(areaId, XP);
             }
@@ -6160,7 +6160,7 @@ bool Player::RewardHonor(Unit* uVictim, uint32 groupsize, int32 honor, bool awar
             //  [39+]    Nothing
             uint32 victim_title = victim->GetUInt32Value(PLAYER_CHOSEN_TITLE);
             uint32 killer_title = 0;
-            sScriptMgr->OnVictimRewardBefore(this, victim, killer_title, victim_title);
+            sScriptMgr->OnPlayerVictimRewardBefore(this, victim, killer_title, victim_title);
             // Get Killer titles, CharTitlesEntry::bit_index
             // Ranks:
             //  title[1..14]  -> rank[5..18]
@@ -6187,7 +6187,7 @@ bool Player::RewardHonor(Unit* uVictim, uint32 groupsize, int32 honor, bool awar
             UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_HONORABLE_KILL_AT_AREA, GetAreaId());
             UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_HONORABLE_KILL, 1, 0, victim);
             UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_SPECIAL_PVP_KILL, 1, 0, victim);
-            sScriptMgr->OnVictimRewardAfter(this, victim, killer_title, victim_rank, honor_f);
+            sScriptMgr->OnPlayerVictimRewardAfter(this, victim, killer_title, victim_rank, honor_f);
         }
         else
         {
@@ -6239,7 +6239,7 @@ bool Player::RewardHonor(Unit* uVictim, uint32 groupsize, int32 honor, bool awar
             if (!uVictim)
             {
                 uint32 xp = uint32(honor * (3 + GetLevel() * 0.30f));
-                sScriptMgr->OnGivePlayerXP(this, xp, nullptr, PlayerXPSource::XPSOURCE_BATTLEGROUND);
+                sScriptMgr->OnPlayerGiveXP(this, xp, nullptr, PlayerXPSource::XPSOURCE_BATTLEGROUND);
                 GiveXP(xp, nullptr);
             }
         }
@@ -6633,7 +6633,7 @@ void Player::_ApplyItemBonuses(ItemTemplate const* proto, uint8 slot, bool apply
     uint32 ssd_level = GetLevel();
     uint32 CustomScalingStatValue = 0;
 
-    sScriptMgr->OnCustomScalingStatValueBefore(this, proto, slot, apply, CustomScalingStatValue);
+    sScriptMgr->OnPlayerCustomScalingStatValueBefore(this, proto, slot, apply, CustomScalingStatValue);
 
     uint32 ScalingStatValue = proto->ScalingStatValue > 0 ? proto->ScalingStatValue : CustomScalingStatValue;
 
@@ -6665,7 +6665,7 @@ void Player::_ApplyItemBonuses(ItemTemplate const* proto, uint8 slot, bool apply
                     continue;
 
                 // OnCustomScalingStatValue(Player* player, ItemTemplate const* proto, uint32& statType, int32& val, uint8 itemProtoStatNumber, uint32 ScalingStatValue, ScalingStatValuesEntry const* ssv)
-                sScriptMgr->OnCustomScalingStatValue(this, proto, statType, val, i, ScalingStatValue, ssv);
+                sScriptMgr->OnPlayerCustomScalingStatValue(this, proto, statType, val, i, ScalingStatValue, ssv);
             }
         }
         else
@@ -6676,7 +6676,7 @@ void Player::_ApplyItemBonuses(ItemTemplate const* proto, uint8 slot, bool apply
             statType = proto->ItemStat[i].ItemStatType;
             val = proto->ItemStat[i].ItemStatValue;
 
-            sScriptMgr->OnApplyItemModsBefore(this, slot, apply, i, statType, val);
+            sScriptMgr->OnPlayerApplyItemModsBefore(this, slot, apply, i, statType, val);
         }
 
         if (val == 0)
@@ -6867,7 +6867,7 @@ void Player::_ApplyItemBonuses(ItemTemplate const* proto, uint8 slot, bool apply
     }
 
     // Add armor bonus from ArmorDamageModifier if > 0
-    if (proto->ArmorDamageModifier > 0 && sScriptMgr->CanArmorDamageModifier(this))
+    if (proto->ArmorDamageModifier > 0 && sScriptMgr->OnPlayerCanArmorDamageModifier(this))
         HandleStatModifier(UNIT_MOD_ARMOR, TOTAL_VALUE, float(proto->ArmorDamageModifier), apply);
 
     if (proto->Block)
@@ -6909,7 +6909,7 @@ void Player::_ApplyItemBonuses(ItemTemplate const* proto, uint8 slot, bool apply
         }
 
         feral_bonus += proto->getFeralBonus(dpsMod);
-        sScriptMgr->OnGetFeralApBonus(this, feral_bonus, dpsMod, proto, ssv);
+        sScriptMgr->OnPlayerGetFeralApBonus(this, feral_bonus, dpsMod, proto, ssv);
         if (feral_bonus)
             ApplyFeralAPBonus(feral_bonus, apply);
     }
@@ -6919,7 +6919,7 @@ void Player::_ApplyWeaponDamage(uint8 slot, ItemTemplate const* proto, ScalingSt
 {
     uint32 CustomScalingStatValue = 0;
 
-    sScriptMgr->OnCustomScalingStatValueBefore(this, proto, slot, apply, CustomScalingStatValue);
+    sScriptMgr->OnPlayerCustomScalingStatValueBefore(this, proto, slot, apply, CustomScalingStatValue);
 
     uint32 ScalingStatValue = proto->ScalingStatValue > 0 ? proto->ScalingStatValue : CustomScalingStatValue;
 
@@ -6965,7 +6965,7 @@ void Player::_ApplyWeaponDamage(uint8 slot, ItemTemplate const* proto, ScalingSt
 
         if (apply)
         {
-            sScriptMgr->OnApplyWeaponDamage(this, slot, proto, minDamage, maxDamage, i);
+            sScriptMgr->OnPlayerApplyWeaponDamage(this, slot, proto, minDamage, maxDamage, i);
 
             if (minDamage > 0.f)
             {
@@ -7047,7 +7047,7 @@ void Player::_ApplyWeaponDependentAuraCritMod(Item* item, WeaponAttackType attac
     if (aura->GetSpellInfo()->EquippedItemClass == -1)
         return;
 
-    if (!sScriptMgr->CanApplyWeaponDependentAuraDamageMod(this, item, attackType, aura, apply))
+    if (!sScriptMgr->OnPlayerCanApplyWeaponDependentAuraDamageMod(this, item, attackType, aura, apply))
         return;
 
     BaseModGroup mod = BASEMOD_END;
@@ -7181,7 +7181,7 @@ void Player::ApplyEquipSpell(SpellInfo const* spellInfo, Item* item, bool apply,
 {
     if (apply)
     {
-        if (!sScriptMgr->CanApplyEquipSpell(this, spellInfo, item, apply, form_change))
+        if (!sScriptMgr->OnPlayerCanApplyEquipSpell(this, spellInfo, item, apply, form_change))
             return;
 
         // Cannot be used in this stance/form
@@ -7277,7 +7277,7 @@ void Player::CastItemCombatSpell(Unit* target, WeaponAttackType attType, uint32 
 
 void Player::CastItemCombatSpell(Unit* target, WeaponAttackType attType, uint32 procVictim, uint32 procEx, Item* item, ItemTemplate const* proto)
 {
-    if (!sScriptMgr->CanCastItemCombatSpell(this, target, attType, procVictim, procEx, item, proto))
+    if (!sScriptMgr->OnPlayerCanCastItemCombatSpell(this, target, attType, procVictim, procEx, item, proto))
         return;
 
     // Can do effect if any damage done to target
@@ -7409,7 +7409,7 @@ void Player::CastItemCombatSpell(Unit* target, WeaponAttackType attType, uint32 
 
 void Player::CastItemUseSpell(Item* item, SpellCastTargets const& targets, uint8 cast_count, uint32 glyphIndex)
 {
-    if (!sScriptMgr->CanCastItemUseSpell(this, item, targets, cast_count, glyphIndex))
+    if (!sScriptMgr->OnPlayerCanCastItemUseSpell(this, item, targets, cast_count, glyphIndex))
         return;
 
     ItemTemplate const* proto = item->GetTemplate();
@@ -7674,7 +7674,7 @@ void Player::_ApplyAmmoBonuses()
     else
         currentAmmoDPS = (ammo_proto->Damage[0].DamageMin + ammo_proto->Damage[0].DamageMax) / 2;
 
-    sScriptMgr->OnApplyAmmoBonuses(this, ammo_proto, currentAmmoDPS);
+    sScriptMgr->OnPlayerApplyAmmoBonuses(this, ammo_proto, currentAmmoDPS);
 
     if (currentAmmoDPS == GetAmmoDPS())
         return;
@@ -9370,7 +9370,7 @@ void Player::StopCastingCharm(Aura* except /*= nullptr*/)
 void Player::Say(std::string_view text, Language language, WorldObject const* /*= nullptr*/)
 {
     std::string _text(text);
-    if (!sScriptMgr->CanPlayerUseChat(this, CHAT_MSG_SAY, language, _text))
+    if (!sScriptMgr->OnPlayerCanUseChat(this, CHAT_MSG_SAY, language, _text))
     {
         return;
     }
@@ -9391,7 +9391,7 @@ void Player::Yell(std::string_view text, Language language, WorldObject const* /
 {
     std::string _text(text);
 
-    if (!sScriptMgr->CanPlayerUseChat(this, CHAT_MSG_YELL, language, _text))
+    if (!sScriptMgr->OnPlayerCanUseChat(this, CHAT_MSG_YELL, language, _text))
     {
         return;
     }
@@ -9412,7 +9412,7 @@ void Player::TextEmote(std::string_view text, WorldObject const* /*= nullptr*/, 
 {
     std::string _text(text);
 
-    if (!sScriptMgr->CanPlayerUseChat(this, CHAT_MSG_EMOTE, LANG_UNIVERSAL, _text))
+    if (!sScriptMgr->OnPlayerCanUseChat(this, CHAT_MSG_EMOTE, LANG_UNIVERSAL, _text))
     {
         return;
     }
@@ -9441,7 +9441,7 @@ void Player::Whisper(std::string_view text, Language language, Player* target, b
 
     std::string _text(text);
 
-    if (!sScriptMgr->CanPlayerUseChat(this, CHAT_MSG_WHISPER, language, _text, target))
+    if (!sScriptMgr->OnPlayerCanUseChat(this, CHAT_MSG_WHISPER, language, _text, target))
     {
         return;
     }
@@ -10705,7 +10705,7 @@ inline bool Player::_StoreOrEquipNewItem(uint32 vendorslot, uint32 item, uint8 c
         }
     }
 
-    sScriptMgr->OnBeforeStoreOrEquipNewItem(this, vendorslot, item, count, bag, slot, pProto, pVendor, crItem, bStore);
+    sScriptMgr->OnPlayerBeforeStoreOrEquipNewItem(this, vendorslot, item, count, bag, slot, pProto, pVendor, crItem, bStore);
 
     Item* it = bStore ? StoreNewItem(vDest, item, true) : EquipNewItem(uiDest, item, true);
     if (it)
@@ -10734,7 +10734,7 @@ inline bool Player::_StoreOrEquipNewItem(uint32 vendorslot, uint32 item, uint8 c
         }
     }
 
-    sScriptMgr->OnAfterStoreOrEquipNewItem(this, vendorslot, it, count, bag, slot, pProto, pVendor, crItem, bStore);
+    sScriptMgr->OnPlayerAfterStoreOrEquipNewItem(this, vendorslot, it, count, bag, slot, pProto, pVendor, crItem, bStore);
 
     return true;
 }
@@ -10742,7 +10742,7 @@ inline bool Player::_StoreOrEquipNewItem(uint32 vendorslot, uint32 item, uint8 c
 // Return true is the bought item has a max count to force refresh of window by caller
 bool Player::BuyItemFromVendorSlot(ObjectGuid vendorguid, uint32 vendorslot, uint32 item, uint8 count, uint8 bag, uint8 slot)
 {
-    sScriptMgr->OnBeforeBuyItemFromVendor(this, vendorguid, vendorslot, item, count, bag, slot);
+    sScriptMgr->OnPlayerBeforeBuyItemFromVendor(this, vendorguid, vendorslot, item, count, bag, slot);
 
     // this check can be used from the hook to implement a custom vendor process
     if (item == 0)
@@ -10934,7 +10934,7 @@ uint32 Player::GetMaxPersonalArenaRatingRequirement(uint32 minarenaslot) const
         }
     }
 
-    sScriptMgr->OnGetMaxPersonalArenaRatingRequirement(this, minarenaslot, max_personal_rating);
+    sScriptMgr->OnPlayerGetMaxPersonalArenaRatingRequirement(this, minarenaslot, max_personal_rating);
 
     return max_personal_rating;
 }
@@ -11368,11 +11368,11 @@ void Player::LeaveBattleground(Battleground* bg)
             stmt->SetData(1, BG_DESERTION_TYPE_LEAVE_BG);
             CharacterDatabase.Execute(stmt);
         }
-        sScriptMgr->OnBattlegroundDesertion(this, BG_DESERTION_TYPE_LEAVE_BG);
+        sScriptMgr->OnPlayerBattlegroundDesertion(this, BG_DESERTION_TYPE_LEAVE_BG);
     }
 
     if (bg->isArena() && (bg->GetStatus() == STATUS_IN_PROGRESS || bg->GetStatus() == STATUS_WAIT_JOIN))
-        sScriptMgr->OnBattlegroundDesertion(this, ARENA_DESERTION_TYPE_LEAVE_BG);
+        sScriptMgr->OnPlayerBattlegroundDesertion(this, ARENA_DESERTION_TYPE_LEAVE_BG);
 
     // xinef: reset corpse reclaim time
     m_deathExpireTime = GameTime::GetGameTime().count();
@@ -11532,7 +11532,7 @@ bool Player::IsVisibleGloballyFor(Player const* u) const
     if (!AccountMgr::IsPlayerAccount(u->GetSession()->GetSecurity()))
         return GetSession()->GetSecurity() <= u->GetSession()->GetSecurity();
 
-    if (!sScriptMgr->NotVisibleGloballyFor(const_cast<Player*>(this), u))
+    if (!sScriptMgr->OnPlayerNotVisibleGloballyFor(const_cast<Player*>(this), u))
         return true;
 
     // non faction visibility non-breakable for non-GMs
@@ -11661,7 +11661,7 @@ void Player::SendInitialPacketsBeforeAddToMap()
 
     SetMover(this);
 
-    sScriptMgr->OnSendInitialPacketsBeforeAddToMap(this, data);
+    sScriptMgr->OnPlayerSendInitialPacketsBeforeAddToMap(this, data);
 }
 
 void Player::SendInitialPacketsAfterAddToMap()
@@ -13559,7 +13559,7 @@ LootItem* Player::StoreLootItem(uint8 lootSlot, Loot* loot, InventoryResult& msg
     LootItem* item = loot->LootItemInSlot(lootSlot, this, &qitem, &ffaitem, &conditem);
     if (!item || item->is_looted)
     {
-        if (!sScriptMgr->CanSendErrorAlreadyLooted(this))
+        if (!sScriptMgr->OnPlayerCanSendErrorAlreadyLooted(this))
         {
             SendEquipError(EQUIP_ERR_ALREADY_LOOTED, nullptr, nullptr);
         }
@@ -13641,7 +13641,7 @@ LootItem* Player::StoreLootItem(uint8 lootSlot, Loot* loot, InventoryResult& msg
         if (loot->containerGUID)
             sLootItemStorage->RemoveStoredLootItem(loot->containerGUID, item->itemid, item->count, loot, item->itemIndex);
 
-        sScriptMgr->OnLootItem(this, newitem, item->count, this->GetLootGUID());
+        sScriptMgr->OnPlayerLootItem(this, newitem, item->count, this->GetLootGUID());
     }
     else
     {
@@ -13672,13 +13672,13 @@ uint32 Player::CalculateTalentsPoints() const
     }
 
     talentPointsForLevel += m_extraBonusTalentCount;
-    sScriptMgr->OnCalculateTalentsPoints(this, talentPointsForLevel);
+    sScriptMgr->OnPlayerCalculateTalentsPoints(this, talentPointsForLevel);
     return uint32(talentPointsForLevel * sWorld->getRate(RATE_TALENT));
 }
 
 bool Player::canFlyInZone(uint32 mapid, uint32 zone, SpellInfo const* bySpell)
 {
-    if (!sScriptMgr->OnCanPlayerFlyInZone(this, mapid,zone,bySpell))
+    if (!sScriptMgr->OnPlayerCanFlyInZone(this, mapid,zone,bySpell))
     {
         return false;
     }
@@ -15299,7 +15299,7 @@ void Player::ActivateSpec(uint8 spec)
             ++iter;
     }
 
-    sScriptMgr->OnAfterSpecSlotChanged(this, GetActiveSpec());
+    sScriptMgr->OnPlayerAfterSpecSlotChanged(this, GetActiveSpec());
 }
 
 void Player::LoadActions(PreparedQueryResult result)
@@ -15396,7 +15396,7 @@ void Player::SetIsSpectator(bool on)
         if (HasByteFlag(UNIT_FIELD_BYTES_2, 1, UNIT_BYTE2_FLAG_FFA_PVP))
         {
             RemoveByteFlag(UNIT_FIELD_BYTES_2, 1, UNIT_BYTE2_FLAG_FFA_PVP);
-            sScriptMgr->OnFfaPvpStateUpdate(this, false);
+            sScriptMgr->OnPlayerFfaPvpStateUpdate(this, false);
         }
         ResetContestedPvP();
         SetDisplayId(23691);
@@ -15421,7 +15421,7 @@ void Player::SetIsSpectator(bool on)
                 if (!HasByteFlag(UNIT_FIELD_BYTES_2, 1, UNIT_BYTE2_FLAG_FFA_PVP))
                 {
                     SetByteFlag(UNIT_FIELD_BYTES_2, 1, UNIT_BYTE2_FLAG_FFA_PVP);
-                    sScriptMgr->OnFfaPvpStateUpdate(this, true);
+                    sScriptMgr->OnPlayerFfaPvpStateUpdate(this, true);
 
                 }
             }
@@ -16226,7 +16226,7 @@ uint32 Player::DoRandomRoll(uint32 minimum, uint32 maximum)
 
 void Player::SetArenaTeamInfoField(uint8 slot, ArenaTeamInfoType type, uint32 value)
 {
-    if (sScriptMgr->NotSetArenaTeamInfoField(this, slot, type, value))
+    if (sScriptMgr->OnPlayerNotSetArenaTeamInfoField(this, slot, type, value))
         SetUInt32Value(PLAYER_FIELD_ARENA_TEAM_INFO_1_1 + (slot * ARENA_TEAM_END) + type, value);
 }
 
@@ -16234,7 +16234,7 @@ uint32 Player::GetArenaPersonalRating(uint8 slot) const
 {
     uint32 result = GetUInt32Value(PLAYER_FIELD_ARENA_TEAM_INFO_1_1 + (slot * ARENA_TEAM_END) + ARENA_TEAM_PERSONAL_RATING);
 
-    sScriptMgr->OnGetArenaPersonalRating(const_cast<Player*>(this), slot, result);
+    sScriptMgr->OnPlayerGetArenaPersonalRating(const_cast<Player*>(this), slot, result);
 
     return result;
 }
@@ -16243,7 +16243,7 @@ uint32 Player::GetArenaTeamId(uint8 slot) const
 {
     uint32 result = GetUInt32Value(PLAYER_FIELD_ARENA_TEAM_INFO_1_1 + (slot * ARENA_TEAM_END) + ARENA_TEAM_ID);
 
-    sScriptMgr->OnGetArenaTeamId(const_cast<Player*>(this), slot, result);
+    sScriptMgr->OnPlayerGetArenaTeamId(const_cast<Player*>(this), slot, result);
 
     return result;
 }
@@ -16252,7 +16252,7 @@ bool Player::IsFFAPvP()
 {
     bool result = Unit::IsFFAPvP();
 
-    sScriptMgr->OnIsFFAPvP(this, result);
+    sScriptMgr->OnPlayerIsFFAPvP(this, result);
 
     return result;
 }
@@ -16261,7 +16261,7 @@ bool Player::IsPvP()
 {
     bool result = Unit::IsPvP();
 
-    sScriptMgr->OnIsPvP(this, result);
+    sScriptMgr->OnPlayerIsPvP(this, result);
 
     return result;
 }
@@ -16270,7 +16270,7 @@ uint16 Player::GetMaxSkillValueForLevel() const
 {
     uint16 result = Unit::GetMaxSkillValueForLevel();
 
-    sScriptMgr->OnGetMaxSkillValueForLevel(const_cast<Player*>(this), result);
+    sScriptMgr->OnPlayerGetMaxSkillValueForLevel(const_cast<Player*>(this), result);
 
     return result;
 }
@@ -16279,21 +16279,21 @@ float Player::GetQuestRate(bool isDFQuest)
 {
     float result = isDFQuest ? sWorld->getRate(RATE_XP_QUEST_DF) : sWorld->getRate(RATE_XP_QUEST);
 
-    sScriptMgr->OnGetQuestRate(this, result);
+    sScriptMgr->OnPlayerGetQuestRate(this, result);
 
     return result;
 }
 
 void Player::SetServerSideVisibility(ServerSideVisibilityType type, AccountTypes sec)
 {
-    sScriptMgr->OnSetServerSideVisibility(this, type, sec);
+    sScriptMgr->OnPlayerSetServerSideVisibility(this, type, sec);
 
     m_serverSideVisibility.SetValue(type, sec);
 }
 
 void Player::SetServerSideVisibilityDetect(ServerSideVisibilityType type, AccountTypes sec)
 {
-    sScriptMgr->OnSetServerSideVisibilityDetect(this, type, sec);
+    sScriptMgr->OnPlayerSetServerSideVisibilityDetect(this, type, sec);
 
     m_serverSideVisibilityDetect.SetValue(type, sec);
 }
