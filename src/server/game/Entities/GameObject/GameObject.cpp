@@ -1001,50 +1001,25 @@ void GameObject::Delete()
         AddObjectToRemoveList();
 }
 
-void GameObject::GetFishLoot(Loot* fishloot, Player* loot_owner)
+void GameObject::GetFishLoot(Loot* fishLoot, Player* lootOwner, bool junk /*= false*/)
 {
-    fishloot->clear();
+    fishLoot->clear();
 
-    uint32 zone, subzone;
-    uint32 defaultzone = 1;
-    GetZoneAndAreaId(zone, subzone);
+    uint32 zone, area;
+    uint32 defaultZone = 1;
+    GetZoneAndAreaId(zone, area);
 
-    // if subzone loot exist use it
-    fishloot->FillLoot(subzone, LootTemplates_Fishing, loot_owner, true, true);
-
-    // isLooted() returns true here if player is e.g. not eligible for any loot due to conditions
-    if (fishloot->empty() || fishloot->isLooted())  //use this becase if zone or subzone has set LOOT_MODE_JUNK_FISH,Even if no normal drop, fishloot->FillLoot return true. it wrong.
+    uint16 lootMode = junk ? LOOT_MODE_JUNK_FISH : LOOT_MODE_DEFAULT;
+    // Check to fill loot in the order area - zone - defaultZone.
+    // This is because area and zone is not set in some places, like Off the coast of Storm Peaks.
+    uint32 lootZones[] = { area, zone, defaultZone };
+    for (uint32 fillZone : lootZones)
     {
-        //subzone no result,use zone loot
-        fishloot->FillLoot(zone, LootTemplates_Fishing, loot_owner, true, true);
-        //use zone 1 as default, somewhere fishing got nothing,becase subzone and zone not set, like Off the coast of Storm Peaks.
-        // isLooted() returns true here if player is e.g. not eligible for any loot due to conditions
-        if (fishloot->empty() || fishloot->isLooted())
-            fishloot->FillLoot(defaultzone, LootTemplates_Fishing, loot_owner, true, true);
-    }
-}
+        fishLoot->FillLoot(fillZone, LootTemplates_Fishing, lootOwner, true, true, lootMode);
 
-void GameObject::GetFishLootJunk(Loot* fishloot, Player* loot_owner)
-{
-    fishloot->clear();
-
-    uint32 zone, subzone;
-    uint32 defaultzone = 1;
-    GetZoneAndAreaId(zone, subzone);
-
-    // if subzone loot exist use it
-    fishloot->FillLoot(subzone, LootTemplates_Fishing, loot_owner, true, true, LOOT_MODE_JUNK_FISH);
-
-    // isLooted() returns true here if player is e.g. not eligible for any loot due to conditions
-    if (fishloot->empty() || fishloot->isLooted())  //use this becase if zone or subzone has normal mask drop, then fishloot->FillLoot return true.
-    {
-        //use zone loot
-        fishloot->FillLoot(zone, LootTemplates_Fishing, loot_owner, true, true, LOOT_MODE_JUNK_FISH);
-
-        // isLooted() returns true here if player is e.g. not eligible for any loot due to conditions
-        if (fishloot->empty() || fishloot->isLooted())
-            //use zone 1 as default
-            fishloot->FillLoot(defaultzone, LootTemplates_Fishing, loot_owner, true, true, LOOT_MODE_JUNK_FISH);
+        // If the loot is filled and the loot is eligible, then we break out of the loop.
+        if (!fishLoot->empty() && !fishLoot->isLooted())
+            break;
     }
 }
 
