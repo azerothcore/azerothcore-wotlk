@@ -8697,7 +8697,7 @@ bool ObjectMgr::LoadModuleStringsLocale()
 std::string const* ObjectMgr::GetModuleString(std::string module, uint32 id, LocaleConstant locale) const
 {
     ModuleString const* ms = GetModuleString(module, id);
-    if (ms->Content.size())
+    if (ms && !ms->Content.empty())
     {
         if (ms->Content.size() > size_t(locale) && !ms->Content[locale].empty())
             return &ms->Content[locale];
