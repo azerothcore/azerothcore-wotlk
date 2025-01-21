@@ -25,9 +25,9 @@ const uint32 EP_AllianceBuffs[4] = {11413, 11414, 11415, 1386};
 
 const uint32 EP_HordeBuffs[4] = {30880, 30683, 30682, 29520};
 
-const uint32 EP_GraveYardZone = 139;
+const uint32 EP_GraveyardZone = 139;
 
-const uint32 EP_GraveYardId = 927;
+const uint32 EP_GraveyardId = 927;
 
 const uint8 EPBuffZonesNum = 3;
 
@@ -191,7 +191,7 @@ public:
 
     void SendChangePhase() override;
 
-    void FillInitialWorldStates(WorldPacket& data) override;
+    void FillInitialWorldStates(WorldPackets::WorldState::InitWorldStates& packet) override;
 
     // used when player is activated/inactivated in the area
     bool HandlePlayerEnter(Player* player) override;
@@ -217,7 +217,7 @@ public:
 
     void SendChangePhase() override;
 
-    void FillInitialWorldStates(WorldPacket& data) override;
+    void FillInitialWorldStates(WorldPackets::WorldState::InitWorldStates& packet) override;
 
     // used when player is activated/inactivated in the area
     bool HandlePlayerEnter(Player* player) override;
@@ -243,7 +243,7 @@ public:
 
     void SendChangePhase() override;
 
-    void FillInitialWorldStates(WorldPacket& data) override;
+    void FillInitialWorldStates(WorldPackets::WorldState::InitWorldStates& packet) override;
 
     // used when player is activated/inactivated in the area
     bool HandlePlayerEnter(Player* player) override;
@@ -269,7 +269,7 @@ public:
 
     void SendChangePhase() override;
 
-    void FillInitialWorldStates(WorldPacket& data) override;
+    void FillInitialWorldStates(WorldPackets::WorldState::InitWorldStates& packet) override;
 
     // used when player is activated/inactivated in the area
     bool HandlePlayerEnter(Player* player) override;
@@ -298,7 +298,7 @@ public:
 
     bool Update(uint32 diff) override;
 
-    void FillInitialWorldStates(WorldPacket& data) override;
+    void FillInitialWorldStates(WorldPackets::WorldState::InitWorldStates& packet) override;
 
     void SendRemoveWorldStates(Player* player) override;
 

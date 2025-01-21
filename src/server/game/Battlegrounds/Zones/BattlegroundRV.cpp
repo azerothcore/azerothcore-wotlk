@@ -204,10 +204,10 @@ void BattlegroundRV::HandleAreaTrigger(Player* player, uint32 trigger)
     }
 }
 
-void BattlegroundRV::FillInitialWorldStates(WorldPacket& data)
+void BattlegroundRV::FillInitialWorldStates(WorldPackets::WorldState::InitWorldStates& packet)
 {
-    data << uint32(BG_RV_WORLD_STATE) << uint32(1);
-    Arena::FillInitialWorldStates(data);
+    packet.Worldstates.emplace_back(BG_RV_WORLD_STATE, 1);
+    Arena::FillInitialWorldStates(packet);
 }
 
 void BattlegroundRV::Init()

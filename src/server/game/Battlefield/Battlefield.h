@@ -81,7 +81,7 @@ public:
 
     virtual ~BfCapturePoint() { }
 
-    virtual void FillInitialWorldStates(WorldPacket& /*data*/) {}
+    virtual void FillInitialWorldStates(WorldPackets::WorldState::InitWorldStates& /*packet*/) { }
 
     // Send world state update to all players present
     void SendUpdateWorldState(uint32 field, uint32 value);
@@ -334,7 +334,7 @@ public:
 
     /// Send all worldstate data to all player in zone.
     virtual void SendInitWorldStatesToAll() = 0;
-    virtual void FillInitialWorldStates(WorldPacket& /*data*/) = 0;
+    virtual void FillInitialWorldStates(WorldPackets::WorldState::InitWorldStates& /*packet*/) = 0;
 
     /// Return if we can use mount in battlefield
     bool CanFlyIn() { return !m_isActive; }
