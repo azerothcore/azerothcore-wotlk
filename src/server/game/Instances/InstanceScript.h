@@ -285,6 +285,10 @@ public:
     [[nodiscard]] bool AllBossesDone() const;
     [[nodiscard]] bool AllBossesDone(std::initializer_list<uint32> bossIds) const;
 
+    TeamId GetTeamIdInInstance() const { return _teamIdInInstance; }
+    void SetTeamIdInInstance(TeamId teamId) { _teamIdInInstance = teamId; }
+    bool IsTwoFactionInstance() const;
+
     TaskScheduler scheduler;
 protected:
     void SetHeaders(std::string const& dataHeaders);
@@ -324,9 +328,6 @@ protected:
     void WriteSaveDataBossStates(std::ostringstream& data);
     void WritePersistentData(std::ostringstream& data);
     virtual void WriteSaveDataMore(std::ostringstream& /*data*/) { }
-
-    TeamId GetTeamIdInInstance() const { return _teamIdInInstance; }
-    bool IsTwoFactionInstance() const;
 
 private:
     static void LoadObjectData(ObjectData const* creatureData, ObjectInfoMap& objectInfo);
