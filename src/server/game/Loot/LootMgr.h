@@ -176,6 +176,8 @@ struct LootItem
     LootItem() = default;
 
     // Basic checks for player/item compatibility - if false no chance to see the item in the loot
+    bool AllowedForPlayer(Player const* player, bool isGivenByMasterLooter, ObjectGuid source) const;
+    bool AllowedForPlayer(Player const* player, bool isGivenByMasterLooter = false) const;
     bool AllowedForPlayer(Player const* player, ObjectGuid source) const;
     void AddAllowedLooter(Player const* player);
     [[nodiscard]] const AllowedLooterSet& GetAllowedLooters() const { return allowedGUIDs; }
@@ -384,12 +386,12 @@ struct Loot
     [[nodiscard]] bool hasItemForAll() const;
     bool hasItemFor(Player* player) const;
     [[nodiscard]] bool hasOverThresholdItem() const;
-    void FillNotNormalLootFor(Player* player);
+    void FillNotNormalLootFor(Player* player, bool presentAtLooting);
 
 private:
     QuestItemList* FillFFALoot(Player* player);
     QuestItemList* FillQuestLoot(Player* player);
-    QuestItemList* FillNonQuestNonFFAConditionalLoot(Player* player);
+    QuestItemList* FillNonQuestNonFFAConditionalLoot(Player* player, bool presentAtLooting);
 
     typedef GuidSet PlayersLootingSet;
     PlayersLootingSet PlayersLooting;

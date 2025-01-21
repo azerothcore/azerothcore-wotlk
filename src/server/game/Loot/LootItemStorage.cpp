@@ -224,7 +224,7 @@ bool LootItemStorage::LoadStoredLoot(Item* item, Player* player)
 
     if (loot->unlootedCount)
     {
-        loot->FillNotNormalLootFor(player);
+        loot->FillNotNormalLootFor(player, true);
     }
 
     // Mark the item if it has loot so it won't be generated again on open
