@@ -2123,6 +2123,9 @@ void World::SetInitialWorldSettings()
     LOG_INFO("server.loading", " ");
     sGameEventMgr->StartArenaSeason();
 
+    LOG_INFO("server.loading", "Loading WorldState...");
+    sWorldState->Load();
+
     sTicketMgr->Initialize();
 
     ///- Initialize Battlegrounds
