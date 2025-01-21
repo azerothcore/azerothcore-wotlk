@@ -47,15 +47,11 @@ void WorldSession::HandleJoinChannel(WorldPacket& recvPacket)
         return;
 
     if (channelName.size() >= 100 || !DisallowHyperlinksAndMaybeKick(channelName))
-    {
         return;
-    }
 
     if (ChannelMgr* cMgr = ChannelMgr::forTeam(GetPlayer()->GetTeamId()))
-    {
         if (Channel* channel = cMgr->GetJoinChannel(channelName, channelId))
             channel->JoinChannel(GetPlayer(), password);
-    }
 }
 
 void WorldSession::HandleLeaveChannel(WorldPacket& recvPacket)
@@ -70,10 +66,8 @@ void WorldSession::HandleLeaveChannel(WorldPacket& recvPacket)
         return;
 
     if (ChannelMgr* cMgr = ChannelMgr::forTeam(GetPlayer()->GetTeamId()))
-    {
         if (Channel* channel = cMgr->GetChannel(channelName, GetPlayer()))
             channel->LeaveChannel(GetPlayer(), true);
-    }
 }
 
 void WorldSession::HandleChannelList(WorldPacket& recvPacket)

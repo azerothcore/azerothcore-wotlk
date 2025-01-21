@@ -461,6 +461,44 @@ void Player::UpdateNextMailTimeAndUnreads()
     }
 }
 
+void Player::UpdateLFGChannel()
+{
+    if (!sWorld->getBoolConfig(CONFIG_RESTRICTED_LFG_CHANNEL))
+        return;
+
+    ChannelMgr* cMgr = ChannelMgr::forTeam(GetTeamId());
+    if (!cMgr)
+        return;
+
+    ChatChannelsEntry const* cce = sChatChannelsStore.LookupEntry(26); /*LookingForGroup*/
+    Channel* cLFG = cMgr->GetJoinChannel(cce->pattern[m_session->GetSessionDbcLocale()], cce->ChannelID);
+    if (!cLFG)
+        return;
+
+    Channel* cUsed = nullptr;
+    for (Channel* channel : m_channels)
+        if (channel && channel->GetChannelId() == cce->ChannelID)
+        {
+            cUsed = cLFG;
+            break;
+        }
+
+    if (IsUsingLfg())
+    {
+        if (cUsed == cLFG)
+            return;
+
+        cLFG->JoinChannel(this, "");
+    }
+    else
+    {
+        if (cLFG != cUsed)
+            return;
+
+        cLFG->LeaveChannel(this, true);
+    }
+}
+
 void Player::UpdateLocalChannels(uint32 newZone)
 {
     // pussywizard: mutex needed (tc changed opcode to THREAD UNSAFE)
