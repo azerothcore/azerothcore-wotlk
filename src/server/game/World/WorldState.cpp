@@ -763,11 +763,96 @@ void WorldState::StartSunsReachPhase(bool initial)
     }
 }
 
+std::string WorldState::GetSunsReachPhaseName(uint32 phase) const
+{
+    switch (phase)
+    {
+        case SUNS_REACH_PHASE_1_STAGING_AREA: return "Phase 1: Staging Area";
+        case SUNS_REACH_PHASE_2_SANCTUM: return "Phase 2: Sanctum";
+        case SUNS_REACH_PHASE_3_ARMORY: return "Phase 3: Armory";
+        case SUNS_REACH_PHASE_4_HARBOR: return "Phase 4: Harbor";
+        default: return "Unknown";
+    }
+}
+
+std::string WorldState::GetSunsReachSubPhaseName(uint32 subPhase) const
+{
+    switch (subPhase)
+    {
+        case SUBPHASE_PORTAL: return "Portal";
+        case SUBPHASE_ANVIL: return "Anvil";
+        case SUBPHASE_ALCHEMY_LAB: return "Alchemy Lab";
+        case SUBPHASE_MONUMENT: return "Monument";
+        default: return "Unknown";
+    }
+}
+
+std::string WorldState::GetSunsReachCounterName(uint32 counter) const
+{
+    switch (counter)
+    {
+        case COUNTER_ERRATIC_BEHAVIOR: return "Erratic Behavior";
+        case COUNTER_SANCTUM_WARDS: return "Sanctum Wards";
+        case COUNTER_BATTLE_FOR_THE_SUNS_REACH_ARMORY: return "Battle for the Sun's Reach Armory";
+        case COUNTER_DISTRACTION_AT_THE_DEAD_SCAR: return "Distraction at the Dead Scar";
+        case COUNTER_INTERCEPTING_THE_MANA_CELLS: return "Intercepting the Mana Cells";
+        case COUNTER_INTERCEPT_THE_REINFORCEMENTS: return "Intercept the Reinforcements";
+        case COUNTER_TAKING_THE_HARBOR: return "Taking the Harbor";
+        case COUNTER_MAKING_READY: return "Making Ready";
+        case COUNTER_DISCOVERING_YOUR_ROOTS: return "Discovering Your Roots";
+        case COUNTER_A_CHARITABLE_DONATION: return "A Charitable Donation";
+        default: return "Unknown";
+    }
+}
+
 std::string WorldState::GetSunsReachPrintout()
 {
-    std::string output = "Phase: " + std::to_string(m_sunsReachData.m_phase) + " Subphase mask: " + std::to_string(m_sunsReachData.m_subphaseMask) + "\nValues:";
-    for (uint32 value : m_sunsReachData.m_sunsReachReclamationCounters)
-        output += " " + std::to_string(value);
+    std::string output = "Phase: " + std::to_string(m_sunsReachData.m_phase) + " (" + GetSunsReachPhaseName(m_sunsReachData.m_phase) + ") " + std::to_string(m_sunsReachData.GetPhasePercentage(m_sunsReachData.m_phase)) + "%\n";
+
+    output += "Subphase mask: " + std::to_string(m_sunsReachData.m_subphaseMask) + "\n";
+    for (uint32 i = 0; i < 4; ++i)
+    {
+        uint32 subPhaseMask = 1 << i;
+        output += "  " + GetSunsReachSubPhaseName(subPhaseMask) + ": " + (m_sunsReachData.m_subphaseMask & subPhaseMask ? "100%" : std::to_string(m_sunsReachData.GetSubPhasePercentage(subPhaseMask)) + "%") + "\n";
+    }
+    output += "Counters:\n";
+    output += "  Sunsreach.CounterMax = " + std::to_string(sWorld->getIntConfig(CONFIG_SUNSREACH_COUNTER_MAX)) + "\n";
+    for (uint32 i = 0; i < COUNTERS_MAX; ++i)
+    {
+        output += "  " + std::to_string(i) + ". " + GetSunsReachCounterName(i) + ": " + std::to_string(m_sunsReachData.m_sunsReachReclamationCounters[i]) + " (";
+        switch (i)
+        {
+            case COUNTER_ERRATIC_BEHAVIOR:
+            case COUNTER_SANCTUM_WARDS:
+                output += "counts towards Phase 2: Sanctum";
+                break;
+            case COUNTER_BATTLE_FOR_THE_SUNS_REACH_ARMORY:
+            case COUNTER_DISTRACTION_AT_THE_DEAD_SCAR:
+                output += "counts towards Phase 3: Armory";
+                break;
+            case COUNTER_INTERCEPTING_THE_MANA_CELLS:
+                output += "counts towards Subphase: Portal";
+                break;
+            case COUNTER_INTERCEPT_THE_REINFORCEMENTS:
+            case COUNTER_TAKING_THE_HARBOR:
+                output += "counts towards Phase 4: Harbor";
+                break;
+            case COUNTER_MAKING_READY:
+                output += "counts towards Subphase: Anvil";
+                break;
+            case COUNTER_DISCOVERING_YOUR_ROOTS:
+                output += "counts towards Subphase: Alchemy Lab";
+                break;
+            case COUNTER_A_CHARITABLE_DONATION:
+                output += "counts towards Subphase: Monument";
+                break;
+            default:
+                output += "Unknown goal";
+                break;
+        }
+        output += ")\n";
+    }
+
     return output;
 }
 

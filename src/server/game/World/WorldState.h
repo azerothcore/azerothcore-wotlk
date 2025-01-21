@@ -195,6 +195,9 @@ class WorldState
         bool _isMagtheridonHeadSpawnedHorde;
         bool _isMagtheridonHeadSpawnedAlliance;
         SunsReachReclamationData m_sunsReachData;
+        std::string GetSunsReachPhaseName(uint32 phase) const;
+        std::string GetSunsReachSubPhaseName(uint32 subPhase) const;
+        std::string GetSunsReachCounterName(uint32 counter) const;
         std::map<WorldStateCondition, std::atomic<WorldStateConditionState>> _transportStates; // atomic to avoid having to lock
         std::mutex _mutex; // all World State operations are threat unsafe
 };

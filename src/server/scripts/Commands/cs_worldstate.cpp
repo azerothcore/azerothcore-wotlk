@@ -38,6 +38,7 @@ public:
     {
         static ChatCommandTable sunsreachCommandTable =
         {
+            { "status",   HandleSunsReachReclamationStatusCommand,   SEC_ADMINISTRATOR, Console::Yes },
             { "phase",    HandleSunsReachReclamationPhaseCommand,    SEC_ADMINISTRATOR, Console::Yes },
             { "subphase", HandleSunsReachReclamationSubPhaseCommand, SEC_ADMINISTRATOR, Console::Yes },
             { "counter",  HandleSunsReachReclamationCounterCommand,  SEC_ADMINISTRATOR, Console::Yes },
@@ -53,37 +54,46 @@ public:
         return commandTable;
     }
 
-    static bool HandleSunsReachReclamationPhaseCommand(ChatHandler* handler, Optional<uint32> param)
+    static bool HandleSunsReachReclamationStatusCommand(ChatHandler* handler )
     {
-        if (!param)
-        {
-            handler->PSendSysMessage("{}", sWorldState->GetSunsReachPrintout().data());
-            return true;
-        }
-        sWorldState->HandleSunsReachPhaseTransition(param.value());
+        handler->PSendSysMessage(sWorldState->GetSunsReachPrintout());
         return true;
     }
 
-    static bool HandleSunsReachReclamationSubPhaseCommand(ChatHandler* handler, Optional<uint32> param)
+    static bool HandleSunsReachReclamationPhaseCommand(ChatHandler* handler, uint32 phase)
     {
-        if (!param)
+        if (phase > SUNS_REACH_PHASE_4_HARBOR)
         {
-            handler->PSendSysMessage("{}", sWorldState->GetSunsReachPrintout().data());
-            return true;
+            handler->PSendSysMessage("Invalid phase, see \".worldstate sunsreach phase\" for usage");
+            return false;
         }
-        sWorldState->HandleSunsReachSubPhaseTransition(param.value());
+        sWorldState->HandleSunsReachPhaseTransition(phase);
+        handler->PSendSysMessage(sWorldState->GetSunsReachPrintout());
         return true;
     }
 
-    static bool HandleSunsReachReclamationCounterCommand(ChatHandler* handler, uint32 index, uint32 value)
+    static bool HandleSunsReachReclamationSubPhaseCommand(ChatHandler* handler, uint32 subphase)
     {
-        if (index >= COUNTERS_MAX)
+        if (subphase > SUBPHASE_ALL)
         {
-            handler->PSendSysMessage("Invalid counter, see \".worldstate sunsreach counter\" for usage");
+            handler->PSendSysMessage("Invalid subphase, see \".worldstate sunsreach subphase\" for usage");
+            return false;
+        }
+        sWorldState->HandleSunsReachSubPhaseTransition(subphase);;
+        handler->PSendSysMessage(sWorldState->GetSunsReachPrintout());
+        return true;
+    }
+
+    static bool HandleSunsReachReclamationCounterCommand(ChatHandler* handler, Optional<uint32> index, Optional<uint32> value)
+    {
+        if (!index || !value || index.value() >= COUNTERS_MAX)
+        {
+            handler->PSendSysMessage("Syntax: .worldstate sunsreach counter <index> <value>.");
+            handler->PSendSysMessage(sWorldState->GetSunsReachPrintout());
             return true;
         }
-        sWorldState->SetSunsReachCounter(SunsReachCounters(index), value);
-        handler->PSendSysMessage("{}", sWorldState->GetSunsReachPrintout().data());
+        sWorldState->SetSunsReachCounter(SunsReachCounters(index.value()), value.value());
+        handler->PSendSysMessage(sWorldState->GetSunsReachPrintout());
         return true;
     }
 };

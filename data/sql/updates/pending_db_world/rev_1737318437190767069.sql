@@ -1,9 +1,9 @@
 --
-DELETE FROM `command` WHERE `name` IN ('worldstate sunsreach counter');
+DELETE FROM `command` WHERE `name` IN ('worldstate sunsreach phase', 'worldstate sunsreach subphase');
 INSERT INTO `command` (`name`, `security`, `help`) VALUES
-('worldstate sunsreach counter', 3, 'Syntax: .worldstate sunsreach counter <index> <value>.\nSets counter [0-9] to value');
+('worldstate sunsreach phase', 3, 'Syntax: .worldstate sunsreach phase <value>.\nSets the phase of Sun''s Reach.\nValid values are:\n0: Staging Area\n1: Harbor\n2: Armory\n3: Sanctum.'),
+('worldstate sunsreach subphase', 3, 'Syntax: .worldstate sunsreach subphase <mask>.\nSets the subphase mask of Sun''s Reach.\nValid values are:\n1: Portal\n2: Anvil\n4: Alchemy Lab\n8: Monument\n15: All.');
 
--- Suns Reach counter inc onQuestComplete
 UPDATE `creature_template` SET `ScriptName`='npc_suns_reach_reclamation' WHERE `entry` IN (24965,24967,25061,25057,24932,25108,25069,25046,24975,25112,25163);
 
 -- 20-1-2025
