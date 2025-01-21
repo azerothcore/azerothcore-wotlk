@@ -25,6 +25,8 @@
 #include "ScriptedCreature.h"
 #include "naxxramas.h"
 
+static constexpr uint8 HorsemanCount = 4;
+
 const float HeiganPos[2] = {2796, -3707};
 const float HeiganEruptionSlope[3] =
 {
@@ -94,13 +96,12 @@ public:
             PatchwerkRoomTrash.clear();
 
             // Controls
-            _horsemanKilled = 0;
             _speakTimer = 0;
             _horsemanTimer = 0;
             _screamTimer = 2 * MINUTE * IN_MILLISECONDS;
             _hadThaddiusGreet = false;
             _currentWingTaunt = SAY_FIRST_WING_TAUNT;
-            _horsemanLoadDoneState = false;
+            _horsemanLoaded = 0;
 
             // Achievements
             abominationsKilled = 0;
@@ -167,14 +168,13 @@ public:
         ObjectGuid _lichkingGUID;
 
         // Controls
-        uint8 _horsemanKilled;
         uint32 _speakTimer;
         uint32 _horsemanTimer;
         uint32 _screamTimer;
         bool _hadThaddiusGreet;
         EventMap events;
         uint8 _currentWingTaunt;
-        bool _horsemanLoadDoneState;
+        uint8 _horsemanLoaded;
 
         // Achievements
         uint8 abominationsKilled;
@@ -251,15 +251,19 @@ public:
                     return;
                 case NPC_LADY_BLAUMEUX:
                     _blaumeuxGUID = creature->GetGUID();
+                    ++_horsemanLoaded;
                     return;
                 case NPC_SIR_ZELIEK:
                     _zeliekGUID = creature->GetGUID();
+                    ++_horsemanLoaded;
                     return;
                 case NPC_BARON_RIVENDARE:
                     _rivendareGUID = creature->GetGUID();
+                    ++_horsemanLoaded;
                     return;
                 case NPC_THANE_KORTHAZZ:
                     _korthazzGUID = creature->GetGUID();
+                    ++_horsemanLoaded;
                     return;
                 case NPC_SAPPHIRON:
                     _sapphironGUID = creature->GetGUID();
@@ -271,6 +275,9 @@ public:
                     _lichkingGUID = creature->GetGUID();
                     return;
             }
+
+            if (_horsemanLoaded == HorsemanCount)
+                SetBossState(BOSS_HORSEMAN, GetBossState(BOSS_HORSEMAN));
 
             InstanceScript::OnCreatureCreate(creature);
         }
@@ -681,13 +688,25 @@ public:
             }
 
             // Horseman handling
-            if (bossId == BOSS_HORSEMAN && !_horsemanLoadDoneState)
+            if (bossId == BOSS_HORSEMAN && _horsemanLoaded == HorsemanCount)
             {
+                uint8 horsemanKilled {};
+                if (Creature* cr = instance->GetCreature(_blaumeuxGUID))
+                    horsemanKilled += !cr->IsAlive();
+
+                if (Creature* cr = instance->GetCreature(_rivendareGUID))
+                    horsemanKilled += !cr->IsAlive();
+
+                if (Creature* cr = instance->GetCreature(_zeliekGUID))
+                    horsemanKilled += !cr->IsAlive();
+
+                if (Creature* cr = instance->GetCreature(_korthazzGUID))
+                    horsemanKilled += !cr->IsAlive();
+
                 if (state == DONE)
                 {
                     _horsemanTimer++;
-                    _horsemanKilled++;
-                    if (_horsemanKilled < 4)
+                    if (horsemanKilled < HorsemanCount)
                     {
                         return false;
                     }
@@ -699,10 +718,9 @@ public:
                 }
 
                 // respawn
-                else if (state == NOT_STARTED && _horsemanKilled > 0)
+                else if (state == NOT_STARTED && horsemanKilled > 0)
                 {
                     Creature* cr;
-                    _horsemanKilled = 0;
                     if ((cr = instance->GetCreature(_blaumeuxGUID)))
                     {
                         if (!cr->IsAlive())

@@ -16,6 +16,7 @@ results = {
     "Trailing whitespace check": "Passed",
     "SQL codestyle check": "Passed",
     "INSERT safety usage check": "Passed",
+    "Missing semicolon check": "Passed"
 }
 
 # Collect all files in all directories
@@ -44,6 +45,7 @@ def parsing_file(files: list) -> None:
                 trailing_whitespace_check(file, file_path)
                 sql_check(file, file_path)
                 insert_safety_check(file, file_path)
+                semicolon_check(file, file_path)
         except UnicodeDecodeError:
             print(f"\nCould not decode file {file_path}")
             sys.exit(1)
@@ -121,14 +123,6 @@ def sql_check(file: io, file_path: str) -> None:
                 f"Tab found! Replace it to 4 spaces: {file_path} at line {line_number}")
             check_failed = True
 
-        # Ignore comments (remove content after --)
-        line_without_comment = re.sub(r'--.*', '', line).strip()
-        # Check if the last non-empty line ends with a semicolon
-        if not line_without_comment.endswith(';'):
-            print(
-                f"The last non-empty line does not end with a semicolon: {file_path}")
-            check_failed = True
-
         last_line = line[-1].strip()
         if last_line:
             print(
@@ -157,6 +151,40 @@ def insert_safety_check(file: io, file_path: str) -> None:
     if check_failed:
         error_handler = True
         results["INSERT safety usage check"] = "Failed"
+
+def semicolon_check(file: io, file_path: str) -> None:
+    global error_handler, results
+    file.seek(0)  # Reset file pointer to the beginning
+    check_failed = False
+    sql_keywords = ["SELECT", "INSERT", "UPDATE", "DELETE"]
+    query_open = False
+
+    lines = file.readlines()
+    total_lines = len(lines)
+
+    for line_number, line in enumerate(lines, start=1):
+        stripped_line = line.rstrip()  # Remove trailing whitespace including newline
+
+        # Check if one keyword is in the line
+        if not query_open and any(keyword in stripped_line for keyword in sql_keywords):
+            query_open = True
+
+        if query_open:
+            if stripped_line == '':
+                print(f"Missing semicolon in {file_path} at line {line_number - 1}")
+                check_failed = True
+                query_open = False
+            elif line_number == total_lines:
+                if not stripped_line.endswith(';'):
+                    print(f"Missing semicolon in {file_path} at the last line {line_number}")
+                    check_failed = True
+                    query_open = False
+            elif stripped_line.endswith(';'):
+                query_open = False
+
+    if check_failed:
+        error_handler = True
+        results["Missing semicolon check"] = "Failed"
 
 # Collect all files from matching directories
 all_files = collect_files_from_directories(src_directory)
