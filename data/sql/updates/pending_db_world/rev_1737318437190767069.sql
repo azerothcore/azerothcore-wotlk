@@ -28,21 +28,21 @@ SET
 
 DELETE FROM `game_event` WHERE `eventEntry` IN (@sunsreachpone, @sunsreachptwoonly, @sunsreachptwoperm, @sunsreachnoportal, @sunsreachportal, @sunsreachpthreeonly, @sunsreachpthreeperm, @sunsreachnoanvil, @sunsreachanvil, @sunsreachpfour, @sunsreachnomonument, @sunsreachmonument, @sunsreachnolab, @sunsreachlab, @sunsreachkiru);
 INSERT INTO `game_event` (`eventEntry`, `start_time`, `end_time`, `occurence`, `length`, `holiday`, `holidayStage`, `description`, `world_event`, `announce`) VALUES
-(@sunsreachpone,       '2000-01-01 14:00:00', '2000-01-01 14:00:00', 525600, 1, 0, 0, 'Sun''s Reach Reclamation Phase 1',              0, 2),
-(@sunsreachptwoonly,   '2000-01-01 14:00:00', '2000-01-01 14:00:00', 525600, 1, 0, 0, 'Sun''s Reach Reclamation Phase 2 Only',         0, 2),
-(@sunsreachptwoperm,   '2000-01-01 14:00:00', '2000-01-01 14:00:00', 525600, 1, 0, 0, 'Sun''s Reach Reclamation Phase 2 Permanent',    0, 2),
-(@sunsreachnoportal,   '2000-01-01 14:00:00', '2000-01-01 14:00:00', 525600, 1, 0, 0, 'Sun''s Reach Reclamation Phase No Portal',      0, 2),
-(@sunsreachportal,     '2000-01-01 14:00:00', '2000-01-01 14:00:00', 525600, 1, 0, 0, 'Sun''s Reach Reclamation Phase Portal',         0, 2),
-(@sunsreachpthreeonly, '2000-01-01 14:00:00', '2000-01-01 14:00:00', 525600, 1, 0, 0, 'Sun''s Reach Reclamation Phase 3 Only',         0, 2),
-(@sunsreachpthreeperm, '2000-01-01 14:00:00', '2000-01-01 14:00:00', 525600, 1, 0, 0, 'Sun''s Reach Reclamation Phase 3 Permanent',    0, 2),
-(@sunsreachnoanvil,    '2000-01-01 14:00:00', '2000-01-01 14:00:00', 525600, 1, 0, 0, 'Sun''s Reach Reclamation Phase No Anvil',       0, 2),
-(@sunsreachanvil,      '2000-01-01 14:00:00', '2000-01-01 14:00:00', 525600, 1, 0, 0, 'Sun''s Reach Reclamation Phase Anvil',          0, 2),
-(@sunsreachpfour,      '2000-01-01 14:00:00', '2000-01-01 14:00:00', 525600, 1, 0, 0, 'Sun''s Reach Reclamation Phase 4',              0, 2),
-(@sunsreachnomonument, '2000-01-01 14:00:00', '2000-01-01 14:00:00', 525600, 1, 0, 0, 'Sun''s Reach Reclamation Phase No Monument',    0, 2),
-(@sunsreachmonument,   '2000-01-01 14:00:00', '2000-01-01 14:00:00', 525600, 1, 0, 0, 'Sun''s Reach Reclamation Phase Monument',       0, 2),
-(@sunsreachnolab,      '2000-01-01 14:00:00', '2000-01-01 14:00:00', 525600, 1, 0, 0, 'Sun''s Reach Reclamation Phase No Alchemy Lab', 0, 2),
-(@sunsreachlab,        '2000-01-01 14:00:00', '2000-01-01 14:00:00', 525600, 1, 0, 0, 'Sun''s Reach Reclamation Phase Alchemy Lab',    0, 2),
-(@sunsreachkiru,       '2000-01-01 14:00:00', '2000-01-01 14:00:00', 525600, 1, 0, 0, 'Sun''s Reach Reclamation Phase K''iru',         0, 2);
+(@sunsreachpone,       '2000-01-01 14:00:00', '2000-01-01 14:00:00', 5184000, 2592000, 0, 0, 'Sun''s Reach Reclamation Phase 1',              5, 2),
+(@sunsreachptwoonly,   '2000-01-01 14:00:00', '2000-01-01 14:00:00', 5184000, 2592000, 0, 0, 'Sun''s Reach Reclamation Phase 2 Only',         5, 2),
+(@sunsreachptwoperm,   '2000-01-01 14:00:00', '2000-01-01 14:00:00', 5184000, 2592000, 0, 0, 'Sun''s Reach Reclamation Phase 2 Permanent',    5, 2),
+(@sunsreachnoportal,   '2000-01-01 14:00:00', '2000-01-01 14:00:00', 5184000, 2592000, 0, 0, 'Sun''s Reach Reclamation Phase No Portal',      5, 2),
+(@sunsreachportal,     '2000-01-01 14:00:00', '2000-01-01 14:00:00', 5184000, 2592000, 0, 0, 'Sun''s Reach Reclamation Phase Portal',         5, 2),
+(@sunsreachpthreeonly, '2000-01-01 14:00:00', '2000-01-01 14:00:00', 5184000, 2592000, 0, 0, 'Sun''s Reach Reclamation Phase 3 Only',         5, 2),
+(@sunsreachpthreeperm, '2000-01-01 14:00:00', '2000-01-01 14:00:00', 5184000, 2592000, 0, 0, 'Sun''s Reach Reclamation Phase 3 Permanent',    5, 2),
+(@sunsreachnoanvil,    '2000-01-01 14:00:00', '2000-01-01 14:00:00', 5184000, 2592000, 0, 0, 'Sun''s Reach Reclamation Phase No Anvil',       5, 2),
+(@sunsreachanvil,      '2000-01-01 14:00:00', '2000-01-01 14:00:00', 5184000, 2592000, 0, 0, 'Sun''s Reach Reclamation Phase Anvil',          5, 2),
+(@sunsreachpfour,      '2000-01-01 14:00:00', '2000-01-01 14:00:00', 5184000, 2592000, 0, 0, 'Sun''s Reach Reclamation Phase 4',              5, 2),
+(@sunsreachnomonument, '2000-01-01 14:00:00', '2000-01-01 14:00:00', 5184000, 2592000, 0, 0, 'Sun''s Reach Reclamation Phase No Monument',    5, 2),
+(@sunsreachmonument,   '2000-01-01 14:00:00', '2000-01-01 14:00:00', 5184000, 2592000, 0, 0, 'Sun''s Reach Reclamation Phase Monument',       5, 2),
+(@sunsreachnolab,      '2000-01-01 14:00:00', '2000-01-01 14:00:00', 5184000, 2592000, 0, 0, 'Sun''s Reach Reclamation Phase No Alchemy Lab', 5, 2),
+(@sunsreachlab,        '2000-01-01 14:00:00', '2000-01-01 14:00:00', 5184000, 2592000, 0, 0, 'Sun''s Reach Reclamation Phase Alchemy Lab',    5, 2),
+(@sunsreachkiru,       '2000-01-01 14:00:00', '2000-01-01 14:00:00', 5184000, 2592000, 0, 0, 'Sun''s Reach Reclamation Phase K''iru',         5, 2);
 
 DELETE FROM `game_event_creature` WHERE `eventEntry` IN (@sunsreachpone, @sunsreachptwoonly, @sunsreachptwoperm, @sunsreachnoportal, @sunsreachportal, @sunsreachpthreeonly, @sunsreachpthreeperm, @sunsreachnoanvil, @sunsreachanvil, @sunsreachpfour, @sunsreachnomonument, @sunsreachmonument, @sunsreachnolab, @sunsreachlab, @sunsreachkiru, -@sunsreachpone, -@sunsreachptwoonly, -@sunsreachptwoperm, -@sunsreachnoportal, -@sunsreachportal, -@sunsreachpthreeonly, -@sunsreachpthreeperm, -@sunsreachnoanvil, -@sunsreachanvil, -@sunsreachpfour, -@sunsreachnomonument, -@sunsreachmonument, -@sunsreachnolab, -@sunsreachlab, -@sunsreachkiru);
 INSERT INTO `game_event_creature` (`guid`, `eventEntry`) VALUES
