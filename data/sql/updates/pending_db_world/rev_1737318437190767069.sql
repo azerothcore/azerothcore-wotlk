@@ -8,7 +8,7 @@ UPDATE `creature_template` SET `ScriptName`='npc_suns_reach_reclamation' WHERE `
 
 -- 20-1-2025
 -- author: heyitsbench
--- https://gist.githubusercontent.com/heyitsbench/64e9741fdc5e06f48592b583a4712b4f/raw/43ef22898c5268973ab01051d9387ca1f5aeec9f/suns-reach-reclamation.sql
+-- original: https://gist.githubusercontent.com/heyitsbench/64e9741fdc5e06f48592b583a4712b4f/raw/43ef22898c5268973ab01051d9387ca1f5aeec9f/suns-reach-reclamation.sql
 SET
 @sunsreachpone       = 101,
 @sunsreachptwoonly   = 102,
@@ -24,13 +24,9 @@ SET
 @sunsreachmonument   = 112,
 @sunsreachnolab      = 113,
 @sunsreachlab        = 114,
-@sunsreachkiru       = 115,
-@sunwellnone         = 116,
-@sunwellfirst        = 117,
-@sunwellsecond       = 118,
-@sunwellall          = 119;
+@sunsreachkiru       = 115;
 
-DELETE FROM `game_event` WHERE `eventEntry` IN (@sunsreachpone, @sunsreachptwoonly, @sunsreachptwoperm, @sunsreachnoportal, @sunsreachportal, @sunsreachpthreeonly, @sunsreachpthreeperm, @sunsreachnoanvil, @sunsreachanvil, @sunsreachpfour, @sunsreachnomonument, @sunsreachmonument, @sunsreachnolab, @sunsreachlab, @sunsreachkiru, @sunwellnone, @sunwellfirst, @sunwellsecond, @sunwellall);
+DELETE FROM `game_event` WHERE `eventEntry` IN (@sunsreachpone, @sunsreachptwoonly, @sunsreachptwoperm, @sunsreachnoportal, @sunsreachportal, @sunsreachpthreeonly, @sunsreachpthreeperm, @sunsreachnoanvil, @sunsreachanvil, @sunsreachpfour, @sunsreachnomonument, @sunsreachmonument, @sunsreachnolab, @sunsreachlab, @sunsreachkiru);
 INSERT INTO `game_event` (`eventEntry`, `start_time`, `end_time`, `occurence`, `length`, `holiday`, `holidayStage`, `description`, `world_event`, `announce`) VALUES
 (@sunsreachpone,       '2000-01-01 14:00:00', '2000-01-01 14:00:00', 525600, 1, 0, 0, 'Sun''s Reach Reclamation Phase 1',              0, 2),
 (@sunsreachptwoonly,   '2000-01-01 14:00:00', '2000-01-01 14:00:00', 525600, 1, 0, 0, 'Sun''s Reach Reclamation Phase 2 Only',         0, 2),
@@ -46,13 +42,9 @@ INSERT INTO `game_event` (`eventEntry`, `start_time`, `end_time`, `occurence`, `
 (@sunsreachmonument,   '2000-01-01 14:00:00', '2000-01-01 14:00:00', 525600, 1, 0, 0, 'Sun''s Reach Reclamation Phase Monument',       0, 2),
 (@sunsreachnolab,      '2000-01-01 14:00:00', '2000-01-01 14:00:00', 525600, 1, 0, 0, 'Sun''s Reach Reclamation Phase No Alchemy Lab', 0, 2),
 (@sunsreachlab,        '2000-01-01 14:00:00', '2000-01-01 14:00:00', 525600, 1, 0, 0, 'Sun''s Reach Reclamation Phase Alchemy Lab',    0, 2),
-(@sunsreachkiru,       '2000-01-01 14:00:00', '2000-01-01 14:00:00', 525600, 1, 0, 0, 'Sun''s Reach Reclamation Phase K''iru',         0, 2),
-(@sunwellnone,         '2000-01-01 14:00:00', '2000-01-01 14:00:00', 525600, 1, 0, 0, 'SWP - All Gates Closed',                        0, 2), -- 1 1 1
-(@sunwellfirst,        '2000-01-01 14:00:00', '2000-01-01 14:00:00', 525600, 1, 0, 0, 'SWP - First Gate Open',                         0, 2), -- 0 1 1
-(@sunwellsecond,       '2000-01-01 14:00:00', '2000-01-01 14:00:00', 525600, 1, 0, 0, 'SWP - Second Gate Open',                        0, 2), -- 0 0 1
-(@sunwellall,          '2000-01-01 14:00:00', '2000-01-01 14:00:00', 525600, 1, 0, 0, 'SWP - All Gates Open',                          0, 2); -- 0 0 0
+(@sunsreachkiru,       '2000-01-01 14:00:00', '2000-01-01 14:00:00', 525600, 1, 0, 0, 'Sun''s Reach Reclamation Phase K''iru',         0, 2);
 
-DELETE FROM `game_event_creature` WHERE `eventEntry` IN (@sunsreachpone, @sunsreachptwoonly, @sunsreachptwoperm, @sunsreachnoportal, @sunsreachportal, @sunsreachpthreeonly, @sunsreachpthreeperm, @sunsreachnoanvil, @sunsreachanvil, @sunsreachpfour, @sunsreachnomonument, @sunsreachmonument, @sunsreachnolab, @sunsreachlab, @sunsreachkiru, @sunwellnone, @sunwellfirst, @sunwellsecond, @sunwellall, -@sunsreachpone, -@sunsreachptwoonly, -@sunsreachptwoperm, -@sunsreachnoportal, -@sunsreachportal, -@sunsreachpthreeonly, -@sunsreachpthreeperm, -@sunsreachnoanvil, -@sunsreachanvil, -@sunsreachpfour, -@sunsreachnomonument, -@sunsreachmonument, -@sunsreachnolab, -@sunsreachlab, -@sunsreachkiru, -@sunwellnone, -@sunwellfirst, -@sunwellsecond, -@sunwellall);
+DELETE FROM `game_event_creature` WHERE `eventEntry` IN (@sunsreachpone, @sunsreachptwoonly, @sunsreachptwoperm, @sunsreachnoportal, @sunsreachportal, @sunsreachpthreeonly, @sunsreachpthreeperm, @sunsreachnoanvil, @sunsreachanvil, @sunsreachpfour, @sunsreachnomonument, @sunsreachmonument, @sunsreachnolab, @sunsreachlab, @sunsreachkiru, -@sunsreachpone, -@sunsreachptwoonly, -@sunsreachptwoperm, -@sunsreachnoportal, -@sunsreachportal, -@sunsreachpthreeonly, -@sunsreachpthreeperm, -@sunsreachnoanvil, -@sunsreachanvil, -@sunsreachpfour, -@sunsreachnomonument, -@sunsreachmonument, -@sunsreachnolab, -@sunsreachlab, -@sunsreachkiru);
 INSERT INTO `game_event_creature` (`guid`, `eventEntry`) VALUES
 -- Phase 2
 (93950, @sunsreachptwoperm), -- 25061 (Harbinger Inuuro)
@@ -323,7 +315,7 @@ INSERT INTO `game_event_creature` (`guid`, `eventEntry`) VALUES
 (5300078, @sunsreachportal), -- 24936 (Sunwell Daily Bunny x 0.01)
 (5300079, @sunsreachportal); -- 24936 (Sunwell Daily Bunny x 0.01)
 
-DELETE FROM `game_event_gameobject` WHERE `eventEntry` IN (@sunsreachpone, @sunsreachptwoonly, @sunsreachptwoperm, @sunsreachnoportal, @sunsreachportal, @sunsreachpthreeonly, @sunsreachpthreeperm, @sunsreachnoanvil, @sunsreachanvil, @sunsreachpfour, @sunsreachnomonument, @sunsreachmonument, @sunsreachnolab, @sunsreachlab, @sunsreachkiru, @sunwellnone, @sunwellfirst, @sunwellsecond, @sunwellall, -@sunsreachpone, -@sunsreachptwoonly, -@sunsreachptwoperm, -@sunsreachnoportal, -@sunsreachportal, -@sunsreachpthreeonly, -@sunsreachpthreeperm, -@sunsreachnoanvil, -@sunsreachanvil, -@sunsreachpfour, -@sunsreachnomonument, -@sunsreachmonument, -@sunsreachnolab, -@sunsreachlab, -@sunsreachkiru, -@sunwellnone, -@sunwellfirst, -@sunwellsecond, -@sunwellall);
+DELETE FROM `game_event_gameobject` WHERE `eventEntry` IN (@sunsreachpone, @sunsreachptwoonly, @sunsreachptwoperm, @sunsreachnoportal, @sunsreachportal, @sunsreachpthreeonly, @sunsreachpthreeperm, @sunsreachnoanvil, @sunsreachanvil, @sunsreachpfour, @sunsreachnomonument, @sunsreachmonument, @sunsreachnolab, @sunsreachlab, @sunsreachkiru, -@sunsreachpone, -@sunsreachptwoonly, -@sunsreachptwoperm, -@sunsreachnoportal, -@sunsreachportal, -@sunsreachpthreeonly, -@sunsreachpthreeperm, -@sunsreachnoanvil, -@sunsreachanvil, -@sunsreachpfour, -@sunsreachnomonument, -@sunsreachmonument, -@sunsreachnolab, -@sunsreachlab, -@sunsreachkiru);
 INSERT INTO `game_event_gameobject` (`guid`, `eventEntry`) VALUES
 -- Portal
 (47196,   @sunsreachportal), -- 187056, Shattrath Portal to Isle of Quel'Danas
@@ -339,10 +331,6 @@ INSERT INTO `game_event_gameobject` (`guid`, `eventEntry`) VALUES
 (27862,   @sunsreachmonument), -- 187116, Monument to the Fallen - Isle of Quel'Danas
 -- 5800005? Sunwell bench? Not included
 (5300290, @sunsreachlab), -- 187115, Alchemy Lab
--- Gates
-(50441,   @sunwellnone), -- 187766, Agamath, The First Gate
-(50439,   @sunwellfirst), -- 187764, Rohendor, The Second Gate
-(50440,   @sunwellsecond), -- 187765, Archonisus, The Third Gate
 -- Crystals
 (5300500, -@sunsreachpthreeperm), -- 187120, Demonic Crystal
 (5300501, -@sunsreachpthreeperm), -- 187120, Demonic Crystal
@@ -351,7 +339,7 @@ INSERT INTO `game_event_gameobject` (`guid`, `eventEntry`) VALUES
 (5300504, -@sunsreachpthreeperm); -- 187120, Demonic Crystal
 
 DELETE FROM `creature_queststarter` WHERE `quest` IN (11514, 11520, 11521, 11523, 11525, 11532, 11533, 11535, 11536, 11537, 11538, 11539, 11540, 11541, 11542, 11543, 11544, 11545, 11546, 11547, 11548, 11549);
-DELETE FROM `game_event_creature_quest` WHERE `eventEntry` IN (@sunsreachpone, @sunsreachptwoonly, @sunsreachptwoperm, @sunsreachnoportal, @sunsreachportal, @sunsreachpthreeonly, @sunsreachpthreeperm, @sunsreachnoanvil, @sunsreachanvil, @sunsreachpfour, @sunsreachnomonument, @sunsreachmonument, @sunsreachnolab, @sunsreachlab, @sunsreachkiru, @sunwellnone, @sunwellfirst, @sunwellsecond, @sunwellall);
+DELETE FROM `game_event_creature_quest` WHERE `eventEntry` IN (@sunsreachpone, @sunsreachptwoonly, @sunsreachptwoperm, @sunsreachnoportal, @sunsreachportal, @sunsreachpthreeonly, @sunsreachpthreeperm, @sunsreachnoanvil, @sunsreachanvil, @sunsreachpfour, @sunsreachnomonument, @sunsreachmonument, @sunsreachnolab, @sunsreachlab, @sunsreachkiru);
 INSERT INTO `game_event_creature_quest` (`eventEntry`, `id`, `quest`) VALUES
 -- Phase 1
 (@sunsreachpone,       24965, 11524), -- Erratic Behavior
@@ -395,8 +383,8 @@ INSERT INTO `game_event_creature_quest` (`eventEntry`, `id`, `quest`) VALUES
 (@sunsreachlab,        24975, 11521), -- Rediscovering Your Roots
 (@sunsreachlab,        24975, 11546); -- Open for Business
 
-DELETE FROM `gossip_menu` WHERE `MenuID` IN (51000, 51001, 51002, 51003, 51004, 51005, 51006, 51007, 51008, 51009, 51010, 51011, 51012, 51013); -- Custom IDs
-DELETE FROM `gossip_menu` WHERE `MenuID` IN (9046, 9307) AND `TextID` IN (12226, 12304, 12305, 12306);
+DELETE FROM `gossip_menu` WHERE `MenuID` IN (51000, 51001, 51002, 51003, 51005, 51006, 51007, 51008, 51009, 51010, 51011, 51012, 51013); -- Custom IDs
+DELETE FROM `gossip_menu` WHERE `MenuID` IN (9046) AND `TextID` IN (12226, 12304, 12305, 12306);
 INSERT INTO `gossip_menu` (`MenuID`, `TextID`) VALUES
 -- Exarch Nasuun
 (9046,  12226), -- Portal progress
@@ -404,13 +392,6 @@ INSERT INTO `gossip_menu` (`MenuID`, `TextID`) VALUES
 (51001, 12301), -- Anvil progress
 (51002, 12302), -- Harbor progress
 (51003, 12303), -- Alchemy lab progress
-(9307,  12304), -- Agamath gate progress
-(9307,  12305), -- Rohendor gate progress
-(9307,  12306), -- Archonisus gate progress - (MISSING!)
--- Vindicator Moorba
-(51004, 12602), -- Agamath gate progress - (MISSING!)
-(51004, 12603), -- Rohendor gate progress - (MISSING!)
-(51004, 12605), -- Archonisus gate progress - (MISSING!)
 -- Vindicator Xayann
 (51005, 12240), -- Sanctum progress
 -- Captain Theris Dawnheart
@@ -444,13 +425,6 @@ INSERT INTO `gossip_menu_option` (`MenuID`, `OptionID`, `OptionIcon`, `OptionTex
 (9046, 2, 0, 'Exarch, have we taken the Sun''s Reach Harbor yet?',                                    24227, 1, 1, 51001, 0, 0, 0, '', 0, 0),
 (9046, 3, 0, 'Nasuun, do you know how long until we have an alchemy lab at the Sun''s Reach Harbor?', 24229, 1, 1, 51003, 0, 0, 0, '', 0, 0);
 
-DELETE FROM `npc_text` WHERE `ID` IN (12306, 12602, 12603, 12605);
-INSERT INTO `npc_text` (`ID`, `text0_0`, `text0_1`, `BroadcastTextID0`, `lang0`, `Probability0`, `em0_0`, `em0_1`, `em0_2`, `em0_3`, `em0_4`, `em0_5`, `text1_0`, `text1_1`, `BroadcastTextID1`, `lang1`, `Probability1`, `em1_0`, `em1_1`, `em1_2`, `em1_3`, `em1_4`, `em1_5`, `text2_0`, `text2_1`, `BroadcastTextID2`, `lang2`, `Probability2`, `em2_0`, `em2_1`, `em2_2`, `em2_3`, `em2_4`, `em2_5`, `text3_0`, `text3_1`, `BroadcastTextID3`, `lang3`, `Probability3`, `em3_0`, `em3_1`, `em3_2`, `em3_3`, `em3_4`, `em3_5`, `text4_0`, `text4_1`, `BroadcastTextID4`, `lang4`, `Probability4`, `em4_0`, `em4_1`, `em4_2`, `em4_3`, `em4_4`, `em4_5`, `text5_0`, `text5_1`, `BroadcastTextID5`, `lang5`, `Probability5`, `em5_0`, `em5_1`, `em5_2`, `em5_3`, `em5_4`, `em5_5`, `text6_0`, `text6_1`, `BroadcastTextID6`, `lang6`, `Probability6`, `em6_0`, `em6_1`, `em6_2`, `em6_3`, `em6_4`, `em6_5`, `text7_0`, `text7_1`, `BroadcastTextID7`, `lang7`, `Probability7`, `em7_0`, `em7_1`, `em7_2`, `em7_3`, `em7_4`, `em7_5`, `VerifiedBuild`) VALUES
-(12602, 'All three barriers are fully operational. Consult with Archmage Ne''thul in Sun''s Reach Harbor to aid the effort in unlocking the gates.',                                                                        '', 25535, 0, 1, 0, 0, 0, 0, 0, 0, '', '', 0, 0, 0, 0, 0, 0, 0, 0, 0, '', '', 0, 0, 0, 0, 0, 0, 0, 0, 0, '', '', 0, 0, 0, 0, 0, 0, 0, 0, 0, '', '', 0, 0, 0, 0, 0, 0, 0, 0, 0, '', '', 0, 0, 0, 0, 0, 0, 0, 0, 0, '', '', 0, 0, 0, 0, 0, 0, 0, 0, 0, '', '', 0, 0, 0, 0, 0, 0, 0, 0, 0, 0),
-(12603, 'Agamath, the First Gate has been breached. Two of Kil''jaeden''s most powerful lieutenants, Lady Sacrolash and Grand Warlock Alythess, are now vulnerable to attack.',                                             '', 25534, 0, 1, 0, 0, 0, 0, 0, 0, '', '', 0, 0, 0, 0, 0, 0, 0, 0, 0, '', '', 0, 0, 0, 0, 0, 0, 0, 0, 0, '', '', 0, 0, 0, 0, 0, 0, 0, 0, 0, '', '', 0, 0, 0, 0, 0, 0, 0, 0, 0, '', '', 0, 0, 0, 0, 0, 0, 0, 0, 0, '', '', 0, 0, 0, 0, 0, 0, 0, 0, 0, '', '', 0, 0, 0, 0, 0, 0, 0, 0, 0, 0),
-(12605, 'Agamath, the First Gate and Rohendor, the Second Gate are now destroyed. Only Archonisus, the Third Gate remains.',                                                                                                '', 25536, 0, 1, 0, 0, 0, 0, 0, 0, '', '', 0, 0, 0, 0, 0, 0, 0, 0, 0, '', '', 0, 0, 0, 0, 0, 0, 0, 0, 0, '', '', 0, 0, 0, 0, 0, 0, 0, 0, 0, '', '', 0, 0, 0, 0, 0, 0, 0, 0, 0, '', '', 0, 0, 0, 0, 0, 0, 0, 0, 0, '', '', 0, 0, 0, 0, 0, 0, 0, 0, 0, '', '', 0, 0, 0, 0, 0, 0, 0, 0, 0, 0),
-(12306, 'Rohendor, the Second Gate has been brought down, but the last of the Sunwell Plateau''s magical barriers, Archonisus, resists us, $n.$B$BMaintain your efforts to assist at the Sunwell in any way that you can.', '', 24234, 0, 1, 0, 0, 0, 0, 0, 0, '', '', 0, 0, 0, 0, 0, 0, 0, 0, 0, '', '', 0, 0, 0, 0, 0, 0, 0, 0, 0, '', '', 0, 0, 0, 0, 0, 0, 0, 0, 0, '', '', 0, 0, 0, 0, 0, 0, 0, 0, 0, '', '', 0, 0, 0, 0, 0, 0, 0, 0, 0, '', '', 0, 0, 0, 0, 0, 0, 0, 0, 0, '', '', 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
-
 DELETE FROM `creature_questender` WHERE `quest` IN (11496, 11513, 11517, 11520, 11524, 11532, 11535, 11538, 11539, 11542, 11545);
 INSERT INTO `creature_questender` (`id`, `quest`) VALUES
 (24965, 11524), -- Erratic Behavior
@@ -466,19 +440,13 @@ INSERT INTO `creature_questender` (`id`, `quest`) VALUES
 (24975, 11520), -- Discovering Your Roots
 (25112, 11545); -- A Charitable Donation
 
-DELETE FROM `conditions` WHERE `ConditionTypeOrReference` = 12 AND `ConditionValue1` IN (@sunsreachpone, @sunsreachptwoonly, @sunsreachptwoperm, @sunsreachnoportal, @sunsreachportal, @sunsreachpthreeonly, @sunsreachpthreeperm, @sunsreachnoanvil, @sunsreachanvil, @sunsreachpfour, @sunsreachnomonument, @sunsreachmonument, @sunsreachnolab, @sunsreachlab, @sunsreachkiru, @sunwellnone, @sunwellfirst, @sunwellsecond, @sunwellall);
+DELETE FROM `conditions` WHERE `ConditionTypeOrReference` = 12 AND `ConditionValue1` IN (@sunsreachpone, @sunsreachptwoonly, @sunsreachptwoperm, @sunsreachnoportal, @sunsreachportal, @sunsreachpthreeonly, @sunsreachpthreeperm, @sunsreachnoanvil, @sunsreachanvil, @sunsreachpfour, @sunsreachnomonument, @sunsreachmonument, @sunsreachnolab, @sunsreachlab, @sunsreachkiru);
 INSERT INTO `conditions` (`SourceTypeOrReferenceId`, `SourceGroup`, `SourceEntry`, `SourceId`, `ElseGroup`, `ConditionTypeOrReference`, `ConditionTarget`, `ConditionValue1`, `ConditionValue2`, `ConditionValue3`, `NegativeCondition`, `ErrorType`, `ErrorTextId`, `ScriptName`, `Comment`) VALUES
 (14, 9046,  12226, 0, 0, 12, 0, @sunsreachnoportal,   0, 0, 0, 0, 0, '', 'Show gossip text if the event ''Sun''s Reach Reclamation Phase No Portal'' is active'),
 (14, 51000, 12300, 0, 0, 12, 0, @sunsreachptwoonly,   0, 0, 0, 0, 0, '', 'Show gossip text if the event ''Sun''s Reach Reclamation Phase 2 Only'' is active'),
 (14, 51001, 12301, 0, 0, 12, 0, @sunsreachnoanvil,    0, 0, 0, 0, 0, '', 'Show gossip text if the event ''Sun''s Reach Reclamation Phase No Anvil'' is active'),
 (14, 51002, 12302, 0, 0, 12, 0, @sunsreachpthreeonly, 0, 0, 0, 0, 0, '', 'Show gossip text if the event ''Sun''s Reach Reclamation Phase 3 Only'' is active'),
 (14, 51003, 12303, 0, 0, 12, 0, @sunsreachnolab,      0, 0, 0, 0, 0, '', 'Show gossip text if the event ''Sun''s Reach Reclamation Phase No Alchemy Lab'' is active'),
-(14, 9307,  12304, 0, 0, 12, 0, @sunwellnone,         0, 0, 0, 0, 0, '', 'Show gossip text if the event ''SWP - All Gates Closed'' is active'),
-(14, 9307,  12305, 0, 0, 12, 0, @sunwellfirst,        0, 0, 0, 0, 0, '', 'Show gossip text if the event ''SWP - First Gate Open'' is active'),
-(14, 9307,  12306, 0, 0, 12, 0, @sunwellsecond,       0, 0, 0, 0, 0, '', 'Show gossip text if the event ''SWP - Second Gate Open'' is active'),
-(14, 51004, 12602, 0, 0, 12, 0, @sunwellnone,         0, 0, 0, 0, 0, '', 'Show gossip text if the event ''SWP - All Gates Closed'' is active'),
-(14, 51004, 12603, 0, 0, 12, 0, @sunwellfirst,        0, 0, 0, 0, 0, '', 'Show gossip text if the event ''SWP - First Gate Open'' is active'),
-(14, 51004, 12605, 0, 0, 12, 0, @sunwellsecond,       0, 0, 0, 0, 0, '', 'Show gossip text if the event ''SWP - Second Gate Open'' is active'),
 (14, 51005, 12240, 0, 0, 12, 0, @sunsreachpone,       0, 0, 0, 0, 0, '', 'Show gossip text if the event ''Sun''s Reach Reclamation Phase 1'' is active'),
 (14, 51006, 12260, 0, 0, 12, 0, @sunsreachpone,       0, 0, 0, 0, 0, '', 'Show gossip text if the event ''Sun''s Reach Reclamation Phase 1'' is active'),
 (14, 51007, 12255, 0, 0, 12, 0, @sunsreachptwoonly,   0, 0, 0, 0, 0, '', 'Show gossip text if the event ''Sun''s Reach Reclamation Phase 2 Only'' is active'),
