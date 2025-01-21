@@ -505,6 +505,10 @@ public:
 
     virtual std::string GetDebugInfo() const;
 
+    uint32 GetCreatedGridsCount();
+    uint32 GetLoadedGridsCount();
+    uint32 GetCreatedCellsInGridCount(uint16 const x, uint16 const y);
+
 private:
 
     template<class T> void InitializeObject(T* obj);

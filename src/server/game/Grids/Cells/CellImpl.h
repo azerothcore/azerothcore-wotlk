@@ -66,7 +66,8 @@ inline void Cell::Visit(CellCoord const& standing_cell, TypeContainerVisitor<T, 
 }
 
 template<class T, class CONTAINER>
-inline void Cell::Visit(CellCoord const& standing_cell, TypeContainerVisitor<T, CONTAINER>& visitor, Map& map, float x_off, float y_off, float radius) const{
+inline void Cell::Visit(CellCoord const& standing_cell, TypeContainerVisitor<T, CONTAINER>& visitor, Map& map, float x_off, float y_off, float radius) const
+{
     if (!standing_cell.IsCoordValid())
         return;
 
@@ -101,23 +102,15 @@ inline void Cell::Visit(CellCoord const& standing_cell, TypeContainerVisitor<T, 
         return;
     }
 
-    //ALWAYS visit standing cell first!!! Since we deal with small radiuses
-    //it is very essential to call visitor for standing cell firstly...
-    map.Visit(*this, visitor);
-
     // loop the cell range
     for (uint32 x = area.low_bound.x_coord; x <= area.high_bound.x_coord; ++x)
     {
         for (uint32 y = area.low_bound.y_coord; y <= area.high_bound.y_coord; ++y)
         {
             CellCoord cellCoord(x, y);
-            //lets skip standing cell since we already visited it
-            if (cellCoord != standing_cell)
-            {
-                Cell r_zone(cellCoord);
-                r_zone.data.Part.nocreate = this->data.Part.nocreate;
-                map.Visit(r_zone, visitor);
-            }
+            Cell r_zone(cellCoord);
+            r_zone.data.Part.nocreate = this->data.Part.nocreate;
+            map.Visit(r_zone, visitor);
         }
     }
 }

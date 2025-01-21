@@ -3223,6 +3223,21 @@ std::string Map::GetDebugInfo() const
     return sstr.str();
 }
 
+uint32 Map::GetCreatedGridsCount()
+{
+    return _mapGridManager.GetCreatedGridsCount();
+}
+
+uint32 Map::GetLoadedGridsCount()
+{
+    return _mapGridManager.GetLoadedGridsCount();
+}
+
+uint32 Map::GetCreatedCellsInGridCount(uint16 const x, uint16 const y)
+{
+    return _mapGridManager.GetCreatedCellsInGridCount(x, y);
+}
+
 std::string InstanceMap::GetDebugInfo() const
 {
     std::stringstream sstr;

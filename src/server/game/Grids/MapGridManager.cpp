@@ -23,10 +23,11 @@ bool MapGridManager::LoadGrid(uint16 const x, uint16 const y)
     if (!grid || grid->IsObjectDataLoaded())
         return false;
 
+    // Must mark as loaded first, as GridObjectLoader spawning objects can attempt to recursively load the grid
+    grid->SetObjectDataLoaded();
+
     GridObjectLoader loader(*grid, _map);
     loader.LoadAllCellsInGrid();
-
-    grid->SetObjectDataLoaded();
     return true;
 }
 
@@ -49,7 +50,6 @@ void MapGridManager::UnloadGrid(uint16 const x, uint16 const y)
         TypeContainerVisitor<GridObjectUnloader, GridTypeMapContainer> visitor(worker);
         grid->VisitAllCells(visitor);
     }
-
 
     GridTerrainUnloader terrainUnloader(*grid, _map);
     terrainUnloader.UnloadTerrain();
@@ -79,4 +79,42 @@ MapGridType* MapGridManager::GetGrid(uint16 const x, uint16 const y)
         return nullptr;
 
     return _mapGrid[x][y].get();
+}
+
+uint32 MapGridManager::GetCreatedGridsCount()
+{
+    uint32 count = 0;
+    for (uint32 gridX = 0; gridX < MAX_NUMBER_OF_GRIDS; ++gridX)
+    {
+        for (uint32 gridY = 0; gridY < MAX_NUMBER_OF_GRIDS; ++gridY)
+        {
+            if (GetGrid(gridX, gridY))
+                ++count;
+        }
+    }
+    return count;
+}
+
+uint32 MapGridManager::GetLoadedGridsCount()
+{
+    uint32 count = 0;
+    for (uint32 gridX = 0; gridX < MAX_NUMBER_OF_GRIDS; ++gridX)
+    {
+        for (uint32 gridY = 0; gridY < MAX_NUMBER_OF_GRIDS; ++gridY)
+        {
+            if (MapGridType* grid = GetGrid(gridX, gridY))
+                if (grid->IsObjectDataLoaded())
+                    ++count;
+        }
+    }
+    return count;
+}
+
+uint32 MapGridManager::GetCreatedCellsInGridCount(uint16 const x, uint16 const y)
+{
+    MapGridType* grid = GetGrid(x, y);
+    if (grid)
+        return grid->GetCreatedCellsCount();
+
+    return 0;
 }

@@ -37,10 +37,10 @@ public:
         : _x(x), _y(y), _objectDataLoaded(false), _terrainData(nullptr) { }
 
     // Unique identifier for grid
-    uint32 const GetId() { return _y * MAX_NUMBER_OF_GRIDS + _x; }
+    uint32 GetId() const { return _y * MAX_NUMBER_OF_GRIDS + _x; }
 
-    uint16 const GetX() { return _x; }
-    uint16 const GetY() { return _y; }
+    uint16 GetX() const { return _x; }
+    uint16 GetY() const { return _y; }
 
     bool const IsObjectDataLoaded() { return _objectDataLoaded; }
     void SetObjectDataLoaded() { _objectDataLoaded = true; }
@@ -92,7 +92,6 @@ public:
         gridCell->Visit(visitor);
     }
 
-    
     void link(GridRefMgr<MapGrid<WORLD_OBJECT_TYPES, GRID_OBJECT_TYPES>>* pTo)
     {
         _gridReference.link(pTo, this);
@@ -101,6 +100,22 @@ public:
     GridTerrainData* GetTerrainData() const { return _terrainData.get(); }
     std::shared_ptr<GridTerrainData> GetTerrainDataSharedPtr() { return _terrainData; }
     void SetTerrainData(std::shared_ptr<GridTerrainData> terrainData) { _terrainData = terrainData; }
+
+    uint32 GetCreatedCellsCount()
+    {
+        uint32 count = 0;
+        for (auto& cellX : _cells)
+        {
+            for (auto& cellY : cellX)
+            {
+                if (!cellY)
+                    continue;
+
+                ++count;
+            }
+        }
+        return count;
+    }
 
 private:
     // Creates and returns the cell if not already created
