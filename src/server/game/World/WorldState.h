@@ -185,21 +185,7 @@ class WorldState
         void StartSunsReachPhase(bool initial = false);
         std::string GetSunsReachPrintout();
 
-        void FillInitialWorldStates(ByteBuffer& data, uint32& count, uint32 zoneId, uint32 areaId);
-        // helper functions for world state list fill
-        inline void FillInitialWorldStateData(ByteBuffer& data, uint32& count, uint32 state, uint32 value)
-        {
-            data << uint32(state);
-            data << uint32(value);
-            ++count;
-        }
-
-        inline void FillInitialWorldStateData(ByteBuffer& data, uint32& count, uint32 state, int32 value)
-        {
-            data << uint32(state);
-            data << int32(value);
-            ++count;
-        }
+        void FillInitialWorldStates(ByteBuffer& data, uint32 zoneId, uint32 areaId);
     private:
         void BuffAdalsSongOfBattle();
         void DispelAdalsSongOfBattle();

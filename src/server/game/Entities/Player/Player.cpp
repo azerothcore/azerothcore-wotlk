@@ -8847,8 +8847,7 @@ void Player::SendInitWorldStates(uint32 zoneid, uint32 areaid)
         }
     }
 
-    uint32 temp = 0;
-    sWorldState->FillInitialWorldStates(data, temp, zoneid, areaid);
+    sWorldState->FillInitialWorldStates(data, zoneid, areaid);
 
     uint16 length = (data.wpos() - countPos) / 8;
     data.put<uint16>(countPos, length);

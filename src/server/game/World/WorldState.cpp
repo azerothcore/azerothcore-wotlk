@@ -802,7 +802,7 @@ uint32 SunsReachReclamationData::GetSubPhasePercentage(uint32 subPhase)
     }
 }
 
-void WorldState::FillInitialWorldStates(ByteBuffer& data, uint32& count, uint32 zoneId, uint32 /*areaId*/)
+void WorldState::FillInitialWorldStates(ByteBuffer& data, uint32 zoneId, uint32 /*areaId*/)
 {
     switch (zoneId)
     {
@@ -814,28 +814,28 @@ void WorldState::FillInitialWorldStates(ByteBuffer& data, uint32& count, uint32 
             switch (m_sunsReachData.m_phase)
             {
                 case SUNS_REACH_PHASE_1_STAGING_AREA:
-                    FillInitialWorldStateData(data, count, WORLD_STATE_QUEL_DANAS_SANCTUM, m_sunsReachData.GetPhasePercentage(m_sunsReachData.m_phase));
+                    data << WORLD_STATE_QUEL_DANAS_SANCTUM << m_sunsReachData.GetPhasePercentage(m_sunsReachData.m_phase);
                     break;
                 case SUNS_REACH_PHASE_2_SANCTUM:
-                    FillInitialWorldStateData(data, count, WORLD_STATE_QUEL_DANAS_ARMORY, m_sunsReachData.GetPhasePercentage(m_sunsReachData.m_phase));
+                    data << WORLD_STATE_QUEL_DANAS_ARMORY << m_sunsReachData.GetPhasePercentage(m_sunsReachData.m_phase);
                     break;
                 case SUNS_REACH_PHASE_3_ARMORY:
-                    FillInitialWorldStateData(data, count, WORLD_STATE_QUEL_DANAS_HARBOR, m_sunsReachData.GetPhasePercentage(m_sunsReachData.m_phase));
+                    data << WORLD_STATE_QUEL_DANAS_HARBOR << m_sunsReachData.GetPhasePercentage(m_sunsReachData.m_phase);
                     break;
                 case SUNS_REACH_PHASE_4_HARBOR:
                     if ((m_sunsReachData.m_subphaseMask & SUBPHASE_ALCHEMY_LAB) == 0)
-                        FillInitialWorldStateData(data, count, WORLD_STATE_QUEL_DANAS_ALCHEMY_LAB, m_sunsReachData.GetSubPhasePercentage(SUBPHASE_ALCHEMY_LAB));
+                        data << WORLD_STATE_QUEL_DANAS_ALCHEMY_LAB << m_sunsReachData.GetSubPhasePercentage(SUBPHASE_ALCHEMY_LAB);
                     if ((m_sunsReachData.m_subphaseMask & SUBPHASE_MONUMENT) == 0)
-                        FillInitialWorldStateData(data, count, WORLD_STATE_QUEL_DANAS_MONUMENT, m_sunsReachData.GetSubPhasePercentage(SUBPHASE_MONUMENT));
+                        data << WORLD_STATE_QUEL_DANAS_MONUMENT << m_sunsReachData.GetSubPhasePercentage(SUBPHASE_MONUMENT);
                     break;
             }
             if (m_sunsReachData.m_phase >= SUNS_REACH_PHASE_3_ARMORY && (m_sunsReachData.m_subphaseMask & SUBPHASE_ANVIL) == 0)
-                FillInitialWorldStateData(data, count, WORLD_STATE_QUEL_DANAS_ANVIL, m_sunsReachData.GetSubPhasePercentage(SUBPHASE_ANVIL));
+                data << WORLD_STATE_QUEL_DANAS_ANVIL << m_sunsReachData.GetSubPhasePercentage(SUBPHASE_ANVIL);
 
-            FillInitialWorldStateData(data, count, WORLD_STATE_QUEL_DANAS_MUSIC, m_sunsReachData.m_phase);
+            data << WORLD_STATE_QUEL_DANAS_MUSIC << m_sunsReachData.m_phase;
 
             if (m_sunsReachData.m_phase >= SUNS_REACH_PHASE_2_SANCTUM && (m_sunsReachData.m_subphaseMask & SUBPHASE_PORTAL) == 0)
-                FillInitialWorldStateData(data, count, WORLD_STATE_QUEL_DANAS_PORTAL, m_sunsReachData.GetSubPhasePercentage(SUBPHASE_PORTAL));
+                data << WORLD_STATE_QUEL_DANAS_PORTAL << m_sunsReachData.GetSubPhasePercentage(SUBPHASE_PORTAL);
             break;
         }
     }
