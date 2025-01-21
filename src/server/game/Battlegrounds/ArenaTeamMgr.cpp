@@ -125,6 +125,27 @@ void ArenaTeamMgr::RemoveArenaTeam(uint32 arenaTeamId)
     ArenaTeamStore.erase(arenaTeamId);
 }
 
+void ArenaTeamMgr::DeleteAllArenaTeams()
+{
+    for (auto const& [id, team] : ArenaTeamStore)
+    {
+        while (team->GetMembersSize() > 0)
+            team->DelMember(team->GetMembers().front().Guid, false);
+
+        delete team;
+    }
+
+    ArenaTeamStore.clear();
+
+    CharacterDatabaseTransaction trans = CharacterDatabase.BeginTransaction();
+    trans->Append("DELETE FROM arena_team_member");
+    trans->Append("DELETE FROM arena_team");
+    trans->Append("DELETE FROM character_arena_stats");
+    CharacterDatabase.CommitTransaction(trans);
+
+    NextArenaTeamId = 1;
+}
+
 uint32 ArenaTeamMgr::GenerateArenaTeamId()
 {
     if (NextArenaTeamId >= MAX_ARENA_TEAM_ID)
