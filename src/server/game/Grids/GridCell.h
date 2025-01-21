@@ -15,11 +15,11 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef ACORE_GRID_H
-#define ACORE_GRID_H
+#ifndef ACORE_GRID_CELL_H
+#define ACORE_GRID_CELL_H
 
 /*
-  @class Grid
+  @class GridCell
   Grid is a logical segment of the game world represented inside TrinIty.
   Grid is bind at compile time to a particular type of object which
   we call it the object of interested.  There are many types of loader,
@@ -33,24 +33,15 @@
 #include "TypeContainer.h"
 #include "TypeContainerVisitor.h"
 
-// forward declaration
-template<class A, class T, class O> class GridLoader;
-
 template
 <
-    class ACTIVE_OBJECT,
     class WORLD_OBJECT_TYPES,
     class GRID_OBJECT_TYPES
-    >
-class Grid
+>
+class GridCell
 {
-    // allows the GridLoader to access its internals
-    template<class A, class T, class O> friend class GridLoader;
 public:
-    /** destructor to clean up its resources. This includes unloading the
-    grid if it has not been unload.
-    */
-    ~Grid() = default;
+    ~GridCell() = default;
 
     template<class SPECIFIC_OBJECT> void AddWorldObject(SPECIFIC_OBJECT* obj)
     {

@@ -15,7 +15,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "ObjectGridLoader.h"
+#include "GridObjectLoader.h"
 #include "CellImpl.h"
 #include "Corpse.h"
 #include "Creature.h"
@@ -25,7 +25,7 @@
 #include "Transport.h"
 
 template <class T>
-void ObjectGridLoader::AddObjectHelper(Map* map, T* obj)
+void GridObjectLoader::AddObjectHelper(Map* map, T* obj)
 {
     CellCoord cellCoord = Acore::ComputeCellCoord(obj->GetPositionX(), obj->GetPositionY());
     Cell cell(cellCoord);
@@ -36,7 +36,7 @@ void ObjectGridLoader::AddObjectHelper(Map* map, T* obj)
         map->AddToActive(obj);
 }
 
-void ObjectGridLoader::LoadCreatures(CellGuidSet const& guid_set, Map* map)
+void GridObjectLoader::LoadCreatures(CellGuidSet const& guid_set, Map* map)
 {
     for (CellGuidSet::const_iterator i_guid = guid_set.begin(); i_guid != guid_set.end(); ++i_guid)
     {
@@ -62,7 +62,7 @@ void ObjectGridLoader::LoadCreatures(CellGuidSet const& guid_set, Map* map)
     }
 }
 
-void ObjectGridLoader::LoadGameObjects(CellGuidSet const& guid_set, Map* map)
+void GridObjectLoader::LoadGameObjects(CellGuidSet const& guid_set, Map* map)
 {
     for (CellGuidSet::const_iterator i_guid = guid_set.begin(); i_guid != guid_set.end(); ++i_guid)
     {
@@ -80,13 +80,13 @@ void ObjectGridLoader::LoadGameObjects(CellGuidSet const& guid_set, Map* map)
     }
 }
 
-void ObjectGridLoader::LoadAllCellsInGrid()
+void GridObjectLoader::LoadAllCellsInGrid()
 {
-    CellObjectGuids const& cell_guids = sObjectMgr->GetGridObjectGuids(i_map->GetId(), i_map->GetSpawnMode(), i_grid.GetGridId());
-    LoadGameObjects(cell_guids.gameobjects, i_map);
-    LoadCreatures(cell_guids.creatures, i_map);
+    CellObjectGuids const& cell_guids = sObjectMgr->GetGridObjectGuids(_map->GetId(), _map->GetSpawnMode(), _grid.GetId());
+    LoadGameObjects(cell_guids.gameobjects, _map);
+    LoadCreatures(cell_guids.creatures, _map);
 
-    if (std::unordered_set<Corpse*> const* corpses = i_map->GetCorpsesInCell(i_grid.GetGridId()))
+    if (std::unordered_set<Corpse*> const* corpses = _map->GetCorpsesInCell(_grid.GetId()))
     {
         for (Corpse* corpse : *corpses)
         {
@@ -97,15 +97,15 @@ void ObjectGridLoader::LoadAllCellsInGrid()
             Cell cell(cellCoord);
 
             if (corpse->IsWorldObject())
-                i_grid.AddWorldObject(cell.CellX(), cell.CellY(), corpse);
+                _grid.AddWorldObject(cell.CellX(), cell.CellY(), corpse);
             else
-                i_grid.AddGridObject(cell.CellX(), cell.CellY(), corpse);
+                _grid.AddGridObject(cell.CellX(), cell.CellY(), corpse);
         }
     }
 }
 
 template<class T>
-void ObjectGridUnloader::Visit(GridRefMgr<T>& m)
+void GridObjectUnloader::Visit(GridRefMgr<T>& m)
 {
     while (!m.IsEmpty())
     {
@@ -124,17 +124,17 @@ void ObjectGridUnloader::Visit(GridRefMgr<T>& m)
 }
 
 template<class T>
-void ObjectGridCleaner::Visit(GridRefMgr<T>& m)
+void GridObjectCleaner::Visit(GridRefMgr<T>& m)
 {
     for (typename GridRefMgr<T>::iterator iter = m.begin(); iter != m.end(); ++iter)
         iter->GetSource()->CleanupsBeforeDelete();
 }
 
-template void ObjectGridUnloader::Visit(CreatureMapType&);
-template void ObjectGridUnloader::Visit(GameObjectMapType&);
-template void ObjectGridUnloader::Visit(DynamicObjectMapType&);
+template void GridObjectUnloader::Visit(CreatureMapType&);
+template void GridObjectUnloader::Visit(GameObjectMapType&);
+template void GridObjectUnloader::Visit(DynamicObjectMapType&);
 
-template void ObjectGridCleaner::Visit(CreatureMapType&);
-template void ObjectGridCleaner::Visit<GameObject>(GameObjectMapType&);
-template void ObjectGridCleaner::Visit<DynamicObject>(DynamicObjectMapType&);
-template void ObjectGridCleaner::Visit<Corpse>(CorpseMapType&);
+template void GridObjectCleaner::Visit(CreatureMapType&);
+template void GridObjectCleaner::Visit<GameObject>(GameObjectMapType&);
+template void GridObjectCleaner::Visit<DynamicObject>(DynamicObjectMapType&);
+template void GridObjectCleaner::Visit<Corpse>(CorpseMapType&);

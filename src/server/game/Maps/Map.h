@@ -26,6 +26,7 @@
 #include "GameObjectModel.h"
 #include "GridDefines.h"
 #include "GridRefMgr.h"
+#include "MapGridManager.h"
 #include "MapRefMgr.h"
 #include "ObjectDefines.h"
 #include "ObjectGuid.h"
@@ -151,10 +152,10 @@ enum EncounterCreditType : uint8
     ENCOUNTER_CREDIT_CAST_SPELL     = 1,
 };
 
-class Map : public GridRefMgr<NGridType>
+class Map : public GridRefMgr<MapGridType>
 {
     friend class MapReference;
-    friend class ObjectGridLoader;
+    friend class GridObjectLoader;
 public:
     Map(uint32 id, uint32 InstanceId, uint8 SpawnMode, Map* _parent = nullptr);
     ~Map() override;
@@ -203,21 +204,25 @@ public:
 
     template<class T, class CONTAINER> void Visit(const Cell& cell, TypeContainerVisitor<T, CONTAINER>& visitor);
 
-    [[nodiscard]] bool IsRemovalGrid(float x, float y) const
-    {
-        GridCoord p = Acore::ComputeGridCoord(x, y);
-        return !getNGrid(p.x_coord, p.y_coord);
-    }
-
-    [[nodiscard]] bool IsGridLoaded(float x, float y) const
+    bool IsGridLoaded(GridCoord const& gridCoord) const;
+    bool IsGridLoaded(float x, float y) const
     {
         return IsGridLoaded(Acore::ComputeGridCoord(x, y));
+    }
+    bool IsGridCreated(GridCoord const& gridCoord) const;
+    bool IsGridCreated(float x, float y) const
+    {
+        return IsGridCreated(Acore::ComputeGridCoord(x, y));
     }
 
     void LoadGrid(float x, float y);
     void LoadAllCells();
-    bool UnloadGrid(NGridType& ngrid);
+    bool UnloadGrid(MapGridType& grid);
     virtual void UnloadAll();
+
+    std::shared_ptr<GridTerrainData> GetGridTerrainDataSharedPtr(GridCoord const& gridCoord);
+    GridTerrainData* GetGridTerrainData(GridCoord const& gridCoord);
+    GridTerrainData* GetGridTerrainData(float x, float y);
 
     [[nodiscard]] uint32 GetId() const { return i_mapEntry->MapID; }
 
@@ -469,8 +474,7 @@ public:
     // Do whatever you want to all the players in map [including GameMasters], i.e.: param exec = [&](Player* p) { p->Whatever(); }
     void DoForAllPlayers(std::function<void(Player*)> exec);
 
-    GridTerrainData* GetGridTerrainData(float x, float y);
-    void EnsureGridCreated(const GridCoord&);
+    void EnsureGridCreated(GridCoord const& gridCoord);
     [[nodiscard]] bool AllTransportsEmpty() const; // pussywizard
     void AllTransportsRemovePassengers(); // pussywizard
     [[nodiscard]] TransportsContainer const& GetAllTransports() const { return _transports; }
@@ -502,12 +506,6 @@ public:
     virtual std::string GetDebugInfo() const;
 
 private:
-    void LoadMapAndVMap(int gx, int gy);
-    void LoadVMap(int gx, int gy);
-    void LoadMap(int gx, int gy, bool reload = false);
-
-    // Load MMap Data
-    void LoadMMap(int gx, int gy);
 
     template<class T> void InitializeObject(T* obj);
     void AddCreatureToMoveList(Creature* c);
@@ -521,25 +519,10 @@ private:
     std::vector<GameObject*> _gameObjectsToMove;
     std::vector<DynamicObject*> _dynamicObjectsToMove;
 
-    [[nodiscard]] bool IsGridLoaded(const GridCoord&) const;
-    void EnsureGridCreated_i(const GridCoord&);
+    bool EnsureGridLoaded(Cell const& cell);
+    MapGridType* GetMapGrid(uint16 const x, uint16 const y);
 
-    void buildNGridLinkage(NGridType* pNGridType) { pNGridType->link(this); }
-
-    [[nodiscard]] NGridType* getNGrid(uint32 x, uint32 y) const
-    {
-        ASSERT(x < MAX_NUMBER_OF_GRIDS && y < MAX_NUMBER_OF_GRIDS);
-        return i_grids[x][y];
-    }
-
-    bool EnsureGridLoaded(Cell const&);
-    [[nodiscard]] bool isGridObjectDataLoaded(uint32 x, uint32 y) const { return getNGrid(x, y)->isGridObjectDataLoaded(); }
-    void setGridObjectDataLoaded(bool pLoaded, uint32 x, uint32 y) { getNGrid(x, y)->setGridObjectDataLoaded(pLoaded); }
-
-    void setNGrid(NGridType* grid, uint32 x, uint32 y);
     void ScriptsProcess();
-
-    void UpdateActiveCells(const float& x, const float& y, const uint32 t_diff);
 
     void SendObjectUpdates();
 
@@ -549,9 +532,9 @@ protected:
     void AddToGrid(T* object, Cell const& cell);
 
     std::mutex Lock;
-    std::mutex GridLock;
     std::shared_mutex MMapLock;
 
+    MapGridManager _mapGridManager;
     MapEntry const* i_mapEntry;
     uint8 i_spawnMode;
     uint32 i_InstanceId;
@@ -585,10 +568,8 @@ private:
     //InstanceMaps and BattlegroundMaps...
     Map* m_parentMap;
 
-    NGridType* i_grids[MAX_NUMBER_OF_GRIDS][MAX_NUMBER_OF_GRIDS];
-    GridTerrainData* _gridTerrainData[MAX_NUMBER_OF_GRIDS][MAX_NUMBER_OF_GRIDS];
-    std::bitset<TOTAL_NUMBER_OF_CELLS_PER_MAP* TOTAL_NUMBER_OF_CELLS_PER_MAP> marked_cells;
-    std::bitset<TOTAL_NUMBER_OF_CELLS_PER_MAP* TOTAL_NUMBER_OF_CELLS_PER_MAP> marked_cells_large;
+    std::bitset<TOTAL_NUMBER_OF_CELLS_PER_MAP * TOTAL_NUMBER_OF_CELLS_PER_MAP> marked_cells;
+    std::bitset<TOTAL_NUMBER_OF_CELLS_PER_MAP * TOTAL_NUMBER_OF_CELLS_PER_MAP> marked_cells_large;
 
     bool i_scriptLock;
     std::unordered_set<WorldObject*> i_objectsToRemove;
@@ -723,7 +704,7 @@ inline void Map::Visit(Cell const& cell, TypeContainerVisitor<T, CONTAINER>& vis
     if (!cell.NoCreate() || IsGridLoaded(GridCoord(x, y)))
     {
         EnsureGridLoaded(cell);
-        getNGrid(x, y)->VisitGrid(cell_x, cell_y, visitor);
+        GetMapGrid(x, y)->VisitCell(cell_x, cell_y, visitor);
     }
 }
 

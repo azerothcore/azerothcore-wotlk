@@ -28,13 +28,13 @@
 #include "InstanceScript.h"
 #include "IVMapMgr.h"
 #include "LFGMgr.h"
+#include "MapGrid.h"
 #include "MapInstanced.h"
 #include "Metric.h"
 #include "MiscPackets.h"
 #include "MMapFactory.h"
 #include "Object.h"
 #include "ObjectAccessor.h"
-#include "ObjectGridLoader.h"
 #include "ObjectMgr.h"
 #include "Pet.h"
 #include "ScriptMgr.h"
@@ -128,114 +128,13 @@ bool Map::ExistVMap(uint32 mapid, int gx, int gy)
     return true;
 }
 
-void Map::LoadMMap(int gx, int gy)
-{
-    if (!DisableMgr::IsPathfindingEnabled(this)) // pussywizard
-        return;
-
-    int mmapLoadResult = MMAP::MMapFactory::createOrGetMMapMgr()->loadMap(GetId(), gx, gy);
-    switch (mmapLoadResult)
-    {
-        case MMAP::MMAP_LOAD_RESULT_OK:
-            LOG_DEBUG("maps", "MMAP loaded name:{}, id:{}, x:{}, y:{} (vmap rep.: x:{}, y:{})", GetMapName(), GetId(), gx, gy, gx, gy);
-            break;
-        case MMAP::MMAP_LOAD_RESULT_ERROR:
-            LOG_DEBUG("maps", "Could not load MMAP name:{}, id:{}, x:{}, y:{} (vmap rep.: x:{}, y:{})", GetMapName(), GetId(), gx, gy, gx, gy);
-            break;
-        case MMAP::MMAP_LOAD_RESULT_IGNORED:
-            LOG_DEBUG("maps", "Ignored MMAP name:{}, id:{}, x:{}, y:{} (vmap rep.: x:{}, y:{})", GetMapName(), GetId(), gx, gy, gx, gy);
-            break;
-    }
-}
-
-void Map::LoadVMap(int gx, int gy)
-{
-    // x and y are swapped !!
-    int vmapLoadResult = VMAP::VMapFactory::createOrGetVMapMgr()->loadMap((sWorld->GetDataPath() + "vmaps").c_str(), GetId(), gx, gy);
-    switch (vmapLoadResult)
-    {
-        case VMAP::VMAP_LOAD_RESULT_OK:
-            LOG_DEBUG("maps", "VMAP loaded name:{}, id:{}, x:{}, y:{} (vmap rep.: x:{}, y:{})", GetMapName(), GetId(), gx, gy, gx, gy);
-            break;
-        case VMAP::VMAP_LOAD_RESULT_ERROR:
-            LOG_DEBUG("maps", "Could not load VMAP name:{}, id:{}, x:{}, y:{} (vmap rep.: x:{}, y:{})", GetMapName(), GetId(), gx, gy, gx, gy);
-            break;
-        case VMAP::VMAP_LOAD_RESULT_IGNORED:
-            LOG_DEBUG("maps", "Ignored VMAP name:{}, id:{}, x:{}, y:{} (vmap rep.: x:{}, y:{})", GetMapName(), GetId(), gx, gy, gx, gy);
-            break;
-    }
-}
-
-void Map::LoadMap(int gx, int gy, bool reload)
-{
-    if (i_InstanceId != 0)
-    {
-        if (_gridTerrainData[gx][gy])
-            return;
-
-        // load grid map for base map
-        m_parentMap->EnsureGridCreated(GridCoord(63 - gx, 63 - gy));
-
-        _gridTerrainData[gx][gy] = m_parentMap->_gridTerrainData[gx][gy];
-        return;
-    }
-
-    if (_gridTerrainData[gx][gy] && !reload)
-        return;
-
-    //map already load, delete it before reloading (Is it necessary? Do we really need the ability the reload maps during runtime?)
-    if (_gridTerrainData[gx][gy])
-    {
-        LOG_DEBUG("maps", "Unloading previously loaded map {} before reloading.", GetId());
-        sScriptMgr->OnUnloadGridMap(this, _gridTerrainData[gx][gy], gx, gy);
-
-        delete (_gridTerrainData[gx][gy]);
-        _gridTerrainData[gx][gy] = nullptr;
-    }
-
-    // map file name
-    char* tmp = nullptr;
-    int len = sWorld->GetDataPath().length() + strlen("maps/%03u%02u%02u.map") + 1;
-    tmp = new char[len];
-    snprintf(tmp, len, (char*)(sWorld->GetDataPath() + "maps/%03u%02u%02u.map").c_str(), GetId(), gx, gy);
-    LOG_DEBUG("maps", "Loading map {}", tmp);
-    // loading data
-    _gridTerrainData[gx][gy] = new GridTerrainData();
-    if (!_gridTerrainData[gx][gy]->loadData(tmp))
-    {
-        LOG_ERROR("maps", "Error loading map file: \n {}\n", tmp);
-    }
-    delete [] tmp;
-
-    sScriptMgr->OnLoadGridMap(this, _gridTerrainData[gx][gy], gx, gy);
-}
-
-void Map::LoadMapAndVMap(int gx, int gy)
-{
-    LoadMap(gx, gy);
-    if (i_InstanceId == 0)
-    {
-        LoadVMap(gx, gy);                                   // Only load the data for the base map
-        LoadMMap(gx, gy);
-    }
-}
-
 Map::Map(uint32 id, uint32 InstanceId, uint8 SpawnMode, Map* _parent) :
-    i_mapEntry(sMapStore.LookupEntry(id)), i_spawnMode(SpawnMode), i_InstanceId(InstanceId),
+    _mapGridManager(this), i_mapEntry(sMapStore.LookupEntry(id)), i_spawnMode(SpawnMode), i_InstanceId(InstanceId),
     m_unloadTimer(0), m_VisibleDistance(DEFAULT_VISIBILITY_DISTANCE),
     _instanceResetPeriod(0), m_activeNonPlayersIter(m_activeNonPlayers.end()),
     _transportsUpdateIter(_transports.end()), i_scriptLock(false), _defaultLight(GetDefaultMapLight(id))
 {
     m_parentMap = (_parent ? _parent : this);
-    for (unsigned int idx = 0; idx < MAX_NUMBER_OF_GRIDS; ++idx)
-    {
-        for (unsigned int j = 0; j < MAX_NUMBER_OF_GRIDS; ++j)
-        {
-            //z code
-            _gridTerrainData[idx][j] = nullptr;
-            setNGrid(nullptr, idx, j);
-        }
-    }
 
     //lets initialize visibility distance for map
     Map::InitVisibilityDistance();
@@ -263,7 +162,7 @@ void Map::InitVisibilityDistance()
 template<class T>
 void Map::AddToGrid(T* obj, Cell const& cell)
 {
-    NGridType* grid = getNGrid(cell.GridX(), cell.GridY());
+    MapGridType* grid = GetMapGrid(cell.GridX(), cell.GridY());
     if (obj->IsWorldObject())
         grid->AddWorldObject<T>(cell.CellX(), cell.CellY(), obj);
     else
@@ -273,7 +172,7 @@ void Map::AddToGrid(T* obj, Cell const& cell)
 template<>
 void Map::AddToGrid(Creature* obj, Cell const& cell)
 {
-    NGridType* grid = getNGrid(cell.GridX(), cell.GridY());
+    MapGridType* grid = GetMapGrid(cell.GridX(), cell.GridY());
     if (obj->IsWorldObject())
         grid->AddWorldObject(cell.CellX(), cell.CellY(), obj);
     else
@@ -285,7 +184,7 @@ void Map::AddToGrid(Creature* obj, Cell const& cell)
 template<>
 void Map::AddToGrid(GameObject* obj, Cell const& cell)
 {
-    NGridType* grid = getNGrid(cell.GridX(), cell.GridY());
+    MapGridType* grid = GetMapGrid(cell.GridX(), cell.GridY());
     grid->AddGridObject(cell.CellX(), cell.CellY(), obj);
 
     obj->SetCurrentCell(cell);
@@ -294,7 +193,7 @@ void Map::AddToGrid(GameObject* obj, Cell const& cell)
 template<>
 void Map::AddToGrid(DynamicObject* obj, Cell const& cell)
 {
-    NGridType* grid = getNGrid(cell.GridX(), cell.GridY());
+    MapGridType* grid = GetMapGrid(cell.GridX(), cell.GridY());
     if (obj->IsWorldObject())
         grid->AddWorldObject(cell.CellX(), cell.CellY(), obj);
     else
@@ -306,14 +205,14 @@ void Map::AddToGrid(DynamicObject* obj, Cell const& cell)
 template<>
 void Map::AddToGrid(Corpse* obj, Cell const& cell)
 {
-    NGridType* grid = getNGrid(cell.GridX(), cell.GridY());
+    MapGridType* grid = GetMapGrid(cell.GridX(), cell.GridY());
     // Corpses are a special object type - they can be added to grid via a call to AddToMap
     // or loaded through ObjectGridLoader.
     // Both corpses loaded from database and these freshly generated by Player::CreateCoprse are added to _corpsesByCell
     // ObjectGridLoader loads all corpses from _corpsesByCell even if they were already added to grid before it was loaded
     // so we need to explicitly check it here (Map::AddToGrid is only called from Player::BuildPlayerRepop, not from ObjectGridLoader)
     // to avoid failing an assertion in GridObject::AddToGrid
-    if (grid->isGridObjectDataLoaded())
+    if (grid->IsObjectDataLoaded())
     {
         if (obj->IsWorldObject())
             grid->AddWorldObject(cell.CellX(), cell.CellY(), obj);
@@ -344,19 +243,19 @@ void Map::SwitchGridContainers(Creature* obj, bool on)
         return;
 
     LOG_DEBUG("maps", "Switch object {} from grid[{}, {}] {}", obj->GetGUID().ToString(), cell.GridX(), cell.GridY(), on);
-    NGridType* ngrid = getNGrid(cell.GridX(), cell.GridY());
-    ASSERT(ngrid);
+    MapGridType* grid = GetMapGrid(cell.GridX(), cell.GridY());
+    ASSERT(grid);
 
     obj->RemoveFromGrid(); //This step is not really necessary but we want to do ASSERT in remove/add
 
     if (on)
     {
-        ngrid->AddWorldObject(cell.CellX(), cell.CellY(), obj);
+        grid->AddWorldObject(cell.CellX(), cell.CellY(), obj);
         AddWorldObject(obj);
     }
     else
     {
-        ngrid->AddGridObject(cell.CellX(), cell.CellY(), obj);
+        grid->AddGridObject(cell.CellX(), cell.CellY(), obj);
         RemoveWorldObject(obj);
     }
 
@@ -380,19 +279,19 @@ void Map::SwitchGridContainers(GameObject* obj, bool on)
         return;
 
     //LOG_DEBUG(LOG_FILTER_MAPS, "Switch object {} from grid[{}, {}] {}", obj->GetGUID().ToString(), cell.data.Part.grid_x, cell.data.Part.grid_y, on);
-    NGridType* ngrid = getNGrid(cell.GridX(), cell.GridY());
-    ASSERT(ngrid);
+    MapGridType* grid = GetMapGrid(cell.GridX(), cell.GridY());
+    ASSERT(grid);
 
     obj->RemoveFromGrid(); //This step is not really necessary but we want to do ASSERT in remove/add
 
     if (on)
     {
-        ngrid->AddWorldObject(cell.CellX(), cell.CellY(), obj);
+        grid->AddWorldObject(cell.CellX(), cell.CellY(), obj);
         AddWorldObject(obj);
     }
     else
     {
-        ngrid->AddGridObject(cell.CellX(), cell.CellY(), obj);
+        grid->AddGridObject(cell.CellX(), cell.CellY(), obj);
         RemoveWorldObject(obj);
     }
 }
@@ -413,61 +312,37 @@ void Map::DeleteFromWorld(Player* player)
     delete player;
 }
 
-void Map::EnsureGridCreated(const GridCoord& p)
+void Map::EnsureGridCreated(GridCoord const& gridCoord)
 {
-    if (getNGrid(p.x_coord, p.y_coord)) // pussywizard
-        return;
-    std::lock_guard<std::mutex> guard(GridLock);
-    EnsureGridCreated_i(p);
+    _mapGridManager.CreateGrid(gridCoord.x_coord, gridCoord.y_coord);
 }
 
-//Create NGrid so the object can be added to it
-//But object data is not loaded here
-void Map::EnsureGridCreated_i(const GridCoord& p)
-{
-    if (!getNGrid(p.x_coord, p.y_coord))
-    {
-        // pussywizard: moved setNGrid to the end of the function
-        NGridType* ngt = new NGridType(p.y_coord * MAX_NUMBER_OF_GRIDS + p.x_coord, p.x_coord, p.y_coord);
-
-        // build a linkage between this map and NGridType
-        buildNGridLinkage(ngt); // pussywizard: getNGrid(x, y) changed to: ngt
-
-        //z coord
-        int gx = (MAX_NUMBER_OF_GRIDS - 1) - p.x_coord;
-        int gy = (MAX_NUMBER_OF_GRIDS - 1) - p.y_coord;
-
-        if (!_gridTerrainData[gx][gy])
-        {
-            LoadMapAndVMap(gx, gy);
-        }
-
-        // pussywizard: moved here
-        setNGrid(ngt, p.x_coord, p.y_coord);
-    }
-}
-
-//Create NGrid and load the object data in it
-bool Map::EnsureGridLoaded(const Cell& cell)
+bool Map::EnsureGridLoaded(Cell const& cell)
 {
     EnsureGridCreated(GridCoord(cell.GridX(), cell.GridY()));
-    NGridType* grid = getNGrid(cell.GridX(), cell.GridY());
 
-    ASSERT(grid);
-    if (!isGridObjectDataLoaded(cell.GridX(), cell.GridY()))
+    if (_mapGridManager.LoadGrid(cell.GridX(), cell.GridY()))
     {
-        LOG_DEBUG("maps", "Loading grid[{}, {}] for map {} instance {}", cell.GridX(), cell.GridY(), GetId(), i_InstanceId);
-
-        setGridObjectDataLoaded(true, cell.GridX(), cell.GridY());
-
-        ObjectGridLoader loader(*grid, this);
-        loader.LoadAllCellsInGrid();
-
         Balance();
         return true;
     }
 
     return false;
+}
+
+MapGridType* Map::GetMapGrid(uint16 const x, uint16 const y)
+{
+    return _mapGridManager.GetGrid(x, y);
+}
+
+bool Map::IsGridLoaded(GridCoord const& gridCoord) const
+{
+    return _mapGridManager.IsGridLoaded(gridCoord.x_coord, gridCoord.y_coord);
+}
+
+bool Map::IsGridCreated(GridCoord const& gridCoord) const
+{
+    return _mapGridManager.IsGridCreated(gridCoord.x_coord, gridCoord.y_coord);
 }
 
 void Map::LoadGrid(float x, float y)
@@ -632,11 +507,6 @@ bool Map::AddToMap(MotionTransport* obj, bool /*checkTransport*/)
     }
 
     return true;
-}
-
-bool Map::IsGridLoaded(const GridCoord& p) const
-{
-    return (getNGrid(p.x_coord, p.y_coord) && isGridObjectDataLoaded(p.x_coord, p.y_coord));
 }
 
 void Map::VisitNearbyCellsOfPlayer(Player* player, TypeContainerVisitor<Acore::ObjectUpdater, GridTypeMapContainer>& gridVisitor,
@@ -1189,50 +1059,12 @@ void Map::MoveAllDynamicObjectsInMoveList()
     _dynamicObjectsToMove.clear();
 }
 
-bool Map::UnloadGrid(NGridType& ngrid)
+bool Map::UnloadGrid(MapGridType& grid)
 {
-    // pussywizard: UnloadGrid only done when whole map is unloaded, no need to worry about moving npcs between grids, etc.
-
-    const uint32 x = ngrid.getX();
-    const uint32 y = ngrid.getY();
-
-    {
-        ObjectGridCleaner worker;
-        TypeContainerVisitor<ObjectGridCleaner, GridTypeMapContainer> visitor(worker);
-        ngrid.VisitAllGrids(visitor);
-    }
-
-    RemoveAllObjectsInRemoveList();
-
-    {
-        ObjectGridUnloader worker;
-        TypeContainerVisitor<ObjectGridUnloader, GridTypeMapContainer> visitor(worker);
-        ngrid.VisitAllGrids(visitor);
-    }
+    _mapGridManager.UnloadGrid(grid.GetX(), grid.GetY());
 
     ASSERT(i_objectsToRemove.empty());
-
-    delete &ngrid;
-    setNGrid(nullptr, x, y);
-
-    int gx = (MAX_NUMBER_OF_GRIDS - 1) - x;
-    int gy = (MAX_NUMBER_OF_GRIDS - 1) - y;
-
-    if (i_InstanceId == 0)
-    {
-        if (_gridTerrainData[gx][gy])
-        {
-            _gridTerrainData[gx][gy]->unloadData();
-            delete _gridTerrainData[gx][gy];
-        }
-        // x and y are swapped
-        VMAP::VMapFactory::createOrGetVMapMgr()->unloadMap(GetId(), gx, gy);
-        MMAP::MMapFactory::createOrGetMMapMgr()->unloadMap(GetId(), gx, gy);
-    }
-
-    _gridTerrainData[gx][gy] = nullptr;
-
-    LOG_DEBUG("maps", "Unloading grid[{}, {}] for map {} finished", x, y, GetId());
+    LOG_DEBUG("maps", "Unloading grid[{}, {}] for map {} finished", grid.GetX(), grid.GetY(), GetId());
     return true;
 }
 
@@ -1259,9 +1091,9 @@ void Map::UnloadAll()
     _creaturesToMove.clear();
     _gameObjectsToMove.clear();
 
-    for (GridRefMgr<NGridType>::iterator i = GridRefMgr<NGridType>::begin(); i != GridRefMgr<NGridType>::end();)
+    for (GridRefMgr<MapGridType>::iterator i = GridRefMgr<MapGridType>::begin(); i != GridRefMgr<MapGridType>::end();)
     {
-        NGridType& grid(*i->GetSource());
+        MapGridType& grid(*i->GetSource());
         ++i;
         UnloadGrid(grid); // deletes the grid and removes it from the GridRefMgr
     }
@@ -1296,16 +1128,27 @@ void Map::UnloadAll()
     _corpseBones.clear();
 }
 
+std::shared_ptr<GridTerrainData> Map::GetGridTerrainDataSharedPtr(GridCoord const& gridCoord)
+{
+    // ensure GridMap is created
+    EnsureGridCreated(gridCoord);
+    return _mapGridManager.GetGrid(gridCoord.x_coord, gridCoord.y_coord)->GetTerrainDataSharedPtr();
+}
+
+GridTerrainData* Map::GetGridTerrainData(GridCoord const& gridCoord)
+{
+    if (!MapGridManager::IsValidGridCoordinates(gridCoord.x_coord, gridCoord.y_coord))
+        return nullptr;
+
+    // ensure GridMap is created
+    EnsureGridCreated(gridCoord);
+    return _mapGridManager.GetGrid(gridCoord.x_coord, gridCoord.y_coord)->GetTerrainData();
+}
+
 GridTerrainData* Map::GetGridTerrainData(float x, float y)
 {
-    // half opt method
-    int gx = (int)(32 - x / SIZE_OF_GRIDS);                 //grid x
-    int gy = (int)(32 - y / SIZE_OF_GRIDS);                 //grid y
-
-    // ensure GridMap is loaded
-    EnsureGridCreated(GridCoord(63 - gx, 63 - gy));
-
-    return _gridTerrainData[gx][gy];
+    GridCoord const gridCoord = Acore::ComputeGridCoord(x, y);
+    return GetGridTerrainData(gridCoord);
 }
 
 float Map::GetWaterOrGroundLevel(uint32 phasemask, float x, float y, float z, float* ground /*= nullptr*/, bool /*swim = false*/, float collisionHeight) const
@@ -1919,16 +1762,6 @@ void Map::SendRemoveTransports(Player* player)
     WorldPacket packet;
     transData.BuildPacket(packet);
     player->GetSession()->SendPacket(&packet);
-}
-
-inline void Map::setNGrid(NGridType* grid, uint32 x, uint32 y)
-{
-    if (x >= MAX_NUMBER_OF_GRIDS || y >= MAX_NUMBER_OF_GRIDS)
-    {
-        LOG_ERROR("maps", "map::setNGrid() Invalid grid coordinates found: {}, {}!", x, y);
-        ABORT();
-    }
-    i_grids[x][y] = grid;
 }
 
 void Map::SendObjectUpdates()
@@ -2968,7 +2801,7 @@ Corpse* Map::ConvertCorpseToBones(ObjectGuid const ownerGuid, bool insignia /*= 
     // ignore bones creating option in case insignia
     if ((insignia ||
         (IsBattlegroundOrArena() ? sWorld->getBoolConfig(CONFIG_DEATH_BONES_BG_OR_ARENA) : sWorld->getBoolConfig(CONFIG_DEATH_BONES_WORLD))) &&
-        !IsRemovalGrid(corpse->GetPositionX(), corpse->GetPositionY()))
+        !IsGridCreated(corpse->GetPositionX(), corpse->GetPositionY()))
     {
         // Create bones, don't change Corpse
         bones = new Corpse();

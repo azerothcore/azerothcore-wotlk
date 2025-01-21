@@ -20,7 +20,8 @@
 
 #include "Common.h"
 #include "MapDefines.h"
-#include "NGrid.h"
+#include "GridCell.h"
+#include "MapGrid.h"
 
 // Forward class definitions
 class Corpse;
@@ -30,8 +31,6 @@ class GameObject;
 class Pet;
 class Player;
 class ObjectGuid;
-
-#define MAX_NUMBER_OF_CELLS     8
 
 #define CENTER_GRID_ID          (MAX_NUMBER_OF_GRIDS/2)
 
@@ -73,8 +72,8 @@ enum GridMapTypeMask
     GRID_MAP_TYPE_MASK_ALL              = 0x1F
 };
 
-typedef Grid<Player, AllWorldObjectTypes, AllGridObjectTypes> GridType;
-typedef NGrid<MAX_NUMBER_OF_CELLS, Player, AllWorldObjectTypes, AllGridObjectTypes> NGridType;
+typedef GridCell<AllWorldObjectTypes, AllGridObjectTypes> GridCellType;
+typedef MapGrid<AllWorldObjectTypes, AllGridObjectTypes> MapGridType;
 
 typedef TypeMapContainer<AllGridObjectTypes> GridTypeMapContainer;
 typedef TypeMapContainer<AllWorldObjectTypes> WorldTypeMapContainer;
