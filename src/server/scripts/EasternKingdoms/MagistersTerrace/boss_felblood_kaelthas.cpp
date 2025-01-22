@@ -37,13 +37,13 @@ enum Says
 enum Spells
 {
     // Phase 1
-    SPELL_FIREBALL                 = 44189,
     SPELL_FLAMESTRIKE_SUMMON       = 44192,
     SPELL_PHOENIX                  = 44194,
     SPELL_SHOCK_BARRIER            = 46165,
     SPELL_PYROBLAST                = 36819,
 
     // Phase 2
+    SPELL_FIREBALL                 = 44189,
     SPELL_SUMMON_ARCANE_SPHERE     = 44265,
     SPELL_TELEPORT_CENTER          = 44218,
     SPELL_GRAVITY_LAPSE_INITIAL    = 44224,
