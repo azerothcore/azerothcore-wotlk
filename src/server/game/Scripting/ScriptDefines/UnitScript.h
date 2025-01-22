@@ -116,7 +116,7 @@ public:
     virtual void OnUnitEnterEvadeMode(Unit* /*unit*/, uint8 /*evadeReason*/) { }
     virtual void OnUnitEnterCombat(Unit* /*unit*/, Unit* /*victim*/) { }
     virtual void OnUnitDeath(Unit* /*unit*/, Unit* /*killer*/) { }
-    virtual void OnUnitSetShapeshiftForm(Unit* /*unit*/, ShapeshiftForm /*form*/) { }
+    virtual void OnUnitSetShapeshiftForm(Unit* /*unit*/, uint8 /*form*/) { }
 };
 
 #endif
