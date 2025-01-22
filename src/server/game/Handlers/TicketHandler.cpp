@@ -155,7 +155,6 @@ void WorldSession::HandleGMTicketUpdateOpcode(WorldPacket& recv_data)
         sScriptMgr->OnTicketUpdate(GetPlayer(), ticket, message);
     }
 
-
     WorldPacket data(SMSG_GMTICKET_UPDATETEXT, 4);
     data << uint32(response);
     SendPacket(&data);

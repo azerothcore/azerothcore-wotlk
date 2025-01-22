@@ -56,4 +56,3 @@ TicketScript::TicketScript(const char* name, std::vector<uint16> enabledHooks)
 }
 
 template class AC_GAME_API ScriptRegistry<TicketScript>;
-
