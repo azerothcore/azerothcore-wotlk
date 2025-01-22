@@ -2075,6 +2075,7 @@ public:
     void LeftChannel(Channel* c);
     void CleanupChannels();
     void ClearChannelWatch();
+    void UpdateLFGChannel();
     void UpdateLocalChannels(uint32 newZone);
 
     void UpdateDefense();
@@ -2410,7 +2411,7 @@ public:
     void SetAtLoginFlag(AtLoginFlags f) { m_atLoginFlags |= f; }
     void RemoveAtLoginFlag(AtLoginFlags flags, bool persist = false);
 
-    bool isUsingLfg();
+    bool IsUsingLfg();
     bool inRandomLfgDungeon();
 
     typedef std::set<uint32> DFQuestsDoneList;
