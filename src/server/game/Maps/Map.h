@@ -508,6 +508,7 @@ public:
     uint32 GetCreatedGridsCount();
     uint32 GetLoadedGridsCount();
     uint32 GetCreatedCellsInGridCount(uint16 const x, uint16 const y);
+    uint32 GetCreatedCellsInMapCount();
 
 private:
 

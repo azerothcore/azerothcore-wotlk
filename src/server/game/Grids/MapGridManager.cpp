@@ -118,3 +118,17 @@ uint32 MapGridManager::GetCreatedCellsInGridCount(uint16 const x, uint16 const y
 
     return 0;
 }
+
+uint32 MapGridManager::GetCreatedCellsInMapCount()
+{
+    uint32 count = 0;
+    for (uint32 gridX = 0; gridX < MAX_NUMBER_OF_GRIDS; ++gridX)
+    {
+        for (uint32 gridY = 0; gridY < MAX_NUMBER_OF_GRIDS; ++gridY)
+        {
+            if (MapGridType* grid = GetGrid(gridX, gridY))
+                count += grid->GetCreatedCellsCount();
+        }
+    }
+    return count;
+}

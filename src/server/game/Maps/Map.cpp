@@ -3238,6 +3238,11 @@ uint32 Map::GetCreatedCellsInGridCount(uint16 const x, uint16 const y)
     return _mapGridManager.GetCreatedCellsInGridCount(x, y);
 }
 
+uint32 Map::GetCreatedCellsInMapCount()
+{
+    return _mapGridManager.GetCreatedCellsInMapCount();
+}
+
 std::string InstanceMap::GetDebugInfo() const
 {
     std::stringstream sstr;

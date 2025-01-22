@@ -36,11 +36,12 @@ public:
     bool IsGridLoaded(uint16 const x, uint16 const y) const;
     MapGridType* GetGrid(uint16 const x, uint16 const y);
 
-    static const bool IsValidGridCoordinates(uint16 const x, uint16 const y) { return (x < MAX_NUMBER_OF_GRIDS && y < MAX_NUMBER_OF_GRIDS); }
+    static bool IsValidGridCoordinates(uint16 const x, uint16 const y) { return (x < MAX_NUMBER_OF_GRIDS && y < MAX_NUMBER_OF_GRIDS); }
 
     uint32 GetCreatedGridsCount();
     uint32 GetLoadedGridsCount();
     uint32 GetCreatedCellsInGridCount(uint16 const x, uint16 const y);
+    uint32 GetCreatedCellsInMapCount();
 
 private:
     Map* _map;
