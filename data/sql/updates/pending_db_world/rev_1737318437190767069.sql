@@ -691,3 +691,108 @@ INSERT INTO `game_event_npc_vendor` (`eventEntry`, `guid`, `slot`, `item`, `maxc
 (@sunsreachlab, @guidjc, 0, 35769, 0, 0, 0),
 (@sunsreachlab, @guidjc, 0, 37504, 0, 0, 0);
 
+-- Shattered Sun Marksman + Warrior Transform Auras
+-- Marksman Transform Auras
+DELETE FROM `smart_scripts` WHERE (`entryorguid` = 24938) AND (`source_type` = 0) AND (`id` IN (3, 4, 5, 6));
+INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `event_param6`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
+(24938, 0, 3, 0, 11, 0, 100, 0, 0, 0, 0, 0, 0, 0, 88, 2493810, 2493813, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Shattered Sun Marksman - On Respawn - Run Random Script'),
+(24938, 0, 4, 0, 11, 0, 100, 0, 0, 0, 0, 0, 0, 0, 88, 2493820, 2493823, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Shattered Sun Marksman - On Respawn - Run Random Script'),
+(24938, 0, 5, 0, 11, 0, 100, 0, 0, 0, 0, 0, 0, 0, 88, 2493830, 2493833, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Shattered Sun Marksman - On Respawn - Run Random Script'),
+(24938, 0, 6, 0, 11, 0, 100, 0, 0, 0, 0, 0, 0, 0, 88, 2493840, 2493843, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Shattered Sun Marksman - On Respawn - Run Random Script');
+
+DELETE FROM `smart_scripts` WHERE (`source_type` = 9 AND `entryorguid` BETWEEN 2493810 AND 2493813);
+INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `event_param6`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
+(2493810, 9, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 11, 44962, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Shattered Sun Marksman - Actionlist - Cast ''Serverside - Archer - BE Male Transform Tier 1'''),
+(2493811, 9, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 11, 44921, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Shattered Sun Marksman - Actionlist - Cast ''Serverside - Archer - BE Female Transform Tier 1'''),
+(2493812, 9, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 11, 44925, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Shattered Sun Marksman - Actionlist - Cast ''Serverside - Archer - Draenei Male Transform Tier 1'''),
+(2493813, 9, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 11, 44929, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Shattered Sun Marksman - Actionlist - Cast ''Serverside - Archer - Draenei Female Transform Tier 1''');
+
+DELETE FROM `smart_scripts` WHERE (`source_type` = 9 AND `entryorguid` BETWEEN 2493820 AND 2493823);
+INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `event_param6`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
+(2493820, 9, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 11, 44918, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Shattered Sun Marksman - Actionlist - Cast ''Serverside - Archer - BE Male Transform Tier 2'''),
+(2493821, 9, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 11, 44922, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Shattered Sun Marksman - Actionlist - Cast ''Serverside - Archer - BE Female Transform Tier 2'''),
+(2493822, 9, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 11, 44926, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Shattered Sun Marksman - Actionlist - Cast ''Serverside - Archer - Draenei Male Transform Tier 2'''),
+(2493823, 9, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 11, 44930, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Shattered Sun Marksman - Actionlist - Cast ''Serverside - Archer - Draenei Female Transform Tier 2''');
+
+DELETE FROM `smart_scripts` WHERE (`source_type` = 9 AND `entryorguid` BETWEEN 2493830 AND 2493833);
+INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `event_param6`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
+(2493830, 9, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 11, 44919, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Shattered Sun Marksman - Actionlist - Cast ''Serverside - Archer - BE Male Transform Tier 3'''),
+(2493831, 9, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 11, 44923, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Shattered Sun Marksman - Actionlist - Cast ''Serverside - Archer - BE Female Transform Tier 3'''),
+(2493832, 9, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 11, 44927, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Shattered Sun Marksman - Actionlist - Cast ''Serverside - Archer - Draenei Male Transform Tier 3'''),
+(2493833, 9, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 11, 44931, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Shattered Sun Marksman - Actionlist - Cast ''Serverside - Archer - Draenei Female Transform Tier 3''');
+
+DELETE FROM `smart_scripts` WHERE (`source_type` = 9 AND `entryorguid` BETWEEN 2493840 AND 2493843);
+INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `event_param6`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
+(2493840, 9, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 11, 44920, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Shattered Sun Marksman - Actionlist - Cast ''Serverside - Archer - BE Male Transform Tier 4'''),
+(2493841, 9, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 11, 44924, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Shattered Sun Marksman - Actionlist - Cast ''Serverside - Archer - BE Female Transform Tier 4'''),
+(2493842, 9, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 11, 44928, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Shattered Sun Marksman - Actionlist - Cast ''Serverside - Archer - Draenei Male Transform Tier 4'''),
+(2493843, 9, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 11, 44932, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Shattered Sun Marksman - Actionlist - Cast ''Serverside - Archer - Draenei Female Transform Tier 4''');
+
+-- Shattered Sun Warrior Transform Auras
+UPDATE `creature_template` SET `AIName` = 'SmartAI' WHERE `entry` = 25115;
+DELETE FROM `smart_scripts` WHERE (`entryorguid` = 25115) AND (`source_type` = 0);
+INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `event_param6`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
+(25115, 0, 0, 0, 11, 0, 100, 0, 0, 0, 0, 0, 0, 0, 88, 2511510, 2511513, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Shattered Sun Warrior - On Respawn - Run Random Script'),
+(25115, 0, 1, 0, 11, 0, 100, 0, 0, 0, 0, 0, 0, 0, 88, 2511520, 2511523, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Shattered Sun Warrior - On Respawn - Run Random Script'),
+(25115, 0, 2, 0, 11, 0, 100, 0, 0, 0, 0, 0, 0, 0, 88, 2511530, 2511533, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Shattered Sun Warrior - On Respawn - Run Random Script'),
+(25115, 0, 3, 0, 11, 0, 100, 0, 0, 0, 0, 0, 0, 0, 88, 2511540, 2511543, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Shattered Sun Warrior - On Respawn - Run Random Script');
+
+DELETE FROM `smart_scripts` WHERE (`source_type` = 9 AND `entryorguid` BETWEEN 2511510 AND 2511513);
+INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `event_param6`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
+(2511510, 9, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 11, 45159, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Shattered Sun Warrior - Actionlist - Cast ''Serverside - Warrior - BE Male Transform Tier 1'''),
+(2511511, 9, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 11, 45155, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Shattered Sun Warrior - Actionlist - Cast ''Serverside - Warrior - BE Female Transform Tier 1'''),
+(2511512, 9, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 11, 45167, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Shattered Sun Warrior - Actionlist - Cast ''Serverside - Warrior - Draenei Male Transform Tier 1'''),
+(2511513, 9, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 11, 45163, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Shattered Sun Warrior - Actionlist - Cast ''Serverside - Warrior - Draenei Female Transform Tier 1''');
+
+DELETE FROM `smart_scripts` WHERE (`source_type` = 9 AND `entryorguid` BETWEEN 2511520 AND 2511523);
+INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `event_param6`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
+(2511520, 9, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 11, 45160, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Shattered Sun Warrior - Actionlist - Cast ''Serverside - Warrior - BE Male Transform Tier 2'''),
+(2511521, 9, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 11, 45156, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Shattered Sun Warrior - Actionlist - Cast ''Serverside - Warrior - BE Female Transform Tier 2'''),
+(2511522, 9, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 11, 45168, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Shattered Sun Warrior - Actionlist - Cast ''Serverside - Warrior - Draenei Male Transform Tier 2'''),
+(2511523, 9, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 11, 45164, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Shattered Sun Warrior - Actionlist - Cast ''Serverside - Warrior - Draenei Female Transform Tier 2''');
+
+DELETE FROM `smart_scripts` WHERE (`source_type` = 9 AND `entryorguid` BETWEEN 2511530 AND 2511533);
+INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `event_param6`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
+(2511530, 9, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 11, 45161, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Shattered Sun Warrior - Actionlist - Cast ''Serverside - Warrior - BE Male Transform Tier 3'''),
+(2511531, 9, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 11, 45157, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Shattered Sun Warrior - Actionlist - Cast ''Serverside - Warrior - BE Female Transform Tier 3'''),
+(2511532, 9, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 11, 45169, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Shattered Sun Warrior - Actionlist - Cast ''Serverside - Warrior - Draenei Male Transform Tier 3'''),
+(2511533, 9, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 11, 45165, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Shattered Sun Warrior - Actionlist - Cast ''Serverside - Warrior - Draenei Female Transform Tier 3''');
+
+DELETE FROM `smart_scripts` WHERE (`source_type` = 9 AND `entryorguid` BETWEEN 2511540 AND 2511543);
+INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `event_param6`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
+(2511540, 9, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 11, 45162, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Shattered Sun Warrior - Actionlist - Cast ''Serverside - Warrior - BE Male Transform Tier 4'''),
+(2511541, 9, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 11, 45158, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Shattered Sun Warrior - Actionlist - Cast ''Serverside - Warrior - BE Female Transform Tier 4'''),
+(2511542, 9, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 11, 45170, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Shattered Sun Warrior - Actionlist - Cast ''Serverside - Warrior - Draenei Male Transform Tier 4'''),
+(2511543, 9, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 11, 45166, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Shattered Sun Warrior - Actionlist - Cast ''Serverside - Warrior - Draenei Female Transform Tier 4''');
+
+-- Marksman SAI conditions
+DELETE FROM `conditions` WHERE (`SourceTypeOrReferenceId` = 22) AND (`SourceGroup` IN (4, 5, 6, 7)) AND (`SourceEntry` = 24938) AND (`SourceId` = 0);
+INSERT INTO `conditions` (`SourceTypeOrReferenceId`, `SourceGroup`, `SourceEntry`, `SourceId`, `ElseGroup`, `ConditionTypeOrReference`, `ConditionTarget`, `ConditionValue1`, `ConditionValue2`, `ConditionValue3`, `NegativeCondition`, `ErrorType`, `ErrorTextId`, `ScriptName`, `Comment`) VALUES
+-- Tier 1: !anvil && !p4 (!@sunsreachanvil && !@sunsreachpfour)
+(22, 4, 24938, 0, 0, 12, 1, @sunsreachanvil, 0, 0, 1, 0, 0, '', 'if the event ''Sun''s Reach Reclamation Phase Anvil'' is not active'),
+(22, 4, 24938, 0, 0, 12, 1, @sunsreachpfour, 0, 0, 1, 0, 0, '', 'if the event ''Sun''s Reach Reclamation Phase Harbor'' is not active'),
+-- Tier 2: p3 only && anvil (@sunsreachpthreeonly && @sunsreachanvil)
+(22, 5, 24938, 0, 0, 12, 1, @sunsreachpthreeonly, 0, 0, 0, 0, 0, '', 'if the event ''Sun''s Reach Reclamation Phase Three Only'' is active'),
+(22, 5, 24938, 0, 0, 12, 1, @sunsreachanvil, 0, 0, 0, 0, 0, '', 'if the event ''Sun''s Reach Reclamation Phase Anvil'' is active'),
+-- Tier 3: p4 && !anvil (@sunsreachpfour && !@sunsreachanvil)
+(22, 6, 24938, 0, 0, 12, 1, @sunsreachpfour, 0, 0, 0, 0, 0, '', 'if the event ''Sun''s Reach Reclamation Phase Harbor'' is active'),
+(22, 6, 24938, 0, 0, 12, 1, @sunsreachanvil, 0, 0, 1, 0, 0, '', 'if the event ''Sun''s Reach Reclamation Phase Anvil'' is not active'),
+-- Tier 4: p4 && anvil (@sunsreachpfour && @sunsreachanvil)
+(22, 7, 24938, 0, 0, 12, 1, @sunsreachpfour, 0, 0, 0, 0, 0, '', 'if the event ''Sun''s Reach Reclamation Phase Harbor'' is active'),
+(22, 7, 24938, 0, 0, 12, 1, @sunsreachanvil, 0, 0, 0, 0, 0, '', 'if the event ''Sun''s Reach Reclamation Phase Anvil'' is active');
+
+-- Warrior SAI conditions
+DELETE FROM `conditions` WHERE (`SourceTypeOrReferenceId` = 22) AND (`SourceGroup` IN (1, 2, 3, 4)) AND (`SourceEntry` = 25115) AND (`SourceId` = 0);
+INSERT INTO `conditions` (`SourceTypeOrReferenceId`, `SourceGroup`, `SourceEntry`, `SourceId`, `ElseGroup`, `ConditionTypeOrReference`, `ConditionTarget`, `ConditionValue1`, `ConditionValue2`, `ConditionValue3`, `NegativeCondition`, `ErrorType`, `ErrorTextId`, `ScriptName`, `Comment`) VALUES
+-- Tier 1: !anvil && !p4 (!@sunsreachanvil && !@sunsreachpfour)
+(22, 1, 25115, 0, 0, 12, 1, @sunsreachanvil, 0, 0, 1, 0, 0, '', 'if the event ''Sun''s Reach Reclamation Phase Anvil'' is not active'),
+(22, 1, 25115, 0, 0, 12, 1, @sunsreachpfour, 0, 0, 1, 0, 0, '', 'if the event ''Sun''s Reach Reclamation Phase Harbor'' is not active'),
+-- Tier 2: p3 only && anvil (@sunsreachpthreeonly && @sunsreachanvil)
+(22, 2, 25115, 0, 0, 12, 1, @sunsreachpthreeonly, 0, 0, 0, 0, 0, '', 'if the event ''Sun''s Reach Reclamation Phase Three Only'' is active'),
+(22, 2, 25115, 0, 0, 12, 1, @sunsreachanvil, 0, 0, 0, 0, 0, '', 'if the event ''Sun''s Reach Reclamation Phase Anvil'' is active'),
+-- Tier 3: p4 && !anvil (@sunsreachpfour && !@sunsreachanvil)
+(22, 3, 25115, 0, 0, 12, 1, @sunsreachpfour, 0, 0, 0, 0, 0, '', 'if the event ''Sun''s Reach Reclamation Phase Harbor'' is active'),
+(22, 3, 25115, 0, 0, 12, 1, @sunsreachanvil, 0, 0, 1, 0, 0, '', 'if the event ''Sun''s Reach Reclamation Phase Anvil'' is not active'),
+-- Tier 4: p4 && anvil (@sunsreachpfour && @sunsreachanvil)
+(22, 4, 25115, 0, 0, 12, 1, @sunsreachpfour, 0, 0, 0, 0, 0, '', 'if the event ''Sun''s Reach Reclamation Phase Harbor'' is active'),
+(22, 4, 25115, 0, 0, 12, 1, @sunsreachanvil, 0, 0, 0, 0, 0, '', 'if the event ''Sun''s Reach Reclamation Phase Anvil'' is active');
