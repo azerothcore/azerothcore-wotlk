@@ -65,7 +65,7 @@ ObjectData const creatureData[] =
     { NPC_JANALAI,          DATA_JANALAI        },
     { NPC_SPIRIT_LYNX,      DATA_SPIRIT_LYNX    },
     { NPC_HARRISON_JONES,   DATA_HARRISON_JONES },
-    { NPC_AMINISHI_LOOKOUT, DATA_LOOKOUT        },
+    { NPC_AMANISHI_LOOKOUT, DATA_LOOKOUT        },
     { 0,                    0                   }
 };
 
@@ -112,7 +112,6 @@ public:
             LoadBossBoundaries(boundaries);
             LoadDoorData(doorData);
             LoadSummonData(summonData);
-            _chestLooted = 0;
 
             for (uint8 i = 0; i < RAND_VENDOR; ++i)
                 RandVendor[i] = NOT_STARTED;
@@ -128,13 +127,18 @@ public:
         {
             switch (creature->GetEntry())
             {
+                case NPC_AMANISHI_GUARDIAN:
+                case NPC_AMANISHI_SAVAGE:
+                    if (creature->GetPositionY() >= 1500.0f) // gate
+                        creature->SetImmuneToAll(true);
+                    break;
                 // Akil'zon gauntlet
-                case NPC_AMINISHI_TEMPEST:
+                case NPC_AMANISHI_TEMPEST:
                     if (creature->GetPositionZ() >= 50.0f) // excludes Tempest in Hexlord Malacrass' trash
                         AkilzonTrash.insert(creature->GetGUID());
                     break;
-                case NPC_AMINISHI_LOOKOUT:
-                case NPC_AMINISHI_PROTECTOR:
+                case NPC_AMANISHI_LOOKOUT:
+                case NPC_AMANISHI_PROTECTOR:
                 case NPC_EAGLE_TRASH_AGGRO_TRIGGER:
                     AkilzonTrash.insert(creature->GetGUID());
                     break;
@@ -211,7 +215,10 @@ public:
                     _akilzonGauntlet = DONE;
             }
             else if (type == DATA_CHEST_LOOTED)
-                ++_chestLooted;
+            {
+                uint8 chestCount = GetPersistentData(DATA_CHEST_COUNT);
+                StorePersistentData(DATA_CHEST_COUNT, ++chestCount);
+            }
         }
 
         void StartAkilzonGauntlet()
@@ -224,8 +231,8 @@ public:
                         case NPC_EAGLE_TRASH_AGGRO_TRIGGER:
                             creature->DisappearAndDie();
                             break;
-                        case NPC_AMINISHI_LOOKOUT:
-                        case NPC_AMINISHI_TEMPEST:
+                        case NPC_AMANISHI_LOOKOUT:
+                        case NPC_AMANISHI_TEMPEST:
                             creature->AI()->DoAction(ACTION_START_AKILZON_GAUNTLET);
                             break;
                         default:
@@ -241,7 +248,7 @@ public:
                 {
                     if (!creature->IsAlive())
                         creature->Respawn();
-                    else if (creature->GetEntry() == NPC_AMINISHI_TEMPEST)
+                    else if (creature->GetEntry() == NPC_AMANISHI_TEMPEST)
                         creature->AI()->DoAction(ACTION_RESET_AKILZON_GAUNTLET);
                 }
             if (Creature* creature = GetCreature(DATA_LOOKOUT))
@@ -249,12 +256,29 @@ public:
                     creature->Respawn(true);
         }
 
+        void OnUnitDeath(Unit* unit) override
+        {
+            Creature* creature = unit->ToCreature();
+            if (!creature)
+                return;
+
+            switch (creature->GetEntry())
+            {
+                case NPC_AMANISHI_PROTECTOR:
+                case NPC_AMANISHI_WIND_WALKER:
+                    if (_akilzonGauntlet == NOT_STARTED && AkilzonTrash.contains(creature->GetGUID()))
+                        creature->DespawnOrUnsummon(30s, 1s);
+                default:
+                    break;
+            }
+        }
+
         void OnCreatureEvade(Creature* creature) override
         {
             switch (creature->GetEntry())
             {
-                case NPC_AMINISHI_TEMPEST:
-                case NPC_AMINISHI_PROTECTOR:
+                case NPC_AMANISHI_TEMPEST:
+                case NPC_AMANISHI_PROTECTOR:
                 case NPC_AMANISHI_WIND_WALKER:
                     if (AkilzonTrash.contains(creature->GetGUID()))
                         ResetAkilzonGauntlet();
@@ -337,7 +361,7 @@ public:
             else if (type == TYPE_AKILZON_GAUNTLET)
                 return _akilzonGauntlet;
             else if (type == DATA_CHEST_LOOTED)
-                return _chestLooted;
+                return GetPersistentData(DATA_CHEST_COUNT);
 
             return 0;
         }
@@ -348,7 +372,6 @@ public:
         }
 
         private:
-            uint16 _chestLooted;
             uint32 RandVendor[RAND_VENDOR];
             GuidSet AkilzonTrash;
             EncounterState _akilzonGauntlet = NOT_STARTED;
