@@ -87,13 +87,9 @@ struct npc_phoenix_tk : public ScriptedAI
         _scheduler.Schedule(2s, [this](TaskContext context)
         {
             if (Creature* kael = ObjectAccessor::GetCreature(*me, _kaelGuid))
-            {
-                if (kael->GetHealthPct() <= 50.0f)
-                {
+                if (kael->HealthBelowPct(50.0f))
                     DoCastRandomTarget(SPELL_FIREBALL, 0, 40.0f);
-                }
-            }
-            context.Repeat(4s);
+                context.Repeat(4s);
         });
     }
 
