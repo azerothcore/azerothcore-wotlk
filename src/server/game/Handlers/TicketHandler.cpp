@@ -121,7 +121,7 @@ void WorldSession::HandleGMTicketCreateOpcode(WorldPacket& recvData)
 
         ChatHandler(nullptr).SendGMText(LANG_COMMAND_TICKETNEW, GetPlayer()->GetName(), ticket->GetId());
 
-        sScriptMgr->OnCreateTicket(GetPlayer(), ticket);
+        sScriptMgr->OnTicketCreate(GetPlayer(), ticket);
 
         response = GMTICKET_RESPONSE_CREATE_SUCCESS;
     }

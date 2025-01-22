@@ -19,9 +19,9 @@
 #include "ScriptMgr.h"
 #include "ScriptMgrMacros.h"
 
-void ScriptMgr::OnCreateTicket(Player* player, GmTicket* ticket)
+void ScriptMgr::OnTicketCreate(Player* player, GmTicket* ticket)
 {
-    CALL_ENABLED_HOOKS(TicketScript, TICKETHOOK_ON_CREATE_TICKET, script->OnCreateTicket(player, ticket));
+    CALL_ENABLED_HOOKS(TicketScript, TICKETHOOK_ON_CREATE_TICKET, script->OnTicketCreate(player, ticket));
 }
 
 void ScriptMgr::OnTicketUpdate(Player* player, GmTicket* ticket, std::string message)
