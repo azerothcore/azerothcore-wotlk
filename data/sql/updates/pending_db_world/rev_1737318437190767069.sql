@@ -26,6 +26,13 @@ SET
 @sunsreachlab        = 114,
 @sunsreachkiru       = 115;
 
+-- Smith Hauthaa <Weapons & Armorsmith>
+SET @guidsmith = 93964;
+-- Shaani <Jewelcrafting Supplies>
+SET @guidjc = 94386;
+-- Mar'nah <Alchemist>
+SET @guidalch = 94378;
+
 DELETE FROM `game_event` WHERE `eventEntry` IN (@sunsreachpone, @sunsreachptwoonly, @sunsreachptwoperm, @sunsreachnoportal, @sunsreachportal, @sunsreachpthreeonly, @sunsreachpthreeperm, @sunsreachnoanvil, @sunsreachanvil, @sunsreachpfour, @sunsreachnomonument, @sunsreachmonument, @sunsreachnolab, @sunsreachlab, @sunsreachkiru);
 INSERT INTO `game_event` (`eventEntry`, `start_time`, `end_time`, `occurence`, `length`, `holiday`, `holidayStage`, `description`, `world_event`, `announce`) VALUES
 (@sunsreachpone,       '2000-01-01 14:00:00', '2000-01-01 14:00:00', 5184000, 2592000, 0, 0, 'Sun''s Reach Reclamation Phase 1',              5, 2),
@@ -53,7 +60,7 @@ INSERT INTO `game_event_creature` (`guid`, `eventEntry`) VALUES
 (93953, @sunsreachptwoperm), -- 25133 (Astromancer Darnarian)
 (96655, @sunsreachptwoperm), -- 24932 (Exarch Nasuun)
 -- Phase 3
-(93964, @sunsreachpthreeperm), -- 25046 (Smith Hauthaa <Weapons & Armorsmith>)
+(@guidsmith, @sunsreachpthreeperm), -- 25046 (Smith Hauthaa <Weapons & Armorsmith>)
 (93955, @sunsreachpthreeperm), -- 25108 (Vindicator Kaalan)
 (93954, @sunsreachpthreeperm), -- 25035 (Tyrael Flamekissed <General Goods>)
 (93960, @sunsreachpthreeperm), -- 26089 (Kayri <Exotic Gear Purveyor>)
@@ -62,11 +69,11 @@ INSERT INTO `game_event_creature` (`guid`, `eventEntry`) VALUES
 (93958, @sunsreachpthreeperm), -- 26092 (Soryn <Exotic Gear Purveyor>)
 (93957, @sunsreachpthreeperm), -- 25069 (Magister Ilastar)
 -- Phase 4
-(94378, @sunsreachpfour), -- 24975 (Mar'nah <Alchemist>)
+(@guidalch, @sunsreachpfour), -- 24975 (Mar'nah <Alchemist>)
 (94379, @sunsreachpfour), -- 25036 (Caregiver Inaara <Innkeeper>)
 (94384, @sunsreachpfour), -- 25112 (Anchorite Ayuri)
 (94385, @sunsreachpfour), -- 25163 (Anchorite Kairthos)
-(94386, @sunsreachpfour), -- 25950 (Shaani <Jewelcrafting Supplies>)
+(@guidjc, @sunsreachpfour), -- 25950 (Shaani <Jewelcrafting Supplies>)
 -- Kaalif?
 (94381, @sunsreachpfour), -- 25043 (Sereth Duskbringer <Poison Supplies>)
 (94383, @sunsreachpfour), -- 25088 (Captain Valindria)
@@ -329,7 +336,6 @@ INSERT INTO `game_event_gameobject` (`guid`, `eventEntry`) VALUES
 -- Monument
 (50446,   @sunsreachmonument), -- 187116, Monument to the Fallen - Sunwell Plateau
 (27862,   @sunsreachmonument), -- 187116, Monument to the Fallen - Isle of Quel'Danas
--- 5800005? Sunwell bench? Not included
 (5300290, @sunsreachlab), -- 187115, Alchemy Lab
 -- Crystals
 (5300500, -@sunsreachpthreeperm), -- 187120, Demonic Crystal
@@ -442,21 +448,235 @@ INSERT INTO `creature_questender` (`id`, `quest`) VALUES
 
 DELETE FROM `conditions` WHERE `ConditionTypeOrReference` = 12 AND `ConditionValue1` IN (@sunsreachpone, @sunsreachptwoonly, @sunsreachptwoperm, @sunsreachnoportal, @sunsreachportal, @sunsreachpthreeonly, @sunsreachpthreeperm, @sunsreachnoanvil, @sunsreachanvil, @sunsreachpfour, @sunsreachnomonument, @sunsreachmonument, @sunsreachnolab, @sunsreachlab, @sunsreachkiru);
 INSERT INTO `conditions` (`SourceTypeOrReferenceId`, `SourceGroup`, `SourceEntry`, `SourceId`, `ElseGroup`, `ConditionTypeOrReference`, `ConditionTarget`, `ConditionValue1`, `ConditionValue2`, `ConditionValue3`, `NegativeCondition`, `ErrorType`, `ErrorTextId`, `ScriptName`, `Comment`) VALUES
+(14, 9052, 12240, 0, 0, 12, 0, @sunsreachpone,       0, 0, 0, 0, 0, '', 'Show gossip text if the event ''Sun''s Reach Reclamation Phase 1'' is active'),
+(14, 9052, 12241, 0, 1, 12, 0, @sunsreachpone,       0, 0, 1, 0, 0, '', 'Show gossip text if the event ''Sun''s Reach Reclamation Phase 1'' is not active'),
+(14, 9065, 12260, 0, 0, 12, 0, @sunsreachpone,       0, 0, 0, 0, 0, '', 'Show gossip text if the event ''Sun''s Reach Reclamation Phase 1'' is active'),
+(14, 9065, 12259, 0, 1, 12, 0, @sunsreachpone,       0, 0, 1, 0, 0, '', 'Show gossip text if the event ''Sun''s Reach Reclamation Phase 1'' is not active'),
+
 (14, 9046,  12226, 0, 0, 12, 0, @sunsreachnoportal,   0, 0, 0, 0, 0, '', 'Show gossip text if the event ''Sun''s Reach Reclamation Phase No Portal'' is active'),
+(14, 9046,  12227, 0, 1, 12, 0, @sunsreachnoportal,   0, 0, 1, 0, 0, '', 'Show gossip text if the event ''Sun''s Reach Reclamation Phase No Portal'' is not active'),
+
+(14, 9064,  12257, 0, 0, 12, 0, @sunsreachptwoonly,   0, 0, 0, 0, 0, '', 'Show gossip text if the event ''Sun''s Reach Reclamation Phase 2 Only'' is active'),
+(14, 9064,  12258, 0, 1, 12, 0, @sunsreachptwoonly,   0, 0, 1, 0, 0, '', 'Show gossip text if the event ''Sun''s Reach Reclamation Phase 2 Only'' is not active'),
+(14, 9063,  12255, 0, 0, 12, 0, @sunsreachptwoonly,   0, 0, 0, 0, 0, '', 'Show gossip text if the event ''Sun''s Reach Reclamation Phase 2 Only'' is active'),
+(14, 9063,  12256, 0, 1, 12, 0, @sunsreachptwoonly,   0, 0, 1, 0, 0, '', 'Show gossip text if the event ''Sun''s Reach Reclamation Phase 2 Only'' is not active'),
 (14, 51000, 12300, 0, 0, 12, 0, @sunsreachptwoonly,   0, 0, 0, 0, 0, '', 'Show gossip text if the event ''Sun''s Reach Reclamation Phase 2 Only'' is active'),
+
 (14, 51001, 12301, 0, 0, 12, 0, @sunsreachnoanvil,    0, 0, 0, 0, 0, '', 'Show gossip text if the event ''Sun''s Reach Reclamation Phase No Anvil'' is active'),
+(14, 9087, 12285, 0, 0, 12, 0, @sunsreachnoanvil,    0, 0, 0, 0, 0, '', 'Show gossip text if the event ''Sun''s Reach Reclamation Phase No Anvil'' is active'),
+(14, 9087, 12286, 0, 1, 12, 0, @sunsreachnoanvil,    0, 0, 1, 0, 0, '', 'Show gossip text if the event ''Sun''s Reach Reclamation Phase No Anvil'' is not active'),
+
 (14, 51002, 12302, 0, 0, 12, 0, @sunsreachpthreeonly, 0, 0, 0, 0, 0, '', 'Show gossip text if the event ''Sun''s Reach Reclamation Phase 3 Only'' is active'),
+
+(14, 9127, 12339, 0, 0, 12, 0, @sunsreachpthreeonly, 0, 0, 0, 0, 0, '', 'Show gossip text if the event ''Sun''s Reach Reclamation Phase 3 Only'' is active'),
+(14, 9127, 12340, 0, 1, 12, 0, @sunsreachpthreeonly, 0, 0, 1, 0, 0, '', 'Show gossip text if the event ''Sun''s Reach Reclamation Phase 3 Only'' is not active'),
+(14, 9111, 12319, 0, 0, 12, 0, @sunsreachpthreeonly, 0, 0, 0, 0, 0, '', 'Show gossip text if the event ''Sun''s Reach Reclamation Phase 3 Only'' is active'),
+(14, 9111, 12320, 0, 1, 12, 0, @sunsreachpthreeonly, 0, 0, 1, 0, 0, '', 'Show gossip text if the event ''Sun''s Reach Reclamation Phase 3 Only'' is not active'),
+
 (14, 51003, 12303, 0, 0, 12, 0, @sunsreachnolab,      0, 0, 0, 0, 0, '', 'Show gossip text if the event ''Sun''s Reach Reclamation Phase No Alchemy Lab'' is active'),
-(14, 51005, 12240, 0, 0, 12, 0, @sunsreachpone,       0, 0, 0, 0, 0, '', 'Show gossip text if the event ''Sun''s Reach Reclamation Phase 1'' is active'),
-(14, 51006, 12260, 0, 0, 12, 0, @sunsreachpone,       0, 0, 0, 0, 0, '', 'Show gossip text if the event ''Sun''s Reach Reclamation Phase 1'' is active'),
-(14, 51007, 12255, 0, 0, 12, 0, @sunsreachptwoonly,   0, 0, 0, 0, 0, '', 'Show gossip text if the event ''Sun''s Reach Reclamation Phase 2 Only'' is active'),
-(14, 51008, 12257, 0, 0, 12, 0, @sunsreachptwoonly,   0, 0, 0, 0, 0, '', 'Show gossip text if the event ''Sun''s Reach Reclamation Phase 2 Only'' is active'),
-(14, 51009, 12339, 0, 0, 12, 0, @sunsreachpthreeonly, 0, 0, 0, 0, 0, '', 'Show gossip text if the event ''Sun''s Reach Reclamation Phase 3 Only'' is active'),
-(14, 51010, 12319, 0, 0, 12, 0, @sunsreachpthreeonly, 0, 0, 0, 0, 0, '', 'Show gossip text if the event ''Sun''s Reach Reclamation Phase 3 Only'' is active'),
-(14, 51011, 12285, 0, 0, 12, 0, @sunsreachnoanvil,    0, 0, 0, 0, 0, '', 'Show gossip text if the event ''Sun''s Reach Reclamation Phase No Anvil'' is active'),
-(14, 51012, 12238, 0, 0, 12, 0, @sunsreachnolab,      0, 0, 0, 0, 0, '', 'Show gossip text if the event ''Sun''s Reach Reclamation Phase No Alchemy Lab'' is active'),
-(14, 51013, 12322, 0, 0, 12, 0, @sunsreachnomonument, 0, 0, 0, 0, 0, '', 'Show gossip text if the event ''Sun''s Reach Reclamation Phase No Monument'' is active'),
+(14, 9050, 12238, 0, 0, 12, 0, @sunsreachnolab,      0, 0, 0, 0, 0, '', 'Show gossip text if the event ''Sun''s Reach Reclamation Phase No Alchemy Lab'' is active'),
+(14, 9050, 12237, 0, 1, 12, 0, @sunsreachnolab,      0, 0, 1, 0, 0, '', 'Show gossip text if the event ''Sun''s Reach Reclamation Phase No Alchemy Lab'' is not active'),
+(14, 9198, 12496, 0, 0, 12, 0, @sunsreachnolab,      0, 0, 0, 0, 0, '', 'Show gossip text if the event ''Sun''s Reach Reclamation Phase No Alchemy Lab'' is active'),
+(14, 9198, 12497, 0, 1, 12, 0, @sunsreachnolab,      0, 0, 1, 0, 0, '', 'Show gossip text if the event ''Sun''s Reach Reclamation Phase No Alchemy Lab'' is not active'),
+(14, 9115, 12322, 0, 0, 12, 0, @sunsreachnomonument, 0, 0, 0, 0, 0, '', 'Show gossip text if the event ''Sun''s Reach Reclamation Phase No Monument'' is active'),
+(14, 9115, 12323, 0, 1, 12, 0, @sunsreachnomonument, 0, 0, 1, 0, 0, '', 'Show gossip text if the event ''Sun''s Reach Reclamation Phase No Monument'' is not active'),
+
 (15, 9046,  0,     0, 0, 12, 0, @sunsreachptwoonly,   0, 0, 0, 0, 0, '', 'Show gossip option if the event ''Sun''s Reach Reclamation Phase 2 Only'' is active'),
 (15, 9046,  1,     0, 0, 12, 0, @sunsreachnoanvil,    0, 0, 0, 0, 0, '', 'Show gossip option if the event ''Sun''s Reach Reclamation Phase No Anvil'' is active'),
 (15, 9046,  2,     0, 0, 12, 0, @sunsreachpthreeonly, 0, 0, 0, 0, 0, '', 'Show gossip option if the event ''Sun''s Reach Reclamation Phase 3 Only'' is active'),
 (15, 9046,  3,     0, 0, 12, 0, @sunsreachnolab,      0, 0, 0, 0, 0, '', 'Show gossip option if the event ''Sun''s Reach Reclamation Phase No Alchemy Lab'' is active');
+
+-- Staging
+-- Captain Theris Dawnhearth
+DELETE FROM `gossip_menu` WHERE (`MenuID` = 9065) AND (`TextID` IN (12260));
+INSERT INTO `gossip_menu` (`MenuID`, `TextID`) VALUES
+(9065, 12260);
+-- Vindicator Xayann
+DELETE FROM `gossip_menu` WHERE (`MenuID` = 9052) AND (`TextID` IN (12240));
+INSERT INTO `gossip_menu` (`MenuID`, `TextID`) VALUES
+(9052, 12240);
+
+-- Sanctum
+-- Battlemage Arynna
+DELETE FROM `gossip_menu` WHERE (`MenuID` = 9064) AND (`TextID` IN (12257));
+INSERT INTO `gossip_menu` (`MenuID`, `TextID`) VALUES
+(9064, 12257);
+-- Harbinger Inuuro
+DELETE FROM `gossip_menu` WHERE (`MenuID` = 9063) AND (`TextID` IN (12255));
+INSERT INTO `gossip_menu` (`MenuID`, `TextID`) VALUES
+(9063, 12255);
+
+-- Armory
+-- Magister Ilastar
+DELETE FROM `gossip_menu` WHERE (`MenuID` = 9127) AND (`TextID` IN (12339));
+INSERT INTO `gossip_menu` (`MenuID`, `TextID`) VALUES
+(9127, 12339);
+
+-- Anvil subphase
+-- Smith Hauthaa
+DELETE FROM `gossip_menu` WHERE (`MenuID` = 9087) AND (`TextID` IN (12285));
+INSERT INTO `gossip_menu` (`MenuID`, `TextID`) VALUES
+(9087, 12285);
+
+-- Docks
+-- JC
+-- Shaani
+DELETE FROM `gossip_menu` WHERE (`MenuID` = 9198) AND (`TextID` IN (12496));
+INSERT INTO `gossip_menu` (`MenuID`, `TextID`) VALUES
+(9198, 12496);
+
+-- Alchemist
+-- Mar'nah
+DELETE FROM `gossip_menu` WHERE (`MenuID` = 9050) AND (`TextID` IN (12238));
+INSERT INTO `gossip_menu` (`MenuID`, `TextID`) VALUES
+(9050, 12238);
+
+-- Alchemy Lab
+DELETE FROM `gameobject` WHERE (`id` = 187115) AND (`guid` IN (5300290));
+INSERT INTO `gameobject` (`guid`, `id`, `map`, `zoneId`, `areaId`, `spawnMask`, `phaseMask`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecs`, `animprogress`, `state`, `ScriptName`, `VerifiedBuild`) VALUES
+(5300290, 187115, 530, 4080, 4087, 1, 1, 12845.603516, -7011.98584, 18.592701, 5.543178, 0, 0, 0, 0, 0, 0, 0, '', 0);
+
+-- Monument
+DELETE FROM `gossip_menu` WHERE (`MenuID` = 9115) AND (`TextID` IN (12322));
+INSERT INTO `gossip_menu` (`MenuID`, `TextID`) VALUES
+(9115, 12322);
+
+-- Portal Subphase Shattrath mobs walking to portal, entering and despawning
+-- Remove Shattrath - Shattered Sun Marksman that should be spawned by Portal Subphase
+DELETE FROM `creature` WHERE (`id1` = 24938) AND (`guid` IN (96656, 96657, 96658));
+-- Remove Shattrath - Shattered Sun Warrior that should be spawned by Portal Subphase
+DELETE FROM `creature` WHERE (`id1` = 25115) AND (`guid` IN (96593));
+
+-- Anvil vendor
+-- Smith Hauthaa
+DELETE FROM `npc_vendor` WHERE (`entry` = 25046);
+DELETE FROM `game_event_npc_vendor` WHERE (`eventEntry` = @sunsreachanvil) AND `guid` = @guidsmith;
+INSERT INTO `game_event_npc_vendor` (`eventEntry`, `guid`, `slot`, `item`, `maxcount`, `incrtime`, `ExtendedCost`) VALUES
+(@sunsreachanvil, @guidsmith, 0, 34887, 0, 0, 2059),
+(@sunsreachanvil, @guidsmith, 0, 34888, 0, 0, 2059),
+(@sunsreachanvil, @guidsmith, 0, 34889, 0, 0, 2059),
+(@sunsreachanvil, @guidsmith, 0, 34890, 0, 0, 2059),
+(@sunsreachanvil, @guidsmith, 0, 34891, 0, 0, 2329),
+(@sunsreachanvil, @guidsmith, 0, 34892, 0, 0, 2329),
+(@sunsreachanvil, @guidsmith, 0, 34893, 0, 0, 2331),
+(@sunsreachanvil, @guidsmith, 0, 34894, 0, 0, 2331),
+(@sunsreachanvil, @guidsmith, 0, 34895, 0, 0, 2329),
+(@sunsreachanvil, @guidsmith, 0, 34896, 0, 0, 2329),
+(@sunsreachanvil, @guidsmith, 0, 34898, 0, 0, 2329),
+(@sunsreachanvil, @guidsmith, 0, 34900, 0, 0, 2333),
+(@sunsreachanvil, @guidsmith, 0, 34901, 0, 0, 2333),
+(@sunsreachanvil, @guidsmith, 0, 34902, 0, 0, 2049),
+(@sunsreachanvil, @guidsmith, 0, 34903, 0, 0, 2333),
+(@sunsreachanvil, @guidsmith, 0, 34904, 0, 0, 2049),
+(@sunsreachanvil, @guidsmith, 0, 34905, 0, 0, 2333),
+(@sunsreachanvil, @guidsmith, 0, 34906, 0, 0, 2333),
+(@sunsreachanvil, @guidsmith, 0, 34910, 0, 0, 2333),
+(@sunsreachanvil, @guidsmith, 0, 34911, 0, 0, 2049),
+(@sunsreachanvil, @guidsmith, 0, 34912, 0, 0, 2333),
+(@sunsreachanvil, @guidsmith, 0, 34914, 0, 0, 2333),
+(@sunsreachanvil, @guidsmith, 0, 34916, 0, 0, 2049),
+(@sunsreachanvil, @guidsmith, 0, 34917, 0, 0, 2333),
+(@sunsreachanvil, @guidsmith, 0, 34918, 0, 0, 2333),
+(@sunsreachanvil, @guidsmith, 0, 34919, 0, 0, 2049),
+(@sunsreachanvil, @guidsmith, 0, 34921, 0, 0, 2333),
+(@sunsreachanvil, @guidsmith, 0, 34922, 0, 0, 2333),
+(@sunsreachanvil, @guidsmith, 0, 34923, 0, 0, 2049),
+(@sunsreachanvil, @guidsmith, 0, 34924, 0, 0, 2333),
+(@sunsreachanvil, @guidsmith, 0, 34925, 0, 0, 2333),
+(@sunsreachanvil, @guidsmith, 0, 34926, 0, 0, 2049),
+(@sunsreachanvil, @guidsmith, 0, 34927, 0, 0, 2333),
+(@sunsreachanvil, @guidsmith, 0, 34928, 0, 0, 2333),
+(@sunsreachanvil, @guidsmith, 0, 34929, 0, 0, 2049),
+(@sunsreachanvil, @guidsmith, 0, 34930, 0, 0, 2333),
+(@sunsreachanvil, @guidsmith, 0, 34931, 0, 0, 2333),
+(@sunsreachanvil, @guidsmith, 0, 34932, 0, 0, 2049),
+(@sunsreachanvil, @guidsmith, 0, 34933, 0, 0, 2333),
+(@sunsreachanvil, @guidsmith, 0, 34934, 0, 0, 2333),
+(@sunsreachanvil, @guidsmith, 0, 34935, 0, 0, 2049),
+(@sunsreachanvil, @guidsmith, 0, 34936, 0, 0, 2333),
+(@sunsreachanvil, @guidsmith, 0, 34937, 0, 0, 2333),
+(@sunsreachanvil, @guidsmith, 0, 34938, 0, 0, 2049),
+(@sunsreachanvil, @guidsmith, 0, 34939, 0, 0, 2333),
+(@sunsreachanvil, @guidsmith, 0, 34940, 0, 0, 2333),
+(@sunsreachanvil, @guidsmith, 0, 34941, 0, 0, 2049),
+(@sunsreachanvil, @guidsmith, 0, 34942, 0, 0, 2333),
+(@sunsreachanvil, @guidsmith, 0, 34943, 0, 0, 2333),
+(@sunsreachanvil, @guidsmith, 0, 34944, 0, 0, 2049),
+(@sunsreachanvil, @guidsmith, 0, 34945, 0, 0, 2333),
+(@sunsreachanvil, @guidsmith, 0, 34946, 0, 0, 2333),
+(@sunsreachanvil, @guidsmith, 0, 34947, 0, 0, 2049),
+(@sunsreachanvil, @guidsmith, 0, 34949, 0, 0, 2332),
+(@sunsreachanvil, @guidsmith, 0, 34950, 0, 0, 2332),
+(@sunsreachanvil, @guidsmith, 0, 34951, 0, 0, 2332),
+(@sunsreachanvil, @guidsmith, 0, 34952, 0, 0, 2332);
+
+-- Alchemist vendor
+-- Mar'nah
+DELETE FROM `npc_vendor` WHERE (`entry` = 24975);
+DELETE FROM `game_event_npc_vendor` WHERE (`eventEntry` = @sunsreachlab) AND `guid` = @guidalch;
+INSERT INTO `game_event_npc_vendor` (`eventEntry`, `guid`, `slot`, `item`, `maxcount`, `incrtime`, `ExtendedCost`) VALUES
+(@sunsreachlab, @guidalch, 0, 3371, 0, 0, 0),
+(@sunsreachlab, @guidalch, 0, 3372, 0, 0, 0),
+(@sunsreachlab, @guidalch, 0, 8925, 0, 0, 0),
+(@sunsreachlab, @guidalch, 0, 13467, 3, 9000, 0),
+(@sunsreachlab, @guidalch, 0, 18256, 0, 0, 0),
+(@sunsreachlab, @guidalch, 0, 22785, 3, 9000, 0),
+(@sunsreachlab, @guidalch, 0, 22786, 3, 9000, 0),
+(@sunsreachlab, @guidalch, 0, 22791, 3, 9000, 0),
+(@sunsreachlab, @guidalch, 0, 22793, 1, 9000, 0),
+(@sunsreachlab, @guidalch, 0, 40411, 0, 0, 0);
+
+-- JC vendor
+-- Shaani
+DELETE FROM `npc_vendor` WHERE (`entry` = 25950);
+DELETE FROM `game_event_npc_vendor` WHERE (`eventEntry` = @sunsreachlab) AND `guid` = @guidjc;
+INSERT INTO `game_event_npc_vendor` (`eventEntry`, `guid`, `slot`, `item`, `maxcount`, `incrtime`, `ExtendedCost`) VALUES
+(@sunsreachlab, @guidjc, 0, 32227, 0, 0, 1642),
+(@sunsreachlab, @guidjc, 0, 32228, 0, 0, 1642),
+(@sunsreachlab, @guidjc, 0, 32229, 0, 0, 1642),
+(@sunsreachlab, @guidjc, 0, 32230, 0, 0, 1642),
+(@sunsreachlab, @guidjc, 0, 32231, 0, 0, 1642),
+(@sunsreachlab, @guidjc, 0, 32249, 0, 0, 1642),
+(@sunsreachlab, @guidjc, 0, 35238, 0, 0, 0),
+(@sunsreachlab, @guidjc, 0, 35239, 0, 0, 0),
+(@sunsreachlab, @guidjc, 0, 35240, 0, 0, 0),
+(@sunsreachlab, @guidjc, 0, 35241, 0, 0, 0),
+(@sunsreachlab, @guidjc, 0, 35242, 0, 0, 0),
+(@sunsreachlab, @guidjc, 0, 35243, 0, 0, 0),
+(@sunsreachlab, @guidjc, 0, 35244, 0, 0, 0),
+(@sunsreachlab, @guidjc, 0, 35245, 0, 0, 0),
+(@sunsreachlab, @guidjc, 0, 35246, 0, 0, 0),
+(@sunsreachlab, @guidjc, 0, 35247, 0, 0, 0),
+(@sunsreachlab, @guidjc, 0, 35248, 0, 0, 0),
+(@sunsreachlab, @guidjc, 0, 35249, 0, 0, 0),
+(@sunsreachlab, @guidjc, 0, 35250, 0, 0, 0),
+(@sunsreachlab, @guidjc, 0, 35251, 0, 0, 0),
+(@sunsreachlab, @guidjc, 0, 35252, 0, 0, 0),
+(@sunsreachlab, @guidjc, 0, 35253, 0, 0, 0),
+(@sunsreachlab, @guidjc, 0, 35254, 0, 0, 0),
+(@sunsreachlab, @guidjc, 0, 35255, 0, 0, 0),
+(@sunsreachlab, @guidjc, 0, 35256, 0, 0, 0),
+(@sunsreachlab, @guidjc, 0, 35257, 0, 0, 0),
+(@sunsreachlab, @guidjc, 0, 35258, 0, 0, 0),
+(@sunsreachlab, @guidjc, 0, 35259, 0, 0, 0),
+(@sunsreachlab, @guidjc, 0, 35260, 0, 0, 0),
+(@sunsreachlab, @guidjc, 0, 35261, 0, 0, 0),
+(@sunsreachlab, @guidjc, 0, 35262, 0, 0, 0),
+(@sunsreachlab, @guidjc, 0, 35263, 0, 0, 0),
+(@sunsreachlab, @guidjc, 0, 35264, 0, 0, 0),
+(@sunsreachlab, @guidjc, 0, 35265, 0, 0, 0),
+(@sunsreachlab, @guidjc, 0, 35266, 0, 0, 0),
+(@sunsreachlab, @guidjc, 0, 35267, 0, 0, 0),
+(@sunsreachlab, @guidjc, 0, 35268, 0, 0, 0),
+(@sunsreachlab, @guidjc, 0, 35269, 0, 0, 0),
+(@sunsreachlab, @guidjc, 0, 35270, 0, 0, 0),
+(@sunsreachlab, @guidjc, 0, 35271, 0, 0, 0),
+(@sunsreachlab, @guidjc, 0, 35322, 0, 0, 0),
+(@sunsreachlab, @guidjc, 0, 35323, 0, 0, 0),
+(@sunsreachlab, @guidjc, 0, 35325, 0, 0, 0),
+(@sunsreachlab, @guidjc, 0, 35766, 0, 0, 0),
+(@sunsreachlab, @guidjc, 0, 35767, 0, 0, 0),
+(@sunsreachlab, @guidjc, 0, 35768, 0, 0, 0),
+(@sunsreachlab, @guidjc, 0, 35769, 0, 0, 0),
+(@sunsreachlab, @guidjc, 0, 37504, 0, 0, 0);
+
