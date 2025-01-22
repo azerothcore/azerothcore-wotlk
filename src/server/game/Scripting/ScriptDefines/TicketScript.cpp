@@ -24,9 +24,9 @@ void ScriptMgr::OnTicketCreate(Player* player, GmTicket* ticket)
     CALL_ENABLED_HOOKS(TicketScript, TICKETHOOK_ON_CREATE_TICKET, script->OnTicketCreate(player, ticket));
 }
 
-void ScriptMgr::OnTicketUpdate(Player* player, GmTicket* ticket, std::string message)
+void ScriptMgr::OnTicketUpdate(Player* player, GmTicket* ticket)
 {
-    CALL_ENABLED_HOOKS(TicketScript, TICKETHOOK_ON_UPDATE_TICKET, script->OnTicketUpdate(player, ticket, message));
+    CALL_ENABLED_HOOKS(TicketScript, TICKETHOOK_ON_UPDATE_TICKET, script->OnTicketUpdate(player, ticket));
 }
 
 void ScriptMgr::OnTicketClose(Player* player, GmTicket* ticket)

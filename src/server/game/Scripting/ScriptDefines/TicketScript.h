@@ -41,7 +41,7 @@ public:
     [[nodiscard]] bool IsDatabaseBound() const override { return false; }
 
     virtual void OnTicketCreate(Player* /*player*/, GmTicket* /*ticket*/) { }
-    virtual void OnTicketUpdate(Player* /*player*/, GmTicket* /*ticket*/, std::string /*message*/) { }
+    virtual void OnTicketUpdate(Player* /*player*/, GmTicket* /*ticket*/) { }
     virtual void OnTicketClose(Player* /*player*/, GmTicket* /*ticket*/) { }
     virtual void OnTicketStatusUpdate(Player* /*player*/, GmTicket* /*ticket*/) { }
     virtual void OnTicketResolve(Player* /*player*/, GmTicket* /*ticket*/) { }

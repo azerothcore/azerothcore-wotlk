@@ -20,7 +20,6 @@
 #include "Language.h"
 #include "Opcodes.h"
 #include "Player.h"
-#include "ScriptMgr.h"
 #include "TicketMgr.h"
 #include "Util.h"
 #include "World.h"
@@ -117,11 +116,9 @@ void WorldSession::HandleGMTicketCreateOpcode(WorldPacket& recvData)
             ticket->SetChatLog(times, chatLog);
 
         sTicketMgr->AddTicket(ticket);
-        sTicketMgr->UpdateLastChange();
+        sTicketMgr->UpdateLastChange(ticket);
 
         ChatHandler(nullptr).SendGMText(LANG_COMMAND_TICKETNEW, GetPlayer()->GetName(), ticket->GetId());
-
-        sScriptMgr->OnTicketCreate(GetPlayer(), ticket);
 
         response = GMTICKET_RESPONSE_CREATE_SUCCESS;
     }
@@ -151,8 +148,6 @@ void WorldSession::HandleGMTicketUpdateOpcode(WorldPacket& recv_data)
         ChatHandler(nullptr).SendGMText(LANG_COMMAND_TICKETUPDATED, GetPlayer()->GetName(), ticket->GetId());
 
         response = GMTICKET_RESPONSE_UPDATE_SUCCESS;
-
-        sScriptMgr->OnTicketUpdate(GetPlayer(), ticket, message);
     }
 
     WorldPacket data(SMSG_GMTICKET_UPDATETEXT, 4);
@@ -172,8 +167,6 @@ void WorldSession::HandleGMTicketDeleteOpcode(WorldPacket& /*recv_data*/)
 
         sTicketMgr->CloseTicket(ticket->GetId(), GetPlayer()->GetGUID());
         sTicketMgr->SendTicket(this, nullptr);
-
-        sScriptMgr->OnTicketClose(GetPlayer(), ticket);
     }
 }
 
@@ -303,7 +296,5 @@ void WorldSession::HandleGMResponseResolve(WorldPacket& /*recvPacket*/)
 
         sTicketMgr->CloseTicket(ticket->GetId(), GetPlayer()->GetGUID());
         sTicketMgr->SendTicket(this, nullptr);
-
-        sScriptMgr->OnTicketResolve(GetPlayer(), ticket);
     }
 }

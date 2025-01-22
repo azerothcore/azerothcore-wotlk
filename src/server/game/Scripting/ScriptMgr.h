@@ -702,7 +702,7 @@ public: /* LootScript */
 public: /* TicketScript */
 
     void OnTicketCreate(Player* player, GmTicket* ticket);
-    void OnTicketUpdate(Player* player, GmTicket* ticket, std::string message);
+    void OnTicketUpdate(Player* player, GmTicket* ticket);
     void OnTicketClose(Player* player, GmTicket* ticket);
     void OnTicketStatusUpdate(Player* player, GmTicket* ticket);
     void OnTicketResolve(Player* player, GmTicket* ticket);
