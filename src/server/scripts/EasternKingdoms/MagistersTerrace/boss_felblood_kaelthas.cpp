@@ -37,36 +37,36 @@ enum Says
 enum Spells
 {
     // Phase 1
-    SPELL_FIREBALL                  = 44189,
-    SPELL_FLAMESTRIKE_SUMMON        = 44192,
-    SPELL_PHOENIX                   = 44194,
-    SPELL_SHOCK_BARRIER             = 46165,
-    SPELL_PYROBLAST                 = 36819,
+    SPELL_FIREBALL                 = 44189,
+    SPELL_FLAMESTRIKE_SUMMON       = 44192,
+    SPELL_PHOENIX                  = 44194,
+    SPELL_SHOCK_BARRIER            = 46165,
+    SPELL_PYROBLAST                = 36819,
 
     // Phase 2
-    SPELL_SUMMON_ARCANE_SPHERE      = 44265,
-    SPELL_TELEPORT_CENTER           = 44218,
-    SPELL_GRAVITY_LAPSE_INITIAL     = 44224,
-    SPELL_GRAVITY_LAPSE_PLAYER      = 44219, // Till 44223, 5 players
-    SPELL_GRAVITY_LAPSE_FLY         = 44227,
-    SPELL_GRAVITY_LAPSE_DOT         = 44226,
-    SPELL_GRAVITY_LAPSE_CHANNEL     = 44251,
-    SPELL_POWER_FEEDBACK            = 44233,
+    SPELL_SUMMON_ARCANE_SPHERE     = 44265,
+    SPELL_TELEPORT_CENTER          = 44218,
+    SPELL_GRAVITY_LAPSE_INITIAL    = 44224,
+    SPELL_GRAVITY_LAPSE_PLAYER     = 44219, // Till 44223, 5 players
+    SPELL_GRAVITY_LAPSE_FLY        = 44227,
+    SPELL_GRAVITY_LAPSE_DOT        = 44226,
+    SPELL_GRAVITY_LAPSE_CHANNEL    = 44251,
+    SPELL_POWER_FEEDBACK           = 44233,
 
     // Phoenix spells
-    SPELL_PHOENIX_BURN              = 44197,
-    SPELL_REBIRTH                   = 44196
+    SPELL_PHOENIX_BURN             = 44197,
+    SPELL_REBIRTH                  = 44196
 };
 
 enum Misc
 {
-    ACTION_TELEPORT_PLAYERS     = 1,
-    ACTION_KNOCKUP              = 2,
-    ACTION_ALLOW_FLY            = 3,
-    ACTION_REMOVE_FLY           = 4,
+    ACTION_TELEPORT_PLAYERS    = 1,
+    ACTION_KNOCKUP             = 2,
+    ACTION_ALLOW_FLY           = 3,
+    ACTION_REMOVE_FLY          = 4,
 
-    CREATURE_ARCANE_SPHERE      = 24708,
-    CREATURE_PHOENIX            = 24674
+    CREATURE_ARCANE_SPHERE     = 24708,
+    CREATURE_PHOENIX           = 24674
 };
 
 struct npc_phoenix_tk : public ScriptedAI
@@ -105,7 +105,8 @@ struct npc_phoenix_tk : public ScriptedAI
 
         _scheduler.Update(diff);
 
-        DoMeleeAttackIfReady();
+        if (!me->HasUnitState(UNIT_STATE_CASTING))
+            DoMeleeAttackIfReady();
     }
 
 private:
@@ -138,6 +139,7 @@ struct boss_felblood_kaelthas : public BossAI
             me->StopMoving();
             me->GetMotionMaster()->Clear();
             me->GetMotionMaster()->MoveIdle();
+            
             ScheduleTimedEvent(5s, [&]{
                 summons.DoForAllSummons([&](WorldObject* summon){
                     if (Unit* player = SelectTarget(SelectTargetMethod::Random, 0, 0.0f, true))
@@ -145,6 +147,7 @@ struct boss_felblood_kaelthas : public BossAI
                             summonedCreature->GetMotionMaster()->MoveChase(player);
                 });
             }, 10s, 15s);
+            
             GravityLapseSequence(true);
         });
     }
@@ -159,6 +162,7 @@ struct boss_felblood_kaelthas : public BossAI
     {
         Talk(firstTime ? SAY_GRAVITY_LAPSE : SAY_RECAST_GRAVITY);
         DoCastSelf(SPELL_GRAVITY_LAPSE_INITIAL);
+        
         scheduler.Schedule(2s, [this](TaskContext){
             LapseAction(ACTION_TELEPORT_PLAYERS);
         }).Schedule(3s, [this](TaskContext){
@@ -168,11 +172,13 @@ struct boss_felblood_kaelthas : public BossAI
             for (uint8 i = 0; i < 3; ++i)
                 DoCastSelf(SPELL_SUMMON_ARCANE_SPHERE, true);
             DoCastSelf(SPELL_GRAVITY_LAPSE_CHANNEL);
+            
             scheduler.Schedule(30s, [this](TaskContext){
                 LapseAction(ACTION_REMOVE_FLY);
                 me->InterruptNonMeleeSpells(false);
                 Talk(SAY_TIRED);
                 DoCastSelf(SPELL_POWER_FEEDBACK);
+                
                 scheduler.Schedule(10s, [this](TaskContext){
                     GravityLapseSequence(false);
                 });
@@ -200,20 +206,24 @@ struct boss_felblood_kaelthas : public BossAI
         ScheduleTimedEvent(0ms, [&]{
             DoCastVictim(SPELL_FIREBALL);
         }, 3000ms, 4500ms);
+
         ScheduleTimedEvent(15s, [&]{
             Talk(SAY_PHOENIX);
             DoCastSelf(SPELL_PHOENIX);
         }, 60s);
+
         ScheduleTimedEvent(22s, [&]{
-            DoCastRandomTarget(SPELL_FLAMESTRIKE_SUMMON, 0, 100.0f);
             Talk(SAY_FLAMESTRIKE);
+            DoCastRandomTarget(SPELL_FLAMESTRIKE_SUMMON, 0, 100.0f);
         }, 25s);
 
         if (IsHeroic())
+        {
             ScheduleTimedEvent(50s, [&]{
                 DoCastSelf(SPELL_SHOCK_BARRIER, true);
                 me->CastCustomSpell(SPELL_PYROBLAST, SPELLVALUE_MAX_TARGETS, 1, (Unit*)nullptr, false);
             }, 50s);
+        }
     }
 
     void MoveInLineOfSight(Unit* who) override
@@ -279,8 +289,15 @@ struct boss_felblood_kaelthas : public BossAI
     void UpdateAI(uint32 diff) override
     {
         _OOCScheduler.Update(diff);
+        if (!UpdateVictim())
+            return;
+
+        if (!me->HasUnitState(UNIT_STATE_CASTING))
+            DoMeleeAttackIfReady();
+
         BossAI::UpdateAI(diff);
     }
+
 private:
     TaskScheduler _OOCScheduler;
     bool _hasDoneIntro;
