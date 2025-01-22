@@ -67,7 +67,7 @@ enum Misc
 
     CREATURE_ARCANE_SPHERE     = 24708,
     CREATURE_PHOENIX           = 24674,
-    DATA_KAELTHAS              = 24664
+    CREATURE_KAEL              = 24664
 };
 
 struct npc_phoenix_tk : public ScriptedAI
@@ -87,7 +87,7 @@ struct npc_phoenix_tk : public ScriptedAI
 
         _scheduler.Schedule(2s, [this](TaskContext context)
         {
-            if (Creature* kael = me->FindNearestCreature(CREATURE_KAELTHAS, 100.0f))
+            if (Creature* kael = me->FindNearestCreature(CREATURE_KAEL, 100.0f))
             {
                 if (kael->HealthBelowPct(50))
                     DoCastRandomTarget(SPELL_FIREBALL, 0, 40.0f);
