@@ -96,6 +96,7 @@ void GridTerrainData::unloadData()
     delete[] _areaMap;
     delete[] m_V9;
     delete[] m_V8;
+    delete[] _minHeightPlanes;
     delete[] _liquidEntry;
     delete[] _liquidFlags;
     delete[] _liquidMap;

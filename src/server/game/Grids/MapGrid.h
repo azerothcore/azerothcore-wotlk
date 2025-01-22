@@ -42,7 +42,7 @@ public:
     uint16 GetX() const { return _x; }
     uint16 GetY() const { return _y; }
 
-    bool const IsObjectDataLoaded() { return _objectDataLoaded; }
+    bool IsObjectDataLoaded() const { return _objectDataLoaded; }
     void SetObjectDataLoaded() { _objectDataLoaded = true; }
 
     template<class SPECIFIC_OBJECT> void AddWorldObject(uint16 const x, uint16 const y, SPECIFIC_OBJECT* obj)
