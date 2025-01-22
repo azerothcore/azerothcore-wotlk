@@ -51,7 +51,11 @@ enum Spells
     SPELL_GRAVITY_LAPSE_FLY         = 44227,
     SPELL_GRAVITY_LAPSE_DOT         = 44226,
     SPELL_GRAVITY_LAPSE_CHANNEL     = 44251,
-    SPELL_POWER_FEEDBACK            = 44233
+    SPELL_POWER_FEEDBACK            = 44233,
+
+    // Phoenix spells
+    SPELL_PHOENIX_BURN              = 44197,
+    SPELL_REBIRTH                   = 44196
 };
 
 enum Misc
@@ -61,7 +65,52 @@ enum Misc
     ACTION_ALLOW_FLY            = 3,
     ACTION_REMOVE_FLY           = 4,
 
-    CREATURE_ARCANE_SPHERE      = 24708
+    CREATURE_ARCANE_SPHERE      = 24708,
+    CREATURE_PHOENIX            = 24674
+};
+
+struct npc_phoenix_tk : public ScriptedAI
+{
+    npc_phoenix_tk(Creature* creature) : ScriptedAI(creature), _bossGUID(me->GetOwnerGUID()) { }
+
+    void Reset() override
+    {
+        _scheduler.CancelAll();
+        me->SetReactState(REACT_AGGRESSIVE);
+    }
+
+    void JustEngagedWith(Unit* /*who*/) override
+    {
+        // Only schedule abilities if not in gravity lapse phase
+        if (!me->GetMap()->GetCreature(_bossGUID) || !me->GetMap()->GetCreature(_bossGUID)->HasUnitState(UNIT_STATE_CASTING))
+        {
+            _scheduler.Schedule(2s, [this](TaskContext context)
+            {
+                DoCastRandomTarget(SPELL_FIREBALL, 0, 40.0f);
+                context.Repeat(4s);
+            });
+
+            _scheduler.Schedule(5s, [this](TaskContext context)
+            {
+                DoCastSelf(SPELL_PHOENIX_BURN);
+                context.Repeat(10s);
+            });
+        }
+    }
+
+    void UpdateAI(uint32 diff) override
+    {
+        if (!UpdateVictim())
+            return;
+
+        _scheduler.Update(diff);
+
+        DoMeleeAttackIfReady();
+    }
+
+private:
+    TaskScheduler _scheduler;
+    ObjectGuid _bossGUID;
 };
 
 struct boss_felblood_kaelthas : public BossAI
@@ -257,5 +306,6 @@ class spell_mt_phoenix_burn : public SpellScript
 void AddSC_boss_felblood_kaelthas()
 {
     RegisterMagistersTerraceCreatureAI(boss_felblood_kaelthas);
+    RegisterMagistersTerraceCreatureAI(npc_phoenix_tk);
     RegisterSpellScript(spell_mt_phoenix_burn);
 }
