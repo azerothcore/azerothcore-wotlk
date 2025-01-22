@@ -43,7 +43,6 @@ enum Spells
     SPELL_PYROBLAST                = 36819,
 
     // Phase 2
-    SPELL_FIREBALL                 = 44189,
     SPELL_SUMMON_ARCANE_SPHERE     = 44265,
     SPELL_TELEPORT_CENTER          = 44218,
     SPELL_GRAVITY_LAPSE_INITIAL    = 44224,
@@ -56,6 +55,7 @@ enum Spells
     // Phoenix spells
     SPELL_PHOENIX_BURN             = 44197,
     SPELL_REBIRTH                  = 44196,
+    SPELL_FIREBALL                 = 44189
 };
 
 enum Misc
