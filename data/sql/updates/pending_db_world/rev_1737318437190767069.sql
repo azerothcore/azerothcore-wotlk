@@ -342,7 +342,18 @@ INSERT INTO `game_event_gameobject` (`guid`, `eventEntry`) VALUES
 (5300501, -@sunsreachpthreeperm), -- 187120, Demonic Crystal
 (5300502, -@sunsreachpthreeperm), -- 187120, Demonic Crystal
 (5300503, -@sunsreachpthreeperm), -- 187120, Demonic Crystal
-(5300504, -@sunsreachpthreeperm); -- 187120, Demonic Crystal
+(5300504, -@sunsreachpthreeperm), -- 187120, Demonic Crystal
+-- Banners
+(27839, @sunsreachptwoperm), -- 187356, Shattered Sun Banner (Draenei - Pole)
+(27833, @sunsreachptwoperm), -- 187357, Shattered Sun Banner (Blood Elf - Pole)
+(27838, @sunsreachpthreeperm), -- 187357, Shattered Sun Banner (Blood Elf - Pole)
+(27844, @sunsreachpthreeperm), -- 187356, Shattered Sun Banner (Draenei - Pole)
+(27830, @sunsreachpfour), -- 187356, Shattered Sun Banner (Draenei - Pole)
+(27831, @sunsreachpfour), -- 187356, Shattered Sun Banner (Draenei - Pole)
+(27861, @sunsreachpfour), -- 187357, Shattered Sun Banner (Blood Elf - Pole)
+(27836, @sunsreachpfour), -- 187357, Shattered Sun Banner (Blood Elf - Pole)
+(27827, @sunsreachpfour), -- 187357, Shattered Sun Banner (Blood Elf - Pole)
+(27828, @sunsreachpfour); -- 187356, Shattered Sun Banner (Draenei - Pole)
 
 DELETE FROM `creature_queststarter` WHERE `quest` IN (11514, 11520, 11521, 11523, 11525, 11532, 11533, 11535, 11536, 11537, 11538, 11539, 11540, 11541, 11542, 11543, 11544, 11545, 11546, 11547, 11548, 11549);
 DELETE FROM `game_event_creature_quest` WHERE `eventEntry` IN (@sunsreachpone, @sunsreachptwoonly, @sunsreachptwoperm, @sunsreachnoportal, @sunsreachportal, @sunsreachpthreeonly, @sunsreachpthreeperm, @sunsreachnoanvil, @sunsreachanvil, @sunsreachpfour, @sunsreachnomonument, @sunsreachmonument, @sunsreachnolab, @sunsreachlab, @sunsreachkiru);
