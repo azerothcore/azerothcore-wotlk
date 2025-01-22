@@ -5,14 +5,6 @@
  * under the terms of the GNU Affero General Public License as published by the
  * Free Software Foundation; either version 3 of the License, or (at your
  * option) any later version.
- *
- * This program is distributed in the hope that it will be useful, but WITHOUT
- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
- * more details.
- *
- * You should have received a copy of the GNU General Public License along
- * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
 #include "CreatureScript.h"
@@ -71,30 +63,37 @@ enum Misc
 
 struct npc_phoenix_tk : public ScriptedAI
 {
-    npc_phoenix_tk(Creature* creature) : ScriptedAI(creature), _bossGUID(me->GetOwnerGUID()) { }
+    npc_phoenix_tk(Creature* creature) : ScriptedAI(creature) { }
 
     void Reset() override
     {
         _scheduler.CancelAll();
         me->SetReactState(REACT_AGGRESSIVE);
+
+        _scheduler.Schedule(5s, [this](TaskContext context)
+        {
+            DoCastSelf(SPELL_PHOENIX_BURN);
+            context.Repeat(10s);
+        });
+
+        _scheduler.Schedule(2s, [this](TaskContext context)
+        {
+            if (Creature* kael = ObjectAccessor::GetCreature(*me, _kaelGuid))
+            {
+                if (kael->GetHealthPct() <= 50.0f)
+                {
+                    DoCastRandomTarget(SPELL_FIREBALL, 0, 40.0f);
+                }
+            }
+            context.Repeat(4s);
+        });
     }
 
-    void JustEngagedWith(Unit* /*who*/) override
+    void IsSummonedBy(WorldObject* summoner) override
     {
-        // Only schedule abilities if not in gravity lapse phase
-        if (!me->GetMap()->GetCreature(_bossGUID) || !me->GetMap()->GetCreature(_bossGUID)->HasUnitState(UNIT_STATE_CASTING))
+        if (Creature* kael = summoner->ToCreature())
         {
-            _scheduler.Schedule(2s, [this](TaskContext context)
-            {
-                DoCastRandomTarget(SPELL_FIREBALL, 0, 40.0f);
-                context.Repeat(4s);
-            });
-
-            _scheduler.Schedule(5s, [this](TaskContext context)
-            {
-                DoCastSelf(SPELL_PHOENIX_BURN);
-                context.Repeat(10s);
-            });
+            _kaelGuid = kael->GetGUID();
         }
     }
 
@@ -111,7 +110,7 @@ struct npc_phoenix_tk : public ScriptedAI
 
 private:
     TaskScheduler _scheduler;
-    ObjectGuid _bossGUID;
+    ObjectGuid _kaelGuid;
 };
 
 struct boss_felblood_kaelthas : public BossAI
@@ -155,7 +154,10 @@ struct boss_felblood_kaelthas : public BossAI
     void JustSummoned(Creature* summon) override
     {
         BossAI::JustSummoned(summon);
-        summon->SetReactState(REACT_PASSIVE);
+        if (summon->GetEntry() != CREATURE_PHOENIX)
+        {
+            summon->SetReactState(REACT_PASSIVE);
+        }
     }
 
     void GravityLapseSequence(bool firstTime)
