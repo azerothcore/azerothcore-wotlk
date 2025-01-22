@@ -55,7 +55,7 @@ enum Spells
 
     // Phoenix spells
     SPELL_PHOENIX_BURN             = 44197,
-    SPELL_REBIRTH                  = 44196
+    SPELL_REBIRTH                  = 44196,
 };
 
 enum Misc
@@ -66,7 +66,8 @@ enum Misc
     ACTION_REMOVE_FLY          = 4,
 
     CREATURE_ARCANE_SPHERE     = 24708,
-    CREATURE_PHOENIX           = 24674
+    CREATURE_PHOENIX           = 24674,
+    DATA_KAELTHAS              = 24664
 };
 
 struct npc_phoenix_tk : public ScriptedAI
@@ -86,18 +87,13 @@ struct npc_phoenix_tk : public ScriptedAI
 
         _scheduler.Schedule(2s, [this](TaskContext context)
         {
-            if (Creature* kael = ObjectAccessor::GetCreature(*me, _kaelGuid))
+            if (Creature* kael = me->FindNearestCreature(CREATURE_KAELTHAS, 100.0f))
+            {
                 if (kael->HealthBelowPct(50))
                     DoCastRandomTarget(SPELL_FIREBALL, 0, 40.0f);
+            }
+            context.Repeat(2s);
         });
-    }
-
-    void IsSummonedBy(WorldObject* summoner) override
-    {
-        if (Creature* kael = summoner->ToCreature())
-        {
-            _kaelGuid = kael->GetGUID();
-        }
     }
 
     void UpdateAI(uint32 diff) override
@@ -113,7 +109,6 @@ struct npc_phoenix_tk : public ScriptedAI
 
 private:
     TaskScheduler _scheduler;
-    ObjectGuid _kaelGuid;
 };
 
 struct boss_felblood_kaelthas : public BossAI
