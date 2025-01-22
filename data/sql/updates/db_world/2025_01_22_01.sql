@@ -1,3 +1,4 @@
+-- DB update 2025_01_22_00 -> 2025_01_22_01
 
 -- Shoveltusk Stag
 UPDATE `creature_template` SET `AIName` = 'SmartAI' WHERE `entry` = 23691;
