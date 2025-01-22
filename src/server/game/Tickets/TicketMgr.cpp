@@ -448,6 +448,6 @@ void TicketMgr::SendTicket(WorldSession* session, GmTicket* ticket) const
 void TicketMgr::UpdateLastChange(GmTicket* ticket)
 {
     _lastChange = GameTime::GetGameTime().count();
-    
+
     sScriptMgr->OnTicketUpdate(ticket->GetPlayer(), ticket);
 }
