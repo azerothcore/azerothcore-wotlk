@@ -826,16 +826,110 @@ INSERT INTO `gameobject` (`guid`, `id`, `map`, `spawnMask`, `phaseMask`, `positi
 -- Creatures
 -- Portal Subphase, Shattrath City, Shattered Sun Warrior and Shattered Sun Marksman
 DELETE FROM `creature` WHERE `id1` IN (25115, 24938) AND `guid` BETWEEN @cguidportalshat AND @cguidportalshat+7;
+-- spawntimesecs 30-120s, 75s avg
 INSERT INTO `creature` (`guid`, `id1`, `map`, `spawnMask`, `phaseMask`, `position_x`, `position_y`, `position_z`, `orientation`, `spawntimesecs`, `MovementType`, `VerifiedBuild`, `Comment`) VALUES
-(@cguidportalshat+0, 25115, 530, 1, 1, -1983.31005859375, 5491.89013671875, -12.344799995422363, 0.1725849956274032, 120, 2, 0, ''),
-(@cguidportalshat+1, 25115, 530, 1, 1, -1866.1199951171875, 5519.31005859375, -12.344799995422363, 3.35932993888855, 120, 2, 0, ''),
-(@cguidportalshat+2, 25115, 530, 1, 1, -1955.0699462890625, 5432.39990234375, -12.344799995422363, 4.982600212097168, 120, 2, 0, ''),
-(@cguidportalshat+3, 25115, 530, 1, 1, -1753.5, 5495.75, -12.344799995422363, 3.782819986343384, 120, 2, 0, ''),
-(@cguidportalshat+4, 24938, 530, 1, 1, -1941.18994140625, 5486.89990234375, -12.344799995422363, 0.5934119820594788, 120, 2, 0, ''),
-(@cguidportalshat+5, 24938, 530, 1, 1, -1958.1099853515625, 5418.16015625, -12.344799995422363, 5.061450004577637, 120, 2, 0, ''),
-(@cguidportalshat+6, 24938, 530, 1, 1, -1771.47998046875, 5424.3798828125, -12.344799995422363, 1.7976900339126587, 120, 2, 0, ''),
-(@cguidportalshat+7, 24938, 530, 1, 1, -1799.050048828125, 5549.31982421875, -12.344799995422363, 5.026549816131592, 120, 2, 0, '');
--- TODO: waypoint script from creature_movement Id  BETWEEN 165102 AND 165109
+(@cguidportalshat+0, 25115, 530, 1, 1, -1983.31005859375, 5491.89013671875, -12.344799995422363, 0.1725849956274032, 75, 2, 0, ''),
+(@cguidportalshat+1, 25115, 530, 1, 1, -1866.1199951171875, 5519.31005859375, -12.344799995422363, 3.35932993888855, 75, 2, 0, ''),
+(@cguidportalshat+2, 25115, 530, 1, 1, -1955.0699462890625, 5432.39990234375, -12.344799995422363, 4.982600212097168, 75, 2, 0, ''),
+(@cguidportalshat+3, 25115, 530, 1, 1, -1753.5, 5495.75, -12.344799995422363, 3.782819986343384, 75, 2, 0, ''),
+(@cguidportalshat+4, 24938, 530, 1, 1, -1941.18994140625, 5486.89990234375, -12.344799995422363, 0.5934119820594788, 75, 2, 0, ''),
+(@cguidportalshat+5, 24938, 530, 1, 1, -1958.1099853515625, 5418.16015625, -12.344799995422363, 5.061450004577637, 75, 2, 0, ''),
+(@cguidportalshat+6, 24938, 530, 1, 1, -1771.47998046875, 5424.3798828125, -12.344799995422363, 1.7976900339126587, 75, 2, 0, ''),
+(@cguidportalshat+7, 24938, 530, 1, 1, -1799.050048828125, 5549.31982421875, -12.344799995422363, 5.026549816131592, 75, 2, 0, '');
+
+DELETE FROM `waypoint_data` WHERE `id` = (@cguidportalshat+0)*10;
+INSERT INTO `waypoint_data` (`id`, `point`, `position_x`, `position_y`, `position_z`, `orientation`, `delay`, `move_type`, `action`) VALUES
+((@cguidportalshat+0)*10, 1, -1983.33, 5492.03, -12.4281, 0.0, 250, 1, 0),
+((@cguidportalshat+0)*10, 2, -1941.97, 5499.10, -12.4281, 0.0, 0, 1, 0),
+((@cguidportalshat+0)*10, 3, -1905.15, 5501.05, -12.4281, 0.0, 0, 1, 0),
+((@cguidportalshat+0)*10, 4, -1875.16, 5471.33, -12.4281, 0.0, 0, 1, 0),
+((@cguidportalshat+0)*10, 5, -1853.28, 5475.17, -12.4281, 0.0, 0, 1, 0),
+((@cguidportalshat+0)*10, 6, -1847.65, 5493.82, -12.4545, 0.0, 0, 1, 0),
+((@cguidportalshat+0)*10, 7, -1841.89, 5499.54, -12.4281, 1.23, 5000, 1, @cguidportalshat*10);
+
+DELETE FROM `waypoint_data` WHERE `id` = (@cguidportalshat+1)*10;
+INSERT INTO `waypoint_data` (`id`, `point`, `position_x`, `position_y`, `position_z`, `orientation`, `delay`, `move_type`, `action`) VALUES
+((@cguidportalshat+1)*10, 1, -1866.18, 5519.39, -12.4281, 0.0, 250, 1, 0),
+((@cguidportalshat+1)*10, 2, -1889.29, 5514.19, -12.4281, 0.0, 0, 1, 0),
+((@cguidportalshat+1)*10, 3, -1897.09, 5497.14, -12.4281, 0.0, 0, 1, 0),
+((@cguidportalshat+1)*10, 4, -1876.34, 5471.40, -12.4281, 0.0, 0, 1, 0),
+((@cguidportalshat+1)*10, 5, -1856.19, 5471.47, -12.4281, 0.0, 0, 1, 0),
+((@cguidportalshat+1)*10, 6, -1845.27, 5496.98, -12.4569, 0.0, 0, 1, 0),
+((@cguidportalshat+1)*10, 7, -1840.91, 5499.92, -12.4280, 1.23, 5000, 1, @cguidportalshat*10);
+
+DELETE FROM `waypoint_data` WHERE `id` = (@cguidportalshat+2)*10;
+INSERT INTO `waypoint_data` (`id`, `point`, `position_x`, `position_y`, `position_z`, `orientation`, `delay`, `move_type`, `action`) VALUES
+((@cguidportalshat+2)*10, 1, -1954.96, 5432.12, -12.4281, 0.0, 250, 1, 0),
+((@cguidportalshat+2)*10, 2, -1947.68, 5405.70, -12.4281, 0.0, 0, 1, 0),
+((@cguidportalshat+2)*10, 3, -1928.35, 5396.70, -12.4281, 0.0, 0, 1, 0),
+((@cguidportalshat+2)*10, 4, -1892.14, 5430.80, -12.4282, 0.0, 0, 1, 0),
+((@cguidportalshat+2)*10, 5, -1865.26, 5463.53, -12.4281, 0.0, 0, 1, 0),
+((@cguidportalshat+2)*10, 6, -1841.39, 5493.11, -12.4281, 0.0, 0, 1, 0),
+((@cguidportalshat+2)*10, 7, -1840.05, 5499.26, -12.4280, 1.23, 5000, 1, @cguidportalshat*10);
+
+DELETE FROM `waypoint_data` WHERE `id` = (@cguidportalshat+3)*10;
+INSERT INTO `waypoint_data` (`id`, `point`, `position_x`, `position_y`, `position_z`, `orientation`, `delay`, `move_type`, `action`) VALUES
+((@cguidportalshat+3)*10, 1, -1753.56, 5495.54, -12.4281, 0.0, 250, 1, 0),
+((@cguidportalshat+3)*10, 2, -1791.01, 5467.76, -12.4281, 0.0, 0, 1, 0),
+((@cguidportalshat+3)*10, 3, -1825.64, 5453.07, -12.4282, 0.0, 0, 1, 0),
+((@cguidportalshat+3)*10, 4, -1844.89, 5473.19, -12.4281, 0.0, 0, 1, 0),
+((@cguidportalshat+3)*10, 5, -1840.24, 5498.82, -12.4281, 1.23, 5000, 1, @cguidportalshat*10);
+
+DELETE FROM `waypoint_data` WHERE `id` = (@cguidportalshat+4)*10;
+INSERT INTO `waypoint_data` (`id`, `point`, `position_x`, `position_y`, `position_z`, `orientation`, `delay`, `move_type`, `action`) VALUES
+((@cguidportalshat+4)*10, 1, -1941.15, 5487.12, -12.42811, 0.0, 250, 1, 0),
+((@cguidportalshat+4)*10, 2, -1914.21, 5504.99, -12.42810, 0.0, 0, 1, 0),
+((@cguidportalshat+4)*10, 3, -1896.75, 5495.92, -12.42810, 0.0, 0, 1, 0),
+((@cguidportalshat+4)*10, 4, -1879.80, 5472.28, -12.42810, 0.0, 0, 1, 0),
+((@cguidportalshat+4)*10, 5, -1853.05, 5469.34, -12.42811, 0.0, 0, 1, 0),
+((@cguidportalshat+4)*10, 6, -1839.51, 5498.56, -12.42811, 0.0, 0, 1, 0),
+((@cguidportalshat+4)*10, 7, -1839.51, 5498.56, -12.42810, 1.23, 5000, 1, @cguidportalshat*10);
+
+DELETE FROM `waypoint_data` WHERE `id` = (@cguidportalshat+5)*10;
+INSERT INTO `waypoint_data` (`id`, `point`, `position_x`, `position_y`, `position_z`, `orientation`, `delay`, `move_type`, `action`) VALUES
+((@cguidportalshat+5)*10, 1, -1958.15, 5418.13, -12.4281, 0.0, 250, 1, 0),
+((@cguidportalshat+5)*10, 2, -1937.75, 5396.30, -12.4281, 0.0, 0, 1, 0),
+((@cguidportalshat+5)*10, 3, -1903.02, 5412.98, -12.4282, 0.0, 0, 1, 0),
+((@cguidportalshat+5)*10, 4, -1885.32, 5439.74, -12.4281,0.0, 0, 1, 0),
+((@cguidportalshat+5)*10, 5, -1856.43, 5471.17, -12.4281, 0.0, 0, 1, 0),
+((@cguidportalshat+5)*10, 6, -1848.19, 5493.08, -12.4475, 0.0, 0, 1, 0),
+((@cguidportalshat+5)*10, 7, -1841.45, 5499.37, -12.4281, 1.23, 5000, 1, @cguidportalshat*10);
+
+DELETE FROM `waypoint_data` WHERE `id` = (@cguidportalshat+6)*10;
+INSERT INTO `waypoint_data` (`id`, `point`, `position_x`, `position_y`, `position_z`, `orientation`, `delay`, `move_type`, `action`) VALUES
+((@cguidportalshat+6)*10, 1, -1771.40, 5424.44, -12.4281, 0.0, 250, 1, 0),
+((@cguidportalshat+6)*10, 2, -1780.13, 5458.50, -12.4281, 0.0, 0, 1, 0),
+((@cguidportalshat+6)*10, 3, -1802.26, 5461.31, -12.4281, 0.0, 0, 1, 0),
+((@cguidportalshat+6)*10, 4, -1826.47, 5454.01, -12.4283, 0.0, 0, 1, 0),
+((@cguidportalshat+6)*10, 5, -1844.75, 5471.00, -12.4282, 0.0, 0, 1, 0),
+((@cguidportalshat+6)*10, 6, -1840.07, 5498.43, -12.4281, 1.23, 5000, 1, @cguidportalshat*10);
+
+DELETE FROM `waypoint_data` WHERE `id` = (@cguidportalshat+7)*10;
+INSERT INTO `waypoint_data` (`id`, `point`, `position_x`, `position_y`, `position_z`, `orientation`, `delay`, `move_type`, `action`) VALUES
+((@cguidportalshat+7)*10, 1, -1799.13, 5549.21,0 -12.42810, 0.0, 250, 1, 0),
+((@cguidportalshat+7)*10, 2, -1786.30, 5503.25,0 -12.42810, 0.0, 0, 1, 0),
+((@cguidportalshat+7)*10, 3, -1788.18, 5469.74,0 -12.42811, 0.0, 0, 1, 0),
+((@cguidportalshat+7)*10, 4, -1822.23, 5450.82,0 -12.42813, 0.0, 0, 1, 0),
+((@cguidportalshat+7)*10, 5, -1844.87, 5471.94,0 -12.42820, 0.0, 0, 1, 0),
+((@cguidportalshat+7)*10, 6, -1840.02, 5499.12,0 -12.42810, 1.23, 5000, 1, @cguidportalshat*10);
+
+DELETE FROM `waypoint_scripts` WHERE `id` = @cguidportalshat*10 AND `guid` BETWEEN (@cguidportalshat*10) AND (@cguidportalshat*10)+2;
+INSERT INTO `waypoint_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `dataint`, `x`, `y`, `z`, `o`, `guid`) VALUES
+(@cguidportalshat*10, 0, 15, 34427, 1, 0, 0.0, 0.0, 0.0, 0.0, (@cguidportalshat*10)+0),
+(@cguidportalshat*10, 0, 1, 66, 0, 0, 0.0, 0.0, 0.0, 0.0, (@cguidportalshat*10)+1),
+(@cguidportalshat*10, 0, 18, 1000, 0, 0, 0.0, 0.0, 0.0, 0.0, (@cguidportalshat*10)+2);
+
+-- Set `path_id` for the above creatures
+DELETE FROM `creature_addon` WHERE `guid` BETWEEN @cguidportalshat AND @cguidportalshat+7;
+INSERT INTO `creature_addon` (`guid`, `path_id`, `mount`, `bytes1`, `bytes2`, `emote`, `visibilityDistanceType`, `auras`) VALUES
+(@cguidportalshat+0, (@cguidportalshat+0)*10, 0, 0, 0, 45, 0, NULL),
+(@cguidportalshat+1, (@cguidportalshat+1)*10, 0, 0, 0, 45, 0, NULL),
+(@cguidportalshat+2, (@cguidportalshat+2)*10, 0, 0, 0, 45, 0, NULL),
+(@cguidportalshat+3, (@cguidportalshat+3)*10, 0, 0, 0, 45, 0, NULL),
+(@cguidportalshat+4, (@cguidportalshat+4)*10, 0, 0, 0, 45, 0, NULL),
+(@cguidportalshat+5, (@cguidportalshat+5)*10, 0, 0, 0, 45, 0, NULL),
+(@cguidportalshat+6, (@cguidportalshat+6)*10, 0, 0, 0, 45, 0, NULL),
+(@cguidportalshat+7, (@cguidportalshat+7)*10, 0, 0, 0, 45, 0, NULL);
 
 -- Portal Subphase, Isle of Quel'Danas
 DELETE FROM `creature` WHERE `id1` = 24936 AND `guid` BETWEEN @cguidportalisle AND @cguidportalisle+9;
