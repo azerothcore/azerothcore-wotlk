@@ -27,17 +27,29 @@ SET
 @sunsreachkiru       = 115;
 
 -- Smith Hauthaa <Weapons & Armorsmith>
-SET @guidsmith = 93964;
+SET @cguidsmith = 93964;
 -- Shaani <Jewelcrafting Supplies>
-SET @guidjc = 94386;
+SET @cguidjc = 94386;
 -- Mar'nah <Alchemist>
-SET @guidalch = 94378;
+SET @cguidalch = 94378;
 -- Demonic Crystals
-SET @guidcrystals:=5300500;
+SET @guidcrystals = 5300500;
 -- Alchemy lab
-SET @guidalch=5300290;
--- Shattrath City, Portal Subphase, Shattered Sun Warrior and Shattered Sun Marksman
-SET @cguidshatportal:=165102;
+SET @guidalch = 5300290;
+-- Portal Subphase, Shattrath City, Shattered Sun Warrior and Shattered Sun Marksman
+SET @cguidportalshat = 165102;
+-- Portal Subphase, Isle of Quel'Danas
+SET @cguidportalisle = 5300070;
+-- Dawnblade Blood Knight
+SET @cguidbloodknights = 5300293;
+-- Dawnblade Summoner, Dawnblade Marksman
+SET @cguidsummonermarksman = 5300355;
+-- Irespeaker
+SET @cguidirespeaker = 5300460;
+-- Abyssal Flamewalker, Unleashed Hellion
+SET @cguidflamewalkerhellion = 5300471;
+-- Invisible Stalker Floating -> Fel Crystal Spell target
+SET @cguidfelcrystalspelltarget = 5300031;
 
 DELETE FROM `game_event` WHERE `eventEntry` IN (@sunsreachpone, @sunsreachptwoonly, @sunsreachptwoperm, @sunsreachnoportal, @sunsreachportal, @sunsreachpthreeonly, @sunsreachpthreeperm, @sunsreachnoanvil, @sunsreachanvil, @sunsreachpfour, @sunsreachnomonument, @sunsreachmonument, @sunsreachnolab, @sunsreachlab, @sunsreachkiru);
 INSERT INTO `game_event` (`eventEntry`, `start_time`, `end_time`, `occurence`, `length`, `holiday`, `holidayStage`, `description`, `world_event`, `announce`) VALUES
@@ -66,7 +78,7 @@ INSERT INTO `game_event_creature` (`guid`, `eventEntry`) VALUES
 (93953, @sunsreachptwoperm), -- 25133 (Astromancer Darnarian)
 (96655, @sunsreachptwoperm), -- 24932 (Exarch Nasuun)
 -- Phase 3
-(@guidsmith, @sunsreachpthreeperm), -- 25046 (Smith Hauthaa <Weapons & Armorsmith>)
+(@cguidsmith, @sunsreachpthreeperm), -- 25046 (Smith Hauthaa <Weapons & Armorsmith>)
 (93955, @sunsreachpthreeperm), -- 25108 (Vindicator Kaalan)
 (93954, @sunsreachpthreeperm), -- 25035 (Tyrael Flamekissed <General Goods>)
 (93960, @sunsreachpthreeperm), -- 26089 (Kayri <Exotic Gear Purveyor>)
@@ -75,11 +87,13 @@ INSERT INTO `game_event_creature` (`guid`, `eventEntry`) VALUES
 (93958, @sunsreachpthreeperm), -- 26092 (Soryn <Exotic Gear Purveyor>)
 (93957, @sunsreachpthreeperm), -- 25069 (Magister Ilastar)
 -- Phase 4
-(@guidalch, @sunsreachpfour), -- 24975 (Mar'nah <Alchemist>)
+(@cguidalch, @sunsreachpfour), -- 24975 (Mar'nah <Alchemist>)
 (94379, @sunsreachpfour), -- 25036 (Caregiver Inaara <Innkeeper>)
 (94384, @sunsreachpfour), -- 25112 (Anchorite Ayuri)
 (94385, @sunsreachpfour), -- 25163 (Anchorite Kairthos)
-(@guidjc, @sunsreachpfour), -- 25950 (Shaani <Jewelcrafting Supplies>)
+(@cguidjc, @sunsreachpfour), -- 25950 (Shaani <Jewelcrafting Supplies>)
+(94377, @sunsreachpfour), -- 24994 (Shattered Sun Sentry)
+(83998, @sunsreachpfour), -- 24994 (Shattered Sun Sentry)
 -- Kaalif?
 (94381, @sunsreachpfour), -- 25043 (Sereth Duskbringer <Poison Supplies>)
 (94383, @sunsreachpfour), -- 25088 (Captain Valindria)
@@ -224,6 +238,11 @@ INSERT INTO `game_event_creature` (`guid`, `eventEntry`) VALUES
 (5300496, -@sunsreachpthreeperm), -- 25002 (Unleashed Hellion)
 (5300497, -@sunsreachpthreeperm), -- 25002 (Unleashed Hellion)
 (5300501, -@sunsreachpthreeperm), -- 25002 (Unleashed Hellion)
+(@cguidfelcrystalspelltarget+0, -@sunsreachpthreeperm), -- 25953 (Fel Crystal Spell Target)
+(@cguidfelcrystalspelltarget+1, -@sunsreachpthreeperm), -- 25953 (Fel Crystal Spell Target)
+(@cguidfelcrystalspelltarget+2, -@sunsreachpthreeperm), -- 25953 (Fel Crystal Spell Target)
+(@cguidfelcrystalspelltarget+3, -@sunsreachpthreeperm), -- 25953 (Fel Crystal Spell Target)
+(@cguidfelcrystalspelltarget+4, -@sunsreachpthreeperm), -- 25953 (Fel Crystal Spell Target)
 -- Dawning Square Enemies
 (5300406, -@sunsreachpfour), -- 24979 (Dawnblade Marksman)
 (5300403, -@sunsreachpfour), -- 24979 (Dawnblade Marksman)
@@ -283,8 +302,8 @@ INSERT INTO `game_event_creature` (`guid`, `eventEntry`) VALUES
 (5300474, -@sunsreachpthreeperm), -- 25001 (Abyssal Flamewalker)
 (5300502, -@sunsreachpthreeperm), -- 25002 (Unleashed Hellion)
 (5300503, -@sunsreachpthreeperm), -- 25002 (Unleashed Hellion)
-(5300086, -@sunsreachptwoperm), -- 24938 (Shattered Sun Marksman)
-(5300087, -@sunsreachptwoperm), -- 24938 (Shattered Sun Marksman)
+(54030, -@sunsreachptwoperm), -- 24938 (Shattered Sun Marksman)
+(54031, -@sunsreachptwoperm), -- 24938 (Shattered Sun Marksman)
 (5300293, -@sunsreachptwoperm), -- 24976 (Dawnblade Blood Knight)
 (5300294, -@sunsreachptwoperm), -- 24976 (Dawnblade Blood Knight)
 (5300309, -@sunsreachptwoperm), -- 24976 (Dawnblade Blood Knight)
@@ -293,11 +312,11 @@ INSERT INTO `game_event_creature` (`guid`, `eventEntry`) VALUES
 (5300370, -@sunsreachptwoperm), -- 24978 (Dawnblade Summoner)
 (5300401, -@sunsreachptwoperm), -- 24979 (Dawnblade Marksman)
 (5300402, -@sunsreachptwoperm), -- 24979 (Dawnblade Marksman)
-(5301085, -@sunsreachptwoperm), -- 25115 (Shattered Sun Warrior)
-(5301086, -@sunsreachptwoperm), -- 25115 (Shattered Sun Warrior)
-(5301087, -@sunsreachptwoperm), -- 25115 (Shattered Sun Warrior)
-(5300086, -@sunsreachptwoonly), -- 24938 (Shattered Sun Marksman)
-(5300087, -@sunsreachptwoonly), -- 24938 (Shattered Sun Marksman)
+(71916, -@sunsreachptwoperm), -- 25115 (Shattered Sun Warrior)
+(71917, -@sunsreachptwoperm), -- 25115 (Shattered Sun Warrior)
+(71919, -@sunsreachptwoperm), -- 25115 (Shattered Sun Warrior)
+(54030, -@sunsreachptwoonly), -- 24938 (Shattered Sun Marksman)
+(54031, -@sunsreachptwoonly), -- 24938 (Shattered Sun Marksman)
 (5300293, -@sunsreachptwoonly), -- 24976 (Dawnblade Blood Knight)
 (5300294, -@sunsreachptwoonly), -- 24976 (Dawnblade Blood Knight)
 (5300309, -@sunsreachptwoonly), -- 24976 (Dawnblade Blood Knight)
@@ -306,27 +325,24 @@ INSERT INTO `game_event_creature` (`guid`, `eventEntry`) VALUES
 (5300370, -@sunsreachptwoonly), -- 24978 (Dawnblade Summoner)
 (5300401, -@sunsreachptwoonly), -- 24979 (Dawnblade Marksman)
 (5300402, -@sunsreachptwoonly), -- 24979 (Dawnblade Marksman)
-(5301085, -@sunsreachptwoonly), -- 25115 (Shattered Sun Warrior)
-(5301086, -@sunsreachptwoonly), -- 25115 (Shattered Sun Warrior)
-(5301087, -@sunsreachptwoonly), -- 25115 (Shattered Sun Warrior)
-(@cguidshatportal+0,  @sunsreachportal), -- 25115 (Shattered Sun Warrior)
-(@cguidshatportal+1,  @sunsreachportal), -- 25115 (Shattered Sun Warrior)
-(@cguidshatportal+2,  @sunsreachportal), -- 25115 (Shattered Sun Warrior)
-(@cguidshatportal+3,  @sunsreachportal), -- 25115 (Shattered Sun Warrior)
-(@cguidshatportal+4,  @sunsreachportal), -- 24938 (Shattered Sun Marksman)
-(@cguidshatportal+5,  @sunsreachportal), -- 24938 (Shattered Sun Marksman)
-(@cguidshatportal+6,  @sunsreachportal), -- 24938 (Shattered Sun Marksman)
-(@cguidshatportal+7,  @sunsreachportal), -- 24938 (Shattered Sun Marksman)
-(5300070, @sunsreachportal), -- 24936 (Sunwell Daily Bunny x 0.01)
-(5300071, @sunsreachportal), -- 24936 (Sunwell Daily Bunny x 0.01)
-(5300072, @sunsreachportal), -- 24936 (Sunwell Daily Bunny x 0.01)
-(5300073, @sunsreachportal), -- 24936 (Sunwell Daily Bunny x 0.01)
-(5300074, @sunsreachportal), -- 24936 (Sunwell Daily Bunny x 0.01)
-(5300075, @sunsreachportal), -- 24936 (Sunwell Daily Bunny x 0.01)
-(5300076, @sunsreachportal), -- 24936 (Sunwell Daily Bunny x 0.01)
-(5300077, @sunsreachportal), -- 24936 (Sunwell Daily Bunny x 0.01)
-(5300078, @sunsreachportal), -- 24936 (Sunwell Daily Bunny x 0.01)
-(5300079, @sunsreachportal); -- 24936 (Sunwell Daily Bunny x 0.01)
+(@cguidportalshat+0,  @sunsreachportal), -- 25115 (Shattered Sun Warrior)
+(@cguidportalshat+1,  @sunsreachportal), -- 25115 (Shattered Sun Warrior)
+(@cguidportalshat+2,  @sunsreachportal), -- 25115 (Shattered Sun Warrior)
+(@cguidportalshat+3,  @sunsreachportal), -- 25115 (Shattered Sun Warrior)
+(@cguidportalshat+4,  @sunsreachportal), -- 24938 (Shattered Sun Marksman)
+(@cguidportalshat+5,  @sunsreachportal), -- 24938 (Shattered Sun Marksman)
+(@cguidportalshat+6,  @sunsreachportal), -- 24938 (Shattered Sun Marksman)
+(@cguidportalshat+7,  @sunsreachportal), -- 24938 (Shattered Sun Marksman)
+(@cguidportalisle+0, @sunsreachportal), -- 24936 (Sunwell Daily Bunny x 0.01)
+(@cguidportalisle+1, @sunsreachportal), -- 24936 (Sunwell Daily Bunny x 0.01)
+(@cguidportalisle+2, @sunsreachportal), -- 24936 (Sunwell Daily Bunny x 0.01)
+(@cguidportalisle+3, @sunsreachportal), -- 24936 (Sunwell Daily Bunny x 0.01)
+(@cguidportalisle+4, @sunsreachportal), -- 24936 (Sunwell Daily Bunny x 0.01)
+(@cguidportalisle+5, @sunsreachportal), -- 24936 (Sunwell Daily Bunny x 0.01)
+(@cguidportalisle+6, @sunsreachportal), -- 24936 (Sunwell Daily Bunny x 0.01)
+(@cguidportalisle+7, @sunsreachportal), -- 24936 (Sunwell Daily Bunny x 0.01)
+(@cguidportalisle+8, @sunsreachportal), -- 24936 (Sunwell Daily Bunny x 0.01)
+(@cguidportalisle+9, @sunsreachportal); -- 24936 (Sunwell Daily Bunny x 0.01)
 
 DELETE FROM `game_event_gameobject` WHERE `eventEntry` IN (@sunsreachpone, @sunsreachptwoonly, @sunsreachptwoperm, @sunsreachnoportal, @sunsreachportal, @sunsreachpthreeonly, @sunsreachpthreeperm, @sunsreachnoanvil, @sunsreachanvil, @sunsreachpfour, @sunsreachnomonument, @sunsreachmonument, @sunsreachnolab, @sunsreachlab, @sunsreachkiru, -@sunsreachpone, -@sunsreachptwoonly, -@sunsreachptwoperm, -@sunsreachnoportal, -@sunsreachportal, -@sunsreachpthreeonly, -@sunsreachpthreeperm, -@sunsreachnoanvil, -@sunsreachanvil, -@sunsreachpfour, -@sunsreachnomonument, -@sunsreachmonument, -@sunsreachnolab, -@sunsreachlab, -@sunsreachkiru);
 INSERT INTO `game_event_gameobject` (`guid`, `eventEntry`) VALUES
@@ -562,135 +578,135 @@ DELETE FROM `creature` WHERE (`id1` = 25115) AND (`guid` IN (96593));
 -- Anvil vendor
 -- Smith Hauthaa
 DELETE FROM `npc_vendor` WHERE (`entry` = 25046);
-DELETE FROM `game_event_npc_vendor` WHERE (`eventEntry` = @sunsreachanvil) AND `guid` = @guidsmith;
+DELETE FROM `game_event_npc_vendor` WHERE (`eventEntry` = @sunsreachanvil) AND `guid` = @cguidsmith;
 INSERT INTO `game_event_npc_vendor` (`eventEntry`, `guid`, `slot`, `item`, `maxcount`, `incrtime`, `ExtendedCost`) VALUES
-(@sunsreachanvil, @guidsmith, 0, 34887, 0, 0, 2059),
-(@sunsreachanvil, @guidsmith, 0, 34888, 0, 0, 2059),
-(@sunsreachanvil, @guidsmith, 0, 34889, 0, 0, 2059),
-(@sunsreachanvil, @guidsmith, 0, 34890, 0, 0, 2059),
-(@sunsreachanvil, @guidsmith, 0, 34891, 0, 0, 2329),
-(@sunsreachanvil, @guidsmith, 0, 34892, 0, 0, 2329),
-(@sunsreachanvil, @guidsmith, 0, 34893, 0, 0, 2331),
-(@sunsreachanvil, @guidsmith, 0, 34894, 0, 0, 2331),
-(@sunsreachanvil, @guidsmith, 0, 34895, 0, 0, 2329),
-(@sunsreachanvil, @guidsmith, 0, 34896, 0, 0, 2329),
-(@sunsreachanvil, @guidsmith, 0, 34898, 0, 0, 2329),
-(@sunsreachanvil, @guidsmith, 0, 34900, 0, 0, 2333),
-(@sunsreachanvil, @guidsmith, 0, 34901, 0, 0, 2333),
-(@sunsreachanvil, @guidsmith, 0, 34902, 0, 0, 2049),
-(@sunsreachanvil, @guidsmith, 0, 34903, 0, 0, 2333),
-(@sunsreachanvil, @guidsmith, 0, 34904, 0, 0, 2049),
-(@sunsreachanvil, @guidsmith, 0, 34905, 0, 0, 2333),
-(@sunsreachanvil, @guidsmith, 0, 34906, 0, 0, 2333),
-(@sunsreachanvil, @guidsmith, 0, 34910, 0, 0, 2333),
-(@sunsreachanvil, @guidsmith, 0, 34911, 0, 0, 2049),
-(@sunsreachanvil, @guidsmith, 0, 34912, 0, 0, 2333),
-(@sunsreachanvil, @guidsmith, 0, 34914, 0, 0, 2333),
-(@sunsreachanvil, @guidsmith, 0, 34916, 0, 0, 2049),
-(@sunsreachanvil, @guidsmith, 0, 34917, 0, 0, 2333),
-(@sunsreachanvil, @guidsmith, 0, 34918, 0, 0, 2333),
-(@sunsreachanvil, @guidsmith, 0, 34919, 0, 0, 2049),
-(@sunsreachanvil, @guidsmith, 0, 34921, 0, 0, 2333),
-(@sunsreachanvil, @guidsmith, 0, 34922, 0, 0, 2333),
-(@sunsreachanvil, @guidsmith, 0, 34923, 0, 0, 2049),
-(@sunsreachanvil, @guidsmith, 0, 34924, 0, 0, 2333),
-(@sunsreachanvil, @guidsmith, 0, 34925, 0, 0, 2333),
-(@sunsreachanvil, @guidsmith, 0, 34926, 0, 0, 2049),
-(@sunsreachanvil, @guidsmith, 0, 34927, 0, 0, 2333),
-(@sunsreachanvil, @guidsmith, 0, 34928, 0, 0, 2333),
-(@sunsreachanvil, @guidsmith, 0, 34929, 0, 0, 2049),
-(@sunsreachanvil, @guidsmith, 0, 34930, 0, 0, 2333),
-(@sunsreachanvil, @guidsmith, 0, 34931, 0, 0, 2333),
-(@sunsreachanvil, @guidsmith, 0, 34932, 0, 0, 2049),
-(@sunsreachanvil, @guidsmith, 0, 34933, 0, 0, 2333),
-(@sunsreachanvil, @guidsmith, 0, 34934, 0, 0, 2333),
-(@sunsreachanvil, @guidsmith, 0, 34935, 0, 0, 2049),
-(@sunsreachanvil, @guidsmith, 0, 34936, 0, 0, 2333),
-(@sunsreachanvil, @guidsmith, 0, 34937, 0, 0, 2333),
-(@sunsreachanvil, @guidsmith, 0, 34938, 0, 0, 2049),
-(@sunsreachanvil, @guidsmith, 0, 34939, 0, 0, 2333),
-(@sunsreachanvil, @guidsmith, 0, 34940, 0, 0, 2333),
-(@sunsreachanvil, @guidsmith, 0, 34941, 0, 0, 2049),
-(@sunsreachanvil, @guidsmith, 0, 34942, 0, 0, 2333),
-(@sunsreachanvil, @guidsmith, 0, 34943, 0, 0, 2333),
-(@sunsreachanvil, @guidsmith, 0, 34944, 0, 0, 2049),
-(@sunsreachanvil, @guidsmith, 0, 34945, 0, 0, 2333),
-(@sunsreachanvil, @guidsmith, 0, 34946, 0, 0, 2333),
-(@sunsreachanvil, @guidsmith, 0, 34947, 0, 0, 2049),
-(@sunsreachanvil, @guidsmith, 0, 34949, 0, 0, 2332),
-(@sunsreachanvil, @guidsmith, 0, 34950, 0, 0, 2332),
-(@sunsreachanvil, @guidsmith, 0, 34951, 0, 0, 2332),
-(@sunsreachanvil, @guidsmith, 0, 34952, 0, 0, 2332);
+(@sunsreachanvil, @cguidsmith, 0, 34887, 0, 0, 2059),
+(@sunsreachanvil, @cguidsmith, 0, 34888, 0, 0, 2059),
+(@sunsreachanvil, @cguidsmith, 0, 34889, 0, 0, 2059),
+(@sunsreachanvil, @cguidsmith, 0, 34890, 0, 0, 2059),
+(@sunsreachanvil, @cguidsmith, 0, 34891, 0, 0, 2329),
+(@sunsreachanvil, @cguidsmith, 0, 34892, 0, 0, 2329),
+(@sunsreachanvil, @cguidsmith, 0, 34893, 0, 0, 2331),
+(@sunsreachanvil, @cguidsmith, 0, 34894, 0, 0, 2331),
+(@sunsreachanvil, @cguidsmith, 0, 34895, 0, 0, 2329),
+(@sunsreachanvil, @cguidsmith, 0, 34896, 0, 0, 2329),
+(@sunsreachanvil, @cguidsmith, 0, 34898, 0, 0, 2329),
+(@sunsreachanvil, @cguidsmith, 0, 34900, 0, 0, 2333),
+(@sunsreachanvil, @cguidsmith, 0, 34901, 0, 0, 2333),
+(@sunsreachanvil, @cguidsmith, 0, 34902, 0, 0, 2049),
+(@sunsreachanvil, @cguidsmith, 0, 34903, 0, 0, 2333),
+(@sunsreachanvil, @cguidsmith, 0, 34904, 0, 0, 2049),
+(@sunsreachanvil, @cguidsmith, 0, 34905, 0, 0, 2333),
+(@sunsreachanvil, @cguidsmith, 0, 34906, 0, 0, 2333),
+(@sunsreachanvil, @cguidsmith, 0, 34910, 0, 0, 2333),
+(@sunsreachanvil, @cguidsmith, 0, 34911, 0, 0, 2049),
+(@sunsreachanvil, @cguidsmith, 0, 34912, 0, 0, 2333),
+(@sunsreachanvil, @cguidsmith, 0, 34914, 0, 0, 2333),
+(@sunsreachanvil, @cguidsmith, 0, 34916, 0, 0, 2049),
+(@sunsreachanvil, @cguidsmith, 0, 34917, 0, 0, 2333),
+(@sunsreachanvil, @cguidsmith, 0, 34918, 0, 0, 2333),
+(@sunsreachanvil, @cguidsmith, 0, 34919, 0, 0, 2049),
+(@sunsreachanvil, @cguidsmith, 0, 34921, 0, 0, 2333),
+(@sunsreachanvil, @cguidsmith, 0, 34922, 0, 0, 2333),
+(@sunsreachanvil, @cguidsmith, 0, 34923, 0, 0, 2049),
+(@sunsreachanvil, @cguidsmith, 0, 34924, 0, 0, 2333),
+(@sunsreachanvil, @cguidsmith, 0, 34925, 0, 0, 2333),
+(@sunsreachanvil, @cguidsmith, 0, 34926, 0, 0, 2049),
+(@sunsreachanvil, @cguidsmith, 0, 34927, 0, 0, 2333),
+(@sunsreachanvil, @cguidsmith, 0, 34928, 0, 0, 2333),
+(@sunsreachanvil, @cguidsmith, 0, 34929, 0, 0, 2049),
+(@sunsreachanvil, @cguidsmith, 0, 34930, 0, 0, 2333),
+(@sunsreachanvil, @cguidsmith, 0, 34931, 0, 0, 2333),
+(@sunsreachanvil, @cguidsmith, 0, 34932, 0, 0, 2049),
+(@sunsreachanvil, @cguidsmith, 0, 34933, 0, 0, 2333),
+(@sunsreachanvil, @cguidsmith, 0, 34934, 0, 0, 2333),
+(@sunsreachanvil, @cguidsmith, 0, 34935, 0, 0, 2049),
+(@sunsreachanvil, @cguidsmith, 0, 34936, 0, 0, 2333),
+(@sunsreachanvil, @cguidsmith, 0, 34937, 0, 0, 2333),
+(@sunsreachanvil, @cguidsmith, 0, 34938, 0, 0, 2049),
+(@sunsreachanvil, @cguidsmith, 0, 34939, 0, 0, 2333),
+(@sunsreachanvil, @cguidsmith, 0, 34940, 0, 0, 2333),
+(@sunsreachanvil, @cguidsmith, 0, 34941, 0, 0, 2049),
+(@sunsreachanvil, @cguidsmith, 0, 34942, 0, 0, 2333),
+(@sunsreachanvil, @cguidsmith, 0, 34943, 0, 0, 2333),
+(@sunsreachanvil, @cguidsmith, 0, 34944, 0, 0, 2049),
+(@sunsreachanvil, @cguidsmith, 0, 34945, 0, 0, 2333),
+(@sunsreachanvil, @cguidsmith, 0, 34946, 0, 0, 2333),
+(@sunsreachanvil, @cguidsmith, 0, 34947, 0, 0, 2049),
+(@sunsreachanvil, @cguidsmith, 0, 34949, 0, 0, 2332),
+(@sunsreachanvil, @cguidsmith, 0, 34950, 0, 0, 2332),
+(@sunsreachanvil, @cguidsmith, 0, 34951, 0, 0, 2332),
+(@sunsreachanvil, @cguidsmith, 0, 34952, 0, 0, 2332);
 
 -- Alchemist vendor
 -- Mar'nah
 DELETE FROM `npc_vendor` WHERE (`entry` = 24975);
-DELETE FROM `game_event_npc_vendor` WHERE (`eventEntry` = @sunsreachlab) AND `guid` = @guidalch;
+DELETE FROM `game_event_npc_vendor` WHERE (`eventEntry` = @sunsreachlab) AND `guid` = @cguidalch;
 INSERT INTO `game_event_npc_vendor` (`eventEntry`, `guid`, `slot`, `item`, `maxcount`, `incrtime`, `ExtendedCost`) VALUES
-(@sunsreachlab, @guidalch, 0, 3371, 0, 0, 0),
-(@sunsreachlab, @guidalch, 0, 3372, 0, 0, 0),
-(@sunsreachlab, @guidalch, 0, 8925, 0, 0, 0),
-(@sunsreachlab, @guidalch, 0, 13467, 3, 9000, 0),
-(@sunsreachlab, @guidalch, 0, 18256, 0, 0, 0),
-(@sunsreachlab, @guidalch, 0, 22785, 3, 9000, 0),
-(@sunsreachlab, @guidalch, 0, 22786, 3, 9000, 0),
-(@sunsreachlab, @guidalch, 0, 22791, 3, 9000, 0),
-(@sunsreachlab, @guidalch, 0, 22793, 1, 9000, 0),
-(@sunsreachlab, @guidalch, 0, 40411, 0, 0, 0);
+(@sunsreachlab, @cguidalch, 0, 3371, 0, 0, 0),
+(@sunsreachlab, @cguidalch, 0, 3372, 0, 0, 0),
+(@sunsreachlab, @cguidalch, 0, 8925, 0, 0, 0),
+(@sunsreachlab, @cguidalch, 0, 13467, 3, 9000, 0),
+(@sunsreachlab, @cguidalch, 0, 18256, 0, 0, 0),
+(@sunsreachlab, @cguidalch, 0, 22785, 3, 9000, 0),
+(@sunsreachlab, @cguidalch, 0, 22786, 3, 9000, 0),
+(@sunsreachlab, @cguidalch, 0, 22791, 3, 9000, 0),
+(@sunsreachlab, @cguidalch, 0, 22793, 1, 9000, 0),
+(@sunsreachlab, @cguidalch, 0, 40411, 0, 0, 0);
 
 -- JC vendor
 -- Shaani
 DELETE FROM `npc_vendor` WHERE (`entry` = 25950);
-DELETE FROM `game_event_npc_vendor` WHERE (`eventEntry` = @sunsreachlab) AND `guid` = @guidjc;
+DELETE FROM `game_event_npc_vendor` WHERE (`eventEntry` = @sunsreachlab) AND `guid` = @cguidjc;
 INSERT INTO `game_event_npc_vendor` (`eventEntry`, `guid`, `slot`, `item`, `maxcount`, `incrtime`, `ExtendedCost`) VALUES
-(@sunsreachlab, @guidjc, 0, 32227, 0, 0, 1642),
-(@sunsreachlab, @guidjc, 0, 32228, 0, 0, 1642),
-(@sunsreachlab, @guidjc, 0, 32229, 0, 0, 1642),
-(@sunsreachlab, @guidjc, 0, 32230, 0, 0, 1642),
-(@sunsreachlab, @guidjc, 0, 32231, 0, 0, 1642),
-(@sunsreachlab, @guidjc, 0, 32249, 0, 0, 1642),
-(@sunsreachlab, @guidjc, 0, 35238, 0, 0, 0),
-(@sunsreachlab, @guidjc, 0, 35239, 0, 0, 0),
-(@sunsreachlab, @guidjc, 0, 35240, 0, 0, 0),
-(@sunsreachlab, @guidjc, 0, 35241, 0, 0, 0),
-(@sunsreachlab, @guidjc, 0, 35242, 0, 0, 0),
-(@sunsreachlab, @guidjc, 0, 35243, 0, 0, 0),
-(@sunsreachlab, @guidjc, 0, 35244, 0, 0, 0),
-(@sunsreachlab, @guidjc, 0, 35245, 0, 0, 0),
-(@sunsreachlab, @guidjc, 0, 35246, 0, 0, 0),
-(@sunsreachlab, @guidjc, 0, 35247, 0, 0, 0),
-(@sunsreachlab, @guidjc, 0, 35248, 0, 0, 0),
-(@sunsreachlab, @guidjc, 0, 35249, 0, 0, 0),
-(@sunsreachlab, @guidjc, 0, 35250, 0, 0, 0),
-(@sunsreachlab, @guidjc, 0, 35251, 0, 0, 0),
-(@sunsreachlab, @guidjc, 0, 35252, 0, 0, 0),
-(@sunsreachlab, @guidjc, 0, 35253, 0, 0, 0),
-(@sunsreachlab, @guidjc, 0, 35254, 0, 0, 0),
-(@sunsreachlab, @guidjc, 0, 35255, 0, 0, 0),
-(@sunsreachlab, @guidjc, 0, 35256, 0, 0, 0),
-(@sunsreachlab, @guidjc, 0, 35257, 0, 0, 0),
-(@sunsreachlab, @guidjc, 0, 35258, 0, 0, 0),
-(@sunsreachlab, @guidjc, 0, 35259, 0, 0, 0),
-(@sunsreachlab, @guidjc, 0, 35260, 0, 0, 0),
-(@sunsreachlab, @guidjc, 0, 35261, 0, 0, 0),
-(@sunsreachlab, @guidjc, 0, 35262, 0, 0, 0),
-(@sunsreachlab, @guidjc, 0, 35263, 0, 0, 0),
-(@sunsreachlab, @guidjc, 0, 35264, 0, 0, 0),
-(@sunsreachlab, @guidjc, 0, 35265, 0, 0, 0),
-(@sunsreachlab, @guidjc, 0, 35266, 0, 0, 0),
-(@sunsreachlab, @guidjc, 0, 35267, 0, 0, 0),
-(@sunsreachlab, @guidjc, 0, 35268, 0, 0, 0),
-(@sunsreachlab, @guidjc, 0, 35269, 0, 0, 0),
-(@sunsreachlab, @guidjc, 0, 35270, 0, 0, 0),
-(@sunsreachlab, @guidjc, 0, 35271, 0, 0, 0),
-(@sunsreachlab, @guidjc, 0, 35322, 0, 0, 0),
-(@sunsreachlab, @guidjc, 0, 35323, 0, 0, 0),
-(@sunsreachlab, @guidjc, 0, 35325, 0, 0, 0),
-(@sunsreachlab, @guidjc, 0, 35766, 0, 0, 0),
-(@sunsreachlab, @guidjc, 0, 35767, 0, 0, 0),
-(@sunsreachlab, @guidjc, 0, 35768, 0, 0, 0),
-(@sunsreachlab, @guidjc, 0, 35769, 0, 0, 0),
-(@sunsreachlab, @guidjc, 0, 37504, 0, 0, 0);
+(@sunsreachlab, @cguidjc, 0, 32227, 0, 0, 1642),
+(@sunsreachlab, @cguidjc, 0, 32228, 0, 0, 1642),
+(@sunsreachlab, @cguidjc, 0, 32229, 0, 0, 1642),
+(@sunsreachlab, @cguidjc, 0, 32230, 0, 0, 1642),
+(@sunsreachlab, @cguidjc, 0, 32231, 0, 0, 1642),
+(@sunsreachlab, @cguidjc, 0, 32249, 0, 0, 1642),
+(@sunsreachlab, @cguidjc, 0, 35238, 0, 0, 0),
+(@sunsreachlab, @cguidjc, 0, 35239, 0, 0, 0),
+(@sunsreachlab, @cguidjc, 0, 35240, 0, 0, 0),
+(@sunsreachlab, @cguidjc, 0, 35241, 0, 0, 0),
+(@sunsreachlab, @cguidjc, 0, 35242, 0, 0, 0),
+(@sunsreachlab, @cguidjc, 0, 35243, 0, 0, 0),
+(@sunsreachlab, @cguidjc, 0, 35244, 0, 0, 0),
+(@sunsreachlab, @cguidjc, 0, 35245, 0, 0, 0),
+(@sunsreachlab, @cguidjc, 0, 35246, 0, 0, 0),
+(@sunsreachlab, @cguidjc, 0, 35247, 0, 0, 0),
+(@sunsreachlab, @cguidjc, 0, 35248, 0, 0, 0),
+(@sunsreachlab, @cguidjc, 0, 35249, 0, 0, 0),
+(@sunsreachlab, @cguidjc, 0, 35250, 0, 0, 0),
+(@sunsreachlab, @cguidjc, 0, 35251, 0, 0, 0),
+(@sunsreachlab, @cguidjc, 0, 35252, 0, 0, 0),
+(@sunsreachlab, @cguidjc, 0, 35253, 0, 0, 0),
+(@sunsreachlab, @cguidjc, 0, 35254, 0, 0, 0),
+(@sunsreachlab, @cguidjc, 0, 35255, 0, 0, 0),
+(@sunsreachlab, @cguidjc, 0, 35256, 0, 0, 0),
+(@sunsreachlab, @cguidjc, 0, 35257, 0, 0, 0),
+(@sunsreachlab, @cguidjc, 0, 35258, 0, 0, 0),
+(@sunsreachlab, @cguidjc, 0, 35259, 0, 0, 0),
+(@sunsreachlab, @cguidjc, 0, 35260, 0, 0, 0),
+(@sunsreachlab, @cguidjc, 0, 35261, 0, 0, 0),
+(@sunsreachlab, @cguidjc, 0, 35262, 0, 0, 0),
+(@sunsreachlab, @cguidjc, 0, 35263, 0, 0, 0),
+(@sunsreachlab, @cguidjc, 0, 35264, 0, 0, 0),
+(@sunsreachlab, @cguidjc, 0, 35265, 0, 0, 0),
+(@sunsreachlab, @cguidjc, 0, 35266, 0, 0, 0),
+(@sunsreachlab, @cguidjc, 0, 35267, 0, 0, 0),
+(@sunsreachlab, @cguidjc, 0, 35268, 0, 0, 0),
+(@sunsreachlab, @cguidjc, 0, 35269, 0, 0, 0),
+(@sunsreachlab, @cguidjc, 0, 35270, 0, 0, 0),
+(@sunsreachlab, @cguidjc, 0, 35271, 0, 0, 0),
+(@sunsreachlab, @cguidjc, 0, 35322, 0, 0, 0),
+(@sunsreachlab, @cguidjc, 0, 35323, 0, 0, 0),
+(@sunsreachlab, @cguidjc, 0, 35325, 0, 0, 0),
+(@sunsreachlab, @cguidjc, 0, 35766, 0, 0, 0),
+(@sunsreachlab, @cguidjc, 0, 35767, 0, 0, 0),
+(@sunsreachlab, @cguidjc, 0, 35768, 0, 0, 0),
+(@sunsreachlab, @cguidjc, 0, 35769, 0, 0, 0),
+(@sunsreachlab, @cguidjc, 0, 37504, 0, 0, 0);
 
 -- Shattered Sun Marksman + Warrior Transform Auras
 -- Marksman Transform Auras
@@ -813,15 +829,166 @@ INSERT INTO `gameobject` (`guid`, `id`, `map`, `spawnMask`, `phaseMask`, `positi
 (@guidcrystals+4, 187120, 530, 1, 1, 12645.2001953125, -6980.97998046875, 40.50529861450195, -1.85004997253418, 0.0, 0.0, 0.0, 0.0, 180, 0, '');
 
 -- Creatures
--- Shattrath City, Portal Subphase, Shattered Sun Warrior and Shattered Sun Marksman
-DELETE FROM `creature` WHERE `id1` IN (25115, 24938) AND `guid` BETWEEN @cguidshatportal AND @cguidshatportal+7;
+-- Portal Subphase, Shattrath City, Shattered Sun Warrior and Shattered Sun Marksman
+DELETE FROM `creature` WHERE `id1` IN (25115, 24938) AND `guid` BETWEEN @cguidportalshat AND @cguidportalshat+7;
 INSERT INTO `creature` (`guid`, `id1`, `map`, `spawnMask`, `phaseMask`, `position_x`, `position_y`, `position_z`, `orientation`, `spawntimesecs`, `MovementType`, `VerifiedBuild`, `Comment`) VALUES
-(@cguidshatportal+0, 25115, 530, 1, 1, -1983.31005859375, 5491.89013671875, -12.344799995422363, 0.1725849956274032, 120, 2, 0, ''),
-(@cguidshatportal+1, 25115, 530, 1, 1, -1866.1199951171875, 5519.31005859375, -12.344799995422363, 3.35932993888855, 120, 2, 0, ''),
-(@cguidshatportal+2, 25115, 530, 1, 1, -1955.0699462890625, 5432.39990234375, -12.344799995422363, 4.982600212097168, 120, 2, 0, ''),
-(@cguidshatportal+3, 25115, 530, 1, 1, -1753.5, 5495.75, -12.344799995422363, 3.782819986343384, 120, 2, 0, ''),
-(@cguidshatportal+4, 24938, 530, 1, 1, -1941.18994140625, 5486.89990234375, -12.344799995422363, 0.5934119820594788, 120, 2, 0, ''),
-(@cguidshatportal+5, 24938, 530, 1, 1, -1958.1099853515625, 5418.16015625, -12.344799995422363, 5.061450004577637, 120, 2, 0, ''),
-(@cguidshatportal+6, 24938, 530, 1, 1, -1771.47998046875, 5424.3798828125, -12.344799995422363, 1.7976900339126587, 120, 2, 0, ''),
-(@cguidshatportal+7, 24938, 530, 1, 1, -1799.050048828125, 5549.31982421875, -12.344799995422363, 5.026549816131592, 120, 2, 0, '');
+(@cguidportalshat+0, 25115, 530, 1, 1, -1983.31005859375, 5491.89013671875, -12.344799995422363, 0.1725849956274032, 120, 2, 0, ''),
+(@cguidportalshat+1, 25115, 530, 1, 1, -1866.1199951171875, 5519.31005859375, -12.344799995422363, 3.35932993888855, 120, 2, 0, ''),
+(@cguidportalshat+2, 25115, 530, 1, 1, -1955.0699462890625, 5432.39990234375, -12.344799995422363, 4.982600212097168, 120, 2, 0, ''),
+(@cguidportalshat+3, 25115, 530, 1, 1, -1753.5, 5495.75, -12.344799995422363, 3.782819986343384, 120, 2, 0, ''),
+(@cguidportalshat+4, 24938, 530, 1, 1, -1941.18994140625, 5486.89990234375, -12.344799995422363, 0.5934119820594788, 120, 2, 0, ''),
+(@cguidportalshat+5, 24938, 530, 1, 1, -1958.1099853515625, 5418.16015625, -12.344799995422363, 5.061450004577637, 120, 2, 0, ''),
+(@cguidportalshat+6, 24938, 530, 1, 1, -1771.47998046875, 5424.3798828125, -12.344799995422363, 1.7976900339126587, 120, 2, 0, ''),
+(@cguidportalshat+7, 24938, 530, 1, 1, -1799.050048828125, 5549.31982421875, -12.344799995422363, 5.026549816131592, 120, 2, 0, '');
 -- TODO: waypoint script from creature_movement Id  BETWEEN 165102 AND 165109
+
+-- Portal Subphase, Isle of Quel'Danas
+DELETE FROM `creature` WHERE `id1` = 24936 AND `guid` BETWEEN @cguidportalisle AND @cguidportalisle+9;
+INSERT INTO `creature` (`guid`, `id1`, `map`, `spawnMask`, `phaseMask`, `position_x`, `position_y`, `position_z`, `orientation`, `spawntimesecs`, `MovementType`, `VerifiedBuild`, `Comment`) VALUES
+(@cguidportalisle+0, 24936, 530, 1, 1, -1842.9300537109373, 5509.740234375, -12.184900283813477, 5.039340019226073, 300, 0, 0, ''),
+(@cguidportalisle+1, 24936, 530, 1, 1, -1841.0500488281248, 5510.43994140625, -10.386300086975098, 4.83420991897583, 300, 0, 0, ''),
+(@cguidportalisle+2, 24936, 530, 1, 1, -1833.4599609375, 5507.990234375, -11.58769989013672, 3.994129896163941, 300, 0, 0, ''),
+(@cguidportalisle+3, 24936, 530, 1, 1, -1833.1500244140625, 5507.06005859375, -12.136099815368652, 3.902909994125366, 300, 0, 0, ''),
+(@cguidportalisle+4, 24936, 530, 1, 1, -1839.1700439453125, 5510.02978515625, -12.219599723815918, 4.6390299797058105, 300, 0, 0, ''),
+(@cguidportalisle+5, 24936, 530, 1, 1, -1835.4100341796875, 5507.0400390625, -12.114999771118164, 4.103789806365967, 300, 0, 0, ''),
+(@cguidportalisle+6, 24936, 530, 1, 1, -1841.6999511718752, 5510.3798828125, -11.60849952697754, 4.900139808654785, 300, 0, 0, ''),
+(@cguidportalisle+7, 24936, 530, 1, 1, -1834.4000244140625, 5507.919921875, -10.934700012207031, 4.06702995300293, 300, 0, 0, ''),
+(@cguidportalisle+8, 24936, 530, 1, 1, -1840.27001953125, 5509.81005859375, -11.740400314331056, 4.758059978485107, 300, 0, 0, ''),
+(@cguidportalisle+9, 24936, 530, 1, 1, -1832.4599609375, 5506.02001953125, -12.198599815368652, 3.76786994934082, 300, 0, 0, '');
+
+-- Dawnblade Blood Knight
+DELETE FROM `creature` WHERE `id1` = 24976 AND `guid` BETWEEN @cguidbloodknights AND @cguidbloodknights+22;
+INSERT INTO `creature` (`guid`, `id1`, `map`, `spawnMask`, `phaseMask`, `position_x`, `position_y`, `position_z`, `orientation`, `spawntimesecs`, `wander_distance`, `MovementType`, `VerifiedBuild`, `Comment`) VALUES
+(@cguidbloodknights+00, 24976, 530, 1, 1, 12873.400390625, -6957.669921875, 3.931679964065552, 1.5707999467849731, 300, 0.0, 0, 0, ''),
+(@cguidbloodknights+01, 24976, 530, 1, 1, 12874.599609375, -6958.58984375, 3.9531400203704834, 0.5235990285873413, 300, 0.0, 0, 0, ''),
+(@cguidbloodknights+02, 24976, 530, 1, 1, 12845.599609375, -7014.43017578125, 71.28970336914062, 0.6806780099868774, 300, 0.0, 0, 0, ''),
+(@cguidbloodknights+03, 24976, 530, 1, 1, 12826.599609375, -7030.5498046875, 71.57510375976561, 1.9024100303649905, 300, 0.0, 0, 0, ''),
+(@cguidbloodknights+04, 24976, 530, 1, 1, 12833.400390625, -6993.60986328125, 71.206298828125, 1.7278800010681152, 300, 0.0, 0, 0, ''),
+(@cguidbloodknights+05, 24976, 530, 1, 1, 12817.7998046875, -6999.2900390625, 71.34230041503906, -2.7931900024414062, 300, 0.0, 0, 0, ''),
+(@cguidbloodknights+06, 24976, 530, 1, 1, 12850.7998046875, -7035.56005859375, 47.862499237060554, 2.932149887084961, 300, 0.0, 0, 0, ''),
+(@cguidbloodknights+07, 24976, 530, 1, 1, 12852.2998046875, -7051.7099609375, 19.04030036926269, 2.0726099014282227, 300, 0.0, 0, 0, ''),
+(@cguidbloodknights+08, 24976, 530, 1, 1, 12846.599609375, -7008.5400390625, 18.5935001373291, 3.0896999835968018, 300, 0.0, 0, 0, ''),
+(@cguidbloodknights+09, 24976, 530, 1, 1, 12811.5, -6989.0400390625, 18.721200942993164, 2.6005399227142334, 300, 0.0, 0, 0, ''),
+(@cguidbloodknights+10, 24976, 530, 1, 1, 12801.7001953125, -6997.02978515625, 18.71999931335449, 2.007129907608032, 300, 0.0, 0, 0, ''),
+(@cguidbloodknights+11, 24976, 530, 1, 1, 12869.5, -7019.9599609375, 3.2795801162719727, 5.4698500633239755, 300, 0.0, 0, 0, ''),
+(@cguidbloodknights+12, 24976, 530, 1, 1, 12871.2998046875, -7022.18994140625, 3.2777199745178223, 5.5664801597595215, 300, 0.0, 0, 0, ''),
+(@cguidbloodknights+13, 24976, 530, 1, 1, 12872.0, -7018.4599609375, 3.274280071258545, 6.139150142669679, 300, 0.0, 0, 0, ''),
+(@cguidbloodknights+14, 24976, 530, 1, 1, 12837.900390625, -7049.5400390625, 3.3980100154876713, 5.550149917602539, 300, 0.0, 0, 0, ''),
+(@cguidbloodknights+15, 24976, 530, 1, 1, 12748.5, -7066.2998046875, 7.478529930114745, 6.09119987487793, 300, 0.0, 0, 0, ''),
+(@cguidbloodknights+16, 24976, 530, 1, 1, 12887.2998046875, -6924.3701171875, 3.8923499584198, 0.1548810005187988, 300, 0.0, 0, 0, ''),
+(@cguidbloodknights+17, 24976, 530, 1, 1, 12869.5, -6986.85009765625, 3.2696700096130367, 1.5028200149536133, 300, 0.0, 0, 0, ''),
+(@cguidbloodknights+18, 24976, 530, 1, 1, 12756.2001953125, -7139.580078125, 3.462500095367432, 2.255970001220703, 300, 3.0, 1, 0, ''),
+(@cguidbloodknights+19, 24976, 530, 1, 1, 12787.099609375, -7032.419921875, 11.81439971923828, 0.1741870045661926, 300, 5.0, 1, 0, ''),
+(@cguidbloodknights+20, 24976, 530, 1, 1, 12736.7998046875, -6890.7998046875, 12.408699989318848, 5.4163498878479, 300, 5.0, 1, 0, ''),
+(@cguidbloodknights+21, 24976, 530, 1, 1, 12755.900390625, -6937.7099609375, 12.485600471496582, 3.4923501014709477, 300, 5.0, 1, 0, ''),
+(@cguidbloodknights+22, 24976, 530, 1, 1, 12821.900390625, -6919.1298828125, 11.729999542236328, 1.271530032157898, 300, 5.0, 1, 0, '');
+
+-- Dawnblade Summoner, Dawnblade Marksman
+DELETE FROM `creature` WHERE `id1` IN (24978, 24979) AND `guid` BETWEEN @cguidsummonermarksman AND @cguidsummonermarksman+60;
+INSERT INTO `creature` (`guid`, `id1`, `map`, `spawnMask`, `phaseMask`, `position_x`, `position_y`, `position_z`, `orientation`, `spawntimesecs`, `wander_distance`, `MovementType`, `VerifiedBuild`, `Comment`) VALUES
+(@cguidsummonermarksman+00, 24978, 530, 1, 1, 12798.2998046875, -6996.10009765625, 47.56069946289063, 1.2217299938201904, 300, 0.0, 0, 0, ''),
+(@cguidsummonermarksman+01, 24978, 530, 1, 1, 12820.2001953125, -7040.509765625, 18.676000595092773, 2.164210081100464, 300, 0.0, 0, 0, ''),
+(@cguidsummonermarksman+02, 24978, 530, 1, 1, 12845.7998046875, -7007.8701171875, 47.51129913330078, 2.909019947052002, 300, 0.0, 0, 0, ''),
+(@cguidsummonermarksman+03, 24978, 530, 1, 1, 12858.400390625, -7044.52978515625, 19.007099151611328, 1.9688700437545776, 300, 0.0, 0, 0, ''),
+(@cguidsummonermarksman+04, 24978, 530, 1, 1, 12834.599609375, -6994.66015625, 18.762199401855472, 3.525520086288452, 300, 0.0, 0, 0, ''),
+(@cguidsummonermarksman+05, 24978, 530, 1, 1, 12810.5, -7055.56005859375, 3.0357499122619633, 5.900400161743164, 300, 0.0, 0, 0, ''),
+(@cguidsummonermarksman+06, 24978, 530, 1, 1, 12834.400390625, -7066.47021484375, 3.369379997253418, 1.3788100481033323, 300, 0.0, 0, 0, ''),
+(@cguidsummonermarksman+07, 24978, 530, 1, 1, 12853.900390625, -6976.75, 5.031179904937744, 5.301620006561279, 300, 3.0, 1, 0, ''),
+(@cguidsummonermarksman+08, 24978, 530, 1, 1, 12754.2001953125, -7103.52978515625, 6.988080024719238, 1.578089952468872, 300, 3.0, 1, 0, ''),
+(@cguidsummonermarksman+09, 24978, 530, 1, 1, 12757.400390625, -7029.89990234375, 9.374119758605955, 5.8371901512146, 300, 5.0, 1, 0, ''),
+(@cguidsummonermarksman+10, 24978, 530, 1, 1, 12745.099609375, -6984.7001953125, 19.198400497436523, 2.3560900688171387, 300, 3.0, 1, 0, ''),
+(@cguidsummonermarksman+11, 24978, 530, 1, 1, 12778.2998046875, -7005.10986328125, 13.887200355529783, 1.0297399759292605, 300, 3.0, 1, 0, ''),
+(@cguidsummonermarksman+12, 24978, 530, 1, 1, 12760.099609375, -6993.27978515625, 11.464699745178224, 0.3670099973678589, 300, 3.0, 1, 0, ''),
+(@cguidsummonermarksman+13, 24978, 530, 1, 1, 12764.099609375, -6920.009765625, 12.275699615478516, -2.9297499656677246, 300, 3.0, 1, 0, ''),
+(@cguidsummonermarksman+14, 24978, 530, 1, 1, 12837.7998046875, -6943.52978515625, 7.168889999389648, 1.9164899587631223, 300, 3.0, 1, 0, ''),
+(@cguidsummonermarksman+15, 24978, 530, 1, 1, 12881.900390625, -6932.259765625, 3.9561200141906734, 1.015720009803772, 300, 3.0, 1, 0, ''),
+(@cguidsummonermarksman+16, 24979, 530, 1, 1, 12709.099609375, -6756.33984375, 4.5231099128723145, 3.2114100456237797, 300, 0.0, 2, 0, ''),
+(@cguidsummonermarksman+17, 24979, 530, 1, 1, 12707.7998046875, -6747.6201171875, 4.235909938812256, 3.473210096359253, 300, 0.0, 2, 0, ''),
+(@cguidsummonermarksman+18, 24979, 530, 1, 1, 12703.900390625, -6738.4599609375, 4.158609867095947, 3.892080068588257, 300, 0.0, 2, 0, ''),
+(@cguidsummonermarksman+19, 24979, 530, 1, 1, 12685.7998046875, -6594.77978515625, 5.330389976501465, 4.328420162200928, 300, 0.0, 2, 0, ''),
+(@cguidsummonermarksman+20, 24979, 530, 1, 1, 12678.099609375, -6593.6201171875, 5.4209299087524405, 4.363319873809815, 300, 0.0, 2, 0, ''),
+(@cguidsummonermarksman+21, 24979, 530, 1, 1, 12669.2998046875, -6594.0498046875, 5.2151198387146, 4.485499858856201, 300, 0.0, 2, 0, ''),
+(@cguidsummonermarksman+22, 24979, 530, 1, 1, 12659.400390625, -6595.08984375, 4.4621901512146, 0.0698131993412971, 300, 0.0, 2, 0, ''),
+(@cguidsummonermarksman+23, 24979, 530, 1, 1, 12699.7998046875, -6655.2900390625, 3.2273099422454834, 0.0263839997351169, 300, 0.0, 2, 0, ''),
+(@cguidsummonermarksman+24, 24979, 530, 1, 1, 12763.2001953125, -6648.77978515625, -0.7067840099334717, 1.553339958190918, 300, 0.0, 0, 0, ''),
+(@cguidsummonermarksman+25, 24979, 530, 1, 1, 12759.0, -6665.2099609375, 18.955400466918945, 2.199120044708252, 300, 0.0, 0, 0, ''),
+(@cguidsummonermarksman+26, 24979, 530, 1, 1, 12795.599609375, -6738.83984375, 18.956199645996094, 5.166170120239258, 300, 0.0, 0, 0, ''),
+(@cguidsummonermarksman+27, 24979, 530, 1, 1, 12604.400390625, -6697.06005859375, 7.462779998779298, 5.672319889068604, 300, 0.0, 0, 0, ''),
+(@cguidsummonermarksman+28, 24979, 530, 1, 1, 12740.599609375, -6677.2001953125, 0.4034200012683868, 2.897249937057495, 300, 0.0, 0, 0, ''),
+(@cguidsummonermarksman+29, 24979, 530, 1, 1, 12646.599609375, -6648.35986328125, 22.986999511718754, 5.5326900482177725, 300, 0.0, 0, 0, ''),
+(@cguidsummonermarksman+30, 24979, 530, 1, 1, 12688.900390625, -6623.509765625, 22.986999511718754, 0.1221729964017868, 300, 0.0, 0, 0, ''),
+(@cguidsummonermarksman+31, 24979, 530, 1, 1, 12677.2998046875, -6642.169921875, 22.983400344848636, 5.445429801940918, 300, 0.0, 0, 0, ''),
+(@cguidsummonermarksman+32, 24979, 530, 1, 1, 12663.400390625, -6647.89990234375, 22.983400344848636, 5.305799961090088, 300, 0.0, 0, 0, ''),
+(@cguidsummonermarksman+33, 24979, 530, 1, 1, 12780.2001953125, -7133.77001953125, 9.23165035247803, 1.81046998500824, 300, 0.0, 0, 0, ''),
+(@cguidsummonermarksman+34, 24979, 530, 1, 1, 12806.2998046875, -7089.10009765625, 8.221309661865234, -1.0778800249099731, 300, 0.0, 0, 0, ''),
+(@cguidsummonermarksman+35, 24979, 530, 1, 1, 12848.7001953125, -7128.97998046875, 6.870110034942627, 2.702569961547852, 300, 0.0, 0, 0, ''),
+(@cguidsummonermarksman+36, 24979, 530, 1, 1, 12828.2998046875, -7118.52001953125, 5.363649845123291, 4.1189799308776855, 300, 0.0, 0, 0, ''),
+(@cguidsummonermarksman+37, 24979, 530, 1, 1, 12793.2998046875, -7121.31005859375, 5.416520118713379, 5.479209899902344, 300, 0.0, 0, 0, ''),
+(@cguidsummonermarksman+38, 24979, 530, 1, 1, 12800.400390625, -6980.72021484375, 47.661598205566406, 5.375609874725343, 300, 0.0, 0, 0, ''),
+(@cguidsummonermarksman+39, 24979, 530, 1, 1, 12843.5, -7041.06005859375, 47.91299819946289, 0.1919859945774078, 300, 0.0, 0, 0, ''),
+(@cguidsummonermarksman+40, 24979, 530, 1, 1, 12809.2998046875, -7004.2998046875, 70.59559631347656, 4.712389945983888, 300, 0.0, 0, 0, ''),
+(@cguidsummonermarksman+41, 24979, 530, 1, 1, 12841.7998046875, -7001.31982421875, 71.206298828125, 0.5759590268135071, 300, 0.0, 0, 0, ''),
+(@cguidsummonermarksman+42, 24979, 530, 1, 1, 12879.900390625, -6997.669921875, 3.0978500843048096, 0.0349065996706485, 300, 0.0, 0, 0, ''),
+(@cguidsummonermarksman+43, 24979, 530, 1, 1, 12877.7998046875, -7028.16015625, 3.275310039520264, 5.6374101638793945, 300, 0.0, 0, 0, ''),
+(@cguidsummonermarksman+44, 24979, 530, 1, 1, 12807.2998046875, -7028.919921875, 18.69499969482422, 0.8552110195159912, 300, 0.0, 0, 0, ''),
+(@cguidsummonermarksman+45, 24979, 530, 1, 1, 12787.099609375, -6955.93994140625, 13.763099670410156, 2.007129907608032, 300, 0.0, 0, 0, ''),
+(@cguidsummonermarksman+46, 24979, 530, 1, 1, 12898.599609375, -6956.919921875, 3.3791999816894527, 0.7504919767379761, 300, 0.0, 0, 0, ''),
+(@cguidsummonermarksman+47, 24979, 530, 1, 1, 12885.7001953125, -6938.580078125, 3.899499893188477, 0.2443459928035736, 300, 0.0, 0, 0, ''),
+(@cguidsummonermarksman+48, 24979, 530, 1, 1, 12668.5, -6860.10009765625, 13.115699768066406, 2.932149887084961, 300, 0.0, 0, 0, ''),
+(@cguidsummonermarksman+49, 24979, 530, 1, 1, 12657.400390625, -6820.08984375, 12.552800178527832, 0.4712390005588531, 300, 0.0, 0, 0, ''),
+(@cguidsummonermarksman+50, 24979, 530, 1, 1, 12646.400390625, -6830.10986328125, 12.41569995880127, 5.113810062408447, 300, 0.0, 0, 0, ''),
+(@cguidsummonermarksman+51, 24979, 530, 1, 1, 12689.7998046875, -6848.2001953125, 13.33329963684082, 0.2967059910297394, 300, 0.0, 0, 0, ''),
+(@cguidsummonermarksman+52, 24979, 530, 1, 1, 12703.2001953125, -6868.35986328125, 12.553899765014648, 5.3581600189208975, 300, 0.0, 0, 0, ''),
+(@cguidsummonermarksman+53, 24979, 530, 1, 1, 12692.7001953125, -6878.35009765625, 12.4197998046875, 5.550149917602539, 300, 0.0, 0, 0, ''),
+(@cguidsummonermarksman+54, 24979, 530, 1, 1, 12794.900390625, -7012.02001953125, 18.750099182128903, 2.268929958343506, 300, 0.0, 0, 0, ''),
+(@cguidsummonermarksman+55, 24979, 530, 1, 1, 12826.099609375, -6984.009765625, 18.64080047607422, 1.924110054969788, 300, 0.0, 0, 0, ''),
+(@cguidsummonermarksman+56, 24979, 530, 1, 1, 12765.2998046875, -6897.490234375, 13.382100105285645, 3.7815499305725098, 300, 0.0, 0, 0, ''),
+(@cguidsummonermarksman+57, 24979, 530, 1, 1, 12769.2001953125, -6902.72998046875, 13.392399787902832, -2.02396011352539, 300, 0.0, 0, 0, ''),
+(@cguidsummonermarksman+58, 24979, 530, 1, 1, 12775.7998046875, -6970.490234375, 14.151200294494627, 2.1118500232696533, 300, 0.0, 0, 0, ''),
+(@cguidsummonermarksman+59, 24979, 530, 1, 1, 12852.599609375, -6911.85009765625, 8.594349861145021, 0.2445050030946731, 300, 0.0, 0, 0, ''),
+(@cguidsummonermarksman+60, 24979, 530, 1, 1, 12865.099609375, -7039.6298828125, 3.2777299880981445, 3.875829935073853, 300, 0.0, 0, 0, '');
+
+-- Irespeaker
+DELETE FROM `creature` WHERE `id1` = 24999 AND `guid` BETWEEN @cguidirespeaker AND @cguidirespeaker+5;
+INSERT INTO `creature` (`guid`, `id1`, `map`, `spawnMask`, `phaseMask`, `position_x`, `position_y`, `position_z`, `orientation`, `spawntimesecs`, `wander_distance`, `MovementType`, `VerifiedBuild`, `Comment`) VALUES
+(@cguidirespeaker+0, 24999, 530, 1, 1, 12702.7001953125, -6942.97021484375, 36.3202018737793, 0.4014259874820709, 300, 0.0, 2, 0, ''),
+(@cguidirespeaker+1, 24999, 530, 1, 1, 12684.599609375, -6933.43994140625, 36.32070159912109, 1.6231600046157837, 300, 0.0, 2, 0, ''),
+(@cguidirespeaker+2, 24999, 530, 1, 1, 12655.400390625, -6976.35986328125, 36.316699981689446, 3.4033899307250977, 300, 0.0, 2, 0, ''),
+(@cguidirespeaker+3, 24999, 530, 1, 1, 12660.0, -6950.81982421875, 36.32229995727539, 3.0543301105499268, 300, 0.0, 2, 0, ''),
+(@cguidirespeaker+4, 24999, 530, 1, 1, 12670.7001953125, -6940.8798828125, 23.57360076904297, 1.745329976081848, 300, 0.0, 2, 0, ''),
+(@cguidirespeaker+5, 24999, 530, 1, 1, 12684.0, -6957.1201171875, 15.554200172424316, 0.63127201795578, 300, 0.0, 0, 0, '');
+
+-- Abyssal Flamewalker, Unleashed Hellion
+DELETE FROM `creature` WHERE `id1` IN (25001, 25002) AND `guid` BETWEEN @cguidflamewalkerhellion AND @cguidflamewalkerhellion+32;
+INSERT INTO `creature` (`guid`, `id1`, `map`, `spawnMask`, `phaseMask`, `position_x`, `position_y`, `position_z`, `orientation`, `spawntimesecs`, `wander_distance`, `MovementType`, `VerifiedBuild`, `Comment`) VALUES
+(@cguidflamewalkerhellion+00, 25001, 530, 1, 1, 12683.099609375, -7043.16015625, 19.74679946899414, 4.3615899085998535, 300, 8.0, 1, 0, ''),
+(@cguidflamewalkerhellion+01, 25001, 530, 1, 1, 12636.7998046875, -7073.240234375, 16.414199829101562, 1.161870002746582, 300, 8.0, 1, 0, ''),
+(@cguidflamewalkerhellion+02, 25001, 530, 1, 1, 12692.0, -7107.39990234375, 19.421600341796875, 6.03203010559082, 300, 8.0, 1, 0, ''),
+(@cguidflamewalkerhellion+03, 25001, 530, 1, 1, 12663.7001953125, -7082.509765625, 19.48740005493164, 4.04925012588501, 300, 8.0, 1, 0, ''),
+(@cguidflamewalkerhellion+04, 25001, 530, 1, 1, 12641.0, -7043.39013671875, 19.326499938964844, 0.1822019964456558, 300, 8.0, 1, 0, ''),
+(@cguidflamewalkerhellion+05, 25001, 530, 1, 1, 12728.2001953125, -6945.3798828125, 14.332799911499023, 1.623579978942871, 300, 0.0, 2, 0, ''),
+(@cguidflamewalkerhellion+06, 25001, 530, 1, 1, 12657.0, -6979.91015625, 14.657400131225586, 4.1078500747680655, 300, 8.0, 1, 0, ''),
+(@cguidflamewalkerhellion+07, 25001, 530, 1, 1, 12703.900390625, -6920.830078125, 13.740599632263184, 0.8711439967155457, 300, 8.0, 1, 0, ''),
+(@cguidflamewalkerhellion+08, 25001, 530, 1, 1, 12696.0, -7010.14013671875, 21.250799179077152, 1.210919976234436, 300, 8.0, 1, 0, ''),
+(@cguidflamewalkerhellion+09, 25001, 530, 1, 1, 12606.099609375, -6987.64990234375, 17.03179931640625, 5.598269939422607, 300, 8.0, 1, 0, ''),
+(@cguidflamewalkerhellion+10, 25001, 530, 1, 1, 12636.7001953125, -7014.68017578125, 20.319900512695312, 2.3435299396514893, 300, 8.0, 1, 0, ''),
+(@cguidflamewalkerhellion+22, 25002, 530, 1, 1, 12702.0, -6950.81005859375, 15.645500183105469, 0.663224995136261, 300, 0.0, 0, 0, ''),
+(@cguidflamewalkerhellion+23, 25002, 530, 1, 1, 12696.2001953125, -6942.97998046875, 15.641799926757812, 0.5235990285873413, 300, 0.0, 0, 0, ''),
+(@cguidflamewalkerhellion+24, 25002, 530, 1, 1, 12701.099609375, -6983.31005859375, 25.60110092163086, 6.117310047149657, 300, 0.0, 0, 0, ''),
+(@cguidflamewalkerhellion+25, 25002, 530, 1, 1, 12683.2001953125, -6957.72021484375, 36.25310134887695, 3.7768199443817134, 300, 0.0, 0, 0, ''),
+(@cguidflamewalkerhellion+26, 25002, 530, 1, 1, 12673.099609375, -6943.68994140625, 36.338600158691406, 5.46288013458252, 300, 0.0, 0, 0, ''),
+(@cguidflamewalkerhellion+27, 25002, 530, 1, 1, 12704.0, -6972.18017578125, 36.23080062866211, 0.3528819978237152, 300, 0.0, 0, 0, ''),
+(@cguidflamewalkerhellion+28, 25002, 530, 1, 1, 12689.7998046875, -6983.56005859375, 15.571100234985352, 5.247819900512695, 300, 3.0, 1, 0, ''),
+(@cguidflamewalkerhellion+29, 25002, 530, 1, 1, 12657.7001953125, -7019.89990234375, 21.81920051574707, 2.5725700855255127, 300, 3.0, 1, 0, ''),
+(@cguidflamewalkerhellion+30, 25002, 530, 1, 1, 12612.900390625, -7022.419921875, 18.695499420166016, 1.23540997505188, 300, 5.0, 1, 0, ''),
+(@cguidflamewalkerhellion+31, 25002, 530, 1, 1, 12674.900390625, -7100.25, 18.68600082397461, 1.3909200429916382, 300, 5.0, 1, 0, ''),
+(@cguidflamewalkerhellion+32, 25002, 530, 1, 1, 12652.2998046875, -7074.39013671875, 18.13419914245605, 5.452239990234375, 300, 5.0, 1, 0, '');
+
+-- Invisible Stalker Floating -> Fel Crystal Spell target
+DELETE FROM `creature` WHERE `id1` = 25953 AND `guid` BETWEEN @cguidfelcrystalspelltarget AND @cguidfelcrystalspelltarget+4;
+INSERT INTO `creature` (`guid`, `id1`, `map`, `spawnMask`, `phaseMask`, `position_x`, `position_y`, `position_z`, `orientation`, `spawntimesecs`, `wander_distance`, `MovementType`, `VerifiedBuild`, `Comment`) VALUES
+(@cguidfelcrystalspelltarget+0, 25953, 530, 1, 1, 12707.900390625, -6938.85009765625, 39.885299682617195, 6.24828004837036, 300, 0.0, 0, 0, ''),
+(@cguidfelcrystalspelltarget+1, 25953, 530, 1, 1, 12685.900390625, -6925.9501953125, 39.12950134277344, 3.4906599521636963, 300, 0.0, 0, 0, ''),
+(@cguidfelcrystalspelltarget+2, 25953, 530, 1, 1, 12665.0, -6935.7099609375, 28.988800048828125, 5.5326900482177725, 300, 0.0, 0, 0, ''),
+(@cguidfelcrystalspelltarget+3, 25953, 530, 1, 1, 12655.599609375, -6948.64990234375, 38.00170135498047, 1.518440008163452, 300, 0.0, 0, 0, ''),
+(@cguidfelcrystalspelltarget+4, 25953, 530, 1, 1, 12645.099609375, -6981.1298828125, 39.86289978027344, 2.2863800525665283, 300, 0.0, 0, 0, '');
