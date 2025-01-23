@@ -61,7 +61,6 @@ enum Spells
 enum Misc
 {
     EVENT_SPELL_BERSERK             = 1,
-
     GROUP_DELAY                     = 1
 };
 
@@ -80,11 +79,14 @@ struct boss_gurtogg_bloodboil : public BossAI
         BossAI::JustEngagedWith(who);
         Talk(SAY_AGGRO);
 
-        DoCastSelf(SPELL_ACIDIC_WOUND, true);
+        if (!me->HasAura(SPELL_FEL_RAGE_SELF))
+            DoCastSelf(SPELL_ACIDIC_WOUND, true);
 
         ScheduleTimedEvent(10s, [&] {
-            if (!me->HasAura(SPELL_FEL_RAGE_SELF))
+            if (!me->HasAura(SPELL_FEL_RAGE_SELF)) {
                 me->CastCustomSpell(SPELL_BLOODBOIL, SPELLVALUE_MAX_TARGETS, 5, me, false);
+                DoCastSelf(SPELL_ACIDIC_WOUND, true);
+            }
         }, 10s);
 
         ScheduleTimedEvent(38s, [&] {
@@ -139,7 +141,7 @@ struct boss_gurtogg_bloodboil : public BossAI
         return !who->IsImmunedToDamage(SPELL_SCHOOL_MASK_ALL) && !who->HasUnitState(UNIT_STATE_CONFUSED);
     }
 
-    void KilledUnit(Unit*  /*victim*/) override
+    void KilledUnit(Unit* /*victim*/) override
     {
         if (!_recentlySpoken)
         {
