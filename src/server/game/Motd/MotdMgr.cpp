@@ -39,11 +39,6 @@ MotdMgr* MotdMgr::instance()
     return &instance;
 }
 
-bool MotdMgr::IsValidLocale(std::string const& locale) {
-    // Use std::find to search for the locale in the array
-    return std::find(std::begin(localeNames), std::end(localeNames), locale) != std::end(localeNames);
-}
-
 void MotdMgr::SetMotd(std::string motd, LocaleConstant locale)
 {
     // scripts may change motd
@@ -74,7 +69,7 @@ void MotdMgr::LoadMotd()
         Field* fields = result->Fetch();
         std::string motd = fields[0].Get<std::string>();  // Return the main motd if found
 
-        MotdMap[DEFAULT_LOCALE] = motd;  // Assign the loaded motd to enUS
+        MotdMap[LOCALE_enUS] = motd;  // Assign the loaded motd to enUS
 
         // Load localized texts if available
         LoadMotdLocale(realmId);
@@ -85,31 +80,12 @@ void MotdMgr::LoadMotd()
     else
     {
         LOG_INFO("server.loading", ">> Loaded 0 motd definitions. DB table `motd` is empty for this realm!");
+        LOG_INFO("server.loading", ">> Loaded 0 motd locale definitions. DB table `motd` needs an entry to be able to load DB table `motd_locale`!");
         LOG_INFO("server.loading", " ");
     }
 
-    LOG_INFO("server.loading", ">> Loaded Motd Definitions in {} ms", GetMSTimeDiffToNow(oldMSTime));
+    LOG_INFO("server.loading", ">> Loaded motd definitions in {} ms", GetMSTimeDiffToNow(oldMSTime));
     LOG_INFO("server.loading", " ");
-}
-
-char const* MotdMgr::GetMotd(LocaleConstant locale)
-{
-    // Return localized motd if available, otherwise fallback to enUS
-    auto it = MotdMap.find(locale);
-    if (it != MotdMap.end())
-        return it->second.c_str();
-
-    return MotdMap[DEFAULT_LOCALE].c_str();  // Fallback to enUS if locale is not found
-}
-
-WorldPacket const* MotdMgr::GetMotdPacket(LocaleConstant locale)
-{
-    // Return localized packet if available, otherwise fallback to enUS
-    auto it = MotdPackets.find(locale);
-    if (it != MotdPackets.end())
-        return &it->second;
-
-    return &MotdPackets[DEFAULT_LOCALE];  // Fallback to enUS if locale is not found
 }
 
 void MotdMgr::LoadMotdLocale(uint32 realmId)
@@ -130,7 +106,7 @@ void MotdMgr::LoadMotdLocale(uint32 realmId)
             // Convert locale string to LocaleConstant
             LocaleConstant localeId = GetLocaleByName(fields[0].Get<std::string>());
 
-            if (localeId == DEFAULT_LOCALE)
+            if (localeId == LOCALE_enUS)
                 continue;
 
             MotdMap[localeId] = localizedText;
@@ -142,8 +118,28 @@ void MotdMgr::LoadMotdLocale(uint32 realmId)
         LOG_INFO("server.loading", " ");
     }
 
-    LOG_INFO("server.loading", ">> Loaded Motd locale Definitions in {} ms", GetMSTimeDiffToNow(oldMSTime));
+    LOG_INFO("server.loading", ">> Loaded motd locale definitions in {} ms", GetMSTimeDiffToNow(oldMSTime));
     LOG_INFO("server.loading", " ");
+}
+
+char const* MotdMgr::GetMotd(LocaleConstant locale)
+{
+    // Return localized motd if available, otherwise fallback to enUS
+    auto it = MotdMap.find(locale);
+    if (it != MotdMap.end())
+        return it->second.c_str();
+
+    return MotdMap[LOCALE_enUS].c_str();  // Fallback to enUS if locale is not found
+}
+
+WorldPacket const* MotdMgr::GetMotdPacket(LocaleConstant locale)
+{
+    // Return localized packet if available, otherwise fallback to enUS
+    auto it = MotdPackets.find(locale);
+    if (it != MotdPackets.end())
+        return &it->second;
+
+    return &MotdPackets[LOCALE_enUS];  // Fallback to enUS if locale is not found
 }
 
 WorldPacket MotdMgr::CreateWorldPacket(std::string motd)

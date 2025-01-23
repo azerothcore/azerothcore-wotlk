@@ -44,12 +44,7 @@ public:
     /// Returns the current motd packet for the given locale
     WorldPacket const* GetMotdPacket(LocaleConstant locale);
 
-    // Checks if string is valid locale
-    bool IsValidLocale(std::string const& locale);
-
 private:
-    // Loads the default motd from the motd table
-    std::string LoadDefaultMotd(uint32 realmId);
     // Loads all available localized motd for the realm
     void LoadMotdLocale(uint32 realmId);
     // Create a worldpacket for a given motd localization
