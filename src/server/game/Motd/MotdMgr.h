@@ -51,11 +51,9 @@ private:
     // Loads the default motd from the motd table
     std::string LoadDefaultMotd(uint32 realmId);
     // Loads all available localized motd for the realm
-    void LoadLocalizedMotds(uint32 realmId);
-    // Sets the default mode if none is found in the database
-    void SetDefaultMotd();
+    void LoadMotdLocale(uint32 realmId);
     // Create a worldpacket for a given motd localization
-    WorldPacket CreateWorldPacket(std::string const& motd);
+    WorldPacket CreateWorldPacket(std::string motd);
 };
 
 #define sMotdMgr MotdMgr::instance()
