@@ -34,6 +34,8 @@ SET @guidjc = 94386;
 SET @guidalch = 94378;
 -- Demonic Crystals
 SET @guidcrystals:=5300500;
+-- Alchemy lab
+SET @guidalch=5300290;
 
 DELETE FROM `game_event` WHERE `eventEntry` IN (@sunsreachpone, @sunsreachptwoonly, @sunsreachptwoperm, @sunsreachnoportal, @sunsreachportal, @sunsreachpthreeonly, @sunsreachpthreeperm, @sunsreachnoanvil, @sunsreachanvil, @sunsreachpfour, @sunsreachnomonument, @sunsreachmonument, @sunsreachnolab, @sunsreachlab, @sunsreachkiru);
 INSERT INTO `game_event` (`eventEntry`, `start_time`, `end_time`, `occurence`, `length`, `holiday`, `holidayStage`, `description`, `world_event`, `announce`) VALUES
@@ -338,7 +340,7 @@ INSERT INTO `game_event_gameobject` (`guid`, `eventEntry`) VALUES
 -- Monument
 (50446,   @sunsreachmonument), -- 187116, Monument to the Fallen - Sunwell Plateau
 (27862,   @sunsreachmonument), -- 187116, Monument to the Fallen - Isle of Quel'Danas
-(5300290, @sunsreachlab), -- 187115, Alchemy Lab
+(@guidalch, @sunsreachlab), -- 187115, Alchemy Lab
 -- Crystals
 (@guidcrystals+0, -@sunsreachpthreeperm), -- 187120, Demonic Crystal
 (@guidcrystals+1, -@sunsreachpthreeperm), -- 187120, Demonic Crystal
@@ -543,11 +545,6 @@ INSERT INTO `gossip_menu` (`MenuID`, `TextID`) VALUES
 DELETE FROM `gossip_menu` WHERE (`MenuID` = 9050) AND (`TextID` IN (12238));
 INSERT INTO `gossip_menu` (`MenuID`, `TextID`) VALUES
 (9050, 12238);
-
--- Alchemy Lab
-DELETE FROM `gameobject` WHERE (`id` = 187115) AND (`guid` IN (5300290));
-INSERT INTO `gameobject` (`guid`, `id`, `map`, `zoneId`, `areaId`, `spawnMask`, `phaseMask`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecs`, `animprogress`, `state`, `ScriptName`, `VerifiedBuild`) VALUES
-(5300290, 187115, 530, 4080, 4087, 1, 1, 12845.603516, -7011.98584, 18.592701, 5.543178, 0, 0, 0, 0, 0, 0, 0, '', 0);
 
 -- Monument
 DELETE FROM `gossip_menu` WHERE (`MenuID` = 9115) AND (`TextID` IN (12322));
@@ -800,6 +797,10 @@ INSERT INTO `conditions` (`SourceTypeOrReferenceId`, `SourceGroup`, `SourceEntry
 (22, 4, 25115, 0, 0, 12, 1, @sunsreachanvil, 0, 0, 0, 0, 0, '', 'if the event ''Sun''s Reach Reclamation Phase Anvil'' is active');
 
 -- Gameobjects
+-- Alchemy Lab
+DELETE FROM `gameobject` WHERE (`id` = 187115) AND (`guid` IN (@guidalch));
+INSERT INTO `gameobject` (`guid`, `id`, `map`, `zoneId`, `areaId`, `spawnMask`, `phaseMask`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecs`, `animprogress`, `state`, `ScriptName`, `VerifiedBuild`) VALUES
+(@guidalch, 187115, 530, 4080, 4087, 1, 1, 12845.603516, -7011.98584, 18.592701, 5.543178, 0, 0, 0, 0, 0, 0, 0, '', 0);
 -- Demonic Crystals
 DELETE FROM `gameobject` WHERE `id` = 187120 AND `guid` BETWEEN @guidcrystals AND @guidcrystals+4;
 INSERT INTO `gameobject` (`guid`, `id`, `map`, `spawnMask`, `phaseMask`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecs`, `VerifiedBuild`, `Comment`) VALUES
