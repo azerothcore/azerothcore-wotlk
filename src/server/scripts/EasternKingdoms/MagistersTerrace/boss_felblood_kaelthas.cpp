@@ -65,9 +65,10 @@ enum Misc
     ACTION_ALLOW_FLY           = 3,
     ACTION_REMOVE_FLY          = 4,
 
-    CREATURE_ARCANE_SPHERE     = 24708,
-    CREATURE_PHOENIX           = 24674,
-    CREATURE_KAEL              = 24664
+    //Leftover from previous script, don't see it being used?
+    //CREATURE_ARCANE_SPHERE     = 24708,
+    NPC_PHOENIX           = 24674,
+    NPC_KAEL              = 24664
 };
 
 struct npc_phoenix_tk : public ScriptedAI
@@ -87,7 +88,7 @@ struct npc_phoenix_tk : public ScriptedAI
 
         _scheduler.Schedule(2s, [this](TaskContext context)
         {
-            if (Creature* kael = me->FindNearestCreature(CREATURE_KAEL, 100.0f))
+            if (Creature* kael = me->FindNearestCreature(NPC_KAEL, 100.0f))
             {
                 if (kael->HealthBelowPct(50))
                     DoCastRandomTarget(SPELL_FIREBALL, 0, 40.0f);
@@ -152,7 +153,7 @@ struct boss_felblood_kaelthas : public BossAI
     void JustSummoned(Creature* summon) override
     {
         BossAI::JustSummoned(summon);
-        if (summon->GetEntry() != CREATURE_PHOENIX)
+        if (summon->GetEntry() != NPC_PHOENIX)
         {
             summon->SetReactState(REACT_PASSIVE);
         }
@@ -291,9 +292,6 @@ struct boss_felblood_kaelthas : public BossAI
         _OOCScheduler.Update(diff);
         if (!UpdateVictim())
             return;
-
-        if (!me->HasUnitState(UNIT_STATE_CASTING))
-            DoMeleeAttackIfReady();
 
         BossAI::UpdateAI(diff);
     }
