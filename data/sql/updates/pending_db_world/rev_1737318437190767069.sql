@@ -32,6 +32,8 @@ SET @guidsmith = 93964;
 SET @guidjc = 94386;
 -- Mar'nah <Alchemist>
 SET @guidalch = 94378;
+-- Demonic Crystals
+SET @guidcrystals:=5300500;
 
 DELETE FROM `game_event` WHERE `eventEntry` IN (@sunsreachpone, @sunsreachptwoonly, @sunsreachptwoperm, @sunsreachnoportal, @sunsreachportal, @sunsreachpthreeonly, @sunsreachpthreeperm, @sunsreachnoanvil, @sunsreachanvil, @sunsreachpfour, @sunsreachnomonument, @sunsreachmonument, @sunsreachnolab, @sunsreachlab, @sunsreachkiru);
 INSERT INTO `game_event` (`eventEntry`, `start_time`, `end_time`, `occurence`, `length`, `holiday`, `holidayStage`, `description`, `world_event`, `announce`) VALUES
@@ -338,11 +340,11 @@ INSERT INTO `game_event_gameobject` (`guid`, `eventEntry`) VALUES
 (27862,   @sunsreachmonument), -- 187116, Monument to the Fallen - Isle of Quel'Danas
 (5300290, @sunsreachlab), -- 187115, Alchemy Lab
 -- Crystals
-(5300500, -@sunsreachpthreeperm), -- 187120, Demonic Crystal
-(5300501, -@sunsreachpthreeperm), -- 187120, Demonic Crystal
-(5300502, -@sunsreachpthreeperm), -- 187120, Demonic Crystal
-(5300503, -@sunsreachpthreeperm), -- 187120, Demonic Crystal
-(5300504, -@sunsreachpthreeperm), -- 187120, Demonic Crystal
+(@guidcrystals+0, -@sunsreachpthreeperm), -- 187120, Demonic Crystal
+(@guidcrystals+1, -@sunsreachpthreeperm), -- 187120, Demonic Crystal
+(@guidcrystals+2, -@sunsreachpthreeperm), -- 187120, Demonic Crystal
+(@guidcrystals+3, -@sunsreachpthreeperm), -- 187120, Demonic Crystal
+(@guidcrystals+4, -@sunsreachpthreeperm), -- 187120, Demonic Crystal
 -- Banners
 (27839, @sunsreachptwoperm), -- 187356, Shattered Sun Banner (Draenei - Pole)
 (27833, @sunsreachptwoperm), -- 187357, Shattered Sun Banner (Blood Elf - Pole)
@@ -796,3 +798,13 @@ INSERT INTO `conditions` (`SourceTypeOrReferenceId`, `SourceGroup`, `SourceEntry
 -- Tier 4: p4 && anvil (@sunsreachpfour && @sunsreachanvil)
 (22, 4, 25115, 0, 0, 12, 1, @sunsreachpfour, 0, 0, 0, 0, 0, '', 'if the event ''Sun''s Reach Reclamation Phase Harbor'' is active'),
 (22, 4, 25115, 0, 0, 12, 1, @sunsreachanvil, 0, 0, 0, 0, 0, '', 'if the event ''Sun''s Reach Reclamation Phase Anvil'' is active');
+
+-- Gameobjects
+-- Demonic Crystals
+DELETE FROM `gameobject` WHERE `id` = 187120 AND `guid` BETWEEN @guidcrystals AND @guidcrystals+4;
+INSERT INTO `gameobject` (`guid`, `id`, `map`, `spawnMask`, `phaseMask`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecs`, `VerifiedBuild`, `Comment`) VALUES
+(@guidcrystals+0, 187120, 530, 1, 1, 12685.7998046875, -6925.830078125, 39.61629867553711, 2.4260098934173584, 0.0, 0.0, 0.9366719722747804, 0.3502070009708404, 180, 0, ''),
+(@guidcrystals+1, 187120, 530, 1, 1, 12707.7998046875, -6938.7900390625, 40.44039916992188, 1.815140008926392, 0.0, 0.0, 0.7880110144615173, 0.6156619787216187, 180, 0, ''),
+(@guidcrystals+2, 187120, 530, 1, 1, 12665.0, -6935.72998046875, 29.555299758911133, -0.5934119820594788, 0.0, 0.0, 0.2923719882965088, -0.9563050270080566, 180, 0, ''),
+(@guidcrystals+3, 187120, 530, 1, 1, 12655.7001953125, -6948.68994140625, 38.598098754882805, 2.687809944152832, 0.0, 0.0, 0.974370002746582, 0.2249509990215301, 180, 0, ''),
+(@guidcrystals+4, 187120, 530, 1, 1, 12645.2001953125, -6980.97998046875, 40.50529861450195, -1.85004997253418, 0.0, 0.0, 0.0, 0.0, 180, 0, '');
