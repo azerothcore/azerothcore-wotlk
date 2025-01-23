@@ -133,7 +133,7 @@ struct boss_gurtogg_bloodboil : public BossAI
                     DoCastVictim(SPELL_CHARGE);
                 }, 2s);
 
-                // End Fel Rage phase after 28 seconds
+                // End Fel Rage phase after 28 seconds based on fel rage duration
                 me->m_Events.AddEventAtOffset([&] {
                     _inFelRage = false;
                 }, 28s);
