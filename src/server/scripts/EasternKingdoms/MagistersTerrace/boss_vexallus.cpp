@@ -58,7 +58,7 @@ struct boss_vexallus : public BossAI
         _Reset();
         _energyCooldown = false;
 
-        ScheduleHealthCheckEvent({ 85, 70, 55, 40 , 25}, [&]
+        ScheduleHealthCheckEvent({ 85, 70, 55, 40 , 25 }, [&]
         {
             if (!_energyCooldown)
             {
