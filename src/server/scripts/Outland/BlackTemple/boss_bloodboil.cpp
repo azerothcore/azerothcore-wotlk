@@ -64,14 +64,16 @@ enum Misc
     GROUP_DELAY                     = 1
 };
 
+// Main boss class
 struct boss_gurtogg_bloodboil : public BossAI
 {
-    boss_gurtogg_bloodboil(Creature* creature) : BossAI(creature, DATA_GURTOGG_BLOODBOIL), _recentlySpoken(false) { }
+    boss_gurtogg_bloodboil(Creature* creature) : BossAI(creature, DATA_GURTOGG_BLOODBOIL), _recentlySpoken(false), _inFelRage(false) { }
 
     void Reset() override
     {
         BossAI::Reset();
         _recentlySpoken = false;
+        _inFelRage = false;
     }
 
     void JustEngagedWith(Unit* who) override
@@ -79,32 +81,41 @@ struct boss_gurtogg_bloodboil : public BossAI
         BossAI::JustEngagedWith(who);
         Talk(SAY_AGGRO);
 
-        if (!me->HasAura(SPELL_FEL_RAGE_SELF))
+        // Apply Acidic Wound only outside Fel Rage
+        if (!_inFelRage)
             DoCastSelf(SPELL_ACIDIC_WOUND, true);
 
+        // Bloodboil timer - only outside Fel Rage
         ScheduleTimedEvent(10s, [&] {
-            if (!me->HasAura(SPELL_FEL_RAGE_SELF)) {
+            if (!_inFelRage) {
                 me->CastCustomSpell(SPELL_BLOODBOIL, SPELLVALUE_MAX_TARGETS, 5, me, false);
                 DoCastSelf(SPELL_ACIDIC_WOUND, true);
             }
         }, 10s);
 
+        // Fel Acid Breath
         ScheduleTimedEvent(38s, [&] {
             DoCastVictim(me->HasAura(SPELL_FEL_RAGE_SELF) ? SPELL_FEL_ACID_BREATH2 : SPELL_FEL_ACID_BREATH1);
         }, 30s);
 
+        // Eject
         ScheduleTimedEvent(14s, [&] {
             DoCastVictim(me->HasAura(SPELL_FEL_RAGE_SELF) ? SPELL_EJECT2 : SPELL_EJECT1);
         }, 20s);
 
+        // Arcing Smash
         ScheduleTimedEvent(5s, [&] {
             DoCastVictim(me->HasAura(SPELL_FEL_RAGE_SELF) ? SPELL_ARCING_SMASH2 : SPELL_ARCING_SMASH1);
         }, 15s);
 
+        // Fel Rage phase transition
         ScheduleTimedEvent(1min, [&] {
             if (Unit* target = SelectTarget(SelectTargetMethod::Random, 1, 40.0f, true))
             {
+                _inFelRage = true;
                 me->RemoveAurasByType(SPELL_AURA_MOD_TAUNT);
+                
+                // Apply Fel Rage effects
                 DoCastSelf(SPELL_FEL_RAGE_SELF, true);
                 DoCast(target, SPELL_FEL_RAGE_TARGET, true);
                 DoCast(target, SPELL_FEL_RAGE_2, true);
@@ -112,23 +123,32 @@ struct boss_gurtogg_bloodboil : public BossAI
                 DoCast(target, SPELL_FEL_RAGE_SIZE, true);
                 target->CastSpell(me, SPELL_TAUNT_GURTOGG, true);
 
+                // Additional effects
                 DoCast(target, SPELL_FEL_GEYSER_SUMMON, true);
                 DoCastSelf(SPELL_FEL_GEYSER_STUN, true);
                 DoCastSelf(SPELL_INSIGNIFICANCE, true);
 
+                // Delayed charge
                 me->m_Events.AddEventAtOffset([&] {
                     DoCastVictim(SPELL_CHARGE);
                 }, 2s);
+
+                // End Fel Rage phase after 28 seconds
+                me->m_Events.AddEventAtOffset([&] {
+                    _inFelRage = false;
+                }, 28s);
 
                 scheduler.DelayGroup(GROUP_DELAY, 30s);
             }
         }, 90s);
 
+        // Enrage timer
         ScheduleUniqueTimedEvent(10min, [&] {
             Talk(SAY_ENRAGE);
             DoCastSelf(SPELL_BERSERK, true);
         }, EVENT_SPELL_BERSERK);
 
+        // Bewildering Strike
         scheduler.Schedule(28s, [this](TaskContext context) {
             context.SetGroup(GROUP_DELAY);
             DoCastVictim(SPELL_BEWILDERING_STRIKE);
@@ -171,8 +191,10 @@ struct boss_gurtogg_bloodboil : public BossAI
 
 private:
     bool _recentlySpoken;
+    bool _inFelRage;
 };
 
+// Bloodboil spell implementation
 class spell_gurtogg_bloodboil : public SpellScript
 {
     PrepareSpellScript(spell_gurtogg_bloodboil);
@@ -197,6 +219,7 @@ class spell_gurtogg_bloodboil : public SpellScript
     }
 };
 
+// Eject spell implementation
 class spell_gurtogg_eject : public SpellScript
 {
     PrepareSpellScript(spell_gurtogg_eject);
@@ -219,4 +242,5 @@ void AddSC_boss_gurtogg_bloodboil()
     RegisterBlackTempleCreatureAI(boss_gurtogg_bloodboil);
     RegisterSpellScript(spell_gurtogg_bloodboil);
     RegisterSpellScript(spell_gurtogg_eject);
+}
 }
