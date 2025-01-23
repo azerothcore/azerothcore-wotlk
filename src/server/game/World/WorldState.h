@@ -25,14 +25,18 @@
 enum WorldStateWorldStates
 {
     // Suns Reach Reclamation
-    WORLD_STATE_QUEL_DANAS_MUSIC        = 3426,
-    WORLD_STATE_QUEL_DANAS_HARBOR       = 3238,
-    WORLD_STATE_QUEL_DANAS_ALCHEMY_LAB  = 3223,
-    WORLD_STATE_QUEL_DANAS_ARMORY       = 3233,
-    WORLD_STATE_QUEL_DANAS_SANCTUM      = 3244,
-    WORLD_STATE_QUEL_DANAS_PORTAL       = 3269,
-    WORLD_STATE_QUEL_DANAS_ANVIL        = 3228,
-    WORLD_STATE_QUEL_DANAS_MONUMENT     = 3275,
+    WORLD_STATE_QUEL_DANAS_MUSIC                    = 3426,
+    WORLD_STATE_QUEL_DANAS_HARBOR                   = 3238,
+    WORLD_STATE_QUEL_DANAS_ALCHEMY_LAB              = 3223,
+    WORLD_STATE_QUEL_DANAS_ARMORY                   = 3233,
+    WORLD_STATE_QUEL_DANAS_SANCTUM                  = 3244,
+    WORLD_STATE_QUEL_DANAS_PORTAL                   = 3269,
+    WORLD_STATE_QUEL_DANAS_ANVIL                    = 3228,
+    WORLD_STATE_QUEL_DANAS_MONUMENT                 = 3275,
+    // Sunwell Gate
+    WORLD_STATE_AGAMATH_THE_FIRST_GATE_HEALTH       = 3253, // guessed, potentially wrong
+    WORLD_STATE_ROHENDOR_THE_SECOND_GATE_HEALTH     = 3255,
+    WORLD_STATE_ARCHONISUS_THE_FINAL_GATE_HEALTH    = 3257,
 };
 
 enum WorldStateCondition
@@ -109,6 +113,11 @@ enum WorldStateGameEvents
     GAME_EVENT_QUEL_DANAS_PHASE_4_NO_ALCHEMY_LAB= 113,
     GAME_EVENT_QUEL_DANAS_PHASE_4_ALCHEMY_LAB   = 114,
     GAME_EVENT_QUEL_DANAS_PHASE_4_KIRU          = 115,
+    // SWP Phases
+    GAME_EVENT_SWP_GATES_PHASE_0                = 116, // All Gates Closed
+    GAME_EVENT_SWP_GATES_PHASE_1                = 117, // First Gate Open
+    GAME_EVENT_SWP_GATES_PHASE_2                = 118, // Second Gate Open
+    GAME_EVENT_SWP_GATES_PHASE_3                = 119, // All Gates Open
 };
 
 enum SunsReachPhases
@@ -143,6 +152,21 @@ enum SunsReachCounters
     COUNTERS_MAX,
 };
 
+enum SunwellGates
+{
+    SUNWELL_ALL_GATES_CLOSED,
+    SUNWELL_AGAMATH_GATE1_OPEN,
+    SUNWELL_ROHENDOR_GATE2_OPEN,
+    SUNWELL_ARCHONISUS_GATE3_OPEN,
+};
+enum SunwellGateCounters
+{
+    COUNTER_AGAMATH_THE_FIRST_GATE,
+    COUNTER_ROHENDOR_THE_SECOND_GATE,
+    COUNTER_ARCHONISUS_THE_FINAL_GATE,
+    COUNTERS_MAX_GATES,
+};
+
 struct SunsReachReclamationData
 {
     uint32 m_phase;
@@ -150,13 +174,17 @@ struct SunsReachReclamationData
     uint32 m_sunsReachReclamationCounters[COUNTERS_MAX];
     GuidVector m_sunsReachReclamationPlayers;
     std::mutex m_sunsReachReclamationMutex;
-    SunsReachReclamationData() : m_phase(SUNS_REACH_PHASE_1_STAGING_AREA), m_subphaseMask(0)
+    uint32 m_gate;
+    uint32 m_gateCounters[COUNTERS_MAX_GATES];
+    SunsReachReclamationData() : m_phase(SUNS_REACH_PHASE_1_STAGING_AREA), m_subphaseMask(0), m_gate(SUNWELL_ALL_GATES_CLOSED)
     {
         memset(m_sunsReachReclamationCounters, 0, sizeof(m_sunsReachReclamationCounters));
+        memset(m_gateCounters, 0, sizeof(m_gateCounters));
     }
     std::string GetData();
     uint32 GetPhasePercentage(uint32 phase);
     uint32 GetSubPhasePercentage(uint32 subPhase);
+    uint32 GetSunwellGatePercentage(uint32 gate);
 };
 
 // Intended for implementing server wide scripts, note: all behaviour must be safeguarded towards multithreading
@@ -184,7 +212,10 @@ class WorldState
         void StopSunsReachPhase(bool forward);
         void StartSunsReachPhase(bool initial = false);
         std::string GetSunsReachPrintout();
-
+        void AddSunwellGateProgress(uint32 questId);
+        void HandleSunwellGateTransition(uint32 newGate);
+        void SetSunwellGateCounter(SunwellGateCounters index, uint32 value);
+        void StopSunwellGatePhase();
         void FillInitialWorldStates(ByteBuffer& data, uint32 zoneId, uint32 areaId);
     private:
         void BuffAdalsSongOfBattle();
@@ -198,6 +229,7 @@ class WorldState
         std::string GetSunsReachPhaseName(uint32 phase) const;
         std::string GetSunsReachSubPhaseName(uint32 subPhase) const;
         std::string GetSunsReachCounterName(uint32 counter) const;
+        void StartSunwellGatePhase();
         std::map<WorldStateCondition, std::atomic<WorldStateConditionState>> _transportStates; // atomic to avoid having to lock
         std::mutex _mutex; // all World State operations are threat unsafe
 };

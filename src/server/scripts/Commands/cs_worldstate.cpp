@@ -38,15 +38,19 @@ public:
     {
         static ChatCommandTable sunsreachCommandTable =
         {
-            { "status",   HandleSunsReachReclamationStatusCommand,   SEC_ADMINISTRATOR, Console::Yes },
-            { "phase",    HandleSunsReachReclamationPhaseCommand,    SEC_ADMINISTRATOR, Console::Yes },
-            { "subphase", HandleSunsReachReclamationSubPhaseCommand, SEC_ADMINISTRATOR, Console::Yes },
-            { "counter",  HandleSunsReachReclamationCounterCommand,  SEC_ADMINISTRATOR, Console::Yes },
+            { "status",      HandleSunsReachReclamationStatusCommand,   SEC_ADMINISTRATOR, Console::Yes },
+            { "phase",       HandleSunsReachReclamationPhaseCommand,    SEC_ADMINISTRATOR, Console::Yes },
+            { "subphase",    HandleSunsReachReclamationSubPhaseCommand, SEC_ADMINISTRATOR, Console::Yes },
+            { "counter",     HandleSunsReachReclamationCounterCommand,  SEC_ADMINISTRATOR, Console::Yes },
+            { "gate",        HandleSunwellGateCommand,                  SEC_ADMINISTRATOR, Console::Yes },
+            { "gatecounter", HandleSunwellGateCounterCommand,           SEC_ADMINISTRATOR, Console::Yes },
         };
+
         static ChatCommandTable worldStateCommandTable =
         {
             { "sunsreach", sunsreachCommandTable }
         };
+
         static ChatCommandTable commandTable =
         {
             { "worldstate", worldStateCommandTable }
@@ -93,6 +97,31 @@ public:
             return true;
         }
         sWorldState->SetSunsReachCounter(SunsReachCounters(index.value()), value.value());
+        handler->PSendSysMessage(sWorldState->GetSunsReachPrintout());
+        return true;
+    }
+
+    static bool HandleSunwellGateCommand(ChatHandler* handler, uint32 newGate)
+    {
+        if (newGate > SUNWELL_ARCHONISUS_GATE3_OPEN)
+        {
+            handler->PSendSysMessage("Invalid phase, see \".worldstate sunsreach gate\" for usage");
+            return false;
+        }
+        sWorldState->HandleSunwellGateTransition(newGate);
+        handler->PSendSysMessage(sWorldState->GetSunsReachPrintout());
+        return true;
+    }
+
+    static bool HandleSunwellGateCounterCommand(ChatHandler* handler, Optional<uint32> index, Optional<uint32> value)
+    {
+        if (!index || !value || index.value() >= COUNTERS_MAX_GATES)
+        {
+            handler->PSendSysMessage("Syntax: .worldstate sunsreach gatecounter <index> <value>.");
+            handler->PSendSysMessage(sWorldState->GetSunsReachPrintout());
+            return true;
+        }
+        sWorldState->SetSunwellGateCounter(SunwellGateCounters(index.value()), value.value());
         handler->PSendSysMessage(sWorldState->GetSunsReachPrintout());
         return true;
     }

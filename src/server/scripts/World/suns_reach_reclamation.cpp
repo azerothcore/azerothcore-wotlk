@@ -30,7 +30,20 @@ public:
     }
 };
 
+class npc_sunwell_gate : public CreatureScript
+{
+public:
+    npc_sunwell_gate() : CreatureScript("npc_sunwell_gate") { }
+
+    bool OnQuestReward(Player* /*player*/, Creature* /*creature*/, const Quest* quest, uint32 /*slot*/) override
+    {
+        sWorldState->AddSunwellGateProgress(quest->GetQuestId());
+        return true;
+    }
+};
+
 void AddSC_suns_reach_reclamation()
 {
     new npc_suns_reach_reclamation();
+    new npc_sunwell_gate();
 }
