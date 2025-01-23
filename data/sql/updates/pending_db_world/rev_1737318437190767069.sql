@@ -4,28 +4,6 @@ INSERT INTO `command` (`name`, `security`, `help`) VALUES
 ('worldstate sunsreach phase', 3, 'Syntax: .worldstate sunsreach phase <value>.\nSets the phase of Sun''s Reach.\nValid values are:\n0: Staging Area\n1: Harbor\n2: Armory\n3: Sanctum.'),
 ('worldstate sunsreach subphase', 3, 'Syntax: .worldstate sunsreach subphase <mask>.\nSets the subphase mask of Sun''s Reach.\nValid values are:\n1: Portal\n2: Anvil\n4: Alchemy Lab\n8: Monument\n15: All.');
 
-UPDATE `creature_template` SET `ScriptName`='npc_suns_reach_reclamation' WHERE `entry` IN (24965,24967,25061,25057,24932,25108,25069,25046,24975,25112,25163);
-
--- 20-1-2025
--- author: heyitsbench
--- original: https://gist.githubusercontent.com/heyitsbench/64e9741fdc5e06f48592b583a4712b4f/raw/43ef22898c5268973ab01051d9387ca1f5aeec9f/suns-reach-reclamation.sql
-SET
-@sunsreachpone       = 101,
-@sunsreachptwoonly   = 102,
-@sunsreachptwoperm   = 103,
-@sunsreachnoportal   = 104,
-@sunsreachportal     = 105,
-@sunsreachpthreeonly = 106,
-@sunsreachpthreeperm = 107,
-@sunsreachnoanvil    = 108,
-@sunsreachanvil      = 109,
-@sunsreachpfour      = 110,
-@sunsreachnomonument = 111,
-@sunsreachmonument   = 112,
-@sunsreachnolab      = 113,
-@sunsreachlab        = 114,
-@sunsreachkiru       = 115;
-
 -- Smith Hauthaa <Weapons & Armorsmith>
 SET @cguidsmith = 93964;
 -- Shaani <Jewelcrafting Supplies>
@@ -51,6 +29,23 @@ SET @cguidflamewalkerhellion = 5300471;
 -- Invisible Stalker Floating -> Fel Crystal Spell target
 SET @cguidfelcrystalspelltarget = 5300031;
 
+SET
+@sunsreachpone       = 101,
+@sunsreachptwoonly   = 102,
+@sunsreachptwoperm   = 103,
+@sunsreachnoportal   = 104,
+@sunsreachportal     = 105,
+@sunsreachpthreeonly = 106,
+@sunsreachpthreeperm = 107,
+@sunsreachnoanvil    = 108,
+@sunsreachanvil      = 109,
+@sunsreachpfour      = 110,
+@sunsreachnomonument = 111,
+@sunsreachmonument   = 112,
+@sunsreachnolab      = 113,
+@sunsreachlab        = 114,
+@sunsreachkiru       = 115;
+
 DELETE FROM `game_event` WHERE `eventEntry` IN (@sunsreachpone, @sunsreachptwoonly, @sunsreachptwoperm, @sunsreachnoportal, @sunsreachportal, @sunsreachpthreeonly, @sunsreachpthreeperm, @sunsreachnoanvil, @sunsreachanvil, @sunsreachpfour, @sunsreachnomonument, @sunsreachmonument, @sunsreachnolab, @sunsreachlab, @sunsreachkiru);
 INSERT INTO `game_event` (`eventEntry`, `start_time`, `end_time`, `occurence`, `length`, `holiday`, `holidayStage`, `description`, `world_event`, `announce`) VALUES
 (@sunsreachpone,       '2000-01-01 14:00:00', '2000-01-01 14:00:00', 5184000, 2592000, 0, 0, 'Sun''s Reach Reclamation Phase 1',              5, 2),
@@ -68,6 +63,8 @@ INSERT INTO `game_event` (`eventEntry`, `start_time`, `end_time`, `occurence`, `
 (@sunsreachnolab,      '2000-01-01 14:00:00', '2000-01-01 14:00:00', 5184000, 2592000, 0, 0, 'Sun''s Reach Reclamation Phase No Alchemy Lab', 5, 2),
 (@sunsreachlab,        '2000-01-01 14:00:00', '2000-01-01 14:00:00', 5184000, 2592000, 0, 0, 'Sun''s Reach Reclamation Phase Alchemy Lab',    5, 2),
 (@sunsreachkiru,       '2000-01-01 14:00:00', '2000-01-01 14:00:00', 5184000, 2592000, 0, 0, 'Sun''s Reach Reclamation Phase K''iru',         5, 2);
+
+UPDATE `creature_template` SET `ScriptName`='npc_suns_reach_reclamation' WHERE `entry` IN (24965,24967,25061,25057,24932,25108,25069,25046,24975,25112,25163);
 
 DELETE FROM `game_event_creature` WHERE `eventEntry` IN (@sunsreachpone, @sunsreachptwoonly, @sunsreachptwoperm, @sunsreachnoportal, @sunsreachportal, @sunsreachpthreeonly, @sunsreachpthreeperm, @sunsreachnoanvil, @sunsreachanvil, @sunsreachpfour, @sunsreachnomonument, @sunsreachmonument, @sunsreachnolab, @sunsreachlab, @sunsreachkiru, -@sunsreachpone, -@sunsreachptwoonly, -@sunsreachptwoperm, -@sunsreachnoportal, -@sunsreachportal, -@sunsreachpthreeonly, -@sunsreachpthreeperm, -@sunsreachnoanvil, -@sunsreachanvil, -@sunsreachpfour, -@sunsreachnomonument, -@sunsreachmonument, -@sunsreachnolab, -@sunsreachlab, -@sunsreachkiru);
 INSERT INTO `game_event_creature` (`guid`, `eventEntry`) VALUES
@@ -638,8 +635,7 @@ INSERT INTO `game_event_npc_vendor` (`eventEntry`, `guid`, `slot`, `item`, `maxc
 (@sunsreachanvil, @cguidsmith, 0, 34951, 0, 0, 2332),
 (@sunsreachanvil, @cguidsmith, 0, 34952, 0, 0, 2332);
 
--- Alchemist vendor
--- Mar'nah
+-- Mar'nah <Alchemist>
 DELETE FROM `npc_vendor` WHERE (`entry` = 24975);
 DELETE FROM `game_event_npc_vendor` WHERE (`eventEntry` = @sunsreachlab) AND `guid` = @cguidalch;
 INSERT INTO `game_event_npc_vendor` (`eventEntry`, `guid`, `slot`, `item`, `maxcount`, `incrtime`, `ExtendedCost`) VALUES
@@ -654,8 +650,7 @@ INSERT INTO `game_event_npc_vendor` (`eventEntry`, `guid`, `slot`, `item`, `maxc
 (@sunsreachlab, @cguidalch, 0, 22793, 1, 9000, 0),
 (@sunsreachlab, @cguidalch, 0, 40411, 0, 0, 0);
 
--- JC vendor
--- Shaani
+-- Shaani <Jewelcrafting Supplies>
 DELETE FROM `npc_vendor` WHERE (`entry` = 25950);
 DELETE FROM `game_event_npc_vendor` WHERE (`eventEntry` = @sunsreachlab) AND `guid` = @cguidjc;
 INSERT INTO `game_event_npc_vendor` (`eventEntry`, `guid`, `slot`, `item`, `maxcount`, `incrtime`, `ExtendedCost`) VALUES
