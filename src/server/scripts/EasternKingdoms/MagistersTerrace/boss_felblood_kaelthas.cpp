@@ -78,6 +78,8 @@ struct boss_felblood_kaelthas : public BossAI
         _gravityLapseCounter = 0;
         me->ApplySpellImmune(0, IMMUNITY_EFFECT, SPELL_EFFECT_INTERRUPT_CAST, false);
         me->SetImmuneToAll(false);
+        summons.DespawnAll();
+
         ScheduleHealthCheckEvent(50, [&]{
             me->CastStop();
             me->ApplySpellImmune(0, IMMUNITY_EFFECT, SPELL_EFFECT_INTERRUPT_CAST, true);
