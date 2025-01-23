@@ -36,6 +36,8 @@ SET @guidalch = 94378;
 SET @guidcrystals:=5300500;
 -- Alchemy lab
 SET @guidalch=5300290;
+-- Shattrath City, Portal Subphase, Shattered Sun Warrior and Shattered Sun Marksman
+SET @cguidshatportal:=165102;
 
 DELETE FROM `game_event` WHERE `eventEntry` IN (@sunsreachpone, @sunsreachptwoonly, @sunsreachptwoperm, @sunsreachnoportal, @sunsreachportal, @sunsreachpthreeonly, @sunsreachpthreeperm, @sunsreachnoanvil, @sunsreachanvil, @sunsreachpfour, @sunsreachnomonument, @sunsreachmonument, @sunsreachnolab, @sunsreachlab, @sunsreachkiru);
 INSERT INTO `game_event` (`eventEntry`, `start_time`, `end_time`, `occurence`, `length`, `holiday`, `holidayStage`, `description`, `world_event`, `announce`) VALUES
@@ -307,14 +309,14 @@ INSERT INTO `game_event_creature` (`guid`, `eventEntry`) VALUES
 (5301085, -@sunsreachptwoonly), -- 25115 (Shattered Sun Warrior)
 (5301086, -@sunsreachptwoonly), -- 25115 (Shattered Sun Warrior)
 (5301087, -@sunsreachptwoonly), -- 25115 (Shattered Sun Warrior)
-(165102,  @sunsreachportal), -- 25115 (Shattered Sun Warrior)
-(165103,  @sunsreachportal), -- 25115 (Shattered Sun Warrior)
-(165104,  @sunsreachportal), -- 25115 (Shattered Sun Warrior)
-(165105,  @sunsreachportal), -- 25115 (Shattered Sun Warrior)
-(165106,  @sunsreachportal), -- 24938 (Shattered Sun Marksman)
-(165107,  @sunsreachportal), -- 24938 (Shattered Sun Marksman)
-(165108,  @sunsreachportal), -- 24938 (Shattered Sun Marksman)
-(165109,  @sunsreachportal), -- 24938 (Shattered Sun Marksman)
+(@cguidshatportal+0,  @sunsreachportal), -- 25115 (Shattered Sun Warrior)
+(@cguidshatportal+1,  @sunsreachportal), -- 25115 (Shattered Sun Warrior)
+(@cguidshatportal+2,  @sunsreachportal), -- 25115 (Shattered Sun Warrior)
+(@cguidshatportal+3,  @sunsreachportal), -- 25115 (Shattered Sun Warrior)
+(@cguidshatportal+4,  @sunsreachportal), -- 24938 (Shattered Sun Marksman)
+(@cguidshatportal+5,  @sunsreachportal), -- 24938 (Shattered Sun Marksman)
+(@cguidshatportal+6,  @sunsreachportal), -- 24938 (Shattered Sun Marksman)
+(@cguidshatportal+7,  @sunsreachportal), -- 24938 (Shattered Sun Marksman)
 (5300070, @sunsreachportal), -- 24936 (Sunwell Daily Bunny x 0.01)
 (5300071, @sunsreachportal), -- 24936 (Sunwell Daily Bunny x 0.01)
 (5300072, @sunsreachportal), -- 24936 (Sunwell Daily Bunny x 0.01)
@@ -809,3 +811,17 @@ INSERT INTO `gameobject` (`guid`, `id`, `map`, `spawnMask`, `phaseMask`, `positi
 (@guidcrystals+2, 187120, 530, 1, 1, 12665.0, -6935.72998046875, 29.555299758911133, -0.5934119820594788, 0.0, 0.0, 0.2923719882965088, -0.9563050270080566, 180, 0, ''),
 (@guidcrystals+3, 187120, 530, 1, 1, 12655.7001953125, -6948.68994140625, 38.598098754882805, 2.687809944152832, 0.0, 0.0, 0.974370002746582, 0.2249509990215301, 180, 0, ''),
 (@guidcrystals+4, 187120, 530, 1, 1, 12645.2001953125, -6980.97998046875, 40.50529861450195, -1.85004997253418, 0.0, 0.0, 0.0, 0.0, 180, 0, '');
+
+-- Creatures
+-- Shattrath City, Portal Subphase, Shattered Sun Warrior and Shattered Sun Marksman
+DELETE FROM `creature` WHERE `id1` IN (25115, 24938) AND `guid` BETWEEN @cguidshatportal AND @cguidshatportal+7;
+INSERT INTO `creature` (`guid`, `id1`, `map`, `spawnMask`, `phaseMask`, `position_x`, `position_y`, `position_z`, `orientation`, `spawntimesecs`, `MovementType`, `VerifiedBuild`, `Comment`) VALUES
+(@cguidshatportal+0, 25115, 530, 1, 1, -1983.31005859375, 5491.89013671875, -12.344799995422363, 0.1725849956274032, 120, 2, 0, ''),
+(@cguidshatportal+1, 25115, 530, 1, 1, -1866.1199951171875, 5519.31005859375, -12.344799995422363, 3.35932993888855, 120, 2, 0, ''),
+(@cguidshatportal+2, 25115, 530, 1, 1, -1955.0699462890625, 5432.39990234375, -12.344799995422363, 4.982600212097168, 120, 2, 0, ''),
+(@cguidshatportal+3, 25115, 530, 1, 1, -1753.5, 5495.75, -12.344799995422363, 3.782819986343384, 120, 2, 0, ''),
+(@cguidshatportal+4, 24938, 530, 1, 1, -1941.18994140625, 5486.89990234375, -12.344799995422363, 0.5934119820594788, 120, 2, 0, ''),
+(@cguidshatportal+5, 24938, 530, 1, 1, -1958.1099853515625, 5418.16015625, -12.344799995422363, 5.061450004577637, 120, 2, 0, ''),
+(@cguidshatportal+6, 24938, 530, 1, 1, -1771.47998046875, 5424.3798828125, -12.344799995422363, 1.7976900339126587, 120, 2, 0, ''),
+(@cguidshatportal+7, 24938, 530, 1, 1, -1799.050048828125, 5549.31982421875, -12.344799995422363, 5.026549816131592, 120, 2, 0, '');
+-- TODO: waypoint script from creature_movement Id  BETWEEN 165102 AND 165109
