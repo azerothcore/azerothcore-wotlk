@@ -31,7 +31,8 @@ enum Says
     SAY_GRAVITY_LAPSE           = 3,
     SAY_TIRED                   = 4,
     SAY_RECAST_GRAVITY          = 5,
-    SAY_DEATH                   = 6
+    SAY_DEATH                   = 6,
+    SAY_AGGRO_2                 = 7
 };
 
 enum Spells
@@ -78,6 +79,8 @@ struct boss_felblood_kaelthas : public BossAI
         _gravityLapseCounter = 0;
         me->ApplySpellImmune(0, IMMUNITY_EFFECT, SPELL_EFFECT_INTERRUPT_CAST, false);
         me->SetImmuneToAll(false);
+        summons.DespawnAll();
+
         ScheduleHealthCheckEvent(50, [&]{
             me->CastStop();
             me->ApplySpellImmune(0, IMMUNITY_EFFECT, SPELL_EFFECT_INTERRUPT_CAST, true);
@@ -170,6 +173,7 @@ struct boss_felblood_kaelthas : public BossAI
         if (!_hasDoneIntro && me->IsWithinDistInMap(who, 40.0f) && who->IsPlayer())
         {
             Talk(SAY_AGGRO);
+            Talk(SAY_AGGRO_2, 20s);
             _hasDoneIntro = true;
             _OOCScheduler.Schedule(35s, [this](TaskContext){
                 me->SetReactState(REACT_AGGRESSIVE);

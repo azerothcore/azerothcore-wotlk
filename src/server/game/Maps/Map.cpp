@@ -103,7 +103,7 @@ bool Map::ExistMap(uint32 mapid, int gx, int gy)
         {
             if (header.mapMagic != MapMagic.asUInt || header.versionMagic != MapVersionMagic)
             {
-                LOG_ERROR("maps", "Map file '{}' is from an incompatible map version (%.*u v{}), %.*s v{} is expected. Please pull your source, recompile tools and recreate maps using the updated mapextractor, then replace your old map files with new files.",
+                LOG_ERROR("maps", "Map file '{}' is from an incompatible map version ({:.4u} v{}), {:.4s} v{} is expected. Please pull your source, recompile tools and recreate maps using the updated mapextractor, then replace your old map files with new files.",
                     tmp, 4, header.mapMagic, header.versionMagic, 4, MapMagic.asChar, MapVersionMagic);
             }
 
@@ -3025,6 +3025,15 @@ bool InstanceMap::AddPlayerToMap(Player* player)
     m_unloadTimer = 0;
     m_resetAfterUnload = false;
     m_unloadWhenEmpty = false;
+
+    if (instance_data && instance_data->IsTwoFactionInstance()
+        && instance_data->GetTeamIdInInstance() == TEAM_NEUTRAL)
+    {
+        instance_data->SetTeamIdInInstance(player->GetTeamId());
+        if (Group* group = player->GetGroup())
+            if (Player* leader = ObjectAccessor::FindConnectedPlayer(group->GetLeaderGUID()))
+                instance_data->SetTeamIdInInstance(leader->GetTeamId());
+    }
 
     // this will acquire the same mutex so it cannot be in the previous block
     Map::AddPlayerToMap(player);

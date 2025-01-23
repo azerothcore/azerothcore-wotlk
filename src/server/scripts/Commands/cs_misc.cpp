@@ -280,7 +280,7 @@ public:
                 break;
             }
 
-            if (plr->isUsingLfg())
+            if (plr->IsUsingLfg())
             {
                 error = 4;
                 break;
