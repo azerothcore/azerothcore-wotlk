@@ -11,7 +11,6 @@ INSERT INTO `creature_loot_template` (`Entry`, `Item`, `Reference`, `Chance`, `Q
 (24857, 34616, 0, 0, 0, 1, 2, 1, 1, 'Kael\'thas Sunstrider (1) - Breeching Comet'),
 (24857, 34613, 0, 0, 0, 1, 2, 1, 1, 'Kael\'thas Sunstrider (1) - Shoulderpads of the Silvermoon Retainer');
 
-
 -- Remove normal loot from Delrissa HC
 DELETE FROM `creature_loot_template` WHERE (`Entry` = 25560) AND (`Item` IN (25027));
 
