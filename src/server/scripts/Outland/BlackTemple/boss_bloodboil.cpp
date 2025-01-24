@@ -79,7 +79,7 @@ struct boss_gurtogg_bloodboil : public BossAI
         BossAI::JustEngagedWith(who);
         Talk(SAY_AGGRO);
 
-        DoCastVictim(SPELL_ACIDIC_WOUND, true);
+        DoCastSelf(SPELL_ACIDIC_WOUND, true);
 
         ScheduleTimedEvent(10s, [&] {
             if (!me->HasAura(SPELL_FEL_RAGE_SELF))
@@ -118,7 +118,7 @@ struct boss_gurtogg_bloodboil : public BossAI
                 }, 2s);
 
                 me->m_Events.AddEventAtOffset([&] {
-                    DoCastVictim(SPELL_ACIDIC_WOUND, true);
+                    DoCastSelf(SPELL_ACIDIC_WOUND, true);
                 }, 28s);
 
                 scheduler.DelayGroup(GROUP_DELAY, 30s);
