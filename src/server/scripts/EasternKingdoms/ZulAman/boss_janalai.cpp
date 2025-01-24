@@ -398,6 +398,7 @@ struct npc_janalai_hatcher : public ScriptedAI
         _isHatching = false;
         me->GetMotionMaster()->Clear();
         me->GetMotionMaster()->MovePoint(0, hatcherway[_side][0]);
+        me->ClearUnitState(UNIT_STATE_NOT_MOVE);
     }
 
     void MovementInform(uint32, uint32) override
