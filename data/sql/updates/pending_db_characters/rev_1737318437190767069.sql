@@ -5,3 +5,7 @@ CREATE TABLE IF NOT EXISTS `world_state` (
    `Data` longtext,
    PRIMARY KEY(`Id`)
 ) ENGINE=MYISAM DEFAULT CHARSET=utf8mb4 COMMENT='WorldState save system';
+
+-- Isle of Quel'danas is in its final stage with all subphases completed
+-- open all Sunwell Plateau gates
+INSERT INTO `world_state` (`Id`, `Data`) VALUES(20, '3 15 10000 10000 10000 10000 10000 10000 10000 10000 10000 10000 3 80 80 80');
