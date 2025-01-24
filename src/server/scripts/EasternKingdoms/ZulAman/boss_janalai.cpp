@@ -230,7 +230,7 @@ struct boss_janalai : public BossAI
                     scheduler.Schedule(1500ms, [this](TaskContext)
                     {
     			        _isFlameBreathing = false;
-		            });
+                    });
                 }
             }
         }, 8s);
