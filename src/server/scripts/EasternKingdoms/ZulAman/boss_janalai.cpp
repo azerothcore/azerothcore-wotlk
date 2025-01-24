@@ -292,15 +292,11 @@ struct boss_janalai : public BossAI
 
     void SpawnBombs()
     {
-        float centerX = me->GetPositionX();
-        float centerY = me->GetPositionY();
         float maxRadius = std::min(area_dx, area_dy) / 2.0f;
         for (int i = 0; i < MAX_BOMB_COUNT; ++i)
         {
-            // Generate random angle and radius
             float angle = float(rand()) / float(RAND_MAX) * 2.0f * M_PI;
             float radius = float(rand()) / float(RAND_MAX) * maxRadius;
-            // Convert to cartesian coordinates
             float dx = radius * cos(angle);
             float dy = radius * sin(angle);
             DoSpawnCreature(NPC_FIRE_BOMB, dx, dy, 0, 0, TEMPSUMMON_TIMED_DESPAWN, 15000);
