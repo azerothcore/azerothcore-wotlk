@@ -750,6 +750,25 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 (24938, 0, 4, 0, 11, 0, 100, 0, 0, 0, 0, 0, 0, 0, 88, 2493820, 2493823, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Shattered Sun Marksman - On Respawn - Run Random Script'),
 (24938, 0, 5, 0, 11, 0, 100, 0, 0, 0, 0, 0, 0, 0, 88, 2493830, 2493833, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Shattered Sun Marksman - On Respawn - Run Random Script'),
 (24938, 0, 6, 0, 11, 0, 100, 0, 0, 0, 0, 0, 0, 0, 88, 2493840, 2493843, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Shattered Sun Marksman - On Respawn - Run Random Script');
+-- Bridge Marksman spawn in Harbor Phase, (hard-coded bunny target GUIDs...)
+DELETE FROM `smart_scripts` WHERE (`entryorguid` IN (-65694, -65695, -65696, -65697, -65698, -65699, -65700, -65702)) AND (`source_type` = 0) AND (`id` IN (1, 2));
+INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `event_param6`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
+(-65694, 0, 1, 0, 11, 0, 100, 0, 0, 0, 0, 0, 0, 0, 88, 2493830, 2493833, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Shattered Sun Marksman - On Respawn - Run Script'),
+(-65694, 0, 2, 0, 11, 0, 100, 0, 0, 0, 0, 0, 0, 0, 88, 2493840, 2493843, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Shattered Sun Marksman - On Respawn - Run Script'),
+(-65695, 0, 1, 0, 11, 0, 100, 0, 0, 0, 0, 0, 0, 0, 88, 2493830, 2493833, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Shattered Sun Marksman - On Respawn - Run Script'),
+(-65695, 0, 2, 0, 11, 0, 100, 0, 0, 0, 0, 0, 0, 0, 88, 2493840, 2493843, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Shattered Sun Marksman - On Respawn - Run Script'),
+(-65696, 0, 1, 0, 11, 0, 100, 0, 0, 0, 0, 0, 0, 0, 88, 2493830, 2493833, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Shattered Sun Marksman - On Respawn - Run Script'),
+(-65696, 0, 2, 0, 11, 0, 100, 0, 0, 0, 0, 0, 0, 0, 88, 2493840, 2493843, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Shattered Sun Marksman - On Respawn - Run Script'),
+(-65697, 0, 1, 0, 11, 0, 100, 0, 0, 0, 0, 0, 0, 0, 88, 2493830, 2493833, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Shattered Sun Marksman - On Respawn - Run Script'),
+(-65697, 0, 2, 0, 11, 0, 100, 0, 0, 0, 0, 0, 0, 0, 88, 2493840, 2493843, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Shattered Sun Marksman - On Respawn - Run Script'),
+(-65698, 0, 1, 0, 11, 0, 100, 0, 0, 0, 0, 0, 0, 0, 88, 2493830, 2493833, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Shattered Sun Marksman - On Respawn - Run Script'),
+(-65698, 0, 2, 0, 11, 0, 100, 0, 0, 0, 0, 0, 0, 0, 88, 2493840, 2493843, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Shattered Sun Marksman - On Respawn - Run Script'),
+(-65699, 0, 1, 0, 11, 0, 100, 0, 0, 0, 0, 0, 0, 0, 88, 2493830, 2493833, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Shattered Sun Marksman - On Respawn - Run Script'),
+(-65699, 0, 2, 0, 11, 0, 100, 0, 0, 0, 0, 0, 0, 0, 88, 2493840, 2493843, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Shattered Sun Marksman - On Respawn - Run Script'),
+(-65700, 0, 1, 0, 11, 0, 100, 0, 0, 0, 0, 0, 0, 0, 88, 2493830, 2493833, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Shattered Sun Marksman - On Respawn - Run Script'),
+(-65700, 0, 2, 0, 11, 0, 100, 0, 0, 0, 0, 0, 0, 0, 88, 2493840, 2493843, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Shattered Sun Marksman - On Respawn - Run Script'),
+(-65702, 0, 1, 0, 11, 0, 100, 0, 0, 0, 0, 0, 0, 0, 88, 2493830, 2493833, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Shattered Sun Marksman - On Respawn - Run Script'),
+(-65702, 0, 2, 0, 11, 0, 100, 0, 0, 0, 0, 0, 0, 0, 88, 2493840, 2493843, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Shattered Sun Marksman - On Respawn - Run Script');
 
 DELETE FROM `smart_scripts` WHERE (`source_type` = 9 AND `entryorguid` BETWEEN 2493810 AND 2493813);
 INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `event_param6`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
@@ -831,6 +850,57 @@ INSERT INTO `conditions` (`SourceTypeOrReferenceId`, `SourceGroup`, `SourceEntry
 -- Tier 4: p4 && anvil (@sunsreachpfour && @sunsreachanvil)
 (22, 7, 24938, 0, 0, 12, 1, @sunsreachpfour, 0, 0, 0, 0, 0, '', 'if the event ''Sun''s Reach Reclamation Phase Harbor'' is active'),
 (22, 7, 24938, 0, 0, 12, 1, @sunsreachanvil, 0, 0, 0, 0, 0, '', 'if the event ''Sun''s Reach Reclamation Phase Anvil'' is active');
+-- Bridge Marksman SAI conditions
+DELETE FROM `conditions` WHERE (`SourceTypeOrReferenceId` = 22) AND (`SourceGroup` IN (2, 3)) AND (`SourceEntry` IN (-65694, -65695, -65696, -65697, -65698, -65699, -65700, -65702)) AND (`SourceId` = 0);
+INSERT INTO `conditions` (`SourceTypeOrReferenceId`, `SourceGroup`, `SourceEntry`, `SourceId`, `ElseGroup`, `ConditionTypeOrReference`, `ConditionTarget`, `ConditionValue1`, `ConditionValue2`, `ConditionValue3`, `NegativeCondition`, `ErrorType`, `ErrorTextId`, `ScriptName`, `Comment`) VALUES
+-- Tier 3: p4 && !anvil (@sunsreachpfour && !@sunsreachanvil)
+(22, 2, -65694, 0, 0, 12, 1, @sunsreachpfour, 0, 0, 0, 0, 0, '', 'if the event ''Sun''s Reach Reclamation Phase Harbor'' is active'),
+(22, 2, -65694, 0, 0, 12, 1, @sunsreachanvil, 0, 0, 1, 0, 0, '', 'if the event ''Sun''s Reach Reclamation Phase Anvil'' is not active'),
+-- Tier 4: p4 && anvil (@sunsreachpfour && @sunsreachanvil)
+(22, 3, -65694, 0, 0, 12, 1, @sunsreachpfour, 0, 0, 0, 0, 0, '', 'if the event ''Sun''s Reach Reclamation Phase Harbor'' is active'),
+(22, 3, -65694, 0, 0, 12, 1, @sunsreachanvil, 0, 0, 0, 0, 0, '', 'if the event ''Sun''s Reach Reclamation Phase Anvil'' is active'),
+-- Tier 3: p4 && !anvil (@sunsreachpfour && !@sunsreachanvil)
+(22, 2, -65695, 0, 0, 12, 1, @sunsreachpfour, 0, 0, 0, 0, 0, '', 'if the event ''Sun''s Reach Reclamation Phase Harbor'' is active'),
+(22, 2, -65695, 0, 0, 12, 1, @sunsreachanvil, 0, 0, 1, 0, 0, '', 'if the event ''Sun''s Reach Reclamation Phase Anvil'' is not active'),
+-- Tier 4: p4 && anvil (@sunsreachpfour && @sunsreachanvil)
+(22, 3, -65695, 0, 0, 12, 1, @sunsreachpfour, 0, 0, 0, 0, 0, '', 'if the event ''Sun''s Reach Reclamation Phase Harbor'' is active'),
+(22, 3, -65695, 0, 0, 12, 1, @sunsreachanvil, 0, 0, 0, 0, 0, '', 'if the event ''Sun''s Reach Reclamation Phase Anvil'' is active'),
+-- Tier 3: p4 && !anvil (@sunsreachpfour && !@sunsreachanvil)
+(22, 2, -65696, 0, 0, 12, 1, @sunsreachpfour, 0, 0, 0, 0, 0, '', 'if the event ''Sun''s Reach Reclamation Phase Harbor'' is active'),
+(22, 2, -65696, 0, 0, 12, 1, @sunsreachanvil, 0, 0, 1, 0, 0, '', 'if the event ''Sun''s Reach Reclamation Phase Anvil'' is not active'),
+-- Tier 4: p4 && anvil (@sunsreachpfour && @sunsreachanvil)
+(22, 3, -65696, 0, 0, 12, 1, @sunsreachpfour, 0, 0, 0, 0, 0, '', 'if the event ''Sun''s Reach Reclamation Phase Harbor'' is active'),
+(22, 3, -65696, 0, 0, 12, 1, @sunsreachanvil, 0, 0, 0, 0, 0, '', 'if the event ''Sun''s Reach Reclamation Phase Anvil'' is active'),
+-- Tier 3: p4 && !anvil (@sunsreachpfour && !@sunsreachanvil)
+(22, 2, -65697, 0, 0, 12, 1, @sunsreachpfour, 0, 0, 0, 0, 0, '', 'if the event ''Sun''s Reach Reclamation Phase Harbor'' is active'),
+(22, 2, -65697, 0, 0, 12, 1, @sunsreachanvil, 0, 0, 1, 0, 0, '', 'if the event ''Sun''s Reach Reclamation Phase Anvil'' is not active'),
+-- Tier 4: p4 && anvil (@sunsreachpfour && @sunsreachanvil)
+(22, 3, -65697, 0, 0, 12, 1, @sunsreachpfour, 0, 0, 0, 0, 0, '', 'if the event ''Sun''s Reach Reclamation Phase Harbor'' is active'),
+(22, 3, -65697, 0, 0, 12, 1, @sunsreachanvil, 0, 0, 0, 0, 0, '', 'if the event ''Sun''s Reach Reclamation Phase Anvil'' is active'),
+-- Tier 3: p4 && !anvil (@sunsreachpfour && !@sunsreachanvil)
+(22, 2, -65698, 0, 0, 12, 1, @sunsreachpfour, 0, 0, 0, 0, 0, '', 'if the event ''Sun''s Reach Reclamation Phase Harbor'' is active'),
+(22, 2, -65698, 0, 0, 12, 1, @sunsreachanvil, 0, 0, 1, 0, 0, '', 'if the event ''Sun''s Reach Reclamation Phase Anvil'' is not active'),
+-- Tier 4: p4 && anvil (@sunsreachpfour && @sunsreachanvil)
+(22, 3, -65698, 0, 0, 12, 1, @sunsreachpfour, 0, 0, 0, 0, 0, '', 'if the event ''Sun''s Reach Reclamation Phase Harbor'' is active'),
+(22, 3, -65698, 0, 0, 12, 1, @sunsreachanvil, 0, 0, 0, 0, 0, '', 'if the event ''Sun''s Reach Reclamation Phase Anvil'' is active'),
+-- Tier 3: p4 && !anvil (@sunsreachpfour && !@sunsreachanvil)
+(22, 2, -65699, 0, 0, 12, 1, @sunsreachpfour, 0, 0, 0, 0, 0, '', 'if the event ''Sun''s Reach Reclamation Phase Harbor'' is active'),
+(22, 2, -65699, 0, 0, 12, 1, @sunsreachanvil, 0, 0, 1, 0, 0, '', 'if the event ''Sun''s Reach Reclamation Phase Anvil'' is not active'),
+-- Tier 4: p4 && anvil (@sunsreachpfour && @sunsreachanvil)
+(22, 3, -65699, 0, 0, 12, 1, @sunsreachpfour, 0, 0, 0, 0, 0, '', 'if the event ''Sun''s Reach Reclamation Phase Harbor'' is active'),
+(22, 3, -65699, 0, 0, 12, 1, @sunsreachanvil, 0, 0, 0, 0, 0, '', 'if the event ''Sun''s Reach Reclamation Phase Anvil'' is active'),
+-- Tier 3: p4 && !anvil (@sunsreachpfour && !@sunsreachanvil)
+(22, 2, -65700, 0, 0, 12, 1, @sunsreachpfour, 0, 0, 0, 0, 0, '', 'if the event ''Sun''s Reach Reclamation Phase Harbor'' is active'),
+(22, 2, -65700, 0, 0, 12, 1, @sunsreachanvil, 0, 0, 1, 0, 0, '', 'if the event ''Sun''s Reach Reclamation Phase Anvil'' is not active'),
+-- Tier 4: p4 && anvil (@sunsreachpfour && @sunsreachanvil)
+(22, 3, -65700, 0, 0, 12, 1, @sunsreachpfour, 0, 0, 0, 0, 0, '', 'if the event ''Sun''s Reach Reclamation Phase Harbor'' is active'),
+(22, 3, -65700, 0, 0, 12, 1, @sunsreachanvil, 0, 0, 0, 0, 0, '', 'if the event ''Sun''s Reach Reclamation Phase Anvil'' is active'),
+-- Tier 3: p4 && !anvil (@sunsreachpfour && !@sunsreachanvil)
+(22, 2, -65702, 0, 0, 12, 1, @sunsreachpfour, 0, 0, 0, 0, 0, '', 'if the event ''Sun''s Reach Reclamation Phase Harbor'' is active'),
+(22, 2, -65702, 0, 0, 12, 1, @sunsreachanvil, 0, 0, 1, 0, 0, '', 'if the event ''Sun''s Reach Reclamation Phase Anvil'' is not active'),
+-- Tier 4: p4 && anvil (@sunsreachpfour && @sunsreachanvil)
+(22, 3, -65702, 0, 0, 12, 1, @sunsreachpfour, 0, 0, 0, 0, 0, '', 'if the event ''Sun''s Reach Reclamation Phase Harbor'' is active'),
+(22, 3, -65702, 0, 0, 12, 1, @sunsreachanvil, 0, 0, 0, 0, 0, '', 'if the event ''Sun''s Reach Reclamation Phase Anvil'' is active');
 
 -- Warrior SAI conditions
 DELETE FROM `conditions` WHERE (`SourceTypeOrReferenceId` = 22) AND (`SourceGroup` IN (1, 2, 3, 4)) AND (`SourceEntry` = 25115) AND (`SourceId` = 0);
@@ -1116,3 +1186,7 @@ INSERT INTO `waypoint_data` (`id`, `point`, `position_x`, `position_y`, `positio
 DELETE FROM `smart_scripts` WHERE (`entryorguid` = 24979) AND (`source_type` = 0) AND (`id` IN (2));
 INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `event_param6`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
 (24979, 0, 2, 0, 25, 0, 100, 0, 0, 0, 0, 0, 0, 0, 40, 2, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Dawnblade Marksman - On Reset - Set Sheath Ranged');
+
+-- Do not remove transform auras on evade
+-- SPELL_ATTR1_AURA_STAYS_AFTER_COMBAT = 0x02000000, // TITLE Aura stays after combat DESCRIPTION Aura will not be removed when the unit leaves combat
+UPDATE `spell_dbc` SET `AttributesEx`=`AttributesEx`|(0x02000000) WHERE `ID` IN (44918, 44919, 44920, 44921, 44922, 44923, 44924, 44925, 44926, 44927, 44928, 44929, 44930, 44931, 44932, 44962, 45155, 45156, 45157, 45158, 45159, 45160, 45161, 45162, 45163, 45164, 45165, 45166, 45167, 45168, 45169, 45170);
