@@ -802,100 +802,89 @@ void WorldState::StartSunsReachPhase(bool initial)
     }
 }
 
-std::string WorldState::GetSunsReachPhaseName(uint32 phase) const
-{
-    switch (phase)
-    {
-        case SUNS_REACH_PHASE_1_STAGING_AREA: return "Phase 1: Staging Area";
-        case SUNS_REACH_PHASE_2_SANCTUM: return "Phase 2: Sanctum";
-        case SUNS_REACH_PHASE_3_ARMORY: return "Phase 3: Armory";
-        case SUNS_REACH_PHASE_4_HARBOR: return "Phase 4: Harbor";
-        default: return "Unknown";
-    }
-}
-
-std::string WorldState::GetSunsReachSubPhaseName(uint32 subPhase) const
-{
-    switch (subPhase)
-    {
-        case SUBPHASE_PORTAL: return "Portal";
-        case SUBPHASE_ANVIL: return "Anvil";
-        case SUBPHASE_ALCHEMY_LAB: return "Alchemy Lab";
-        case SUBPHASE_MONUMENT: return "Monument";
-        default: return "Unknown";
-    }
-}
-
-std::string WorldState::GetSunsReachCounterName(uint32 counter) const
-{
-    switch (counter)
-    {
-        case COUNTER_ERRATIC_BEHAVIOR: return "Erratic Behavior";
-        case COUNTER_SANCTUM_WARDS: return "Sanctum Wards";
-        case COUNTER_BATTLE_FOR_THE_SUNS_REACH_ARMORY: return "Battle for the Sun's Reach Armory";
-        case COUNTER_DISTRACTION_AT_THE_DEAD_SCAR: return "Distraction at the Dead Scar";
-        case COUNTER_INTERCEPTING_THE_MANA_CELLS: return "Intercepting the Mana Cells";
-        case COUNTER_INTERCEPT_THE_REINFORCEMENTS: return "Intercept the Reinforcements";
-        case COUNTER_TAKING_THE_HARBOR: return "Taking the Harbor";
-        case COUNTER_MAKING_READY: return "Making Ready";
-        case COUNTER_DISCOVERING_YOUR_ROOTS: return "Discovering Your Roots";
-        case COUNTER_A_CHARITABLE_DONATION: return "A Charitable Donation";
-        default: return "Unknown";
-    }
-}
-
 std::string WorldState::GetSunsReachPrintout()
 {
-    std::string output = "Phase: " + std::to_string(m_sunsReachData.m_phase) + " (" + GetSunsReachPhaseName(m_sunsReachData.m_phase) + ") " + std::to_string(m_sunsReachData.GetPhasePercentage(m_sunsReachData.m_phase)) + "%\n";
+    auto formatPhase = [this]() -> std::string {
+        std::string name;
+        switch (m_sunsReachData.m_phase)
+        {
+            case SUNS_REACH_PHASE_1_STAGING_AREA: name = "Phase 1: Staging Area"; break;
+            case SUNS_REACH_PHASE_2_SANCTUM: name = "Phase 2: Sanctum"; break;
+            case SUNS_REACH_PHASE_3_ARMORY: name = "Phase 3: Armory"; break;
+            case SUNS_REACH_PHASE_4_HARBOR: name = "Phase 4: Harbor"; break;
+            default: name = "Unknown"; break;
+        }
+        return "Phase: " + std::to_string(m_sunsReachData.m_phase) + " (" + name + ") " + std::to_string(m_sunsReachData.GetPhasePercentage(m_sunsReachData.m_phase)) + "%\n";
+    };
 
+    auto formatSubPhase = [this](uint32 subPhase) -> std::string {
+        std::string name;
+        switch (subPhase)
+        {
+            case SUBPHASE_PORTAL: name = "Portal"; break;
+            case SUBPHASE_ANVIL: name = "Anvil"; break;
+            case SUBPHASE_ALCHEMY_LAB: name = "Alchemy Lab"; break;
+            case SUBPHASE_MONUMENT: name = "Monument"; break;
+            default: name = "Unknown"; break;
+        }
+        return name + ": " + (m_sunsReachData.m_subphaseMask & subPhase ? "100%" : std::to_string(m_sunsReachData.GetSubPhasePercentage(subPhase)) + "%");
+    };
+
+    auto formatCounter = [](uint32 counter, uint32 value) -> std::string {
+        switch (counter)
+        {
+            case COUNTER_ERRATIC_BEHAVIOR:
+                return "Erratic Behavior: " + std::to_string(value) + " (counts towards Phase 2: Sanctum)";
+            case COUNTER_SANCTUM_WARDS:
+                return "Sanctum Wards: " + std::to_string(value) + " (counts towards Phase 2: Sanctum)";
+            case COUNTER_BATTLE_FOR_THE_SUNS_REACH_ARMORY:
+                return "Battle for the Sun's Reach Armory: " + std::to_string(value) + " (counts towards Phase 3: Armory)";
+            case COUNTER_DISTRACTION_AT_THE_DEAD_SCAR:
+                return "Distraction at the Dead Scar: " + std::to_string(value) + " (counts towards Phase 3: Armory)";
+            case COUNTER_INTERCEPTING_THE_MANA_CELLS:
+                return "Intercepting the Mana Cells: " + std::to_string(value) + " (counts towards Subphase: Portal)";
+            case COUNTER_INTERCEPT_THE_REINFORCEMENTS:
+                return "Intercept the Reinforcements: " + std::to_string(value) + " (counts towards Phase 4: Harbor)";
+            case COUNTER_TAKING_THE_HARBOR:
+                return "Taking the Harbor: " + std::to_string(value) + " (counts towards Phase 4: Harbor)";
+            case COUNTER_MAKING_READY:
+                return "Making Ready: " + std::to_string(value) + " (counts towards Subphase: Anvil)";
+            case COUNTER_DISCOVERING_YOUR_ROOTS:
+                return "Discovering Your Roots: " + std::to_string(value) + " (counts towards Subphase: Alchemy Lab)";
+            case COUNTER_A_CHARITABLE_DONATION:
+                return "A Charitable Donation: " + std::to_string(value) + " (counts towards Subphase: Monument)";
+            default:
+                return "Unknown: " + std::to_string(value) + " (Unknown goal)";
+        }
+    };
+
+    std::string output = formatPhase();
     output += "Subphase mask: " + std::to_string(m_sunsReachData.m_subphaseMask) + "\n";
     for (uint32 i = 0; i < 4; ++i)
     {
         uint32 subPhaseMask = 1 << i;
-        output += "  " + GetSunsReachSubPhaseName(subPhaseMask) + ": " + (m_sunsReachData.m_subphaseMask & subPhaseMask ? "100%" : std::to_string(m_sunsReachData.GetSubPhasePercentage(subPhaseMask)) + "%") + "\n";
+        output += "  " + formatSubPhase(subPhaseMask) + "\n";
     }
     output += "Counters:\n";
     output += "  Sunsreach.CounterMax = " + std::to_string(sWorld->getIntConfig(CONFIG_SUNSREACH_COUNTER_MAX)) + "\n";
     for (uint32 i = 0; i < COUNTERS_MAX; ++i)
-    {
-        output += "  " + std::to_string(i) + ". " + GetSunsReachCounterName(i) + ": " + std::to_string(m_sunsReachData.m_sunsReachReclamationCounters[i]) + " (";
-        switch (i)
-        {
-            case COUNTER_ERRATIC_BEHAVIOR:
-            case COUNTER_SANCTUM_WARDS:
-                output += "counts towards Phase 2: Sanctum";
-                break;
-            case COUNTER_BATTLE_FOR_THE_SUNS_REACH_ARMORY:
-            case COUNTER_DISTRACTION_AT_THE_DEAD_SCAR:
-                output += "counts towards Phase 3: Armory";
-                break;
-            case COUNTER_INTERCEPTING_THE_MANA_CELLS:
-                output += "counts towards Subphase: Portal";
-                break;
-            case COUNTER_INTERCEPT_THE_REINFORCEMENTS:
-            case COUNTER_TAKING_THE_HARBOR:
-                output += "counts towards Phase 4: Harbor";
-                break;
-            case COUNTER_MAKING_READY:
-                output += "counts towards Subphase: Anvil";
-                break;
-            case COUNTER_DISCOVERING_YOUR_ROOTS:
-                output += "counts towards Subphase: Alchemy Lab";
-                break;
-            case COUNTER_A_CHARITABLE_DONATION:
-                output += "counts towards Subphase: Monument";
-                break;
-            default:
-                output += "Unknown goal";
-                break;
-        }
-        output += ")\n";
-    }
+        output += "  " + std::to_string(i) + ". " + formatCounter(i, m_sunsReachData.m_sunsReachReclamationCounters[i]) + "\n";
 
-    output += "Sunwell Plateau PTR Gate Phase:\n"
-    //  + std::to_string(m_sunsReachData.m_gate) + "\nValues:";
-    for (uint32 value : m_sunsReachData.m_gateCounters)
-        output += " " + std::to_string(value);
+    // Sunwell Gates
+    auto formatGatePhase = [](uint32 gate) -> std::string {
+        switch (gate)
+        {
+            case SUNWELL_ALL_GATES_CLOSED: return "All Gates Closed"; break;
+            case SUNWELL_AGAMATH_GATE1_OPEN: return "Gate 1 Agamath Open"; break;
+            case SUNWELL_ROHENDOR_GATE2_OPEN: return "Gate 2 Rohendar Open"; break;
+            case SUNWELL_ARCHONISUS_GATE3_OPEN: return "Gate 3 Archonisus Open"; break;
+            default: return "Unknown"; break;
+        }
+    };
+    output += "Sunwell Plateau Gate Phase " + std::to_string(m_sunsReachData.m_gate) + " (" + formatGatePhase(m_sunsReachData.m_gate) + ")" + ":\n";
+    output += "  Gate 1 (Agamath): " + std::string(m_sunsReachData.m_gate >= SUNWELL_AGAMATH_GATE1_OPEN ? "Open " : "Closed ") + '(' + std::to_string(m_sunsReachData.GetSunwellGatePercentage(SUNWELL_ALL_GATES_CLOSED)) + "%)\n";
+    output += "  Gate 2 (Rohendor): " + std::string(m_sunsReachData.m_gate >= SUNWELL_ROHENDOR_GATE2_OPEN ? "Open " : "Closed ") + '(' + std::to_string(m_sunsReachData.GetSunwellGatePercentage(SUNWELL_AGAMATH_GATE1_OPEN)) + "%)\n";
+    output += "  Gate 3 (Archonisus): " + std::string(m_sunsReachData.m_gate >= SUNWELL_ARCHONISUS_GATE3_OPEN ? "Open " : "Closed ") + '(' + std::to_string(m_sunsReachData.GetSunwellGatePercentage(SUNWELL_ROHENDOR_GATE2_OPEN)) + "%)\n";
     return output;
 }
 
@@ -903,6 +892,9 @@ std::string SunsReachReclamationData::GetData()
 {
     std::string output = std::to_string(m_phase) + " " + std::to_string(m_subphaseMask);
     for (uint32 value : m_sunsReachReclamationCounters)
+        output += " " + std::to_string(value);
+    output += " " + std::to_string(m_gate);
+    for (uint32 value : m_gateCounters)
         output += " " + std::to_string(value);
     return output;
 }

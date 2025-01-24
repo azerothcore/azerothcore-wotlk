@@ -591,15 +591,12 @@ DELETE FROM `gossip_menu` WHERE (`MenuID` = 9087) AND (`TextID` IN (12285));
 INSERT INTO `gossip_menu` (`MenuID`, `TextID`) VALUES
 (9087, 12285);
 
--- Docks
--- JC
--- Shaani
+-- Harbor
+-- Shaani Jewelcrafting Supplies>
 DELETE FROM `gossip_menu` WHERE (`MenuID` = 9198) AND (`TextID` IN (12496));
 INSERT INTO `gossip_menu` (`MenuID`, `TextID`) VALUES
 (9198, 12496);
-
--- Alchemist
--- Mar'nah
+-- Mar'nah <Alchemist>
 DELETE FROM `gossip_menu` WHERE (`MenuID` = 9050) AND (`TextID` IN (12238));
 INSERT INTO `gossip_menu` (`MenuID`, `TextID`) VALUES
 (9050, 12238);

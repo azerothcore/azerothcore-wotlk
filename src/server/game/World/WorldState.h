@@ -24,7 +24,7 @@
 // TODO: Move these to WorldStateDefines.h
 enum WorldStateWorldStates
 {
-    // Suns Reach Reclamation
+    // Sun's Reach Reclamation
     WORLD_STATE_QUEL_DANAS_MUSIC                    = 3426,
     WORLD_STATE_QUEL_DANAS_HARBOR                   = 3238,
     WORLD_STATE_QUEL_DANAS_ALCHEMY_LAB              = 3223,
@@ -203,21 +203,21 @@ class WorldState
         void HandleConditionStateChange(WorldStateCondition conditionId, WorldStateConditionState state);
         void HandleExternalEvent(WorldStateEvent eventId, uint32 param);
         void Update(uint32 diff);
-        void SendWorldstateUpdate(std::mutex& mutex, GuidVector const& guids, uint32 value, uint32 worldStateId);
-        // Sun's Reach Reclamation
+        void AddSunwellGateProgress(uint32 questId);
         void AddSunsReachProgress(uint32 questId);
+        std::string GetSunsReachPrintout();
+        void FillInitialWorldStates(ByteBuffer& data, uint32 zoneId, uint32 areaId);
         void HandleSunsReachPhaseTransition(uint32 newPhase);
         void HandleSunsReachSubPhaseTransition(int32 subPhaseMask, bool initial = false);
         void SetSunsReachCounter(SunsReachCounters index, uint32 value);
-        void StopSunsReachPhase(bool forward);
-        void StartSunsReachPhase(bool initial = false);
-        std::string GetSunsReachPrintout();
-        void AddSunwellGateProgress(uint32 questId);
         void HandleSunwellGateTransition(uint32 newGate);
         void SetSunwellGateCounter(SunwellGateCounters index, uint32 value);
-        void StopSunwellGatePhase();
-        void FillInitialWorldStates(ByteBuffer& data, uint32 zoneId, uint32 areaId);
     private:
+        void SendWorldstateUpdate(std::mutex& mutex, GuidVector const& guids, uint32 value, uint32 worldStateId);
+        void StopSunsReachPhase(bool forward);
+        void StartSunsReachPhase(bool initial = false);
+        void StartSunwellGatePhase();
+        void StopSunwellGatePhase();
         void BuffAdalsSongOfBattle();
         void DispelAdalsSongOfBattle();
         uint32 _adalSongOfBattleTimer;
@@ -226,10 +226,6 @@ class WorldState
         bool _isMagtheridonHeadSpawnedHorde;
         bool _isMagtheridonHeadSpawnedAlliance;
         SunsReachReclamationData m_sunsReachData;
-        std::string GetSunsReachPhaseName(uint32 phase) const;
-        std::string GetSunsReachSubPhaseName(uint32 subPhase) const;
-        std::string GetSunsReachCounterName(uint32 counter) const;
-        void StartSunwellGatePhase();
         std::map<WorldStateCondition, std::atomic<WorldStateConditionState>> _transportStates; // atomic to avoid having to lock
         std::mutex _mutex; // all World State operations are threat unsafe
 };
