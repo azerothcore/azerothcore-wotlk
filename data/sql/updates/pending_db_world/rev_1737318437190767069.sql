@@ -98,8 +98,6 @@ INSERT INTO `game_event_creature` (`guid`, `eventEntry`) VALUES
 (94384, @sunsreachpfour), -- 25112 (Anchorite Ayuri)
 (94385, @sunsreachpfour), -- 25163 (Anchorite Kairthos)
 (@cguidjc, @sunsreachpfour), -- 25950 (Shaani <Jewelcrafting Supplies>)
-(94377, @sunsreachpfour), -- 24994 (Shattered Sun Sentry)
-(83998, @sunsreachpfour), -- 24994 (Shattered Sun Sentry)
 -- Kaalif?
 (94381, @sunsreachpfour), -- 25043 (Sereth Duskbringer <Poison Supplies>)
 (94383, @sunsreachpfour), -- 25088 (Captain Valindria)
@@ -134,8 +132,8 @@ INSERT INTO `game_event_creature` (`guid`, `eventEntry`) VALUES
 (71926, @sunsreachptwoperm), -- 25115 (Shattered Sun Warrior) 5301090
 (71925, @sunsreachptwoperm), -- 25115 (Shattered Sun Warrior) 5301089
 (76577, @sunsreachptwoperm), -- 24994 (Shattered Sun Sentry) 5300441
--- (5300434, @sunsreachptwoperm), -- 24994 (Shattered Sun Sentry) Probably 76582
--- (5300431, @sunsreachptwoperm), -- 24994 (Shattered Sun Sentry) Probably 76581
+(76582, @sunsreachptwoperm), -- 24994 (Shattered Sun Sentry)
+(76581, @sunsreachptwoperm), -- 24994 (Shattered Sun Sentry)
 -- Armory Allies
 (65693, @sunsreachpthreeperm), -- 24938 (Shattered Sun Marksman) 5300118
 (65692, @sunsreachpthreeperm), -- 24938 (Shattered Sun Marksman) 5300117
@@ -160,7 +158,7 @@ INSERT INTO `game_event_creature` (`guid`, `eventEntry`) VALUES
 (78386, @sunsreachpthreeperm), -- 24994 (Shattered Sun Sentry) 5300433
 -- (5300436, @sunsreachpthreeperm), -- 24994 (Shattered Sun Sentry) Missing?
 (77479, @sunsreachpthreeperm), -- 24994 (Shattered Sun Sentry) 5300444
--- (5300432, @sunsreachpthreeperm), -- 24994 (Shattered Sun Sentry) Maybe 78385?
+(78385, @sunsreachpthreeperm), -- 24994 (Shattered Sun Sentry)
 (78389, @sunsreachpthreeperm), -- 24994 (Shattered Sun Sentry) 5300447
 -- (5301095, @sunsreachpthreeperm), -- 25115 (Shattered Sun Warrior) Maybe 94387?
 -- Dawning Square Allies (Unconfirmed)
@@ -178,7 +176,6 @@ INSERT INTO `game_event_creature` (`guid`, `eventEntry`) VALUES
 (94432, @sunsreachpfour), -- 25115 (Shattered Sun Warrior) 5301211
 (94401, @sunsreachpfour), -- 24994 (Shattered Sun Sentry) 5300448
 (94406, @sunsreachpfour), -- 24994 (Shattered Sun Sentry) 5300451
--- (5301204, @sunsreachpfour), -- 24994 (Shattered Sun Sentry) Missing? Maybe 94377?
 (94413, @sunsreachpfour), -- 24938 (Shattered Sun Marksman) 5300134
 (94414, @sunsreachpfour), -- 24938 (Shattered Sun Marksman) 5300135
 (94415, @sunsreachpfour), -- 24938 (Shattered Sun Marksman) 5300136
@@ -200,7 +197,8 @@ INSERT INTO `game_event_creature` (`guid`, `eventEntry`) VALUES
 (94431, @sunsreachpfour), -- 24938 (Shattered Sun Marksman) 5300151
 (94409, @sunsreachpfour), -- 24938 (Shattered Sun Marksman) 5300130
 (94402, @sunsreachpfour), -- 24994 (Shattered Sun Sentry) 5300449
--- (5300435, @sunsreachpfour), -- 24994 (Shattered Sun Sentry) Maybe 83998 or 94377?
+(94377, @sunsreachpfour), -- 24994 (Shattered Sun Sentry)
+(83998, @sunsreachpfour), -- 24994 (Shattered Sun Sentry)
 (94435, @sunsreachpfour), -- 25115 (Shattered Sun Warrior) 5301097
 (94434, @sunsreachpfour), -- 25115 (Shattered Sun Warrior) 5301096
 (94436, @sunsreachpfour), -- 25115 (Shattered Sun Warrior) 5301098
