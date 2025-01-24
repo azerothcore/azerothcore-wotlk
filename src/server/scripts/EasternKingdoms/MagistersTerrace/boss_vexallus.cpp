@@ -47,7 +47,7 @@ enum Misc
 
 struct boss_vexallus : public BossAI
 {
-    boss_vexallus(Creature* creature) : BossAI(creature, DATA_VEXALLUS), 
+    boss_vexallus(Creature* creature) : BossAI(creature, DATA_VEXALLUS),
         _energyCooldown(false),
         _energyQueue(0) { }
 
@@ -76,7 +76,7 @@ struct boss_vexallus : public BossAI
             DoCastSelf(SPELL_OVERLOAD, true);
         });
 
-        // Energy cast scheduler 
+        // Energy cast scheduler
         scheduler.Schedule(1s, [this](TaskContext context)
         {
             if (!_energyCooldown && _energyQueue > 0)
@@ -114,7 +114,6 @@ struct boss_vexallus : public BossAI
     {
         _JustEngagedWith();
         Talk(SAY_AGGRO);
-        
         ScheduleTimedEvent(8s, [&]
         {
             DoCastRandomTarget(SPELL_CHAIN_LIGHTNING);
