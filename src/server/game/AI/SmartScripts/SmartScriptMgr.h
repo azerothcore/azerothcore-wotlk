@@ -1016,6 +1016,11 @@ struct SmartAction
 
         struct
         {
+            SAIBool combatStop;
+        } attackStop;
+
+        struct
+        {
             SAIBool state;
         } visibility;
 

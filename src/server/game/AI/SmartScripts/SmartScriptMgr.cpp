@@ -738,7 +738,7 @@ bool SmartAIMgr::CheckUnusedActionParams(SmartScriptHolder const& e)
             case SMART_ACTION_SET_INGAME_PHASE_MASK: return sizeof(SmartAction::ingamePhaseMask);
             case SMART_ACTION_SET_DATA: return sizeof(SmartAction::setData);
             case SMART_ACTION_MOVE_FORWARD: return sizeof(SmartAction::moveRandom);
-            case SMART_ACTION_ATTACK_STOP: return NO_PARAMS;
+            case SMART_ACTION_ATTACK_STOP: return sizeof(SmartAction::attackStop);
             case SMART_ACTION_SET_VISIBILITY: return sizeof(SmartAction::visibility);
             case SMART_ACTION_SET_ACTIVE: return sizeof(SmartAction::setActive);
             case SMART_ACTION_ATTACK_START: return NO_PARAMS;
@@ -1894,6 +1894,8 @@ bool SmartAIMgr::IsEventValid(SmartScriptHolder& e)
             return IsSAIBoolValid(e, e.action.setHealthRegen.regenHealth);
         case SMART_ACTION_CALL_TIMED_ACTIONLIST:
             return IsSAIBoolValid(e, e.action.timedActionList.allowOverride);
+        case SMART_ACTION_ATTACK_STOP:
+            return IsSAIBoolValid(e, e.action.attackStop.combatStop);
         case SMART_ACTION_FLEE_FOR_ASSIST:
         case SMART_ACTION_MOVE_TO_POS:
         case SMART_ACTION_EVADE:
@@ -1974,7 +1976,6 @@ bool SmartAIMgr::IsEventValid(SmartScriptHolder& e)
         case SMART_ACTION_CU_ENCOUNTER_START:
         case SMART_ACTION_DO_ACTION:
         case SMART_ACTION_SET_CORPSE_DELAY:
-        case SMART_ACTION_ATTACK_STOP:
         case SMART_ACTION_PLAY_CINEMATIC:
         case SMART_ACTION_SET_GUID:
         case SMART_ACTION_SCRIPTED_SPAWN:

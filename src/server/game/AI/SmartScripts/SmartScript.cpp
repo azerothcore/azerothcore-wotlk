@@ -1507,7 +1507,12 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
         {
             for (WorldObject* target : targets)
                 if (Unit* unitTarget = target->ToUnit())
+                {
                     unitTarget->AttackStop();
+
+                    if (e.action.attackStop.combatStop)
+                        unitTarget->CombatStop();
+                }
             break;
         }
         case SMART_ACTION_SUMMON_CREATURE:
