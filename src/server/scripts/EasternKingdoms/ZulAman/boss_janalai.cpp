@@ -220,7 +220,7 @@ struct boss_janalai : public BossAI
         ScheduleTimedEvent(8s, [&]{
             if (!_isBombing)
             {
-                if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0))
+                if (Unit* target = SelectTarget(SelectTargetMethod::MaxThreat, 0))
                 {
                     me->AttackStop();
                     me->GetMotionMaster()->Clear();
