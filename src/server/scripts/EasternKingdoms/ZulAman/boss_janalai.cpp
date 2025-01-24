@@ -294,7 +294,7 @@ struct boss_janalai : public BossAI
     {
         float centerX = me->GetPositionX();
         float centerY = me->GetPositionY();
-        float maxRadius = std::min(area_dx, area_dy) / 2.0f;   
+        float maxRadius = std::min(area_dx, area_dy) / 2.0f;
         for (int i = 0; i < MAX_BOMB_COUNT; ++i)
         {
             // Generate random angle and radius
