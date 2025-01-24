@@ -30,15 +30,11 @@ enum Yells
 
 enum Spells
 {
-    // Pure energy spell info
     SPELL_ENERGY_FEEDBACK_CHANNEL   = 44328,
     SPELL_ENERGY_FEEDBACK           = 44335,
-
-    // Vexallus spell info
     SPELL_CHAIN_LIGHTNING           = 44318,
     SPELL_OVERLOAD                  = 44352,
     SPELL_ARCANE_SHOCK              = 44319,
-
     SPELL_SUMMON_PURE_ENERGY_N      = 44322,
     SPELL_SUMMON_PURE_ENERGY_H1     = 46154,
     SPELL_SUMMON_PURE_ENERGY_H2     = 46159
@@ -51,16 +47,42 @@ enum Misc
 
 struct boss_vexallus : public BossAI
 {
-    boss_vexallus(Creature* creature) : BossAI(creature, DATA_VEXALLUS), _energyCooldown(false) { }
+    boss_vexallus(Creature* creature) : BossAI(creature, DATA_VEXALLUS), 
+        _energyCooldown(false),
+        _energyQueue(0) { }
 
     void Reset() override
     {
         _Reset();
         _energyCooldown = false;
+        _energyQueue = 0;
+        std::fill(_thresholdsPassed.begin(), _thresholdsPassed.end(), false);
 
-        ScheduleHealthCheckEvent({ 85, 70, 55, 40, 25 }, [&]
+        // Health check scheduler
+        scheduler.Schedule(25ms, [this](TaskContext context)
         {
-            if (!_energyCooldown)
+            float currentPct = me->GetHealthPct();
+
+            if (currentPct <= 20.0f)
+            {
+                context.CancelAll();
+                DoCastSelf(SPELL_OVERLOAD, true);
+                return;
+            }
+
+            if (currentPct <= 85.0f && !_thresholdsPassed[0]) { _energyQueue++; _thresholdsPassed[0] = true; }
+            if (currentPct <= 70.0f && !_thresholdsPassed[1]) { _energyQueue++; _thresholdsPassed[1] = true; }
+            if (currentPct <= 55.0f && !_thresholdsPassed[2]) { _energyQueue++; _thresholdsPassed[2] = true; }
+            if (currentPct <= 40.0f && !_thresholdsPassed[3]) { _energyQueue++; _thresholdsPassed[3] = true; }
+            if (currentPct <= 25.0f && !_thresholdsPassed[4]) { _energyQueue++; _thresholdsPassed[4] = true; }
+
+            context.Repeat(1s);
+        });
+
+        // Energy cast scheduler 
+        scheduler.Schedule(25ms, [this](TaskContext context)
+        {
+            if (!_energyCooldown && _energyQueue > 0)
             {
                 Talk(SAY_ENERGY);
                 Talk(EMOTE_DISCHARGE_ENERGY);
@@ -73,18 +95,15 @@ struct boss_vexallus : public BossAI
                 else
                     DoCastSelf(SPELL_SUMMON_PURE_ENERGY_N);
 
+                _energyQueue--;
                 _energyCooldown = true;
                 scheduler.Schedule(5s, [this](TaskContext)
                 {
                     _energyCooldown = false;
                 });
             }
-        });
 
-        ScheduleHealthCheckEvent(20, [&]
-        {
-            scheduler.CancelAll();
-            DoCastSelf(SPELL_OVERLOAD, true);
+            context.Repeat(1s);
         });
     }
 
@@ -98,7 +117,7 @@ struct boss_vexallus : public BossAI
     {
         _JustEngagedWith();
         Talk(SAY_AGGRO);
-
+        
         ScheduleTimedEvent(8s, [&]
         {
             DoCastRandomTarget(SPELL_CHAIN_LIGHTNING);
@@ -130,6 +149,8 @@ struct boss_vexallus : public BossAI
 
 private:
     bool _energyCooldown;
+    uint8 _energyQueue;
+    std::array<bool, 5> _thresholdsPassed{};
 };
 
 void AddSC_boss_vexallus()
