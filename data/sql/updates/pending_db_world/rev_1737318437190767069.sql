@@ -383,9 +383,9 @@ INSERT INTO `game_event_gameobject` (`guid`, `eventEntry`) VALUES
 (27827, @sunsreachpfour), -- 187357, Shattered Sun Banner (Blood Elf - Pole)
 (27828, @sunsreachpfour), -- 187356, Shattered Sun Banner (Draenei - Pole)
 -- Gates
-(50441,   @sunwellnone), -- 187766, Agamath, The First Gate
-(50439,   @sunwellfirst), -- 187764, Rohendor, The Second Gate
-(50440,   @sunwellsecond); -- 187765, Archonisus, The Third Gate
+(50441, @sunwellnone), -- 187766, Agamath, The First Gate
+(50439, @sunwellfirst), -- 187764, Rohendor, The Second Gate
+(50440, @sunwellsecond); -- 187765, Archonisus, The Third Gate
 
 DELETE FROM `creature_queststarter` WHERE `quest` IN (11514, 11520, 11521, 11523, 11525, 11532, 11533, 11535, 11536, 11537, 11538, 11539, 11540, 11541, 11542, 11543, 11544, 11545, 11546, 11547, 11548, 11549);
 DELETE FROM `game_event_creature_quest` WHERE `eventEntry` IN (@sunsreachpone, @sunsreachptwoonly, @sunsreachptwoperm, @sunsreachnoportal, @sunsreachportal, @sunsreachpthreeonly, @sunsreachpthreeperm, @sunsreachnoanvil, @sunsreachanvil, @sunsreachpfour, @sunsreachnomonument, @sunsreachmonument, @sunsreachnolab, @sunsreachlab, @sunsreachkiru, @sunwellnone, @sunwellfirst, @sunwellsecond, @sunwellall);
@@ -1191,3 +1191,6 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 -- Do not remove transform auras on evade
 -- SPELL_ATTR1_AURA_STAYS_AFTER_COMBAT = 0x02000000, // TITLE Aura stays after combat DESCRIPTION Aura will not be removed when the unit leaves combat
 UPDATE `spell_dbc` SET `AttributesEx`=`AttributesEx`|(0x02000000) WHERE `ID` IN (44918, 44919, 44920, 44921, 44922, 44923, 44924, 44925, 44926, 44927, 44928, 44929, 44930, 44931, 44932, 44962, 45155, 45156, 45157, 45158, 45159, 45160, 45161, 45162, 45163, 45164, 45165, 45166, 45167, 45168, 45169, 45170);
+
+-- Close First, Second, Third Gate
+UPDATE `gameobject` SET `state` = 1 WHERE `id` IN (187766, 187765, 187764) AND `guid` IN (50441, 50440, 50439);
