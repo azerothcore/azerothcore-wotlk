@@ -260,6 +260,7 @@ INSERT INTO `game_event_creature` (`guid`, `eventEntry`) VALUES
 (5300302, -@sunsreachpfour), -- 24976 (Dawnblade Blood Knight)
 (5300303, -@sunsreachpfour), -- 24976 (Dawnblade Blood Knight)
 (5300409, -@sunsreachpfour), -- 24979 (Dawnblade Marksman)
+(5300397, -@sunsreachpfour), -- 24979 (Dawnblade Marksman)
 (5300399, -@sunsreachpfour), -- 24979 (Dawnblade Marksman)
 (5300356, -@sunsreachpfour), -- 24978 (Dawnblade Summoner)
 (5300359, -@sunsreachpfour), -- 24978 (Dawnblade Summoner)
