@@ -102,7 +102,6 @@ struct boss_gurtogg_bloodboil : public BossAI
             if (Unit* target = SelectTarget(SelectTargetMethod::Random, 1, 40.0f, true))
             {
                 me->RemoveAurasByType(SPELL_AURA_MOD_TAUNT);
-                me->RemoveAura(SPELL_ACIDIC_WOUND);
                 DoCastSelf(SPELL_FEL_RAGE_SELF, true);
                 DoCast(target, SPELL_FEL_RAGE_TARGET, true);
                 DoCast(target, SPELL_FEL_RAGE_2, true);
