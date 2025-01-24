@@ -59,28 +59,25 @@ struct boss_vexallus : public BossAI
         std::fill(_thresholdsPassed.begin(), _thresholdsPassed.end(), false);
 
         // Health check scheduler
-        scheduler.Schedule(25ms, [this](TaskContext context)
+        scheduler.Schedule(1s, [this](TaskContext context)
         {
             float currentPct = me->GetHealthPct();
-
-            if (currentPct <= 20.0f)
-            {
-                context.CancelAll();
-                DoCastSelf(SPELL_OVERLOAD, true);
-                return;
-            }
-
             if (currentPct <= 85.0f && !_thresholdsPassed[0]) { _energyQueue++; _thresholdsPassed[0] = true; }
             if (currentPct <= 70.0f && !_thresholdsPassed[1]) { _energyQueue++; _thresholdsPassed[1] = true; }
             if (currentPct <= 55.0f && !_thresholdsPassed[2]) { _energyQueue++; _thresholdsPassed[2] = true; }
             if (currentPct <= 40.0f && !_thresholdsPassed[3]) { _energyQueue++; _thresholdsPassed[3] = true; }
             if (currentPct <= 25.0f && !_thresholdsPassed[4]) { _energyQueue++; _thresholdsPassed[4] = true; }
-
             context.Repeat(1s);
         });
 
+        ScheduleHealthCheckEvent(20, [&]
+        {
+            scheduler.CancelAll();
+            DoCastSelf(SPELL_OVERLOAD, true);
+        });
+
         // Energy cast scheduler 
-        scheduler.Schedule(25ms, [this](TaskContext context)
+        scheduler.Schedule(1s, [this](TaskContext context)
         {
             if (!_energyCooldown && _energyQueue > 0)
             {
