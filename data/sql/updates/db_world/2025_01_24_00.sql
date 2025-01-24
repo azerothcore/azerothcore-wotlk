@@ -1,3 +1,4 @@
+-- DB update 2025_01_23_04 -> 2025_01_24_00
 -- Fix Kaelthas HC
 DELETE FROM `creature_loot_template` WHERE (`Entry` = 24857) AND (`Item` IN (23572, 25028, 25029, 34609, 34610, 34611, 34612, 34613, 34614, 34615, 34616));
 INSERT INTO `creature_loot_template` (`Entry`, `Item`, `Reference`, `Chance`, `QuestRequired`, `LootMode`, `GroupId`, `MinCount`, `MaxCount`, `Comment`) VALUES
