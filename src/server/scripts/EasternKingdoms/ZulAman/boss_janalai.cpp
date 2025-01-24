@@ -337,7 +337,6 @@ struct boss_janalai : public BossAI
             FireWall();
             SpawnBombs();
             ThrowBombs();
-        
             scheduler.Schedule(6s, [this](TaskContext)
             {
                 _isBombing = false;
