@@ -301,10 +301,9 @@ struct boss_janalai : public BossAI
             float angle = float(rand()) / float(RAND_MAX) * 2.0f * M_PI;
             float radius = (static_cast<float>(i) / static_cast<float>(MAX_BOMB_COUNT)) * maxRadius;
             radius += frand(-2.0f, 2.0f);
-        
             float dx = radius * cos(angle);
             float dy = radius * sin(angle);
-
+            
             me->m_Events.AddEventAtOffset([this, dx, dy] {
                 DoSpawnCreature(NPC_FIRE_BOMB, dx, dy, 0, 0, TEMPSUMMON_TIMED_DESPAWN, 15000);
             }, spawnTimer);
@@ -361,7 +360,6 @@ struct boss_janalai : public BossAI
     {
         std::chrono::milliseconds bombTimer = 0ms;
         const std::chrono::milliseconds throwDuration = 5000ms;
-        
         summons.DoForAllSummons([this, &bombTimer, throwDuration](WorldObject* summon) {
             if (summon->GetEntry() == NPC_FIRE_BOMB)
             {
@@ -369,14 +367,12 @@ struct boss_janalai : public BossAI
                 {
                     // Calculate timing to spread throws over 5 seconds
                     std::chrono::milliseconds throwTime = bombTimer % throwDuration;
-                    
                     bomb->m_Events.AddEventAtOffset([this, bomb] {
                         bomb->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
                         DoCast(bomb, SPELL_FIRE_BOMB_THROW, true);
                         bomb->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
                     }, throwTime);
                 }
-
                 bombTimer += throwDuration / MAX_BOMB_COUNT;
             }
         });
