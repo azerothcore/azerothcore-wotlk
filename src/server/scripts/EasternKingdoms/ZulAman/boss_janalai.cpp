@@ -290,37 +290,6 @@ struct boss_janalai : public BossAI
         }
     }
 
-    /*
-    void SpawnBombs()
-    {
-        // Create concentric circles of bombs spreading outward
-        float centerX = me->GetPositionX();
-        float centerY = me->GetPositionY();
-        
-        // Number of rings and bombs per ring
-        const uint8 numRings = 4;
-        const uint8 bombsPerRing = 10;
-        
-        for (uint8 ring = 1; ring <= numRings; ring++)
-        {
-            float radius = ring * 5.0f; // Increasing radius for each ring
-            
-            for (uint8 i = 0; i < bombsPerRing; i++)
-            {
-                float angle = (2.0f * M_PI * i) / bombsPerRing;
-                float dx = radius * cos(angle);
-                float dy = radius * sin(angle);
-                
-                // Add some randomness to positions
-                dx += frand(-1.0f, 1.0f);
-                dy += frand(-1.0f, 1.0f);
-                
-                DoSpawnCreature(NPC_FIRE_BOMB, dx, dy, 0, 0, TEMPSUMMON_TIMED_DESPAWN, 15000);
-            }
-        }
-    }
-    */
-
     void SpawnBombs()
     {
         float centerX = me->GetPositionX();
