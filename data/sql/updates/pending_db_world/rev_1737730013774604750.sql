@@ -19,4 +19,3 @@ DELETE FROM `creature_loot_template` WHERE (`Entry` = 25573) AND (`Item` IN (250
 
 --Remove normal loot from Selin Fireheart HC
 DELETE FROM `creature_loot_template` WHERE (`Entry` = 25562) AND (`Item` IN (25025));
-
