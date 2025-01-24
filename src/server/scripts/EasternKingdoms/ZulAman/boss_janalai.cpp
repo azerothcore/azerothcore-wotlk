@@ -57,7 +57,7 @@ enum Spells
     SPELL_FIRE_BOMB_DAMAGE      = 42630,
 
     // Hatcher Spells
-    SPELL_HATCH_EGG_ALL       21266  = 42471,
+    SPELL_HATCH_EGG_ALL         = 42471,
     SPELL_HATCH_EGG_SINGULAR    = 43734,
     SPELL_SUMMON_HATCHLING      = 42493,
 
