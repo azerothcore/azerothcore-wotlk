@@ -217,7 +217,7 @@ struct boss_janalai : public BossAI
             context.Repeat(90s);
         });
 
-	ScheduleTimedEvent(8s, [&]{
+	    ScheduleTimedEvent(8s, [&]{
             if (!_isBombing)
             {
                 if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0))
