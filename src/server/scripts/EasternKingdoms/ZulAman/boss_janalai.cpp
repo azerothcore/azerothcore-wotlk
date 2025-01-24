@@ -187,9 +187,9 @@ struct boss_janalai : public BossAI
         BossAI::JustEngagedWith(who);
         Talk(SAY_AGGRO);
         //schedule abilities
-        ScheduleTimedEvent(30s, [&]{
+        ScheduleTimedEvent(57s, [&]{
             StartBombing();
-        }, 20s, 40s);
+        }, 30s);
 
         scheduler.Schedule(10s, GROUP_HATCHING, [this](TaskContext context)
         {
