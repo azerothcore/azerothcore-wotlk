@@ -747,7 +747,6 @@ void WorldState::HandleSunwellGateTransition(uint32 newGate)
     Save(SAVE_ID_QUEL_DANAS);
 }
 
-
 void WorldState::SetSunsReachCounter(SunsReachCounters index, uint32 value)
 {
     m_sunsReachData.m_sunsReachReclamationCounters[index] = value;
@@ -882,9 +881,9 @@ std::string WorldState::GetSunsReachPrintout()
         }
     };
     output += "Sunwell Plateau Gate Phase " + std::to_string(m_sunsReachData.m_gate) + " (" + formatGatePhase(m_sunsReachData.m_gate) + ")" + ":\n";
-    output += "  Gate 1 (Agamath): " + std::string(m_sunsReachData.m_gate >= SUNWELL_AGAMATH_GATE1_OPEN ? "Open " : "Closed ") + '(' + std::to_string(m_sunsReachData.GetSunwellGatePercentage(SUNWELL_ALL_GATES_CLOSED)) + "%)\n";
-    output += "  Gate 2 (Rohendor): " + std::string(m_sunsReachData.m_gate >= SUNWELL_ROHENDOR_GATE2_OPEN ? "Open " : "Closed ") + '(' + std::to_string(m_sunsReachData.GetSunwellGatePercentage(SUNWELL_AGAMATH_GATE1_OPEN)) + "%)\n";
-    output += "  Gate 3 (Archonisus): " + std::string(m_sunsReachData.m_gate >= SUNWELL_ARCHONISUS_GATE3_OPEN ? "Open " : "Closed ") + '(' + std::to_string(m_sunsReachData.GetSunwellGatePercentage(SUNWELL_ROHENDOR_GATE2_OPEN)) + "%)\n";
+    output += "  0. Gate 1 (Agamath): " + std::string(m_sunsReachData.m_gate >= SUNWELL_AGAMATH_GATE1_OPEN ? "Open " : "Closed ") + std::to_string(m_sunsReachData.m_sunsReachReclamationCounters[COUNTER_AGAMATH_THE_FIRST_GATE]) + " (" + std::to_string(m_sunsReachData.GetSunwellGatePercentage(SUNWELL_ALL_GATES_CLOSED)) + "%)\n";
+    output += "  1. Gate 2 (Rohendor): " + std::string(m_sunsReachData.m_gate >= SUNWELL_ROHENDOR_GATE2_OPEN ? "Open " : "Closed ") + std::to_string(m_sunsReachData.m_sunsReachReclamationCounters[COUNTER_ROHENDOR_THE_SECOND_GATE]) +  " (" + std::to_string(m_sunsReachData.GetSunwellGatePercentage(SUNWELL_AGAMATH_GATE1_OPEN)) + "%)\n";
+    output += "  2. Gate 3 (Archonisus): " + std::string(m_sunsReachData.m_gate >= SUNWELL_ARCHONISUS_GATE3_OPEN ? "Open " : "Closed ") + std::to_string(m_sunsReachData.m_sunsReachReclamationCounters[COUNTER_ARCHONISUS_THE_FINAL_GATE]) + " (" + std::to_string(m_sunsReachData.GetSunwellGatePercentage(SUNWELL_ROHENDOR_GATE2_OPEN)) + "%)\n";
     return output;
 }
 
@@ -1018,13 +1017,22 @@ void WorldState::StopSunwellGatePhase()
 
 uint32 SunsReachReclamationData::GetSunwellGatePercentage(uint32 gate)
 {
+    int32 percentage = 0;
     switch (gate)
     {
-        case SUNWELL_ALL_GATES_CLOSED: return 100 - uint32(m_gateCounters[COUNTER_AGAMATH_THE_FIRST_GATE] * 100 / COUNTER_MAX_VAL_REQ_SWP_GATES);
-        case SUNWELL_AGAMATH_GATE1_OPEN: return 100 - uint32(m_gateCounters[COUNTER_ROHENDOR_THE_SECOND_GATE] * 100 / COUNTER_MAX_VAL_REQ_SWP_GATES);
-        case SUNWELL_ROHENDOR_GATE2_OPEN: return 100 - uint32(m_gateCounters[COUNTER_ARCHONISUS_THE_FINAL_GATE] * 100 / COUNTER_MAX_VAL_REQ_SWP_GATES);
-        default: return 0;
+        case SUNWELL_ALL_GATES_CLOSED:
+            percentage = 100 - int32(m_gateCounters[COUNTER_AGAMATH_THE_FIRST_GATE] * 100 / COUNTER_MAX_VAL_REQ_SWP_GATES);
+            break;
+        case SUNWELL_AGAMATH_GATE1_OPEN:
+            percentage = 100 - int32(m_gateCounters[COUNTER_ROHENDOR_THE_SECOND_GATE] * 100 / COUNTER_MAX_VAL_REQ_SWP_GATES);
+            break;
+        case SUNWELL_ROHENDOR_GATE2_OPEN:
+            percentage = 100 - int32(m_gateCounters[COUNTER_ARCHONISUS_THE_FINAL_GATE] * 100 / COUNTER_MAX_VAL_REQ_SWP_GATES);
+            break;
+        default:
+            return 0;
     }
+    return percentage < 0 ? 0 : uint32(percentage);
 }
 
 void WorldState::FillInitialWorldStates(ByteBuffer& data, uint32 zoneId, uint32 /*areaId*/)
@@ -1060,7 +1068,6 @@ void WorldState::FillInitialWorldStates(ByteBuffer& data, uint32 zoneId, uint32 
             if (m_sunsReachData.m_phase >= SUNS_REACH_PHASE_3_ARMORY && (m_sunsReachData.m_subphaseMask & SUBPHASE_ANVIL) == 0)
                 data << WORLD_STATE_QUEL_DANAS_ANVIL << m_sunsReachData.GetSubPhasePercentage(SUBPHASE_ANVIL);
             data << WORLD_STATE_QUEL_DANAS_MUSIC << m_sunsReachData.m_phase;
-
 
             // Sunwell Gates
             switch (m_sunsReachData.m_gate)

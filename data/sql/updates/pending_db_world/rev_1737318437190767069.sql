@@ -1,8 +1,9 @@
 --
-DELETE FROM `command` WHERE `name` IN ('worldstate sunsreach phase', 'worldstate sunsreach subphase');
+DELETE FROM `command` WHERE `name` IN ('worldstate sunsreach phase', 'worldstate sunsreach subphase', 'worldstate sunsreach gate');
 INSERT INTO `command` (`name`, `security`, `help`) VALUES
-('worldstate sunsreach phase', 3, 'Syntax: .worldstate sunsreach phase <value>.\nSets the phase of Sun''s Reach.\nValid values are:\n0: Staging Area\n1: Harbor\n2: Armory\n3: Sanctum.'),
-('worldstate sunsreach subphase', 3, 'Syntax: .worldstate sunsreach subphase <mask>.\nSets the subphase mask of Sun''s Reach.\nValid values are:\n1: Portal\n2: Anvil\n4: Alchemy Lab\n8: Monument\n15: All.');
+('worldstate sunsreach phase', 3, 'Syntax: .worldstate sunsreach phase <value>.\nSets the phase of Sun''s Reach.\nValid values are:\n0: Staging Area\n1: Sanctum\n2: Armory\n3: Harbor.'),
+('worldstate sunsreach subphase', 3, 'Syntax: .worldstate sunsreach subphase <mask>.\nSets the subphase mask of Sun''s Reach.\nValid values are:\n1: Portal\n2: Anvil\n4: Alchemy Lab\n8: Monument\n15: All.'),
+('worldstate sunsreach gate', 3, 'Syntax: .worldstate sunsreach gate <gate>.\nSets the phase of Sunwell Plateau Gate.\nValid values are:\n0: All Gates Closed\n1: Gate 1 Agamath Open\n2: Gate 2 Rohendar Open\n3: Gate 3 Archonisus Open.');
 
 -- Smith Hauthaa <Weapons & Armorsmith>
 SET @cguidsmith = 93964;
