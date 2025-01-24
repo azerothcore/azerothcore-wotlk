@@ -160,7 +160,7 @@ INSERT INTO `game_event_creature` (`guid`, `eventEntry`) VALUES
 (77479, @sunsreachpthreeperm), -- 24994 (Shattered Sun Sentry) 5300444
 (78385, @sunsreachpthreeperm), -- 24994 (Shattered Sun Sentry)
 (78389, @sunsreachpthreeperm), -- 24994 (Shattered Sun Sentry) 5300447
--- (5301095, @sunsreachpthreeperm), -- 25115 (Shattered Sun Warrior) Maybe 94387?
+(94387, @sunsreachpthreeperm), -- 25115 (Shattered Sun Warrior)
 -- Dawning Square Allies (Unconfirmed)
 (65702, @sunsreachpfour), -- 24938 (Shattered Sun Marksman) 5300126
 (65700, @sunsreachpfour), -- 24938 (Shattered Sun Marksman) 5300125
