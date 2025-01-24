@@ -217,19 +217,21 @@ struct boss_janalai : public BossAI
             context.Repeat(90s);
         });
 
-        ScheduleTimedEvent(8s, [&]{
-            if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0))
+	ScheduleTimedEvent(8s, [&]{
+            if (!_isBombing)
             {
-                me->AttackStop();
-                me->GetMotionMaster()->Clear();
-                DoCast(target, SPELL_FLAME_BREATH);
-                me->StopMoving();
-                _isFlameBreathing = true;
-                // placeholder time idk yet
-                scheduler.Schedule(2s, [this](TaskContext)
+                if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0))
                 {
-                    _isFlameBreathing = false;
-                });
+                    me->AttackStop();
+                    me->GetMotionMaster()->Clear();
+                    DoCast(target, SPELL_FLAME_BREATH);
+                    me->StopMoving();
+                    _isFlameBreathing = true;
+                    scheduler.Schedule(1500ms, [this](TaskContext)
+		    {
+    			_isFlameBreathing = false;
+		    });
+                }
             }
         }, 8s);
 
@@ -288,13 +290,53 @@ struct boss_janalai : public BossAI
         }
     }
 
+    /*
     void SpawnBombs()
     {
-        float dx, dy;
+        // Create concentric circles of bombs spreading outward
+        float centerX = me->GetPositionX();
+        float centerY = me->GetPositionY();
+        
+        // Number of rings and bombs per ring
+        const uint8 numRings = 4;
+        const uint8 bombsPerRing = 10;
+        
+        for (uint8 ring = 1; ring <= numRings; ring++)
+        {
+            float radius = ring * 5.0f; // Increasing radius for each ring
+            
+            for (uint8 i = 0; i < bombsPerRing; i++)
+            {
+                float angle = (2.0f * M_PI * i) / bombsPerRing;
+                float dx = radius * cos(angle);
+                float dy = radius * sin(angle);
+                
+                // Add some randomness to positions
+                dx += frand(-1.0f, 1.0f);
+                dy += frand(-1.0f, 1.0f);
+                
+                DoSpawnCreature(NPC_FIRE_BOMB, dx, dy, 0, 0, TEMPSUMMON_TIMED_DESPAWN, 15000);
+            }
+        }
+    }
+    */
+
+    void SpawnBombs()
+    {
+        float centerX = me->GetPositionX();
+        float centerY = me->GetPositionY();
+        float maxRadius = std::min(area_dx, area_dy) / 2.0f;
+
         for (int i = 0; i < MAX_BOMB_COUNT; ++i)
         {
-            dx = float(irand(-area_dx / 2, area_dx / 2));
-            dy = float(irand(-area_dy / 2, area_dy / 2));
+            // Generate random angle and radius
+            float angle = float(rand()) / float(RAND_MAX) * 2.0f * M_PI;
+            float radius = float(rand()) / float(RAND_MAX) * maxRadius;
+
+            // Convert to cartesian coordinates
+            float dx = radius * cos(angle);
+            float dy = radius * sin(angle);
+
             DoSpawnCreature(NPC_FIRE_BOMB, dx, dy, 0, 0, TEMPSUMMON_TIMED_DESPAWN, 15000);
         }
     }
@@ -320,22 +362,20 @@ struct boss_janalai : public BossAI
         me->GetMotionMaster()->Clear();
         me->SetPosition(janalainPos);
         me->StopMovingOnCurrentPos();
-        
-        // Teleport to center
+        me->AddUnitState(UNIT_STATE_NOT_MOVE);
+        _isBombing = true;
+
         DoCastSelf(SPELL_TELE_TO_CENTER);
-        
-        // Wait 3 seconds before starting the bombing sequence
+        DoCastAOE(SPELL_SUMMON_PLAYERS_DUMMY, true);
+
         scheduler.Schedule(3s, [this](TaskContext)
         {
+            me->ClearUnitState(UNIT_STATE_NOT_MOVE);
             DoCastSelf(SPELL_FIRE_BOMB_CHANNEL);
             FireWall();
             SpawnBombs();
-            _isBombing = true;
-            
-            // Start throwing bombs over 5 seconds
             ThrowBombs();
-            
-            // After 5 seconds of throwing, wait 4 seconds then explode
+
             scheduler.Schedule(9s, [this](TaskContext)
             {
                 Boom();
