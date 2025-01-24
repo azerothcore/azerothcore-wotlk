@@ -25,7 +25,7 @@ SET @cguidsummonermarksman = 5300355;
 -- Irespeaker
 SET @cguidirespeaker = 5300460;
 -- Abyssal Flamewalker, Unleashed Hellion
-SET @cguidflamewalkerhellion = 5300471;
+SET @cguidflamewalkerhellion = 5300473;
 -- Invisible Stalker Floating -> Fel Crystal Spell target
 SET @cguidfelcrystalspelltarget = 5300031;
 
@@ -231,7 +231,7 @@ INSERT INTO `game_event_creature` (`guid`, `eventEntry`) VALUES
 (5300478, -@sunsreachpthreeperm), -- 25001 (Abyssal Flamewalker)
 (5300476, -@sunsreachpthreeperm), -- 25001 (Abyssal Flamewalker)
 (5300495, -@sunsreachpthreeperm), -- 25002 (Unleashed Hellion)
-(5300471, -@sunsreachpthreeperm), -- 25001 (Abyssal Flamewalker)
+(93965,   -@sunsreachpthreeperm), -- 25001 (Abyssal Flamewalker)
 (5300480, -@sunsreachpthreeperm), -- 25001 (Abyssal Flamewalker)
 (5300365, -@sunsreachpthreeperm), -- 24978 (Dawnblade Summoner)
 (5300499, -@sunsreachpthreeperm), -- 25002 (Unleashed Hellion)
@@ -242,6 +242,7 @@ INSERT INTO `game_event_creature` (`guid`, `eventEntry`) VALUES
 (5300496, -@sunsreachpthreeperm), -- 25002 (Unleashed Hellion)
 (5300497, -@sunsreachpthreeperm), -- 25002 (Unleashed Hellion)
 (5300501, -@sunsreachpthreeperm), -- 25002 (Unleashed Hellion)
+(93982, -@sunsreachpthreeperm), -- 25002 (Unleashed Hellion)
 (@cguidfelcrystalspelltarget+0, -@sunsreachpthreeperm), -- 25953 (Fel Crystal Spell Target)
 (@cguidfelcrystalspelltarget+1, -@sunsreachpthreeperm), -- 25953 (Fel Crystal Spell Target)
 (@cguidfelcrystalspelltarget+2, -@sunsreachpthreeperm), -- 25953 (Fel Crystal Spell Target)
@@ -301,10 +302,10 @@ INSERT INTO `game_event_creature` (`guid`, `eventEntry`) VALUES
 (5300299, -@sunsreachpfour), -- 24976 (Dawnblade Blood Knight)
 (5300296, -@sunsreachpfour), -- 24976 (Dawnblade Blood Knight)
 -- Unmarked
-(5300472, -@sunsreachpthreeperm), -- 25001 (Abyssal Flamewalker)
+(93969, -@sunsreachpthreeperm), -- 25001 (Abyssal Flamewalker)
 (5300473, -@sunsreachpthreeperm), -- 25001 (Abyssal Flamewalker)
 (5300474, -@sunsreachpthreeperm), -- 25001 (Abyssal Flamewalker)
-(5300502, -@sunsreachpthreeperm), -- 25002 (Unleashed Hellion)
+(93983, -@sunsreachpthreeperm), -- 25002 (Unleashed Hellion)
 (5300503, -@sunsreachpthreeperm), -- 25002 (Unleashed Hellion)
 (54030, -@sunsreachptwoperm), -- 24938 (Shattered Sun Marksman)
 (54031, -@sunsreachptwoperm), -- 24938 (Shattered Sun Marksman)
@@ -865,15 +866,15 @@ INSERT INTO `gameobject` (`guid`, `id`, `map`, `spawnMask`, `phaseMask`, `positi
 -- Portal Subphase, Shattrath City, Shattered Sun Warrior and Shattered Sun Marksman
 DELETE FROM `creature` WHERE `id1` IN (25115, 24938) AND `guid` BETWEEN @cguidportalshat AND @cguidportalshat+7;
 -- spawntimesecs 30-120s, 75s avg
-INSERT INTO `creature` (`guid`, `id1`, `map`, `spawnMask`, `phaseMask`, `position_x`, `position_y`, `position_z`, `orientation`, `spawntimesecs`, `MovementType`, `VerifiedBuild`, `Comment`) VALUES
-(@cguidportalshat+0, 25115, 530, 1, 1, -1983.31005859375, 5491.89013671875, -12.344799995422363, 0.1725849956274032, 75, 2, 0, ''),
-(@cguidportalshat+1, 25115, 530, 1, 1, -1866.1199951171875, 5519.31005859375, -12.344799995422363, 3.35932993888855, 75, 2, 0, ''),
-(@cguidportalshat+2, 25115, 530, 1, 1, -1955.0699462890625, 5432.39990234375, -12.344799995422363, 4.982600212097168, 75, 2, 0, ''),
-(@cguidportalshat+3, 25115, 530, 1, 1, -1753.5, 5495.75, -12.344799995422363, 3.782819986343384, 75, 2, 0, ''),
-(@cguidportalshat+4, 24938, 530, 1, 1, -1941.18994140625, 5486.89990234375, -12.344799995422363, 0.5934119820594788, 75, 2, 0, ''),
-(@cguidportalshat+5, 24938, 530, 1, 1, -1958.1099853515625, 5418.16015625, -12.344799995422363, 5.061450004577637, 75, 2, 0, ''),
-(@cguidportalshat+6, 24938, 530, 1, 1, -1771.47998046875, 5424.3798828125, -12.344799995422363, 1.7976900339126587, 75, 2, 0, ''),
-(@cguidportalshat+7, 24938, 530, 1, 1, -1799.050048828125, 5549.31982421875, -12.344799995422363, 5.026549816131592, 75, 2, 0, '');
+INSERT INTO `creature` (`guid`, `id1`, `map`, `spawnMask`, `phaseMask`, `equipment_id`, `position_x`, `position_y`, `position_z`, `orientation`, `spawntimesecs`, `MovementType`, `VerifiedBuild`, `Comment`) VALUES
+(@cguidportalshat+0, 25115, 530, 1, 1, 1, -1983.31005859375, 5491.89013671875, -12.344799995422363, 0.1725849956274032, 75, 2, 0, ''),
+(@cguidportalshat+1, 25115, 530, 1, 1, 1, -1866.1199951171875, 5519.31005859375, -12.344799995422363, 3.35932993888855, 75, 2, 0, ''),
+(@cguidportalshat+2, 25115, 530, 1, 1, 1, -1955.0699462890625, 5432.39990234375, -12.344799995422363, 4.982600212097168, 75, 2, 0, ''),
+(@cguidportalshat+3, 25115, 530, 1, 1, 1, -1753.5, 5495.75, -12.344799995422363, 3.782819986343384, 75, 2, 0, ''),
+(@cguidportalshat+4, 24938, 530, 1, 1, 1, -1941.18994140625, 5486.89990234375, -12.344799995422363, 0.5934119820594788, 75, 2, 0, ''),
+(@cguidportalshat+5, 24938, 530, 1, 1, 1, -1958.1099853515625, 5418.16015625, -12.344799995422363, 5.061450004577637, 75, 2, 0, ''),
+(@cguidportalshat+6, 24938, 530, 1, 1, 1, -1771.47998046875, 5424.3798828125, -12.344799995422363, 1.7976900339126587, 75, 2, 0, ''),
+(@cguidportalshat+7, 24938, 530, 1, 1, 1, -1799.050048828125, 5549.31982421875, -12.344799995422363, 5.026549816131592, 75, 2, 0, '');
 
 DELETE FROM `waypoint_data` WHERE `id` = (@cguidportalshat+0)*10;
 INSERT INTO `waypoint_data` (`id`, `point`, `position_x`, `position_y`, `position_z`, `orientation`, `delay`, `move_type`, `action`) VALUES
