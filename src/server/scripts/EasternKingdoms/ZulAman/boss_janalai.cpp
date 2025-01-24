@@ -337,12 +337,18 @@ struct boss_janalai : public BossAI
             FireWall();
             SpawnBombs();
             ThrowBombs();
+        
+            scheduler.Schedule(8s, [this](TaskContext)
+            {
+                _isBombing = false;
+                me->RemoveAurasDueToSpell(SPELL_FIRE_BOMB_CHANNEL);
+                if (Unit* victim = me->GetVictim())
+                me->Attack(victim, true);
+            });
 
             scheduler.Schedule(9s, [this](TaskContext)
             {
                 Boom();
-                _isBombing = false;
-                me->RemoveAurasDueToSpell(SPELL_FIRE_BOMB_CHANNEL);
             });
         });
     }
