@@ -45,6 +45,31 @@ enum Misc
     NPC_PURE_ENERGY                 = 24745
 };
 
+struct npc_pure_energy : public ScriptedAI
+{
+    npc_pure_energy(Creature* creature) : ScriptedAI(creature) {}
+
+    void IsSummonedBy(WorldObject* summoner) override
+    {
+         if (Creature* vexallus = dynamic_cast<Creature*>(summoner))
+         {
+             if (Unit* target = vexallus->AI()->SelectTarget(SelectTargetMethod::Random, 0))
+             {
+                 AttackStart(target);
+                 me->CastSpell(target, SPELL_ENERGY_FEEDBACK_CHANNEL, false);
+             }
+         }
+    }
+
+    void DamageTaken(Unit* attacker, uint32& damage, DamageEffectType /*damagetype*/, SpellSchoolMask /*damageSchoolMask*/) override 
+    {
+        if (!attacker || !attacker->IsPlayer() || !attacker->GetVictim() || attacker->GetVictim() != me)
+        {
+            damage = 0;
+        }
+    }
+};
+
 struct boss_vexallus : public BossAI
 {
     boss_vexallus(Creature* creature) : BossAI(creature, DATA_VEXALLUS),
@@ -151,5 +176,6 @@ private:
 
 void AddSC_boss_vexallus()
 {
+    RegisterMagistersTerraceCreatureAI(npc_pure_energy);
     RegisterMagistersTerraceCreatureAI(boss_vexallus);
 }
