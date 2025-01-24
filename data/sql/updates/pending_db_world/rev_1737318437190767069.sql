@@ -937,8 +937,8 @@ INSERT INTO `gameobject` (`guid`, `id`, `map`, `spawnMask`, `phaseMask`, `positi
 -- Creatures
 -- Portal Subphase, Shattrath City, Shattered Sun Warrior and Shattered Sun Marksman
 DELETE FROM `creature` WHERE `id1` IN (25115, 24938) AND `guid` BETWEEN @cguidportalshat AND @cguidportalshat+7;
--- spawntimesecs 30-120s, 75s avg
 INSERT INTO `creature` (`guid`, `id1`, `map`, `spawnMask`, `phaseMask`, `equipment_id`, `position_x`, `position_y`, `position_z`, `orientation`, `spawntimesecs`, `MovementType`, `VerifiedBuild`, `Comment`) VALUES
+-- spawntimesecs 30-120s, 75s avg
 (@cguidportalshat+0, 25115, 530, 1, 1, 1, -1983.31005859375, 5491.89013671875, -12.344799995422363, 0.1725849956274032, 75, 2, 0, ''),
 (@cguidportalshat+1, 25115, 530, 1, 1, 1, -1866.1199951171875, 5519.31005859375, -12.344799995422363, 3.35932993888855, 75, 2, 0, ''),
 (@cguidportalshat+2, 25115, 530, 1, 1, 1, -1955.0699462890625, 5432.39990234375, -12.344799995422363, 4.982600212097168, 75, 2, 0, ''),
