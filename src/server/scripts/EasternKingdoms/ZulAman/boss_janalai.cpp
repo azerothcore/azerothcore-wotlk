@@ -228,9 +228,9 @@ struct boss_janalai : public BossAI
                     me->StopMoving();
                     _isFlameBreathing = true;
                     scheduler.Schedule(1500ms, [this](TaskContext)
-		    {
-    			_isFlameBreathing = false;
-		    });
+                    {
+                        _isFlameBreathing = false;
+                    });
                 }
             }
         }, 8s);
