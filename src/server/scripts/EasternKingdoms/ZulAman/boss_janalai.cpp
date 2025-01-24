@@ -320,44 +320,52 @@ struct boss_janalai : public BossAI
         me->GetMotionMaster()->Clear();
         me->SetPosition(janalainPos);
         me->StopMovingOnCurrentPos();
-        DoCastSelf(SPELL_FIRE_BOMB_CHANNEL);
-
-        FireWall();
-        SpawnBombs();
-        _isBombing = true;
-
+        
+        // Teleport to center
         DoCastSelf(SPELL_TELE_TO_CENTER);
-        DoCastAOE(SPELL_SUMMON_PLAYERS_DUMMY, true);
-
-        //DoCast(Temp, SPELL_SUMMON_PLAYERS, true) // core bug, spell does not work if too far
-        ThrowBombs();
-
-        scheduler.Schedule(11s, [this](TaskContext)
+        
+        // Wait 3 seconds before starting the bombing sequence
+        scheduler.Schedule(3s, [this](TaskContext)
         {
-            Boom();
-            _isBombing = false;
-
-            me->RemoveAurasDueToSpell(SPELL_FIRE_BOMB_CHANNEL);
+            DoCastSelf(SPELL_FIRE_BOMB_CHANNEL);
+            FireWall();
+            SpawnBombs();
+            _isBombing = true;
+            
+            // Start throwing bombs over 5 seconds
+            ThrowBombs();
+            
+            // After 5 seconds of throwing, wait 4 seconds then explode
+            scheduler.Schedule(9s, [this](TaskContext)
+            {
+                Boom();
+                _isBombing = false;
+                me->RemoveAurasDueToSpell(SPELL_FIRE_BOMB_CHANNEL);
+            });
         });
     }
 
     void ThrowBombs()
     {
-        std::chrono::milliseconds bombTimer = 100ms;
-
-        summons.DoForAllSummons([this, &bombTimer](WorldObject* summon) {
+        std::chrono::milliseconds bombTimer = 0ms;
+        const std::chrono::milliseconds throwDuration = 5000ms;
+        
+        summons.DoForAllSummons([this, &bombTimer, throwDuration](WorldObject* summon) {
             if (summon->GetEntry() == NPC_FIRE_BOMB)
             {
                 if (Creature* bomb = summon->ToCreature())
                 {
+                    // Calculate timing to spread throws over 5 seconds
+                    std::chrono::milliseconds throwTime = bombTimer % throwDuration;
+                    
                     bomb->m_Events.AddEventAtOffset([this, bomb] {
                         bomb->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
                         DoCast(bomb, SPELL_FIRE_BOMB_THROW, true);
                         bomb->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
-                    }, bombTimer);
+                    }, throwTime);
                 }
 
-                bombTimer += 100ms;
+                bombTimer += throwDuration / MAX_BOMB_COUNT;
             }
         });
     }
