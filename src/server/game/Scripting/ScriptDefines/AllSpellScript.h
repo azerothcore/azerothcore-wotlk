@@ -36,6 +36,9 @@ enum AllSpellHook
     ALLSPELLHOOK_ON_DUMMY_EFFECT_GAMEOBJECT,
     ALLSPELLHOOK_ON_DUMMY_EFFECT_CREATURE,
     ALLSPELLHOOK_ON_DUMMY_EFFECT_ITEM,
+    ALLSPELLHOOK_ON_CAST_CANCEL,
+    ALLSPELLHOOK_ON_CAST,
+    ALLSPELLHOOK_ON_PREPARE,
     ALLSPELLHOOK_END
 };
 
@@ -100,6 +103,12 @@ public:
      * @param itemTarget Contains information about the Item
      */
     virtual void OnDummyEffect(WorldObject* /*caster*/, uint32 /*spellID*/, SpellEffIndex /*effIndex*/, Item* /*itemTarget*/) { }
+
+    virtual void OnSpellCastCancel(Spell* /*spell*/, Unit* /*caster*/, SpellInfo const* /*spellInfo*/, bool /*bySelf*/) { }
+
+    virtual void OnSpellCast(Spell* /*spell*/, Unit* /*caster*/, SpellInfo const* /*spellInfo*/, bool /*skipCheck*/) { }
+
+    virtual void OnSpellPrepare(Spell* /*spell*/, Unit* /*caster*/, SpellInfo const* /*spellInfo*/) { }
 };
 
 // Compatibility for old scripts

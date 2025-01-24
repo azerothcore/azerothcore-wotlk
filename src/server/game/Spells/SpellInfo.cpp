@@ -2706,8 +2706,6 @@ bool SpellInfo::_IsPositiveEffect(uint8 effIndex, bool deep) const
             // some explicitly required dummy effect sets
             switch (Id)
             {
-                case 28441:
-                    return false; // AB Effect 000
                 default:
                     break;
             }
