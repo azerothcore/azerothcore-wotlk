@@ -302,7 +302,7 @@ struct boss_janalai : public BossAI
             float radius = (static_cast<float>(i) / static_cast<float>(MAX_BOMB_COUNT)) * maxRadius;
             radius += frand(-2.0f, 2.0f);
             float dx = radius * cos(angle);
-            float dy = radius * sin(angle);   
+            float dy = radius * sin(angle);
             me->m_Events.AddEventAtOffset([this, dx, dy] {
                 DoSpawnCreature(NPC_FIRE_BOMB, dx, dy, 0, 0, TEMPSUMMON_TIMED_DESPAWN, 15000);
             }, spawnTimer);
