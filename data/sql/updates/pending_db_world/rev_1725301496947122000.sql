@@ -12,7 +12,7 @@ CREATE TABLE `arena_season_reward_group` (
 );
 
 -- Season 8
-INSERT INTO `arena_season_reward_group` (`id`, `arena_season`, `criteria_type`, `min_criteria`, `max_criteria`, `reward_mail_template_id`, `reward_mail_subject`, `reward_mail_body`, `gold_reward`) VALUES 
+INSERT INTO `arena_season_reward_group` (`id`, `arena_season`, `criteria_type`, `min_criteria`, `max_criteria`, `reward_mail_template_id`, `reward_mail_subject`, `reward_mail_body`, `gold_reward`) VALUES
 (1, 8, 'abs', 1, 1, 0, '', '', 0),
 (2, 8, 'pct', 0, 0.5, 287, '', '', 0),
 (3, 8, 'pct', 0.5, 3, 0, '', '', 0),
@@ -81,7 +81,7 @@ INSERT INTO `command` (`name`, `security`, `help`) VALUES ('arena season deletet
 INSERT INTO `command` (`name`, `security`, `help`) VALUES ('arena season set state', 3, 'Syntax: .arena season set state $state\nChanges the state for the current season.\nAvailable states:\n 0 - disabled. Players can\'t queue for the arena.\n 1 - in progress. Players can use arena-related functionality.');
 
 DELETE FROM `achievement_reward` WHERE `ID` IN (3336, 2091, 2092, 2093, 2090);
-INSERT INTO `achievement_reward` (`ID`, `TitleA`, `TitleH`, `ItemID`, `Sender`, `Subject`, `Body`, `MailTemplateID`) VALUES 
+INSERT INTO `achievement_reward` (`ID`, `TitleA`, `TitleH`, `ItemID`, `Sender`, `Subject`, `Body`, `MailTemplateID`) VALUES
 (3336, 157, 157, 0, 0, '', '', 0),
 (2091, 42, 42, 0, 0, '', '', 0),
 (2092, 43, 43, 0, 0, '', '', 0),
