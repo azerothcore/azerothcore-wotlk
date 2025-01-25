@@ -2223,6 +2223,16 @@ class spell_random_rocket_missile : public SpellScript
 {
     PrepareSpellScript(spell_random_rocket_missile);
 
+    void CheckTargets(std::list<WorldObject*>& targets)
+    {
+        targets.remove_if([&](WorldObject const* target) -> bool
+        {
+            if (GameObject const* go = target->ToGameObject())
+                return go->getLootState() == GO_ACTIVATED; // can only hit unused Deathforged Infernal
+            return true;
+        });
+    }
+
     void HandleActivateObject(SpellEffIndex /*effIndex*/)
     {
         GetHitGObj()->SetLootState(GO_JUST_DEACTIVATED);
@@ -2230,6 +2240,7 @@ class spell_random_rocket_missile : public SpellScript
 
     void Register() override
     {
+        OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_random_rocket_missile::CheckTargets, EFFECT_0, TARGET_GAMEOBJECT_SRC_AREA);
         OnEffectHitTarget += SpellEffectFn(spell_random_rocket_missile::HandleActivateObject, EFFECT_0, SPELL_EFFECT_ACTIVATE_OBJECT);
     }
 };
