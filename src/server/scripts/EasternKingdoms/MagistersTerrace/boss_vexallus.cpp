@@ -51,14 +51,17 @@ struct npc_pure_energy : public ScriptedAI
 
     void IsSummonedBy(WorldObject* summoner) override
     {
-         if (Creature* vexallus = dynamic_cast<Creature*>(summoner))
-         {
-             if (Unit* target = vexallus->AI()->SelectTarget(SelectTargetMethod::Random, 0))
-             {
-                 AttackStart(target);
-                 me->CastSpell(target, SPELL_ENERGY_FEEDBACK_CHANNEL, false);
-             }
-         }
+        if (!summoner)
+            return;
+        
+        if (Creature* vexallus = summoner->ToCreature())
+        {
+            if (Unit* target = vexallus->AI()->SelectTarget(SelectTargetMethod::Random, 0))
+            {
+                AttackStart(target);
+                me->CastSpell(target, SPELL_ENERGY_FEEDBACK_CHANNEL, false);
+            }
+        }
     }
 
     void DamageTaken(Unit* attacker, uint32& damage, DamageEffectType /*damagetype*/, SpellSchoolMask /*damageSchoolMask*/) override
