@@ -189,7 +189,7 @@ private:
     bool _energyCooldown;
     bool _overloaded{false};
     uint8 _energyQueue;
-    uint9 _pureEnergy{5};
+    uint8 _pureEnergy{5};
     std::array<bool, 5> _thresholdsPassed{};
 };
 
