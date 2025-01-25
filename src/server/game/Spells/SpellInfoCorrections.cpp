@@ -4871,7 +4871,7 @@ void SpellMgr::LoadSpellInfoCorrections()
     // Random Rocket Missile
     ApplySpellFix({ 38054 }, [](SpellInfo* spellInfo)
     {
-        spellInfo->MaxAffectedTargets = 1;
+        spellInfo->MaxAffectedTargets = 10;
     });
 
     for (uint32 i = 0; i < GetSpellInfoStoreSize(); ++i)

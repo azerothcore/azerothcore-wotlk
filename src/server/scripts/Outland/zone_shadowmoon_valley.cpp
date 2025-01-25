@@ -67,8 +67,7 @@ class spell_q10612_10613_the_fel_and_the_furious : public SpellScript
     void HandleScriptEffect(SpellEffIndex effIndex)
     {
         PreventHitEffect(effIndex);
-        for (uint8 i = 0; i < 10; ++i)
-            GetCaster()->CastSpell(GetCaster(), SPELL_RANDOM_ROCKET_MISSILE, true); // goober implicit target
+        GetCaster()->CastSpell(GetCaster(), SPELL_RANDOM_ROCKET_MISSILE, true); // goober implicit target
     }
 
     void Register() override
