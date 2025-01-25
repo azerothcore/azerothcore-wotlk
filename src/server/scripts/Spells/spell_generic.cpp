@@ -5400,6 +5400,49 @@ class spell_gen_proc_on_victim : public AuraScript
     }
 };
 
+enum CallOfBeastSpells
+{
+    SPELL_CALL_OF_THE_BEAST = 43359
+};
+
+// 43359 - Call of the Beast
+class spell_gen_call_of_the_beast : public SpellScript
+{
+    PrepareSpellScript(spell_gen_call_of_the_beast);
+
+    bool Validate(SpellInfo const* /*spellInfo*/) override
+    {
+        return ValidateSpellInfo({ SPELL_CALL_OF_THE_BEAST });
+    }
+
+    void HandleScript(SpellEffIndex /*effIndex*/)
+    {
+        if (Unit* caster = GetCaster())
+        {
+            if (Unit* target = GetHitUnit())
+            {
+                std::list<Creature*> creatureList;
+                caster->GetCreatureListWithEntryInGrid(creatureList, 0, 100.0f);
+                
+                for (Creature* creature : creatureList)
+                {
+                    if (creature->GetCreatureType() == CREATURE_TYPE_BEAST && 
+                        !creature->IsPet() && 
+                        creature->IsAIEnabled)
+                    {
+                        creature->AI()->AttackStart(target);
+                    }
+                }
+            }
+        }
+    }
+
+    void Register() override
+    {
+        OnEffectHitTarget += SpellEffectFn(spell_gen_call_of_the_beast::HandleScript, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
+    }
+};
+
 void AddSC_generic_spell_scripts()
 {
     RegisterSpellScript(spell_silithyst);
