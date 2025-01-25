@@ -2219,6 +2219,7 @@ private:
         return true;
     }
 
+    static bool IsSAIBoolValid(SmartScriptHolder const& e, SAIBool value);
     static bool IsTextValid(SmartScriptHolder const& e, uint32 id);
     static bool CheckUnusedEventParams(SmartScriptHolder const& e);
     static bool CheckUnusedActionParams(SmartScriptHolder const& e);
