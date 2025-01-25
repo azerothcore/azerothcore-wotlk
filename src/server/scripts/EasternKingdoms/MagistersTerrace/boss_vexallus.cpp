@@ -168,7 +168,7 @@ struct boss_vexallus : public BossAI
 
         float currentPct = me->GetHealthPct();
 
-        if (currentPct <= 20.0f && !_overloaded && _pureEnergy == 0;)
+        if (!_overloaded && currentPct <= 20.0f && _pureEnergy == 0;)
         {   
             DoCastSelf(SPELL_OVERLOAD, true);
             _overloaded = true;
