@@ -51,6 +51,7 @@ enum TheFelAndTheFurious
     SPELL_RANDOM_ROCKET_MISSILE = 38054,
     SPELL_FEL_REAVER_SENTINEL_TAG = 38020,
     SPELL_FRS_QUEST_CREDIT = 38022,
+    SPELL_ROCKET_LAUNCHER = 38083, // visual only
 };
 
 // 38055 - Destroy Deathforged Infernal
@@ -2223,6 +2224,11 @@ class spell_random_rocket_missile : public SpellScript
 {
     PrepareSpellScript(spell_random_rocket_missile);
 
+    bool Validate(SpellInfo const* /*spellInfo*/) override
+    {
+        return ValidateSpellInfo({ SPELL_ROCKET_LAUNCHER });
+    }
+
     void CheckTargets(std::list<WorldObject*>& targets)
     {
         targets.remove_if([&](WorldObject const* target) -> bool
@@ -2235,7 +2241,18 @@ class spell_random_rocket_missile : public SpellScript
 
     void HandleActivateObject(SpellEffIndex /*effIndex*/)
     {
-        GetHitGObj()->SetLootState(GO_JUST_DEACTIVATED);
+        if (GameObject* go = GetHitGObj())
+        {
+            go->SetLootState(GO_JUST_DEACTIVATED);
+            // Hack: Rocket visual
+            Creature* cr2 = GetCaster()->SummonTrigger(go->GetPositionX(), go->GetPositionY(), go->GetPositionZ() + 2.0f, 0.0f, 20);
+            if (cr2)
+            {
+                cr2->SetFaction(FACTION_MONSTER);
+                cr2->ReplaceAllUnitFlags(UNIT_FLAG_NONE);
+                GetCaster()->CastSpell(cr2, SPELL_ROCKET_LAUNCHER, true); // for visual only
+            }
+        }
     }
 
     void Register() override
