@@ -5442,8 +5442,7 @@ class spell_gen_call_of_the_beast : public SpellScript
                     if (creature->GetCreatureType() == CREATURE_TYPE_BEAST &&
                         !creature->IsPet() &&
                         !creature->IsPlayer() &&
-                        !creature->IsDungeonBoss() &&
-                        creature->IsAIEnabled)
+                        !creature->IsDungeonBoss())
                     {
                         creature->ApplySpellImmune(0, IMMUNITY_STATE, SPELL_AURA_MOD_TAUNT, true);
                         creature->ApplySpellImmune(0, IMMUNITY_EFFECT, SPELL_EFFECT_ATTACK_ME, true);
