@@ -92,12 +92,6 @@ struct boss_vexallus : public BossAI
         _energyQueue = 0;
         std::fill(_thresholdsPassed.begin(), _thresholdsPassed.end(), false);
 
-        ScheduleHealthCheckEvent(20, [&]
-        {
-            scheduler.CancelAll();
-            DoCastSelf(SPELL_OVERLOAD, true);
-        });
-
         scheduler.Schedule(1s, [this](TaskContext context)
         {
             if (!_energyCooldown && _energyQueue > 0)
@@ -168,6 +162,15 @@ struct boss_vexallus : public BossAI
     {
         if (!UpdateVictim())
             return;
+
+        float currentPct = me->GetHealthPct();
+
+        if (currentPct <= 20.0f && !_overloaded)
+        {   
+            DoCastSelf(SPELL_OVERLOAD, true);
+            _overloaded = true;
+            me->RemoveUnitFlag(UNIT_FLAG_STUNNED); // This currently is a hack; SPELL_OVERLOAD applies UNIT_FLAG_STUNNED when it shouldn't
+        }
 
         float currentPct = me->GetHealthPct();
         if (currentPct <= 85.0f && !_thresholdsPassed[0]) { _energyQueue++; _thresholdsPassed[0] = true; }
