@@ -90,6 +90,7 @@ struct boss_vexallus : public BossAI
         _Reset();
         _energyCooldown = false;
         _energyQueue = 0;
+        _overloaded = false;
         std::fill(_thresholdsPassed.begin(), _thresholdsPassed.end(), false);
 
         scheduler.Schedule(1s, [this](TaskContext context)
@@ -184,6 +185,7 @@ struct boss_vexallus : public BossAI
 
 private:
     bool _energyCooldown;
+    bool _overloaded{false};
     uint8 _energyQueue;
     std::array<bool, 5> _thresholdsPassed{};
 };
