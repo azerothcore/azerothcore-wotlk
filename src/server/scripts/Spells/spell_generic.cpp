@@ -5419,7 +5419,7 @@ public:
         return ValidateSpellInfo({ SPELL_CALL_OF_THE_BEAST });
     }
 
-    void HandleRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
+    void HandleRemove(SpellEffIndex /*effIndex*/)
     {
         for (Creature* creature : m_creatureList)
         {
@@ -5456,7 +5456,7 @@ public:
     void Register() override
     {
         OnEffectHitTarget += SpellEffectFn(spell_gen_call_of_the_beast::HandleScript, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
-        AfterEffectRemove += AuraEffectRemoveFn(spell_gen_call_of_the_beast::HandleRemove);
+        OnEffectHit += SpellEffectFn(spell_gen_call_of_the_beast::HandleRemove, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
     }
 };
 
