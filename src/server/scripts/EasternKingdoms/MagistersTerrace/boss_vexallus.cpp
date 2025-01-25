@@ -64,9 +64,7 @@ struct npc_pure_energy : public ScriptedAI
     void DamageTaken(Unit* attacker, uint32& damage, DamageEffectType /*damagetype*/, SpellSchoolMask /*damageSchoolMask*/) override
     {
         if (!attacker || !attacker->IsPlayer() || !attacker->GetVictim() || attacker->GetVictim() != me)
-        {
             damage = 0;
-        }
     }
 };
 
@@ -80,9 +78,7 @@ struct boss_vexallus : public BossAI
     {
         _JustDied();
         if (instance)
-        {
             instance->DoRemoveAurasDueToSpellOnPlayers(SPELL_ENERGY_FEEDBACK);
-        }
     }
 
     void Reset() override
@@ -148,7 +144,7 @@ struct boss_vexallus : public BossAI
         if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0))
         {
             summon->GetMotionMaster()->MoveFollow(target, 0.0f, 0.0f);
-            summon->CastSpell(target, SPELL_ENERGY_FEEDBACK_CHANNEL, false);
+            summon->CastSpell(target, SPELL_ENERGY_FEEDBACK_CHANNEL);
         }
         summons.Summon(summon);
     }
@@ -166,8 +162,6 @@ struct boss_vexallus : public BossAI
         if (!UpdateVictim())
             return;
 
-        float currentPct = me->GetHealthPct();
-
         if (!_overloaded && currentPct <= 20.0f && _pureEnergy == 0)
         {   
             DoCastSelf(SPELL_OVERLOAD, true);
@@ -175,11 +169,11 @@ struct boss_vexallus : public BossAI
             me->RemoveUnitFlag(UNIT_FLAG_STUNNED); // This currently is a hack; SPELL_OVERLOAD applies UNIT_FLAG_STUNNED when it shouldn't
         }
 
-        if (currentPct <= 85.0f && !_thresholdsPassed[0]) { _energyQueue++; _thresholdsPassed[0] = true; }
-        if (currentPct <= 70.0f && !_thresholdsPassed[1]) { _energyQueue++; _thresholdsPassed[1] = true; }
-        if (currentPct <= 55.0f && !_thresholdsPassed[2]) { _energyQueue++; _thresholdsPassed[2] = true; }
-        if (currentPct <= 40.0f && !_thresholdsPassed[3]) { _energyQueue++; _thresholdsPassed[3] = true; }
-        if (currentPct <= 25.0f && !_thresholdsPassed[4]) { _energyQueue++; _thresholdsPassed[4] = true; }
+        if (HealthBelowPct(85) && !_thresholdsPassed[0]) { _energyQueue++; _thresholdsPassed[0] = true; }
+        if (HealthBelowPct(70) && !_thresholdsPassed[1]) { _energyQueue++; _thresholdsPassed[1] = true; }
+        if (HealthBelowPct(55) && !_thresholdsPassed[2]) { _energyQueue++; _thresholdsPassed[2] = true; }
+        if (HealthBelowPct(40) && !_thresholdsPassed[3]) { _energyQueue++; _thresholdsPassed[3] = true; }
+        if (HealthBelowPct(25) && !_thresholdsPassed[4]) { _energyQueue++; _thresholdsPassed[4] = true; }
 
         events.Update(diff);
         scheduler.Update(diff);
