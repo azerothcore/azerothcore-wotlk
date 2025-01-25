@@ -76,6 +76,15 @@ struct boss_vexallus : public BossAI
         _energyCooldown(false),
         _energyQueue(0) { }
 
+    void JustDied(Unit* /*killer*/) override
+    {
+        _JustDied();
+        if (instance)
+        {
+            instance->DoRemoveAurasDueToSpellOnPlayers(SPELL_ENERGY_FEEDBACK);
+        }
+    }
+
     void Reset() override
     {
         _Reset();
