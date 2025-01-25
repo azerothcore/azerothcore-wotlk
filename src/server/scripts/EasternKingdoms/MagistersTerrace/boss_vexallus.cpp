@@ -114,10 +114,6 @@ struct boss_vexallus : public BossAI
                 scheduler.Schedule(5s, [this](TaskContext)
                 {
                     _energyCooldown = false;
-                    if (_energyCooldown == 0)
-                    {
-                        _overloaded = true;
-                    }
                 });
             }
 
@@ -171,7 +167,7 @@ struct boss_vexallus : public BossAI
 
         float currentPct = me->GetHealthPct();
 
-        if (currentPct <= 20.0f && !_overloaded)
+        if (currentPct <= 20.0f && _energyPotential == 0)
         {   
             DoCastSelf(SPELL_OVERLOAD, true);
             me->RemoveUnitFlag(UNIT_FLAG_STUNNED); // This currently is a hack; SPELL_OVERLOAD applies UNIT_FLAG_STUNNED when it shouldn't
