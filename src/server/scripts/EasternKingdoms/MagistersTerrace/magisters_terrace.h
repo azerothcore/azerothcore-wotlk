@@ -40,8 +40,8 @@ enum MTCreatures
     NPC_DELRISSA                = 24560,
     NPC_FEL_CRYSTAL             = 24722,
     NPC_KAEL_THAS               = 24664,
-    NPC_PHOENIX                 = 21362,
-    NPC_PHOENIX_EGG             = 21364,
+    NPC_PHOENIX                 = 24674,
+    NPC_PHOENIX_EGG             = 24675,
     NPC_KALECGOS                = 24844
 };
 
