@@ -51,24 +51,34 @@ enum Misc
 
 struct boss_vexallus : public BossAI
 {
-    boss_vexallus(Creature* creature) : BossAI(creature, DATA_VEXALLUS) { }
+    boss_vexallus(Creature* creature) : BossAI(creature, DATA_VEXALLUS), _energyCooldown(false) { }
 
     void Reset() override
     {
         _Reset();
+        _energyCooldown = false;
 
-        ScheduleHealthCheckEvent({ 85, 70, 55, 40 }, [&]
+        ScheduleHealthCheckEvent({ 85, 70, 55, 40, 25 }, [&]
         {
-            Talk(SAY_ENERGY);
-            Talk(EMOTE_DISCHARGE_ENERGY);
-
-            if (IsHeroic())
+            if (!_energyCooldown)
             {
-                DoCastSelf(SPELL_SUMMON_PURE_ENERGY_H1);
-                DoCastSelf(SPELL_SUMMON_PURE_ENERGY_H2);
+                Talk(SAY_ENERGY);
+                Talk(EMOTE_DISCHARGE_ENERGY);
+
+                if (IsHeroic())
+                {
+                    DoCastSelf(SPELL_SUMMON_PURE_ENERGY_H1);
+                    DoCastSelf(SPELL_SUMMON_PURE_ENERGY_H2);
+                }
+                else
+                    DoCastSelf(SPELL_SUMMON_PURE_ENERGY_N);
+
+                _energyCooldown = true;
+                scheduler.Schedule(5s, [this](TaskContext)
+                {
+                    _energyCooldown = false;
+                });
             }
-            else
-                DoCastSelf(SPELL_SUMMON_PURE_ENERGY_N);
         });
 
         ScheduleHealthCheckEvent(20, [&]
@@ -117,6 +127,9 @@ struct boss_vexallus : public BossAI
         if (killer)
             killer->CastSpell(killer, SPELL_ENERGY_FEEDBACK, true, 0, 0, summon->GetGUID());
     }
+
+private:
+    bool _energyCooldown;
 };
 
 void AddSC_boss_vexallus()
