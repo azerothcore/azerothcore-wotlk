@@ -91,7 +91,7 @@ struct boss_vexallus : public BossAI
         _energyCooldown = false;
         _energyQueue = 0;
         _overloaded = false;
-        _pureEnergy = false;
+        _pureEnergy = 5;
         std::fill(_thresholdsPassed.begin(), _thresholdsPassed.end(), false);
 
         scheduler.Schedule(1s, [this](TaskContext context)
@@ -110,6 +110,7 @@ struct boss_vexallus : public BossAI
                     DoCastSelf(SPELL_SUMMON_PURE_ENERGY_N);
 
                 _energyQueue--;
+                _pureEnergy--;
                 _energyCooldown = true;
                 scheduler.Schedule(5s, [this](TaskContext)
                 {
@@ -167,7 +168,7 @@ struct boss_vexallus : public BossAI
 
         float currentPct = me->GetHealthPct();
 
-        if (currentPct <= 20.0f && _pureEnergy && !_overloaded)
+        if (currentPct <= 20.0f && !_overloaded && _pureEnergy == 0;)
         {   
             DoCastSelf(SPELL_OVERLOAD, true);
             _overloaded = true;
@@ -178,7 +179,7 @@ struct boss_vexallus : public BossAI
         if (currentPct <= 70.0f && !_thresholdsPassed[1]) { _energyQueue++; _thresholdsPassed[1] = true; }
         if (currentPct <= 55.0f && !_thresholdsPassed[2]) { _energyQueue++; _thresholdsPassed[2] = true; }
         if (currentPct <= 40.0f && !_thresholdsPassed[3]) { _energyQueue++; _thresholdsPassed[3] = true; }
-        if (currentPct <= 25.0f && !_thresholdsPassed[4]) { _energyQueue++; _thresholdsPassed[4] = true; _pureEnergy = true; }
+        if (currentPct <= 25.0f && !_thresholdsPassed[4]) { _energyQueue++; _thresholdsPassed[4] = true; }
 
         events.Update(diff);
         scheduler.Update(diff);
@@ -187,8 +188,8 @@ struct boss_vexallus : public BossAI
 private:
     bool _energyCooldown;
     bool _overloaded{false};
-    bool _pureEnergy{false};
     uint8 _energyQueue;
+    uint9 _pureEnergy{5};
     std::array<bool, 5> _thresholdsPassed{};
 };
 
