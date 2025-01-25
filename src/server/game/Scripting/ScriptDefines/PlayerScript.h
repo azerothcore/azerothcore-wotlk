@@ -769,9 +769,9 @@ public:
 
     /**
      * @brief This hook is called, to avoid player resurrect
-     * 
+     *
      * @param player Contains information about the Player
-     * 
+     *
      * @return true if player is authorized to resurect
      */
     virtual bool CanPlayerResurrect(Player* /*player*/) { return true; }
