@@ -114,7 +114,7 @@ struct boss_vexallus : public BossAI
                 scheduler.Schedule(5s, [this](TaskContext)
                 {
                     _energyCooldown = false;
-                    if (_energyCooldown = 0)
+                    if (_energyCooldown == 0)
                     {
                         _overloaded = true;
                     }
