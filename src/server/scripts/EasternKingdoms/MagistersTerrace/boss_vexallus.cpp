@@ -90,7 +90,6 @@ struct boss_vexallus : public BossAI
         _Reset();
         _energyCooldown = false;
         _energyQueue = 0;
-        _overload = false;
         std::fill(_thresholdsPassed.begin(), _thresholdsPassed.end(), false);
 
         scheduler.Schedule(1s, [this](TaskContext context)
@@ -129,7 +128,6 @@ struct boss_vexallus : public BossAI
     void JustEngagedWith(Unit* /*who*/) override
     {
         _JustEngagedWith();
-        _overload = false;
         Talk(SAY_AGGRO);
         ScheduleTimedEvent(8s, [&]
         {
@@ -167,9 +165,10 @@ struct boss_vexallus : public BossAI
 
         float currentPct = me->GetHealthPct();
 
-        if (currentPct <= 20.0f && _overload)
+        if (currentPct <= 20.0f && !_overloaded)
         {   
             DoCastSelf(SPELL_OVERLOAD, true);
+            _overloaded = true;
             me->RemoveUnitFlag(UNIT_FLAG_STUNNED); // This currently is a hack; SPELL_OVERLOAD applies UNIT_FLAG_STUNNED when it shouldn't
         }
 
@@ -185,7 +184,6 @@ struct boss_vexallus : public BossAI
 
 private:
     bool _energyCooldown;
-    bool _overload;
     uint8 _energyQueue;
     std::array<bool, 5> _thresholdsPassed{};
 };
