@@ -166,7 +166,7 @@ public: /* WorldScript */
     void OnBeforeConfigLoad(bool reload);
     void OnAfterConfigLoad(bool reload);
     void OnBeforeFinalizePlayerWorldSession(uint32& cacheVersion);
-    void OnMotdChange(std::string& newMotd);
+    void OnMotdChange(std::string& newMotd, LocaleConstant& locale);
     void OnShutdownInitiate(ShutdownExitCode code, ShutdownMask mask);
     void OnShutdownCancel();
     void OnWorldUpdate(uint32 diff);
@@ -615,6 +615,9 @@ public: /* SpellSC */
     void OnDummyEffect(WorldObject* caster, uint32 spellID, SpellEffIndex effIndex, GameObject* gameObjTarget);
     void OnDummyEffect(WorldObject* caster, uint32 spellID, SpellEffIndex effIndex, Creature* creatureTarget);
     void OnDummyEffect(WorldObject* caster, uint32 spellID, SpellEffIndex effIndex, Item* itemTarget);
+    void OnSpellCastCancel(Spell* spell, Unit* caster, SpellInfo const* spellInfo, bool bySelf);
+    void OnSpellCast(Spell* spell, Unit* caster, SpellInfo const* spellInfo, bool skipCheck);
+    void OnSpellPrepare(Spell* spell, Unit* caster, SpellInfo const* spellInfo);
 
 public: /* GameEventScript */
     void OnGameEventStart(uint16 EventID);

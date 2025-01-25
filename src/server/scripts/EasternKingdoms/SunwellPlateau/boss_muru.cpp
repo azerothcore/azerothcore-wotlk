@@ -83,6 +83,14 @@ struct boss_muru : public BossAI
         }, 10min);
     }
 
+    void JustSummoned(Creature* creature) override
+    {
+        if (creature->GetEntry() == NPC_ENTROPIUS)
+            creature->SetInCombatWithZone();
+        else
+            BossAI::JustSummoned(creature);
+    }
+
     void DamageTaken(Unit*, uint32& damage, DamageEffectType, SpellSchoolMask) override
     {
         if (damage >= me->GetHealth())
@@ -334,7 +342,7 @@ class spell_entropius_negative_energy_periodic : public AuraScript
     void PeriodicTick(AuraEffect const* aurEff)
     {
         PreventDefaultAction();
-        uint32 targetCount = aurEff->GetTickNumber() > 12 ? 1 : aurEff->GetTickNumber() / 12;
+        uint32 targetCount = (aurEff->GetTickNumber() + 11) / 12;
         GetTarget()->CastCustomSpell(aurEff->GetSpellInfo()->Effects[EFFECT_0].TriggerSpell, SPELLVALUE_MAX_TARGETS, targetCount);
     }
 

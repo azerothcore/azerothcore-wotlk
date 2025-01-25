@@ -705,7 +705,7 @@ enum SMART_ACTION
     SMART_ACTION_EXIT_VEHICLE                       = 203,    // none
     SMART_ACTION_SET_UNIT_MOVEMENT_FLAGS            = 204,    // flags
     SMART_ACTION_SET_COMBAT_DISTANCE                = 205,    // combatDistance
-    // UNUSED                                       = 206,
+    SMART_ACTION_DISMOUNT                           = 206,
     SMART_ACTION_SET_HOVER                          = 207,    // 0/1
     SMART_ACTION_ADD_IMMUNITY                       = 208,    // type, id, value
     SMART_ACTION_REMOVE_IMMUNITY                    = 209,    // type, id, value
@@ -2219,6 +2219,7 @@ private:
         return true;
     }
 
+    static bool IsSAIBoolValid(SmartScriptHolder const& e, SAIBool value);
     static bool IsTextValid(SmartScriptHolder const& e, uint32 id);
     static bool CheckUnusedEventParams(SmartScriptHolder const& e);
     static bool CheckUnusedActionParams(SmartScriptHolder const& e);

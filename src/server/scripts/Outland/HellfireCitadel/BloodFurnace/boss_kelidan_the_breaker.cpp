@@ -67,10 +67,6 @@ struct boss_kelidan_the_breaker : public BossAI
         me->SetReactState(REACT_PASSIVE);
         me->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
         DoCastSelf(SPELL_EVOCATION);
-        if (instance)
-        {
-            instance->SetData(DATA_KELIDAN, NOT_STARTED);
-        }
     }
 
     void JustEngagedWith(Unit*  /*who*/) override
@@ -78,10 +74,7 @@ struct boss_kelidan_the_breaker : public BossAI
         Talk(SAY_WAKE);
         _JustEngagedWith();
         me->InterruptNonMeleeSpells(false);
-        if (instance)
-        {
-            instance->SetData(DATA_KELIDAN, IN_PROGRESS);
-        }
+
         scheduler.Schedule(1s, [this](TaskContext context)
         {
             DoCastAOE(SPELL_SHADOW_BOLT_VOLLEY);
@@ -97,9 +90,7 @@ struct boss_kelidan_the_breaker : public BossAI
             me->AddAura(SPELL_BURNING_NOVA, me);
             ApplyImmunities(true);
             if (IsHeroic())
-            {
                 DoCastAOE(SPELL_VORTEX);
-            }
             scheduler.DelayGroup(0, 6s);
             scheduler.Schedule(5s, [this](TaskContext /*context*/)
             {
@@ -112,41 +103,29 @@ struct boss_kelidan_the_breaker : public BossAI
     void KilledUnit(Unit* /*victim*/) override
     {
         if (urand(0, 1))
-        {
             Talk(SAY_KILL);
-        }
     }
 
     void DoAction(int32 param) override
     {
         if (param == ACTION_CHANNELER_DIED)
         {
-            if (me->FindNearestCreature(NPC_SHADOWMOON_CHANNELER, 100.0f))
+            if (!me->FindNearestCreature(NPC_SHADOWMOON_CHANNELER, 100.0f))
             {
-                    return;
+                me->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
+                me->SetReactState(REACT_AGGRESSIVE);
+                me->SetInCombatWithZone();
             }
-            me->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
-            me->SetReactState(REACT_AGGRESSIVE);
-            me->SetInCombatWithZone();
         }
-
         else if (param == ACTION_CHANNELER_AGGRO)
-        {
             Talk(SAY_ADD_AGGRO);
-        }
     }
 
     void JustDied(Unit* /*killer*/) override
     {
         Talk(SAY_DIE);
         _JustDied();
-        if (instance)
-        {
-            me->GetMap()->LoadGrid(0, -111.0f);
-            instance->SetData(DATA_KELIDAN, DONE);
-            instance->HandleGameObject(instance->GetGuidData(DATA_DOOR1), true);
-            instance->HandleGameObject(instance->GetGuidData(DATA_DOOR6), true);
-        }
+        me->GetMap()->LoadGrid(0, -111.0f);
     }
 
     void ApplyImmunities(bool apply)

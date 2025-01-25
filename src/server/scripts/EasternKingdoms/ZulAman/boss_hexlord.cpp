@@ -135,7 +135,8 @@ enum Misc
     MAX_ADD_COUNT               = 4,
     ADDITIONAL_CLASS_SPRIEST    = 11,
     AURA_SHADOW_FORM            = 15473,
-    GROUP_CLASS_ABILITY         = 1
+    GROUP_CLASS_ABILITY         = 1,
+    GROUP_DRAIN_POWER           = 2
 };
 
 enum AbilityTarget
@@ -229,28 +230,46 @@ static PlayerAbilityStruct PlayerAbility[13][3] =
 
 struct boss_hexlord_malacrass : public BossAI
 {
-    boss_hexlord_malacrass(Creature* creature) : BossAI(creature, DATA_HEXLORD) { }
+    boss_hexlord_malacrass(Creature* creature) : BossAI(creature, DATA_HEXLORD)
+    {
+        scheduler.SetValidator([this]
+        {
+            return !me->HasUnitState(UNIT_STATE_CASTING);
+        });
+    }
 
     void Reset() override
     {
         BossAI::Reset();
         _currentClass = CLASS_NONE;
         _classAbilityTimer = 10000ms;
+        _timeUntilNextDrainPower = 0ms;
         SpawnAdds();
         ScheduleHealthCheckEvent(80, [&] {
-            ScheduleTimedEvent(0s, [&] {
+            scheduler.Schedule(1s, GROUP_DRAIN_POWER, [this](TaskContext context)
+            {
                 DoCastSelf(SPELL_DRAIN_POWER, true);
                 Talk(SAY_DRAIN_POWER);
-            }, 30s, 30s);
+                context.Repeat(30s);
+            });
         });
     }
 
     void SpawnAdds()
     {
-        for (uint8 i = 0; i < MAX_ADD_COUNT; ++i)
+        if (_creatureIndex.empty())
         {
-            uint8 flip = urand(0, 1);
-            me->SummonCreature(AddEntrySets[i][flip], AddPosition[i], TEMPSUMMON_DEAD_DESPAWN, 0);
+            for (uint8 i = 0; i < MAX_ADD_COUNT; ++i)
+            {
+                uint8 flip = urand(0, 1);
+                me->SummonCreature(AddEntrySets[i][flip], AddPosition[i], TEMPSUMMON_DEAD_DESPAWN, 0);
+                _creatureIndex.push_back(flip);
+            }
+        }
+        else
+        {
+            for (uint8 i = 0; i < MAX_ADD_COUNT; ++i)
+                me->SummonCreature(AddEntrySets[i][_creatureIndex[i]], AddPosition[i], TEMPSUMMON_DEAD_DESPAWN, 0);
         }
     }
 
@@ -267,6 +286,14 @@ struct boss_hexlord_malacrass : public BossAI
         ScheduleTimedEvent(30s, [&]{
             scheduler.CancelGroup(GROUP_CLASS_ABILITY);
             DoCastSelf(SPELL_SPIRIT_BOLTS);
+            // Delay Drain Power if it's currently within 10s of being cast
+            // TODO: see what is wrong with GetNextGroupOccurrence as the timers don't seem correct on resets
+            _timeUntilNextDrainPower = scheduler.GetNextGroupOccurrence(GROUP_DRAIN_POWER);
+            if (_timeUntilNextDrainPower > 0s && _timeUntilNextDrainPower < 10s)
+            {
+                std::chrono::milliseconds delayTime = 10s - _timeUntilNextDrainPower + 1s;
+                scheduler.DelayGroup(GROUP_DRAIN_POWER, delayTime);
+            }
             scheduler.Schedule(10s, [this](TaskContext)
             {
                 if (Creature* siphonTrigger = me->SummonCreature(NPC_TEMP_TRIGGER, me->GetPosition(), TEMPSUMMON_TIMED_DESPAWN, 30000))
@@ -339,6 +366,8 @@ struct boss_hexlord_malacrass : public BossAI
 private:
     uint8 _currentClass;
     std::chrono::milliseconds _classAbilityTimer;
+    std::chrono::milliseconds _timeUntilNextDrainPower;
+    std::vector<uint8> _creatureIndex;
 };
 
 struct boss_alyson_antille : public ScriptedAI

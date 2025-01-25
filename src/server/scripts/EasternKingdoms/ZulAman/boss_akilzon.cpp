@@ -98,7 +98,7 @@ struct boss_akilzon : public BossAI
         });
 
         ScheduleTimedEvent(20s, 30s, [&] {
-            if (scheduler.GetNextGroupOcurrence(GROUP_ELECTRICAL_STORM) > 5s)
+            if (scheduler.GetNextGroupOccurrence(GROUP_ELECTRICAL_STORM) > 5s)
                 DoCastRandomTarget(SPELL_GUST_OF_WIND, 1);
         }, 20s, 30s);
 
@@ -114,8 +114,12 @@ struct boss_akilzon : public BossAI
                 EnterEvadeMode();
                 return;
             }
-            target->CastSpell(target, SPELL_ELECTRICAL_STORM_AREA, true); // cloud visual
+
             DoCast(target, SPELL_ELECTRICAL_STORM); // storm cyclon + visual
+            target->CastSpell(target, SPELL_ELECTRICAL_STORM_AREA, true); // cloud visual
+
+            if (DynamicObject* dynObj = target->GetDynObject(SPELL_ELECTRICAL_STORM_AREA))
+                dynObj->SetDuration(8500);
 
             float x, y, z;
             target->GetPosition(x, y, z);
@@ -328,6 +332,11 @@ class spell_electrical_storm_proc : public SpellScript
 {
     PrepareSpellScript(spell_electrical_storm_proc);
 
+    void FilterTargets(std::list<WorldObject*>& targets)
+    {
+        targets.remove_if(Acore::UnitAuraCheck(true, SPELL_ELECTRICAL_STORM_AREA));
+    }
+
     void HandleDamageCalc(SpellEffIndex /*effIndex*/)
     {
         if (Aura* aura = GetCaster()->GetAura(SPELL_ELECTRICAL_STORM))
@@ -339,6 +348,7 @@ class spell_electrical_storm_proc : public SpellScript
 
     void Register() override
     {
+        OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_electrical_storm_proc::FilterTargets, EFFECT_0, TARGET_UNIT_SRC_AREA_ALLY);
         OnEffectHitTarget += SpellEffectFn(spell_electrical_storm_proc::HandleDamageCalc, EFFECT_0, SPELL_EFFECT_SCHOOL_DAMAGE);
     }
 };
