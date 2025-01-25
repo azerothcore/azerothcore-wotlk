@@ -164,7 +164,6 @@ uint32 AuctionHouseBot::getNofAuctions(AHBConfig* config, AuctionHouseObject* au
         if (guid == Aentry->owner)
         {
             count++;
-            break;
         }
     }
 

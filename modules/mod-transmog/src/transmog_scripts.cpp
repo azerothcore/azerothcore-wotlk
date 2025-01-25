@@ -443,7 +443,7 @@ void PerformTransmogrification (Player* player, uint32 itemEntry, uint32 cost)
     }
     TransmogAcoreStrings res = sT->Transmogrify(player, itemEntry, slot);
     if (res == LANG_ERR_TRANSMOG_OK)
-        session->SendAreaTriggerMessage("%s",GTS(LANG_ERR_TRANSMOG_OK));
+        session->SendAreaTriggerMessage("{}",GTS(LANG_ERR_TRANSMOG_OK));
     else
         ChatHandler(session).SendNotification(res);
 }
@@ -457,7 +457,7 @@ void RemoveTransmogrification (Player* player)
         if (sT->GetFakeEntry(newItem->GetGUID()))
         {
             sT->DeleteFakeEntry(player, slot, newItem);
-            session->SendAreaTriggerMessage("%s", GTS(LANG_ERR_UNTRANSMOG_OK));
+            session->SendAreaTriggerMessage("{}", GTS(LANG_ERR_UNTRANSMOG_OK));
         }
         else
             ChatHandler(session).SendNotification(LANG_ERR_UNTRANSMOG_NO_TRANSMOGS);
@@ -485,7 +485,7 @@ public:
                 }
             }
 
-            return sTransmogrification->IsEnabled() && (target && !target->GetPlayerSetting("mod-transmog", SETTING_HIDE_TRANSMOG).value);
+            return sTransmogrification->IsEnabled() && (target && !target->GetPlayerSetting("mod-transmog", SETTING_HIDE_TRANSMOG).IsEnabled());
         }
     };
 
@@ -538,13 +538,18 @@ public:
         switch (sender)
         {
             case EQUIPMENT_SLOT_END: // Show items you can use
+            {
                 sT->selectionCache[player->GetGUID()] = action;
 
-                if (sT->GetUseVendorInterface())
+                bool useVendorInterface = player->GetPlayerSetting("mod-transmog", SETTING_VENDOR_INTERFACE).IsEnabled();
+
+                if (sT->GetUseVendorInterface() || useVendorInterface)
                     ShowTransmogItemsInFakeVendor(player, creature, action);
                 else
                     ShowTransmogItemsInGossipMenu(player, creature, action, sender);
+
                 break;
+            }
             case EQUIPMENT_SLOT_END + 1: // Main menu
                 OnGossipHello(player, creature);
                 break;
@@ -564,7 +569,7 @@ public:
                 }
                 if (removed)
                 {
-                    session->SendAreaTriggerMessage("%s", GTS(LANG_ERR_UNTRANSMOG_OK));
+                    session->SendAreaTriggerMessage("{}", GTS(LANG_ERR_UNTRANSMOG_OK));
                     CharacterDatabase.CommitTransaction(trans);
                 }
                 else
@@ -1156,9 +1161,7 @@ public:
                 accountId = player->GetSession()->GetAccountId();
 
             QueryResult resultAcc = LoginDatabase.Query("SELECT `membership_level`  FROM `acore_cms_subscriptions` WHERE `account_name` COLLATE utf8mb4_general_ci = (SELECT `username` FROM `account` WHERE `id` = {})", accountId);
-
-            if (resultAcc)
-                player->UpdatePlayerSetting("acore_cms_subscriptions", SETTING_TRANSMOG_MEMBERSHIP_LEVEL, (*resultAcc)[0].Get<uint32>());
+            player->UpdatePlayerSetting("acore_cms_subscriptions", SETTING_TRANSMOG_MEMBERSHIP_LEVEL, resultAcc ? (*resultAcc)[0].Get<uint32>() : 0);
         }
 
 #ifdef PRESETS

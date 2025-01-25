@@ -29,6 +29,7 @@ enum TransmogSettings
 {
     SETTING_HIDE_TRANSMOG             = 0,
     SETTING_RETROACTIVE_CHECK         = 1,
+    SETTING_VENDOR_INTERFACE          = 2,
 
     // Subscriptions
     SETTING_TRANSMOG_MEMBERSHIP_LEVEL = 0
@@ -64,6 +65,8 @@ enum TransmogAcoreStrings // Language.h might have same entries, appears when ex
     LANG_CMD_TRANSMOG_ADD_FORBIDDEN = 11114,
     LANG_CMD_TRANSMOG_BEGIN_SYNC = 11115,
     LANG_CMD_TRANSMOG_COMPLETE_SYNC = 11116,
+    LANG_CMD_TRANSMOG_VENDOR_INTERFACE_ENABLE = 11117,
+    LANG_CMD_TRANSMOG_VENDOR_INTERFACE_DISABLE = 11118
 };
 
 enum ArmorClassSpellIDs

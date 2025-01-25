@@ -40,10 +40,11 @@ public:
 
         static ChatCommandTable transmogTable =
         {
-            { "add",      addCollectionTable                                        },
-            { "",         HandleDisableTransMogVisual,   SEC_PLAYER,    Console::No },
-            { "sync",     HandleSyncTransMogCommand,     SEC_PLAYER,    Console::No },
-            { "portable", HandleTransmogPortableCommand, SEC_PLAYER,    Console::No },
+            { "add",       addCollectionTable                                        },
+            { "",          HandleDisableTransMogVisual,   SEC_PLAYER,    Console::No },
+            { "sync",      HandleSyncTransMogCommand,     SEC_PLAYER,    Console::No },
+            { "portable",  HandleTransmogPortableCommand, SEC_PLAYER,    Console::No },
+            { "interface", HandleInterfaceOption,         SEC_PLAYER,    Console::No }
         };
 
         static ChatCommandTable commandTable =
@@ -99,27 +100,19 @@ public:
         }
 
         if (!player)
-        {
             player = PlayerIdentifier::FromTargetOrSelf(handler);
-        }
 
         if (!player)
-        {
             return false;
-        }
 
         Player* target = player->GetConnectedPlayer();
         bool isNotConsole = handler->GetSession();
         bool suitableForTransmog;
 
         if (target)
-        {
             suitableForTransmog = sTransmogrification->SuitableForTransmogrification(target, itemTemplate);
-        }
         else
-        {
             suitableForTransmog = sTransmogrification->SuitableForTransmogrification(player->GetGUID(), itemTemplate);
-        }
 
         if (!sTransmogrification->GetTrackUnusableItems() && !suitableForTransmog)
         {
@@ -192,14 +185,10 @@ public:
         }
 
         if (!player)
-        {
             player = PlayerIdentifier::FromTargetOrSelf(handler);
-        }
 
         if (!player)
-        {
             return false;
-        }
 
         Player* target = player->GetConnectedPlayer();
         ItemSetEntry const* set = sItemSetStore.LookupEntry(uint32(itemSetId));
@@ -277,16 +266,12 @@ public:
 
             // Successful command execution
             if (target != handler->GetPlayer())
-            {
                 handler->PSendSysMessage("ItemSet |cffffffff|Hitemset:{}|h[{} {}]|h|r has been added to the appearance collection of Player {}.", uint32(itemSetId), setName.c_str(), localeNames[locale], nameLink);
-            }
         }
 
         // Notify target of new item in appearance collection
         if (target && !(target->GetPlayerSetting("mod-transmog", SETTING_HIDE_TRANSMOG).value))
-        {
             ChatHandler(target->GetSession()).PSendSysMessage("ItemSet |cffffffff|Hitemset:%d|h[{} {}]|h|r has been added to your appearance collection.", uint32(itemSetId), setName.c_str(), localeNames[locale]);
-        }
 
         return true;
     }
@@ -318,6 +303,13 @@ public:
 
         return true;
     };
+
+    static bool HandleInterfaceOption(ChatHandler* handler, bool enable)
+    {
+        handler->GetPlayer()->UpdatePlayerSetting("mod-transmog", SETTING_VENDOR_INTERFACE, enable);
+        handler->SendSysMessage(enable ? LANG_CMD_TRANSMOG_VENDOR_INTERFACE_ENABLE : LANG_CMD_TRANSMOG_VENDOR_INTERFACE_DISABLE);
+        return true;
+    }
 };
 
 void AddSC_transmog_commandscript()

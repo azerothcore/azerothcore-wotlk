@@ -45,7 +45,7 @@ ServerAutoShutdown.PreAnnounce.Seconds = 3600
 #        Default:     "[SERVER]: Automated (quick) server restart in %s"
 #
 
-ServerAutoShutdown.PreAnnounce.Message = "[SERVER]: Automated (quick) server restart in %s"
+ServerAutoShutdown.PreAnnounce.Message = "[SERVER]: Automated (quick) server restart in {}"
 
 #
 #    ServerAutoShutdown.StartEvents
