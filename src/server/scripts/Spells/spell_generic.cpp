@@ -5427,6 +5427,7 @@ class spell_gen_call_of_the_beast : public SpellScript
                 {
                     if (creature->GetCreatureType() == CREATURE_TYPE_BEAST &&
                         !creature->IsPet() &&
+                        !creature->IsPlayer() &&
                         creature->IsAIEnabled)
                     {
                         creature->AI()->AttackStart(target);
