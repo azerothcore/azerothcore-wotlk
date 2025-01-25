@@ -173,7 +173,6 @@ struct boss_vexallus : public BossAI
             me->RemoveUnitFlag(UNIT_FLAG_STUNNED); // This currently is a hack; SPELL_OVERLOAD applies UNIT_FLAG_STUNNED when it shouldn't
         }
 
-        float currentPct = me->GetHealthPct();
         if (currentPct <= 85.0f && !_thresholdsPassed[0]) { _energyQueue++; _thresholdsPassed[0] = true; }
         if (currentPct <= 70.0f && !_thresholdsPassed[1]) { _energyQueue++; _thresholdsPassed[1] = true; }
         if (currentPct <= 55.0f && !_thresholdsPassed[2]) { _energyQueue++; _thresholdsPassed[2] = true; }
