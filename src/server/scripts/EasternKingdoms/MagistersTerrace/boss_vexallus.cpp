@@ -90,6 +90,7 @@ struct boss_vexallus : public BossAI
         _Reset();
         _energyCooldown = false;
         _energyQueue = 0;
+        _energyPotential = 5;
         std::fill(_thresholdsPassed.begin(), _thresholdsPassed.end(), false);
 
         scheduler.Schedule(1s, [this](TaskContext context)
@@ -108,10 +109,15 @@ struct boss_vexallus : public BossAI
                     DoCastSelf(SPELL_SUMMON_PURE_ENERGY_N);
 
                 _energyQueue--;
+                _energyPotential--;
                 _energyCooldown = true;
                 scheduler.Schedule(5s, [this](TaskContext)
                 {
                     _energyCooldown = false;
+                    if (_energyCooldown = 0)
+                    {
+                        _overloaded = true;
+                    }
                 });
             }
 
@@ -168,7 +174,6 @@ struct boss_vexallus : public BossAI
         if (currentPct <= 20.0f && !_overloaded)
         {   
             DoCastSelf(SPELL_OVERLOAD, true);
-            _overloaded = true;
             me->RemoveUnitFlag(UNIT_FLAG_STUNNED); // This currently is a hack; SPELL_OVERLOAD applies UNIT_FLAG_STUNNED when it shouldn't
         }
 
@@ -186,6 +191,7 @@ struct boss_vexallus : public BossAI
 private:
     bool _energyCooldown;
     uint8 _energyQueue;
+    uint8 _energyPotential;
     std::array<bool, 5> _thresholdsPassed{};
 };
 
