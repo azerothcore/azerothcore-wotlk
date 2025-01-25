@@ -5419,7 +5419,7 @@ class spell_gen_call_of_the_beast : public SpellScript
     {
         if (Unit* caster = GetCaster())
         {
-            if (Unit* target = GetHitUnit())
+            if (Unit* target = GetExplTargetUnit())
             {
                 std::list<Creature*> creatureList;
                 caster->GetCreatureListWithEntryInGrid(creatureList, 0, 100.0f);
