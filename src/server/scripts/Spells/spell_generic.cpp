@@ -5410,6 +5410,10 @@ class spell_gen_call_of_the_beast : public SpellScript
 {
     PrepareSpellScript(spell_gen_call_of_the_beast);
 
+private:
+    std::list<Creature*> m_creatureList;
+
+public:
     bool Validate(SpellInfo const* /*spellInfo*/) override
     {
         return ValidateSpellInfo({ SPELL_CALL_OF_THE_BEAST });
@@ -5417,15 +5421,10 @@ class spell_gen_call_of_the_beast : public SpellScript
 
     void HandleRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
     {
-        if (Unit* target = GetTarget())
+        for (Creature* creature : m_creatureList)
         {
-            std::list<Creature*> creatureList;
-            target->GetCreatureListWithEntryInGrid(creatureList, 0, 100.0f);
-            for (Creature* creature : creatureList)
-            {
-                creature->ApplySpellImmune(0, IMMUNITY_STATE, SPELL_AURA_MOD_TAUNT, false);
-                creature->ApplySpellImmune(0, IMMUNITY_EFFECT, SPELL_EFFECT_ATTACK_ME, false);
-            }
+            creature->ApplySpellImmune(0, IMMUNITY_STATE, SPELL_AURA_MOD_TAUNT, false);
+            creature->ApplySpellImmune(0, IMMUNITY_EFFECT, SPELL_EFFECT_ATTACK_ME, false);
         }
     }
 
@@ -5435,9 +5434,8 @@ class spell_gen_call_of_the_beast : public SpellScript
         {
             if (Unit* target = GetExplTargetUnit())
             {
-                std::list<Creature*> creatureList;
-                caster->GetCreatureListWithEntryInGrid(creatureList, 0, 100.0f);
-                for (Creature* creature : creatureList)
+                caster->GetCreatureListWithEntryInGrid(m_creatureList, 0, 100.0f);
+                for (Creature* creature : m_creatureList)
                 {
                     if (creature->GetCreatureType() == CREATURE_TYPE_BEAST &&
                         !creature->IsPet() &&
@@ -5447,7 +5445,7 @@ class spell_gen_call_of_the_beast : public SpellScript
                         creature->ApplySpellImmune(0, IMMUNITY_STATE, SPELL_AURA_MOD_TAUNT, true);
                         creature->ApplySpellImmune(0, IMMUNITY_EFFECT, SPELL_EFFECT_ATTACK_ME, true);
                         creature->SetInCombatWith(target);
-                        creature->AddThreat(target, 100.0f); // Need something that makes it more focused.. Don't want players to be able to pull off
+                        creature->AddThreat(target, 100.0f);
                         creature->AI()->AttackStart(target);
                     }
                 }
