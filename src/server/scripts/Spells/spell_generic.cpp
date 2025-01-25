@@ -5415,6 +5415,20 @@ class spell_gen_call_of_the_beast : public SpellScript
         return ValidateSpellInfo({ SPELL_CALL_OF_THE_BEAST });
     }
 
+    void HandleRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
+    {
+        if (Unit* target = GetTarget())
+        {
+            std::list<Creature*> creatureList;
+            target->GetCreatureListWithEntryInGrid(creatureList, 0, 100.0f);
+            for (Creature* creature : creatureList)
+            {
+                creature->ApplySpellImmune(0, IMMUNITY_STATE, SPELL_AURA_MOD_TAUNT, false);
+                creature->ApplySpellImmune(0, IMMUNITY_EFFECT, SPELL_EFFECT_ATTACK_ME, false);
+            }
+        }
+    }
+
     void HandleScript(SpellEffIndex /*effIndex*/)
     {
         if (Unit* caster = GetCaster())
@@ -5431,6 +5445,10 @@ class spell_gen_call_of_the_beast : public SpellScript
                         !creature->IsDungeonBoss() &&
                         creature->IsAIEnabled)
                     {
+                        creature->ApplySpellImmune(0, IMMUNITY_STATE, SPELL_AURA_MOD_TAUNT, true);
+                        creature->ApplySpellImmune(0, IMMUNITY_EFFECT, SPELL_EFFECT_ATTACK_ME, true);
+                        creature->SetInCombatWith(target);
+                        creature->AddThreat(target, 100.0f); // Need something that makes it more focused.. Don't want players to be able to pull off
                         creature->AI()->AttackStart(target);
                     }
                 }
@@ -5441,6 +5459,7 @@ class spell_gen_call_of_the_beast : public SpellScript
     void Register() override
     {
         OnEffectHitTarget += SpellEffectFn(spell_gen_call_of_the_beast::HandleScript, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
+        AfterEffectRemove += AuraEffectRemoveFn(spell_gen_call_of_the_beast::HandleRemove);
     }
 };
 
