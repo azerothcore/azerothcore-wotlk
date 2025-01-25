@@ -2884,27 +2884,27 @@ void World::UpdateRealmCharCount(uint32 accountId)
 {
     CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_CHARACTER_COUNT);
     stmt->SetData(0, accountId);
-    _queryProcessor.AddCallback(CharacterDatabase.AsyncQuery(stmt).WithPreparedCallback(std::bind(&World::_UpdateRealmCharCount, this, std::placeholders::_1)));
+    _queryProcessor.AddCallback(CharacterDatabase.AsyncQuery(stmt).WithPreparedCallback(std::bind(&World::_UpdateRealmCharCount, this, std::placeholders::_1,accountId)));
 }
 
-void World::_UpdateRealmCharCount(PreparedQueryResult resultCharCount)
+void World::_UpdateRealmCharCount(PreparedQueryResult resultCharCount,uint32 accountId)
 {
+    uint8 charCount{0};
     if (resultCharCount)
     {
         Field* fields = resultCharCount->Fetch();
-        uint32 accountId = fields[0].Get<uint32>();
-        uint8 charCount = uint8(fields[1].Get<uint64>());
-
-        LoginDatabaseTransaction trans = LoginDatabase.BeginTransaction();
-
-        LoginDatabasePreparedStatement* stmt = LoginDatabase.GetPreparedStatement(LOGIN_REP_REALM_CHARACTERS);
-        stmt->SetData(0, charCount);
-        stmt->SetData(1, accountId);
-        stmt->SetData(2, realm.Id.Realm);
-        trans->Append(stmt);
-
-        LoginDatabase.CommitTransaction(trans);
+        charCount = uint8(fields[1].Get<uint64>());
     }
+
+    LoginDatabaseTransaction trans = LoginDatabase.BeginTransaction();
+
+    LoginDatabasePreparedStatement* stmt = LoginDatabase.GetPreparedStatement(LOGIN_REP_REALM_CHARACTERS);
+    stmt->SetData(0, charCount);
+    stmt->SetData(1, accountId);
+    stmt->SetData(2, realm.Id.Realm);
+    trans->Append(stmt);
+
+    LoginDatabase.CommitTransaction(trans);
 }
 
 void World::InitWeeklyQuestResetTime()

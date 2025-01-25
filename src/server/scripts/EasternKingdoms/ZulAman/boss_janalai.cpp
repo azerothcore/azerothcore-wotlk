@@ -401,7 +401,7 @@ struct npc_janalai_hatcher : public ScriptedAI
                 ++_repeatCount;
 
                 if (me->FindNearestCreature(NPC_EGG, 100.0f))
-                    context.Repeat(4s);
+                    context.Repeat(5s);
                 else
                 {
                     if (WorldObject* summoner = GetSummoner())
@@ -464,7 +464,7 @@ class spell_summon_all_players_dummy: public SpellScript
         Position pos = GetCaster()->GetPosition();
         targets.remove_if([&, pos](WorldObject* target) -> bool
         {
-            return target->IsWithinBox(pos, 18.0f, 18.0f, 18.0f);
+            return target->IsWithinBox(pos, 22.0f, 28.0f, 28.0f);
         });
     }
 
