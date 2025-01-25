@@ -90,7 +90,7 @@ struct boss_vexallus : public BossAI
         _Reset();
         _energyCooldown = false;
         _energyQueue = 0;
-        _energyPotential = 5;
+        _energyPotential = 4;
         std::fill(_thresholdsPassed.begin(), _thresholdsPassed.end(), false);
 
         scheduler.Schedule(1s, [this](TaskContext context)
