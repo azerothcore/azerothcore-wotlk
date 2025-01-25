@@ -5423,11 +5423,10 @@ class spell_gen_call_of_the_beast : public SpellScript
             {
                 std::list<Creature*> creatureList;
                 caster->GetCreatureListWithEntryInGrid(creatureList, 0, 100.0f);
-                
                 for (Creature* creature : creatureList)
                 {
-                    if (creature->GetCreatureType() == CREATURE_TYPE_BEAST && 
-                        !creature->IsPet() && 
+                    if (creature->GetCreatureType() == CREATURE_TYPE_BEAST &&
+                        !creature->IsPet() &&
                         creature->IsAIEnabled)
                     {
                         creature->AI()->AttackStart(target);
