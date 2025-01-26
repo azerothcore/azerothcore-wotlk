@@ -1,3 +1,4 @@
+-- DB update 2025_01_26_00 -> 2025_01_26_01
 
 -- Dragonflayer Vrykul
 UPDATE `creature_template` SET `AIName` = 'SmartAI' WHERE `entry` = 23652;
