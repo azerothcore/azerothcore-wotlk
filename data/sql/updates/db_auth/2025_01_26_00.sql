@@ -1,3 +1,4 @@
+-- DB update 2024_12_15_00 -> 2025_01_26_00
 DROP TABLE IF EXISTS `autobroadcast_locale`;
 CREATE TABLE `autobroadcast_locale` (
   `realmid` INT NOT NULL,
