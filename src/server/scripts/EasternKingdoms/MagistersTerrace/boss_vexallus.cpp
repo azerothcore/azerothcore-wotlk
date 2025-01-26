@@ -47,7 +47,7 @@ enum Misc
 
 struct npc_pure_energy : public ScriptedAI
 {
-    npc_pure_energy(Creature* creature) : ScriptedAI(creature) {}
+    npc_pure_energy(Creature* creature) : ScriptedAI(creature) { }
 
     void IsSummonedBy(WorldObject* summoner) override
     {
@@ -165,11 +165,10 @@ struct boss_vexallus : public BossAI
         if (!UpdateVictim())
             return;
 
-        if (!_overloaded && currentPct <= 20.0f && _pureEnergy == 0)
+        if (!_overloaded && HealthBelowPct(20) && _pureEnergy == 0)
         {   
             DoCastSelf(SPELL_OVERLOAD, true);
             _overloaded = true;
-            me->RemoveUnitFlag(UNIT_FLAG_STUNNED); // This currently is a hack; SPELL_OVERLOAD applies UNIT_FLAG_STUNNED when it shouldn't
         }
 
         if (HealthBelowPct(85) && !_thresholdsPassed[0]) { _energyQueue++; _thresholdsPassed[0] = true; }
@@ -190,8 +189,37 @@ private:
     std::array<bool, 5> _thresholdsPassed{};
 };
 
+// Spell Script for Overload
+class spell_vexallus_overload : public SpellScriptLoader
+{
+public:
+    spell_vexallus_overload() : SpellScriptLoader("spell_vexallus_overload") { }
+
+    class spell_vexallus_overload_AuraScript : public AuraScript
+    {
+        PrepareAuraScript(spell_vexallus_overload_AuraScript);
+
+        void OnApply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
+        {
+            if (Unit* target = GetTarget())
+                target->RemoveUnitFlag(UNIT_FLAG_STUNNED);
+        }
+
+        void Register() override
+        {
+            AfterEffectApply += AuraEffectApplyFn(spell_vexallus_overload_AuraScript::OnApply, EFFECT_0, SPELL_AURA_MOD_DAMAGE_PERCENT_TAKEN, AURA_EFFECT_HANDLE_REAL);
+        }
+    };
+
+    AuraScript* GetAuraScript() const override
+    {
+        return new spell_vexallus_overload_AuraScript();
+    }
+};
+
 void AddSC_boss_vexallus()
 {
     RegisterMagistersTerraceCreatureAI(npc_pure_energy);
     RegisterMagistersTerraceCreatureAI(boss_vexallus);
+    new spell_vexallus_overload();
 }
