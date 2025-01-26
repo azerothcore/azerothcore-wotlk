@@ -85,7 +85,7 @@ struct boss_vexallus : public BossAI
     static constexpr Seconds ABILITY_TIMER = 8s;      // Basic ability cooldown
     static constexpr uint8_t INITIAL_PURE_ENERGY = 5; // Starting energy count
 
-    explicit boss_vexallus(Creature* creature) 
+    explicit boss_vexallus(Creature* creature)
         : BossAI(creature, DATA_VEXALLUS)
         , _energyCooldown(false)
         , _overloaded(false)
@@ -127,7 +127,6 @@ struct boss_vexallus : public BossAI
     {
         _JustEngagedWith();
         Talk(SAY_AGGRO);
-        
         ScheduleCombatAbilities();
     }
 
@@ -175,7 +174,6 @@ private:
 
             _energyQueue--;
             _pureEnergy--;
-            
             SetEnergyCooldown();
         }
     }
