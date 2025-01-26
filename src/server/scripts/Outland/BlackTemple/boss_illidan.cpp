@@ -234,6 +234,7 @@ struct boss_illidan_stormrage : public BossAI
             // Maiev Spawn Scene
             if (!_maievSpawned)
             {
+                _maievSpawned = true;
                 scheduler.CancelAll();
                 if (me->HasAura(SPELL_DEMON_FORM))
                     DoAction(ACTION_ILLIDAN_DEMON_TRANSFORM_BACK);
