@@ -136,7 +136,6 @@ struct boss_vexallus : public BossAI
     {
         if (!UpdateVictim())
             return;
-        
         DoMeleeAttackIfReady();
         CheckOverload();
         CheckHealthThresholds();
