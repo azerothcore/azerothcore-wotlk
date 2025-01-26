@@ -115,7 +115,7 @@ enum Misc
     ACTION_SHADOW_PRISON                = 4,
     ACTION_ILLIDAN_DIE                  = 5,
     ACTION_ILLIDAN_DEMON_TRANSFORM      = 6,
-    ACTION_ILLIDAN_DEMON_TRANSFORM_BACK = 7,
+     = 7,
 
     // Akama
     ACTION_ILLIDARI_COUNCIL_DONE        = 0,
@@ -207,6 +207,7 @@ struct boss_illidan_stormrage : public BossAI
         _canTalk = true;
         _dying = false;
         _inCutscene = false;
+        _maievSpawned = false;
         beamPosId = urand(0, MAX_EYE_BEAM_POS);
         me->ReplaceAllUnitFlags(UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
         me->SetDisableGravity(false);
@@ -231,11 +232,14 @@ struct boss_illidan_stormrage : public BossAI
         });
         ScheduleHealthCheckEvent(30, [&] {
             // Maiev Spawn Scene
-            scheduler.CancelAll();
-            if (me->HasAura(SPELL_DEMON_FORM))
-                DoAction(ACTION_ILLIDAN_DEMON_TRANSFORM_BACK);
-            me->m_Events.CancelEventGroup(GROUP_DEMON_FORM);
-            DoAction(ACTION_SHADOW_PRISON);
+            if (!_maievSpawned)
+            {
+                scheduler.CancelAll();
+                if (me->HasAura(SPELL_DEMON_FORM))
+                    DoAction(ACTION_ILLIDAN_DEMON_TRANSFORM_BACK);
+                me->m_Events.CancelEventGroup(GROUP_DEMON_FORM);
+                DoAction(ACTION_SHADOW_PRISON);
+            }
         });
     }
 
@@ -692,6 +696,7 @@ private:
     bool _canTalk;
     bool _dying;
     bool _inCutscene;
+    bool _maievSpawned;
     uint8 beamPosId;
 
     void CycleBeamPos(uint8 &beamPosId)
