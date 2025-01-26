@@ -2028,6 +2028,7 @@ void World::SetInitialWorldSettings()
     ///- Load AutoBroadCast
     LOG_INFO("server.loading", "Loading Autobroadcasts...");
     sAutobroadcastMgr->LoadAutobroadcasts();
+    sAutobroadcastMgr->LoadAutobroadcastsLocalized();
 
     ///- Load Motd
     LOG_INFO("server.loading", "Loading Motd...");
