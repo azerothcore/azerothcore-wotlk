@@ -1,3 +1,4 @@
+-- DB update 2025_01_26_01 -> 2025_01_26_02
 --
 -- Updates the Action from "Action Invoker" (7) to "Self" (1).
 UPDATE `smart_scripts` SET `target_type` = 1 WHERE `entryorguid` = 9456 AND `source_type` = 0 AND `id` = 1;
