@@ -115,7 +115,7 @@ struct boss_vexallus : public BossAI
                     _energyCooldown = false;
                 });
             }
-            else if (_overloaded && HealthBelowPct(20) && _pureEnergy == 0)
+            else if (!_overloaded && HealthBelowPct(20) && _pureEnergy == 0)
             {
                 Talk(SAY_OVERLOAD);
                 DoCastSelf(SPELL_OVERLOAD, true);
