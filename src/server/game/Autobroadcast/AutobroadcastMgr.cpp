@@ -42,7 +42,6 @@ void AutobroadcastMgr::LoadAutobroadcasts()
     if (!result)
     {
         LOG_WARN("autobroadcast", ">> Loaded 0 autobroadcasts definitions. DB table `autobroadcast` is empty for this realm!");
-        LOG_INFO("autobroadcast", " ");
         return;
     }
 
@@ -65,7 +64,6 @@ void AutobroadcastMgr::LoadAutobroadcasts()
     } while (result->NextRow());
 
     LOG_INFO("server.loading", ">> Loaded {} Autobroadcast Definitions in {} ms", _autobroadcasts.size(), GetMSTimeDiffToNow(oldMSTime));
-    LOG_INFO("server.loading", " ");
 }
 
 void AutobroadcastMgr::LoadAutobroadcastsLocalized()
@@ -83,6 +81,7 @@ void AutobroadcastMgr::LoadAutobroadcastsLocalized()
     if (!result)
     {
         LOG_WARN("server.loading", ">> Loaded 0 localized autobroadcasts definitions. DB table `autobroadcast_localized` is empty for this realm!");
+        LOG_INFO("server.loading", " ");
         return;
     }
 
@@ -102,6 +101,7 @@ void AutobroadcastMgr::LoadAutobroadcastsLocalized()
     } while (result->NextRow());
 
     LOG_INFO("server.loading", ">> Loaded {} Localized Autobroadcast Definitions in {} ms", count, GetMSTimeDiffToNow(oldMSTime));
+    LOG_INFO("server.loading", " ");
 }
 
 void AutobroadcastMgr::SendAutobroadcasts()
