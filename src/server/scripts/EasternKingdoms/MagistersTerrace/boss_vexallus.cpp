@@ -205,7 +205,7 @@ private:
     // Check for final phase transition
     void CheckOverload()
     {
-        if (!_overloaded && _pureEnergy == 0 && HealthBelowPct(20))
+        if (!_overloaded && _pureEnergy == 0 && !_energyCooldown && HealthBelowPct(20))
         {
             DoCastSelf(SPELL_OVERLOAD, true);
             _overloaded = true;
