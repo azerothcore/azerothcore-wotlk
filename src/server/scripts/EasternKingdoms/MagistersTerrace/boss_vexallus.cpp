@@ -68,6 +68,12 @@ struct npc_pure_energy : public ScriptedAI
         if (!attacker || !attacker->IsPlayer() || !attacker->GetVictim() || attacker->GetVictim() != me)
             damage = 0;
     }
+    
+    void JustDied(Unit* killer) override
+    {
+        if (killer)
+            killer->CastSpell(killer, SPELL_ENERGY_FEEDBACK, true, 0, 0, me->GetGUID());
+    }
 };
 
 struct boss_vexallus : public BossAI
@@ -126,9 +132,10 @@ struct boss_vexallus : public BossAI
             Talk(SAY_KILL);
     }
 
-    void JustEngagedWith(Unit* /*who*/) override
+    void JustEngagedWith(Unit* victim) override
     {
         _JustEngagedWith();
+        AttackStart(victim);
         Talk(SAY_AGGRO);
         ScheduleTimedEvent(8s, [&]
         {
@@ -139,24 +146,6 @@ struct boss_vexallus : public BossAI
         {
             DoCastRandomTarget(SPELL_ARCANE_SHOCK);
         }, 8s, 8s);
-    }
-
-    void JustSummoned(Creature* summon) override
-    {
-        if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0))
-        {
-            summon->GetMotionMaster()->MoveFollow(target, 0.0f, 0.0f);
-            summon->CastSpell(target, SPELL_ENERGY_FEEDBACK_CHANNEL);
-        }
-        summons.Summon(summon);
-    }
-
-    void SummonedCreatureDies(Creature* summon, Unit* killer) override
-    {
-        summons.Despawn(summon);
-        summon->DespawnOrUnsummon(1);
-        if (killer)
-            killer->CastSpell(killer, SPELL_ENERGY_FEEDBACK, true, 0, 0, summon->GetGUID());
     }
 
     void UpdateAI(uint32 diff) override
