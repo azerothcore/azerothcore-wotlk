@@ -68,7 +68,6 @@ struct npc_pure_energy : public ScriptedAI
         if (!attacker || !attacker->IsPlayer() || !attacker->GetVictim() || attacker->GetVictim() != me)
             damage = 0;
     }
-    
     void JustDied(Unit* killer) override
     {
         if (killer)
