@@ -115,7 +115,7 @@ enum Misc
     ACTION_SHADOW_PRISON                = 4,
     ACTION_ILLIDAN_DIE                  = 5,
     ACTION_ILLIDAN_DEMON_TRANSFORM      = 6,
-     = 7,
+    ACTION_ILLIDAN_DEMON_TRANSFORM_BACK = 7,
 
     // Akama
     ACTION_ILLIDARI_COUNCIL_DONE        = 0,
