@@ -308,7 +308,7 @@ public:
                     return true;
                 }
 
-                char const* active = activeEvents.find(id) != activeEvents.end() ? handler->GetAcoreString(LANG_ACTIVE) : "";
+                std::string active = activeEvents.find(id) != activeEvents.end() ? handler->GetAcoreString(LANG_ACTIVE) : "";
 
                 if (handler->GetSession())
                 {
@@ -806,7 +806,7 @@ public:
                                 return true;
                             }
 
-                            char const* statusStr = "";
+                            std::string statusStr = "";
 
                             if (target)
                             {
@@ -862,7 +862,7 @@ public:
                     return true;
                 }
 
-                char const* statusStr = "";
+                std::string statusStr = "";
 
                 if (target)
                 {
@@ -1498,20 +1498,16 @@ public:
                     return true;
                 }
 
-                char const* knownStr = target && target->HasTitle(titleInfo) ? handler->GetAcoreString(LANG_KNOWN) : "";
-                char const* activeStr = target && target->GetUInt32Value(PLAYER_CHOSEN_TITLE) == titleInfo->bit_index ? handler->GetAcoreString(LANG_ACTIVE) : "";
+                std::string knownStr = target && target->HasTitle(titleInfo) ? handler->GetAcoreString(LANG_KNOWN) : "";
+                std::string activeStr = target && target->GetUInt32Value(PLAYER_CHOSEN_TITLE) == titleInfo->bit_index ? handler->GetAcoreString(LANG_ACTIVE) : "";
 
                 std::string titleNameStr = Acore::StringFormat(name, targetName);
 
                 // send title in "id (idx:idx) - [namedlink locale]" format
                 if (handler->GetSession())
-                {
                     handler->PSendSysMessage(LANG_TITLE_LIST_CHAT, titleInfo->ID, titleInfo->bit_index, titleInfo->ID, titleNameStr, localeNames[locale], knownStr, activeStr);
-                }
                 else
-                {
                     handler->PSendSysMessage(LANG_TITLE_LIST_CONSOLE, titleInfo->ID, titleInfo->bit_index, titleNameStr, localeNames[locale], knownStr, activeStr);
-                }
 
                 ++counter;
             }

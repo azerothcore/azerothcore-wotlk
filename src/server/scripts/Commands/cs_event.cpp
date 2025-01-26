@@ -61,28 +61,22 @@ public:
         GameEventMgr::GameEventDataMap const& events = sGameEventMgr->GetEventMap();
         GameEventMgr::ActiveEvents const& activeEvents = sGameEventMgr->GetActiveEventList();
 
-        char const* active = handler->GetAcoreString(LANG_ACTIVE);
+        std::string active = handler->GetAcoreString(LANG_ACTIVE);
 
         for (uint16 eventId : activeEvents)
         {
             GameEventData const& eventData = events[eventId];
 
             if (handler->GetSession())
-            {
                 handler->PSendSysMessage(LANG_EVENT_ENTRY_LIST_CHAT, eventId, eventId, eventData.description, active);
-            }
             else
-            {
                 handler->PSendSysMessage(LANG_EVENT_ENTRY_LIST_CONSOLE, eventId, eventData.description, active);
-            }
 
             ++counter;
         }
 
         if (counter == 0)
-        {
             handler->SendSysMessage(LANG_NOEVENTFOUND);
-        }
 
         handler->SetSentErrorMessage(true);
 
@@ -108,7 +102,7 @@ public:
 
         GameEventMgr::ActiveEvents const& activeEvents = sGameEventMgr->GetActiveEventList();
         bool active = activeEvents.find(eventId) != activeEvents.end();
-        char const* activeStr = active ? handler->GetAcoreString(LANG_ACTIVE) : "";
+        std::string activeStr = active ? handler->GetAcoreString(LANG_ACTIVE) : "";
 
         std::string startTimeStr = Acore::Time::TimeToTimestampStr(Seconds(eventData.start));
         std::string endTimeStr = Acore::Time::TimeToTimestampStr(Seconds(eventData.end));
