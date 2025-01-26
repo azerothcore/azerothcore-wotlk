@@ -1,3 +1,4 @@
+-- DB update 2025_01_25_00 -> 2025_01_26_00
 --
 DROP TABLE IF EXISTS `creature_sparring`;
 CREATE TABLE `creature_sparring` (
