@@ -55,7 +55,6 @@ struct npc_pure_energy : public ScriptedAI
         {
             if (Unit* target = vexallus->AI()->SelectTarget(SelectTargetMethod::Random, 0))
             {
-                AttackStart(target);
                 me->CastSpell(target, SPELL_ENERGY_FEEDBACK_CHANNEL, false);
             }
         }
