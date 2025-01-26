@@ -166,7 +166,7 @@ struct boss_vexallus : public BossAI
             return;
 
         if (!_overloaded && HealthBelowPct(20) && _pureEnergy == 0)
-        {   
+        {
             DoCastSelf(SPELL_OVERLOAD, true);
             _overloaded = true;
         }
