@@ -136,10 +136,8 @@ struct boss_vexallus : public BossAI
     {
         if (!UpdateVictim())
             return;
-
-        if (!me->IsWithinMeleeRange(me->GetVictim()))
-            DoMeleeAttackIfReady();
-
+        
+        DoMeleeAttackIfReady();
         CheckOverload();
         CheckHealthThresholds();
 
