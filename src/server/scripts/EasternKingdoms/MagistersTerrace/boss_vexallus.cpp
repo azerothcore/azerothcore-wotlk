@@ -115,23 +115,8 @@ struct boss_vexallus : public BossAI
                     _energyCooldown = false;
                 });
             }
-            else if (!_overloaded && HealthBelowPct(20) && _pureEnergy == 0)
-            {
-                Talk(SAY_OVERLOAD);
-                DoCastSelf(SPELL_OVERLOAD, true);
-                StartEnergyCooldown();
-            }
 
             context.Repeat(1s);
-        });
-    }
-
-    void StartEnergyCooldown()
-    {
-        _energyCooldown = true;
-        scheduler.Schedule(5s, [this](TaskContext)
-        {
-            _energyCooldown = false;
         });
     }
 
@@ -178,6 +163,12 @@ struct boss_vexallus : public BossAI
     {
         if (!UpdateVictim())
             return;
+
+        if (!_overloaded && HealthBelowPct(20) && _pureEnergy == 0)
+        {
+            DoCastSelf(SPELL_OVERLOAD, true);
+            _overloaded = true;
+        }
 
         if (HealthBelowPct(85) && !_thresholdsPassed[0]) { _energyQueue++; _thresholdsPassed[0] = true; }
         if (HealthBelowPct(70) && !_thresholdsPassed[1]) { _energyQueue++; _thresholdsPassed[1] = true; }
