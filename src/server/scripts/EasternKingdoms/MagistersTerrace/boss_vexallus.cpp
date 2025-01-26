@@ -131,10 +131,9 @@ struct boss_vexallus : public BossAI
             Talk(SAY_KILL);
     }
 
-    void JustEngagedWith(Unit* victim) override
+    void JustEngagedWith(Unit* /*who*/) override
     {
         _JustEngagedWith();
-        AttackStart(victim);
         Talk(SAY_AGGRO);
         ScheduleTimedEvent(8s, [&]
         {
