@@ -1,6 +1,6 @@
 --
--- Removes NOT_REPEATABLE and WHILE_CHARMED event_flag, allowing to always drop the flag no matter if it's CC'd or not.
-UPDATE `smart_scripts` SET `event_flags` = `event_flags` &~(1|512) WHERE `entryorguid` = 9456 AND `source_type` = 0 AND `id` = 1;
+-- Updates the Action from "Action Invoker" (7) to "Self" (1).
+UPDATE `smart_scripts` SET `target_type` = 1 WHERE `entryorguid` = 9456 AND `source_type` = 0 AND `id` = 1;
 
 -- Adds Strike sniffed from: 4.4.1.58158 and 1.15.5.57979
 DELETE FROM `smart_scripts` WHERE `entryorguid` = 9456 AND `source_type` = 0 AND `id` = 0;
