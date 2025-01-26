@@ -123,9 +123,10 @@ struct boss_vexallus : public BossAI
     }
 
     // Initialize combat
-    void JustEngagedWith(Unit*) override
+    void JustEngagedWith(Unit* victim) override
     {
         _JustEngagedWith();
+        AttackStart(victim);
         Talk(SAY_AGGRO);
         ScheduleCombatAbilities();
     }
