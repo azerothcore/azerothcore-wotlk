@@ -1766,6 +1766,9 @@ void World::SetInitialWorldSettings()
     LOG_INFO("server.loading", "Loading Creature Data...");
     sObjectMgr->LoadCreatures();
 
+    LOG_INFO("server.loading", "Loading Creature sparring...");
+    sObjectMgr->LoadCreatureSparring();
+
     LOG_INFO("server.loading", "Loading Temporary Summon Data...");
     sObjectMgr->LoadTempSummons();                               // must be after LoadCreatureTemplates() and LoadGameObjectTemplates()
 
@@ -2034,6 +2037,7 @@ void World::SetInitialWorldSettings()
     ///- Load AutoBroadCast
     LOG_INFO("server.loading", "Loading Autobroadcasts...");
     sAutobroadcastMgr->LoadAutobroadcasts();
+    sAutobroadcastMgr->LoadAutobroadcastsLocalized();
 
     ///- Load Motd
     LOG_INFO("server.loading", "Loading Motd...");

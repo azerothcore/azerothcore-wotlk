@@ -115,6 +115,7 @@ void LoginDatabaseConnection::DoPrepareStatements()
     PrepareStatement(LOGIN_SEL_REALMLIST_SECURITY_LEVEL, "SELECT allowedSecurityLevel from realmlist WHERE id = ?", CONNECTION_SYNCH);
     PrepareStatement(LOGIN_DEL_ACCOUNT, "DELETE FROM account WHERE id = ?", CONNECTION_ASYNC);
     PrepareStatement(LOGIN_SEL_AUTOBROADCAST, "SELECT id, weight, text FROM autobroadcast WHERE realmid = ? OR realmid = -1", CONNECTION_SYNCH);
+    PrepareStatement(LOGIN_SEL_AUTOBROADCAST_LOCALIZED, "SELECT id, locale, text FROM autobroadcast_locale WHERE realmid = ? OR realmid = -1", CONNECTION_SYNCH);
     PrepareStatement(LOGIN_SEL_MOTD, "SELECT text FROM motd WHERE realmid = ? OR realmid = -1 ORDER BY realmid DESC", CONNECTION_SYNCH);
     PrepareStatement(LOGIN_SEL_MOTD_LOCALE, "SELECT locale, text FROM motd_localized WHERE realmid = ? OR realmid = -1 ORDER BY realmid DESC", CONNECTION_SYNCH);
     PrepareStatement(LOGIN_INS_MOTD, "INSERT INTO motd (realmid, text) VALUES (?, ?) ON DUPLICATE KEY UPDATE text = ?", CONNECTION_ASYNC);
