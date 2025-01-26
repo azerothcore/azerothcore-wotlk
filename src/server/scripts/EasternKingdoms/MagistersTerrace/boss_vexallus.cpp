@@ -53,7 +53,6 @@ struct npc_pure_energy : public ScriptedAI
     {
         if (!summoner)
             return;
-        
         if (Creature* vexallus = summoner->ToCreature())
         {
             if (Unit* target = vexallus->AI()->SelectTarget(SelectTargetMethod::Random, 0))
