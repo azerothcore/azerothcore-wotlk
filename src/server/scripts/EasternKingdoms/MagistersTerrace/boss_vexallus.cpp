@@ -207,6 +207,7 @@ private:
     {
         if (!_overloaded && _pureEnergy == 0 && !_energyCooldown && HealthBelowPct(20))
         {
+            Talk(SAY_OVERLOAD);
             DoCastSelf(SPELL_OVERLOAD, true);
             _overloaded = true;
         }
