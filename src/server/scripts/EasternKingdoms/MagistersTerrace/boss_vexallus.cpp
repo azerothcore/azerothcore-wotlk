@@ -131,10 +131,10 @@ struct boss_vexallus : public BossAI
 
     void SummonedCreatureDies(Creature* summon, Unit* killer) override
     {
-        if (killer && summon->GetEntry() == NPC_PURE_ENERGY)
-        {
-            killer->CastSpell(killer, SPELL_ENERGY_FEEDBACK, true, nullptr, nullptr, summon->GetGUID());
-        }
+        summons.Despawn(summon);
+        summon->DespawnOrUnsummon(1);
+        if (killer)
+            killer->CastSpell(killer, SPELL_ENERGY_FEEDBACK, true, 0, 0, summon->GetGUID());
     }
 
     void UpdateAI(uint32 diff) override
