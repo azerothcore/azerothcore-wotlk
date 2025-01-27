@@ -235,7 +235,6 @@ private:
     std::array<bool, 5> _thresholdsPassed; // Health threshold tracking
 };
 
-// Register script
 void AddSC_boss_vexallus()
 {
     RegisterMagistersTerraceCreatureAI(npc_pure_energy);
