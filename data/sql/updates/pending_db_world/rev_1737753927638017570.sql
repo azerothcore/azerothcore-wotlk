@@ -5,4 +5,4 @@ UPDATE `creature_template` SET `ScriptName` = 'npc_pure_energy' WHERE (`entry` =
 UPDATE `creature_template` SET `flags_extra` = (`flags_extra` | 4194304) WHERE (`entry` = 24745);
 -- Vexallus (Entry: 24744) Overload Emote
 INSERT INTO `creature_text` (`CreatureID`, `GroupID`, `ID`, `Text`, `Type`, `Language`, `Probability`, `Emote`, `Duration`, `Sound`, `BroadcastTextId`, `TextRange`, `comment`) VALUES
-(24733, 5, 0, 'Vexallus overloads!', 41, 0, 100, 0, 0, 0, 0, 0, 'Vexallus - EMOTE_OVERLOAD');
+(24744, 5, 0, 'Vexallus overloads!', 41, 0, 100, 0, 0, 0, 0, 0, 'Vexallus - EMOTE_OVERLOAD');
