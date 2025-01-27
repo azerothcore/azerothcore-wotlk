@@ -56,11 +56,10 @@ struct npc_pure_energy : public ScriptedAI
         }
     }
 
-    // Only take damage from players targeting this add
     void DamageTaken(Unit* attacker, uint32& damage, DamageEffectType, SpellSchoolMask) override
     {
         if (!attacker || !attacker->IsPlayer() || attacker->GetVictim() != me)
-            damage = 0;
+            damage = 0; // Only take damage from players targeting this add
     }
 
     void UpdateAI(uint32 diff) override
