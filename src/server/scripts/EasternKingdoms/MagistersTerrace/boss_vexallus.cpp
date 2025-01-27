@@ -69,7 +69,7 @@ struct npc_pure_energy : public ScriptedAI
             return;
     }
 
-    void AttackStart(Unit* victim) override 
+    void AttackStart(Unit* victim) override
     {
         if (victim)
         {
