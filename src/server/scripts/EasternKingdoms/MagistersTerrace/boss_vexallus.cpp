@@ -15,12 +15,10 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-// Boss encounter script for Vexallus in Magister's Terrace
 #include "CreatureScript.h"
 #include "ScriptedCreature.h"
 #include "magisters_terrace.h"
 
-// Boss combat text and emotes
 enum Yells
 {
     SAY_AGGRO                       = 0,    // Combat start
@@ -30,7 +28,6 @@ enum Yells
     EMOTE_DISCHARGE_ENERGY          = 4     // Energy discharge warning
 };
 
-// Combat ability spell IDs
 enum Spells
 {
     SPELL_ENERGY_FEEDBACK_CHANNEL   = 44328, // Pure energy channel
@@ -43,7 +40,6 @@ enum Spells
     SPELL_SUMMON_PURE_ENERGY_H2     = 46159  // Heroic mode summon 2
 };
 
-// Pure energy add AI implementation
 struct npc_pure_energy : public ScriptedAI
 {
     explicit npc_pure_energy(Creature* creature) : ScriptedAI(creature) {}
@@ -56,9 +52,7 @@ struct npc_pure_energy : public ScriptedAI
             if (!summoner)
                 return;
             if (Unit* target = vexallus->AI()->SelectTarget(SelectTargetMethod::Random, 0))
-            {
                 me->CastSpell(target, SPELL_ENERGY_FEEDBACK_CHANNEL, false);
-            }
         }
     }
 
@@ -123,8 +117,7 @@ struct boss_vexallus : public BossAI
     void JustDied(Unit*) override
     {
         _JustDied();
-        if (instance)
-            instance->DoRemoveAurasDueToSpellOnPlayers(SPELL_ENERGY_FEEDBACK);
+        instance->DoRemoveAurasDueToSpellOnPlayers(SPELL_ENERGY_FEEDBACK);
     }
 
     void KilledUnit(Unit* victim) override
@@ -242,8 +235,8 @@ private:
     // State tracking
     bool _energyCooldown;     // Energy spawn on cooldown
     bool _overloaded;         // Final phase active
-    uint8_t _energyQueue;     // Pending energy spawns
-    uint8_t _pureEnergy;      // Remaining energy count
+    uint8 _energyQueue;     // Pending energy spawns
+    uint8 _pureEnergy;      // Remaining energy count
     std::array<bool, 5> _thresholdsPassed; // Health threshold tracking
 };
 
