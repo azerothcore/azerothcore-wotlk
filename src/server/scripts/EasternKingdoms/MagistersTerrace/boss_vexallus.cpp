@@ -63,7 +63,7 @@ struct npc_pure_energy : public ScriptedAI
             damage = 0; // Only take damage from players targeting this add
     }
 
-    void UpdateAI(uint32 diff) override
+    void UpdateAI(uint32 /*diff*/) override
     {
         if (!UpdateVictim())
             return;
