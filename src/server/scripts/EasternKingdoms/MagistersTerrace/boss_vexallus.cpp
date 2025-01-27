@@ -63,12 +63,17 @@ struct npc_pure_energy : public ScriptedAI
             damage = 0;
     }
 
-    // Override to prevent actual melee attacks while still allowing movement
+    void UpdateAI(uint32 diff) override
+    {
+        if (!UpdateVictim())
+            return;
+    }
+
     void AttackStart(Unit* victim) override 
     {
         if (victim)
         {
-            me->Attack(victim, false); // Set victim but don't allow melee
+            me->Attack(victim, false);
             me->GetMotionMaster()->MoveChase(victim, 0.0f, 0.0f);
         }
     }
