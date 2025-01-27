@@ -63,13 +63,6 @@ struct npc_pure_energy : public ScriptedAI
             damage = 0;
     }
 
-    // Apply feedback effect on death
-    void JustDied(Unit* killer) override
-    {
-        if (killer)
-            killer->CastSpell(killer, SPELL_ENERGY_FEEDBACK, true, nullptr, nullptr, me->GetGUID());
-    }
-
     // Override to prevent actual melee attacks while still allowing movement
     void AttackStart(Unit* victim) override 
     {
@@ -129,6 +122,14 @@ struct boss_vexallus : public BossAI
         AttackStart(victim);
         Talk(SAY_AGGRO);
         ScheduleCombatAbilities();
+    }
+
+    void SummonedCreatureDies(Creature* summon, Unit* killer) override
+    {
+        if (killer && summon->GetEntry() == NPC_PURE_ENERGY)
+        {
+            killer->CastSpell(killer, SPELL_ENERGY_FEEDBACK, true, nullptr, nullptr, summon->GetGUID());
+        }
     }
 
     void UpdateAI(uint32 diff) override
