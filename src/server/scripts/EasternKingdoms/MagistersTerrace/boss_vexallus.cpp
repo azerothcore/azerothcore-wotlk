@@ -85,7 +85,7 @@ struct boss_vexallus : public BossAI
     static constexpr std::array<uint8_t, 5> HEALTH_THRESHOLDS = {85, 70, 55, 40, 25}; // HP % for energy spawns
     static constexpr Seconds ENERGY_COOLDOWN = 5s;    // Time between energy spawns
     static constexpr Seconds ABILITY_TIMER = 8s;      // Basic ability cooldown
-    static constexpr uint8_t INITIAL_PURE_ENERGY = 5; // Starting energy count
+    static constexpr uint8 INITIAL_PURE_ENERGY = 5; // Starting energy count
 
     explicit boss_vexallus(Creature* creature)
         : BossAI(creature, DATA_VEXALLUS)
