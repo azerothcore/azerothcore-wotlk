@@ -162,6 +162,11 @@ struct boss_felblood_kaelthas : public BossAI
             {
                 me->SetEmoteState(EMOTE_STATE_TALK);
                 Talk(SAY_AGGRO);
+
+                me->m_Events.AddEventAtOffset([&] {
+                    me->HandleEmoteCommand(EMOTE_ONESHOT_LAUGH_NO_SHEATHE);
+                }, 15s);
+
                 Talk(SAY_AGGRO_2, 20s);
                 me->SetImmuneToAll(true);
                 _OOCScheduler.Schedule(35s, [this](TaskContext) {
