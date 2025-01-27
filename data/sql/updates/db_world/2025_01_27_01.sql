@@ -1,3 +1,4 @@
+-- DB update 2025_01_27_00 -> 2025_01_27_01
 --
 UPDATE `creature_template` SET `flags_extra` = `flags_extra` |134217728 WHERE `entry` IN (24698, 24684, 24697, 24696, 24683, 24686);
 
