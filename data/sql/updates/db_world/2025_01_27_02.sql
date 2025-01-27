@@ -1,3 +1,4 @@
+-- DB update 2025_01_27_01 -> 2025_01_27_02
 -- Fix Amani Trainer Abilities
 UPDATE `creature_template` SET `AIName` = 'SmartAI' WHERE `entry` = 23774;
 
