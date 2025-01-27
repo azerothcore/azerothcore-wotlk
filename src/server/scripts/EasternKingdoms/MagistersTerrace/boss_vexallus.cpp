@@ -25,7 +25,8 @@ enum Yells
     SAY_ENERGY                      = 1,    // Pure energy spawn
     SAY_OVERLOAD                    = 2,    // Final phase
     SAY_KILL                        = 3,    // Player kill
-    EMOTE_DISCHARGE_ENERGY          = 4     // Energy discharge warning
+    EMOTE_DISCHARGE_ENERGY          = 4,     // Energy discharge warning
+    EMOTE_OVERLOAD                  = 5     // Overload emote
 };
 
 enum Spells
@@ -213,7 +214,7 @@ private:
         if (!_overloaded && _pureEnergy == 0 && !_energyCooldown && HealthBelowPct(20))
         {
             Talk(SAY_OVERLOAD);
-            me->TextEmote("Vexallus overloads!", nullptr, true);
+            Talk(EMOTE_OVERLOAD);
             DoCastSelf(SPELL_OVERLOAD, true);
             _overloaded = true;
         }
