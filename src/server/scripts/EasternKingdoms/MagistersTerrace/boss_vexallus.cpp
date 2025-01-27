@@ -81,7 +81,6 @@ struct npc_pure_energy : public ScriptedAI
     }
 };
 
-// Main boss AI implementation
 struct boss_vexallus : public BossAI
 {
     // Configuration constants
@@ -100,7 +99,6 @@ struct boss_vexallus : public BossAI
     {
     }
 
-    // Reset encounter state
     void Reset() override
     {
         _Reset();
@@ -113,7 +111,6 @@ struct boss_vexallus : public BossAI
         ScheduleEnergyCheck();
     }
 
-    // Cleanup on death
     void JustDied(Unit*) override
     {
         _JustDied();
@@ -126,7 +123,6 @@ struct boss_vexallus : public BossAI
             Talk(SAY_KILL);
     }
 
-    // Initialize combat
     void JustEngagedWith(Unit* victim) override
     {
         _JustEngagedWith();
@@ -135,7 +131,6 @@ struct boss_vexallus : public BossAI
         ScheduleCombatAbilities();
     }
 
-    // Main update loop
     void UpdateAI(uint32 diff) override
     {
         if (!UpdateVictim())
