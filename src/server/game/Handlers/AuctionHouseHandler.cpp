@@ -749,6 +749,9 @@ void WorldSession::HandleAuctionListItems(WorldPacket& recvData)
     if (usable)
     {
         AuctionHouseUsablePlayerInfo usablePlayerInfo;
+        usablePlayerInfo.classMask = GetPlayer()->getClassMask();
+        usablePlayerInfo.raceMask = GetPlayer()->getRaceMask();
+        usablePlayerInfo.level = GetPlayer()->GetLevel();
 
         SkillStatusMap const& skillMap = GetPlayer()->GetSkillStatusMap();
         for (auto const& pair : skillMap)

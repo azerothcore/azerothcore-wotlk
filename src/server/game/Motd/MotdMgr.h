@@ -29,9 +29,6 @@ class AC_GAME_API MotdMgr
 public:
     static MotdMgr* instance();
 
-    /// Converts the localized string to world packages
-    void CreateWorldPackages();
-
     /// Set a new Message of the Day
     void SetMotd(std::string motd, LocaleConstant locale);
 
@@ -44,18 +41,12 @@ public:
     /// Returns the current motd packet for the given locale
     WorldPacket const* GetMotdPacket(LocaleConstant locale);
 
-    // Checks if string is valid locale
-    bool IsValidLocale(std::string const& locale);
-
 private:
-    // Loads the default motd from the motd table
-    std::string LoadDefaultMotd(uint32 realmId);
     // Loads all available localized motd for the realm
-    void LoadLocalizedMotds(uint32 realmId);
-    // Sets the default mode if none is found in the database
-    void SetDefaultMotd();
+    void LoadMotdLocale();
+
     // Create a worldpacket for a given motd localization
-    WorldPacket CreateWorldPacket(std::string const& motd);
+    WorldPacket CreateWorldPacket(std::string motd);
 };
 
 #define sMotdMgr MotdMgr::instance()
