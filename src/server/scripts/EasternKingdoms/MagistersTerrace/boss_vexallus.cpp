@@ -53,6 +53,8 @@ struct npc_pure_energy : public ScriptedAI
     {
         if (Creature* vexallus = summoner ? summoner->ToCreature() : nullptr)
         {
+            if (!summoner)
+                return;
             if (Unit* target = vexallus->AI()->SelectTarget(SelectTargetMethod::Random, 0))
             {
                 me->CastSpell(target, SPELL_ENERGY_FEEDBACK_CHANNEL, false);
