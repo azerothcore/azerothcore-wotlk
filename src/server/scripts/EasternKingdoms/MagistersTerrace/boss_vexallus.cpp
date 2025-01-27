@@ -73,6 +73,16 @@ struct npc_pure_energy : public ScriptedAI
         if (killer)
             killer->CastSpell(killer, SPELL_ENERGY_FEEDBACK, true, nullptr, nullptr, me->GetGUID());
     }
+
+    // Override to prevent actual melee attacks while still allowing movement
+    void AttackStart(Unit* victim) override 
+    {
+        if (victim)
+        {
+            me->Attack(victim, false); // Set victim but don't allow melee
+            me->GetMotionMaster()->MoveChase(victim, 0.0f, 0.0f);
+        }
+    }
 };
 
 // Main boss AI implementation
