@@ -5418,7 +5418,7 @@ class spell_gen_call_of_beast : public SpellScript
             if (Unit* caster = GetCaster())
             {
                 std::list<Creature*> nearbyBeasts;
-                caster->GetCreatureListWithEntryInGrid(nearbyBeasts, 3100, 100.0f); // motted boar test
+                caster->GetCreatureListWithEntryInGrid(nearbyBeasts, 0, 100.0f);
 
                 for (Creature* beast : nearbyBeasts)
                 {
