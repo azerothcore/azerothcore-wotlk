@@ -1629,6 +1629,7 @@ WorldSession::DosProtection::DosProtection(WorldSession* s) :
 void WorldSession::ResetTimeSync()
 {
     _timeSyncNextCounter = 0;
+    std::lock_guard<std::mutex> guard(_timeSyncLock);
     _pendingTimeSyncRequests.clear();
 }
 
