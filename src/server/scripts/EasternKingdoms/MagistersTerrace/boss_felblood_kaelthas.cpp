@@ -67,10 +67,7 @@ enum Misc
 
 struct boss_felblood_kaelthas : public BossAI
 {
-    boss_felblood_kaelthas(Creature* creature) : BossAI(creature, DATA_KAELTHAS)
-    {
-        _hasDoneIntro = false;
-    }
+    boss_felblood_kaelthas(Creature* creature) : BossAI(creature, DATA_KAELTHAS) { }
 
     void Reset() override
     {
@@ -78,7 +75,6 @@ struct boss_felblood_kaelthas : public BossAI
         _OOCScheduler.CancelAll();
         _gravityLapseCounter = 0;
         me->ApplySpellImmune(0, IMMUNITY_EFFECT, SPELL_EFFECT_INTERRUPT_CAST, false);
-        me->SetImmuneToAll(false);
 
         ScheduleHealthCheckEvent(50, [&]{
             me->CastStop();
@@ -125,12 +121,6 @@ struct boss_felblood_kaelthas : public BossAI
         });
     }
 
-    void InitializeAI() override
-    {
-        BossAI::InitializeAI();
-        me->SetImmuneToAll(true);
-    }
-
     void JustDied(Unit* killer) override
     {
         BossAI::JustDied(killer);
@@ -161,20 +151,31 @@ struct boss_felblood_kaelthas : public BossAI
             }, 50s);
     }
 
-    void MoveInLineOfSight(Unit* who) override
+    void DoAction(int32 actionId) override
     {
-        if (!_hasDoneIntro && me->IsWithinDistInMap(who, 40.0f) && who->IsPlayer())
+        if (actionId == DATA_KAEL_INTRO)
         {
-            Talk(SAY_AGGRO);
-            Talk(SAY_AGGRO_2, 20s);
-            _hasDoneIntro = true;
-            _OOCScheduler.Schedule(35s, [this](TaskContext){
-                me->SetReactState(REACT_AGGRESSIVE);
-                me->SetImmuneToAll(false);
-                me->SetInCombatWithZone();
-            });
+            uint32 counter = instance->GetPersistentData(DATA_KAEL_INTRO);
+            instance->StorePersistentData(DATA_KAEL_INTRO, ++counter);
+
+            if (counter == 6 && !me->IsInCombat())
+            {
+                me->SetEmoteState(EMOTE_STATE_TALK);
+                Talk(SAY_AGGRO);
+
+                me->m_Events.AddEventAtOffset([&] {
+                    me->HandleEmoteCommand(EMOTE_ONESHOT_LAUGH_NO_SHEATHE);
+                }, 15s);
+
+                Talk(SAY_AGGRO_2, 20s);
+                me->SetImmuneToAll(true);
+                _OOCScheduler.Schedule(35s, [this](TaskContext) {
+                    me->ClearEmoteState();
+                    me->SetReactState(REACT_AGGRESSIVE);
+                    me->SetImmuneToAll(false);
+                });
+            }
         }
-        BossAI::MoveInLineOfSight(who);
     }
 
     void DamageTaken(Unit* attacker, uint32& damage, DamageEffectType damagetype, SpellSchoolMask damageSchoolMask) override
@@ -229,7 +230,6 @@ struct boss_felblood_kaelthas : public BossAI
     }
 private:
     TaskScheduler _OOCScheduler;
-    bool _hasDoneIntro;
     uint8 _gravityLapseCounter;
 };
 
