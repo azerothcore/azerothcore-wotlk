@@ -752,7 +752,7 @@ void Map::Update(const uint32 t_diff, const uint32 s_diff, bool /*thread*/)
             MapSessionFilter updater(session);
             session->Update(s_diff, updater);
 
-            // Update player if !t_diff
+            // update players at tick
             if (!t_diff)
                 player->Update(s_diff);
         }
