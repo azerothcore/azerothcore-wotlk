@@ -35,6 +35,7 @@
 #include <map>
 #include <memory>
 #include <utility>
+#include <mutex>
 
 class Creature;
 class GameObject;
@@ -1200,6 +1201,7 @@ private:
     std::map<uint32, uint32> _pendingTimeSyncRequests; // key: counter. value: server time when packet with that counter was sent.
     uint32 _timeSyncNextCounter;
     uint32 _timeSyncTimer;
+    mutable std::mutex _timeSyncLock;
 
     WorldSession(WorldSession const& right) = delete;
     WorldSession& operator=(WorldSession const& right) = delete;
