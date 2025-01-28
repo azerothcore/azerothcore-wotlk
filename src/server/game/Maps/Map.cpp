@@ -794,9 +794,8 @@ void Map::Update(const uint32 t_diff, const uint32 s_diff, bool /*thread*/)
         WorldObject* obj = *m_activeNonPlayersIter;
         ++m_activeNonPlayersIter;
 
-        if (obj && obj->IsInWorld()) {
+        if (obj && obj->IsInWorld())
             VisitNearbyCellsOf(obj, grid_object_update, world_object_update, grid_large_object_update, world_large_object_update);
-        }
     }
 
     // Update players and their associated objects
@@ -858,7 +857,8 @@ void Map::Update(const uint32 t_diff, const uint32 s_diff, bool /*thread*/)
     SendObjectUpdates();
 
     // Process necessary scripts
-    if (!m_scriptSchedule.empty()) {
+    if (!m_scriptSchedule.empty())
+    {
         std::lock_guard<std::mutex> lock(i_scriptLock);
         ScriptsProcess();
     }
