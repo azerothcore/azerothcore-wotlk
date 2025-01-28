@@ -1639,7 +1639,7 @@ void WorldSession::SendTimeSync()
     SendPacket(&data);
 
     {
-        std::lock_guard<std::mutex> guard(_timeSyncLock); 
+        std::lock_guard<std::mutex> guard(_timeSyncLock);
         _pendingTimeSyncRequests[_timeSyncNextCounter] = getMSTime();
     }
 
