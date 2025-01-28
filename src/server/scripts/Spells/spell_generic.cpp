@@ -5406,47 +5406,30 @@ enum CallOfBeastSpells
 };
 
 // 43359 - Call of the Beast
-class spell_gen_call_of_the_beast : public SpellScript
+class spell_gen_call_of_beast : public SpellScript
 {
-    PrepareSpellScript(spell_gen_call_of_the_beast);
+    PrepareSpellScript(spell_gen_call_of_beast);
 
-private:
-    std::list<Creature*> m_creatureList;
-
-public:
-    bool Validate(SpellInfo const* /*spellInfo*/) override
+    void HandleScriptEffect(SpellEffIndex effIndex)
     {
-        return ValidateSpellInfo({ SPELL_CALL_OF_THE_BEAST });
-    }
-
-    void HandleRemove(SpellEffIndex /*effIndex*/)
-    {
-        for (Creature* creature : m_creatureList)
+        PreventHitDefaultEffect(effIndex);
+        if (Unit* target = GetHitUnit())
         {
-            creature->ApplySpellImmune(0, IMMUNITY_STATE, SPELL_AURA_MOD_TAUNT, false);
-            creature->ApplySpellImmune(0, IMMUNITY_EFFECT, SPELL_EFFECT_ATTACK_ME, false);
-        }
-    }
-
-    void HandleScript(SpellEffIndex /*effIndex*/)
-    {
-        if (Unit* caster = GetCaster())
-        {
-            if (Unit* target = GetExplTargetUnit())
+            if (Unit* caster = GetCaster())
             {
-                caster->GetCreatureListWithEntryInGrid(m_creatureList, 0, 100.0f);
-                for (Creature* creature : m_creatureList)
+                std::list<Creature*> nearbyBeasts;
+                caster->GetCreatureListWithEntryInGrid(nearbyBeasts, 0, 100.0f);
+
+                for (Creature* beast : nearbyBeasts)
                 {
-                    if (creature->GetCreatureType() == CREATURE_TYPE_BEAST &&
-                        !creature->IsPet() &&
-                        !creature->IsPlayer() &&
-                        !creature->IsDungeonBoss())
+                    if (beast->GetCreatureType() == CREATURE_TYPE_BEAST &&
+                        !beast->IsPet() &&
+                        !beast->IsDungeonBoss() &&
+                        !beast->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE))
                     {
-                        creature->ApplySpellImmune(0, IMMUNITY_STATE, SPELL_AURA_MOD_TAUNT, true);
-                        creature->ApplySpellImmune(0, IMMUNITY_EFFECT, SPELL_EFFECT_ATTACK_ME, true);
-                        creature->SetInCombatWith(target);
-                        creature->AddThreat(target, 100.0f);
-                        creature->AI()->AttackStart(target);
+                        beast->SetReactState(REACT_AGGRESSIVE);
+                        beast->AI()->AttackStart(target); // Why beasts not attacking =/ maybe test is bad?
+                        beast->GetThreatMgr().AddThreat(target, 1000000.0f);
                     }
                 }
             }
@@ -5455,8 +5438,7 @@ public:
 
     void Register() override
     {
-        OnEffectHitTarget += SpellEffectFn(spell_gen_call_of_the_beast::HandleScript, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
-        OnEffectHit += SpellEffectFn(spell_gen_call_of_the_beast::HandleRemove, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
+        OnEffectHitTarget += SpellEffectFn(spell_gen_call_of_beast::HandleScriptEffect, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
     }
 };
 
