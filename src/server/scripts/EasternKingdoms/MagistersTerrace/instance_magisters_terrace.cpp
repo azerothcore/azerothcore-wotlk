@@ -64,6 +64,7 @@ public:
         {
             SetHeaders(DataHeader);
             SetBossNumber(MAX_ENCOUNTER);
+            SetPersistentDataCount(MAX_PERSISTENT_DATA);
             LoadObjectData(creatureData, gameobjectData);
             LoadDoorData(doorData);
             LoadSummonData(summonerData);
