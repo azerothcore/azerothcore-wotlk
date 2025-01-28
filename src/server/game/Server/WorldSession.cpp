@@ -1635,13 +1635,14 @@ void WorldSession::ResetTimeSync()
 
 void WorldSession::SendTimeSync()
 {
+    std::lock_guard<std::mutex> guard(_timeSyncLock);
+
+    // Create the packet and increment the counter under the lock
     WorldPacket data(SMSG_TIME_SYNC_REQ, 4);
     data << uint32(_timeSyncNextCounter);
     SendPacket(&data);
 
-    std::lock_guard<std::mutex> guard(_timeSyncLock);
-    _pendingTimeSyncRequests[_timeSyncNextCounter] = getMSTime();
-
+    _pendingTimeSyncRequests.emplace(_timeSyncNextCounter, getMSTime());
     // Schedule next sync in 10 sec (except for the 2 first packets, which are spaced by only 5s)
     _timeSyncTimer = _timeSyncNextCounter == 0 ? 5000 : 10000;
     _timeSyncNextCounter++;
