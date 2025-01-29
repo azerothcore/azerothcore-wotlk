@@ -136,31 +136,57 @@ struct boss_murmur : public BossAI
         scheduler.Schedule(28s, [this](TaskContext context)
         {
             Talk(EMOTE_SONIC_BOOM);
+
             DoCastAOE(SPELL_SONIC_BOOM_CAST);
 
             scheduler.Schedule(1500ms, [this](TaskContext)
             {
                 DoCastAOE(SPELL_SONIC_BOOM_EFFECT, true);
+
+                scheduler.Schedule(3s, [this](TaskContext)
+                {
+                    me->ClearUnitState(UNIT_STATE_CASTING);
+                });
             });
 
             context.Repeat(34s, 40s);
-        }).Schedule(14600ms, 25500ms, [this](TaskContext context)
+        });
+
+        scheduler.Schedule(14600ms, 25500ms, [this](TaskContext context)
         {
-            DoCastRandomTarget(SPELL_MURMURS_TOUCH);
-            context.Repeat(14600ms, 25500ms);
-        }).Schedule(15s, 30s, [this](TaskContext context)
-        {
-            if (DoCastRandomTarget(SPELL_MAGNETIC_PULL, 0, 80.0f) == SPELL_CAST_OK)
+            if (!me->HasUnitState(UNIT_STATE_CASTING))
             {
-                context.Repeat(15s, 30s);
+                DoCastRandomTarget(SPELL_MURMURS_TOUCH);
+                context.Repeat(14600ms, 25500ms);
             }
             else
             {
-                context.Repeat(500ms);
+                context.Repeat(3s);
             }
-        }).Schedule(3s, [this](TaskContext context)
+        });
+
+        scheduler.Schedule(15s, 30s, [this](TaskContext context)
         {
-            if (ShouldCastResonance())
+            if (!me->HasUnitState(UNIT_STATE_CASTING))
+            {
+                if (DoCastRandomTarget(SPELL_MAGNETIC_PULL, 0, 80.0f) == SPELL_CAST_OK)
+                {
+                    context.Repeat(15s, 30s);
+                }
+                else
+                {
+                    context.Repeat(500ms);
+                }
+            }
+            else
+            {
+                context.Repeat(3s);
+            }
+        });
+
+        scheduler.Schedule(3s, [this](TaskContext context)
+        {
+            if (ShouldCastResonance() && !me->HasUnitState(UNIT_STATE_CASTING))
             {
                 if (!scheduler.IsGroupScheduled(GROUP_RESONANCE))
                 {
@@ -181,11 +207,19 @@ struct boss_murmur : public BossAI
         {
             scheduler.Schedule(5s, [this](TaskContext context)
             {
-                DoCastAOE(SPELL_THUNDERING_STORM);
+                if (!me->HasUnitState(UNIT_STATE_CASTING))
+                {
+                    DoCastAOE(SPELL_THUNDERING_STORM);
+                }
                 context.Repeat(6050ms, 10s);
-            }).Schedule(3650ms, 9150ms, [this](TaskContext context)
+            });
+
+            scheduler.Schedule(3650ms, 9150ms, [this](TaskContext context)
             {
-                DoCastVictim(SPELL_SONIC_SHOCK);
+                if (!me->HasUnitState(UNIT_STATE_CASTING))
+                {
+                    DoCastVictim(SPELL_SONIC_SHOCK);
+                }
                 context.Repeat(3650ms, 9150ms);
             });
         }
