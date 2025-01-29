@@ -194,7 +194,7 @@ struct npc_madrigosa : public NullCreatureAI
             me->SetStandState(UNIT_STAND_STATE_STAND);
             me->RemoveDynamicFlag(UNIT_DYNFLAG_DEAD);
             me->SendMovementFlagUpdate();
-            
+
             events.ScheduleEvent(EVENT_MAD_1, 2000);
         }
         else if (param == ACTION_SPAWN_FELMYST)
