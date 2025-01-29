@@ -335,6 +335,9 @@ struct boss_felmyst : public BossAI
     {
         scheduler.Update(diff);
 
+        if (!UpdateVictim())
+            return;
+
         if (!me->HasUnitMovementFlag(MOVEMENTFLAG_DISABLE_GRAVITY))
             DoMeleeAttackIfReady();
     }
