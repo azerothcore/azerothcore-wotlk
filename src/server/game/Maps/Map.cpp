@@ -44,6 +44,12 @@
 #include "VMapMgr2.h"
 #include "Weather.h"
 
+#if defined(MOD_ELUNA)
+#include "LuaEngine.h"
+#include "ElunaConfig.h"
+#include "ElunaLoader.h"
+#endif
+
 union u_map_magic
 {
     char asChar[4];
@@ -64,6 +70,11 @@ ZoneDynamicInfo::ZoneDynamicInfo() : MusicId(0), WeatherId(WEATHER_STATE_FINE),
 
 Map::~Map()
 {
+#if defined(MOD_ELUNA)
+    delete eluna;
+    eluna = nullptr;
+#endif
+
     // UnloadAll must be called before deleting the map
 
     sScriptMgr->OnDestroyMap(this);
@@ -242,6 +253,16 @@ Map::Map(uint32 id, uint32 InstanceId, uint8 SpawnMode, Map* _parent) :
     _transportsUpdateIter(_transports.end()), i_scriptLock(false), _defaultLight(GetDefaultMapLight(id))
 {
     m_parentMap = (_parent ? _parent : this);
+
+    // lua state begins uninitialized
+#if defined(MOD_ELUNA)
+    eluna = nullptr;
+
+    if (sElunaConfig->IsElunaEnabled() && !sElunaConfig->IsElunaCompatibilityMode() && sElunaConfig->ShouldMapLoadEluna(id))
+        if (!IsParentMap() || (IsParentMap() && !Instanceable()))
+            eluna = new Eluna(this);
+#endif
+
     for (unsigned int idx = 0; idx < MAX_NUMBER_OF_GRIDS; ++idx)
     {
         for (unsigned int j = 0; j < MAX_NUMBER_OF_GRIDS; ++j)
@@ -2655,6 +2676,16 @@ void Map::AddObjectToRemoveList(WorldObject* obj)
 {
     ASSERT(obj->GetMapId() == GetId() && obj->GetInstanceId() == GetInstanceId());
 
+#if defined(MOD_ELUNA)
+    if (Eluna* E = GetEluna())
+    {
+        if (Creature* creature = obj->ToCreature())
+            E->OnRemove(creature);
+        else if (GameObject* gameobject = obj->ToGameObject())
+            E->OnRemove(gameobject);
+    }
+#endif
+
     obj->CleanupsBeforeDelete(false);                            // remove or simplify at least cross referenced links
 
     i_objectsToRemove.insert(obj);
@@ -4088,3 +4119,14 @@ std::string InstanceMap::GetDebugInfo() const
         << "ScriptId: " << GetScriptId() << " ScriptName: " << GetScriptName();
     return sstr.str();
 }
+
+#if defined(MOD_ELUNA)
+Eluna *Map::GetEluna() const
+{
+    if(sElunaConfig->IsElunaCompatibilityMode())
+        return sWorld->GetEluna();
+
+    return eluna;
+}
+#endif
+

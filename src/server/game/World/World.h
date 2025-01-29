@@ -33,6 +33,7 @@
 #include <map>
 #include <unordered_map>
 
+class Eluna;
 class Object;
 class WorldPacket;
 class WorldSocket;
@@ -343,6 +344,9 @@ public:
     void RemoveOldCorpses() override;
 
     void DoForAllOnlinePlayers(std::function<void(Player*)> exec) override;
+
+    Eluna* GetEluna() const { return eluna; }
+    Eluna* eluna;
 
 protected:
     void _UpdateGameTime();

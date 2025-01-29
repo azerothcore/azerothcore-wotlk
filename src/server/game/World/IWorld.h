@@ -25,6 +25,7 @@
 #include "SharedDefines.h"
 #include <unordered_map>
 
+class Eluna;
 class WorldPacket;
 class WorldSession;
 class Player;
@@ -611,6 +612,9 @@ public:
     virtual void SetRealmName(std::string name) = 0;
     virtual void RemoveOldCorpses() = 0;
     virtual void DoForAllOnlinePlayers(std::function<void(Player*)> exec) = 0;
+
+    Eluna* GetEluna() const { return eluna; }
+    Eluna* eluna;
 };
 
 #endif //AZEROTHCORE_IWORLD_H
