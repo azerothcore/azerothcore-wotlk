@@ -5406,6 +5406,7 @@ enum CallOfBeastSpells
 };
 
 // 43359 - Call of the Beast
+// 43359 - Call of the Beast
 class spell_gen_call_of_beast : public SpellScript
 {
     PrepareSpellScript(spell_gen_call_of_beast);
@@ -5413,26 +5414,36 @@ class spell_gen_call_of_beast : public SpellScript
     void HandleScriptEffect(SpellEffIndex effIndex)
     {
         PreventHitDefaultEffect(effIndex);
-        if (Unit* target = GetHitUnit())
-        {
-            if (Unit* caster = GetCaster())
-            {
-                std::list<Creature*> nearbyBeasts;
-                caster->GetCreatureListWithEntryInGrid(nearbyBeasts, 0, 100.0f);
+        Unit* target = GetHitUnit();
+        Unit* caster = GetCaster();
+        
+        if (!target || !caster)
+            return;
 
-                for (Creature* beast : nearbyBeasts)
-                {
-                    if (beast->GetCreatureType() == CREATURE_TYPE_BEAST &&
-                        !beast->IsPet() &&
-                        !beast->IsDungeonBoss() &&
-                        !beast->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE))
-                    {
-                        beast->SetReactState(REACT_AGGRESSIVE);
-                        beast->AI()->AttackStart(target); // Why beasts not attacking =/ maybe test is bad?
-                        beast->GetThreatMgr().AddThreat(target, 1000000.0f);
-                    }
-                }
-            }
+        std::list<Creature*> nearbyCreatures;
+        caster->GetCreaturesNearbyList(nearbyCreatures, 100.0f);
+
+        for (Creature* beast : nearbyCreatures)
+        {
+            if (!beast);
+                break;
+            if (beast->IsAlive() ||
+                beast->GetCreatureType() == CREATURE_TYPE_BEAST ||
+                !beast->IsPet() ||
+                !beast->IsDungeonBoss() ||
+                !beast->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE))
+                continue;
+
+            beast->ClearUnitState(UNIT_STATE_EVADE);
+            beast->InterruptNonMeleeSpells(false);
+            beast->AttackStop();
+            beast->ToCreature()->AI()->EnterEvadeMode();
+            beast->StopMoving();
+            
+            beast->SetReactState(REACT_AGGRESSIVE);
+            beast->GetThreatMgr().ClearAllThreat();
+            beast->GetThreatMgr().AddThreat(target, 1000000.0f);
+            beast->AI()->AttackStart(target);
         }
     }
 
