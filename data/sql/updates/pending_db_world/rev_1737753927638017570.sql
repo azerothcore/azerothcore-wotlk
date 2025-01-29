@@ -8,4 +8,5 @@ DELETE FROM `creature_text` WHERE `CreatureID` = 24744 AND `GroupID` = 5 AND `ID
 INSERT INTO `creature_text` (`CreatureID`, `GroupID`, `ID`, `Text`, `Type`, `Language`, `Probability`, `Emote`, `Duration`, `Sound`, `BroadcastTextId`, `TextRange`, `comment`) VALUES
 (24744, 5, 0, 'Vexallus overloads!', 41, 0, 100, 0, 0, 0, 77866, 0, 'Vexallus - EMOTE_OVERLOAD');
 -- Add to broadcast_text used SELECT MAX(ID) + 1 FROM broadcast_text; for next ID
+DELETE FROM `broadcast_text` WHERE `ID`=77866;
 INSERT INTO `broadcast_text` VALUES (77866, 0, 'Vexallus overloads!', 'Vexallus overloads!', 0, 0, 0, 0, 0, 0, 0, 0, 0, 1);
