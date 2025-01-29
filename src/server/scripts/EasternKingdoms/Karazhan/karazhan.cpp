@@ -25,18 +25,6 @@
 #include "SpellAuraEffects.h"
 #include "SpellScript.h"
 #include "SpellScriptLoader.h"
-/* ScriptData
-SDName: Karazhan
-SD%Complete: 100
-SDComment: Support for Barnes (Opera controller) and Berthold (Doorman), Support for Quest 9645.
-SDCategory: Karazhan
-EndScriptData */
-
-/* ContentData
-npc_barnes
-npc_berthold
-npc_image_of_medivh
-EndContentData */
 
 enum Spells
 {
@@ -608,10 +596,27 @@ class spell_karazhan_temptation : public AuraScript
     }
 };
 
+// 29793 - Return Fire (Spell)
+class spell_karazhan_returnfire_spell : public AuraScript
+{
+    PrepareAuraScript(spell_karazhan_returnfire_spell);
+
+    bool CheckProc(ProcEventInfo& eventInfo)
+    {
+        return !(eventInfo.GetActor()->IsClass(CLASS_ROGUE));
+    }
+
+    void Register() override
+    {
+        DoCheckProc += AuraCheckProcFn(spell_karazhan_returnfire_spell::CheckProc);
+    }
+};
+
 void AddSC_karazhan()
 {
     new npc_barnes();
     new npc_image_of_medivh();
     new at_karazhan_side_entrance();
     RegisterSpellScript(spell_karazhan_temptation);
+    RegisterSpellScript(spell_karazhan_returnfire_spell);
 }
