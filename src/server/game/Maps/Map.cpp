@@ -2504,14 +2504,16 @@ bool Map::IsUnderWater(uint32 phaseMask, float x, float y, float z, float collis
 
 bool Map::HasEnoughWater(WorldObject const* searcher, float x, float y, float z) const
 {
-    LiquidData const& liquidData = const_cast<Map*>(this)->GetLiquidData(searcher->GetPhaseMask(), x, y, z, searcher->GetCollisionHeight(), MAP_ALL_LIQUIDS);
-    return (liquidData.Status & MAP_LIQUID_STATUS_SWIMMING) != 0 && HasEnoughWater(searcher, liquidData);
-}
+    LiquidData const& liquidData = const_cast<Map*>(this)->GetLiquidData(
+        searcher->GetPhaseMask(), x, y, z, searcher->GetCollisionHeight(), MAP_ALL_LIQUIDS);
 
-bool Map::HasEnoughWater(WorldObject const* searcher, LiquidData const& liquidData) const
-{
+    if ((liquidData.Status & MAP_LIQUID_STATUS_SWIMMING) == 0)
+        return false;
+
     float minHeightInWater = searcher->GetMinHeightInWater();
-    return liquidData.Level > INVALID_HEIGHT && liquidData.Level > liquidData.DepthLevel && liquidData.Level - liquidData.DepthLevel >= minHeightInWater;
+    return liquidData.Level > INVALID_HEIGHT &&
+           liquidData.Level > liquidData.DepthLevel &&
+           liquidData.Level - liquidData.DepthLevel >= minHeightInWater;
 }
 
 char const* Map::GetMapName() const
