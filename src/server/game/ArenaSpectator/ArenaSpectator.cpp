@@ -85,7 +85,7 @@ bool ArenaSpectator::HandleSpectatorSpectateCommand(ChatHandler* handler, std::s
     if (player->IsInCombat())
         errors.push_back("Can't be in combat.");
 
-    if (player->isUsingLfg())
+    if (player->IsUsingLfg())
         errors.push_back("Can't spectate while using LFG system.");
 
     if (player->InBattlegroundQueue())
