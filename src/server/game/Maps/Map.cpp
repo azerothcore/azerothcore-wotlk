@@ -4123,10 +4123,11 @@ std::string InstanceMap::GetDebugInfo() const
 #if defined(MOD_ELUNA)
 Eluna *Map::GetEluna() const
 {
-    if(sElunaConfig->IsElunaCompatibilityMode())
+    if (sElunaConfig->IsElunaCompatibilityMode())
         return sWorld->GetEluna();
 
     return eluna;
 }
 #endif
+
 
