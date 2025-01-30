@@ -4129,4 +4129,3 @@ Eluna *Map::GetEluna() const
     return eluna;
 }
 #endif
-
