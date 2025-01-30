@@ -25,7 +25,10 @@
 #include "SharedDefines.h"
 #include <unordered_map>
 
+#if defined(MOD_ELUNA)
 class Eluna;
+#endif
+
 class WorldPacket;
 class WorldSession;
 class Player;
@@ -613,8 +616,10 @@ public:
     virtual void RemoveOldCorpses() = 0;
     virtual void DoForAllOnlinePlayers(std::function<void(Player*)> exec) = 0;
 
+#if defined(MOD_ELUNA)
     Eluna* GetEluna() const { return eluna; }
     Eluna* eluna;
+#endif
 };
 
 #endif //AZEROTHCORE_IWORLD_H
