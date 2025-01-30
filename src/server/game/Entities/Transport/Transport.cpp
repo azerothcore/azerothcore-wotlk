@@ -578,11 +578,26 @@ void MotionTransport::DelayedTeleportTransport()
                 obj->AddObjectToRemoveList();
                 break;
             case TYPEID_PLAYER:
+                float destX, destY, destZ, destO;
+                obj->m_movementInfo.transport.pos.GetPosition(destX, destY, destZ, destO);
+                TransportBase::CalculatePassengerPosition(destX, destY, destZ, &destO, x, y, z, o);
+
+                if (Player* player = obj->ToPlayer())
                 {
-                    float destX, destY, destZ, destO;
-                    obj->m_movementInfo.transport.pos.GetPosition(destX, destY, destZ, destO);
-                    TransportBase::CalculatePassengerPosition(destX, destY, destZ, &destO, x, y, z, o);
-                    if (!obj->ToPlayer()->TeleportTo(newMapId, destX, destY, destZ, destO, TELE_TO_NOT_LEAVE_TRANSPORT))
+                    // Vehicle passengers are dropped in the midle of nowhere, so lets try to eject them, add to transport and teleport
+                    if (player->IsVehicle())
+                        if (Vehicle* vehicleKit = player->GetVehicleKit())
+                            for (SeatMap::iterator itr = vehicleKit->Seats.begin(); itr != vehicleKit->Seats.end(); ++itr)
+                                if (Unit* unit = ObjectAccessor::GetUnit(*player, itr->second.Passenger.Guid))
+                                    if (Player* passenger = unit->ToPlayer())
+                                    {
+                                        passenger->ExitVehicle();
+                                        AddPassenger(passenger, true);
+                                        if (!passenger->TeleportTo(newMapId, destX, destY, destZ, destO, TELE_TO_NOT_LEAVE_TRANSPORT))
+                                            _passengers.erase(obj);
+                                    }
+
+                    if (!player->TeleportTo(newMapId, destX, destY, destZ, destO, TELE_TO_NOT_LEAVE_TRANSPORT))
                         _passengers.erase(obj);
                 }
                 break;
