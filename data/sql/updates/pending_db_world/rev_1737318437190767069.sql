@@ -385,7 +385,10 @@ INSERT INTO `game_event_gameobject` (`guid`, `eventEntry`) VALUES
 (27828, @sunsreachpfour), -- 187356, Shattered Sun Banner (Draenei - Pole)
 -- Gates
 (50441, @sunwellnone), -- 187766, Agamath, The First Gate
+(50439, @sunwellnone), -- 187764, Rohendor, The Second Gate
+(50440, @sunwellnone), -- 187765, Archonisus, The Third Gate
 (50439, @sunwellfirst), -- 187764, Rohendor, The Second Gate
+(50440, @sunwellfirst), -- 187765, Archonisus, The Third Gate
 (50440, @sunwellsecond); -- 187765, Archonisus, The Third Gate
 
 DELETE FROM `creature_queststarter` WHERE `quest` IN (11514, 11520, 11521, 11523, 11525, 11532, 11533, 11535, 11536, 11537, 11538, 11539, 11540, 11541, 11542, 11543, 11544, 11545, 11546, 11547, 11548, 11549);
