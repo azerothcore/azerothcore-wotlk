@@ -71,7 +71,7 @@ INSERT INTO `game_event` (`eventEntry`, `start_time`, `end_time`, `occurence`, `
 (@sunwellnone,         '2000-01-01 14:00:00', '2000-01-01 14:00:00', 5184000, 2592000, 0, 0, 'SWP - All Gates Closed',                        5, 2), -- 1 1 1
 (@sunwellfirst,        '2000-01-01 14:00:00', '2000-01-01 14:00:00', 5184000, 2592000, 0, 0, 'SWP - First Gate Open',                         5, 2), -- 0 1 1
 (@sunwellsecond,       '2000-01-01 14:00:00', '2000-01-01 14:00:00', 5184000, 2592000, 0, 0, 'SWP - Second Gate Open',                        5, 2), -- 0 0 1
-(@sunwellall,          '2000-01-01 14:00:00', '2000-01-01 14:00:00', 5184000, 2592000, 0, 0, 'SWP - All Gates Open',                          5, 2); -- 0 0 0;
+(@sunwellall,          '2000-01-01 14:00:00', '2000-01-01 14:00:00', 5184000, 2592000, 0, 0, 'SWP - All Gates Open',                          5, 2); -- 0 0 0
 
 UPDATE `creature_template` SET `ScriptName`='npc_suns_reach_reclamation' WHERE `entry` IN (24965,24967,25061,25057,24932,25108,25069,25046,24975,25112,25163);
 UPDATE `creature_template` SET `ScriptName`='npc_sunwell_gate' WHERE `entry` = 25169;
@@ -349,7 +349,7 @@ INSERT INTO `game_event_creature` (`guid`, `eventEntry`) VALUES
 (@cguidportalisle+6, @sunsreachportal), -- 24936 (Sunwell Daily Bunny x 0.01)
 (@cguidportalisle+7, @sunsreachportal), -- 24936 (Sunwell Daily Bunny x 0.01)
 (@cguidportalisle+8, @sunsreachportal), -- 24936 (Sunwell Daily Bunny x 0.01)
-(@cguidportalisle+9, @sunsreachportal); -- 24936 (Sunwell Daily Bunny x 0.01);
+(@cguidportalisle+9, @sunsreachportal); -- 24936 (Sunwell Daily Bunny x 0.01)
 
 DELETE FROM `game_event_gameobject` WHERE `eventEntry` IN (@sunsreachpone, @sunsreachptwoonly, @sunsreachptwoperm, @sunsreachnoportal, @sunsreachportal, @sunsreachpthreeonly, @sunsreachpthreeperm, @sunsreachnoanvil, @sunsreachanvil, @sunsreachpfour, @sunsreachnomonument, @sunsreachmonument, @sunsreachnolab, @sunsreachlab, @sunsreachkiru, @sunwellnone, @sunwellfirst, @sunwellsecond, @sunwellall, -@sunsreachpone, -@sunsreachptwoonly, -@sunsreachptwoperm, -@sunsreachnoportal, -@sunsreachportal, -@sunsreachpthreeonly, -@sunsreachpthreeperm, -@sunsreachnoanvil, -@sunsreachanvil, -@sunsreachpfour, -@sunsreachnomonument, -@sunsreachmonument, -@sunsreachnolab, -@sunsreachlab, -@sunsreachkiru, -@sunwellnone, -@sunwellfirst, -@sunwellsecond, -@sunwellall);
 INSERT INTO `game_event_gameobject` (`guid`, `eventEntry`) VALUES
@@ -386,7 +386,7 @@ INSERT INTO `game_event_gameobject` (`guid`, `eventEntry`) VALUES
 -- Gates
 (50441, @sunwellnone), -- 187766, Agamath, The First Gate
 (50439, @sunwellfirst), -- 187764, Rohendor, The Second Gate
-(50440, @sunwellsecond); -- 187765, Archonisus, The Third Gate;
+(50440, @sunwellsecond); -- 187765, Archonisus, The Third Gate
 
 DELETE FROM `creature_queststarter` WHERE `quest` IN (11514, 11520, 11521, 11523, 11525, 11532, 11533, 11535, 11536, 11537, 11538, 11539, 11540, 11541, 11542, 11543, 11544, 11545, 11546, 11547, 11548, 11549);
 DELETE FROM `game_event_creature_quest` WHERE `eventEntry` IN (@sunsreachpone, @sunsreachptwoonly, @sunsreachptwoperm, @sunsreachnoportal, @sunsreachportal, @sunsreachpthreeonly, @sunsreachpthreeperm, @sunsreachnoanvil, @sunsreachanvil, @sunsreachpfour, @sunsreachnomonument, @sunsreachmonument, @sunsreachnolab, @sunsreachlab, @sunsreachkiru, @sunwellnone, @sunwellfirst, @sunwellsecond, @sunwellall);
@@ -431,7 +431,7 @@ INSERT INTO `game_event_creature_quest` (`eventEntry`, `id`, `quest`) VALUES
 (@sunsreachmonument,   25112, 11548), -- Your Continued Support
 -- Alchemy lab
 (@sunsreachlab,        24975, 11521), -- Rediscovering Your Roots
-(@sunsreachlab,        24975, 11546); -- Open for Business;
+(@sunsreachlab,        24975, 11546); -- Open for Business
 
 DELETE FROM `gossip_menu` WHERE `MenuID` IN (51000, 51001, 51002, 51003, 51004, 51005, 51006, 51007, 51008, 51009, 51010, 51011, 51012, 51013); -- Custom IDs
 DELETE FROM `gossip_menu` WHERE `MenuID` IN (9046, 9307) AND `TextID` IN (12226, 12304, 12305, 12306);
@@ -466,7 +466,7 @@ INSERT INTO `gossip_menu` (`MenuID`, `TextID`) VALUES
 -- Mar'nah
 (51012, 12238), -- Alchemy lab progress
 -- Anchorite Ayuri
-(51013, 12322); -- Monument progress;
+(51013, 12322); -- Monument progress
 
 DELETE FROM `npc_text` WHERE `ID` IN (12306, 12602, 12603, 12605);
 INSERT INTO `npc_text` (`ID`, `text0_0`, `text0_1`, `BroadcastTextID0`, `lang0`, `Probability0`, `em0_0`, `em0_1`, `em0_2`, `em0_3`, `em0_4`, `em0_5`, `text1_0`, `text1_1`, `BroadcastTextID1`, `lang1`, `Probability1`, `em1_0`, `em1_1`, `em1_2`, `em1_3`, `em1_4`, `em1_5`, `text2_0`, `text2_1`, `BroadcastTextID2`, `lang2`, `Probability2`, `em2_0`, `em2_1`, `em2_2`, `em2_3`, `em2_4`, `em2_5`, `text3_0`, `text3_1`, `BroadcastTextID3`, `lang3`, `Probability3`, `em3_0`, `em3_1`, `em3_2`, `em3_3`, `em3_4`, `em3_5`, `text4_0`, `text4_1`, `BroadcastTextID4`, `lang4`, `Probability4`, `em4_0`, `em4_1`, `em4_2`, `em4_3`, `em4_4`, `em4_5`, `text5_0`, `text5_1`, `BroadcastTextID5`, `lang5`, `Probability5`, `em5_0`, `em5_1`, `em5_2`, `em5_3`, `em5_4`, `em5_5`, `text6_0`, `text6_1`, `BroadcastTextID6`, `lang6`, `Probability6`, `em6_0`, `em6_1`, `em6_2`, `em6_3`, `em6_4`, `em6_5`, `text7_0`, `text7_1`, `BroadcastTextID7`, `lang7`, `Probability7`, `em7_0`, `em7_1`, `em7_2`, `em7_3`, `em7_4`, `em7_5`, `VerifiedBuild`) VALUES
@@ -502,7 +502,7 @@ INSERT INTO `creature_questender` (`id`, `quest`) VALUES
 (25069, 11539), -- Taking the Harbor
 (25046, 11535), -- Making Ready
 (24975, 11520), -- Discovering Your Roots
-(25112, 11545); -- A Charitable Donation;
+(25112, 11545); -- A Charitable Donation
 
 DELETE FROM `conditions` WHERE `ConditionTypeOrReference` = 12 AND `ConditionValue1` IN (@sunsreachpone, @sunsreachptwoonly, @sunsreachptwoperm, @sunsreachnoportal, @sunsreachportal, @sunsreachpthreeonly, @sunsreachpthreeperm, @sunsreachnoanvil, @sunsreachanvil, @sunsreachpfour, @sunsreachnomonument, @sunsreachmonument, @sunsreachnolab, @sunsreachlab, @sunsreachkiru, @sunwellnone, @sunwellfirst, @sunwellsecond, @sunwellall);
 INSERT INTO `conditions` (`SourceTypeOrReferenceId`, `SourceGroup`, `SourceEntry`, `SourceId`, `ElseGroup`, `ConditionTypeOrReference`, `ConditionTarget`, `ConditionValue1`, `ConditionValue2`, `ConditionValue3`, `NegativeCondition`, `ErrorType`, `ErrorTextId`, `ScriptName`, `Comment`) VALUES
@@ -937,8 +937,8 @@ INSERT INTO `gameobject` (`guid`, `id`, `map`, `spawnMask`, `phaseMask`, `positi
 -- Creatures
 -- Portal Subphase, Shattrath City, Shattered Sun Warrior and Shattered Sun Marksman
 DELETE FROM `creature` WHERE `id1` IN (25115, 24938) AND `guid` BETWEEN @cguidportalshat AND @cguidportalshat+7;
-INSERT INTO `creature` (`guid`, `id1`, `map`, `spawnMask`, `phaseMask`, `equipment_id`, `position_x`, `position_y`, `position_z`, `orientation`, `spawntimesecs`, `MovementType`, `VerifiedBuild`, `Comment`) VALUES
 -- spawntimesecs 30-120s, 75s avg
+INSERT INTO `creature` (`guid`, `id1`, `map`, `spawnMask`, `phaseMask`, `equipment_id`, `position_x`, `position_y`, `position_z`, `orientation`, `spawntimesecs`, `MovementType`, `VerifiedBuild`, `Comment`) VALUES
 (@cguidportalshat+0, 25115, 530, 1, 1, 1, -1983.31005859375, 5491.89013671875, -12.344799995422363, 0.1725849956274032, 75, 2, 0, ''),
 (@cguidportalshat+1, 25115, 530, 1, 1, 1, -1866.1199951171875, 5519.31005859375, -12.344799995422363, 3.35932993888855, 75, 2, 0, ''),
 (@cguidportalshat+2, 25115, 530, 1, 1, 1, -1955.0699462890625, 5432.39990234375, -12.344799995422363, 4.982600212097168, 75, 2, 0, ''),
