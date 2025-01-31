@@ -333,10 +333,10 @@ struct boss_felmyst : public BossAI
 
     void UpdateAI(uint32 diff) override
     {
+        scheduler.Update(diff);
+
         if (!UpdateVictim())
             return;
-
-        scheduler.Update(diff);
 
         if (!me->HasUnitMovementFlag(MOVEMENTFLAG_DISABLE_GRAVITY))
             DoMeleeAttackIfReady();

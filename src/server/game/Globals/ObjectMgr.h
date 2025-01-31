@@ -751,6 +751,8 @@ public:
 
     typedef std::map<uint32, uint32> CharacterConversionMap;
 
+    typedef std::unordered_map<ObjectGuid::LowType, std::vector<float>> CreatureSparringContainer;
+
     GameObjectTemplate const* GetGameObjectTemplate(uint32 entry);
     bool IsGameObjectStaticTransport(uint32 entry);
     [[nodiscard]] GameObjectTemplateContainer const* GetGameObjectTemplates() const { return &_gameObjectTemplateStore; }
@@ -1029,6 +1031,7 @@ public:
     void LoadCreatureQuestItems();
     void LoadTempSummons();
     void LoadCreatures();
+    void LoadCreatureSparring();
     void LoadLinkedRespawn();
     bool SetCreatureLinkedRespawn(ObjectGuid::LowType guid, ObjectGuid::LowType linkedGuid);
     void LoadCreatureAddons();
@@ -1202,6 +1205,9 @@ public:
         if (itr == _creatureDataStore.end()) return nullptr;
         return &itr->second;
     }
+
+    [[nodiscard]] CreatureSparringContainer const& GetSparringData() const { return _creatureSparringStore; }
+
     CreatureData& NewOrExistCreatureData(ObjectGuid::LowType spawnId) { return _creatureDataStore[spawnId]; }
     void DeleteCreatureData(ObjectGuid::LowType spawnId);
     [[nodiscard]] ObjectGuid GetLinkedRespawnGuid(ObjectGuid guid) const
@@ -1526,6 +1532,8 @@ private:
 
     PageTextContainer _pageTextStore;
     InstanceTemplateContainer _instanceTemplateStore;
+
+    CreatureSparringContainer _creatureSparringStore;
 
 private:
     void LoadScripts(ScriptsType type);

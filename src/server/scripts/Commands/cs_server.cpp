@@ -297,11 +297,9 @@ public:
     // Display the 'Message of the day' for the realm
     static bool HandleServerMotdCommand(ChatHandler* handler)
     {
-        LocaleConstant localeConstant = DEFAULT_LOCALE;
-        if (Player* player = handler->GetPlayer())
-            localeConstant = player->GetSession()->GetSessionDbLocaleIndex();
-
-        handler->PSendSysMessage(LANG_MOTD_CURRENT, sMotdMgr->GetMotd(localeConstant));
+        handler->PSendSysMessage(LANG_MOTD_CURRENT);
+        for (uint32 i = 0; i < TOTAL_LOCALES; ++i)
+            handler->PSendSysMessage(LANG_GENERIC_TWO_CURLIES_WITH_COLON, GetNameByLocaleConstant(LocaleConstant(i)), sMotdMgr->GetMotd(LocaleConstant(i)));
         return true;
     }
 
@@ -533,7 +531,7 @@ public:
     }
 
     // Define the 'Message of the day' for the realm
-    static bool HandleServerSetMotdCommand(ChatHandler* handler, Optional<int32> realmId, Optional<std::string> locale, Tail motd)
+    static bool HandleServerSetMotdCommand(ChatHandler* handler, Optional<int32> realmId, std::string locale, Tail motd)
     {
         std::wstring wMotd = std::wstring();
         std::string strMotd = std::string();
@@ -542,39 +540,21 @@ public:
         if (!realmId)
             realmId = static_cast<int32>(realm.Id.Realm);
 
+        // Determine the locale; default to "enUS" if not provided
+        LocaleConstant localeConstant;
+        if (IsLocaleValid(locale))
+            localeConstant = GetLocaleByName(locale);
+        else
+        {
+            handler->SendErrorMessage("locale ({}) is not valid. Valid locales: enUS, koKR, frFR, deDE, zhCN, zhWE, esES, esMX, ruRU.", locale);
+            return false;
+        }
+
         if (motd.empty())
             return false;
 
-        // Convert Tail (motd) to std::string
-        std::ostringstream motdStream;
-        motdStream << motd;
-        std::string motdString = motdStream.str(); // Convert Tail to std::string
-        // Determine the locale; default to "enUS" if not provided
-        LocaleConstant localeConstant = DEFAULT_LOCALE;
-        if (locale.has_value())
-        {
-            if (sMotdMgr->IsValidLocale(locale.value()))
-            {
-                localeConstant = GetLocaleByName(locale.value());
-            }
-            else
-            {
-                motdStream.str("");
-                motdStream << locale.value() << " " << motd;
-                motdString = motdStream.str();
-                localeConstant = DEFAULT_LOCALE;
-                locale = GetNameByLocaleConstant(localeConstant);
-            }
-        }
-        else
-        {
-            // Set to default locale string
-            localeConstant = DEFAULT_LOCALE;
-            locale = GetNameByLocaleConstant(localeConstant);
-        }
-
         // Convert the concatenated motdString to UTF-8 and ensure encoding consistency
-        if (!Utf8toWStr(motdString, wMotd))
+        if (!Utf8toWStr(motd, wMotd))
             return false;
 
         if (!WStrToUtf8(wMotd, strMotd))
@@ -583,34 +563,29 @@ public:
         // Start a transaction for the database operations
         LoginDatabaseTransaction trans = LoginDatabase.BeginTransaction();
 
-        if (localeConstant == DEFAULT_LOCALE)
+        if (localeConstant == LOCALE_enUS)
         {
             // Insert or update in the main motd table for enUS
-            LoginDatabasePreparedStatement* stmt = LoginDatabase.GetPreparedStatement(LOGIN_INS_MOTD);
+            LoginDatabasePreparedStatement* stmt = LoginDatabase.GetPreparedStatement(LOGIN_REP_MOTD);
             stmt->SetData(0, realmId.value());  // realmId for insertion
             stmt->SetData(1, strMotd);          // motd text for insertion
-            stmt->SetData(2, strMotd);          // motd text for ON DUPLICATE KEY UPDATE
             trans->Append(stmt);
         }
         else
         {
             // Insert or update in the motd_localized table for other locales
-            LoginDatabasePreparedStatement* stmt = LoginDatabase.GetPreparedStatement(LOGIN_INS_MOTD_LOCALE);
+            LoginDatabasePreparedStatement* stmt = LoginDatabase.GetPreparedStatement(LOGIN_REP_MOTD_LOCALE);
             stmt->SetData(0, realmId.value());  // realmId for insertion
-            stmt->SetData(1, locale.value());           // locale for insertion
+            stmt->SetData(1, locale);           // locale for insertion
             stmt->SetData(2, strMotd);          // motd text for insertion
-            stmt->SetData(3, strMotd);          // motd text for ON DUPLICATE KEY UPDATE
             trans->Append(stmt);
         }
 
         // Commit the transaction & update db
         LoginDatabase.CommitTransaction(trans);
 
-        // Update the in-memory maps for the current realm. Otherwise, do not update
-        if (realmId == -1 || realmId == static_cast<int32>(realm.Id.Realm))
-            sMotdMgr->SetMotd(strMotd, localeConstant);
-
-        handler->PSendSysMessage(LANG_MOTD_NEW, realmId.value(), locale.value(), strMotd);
+        sMotdMgr->SetMotd(strMotd, localeConstant);
+        handler->PSendSysMessage(LANG_MOTD_NEW, realmId.value(), locale, strMotd);
         return true;
     }
 

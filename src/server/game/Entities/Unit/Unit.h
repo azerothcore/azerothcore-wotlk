@@ -726,6 +726,9 @@ public:
     void RemoveUnitFlag2(UnitFlags2 flags) { RemoveFlag(UNIT_FIELD_FLAGS_2, flags); }
     void ReplaceAllUnitFlags2(UnitFlags2 flags) { SetUInt32Value(UNIT_FIELD_FLAGS_2, flags); }
 
+    void SetEmoteState(Emote emoteState) { SetUInt32Value(UNIT_NPC_EMOTESTATE, emoteState); }  /// @brief Sets emote state (looping emote). Emotes available in SharedDefines.h
+    void ClearEmoteState() { SetEmoteState(EMOTE_ONESHOT_NONE); }  /// @brief Clears emote state (looping emote)
+
     // NPC flags
     NPCFlags GetNpcFlags() const { return NPCFlags(GetUInt32Value(UNIT_NPC_FLAGS)); }
     bool HasNpcFlag(NPCFlags flags) const { return HasFlag(UNIT_NPC_FLAGS, flags) != 0; }
@@ -2043,6 +2046,8 @@ protected:
     void _DeleteRemovedAuras();
 
     void _UpdateAutoRepeatSpell();
+
+    bool CanSparringWith(Unit const* attacker) const;   ///@brief: Check if unit is eligible for sparring damages. Work only if attacker and victim are creatures.
 
     bool IsAlwaysVisibleFor(WorldObject const* seer) const override;
     bool IsAlwaysDetectableFor(WorldObject const* seer) const override;
