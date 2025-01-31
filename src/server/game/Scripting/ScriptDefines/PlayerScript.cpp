@@ -895,6 +895,11 @@ bool ScriptMgr::AnticheatCheckMovementInfo(Player* player, MovementInfo const& m
     CALL_ENABLED_BOOLEAN_HOOKS(PlayerScript, PLAYERHOOK_ANTICHEAT_CHECK_MOVEMENT_INFO, !script->AnticheatCheckMovementInfo(player, movementInfo, mover, jump));
 }
 
+bool ScriptMgr::CanPlayerResurrect(Player* player)
+{
+    CALL_ENABLED_BOOLEAN_HOOKS(PlayerScript, PLAYERHOOK_CAN_RESURRECT, !script->CanPlayerResurrect(player));
+}
+
 PlayerScript::PlayerScript(const char* name, std::vector<uint16> enabledHooks)
     : ScriptObject(name, PLAYERHOOK_END)
 {
