@@ -1,3 +1,4 @@
+-- DB update 2024_11_15_00 -> 2025_01_31_00
 --
 DROP TABLE IF EXISTS `world_state`;
 CREATE TABLE IF NOT EXISTS `world_state` (

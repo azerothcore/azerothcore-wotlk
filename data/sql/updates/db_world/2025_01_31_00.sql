@@ -1,3 +1,4 @@
+-- DB update 2025_01_28_00 -> 2025_01_31_00
 --
 DELETE FROM `command` WHERE `name` IN ('worldstate sunsreach phase', 'worldstate sunsreach subphase', 'worldstate sunsreach gate');
 INSERT INTO `command` (`name`, `security`, `help`) VALUES
