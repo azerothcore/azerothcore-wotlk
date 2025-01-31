@@ -104,7 +104,8 @@ public:
             { "moveflags",      HandleDebugMoveflagsCommand,           SEC_ADMINISTRATOR, Console::No },
             { "unitstate",      HandleDebugUnitStateCommand,           SEC_ADMINISTRATOR, Console::No },
             { "objectcount",    HandleDebugObjectCountCommand,         SEC_ADMINISTRATOR, Console::Yes},
-            { "dummy",          HandleDebugDummyCommand,               SEC_ADMINISTRATOR, Console::No }
+            { "dummy",          HandleDebugDummyCommand,               SEC_ADMINISTRATOR, Console::No },
+            { "mapdata",        HandleDebugMapDataCommand,             SEC_ADMINISTRATOR, Console::No }
         };
         static ChatCommandTable commandTable =
         {
@@ -1371,6 +1372,20 @@ public:
     static bool HandleDebugDummyCommand(ChatHandler* handler)
     {
         handler->SendSysMessage("This command does nothing right now. Edit your local core (cs_debug.cpp) to make it do whatever you need for testing.");
+        return true;
+    }
+
+    static bool HandleDebugMapDataCommand(ChatHandler* handler)
+    {
+        Cell cell(handler->GetPlayer()->GetPositionX(), handler->GetPlayer()->GetPositionY());
+        Map* map = handler->GetPlayer()->GetMap();
+
+        handler->PSendSysMessage("GridX {} GridY {}", cell.GridX(), cell.GridY());
+        handler->PSendSysMessage("CellX {} CellY {}", cell.CellX(), cell.CellY());
+        handler->PSendSysMessage("Created Grids: {} / {}", map->GetCreatedGridsCount(), MAX_NUMBER_OF_GRIDS * MAX_NUMBER_OF_GRIDS);
+        handler->PSendSysMessage("Loaded Grids: {} / {}", map->GetLoadedGridsCount(), MAX_NUMBER_OF_GRIDS * MAX_NUMBER_OF_GRIDS);
+        handler->PSendSysMessage("Created Cells In Grid: {} / {}", map->GetCreatedCellsInGridCount(cell.GridX(), cell.GridY()), MAX_NUMBER_OF_CELLS * MAX_NUMBER_OF_CELLS);
+        handler->PSendSysMessage("Created Cells In Map: {} / {}", map->GetCreatedCellsInMapCount(), TOTAL_NUMBER_OF_CELLS_PER_MAP * TOTAL_NUMBER_OF_CELLS_PER_MAP);
         return true;
     }
 };
