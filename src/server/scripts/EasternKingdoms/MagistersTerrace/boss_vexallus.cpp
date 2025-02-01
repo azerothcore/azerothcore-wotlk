@@ -99,7 +99,7 @@ struct boss_vexallus : public BossAI
                     }
                     else
                         DoCastSelf(SPELL_SUMMON_PURE_ENERGY_N);
-                    
+
                     _energyCooldown = true;
                     ++_energyCount;
 
