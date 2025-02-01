@@ -17778,106 +17778,6 @@ void Unit::Kill(Unit* killer, Unit* victim, bool durabilityLoss, WeaponAttackTyp
     Player* player = killer ? killer->GetCharmerOrOwnerPlayerOrPlayerItself() : nullptr;
     Creature* creature = victim->ToCreature();
 
-    bool isRewardAllowed = true;
-    if (creature)
-    {
-        isRewardAllowed = creature->IsDamageEnoughForLootingAndReward();
-        if (!isRewardAllowed)
-            creature->SetLootRecipient(nullptr);
-    }
-
-    // pussywizard: remade this if section (player is on the same map
-    if (isRewardAllowed && creature)
-    {
-        Player* lr = creature->GetLootRecipient();
-        if (lr && lr->IsInMap(creature))
-            player = creature->GetLootRecipient();
-        else if (Group* lrg = creature->GetLootRecipientGroup())
-            for (GroupReference* itr = lrg->GetFirstMember(); itr != nullptr; itr = itr->next())
-                if (Player* member = itr->GetSource())
-                    if (member->IsAtLootRewardDistance(creature))
-                    {
-                        player = member;
-                        break;
-                    }
-    }
-
-    // Exploit fix
-    if (creature && creature->IsPet() && creature->GetOwnerGUID().IsPlayer())
-        isRewardAllowed = false;
-
-    // Reward player, his pets, and group/raid members
-    // call kill spell proc event (before real die and combat stop to triggering auras removed at death/combat stop)
-    if (isRewardAllowed && player && player != victim)
-    {
-        WorldPacket data(SMSG_PARTYKILLLOG, (8 + 8)); // send event PARTY_KILL
-        data << player->GetGUID(); // player with killing blow
-        data << victim->GetGUID(); // victim
-
-        Player* looter = player;
-        Group* group = player->GetGroup();
-        bool hasLooterGuid = false;
-
-        if (group)
-        {
-            group->BroadcastPacket(&data, group->GetMemberGroup(player->GetGUID()));
-
-            if (creature)
-            {
-                group->UpdateLooterGuid(creature, true);
-                if (group->GetLooterGuid() && group->GetLootMethod() != FREE_FOR_ALL)
-                {
-                    looter = ObjectAccessor::FindPlayer(group->GetLooterGuid());
-                    if (looter)
-                    {
-                        hasLooterGuid = true;
-                        creature->SetLootRecipient(looter);   // update creature loot recipient to the allowed looter.
-                    }
-                }
-            }
-        }
-        else
-        {
-            player->SendDirectMessage(&data);
-
-            if (creature)
-            {
-                WorldPacket data2(SMSG_LOOT_LIST, 8 + 1 + 1);
-                data2 << creature->GetGUID();
-                data2 << uint8(0); // unk1
-                data2 << uint8(0); // no group looter
-                player->SendMessageToSet(&data2, true);
-            }
-        }
-
-        // Generate loot before updating looter
-        if (creature)
-        {
-            Loot* loot = &creature->loot;
-            loot->clear();
-
-            if (uint32 lootid = creature->GetCreatureTemplate()->lootid)
-                loot->FillLoot(lootid, LootTemplates_Creature, looter, false, false, creature->GetLootMode(), creature);
-
-            if (creature->GetLootMode())
-                loot->generateMoneyLoot(creature->GetCreatureTemplate()->mingold, creature->GetCreatureTemplate()->maxgold);
-
-            if (group)
-            {
-                if (hasLooterGuid)
-                    group->SendLooter(creature, looter);
-                else
-                    group->SendLooter(creature, nullptr);
-
-                // Update round robin looter only if the creature had loot
-                if (!creature->loot.empty())
-                    group->UpdateLooterGuid(creature);
-            }
-        }
-
-        player->RewardPlayerAndGroupAtKill(victim, false);
-    }
-
     // Do KILL and KILLED procs. KILL proc is called only for the unit who landed the killing blow (and its owner - for pets and totems) regardless of who tapped the victim
     if (killer && (killer->IsPet() || killer->IsTotem()))
         if (Unit* owner = killer->GetOwner())
@@ -18041,6 +17941,106 @@ void Unit::Kill(Unit* killer, Unit* victim, bool durabilityLoss, WeaponAttackTyp
                     if (creature->GetCreatureTemplate()->flags_extra & CREATURE_FLAG_EXTRA_INSTANCE_BIND)
                         instanceMap->ToInstanceMap()->PermBindAllPlayers();
         }
+    }
+
+    bool isRewardAllowed = true;
+    if (creature)
+    {
+        isRewardAllowed = creature->IsDamageEnoughForLootingAndReward();
+        if (!isRewardAllowed)
+            creature->SetLootRecipient(nullptr);
+    }
+
+    // pussywizard: remade this if section (player is on the same map
+    if (isRewardAllowed && creature)
+    {
+        Player* lr = creature->GetLootRecipient();
+        if (lr && lr->IsInMap(creature))
+            player = creature->GetLootRecipient();
+        else if (Group* lrg = creature->GetLootRecipientGroup())
+            for (GroupReference* itr = lrg->GetFirstMember(); itr != nullptr; itr = itr->next())
+                if (Player* member = itr->GetSource())
+                    if (member->IsAtLootRewardDistance(creature))
+                    {
+                        player = member;
+                        break;
+                    }
+    }
+
+    // Exploit fix
+    if (creature && creature->IsPet() && creature->GetOwnerGUID().IsPlayer())
+        isRewardAllowed = false;
+
+    // Reward player, his pets, and group/raid members
+    // call kill spell proc event (before real die and combat stop to triggering auras removed at death/combat stop)
+    if (isRewardAllowed && player && player != victim)
+    {
+        WorldPacket data(SMSG_PARTYKILLLOG, (8 + 8)); // send event PARTY_KILL
+        data << player->GetGUID(); // player with killing blow
+        data << victim->GetGUID(); // victim
+
+        Player* looter = player;
+        Group* group = player->GetGroup();
+        bool hasLooterGuid = false;
+
+        if (group)
+        {
+            group->BroadcastPacket(&data, group->GetMemberGroup(player->GetGUID()));
+
+            if (creature)
+            {
+                group->UpdateLooterGuid(creature, true);
+                if (group->GetLooterGuid() && group->GetLootMethod() != FREE_FOR_ALL)
+                {
+                    looter = ObjectAccessor::FindPlayer(group->GetLooterGuid());
+                    if (looter)
+                    {
+                        hasLooterGuid = true;
+                        creature->SetLootRecipient(looter);   // update creature loot recipient to the allowed looter.
+                    }
+                }
+            }
+        }
+        else
+        {
+            player->SendDirectMessage(&data);
+
+            if (creature)
+            {
+                WorldPacket data2(SMSG_LOOT_LIST, 8 + 1 + 1);
+                data2 << creature->GetGUID();
+                data2 << uint8(0); // unk1
+                data2 << uint8(0); // no group looter
+                player->SendMessageToSet(&data2, true);
+            }
+        }
+
+        // Generate loot before updating looter
+        if (creature)
+        {
+            Loot* loot = &creature->loot;
+            loot->clear();
+
+            if (uint32 lootid = creature->GetCreatureTemplate()->lootid)
+                loot->FillLoot(lootid, LootTemplates_Creature, looter, false, false, creature->GetLootMode(), creature);
+
+            if (creature->GetLootMode())
+                loot->generateMoneyLoot(creature->GetCreatureTemplate()->mingold, creature->GetCreatureTemplate()->maxgold);
+
+            if (group)
+            {
+                if (hasLooterGuid)
+                    group->SendLooter(creature, looter);
+                else
+                    group->SendLooter(creature, nullptr);
+
+                // Update round robin looter only if the creature had loot
+                if (!creature->loot.empty())
+                    group->UpdateLooterGuid(creature);
+            }
+        }
+
+        player->RewardPlayerAndGroupAtKill(victim, false);
     }
 
     // outdoor pvp things, do these after setting the death state, else the player activity notify won't work... doh...
