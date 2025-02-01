@@ -90,6 +90,8 @@ struct OutdoorPvPData;
 struct TargetInfo;
 struct SpellModifier;
 
+enum ReputationSource;
+
 namespace Acore::ChatCommands
 {
     struct ChatCommandBuilder;
@@ -311,6 +313,10 @@ public: /* PlayerScript */
     void OnPlayerMoneyChanged(Player* player, int32& amount);
     void OnPlayerBeforeLootMoney(Player* player, Loot* loot);
     void OnPlayerGiveXP(Player* player, uint32& amount, Unit* victim, uint8 xpSource);
+    void OnBeforePlayerReputationChange(Player* player, uint32 factionId, float& amount, Unit* victim);
+    void OnBeforePlayerReputationChange(Player* player, uint32 factionId, float& amount, Quest const* quest);
+    void OnBeforePlayerReputationChange(Player* player, uint32 factionId, float& amount, Spell* spell);
+    void OnBeforePlayerReputationChange(Player* player, uint32 factionId, float& amount, ReputationSource reputationSource);
     bool OnPlayerReputationChange(Player* player, uint32 factionID, int32& standing, bool incremental);
     void OnPlayerReputationRankChange(Player* player, uint32 factionID, ReputationRank newRank, ReputationRank oldRank, bool increased);
     void OnPlayerLearnSpell(Player* player, uint32 spellID);

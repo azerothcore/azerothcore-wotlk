@@ -6011,6 +6011,8 @@ void Player::RewardReputation(Unit* victim)
     if (Rep->RepFaction1 && (!Rep->TeamDependent || teamId == TEAM_ALLIANCE))
     {
         float donerep1 = CalculateReputationGain(REPUTATION_SOURCE_KILL, victim->GetLevel(), static_cast<float>(Rep->RepValue1), ChampioningFaction ? ChampioningFaction : Rep->RepFaction1);
+        ScriptMgr::instance()->OnBeforePlayerReputationChange(this, static_cast<float>(Rep->RepValue1), donerep1, ReputationSource::REPUTATION_SOURCE_KILL);
+        ScriptMgr::instance()->OnBeforePlayerReputationChange(this, static_cast<float>(Rep->RepValue1), donerep1, victim);
 
         FactionEntry const* factionEntry1 = sFactionStore.LookupEntry(ChampioningFaction ? ChampioningFaction : Rep->RepFaction1);
         if (factionEntry1)
@@ -6022,6 +6024,8 @@ void Player::RewardReputation(Unit* victim)
     if (Rep->RepFaction2 && (!Rep->TeamDependent || teamId == TEAM_HORDE))
     {
         float donerep2 = CalculateReputationGain(REPUTATION_SOURCE_KILL, victim->GetLevel(), static_cast<float>(Rep->RepValue2), ChampioningFaction ? ChampioningFaction : Rep->RepFaction2);
+        ScriptMgr::instance()->OnBeforePlayerReputationChange(this, static_cast<float>(Rep->RepValue1), donerep2, ReputationSource::REPUTATION_SOURCE_KILL);
+        ScriptMgr::instance()->OnBeforePlayerReputationChange(this, static_cast<float>(Rep->RepValue1), donerep2, victim);
 
         FactionEntry const* factionEntry2 = sFactionStore.LookupEntry(ChampioningFaction ? ChampioningFaction : Rep->RepFaction2);
         if (factionEntry2)
@@ -6061,24 +6065,30 @@ void Player::RewardReputation(Quest const* quest)
         if (quest->IsDaily())
         {
             rep = CalculateReputationGain(REPUTATION_SOURCE_DAILY_QUEST, GetQuestLevel(quest), rep, quest->RewardFactionId[i], false);
+            ScriptMgr::instance()->OnBeforePlayerReputationChange(this, quest->RewardFactionId[i], rep, ReputationSource::REPUTATION_SOURCE_DAILY_QUEST);
         }
         else if (quest->IsWeekly())
         {
             rep = CalculateReputationGain(REPUTATION_SOURCE_WEEKLY_QUEST, GetQuestLevel(quest), rep, quest->RewardFactionId[i], false);
+            ScriptMgr::instance()->OnBeforePlayerReputationChange(this, quest->RewardFactionId[i], rep, ReputationSource::REPUTATION_SOURCE_WEEKLY_QUEST);
         }
         else if (quest->IsMonthly())
         {
             rep = CalculateReputationGain(REPUTATION_SOURCE_MONTHLY_QUEST, GetQuestLevel(quest), rep, quest->RewardFactionId[i], false);
+            ScriptMgr::instance()->OnBeforePlayerReputationChange(this, quest->RewardFactionId[i], rep, ReputationSource::REPUTATION_SOURCE_MONTHLY_QUEST);
         }
         else if (quest->IsRepeatable())
         {
             rep = CalculateReputationGain(REPUTATION_SOURCE_REPEATABLE_QUEST, GetQuestLevel(quest), rep, quest->RewardFactionId[i], false);
+            ScriptMgr::instance()->OnBeforePlayerReputationChange(this, quest->RewardFactionId[i], rep, ReputationSource::REPUTATION_SOURCE_REPEATABLE_QUEST);
         }
         else
         {
             rep = CalculateReputationGain(REPUTATION_SOURCE_QUEST, GetQuestLevel(quest), rep, quest->RewardFactionId[i], false);
+            ScriptMgr::instance()->OnBeforePlayerReputationChange(this, quest->RewardFactionId[i], rep, ReputationSource::REPUTATION_SOURCE_QUEST);
         }
 
+        ScriptMgr::instance()->OnBeforePlayerReputationChange(this, quest->RewardFactionId[i], rep, quest);
         if (FactionEntry const* factionEntry = sFactionStore.LookupEntry(quest->RewardFactionId[i]))
         {
             GetReputationMgr().ModifyReputation(factionEntry, rep, quest->HasSpecialFlag(QUEST_SPECIAL_FLAGS_NO_REP_SPILLOVER));

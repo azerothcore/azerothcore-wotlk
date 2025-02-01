@@ -26,6 +26,8 @@
 #include "AchievementMgr.h"
 #include "KillRewarder.h"
 
+enum ReputationSource;
+
 enum PlayerHook
 {
     PLAYERHOOK_ON_PLAYER_JUST_DIED,
@@ -48,6 +50,10 @@ enum PlayerHook
     PLAYERHOOK_ON_MONEY_CHANGED,
     PLAYERHOOK_ON_BEFORE_LOOT_MONEY,
     PLAYERHOOK_ON_GIVE_EXP,
+    PLAYERHOOK_ON_BEFORE_REPUTATION_CHANGE_UNIT,
+    PLAYERHOOK_ON_BEFORE_REPUTATION_CHANGE_QUEST,
+    PLAYERHOOK_ON_BEFORE_REPUTATION_CHANGE_SPELL,
+    PLAYERHOOK_ON_BEFORE_REPUTATION_CHANGE_SOURCE,
     PLAYERHOOK_ON_REPUTATION_CHANGE,
     PLAYERHOOK_ON_REPUTATION_RANK_CHANGE,
     PLAYERHOOK_ON_LEARN_SPELL,
@@ -274,6 +280,18 @@ public:
 
     // Called when a player gains XP (before anything is given)
     virtual void OnPlayerGiveXP(Player* /*player*/, uint32& /*amount*/, Unit* /*victim*/, uint8 /*xpSource*/) { }
+
+    // Called before a player gains or looses Reputation
+    virtual void OnBeforeReputationChange(Player* player, uint32 factionId, float& amount, Unit* victim) {}
+
+    // Called before a player gains or looses Reputation
+    virtual void OnBeforeReputationChange(Player* player, uint32 factionId, float& amount, Quest const* quest) {}
+
+    // Called before a player gains or looses Reputation
+    virtual void OnBeforeReputationChange(Player* player, uint32 factionId, float& amount, Spell* spell) {}
+
+    // Called before a player gains or looses Reputation
+    virtual void OnBeforeReputationChange(Player* player, uint32 factionId, float& amount, ReputationSource reputationSource) {}
 
     // Called when a player's reputation changes (before it is actually changed)
     virtual bool OnPlayerReputationChange(Player* /*player*/, uint32 /*factionID*/, int32& /*standing*/, bool /*incremental*/) { return true; }
