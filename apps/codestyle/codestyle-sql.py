@@ -102,7 +102,7 @@ def trailing_whitespace_check(file: io, file_path: str) -> None:
 def sql_check(file: io, file_path: str) -> None:
     global error_handler, results
     file.seek(0)  # Reset file pointer to the beginning
-    not_delete = ["creature_template", "gameobject_template", "item_template"]
+    not_delete = ["creature_template", "gameobject_template", "item_template", "quest_template"]
     check_failed = False
 
     # Parse all the file
