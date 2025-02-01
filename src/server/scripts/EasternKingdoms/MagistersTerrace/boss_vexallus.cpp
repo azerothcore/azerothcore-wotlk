@@ -41,39 +41,6 @@ enum Spells
     SPELL_SUMMON_PURE_ENERGY_H2     = 46159  // Heroic mode summon 2
 };
 
-struct npc_pure_energy : public ScriptedAI
-{
-    npc_pure_energy(Creature* creature) : ScriptedAI(creature) { }
-
-    void IsSummonedBy(WorldObject* summoner) override
-    {
-        if (Creature* vexallus = summoner->ToCreature())
-            if (Unit* target = vexallus->AI()->SelectTarget(SelectTargetMethod::Random, 0))
-                me->CastSpell(target, SPELL_ENERGY_FEEDBACK_CHANNEL, false);
-    }
-
-    void DamageTaken(Unit* attacker, uint32& damage, DamageEffectType, SpellSchoolMask) override
-    {
-        if (!attacker || !attacker->IsPlayer() || attacker->GetVictim() != me)
-            damage = 0; // Only take damage from players targeting this add
-    }
-
-    void UpdateAI(uint32 /*diff*/) override
-    {
-        if (!UpdateVictim())
-            return;
-    }
-
-    void AttackStart(Unit* victim) override
-    {
-        if (victim)
-        {
-            me->Attack(victim, false);
-            me->GetMotionMaster()->MoveChase(victim, 0.0f, 0.0f);
-        }
-    }
-};
-
 struct boss_vexallus : public BossAI
 {
     boss_vexallus(Creature* creature) : BossAI(creature, DATA_VEXALLUS), _energyCooldown(false), _energyCount(0) { }
@@ -118,7 +85,7 @@ struct boss_vexallus : public BossAI
         {
             scheduler.Schedule(1s, [this](TaskContext context)
             {
-                if (_energyCount == 5)
+                if (_energyCount == 5 && !_energyCooldown)
                 {
                     scheduler.CancelAll();
                     Talk(SAY_OVERLOAD);
@@ -159,6 +126,18 @@ struct boss_vexallus : public BossAI
         }, 5s);
     }
 
+    void JustSummoned(Creature* summon) override
+    {
+        if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0))
+        {
+            summon->SetReactState(REACT_PASSIVE);
+            summon->GetMotionMaster()->MoveFollow(target, 0.0f, 0.0f);
+            summon->CastSpell(target, SPELL_ENERGY_FEEDBACK_CHANNEL, false);
+        }
+
+        summons.Summon(summon);
+    }
+
     void SummonedCreatureDies(Creature* summon, Unit* killer) override
     {
         summons.Despawn(summon);
@@ -174,6 +153,5 @@ private:
 
 void AddSC_boss_vexallus()
 {
-    RegisterMagistersTerraceCreatureAI(npc_pure_energy);
     RegisterMagistersTerraceCreatureAI(boss_vexallus);
 }
