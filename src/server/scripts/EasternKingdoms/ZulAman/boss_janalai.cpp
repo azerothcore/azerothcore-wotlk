@@ -187,9 +187,9 @@ struct boss_janalai : public BossAI
         BossAI::JustEngagedWith(who);
         Talk(SAY_AGGRO);
         //schedule abilities
-        ScheduleTimedEvent(30s, [&]{
+        ScheduleTimedEvent(57s, [&]{
             StartBombing();
-        }, 20s, 40s);
+        }, 30s);
 
         scheduler.Schedule(10s, GROUP_HATCHING, [this](TaskContext context)
         {
@@ -218,18 +218,20 @@ struct boss_janalai : public BossAI
         });
 
         ScheduleTimedEvent(8s, [&]{
-            if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0))
+            if (!_isBombing)
             {
-                me->AttackStop();
-                me->GetMotionMaster()->Clear();
-                DoCast(target, SPELL_FLAME_BREATH);
-                me->StopMoving();
-                _isFlameBreathing = true;
-                // placeholder time idk yet
-                scheduler.Schedule(2s, [this](TaskContext)
+                if (Unit* target = SelectTarget(SelectTargetMethod::MaxThreat, 0))
                 {
-                    _isFlameBreathing = false;
-                });
+                    me->AttackStop();
+                    me->GetMotionMaster()->Clear();
+                    DoCast(target, SPELL_FLAME_BREATH);
+                    me->StopMoving();
+                    _isFlameBreathing = true;
+                    scheduler.Schedule(1500ms, [this](TaskContext)
+                    {
+    			        _isFlameBreathing = false;
+                    });
+                }
             }
         }, 8s);
 
@@ -290,11 +292,13 @@ struct boss_janalai : public BossAI
 
     void SpawnBombs()
     {
-        float dx, dy;
+        float maxRadius = std::min(area_dx, area_dy) / 2.0f;
         for (int i = 0; i < MAX_BOMB_COUNT; ++i)
         {
-            dx = float(irand(-area_dx / 2, area_dx / 2));
-            dy = float(irand(-area_dy / 2, area_dy / 2));
+            float angle = float(rand()) / float(RAND_MAX) * 2.0f * M_PI;
+            float radius = float(rand()) / float(RAND_MAX) * maxRadius;
+            float dx = radius * cos(angle);
+            float dy = radius * sin(angle);
             DoSpawnCreature(NPC_FIRE_BOMB, dx, dy, 0, 0, TEMPSUMMON_TIMED_DESPAWN, 15000);
         }
     }
@@ -320,44 +324,52 @@ struct boss_janalai : public BossAI
         me->GetMotionMaster()->Clear();
         me->SetPosition(janalainPos);
         me->StopMovingOnCurrentPos();
-        DoCastSelf(SPELL_FIRE_BOMB_CHANNEL);
-
-        FireWall();
-        SpawnBombs();
+        me->AddUnitState(UNIT_STATE_NOT_MOVE);
         _isBombing = true;
 
         DoCastSelf(SPELL_TELE_TO_CENTER);
         DoCastAOE(SPELL_SUMMON_PLAYERS_DUMMY, true);
 
-        //DoCast(Temp, SPELL_SUMMON_PLAYERS, true) // core bug, spell does not work if too far
-        ThrowBombs();
-
-        scheduler.Schedule(11s, [this](TaskContext)
+        scheduler.Schedule(3s, [this](TaskContext)
         {
-            Boom();
-            _isBombing = false;
+            me->ClearUnitState(UNIT_STATE_NOT_MOVE);
+            DoCastSelf(SPELL_FIRE_BOMB_CHANNEL);
+            FireWall();
+            SpawnBombs();
+            ThrowBombs();
+            scheduler.Schedule(6s, [this](TaskContext)
+            {
+                _isBombing = false;
+                me->RemoveAurasDueToSpell(SPELL_FIRE_BOMB_CHANNEL);
+                if (Unit* victim = me->GetVictim())
+                me->Attack(victim, true);
+            });
 
-            me->RemoveAurasDueToSpell(SPELL_FIRE_BOMB_CHANNEL);
+            scheduler.Schedule(9s, [this](TaskContext)
+            {
+                Boom();
+            });
         });
     }
 
     void ThrowBombs()
     {
-        std::chrono::milliseconds bombTimer = 100ms;
-
-        summons.DoForAllSummons([this, &bombTimer](WorldObject* summon) {
+        std::chrono::milliseconds bombTimer = 0ms;
+        const std::chrono::milliseconds throwDuration = 5000ms;
+        summons.DoForAllSummons([this, &bombTimer, throwDuration](WorldObject* summon) {
             if (summon->GetEntry() == NPC_FIRE_BOMB)
             {
                 if (Creature* bomb = summon->ToCreature())
                 {
+                    // Calculate timing to spread throws over 5 seconds
+                    std::chrono::milliseconds throwTime = bombTimer % throwDuration;
                     bomb->m_Events.AddEventAtOffset([this, bomb] {
                         bomb->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
                         DoCast(bomb, SPELL_FIRE_BOMB_THROW, true);
                         bomb->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
-                    }, bombTimer);
+                    }, throwTime);
                 }
-
-                bombTimer += 100ms;
+                bombTimer += throwDuration / MAX_BOMB_COUNT;
             }
         });
     }
@@ -386,6 +398,7 @@ struct npc_janalai_hatcher : public ScriptedAI
         _isHatching = false;
         me->GetMotionMaster()->Clear();
         me->GetMotionMaster()->MovePoint(0, hatcherway[_side][0]);
+        me->ClearUnitState(UNIT_STATE_NOT_MOVE);
     }
 
     void MovementInform(uint32, uint32) override
