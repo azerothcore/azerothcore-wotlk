@@ -59,7 +59,8 @@ function(ConfigureElunaModule moduleName)
   target_compile_options(game-interface
     INTERFACE
       -DAZEROTHCORE
-      -DWOTLK)
+      -DWOTLK
+      -DMOD_ELUNA)
 endfunction()
 
 # Set the MODULES_${SOURCE_MODULE} variables from the
