@@ -337,6 +337,12 @@ static Optional<float> GetVelocity(Unit* owner, Unit* target, G3D::Vector3 const
     if (!owner->IsInCombat() && !owner->IsVehicle() && !owner->HasUnitFlag(UNIT_FLAG_POSSESSED) &&
         (owner->IsPet() || owner->IsGuardian() || owner->GetGUID() == target->GetCritterGUID() || owner->GetCharmerOrOwnerGUID() == target->GetGUID()))
     {
+        // Some temp summons are designed to just follow the owner to the quest giver
+        // They are not always intended to have their speed adjusted based on their owner
+        if (TempSummon* summon = owner->ToTempSummon())
+            if (!summon->m_InheritsOwnerSpeed)
+                return speed;
+
         uint32 moveFlags = target->GetUnitMovementFlags();
         if (target->movespline->isWalking())
         {
