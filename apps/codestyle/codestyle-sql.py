@@ -108,7 +108,7 @@ def sql_check(file: io, file_path: str) -> None:
     # Parse all the file
     for line_number, line in enumerate(file, start = 1):
         for table in not_delete:
-            pattern = rf"DELETE FROM\s+`{table}`\b"
+            pattern = rf"DELETE FROM\s+`{table}`\s*"
             if re.search(pattern, line, re.IGNORECASE):
                 print(
                     f"Entries from this {table} should not be deleted! {file_path} at line {line_number}")
