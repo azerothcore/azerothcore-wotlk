@@ -155,7 +155,7 @@ def insert_delete_safety_check(file: io, file_path: str) -> None:
             if table_name in not_delete:
                 print(
                     f"Entries from this {table} should not be deleted! {file_path} at line {line_number}")
-            check_failed = True
+                check_failed = True
 
     # Handle the script error and update the result output
     if check_failed:
