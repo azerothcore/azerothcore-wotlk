@@ -1,2 +1,2 @@
 --
-DELETE FROM `creature_template`
+DELETE FROM `creature_template`;
