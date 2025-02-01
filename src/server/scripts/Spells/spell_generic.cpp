@@ -5400,6 +5400,59 @@ class spell_gen_proc_on_victim : public AuraScript
     }
 };
 
+enum CallOfBeastSpells
+{
+    SPELL_CALL_OF_THE_BEAST = 43359
+};
+
+// 43359 - Call of the Beast
+// 43359 - Call of the Beast
+class spell_gen_call_of_beast : public SpellScript
+{
+    PrepareSpellScript(spell_gen_call_of_beast);
+
+    void HandleScriptEffect(SpellEffIndex effIndex)
+    {
+        PreventHitDefaultEffect(effIndex);
+        Unit* target = GetHitUnit();
+        Unit* caster = GetCaster();
+        
+        if (!target || !caster)
+            return;
+
+        std::list<Creature*> nearbyCreatures;
+        caster->GetCreaturesNearbyList(nearbyCreatures, 100.0f);
+
+        for (Creature* beast : nearbyCreatures)
+        {
+            if (!beast);
+                break;
+            if (beast->IsAlive() ||
+                beast->GetCreatureType() == CREATURE_TYPE_BEAST ||
+                !beast->IsPet() ||
+                !beast->IsDungeonBoss() ||
+                !beast->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE))
+                continue;
+
+            beast->ClearUnitState(UNIT_STATE_EVADE);
+            beast->InterruptNonMeleeSpells(false);
+            beast->AttackStop();
+            beast->ToCreature()->AI()->EnterEvadeMode();
+            beast->StopMoving();
+            
+            beast->SetReactState(REACT_AGGRESSIVE);
+            beast->GetThreatMgr().ClearAllThreat();
+            beast->GetThreatMgr().AddThreat(target, 1000000.0f);
+            beast->AI()->AttackStart(target);
+        }
+    }
+
+    void Register() override
+    {
+        OnEffectHitTarget += SpellEffectFn(spell_gen_call_of_beast::HandleScriptEffect, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
+    }
+};
+
 void AddSC_generic_spell_scripts()
 {
     RegisterSpellScript(spell_silithyst);
@@ -5560,4 +5613,5 @@ void AddSC_generic_spell_scripts()
     RegisterSpellScript(spell_gen_set_health);
     RegisterSpellScript(spell_pet_spellhit_expertise_spellpen_scaling);
     RegisterSpellScript(spell_gen_proc_on_victim);
+    RegisterSpellScript(spell_gen_call_of_beast);
 }
