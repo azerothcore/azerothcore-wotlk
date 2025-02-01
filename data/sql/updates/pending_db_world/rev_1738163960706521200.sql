@@ -15,7 +15,7 @@ INSERT INTO `creature` (`guid`, `id1`, `id2`, `id3`, `map`, `zoneId`, `areaId`, 
 
 DELETE FROM `creature_addon` WHERE (`guid` IN (3110422));
 INSERT INTO `creature_addon` (`guid`, `path_id`, `mount`, `bytes1`, `bytes2`, `emote`, `visibilityDistanceType`, `auras`) VALUES
-(3110422, 0, 0, 0, 1, 0, 0, '29266'); 
+(3110422, 0, 0, 0, 1, 0, 0, '29266');
 
 DELETE FROM `creature_text` WHERE `CreatureID` = 20780;
 INSERT INTO `creature_text` (`CreatureID`, `GroupID`, `ID`, `Text`, `Type`, `Language`, `Probability`, `Emote`, `Duration`, `Sound`, `BroadcastTextId`, `TextRange`, `comment`) VALUES
