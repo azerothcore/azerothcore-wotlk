@@ -6722,7 +6722,7 @@ bool Player::Satisfy(DungeonProgressionRequirements const* ar, uint32 target_map
                 LevelMax = ar->levelMax;
         }
 
-        if (DisableMgr::IsDisabledFor(DISABLE_TYPE_MAP, target_map, this))
+        if (sDisableMgr->IsDisabledFor(DISABLE_TYPE_MAP, target_map, this))
         {
             GetSession()->SendAreaTriggerMessage("{}", GetSession()->GetAcoreString(LANG_INSTANCE_CLOSED));
             return false;
