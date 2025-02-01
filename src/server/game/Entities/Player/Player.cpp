@@ -5982,7 +5982,7 @@ void Player::RewardReputation(Unit* victim)
     if (!victim || victim->IsPlayer())
         return;
 
-    if (victim->ToCreature()->IsReputationGainDisabled())
+    if (victim->ToCreature()->IsReputationRewardDisabled())
         return;
 
     ReputationOnKillEntry const* Rep = sObjectMgr->GetReputationOnKilEntry(victim->ToCreature()->GetCreatureTemplate()->Entry);
