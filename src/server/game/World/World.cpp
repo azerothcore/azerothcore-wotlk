@@ -1498,6 +1498,8 @@ void World::LoadConfigSettings(bool reload)
     _bool_configs[CONFIG_SPELL_QUEUE_ENABLED] = sConfigMgr->GetOption<bool>("SpellQueue.Enabled", true);
     _int_configs[CONFIG_SPELL_QUEUE_WINDOW] = sConfigMgr->GetOption<uint32>("SpellQueue.Window", 400);
 
+    _int_configs[CONFIG_SUNSREACH_COUNTER_MAX] = sConfigMgr->GetOption<uint32>("Sunsreach.CounterMax", 10000);
+
     // call ScriptMgr if we're reloading the configuration
     sScriptMgr->OnAfterConfigLoad(reload);
 }
@@ -1759,6 +1761,9 @@ void World::SetInitialWorldSettings()
 
     LOG_INFO("server.loading", "Loading Creature Data...");
     sObjectMgr->LoadCreatures();
+
+    LOG_INFO("server.loading", "Loading Creature sparring...");
+    sObjectMgr->LoadCreatureSparring();
 
     LOG_INFO("server.loading", "Loading Temporary Summon Data...");
     sObjectMgr->LoadTempSummons();                               // must be after LoadCreatureTemplates() and LoadGameObjectTemplates()
@@ -2028,6 +2033,7 @@ void World::SetInitialWorldSettings()
     ///- Load AutoBroadCast
     LOG_INFO("server.loading", "Loading Autobroadcasts...");
     sAutobroadcastMgr->LoadAutobroadcasts();
+    sAutobroadcastMgr->LoadAutobroadcastsLocalized();
 
     ///- Load Motd
     LOG_INFO("server.loading", "Loading Motd...");
@@ -2120,6 +2126,9 @@ void World::SetInitialWorldSettings()
     LOG_INFO("server.loading", "Starting Arena Season...");
     LOG_INFO("server.loading", " ");
     sGameEventMgr->StartArenaSeason();
+
+    LOG_INFO("server.loading", "Loading WorldState...");
+    sWorldState->Load();
 
     sTicketMgr->Initialize();
 
