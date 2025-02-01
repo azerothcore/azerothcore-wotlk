@@ -2572,7 +2572,8 @@ namespace Acore
         explicit WorldWorldTextBuilder(uint32 textId, va_list* args = nullptr) : i_textId(textId), i_args(args) {}
         void operator()(WorldPacketList& data_list, LocaleConstant loc_idx)
         {
-            char const* text = sObjectMgr->GetAcoreString(i_textId, loc_idx);
+            std::string strtext = sObjectMgr->GetAcoreString(i_textId, loc_idx);
+            char const* text = strtext.c_str();
 
             if (i_args)
             {
@@ -2631,10 +2632,10 @@ bool World::SendZoneMessage(uint32 zone, WorldPacket const* packet, WorldSession
 }
 
 /// Send a System Message to all players in the zone (except self if mentioned)
-void World::SendZoneText(uint32 zone, const char* text, WorldSession* self, TeamId teamId)
+void World::SendZoneText(uint32 zone, std::string text, WorldSession* self, TeamId teamId)
 {
     WorldPacket data;
-    ChatHandler::BuildChatPacket(data, CHAT_MSG_SYSTEM, LANG_UNIVERSAL, nullptr, nullptr, text);
+    ChatHandler::BuildChatPacket(data, CHAT_MSG_SYSTEM, LANG_UNIVERSAL, nullptr, nullptr, text.c_str());
     SendZoneMessage(zone, &data, self, teamId);
 }
 

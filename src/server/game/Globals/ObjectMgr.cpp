@@ -8770,19 +8770,20 @@ bool ObjectMgr::LoadAcoreStrings()
     return true;
 }
 
-char const* ObjectMgr::GetAcoreString(uint32 entry, LocaleConstant locale) const
+std::string ObjectMgr::GetAcoreString(uint32 entry, LocaleConstant locale) const
 {
-    if (AcoreString const* ts = GetAcoreString(entry))
+    AcoreString const* as = GetAcoreString(entry);
+    if (as && !as->Content.empty())
     {
-        if (ts->Content.size() > std::size_t(locale) && !ts->Content[locale].empty())
-            return ts->Content[locale].c_str();
+        if (as->Content.size() > std::size_t(locale) && !as->Content[locale].empty())
+            return as->Content[locale];
 
-        return ts->Content[DEFAULT_LOCALE].c_str();
+        return as->Content[DEFAULT_LOCALE];
     }
 
-    LOG_ERROR("sql.sql", "Acore string entry {} not found in DB.", entry);
-
-    return "<error>";
+    std::string msg = Acore::StringFormat("No entry for acore_string ({}) in DB.", entry);
+    LOG_ERROR("sql.sql", msg);
+    return msg;
 }
 
 void ObjectMgr::LoadFishingBaseSkillLevel()
