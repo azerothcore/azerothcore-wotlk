@@ -107,7 +107,7 @@ public:
 
         InstanceScript* pInstance;
         EventMap events;
-        bool lock;
+        bool lock, inCenter;
         float x, y, z;
         int32 releaseLockTimer;
 
@@ -134,6 +134,7 @@ public:
             me->CastSpell(me, SPELL_EVOCATION, true);
             events.Reset();
             lock = false;
+            inCenter = false;
             x = 0.0f;
             y = 0.0f;
             z = 0.0f;
@@ -222,9 +223,14 @@ public:
             {
                 pInstance->SetData(DATA_UROM, DONE);
             }
-            me->SetCanFly(false);
-            me->SetDisableGravity(false);
-            me->NearTeleportTo(x, y, z, 0.0f);
+
+            // Body teleportation required only when boss is flying in the center
+            if (inCenter)
+            {
+                me->SetCanFly(false);
+                me->SetDisableGravity(false);
+                me->NearTeleportTo(x, y, z, 0.0f);
+            }
         }
 
         void KilledUnit(Unit* /*victim*/) override
@@ -281,6 +287,7 @@ public:
                     me->SetCanFly(true);
                     me->SetDisableGravity(true);
                     me->NearTeleportTo(1103.69f, 1048.76f, 512.279f, 1.16f);
+                    inCenter = true;
 
                     Talk(SAY_ARCANE_EXPLOSION);
                     Talk(EMOTE_ARCANE_EXPLOSION);
@@ -356,6 +363,7 @@ public:
                     me->SetControlled(false, UNIT_STATE_ROOT);
                     me->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
                     me->GetMotionMaster()->MoveChase(me->GetVictim());
+                    inCenter = false;
                     break;
             }
         }
@@ -365,6 +373,7 @@ public:
             me->SetCanFly(false);
             me->SetDisableGravity(false);
             me->SetControlled(false, UNIT_STATE_ROOT);
+            inCenter = false;
             ScriptedAI::EnterEvadeMode(why);
         }
     };
