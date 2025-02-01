@@ -107,11 +107,12 @@ def sql_check(file: io, file_path: str) -> None:
 
     # Parse all the file
     for line_number, line in enumerate(file, start = 1):
-    #    for table in not_delete:
-    #        if f"DELETE FROM `{table}`" in line:
-    #            print(
-     #               f"Entries from this {table} should not be deleted! {file_path} at line {line_number}")
-    #        check_failed = True
+        for table in not_delete:
+            pattern = rf"DELETE FROM\s+`{table}`\b"
+            if re.search(pattern, line, re.IGNORECASE):
+                print(
+                    f"Entries from this {table} should not be deleted! {file_path} at line {line_number}")
+            check_failed = True
         if [match for match in ['broadcast_text'] if match in line]:
             print(
                 f"DON'T EDIT broadcast_text TABLE UNLESS YOU KNOW WHAT YOU ARE DOING!\nThis error can safely be ignored if the changes are approved to be sniffed: {file_path} at line {line_number}")
