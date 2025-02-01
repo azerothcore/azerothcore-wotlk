@@ -110,7 +110,7 @@ def sql_check(file: io, file_path: str) -> None:
         for table in not_delete:
             if f"DELETE FROM `{table}`" in line:
                 print(
-                    f"Entries from this tables should not be deleted! {file_path} at line {line_number}")
+                    f"Entries from this {table} should not be deleted! {file_path} at line {line_number}")
             check_failed = True
         if [match for match in ['broadcast_text'] if match in line]:
             print(
