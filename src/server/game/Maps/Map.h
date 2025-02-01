@@ -36,6 +36,7 @@
 #include <bitset>
 #include <list>
 #include <memory>
+#include <mutex>
 #include <shared_mutex>
 
 class Unit;
@@ -741,7 +742,7 @@ private:
     std::bitset<TOTAL_NUMBER_OF_CELLS_PER_MAP* TOTAL_NUMBER_OF_CELLS_PER_MAP> marked_cells;
     std::bitset<TOTAL_NUMBER_OF_CELLS_PER_MAP* TOTAL_NUMBER_OF_CELLS_PER_MAP> marked_cells_large;
 
-    bool i_scriptLock;
+    std::mutex i_scriptLock;
     std::unordered_set<WorldObject*> i_objectsToRemove;
     std::map<WorldObject*, bool> i_objectsToSwitch;
     std::unordered_set<WorldObject*> i_worldObjects;
