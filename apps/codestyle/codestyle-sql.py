@@ -44,7 +44,7 @@ def parsing_file(files: list) -> None:
                 multiple_blank_lines_check(file, file_path)
                 trailing_whitespace_check(file, file_path)
                 sql_check(file, file_path)
-                insert_safety_check(file, file_path)
+                insert_delete_safety_check(file, file_path)
                 semicolon_check(file, file_path)
         except UnicodeDecodeError:
             print(f"\nCould not decode file {file_path}")
@@ -102,16 +102,10 @@ def trailing_whitespace_check(file: io, file_path: str) -> None:
 def sql_check(file: io, file_path: str) -> None:
     global error_handler, results
     file.seek(0)  # Reset file pointer to the beginning
-    not_delete = ["creature_template", "gameobject_template", "item_template", "quest_template"]
     check_failed = False
 
     # Parse all the file
     for line_number, line in enumerate(file, start = 1):
-        for table in not_delete:
-            if f"DELETE FROM `{table}`" in line:
-                print(
-                    f"Entries from this {table} should not be deleted! {file_path} at line {line_number}")
-            check_failed = True
         if [match for match in ['broadcast_text'] if match in line]:
             print(
                 f"DON'T EDIT broadcast_text TABLE UNLESS YOU KNOW WHAT YOU ARE DOING!\nThis error can safely be ignored if the changes are approved to be sniffed: {file_path} at line {line_number}")
@@ -140,9 +134,10 @@ def sql_check(file: io, file_path: str) -> None:
         error_handler = True
         results["SQL codestyle check"] = "Failed"
 
-def insert_safety_check(file: io, file_path: str) -> None:
+def insert_delete_safety_check(file: io, file_path: str) -> None:
     global error_handler, results
     file.seek(0)  # Reset file pointer to the beginning
+    not_delete = ["creature_template", "gameobject_template", "item_template", "quest_template"]
     check_failed = False
     previous_line = ""
 
@@ -154,11 +149,18 @@ def insert_safety_check(file: io, file_path: str) -> None:
             print(f"No DELETE keyword found after the INSERT in {file_path} at line {line_number}\nIf this error is intended, please advert a maintainer")
             check_failed = True
         previous_line = line
+        match = re.match(r"DELETE FROM\s+`([^`]+)`", line, re.IGNORECASE)
+        if match:
+            table_name = match.group(1)
+            if table_name in not_delete:
+                print(
+                    f"Entries from {table} should not be deleted! {file_path} at line {line_number}")
+                check_failed = True
 
     # Handle the script error and update the result output
     if check_failed:
         error_handler = True
-        results["INSERT safety usage check"] = "Failed"
+        results["INSERT & DELETE safety usage check"] = "Failed"
 
 def semicolon_check(file: io, file_path: str) -> None:
     global error_handler, results
