@@ -5909,7 +5909,7 @@ float Player::CalculateReputationGain(ReputationSource source, uint32 creatureOr
     float repMod = noQuestBonus ? 0.0f : float(GetTotalAuraModifier(SPELL_AURA_MOD_REPUTATION_GAIN));
 
     // faction specific auras only seem to apply to kills
-    if (source == REPUTATION_SOURCE_KILL)
+    if (source == ReputationSource::Kill)
         repMod += GetTotalAuraModifierByMiscValue(SPELL_AURA_MOD_FACTION_REPUTATION_GAIN, faction);
 
     percent += rep > 0.f ? repMod : -repMod;
@@ -5917,17 +5917,17 @@ float Player::CalculateReputationGain(ReputationSource source, uint32 creatureOr
     float rate;
     switch (source)
     {
-        case REPUTATION_SOURCE_KILL:
+        case ReputationSource::Kill:
             rate = sWorld->getRate(RATE_REPUTATION_LOWLEVEL_KILL);
             break;
-        case REPUTATION_SOURCE_QUEST:
-        case REPUTATION_SOURCE_DAILY_QUEST:
-        case REPUTATION_SOURCE_WEEKLY_QUEST:
-        case REPUTATION_SOURCE_MONTHLY_QUEST:
-        case REPUTATION_SOURCE_REPEATABLE_QUEST:
+        case ReputationSource::Quest:
+        case ReputationSource::DailyQuest:
+        case ReputationSource::WeeklyQuest:
+        case ReputationSource::MonthlyQuest:
+        case ReputationSource::RepeatableQuest:
             rate = sWorld->getRate(RATE_REPUTATION_LOWLEVEL_QUEST);
             break;
-        case REPUTATION_SOURCE_SPELL:
+        case ReputationSource::Spell:
         default:
             rate = 1.0f;
             break;
@@ -5945,25 +5945,25 @@ float Player::CalculateReputationGain(ReputationSource source, uint32 creatureOr
         float repRate = 0.0f;
         switch (source)
         {
-            case REPUTATION_SOURCE_KILL:
+            case ReputationSource::Kill:
                 repRate = repData->creatureRate;
                 break;
-            case REPUTATION_SOURCE_QUEST:
+            case ReputationSource::Quest:
                 repRate = repData->questRate;
                 break;
-            case REPUTATION_SOURCE_DAILY_QUEST:
+            case ReputationSource::DailyQuest:
                 repRate = repData->questDailyRate;
                 break;
-            case REPUTATION_SOURCE_WEEKLY_QUEST:
+            case ReputationSource::WeeklyQuest:
                 repRate = repData->questWeeklyRate;
                 break;
-            case REPUTATION_SOURCE_MONTHLY_QUEST:
+            case ReputationSource::MonthlyQuest:
                 repRate = repData->questMonthlyRate;
                 break;
-            case REPUTATION_SOURCE_REPEATABLE_QUEST:
+            case ReputationSource::RepeatableQuest:
                 repRate = repData->questRepeatableRate;
                 break;
-            case REPUTATION_SOURCE_SPELL:
+            case ReputationSource::Spell:
                 repRate = repData->spellRate;
                 break;
         }
@@ -5975,7 +5975,7 @@ float Player::CalculateReputationGain(ReputationSource source, uint32 creatureOr
         percent *= repRate;
     }
 
-    if (source != REPUTATION_SOURCE_SPELL && GetsRecruitAFriendBonus(false))
+    if (source != ReputationSource::Spell && GetsRecruitAFriendBonus(false))
         percent *= 1.0f + sWorld->getRate(RATE_REPUTATION_RECRUIT_A_FRIEND_BONUS);
 
     return CalculatePct(rep, percent);
@@ -6010,8 +6010,8 @@ void Player::RewardReputation(Unit* victim)
 
     if (Rep->RepFaction1 && (!Rep->TeamDependent || teamId == TEAM_ALLIANCE))
     {
-        float donerep1 = CalculateReputationGain(REPUTATION_SOURCE_KILL, victim->GetLevel(), static_cast<float>(Rep->RepValue1), ChampioningFaction ? ChampioningFaction : Rep->RepFaction1);
-        ScriptMgr::instance()->OnBeforePlayerReputationChange(this, static_cast<float>(Rep->RepValue1), donerep1, ReputationSource::REPUTATION_SOURCE_KILL);
+        float donerep1 = CalculateReputationGain(ReputationSource::Kill, victim->GetLevel(), static_cast<float>(Rep->RepValue1), ChampioningFaction ? ChampioningFaction : Rep->RepFaction1);
+        ScriptMgr::instance()->OnBeforePlayerReputationChange(this, static_cast<float>(Rep->RepValue1), donerep1, ReputationSource::Kill);
         ScriptMgr::instance()->OnBeforePlayerReputationChange(this, static_cast<float>(Rep->RepValue1), donerep1, victim);
 
         FactionEntry const* factionEntry1 = sFactionStore.LookupEntry(ChampioningFaction ? ChampioningFaction : Rep->RepFaction1);
@@ -6023,8 +6023,8 @@ void Player::RewardReputation(Unit* victim)
 
     if (Rep->RepFaction2 && (!Rep->TeamDependent || teamId == TEAM_HORDE))
     {
-        float donerep2 = CalculateReputationGain(REPUTATION_SOURCE_KILL, victim->GetLevel(), static_cast<float>(Rep->RepValue2), ChampioningFaction ? ChampioningFaction : Rep->RepFaction2);
-        ScriptMgr::instance()->OnBeforePlayerReputationChange(this, static_cast<float>(Rep->RepValue1), donerep2, ReputationSource::REPUTATION_SOURCE_KILL);
+        float donerep2 = CalculateReputationGain(ReputationSource::Kill, victim->GetLevel(), static_cast<float>(Rep->RepValue2), ChampioningFaction ? ChampioningFaction : Rep->RepFaction2);
+        ScriptMgr::instance()->OnBeforePlayerReputationChange(this, static_cast<float>(Rep->RepValue1), donerep2, ReputationSource::Kill);
         ScriptMgr::instance()->OnBeforePlayerReputationChange(this, static_cast<float>(Rep->RepValue1), donerep2, victim);
 
         FactionEntry const* factionEntry2 = sFactionStore.LookupEntry(ChampioningFaction ? ChampioningFaction : Rep->RepFaction2);
@@ -6064,28 +6064,28 @@ void Player::RewardReputation(Quest const* quest)
 
         if (quest->IsDaily())
         {
-            rep = CalculateReputationGain(REPUTATION_SOURCE_DAILY_QUEST, GetQuestLevel(quest), rep, quest->RewardFactionId[i], false);
-            ScriptMgr::instance()->OnBeforePlayerReputationChange(this, quest->RewardFactionId[i], rep, ReputationSource::REPUTATION_SOURCE_DAILY_QUEST);
+            rep = CalculateReputationGain(ReputationSource::DailyQuest, GetQuestLevel(quest), rep, quest->RewardFactionId[i], false);
+            ScriptMgr::instance()->OnBeforePlayerReputationChange(this, quest->RewardFactionId[i], rep, ReputationSource::DailyQuest);
         }
         else if (quest->IsWeekly())
         {
-            rep = CalculateReputationGain(REPUTATION_SOURCE_WEEKLY_QUEST, GetQuestLevel(quest), rep, quest->RewardFactionId[i], false);
-            ScriptMgr::instance()->OnBeforePlayerReputationChange(this, quest->RewardFactionId[i], rep, ReputationSource::REPUTATION_SOURCE_WEEKLY_QUEST);
+            rep = CalculateReputationGain(ReputationSource::WeeklyQuest, GetQuestLevel(quest), rep, quest->RewardFactionId[i], false);
+            ScriptMgr::instance()->OnBeforePlayerReputationChange(this, quest->RewardFactionId[i], rep, ReputationSource::WeeklyQuest);
         }
         else if (quest->IsMonthly())
         {
-            rep = CalculateReputationGain(REPUTATION_SOURCE_MONTHLY_QUEST, GetQuestLevel(quest), rep, quest->RewardFactionId[i], false);
-            ScriptMgr::instance()->OnBeforePlayerReputationChange(this, quest->RewardFactionId[i], rep, ReputationSource::REPUTATION_SOURCE_MONTHLY_QUEST);
+            rep = CalculateReputationGain(ReputationSource::MonthlyQuest, GetQuestLevel(quest), rep, quest->RewardFactionId[i], false);
+            ScriptMgr::instance()->OnBeforePlayerReputationChange(this, quest->RewardFactionId[i], rep, ReputationSource::MonthlyQuest);
         }
         else if (quest->IsRepeatable())
         {
-            rep = CalculateReputationGain(REPUTATION_SOURCE_REPEATABLE_QUEST, GetQuestLevel(quest), rep, quest->RewardFactionId[i], false);
-            ScriptMgr::instance()->OnBeforePlayerReputationChange(this, quest->RewardFactionId[i], rep, ReputationSource::REPUTATION_SOURCE_REPEATABLE_QUEST);
+            rep = CalculateReputationGain(ReputationSource::RepeatableQuest, GetQuestLevel(quest), rep, quest->RewardFactionId[i], false);
+            ScriptMgr::instance()->OnBeforePlayerReputationChange(this, quest->RewardFactionId[i], rep, ReputationSource::RepeatableQuest);
         }
         else
         {
-            rep = CalculateReputationGain(REPUTATION_SOURCE_QUEST, GetQuestLevel(quest), rep, quest->RewardFactionId[i], false);
-            ScriptMgr::instance()->OnBeforePlayerReputationChange(this, quest->RewardFactionId[i], rep, ReputationSource::REPUTATION_SOURCE_QUEST);
+            rep = CalculateReputationGain(ReputationSource::Quest, GetQuestLevel(quest), rep, quest->RewardFactionId[i], false);
+            ScriptMgr::instance()->OnBeforePlayerReputationChange(this, quest->RewardFactionId[i], rep, ReputationSource::Quest);
         }
 
         ScriptMgr::instance()->OnBeforePlayerReputationChange(this, quest->RewardFactionId[i], rep, quest);

@@ -32,6 +32,7 @@
 #include "LFGMgr.h"
 #include "ObjectMgr.h"
 #include "PetDefines.h"
+#include "ReputationSource.h"
 #include "SharedDefines.h"
 #include "Tuples.h"
 #include "Weather.h"
@@ -89,8 +90,6 @@ struct ItemTemplate;
 struct OutdoorPvPData;
 struct TargetInfo;
 struct SpellModifier;
-
-enum ReputationSource;
 
 namespace Acore::ChatCommands
 {

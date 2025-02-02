@@ -18,6 +18,7 @@
 #ifndef SCRIPT_OBJECT_PLAYER_SCRIPT_H_
 #define SCRIPT_OBJECT_PLAYER_SCRIPT_H_
 
+#include "ReputationSource.h"
 #include "ScriptObject.h"
 #include "SharedDefines.h"
 #include <vector>
@@ -25,8 +26,6 @@
 // TODO to remove
 #include "AchievementMgr.h"
 #include "KillRewarder.h"
-
-enum ReputationSource;
 
 enum PlayerHook
 {
@@ -291,7 +290,7 @@ public:
     virtual void OnBeforeReputationChange(Player* player, uint32 factionId, float& amount, Spell* spell) {}
 
     // Called before a player gains or looses Reputation
-    virtual void OnBeforeReputationChange(Player* player, uint32 factionId, float& amount, ReputationSource reputationSource) {}
+    virtual void OnBeforeReputationChange(Player* /*player*/, uint32 /*factionId*/, float& /*amount*/, ReputationSource /*reputationSource*/) {}
 
     // Called when a player's reputation changes (before it is actually changed)
     virtual bool OnPlayerReputationChange(Player* /*player*/, uint32 /*factionID*/, int32& /*standing*/, bool /*incremental*/) { return true; }

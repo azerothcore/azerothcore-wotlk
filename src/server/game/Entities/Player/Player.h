@@ -36,6 +36,7 @@
 #include "PlayerSettings.h"
 #include "PlayerTaxi.h"
 #include "QuestDef.h"
+#include "ReputationSource.h"
 #include "SpellAuras.h"
 #include "SpellInfo.h"
 #include "TradeData.h"
@@ -232,17 +233,6 @@ enum ActionButtonType
     ACTION_BUTTON_MACRO     = 0x40,
     ACTION_BUTTON_CMACRO    = ACTION_BUTTON_C | ACTION_BUTTON_MACRO,
     ACTION_BUTTON_ITEM      = 0x80
-};
-
-enum ReputationSource
-{
-    REPUTATION_SOURCE_KILL,
-    REPUTATION_SOURCE_QUEST,
-    REPUTATION_SOURCE_DAILY_QUEST,
-    REPUTATION_SOURCE_WEEKLY_QUEST,
-    REPUTATION_SOURCE_MONTHLY_QUEST,
-    REPUTATION_SOURCE_REPEATABLE_QUEST,
-    REPUTATION_SOURCE_SPELL
 };
 
 enum QuestSound
