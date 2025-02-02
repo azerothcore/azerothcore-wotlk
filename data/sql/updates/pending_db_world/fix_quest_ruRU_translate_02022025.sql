@@ -1,7 +1,9 @@
 -- Add Russian locale for QuestID: 4641
+DELETE FROM quest_offer_reward_locale WHERE ID = 4641 AND locale = 'ruRU';
 INSERT INTO quest_offer_reward_locale(ID,locale,RewardText,VerifiedBuild) VALUES (4641,'ruRU','Очередной рекрут Калтунка?$B$BВидно, плохи наши дела, если у нас нет никого получше. Ну, ничего. К тому времени, как мы решим, что тебе пора покинуть долину, из тебя $c получится бравый воитель Орды!',0);
 
 -- Add Russian locale for QuestID: 788
+DELETE FROM quest_offer_reward_locale WHERE ID = 788 AND locale = 'ruRU';
 INSERT INTO quest_offer_reward_locale(ID,locale,RewardText,VerifiedBuild) VALUES (788,'ruRU','Ну что ж, $N, неплохо. Но не задирай носа: грядут бои с куда более серьезными врагами.$b$bОднако ты показал себя достойным бойцом. В следующем испытании тебе придется встретиться с более опасным противником, так что дополнительная защита не помешает.',0);
 
 -- Fix Russian locale for QuestID: 783
