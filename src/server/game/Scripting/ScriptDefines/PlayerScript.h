@@ -280,16 +280,56 @@ public:
     // Called when a player gains XP (before anything is given)
     virtual void OnPlayerGiveXP(Player* /*player*/, uint32& /*amount*/, Unit* /*victim*/, uint8 /*xpSource*/) { }
 
-    // Called before a player gains or looses Reputation
-    virtual void OnBeforeReputationChange(Player* player, uint32 factionId, float& amount, Unit* victim) {}
+    /**
+    * @brief Called before a player gains or looses Reputation
+    *
+    * @param [in] player instance of the current player
+    * @param [in] factionId id of the faction which reputation changes
+    * @param[in,out] amount the amount of reputation the player gets or loses
+    * @param[in] victim the unit which was killed to gain reputation
+    * 
+    * @remark avoid hooking both versions of this event ReputationSource is a more generic one <br />
+    * ReputationSource is called first 
+    */
+    virtual void OnBeforeReputationChange(Player* /*player*/, uint32 /*factionId*/, float& /*amount*/, Unit* /*victim*/ ) {}
 
-    // Called before a player gains or looses Reputation
-    virtual void OnBeforeReputationChange(Player* player, uint32 factionId, float& amount, Quest const* quest) {}
+    /**
+    * @brief Called before a player gains or looses Reputation
+    *
+    * @param [in] player instance of the current player
+    * @param [in] factionId id of the faction which reputation changes
+    * @param[in,out] amount the amount of reputation the player gets or loses
+    * @param[in] quest the quest which was turn in to gain reputation
+    * 
+    * @remark avoid hooking both versions of this event ReputationSource is a more generic one <br />
+    * ReputationSource is called first 
+    */
+    virtual void OnBeforeReputationChange(Player* /*player*/, uint32 /*factionId*/ , float& /*amount*/, Quest const* /*quest*/) {}
 
-    // Called before a player gains or looses Reputation
-    virtual void OnBeforeReputationChange(Player* player, uint32 factionId, float& amount, Spell* spell) {}
+    /**
+    * @brief Called before a player gains or looses Reputation
+    *
+    * @param [in] player instance of the current player
+    * @param [in] factionId id of the faction which reputation changes
+    * @param[in,out] amount the amount of reputation the player gets or loses
+    * @param[in] spell the spell which was used to gain reputation
+    * 
+    * @remark avoid hooking both versions of this event ReputationSource is a more generic one <br />
+    * ReputationSource is called first 
+    */
+    virtual void OnBeforeReputationChange(Player* /*player*/, uint32 /*factionId*/, float& /*amount*/ , Spell* /*spell*/) {}
 
-    // Called before a player gains or looses Reputation
+    /**
+    * @brief Called before a player gains or looses Reputation
+    *
+    * @param [in] player instance of the current player
+    * @param [in] factionId id of the faction which reputation changes
+    * @param[in,out] amount the amount of reputation the player gets or loses
+    * @param[in] reputationSource an enum which determinate the source used to gain or loose reputation
+    * 
+    * @remark avoid hooking both versions of this event ReputationSource is a more generic one <br />
+    * ReputationSource is called first 
+    */
     virtual void OnBeforeReputationChange(Player* /*player*/, uint32 /*factionId*/, float& /*amount*/, ReputationSource /*reputationSource*/) {}
 
     // Called when a player's reputation changes (before it is actually changed)
