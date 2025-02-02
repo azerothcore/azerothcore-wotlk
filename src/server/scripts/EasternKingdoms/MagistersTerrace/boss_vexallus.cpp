@@ -41,72 +41,61 @@ enum Spells
     SPELL_SUMMON_PURE_ENERGY_H2     = 46159  // Heroic mode summon 2
 };
 
-struct npc_pure_energy : public ScriptedAI
-{
-    explicit npc_pure_energy(Creature* creature) : ScriptedAI(creature) {}
-
-    // Initialize on summon
-    void IsSummonedBy(WorldObject* summoner) override
-    {
-        if (!summoner)
-            return;
-        if (Creature* vexallus = summoner ? summoner->ToCreature() : nullptr)
-        {
-            if (Unit* target = vexallus->AI()->SelectTarget(SelectTargetMethod::Random, 0))
-                me->CastSpell(target, SPELL_ENERGY_FEEDBACK_CHANNEL, false);
-        }
-    }
-
-    void DamageTaken(Unit* attacker, uint32& damage, DamageEffectType, SpellSchoolMask) override
-    {
-        if (!attacker || !attacker->IsPlayer() || attacker->GetVictim() != me)
-            damage = 0; // Only take damage from players targeting this add
-    }
-
-    void UpdateAI(uint32 /*diff*/) override
-    {
-        if (!UpdateVictim())
-            return;
-    }
-
-    void AttackStart(Unit* victim) override
-    {
-        if (victim)
-        {
-            me->Attack(victim, false);
-            me->GetMotionMaster()->MoveChase(victim, 0.0f, 0.0f);
-        }
-    }
-};
-
 struct boss_vexallus : public BossAI
 {
-    // Configuration constants
-    static constexpr std::array<uint8_t, 5> HEALTH_THRESHOLDS = {85, 70, 55, 40, 25}; // HP % for energy spawns
-    static constexpr Seconds ENERGY_COOLDOWN = 5s;    // Time between energy spawns
-    static constexpr Seconds ABILITY_TIMER = 8s;      // Basic ability cooldown
-    static constexpr uint8 INITIAL_PURE_ENERGY = 5; // Starting energy count
-
-    explicit boss_vexallus(Creature* creature)
-        : BossAI(creature, DATA_VEXALLUS)
-        , _energyCooldown(false)
-        , _overloaded(false)
-        , _energyQueue(0)
-        , _pureEnergy(INITIAL_PURE_ENERGY)
-        , _thresholdsPassed({})
-    {
-    }
+    boss_vexallus(Creature* creature) : BossAI(creature, DATA_VEXALLUS), _energyCooldown(false), _energyCount(0) { }
 
     void Reset() override
     {
         _Reset();
         _energyCooldown = false;
-        _energyQueue = 0;
-        _overloaded = false;
-        _pureEnergy = INITIAL_PURE_ENERGY;
-        std::fill(_thresholdsPassed.begin(), _thresholdsPassed.end(), false);
+        _energyCount = 0;
 
-        ScheduleEnergyCheck();
+        ScheduleHealthCheckEvent({ 85, 70, 55, 40, 25 }, [&]
+        {
+            scheduler.Schedule(1s, [this](TaskContext context)
+            {
+                if (!_energyCooldown)
+                {
+                    Talk(SAY_ENERGY);
+                    Talk(EMOTE_DISCHARGE_ENERGY);
+                    if (IsHeroic())
+                    {
+                        DoCastSelf(SPELL_SUMMON_PURE_ENERGY_H1);
+                        DoCastSelf(SPELL_SUMMON_PURE_ENERGY_H2);
+                    }
+                    else
+                        DoCastSelf(SPELL_SUMMON_PURE_ENERGY_N);
+
+                    _energyCooldown = true;
+                    ++_energyCount;
+
+                    me->m_Events.AddEventAtOffset([&]
+                    {
+                        _energyCooldown = false;
+                    }, 5s);
+                }
+                else
+                    context.Repeat(5s);
+
+            });
+        });
+
+        ScheduleHealthCheckEvent(20, [&]
+        {
+            scheduler.Schedule(1s, [this](TaskContext context)
+            {
+                if (_energyCount == 5 && !_energyCooldown)
+                {
+                    scheduler.CancelAll();
+                    Talk(SAY_OVERLOAD);
+                    Talk(EMOTE_OVERLOAD);
+                    DoCastSelf(SPELL_OVERLOAD, true);
+                }
+                else
+                    context.Repeat(5s);
+            });
+        });
     }
 
     void JustDied(Unit*) override
@@ -125,7 +114,28 @@ struct boss_vexallus : public BossAI
     {
         _JustEngagedWith();
         Talk(SAY_AGGRO);
-        ScheduleCombatAbilities();
+
+        ScheduleTimedEvent(5s, [&]
+        {
+            DoCastRandomTarget(SPELL_CHAIN_LIGHTNING);
+        }, 8s);
+
+        ScheduleTimedEvent(5s, [&]
+        {
+            DoCastRandomTarget(SPELL_ARCANE_SHOCK);
+        }, 5s);
+    }
+
+    void JustSummoned(Creature* summon) override
+    {
+        if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0))
+        {
+            summon->SetReactState(REACT_PASSIVE);
+            summon->GetMotionMaster()->MoveFollow(target, 0.0f, 0.0f);
+            summon->CastSpell(target, SPELL_ENERGY_FEEDBACK_CHANNEL, false);
+        }
+
+        summons.Summon(summon);
     }
 
     void SummonedCreatureDies(Creature* summon, Unit* killer) override
@@ -136,112 +146,12 @@ struct boss_vexallus : public BossAI
             killer->CastSpell(killer, SPELL_ENERGY_FEEDBACK, true, 0, 0, summon->GetGUID());
     }
 
-    void UpdateAI(uint32 diff) override
-    {
-        if (!UpdateVictim())
-            return;
-        DoMeleeAttackIfReady();
-        CheckOverload();
-        CheckHealthThresholds();
-
-        events.Update(diff);
-        scheduler.Update(diff);
-    }
-
 private:
-    // Schedule periodic energy spawn checks
-    void ScheduleEnergyCheck()
-    {
-        scheduler.Schedule(1s, [this](TaskContext context)
-        {
-            ProcessEnergyQueue();
-            context.Repeat(1s);
-        });
-    }
-
-    // Handle energy spawn logic
-    void ProcessEnergyQueue()
-    {
-        if (!_energyCooldown && _energyQueue > 0)
-        {
-            Talk(SAY_ENERGY);
-            Talk(EMOTE_DISCHARGE_ENERGY);
-
-            if (IsHeroic())
-            {
-                DoCastSelf(SPELL_SUMMON_PURE_ENERGY_H1);
-                DoCastSelf(SPELL_SUMMON_PURE_ENERGY_H2);
-            }
-            else
-            {
-                DoCastSelf(SPELL_SUMMON_PURE_ENERGY_N);
-            }
-
-            _energyQueue--;
-            _pureEnergy--;
-            SetEnergyCooldown();
-        }
-    }
-
-    // Start energy spawn cooldown
-    void SetEnergyCooldown()
-    {
-        _energyCooldown = true;
-        scheduler.Schedule(ENERGY_COOLDOWN, [this](TaskContext)
-        {
-            _energyCooldown = false;
-        });
-    }
-
-    // Schedule basic combat abilities
-    void ScheduleCombatAbilities()
-    {
-        ScheduleTimedEvent(ABILITY_TIMER, [&]
-        {
-            DoCastRandomTarget(SPELL_CHAIN_LIGHTNING);
-        }, ABILITY_TIMER, ABILITY_TIMER);
-
-        ScheduleTimedEvent(5s, [&]
-        {
-            DoCastRandomTarget(SPELL_ARCANE_SHOCK);
-        }, ABILITY_TIMER, ABILITY_TIMER);
-    }
-
-    // Check for final phase transition
-    void CheckOverload()
-    {
-        if (!_overloaded && _pureEnergy == 0 && !_energyCooldown && HealthBelowPct(20))
-        {
-            Talk(SAY_OVERLOAD);
-            Talk(EMOTE_OVERLOAD);
-            DoCastSelf(SPELL_OVERLOAD, true);
-            _overloaded = true;
-        }
-    }
-
-    // Check health-based energy spawn triggers
-    void CheckHealthThresholds()
-    {
-        for (size_t i = 0; i < HEALTH_THRESHOLDS.size(); ++i)
-        {
-            if (!_thresholdsPassed[i] && HealthBelowPct(HEALTH_THRESHOLDS[i]))
-            {
-                _energyQueue++;
-                _thresholdsPassed[i] = true;
-            }
-        }
-    }
-
-    // State tracking
-    bool _energyCooldown;     // Energy spawn on cooldown
-    bool _overloaded;         // Final phase active
-    uint8 _energyQueue;     // Pending energy spawns
-    uint8 _pureEnergy;      // Remaining energy count
-    std::array<bool, 5> _thresholdsPassed; // Health threshold tracking
+    bool _energyCooldown;
+    uint8 _energyCount;
 };
 
 void AddSC_boss_vexallus()
 {
-    RegisterMagistersTerraceCreatureAI(npc_pure_energy);
     RegisterMagistersTerraceCreatureAI(boss_vexallus);
 }
