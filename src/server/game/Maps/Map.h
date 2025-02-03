@@ -216,7 +216,8 @@ public:
     }
 
     void LoadGrid(float x, float y);
-    void LoadAllCells();
+    void LoadAllGrids();
+    void LoadGridsInRange(Position const& center, float radius);
     bool UnloadGrid(MapGridType& grid);
     virtual void UnloadAll();
 
@@ -701,16 +702,14 @@ private:
 template<class T, class CONTAINER>
 inline void Map::Visit(Cell const& cell, TypeContainerVisitor<T, CONTAINER>& visitor)
 {
-    const uint32 x = cell.GridX();
-    const uint32 y = cell.GridY();
-    const uint32 cell_x = cell.CellX();
-    const uint32 cell_y = cell.CellY();
+    uint32 const grid_x = cell.GridX();
+    uint32 const grid_y = cell.GridY();
 
-    if (!cell.NoCreate() || IsGridLoaded(GridCoord(x, y)))
-    {
-        EnsureGridLoaded(cell);
-        GetMapGrid(x, y)->VisitCell(cell_x, cell_y, visitor);
-    }
+    // If grid is not loaded, nothing to visit.
+    if (!IsGridLoaded(GridCoord(grid_x, grid_y)))
+        return;
+
+    GetMapGrid(grid_x, grid_y)->VisitCell(cell.CellX(), cell.CellY(), visitor);
 }
 
 #endif

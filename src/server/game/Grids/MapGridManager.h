@@ -27,7 +27,7 @@
 class MapGridManager
 {
 public:
-    MapGridManager(Map* map) : _map(map) { }
+    MapGridManager(Map* map) : _map(map), _createdGridsCount(0), _loadedGridsCount(0) { }
 
     void CreateGrid(uint16 const x, uint16 const y);
     bool LoadGrid(uint16 const x, uint16 const y);
@@ -43,8 +43,14 @@ public:
     uint32 GetCreatedCellsInGridCount(uint16 const x, uint16 const y);
     uint32 GetCreatedCellsInMapCount();
 
+    bool IsGridsFullyCreated() const;
+    bool IsGridsFullyLoaded() const;
+
 private:
     Map* _map;
+
+    uint32 _createdGridsCount;
+    uint32 _loadedGridsCount;
 
     std::mutex _gridLock;
     std::unique_ptr<MapGridType> _mapGrid[MAX_NUMBER_OF_GRIDS][MAX_NUMBER_OF_GRIDS];

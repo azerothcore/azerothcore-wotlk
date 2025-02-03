@@ -2409,10 +2409,6 @@ public:
     {
         Player* player = handler->GetSession()->GetPlayer();
 
-        CellCoord p(Acore::ComputeCellCoord(player->GetPositionX(), player->GetPositionY()));
-        Cell cell(p);
-        cell.SetNoCreate();
-
         Acore::RespawnDo u_do;
         Acore::WorldObjectWorker<Acore::RespawnDo> worker(player, u_do);
         Cell::VisitGridObjects(player, worker, player->GetGridActivationRange());

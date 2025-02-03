@@ -66,7 +66,6 @@ Map::~Map()
     if (!m_scriptSchedule.empty())
         sScriptMgr->DecreaseScheduledScriptCount(m_scriptSchedule.size());
 
-    //MMAP::MMapFactory::createOrGetMMapMgr()->unloadMap(GetId());
     MMAP::MMapFactory::createOrGetMMapMgr()->unloadMapInstance(GetId(), i_InstanceId);
 }
 
@@ -350,11 +349,41 @@ void Map::LoadGrid(float x, float y)
     EnsureGridLoaded(Cell(x, y));
 }
 
-void Map::LoadAllCells()
+void Map::LoadAllGrids()
 {
     for (uint32 cellX = 0; cellX < TOTAL_NUMBER_OF_CELLS_PER_MAP; cellX++)
         for (uint32 cellY = 0; cellY < TOTAL_NUMBER_OF_CELLS_PER_MAP; cellY++)
             LoadGrid((cellX + 0.5f - CENTER_GRID_CELL_ID) * SIZE_OF_GRID_CELL, (cellY + 0.5f - CENTER_GRID_CELL_ID) * SIZE_OF_GRID_CELL);
+}
+
+void Map::LoadGridsInRange(Position const& center, float radius)
+{
+    if (_mapGridManager.IsGridsFullyLoaded())
+        return;
+
+    float const x = center.GetPositionX();
+    float const y = center.GetPositionY();
+
+    CellCoord cellCoord(Acore::ComputeCellCoord(x, y));
+    if (!cellCoord.IsCoordValid())
+        return;
+
+    if (radius > SIZE_OF_GRIDS)
+        radius = SIZE_OF_GRIDS;
+
+    CellArea area = Cell::CalculateCellArea(x, y, radius);
+    if (!area)
+        return;
+
+    for (uint32 x = area.low_bound.x_coord; x <= area.high_bound.x_coord; ++x)
+    {
+        for (uint32 y = area.low_bound.y_coord; y <= area.high_bound.y_coord; ++y)
+        {
+            CellCoord cellCoord(x, y);
+            Cell cell(cellCoord);
+            EnsureGridLoaded(cell);
+        }
+    }
 }
 
 bool Map::AddPlayerToMap(Player* player)
@@ -368,7 +397,7 @@ bool Map::AddPlayerToMap(Player* player)
     }
 
     Cell cell(cellCoord);
-    EnsureGridLoaded(cell);
+    LoadGridsInRange(*player, MAX_VISIBILITY_DISTANCE);
     AddToGrid(player, cell);
 
     // Check if we are adding to correct map
@@ -569,7 +598,6 @@ void Map::VisitNearbyCellsOf(WorldObject* obj, TypeContainerVisitor<Acore::Objec
             markCell(cell_id);
             CellCoord pair(x, y);
             Cell cell(pair);
-            //cell.SetNoCreate(); // in mmaps this is missing
 
             Visit(cell, gridVisitor);
             Visit(cell, worldVisitor);

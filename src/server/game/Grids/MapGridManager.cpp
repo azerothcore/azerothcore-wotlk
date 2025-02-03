@@ -15,6 +15,8 @@ void MapGridManager::CreateGrid(uint16 const x, uint16 const y)
     loader.LoadTerrain();
 
     _mapGrid[x][y] = std::move(grid);
+
+    ++_createdGridsCount;
 }
 
 bool MapGridManager::LoadGrid(uint16 const x, uint16 const y)
@@ -28,6 +30,8 @@ bool MapGridManager::LoadGrid(uint16 const x, uint16 const y)
 
     GridObjectLoader loader(*grid, _map);
     loader.LoadAllCellsInGrid();
+
+    ++_loadedGridsCount;
     return true;
 }
 
@@ -83,31 +87,12 @@ MapGridType* MapGridManager::GetGrid(uint16 const x, uint16 const y)
 
 uint32 MapGridManager::GetCreatedGridsCount()
 {
-    uint32 count = 0;
-    for (uint32 gridX = 0; gridX < MAX_NUMBER_OF_GRIDS; ++gridX)
-    {
-        for (uint32 gridY = 0; gridY < MAX_NUMBER_OF_GRIDS; ++gridY)
-        {
-            if (GetGrid(gridX, gridY))
-                ++count;
-        }
-    }
-    return count;
+    return _createdGridsCount;
 }
 
 uint32 MapGridManager::GetLoadedGridsCount()
 {
-    uint32 count = 0;
-    for (uint32 gridX = 0; gridX < MAX_NUMBER_OF_GRIDS; ++gridX)
-    {
-        for (uint32 gridY = 0; gridY < MAX_NUMBER_OF_GRIDS; ++gridY)
-        {
-            if (MapGridType* grid = GetGrid(gridX, gridY))
-                if (grid->IsObjectDataLoaded())
-                    ++count;
-        }
-    }
-    return count;
+    return _loadedGridsCount;
 }
 
 uint32 MapGridManager::GetCreatedCellsInGridCount(uint16 const x, uint16 const y)
@@ -131,4 +116,14 @@ uint32 MapGridManager::GetCreatedCellsInMapCount()
         }
     }
     return count;
+}
+
+bool MapGridManager::IsGridsFullyCreated() const
+{
+    return _createdGridsCount == (MAX_NUMBER_OF_GRIDS * MAX_NUMBER_OF_GRIDS);
+}
+
+bool MapGridManager::IsGridsFullyLoaded() const
+{
+    return _loadedGridsCount == (MAX_NUMBER_OF_GRIDS * MAX_NUMBER_OF_GRIDS);
 }
