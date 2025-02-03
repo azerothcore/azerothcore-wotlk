@@ -83,13 +83,17 @@ Map* MapMgr::CreateBaseMap(uint32 id)
             if (entry->Instanceable())
                 map = new MapInstanced(id);
             else
-            {
                 map = new Map(id, 0, REGULAR_DIFFICULTY);
+
+            i_maps[id] = map;
+
+            map->OnCreateMap();
+
+            if (!entry->Instanceable())
+            {
                 map->LoadRespawnTimes();
                 map->LoadCorpseData();
             }
-
-            i_maps[id] = map;
         }
     }
 

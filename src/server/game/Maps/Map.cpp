@@ -137,6 +137,14 @@ Map::Map(uint32 id, uint32 InstanceId, uint8 SpawnMode, Map* _parent) :
 
     //lets initialize visibility distance for map
     Map::InitVisibilityDistance();
+}
+
+// Hook called after map is created AND after added to map list
+void Map::OnCreateMap()
+{
+    // Instances load all grids by default (both base map and child maps)
+    if (GetInstanceId())
+        LoadAllGrids();
 
     sScriptMgr->OnCreateMap(this);
 }

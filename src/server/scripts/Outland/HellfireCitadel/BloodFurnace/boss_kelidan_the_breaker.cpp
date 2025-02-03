@@ -142,7 +142,6 @@ struct boss_kelidan_the_breaker : public BossAI
         _JustDied();
         if (instance)
         {
-            me->GetMap()->LoadGrid(0, -111.0f);
             instance->SetData(DATA_KELIDAN, DONE);
             instance->HandleGameObject(instance->GetGuidData(DATA_DOOR1), true);
             instance->HandleGameObject(instance->GetGuidData(DATA_DOOR6), true);
