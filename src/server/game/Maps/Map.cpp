@@ -70,6 +70,9 @@ ZoneDynamicInfo::ZoneDynamicInfo() : MusicId(0), WeatherId(WEATHER_STATE_FINE),
 
 Map::~Map()
 {
+#if defined(MOD_ELUNA)
+    eluna.reset(nullptr);
+#endif
     // UnloadAll must be called before deleting the map
 
     sScriptMgr->OnDestroyMap(this);
