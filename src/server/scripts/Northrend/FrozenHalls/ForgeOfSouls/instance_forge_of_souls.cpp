@@ -96,12 +96,6 @@ public:
             }
         }
 
-        void OnPlayerLeave(Player* player) override
-        {
-            if (sWorld->getBoolConfig(CONFIG_ALLOW_TWO_SIDE_INTERACTION_GROUP))
-                player->SetFactionForRace(player->getRace());
-        }
-
         void OnCreatureCreate(Creature* creature) override
         {
             if (teamIdInInstance == TEAM_NEUTRAL)
