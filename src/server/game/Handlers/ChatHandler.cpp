@@ -727,6 +727,18 @@ namespace Acore
 
 void WorldSession::HandleTextEmoteOpcode(WorldPacket& recvData)
 {
+    uint32 text_emote;
+    recvData >> text_emote;
+
+    constexpr uint32 readyEmote = 126;
+
+    // Handle confirmation redirect when the player types "/read" after the new node becomes available for redirection.
+    if (text_emote == readyEmote && GetPlayer()->GetMap()->IsPlayerRedirectKickTimerActive())
+    {
+        HandleTC9PrepareForRedirect(recvData);
+        return;
+    }
+
     if (!GetPlayer()->IsAlive())
         return;
 
@@ -742,10 +754,9 @@ void WorldSession::HandleTextEmoteOpcode(WorldPacket& recvData)
     if (GetPlayer()->IsSpectator())
         return;
 
-    uint32 text_emote, emoteNum;
+    uint32 emoteNum;
     ObjectGuid guid;
 
-    recvData >> text_emote;
     recvData >> emoteNum;
     recvData >> guid;
 

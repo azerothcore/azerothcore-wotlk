@@ -7,6 +7,14 @@ void panicWithTC9Unavailable(const char* message) {
     exit(EXIT_FAILURE);
 }
 
+// TC9SetBattlegroundStartHandler sets handler for starting battleground.
+//
+extern void TC9SetBattlegroundStartHandler(BattlegroundStartHandler h) { panicWithTC9Unavailable("TC9SetBattlegroundStartHandler"); }
+
+// TC9SetBattlegroundAddPlayersHandler sets handler for adding players to battleground.
+//
+extern void TC9SetBattlegroundAddPlayersHandler(BattlegroundAddPlayersHandler h) { panicWithTC9Unavailable("TC9SetBattlegroundAddPlayersHandler"); }
+
 void TC9SetOnGroupCreatedHook(OnGroupCreatedHook h) { panicWithTC9Unavailable("TC9SetOnGroupCreatedHook"); }
 
 // TC9SetOnGroupMemberAddedHook sets hook for member added event.
@@ -50,21 +58,21 @@ void TC9ProcessEventsHooks() { panicWithTC9Unavailable("TC9ProcessEventsHooks");
 
 // TC9ProcessGRPCOrHTTPRequests calls all grpc or http handlers in queue.
 //
-void TC9ProcessGRPCOrHTTPRequests() { panicWithTC9Unavailable("TC9ProcessGRPCOrHTTPRequests"); }
+void TC9ProcessGRPCOrHTTPRequests(GoInt realmID) { panicWithTC9Unavailable("TC9ProcessGRPCOrHTTPRequests"); }
 
 // TC9GetNextAvailableCharacterGuid returns next available characters GUID. Thread unsafe.
-GoUint64 TC9GetNextAvailableCharacterGuid() { panicWithTC9Unavailable("TC9GetNextAvailableCharacterGuid"); return 0; }
+GoUint64 TC9GetNextAvailableCharacterGuid(GoInt realmID) { panicWithTC9Unavailable("TC9GetNextAvailableCharacterGuid"); return 0; }
 
 // TC9GetNextAvailableItemGuid returns next available item GUID. Thread unsafe.
-GoUint64 TC9GetNextAvailableItemGuid() { panicWithTC9Unavailable("TC9GetNextAvailableItemGuid"); return 0; }
+GoUint64 TC9GetNextAvailableItemGuid(GoInt realmID) { panicWithTC9Unavailable("TC9GetNextAvailableItemGuid"); return 0; }
 
 // TC9GetNextAvailableInstanceGuid returns next available dungeon/raid instance GUID. Thread unsafe.
-GoUint64 TC9GetNextAvailableInstanceGuid() { panicWithTC9Unavailable("TC9GetNextAvailableInstanceGuid"); return 0; }
+GoUint64 TC9GetNextAvailableInstanceGuid(GoInt realmID) { panicWithTC9Unavailable("TC9GetNextAvailableInstanceGuid"); return 0; }
 
 // TC9InitLib inits lib by starting services like grpc and healthcheck.
 // Adds game server to the servers registry that will make this server visible for game load balancer.
 //
-void TC9InitLib(GoUint16 port, GoUint32 realmID, char* availableMaps, uint32_t** assignedMaps, int* assignedMapsSize) { panicWithTC9Unavailable("TC9InitLib"); }
+void TC9InitLib(GoUint16 port, GoUint32 realmID, GoUint8 isCrossRealm, char* availableMaps, uint32_t** assignedMaps, int* assignedMapsSize) { panicWithTC9Unavailable("TC9InitLib"); }
 
 // TC9GracefulShutdown gracefully stops all running services.
 //
@@ -109,3 +117,18 @@ void TC9SetOnMapsReassignedHook(OnMapsReassignedHook h) { panicWithTC9Unavailabl
 //
 void TC9SetMonitoringDataCollectorHandler(MonitoringDataCollectorHandler h) { panicWithTC9Unavailable("TC9SetOnMapsReassignedHook"); }
 
+// TC9PlayerLeftBattleground notifies matchmaking server that player left battleground
+//
+void TC9PlayerLeftBattleground(uint64_t playerGUID, uint32_t realmID, uint32_t instanceID) { panicWithTC9Unavailable("TC9PlayerLeftBattleground"); }
+
+// TC9BattlegroundStatusChanged notifies matchmaking server that battleground status changed
+//
+void TC9BattlegroundStatusChanged(uint32_t instanceID, uint8_t status) { panicWithTC9Unavailable("TC9BattlegroundStatusChanged"); }
+
+// TC9SetCanPlayerJoinBattlegroundQueueHandler sets handler for checking if player can join to battleground queue.
+//
+void TC9SetCanPlayerJoinBattlegroundQueueHandler(CanPlayerJoinBattlegroundQueueHandler h) { panicWithTC9Unavailable("TC9SetCanPlayerJoinBattlegroundQueueHandler"); }
+
+// TC9SetCanPlayerTeleportToBattlegroundHandler sets handler for checking if player can teleport to battleground.
+//
+void TC9SetCanPlayerTeleportToBattlegroundHandler(CanPlayerTeleportToBattlegroundHandler h) { panicWithTC9Unavailable("TC9SetCanPlayerTeleportToBattlegroundHandler"); }

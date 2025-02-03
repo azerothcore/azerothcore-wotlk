@@ -19,6 +19,12 @@ typedef struct { const char *p; ptrdiff_t n; } _GoString_;
 /* Start of preamble from import "C" comments.  */
 
 
+#line 3 "battleground-api.go"
+
+#include "battleground-api.h"
+
+#line 1 "cgo-generated-wrapper"
+
 #line 3 "events-group.go"
 
 #include "events-group.h"
@@ -39,7 +45,13 @@ typedef struct { const char *p; ptrdiff_t n; } _GoString_;
 
 
 
-#line 16 "lib.go"
+#line 3 "lib.go"
+
+#include <stdint.h>
+
+#line 1 "cgo-generated-wrapper"
+
+#line 3 "matchmaking.go"
 
 #include <stdint.h>
 
@@ -124,6 +136,22 @@ extern "C" {
 #endif
 
 
+// TC9SetBattlegroundStartHandler sets handler for starting battleground.
+//
+extern void TC9SetBattlegroundStartHandler(BattlegroundStartHandler h);
+
+// TC9SetBattlegroundAddPlayersHandler sets handler for adding players to battleground.
+//
+extern void TC9SetBattlegroundAddPlayersHandler(BattlegroundAddPlayersHandler h);
+
+// TC9SetCanPlayerJoinBattlegroundQueueHandler sets handler for checking if player can join to battleground queue.
+//
+extern void TC9SetCanPlayerJoinBattlegroundQueueHandler(CanPlayerJoinBattlegroundQueueHandler h);
+
+// TC9SetCanPlayerTeleportToBattlegroundHandler sets handler for checking if player can teleport to battleground.
+//
+extern void TC9SetCanPlayerTeleportToBattlegroundHandler(CanPlayerTeleportToBattlegroundHandler h);
+
 // TC9SetOnGroupCreatedHook sets hook for group created event.
 //
 extern void TC9SetOnGroupCreatedHook(OnGroupCreatedHook h);
@@ -178,20 +206,20 @@ extern void TC9ProcessEventsHooks();
 
 // TC9GetNextAvailableCharacterGuid returns next available characters GUID. Thread unsafe.
 //
-extern GoUint64 TC9GetNextAvailableCharacterGuid();
+extern GoUint64 TC9GetNextAvailableCharacterGuid(GoInt realmID);
 
 // TC9GetNextAvailableItemGuid returns next available item GUID. Thread unsafe.
 //
-extern GoUint64 TC9GetNextAvailableItemGuid();
+extern GoUint64 TC9GetNextAvailableItemGuid(GoInt realmID);
 
 // TC9GetNextAvailableInstanceGuid returns next available dungeon/raid instance GUID. Thread unsafe.
 //
-extern GoUint64 TC9GetNextAvailableInstanceGuid();
+extern GoUint64 TC9GetNextAvailableInstanceGuid(GoInt realmID);
 
 // TC9InitLib inits lib by starting services like grpc and healthcheck.
 // Adds game server to the servers registry that will make this server visible for game load balancer.
 //
-extern void TC9InitLib(GoUint16 port, GoUint32 realmID, char* availableMaps, uint32_t** assignedMaps, int* assignedMapsSize);
+extern void TC9InitLib(GoUint16 port, GoUint32 realmID, GoUint8 isCrossRealm, char* availableMaps, uint32_t** assignedMaps, int* assignedMapsSize);
 
 // TC9GracefulShutdown gracefully stops all running services.
 //
@@ -206,6 +234,14 @@ extern void TC9ProcessGRPCOrHTTPRequests();
 //
 extern void TC9ReadyToAcceptPlayersFromMaps(uint32_t* maps, int mapsLen);
 
+// TC9PlayerLeftBattleground notifies matchmaking server that player left battleground
+//
+extern void TC9PlayerLeftBattleground(uint64_t playerGUID, uint32_t realmID, uint32_t instanceID);
+
+// TC9BattlegroundStatusChanged notifies matchmaking server that battleground status changed
+//
+extern void TC9BattlegroundStatusChanged(uint32_t instanceID, uint8_t status);
+
 // TC9SetMonitoringDataCollectorHandler sets handler for getting data to handle monitoring request.
 //
 extern void TC9SetMonitoringDataCollectorHandler(MonitoringDataCollectorHandler h);
@@ -219,12 +255,15 @@ extern void TC9SetCanPlayerInteractWithNPCAndFlagsHandler(CanPlayerInteractWithN
 extern void TC9SetCanPlayerInteractWithGOAndTypeHandler(CanPlayerInteractWithGOAndTypeHandler h);
 
 // TC9SetGetPlayerItemsByGuidsHandler sets handler for getting players item by guids request.
+//
 extern void TC9SetGetPlayerItemsByGuidsHandler(GetPlayerItemsByGuidsHandler h);
 
 // TC9SetRemoveItemsWithGuidsFromPlayerHandler sets handler for removing items by guids from player request.
+//
 extern void TC9SetRemoveItemsWithGuidsFromPlayerHandler(RemoveItemsWithGuidsFromPlayerHandler h);
 
 // TC9SetAddExistingItemToPlayerHandler sets handler for adding item to player request.
+//
 extern void TC9SetAddExistingItemToPlayerHandler(AddExistingItemToPlayerHandler h);
 
 // TC9SetGetMoneyForPlayerHandler sets handler for getting money for player request.

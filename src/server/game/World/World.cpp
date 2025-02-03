@@ -91,11 +91,8 @@
 #include "WhoListCacheMgr.h"
 #include "WorldPacket.h"
 #include "WorldSession.h"
-<<<<<<< HEAD
-#include "TC9Sidecar.h"
-=======
 #include "WorldState.h"
->>>>>>> 131671d793bdd63c66dd03f903a09e036800d927
+#include "TC9Sidecar.h"
 #include <boost/asio/ip/address.hpp>
 #include <cmath>
 
@@ -3166,6 +3163,9 @@ void World::LoadWorldStates()
 // Setting a worldstate will save it to DB
 void World::setWorldState(uint32 index, uint64 timeValue)
 {
+    if (sToCloud9Sidecar->IsCrossrealm())
+        return;
+    
     auto const& it = _worldstates.find(index);
     if (it != _worldstates.end())
     {

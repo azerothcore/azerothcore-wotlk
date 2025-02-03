@@ -754,9 +754,12 @@ void WorldSession::LogoutPlayer(bool save, bool redirecting)
         LOG_DEBUG("network", "SESSION: Sent SMSG_LOGOUT_COMPLETE Message");
 
         //! Since each account can only have one online character at any given time, ensure all characters for active account are marked as offline
-        CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_UPD_ACCOUNT_ONLINE);
-        stmt->SetData(0, GetAccountId());
-        CharacterDatabase.Execute(stmt);
+        if (!redirecting)
+        {
+            CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_UPD_ACCOUNT_ONLINE);
+            stmt->SetData(0, GetAccountId());
+            CharacterDatabase.Execute(stmt);
+        }
     }
 
     m_playerLogout = false;
@@ -1757,7 +1760,9 @@ void WorldSession::HandleTC9PrepareForRedirect(WorldPacket& /*recvData*/)
 
         LOG_DEBUG("network", "Saved, AccountId = %d", GetAccountId());
 
-        KickPlayer("HandlePrepareForRedirect client redirected");
-        LogoutPlayer(false, true);
+        GetPlayer()->m_Events.AddEventAtOffset([this](){
+            KickPlayer("HandlePrepareForRedirect client redirected");
+        }, 100ms);
+
     });
 }

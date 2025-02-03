@@ -23,6 +23,7 @@
 #include "AsyncCallbackProcessor.h"
 
 #define MAX_MAP_ID 800 // Probably too much, but let's lean towards caution.
+#define DEFAULT_NON_CROSSREALM_REALM_ID 0
 
 class ToCloud9Sidecar
 {
@@ -37,6 +38,7 @@ public:
     void Deinit();
 
     bool ClusterModeEnabled() { return _clusterModeEnabled; }
+    bool IsCrossrealm() { return _isCrossrealm; }
 
     bool IsMapAssigned(uint32 mapId);
 
@@ -47,14 +49,18 @@ public:
     void ProcessGrpcOrHttpRequests();
     void ProcessAsyncTasks();
 
-    uint32 GenerateCharacterGuid();
-    uint32 GenerateItemGuid();
-    uint32 GenerateInstanceGuid();
+    uint32 GenerateCharacterGuid(uint16 realmId = DEFAULT_NON_CROSSREALM_REALM_ID);
+    uint32 GenerateItemGuid(uint16 realmId = DEFAULT_NON_CROSSREALM_REALM_ID);
+    uint32 GenerateInstanceGuid(uint16 realmId = DEFAULT_NON_CROSSREALM_REALM_ID);
+
+    void OnPlayerLeftBattleground(uint64 playerGUID, uint32 realmID, uint32 instanceID);
+    void OnBattlegroundStatusChanged(uint32 instanceID, uint8 status);
 
 private:
     static void OnMapsReassigned(uint32* addedMaps, int addedMapsSize, uint32* removedMaps, int removedMapsSize);
 
     bool _clusterModeEnabled;
+    bool _isCrossrealm;
 
     bool _assignedMapsByID[MAX_MAP_ID];
 

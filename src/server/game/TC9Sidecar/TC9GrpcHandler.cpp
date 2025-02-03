@@ -20,6 +20,7 @@
 #include "Item.h"
 #include "Bag.h"
 #include "Player.h"
+#include "BattlegroundMgr.h"
 
 GetPlayerItemsByGuidsResponse ToCloud9GrpcHandler::GetPlayerItemsByGuids(uint64 playerGuid, uint64* items, int itemsLen)
 {
@@ -252,4 +253,98 @@ CanPlayerInteractWithNPCAndFlagsResponse ToCloud9GrpcHandler::CanPlayerInteractW
     resp.errorCode = PlayerInteractionErrorCodeNoError;
     resp.canInteract = player->GetNPCIfCanInteractWith(ObjectGuid(npc), (NPCFlags)unitFlags) != nullptr;
     return resp;
+}
+
+BattlegroundStartResponse ToCloud9GrpcHandler::StartBattleground(BattlegroundStartRequest* req)
+{
+    PvPDifficultyEntry const* pvpEntry = GetBattlegroundBracketByLevel(req->mapID, req->bracketLvl);
+    if (!pvpEntry)
+    {
+        BattlegroundStartResponse resp;
+        resp.errorCode = BattlegroundErrorFailedToCreateBG;
+        return resp;
+    }
+
+    BattlegroundTypeId bgTypeId = BattlegroundTypeId(req->battlegroundTypeID);
+
+    Battleground* bg = sBattlegroundMgr->CreateNewBattleground(bgTypeId, pvpEntry, req->arenaType, req->isRated);
+    if (!bg)
+    {
+        BattlegroundStartResponse resp;
+        resp.errorCode = BattlegroundErrorFailedToCreateBG;
+        return resp;
+    }
+
+    bg->StartBattleground();
+
+    bg->IncreaseInvitedCount(TEAM_HORDE);
+    bg->IncreaseInvitedCount(TEAM_ALLIANCE);
+
+    BattlegroundStartResponse resp;
+    resp.errorCode = BattlegroundErrorCodeNoError;
+    resp.instanceID = bg->GetInstanceID();
+    resp.instanceClientID = bg->GetClientInstanceID();
+    return resp;
+}
+
+BattlegroundErrorCode ToCloud9GrpcHandler::AddPlayersToBattleground(BattlegroundAddPlayersRequest* request)
+{
+    BattlegroundTypeId bgTypeId = BattlegroundTypeId(request->battlegroundTypeID);
+
+    Battleground* bg = sBattlegroundMgr->GetBattleground(request->instanceID, BATTLEGROUND_TYPE_NONE);
+    if (!bg)
+        return BattlegroundErrorBattlegroundNotFound;
+
+    for (int i = 0; i < request->alliancePlayersToAddSize; i++)
+    {
+        Player *player = ObjectAccessor::FindPlayer(ObjectGuid(request->alliancePlayersToAdd[i]));
+        if (player)
+        {
+            player->SetEntryPoint();
+            player->SetBattlegroundId(bg->GetInstanceID(), bg->GetBgTypeID(), 1, true, bgTypeId == BATTLEGROUND_RB, player->GetTeamId(true));
+            sBattlegroundMgr->SendToBattleground(player, bg->GetInstanceID(), bgTypeId);
+        }
+    }
+
+    for (int i = 0; i < request->hordePlayersToAddSize; i++)
+    {
+        Player *player = ObjectAccessor::FindPlayer(ObjectGuid(request->hordePlayersToAdd[i]));
+        if (player)
+        {
+            player->SetEntryPoint();
+            player->SetBattlegroundId(bg->GetInstanceID(), bg->GetBgTypeID(), 1, true, bgTypeId == BATTLEGROUND_RB, player->GetTeamId(true));
+            sBattlegroundMgr->SendToBattleground(player, bg->GetInstanceID(), bgTypeId);
+        }
+    }
+
+    return BattlegroundErrorCodeNoError;
+}
+
+BattlegroundJoinCheckErrorCode ToCloud9GrpcHandler::CanPlayerJoinBattlgroundQueue(uint64 playerGuid)
+{
+    Player *player = ObjectAccessor::FindPlayer(ObjectGuid(playerGuid));
+    if (!player)
+        return BattlegroundJoinCheckErrorCodePlayerNotFound;
+
+    // has deserter debuff
+    if (!player->CanJoinToBattleground())
+        return BattlegroundJoinCheckErrorCodeResponseIsFalse;
+
+    // don't let Death Knights join BG queues when they are not allowed to be teleported yet
+    if (player->IsClass(CLASS_DEATH_KNIGHT, CLASS_CONTEXT_TELEPORT) && player->GetMapId() == 609 && !player->IsGameMaster() && !player->HasSpell(50977))
+        return BattlegroundJoinCheckErrorCodeResponseIsFalse;
+
+    return BattlegroundJoinCheckErrorCodeOK;
+}
+
+BattlegroundJoinCheckErrorCode ToCloud9GrpcHandler::CanPlayerTeleportToBattlground(uint64 playerGuid)
+{
+    Player *player = ObjectAccessor::FindPlayer(ObjectGuid(playerGuid));
+    if (!player)
+        return BattlegroundJoinCheckErrorCodePlayerNotFound;
+
+    if (player->GetCharmGUID() || player->IsInCombat())
+        return BattlegroundJoinCheckErrorCodeResponseIsFalse;
+
+    return BattlegroundJoinCheckErrorCodeOK;
 }

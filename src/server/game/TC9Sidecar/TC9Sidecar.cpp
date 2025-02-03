@@ -20,6 +20,8 @@
 #include "TC9GuildHooks.h"
 #include "TC9GroupHooks.h"
 #include "TC9GrpcHandler.h"
+#include "MapMgr.h"
+#include "Player.h"
 #include "Config.h"
 #include "Log.h"
 #include "InstanceSaveMgr.h"
@@ -36,7 +38,7 @@ ToCloud9Sidecar* ToCloud9Sidecar::instance()
     return &instance;
 }
 
-ToCloud9Sidecar::ToCloud9Sidecar() : _clusterModeEnabled(false)
+ToCloud9Sidecar::ToCloud9Sidecar() : _clusterModeEnabled(false), _isCrossrealm(false)
 {
 }
 
@@ -49,8 +51,10 @@ void ToCloud9Sidecar::Init(uint16 port, int realmId)
         uint32 *assignedMaps;
         int assignedMapsSize = 0;
 
+        _isCrossrealm = sConfigMgr->GetOption<bool>("Cluster.IsCrossrealm", false);
+
         std::string availableMaps = sConfigMgr->GetOption<std::string>("Cluster.AvailableMaps", AVAILABLE_MAPS_ALL_MAPS);
-        TC9InitLib(port, realmId, availableMaps.data(), &assignedMaps, &assignedMapsSize);
+        TC9InitLib(port, realmId, _isCrossrealm, availableMaps.data(), &assignedMaps, &assignedMapsSize);
 
         for (int i = 0; i < MAX_MAP_ID; i++)
             _assignedMapsByID[i] = false;
@@ -58,7 +62,8 @@ void ToCloud9Sidecar::Init(uint16 port, int realmId)
         for (int i = 0; i < assignedMapsSize; i++)
             _assignedMapsByID[assignedMaps[i]] = true;
 
-        free(assignedMaps);
+        if (assignedMapsSize > 0)
+            free(assignedMaps);
 
         SetupHooks();
         SetupGrpcHandlers();
@@ -101,6 +106,11 @@ void ToCloud9Sidecar::SetupGrpcHandlers()
     TC9SetCanPlayerInteractWithGOAndTypeHandler(&ToCloud9GrpcHandler::CanPlayerInteractWithGOAndType);
     TC9SetCanPlayerInteractWithNPCAndFlagsHandler(&ToCloud9GrpcHandler::CanPlayerInteractWithNPCAndFlags);
 
+    TC9SetBattlegroundStartHandler(&ToCloud9GrpcHandler::StartBattleground);
+    TC9SetBattlegroundAddPlayersHandler(&ToCloud9GrpcHandler::AddPlayersToBattleground);
+    TC9SetCanPlayerJoinBattlegroundQueueHandler(&ToCloud9GrpcHandler::CanPlayerJoinBattlgroundQueue);
+    TC9SetCanPlayerTeleportToBattlegroundHandler(&ToCloud9GrpcHandler::CanPlayerTeleportToBattlground);
+
     TC9SetMonitoringDataCollectorHandler(&HandleMonitoringRequest);
 }
 
@@ -124,28 +134,48 @@ bool ToCloud9Sidecar::IsMapAssigned(uint32 mapId)
     return _assignedMapsByID[mapId];
 }
 
-uint32 ToCloud9Sidecar::GenerateCharacterGuid()
+uint32 ToCloud9Sidecar::GenerateCharacterGuid(uint16 realmId)
 {
-    return uint32(TC9GetNextAvailableCharacterGuid());
+    return uint32(TC9GetNextAvailableCharacterGuid(realmId));
 }
 
-uint32 ToCloud9Sidecar::GenerateItemGuid()
+uint32 ToCloud9Sidecar::GenerateItemGuid(uint16 realmId)
 {
-    return uint32(TC9GetNextAvailableItemGuid());
+    return uint32(TC9GetNextAvailableItemGuid(realmId));
 }
 
-uint32 ToCloud9Sidecar::GenerateInstanceGuid()
+uint32 ToCloud9Sidecar::GenerateInstanceGuid(uint16 realmId)
 {
-    return uint32(TC9GetNextAvailableInstanceGuid());
+    return uint32(TC9GetNextAvailableInstanceGuid(realmId));
+}
+
+void ToCloud9Sidecar::OnPlayerLeftBattleground(uint64 playerGUID, uint32 realmID, uint32 instanceID)
+{
+    TC9PlayerLeftBattleground(playerGUID, realmID, instanceID);
+}
+
+void ToCloud9Sidecar::OnBattlegroundStatusChanged(uint32 instanceID, uint8 status)
+{
+    TC9BattlegroundStatusChanged(instanceID, status);
 }
 
 void ToCloud9Sidecar::OnMapsReassigned(uint32* addedMaps, int addedMapsSize, uint32* removedMaps, int removedMapsSize)
 {
     for (int i = 0; i < addedMapsSize; i++)
+    {
         sToCloud9Sidecar->_assignedMapsByID[addedMaps[i]] = true;
 
+        if (Map *map = sMapMgr->FindBaseNonInstanceMap(addedMaps[i]))
+            map->StopPlayersRedirectKickTimer();
+    }
+
     for (int i = 0; i < removedMapsSize; i++)
+    {
         sToCloud9Sidecar->_assignedMapsByID[removedMaps[i]] = false;
+
+        if (Map *map = sMapMgr->FindBaseNonInstanceMap(removedMaps[i]))
+            map->StartPlayersRedirectKickTimer();
+    }
 
     if (addedMapsSize > 0)
     {

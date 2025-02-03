@@ -143,6 +143,7 @@ class ObjectGuid
         [[nodiscard]] uint64   GetRawValue() const { return _guid; }
         [[nodiscard]] HighGuid GetHigh() const { return HighGuid((_guid >> 48) & 0x0000FFFF); }
         [[nodiscard]] uint32   GetEntry() const { return HasEntry() ? uint32((_guid >> 24) & UI64LIT(0x0000000000FFFFFF)) : 0; }
+        [[nodiscard]] uint16   GetRealmID() const { return IsPlayer() ? uint16((_guid >> 32) & UI64LIT(0xFFFF)) : 0; }
         [[nodiscard]] LowType  GetCounter()  const
         {
             return HasEntry()
@@ -284,7 +285,7 @@ public:
     ObjectGuidGeneratorBase(ObjectGuid::LowType start = 1) : _nextGuid(start) { }
 
     virtual void Set(ObjectGuid::LowType val) { _nextGuid = val; }
-    virtual ObjectGuid::LowType Generate() = 0;
+    virtual ObjectGuid::LowType Generate(uint16 realmId = DEFAULT_NON_CROSSREALM_REALM_ID) = 0;
     [[nodiscard]] ObjectGuid::LowType GetNextAfterMaxUsed() const { return _nextGuid; }
     virtual ~ObjectGuidGeneratorBase() = default;
 
@@ -299,12 +300,12 @@ class ObjectGuidGenerator : public ObjectGuidGeneratorBase
 public:
     explicit ObjectGuidGenerator(ObjectGuid::LowType start = 1) : ObjectGuidGeneratorBase(start) { }
 
-    ObjectGuid::LowType Generate() override
+    ObjectGuid::LowType Generate(uint16 realmId = DEFAULT_NON_CROSSREALM_REALM_ID) override
     {
         if (high == HighGuid::Player && sToCloud9Sidecar->ClusterModeEnabled())
-            return ObjectGuid::LowType(sToCloud9Sidecar->GenerateCharacterGuid());
+            return ObjectGuid::LowType(sToCloud9Sidecar->GenerateCharacterGuid(realmId));
         if (high == HighGuid::Item && sToCloud9Sidecar->ClusterModeEnabled())
-            return ObjectGuid::LowType(sToCloud9Sidecar->GenerateItemGuid());
+            return ObjectGuid::LowType(sToCloud9Sidecar->GenerateItemGuid(realmId));
 
         if (_nextGuid >= ObjectGuid::GetMaxCounter(high) - 1)
             HandleCounterOverflow(high);

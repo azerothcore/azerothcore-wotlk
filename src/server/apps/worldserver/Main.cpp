@@ -364,7 +364,8 @@ int main(int argc, char** argv)
         sWorldSocketMgr.StopNetwork();
 
         ///- Clean database before leaving
-        ClearOnlineAccounts();
+        if (!sToCloud9Sidecar->ClusterModeEnabled())
+            ClearOnlineAccounts();
     });
 
     // Set server online (allow connecting now)
@@ -458,7 +459,8 @@ bool StartDB()
     LOG_INFO("server.loading", "> RealmID:              {}", realm.Id.Realm);
 
     ///- Clean the database before starting
-    ClearOnlineAccounts();
+    if (!sToCloud9Sidecar->ClusterModeEnabled())
+        ClearOnlineAccounts();
 
     ///- Insert version info into DB
     WorldDatabasePreparedStatement* stmt = WorldDatabase.GetPreparedStatement(WORLD_UPD_VERSION);

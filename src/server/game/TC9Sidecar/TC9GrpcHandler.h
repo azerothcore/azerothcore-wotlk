@@ -39,6 +39,12 @@ public:
     // Interactions
     static CanPlayerInteractWithGOAndTypeResponse   CanPlayerInteractWithGOAndType(uint64 player, uint64 go, uint8 goType);
     static CanPlayerInteractWithNPCAndFlagsResponse CanPlayerInteractWithNPCAndFlags(uint64 player, uint64 npc, uint32 unitFlags);
+
+    // Battlegrounds
+    static BattlegroundStartResponse StartBattleground(BattlegroundStartRequest* request);
+    static BattlegroundErrorCode AddPlayersToBattleground(BattlegroundAddPlayersRequest* request);
+    static BattlegroundJoinCheckErrorCode CanPlayerJoinBattlgroundQueue(uint64 player);
+    static BattlegroundJoinCheckErrorCode CanPlayerTeleportToBattlground(uint64 player);
 };
 
 #endif // _TC9_GRPC_HANDLER_H
