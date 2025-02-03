@@ -1,3 +1,4 @@
+-- DB update 2025_02_01_02 -> 2025_02_03_00
 -- Add Russian locale for QuestID: 4641
 DELETE FROM quest_offer_reward_locale WHERE ID = 4641 AND locale = 'ruRU';
 INSERT INTO quest_offer_reward_locale(ID,locale,RewardText,VerifiedBuild) VALUES (4641,'ruRU','Очередной рекрут Калтунка?$B$BВидно, плохи наши дела, если у нас нет никого получше. Ну, ничего. К тому времени, как мы решим, что тебе пора покинуть долину, из тебя $c получится бравый воитель Орды!',0);
