@@ -15,8 +15,9 @@ results = {
     "Multiple blank lines check": "Passed",
     "Trailing whitespace check": "Passed",
     "SQL codestyle check": "Passed",
-    "INSERT safety usage check": "Passed",
-    "Missing semicolon check": "Passed"
+    "INSERT & DELETE safety usage check": "Passed",
+    "Missing semicolon check": "Passed",
+    "Backtick check": "Passed"
 }
 
 # Collect all files in all directories
@@ -46,6 +47,7 @@ def parsing_file(files: list) -> None:
                 sql_check(file, file_path)
                 insert_delete_safety_check(file, file_path)
                 semicolon_check(file, file_path)
+                backtick_check(file, file_path)
         except UnicodeDecodeError:
             print(f"\nCould not decode file {file_path}")
             sys.exit(1)
@@ -199,6 +201,30 @@ def semicolon_check(file: io, file_path: str) -> None:
     if check_failed:
         error_handler = True
         results["Missing semicolon check"] = "Failed"
+
+def backtick_check(file: io, file_path: str) -> None:
+    global error_handler, results
+    file.seek(0)
+    check_failed = False
+    pattern = re.compile(
+        r'\b(SELECT|FROM|JOIN|WHERE|GROUP BY|ORDER BY|DELETE FROM|UPDATE|INSERT INTO|SET)\s+([^;]+)', 
+        re.IGNORECASE)
+
+    for line_number, line in enumerate(file, start=1):
+        matches = pattern.findall(line)
+        for clause, content in matches:
+            words = re.findall(r'\b[a-zA-Z_][a-zA-Z0-9_]*\b', content)
+            for word in words:
+                if word.upper() in {"SELECT", "FROM", "JOIN", "WHERE", "GROUP", "BY", "ORDER", 
+                                    "DELETE", "UPDATE", "INSERT", "INTO", "SET", "VALUES"}:
+                    continue
+                if not re.search(rf'`{re.escape(word)}`', content):
+                    print(f"Missing backticks around ({word}). {file_path} at line {line_number}")
+                    check_failed = True
+
+    if check_failed:
+        error_handler = True
+        results["Backtick check"] = "Failed"
 
 # Collect all files from matching directories
 all_files = collect_files_from_directories(src_directory)
