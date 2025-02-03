@@ -28,7 +28,6 @@
 #include "Player.h"
 #include "ScriptMgr.h"
 #include "Spell.h"
-#include "Timer.h"
 #include "Vehicle.h"
 #include "WorldModel.h"
 
