@@ -19,6 +19,7 @@
 #define GRID_TERRAIN_DATA_H
 
 #include "Common.h"
+#include <G3D/Plane.h>
 
 #define MAX_HEIGHT            100000.0f                     // can be use for find ground height at surface
 #define INVALID_HEIGHT       -100000.0f                     // for check, must be equal to VMAP_INVALID_HEIGHT, real value for unknown height is VMAP_INVALID_HEIGHT_VALUE
