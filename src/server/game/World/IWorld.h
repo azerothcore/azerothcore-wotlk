@@ -618,8 +618,8 @@ public:
     virtual void DoForAllOnlinePlayers(std::function<void(Player*)> exec) = 0;
 
 #if defined(MOD_ELUNA)
-    Eluna* GetEluna() const { return eluna; }
-    Eluna* eluna;
+    std::unique_ptr<Eluna> eluna;
+    Eluna* GetEluna() const { return eluna.get(); }
 #endif
 };
 

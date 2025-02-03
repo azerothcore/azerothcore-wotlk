@@ -70,11 +70,6 @@ ZoneDynamicInfo::ZoneDynamicInfo() : MusicId(0), WeatherId(WEATHER_STATE_FINE),
 
 Map::~Map()
 {
-#if defined(MOD_ELUNA)
-    delete eluna;
-    eluna = nullptr;
-#endif
-
     // UnloadAll must be called before deleting the map
 
     sScriptMgr->OnDestroyMap(this);
@@ -256,11 +251,14 @@ Map::Map(uint32 id, uint32 InstanceId, uint8 SpawnMode, Map* _parent) :
 
     // lua state begins uninitialized
 #if defined(MOD_ELUNA)
-    eluna = nullptr;
-
-    if (sElunaConfig->IsElunaEnabled() && !sElunaConfig->IsElunaCompatibilityMode() && sElunaConfig->ShouldMapLoadEluna(id))
+    eluna.reset();
+    if (sElunaConfig->IsElunaEnabled() &&
+        !sElunaConfig->IsElunaCompatibilityMode() &&
+        sElunaConfig->ShouldMapLoadEluna(id))
+    {
         if (!IsParentMap() || (IsParentMap() && !Instanceable()))
-            eluna = new Eluna(this);
+            eluna = std::make_unique<Eluna>(this);
+    }
 #endif
 
     for (unsigned int idx = 0; idx < MAX_NUMBER_OF_GRIDS; ++idx)
@@ -4121,11 +4119,11 @@ std::string InstanceMap::GetDebugInfo() const
 }
 
 #if defined(MOD_ELUNA)
-Eluna *Map::GetEluna() const
+Eluna* Map::GetEluna() const
 {
     if (sElunaConfig->IsElunaCompatibilityMode())
         return sWorld->GetEluna();
 
-    return eluna;
+    return eluna.get();
 }
 #endif

@@ -349,8 +349,8 @@ public:
     void DoForAllOnlinePlayers(std::function<void(Player*)> exec) override;
 
 #if defined(MOD_ELUNA)
-    Eluna* GetEluna() const { return eluna; }
-    Eluna* eluna;
+    std::unique_ptr<Eluna> eluna;
+    Eluna* GetEluna() const;
 #endif
 
 protected:

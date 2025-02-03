@@ -661,7 +661,9 @@ public:
 
     virtual std::string GetDebugInfo() const;
 
+
 #if defined(MOD_ELUNA)
+    std::unique_ptr<Eluna> eluna;
     Eluna* GetEluna() const;
 #endif
 
@@ -811,10 +813,6 @@ private:
     std::unordered_set<Corpse*> _corpseBones;
 
     std::unordered_set<Object*> _updateObjects;
-
-#if defined(MOD_ELUNA)
-    Eluna* eluna;
-#endif
 };
 
 enum InstanceResetMethod

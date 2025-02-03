@@ -3240,7 +3240,7 @@ void WorldObject::RemoveAllowedLooter(ObjectGuid guid)
 #if defined(MOD_ELUNA)
 Eluna* WorldObject::GetEluna() const
 {
-    if (const Map * map = FindMap())
+    if (Map * map = FindMap())
         return map->GetEluna();
 
     return nullptr;
