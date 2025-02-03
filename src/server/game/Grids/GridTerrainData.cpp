@@ -1,5 +1,6 @@
-#include "GridTerrainData.h"
 #include "DBCStores.h"
+#include "GridTerrainData.h"
+#include "Log.h"
 
 uint16 const holetab_h[4] = { 0x1111, 0x2222, 0x4444, 0x8888 };
 uint16 const holetab_v[4] = { 0x000F, 0x00F0, 0x0F00, 0xF000 };
