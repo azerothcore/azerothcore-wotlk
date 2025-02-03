@@ -661,7 +661,6 @@ public:
 
     virtual std::string GetDebugInfo() const;
 
-
 #if defined(MOD_ELUNA)
     std::unique_ptr<Eluna> eluna;
     Eluna* GetEluna() const;
