@@ -5406,7 +5406,6 @@ enum CallOfBeastSpells
 };
 
 // 43359 - Call of the Beast
-// 43359 - Call of the Beast 
 class spell_gen_call_of_beast : public SpellScript
 {
     PrepareSpellScript(spell_gen_call_of_beast);
