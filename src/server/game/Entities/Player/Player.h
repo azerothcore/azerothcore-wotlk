@@ -1728,6 +1728,10 @@ public:
     [[nodiscard]] bool HasTalent(uint32 spell_id, uint8 spec) const;
 
     [[nodiscard]] uint32 CalculateTalentsPoints() const;
+    void SetBonusTalentCount(uint32 count) { m_extraBonusTalentCount = count; };
+    uint32 GetBonusTalentCount() { return m_extraBonusTalentCount; };
+    void AddBonusTalent(uint32 count) { m_extraBonusTalentCount += count; };
+    void RemoveBonusTalent(uint32 count) { m_extraBonusTalentCount -= count; };
 
     // Dual Spec
     void UpdateSpecCount(uint8 count);

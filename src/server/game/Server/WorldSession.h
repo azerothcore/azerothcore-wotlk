@@ -372,7 +372,7 @@ public:
     void SendAreaTriggerMessage(std::string_view str);
 
     template<typename... Args>
-    void SendAreaTriggerMessage(char const* fmt, Args&&... args)
+    void SendAreaTriggerMessage(std::string fmt, Args&&... args)
     {
         if (!m_playerLoading)
             SendAreaTriggerMessage(Acore::StringFormat(fmt, std::forward<Args>(args)...));
@@ -528,9 +528,9 @@ public:
     time_t m_muteTime;
 
     // Locales
-    LocaleConstant GetSessionDbcLocale() const { return /*_isBot? LOCALE_enUS : */m_sessionDbcLocale; }
-    LocaleConstant GetSessionDbLocaleIndex() const { return /*_isBot? LOCALE_enUS : */m_sessionDbLocaleIndex; }
-    char const* GetAcoreString(uint32 entry) const;
+    LocaleConstant GetSessionDbcLocale() const { return m_sessionDbcLocale; }
+    LocaleConstant GetSessionDbLocaleIndex() const { return m_sessionDbLocaleIndex; }
+    std::string GetAcoreString(uint32 entry) const;
     std::string const* GetModuleString(std::string module, uint32 id) const;
 
     uint32 GetLatency() const { return m_latency; }
