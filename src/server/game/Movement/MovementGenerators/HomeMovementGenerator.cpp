@@ -63,7 +63,7 @@ void HomeMovementGenerator<Creature>::_setTargetLocation(Creature* owner)
     }
 
     owner->UpdateAllowedPositionZ(x, y, z);
-    init.MoveTo(x, y, z, DisableMgr::IsPathfindingEnabled(owner->FindMap()), true);
+    init.MoveTo(x, y, z, sDisableMgr->IsPathfindingEnabled(owner->FindMap()), true);
     init.SetWalk(_walk);
     init.Launch();
 

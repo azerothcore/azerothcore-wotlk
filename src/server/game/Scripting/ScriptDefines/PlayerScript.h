@@ -207,6 +207,7 @@ enum PlayerHook
     PLAYERHOOK_ON_CAN_UPDATE_SKILL,
     PLAYERHOOK_ON_BEFORE_UPDATE_SKILL,
     PLAYERHOOK_ON_UPDATE_SKILL,
+    PLAYERHOOK_CAN_RESURRECT,
     PLAYERHOOK_END
 };
 
@@ -773,6 +774,14 @@ public:
     virtual void OnBeforePlayerUpdateSkill(Player* /*player*/, uint32 /*skill_id*/, uint32& /*value*/, uint32 /*max*/, uint32 /*step*/) { }
     virtual void OnPlayerUpdateSkill(Player* /*player*/, uint32 /*skill_id*/, uint32 /*value*/, uint32 /*max*/, uint32 /*step*/, uint32 /*new_value*/) { }
 
+    /**
+     * @brief This hook is called, to avoid player resurrect
+     *
+     * @param player Contains information about the Player
+     *
+     * @return true if player is authorized to resurect
+     */
+    virtual bool CanPlayerResurrect(Player* /*player*/) { return true; }
 };
 
 #endif

@@ -37,7 +37,7 @@ Player* ChatHandler::GetPlayer() const
     return m_session ? m_session->GetPlayer() : nullptr;
 }
 
-char const* ChatHandler::GetAcoreString(uint32 entry) const
+std::string ChatHandler::GetAcoreString(uint32 entry) const
 {
     return m_session->GetAcoreString(entry);
 }
@@ -881,7 +881,7 @@ std::string ChatHandler::GetNameLink(Player* chr) const
     return playerLink(chr->GetName());
 }
 
-char const* CliHandler::GetAcoreString(uint32 entry) const
+std::string CliHandler::GetAcoreString(uint32 entry) const
 {
     return sObjectMgr->GetAcoreStringForDBCLocale(entry);
 }
