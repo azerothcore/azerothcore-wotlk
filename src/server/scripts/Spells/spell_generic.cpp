@@ -5406,7 +5406,6 @@ enum CallOfBeastSpells
 };
 
 // 43359 - Call of the Beast
-// 43359 - Call of the Beast
 class spell_gen_call_of_beast : public SpellScript
 {
     PrepareSpellScript(spell_gen_call_of_beast);
@@ -5425,24 +5424,10 @@ class spell_gen_call_of_beast : public SpellScript
 
         for (Creature* beast : nearbyCreatures)
         {
-            if (!beast);
-                break;
-            if (beast->IsAlive() ||
-                beast->GetCreatureType() == CREATURE_TYPE_BEAST ||
-                !beast->IsPet() ||
-                !beast->IsDungeonBoss() ||
-                !beast->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE))
+            if (!beast || !beast->IsAlive() || beast->GetCreatureType() != CREATURE_TYPE_BEAST)
                 continue;
 
-            beast->ClearUnitState(UNIT_STATE_EVADE);
-            beast->InterruptNonMeleeSpells(false);
-            beast->AttackStop();
-            beast->ToCreature()->AI()->EnterEvadeMode();
-            beast->StopMoving();
-            
-            beast->SetReactState(REACT_AGGRESSIVE);
-            beast->GetThreatMgr().ClearAllThreat();
-            beast->GetThreatMgr().AddThreat(target, 1000000.0f);
+            beast->SetTarget(target->GetGUID());
             beast->AI()->AttackStart(target);
         }
     }
