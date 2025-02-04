@@ -24,6 +24,8 @@
 
 #include <mutex>
 
+class Map;
+
 class MapGridManager
 {
 public:
