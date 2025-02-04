@@ -29,6 +29,7 @@ EndScriptData */
 #include "Pet.h"
 #include "Player.h"
 #include "ReputationMgr.h"
+#include "ScriptMgr.h"
 #include "StringConvert.h"
 
 using namespace Acore::ChatCommands;
@@ -826,8 +827,9 @@ public:
             handler->SendErrorMessage(LANG_COMMAND_FACTION_NOREP_ERROR, factionEntry->name[handler->GetSessionDbcLocale()], factionId);
             return false;
         }
-
-        target->GetReputationMgr().SetOneFactionReputation(factionEntry, float(amount), false);
+        float rep = target->GetReputationMgr().GetReputation(factionId) - float(amount);
+        ScriptMgr::instance()->OnBeforePlayerReputationChange(target, factionId, rep, ReputationSource::Console);
+        target->GetReputationMgr().SetOneFactionReputation(factionEntry, rep, false);
         target->GetReputationMgr().SendState(target->GetReputationMgr().GetState(factionEntry));
 
         handler->PSendSysMessage(LANG_COMMAND_MODIFY_REP, factionEntry->name[handler->GetSessionDbcLocale()], factionId,

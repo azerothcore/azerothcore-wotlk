@@ -20,6 +20,8 @@ enum class ReputationSource : uint8 {
     RepeatableQuest,
     /// The player used a spell
     Spell,
+    // The player get reputation by doing PvP related tasks
+    PvP,
     /// The player get reputation by a console command
     Console,
     /// The player get some reputation by server configuration
