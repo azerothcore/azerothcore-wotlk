@@ -1,4 +1,5 @@
 #include "DBCStores.h"
+#include "GridDefines.h"
 #include "GridTerrainData.h"
 #include "Log.h"
 #include "MapDefines.h"
