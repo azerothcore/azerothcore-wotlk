@@ -2524,13 +2524,6 @@ void WorldObject::GetDeadCreatureListInGrid(std::list<Creature*>& creaturedeadLi
     Cell::VisitGridObjects(this, searcher, maxSearchRange);
 }
 
-void WorldObject::GetCreaturesNearbyList(std::list<Creature*>& creatureList, float maxSearchRange) const
-{
-    Acore::AnyCreatureInObjectRangeCheck check(this, maxSearchRange);
-    Acore::CreatureListSearcher<Acore::AnyCreatureInObjectRangeCheck> searcher(this, creatureList, check);
-    Cell::VisitGridObjects(this, searcher, maxSearchRange);
-}
-
 /*
 namespace Acore
 {
