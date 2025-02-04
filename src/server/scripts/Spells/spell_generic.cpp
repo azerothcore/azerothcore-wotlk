@@ -5406,6 +5406,7 @@ enum CallOfBeastSpells
 };
 
 // 43359 - Call of the Beast
+// 43359 - Call of the Beast 
 class spell_gen_call_of_beast : public SpellScript
 {
     PrepareSpellScript(spell_gen_call_of_beast);
@@ -5420,15 +5421,20 @@ class spell_gen_call_of_beast : public SpellScript
             return;
 
         std::list<Creature*> nearbyCreatures;
-        caster->GetCreaturesNearbyList(nearbyCreatures, 100.0f);
+        // Call of Beasts never used vs any other beasts then these ID's
+        uint32 beastEntries[14] = { 23584, 24217, 24047, 23834, 23598, 24159, 24530, 24043, 24064, 24338, 24242, 24858, 24143, 24138 };
 
-        for (Creature* beast : nearbyCreatures)
+        for (uint32 beastEntry : beastEntries)
         {
-            if (!beast || !beast->IsAlive() || beast->GetCreatureType() != CREATURE_TYPE_BEAST)
-                continue;
+            caster->GetCreatureListWithEntryInGrid(nearbyCreatures, beastEntry, 100.0f);
+            for (Creature* beast : nearbyCreatures)
+            {
+                if (!beast || !beast->IsAlive())
+                    continue;
 
-            beast->SetTarget(target->GetGUID());
-            beast->AI()->AttackStart(target);
+                beast->AI()->AttackStart(target);
+            }
+            nearbyCreatures.clear();
         }
     }
 
