@@ -556,14 +556,6 @@ public:
     void GetCreatureListWithEntryInGrid(std::list<Creature*>& lList, uint32 uiEntry, float fMaxSearchRange) const;
     void GetDeadCreatureListInGrid(std::list<Creature*>& lList, float maxSearchRange, bool alive = false) const;
 
-     /**
-     * @brief Gets a list of all creatures within the specified range
-     * 
-     * @param creatureList List to store the found creatures
-     * @param maxSearchRange Maximum range to search for creatures
-     */
-    void GetCreaturesNearbyList(std::list<Creature*>& creatureList, float maxSearchRange) const; // <-- Linking error =/
-
     void DestroyForNearbyPlayers();
     virtual void UpdateObjectVisibility(bool forced = true, bool fromUpdate = false);
     virtual void UpdateObjectVisibilityOnCreate() { UpdateObjectVisibility(true); }
