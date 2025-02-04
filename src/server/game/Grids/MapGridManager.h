@@ -19,6 +19,7 @@
 #define MAP_GRID_MANAGER_H
 
 #include "Common.h"
+#include "GridDefines.h"
 #include "MapDefines.h"
 #include "MapGrid.h"
 
