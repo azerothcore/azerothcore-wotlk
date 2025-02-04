@@ -36,7 +36,6 @@
 #include "PlayerSettings.h"
 #include "PlayerTaxi.h"
 #include "QuestDef.h"
-#include "ReputationSource.h"
 #include "SpellAuras.h"
 #include "SpellInfo.h"
 #include "TradeData.h"
@@ -233,6 +232,32 @@ enum ActionButtonType
     ACTION_BUTTON_MACRO     = 0x40,
     ACTION_BUTTON_CMACRO    = ACTION_BUTTON_C | ACTION_BUTTON_MACRO,
     ACTION_BUTTON_ITEM      = 0x80
+};
+
+/**
+ * @brief This enum represent all known sources a character can get reputation
+ */
+enum class ReputationSource : uint8 {
+    /// The player killed an enemy
+    Kill,
+    /// The player turned in a quest
+    Quest,
+    /// The player turned in a daily quest
+    DailyQuest,
+    /// The player turned in a weekly quest
+    WeeklyQuest,
+    /// The player turned in a montly quest
+    MonthlyQuest,
+    /// The player turned in a repeatable quest
+    RepeatableQuest,
+    /// The player used a spell
+    Spell,
+    // The player get reputation by doing PvP related tasks
+    PvP,
+    /// The player get reputation by a console command
+    Console,
+    /// The player get some reputation by server configuration
+    Config
 };
 
 enum QuestSound

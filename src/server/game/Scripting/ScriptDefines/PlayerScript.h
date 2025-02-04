@@ -18,7 +18,7 @@
 #ifndef SCRIPT_OBJECT_PLAYER_SCRIPT_H_
 #define SCRIPT_OBJECT_PLAYER_SCRIPT_H_
 
-#include "ReputationSource.h"
+#include "Player.h"
 #include "ScriptObject.h"
 #include "SharedDefines.h"
 #include <vector>

@@ -32,7 +32,7 @@
 #include "LFGMgr.h"
 #include "ObjectMgr.h"
 #include "PetDefines.h"
-#include "ReputationSource.h"
+#include "Player.h"
 #include "SharedDefines.h"
 #include "Tuples.h"
 #include "Weather.h"
