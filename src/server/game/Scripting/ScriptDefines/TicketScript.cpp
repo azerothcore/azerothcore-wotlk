@@ -45,11 +45,11 @@ void ScriptMgr::OnTicketResolve(Player* player, GmTicket* ticket)
 }
 
 TicketScript::TicketScript(const char* name, std::vector<uint16> enabledHooks)
-: ScriptObject(name, SERVERHOOK_END)
+: ScriptObject(name, TICKETHOOK_END)
 {
     // If empty - enable all available hooks.
     if (enabledHooks.empty())
-        for (uint16 i = 0; i < SERVERHOOK_END; ++i)
+        for (uint16 i = 0; i < TICKETHOOK_END; ++i)
             enabledHooks.emplace_back(i);
 
     ScriptRegistry<TicketScript>::AddScript(this, std::move(enabledHooks));
