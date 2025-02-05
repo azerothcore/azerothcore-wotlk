@@ -6,7 +6,7 @@ import glob
 
 # Get the pending directory of the project
 base_dir = os.getcwd()
-pattern = os.path.join("D:/azerothcore-wotlk/", 'data/sql/updates/pending_db_*')
+pattern = os.path.join(base_dir, 'data/sql/updates/pending_db_*')
 src_directory = glob.glob(pattern)
 
 print(f"{pattern}")
