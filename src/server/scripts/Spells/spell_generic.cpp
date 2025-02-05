@@ -5400,6 +5400,38 @@ class spell_gen_proc_on_victim : public AuraScript
     }
 };
 
+enum TranslocateSpells
+{
+    SPELL_TRANSLOCATION_DOWN = 45368,
+    SPELL_TRANSLOCATION_UP   = 45371
+};
+
+class spell_gen_translocate : public SpellScript
+{
+    PrepareSpellScript(spell_gen_translocate);
+
+public:
+    spell_gen_translocate(uint32 spellId) : SpellScript(), _spellId(spellId) {}
+
+    bool Validate(SpellInfo const* /*spellInfo*/) override
+    {
+        return ValidateSpellInfo({ _spellId });
+    }
+
+    void HandleScript()
+    {
+        GetCaster()->CastSpell(GetCaster(), _spellId);
+    }
+
+    void Register() override
+    {
+        AfterCast += SpellCastFn(spell_gen_translocate::HandleScript);
+    }
+
+private:
+    uint32 _spellId;
+};
+
 void AddSC_generic_spell_scripts()
 {
     RegisterSpellScript(spell_silithyst);
@@ -5560,4 +5592,6 @@ void AddSC_generic_spell_scripts()
     RegisterSpellScript(spell_gen_set_health);
     RegisterSpellScript(spell_pet_spellhit_expertise_spellpen_scaling);
     RegisterSpellScript(spell_gen_proc_on_victim);
+    RegisterSpellScriptWithArgs(spell_gen_translocate, "spell_gen_translocate_down", SPELL_TRANSLOCATION_DOWN);
+    RegisterSpellScriptWithArgs(spell_gen_translocate, "spell_gen_translocate_up", SPELL_TRANSLOCATION_UP);
 }
