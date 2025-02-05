@@ -130,7 +130,7 @@ public:
     }
 
     // function with different implementation for chat/console
-    virtual char const* GetAcoreString(uint32 entry) const;
+    virtual std::string GetAcoreString(uint32 entry) const;
     virtual void SendSysMessage(std::string_view str, bool escapeCharacters = false);
 
     void SendSysMessage(uint32 entry);
@@ -258,7 +258,7 @@ public:
     explicit CliHandler(void* callbackArg, Print* zprint) : m_callbackArg(callbackArg), m_print(zprint) { }
 
     // overwrite functions
-    char const* GetAcoreString(uint32 entry) const override;
+    std::string GetAcoreString(uint32 entry) const override;
     void SendSysMessage(std::string_view, bool escapeCharacters) override;
     bool ParseCommands(std::string_view str) override;
     std::string GetNameLink() const override;
