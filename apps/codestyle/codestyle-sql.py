@@ -6,8 +6,10 @@ import glob
 
 # Get the pending directory of the project
 base_dir = os.getcwd()
-pattern = os.path.join(base_dir, 'data/sql/updates/pending_db_*')
+pattern = os.path.join("D:/azerothcore-wotlk/", 'data/sql/updates/pending_db_*')
 src_directory = glob.glob(pattern)
+
+print(f"{pattern}")
 
 # Global variables
 error_handler = False
@@ -206,18 +208,27 @@ def backtick_check(file: io, file_path: str) -> None:
     global error_handler, results
     file.seek(0)
     check_failed = False
+
+    # Find SQL clauses
     pattern = re.compile(
-        r'\b(SELECT|FROM|JOIN|WHERE|GROUP BY|ORDER BY|DELETE FROM|UPDATE|INSERT INTO|SET)\s+([^;]+)', 
+        r'\b(SELECT|FROM|JOIN|WHERE|GROUP BY|ORDER BY|DELETE FROM|UPDATE|INSERT INTO|SET|REPLACE|REPLACE INTO)\s+([^;]+)', 
         re.IGNORECASE)
 
+    # Make sure to ignore values enclosed in single- and doublequotes
+    quote_pattern = re.compile(r"'(?:\\'|[^'])*'|\"(?:\\\"|[^\"])*\"")
+
     for line_number, line in enumerate(file, start=1):
-        matches = pattern.findall(line)
+        sanitized_line = quote_pattern.sub('', line)
+        matches = pattern.findall(sanitized_line)
+        
         for clause, content in matches:
             words = re.findall(r'\b[a-zA-Z_][a-zA-Z0-9_]*\b', content)
             for word in words:
                 if word.upper() in {"SELECT", "FROM", "JOIN", "WHERE", "GROUP", "BY", "ORDER", 
-                                    "DELETE", "UPDATE", "INSERT", "INTO", "SET", "VALUES"}:
+                                    "DELETE", "UPDATE", "INSERT", "INTO", "SET", "VALUES", "AND",
+                                    "IN", "OR", "REPLACE"}:
                     continue
+
                 if not re.search(rf'`{re.escape(word)}`', content):
                     print(f"Missing backticks around ({word}). {file_path} at line {line_number}")
                     check_failed = True
