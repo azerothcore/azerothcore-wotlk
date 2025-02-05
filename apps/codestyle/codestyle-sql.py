@@ -9,8 +9,6 @@ base_dir = os.getcwd()
 pattern = os.path.join(base_dir, 'data/sql/updates/pending_db_*')
 src_directory = glob.glob(pattern)
 
-print(f"{pattern}")
-
 # Global variables
 error_handler = False
 results = {
