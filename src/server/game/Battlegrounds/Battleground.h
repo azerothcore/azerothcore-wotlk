@@ -558,8 +558,6 @@ public:
 
     void DoorOpen(uint32 type);
     void DoorClose(uint32 type);
-    //to be removed
-    const char* GetAcoreString(int32 entry);
 
     virtual bool HandlePlayerUnderMap(Player* /*player*/) { return false; }
 

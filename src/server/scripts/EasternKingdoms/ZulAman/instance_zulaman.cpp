@@ -115,11 +115,13 @@ public:
 
             for (uint8 i = 0; i < RAND_VENDOR; ++i)
                 RandVendor[i] = NOT_STARTED;
+
+            StorePersistentData(DATA_TIMED_RUN, 0);
         }
 
         void OnPlayerEnter(Player* /*player*/) override
         {
-            if (!scheduler.IsGroupScheduled(GROUP_TIMED_RUN))
+            if (!scheduler.IsGroupScheduled(GROUP_TIMED_RUN) && GetPersistentData(DATA_TIMED_RUN))
                 DoAction(ACTION_START_TIMED_RUN);
         }
 
@@ -293,53 +295,36 @@ public:
             if (!InstanceScript::SetBossState(type, state))
                 return false;
 
-            switch (type)
+            if (state == DONE)
             {
-                case DATA_NALORAKK:
-                    if (state == DONE)
-                    {
+                switch (type)
+                {
+                    case DATA_NALORAKK:
                         if (uint32 timer = GetPersistentData(DATA_TIMED_RUN))
                         {
                             StorePersistentData(DATA_TIMED_RUN, timer += 15);
                             DoUpdateWorldState(WORLDSTATE_TIME_TO_SACRIFICE, timer);
                         }
-                        SummonHostage(0);
-                    }
-                    break;
-                case DATA_AKILZON:
-                    if (state == DONE)
-                    {
+                        SummonHostage(type);
+                        break;
+                    case DATA_AKILZON:
                         if (uint32 timer = GetPersistentData(DATA_TIMED_RUN))
                         {
                             StorePersistentData(DATA_TIMED_RUN, timer += 10);
                             DoUpdateWorldState(WORLDSTATE_TIME_TO_SACRIFICE, timer);
                         }
-                        SummonHostage(1);
-                    }
-                    break;
-                case DATA_JANALAI:
-                    if (state == DONE)
-                        SummonHostage(2);
-                    break;
-                case DATA_HALAZZI:
-                    if (state == DONE)
-                        SummonHostage(3);
-                    break;
-                case DATA_HEXLORD:
-                    if (state == IN_PROGRESS)
-                        HandleGameObject(ObjectGuid::Empty, false, GetGameObject(DATA_HEXLORD_GATE));
-                    else if (state == NOT_STARTED)
-                        CheckInstanceStatus();
-                    else if (state == DONE)
-                    {
+                        SummonHostage(type);
+                        break;
+                    case DATA_JANALAI:
+                    case DATA_HALAZZI:
+                        SummonHostage(type);
+                        break;
+                    case DATA_HEXLORD:
                         if (GameObject* zuljinGate = GetGameObject(DATA_ZULJIN_GATE))
                             zuljinGate->RemoveGameObjectFlag(GO_FLAG_LOCKED);
-                    }
-                    break;
-            }
+                        break;
+                }
 
-            if (state == DONE)
-            {
                 if (GetPersistentData(DATA_TIMED_RUN) && AllBossesDone({ DATA_NALORAKK, DATA_AKILZON, DATA_JANALAI, DATA_HALAZZI }))
                 {
                     StorePersistentData(DATA_TIMED_RUN, 0);
@@ -347,6 +332,16 @@ public:
                 }
 
                 CheckInstanceStatus();
+            }
+            else
+            {
+                if (type == DATA_HEXLORD)
+                {
+                    if (state == IN_PROGRESS)
+                        HandleGameObject(ObjectGuid::Empty, false, GetGameObject(DATA_HEXLORD_GATE));
+                    else if (state == NOT_STARTED)
+                        CheckInstanceStatus();
+                }
             }
 
             return true;

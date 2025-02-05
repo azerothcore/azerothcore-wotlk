@@ -15,8 +15,9 @@ results = {
     "Multiple blank lines check": "Passed",
     "Trailing whitespace check": "Passed",
     "SQL codestyle check": "Passed",
-    "INSERT safety usage check": "Passed",
-    "Missing semicolon check": "Passed"
+    "INSERT & DELETE safety usage check": "Passed",
+    "Missing semicolon check": "Passed",
+    "Backtick check": "Passed"
 }
 
 # Collect all files in all directories
@@ -44,8 +45,9 @@ def parsing_file(files: list) -> None:
                 multiple_blank_lines_check(file, file_path)
                 trailing_whitespace_check(file, file_path)
                 sql_check(file, file_path)
-                insert_safety_check(file, file_path)
+                insert_delete_safety_check(file, file_path)
                 semicolon_check(file, file_path)
+                backtick_check(file, file_path)
         except UnicodeDecodeError:
             print(f"\nCould not decode file {file_path}")
             sys.exit(1)
@@ -134,9 +136,10 @@ def sql_check(file: io, file_path: str) -> None:
         error_handler = True
         results["SQL codestyle check"] = "Failed"
 
-def insert_safety_check(file: io, file_path: str) -> None:
+def insert_delete_safety_check(file: io, file_path: str) -> None:
     global error_handler, results
     file.seek(0)  # Reset file pointer to the beginning
+    not_delete = ["creature_template", "gameobject_template", "item_template", "quest_template"]
     check_failed = False
     previous_line = ""
 
@@ -148,11 +151,18 @@ def insert_safety_check(file: io, file_path: str) -> None:
             print(f"No DELETE keyword found after the INSERT in {file_path} at line {line_number}\nIf this error is intended, please advert a maintainer")
             check_failed = True
         previous_line = line
+        match = re.match(r"DELETE FROM\s+`([^`]+)`", line, re.IGNORECASE)
+        if match:
+            table_name = match.group(1)
+            if table_name in not_delete:
+                print(
+                    f"Entries from {table} should not be deleted! {file_path} at line {line_number}")
+                check_failed = True
 
     # Handle the script error and update the result output
     if check_failed:
         error_handler = True
-        results["INSERT safety usage check"] = "Failed"
+        results["INSERT & DELETE safety usage check"] = "Failed"
 
 def semicolon_check(file: io, file_path: str) -> None:
     global error_handler, results
@@ -191,6 +201,30 @@ def semicolon_check(file: io, file_path: str) -> None:
     if check_failed:
         error_handler = True
         results["Missing semicolon check"] = "Failed"
+
+def backtick_check(file: io, file_path: str) -> None:
+    global error_handler, results
+    file.seek(0)
+    check_failed = False
+    pattern = re.compile(
+        r'\b(SELECT|FROM|JOIN|WHERE|GROUP BY|ORDER BY|DELETE FROM|UPDATE|INSERT INTO|SET)\s+([^;]+)', 
+        re.IGNORECASE)
+
+    for line_number, line in enumerate(file, start=1):
+        matches = pattern.findall(line)
+        for clause, content in matches:
+            words = re.findall(r'\b[a-zA-Z_][a-zA-Z0-9_]*\b', content)
+            for word in words:
+                if word.upper() in {"SELECT", "FROM", "JOIN", "WHERE", "GROUP", "BY", "ORDER", 
+                                    "DELETE", "UPDATE", "INSERT", "INTO", "SET", "VALUES"}:
+                    continue
+                if not re.search(rf'`{re.escape(word)}`', content):
+                    print(f"Missing backticks around ({word}). {file_path} at line {line_number}")
+                    check_failed = True
+
+    if check_failed:
+        error_handler = True
+        results["Backtick check"] = "Failed"
 
 # Collect all files from matching directories
 all_files = collect_files_from_directories(src_directory)

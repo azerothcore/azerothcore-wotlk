@@ -1602,6 +1602,7 @@ void SpellMgr::LoadSpellInfoCorrections()
     ApplySpellFix({ 44335 }, [](SpellInfo* spellInfo)
     {
         spellInfo->AuraInterruptFlags |= AURA_INTERRUPT_FLAG_CHANGE_MAP;
+        spellInfo->AttributesCu |= SPELL_ATTR0_CU_SINGLE_AURA_STACK;
     });
 
     ApplySpellFix({
