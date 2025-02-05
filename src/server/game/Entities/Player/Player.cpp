@@ -5966,6 +5966,8 @@ float Player::CalculateReputationGain(ReputationSource source, uint32 creatureOr
             case ReputationSource::Spell:
                 repRate = repData->spellRate;
                 break;
+            default:
+                break;
         }
 
         // for custom, a rate of 0.0 will totally disable reputation gain for this faction/type
