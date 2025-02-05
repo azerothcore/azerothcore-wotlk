@@ -237,7 +237,8 @@ enum ActionButtonType
 /**
  * @brief This enum represent all known sources a character can get reputation
  */
-enum class ReputationSource : uint8 {
+enum class ReputationSource : uint8
+{
     /// The player killed an enemy
     Kill,
     /// The player turned in a quest
