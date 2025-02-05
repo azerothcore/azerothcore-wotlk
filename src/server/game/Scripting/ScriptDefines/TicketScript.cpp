@@ -21,27 +21,27 @@
 
 void ScriptMgr::OnTicketCreate(Player* player, GmTicket* ticket)
 {
-    CALL_ENABLED_HOOKS(TicketScript, TICKETHOOK_ON_CREATE_TICKET, script->OnTicketCreate(player, ticket));
+    CALL_ENABLED_HOOKS(TicketScript, TICKETHOOK_ON_TICKET_CREATE, script->OnTicketCreate(player, ticket));
 }
 
 void ScriptMgr::OnTicketUpdate(Player* player, GmTicket* ticket)
 {
-    CALL_ENABLED_HOOKS(TicketScript, TICKETHOOK_ON_UPDATE_TICKET, script->OnTicketUpdate(player, ticket));
+    CALL_ENABLED_HOOKS(TicketScript, TICKETHOOK_ON_TICKET_UPDATE, script->OnTicketUpdate(player, ticket));
 }
 
 void ScriptMgr::OnTicketClose(Player* player, GmTicket* ticket)
 {
-    CALL_ENABLED_HOOKS(TicketScript, TICKETHOOK_ON_CLOSE_TICKET, script->OnTicketClose(player, ticket));
+    CALL_ENABLED_HOOKS(TicketScript, TICKETHOOK_ON_TICKET_CLOSE, script->OnTicketClose(player, ticket));
 }
 
 void ScriptMgr::OnTicketStatusUpdate(Player* player, GmTicket* ticket)
 {
-    CALL_ENABLED_HOOKS(TicketScript, TICKETHOOK_ON_STATUS_UPDATE_TICKET, script->OnTicketStatusUpdate(player, ticket));
+    CALL_ENABLED_HOOKS(TicketScript, TICKETHOOK_ON_TICKET_STATUS_UPDATE, script->OnTicketStatusUpdate(player, ticket));
 }
 
 void ScriptMgr::OnTicketResolve(Player* player, GmTicket* ticket)
 {
-    CALL_ENABLED_HOOKS(TicketScript, TICKETHOOK_ON_RESOLVE_TICKET, script->OnTicketResolve(player, ticket));
+    CALL_ENABLED_HOOKS(TicketScript, TICKETHOOK_ON_TICKET_RESOLVE, script->OnTicketResolve(player, ticket));
 }
 
 TicketScript::TicketScript(const char* name, std::vector<uint16> enabledHooks)
