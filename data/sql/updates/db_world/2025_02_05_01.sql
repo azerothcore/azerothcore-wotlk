@@ -1,3 +1,4 @@
+-- DB update 2025_02_05_00 -> 2025_02_05_01
 
 -- Trapdoor Crawler
 UPDATE `creature_template` SET `AIName` = 'SmartAI' WHERE `entry` = 28221;
