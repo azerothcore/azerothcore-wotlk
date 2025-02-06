@@ -20,6 +20,7 @@
 #include "GridNotifiers.h"
 #include "GridNotifiersImpl.h"
 #include "PassiveAI.h"
+#include "Random.h"
 #include "ScriptedCreature.h"
 #include "SpellScript.h"
 #include "SpellScriptLoader.h"
@@ -295,8 +296,8 @@ struct boss_janalai : public BossAI
         float maxRadius = std::min(area_dx, area_dy) / 2.0f;
         for (int i = 0; i < MAX_BOMB_COUNT; ++i)
         {
-            float angle = float(rand()) / float(RAND_MAX) * 2.0f * M_PI;
-            float radius = float(rand()) / float(RAND_MAX) * maxRadius;
+            float angle = frand(0.0f, 2.0f * M_PI);
+            float radius = frand(0.0f, maxRadius);
             float dx = radius * cos(angle);
             float dy = radius * sin(angle);
             DoSpawnCreature(NPC_FIRE_BOMB, dx, dy, 0, 0, TEMPSUMMON_TIMED_DESPAWN, 15000);
