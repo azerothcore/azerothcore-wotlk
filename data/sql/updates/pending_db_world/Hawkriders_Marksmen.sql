@@ -1,6 +1,8 @@
 
--- Remove flag IMMUNE_TO_NPC (Sniffed Values)
+-- Remove flag IMMUNE_TO_NPC. Add Flag PET_IN_COMBAT (Sniffed Values)
 UPDATE `creature_template` SET `unit_flags`=`unit_flags`& ~512 WHERE (`entry` = 24938);
+UPDATE `creature_template` SET `unit_flags`=`unit_flags`|2048 WHERE (`entry` = 24938);
+
 -- Change Temp movement
 UPDATE `creature_template_movement` SET `Rooted` = `Rooted`|1 WHERE (`CreatureId` = 24938);
 
