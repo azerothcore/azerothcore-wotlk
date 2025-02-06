@@ -96,14 +96,6 @@ public:
             if (GameObject* gobj = GetGameObject(DATA_ICEBARRIER))
                 gobj->SendUpdateToPlayer(player);
         }
-
-        void OnCreatureCreate(Creature* creature) override
-        {
-            if (creature->GetSpawnId() > 0 || !creature->GetOwnerGUID().IsPlayer())
-                creature->CastSpell(creature, SPELL_SUNWELL_RADIANCE, true);
-
-            InstanceScript::OnCreatureCreate(creature);
-        }
     };
 
     InstanceScript* GetInstanceScript(InstanceMap* map) const override
