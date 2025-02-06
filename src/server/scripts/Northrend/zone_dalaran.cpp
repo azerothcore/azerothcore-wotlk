@@ -443,8 +443,10 @@ public:
         void AttackStart(Unit* /*who*/) override {}
 
         void MoveInLineOfSight(Unit* who) override
-        {                                                  /* Dalaran          Sewer Exit Pipe */
-            if (!who || !who->IsInWorld() || who->GetZoneId() != 4395 || who->GetAreaId() == 4569)
+        {
+            // 4395 Dalaran
+            // 4569 Sewer Exit Pipe
+            if (!who || !who->IsInWorld()|| who->GetZoneId() != 4395 || who->GetAreaId() == 4569)
                 return;
 
             if (!me->IsWithinDist(who, 5.0f, false))
