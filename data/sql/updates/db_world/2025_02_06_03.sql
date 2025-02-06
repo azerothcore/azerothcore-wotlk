@@ -1,3 +1,4 @@
+-- DB update 2025_02_06_02 -> 2025_02_06_03
 
 SET @LOOTTHISTLEBOAR := 1985; -- Skinning loot template for Thistle Boar
 SET @LOOTSCORPIDWORKER := 3124; -- Skinning loot template for Scorpid Worker
