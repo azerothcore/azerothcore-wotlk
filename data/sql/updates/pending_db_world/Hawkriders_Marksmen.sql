@@ -1,9 +1,9 @@
 
--- Change Unit Flag (Sniffed Values)
-UPDATE `creature_template` SET `unit_flags`=`unit_flags`& ~33536 WHERE (`entry` = 24938);
-UPDATE `creature_template` SET `unit_flags`=`unit_flags`|559360 WHERE (`entry` = 24938);
+-- Remove flag IMMUNE_TO_NPC. Add flags PET_IN_COMBAT and IN_COMBAT (Sniffed Values)
+UPDATE `creature_template` SET `unit_flags`=`unit_flags`& ~512 WHERE (`entry` = 24938);
+UPDATE `creature_template` SET `unit_flags`=`unit_flags`|2048|524288 WHERE (`entry` = 24938);
 
--- Sniffed Movement Flags for Marksmen (Sniffed Value)
+-- Set rooted to 1 (Sniffed Value)
 UPDATE `creature_template_movement` SET `Rooted` = 1 WHERE (`CreatureId` = 24938);
 
 -- Dawnblade Hawkrider SmartAI
@@ -14,7 +14,7 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 (25063, 0, 0, 0, 25, 0, 100, 0, 0, 0, 0, 0, 0, 0, 8, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Dawnblade Hawkrider - On Reset - Set Reactstate Passive'),
 (25063, 0, 1, 0, 60, 0, 100, 0, 3000, 6500, 3000, 6500, 0, 0, 11, 45189, 2, 0, 1, 0, 0, 9, 24938, 5, 40, 0, 0, 0, 0, 0, 'Dawnblade Hawkrider - On Update - Cast \'Dawnblade Attack\'');
 
--- Shattered Sun Marksman
+-- Shattered Sun Marksman SmartAI
 UPDATE `creature_template` SET `AIName` = 'SmartAI' WHERE `entry` = 24938;
 
 DELETE FROM `smart_scripts` WHERE (`source_type` = 0 AND `entryorguid` = 24938);
