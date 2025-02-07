@@ -84,17 +84,17 @@ void WorldSession::HandleTrainerListOpcode(WorldPacket& recvData)
     SendTrainerList(guid);
 }
 
-void WorldSession::SendTrainerList(ObjectGuid guid)
+void WorldSession::SendTrainerList(ObjectGuid guid, uint32 trainerEntry)
 {
     std::string str = GetAcoreString(LANG_NPC_TAINER_HELLO);
-    SendTrainerList(guid, str);
+    SendTrainerList(guid, str, trainerEntry);
 }
 
-void WorldSession::SendTrainerList(ObjectGuid guid, const std::string& strTitle)
+void WorldSession::SendTrainerList(ObjectGuid guid, const std::string& strTitle, uint32 trainerEntry)
 {
     LOG_DEBUG("network", "WORLD: SendTrainerList");
 
-    Creature* unit = GetPlayer()->GetNPCIfCanInteractWith(guid, UNIT_NPC_FLAG_TRAINER);
+    Creature* unit = trainerEntry ? GetPlayer()->GetMap()->GetCreature(guid) : GetPlayer()->GetNPCIfCanInteractWith(guid, UNIT_NPC_FLAG_TRAINER);
     if (!unit)
     {
         LOG_DEBUG("network", "WORLD: SendTrainerList - Unit ({}) not found or you can not interact with him.", guid.ToString());
@@ -112,8 +112,9 @@ void WorldSession::SendTrainerList(ObjectGuid guid, const std::string& strTitle)
         LOG_DEBUG("network", "WORLD: SendTrainerList - ({}) NO CREATUREINFO!", guid.ToString());
         return;
     }
-
-    TrainerSpellData const* trainer_spells = unit->GetTrainerSpells();
+    
+    SetCurrentTrainer(trainerEntry);
+    TrainerSpellData const* trainer_spells = GetCurrentTrainer() ? sObjectMgr->GetNpcTrainerSpells(GetCurrentTrainer()) : unit->GetTrainerSpells();
     if (!trainer_spells)
     {
         LOG_DEBUG("network", "WORLD: SendTrainerList - Training spells not found for creature ({})", guid.ToString());
@@ -228,7 +229,7 @@ void WorldSession::HandleTrainerBuySpellOpcode(WorldPacket& recvData)
         GetPlayer()->RemoveAurasByType(SPELL_AURA_FEIGN_DEATH);
 
     // check present spell in trainer spell list
-    TrainerSpellData const* trainer_spells = unit->GetTrainerSpells();
+    TrainerSpellData const* trainer_spells = GetCurrentTrainer() ? sObjectMgr->GetNpcTrainerSpells(GetCurrentTrainer()) : unit->GetTrainerSpells();
     if (!trainer_spells)
         return;
 
