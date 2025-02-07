@@ -112,7 +112,7 @@ void WorldSession::SendTrainerList(ObjectGuid guid, const std::string& strTitle,
         LOG_DEBUG("network", "WORLD: SendTrainerList - ({}) NO CREATUREINFO!", guid.ToString());
         return;
     }
-    
+
     SetCurrentTrainer(trainerEntry);
     TrainerSpellData const* trainer_spells = GetCurrentTrainer() ? sObjectMgr->GetNpcTrainerSpells(GetCurrentTrainer()) : unit->GetTrainerSpells();
     if (!trainer_spells)
