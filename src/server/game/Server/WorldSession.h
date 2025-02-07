@@ -352,7 +352,7 @@ public:
     void SendAreaTriggerMessage(std::string_view str);
 
     template<typename... Args>
-    void SendAreaTriggerMessage(std::string fmt, Args&&... args)
+    void SendAreaTriggerMessage(char const* fmt, Args&&... args)
     {
         if (!m_playerLoading)
             SendAreaTriggerMessage(Acore::StringFormat(fmt, std::forward<Args>(args)...));
