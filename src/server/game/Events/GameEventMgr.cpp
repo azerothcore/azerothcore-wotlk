@@ -134,9 +134,7 @@ void GameEventMgr::StartInternalEvent(uint16 eventId)
 bool GameEventMgr::StartEvent(uint16 eventId, bool overwrite)
 {
     if (sDisableMgr->IsDisabledFor(DISABLE_TYPE_GAME_EVENT, eventId, nullptr) && !overwrite)
-    {
         return false;
-    }
 
     GameEventData& data = _gameEvent[eventId];
     if (data.State == GAMEEVENT_NORMAL || data.State == GAMEEVENT_INTERNAL)
