@@ -351,21 +351,21 @@ void GameEventMgr::LoadEvents()
         }
 
         GameEventData& pGameEvent = _gameEvent[eventId];
-        pGameEvent.EventId = fields[0].Get<uint32>();
-        uint64 starttime = fields[1].Get<uint64>();
-        pGameEvent.Start = time_t(starttime);
-        uint64 endtime = fields[2].Get<uint64>();
+        pGameEvent.EventId        = fields[0].Get<uint32>();
+        uint64 starttime          = fields[1].Get<uint64>();
+        pGameEvent.Start          = time_t(starttime);
+        uint64 endtime            = fields[2].Get<uint64>();
         if (fields[2].IsNull())
-            endtime = GameTime::GetGameTime().count() + 63072000; // add 2 years to current date
-        pGameEvent.End = time_t(endtime);
-        pGameEvent.Occurence = fields[3].Get<uint64>();
-        pGameEvent.Length = fields[4].Get<uint64>();
-        pGameEvent.HolidayId = HolidayIds(fields[5].Get<uint32>());
-        pGameEvent.HolidayStage = fields[6].Get<uint8>();
-        pGameEvent.Description = fields[7].Get<std::string>();
-        pGameEvent.State = (GameEventState)(fields[8].Get<uint8>());
-        pGameEvent.Announce = fields[9].Get<uint8>();
-        pGameEvent.NextStart = 0;
+            endtime               = GameTime::GetGameTime().count() + 63072000; // add 2 years to current date
+        pGameEvent.End            = time_t(endtime);
+        pGameEvent.Occurence      = fields[3].Get<uint64>();
+        pGameEvent.Length         = fields[4].Get<uint64>();
+        pGameEvent.HolidayId      = HolidayIds(fields[5].Get<uint32>());
+        pGameEvent.HolidayStage   = fields[6].Get<uint8>();
+        pGameEvent.Description    = fields[7].Get<std::string>();
+        pGameEvent.State          = (GameEventState)(fields[8].Get<uint8>());
+        pGameEvent.Announce       = fields[9].Get<uint8>();
+        pGameEvent.NextStart      = 0;
 
         ++count;
 
@@ -1870,7 +1870,7 @@ void GameEventMgr::SetHolidayEventTime(GameEventData& event)
     if (!event.HolidayStage) // Ignore holiday
         return;
 
-    const HolidaysEntry* holiday = sHolidaysStore.LookupEntry(event.HolidayId);
+    HolidaysEntry const* holiday = sHolidaysStore.LookupEntry(event.HolidayId);
 
     if (!holiday->Date[0] || !holiday->Duration[0]) // Invalid definitions
     {

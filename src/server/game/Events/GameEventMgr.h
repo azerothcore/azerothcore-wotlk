@@ -185,8 +185,6 @@ private:
     GameEventQuestMap _gameEventGameObjectQuests;
     GameEventNPCVendorMap _gameEventVendors;
     GameEventModelEquipMap _gameEventModelEquip;
-    //GameEventGuidMap  mGameEventCreatureGuids;
-    //GameEventGuidMap  mGameEventGameobjectGuids;
     GameEventIdMap    _gameEventPoolIds;
     GameEventDataMap  _gameEvent;
     GameEventBitmask  _gameEventBattlegroundHolidays;
