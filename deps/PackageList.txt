@@ -44,9 +44,9 @@ utf8-cpp (UTF-8 with C++ in a Portable Way)
   http://utfcpp.sourceforge.net/
   Version: 2.3.4
 
-zlib (A Massively Spiffy Yet Delicately Unobtrusive Compression Library)
-  http://www.zlib.net/
-  Version: 1.2.12
+zlib (A Massively Spiffy Yet Delicately Unobtrusive Compression Library - fork of Cloudflare)
+  https://github.com/cloudflare/zlib (based on http://www.zlib.net/)
+  Version: 23-12-2024
 
 gSOAP (a portable development toolkit for C and C++ XML Web services and XML data bindings)
   http://gsoap2.sourceforge.net/
