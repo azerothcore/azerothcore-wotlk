@@ -221,7 +221,7 @@ def backtick_check(file: io, file_path: str) -> None:
             continue
         
         # Ignore SET variables with multiple lines
-        if line.startwith('@'):
+        if line.startswith('@'):
             continue
 
         # Sanitize single- and doublequotes to prevent false positives
