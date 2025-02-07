@@ -718,8 +718,8 @@ bool Player::UpdateSkill(uint32 skill_id, uint32 step)
 
     uint32 valueIndex = PLAYER_SKILL_VALUE_INDEX(itr->second.pos);
     uint32 data       = GetUInt32Value(valueIndex);
+    uint32 value      = SKILL_VALUE(data);
     uint32 max        = SKILL_MAX(data);
-    uint32 value      = SKILL_MAX(data);
 
     sScriptMgr->OnBeforePlayerUpdateSkill(this, skill_id, value, max, step);
 
