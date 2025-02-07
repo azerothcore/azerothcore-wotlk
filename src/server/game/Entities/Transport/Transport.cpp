@@ -584,7 +584,8 @@ void MotionTransport::DelayedTeleportTransport()
                     TransportBase::CalculatePassengerPosition(destX, destY, destZ, &destO, x, y, z, o);
 
                     Player* player = obj->ToPlayer();
-                    // Vehicle passengers are dropped in the midle of nowhere, so lets try to eject them, add to the transport and teleport
+                    // Vehicle passengers are dropped in the middle of nowhere, so lets try to eject them, add to the transport and teleport
+                    // this needs to be revisited to properly restore vehicles with passengers after transport teleportation
                     if (player->IsVehicle())
                         if (Vehicle* vehicleKit = player->GetVehicleKit())
                             for (SeatMap::iterator itr = vehicleKit->Seats.begin(); itr != vehicleKit->Seats.end(); ++itr)
