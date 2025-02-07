@@ -219,6 +219,10 @@ def backtick_check(file: io, file_path: str) -> None:
         # Ignore comments
         if line.startswith('--'):
             continue
+        
+        # Ignore SET variables with multiple lines
+        if line.startwith('@'):
+            continue
 
         # Sanitize single- and doublequotes to prevent false positives
         sanitized_line = quote_pattern.sub('', line)
