@@ -6066,7 +6066,7 @@ Item* Player::_LoadItem(CharacterDatabaseTransaction trans, uint32 zoneId, uint3
                 GameEventMgr::ActiveEvents const& activeEventsList = sGameEventMgr->GetActiveEventList();
                 for (GameEventMgr::ActiveEvents::const_iterator itr = activeEventsList.begin(); itr != activeEventsList.end(); ++itr)
                 {
-                    if (uint32(events[*itr].holiday_id) == proto->HolidayId)
+                    if (uint32(events[*itr].HolidayId) == proto->HolidayId)
                     {
                         remove = false;
                         break;
