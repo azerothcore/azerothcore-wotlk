@@ -9,7 +9,7 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 (@ENTRY * 100, 9, 1, 0, 0, 0, 100, 0, 2000, 2000, 0, 0, 0, 0, 11, 35746, 0, 0, 0, 0, 0, 19, 20922, 10, 0, 0, 0, 0, 0, 'Kaylaan - Actionlist - Cast \'Resurrection\''),
 (@ENTRY * 100, 9, 2, 0, 0, 0, 100, 0, 8000, 8000, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 'Kaylaan - Actionlist - Say Line 1');
 
-DELETE FROM `creature` WHERE (`id1` = 20922);
+DELETE FROM `creature` WHERE `id1` = 20922 AND `guid` = 3110422;
 INSERT INTO `creature` (`guid`, `id1`, `id2`, `id3`, `map`, `zoneId`, `areaId`, `spawnMask`, `phaseMask`, `equipment_id`, `position_x`, `position_y`, `position_z`, `orientation`, `spawntimesecs`, `wander_distance`, `currentwaypoint`, `curhealth`, `curmana`, `MovementType`, `npcflag`, `unit_flags`, `dynamicflags`, `ScriptName`, `VerifiedBuild`) VALUES
 (3110422, 20922, 0, 0, 530, 3523, 3852, 1, 1, 0, 4034.83203125, 3545.646728515625, 121.47908782958984, 2.670353651046753, 120, 0, 0, 6986, 0, 0, 0, 0, 0, '', 58629);
 
