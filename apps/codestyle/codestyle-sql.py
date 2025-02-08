@@ -237,6 +237,7 @@ def backtick_check(file: io, file_path: str) -> None:
                                     "IN", "OR", "REPLACE"}:
                     continue
 
+                # Make sure the word is enclosed in backticks
                 if not re.search(rf'`{re.escape(word)}`', content):
                     print(f"Missing backticks around ({word}). {file_path} at line {line_number}")
                     check_failed = True
