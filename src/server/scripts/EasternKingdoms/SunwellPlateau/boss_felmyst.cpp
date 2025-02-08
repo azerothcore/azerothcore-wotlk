@@ -128,7 +128,7 @@ struct boss_felmyst : public BossAI
             Talk(YELL_BERSERK);
             DoCastSelf(SPELL_BERSERK, true);
         }, 10min);
-        me->GetMotionMaster()->MovePoint(POINT_GROUND, 1500.0f, 552.8f, 26.52f, false, true);
+        me->GetMotionMaster()->MovePoint(POINT_GROUND, who->GetPosition(), false, true);
     }
 
     void KilledUnit(Unit* victim) override
