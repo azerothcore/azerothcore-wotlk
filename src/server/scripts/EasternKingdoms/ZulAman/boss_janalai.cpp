@@ -355,7 +355,7 @@ struct boss_janalai : public BossAI
     void ThrowBombs()
     {
         std::chrono::milliseconds bombTimer = 0ms;
-        std::chrono::milliseconds const throwDuration = 5000ms;
+        constexpr std::chrono::milliseconds const throwDuration = 5000ms;
         summons.DoForAllSummons([this, &bombTimer, throwDuration](WorldObject* summon) {
             if (summon->GetEntry() == NPC_FIRE_BOMB)
             {
