@@ -49,8 +49,7 @@ enum Spells
     SPELL_STOMP                         = 45185,
     SPELL_BERSERK                       = 26662,
     SPELL_DUAL_WIELD                    = 42459,
-    SPELL_SUMMON_BRUTALLUS_DEATH_CLOUD  = 45884,
-    SPELL_SUMMON_FELBLAZE               = 45069, // Felblaze? Summons Felmyst.
+    SPELL_SUMMON_BRUTALLUS_DEATH_CLOUD  = 45884
 };
 
 enum Misc
