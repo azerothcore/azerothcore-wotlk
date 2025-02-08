@@ -342,7 +342,7 @@ struct boss_janalai : public BossAI
                 _isBombing = false;
                 me->RemoveAurasDueToSpell(SPELL_FIRE_BOMB_CHANNEL);
                 if (Unit* victim = me->GetVictim())
-                me->Attack(victim, true);
+                    me->Attack(victim, true);
             });
 
             scheduler.Schedule(9s, [this](TaskContext)
