@@ -49,7 +49,8 @@ enum Spells
     SPELL_STOMP                         = 45185,
     SPELL_BERSERK                       = 26662,
     SPELL_DUAL_WIELD                    = 42459,
-    SPELL_SUMMON_BRUTALLUS_DEATH_CLOUD  = 45884
+    SPELL_SUMMON_BRUTALLUS_DEATH_CLOUD  = 45884,
+    SPELL_SUMMON_FELBLAZE               = 45069, // Felblaze? Summons Felmyst.
 };
 
 enum Misc
@@ -354,9 +355,8 @@ struct npc_madrigosa : public NullCreatureAI
             }
             break;
         case EVENT_SPAWN_FELMYST:
+            DoCastAOE(SPELL_SUMMON_FELBLAZE, true);
             me->DespawnOrUnsummon(1);
-            if (Creature* felmyst = instance->GetCreature(DATA_FELMYST))
-                felmyst->AI()->DoAction(ACTION_START_EVENT);
             break;
         }
     }
