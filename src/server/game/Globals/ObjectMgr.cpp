@@ -1651,7 +1651,7 @@ CreatureModel const* ObjectMgr::ChooseDisplayId(CreatureTemplate const* cinfo, C
         if (CreatureModel const* model = cinfo->GetModelWithDisplayId(data->displayid))
             return model;
 
-    if (!(cinfo->flags_extra & CREATURE_FLAG_EXTRA_TRIGGER))
+    if (!cinfo->HasFlagsExtra(CREATURE_FLAG_EXTRA_TRIGGER))
         if (CreatureModel const* model = cinfo->GetRandomValidModel())
             return model;
 
@@ -2233,7 +2233,7 @@ void ObjectMgr::LoadCreatures()
                 data.equipmentId = 0;
             }
         }
-        if ((cInfo->flags_extra & CREATURE_FLAG_EXTRA_INSTANCE_BIND) || (data.id2 && cInfo2->flags_extra & CREATURE_FLAG_EXTRA_INSTANCE_BIND) || (data.id3 && cInfo3->flags_extra & CREATURE_FLAG_EXTRA_INSTANCE_BIND))
+        if (cInfo->HasFlagsExtra(CREATURE_FLAG_EXTRA_INSTANCE_BIND) || (data.id2 && cInfo2->HasFlagsExtra(CREATURE_FLAG_EXTRA_INSTANCE_BIND)) || (data.id3 && cInfo3->HasFlagsExtra(CREATURE_FLAG_EXTRA_INSTANCE_BIND)))
         {
             if (!mapEntry->IsDungeon())
                 LOG_ERROR("sql.sql", "Table `creature` have creature (SpawnId: {} Entries: {}, {}, {}) with a `creature_template`.`flags_extra` in one or more entries including CREATURE_FLAG_EXTRA_INSTANCE_BIND but creature are not in instance.",
