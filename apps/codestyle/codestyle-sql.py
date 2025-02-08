@@ -6,7 +6,7 @@ import glob
 
 # Get the pending directory of the project
 base_dir = os.getcwd()
-pattern = os.path.join(base_dir, 'data/sql/updates/pending_db_*')
+pattern = os.path.join('D:/Azerothcore-wotlk/', 'data/sql/updates/pending_db_*')
 src_directory = glob.glob(pattern)
 
 # Global variables
@@ -209,7 +209,7 @@ def backtick_check(file: io, file_path: str) -> None:
 
     # Find SQL clauses
     pattern = re.compile(
-        r'\b(SELECT|FROM|JOIN|WHERE|GROUP BY|ORDER BY|DELETE FROM|UPDATE|INSERT INTO|SET|REPLACE|REPLACE INTO)\s+([^;]+)', 
+        r'\b(SELECT|FROM|JOIN|WHERE|GROUP BY|ORDER BY|DELETE FROM|UPDATE|INSERT INTO|SET|REPLACE|REPLACE INTO)\s+(.*?)(?=;$)', 
         re.IGNORECASE)
 
     # Make sure to ignore values enclosed in single- and doublequotes
@@ -219,22 +219,24 @@ def backtick_check(file: io, file_path: str) -> None:
         # Ignore comments
         if line.startswith('--'):
             continue
-        
-        # Ignore SET variables with multiple lines
-        if line.startswith('@'):
-            continue
 
         # Sanitize single- and doublequotes to prevent false positives
         sanitized_line = quote_pattern.sub('', line)
         matches = pattern.findall(sanitized_line)
         
         for clause, content in matches:
-            words = re.findall(r'\b[a-zA-Z_][a-zA-Z0-9_]*\b', content)
+            words = re.findall(r'(?<!@)\b[a-zA-Z_][a-zA-Z0-9_]*\b', content)
+
+            # Filter out operators and numbers
+            words = [word for word in words if not word.isdigit()]
             for word in words:
                 # Skip SQL keywords
                 if word.upper() in {"SELECT", "FROM", "JOIN", "WHERE", "GROUP", "BY", "ORDER", 
                                     "DELETE", "UPDATE", "INSERT", "INTO", "SET", "VALUES", "AND",
                                     "IN", "OR", "REPLACE"}:
+                    continue
+
+                if word.startswith('@'):
                     continue
 
                 if not re.search(rf'`{re.escape(word)}`', content):
