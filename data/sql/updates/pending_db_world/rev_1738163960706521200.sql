@@ -9,14 +9,17 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 (@ENTRY * 100, 9, 1, 0, 0, 0, 100, 0, 2000, 2000, 0, 0, 0, 0, 11, 35746, 0, 0, 0, 0, 0, 19, 20922, 10, 0, 0, 0, 0, 0, 'Kaylaan - Actionlist - Cast \'Resurrection\''),
 (@ENTRY * 100, 9, 2, 0, 0, 0, 100, 0, 8000, 8000, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 'Kaylaan - Actionlist - Say Line 1');
 
-DELETE FROM `creature` WHERE `id1` = 20922 AND `guid` = 3110422;
+-- Add creature spawn
+SET @CGUID := 425;
+DELETE FROM `creature` WHERE `id1` = 20922 AND `guid` = @CGUID;
 INSERT INTO `creature` (`guid`, `id1`, `id2`, `id3`, `map`, `zoneId`, `areaId`, `spawnMask`, `phaseMask`, `equipment_id`, `position_x`, `position_y`, `position_z`, `orientation`, `spawntimesecs`, `wander_distance`, `currentwaypoint`, `curhealth`, `curmana`, `MovementType`, `npcflag`, `unit_flags`, `dynamicflags`, `ScriptName`, `VerifiedBuild`) VALUES
-(3110422, 20922, 0, 0, 530, 3523, 3852, 1, 1, 0, 4034.83203125, 3545.646728515625, 121.47908782958984, 2.670353651046753, 120, 0, 0, 6986, 0, 0, 0, 0, 0, '', 58629);
+(@CGUID, 20922, 0, 0, 530, 3523, 3852, 1, 1, 0, 4034.83203125, 3545.646728515625, 121.47908782958984, 2.670353651046753, 120, 0, 0, 6986, 0, 0, 0, 0, 0, '', 58629);
 
-DELETE FROM `creature_addon` WHERE (`guid` IN (3110422));
+DELETE FROM `creature_addon` WHERE (`guid` IN (@CGUID));
 INSERT INTO `creature_addon` (`guid`, `path_id`, `mount`, `bytes1`, `bytes2`, `emote`, `visibilityDistanceType`, `auras`) VALUES
-(3110422, 0, 0, 0, 1, 0, 0, '29266');
+(@CGUID, 0, 0, 0, 1, 0, 0, '29266');
 
+-- add creature_text
 DELETE FROM `creature_text` WHERE `CreatureID` = 20780;
 INSERT INTO `creature_text` (`CreatureID`, `GroupID`, `ID`, `Text`, `Type`, `Language`, `Probability`, `Emote`, `Duration`, `Sound`, `BroadcastTextId`, `TextRange`, `comment`) VALUES
 (20780, 0, 1, 'Light!  Do not fail me!', 12, 0, 100, 274, 0, 0, 18385, 0, 'Kaylaan'),
