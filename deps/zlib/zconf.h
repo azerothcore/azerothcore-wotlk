@@ -7,7 +7,7 @@
 
 #ifndef ZCONF_H
 #define ZCONF_H
-#include <stdint.h>
+
 /*
  * If you *really* need a unique prefix for all types and library functions,
  * compile with -DZ_PREFIX. The "standard" zlib should be compiled without it.
@@ -29,6 +29,7 @@
 #  define adler32               z_adler32
 #  define adler32_combine       z_adler32_combine
 #  define adler32_combine64     z_adler32_combine64
+#  define adler32_z             z_adler32_z
 #  ifndef Z_SOLO
 #    define compress              z_compress
 #    define compress2             z_compress2
@@ -37,10 +38,14 @@
 #  define crc32                 z_crc32
 #  define crc32_combine         z_crc32_combine
 #  define crc32_combine64       z_crc32_combine64
+#  define crc32_z               z_crc32_z
 #  define deflate               z_deflate
 #  define deflateBound          z_deflateBound
 #  define deflateCopy           z_deflateCopy
 #  define deflateEnd            z_deflateEnd
+#  define deflateGetDictionary  z_deflateGetDictionary
+#  define deflateInit           z_deflateInit
+#  define deflateInit2          z_deflateInit2
 #  define deflateInit2_         z_deflateInit2_
 #  define deflateInit_          z_deflateInit_
 #  define deflateParams         z_deflateParams
@@ -67,6 +72,8 @@
 #    define gzeof                 z_gzeof
 #    define gzerror               z_gzerror
 #    define gzflush               z_gzflush
+#    define gzfread               z_gzfread
+#    define gzfwrite              z_gzfwrite
 #    define gzgetc                z_gzgetc
 #    define gzgetc_               z_gzgetc_
 #    define gzgets                z_gzgets
@@ -78,7 +85,6 @@
 #      define gzopen_w              z_gzopen_w
 #    endif
 #    define gzprintf              z_gzprintf
-#    define gzvprintf             z_gzvprintf
 #    define gzputc                z_gzputc
 #    define gzputs                z_gzputs
 #    define gzread                z_gzread
@@ -89,32 +95,39 @@
 #    define gztell                z_gztell
 #    define gztell64              z_gztell64
 #    define gzungetc              z_gzungetc
+#    define gzvprintf             z_gzvprintf
 #    define gzwrite               z_gzwrite
 #  endif
 #  define inflate               z_inflate
 #  define inflateBack           z_inflateBack
 #  define inflateBackEnd        z_inflateBackEnd
+#  define inflateBackInit       z_inflateBackInit
 #  define inflateBackInit_      z_inflateBackInit_
+#  define inflateCodesUsed      z_inflateCodesUsed
 #  define inflateCopy           z_inflateCopy
 #  define inflateEnd            z_inflateEnd
+#  define inflateGetDictionary  z_inflateGetDictionary
 #  define inflateGetHeader      z_inflateGetHeader
+#  define inflateInit           z_inflateInit
+#  define inflateInit2          z_inflateInit2
 #  define inflateInit2_         z_inflateInit2_
 #  define inflateInit_          z_inflateInit_
 #  define inflateMark           z_inflateMark
 #  define inflatePrime          z_inflatePrime
 #  define inflateReset          z_inflateReset
 #  define inflateReset2         z_inflateReset2
+#  define inflateResetKeep      z_inflateResetKeep
 #  define inflateSetDictionary  z_inflateSetDictionary
-#  define inflateGetDictionary  z_inflateGetDictionary
 #  define inflateSync           z_inflateSync
 #  define inflateSyncPoint      z_inflateSyncPoint
 #  define inflateUndermine      z_inflateUndermine
-#  define inflateResetKeep      z_inflateResetKeep
+#  define inflateValidate       z_inflateValidate
 #  define inflate_copyright     z_inflate_copyright
 #  define inflate_fast          z_inflate_fast
 #  define inflate_table         z_inflate_table
 #  ifndef Z_SOLO
 #    define uncompress            z_uncompress
+#    define uncompress2           z_uncompress2
 #  endif
 #  define zError                z_zError
 #  ifndef Z_SOLO
@@ -224,24 +237,19 @@
 #  define z_const
 #endif
 
-#ifndef Z_SOLO
-#  ifdef NO_SIZE_T
+#ifdef Z_SOLO
+   typedef unsigned long z_size_t;
+#else
+#  define z_longlong long long
+#  if defined(NO_SIZE_T)
      typedef unsigned NO_SIZE_T z_size_t;
-#  else
+#  elif defined(STDC)
 #    include <stddef.h>
      typedef size_t z_size_t;
-#  endif
-#  ifdef NO_SSIZE_T
-     typedef NO_SSIZE_T z_ssize_t;
 #  else
-#    include <stddef.h>
-#    include <sys/types.h>
-#    ifdef _MSC_VER
-       typedef intptr_t z_ssize_t;
-#    else
-       typedef ssize_t z_ssize_t;
-#    endif
+     typedef unsigned long z_size_t;
 #  endif
+#  undef z_longlong
 #endif
 
 /* Maximum value for memLevel in deflateInit2 */
@@ -271,9 +279,27 @@
  Of course this will generally degrade compression (there's no free lunch).
 
    The memory requirements for inflate are (in bytes) 1 << windowBits
- that is, 32K for windowBits=15 (default value) plus a few kilobytes
+ that is, 32K for windowBits=15 (default value) plus about 7 kilobytes
  for small objects.
 */
+
+                        /* Type declarations */
+
+#ifndef OF /* function prototypes */
+#  ifdef STDC
+#    define OF(args)  args
+#  else
+#    define OF(args)  ()
+#  endif
+#endif
+
+#ifndef Z_ARG /* function prototypes for stdarg */
+#  if defined(STDC) || defined(Z_HAVE_STDARG_H)
+#    define Z_ARG(args)  args
+#  else
+#    define Z_ARG(args)  ()
+#  endif
+#endif
 
 /* The following definitions for FAR are needed only for MSDOS mixed
  * model programming (small or medium model with some far allocations).
@@ -323,9 +349,6 @@
 #    ifdef FAR
 #      undef FAR
 #    endif
-#    ifndef WIN32_LEAN_AND_MEAN
-#      define WIN32_LEAN_AND_MEAN
-#    endif
 #    include <windows.h>
      /* No need for _export, use ZLIB.DEF instead. */
      /* For complete Windows compatibility, use WINAPI, not __stdcall. */
@@ -365,10 +388,10 @@
 #endif
 
 #if !defined(__MACTYPES__)
-typedef uint8_t    Byte;  /* 8 bits */
+typedef unsigned char  Byte;  /* 8 bits */
 #endif
-typedef uint32_t   uInt;  /* 32 bits */
-typedef uint64_t   uLong; /* 64 bits */
+typedef unsigned int   uInt;  /* 16 bits or more */
+typedef unsigned long  uLong; /* 32 bits or more */
 
 #ifdef SMALL_MEDIUM
    /* Borland C/C++ and some old MSC versions ignore FAR inside typedef */
@@ -449,11 +472,7 @@ typedef uLong FAR uLongf;
 #endif
 #ifndef Z_SOLO
 #  if defined(Z_HAVE_UNISTD_H) || defined(_LARGEFILE64_SOURCE)
-#    ifdef _WIN32               /* _MSC_VER doesn't work for some reason when building dll*/
-#      include <io.h>
-#    else
-#      include <unistd.h>       /* for SEEK_*, off_t, and _LFS64_LARGEFILE */
-#    endif
+#    include <unistd.h>         /* for SEEK_*, off_t, and _LFS64_LARGEFILE */
 #    ifdef VMS
 #      include <unixio.h>       /* for off_t */
 #    endif
@@ -488,7 +507,7 @@ typedef uLong FAR uLongf;
 #if !defined(_WIN32) && defined(Z_LARGE64)
 #  define z_off64_t off64_t
 #else
-#  if defined(_WIN32) && !defined(__GNUC__)
+#  if defined(_WIN32) && !defined(__GNUC__) && !defined(Z_SOLO)
 #    define z_off64_t __int64
 #  else
 #    define z_off64_t z_off_t
