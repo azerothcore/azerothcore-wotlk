@@ -510,7 +510,7 @@ public:
     // Locales
     LocaleConstant GetSessionDbcLocale() const { return m_sessionDbcLocale; }
     LocaleConstant GetSessionDbLocaleIndex() const { return m_sessionDbLocaleIndex; }
-    char const* GetAcoreString(uint32 entry) const;
+    std::string GetAcoreString(uint32 entry) const;
     std::string const* GetModuleString(std::string module, uint32 id) const;
 
     uint32 GetLatency() const { return m_latency; }

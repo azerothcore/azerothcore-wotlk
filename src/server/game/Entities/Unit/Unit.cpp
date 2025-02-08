@@ -1032,6 +1032,17 @@ uint32 Unit::DealDamage(Unit* attacker, Unit* victim, uint32 damage, CleanDamage
         }
     }
 
+    // Sparring
+    if (victim->CanSparringWith(attacker))
+    {
+        if (damage >= victim->GetHealth())
+            damage = 0;
+
+        uint32 sparringHealth = victim->GetHealth() * (victim->ToCreature()->GetSparringPct() / 100);
+        if (victim->GetHealth() - damage <= sparringHealth)
+            damage = 0;
+    }
+
     if (health <= damage)
     {
         LOG_DEBUG("entities.unit", "DealDamage: victim just died");
@@ -2635,6 +2646,10 @@ void Unit::AttackerStateUpdate(Unit* victim, WeaponAttackType attType /*= BASE_A
             Unit::DealDamageMods(victim, damageInfo.damages[i].damage, &damageInfo.damages[i].absorb);
         }
 
+        // Related to sparring system. Allow attack animations even if there are no damages
+        if (victim->CanSparringWith(damageInfo.attacker))
+            damageInfo.HitInfo |= HITINFO_FAKE_DAMAGE;
+
         SendAttackStateUpdate(&damageInfo);
 
         //TriggerAurasProcOnEvent(damageInfo);
@@ -3952,6 +3967,24 @@ void Unit::_UpdateAutoRepeatSpell()
         // Reset attack
         resetAttackTimer(RANGED_ATTACK);
     }
+}
+
+bool Unit::CanSparringWith(Unit const* attacker) const
+{
+    if (!IsCreature() || IsCharmedOwnedByPlayerOrPlayer())
+        return false;
+
+    if (!attacker)
+        return false;
+
+    if (!attacker->IsCreature() || attacker->IsCharmedOwnedByPlayerOrPlayer())
+        return false;
+
+    if (Creature const* creature = ToCreature())
+        if (!creature->GetSparringPct())
+            return false;
+
+    return true;
 }
 
 void Unit::SetCurrentCastedSpell(Spell* pSpell)
@@ -17748,7 +17781,7 @@ void Unit::Kill(Unit* killer, Unit* victim, bool durabilityLoss, WeaponAttackTyp
     bool isRewardAllowed = true;
     if (creature)
     {
-        isRewardAllowed = creature->IsDamageEnoughForLootingAndReward();
+        isRewardAllowed = (creature->IsDamageEnoughForLootingAndReward() && !creature->IsLootRewardDisabled());
         if (!isRewardAllowed)
             creature->SetLootRecipient(nullptr);
     }
@@ -20380,7 +20413,7 @@ void Unit::PetSpellFail(SpellInfo const* spellInfo, Unit* target, uint32 result)
     if (!charmInfo || !IsCreature())
         return;
 
-    if ((DisableMgr::IsPathfindingEnabled(GetMap()) || result != SPELL_FAILED_LINE_OF_SIGHT) && target)
+    if ((sDisableMgr->IsPathfindingEnabled(GetMap()) || result != SPELL_FAILED_LINE_OF_SIGHT) && target)
     {
         if ((result == SPELL_FAILED_LINE_OF_SIGHT || result == SPELL_FAILED_OUT_OF_RANGE) || !ToCreature()->HasReactState(REACT_PASSIVE))
             if (Unit* owner = GetOwner())
@@ -21289,6 +21322,12 @@ bool Unit::CanRestoreMana(SpellInfo const* spellInfo) const
     }
 
     return false;
+}
+
+void Unit::SetShapeshiftForm(ShapeshiftForm form)
+{
+    SetByteValue(UNIT_FIELD_BYTES_2, 3, form);
+    sScriptMgr->OnUnitSetShapeshiftForm((Unit*)this, form);
 }
 
 bool Unit::IsInDisallowedMountForm() const

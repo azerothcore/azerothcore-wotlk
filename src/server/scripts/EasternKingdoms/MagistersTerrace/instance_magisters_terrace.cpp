@@ -48,6 +48,7 @@ DoorData const doorData[] =
     { GO_SELIN_ENCOUNTER_DOOR, DATA_SELIN_FIREHEART, DOOR_TYPE_ROOM    },
     { GO_VEXALLUS_DOOR,        DATA_VEXALLUS,        DOOR_TYPE_PASSAGE },
     { GO_DELRISSA_DOOR,        DATA_DELRISSA,        DOOR_TYPE_PASSAGE },
+    { GO_KAEL_DOOR,            DATA_KAELTHAS,        DOOR_TYPE_ROOM    },
     { 0,                       0,                    DOOR_TYPE_ROOM    } // END
 };
 
@@ -64,6 +65,7 @@ public:
         {
             SetHeaders(DataHeader);
             SetBossNumber(MAX_ENCOUNTER);
+            SetPersistentDataCount(MAX_PERSISTENT_DATA);
             LoadObjectData(creatureData, gameobjectData);
             LoadDoorData(doorData);
             LoadSummonData(summonerData);

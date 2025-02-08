@@ -281,7 +281,7 @@ void BinaryOutput::compress(int level) {
     alwaysAssertM(m_bufferLen < 0xFFFFFFFF, "Compress only works for 32-bit files.");
 
     // This is the worst-case size, as mandated by zlib
-    unsigned long compressedSize = iCeil(m_bufferLen * 1.001) + 12;
+    uint64_t compressedSize = iCeil(m_bufferLen * 1.001) + 12;
 
     // Save the old buffer and reallocate to the worst-case size
     const uint8* src     = m_buffer;
