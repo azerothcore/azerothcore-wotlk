@@ -32,7 +32,11 @@ enum MTData
     MAX_ENCOUNTER               = 4,
 
     DATA_KALECGOS               = 5,
-    DATA_ESCAPE_ORB             = 6
+    DATA_ESCAPE_ORB             = 6,
+
+    // Persistent data
+    DATA_KAEL_INTRO             = 0,
+    MAX_PERSISTENT_DATA         = 1
 };
 
 enum MTCreatures
@@ -40,8 +44,8 @@ enum MTCreatures
     NPC_DELRISSA                = 24560,
     NPC_FEL_CRYSTAL             = 24722,
     NPC_KAEL_THAS               = 24664,
-    NPC_PHOENIX                 = 21362,
-    NPC_PHOENIX_EGG             = 21364,
+    NPC_PHOENIX                 = 24674,
+    NPC_PHOENIX_EGG             = 24675,
     NPC_KALECGOS                = 24844
 };
 

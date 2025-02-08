@@ -111,7 +111,8 @@ enum AcoreStrings
     LANG_RBAC_PERM_REVOKED_NOT_IN_LIST  = 79,
     LANG_PVPSTATS                       = 80,
     LANG_PVPSTATS_DISABLED              = 81,
-    // Free 82 - 86
+    LANG_GENERIC_TWO_CURLIES_WITH_COLON = 82,
+    // Free 83 - 86
 
     LANG_UNKNOWN_ERROR                  = 87,
     LANG_2FA_COMMANDS_NOT_SETUP         = 88,
@@ -1168,8 +1169,7 @@ enum AcoreStrings
 
     LANG_GM_SILENCE                      = 6616,              // "Silence is ON for %s" - Spell 1852
 
-    // Used for .string command
-    LANG_NO_ACORE_STRING_FOUND           = 6617,
+    // Free strings 6617-7522
 
     LANG_WORLD_CLOSED                    = 7523,
     LANG_WORLD_OPENED                    = 7524,
