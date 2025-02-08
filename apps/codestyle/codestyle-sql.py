@@ -209,8 +209,10 @@ def backtick_check(file: io, file_path: str) -> None:
 
     # Find SQL clauses
     pattern = re.compile(
-        r'\b(SELECT|FROM|JOIN|WHERE|GROUP BY|ORDER BY|DELETE FROM|UPDATE|INSERT INTO|SET|REPLACE|REPLACE INTO)\s+(.*?)(?=;$)', 
-        re.IGNORECASE)
+        r'\b(SELECT|FROM|JOIN|WHERE|GROUP BY|ORDER BY|DELETE FROM|UPDATE|INSERT INTO|SET|REPLACE|REPLACE INTO)\s+(.*?)(?=;$|(?=\b(?:WHERE|SET|VALUES)\b)|$)',  
+        re.IGNORECASE | re.DOTALL
+    )
+
 
     # Make sure to ignore values enclosed in single- and doublequotes
     quote_pattern = re.compile(r"'(?:\\'|[^'])*'|\"(?:\\\"|[^\"])*\"")
@@ -225,7 +227,7 @@ def backtick_check(file: io, file_path: str) -> None:
         matches = pattern.findall(sanitized_line)
         
         for clause, content in matches:
-            words = re.findall(r'(?<!@)\b[a-zA-Z_][a-zA-Z0-9_]*\b', content)
+            words = re.findall(r'\b(?<!@)([a-zA-Z_][a-zA-Z0-9_]*)\b', content)
 
             # Filter out operators and numbers
             words = [word for word in words if not word.isdigit()]
