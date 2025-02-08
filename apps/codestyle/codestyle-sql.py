@@ -227,10 +227,9 @@ def backtick_check(file: io, file_path: str) -> None:
         matches = pattern.findall(sanitized_line)
         
         for clause, content in matches:
+            # Find all words and exclude @variables
             words = re.findall(r'\b(?<!@)([a-zA-Z_][a-zA-Z0-9_]*)\b', content)
 
-            # Filter out operators and numbers
-            words = [word for word in words if not word.isdigit()]
             for word in words:
                 # Skip SQL keywords
                 if word.upper() in {"SELECT", "FROM", "JOIN", "WHERE", "GROUP", "BY", "ORDER", 
