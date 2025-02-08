@@ -197,14 +197,12 @@ void ServerAutoShutdown::StartPersistentGameEvents()
     for (auto token : tokens)
     {
         if (token.empty())
-        {
             continue;
-        }
 
         uint32 eventId = *Acore::StringTo<uint32>(token);
         sGameEventMgr->StartEvent(eventId);
 
         GameEventData const& eventData = events[eventId];
-        LOG_INFO("module", "> ServerAutoShutdown: Starting event {} ({}).", eventData.description, eventId);
+        LOG_INFO("module", "> ServerAutoShutdown: Starting event {} ({}).", eventData.Description, eventId);
     }
 }
