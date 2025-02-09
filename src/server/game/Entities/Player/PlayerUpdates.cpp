@@ -979,9 +979,7 @@ void Player::UpdateWeaponSkill(Unit* victim, WeaponAttackType attType, Item* ite
     if (GetShapeshiftForm() == FORM_TREE)
         return; // use weapon but not skill up
 
-    if (victim->IsCreature() &&
-        (victim->ToCreature()->GetCreatureTemplate()->flags_extra &
-         CREATURE_FLAG_EXTRA_NO_SKILL_GAINS))
+    if (victim->IsCreature() && victim->ToCreature()->HasFlagsExtra(CREATURE_FLAG_EXTRA_NO_SKILL_GAINS))
         return;
 
     uint32 weapon_skill_gain = sWorld->getIntConfig(CONFIG_SKILL_GAIN_WEAPON);
