@@ -1,5 +1,5 @@
 /* infback.c -- inflate using a call-back interface
- * Copyright (C) 1995-2011 Mark Adler
+ * Copyright (C) 1995-2022 Mark Adler
  * For conditions of distribution and use, see copyright notice in zlib.h
  */
 
@@ -16,7 +16,7 @@
 #include "inffast.h"
 
 /* function prototypes */
-local void fixedtables(struct inflate_state FAR *state);
+local void fixedtables OF((struct inflate_state FAR *state));
 
 /*
    strm provides memory allocation functions in zalloc and zfree, or
@@ -25,9 +25,13 @@ local void fixedtables(struct inflate_state FAR *state);
    windowBits is in the range 8..15, and window is a user-supplied
    window and output buffer that is 2**windowBits bytes.
  */
-int ZEXPORT inflateBackInit_(z_streamp strm, int windowBits,
-                             unsigned char FAR *window, const char *version,
-                             int stream_size) {
+int ZEXPORT inflateBackInit_(strm, windowBits, window, version, stream_size)
+z_streamp strm;
+int windowBits;
+unsigned char FAR *window;
+const char *version;
+int stream_size;
+{
     struct inflate_state FAR *state;
 
     if (version == Z_NULL || version[0] != ZLIB_VERSION[0] ||
@@ -57,12 +61,11 @@ int ZEXPORT inflateBackInit_(z_streamp strm, int windowBits,
     Tracev((stderr, "inflate: allocated\n"));
     strm->state = (struct internal_state FAR *)state;
     state->dmax = 32768U;
-    state->wbits = windowBits;
+    state->wbits = (uInt)windowBits;
     state->wsize = 1U << windowBits;
     state->window = window;
     state->wnext = 0;
     state->whave = 0;
-    state->sane = 1;
     return Z_OK;
 }
 
@@ -76,7 +79,9 @@ int ZEXPORT inflateBackInit_(z_streamp strm, int windowBits,
    used for threaded applications, since the rewriting of the tables and virgin
    may not be thread-safe.
  */
-static void fixedtables(struct inflate_state FAR *state) {
+local void fixedtables(state)
+struct inflate_state FAR *state;
+{
 #ifdef BUILDFIXED
     static int virgin = 1;
     static code *lenfix, *distfix;
@@ -242,8 +247,13 @@ static void fixedtables(struct inflate_state FAR *state) {
    inflateBack() can also return Z_STREAM_ERROR if the input parameters
    are not correct, i.e. strm is Z_NULL or the state was not initialized.
  */
-int ZEXPORT inflateBack(z_streamp strm, in_func in, void FAR *in_desc,
-                        out_func out, void FAR *out_desc) {
+int ZEXPORT inflateBack(strm, in, in_desc, out, out_desc)
+z_streamp strm;
+in_func in;
+void FAR *in_desc;
+out_func out;
+void FAR *out_desc;
+{
     struct inflate_state FAR *state;
     z_const unsigned char FAR *next;    /* next input */
     unsigned char FAR *put;     /* next output */
@@ -444,11 +454,11 @@ int ZEXPORT inflateBack(z_streamp strm, in_func in, void FAR *in_desc,
             }
 
             /* build code tables -- note: do not change the lenbits or distbits
-               values here (10 and 9) without reading the comments in inftrees.h
+               values here (9 and 6) without reading the comments in inftrees.h
                concerning the ENOUGH constants, which depend on those values */
             state->next = state->codes;
             state->lencode = (code const FAR *)(state->next);
-            state->lenbits = 10;
+            state->lenbits = 9;
             ret = inflate_table(LENS, state->lens, state->nlen, &(state->next),
                                 &(state->lenbits), state->work);
             if (ret) {
@@ -457,7 +467,7 @@ int ZEXPORT inflateBack(z_streamp strm, in_func in, void FAR *in_desc,
                 break;
             }
             state->distcode = (code const FAR *)(state->next);
-            state->distbits = 9;
+            state->distbits = 6;
             ret = inflate_table(DISTS, state->lens + state->nlen, state->ndist,
                             &(state->next), &(state->distbits), state->work);
             if (ret) {
@@ -471,8 +481,7 @@ int ZEXPORT inflateBack(z_streamp strm, in_func in, void FAR *in_desc,
 
         case LEN:
             /* use inflate_fast() if we have enough input and output */
-            if (have >= INFLATE_FAST_MIN_INPUT &&
-                left >= INFLATE_FAST_MIN_OUTPUT) {
+            if (have >= 6 && left >= 258) {
                 RESTORE();
                 if (state->whave < state->wsize)
                     state->whave = state->wsize - left;
@@ -596,33 +605,33 @@ int ZEXPORT inflateBack(z_streamp strm, in_func in, void FAR *in_desc,
             break;
 
         case DONE:
-            /* inflate stream terminated properly */
+            /* inflate stream terminated properly -- write leftover output */
             ret = Z_STREAM_END;
+            if (left < state->wsize) {
+                if (out(out_desc, state->window, state->wsize - left))
+                    ret = Z_BUF_ERROR;
+            }
             goto inf_leave;
 
         case BAD:
             ret = Z_DATA_ERROR;
             goto inf_leave;
 
-        default:
-            /* can't happen, but makes compilers happy */
+        default:                /* can't happen, but makes compilers happy */
             ret = Z_STREAM_ERROR;
             goto inf_leave;
         }
 
-    /* Write leftover output and return unused input */
+    /* Return unused input */
   inf_leave:
-    if (left < state->wsize) {
-        if (out(out_desc, state->window, state->wsize - left) &&
-            ret == Z_STREAM_END)
-            ret = Z_BUF_ERROR;
-    }
     strm->next_in = next;
     strm->avail_in = have;
     return ret;
 }
 
-int ZEXPORT inflateBackEnd(z_streamp strm) {
+int ZEXPORT inflateBackEnd(strm)
+z_streamp strm;
+{
     if (strm == Z_NULL || strm->state == Z_NULL || strm->zfree == (free_func)0)
         return Z_STREAM_ERROR;
     ZFREE(strm, strm->state);
