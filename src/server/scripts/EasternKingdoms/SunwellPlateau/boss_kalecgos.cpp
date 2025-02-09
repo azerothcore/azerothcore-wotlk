@@ -282,10 +282,7 @@ enum Kalec
 
 struct boss_kalec : public ScriptedAI
 {
-    boss_kalec(Creature* creature) : ScriptedAI(creature)
-    {
-        SetInvincibility(true);
-    }
+    boss_kalec(Creature* creature) : ScriptedAI(creature) { }
 
     void Reset() override
     {
