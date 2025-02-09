@@ -38,10 +38,9 @@ void GridObjectLoader::AddObjectHelper(Map* map, T* obj)
 
 void GridObjectLoader::LoadCreatures(CellGuidSet const& guid_set, Map* map)
 {
-    for (CellGuidSet::const_iterator i_guid = guid_set.begin(); i_guid != guid_set.end(); ++i_guid)
+    for (ObjectGuid::LowType const& guid : guid_set)
     {
         Creature* obj = new Creature();
-        ObjectGuid::LowType guid = *i_guid;
         if (!obj->LoadFromDB(guid, map))
         {
             delete obj;
@@ -64,9 +63,8 @@ void GridObjectLoader::LoadCreatures(CellGuidSet const& guid_set, Map* map)
 
 void GridObjectLoader::LoadGameObjects(CellGuidSet const& guid_set, Map* map)
 {
-    for (CellGuidSet::const_iterator i_guid = guid_set.begin(); i_guid != guid_set.end(); ++i_guid)
+    for (ObjectGuid::LowType const& guid : guid_set)
     {
-        ObjectGuid::LowType guid = *i_guid;
         GameObjectData const* data = sObjectMgr->GetGameObjectData(guid);
         GameObject* obj = data && sObjectMgr->IsGameObjectStaticTransport(data->id) ? new StaticTransport() : new GameObject();
 

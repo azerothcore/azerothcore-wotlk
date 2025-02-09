@@ -137,7 +137,6 @@ void ScriptMgr::OnDestroyMap(Map* map)
 void ScriptMgr::OnLoadGridMap(Map* map, GridTerrainData* gmap, uint32 gx, uint32 gy)
 {
     ASSERT(map);
-    ASSERT(gmap);
 
     ForeachMaps<WorldMapScript>(map,
     [&](WorldMapScript* script)

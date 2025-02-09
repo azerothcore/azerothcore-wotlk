@@ -3,6 +3,7 @@
 #include "GridTerrainData.h"
 #include "Log.h"
 #include "MapDefines.h"
+#include <filesystem>
 #include <G3D/Ray.h>
 
 uint16 const holetab_h[4] = { 0x1111, 0x2222, 0x4444, 0x8888 };
@@ -10,168 +11,107 @@ uint16 const holetab_v[4] = { 0x000F, 0x00F0, 0x0F00, 0xF000 };
 
 GridTerrainData::GridTerrainData()
 {
-    _flags = 0;
-    // Area data
-    _gridArea = 0;
-    _areaMap = nullptr;
-    // Height level data
-    _gridHeight = INVALID_HEIGHT;
     _gridGetHeight = &GridTerrainData::getHeightFromFlat;
-    _gridIntHeightMultiplier = 0;
-    m_V9 = nullptr;
-    m_V8 = nullptr;
-    _minHeightPlanes = nullptr;
-    // Liquid data
-    _liquidGlobalEntry = 0;
-    _liquidGlobalFlags = 0;
-    _liquidOffX = 0;
-    _liquidOffY = 0;
-    _liquidWidth = 0;
-    _liquidHeight = 0;
-    _liquidLevel = INVALID_HEIGHT;
-    _liquidEntry = nullptr;
-    _liquidFlags = nullptr;
-    _liquidMap = nullptr;
-    _holes = nullptr;
 }
 
-GridTerrainData::~GridTerrainData()
+TerrainMapDataReadResult GridTerrainData::Load(std::string const& mapFileName)
 {
-    unloadData();
-}
+    // Check if file exists, we do this first as we need to
+    // differentiate between file existing and any other file errors
+    if (!std::filesystem::exists(mapFileName))
+        return TerrainMapDataReadResult::NotFound;
 
-bool GridTerrainData::loadData(char* filename)
-{
-    // Unload old data if exist
-    unloadData();
+    // Start the input stream and check for any errors
+    std::ifstream fileStream(mapFileName, std::ios::binary);
+    if (fileStream.fail())
+        return TerrainMapDataReadResult::ReadError;
 
+    // Read the map header
     map_fileheader header;
-    // Not return error if file not found
-    FILE* in = fopen(filename, "rb");
-    if (!in)
-        return true;
+    if (!fileStream.read(reinterpret_cast<char*>(&header), sizeof(header)))
+        return TerrainMapDataReadResult::ReadError;
 
-    if (fread(&header, sizeof(header), 1, in) != 1)
-    {
-        fclose(in);
-        return false;
-    }
+    // Check for valid map and version magics
+    if (header.mapMagic != MapMagic.asUInt || header.versionMagic != MapVersionMagic)
+        return TerrainMapDataReadResult::InvalidMagic;
 
-    if (header.mapMagic == MapMagic.asUInt && header.versionMagic == MapVersionMagic)
-    {
-        // loadup area data
-        if (header.areaMapOffset && !loadAreaData(in, header.areaMapOffset, header.areaMapSize))
-        {
-            LOG_ERROR("maps", "Error loading map area data\n");
-            fclose(in);
-            return false;
-        }
-        // loadup height data
-        if (header.heightMapOffset && !loadHeightData(in, header.heightMapOffset, header.heightMapSize))
-        {
-            LOG_ERROR("maps", "Error loading map height data\n");
-            fclose(in);
-            return false;
-        }
-        // loadup liquid data
-        if (header.liquidMapOffset && !loadLiquidData(in, header.liquidMapOffset, header.liquidMapSize))
-        {
-            LOG_ERROR("maps", "Error loading map liquids data\n");
-            fclose(in);
-            return false;
-        }
-        // loadup holes data (if any. check header.holesOffset)
-        if (header.holesSize && !loadHolesData(in, header.holesOffset, header.holesSize))
-        {
-            LOG_ERROR("maps", "Error loading map holes data\n");
-            fclose(in);
-            return false;
-        }
-        fclose(in);
-        return true;
-    }
-    LOG_ERROR("maps", "Map file '{}' is from an incompatible clientversion. Please recreate using the mapextractor.", filename);
-    fclose(in);
-    return false;
+    // Load area data
+    if (header.areaMapOffset && !LoadAreaData(fileStream, header.areaMapOffset))
+        return TerrainMapDataReadResult::InvalidAreaData;
+
+    // Load height data
+    if (header.heightMapOffset && !LoadHeightData(fileStream, header.heightMapOffset))
+        return TerrainMapDataReadResult::InvalidHeightData;
+
+    // Load liquid data
+    if (header.liquidMapOffset && !LoadLiquidData(fileStream, header.liquidMapOffset))
+        return TerrainMapDataReadResult::InvalidLiquidData;
+
+    // Load hole data
+    if (header.holesSize && !LoadHolesData(fileStream, header.holesOffset))
+        return TerrainMapDataReadResult::InvalidHoleData;
+
+    return TerrainMapDataReadResult::Success;
 }
 
-void GridTerrainData::unloadData()
+bool GridTerrainData::LoadAreaData(std::ifstream& fileStream, uint32 const offset)
 {
-    delete[] _areaMap;
-    delete[] m_V9;
-    delete[] m_V8;
-    delete[] _minHeightPlanes;
-    delete[] _liquidEntry;
-    delete[] _liquidFlags;
-    delete[] _liquidMap;
-    delete[] _holes;
-    _areaMap = nullptr;
-    m_V9 = nullptr;
-    m_V8 = nullptr;
-    _minHeightPlanes = nullptr;
-    _liquidEntry = nullptr;
-    _liquidFlags = nullptr;
-    _liquidMap = nullptr;
-    _holes = nullptr;
-    _gridGetHeight = &GridTerrainData::getHeightFromFlat;
-}
+    fileStream.seekg(offset);
 
-bool GridTerrainData::loadAreaData(FILE* in, uint32 offset, uint32 /*size*/)
-{
     map_areaHeader header;
-    fseek(in, offset, SEEK_SET);
-
-    if (fread(&header, sizeof(header), 1, in) != 1 || header.fourcc != MapAreaMagic.asUInt)
+    if (!fileStream.read(reinterpret_cast<char*>(&header), sizeof(header)) || header.fourcc != MapAreaMagic.asUInt)
         return false;
 
-    _gridArea = header.gridArea;
+    _loadedAreaData = std::make_unique<LoadedAreaData>();
+    _loadedAreaData->gridArea = header.gridArea;
     if (!(header.flags & MAP_AREA_NO_AREA))
     {
-        _areaMap = new uint16[16 * 16];
-        if (fread(_areaMap, sizeof(uint16), 16 * 16, in) != 16 * 16)
+        _loadedAreaData->areaMap = std::make_unique<LoadedAreaData::AreaMapType>();
+        if (!fileStream.read(reinterpret_cast<char*>(_loadedAreaData->areaMap.get()), sizeof(LoadedAreaData::AreaMapType)))
             return false;
     }
     return true;
 }
 
-bool GridTerrainData::loadHeightData(FILE* in, uint32 offset, uint32 /*size*/)
+bool GridTerrainData::LoadHeightData(std::ifstream& fileStream, uint32 const offset)
 {
-    map_heightHeader header;
-    fseek(in, offset, SEEK_SET);
+    fileStream.seekg(offset);
 
-    if (fread(&header, sizeof(header), 1, in) != 1 || header.fourcc != MapHeightMagic.asUInt)
+    map_heightHeader header;
+    if (!fileStream.read(reinterpret_cast<char*>(&header), sizeof(header)) || header.fourcc != MapHeightMagic.asUInt)
         return false;
 
-    _gridHeight = header.gridHeight;
+    _loadedHeightData = std::make_unique<LoadedHeightData>();
+    _loadedHeightData->gridHeight = header.gridHeight;
     if (!(header.flags & MAP_HEIGHT_NO_HEIGHT))
     {
         if ((header.flags & MAP_HEIGHT_AS_INT16))
         {
-            m_uint16_V9 = new uint16[129 * 129];
-            m_uint16_V8 = new uint16[128 * 128];
-            if (fread(m_uint16_V9, sizeof(uint16), 129 * 129, in) != 129 * 129 ||
-                fread(m_uint16_V8, sizeof(uint16), 128 * 128, in) != 128 * 128)
+            _loadedHeightData->uint16HeightData = std::make_unique<LoadedHeightData::Uint16HeightData>();
+            if (!fileStream.read(reinterpret_cast<char*>(&_loadedHeightData->uint16HeightData->v9), sizeof(_loadedHeightData->uint16HeightData->v9))
+                || !fileStream.read(reinterpret_cast<char*>(&_loadedHeightData->uint16HeightData->v8), sizeof(_loadedHeightData->uint16HeightData->v8)))
                 return false;
-            _gridIntHeightMultiplier = (header.gridMaxHeight - header.gridHeight) / 65535;
+
+            _loadedHeightData->uint16HeightData->gridIntHeightMultiplier = (header.gridMaxHeight - header.gridHeight) / 65535;
             _gridGetHeight = &GridTerrainData::getHeightFromUint16;
         }
         else if ((header.flags & MAP_HEIGHT_AS_INT8))
         {
-            m_uint8_V9 = new uint8[129 * 129];
-            m_uint8_V8 = new uint8[128 * 128];
-            if (fread(m_uint8_V9, sizeof(uint8), 129 * 129, in) != 129 * 129 ||
-                fread(m_uint8_V8, sizeof(uint8), 128 * 128, in) != 128 * 128)
+            _loadedHeightData->uint8HeightData = std::make_unique<LoadedHeightData::Uint8HeightData>();
+            if (!fileStream.read(reinterpret_cast<char*>(&_loadedHeightData->uint8HeightData->v9), sizeof(_loadedHeightData->uint8HeightData->v9))
+                || !fileStream.read(reinterpret_cast<char*>(&_loadedHeightData->uint8HeightData->v8), sizeof(_loadedHeightData->uint8HeightData->v8)))
                 return false;
-            _gridIntHeightMultiplier = (header.gridMaxHeight - header.gridHeight) / 255;
+
+            _loadedHeightData->uint8HeightData->gridIntHeightMultiplier = (header.gridMaxHeight - header.gridHeight) / 255;
             _gridGetHeight = &GridTerrainData::getHeightFromUint8;
         }
         else
         {
-            m_V9 = new float[129 * 129];
-            m_V8 = new float[128 * 128];
-            if (fread(m_V9, sizeof(float), 129 * 129, in) != 129 * 129 ||
-                fread(m_V8, sizeof(float), 128 * 128, in) != 128 * 128)
+            _loadedHeightData->floatHeightData = std::make_unique<LoadedHeightData::FloatHeightData>();
+            if (!fileStream.read(reinterpret_cast<char*>(&_loadedHeightData->floatHeightData->v9), sizeof(_loadedHeightData->floatHeightData->v9))
+                || !fileStream.read(reinterpret_cast<char*>(&_loadedHeightData->floatHeightData->v8), sizeof(_loadedHeightData->floatHeightData->v8)))
                 return false;
+
             _gridGetHeight = &GridTerrainData::getHeightFromFloat;
         }
     }
@@ -182,8 +122,8 @@ bool GridTerrainData::loadHeightData(FILE* in, uint32 offset, uint32 /*size*/)
     {
         std::array<int16, 9> maxHeights;
         std::array<int16, 9> minHeights;
-        if (fread(maxHeights.data(), sizeof(int16), maxHeights.size(), in) != maxHeights.size() ||
-            fread(minHeights.data(), sizeof(int16), minHeights.size(), in) != minHeights.size())
+        if (!fileStream.read(reinterpret_cast<char*>(maxHeights.data()), sizeof(maxHeights)) ||
+            !fileStream.read(reinterpret_cast<char*>(minHeights.data()), sizeof(minHeights)))
             return false;
 
         static uint32 constexpr indices[8][3] =
@@ -211,9 +151,9 @@ bool GridTerrainData::loadHeightData(FILE* in, uint32 offset, uint32 /*size*/)
             { -533.33331f, -533.33331f }
         };
 
-        _minHeightPlanes = new G3D::Plane[8];
-        for (uint32 quarterIndex = 0; quarterIndex < 8; ++quarterIndex)
-            _minHeightPlanes[quarterIndex] = G3D::Plane(
+        _loadedHeightData->minHeightPlanes = std::make_unique<LoadedHeightData::HeightPlanesType>();
+        for (uint32 quarterIndex = 0; quarterIndex < _loadedHeightData->minHeightPlanes->size(); ++quarterIndex)
+            _loadedHeightData->minHeightPlanes->at(quarterIndex) = G3D::Plane(
                 G3D::Vector3(boundGridCoords[indices[quarterIndex][0]][0], boundGridCoords[indices[quarterIndex][0]][1], minHeights[indices[quarterIndex][0]]),
                 G3D::Vector3(boundGridCoords[indices[quarterIndex][1]][0], boundGridCoords[indices[quarterIndex][1]][1], minHeights[indices[quarterIndex][1]]),
                 G3D::Vector3(boundGridCoords[indices[quarterIndex][2]][0], boundGridCoords[indices[quarterIndex][2]][1], minHeights[indices[quarterIndex][2]])
@@ -223,48 +163,49 @@ bool GridTerrainData::loadHeightData(FILE* in, uint32 offset, uint32 /*size*/)
     return true;
 }
 
-bool GridTerrainData::loadLiquidData(FILE* in, uint32 offset, uint32 /*size*/)
+bool GridTerrainData::LoadLiquidData(std::ifstream& fileStream, uint32 const offset)
 {
-    map_liquidHeader header;
-    fseek(in, offset, SEEK_SET);
+    fileStream.seekg(offset);
 
-    if (fread(&header, sizeof(header), 1, in) != 1 || header.fourcc != MapLiquidMagic.asUInt)
+    map_liquidHeader header;
+    if (!fileStream.read(reinterpret_cast<char*>(&header), sizeof(header)) || header.fourcc != MapLiquidMagic.asUInt)
         return false;
 
-    _liquidGlobalEntry = header.liquidType;
-    _liquidGlobalFlags = header.liquidFlags;
-    _liquidOffX = header.offsetX;
-    _liquidOffY = header.offsetY;
-    _liquidWidth = header.width;
-    _liquidHeight = header.height;
-    _liquidLevel = header.liquidLevel;
+    _loadedLiquidData = std::make_unique<LoadedLiquidData>();
+    _loadedLiquidData->liquidGlobalEntry = header.liquidType;
+    _loadedLiquidData->liquidGlobalFlags = header.liquidFlags;
+    _loadedLiquidData->liquidOffX = header.offsetX;
+    _loadedLiquidData->liquidOffY = header.offsetY;
+    _loadedLiquidData->liquidWidth = header.width;
+    _loadedLiquidData->liquidHeight = header.height;
+    _loadedLiquidData->liquidLevel = header.liquidLevel;
 
     if (!(header.flags & MAP_LIQUID_NO_TYPE))
     {
-        _liquidEntry = new uint16[16 * 16];
-        if (fread(_liquidEntry, sizeof(uint16), 16 * 16, in) != 16 * 16)
+        _loadedLiquidData->liquidEntry = std::make_unique<LoadedLiquidData::LiquidEntryType>();
+        if (!fileStream.read(reinterpret_cast<char*>(_loadedLiquidData->liquidEntry.get()), sizeof(LoadedLiquidData::LiquidEntryType)))
             return false;
 
-        _liquidFlags = new uint8[16 * 16];
-        if (fread(_liquidFlags, sizeof(uint8), 16 * 16, in) != 16 * 16)
+        _loadedLiquidData->liquidFlags = std::make_unique<LoadedLiquidData::LiquidFlagsType>();
+        if (!fileStream.read(reinterpret_cast<char*>(_loadedLiquidData->liquidFlags.get()), sizeof(LoadedLiquidData::LiquidFlagsType)))
             return false;
     }
     if (!(header.flags & MAP_LIQUID_NO_HEIGHT))
     {
-        _liquidMap = new float[uint32(_liquidWidth) * uint32(_liquidHeight)];
-        if (fread(_liquidMap, sizeof(float), _liquidWidth * _liquidHeight, in) != (uint32(_liquidWidth) * uint32(_liquidHeight)))
+        _loadedLiquidData->liquidMap = std::make_unique<LoadedLiquidData::LiquidMapType>();
+        _loadedLiquidData->liquidMap->resize(_loadedLiquidData->liquidWidth * _loadedLiquidData->liquidHeight);
+        if (!fileStream.read(reinterpret_cast<char*>(_loadedLiquidData->liquidMap->data()), _loadedLiquidData->liquidMap->size() * sizeof(float)))
             return false;
     }
     return true;
 }
 
-bool GridTerrainData::loadHolesData(FILE* in, uint32 offset, uint32 /*size*/)
+bool GridTerrainData::LoadHolesData(std::ifstream& fileStream, uint32 const offset)
 {
-    if (fseek(in, offset, SEEK_SET) != 0)
-        return false;
+    fileStream.seekg(offset);
 
-    _holes = new uint16[16 * 16];
-    if (fread(_holes, sizeof(uint16), 16 * 16, in) != 16 * 16)
+    _loadedHoleData = std::make_unique<LoadedHoleData>();
+    if (!fileStream.read(reinterpret_cast<char*>(&_loadedHoleData->holes), sizeof(_loadedHoleData->holes)))
         return false;
 
     return true;
@@ -272,25 +213,31 @@ bool GridTerrainData::loadHolesData(FILE* in, uint32 offset, uint32 /*size*/)
 
 uint16 GridTerrainData::getArea(float x, float y) const
 {
-    if (!_areaMap)
-        return _gridArea;
+    if (!_loadedAreaData)
+        return 0;
+
+    if (!_loadedAreaData->areaMap)
+        return _loadedAreaData->gridArea;
 
     x = 16 * (32 - x / SIZE_OF_GRIDS);
     y = 16 * (32 - y / SIZE_OF_GRIDS);
     int lx = (int)x & 15;
     int ly = (int)y & 15;
-    return _areaMap[lx * 16 + ly];
+    return _loadedAreaData->areaMap->at(lx * 16 + ly);
 }
 
 float GridTerrainData::getHeightFromFlat(float /*x*/, float /*y*/) const
 {
-    return _gridHeight;
+    if (!_loadedHeightData)
+        return INVALID_HEIGHT;
+
+    return _loadedHeightData->gridHeight;
 }
 
 float GridTerrainData::getHeightFromFloat(float x, float y) const
 {
-    if (!m_V8 || !m_V9)
-        return _gridHeight;
+    if (!_loadedHeightData || !_loadedHeightData->floatHeightData)
+        return INVALID_HEIGHT;
 
     x = MAP_RESOLUTION * (32 - x / SIZE_OF_GRIDS);
     y = MAP_RESOLUTION * (32 - y / SIZE_OF_GRIDS);
@@ -327,9 +274,9 @@ float GridTerrainData::getHeightFromFloat(float x, float y) const
         if (x > y)
         {
             // 1 triangle (h1, h2, h5 points)
-            float h1 = m_V9[(x_int) * 129 + y_int];
-            float h2 = m_V9[(x_int + 1) * 129 + y_int];
-            float h5 = 2 * m_V8[x_int * 128 + y_int];
+            float h1 = _loadedHeightData->floatHeightData->v9[(x_int) * 129 + y_int];
+            float h2 = _loadedHeightData->floatHeightData->v9[(x_int + 1) * 129 + y_int];
+            float h5 = 2 * _loadedHeightData->floatHeightData->v8[x_int * 128 + y_int];
             a = h2 - h1;
             b = h5 - h1 - h2;
             c = h1;
@@ -337,9 +284,9 @@ float GridTerrainData::getHeightFromFloat(float x, float y) const
         else
         {
             // 2 triangle (h1, h3, h5 points)
-            float h1 = m_V9[x_int * 129 + y_int];
-            float h3 = m_V9[x_int * 129 + y_int + 1];
-            float h5 = 2 * m_V8[x_int * 128 + y_int];
+            float h1 = _loadedHeightData->floatHeightData->v9[x_int * 129 + y_int];
+            float h3 = _loadedHeightData->floatHeightData->v9[x_int * 129 + y_int + 1];
+            float h5 = 2 * _loadedHeightData->floatHeightData->v8[x_int * 128 + y_int];
             a = h5 - h1 - h3;
             b = h3 - h1;
             c = h1;
@@ -350,9 +297,9 @@ float GridTerrainData::getHeightFromFloat(float x, float y) const
         if (x > y)
         {
             // 3 triangle (h2, h4, h5 points)
-            float h2 = m_V9[(x_int + 1) * 129 + y_int];
-            float h4 = m_V9[(x_int + 1) * 129 + y_int + 1];
-            float h5 = 2 * m_V8[x_int * 128 + y_int];
+            float h2 = _loadedHeightData->floatHeightData->v9[(x_int + 1) * 129 + y_int];
+            float h4 = _loadedHeightData->floatHeightData->v9[(x_int + 1) * 129 + y_int + 1];
+            float h5 = 2 * _loadedHeightData->floatHeightData->v8[x_int * 128 + y_int];
             a = h2 + h4 - h5;
             b = h4 - h2;
             c = h5 - h4;
@@ -360,9 +307,9 @@ float GridTerrainData::getHeightFromFloat(float x, float y) const
         else
         {
             // 4 triangle (h3, h4, h5 points)
-            float h3 = m_V9[(x_int) * 129 + y_int + 1];
-            float h4 = m_V9[(x_int + 1) * 129 + y_int + 1];
-            float h5 = 2 * m_V8[x_int * 128 + y_int];
+            float h3 = _loadedHeightData->floatHeightData->v9[(x_int) * 129 + y_int + 1];
+            float h4 = _loadedHeightData->floatHeightData->v9[(x_int + 1) * 129 + y_int + 1];
+            float h5 = 2 * _loadedHeightData->floatHeightData->v8[x_int * 128 + y_int];
             a = h4 - h3;
             b = h3 + h4 - h5;
             c = h5 - h4;
@@ -374,8 +321,8 @@ float GridTerrainData::getHeightFromFloat(float x, float y) const
 
 float GridTerrainData::getHeightFromUint8(float x, float y) const
 {
-    if (!m_uint8_V8 || !m_uint8_V9)
-        return _gridHeight;
+    if (!_loadedHeightData || !_loadedHeightData->uint8HeightData)
+        return INVALID_HEIGHT;
 
     x = MAP_RESOLUTION * (32 - x / SIZE_OF_GRIDS);
     y = MAP_RESOLUTION * (32 - y / SIZE_OF_GRIDS);
@@ -391,7 +338,7 @@ float GridTerrainData::getHeightFromUint8(float x, float y) const
         return INVALID_HEIGHT;
 
     int32 a, b, c;
-    uint8* V9_h1_ptr = &m_uint8_V9[x_int * 128 + x_int + y_int];
+    uint8* V9_h1_ptr = &_loadedHeightData->uint8HeightData->v9[x_int * 128 + x_int + y_int];
     if (x + y < 1)
     {
         if (x > y)
@@ -399,7 +346,7 @@ float GridTerrainData::getHeightFromUint8(float x, float y) const
             // 1 triangle (h1, h2, h5 points)
             int32 h1 = V9_h1_ptr[0];
             int32 h2 = V9_h1_ptr[129];
-            int32 h5 = 2 * m_uint8_V8[x_int * 128 + y_int];
+            int32 h5 = 2 * _loadedHeightData->uint8HeightData->v8[x_int * 128 + y_int];
             a = h2 - h1;
             b = h5 - h1 - h2;
             c = h1;
@@ -409,7 +356,7 @@ float GridTerrainData::getHeightFromUint8(float x, float y) const
             // 2 triangle (h1, h3, h5 points)
             int32 h1 = V9_h1_ptr[0];
             int32 h3 = V9_h1_ptr[1];
-            int32 h5 = 2 * m_uint8_V8[x_int * 128 + y_int];
+            int32 h5 = 2 * _loadedHeightData->uint8HeightData->v8[x_int * 128 + y_int];
             a = h5 - h1 - h3;
             b = h3 - h1;
             c = h1;
@@ -422,7 +369,7 @@ float GridTerrainData::getHeightFromUint8(float x, float y) const
             // 3 triangle (h2, h4, h5 points)
             int32 h2 = V9_h1_ptr[129];
             int32 h4 = V9_h1_ptr[130];
-            int32 h5 = 2 * m_uint8_V8[x_int * 128 + y_int];
+            int32 h5 = 2 * _loadedHeightData->uint8HeightData->v8[x_int * 128 + y_int];
             a = h2 + h4 - h5;
             b = h4 - h2;
             c = h5 - h4;
@@ -432,20 +379,20 @@ float GridTerrainData::getHeightFromUint8(float x, float y) const
             // 4 triangle (h3, h4, h5 points)
             int32 h3 = V9_h1_ptr[1];
             int32 h4 = V9_h1_ptr[130];
-            int32 h5 = 2 * m_uint8_V8[x_int * 128 + y_int];
+            int32 h5 = 2 * _loadedHeightData->uint8HeightData->v8[x_int * 128 + y_int];
             a = h4 - h3;
             b = h3 + h4 - h5;
             c = h5 - h4;
         }
     }
     // Calculate height
-    return (float)((a * x) + (b * y) + c) * _gridIntHeightMultiplier + _gridHeight;
+    return (float)((a * x) + (b * y) + c) * _loadedHeightData->uint8HeightData->gridIntHeightMultiplier + _loadedHeightData->gridHeight;
 }
 
 float GridTerrainData::getHeightFromUint16(float x, float y) const
 {
-    if (!m_uint16_V8 || !m_uint16_V9)
-        return _gridHeight;
+    if (!_loadedHeightData || !_loadedHeightData->uint16HeightData)
+        return INVALID_HEIGHT;
 
     x = MAP_RESOLUTION * (32 - x / SIZE_OF_GRIDS);
     y = MAP_RESOLUTION * (32 - y / SIZE_OF_GRIDS);
@@ -461,7 +408,7 @@ float GridTerrainData::getHeightFromUint16(float x, float y) const
         return INVALID_HEIGHT;
 
     int32 a, b, c;
-    uint16* V9_h1_ptr = &m_uint16_V9[x_int * 128 + x_int + y_int];
+    uint16* V9_h1_ptr = &_loadedHeightData->uint16HeightData->v9[x_int * 128 + x_int + y_int];
     if (x + y < 1)
     {
         if (x > y)
@@ -469,7 +416,7 @@ float GridTerrainData::getHeightFromUint16(float x, float y) const
             // 1 triangle (h1, h2, h5 points)
             int32 h1 = V9_h1_ptr[0];
             int32 h2 = V9_h1_ptr[129];
-            int32 h5 = 2 * m_uint16_V8[x_int * 128 + y_int];
+            int32 h5 = 2 * _loadedHeightData->uint16HeightData->v8[x_int * 128 + y_int];
             a = h2 - h1;
             b = h5 - h1 - h2;
             c = h1;
@@ -479,7 +426,7 @@ float GridTerrainData::getHeightFromUint16(float x, float y) const
             // 2 triangle (h1, h3, h5 points)
             int32 h1 = V9_h1_ptr[0];
             int32 h3 = V9_h1_ptr[1];
-            int32 h5 = 2 * m_uint16_V8[x_int * 128 + y_int];
+            int32 h5 = 2 * _loadedHeightData->uint16HeightData->v8[x_int * 128 + y_int];
             a = h5 - h1 - h3;
             b = h3 - h1;
             c = h1;
@@ -492,7 +439,7 @@ float GridTerrainData::getHeightFromUint16(float x, float y) const
             // 3 triangle (h2, h4, h5 points)
             int32 h2 = V9_h1_ptr[129];
             int32 h4 = V9_h1_ptr[130];
-            int32 h5 = 2 * m_uint16_V8[x_int * 128 + y_int];
+            int32 h5 = 2 * _loadedHeightData->uint16HeightData->v8[x_int * 128 + y_int];
             a = h2 + h4 - h5;
             b = h4 - h2;
             c = h5 - h4;
@@ -502,19 +449,19 @@ float GridTerrainData::getHeightFromUint16(float x, float y) const
             // 4 triangle (h3, h4, h5 points)
             int32 h3 = V9_h1_ptr[1];
             int32 h4 = V9_h1_ptr[130];
-            int32 h5 = 2 * m_uint16_V8[x_int * 128 + y_int];
+            int32 h5 = 2 * _loadedHeightData->uint16HeightData->v8[x_int * 128 + y_int];
             a = h4 - h3;
             b = h3 + h4 - h5;
             c = h5 - h4;
         }
     }
     // Calculate height
-    return (float)((a * x) + (b * y) + c) * _gridIntHeightMultiplier + _gridHeight;
+    return (float)((a * x) + (b * y) + c) * _loadedHeightData->uint16HeightData->gridIntHeightMultiplier + _loadedHeightData->gridHeight;
 }
 
 bool GridTerrainData::isHole(int row, int col) const
 {
-    if (!_holes)
+    if (!_loadedHoleData)
         return false;
 
     int cellRow = row / 8; // 8 squares per cell
@@ -522,14 +469,14 @@ bool GridTerrainData::isHole(int row, int col) const
     int holeRow = row % 8 / 2;
     int holeCol = (col - (cellCol * 8)) / 2;
 
-    uint16 hole = _holes[cellRow * 16 + cellCol];
+    uint16 hole = _loadedHoleData->holes[cellRow * 16 + cellCol];
 
     return (hole & holetab_h[holeCol] & holetab_v[holeRow]) != 0;
 }
 
 float GridTerrainData::getMinHeight(float x, float y) const
 {
-    if (!_minHeightPlanes)
+    if (!_loadedHeightData || !_loadedHeightData->minHeightPlanes)
         return -500.0f;
 
     GridCoord gridCoord = Acore::ComputeGridCoordSimple(x, y);
@@ -553,38 +500,41 @@ float GridTerrainData::getMinHeight(float x, float y) const
     else
         quarterIndex = gx > gy;
 
-    quarterIndex *= 3;
-
     G3D::Ray ray = G3D::Ray::fromOriginAndDirection(G3D::Vector3(gx, gy, 0.0f), G3D::Vector3::unitZ());
-    return ray.intersection(_minHeightPlanes[quarterIndex]).z;
+    return ray.intersection(_loadedHeightData->minHeightPlanes->at(quarterIndex)).z;
 }
 
 float GridTerrainData::getLiquidLevel(float x, float y) const
 {
-    if (!_liquidMap)
-        return _liquidLevel;
+    if (!_loadedLiquidData)
+        return INVALID_HEIGHT;
+
+    if (!_loadedLiquidData->liquidMap)
+        return _loadedLiquidData->liquidLevel;
 
     x = MAP_RESOLUTION * (32 - x / SIZE_OF_GRIDS);
     y = MAP_RESOLUTION * (32 - y / SIZE_OF_GRIDS);
 
-    int cx_int = ((int)x & (MAP_RESOLUTION - 1)) - _liquidOffY;
-    int cy_int = ((int)y & (MAP_RESOLUTION - 1)) - _liquidOffX;
+    int cx_int = ((int)x & (MAP_RESOLUTION - 1)) - _loadedLiquidData->liquidOffY;
+    int cy_int = ((int)y & (MAP_RESOLUTION - 1)) - _loadedLiquidData->liquidOffX;
 
-    if (cx_int < 0 || cx_int >= _liquidHeight)
+    if (cx_int < 0 || cx_int >= _loadedLiquidData->liquidHeight)
         return INVALID_HEIGHT;
-    if (cy_int < 0 || cy_int >= _liquidWidth)
+    if (cy_int < 0 || cy_int >= _loadedLiquidData->liquidWidth)
         return INVALID_HEIGHT;
 
-    return _liquidMap[cx_int * _liquidWidth + cy_int];
+    return _loadedLiquidData->liquidMap->at(cx_int * _loadedLiquidData->liquidWidth + cy_int);
 }
 
 // Get water state on map
 LiquidData const GridTerrainData::GetLiquidData(float x, float y, float z, float collisionHeight, uint8 ReqLiquidType) const
 {
     LiquidData liquidData;
+    if (!_loadedLiquidData)
+        return liquidData;
 
     // Check water type (if no water return)
-    if (_liquidGlobalFlags || _liquidFlags)
+    if (_loadedLiquidData->liquidGlobalFlags || _loadedLiquidData->liquidFlags)
     {
         // Get cell
         float cx = MAP_RESOLUTION * (32 - x / SIZE_OF_GRIDS);
@@ -595,8 +545,8 @@ LiquidData const GridTerrainData::GetLiquidData(float x, float y, float z, float
 
         // Check water type in cell
         int idx = (x_int >> 3) * 16 + (y_int >> 3);
-        uint8 type = _liquidFlags ? _liquidFlags[idx] : _liquidGlobalFlags;
-        uint32 entry = _liquidEntry ? _liquidEntry[idx] : _liquidGlobalEntry;
+        uint8 type = _loadedLiquidData->liquidFlags ? _loadedLiquidData->liquidFlags->at(idx) : _loadedLiquidData->liquidGlobalFlags;
+        uint32 entry = _loadedLiquidData->liquidEntry ? _loadedLiquidData->liquidEntry->at(idx) : _loadedLiquidData->liquidGlobalEntry;
         if (LiquidTypeEntry const* liquidEntry = sLiquidTypeStore.LookupEntry(entry))
         {
             type &= MAP_LIQUID_TYPE_DARK_WATER;
@@ -629,12 +579,12 @@ LiquidData const GridTerrainData::GetLiquidData(float x, float y, float z, float
         {
             // Check water level:
             // Check water height map
-            int lx_int = x_int - _liquidOffY;
-            int ly_int = y_int - _liquidOffX;
-            if (lx_int >= 0 && lx_int < _liquidHeight && ly_int >= 0 && ly_int < _liquidWidth)
+            int lx_int = x_int - _loadedLiquidData->liquidOffY;
+            int ly_int = y_int - _loadedLiquidData->liquidOffX;
+            if (lx_int >= 0 && lx_int < _loadedLiquidData->liquidHeight && ly_int >= 0 && ly_int < _loadedLiquidData->liquidWidth)
             {
                 // Get water level
-                float liquid_level = _liquidMap ? _liquidMap[lx_int * _liquidWidth + ly_int] : _liquidLevel;
+                float liquid_level = _loadedLiquidData->liquidMap ? _loadedLiquidData->liquidMap->at(lx_int * _loadedLiquidData->liquidWidth + ly_int) : _loadedLiquidData->liquidLevel;
                 // Get ground level
                 float ground_level = getHeight(x, y);
 

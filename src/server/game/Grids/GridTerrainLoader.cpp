@@ -30,19 +30,21 @@ void GridTerrainLoader::LoadMap()
     }
 
     // map file name
-    char* tmp = nullptr;
-    int len = sWorld->GetDataPath().length() + strlen("maps/%03u%02u%02u.map") + 1;
-    tmp = new char[len];
-    snprintf(tmp, len, (char*)(sWorld->GetDataPath() + "maps/%03u%02u%02u.map").c_str(), _map->GetId(), GetX(), GetY());
+    std::string const mapFileName = Acore::StringFormat("{}maps/{:03}{:02}{:02}.map", sWorld->GetDataPath(), _map->GetId(), GetX(), GetY());
 
     // loading data
-    LOG_DEBUG("maps", "Loading map {}", tmp);
+    LOG_DEBUG("maps", "Loading map {}", mapFileName);
     std::unique_ptr<GridTerrainData> terrainData = std::make_unique<GridTerrainData>();
-    if (!terrainData->loadData(tmp))
-        LOG_ERROR("maps", "Error loading map file: \n {}\n", tmp);
-
-    _grid.SetTerrainData(std::move(terrainData));
-    delete[] tmp;
+    TerrainMapDataReadResult loadResult = terrainData->Load(mapFileName);
+    if (loadResult == TerrainMapDataReadResult::Success)
+        _grid.SetTerrainData(std::move(terrainData));
+    else
+    {
+        if (loadResult == TerrainMapDataReadResult::InvalidMagic)
+            LOG_ERROR("maps", "Map file '{}' is from an incompatible clientversion. Please recreate using the mapextractor.", mapFileName);
+        else
+            LOG_DEBUG("maps", "Error (result: {}) loading map file: {}", uint32(loadResult), mapFileName);
+    }
 
     sScriptMgr->OnLoadGridMap(_map, _grid.GetTerrainData(), GetX(), GetY());
 }
@@ -98,9 +100,6 @@ void GridTerrainUnloader::UnloadTerrain()
 
     int gx = (MAX_NUMBER_OF_GRIDS - 1) - _grid.GetX();
     int gy = (MAX_NUMBER_OF_GRIDS - 1) - _grid.GetY();
-
-    if (GridTerrainData* terrainData = _grid.GetTerrainData())
-        terrainData->unloadData();
 
     VMAP::VMapFactory::createOrGetVMapMgr()->unloadMap(_map->GetId(), gx, gy);
     MMAP::MMapFactory::createOrGetMMapMgr()->unloadMap(_map->GetId(), gx, gy);

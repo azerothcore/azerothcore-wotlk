@@ -19,7 +19,9 @@
 #define GRID_TERRAIN_DATA_H
 
 #include "Common.h"
+#include <fstream>
 #include <G3D/Plane.h>
+#include <memory>
 
 #define MAX_HEIGHT            100000.0f                     // can be use for find ground height at surface
 #define INVALID_HEIGHT       -100000.0f                     // for check, must be equal to VMAP_INVALID_HEIGHT, real value for unknown height is VMAP_INVALID_HEIGHT_VALUE
@@ -106,6 +108,83 @@ struct map_liquidHeader
     float  liquidLevel;
 };
 
+// ******************************************
+// Loaded map data structures
+// ******************************************
+
+struct LoadedAreaData
+{
+    typedef std::array<uint16, 16 * 16> AreaMapType;
+
+    uint16 gridArea;
+    std::unique_ptr<AreaMapType> areaMap;
+};
+
+struct LoadedHeightData
+{
+    typedef std::array<G3D::Plane, 8> HeightPlanesType;
+
+    struct Uint16HeightData
+    {
+        typedef std::array<uint16, 129 * 129> V9Type;
+        typedef std::array<uint16, 128 * 128> V8Type;
+
+        V9Type v9;
+        V8Type v8;
+        float gridIntHeightMultiplier;
+    };
+
+    struct Uint8HeightData
+    {
+        typedef std::array<uint8, 129 * 129> V9Type;
+        typedef std::array<uint8, 128 * 128> V8Type;
+
+        V9Type v9;
+        V8Type v8;
+        float gridIntHeightMultiplier;
+    };
+
+    struct FloatHeightData
+    {
+        typedef std::array<float, 129 * 129> V9Type;
+        typedef std::array<float, 128 * 128> V8Type;
+
+        V9Type v9;
+        V8Type v8;
+    };
+
+    float gridHeight;
+    std::unique_ptr<Uint16HeightData> uint16HeightData;
+    std::unique_ptr<Uint8HeightData> uint8HeightData;
+    std::unique_ptr<FloatHeightData> floatHeightData;
+    std::unique_ptr<HeightPlanesType> minHeightPlanes;
+};
+
+struct LoadedLiquidData
+{
+    typedef std::array<uint16, 16 * 16> LiquidEntryType;
+    typedef std::array<uint8, 16 * 16> LiquidFlagsType;
+    typedef std::vector<float> LiquidMapType;
+
+    uint16 liquidGlobalEntry;
+    uint8 liquidGlobalFlags;
+    uint8 liquidOffX;
+    uint8 liquidOffY;
+    uint8 liquidWidth;
+    uint8 liquidHeight;
+    float liquidLevel;
+    std::unique_ptr<LiquidEntryType> liquidEntry;
+    std::unique_ptr<LiquidFlagsType> liquidFlags;
+    std::unique_ptr<LiquidMapType> liquidMap;
+};
+
+struct LoadedHoleData
+{
+    typedef std::array<uint16, 16 * 16> HolesType;
+
+    HolesType holes;
+};
+
 enum LiquidStatus
 {
     LIQUID_MAP_NO_WATER     = 0x00000000,
@@ -126,68 +205,50 @@ struct LiquidData
     LiquidStatus Status{ LIQUID_MAP_NO_WATER };
 };
 
+enum class TerrainMapDataReadResult
+{
+    Success,
+    NotFound,
+    ReadError,
+    InvalidMagic,
+    InvalidAreaData,
+    InvalidHeightData,
+    InvalidLiquidData,
+    InvalidHoleData
+};
+
 class GridTerrainData
 {
-    uint32  _flags;
-    union
-    {
-        float* m_V9;
-        uint16* m_uint16_V9;
-        uint8* m_uint8_V9;
-    };
-    union
-    {
-        float* m_V8;
-        uint16* m_uint16_V8;
-        uint8* m_uint8_V8;
-    };
-    G3D::Plane* _minHeightPlanes;
-    // Height level data
-    float _gridHeight;
-    float _gridIntHeightMultiplier;
+    bool LoadAreaData(std::ifstream& fileStream, uint32 const offset);
+    bool LoadHeightData(std::ifstream& fileStream, uint32 const offset);
+    bool LoadLiquidData(std::ifstream& fileStream, uint32 const offset);
+    bool LoadHolesData(std::ifstream& fileStream, uint32 const offset);
 
-    // Area data
-    uint16* _areaMap;
+    std::unique_ptr<LoadedAreaData> _loadedAreaData;
+    std::unique_ptr<LoadedHeightData> _loadedHeightData;
+    std::unique_ptr<LoadedLiquidData> _loadedLiquidData;
+    std::unique_ptr<LoadedHoleData> _loadedHoleData;
 
-    // Liquid data
-    float _liquidLevel;
-    uint16* _liquidEntry;
-    uint8* _liquidFlags;
-    float* _liquidMap;
-    uint16 _gridArea;
-    uint16 _liquidGlobalEntry;
-    uint8 _liquidGlobalFlags;
-    uint8 _liquidOffX;
-    uint8 _liquidOffY;
-    uint8 _liquidWidth;
-    uint8 _liquidHeight;
-    uint16* _holes;
-
-    bool loadAreaData(FILE* in, uint32 offset, uint32 size);
-    bool loadHeightData(FILE* in, uint32 offset, uint32 size);
-    bool loadLiquidData(FILE* in, uint32 offset, uint32 size);
-    bool loadHolesData(FILE* in, uint32 offset, uint32 size);
-    [[nodiscard]] bool isHole(int row, int col) const;
+    bool isHole(int row, int col) const;
 
     // Get height functions and pointers
     typedef float (GridTerrainData::* GetHeightPtr) (float x, float y) const;
     GetHeightPtr _gridGetHeight;
-    [[nodiscard]] float getHeightFromFloat(float x, float y) const;
-    [[nodiscard]] float getHeightFromUint16(float x, float y) const;
-    [[nodiscard]] float getHeightFromUint8(float x, float y) const;
-    [[nodiscard]] float getHeightFromFlat(float x, float y) const;
+    float getHeightFromFloat(float x, float y) const;
+    float getHeightFromUint16(float x, float y) const;
+    float getHeightFromUint8(float x, float y) const;
+    float getHeightFromFlat(float x, float y) const;
 
 public:
     GridTerrainData();
-    ~GridTerrainData();
-    bool loadData(char* filaname);
-    void unloadData();
+    ~GridTerrainData() { };
+    TerrainMapDataReadResult Load(std::string const& mapFileName);
 
-    [[nodiscard]] uint16 getArea(float x, float y) const;
-    [[nodiscard]] inline float getHeight(float x, float y) const { return (this->*_gridGetHeight)(x, y); }
-    [[nodiscard]] float getMinHeight(float x, float y) const;
-    [[nodiscard]] float getLiquidLevel(float x, float y) const;
-    [[nodiscard]] LiquidData const GetLiquidData(float x, float y, float z, float collisionHeight, uint8 ReqLiquidType) const;
+    uint16 getArea(float x, float y) const;
+    inline float getHeight(float x, float y) const { return (this->*_gridGetHeight)(x, y); }
+    float getMinHeight(float x, float y) const;
+    float getLiquidLevel(float x, float y) const;
+    LiquidData const GetLiquidData(float x, float y, float z, float collisionHeight, uint8 ReqLiquidType) const;
 };
 
 #endif
