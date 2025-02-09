@@ -1,3 +1,4 @@
+-- DB update 2025_02_09_03 -> 2025_02_09_04
 --
 UPDATE `creature_template_movement` SET `Flight` = 2 WHERE `CreatureId` = 25038;
 
