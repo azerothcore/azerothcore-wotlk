@@ -1,3 +1,4 @@
+-- DB update 2025_02_09_01 -> 2025_02_09_02
 
 -- Theremis
 UPDATE `creature_template_movement` SET `Flight` = 1, `Ground` = 2 WHERE (`CreatureId` = 25976);
