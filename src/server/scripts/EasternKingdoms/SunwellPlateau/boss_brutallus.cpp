@@ -189,10 +189,12 @@ struct npc_madrigosa : public NullCreatureAI
     {
         if (param == ACTION_START_EVENT)
         {
+            me->NearTeleportTo(1570.97f, 725.51f, 79.77f, 3.82f);
             me->SetDisableGravity(true);
             me->SetStandState(UNIT_STAND_STATE_STAND);
             me->RemoveDynamicFlag(UNIT_DYNFLAG_DEAD);
-            me->NearTeleportTo(1570.97f, 725.51f, 79.77f, 3.82f);
+            me->SendMovementFlagUpdate();
+
             events.ScheduleEvent(EVENT_MAD_1, 2000);
         }
         else if (param == ACTION_SPAWN_FELMYST)
@@ -212,9 +214,9 @@ struct npc_madrigosa : public NullCreatureAI
                 brutallus->SetReactState(REACT_PASSIVE);
                 brutallus->setActive(true);
             }
-            me->GetMotionMaster()->MovePoint(1, 1477.94f, 643.22f, 21.21f);
+            me->GetMotionMaster()->MoveTakeoff(1, 1477.94f, 643.22f, 21.21f);
             me->AddUnitState(UNIT_STATE_NO_ENVIRONMENT_UPD);
-            events.ScheduleEvent(EVENT_MAD_2, 6000);
+            events.ScheduleEvent(EVENT_MAD_2, 4000);
             break;
         case EVENT_MAD_2:
             Talk(SAY_MAD_1);
@@ -352,9 +354,8 @@ struct npc_madrigosa : public NullCreatureAI
             }
             break;
         case EVENT_SPAWN_FELMYST:
+            DoCastAOE(SPELL_SUMMON_FELBLAZE, true);
             me->DespawnOrUnsummon(1);
-            if (Creature* felmyst = instance->GetCreature(DATA_FELMYST))
-                felmyst->AI()->DoAction(ACTION_START_EVENT);
             break;
         }
     }

@@ -1992,8 +1992,8 @@ public:
         uint32 mapId;
         uint32 areaId;
         uint32 phase            = 0;
-        char const* areaName    = nullptr;
-        char const* zoneName    = nullptr;
+        std::string areaName    = "";
+        std::string zoneName    = "";
 
         // Guild data print variables defined so that they exist, but are not necessarily used
         uint32 guildId           = 0;
@@ -2325,19 +2325,13 @@ public:
             }
         }
 
-        if (!zoneName)
-        {
+        if (zoneName.empty())
             zoneName = handler->GetAcoreString(LANG_UNKNOWN);
-        }
 
-        if (areaName)
-        {
+        if (!areaName.empty())
             handler->PSendSysMessage(LANG_PINFO_CHR_MAP_WITH_AREA, map->name[locale], zoneName, areaName);
-        }
         else
-        {
             handler->PSendSysMessage(LANG_PINFO_CHR_MAP, map->name[locale], zoneName);
-        }
 
         // Output XVII. - XVIX. if they are not empty
         if (!guildName.empty())
@@ -3022,18 +3016,9 @@ public:
             return false;
         }
 
-        const char* str = sObjectMgr->GetAcoreString(id, locale ? static_cast<LocaleConstant>(*locale) : DEFAULT_LOCALE);
-
-        if (!strcmp(str, "<error>"))
-        {
-            handler->PSendSysMessage(LANG_NO_ACORE_STRING_FOUND, id);
-            return true;
-        }
-        else
-        {
-            handler->SendSysMessage(str);
-            return true;
-        }
+        std::string str = sObjectMgr->GetAcoreString(id, locale ? static_cast<LocaleConstant>(*locale) : DEFAULT_LOCALE);
+        handler->SendSysMessage(str);
+        return true;
     }
 
     static bool HandleOpenDoorCommand(ChatHandler* handler, Optional<float> range)

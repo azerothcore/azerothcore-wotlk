@@ -100,41 +100,35 @@ private:
 
 struct boss_felmyst : public BossAI
 {
-    boss_felmyst(Creature* creature) : BossAI(creature, DATA_FELMYST)
-    {
-        bool appear = instance->GetBossState(DATA_BRUTALLUS) == DONE;
-        creature->SetVisible(appear);
-        creature->SetStandState(UNIT_STAND_STATE_SLEEP);
-        creature->SetReactState(REACT_PASSIVE);
-    }
+    boss_felmyst(Creature* creature) : BossAI(creature, DATA_FELMYST) { }
 
-    void DoAction(int32 param) override
+    void InitializeAI() override
     {
-        if (param == ACTION_START_EVENT)
-        {
-            me->SetVisible(true);
-            me->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
-            StartIntro();
-        }
+        me->SetStandState(UNIT_STAND_STATE_SLEEP);
+        me->SetReactState(REACT_PASSIVE);
+        me->SetImmuneToPC(true);
+        StartIntro();
     }
 
     void Reset() override
     {
         BossAI::Reset();
-        me->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
-        me->SetReactState(REACT_PASSIVE);
-        me->SetDisableGravity(false);
         me->m_Events.KillAllEvents(false);
         instance->DoRemoveAurasDueToSpellOnPlayers(SPELL_FOG_OF_CORRUPTION_CHARM);
+        me->SetCanFly(true);
+        me->SetDisableGravity(true);
+        me->SendMovementFlagUpdate();
     }
 
     void JustEngagedWith(Unit* who) override
     {
         BossAI::JustEngagedWith(who);
-        me->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
-
-        if (!scheduler.IsGroupScheduled(GROUP_START_INTRO))
-            StartIntro();
+        me->CastSpell(me, SPELL_NOXIOUS_FUMES, true);
+        me->m_Events.AddEventAtOffset([&] {
+            Talk(YELL_BERSERK);
+            DoCastSelf(SPELL_BERSERK, true);
+        }, 10min);
+        me->GetMotionMaster()->MovePoint(POINT_GROUND, who->GetPosition(), false, true);
     }
 
     void KilledUnit(Unit* victim) override
@@ -146,6 +140,7 @@ struct boss_felmyst : public BossAI
     void JustDied(Unit* killer) override
     {
         BossAI::JustDied(killer);
+        me->m_Events.KillAllEvents(false);
         Talk(YELL_DEATH);
         instance->DoRemoveAurasDueToSpellOnPlayers(SPELL_FOG_OF_CORRUPTION_CHARM);
 
@@ -161,8 +156,10 @@ struct boss_felmyst : public BossAI
         if (point == POINT_GROUND)
         {
             me->HandleEmoteCommand(EMOTE_ONESHOT_LAND);
+            me->SetCanFly(false);
             me->SetDisableGravity(false);
             me->SendMovementFlagUpdate();
+            SetInvincibility(false);
 
             me->m_Events.AddEventAtOffset([&] {
                 me->SetReactState(REACT_AGGRESSIVE);
@@ -171,7 +168,7 @@ struct boss_felmyst : public BossAI
                     me->SetTarget(me->GetVictim()->GetGUID());
 
                 me->ResumeChasingVictim();
-            }, 1s);
+            }, 2s);
 
             ScheduleTimedEvent(7500ms, [&] {
                 DoCastVictim(SPELL_CLEAVE);
@@ -238,6 +235,7 @@ struct boss_felmyst : public BossAI
         me->HandleEmoteCommand(EMOTE_ONESHOT_LIFTOFF);
         me->SetDisableGravity(true);
         me->SendMovementFlagUpdate();
+        SetInvincibility(true);
 
         me->m_Events.AddEventAtOffset([&] {
             me->GetMotionMaster()->MovePoint(POINT_AIR, me->GetPositionX(), me->GetPositionY(), me->GetPositionZ() + 15.0f, false, true);
@@ -304,39 +302,25 @@ struct boss_felmyst : public BossAI
 
             me->m_Events.AddEventAtOffset([&] {
                 Talk(YELL_BIRTH);
+                me->SetCanFly(true);
                 me->SetDisableGravity(true);
-                me->HandleEmoteCommand(EMOTE_ONESHOT_LIFTOFF);
                 me->SendMovementFlagUpdate();
+                me->HandleEmoteCommand(EMOTE_ONESHOT_LIFTOFF);
             }, 7s);
 
             me->m_Events.AddEventAtOffset([&] {
-                me->GetMotionMaster()->MovePoint(POINT_AIR, me->GetPositionX(), me->GetPositionY(), me->GetPositionZ() + 10.0f, false, true);
+                me->SetImmuneToPC(false);
+                me->GetMotionMaster()->MovePath(me->GetEntry() * 10, true);
             }, 8500ms);
-
-            me->m_Events.AddEventAtOffset([&] {
-                me->SetInCombatWithZone();
-                me->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
-                me->CastSpell(me, SPELL_NOXIOUS_FUMES, true);
-                me->GetMotionMaster()->MovePoint(POINT_MISC, 1472.18f, 603.38f, 34.0f, false, true);
-
-                me->m_Events.AddEventAtOffset([&] {
-                    me->GetMotionMaster()->MovePoint(POINT_GROUND, me->GetPositionX(), me->GetPositionY(), me->GetMapHeight(me->GetPositionX(), me->GetPositionY(), me->GetPositionZ()), false, true);
-                }, 3s);
-
-                me->m_Events.AddEventAtOffset([&] {
-                    Talk(YELL_BERSERK);
-                    DoCastSelf(SPELL_BERSERK, true);
-                }, 10min);
-            }, 10500ms);
         });
     }
 
     void UpdateAI(uint32 diff) override
     {
+        scheduler.Update(diff);
+
         if (!UpdateVictim())
             return;
-
-        scheduler.Update(diff);
 
         if (!me->HasUnitMovementFlag(MOVEMENTFLAG_DISABLE_GRAVITY))
             DoMeleeAttackIfReady();
