@@ -1,6 +1,5 @@
 name: CC Triage
 description: This template is only used for ChromieCraft
-title: "Crash: "
 labels: ["ChromieCraft Generic"]
 body:
   - type: textarea
