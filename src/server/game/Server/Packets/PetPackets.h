@@ -18,6 +18,7 @@
 #ifndef PetPackets_h__
 #define PetPackets_h__
 
+#include "G3D/Vector3.h"
 #include "ObjectGuid.h"
 #include "Packet.h"
 
@@ -93,6 +94,18 @@ namespace WorldPackets
             RequestPetInfo(WorldPacket&& packet) : ClientPacket(CMSG_REQUEST_PET_INFO, std::move(packet)) { }
 
             void Read() override { }
+        };
+
+        class PetDismissSound final : public ServerPacket
+        {
+        public:
+            PetDismissSound(int32 modelId, G3D::Vector3 modelPosition)
+                : ServerPacket(SMSG_PET_DISMISS_SOUND, 4 + 12), ModelId(modelId), ModelPosition(modelPosition) { }
+
+            WorldPacket const* Write() override;
+
+            int32 ModelId = 0;
+            G3D::Vector3 ModelPosition;
         };
     }
 }

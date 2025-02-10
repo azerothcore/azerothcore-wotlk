@@ -1946,6 +1946,7 @@ public:
 
     void SendPetActionFeedback (uint8 msg);
     void SendPetTalk (uint32 pettalk);
+    void SendPetDismissSound() const;
     void SendPetAIReaction(ObjectGuid guid);
 
     void SendPeriodicAuraLog(SpellPeriodicAuraLogInfo* pInfo);
