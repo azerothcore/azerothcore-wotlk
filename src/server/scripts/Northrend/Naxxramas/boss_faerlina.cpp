@@ -157,7 +157,7 @@ public:
                 me->RemoveAurasDueToSpell(SPELL_FRENZY);
                 instance->SetData(DATA_FRENZY_REMOVED, 0);
                 if (Is25ManRaid())
-                    caster->KillSelf();;
+                    caster->KillSelf();
             }
         }
 
