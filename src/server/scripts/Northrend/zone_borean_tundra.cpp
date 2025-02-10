@@ -510,7 +510,7 @@ struct npc_beryl_sorcererAI : public CreatureAI
         {
             _playerGUID.Clear();
             _chainsCast = false;
-            __blinkUsed = false;
+            _blinkUsed = false;
         }
 
         void Reset() override
