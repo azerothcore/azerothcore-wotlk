@@ -881,9 +881,9 @@ std::string WorldState::GetSunsReachPrintout()
         }
     };
     output += "Sunwell Plateau Gate Phase " + std::to_string(m_sunsReachData.m_gate) + " (" + formatGatePhase(m_sunsReachData.m_gate) + ")" + ":\n";
-    output += "  0. Gate 1 (Agamath): " + std::string(m_sunsReachData.m_gate >= SUNWELL_AGAMATH_GATE1_OPEN ? "Open " : "Closed ") + std::to_string(m_sunsReachData.m_sunsReachReclamationCounters[COUNTER_AGAMATH_THE_FIRST_GATE]) + " (" + std::to_string(m_sunsReachData.GetSunwellGatePercentage(SUNWELL_ALL_GATES_CLOSED)) + "%)\n";
-    output += "  1. Gate 2 (Rohendor): " + std::string(m_sunsReachData.m_gate >= SUNWELL_ROHENDOR_GATE2_OPEN ? "Open " : "Closed ") + std::to_string(m_sunsReachData.m_sunsReachReclamationCounters[COUNTER_ROHENDOR_THE_SECOND_GATE]) +  " (" + std::to_string(m_sunsReachData.GetSunwellGatePercentage(SUNWELL_AGAMATH_GATE1_OPEN)) + "%)\n";
-    output += "  2. Gate 3 (Archonisus): " + std::string(m_sunsReachData.m_gate >= SUNWELL_ARCHONISUS_GATE3_OPEN ? "Open " : "Closed ") + std::to_string(m_sunsReachData.m_sunsReachReclamationCounters[COUNTER_ARCHONISUS_THE_FINAL_GATE]) + " (" + std::to_string(m_sunsReachData.GetSunwellGatePercentage(SUNWELL_ROHENDOR_GATE2_OPEN)) + "%)\n";
+    output += "  0. Gate 1 (Agamath): " + std::string(m_sunsReachData.m_gate >= SUNWELL_AGAMATH_GATE1_OPEN ? "Open " : "Closed ") + std::to_string(m_sunsReachData.m_gateCounters[COUNTER_AGAMATH_THE_FIRST_GATE]) + " (" + std::to_string(m_sunsReachData.GetSunwellGatePercentage(SUNWELL_ALL_GATES_CLOSED)) + "%)\n";
+    output += "  1. Gate 2 (Rohendor): " + std::string(m_sunsReachData.m_gate >= SUNWELL_ROHENDOR_GATE2_OPEN ? "Open " : "Closed ") + std::to_string(m_sunsReachData.m_gateCounters[COUNTER_ROHENDOR_THE_SECOND_GATE]) +  " (" + std::to_string(m_sunsReachData.GetSunwellGatePercentage(SUNWELL_AGAMATH_GATE1_OPEN)) + "%)\n";
+    output += "  2. Gate 3 (Archonisus): " + std::string(m_sunsReachData.m_gate >= SUNWELL_ARCHONISUS_GATE3_OPEN ? "Open " : "Closed ") + std::to_string(m_sunsReachData.m_gateCounters[COUNTER_ARCHONISUS_THE_FINAL_GATE]) + " (" + std::to_string(m_sunsReachData.GetSunwellGatePercentage(SUNWELL_ROHENDOR_GATE2_OPEN)) + "%)\n";
     return output;
 }
 

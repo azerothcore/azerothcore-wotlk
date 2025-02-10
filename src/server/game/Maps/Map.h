@@ -596,7 +596,7 @@ public:
 
     TaskScheduler _creatureRespawnScheduler;
 
-    void ScheduleCreatureRespawn(ObjectGuid /*creatureGuid*/, Milliseconds /*respawnTimer*/);
+    void ScheduleCreatureRespawn(ObjectGuid /*creatureGuid*/, Milliseconds /*respawnTimer*/, Position pos = Position());
 
     void LoadCorpseData();
     void DeleteCorpseData();
