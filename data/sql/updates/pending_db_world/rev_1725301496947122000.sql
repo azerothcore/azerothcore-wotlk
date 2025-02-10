@@ -9,7 +9,10 @@ CREATE TABLE `arena_season_reward_group` (
     `reward_mail_subject` VARCHAR(255),
     `reward_mail_body` TEXT,
     `gold_reward` INT UNSIGNED
-);
+)
+CHARSET = utf8mb4
+COLLATE = utf8mb4_unicode_ci
+ENGINE = InnoDB;
 
 -- Season 8
 INSERT INTO `arena_season_reward_group` (`id`, `arena_season`, `criteria_type`, `min_criteria`, `max_criteria`, `reward_mail_template_id`, `reward_mail_subject`, `reward_mail_body`, `gold_reward`) VALUES
@@ -43,7 +46,10 @@ CREATE TABLE `arena_season_reward` (
     `type` ENUM('achievement', 'item') NOT NULL DEFAULT 'achievement',
     `entry` INT UNSIGNED NOT NULL COMMENT 'For item type - item entry, for achievement - achevement id.',
     PRIMARY KEY (`group_id`, `type`, `entry`)
-);
+)
+CHARSET = utf8mb4
+COLLATE = utf8mb4_unicode_ci
+ENGINE = InnoDB;
 
 -- Season 8
 INSERT INTO `arena_season_reward` (`group_id`, `type`, `entry`) VALUES (1, 'achievement', 3336);
