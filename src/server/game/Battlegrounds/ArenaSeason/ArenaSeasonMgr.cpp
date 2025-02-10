@@ -102,7 +102,7 @@ void ArenaSeasonMgr::LoadRewards()
     for (auto const& itr : groupsMap)
         _arenaSeasonRewardGroupsStore[itr.second.season].push_back(itr.second);
 
-    LOG_INFO("server.loading", ">> Loaded {} arena season rewards in {} ms", (unsigned long)groupsMap.size(), GetMSTimeDiffToNow(oldMSTime));
+    LOG_INFO("server.loading", ">> Loaded {} arena season rewards in {} ms", (uint32)groupsMap.size(), GetMSTimeDiffToNow(oldMSTime));
     LOG_INFO("server.loading", " ");
 }
 

@@ -2,7 +2,7 @@ DROP TABLE IF EXISTS `arena_season_reward_group`;
 CREATE TABLE `arena_season_reward_group` (
     `id` INT AUTO_INCREMENT PRIMARY KEY,
     `arena_season` TINYINT UNSIGNED NOT NULL,
-    `criteria_type` ENUM('pct', 'abs') NOT NULL DEFAULT 'pct',
+    `criteria_type` ENUM('pct', 'abs') NOT NULL DEFAULT 'pct' COMMENT 'Determines how rankings are evaluated: "pct" - percentage-based (e.g., top 20% of the ladder), "abs" - absolute position-based (e.g., top 10 players).',
     `min_criteria` FLOAT NOT NULL,
     `max_criteria` FLOAT NOT NULL,
     `reward_mail_template_id` INT UNSIGNED,
