@@ -354,9 +354,8 @@ struct npc_madrigosa : public NullCreatureAI
             }
             break;
         case EVENT_SPAWN_FELMYST:
+            DoCastAOE(SPELL_SUMMON_FELBLAZE, true);
             me->DespawnOrUnsummon(1);
-            if (Creature* felmyst = instance->GetCreature(DATA_FELMYST))
-                felmyst->AI()->DoAction(ACTION_START_EVENT);
             break;
         }
     }

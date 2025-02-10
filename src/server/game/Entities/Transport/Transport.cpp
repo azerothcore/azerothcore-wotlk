@@ -582,7 +582,22 @@ void MotionTransport::DelayedTeleportTransport()
                     float destX, destY, destZ, destO;
                     obj->m_movementInfo.transport.pos.GetPosition(destX, destY, destZ, destO);
                     TransportBase::CalculatePassengerPosition(destX, destY, destZ, &destO, x, y, z, o);
-                    if (!obj->ToPlayer()->TeleportTo(newMapId, destX, destY, destZ, destO, TELE_TO_NOT_LEAVE_TRANSPORT))
+
+                    Player* player = obj->ToPlayer();
+                    // Vehicle passengers are dropped in the middle of nowhere, so lets try to eject them, add to the transport and teleport
+                    // this needs to be revisited to properly restore vehicles with passengers after transport teleportation
+                    if (player->IsVehicle())
+                        if (Vehicle* vehicleKit = player->GetVehicleKit())
+                            for (SeatMap::iterator itr = vehicleKit->Seats.begin(); itr != vehicleKit->Seats.end(); ++itr)
+                                if (Player* passenger = ObjectAccessor::GetPlayer(*player, itr->second.Passenger.Guid))
+                                {
+                                    passenger->ExitVehicle();
+                                    AddPassenger(passenger, true);
+                                    if (!passenger->TeleportTo(newMapId, destX, destY, destZ, destO, TELE_TO_NOT_LEAVE_TRANSPORT))
+                                        _passengers.erase(passenger);
+                                }
+
+                    if (!player->TeleportTo(newMapId, destX, destY, destZ, destO, TELE_TO_NOT_LEAVE_TRANSPORT))
                         _passengers.erase(obj);
                 }
                 break;
