@@ -1,3 +1,4 @@
+-- DB update 2025_02_10_00 -> 2025_02_10_01
 
 -- Remove flag IMMUNE_TO_NPC. Add Flag PET_IN_COMBAT (Sniffed Values)
 UPDATE `creature_template` SET `unit_flags`=`unit_flags`& ~512 WHERE (`entry` = 24938);
