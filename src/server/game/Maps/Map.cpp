@@ -69,64 +69,6 @@ Map::~Map()
     MMAP::MMapFactory::createOrGetMMapMgr()->unloadMapInstance(GetId(), i_InstanceId);
 }
 
-bool Map::ExistMap(uint32 mapid, int gx, int gy)
-{
-    int len = sWorld->GetDataPath().length() + strlen("maps/%03u%02u%02u.map") + 1;
-    char* tmp = new char[len];
-    snprintf(tmp, len, (char*)(sWorld->GetDataPath() + "maps/%03u%02u%02u.map").c_str(), mapid, gx, gy);
-
-    bool ret = false;
-    FILE* pf = fopen(tmp, "rb");
-
-    if (!pf)
-        LOG_ERROR("maps", "Map file '{}': does not exist!", tmp);
-    else
-    {
-        map_fileheader header;
-        if (fread(&header, sizeof(header), 1, pf) == 1)
-        {
-            if (header.mapMagic != MapMagic.asUInt || header.versionMagic != MapVersionMagic)
-            {
-                LOG_ERROR("maps", "Map file '{}' is from an incompatible map version ({:.4u} v{}), {:.4s} v{} is expected. Please pull your source, recompile tools and recreate maps using the updated mapextractor, then replace your old map files with new files.",
-                    tmp, 4, header.mapMagic, header.versionMagic, 4, MapMagic.asChar, MapVersionMagic);
-            }
-
-            else
-                ret = true;
-        }
-        fclose(pf);
-    }
-    delete [] tmp;
-    return ret;
-}
-
-bool Map::ExistVMap(uint32 mapid, int gx, int gy)
-{
-    if (VMAP::IVMapMgr* vmgr = VMAP::VMapFactory::createOrGetVMapMgr())
-    {
-        if (vmgr->isMapLoadingEnabled())
-        {
-            VMAP::LoadResult result = vmgr->existsMap((sWorld->GetDataPath() + "vmaps").c_str(), mapid, gx, gy);
-            std::string name = vmgr->getDirFileName(mapid, gx, gy);
-            switch (result)
-            {
-                case VMAP::LoadResult::Success:
-                    break;
-                case VMAP::LoadResult::FileNotFound:
-                    LOG_ERROR("maps", "VMap file '{}' does not exist", (sWorld->GetDataPath() + "vmaps/" + name));
-                    LOG_ERROR("maps", "Please place VMAP files (*.vmtree and *.vmtile) in the vmap directory ({}), or correct the DataDir setting in your worldserver.conf file.", (sWorld->GetDataPath() + "vmaps/"));
-                    return false;
-                case VMAP::LoadResult::VersionMismatch:
-                    LOG_ERROR("maps", "VMap file '{}' couldn't be loaded", (sWorld->GetDataPath() + "vmaps/" + name));
-                    LOG_ERROR("maps", "This is because the version of the VMap file and the version of this module are different, please re-extract the maps with the tools compiled with this module.");
-                    return false;
-            }
-        }
-    }
-
-    return true;
-}
-
 Map::Map(uint32 id, uint32 InstanceId, uint8 SpawnMode, Map* _parent) :
     _mapGridManager(this), i_mapEntry(sMapStore.LookupEntry(id)), i_spawnMode(SpawnMode), i_InstanceId(InstanceId),
     m_unloadTimer(0), m_VisibleDistance(DEFAULT_VISIBILITY_DISTANCE),

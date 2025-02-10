@@ -25,6 +25,7 @@
 #include "GameGraveyard.h"
 #include "GameTime.h"
 #include "GridNotifiers.h"
+#include "GridTerrainLoader.h"
 #include "Group.h"
 #include "GuildMgr.h"
 #include "IPLocation.h"
@@ -588,8 +589,8 @@ public:
         int gridX = 63 - gridCoord.x_coord;
         int gridY = 63 - gridCoord.y_coord;
 
-        uint32 haveMap = Map::ExistMap(object->GetMapId(), gridX, gridY) ? 1 : 0;
-        uint32 haveVMap = Map::ExistVMap(object->GetMapId(), gridX, gridY) ? 1 : 0;
+        uint32 haveMap = GridTerrainLoader::ExistMap(object->GetMapId(), gridX, gridY) ? 1 : 0;
+        uint32 haveVMap = GridTerrainLoader::ExistVMap(object->GetMapId(), gridX, gridY) ? 1 : 0;
         uint32 haveMMAP = MMAP::MMapFactory::createOrGetMMapMgr()->GetNavMesh(handler->GetSession()->GetPlayer()->GetMapId()) ? 1 : 0;
 
         if (haveVMap)

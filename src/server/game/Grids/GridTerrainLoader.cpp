@@ -92,6 +92,60 @@ void GridTerrainLoader::LoadMMap()
     }
 }
 
+bool GridTerrainLoader::ExistMap(uint32 mapid, int gx, int gy)
+{
+    std::string const mapFileName = Acore::StringFormat("{}maps/{:03}{:02}{:02}.map", sWorld->GetDataPath(), mapid, gx, gy);
+    std::ifstream fileStream(mapFileName, std::ios::binary);
+    if (fileStream.fail())
+    {
+        LOG_DEBUG("maps", "Map file '{}': error opening file", mapFileName);
+        return false;
+    }
+
+    map_fileheader header;
+    if (!fileStream.read(reinterpret_cast<char*>(&header), sizeof(header)))
+    {
+        LOG_DEBUG("maps", "Map file '{}': unable to read header", mapFileName);
+        return false;
+    }
+
+    if (header.mapMagic != MapMagic.asUInt || header.versionMagic != MapVersionMagic)
+    {
+        LOG_ERROR("maps", "Map file '{}' is from an incompatible map version ({:.4u} v{}), {:.4s} v{} is expected. Please pull your source, recompile tools and recreate maps using the updated mapextractor, then replace your old map files with new files.",
+            mapFileName, 4, header.mapMagic, header.versionMagic, 4, MapMagic.asChar, MapVersionMagic);
+        return false;
+    }
+
+    return true;
+}
+
+bool GridTerrainLoader::ExistVMap(uint32 mapid, int gx, int gy)
+{
+    if (VMAP::IVMapMgr* vmgr = VMAP::VMapFactory::createOrGetVMapMgr())
+    {
+        if (vmgr->isMapLoadingEnabled())
+        {
+            VMAP::LoadResult result = vmgr->existsMap((sWorld->GetDataPath() + "vmaps").c_str(), mapid, gx, gy);
+            std::string name = vmgr->getDirFileName(mapid, gx, gy);
+            switch (result)
+            {
+            case VMAP::LoadResult::Success:
+                break;
+            case VMAP::LoadResult::FileNotFound:
+                LOG_DEBUG("maps", "VMap file '{}' does not exist", (sWorld->GetDataPath() + "vmaps/" + name));
+                LOG_DEBUG("maps", "Please place VMAP files (*.vmtree and *.vmtile) in the vmap directory ({}), or correct the DataDir setting in your worldserver.conf file.", (sWorld->GetDataPath() + "vmaps/"));
+                return false;
+            case VMAP::LoadResult::VersionMismatch:
+                LOG_ERROR("maps", "VMap file '{}' couldn't be loaded", (sWorld->GetDataPath() + "vmaps/" + name));
+                LOG_ERROR("maps", "This is because the version of the VMap file and the version of this module are different, please re-extract the maps with the tools compiled with this module.");
+                return false;
+            }
+        }
+    }
+
+    return true;
+}
+
 void GridTerrainUnloader::UnloadTerrain()
 {
     // Only parent maps manage terrain data

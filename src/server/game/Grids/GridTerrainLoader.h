@@ -28,6 +28,9 @@ public:
 
     void LoadTerrain();
 
+    static bool ExistMap(uint32 mapid, int gx, int gy);
+    static bool ExistVMap(uint32 mapid, int gx, int gy);
+
 private:
     void LoadMap();
     void LoadVMap();
