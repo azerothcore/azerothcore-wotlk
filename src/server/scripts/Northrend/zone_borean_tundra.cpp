@@ -486,7 +486,7 @@ enum BerylSorcerer
     NPC_LIBRARIAN_DONATHAN                         = 25262,
     NPC_CAPTURED_BERLY_SORCERER                    = 25474,
     SPELL_FROSTBOLT                                = 9672,
-    SPELL_BLINK					   = 50648,
+    SPELL_BLINK                                    = 50648,
     SPELL_ARCANE_CHAINS                            = 45611,
     SPELL_ARCANE_CHAINS_CHARACTER_FORCE_CAST       = 45625,
     SPELL_ARCANE_CHAINS_SUMMON_CHAINED_MAGE_HUNTER = 45626,
@@ -510,7 +510,7 @@ struct npc_beryl_sorcererAI : public CreatureAI
         {
             _playerGUID.Clear();
             _chainsCast = false;
-	    __blinkUsed = false;
+            __blinkUsed = false;
         }
 
         void Reset() override
@@ -556,8 +556,8 @@ struct npc_beryl_sorcererAI : public CreatureAI
                     if (me->IsWithinMeleeRange(victim) && urand(0, 99) < 20)
                     {
                         me->CastSpell(me, SPELL_BLINK, true);
-                        _blinkUsed = true;
                     }
+                        _blinkUsed = true;
                 }
             }
 
