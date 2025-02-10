@@ -140,6 +140,7 @@ struct boss_felmyst : public BossAI
     void JustDied(Unit* killer) override
     {
         BossAI::JustDied(killer);
+        me->m_Events.KillAllEvents(false);
         Talk(YELL_DEATH);
         instance->DoRemoveAurasDueToSpellOnPlayers(SPELL_FOG_OF_CORRUPTION_CHARM);
 
