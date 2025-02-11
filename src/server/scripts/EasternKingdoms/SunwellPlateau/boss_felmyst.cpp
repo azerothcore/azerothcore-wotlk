@@ -104,9 +104,10 @@ struct boss_felmyst : public BossAI
 
     void InitializeAI() override
     {
+        me->SetReactState(REACT_PASSIVE);
+
         if (instance->GetBossState(DATA_FELMYST) == TO_BE_DECIDED)
         {
-            me->SetReactState(REACT_PASSIVE);
             me->SetStandState(UNIT_STAND_STATE_SLEEP);
             me->SetImmuneToPC(true);
             StartIntro();
@@ -114,6 +115,8 @@ struct boss_felmyst : public BossAI
         else
         {
             me->SetCanFly(true);
+            me->SetDisableGravity(true);
+            me->SendMovementFlagUpdate();
             me->GetMotionMaster()->MovePath(me->GetEntry() * 10, true);
         }
     }
@@ -123,9 +126,6 @@ struct boss_felmyst : public BossAI
         BossAI::Reset();
         me->m_Events.KillAllEvents(false);
         instance->DoRemoveAurasDueToSpellOnPlayers(SPELL_FOG_OF_CORRUPTION_CHARM);
-        me->SetCanFly(true);
-        me->SetDisableGravity(true);
-        me->SendMovementFlagUpdate();
     }
 
     void JustEngagedWith(Unit* who) override
@@ -136,7 +136,13 @@ struct boss_felmyst : public BossAI
             Talk(YELL_BERSERK);
             DoCastSelf(SPELL_BERSERK, true);
         }, 10min);
-        me->GetMotionMaster()->MovePoint(POINT_GROUND, who->GetPosition(), false, true);
+
+        me->GetMotionMaster()->Clear();
+
+        Position landPos = who->GetPosition();
+        me->m_Events.AddEventAtOffset([&, landPos] {
+            me->GetMotionMaster()->MovePoint(POINT_GROUND, landPos, false, true);
+        }, 2s);
     }
 
     void KilledUnit(Unit* victim) override
