@@ -477,7 +477,7 @@ bool GridTerrainData::isHole(int row, int col) const
 float GridTerrainData::getMinHeight(float x, float y) const
 {
     if (!_loadedHeightData || !_loadedHeightData->minHeightPlanes)
-        return -500.0f;
+        return MIN_HEIGHT;
 
     GridCoord gridCoord = Acore::ComputeGridCoordSimple(x, y);
 

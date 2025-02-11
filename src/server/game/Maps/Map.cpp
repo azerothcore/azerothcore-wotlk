@@ -1219,7 +1219,7 @@ float Map::GetGridHeight(float x, float y) const
     if (GridTerrainData* gmap = const_cast<Map*>(this)->GetGridTerrainData(x, y))
         return gmap->getHeight(x, y);
 
-    return VMAP_INVALID_HEIGHT_VALUE;
+    return INVALID_HEIGHT;
 }
 
 float Map::GetMinHeight(float x, float y) const
@@ -1227,7 +1227,7 @@ float Map::GetMinHeight(float x, float y) const
     if (GridTerrainData const* grid = const_cast<Map*>(this)->GetGridTerrainData(x, y))
         return grid->getMinHeight(x, y);
 
-    return -500.0f;
+    return MIN_HEIGHT;
 }
 
 static inline bool IsInWMOInterior(uint32 mogpFlags)
@@ -1571,8 +1571,8 @@ float Map::GetWaterLevel(float x, float y) const
 {
     if (GridTerrainData* gmap = const_cast<Map*>(this)->GetGridTerrainData(x, y))
         return gmap->getLiquidLevel(x, y);
-    else
-        return 0;
+
+    return INVALID_HEIGHT;
 }
 
 bool Map::isInLineOfSight(float x1, float y1, float z1, float x2, float y2, float z2, uint32 phasemask, LineOfSightChecks checks, VMAP::ModelIgnoreFlags ignoreFlags) const
