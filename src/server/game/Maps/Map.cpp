@@ -239,7 +239,7 @@ Map::Map(uint32 id, uint32 InstanceId, uint8 SpawnMode, Map* _parent) :
     i_mapEntry(sMapStore.LookupEntry(id)), i_spawnMode(SpawnMode), i_InstanceId(InstanceId),
     m_unloadTimer(0), m_VisibleDistance(DEFAULT_VISIBILITY_DISTANCE),
     _instanceResetPeriod(0), m_activeNonPlayersIter(m_activeNonPlayers.end()),
-    _transportsUpdateIter(_transports.end()), i_scriptLock(), _defaultLight(GetDefaultMapLight(id))
+    _transportsUpdateIter(_transports.end()), i_scriptLock(false), _defaultLight(GetDefaultMapLight(id))
 {
     m_parentMap = (_parent ? _parent : this);
     for (unsigned int idx = 0; idx < MAX_NUMBER_OF_GRIDS; ++idx)
@@ -856,11 +856,12 @@ void Map::Update(const uint32 t_diff, const uint32 s_diff, bool /*thread*/)
 
     SendObjectUpdates();
 
-    // Process necessary scripts
+    ///- Process necessary scripts
     if (!m_scriptSchedule.empty())
     {
-        std::lock_guard<std::mutex> lock(i_scriptLock);
+        i_scriptLock = true;
         ScriptsProcess();
+        i_scriptLock = false;
     }
 
     MoveAllCreaturesInMoveList();
