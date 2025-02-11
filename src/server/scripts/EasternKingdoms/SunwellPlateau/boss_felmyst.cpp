@@ -104,10 +104,18 @@ struct boss_felmyst : public BossAI
 
     void InitializeAI() override
     {
-        me->SetStandState(UNIT_STAND_STATE_SLEEP);
-        me->SetReactState(REACT_PASSIVE);
-        me->SetImmuneToPC(true);
-        StartIntro();
+        if (instance->GetBossState(DATA_FELMYST) == TO_BE_DECIDED)
+        {
+            me->SetReactState(REACT_PASSIVE);
+            me->SetStandState(UNIT_STAND_STATE_SLEEP);
+            me->SetImmuneToPC(true);
+            StartIntro();
+        }
+        else
+        {
+            me->SetCanFly(true);
+            me->GetMotionMaster()->MovePath(me->GetEntry() * 10, true);
+        }
     }
 
     void Reset() override
