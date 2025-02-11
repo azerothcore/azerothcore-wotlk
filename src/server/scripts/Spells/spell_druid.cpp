@@ -234,30 +234,30 @@ class spell_dru_omen_of_clarity : public AuraScript
                 {
                     return false;
                 }
+                
                 if (spellInfo->SpellIconID == SPELL_ICON_MASTER_SHAPESHIFTER)
                 {
                     return false;
                 }
+
                 if (spellInfo->SpellIconID == SPELL_ICON_NURTURING_INSTINCT)
                 {
                     return false;
                 }
+
                 if (spellInfo->SpellIconID == SPELL_ICON_FERAL_SWIFTNESS_PASSIVE_2A)
                 {
                     return false;
                 }
+
                 if (spellInfo->SpellIconID == SPELL_ICON_LEADER_OF_THE_PACK)
                 {
                     return false;
                 }
+
                 if (spellInfo->SpellIconID == SPELL_ICON_TREE_OF_LIFE)
                 {
                     return false;
-                }
-
-                if(!spellInfo->HasAura(SPELL_AURA_MOD_SHAPESHIFT)){
-                    LOG_INFO("module", "SPELLINFO ID {}", spellInfo->Id);
-                    LOG_INFO("module", "SPELLINFO ICON ID {}", spellInfo->SpellIconID);
                 }
 
                 return !spellInfo->HasAura(SPELL_AURA_MOD_SHAPESHIFT);
