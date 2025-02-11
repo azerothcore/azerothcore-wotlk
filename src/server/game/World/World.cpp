@@ -2678,7 +2678,6 @@ void World::ResetGuildCap()
     sGuildMgr->ResetTimes();
 }
 
-
 void World::LoadDBVersion()
 {
     QueryResult result = WorldDatabase.Query("SELECT db_version, cache_id FROM version LIMIT 1");
