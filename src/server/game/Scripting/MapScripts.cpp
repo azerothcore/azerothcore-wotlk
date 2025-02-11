@@ -58,10 +58,11 @@ void Map::ScriptsStart(ScriptMapMap const& scripts, uint32 id, Object* source, O
         sScriptMgr->IncreaseScheduledScriptsCount();
     }
     ///- If one of the effects should be immediate, launch the script execution
-    if (/*start &&*/ immedScript)
+    if (/*start &&*/ immedScript && !i_scriptLock)
     {
-        std::lock_guard<std::mutex> lock(i_scriptLock);  // Lock the mutex
-        ScriptsProcess();  // Perform the script processing
+        i_scriptLock = true;
+        ScriptsProcess();
+        i_scriptLock = false;
     }
 }
 
@@ -85,10 +86,11 @@ void Map::ScriptCommandStart(ScriptInfo const& script, uint32 delay, Object* sou
     sScriptMgr->IncreaseScheduledScriptsCount();
 
     ///- If effects should be immediate, launch the script execution
-    if (delay == 0)
+    if (delay == 0 && !i_scriptLock)
     {
-        std::lock_guard<std::mutex> lock(i_scriptLock);
+        i_scriptLock = true;
         ScriptsProcess();
+        i_scriptLock = false;
     }
 }
 
