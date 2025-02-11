@@ -234,7 +234,7 @@ class spell_dru_omen_of_clarity : public AuraScript
                 {
                     return false;
                 }
-                
+
                 if (spellInfo->SpellIconID == SPELL_ICON_MASTER_SHAPESHIFTER)
                 {
                     return false;
