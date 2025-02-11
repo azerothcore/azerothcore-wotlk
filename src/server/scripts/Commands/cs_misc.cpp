@@ -45,6 +45,7 @@
 #include "TargetedMovementGenerator.h"
 #include "Tokenize.h"
 #include "WeatherMgr.h"
+#include "WorldSessionMgr.h"
 
 /// @todo: this import is not necessary for compilation and marked as unused by the IDE
 //  however, for some reasons removing it would cause a damn linking issue
@@ -2451,7 +2452,7 @@ public:
 
         // find only player from same account if any
         if (!target)
-            if (WorldSession* session = sWorld->FindSession(accountId))
+            if (WorldSession* session = sWorldSessionMgr->FindSession(accountId))
             {
                 target = session->GetPlayer();
             }
@@ -2557,7 +2558,7 @@ public:
         // find only player from same account if any
         if (!playerTarget)
         {
-            if (WorldSession* session = sWorld->FindSession(accountId))
+            if (WorldSession* session = sWorldSessionMgr->FindSession(accountId))
             {
                 playerTarget = session->GetPlayer();
             }
@@ -2946,7 +2947,7 @@ public:
             return false;
         }
 
-        sWorld->SendGlobalMessage(WorldPackets::Misc::Playsound(soundId).Write());
+        sWorldSessionMgr->SendGlobalMessage(WorldPackets::Misc::Playsound(soundId).Write());
 
         handler->PSendSysMessage(LANG_COMMAND_PLAYED_TO_ALL, soundId);
         return true;

@@ -31,6 +31,7 @@
 #include "ObjectMgr.h"
 #include "Transport.h"
 #include "WorldPacket.h"
+#include "WorldSessionMgr.h"
 
 /// @todo: this import is not necessary for compilation and marked as unused by the IDE
 //  however, for some reasons removing it would cause a damn linking issue
@@ -143,7 +144,7 @@ bool Battlefield::Update(uint32 diff)
 {
     if (m_Timer <= diff)
     {
-        if (!IsEnabled() || (!IsWarTime() && sWorld->GetActiveSessionCount() > 3500)) // if WG is disabled or there is more than 3500 connections, switch automaticly
+        if (!IsEnabled() || (!IsWarTime() && sWorldSessionMgr->GetActiveSessionCount() > 3500)) // if WG is disabled or there is more than 3500 connections, switch automaticly
         {
             m_isActive = true;
             EndBattle(false);

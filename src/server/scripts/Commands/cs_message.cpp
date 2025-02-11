@@ -32,6 +32,7 @@ EndScriptData */
 #include "Player.h"
 #include "World.h"
 #include "WorldSession.h"
+#include "WorldSessionMgr.h"
 
 using namespace Acore::ChatCommands;
 
@@ -87,7 +88,7 @@ public:
         if (message.empty())
             return false;
 
-        sWorld->SendServerMessage(SERVER_MSG_STRING, Acore::StringFormat(handler->GetAcoreString(LANG_SYSTEMMESSAGE), message.data()));
+        sWorldSessionMgr->SendServerMessage(SERVER_MSG_STRING, Acore::StringFormat(handler->GetAcoreString(LANG_SYSTEMMESSAGE), message.data()));
         return true;
     }
 
@@ -112,7 +113,7 @@ public:
 
         WorldPacket data(SMSG_NOTIFICATION, (str.size() + 1));
         data << str;
-        sWorld->SendGlobalMessage(&data);
+        sWorldSessionMgr->SendGlobalMessage(&data);
 
         return true;
     }
@@ -128,7 +129,7 @@ public:
 
         WorldPacket data(SMSG_NOTIFICATION, (str.size() + 1));
         data << str;
-        sWorld->SendGlobalGMMessage(&data);
+        sWorldSessionMgr->SendGlobalGMMessage(&data);
 
         return true;
     }
