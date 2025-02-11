@@ -1131,23 +1131,20 @@ GridTerrainData* Map::GetGridTerrainData(float x, float y)
 
 float Map::GetWaterOrGroundLevel(uint32 phasemask, float x, float y, float z, float* ground /*= nullptr*/, bool /*swim = false*/, float collisionHeight) const
 {
-    if (const_cast<Map*>(this)->GetGridTerrainData(x, y))
-    {
-        // we need ground level (including grid height version) for proper return water level in point
-        float ground_z = GetHeight(phasemask, x, y, z + Z_OFFSET_FIND_HEIGHT, true, 50.0f);
-        if (ground)
-            *ground = ground_z;
+    // we need ground level (including grid height version) for proper return water level in point
+    float ground_z = GetHeight(phasemask, x, y, z + Z_OFFSET_FIND_HEIGHT, true, 50.0f);
+    if (ground)
+        *ground = ground_z;
 
-        LiquidData const& liquidData = const_cast<Map*>(this)->GetLiquidData(phasemask, x, y, ground_z, collisionHeight, MAP_ALL_LIQUIDS);
-        switch (liquidData.Status)
-        {
-            case LIQUID_MAP_ABOVE_WATER:
-                return std::max<float>(liquidData.Level, ground_z);
-            case LIQUID_MAP_NO_WATER:
-                return ground_z;
-            default:
-                return liquidData.Level;
-        }
+    LiquidData const& liquidData = const_cast<Map*>(this)->GetLiquidData(phasemask, x, y, ground_z, collisionHeight, MAP_ALL_LIQUIDS);
+    switch (liquidData.Status)
+    {
+        case LIQUID_MAP_ABOVE_WATER:
+            return std::max<float>(liquidData.Level, ground_z);
+        case LIQUID_MAP_NO_WATER:
+            return ground_z;
+        default:
+            return liquidData.Level;
     }
 
     return VMAP_INVALID_HEIGHT_VALUE;
