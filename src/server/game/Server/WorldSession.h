@@ -372,7 +372,7 @@ public:
     void SendAreaTriggerMessage(std::string_view str);
 
     template<typename... Args>
-    void SendAreaTriggerMessage(std::string fmt, Args&&... args)
+    void SendAreaTriggerMessage(char const* fmt, Args&&... args)
     {
         if (!m_playerLoading)
             SendAreaTriggerMessage(Acore::StringFormat(fmt, std::forward<Args>(args)...));
@@ -466,7 +466,7 @@ public:
 
     void SendTradeStatus(TradeStatus status);
     void SendUpdateTrade(bool trader_data = true);
-    void SendCancelTrade();
+    void SendCancelTrade(TradeStatus status);
 
     void SendPetitionQueryOpcode(ObjectGuid petitionguid);
 

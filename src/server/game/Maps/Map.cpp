@@ -3724,14 +3724,14 @@ void Map::RemoveOldCorpses()
     }
 }
 
-void Map::ScheduleCreatureRespawn(ObjectGuid creatureGuid, Milliseconds respawnTimer)
+void Map::ScheduleCreatureRespawn(ObjectGuid creatureGuid, Milliseconds respawnTimer, Position pos)
 {
-    _creatureRespawnScheduler.Schedule(respawnTimer, [this, creatureGuid](TaskContext)
+    _creatureRespawnScheduler.Schedule(respawnTimer, [this, creatureGuid, pos](TaskContext)
     {
         if (Creature* creature = GetCreature(creatureGuid))
-        {
             creature->Respawn();
-        }
+        else
+            SummonCreature(creatureGuid.GetEntry(), pos);
     });
 }
 

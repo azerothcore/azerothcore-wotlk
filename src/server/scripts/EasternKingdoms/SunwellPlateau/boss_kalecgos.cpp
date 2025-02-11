@@ -106,12 +106,6 @@ struct boss_kalecgos : public BossAI
         return true;
     }
 
-    void JustReachedHome() override
-    {
-        BossAI::JustReachedHome();
-        me->SetVisible(true);
-    }
-
     void Reset() override
     {
         BossAI::Reset();
@@ -175,7 +169,6 @@ struct boss_kalecgos : public BossAI
             }, 4s);
 
             me->m_Events.AddEventAtOffset([&] {
-                me->SetVisible(false);
                 EnterEvadeMode();
             }, 9s);
 
@@ -251,10 +244,11 @@ struct boss_kalecgos : public BossAI
             DoCastAOE(SPELL_SPECTRAL_BLAST);
         }, 15s, 25s);
 
-        me->m_Events.AddEventAtOffset([&] {
+        scheduler.Schedule(16s, [this](TaskContext)
+        {
             me->SummonCreature(NPC_KALEC, 1702.21f, 931.7f, -74.56f, 5.07f, TEMPSUMMON_MANUAL_DESPAWN);
             me->SummonCreature(NPC_SATHROVARR, 1704.62f, 927.78f, -73.9f, 2.0f, TEMPSUMMON_MANUAL_DESPAWN);
-        }, 16s);
+        });
 
         me->SetStandState(UNIT_STAND_STATE_STAND);
         Talk(SAY_EVIL_AGGRO);
@@ -282,10 +276,7 @@ enum Kalec
 
 struct boss_kalec : public ScriptedAI
 {
-    boss_kalec(Creature* creature) : ScriptedAI(creature)
-    {
-        SetInvincibility(true);
-    }
+    boss_kalec(Creature* creature) : ScriptedAI(creature) { }
 
     void Reset() override
     {
