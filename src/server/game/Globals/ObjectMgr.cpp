@@ -9275,15 +9275,16 @@ int ObjectMgr::LoadReferenceVendor(int32 vendor, int32 item, std::set<uint32>* s
         else
         {
             int32  maxcount     = fields[1].Get<uint8>();
-            uint32 incrtime     = fields[2].Get<uint32>();
-            uint32 ExtendedCost = fields[3].Get<uint32>();
+            int32  buycount     = fields[2].Get<uint8>();
+            uint32 incrtime     = fields[3].Get<uint32>();
+            uint32 ExtendedCost = fields[4].Get<uint32>();
 
-            if (!IsVendorItemValid(vendor, item_id, maxcount, incrtime, ExtendedCost, nullptr, skip_vendors))
+            if (!IsVendorItemValid(vendor, item_id, maxcount, buycount, incrtime, ExtendedCost, nullptr, skip_vendors))
                 continue;
 
             VendorItemData& vList = _cacheVendorItemStore[vendor];
 
-            vList.AddItem(item_id, maxcount, incrtime, ExtendedCost);
+            vList.AddItem(item_id, maxcount, buycount, incrtime, ExtendedCost);
             ++count;
         }
     } while (result->NextRow());
@@ -9302,7 +9303,7 @@ void ObjectMgr::LoadVendors()
 
     std::set<uint32> skip_vendors;
 
-    QueryResult result = WorldDatabase.Query("SELECT entry, item, maxcount, incrtime, ExtendedCost FROM npc_vendor ORDER BY entry, slot ASC, item, ExtendedCost");
+    QueryResult result = WorldDatabase.Query("SELECT entry, item, maxcount, buycount, incrtime, ExtendedCost FROM npc_vendor ORDER BY entry, slot ASC, item, ExtendedCost");
     if (!result)
     {
         LOG_INFO("server.loading", " ");
@@ -9325,15 +9326,16 @@ void ObjectMgr::LoadVendors()
         else
         {
             uint32 maxcount     = fields[2].Get<uint8>();
-            uint32 incrtime     = fields[3].Get<uint32>();
-            uint32 ExtendedCost = fields[4].Get<uint32>();
+            uint32 buycount     = fields[3].Get<uint8>();
+            uint32 incrtime     = fields[4].Get<uint32>();
+            uint32 ExtendedCost = fields[5].Get<uint32>();
 
-            if (!IsVendorItemValid(entry, item_id, maxcount, incrtime, ExtendedCost, nullptr, &skip_vendors))
+            if (!IsVendorItemValid(entry, item_id, maxcount, buycount, incrtime, ExtendedCost, nullptr, &skip_vendors))
                 continue;
 
             VendorItemData& vList = _cacheVendorItemStore[entry];
 
-            vList.AddItem(item_id, maxcount, incrtime, ExtendedCost);
+            vList.AddItem(item_id, maxcount, buycount, incrtime, ExtendedCost);
             ++count;
         }
     } while (result->NextRow());
@@ -9451,10 +9453,10 @@ void ObjectMgr::LoadGossipMenuItems()
     LOG_INFO("server.loading", " ");
 }
 
-void ObjectMgr::AddVendorItem(uint32 entry, uint32 item, int32 maxcount, uint32 incrtime, uint32 extendedCost, bool persist /*= true*/)
+void ObjectMgr::AddVendorItem(uint32 entry, uint32 item, int32 maxcount, int32 buycount, uint32 incrtime, uint32 extendedCost, bool persist /*= true*/)
 {
     VendorItemData& vList = _cacheVendorItemStore[entry];
-    vList.AddItem(item, maxcount, incrtime, extendedCost);
+    vList.AddItem(item, maxcount, buycount, incrtime, extendedCost);
 
     if (persist)
     {
@@ -9463,8 +9465,9 @@ void ObjectMgr::AddVendorItem(uint32 entry, uint32 item, int32 maxcount, uint32 
         stmt->SetData(0, entry);
         stmt->SetData(1, item);
         stmt->SetData(2, maxcount);
-        stmt->SetData(3, incrtime);
-        stmt->SetData(4, extendedCost);
+        stmt->SetData(3, buycount);
+        stmt->SetData(4, incrtime);
+        stmt->SetData(5, extendedCost);
 
         WorldDatabase.Execute(stmt);
     }
@@ -9492,7 +9495,7 @@ bool ObjectMgr::RemoveVendorItem(uint32 entry, uint32 item, bool persist /*= tru
     return true;
 }
 
-bool ObjectMgr::IsVendorItemValid(uint32 vendor_entry, uint32 item_id, int32 maxcount, uint32 incrtime, uint32 ExtendedCost, Player* player, std::set<uint32>* /*skip_vendors*/, uint32 /*ORnpcflag*/) const
+bool ObjectMgr::IsVendorItemValid(uint32 vendor_entry, uint32 item_id, int32 maxcount, int32 /*buycount*/ uint32 incrtime, uint32 ExtendedCost, Player* player, std::set<uint32>* /*skip_vendors*/, uint32 /*ORnpcflag*/) const
 {
     /*
     CreatureTemplate const* cInfo = sObjectMgr->GetCreatureTemplate(vendor_entry);
