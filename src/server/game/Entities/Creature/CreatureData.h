@@ -452,11 +452,12 @@ typedef std::unordered_map<uint32, CreatureAddon> CreatureAddonContainer;
 // Vendors
 struct VendorItem
 {
-    VendorItem(uint32 _item, int32 _maxcount, uint32 _incrtime, uint32 _ExtendedCost)
-        : item(_item), maxcount(_maxcount), incrtime(_incrtime), ExtendedCost(_ExtendedCost) {}
+    VendorItem(uint32 _item, int32 _maxcount, int32 _buycount, uint32 _incrtime, uint32 _ExtendedCost)
+        : item(_item), maxcount(_maxcount), buycount(_buycount), incrtime(_incrtime), ExtendedCost(_ExtendedCost) {}
 
     uint32 item;
-    uint32  maxcount;                                       // 0 for infinity item amount
+    uint32 maxcount;                                        // 0 for infinity item amount
+    uint32 buycount;                                        // 0 to use fallback from item_template
     uint32 incrtime;                                        // time for restore items amount if maxcount != 0
     uint32 ExtendedCost;
 
@@ -478,9 +479,9 @@ struct VendorItemData
     }
     [[nodiscard]] bool Empty() const { return m_items.empty(); }
     [[nodiscard]] uint8 GetItemCount() const { return m_items.size(); }
-    void AddItem(uint32 item, int32 maxcount, uint32 ptime, uint32 ExtendedCost)
+    void AddItem(uint32 item, int32 maxcount, int32 buycount, uint32 ptime, uint32 ExtendedCost)
     {
-        m_items.push_back(new VendorItem(item, maxcount, ptime, ExtendedCost));
+        m_items.push_back(new VendorItem(item, maxcount, buycount, ptime, ExtendedCost));
     }
     bool RemoveItem(uint32 item_id);
     [[nodiscard]] VendorItem const* FindItemCostPair(uint32 item_id, uint32 extendedCost) const;
