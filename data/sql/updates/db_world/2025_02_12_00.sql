@@ -1,3 +1,4 @@
+-- DB update 2025_02_10_01 -> 2025_02_12_00
 DROP TABLE IF EXISTS `arena_season_reward_group`;
 CREATE TABLE `arena_season_reward_group` (
     `id` INT AUTO_INCREMENT PRIMARY KEY,
