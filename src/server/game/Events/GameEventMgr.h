@@ -86,6 +86,7 @@ struct NPCVendorEntry
     uint32 Entry;                       // creature entry
     uint32 Item;                        // item id
     int32  MaxCount;                    // 0 for infinite
+    int32  BuyCount;                    // 0 to use fallback from item_template
     uint32 Incrtime;                    // time for restore items amount if maxcount != 0
     uint32 ExtendedCost;
 };
