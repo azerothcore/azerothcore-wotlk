@@ -594,6 +594,9 @@ public:
     void DeleteRespawnTimes();
     [[nodiscard]] time_t GetInstanceResetPeriod() const { return _instanceResetPeriod; }
 
+    void UpdatePlayerZoneStats(uint32 oldZone, uint32 newZone);
+    void ApplyDynamicModeRespawnScaling(WorldObject const* obj, uint32& respawnDelay) const;
+
     TaskScheduler _creatureRespawnScheduler;
 
     void ScheduleCreatureRespawn(ObjectGuid /*creatureGuid*/, Milliseconds /*respawnTimer*/, Position pos = Position());
@@ -779,6 +782,8 @@ private:
 
     std::unordered_map<ObjectGuid::LowType /*dbGUID*/, time_t> _creatureRespawnTimes;
     std::unordered_map<ObjectGuid::LowType /*dbGUID*/, time_t> _goRespawnTimes;
+
+    std::unordered_map<uint32, uint32> _zonePlayerCountMap;
 
     ZoneDynamicInfoMap _zoneDynamicInfo;
     uint32 _defaultLight;

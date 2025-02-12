@@ -67,6 +67,7 @@
 #    PLAYER DUMP
 #    CUSTOM
 #    DEBUG
+#    DYNAMIC RESPAWN SETTINGS
 #
 ###################################################################################################
 
@@ -4463,6 +4464,46 @@ Debug.Battleground = 0
 #                 1 - (Enabled)
 
 Debug.Arena = 0
+
+#
+###################################################################################################
+
+###################################################################################################
+# DYNAMIC RESPAWN SETTINGS
+#
+#
+#    Respawn.DynamicRateCreature
+#        Description: The rate at which the respawn time is adjusted for high player counts in a zone (for creatures).
+#                     Up to this number of players, the respawn rate is unchanged.
+#                     Does not affect instanced creatures, bosses or quest givers.
+#                     At double this number in players, you get twice as many respawns, at three times this number, three times the respawns, and so forth.
+#        Default:     1 (Disabled)
+
+Respawn.DynamicRateCreature = 1
+
+#
+#    Respawn.DynamicMinimumCreature
+#        Description: The minimum respawn time for a creature under dynamic scaling.
+#        Default:     10 - (10 seconds)
+
+Respawn.DynamicMinimumCreature = 10
+
+#
+#    Respawn.DynamicRateGameObject
+#        Description: The rate at which the respawn time is adjusted for high player counts in a zone (for gameobjects).
+#                     Up to this number of players, the respawn rate is unchanged.
+#                     Does not affect instanced objects or quest givers.
+#                     At double this number in players, you get twice as many respawns, at three times this number, three times the respawns, and so forth.
+#        Default:     1 (Disabled)
+
+Respawn.DynamicRateGameObject = 1
+
+#
+#    Respawn.DynamicMinimumGameObject
+#        Description: The minimum respawn time for a gameobject under dynamic scaling.
+#        Default:     10 - (10 seconds)
+
+Respawn.DynamicMinimumGameObject = 10
 
 #
 ###################################################################################################
