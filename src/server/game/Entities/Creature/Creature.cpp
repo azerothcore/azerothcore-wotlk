@@ -417,6 +417,7 @@ void Creature::RemoveCorpse(bool setSpawnTime, bool skipVisibility)
     // Should get removed later, just keep "compatibility" with scripts
     if (setSpawnTime)
     {
+        GetMap()->ApplyDynamicModeRespawnScaling(this, respawnDelay);
         m_respawnTime = GameTime::GetGameTime().count() + respawnDelay;
         //SaveRespawnTime();
     }

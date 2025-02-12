@@ -897,6 +897,7 @@ void GameObject::Update(uint32 diff)
                     return;
                 }
 
+                GetMap()->ApplyDynamicModeRespawnScaling(this, m_respawnDelayTime);
                 m_respawnTime = GameTime::GetGameTime().count() + m_respawnDelayTime;
 
                 // if option not set then object will be saved at grid unload
