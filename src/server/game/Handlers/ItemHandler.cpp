@@ -1098,6 +1098,7 @@ void WorldSession::SendListInventory(ObjectGuid vendorGuid, uint32 vendorEntry)
 
                 // Items sold out are not displayed in list
                 uint32 leftInStock = !item->maxcount ? 0xFFFFFFFF : vendor->GetVendorItemCurrentCount(item);
+                uint32 quantity = !item->buycount ? itemTemplate->BuyCount : item->buycount;
                 if (!_player->IsGameMaster() && !leftInStock)
                 {
                     continue;
@@ -1119,7 +1120,7 @@ void WorldSession::SendListInventory(ObjectGuid vendorGuid, uint32 vendorEntry)
                 data << int32(leftInStock);
                 data << uint32(price);
                 data << uint32(itemTemplate->MaxDurability);
-                data << uint32(itemTemplate->BuyCount);
+                data << uint32(quantity);
                 data << uint32(item->ExtendedCost);
 
                 if (++count >= MAX_VENDOR_ITEMS)
