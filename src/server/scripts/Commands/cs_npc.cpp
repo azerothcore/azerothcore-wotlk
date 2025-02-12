@@ -260,7 +260,7 @@ public:
     }
 
     //add item in vendorlist
-    static bool HandleNpcAddVendorItemCommand(ChatHandler* handler, ItemTemplate const* item, Optional<uint32> mc, Optional<uint32> it, Optional<uint32> ec, Optional<bool> addMulti)
+    static bool HandleNpcAddVendorItemCommand(ChatHandler* handler, ItemTemplate const* item, Optional<uint32> mc, Optional<uint32> bc, Optional<uint32> it, Optional<uint32> ec, Optional<bool> addMulti)
     {
         if (!item)
         {
@@ -277,19 +277,20 @@ public:
 
         uint32 itemId = item->ItemId;
         uint32 maxcount = mc.value_or(0);
+        uint32 buycount = bc.value_or(0);
         uint32 incrtime = it.value_or(0);
         uint32 extendedcost = ec.value_or(0);
         uint32 vendor_entry = addMulti.value_or(false) ? handler->GetSession()->GetCurrentVendor() : vendor->GetEntry();
 
-        if (!sObjectMgr->IsVendorItemValid(vendor_entry, itemId, maxcount, incrtime, extendedcost, handler->GetSession()->GetPlayer()))
+        if (!sObjectMgr->IsVendorItemValid(vendor_entry, itemId, maxcount, buycount, incrtime, extendedcost, handler->GetSession()->GetPlayer()))
         {
             handler->SetSentErrorMessage(true);
             return false;
         }
 
-        sObjectMgr->AddVendorItem(vendor_entry, itemId, maxcount, incrtime, extendedcost);
+        sObjectMgr->AddVendorItem(vendor_entry, itemId, maxcount, buycount, incrtime, extendedcost);
 
-        handler->PSendSysMessage(LANG_ITEM_ADDED_TO_LIST, itemId, item->Name1, maxcount, incrtime, extendedcost);
+        handler->PSendSysMessage(LANG_ITEM_ADDED_TO_LIST, itemId, item->Name1, maxcount, buycount, incrtime, extendedcost);
         return true;
     }
 
