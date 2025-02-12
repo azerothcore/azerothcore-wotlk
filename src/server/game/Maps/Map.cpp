@@ -2689,7 +2689,7 @@ void Map::ApplyDynamicModeRespawnScaling(WorldObject const* obj, uint32& respawn
     if (respawnDelay <= timeMinimum)
         return;
 
-    respawnDelay = std::max<uint32>(ceil(respawnDelay * adjustFactor), timeMinimum);
+    respawnDelay = std::max<uint32>(std::ceil(respawnDelay * adjustFactor), timeMinimum);
 }
 
 void Map::DelayedUpdate(const uint32 t_diff)
