@@ -1878,7 +1878,7 @@ public:
             OnSpellHit(caster, spell);
         }
 
-        void DamageDealt(Unit* victim, uint32& damage, DamageEffectType damageType) override
+        void DamageDealt(Unit* victim, uint32& damage, DamageEffectType damageType, SpellSchoolMask damageSchoolMask) override
         {
             //Unbridled Wrath
             if ((GetSpec() == BOT_SPEC_WARRIOR_FURY || GetSpec() == BOT_SPEC_WARRIOR_ARMS) &&
@@ -1888,7 +1888,7 @@ public:
                 if (roll_chance_f(me->GetPPMProcChance(me->GetFloatValue(UNIT_FIELD_BASEATTACKTIME), 15.f, nullptr)))
                     me->CastSpell(me, UNBRIDLED_WRATH_EFFECT, true);
             }
-            bot_ai::DamageDealt(victim, damage, damageType);
+            bot_ai::DamageDealt(victim, damage, damageType, damageSchoolMask);
         }
 
         void DamageTaken(Unit* u, uint32& /*damage*/, DamageEffectType /*damageType*/, SpellSchoolMask /*schoolMask*/) override

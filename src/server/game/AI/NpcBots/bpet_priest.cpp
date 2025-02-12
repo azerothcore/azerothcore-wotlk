@@ -117,13 +117,13 @@ public:
         {
         }
 
-        void DamageDealt(Unit* victim, uint32& damage, DamageEffectType damageType) override
+        void DamageDealt(Unit* victim, uint32& damage, DamageEffectType damageType, SpellSchoolMask damageSchoolMask) override
         {
             //Handled by spell scripts
             //if (damage && victim && damageType == DIRECT_DAMAGE)
             //    victim->CastSpell(petOwner, MANA_LEECH_PROC, true);
 
-            bot_pet_ai::DamageDealt(victim, damage, damageType);
+            bot_pet_ai::DamageDealt(victim, damage, damageType, damageSchoolMask);
         }
 
         void DamageTaken(Unit* u, uint32& damage, DamageEffectType /*damageType*/, SpellSchoolMask /*schoolMask*/) override

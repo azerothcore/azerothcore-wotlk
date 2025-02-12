@@ -16488,7 +16488,7 @@ void bot_ai::AttackStart(Unit* /*u*/)
 {
 }
 
-void bot_ai::DamageDealt(Unit* victim, uint32& damage, DamageEffectType /*damageType*/)
+void bot_ai::DamageDealt(Unit* victim, uint32& damage, DamageEffectType /*damageType*/, SpellSchoolMask /*damageSchoolMask*/)
 {
     if (victim == me)
         return;

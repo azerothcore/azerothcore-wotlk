@@ -31,7 +31,7 @@ class bot_pet_ai : public CreatureAI
         void AttackStart(Unit* u) override;
         //virtual void JustEngagedWith(Unit* u) override;
         void MoveInLineOfSight(Unit* /*u*/) override {}
-        void DamageDealt(Unit* victim, uint32& damage, DamageEffectType damageType) override;
+        void DamageDealt(Unit* victim, uint32& damage, DamageEffectType damageType, SpellSchoolMask damageSchoolMask) override;
         void DamageTaken(Unit* /*attacker*/, uint32& /*damage*/, DamageEffectType /*damageType*/, SpellSchoolMask /*schoolMask*/) override { }
         //void ReceiveEmote(Player* player, uint32 emote);
         void EnterEvadeMode(EvadeReason/* why*/ = EVADE_REASON_OTHER) override { }
