@@ -279,8 +279,9 @@ void GameEventMgr::LoadEventVendors()
         NPCVendorEntry newEntry;
         newEntry.Item = fields[2].Get<uint32>();
         newEntry.MaxCount = fields[3].Get<uint32>();
-        newEntry.Incrtime = fields[4].Get<uint32>();
-        newEntry.ExtendedCost = fields[5].Get<uint32>();
+        newEntry.BuyCount = fields[4].Get<uint32>();
+        newEntry.Incrtime = fields[5].Get<uint32>();
+        newEntry.ExtendedCost = fields[6].Get<uint32>();
 
         // Get the event NPC flag for validity check
         uint32 event_npc_flag = 0;
@@ -300,7 +301,7 @@ void GameEventMgr::LoadEventVendors()
             newEntry.Entry = data->id1;
 
         // Validate vendor item
-        if (!sObjectMgr->IsVendorItemValid(newEntry.Entry, newEntry.Item, newEntry.MaxCount, newEntry.Incrtime, newEntry.ExtendedCost, nullptr, nullptr, event_npc_flag))
+        if (!sObjectMgr->IsVendorItemValid(newEntry.Entry, newEntry.Item, newEntry.MaxCount, newEntry.BuyCount, newEntry.Incrtime, newEntry.ExtendedCost, nullptr, nullptr, event_npc_flag))
         {
             LOG_ERROR("sql.sql", "Table `game_event_npc_vendor` has invalid item ({}) for guid ({}) for event ({}), skipped.",
                 newEntry.Item, newEntry.Entry, eventId);
@@ -309,7 +310,7 @@ void GameEventMgr::LoadEventVendors()
 
         // Add the item to the vendor if event is active
         if (IsEventActive(eventId))
-            sObjectMgr->AddVendorItem(newEntry.Entry, newEntry.Item, newEntry.MaxCount, newEntry.Incrtime, newEntry.ExtendedCost, false);
+            sObjectMgr->AddVendorItem(newEntry.Entry, newEntry.Item, newEntry.MaxCount, newEntry.BuyCount, newEntry.Incrtime, newEntry.ExtendedCost, false);
 
         vendors.push_back(newEntry);
 
@@ -1349,7 +1350,7 @@ void GameEventMgr::UpdateEventNPCVendor(uint16 eventId, bool activate)
     for (NPCVendorList::iterator itr = _gameEventVendors[eventId].begin(); itr != _gameEventVendors[eventId].end(); ++itr)
     {
         if (activate)
-            sObjectMgr->AddVendorItem(itr->Entry, itr->Item, itr->MaxCount, itr->Incrtime, itr->ExtendedCost, false);
+            sObjectMgr->AddVendorItem(itr->Entry, itr->Item, itr->MaxCount, itr->BuyCount, itr->Incrtime, itr->ExtendedCost, false);
         else
             sObjectMgr->RemoveVendorItem(itr->Entry, itr->Item, false);
     }
