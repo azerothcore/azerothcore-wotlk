@@ -105,6 +105,14 @@ struct boss_sacrolash : public BossAI
         }
     }
 
+    void DamageDealt(Unit* victim, uint32& /*damage*/, DamageEffectType, SpellSchoolMask schoolMask) override
+    {
+        if (schoolMask & SPELL_SCHOOL_SHADOW)
+            victim->CastSpell(victim, SPELL_DARK_TOUCHED, true, nullptr, nullptr, me->GetGUID());
+        else if (schoolMask & SPELL_SCHOOL_FIRE)
+            victim->CastSpell(victim, SPELL_FLAME_TOUCHED, true, nullptr, nullptr, me->GetGUID());
+    }
+
     void EnterEvadeMode(EvadeReason why) override
     {
         BossAI::EnterEvadeMode(why);
@@ -217,6 +225,14 @@ struct boss_alythess : public BossAI
         }
     }
 
+    void DamageDealt(Unit* victim, uint32& /*damage*/, DamageEffectType, SpellSchoolMask schoolMask) override
+    {
+        if (schoolMask & SPELL_SCHOOL_FIRE)
+            victim->CastSpell(victim, SPELL_DARK_TOUCHED, true, nullptr, nullptr, me->GetGUID());
+        else if (schoolMask & SPELL_SCHOOL_SHADOW)
+            victim->CastSpell(victim, SPELL_FLAME_TOUCHED, true, nullptr, nullptr, me->GetGUID());
+    }
+
     void EnterEvadeMode(EvadeReason why) override
     {
         BossAI::EnterEvadeMode(why);
@@ -285,33 +301,6 @@ struct boss_alythess : public BossAI
 
     private:
         bool _isSisterDead;
-};
-
-class spell_eredar_twins_apply_touch : public SpellScript
-{
-    PrepareSpellScript(spell_eredar_twins_apply_touch);
-
-public:
-    spell_eredar_twins_apply_touch(uint32 touchSpell) : SpellScript(), _touchSpell(touchSpell) { }
-
-    bool Validate(SpellInfo const* /*spellInfo*/) override
-    {
-        return ValidateSpellInfo({ _touchSpell });
-    }
-
-    void HandleApplyTouch()
-    {
-        if (Player* target = GetHitPlayer())
-            target->CastSpell(target, _touchSpell, true);
-    }
-
-    void Register() override
-    {
-        AfterHit += SpellHitFn(spell_eredar_twins_apply_touch::HandleApplyTouch);
-    }
-
-private:
-    uint32 _touchSpell;
 };
 
 class spell_eredar_twins_handle_touch : public SpellScript
@@ -400,8 +389,6 @@ void AddSC_boss_eredar_twins()
 {
     RegisterSunwellPlateauCreatureAI(boss_sacrolash);
     RegisterSunwellPlateauCreatureAI(boss_alythess);
-    RegisterSpellScriptWithArgs(spell_eredar_twins_apply_touch, "spell_eredar_twins_apply_dark_touched", SPELL_DARK_TOUCHED);
-    RegisterSpellScriptWithArgs(spell_eredar_twins_apply_touch, "spell_eredar_twins_apply_flame_touched", SPELL_FLAME_TOUCHED);
     RegisterSpellScript(spell_eredar_twins_handle_touch);
     RegisterSpellScript(spell_eredar_twins_blaze);
     new at_sunwell_eredar_twins();
