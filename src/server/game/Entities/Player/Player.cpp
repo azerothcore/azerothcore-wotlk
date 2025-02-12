@@ -10685,7 +10685,7 @@ inline bool Player::_StoreOrEquipNewItem(uint32 vendorslot, uint32 item, uint8 c
     ItemPosCountVec vDest;
     uint16 uiDest = 0;
     InventoryResult msg = bStore ?
-                          CanStoreNewItem(bag, slot, vDest, item, pProto->BuyCount * count) :
+                          CanStoreNewItem(bag, slot, vDest, item, (!crItem->buycount ? pProto->BuyCount : crItem->buycount) * count) :
                           CanEquipNewItem(slot, uiDest, item, false);
     if (msg != EQUIP_ERR_OK)
     {
@@ -10716,7 +10716,7 @@ inline bool Player::_StoreOrEquipNewItem(uint32 vendorslot, uint32 item, uint8 c
     Item* it = bStore ? StoreNewItem(vDest, item, true) : EquipNewItem(uiDest, item, true);
     if (it)
     {
-        uint32 new_count = pVendor->UpdateVendorItemCurrentCount(crItem, pProto->BuyCount * count);
+        uint32 new_count = pVendor->UpdateVendorItemCurrentCount(crItem, (!crItem->buycount ? pProto->BuyCount : crItem->buycount) * count);
 
         WorldPacket data(SMSG_BUY_ITEM, (8 + 4 + 4 + 4));
         data << pVendor->GetGUID();
@@ -10724,7 +10724,7 @@ inline bool Player::_StoreOrEquipNewItem(uint32 vendorslot, uint32 item, uint8 c
         data << int32(crItem->maxcount > 0 ? new_count : 0xFFFFFFFF);
         data << uint32(count);
         GetSession()->SendPacket(&data);
-        SendNewItem(it, pProto->BuyCount * count, true, false, false);
+        SendNewItem(it, (!crItem->buycount ? pProto->BuyCount : crItem->buycount) * count, true, false, false);
 
         if (!bStore)
             AutoUnequipOffhandIfNeed();
@@ -10822,7 +10822,7 @@ bool Player::BuyItemFromVendorSlot(ObjectGuid vendorguid, uint32 vendorslot, uin
     // check current item amount if it limited
     if (crItem->maxcount != 0)
     {
-        if (creature->GetVendorItemCurrentCount(crItem) < pProto->BuyCount * count)
+        if (creature->GetVendorItemCurrentCount(crItem) < (!crItem->buycount ? pProto->BuyCount : crItem->buycount) * count)
         {
             SendBuyError(BUY_ERR_ITEM_ALREADY_SOLD, creature, item, 0);
             return false;
@@ -10905,7 +10905,7 @@ bool Player::BuyItemFromVendorSlot(ObjectGuid vendorguid, uint32 vendorslot, uin
     }
     else if (IsEquipmentPos(bag, slot))
     {
-        if (pProto->BuyCount * count != 1)
+        if ((!crItem->buycount ? pProto->BuyCount : crItem->buycount) * count != 1)
         {
             SendEquipError(EQUIP_ERR_ITEM_CANT_BE_EQUIPPED, nullptr, nullptr);
             return false;
