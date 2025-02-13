@@ -79,7 +79,10 @@ public:
                     scheduler.Schedule(1min, 1min, DATA_KALECGOS,[this](TaskContext)
                     {
                         if (Creature* kalecgos = instance->SummonCreature(NPC_KALECGOS, KalecgosSpawnPos))
+                        {
                             kalecgos->GetMotionMaster()->MovePath(PATH_KALECGOS_FLIGHT, false);
+                            kalecgos->AI()->Talk(SAY_KALECGOS_SPAWN);
+                        }
                     });
                 }
         }
