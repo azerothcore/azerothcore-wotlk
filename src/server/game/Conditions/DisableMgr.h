@@ -20,6 +20,7 @@
 
 #include "Define.h"
 #include "Map.h"
+
 class Unit;
 
 enum DisableType
@@ -68,19 +69,19 @@ public:
     static DisableMgr* instance();
 
     void LoadDisables();
-    void AddDisable(DisableType type, uint32 entry, uint8 flags, std::string param0, std::string param1);
+    void AddDisable(DisableType type, uint32 entry, uint8 flags, std::string const& param0, std::string const& param1);
     bool HandleDisableType(DisableType type, uint32 entry, uint8 flags, std::string const& params_0, std::string const& params_1, DisableData& data);
     static bool IsDisabledFor(DisableType type, uint32 entry, Unit const* unit, uint8 flags = 0);
     void CheckQuestDisables();
     static bool IsVMAPDisabledFor(uint32 entry, uint8 flags);
     static bool IsPathfindingEnabled(Map const* map);
 
-private:
     // single disables here with optional data
-    typedef std::map<uint32, DisableData> DisableTypeMap;
+    typedef std::unordered_map<uint32, DisableData> DisableTypeMap;
     // global disable map by source
-    typedef std::map<DisableType, DisableTypeMap> DisableMap;
+    typedef std::array<DisableTypeMap, MAX_DISABLE_TYPES> DisableMap;
 
+private:
     static DisableMap m_DisableMap;
 };
 
