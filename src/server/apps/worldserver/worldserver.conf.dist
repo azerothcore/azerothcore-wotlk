@@ -4475,7 +4475,7 @@ Debug.Arena = 0
 #    Respawn.DynamicRateCreature
 #        Description: Controls how creature respawn times adjust based on player count in a zone.
 #                     The respawn time is unchanged up to the configured number of players.
-#                     As player count exceeds this value, respawn times decrease proportionally 
+#                     As player count exceeds this value, respawn times decrease proportionally
 #                     (e.g., at double the player count, respawn times are halved; at triple the player count, respawns happen three times as fast).
 #                     Does not affect instanced creatures, bosses, or quest givers.
 #                     Formula: adjustFactor = rate / playerCount
@@ -4495,7 +4495,7 @@ Respawn.DynamicMinimumCreature = 10
 #    Respawn.DynamicRateGameObject
 #        Description: Controls how gameobject respawn times adjust based on player count in a zone.
 #                     The respawn time is unchanged up to the configured number of players.
-#                     As player count exceeds this value, respawn times decrease proportionally 
+#                     As player count exceeds this value, respawn times decrease proportionally
 #                     (e.g., at double the player count, respawn times are halved; at triple the player count, respawns happen three times as fast).
 #                     Does not affect instanced objects or quest givers.
 #                     Formula: adjustFactor = rate / playerCount
