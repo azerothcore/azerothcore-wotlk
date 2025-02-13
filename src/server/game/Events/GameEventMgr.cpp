@@ -31,6 +31,7 @@
 #include "Transport.h"
 #include "UnitAI.h"
 #include "World.h"
+#include "WorldSessionMgr.h"
 #include "WorldStatePackets.h"
 #include <time.h>
 
@@ -1163,34 +1164,6 @@ uint32 GameEventMgr::StartSystem()                           // return the next 
     return delay;
 }
 
-void GameEventMgr::StartArenaSeason()
-{
-    uint8 season = sWorld->getIntConfig(CONFIG_ARENA_SEASON_ID);
-
-    WorldDatabasePreparedStatement* stmt = WorldDatabase.GetPreparedStatement(WORLD_SEL_GAME_EVENT_ARENA_SEASON);
-    stmt->SetData(0, season);
-    PreparedQueryResult result = WorldDatabase.Query(stmt);
-
-    if (!result)
-    {
-        LOG_ERROR("gameevent", "ArenaSeason ({}) must be an existant Arena Season", season);
-        return;
-    }
-
-    Field* fields = result->Fetch();
-    uint16 eventId = fields[0].Get<uint8>();
-
-    if (eventId >= _gameEvent.size())
-    {
-        LOG_ERROR("gameevent", "EventEntry {} for ArenaSeason ({}) does not exists", eventId, season);
-        return;
-    }
-
-    StartEvent(eventId, true);
-    LOG_INFO("server.loading", "Arena Season {} started...", season);
-    LOG_INFO("server.loading", " ");
-}
-
 uint32 GameEventMgr::Update()                               // return the next event delay in ms
 {
     time_t currenttime = GameTime::GetGameTime().count();
@@ -1714,7 +1687,7 @@ void GameEventMgr::UpdateWorldStates(uint16 eventId, bool Activate)
                 WorldPackets::WorldState::UpdateWorldState worldstate;
                 worldstate.VariableID = bl->HolidayWorldStateId;
                 worldstate.Value = Activate ? 1 : 0;
-                sWorld->SendGlobalMessage(worldstate.Write());
+                sWorldSessionMgr->SendGlobalMessage(worldstate.Write());
             }
         }
     }

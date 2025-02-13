@@ -246,7 +246,9 @@ struct boss_kalecgos : public BossAI
 
         scheduler.Schedule(16s, [this](TaskContext)
         {
-            me->SummonCreature(NPC_KALEC, 1702.21f, 931.7f, -74.56f, 5.07f, TEMPSUMMON_MANUAL_DESPAWN);
+            if (Creature* kalec = me->SummonCreature(NPC_KALEC, 1702.21f, 931.7f, -74.56f, 5.07f, TEMPSUMMON_MANUAL_DESPAWN))
+                kalec->CastSpell(kalec, SPELL_SPECTRAL_INVISIBILITY, true);
+
             me->SummonCreature(NPC_SATHROVARR, 1704.62f, 927.78f, -73.9f, 2.0f, TEMPSUMMON_MANUAL_DESPAWN);
         });
 
@@ -264,48 +266,9 @@ struct boss_kalecgos : public BossAI
         bool _sathBanished;
 };
 
-enum Kalec
-{
-    SPELL_OPEN_BRUTALLUS_BACK_DOOR = 46650,
-    MODEL_KALECGOS_DRAGON       = 23487,
-
-    EVENT_KALEC_SCENE_1         = 101,
-    EVENT_KALEC_SCENE_2         = 102,
-    EVENT_KALEC_SCENE_3         = 103
-};
-
 struct boss_kalec : public ScriptedAI
 {
     boss_kalec(Creature* creature) : ScriptedAI(creature) { }
-
-    void Reset() override
-    {
-        if (me->GetPositionY() < 750.0f)
-        {
-            me->SetSpeed(MOVE_RUN, 2.4f);
-            me->SetDisplayId(MODEL_KALECGOS_DRAGON);
-            me->SetDisableGravity(true);
-            me->GetMotionMaster()->MovePoint(0, 1483.30f, 657.99f, 28.0f, false, true);
-
-            me->m_Events.AddEventAtOffset([&] {
-                Talk(SAY_GOOD_MADRIGOSA);
-                me->GetMotionMaster()->MovePoint(0, 1509.0f, 560.0f, 30.0f, false, true);
-            }, 9s);
-
-            me->m_Events.AddEventAtOffset([&] {
-                DoCastAOE(SPELL_OPEN_BRUTALLUS_BACK_DOOR, true);
-                me->GetInstanceScript()->SetBossState(DATA_FELMYST_DOORS, NOT_STARTED);
-                me->GetInstanceScript()->SetBossState(DATA_FELMYST_DOORS, DONE);
-            }, 16s);
-
-            me->m_Events.AddEventAtOffset([&] {
-                me->GetMotionMaster()->MovePoint(0, 1400.0f, 630.0f, 90.0f, false, true);
-                me->DespawnOrUnsummon(6000);
-            }, 22s);
-        }
-        else
-            DoCastSelf(SPELL_SPECTRAL_INVISIBILITY, true);
-    }
 
     void JustEngagedWith(Unit*) override
     {

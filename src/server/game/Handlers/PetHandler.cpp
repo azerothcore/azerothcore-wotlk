@@ -441,7 +441,10 @@ void WorldSession::HandlePetActionHelper(Unit* pet, ObjectGuid guid1, uint32 spe
                     bool haspositiveeffect = false;
 
                     if (!unit_target)
+                    {
+                        delete spell;
                         return;
+                    }
 
                     // search positive effects for spell
                     for (uint8 i = 0; i < MAX_SPELL_EFFECTS; ++i)
