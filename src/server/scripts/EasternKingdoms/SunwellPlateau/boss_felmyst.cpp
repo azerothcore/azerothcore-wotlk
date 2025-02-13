@@ -73,10 +73,13 @@ enum Misc
     POINT_AIR_BREATH_END2       = 6,
     POINT_MISC                  = 7,
 
+    POINT_KALECGOS              = 1,
+
     GROUP_START_INTRO           = 0,
     GROUP_BREATH                = 1,
 
-    NPC_FOG_TRIGGER             = 23472
+    NPC_FOG_TRIGGER             = 23472,
+    NPC_KALECGOS_FELMYST        = 24844 // Same as Magister's Terrace
 };
 
 class CorruptTriggers : public BasicEvent
@@ -100,30 +103,30 @@ private:
 
 struct boss_felmyst : public BossAI
 {
-    boss_felmyst(Creature* creature) : BossAI(creature, DATA_FELMYST)
-    {
-        bool appear = instance->GetBossState(DATA_BRUTALLUS) == DONE;
-        creature->SetVisible(appear);
-        creature->SetStandState(UNIT_STAND_STATE_SLEEP);
-        creature->SetReactState(REACT_PASSIVE);
-    }
+    boss_felmyst(Creature* creature) : BossAI(creature, DATA_FELMYST) { }
 
-    void DoAction(int32 param) override
+    void InitializeAI() override
     {
-        if (param == ACTION_START_EVENT)
+        me->SetReactState(REACT_PASSIVE);
+
+        if (instance->GetBossState(DATA_FELMYST) == TO_BE_DECIDED)
         {
-            me->SetVisible(true);
-            me->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
+            me->SetStandState(UNIT_STAND_STATE_SLEEP);
+            me->SetImmuneToPC(true);
             StartIntro();
+        }
+        else
+        {
+            me->SetCanFly(true);
+            me->SetDisableGravity(true);
+            me->SendMovementFlagUpdate();
+            me->GetMotionMaster()->MovePath(me->GetEntry() * 10, true);
         }
     }
 
     void Reset() override
     {
         BossAI::Reset();
-        me->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
-        me->SetReactState(REACT_PASSIVE);
-        me->SetDisableGravity(false);
         me->m_Events.KillAllEvents(false);
         instance->DoRemoveAurasDueToSpellOnPlayers(SPELL_FOG_OF_CORRUPTION_CHARM);
     }
@@ -131,10 +134,18 @@ struct boss_felmyst : public BossAI
     void JustEngagedWith(Unit* who) override
     {
         BossAI::JustEngagedWith(who);
-        me->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
+        me->CastSpell(me, SPELL_NOXIOUS_FUMES, true);
+        me->m_Events.AddEventAtOffset([&] {
+            Talk(YELL_BERSERK);
+            DoCastSelf(SPELL_BERSERK, true);
+        }, 10min);
 
-        if (!scheduler.IsGroupScheduled(GROUP_START_INTRO))
-            StartIntro();
+        me->GetMotionMaster()->Clear();
+
+        Position landPos = who->GetPosition();
+        me->m_Events.AddEventAtOffset([&, landPos] {
+            me->GetMotionMaster()->MovePoint(POINT_GROUND, landPos, false, true);
+        }, 2s);
     }
 
     void KilledUnit(Unit* victim) override
@@ -146,11 +157,13 @@ struct boss_felmyst : public BossAI
     void JustDied(Unit* killer) override
     {
         BossAI::JustDied(killer);
+        me->m_Events.KillAllEvents(false);
         Talk(YELL_DEATH);
         instance->DoRemoveAurasDueToSpellOnPlayers(SPELL_FOG_OF_CORRUPTION_CHARM);
 
         // Summon Kalecgos (human form of kalecgos fight)
-        me->SummonCreature(NPC_KALEC, 1526.28f, 700.10f, 60.0f, 4.33f);
+        if (Creature* kalec = me->SummonCreature(NPC_KALECGOS_FELMYST, 1573.1461f, 755.20245f, 99.524956f, 3.595378f))
+            kalec->GetMotionMaster()->MovePoint(POINT_KALECGOS, 1474.2347f, 624.0703f, 29.32589f, false, true);
     }
 
     void MovementInform(uint32 type, uint32 point) override
@@ -161,8 +174,10 @@ struct boss_felmyst : public BossAI
         if (point == POINT_GROUND)
         {
             me->HandleEmoteCommand(EMOTE_ONESHOT_LAND);
+            me->SetCanFly(false);
             me->SetDisableGravity(false);
             me->SendMovementFlagUpdate();
+            SetInvincibility(false);
 
             me->m_Events.AddEventAtOffset([&] {
                 me->SetReactState(REACT_AGGRESSIVE);
@@ -171,7 +186,7 @@ struct boss_felmyst : public BossAI
                     me->SetTarget(me->GetVictim()->GetGUID());
 
                 me->ResumeChasingVictim();
-            }, 1s);
+            }, 2s);
 
             ScheduleTimedEvent(7500ms, [&] {
                 DoCastVictim(SPELL_CLEAVE);
@@ -238,6 +253,7 @@ struct boss_felmyst : public BossAI
         me->HandleEmoteCommand(EMOTE_ONESHOT_LIFTOFF);
         me->SetDisableGravity(true);
         me->SendMovementFlagUpdate();
+        SetInvincibility(true);
 
         me->m_Events.AddEventAtOffset([&] {
             me->GetMotionMaster()->MovePoint(POINT_AIR, me->GetPositionX(), me->GetPositionY(), me->GetPositionZ() + 15.0f, false, true);
@@ -304,30 +320,16 @@ struct boss_felmyst : public BossAI
 
             me->m_Events.AddEventAtOffset([&] {
                 Talk(YELL_BIRTH);
+                me->SetCanFly(true);
                 me->SetDisableGravity(true);
-                me->HandleEmoteCommand(EMOTE_ONESHOT_LIFTOFF);
                 me->SendMovementFlagUpdate();
+                me->HandleEmoteCommand(EMOTE_ONESHOT_LIFTOFF);
             }, 7s);
 
             me->m_Events.AddEventAtOffset([&] {
-                me->GetMotionMaster()->MovePoint(POINT_AIR, me->GetPositionX(), me->GetPositionY(), me->GetPositionZ() + 10.0f, false, true);
+                me->SetImmuneToPC(false);
+                me->GetMotionMaster()->MovePath(me->GetEntry() * 10, true);
             }, 8500ms);
-
-            me->m_Events.AddEventAtOffset([&] {
-                me->SetInCombatWithZone();
-                me->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
-                me->CastSpell(me, SPELL_NOXIOUS_FUMES, true);
-                me->GetMotionMaster()->MovePoint(POINT_MISC, 1472.18f, 603.38f, 34.0f, false, true);
-
-                me->m_Events.AddEventAtOffset([&] {
-                    me->GetMotionMaster()->MovePoint(POINT_GROUND, me->GetPositionX(), me->GetPositionY(), me->GetMapHeight(me->GetPositionX(), me->GetPositionY(), me->GetPositionZ()), false, true);
-                }, 3s);
-
-                me->m_Events.AddEventAtOffset([&] {
-                    Talk(YELL_BERSERK);
-                    DoCastSelf(SPELL_BERSERK, true);
-                }, 10min);
-            }, 10500ms);
         });
     }
 
@@ -474,14 +476,26 @@ class spell_felmyst_open_brutallus_back_doors : public SpellScript
 {
     PrepareSpellScript(spell_felmyst_open_brutallus_back_doors);
 
+    bool Load() override
+    {
+        return GetCaster()->GetInstanceScript();
+    }
+
     void FilterTargets(std::list<WorldObject*>& unitList)
     {
         unitList.remove_if(DoorsGuidCheck());
     }
 
+    void HandleAfterCast()
+    {
+        GetCaster()->GetInstanceScript()->SetBossState(DATA_FELMYST_DOORS, NOT_STARTED);
+        GetCaster()->GetInstanceScript()->SetBossState(DATA_FELMYST_DOORS, DONE);
+    }
+
     void Register() override
     {
         OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_felmyst_open_brutallus_back_doors::FilterTargets, EFFECT_0, TARGET_UNIT_SRC_AREA_ENTRY);
+        AfterCast += SpellCastFn(spell_felmyst_open_brutallus_back_doors::HandleAfterCast);
     }
 };
 

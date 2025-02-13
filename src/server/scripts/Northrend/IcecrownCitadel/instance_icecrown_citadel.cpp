@@ -1161,17 +1161,6 @@ public:
                     {
                         IsSindragosaIntroDone = true;
                         HandleDropAttempt();
-                        if (instance->IsHeroic())
-                        {
-                            if (HeroicAttempts)
-                            {
-                                Events.ScheduleEvent(EVENT_RESPAWN_SINDRAGOSA, 30s);
-                            }
-                        }
-                        else
-                        {
-                            Events.ScheduleEvent(EVENT_RESPAWN_SINDRAGOSA, 30s);
-                        }
                     }
                     if (state == DONE && !instance->IsHeroic() && LichKingHeroicAvailable)
                     {

@@ -167,7 +167,7 @@ Map::EnterState MapMgr::PlayerCannotEnter(uint32 mapid, Player* player, bool log
         {
             // probably there must be special opcode, because client has this string constant in GlobalStrings.lua
             /// @todo: this is not a good place to send the message
-            player->GetSession()->SendAreaTriggerMessage(player->GetSession()->GetAcoreString(LANG_INSTANCE_RAID_GROUP_ONLY), mapName);
+            player->GetSession()->SendAreaTriggerMessage(LANG_INSTANCE_RAID_GROUP_ONLY, mapName);
             LOG_DEBUG("maps", "MAP: Player '{}' must be in a raid group to enter instance '{}'", player->GetName(), mapName);
             return Map::CANNOT_ENTER_NOT_IN_RAID;
         }

@@ -359,7 +359,7 @@ public:
     virtual void JustExitedCombat() { }
 
     /// @brief Called at any Damage to any victim (before damage apply)
-    virtual void DamageDealt(Unit* /*victim*/, uint32& /*damage*/, DamageEffectType /*damageType*/) { }
+    virtual void DamageDealt(Unit* /*victim*/, uint32& /*damage*/, DamageEffectType /*damageType*/, SpellSchoolMask /*damageSchoolMask*/) {}
 
     /** @brief Called at any Damage from any attacker (before damage apply)
      *

@@ -979,9 +979,7 @@ void Player::UpdateWeaponSkill(Unit* victim, WeaponAttackType attType, Item* ite
     if (GetShapeshiftForm() == FORM_TREE)
         return; // use weapon but not skill up
 
-    if (victim->IsCreature() &&
-        (victim->ToCreature()->GetCreatureTemplate()->flags_extra &
-         CREATURE_FLAG_EXTRA_NO_SKILL_GAINS))
+    if (victim->IsCreature() && victim->ToCreature()->HasFlagsExtra(CREATURE_FLAG_EXTRA_NO_SKILL_GAINS))
         return;
 
     uint32 weapon_skill_gain = sWorld->getIntConfig(CONFIG_SKILL_GAIN_WEAPON);
@@ -1167,7 +1165,7 @@ bool Player::UpdatePosition(float x, float y, float z, float orientation,
         SetGroupUpdateFlag(GROUP_UPDATE_FLAG_POSITION);
 
     if (GetTrader() && !IsWithinDistInMap(GetTrader(), INTERACTION_DISTANCE))
-        GetSession()->SendCancelTrade();
+        GetSession()->SendCancelTrade(TRADE_STATUS_TRADE_CANCELED);
 
     CheckAreaExploreAndOutdoor();
 
@@ -1247,9 +1245,7 @@ void Player::UpdateArea(uint32 newArea)
 void Player::UpdateZone(uint32 newZone, uint32 newArea)
 {
     if (!newZone)
-    {
         return;
-    }
 
     if (m_zoneUpdateId != newZone)
     {
@@ -1265,6 +1261,8 @@ void Player::UpdateZone(uint32 newZone, uint32 newArea)
         if (Guild* guild = GetGuild())
             guild->UpdateMemberData(this, GUILD_MEMBER_DATA_ZONEID, newZone);
     }
+
+    GetMap()->UpdatePlayerZoneStats(m_zoneUpdateId, newZone);
 
     // group update
     if (GetGroup())
