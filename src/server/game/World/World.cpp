@@ -92,6 +92,7 @@
 #include "WhoListCacheMgr.h"
 #include "WorldPacket.h"
 #include "WorldSession.h"
+#include "WorldSessionMgr.h"
 #include "WorldState.h"
 #include <boost/asio/ip/address.hpp>
 #include <cmath>
@@ -109,15 +110,10 @@ Realm realm;
 /// World constructor
 World::World()
 {
-    _playerLimit = 0;
     _allowedSecurityLevel = SEC_PLAYER;
     _allowMovement = true;
     _shutdownMask = 0;
     _shutdownTimer = 0;
-    _maxActiveSessionCount = 0;
-    _maxQueuedSessionCount = 0;
-    _playerCount = 0;
-    _maxPlayerCount = 0;
     _nextDailyQuestReset = 0s;
     _nextWeeklyQuestReset = 0s;
     _nextMonthlyQuestReset = 0s;
@@ -138,54 +134,18 @@ World::World()
 /// World destructor
 World::~World()
 {
-    ///- Empty the kicked session set
-    while (!_sessions.empty())
-    {
-        // not remove from queue, prevent loading new sessions
-        delete _sessions.begin()->second;
-        _sessions.erase(_sessions.begin());
-    }
-
-    while (!_offlineSessions.empty())
-    {
-        delete _offlineSessions.begin()->second;
-        _offlineSessions.erase(_offlineSessions.begin());
-    }
-
     CliCommandHolder* command = nullptr;
     while (_cliCmdQueue.next(command))
         delete command;
 
     VMAP::VMapFactory::clear();
     MMAP::MMapFactory::clear();
-
-    //TODO free addSessQueue
 }
 
 std::unique_ptr<IWorld>& getWorldInstance()
 {
     static std::unique_ptr<IWorld> instance = std::make_unique<World>();
     return instance;
-}
-
-/// Find a player in a specified zone
-Player* World::FindPlayerInZone(uint32 zone)
-{
-    ///- circle through active sessions and return the first player found in the zone
-    SessionMap::const_iterator itr;
-    for (itr = _sessions.begin(); itr != _sessions.end(); ++itr)
-    {
-        if (!itr->second)
-            continue;
-
-        Player* player = itr->second->GetPlayer();
-        if (!player)
-            continue;
-
-        if (player->IsInWorld() && player->GetZoneId() == zone)
-            return player;
-    }
-    return nullptr;
 }
 
 bool World::IsClosed() const
@@ -199,211 +159,6 @@ void World::SetClosed(bool val)
 
     // Invert the value, for simplicity for scripters.
     sScriptMgr->OnOpenStateChange(!val);
-}
-
-/// Find a session by its id
-WorldSession* World::FindSession(uint32 id) const
-{
-    SessionMap::const_iterator itr = _sessions.find(id);
-
-    if (itr != _sessions.end())
-        return itr->second;                                 // also can return nullptr for kicked session
-    else
-        return nullptr;
-}
-
-WorldSession* World::FindOfflineSession(uint32 id) const
-{
-    SessionMap::const_iterator itr = _offlineSessions.find(id);
-    if (itr != _offlineSessions.end())
-        return itr->second;
-    else
-        return nullptr;
-}
-
-WorldSession* World::FindOfflineSessionForCharacterGUID(ObjectGuid::LowType guidLow) const
-{
-    if (_offlineSessions.empty())
-        return nullptr;
-
-    for (SessionMap::const_iterator itr = _offlineSessions.begin(); itr != _offlineSessions.end(); ++itr)
-        if (itr->second->GetGuidLow() == guidLow)
-            return itr->second;
-
-    return nullptr;
-}
-
-/// Remove a given session
-bool World::KickSession(uint32 id)
-{
-    ///- Find the session, kick the user, but we can't delete session at this moment to prevent iterator invalidation
-    SessionMap::const_iterator itr = _sessions.find(id);
-
-    if (itr != _sessions.end() && itr->second)
-    {
-        if (itr->second->PlayerLoading())
-            return false;
-
-        itr->second->KickPlayer("KickSession", false);
-    }
-
-    return true;
-}
-
-void World::AddSession(WorldSession* s)
-{
-    _addSessQueue.add(s);
-}
-
-void World::AddSession_(WorldSession* s)
-{
-    ASSERT (s);
-
-    // kick existing session with same account (if any)
-    // if character on old session is being loaded, then return
-    if (!KickSession(s->GetAccountId()))
-    {
-        s->KickPlayer("kick existing session with same account");
-        delete s; // session not added yet in session list, so not listed in queue
-        return;
-    }
-
-    SessionMap::const_iterator old = _sessions.find(s->GetAccountId());
-    if (old != _sessions.end())
-    {
-        WorldSession* oldSession = old->second;
-
-        if (!RemoveQueuedPlayer(oldSession) && getIntConfig(CONFIG_INTERVAL_DISCONNECT_TOLERANCE))
-            _disconnects[s->GetAccountId()] = GameTime::GetGameTime().count();
-
-        // pussywizard:
-        if (oldSession->HandleSocketClosed())
-        {
-            // there should be no offline session if current one is logged onto a character
-            SessionMap::iterator iter;
-            if ((iter = _offlineSessions.find(oldSession->GetAccountId())) != _offlineSessions.end())
-            {
-                WorldSession* tmp = iter->second;
-                _offlineSessions.erase(iter);
-                delete tmp;
-            }
-            oldSession->SetOfflineTime(GameTime::GetGameTime().count());
-            _offlineSessions[oldSession->GetAccountId()] = oldSession;
-        }
-        else
-        {
-            delete oldSession;
-        }
-    }
-
-    _sessions[s->GetAccountId()] = s;
-
-    uint32 Sessions = GetActiveAndQueuedSessionCount();
-    uint32 pLimit = GetPlayerAmountLimit();
-
-    // don't count this session when checking player limit
-    --Sessions;
-
-    if (pLimit > 0 && Sessions >= pLimit && AccountMgr::IsPlayerAccount(s->GetSecurity()) && !s->CanSkipQueue() && !HasRecentlyDisconnected(s))
-    {
-        AddQueuedPlayer(s);
-        UpdateMaxSessionCounters();
-        return;
-    }
-
-    s->InitializeSession();
-
-    UpdateMaxSessionCounters();
-}
-
-bool World::HasRecentlyDisconnected(WorldSession* session)
-{
-    if (!session)
-        return false;
-
-    if (uint32 tolerance = getIntConfig(CONFIG_INTERVAL_DISCONNECT_TOLERANCE))
-    {
-        for (DisconnectMap::iterator i = _disconnects.begin(); i != _disconnects.end();)
-        {
-            if ((GameTime::GetGameTime().count() - i->second) < tolerance)
-            {
-                if (i->first == session->GetAccountId())
-                    return true;
-                ++i;
-            }
-            else
-                _disconnects.erase(i++);
-        }
-    }
-    return false;
-}
-
-int32 World::GetQueuePos(WorldSession* sess)
-{
-    uint32 position = 1;
-
-    for (Queue::const_iterator iter = _queuedPlayer.begin(); iter != _queuedPlayer.end(); ++iter, ++position)
-        if ((*iter) == sess)
-            return position;
-
-    return 0;
-}
-
-void World::AddQueuedPlayer(WorldSession* sess)
-{
-    sess->SetInQueue(true);
-    _queuedPlayer.push_back(sess);
-
-    // The 1st SMSG_AUTH_RESPONSE needs to contain other info too.
-    sess->SendAuthResponse(AUTH_WAIT_QUEUE, false, GetQueuePos(sess));
-}
-
-bool World::RemoveQueuedPlayer(WorldSession* sess)
-{
-    uint32 sessions = GetActiveSessionCount();
-
-    uint32 position = 1;
-    Queue::iterator iter = _queuedPlayer.begin();
-
-    // search to remove and count skipped positions
-    bool found = false;
-
-    for (; iter != _queuedPlayer.end(); ++iter, ++position)
-    {
-        if (*iter == sess)
-        {
-            sess->SetInQueue(false);
-            sess->ResetTimeOutTime(false);
-            iter = _queuedPlayer.erase(iter);
-            found = true;
-            break;
-        }
-    }
-
-    // if session not queued then it was an active session
-    if (!found)
-    {
-        ASSERT(sessions > 0);
-        --sessions;
-    }
-
-    // accept first in queue
-    if ((!GetPlayerAmountLimit() || sessions < GetPlayerAmountLimit()) && !_queuedPlayer.empty())
-    {
-        WorldSession* pop_sess = _queuedPlayer.front();
-        pop_sess->InitializeSession();
-        _queuedPlayer.pop_front();
-
-        // update iter to point first queued socket or end() if queue is empty now
-        iter = _queuedPlayer.begin();
-        position = 1;
-    }
-
-    // update queue position from iter to end()
-    for (; iter != _queuedPlayer.end(); ++iter, ++position)
-        (*iter)->SendAuthWaitQueue(position);
-
-    return found;
 }
 
 /// Initialize config values
@@ -431,9 +186,7 @@ void World::LoadConfigSettings(bool reload)
 
     ///- Read the player limit and the Message of the day from the config file
     if (!reload)
-    {
-        SetPlayerAmountLimit(sConfigMgr->GetOption<int32>("PlayerLimit", 1000));
-    }
+        sWorldSessionMgr->SetPlayerAmountLimit(sConfigMgr->GetOption<int32>("PlayerLimit", 1000));
 
     ///- Read ticket system setting from the config file
     _bool_configs[CONFIG_ALLOW_TICKETS] = sConfigMgr->GetOption<bool>("AllowTickets", true);
@@ -2293,9 +2046,9 @@ void World::Update(uint32 diff)
     sWorldUpdateTime.UpdateWithDiff(diff);
 
     // Record update if recording set in log and diff is greater then minimum set in log
-    sWorldUpdateTime.RecordUpdateTime(GameTime::GetGameTimeMS(), diff, GetActiveSessionCount());
+    sWorldUpdateTime.RecordUpdateTime(GameTime::GetGameTimeMS(), diff, sWorldSessionMgr->GetActiveSessionCount());
 
-    DynamicVisibilityMgr::Update(GetActiveSessionCount());
+    DynamicVisibilityMgr::Update(sWorldSessionMgr->GetActiveSessionCount());
 
     ///- Update the different timers
     for (int i = 0; i < WUPDATE_COUNT; ++i)
@@ -2376,8 +2129,10 @@ void World::Update(uint32 diff)
         _mail_expire_check_timer = currentGameTime + 6h;
     }
 
-    METRIC_TIMER("world_update_time", METRIC_TAG("type", "Update sessions"));
-    UpdateSessions(diff);
+    {
+        METRIC_TIMER("world_update_time", METRIC_TAG("type", "Update sessions"));
+        sWorldSessionMgr->UpdateSessions(diff);
+    }
 
     /// <li> Handle weather updates when the timer has passed
     if (_timers[WUPDATE_WEATHERS].Passed())
@@ -2463,7 +2218,7 @@ void World::Update(uint32 diff)
 
         LoginDatabasePreparedStatement* stmt = LoginDatabase.GetPreparedStatement(LOGIN_UPD_UPTIME_PLAYERS);
         stmt->SetData(0, uint32(GameTime::GetUptime().count()));
-        stmt->SetData(1, uint16(GetMaxPlayerCount()));
+        stmt->SetData(1, uint16(sWorldSessionMgr->GetMaxPlayerCount()));
         stmt->SetData(2, realm.Id.Realm);
         stmt->SetData(3, uint32(GameTime::GetStartTime().count()));
         LoginDatabase.Execute(stmt);
@@ -2535,41 +2290,6 @@ void World::ForceGameEventUpdate()
     _timers[WUPDATE_EVENTS].Reset();
 }
 
-/// Send a packet to all players (except self if mentioned)
-void World::SendGlobalMessage(WorldPacket const* packet, WorldSession* self, TeamId teamId)
-{
-    SessionMap::const_iterator itr;
-    for (itr = _sessions.begin(); itr != _sessions.end(); ++itr)
-    {
-        if (itr->second &&
-                itr->second->GetPlayer() &&
-                itr->second->GetPlayer()->IsInWorld() &&
-                itr->second != self &&
-                (teamId == TEAM_NEUTRAL || itr->second->GetPlayer()->GetTeamId() == teamId))
-        {
-            itr->second->SendPacket(packet);
-        }
-    }
-}
-
-/// Send a packet to all GMs (except self if mentioned)
-void World::SendGlobalGMMessage(WorldPacket const* packet, WorldSession* self, TeamId teamId)
-{
-    SessionMap::iterator itr;
-    for (itr = _sessions.begin(); itr != _sessions.end(); ++itr)
-    {
-        if (itr->second &&
-                itr->second->GetPlayer() &&
-                itr->second->GetPlayer()->IsInWorld() &&
-                itr->second != self &&
-                !AccountMgr::IsPlayerAccount(itr->second->GetSecurity()) &&
-                (teamId == TEAM_NEUTRAL || itr->second->GetPlayer()->GetTeamId() == teamId))
-        {
-            itr->second->SendPacket(packet);
-        }
-    }
-}
-
 namespace Acore
 {
     class WorldWorldTextBuilder
@@ -2615,60 +2335,6 @@ namespace Acore
     };
 }                                                           // namespace Acore
 
-/// Send a packet to all players (or players selected team) in the zone (except self if mentioned)
-bool World::SendZoneMessage(uint32 zone, WorldPacket const* packet, WorldSession* self, TeamId teamId)
-{
-    bool foundPlayerToSend = false;
-    SessionMap::const_iterator itr;
-
-    for (itr = _sessions.begin(); itr != _sessions.end(); ++itr)
-    {
-        if (itr->second &&
-                itr->second->GetPlayer() &&
-                itr->second->GetPlayer()->IsInWorld() &&
-                itr->second->GetPlayer()->GetZoneId() == zone &&
-                itr->second != self &&
-                (teamId == TEAM_NEUTRAL || itr->second->GetPlayer()->GetTeamId() == teamId))
-        {
-            itr->second->SendPacket(packet);
-            foundPlayerToSend = true;
-        }
-    }
-
-    return foundPlayerToSend;
-}
-
-/// Send a System Message to all players in the zone (except self if mentioned)
-void World::SendZoneText(uint32 zone, std::string text, WorldSession* self, TeamId teamId)
-{
-    WorldPacket data;
-    ChatHandler::BuildChatPacket(data, CHAT_MSG_SYSTEM, LANG_UNIVERSAL, nullptr, nullptr, text.c_str());
-    SendZoneMessage(zone, &data, self, teamId);
-}
-
-/// Kick (and save) all players
-void World::KickAll()
-{
-    _queuedPlayer.clear();                                 // prevent send queue update packet and login queued sessions
-
-    // session not removed at kick and will removed in next update tick
-    for (SessionMap::const_iterator itr = _sessions.begin(); itr != _sessions.end(); ++itr)
-        itr->second->KickPlayer("KickAll sessions");
-
-    // pussywizard: kick offline sessions
-    for (SessionMap::const_iterator itr = _offlineSessions.begin(); itr != _offlineSessions.end(); ++itr)
-        itr->second->KickPlayer("KickAll offline sessions");
-}
-
-/// Kick (and save) all players with security level less `sec`
-void World::KickAllLess(AccountTypes sec)
-{
-    // session not removed at kick and will removed in next update tick
-    for (SessionMap::const_iterator itr = _sessions.begin(); itr != _sessions.end(); ++itr)
-        if (itr->second->GetSecurity() < sec)
-            itr->second->KickPlayer("KickAllLess");
-}
-
 /// Update the game time
 void World::_UpdateGameTime()
 {
@@ -2684,7 +2350,7 @@ void World::_UpdateGameTime()
         ///- ... and it is overdue, stop the world (set m_stopEvent)
         if (_shutdownTimer <= elapsed.count())
         {
-            if (!(_shutdownMask & SHUTDOWN_MASK_IDLE) || GetActiveAndQueuedSessionCount() == 0)
+            if (!(_shutdownMask & SHUTDOWN_MASK_IDLE) || sWorldSessionMgr->GetActiveAndQueuedSessionCount() == 0)
                 _stopEvent = true;                         // exist code already set
             else
                 _shutdownTimer = 1;                        // minimum timer value to wait idle state
@@ -2715,7 +2381,7 @@ void World::ShutdownServ(uint32 time, uint32 options, uint8 exitcode, std::strin
     ///- If the shutdown time is 0, set m_stopEvent (except if shutdown is 'idle' with remaining sessions)
     if (time == 0)
     {
-        if (!(options & SHUTDOWN_MASK_IDLE) || GetActiveAndQueuedSessionCount() == 0)
+        if (!(options & SHUTDOWN_MASK_IDLE) || sWorldSessionMgr->GetActiveAndQueuedSessionCount() == 0)
             _stopEvent = true;                             // exist code already set
         else
             _shutdownTimer = 1;                            //So that the session count is re-evaluated at next world tick
@@ -2767,7 +2433,7 @@ void World::ShutdownMsg(bool show, Player* player, std::string const& reason)
             str += " - " + _shutdownReason;
 
         ServerMessageType msgid = (_shutdownMask & SHUTDOWN_MASK_RESTART) ? SERVER_MSG_RESTART_TIME : SERVER_MSG_SHUTDOWN_TIME;
-        SendServerMessage(msgid, str, player);
+        sWorldSessionMgr->SendServerMessage(msgid, str, player);
         LOG_WARN("server.worldserver", "Server {} in {}", (_shutdownMask & SHUTDOWN_MASK_RESTART ? "restarting" : "shutdown"), str);
     }
 }
@@ -2784,98 +2450,11 @@ void World::ShutdownCancel()
     _shutdownMask = 0;
     _shutdownTimer = 0;
     _exitCode = SHUTDOWN_EXIT_CODE;                       // to default value
-    SendServerMessage(msgid);
+    sWorldSessionMgr->SendServerMessage(msgid);
 
     LOG_DEBUG("server.worldserver", "Server {} cancelled.", (_shutdownMask & SHUTDOWN_MASK_RESTART ? "restart" : "shuttingdown"));
 
     sScriptMgr->OnShutdownCancel();
-}
-
-/// Send a server message to the user(s)
-void World::SendServerMessage(ServerMessageType messageID, std::string stringParam /*= ""*/, Player* player /*= nullptr*/)
-{
-    WorldPackets::Chat::ChatServerMessage chatServerMessage;
-    chatServerMessage.MessageID = int32(messageID);
-    if (messageID <= SERVER_MSG_STRING)
-        chatServerMessage.StringParam = stringParam;
-
-    if (player)
-        player->SendDirectMessage(chatServerMessage.Write());
-    else
-        SendGlobalMessage(chatServerMessage.Write());
-}
-
-void World::UpdateSessions(uint32 diff)
-{
-    {
-        METRIC_DETAILED_NO_THRESHOLD_TIMER("world_update_time",
-            METRIC_TAG("type", "Add sessions"),
-            METRIC_TAG("parent_type", "Update sessions"));
-
-        ///- Add new sessions
-        WorldSession* sess = nullptr;
-        while (_addSessQueue.next(sess))
-        {
-            AddSession_(sess);
-        }
-    }
-
-    ///- Then send an update signal to remaining ones
-    for (SessionMap::iterator itr = _sessions.begin(), next; itr != _sessions.end(); itr = next)
-    {
-        next = itr;
-        ++next;
-
-        ///- and remove not active sessions from the list
-        WorldSession* pSession = itr->second;
-        WorldSessionFilter updater(pSession);
-
-        // pussywizard:
-        if (pSession->HandleSocketClosed())
-        {
-            if (!RemoveQueuedPlayer(pSession) && getIntConfig(CONFIG_INTERVAL_DISCONNECT_TOLERANCE))
-                _disconnects[pSession->GetAccountId()] = GameTime::GetGameTime().count();
-            _sessions.erase(itr);
-            // there should be no offline session if current one is logged onto a character
-            SessionMap::iterator iter;
-            if ((iter = _offlineSessions.find(pSession->GetAccountId())) != _offlineSessions.end())
-            {
-                WorldSession* tmp = iter->second;
-                _offlineSessions.erase(iter);
-                delete tmp;
-            }
-            pSession->SetOfflineTime(GameTime::GetGameTime().count());
-            _offlineSessions[pSession->GetAccountId()] = pSession;
-            continue;
-        }
-
-        [[maybe_unused]] uint32 currentSessionId = itr->first;
-        METRIC_DETAILED_TIMER("world_update_sessions_time", METRIC_TAG("account_id", std::to_string(currentSessionId)));
-
-        if (!pSession->Update(diff, updater))
-        {
-            if (!RemoveQueuedPlayer(pSession) && getIntConfig(CONFIG_INTERVAL_DISCONNECT_TOLERANCE))
-                _disconnects[pSession->GetAccountId()] = GameTime::GetGameTime().count();
-            _sessions.erase(itr);
-            delete pSession;
-        }
-    }
-
-    // pussywizard:
-    if (_offlineSessions.empty())
-        return;
-    uint32 currTime = GameTime::GetGameTime().count();
-    for (SessionMap::iterator itr = _offlineSessions.begin(), next; itr != _offlineSessions.end(); itr = next)
-    {
-        next = itr;
-        ++next;
-        WorldSession* pSession = itr->second;
-        if (!pSession->GetPlayer() || pSession->GetOfflineTime() + 60 < currTime || pSession->IsKicked())
-        {
-            _offlineSessions.erase(itr);
-            delete pSession;
-        }
-    }
 }
 
 // This handles the issued and queued CLI commands
@@ -2995,7 +2574,8 @@ void World::ResetDailyQuests()
     CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_QUEST_STATUS_DAILY);
     CharacterDatabase.Execute(stmt);
 
-    for (SessionMap::const_iterator itr = _sessions.begin(); itr != _sessions.end(); ++itr)
+    WorldSessionMgr::SessionMap const& sessionMap = sWorldSessionMgr->GetAllSessions();
+    for (WorldSessionMgr::SessionMap::const_iterator itr = sessionMap.begin(); itr != sessionMap.end(); ++itr)
         if (itr->second->GetPlayer())
             itr->second->GetPlayer()->ResetDailyQuestStatus();
 
@@ -3022,7 +2602,7 @@ void World::SetPlayerSecurityLimit(AccountTypes _sec)
     bool update = sec > _allowedSecurityLevel;
     _allowedSecurityLevel = sec;
     if (update)
-        KickAllLess(_allowedSecurityLevel);
+        sWorldSessionMgr->KickAllLess(_allowedSecurityLevel);
 }
 
 void World::ResetWeeklyQuests()
@@ -3030,7 +2610,8 @@ void World::ResetWeeklyQuests()
     CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_QUEST_STATUS_WEEKLY);
     CharacterDatabase.Execute(stmt);
 
-    for (SessionMap::const_iterator itr = _sessions.begin(); itr != _sessions.end(); ++itr)
+    WorldSessionMgr::SessionMap const& sessionMap = sWorldSessionMgr->GetAllSessions();
+    for (WorldSessionMgr::SessionMap::const_iterator itr = sessionMap.begin(); itr != sessionMap.end(); ++itr)
         if (itr->second->GetPlayer())
             itr->second->GetPlayer()->ResetWeeklyQuestStatus();
 
@@ -3048,7 +2629,8 @@ void World::ResetMonthlyQuests()
     CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_QUEST_STATUS_MONTHLY);
     CharacterDatabase.Execute(stmt);
 
-    for (SessionMap::const_iterator itr = _sessions.begin(); itr != _sessions.end(); ++itr)
+    WorldSessionMgr::SessionMap const& sessionMap = sWorldSessionMgr->GetAllSessions();
+    for (WorldSessionMgr::SessionMap::const_iterator itr = sessionMap.begin(); itr != sessionMap.end(); ++itr)
         if (itr->second->GetPlayer())
             itr->second->GetPlayer()->ResetMonthlyQuestStatus();
 
@@ -3062,7 +2644,8 @@ void World::ResetEventSeasonalQuests(uint16 event_id)
     stmt->SetData(0, event_id);
     CharacterDatabase.Execute(stmt);
 
-    for (SessionMap::const_iterator itr = _sessions.begin(); itr != _sessions.end(); ++itr)
+    WorldSessionMgr::SessionMap const& sessionMap = sWorldSessionMgr->GetAllSessions();
+    for (WorldSessionMgr::SessionMap::const_iterator itr = sessionMap.begin(); itr != sessionMap.end(); ++itr)
         if (itr->second->GetPlayer())
             itr->second->GetPlayer()->ResetSeasonalQuestStatus(event_id);
 }
@@ -3074,7 +2657,8 @@ void World::ResetRandomBG()
     CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_BATTLEGROUND_RANDOM);
     CharacterDatabase.Execute(stmt);
 
-    for (SessionMap::const_iterator itr = _sessions.begin(); itr != _sessions.end(); ++itr)
+    WorldSessionMgr::SessionMap const& sessionMap = sWorldSessionMgr->GetAllSessions();
+    for (WorldSessionMgr::SessionMap::const_iterator itr = sessionMap.begin(); itr != sessionMap.end(); ++itr)
         if (itr->second->GetPlayer())
             itr->second->GetPlayer()->SetRandomWinner(false);
 
@@ -3101,12 +2685,6 @@ void World::ResetGuildCap()
     sGuildMgr->ResetTimes();
 }
 
-void World::UpdateMaxSessionCounters()
-{
-    _maxActiveSessionCount = std::max(_maxActiveSessionCount, uint32(_sessions.size() - _queuedPlayer.size()));
-    _maxQueuedSessionCount = std::max(_maxQueuedSessionCount, uint32(_queuedPlayer.size()));
-}
-
 void World::LoadDBVersion()
 {
     QueryResult result = WorldDatabase.Query("SELECT db_version, cache_id FROM version LIMIT 1");
@@ -3126,8 +2704,8 @@ void World::LoadDBVersion()
 
 void World::UpdateAreaDependentAuras()
 {
-    SessionMap::const_iterator itr;
-    for (itr = _sessions.begin(); itr != _sessions.end(); ++itr)
+    WorldSessionMgr::SessionMap const& sessionMap = sWorldSessionMgr->GetAllSessions();
+    for (WorldSessionMgr::SessionMap::const_iterator itr = sessionMap.begin(); itr != sessionMap.end(); ++itr)
         if (itr->second && itr->second->GetPlayer() && itr->second->GetPlayer()->IsInWorld())
         {
             itr->second->GetPlayer()->UpdateAreaDependentAuras(itr->second->GetPlayer()->GetAreaId());
@@ -3194,23 +2772,6 @@ void World::ProcessQueryCallbacks()
 void World::RemoveOldCorpses()
 {
     _timers[WUPDATE_CORPSES].SetCurrent(_timers[WUPDATE_CORPSES].GetInterval());
-}
-
-void World::DoForAllOnlinePlayers(std::function<void(Player*)> exec)
-{
-    std::shared_lock lock(*HashMapHolder<Player>::GetLock());
-    for (auto const& it : ObjectAccessor::GetPlayers())
-    {
-        if (Player* player = it.second)
-        {
-            if (!player->IsInWorld())
-            {
-                continue;
-            }
-
-            exec(player);
-        }
-    }
 }
 
 bool World::IsPvPRealm() const
