@@ -88,13 +88,13 @@ Map* MapMgr::CreateBaseMap(uint32 id)
 
             i_maps[id] = map;
 
-            map->OnCreateMap();
-
             if (!entry->Instanceable())
             {
                 map->LoadRespawnTimes();
                 map->LoadCorpseData();
             }
+
+            map->OnCreateMap();
         }
     }
 

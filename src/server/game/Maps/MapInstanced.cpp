@@ -205,7 +205,6 @@ InstanceMap* MapInstanced::CreateInstance(uint32 InstanceId, InstanceSave* save,
     ASSERT(map->IsDungeon());
     m_InstancedMaps[InstanceId] = map;
 
-    map->OnCreateMap();
     map->LoadRespawnTimes();
     map->LoadCorpseData();
 
@@ -213,6 +212,8 @@ InstanceMap* MapInstanced::CreateInstance(uint32 InstanceId, InstanceSave* save,
         map->CreateInstanceScript(true, save->GetInstanceData(), save->GetCompletedEncounterMask());
     else
         map->CreateInstanceScript(false, "", 0);
+
+    map->OnCreateMap();
 
     if (!save) // this is for sure a dungeon (assert above), no need to check here
         sInstanceSaveMgr->AddInstanceSave(GetId(), InstanceId, difficulty);
@@ -240,9 +241,10 @@ BattlegroundMap* MapInstanced::CreateBattleground(uint32 InstanceId, Battlegroun
     ASSERT(map->IsBattlegroundOrArena());
     m_InstancedMaps[InstanceId] = map;
 
-    map->OnCreateMap();
     map->SetBG(bg);
     bg->SetBgMap(map);
+
+    map->OnCreateMap();
 
     return map;
 }
