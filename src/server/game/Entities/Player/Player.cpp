@@ -21,6 +21,7 @@
 #include "ArenaSpectator.h"
 #include "ArenaTeam.h"
 #include "ArenaTeamMgr.h"
+#include "ArenaSeasonMgr.h"
 #include "Battlefield.h"
 #include "BattlefieldMgr.h"
 #include "BattlefieldWG.h"
@@ -83,6 +84,7 @@
 #include "World.h"
 #include "WorldPacket.h"
 #include "WorldSession.h"
+#include "WorldSessionMgr.h"
 #include "WorldState.h"
 #include <cmath>
 
@@ -362,7 +364,7 @@ Player::Player(WorldSession* session): Unit(true), m_mover(this)
 
     m_ControlledByPlayer = true;
 
-    sWorld->IncreasePlayerCount();
+    sWorldSessionMgr->IncreasePlayerCount();
 
     m_ChampioningFaction = 0;
 
@@ -446,7 +448,7 @@ Player::~Player()
     delete m_reputationMgr;
     delete _cinematicMgr;
 
-    sWorld->DecreasePlayerCount();
+    sWorldSessionMgr->DecreasePlayerCount();
 
     if (!m_isInSharedVisionOf.empty())
     {
@@ -8243,9 +8245,9 @@ void Player::SendInitWorldStates(uint32 zoneid, uint32 areaid)
     data << uint32(0x8d4) << uint32(0x0);                   // 5
     data << uint32(0x8d3) << uint32(0x0);                   // 6
     // 7 1 - Arena season in progress, 0 - end of season
-    data << uint32(0xC77) << uint32(sWorld->getBoolConfig(CONFIG_ARENA_SEASON_IN_PROGRESS));
+    data << uint32(0xC77) << uint32(sArenaSeasonMgr->GetSeasonState() == ARENA_SEASON_STATE_IN_PROGRESS);
     // 8 Arena season id
-    data << uint32(0xF3D) << uint32(sWorld->getIntConfig(CONFIG_ARENA_SEASON_ID));
+    data << uint32(0xF3D) << uint32(sArenaSeasonMgr->GetCurrentSeason());
 
     if (mapid == 530)                                       // Outland
     {

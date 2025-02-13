@@ -1165,7 +1165,7 @@ bool Player::UpdatePosition(float x, float y, float z, float orientation,
         SetGroupUpdateFlag(GROUP_UPDATE_FLAG_POSITION);
 
     if (GetTrader() && !IsWithinDistInMap(GetTrader(), INTERACTION_DISTANCE))
-        GetSession()->SendCancelTrade();
+        GetSession()->SendCancelTrade(TRADE_STATUS_TRADE_CANCELED);
 
     CheckAreaExploreAndOutdoor();
 
@@ -1245,9 +1245,7 @@ void Player::UpdateArea(uint32 newArea)
 void Player::UpdateZone(uint32 newZone, uint32 newArea)
 {
     if (!newZone)
-    {
         return;
-    }
 
     if (m_zoneUpdateId != newZone)
     {
@@ -1263,6 +1261,8 @@ void Player::UpdateZone(uint32 newZone, uint32 newArea)
         if (Guild* guild = GetGuild())
             guild->UpdateMemberData(this, GUILD_MEMBER_DATA_ZONEID, newZone);
     }
+
+    GetMap()->UpdatePlayerZoneStats(m_zoneUpdateId, newZone);
 
     // group update
     if (GetGroup())

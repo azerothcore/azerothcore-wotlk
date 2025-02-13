@@ -431,7 +431,7 @@ void WorldState::AddSunsReachProgress(uint32 questId)
             break;
         case QUEST_SANCTUM_WARDS:
             counter = COUNTER_SANCTUM_WARDS;
-            otherCounter = COUNTER_SANCTUM_WARDS;
+            otherCounter = COUNTER_ERRATIC_BEHAVIOR;
             worldState = WORLD_STATE_QUEL_DANAS_SANCTUM;
             break;
         case QUEST_BATTLE_FOR_THE_SUNS_REACH_ARMORY:

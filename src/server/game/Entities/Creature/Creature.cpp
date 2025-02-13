@@ -47,6 +47,7 @@
 #include "WaypointMovementGenerator.h"
 #include "World.h"
 #include "WorldPacket.h"
+#include "WorldSessionMgr.h"
 
 /// @todo: this import is not necessary for compilation and marked as unused by the IDE
 //  however, for some reasons removing it would cause a damn linking issue
@@ -1974,6 +1975,7 @@ void Creature::setDeathState(DeathState state, bool despawn)
     if (state == DeathState::JustDied)
     {
         m_corpseRemoveTime = GameTime::GetGameTime().count() + m_corpseDelay;
+        GetMap()->ApplyDynamicModeRespawnScaling(this, m_respawnDelay);
         m_respawnTime = GameTime::GetGameTime().count() + m_respawnDelay + m_corpseDelay;
 
         // always save boss respawn time at death to prevent crash cheating
@@ -2198,7 +2200,7 @@ void Creature::DespawnOnEvade(Seconds respawnDelay)
 
     if (TempSummon* whoSummon = ToTempSummon())
     {
-        LOG_WARN("entities.unit", "DespawnOnEvade called on a temporary summon.");
+        GetMap()->ScheduleCreatureRespawn(GetGUID(), respawnDelay, GetHomePosition());
         whoSummon->UnSummon();
         return;
     }
@@ -2817,7 +2819,7 @@ void Creature::SendZoneUnderAttackMessage(Player* attacker)
 {
     WorldPacket data(SMSG_ZONE_UNDER_ATTACK, 4);
     data << (uint32)GetAreaId();
-    sWorld->SendGlobalMessage(&data, nullptr, (attacker->GetTeamId() == TEAM_ALLIANCE ? TEAM_HORDE : TEAM_ALLIANCE));
+    sWorldSessionMgr->SendGlobalMessage(&data, nullptr, (attacker->GetTeamId() == TEAM_ALLIANCE ? TEAM_HORDE : TEAM_ALLIANCE));
 }
 
 /**

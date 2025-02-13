@@ -819,7 +819,7 @@ uint32 Unit::DealDamage(Unit* attacker, Unit* victim, uint32 damage, CleanDamage
             victim->GetAI()->DamageTaken(attacker, damage, damagetype, damageSchoolMask);
 
         if (attacker && attacker->IsAIEnabled)
-            attacker->GetAI()->DamageDealt(victim, damage, damagetype);
+            attacker->GetAI()->DamageDealt(victim, damage, damagetype, damageSchoolMask);
     }
 
     // Hook for OnDamage Event

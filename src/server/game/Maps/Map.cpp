@@ -44,6 +44,8 @@
 #include "VMapMgr2.h"
 #include "Weather.h"
 
+#define MAP_INVALID_ZONE        0xFFFFFFFF
+
 ZoneDynamicInfo::ZoneDynamicInfo() : MusicId(0), WeatherId(WEATHER_STATE_FINE),
                                      WeatherGrade(0.0f), OverrideLightId(0), LightFadeInTime(0) { }
 
@@ -76,6 +78,8 @@ Map::Map(uint32 id, uint32 InstanceId, uint8 SpawnMode, Map* _parent) :
     _transportsUpdateIter(_transports.end()), i_scriptLock(false), _defaultLight(GetDefaultMapLight(id))
 {
     m_parentMap = (_parent ? _parent : this);
+
+    _zonePlayerCountMap.clear();
 
     //lets initialize visibility distance for map
     Map::InitVisibilityDistance();
@@ -562,6 +566,23 @@ void Map::VisitNearbyCellsOf(WorldObject* obj, TypeContainerVisitor<Acore::Objec
     }
 }
 
+void Map::UpdatePlayerZoneStats(uint32 oldZone, uint32 newZone)
+{
+    // Nothing to do if no change
+    if (oldZone == newZone)
+        return;
+
+    if (oldZone != MAP_INVALID_ZONE)
+    {
+        uint32& oldZoneCount = _zonePlayerCountMap[oldZone];
+        if (!oldZoneCount)
+            LOG_ERROR("maps", "A player left zone {} (went to {}) - but there were no players in the zone!", oldZone, newZone);
+        else
+            --oldZoneCount;
+    }
+    ++_zonePlayerCountMap[newZone];
+}
+
 void Map::Update(const uint32 t_diff, const uint32 s_diff, bool  /*thread*/)
 {
     if (t_diff)
@@ -739,6 +760,8 @@ struct ResetNotifier
 
 void Map::RemovePlayerFromMap(Player* player, bool remove)
 {
+    // Before leaving map, update zone/area for stats
+    player->UpdateZone(MAP_INVALID_ZONE, 0);
     player->getHostileRefMgr().deleteReferences(true); // pussywizard: multithreading crashfix
 
     bool inWorld = player->IsInWorld();
@@ -1760,6 +1783,40 @@ void Map::SendObjectUpdates()
         iter->first->GetSession()->SendPacket(&packet);
         packet.clear();                                     // clean the string
     }
+}
+
+void Map::ApplyDynamicModeRespawnScaling(WorldObject const* obj, uint32& respawnDelay) const
+{
+    ASSERT(obj->GetMap() == this);
+
+    float rate = sWorld->getFloatConfig(obj->IsGameObject() ? CONFIG_RESPAWN_DYNAMICRATE_GAMEOBJECT : CONFIG_RESPAWN_DYNAMICRATE_CREATURE);
+
+    if (rate == 1.0f)
+        return;
+
+    // No instanced maps (dungeons, battlegrounds, arenas etc.)
+    if (obj->GetMap()->Instanceable())
+        return;
+
+    // No quest givers or world bosses
+    if (Creature const* creature = obj->ToCreature())
+        if (creature->IsQuestGiver() || creature->isWorldBoss())
+            return;
+
+    auto it = _zonePlayerCountMap.find(obj->GetZoneId());
+    if (it == _zonePlayerCountMap.end())
+        return;
+    uint32 const playerCount = it->second;
+    if (!playerCount)
+        return;
+    double const adjustFactor =  rate / playerCount;
+    if (adjustFactor >= 1.0) // nothing to do here
+        return;
+    uint32 const timeMinimum = sWorld->getIntConfig(obj->IsGameObject() ? CONFIG_RESPAWN_DYNAMICMINIMUM_GAMEOBJECT : CONFIG_RESPAWN_DYNAMICMINIMUM_CREATURE);
+    if (respawnDelay <= timeMinimum)
+        return;
+
+    respawnDelay = std::max<uint32>(std::ceil(respawnDelay * adjustFactor), timeMinimum);
 }
 
 void Map::DelayedUpdate(const uint32 t_diff)
@@ -2845,12 +2902,14 @@ void Map::RemoveOldCorpses()
     }
 }
 
-void Map::ScheduleCreatureRespawn(ObjectGuid creatureGuid, Milliseconds respawnTimer)
+void Map::ScheduleCreatureRespawn(ObjectGuid creatureGuid, Milliseconds respawnTimer, Position pos)
 {
-    _creatureRespawnScheduler.Schedule(respawnTimer, [this, creatureGuid](TaskContext)
+    _creatureRespawnScheduler.Schedule(respawnTimer, [this, creatureGuid, pos](TaskContext)
     {
         if (Creature* creature = GetCreature(creatureGuid))
             creature->Respawn();
+        else
+            SummonCreature(creatureGuid.GetEntry(), pos);
     });
 }
 

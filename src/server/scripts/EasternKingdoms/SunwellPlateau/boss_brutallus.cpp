@@ -91,10 +91,10 @@ struct boss_brutallus : public BossAI
             Talk(YELL_LOVE);
         }, 30s);
 
-        ScheduleTimedEvent(45s, [&] {
+        ScheduleTimedEvent(20s, [&] {
             if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 100.0f, true, true, -SPELL_BURN_DAMAGE))
                 DoCast(target, SPELL_BURN);
-        }, 1min);
+        }, 20s);
 
         me->m_Events.AddEventAtOffset([&] {
             DoCastSelf(SPELL_BERSERK, true);
