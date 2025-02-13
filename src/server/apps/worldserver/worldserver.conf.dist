@@ -4473,10 +4473,13 @@ Debug.Arena = 0
 #
 #
 #    Respawn.DynamicRateCreature
-#        Description: The rate at which the respawn time is adjusted for high player counts in a zone (for creatures).
-#                     Up to this number of players, the respawn rate is unchanged.
-#                     Does not affect instanced creatures, bosses or quest givers.
-#                     At double this number in players, you get twice as many respawns, at three times this number, three times the respawns, and so forth.
+#        Description: Controls how creature respawn times adjust based on player count in a zone.
+#                     The respawn time is unchanged up to the configured number of players.
+#                     As player count exceeds this value, respawn times decrease proportionally
+#                     (e.g., at double the player count, respawn times are halved; at triple the player count, respawns happen three times as fast).
+#                     Does not affect instanced creatures, bosses, or quest givers.
+#                     Formula: adjustFactor = rate / playerCount
+#                              RespawnTime = RespawnTime * adjustFactor
 #        Default:     1 (Disabled)
 
 Respawn.DynamicRateCreature = 1
@@ -4490,10 +4493,13 @@ Respawn.DynamicMinimumCreature = 10
 
 #
 #    Respawn.DynamicRateGameObject
-#        Description: The rate at which the respawn time is adjusted for high player counts in a zone (for gameobjects).
-#                     Up to this number of players, the respawn rate is unchanged.
+#        Description: Controls how gameobject respawn times adjust based on player count in a zone.
+#                     The respawn time is unchanged up to the configured number of players.
+#                     As player count exceeds this value, respawn times decrease proportionally
+#                     (e.g., at double the player count, respawn times are halved; at triple the player count, respawns happen three times as fast).
 #                     Does not affect instanced objects or quest givers.
-#                     At double this number in players, you get twice as many respawns, at three times this number, three times the respawns, and so forth.
+#                     Formula: adjustFactor = rate / playerCount
+#                              RespawnTime = RespawnTime * adjustFactor
 #        Default:     1 (Disabled)
 
 Respawn.DynamicRateGameObject = 1
