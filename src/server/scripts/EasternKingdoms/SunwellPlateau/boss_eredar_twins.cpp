@@ -108,9 +108,9 @@ struct boss_sacrolash : public BossAI
     void DamageDealt(Unit* victim, uint32& /*damage*/, DamageEffectType, SpellSchoolMask schoolMask) override
     {
         if (schoolMask & SPELL_SCHOOL_MASK_SHADOW)
-            victim->CastSpell(victim, SPELL_DARK_TOUCHED, true, nullptr, nullptr, me->GetGUID());
+            victim->CastSpell(victim, SPELL_DARK_TOUCHED, true);
         else if (schoolMask & SPELL_SCHOOL_MASK_FIRE)
-            victim->CastSpell(victim, SPELL_FLAME_TOUCHED, true, nullptr, nullptr, me->GetGUID());
+            victim->CastSpell(victim, SPELL_FLAME_TOUCHED, true);
     }
 
     void EnterEvadeMode(EvadeReason why) override
@@ -228,9 +228,9 @@ struct boss_alythess : public BossAI
     void DamageDealt(Unit* victim, uint32& /*damage*/, DamageEffectType, SpellSchoolMask schoolMask) override
     {
         if (schoolMask & SPELL_SCHOOL_MASK_FIRE)
-            victim->CastSpell(victim, SPELL_DARK_TOUCHED, true, nullptr, nullptr, me->GetGUID());
-        else if (schoolMask & SPELL_SCHOOL_MASK_SHADOW)
             victim->CastSpell(victim, SPELL_FLAME_TOUCHED, true, nullptr, nullptr, me->GetGUID());
+        else if (schoolMask & SPELL_SCHOOL_MASK_SHADOW)
+            victim->CastSpell(victim, SPELL_DARK_TOUCHED, true, nullptr, nullptr, me->GetGUID());
     }
 
     void EnterEvadeMode(EvadeReason why) override
