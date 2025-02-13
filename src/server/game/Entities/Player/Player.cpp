@@ -84,6 +84,7 @@
 #include "World.h"
 #include "WorldPacket.h"
 #include "WorldSession.h"
+#include "WorldSessionMgr.h"
 #include "WorldState.h"
 #include <cmath>
 
@@ -368,7 +369,7 @@ Player::Player(WorldSession* session): Unit(true), m_mover(this)
 
     m_ControlledByPlayer = true;
 
-    sWorld->IncreasePlayerCount();
+    sWorldSessionMgr->IncreasePlayerCount();
 
     m_ChampioningFaction = 0;
 
@@ -460,7 +461,7 @@ Player::~Player()
     delete _botMgr;
     //end npcbot
 
-    sWorld->DecreasePlayerCount();
+    sWorldSessionMgr->DecreasePlayerCount();
 
     if (!m_isInSharedVisionOf.empty())
     {

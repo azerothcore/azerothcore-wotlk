@@ -31,6 +31,7 @@
 #include "Transport.h"
 #include "UnitAI.h"
 #include "World.h"
+#include "WorldSessionMgr.h"
 #include "WorldStatePackets.h"
 #include <time.h>
 
@@ -1686,7 +1687,7 @@ void GameEventMgr::UpdateWorldStates(uint16 eventId, bool Activate)
                 WorldPackets::WorldState::UpdateWorldState worldstate;
                 worldstate.VariableID = bl->HolidayWorldStateId;
                 worldstate.Value = Activate ? 1 : 0;
-                sWorld->SendGlobalMessage(worldstate.Write());
+                sWorldSessionMgr->SendGlobalMessage(worldstate.Write());
             }
         }
     }
