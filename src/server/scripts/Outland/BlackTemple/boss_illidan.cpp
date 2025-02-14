@@ -696,11 +696,11 @@ private:
 
     void CycleBeamPos(uint8 &beamPosId)
     {
-        uint8 _incumbentBeamPos = urand(0, MAX_EYE_BEAM_POS - 1);
-        if (_incumbentBeamPos == beamPosId)
-            CycleBeamPos(beamPosId);
-        else
-            beamPosId = _incumbentBeamPos;
+        uint8 newPos;
+        do {
+            newPos = urand(0, MAX_EYE_BEAM_POS - 1);
+        } while (newPos == beamPosId);
+        beamPosId = newPos;
     }
 };
 
