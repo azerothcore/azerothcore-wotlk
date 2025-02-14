@@ -2658,38 +2658,40 @@ void Map::SendObjectUpdates()
     }
 }
 
-void Map::ApplyDynamicModeRespawnScaling(WorldObject const* obj, uint32& respawnDelay) const
+uint32 Map::ApplyDynamicModeRespawnScaling(WorldObject const* obj, uint32 respawnDelay) const
 {
     ASSERT(obj->GetMap() == this);
 
     float rate = sWorld->getFloatConfig(obj->IsGameObject() ? CONFIG_RESPAWN_DYNAMICRATE_GAMEOBJECT : CONFIG_RESPAWN_DYNAMICRATE_CREATURE);
 
     if (rate == 1.0f)
-        return;
+        return respawnDelay;
 
     // No instanced maps (dungeons, battlegrounds, arenas etc.)
     if (obj->GetMap()->Instanceable())
-        return;
+        return respawnDelay;
 
     // No quest givers or world bosses
     if (Creature const* creature = obj->ToCreature())
-        if (creature->IsQuestGiver() || creature->isWorldBoss())
-            return;
+        if (creature->IsQuestGiver() || creature->isWorldBoss()
+            || (creature->GetCreatureTemplate()->rank == CREATURE_ELITE_RARE)
+            || (creature->GetCreatureTemplate()->rank == CREATURE_ELITE_RAREELITE))
+            return respawnDelay;
 
     auto it = _zonePlayerCountMap.find(obj->GetZoneId());
     if (it == _zonePlayerCountMap.end())
-        return;
+        return respawnDelay;
     uint32 const playerCount = it->second;
     if (!playerCount)
-        return;
+        return respawnDelay;
     double const adjustFactor =  rate / playerCount;
     if (adjustFactor >= 1.0) // nothing to do here
-        return;
+        return respawnDelay;
     uint32 const timeMinimum = sWorld->getIntConfig(obj->IsGameObject() ? CONFIG_RESPAWN_DYNAMICMINIMUM_GAMEOBJECT : CONFIG_RESPAWN_DYNAMICMINIMUM_CREATURE);
     if (respawnDelay <= timeMinimum)
-        return;
+        return respawnDelay;
 
-    respawnDelay = std::max<uint32>(std::ceil(respawnDelay * adjustFactor), timeMinimum);
+    return std::max<uint32>(std::ceil(respawnDelay * adjustFactor), timeMinimum);
 }
 
 void Map::DelayedUpdate(const uint32 t_diff)
