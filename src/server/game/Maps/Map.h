@@ -595,7 +595,7 @@ public:
     [[nodiscard]] time_t GetInstanceResetPeriod() const { return _instanceResetPeriod; }
 
     void UpdatePlayerZoneStats(uint32 oldZone, uint32 newZone);
-    void ApplyDynamicModeRespawnScaling(WorldObject const* obj, uint32& respawnDelay) const;
+    [[nodiscard]] uint32 ApplyDynamicModeRespawnScaling(WorldObject const* obj, uint32 respawnDelay) const;
 
     TaskScheduler _creatureRespawnScheduler;
 

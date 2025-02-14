@@ -897,8 +897,8 @@ void GameObject::Update(uint32 diff)
                     return;
                 }
 
-                GetMap()->ApplyDynamicModeRespawnScaling(this, m_respawnDelayTime);
-                m_respawnTime = GameTime::GetGameTime().count() + m_respawnDelayTime;
+                uint32 dynamicRespawnDelay = GetMap()->ApplyDynamicModeRespawnScaling(this, m_respawnDelayTime);
+                m_respawnTime = GameTime::GetGameTime().count() + dynamicRespawnDelay;
 
                 // if option not set then object will be saved at grid unload
                 if (GetMap()->IsDungeon())
