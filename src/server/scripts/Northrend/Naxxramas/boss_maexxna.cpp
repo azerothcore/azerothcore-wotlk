@@ -135,7 +135,10 @@ public:
             {
                 if (GameObject* go = me->GetMap()->GetGameObject(pInstance->GetGuidData(DATA_MAEXXNA_GATE)))
                 {
-                    go->SetGoState(GO_STATE_ACTIVE);
+                    if (pInstance->GetBossState(BOSS_FAERLINA) == DONE)
+                    {
+                        go->SetGoState(GO_STATE_ACTIVE);
+                    }
                 }
             }
         }
