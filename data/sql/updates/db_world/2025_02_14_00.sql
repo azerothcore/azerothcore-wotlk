@@ -1,3 +1,4 @@
+-- DB update 2025_02_13_01 -> 2025_02_14_00
 -- Update creature 'Chemical Wagon' with sniffed values
 -- updated spawns
 DELETE FROM `creature` WHERE (`id1` IN (38035))
