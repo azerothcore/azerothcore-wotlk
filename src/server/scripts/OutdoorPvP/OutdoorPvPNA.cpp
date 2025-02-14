@@ -89,7 +89,7 @@ void UpdateCreatureHalaa(ObjectGuid::LowType spawnId, Map* map, float x, float y
     sObjectMgr->AddCreatureToGrid(spawnId, &data);
 
     // Spawn if necessary (loaded grids only)
-    if (!map->Instanceable() && !map->IsRemovalGrid(x, y))
+    if (!map->Instanceable() && !map->IsGridCreated(x, y))
     {
         Creature* creature = new Creature();
         if (!creature->LoadCreatureFromDB(spawnId, map, true, true))

@@ -20,6 +20,7 @@
 #include "ObjectMgr.h"
 #include "PreparedStatement.h"
 #include "QueryResult.h"
+#include "Timer.h"
 
 LootItemStorage::LootItemStorage()
 {
