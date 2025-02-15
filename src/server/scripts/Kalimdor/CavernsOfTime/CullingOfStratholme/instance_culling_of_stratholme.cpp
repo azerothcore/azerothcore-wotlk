@@ -67,8 +67,6 @@ public:
             if (instance->GetPlayersCountExceptGMs() == 1)
                 SetData(DATA_ARTHAS_REPOSITION, 2);
 
-            EnsureGridLoaded();
-
             if (plr->getRace() != RACE_HUMAN && plr->getRace() != RACE_DWARF && plr->getRace() != RACE_GNOME)
                 plr->CastSpell(plr, ((plr->getGender() == GENDER_MALE) ? SPELL_HUMAN_MALE : SPELL_HUMAN_FEMALE), true);
         }
@@ -224,7 +222,6 @@ public:
                 {
                     if (!arthas->IsAlive())
                     {
-                        EnsureGridLoaded();
                         arthas->setDeathState(DeathState::Dead);
                         arthas->Respawn();
                     }
@@ -350,16 +347,6 @@ public:
                     arthas->SetFacingTo(LeaderIntroPos6.GetOrientation());
                     break;
             }
-        }
-
-        void EnsureGridLoaded()
-        {
-            instance->LoadGrid(LeaderIntroPos1.GetPositionX(), LeaderIntroPos1.GetPositionY());
-            instance->LoadGrid(LeaderIntroPos2.GetPositionX(), LeaderIntroPos2.GetPositionY());
-            instance->LoadGrid(LeaderIntroPos3.GetPositionX(), LeaderIntroPos3.GetPositionY());
-            instance->LoadGrid(LeaderIntroPos4.GetPositionX(), LeaderIntroPos4.GetPositionY());
-            instance->LoadGrid(LeaderIntroPos5.GetPositionX(), LeaderIntroPos5.GetPositionY());
-            instance->LoadGrid(LeaderIntroPos6.GetPositionX(), LeaderIntroPos6.GetPositionY());
         }
 
         std::string GetSaveData() override

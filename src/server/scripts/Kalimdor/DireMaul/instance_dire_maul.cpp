@@ -95,11 +95,9 @@ public:
             {
                 case TYPE_EAST_WING_PROGRESS:
                     _eastWingProgress = data;
-                    instance->LoadGrid(-56.59f, -269.12f);
                     break;
                 case TYPE_WEST_WING_PROGRESS:
                     _westWingProgress = data;
-                    instance->LoadGrid(132.626f, 625.913f);
                     break;
                 case TYPE_NORTH_WING_PROGRESS:
                     _northWingProgress = data;
@@ -113,7 +111,6 @@ public:
                     _pylonsState |= data;
                     if (_pylonsState == ALL_PYLONS_OFF) // all five active, 31
                     {
-                        instance->LoadGrid(-38.08f, 812.44f);
                         if (Creature* immol = instance->GetCreature(_immoltharGUID))
                         {
                             immol->setActive(true);

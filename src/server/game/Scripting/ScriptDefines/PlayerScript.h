@@ -204,6 +204,10 @@ enum PlayerHook
     PLAYERHOOK_CAN_SEND_ERROR_ALREADY_LOOTED,
     PLAYERHOOK_ON_AFTER_CREATURE_LOOT,
     PLAYERHOOK_ON_AFTER_CREATURE_LOOT_MONEY,
+    PLAYERHOOK_ON_CAN_UPDATE_SKILL,
+    PLAYERHOOK_ON_BEFORE_UPDATE_SKILL,
+    PLAYERHOOK_ON_UPDATE_SKILL,
+    PLAYERHOOK_CAN_RESURRECT,
     PLAYERHOOK_END
 };
 
@@ -765,6 +769,19 @@ public:
      * @param player Contains information about the Player
      */
     virtual void OnAfterCreatureLootMoney(Player* /*player*/) { }
+
+    virtual bool CanPlayerUpdateSkill(Player* /*player*/, uint32 /*skillId*/) { return true; }
+    virtual void OnBeforePlayerUpdateSkill(Player* /*player*/, uint32 /*skillId*/, uint32& /*value*/, uint32 /*max*/, uint32 /*step*/) { }
+    virtual void OnPlayerUpdateSkill(Player* /*player*/, uint32 /*skillId*/, uint32 /*value*/, uint32 /*max*/, uint32 /*step*/, uint32 /*newValue*/) { }
+
+    /**
+     * @brief This hook is called, to avoid player resurrect
+     *
+     * @param player Contains information about the Player
+     *
+     * @return true if player is authorized to resurect
+     */
+    virtual bool CanPlayerResurrect(Player* /*player*/) { return true; }
 };
 
 #endif

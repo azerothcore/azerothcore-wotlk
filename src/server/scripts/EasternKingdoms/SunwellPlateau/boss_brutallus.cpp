@@ -91,10 +91,10 @@ struct boss_brutallus : public BossAI
             Talk(YELL_LOVE);
         }, 30s);
 
-        ScheduleTimedEvent(45s, [&] {
+        ScheduleTimedEvent(20s, [&] {
             if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 100.0f, true, true, -SPELL_BURN_DAMAGE))
                 DoCast(target, SPELL_BURN);
-        }, 1min);
+        }, 20s);
 
         me->m_Events.AddEventAtOffset([&] {
             DoCastSelf(SPELL_BERSERK, true);
@@ -354,9 +354,8 @@ struct npc_madrigosa : public NullCreatureAI
             }
             break;
         case EVENT_SPAWN_FELMYST:
+            DoCastAOE(SPELL_SUMMON_FELBLAZE, true);
             me->DespawnOrUnsummon(1);
-            if (Creature* felmyst = instance->GetCreature(DATA_FELMYST))
-                felmyst->AI()->DoAction(ACTION_START_EVENT);
             break;
         }
     }

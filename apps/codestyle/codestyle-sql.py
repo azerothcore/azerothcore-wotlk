@@ -15,8 +15,9 @@ results = {
     "Multiple blank lines check": "Passed",
     "Trailing whitespace check": "Passed",
     "SQL codestyle check": "Passed",
-    "INSERT safety usage check": "Passed",
-    "Missing semicolon check": "Passed"
+    "INSERT & DELETE safety usage check": "Passed",
+    "Missing semicolon check": "Passed",
+    "Backtick check": "Passed"
 }
 
 # Collect all files in all directories
@@ -44,8 +45,9 @@ def parsing_file(files: list) -> None:
                 multiple_blank_lines_check(file, file_path)
                 trailing_whitespace_check(file, file_path)
                 sql_check(file, file_path)
-                insert_safety_check(file, file_path)
+                insert_delete_safety_check(file, file_path)
                 semicolon_check(file, file_path)
+                backtick_check(file, file_path)
         except UnicodeDecodeError:
             print(f"\nCould not decode file {file_path}")
             sys.exit(1)
@@ -134,9 +136,10 @@ def sql_check(file: io, file_path: str) -> None:
         error_handler = True
         results["SQL codestyle check"] = "Failed"
 
-def insert_safety_check(file: io, file_path: str) -> None:
+def insert_delete_safety_check(file: io, file_path: str) -> None:
     global error_handler, results
     file.seek(0)  # Reset file pointer to the beginning
+    not_delete = ["creature_template", "gameobject_template", "item_template", "quest_template"]
     check_failed = False
     previous_line = ""
 
@@ -145,14 +148,21 @@ def insert_safety_check(file: io, file_path: str) -> None:
         if line.startswith("--"):
             continue
         if "INSERT" in line and "DELETE" not in previous_line:
-            print(f"No DELETE keyword found after the INSERT in {file_path} at line {line_number}\nIf this error is intended, please advert a maintainer")
+            print(f"No DELETE keyword found before the INSERT in {file_path} at line {line_number}\nIf this error is intended, please advert a maintainer")
             check_failed = True
         previous_line = line
+        match = re.match(r"DELETE FROM\s+`([^`]+)`", line, re.IGNORECASE)
+        if match:
+            table_name = match.group(1)
+            if table_name in not_delete:
+                print(
+                    f"Entries from {table} should not be deleted! {file_path} at line {line_number}")
+                check_failed = True
 
     # Handle the script error and update the result output
     if check_failed:
         error_handler = True
-        results["INSERT safety usage check"] = "Failed"
+        results["INSERT & DELETE safety usage check"] = "Failed"
 
 def semicolon_check(file: io, file_path: str) -> None:
     global error_handler, results
@@ -191,6 +201,50 @@ def semicolon_check(file: io, file_path: str) -> None:
     if check_failed:
         error_handler = True
         results["Missing semicolon check"] = "Failed"
+
+def backtick_check(file: io, file_path: str) -> None:
+    global error_handler, results
+    file.seek(0)
+    check_failed = False
+
+    # Find SQL clauses
+    pattern = re.compile(
+        r'\b(SELECT|FROM|JOIN|WHERE|GROUP BY|ORDER BY|DELETE FROM|UPDATE|INSERT INTO|SET|REPLACE|REPLACE INTO)\s+(.*?)(?=;$|(?=\b(?:WHERE|SET|VALUES)\b)|$)',  
+        re.IGNORECASE | re.DOTALL
+    )
+
+
+    # Make sure to ignore values enclosed in single- and doublequotes
+    quote_pattern = re.compile(r"'(?:\\'|[^'])*'|\"(?:\\\"|[^\"])*\"")
+
+    for line_number, line in enumerate(file, start=1):
+        # Ignore comments
+        if line.startswith('--'):
+            continue
+
+        # Sanitize single- and doublequotes to prevent false positives
+        sanitized_line = quote_pattern.sub('', line)
+        matches = pattern.findall(sanitized_line)
+        
+        for clause, content in matches:
+            # Find all words and exclude @variables
+            words = re.findall(r'\b(?<!@)([a-zA-Z_][a-zA-Z0-9_]*)\b', content)
+
+            for word in words:
+                # Skip SQL keywords
+                if word.upper() in {"SELECT", "FROM", "JOIN", "WHERE", "GROUP", "BY", "ORDER", 
+                                    "DELETE", "UPDATE", "INSERT", "INTO", "SET", "VALUES", "AND",
+                                    "IN", "OR", "REPLACE"}:
+                    continue
+
+                # Make sure the word is enclosed in backticks
+                if not re.search(rf'`{re.escape(word)}`', content):
+                    print(f"Missing backticks around ({word}). {file_path} at line {line_number}")
+                    check_failed = True
+
+    if check_failed:
+        error_handler = True
+        results["Backtick check"] = "Failed"
 
 # Collect all files from matching directories
 all_files = collect_files_from_directories(src_directory)
