@@ -701,6 +701,14 @@ public: /* LootScript */
 
     void OnLootMoney(Player* player, uint32 gold);
 
+public: /* TicketScript */
+
+    void OnTicketCreate(Player* player, GmTicket* ticket);
+    void OnTicketUpdate(Player* player, GmTicket* ticket);
+    void OnTicketClose(Player* player, GmTicket* ticket);
+    void OnTicketStatusUpdate(Player* player, GmTicket* ticket);
+    void OnTicketResolve(Player* player, GmTicket* ticket);
+
 private:
     uint32 _scriptCount;
 
