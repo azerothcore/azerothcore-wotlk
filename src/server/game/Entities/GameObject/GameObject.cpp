@@ -165,7 +165,6 @@ void GameObject::AddToWorld()
     }
 }
 
-// blame kitzunu
 void GameObject::RemoveFromWorld()
 {
     ///- Remove the gameobject from the accessor
