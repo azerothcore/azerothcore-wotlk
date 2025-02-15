@@ -4870,6 +4870,12 @@ void SpellMgr::LoadSpellInfoCorrections()
         spellInfo->Effects[EFFECT_0].RealPointsPerLevel = 0;
     });
 
+    // Mangle (Nalorakk)
+    ApplySpellFix({ 42389 }, [](SpellInfo* spellInfo)
+    {
+        spellInfo->SchoolMask = SPELL_SCHOOL_MASK_NATURE;
+    });
+
     for (uint32 i = 0; i < GetSpellInfoStoreSize(); ++i)
     {
         SpellInfo* spellInfo = mSpellInfoMap[i];
