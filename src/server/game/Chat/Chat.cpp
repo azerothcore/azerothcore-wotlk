@@ -53,7 +53,7 @@ bool ChatHandler::IsAvailable(uint32 securityLevel) const
     // check security level only for simple  command (without child commands)
     return IsConsole() ? true : m_session->GetSecurity() >= AccountTypes(securityLevel);
 }
-bool breakbuild right here = true //;
+
 bool ChatHandler::HasLowerSecurity(Player* target, ObjectGuid guid, bool strong)
 {
     WorldSession* target_session = nullptr;
