@@ -751,11 +751,6 @@ void AchievementMgr::SendAchievementEarned(AchievementEntry const* achievement) 
     // if player is in world he can tell his friends about new achievement
     else if (GetPlayer()->IsInWorld())
     {
-        CellCoord p = Acore::ComputeCellCoord(GetPlayer()->GetPositionX(), GetPlayer()->GetPositionY());
-
-        Cell cell(p);
-        cell.SetNoCreate();
-
         Acore::BroadcastTextBuilder _builder(GetPlayer(), CHAT_MSG_ACHIEVEMENT, BROADCAST_TEXT_ACHIEVEMENT_EARNED, GetPlayer()->getGender(), GetPlayer(), achievement->ID);
         Acore::LocalizedPacketDo<Acore::BroadcastTextBuilder> _localizer(_builder);
         Acore::PlayerDistWorker<Acore::LocalizedPacketDo<Acore::BroadcastTextBuilder>> _worker(GetPlayer(), sWorld->getFloatConfig(CONFIG_LISTEN_RANGE_SAY), _localizer);

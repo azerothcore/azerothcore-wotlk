@@ -63,7 +63,6 @@ public:
         {
             if (GetBossState(DATA_HALION_INTRO_DONE) != DONE && GetBossState(DATA_GENERAL_ZARITHRIAN) == DONE)
             {
-                instance->LoadGrid(3156.0f, 537.0f);
                 if (Creature* halionController = instance->GetCreature(HalionControllerGUID))
                     halionController->AI()->DoAction(ACTION_INTRO_HALION);
             }

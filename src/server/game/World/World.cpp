@@ -1963,7 +1963,7 @@ void World::SetInitialWorldSettings()
 				if (!map->Instanceable())
                 {
                     LOG_INFO("server.loading", ">> Loading All Grids For Map {}", map->GetId());
-                    map->LoadAllCells();
+                    map->LoadAllGrids();
                 }
             });
 		//End Lanny
