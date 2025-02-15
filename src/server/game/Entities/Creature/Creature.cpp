@@ -1901,7 +1901,7 @@ bool Creature::LoadCreatureFromDB(ObjectGuid::LowType spawnId, Map* map, bool ad
     if (IsNPCBot())
     {
         //prevent loading npcbot twice (grid unload/load case)
-        if (sWorld->GetMaxPlayerCount() > 0)
+        if (sWorldSessionMgr->GetMaxPlayerCount() > 0)
             return false;
 
         LOG_INFO("entities.unit", "Creature: loading npcbot {} (id: {})", GetName(), GetEntry());

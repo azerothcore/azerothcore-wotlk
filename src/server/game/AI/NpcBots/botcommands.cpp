@@ -37,6 +37,7 @@
 #include "World.h"
 #include "WorldDatabase.h"
 #include "WorldSession.h"
+#include "WorldSessionMgr.h"
 
 /*
 Name: script_bot_commands
@@ -2011,20 +2012,20 @@ public:
     static bool HandleNpcBotDumpLoadCommand(ChatHandler* handler, Optional<std::string> file_str, Optional<bool> forceKick)
     {
         bool force_kick = forceKick.value_or(false);
-        if (!file_str || (!force_kick && sWorld->GetPlayerCount() > 0))
+        if (!file_str || (!force_kick && sWorldSessionMgr->GetPlayerCount() > 0))
         {
             handler->SendSysMessage(".npcbot dump load");
             handler->SendSysMessage("Imports NPCBots from a backup SQL file created with '.npcbot dump write' command.");
             handler->SendSysMessage("Syntax: .npcbot dump load #file_name [#force_kick_all]");
-            if (!force_kick && sWorld->GetPlayerCount() > 0)
+            if (!force_kick && sWorldSessionMgr->GetPlayerCount() > 0)
                 handler->SendSysMessage("Make sure no players are online before importing.");
             handler->SetSentErrorMessage(true);
             return false;
         }
 
-        sWorld->SetPlayerAmountLimit(0);
+        sWorldSessionMgr->SetPlayerAmountLimit(0);
         if (force_kick)
-            sWorld->KickAll();
+            sWorldSessionMgr->KickAll();
 
         //omit file ext if needed
         if (file_str->find('.') == std::string::npos)
