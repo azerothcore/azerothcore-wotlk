@@ -218,7 +218,7 @@ void WorldSession::HandleTrainerBuySpellOpcode(WorldPacket& recvData)
     recvData >> guid >> spellId;
 
     Creature* unit = GetPlayer()->GetNPCIfCanInteractWith(guid, UNIT_NPC_FLAG_TRAINER);
-    if (!unit && !GetCurrentTrainer())
+    if (!unit && !trainerEntry)
     {
         LOG_DEBUG("network", "WORLD: HandleTrainerBuySpellOpcode - Unit ({}) not found or you can not interact with him.", guid.ToString());
         return;
