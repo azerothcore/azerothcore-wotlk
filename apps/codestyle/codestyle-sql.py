@@ -148,7 +148,7 @@ def insert_delete_safety_check(file: io, file_path: str) -> None:
         if line.startswith("--"):
             continue
         if "INSERT" in line and "DELETE" not in previous_line:
-            print(f"No DELETE keyword found after the INSERT in {file_path} at line {line_number}\nIf this error is intended, please advert a maintainer")
+            print(f"No DELETE keyword found before the INSERT in {file_path} at line {line_number}\nIf this error is intended, please advert a maintainer")
             check_failed = True
         previous_line = line
         match = re.match(r"DELETE FROM\s+`([^`]+)`", line, re.IGNORECASE)
