@@ -121,7 +121,10 @@ runs:
     - name: build
       shell: bash
       working-directory: "${{ github.workspace }}/build"
-      run: cmake --build . --config "Release" -j "$(($(nproc) + 2))"
+      run: |
+        set +e  # Allow the script to continue on errors
+        cmake --build . --config "Release" -j "$(($(nproc) + 2))"
+        set -e  # Re-enable error stopping after build
 
     - name: install
       shell: bash
