@@ -272,6 +272,7 @@ private:
     uint32 _reputationCapture;
     uint32 _honorWinKills;
     uint32 _honorEndKills;
+    uint32 _configurableMaxTeamScore;
 
     void PostUpdateImpl(uint32 diff) override;
 };

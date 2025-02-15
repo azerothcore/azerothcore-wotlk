@@ -265,6 +265,9 @@ void BattlegroundAV::HandleQuestComplete(uint32 questid, Player* player)
 
 void BattlegroundAV::UpdateScore(TeamId teamId, int16 points)
 {
+    if (BG_AV_SCORE_INITIAL_POINTS == 0)
+        return; // don't update teamscores if reinforcements are disabled
+
     //note: to remove reinforcementpoints points must be negative, for adding reinforcements points must be positive
     m_Team_Scores[teamId] += points;
 
@@ -474,8 +477,11 @@ void BattlegroundAV::StartingEventOpenDoors()
     for (uint8 mine = AV_NORTH_MINE; mine <= AV_SOUTH_MINE; mine++) //mine population
         ChangeMineOwner(mine, TEAM_NEUTRAL, true);
 
-    UpdateWorldState(AV_SHOW_H_SCORE, 1);
-    UpdateWorldState(AV_SHOW_A_SCORE, 1);
+    if (BG_AV_SCORE_INITIAL_POINTS > 0) // display teamscores on top only if reinforcements are enabled
+    {
+        UpdateWorldState(AV_SHOW_H_SCORE, 1);
+        UpdateWorldState(AV_SHOW_A_SCORE, 1);
+    }
 
     DoorOpen(BG_AV_OBJECT_DOOR_H);
     DoorOpen(BG_AV_OBJECT_DOOR_A);
@@ -1112,7 +1118,7 @@ void BattlegroundAV::FillInitialWorldStates(WorldPacket& data)
         data << uint32(AV_SNOWFALL_N) << uint32(1);
     data << uint32(AV_Alliance_Score)  << uint32(m_Team_Scores[0]);
     data << uint32(AV_Horde_Score) << uint32(m_Team_Scores[1]);
-    if (GetStatus() == STATUS_IN_PROGRESS)  //only if game started the teamscores are displayed
+    if (GetStatus() == STATUS_IN_PROGRESS && BG_AV_SCORE_INITIAL_POINTS > 0)  //only if game started the teamscores are displayed && reinforcements are enabled
     {
         data << uint32(AV_SHOW_A_SCORE) << uint32(1);
         data << uint32(AV_SHOW_H_SCORE) << uint32(1);
