@@ -62,7 +62,8 @@ enum Texts
 
 MinionData const minionData[] =
 {
-    { NPC_CHROMATIC_ELITE_GUARD, DATA_GENERAL_DRAKKISATH }
+    { NPC_CHROMATIC_ELITE_GUARD, DATA_GENERAL_DRAKKISATH },
+    { 0,                         0,                      }
 };
 
 DoorData const doorData[] =

@@ -110,25 +110,7 @@ public:
 
         bool CanAIAttack(Unit const* target) const override
         {
-            if (target->IsCreature() && !secondPhase)
-            {
-                return false;
-            }
-
-            if (me->GetThreatMgr().GetThreatListSize() > 1)
-            {
-                ThreatContainer::StorageType::const_iterator lastRef = me->GetThreatMgr().GetOnlineContainer().GetThreatList().end();
-                --lastRef;
-                if (Unit* lastTarget = (*lastRef)->getTarget())
-                {
-                    if (lastTarget != target)
-                    {
-                        return !target->HasAura(SPELL_CONFLAGRATION);
-                    }
-                }
-            }
-
-            return true;
+            return !(target->IsCreature() && !secondPhase);
         }
 
         void JustEngagedWith(Unit* /*who*/) override
