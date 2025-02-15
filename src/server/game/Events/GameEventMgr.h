@@ -38,17 +38,17 @@ enum GameEventState
 
 struct GameEventFinishCondition
 {
-    float reqNum;  // required number // use float, since some events use percent
-    float done;    // done number
-    uint32 max_world_state;  // max resource count world state update id
-    uint32 done_world_state; // done resource count world state update id
+    float ReqNum;  // required number // use float, since some events use percent
+    float Done;    // done number
+    uint32 MaxWorldState;  // max resource count world state update id
+    uint32 DoneWorldState; // done resource count world state update id
 };
 
 struct GameEventQuestToEventConditionNum
 {
-    uint16 event_id;
-    uint32 condition;
-    float num;
+    uint16 EventId;
+    uint32 Condition;
+    float Num;
 };
 
 typedef std::map<uint32 /*condition id*/, GameEventFinishCondition> GameEventConditionMap;
@@ -56,37 +56,37 @@ typedef std::map<uint32 /*condition id*/, GameEventFinishCondition> GameEventCon
 struct GameEventData
 {
     GameEventData()  = default;
-    uint32 eventId;
-    time_t start{1};           // occurs after this time
-    time_t end{0};             // occurs before this time
-    time_t nextstart{0};       // after this time the follow-up events count this phase completed
-    uint32 occurence{0};       // time between end and start
-    uint32 length{0};          // length of the event (minutes) after finishing all conditions
-    HolidayIds holiday_id{HOLIDAY_NONE};
-    uint8 holidayStage;
-    GameEventState state{GAMEEVENT_NORMAL};   // state of the game event, these are saved into the game_event table on change!
-    GameEventConditionMap conditions;  // conditions to finish
-    std::set<uint16 /*gameevent id*/> prerequisite_events;  // events that must be completed before starting this event
-    std::string description;
-    uint8 announce;         // if 0 dont announce, if 1 announce, if 2 take config value
+    uint32 EventId;
+    time_t Start{1};           // occurs after this time
+    time_t End{0};             // occurs before this time
+    time_t NextStart{0};       // after this time the follow-up events count this phase completed
+    uint32 Occurence{0};       // time between end and start
+    uint32 Length{0};          // length of the event (minutes) after finishing all conditions
+    HolidayIds HolidayId{HOLIDAY_NONE};
+    uint8 HolidayStage;
+    GameEventState State{GAMEEVENT_NORMAL};   // state of the game event, these are saved into the game_event table on change!
+    GameEventConditionMap Conditions;  // conditions to finish
+    std::set<uint16 /*gameevent id*/> PrerequisiteEvents;  // events that must be completed before starting this event
+    std::string Description;
+    uint8 Announce;         // if 0 dont announce, if 1 announce, if 2 take config value
 
-    [[nodiscard]] bool isValid() const { return length > 0 || state > GAMEEVENT_NORMAL; }
+    [[nodiscard]] bool isValid() const { return Length > 0 || State > GAMEEVENT_NORMAL; }
 };
 
 struct ModelEquip
 {
-    uint32 modelid;
-    uint32 modelid_prev;
-    uint8 equipment_id;
-    uint8 equipement_id_prev;
+    uint32 ModelId;
+    uint32 ModelIdPrev;
+    uint8 EquipmentId;
+    uint8 EquipementIdPrev;
 };
 
 struct NPCVendorEntry
 {
-    uint32 entry;                       // creature entry
-    uint32 item;                        // item id
-    int32  maxcount;                    // 0 for infinite
-    uint32 incrtime;                    // time for restore items amount if maxcount != 0
+    uint32 Entry;                       // creature entry
+    uint32 Item;                        // item id
+    int32  MaxCount;                    // 0 for infinite
+    uint32 Incrtime;                    // time for restore items amount if maxcount != 0
     uint32 ExtendedCost;
 };
 
@@ -105,17 +105,16 @@ public:
 
     typedef std::set<uint16> ActiveEvents;
     typedef std::vector<GameEventData> GameEventDataMap;
-    [[nodiscard]] ActiveEvents const& GetActiveEventList() const { return m_ActiveEvents; }
-    [[nodiscard]] GameEventDataMap const& GetEventMap() const { return mGameEvent; }
+    [[nodiscard]] ActiveEvents const& GetActiveEventList() const { return _activeEvents; }
+    [[nodiscard]] GameEventDataMap const& GetEventMap() const { return _gameEvent; }
     [[nodiscard]] bool CheckOneGameEvent(uint16 entry) const;
     [[nodiscard]] uint32 NextCheck(uint16 entry) const;
     void LoadFromDB();
     void LoadHolidayDates();
     uint32 Update();
-    bool IsActiveEvent(uint16 event_id) { return (m_ActiveEvents.find(event_id) != m_ActiveEvents.end()); }
+    bool IsActiveEvent(uint16 eventId) { return (_activeEvents.find(eventId) != _activeEvents.end()); }
     uint32 StartSystem();
     void Initialize();
-    void StartArenaSeason();
     void StartInternalEvent(uint16 event_id);
     bool StartEvent(uint16 event_id, bool overwrite = false);
     void StopEvent(uint16 event_id, bool overwrite = false);
@@ -125,26 +124,42 @@ public:
     void LoadEventVendors();
     [[nodiscard]] uint32 GetHolidayEventId(uint32 holidayId) const;
 private:
-    void SendWorldStateUpdate(Player* player, uint16 event_id);
-    void AddActiveEvent(uint16 event_id) { m_ActiveEvents.insert(event_id); }
-    void RemoveActiveEvent(uint16 event_id) { m_ActiveEvents.erase(event_id); }
-    void ApplyNewEvent(uint16 event_id);
-    void UnApplyEvent(uint16 event_id);
-    void GameEventSpawn(int16 event_id);
-    void GameEventUnspawn(int16 event_id);
-    void ChangeEquipOrModel(int16 event_id, bool activate);
-    void UpdateEventQuests(uint16 event_id, bool activate);
-    void UpdateWorldStates(uint16 event_id, bool Activate);
-    void UpdateEventNPCFlags(uint16 event_id);
-    void UpdateEventNPCVendor(uint16 event_id, bool activate);
+    void LoadEvents();
+    void LoadEventSaveData();
+    void LoadEventPrerequisiteData();
+    void LoadEventCreatureData();
+    void LoadEventGameObjectData();
+    void LoadEventModelEquipmentChangeData();
+    void LoadEventQuestData();
+    void LoadEventGameObjectQuestData();
+    void LoadEventQuestConditionData();
+    void LoadEventConditionData();
+    void LoadEventConditionSaveData();
+    void LoadEventNPCFlags();
+    void LoadEventSeasonalQuestRelations();
+    void LoadEventBattlegroundData();
+    void LoadEventPoolData();
+
+    void SendWorldStateUpdate(Player* player, uint16 eventId);
+    void AddActiveEvent(uint16 eventId) { _activeEvents.insert(eventId); }
+    void RemoveActiveEvent(uint16 eventId) { _activeEvents.erase(eventId); }
+    void ApplyNewEvent(uint16 eventId);
+    void UnApplyEvent(uint16 eventId);
+    void GameEventSpawn(int16 eventId);
+    void GameEventUnspawn(int16 eventId);
+    void ChangeEquipOrModel(int16 eventId, bool activate);
+    void UpdateEventQuests(uint16 eventId, bool activate);
+    void UpdateWorldStates(uint16 eventId, bool Activate);
+    void UpdateEventNPCFlags(uint16 eventId);
+    void UpdateEventNPCVendor(uint16 eventId, bool activate);
     void UpdateBattlegroundSettings();
-    void RunSmartAIScripts(uint16 event_id, bool activate);    //! Runs SMART_EVENT_GAME_EVENT_START/_END SAI
-    bool CheckOneGameEventConditions(uint16 event_id);
-    void SaveWorldEventStateToDB(uint16 event_id);
-    bool hasCreatureQuestActiveEventExcept(uint32 quest_id, uint16 event_id);
-    bool hasGameObjectQuestActiveEventExcept(uint32 quest_id, uint16 event_id);
-    bool hasCreatureActiveEventExcept(ObjectGuid::LowType creature_guid, uint16 event_id);
-    bool hasGameObjectActiveEventExcept(ObjectGuid::LowType go_guid, uint16 event_id);
+    void RunSmartAIScripts(uint16 eventId, bool activate);    //! Runs SMART_EVENT_GAME_EVENT_START/_END SAI
+    bool CheckOneGameEventConditions(uint16 eventId);
+    void SaveWorldEventStateToDB(uint16 eventId);
+    bool HasCreatureQuestActiveEventExcept(uint32 quest_id, uint16 eventId);
+    bool HasGameObjectQuestActiveEventExcept(uint32 quest_id, uint16 eventId);
+    bool HasCreatureActiveEventExcept(ObjectGuid::LowType creature_guid, uint16 eventId);
+    bool HasGameObjectActiveEventExcept(ObjectGuid::LowType go_guid, uint16 eventId);
     void SetHolidayEventTime(GameEventData& event);
 
     typedef std::list<ObjectGuid::LowType> GuidLowList;
@@ -165,29 +180,27 @@ private:
     typedef std::vector<NPCFlagList> GameEventNPCFlagMap;
     typedef std::vector<uint32> GameEventBitmask;
     typedef std::unordered_map<uint32, std::vector<uint32>> GameEventSeasonalQuestsMap;
-    GameEventQuestMap mGameEventCreatureQuests;
-    GameEventQuestMap mGameEventGameObjectQuests;
-    GameEventNPCVendorMap mGameEventVendors;
-    GameEventModelEquipMap mGameEventModelEquip;
-    //GameEventGuidMap  mGameEventCreatureGuids;
-    //GameEventGuidMap  mGameEventGameobjectGuids;
-    GameEventIdMap    mGameEventPoolIds;
-    GameEventDataMap  mGameEvent;
-    GameEventBitmask  mGameEventBattlegroundHolidays;
-    QuestIdToEventConditionMap mQuestToEventConditions;
-    GameEventNPCFlagMap mGameEventNPCFlags;
-    ActiveEvents m_ActiveEvents;
-    bool isSystemInit;
+    GameEventQuestMap _gameEventCreatureQuests;
+    GameEventQuestMap _gameEventGameObjectQuests;
+    GameEventNPCVendorMap _gameEventVendors;
+    GameEventModelEquipMap _gameEventModelEquip;
+    GameEventIdMap    _gameEventPoolIds;
+    GameEventDataMap  _gameEvent;
+    GameEventBitmask  _gameEventBattlegroundHolidays;
+    QuestIdToEventConditionMap _questToEventConditions;
+    GameEventNPCFlagMap _gameEventNPCFlags;
+    ActiveEvents _activeEvents;
+    bool _isSystemInit;
     GameEventSeasonalQuestsMap _gameEventSeasonalQuestsMap;
 public:
-    GameEventGuidMap  mGameEventCreatureGuids;
-    GameEventGuidMap  mGameEventGameobjectGuids;
-    std::vector<uint32> modifiedHolidays;
+    GameEventGuidMap  GameEventCreatureGuids;
+    GameEventGuidMap  GameEventGameobjectGuids;
+    std::vector<uint32> ModifiedHolidays;
 };
 
 #define sGameEventMgr GameEventMgr::instance()
 
 bool IsHolidayActive(HolidayIds id);
-bool IsEventActive(uint16 event_id);
+bool IsEventActive(uint16 eventId);
 
 #endif

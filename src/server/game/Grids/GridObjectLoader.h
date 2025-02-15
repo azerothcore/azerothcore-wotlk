@@ -15,51 +15,42 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef ACORE_OBJECTGRIDLOADER_H
-#define ACORE_OBJECTGRIDLOADER_H
+#ifndef ACORE_GRID_OBJECT_LOADER_H
+#define ACORE_GRID_OBJECT_LOADER_H
 
 #include "Cell.h"
 #include "Define.h"
 #include "GridDefines.h"
+#include "ObjectMgr.h"
 
-class ObjectWorldLoader;
-
-class ObjectGridLoader
+class GridObjectLoader
 {
-    friend class ObjectWorldLoader;
-
 public:
-    ObjectGridLoader(NGridType& grid, Map* map, const Cell& cell)
-        : i_cell(cell), i_grid(grid), i_map(map), i_gameObjects(0), i_creatures(0), i_corpses (0)
-    {}
+    GridObjectLoader(MapGridType& grid, Map* map)
+        : _grid(grid), _map(map) { }
 
-    void Visit(GameObjectMapType& m);
-    void Visit(CreatureMapType& m);
-    void Visit(CorpseMapType&) const {}
-    void Visit(DynamicObjectMapType&) const {}
-
-    void LoadN(void);
-
-    template<class T> static void SetObjectCell(T* obj, CellCoord const& cellCoord);
+    void LoadAllCellsInGrid();
 
 private:
-    Cell i_cell;
-    NGridType& i_grid;
-    Map* i_map;
-    uint32 i_gameObjects;
-    uint32 i_creatures;
-    uint32 i_corpses;
+    template<class T>
+    void AddObjectHelper(Map* map, T* obj);
+
+    void LoadCreatures(CellGuidSet const& guid_set, Map* map);
+    void LoadGameObjects(CellGuidSet const& guid_set, Map* map);
+
+    MapGridType& _grid;
+    Map* _map;
 };
 
-//Clean up and remove from world
-class ObjectGridCleaner
+// Clean up and remove from world
+class GridObjectCleaner
 {
 public:
     template<class T> void Visit(GridRefMgr<T>&);
 };
 
-//Delete objects before deleting NGrid
-class ObjectGridUnloader
+// Delete objects before deleting NGrid
+class GridObjectUnloader
 {
 public:
     void Visit(CorpseMapType&) { }    // corpses are deleted with Map
