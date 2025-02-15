@@ -770,9 +770,9 @@ public:
      */
     virtual void OnAfterCreatureLootMoney(Player* /*player*/) { }
 
-    virtual bool CanPlayerUpdateSkill(Player* /*player*/, uint32 /*skill_id*/) { return true; }
-    virtual void OnBeforePlayerUpdateSkill(Player* /*player*/, uint32 /*skill_id*/, uint32& /*value*/, uint32 /*max*/, uint32 /*step*/) { }
-    virtual void OnPlayerUpdateSkill(Player* /*player*/, uint32 /*skill_id*/, uint32 /*value*/, uint32 /*max*/, uint32 /*step*/, uint32 /*new_value*/) { }
+    virtual bool CanPlayerUpdateSkill(Player* /*player*/, uint32 /*skillId*/) { return true; }
+    virtual void OnBeforePlayerUpdateSkill(Player* /*player*/, uint32 /*skillId*/, uint32& /*value*/, uint32 /*max*/, uint32 /*step*/) { }
+    virtual void OnPlayerUpdateSkill(Player* /*player*/, uint32 /*skillId*/, uint32 /*value*/, uint32 /*max*/, uint32 /*step*/, uint32 /*newValue*/) { }
 
     /**
      * @brief This hook is called, to avoid player resurrect
