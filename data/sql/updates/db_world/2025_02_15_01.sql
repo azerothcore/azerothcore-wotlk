@@ -1,3 +1,4 @@
+-- DB update 2025_02_15_00 -> 2025_02_15_01
 
 -- Fix Missing Link
 UPDATE `creature_template` SET `AIName` = 'SmartAI' WHERE `entry` = 23821;
