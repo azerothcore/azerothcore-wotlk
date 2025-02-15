@@ -21,10 +21,10 @@
 #include "PlayerScript.h"
 #include "QueryResult.h"
 
-class ServerMailReward : public Player42Script
+class ServerMailReward : public PlayerScript
 {
 public:
-    ServerMailReward() : Player42Script("ServerMailReward", {PLAYERHOOK_ON_LOGIN}) { }
+    ServerMailReward() : PlayerScript("ServerMailReward", {PLAYERHOOK_ON_LOGIN}) { }
 
     // CHARACTER_LOGIN = 8
     void OnLogin(Player* player) override

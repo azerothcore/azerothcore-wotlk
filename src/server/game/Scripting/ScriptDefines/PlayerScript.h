@@ -208,10 +208,10 @@ enum PlayerHook
     PLAYERHOOK_END
 };
 
-class Player42Script : public ScriptObject
+class PlayerScript : public ScriptObject
 {
 protected:
-    Player42Script(const char* name, std::vector<uint16> enabledHooks = std::vector<uint16>());
+    PlayerScript(const char* name, std::vector<uint16> enabledHooks = std::vector<uint16>());
 
 public:
     // Called when a player dies

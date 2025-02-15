@@ -28,7 +28,7 @@ class Group;
 
 namespace lfg
 {
-    class LFGPlayerScript : public Player42Script
+    class LFGPlayerScript : public PlayerScript
     {
     public:
         LFGPlayerScript();

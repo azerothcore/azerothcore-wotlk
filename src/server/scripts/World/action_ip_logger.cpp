@@ -165,11 +165,11 @@ public:
     }
 };
 
-class CharacterActionIpLogger : public Player42Script
+class CharacterActionIpLogger : public PlayerScript
 {
 public:
     CharacterActionIpLogger() :
-        Player42Script("CharacterActionIpLogger",
+        PlayerScript("CharacterActionIpLogger",
         {
             PLAYERHOOK_ON_CREATE,
             PLAYERHOOK_ON_LOGIN,
@@ -260,11 +260,11 @@ public:
     }
 };
 
-class CharacterDeleteActionIpLogger : public Player42Script
+class CharacterDeleteActionIpLogger : public PlayerScript
 {
 public:
     CharacterDeleteActionIpLogger() :
-        Player42Script("CharacterDeleteActionIpLogger",
+        PlayerScript("CharacterDeleteActionIpLogger",
         {
             PLAYERHOOK_ON_DELETE,
             PLAYERHOOK_ON_FAILED_DELETE
