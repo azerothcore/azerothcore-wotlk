@@ -23,10 +23,10 @@ enum ApprenticeAnglerQuestEnum
     QUEST_APPRENTICE_ANGLER = 8194
 };
 
-class QuestApprenticeAnglerPlayerScript : public PlayerScript
+class QuestApprenticeAnglerPlayerScript : public Player42Script
 {
 public:
-    QuestApprenticeAnglerPlayerScript() : PlayerScript("QuestApprenticeAnglerPlayerScript", {PLAYERHOOK_ON_PLAYER_COMPLETE_QUEST})
+    QuestApprenticeAnglerPlayerScript() : Player42Script("QuestApprenticeAnglerPlayerScript", {PLAYERHOOK_ON_PLAYER_COMPLETE_QUEST})
     {
     }
 
