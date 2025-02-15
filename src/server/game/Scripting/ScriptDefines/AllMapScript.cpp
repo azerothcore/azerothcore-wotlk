@@ -188,7 +188,7 @@ void ScriptMgr::OnPlayerEnterMap(Map* map, Player* player)
 
     CALL_ENABLED_HOOKS(AllMapScript, ALLMAPHOOK_ON_PLAYER_ENTER_ALL, script->OnPlayerEnterAll(map, player));
 
-    ExecuteScript<PlayerScript>([=](PlayerScript* script)
+    ExecuteScript<Player42Script>([=](Player42Script* script)
     {
         script->OnMapChanged(player);
     });

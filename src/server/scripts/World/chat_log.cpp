@@ -21,11 +21,11 @@
 #include "Log.h"
 #include "PlayerScript.h"
 
-class ChatLogScript : public PlayerScript
+class ChatLogScript : public Player42Script
 {
 public:
     ChatLogScript() :
-        PlayerScript("ChatLogScript",
+        Player42Script("ChatLogScript",
         {
             PLAYERHOOK_ON_CHAT,
             PLAYERHOOK_ON_CHAT_WITH_GROUP,

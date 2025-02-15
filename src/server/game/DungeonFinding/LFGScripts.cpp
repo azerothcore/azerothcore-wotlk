@@ -30,7 +30,7 @@
 namespace lfg
 {
     LFGPlayerScript::LFGPlayerScript() :
-        PlayerScript("LFGPlayerScript",
+        Player42Script("LFGPlayerScript",
         {
             PLAYERHOOK_ON_LEVEL_CHANGED,
             PLAYERHOOK_ON_LOGOUT,

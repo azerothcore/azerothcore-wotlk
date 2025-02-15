@@ -95,7 +95,7 @@ void ScriptMgr::Initialize()
     ScriptRegistry<MiscScript>::InitEnabledHooksIfNeeded(MISCHOOK_END);
     ScriptRegistry<MovementHandlerScript>::InitEnabledHooksIfNeeded(MOVEMENTHOOK_END);
     ScriptRegistry<PetScript>::InitEnabledHooksIfNeeded(PETHOOK_END);
-    ScriptRegistry<PlayerScript>::InitEnabledHooksIfNeeded(PLAYERHOOK_END);
+    ScriptRegistry<Player42Script>::InitEnabledHooksIfNeeded(PLAYERHOOK_END);
     ScriptRegistry<ServerScript>::InitEnabledHooksIfNeeded(SERVERHOOK_END);
     ScriptRegistry<SpellSC>::InitEnabledHooksIfNeeded(ALLSPELLHOOK_END);
     ScriptRegistry<UnitScript>::InitEnabledHooksIfNeeded(UNITHOOK_END);
@@ -141,7 +141,7 @@ void ScriptMgr::Unload()
     SCR_CLEAR<MovementHandlerScript>();
     SCR_CLEAR<OutdoorPvPScript>();
     SCR_CLEAR<PetScript>();
-    SCR_CLEAR<PlayerScript>();
+    SCR_CLEAR<Player42Script>();
     SCR_CLEAR<ServerScript>();
     SCR_CLEAR<SpellSC>();
     SCR_CLEAR<SpellScriptLoader>();
@@ -213,7 +213,7 @@ void ScriptMgr::CheckIfScriptsInDatabaseExist()
                 !ScriptRegistry<DynamicObjectScript>::GetScriptById(sid) &&
                 !ScriptRegistry<TransportScript>::GetScriptById(sid) &&
                 !ScriptRegistry<AchievementCriteriaScript>::GetScriptById(sid) &&
-                !ScriptRegistry<PlayerScript>::GetScriptById(sid) &&
+                !ScriptRegistry<Player42Script>::GetScriptById(sid) &&
                 !ScriptRegistry<GuildScript>::GetScriptById(sid) &&
                 !ScriptRegistry<BGScript>::GetScriptById(sid) &&
                 !ScriptRegistry<AchievementScript>::GetScriptById(sid) &&

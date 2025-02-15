@@ -72,7 +72,6 @@ bool ChatHandler::HasLowerSecurity(Player* target, ObjectGuid guid, bool strong)
 
     return HasLowerSecurityAccount(target_session, target_account, strong);
 }
-
 bool ChatHandler::HasLowerSecurityAccount(WorldSession* target, uint32 target_account, bool strong)
 {
     uint32 target_sec;
