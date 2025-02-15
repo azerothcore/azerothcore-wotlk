@@ -178,7 +178,6 @@ public:
         void OnPlayerEnter(Player* player) override
         {
             // mimiron tram:
-            instance->LoadGrid(2307.0f, 284.632f);
             if (GameObject* MimironTram = instance->GetGameObject(m_mimironTramGUID))
             {
                 player->UpdateVisibilityOf(MimironTram);
@@ -537,10 +536,7 @@ public:
                     break;
                 case GO_KEEPERS_GATE:
                     if (GetData(TYPE_MIMIRON) == DONE && GetData(TYPE_FREYA) == DONE && GetData(TYPE_HODIR) == DONE && GetData(TYPE_THORIM) == DONE)
-                    {
-                        instance->LoadGrid(1903.0f, 248.0f);
                         gameObject->RemoveGameObjectFlag(GO_FLAG_LOCKED);
-                    }
 
                     m_keepersgateGUID = gameObject->GetGUID();
                     break;
@@ -752,8 +748,6 @@ public:
                 case EVENT_TOWER_OF_FROST_DESTROYED:
                 case EVENT_TOWER_OF_FLAMES_DESTROYED:
                     {
-                        instance->LoadGrid(364.0f, -16.0f); //make sure leviathan is loaded
-                        instance->LoadGrid(364.0f, 32.0f); //make sure Mimiron's and Thorim's Targetting Crystal are loaded
                         m_leviathanTowers[type - EVENT_TOWER_OF_LIFE_DESTROYED] = data;
                         for (uint8 i = 0; i < 2; ++i)
                         {

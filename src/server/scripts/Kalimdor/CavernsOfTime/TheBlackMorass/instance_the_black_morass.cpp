@@ -74,7 +74,6 @@ public:
             // prevent getting stuck if event fails during boss break
             _noBossSpawnDelay = true;
 
-            instance->LoadGrid(-2023.0f, 7121.0f);
             if (Creature* medivh = GetCreature(DATA_MEDIVH))
             {
                 medivh->Respawn();

@@ -821,8 +821,6 @@ public:
                     if (state == DONE)
                     {
                         _speakTimer = 1;
-                        // Load KT's grid so he can talk
-                        instance->LoadGrid(3763.43f, -5115.87f);
                     }
                     else if (state == NOT_STARTED)
                     {
@@ -1061,8 +1059,6 @@ public:
             switch (events.ExecuteEvent())
             {
                 case EVENT_KELTHUZAD_WING_TAUNT:
-                    // Loads Kel'Thuzad's grid. We need this as he must be active in order for his texts to work.
-                    instance->LoadGrid(3749.67f, -5114.06f);
                     if (Creature* kelthuzad = instance->GetCreature(_kelthuzadGUID))
                     {
                         kelthuzad->AI()->Talk(_currentWingTaunt);
