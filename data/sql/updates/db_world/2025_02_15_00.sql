@@ -1,3 +1,4 @@
+-- DB update 2025_02_14_00 -> 2025_02_15_00
 -- Dragonflayer Invader - Set detection_range
 UPDATE `creature_template` SET `detection_range` = 25 WHERE (`entry` = 24051);
 
