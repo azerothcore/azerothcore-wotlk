@@ -123,7 +123,8 @@ runs:
       working-directory: "${{ github.workspace }}/build"
       run: |
         set +e  # Allow the script to continue on errors
-        cmake --build . --keep-going --config "Release" -j "$(($(nproc) + 2))"
+        # '--' passes '--keep-going' to the underlying build system (make)
+        cmake --build . --config "Release" -j "$(($(nproc) + 2))" -- --keep-going 
         set -e  # Re-enable error stopping after build
 
     - name: install
