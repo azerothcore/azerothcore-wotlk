@@ -2377,7 +2377,15 @@ void Player::ProcessSpellQueue()
         if (CanExecutePendingSpellCastRequest(spellInfo))
         {
             ExecuteOrCancelSpellCastRequest(&request);
-            SpellQueue.pop_front(); // Remove from the queue
+
+            // ExecuteOrCancelSpellCastRequest() can lead to clearing the SpellQueue.
+            // Example scenario:
+            //   Handling a spell → Dealing damage to yourself (e.g., spell_pri_vampiric_touch) →
+            //   Killing yourself → Player::setDeathState() → SpellQueue.clear().
+            // Calling std::deque::pop_front() on an empty deque results in undefined behavior,
+            // so an additional check is added.
+            if (!SpellQueue.empty())
+                SpellQueue.pop_front();
         }
         else // If the first spell can't execute, stop processing
             break;
