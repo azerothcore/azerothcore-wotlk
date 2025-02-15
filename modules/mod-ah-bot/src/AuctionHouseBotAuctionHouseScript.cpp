@@ -80,9 +80,9 @@ void AHBot_AuctionHouseScript::OnBeforeAuctionHouseMgrSendAuctionOutbiddedMail(
 
 void AHBot_AuctionHouseScript::OnAuctionAdd(AuctionHouseObject* /*ah*/, AuctionEntry* auction)
 {
-    // 
+    //
     // The the configuration for the auction house
-    // 
+    //
 
     AuctionHouseEntry const* ahEntry = sAuctionMgr->GetAuctionHouseEntryFromHouse(auction->GetHouseId());
     AHBConfig*               config  = gNeutralConfig;
@@ -99,9 +99,9 @@ void AHBot_AuctionHouseScript::OnAuctionAdd(AuctionHouseObject* /*ah*/, AuctionE
         }
     }
 
-    // 
+    //
     // Consider only those auctions handled by the bots
-    // 
+    //
 
     if (config->ConsiderOnlyBotAuctions)
     {
@@ -143,12 +143,9 @@ void AHBot_AuctionHouseScript::OnAuctionAdd(AuctionHouseObject* /*ah*/, AuctionE
 
 void AHBot_AuctionHouseScript::OnAuctionRemove(AuctionHouseObject* /*ah*/, AuctionEntry* auction)
 {
-    // 
     // Get the configuration for the auction house
-    // 
-
     AuctionHouseEntry const* ahEntry = sAuctionMgr->GetAuctionHouseEntryFromHouse(auction->GetHouseId());
-    AHBConfig*               config  = gNeutralConfig;
+    AHBConfig* config = gNeutralConfig;
 
     if (ahEntry)
     {
@@ -162,10 +159,7 @@ void AHBot_AuctionHouseScript::OnAuctionRemove(AuctionHouseObject* /*ah*/, Aucti
         }
     }
 
-    // 
     // Consider only those auctions handled by the bots
-    // 
-
     if (config->ConsiderOnlyBotAuctions)
     {
         if (gBotsId.find(auction->owner.GetCounter()) != gBotsId.end())
@@ -174,11 +168,10 @@ void AHBot_AuctionHouseScript::OnAuctionRemove(AuctionHouseObject* /*ah*/, Aucti
         }
     }
 
-    //
     // Verify if we can operate on the item
-    //
-
     Item* pItem = sAuctionMgr->GetAItem(auction->item_guid);
+
+    ItemTemplate const* prototype = sObjectMgr->GetItemTemplate(auction->item_template);
 
     if (!pItem)
     {
@@ -187,13 +180,82 @@ void AHBot_AuctionHouseScript::OnAuctionRemove(AuctionHouseObject* /*ah*/, Aucti
             LOG_ERROR("module", "AHBot: Item {} doesn't exist, perhaps bought already?", auction->item_guid.ToString());
         }
 
-        // return;
+        // Decrement item counts even if the item does not exist
+        if (prototype)
+        {
+            config->DecItemCounts(prototype->Class, prototype->Quality);
+        }
+
+        return;
+    }
+
+    if (config->DebugOut)
+    {
+        LOG_INFO("module", "AHBot: ah={}, item={}, count={}", auction->GetHouseId(), auction->item_template, config->GetItemCounts(prototype->Quality));
+    }
+
+    // Decrement item counts
+    config->DecItemCounts(prototype->Class, prototype->Quality);
+}
+
+void AHBot_AuctionHouseScript::OnAuctionSuccessful(AuctionHouseObject* /*ah*/, AuctionEntry* auction)
+{
+    //
+    // Get the configuration for the auction house
+    //
+
+    AuctionHouseEntry const* ahEntry = sAuctionMgr->GetAuctionHouseEntryFromHouse(auction->GetHouseId());
+    AHBConfig*               config  = gNeutralConfig;
+
+    if (ahEntry)
+    {
+        if (AuctionHouseId(ahEntry->houseId) == AuctionHouseId::Alliance)
+        {
+            config = gAllianceConfig;
+        }
+        else if (AuctionHouseId(ahEntry->houseId) == AuctionHouseId::Horde)
+        {
+            config = gHordeConfig;
+        }
     }
 
     //
-    // Decrements
+    // If the auction has been won, it means that it has been accepted by the market.
+    // Use the buyout as a reference since the price for the bid is downgraded during selling.
     //
 
+    config->UpdateItemStats(auction->item_template, auction->itemCount, auction->buyout);
+}
+
+void AHBot_AuctionHouseScript::OnAuctionExpire(AuctionHouseObject* /*ah*/, AuctionEntry* auction)
+{
+    //
+    // Get the configuration for the auction house
+    //
+
+    AuctionHouseEntry const* ahEntry = sAuctionMgr->GetAuctionHouseEntryFromHouse(auction->GetHouseId());
+    AHBConfig*               config  = gNeutralConfig;
+
+    if (ahEntry)
+    {
+        if (AuctionHouseId(ahEntry->houseId) == AuctionHouseId::Alliance)
+        {
+            config = gAllianceConfig;
+        }
+        else if (AuctionHouseId(ahEntry->houseId) == AuctionHouseId::Horde)
+        {
+            config = gHordeConfig;
+        }
+    }
+
+    //
+    // If the auction expired, then it means that the bid was unwanted by the market.
+    // Bid price is usually less or equal to the buyout, so this likely will bring the price down.
+    //
+
+    config->UpdateItemStats(auction->item_template, auction->itemCount, auction->bid);
+
+    // Decrement item counts
     ItemTemplate const* prototype = sObjectMgr->GetItemTemplate(auction->item_template);
 
     if (config->DebugOut)
@@ -202,64 +264,6 @@ void AHBot_AuctionHouseScript::OnAuctionRemove(AuctionHouseObject* /*ah*/, Aucti
     }
 
     config->DecItemCounts(prototype->Class, prototype->Quality);
-}
-
-void AHBot_AuctionHouseScript::OnAuctionSuccessful(AuctionHouseObject* /*ah*/, AuctionEntry* auction)
-{
-    // 
-    // Get the configuration for the auction house
-    // 
-
-    AuctionHouseEntry const* ahEntry = sAuctionMgr->GetAuctionHouseEntryFromHouse(auction->GetHouseId());
-    AHBConfig*               config  = gNeutralConfig;
-
-    if (ahEntry)
-    {
-        if (AuctionHouseId(ahEntry->houseId) == AuctionHouseId::Alliance)
-        {
-            config = gAllianceConfig;
-        }
-        else if (AuctionHouseId(ahEntry->houseId) == AuctionHouseId::Horde)
-        {
-            config = gHordeConfig;
-        }
-    }
-
-    // 
-    // If the auction has been won, it means that it has been accepted by the market.
-    // Use the buyout as a reference since the price for the bid is downgraded during selling.
-    // 
-
-    config->UpdateItemStats(auction->item_template, auction->itemCount, auction->buyout);
-}
-
-void AHBot_AuctionHouseScript::OnAuctionExpire(AuctionHouseObject* /*ah*/, AuctionEntry* auction)
-{
-    // 
-    // Get the configuration for the auction house
-    // 
-
-    AuctionHouseEntry const* ahEntry = sAuctionMgr->GetAuctionHouseEntryFromHouse(auction->GetHouseId());
-    AHBConfig*               config  = gNeutralConfig;
-
-    if (ahEntry)
-    {
-        if (AuctionHouseId(ahEntry->houseId) == AuctionHouseId::Alliance)
-        {
-            config = gAllianceConfig;
-        }
-        else if (AuctionHouseId(ahEntry->houseId) == AuctionHouseId::Horde)
-        {
-            config = gHordeConfig;
-        }
-    }
-
-    // 
-    // If the auction expired, then it means that the bid was unwanted by the market.
-    // Bid price is usually less or equal to the buyout, so this likely will bring the price down.
-    // 
-
-    config->UpdateItemStats(auction->item_template, auction->itemCount, auction->bid);
 }
 
 void AHBot_AuctionHouseScript::OnBeforeAuctionHouseMgrUpdate()
