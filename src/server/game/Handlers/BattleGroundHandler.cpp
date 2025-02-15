@@ -17,6 +17,7 @@
 
 #include "ArenaTeam.h"
 #include "ArenaTeamMgr.h"
+#include "ArenaSeasonMgr.h"
 #include "Battleground.h"
 #include "BattlegroundMgr.h"
 #include "Chat.h"
@@ -812,7 +813,7 @@ void WorldSession::HandleBattlemasterJoinArena(WorldPacket& recvData)
         if (isRated)
         {
             // pussywizard: for rated matches check if season is in progress!
-            if (!sWorld->getBoolConfig(CONFIG_ARENA_SEASON_IN_PROGRESS))
+            if (sArenaSeasonMgr->GetSeasonState() == ARENA_SEASON_STATE_DISABLED)
                 return;
 
             ateamId = _player->GetArenaTeamId(arenaslot);

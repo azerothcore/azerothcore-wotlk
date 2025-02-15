@@ -106,6 +106,11 @@ enum GameObjectIds
     GO_ORB_OF_THE_BLUE_DRAGONFLIGHT4        = 188116
 };
 
+enum SpellIds
+{
+    SPELL_SUMMON_FELBLAZE                    = 45069 // Felblaze? Summons Felmyst
+};
+
 template <class AI, class T>
 inline AI* GetSunwellPlateauAI(T* obj)
 {

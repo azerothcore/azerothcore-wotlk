@@ -89,7 +89,7 @@ BinaryInput::BinaryInput(
         debugAssert(m_freeBuffer);
         m_buffer = (uint8*)System::alignedMalloc(m_length, 16);
 
-        uint64_t L = (uint64_t)m_length;
+        unsigned long L = (unsigned long)m_length;
         // Decompress with zlib
         int64 result = uncompress(m_buffer, &L, data + 4, (uLong)dataLen - 4);
         m_length = L;
@@ -257,7 +257,7 @@ void BinaryInput::decompress() {
     debugAssert(isValidHeapPointer(tempBuffer));
     debugAssert(isValidHeapPointer(m_buffer));
     
-    uint64_t L = (uint64_t)m_length;
+    unsigned long L = (unsigned long)m_length;
     int64 result = (int64)uncompress(m_buffer, &L, tempBuffer + 4, (uLong)tempLength - 4);
     m_length = L;
     m_bufferLength = m_length;

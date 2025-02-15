@@ -83,7 +83,7 @@ public:
             handler->PSendSysMessage("Invalid subphase, see \".worldstate sunsreach subphase\" for usage");
             return false;
         }
-        sWorldState->HandleSunsReachSubPhaseTransition(subphase);;
+        sWorldState->HandleSunsReachSubPhaseTransition(subphase);
         handler->PSendSysMessage(sWorldState->GetSunsReachPrintout());
         return true;
     }

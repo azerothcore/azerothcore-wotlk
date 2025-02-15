@@ -89,10 +89,20 @@ public:
             LoadSummonData(summonData);
         }
 
+        void Load(char const* data) override
+        {
+            InstanceScript::Load(data);
+
+            scheduler.Schedule(3s, [this](TaskContext /*context*/)
+            {
+                if (IsBossDone(DATA_BRUTALLUS) && !IsBossDone(DATA_FELMYST))
+                    if (Creature* madrigosa = GetCreature(DATA_MADRIGOSA))
+                        madrigosa->CastSpell((Unit*)nullptr, SPELL_SUMMON_FELBLAZE, true);
+            });
+        }
+
         void OnPlayerEnter(Player* player) override
         {
-            instance->LoadGrid(1477.94f, 643.22f);
-            instance->LoadGrid(1641.45f, 988.08f);
             if (GameObject* gobj = GetGameObject(DATA_ICEBARRIER))
                 gobj->SendUpdateToPlayer(player);
         }
