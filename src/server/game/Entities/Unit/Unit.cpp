@@ -19310,7 +19310,7 @@ void Unit::Kill(Unit* killer, Unit* victim, bool durabilityLoss, WeaponAttackTyp
             {
                 Unit* killerCreOwner = killerCre->GetCreator();
                 if (killerCre->IsNPCBotOrPet() && killerCreOwner && killerCreOwner->GetTypeId() == TYPEID_PLAYER)
-                    sScriptMgr->OnCreatureKill(killerCreOwner->ToPlayer(), killedCre);
+                    sScriptMgr->OnPlayerCreatureKill(killerCreOwner->ToPlayer(), killedCre);
             }
             //end npcbot
         }
