@@ -649,44 +649,45 @@ void Map::Update(const uint32 t_diff, const uint32 s_diff, bool  /*thread*/)
     for (m_mapRefIter = m_mapRefMgr.begin(); m_mapRefIter != m_mapRefMgr.end(); ++m_mapRefIter)
     {
         Player* player = m_mapRefIter->GetSource();
-        if (player && player->IsInWorld())
-        {
-            player->Update(s_diff);
-            VisitNearbyCellsOfPlayer(player, grid_object_update, world_object_update, grid_large_object_update, world_large_object_update);
 
-            // If player is using far sight, update viewpoint
-            if (WorldObject* viewPoint = player->GetViewpoint())
+        if (!player || !player->IsInWorld())
+            continue;
+
+        player->Update(s_diff);
+        VisitNearbyCellsOfPlayer(player, grid_object_update, world_object_update, grid_large_object_update, world_large_object_update);
+
+        // If player is using far sight, update viewpoint
+        if (WorldObject* viewPoint = player->GetViewpoint())
+        {
+            if (Creature* viewCreature = viewPoint->ToCreature())
             {
-                if (Creature* viewCreature = viewPoint->ToCreature())
-                {
-                    VisitNearbyCellsOf(viewCreature, grid_object_update, world_object_update, grid_large_object_update, world_large_object_update);
-                }
-                else if (DynamicObject* viewObject = viewPoint->ToDynObject())
-                {
-                    VisitNearbyCellsOf(viewObject, grid_object_update, world_object_update, grid_large_object_update, world_large_object_update);
-                }
+                VisitNearbyCellsOf(viewCreature, grid_object_update, world_object_update, grid_large_object_update, world_large_object_update);
+            }
+            else if (DynamicObject* viewObject = viewPoint->ToDynObject())
+            {
+                VisitNearbyCellsOf(viewObject, grid_object_update, world_object_update, grid_large_object_update, world_large_object_update);
+            }
+        }
+
+        // handle updates for creatures in combat with player and are more than X yards away
+        if (player->IsInCombat())
+        {
+            updateList.clear();
+            float rangeSq = player->GetGridActivationRange() - 1.0f;
+            rangeSq *= rangeSq;
+
+            HostileReference* ref = player->getHostileRefMgr().getFirst();
+            while (ref)
+            {
+                if (Unit* unit = ref->GetSource()->GetOwner())
+                    if (Creature* cre = unit->ToCreature())
+                        if (cre->FindMap() == player->FindMap() && cre->GetExactDist2dSq(player) > rangeSq)
+                            updateList.push_back(cre);
+                ref = ref->next();
             }
 
-            // handle updates for creatures in combat with player and are more than X yards away
-            if (player->IsInCombat())
-            {
-                updateList.clear();
-                float rangeSq = player->GetGridActivationRange() - 1.0f;
-                rangeSq *= rangeSq;
-
-                HostileReference* ref = player->getHostileRefMgr().getFirst();
-                while (ref)
-                {
-                    if (Unit* unit = ref->GetSource()->GetOwner())
-                        if (Creature* cre = unit->ToCreature())
-                            if (cre->FindMap() == player->FindMap() && cre->GetExactDist2dSq(player) > rangeSq)
-                                updateList.push_back(cre);
-                    ref = ref->next();
-                }
-
-                for (Creature* cre : updateList) {
-                    VisitNearbyCellsOf(cre, grid_object_update, world_object_update, grid_large_object_update, world_large_object_update);
-                }
+            for (Creature* cre : updateList) {
+                VisitNearbyCellsOf(cre, grid_object_update, world_object_update, grid_large_object_update, world_large_object_update);
             }
         }
     }
