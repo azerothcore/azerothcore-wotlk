@@ -1780,7 +1780,7 @@ void GameObject::Use(Unit* user)
 
                             LOG_DEBUG("entities.gameobject", "Fishing check (skill: {} zone min skill: {} chance {} roll: {}", skill, zone_skill, chance, roll);
 
-                            if (sScriptMgr->OnUpdateFishingSkill(player, skill, zone_skill, chance, roll))
+                            if (sScriptMgr->OnPlayerUpdateFishingSkill(player, skill, zone_skill, chance, roll))
                             {
                                 player->UpdateFishingSkill();
                             }
