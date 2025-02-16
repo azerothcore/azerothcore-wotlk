@@ -26,7 +26,7 @@ void ScriptMgr::OnTicketCreate(GmTicket* ticket)
 
 void ScriptMgr::OnTicketUpdateLastChange(GmTicket* ticket)
 {
-    CALL_ENABLED_HOOKS(TicketScript, TICKETHOOK_ON_TICKET_UPDATE, script->OnTicketUpdateLastChange(ticket));
+    CALL_ENABLED_HOOKS(TicketScript, TICKETHOOK_ON_TICKET_UPDATE_LAST_CHANGE, script->OnTicketUpdateLastChange(ticket));
 }
 
 void ScriptMgr::OnTicketClose(GmTicket* ticket)
