@@ -5,7 +5,7 @@ VALUES
 (112513, 24238, 0, 0, 571, 0, 0, 1, 1, 1, 1510.538, -5271.508, 206.169, 5.3840, 60, 0, 0, 35928, 0, 0, 0, 0, 0, '', 0, 0, NULL);
 
 -- Bjorn Halgurdsson - Set speed_run
-UPDATE `creature_template` SET `speed_run` = 1, 1.7435 WHERE (`entry` = 24051);
+UPDATE `creature_template` SET `speed_run` = 1.7435 WHERE (`entry` = 24238);
 
 -- Bjorn Halgurdsson - Set mount
 DELETE FROM `creature_template_addon` WHERE (`entry` = 24238);
@@ -13,9 +13,7 @@ INSERT INTO `creature_template_addon` (`entry`, `path_id`, `mount`, `bytes1`, `b
 (24238, 0, 22657, 0, 0, 0, 0, '');
 
 -- Bjorn Halgurdsson - Set movement
-DELETE FROM `creature_template_movement` WHERE (`CreatureId` = 24238);
-INSERT INTO `creature_template_movement` (`CreatureId`, `Ground`, `Swim`, `Flight`, `Rooted`, `Chase`, `Random`, `InteractionPauseTimer`) VALUES
-(24238, 1, 0, 0, 0, 0, 0, NULL);
+UPDATE `creature_template_movement` SET `Swim` = 0, `Flight` = 0 WHERE (`CreatureId` = 24238);
 
 -- Bjorn Halgurdsson - SmartAI
 UPDATE `creature_template` SET `AIName` = 'SmartAI' WHERE (`entry` = 24051);
