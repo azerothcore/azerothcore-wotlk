@@ -421,7 +421,7 @@ bool LootItem::AllowedForPlayer(Player const* player, ObjectGuid source) const
         return false;
     }
 
-    if (DisableMgr::IsDisabledFor(DISABLE_TYPE_LOOT, itemid, nullptr))
+    if (sDisableMgr->IsDisabledFor(DISABLE_TYPE_LOOT, itemid, nullptr))
     {
         return false;
     }

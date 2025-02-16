@@ -189,8 +189,8 @@ public: /* FormulaScript */
 public: /* MapScript */
     void OnCreateMap(Map* map);
     void OnDestroyMap(Map* map);
-    void OnLoadGridMap(Map* map, GridMap* gmap, uint32 gx, uint32 gy);
-    void OnUnloadGridMap(Map* map, GridMap* gmap, uint32 gx, uint32 gy);
+    void OnLoadGridMap(Map* map, GridTerrainData* gmap, uint32 gx, uint32 gy);
+    void OnUnloadGridMap(Map* map, GridTerrainData* gmap, uint32 gx, uint32 gy);
     void OnPlayerEnterMap(Map* map, Player* player);
     void OnPlayerLeaveMap(Map* map, Player* player);
     void OnMapUpdate(Map* map, uint32 diff);
@@ -459,6 +459,10 @@ public: /* PlayerScript */
     void OnPlayerAfterCreatureLoot(Player* player);
     void OnPlayerAfterCreatureLootMoney(Player* player);
     bool OnPlayerCanFlyInZone(Player* player, uint32 mapId, uint32 zoneId, SpellInfo const* bySpell);
+    bool CanPlayerUpdateSkill(Player* player, uint32 skillId);
+    void OnBeforePlayerUpdateSkill(Player* player, uint32 skill_id, uint32& value, uint32 max, uint32 step);
+    void OnPlayerUpdateSkill(Player* player, uint32 skillId, uint32 value, uint32 max, uint32 step, uint32 newValue);
+    bool CanPlayerResurrect(Player* player);
 
     // Anti cheat
     void AnticheatSetCanFlybyServer(Player* player, bool apply);
@@ -556,6 +560,7 @@ public: /* UnitScript */
     void OnUnitEnterEvadeMode(Unit* unit, uint8 why);
     void OnUnitEnterCombat(Unit* unit, Unit* victim);
     void OnUnitDeath(Unit* unit, Unit* killer);
+    void OnUnitSetShapeshiftForm(Unit* unit, uint8 form);
 
 public: /* MovementHandlerScript */
     void OnPlayerMove(Player* player, MovementInfo movementInfo, uint32 opcode);
@@ -615,6 +620,9 @@ public: /* SpellSC */
     void OnDummyEffect(WorldObject* caster, uint32 spellID, SpellEffIndex effIndex, GameObject* gameObjTarget);
     void OnDummyEffect(WorldObject* caster, uint32 spellID, SpellEffIndex effIndex, Creature* creatureTarget);
     void OnDummyEffect(WorldObject* caster, uint32 spellID, SpellEffIndex effIndex, Item* itemTarget);
+    void OnSpellCastCancel(Spell* spell, Unit* caster, SpellInfo const* spellInfo, bool bySelf);
+    void OnSpellCast(Spell* spell, Unit* caster, SpellInfo const* spellInfo, bool skipCheck);
+    void OnSpellPrepare(Spell* spell, Unit* caster, SpellInfo const* spellInfo);
 
 public: /* GameEventScript */
     void OnGameEventStart(uint16 EventID);

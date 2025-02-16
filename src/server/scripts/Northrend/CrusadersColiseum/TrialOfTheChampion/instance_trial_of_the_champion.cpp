@@ -57,7 +57,6 @@ public:
         }
 
         bool CLEANED;
-        TeamId TeamIdInInstance;
         uint32 InstanceProgress;
         uint32 m_auiEncounter[MAX_ENCOUNTER];
         std::string str_data;
@@ -83,7 +82,6 @@ public:
 
         void Initialize() override
         {
-            TeamIdInInstance = TEAM_NEUTRAL;
             InstanceProgress = 0;
             memset(&m_auiEncounter, 0, sizeof(m_auiEncounter));
 
@@ -109,57 +107,49 @@ public:
 
         void OnCreatureCreate(Creature* creature) override
         {
-            if (TeamIdInInstance == TEAM_NEUTRAL)
-            {
-                Map::PlayerList const& players = instance->GetPlayers();
-                if (!players.IsEmpty())
-                    if (Player* pPlayer = players.begin()->GetSource())
-                        TeamIdInInstance = pPlayer->GetTeamId();
-            }
-
             switch (creature->GetEntry())
             {
                 // Grand Champions:
                 case NPC_MOKRA:
-                    if (TeamIdInInstance == TEAM_HORDE)
+                    if (GetTeamIdInInstance() == TEAM_HORDE)
                         creature->UpdateEntry(NPC_JACOB);
                     break;
                 case NPC_ERESSEA:
-                    if (TeamIdInInstance == TEAM_HORDE)
+                    if (GetTeamIdInInstance() == TEAM_HORDE)
                         creature->UpdateEntry(NPC_AMBROSE);
                     break;
                 case NPC_RUNOK:
-                    if (TeamIdInInstance == TEAM_HORDE)
+                    if (GetTeamIdInInstance() == TEAM_HORDE)
                         creature->UpdateEntry(NPC_COLOSOS);
                     break;
                 case NPC_ZULTORE:
-                    if (TeamIdInInstance == TEAM_HORDE)
+                    if (GetTeamIdInInstance() == TEAM_HORDE)
                         creature->UpdateEntry(NPC_JAELYNE);
                     break;
                 case NPC_VISCERI:
-                    if (TeamIdInInstance == TEAM_HORDE)
+                    if (GetTeamIdInInstance() == TEAM_HORDE)
                         creature->UpdateEntry(NPC_LANA);
                     break;
 
                 // Grand Champion Minions:
                 case NPC_ORGRIMMAR_MINION:
-                    if (TeamIdInInstance == TEAM_HORDE)
+                    if (GetTeamIdInInstance() == TEAM_HORDE)
                         creature->UpdateEntry(NPC_STORMWIND_MINION);
                     break;
                 case NPC_SILVERMOON_MINION:
-                    if (TeamIdInInstance == TEAM_HORDE)
+                    if (GetTeamIdInInstance() == TEAM_HORDE)
                         creature->UpdateEntry(NPC_GNOMEREGAN_MINION);
                     break;
                 case NPC_THUNDER_BLUFF_MINION:
-                    if (TeamIdInInstance == TEAM_HORDE)
+                    if (GetTeamIdInInstance() == TEAM_HORDE)
                         creature->UpdateEntry(NPC_EXODAR_MINION);
                     break;
                 case NPC_SENJIN_MINION:
-                    if (TeamIdInInstance == TEAM_HORDE)
+                    if (GetTeamIdInInstance() == TEAM_HORDE)
                         creature->UpdateEntry(NPC_DARNASSUS_MINION);
                     break;
                 case NPC_UNDERCITY_MINION:
-                    if (TeamIdInInstance == TEAM_HORDE)
+                    if (GetTeamIdInInstance() == TEAM_HORDE)
                         creature->UpdateEntry(NPC_IRONFORGE_MINION);
                     break;
 
@@ -173,7 +163,7 @@ public:
                 case NPC_JAEREN:
                 case NPC_ARELAS:
                     NPC_AnnouncerGUID = creature->GetGUID();
-                    //if (TeamIdInInstance == TEAM_ALLIANCE)
+                    //if (GetTeamIdInInstance() == TEAM_ALLIANCE)
                     //  creature->UpdateEntry(NPC_ARELAS);
                     creature->SetReactState(REACT_PASSIVE);
                     break;
@@ -271,12 +261,12 @@ public:
 
         // EVENT STUFF BELOW:
 
-        void OnPlayerEnter(Player* plr) override
+        void OnPlayerEnter(Player* player) override
         {
-            if (DoNeedCleanup(plr))
-            {
+            InstanceScript::OnPlayerEnter(player);
+
+            if (DoNeedCleanup(player))
                 InstanceCleanup();
-            }
 
             events.RescheduleEvent(EVENT_CHECK_PLAYERS, CLEANUP_CHECK_INTERVAL);
         }
@@ -465,7 +455,7 @@ public:
                 case DATA_INSTANCE_PROGRESS:
                     return InstanceProgress;
                 case DATA_TEAMID_IN_INSTANCE:
-                    return TeamIdInInstance;
+                    return GetTeamIdInInstance();
             }
 
             return 0;

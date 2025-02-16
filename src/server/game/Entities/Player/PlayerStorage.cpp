@@ -4085,7 +4085,7 @@ void Player::SendSellError(SellResult msg, Creature* creature, ObjectGuid guid, 
     GetSession()->SendPacket(&data);
 }
 
-void Player::TradeCancel(bool sendback)
+void Player::TradeCancel(bool sendback, TradeStatus status /*= TRADE_STATUS_TRADE_CANCELED*/)
 {
     if (m_trade)
     {
@@ -4093,9 +4093,9 @@ void Player::TradeCancel(bool sendback)
 
         // send yellow "Trade canceled" message to both traders
         if (sendback)
-            GetSession()->SendCancelTrade();
+            GetSession()->SendCancelTrade(status);
 
-        trader->GetSession()->SendCancelTrade();
+        trader->GetSession()->SendCancelTrade(status);
 
         // cleanup
         delete m_trade;
@@ -5619,7 +5619,7 @@ bool Player::LoadFromDB(ObjectGuid playerGuid, CharacterDatabaseQueryHolder cons
 
 bool Player::isAllowedToLoot(Creature const* creature)
 {
-    if (!creature->isDead() || !creature->IsDamageEnoughForLootingAndReward())
+    if (!creature->isDead() || !creature->IsDamageEnoughForLootingAndReward() || creature->IsLootRewardDisabled())
         return false;
 
     if (HasPendingBind())
@@ -5687,7 +5687,8 @@ void Player::_LoadActions(PreparedQueryResult result)
                 ab->uState = ACTIONBUTTON_UNCHANGED;
             else
             {
-                LOG_ERROR("entities.player", "ActionButton loading problem, will be deleted from db...");
+
+                LOG_ERROR("entities.player", "ActionButton loading problem, will be deleted from db. player: {}, guid: {}, button: {}, action: {}, type: {}", GetName(), GetGUID().GetCounter(), button, action, type);
 
                 // Will deleted in DB at next save (it can create data until save but marked as deleted)
                 m_actionButtons[button].uState = ACTIONBUTTON_DELETED;
@@ -6065,7 +6066,7 @@ Item* Player::_LoadItem(CharacterDatabaseTransaction trans, uint32 zoneId, uint3
                 GameEventMgr::ActiveEvents const& activeEventsList = sGameEventMgr->GetActiveEventList();
                 for (GameEventMgr::ActiveEvents::const_iterator itr = activeEventsList.begin(); itr != activeEventsList.end(); ++itr)
                 {
-                    if (uint32(events[*itr].holiday_id) == proto->HolidayId)
+                    if (uint32(events[*itr].HolidayId) == proto->HolidayId)
                     {
                         remove = false;
                         break;
@@ -6721,9 +6722,9 @@ bool Player::Satisfy(DungeonProgressionRequirements const* ar, uint32 target_map
                 LevelMax = ar->levelMax;
         }
 
-        if (DisableMgr::IsDisabledFor(DISABLE_TYPE_MAP, target_map, this))
+        if (sDisableMgr->IsDisabledFor(DISABLE_TYPE_MAP, target_map, this))
         {
-            GetSession()->SendAreaTriggerMessage("{}", GetSession()->GetAcoreString(LANG_INSTANCE_CLOSED));
+            GetSession()->SendAreaTriggerMessage(LANG_INSTANCE_CLOSED);
             return false;
         }
 
@@ -6861,11 +6862,11 @@ bool Player::Satisfy(DungeonProgressionRequirements const* ar, uint32 target_map
                         {
                             ObjectMgr::GetLocaleString(il->Name, loc_idx, name);
                         }
-                        GetSession()->SendAreaTriggerMessage(GetSession()->GetAcoreString(LANG_LEVEL_MINREQUIRED_AND_ITEM), ar->levelMin, name.c_str());
+                        GetSession()->SendAreaTriggerMessage(LANG_LEVEL_MINREQUIRED_AND_ITEM, ar->levelMin, name);
                     }
                     else if (LevelMin)
                     {
-                        GetSession()->SendAreaTriggerMessage(GetSession()->GetAcoreString(LANG_LEVEL_MINREQUIRED), LevelMin);
+                        GetSession()->SendAreaTriggerMessage(LANG_LEVEL_MINREQUIRED, LevelMin);
                     }
                     else if (ilvlRequirementNotMet)
                     {
@@ -6923,11 +6924,11 @@ bool Player::Satisfy(DungeonProgressionRequirements const* ar, uint32 target_map
 
                     if (LevelMin)
                     {
-                        GetSession()->SendAreaTriggerMessage(GetSession()->GetAcoreString(LANG_LEVEL_MINREQUIRED), LevelMin);
+                        GetSession()->SendAreaTriggerMessage(LANG_LEVEL_MINREQUIRED, LevelMin);
                     }
                     else if (LevelMax)
                     {
-                        GetSession()->SendAreaTriggerMessage(GetSession()->GetAcoreString(LANG_ACCESS_REQUIREMENT_MAX_LEVEL), LevelMax);
+                        GetSession()->SendAreaTriggerMessage(LANG_ACCESS_REQUIREMENT_MAX_LEVEL, LevelMax);
                     }
                     else if (mapDiff->hasErrorMessage && !errorAlreadyPrinted)
                     {

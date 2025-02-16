@@ -70,14 +70,12 @@ void WorldSession::SendTradeStatus(TradeStatus status)
 
 void WorldSession::HandleIgnoreTradeOpcode(WorldPacket& /*recvPacket*/)
 {
-    LOG_DEBUG("network", "WORLD: Ignore Trade {}", _player->GetGUID().ToString());
-    // recvPacket.print_storage();
+    _player->TradeCancel(true, TRADE_STATUS_IGNORE_YOU);
 }
 
 void WorldSession::HandleBusyTradeOpcode(WorldPacket& /*recvPacket*/)
 {
-    LOG_DEBUG("network", "WORLD: Busy Trade {}", _player->GetGUID().ToString());
-    // recvPacket.print_storage();
+    _player->TradeCancel(true, TRADE_STATUS_BUSY);
 }
 
 void WorldSession::SendUpdateTrade(bool trader_data /*= true*/)
@@ -526,12 +524,12 @@ void WorldSession::HandleBeginTradeOpcode(WorldPacket& /*recvPacket*/)
     SendTradeStatus(TRADE_STATUS_OPEN_WINDOW);
 }
 
-void WorldSession::SendCancelTrade()
+void WorldSession::SendCancelTrade(TradeStatus status)
 {
     if (PlayerRecentlyLoggedOut() || PlayerLogout())
         return;
 
-    SendTradeStatus(TRADE_STATUS_TRADE_CANCELED);
+    SendTradeStatus(status);
 }
 
 void WorldSession::HandleCancelTradeOpcode(WorldPacket& /*recvPacket*/)
@@ -617,12 +615,6 @@ void WorldSession::HandleInitiateTradeOpcode(WorldPacket& recvPacket)
     if (pOther->GetSession()->isLogingOut())
     {
         SendTradeStatus(TRADE_STATUS_TARGET_LOGOUT);
-        return;
-    }
-
-    if (pOther->GetSocial()->HasIgnore(GetPlayer()->GetGUID()))
-    {
-        SendTradeStatus(TRADE_STATUS_IGNORE_YOU);
         return;
     }
 

@@ -630,7 +630,7 @@ public:
         uint32 _timer;
         bool _damaged, justSpawned;
 
-        void DamageDealt(Unit* /*victim*/, uint32& damage, DamageEffectType /*damageType*/) override
+        void DamageDealt(Unit* /*victim*/, uint32& damage, DamageEffectType /*damageType*/, SpellSchoolMask /*damageSchoolMask*/) override
         {
             if (damage > 0 && !_damaged && me->GetInstanceScript())
             {
