@@ -19,6 +19,7 @@
 #include "Chat.h"
 #include "DatabaseEnv.h"
 #include "GridDefines.h"
+#include "GridTerrainLoader.h"
 #include "Group.h"
 #include "InstanceSaveMgr.h"
 #include "LFGMgr.h"
@@ -83,13 +84,17 @@ Map* MapMgr::CreateBaseMap(uint32 id)
             if (entry->Instanceable())
                 map = new MapInstanced(id);
             else
-            {
                 map = new Map(id, 0, REGULAR_DIFFICULTY);
+
+            i_maps[id] = map;
+
+            if (!entry->Instanceable())
+            {
                 map->LoadRespawnTimes();
                 map->LoadCorpseData();
             }
 
-            i_maps[id] = map;
+            map->OnCreateMap();
         }
     }
 
@@ -303,7 +308,7 @@ bool MapMgr::ExistMapAndVMap(uint32 mapid, float x, float y)
     int gx = 63 - p.x_coord;
     int gy = 63 - p.y_coord;
 
-    return Map::ExistMap(mapid, gx, gy) && Map::ExistVMap(mapid, gx, gy);
+    return GridTerrainLoader::ExistMap(mapid, gx, gy) && GridTerrainLoader::ExistVMap(mapid, gx, gy);
 }
 
 bool MapMgr::IsValidMAP(uint32 mapid, bool startUp)
