@@ -35,16 +35,16 @@ enum TicketHook
 class TicketScript : public ScriptObject
 {
 protected:
-    TicketScript(const char* name, std::vector<uint16> enabledHooks = std::vector<uint16>());
+    TicketScript(char const* name, std::vector<uint16> enabledHooks = std::vector<uint16>());
 
 public:
     [[nodiscard]] bool IsDatabaseBound() const override { return false; }
 
-    virtual void OnTicketCreate(Player* /*player*/, GmTicket* /*ticket*/) { }
-    virtual void OnTicketUpdate(Player* /*player*/, GmTicket* /*ticket*/) { }
-    virtual void OnTicketClose(Player* /*player*/, GmTicket* /*ticket*/) { }
-    virtual void OnTicketStatusUpdate(Player* /*player*/, GmTicket* /*ticket*/) { }
-    virtual void OnTicketResolve(Player* /*player*/, GmTicket* /*ticket*/) { }
+    virtual void OnTicketCreate(GmTicket* /*ticket*/) { }
+    virtual void OnTicketUpdateLastChange(GmTicket* /*ticket*/) { }
+    virtual void OnTicketClose(GmTicket* /*ticket*/) { }
+    virtual void OnTicketStatusUpdate(GmTicket* /*ticket*/) { }
+    virtual void OnTicketResolve(GmTicket* /*ticket*/) { }
 };
 
 #endif

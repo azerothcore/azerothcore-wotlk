@@ -366,7 +366,7 @@ void TicketMgr::AddTicket(GmTicket* ticket)
     CharacterDatabaseTransaction trans = CharacterDatabaseTransaction(nullptr);
     ticket->SaveToDB(trans);
 
-    sScriptMgr->OnTicketCreate(ticket->GetPlayer(), ticket);
+    sScriptMgr->OnTicketCreate(ticket);
 }
 
 void TicketMgr::CloseTicket(uint32 ticketId, ObjectGuid source)
@@ -379,7 +379,7 @@ void TicketMgr::CloseTicket(uint32 ticketId, ObjectGuid source)
             --_openTicketCount;
         ticket->SaveToDB(trans);
 
-        sScriptMgr->OnTicketClose(ticket->GetPlayer(), ticket);
+        sScriptMgr->OnTicketClose(ticket);
     }
 }
 
@@ -404,7 +404,7 @@ void TicketMgr::ResolveAndCloseTicket(uint32 ticketId, ObjectGuid source)
             --_openTicketCount;
         ticket->SaveToDB(trans);
 
-        sScriptMgr->OnTicketResolve(ticket->GetPlayer(), ticket);
+        sScriptMgr->OnTicketResolve(ticket);
     }
 }
 
@@ -449,5 +449,5 @@ void TicketMgr::UpdateLastChange(GmTicket* ticket)
 {
     _lastChange = GameTime::GetGameTime().count();
 
-    sScriptMgr->OnTicketUpdate(ticket->GetPlayer(), ticket);
+    sScriptMgr->OnTicketUpdateLastChange(ticket);
 }

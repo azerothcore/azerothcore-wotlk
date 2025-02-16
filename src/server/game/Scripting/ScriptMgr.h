@@ -701,11 +701,11 @@ public: /* LootScript */
 
 public: /* TicketScript */
 
-    void OnTicketCreate(Player* player, GmTicket* ticket);
-    void OnTicketUpdate(Player* player, GmTicket* ticket);
-    void OnTicketClose(Player* player, GmTicket* ticket);
-    void OnTicketStatusUpdate(Player* player, GmTicket* ticket);
-    void OnTicketResolve(Player* player, GmTicket* ticket);
+    void OnTicketCreate(GmTicket* ticket);
+    void OnTicketUpdateLastChange(GmTicket* ticket);
+    void OnTicketClose(GmTicket* ticket);
+    void OnTicketStatusUpdate(GmTicket* ticket);
+    void OnTicketResolve(GmTicket* ticket);
 
 private:
     uint32 _scriptCount;

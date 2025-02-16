@@ -19,32 +19,32 @@
 #include "ScriptMgr.h"
 #include "ScriptMgrMacros.h"
 
-void ScriptMgr::OnTicketCreate(Player* player, GmTicket* ticket)
+void ScriptMgr::OnTicketCreate(GmTicket* ticket)
 {
-    CALL_ENABLED_HOOKS(TicketScript, TICKETHOOK_ON_TICKET_CREATE, script->OnTicketCreate(player, ticket));
+    CALL_ENABLED_HOOKS(TicketScript, TICKETHOOK_ON_TICKET_CREATE, script->OnTicketCreate(ticket));
 }
 
-void ScriptMgr::OnTicketUpdate(Player* player, GmTicket* ticket)
+void ScriptMgr::OnTicketUpdateLastChange(GmTicket* ticket)
 {
-    CALL_ENABLED_HOOKS(TicketScript, TICKETHOOK_ON_TICKET_UPDATE, script->OnTicketUpdate(player, ticket));
+    CALL_ENABLED_HOOKS(TicketScript, TICKETHOOK_ON_TICKET_UPDATE, script->OnTicketUpdateLastChange(ticket));
 }
 
-void ScriptMgr::OnTicketClose(Player* player, GmTicket* ticket)
+void ScriptMgr::OnTicketClose(GmTicket* ticket)
 {
-    CALL_ENABLED_HOOKS(TicketScript, TICKETHOOK_ON_TICKET_CLOSE, script->OnTicketClose(player, ticket));
+    CALL_ENABLED_HOOKS(TicketScript, TICKETHOOK_ON_TICKET_CLOSE, script->OnTicketClose(ticket));
 }
 
-void ScriptMgr::OnTicketStatusUpdate(Player* player, GmTicket* ticket)
+void ScriptMgr::OnTicketStatusUpdate(GmTicket* ticket)
 {
-    CALL_ENABLED_HOOKS(TicketScript, TICKETHOOK_ON_TICKET_STATUS_UPDATE, script->OnTicketStatusUpdate(player, ticket));
+    CALL_ENABLED_HOOKS(TicketScript, TICKETHOOK_ON_TICKET_STATUS_UPDATE, script->OnTicketStatusUpdate(ticket));
 }
 
-void ScriptMgr::OnTicketResolve(Player* player, GmTicket* ticket)
+void ScriptMgr::OnTicketResolve(GmTicket* ticket)
 {
-    CALL_ENABLED_HOOKS(TicketScript, TICKETHOOK_ON_TICKET_RESOLVE, script->OnTicketResolve(player, ticket));
+    CALL_ENABLED_HOOKS(TicketScript, TICKETHOOK_ON_TICKET_RESOLVE, script->OnTicketResolve(ticket));
 }
 
-TicketScript::TicketScript(const char* name, std::vector<uint16> enabledHooks)
+TicketScript::TicketScript(char const* name, std::vector<uint16> enabledHooks)
 : ScriptObject(name, TICKETHOOK_END)
 {
     // If empty - enable all available hooks.
