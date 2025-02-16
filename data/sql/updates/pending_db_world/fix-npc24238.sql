@@ -1,16 +1,13 @@
--- Bjorn Halgurdsson - Set position, spawntimesecs
-DELETE FROM `creature` WHERE (`guid` = 112513 AND `id1` = 24238);
-INSERT INTO `creature` (`guid`, `id1`, `id2`, `id3`, `map`, `zoneId`, `areaId`, `spawnMask`, `phaseMask`, `equipment_id`, `position_x`, `position_y`, `position_z`, `orientation`, `spawntimesecs`, `wander_distance`, `currentwaypoint`, `curhealth`, `curmana`, `MovementType`, `npcflag`, `unit_flags`, `dynamicflags`, `ScriptName`, `VerifiedBuild`, `CreateObject`, `Comment`)
-VALUES
-(112513, 24238, 0, 0, 571, 0, 0, 1, 1, 1, 1510.538, -5271.508, 206.169, 5.3840, 60, 0, 0, 35928, 0, 0, 0, 0, 0, '', 0, 0, NULL);
+-- Bjorn Halgurdsson - Set position
+UPDATE `creature` SET `position_x` = 1510.538, `position_y` = -5271.508, `position_z` = 206.169, `orientation` = 5.3840 WHERE (`guid` = 112513 AND `id1` = 24238);
 
 -- Bjorn Halgurdsson - Set speed_run
 UPDATE `creature_template` SET `speed_run` = 1.7435 WHERE (`entry` = 24238);
 
 -- Bjorn Halgurdsson - Set mount
-DELETE FROM `creature_template_addon` WHERE (`entry` = 24238);
-INSERT INTO `creature_template_addon` (`entry`, `path_id`, `mount`, `bytes1`, `bytes2`, `emote`, `visibilityDistanceType`, `auras`) VALUES
-(24238, 0, 22657, 0, 0, 0, 0, '');
+DELETE FROM `creature_addon` WHERE (`entry` = 112513);
+INSERT INTO `creature_addon` (`entry`, `path_id`, `mount`, `bytes1`, `bytes2`, `emote`, `visibilityDistanceType`, `auras`) VALUES
+(112513, 0, 22657, 0, 0, 0, 0, '');
 
 -- Bjorn Halgurdsson - Set movement
 UPDATE `creature_template_movement` SET `Swim` = 0, `Flight` = 0 WHERE (`CreatureId` = 24238);
@@ -22,13 +19,14 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 (24238, 0, 0, 0, 1, 0, 100, 0, 10000, 15000, 45000, 60000, 0, 0, 1, 2, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Bjorn Halgurdsson - On update OOC - Say text 2'),
 (24238, 0, 1, 2, 8, 0, 100, 0, 43315, 0, 0, 0, 0, 0, 84, 0, 0, 0, 0, 0, 0, 7, 0, 0, 0, 0, 0, 0, 0, 0, 'Bjorn Halgurdsson - On spellhit Vrykul Insult - Invoker say text 0'),
 (24238, 0, 2, 3, 61, 0, 100, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Bjorn Halgurdsson - On spellhit Vrykul Insult - Say text 1'),
-(24238, 0, 3, 4, 61, 0, 100, 512, 0, 0, 0, 0, 0, 0, 43, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Bjorn Halgurdsson - On spellhit Vrykul Insult - Unmount'),
-(24238, 0, 4, 5, 61, 0, 100, 512, 0, 0, 0, 0, 0, 0, 8, 2, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Bjorn Halgurdsson - On spellhit Vrykul Insult - Set Aggressive'),
-(24238, 0, 5, 6, 61, 0, 100, 512, 0, 0, 0, 0, 0, 0, 19, 2, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Bjorn Halgurdsson - On spellhit Vrykul Insult - Remove Unit Flags'),
-(24238, 0, 6, 0, 61, 0, 100, 512, 0, 0, 0, 0, 0, 0, 49, 0, 0, 0, 0, 0, 0, 7, 0, 0, 0, 0, 0, 0, 0, 0, 'Bjorn Halgurdsson - On spellhit Vrykul Insult - Attack Start'),
-(24238, 0, 7, 0, 6, 0, 100, 0, 0, 0, 0, 0, 0, 0, 11, 43371, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Bjorn Halgurdsson - On death - Spellcast Bjorn Kill Credit'),
-(24238, 0, 8, 0, 0, 0, 100, 0, 5000, 10000, 10000, 15000, 0, 0, 11, 32736, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Bjorn Halgurdsson - On update IC - Spellcast Mortal Strike'),
-(24238, 0, 9, 0, 0, 0, 100, 0, 0, 5000, 10000, 15000, 0, 0, 11, 33661, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Bjorn Halgurdsson - On update IC - Spellcast Crush Armor'),
-(24238, 0, 11, 12, 7, 0, 100, 512, 0, 0, 0, 0, 0, 0, 43, 0, 22657, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Bjorn Halgurdsson - On evade - Mount'),
-(24238, 0, 12, 13, 61, 0, 100, 512, 0, 0, 0, 0, 0, 0, 8, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Bjorn Halgurdsson - On evade - Set Passive'),
-(24238, 0, 13, 0, 61, 0, 100, 512, 0, 0, 0, 0, 0, 0, 18, 2, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Bjorn Halgurdsson - On evade - Set Unit Flags');
+(24238, 0, 3, 4, 61, 0, 100, 512, 0, 0, 0, 0, 0, 0, 207, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Bjorn Halgurdsson - On spellhit Vrykul Insult - Remove Hover'),
+(24238, 0, 4, 5, 61, 0, 100, 512, 0, 0, 0, 0, 0, 0, 43, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Bjorn Halgurdsson - On spellhit Vrykul Insult - Unmount'),
+(24238, 0, 5, 6, 61, 0, 100, 512, 0, 0, 0, 0, 0, 0, 8, 2, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Bjorn Halgurdsson - On spellhit Vrykul Insult - Set Aggressive'),
+(24238, 0, 6, 7, 61, 0, 100, 512, 0, 0, 0, 0, 0, 0, 19, 2, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Bjorn Halgurdsson - On spellhit Vrykul Insult - Remove Unit Flags'),
+(24238, 0, 7, 0, 61, 0, 100, 512, 0, 0, 0, 0, 0, 0, 49, 0, 0, 0, 0, 0, 0, 7, 0, 0, 0, 0, 0, 0, 0, 0, 'Bjorn Halgurdsson - On spellhit Vrykul Insult - Attack Start'),
+(24238, 0, 8, 0, 6, 0, 100, 0, 0, 0, 0, 0, 0, 0, 11, 43371, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Bjorn Halgurdsson - On death - Spellcast Bjorn Kill Credit'),
+(24238, 0, 9, 0, 0, 0, 100, 0, 5000, 10000, 10000, 15000, 0, 0, 11, 32736, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Bjorn Halgurdsson - On update IC - Spellcast Mortal Strike'),
+(24238, 0, 10, 0, 0, 0, 100, 0, 0, 5000, 10000, 15000, 0, 0, 11, 33661, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Bjorn Halgurdsson - On update IC - Spellcast Crush Armor'),
+(24238, 0, 11, 12, 25, 0, 100, 512, 0, 0, 0, 0, 0, 0, 8, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Bjorn Halgurdsson - On evade - Set Passive'),
+(24238, 0, 12, 13, 61, 0, 100, 512, 0, 0, 0, 0, 0, 0, 18, 2, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Bjorn Halgurdsson - On evade - Set Unit Flags'),
+(24238, 0, 13, 0, 61, 0, 100, 512, 0, 0, 0, 0, 0, 0, 207, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Bjorn Halgurdsson - On evade - Set Hover');
