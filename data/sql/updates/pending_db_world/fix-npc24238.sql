@@ -14,8 +14,10 @@ DELETE FROM `creature_template_addon` WHERE (`entry` = 24238);
 INSERT INTO `creature_template_addon` (`entry`, `path_id`, `mount`, `bytes1`, `bytes2`, `emote`, `visibilityDistanceType`, `auras`) VALUES
 (24238, 0, 22657, 0, 0, 0, 0, '');
 
--- Bjorn Halgurdsson - remove from `creature_template_movement`
+-- Bjorn Halgurdsson - Set movement
 DELETE FROM `creature_template_movement` WHERE (`CreatureId` = 24238);
+INSERT INTO `creature_template_movement` (`CreatureId`, `Ground`, `Swim`, `Flight`, `Rooted`, `Chase`, `Random`, `InteractionPauseTimer`) VALUES
+(24238, 1, 0, 0, 0, 0, 0, NULL);
 
 -- Bjorn Halgurdsson - SmartAI
 UPDATE `creature_template` SET `AIName` = 'SmartAI' WHERE (`entry` = 24051);
