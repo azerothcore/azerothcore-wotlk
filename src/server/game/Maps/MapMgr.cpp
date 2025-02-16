@@ -161,7 +161,7 @@ Map::EnterState MapMgr::PlayerCannotEnter(uint32 mapid, Player* player, bool log
 
     char const* mapName = entry->name[player->GetSession()->GetSessionDbcLocale()];
 
-    if (!sScriptMgr->CanEnterMap(player, entry, instance, mapDiff, loginCheck))
+    if (!sScriptMgr->OnPlayerCanEnterMap(player, entry, instance, mapDiff, loginCheck))
         return Map::CANNOT_ENTER_UNSPECIFIED_REASON;
 
     Group* group = player->GetGroup();
