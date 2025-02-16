@@ -819,7 +819,7 @@ uint32 Unit::DealDamage(Unit* attacker, Unit* victim, uint32 damage, CleanDamage
             victim->GetAI()->DamageTaken(attacker, damage, damagetype, damageSchoolMask);
 
         if (attacker && attacker->IsAIEnabled)
-            attacker->GetAI()->DamageDealt(victim, damage, damagetype);
+            attacker->GetAI()->DamageDealt(victim, damage, damagetype, damageSchoolMask);
     }
 
     // Hook for OnDamage Event
@@ -20534,6 +20534,8 @@ void Unit::ExecuteDelayedUnitRelocationEvent()
                 active->m_last_notify_position.Relocate(active->GetPositionX(), active->GetPositionY(), active->GetPositionZ());
             }
         }
+
+        GetMap()->LoadGridsInRange(*player, MAX_VISIBILITY_DISTANCE);
 
         Acore::PlayerRelocationNotifier relocateNoLarge(*player, false); // visit only objects which are not large; default distance
         Cell::VisitAllObjects(viewPoint, relocateNoLarge, player->GetSightRange() + VISIBILITY_INC_FOR_GOBJECTS);

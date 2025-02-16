@@ -44,6 +44,7 @@
 #include "SpellMgr.h"
 #include "World.h"
 #include "WorldPacket.h"
+#include "WorldSessionMgr.h"
 
 bool AchievementCriteriaData::IsValid(AchievementCriteriaEntry const* criteria)
 {
@@ -728,7 +729,7 @@ void AchievementMgr::SendAchievementEarned(AchievementEntry const* achievement) 
             data << GetPlayer()->GetGUID();
             data << uint32(achievement->ID);
             data << uint32(0);                                  // display name as plain string in chat (always 0 for guild)
-            sWorld->SendGlobalMessage(&data);
+            sWorldSessionMgr->SendGlobalMessage(&data);
         }
         else
         {
@@ -741,20 +742,15 @@ void AchievementMgr::SendAchievementEarned(AchievementEntry const* achievement) 
             data << uint32(achievement->ID);
             std::size_t linkTypePos = data.wpos();
             data << uint32(1);                                  // display name as clickable link in chat
-            sWorld->SendGlobalMessage(&data, nullptr, teamId);
+            sWorldSessionMgr->SendGlobalMessage(&data, nullptr, teamId);
 
             data.put<uint32>(linkTypePos, 0);                   // display name as plain string in chat
-            sWorld->SendGlobalMessage(&data, nullptr, teamId == TEAM_ALLIANCE ? TEAM_HORDE : TEAM_ALLIANCE);
+            sWorldSessionMgr->SendGlobalMessage(&data, nullptr, teamId == TEAM_ALLIANCE ? TEAM_HORDE : TEAM_ALLIANCE);
         }
     }
     // if player is in world he can tell his friends about new achievement
     else if (GetPlayer()->IsInWorld())
     {
-        CellCoord p = Acore::ComputeCellCoord(GetPlayer()->GetPositionX(), GetPlayer()->GetPositionY());
-
-        Cell cell(p);
-        cell.SetNoCreate();
-
         Acore::BroadcastTextBuilder _builder(GetPlayer(), CHAT_MSG_ACHIEVEMENT, BROADCAST_TEXT_ACHIEVEMENT_EARNED, GetPlayer()->getGender(), GetPlayer(), achievement->ID);
         Acore::LocalizedPacketDo<Acore::BroadcastTextBuilder> _localizer(_builder);
         Acore::PlayerDistWorker<Acore::LocalizedPacketDo<Acore::BroadcastTextBuilder>> _worker(GetPlayer(), sWorld->getFloatConfig(CONFIG_LISTEN_RANGE_SAY), _localizer);

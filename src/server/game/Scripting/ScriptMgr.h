@@ -189,8 +189,8 @@ public: /* FormulaScript */
 public: /* MapScript */
     void OnCreateMap(Map* map);
     void OnDestroyMap(Map* map);
-    void OnLoadGridMap(Map* map, GridMap* gmap, uint32 gx, uint32 gy);
-    void OnUnloadGridMap(Map* map, GridMap* gmap, uint32 gx, uint32 gy);
+    void OnLoadGridMap(Map* map, GridTerrainData* gmap, uint32 gx, uint32 gy);
+    void OnUnloadGridMap(Map* map, GridTerrainData* gmap, uint32 gx, uint32 gy);
     void OnPlayerEnterMap(Map* map, Player* player);
     void OnPlayerLeaveMap(Map* map, Player* player);
     void OnMapUpdate(Map* map, uint32 diff);
@@ -459,6 +459,9 @@ public: /* PlayerScript */
     void OnAfterCreatureLoot(Player* player);
     void OnAfterCreatureLootMoney(Player* player);
     bool OnCanPlayerFlyInZone(Player* player, uint32 mapId, uint32 zoneId, SpellInfo const* bySpell);
+    bool CanPlayerUpdateSkill(Player* player, uint32 skillId);
+    void OnBeforePlayerUpdateSkill(Player* player, uint32 skill_id, uint32& value, uint32 max, uint32 step);
+    void OnPlayerUpdateSkill(Player* player, uint32 skillId, uint32 value, uint32 max, uint32 step, uint32 newValue);
     bool CanPlayerResurrect(Player* player);
 
     // Anti cheat
