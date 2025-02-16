@@ -63,7 +63,7 @@ class IndividualXP : public PlayerScript
 public:
     IndividualXP() : PlayerScript("IndividualXP") {}
 
-    void OnLogin(Player* player) override
+    void OnPlayerLogin(Player* player) override
     {
         QueryResult result = CharacterDatabase.Query("SELECT `XPRate` FROM `individualxp` WHERE `CharacterGUID`='{}'", player->GetGUID().GetCounter());
 
@@ -101,7 +101,7 @@ public:
         }
     }
 
-    void OnLogout(Player* player) override
+    void OnPlayerLogout(Player* player) override
     {
         if (PlayerXpRate* data = player->CustomData.Get<PlayerXpRate>("IndividualXP"))
         {
@@ -109,7 +109,7 @@ public:
         }
     }
 
-    void OnGiveXP(Player* player, uint32& amount, Unit* /*victim*/, uint8 /*xpSource*/) override
+    void OnPlayerGiveXP(Player* player, uint32& amount, Unit* /*victim*/, uint8 /*xpSource*/) override
     {
         if (individualXp.Enabled)
         {

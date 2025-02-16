@@ -1046,14 +1046,14 @@ private:
 public:
     PS_Transmogrification() : PlayerScript("Player_Transmogrify") { }
 
-    void OnEquip(Player* player, Item* it, uint8 /*bag*/, uint8 /*slot*/, bool /*update*/) override
+    void OnPlayerEquip(Player* player, Item* it, uint8 /*bag*/, uint8 /*slot*/, bool /*update*/) override
     {
         if (!sT->GetUseCollectionSystem())
             return;
         AddToDatabase(player, it);
     }
 
-    void OnLootItem(Player* player, Item* item, uint32 /*count*/, ObjectGuid /*lootguid*/) override
+    void OnPlayerLootItem(Player* player, Item* item, uint32 /*count*/, ObjectGuid /*lootguid*/) override
     {
         if (!sT->GetUseCollectionSystem() || !item || typeid(*item) != typeid(Item))
             return;
@@ -1063,7 +1063,7 @@ public:
         }
     }
 
-    void OnCreateItem(Player* player, Item* item, uint32 /*count*/) override
+    void OnPlayerCreateItem(Player* player, Item* item, uint32 /*count*/) override
     {
         if (!sT->GetUseCollectionSystem())
             return;
@@ -1073,7 +1073,7 @@ public:
         }
     }
 
-    void OnAfterStoreOrEquipNewItem(Player* player, uint32 /*vendorslot*/, Item* item, uint8 /*count*/, uint8 /*bag*/, uint8 /*slot*/, ItemTemplate const* /*pProto*/, Creature* /*pVendor*/, VendorItem const* /*crItem*/, bool /*bStore*/) override
+    void OnPlayerAfterStoreOrEquipNewItem(Player* player, uint32 /*vendorslot*/, Item* item, uint8 /*count*/, uint8 /*bag*/, uint8 /*slot*/, ItemTemplate const* /*pProto*/, Creature* /*pVendor*/, VendorItem const* /*crItem*/, bool /*bStore*/) override
     {
         if (!sT->GetUseCollectionSystem())
             return;
@@ -1106,7 +1106,7 @@ public:
         }
     }
 
-    void OnAfterSetVisibleItemSlot(Player* player, uint8 slot, Item *item) override
+    void OnPlayerAfterSetVisibleItemSlot(Player* player, uint8 slot, Item *item) override
     {
         if (!item)
             return;
@@ -1117,12 +1117,12 @@ public:
         }
     }
 
-    void OnAfterMoveItemFromInventory(Player* /*player*/, Item* it, uint8 /*bag*/, uint8 /*slot*/, bool /*update*/) override
+    void OnPlayerAfterMoveItemFromInventory(Player* /*player*/, Item* it, uint8 /*bag*/, uint8 /*slot*/, bool /*update*/) override
     {
         sT->DeleteFakeFromDB(it->GetGUID().GetCounter());
     }
 
-    void OnLogin(Player* player) override
+    void OnPlayerLogin(Player* player) override
     {
         if (sT->EnableResetRetroActiveAppearances())
             player->UpdatePlayerSetting("mod-transmog", SETTING_RETROACTIVE_CHECK, 0);
@@ -1170,7 +1170,7 @@ public:
 #endif
     }
 
-    void OnLogout(Player* player) override
+    void OnPlayerLogout(Player* player) override
     {
         ObjectGuid pGUID = player->GetGUID();
         for (Transmogrification::transmog2Data::const_iterator it = sT->entryMap[pGUID].begin(); it != sT->entryMap[pGUID].end(); ++it)
@@ -1184,7 +1184,7 @@ public:
 #endif
     }
 
-    void OnBeforeBuyItemFromVendor(Player* player, ObjectGuid vendorguid, uint32 /*vendorslot*/, uint32& itemEntry, uint8 /*count*/, uint8 /*bag*/, uint8 /*slot*/) override
+    void OnPlayerBeforeBuyItemFromVendor(Player* player, ObjectGuid vendorguid, uint32 /*vendorslot*/, uint32& itemEntry, uint8 /*count*/, uint8 /*bag*/, uint8 /*slot*/) override
     {
         Creature* vendor = player->GetMap()->GetCreature(vendorguid);
         if (!vendor)

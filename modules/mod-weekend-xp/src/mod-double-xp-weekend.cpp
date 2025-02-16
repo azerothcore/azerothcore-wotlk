@@ -282,14 +282,14 @@ class DoubleXpWeekendPlayerScript : public PlayerScript
 public:
     DoubleXpWeekendPlayerScript() : PlayerScript("DoubleXpWeekend") { }
 
-    void OnLogin(Player* player) override
+    void OnPlayerLogin(Player* player) override
     {
         DoubleXpWeekend* mod = DoubleXpWeekend::instance();
         ChatHandler handler = ChatHandler(player->GetSession());
         mod->OnLogin(player, &handler);
     }
 
-    void OnGiveXP(Player* player, uint32& amount, Unit* /*victim*/, uint8 xpSource) override
+    void OnPlayerGiveXP(Player* player, uint32& amount, Unit* /*victim*/, uint8 xpSource) override
     {
         DoubleXpWeekend* mod = DoubleXpWeekend::instance();
         amount = mod->OnGiveXP(player, amount, xpSource);

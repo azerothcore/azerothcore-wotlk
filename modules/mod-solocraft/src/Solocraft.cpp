@@ -718,7 +718,7 @@ class SolocraftAnnounce : public PlayerScript
 public:
     SolocraftAnnounce() : PlayerScript("SolocraftAnnounce") {}
 
-    void OnLogin(Player* player) override
+    void OnPlayerLogin(Player* player) override
     {
         if (SoloCraftEnable && SoloCraftAnnounceModule)
             ChatHandler(player->GetSession()).SendSysMessage("This server is running the |cff4CFF00SoloCraft |rmodule.");
@@ -754,27 +754,27 @@ class SolocraftPlayerScript : public PlayerScript
 public:
     SolocraftPlayerScript() : PlayerScript("SolocraftPlayerScript") {}
 
-    void OnLogin(Player* player) override
+    void OnPlayerLogin(Player* player) override
     {
         Solocraft::OnPlayerLogin(player);
     }
 
-    void OnLogout(Player* player) override
+    void OnPlayerLogout(Player* player) override
     {
         Solocraft::OnPlayerLogout(player);
     }
 
-    void OnGiveXP(Player* player, uint32& amount, Unit* /*victim*/, uint8 /*xpSource*/) override
+    void OnPlayerGiveXP(Player* player, uint32& amount, Unit* /*victim*/, uint8 /*xpSource*/) override
     {
         Solocraft::OnGiveXP(player, amount);
     }
 
-    void OnMapChanged(Player* player) override
+    void OnPlayerMapChanged(Player* player) override
     {
         Solocraft::OnPlayerMapChange(player);
     }
 
-    void OnAfterGuardianInitStatsForLevel(Player* player, Guardian* guardian) override
+    void OnPlayerAfterGuardianInitStatsForLevel(Player* player, Guardian* guardian) override
     {
         Solocraft::OnAfterPetInitStats(player, guardian);
     }
