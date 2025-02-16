@@ -1,3 +1,4 @@
+-- DB update 2025_02_15_02 -> 2025_02_16_00
 
 -- Chillmere Tidehunter
 UPDATE `creature_template` SET `AIName` = 'SmartAI' WHERE `entry` = 24460;
