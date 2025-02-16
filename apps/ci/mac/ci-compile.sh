@@ -26,6 +26,7 @@ time cmake ../../../ \
 -DBUILD_TESTING=1 \
 -DSCRIPTS=static \
 -DCMAKE_BUILD_TYPE=Release \
+-DCMAKE_INSTALL_PREFIX=/opt/azeroth-server/
 -DMYSQL_ADD_INCLUDE_PATH=$mysql_include_path \
 -DMYSQL_LIBRARY=$mysql_lib_path \
 -DREADLINE_INCLUDE_DIR=$(brew --prefix readline)/include \
