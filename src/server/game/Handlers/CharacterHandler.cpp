@@ -962,7 +962,7 @@ void WorldSession::HandlePlayerLoginFromDB(LoginQueryHolder const& holder)
     if (sWorld->IsFFAPvPRealm() && !pCurrChar->IsGameMaster() && !pCurrChar->HasPlayerFlag(PLAYER_FLAGS_RESTING))
         if (!pCurrChar->HasByteFlag(UNIT_FIELD_BYTES_2, 1, UNIT_BYTE2_FLAG_FFA_PVP))
         {
-            sScriptMgr->OnFfaPvpStateUpdate(pCurrChar,true);
+            sScriptMgr->OnPlayerFfaPvpStateUpdate(pCurrChar,true);
             pCurrChar->SetByteFlag(UNIT_FIELD_BYTES_2, 1, UNIT_BYTE2_FLAG_FFA_PVP);
         }
 
@@ -1124,7 +1124,7 @@ void WorldSession::HandlePlayerLoginFromDB(LoginQueryHolder const& holder)
     if (pCurrChar->HasAtLoginFlag(AT_LOGIN_FIRST))
     {
         pCurrChar->RemoveAtLoginFlag(AT_LOGIN_FIRST);
-        sScriptMgr->OnFirstLogin(pCurrChar);
+        sScriptMgr->OnPlayerFirstLogin(pCurrChar);
     }
 
     METRIC_EVENT("player_events", "Login", pCurrChar->GetName());
