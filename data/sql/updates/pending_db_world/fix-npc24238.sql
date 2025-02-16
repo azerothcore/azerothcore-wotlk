@@ -27,6 +27,6 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 (24238, 0, 8, 0, 6, 0, 100, 0, 0, 0, 0, 0, 0, 0, 11, 43371, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Bjorn Halgurdsson - On death - Spellcast Bjorn Kill Credit'),
 (24238, 0, 9, 0, 0, 0, 100, 0, 5000, 10000, 10000, 15000, 0, 0, 11, 32736, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Bjorn Halgurdsson - On update IC - Spellcast Mortal Strike'),
 (24238, 0, 10, 0, 0, 0, 100, 0, 0, 5000, 10000, 15000, 0, 0, 11, 33661, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Bjorn Halgurdsson - On update IC - Spellcast Crush Armor'),
-(24238, 0, 11, 12, 25, 0, 100, 512, 0, 0, 0, 0, 0, 0, 8, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Bjorn Halgurdsson - On evade - Set Passive'),
-(24238, 0, 12, 13, 61, 0, 100, 512, 0, 0, 0, 0, 0, 0, 18, 2, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Bjorn Halgurdsson - On evade - Set Unit Flags'),
-(24238, 0, 13, 0, 61, 0, 100, 512, 0, 0, 0, 0, 0, 0, 207, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Bjorn Halgurdsson - On evade - Set Hover');
+(24238, 0, 11, 12, 25, 0, 100, 512, 0, 0, 0, 0, 0, 0, 8, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Bjorn Halgurdsson - On Spawn/ReSpawn/Evade - Set Passive'),
+(24238, 0, 12, 13, 61, 0, 100, 512, 0, 0, 0, 0, 0, 0, 18, 2, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Bjorn Halgurdsson - On Spawn/ReSpawn/Evade - Set Unit Flags'),
+(24238, 0, 13, 0, 61, 0, 100, 512, 0, 0, 0, 0, 0, 0, 207, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Bjorn Halgurdsson - On Spawn/ReSpawn/Evade - Set Hover');
