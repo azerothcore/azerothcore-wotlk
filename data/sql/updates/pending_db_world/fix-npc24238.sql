@@ -1,5 +1,5 @@
 -- Bjorn Halgurdsson - Set position
-UPDATE `creature` SET `position_x` = 1510.538, `position_y` = -5271.508, `position_z` = 206.169, `orientation` = 5.3840 WHERE (`guid` = 112513 AND `id1` = 24238);
+UPDATE `creature` SET `position_x` = 1518.61, `position_y` = -5249.85, `position_z` = 215.38, `orientation` = 5.41052, `VerifiedBuild` = 59069 WHERE `guid` = 112513 AND `id1` = 24238;
 
 -- Bjorn Halgurdsson - Set speed_run
 UPDATE `creature_template` SET `speed_run` = 1.7435 WHERE (`entry` = 24238);
