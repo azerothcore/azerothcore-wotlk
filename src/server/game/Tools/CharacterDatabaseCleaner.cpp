@@ -56,6 +56,9 @@ void CharacterDatabaseCleaner::CleanDatabase()
     if (flags & CLEANING_FLAG_QUESTSTATUS)
         CleanCharacterQuestStatus();
 
+    if (sWorld->getBoolConfig(CONFIG_CLEAN_CHARACTER_DB))
+        CleanCharacterItem();
+
     // NOTE: In order to have persistentFlags be set in worldstates for the next cleanup,
     // you need to define them at least once in worldstates.
     flags &= sWorld->getIntConfig(CONFIG_PERSISTENT_CHARACTER_CLEAN_FLAGS);
@@ -153,4 +156,12 @@ void CharacterDatabaseCleaner::CleanCharacterTalent()
 void CharacterDatabaseCleaner::CleanCharacterQuestStatus()
 {
     CharacterDatabase.DirectExecute("DELETE FROM character_queststatus WHERE status = 0");
+}
+
+void CharacterDatabaseCleaner::CleanCharacterItem()
+{
+    CharacterDatabase.DirectExecute("CREATE TEMPORARY TABLE temp_guid_mapping AS SELECT guid AS old_guid, ROW_NUMBER() OVER (ORDER BY guid) AS new_guid FROM item_instance;");
+    CharacterDatabase.DirectExecute("UPDATE item_instance i JOIN temp_guid_mapping m ON i.guid = m.old_guid SET i.guid = m.new_guid;");
+    CharacterDatabase.DirectExecute("UPDATE character_inventory ci JOIN temp_guid_mapping m ON ci.item = m.old_guid SET ci.item = m.new_guid;");
+    CharacterDatabase.DirectExecute("DROP TEMPORARY TABLE temp_guid_mapping;");
 }

@@ -1746,15 +1746,26 @@ PlayerSave.Stats.SaveOnlyOnLogout = 1
 CleanCharacterDB = 0
 
 #
+#   CleanCharacterDB.OrderItems
+#       Description: Requires CleanCharacterDB = 1
+#                    Reoder item guids in item_instance and character_inventory
+#
+#       Default:     0 - (Disabled)
+#                    1 - (Enable)
+
+CleanCharacterDB.OrderItems = 0
+
+#
 #    PersistentCharacterCleanFlags
-#        Description: Determines the character clean flags that remain set after cleanups.
+#        Description: Requires CleanCharacterDB = 1
+#                     Determines the character clean flags that remain set after cleanups.
 #                     This is a bitmask value, you can use one of the following values:
 #
-#                     CLEANING_FLAG_ACHIEVEMENT_PROGRESS  = 0x1
-#                     CLEANING_FLAG_SKILLS                = 0x2
-#                     CLEANING_FLAG_SPELLS                = 0x4
-#                     CLEANING_FLAG_TALENTS               = 0x8
-#                     CLEANING_FLAG_QUESTSTATUS           = 0x10
+#                     CLEANING_FLAG_ACHIEVEMENT_PROGRESS  = 1
+#                     CLEANING_FLAG_SKILLS                = 2
+#                     CLEANING_FLAG_SPELLS                = 4
+#                     CLEANING_FLAG_TALENTS               = 8
+#                     CLEANING_FLAG_QUESTSTATUS           = 16
 #
 #                     Before use this feature, make a backup of your database.
 #

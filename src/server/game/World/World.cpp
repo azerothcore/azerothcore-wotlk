@@ -399,6 +399,7 @@ void World::LoadConfigSettings(bool reload)
     }
     _bool_configs[CONFIG_ADDON_CHANNEL]                   = sConfigMgr->GetOption<bool>("AddonChannel", true);
     _bool_configs[CONFIG_CLEAN_CHARACTER_DB]              = sConfigMgr->GetOption<bool>("CleanCharacterDB", false);
+    _bool_configs[CONFIG_CLEAN_CHARACTER_DB_ORDER_ITEMS]  = sConfigMgr->GetOption<bool>("CleanCharacterDB.OrderItems", false);
     _int_configs[CONFIG_PERSISTENT_CHARACTER_CLEAN_FLAGS] = sConfigMgr->GetOption<int32>("PersistentCharacterCleanFlags", 0);
     _int_configs[CONFIG_CHAT_CHANNEL_LEVEL_REQ]           = sConfigMgr->GetOption<int32>("ChatLevelReq.Channel", 1);
     _int_configs[CONFIG_CHAT_WHISPER_LEVEL_REQ]           = sConfigMgr->GetOption<int32>("ChatLevelReq.Whisper", 1);
