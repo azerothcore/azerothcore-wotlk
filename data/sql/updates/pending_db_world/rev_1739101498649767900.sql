@@ -58,10 +58,10 @@ INSERT INTO `creature_text` (`CreatureID`, `GroupID`, `ID`, `Text`, `Type`, `Lan
 DELETE FROM `creature_text` WHERE `CreatureID` = 26280;
 INSERT INTO `creature_text` (`CreatureID`, `GroupID`, `ID`, `Text`, `Type`, `Language`, `Probability`, `Emote`, `Duration`, `Sound`, `BroadcastTextId`, `TextRange`, `comment`) VALUES
 (26280, 0, 0, 'I cannot.', 12, 0, 100, 396, 0, 0, 25912, 0, 'Dragonblight Mage Hunter'),
-(26280, 1, 0, 'No.', 12, 0, 100, 396, 0, 0, 25913, 0, 'Dragonblight Mage Hunter'),
-(26280, 2, 0, 'You\'ll have to be patient.', 12, 0, 100, 396, 0, 0, 25914, 0, 'Dragonblight Mage Hunter'),
-(26280, 3, 0, 'Goramosh is busy with a ritual right now.', 12, 0, 100, 396, 0, 0, 25915, 0, 'Dragonblight Mage Hunter'),
-(26280, 4, 0, 'My orders are that you must wait here.', 12, 0, 100, 396, 0, 0, 25916, 0, 'Dragonblight Mage Hunter'),
-(26280, 5, 0, 'The master will be with you momentarily.', 12, 0, 100, 396, 0, 0, 25917, 0, 'Dragonblight Mage Hunter'),
-(26280, 6, 0, 'It won\'t be long now.', 12, 0, 100, 396, 0, 0, 25918, 0, 'Dragonblight Mage Hunter'),
-(26280, 7, 0, 'My apologies, ambassador. My orders were quite clear.', 12, 0, 100, 396, 0, 0, 25919, 0, 'Dragonblight Mage Hunter');
+(26280, 0, 1, 'No.', 12, 0, 100, 396, 0, 0, 25913, 0, 'Dragonblight Mage Hunter'),
+(26280, 0, 2, 'You\'ll have to be patient.', 12, 0, 100, 396, 0, 0, 25914, 0, 'Dragonblight Mage Hunter'),
+(26280, 0, 3, 'Goramosh is busy with a ritual right now.', 12, 0, 100, 396, 0, 0, 25915, 0, 'Dragonblight Mage Hunter'),
+(26280, 0, 4, 'My orders are that you must wait here.', 12, 0, 100, 396, 0, 0, 25916, 0, 'Dragonblight Mage Hunter'),
+(26280, 0, 5, 'The master will be with you momentarily.', 12, 0, 100, 396, 0, 0, 25917, 0, 'Dragonblight Mage Hunter'),
+(26280, 0, 6, 'It won\'t be long now.', 12, 0, 100, 396, 0, 0, 25918, 0, 'Dragonblight Mage Hunter'),
+(26280, 0, 7, 'My apologies, ambassador. My orders were quite clear.', 12, 0, 100, 396, 0, 0, 25919, 0, 'Dragonblight Mage Hunter');
