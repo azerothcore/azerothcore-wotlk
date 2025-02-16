@@ -7467,6 +7467,7 @@ SpellCastResult Spell::CheckItems()
                         uint32 requiredLevel = targetItem->GetTemplate()->RequiredLevel;
                         if (!requiredLevel)
                             requiredLevel = targetItem->GetTemplate()->ItemLevel;
+
                         if (requiredLevel < m_spellInfo->BaseLevel)
                             return SPELL_FAILED_LOWLEVEL;
                     }
