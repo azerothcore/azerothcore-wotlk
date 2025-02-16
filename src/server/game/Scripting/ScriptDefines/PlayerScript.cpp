@@ -895,14 +895,14 @@ bool ScriptMgr::AnticheatCheckMovementInfo(Player* player, MovementInfo const& m
     CALL_ENABLED_BOOLEAN_HOOKS(PlayerScript, PLAYERHOOK_ANTICHEAT_CHECK_MOVEMENT_INFO, !script->AnticheatCheckMovementInfo(player, movementInfo, mover, jump));
 }
 
-bool ScriptMgr::CanPlayerUpdateSkill(Player* player, uint32 skillId)
+bool ScriptMgr::OnPlayerCanUpdateSkill(Player* player, uint32 skillId)
 {
-    CALL_ENABLED_BOOLEAN_HOOKS(PlayerScript, PLAYERHOOK_ON_CAN_UPDATE_SKILL, !script->CanPlayerUpdateSkill(player, skillId));
+    CALL_ENABLED_BOOLEAN_HOOKS(PlayerScript, PLAYERHOOK_ON_CAN_UPDATE_SKILL, !script->OnPlayerCanUpdateSkill(player, skillId));
 }
 
-void ScriptMgr::OnBeforePlayerUpdateSkill(Player* player, uint32 skillId, uint32& value, uint32 max, uint32 step)
+void ScriptMgr::OnPlayerBeforeUpdateSkill(Player* player, uint32 skillId, uint32& value, uint32 max, uint32 step)
 {
-    CALL_ENABLED_HOOKS(PlayerScript, PLAYERHOOK_ON_BEFORE_UPDATE_SKILL, script->OnBeforePlayerUpdateSkill(player, skillId, value, max, step));
+    CALL_ENABLED_HOOKS(PlayerScript, PLAYERHOOK_ON_BEFORE_UPDATE_SKILL, script->OnPlayerBeforeUpdateSkill(player, skillId, value, max, step));
 }
 
 void ScriptMgr::OnPlayerUpdateSkill(Player* player, uint32 skillId, uint32 value, uint32 max, uint32 step, uint32 newValue)
@@ -910,9 +910,9 @@ void ScriptMgr::OnPlayerUpdateSkill(Player* player, uint32 skillId, uint32 value
     CALL_ENABLED_HOOKS(PlayerScript, PLAYERHOOK_ON_UPDATE_SKILL, script->OnPlayerUpdateSkill(player, skillId, value, max, step, newValue));
 }
 
-bool ScriptMgr::CanPlayerResurrect(Player* player)
+bool ScriptMgr::OnPlayerCanResurrect(Player* player)
 {
-    CALL_ENABLED_BOOLEAN_HOOKS(PlayerScript, PLAYERHOOK_CAN_RESURRECT, !script->CanPlayerResurrect(player));
+    CALL_ENABLED_BOOLEAN_HOOKS(PlayerScript, PLAYERHOOK_CAN_RESURRECT, !script->OnPlayerCanResurrect(player));
 }
 
 PlayerScript::PlayerScript(const char* name, std::vector<uint16> enabledHooks)

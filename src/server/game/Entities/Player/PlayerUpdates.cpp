@@ -708,7 +708,7 @@ void Player::UpdateAllRatings()
 // skill+step, checking for max value
 bool Player::UpdateSkill(uint32 skill_id, uint32 step)
 {
-    if (!skill_id || !sScriptMgr->CanPlayerUpdateSkill(this, skill_id))
+    if (!skill_id || !sScriptMgr->OnPlayerCanUpdateSkill(this, skill_id))
         return false;
 
     SkillStatusMap::iterator itr = mSkillStatus.find(skill_id);
@@ -720,7 +720,7 @@ bool Player::UpdateSkill(uint32 skill_id, uint32 step)
     uint32 value      = SKILL_VALUE(data);
     uint32 max        = SKILL_MAX(data);
 
-    sScriptMgr->OnBeforePlayerUpdateSkill(this, skill_id, value, max, step);
+    sScriptMgr->OnPlayerBeforeUpdateSkill(this, skill_id, value, max, step);
 
     if ((!max) || (!value) || (value >= max))
         return false;
@@ -915,7 +915,7 @@ bool Player::UpdateSkillPro(uint16 SkillId, int32 Chance, uint32 step)
     LOG_DEBUG("entities.player.skills",
               "UpdateSkillPro(SkillId {}, Chance {:3.1f}%)", SkillId,
               Chance / 10.0f);
-    if (!SkillId || !sScriptMgr->CanPlayerUpdateSkill(this, SkillId))
+    if (!SkillId || !sScriptMgr->OnPlayerCanUpdateSkill(this, SkillId))
         return false;
 
     if (Chance <= 0) // speedup in 0 chance case
@@ -936,7 +936,7 @@ bool Player::UpdateSkillPro(uint16 SkillId, int32 Chance, uint32 step)
     uint32 SkillValue = SKILL_VALUE(data);
     uint32 MaxValue   = SKILL_MAX(data);
 
-    sScriptMgr->OnBeforePlayerUpdateSkill(this, SkillId, SkillValue, MaxValue, step);
+    sScriptMgr->OnPlayerBeforeUpdateSkill(this, SkillId, SkillValue, MaxValue, step);
 
     if (!MaxValue || !SkillValue || SkillValue >= MaxValue)
         return false;

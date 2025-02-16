@@ -770,8 +770,8 @@ public:
      */
     virtual void OnPlayerAfterCreatureLootMoney(Player* /*player*/) { }
 
-    virtual bool CanPlayerUpdateSkill(Player* /*player*/, uint32 /*skillId*/) { return true; }
-    virtual void OnBeforePlayerUpdateSkill(Player* /*player*/, uint32 /*skillId*/, uint32& /*value*/, uint32 /*max*/, uint32 /*step*/) { }
+    virtual bool OnPlayerCanUpdateSkill(Player* /*player*/, uint32 /*skillId*/) { return true; }
+    virtual void OnPlayerBeforeUpdateSkill(Player* /*player*/, uint32 /*skillId*/, uint32& /*value*/, uint32 /*max*/, uint32 /*step*/) { }
     virtual void OnPlayerUpdateSkill(Player* /*player*/, uint32 /*skillId*/, uint32 /*value*/, uint32 /*max*/, uint32 /*step*/, uint32 /*newValue*/) { }
 
     /**
@@ -781,7 +781,7 @@ public:
      *
      * @return true if player is authorized to resurect
      */
-    virtual bool CanPlayerResurrect(Player* /*player*/) { return true; }
+    virtual bool OnPlayerCanResurrect(Player* /*player*/) { return true; }
 };
 
 #endif
