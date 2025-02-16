@@ -5,8 +5,8 @@ UPDATE `creature` SET `position_x` = 1510.538, `position_y` = -5271.508, `positi
 UPDATE `creature_template` SET `speed_run` = 1.7435 WHERE (`entry` = 24238);
 
 -- Bjorn Halgurdsson - Set mount
-DELETE FROM `creature_addon` WHERE (`entry` = 112513);
-INSERT INTO `creature_addon` (`entry`, `path_id`, `mount`, `bytes1`, `bytes2`, `emote`, `visibilityDistanceType`, `auras`) VALUES
+DELETE FROM `creature_addon` WHERE (`guid` = 112513);
+INSERT INTO `creature_addon` (`guid`, `path_id`, `mount`, `bytes1`, `bytes2`, `emote`, `visibilityDistanceType`, `auras`) VALUES
 (112513, 0, 22657, 0, 0, 0, 0, '');
 
 -- Bjorn Halgurdsson - Set movement
