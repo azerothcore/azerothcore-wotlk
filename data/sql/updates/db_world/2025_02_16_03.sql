@@ -1,3 +1,4 @@
+-- DB update 2025_02_16_02 -> 2025_02_16_03
 --
 SET @ZELIEK = 16063;
 UPDATE `creature_text` SET `Comment` = 'zeliek SAY_ZELI_DIALOG1' WHERE (`CreatureID` = @ZELIEK) AND (`GroupID` = 5);
