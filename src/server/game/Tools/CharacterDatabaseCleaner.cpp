@@ -56,7 +56,7 @@ void CharacterDatabaseCleaner::CleanDatabase()
     if (flags & CLEANING_FLAG_QUESTSTATUS)
         CleanCharacterQuestStatus();
 
-    if (sWorld->getBoolConfig(CONFIG_CLEAN_CHARACTER_DB))
+    if (sWorld->getBoolConfig(CONFIG_CLEAN_CHARACTER_DB_ORDER_ITEMS))
         CleanCharacterItem();
 
     // NOTE: In order to have persistentFlags be set in worldstates for the next cleanup,
