@@ -2,7 +2,7 @@
 SET @CGUID := 452;
 DELETE FROM `creature` WHERE `id1` = 26280 AND `guid` = @CGUID;
 INSERT INTO `creature` (`guid`, `id1`, `id2`, `id3`, `map`, `zoneId`, `areaId`, `spawnMask`, `phaseMask`, `equipment_id`, `position_x`, `position_y`, `position_z`, `orientation`, `spawntimesecs`, `wander_distance`, `currentwaypoint`, `curhealth`, `curmana`, `MovementType`, `npcflag`, `unit_flags`, `dynamicflags`, `ScriptName`, `VerifiedBuild`, `CreateObject`, `Comment`) VALUES
-(@CGUID, 26280, 0, 0, 571, 65, 4157, 1, 1, 1, 3373.642822265625, 2584.31494140625, 42.15882492065429687, 1.623156189918518066, 120, 0, 0, 9291, 3231, 0, 0, 0, 0, '', 58629, 0, `This guid creature has independent smart scripts`);
+(@CGUID, 26280, 0, 0, 571, 65, 4157, 1, 1, 1, 3373.642822265625, 2584.31494140625, 42.15882492065429687, 1.623156189918518066, 120, 0, 0, 9291, 3231, 0, 0, 0, 0, '', 58629, 0, 'has guid specific SAI');
 
 DELETE FROM `creature_addon` WHERE (`guid` IN (@CGUID));
 INSERT INTO `creature_addon` (`guid`, `path_id`, `mount`, `bytes1`, `bytes2`, `emote`, `visibilityDistanceType`, `auras`) VALUES
