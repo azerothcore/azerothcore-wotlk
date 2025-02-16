@@ -45,7 +45,7 @@ std::string CreateConfigWithMap(std::map<std::string, std::string> const& map)
     iniStream.close();
 #if WIN32
     auto tmp = mTempFileAbs.native();
-    return std::string(tmp.begin(), tmp.end());;
+    return std::string(tmp.begin(), tmp.end());
 #else
     return mTempFileAbs.native();
 #endif
