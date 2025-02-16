@@ -108,7 +108,7 @@ enum GameObjectIds
 
 enum SpellIds
 {
-    SPELL_SUNWELL_RADIANCE                  = 45769,
+    SPELL_SUMMON_FELBLAZE                    = 45069 // Felblaze? Summons Felmyst
 };
 
 template <class AI, class T>

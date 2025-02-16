@@ -32,7 +32,11 @@ enum MTData
     MAX_ENCOUNTER               = 4,
 
     DATA_KALECGOS               = 5,
-    DATA_ESCAPE_ORB             = 6
+    DATA_ESCAPE_ORB             = 6,
+
+    // Persistent data
+    DATA_KAEL_INTRO             = 0,
+    MAX_PERSISTENT_DATA         = 1
 };
 
 enum MTCreatures
@@ -63,6 +67,11 @@ enum InstanceEventIds
 enum MovementData
 {
     PATH_KALECGOS_FLIGHT = 248440
+};
+
+enum CreatureTexts
+{
+    SAY_KALECGOS_SPAWN   = 0
 };
 
 template <class AI, class T>

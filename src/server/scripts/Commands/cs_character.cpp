@@ -292,7 +292,7 @@ public:
         Player const* target = player->GetConnectedPlayer();
 
         LocaleConstant loc = handler->GetSessionDbcLocale();
-        char const* knownStr = handler->GetAcoreString(LANG_KNOWN);
+        std::string knownStr = handler->GetAcoreString(LANG_KNOWN);
 
         // Search in CharTitles.dbc
         for (uint32 id = 0; id < sCharTitlesStore.GetNumRows(); id++)
@@ -308,7 +308,7 @@ public:
                 if (!*name)
                     continue;
 
-                char const* activeStr = "";
+                std::string activeStr = "";
                 if (target->GetUInt32Value(PLAYER_CHOSEN_TITLE) == titleInfo->bit_index)
                     activeStr = handler->GetAcoreString(LANG_ACTIVE);
 
