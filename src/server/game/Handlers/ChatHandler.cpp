@@ -335,10 +335,15 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket& recvData)
             msg.erase(end, msg.end());
         }
 
-        // Validate hyperlinks
-        if (!ValidateHyperlinksAndMaybeKick(msg))
+        // Skip validation for playerbots module
+        auto playerbotsHyperlink = msg.find("Hfound:") != std::string::npos;
+        if (!playerbotsHyperlink)
         {
-            return;
+            // Validate hyperlinks
+            if (!ValidateHyperlinksAndMaybeKick(msg))
+            {
+                return;
+            }
         }
     }
 
