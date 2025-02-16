@@ -334,6 +334,18 @@ Battleground* BattlegroundMgr::GetBattlegroundTemplate(BattlegroundTypeId bgType
     return bgs.empty() ? nullptr : bgs.begin()->second;
 }
 
+std::vector<Battleground const*> BattlegroundMgr::GetActiveBattlegrounds()
+{
+    std::vector<Battleground const*> result;
+
+    for (auto const& [bgType, bgData] : bgDataStore)
+        for (auto const& [id, bg] : bgData._Battlegrounds)
+            if (bg->GetStatus() == STATUS_WAIT_JOIN || bg->GetStatus() == STATUS_IN_PROGRESS)
+                result.push_back(static_cast<const Battleground*>(bg));
+
+    return result;
+}
+
 uint32 BattlegroundMgr::CreateClientVisibleInstanceId(BattlegroundTypeId bgTypeId, BattlegroundBracketId bracket_id)
 {
     if (IsArenaType(bgTypeId))
@@ -467,7 +479,7 @@ void BattlegroundMgr::LoadBattlegroundTemplates()
 
         BattlegroundTypeId bgTypeId = static_cast<BattlegroundTypeId>(fields[0].Get<uint32>());
 
-        if (DisableMgr::IsDisabledFor(DISABLE_TYPE_BATTLEGROUND, bgTypeId, nullptr))
+        if (sDisableMgr->IsDisabledFor(DISABLE_TYPE_BATTLEGROUND, bgTypeId, nullptr))
             continue;
 
         // can be overwrite by values from DB

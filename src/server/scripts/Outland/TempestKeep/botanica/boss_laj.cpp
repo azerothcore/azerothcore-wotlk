@@ -93,10 +93,13 @@ struct boss_laj : public BossAI
 
         ScheduleTimedEvent(30s, [&] {
             me->RemoveAurasDueToSpell(_lastTransform.spellId);
-            _lastTransform = Acore::Containers::SelectRandomContainerElementIf(_transformContainer, [&](LajTransformData data) -> bool
+            auto lastTransformItr = Acore::Containers::SelectRandomContainerElementIf(_transformContainer, [&](LajTransformData const& data) -> bool
             {
                 return data.spellId != _lastTransform.spellId;
             });
+            if (lastTransformItr == _transformContainer.end())
+                return;
+            _lastTransform = *lastTransformItr;
             me->SetDisplayId(_lastTransform.modelId);
             DoCastSelf(_lastTransform.spellId, true);
         }, 35s);

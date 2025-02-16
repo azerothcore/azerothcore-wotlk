@@ -41,7 +41,7 @@ class CreatureAI;
 class DynamicObject;
 class GameObject;
 class GameObjectAI;
-class GridMap;
+class GridTerrainData;
 class Group;
 class Guardian;
 class Guild;
