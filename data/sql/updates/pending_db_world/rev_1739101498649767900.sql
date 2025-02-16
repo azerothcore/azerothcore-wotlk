@@ -19,7 +19,7 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 
 DELETE FROM `conditions` WHERE `SourceTypeOrReferenceId` = 22 AND `SourceEntry` = @ENTRY  AND `SourceId` = 0;
 INSERT INTO `conditions` (`SourceTypeOrReferenceId`, `SourceGroup`, `SourceEntry`, `SourceId`, `ElseGroup`, `ConditionTypeOrReference`, `ConditionTarget`, `ConditionValue1`, `ConditionValue2`, `ConditionValue3`, `NegativeCondition`, `Comment`) VALUES
-(22, 3, @ENTRY, 0, 0, 36, 1, 0, 0, 0, 1, 'Object is dead');
+(22, 3, @ENTRY, 0, 0, 36, 1, 0, 0, 0, 1, 'Creatures are reborn when they die');
 
 UPDATE `creature_template` SET `flags_extra` = 134217728 WHERE (`entry` = 26280);
 
@@ -39,9 +39,9 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 (@ENTRY, 0, 5, 0, 21, 0, 100, 0, 0, 0, 0, 0, 0, 0, 45, 0, 1, 0, 0, 0, 0, 10, @CGUID, 26280, 0, 0, 0, 0, 0, 'On home reached - Creature (26280) with guid 452 (fetching): Set creature data #0 to 1'),
 (@ENTRY, 0, 6, 0, 38, 0, 100, 0, 0, 1, 0, 0, 0, 0, 70, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 'On data[0] set to 1 - Self: Set respawn timer to 0 ms');
 
-DELETE FROM `conditions` WHERE `SourceTypeOrReferenceId` = 22 AND `SourceEntry` = 26496 AND `SourceId` = 0;
+DELETE FROM `conditions` WHERE `SourceTypeOrReferenceId` = 22 AND `SourceEntry` = @ENTRY AND `SourceId` = 0;
 INSERT INTO `conditions` (`SourceTypeOrReferenceId`, `SourceGroup`, `SourceEntry`, `SourceId`, `ElseGroup`, `ConditionTypeOrReference`, `ConditionTarget`, `ConditionValue1`, `ConditionValue2`, `ConditionValue3`, `NegativeCondition`, `Comment`) VALUES
-(22, 7, 26496, 0, 0, 36, 1, 0, 0, 0, 1, 'Object is dead');
+(22, 7, @ENTRY, 0, 0, 36, 1, 0, 0, 0, 1, 'Creatures are reborn when they die');
 
 DELETE FROM `creature_text` WHERE `CreatureID` = 26496;
 INSERT INTO `creature_text` (`CreatureID`, `GroupID`, `ID`, `Text`, `Type`, `Language`, `Probability`, `Emote`, `Duration`, `Sound`, `BroadcastTextId`, `TextRange`, `comment`) VALUES
