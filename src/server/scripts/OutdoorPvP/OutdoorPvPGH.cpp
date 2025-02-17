@@ -52,8 +52,8 @@ OPvPCapturePointGH::OPvPCapturePointGH(OutdoorPvP* pvp) : OPvPCapturePoint(pvp)
 void OPvPCapturePointGH::FillInitialWorldStates(WorldPackets::WorldState::InitWorldStates& packet)
 {
     packet.Worldstates.reserve(3);
-    packet.Worldstates.emplace_back(GH_UI_SLIDER_DISPLAY , 0);
-    packet.Worldstates.emplace_back(GH_UI_SLIDER_POS , 50);
+    packet.Worldstates.emplace_back(GH_UI_SLIDER_DISPLAY, 0);
+    packet.Worldstates.emplace_back(GH_UI_SLIDER_POS, 50);
     packet.Worldstates.emplace_back(GH_UI_SLIDER_N, 20);
 }
 
