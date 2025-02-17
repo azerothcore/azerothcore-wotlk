@@ -686,9 +686,8 @@ void Map::Update(const uint32 t_diff, const uint32 s_diff, bool  /*thread*/)
                 ref = ref->next();
             }
 
-            for (Creature* cre : updateList) {
+            for (Creature* cre : updateList)
                 VisitNearbyCellsOf(cre, grid_object_update, world_object_update, grid_large_object_update, world_large_object_update);
-            }
         }
     }
 
