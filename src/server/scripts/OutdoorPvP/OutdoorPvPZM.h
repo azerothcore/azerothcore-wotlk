@@ -188,7 +188,7 @@ protected:
     uint32 m_TowerState;
 };
 
-enum ZM_GraveyardState
+enum Zm_GraveyardState
 {
     ZM_GRAVEYARD_N = 1,
     ZM_GRAVEYARD_A = 2,

@@ -649,7 +649,6 @@ public:
                         FrostwyrmGUIDs.erase(creature->GetSpawnId());
                         if (FrostwyrmGUIDs.empty())
                         {
-                            instance->LoadGrid(SindragosaSpawnPos.GetPositionX(), SindragosaSpawnPos.GetPositionY());
                             if (Creature* boss = instance->SummonCreature(NPC_SINDRAGOSA, SindragosaSpawnPos))
                                 boss->AI()->DoAction(ACTION_START_FROSTWYRM);
                         }
@@ -1159,17 +1158,6 @@ public:
                     {
                         IsSindragosaIntroDone = true;
                         HandleDropAttempt();
-                        if (instance->IsHeroic())
-                        {
-                            if (HeroicAttempts)
-                            {
-                                Events.ScheduleEvent(EVENT_RESPAWN_SINDRAGOSA, 30s);
-                            }
-                        }
-                        else
-                        {
-                            Events.ScheduleEvent(EVENT_RESPAWN_SINDRAGOSA, 30s);
-                        }
                     }
                     if (state == DONE && !instance->IsHeroic() && LichKingHeroicAvailable)
                     {
@@ -1199,7 +1187,6 @@ public:
                             if (GameObject* pillars = instance->GetGameObject(PillarsUnchainedGUID))
                                 pillars->SetRespawnTime(7 * DAY);
 
-                            instance->LoadGrid(JainaSpawnPos.GetPositionX(), JainaSpawnPos.GetPositionY());
                             instance->SummonCreature(NPC_LADY_JAINA_PROUDMOORE_QUEST, JainaSpawnPos);
                             instance->SummonCreature(NPC_MURADIN_BRONZEBEARD_QUEST, MuradinSpawnPos);
                             instance->SummonCreature(NPC_UTHER_THE_LIGHTBRINGER_QUEST, UtherSpawnPos);

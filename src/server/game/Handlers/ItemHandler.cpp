@@ -743,7 +743,7 @@ void WorldSession::HandleSellItemOpcode(WorldPacket& recvData)
         return;
     }
 
-    if ((creature->GetCreatureTemplate()->flags_extra & CREATURE_FLAG_EXTRA_NO_SELL_VENDOR) != 0)
+    if (creature->HasFlagsExtra(CREATURE_FLAG_EXTRA_NO_SELL_VENDOR))
     {
         _player->SendSellError(SELL_ERR_CANT_SELL_TO_THIS_MERCHANT, creature, itemguid, 0);
         return;
@@ -756,7 +756,7 @@ void WorldSession::HandleSellItemOpcode(WorldPacket& recvData)
     Item* pItem = _player->GetItemByGuid(itemguid);
     if (pItem)
     {
-        if (!sScriptMgr->CanSellItem(_player, pItem, creature))
+        if (!sScriptMgr->OnPlayerCanSellItem(_player, pItem, creature))
             return;
 
         // prevent sell not owner item

@@ -421,7 +421,7 @@ bool LootItem::AllowedForPlayer(Player const* player, ObjectGuid source) const
         return false;
     }
 
-    if (DisableMgr::IsDisabledFor(DISABLE_TYPE_LOOT, itemid, nullptr))
+    if (sDisableMgr->IsDisabledFor(DISABLE_TYPE_LOOT, itemid, nullptr))
     {
         return false;
     }
@@ -696,7 +696,7 @@ QuestItemList* Loot::FillQuestLoot(Player* player)
     {
         LootItem& item = quest_items[i];
 
-        sScriptMgr->OnBeforeFillQuestLootItem(player, item);
+        sScriptMgr->OnPlayerBeforeFillQuestLootItem(player, item);
 
         // Quest item is not free for all and is already assigned to another player
         // or player doesn't need it
