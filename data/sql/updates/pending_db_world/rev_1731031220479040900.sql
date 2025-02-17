@@ -1,12 +1,12 @@
 -- Adding COMMENT COLUMN
 -- Achievements
 ALTER TABLE `player_factionchange_achievement`
-ADD `alliance_comment` TEXT NULL DEFAULT NULL 'utf8mb4_unicode_ci' AFTER `alliance_id`,
-ADD `horde_comment` TEXT NULL DEFAULT NULL 'utf8mb4_unicode_ci' AFTER `horde_id`;
+ADD `alliance_comment` TEXT NULL DEFAULT NULL COLLATE 'utf8mb4_unicode_ci' AFTER `alliance_id`,
+ADD `horde_comment` TEXT NULL DEFAULT NULL COLLATE 'utf8mb4_unicode_ci' AFTER `horde_id`;
 -- Reputations
 ALTER TABLE `player_factionchange_reputations`
-ADD `alliance_comment` TEXT NULL DEFAULT NULL 'utf8mb4_unicode_ci' AFTER `alliance_id`,
-ADD `horde_comment` TEXT NULL DEFAULT NULL 'utf8mb4_unicode_ci' AFTER `horde_id`;
+ADD `alliance_comment` TEXT NULL DEFAULT NULL COLLATE 'utf8mb4_unicode_ci' AFTER `alliance_id`,
+ADD `horde_comment` TEXT NULL DEFAULT NULL COLLATE 'utf8mb4_unicode_ci' AFTER `horde_id`;
 
 -- Adding Achievements 
 DELETE FROM `player_factionchange_achievement` WHERE `alliance_id` IN
