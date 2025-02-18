@@ -1,3 +1,4 @@
+-- DB update 2025_02_16_03 -> 2025_02_18_00
 
 -- Remove Wrong Spawns
 DELETE FROM `creature` WHERE `id1` = 28745;
