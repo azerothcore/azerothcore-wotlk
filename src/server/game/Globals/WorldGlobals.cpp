@@ -15,9 +15,9 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "GameTime.h"
 #include "Log.h"
 #include "QueryResult.h"
+#include "Timer.h"
 #include "WorldGlobals.h"
 
 WorldGlobals* WorldGlobals::instance()
@@ -29,6 +29,8 @@ WorldGlobals* WorldGlobals::instance()
 void WorldGlobals::LoadAntiDosOpcodePolicies()
 {
     uint32 oldMSTime = getMSTime();
+
+    _antiDosOpcodePolicies.fill(nullptr);
 
     QueryResult result = WorldDatabase.Query("SELECT Opcode, Policy, MaxAllowedCount FROM antidos_opcode_policies");
     if (!result)
@@ -46,7 +48,10 @@ void WorldGlobals::LoadAntiDosOpcodePolicies()
 
         uint16 opcode = fields[0].Get<uint16>();
         if (opcode >= NUM_OPCODE_HANDLERS)
+        {
+            LOG_ERROR("server.loading", "Unkown opcode {} in table `antidos_opcode_policies`, skipping.", opcode);
             continue;
+        }
 
         std::unique_ptr<AntiDosOpcodePolicy> policy = std::make_unique<AntiDosOpcodePolicy>();
         policy->Policy = fields[1].Get<uint8>();

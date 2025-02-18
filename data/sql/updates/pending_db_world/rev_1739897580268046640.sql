@@ -2,8 +2,9 @@ DROP TABLE IF EXISTS `antidos_opcode_policies`;
 CREATE TABLE `antidos_opcode_policies` (
   `Opcode` smallint unsigned NOT NULL,
   `Policy` tinyint unsigned NOT NULL,
-  `MaxAllowedCount` smallint unsigned NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+  `MaxAllowedCount` smallint unsigned NOT NULL,
+  PRIMARY KEY (`Opcode`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 INSERT INTO `antidos_opcode_policies` (`Opcode`, `Policy`, `MaxAllowedCount`) VALUES
     (393, 1, 200),
