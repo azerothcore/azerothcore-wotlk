@@ -1203,7 +1203,7 @@ void WorldSession::ReadAddonsInfo(ByteBuffer& data)
         }
         catch (ByteBufferException const& e)
         {
-            LOG_ERROR("network", "Addon packet read error! %s", e.what());
+            LOG_ERROR("network", "Addon packet read error! {}", e.what());
         }
     }
     else
