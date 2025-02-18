@@ -593,7 +593,7 @@ void WorldSession::LogoutPlayer(bool save)
     if (_player)
     {
         //! Call script hook before other logout events
-        sScriptMgr->OnBeforePlayerLogout(_player);
+        sScriptMgr->OnPlayerBeforeLogout(_player);
 
         if (ObjectGuid lguid = _player->GetLootGUID())
             DoLootRelease(lguid);
@@ -646,11 +646,11 @@ void WorldSession::LogoutPlayer(bool save)
                         CharacterDatabase.Execute(stmt);
                     }
 
-                    sScriptMgr->OnBattlegroundDesertion(_player, BG_DESERTION_TYPE_INVITE_LOGOUT);
+                    sScriptMgr->OnPlayerBattlegroundDesertion(_player, BG_DESERTION_TYPE_INVITE_LOGOUT);
                 }
 
                 if (bgQueueTypeId >= BATTLEGROUND_QUEUE_2v2 && bgQueueTypeId < MAX_BATTLEGROUND_QUEUE_TYPES && _player->IsInvitedForBattlegroundQueueType(bgQueueTypeId))
-                    sScriptMgr->OnBattlegroundDesertion(_player, ARENA_DESERTION_TYPE_INVITE_LOGOUT);
+                    sScriptMgr->OnPlayerBattlegroundDesertion(_player, ARENA_DESERTION_TYPE_INVITE_LOGOUT);
 
                 _player->RemoveBattlegroundQueueId(bgQueueTypeId);
                 sBattlegroundMgr->GetBattlegroundQueue(bgQueueTypeId).RemovePlayer(_player->GetGUID(), true);
@@ -667,9 +667,10 @@ void WorldSession::LogoutPlayer(bool save)
         // there are some positive auras from boss encounters that can be kept by logging out and logging in after boss is dead, and may be used on next bosses
         _player->RemoveAurasWithInterruptFlags(AURA_INTERRUPT_FLAG_CHANGE_MAP);
 
-        ///- If the player is in a group and LeaveGroupOnLogout is enabled or if the player is invited to a group, remove him. If the group is then only 1 person, disband the group.
-        if (!_player->GetGroup() || sWorld->getBoolConfig(CONFIG_LEAVE_GROUP_ON_LOGOUT))
-            _player->UninviteFromGroup();
+        if (Group *group = _player->GetGroupInvite())
+            sWorld->getBoolConfig(CONFIG_LEAVE_GROUP_ON_LOGOUT)
+                ? _player->UninviteFromGroup()  // Can disband group.
+                : group->RemoveInvite(_player); // Just removes invite.
 
         // remove player from the group if he is:
         // a) in group; b) not in raid group; c) logging out normally (not being kicked or disconnected) d) LeaveGroupOnLogout is enabled

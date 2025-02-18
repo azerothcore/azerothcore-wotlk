@@ -31,6 +31,11 @@ inputs:
     description: Max allowed error count before compilation stops
     required: false
     type: number
+  keepgoing:
+    default: false
+    description: Flag to continue build after errors
+    required: false
+    type: boolean
 runs:
   using: composite
   steps:
@@ -121,7 +126,9 @@ runs:
     - name: build
       shell: bash
       working-directory: "${{ github.workspace }}/build"
-      run: cmake --build . --config "Release" -j "$(($(nproc) + 2))"
+      run: |
+        # '--' passes '--keep-going' to the underlying build system (make)
+        cmake --build . --config "Release" -j "$(($(nproc) + 2))" ${{ inputs.keepgoing == 'true' && '-- --keep-going' || '' }}
 
     - name: install
       shell: bash

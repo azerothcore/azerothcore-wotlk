@@ -3107,6 +3107,7 @@ void SpellMgr::LoadSpellInfoCorrections()
     // Tail Smash (Sindragosa)
     ApplySpellFix({ 71077 }, [](SpellInfo* spellInfo)
     {
+        spellInfo->AttributesEx2 |= SPELL_ATTR2_IGNORE_LINE_OF_SIGHT;
         spellInfo->Effects[EFFECT_0].TargetA = SpellImplicitTargetInfo(TARGET_DEST_CASTER_BACK);
         spellInfo->Effects[EFFECT_0].TargetB = SpellImplicitTargetInfo(TARGET_UNIT_DEST_AREA_ENEMY);
         spellInfo->Effects[EFFECT_1].TargetA = SpellImplicitTargetInfo(TARGET_DEST_CASTER_BACK);
@@ -4867,6 +4868,20 @@ void SpellMgr::LoadSpellInfoCorrections()
     ApplySpellFix({ 40080 }, [](SpellInfo* spellInfo)
     {
         spellInfo->Effects[EFFECT_0].RealPointsPerLevel = 0;
+    });
+
+    // Mangle (Nalorakk)
+    ApplySpellFix({ 42389 }, [](SpellInfo* spellInfo)
+    {
+        spellInfo->SchoolMask = SPELL_SCHOOL_MASK_NATURE;
+    });
+
+    // Event food, fixes to give correct stamina and spirit of 25% of the character level
+    ApplySpellFix({ 24870 }, [](SpellInfo* spellInfo)
+    {
+        spellInfo->Effects[EFFECT_1].BasePoints = 0;
+        spellInfo->Effects[EFFECT_0].RealPointsPerLevel = 0.25;
+        spellInfo->Effects[EFFECT_1].RealPointsPerLevel = 0.25;
     });
 
     for (uint32 i = 0; i < GetSpellInfoStoreSize(); ++i)
