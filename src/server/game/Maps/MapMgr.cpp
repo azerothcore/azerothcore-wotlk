@@ -161,7 +161,7 @@ Map::EnterState MapMgr::PlayerCannotEnter(uint32 mapid, Player* player, bool log
 
     char const* mapName = entry->name[player->GetSession()->GetSessionDbcLocale()];
 
-    if (!sScriptMgr->CanEnterMap(player, entry, instance, mapDiff, loginCheck))
+    if (!sScriptMgr->OnPlayerCanEnterMap(player, entry, instance, mapDiff, loginCheck))
         return Map::CANNOT_ENTER_UNSPECIFIED_REASON;
 
     Group* group = player->GetGroup();
@@ -304,11 +304,7 @@ void MapMgr::DoDelayedMovesAndRemoves()
 bool MapMgr::ExistMapAndVMap(uint32 mapid, float x, float y)
 {
     GridCoord p = Acore::ComputeGridCoord(x, y);
-
-    int gx = 63 - p.x_coord;
-    int gy = 63 - p.y_coord;
-
-    return GridTerrainLoader::ExistMap(mapid, gx, gy) && GridTerrainLoader::ExistVMap(mapid, gx, gy);
+    return GridTerrainLoader::ExistMap(mapid, p.x_coord, p.y_coord) && GridTerrainLoader::ExistVMap(mapid, p.x_coord, p.y_coord);
 }
 
 bool MapMgr::IsValidMAP(uint32 mapid, bool startUp)

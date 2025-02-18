@@ -4876,6 +4876,14 @@ void SpellMgr::LoadSpellInfoCorrections()
         spellInfo->SchoolMask = SPELL_SCHOOL_MASK_NATURE;
     });
 
+    // Event food, fixes to give correct stamina and spirit of 25% of the character level
+    ApplySpellFix({ 24870 }, [](SpellInfo* spellInfo)
+    {
+        spellInfo->Effects[EFFECT_1].BasePoints = 0;
+        spellInfo->Effects[EFFECT_0].RealPointsPerLevel = 0.25;
+        spellInfo->Effects[EFFECT_1].RealPointsPerLevel = 0.25;
+    });
+
     for (uint32 i = 0; i < GetSpellInfoStoreSize(); ++i)
     {
         SpellInfo* spellInfo = mSpellInfoMap[i];
