@@ -324,7 +324,7 @@ public: /* PlayerScript */
     * @remark avoid hooking both versions of this event ReputationSource is a more generic one.<br />
     * ReputationSource is called first.
     */
-    void OnBeforePlayerReputationChange(Player* player, uint32 factionId, float& amount, Unit* victim);
+    void OnPlayerBeforeReputationChange(Player* player, uint32 factionId, float& amount, Unit* victim);
 
     /**
     * @brief Called before a player gains or looses Reputation
@@ -336,7 +336,7 @@ public: /* PlayerScript */
     * @remark avoid hooking both versions of this event ReputationSource is a more generic one.<br />
     * ReputationSource is called first.
     */
-    void OnBeforePlayerReputationChange(Player* player, uint32 factionId, float& amount, Quest const* quest);
+    void OnPlayerBeforeReputationChange(Player* player, uint32 factionId, float& amount, Quest const* quest);
 
     /**
     * @brief Called before a player gains or looses Reputation
@@ -348,7 +348,7 @@ public: /* PlayerScript */
     * @remark avoid hooking both versions of this event ReputationSource is a more generic one.<br />
     * ReputationSource is called first.
     */
-    void OnBeforePlayerReputationChange(Player* player, uint32 factionId, float& amount, Spell* spell);
+    void OnPlayerBeforeReputationChange(Player* player, uint32 factionId, float& amount, Spell* spell);
 
     /**
     * @brief Called before a player gains or looses Reputation
@@ -361,7 +361,7 @@ public: /* PlayerScript */
     * @remark avoid hooking both versions of this event ReputationSource is a more generic one.<br />
     * ReputationSource is called first.
     */
-    void OnBeforePlayerReputationChange(Player* player, uint32 factionId, float& amount, ReputationSource reputationSource);
+    void OnPlayerBeforeReputationChange(Player* player, uint32 factionId, float& amount, ReputationSource reputationSource);
     bool OnPlayerReputationChange(Player* player, uint32 factionID, int32& standing, bool incremental);
     void OnPlayerReputationRankChange(Player* player, uint32 factionID, ReputationRank newRank, ReputationRank oldRank, bool increased);
     void OnPlayerLearnSpell(Player* player, uint32 spellID);

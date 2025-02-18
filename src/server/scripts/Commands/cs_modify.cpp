@@ -828,7 +828,7 @@ public:
             return false;
         }
         float rep = target->GetReputationMgr().GetReputation(factionId) - float(amount);
-        ScriptMgr::instance()->OnBeforePlayerReputationChange(target, factionId, rep, ReputationSource::Console);
+        ScriptMgr::instance()->OnPlayerBeforeReputationChange(target, factionId, rep, ReputationSource::Console);
         target->GetReputationMgr().SetOneFactionReputation(factionEntry, rep, false);
         target->GetReputationMgr().SendState(target->GetReputationMgr().GetState(factionEntry));
 

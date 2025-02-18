@@ -290,7 +290,7 @@ public:
     * @remark avoid hooking both versions of this event ReputationSource is a more generic one.<br />
     * ReputationSource is called first.
     */
-    virtual void OnBeforeReputationChange(Player* /*player*/, uint32 /*factionId*/, float& /*amount*/, Unit* /*victim*/ ) {}
+    virtual void OnPlayerBeforeReputationChange(Player* /*player*/, uint32 /*factionId*/, float& /*amount*/, Unit* /*victim*/ ) {}
 
     /**
     * @brief Called before a player gains or looses Reputation
@@ -302,7 +302,7 @@ public:
     * @remark avoid hooking both versions of this event ReputationSource is a more generic one.<br />
     * ReputationSource is called first.
     */
-    virtual void OnBeforeReputationChange(Player* /*player*/, uint32 /*factionId*/ , float& /*amount*/, Quest const* /*quest*/) {}
+    virtual void OnPlayerBeforeReputationChange(Player* /*player*/, uint32 /*factionId*/ , float& /*amount*/, Quest const* /*quest*/) {}
 
     /**
     * @brief Called before a player gains or looses Reputation
@@ -314,7 +314,7 @@ public:
     * @remark avoid hooking both versions of this event ReputationSource is a more generic one.<br />
     * ReputationSource is called first.
     */
-    virtual void OnBeforeReputationChange(Player* /*player*/, uint32 /*factionId*/, float& /*amount*/ , Spell* /*spell*/) {}
+    virtual void OnPlayerBeforeReputationChange(Player* /*player*/, uint32 /*factionId*/, float& /*amount*/ , Spell* /*spell*/) {}
 
     /**
     * @brief Called before a player gains or looses Reputation
@@ -326,7 +326,7 @@ public:
     * @remark avoid hooking both versions of this event ReputationSource is a more generic one.<br />
     * ReputationSource is called first.
     */
-    virtual void OnBeforeReputationChange(Player* /*player*/, uint32 /*factionId*/, float& /*amount*/, ReputationSource /*reputationSource*/) {}
+    virtual void OnPlayerBeforeReputationChange(Player* /*player*/, uint32 /*factionId*/, float& /*amount*/, ReputationSource /*reputationSource*/) {}
 
     // Called when a player's reputation changes (before it is actually changed)
     virtual bool OnPlayerReputationChange(Player* /*player*/, uint32 /*factionID*/, int32& /*standing*/, bool /*incremental*/) { return true; }

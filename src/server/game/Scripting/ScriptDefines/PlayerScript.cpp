@@ -129,24 +129,24 @@ void ScriptMgr::OnPlayerGiveXP(Player* player, uint32& amount, Unit* victim, uin
     CALL_ENABLED_HOOKS(PlayerScript, PLAYERHOOK_ON_GIVE_EXP, script->OnPlayerGiveXP(player, amount, victim, xpSource));
 }
 
-void ScriptMgr::OnBeforePlayerReputationChange(Player* player, uint32 factionId, float& amount, Unit* victim)
+void ScriptMgr::OnPlayerBeforeReputationChange(Player* player, uint32 factionId, float& amount, Unit* victim)
 {
-    CALL_ENABLED_HOOKS(PlayerScript, PLAYERHOOK_ON_BEFORE_REPUTATION_CHANGE_UNIT, script->OnBeforeReputationChange(player, factionId, amount, victim));
+    CALL_ENABLED_HOOKS(PlayerScript, PLAYERHOOK_ON_BEFORE_REPUTATION_CHANGE_UNIT, script->OnPlayerBeforeReputationChange(player, factionId, amount, victim));
 }
 
-void ScriptMgr::OnBeforePlayerReputationChange(Player* player, uint32 factionId, float& amount, Quest const* quest)
+void ScriptMgr::OnPlayerBeforeReputationChange(Player* player, uint32 factionId, float& amount, Quest const* quest)
 {
-    CALL_ENABLED_HOOKS(PlayerScript, PLAYERHOOK_ON_BEFORE_REPUTATION_CHANGE_QUEST, script->OnBeforeReputationChange(player, factionId, amount, quest));
+    CALL_ENABLED_HOOKS(PlayerScript, PLAYERHOOK_ON_BEFORE_REPUTATION_CHANGE_QUEST, script->OnPlayerBeforeReputationChange(player, factionId, amount, quest));
 }
 
-void ScriptMgr::OnBeforePlayerReputationChange(Player* player, uint32 factionId, float& amount, Spell* spell)
+void ScriptMgr::OnPlayerBeforeReputationChange(Player* player, uint32 factionId, float& amount, Spell* spell)
 {
-    CALL_ENABLED_HOOKS(PlayerScript, PLAYERHOOK_ON_BEFORE_REPUTATION_CHANGE_SPELL, script->OnBeforeReputationChange(player, factionId, amount, spell));
+    CALL_ENABLED_HOOKS(PlayerScript, PLAYERHOOK_ON_BEFORE_REPUTATION_CHANGE_SPELL, script->OnPlayerBeforeReputationChange(player, factionId, amount, spell));
 }
 
-void ScriptMgr::OnBeforePlayerReputationChange(Player* player, uint32 factionId, float& amount, ReputationSource reputationSource)
+void ScriptMgr::OnPlayerBeforeReputationChange(Player* player, uint32 factionId, float& amount, ReputationSource reputationSource)
 {
-    CALL_ENABLED_HOOKS(PlayerScript, PLAYERHOOK_ON_BEFORE_REPUTATION_CHANGE_SOURCE, script->OnBeforeReputationChange(player, factionId, amount, reputationSource));
+    CALL_ENABLED_HOOKS(PlayerScript, PLAYERHOOK_ON_BEFORE_REPUTATION_CHANGE_SOURCE, script->OnPlayerBeforeReputationChange(player, factionId, amount, reputationSource));
 }
 
 bool ScriptMgr::OnPlayerReputationChange(Player* player, uint32 factionID, int32& standing, bool incremental)

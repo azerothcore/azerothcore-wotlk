@@ -311,7 +311,7 @@ public:
                     if (FactionEntry const* factionEntry = sFactionStore.LookupEntry(repFaction))
                     {
                         auto repDiv = static_cast<float>(repValue - curRep);
-                        ScriptMgr::instance()->OnBeforePlayerReputationChange(player, repFaction, repDiv, ReputationSource::Console);
+                        ScriptMgr::instance()->OnPlayerBeforeReputationChange(player, repFaction, repDiv, ReputationSource::Console);
                         player->GetReputationMgr().SetReputation(factionEntry, repDiv + curRep);
                     }
                 }
@@ -327,7 +327,7 @@ public:
                     if (FactionEntry const* factionEntry = sFactionStore.LookupEntry(repFaction))
                     {
                         auto repDiv = static_cast<float>(repValue2 - curRep);
-                        ScriptMgr::instance()->OnBeforePlayerReputationChange(player, repFaction, repDiv, ReputationSource::Console);
+                        ScriptMgr::instance()->OnPlayerBeforeReputationChange(player, repFaction, repDiv, ReputationSource::Console);
                         player->GetReputationMgr().SetReputation(factionEntry, repDiv + curRep);
                     }
                 }
