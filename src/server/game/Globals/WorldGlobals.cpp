@@ -15,6 +15,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "GameTime.h"
+#include "Log.h"
 #include "QueryResult.h"
 #include "WorldGlobals.h"
 
