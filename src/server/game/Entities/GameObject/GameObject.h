@@ -19,7 +19,6 @@
 #define AZEROTHCORE_GAMEOBJECT_H
 
 #include "Common.h"
-#include "DatabaseEnv.h"
 #include "G3D/Quat.h"
 #include "GameObjectData.h"
 #include "LootMgr.h"
@@ -199,8 +198,7 @@ public:
     void Refresh();
     void DespawnOrUnsummon(Milliseconds delay = 0ms, Seconds forcedRespawnTime = 0s);
     void Delete();
-    void GetFishLoot(Loot* loot, Player* loot_owner);
-    void GetFishLootJunk(Loot* loot, Player* loot_owner);
+    void GetFishLoot(Loot* fishLoot, Player* lootOwner, bool junk = false);
     [[nodiscard]] GameobjectTypes GetGoType() const { return GameobjectTypes(GetByteValue(GAMEOBJECT_BYTES_1, 1)); }
     void SetGoType(GameobjectTypes type) { SetByteValue(GAMEOBJECT_BYTES_1, 1, type); }
     [[nodiscard]] GOState GetGoState() const { return GOState(GetByteValue(GAMEOBJECT_BYTES_1, 0)); }

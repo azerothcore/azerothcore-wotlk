@@ -141,7 +141,7 @@ typedef std::map<ObjectGuid::LowType /*spawnId*/, uint8 /*state*/> ObjectStateMa
 class InstanceScript : public ZoneScript
 {
 public:
-    explicit InstanceScript(Map* map) : instance(map), completedEncounters(0) {}
+    explicit InstanceScript(Map* map) : instance(map), completedEncounters(0), _teamIdInInstance(TEAM_NEUTRAL) {}
 
     ~InstanceScript() override {}
 
@@ -182,7 +182,10 @@ public:
     GameObject* GetGameObject(uint32 type);
 
     //Called when a player successfully enters the instance.
-    virtual void OnPlayerEnter(Player* /*player*/) {}
+    virtual void OnPlayerEnter(Player* /*player*/);
+
+    //Called when a player successfully leaves the instance.
+    virtual void OnPlayerLeave(Player* /*player*/);
 
     virtual void OnPlayerAreaUpdate(Player* /*player*/, uint32 /*oldArea*/, uint32 /*newArea*/) {}
 
@@ -199,6 +202,9 @@ public:
 
     //Respawns a GO having negative spawntimesecs in gameobject-table
     void DoRespawnGameObject(ObjectGuid guid, uint32 timeToDespawn = MINUTE);
+
+    // Respawns a GO by instance storage index
+    void DoRespawnGameObject(uint32 type);
 
     // Respawns a creature.
     void DoRespawnCreature(ObjectGuid guid, bool force = false);
@@ -279,6 +285,10 @@ public:
     [[nodiscard]] bool AllBossesDone() const;
     [[nodiscard]] bool AllBossesDone(std::initializer_list<uint32> bossIds) const;
 
+    TeamId GetTeamIdInInstance() const { return _teamIdInInstance; }
+    void SetTeamIdInInstance(TeamId teamId) { _teamIdInInstance = teamId; }
+    bool IsTwoFactionInstance() const;
+
     TaskScheduler scheduler;
 protected:
     void SetHeaders(std::string const& dataHeaders);
@@ -288,6 +298,11 @@ protected:
     void LoadDoorData(DoorData const* data);
     void LoadMinionData(MinionData const* data);
     void LoadObjectData(ObjectData const* creatureData, ObjectData const* gameObjectData);
+    // Allows setting another creature as summoner for a creature.
+    // This is used to handle summons that are not directly controlled by the summoner.
+    // Summoner creature must be loaded in the instance data (LoadObjectData).
+    void LoadSummonData(ObjectData const* data);
+    void SetSummoner(Creature* creature);
 
     void AddObject(Creature* obj, bool add = true);
     void RemoveObject(Creature* obj);
@@ -324,9 +339,11 @@ private:
     MinionInfoMap minions;
     ObjectInfoMap _creatureInfo;
     ObjectInfoMap _gameObjectInfo;
+    ObjectInfoMap _summonInfo;
     ObjectGuidMap _objectGuids;
     ObjectStateMap _objectStateMap;
     uint32 completedEncounters; // completed encounter mask, bit indexes are DungeonEncounter.dbc boss numbers, used for packets
+    TeamId _teamIdInInstance;
     std::unordered_set<uint32> _activatedAreaTriggers;
 };
 

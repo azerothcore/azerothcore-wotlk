@@ -20,6 +20,7 @@
 
 #include "Define.h"
 #include <string>
+#include "Common.h"
 
 class WorldPacket;
 
@@ -29,16 +30,23 @@ public:
     static MotdMgr* instance();
 
     /// Set a new Message of the Day
-    void SetMotd(std::string motd);
+    void SetMotd(std::string motd, LocaleConstant locale);
 
     /// Load Message of the Day
     void LoadMotd();
 
     /// Get the current Message of the Day
-    char const* GetMotd();
+    char const* GetMotd(LocaleConstant locale);
 
-    /// Get the motd packet to send at login
-    WorldPacket const* GetMotdPacket();
+    /// Returns the current motd packet for the given locale
+    WorldPacket const* GetMotdPacket(LocaleConstant locale);
+
+private:
+    // Loads all available localized motd for the realm
+    void LoadMotdLocale();
+
+    // Create a worldpacket for a given motd localization
+    WorldPacket CreateWorldPacket(std::string motd);
 };
 
 #define sMotdMgr MotdMgr::instance()

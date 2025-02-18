@@ -32,6 +32,8 @@ void AddSC_action_ip_logger(); // location: scripts\World\action_ip_logger.cpp
 void AddSC_player_scripts();
 void AddSC_npc_stave_of_ancients();
 void AddSC_server_mail();
+void AddSC_transport_zeppelins();
+void AddSC_suns_reach_reclamation();
 
 // The name of this function should match:
 // void Add${NameOfDirectory}Scripts()
@@ -53,4 +55,6 @@ void AddWorldScripts()
     AddSC_player_scripts();
     AddSC_npc_stave_of_ancients();
     AddSC_server_mail();
+    AddSC_transport_zeppelins();
+    AddSC_suns_reach_reclamation();
 }

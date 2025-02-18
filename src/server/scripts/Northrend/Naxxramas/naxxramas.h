@@ -50,7 +50,6 @@ enum NXData
     DATA_HEIGAN_ERUPTION            = 101,
     DATA_HEIGAN_ENTER_GATE          = 102,
     DATA_LOATHEB_GATE               = 103,
-    DATA_ANUB_GATE                  = 104,
     DATA_FAERLINA_WEB               = 105,
     DATA_MAEXXNA_GATE               = 106,
     DATA_THADDIUS_BOSS              = 107,
@@ -191,14 +190,17 @@ enum NXSays
     SAY_SAPP_DIALOG5                = 4,
     SAY_SAPP_DIALOG6                = 20,
     SAY_CAT_DIED                    = 5,
-    SAY_FIRST_WING_TAUNT            = 16
+    SAY_FIRST_WING_TAUNT            = 16,
+    SAY_HORSEMEN_DIALOG1            = 5,
+    SAY_HORSEMEN_DIALOG2            = 6
 };
 
 enum NXEvents
 {
     EVENT_THADDIUS_SCREAMS          = 0,
     EVENT_KELTHUZAD_WING_TAUNT      = 1,
-    EVENT_FROSTWYRM_WATERFALL_DOOR  = 2
+    EVENT_FROSTWYRM_WATERFALL_DOOR  = 2,
+    EVENT_HORSEMEN_INTRO            = 3
 };
 
 template <class AI, class T>

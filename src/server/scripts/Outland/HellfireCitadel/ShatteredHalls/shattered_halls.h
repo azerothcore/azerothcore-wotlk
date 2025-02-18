@@ -66,6 +66,11 @@ enum CreatureIds
     NPC_KORAG_PROUDMANE             = 17295,
     NPC_CAPTAIN_BONESHATTER         = 17296,
     NPC_SCOUT_ORGARR                = 17297,
+
+    //Drisella
+    NPC_DRISELLA                    = 17294,
+    // Randy Whizzlesprocket
+    NPC_RANDY_WHIZZLESPROCKET       = 17288,
 };
 
 enum GameobjectIds

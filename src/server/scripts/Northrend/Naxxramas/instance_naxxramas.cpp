@@ -25,6 +25,8 @@
 #include "ScriptedCreature.h"
 #include "naxxramas.h"
 
+static constexpr uint8 HorsemanCount = 4;
+
 const float HeiganPos[2] = {2796, -3707};
 const float HeiganEruptionSlope[3] =
 {
@@ -51,6 +53,12 @@ inline uint8 GetEruptionSection(float x, float y)
     }
     return 3;
 }
+
+DoorData const doorData[] =
+{
+    { GO_ANUB_GATE,     BOSS_ANUB,       DOOR_TYPE_ROOM    },
+    { 0,                0,               DOOR_TYPE_ROOM    },
+};
 
 ObjectData const creatureData[] =
 {
@@ -79,6 +87,7 @@ public:
         {
             SetHeaders(DataHeader);
             SetBossNumber(MAX_ENCOUNTERS);
+            LoadDoorData(doorData);
             LoadObjectData(creatureData, gameObjectData);
             for (auto& i : HeiganEruption)
                 i.clear();
@@ -87,13 +96,12 @@ public:
             PatchwerkRoomTrash.clear();
 
             // Controls
-            _horsemanKilled = 0;
             _speakTimer = 0;
             _horsemanTimer = 0;
             _screamTimer = 2 * MINUTE * IN_MILLISECONDS;
             _hadThaddiusGreet = false;
             _currentWingTaunt = SAY_FIRST_WING_TAUNT;
-            _horsemanLoadDoneState = false;
+            _currentHorsemenLine = 0;
 
             // Achievements
             abominationsKilled = 0;
@@ -115,7 +123,6 @@ public:
         ObjectGuid _heiganGateGUID;
         ObjectGuid _heiganGateExitGUID;
         ObjectGuid _loathebGateGUID;
-        ObjectGuid _anubGateGUID;
         ObjectGuid _anubNextGateGUID;
         ObjectGuid _faerlinaWebGUID;
         ObjectGuid _faerlinaGateGUID;
@@ -161,14 +168,14 @@ public:
         ObjectGuid _lichkingGUID;
 
         // Controls
-        uint8 _horsemanKilled;
         uint32 _speakTimer;
         uint32 _horsemanTimer;
         uint32 _screamTimer;
         bool _hadThaddiusGreet;
         EventMap events;
         uint8 _currentWingTaunt;
-        bool _horsemanLoadDoneState;
+        uint8 _currentHorsemenLine;
+        uint8 _horsemanLoaded;
 
         // Achievements
         uint8 abominationsKilled;
@@ -245,15 +252,19 @@ public:
                     return;
                 case NPC_LADY_BLAUMEUX:
                     _blaumeuxGUID = creature->GetGUID();
+                    ++_horsemanLoaded;
                     return;
                 case NPC_SIR_ZELIEK:
                     _zeliekGUID = creature->GetGUID();
+                    ++_horsemanLoaded;
                     return;
                 case NPC_BARON_RIVENDARE:
                     _rivendareGUID = creature->GetGUID();
+                    ++_horsemanLoaded;
                     return;
                 case NPC_THANE_KORTHAZZ:
                     _korthazzGUID = creature->GetGUID();
+                    ++_horsemanLoaded;
                     return;
                 case NPC_SAPPHIRON:
                     _sapphironGUID = creature->GetGUID();
@@ -265,6 +276,9 @@ public:
                     _lichkingGUID = creature->GetGUID();
                     return;
             }
+
+            if (_horsemanLoaded == HorsemanCount)
+                SetBossState(BOSS_HORSEMAN, GetBossState(BOSS_HORSEMAN));
 
             InstanceScript::OnCreatureCreate(creature);
         }
@@ -324,13 +338,6 @@ public:
                 case GO_LOATHEB_GATE:
                     _loathebGateGUID = pGo->GetGUID();
                     if (GetBossState(BOSS_LOATHEB) == DONE)
-                    {
-                        pGo->SetGoState(GO_STATE_ACTIVE);
-                    }
-                    break;
-                case GO_ANUB_GATE:
-                    _anubGateGUID = pGo->GetGUID();
-                    if (GetBossState(BOSS_ANUB) == DONE)
                     {
                         pGo->SetGoState(GO_STATE_ACTIVE);
                     }
@@ -682,13 +689,25 @@ public:
             }
 
             // Horseman handling
-            if (bossId == BOSS_HORSEMAN && !_horsemanLoadDoneState)
+            if (bossId == BOSS_HORSEMAN && _horsemanLoaded == HorsemanCount)
             {
+                uint8 horsemanKilled {};
+                if (Creature* cr = instance->GetCreature(_blaumeuxGUID))
+                    horsemanKilled += !cr->IsAlive();
+
+                if (Creature* cr = instance->GetCreature(_rivendareGUID))
+                    horsemanKilled += !cr->IsAlive();
+
+                if (Creature* cr = instance->GetCreature(_zeliekGUID))
+                    horsemanKilled += !cr->IsAlive();
+
+                if (Creature* cr = instance->GetCreature(_korthazzGUID))
+                    horsemanKilled += !cr->IsAlive();
+
                 if (state == DONE)
                 {
                     _horsemanTimer++;
-                    _horsemanKilled++;
-                    if (_horsemanKilled < 4)
+                    if (horsemanKilled < HorsemanCount)
                     {
                         return false;
                     }
@@ -700,10 +719,9 @@ public:
                 }
 
                 // respawn
-                else if (state == NOT_STARTED && _horsemanKilled > 0)
+                else if (state == NOT_STARTED && horsemanKilled > 0)
                 {
                     Creature* cr;
-                    _horsemanKilled = 0;
                     if ((cr = instance->GetCreature(_blaumeuxGUID)))
                     {
                         if (!cr->IsAlive())
@@ -804,8 +822,6 @@ public:
                     if (state == DONE)
                     {
                         _speakTimer = 1;
-                        // Load KT's grid so he can talk
-                        instance->LoadGrid(3763.43f, -5115.87f);
                     }
                     else if (state == NOT_STARTED)
                     {
@@ -880,10 +896,6 @@ public:
                         events.ScheduleEvent(EVENT_KELTHUZAD_WING_TAUNT, 6s);
                         break;
                     case BOSS_ANUB:
-                        if (GameObject* go = instance->GetGameObject(_anubGateGUID))
-                        {
-                            go->SetGoState(GO_STATE_ACTIVE);
-                        }
                         if (GameObject* go = instance->GetGameObject(_anubNextGateGUID))
                         {
                             go->SetGoState(GO_STATE_ACTIVE);
@@ -932,6 +944,7 @@ public:
                         {
                             go->SetGoState(GO_STATE_ACTIVE);
                         }
+                        events.ScheduleEvent(EVENT_HORSEMEN_INTRO, 10s);
                         break;
                     case BOSS_SAPPHIRON:
                         events.ScheduleEvent(EVENT_FROSTWYRM_WATERFALL_DOOR, 5s);
@@ -1048,8 +1061,6 @@ public:
             switch (events.ExecuteEvent())
             {
                 case EVENT_KELTHUZAD_WING_TAUNT:
-                    // Loads Kel'Thuzad's grid. We need this as he must be active in order for his texts to work.
-                    instance->LoadGrid(3749.67f, -5114.06f);
                     if (Creature* kelthuzad = instance->GetCreature(_kelthuzadGUID))
                     {
                         kelthuzad->AI()->Talk(_currentWingTaunt);
@@ -1061,6 +1072,52 @@ public:
                     {
                         go->SetGoState(GO_STATE_ACTIVE);
                     }
+                    break;
+                case EVENT_HORSEMEN_INTRO:
+                    switch (_currentHorsemenLine)
+                    {
+                        case 0: // To arms, ye roustabouts! We've got company!
+                            if (Creature* korthazz = instance->GetCreature(_korthazzGUID))
+                                korthazz->AI()->Talk(SAY_HORSEMEN_DIALOG1);
+                            events.ScheduleEvent(EVENT_HORSEMEN_INTRO, 4500ms);
+                            break;
+                        case 1: // Invaders, cease this foolish venture at once! Turn away while you still can!
+                            if (Creature* zeliek = instance->GetCreature(_zeliekGUID))
+                                zeliek->AI()->Talk(SAY_HORSEMEN_DIALOG1);
+                            events.ScheduleEvent(EVENT_HORSEMEN_INTRO, 6500ms);
+                            break;
+                        case 2: // Come, Zeliek, do not drive them out. Not before we've had our fun!
+                            if (Creature* blaumeux = instance->GetCreature(_blaumeuxGUID))
+                                blaumeux->AI()->Talk(SAY_HORSEMEN_DIALOG1);
+                            events.ScheduleEvent(EVENT_HORSEMEN_INTRO, 6500ms);
+                            break;
+                        case 3: // Enough prattling. Let them come. We shall grind their bones to dust.
+                            if (Creature* rivendare = instance->GetCreature(_rivendareGUID))
+                                rivendare->AI()->Talk(SAY_HORSEMEN_DIALOG1);
+                            events.ScheduleEvent(EVENT_HORSEMEN_INTRO, 6500ms);
+                            break;
+                        case 4: // I do hope they stay alive long enough for me to... introduce myself.
+                            if (Creature* blaumeux = instance->GetCreature(_blaumeuxGUID))
+                                blaumeux->AI()->Talk(SAY_HORSEMEN_DIALOG2);
+                            events.ScheduleEvent(EVENT_HORSEMEN_INTRO, 6500ms);
+                            break;
+                        case 5: // Perhaps they will come to their senses... and run away as fast as they can.
+                            if (Creature* zeliek = instance->GetCreature(_zeliekGUID))
+                                zeliek->AI()->Talk(SAY_HORSEMEN_DIALOG2);
+                            events.ScheduleEvent(EVENT_HORSEMEN_INTRO, 6500ms);
+                            break;
+                        case 6: // I've heard about enough a' yer snivelin'! Shut yer flytrap before I shut it for ye'!
+                            if (Creature* korthazz = instance->GetCreature(_korthazzGUID))
+                                korthazz->AI()->Talk(SAY_HORSEMEN_DIALOG2);
+                            events.ScheduleEvent(EVENT_HORSEMEN_INTRO, 6500ms);
+                            break;
+                        case 7: // Conserve your anger. Harness your rage. You will all have outlets for your frustrations soon enough.
+                            if (Creature* rivendare = instance->GetCreature(_rivendareGUID))
+                                rivendare->AI()->Talk(SAY_HORSEMEN_DIALOG2);
+                            events.ScheduleEvent(EVENT_HORSEMEN_INTRO, 6500ms);
+                            break;
+                    }
+                    ++_currentHorsemenLine;
                     break;
             }
         }
@@ -1074,8 +1131,6 @@ public:
                     return _heiganGateGUID;
                 case DATA_LOATHEB_GATE:
                     return _loathebGateGUID;
-                case DATA_ANUB_GATE:
-                    return _anubGateGUID;
                 case DATA_FAERLINA_WEB:
                     return _faerlinaWebGUID;
                 case DATA_MAEXXNA_GATE:
