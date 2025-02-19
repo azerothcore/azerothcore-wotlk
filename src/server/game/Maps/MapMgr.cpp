@@ -304,11 +304,7 @@ void MapMgr::DoDelayedMovesAndRemoves()
 bool MapMgr::ExistMapAndVMap(uint32 mapid, float x, float y)
 {
     GridCoord p = Acore::ComputeGridCoord(x, y);
-
-    int gx = 63 - p.x_coord;
-    int gy = 63 - p.y_coord;
-
-    return GridTerrainLoader::ExistMap(mapid, gx, gy) && GridTerrainLoader::ExistVMap(mapid, gx, gy);
+    return GridTerrainLoader::ExistMap(mapid, p.x_coord, p.y_coord) && GridTerrainLoader::ExistVMap(mapid, p.x_coord, p.y_coord);
 }
 
 bool MapMgr::IsValidMAP(uint32 mapid, bool startUp)

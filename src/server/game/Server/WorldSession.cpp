@@ -1147,57 +1147,64 @@ void WorldSession::ReadAddonsInfo(ByteBuffer& data)
 
     if (uncompress(addonInfo.contents(), &uSize, data.contents() + pos, data.size() - pos) == Z_OK)
     {
-        uint32 addonsCount;
-        addonInfo >> addonsCount;                         // addons count
-
-        for (uint32 i = 0; i < addonsCount; ++i)
+        try
         {
-            std::string addonName;
-            uint8 enabled;
-            uint32 crc, unk1;
+            uint32 addonsCount;
+            addonInfo >> addonsCount;                         // addons count
 
-            // check next addon data format correctness
-            if (addonInfo.rpos() + 1 > addonInfo.size())
-                return;
-
-            addonInfo >> addonName;
-
-            addonInfo >> enabled >> crc >> unk1;
-
-            LOG_DEBUG("network", "ADDON: Name: {}, Enabled: 0x{:x}, CRC: 0x{:x}, Unknown2: 0x{:x}", addonName, enabled, crc, unk1);
-
-            AddonInfo addon(addonName, enabled, crc, 2, true);
-
-            SavedAddon const* savedAddon = AddonMgr::GetAddonInfo(addonName);
-            if (savedAddon)
+            for (uint32 i = 0; i < addonsCount; ++i)
             {
-                bool match = true;
+                std::string addonName;
+                uint8 enabled;
+                uint32 crc, unk1;
 
-                if (addon.CRC != savedAddon->CRC)
-                    match = false;
+                // check next addon data format correctness
+                if (addonInfo.rpos() + 1 > addonInfo.size())
+                    return;
 
-                if (!match)
-                    LOG_DEBUG("network", "ADDON: {} was known, but didn't match known CRC (0x{:x})!", addon.Name, savedAddon->CRC);
+                addonInfo >> addonName;
+
+                addonInfo >> enabled >> crc >> unk1;
+
+                LOG_DEBUG("network", "ADDON: Name: {}, Enabled: 0x{:x}, CRC: 0x{:x}, Unknown2: 0x{:x}", addonName, enabled, crc, unk1);
+
+                AddonInfo addon(addonName, enabled, crc, 2, true);
+
+                SavedAddon const* savedAddon = AddonMgr::GetAddonInfo(addonName);
+                if (savedAddon)
+                {
+                    bool match = true;
+
+                    if (addon.CRC != savedAddon->CRC)
+                        match = false;
+
+                    if (!match)
+                        LOG_DEBUG("network", "ADDON: {} was known, but didn't match known CRC (0x{:x})!", addon.Name, savedAddon->CRC);
+                    else
+                        LOG_DEBUG("network", "ADDON: {} was known, CRC is correct (0x{:x})", addon.Name, savedAddon->CRC);
+                }
                 else
-                    LOG_DEBUG("network", "ADDON: {} was known, CRC is correct (0x{:x})", addon.Name, savedAddon->CRC);
-            }
-            else
-            {
-                AddonMgr::SaveAddon(addon);
+                {
+                    AddonMgr::SaveAddon(addon);
 
-                LOG_DEBUG("network", "ADDON: {} (0x{:x}) was not known, saving...", addon.Name, addon.CRC);
+                    LOG_DEBUG("network", "ADDON: {} (0x{:x}) was not known, saving...", addon.Name, addon.CRC);
+                }
+
+                /// @todo: Find out when to not use CRC/pubkey, and other possible states.
+                m_addonsList.push_back(addon);
             }
 
-            /// @todo: Find out when to not use CRC/pubkey, and other possible states.
-            m_addonsList.push_back(addon);
+            uint32 currentTime;
+            addonInfo >> currentTime;
+            LOG_DEBUG("network", "ADDON: CurrentTime: {}", currentTime);
+
+            if (addonInfo.rpos() != addonInfo.size())
+                LOG_DEBUG("network", "packet under-read!");
         }
-
-        uint32 currentTime;
-        addonInfo >> currentTime;
-        LOG_DEBUG("network", "ADDON: CurrentTime: {}", currentTime);
-
-        if (addonInfo.rpos() != addonInfo.size())
-            LOG_DEBUG("network", "packet under-read!");
+        catch (ByteBufferException const& e)
+        {
+            LOG_ERROR("network", "Addon packet read error! {}", e.what());
+        }
     }
     else
         LOG_ERROR("network", "Addon packet uncompress error!");
