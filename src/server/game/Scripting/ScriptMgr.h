@@ -731,7 +731,6 @@ public: /* LootScript */
 
     void OnLootMoney(Player* player, uint32 gold);
 
-#ifdef MOD_PLAYERBOTS
 public: /* PlayerbotScript */
     
     bool OnPlayerbotCheckLFGQueue(lfg::Lfg5Guids const& guidsList);
@@ -743,7 +742,6 @@ public: /* PlayerbotScript */
     void OnPlayerbotUpdateSessions(Player* player);
     void OnPlayerbotLogout(Player* player);
     void OnPlayerbotLogoutBots();
-#endif
 
 public: /* TicketScript */
 
