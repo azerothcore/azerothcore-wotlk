@@ -878,7 +878,6 @@ bool BattlegroundEY::UpdateBotScore(Creature const* bot, uint32 type, uint32 val
 //end npcbot
 
 void BattlegroundEY::FillInitialWorldStates(WorldPackets::WorldState::InitWorldStates& packet)
-
 {
     packet.Worldstates.reserve(22);
     packet.Worldstates.emplace_back(EY_HORDE_BASE, _ownedPointsCount[TEAM_HORDE]);

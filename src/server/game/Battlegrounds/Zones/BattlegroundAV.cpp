@@ -1437,7 +1437,6 @@ void BattlegroundAV::EventBotAssaultsPoint(Creature* bot, uint32 object)
 //End NPCBot
 
 void BattlegroundAV::FillInitialWorldStates(WorldPackets::WorldState::InitWorldStates& packet)
-
 {
     bool stateok;
     packet.Worldstates.reserve(7*2*2 + 8*2*2 + 5);

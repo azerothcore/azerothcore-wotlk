@@ -869,7 +869,6 @@ GraveyardStruct const* BattlegroundWS::GetClosestGraveyardForBot(Creature* bot) 
 //end npcbot
 
 void BattlegroundWS::FillInitialWorldStates(WorldPackets::WorldState::InitWorldStates& packet)
-
 {
     packet.Worldstates.reserve(7);
     packet.Worldstates.emplace_back(BG_WS_FLAG_CAPTURES_ALLIANCE, GetTeamScore(TEAM_ALLIANCE));

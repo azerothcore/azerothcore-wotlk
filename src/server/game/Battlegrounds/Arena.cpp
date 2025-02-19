@@ -177,7 +177,6 @@ void Arena::RemoveBot(ObjectGuid /*guid*/)
 //end npcbot
 
 void Arena::FillInitialWorldStates(WorldPackets::WorldState::InitWorldStates& packet)
-
 {
     packet.Worldstates.reserve(2);
     packet.Worldstates.emplace_back(ARENA_WORLD_STATE_ALIVE_PLAYERS_GREEN, GetAlivePlayersCountByTeam(TEAM_HORDE));
