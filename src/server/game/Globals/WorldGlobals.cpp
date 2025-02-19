@@ -30,7 +30,7 @@ void WorldGlobals::LoadAntiDosOpcodePolicies()
 {
     uint32 oldMSTime = getMSTime();
 
-    _antiDosOpcodePolicies.fill(nullptr);
+    _antiDosOpcodePolicies = {};
 
     QueryResult result = WorldDatabase.Query("SELECT Opcode, Policy, MaxAllowedCount FROM antidos_opcode_policies");
     if (!result)
