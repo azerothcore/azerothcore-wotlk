@@ -1,3 +1,4 @@
+-- DB update 2025_02_19_00 -> 2025_02_19_01
 -- Bjorn Halgurdsson - Set position
 UPDATE `creature` SET `position_x` = 1518.61, `position_y` = -5249.85, `position_z` = 215.38, `orientation` = 5.41052, `VerifiedBuild` = 59069 WHERE `guid` = 112513 AND `id1` = 24238;
 
