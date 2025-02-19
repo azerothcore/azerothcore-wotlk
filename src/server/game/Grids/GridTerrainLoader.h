@@ -15,13 +15,42 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "ScriptMgr.h"
-#include "ScriptMgrMacros.h"
+#ifndef ACORE_GRID_TERRAIN_LOADER_H
+#define ACORE_GRID_TERRAIN_LOADER_H
 
-void ScriptMgr::OnMetricLogging()
+#include "GridDefines.h"
+
+class GridTerrainLoader
 {
-    ExecuteScript<MetricScript>([&](MetricScript* script)
-    {
-        script->OnMetricLogging();
-    });
-}
+public:
+    GridTerrainLoader(MapGridType& grid, Map* map)
+        : _grid(grid), _map(map) { }
+
+    void LoadTerrain();
+
+    static bool ExistMap(uint32 mapid, int gx, int gy);
+    static bool ExistVMap(uint32 mapid, int gx, int gy);
+
+private:
+    void LoadMap();
+    void LoadVMap();
+    void LoadMMap();
+
+    MapGridType& _grid;
+    Map* _map;
+};
+
+class GridTerrainUnloader
+{
+public:
+    GridTerrainUnloader(MapGridType& grid, Map* map)
+        : _grid(grid), _map(map) { }
+
+    void UnloadTerrain();
+
+private:
+    MapGridType& _grid;
+    Map* _map;
+};
+
+#endif

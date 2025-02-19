@@ -615,7 +615,7 @@ void WorldSession::LogoutPlayer(bool save)
     if (_player)
     {
         //! Call script hook before other logout events
-        sScriptMgr->OnBeforePlayerLogout(_player);
+        sScriptMgr->OnPlayerBeforeLogout(_player);
 
         if (ObjectGuid lguid = _player->GetLootGUID())
             DoLootRelease(lguid);
@@ -670,11 +670,11 @@ void WorldSession::LogoutPlayer(bool save)
                         CharacterDatabase.Execute(stmt);
                     }
 
-                    sScriptMgr->OnBattlegroundDesertion(_player, BG_DESERTION_TYPE_INVITE_LOGOUT);
+                    sScriptMgr->OnPlayerBattlegroundDesertion(_player, BG_DESERTION_TYPE_INVITE_LOGOUT);
                 }
 
                 if (bgQueueTypeId >= BATTLEGROUND_QUEUE_2v2 && bgQueueTypeId < MAX_BATTLEGROUND_QUEUE_TYPES && _player->IsInvitedForBattlegroundQueueType(bgQueueTypeId))
-                    sScriptMgr->OnBattlegroundDesertion(_player, ARENA_DESERTION_TYPE_INVITE_LOGOUT);
+                    sScriptMgr->OnPlayerBattlegroundDesertion(_player, ARENA_DESERTION_TYPE_INVITE_LOGOUT);
 
                 _player->RemoveBattlegroundQueueId(bgQueueTypeId);
                 sBattlegroundMgr->GetBattlegroundQueue(bgQueueTypeId).RemovePlayer(_player->GetGUID(), true);
@@ -691,9 +691,10 @@ void WorldSession::LogoutPlayer(bool save)
         // there are some positive auras from boss encounters that can be kept by logging out and logging in after boss is dead, and may be used on next bosses
         _player->RemoveAurasWithInterruptFlags(AURA_INTERRUPT_FLAG_CHANGE_MAP);
 
-        ///- If the player is in a group and LeaveGroupOnLogout is enabled or if the player is invited to a group, remove him. If the group is then only 1 person, disband the group.
-        if (!_player->GetGroup() || sWorld->getBoolConfig(CONFIG_LEAVE_GROUP_ON_LOGOUT))
-            _player->UninviteFromGroup();
+        if (Group *group = _player->GetGroupInvite())
+            sWorld->getBoolConfig(CONFIG_LEAVE_GROUP_ON_LOGOUT)
+                ? _player->UninviteFromGroup()  // Can disband group.
+                : group->RemoveInvite(_player); // Just removes invite.
 
         // remove player from the group if he is:
         // a) in group; b) not in raid group; c) logging out normally (not being kicked or disconnected) d) LeaveGroupOnLogout is enabled
@@ -704,7 +705,7 @@ void WorldSession::LogoutPlayer(bool save)
         if (!_player->IsBeingTeleportedFar() && !_player->m_InstanceValid && !_player->IsGameMaster())
             _player->RepopAtGraveyard();
 
-        // Repop at GraveYard or other player far teleport will prevent saving player because of not present map
+        // Repop at Graveyard or other player far teleport will prevent saving player because of not present map
         // Teleport player immediately for correct player save
         while (_player && _player->IsBeingTeleportedFar())
             HandleMoveWorldportAck();
@@ -1174,57 +1175,64 @@ void WorldSession::ReadAddonsInfo(ByteBuffer& data)
 
     if (uncompress(addonInfo.contents(), &uSize, data.contents() + pos, data.size() - pos) == Z_OK)
     {
-        uint32 addonsCount;
-        addonInfo >> addonsCount;                         // addons count
-
-        for (uint32 i = 0; i < addonsCount; ++i)
+        try
         {
-            std::string addonName;
-            uint8 enabled;
-            uint32 crc, unk1;
+            uint32 addonsCount;
+            addonInfo >> addonsCount;                         // addons count
 
-            // check next addon data format correctness
-            if (addonInfo.rpos() + 1 > addonInfo.size())
-                return;
-
-            addonInfo >> addonName;
-
-            addonInfo >> enabled >> crc >> unk1;
-
-            LOG_DEBUG("network", "ADDON: Name: {}, Enabled: 0x{:x}, CRC: 0x{:x}, Unknown2: 0x{:x}", addonName, enabled, crc, unk1);
-
-            AddonInfo addon(addonName, enabled, crc, 2, true);
-
-            SavedAddon const* savedAddon = AddonMgr::GetAddonInfo(addonName);
-            if (savedAddon)
+            for (uint32 i = 0; i < addonsCount; ++i)
             {
-                bool match = true;
+                std::string addonName;
+                uint8 enabled;
+                uint32 crc, unk1;
 
-                if (addon.CRC != savedAddon->CRC)
-                    match = false;
+                // check next addon data format correctness
+                if (addonInfo.rpos() + 1 > addonInfo.size())
+                    return;
 
-                if (!match)
-                    LOG_DEBUG("network", "ADDON: {} was known, but didn't match known CRC (0x{:x})!", addon.Name, savedAddon->CRC);
+                addonInfo >> addonName;
+
+                addonInfo >> enabled >> crc >> unk1;
+
+                LOG_DEBUG("network", "ADDON: Name: {}, Enabled: 0x{:x}, CRC: 0x{:x}, Unknown2: 0x{:x}", addonName, enabled, crc, unk1);
+
+                AddonInfo addon(addonName, enabled, crc, 2, true);
+
+                SavedAddon const* savedAddon = AddonMgr::GetAddonInfo(addonName);
+                if (savedAddon)
+                {
+                    bool match = true;
+
+                    if (addon.CRC != savedAddon->CRC)
+                        match = false;
+
+                    if (!match)
+                        LOG_DEBUG("network", "ADDON: {} was known, but didn't match known CRC (0x{:x})!", addon.Name, savedAddon->CRC);
+                    else
+                        LOG_DEBUG("network", "ADDON: {} was known, CRC is correct (0x{:x})", addon.Name, savedAddon->CRC);
+                }
                 else
-                    LOG_DEBUG("network", "ADDON: {} was known, CRC is correct (0x{:x})", addon.Name, savedAddon->CRC);
-            }
-            else
-            {
-                AddonMgr::SaveAddon(addon);
+                {
+                    AddonMgr::SaveAddon(addon);
 
-                LOG_DEBUG("network", "ADDON: {} (0x{:x}) was not known, saving...", addon.Name, addon.CRC);
+                    LOG_DEBUG("network", "ADDON: {} (0x{:x}) was not known, saving...", addon.Name, addon.CRC);
+                }
+
+                /// @todo: Find out when to not use CRC/pubkey, and other possible states.
+                m_addonsList.push_back(addon);
             }
 
-            /// @todo: Find out when to not use CRC/pubkey, and other possible states.
-            m_addonsList.push_back(addon);
+            uint32 currentTime;
+            addonInfo >> currentTime;
+            LOG_DEBUG("network", "ADDON: CurrentTime: {}", currentTime);
+
+            if (addonInfo.rpos() != addonInfo.size())
+                LOG_DEBUG("network", "packet under-read!");
         }
-
-        uint32 currentTime;
-        addonInfo >> currentTime;
-        LOG_DEBUG("network", "ADDON: CurrentTime: {}", currentTime);
-
-        if (addonInfo.rpos() != addonInfo.size())
-            LOG_DEBUG("network", "packet under-read!");
+        catch (ByteBufferException const& e)
+        {
+            LOG_ERROR("network", "Addon packet read error! {}", e.what());
+        }
     }
     else
         LOG_ERROR("network", "Addon packet uncompress error!");

@@ -73,10 +73,13 @@ enum Misc
     POINT_AIR_BREATH_END2       = 6,
     POINT_MISC                  = 7,
 
+    POINT_KALECGOS              = 1,
+
     GROUP_START_INTRO           = 0,
     GROUP_BREATH                = 1,
 
-    NPC_FOG_TRIGGER             = 23472
+    NPC_FOG_TRIGGER             = 23472,
+    NPC_KALECGOS_FELMYST        = 24844 // Same as Magister's Terrace
 };
 
 class CorruptTriggers : public BasicEvent
@@ -159,7 +162,8 @@ struct boss_felmyst : public BossAI
         instance->DoRemoveAurasDueToSpellOnPlayers(SPELL_FOG_OF_CORRUPTION_CHARM);
 
         // Summon Kalecgos (human form of kalecgos fight)
-        me->SummonCreature(NPC_KALEC, 1526.28f, 700.10f, 60.0f, 4.33f);
+        if (Creature* kalec = me->SummonCreature(NPC_KALECGOS_FELMYST, 1573.1461f, 755.20245f, 99.524956f, 3.595378f))
+            kalec->GetMotionMaster()->MovePoint(POINT_KALECGOS, 1474.2347f, 624.0703f, 29.32589f, false, true);
     }
 
     void MovementInform(uint32 type, uint32 point) override
@@ -472,14 +476,26 @@ class spell_felmyst_open_brutallus_back_doors : public SpellScript
 {
     PrepareSpellScript(spell_felmyst_open_brutallus_back_doors);
 
+    bool Load() override
+    {
+        return GetCaster()->GetInstanceScript();
+    }
+
     void FilterTargets(std::list<WorldObject*>& unitList)
     {
         unitList.remove_if(DoorsGuidCheck());
     }
 
+    void HandleAfterCast()
+    {
+        GetCaster()->GetInstanceScript()->SetBossState(DATA_FELMYST_DOORS, NOT_STARTED);
+        GetCaster()->GetInstanceScript()->SetBossState(DATA_FELMYST_DOORS, DONE);
+    }
+
     void Register() override
     {
         OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_felmyst_open_brutallus_back_doors::FilterTargets, EFFECT_0, TARGET_UNIT_SRC_AREA_ENTRY);
+        AfterCast += SpellCastFn(spell_felmyst_open_brutallus_back_doors::HandleAfterCast);
     }
 };
 

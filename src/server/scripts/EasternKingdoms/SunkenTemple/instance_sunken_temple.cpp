@@ -116,7 +116,6 @@ public:
                     ++_defendersKilled;
                     if (_defendersKilled == DEFENDERS_COUNT)
                     {
-                        instance->LoadGrid(-425.89f, -86.07f);
                         if (Creature* jammal = instance->GetCreature(_jammalanGUID))
                             jammal->AI()->Talk(0);
                         if (GameObject* forcefield = instance->GetGameObject(_forcefieldGUID))

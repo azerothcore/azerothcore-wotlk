@@ -1940,7 +1940,7 @@ private:
     void ChangeMineOwner(uint8 mine, TeamId teamId, bool initial = false);
 
     /*worldstates*/
-    void FillInitialWorldStates(WorldPacket& data) override;
+    void FillInitialWorldStates(WorldPackets::WorldState::InitWorldStates& packet) override;
     uint8 GetWorldStateType(uint8 state, TeamId teamId);
     void SendMineWorldStates(uint32 mine);
     void UpdateNodeWorldState(BG_AV_Nodes node);

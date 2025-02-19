@@ -24,6 +24,7 @@
 #include "GameObject.h"
 #include "SharedDefines.h"
 #include "World.h"
+#include "WorldStatePackets.h"
 
 class Creature;
 class GameObject;
@@ -458,7 +459,7 @@ public:
 
     // Packet Transfer
     // method that should fill worldpacket with actual world states (not yet implemented for all battlegrounds!)
-    virtual void FillInitialWorldStates(WorldPacket& /*data*/) { }
+    virtual void FillInitialWorldStates(WorldPackets::WorldState::InitWorldStates& /*packet*/) { }
     void SendPacketToTeam(TeamId teamId, WorldPacket const* packet, Player* sender = nullptr, bool self = true);
     void SendPacketToAll(WorldPacket const* packet);
     void YellToAll(Creature* creature, const char* text, uint32 language);

@@ -305,11 +305,11 @@ struct BattlegroundEYLosingPointStruct
 
 struct BattlegroundEYCapturingPointStruct
 {
-    BattlegroundEYCapturingPointStruct(uint32 _DespawnNeutralObjectType, uint32 _SpawnObjectTypeAlliance, uint32 _MessageIdAlliance, uint32 _SpawnObjectTypeHorde, uint32 _MessageIdHorde, uint32 _GraveYardId)
+    BattlegroundEYCapturingPointStruct(uint32 _DespawnNeutralObjectType, uint32 _SpawnObjectTypeAlliance, uint32 _MessageIdAlliance, uint32 _SpawnObjectTypeHorde, uint32 _MessageIdHorde, uint32 _GraveyardId)
         : DespawnNeutralObjectType(_DespawnNeutralObjectType),
           SpawnObjectTypeAlliance(_SpawnObjectTypeAlliance), MessageIdAlliance(_MessageIdAlliance),
           SpawnObjectTypeHorde(_SpawnObjectTypeHorde), MessageIdHorde(_MessageIdHorde),
-          GraveYardId(_GraveYardId)
+          GraveyardId(_GraveyardId)
     {}
 
     uint32 DespawnNeutralObjectType;
@@ -317,7 +317,7 @@ struct BattlegroundEYCapturingPointStruct
     uint32 MessageIdAlliance;
     uint32 SpawnObjectTypeHorde;
     uint32 MessageIdHorde;
-    uint32 GraveYardId;
+    uint32 GraveyardId;
 };
 
 const uint32 BG_EY_TickPoints[EY_POINTS_MAX] = {1, 2, 5, 10};
@@ -421,7 +421,7 @@ public:
     void Init() override;
     void EndBattleground(TeamId winnerTeamId) override;
     bool UpdatePlayerScore(Player* player, uint32 type, uint32 value, bool doAddHonor = true) override;
-    void FillInitialWorldStates(WorldPacket& data) override;
+    void FillInitialWorldStates(WorldPackets::WorldState::InitWorldStates& packet) override;
     void SetDroppedFlagGUID(ObjectGuid guid, TeamId /*teamId*/ = TEAM_NEUTRAL) override  { _droppedFlagGUID = guid; }
     ObjectGuid GetDroppedFlagGUID() const { return _droppedFlagGUID; }
 

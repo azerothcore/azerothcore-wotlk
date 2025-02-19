@@ -21,7 +21,6 @@
 #include "SpellInfo.h"
 #include "naxxramas.h"
 
-
 using namespace Faerlina;
 
 void AddSC_boss_faerlina()
