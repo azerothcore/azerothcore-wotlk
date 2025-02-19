@@ -546,17 +546,18 @@ GraveyardStruct const* BattlegroundWS::GetClosestGraveyard(Player* player)
         return sGraveyard->GetGraveyard(player->GetTeamId() == TEAM_ALLIANCE ? WS_GRAVEYARD_FLAGROOM_ALLIANCE : WS_GRAVEYARD_FLAGROOM_HORDE);
 }
 
-void BattlegroundWS::FillInitialWorldStates(WorldPacket& data)
+void BattlegroundWS::FillInitialWorldStates(WorldPackets::WorldState::InitWorldStates& packet)
 {
-    data << uint32(BG_WS_FLAG_CAPTURES_ALLIANCE) << uint32(GetTeamScore(TEAM_ALLIANCE));
-    data << uint32(BG_WS_FLAG_CAPTURES_HORDE) << uint32(GetTeamScore(TEAM_HORDE));
-    data << uint32(BG_WS_FLAG_CAPTURES_MAX) << uint32(BG_WS_MAX_TEAM_SCORE);
+    packet.Worldstates.reserve(7);
+    packet.Worldstates.emplace_back(BG_WS_FLAG_CAPTURES_ALLIANCE, GetTeamScore(TEAM_ALLIANCE));
+    packet.Worldstates.emplace_back(BG_WS_FLAG_CAPTURES_HORDE, GetTeamScore(TEAM_HORDE));
+    packet.Worldstates.emplace_back(BG_WS_FLAG_CAPTURES_MAX, BG_WS_MAX_TEAM_SCORE);
 
-    data << uint32(BG_WS_STATE_TIMER_ACTIVE) << uint32(GetStatus() == STATUS_IN_PROGRESS);
-    data << uint32(BG_WS_STATE_TIMER) << uint32(GetMatchTime());
+    packet.Worldstates.emplace_back(BG_WS_STATE_TIMER_ACTIVE, GetStatus() == STATUS_IN_PROGRESS ? 1 : 0);
+    packet.Worldstates.emplace_back(BG_WS_STATE_TIMER, GetMatchTime());
 
-    data << uint32(BG_WS_FLAG_STATE_HORDE) << uint32(GetFlagState(TEAM_HORDE));
-    data << uint32(BG_WS_FLAG_STATE_ALLIANCE) << uint32(GetFlagState(TEAM_ALLIANCE));
+    packet.Worldstates.emplace_back(BG_WS_FLAG_STATE_HORDE, GetFlagState(TEAM_HORDE));
+    packet.Worldstates.emplace_back(BG_WS_FLAG_STATE_ALLIANCE, GetFlagState(TEAM_ALLIANCE));
 }
 
 TeamId BattlegroundWS::GetPrematureWinner()
