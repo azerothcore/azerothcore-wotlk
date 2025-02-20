@@ -377,6 +377,33 @@ class spell_eredar_twins_blaze : public SpellScript
     }
 };
 
+class spell_eredar_twins_handle_touch_periodic : public AuraScript
+{
+    PrepareAuraScript(spell_eredar_twins_handle_touch_periodic);
+
+public:
+    spell_eredar_twins_handle_touch_periodic(uint32 touchSpell, uint8 effIndex) : AuraScript(), _touchSpell(touchSpell), _effectIndex(effIndex) {}
+
+    bool Validate(SpellInfo const* /*spellInfo*/) override
+    {
+        return ValidateSpellInfo({ _touchSpell });
+    }
+
+    void OnPeriodic(AuraEffect const* /*aurEff*/)
+    {
+        GetTarget()->CastSpell(GetTarget(), _touchSpell, true);
+    }
+
+    void Register() override
+    {
+        OnEffectPeriodic += AuraEffectPeriodicFn(spell_eredar_twins_handle_touch_periodic::OnPeriodic, _effectIndex, SPELL_AURA_PERIODIC_DUMMY);
+    }
+
+private:
+    uint32 _touchSpell;
+    uint32 _effectIndex;
+};
+
 class at_sunwell_eredar_twins : public OnlyOnceAreaTriggerScript
 {
 public:
@@ -404,5 +431,8 @@ void AddSC_boss_eredar_twins()
     RegisterSpellScriptWithArgs(spell_eredar_twins_apply_touch, "spell_eredar_twins_apply_flame_touched", SPELL_FLAME_TOUCHED);
     RegisterSpellScript(spell_eredar_twins_handle_touch);
     RegisterSpellScript(spell_eredar_twins_blaze);
+    RegisterSpellScriptWithArgs(spell_eredar_twins_handle_touch_periodic, "spell_eredar_twins_handle_dark_touched_periodic", SPELL_DARK_TOUCHED, EFFECT_0);
+    RegisterSpellScriptWithArgs(spell_eredar_twins_handle_touch_periodic, "spell_eredar_twins_handle_flame_touched_periodic", SPELL_FLAME_TOUCHED, EFFECT_2);
+    RegisterSpellScriptWithArgs(spell_eredar_twins_handle_touch_periodic, "spell_eredar_twins_handle_flame_touched_flame_sear", SPELL_FLAME_TOUCHED, EFFECT_0);
     new at_sunwell_eredar_twins();
 }
