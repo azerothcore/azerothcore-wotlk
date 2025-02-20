@@ -396,7 +396,7 @@ public:
 
     void Register() override
     {
-        OnEffectPeriodic += AuraEffectPeriodicFn(spell_eredar_twins_handle_touch_periodic::OnPeriodic, _effectIndex, SPELL_AURA_PERIODIC_DAMAGE);
+        OnEffectPeriodic += AuraEffectPeriodicFn(spell_eredar_twins_handle_touch_periodic::OnPeriodic, _effectIndex, SPELL_AURA_PERIODIC_TRIGGER_SPELL);
     }
 
 private:
