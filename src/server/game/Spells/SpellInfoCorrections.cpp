@@ -4884,6 +4884,12 @@ void SpellMgr::LoadSpellInfoCorrections()
         spellInfo->Effects[EFFECT_1].RealPointsPerLevel = 0.25;
     });
 
+    // Swoop (Moth hunter pet) root effect fix
+    ApplySpellFix({ 52825 }, [](SpellInfo* spellInfo)
+    {
+        spellInfo->Effects[EFFECT_2].TargetA = 6;
+    });
+
     for (uint32 i = 0; i < GetSpellInfoStoreSize(); ++i)
     {
         SpellInfo* spellInfo = mSpellInfoMap[i];
