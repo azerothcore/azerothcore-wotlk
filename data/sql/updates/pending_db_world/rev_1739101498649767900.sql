@@ -22,7 +22,7 @@ INSERT INTO `conditions` (`SourceTypeOrReferenceId`, `SourceGroup`, `SourceEntry
 (22, 3, @ENTRY, 0, 0, 36, 1, 0, 0, 0, 1, 'Creatures are reborn when they die');
 
 -- 134217728 - CREATURE_FLAG_EXTRA_DONT_OVERRIDE_SAI_ENTRY
-UPDATE `creature_template` SET 'flags_extra'='flags_extra'|134217728 WHERE (`entry` = 26280);
+UPDATE `creature_template` SET `flags_extra`=`flags_extra`|134217728 WHERE (`entry` = 26280);
 
 -- Wind Trader Mu'fah smart ai
 SET @ENTRY := 26496;
