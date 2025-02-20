@@ -28,8 +28,6 @@ inline Cell::Cell(CellCoord const& p)
     data.Part.grid_y = p.y_coord / MAX_NUMBER_OF_CELLS;
     data.Part.cell_x = p.x_coord % MAX_NUMBER_OF_CELLS;
     data.Part.cell_y = p.y_coord % MAX_NUMBER_OF_CELLS;
-    data.Part.nocreate = 0;
-    data.Part.reserved = 0;
 }
 
 inline Cell::Cell(float x, float y)
@@ -39,8 +37,6 @@ inline Cell::Cell(float x, float y)
     data.Part.grid_y = p.y_coord / MAX_NUMBER_OF_CELLS;
     data.Part.cell_x = p.x_coord % MAX_NUMBER_OF_CELLS;
     data.Part.cell_y = p.y_coord % MAX_NUMBER_OF_CELLS;
-    data.Part.nocreate = 0;
-    data.Part.reserved = 0;
 }
 
 inline CellArea Cell::CalculateCellArea(float x, float y, float radius)
@@ -51,8 +47,8 @@ inline CellArea Cell::CalculateCellArea(float x, float y, float radius)
         return CellArea(center, center);
     }
 
-    CellCoord centerX = Acore::ComputeCellCoord(x - radius, y - radius).normalize();
-    CellCoord centerY = Acore::ComputeCellCoord(x + radius, y + radius).normalize();
+    CellCoord centerX = Acore::ComputeCellCoord(x + radius, y + radius).normalize();
+    CellCoord centerY = Acore::ComputeCellCoord(x - radius, y - radius).normalize();
 
     return CellArea(centerX, centerY);
 }
@@ -66,7 +62,8 @@ inline void Cell::Visit(CellCoord const& standing_cell, TypeContainerVisitor<T, 
 }
 
 template<class T, class CONTAINER>
-inline void Cell::Visit(CellCoord const& standing_cell, TypeContainerVisitor<T, CONTAINER>& visitor, Map& map, float x_off, float y_off, float radius) const{
+inline void Cell::Visit(CellCoord const& standing_cell, TypeContainerVisitor<T, CONTAINER>& visitor, Map& map, float x_off, float y_off, float radius) const
+{
     if (!standing_cell.IsCoordValid())
         return;
 
@@ -101,23 +98,16 @@ inline void Cell::Visit(CellCoord const& standing_cell, TypeContainerVisitor<T, 
         return;
     }
 
-    //ALWAYS visit standing cell first!!! Since we deal with small radiuses
-    //it is very essential to call visitor for standing cell firstly...
-    map.Visit(*this, visitor);
-
     // loop the cell range
+    ASSERT(area.high_bound.x_coord >= area.low_bound.x_coord);
+    ASSERT(area.high_bound.y_coord >= area.low_bound.y_coord);
     for (uint32 x = area.low_bound.x_coord; x <= area.high_bound.x_coord; ++x)
     {
         for (uint32 y = area.low_bound.y_coord; y <= area.high_bound.y_coord; ++y)
         {
             CellCoord cellCoord(x, y);
-            //lets skip standing cell since we already visited it
-            if (cellCoord != standing_cell)
-            {
-                Cell r_zone(cellCoord);
-                r_zone.data.Part.nocreate = this->data.Part.nocreate;
-                map.Visit(r_zone, visitor);
-            }
+            Cell r_zone(cellCoord);
+            map.Visit(r_zone, visitor);
         }
     }
 }
@@ -138,7 +128,6 @@ inline void Cell::VisitCircle(TypeContainerVisitor<T, CONTAINER>& visitor, Map& 
         {
             CellCoord cellCoord(x, y);
             Cell r_zone(cellCoord);
-            r_zone.data.Part.nocreate = this->data.Part.nocreate;
             map.Visit(r_zone, visitor);
         }
     }
@@ -162,55 +151,41 @@ inline void Cell::VisitCircle(TypeContainerVisitor<T, CONTAINER>& visitor, Map& 
             //e.g. filling 2 trapezoids after filling central cell strip...
             CellCoord cellCoord_left(x_start - step, y);
             Cell r_zone_left(cellCoord_left);
-            r_zone_left.data.Part.nocreate = this->data.Part.nocreate;
             map.Visit(r_zone_left, visitor);
 
             //right trapezoid cell visit
             CellCoord cellCoord_right(x_end + step, y);
             Cell r_zone_right(cellCoord_right);
-            r_zone_right.data.Part.nocreate = this->data.Part.nocreate;
             map.Visit(r_zone_right, visitor);
         }
     }
 }
 
 template<class T>
-inline void Cell::VisitGridObjects(WorldObject const* center_obj, T& visitor, float radius, bool dont_load /*= true*/)
+inline void Cell::VisitGridObjects(WorldObject const* center_obj, T& visitor, float radius)
 {
     CellCoord p(Acore::ComputeCellCoord(center_obj->GetPositionX(), center_obj->GetPositionY()));
     Cell cell(p);
-    if (dont_load)
-    {
-        cell.SetNoCreate();
-    }
 
     TypeContainerVisitor<T, GridTypeMapContainer> gnotifier(visitor);
     cell.Visit(p, gnotifier, *center_obj->GetMap(), *center_obj, radius);
 }
 
 template<class T>
-inline void Cell::VisitWorldObjects(WorldObject const* center_obj, T& visitor, float radius, bool dont_load /*= true*/)
+inline void Cell::VisitWorldObjects(WorldObject const* center_obj, T& visitor, float radius)
 {
     CellCoord p(Acore::ComputeCellCoord(center_obj->GetPositionX(), center_obj->GetPositionY()));
     Cell cell(p);
-    if (dont_load)
-    {
-        cell.SetNoCreate();
-    }
 
     TypeContainerVisitor<T, WorldTypeMapContainer> wnotifier(visitor);
     cell.Visit(p, wnotifier, *center_obj->GetMap(), *center_obj, radius);
 }
 
 template<class T>
-inline void Cell::VisitAllObjects(WorldObject const* center_obj, T& visitor, float radius, bool dont_load /*= true*/)
+inline void Cell::VisitAllObjects(WorldObject const* center_obj, T& visitor, float radius)
 {
     CellCoord p(Acore::ComputeCellCoord(center_obj->GetPositionX(), center_obj->GetPositionY()));
     Cell cell(p);
-    if (dont_load)
-    {
-        cell.SetNoCreate();
-    }
 
     TypeContainerVisitor<T, WorldTypeMapContainer> wnotifier(visitor);
     cell.Visit(p, wnotifier, *center_obj->GetMap(), *center_obj, radius);
@@ -219,42 +194,30 @@ inline void Cell::VisitAllObjects(WorldObject const* center_obj, T& visitor, flo
 }
 
 template<class T>
-inline void Cell::VisitGridObjects(float x, float y, Map* map, T& visitor, float radius, bool dont_load /*= true*/)
+inline void Cell::VisitGridObjects(float x, float y, Map* map, T& visitor, float radius)
 {
     CellCoord p(Acore::ComputeCellCoord(x, y));
     Cell cell(p);
-    if (dont_load)
-    {
-        cell.SetNoCreate();
-    }
 
     TypeContainerVisitor<T, GridTypeMapContainer> gnotifier(visitor);
     cell.Visit(p, gnotifier, *map, x, y, radius);
 }
 
 template<class T>
-inline void Cell::VisitWorldObjects(float x, float y, Map* map, T& visitor, float radius, bool dont_load /*= true*/)
+inline void Cell::VisitWorldObjects(float x, float y, Map* map, T& visitor, float radius)
 {
     CellCoord p(Acore::ComputeCellCoord(x, y));
     Cell cell(p);
-    if (dont_load)
-    {
-        cell.SetNoCreate();
-    }
 
     TypeContainerVisitor<T, WorldTypeMapContainer> wnotifier(visitor);
     cell.Visit(p, wnotifier, *map, x, y, radius);
 }
 
 template<class T>
-inline void Cell::VisitAllObjects(float x, float y, Map* map, T& visitor, float radius, bool dont_load /*= true*/)
+inline void Cell::VisitAllObjects(float x, float y, Map* map, T& visitor, float radius)
 {
     CellCoord p(Acore::ComputeCellCoord(x, y));
     Cell cell(p);
-    if (dont_load)
-    {
-        cell.SetNoCreate();
-    }
 
     TypeContainerVisitor<T, WorldTypeMapContainer> wnotifier(visitor);
     cell.Visit(p, wnotifier, *map, x, y, radius);

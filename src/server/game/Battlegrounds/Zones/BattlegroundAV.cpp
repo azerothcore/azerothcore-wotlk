@@ -25,6 +25,7 @@
 #include "Player.h"
 #include "SpellAuras.h"
 #include "WorldPacket.h"
+#include "WorldStatePackets.h"
 
 void BattlegroundAVScore::BuildObjectivesBlock(WorldPacket& data)
 {
@@ -1084,9 +1085,10 @@ void BattlegroundAV::EventPlayerAssaultsPoint(Player* player, uint32 object)
     player->KilledMonsterCredit((IsTower(node)) ? BG_AV_QUEST_CREDIT_TOWER : BG_AV_QUEST_CREDIT_GRAVEYARD);
 }
 
-void BattlegroundAV::FillInitialWorldStates(WorldPacket& data)
+void BattlegroundAV::FillInitialWorldStates(WorldPackets::WorldState::InitWorldStates& packet)
 {
     bool stateok;
+    packet.Worldstates.reserve(7*2*2 + 8*2*2 + 5);
     //graveyards
     for (uint8 i = BG_AV_NODES_FIRSTAID_STATION; i <= BG_AV_NODES_FROSTWOLF_HUT; i++)
     {
@@ -1094,8 +1096,8 @@ void BattlegroundAV::FillInitialWorldStates(WorldPacket& data)
         {
             //j=1=assaulted j=3=controled
             stateok = (m_Nodes[i].State == j);
-            data << uint32(BG_AV_NodeWorldStates[i][GetWorldStateType(j, TEAM_ALLIANCE)]) << uint32((m_Nodes[i].OwnerId == TEAM_ALLIANCE && stateok) ? 1 : 0);
-            data << uint32(BG_AV_NodeWorldStates[i][GetWorldStateType(j, TEAM_HORDE)]) << uint32((m_Nodes[i].OwnerId == TEAM_HORDE && stateok) ? 1 : 0);
+            packet.Worldstates.emplace_back(BG_AV_NodeWorldStates[i][GetWorldStateType(j, TEAM_ALLIANCE)], (m_Nodes[i].OwnerId == TEAM_ALLIANCE && stateok) ? 1 : 0);
+            packet.Worldstates.emplace_back(BG_AV_NodeWorldStates[i][GetWorldStateType(j, TEAM_HORDE)], (m_Nodes[i].OwnerId == TEAM_HORDE && stateok) ? 1 : 0);
         }
     }
 
@@ -1105,23 +1107,19 @@ void BattlegroundAV::FillInitialWorldStates(WorldPacket& data)
         {
             //j=1=assaulted j=3=controled //i dont have j=2=destroyed cause destroyed is the same like enemy-team controll
             stateok = (m_Nodes[i].State == j || (m_Nodes[i].State == POINT_DESTROYED && j == 3));
-            data << uint32(BG_AV_NodeWorldStates[i][GetWorldStateType(j, TEAM_ALLIANCE)]) << uint32((m_Nodes[i].OwnerId == TEAM_ALLIANCE && stateok) ? 1 : 0);
-            data << uint32(BG_AV_NodeWorldStates[i][GetWorldStateType(j, TEAM_HORDE)]) << uint32((m_Nodes[i].OwnerId == TEAM_HORDE && stateok) ? 1 : 0);
+            packet.Worldstates.emplace_back(BG_AV_NodeWorldStates[i][GetWorldStateType(j, TEAM_ALLIANCE)], (m_Nodes[i].OwnerId == TEAM_ALLIANCE && stateok) ? 1 : 0);
+            packet.Worldstates.emplace_back(BG_AV_NodeWorldStates[i][GetWorldStateType(j, TEAM_HORDE)], (m_Nodes[i].OwnerId == TEAM_HORDE && stateok) ? 1 : 0);
         }
     if (m_Nodes[BG_AV_NODES_SNOWFALL_GRAVE].OwnerId == TEAM_NEUTRAL) //cause neutral teams aren't handled generic
-        data << uint32(AV_SNOWFALL_N) << uint32(1);
-    data << uint32(AV_Alliance_Score)  << uint32(m_Team_Scores[0]);
-    data << uint32(AV_Horde_Score) << uint32(m_Team_Scores[1]);
-    if (GetStatus() == STATUS_IN_PROGRESS)  //only if game started the teamscores are displayed
     {
-        data << uint32(AV_SHOW_A_SCORE) << uint32(1);
-        data << uint32(AV_SHOW_H_SCORE) << uint32(1);
+        packet.Worldstates.emplace_back(AV_SNOWFALL_N, 1);
     }
-    else
-    {
-        data << uint32(AV_SHOW_A_SCORE) << uint32(0);
-        data << uint32(AV_SHOW_H_SCORE) << uint32(0);
-    }
+    packet.Worldstates.emplace_back(AV_Alliance_Score, m_Team_Scores[0]);
+    packet.Worldstates.emplace_back(AV_Horde_Score, m_Team_Scores[1]);
+
+    packet.Worldstates.emplace_back(AV_SHOW_A_SCORE, GetStatus() == STATUS_IN_PROGRESS ? 1 : 0);
+    packet.Worldstates.emplace_back(AV_SHOW_H_SCORE, GetStatus() == STATUS_IN_PROGRESS ? 1 : 0);
+
     SendMineWorldStates(AV_NORTH_MINE);
     SendMineWorldStates(AV_SOUTH_MINE);
 }

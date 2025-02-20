@@ -103,8 +103,6 @@ public:
 
         void OnPlayerEnter(Player* player) override
         {
-            instance->LoadGrid(1477.94f, 643.22f);
-            instance->LoadGrid(1641.45f, 988.08f);
             if (GameObject* gobj = GetGameObject(DATA_ICEBARRIER))
                 gobj->SendUpdateToPlayer(player);
         }

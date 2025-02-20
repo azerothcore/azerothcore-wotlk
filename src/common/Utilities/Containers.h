@@ -138,18 +138,28 @@ namespace Acore::Containers
     }
 
     /*
-     * Select a random element from a container.
+     * @brief Selects a random element from a container that matches the given predicate
+     *
+     * @param container Source container to select from
+     * @param predicate Unary predicate to filter elements
+     * @return Iterator to the randomly selected element, or end iterator if no elements match the predicate
      *
      * Note: container cannot be empty
      */
     template<class C, class Predicate>
-    inline auto SelectRandomContainerElementIf(C const& container, Predicate&& predicate) -> typename std::add_const<decltype(*std::begin(container))>::type&
+    inline auto SelectRandomContainerElementIf(C const& container, Predicate&& predicate) -> decltype(std::begin(container))
     {
-        C containerCopy;
-        std::copy_if(std::begin(container), std::end(container), std::inserter(containerCopy, std::end(containerCopy)), predicate);
-        auto it = std::begin(containerCopy);
-        std::advance(it, urand(0, uint32(std::size(containerCopy)) - 1));
-        return *it;
+        std::vector<decltype(std::begin(container))> matchingElements;
+
+        for (auto it = std::begin(container); it != std::end(container); ++it)
+            if (predicate(*it))
+                matchingElements.push_back(it);
+
+        if (matchingElements.empty())
+            return std::end(container);
+
+        auto randomIt = matchingElements[urand(0, matchingElements.size() - 1)];
+        return randomIt;
     }
 
     /*

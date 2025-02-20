@@ -25,6 +25,7 @@
 #include "Log.h"
 #include "Opcodes.h"
 #include "Player.h"
+#include "ScriptMgr.h"
 #include "World.h"
 #include "WorldPacket.h"
 #include "WorldSession.h"
@@ -364,6 +365,8 @@ void TicketMgr::AddTicket(GmTicket* ticket)
         ++_openTicketCount;
     CharacterDatabaseTransaction trans = CharacterDatabaseTransaction(nullptr);
     ticket->SaveToDB(trans);
+
+    sScriptMgr->OnTicketCreate(ticket);
 }
 
 void TicketMgr::CloseTicket(uint32 ticketId, ObjectGuid source)
@@ -375,6 +378,8 @@ void TicketMgr::CloseTicket(uint32 ticketId, ObjectGuid source)
         if (source)
             --_openTicketCount;
         ticket->SaveToDB(trans);
+
+        sScriptMgr->OnTicketClose(ticket);
     }
 }
 
@@ -398,6 +403,8 @@ void TicketMgr::ResolveAndCloseTicket(uint32 ticketId, ObjectGuid source)
         if (source)
             --_openTicketCount;
         ticket->SaveToDB(trans);
+
+        sScriptMgr->OnTicketResolve(ticket);
     }
 }
 
@@ -438,7 +445,9 @@ void TicketMgr::SendTicket(WorldSession* session, GmTicket* ticket) const
     session->SendPacket(&data);
 }
 
-void TicketMgr::UpdateLastChange()
+void TicketMgr::UpdateLastChange(GmTicket* ticket)
 {
     _lastChange = GameTime::GetGameTime().count();
+
+    sScriptMgr->OnTicketUpdateLastChange(ticket);
 }
