@@ -36,9 +36,6 @@ private:
     void LoadVMap();
     void LoadMMap();
 
-    uint16 GetX() { return (MAX_NUMBER_OF_GRIDS - 1) - _grid.GetX(); }
-    uint16 GetY() { return (MAX_NUMBER_OF_GRIDS - 1) - _grid.GetY(); }
-
     MapGridType& _grid;
     Map* _map;
 };

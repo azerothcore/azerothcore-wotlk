@@ -567,7 +567,8 @@ public:
             return false;
         }
 
-        Cell cell(Acore::ComputeCellCoord(object->GetPositionX(), object->GetPositionY()));
+        CellCoord const cellCoord = Acore::ComputeCellCoord(object->GetPositionX(), object->GetPositionY());
+        Cell cell(cellCoord);
 
         uint32 zoneId, areaId;
         object->GetZoneAndAreaId(zoneId, areaId);
@@ -584,14 +585,8 @@ public:
         float groundZ = object->GetMapHeight(object->GetPositionX(), object->GetPositionY(), MAX_HEIGHT);
         float floorZ = object->GetMapHeight(object->GetPositionX(), object->GetPositionY(), object->GetPositionZ());
 
-        GridCoord gridCoord = Acore::ComputeGridCoord(object->GetPositionX(), object->GetPositionY());
-
-        // 63? WHY?
-        int gridX = 63 - gridCoord.x_coord;
-        int gridY = 63 - gridCoord.y_coord;
-
-        uint32 haveMap = GridTerrainLoader::ExistMap(object->GetMapId(), gridX, gridY) ? 1 : 0;
-        uint32 haveVMap = GridTerrainLoader::ExistVMap(object->GetMapId(), gridX, gridY) ? 1 : 0;
+        uint32 haveMap = GridTerrainLoader::ExistMap(object->GetMapId(), cell.GridX(), cell.GridY()) ? 1 : 0;
+        uint32 haveVMap = GridTerrainLoader::ExistVMap(object->GetMapId(), cell.GridX(), cell.GridY()) ? 1 : 0;
         uint32 haveMMAP = MMAP::MMapFactory::createOrGetMMapMgr()->GetNavMesh(handler->GetSession()->GetPlayer()->GetMapId()) ? 1 : 0;
 
         if (haveVMap)
