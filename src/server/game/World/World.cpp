@@ -90,6 +90,7 @@
 #include "WaypointMovementGenerator.h"
 #include "WeatherMgr.h"
 #include "WhoListCacheMgr.h"
+#include "WorldGlobals.h"
 #include "WorldPacket.h"
 #include "WorldSession.h"
 #include "WorldSessionMgr.h"
@@ -1196,7 +1197,6 @@ void World::LoadConfigSettings(bool reload)
     _bool_configs[CONFIG_SET_ALL_CREATURES_WITH_WAYPOINT_MOVEMENT_ACTIVE] = sConfigMgr->GetOption<bool>("SetAllCreaturesWithWaypointMovementActive", false);
 
     // packet spoof punishment
-    _int_configs[CONFIG_PACKET_SPOOF_POLICY] = sConfigMgr->GetOption<int32>("PacketSpoof.Policy", (uint32)WorldSession::DosProtection::POLICY_KICK);
     _int_configs[CONFIG_PACKET_SPOOF_BANMODE] = sConfigMgr->GetOption<int32>("PacketSpoof.BanMode", (uint32)0);
     if (_int_configs[CONFIG_PACKET_SPOOF_BANMODE] > 1)
         _int_configs[CONFIG_PACKET_SPOOF_BANMODE] = (uint32)0;
@@ -1951,6 +1951,9 @@ void World::SetInitialWorldSettings()
 
     LOG_INFO("server.loading", "Load Channels...");
     ChannelMgr::LoadChannels();
+
+    LOG_INFO("server.loading", "Loading AntiDos opcode policies");
+    sWorldGlobals->LoadAntiDosOpcodePolicies();
 
     sScriptMgr->OnBeforeWorldInitialized();
 
