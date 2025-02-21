@@ -1,3 +1,4 @@
+-- DB update 2025_02_19_01 -> 2025_02_21_00
 DROP TABLE IF EXISTS `antidos_opcode_policies`;
 CREATE TABLE `antidos_opcode_policies` (
   `Opcode` smallint unsigned NOT NULL,
