@@ -71,6 +71,8 @@ class AuctionHouseBot;
 #define AHB_ORANGE_I         12
 #define AHB_YELLOW_I         13
 
+#define AHB_ITEM_TYPE_OFFSET 7
+
 //
 // Chat GM commands
 //

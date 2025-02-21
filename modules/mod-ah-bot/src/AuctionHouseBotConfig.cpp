@@ -201,8 +201,8 @@ AHBConfig::AHBConfig(uint32 ahid, AHBConfig* conf)
     TraceBuyer                     = conf->TraceBuyer;
     AHBSeller                      = conf->AHBSeller;
     AHBBuyer                       = conf->AHBBuyer;
-    BuyMethod                      = conf->BuyMethod;
-    SellMethod                     = conf->SellMethod;
+    UseBuyPriceForBuyer            = conf->UseBuyPriceForBuyer;
+    UseBuyPriceForSeller           = conf->UseBuyPriceForSeller;
     ConsiderOnlyBotAuctions        = conf->ConsiderOnlyBotAuctions;
     ItemsPerCycle                  = conf->ItemsPerCycle;
     Vendor_Items                   = conf->Vendor_Items;
@@ -508,8 +508,8 @@ void AHBConfig::Reset()
     AHBSeller                      = false;
     AHBBuyer                       = false;
 
-    BuyMethod                      = false;
-    SellMethod                     = false;
+    UseBuyPriceForBuyer            = false;
+    UseBuyPriceForSeller           = false;
     SellAtMarketPrice              = false;
     ConsiderOnlyBotAuctions        = false;
     ItemsPerCycle                  = 200;
@@ -1615,68 +1615,57 @@ void AHBConfig::CalculatePercents()
     }
 }
 
-uint32 AHBConfig::GetMaximum(uint32 color)
+uint32 AHBConfig::GetMaximum(uint32 ahbotItemType)
 {
-    switch (color)
+    switch (ahbotItemType)
     {
     case AHB_GREY_TG:
         return greytgp;
-        break;
 
     case AHB_WHITE_TG:
         return whitetgp;
-        break;
 
     case AHB_GREEN_TG:
         return greentgp;
-        break;
 
     case AHB_BLUE_TG:
         return bluetgp;
-        break;
 
     case AHB_PURPLE_TG:
         return purpletgp;
-        break;
+
     case AHB_ORANGE_TG:
         return orangetgp;
-        break;
 
     case AHB_YELLOW_TG:
         return yellowtgp;
-        break;
 
     case AHB_GREY_I:
         return greyip;
-        break;
 
     case AHB_WHITE_I:
         return whiteip;
-        break;
 
     case AHB_GREEN_I:
         return greenip;
-        break;
 
     case AHB_BLUE_I:
         return blueip;
-        break;
 
     case AHB_PURPLE_I:
         return purpleip;
-        break;
 
     case AHB_ORANGE_I:
         return orangeip;
-        break;
 
     case AHB_YELLOW_I:
         return yellowip;
-        break;
 
     default:
+    {
+        LOG_ERROR("module", "AHBot AHBConfig::GetMaximum() invalid param");
         return 0;
-        break;
+    }
     }
 }
 
@@ -1689,69 +1678,111 @@ void AHBConfig::DecItemCounts(uint32 Class, uint32 Quality)
         break;
 
     default:
-        DecItemCounts(Quality + 7);
+        DecItemCounts(Quality + AHB_ITEM_TYPE_OFFSET);
         break;
     }
 }
 
-void AHBConfig::DecItemCounts(uint32 color)
+void AHBConfig::DecItemCounts(uint32 ahbotItemType)
 {
-    switch (color)
+    switch (ahbotItemType)
     {
     case AHB_GREY_TG:
-        --greyTGoods;
+        if (greyTGoods > 0)
+        {
+            --greyTGoods;
+        }
         break;
 
     case AHB_WHITE_TG:
-        --whiteTGoods;
+        if (whiteTGoods > 0)
+        {
+            --whiteTGoods;
+        }
         break;
 
-    case AHB_GREEN_TG:
-        --greenTGoods;
+    case AHB_GREEN_TG:        
+        if (greenTGoods > 0)
+        {
+            --greenTGoods;
+        }
         break;
 
     case AHB_BLUE_TG:
-        --blueTGoods;
+        if (blueTGoods > 0)
+        {
+            --blueTGoods;
+        }
         break;
 
     case AHB_PURPLE_TG:
-        --purpleTGoods;
+        if (purpleTGoods > 0)
+        {
+            --purpleTGoods;
+        }
         break;
 
     case AHB_ORANGE_TG:
-        --orangeTGoods;
+        if (orangeTGoods > 0)
+        {
+            --orangeTGoods;        
+        }
         break;
 
     case AHB_YELLOW_TG:
-        --yellowTGoods;
+        if (yellowTGoods > 0)
+        {
+            --yellowTGoods;
+        }
         break;
 
     case AHB_GREY_I:
-        --greyItems;
+        if (greyItems > 0)
+        {
+            --greyItems;
+        }
         break;
 
     case AHB_WHITE_I:
-        --whiteItems;
+        if (whiteItems > 0)
+        {
+            --whiteItems;
+        }
         break;
 
     case AHB_GREEN_I:
-        --greenItems;
+        if (greenItems > 0)
+        {
+            --greenItems;
+        }
         break;
 
     case AHB_BLUE_I:
-        --blueItems;
+        if (blueItems > 0)
+        {
+            --blueItems;
+        }
         break;
 
     case AHB_PURPLE_I:
-        --purpleItems;
+        if (purpleItems > 0)
+        {
+            --purpleItems;
+        }
         break;
 
     case AHB_ORANGE_I:
-        --orangeItems;
+        if (orangeItems > 0)
+        {
+            --orangeItems;
+        }
         break;
 
     case AHB_YELLOW_I:
-        --yellowItems;
+        if (yellowItems > 0)
+        {
+            --yellowItems;
+        }
         break;
 
     default:
@@ -1773,9 +1804,9 @@ void AHBConfig::IncItemCounts(uint32 Class, uint32 Quality)
     }
 }
 
-void AHBConfig::IncItemCounts(uint32 color)
+void AHBConfig::IncItemCounts(uint32 ahbotItemType)
 {
-    switch (color)
+    switch (ahbotItemType)
     {
     case AHB_GREY_TG:
         ++greyTGoods;
@@ -2039,8 +2070,8 @@ void AHBConfig::InitializeFromFile()
 
     AHBSeller                      = sConfigMgr->GetOption<bool>  ("AuctionHouseBot.EnableSeller"           , false);
     AHBBuyer                       = sConfigMgr->GetOption<bool>  ("AuctionHouseBot.EnableBuyer"            , false);
-    SellMethod                     = sConfigMgr->GetOption<bool>  ("AuctionHouseBot.UseBuyPriceForSeller"   , false);
-    BuyMethod                      = sConfigMgr->GetOption<bool>  ("AuctionHouseBot.UseBuyPriceForBuyer"    , false);
+    UseBuyPriceForSeller           = sConfigMgr->GetOption<bool>  ("AuctionHouseBot.UseBuyPriceForSeller"   , false);
+    UseBuyPriceForBuyer            = sConfigMgr->GetOption<bool>  ("AuctionHouseBot.UseBuyPriceForBuyer"    , false);
     SellAtMarketPrice              = sConfigMgr->GetOption<bool>  ("AuctionHouseBot.UseMarketPriceForSeller", false);
     MarketResetThreshold           = sConfigMgr->GetOption<uint32>("AuctionHouseBot.MarketResetThreshold"   , 25);
     DuplicatesCount                = sConfigMgr->GetOption<uint32>("AuctionHouseBot.DuplicatesCount"        , 0);
@@ -2286,9 +2317,9 @@ void AHBConfig::InitializeFromSql(std::set<uint32> botsIds)
     //
 
     AuctionHouseObject* auctionHouse = sAuctionMgr->GetAuctionsMap(GetAHFID());
-    uint32              auctions     = auctionHouse->Getcount();
+    uint32 numberOfAuctions = auctionHouse->Getcount();
 
-    if (auctions)
+    if (numberOfAuctions > 0)
     {
         for (AuctionHouseObject::AuctionEntryMap::const_iterator itr = auctionHouse->GetAuctionsBegin(); itr != auctionHouse->GetAuctionsEnd(); ++itr)
         {
@@ -2621,7 +2652,7 @@ void AHBConfig::InitializeBins()
         // Exclude items with no possible price
         //
 
-        if (SellMethod)
+        if (UseBuyPriceForSeller)
         {
             if (itr->second.BuyPrice == 0)
             {
