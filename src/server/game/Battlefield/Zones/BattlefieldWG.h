@@ -21,6 +21,7 @@
 #include "Battlefield.h"
 #include "Log.h"
 #include "World.h"
+#include "WorldStatePackets.h"
 
 class Group;
 class BattlefieldWG;
@@ -238,7 +239,7 @@ const uint32 WGQuest[2][6] =
     { 13185, 13183, 13223, 13539, 13178, 13180 },
 };
 // 7 in sql, 7 in header
-const BfWGCoordGY WGGraveYard[BATTLEFIELD_WG_GRAVEYARD_MAX] =
+const BfWGCoordGY WGGraveyard[BATTLEFIELD_WG_GRAVEYARD_MAX] =
 {
     { 5104.750f, 2300.940f, 368.579f, 0.733038f, 1329, BATTLEFIELD_WG_GY_WORKSHOP_NE, BATTLEFIELD_WG_GOSSIPTEXT_GY_NE, TEAM_NEUTRAL },
     { 5099.120f, 3466.036f, 368.484f, 5.317802f, 1330, BATTLEFIELD_WG_GY_WORKSHOP_NW, BATTLEFIELD_WG_GOSSIPTEXT_GY_NW, TEAM_NEUTRAL },
@@ -403,7 +404,7 @@ public:
 
     void SendInitWorldStatesTo(Player* player);
     void SendInitWorldStatesToAll() override;
-    void FillInitialWorldStates(WorldPacket& data) override;
+    void FillInitialWorldStates(WorldPackets::WorldState::InitWorldStates& packet) override;
 
     void HandleKill(Player* killer, Unit* victim) override;
     void OnUnitDeath(Unit* unit) override;

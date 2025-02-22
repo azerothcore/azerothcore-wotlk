@@ -291,7 +291,7 @@ FlashAtStart = 1
 #           DATABASE_CHARACTER = 2, // Character database
 #           DATABASE_WORLD     = 4, // World database
 #
-#        Default:     7 - (All enabled)
+#        Default:     7  - (All enabled)
 #                     4  - (Enable world only)
 #                     0  - (All disabled)
 
@@ -1118,17 +1118,6 @@ PreventAFKLogout = 0
 
 ###################################################################################################
 # PACKET SPOOF PROTECTION SETTINGS
-#
-# These settings determine which action to take when harmful packet spoofing is detected.
-#
-#    PacketSpoof.Policy
-#        Description: Determines the course of action when packet spoofing is detected.
-#        Values:     0 - Log only
-#                    1 - Log + kick
-#                    2 - Log + kick + ban
-
-PacketSpoof.Policy = 1
-
 #
 #    PacketSpoof.BanMode
 #        Description: If PacketSpoof.Policy equals 2, this will determine the ban mode.
@@ -4517,10 +4506,13 @@ Debug.Arena = 0
 #
 #
 #    Respawn.DynamicRateCreature
-#        Description: The rate at which the respawn time is adjusted for high player counts in a zone (for creatures).
-#                     Up to this number of players, the respawn rate is unchanged.
-#                     Does not affect instanced creatures, bosses or quest givers.
-#                     At double this number in players, you get twice as many respawns, at three times this number, three times the respawns, and so forth.
+#        Description: Controls how creature respawn times adjust based on player count in a zone.
+#                     The respawn time is unchanged up to the configured number of players.
+#                     As player count exceeds this value, respawn times decrease proportionally
+#                     (e.g., at double the player count, respawn times are halved; at triple the player count, respawns happen three times as fast).
+#                     Does not affect instanced creatures, bosses, or quest givers.
+#                     Formula: adjustFactor = rate / playerCount
+#                              RespawnTime = RespawnTime * adjustFactor
 #        Default:     1 (Disabled)
 
 Respawn.DynamicRateCreature = 1
@@ -4534,10 +4526,13 @@ Respawn.DynamicMinimumCreature = 10
 
 #
 #    Respawn.DynamicRateGameObject
-#        Description: The rate at which the respawn time is adjusted for high player counts in a zone (for gameobjects).
-#                     Up to this number of players, the respawn rate is unchanged.
+#        Description: Controls how gameobject respawn times adjust based on player count in a zone.
+#                     The respawn time is unchanged up to the configured number of players.
+#                     As player count exceeds this value, respawn times decrease proportionally
+#                     (e.g., at double the player count, respawn times are halved; at triple the player count, respawns happen three times as fast).
 #                     Does not affect instanced objects or quest givers.
-#                     At double this number in players, you get twice as many respawns, at three times this number, three times the respawns, and so forth.
+#                     Formula: adjustFactor = rate / playerCount
+#                              RespawnTime = RespawnTime * adjustFactor
 #        Default:     1 (Disabled)
 
 Respawn.DynamicRateGameObject = 1
