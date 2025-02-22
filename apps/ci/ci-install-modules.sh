@@ -28,3 +28,4 @@ git clone --depth=1 --branch=master https://github.com/azerothcore/mod-server-au
 git clone --depth=1 --branch=master https://github.com/azerothcore/mod-transmog.git modules/mod-transmog
 git clone --depth=1 --branch=main   https://github.com/azerothcore/mod-progression-system.git modules/mod-progression-system
 git clone --depth=1 --branch=master https://github.com/azerothcore/mod-arena-3v3-solo-queue.git modules/mod-arena-3v3-solo-queue
+git clone --depth=1 --branch=master https://github.com/azerothcore/mod-costumes.git modules/mod-costumes
