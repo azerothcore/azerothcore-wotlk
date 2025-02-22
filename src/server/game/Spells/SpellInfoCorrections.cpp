@@ -1,3 +1,4 @@
+
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
@@ -4894,7 +4895,7 @@ void SpellMgr::LoadSpellInfoCorrections()
     // Swoop (Moth hunter pet) root effect fix
     ApplySpellFix({ 52825 }, [](SpellInfo* spellInfo)
     {
-        spellInfo->Effects[EFFECT_2].TargetA = TARGET_UNIT_TARGET_ENEMY;
+        spellInfo->Effects[EFFECT_2].TargetA = SpellImplicitTargetInfo(TARGET_UNIT_TARGET_ENEMY);
     });
 
     for (uint32 i = 0; i < GetSpellInfoStoreSize(); ++i)
