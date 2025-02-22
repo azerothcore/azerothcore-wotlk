@@ -105,18 +105,6 @@ namespace Acore::ChatCommands
 
 */
 
-// Yunfan: refactor
-class MetricScript : public ScriptObject
-{
-protected:
-    MetricScript(const char* name);
-
-public:
-    bool IsDatabaseBound() const { return false; }
-
-    virtual void OnMetricLogging() { }
-};
-
 class PlayerbotScript : public ScriptObject
 {
 protected:
@@ -221,8 +209,8 @@ public: /* FormulaScript */
 public: /* MapScript */
     void OnCreateMap(Map* map);
     void OnDestroyMap(Map* map);
-    void OnLoadGridMap(Map* map, GridMap* gmap, uint32 gx, uint32 gy);
-    void OnUnloadGridMap(Map* map, GridMap* gmap, uint32 gx, uint32 gy);
+    void OnLoadGridMap(Map* map, GridTerrainData* gmap, uint32 gx, uint32 gy);
+    void OnUnloadGridMap(Map* map, GridTerrainData* gmap, uint32 gx, uint32 gy);
     void OnPlayerEnterMap(Map* map, Player* player);
     void OnPlayerLeaveMap(Map* map, Player* player);
     void OnMapUpdate(Map* map, uint32 diff);
@@ -325,25 +313,25 @@ public: /* AchievementCriteriaScript */
     bool OnCriteriaCheck(uint32 scriptId, Player* source, Unit* target, uint32 criteria_id);
 
 public: /* PlayerScript */
-    void OnBeforePlayerUpdate(Player* player, uint32 p_time);
-    void OnPlayerUpdate(Player* player, uint32 p_time);
-    void OnAfterPlayerUpdate(Player* player, uint32 diff);
-    void OnSendInitialPacketsBeforeAddToMap(Player* player, WorldPacket& data);
     void OnPlayerJustDied(Player* player);
-    void OnCalculateTalentsPoints(Player const* player, uint32& talentPointsForLevel);
+    void OnPlayerCalculateTalentsPoints(Player const* player, uint32& talentPointsForLevel);
     void OnPlayerReleasedGhost(Player* player);
-    void OnPVPKill(Player* killer, Player* killed);
+    void OnPlayerSendInitialPacketsBeforeAddToMap(Player* player, WorldPacket& data);
+    void OnPlayerBeforeUpdate(Player* player, uint32 p_time);
+    void OnPlayerAfterUpdate(Player* player, uint32 diff);
+    void OnPlayerUpdate(Player* player, uint32 p_time);
+    void OnPlayerPVPKill(Player* killer, Player* killed);
     void OnPlayerPVPFlagChange(Player* player, bool state);
-    void OnCreatureKill(Player* killer, Creature* killed);
-    void OnCreatureKilledByPet(Player* petOwner, Creature* killed);
+    void OnPlayerCreatureKill(Player* killer, Creature* killed);
+    void OnPlayerCreatureKilledByPet(Player* petOwner, Creature* killed);
     void OnPlayerKilledByCreature(Creature* killer, Player* killed);
     void OnPlayerLevelChanged(Player* player, uint8 oldLevel);
     void OnPlayerFreeTalentPointsChanged(Player* player, uint32 newPoints);
     void OnPlayerTalentsReset(Player* player, bool noCost);
-    void OnAfterSpecSlotChanged(Player* player, uint8 newSlot);
+    void OnPlayerAfterSpecSlotChanged(Player* player, uint8 newSlot);
     void OnPlayerMoneyChanged(Player* player, int32& amount);
-    void OnBeforeLootMoney(Player* player, Loot* loot);
-    void OnGivePlayerXP(Player* player, uint32& amount, Unit* victim, uint8 xpSource);
+    void OnPlayerBeforeLootMoney(Player* player, Loot* loot);
+    void OnPlayerGiveXP(Player* player, uint32& amount, Unit* victim, uint8 xpSource);
     bool OnPlayerReputationChange(Player* player, uint32 factionID, int32& standing, bool incremental);
     void OnPlayerReputationRankChange(Player* player, uint32 factionID, ReputationRank newRank, ReputationRank oldRank, bool increased);
     void OnPlayerLearnSpell(Player* player, uint32 spellID);
@@ -352,7 +340,7 @@ public: /* PlayerScript */
     void OnPlayerDuelStart(Player* player1, Player* player2);
     void OnPlayerDuelEnd(Player* winner, Player* loser, DuelCompleteType type);
     void OnPlayerChat(Player* player, uint32 type, uint32 lang, std::string& msg);
-    void OnBeforeSendChatMessage(Player* player, uint32& type, uint32& lang, std::string& msg);
+    void OnPlayerBeforeSendChatMessage(Player* player, uint32& type, uint32& lang, std::string& msg);
     void OnPlayerChat(Player* player, uint32 type, uint32 lang, std::string& msg, Player* receiver);
     void OnPlayerChat(Player* player, uint32 type, uint32 lang, std::string& msg, Group* group);
     void OnPlayerChat(Player* player, uint32 type, uint32 lang, std::string& msg, Guild* guild);
@@ -362,7 +350,7 @@ public: /* PlayerScript */
     void OnPlayerSpellCast(Player* player, Spell* spell, bool skipCheck);
     void OnPlayerLogin(Player* player);
     void OnPlayerLoadFromDB(Player* player);
-    void OnBeforePlayerLogout(Player* player);
+    void OnPlayerBeforeLogout(Player* player);
     void OnPlayerLogout(Player* player);
     void OnPlayerCreate(Player* player);
     void OnPlayerSave(Player* player);
@@ -371,128 +359,131 @@ public: /* PlayerScript */
     void OnPlayerBindToInstance(Player* player, Difficulty difficulty, uint32 mapid, bool permanent);
     void OnPlayerUpdateZone(Player* player, uint32 newZone, uint32 newArea);
     void OnPlayerUpdateArea(Player* player, uint32 oldArea, uint32 newArea);
-    bool OnBeforePlayerTeleport(Player* player, uint32 mapid, float x, float y, float z, float orientation, uint32 options, Unit* target);
+    bool OnPlayerBeforeTeleport(Player* player, uint32 mapid, float x, float y, float z, float orientation, uint32 options, Unit* target);
     void OnPlayerUpdateFaction(Player* player);
     void OnPlayerAddToBattleground(Player* player, Battleground* bg);
     void OnPlayerQueueRandomDungeon(Player* player, uint32 & rDungeonId);
     void OnPlayerRemoveFromBattleground(Player* player, Battleground* bg);
-    void OnAchievementComplete(Player* player, AchievementEntry const* achievement);
-    bool OnBeforeAchievementComplete(Player* player, AchievementEntry const* achievement);
-    void OnCriteriaProgress(Player* player, AchievementCriteriaEntry const* criteria);
-    bool OnBeforeCriteriaProgress(Player* player, AchievementCriteriaEntry const* criteria);
-    void OnAchievementSave(CharacterDatabaseTransaction trans, Player* player, uint16 achiId, CompletedAchievementData achiData);
-    void OnCriteriaSave(CharacterDatabaseTransaction trans, Player* player, uint16 critId, CriteriaProgress criteriaData);
-    void OnGossipSelect(Player* player, uint32 menu_id, uint32 sender, uint32 action);
-    void OnGossipSelectCode(Player* player, uint32 menu_id, uint32 sender, uint32 action, const char* code);
+    void OnPlayerAchievementComplete(Player* player, AchievementEntry const* achievement);
+    bool OnPlayerBeforeAchievementComplete(Player* player, AchievementEntry const* achievement);
+    void OnPlayerCriteriaProgress(Player* player, AchievementCriteriaEntry const* criteria);
+    bool OnPlayerBeforeCriteriaProgress(Player* player, AchievementCriteriaEntry const* criteria);
+    void OnPlayerAchievementSave(CharacterDatabaseTransaction trans, Player* player, uint16 achiId, CompletedAchievementData achiData);
+    void OnPlayerCriteriaSave(CharacterDatabaseTransaction trans, Player* player, uint16 critId, CriteriaProgress criteriaData);
+    void OnPlayerGossipSelect(Player* player, uint32 menu_id, uint32 sender, uint32 action);
+    void OnPlayerGossipSelectCode(Player* player, uint32 menu_id, uint32 sender, uint32 action, const char* code);
     void OnPlayerBeingCharmed(Player* player, Unit* charmer, uint32 oldFactionId, uint32 newFactionId);
-    void OnAfterPlayerSetVisibleItemSlot(Player* player, uint8 slot, Item* item);
-    void OnAfterPlayerMoveItemFromInventory(Player* player, Item* it, uint8 bag, uint8 slot, bool update);
-    void OnEquip(Player* player, Item* it, uint8 bag, uint8 slot, bool update);
+    void OnPlayerAfterSetVisibleItemSlot(Player* player, uint8 slot, Item* item);
+    void OnPlayerAfterMoveItemFromInventory(Player* player, Item* it, uint8 bag, uint8 slot, bool update);
+    void OnPlayerEquip(Player* player, Item* it, uint8 bag, uint8 slot, bool update);
     void OnPlayerJoinBG(Player* player);
     void OnPlayerJoinArena(Player* player);
-    void OnGetMaxPersonalArenaRatingRequirement(Player const* player, uint32 minSlot, uint32& maxArenaRating) const;
-    void OnLootItem(Player* player, Item* item, uint32 count, ObjectGuid lootguid);
-    void OnBeforeFillQuestLootItem(Player* player, LootItem& item);
-    void OnStoreNewItem(Player* player, Item* item, uint32 count);
-    void OnCreateItem(Player* player, Item* item, uint32 count);
-    void OnQuestRewardItem(Player* player, Item* item, uint32 count);
-    bool CanPlaceAuctionBid(Player* player, AuctionEntry* auction);
-    void OnGroupRollRewardItem(Player* player, Item* item, uint32 count, RollVote voteType, Roll* roll);
-    bool OnBeforeOpenItem(Player* player, Item* item);
-    bool OnBeforePlayerQuestComplete(Player* player, uint32 quest_id);
-    void OnQuestComputeXP(Player* player, Quest const* quest, uint32& xpValue);
-    void OnBeforePlayerDurabilityRepair(Player* player, ObjectGuid npcGUID, ObjectGuid itemGUID, float& discountMod, uint8 guildBank);
-    void OnBeforeBuyItemFromVendor(Player* player, ObjectGuid vendorguid, uint32 vendorslot, uint32& item, uint8 count, uint8 bag, uint8 slot);
-    void OnBeforeStoreOrEquipNewItem(Player* player, uint32 vendorslot, uint32& item, uint8 count, uint8 bag, uint8 slot, ItemTemplate const* pProto, Creature* pVendor, VendorItem const* crItem, bool bStore);
-    void OnAfterStoreOrEquipNewItem(Player* player, uint32 vendorslot, Item* item, uint8 count, uint8 bag, uint8 slot, ItemTemplate const* pProto, Creature* pVendor, VendorItem const* crItem, bool bStore);
-    void OnAfterUpdateMaxPower(Player* player, Powers& power, float& value);
-    void OnAfterUpdateMaxHealth(Player* player, float& value);
-    void OnBeforeUpdateAttackPowerAndDamage(Player* player, float& level, float& val2, bool ranged);
-    void OnAfterUpdateAttackPowerAndDamage(Player* player, float& level, float& base_attPower, float& attPowerMod, float& attPowerMultiplier, bool ranged);
-    void OnBeforeInitTalentForLevel(Player* player, uint8& level, uint32& talentPointsForLevel);
-    void OnFirstLogin(Player* player);
-    void OnSetMaxLevel(Player* player, uint32& maxPlayerLevel);
+    void OnPlayerGetMaxPersonalArenaRatingRequirement(Player const* player, uint32 minSlot, uint32& maxArenaRating) const;
+    void OnPlayerLootItem(Player* player, Item* item, uint32 count, ObjectGuid lootguid);
+    void OnPlayerBeforeFillQuestLootItem(Player* player, LootItem& item);
+    void OnPlayerStoreNewItem(Player* player, Item* item, uint32 count);
+    void OnPlayerCreateItem(Player* player, Item* item, uint32 count);
+    void OnPlayerQuestRewardItem(Player* player, Item* item, uint32 count);
+    bool OnPlayerCanPlaceAuctionBid(Player* player, AuctionEntry* auction);
+    void OnPlayerGroupRollRewardItem(Player* player, Item* item, uint32 count, RollVote voteType, Roll* roll);
+    bool OnPlayerBeforeOpenItem(Player* player, Item* item);
+    bool OnPlayerBeforeQuestComplete(Player* player, uint32 quest_id);
+    void OnPlayerQuestComputeXP(Player* player, Quest const* quest, uint32& xpValue);
+    void OnPlayerBeforeDurabilityRepair(Player* player, ObjectGuid npcGUID, ObjectGuid itemGUID, float& discountMod, uint8 guildBank);
+    void OnPlayerBeforeBuyItemFromVendor(Player* player, ObjectGuid vendorguid, uint32 vendorslot, uint32& item, uint8 count, uint8 bag, uint8 slot);
+    void OnPlayerBeforeStoreOrEquipNewItem(Player* player, uint32 vendorslot, uint32& item, uint8 count, uint8 bag, uint8 slot, ItemTemplate const* pProto, Creature* pVendor, VendorItem const* crItem, bool bStore);
+    void OnPlayerAfterStoreOrEquipNewItem(Player* player, uint32 vendorslot, Item* item, uint8 count, uint8 bag, uint8 slot, ItemTemplate const* pProto, Creature* pVendor, VendorItem const* crItem, bool bStore);
+    void OnPlayerAfterUpdateMaxPower(Player* player, Powers& power, float& value);
+    void OnPlayerAfterUpdateMaxHealth(Player* player, float& value);
+    void OnPlayerBeforeUpdateAttackPowerAndDamage(Player* player, float& level, float& val2, bool ranged);
+    void OnPlayerAfterUpdateAttackPowerAndDamage(Player* player, float& level, float& base_attPower, float& attPowerMod, float& attPowerMultiplier, bool ranged);
+    void OnPlayerBeforeInitTalentForLevel(Player* player, uint8& level, uint32& talentPointsForLevel);
+    void OnPlayerFirstLogin(Player* player);
+    void OnPlayerSetMaxLevel(Player* player, uint32& maxPlayerLevel);
     void OnPlayerCompleteQuest(Player* player, Quest const* quest);
-    void OnBattlegroundDesertion(Player* player, BattlegroundDesertionType const desertionType);
-    bool CanJoinInBattlegroundQueue(Player* player, ObjectGuid BattlemasterGuid, BattlegroundTypeId BGTypeID, uint8 joinAsGroup, GroupJoinBattlegroundResult& err);
-    bool ShouldBeRewardedWithMoneyInsteadOfExp(Player* player);
-    void OnBeforeTempSummonInitStats(Player* player, TempSummon* tempSummon, uint32& duration);
-    void OnBeforeGuardianInitStatsForLevel(Player* player, Guardian* guardian, CreatureTemplate const* cinfo, PetType& petType);
-    void OnAfterGuardianInitStatsForLevel(Player* player, Guardian* guardian);
-    void OnBeforeLoadPetFromDB(Player* player, uint32& petentry, uint32& petnumber, bool& current, bool& forceLoadFromDB);
-    bool CanJoinInArenaQueue(Player* player, ObjectGuid BattlemasterGuid, uint8 arenaslot, BattlegroundTypeId BGTypeID, uint8 joinAsGroup, uint8 IsRated, GroupJoinBattlegroundResult& err);
-    bool CanBattleFieldPort(Player* player, uint8 arenaType, BattlegroundTypeId BGTypeID, uint8 action);
-    bool CanGroupInvite(Player* player, std::string& membername);
-    bool CanGroupAccept(Player* player, Group* group);
-    bool CanSellItem(Player* player, Item* item, Creature* creature);
-    bool CanSendMail(Player* player, ObjectGuid receiverGuid, ObjectGuid mailbox, std::string& subject, std::string& body, uint32 money, uint32 COD, Item* item);
-    void PetitionBuy(Player* player, Creature* creature, uint32& charterid, uint32& cost, uint32& type);
-    void PetitionShowList(Player* player, Creature* creature, uint32& CharterEntry, uint32& CharterDispayID, uint32& CharterCost);
-    void OnRewardKillRewarder(Player* player, KillRewarder* rewarder, bool isDungeon, float& rate);
-    bool CanGiveMailRewardAtGiveLevel(Player* player, uint8 level);
-    void OnDeleteFromDB(CharacterDatabaseTransaction trans, uint32 guid);
-    bool CanRepopAtGraveyard(Player* player);
+    void OnPlayerBattlegroundDesertion(Player* player, BattlegroundDesertionType const desertionType);
+    bool OnPlayerCanJoinInBattlegroundQueue(Player* player, ObjectGuid BattlemasterGuid, BattlegroundTypeId BGTypeID, uint8 joinAsGroup, GroupJoinBattlegroundResult& err);
+    bool OnPlayerShouldBeRewardedWithMoneyInsteadOfExp(Player* player);
+    void OnPlayerBeforeTempSummonInitStats(Player* player, TempSummon* tempSummon, uint32& duration);
+    void OnPlayerBeforeGuardianInitStatsForLevel(Player* player, Guardian* guardian, CreatureTemplate const* cinfo, PetType& petType);
+    void OnPlayerAfterGuardianInitStatsForLevel(Player* player, Guardian* guardian);
+    void OnPlayerBeforeLoadPetFromDB(Player* player, uint32& petentry, uint32& petnumber, bool& current, bool& forceLoadFromDB);
+    bool OnPlayerCanJoinInArenaQueue(Player* player, ObjectGuid BattlemasterGuid, uint8 arenaslot, BattlegroundTypeId BGTypeID, uint8 joinAsGroup, uint8 IsRated, GroupJoinBattlegroundResult& err);
+    bool OnPlayerCanBattleFieldPort(Player* player, uint8 arenaType, BattlegroundTypeId BGTypeID, uint8 action);
+    bool OnPlayerCanGroupInvite(Player* player, std::string& membername);
+    bool OnPlayerCanGroupAccept(Player* player, Group* group);
+    bool OnPlayerCanSellItem(Player* player, Item* item, Creature* creature);
+    bool OnPlayerCanSendMail(Player* player, ObjectGuid receiverGuid, ObjectGuid mailbox, std::string& subject, std::string& body, uint32 money, uint32 COD, Item* item);
+    void OnPlayerPetitionBuy(Player* player, Creature* creature, uint32& charterid, uint32& cost, uint32& type);
+    void OnPlayerPetitionShowList(Player* player, Creature* creature, uint32& CharterEntry, uint32& CharterDispayID, uint32& CharterCost);
+    void OnPlayerRewardKillRewarder(Player* player, KillRewarder* rewarder, bool isDungeon, float& rate);
+    bool OnPlayerCanGiveMailRewardAtGiveLevel(Player* player, uint8 level);
+    void OnPlayerDeleteFromDB(CharacterDatabaseTransaction trans, uint32 guid);
+    bool OnPlayerCanRepopAtGraveyard(Player* player);
     std::optional<bool> OnPlayerIsClass(Player const* player, Classes playerClass, ClassContext context);
-    void OnGetMaxSkillValue(Player* player, uint32 skill, int32& result, bool IsPure);
+    void OnPlayerGetMaxSkillValue(Player* player, uint32 skill, int32& result, bool IsPure);
     bool OnPlayerHasActivePowerType(Player const* player, Powers power);
-    void OnUpdateGatheringSkill(Player* player, uint32 skillId, uint32 currentLevel, uint32 gray, uint32 green, uint32 yellow, uint32& gain);
-    void OnUpdateCraftingSkill(Player* player, SkillLineAbilityEntry const* skill, uint32 currentLevel, uint32& gain);
-    bool OnUpdateFishingSkill(Player* player, int32 skill, int32 zone_skill, int32 chance, int32 roll);
-    bool CanAreaExploreAndOutdoor(Player* player);
-    void OnVictimRewardBefore(Player* player, Player* victim, uint32& killer_title, uint32& victim_title);
-    void OnVictimRewardAfter(Player* player, Player* victim, uint32& killer_title, uint32& victim_rank, float& honor_f);
-    void OnCustomScalingStatValueBefore(Player* player, ItemTemplate const* proto, uint8 slot, bool apply, uint32& CustomScalingStatValue);
-    void OnCustomScalingStatValue(Player* player, ItemTemplate const* proto, uint32& statType, int32& val, uint8 itemProtoStatNumber, uint32 ScalingStatValue, ScalingStatValuesEntry const* ssv);
-    void OnApplyItemModsBefore(Player* player, uint8 slot, bool apply, uint8 itemProtoStatNumber, uint32 statType, int32& val);
-    void OnApplyEnchantmentItemModsBefore(Player* player, Item* item, EnchantmentSlot slot, bool apply, uint32 enchant_spell_id, uint32& enchant_amount);
-    void OnApplyWeaponDamage(Player* player, uint8 slot, ItemTemplate const* proto, float& minDamage, float& maxDamage, uint8 damageIndex);
-    bool CanArmorDamageModifier(Player* player);
-    void OnGetFeralApBonus(Player* player, int32& feral_bonus, int32 dpsMod, ItemTemplate const* proto, ScalingStatValuesEntry const* ssv);
-    bool CanApplyWeaponDependentAuraDamageMod(Player* player, Item* item, WeaponAttackType attackType, AuraEffect const* aura, bool apply);
-    bool CanApplyEquipSpell(Player* player, SpellInfo const* spellInfo, Item* item, bool apply, bool form_change);
-    bool CanApplyEquipSpellsItemSet(Player* player, ItemSetEffect* eff);
-    bool CanCastItemCombatSpell(Player* player, Unit* target, WeaponAttackType attType, uint32 procVictim, uint32 procEx, Item* item, ItemTemplate const* proto);
-    bool CanCastItemUseSpell(Player* player, Item* item, SpellCastTargets const& targets, uint8 cast_count, uint32 glyphIndex);
-    void OnApplyAmmoBonuses(Player* player, ItemTemplate const* proto, float& currentAmmoDPS);
-    bool CanEquipItem(Player* player, uint8 slot, uint16& dest, Item* pItem, bool swap, bool not_loading);
-    bool CanUnequipItem(Player* player, uint16 pos, bool swap);
-    bool CanUseItem(Player* player, ItemTemplate const* proto, InventoryResult& result);
-    bool CanSaveEquipNewItem(Player* player, Item* item, uint16 pos, bool update);
-    bool CanApplyEnchantment(Player* player, Item* item, EnchantmentSlot slot, bool apply, bool apply_dur, bool ignore_condition);
-    void OnGetQuestRate(Player* player, float& result);
-    bool PassedQuestKilledMonsterCredit(Player* player, Quest const* qinfo, uint32 entry, uint32 real_entry, ObjectGuid guid);
-    bool CheckItemInSlotAtLoadInventory(Player* player, Item* item, uint8 slot, uint8& err, uint16& dest);
-    bool NotAvoidSatisfy(Player* player, DungeonProgressionRequirements const* ar, uint32 target_map, bool report);
-    bool NotVisibleGloballyFor(Player* player, Player const* u);
-    void OnGetArenaPersonalRating(Player* player, uint8 slot, uint32& result);
-    void OnFfaPvpStateUpdate(Player* player, bool result);
-    void OnGetArenaTeamId(Player* player, uint8 slot, uint32& result);
-    void OnIsFFAPvP(Player* player, bool& result);
-    void OnIsPvP(Player* player, bool& result);
-    void OnGetMaxSkillValueForLevel(Player* player, uint16& result);
-    bool NotSetArenaTeamInfoField(Player* player, uint8 slot, ArenaTeamInfoType type, uint32 value);
-    bool CanJoinLfg(Player* player, uint8 roles, lfg::LfgDungeonSet& dungeons, const std::string& comment);
-    bool CanEnterMap(Player* player, MapEntry const* entry, InstanceTemplate const* instance, MapDifficulty const* mapDiff, bool loginCheck);
-    bool CanInitTrade(Player* player, Player* target);
-    bool CanSetTradeItem(Player* player, Item* tradedItem, uint8 tradeSlot);
-    void OnSetServerSideVisibility(Player* player, ServerSideVisibilityType& type, AccountTypes& sec);
-    void OnSetServerSideVisibilityDetect(Player* player, ServerSideVisibilityType& type, AccountTypes& sec);
+    void OnPlayerUpdateGatheringSkill(Player* player, uint32 skillId, uint32 currentLevel, uint32 gray, uint32 green, uint32 yellow, uint32& gain);
+    void OnPlayerUpdateCraftingSkill(Player* player, SkillLineAbilityEntry const* skill, uint32 currentLevel, uint32& gain);
+    bool OnPlayerUpdateFishingSkill(Player* player, int32 skill, int32 zone_skill, int32 chance, int32 roll);
+    bool OnPlayerCanAreaExploreAndOutdoor(Player* player);
+    void OnPlayerVictimRewardBefore(Player* player, Player* victim, uint32& killer_title, uint32& victim_title);
+    void OnPlayerVictimRewardAfter(Player* player, Player* victim, uint32& killer_title, uint32& victim_rank, float& honor_f);
+    void OnPlayerCustomScalingStatValueBefore(Player* player, ItemTemplate const* proto, uint8 slot, bool apply, uint32& CustomScalingStatValue);
+    void OnPlayerCustomScalingStatValue(Player* player, ItemTemplate const* proto, uint32& statType, int32& val, uint8 itemProtoStatNumber, uint32 ScalingStatValue, ScalingStatValuesEntry const* ssv);
+    void OnPlayerApplyItemModsBefore(Player* player, uint8 slot, bool apply, uint8 itemProtoStatNumber, uint32 statType, int32& val);
+    void OnPlayerApplyEnchantmentItemModsBefore(Player* player, Item* item, EnchantmentSlot slot, bool apply, uint32 enchant_spell_id, uint32& enchant_amount);
+    void OnPlayerApplyWeaponDamage(Player* player, uint8 slot, ItemTemplate const* proto, float& minDamage, float& maxDamage, uint8 damageIndex);
+    bool OnPlayerCanArmorDamageModifier(Player* player);
+    void OnPlayerGetFeralApBonus(Player* player, int32& feral_bonus, int32 dpsMod, ItemTemplate const* proto, ScalingStatValuesEntry const* ssv);
+    bool OnPlayerCanApplyWeaponDependentAuraDamageMod(Player* player, Item* item, WeaponAttackType attackType, AuraEffect const* aura, bool apply);
+    bool OnPlayerCanApplyEquipSpell(Player* player, SpellInfo const* spellInfo, Item* item, bool apply, bool form_change);
+    bool OnPlayerCanApplyEquipSpellsItemSet(Player* player, ItemSetEffect* eff);
+    bool OnPlayerCanCastItemCombatSpell(Player* player, Unit* target, WeaponAttackType attType, uint32 procVictim, uint32 procEx, Item* item, ItemTemplate const* proto);
+    bool OnPlayerCanCastItemUseSpell(Player* player, Item* item, SpellCastTargets const& targets, uint8 cast_count, uint32 glyphIndex);
+    void OnPlayerApplyAmmoBonuses(Player* player, ItemTemplate const* proto, float& currentAmmoDPS);
+    bool OnPlayerCanEquipItem(Player* player, uint8 slot, uint16& dest, Item* pItem, bool swap, bool not_loading);
+    bool OnPlayerCanUnequipItem(Player* player, uint16 pos, bool swap);
+    bool OnPlayerCanUseItem(Player* player, ItemTemplate const* proto, InventoryResult& result);
+    bool OnPlayerCanSaveEquipNewItem(Player* player, Item* item, uint16 pos, bool update);
+    bool OnPlayerCanApplyEnchantment(Player* player, Item* item, EnchantmentSlot slot, bool apply, bool apply_dur, bool ignore_condition);
+    void OnPlayerGetQuestRate(Player* player, float& result);
+    bool OnPlayerPassedQuestKilledMonsterCredit(Player* player, Quest const* qinfo, uint32 entry, uint32 real_entry, ObjectGuid guid);
+    bool OnPlayerCheckItemInSlotAtLoadInventory(Player* player, Item* item, uint8 slot, uint8& err, uint16& dest);
+    bool OnPlayerNotAvoidSatisfy(Player* player, DungeonProgressionRequirements const* ar, uint32 target_map, bool report); // Wahts that?
+    bool OnPlayerNotVisibleGloballyFor(Player* player, Player const* u);
+    void OnPlayerGetArenaPersonalRating(Player* player, uint8 slot, uint32& result);
+    void OnPlayerFfaPvpStateUpdate(Player* player, bool result);
+    void OnPlayerGetArenaTeamId(Player* player, uint8 slot, uint32& result);
+    void OnPlayerIsFFAPvP(Player* player, bool& result);
+    void OnPlayerIsPvP(Player* player, bool& result);
+    void OnPlayerGetMaxSkillValueForLevel(Player* player, uint16& result);
+    bool OnPlayerNotSetArenaTeamInfoField(Player* player, uint8 slot, ArenaTeamInfoType type, uint32 value);
+    bool OnPlayerCanJoinLfg(Player* player, uint8 roles, lfg::LfgDungeonSet& dungeons, const std::string& comment);
+    bool OnPlayerCanEnterMap(Player* player, MapEntry const* entry, InstanceTemplate const* instance, MapDifficulty const* mapDiff, bool loginCheck);
+    bool OnPlayerCanInitTrade(Player* player, Player* target);
+    bool OnPlayerCanSetTradeItem(Player* player, Item* tradedItem, uint8 tradeSlot);
+    void OnPlayerSetServerSideVisibility(Player* player, ServerSideVisibilityType& type, AccountTypes& sec);
+    void OnPlayerSetServerSideVisibilityDetect(Player* player, ServerSideVisibilityType& type, AccountTypes& sec);
     void OnPlayerResurrect(Player* player, float restore_percent, bool applySickness);
-    void OnBeforeChooseGraveyard(Player* player, TeamId teamId, bool nearCorpse, uint32& graveyardOverride);
-    bool CanPlayerUseChat(Player* player, uint32 type, uint32 language, std::string& msg);
-    bool CanPlayerUseChat(Player* player, uint32 type, uint32 language, std::string& msg, Player* receiver);
-    bool CanPlayerUseChat(Player* player, uint32 type, uint32 language, std::string& msg, Group* group);
-    bool CanPlayerUseChat(Player* player, uint32 type, uint32 language, std::string& msg, Guild* guild);
-    bool CanPlayerUseChat(Player* player, uint32 type, uint32 language, std::string& msg, Channel* channel);
+    void OnPlayerBeforeChooseGraveyard(Player* player, TeamId teamId, bool nearCorpse, uint32& graveyardOverride);
+    bool OnPlayerCanUseChat(Player* player, uint32 type, uint32 language, std::string& msg);
+    bool OnPlayerCanUseChat(Player* player, uint32 type, uint32 language, std::string& msg, Player* receiver);
+    bool OnPlayerCanUseChat(Player* player, uint32 type, uint32 language, std::string& msg, Group* group);
+    bool OnPlayerCanUseChat(Player* player, uint32 type, uint32 language, std::string& msg, Guild* guild);
+    bool OnPlayerCanUseChat(Player* player, uint32 type, uint32 language, std::string& msg, Channel* channel);
     void OnPlayerLearnTalents(Player* player, uint32 talentId, uint32 talentRank, uint32 spellid);
     void OnPlayerEnterCombat(Player* player, Unit* enemy);
     void OnPlayerLeaveCombat(Player* player);
-    void OnQuestAbandon(Player* player, uint32 questId);
-    bool CanSendErrorAlreadyLooted(Player* player);
-    void OnAfterCreatureLoot(Player* player);
-    void OnAfterCreatureLootMoney(Player* player);
-    bool OnCanPlayerFlyInZone(Player* player, uint32 mapId, uint32 zoneId, SpellInfo const* bySpell);
-    bool CanPlayerResurrect(Player* player);
+    void OnPlayerQuestAbandon(Player* player, uint32 questId);
+    bool OnPlayerCanSendErrorAlreadyLooted(Player* player);
+    void OnPlayerAfterCreatureLoot(Player* player);
+    void OnPlayerAfterCreatureLootMoney(Player* player);
+    bool OnPlayerCanFlyInZone(Player* player, uint32 mapId, uint32 zoneId, SpellInfo const* bySpell);
+    bool OnPlayerCanUpdateSkill(Player* player, uint32 skillId);
+    void OnPlayerBeforeUpdateSkill(Player* player, uint32 skill_id, uint32& value, uint32 max, uint32 step);
+    void OnPlayerUpdateSkill(Player* player, uint32 skillId, uint32 value, uint32 max, uint32 step, uint32 newValue);
+    bool OnPlayerCanResurrect(Player* player);
 
     // Anti cheat
     void AnticheatSetCanFlybyServer(Player* player, bool apply);
@@ -740,11 +731,8 @@ public: /* LootScript */
 
     void OnLootMoney(Player* player, uint32 gold);
 
-public: /* MetricScript */
-
-    void OnMetricLogging();
-
 public: /* PlayerbotScript */
+    
     bool OnPlayerbotCheckLFGQueue(lfg::Lfg5Guids const& guidsList);
     void OnPlayerbotCheckKillTask(Player* player, Unit* victim);
     void OnPlayerbotCheckPetitionAccount(Player* player, bool& found);
@@ -754,6 +742,14 @@ public: /* PlayerbotScript */
     void OnPlayerbotUpdateSessions(Player* player);
     void OnPlayerbotLogout(Player* player);
     void OnPlayerbotLogoutBots();
+
+public: /* TicketScript */
+
+    void OnTicketCreate(GmTicket* ticket);
+    void OnTicketUpdateLastChange(GmTicket* ticket);
+    void OnTicketClose(GmTicket* ticket);
+    void OnTicketStatusUpdate(GmTicket* ticket);
+    void OnTicketResolve(GmTicket* ticket);
 
 private:
     uint32 _scriptCount;

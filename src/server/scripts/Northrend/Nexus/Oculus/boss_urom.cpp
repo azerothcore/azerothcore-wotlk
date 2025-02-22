@@ -80,12 +80,16 @@ float summons[3][4] =
     {NPC_PHANTASMAL_CLOUDSCRAPER, NPC_PHANTASMAL_CLOUDSCRAPER, NPC_PHANTASMAL_MAMMOTH, NPC_PHANTASMAL_WOLF}
 };
 
-float cords[4][4] =
+float cords[5][4] =
 {
     {1177.47f, 937.722f, 527.405f, 2.21657f},
     {968.66f, 1042.53f, 527.32f, 0.077f},
     {1164.02f, 1170.85f, 527.321f, 3.66f},
-    {1118.31f, 1080.377f, 508.361f, 4.25f}
+    {1118.31f, 1080.377f, 508.361f, 4.25f},
+    // There are 4 phases but with the code like this:
+    // me->SetHomePosition(cords[phase + 1][0], cords[phase + 1][1], cords[phase + 1][2], cords[phase + 1][3]);
+    // lets provide fallback position.
+    {1177.47f, 937.722f, 527.405f, 2.21657f}
 };
 
 class boss_urom : public CreatureScript

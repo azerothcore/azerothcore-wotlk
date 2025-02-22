@@ -24,7 +24,7 @@
 #include "GameObject.h"
 #include "Group.h"
 #include "Object.h"
-#include "ObjectGridLoader.h"
+#include "GridObjectLoader.h"
 #include "Optional.h"
 #include "Player.h"
 #include "Spell.h"

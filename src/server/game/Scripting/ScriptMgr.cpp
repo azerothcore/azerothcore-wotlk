@@ -58,12 +58,6 @@ ScriptMgr* ScriptMgr::instance()
     return &instance;
 }
 
-// Yunfan: refactor
-MetricScript::MetricScript(const char* name) : ScriptObject(name)
-{
-    ScriptRegistry<MetricScript>::AddScript(this);
-}
-
 PlayerbotScript::PlayerbotScript(const char* name) : ScriptObject(name)
 {
     ScriptRegistry<PlayerbotScript>::AddScript(this);
@@ -109,6 +103,7 @@ void ScriptMgr::Initialize()
     ScriptRegistry<PlayerScript>::InitEnabledHooksIfNeeded(PLAYERHOOK_END);
     ScriptRegistry<ServerScript>::InitEnabledHooksIfNeeded(SERVERHOOK_END);
     ScriptRegistry<SpellSC>::InitEnabledHooksIfNeeded(ALLSPELLHOOK_END);
+    ScriptRegistry<TicketScript>::InitEnabledHooksIfNeeded(TICKETHOOK_END);
     ScriptRegistry<UnitScript>::InitEnabledHooksIfNeeded(UNITHOOK_END);
     ScriptRegistry<WorldObjectScript>::InitEnabledHooksIfNeeded(WORLDOBJECTHOOK_END);
     ScriptRegistry<WorldScript>::InitEnabledHooksIfNeeded(WORLDHOOK_END);
@@ -148,7 +143,6 @@ void ScriptMgr::Unload()
     SCR_CLEAR<ItemScript>();
     SCR_CLEAR<LootScript>();
     SCR_CLEAR<MailScript>();
-    SCR_CLEAR<MetricScript>();
     SCR_CLEAR<MiscScript>();
     SCR_CLEAR<MovementHandlerScript>();
     SCR_CLEAR<OutdoorPvPScript>();
@@ -158,6 +152,7 @@ void ScriptMgr::Unload()
     SCR_CLEAR<ServerScript>();
     SCR_CLEAR<SpellSC>();
     SCR_CLEAR<SpellScriptLoader>();
+    SCR_CLEAR<TicketScript>();
     SCR_CLEAR<TransportScript>();
     SCR_CLEAR<UnitScript>();
     SCR_CLEAR<VehicleScript>();
@@ -238,8 +233,8 @@ void ScriptMgr::CheckIfScriptsInDatabaseExist()
                 !ScriptRegistry<ArenaScript>::GetScriptById(sid) &&
                 !ScriptRegistry<GroupScript>::GetScriptById(sid) &&
                 !ScriptRegistry<DatabaseScript>::GetScriptById(sid) &&
-                !ScriptRegistry<MetricScript>::GetScriptById(sid) &&
-                !ScriptRegistry<PlayerbotScript>::GetScriptById(sid))
+                !ScriptRegistry<PlayerbotScript>::GetScriptById(sid) &&
+                !ScriptRegistry<TicketScript>::GetScriptById(sid))
                 {
                     LOG_ERROR("sql.sql", "Script named '{}' is assigned in the database, but has no code!", scriptName);
                 }

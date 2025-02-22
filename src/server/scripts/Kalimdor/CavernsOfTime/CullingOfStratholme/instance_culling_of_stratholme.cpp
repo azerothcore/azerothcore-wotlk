@@ -22,6 +22,7 @@
 #include "ScriptedCreature.h"
 #include "SpellInfo.h"
 #include "TemporarySummon.h"
+#include "WorldStatePackets.h"
 #include "culling_of_stratholme.h"
 
 class instance_culling_of_stratholme : public InstanceMapScript
@@ -53,21 +54,20 @@ public:
             return false;
         }
 
-        void FillInitialWorldStates(WorldPacket& data) override
+        void FillInitialWorldStates(WorldPackets::WorldState::InitWorldStates& packet) override
         {
-            data << uint32(WORLDSTATE_SHOW_CRATES) << uint32(0);
-            data << uint32(WORLDSTATE_CRATES_REVEALED) << uint32(_crateCount);
-            data << uint32(WORLDSTATE_WAVE_COUNT) << uint32(0);
-            data << uint32(WORLDSTATE_TIME_GUARDIAN) << uint32(25);
-            data << uint32(WORLDSTATE_TIME_GUARDIAN_SHOW) << uint32(0);
+            packet.Worldstates.reserve(5);
+            packet.Worldstates.emplace_back(WORLDSTATE_SHOW_CRATES, 0);
+            packet.Worldstates.emplace_back(WORLDSTATE_CRATES_REVEALED, _crateCount);
+            packet.Worldstates.emplace_back(WORLDSTATE_WAVE_COUNT, 0);
+            packet.Worldstates.emplace_back(WORLDSTATE_TIME_GUARDIAN, 25);
+            packet.Worldstates.emplace_back(WORLDSTATE_TIME_GUARDIAN_SHOW, 0);
         }
 
         void OnPlayerEnter(Player* plr) override
         {
             if (instance->GetPlayersCountExceptGMs() == 1)
                 SetData(DATA_ARTHAS_REPOSITION, 2);
-
-            EnsureGridLoaded();
 
             if (plr->getRace() != RACE_HUMAN && plr->getRace() != RACE_DWARF && plr->getRace() != RACE_GNOME)
                 plr->CastSpell(plr, ((plr->getGender() == GENDER_MALE) ? SPELL_HUMAN_MALE : SPELL_HUMAN_FEMALE), true);
@@ -224,7 +224,6 @@ public:
                 {
                     if (!arthas->IsAlive())
                     {
-                        EnsureGridLoaded();
                         arthas->setDeathState(DeathState::Dead);
                         arthas->Respawn();
                     }
@@ -350,16 +349,6 @@ public:
                     arthas->SetFacingTo(LeaderIntroPos6.GetOrientation());
                     break;
             }
-        }
-
-        void EnsureGridLoaded()
-        {
-            instance->LoadGrid(LeaderIntroPos1.GetPositionX(), LeaderIntroPos1.GetPositionY());
-            instance->LoadGrid(LeaderIntroPos2.GetPositionX(), LeaderIntroPos2.GetPositionY());
-            instance->LoadGrid(LeaderIntroPos3.GetPositionX(), LeaderIntroPos3.GetPositionY());
-            instance->LoadGrid(LeaderIntroPos4.GetPositionX(), LeaderIntroPos4.GetPositionY());
-            instance->LoadGrid(LeaderIntroPos5.GetPositionX(), LeaderIntroPos5.GetPositionY());
-            instance->LoadGrid(LeaderIntroPos6.GetPositionX(), LeaderIntroPos6.GetPositionY());
         }
 
         std::string GetSaveData() override
