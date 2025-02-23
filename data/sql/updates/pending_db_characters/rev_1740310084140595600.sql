@@ -9,7 +9,7 @@ CREATE TABLE `mail_server_template_items` (
     PRIMARY KEY (`id`),
     CONSTRAINT `fk_mail_template`
         FOREIGN KEY (`templateID`) REFERENCES `mail_server_template`(`id`)
-        ON DELETE CASCADE;
+        ON DELETE CASCADE
 ) ENGINE=InnoDB COLLATE='utf8mb4_unicode_ci';
 
 INSERT INTO `mail_server_template_items` (`templateID`, `faction`, `item`, `itemCount`)
