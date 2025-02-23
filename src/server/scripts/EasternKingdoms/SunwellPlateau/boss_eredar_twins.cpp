@@ -389,8 +389,12 @@ public:
         return ValidateSpellInfo({ _touchSpell });
     }
 
-    void OnPeriodic(AuraEffect const* /*aurEff*/)
+    void OnPeriodic(AuraEffect const* aurEff)
     {
+        uint32 tick = aurEff->GetTickNumber();
+        if (tick % 2 != 0 || tick > 10)
+            return;
+
         if (Unit* owner = GetOwner()->ToUnit())
             owner->CastSpell(owner, _touchSpell, true);
     }
