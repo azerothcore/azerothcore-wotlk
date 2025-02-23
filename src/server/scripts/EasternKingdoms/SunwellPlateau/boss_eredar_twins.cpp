@@ -22,6 +22,7 @@
 #include "SpellInfo.h"
 #include "SpellScript.h"
 #include "SpellScriptLoader.h"
+#include "SpellAuraEffects.h"
 #include "sunwell_plateau.h"
 
 enum Quotes
