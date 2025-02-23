@@ -4892,6 +4892,12 @@ void SpellMgr::LoadSpellInfoCorrections()
         spellInfo->AttributesEx2 &= ~SPELL_ATTR2_IGNORE_LINE_OF_SIGHT;
     });
 
+    // Swoop (Moth hunter pet) root effect fix
+    ApplySpellFix({ 52825 }, [](SpellInfo* spellInfo)
+    {
+        spellInfo->Effects[EFFECT_2].TargetA = SpellImplicitTargetInfo(TARGET_UNIT_TARGET_ENEMY);
+    });
+
     for (uint32 i = 0; i < GetSpellInfoStoreSize(); ++i)
     {
         SpellInfo* spellInfo = mSpellInfoMap[i];
