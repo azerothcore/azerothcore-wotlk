@@ -10298,38 +10298,45 @@ uint32 ObjectMgr::GetQuestMoneyReward(uint8 level, uint32 questMoneyDifficulty) 
     return 0;
 }
 
-void ObjectMgr::SendServerMail(Player* player, uint32 id, uint32 reqLevel, uint32 reqPlayTime, uint32 rewardMoneyA, uint32 rewardMoneyH, uint32 rewardItemA, uint32 rewardItemCountA, uint32 rewardItemH, uint32 rewardItemCountH, std::string subject, std::string body, uint8 active) const
+void ObjectMgr::SendServerMail(Player* player, uint32 id, uint32 reqLevel, uint32 reqPlayTime, uint32 rewardMoneyA, uint32 rewardMoneyH, std::vector<ServerMailItems> const& items, std::string subject, std::string body, uint8 active) const
 {
-    if (active)
+    if (!active)
+        return;
+
+    if (player->GetLevel() < reqLevel)
+        return;
+
+    if (player->GetTotalPlayedTime() < reqPlayTime)
+        return;
+
+    CharacterDatabaseTransaction trans = CharacterDatabase.BeginTransaction();
+
+    MailSender sender(MAIL_NORMAL, player->GetGUID().GetCounter(), MAIL_STATIONERY_GM);
+    MailDraft draft(subject, body);
+
+    draft.AddMoney(player->GetTeamId() == TEAM_ALLIANCE ? rewardMoneyA : rewardMoneyH);
+    // Loop through all items and attach them to the mail
+    for (auto const& mailItem : items)
     {
-        if (player->GetLevel() < reqLevel)
-            return;
+        if (!mailItem.item || !mailItem.itemCount)
+            continue;
 
-        if (player->GetTotalPlayedTime() < reqPlayTime)
-            return;
-
-        CharacterDatabaseTransaction trans = CharacterDatabase.BeginTransaction();
-
-        MailSender sender(MAIL_NORMAL, player->GetGUID().GetCounter(), MAIL_STATIONERY_GM);
-        MailDraft draft(subject, body);
-
-        draft.AddMoney(player->GetTeamId() == TEAM_ALLIANCE ? rewardMoneyA : rewardMoneyH);
-        if (Item* mailItem = Item::CreateItem(player->GetTeamId() == TEAM_ALLIANCE ? rewardItemA : rewardItemH, player->GetTeamId() == TEAM_ALLIANCE ? rewardItemCountA : rewardItemCountH))
+        if (Item* newItem = Item::CreateItem(mailItem.item, mailItem.itemCount))
         {
-            mailItem->SaveToDB(trans);
-            draft.AddItem(mailItem);
+            newItem->SaveToDB(trans);
+            draft.AddItem(newItem);
         }
-
-        draft.SendMailTo(trans, MailReceiver(player), sender);
-        CharacterDatabase.CommitTransaction(trans);
-
-        CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_REP_MAIL_SERVER_CHARACTER);
-        stmt->SetData(0, player->GetGUID().GetCounter());
-        stmt->SetData(1, id);
-        CharacterDatabase.Execute(stmt);
-
-        LOG_DEBUG("entities.player", "ObjectMgr::SendServerMail() Sent mail id {} to {}", id, player->GetGUID().ToString());
     }
+
+    draft.SendMailTo(trans, MailReceiver(player), sender);
+    CharacterDatabase.CommitTransaction(trans);
+
+    CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_REP_MAIL_SERVER_CHARACTER);
+    stmt->SetData(0, player->GetGUID().GetCounter());
+    stmt->SetData(1, id);
+    CharacterDatabase.Execute(stmt);
+
+    LOG_DEBUG("entities.player", "ObjectMgr::SendServerMail() Sent mail id {} to {}", id, player->GetGUID().ToString());
 }
 
 void ObjectMgr::LoadMailServerTemplates()
@@ -10338,8 +10345,8 @@ void ObjectMgr::LoadMailServerTemplates()
 
     _serverMailStore.clear(); // for reload case
 
-    //                                                    0     1           2              3         4         5        6             7       8             9          10      11
-    QueryResult result = CharacterDatabase.Query("SELECT `id`, `reqLevel`, `reqPlayTime`, `moneyA`, `moneyH`, `itemA`, `itemCountA`, `itemH`,`itemCountH`, `subject`, `body`, `active` FROM `mail_server_template`");
+    //                                                    0     1           2              3         4         5          6       7
+    QueryResult result = CharacterDatabase.Query("SELECT `id`, `reqLevel`, `reqPlayTime`, `moneyA`, `moneyH`, `subject`, `body`, `active` FROM `mail_server_template`");
     if (!result)
     {
         LOG_INFO("sql.sql", ">> Loaded 0 server mail rewards. DB table `mail_server_template` is empty.");
@@ -10362,13 +10369,9 @@ void ObjectMgr::LoadMailServerTemplates()
         servMail.reqPlayTime = fields[2].Get<uint32>();
         servMail.moneyA      = fields[3].Get<uint32>();
         servMail.moneyH      = fields[4].Get<uint32>();
-        servMail.itemA       = fields[5].Get<uint32>();
-        servMail.itemCountA  = fields[6].Get<uint32>();
-        servMail.itemH       = fields[7].Get<uint32>();
-        servMail.itemCountH  = fields[8].Get<uint32>();
-        servMail.subject     = fields[9].Get<std::string>();
-        servMail.body        = fields[10].Get<std::string>();
-        servMail.active      = fields[11].Get<uint8>();
+        servMail.subject     = fields[5].Get<std::string>();
+        servMail.body        = fields[6].Get<std::string>();
+        servMail.active      = fields[7].Get<uint8>();
 
         if (servMail.reqLevel > sWorld->getIntConfig(CONFIG_MAX_PLAYER_LEVEL))
         {
@@ -10381,32 +10384,73 @@ void ObjectMgr::LoadMailServerTemplates()
             LOG_ERROR("sql.sql", "Table `mail_server_template` has moneyA {} or moneyH {} larger than MAX_MONEY_AMOUNT {} for id {}, skipped.", servMail.moneyA, servMail.moneyH, MAX_MONEY_AMOUNT, servMail.id);
             return;
         }
-
-        ItemTemplate const* itemTemplateA = sObjectMgr->GetItemTemplate(servMail.itemA);
-        if (!itemTemplateA && servMail.itemA)
-        {
-            LOG_ERROR("sql.sql", "Table `mail_server_template` has invalid item in itemA {} for id {}, skipped.", servMail.itemA, servMail.id);
-            return;
-        }
-        ItemTemplate const* itemTemplateH = sObjectMgr->GetItemTemplate(servMail.itemH);
-        if (!itemTemplateH && servMail.itemH)
-        {
-            LOG_ERROR("sql.sql", "Table `mail_server_template` has invalid item in itemH {} for id {}, skipped.", servMail.itemH, servMail.id);
-            return;
-        }
-
-        if (!servMail.itemA && servMail.itemCountA)
-        {
-            LOG_ERROR("sql.sql", "Table `mail_server_template` has itemCountA {} with no ItemA, set to 0", servMail.itemCountA);
-            servMail.itemCountA = 0;
-        }
-        if (!servMail.itemH && servMail.itemCountH)
-        {
-            LOG_ERROR("sql.sql", "Table `mail_server_template` has itemCountH {} with no ItemH, set to 0", servMail.itemCountH);
-            servMail.itemCountH = 0;
-        }
     } while (result->NextRow());
+
+    LoadMailServerTemplatesItems();
 
     LOG_INFO("server.loading", ">> Loaded {} Mail Server Template in {} ms", _serverMailStore.size(), GetMSTimeDiffToNow(oldMSTime));
     LOG_INFO("server.loading", " ");
+}
+
+void ObjectMgr::LoadMailServerTemplatesItems()
+{
+    QueryResult result = CharacterDatabase.Query("SELECT `templateID`, `faction`, `item`, `itemCount` FROM `mail_server_template_items`");
+    if (!result)
+    {
+        LOG_INFO("sql.sql", ">> Loaded 0 server mail items. DB table `mail_server_template_items` is empty.");
+        LOG_INFO("server.loading", " ");
+        return;
+    }
+
+    do
+    {
+        Field* fields = result->Fetch();
+
+        uint32 templateID = fields[0].Get<uint32>();
+        std::string faction = fields[1].Get<std::string>();
+        uint32 item = fields[2].Get<uint32>();
+        uint32 itemCount = fields[3].Get<uint32>();
+
+        if (_serverMailStore.find(templateID) == _serverMailStore.end())
+        {
+            LOG_ERROR("sql.sql", "Table `mail_server_template_items` has an invalid templateID {}, skipped.", templateID);
+            continue;
+        }
+
+        ItemTemplate const* itemTemplate = sObjectMgr->GetItemTemplate(item);
+        if (!itemTemplate)
+        {
+            LOG_ERROR("sql.sql", "Table `mail_server_template_items` has an invalid item {} for templateID {}, skipped.", item, templateID);
+            continue;
+        }
+
+        uint32 stackable = itemTemplate->Stackable;
+        if (itemCount > stackable)
+        {
+            LOG_ERROR("sql.sql", "Table `mail_server_template_items` has itemCount {} exceeding item Stackable {} for item {}, skipped.", itemCount, stackable, item);
+            continue;
+        }
+
+        uint32 maxCount = itemTemplate->MaxCount;
+        if (maxCount && itemCount > maxCount)
+        {
+            LOG_ERROR("sql.sql", "Table `mail_server_template_items` has itemCount {} exceeding item MaxCount {} for item {}, skipped", itemCount, maxCount, item);
+            continue;
+        }
+
+        ServerMailItems mailItem;
+        mailItem.item = item;
+        mailItem.itemCount = itemCount;
+
+        if (faction == "Alliance")
+            _serverMailStore[templateID].itemsA.push_back(mailItem);
+        else if (faction == "Horde")
+            _serverMailStore[templateID].itemsH.push_back(mailItem);
+        else
+        {
+            LOG_ERROR("sql.sql", "Table `mail_server_template_items` has invalid faction value '{}' for id {}, skipped.", faction, templateID);
+            continue;
+        }
+
+    } while (result->NextRow());
 }
