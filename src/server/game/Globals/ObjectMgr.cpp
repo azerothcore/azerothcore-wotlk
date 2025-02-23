@@ -10424,17 +10424,23 @@ void ObjectMgr::LoadMailServerTemplatesItems()
             continue;
         }
 
+        if (!itemCount)
+        {
+            LOG_ERROR("sql.sql", "Table `mail_server_template_items` has itemCount 0 for item {}, skipped.", item);
+            continue;
+        }
+
         uint32 stackable = itemTemplate->Stackable;
         if (itemCount > stackable)
         {
-            LOG_ERROR("sql.sql", "Table `mail_server_template_items` has itemCount {} exceeding item Stackable {} for item {}, skipped.", itemCount, stackable, item);
+            LOG_ERROR("sql.sql", "Table `mail_server_template_items` has itemCount {} exceeding item_template.Stackable {} for item {}, skipped.", itemCount, stackable, item);
             continue;
         }
 
         uint32 maxCount = itemTemplate->MaxCount;
         if (maxCount && itemCount > maxCount)
         {
-            LOG_ERROR("sql.sql", "Table `mail_server_template_items` has itemCount {} exceeding item MaxCount {} for item {}, skipped", itemCount, maxCount, item);
+            LOG_ERROR("sql.sql", "Table `mail_server_template_items` has itemCount {} exceeding item_template.MaxCount {} for item {}, skipped", itemCount, maxCount, item);
             continue;
         }
 
