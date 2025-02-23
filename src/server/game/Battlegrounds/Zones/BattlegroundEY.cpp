@@ -774,7 +774,7 @@ void BattlegroundEY::EventBotTeamCapturedPoint(Creature const* bot, TeamId teamI
 
     _capturePointInfo[point]._ownerTeamId = teamId;
 
-    GraveyardStruct const* sg = sGraveyard->GetGraveyard(m_CapturingPointTypes[point].GraveYardId);
+    GraveyardStruct const* sg = sGraveyard->GetGraveyard(m_CapturingPointTypes[point].GraveyardId);
     AddSpiritGuide(point, sg->x, sg->y, sg->z, 3.124139f, teamId);
 
     UpdatePointsIcons(point);
@@ -946,7 +946,7 @@ GraveyardStruct const* BattlegroundEY::GetClosestGraveyardForBot(Creature* bot) 
     {
         if (_capturePointInfo[i].IsUnderControl(GetBotTeamId(bot->GetGUID())))
         {
-            entry = sGraveyard->GetGraveyard(m_CapturingPointTypes[i].GraveYardId);
+            entry = sGraveyard->GetGraveyard(m_CapturingPointTypes[i].GraveyardId);
             dist = (entry->x - x) * (entry->x - x) + (entry->y - y) * (entry->y - y) + (entry->z - z) * (entry->z - z);
             if (dist < minDist)
             {
