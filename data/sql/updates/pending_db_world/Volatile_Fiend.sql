@@ -30,6 +30,9 @@ INSERT INTO `waypoints` (`entry`, `pointid`, `position_x`, `position_y`, `positi
 -- Remove Wrong Flag (Pacified)
 UPDATE `creature_template` SET `unit_flags`=`unit_flags`& ~131072 WHERE (`entry` = 25851);
 
+-- Set Movement Type on Random in Radius
+UPDATE `creature` SET `wander_distance` = 5, `MovementType` = 1 WHERE (`id1` = 25851) AND (`guid` IN (47044, 47153, 47154, 47155, 47265, 47309, 47313, 47449, 47454, 47470, 47471, 47475, 47578, 47607, 47608, 47768, 47769, 47875, 47884, 47893, 47897, 47898, 47899, 47901, 48151));
+
 -- Modify SmartAI
 UPDATE `creature_template` SET `AIName` = 'SmartAI' WHERE `entry` = 25851;
 
