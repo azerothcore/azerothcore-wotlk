@@ -89,11 +89,8 @@ public:
     struct boss_nothAI : public BossAI
     {
         explicit boss_nothAI(Creature* c) : BossAI(c, BOSS_NOTH), summons(me)
-        {
-            pInstance = me->GetInstanceScript();
-        }
+        {}
 
-        InstanceScript* pInstance;
         uint8 timesInBalcony;
         EventMap events;
         SummonList summons;
@@ -151,13 +148,6 @@ public:
             me->SetControlled(false, UNIT_STATE_ROOT);
             me->SetReactState(REACT_AGGRESSIVE);
             timesInBalcony = 0;
-            if (pInstance)
-            {
-                if (GameObject* go = me->GetMap()->GetGameObject(pInstance->GetGuidData(DATA_NOTH_ENTRY_GATE)))
-                {
-                    go->SetGoState(GO_STATE_ACTIVE);
-                }
-            }
         }
 
         void EnterEvadeMode(EvadeReason why) override
@@ -171,13 +161,6 @@ public:
             BossAI::JustEngagedWith(who);
             Talk(SAY_AGGRO);
             StartGroundPhase();
-            if (pInstance)
-            {
-                if (GameObject* go = me->GetMap()->GetGameObject(pInstance->GetGuidData(DATA_NOTH_ENTRY_GATE)))
-                {
-                    go->SetGoState(GO_STATE_READY);
-                }
-            }
         }
 
         void JustSummoned(Creature* summon) override
@@ -195,13 +178,6 @@ public:
             }
             BossAI::JustDied(killer);
             Talk(SAY_DEATH);
-            if (pInstance)
-            {
-                if (GameObject* go = me->GetMap()->GetGameObject(pInstance->GetGuidData(DATA_NOTH_ENTRY_GATE)))
-                {
-                    go->SetGoState(GO_STATE_ACTIVE);
-                }
-            }
         }
 
         void KilledUnit(Unit* who) override
@@ -210,10 +186,7 @@ public:
                 return;
 
             Talk(SAY_SLAY);
-            if (pInstance)
-            {
-                pInstance->SetData(DATA_IMMORTAL_FAIL, 0);
-            }
+            instance->StorePersistentData(PERSISTENT_DATA_IMMORTAL_FAIL, 1);
         }
 
         void UpdateAI(uint32 diff) override
