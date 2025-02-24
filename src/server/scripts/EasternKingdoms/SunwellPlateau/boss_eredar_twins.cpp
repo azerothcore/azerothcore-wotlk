@@ -83,7 +83,6 @@ struct boss_sacrolash : public BossAI
         _isSisterDead = false;
         BossAI::Reset();
         me->SetLootMode(0);
-        me->m_Events.KillAllEvents(false);
     }
 
     void DoAction(int32 param) override
@@ -124,10 +123,7 @@ struct boss_sacrolash : public BossAI
             if (alythess->IsAlive() && !alythess->IsInCombat())
                 alythess->AI()->AttackStart(who);
 
-        me->m_Events.AddEventAtOffset([&] {
-            Talk(YELL_BERSERK);
-            DoCastSelf(SPELL_ENRAGE, true);
-        }, 6min);
+        ScheduleEnrageTimer(SPELL_ENRAGE, 6min, YELL_BERSERK);
 
         ScheduleTimedEvent(10s, [&] {
             DoCastSelf(SPELL_SHADOW_BLADES);
@@ -195,7 +191,6 @@ struct boss_alythess : public BossAI
         _isSisterDead = false;
         BossAI::Reset();
         me->SetLootMode(0);
-        me->m_Events.KillAllEvents(false);
     }
 
     void DoAction(int32 param) override
@@ -236,10 +231,7 @@ struct boss_alythess : public BossAI
             if (sacrolash->IsAlive() && !sacrolash->IsInCombat())
                 sacrolash->AI()->AttackStart(who);
 
-        me->m_Events.AddEventAtOffset([&] {
-            Talk(YELL_BERSERK);
-            DoCastSelf(SPELL_ENRAGE, true);
-        }, 6min);
+        ScheduleEnrageTimer(SPELL_ENRAGE, 6min, YELL_BERSERK);
 
         ScheduleTimedEvent(1s, [&] {
             DoCastVictim(SPELL_BLAZE);
