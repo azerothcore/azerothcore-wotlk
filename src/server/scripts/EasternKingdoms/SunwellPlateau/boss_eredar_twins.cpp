@@ -83,6 +83,10 @@ struct boss_sacrolash : public BossAI
         _isSisterDead = false;
         BossAI::Reset();
         me->SetLootMode(0);
+        
+        if (Creature* alythess = instance->GetCreature(DATA_ALYTHESS))
+            if (!alythess->IsAlive())
+                alythess->Respawn(true);
     }
 
     void DoAction(int32 param) override
@@ -101,18 +105,6 @@ struct boss_sacrolash : public BossAI
                     target = me->GetVictim();
                 me->CastSpell(target, SPELL_CONFLAGRATION, false);
             }, 30s, 35s);
-        }
-    }
-
-    void EnterEvadeMode(EvadeReason why) override
-    {
-        BossAI::EnterEvadeMode(why);
-        if (Creature* alythess = instance->GetCreature(DATA_ALYTHESS))
-        {
-            if (!alythess->IsAlive())
-                alythess->Respawn(true);
-            else if (!alythess->IsInEvadeMode())
-                alythess->AI()->EnterEvadeMode(why);
         }
     }
 
@@ -191,6 +183,10 @@ struct boss_alythess : public BossAI
         _isSisterDead = false;
         BossAI::Reset();
         me->SetLootMode(0);
+        
+        if (Creature* sacrolash = instance->GetCreature(DATA_SACROLASH))
+            if (!sacrolash->IsAlive())
+                sacrolash->Respawn(true);
     }
 
     void DoAction(int32 param) override
@@ -209,18 +205,6 @@ struct boss_alythess : public BossAI
                     target = me->GetVictim();
                 DoCast(target, SPELL_SHADOW_NOVA);
             }, 30s, 35s);
-        }
-    }
-
-    void EnterEvadeMode(EvadeReason why) override
-    {
-        BossAI::EnterEvadeMode(why);
-        if (Creature* sacrolash = instance->GetCreature(DATA_SACROLASH))
-        {
-            if (!sacrolash->IsAlive())
-                sacrolash->Respawn(true);
-            else if (!sacrolash->IsInEvadeMode())
-                sacrolash->AI()->EnterEvadeMode(why);
         }
     }
 
