@@ -22,6 +22,7 @@
 #include "SpellInfo.h"
 #include "SpellScript.h"
 #include "SpellScriptLoader.h"
+#include "SpellAuraEffects.h"
 #include "sunwell_plateau.h"
 
 enum Quotes
@@ -365,8 +366,15 @@ public:
         return ValidateSpellInfo({ _touchSpell });
     }
 
-    void OnPeriodic(AuraEffect const* /*aurEff*/)
+    void OnPeriodic(AuraEffect const* aurEff)
     {
+        if (aurEff->GetId() == SPELL_FLAME_SEAR)
+        {
+            uint32 tick = aurEff->GetTickNumber();
+            if (tick % 2 != 0 || tick > 10)
+                return;
+        }
+
         if (Unit* owner = GetOwner()->ToUnit())
             owner->CastSpell(owner, _touchSpell, true);
     }
