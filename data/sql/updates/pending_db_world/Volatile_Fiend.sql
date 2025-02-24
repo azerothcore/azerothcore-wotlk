@@ -30,7 +30,7 @@ INSERT INTO `waypoints` (`entry`, `pointid`, `position_x`, `position_y`, `positi
 -- Remove Wrong Flag (Pacified)
 UPDATE `creature_template` SET `unit_flags`=`unit_flags`& ~131072 WHERE (`entry` = 25851);
 
--- Updated comments and modified row 3 (setted point to 24, it was 20).
+-- Modify SmartAI
 UPDATE `creature_template` SET `AIName` = 'SmartAI' WHERE `entry` = 25851;
 
 DELETE FROM `smart_scripts` WHERE (`source_type` = 0 AND `entryorguid` = 25851);
