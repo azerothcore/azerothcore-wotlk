@@ -134,7 +134,7 @@ struct boss_felmyst : public BossAI
     void JustEngagedWith(Unit* who) override
     {
         BossAI::JustEngagedWith(who);
-        me->CastSpell(me, SPELL_NOXIOUS_FUMES, true);
+
         me->m_Events.AddEventAtOffset([&] {
             Talk(YELL_BERSERK);
             DoCastSelf(SPELL_BERSERK, true);
@@ -144,7 +144,7 @@ struct boss_felmyst : public BossAI
 
         Position landPos = who->GetPosition();
         me->m_Events.AddEventAtOffset([&, landPos] {
-            me->GetMotionMaster()->MovePoint(POINT_GROUND, landPos, false, true);
+            me->GetMotionMaster()->MoveLand(POINT_GROUND, landPos);
         }, 2s);
     }
 
@@ -168,11 +168,14 @@ struct boss_felmyst : public BossAI
 
     void MovementInform(uint32 type, uint32 point) override
     {
-        if (type != POINT_MOTION_TYPE)
+        if (type != EFFECT_MOTION_TYPE && type != POINT_MOTION_TYPE)
             return;
 
         if (point == POINT_GROUND)
         {
+            if (!me->HasAura(SPELL_NOXIOUS_FUMES))
+                DoCastSelf(SPELL_NOXIOUS_FUMES, true);
+
             me->HandleEmoteCommand(EMOTE_ONESHOT_LAND);
             me->SetCanFly(false);
             me->SetDisableGravity(false);
