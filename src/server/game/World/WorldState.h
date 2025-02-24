@@ -206,7 +206,7 @@ class WorldState
         void AddSunwellGateProgress(uint32 questId);
         void AddSunsReachProgress(uint32 questId);
         std::string GetSunsReachPrintout();
-        void FillInitialWorldStates(ByteBuffer& data, uint32 zoneId, uint32 areaId);
+        void FillInitialWorldStates(WorldPackets::WorldState::InitWorldStates& packet, uint32 zoneId, uint32 /*areaId*/);
         void HandleSunsReachPhaseTransition(uint32 newPhase);
         void HandleSunsReachSubPhaseTransition(int32 subPhaseMask, bool initial = false);
         void SetSunsReachCounter(SunsReachCounters index, uint32 value);

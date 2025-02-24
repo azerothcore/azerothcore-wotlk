@@ -1119,17 +1119,6 @@ PreventAFKLogout = 0
 ###################################################################################################
 # PACKET SPOOF PROTECTION SETTINGS
 #
-# These settings determine which action to take when harmful packet spoofing is detected.
-#
-#    PacketSpoof.Policy
-#        Description: Determines the course of action when packet spoofing is detected.
-#        Values:     0 - Log only
-#                    1 - Log + kick
-#                    2 - Log + kick + ban
-
-PacketSpoof.Policy = 1
-
-#
 #    PacketSpoof.BanMode
 #        Description: If PacketSpoof.Policy equals 2, this will determine the ban mode.
 #        Values:     0 - Ban Account

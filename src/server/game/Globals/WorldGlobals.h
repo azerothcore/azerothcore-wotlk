@@ -15,42 +15,30 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef ACORE_GRID_TERRAIN_LOADER_H
-#define ACORE_GRID_TERRAIN_LOADER_H
+#ifndef __WORLDGLOBALS_H
+#define __WORLDGLOBALS_H
 
-#include "GridDefines.h"
+#include "Common.h"
+#include "Opcodes.h"
 
-class GridTerrainLoader
+struct AntiDosOpcodePolicy
 {
-public:
-    GridTerrainLoader(MapGridType& grid, Map* map)
-        : _grid(grid), _map(map) { }
-
-    void LoadTerrain();
-
-    static bool ExistMap(uint32 mapid, int gx, int gy);
-    static bool ExistVMap(uint32 mapid, int gx, int gy);
-
-private:
-    void LoadMap();
-    void LoadVMap();
-    void LoadMMap();
-
-    MapGridType& _grid;
-    Map* _map;
+    uint8 Policy;
+    uint16 MaxAllowedCount;
 };
 
-class GridTerrainUnloader
+class WorldGlobals
 {
 public:
-    GridTerrainUnloader(MapGridType& grid, Map* map)
-        : _grid(grid), _map(map) { }
+    static WorldGlobals* instance();
 
-    void UnloadTerrain();
+    void LoadAntiDosOpcodePolicies();
+    AntiDosOpcodePolicy const* GetAntiDosPolicyForOpcode(uint16 opcode);
 
 private:
-    MapGridType& _grid;
-    Map* _map;
+    std::array<std::unique_ptr<AntiDosOpcodePolicy>, NUM_OPCODE_HANDLERS> _antiDosOpcodePolicies;
 };
+
+#define sWorldGlobals WorldGlobals::instance()
 
 #endif
