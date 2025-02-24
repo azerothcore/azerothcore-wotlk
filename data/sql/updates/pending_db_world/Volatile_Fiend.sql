@@ -27,6 +27,9 @@ INSERT INTO `waypoints` (`entry`, `pointid`, `position_x`, `position_y`, `positi
 (25851, 23, 1583.75, 521.830, 32.7347, NULL, 0, 'Volatile Fiend'),
 (25851, 24, 1588.91, 506.692, 32.7835, NULL, 0, 'Volatile Fiend');
 
+-- Remove Wrong Flag (Pacified)
+UPDATE `creature_template` SET `unit_flags`=`unit_flags`& ~131072 WHERE (`entry` = 25851);
+
 -- Updated comments and modified row 3 (setted point to 24, it was 20).
 UPDATE `creature_template` SET `AIName` = 'SmartAI' WHERE `entry` = 25851;
 
@@ -35,10 +38,10 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 (25851, 0, 0, 1, 54, 0, 100, 513, 0, 0, 0, 0, 0, 0, 11, 46308, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Volatile Fiend - On Just Summoned - Cast \'Burning Winds\' (No Repeat)'),
 (25851, 0, 1, 2, 61, 0, 100, 512, 0, 0, 0, 0, 0, 0, 22, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Volatile Fiend - On Just Summoned - Set Event Phase 1 (No Repeat)'),
 (25851, 0, 2, 0, 61, 0, 100, 512, 0, 0, 0, 0, 0, 0, 53, 1, 25851, 0, 0, 2500, 2, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Volatile Fiend - On Just Summoned - Start Waypoint Path 25851 (No Repeat)'),
-(25851, 0, 3, 8, 40, 0, 100, 0, 24, 0, 0, 0, 0, 0, 11, 47287, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Volatile Fiend - On Point 24 of Path Any Reached - Cast \'Burning Destruction\''),
-(25851, 0, 4, 0, 6, 1, 100, 512, 0, 0, 0, 0, 0, 0, 11, 46218, 2, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Volatile Fiend - On Just Died - Cast \'Burning Destruction\' (Phase 1)'),
+(25851, 0, 3, 4, 40, 0, 100, 0, 24, 0, 0, 0, 0, 0, 11, 47287, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Volatile Fiend - On Point 24 of Path Any Reached - Cast \'Burning Destruction\''),
+(25851, 0, 4, 0, 61, 0, 100, 512, 0, 0, 0, 0, 0, 0, 41, 1000, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Volatile Fiend - On Point 24 of Path Any Reached - Despawn In 1000 ms'),
 (25851, 0, 5, 0, 6, 2, 100, 512, 0, 0, 0, 0, 0, 0, 11, 45779, 2, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Volatile Fiend - On Just Died - Cast \'Felfire Fission\' (Phase 2)'),
-(25851, 0, 6, 8, 9, 1, 100, 513, 0, 0, 0, 0, 0, 5, 11, 46218, 2, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Volatile Fiend - Within 0-5 Range - Cast \'Burning Destruction\' (Phase 1) (No Repeat)'),
-(25851, 0, 7, 8, 9, 2, 100, 513, 0, 0, 0, 0, 0, 5, 11, 45779, 2, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Volatile Fiend - Within 0-5 Range - Cast \'Felfire Fission\' (Phase 2) (No Repeat)'),
-(25851, 0, 8, 0, 61, 0, 100, 512, 0, 0, 0, 0, 0, 0, 41, 500, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Volatile Fiend - On Point 24 of Path Any Reached - Despawn In 500 ms'),
-(25851, 0, 9, 0, 25, 0, 100, 512, 0, 0, 0, 0, 0, 0, 22, 2, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Volatile Fiend - On Reset - Set Event Phase 2');
+(25851, 0, 6, 7, 0, 1, 100, 513, 0, 0, 0, 0, 0, 5, 11, 47287, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Volatile Fiend - In Combat - Cast \'Burning Destruction\' (Phase 1) (No Repeat)'),
+(25851, 0, 7, 0, 61, 0, 100, 0, 0, 0, 0, 0, 0, 0, 22, 3, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Volatile Fiend - In Combat - Set Event Phase 3 (Phase 1) (No Repeat)'),
+(25851, 0, 8, 0, 25, 0, 100, 512, 0, 0, 0, 0, 0, 0, 22, 2, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Volatile Fiend - On Reset - Set Event Phase 2'),
+(25851, 0, 9, 0, 23, 4, 100, 1, 47287, 0, 0, 0, 0, 0, 11, 46751, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Volatile Fiend - On Aura \'Burning Destruction\' - Cast \'Suicide\' (Phase 3) (No Repeat)');
