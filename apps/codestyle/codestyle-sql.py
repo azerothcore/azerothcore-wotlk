@@ -234,7 +234,7 @@ def backtick_check(file: io, file_path: str) -> None:
                 # Skip SQL keywords
                 if word.upper() in {"SELECT", "FROM", "JOIN", "WHERE", "GROUP", "BY", "ORDER", 
                                     "DELETE", "UPDATE", "INSERT", "INTO", "SET", "VALUES", "AND",
-                                    "IN", "OR", "REPLACE"}:
+                                    "IN", "OR", "REPLACE", "NOT"}:
                     continue
 
                 # Make sure the word is enclosed in backticks
