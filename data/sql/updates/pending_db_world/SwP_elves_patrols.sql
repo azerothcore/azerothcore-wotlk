@@ -167,12 +167,10 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 (-54817, 0, 3, 0, 1, 0, 100, 0, 0, 0, 15000, 45000, 0, 0, 11, 46319, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Sunblade Cabalist - Out of Combat - Cast \'Felblood Channel\''),
 (-54825, 0, 3, 0, 1, 0, 100, 0, 0, 0, 15000, 45000, 0, 0, 11, 46319, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Sunblade Cabalist - Out of Combat - Cast \'Felblood Channel\''),
 (-54824, 0, 3, 0, 1, 0, 100, 0, 0, 0, 15000, 45000, 0, 0, 11, 46319, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Sunblade Cabalist - Out of Combat - Cast \'Felblood Channel\''),
-
 (-42647, 0, 3, 0, 1, 0, 100, 0, 0, 0, 15000, 45000, 0, 0, 11, 46319, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Sunblade Dusk Priest - Out of Combat - Cast \'Felblood Channel\''),
 (-42656, 0, 3, 0, 1, 0, 100, 0, 0, 0, 15000, 45000, 0, 0, 11, 46319, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Sunblade Dusk Priest - Out of Combat - Cast \'Felblood Channel\''),
 (-42657, 0, 3, 0, 1, 0, 100, 0, 0, 0, 15000, 45000, 0, 0, 11, 46319, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Sunblade Dusk Priest - Out of Combat - Cast \'Felblood Channel\''),
 (-42640, 0, 3, 0, 1, 0, 100, 0, 0, 0, 15000, 45000, 0, 0, 11, 46319, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Sunblade Dusk Priest - Out of Combat - Cast \'Felblood Channel\''),
-
 (-43439, 0, 3, 0, 1, 0, 100, 0, 0, 0, 15000, 45000, 0, 0, 11, 46319, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Sunblade Dawn Priest - Out of Combat - Cast \'Felblood Channel\''),
 (-42894, 0, 3, 0, 1, 0, 100, 0, 0, 0, 15000, 45000, 0, 0, 11, 46319, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Sunblade Dawn Priest - Out of Combat - Cast \'Felblood Channel\''),
 (-43654, 0, 3, 0, 1, 0, 100, 0, 0, 0, 15000, 45000, 0, 0, 11, 46319, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Sunblade Dawn Priest - Out of Combat - Cast \'Felblood Channel\''),
