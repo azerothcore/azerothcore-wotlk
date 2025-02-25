@@ -2266,6 +2266,9 @@ void InstanceMap::CreateInstanceScript(bool load, std::string data, uint32 compl
     if (!instance_data)
         return;
 
+    //grids need to be loaded before Initialize the instance script
+    OnCreateMap();
+
     // use mangos behavior if we are dealing with Eluna AI
     // initialize should then be called only if load is false
     if (!isOtherAI || !load)
