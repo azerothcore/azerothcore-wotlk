@@ -22,6 +22,7 @@
 #include "SpellInfo.h"
 #include "SpellScript.h"
 #include "SpellScriptLoader.h"
+#include "SpellAuraEffects.h"
 #include "sunwell_plateau.h"
 
 enum Quotes
@@ -83,6 +84,10 @@ struct boss_sacrolash : public BossAI
         _isSisterDead = false;
         BossAI::Reset();
         me->SetLootMode(0);
+
+        if (Creature* alythess = instance->GetCreature(DATA_ALYTHESS))
+            if (!alythess->IsAlive())
+                alythess->Respawn(true);
     }
 
     void DoAction(int32 param) override
@@ -101,18 +106,6 @@ struct boss_sacrolash : public BossAI
                     target = me->GetVictim();
                 me->CastSpell(target, SPELL_CONFLAGRATION, false);
             }, 30s, 35s);
-        }
-    }
-
-    void EnterEvadeMode(EvadeReason why) override
-    {
-        BossAI::EnterEvadeMode(why);
-        if (Creature* alythess = instance->GetCreature(DATA_ALYTHESS))
-        {
-            if (!alythess->IsAlive())
-                alythess->Respawn(true);
-            else if (!alythess->IsInEvadeMode())
-                alythess->AI()->EnterEvadeMode(why);
         }
     }
 
@@ -191,6 +184,10 @@ struct boss_alythess : public BossAI
         _isSisterDead = false;
         BossAI::Reset();
         me->SetLootMode(0);
+
+        if (Creature* sacrolash = instance->GetCreature(DATA_SACROLASH))
+            if (!sacrolash->IsAlive())
+                sacrolash->Respawn(true);
     }
 
     void DoAction(int32 param) override
@@ -209,18 +206,6 @@ struct boss_alythess : public BossAI
                     target = me->GetVictim();
                 DoCast(target, SPELL_SHADOW_NOVA);
             }, 30s, 35s);
-        }
-    }
-
-    void EnterEvadeMode(EvadeReason why) override
-    {
-        BossAI::EnterEvadeMode(why);
-        if (Creature* sacrolash = instance->GetCreature(DATA_SACROLASH))
-        {
-            if (!sacrolash->IsAlive())
-                sacrolash->Respawn(true);
-            else if (!sacrolash->IsInEvadeMode())
-                sacrolash->AI()->EnterEvadeMode(why);
         }
     }
 
@@ -381,8 +366,15 @@ public:
         return ValidateSpellInfo({ _touchSpell });
     }
 
-    void OnPeriodic(AuraEffect const* /*aurEff*/)
+    void OnPeriodic(AuraEffect const* aurEff)
     {
+        if (aurEff->GetId() == SPELL_FLAME_SEAR)
+        {
+            uint32 tick = aurEff->GetTickNumber();
+            if (tick % 2 != 0 || tick > 10)
+                return;
+        }
+
         if (Unit* owner = GetOwner()->ToUnit())
             owner->CastSpell(owner, _touchSpell, true);
     }
