@@ -709,9 +709,9 @@ class spell_kologarn_focused_eyebeam : public SpellScript
         targets.clear();
 
         // Select a random target
-        auto front = newTargets.begin();
-        advance(front, urand(0, newTargets.size() - 1));
-        targets.push_back(*front);
+        std::list<Unit*>::iterator head = newTargets.begin();
+        advance(head, urand(0, newTargets.size() - 1));
+        targets.push_back(*head);
     }
 
     void Register() override
