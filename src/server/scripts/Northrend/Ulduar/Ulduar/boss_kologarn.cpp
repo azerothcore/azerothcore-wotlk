@@ -478,12 +478,8 @@ public:
                 case EVENT_FOCUSED_EYEBEAM:
                 {
                     events.ScheduleEvent(EVENT_FOCUSED_EYEBEAM, 20s);
-
-                    if (Unit* eyebeamTarget = SelectTarget(SelectTargetMethod::MaxDistance, 0, 0, true))
-                    {
-                        me->CastSpell(eyebeamTarget, SPELL_FOCUSED_EYEBEAM_SUMMON, false);
-                        Talk(EMOTE_EYES);
-                    }
+                    me->CastSpell(me, SPELL_FOCUSED_EYEBEAM_SUMMON, false);
+                    Talk(EMOTE_EYES);
                     return;
                 }
                 case EVENT_RESTORE_ARM_LEFT:
@@ -673,6 +669,55 @@ public:
             }
         }
     };
+};
+
+class spell_kologarn_focused_eyebeam : public SpellScript
+{
+    PrepareSpellScript(spell_kologarn_focused_eyebeam);
+
+    bool Load() override
+    {
+        if (!GetCaster()->IsCreature())
+            return false;
+
+        return true;
+    }
+
+    void FilterTargetsInitial(std::list<WorldObject*>& targets)
+    {
+        std::list<Unit*> newTargets;
+        Creature* creature = GetCaster()->ToCreature();
+        // Select 3 most distant targets
+        GetCaster()->GetAI()->SelectTargetList(newTargets, 3, SelectTargetMethod::MaxDistance, 0, NonTankTargetSelector(creature, true));
+
+        // If no distant targets available, get 1 target from original list
+        if (newTargets.empty())
+        {
+            if (!targets.empty())
+            {
+                while (1 < targets.size())
+                {
+                    std::list<WorldObject*>::iterator itr = targets.begin();
+                    advance(itr, urand(0, targets.size() - 1));
+                    targets.erase(itr);
+                }
+            }
+            return;
+        }
+
+        // Clear original targets
+        targets.clear();
+
+        // Select a random target
+        auto front = newTargets.begin();
+        advance(front, urand(0, newTargets.size() - 1));
+        targets.push_back(*front);
+    }
+
+    void Register() override
+    {
+        OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_kologarn_focused_eyebeam::FilterTargetsInitial, EFFECT_ALL, TARGET_UNIT_SRC_AREA_ENEMY);
+    }
 };
 
 struct boss_kologarn_pit_kill_bunny : public NullCreatureAI
@@ -892,6 +937,7 @@ void AddSC_boss_kologarn()
     RegisterSpellScript(spell_ulduar_stone_grip_cast_target);
     RegisterSpellScript(spell_ulduar_stone_grip_aura);
     RegisterSpellScript(spell_ulduar_squeezed_lifeless);
+    RegisterSpellScript(spell_kologarn_focused_eyebeam);
     RegisterSpellAndAuraScriptPair(spell_kologarn_stone_shout, spell_kologarn_stone_shout_aura);
 
     // Achievements
