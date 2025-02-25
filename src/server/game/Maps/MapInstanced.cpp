@@ -223,8 +223,6 @@ InstanceMap* MapInstanced::CreateInstance(uint32 InstanceId, InstanceSave* save,
                 map->GetInstanceScript()->SetTeamIdInInstance(leader->GetTeamId());
     }
 
-    map->OnCreateMap();
-
     if (!save) // this is for sure a dungeon (assert above), no need to check here
         sInstanceSaveMgr->AddInstanceSave(GetId(), InstanceId, difficulty);
 
