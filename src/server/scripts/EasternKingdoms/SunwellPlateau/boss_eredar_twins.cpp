@@ -84,7 +84,7 @@ struct boss_sacrolash : public BossAI
         _isSisterDead = false;
         BossAI::Reset();
         me->SetLootMode(0);
-        
+
         if (Creature* alythess = instance->GetCreature(DATA_ALYTHESS))
             if (!alythess->IsAlive())
                 alythess->Respawn(true);
@@ -184,7 +184,7 @@ struct boss_alythess : public BossAI
         _isSisterDead = false;
         BossAI::Reset();
         me->SetLootMode(0);
-        
+
         if (Creature* sacrolash = instance->GetCreature(DATA_SACROLASH))
             if (!sacrolash->IsAlive())
                 sacrolash->Respawn(true);
