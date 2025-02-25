@@ -1,3 +1,4 @@
+-- DB update 2025_02_24_00 -> 2025_02_25_00
 -- update Mr. Bigglesworth script name
 UPDATE `creature_template` SET `ScriptName` = 'npc_mr_bigglesworth' WHERE (`entry` = 16998);
 
