@@ -1,3 +1,4 @@
+-- DB update 2025_02_26_02 -> 2025_02_26_03
 -- Update gameobject 'Smuggled Mana Cell' with sniffed values
 -- updated spawns
 DELETE FROM `gameobject` WHERE (`id` IN (187039))
