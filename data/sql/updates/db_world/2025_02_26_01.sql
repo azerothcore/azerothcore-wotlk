@@ -1,3 +1,4 @@
+-- DB update 2025_02_26_00 -> 2025_02_26_01
 
 -- Add new waypoints
 DELETE FROM `waypoints` WHERE `entry` IN (25851);

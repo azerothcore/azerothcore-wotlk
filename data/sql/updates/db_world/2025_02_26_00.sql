@@ -1,3 +1,4 @@
+-- DB update 2025_02_25_00 -> 2025_02_26_00
 
 -- New sniffed waypoints for Vindicators
 DELETE FROM `waypoint_data` WHERE `id` IN (483970);
