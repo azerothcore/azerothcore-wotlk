@@ -1,3 +1,4 @@
+-- DB update 2025_02_26_01 -> 2025_02_26_02
 
 -- Remove old formation (it will be changed with 48372)
 DELETE FROM `creature_formations` WHERE `leaderGUID` = 41817;
