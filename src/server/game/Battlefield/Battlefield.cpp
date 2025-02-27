@@ -403,6 +403,8 @@ void Battlefield::AskToLeaveQueue(Player* player)
 {
     // Remove player from queue
     m_PlayersInQueue[player->GetTeamId()].erase(player->GetGUID());
+    // Send notification
+    player->GetSession()->SendBfLeaveMessage(m_BattleId, BF_LEAVE_REASON_CLOSE);
 }
 
 // Called in WorldSession::HandleHearthAndResurrect
