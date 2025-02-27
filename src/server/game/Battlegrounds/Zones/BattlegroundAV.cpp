@@ -1120,10 +1120,10 @@ void BattlegroundAV::FillInitialWorldStates(WorldPackets::WorldState::InitWorldS
     {
         packet.Worldstates.emplace_back(AV_SNOWFALL_N, 1);
     }
-  
+
     packet.Worldstates.emplace_back(AV_Alliance_Score, m_Team_Scores[0]);
     packet.Worldstates.emplace_back(AV_Horde_Score, m_Team_Scores[1]);
-  
+
     packet.Worldstates.emplace_back(AV_SHOW_A_SCORE, GetStatus() == STATUS_IN_PROGRESS && BG_AV_SCORE_INITIAL_POINTS > 0 ? 1 : 0);
     packet.Worldstates.emplace_back(AV_SHOW_H_SCORE, GetStatus() == STATUS_IN_PROGRESS && BG_AV_SCORE_INITIAL_POINTS > 0 ? 1 : 0);
 

@@ -245,9 +245,7 @@ void BattlegroundAB::FillInitialWorldStates(WorldPackets::WorldState::InitWorldS
 
         for (uint8 i = BG_AB_NODE_STATE_ALLY_OCCUPIED; i <= BG_AB_NODE_STATE_HORDE_CONTESTED; ++i)
             packet.Worldstates.emplace_back(node._iconCapture + i - 1, node._state == i ? 1 : 0);
-
     }
-
 
     packet.Worldstates.emplace_back(BG_AB_OP_OCCUPIED_BASES_ALLY, _controlledPoints[TEAM_ALLIANCE]);
     packet.Worldstates.emplace_back(BG_AB_OP_OCCUPIED_BASES_HORDE, _controlledPoints[TEAM_HORDE]);
