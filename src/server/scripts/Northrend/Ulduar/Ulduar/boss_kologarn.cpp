@@ -629,13 +629,14 @@ public:
     }
     struct boss_kologarn_eyebeamAI : public ScriptedAI
     {
-        boss_kologarn_eyebeamAI(Creature* c) : ScriptedAI(c), _damaged(false), justSpawned(true)
+        boss_kologarn_eyebeamAI(Creature* c) : ScriptedAI(c), _timer(1), _damaged(false)
         {
             m_pInstance = (InstanceScript*)c->GetInstanceScript();
         }
 
         InstanceScript* m_pInstance;
-        bool _damaged, justSpawned;
+        uint32 _timer;
+        bool _damaged;
 
         void DamageDealt(Unit* /*victim*/, uint32& damage, DamageEffectType /*damageType*/, SpellSchoolMask /*damageSchoolMask*/) override
         {
@@ -647,25 +648,36 @@ public:
             }
         }
 
-        void UpdateAI(uint32 /*diff*/) override
+        void IsSummonedBy(WorldObject* summoner) override
         {
-            if (justSpawned)
+            if (!summoner)
             {
-                if (ObjectGuid summoner = me->GetSummonerGUID())
-                {
-                    if (Unit* target = ObjectAccessor::GetUnit(*me, summoner))
-                    {
-                        me->Attack(target, false);
-                        me->GetMotionMaster()->MoveChase(target);
-                    }
-                }
+                return;
+            }
+
+            // Should only work on playable characters
+            if (Player* player = summoner->ToPlayer())
+            {
+                me->Attack(player, false);
+                me->GetMotionMaster()->MoveChase(player);
 
                 if (Creature* cr = ObjectAccessor::GetCreature(*me, m_pInstance->GetGuidData(TYPE_KOLOGARN)))
                 {
                     me->CastSpell(cr, me->GetEntry() == NPC_EYE_LEFT ? SPELL_FOCUSED_EYEBEAM_LEFT : SPELL_FOCUSED_EYEBEAM_RIGHT, true);
-                    me->CastSpell(me, SPELL_FOCUSED_EYEBEAM, true);
                 }
-                justSpawned = false;
+            }
+        }
+
+        void UpdateAI(uint32 diff) override
+        {
+            if (_timer)
+            {
+                _timer += diff;
+                if (_timer >= 2000)
+                {
+                    me->CastSpell(me, SPELL_FOCUSED_EYEBEAM, true);
+                    _timer = 0;
+                }
             }
         }
     };
@@ -677,10 +689,7 @@ class spell_kologarn_focused_eyebeam : public SpellScript
 
     bool Load() override
     {
-        if (!GetCaster()->IsCreature())
-            return false;
-
-        return true;
+        return GetCaster()->IsCreature();
     }
 
     void FilterTargetsInitial(std::list<WorldObject*>& targets)
@@ -779,18 +788,16 @@ class spell_ulduar_stone_grip_cast_target : public SpellScript
 
     bool Load() override
     {
-        if (!GetCaster()->IsCreature())
-            return false;
-        return true;
+        return GetCaster()->IsCreature();
     }
 
     void FilterTargetsInitial(std::list<WorldObject*>& targets)
     {
         // Remove "main tank" and non-player targets
-        targets.remove_if (StoneGripTargetSelector(GetCaster()->ToCreature(), GetCaster()->GetVictim()));
+        targets.remove_if(StoneGripTargetSelector(GetCaster()->ToCreature(), GetCaster()->GetVictim()));
         // Maximum affected targets per difficulty mode
         uint32 maxTargets = 1;
-        if (GetSpellInfo()->Id == 63981)
+        if (GetSpellInfo()->Id == SPELL_STONE_GRIP_25)
             maxTargets = 3;
 
         // Return a random amount of targets based on maxTargets
