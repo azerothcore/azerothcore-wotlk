@@ -407,7 +407,7 @@ public:
     void SendInitWorldStatesTo(Player* player);
     void SendInitWorldStatesToAll() override;
     void FillInitialWorldStates(WorldPackets::WorldState::InitWorldStates& packet) override;
-    void SendUpdateWorldStates(Player* player = nullptr);
+    void SendUpdateWorldStates(Player* player = nullptr) override;
     void SendUpdateWorldStateMessage(uint32 variable, uint32 value, Player* player = nullptr);
 
     void HandleKill(Player* killer, Unit* victim) override;
