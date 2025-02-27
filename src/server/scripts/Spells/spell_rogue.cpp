@@ -508,7 +508,7 @@ class spell_rog_prey_on_the_weak : public AuraScript
         if (!victim && target->IsPlayer())
             victim = target->ToPlayer()->GetSelectedUnit();
 
-        if (victim && (target->GetHealthPct() > victim->GetHealthPct()))
+        if (victim && victim->IsAlive() && (target->GetHealthPct() > victim->GetHealthPct()))
         {
             if (!target->HasAura(SPELL_ROGUE_PREY_ON_THE_WEAK))
             {

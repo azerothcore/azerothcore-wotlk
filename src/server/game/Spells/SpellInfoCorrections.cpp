@@ -3342,6 +3342,7 @@ void SpellMgr::LoadSpellInfoCorrections()
     {
         spellInfo->Effects[EFFECT_0].RadiusEntry = sSpellRadiusStore.LookupEntry(EFFECT_RADIUS_20_YARDS); // 20yd
         spellInfo->Effects[EFFECT_1].RadiusEntry = sSpellRadiusStore.LookupEntry(EFFECT_RADIUS_20_YARDS); // 20yd
+        spellInfo->Effects[EFFECT_2].RadiusEntry = sSpellRadiusStore.LookupEntry(EFFECT_RADIUS_20_YARDS); // 20yd
     });
 
     // Rallying Shout
@@ -4882,6 +4883,19 @@ void SpellMgr::LoadSpellInfoCorrections()
         spellInfo->Effects[EFFECT_1].BasePoints = 0;
         spellInfo->Effects[EFFECT_0].RealPointsPerLevel = 0.25;
         spellInfo->Effects[EFFECT_1].RealPointsPerLevel = 0.25;
+    });
+
+    // Smash
+    // Dark Smash
+    ApplySpellFix({ 42669, 59706, 42723, 59709 }, [](SpellInfo* spellInfo)
+    {
+        spellInfo->AttributesEx2 &= ~SPELL_ATTR2_IGNORE_LINE_OF_SIGHT;
+    });
+
+    // Swoop (Moth hunter pet) root effect fix
+    ApplySpellFix({ 52825 }, [](SpellInfo* spellInfo)
+    {
+        spellInfo->Effects[EFFECT_2].TargetA = SpellImplicitTargetInfo(TARGET_UNIT_TARGET_ENEMY);
     });
 
     for (uint32 i = 0; i < GetSpellInfoStoreSize(); ++i)
