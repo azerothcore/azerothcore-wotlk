@@ -24,7 +24,8 @@ git clone --depth=1 --branch=master https://github.com/azerothcore/mod-cfbg modu
 git clone --depth=1 --branch=master https://github.com/azerothcore/mod-character-tools modules/mod-character-tools
 git clone --depth=1 --branch=master https://github.com/azerothcore/mod-chat-login modules/mod-chat-login
 git clone --depth=1 --branch=master https://github.com/azerothcore/mod-chat-transmitter modules/mod-chat-transmitter
-git clone --depth=1 --branch=master https://github.com/azerothcore/mod-chromie-xp modules/mod-chromie-xp
+# NOTE: disabled because it causes DB startup error
+# git clone --depth=1 --branch=master https://github.com/azerothcore/mod-chromie-xp modules/mod-chromie-xp
 git clone --depth=1 --branch=master https://github.com/azerothcore/mod-congrats-on-level modules/mod-congrats-on-level
 git clone --depth=1 --branch=master https://github.com/azerothcore/mod-costumes modules/mod-costumes
 git clone --depth=1 --branch=master https://github.com/azerothcore/mod-cta-switch modules/mod-cta-switch
