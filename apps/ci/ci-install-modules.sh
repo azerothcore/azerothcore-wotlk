@@ -40,8 +40,7 @@ git clone --depth=1 --branch=main   https://github.com/azerothcore/mod-global-ch
 git clone --depth=1 --branch=master https://github.com/azerothcore/mod-guild-zone-system modules/mod-guild-zone-system
 git clone --depth=1 --branch=master https://github.com/azerothcore/mod-guildhouse modules/mod-guildhouse
 git clone --depth=1 --branch=master https://github.com/azerothcore/mod-individual-xp modules/mod-individual-xp
-# not yet on azerothcore github
-git clone --depth=1 --branch=master https://github.com/nyeriah/mod-instanced-worldbosses modules/mod-instanced-worldbosses
+git clone --depth=1 --branch=master https://github.com/azerothcore/mod-instanced-worldbosses modules/mod-instanced-worldbosses
 git clone --depth=1 --branch=master https://github.com/azerothcore/mod-ip-tracker modules/mod-ip-tracker
 git clone --depth=1 --branch=master https://github.com/azerothcore/mod-item-level-up modules/mod-item-level-up
 git clone --depth=1 --branch=master https://github.com/azerothcore/mod-learn-highest-talent modules/mod-learn-highest-talent
