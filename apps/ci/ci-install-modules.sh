@@ -9,7 +9,6 @@ git clone --depth=1 --branch=master https://github.com/azerothcore/mod-ah-bot mo
 git clone --depth=1 --branch=master https://github.com/azerothcore/mod-anticheat modules/mod-anticheat
 git clone --depth=1 --branch=master https://github.com/azerothcore/mod-arena-3v3-solo-queue modules/mod-arena-3v3-solo-queue
 git clone --depth=1 --branch=main   https://github.com/azerothcore/mod-arena-replay modules/mod-arena-replay
-git clone --depth=1 --branch=master https://github.com/azerothcore/mod-arenaspectator modules/mod-arenaspectator
 git clone --depth=1 --branch=master https://github.com/azerothcore/mod-auto-revive modules/mod-auto-revive
 git clone --depth=1 --branch=master https://github.com/azerothcore/mod-autobalance modules/mod-autobalance
 # NOTE: disabled because it causes DB error
