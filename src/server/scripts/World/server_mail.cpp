@@ -16,10 +16,10 @@
  */
 
 #include "CreatureScript.h"
-#include "ObjectMgr.h"
 #include "Player.h"
 #include "PlayerScript.h"
 #include "QueryResult.h"
+#include "ServerMailMgr.h"
 
 class ServerMailReward : public PlayerScript
 {
@@ -30,7 +30,7 @@ public:
     void OnPlayerLogin(Player* player) override
     {
         // Retrieve all server mail records and session only once
-        auto const& serverMailStore = sObjectMgr->GetAllServerMailStore();
+        auto const& serverMailStore = sServerMailMgr->GetAllServerMailStore();
         WorldSession* session = player->GetSession();
         // We should always have a session, just incase
         if (!session)
@@ -54,7 +54,7 @@ public:
                     {
                         std::vector<ServerMailItems> const& items = isAlliance ? servMail.itemsA : servMail.itemsH;
 
-                        sObjectMgr->SendServerMail(
+                        sServerMailMgr->SendServerMail(
                             session->GetPlayer(),
                             servMail.id,
                             servMail.reqLevel,

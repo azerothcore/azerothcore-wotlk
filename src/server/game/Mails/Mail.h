@@ -210,28 +210,4 @@ struct Mail
     [[nodiscard]] bool IsReturnedMail() const { return checked & MAIL_CHECK_MASK_RETURNED; }
 };
 
-struct ServerMailItems
-{
-    ServerMailItems() = default;
-    uint32 item{ 0 };
-    uint32 itemCount{ 0 };
-};
-
-struct ServerMail
-{
-    ServerMail() = default;
-    uint32 id{ 0 };
-    uint8 reqLevel{ 0 };
-    uint32 reqPlayTime{ 0 };
-    uint32 moneyA{ 0 };
-    uint32 moneyH{ 0 };
-    std::string subject;
-    std::string body;
-    uint8 active{ 0 };
-
-    // Items from mail_server_template_items
-    std::vector<ServerMailItems> itemsA;
-    std::vector<ServerMailItems> itemsH;
-};
-
 #endif

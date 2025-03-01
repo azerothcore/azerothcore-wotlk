@@ -75,6 +75,7 @@
 #include "ScriptMgr.h"
 #include "SkillDiscovery.h"
 #include "SkillExtraItems.h"
+#include "ServerMailMgr.h"
 #include "SmartAI.h"
 #include "SpellMgr.h"
 #include "TaskScheduler.h"
@@ -1662,7 +1663,7 @@ void World::SetInitialWorldSettings()
     sObjectMgr->LoadMailLevelRewards();
 
     LOG_INFO("server.loading", "Load Mail Server Template...");
-    sObjectMgr->LoadMailServerTemplates();
+    sServerMailMgr->LoadMailServerTemplates();
 
     // Loot tables
     LoadLootTables();
