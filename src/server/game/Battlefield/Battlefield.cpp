@@ -410,8 +410,8 @@ void Battlefield::AskToLeaveQueue(Player* player)
 // Called in WorldSession::HandleHearthAndResurrect
 void Battlefield::PlayerAskToLeave(Player* player)
 {
-    // Player leaving Wintergrasp, trigger Hearthstone spell.
-    player->CastSpell(player, 8690, true);
+    // Player leaving Wintergrasp, teleport to homebind possition.
+    player->TeleportTo(player->m_homebindMapId, player->m_homebindX, player->m_homebindY, player->m_homebindZ, player->GetOrientation());
 }
 
 // Called in WorldSession::HandleBfEntryInviteResponse
