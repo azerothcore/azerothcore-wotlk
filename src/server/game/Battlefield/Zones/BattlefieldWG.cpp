@@ -29,8 +29,8 @@
 #include "TemporarySummon.h"
 #include "Vehicle.h"
 #include "WorldSession.h"
-#include "WorldStatePackets.h"
 #include "WorldSessionMgr.h"
+#include "WorldStatePackets.h"
 
 BattlefieldWG::~BattlefieldWG()
 {
@@ -990,7 +990,8 @@ void BattlefieldWG::SendInitWorldStatesToAll()
                 SendInitWorldStatesTo(player);
 }
 
-void BattlefieldWG::SendUpdateWorldStates(Player* player) {
+void BattlefieldWG::SendUpdateWorldStates(Player* player)
+{
     uint32 timer = GetTimer() / 1000;
     bool iconActive = timer < 15 * MINUTE || IsWarTime();
 
@@ -1005,15 +1006,16 @@ void BattlefieldWG::SendUpdateWorldStates(Player* player) {
         SendUpdateWorldStateMessage(ClockWorldState[i], uint32(GameTime::GetGameTime().count() + timer), player);
 }
 
-void BattlefieldWG::SendUpdateWorldStateMessage(uint32 variable, uint32 value, Player* player) {
-    WorldPackets::WorldState::UpdateWorldState worldstate;
-    worldstate.VariableID = variable;
-    worldstate.Value = value;
+void BattlefieldWG::SendUpdateWorldStateMessage(uint32 variable, uint32 value, Player* player)
+{
+    WorldPackets::WorldState::UpdateWorldState worldState;
+    worldState.VariableID = variable;
+    worldState.Value = value;
 
     if (player)
-        player->SendDirectMessage(worldstate.Write());
+        player->SendDirectMessage(worldState.Write());
     else
-        sWorldSessionMgr->SendGlobalMessage(worldstate.Write());
+        sWorldSessionMgr->SendGlobalMessage(worldState.Write());
 }
 
 void BattlefieldWG::BrokenWallOrTower(TeamId  /*team*/)
