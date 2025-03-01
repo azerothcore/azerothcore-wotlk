@@ -23,7 +23,7 @@
 #include <unordered_map>
 #include <vector>
 
-enum class MailConditionType : uint8
+enum class ServerMailConditionType : uint8
 {
     None, // internal, not used in DB
     Level,
@@ -36,20 +36,20 @@ struct ServerMailCondition
 {
     ServerMailCondition() = default;
 
-    MailConditionType type = MailConditionType::None;
+    ServerMailConditionType type = ServerMailConditionType::None;
     uint32 value{ 0 };
 
     bool CheckCondition(Player* player) const
     {
         switch (type)
         {
-        case MailConditionType::Level:
+        case ServerMailConditionType::Level:
             return player->GetLevel() >= value;
-        case MailConditionType::PlayTime:
+        case ServerMailConditionType::PlayTime:
             return player->GetTotalPlayedTime() >= value;
-        case MailConditionType::Quest:
+        case ServerMailConditionType::Quest:
             return player->IsQuestRewarded(value);
-        case MailConditionType::Achievement:
+        case ServerMailConditionType::Achievement:
             return player->HasAchieved(value);
         default:
             LOG_ERROR("server.mail", "Unknown server mail condition type '{}'", static_cast<uint32>(type));

@@ -170,15 +170,15 @@ void ServerMailMgr::LoadMailServerTemplatesConditions()
             continue;
         }
 
-        MailConditionType conditionType;
+        ServerMailConditionType conditionType;
         if (conditionTypeStr == "Level")
-            conditionType = MailConditionType::Level;
+            conditionType = ServerMailConditionType::Level;
         else if (conditionTypeStr == "PlayTime")
-            conditionType = MailConditionType::PlayTime;
+            conditionType = ServerMailConditionType::PlayTime;
         else if (conditionTypeStr == "Quest")
-            conditionType = MailConditionType::Quest;
+            conditionType = ServerMailConditionType::Quest;
         else if (conditionTypeStr == "Achievement")
-            conditionType = MailConditionType::Achievement;
+            conditionType = ServerMailConditionType::Achievement;
         else
         {
             LOG_ERROR("sql.sql", "Table `mail_server_template_conditions` has unknown conditionType '{}', skipped.", conditionTypeStr);
@@ -187,14 +187,14 @@ void ServerMailMgr::LoadMailServerTemplatesConditions()
 
         switch (conditionType)
         {
-        case MailConditionType::Level:
+        case ServerMailConditionType::Level:
             if (conditionValue > sWorld->getIntConfig(CONFIG_MAX_PLAYER_LEVEL))
             {
                 LOG_ERROR("sql.sql", "Table `mail_server_template_conditions` has conditionType 'Level' with invalid conditionValue ({}), max level is ({}) for templateID {}, skipped.", conditionValue, sWorld->getIntConfig(CONFIG_MAX_PLAYER_LEVEL), templateID);
                 continue;
             }
             break;
-        case MailConditionType::Quest:
+        case ServerMailConditionType::Quest:
         {
             Quest const* qInfo = sObjectMgr->GetQuestTemplate(conditionValue);
             if (!qInfo)
@@ -204,7 +204,7 @@ void ServerMailMgr::LoadMailServerTemplatesConditions()
             }
             break;
         }
-        case MailConditionType::Achievement:
+        case ServerMailConditionType::Achievement:
         {
             AchievementEntry const* achievement = sAchievementStore.LookupEntry(conditionValue);
             if (!achievement)
