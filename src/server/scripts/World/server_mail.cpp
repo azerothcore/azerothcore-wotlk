@@ -54,12 +54,12 @@ public:
                     {
                         std::vector<ServerMailItems> const& items = isAlliance ? servMail.itemsA : servMail.itemsH;
                         std::vector< ServerMailCondition> const& conditions = servMail.conditions;
+                        uint32 money = isAlliance ? servMail.moneyA : servMail.moneyH;
 
                         sServerMailMgr->SendServerMail(
                             session->GetPlayer(),
                             servMail.id,
-                            servMail.moneyA,
-                            servMail.moneyH,
+                            money,
                             items,
                             conditions,
                             servMail.subject,

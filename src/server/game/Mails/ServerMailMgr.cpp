@@ -226,7 +226,7 @@ void ServerMailMgr::LoadMailServerTemplatesConditions()
     } while (result->NextRow());
 }
 
-void ServerMailMgr::SendServerMail(Player* player, uint32 id, uint32 rewardMoneyA, uint32 rewardMoneyH,
+void ServerMailMgr::SendServerMail(Player* player, uint32 id, uint32 money,
     std::vector<ServerMailItems> const& items,
     std::vector<ServerMailCondition> const& conditions,
     std::string subject, std::string body, uint8 active) const
@@ -243,7 +243,7 @@ void ServerMailMgr::SendServerMail(Player* player, uint32 id, uint32 rewardMoney
     MailSender sender(MAIL_NORMAL, player->GetGUID().GetCounter(), MAIL_STATIONERY_GM);
     MailDraft draft(subject, body);
 
-    draft.AddMoney(player->GetTeamId() == TEAM_ALLIANCE ? rewardMoneyA : rewardMoneyH);
+    draft.AddMoney(money);
     // Loop through all items and attach them to the mail
     for (auto const& mailItem : items)
     {

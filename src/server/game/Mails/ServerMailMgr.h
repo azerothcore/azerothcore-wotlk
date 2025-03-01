@@ -97,7 +97,7 @@ public:
     void LoadMailServerTemplatesItems();
     void LoadMailServerTemplatesConditions();
 
-    void SendServerMail(Player* player, uint32 id, uint32 rewardMoneyA, uint32 rewardMoneyH, std::vector<ServerMailItems> const& items, std::vector<ServerMailCondition> const& conditions, std::string subject, std::string body, uint8 active) const;
+    void SendServerMail(Player* player, uint32 id, uint32 money, std::vector<ServerMailItems> const& items, std::vector<ServerMailCondition> const& conditions, std::string subject, std::string body, uint8 active) const;
 
     [[nodiscard]] ServerMailContainer const& GetAllServerMailStore() const { return _serverMailStore; }
 
