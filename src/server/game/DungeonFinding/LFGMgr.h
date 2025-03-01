@@ -92,6 +92,7 @@ namespace lfg
         LFG_TELEPORTERROR_IN_VEHICLE                 = 3,
         LFG_TELEPORTERROR_FATIGUE                    = 4,
         LFG_TELEPORTERROR_INVALID_LOCATION           = 6,
+        LFG_TELEPORTERROR_YOU_CANT_DO_THAT_RIGHT_NOW = 7,
         LFG_TELEPORTERROR_COMBAT                     = 8       // FIXME - It can be 7 or 8 (Need proper data)
     };
 
@@ -579,6 +580,8 @@ namespace lfg
         [[nodiscard]] bool IsTesting() const { return m_Testing; }
 
         void SetDungeon(ObjectGuid guid, uint32 dungeon);
+        // Sends a message to all players in a set
+        void SendMessageToAllPlayers(GuidUnorderedSet players, LfgProposal const& proposal);
 
     private:
         TeamId GetTeam(ObjectGuid guid);

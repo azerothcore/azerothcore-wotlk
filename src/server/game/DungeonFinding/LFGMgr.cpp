@@ -2148,12 +2148,15 @@ namespace lfg
         {
             error = LFG_TELEPORTERROR_COMBAT;
         }
+        else if (!sWorld->getBoolConfig(CONFIG_LFG_TELEPORT) && !m_Testing)
+        {
+            ChatHandler(player->GetSession()).PSendSysMessage(LANG_LFG_TELEPORT_DUNGEON, dungeon->name);
+            error = LFG_TELEPORTERROR_YOU_CANT_DO_THAT_RIGHT_NOW;
+        }
         else if (out && error == LFG_TELEPORTERROR_OK)
         {
             if (player->GetMapId() == uint32(dungeon->map))
                 player->TeleportToEntryPoint();
-
-            return;
         }
         else
         {
@@ -2489,6 +2492,23 @@ namespace lfg
     {
         LOG_DEBUG("lfg", "LFGMgr::SetDungeon: [{}] dungeon {}", guid.ToString(), dungeon);
         GroupsStore[guid].SetDungeon(dungeon);
+    }
+
+    void LFGMgr::SendMessageToAllPlayers(GuidUnorderedSet players, LfgProposal const& proposal)
+    {
+        // Send a message to the players
+        for (GuidUnorderedSet::const_iterator it = players.begin(); it != players.end(); ++it)
+        {
+            if (Player* player = ObjectAccessor::FindPlayer(*it))
+            {
+                ChatHandler handler = ChatHandler(player->GetSession());
+                LFGDungeonEntry const* dungeon = sLFGDungeonStore.LookupEntry(proposal.dungeonId);
+                if (dungeon)
+                    handler.PSendSysMessage(LANG_LFG_TELEPORT_DUNGEON, dungeon->Name[0]);
+                else
+                    handler.PSendSysMessage(LANG_LFG_TELEPORT_NO_DUNGEON);
+            }
+        }
     }
 
     void LFGMgr::SetRoles(ObjectGuid guid, uint8 roles)
