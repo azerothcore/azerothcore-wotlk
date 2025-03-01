@@ -18,7 +18,7 @@ SELECT `id`, 'Alliance', `itemA`, `itemCountA` FROM `mail_server_template` WHERE
 INSERT INTO `mail_server_template_items` (`templateID`, `faction`, `item`, `itemCount`)
 SELECT `id`, 'Horde', `itemH`, `itemCountH` FROM `mail_server_template` WHERE `itemH` > 0;
 
-ALTER TABLE `mail_server_template` 
+ALTER TABLE `mail_server_template`
 DROP COLUMN `itemA`,
 DROP COLUMN `itemCountA`,
 DROP COLUMN `itemH`,
