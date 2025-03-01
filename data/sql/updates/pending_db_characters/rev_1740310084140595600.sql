@@ -24,6 +24,30 @@ DROP COLUMN `itemCountA`,
 DROP COLUMN `itemH`,
 DROP COLUMN `itemCountH`;
 
+-- mail_server_template_conditions
+DROP TABLE IF EXISTS `mail_server_template_conditions`;
+CREATE TABLE `mail_server_template_conditions` (
+    `id` INT UNSIGNED AUTO_INCREMENT,
+    `templateID` INT UNSIGNED NOT NULL,
+    `conditionType` ENUM('Level', 'PlayTime', 'Quest', 'Achievement') NOT NULL,
+    `conditionValue` INT UNSIGNED NOT NULL,
+    PRIMARY KEY (`id`),
+    CONSTRAINT `fk_mail_template_conditions`
+        FOREIGN KEY (`templateID`) REFERENCES `mail_server_template`(`id`)
+        ON DELETE CASCADE
+) ENGINE=InnoDB COLLATE='utf8mb4_unicode_ci';
+
+INSERT INTO `mail_server_template_conditions` (`templateID`, `conditionType`, `conditionValue`)
+SELECT `id`, 'Level', `reqLevel` FROM `mail_server_template` WHERE `reqLevel` > 0;
+
+INSERT INTO `mail_server_template_conditions` (`templateID`, `conditionType`, `conditionValue`)
+SELECT `id`, 'PlayTime', `reqPlayTime` FROM `mail_server_template` WHERE `reqPlayTime` > 0;
+
+ALTER TABLE `mail_server_template`
+    DROP COLUMN `reqLevel`,
+    DROP COLUMN `reqPlayTime`;
+
+-- mail_server_character
 -- Make sure we dont have invalid instances in mail_server_character.mailId before we add the foregin key to avoid SQL errors
 DELETE FROM `mail_server_character` WHERE `mailId` NOT IN (SELECT `id` FROM `mail_server_template`);
 
@@ -31,6 +55,6 @@ DELETE FROM `mail_server_character` WHERE `mailId` NOT IN (SELECT `id` FROM `mai
 ALTER TABLE `mail_server_character`
     DROP PRIMARY KEY,
     ADD PRIMARY KEY (`guid`, `mailId`),
-    ADD CONSTRAINT `fk_mail_template_character`
+    ADD CONSTRAINT `fk_mail_server_character`
         FOREIGN KEY (`mailId`) REFERENCES `mail_server_template`(`id`)
         ON DELETE CASCADE;

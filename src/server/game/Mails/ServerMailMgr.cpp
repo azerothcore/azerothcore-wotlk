@@ -16,9 +16,11 @@
  */
 
 #include "ServerMailMgr.h"
+#include "AchievementMgr.h"
 #include "DatabaseEnv.h"
 #include "Item.h"
 #include "Log.h"
+#include "ObjectMgr.h"
 #include "Player.h"
 #include "Timer.h"
 
@@ -37,8 +39,8 @@ void ServerMailMgr::LoadMailServerTemplates()
 
     _serverMailStore.clear(); // for reload case
 
-    //                                                    0     1           2              3         4         5          6       7
-    QueryResult result = CharacterDatabase.Query("SELECT `id`, `reqLevel`, `reqPlayTime`, `moneyA`, `moneyH`, `subject`, `body`, `active` FROM `mail_server_template`");
+    //                                                    0     1         2         3          4       5
+    QueryResult result = CharacterDatabase.Query("SELECT `id`, `moneyA`, `moneyH`, `subject`, `body`, `active` FROM `mail_server_template`");
     if (!result)
     {
         LOG_INFO("sql.sql", ">> Loaded 0 server mail rewards. DB table `mail_server_template` is empty.");
@@ -57,19 +59,11 @@ void ServerMailMgr::LoadMailServerTemplates()
         ServerMail& servMail = _serverMailStore[id];
 
         servMail.id          = id;
-        servMail.reqLevel    = fields[1].Get<uint8>();
-        servMail.reqPlayTime = fields[2].Get<uint32>();
-        servMail.moneyA      = fields[3].Get<uint32>();
-        servMail.moneyH      = fields[4].Get<uint32>();
-        servMail.subject     = fields[5].Get<std::string>();
-        servMail.body        = fields[6].Get<std::string>();
-        servMail.active      = fields[7].Get<uint8>();
-
-        if (servMail.reqLevel > sWorld->getIntConfig(CONFIG_MAX_PLAYER_LEVEL))
-        {
-            LOG_ERROR("sql.sql", "Table `mail_server_template` has reqLevel {} but max level is {} for id {}, skipped.", servMail.reqLevel, sWorld->getIntConfig(CONFIG_MAX_PLAYER_LEVEL), servMail.id);
-            return;
-        }
+        servMail.moneyA      = fields[1].Get<uint32>();
+        servMail.moneyH      = fields[2].Get<uint32>();
+        servMail.subject     = fields[3].Get<std::string>();
+        servMail.body        = fields[4].Get<std::string>();
+        servMail.active      = fields[5].Get<uint8>();
 
         if (servMail.moneyA > MAX_MONEY_AMOUNT || servMail.moneyH > MAX_MONEY_AMOUNT)
         {
@@ -79,6 +73,7 @@ void ServerMailMgr::LoadMailServerTemplates()
     } while (result->NextRow());
 
     LoadMailServerTemplatesItems();
+    LoadMailServerTemplatesConditions();
 
     LOG_INFO("server.loading", ">> Loaded {} Mail Server Template in {} ms", _serverMailStore.size(), GetMSTimeDiffToNow(oldMSTime));
     LOG_INFO("server.loading", " ");
@@ -90,7 +85,6 @@ void ServerMailMgr::LoadMailServerTemplatesItems()
     if (!result)
     {
         LOG_INFO("sql.sql", ">> Loaded 0 server mail items. DB table `mail_server_template_items` is empty.");
-        LOG_INFO("server.loading", " ");
         return;
     }
 
@@ -146,23 +140,103 @@ void ServerMailMgr::LoadMailServerTemplatesItems()
             _serverMailStore[templateID].itemsH.push_back(mailItem);
         else
         {
-            LOG_ERROR("sql.sql", "Table `mail_server_template_items` has invalid faction value '{}' for id {}, skipped.", faction, templateID);
+            LOG_ERROR("sql.sql", "Table `mail_server_template_items` has invalid faction value '{}' for templateID {}, skipped.", faction, templateID);
             continue;
         }
 
     } while (result->NextRow());
 }
 
-void ServerMailMgr::SendServerMail(Player* player, uint32 id, uint32 reqLevel, uint32 reqPlayTime, uint32 rewardMoneyA, uint32 rewardMoneyH, std::vector<ServerMailItems> const& items, std::string subject, std::string body, uint8 active) const
+void ServerMailMgr::LoadMailServerTemplatesConditions()
+{
+    QueryResult result = CharacterDatabase.Query("SELECT `templateID`, `conditionType`, `conditionValue` FROM `mail_server_template_conditions`");
+    if (!result)
+    {
+        LOG_INFO("sql.sql", ">> Loaded 0 server mail conditions. DB table `mail_server_template_conditions` is empty.");
+        return;
+    }
+
+    do
+    {
+        Field* fields = result->Fetch();
+
+        uint32 templateID = fields[0].Get<uint32>();
+        std::string conditionTypeStr = fields[1].Get<std::string>();
+        uint32 conditionValue = fields[2].Get<uint32>();
+
+        if (_serverMailStore.find(templateID) == _serverMailStore.end())
+        {
+            LOG_ERROR("sql.sql", "Table `mail_server_template_conditions` has an invalid templateID {}, skipped.", templateID);
+            continue;
+        }
+
+        MailConditionType conditionType;
+        if (conditionTypeStr == "Level")
+            conditionType = MailConditionType::Level;
+        else if (conditionTypeStr == "PlayTime")
+            conditionType = MailConditionType::PlayTime;
+        else if (conditionTypeStr == "Quest")
+            conditionType = MailConditionType::Quest;
+        else if (conditionTypeStr == "Achievement")
+            conditionType = MailConditionType::Achievement;
+        else
+        {
+            LOG_ERROR("sql.sql", "Table `mail_server_template_conditions` has unknown conditionType '{}', skipped.", conditionTypeStr);
+            continue;
+        }
+
+        switch (conditionType)
+        {
+        case MailConditionType::Level:
+            if (conditionValue > sWorld->getIntConfig(CONFIG_MAX_PLAYER_LEVEL))
+            {
+                LOG_ERROR("sql.sql", "Table `mail_server_template_conditions` has conditionType 'Level' with invalid conditionValue ({}), max level is ({}) for templateID {}, skipped.", conditionValue, sWorld->getIntConfig(CONFIG_MAX_PLAYER_LEVEL), templateID);
+                continue;
+            }
+            break;
+        case MailConditionType::Quest:
+        {
+            Quest const* qInfo = sObjectMgr->GetQuestTemplate(conditionValue);
+            if (!qInfo)
+            {
+                LOG_ERROR("sql.sql", "Table `mail_server_template_conditions` has conditionType 'Quest' with invalid conditionValue ({}) for templateID {}, skipped.", conditionValue, templateID);
+                continue;
+            }
+            break;
+        }
+        case MailConditionType::Achievement:
+        {
+            AchievementEntry const* achievement = sAchievementStore.LookupEntry(conditionValue);
+            if (!achievement)
+            {
+                LOG_ERROR("sql.sql", "Table `mail_server_template_conditions` has conditionType 'Achievement' with invalid conditionValue ({}) for templateID {}, skipped.", conditionValue, templateID);
+                continue;
+            }
+            break;
+        }
+        default:
+            break;
+        }
+
+        ServerMailCondition condition;
+        condition.type = conditionType;
+        condition.value = conditionValue;
+        _serverMailStore[templateID].conditions.push_back(condition);
+
+    } while (result->NextRow());
+}
+
+void ServerMailMgr::SendServerMail(Player* player, uint32 id, uint32 rewardMoneyA, uint32 rewardMoneyH,
+    std::vector<ServerMailItems> const& items,
+    std::vector<ServerMailCondition> const& conditions,
+    std::string subject, std::string body, uint8 active) const
 {
     if (!active)
         return;
 
-    if (player->GetLevel() < reqLevel)
-        return;
-
-    if (player->GetTotalPlayedTime() < reqPlayTime)
-        return;
+    for (ServerMailCondition const& condition : conditions)
+        if (!condition.CheckCondition(player))
+            return;
 
     CharacterDatabaseTransaction trans = CharacterDatabase.BeginTransaction();
 

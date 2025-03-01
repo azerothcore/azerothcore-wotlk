@@ -23,6 +23,41 @@
 #include <unordered_map>
 #include <vector>
 
+enum class MailConditionType : uint8
+{
+    None, // internal, not used in DB
+    Level,
+    PlayTime,
+    Quest,
+    Achievement
+};
+
+struct ServerMailCondition
+{
+    ServerMailCondition() = default;
+
+    MailConditionType type = MailConditionType::None;
+    uint32 value{ 0 };
+
+    bool CheckCondition(Player* player) const
+    {
+        switch (type)
+        {
+        case MailConditionType::Level:
+            return player->GetLevel() >= value;
+        case MailConditionType::PlayTime:
+            return player->GetTotalPlayedTime() >= value;
+        case MailConditionType::Quest:
+            return player->IsQuestRewarded(value);
+        case MailConditionType::Achievement:
+            return player->HasAchieved(value);
+        default:
+            LOG_ERROR("server.mail", "Unknown server mail condition type '{}'", static_cast<uint32>(type));
+            return false;
+        }
+    }
+};
+
 struct ServerMailItems
 {
     ServerMailItems() = default;
@@ -34,13 +69,14 @@ struct ServerMail
 {
     ServerMail() = default;
     uint32 id{ 0 };
-    uint8 reqLevel{ 0 };
-    uint32 reqPlayTime{ 0 };
     uint32 moneyA{ 0 };
     uint32 moneyH{ 0 };
     std::string subject;
     std::string body;
     uint8 active{ 0 };
+
+    // Conditions from mail_server_template_conditions
+    std::vector<ServerMailCondition> conditions;
 
     // Items from mail_server_template_items
     std::vector<ServerMailItems> itemsA;
@@ -59,7 +95,9 @@ public:
 
     void LoadMailServerTemplates();
     void LoadMailServerTemplatesItems();
-    void SendServerMail(Player* player, uint32 id, uint32 reqLevel, uint32 reqPlayTime, uint32 rewardMoneyA, uint32 rewardMoneyH, std::vector<ServerMailItems> const& items, std::string subject, std::string body, uint8 active) const;
+    void LoadMailServerTemplatesConditions();
+
+    void SendServerMail(Player* player, uint32 id, uint32 rewardMoneyA, uint32 rewardMoneyH, std::vector<ServerMailItems> const& items, std::vector<ServerMailCondition> const& conditions, std::string subject, std::string body, uint8 active) const;
 
     [[nodiscard]] ServerMailContainer const& GetAllServerMailStore() const { return _serverMailStore; }
 
