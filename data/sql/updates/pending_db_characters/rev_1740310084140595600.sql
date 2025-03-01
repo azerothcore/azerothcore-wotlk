@@ -12,9 +12,11 @@ CREATE TABLE `mail_server_template_items` (
         ON DELETE CASCADE
 ) ENGINE=InnoDB COLLATE='utf8mb4_unicode_ci';
 
+DELETE FROM `mail_server_template_items` WHERE `faction` = 'Alliance';
 INSERT INTO `mail_server_template_items` (`templateID`, `faction`, `item`, `itemCount`)
 SELECT `id`, 'Alliance', `itemA`, `itemCountA` FROM `mail_server_template` WHERE `itemA` > 0;
 
+DELETE FROM `mail_server_template_items` WHERE `faction` = 'Horde';
 INSERT INTO `mail_server_template_items` (`templateID`, `faction`, `item`, `itemCount`)
 SELECT `id`, 'Horde', `itemH`, `itemCountH` FROM `mail_server_template` WHERE `itemH` > 0;
 
@@ -37,9 +39,11 @@ CREATE TABLE `mail_server_template_conditions` (
         ON DELETE CASCADE
 ) ENGINE=InnoDB COLLATE='utf8mb4_unicode_ci';
 
+DELETE FROM `mail_server_template_conditions` WHERE `conditionType` = 'Level';
 INSERT INTO `mail_server_template_conditions` (`templateID`, `conditionType`, `conditionValue`)
 SELECT `id`, 'Level', `reqLevel` FROM `mail_server_template` WHERE `reqLevel` > 0;
 
+DELETE FROM `mail_server_template_conditions` WHERE `conditionType` = 'PlayTime';
 INSERT INTO `mail_server_template_conditions` (`templateID`, `conditionType`, `conditionValue`)
 SELECT `id`, 'PlayTime', `reqPlayTime` FROM `mail_server_template` WHERE `reqPlayTime` > 0;
 
