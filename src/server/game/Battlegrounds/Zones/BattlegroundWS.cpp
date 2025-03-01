@@ -222,10 +222,10 @@ void BattlegroundWS::EventPlayerCapturedFlag(Player* player)
 
     RewardHonorToTeam(GetBonusHonorFromKill(2), player->GetTeamId());
 
-    if (GetTeamScore(TEAM_ALLIANCE) == BG_WS_MAX_TEAM_SCORE || GetTeamScore(TEAM_HORDE) == BG_WS_MAX_TEAM_SCORE)
+    if (GetTeamScore(TEAM_ALLIANCE) == _configurableMaxTeamScore || GetTeamScore(TEAM_HORDE) == _configurableMaxTeamScore)
     {
         UpdateWorldState(BG_WS_STATE_TIMER_ACTIVE, 0);
-        EndBattleground(GetTeamScore(TEAM_HORDE) == BG_WS_MAX_TEAM_SCORE ? TEAM_HORDE : TEAM_ALLIANCE);
+        EndBattleground(GetTeamScore(TEAM_HORDE) == _configurableMaxTeamScore ? TEAM_HORDE : TEAM_ALLIANCE);
     }
     else
         _bgEvents.ScheduleEvent(BG_WS_EVENT_RESPAWN_BOTH_FLAGS, BG_WS_FLAG_RESPAWN_TIME);
@@ -497,6 +497,11 @@ void BattlegroundWS::Init()
         _honorWinKills = 1;
         _honorEndKills = 2;
     }
+
+    uint32 bgWarsongFlagsConfig = sWorld->getIntConfig(CONFIG_BATTLEGROUND_WARSONG_FLAGS);
+    _configurableMaxTeamScore = bgWarsongFlagsConfig > 0
+        ? bgWarsongFlagsConfig
+        : static_cast<uint32>(BG_WS_MAX_TEAM_SCORE);
 }
 
 void BattlegroundWS::EndBattleground(TeamId winnerTeamId)
@@ -551,7 +556,7 @@ void BattlegroundWS::FillInitialWorldStates(WorldPackets::WorldState::InitWorldS
     packet.Worldstates.reserve(7);
     packet.Worldstates.emplace_back(BG_WS_FLAG_CAPTURES_ALLIANCE, GetTeamScore(TEAM_ALLIANCE));
     packet.Worldstates.emplace_back(BG_WS_FLAG_CAPTURES_HORDE, GetTeamScore(TEAM_HORDE));
-    packet.Worldstates.emplace_back(BG_WS_FLAG_CAPTURES_MAX, BG_WS_MAX_TEAM_SCORE);
+    packet.Worldstates.emplace_back(BG_WS_FLAG_CAPTURES_MAX, _configurableMaxTeamScore);
 
     packet.Worldstates.emplace_back(BG_WS_STATE_TIMER_ACTIVE, GetStatus() == STATUS_IN_PROGRESS ? 1 : 0);
     packet.Worldstates.emplace_back(BG_WS_STATE_TIMER, GetMatchTime());

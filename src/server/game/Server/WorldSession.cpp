@@ -362,8 +362,8 @@ bool WorldSession::Update(uint32 diff, PacketFilter& updater)
                         //! the client to be in world yet. We will re-add the packets to the bottom of the queue and process them later.
                         if (!m_playerRecentlyLogout)
                         {
-                            requeuePackets.push_back(packet);
-                            deletePacket = false;
+                            //requeuePackets.push_back(packet);
+                            //deletePacket = false;
 
                             LOG_DEBUG("network", "Delaying processing of message with status STATUS_LOGGEDIN: No players in the world for account id {}", GetAccountId());
                         }
