@@ -1,3 +1,4 @@
+-- DB update 2025_02_28_00 -> 2025_03_01_00
 
 -- Correct text
 DELETE FROM `creature_text` WHERE (`CreatureID` = 25372) AND (`GroupID` IN (0));
