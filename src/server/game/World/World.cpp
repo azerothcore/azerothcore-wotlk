@@ -928,6 +928,12 @@ void World::LoadConfigSettings(bool reload)
         _int_configs[CONFIG_BATTLEGROUND_SPEED_BUFF_RESPAWN] = 150;
     }
 
+    _int_configs[CONFIG_BATTLEGROUND_WARSONG_FLAGS]                        = sConfigMgr->GetOption<uint32>("Battleground.Warsong.Flags", 3);
+    _int_configs[CONFIG_BATTLEGROUND_ARATHI_CAPTUREPOINTS]                 = sConfigMgr->GetOption<uint32>("Battleground.Arathi.CapturePoints", 1600);
+    _int_configs[CONFIG_BATTLEGROUND_ALTERAC_REINFORCEMENTS]               = sConfigMgr->GetOption<uint32>("Battleground.Alterac.Reinforcements", 600);
+    _int_configs[CONFIG_BATTLEGROUND_ALTERAC_REP_ONBOSSDEATH]              = sConfigMgr->GetOption<uint32>("Battleground.Alterac.ReputationOnBossDeath", 350);
+    _int_configs[CONFIG_BATTLEGROUND_EYEOFTHESTORM_CAPTUREPOINTS]          = sConfigMgr->GetOption<uint32>("Battleground.EyeOfTheStorm.CapturePoints", 1600);
+
     _int_configs[CONFIG_ARENA_MAX_RATING_DIFFERENCE]                = sConfigMgr->GetOption<uint32>("Arena.MaxRatingDifference", 150);
     _int_configs[CONFIG_ARENA_RATING_DISCARD_TIMER]                 = sConfigMgr->GetOption<uint32>("Arena.RatingDiscardTimer", 10 * MINUTE * IN_MILLISECONDS);
     _int_configs[CONFIG_ARENA_PREV_OPPONENTS_DISCARD_TIMER]         = sConfigMgr->GetOption<uint32>("Arena.PreviousOpponentsDiscardTimer", 2 * MINUTE * IN_MILLISECONDS);
