@@ -54,7 +54,7 @@ public:
                     {
                         uint32 money = isAlliance ? servMail.moneyA : servMail.moneyH;
                         std::vector<ServerMailItems> const& items = isAlliance ? servMail.itemsA : servMail.itemsH;
-                        std::vector<ServerMailCondition> const& conditions = servMail.conditions
+                        std::vector<ServerMailCondition> const& conditions = servMail.conditions;
 
                         sServerMailMgr->SendServerMail(
                             session->GetPlayer(),
