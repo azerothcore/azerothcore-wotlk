@@ -1,3 +1,4 @@
+-- DB update 2025_03_01_00 -> 2025_03_01_01
 -- Adding COMMENT COLUMN
 -- Achievements
 ALTER TABLE `player_factionchange_achievement`
