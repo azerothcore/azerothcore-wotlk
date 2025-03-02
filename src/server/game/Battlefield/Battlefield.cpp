@@ -168,6 +168,7 @@ bool Battlefield::Update(uint32 diff)
         m_StartGrouping = true;
         InvitePlayersInZoneToQueue();
         OnStartGrouping();
+        SendUpdateWorldStates();
     }
 
     bool objective_changed = false;
@@ -353,6 +354,8 @@ void Battlefield::StartBattle()
     DoPlaySoundToAll(BF_START);
 
     OnBattleStart();
+
+    SendUpdateWorldStates();
 }
 
 void Battlefield::EndBattle(bool endByTimer)
@@ -377,6 +380,7 @@ void Battlefield::EndBattle(bool endByTimer)
     // Reset battlefield timer
     m_Timer = m_NoWarBattleTime;
     SendInitWorldStatesToAll();
+    SendUpdateWorldStates();
 }
 
 void Battlefield::DoPlaySoundToAll(uint32 SoundID)
@@ -403,13 +407,15 @@ void Battlefield::AskToLeaveQueue(Player* player)
 {
     // Remove player from queue
     m_PlayersInQueue[player->GetTeamId()].erase(player->GetGUID());
+    // Send notification
+    player->GetSession()->SendBfLeaveMessage(m_BattleId, BF_LEAVE_REASON_CLOSE);
 }
 
 // Called in WorldSession::HandleHearthAndResurrect
 void Battlefield::PlayerAskToLeave(Player* player)
 {
-    // Player leaving Wintergrasp, trigger Hearthstone spell.
-    player->CastSpell(player, 8690, true);
+    // Player leaving Wintergrasp, teleport to homebind possition.
+    player->TeleportTo(player->m_homebindMapId, player->m_homebindX, player->m_homebindY, player->m_homebindZ, player->GetOrientation());
 }
 
 // Called in WorldSession::HandleBfEntryInviteResponse

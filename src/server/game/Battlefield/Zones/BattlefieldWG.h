@@ -21,6 +21,7 @@
 #include "Battlefield.h"
 #include "Log.h"
 #include "World.h"
+#include "WorldStatePackets.h"
 
 class Group;
 class BattlefieldWG;
@@ -108,6 +109,8 @@ enum WintergraspWorldStates
     BATTLEFIELD_WG_WORLD_STATE_DEFENDER          = 3802,
     BATTLEFIELD_WG_WORLD_STATE_ATTACKER          = 3803,
     BATTLEFIELD_WG_WORLD_STATE_SHOW_WORLDSTATE   = 3710,
+    BATTLEFIELD_WG_WORLD_STATE_CONTROL           = 3804, // Shows on the map who controls WG
+    BATTLEFIELD_WG_WORLD_STATE_ICON_ACTIVE       = 4375, // Activates "ice" icon
 };
 
 enum WintergraspAreaIds
@@ -238,7 +241,7 @@ const uint32 WGQuest[2][6] =
     { 13185, 13183, 13223, 13539, 13178, 13180 },
 };
 // 7 in sql, 7 in header
-const BfWGCoordGY WGGraveYard[BATTLEFIELD_WG_GRAVEYARD_MAX] =
+const BfWGCoordGY WGGraveyard[BATTLEFIELD_WG_GRAVEYARD_MAX] =
 {
     { 5104.750f, 2300.940f, 368.579f, 0.733038f, 1329, BATTLEFIELD_WG_GY_WORKSHOP_NE, BATTLEFIELD_WG_GOSSIPTEXT_GY_NE, TEAM_NEUTRAL },
     { 5099.120f, 3466.036f, 368.484f, 5.317802f, 1330, BATTLEFIELD_WG_GY_WORKSHOP_NW, BATTLEFIELD_WG_GOSSIPTEXT_GY_NW, TEAM_NEUTRAL },
@@ -403,7 +406,9 @@ public:
 
     void SendInitWorldStatesTo(Player* player);
     void SendInitWorldStatesToAll() override;
-    void FillInitialWorldStates(WorldPacket& data) override;
+    void FillInitialWorldStates(WorldPackets::WorldState::InitWorldStates& packet) override;
+    void SendUpdateWorldStates(Player* player = nullptr) override;
+    void SendUpdateWorldStateMessage(uint32 variable, uint32 value, Player* player = nullptr);
 
     void HandleKill(Player* killer, Unit* victim) override;
     void OnUnitDeath(Unit* unit) override;
