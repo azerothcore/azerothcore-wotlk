@@ -1,4 +1,4 @@
-SET @CGUID := SET_VALUE_MANUALLY_HERE;
+SET @CGUID := 12860;
 DELETE FROM `creature` WHERE `guid` BETWEEN @CGUID+0 AND @CGUID+30 AND `id1` IN (16241, 16255, 16285, 16359, 16490, 16493, 16494, 16495, 16786, 16787, 29441, 29442, 16241, 16281, 16285, 16361, 16478, 16484, 16786);
 INSERT INTO `creature` (`guid`, `id1`, `map`, `zoneId`, `areaId`, `spawnMask`, `phaseMask`, `equipment_id`, `position_x`, `position_y`, `position_z`, `orientation`, `spawntimesecs`, `wander_distance`, `currentwaypoint`, `curhealth`, `MovementType`, `npcflag`, `unit_flags`, `dynamicflags`, `VerifiedBuild`, `CreateObject`) VALUES
 /*
@@ -66,7 +66,7 @@ Lieutenant Kregor         29442
 (@CGUID+29, 16787, 530, 0, 0, 1, 1, 0, 9522.7626953125, -7352.30126953125, 14.40223979949951171, 2.111848354339599609, 120, 0, 0, 5228, 0, 0, 0, 0, 49345, 1),
 (@CGUID+30, 29441, 530, 0, 0, 1, 1, 0, 9348.6884765625, -7286.931640625,   14.66600990295410156, 4.171336650848388671, 120, 0, 0, 198,  0, 0, 0, 0, 46248, 1);
 
-SET @OGUID := SET_VALUE_MANUALLY_HERE;
+SET @OGUID := 2164;
 DELETE FROM `gameobject` WHERE `guid` BETWEEN @OGUID+0 AND @OGUID+40 AND `id` IN (181254, 181255, 181256);
 INSERT INTO `gameobject` (`guid`, `id`, `map`, `zoneId`, `areaId`, `spawnMask`, `phaseMask`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecs`, `animprogress`, `state`, `VerifiedBuild`) VALUES
 /*
