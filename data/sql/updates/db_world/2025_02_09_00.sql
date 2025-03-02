@@ -1,3 +1,4 @@
+-- DB update 2025_02_07_04 -> 2025_02_09_00
 -- Kaylaan smart ai
 SET @ENTRY := 20780;
 UPDATE `creature_template` SET `AIName` = 'SmartAI', `ScriptName` = '' WHERE `entry` = @ENTRY;

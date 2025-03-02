@@ -65,7 +65,7 @@ class SpellCastTargets;
 class UpdateMask;
 
 typedef std::deque<Mail*> PlayerMails;
-typedef void(*bgZoneRef)(Battleground*, WorldPacket&);
+typedef void(*bgZoneRef)(Battleground*, WorldPackets::WorldState::InitWorldStates&);
 
 #define PLAYER_MAX_SKILLS           127
 #define PLAYER_MAX_DAILY_QUESTS     25
@@ -1385,7 +1385,7 @@ public:
 
     [[nodiscard]] Player* GetTrader() const { return m_trade ? m_trade->GetTrader() : nullptr; }
     [[nodiscard]] TradeData* GetTradeData() const { return m_trade; }
-    void TradeCancel(bool sendback);
+    void TradeCancel(bool sendback, TradeStatus status = TRADE_STATUS_TRADE_CANCELED);
 
     CinematicMgr* GetCinematicMgr() const { return _cinematicMgr; }
 
@@ -2236,7 +2236,7 @@ public:
     void SetEquipmentSet(uint32 index, EquipmentSet eqset);
     void DeleteEquipmentSet(uint64 setGuid);
 
-    void SendInitWorldStates(uint32 zone, uint32 area);
+    void SendInitWorldStates(uint32 zoneId, uint32 areaId);
     void SendUpdateWorldState(uint32 variable, uint32 value) const;
     void SendDirectMessage(WorldPacket const* data) const;
     void SendBGWeekendWorldStates();

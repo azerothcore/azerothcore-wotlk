@@ -22,6 +22,7 @@
 #include "DetourNavMesh.h"
 
 #define MAX_NUMBER_OF_GRIDS      64
+#define MAX_NUMBER_OF_CELLS      8
 #define SIZE_OF_GRIDS            533.3333f
 
 #define MMAP_MAGIC 0x4d4d4150   // 'MMAP'

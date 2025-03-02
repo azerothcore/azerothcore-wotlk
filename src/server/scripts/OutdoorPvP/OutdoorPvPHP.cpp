@@ -25,6 +25,7 @@
 #include "Player.h"
 #include "World.h"
 #include "WorldPacket.h"
+#include "WorldSessionMgr.h"
 
 const uint32 HP_LANG_LOSE_A[HP_TOWER_NUM] = {LANG_OPVP_HP_LOSE_BROKENHILL_A, LANG_OPVP_HP_LOSE_OVERLOOK_A, LANG_OPVP_HP_LOSE_STADIUM_A};
 
@@ -153,18 +154,21 @@ void OutdoorPvPHP::SendRemoveWorldStates(Player* player)
     }
 }
 
-void OutdoorPvPHP::FillInitialWorldStates(WorldPacket& data)
+void OutdoorPvPHP::FillInitialWorldStates(WorldPackets::WorldState::InitWorldStates& packet)
 {
-    data << uint32(HP_UI_TOWER_DISPLAY_A) << uint32(1);
-    data << uint32(HP_UI_TOWER_DISPLAY_H) << uint32(1);
-    data << uint32(HP_UI_TOWER_COUNT_A) << uint32(m_AllianceTowersControlled);
-    data << uint32(HP_UI_TOWER_COUNT_H) << uint32(m_HordeTowersControlled);
-    data << uint32(HP_UI_TOWER_SLIDER_DISPLAY) << uint32(0);
-    data << uint32(HP_UI_TOWER_SLIDER_POS) << uint32(50);
-    data << uint32(HP_UI_TOWER_SLIDER_N) << uint32(100);
+    packet.Worldstates.reserve(8);
+    packet.Worldstates.emplace_back(HP_UI_TOWER_DISPLAY_A, 1);
+    packet.Worldstates.emplace_back(HP_UI_TOWER_DISPLAY_H, 1);
+    packet.Worldstates.emplace_back(HP_UI_TOWER_COUNT_A, m_AllianceTowersControlled);
+    packet.Worldstates.emplace_back(HP_UI_TOWER_COUNT_H, m_HordeTowersControlled);
+
+    packet.Worldstates.emplace_back(HP_UI_TOWER_COUNT_H, m_HordeTowersControlled);
+    packet.Worldstates.emplace_back(HP_UI_TOWER_SLIDER_DISPLAY, 0);
+    packet.Worldstates.emplace_back(HP_UI_TOWER_SLIDER_POS, 50);
+    packet.Worldstates.emplace_back(HP_UI_TOWER_SLIDER_N, 100);
     for (OPvPCapturePointMap::iterator itr = _capturePoints.begin(); itr != _capturePoints.end(); ++itr)
     {
-        itr->second->FillInitialWorldStates(data);
+        itr->second->FillInitialWorldStates(packet);
     }
 }
 
@@ -180,13 +184,13 @@ void OPvPCapturePointHP::ChangeState()
             field = HP_MAP_A[m_TowerType];
             if (uint32 alliance_towers = ((OutdoorPvPHP*)_pvp)->GetAllianceTowersControlled())
                 ((OutdoorPvPHP*)_pvp)->SetAllianceTowersControlled(--alliance_towers);
-            sWorld->SendZoneText(OutdoorPvPHPBuffZones[0], sObjectMgr->GetAcoreStringForDBCLocale(HP_LANG_LOSE_A[m_TowerType]));
+            sWorldSessionMgr->SendZoneText(OutdoorPvPHPBuffZones[0], sObjectMgr->GetAcoreStringForDBCLocale(HP_LANG_LOSE_A[m_TowerType]));
             break;
         case OBJECTIVESTATE_HORDE:
             field = HP_MAP_H[m_TowerType];
             if (uint32 horde_towers = ((OutdoorPvPHP*)_pvp)->GetHordeTowersControlled())
                 ((OutdoorPvPHP*)_pvp)->SetHordeTowersControlled(--horde_towers);
-            sWorld->SendZoneText(OutdoorPvPHPBuffZones[0], sObjectMgr->GetAcoreStringForDBCLocale(HP_LANG_LOSE_H[m_TowerType]));
+            sWorldSessionMgr->SendZoneText(OutdoorPvPHPBuffZones[0], sObjectMgr->GetAcoreStringForDBCLocale(HP_LANG_LOSE_H[m_TowerType]));
             break;
         case OBJECTIVESTATE_NEUTRAL_ALLIANCE_CHALLENGE:
             field = HP_MAP_N[m_TowerType];
@@ -223,7 +227,7 @@ void OPvPCapturePointHP::ChangeState()
                 uint32 alliance_towers = ((OutdoorPvPHP*)_pvp)->GetAllianceTowersControlled();
                 if (alliance_towers < 3)
                     ((OutdoorPvPHP*)_pvp)->SetAllianceTowersControlled(++alliance_towers);
-                sWorld->SendZoneText(OutdoorPvPHPBuffZones[0], sObjectMgr->GetAcoreStringForDBCLocale(HP_LANG_CAPTURE_A[m_TowerType]));
+                sWorldSessionMgr->SendZoneText(OutdoorPvPHPBuffZones[0], sObjectMgr->GetAcoreStringForDBCLocale(HP_LANG_CAPTURE_A[m_TowerType]));
                 break;
             }
         case OBJECTIVESTATE_HORDE:
@@ -234,7 +238,7 @@ void OPvPCapturePointHP::ChangeState()
                 uint32 horde_towers = ((OutdoorPvPHP*)_pvp)->GetHordeTowersControlled();
                 if (horde_towers < 3)
                     ((OutdoorPvPHP*)_pvp)->SetHordeTowersControlled(++horde_towers);
-                sWorld->SendZoneText(OutdoorPvPHPBuffZones[0], sObjectMgr->GetAcoreStringForDBCLocale(HP_LANG_CAPTURE_H[m_TowerType]));
+                sWorldSessionMgr->SendZoneText(OutdoorPvPHPBuffZones[0], sObjectMgr->GetAcoreStringForDBCLocale(HP_LANG_CAPTURE_H[m_TowerType]));
                 break;
             }
         case OBJECTIVESTATE_NEUTRAL_ALLIANCE_CHALLENGE:
@@ -273,29 +277,32 @@ void OPvPCapturePointHP::SendChangePhase()
     SendUpdateWorldState(HP_UI_TOWER_SLIDER_DISPLAY, 1);
 }
 
-void OPvPCapturePointHP::FillInitialWorldStates(WorldPacket& data)
+void OPvPCapturePointHP::FillInitialWorldStates(WorldPackets::WorldState::InitWorldStates& packet)
 {
     switch (_state)
     {
         case OBJECTIVESTATE_ALLIANCE:
         case OBJECTIVESTATE_ALLIANCE_HORDE_CHALLENGE:
-            data << uint32(HP_MAP_N[m_TowerType]) << uint32(0);
-            data << uint32(HP_MAP_A[m_TowerType]) << uint32(1);
-            data << uint32(HP_MAP_H[m_TowerType]) << uint32(0);
+            packet.Worldstates.reserve(3);
+            packet.Worldstates.emplace_back(HP_MAP_N[m_TowerType], 0);
+            packet.Worldstates.emplace_back(HP_MAP_A[m_TowerType], 1);
+            packet.Worldstates.emplace_back(HP_MAP_H[m_TowerType], 0);
             break;
         case OBJECTIVESTATE_HORDE:
         case OBJECTIVESTATE_HORDE_ALLIANCE_CHALLENGE:
-            data << uint32(HP_MAP_N[m_TowerType]) << uint32(0);
-            data << uint32(HP_MAP_A[m_TowerType]) << uint32(0);
-            data << uint32(HP_MAP_H[m_TowerType]) << uint32(1);
+            packet.Worldstates.reserve(3);
+            packet.Worldstates.emplace_back(HP_MAP_N[m_TowerType], 0);
+            packet.Worldstates.emplace_back(HP_MAP_A[m_TowerType], 0);
+            packet.Worldstates.emplace_back(HP_MAP_H[m_TowerType], 1);
             break;
         case OBJECTIVESTATE_NEUTRAL:
         case OBJECTIVESTATE_NEUTRAL_ALLIANCE_CHALLENGE:
         case OBJECTIVESTATE_NEUTRAL_HORDE_CHALLENGE:
         default:
-            data << uint32(HP_MAP_N[m_TowerType]) << uint32(1);
-            data << uint32(HP_MAP_A[m_TowerType]) << uint32(0);
-            data << uint32(HP_MAP_H[m_TowerType]) << uint32(0);
+            packet.Worldstates.reserve(3);
+            packet.Worldstates.emplace_back(HP_MAP_N[m_TowerType], 1);
+            packet.Worldstates.emplace_back(HP_MAP_A[m_TowerType], 0);
+            packet.Worldstates.emplace_back(HP_MAP_H[m_TowerType], 0);
             break;
     }
 }

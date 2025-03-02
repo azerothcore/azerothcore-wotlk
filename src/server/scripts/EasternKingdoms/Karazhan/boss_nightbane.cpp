@@ -172,7 +172,6 @@ struct boss_nightbane : public BossAI
     {
         if (action == ACTION_START_INTRO)
         {
-            me->GetMap()->LoadGrid(-11260.0f, -1771.0f); // load grid at far end of intro path
             me->GetMap()->SetVisibilityRange(DEFAULT_VISIBILITY_INSTANCE + 100.0f); // see nightbane
             me->AddUnitState(UNIT_STATE_IGNORE_PATHFINDING);
             _phase = PHASE_INTRO;

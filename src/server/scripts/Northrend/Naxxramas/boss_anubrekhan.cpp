@@ -118,7 +118,7 @@ public:
 
             Talk(SAY_SLAY);
             victim->CastSpell(victim, SPELL_SUMMON_CORPSE_SCRABS_5, true, nullptr, nullptr, me->GetGUID());
-            instance->SetData(DATA_IMMORTAL_FAIL, 0);
+            instance->StorePersistentData(PERSISTENT_DATA_IMMORTAL_FAIL, 1);
         }
 
         void JustEngagedWith(Unit* who) override

@@ -63,7 +63,7 @@ public:
 
     bool Update(uint32 diff) override;
 
-    void FillInitialWorldStates(WorldPacket& data) override;
+    void FillInitialWorldStates(WorldPackets::WorldState::InitWorldStates& packet) override;
 
     void SendRemoveWorldStates(Player* player) override;
 
@@ -78,7 +78,6 @@ public:
 private:
     uint32 m_Gathered_A;
     uint32 m_Gathered_H;
-
     TeamId m_LastController;
 };
 
