@@ -15,6 +15,19 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+ /**
+  * @file ServerMailMgr.h
+  * @brief Manages the ServerMail operations, including template loading, condition checking, and mail delivery.
+  *
+  * This class handles the loading of server mail templates, associated items, and conditions from the database.
+  * It also provides functionality to check player eligibility for receiving server mails based on configured conditions.
+  *
+  * Key features:
+  * - Supports multi-item mails via `mail_server_template_items`
+  * - Supports flexible mail conditions (level, playtime, quest, achievement) via `mail_server_template_conditions`
+  * - Ensures all related data is loaded and validated on startup
+  */
+
 #ifndef _SERVERMAILMGR_H
 #define _SERVERMAILMGR_H
 
@@ -23,15 +36,28 @@
 #include <unordered_map>
 #include <vector>
 
+/**
+ * @enum ServerMailConditionType
+ * @brief Represents the type of conditions that can be applied to server mail.
+ */
 enum class ServerMailConditionType : uint8
 {
-    None, // internal, not used in DB
-    Level,
-    PlayTime,
-    Quest,
-    Achievement
+    None        = 0, ///< Internal use, not used in DB.
+    Level       = 1, ///< Requires the player to be at least a specific level.
+    PlayTime    = 2, ///< Requires the player to have played for a minimum amount of time (in milliseconds).
+    Quest       = 3, ///< Requires the player to have completed a specific quest.
+    Achievement = 4  ///< Requires the player to have earned a specific achievement.
 };
 
+/**
+ * @struct ServerMailCondition
+ * @brief Represents a condition that must be met for a player to receive a server mail.
+ *
+ * Each condition has a type (see @ref ServerMailConditionType) and a value associated with the type.
+ * For example, for a level condition, the value represents the required player level.
+ *
+ * Conditions are attached to server mail templates and are evaluated when players log in.
+ */
 struct ServerMailCondition
 {
     ServerMailCondition() = default;
@@ -39,6 +65,15 @@ struct ServerMailCondition
     ServerMailConditionType type = ServerMailConditionType::None;
     uint32 value{ 0 };
 
+
+    /**
+     * @brief Checks if a player meets this condition.
+     *
+     * Evaluates the condition type and compares the player's attributes to the required value.
+     *
+     * @param player The player to check.
+     * @return True if the player meets the condition, otherwise false.
+     */
     bool CheckCondition(Player* player) const
     {
         switch (type)
@@ -58,6 +93,13 @@ struct ServerMailCondition
     }
 };
 
+/**
+ * @struct ServerMailItems
+ * @brief Represents an item reward associated with a server mail template.
+ *
+ * Server mail templates can have multiple item rewards, stored separately for each faction.
+ * This struct tracks the item ID and item count.
+ */
 struct ServerMailItems
 {
     ServerMailItems() = default;
@@ -65,6 +107,13 @@ struct ServerMailItems
     uint32 itemCount{ 0 };
 };
 
+/**
+ * @struct ServerMail
+ * @brief Represents a server mail template, including rewards, conditions, and metadata.
+ *
+ * This structure defines a mail template that can be sent to players upon login,
+ * provided they meet the associated conditions.
+ */
 struct ServerMail
 {
     ServerMail() = default;
@@ -93,10 +142,47 @@ private:
 public:
     static ServerMailMgr* instance();
 
+    /**
+     * @brief Loads all server mail templates from the database into memory.
+     *
+     * Queries the `mail_server_template` table and loads all rows into memory.
+     * This method is intended to be called during server startup.
+     */
     void LoadMailServerTemplates();
+
+    /**
+     * @brief Loads all items associated with server mail templates.
+     *
+     * Queries the `mail_server_template_items` table and loads all items into memory,
+     * linking them to their corresponding templates by template ID.
+     * This method is intended to be called during server startup.
+     */
     void LoadMailServerTemplatesItems();
+
+    /**
+     * @brief Loads all conditions associated with server mail templates.
+     *
+     * Queries the `mail_server_template_conditions` table and loads all conditions into memory,
+     * linking them to their corresponding templates by template ID.
+     * This method is intended to be called during server startup.
+     */
     void LoadMailServerTemplatesConditions();
 
+    /**
+     * @brief Sends a server mail to a player if the template is active and the player is eligible.
+     *
+     * This method handles the creation of the mail, adding money and items, and saving the mail to the database.
+     * It also records that the player received the mail to prevent duplicate delivery.
+     *
+     * @param player The recipient player.
+     * @param id The template ID.
+     * @param money Money reward.
+     * @param items List of items to include in the mail.
+     * @param conditions List of the conditions for the mail.
+     * @param subject Mail subject.
+     * @param body Mail body.
+     * @param active Whether the mail template is active.
+     */
     void SendServerMail(Player* player, uint32 id, uint32 money, std::vector<ServerMailItems> const& items, std::vector<ServerMailCondition> const& conditions, std::string subject, std::string body, uint8 active) const;
 
     [[nodiscard]] ServerMailContainer const& GetAllServerMailStore() const { return _serverMailStore; }
