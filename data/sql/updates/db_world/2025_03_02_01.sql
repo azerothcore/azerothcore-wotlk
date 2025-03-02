@@ -1,3 +1,4 @@
+-- DB update 2025_03_02_00 -> 2025_03_02_01
 SET @CGUID := 12860;
 DELETE FROM `creature` WHERE `guid` BETWEEN @CGUID+0 AND @CGUID+30 AND `id1` IN (16241, 16255, 16285, 16359, 16490, 16493, 16494, 16495, 16786, 16787, 29441, 29442, 16241, 16281, 16285, 16361, 16478, 16484, 16786);
 INSERT INTO `creature` (`guid`, `id1`, `map`, `zoneId`, `areaId`, `spawnMask`, `phaseMask`, `equipment_id`, `position_x`, `position_y`, `position_z`, `orientation`, `spawntimesecs`, `wander_distance`, `currentwaypoint`, `curhealth`, `MovementType`, `npcflag`, `unit_flags`, `dynamicflags`, `VerifiedBuild`, `CreateObject`) VALUES
