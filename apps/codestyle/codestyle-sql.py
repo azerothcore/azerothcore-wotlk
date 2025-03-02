@@ -168,8 +168,9 @@ def semicolon_check(file: io, file_path: str) -> None:
     global error_handler, results
     file.seek(0)  # Reset file pointer to the beginning
     check_failed = False
-    sql_keywords = ["SELECT", "INSERT", "UPDATE", "DELETE"]
+    sql_keywords = ["SELECT", "INSERT", "UPDATE", "DELETE", "REPLACE"]
     query_open = False
+    in_block_comment = False
 
     lines = file.readlines()
     total_lines = len(lines)
@@ -177,9 +178,25 @@ def semicolon_check(file: io, file_path: str) -> None:
     for line_number, line in enumerate(lines, start=1):
         if line.startswith('--'):
             continue
+
+        stripped_line = line.strip()
+
+        # Check for block comment start and end
+        if '/*' in stripped_line and '*/' in stripped_line:
+            stripped_line = stripped_line.split('/*', 1)[0].strip()
+        elif '/*' in stripped_line:
+            in_block_comment = True
+            stripped_line = stripped_line.split('/*', 1)[0].strip()
+        elif '*/' in stripped_line:
+            in_block_comment = False
+            stripped_line = stripped_line.split('*/', 1)[1].strip()
+
+        if in_block_comment:
+            continue
+
         # Remove trailing whitespace including newline
         # Remove comments from the line
-        stripped_line = line.split('--', 1)[0].strip()
+        stripped_line = stripped_line.split('--', 1)[0].strip()
 
         # Check if one keyword is in the line
         if not query_open and any(keyword in stripped_line for keyword in sql_keywords):
