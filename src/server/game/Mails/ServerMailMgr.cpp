@@ -188,6 +188,8 @@ void ServerMailMgr::LoadMailServerTemplatesConditions()
             conditionType = ServerMailConditionType::Faction;
         else if (conditionTypeStr == "Race")
             conditionType = ServerMailConditionType::Race;
+        else if (conditionTypeStr == "Class")
+            conditionType = ServerMailConditionType::Class;
         else
         {
             LOG_ERROR("sql.sql", "Table `mail_server_template_conditions` has unknown conditionType '{}', skipped.", conditionTypeStr);
