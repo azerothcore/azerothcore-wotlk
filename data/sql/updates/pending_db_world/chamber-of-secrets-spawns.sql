@@ -2,8 +2,8 @@ SET @CGUID := 452;
 SET @OGUID := 517;
 
 DELETE FROM `creature` WHERE `guid` = @CGUID AND `id1` = 28194;
-INSERT INTO `creature` (`guid`, `id1`, `map`, `zoneId`, `areaId`, `spawnMask`, `phaseMask`, `equipment_id`, `position_x`, `position_y`, `position_z`, `orientation`, `spawntimesecs`, `wander_distance`, `currentwaypoint`, `curhealth`, `curmana`, `MovementType`, `npcflag`, `unit_flags`, `dynamicflags`, `VerifiedBuild`) VALUES
-(@CGUID, 28194, 532, 0, 0, 1, 1, 0, -11099.45703125, -1967.8096923828125, 76.2422027587890625, 2.49582076072692871, 7200, 0, 0, 398370, 0, 0, 0, 0, 0, 49345);
+INSERT INTO `creature` (`guid`, `id1`, `map`, `zoneId`, `areaId`, `spawnMask`, `phaseMask`, `equipment_id`, `position_x`, `position_y`, `position_z`, `orientation`, `spawntimesecs`, `wander_distance`, `currentwaypoint`, `curhealth`, `curmana`, `MovementType`, `npcflag`, `unit_flags`, `dynamicflags`, `VerifiedBuild`, `CreateObject`) VALUES
+(@CGUID, 28194, 532, 0, 0, 1, 1, 0, -11099.45703125, -1967.8096923828125, 76.2422027587890625, 2.49582076072692871, 7200, 0, 0, 398370, 0, 0, 0, 0, 0, 49345, 2);
 
 DELETE FROM `gameobject` WHERE `guid` BETWEEN @OGUID+0 AND @OGUID+6 AND `id` IN (190604, 190609, 190610);
 INSERT INTO `gameobject` (`guid`, `id`, `map`, `zoneId`, `areaId`, `spawnMask`, `phaseMask`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecs`, `animprogress`, `state`, `VerifiedBuild`) VALUES
