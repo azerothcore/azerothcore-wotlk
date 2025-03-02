@@ -57,6 +57,7 @@ git clone --depth=1 --branch=master https://github.com/azerothcore/mod-morphsumm
 git clone --depth=1 --branch=master https://github.com/azerothcore/mod-multi-client-check modules/mod-multi-client-check
 git clone --depth=1 --branch=master https://github.com/azerothcore/mod-notify-muted modules/mod-notify-muted
 git clone --depth=1 --branch=master https://github.com/azerothcore/mod-npc-all-mounts modules/mod-npc-all-mounts
+git clone --depth=1 --branch=master https://github.com/azerothcore/mod-npc-beastmaster modules/mod-npc-beastmaster
 git clone --depth=1 --branch=master https://github.com/azerothcore/mod-npc-buffer modules/mod-npc-buffer
 git clone --depth=1 --branch=master https://github.com/azerothcore/mod-npc-codebox modules/mod-npc-codebox
 git clone --depth=1 --branch=master https://github.com/azerothcore/mod-npc-enchanter modules/mod-npc-enchanter
