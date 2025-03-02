@@ -65,7 +65,6 @@ struct ServerMailCondition
     ServerMailConditionType type = ServerMailConditionType::None;
     uint32 value{ 0 };
 
-
     /**
      * @brief Checks if a player meets this condition.
      *
