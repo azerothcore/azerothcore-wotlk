@@ -151,6 +151,7 @@ struct boss_felmyst : public BossAI
         instance->DoRemoveAurasDueToSpellOnPlayers(SPELL_FOG_OF_CORRUPTION_CHARM);
         _currentLane = 0;
         _strafeCount = 0;
+        me->SetCombatMovement(false);
     }
 
     void JustEngagedWith(Unit* who) override
@@ -160,11 +161,12 @@ struct boss_felmyst : public BossAI
         ScheduleEnrageTimer(SPELL_BERSERK, 10min, YELL_BERSERK);
 
         me->GetMotionMaster()->Clear();
+        me->GetMotionMaster()->MoveIdle();
 
         Position landPos = who->GetPosition();
         me->m_Events.AddEventAtOffset([&, landPos] {
             me->GetMotionMaster()->MoveLand(POINT_GROUND, landPos);
-        }, 2s);
+        }, 1s);
     }
 
     void KilledUnit(Unit* victim) override
@@ -245,6 +247,7 @@ struct boss_felmyst : public BossAI
                         me->SetTarget(me->GetVictim()->GetGUID());
 
                     me->ResumeChasingVictim();
+                    me->SetCombatMovement(true);
                 }, 5s);
 
                 ScheduleGroundAbilities();
