@@ -148,7 +148,6 @@ struct boss_felmyst : public BossAI
     void Reset() override
     {
         BossAI::Reset();
-        me->m_Events.KillAllEvents(false);
         instance->DoRemoveAurasDueToSpellOnPlayers(SPELL_FOG_OF_CORRUPTION_CHARM);
         _currentLane = 0;
         _strafeCount = 0;
@@ -158,10 +157,7 @@ struct boss_felmyst : public BossAI
     {
         BossAI::JustEngagedWith(who);
 
-        me->m_Events.AddEventAtOffset([&] {
-            Talk(YELL_BERSERK);
-            DoCastSelf(SPELL_BERSERK, true);
-        }, 10min);
+        ScheduleEnrageTimer(SPELL_BERSERK, 10min, YELL_BERSERK);
 
         me->GetMotionMaster()->Clear();
 
