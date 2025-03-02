@@ -275,9 +275,9 @@ struct boss_felmyst : public BossAI
                     ++_strafeCount;
                     _currentLane = urand(0, 2);
                     if (me->FindNearestCreature(NPC_WORLD_TRIGGER_RIGHT, 30.0f))
-                        me->GetMotionMaster()->MovePoint(POINT_LANE, RightSideLanes[_currentLane]);
+                        me->GetMotionMaster()->MovePoint(POINT_LANE, RightSideLanes[_currentLane], false);
                     else
-                        me->GetMotionMaster()->MovePoint(POINT_LANE, LeftSideLanes[_currentLane]);
+                        me->GetMotionMaster()->MovePoint(POINT_LANE, LeftSideLanes[_currentLane], false);
                 }, 2s);
                 break;
             case POINT_LANE:
@@ -298,9 +298,9 @@ struct boss_felmyst : public BossAI
                     DoCastSelf(SPELL_FELMYST_SPEED_BURST, true);
 
                     if (me->FindNearestCreature(NPC_WORLD_TRIGGER_RIGHT, 30.0f))
-                        me->GetMotionMaster()->MovePoint(POINT_AIR_BREATH_END, LeftSideLanes[_currentLane]);
+                        me->GetMotionMaster()->MovePoint(POINT_AIR_BREATH_END, LeftSideLanes[_currentLane], false);
                     else
-                        me->GetMotionMaster()->MovePoint(POINT_AIR_BREATH_END, RightSideLanes[_currentLane]);
+                        me->GetMotionMaster()->MovePoint(POINT_AIR_BREATH_END, RightSideLanes[_currentLane], false);
                 }, 5s);
                 break;
             case POINT_AIR_BREATH_END:
@@ -308,9 +308,9 @@ struct boss_felmyst : public BossAI
 
                 me->m_Events.AddEventAtOffset([&] {
                     if (me->FindNearestCreature(NPC_WORLD_TRIGGER_RIGHT, 30.0f))
-                        me->GetMotionMaster()->MovePoint(POINT_AIR_UP, RightSide);
+                        me->GetMotionMaster()->MovePoint(POINT_AIR_UP, RightSide, false);
                     else
-                        me->GetMotionMaster()->MovePoint(POINT_AIR_UP, LeftSide);
+                        me->GetMotionMaster()->MovePoint(POINT_AIR_UP, LeftSide, false);
                 }, 2s);
                 break;
         }
