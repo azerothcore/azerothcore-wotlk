@@ -182,6 +182,14 @@ def semicolon_check(file: io, file_path: str) -> None:
     lines = file.readlines()
     total_lines = len(lines)
 
+    def get_next_non_blank_line(start):
+        """ Get the next non-blank, non-comment line starting from `start` """
+        for idx in range(start, total_lines):
+            next_line = lines[idx].strip()
+            if next_line and not next_line.startswith('--') and not next_line.startswith('/*'):
+                return next_line
+        return None
+
     for line_number, line in enumerate(lines, start=1):
         stripped_line = line.strip()
 
@@ -202,37 +210,47 @@ def semicolon_check(file: io, file_path: str) -> None:
                 in_block_comment = True
                 stripped_line = stripped_line.split('/*', 1)[0].strip()
 
-        # Skip empty lines (unless inside a values block)
+        # Skip empty lines (unless inside values block)
         if not stripped_line and not inside_values_block:
             continue
 
         # Remove inline comments after SQL
         stripped_line = stripped_line.split('--', 1)[0].strip()
 
-        # Detect start of query
-        if not query_open and any(keyword in stripped_line.upper() for keyword in ["SELECT", "INSERT", "UPDATE", "DELETE", "REPLACE", "SET"]):
+        # Detect query start
+        if not query_open and any(keyword in stripped_line.upper() for keyword in ["SELECT", "INSERT", "UPDATE", "DELETE", "REPLACE"]):
             query_open = True
 
-        # Detect `INSERT INTO` or `REPLACE INTO` with VALUES to start multi-row check
+        # Detect start of multi-line VALUES block
         if any(kw in stripped_line.upper() for kw in ["INSERT", "REPLACE"]) and "VALUES" in stripped_line.upper():
             inside_values_block = True
             query_open = True  # Ensure query is marked open too
 
-        # Handle values block rows
         if inside_values_block:
             if not stripped_line:
-                continue  # Blank lines are fine within a values block
+                continue  # Allow blank lines inside VALUES block
 
             if stripped_line.startswith('('):
-                if stripped_line.endswith(';'):
-                    inside_values_block = False  # Final row with semicolon ends block
-                    query_open = False
-                elif not stripped_line.endswith(','):
-                    print(f"❌ Missing comma in {file_path} at line {line_number}")
-                    error_handler = True
+                # Get next non-blank line to detect if we're at the last row
+                next_line = get_next_non_blank_line(line_number)
+                
+                if next_line and next_line.startswith('('):
+                    # Expect comma if another row follows
+                    if not stripped_line.endswith(','):
+                        print(f"❌ Missing comma in {file_path} at line {line_number}")
+                        error_handler = True
+                else:
+                    # Expect semicolon if this is the final row
+                    if not stripped_line.endswith(';'):
+                        print(f"❌ Missing semicolon in {file_path} at line {line_number}")
+                        error_handler = True
+                        inside_values_block = False
+                        query_open = False
+                    else:
+                        inside_values_block = False  # Close block if semicolon was found
 
         elif query_open and not inside_values_block:
-            # Regular query check (non-INSERT VALUES types)
+            # Normal query handling (outside multi-row VALUES block)
             if line_number == total_lines and not stripped_line.endswith(';'):
                 print(f"❌ Missing semicolon in {file_path} at the last line {line_number}")
                 error_handler = True
