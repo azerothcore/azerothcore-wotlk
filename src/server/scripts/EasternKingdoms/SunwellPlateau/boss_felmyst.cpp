@@ -85,23 +85,23 @@ enum Misc
     NPC_WORLD_TRIGGER_RIGHT     = 25358
 };
 
-const Position posleft[3] =
+const Position LeftSideLanes[3] =
 {
     { 1494.745f,  704.0001f,  50.084652f, 4.7472f }, // top
     { 1469.923f,  703.23914f, 50.08592f,  4.7472f }, // middle
     { 1446.5154f, 701.5184f,  50.085438f, 4.7472f } // bottom
 };
 
-const Position posright[3] =
+const Position RightSideLanes[3] =
 {
     { 1492.82f,   515.668f,  50.0833f,   1.4486f }, // top
     { 1466.7322f, 515.5953f, 50.571518f, 1.4486f }, // middle
     { 1441.64f,   520.52f,   50.0833f,   1.4486f } // bottom
 };
 
-const Position rightSide = { 1458.5555f, 502.1995f, 59.899513f, 1.605702f };
-const Position leftSide = { 1469.0642f, 729.5854f, 59.823853f, 4.6774f };
-const Position landingPos = { 1476.77f, 665.094f, 20.6423f };
+const Position RightSide = { 1458.5555f, 502.1995f, 59.899513f, 1.605702f };
+const Position LeftSide = { 1469.0642f, 729.5854f, 59.823853f, 4.6774f };
+const Position LandingPos = { 1476.77f, 665.094f, 20.6423f };
 
 class CorruptTriggers : public BasicEvent
 {
@@ -260,7 +260,7 @@ struct boss_felmyst : public BossAI
 
                 scheduler.Schedule(27s, GROUP_BREATH, [this](TaskContext)
                 {
-                    me->GetMotionMaster()->MovePoint(POINT_AIR_UP, rightSide);
+                    me->GetMotionMaster()->MovePoint(POINT_AIR_UP, RightSide);
                 });
                 break;
             case POINT_AIR_UP:
@@ -268,16 +268,16 @@ struct boss_felmyst : public BossAI
                     if (_strafeCount >= 3)
                     {
                         _strafeCount = 0;
-                        me->GetMotionMaster()->MoveLand(POINT_GROUND, landingPos);
+                        me->GetMotionMaster()->MoveLand(POINT_GROUND, LandingPos);
                         return;
                     }
 
                     ++_strafeCount;
                     _currentLane = urand(0, 2);
                     if (me->FindNearestCreature(NPC_WORLD_TRIGGER_RIGHT, 30.0f))
-                        me->GetMotionMaster()->MovePoint(POINT_LANE, posright[_currentLane]);
+                        me->GetMotionMaster()->MovePoint(POINT_LANE, RightSideLanes[_currentLane]);
                     else
-                        me->GetMotionMaster()->MovePoint(POINT_LANE, posleft[_currentLane]);
+                        me->GetMotionMaster()->MovePoint(POINT_LANE, LeftSideLanes[_currentLane]);
                 }, 2s);
                 break;
             case POINT_LANE:
@@ -298,9 +298,9 @@ struct boss_felmyst : public BossAI
                     DoCastSelf(SPELL_FELMYST_SPEED_BURST, true);
 
                     if (me->FindNearestCreature(NPC_WORLD_TRIGGER_RIGHT, 30.0f))
-                        me->GetMotionMaster()->MovePoint(POINT_AIR_BREATH_END, posleft[_currentLane]);
+                        me->GetMotionMaster()->MovePoint(POINT_AIR_BREATH_END, LeftSideLanes[_currentLane]);
                     else
-                        me->GetMotionMaster()->MovePoint(POINT_AIR_BREATH_END, posright[_currentLane]);
+                        me->GetMotionMaster()->MovePoint(POINT_AIR_BREATH_END, RightSideLanes[_currentLane]);
                 }, 5s);
                 break;
             case POINT_AIR_BREATH_END:
@@ -308,9 +308,9 @@ struct boss_felmyst : public BossAI
 
                 me->m_Events.AddEventAtOffset([&] {
                     if (me->FindNearestCreature(NPC_WORLD_TRIGGER_RIGHT, 30.0f))
-                        me->GetMotionMaster()->MovePoint(POINT_AIR_UP, rightSide);
+                        me->GetMotionMaster()->MovePoint(POINT_AIR_UP, RightSide);
                     else
-                        me->GetMotionMaster()->MovePoint(POINT_AIR_UP, leftSide);
+                        me->GetMotionMaster()->MovePoint(POINT_AIR_UP, LeftSide);
                 }, 2s);
                 break;
         }
