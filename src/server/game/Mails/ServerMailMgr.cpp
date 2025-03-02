@@ -184,6 +184,10 @@ void ServerMailMgr::LoadMailServerTemplatesConditions()
             conditionType = ServerMailConditionType::Achievement;
         else if (conditionTypeStr == "Reputation")
             conditionType = ServerMailConditionType::Reputation;
+        else if (conditionTypeStr == "Faction")
+            conditionType = ServerMailConditionType::Faction;
+        else if (conditionTypeStr == "Race")
+            conditionType = ServerMailConditionType::Race;
         else
         {
             LOG_ERROR("sql.sql", "Table `mail_server_template_conditions` has unknown conditionType '{}', skipped.", conditionTypeStr);
@@ -192,7 +196,9 @@ void ServerMailMgr::LoadMailServerTemplatesConditions()
 
         if (conditionState &&
             conditionType != ServerMailConditionType::Quest ||
-            conditionType != ServerMailConditionType::Reputation)
+            conditionType != ServerMailConditionType::Reputation ||
+            conditionType != ServerMailConditionType::Faction ||
+            conditionType != ServerMailConditionType::Race)
             LOG_WARN("sql.sql", "Table `mail_server_template_conditions` has conditionState value ({}) for conditionType ({}) which does not use conditionState.", conditionState, conditionTypeStr);
 
         switch (conditionType)
@@ -245,6 +251,20 @@ void ServerMailMgr::LoadMailServerTemplatesConditions()
             }
             break;
         }
+        case ServerMailConditionType::Faction:
+            if (conditionValue < TEAM_ALLIANCE || conditionValue > TEAM_HORDE)
+            {
+                LOG_ERROR("sql.sql", "Table `mail_server_template_conditions` has conditionType 'Faction' with invalid conditionValue ({}) for templateID {}, skipped.", conditionState, templateID);
+                continue;
+            }
+            break;
+        case ServerMailConditionType::Race:
+            if (conditionValue & ~RACEMASK_ALL_PLAYABLE)
+            {
+                LOG_ERROR("sql.sql", "Table `mail_server_template_conditions` has conditionType 'Race' with invalid conditionValue ({}) for templateID {}, skipped.", conditionState, templateID);
+                continue;
+            }
+            break;
         default:
             break;
         }

@@ -31,7 +31,7 @@ DROP TABLE IF EXISTS `mail_server_template_conditions`;
 CREATE TABLE `mail_server_template_conditions` (
     `id` INT UNSIGNED AUTO_INCREMENT,
     `templateID` INT UNSIGNED NOT NULL,
-    `conditionType` ENUM('Level', 'PlayTime', 'Quest', 'Achievement', 'Reputation') NOT NULL,
+    `conditionType` ENUM('Level', 'PlayTime', 'Quest', 'Achievement', 'Reputation', 'Faction', 'Race') NOT NULL,
     `conditionValue` INT UNSIGNED NOT NULL,
     `conditionState` INT UNSIGNED NOT NULL DEFAULT 0,
     PRIMARY KEY (`id`),

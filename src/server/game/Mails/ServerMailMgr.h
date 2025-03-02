@@ -48,6 +48,8 @@ enum class ServerMailConditionType : uint8
     Quest       = 3, ///< Requires the player to have completed a specific quest.
     Achievement = 4, ///< Requires the player to have earned a specific achievement.
     Reputation  = 5, ///< Requires the player to have earned reputation with a specific faction.
+    Faction     = 6, ///< Requires the player to be a part of a specific faction. Horde/Alliance.
+    Race        = 7, ///< Requires the player to be a specific race.
 };
 
 /**
@@ -89,6 +91,10 @@ struct ServerMailCondition
             return player->HasAchieved(value);
         case ServerMailConditionType::Reputation:
             return player->GetReputationRank(value) >= state;
+        case ServerMailConditionType::Faction:
+            return player->GetTeamId() == value;
+        case ServerMailConditionType::Race:
+            return (player->getRaceMask() & value) != 0;
         default:
             LOG_ERROR("server.mail", "Unknown server mail condition type '{}'", static_cast<uint32>(type));
             return false;
