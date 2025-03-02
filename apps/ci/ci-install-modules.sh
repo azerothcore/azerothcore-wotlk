@@ -84,6 +84,7 @@ git clone --depth=1 --branch=master https://github.com/azerothcore/mod-quick-tel
 git clone --depth=1 --branch=main   https://github.com/azerothcore/mod-racial-trait-swap modules/mod-racial-trait-swap
 git clone --depth=1 --branch=master https://github.com/azerothcore/mod-random-enchants modules/mod-random-enchants
 git clone --depth=1 --branch=master https://github.com/azerothcore/mod-rdf-expansion modules/mod-rdf-expansion
+git clone --depth=1 --branch=master https://github.com/azerothcore/mod-resurrection-scroll modules/mod-resurrection-scroll
 git clone --depth=1 --branch=master https://github.com/azerothcore/mod-reward-played-time modules/mod-reward-played-time
 git clone --depth=1 --branch=master https://github.com/azerothcore/mod-reward-shop modules/mod-reward-shop
 git clone --depth=1 --branch=master https://github.com/azerothcore/mod-server-auto-shutdown.git modules/mod-server-auto-shutdown
