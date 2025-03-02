@@ -175,8 +175,9 @@ def semicolon_check(file: io, file_path: str) -> None:
     block_comment_end = re.compile(r'\*/')
     inline_comment = re.compile(r'--.*')
 
-    in_block_comment = False
     query_open = False
+    in_block_comment = False
+    inside_values_block = False
 
     lines = file.readlines()
     total_lines = len(lines)
@@ -207,20 +208,31 @@ def semicolon_check(file: io, file_path: str) -> None:
         if not query_open and sql_statement_regex.match(stripped_line):
             query_open = True
 
-        # If a query is open, check if it properly ends with a semicolon
-        if query_open:
-            if not stripped_line:
-                # Empty line while a query is open — missing semicolon case
-                print(f"Missing semicolon in {file_path} at line {line_number - 1}")
-                check_failed = True
-                query_open = False
-            elif line_number == total_lines and not stripped_line.endswith(';'):
-                # Last line check
-                print(f"Missing semicolon in {file_path} at the last line {line_number}")
-                check_failed = True
+        # Detect start of multi-line INSERT VALUES block
+        if any(stripped_line.upper().startswith(kw) for kw in ["INSERT", "REPLACE"]) and "VALUES" in stripped_line.upper():
+            inside_values_block = True
+
+        if inside_values_block and stripped_line.startswith('('):
+            if is_last_row(line_number):
+                # Last row - expect semicolon
+                if not stripped_line.endswith(';'):
+                    print(f"❌ Missing semicolon in {file_path} at line {line_number}")
+                    error_handler = True
+                    inside_values_block = False
+                    query_open = False
+            else:
+                # Non-last row - expect comma
+                if not stripped_line.endswith(','):
+                    print(f"❌ Missing comma in {file_path} at line {line_number}")
+                    error_handler = True
+
+        elif query_open and not inside_values_block:
+            # Normal single-line query handling (non-INSERT VALUES)
+            if line_number == total_lines and not stripped_line.endswith(';'):
+                print(f"❌ Missing semicolon in {file_path} at the last line {line_number}")
+                error_handler = True
                 query_open = False
             elif stripped_line.endswith(';'):
-                # Proper query termination
                 query_open = False
 
     if check_failed:
