@@ -167,7 +167,7 @@ INSERT INTO `game_event_creature` (`eventEntry`, `guid`) VALUES
 (@SCOURGEINVASION, @CGUID+29),
 (@SCOURGEINVASION, @CGUID+30);
 
-DELETE FROM `game_event_gameobject` WHERE `eventEntry` = @SCOURGEINVASION AND `guid` BETWEEN @OGUID+0 AND @OGUID+39;
+DELETE FROM `game_event_gameobject` WHERE `eventEntry` = @SCOURGEINVASION AND `guid` BETWEEN @OGUID+0 AND @OGUID+39
 INSERT INTO `game_event_gameobject` (`eventEntry`, `guid`) VALUES
 (@SCOURGEINVASION, @OGUID+0),
 (@SCOURGEINVASION, @OGUID+1),
@@ -208,4 +208,4 @@ INSERT INTO `game_event_gameobject` (`eventEntry`, `guid`) VALUES
 (@SCOURGEINVASION, @OGUID+36),
 (@SCOURGEINVASION, @OGUID+37),
 (@SCOURGEINVASION, @OGUID+38),
-(@SCOURGEINVASION, @OGUID+39)
+(@SCOURGEINVASION, @OGUID+39);
