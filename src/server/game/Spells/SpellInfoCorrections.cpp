@@ -3678,12 +3678,6 @@ void SpellMgr::LoadSpellInfoCorrections()
         spellInfo->AttributesEx5 |= SPELL_ATTR5_ALWAYS_AOE_LINE_OF_SIGHT;
     });
 
-    //Crushing the Crown
-    ApplySpellFix({ 71024 }, [](SpellInfo* spellInfo)
-    {
-        spellInfo->Effects[EFFECT_0].TargetA = SpellImplicitTargetInfo(TARGET_DEST_DYNOBJ_NONE);
-    });
-
     // Battle for the Undercity
     ApplySpellFix({
         59892   // Cyclone fall
