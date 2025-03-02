@@ -181,16 +181,17 @@ def semicolon_check(file: io, file_path: str) -> None:
 
         stripped_line = line.strip()
 
-        # Check for block comment start and end
+        # Check for block comment
         if '/*' in stripped_line and '*/' in stripped_line:
             stripped_line = stripped_line.split('/*', 1)[0].strip()
         elif '/*' in stripped_line:
             in_block_comment = True
-            stripped_line = stripped_line.split('/*', 1)[0].strip()
+            continue
         elif '*/' in stripped_line:
             in_block_comment = False
-            stripped_line = stripped_line.split('*/', 1)[1].strip()
+            continue
 
+        # Skip block comment
         if in_block_comment:
             continue
 
