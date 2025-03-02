@@ -28,6 +28,7 @@ git clone --depth=1 --branch=master https://github.com/azerothcore/mod-chat-tran
 git clone --depth=1 --branch=master https://github.com/azerothcore/mod-congrats-on-level modules/mod-congrats-on-level
 git clone --depth=1 --branch=master https://github.com/azerothcore/mod-costumes modules/mod-costumes
 git clone --depth=1 --branch=master https://github.com/azerothcore/mod-cta-switch modules/mod-cta-switch
+git clone --depth=1 --branch=master https://github.com/azerothcore/mod-custom-login modules/mod-custom-login
 git clone --depth=1 --branch=master https://github.com/azerothcore/mod-desertion-warnings modules/mod-desertion-warnings
 git clone --depth=1 --branch=master https://github.com/azerothcore/mod-detailed-logging modules/mod-detailed-logging
 git clone --depth=1 --branch=main   https://github.com/azerothcore/mod-dmf-switch modules/mod-dmf-switch
