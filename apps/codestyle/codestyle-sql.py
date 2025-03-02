@@ -166,56 +166,61 @@ def insert_delete_safety_check(file: io, file_path: str) -> None:
 
 def semicolon_check(file: io, file_path: str) -> None:
     global error_handler, results
-    file.seek(0)  # Reset file pointer to the beginning
+
+    file.seek(0)  # Reset file pointer to the start
     check_failed = False
-    sql_keywords = ["SELECT", "INSERT", "UPDATE", "DELETE", "REPLACE"]
-    query_open = False
+
+    sql_statement_regex = re.compile(r'^\s*(SELECT|INSERT|UPDATE|DELETE|REPLACE)\b', re.IGNORECASE)
+    block_comment_start = re.compile(r'/\*')
+    block_comment_end = re.compile(r'\*/')
+    inline_comment = re.compile(r'--.*')
+
     in_block_comment = False
+    query_open = False
 
     lines = file.readlines()
     total_lines = len(lines)
 
     for line_number, line in enumerate(lines, start=1):
-        if line.startswith('--'):
-            continue
+        # Remove inline comments
+        line = inline_comment.sub('', line)
 
         stripped_line = line.strip()
 
-        # Check for block comment
         if in_block_comment:
-            if '*/' in stripped_line:
+            if block_comment_end.search(stripped_line):
                 in_block_comment = False
-                stripped_line = stripped_line.split('*/', 1)[1].strip()
+                # Only keep content after the block comment ends
+                stripped_line = block_comment_end.split(stripped_line, 1)[1].strip()
             else:
                 continue
-        else:
-            if '/*' in stripped_line:
-                query_open = False
-                in_block_comment = True
-                stripped_line = stripped_line.split('/*', 1)[0].strip()
+        elif block_comment_start.search(stripped_line):
+            # Block comment starts — ignore anything after /* on this line
+            query_open = False  # Reset query detection inside block comment
+            in_block_comment = True
+            stripped_line = block_comment_start.split(stripped_line, 1)[0].strip()
 
         if not stripped_line:
-            continue
+            continue  # Skip empty lines
 
-        # Remove trailing whitespace including newline
-        # Remove comments from the line
-        stripped_line = stripped_line.split('--', 1)[0].strip()
-
-        # Check if one keyword is in the line
-        if not query_open and any(keyword in stripped_line for keyword in sql_keywords):
+        # Detect if this is the start of a new SQL statement
+        if not query_open and sql_statement_regex.match(stripped_line):
             query_open = True
 
+        # If a query is open, check if it properly ends with a semicolon
         if query_open:
-            if stripped_line == '':
+            if not stripped_line:
+                # Empty line while a query is open — missing semicolon case
                 print(f"Missing semicolon in {file_path} at line {line_number - 1}")
                 check_failed = True
                 query_open = False
-            elif line_number == total_lines:
-                if not stripped_line.endswith(';'):
-                    print(f"Missing semicolon in {file_path} at the last line {line_number}")
-                    check_failed = True
-                    query_open = False
+            elif line_number == total_lines and not stripped_line.endswith(';'):
+                # Last line check
+                print(f"Missing semicolon in {file_path} at the last line {line_number}")
+                check_failed = True
+                query_open = False
             elif stripped_line.endswith(';'):
+                # Proper query termination
                 query_open = False
 
     if check_failed:
