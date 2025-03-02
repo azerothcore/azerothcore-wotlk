@@ -168,6 +168,7 @@ bool Battlefield::Update(uint32 diff)
         m_StartGrouping = true;
         InvitePlayersInZoneToQueue();
         OnStartGrouping();
+        SendUpdateWorldStates();
     }
 
     bool objective_changed = false;
@@ -353,6 +354,8 @@ void Battlefield::StartBattle()
     DoPlaySoundToAll(BF_START);
 
     OnBattleStart();
+
+    SendUpdateWorldStates();
 }
 
 void Battlefield::EndBattle(bool endByTimer)
@@ -377,6 +380,7 @@ void Battlefield::EndBattle(bool endByTimer)
     // Reset battlefield timer
     m_Timer = m_NoWarBattleTime;
     SendInitWorldStatesToAll();
+    SendUpdateWorldStates();
 }
 
 void Battlefield::DoPlaySoundToAll(uint32 SoundID)
