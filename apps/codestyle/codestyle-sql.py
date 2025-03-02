@@ -219,8 +219,12 @@ def semicolon_check(file: io, file_path: str) -> None:
         # Remove inline comments after SQL
         stripped_line = stripped_line.split('--', 1)[0].strip()
 
+        if stripped_line.upper().startswith("SET") and not stripped_line.endswith(";"):
+            print(f"❌ Missing semicolon in {file_path} at line {line_number}")
+            check_failed = True
+
         # Detect query start
-        if not query_open and any(keyword in stripped_line.upper() for keyword in ["SELECT", "INSERT", "UPDATE", "DELETE", "REPLACE", "SET"]):
+        if not query_open and any(keyword in stripped_line.upper() for keyword in ["SELECT", "INSERT", "UPDATE", "DELETE", "REPLACE"]):
             query_open = True
 
         # Detect start of multi-line VALUES block
