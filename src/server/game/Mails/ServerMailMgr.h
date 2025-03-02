@@ -84,7 +84,7 @@ struct ServerMailCondition
         case ServerMailConditionType::PlayTime:
             return player->GetTotalPlayedTime() >= value;
         case ServerMailConditionType::Quest:
-            return player->IsQuestRewarded(value);
+            return player->GetQuestStatus(value) == state;
         case ServerMailConditionType::Achievement:
             return player->HasAchieved(value);
         case ServerMailConditionType::Reputation:

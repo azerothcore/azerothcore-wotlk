@@ -24,6 +24,7 @@
 #include "Player.h"
 #include "SharedDefines.h"
 #include "Timer.h"
+#include "QuestDef.h"
 
 ServerMailMgr::ServerMailMgr() {}
 ServerMailMgr::~ServerMailMgr() {}
@@ -189,9 +190,10 @@ void ServerMailMgr::LoadMailServerTemplatesConditions()
             continue;
         }
 
-        if (conditionState && conditionType != ServerMailConditionType::Reputation)
+        if (conditionState &&
+            (conditionType != ServerMailConditionType::Quest || conditionType != ServerMailConditionType::Reputation))
         {
-            LOG_ERROR("sql.sql", "Table `mail_server_template_conditions` has conditionState value ({}) for invalid conditionType ({}), set to 0.", conditionState, conditionTypeStr);
+            LOG_ERROR("sql.sql", "Table `mail_server_template_conditions` has conditionState value ({}) for conditionType ({}), set to 0.", conditionState, conditionTypeStr);
             conditionState = 0;
         }
 
@@ -210,6 +212,12 @@ void ServerMailMgr::LoadMailServerTemplatesConditions()
             if (!qInfo)
             {
                 LOG_ERROR("sql.sql", "Table `mail_server_template_conditions` has conditionType 'Quest' with invalid quest in conditionValue ({}) for templateID {}, skipped.", conditionValue, templateID);
+                continue;
+            }
+            if (conditionState < QUEST_STATUS_NONE || conditionState >= MAX_QUEST_STATUS ||
+                /*2 and 4 not defined and should not be used*/ conditionState == 2 || conditionState == 4)
+            {
+                LOG_ERROR("sql.sql", "Table `mail_server_template_conditions` has conditionType 'Quest' with invalid conditionState ({}) for templateID {}, skipped.", conditionState, templateID);
                 continue;
             }
             break;
