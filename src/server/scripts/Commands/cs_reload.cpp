@@ -37,6 +37,7 @@ EndScriptData */
 #include "MapMgr.h"
 #include "MotdMgr.h"
 #include "ObjectMgr.h"
+#include "ServerMailMgr.h"
 #include "ScriptMgr.h"
 #include "SkillDiscovery.h"
 #include "SkillExtraItems.h"
@@ -1196,7 +1197,7 @@ public:
     static bool HandleReloadMailServerTemplateCommand(ChatHandler* handler)
     {
         LOG_INFO("server.loading", "Reloading `server_mail_template` table");
-        sObjectMgr->LoadMailServerTemplates();
+        sServerMailMgr->LoadMailServerTemplates();
         handler->SendGlobalGMSysMessage("DB table `server_mail_template` reloaded.");
         return true;
     }
