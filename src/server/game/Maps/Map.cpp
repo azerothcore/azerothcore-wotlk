@@ -2828,7 +2828,7 @@ Corpse* Map::ConvertCorpseToBones(ObjectGuid const ownerGuid, bool insignia /*= 
     // ignore bones creating option in case insignia
     if ((insignia ||
         (IsBattlegroundOrArena() ? sWorld->getBoolConfig(CONFIG_DEATH_BONES_BG_OR_ARENA) : sWorld->getBoolConfig(CONFIG_DEATH_BONES_WORLD))) &&
-        !IsGridCreated(corpse->GetPositionX(), corpse->GetPositionY()))
+        IsGridLoaded(corpse->GetPositionX(), corpse->GetPositionY()))
     {
         // Create bones, don't change Corpse
         bones = new Corpse();
