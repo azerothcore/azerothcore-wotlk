@@ -177,6 +177,10 @@ def semicolon_check(file: io, file_path: str) -> None:
     for line_number, line in enumerate(lines, start=1):
         if line.startswith('--'):
             continue
+        if line.startswith('/*'):
+            continue
+        if line.startswith('*/'):
+            continue
         # Remove trailing whitespace including newline
         # Remove comments from the line
         stripped_line = line.split('--', 1)[0].strip()
@@ -234,7 +238,7 @@ def backtick_check(file: io, file_path: str) -> None:
                 # Skip SQL keywords
                 if word.upper() in {"SELECT", "FROM", "JOIN", "WHERE", "GROUP", "BY", "ORDER", 
                                     "DELETE", "UPDATE", "INSERT", "INTO", "SET", "VALUES", "AND",
-                                    "IN", "OR", "REPLACE", "NOT"}:
+                                    "IN", "OR", "REPLACE", "NOT", "BETWEEN"}:
                     continue
 
                 # Make sure the word is enclosed in backticks
