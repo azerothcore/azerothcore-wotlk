@@ -64,7 +64,7 @@ git clone --depth=1 --branch=master https://github.com/azerothcore/mod-npc-morph
 git clone --depth=1 --branch=master https://github.com/azerothcore/mod-npc-services modules/mod-npc-services
 # not yet on azerothcore github
 git clone --depth=1 --branch=master https://github.com/gozzim/mod-npc-spectator modules/mod-npc-spectator
-git clone --depth=1 --branch=master https://github.com/gozzim/mod-npc-talent-template modules/mod-npc-talent-template
+git clone --depth=1 --branch=master https://github.com/azerorhcore/mod-npc-talent-template modules/mod-npc-talent-template
 git clone --depth=1 --branch=master https://github.com/azerothcore/mod-npc-titles-tokens modules/mod-npc-titles-tokens
 git clone --depth=1 --branch=master https://github.com/azerothcore/mod-phased-duels modules/mod-phased-duels
 # outdated
