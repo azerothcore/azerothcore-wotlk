@@ -161,7 +161,6 @@ struct boss_felmyst : public BossAI
         ScheduleEnrageTimer(SPELL_BERSERK, 10min, YELL_BERSERK);
 
         me->GetMotionMaster()->Clear();
-        me->GetMotionMaster()->MoveIdle();
 
         Position landPos = who->GetPosition();
         me->m_Events.AddEventAtOffset([&, landPos] {
@@ -212,13 +211,15 @@ struct boss_felmyst : public BossAI
             me->SetReactState(REACT_PASSIVE);
             me->SetTarget();
             me->AttackStop();
+            me->SetCombatMovement(false);
             me->GetMotionMaster()->Clear();
             me->GetMotionMaster()->MoveIdle();
             me->SetCanFly(true);
             me->SetDisableGravity(true);
             me->SendMovementFlagUpdate();
             SetInvincibility(true);
-            me->GetMotionMaster()->MoveTakeoff(POINT_TAKEOFF, me->GetPositionX(), me->GetPositionY(), me->GetPositionZ() + 20.0f);
+            me->HandleEmoteCommand(EMOTE_ONESHOT_LIFTOFF);
+            me->GetMotionMaster()->MovePoint(POINT_TAKEOFF, me->GetPositionX(), me->GetPositionY(), me->GetPositionZ() + 20.0f);
         }, 1min);
     }
 
@@ -234,6 +235,7 @@ struct boss_felmyst : public BossAI
                 if (!me->HasAura(SPELL_NOXIOUS_FUMES))
                     DoCastSelf(SPELL_NOXIOUS_FUMES, true);
 
+                me->GetMotionMaster()->MoveIdle();
                 me->HandleEmoteCommand(EMOTE_ONESHOT_LAND);
                 me->SetCanFly(false);
                 me->SetDisableGravity(false);
