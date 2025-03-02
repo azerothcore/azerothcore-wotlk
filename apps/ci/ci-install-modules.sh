@@ -42,6 +42,7 @@ git clone --depth=1 --branch=main   https://github.com/azerothcore/mod-global-ch
 git clone --depth=1 --branch=master https://github.com/azerothcore/mod-guild-zone-system modules/mod-guild-zone-system
 git clone --depth=1 --branch=master https://github.com/azerothcore/mod-guildhouse modules/mod-guildhouse
 git clone --depth=1 --branch=master https://github.com/azerothcore/mod-individual-xp modules/mod-individual-xp
+git clone --depth=1 --branch=master https://github.com/azerothcore/mod-instance-reset modules/mod-instance-reset
 git clone --depth=1 --branch=master https://github.com/azerothcore/mod-instanced-worldbosses modules/mod-instanced-worldbosses
 git clone --depth=1 --branch=master https://github.com/azerothcore/mod-ip-tracker modules/mod-ip-tracker
 git clone --depth=1 --branch=master https://github.com/azerothcore/mod-item-level-up modules/mod-item-level-up
