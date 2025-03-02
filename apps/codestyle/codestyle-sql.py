@@ -170,7 +170,7 @@ def semicolon_check(file: io, file_path: str) -> None:
     file.seek(0)  # Reset file pointer to the start
     check_failed = False
 
-    sql_statement_regex = re.compile(r'^\s*(SELECT|INSERT|UPDATE|DELETE|REPLACE)\b', re.IGNORECASE)
+    sql_statement_regex = re.compile(r'^\s*(SELECT|INSERT|UPDATE|DELETE|REPLACE|SET)\b', re.IGNORECASE)
     block_comment_start = re.compile(r'/\*')
     block_comment_end = re.compile(r'\*/')
     inline_comment = re.compile(r'--.*')
