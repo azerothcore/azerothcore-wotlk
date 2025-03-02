@@ -80,6 +80,8 @@ git clone --depth=1 --branch=master https://github.com/azerothcore/mod-reward-pl
 git clone --depth=1 --branch=master https://github.com/azerothcore/mod-reward-shop modules/mod-reward-shop
 git clone --depth=1 --branch=master https://github.com/azerothcore/mod-server-auto-shutdown.git modules/mod-server-auto-shutdown
 git clone --depth=1 --branch=master https://github.com/azerothcore/mod-skip-dk-starting-area modules/mod-skip-dk-starting-area
+# has core patch file
+# git clone --depth=1 --branch=master https://github.com/azerothcore/mod-spell-regulator modules/mod-spell-regulator
 git clone --depth=1 --branch=main   https://github.com/azerothcore/mod-system-vip modules/mod-system-vip
 git clone --depth=1 --branch=master https://github.com/azerothcore/mod-tic-tac-toe modules/mod-tic-tac-toe
 git clone --depth=1 --branch=master https://github.com/azerothcore/mod-top-arena modules/mod-top-arena
