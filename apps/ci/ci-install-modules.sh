@@ -49,6 +49,7 @@ git clone --depth=1 --branch=main   https://github.com/azerothcore/mod-low-level
 git clone --depth=1 --branch=master https://github.com/azerothcore/mod-low-level-rbg modules/mod-low-level-rbg
 git clone --depth=1 --branch=master https://github.com/azerothcore/mod-mall-teleport modules/mod-mall-teleport
 git clone --depth=1 --branch=master https://github.com/azerothcore/mod-morph-all-players modules/mod-morph-all-players
+git clone --depth=1 --branch=master https://github.com/azerothcore/mod-morphsummon modules/mod-morphsummon
 git clone --depth=1 --branch=master https://github.com/azerothcore/mod-multi-client-check modules/mod-multi-client-check
 git clone --depth=1 --branch=master https://github.com/azerothcore/mod-notify-muted modules/mod-notify-muted
 git clone --depth=1 --branch=master https://github.com/azerothcore/mod-npc-all-mounts modules/mod-npc-all-mounts
