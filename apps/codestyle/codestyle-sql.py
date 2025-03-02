@@ -182,17 +182,19 @@ def semicolon_check(file: io, file_path: str) -> None:
         stripped_line = line.strip()
 
         # Check for block comment
-        if '/*' in stripped_line and '*/' in stripped_line:
-            stripped_line = stripped_line.split('/*', 1)[0].strip()
-        elif '/*' in stripped_line:
-            in_block_comment = True
-            continue
-        elif '*/' in stripped_line:
-            in_block_comment = False
-            continue
-
-        # Skip block comment
         if in_block_comment:
+            if '*/' in stripped_line:
+                in_block_comment = False
+                stripped_line = stripped_line.split('*/', 1)[1].strip()
+            else:
+                continue
+        else:
+            if '/*' in stripped_line:
+                query_open = False
+                in_block_comment = True
+                stripped_line = stripped_line.split('/*', 1)[0].strip()
+
+        if not stripped_line:
             continue
 
         # Remove trailing whitespace including newline
