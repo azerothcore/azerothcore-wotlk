@@ -177,6 +177,10 @@ def semicolon_check(file: io, file_path: str) -> None:
     for line_number, line in enumerate(lines, start=1):
         if line.startswith('--'):
             continue
+        if line.startswith('/*'):
+            continue
+        if line.startswith('*/'):
+            continue
         # Remove trailing whitespace including newline
         # Remove comments from the line
         stripped_line = line.split('--', 1)[0].strip()
@@ -231,10 +235,22 @@ def backtick_check(file: io, file_path: str) -> None:
             words = re.findall(r'\b(?<!@)([a-zA-Z_][a-zA-Z0-9_]*)\b', content)
 
             for word in words:
-                # Skip SQL keywords
-                if word.upper() in {"SELECT", "FROM", "JOIN", "WHERE", "GROUP", "BY", "ORDER", 
+                # Skip MySQL keywords
+                if word.upper() in {"SELECT", "FROM", "JOIN", "WHERE", "GROUP", "BY", "ORDER",
                                     "DELETE", "UPDATE", "INSERT", "INTO", "SET", "VALUES", "AND",
-                                    "IN", "OR", "REPLACE", "NOT"}:
+                                    "IN", "OR", "REPLACE", "NOT", "BETWEEN",
+                                    "DISTINCT", "HAVING", "LIMIT", "OFFSET", "AS", "ON", "INNER",
+                                    "LEFT", "RIGHT", "FULL", "OUTER", "CROSS", "NATURAL",
+                                    "EXISTS", "LIKE", "IS", "NULL", "UNION", "ALL", "ASC", "DESC",
+                                    "CASE", "WHEN", "THEN", "ELSE", "END", "CREATE", "TABLE",
+                                    "ALTER", "DROP", "DATABASE", "INDEX", "VIEW", "TRIGGER",
+                                    "PROCEDURE", "FUNCTION", "PRIMARY", "KEY", "FOREIGN", "REFERENCES",
+                                    "CONSTRAINT", "DEFAULT", "AUTO_INCREMENT", "UNIQUE", "CHECK",
+                                    "SHOW", "DESCRIBE", "EXPLAIN", "USE", "GRANT", "REVOKE",
+                                    "BEGIN", "COMMIT", "ROLLBACK", "SAVEPOINT", "LOCK", "UNLOCK",
+                                    "WITH", "RECURSIVE", "COLUMN", "ENGINE", "CHARSET", "COLLATE",
+                                    "IF", "ELSEIF", "LOOP", "WHILE", "DO", "HANDLER", "LEAVE",
+                                    "ITERATE", "DECLARE", "CURSOR", "FETCH", "OPEN", "CLOSE"}:
                     continue
 
                 # Make sure the word is enclosed in backticks
