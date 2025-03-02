@@ -45,19 +45,20 @@ public:
     {
         static ChatCommandTable goCommandTable =
         {
-            { "creature",      HandleGoCreatureSpawnIdCommand,   SEC_MODERATOR,  Console::No },
-            { "creature id",   HandleGoCreatureCIdCommand,       SEC_MODERATOR,  Console::No },
-            { "creature name", HandleGoCreatureNameCommand,      SEC_MODERATOR,  Console::No },
-            { "gameobject",    HandleGoGameObjectSpawnIdCommand, SEC_MODERATOR,  Console::No },
-            { "gameobject id", HandleGoGameObjectGOIdCommand,    SEC_MODERATOR,  Console::No },
-            { "graveyard",     HandleGoGraveyardCommand,         SEC_MODERATOR,  Console::No },
-            { "grid",          HandleGoGridCommand,              SEC_MODERATOR,  Console::No },
-            { "taxinode",      HandleGoTaxinodeCommand,          SEC_MODERATOR,  Console::No },
-            { "trigger",       HandleGoTriggerCommand,           SEC_MODERATOR,  Console::No },
-            { "zonexy",        HandleGoZoneXYCommand,            SEC_MODERATOR,  Console::No },
-            { "xyz",           HandleGoXYZCommand,               SEC_MODERATOR,  Console::No },
-            { "ticket",        HandleGoTicketCommand,            SEC_GAMEMASTER, Console::No },
-            { "quest",         HandleGoQuestCommand,             SEC_MODERATOR,  Console::No },
+            { "creature",        HandleGoCreatureSpawnIdCommand,   SEC_MODERATOR,  Console::No },
+            { "creature id",     HandleGoCreatureCIdCommand,       SEC_MODERATOR,  Console::No },
+            { "creature name",   HandleGoCreatureNameCommand,      SEC_MODERATOR,  Console::No },
+            { "creature script", HandleGoCreatureScriptCommand,    SEC_MODERATOR,  Console::No },
+            { "gameobject",      HandleGoGameObjectSpawnIdCommand, SEC_MODERATOR,  Console::No },
+            { "gameobject id",   HandleGoGameObjectGOIdCommand,    SEC_MODERATOR,  Console::No },
+            { "graveyard",       HandleGoGraveyardCommand,         SEC_MODERATOR,  Console::No },
+            { "grid",            HandleGoGridCommand,              SEC_MODERATOR,  Console::No },
+            { "taxinode",        HandleGoTaxinodeCommand,          SEC_MODERATOR,  Console::No },
+            { "trigger",         HandleGoTriggerCommand,           SEC_MODERATOR,  Console::No },
+            { "zonexy",          HandleGoZoneXYCommand,            SEC_MODERATOR,  Console::No },
+            { "xyz",             HandleGoXYZCommand,               SEC_MODERATOR,  Console::No },
+            { "ticket",          HandleGoTicketCommand,            SEC_GAMEMASTER, Console::No },
+            { "quest",           HandleGoQuestCommand,             SEC_MODERATOR,  Console::No },
         };
 
         static ChatCommandTable commandTable =
@@ -131,6 +132,36 @@ public:
             str = str.substr(0, str.size() - 1);
 
         QueryResult result = WorldDatabase.Query("SELECT entry FROM creature_template WHERE name = \"{}\" LIMIT 1", str);
+        if (!result)
+        {
+            handler->SendErrorMessage(LANG_COMMAND_GOCREATNOTFOUND);
+            return false;
+        }
+
+        uint32 entry = result->Fetch()[0].Get<uint32>();
+        CreatureData const* spawnpoint = GetCreatureData(handler, entry);
+        if (!spawnpoint)
+        {
+            handler->SendErrorMessage(LANG_COMMAND_GOCREATNOTFOUND);
+            return false;
+        }
+
+        return DoTeleport(handler, { spawnpoint->posX, spawnpoint->posY, spawnpoint->posZ }, spawnpoint->mapid);
+    }
+
+    static bool HandleGoCreatureScriptCommand(ChatHandler* handler, Tail name)
+    {
+        if (!name.data())
+            return false;
+
+        // Make sure we don't pass double quotes into the SQL query. Otherwise it causes a MySQL error
+        std::string str = name.data(); // Making subtractions to the last character does not with in string_view
+        if (str.front() == '"')
+            str = str.substr(1);
+        if (str.back() == '"')
+            str = str.substr(0, str.size() - 1);
+
+        QueryResult result = WorldDatabase.Query("SELECT entry FROM creature_template WHERE ScriptName = \"{}\" LIMIT 1", str);
         if (!result)
         {
             handler->SendErrorMessage(LANG_COMMAND_GOCREATNOTFOUND);
