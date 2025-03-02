@@ -85,6 +85,7 @@ git clone --depth=1 --branch=master https://github.com/azerothcore/mod-rdf-expan
 git clone --depth=1 --branch=master https://github.com/azerothcore/mod-reward-played-time modules/mod-reward-played-time
 git clone --depth=1 --branch=master https://github.com/azerothcore/mod-reward-shop modules/mod-reward-shop
 git clone --depth=1 --branch=master https://github.com/azerothcore/mod-server-auto-shutdown.git modules/mod-server-auto-shutdown
+git clone --depth=1 --branch=master https://github.com/azerothcore/mod-solocraft modules/mod-solocraft
 git clone --depth=1 --branch=master https://github.com/azerothcore/mod-skip-dk-starting-area modules/mod-skip-dk-starting-area
 # has core patch file
 # git clone --depth=1 --branch=master https://github.com/azerothcore/mod-spell-regulator modules/mod-spell-regulator
