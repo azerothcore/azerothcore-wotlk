@@ -48,6 +48,7 @@ git clone --depth=1 --branch=master https://github.com/azerothcore/mod-ip-tracke
 git clone --depth=1 --branch=master https://github.com/azerothcore/mod-item-level-up modules/mod-item-level-up
 git clone --depth=1 --branch=master https://github.com/azerothcore/mod-keep-out modules/mod-keep-out
 git clone --depth=1 --branch=master https://github.com/azerothcore/mod-learn-highest-talent modules/mod-learn-highest-talent
+git clone --depth=1 --branch=master https://github.com/azerothcore/mod-learn-spells modules/mod-learn-spells
 git clone --depth=1 --branch=main   https://github.com/azerothcore/mod-low-level-arena modules/mod-low-level-arena
 git clone --depth=1 --branch=master https://github.com/azerothcore/mod-low-level-rbg modules/mod-low-level-rbg
 git clone --depth=1 --branch=master https://github.com/azerothcore/mod-mall-teleport modules/mod-mall-teleport
