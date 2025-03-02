@@ -34,6 +34,7 @@ git clone --depth=1 --branch=master https://github.com/azerothcore/mod-desertion
 git clone --depth=1 --branch=master https://github.com/azerothcore/mod-detailed-logging modules/mod-detailed-logging
 git clone --depth=1 --branch=main   https://github.com/azerothcore/mod-dmf-switch modules/mod-dmf-switch
 git clone --depth=1 --branch=master https://github.com/azerothcore/mod-duel-reset modules/mod-duel-reset
+git clone --depth=1 --branch=master https://github.com/azerothcore/mod-dynamic-xp modules/mod-dynamic-xp
 git clone --depth=1 --branch=master https://github.com/azerothcore/mod-eluna modules/mod-eluna
 git clone --depth=1 --branch=master https://github.com/azerothcore/mod-emblem-transfer modules/mod-emblem-transfer
 git clone --depth=1 --branch=master https://github.com/azerothcore/mod-fireworks-on-level modules/mod-fireworks-on-level
