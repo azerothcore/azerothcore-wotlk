@@ -49,18 +49,20 @@ def parsing_file(files: list) -> None:
                 semicolon_check(file, file_path)
                 backtick_check(file, file_path)
         except UnicodeDecodeError:
-            print(f"\nCould not decode file {file_path}")
+            print(f"\n❌ Could not decode file {file_path}")
             sys.exit(1)
 
     # Output the results
-    print("")
+    print("\n ")
     for check, result in results.items():
         print(f"{check} : {result}")
     if error_handler:
-        print("\nPlease fix the codestyle issues above.")
+        print("\n ")
+        print("\n❌ Please fix the codestyle issues above.")
         sys.exit(1)
     else:
-        print(f"\nEverything looks good")
+        print("\n ")
+        print(f"\n✅ Everything looks good")
 
 # Codestyle patterns checking for multiple blank lines
 def multiple_blank_lines_check(file: io, file_path: str) -> None:
@@ -73,13 +75,13 @@ def multiple_blank_lines_check(file: io, file_path: str) -> None:
         if line.strip() == '':
             consecutive_blank_lines += 1
             if consecutive_blank_lines > 1:
-                print(f"Multiple blank lines found in {file_path} at line {line_number - 1}")
+                print(f"❌ Multiple blank lines found in {file_path} at line {line_number - 1}")
                 check_failed = True
         else:
             consecutive_blank_lines = 0
     # Additional check for the end of the file
     if consecutive_blank_lines >= 1:
-        print(f"Multiple blank lines found at the end of: {file_path}")
+        print(f"❌ Multiple blank lines found at the end of: {file_path}")
         check_failed = True
     # Handle the script error and update the result output
     if check_failed:
@@ -94,7 +96,7 @@ def trailing_whitespace_check(file: io, file_path: str) -> None:
     # Parse all the file
     for line_number, line in enumerate(file, start = 1):
         if line.endswith(' \n'):
-            print(f"Trailing whitespace found: {file_path} at line {line_number}")
+            print(f"❌ Trailing whitespace found: {file_path} at line {line_number}")
             check_failed = True
     if check_failed:
         error_handler = True
@@ -110,25 +112,25 @@ def sql_check(file: io, file_path: str) -> None:
     for line_number, line in enumerate(file, start = 1):
         if [match for match in ['broadcast_text'] if match in line]:
             print(
-                f"DON'T EDIT broadcast_text TABLE UNLESS YOU KNOW WHAT YOU ARE DOING!\nThis error can safely be ignored if the changes are approved to be sniffed: {file_path} at line {line_number}")
+                f"❌ DON'T EDIT broadcast_text TABLE UNLESS YOU KNOW WHAT YOU ARE DOING!\nThis error can safely be ignored if the changes are approved to be sniffed: {file_path} at line {line_number}")
             check_failed = True
         if "EntryOrGuid" in line:
             print(
-                f"Please use entryorguid syntax instead of EntryOrGuid in {file_path} at line {line_number}\nWe recommend to use keira to have the right syntax in auto-query generation")
+                f"❌ Please use entryorguid syntax instead of EntryOrGuid in {file_path} at line {line_number}\nWe recommend to use keira to have the right syntax in auto-query generation")
             check_failed = True
         if [match for match in [';;'] if match in line]:
             print(
-                f"Double semicolon (;;) found in {file_path} at line {line_number}")
+                f"❌ Double semicolon (;;) found in {file_path} at line {line_number}")
             check_failed = True
         if re.match(r"\t", line):
             print(
-                f"Tab found! Replace it to 4 spaces: {file_path} at line {line_number}")
+                f"❌ Tab found! Replace it to 4 spaces: {file_path} at line {line_number}")
             check_failed = True
 
         last_line = line[-1].strip()
         if last_line:
             print(
-                f"The last line is not a newline. Please add a newline: {file_path}")
+                f"❌ The last line is not a newline. Please add a newline: {file_path}")
             check_failed = True
 
     # Handle the script error and update the result output
@@ -148,7 +150,7 @@ def insert_delete_safety_check(file: io, file_path: str) -> None:
         if line.startswith("--"):
             continue
         if "INSERT" in line and "DELETE" not in previous_line:
-            print(f"No DELETE keyword found before the INSERT in {file_path} at line {line_number}\nIf this error is intended, please advert a maintainer")
+            print(f"❌ No DELETE keyword found before the INSERT in {file_path} at line {line_number}\nIf this error is intended, please advert a maintainer")
             check_failed = True
         previous_line = line
         match = re.match(r"DELETE FROM\s+`([^`]+)`", line, re.IGNORECASE)
@@ -156,7 +158,7 @@ def insert_delete_safety_check(file: io, file_path: str) -> None:
             table_name = match.group(1)
             if table_name in not_delete:
                 print(
-                    f"Entries from {table} should not be deleted! {file_path} at line {line_number}")
+                    f"❌ Entries from {table} should not be deleted! {file_path} at line {line_number}")
                 check_failed = True
 
     # Handle the script error and update the result output
@@ -218,7 +220,7 @@ def semicolon_check(file: io, file_path: str) -> None:
         stripped_line = stripped_line.split('--', 1)[0].strip()
 
         # Detect query start
-        if not query_open and any(keyword in stripped_line.upper() for keyword in ["SELECT", "INSERT", "UPDATE", "DELETE", "REPLACE"]):
+        if not query_open and any(keyword in stripped_line.upper() for keyword in ["SELECT", "INSERT", "UPDATE", "DELETE", "REPLACE", "SET"]):
             query_open = True
 
         # Detect start of multi-line VALUES block
@@ -238,12 +240,12 @@ def semicolon_check(file: io, file_path: str) -> None:
                     # Expect comma if another row follows
                     if not stripped_line.endswith(','):
                         print(f"❌ Missing comma in {file_path} at line {line_number}")
-                        error_handler = True
+                        check_failed = True
                 else:
                     # Expect semicolon if this is the final row
                     if not stripped_line.endswith(';'):
                         print(f"❌ Missing semicolon in {file_path} at line {line_number}")
-                        error_handler = True
+                        check_failed = True
                         inside_values_block = False
                         query_open = False
                     else:
@@ -253,7 +255,7 @@ def semicolon_check(file: io, file_path: str) -> None:
             # Normal query handling (outside multi-row VALUES block)
             if line_number == total_lines and not stripped_line.endswith(';'):
                 print(f"❌ Missing semicolon in {file_path} at the last line {line_number}")
-                error_handler = True
+                check_failed = True
                 query_open = False
             elif stripped_line.endswith(';'):
                 query_open = False
@@ -272,7 +274,6 @@ def backtick_check(file: io, file_path: str) -> None:
         r'\b(SELECT|FROM|JOIN|WHERE|GROUP BY|ORDER BY|DELETE FROM|UPDATE|INSERT INTO|SET|REPLACE|REPLACE INTO)\s+(.*?)(?=;$|(?=\b(?:WHERE|SET|VALUES)\b)|$)',  
         re.IGNORECASE | re.DOTALL
     )
-
 
     # Make sure to ignore values enclosed in single- and doublequotes
     quote_pattern = re.compile(r"'(?:\\'|[^'])*'|\"(?:\\\"|[^\"])*\"")
@@ -311,7 +312,7 @@ def backtick_check(file: io, file_path: str) -> None:
 
                 # Make sure the word is enclosed in backticks
                 if not re.search(rf'`{re.escape(word)}`', content):
-                    print(f"Missing backticks around ({word}). {file_path} at line {line_number}")
+                    print(f"❌ Missing backticks around ({word}). {file_path} at line {line_number}")
                     check_failed = True
 
     if check_failed:
