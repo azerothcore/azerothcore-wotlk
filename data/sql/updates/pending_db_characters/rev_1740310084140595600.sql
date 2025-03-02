@@ -21,10 +21,10 @@ INSERT INTO `mail_server_template_items` (`templateID`, `faction`, `item`, `item
 SELECT `id`, 'Horde', `itemH`, `itemCountH` FROM `mail_server_template` WHERE `itemH` > 0;
 
 ALTER TABLE `mail_server_template`
-DROP COLUMN `itemA`,
-DROP COLUMN `itemCountA`,
-DROP COLUMN `itemH`,
-DROP COLUMN `itemCountH`;
+    DROP COLUMN `itemA`,
+    DROP COLUMN `itemCountA`,
+    DROP COLUMN `itemH`,
+    DROP COLUMN `itemCountH`;
 
 -- mail_server_template_conditions
 DROP TABLE IF EXISTS `mail_server_template_conditions`;
