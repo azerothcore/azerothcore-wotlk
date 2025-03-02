@@ -58,6 +58,7 @@ git clone --depth=1 --branch=master https://github.com/azerothcore/mod-npc-encha
 git clone --depth=1 --branch=master https://github.com/azerothcore/mod-npc-free-professions modules/mod-npc-free-professions
 git clone --depth=1 --branch=master https://github.com/azerothcore/mod-npc-gambler modules/mod-npc-gambler
 git clone --depth=1 --branch=master https://github.com/azerothcore/mod-npc-morph modules/mod-npc-morph
+git clone --depth=1 --branch=master https://github.com/azerothcore/mod-npc-services modules/mod-npc-services
 # not yet on azerothcore github
 git clone --depth=1 --branch=master https://github.com/gozzim/mod-npc-spectator modules/mod-npc-spectator
 git clone --depth=1 --branch=master https://github.com/azerothcore/mod-npc-titles-tokens modules/mod-npc-titles-tokens
