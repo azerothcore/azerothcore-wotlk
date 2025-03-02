@@ -22,6 +22,7 @@
 #include "Log.h"
 #include "ObjectMgr.h"
 #include "Player.h"
+#include "SharedDefines.h"
 #include "Timer.h"
 
 ServerMailMgr::ServerMailMgr() {}
@@ -149,7 +150,7 @@ void ServerMailMgr::LoadMailServerTemplatesItems()
 
 void ServerMailMgr::LoadMailServerTemplatesConditions()
 {
-    QueryResult result = CharacterDatabase.Query("SELECT `templateID`, `conditionType`, `conditionValue` FROM `mail_server_template_conditions`");
+    QueryResult result = CharacterDatabase.Query("SELECT `templateID`, `conditionType`, `conditionValue`, `conditionState` FROM `mail_server_template_conditions`");
     if (!result)
     {
         LOG_INFO("sql.sql", ">> Loaded 0 server mail conditions. DB table `mail_server_template_conditions` is empty.");
@@ -163,6 +164,7 @@ void ServerMailMgr::LoadMailServerTemplatesConditions()
         uint32 templateID = fields[0].Get<uint32>();
         std::string conditionTypeStr = fields[1].Get<std::string>();
         uint32 conditionValue = fields[2].Get<uint32>();
+        uint32 conditionState = fields[3].Get<uint32>();
 
         if (_serverMailStore.find(templateID) == _serverMailStore.end())
         {
@@ -179,10 +181,18 @@ void ServerMailMgr::LoadMailServerTemplatesConditions()
             conditionType = ServerMailConditionType::Quest;
         else if (conditionTypeStr == "Achievement")
             conditionType = ServerMailConditionType::Achievement;
+        else if (conditionTypeStr == "Reputation")
+            conditionType = ServerMailConditionType::Reputation;
         else
         {
             LOG_ERROR("sql.sql", "Table `mail_server_template_conditions` has unknown conditionType '{}', skipped.", conditionTypeStr);
             continue;
+        }
+
+        if (conditionState && conditionType != ServerMailConditionType::Reputation)
+        {
+            LOG_ERROR("sql.sql", "Table `mail_server_template_conditions` has conditionState value ({}) for invalid conditionType ({}), set to 0.", conditionState, conditionTypeStr);
+            conditionState = 0;
         }
 
         switch (conditionType)
@@ -199,7 +209,7 @@ void ServerMailMgr::LoadMailServerTemplatesConditions()
             Quest const* qInfo = sObjectMgr->GetQuestTemplate(conditionValue);
             if (!qInfo)
             {
-                LOG_ERROR("sql.sql", "Table `mail_server_template_conditions` has conditionType 'Quest' with invalid conditionValue ({}) for templateID {}, skipped.", conditionValue, templateID);
+                LOG_ERROR("sql.sql", "Table `mail_server_template_conditions` has conditionType 'Quest' with invalid quest in conditionValue ({}) for templateID {}, skipped.", conditionValue, templateID);
                 continue;
             }
             break;
@@ -209,7 +219,22 @@ void ServerMailMgr::LoadMailServerTemplatesConditions()
             AchievementEntry const* achievement = sAchievementStore.LookupEntry(conditionValue);
             if (!achievement)
             {
-                LOG_ERROR("sql.sql", "Table `mail_server_template_conditions` has conditionType 'Achievement' with invalid conditionValue ({}) for templateID {}, skipped.", conditionValue, templateID);
+                LOG_ERROR("sql.sql", "Table `mail_server_template_conditions` has conditionType 'Achievement' with invalid achievement in conditionValue ({}) for templateID {}, skipped.", conditionValue, templateID);
+                continue;
+            }
+            break;
+        }
+        case ServerMailConditionType::Reputation:
+        {
+            FactionEntry const* faction = sFactionStore.LookupEntry(conditionValue);
+            if (!faction)
+            {
+                LOG_ERROR("sql.sql", "Table `mail_server_template_conditions` has conditionType 'Reputation' with invalid faction in conditionValue ({}) for templateID {}, skipped.", conditionValue, templateID);
+                continue;
+            }
+            if (conditionState < REP_HATED || conditionState > REP_EXALTED)
+            {
+                LOG_ERROR("sql.sql", "Table `mail_server_template_conditions` has conditionType 'Reputation' with invalid conditionState ({}) for templateID {}, skipped.", conditionState, templateID);
                 continue;
             }
             break;
@@ -221,6 +246,7 @@ void ServerMailMgr::LoadMailServerTemplatesConditions()
         ServerMailCondition condition;
         condition.type = conditionType;
         condition.value = conditionValue;
+        condition.state = conditionState;
         _serverMailStore[templateID].conditions.push_back(condition);
 
     } while (result->NextRow());

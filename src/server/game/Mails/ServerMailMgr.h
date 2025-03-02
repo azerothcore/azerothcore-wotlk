@@ -46,7 +46,8 @@ enum class ServerMailConditionType : uint8
     Level       = 1, ///< Requires the player to be at least a specific level.
     PlayTime    = 2, ///< Requires the player to have played for a minimum amount of time (in milliseconds).
     Quest       = 3, ///< Requires the player to have completed a specific quest.
-    Achievement = 4  ///< Requires the player to have earned a specific achievement.
+    Achievement = 4, ///< Requires the player to have earned a specific achievement.
+    Reputation  = 5, ///< Requires the player to have earned reputation with a specific faction.
 };
 
 /**
@@ -64,6 +65,7 @@ struct ServerMailCondition
 
     ServerMailConditionType type = ServerMailConditionType::None;
     uint32 value{ 0 };
+    uint32 state{ 0 };
 
     /**
      * @brief Checks if a player meets this condition.
@@ -85,6 +87,8 @@ struct ServerMailCondition
             return player->IsQuestRewarded(value);
         case ServerMailConditionType::Achievement:
             return player->HasAchieved(value);
+        case ServerMailConditionType::Reputation:
+            return player->GetReputationRank(value) >= state;
         default:
             LOG_ERROR("server.mail", "Unknown server mail condition type '{}'", static_cast<uint32>(type));
             return false;
