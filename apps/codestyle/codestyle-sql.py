@@ -182,6 +182,12 @@ def semicolon_check(file: io, file_path: str) -> None:
     lines = file.readlines()
     total_lines = len(lines)
 
+    def is_last_row(line_number: int) -> bool:
+        """ Helper to check if this is the last row in a multi-line VALUES block. """
+        next_line = lines[line_number].strip() if line_number < total_lines else ""
+        return not next_line.startswith("(")
+
+
     for line_number, line in enumerate(lines, start=1):
         # Remove inline comments
         line = inline_comment.sub('', line)
