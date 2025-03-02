@@ -187,7 +187,6 @@ def semicolon_check(file: io, file_path: str) -> None:
         next_line = lines[line_number].strip() if line_number < total_lines else ""
         return not next_line.startswith("(")
 
-
     for line_number, line in enumerate(lines, start=1):
         # Remove inline comments
         line = inline_comment.sub('', line)
