@@ -45,7 +45,7 @@ void ServerMailMgr::LoadMailServerTemplates()
     QueryResult result = CharacterDatabase.Query("SELECT `id`, `moneyA`, `moneyH`, `subject`, `body`, `active` FROM `mail_server_template`");
     if (!result)
     {
-        LOG_INFO("sql.sql", ">> Loaded 0 server mail rewards. DB table `mail_server_template` is empty.");
+        LOG_INFO("server.loading", ">> Loaded 0 server mail rewards. DB table `mail_server_template` is empty.");
         LOG_INFO("server.loading", " ");
         return;
     }
@@ -86,7 +86,7 @@ void ServerMailMgr::LoadMailServerTemplatesItems()
     QueryResult result = CharacterDatabase.Query("SELECT `templateID`, `faction`, `item`, `itemCount` FROM `mail_server_template_items`");
     if (!result)
     {
-        LOG_INFO("sql.sql", ">> Loaded 0 server mail items. DB table `mail_server_template_items` is empty.");
+        LOG_WARN("server.loading", ">> Loaded 0 server mail items. DB table `mail_server_template_items` is empty.");
         return;
     }
 
@@ -154,7 +154,7 @@ void ServerMailMgr::LoadMailServerTemplatesConditions()
     QueryResult result = CharacterDatabase.Query("SELECT `templateID`, `conditionType`, `conditionValue`, `conditionState` FROM `mail_server_template_conditions`");
     if (!result)
     {
-        LOG_INFO("sql.sql", ">> Loaded 0 server mail conditions. DB table `mail_server_template_conditions` is empty.");
+        LOG_WARN("server.loading", ">> Loaded 0 server mail conditions. DB table `mail_server_template_conditions` is empty.");
         return;
     }
 
