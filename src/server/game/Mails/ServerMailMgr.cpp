@@ -198,7 +198,8 @@ void ServerMailMgr::LoadMailServerTemplatesConditions()
             (conditionType != ServerMailConditionType::Quest ||
             conditionType != ServerMailConditionType::Reputation ||
             conditionType != ServerMailConditionType::Faction ||
-            conditionType != ServerMailConditionType::Race))
+            conditionType != ServerMailConditionType::Race ||
+            conditionType != ServerMailConditionType::Class))
             LOG_WARN("sql.sql", "Table `mail_server_template_conditions` has conditionState value ({}) for conditionType ({}) which does not use conditionState.", conditionState, conditionTypeStr);
 
         switch (conditionType)
@@ -262,6 +263,13 @@ void ServerMailMgr::LoadMailServerTemplatesConditions()
             if (conditionValue & ~RACEMASK_ALL_PLAYABLE)
             {
                 LOG_ERROR("sql.sql", "Table `mail_server_template_conditions` has conditionType 'Race' with invalid conditionValue ({}) for templateID {}, skipped.", conditionState, templateID);
+                continue;
+            }
+            break;
+        case ServerMailConditionType::Class:
+            if (conditionValue & ~CLASSMASK_ALL_PLAYABLE)
+            {
+                LOG_ERROR("sql.sql", "Table `mail_server_template_conditions` has conditionType 'Class' with invalid conditionValue ({}) for templateID {}, skipped.", conditionState, templateID);
                 continue;
             }
             break;
