@@ -195,12 +195,14 @@ void ServerMailMgr::LoadMailServerTemplatesConditions()
         }
 
         if (conditionState &&
-            (conditionType != ServerMailConditionType::Quest ||
-            conditionType != ServerMailConditionType::Reputation ||
-            conditionType != ServerMailConditionType::Faction ||
-            conditionType != ServerMailConditionType::Race ||
-            conditionType != ServerMailConditionType::Class))
+            conditionType != ServerMailConditionType::Quest &&
+            conditionType != ServerMailConditionType::Reputation &&
+            conditionType != ServerMailConditionType::Faction &&
+            conditionType != ServerMailConditionType::Race &&
+            conditionType != ServerMailConditionType::Class)
+        {
             LOG_WARN("sql.sql", "Table `mail_server_template_conditions` has conditionState value ({}) for conditionType ({}) which does not use conditionState.", conditionState, conditionTypeStr);
+        }
 
         switch (conditionType)
         {
