@@ -8415,7 +8415,7 @@ bool Unit::HandleDummyAuraProc(Unit* victim, uint32 damage, AuraEffect* triggere
                     uint32 spell = 45284;
 
                     // chain lightning only procs 1/3 of the time
-                    if(procSpell->SpellFamilyFlags[0] & 0x2)
+                    if (procSpell->SpellFamilyFlags[0] & 0x2)
                     {
                         if (!roll_chance_i(33))
                             return false;
