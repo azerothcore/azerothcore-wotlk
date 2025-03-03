@@ -244,6 +244,8 @@ Creature* ObjectAccessor::GetCreatureOrPetOrVehicle(WorldObject const& u, Object
 
 Player* ObjectAccessor::FindPlayer(ObjectGuid const guid)
 {
+    if (GetPlayers().empty())
+        return nullptr;
     Player* player = HashMapHolder<Player>::Find(guid);
     return player && player->IsInWorld() ? player : nullptr;
 }
