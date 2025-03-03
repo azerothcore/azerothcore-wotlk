@@ -15,18 +15,18 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
- /**
-  * @file ServerMailMgr.h
-  * @brief Manages the ServerMail operations, including template loading, condition checking, and mail delivery.
-  *
-  * This class handles the loading of server mail templates, associated items, and conditions from the database.
-  * It also provides functionality to check player eligibility for receiving server mails based on configured conditions.
-  *
-  * Key features:
-  * - Supports multi-item mails via `mail_server_template_items`
-  * - Supports flexible mail conditions (level, playtime, quest, achievement) via `mail_server_template_conditions`
-  * - Ensures all related data is loaded and validated on startup
-  */
+/**
+ * @file ServerMailMgr.h
+ * @brief Manages the ServerMail operations, including template loading, condition checking, and mail delivery.
+ *
+ * This class handles the loading of server mail templates, associated items, and conditions from the database.
+ * It also provides functionality to check player eligibility for receiving server mails based on configured conditions.
+ *
+ * Key features:
+ * - Supports multi-item mails via `mail_server_template_items`
+ * - Supports flexible mail conditions (level, playtime, quest, achievement) via `mail_server_template_conditions`
+ * - Ensures all related data is loaded and validated on startup
+ */
 
 #ifndef _SERVERMAILMGR_H
 #define _SERVERMAILMGR_H
@@ -59,6 +59,9 @@ enum class ServerMailConditionType : uint8
  *
  * Each condition has a type (see @ref ServerMailConditionType) and a value associated with the type.
  * For example, for a level condition, the value represents the required player level.
+ * 
+ * Some condition also have a state associated with the value.
+ * For example, for a reputation condition, the state represents the current reputation state, like Exalted.
  *
  * Conditions are attached to server mail templates and are evaluated when players log in.
  */
