@@ -338,8 +338,7 @@ void OPvPCapturePointZM_Graveyard::SetBeaconState(TeamId controlling_factionId)
 
 bool OPvPCapturePointZM_Graveyard::CanTalkTo(Player* player, Creature* c, GossipMenuItems const& /*gso*/)
 {
-    ObjectGuid guid = c->GetGUID();
-    auto itr = _creatureTypes.find(guid.GetCounter());
+    auto itr = _creatureTypes.find(c->GetSpawnId());
     if (itr != _creatureTypes.end())
     {
         if (itr->second == ZM_ALLIANCE_FIELD_SCOUT && player->GetTeamId() == TEAM_ALLIANCE && m_BothControllingFactionId == TEAM_ALLIANCE && !m_FlagCarrierGUID && m_GraveyardState != ZM_GRAVEYARD_A)
