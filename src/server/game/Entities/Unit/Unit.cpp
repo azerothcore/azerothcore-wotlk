@@ -8420,7 +8420,7 @@ bool Unit::HandleDummyAuraProc(Unit* victim, uint32 damage, AuraEffect* triggere
                             return false;
                         spell = 45297;
                     }
-                    
+
                     if (procEx & PROC_EX_CRITICAL_HIT)
                         damage /= 2;
 
