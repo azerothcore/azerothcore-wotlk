@@ -58,6 +58,8 @@ struct boss_captain_skarloc : public BossAI
         {
             return !me->HasUnitState(UNIT_STATE_CASTING);
         });
+
+        creature->m_invisibilityDetect.AddFlag(INVISIBILITY_GENERAL);
     }
 
     SummonList summons;
