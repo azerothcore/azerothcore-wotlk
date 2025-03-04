@@ -108,8 +108,8 @@ void BattlegroundAB::PostUpdateImpl(uint32 diff)
                         auto reputationRewards = uint8(m_TeamScores[teamId] / _reputationTics);
                         auto information = uint8(m_TeamScores[teamId] / BG_AB_WARNING_NEAR_VICTORY_SCORE);
                         m_TeamScores[teamId] += BG_AB_TickPoints[controlledPoints];
-                        if (m_TeamScores[teamId] > BG_AB_MAX_TEAM_SCORE)
-                            m_TeamScores[teamId] = BG_AB_MAX_TEAM_SCORE;
+                        if (m_TeamScores[teamId] > static_cast<int32>(_configurableMaxTeamScore))
+                            m_TeamScores[teamId] = _configurableMaxTeamScore;
 
                         if (honorRewards < uint8(m_TeamScores[teamId] / _honorTics))
                             RewardHonorToTeam(GetBonusHonorFromKill(1), teamId);
@@ -132,7 +132,7 @@ void BattlegroundAB::PostUpdateImpl(uint32 diff)
                         UpdateWorldState(teamId == TEAM_ALLIANCE ? BG_AB_OP_RESOURCES_ALLY : BG_AB_OP_RESOURCES_HORDE, m_TeamScores[teamId]);
                         if (m_TeamScores[teamId] > m_TeamScores[GetOtherTeamId(teamId)] + 500)
                             _teamScores500Disadvantage[GetOtherTeamId(teamId)] = true;
-                        if (m_TeamScores[teamId] >= BG_AB_MAX_TEAM_SCORE)
+                        if (m_TeamScores[teamId] >= static_cast<int32>(_configurableMaxTeamScore))
                             EndBattleground(teamId);
 
                         _bgEvents.ScheduleEvent(eventId, BG_AB_TickIntervals[controlledPoints]);
@@ -245,12 +245,11 @@ void BattlegroundAB::FillInitialWorldStates(WorldPackets::WorldState::InitWorldS
 
         for (uint8 i = BG_AB_NODE_STATE_ALLY_OCCUPIED; i <= BG_AB_NODE_STATE_HORDE_CONTESTED; ++i)
             packet.Worldstates.emplace_back(node._iconCapture + i - 1, node._state == i ? 1 : 0);
-
     }
 
     packet.Worldstates.emplace_back(BG_AB_OP_OCCUPIED_BASES_ALLY, _controlledPoints[TEAM_ALLIANCE]);
     packet.Worldstates.emplace_back(BG_AB_OP_OCCUPIED_BASES_HORDE, _controlledPoints[TEAM_HORDE]);
-    packet.Worldstates.emplace_back(BG_AB_OP_RESOURCES_MAX, BG_AB_MAX_TEAM_SCORE);
+    packet.Worldstates.emplace_back(BG_AB_OP_RESOURCES_MAX, _configurableMaxTeamScore);
     packet.Worldstates.emplace_back(BG_AB_OP_RESOURCES_WARNING, BG_AB_WARNING_NEAR_VICTORY_SCORE);
     packet.Worldstates.emplace_back(BG_AB_OP_RESOURCES_ALLY, m_TeamScores[TEAM_ALLIANCE]);
     packet.Worldstates.emplace_back(BG_AB_OP_RESOURCES_HORDE, m_TeamScores[TEAM_HORDE]);
@@ -481,6 +480,11 @@ void BattlegroundAB::Init()
     _capturePointInfo[BG_AB_NODE_BLACKSMITH]._iconCapture = BG_AB_OP_BLACKSMITH_STATE_ALIENCE;
     _capturePointInfo[BG_AB_NODE_LUMBER_MILL]._iconCapture = BG_AB_OP_LUMBERMILL_STATE_ALIENCE;
     _capturePointInfo[BG_AB_NODE_GOLD_MINE]._iconCapture = BG_AB_OP_GOLDMINE_STATE_ALIENCE;
+
+    uint32 bgArathiCapturePointsConfig = sWorld->getIntConfig(CONFIG_BATTLEGROUND_ARATHI_CAPTUREPOINTS);
+    _configurableMaxTeamScore = bgArathiCapturePointsConfig > 0
+        ? bgArathiCapturePointsConfig
+        : static_cast<uint32>(BG_AB_MAX_TEAM_SCORE);
 }
 
 void BattlegroundAB::EndBattleground(TeamId winnerTeamId)

@@ -427,6 +427,12 @@ void WorldConfig::BuildConfigCache()
     SetConfigValue<uint32>(CONFIG_BATTLEGROUND_BERSERKING_BUFF_RESPAWN, "Battleground.BerserkingBuffRespawn", 120, ConfigData::Reloadable::Yes, [](uint32 const& value) { return value > 0; }, "> 0");
     SetConfigValue<uint32>(CONFIG_BATTLEGROUND_SPEED_BUFF_RESPAWN, "Battleground.SpeedBuffRespawn", 150, ConfigData::Reloadable::Yes, [](uint32 const& value) { return value > 0; }, "> 0");
 
+    SetConfigValue<uint32>(CONFIG_BATTLEGROUND_WARSONG_FLAGS, "Battleground.Warsong.Flags", 3);
+    SetConfigValue<uint32>(CONFIG_BATTLEGROUND_ARATHI_CAPTUREPOINTS, "Battleground.Arathi.CapturePoints", 1600);
+    SetConfigValue<uint32>(CONFIG_BATTLEGROUND_ALTERAC_REINFORCEMENTS, "Battleground.Alterac.Reinforcements", 600);
+    SetConfigValue<uint32>(CONFIG_BATTLEGROUND_ALTERAC_REP_ONBOSSDEATH, "Battleground.Alterac.ReputationOnBossDeath", 350);
+    SetConfigValue<uint32>(CONFIG_BATTLEGROUND_EYEOFTHESTORM_CAPTUREPOINTS, "Battleground.EyeOfTheStorm.CapturePoints", 1600);
+
     SetConfigValue<uint32>(CONFIG_ARENA_MAX_RATING_DIFFERENCE, "Arena.MaxRatingDifference", 150);
     SetConfigValue<uint32>(CONFIG_ARENA_RATING_DISCARD_TIMER, "Arena.RatingDiscardTimer", 10);
     SetConfigValue<uint32>(CONFIG_ARENA_PREV_OPPONENTS_DISCARD_TIMER, "Arena.PreviousOpponentsDiscardTimer", 2);

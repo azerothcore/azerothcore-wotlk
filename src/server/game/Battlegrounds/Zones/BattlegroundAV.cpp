@@ -266,6 +266,9 @@ void BattlegroundAV::HandleQuestComplete(uint32 questid, Player* player)
 
 void BattlegroundAV::UpdateScore(TeamId teamId, int16 points)
 {
+    if (BG_AV_SCORE_INITIAL_POINTS == 0)
+        return; // don't update teamscores if reinforcements are disabled
+
     //note: to remove reinforcementpoints points must be negative, for adding reinforcements points must be positive
     m_Team_Scores[teamId] += points;
 
@@ -475,8 +478,11 @@ void BattlegroundAV::StartingEventOpenDoors()
     for (uint8 mine = AV_NORTH_MINE; mine <= AV_SOUTH_MINE; mine++) //mine population
         ChangeMineOwner(mine, TEAM_NEUTRAL, true);
 
-    UpdateWorldState(AV_SHOW_H_SCORE, 1);
-    UpdateWorldState(AV_SHOW_A_SCORE, 1);
+    if (BG_AV_SCORE_INITIAL_POINTS > 0) // display teamscores on top only if reinforcements are enabled
+    {
+        UpdateWorldState(AV_SHOW_H_SCORE, 1);
+        UpdateWorldState(AV_SHOW_A_SCORE, 1);
+    }
 
     DoorOpen(BG_AV_OBJECT_DOOR_H);
     DoorOpen(BG_AV_OBJECT_DOOR_A);
@@ -1114,11 +1120,12 @@ void BattlegroundAV::FillInitialWorldStates(WorldPackets::WorldState::InitWorldS
     {
         packet.Worldstates.emplace_back(AV_SNOWFALL_N, 1);
     }
+
     packet.Worldstates.emplace_back(AV_Alliance_Score, m_Team_Scores[0]);
     packet.Worldstates.emplace_back(AV_Horde_Score, m_Team_Scores[1]);
 
-    packet.Worldstates.emplace_back(AV_SHOW_A_SCORE, GetStatus() == STATUS_IN_PROGRESS ? 1 : 0);
-    packet.Worldstates.emplace_back(AV_SHOW_H_SCORE, GetStatus() == STATUS_IN_PROGRESS ? 1 : 0);
+    packet.Worldstates.emplace_back(AV_SHOW_A_SCORE, GetStatus() == STATUS_IN_PROGRESS && BG_AV_SCORE_INITIAL_POINTS > 0 ? 1 : 0);
+    packet.Worldstates.emplace_back(AV_SHOW_H_SCORE, GetStatus() == STATUS_IN_PROGRESS && BG_AV_SCORE_INITIAL_POINTS > 0 ? 1 : 0);
 
     SendMineWorldStates(AV_NORTH_MINE);
     SendMineWorldStates(AV_SOUTH_MINE);
