@@ -650,4 +650,6 @@ void WorldConfig::BuildConfigCache()
     SetConfigValue<uint32>(CONFIG_SPELL_QUEUE_WINDOW, "SpellQueue.Window", 400);
 
     SetConfigValue<uint32>(CONFIG_SUNSREACH_COUNTER_MAX, "Sunsreach.CounterMax", 10000);
+
+    SetConfigValue<std::string>(CONFIG_NEW_CHAR_STRING, "PlayerStart.String", "");
 }

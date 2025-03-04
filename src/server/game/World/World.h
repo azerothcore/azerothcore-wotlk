@@ -172,11 +172,6 @@ public:
     /// Allow/Disallow object movements
     void SetAllowMovement(bool allow) override { _allowMovement = allow; }
 
-    /// Set the string for new characters (first login)
-    void SetNewCharString(std::string const& str) override { _newCharString = str; }
-    /// Get the string for new characters (first login)
-    [[nodiscard]] std::string const& GetNewCharString() const override { return _newCharString; }
-
     [[nodiscard]] LocaleConstant GetDefaultDbcLocale() const override { return _defaultDbcLocale; }
 
     /// Get the path where data (dbc, maps) are stored on disk
@@ -296,8 +291,6 @@ private:
 
     IntervalTimer _timers[WUPDATE_COUNT];
     Seconds _mail_expire_check_timer;
-
-    std::string _newCharString;
 
     typedef std::map<uint32, uint64> WorldStatesMap;
     WorldStatesMap _worldstates;
