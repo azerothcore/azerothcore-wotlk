@@ -899,6 +899,59 @@ class spell_warr_retaliation : public AuraScript
     }
 };
 
+// 29707 - Heroic Strike (Rank 10)
+// 30324 - Heroic Strike (Rank 11)
+// 47449 - Heroic Strike (Rank 12)
+// 47450 - Heroic Strike (Rank 13)
+class spell_warr_heroic_strike : public SpellScript
+{
+    PrepareSpellScript(spell_warr_heroic_strike);
+
+    void HandleOnHit()
+    {
+        if (Unit* target = GetHitUnit())
+        {
+            std::list<AuraEffect*> AuraEffectList = target->GetAuraEffectsByType(SPELL_AURA_MOD_DECREASE_SPEED);
+            bool bonusDamage = false;
+            for (AuraEffect* eff : AuraEffectList)
+            {
+                const SpellInfo* spellInfo = eff->GetSpellInfo();
+                if (!spellInfo)
+                    continue;
+
+                // Warrior Spells: Piercing Howl or Dazed (29703)
+                if (spellInfo->SpellFamilyName == SPELLFAMILY_WARRIOR && (spellInfo->SpellFamilyFlags[1] & (0x20 | 0x200000)))
+                {
+                    bonusDamage = true;
+                    break;
+                }
+
+                // Generic Daze: icon 15 with mechanic daze or snare
+                if ((spellInfo->SpellIconID == 15)
+                    && ((spellInfo->Mechanic == MECHANIC_DAZE || spellInfo->HasEffectMechanic(MECHANIC_DAZE))
+                       || (spellInfo->Mechanic == MECHANIC_SNARE || spellInfo->HasEffectMechanic(MECHANIC_SNARE))
+                       )
+                )
+                {
+                    bonusDamage = true;
+                    break;
+                }
+            }
+            if (bonusDamage)
+            {
+                int32 damage = GetHitDamage();
+                AddPct(damage, 35); // "Causes ${0.35*$m1} additional damage against Dazed targets."
+                SetHitDamage(damage);
+            }
+        }
+    }
+
+    void Register() override
+    {
+        OnHit += SpellHitFn(spell_warr_heroic_strike::HandleOnHit);
+    }
+};
+
 void AddSC_warrior_spell_scripts()
 {
     RegisterSpellScript(spell_warr_mocking_blow);
@@ -925,4 +978,5 @@ void AddSC_warrior_spell_scripts()
     RegisterSpellScript(spell_warr_vigilance);
     RegisterSpellScript(spell_warr_vigilance_trigger);
     RegisterSpellScript(spell_warr_t3_prot_8p_bonus);
+    RegisterSpellScript(spell_warr_heroic_strike);
 }
