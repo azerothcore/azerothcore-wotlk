@@ -20,6 +20,7 @@
 
 #include "Common.h"
 #include "Config.h"
+#include "Errors.h"
 #include "Log.h"
 #include <variant>
 
