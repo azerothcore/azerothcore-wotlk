@@ -621,8 +621,190 @@ public:
     }
 };
 
+
+uint32 percent = 0;//初始化概率
+
+class quest_Kolkar_Pack_Runner : public CreatureScript
+{
+public:
+    quest_Kolkar_Pack_Runner() : CreatureScript("quest_Kolkar_Pack_Runner") { }
+
+    CreatureAI* GetAI(Creature* creature) const override
+    {
+        return new quest_Kolkar_Pack_RunnerAI(creature);
+    }
+
+    struct quest_Kolkar_Pack_RunnerAI : public ScriptedAI
+    {
+        quest_Kolkar_Pack_RunnerAI(Creature* creature) : ScriptedAI(creature) {}
+
+        void JustDied(Unit* /*who*/) override
+        {
+            percent += 2;  //累加概率
+
+            if (percent > 100)//封装概率最大值防止溢出
+                percent = 100;
+
+            //以累加后的概率尝试召唤狂热的维罗戈				
+            if (roll_chance_i(percent)) {
+                //召唤成功
+                me->AI()->Talk(0);//死亡触发召唤台词
+                me->SummonCreature(3395, -1210.5857, -2725.839, 106.782524, 4.9567f, TEMPSUMMON_TIMED_DESPAWN, 300000);//持续5分钟召唤
+                percent = 0;//召唤成功后初始化召唤概率3%
+            }
+        }
+        //进入战斗，施法
+        void JustEngagedWith(Unit* who) override
+        {
+            events.ScheduleEvent(1, 3s);//战斗怒吼
+        }
+
+        void UpdateAI(uint32 diff) override
+        {
+
+            events.Update(diff);
+            switch (events.ExecuteEvent())
+            {
+
+            case 1: //不重复
+                me->CastSpell(me, 9128, false); //战斗怒吼
+                break;
+            default:
+                break;
+            }
+            DoMeleeAttackIfReady();//允许近战攻击
+        }
+    };
+
+};
+
+
+class quest_Kolkar_Marauder : public CreatureScript
+{
+public:
+    quest_Kolkar_Marauder() : CreatureScript("quest_Kolkar_Marauder") { }
+
+    CreatureAI* GetAI(Creature* creature) const override
+    {
+        return new quest_Kolkar_MarauderAI(creature);
+    }
+
+    struct quest_Kolkar_MarauderAI : public ScriptedAI
+    {
+        quest_Kolkar_MarauderAI(Creature* creature) : ScriptedAI(creature) {}
+
+        void JustDied(Unit* /*who*/) override
+        {
+            percent += 2;  //累加概率
+
+            if (percent > 100)//封装概率最大值防止溢出
+                percent = 100;
+
+            //以累加后的概率尝试召唤狂热的维罗戈				
+            if (roll_chance_i(percent)) {
+                //召唤成功
+                me->AI()->Talk(0);//死亡触发召唤台词
+                me->SummonCreature(3395, -1210.5857, -2725.839, 106.782524, 4.9567f, TEMPSUMMON_TIMED_DESPAWN, 300000);//持续5分钟召唤
+                percent = 0;//召唤成功后初始化召唤概率3%
+            }
+        }
+        //进入战斗，施法 打击
+        void JustEngagedWith(Unit* who) override
+        {
+            events.ScheduleEvent(1, 12s);// 为啥要12秒后才打第一下？
+
+        }
+
+        void UpdateAI(uint32 diff) override
+        {
+
+            events.Update(diff);
+            switch (events.ExecuteEvent())
+            {
+
+            case 1: //重复施法
+                if(me->GetVictim())
+                me->CastSpell(me->GetVictim(), 11976, false); //打击
+                events.ScheduleEvent(1, 7s);//重复
+                break;
+            default:
+                break;
+            }
+            DoMeleeAttackIfReady();//允许近战攻击
+        }
+    };
+
+};
+
+class quest_Kolkar_Bloodcharger : public CreatureScript
+{
+public:
+    quest_Kolkar_Bloodcharger() : CreatureScript("quest_Kolkar_Bloodcharger") { }
+
+    CreatureAI* GetAI(Creature* creature) const override
+    {
+        return new quest_Kolkar_BloodchargerAI(creature);
+    }
+
+    struct quest_Kolkar_BloodchargerAI : public ScriptedAI
+    {
+        quest_Kolkar_BloodchargerAI(Creature* creature) : ScriptedAI(creature) {}
+
+        void JustDied(Unit* /*who*/) override
+        {
+            percent += 2;  //累加概率
+
+            if (percent > 100)//封装概率最大值防止溢出
+                percent = 100;
+
+            //以累加后的概率尝试召唤狂热的维罗戈				
+            if (roll_chance_i(percent)) {
+                //召唤成功
+                me->AI()->Talk(0);//死亡触发召唤台词
+                me->SummonCreature(3395, -1210.5857, -2725.839, 106.782524, 4.9567f, TEMPSUMMON_TIMED_DESPAWN, 300000);//持续5分钟召唤
+                percent = 0;//召唤成功后初始化召唤概率3%
+            }
+        }
+        //进入战斗，施法
+        void JustEngagedWith(Unit* who) override
+        {
+            events.ScheduleEvent(1, 10s);//嗜血
+            events.ScheduleEvent(2, 5s);//腐蚀术
+        }
+
+        void UpdateAI(uint32 diff) override
+        {
+
+            events.Update(diff);
+            switch (events.ExecuteEvent())
+            {
+
+            case 1: //重复施法
+                me->CastSpell(me, 6742, false); //嗜血
+                events.ScheduleEvent(1, 60s);
+                break;
+            case 2: //腐蚀术
+                if (me->GetVictim())
+                me->CastSpell(me, 172, false); 
+                events.ScheduleEvent(2, 20s);
+                break;
+            default:
+                break;
+            }
+            DoMeleeAttackIfReady();//允许近战攻击
+        }
+    };
+
+};
+
 void AddSC_the_barrens()
 {
+    //狂热的维罗戈修改召唤概率累加途径
+    new quest_Kolkar_Pack_Runner();
+    new quest_Kolkar_Marauder();
+    new quest_Kolkar_Bloodcharger();
+
+    
     new npc_gilthares();
     new npc_taskmaster_fizzule();
     new npc_twiggy_flathead();
