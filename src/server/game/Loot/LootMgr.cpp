@@ -322,9 +322,9 @@ bool LootStoreItem::Roll(bool rate, Player const* player, Loot& loot, LootStore 
         return roll_chance_f(_chance * (rate ? sWorld->getRate(RATE_DROP_ITEM_REFERENCED) : 1.0f));
 
     ItemTemplate const* pProto = sObjectMgr->GetItemTemplate(itemid);
-
-    ASSERT(pProto->Quality < MAX_ITEM_QUALITY - 1, "Cannot roll on heirloom items, invalid config read");
-    float qualityModifier = pProto && rate ? sWorld->getRate(qualityToRate[pProto->Quality]) : 1.0f;
+    float qualityModifier = 1.0f;
+    if (pProto && pProto->Quality < ITEM_QUALITY_HEIRLOOM && rate)
+        qualityModifier = sWorld->getRate(qualityToRate[pProto->Quality]);
 
     return roll_chance_f(_chance * qualityModifier);
 }
