@@ -933,6 +933,7 @@ class spell_warr_heroic_strike : public SpellScript
                 break;
             }
 
+            // Generic Daze: icon 15 with mechanic daze or snare
             if ((spellInfo->SpellIconID == ICON_GENERIC_DAZE)
                 && ((spellInfo->Mechanic == MECHANIC_DAZE || spellInfo->HasEffectMechanic(MECHANIC_DAZE))
                     || (spellInfo->Mechanic == MECHANIC_SNARE || spellInfo->HasEffectMechanic(MECHANIC_SNARE))
@@ -943,7 +944,6 @@ class spell_warr_heroic_strike : public SpellScript
                 break;
             }
 
-            // Generic Daze: icon 15 with mechanic daze or snare
             if ((spellInfo->Id == SPELL_GENERIC_AFTERMATH)
                 || (spellInfo->SpellFamilyName == SPELLFAMILY_MAGE && (spellInfo->SpellFamilyFlags[1] & 0x40)) // Blast Wave
                 || (spellInfo->SpellFamilyName == SPELLFAMILY_PALADIN && (spellInfo->SpellFamilyFlags[2] & 0x4000)) // Avenger's Shield
