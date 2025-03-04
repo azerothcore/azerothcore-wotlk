@@ -903,6 +903,12 @@ class spell_warr_retaliation : public AuraScript
 // 30324 - Heroic Strike (Rank 11)
 // 47449 - Heroic Strike (Rank 12)
 // 47450 - Heroic Strike (Rank 13)
+enum DazeSpells
+{
+    ICON_GENERIC_DAZE                   = 15,
+    SPELL_GENERIC_AFTERMATH             = 18118,
+};
+
 class spell_warr_heroic_strike : public SpellScript
 {
     PrepareSpellScript(spell_warr_heroic_strike);
@@ -927,11 +933,20 @@ class spell_warr_heroic_strike : public SpellScript
                 break;
             }
 
-            // Generic Daze: icon 15 with mechanic daze or snare
-            if ((spellInfo->SpellIconID == 15)
+            if ((spellInfo->SpellIconID == ICON_GENERIC_DAZE)
                 && ((spellInfo->Mechanic == MECHANIC_DAZE || spellInfo->HasEffectMechanic(MECHANIC_DAZE))
                     || (spellInfo->Mechanic == MECHANIC_SNARE || spellInfo->HasEffectMechanic(MECHANIC_SNARE))
                     )
+            )
+            {
+                bonusDamage = true;
+                break;
+            }
+
+            // Generic Daze: icon 15 with mechanic daze or snare
+            if ((spellInfo->Id == SPELL_GENERIC_AFTERMATH)
+                || (spellInfo->SpellFamilyName == SPELLFAMILY_MAGE && (spellInfo->SpellFamilyFlags[1] & 0x40)) // Blast Wave
+                || (spellInfo->SpellFamilyName == SPELLFAMILY_PALADIN && (spellInfo->SpellFamilyFlags[2] & 0x4000)) // Avenger's Shield
             )
             {
                 bonusDamage = true;
