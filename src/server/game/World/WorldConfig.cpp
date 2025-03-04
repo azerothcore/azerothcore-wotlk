@@ -291,10 +291,10 @@ void WorldConfig::BuildConfigCache()
 
     SetConfigValue<uint32>(CONFIG_MAIL_DELIVERY_DELAY, "MailDeliveryDelay", HOUR);
 
-    SetConfigValue<uint32>(CONFIG_UPTIME_UPDATE, "UpdateUptimeInterval", 10, ConfigData::Reloadable::Yes, [](uint32 const& value) { return value >= 0; }, ">= 0");
+    SetConfigValue<uint32>(CONFIG_UPTIME_UPDATE, "UpdateUptimeInterval", 10, ConfigData::Reloadable::Yes, [](uint32 const& value) { return value > 0; }, "> 0");
 
     // log db cleanup interval
-    SetConfigValue<uint32>(CONFIG_LOGDB_CLEARINTERVAL, "LogDB.Opt.ClearInterval", 10, ConfigData::Reloadable::Yes, [](uint32 const& value) { return value >= 0; }, ">= 0");
+    SetConfigValue<uint32>(CONFIG_LOGDB_CLEARINTERVAL, "LogDB.Opt.ClearInterval", 10, ConfigData::Reloadable::Yes, [](uint32 const& value) { return value > 0; }, "> 0");
     SetConfigValue<uint32>(CONFIG_LOGDB_CLEARTIME, "LogDB.Opt.ClearTime", 1209600);
 
     SetConfigValue<uint32>(CONFIG_TELEPORT_TIMEOUT_NEAR, "TeleportTimeoutNear", 25);
