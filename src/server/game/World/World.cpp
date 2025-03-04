@@ -1368,7 +1368,7 @@ void World::setStringConfig(ServerConfigs index, std::string const& value)
 
 std::string_view World::getStringConfig(ServerConfigs index) const
 {
-    return _worldConfig.GetConfigValue<std::string>(index);
+    return _worldConfig.GetConfigValue(index);
 }
 
 void World::ForceGameEventUpdate()

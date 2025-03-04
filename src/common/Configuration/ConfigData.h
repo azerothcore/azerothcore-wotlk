@@ -111,7 +111,6 @@ public:
     }
 
     // Custom handling for string configs to convert from std::string to std::string_view
-    template<>
     std::string_view GetConfigValue(ConfigEnum const config) const
     {
         uint32 const configIndex = static_cast<uint32>(config);
