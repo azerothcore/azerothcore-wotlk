@@ -458,5 +458,6 @@ private:
     ObjectGuid _droppedFlagGUID;
     uint8 _flagState;
     uint32 _flagCapturedObject;
+    uint32 _configurableMaxTeamScore;
 };
 #endif

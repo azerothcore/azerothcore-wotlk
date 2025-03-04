@@ -58,13 +58,10 @@ public:
     struct boss_grobbulusAI : public BossAI
     {
         explicit boss_grobbulusAI(Creature* c) : BossAI(c, BOSS_GROBBULUS), summons(me)
-        {
-            pInstance = me->GetInstanceScript();
-        }
+        {}
 
         EventMap events;
         SummonList summons;
-        InstanceScript* pInstance;
         uint32 dropSludgeTimer{};
 
         void Reset() override
@@ -126,10 +123,8 @@ public:
 
         void KilledUnit(Unit* who) override
         {
-            if (who->IsPlayer() && pInstance)
-            {
-                pInstance->SetData(DATA_IMMORTAL_FAIL, 0);
-            }
+            if (who->IsPlayer())
+                instance->StorePersistentData(PERSISTENT_DATA_IMMORTAL_FAIL, 1);
         }
 
         void UpdateAI(uint32 diff) override
@@ -205,10 +200,8 @@ public:
 
         void KilledUnit(Unit* who) override
         {
-            if (who->IsPlayer() && me->GetInstanceScript())
-            {
-                me->GetInstanceScript()->SetData(DATA_IMMORTAL_FAIL, 0);
-            }
+            if (who->IsPlayer())
+                me->GetInstanceScript()->StorePersistentData(PERSISTENT_DATA_IMMORTAL_FAIL, 1);
         }
 
         void UpdateAI(uint32 diff) override

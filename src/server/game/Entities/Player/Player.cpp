@@ -8920,13 +8920,7 @@ void Player::SendBattlefieldWorldStates()
     {
         if (BattlefieldWG* wg = (BattlefieldWG*)sBattlefieldMgr->GetBattlefieldByBattleId(BATTLEFIELD_BATTLEID_WG))
         {
-            SendUpdateWorldState(BATTLEFIELD_WG_WORLD_STATE_ATTACKER, wg->GetAttackerTeam());
-            SendUpdateWorldState(BATTLEFIELD_WG_WORLD_STATE_DEFENDER, wg->GetDefenderTeam());
-            SendUpdateWorldState(BATTLEFIELD_WG_WORLD_STATE_ACTIVE, wg->IsWarTime() ? 0 : 1); // Note: cleanup these two, their names look awkward
-            SendUpdateWorldState(BATTLEFIELD_WG_WORLD_STATE_SHOW_WORLDSTATE, wg->IsWarTime() ? 1 : 0);
-
-            for (uint32 i = 0; i < 2; ++i)
-                SendUpdateWorldState(ClockWorldState[i], uint32(GameTime::GetGameTime().count() + (wg->GetTimer() / 1000)));
+            wg->SendUpdateWorldStates(this);
         }
     }
 }

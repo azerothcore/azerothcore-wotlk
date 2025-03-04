@@ -109,6 +109,8 @@ enum WintergraspWorldStates
     BATTLEFIELD_WG_WORLD_STATE_DEFENDER          = 3802,
     BATTLEFIELD_WG_WORLD_STATE_ATTACKER          = 3803,
     BATTLEFIELD_WG_WORLD_STATE_SHOW_WORLDSTATE   = 3710,
+    BATTLEFIELD_WG_WORLD_STATE_CONTROL           = 3804, // Shows on the map who controls WG
+    BATTLEFIELD_WG_WORLD_STATE_ICON_ACTIVE       = 4375, // Activates "ice" icon
 };
 
 enum WintergraspAreaIds
@@ -405,6 +407,8 @@ public:
     void SendInitWorldStatesTo(Player* player);
     void SendInitWorldStatesToAll() override;
     void FillInitialWorldStates(WorldPackets::WorldState::InitWorldStates& packet) override;
+    void SendUpdateWorldStates(Player* player = nullptr) override;
+    void SendUpdateWorldStateMessage(uint32 variable, uint32 value, Player* player = nullptr);
 
     void HandleKill(Player* killer, Unit* victim) override;
     void OnUnitDeath(Unit* unit) override;
