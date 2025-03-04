@@ -909,40 +909,40 @@ class spell_warr_heroic_strike : public SpellScript
 
     void HandleOnHit()
     {
-        if (Unit* target = GetHitUnit())
+        Unit* target = GetHitUnit();
+        if (!target)
+            return;
+        std::list<AuraEffect*> AuraEffectList = target->GetAuraEffectsByType(SPELL_AURA_MOD_DECREASE_SPEED);
+        bool bonusDamage = false;
+        for (AuraEffect* eff : AuraEffectList)
         {
-            std::list<AuraEffect*> AuraEffectList = target->GetAuraEffectsByType(SPELL_AURA_MOD_DECREASE_SPEED);
-            bool bonusDamage = false;
-            for (AuraEffect* eff : AuraEffectList)
-            {
-                const SpellInfo* spellInfo = eff->GetSpellInfo();
-                if (!spellInfo)
-                    continue;
+            const SpellInfo* spellInfo = eff->GetSpellInfo();
+            if (!spellInfo)
+                continue;
 
-                // Warrior Spells: Piercing Howl or Dazed (29703)
-                if (spellInfo->SpellFamilyName == SPELLFAMILY_WARRIOR && (spellInfo->SpellFamilyFlags[1] & (0x20 | 0x200000)))
-                {
-                    bonusDamage = true;
-                    break;
-                }
-
-                // Generic Daze: icon 15 with mechanic daze or snare
-                if ((spellInfo->SpellIconID == 15)
-                    && ((spellInfo->Mechanic == MECHANIC_DAZE || spellInfo->HasEffectMechanic(MECHANIC_DAZE))
-                       || (spellInfo->Mechanic == MECHANIC_SNARE || spellInfo->HasEffectMechanic(MECHANIC_SNARE))
-                       )
-                )
-                {
-                    bonusDamage = true;
-                    break;
-                }
-            }
-            if (bonusDamage)
+            // Warrior Spells: Piercing Howl or Dazed (29703)
+            if (spellInfo->SpellFamilyName == SPELLFAMILY_WARRIOR && (spellInfo->SpellFamilyFlags[1] & (0x20 | 0x200000)))
             {
-                int32 damage = GetHitDamage();
-                AddPct(damage, 35); // "Causes ${0.35*$m1} additional damage against Dazed targets."
-                SetHitDamage(damage);
+                bonusDamage = true;
+                break;
             }
+
+            // Generic Daze: icon 15 with mechanic daze or snare
+            if ((spellInfo->SpellIconID == 15)
+                && ((spellInfo->Mechanic == MECHANIC_DAZE || spellInfo->HasEffectMechanic(MECHANIC_DAZE))
+                    || (spellInfo->Mechanic == MECHANIC_SNARE || spellInfo->HasEffectMechanic(MECHANIC_SNARE))
+                    )
+            )
+            {
+                bonusDamage = true;
+                break;
+            }
+        }
+        if (bonusDamage)
+        {
+            int32 damage = GetHitDamage();
+            AddPct(damage, 35); // "Causes ${0.35*$m1} additional damage against Dazed targets."
+            SetHitDamage(damage);
         }
     }
 
