@@ -622,7 +622,7 @@ public:
 };
 
 
-uint32 percent = 0;//初始化概率
+uint32 percent = 0;//Initialization probability
 
 class quest_Kolkar_Pack_Runner : public CreatureScript
 {
@@ -640,23 +640,23 @@ public:
 
         void JustDied(Unit* /*who*/) override
         {
-            percent += 2;  //累加概率
+            percent += 2;  //Cumulative probability
 
-            if (percent > 100)//封装概率最大值防止溢出
+            if (percent > 100)//Prevent overflow
                 percent = 100;
 
-            //以累加后的概率尝试召唤狂热的维罗戈				
+            //Attempt to summon based on the accumulated probability		
             if (roll_chance_i(percent)) {
-                //召唤成功
-                me->AI()->Talk(0);//死亡触发召唤台词
-                me->SummonCreature(3395, -1210.5857, -2725.839, 106.782524, 4.9567f, TEMPSUMMON_TIMED_DESPAWN, 300000);//持续5分钟召唤
-                percent = 0;//召唤成功后初始化召唤概率3%
+                //Summoned successfully
+                me->AI()->Talk(0);//death say
+                me->SummonCreature(3395, -1210.5857, -2725.839, 106.782524, 4.9567f, TEMPSUMMON_TIMED_DESPAWN, 300000);//Summon continuously for 5 minutes
+                percent = 0;//Initialize summoning probability after successful summoning
             }
         }
-        //进入战斗，施法
+        //Combat script
         void JustEngagedWith(Unit* who) override
         {
-            events.ScheduleEvent(1, 3s);//战斗怒吼
+            events.ScheduleEvent(1, 3s);//Battle roar in 3 seconds
         }
 
         void UpdateAI(uint32 diff) override
@@ -666,13 +666,13 @@ public:
             switch (events.ExecuteEvent())
             {
 
-            case 1: //不重复
-                me->CastSpell(me, 9128, false); //战斗怒吼
+            case 1: //Not repeat
+                me->CastSpell(me, 9128, false); //Battle roar
                 break;
             default:
                 break;
             }
-            DoMeleeAttackIfReady();//允许近战攻击
+            DoMeleeAttackIfReady();//Prepare for melee attack
         }
     };
 
@@ -695,23 +695,23 @@ public:
 
         void JustDied(Unit* /*who*/) override
         {
-            percent += 2;  //累加概率
+            percent += 2;  //Cumulative probability
 
-            if (percent > 100)//封装概率最大值防止溢出
+            if (percent > 100)//Prevent overflow
                 percent = 100;
 
-            //以累加后的概率尝试召唤狂热的维罗戈				
+            //Attempt to summon based on the accumulated probability				
             if (roll_chance_i(percent)) {
-                //召唤成功
-                me->AI()->Talk(0);//死亡触发召唤台词
-                me->SummonCreature(3395, -1210.5857, -2725.839, 106.782524, 4.9567f, TEMPSUMMON_TIMED_DESPAWN, 300000);//持续5分钟召唤
-                percent = 0;//召唤成功后初始化召唤概率3%
+                //Summoned successfully
+                me->AI()->Talk(0);//death say
+                me->SummonCreature(3395, -1210.5857, -2725.839, 106.782524, 4.9567f, TEMPSUMMON_TIMED_DESPAWN, 300000);//Summon continuously for 5 minutes
+                percent = 0;//Initialize summoning probability after successful summoning
             }
         }
-        //进入战斗，施法 打击
+        //Combat script
         void JustEngagedWith(Unit* who) override
         {
-            events.ScheduleEvent(1, 12s);// 为啥要12秒后才打第一下？
+            events.ScheduleEvent(1, 12s);// Why do we start after 12 seconds?
 
         }
 
@@ -722,15 +722,15 @@ public:
             switch (events.ExecuteEvent())
             {
 
-            case 1: //重复施法
+            case 1: //Repeat hit spell
                 if(me->GetVictim())
-                me->CastSpell(me->GetVictim(), 11976, false); //打击
-                events.ScheduleEvent(1, 7s);//重复
+                me->CastSpell(me->GetVictim(), 11976, false); //Hit spell
+                events.ScheduleEvent(1, 7s);//Repeat
                 break;
             default:
                 break;
             }
-            DoMeleeAttackIfReady();//允许近战攻击
+            DoMeleeAttackIfReady();//Prepare for melee attack
         }
     };
 
@@ -752,24 +752,24 @@ public:
 
         void JustDied(Unit* /*who*/) override
         {
-            percent += 2;  //累加概率
+            percent += 2;  //Cumulative probability
 
-            if (percent > 100)//封装概率最大值防止溢出
+            if (percent > 100)//Prevent overflow
                 percent = 100;
 
-            //以累加后的概率尝试召唤狂热的维罗戈				
+            //Attempt to summon based on the accumulated probability	
             if (roll_chance_i(percent)) {
-                //召唤成功
-                me->AI()->Talk(0);//死亡触发召唤台词
-                me->SummonCreature(3395, -1210.5857, -2725.839, 106.782524, 4.9567f, TEMPSUMMON_TIMED_DESPAWN, 300000);//持续5分钟召唤
-                percent = 0;//召唤成功后初始化召唤概率3%
+                //Summoned successfully
+                me->AI()->Talk(0);//death say
+                me->SummonCreature(3395, -1210.5857, -2725.839, 106.782524, 4.9567f, TEMPSUMMON_TIMED_DESPAWN, 300000);//Summon continuously for 5 minutes
+                percent = 0;//Initialize summoning probability after successful summoning
             }
         }
-        //进入战斗，施法
+        //Combat script
         void JustEngagedWith(Unit* who) override
         {
-            events.ScheduleEvent(1, 10s);//嗜血
-            events.ScheduleEvent(2, 5s);//腐蚀术
+            events.ScheduleEvent(1, 10s);//bloodthirsty
+            events.ScheduleEvent(2, 5s);//Corruption
         }
 
         void UpdateAI(uint32 diff) override
@@ -779,11 +779,11 @@ public:
             switch (events.ExecuteEvent())
             {
 
-            case 1: //重复施法
-                me->CastSpell(me, 6742, false); //嗜血
+            case 1: //bloodthirsty
+                me->CastSpell(me, 6742, false); 
                 events.ScheduleEvent(1, 60s);
                 break;
-            case 2: //腐蚀术
+            case 2: //Corruption
                 if (me->GetVictim())
                 me->CastSpell(me, 172, false); 
                 events.ScheduleEvent(2, 20s);
@@ -791,7 +791,7 @@ public:
             default:
                 break;
             }
-            DoMeleeAttackIfReady();//允许近战攻击
+            DoMeleeAttackIfReady();//Prepare for melee attack
         }
     };
 
@@ -799,7 +799,7 @@ public:
 
 void AddSC_the_barrens()
 {
-    //狂热的维罗戈修改召唤概率累加途径
+    //modifies the summoning probability accumulation path
     new quest_Kolkar_Pack_Runner();
     new quest_Kolkar_Marauder();
     new quest_Kolkar_Bloodcharger();
