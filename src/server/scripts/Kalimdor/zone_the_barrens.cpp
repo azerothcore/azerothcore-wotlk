@@ -622,6 +622,16 @@ public:
 };
 
 
+enum Verog_the_dervish
+{
+    SAY_Death                   = 0,
+
+    SPELL_Battle_Roar           = 9128,
+    SPELL_Hit                   = 11976,
+    SPELL_Bloodthirsty          = 6742,
+    SPELL_Corruption            = 172,
+};
+
 uint32 percent = 0;//Initialization probability
 
 class quest_Kolkar_Pack_Runner : public CreatureScript
@@ -648,7 +658,7 @@ public:
             //Attempt to summon based on the accumulated probability		
             if (roll_chance_i(percent)) {
                 //Summoned successfully
-                me->AI()->Talk(0);//death say
+                me->AI()->Talk(SAY_Death);//death say
                 me->SummonCreature(3395, -1210.5857, -2725.839, 106.782524, 4.9567f, TEMPSUMMON_TIMED_DESPAWN, 300000);//Summon continuously for 5 minutes
                 percent = 0;//Initialize summoning probability after successful summoning
             }
@@ -667,7 +677,7 @@ public:
             {
 
             case 1: //Not repeat
-                me->CastSpell(me, 9128, false); //Battle roar
+                me->CastSpell(me, SPELL_Battle_Roar, false); //Battle roar
                 break;
             default:
                 break;
@@ -703,7 +713,7 @@ public:
             //Attempt to summon based on the accumulated probability				
             if (roll_chance_i(percent)) {
                 //Summoned successfully
-                me->AI()->Talk(0);//death say
+                me->AI()->Talk(SAY_Death);//death say
                 me->SummonCreature(3395, -1210.5857, -2725.839, 106.782524, 4.9567f, TEMPSUMMON_TIMED_DESPAWN, 300000);//Summon continuously for 5 minutes
                 percent = 0;//Initialize summoning probability after successful summoning
             }
@@ -724,7 +734,7 @@ public:
 
             case 1: //Repeat hit spell
                 if(me->GetVictim())
-                me->CastSpell(me->GetVictim(), 11976, false); //Hit spell
+                me->CastSpell(me->GetVictim(), SPELL_Hit, false); //Hit spell
                 events.ScheduleEvent(1, 7s);//Repeat
                 break;
             default:
@@ -760,7 +770,7 @@ public:
             //Attempt to summon based on the accumulated probability	
             if (roll_chance_i(percent)) {
                 //Summoned successfully
-                me->AI()->Talk(0);//death say
+                me->AI()->Talk(SAY_Death);//death say
                 me->SummonCreature(3395, -1210.5857, -2725.839, 106.782524, 4.9567f, TEMPSUMMON_TIMED_DESPAWN, 300000);//Summon continuously for 5 minutes
                 percent = 0;//Initialize summoning probability after successful summoning
             }
@@ -780,12 +790,12 @@ public:
             {
 
             case 1: //bloodthirsty
-                me->CastSpell(me, 6742, false); 
+                me->CastSpell(me, SPELL_Bloodthirsty, false); 
                 events.ScheduleEvent(1, 60s);
                 break;
             case 2: //Corruption
                 if (me->GetVictim())
-                me->CastSpell(me, 172, false); 
+                me->CastSpell(me, SPELL_Corruption, false); 
                 events.ScheduleEvent(2, 20s);
                 break;
             default:
