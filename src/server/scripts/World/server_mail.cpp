@@ -48,7 +48,7 @@ public:
             // Capture servMail by value
             auto callback = [session, servMailWrapper = std::reference_wrapper<ServerMail const>(servMail), isAlliance](PreparedQueryResult result)
                 {
-                     ServerMail const& servMail = servMailWrapper.get();  // Dereference the wrapper to get the original object
+                    ServerMail const& servMail = servMailWrapper.get();  // Dereference the wrapper to get the original object
 
                     if (!result)
                     {
