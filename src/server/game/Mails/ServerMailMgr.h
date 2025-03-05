@@ -59,7 +59,7 @@ enum class ServerMailConditionType : uint8
  *
  * Each condition has a type (see @ref ServerMailConditionType) and a value associated with the type.
  * For example, for a level condition, the value represents the required player level.
- * 
+ *
  * Some condition also have a state associated with the value.
  * For example, for a reputation condition, the state represents the current reputation state, like Exalted.
  *
