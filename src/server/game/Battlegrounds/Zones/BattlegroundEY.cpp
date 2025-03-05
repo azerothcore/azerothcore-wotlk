@@ -114,14 +114,14 @@ void BattlegroundEY::AddPoints(TeamId teamId, uint32 points)
 {
     uint8 honorRewards = uint8(m_TeamScores[teamId] / _honorTics);
     m_TeamScores[teamId] += points;
-    if (m_TeamScores[teamId] > BG_EY_MAX_TEAM_SCORE)
-        m_TeamScores[teamId] = BG_EY_MAX_TEAM_SCORE;
+    if (m_TeamScores[teamId] > static_cast<int32>(_configurableMaxTeamScore))
+        m_TeamScores[teamId] = _configurableMaxTeamScore;
 
     for (; honorRewards < uint8(m_TeamScores[teamId] / _honorTics); ++honorRewards)
         RewardHonorToTeam(GetBonusHonorFromKill(1), teamId);
 
-    UpdateWorldState(teamId == TEAM_ALLIANCE ? EY_ALLIANCE_RESOURCES : EY_HORDE_RESOURCES, std::min<uint32>(m_TeamScores[teamId], BG_EY_MAX_TEAM_SCORE));
-    if (m_TeamScores[teamId] >= BG_EY_MAX_TEAM_SCORE)
+    UpdateWorldState(teamId == TEAM_ALLIANCE ? EY_ALLIANCE_RESOURCES : EY_HORDE_RESOURCES, std::min<uint32>(m_TeamScores[teamId], _configurableMaxTeamScore));
+    if (m_TeamScores[teamId] >= static_cast<int32>(_configurableMaxTeamScore))
         EndBattleground(teamId);
 }
 
@@ -362,6 +362,11 @@ void BattlegroundEY::Init()
     _droppedFlagGUID.Clear();
     _flagState = BG_EY_FLAG_STATE_ON_BASE;
     _flagCapturedObject = 0;
+
+    uint32 bgEyCapturePointsConfig = sWorld->getIntConfig(CONFIG_BATTLEGROUND_EYEOFTHESTORM_CAPTUREPOINTS);
+    _configurableMaxTeamScore = bgEyCapturePointsConfig > 0
+        ? bgEyCapturePointsConfig
+        : static_cast<uint32>(BG_EY_MAX_TEAM_SCORE);
 }
 
 void BattlegroundEY::RespawnFlag()

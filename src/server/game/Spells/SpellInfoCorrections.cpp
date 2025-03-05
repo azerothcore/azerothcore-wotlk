@@ -3984,13 +3984,6 @@ void SpellMgr::LoadSpellInfoCorrections()
         spellInfo->Effects[EFFECT_0].BasePoints = -25;
     });
 
-    // Focused Eyebeam Summon Trigger
-    ApplySpellFix({ 63342 }, [](SpellInfo* spellInfo)
-    {
-        spellInfo->MaxAffectedTargets = 1;
-        spellInfo->Effects[EFFECT_0].TargetB = SpellImplicitTargetInfo();
-    });
-
     // Eye of Kilrogg Passive (DND)
     ApplySpellFix({ 2585 }, [](SpellInfo* spellInfo)
     {
