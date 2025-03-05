@@ -22,9 +22,9 @@
 #include "Log.h"
 #include "ObjectMgr.h"
 #include "Player.h"
+#include "QuestDef.h"
 #include "SharedDefines.h"
 #include "Timer.h"
-#include "QuestDef.h"
 
 ServerMailMgr::ServerMailMgr() {}
 ServerMailMgr::~ServerMailMgr() {}
