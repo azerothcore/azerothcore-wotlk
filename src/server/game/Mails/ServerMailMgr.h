@@ -55,6 +55,9 @@ enum class ServerMailConditionType : uint8
     Class       = 8, ///< Requires the player to be a specific class.
 };
 
+/**
+* @brief Assign string condition to corresponding @ref ServerMailConditionType enum value
+*/
 constexpr std::pair<std::string_view, ServerMailConditionType> ServerMailConditionTypePairs[] =
 {
     { "Level",       ServerMailConditionType::Level       },
