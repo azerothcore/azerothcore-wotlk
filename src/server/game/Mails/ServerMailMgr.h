@@ -31,6 +31,7 @@
 #ifndef _SERVERMAILMGR_H
 #define _SERVERMAILMGR_H
 
+#include "Define.h"
 #include <string>
 #include <unordered_map>
 #include <vector>
