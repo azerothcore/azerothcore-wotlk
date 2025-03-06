@@ -26,9 +26,6 @@
 #include "SharedDefines.h"
 #include "Timer.h"
 
-ServerMailMgr::ServerMailMgr() {}
-ServerMailMgr::~ServerMailMgr() {}
-
 ServerMailMgr* ServerMailMgr::instance()
 {
     static ServerMailMgr instance;
@@ -50,7 +47,7 @@ void ServerMailMgr::LoadMailServerTemplates()
         return;
     }
 
-    _serverMailStore.rehash(result->GetRowCount());
+    _serverMailStore.reserve(result->GetRowCount());
 
     do
     {
@@ -67,10 +64,14 @@ void ServerMailMgr::LoadMailServerTemplates()
         servMail.body        = fields[4].Get<std::string>();
         servMail.active      = fields[5].Get<uint8>();
 
+        // Skip non-activated entries
+        if (!servMail.active)
+            continue;
+
         if (servMail.moneyA > MAX_MONEY_AMOUNT || servMail.moneyH > MAX_MONEY_AMOUNT)
         {
             LOG_ERROR("sql.sql", "Table `mail_server_template` has moneyA {} or moneyH {} larger than MAX_MONEY_AMOUNT {} for id {}, skipped.", servMail.moneyA, servMail.moneyH, MAX_MONEY_AMOUNT, servMail.id);
-            return;
+            continue;
         }
     } while (result->NextRow());
 
@@ -95,7 +96,7 @@ void ServerMailMgr::LoadMailServerTemplatesItems()
         Field* fields = result->Fetch();
 
         uint32 templateID = fields[0].Get<uint32>();
-        std::string faction = fields[1].Get<std::string>();
+        std::string_view faction = fields[1].Get<std::string>();
         uint32 item = fields[2].Get<uint32>();
         uint32 itemCount = fields[3].Get<uint32>();
 
@@ -163,7 +164,7 @@ void ServerMailMgr::LoadMailServerTemplatesConditions()
         Field* fields = result->Fetch();
 
         uint32 templateID = fields[0].Get<uint32>();
-        std::string conditionTypeStr = fields[1].Get<std::string>();
+        std::string_view conditionTypeStr = fields[1].Get<std::string>();
         uint32 conditionValue = fields[2].Get<uint32>();
         uint32 conditionState = fields[3].Get<uint32>();
 
@@ -293,11 +294,8 @@ void ServerMailMgr::LoadMailServerTemplatesConditions()
 void ServerMailMgr::SendServerMail(Player* player, uint32 id, uint32 money,
     std::vector<ServerMailItems> const& items,
     std::vector<ServerMailCondition> const& conditions,
-    std::string subject, std::string body, uint8 active) const
+    std::string const& subject, std::string const& body) const
 {
-    if (!active)
-        return;
-
     for (ServerMailCondition const& condition : conditions)
         if (!condition.CheckCondition(player))
             return;
@@ -310,16 +308,11 @@ void ServerMailMgr::SendServerMail(Player* player, uint32 id, uint32 money,
     draft.AddMoney(money);
     // Loop through all items and attach them to the mail
     for (auto const& mailItem : items)
-    {
-        if (!mailItem.item || !mailItem.itemCount)
-            continue;
-
         if (Item* newItem = Item::CreateItem(mailItem.item, mailItem.itemCount))
         {
             newItem->SaveToDB(trans);
             draft.AddItem(newItem);
         }
-    }
 
     draft.SendMailTo(trans, MailReceiver(player), sender);
     CharacterDatabase.CommitTransaction(trans);

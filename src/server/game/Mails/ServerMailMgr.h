@@ -152,8 +152,8 @@ typedef std::unordered_map<uint32, ServerMail> ServerMailContainer;
 class ServerMailMgr
 {
 private:
-    ServerMailMgr();
-    ~ServerMailMgr();
+    ServerMailMgr() = default;
+    ~ServerMailMgr() = default;
 public:
     static ServerMailMgr* instance();
 
@@ -198,7 +198,7 @@ public:
      * @param body Mail body.
      * @param active Whether the mail template is active.
      */
-    void SendServerMail(Player* player, uint32 id, uint32 money, std::vector<ServerMailItems> const& items, std::vector<ServerMailCondition> const& conditions, std::string subject, std::string body, uint8 active) const;
+    void SendServerMail(Player* player, uint32 id, uint32 money, std::vector<ServerMailItems> const& items, std::vector<ServerMailCondition> const& conditions, std::string const& subject, std::string const& body) const;
 
     [[nodiscard]] ServerMailContainer const& GetAllServerMailStore() const { return _serverMailStore; }
 

@@ -63,8 +63,7 @@ public:
                             items,
                             conditions,
                             servMail.subject,
-                            servMail.body,
-                            servMail.active
+                            servMail.body
                         );
                     }
                 };
