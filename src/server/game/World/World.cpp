@@ -1668,7 +1668,7 @@ void World::SetInitialWorldSettings()
     LOG_INFO("server.loading", "Loading Player Level Dependent Mail Rewards...");
     sObjectMgr->LoadMailLevelRewards();
 
-    LOG_INFO("server.loading", "Load Mail Server Template...");
+    LOG_INFO("server.loading", "Load Mail Server definitions...");
     sServerMailMgr->LoadMailServerTemplates();
 
     // Loot tables
