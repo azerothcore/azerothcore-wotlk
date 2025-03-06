@@ -96,7 +96,7 @@ void ServerMailMgr::LoadMailServerTemplatesItems()
         Field* fields = result->Fetch();
 
         uint32 templateID = fields[0].Get<uint32>();
-        std::string_view faction = fields[1].Get<std::string>();
+        std::string faction = fields[1].Get<std::string>();
         uint32 item = fields[2].Get<uint32>();
         uint32 itemCount = fields[3].Get<uint32>();
 
@@ -164,7 +164,7 @@ void ServerMailMgr::LoadMailServerTemplatesConditions()
         Field* fields = result->Fetch();
 
         uint32 templateID = fields[0].Get<uint32>();
-        std::string_view conditionTypeStr = fields[1].Get<std::string>();
+        std::string conditionTypeStr = fields[1].Get<std::string>();
         uint32 conditionValue = fields[2].Get<uint32>();
         uint32 conditionState = fields[3].Get<uint32>();
 
