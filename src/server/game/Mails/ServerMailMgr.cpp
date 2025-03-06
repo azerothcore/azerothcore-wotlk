@@ -183,15 +183,8 @@ void ServerMailMgr::LoadMailServerTemplatesConditions()
             continue;
         }
 
-        if (conditionState &&
-            conditionType != ServerMailConditionType::Quest &&
-            conditionType != ServerMailConditionType::Reputation &&
-            conditionType != ServerMailConditionType::Faction &&
-            conditionType != ServerMailConditionType::Race &&
-            conditionType != ServerMailConditionType::Class)
-        {
+        if (conditionState && !ConditionTypeUsesConditionState(conditionType))
             LOG_WARN("sql.sql", "Table `mail_server_template_conditions` has conditionState value ({}) for conditionType ({}) which does not use conditionState.", conditionState, conditionTypeStr);
-        }
 
         switch (conditionType)
         {
@@ -316,6 +309,18 @@ ServerMailConditionType ServerMailMgr::GetServerMailConditionType(std::string_vi
             return pair.second;
 
     return ServerMailConditionType::Invalid;
+}
+
+bool ServerMailMgr::ConditionTypeUsesConditionState(ServerMailConditionType type)
+{
+    switch (type)
+    {
+    case ServerMailConditionType::Quest:
+    case ServerMailConditionType::Reputation:
+        return true;
+    default:
+        return false;
+    }
 }
 
 bool ServerMailCondition::CheckCondition(Player* player) const

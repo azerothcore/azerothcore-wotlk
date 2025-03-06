@@ -189,6 +189,13 @@ public:
     ServerMailConditionType GetServerMailConditionType(std::string_view conditionTypeStr);
 
     /**
+    * @brief Check if ConditionType should use ConditionState
+    *
+    * @return True if the ConditionType is allowed to use ConditionState, otherwise False.
+    */
+    bool ConditionTypeUsesConditionState(ServerMailConditionType type);
+
+    /**
      * @brief Sends a server mail to a player if the template is active and the player is eligible.
      *
      * This method handles the creation of the mail, adding money and items, and saving the mail to the database.
