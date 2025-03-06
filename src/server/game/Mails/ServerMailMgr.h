@@ -182,7 +182,7 @@ public:
     * Lookup the corresponding SeverMailConditionType enum for the provided
     * string by DB. If the string is not found we return internal default value
     * ServerMailConditionType::Invalid
-    * 
+    *
     * @param conditionTypeStr string value from DB of conditionType
     * @return ServerMailConditionType The corresponding value (see @ref ServerMailConditionType) or default to ServerMailConditionType::Invalid
     */

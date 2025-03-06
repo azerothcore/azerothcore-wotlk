@@ -311,7 +311,7 @@ void ServerMailMgr::SendServerMail(Player* player, uint32 id, uint32 money,
 
 ServerMailConditionType ServerMailMgr::GetServerMailConditionType(std::string_view conditionTypeStr)
 {
-    for (const auto& pair : ServerMailConditionTypePairs)
+    for (auto const& pair : ServerMailConditionTypePairs)
         if (pair.first == conditionTypeStr)
             return pair.second;
 
