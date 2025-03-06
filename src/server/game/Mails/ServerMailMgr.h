@@ -44,7 +44,7 @@ class Player;
  */
 enum class ServerMailConditionType : uint8
 {
-    None        = 0, ///< Internal use, not used in DB.
+    Invalid     = 0, ///< Internal use, not used in DB.
     Level       = 1, ///< Requires the player to be at least a specific level.
     PlayTime    = 2, ///< Requires the player to have played for a minimum amount of time (in milliseconds).
     Quest       = 3, ///< Requires the player to have completed a specific quest.
@@ -53,6 +53,18 @@ enum class ServerMailConditionType : uint8
     Faction     = 6, ///< Requires the player to be a part of a specific faction. Horde/Alliance.
     Race        = 7, ///< Requires the player to be a specific race.
     Class       = 8, ///< Requires the player to be a specific class.
+};
+
+constexpr std::pair<std::string_view, ServerMailConditionType> ServerMailConditionTypePairs[] =
+{
+    { "Level",       ServerMailConditionType::Level       },
+    { "PlayTime",    ServerMailConditionType::PlayTime    },
+    { "Quest",       ServerMailConditionType::Quest       },
+    { "Achievement", ServerMailConditionType::Achievement },
+    { "Reputation",  ServerMailConditionType::Reputation  },
+    { "Faction",     ServerMailConditionType::Faction     },
+    { "Race",        ServerMailConditionType::Race        },
+    { "Class",       ServerMailConditionType::Class       }
 };
 
 /**
@@ -71,7 +83,7 @@ struct ServerMailCondition
 {
     ServerMailCondition() = default;
 
-    ServerMailConditionType type = ServerMailConditionType::None;
+    ServerMailConditionType type = ServerMailConditionType::Invalid;
     uint32 value{ 0 };
     uint32 state{ 0 };
 
@@ -160,6 +172,18 @@ public:
      * This method is intended to be called during server startup.
      */
     void LoadMailServerTemplatesConditions();
+
+    /**
+    * @brief Convert DB value of conditionType to ServerMailConditionType.
+    *
+    * Lookup the corresponding SeverMailConditionType enum for the provided
+    * string by DB. If the string is not found we return internal default value
+    * ServerMailConditionType::Invalid
+    * 
+    * @param conditionTypeStr string value from DB of conditionType
+    * @return ServerMailConditionType The corresponding value (see @ref ServerMailConditionType) or default to ServerMailConditionType::Invalid
+    */
+    ServerMailConditionType GetServerMailConditionType(std::string_view conditionTypeStr);
 
     /**
      * @brief Sends a server mail to a player if the template is active and the player is eligible.

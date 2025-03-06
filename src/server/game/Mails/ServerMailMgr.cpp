@@ -174,24 +174,10 @@ void ServerMailMgr::LoadMailServerTemplatesConditions()
             continue;
         }
 
+        // Get conditiontype from ServerMailConditionTypePairs
         ServerMailConditionType conditionType;
-        if (conditionTypeStr == "Level")
-            conditionType = ServerMailConditionType::Level;
-        else if (conditionTypeStr == "PlayTime")
-            conditionType = ServerMailConditionType::PlayTime;
-        else if (conditionTypeStr == "Quest")
-            conditionType = ServerMailConditionType::Quest;
-        else if (conditionTypeStr == "Achievement")
-            conditionType = ServerMailConditionType::Achievement;
-        else if (conditionTypeStr == "Reputation")
-            conditionType = ServerMailConditionType::Reputation;
-        else if (conditionTypeStr == "Faction")
-            conditionType = ServerMailConditionType::Faction;
-        else if (conditionTypeStr == "Race")
-            conditionType = ServerMailConditionType::Race;
-        else if (conditionTypeStr == "Class")
-            conditionType = ServerMailConditionType::Class;
-        else
+        conditionType = GetServerMailConditionType(conditionTypeStr);
+        if (conditionType == ServerMailConditionType::Invalid)
         {
             LOG_ERROR("sql.sql", "Table `mail_server_template_conditions` has unknown conditionType '{}', skipped.", conditionTypeStr);
             continue;
@@ -321,6 +307,15 @@ void ServerMailMgr::SendServerMail(Player* player, uint32 id, uint32 money,
     stmt->SetData(0, player->GetGUID().GetCounter());
     stmt->SetData(1, id);
     CharacterDatabase.Execute(stmt);
+}
+
+ServerMailConditionType ServerMailMgr::GetServerMailConditionType(std::string_view conditionTypeStr)
+{
+    for (const auto& pair : ServerMailConditionTypePairs)
+        if (pair.first == conditionTypeStr)
+            return pair.second;
+
+    return ServerMailConditionType::Invalid;
 }
 
 bool ServerMailCondition::CheckCondition(Player* player) const
