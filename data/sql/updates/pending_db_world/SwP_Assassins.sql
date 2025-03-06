@@ -120,15 +120,36 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 
 -- Setup Comment for a Vanquisher
 UPDATE `creature` SET `Comment` = "has guid specific SAI" WHERE (`guid` = 44059) AND (`id1` = 25486);
+UPDATE `creature` SET `Comment` = "has guid specific SAI" WHERE (`guid` = 44079) AND (`id1` = 25486);
+UPDATE `creature` SET `Comment` = "has guid specific SAI" WHERE (`guid` = 44358) AND (`id1` = 25483);
+UPDATE `creature` SET `Comment` = "has guid specific SAI" WHERE (`guid` = 44268) AND (`id1` = 25484);
 
--- Add Extra Flag for Vanquisters (Don't Override SmartAI)
+-- Add Extra Flag for Vanquisters/Manafiend/Assassin (Don't Override SmartAI)
 UPDATE `creature_template` SET `flags_extra` = `flags_extra` |134283264 WHERE (`entry` = 25486);
+UPDATE `creature_template` SET `flags_extra` = `flags_extra` |134283264 WHERE (`entry` = 25484);
+UPDATE `creature_template` SET `flags_extra` = `flags_extra` |134283264 WHERE (`entry` = 25483);
 
--- Add Specific SmartAI for a Vanquisher
+
+-- Add Specific SmartAI for two Vanquishers
 DELETE FROM `smart_scripts` WHERE (`source_type` = 0 AND `entryorguid` = -44059);
 INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `event_param6`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
 (-44059, 0, 2, 3, 101, 0, 100, 257, 1, 60, 1000, 1000, 1000, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Shadowsword Vanquisher - On 1 or More Players in Range - Say Line 0 (No Repeat)'),
 (-44059, 0, 3, 4, 61, 0, 100, 0, 0, 0, 0, 0, 0, 0, 69, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1782.49, 565.23, 56.4824, 0, 'Shadowsword Vanquisher - On 1 or More Players in Range - Move To Self (No Repeat)'),
 (-44059, 0, 4, 5, 61, 0, 100, 0, 0, 0, 0, 0, 0, 0, 201, 0, 0, 0, 0, 0, 0, 10, 44079, 25486, 0, 0, 1795.16, 559.262, 55.452, 0, 'Shadowsword Vanquisher - On 1 or More Players in Range - Move to pos target 0 (No Repeat)'),
 (-44059, 0, 5, 6, 61, 0, 100, 0, 0, 0, 0, 0, 0, 0, 201, 0, 0, 0, 0, 0, 0, 10, 44358, 25483, 0, 0, 1796.5, 565.146, 53.8325, 0, 'Shadowsword Vanquisher - On 1 or More Players in Range - Move to pos target 0 (No Repeat)'),
-(-44059, 0, 6, 0, 61, 0, 100, 0, 0, 0, 0, 0, 0, 0, 201, 0, 0, 0, 0, 0, 0, 10, 44268, 25484, 0, 0, 1792.09, 568.5, 53.796, 0, 'Shadowsword Vanquisher - On 1 or More Players in Range - Move to pos target 0 (No Repeat)');
+(-44059, 0, 6, 0, 61, 0, 100, 0, 0, 0, 0, 0, 0, 0, 201, 0, 0, 0, 0, 0, 0, 10, 44268, 25484, 0, 0, 1792.09, 568.5, 53.796, 0, 'Shadowsword Vanquisher - On 1 or More Players in Range - Move to pos target 0 (No Repeat)'),
+(-44059, 0, 7, 0, 7, 0, 100, 0, 0, 0, 0, 0, 0, 0, 101, 0, 0, 0, 0, 0, 0, 8, 0, 0, 0, 0, 1782.49, 565.23, 56.4824, -2.29478, 'Shadowsword Vanquisher - On Evade - Set Home Position');
+
+DELETE FROM `smart_scripts` WHERE (`source_type` = 0 AND `entryorguid` = -44079);
+INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `event_param6`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
+(-44079, 0, 2, 0, 7, 0, 100, 0, 0, 0, 0, 0, 0, 0, 101, 0, 0, 0, 0, 0, 0, 8, 0, 0, 0, 0, 1795.16, 559.262, 55.452, -1.89717, 'Shadowsword Vanquisher - On Evade - Set Home Position');
+
+-- Add Specific SmartAI for a Manafiend
+DELETE FROM `smart_scripts` WHERE (`source_type` = 0 AND `entryorguid` = -44358);
+INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `event_param6`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
+(-44358, 0, 2, 0, 7, 0, 100, 0, 0, 0, 0, 0, 0, 0, 101, 0, 0, 0, 0, 0, 0, 8, 0, 0, 0, 0, 1796.5, 565.146, 53.8325, -1.9621, 'Shadowsword Manafiend - On Evade - Set Home Position');
+
+-- Add Specific SmartAI for an Assassin
+DELETE FROM `smart_scripts` WHERE (`source_type` = 0 AND `entryorguid` = -44268);
+INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `event_param6`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
+(-44268, 0, 6, 0, 7, 0, 100, 0, 0, 0, 0, 0, 0, 0, 101, 0, 0, 0, 0, 0, 0, 8, 0, 0, 0, 0, 1792.09, 568.5, 53.796, -1.9703, 'Shadowsword Assassin - On Evade - Set Home Position');
