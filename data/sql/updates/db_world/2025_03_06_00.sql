@@ -1,3 +1,4 @@
+-- DB update 2025_03_05_00 -> 2025_03_06_00
 -- Update gameobject 'Isle Daily Gobs' with sniffed values
 -- updated spawns
 DELETE FROM `gameobject` WHERE (`id` IN (187333))
