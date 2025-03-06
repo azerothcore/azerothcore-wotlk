@@ -322,3 +322,29 @@ void ServerMailMgr::SendServerMail(Player* player, uint32 id, uint32 money,
     stmt->SetData(1, id);
     CharacterDatabase.Execute(stmt);
 }
+
+bool ServerMailCondition::CheckCondition(Player* player) const
+{
+    switch (type)
+    {
+    case ServerMailConditionType::Level:
+        return player->GetLevel() >= value;
+    case ServerMailConditionType::PlayTime:
+        return player->GetTotalPlayedTime() >= value;
+    case ServerMailConditionType::Quest:
+        return player->GetQuestStatus(value) == state;
+    case ServerMailConditionType::Achievement:
+        return player->HasAchieved(value);
+    case ServerMailConditionType::Reputation:
+        return player->GetReputationRank(value) >= state;
+    case ServerMailConditionType::Faction:
+        return player->GetTeamId() == value;
+    case ServerMailConditionType::Race:
+        return (player->getRaceMask() & value) != 0;
+    case ServerMailConditionType::Class:
+        return (player->getClassMask() & value) != 0;
+    default:
+        LOG_ERROR("server.mail", "Unknown server mail condition type '{}'", static_cast<uint32>(type));
+        return false;
+    }
+}

@@ -31,10 +31,11 @@
 #ifndef _SERVERMAILMGR_H
 #define _SERVERMAILMGR_H
 
-#include "Player.h"
 #include <string>
 #include <unordered_map>
 #include <vector>
+
+class Player;
 
 /**
  * @enum ServerMailConditionType
@@ -81,31 +82,7 @@ struct ServerMailCondition
      * @param player The player to check.
      * @return True if the player meets the condition, otherwise false.
      */
-    bool CheckCondition(Player* player) const
-    {
-        switch (type)
-        {
-        case ServerMailConditionType::Level:
-            return player->GetLevel() >= value;
-        case ServerMailConditionType::PlayTime:
-            return player->GetTotalPlayedTime() >= value;
-        case ServerMailConditionType::Quest:
-            return player->GetQuestStatus(value) == state;
-        case ServerMailConditionType::Achievement:
-            return player->HasAchieved(value);
-        case ServerMailConditionType::Reputation:
-            return player->GetReputationRank(value) >= state;
-        case ServerMailConditionType::Faction:
-            return player->GetTeamId() == value;
-        case ServerMailConditionType::Race:
-            return (player->getRaceMask() & value) != 0;
-        case ServerMailConditionType::Class:
-            return (player->getClassMask() & value) != 0;
-        default:
-            LOG_ERROR("server.mail", "Unknown server mail condition type '{}'", static_cast<uint32>(type));
-            return false;
-        }
-    }
+    bool CheckCondition(Player* player) const;
 };
 
 /**
