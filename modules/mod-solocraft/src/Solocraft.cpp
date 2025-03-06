@@ -1,14 +1,24 @@
+#include "utils/Utils.h"
 #include "Chat.h"
 #include "Config.h"
 #include "Group.h"
+#include "InstanceScript.h"
 #include "Log.h"
 #include "Map.h"
+#include "ObjectGuid.h"
 #include "Pet.h"
 #include "Player.h"
 #include "ScriptMgr.h"
 #include "SpellAuraEffects.h"
+#include "Unit.h"
 #include "Vehicle.h"
+#include <cstdint>
+#include <iostream>
+#include <map>
+#include <math.h>
+#include <string>
 #include <unordered_map>
+#include <vector>
 
 #if not(defined(MOD_PRESENT_NPCBOTS)) || MOD_PRESENT_NPCBOTS != 1
  #error "NPCBots mod is not installed! This version of Autobalance only supports AzerothCore+NPCBots."
@@ -63,6 +73,7 @@ std::unordered_map<uint8, uint32> classBalanceMap;
 std::unordered_map<uint32, uint32> dungeonLevelMap;
 std::unordered_map<uint32, float> dungeonDifficultyNormalMap;
 std::unordered_map<uint32, float> dungeonDifficultyHeroicMap;
+std::vector<uint32_t> SolocraftInstanceExcluded;
 
 float DifficultyDefault5      = 1.0f;
 float DifficultyDefault10     = 1.0f;
@@ -326,6 +337,11 @@ public:
     //}
 
 private:
+    static bool IsInSolocraftInstanceExcludedList(uint32 id)
+    {
+        return find(SolocraftInstanceExcluded.begin(), SolocraftInstanceExcluded.end(), id) != SolocraftInstanceExcluded.end();
+    }
+
     static void OnGroupMemberAddedOrRemoved(Group const* group, ObjectGuid guid, bool remove = false)
     {
         if (!SoloCraftEnable)
@@ -541,6 +557,17 @@ private:
             return;
         }
 
+        // If dungeon is in the exception list then do not buff
+        if (IsInSolocraftInstanceExcludedList(map->GetId()))
+        {
+            ss << "|cffFF0000[SoloCraft] |cffFF8000" << unit->GetName() << (unit->IsNPCBot() ? " (bot)" : "") << " updates " << map->GetMapName()
+                << " - |cffFF0000Have not been buffed. |cffFF8000Dungeon is excluded from Solocraft.";
+            ReportToSelf(unit, ss.str());
+            //ReportToGroup(unit, members, ss.str());
+            ClearBuffs(unit, map, class_);
+            return;
+        }
+		
         SolocraftPlayer& scp = scPlayers[unit->GetGUID()];
 
         difficulty = roundf(((classBalance / 100.0f) * difficulty) / numInGroup);
@@ -716,7 +743,9 @@ private:
 class SolocraftAnnounce : public PlayerScript
 {
 public:
-    SolocraftAnnounce() : PlayerScript("SolocraftAnnounce") {}
+    SolocraftAnnounce() : PlayerScript("SolocraftAnnounce", {
+        PLAYERHOOK_ON_LOGIN
+    }) {}
 
     void OnPlayerLogin(Player* player) override
     {
@@ -752,7 +781,13 @@ public:
 class SolocraftPlayerScript : public PlayerScript
 {
 public:
-    SolocraftPlayerScript() : PlayerScript("SolocraftPlayerScript") {}
+    SolocraftPlayerScript() : PlayerScript("SolocraftPlayerScript", {
+        PLAYERHOOK_ON_LOGIN,
+        PLAYERHOOK_ON_LOGOUT,
+        PLAYERHOOK_ON_MAP_CHANGED,
+        PLAYERHOOK_ON_GIVE_EXP,
+        PLAYERHOOK_ON_AFTER_GUARDIAN_INIT_STATS_FOR_LEVEL
+    }) {}
 
     void OnPlayerLogin(Player* player) override
     {
@@ -815,7 +850,9 @@ public:
 class SolocraftConfig : public WorldScript
 {
 public:
-    SolocraftConfig() : WorldScript("SolocraftConfig") {}
+    SolocraftConfig() : WorldScript("SolocraftConfig", {
+        WORLDHOOK_ON_BEFORE_CONFIG_LOAD
+    }) {}
 
     void OnBeforeConfigLoad(bool reload) override
     {
@@ -1083,6 +1120,9 @@ public:
         // Unique Raids beyond the heroic and normal versions of themselves
         DifficultyDefault649H10 = sConfigMgr->GetOption<float>("Solocraft.ArgentTournamentRaidH10", 10.0f); // Trial of the Crusader 10 Heroic
         DifficultyDefault649H25 = sConfigMgr->GetOption<float>("Solocraft.ArgentTournamentRaidH25", 25.0f); // Trial of the Crusader 25 Heroic
+
+        //Get from conf excluded map for Solocraft scaling
+        LoadList(sConfigMgr->GetOption<std::string>("Solocraft.Instance.Excluded", ""), SolocraftInstanceExcluded);
     }
 };
 

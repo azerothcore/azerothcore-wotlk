@@ -462,3 +462,15 @@ Solocraft.QuarryOfTears.Level = 78
 Solocraft.HallsOfReflection.Level = 78
 # The Ruby Sanctum
 Solocraft.ChamberOfAspectsRed.Level = 80
+
+###################################################################################################
+#  Misc
+###################################################################################################
+
+# Map excluded
+# This settings excludes some maps from the Solocraft instance scaling
+
+# Example: 
+#   Solocraft.Instance.Excluded = "30,489,529,559,562,566,572,607,617,618,628"
+#   This example excludes scaling in PvP BG & Arena maps
+Solocraft.Instance.Excluded = ""

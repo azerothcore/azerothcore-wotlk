@@ -15,16 +15,20 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "ServerAutoShutdown.h"
 #include "Config.h"
 #include "Log.h"
 #include "ScriptMgr.h"
+#include "ServerAutoShutdown.h"
 #include "TaskScheduler.h"
 
 class ServerAutoShutdown_World : public WorldScript
 {
 public:
-    ServerAutoShutdown_World() : WorldScript("ServerAutoShutdown_World") { }
+    ServerAutoShutdown_World() : WorldScript("ServerAutoShutdown_World", {
+        WORLDHOOK_ON_UPDATE,
+        WORLDHOOK_ON_AFTER_CONFIG_LOAD,
+        WORLDHOOK_ON_STARTUP
+    }) { }
 
     void OnUpdate(uint32 diff) override
     {

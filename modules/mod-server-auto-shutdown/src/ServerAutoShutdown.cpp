@@ -15,13 +15,13 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "ServerAutoShutdown.h"
 #include "Config.h"
 #include "Duration.h"
 #include "GameEventMgr.h"
 #include "Language.h"
 #include "Log.h"
 #include "ObjectMgr.h"
+#include "ServerAutoShutdown.h"
 #include "StringConvert.h"
 #include "StringFormat.h"
 #include "TaskScheduler.h"
@@ -78,10 +78,8 @@ void ServerAutoShutdown::Init()
     auto CheckTime = [tokens](std::initializer_list<uint8> index)
     {
         for (auto const& itr : index)
-        {
             if (!Acore::StringTo<uint8>(tokens.at(itr)))
                 return false;
-        }
 
         return true;
     };
