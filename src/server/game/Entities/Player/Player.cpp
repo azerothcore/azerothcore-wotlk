@@ -2473,7 +2473,7 @@ void Player::GiveXP(uint32 xp, Unit* victim, float group_rate, bool isLFGReward)
 void Player::GiveLevel(uint8 level)
 {
     uint8 oldLevel = GetLevel();
-    if (level == oldLevel)
+    if (level == oldLevel || !sScriptMgr->OnPlayerCanChangeLevel(this, level))
         return;
 
     if (Guild* guild = GetGuild())

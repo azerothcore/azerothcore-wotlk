@@ -915,6 +915,11 @@ bool ScriptMgr::OnPlayerCanResurrect(Player* player)
     CALL_ENABLED_BOOLEAN_HOOKS(PlayerScript, PLAYERHOOK_CAN_RESURRECT, !script->OnPlayerCanResurrect(player));
 }
 
+bool ScriptMgr::OnPlayerCanChangeLevel(Player* player, uint8 newLevel)
+{
+    CALL_ENABLED_BOOLEAN_HOOKS(PlayerScript, PLAYERHOOK_ON_BEFORE_LEVEL_CHANGED, !script->OnPlayerCanChangeLevel(player, newLevel));
+}
+
 PlayerScript::PlayerScript(const char* name, std::vector<uint16> enabledHooks)
     : ScriptObject(name, PLAYERHOOK_END)
 {
