@@ -154,25 +154,25 @@ void CalendarMgr::AddInvite(CalendarEvent* calendarEvent, CalendarInvite* invite
     }
 }
 
-void CalendarMgr::RemoveEvent(uint64 eventId, ObjectGuid remover)
+CalendarEventStore::iterator CalendarMgr::RemoveEvent(uint64 eventId, ObjectGuid remover)
 {
-    CalendarEvent* calendarEvent = GetEvent(eventId);
+    CalendarEventStore::iterator current;
+    CalendarEvent* calendarEvent = GetEvent(eventId, &current);
 
     if (!calendarEvent)
     {
         SendCalendarCommandResult(remover, CALENDAR_ERROR_EVENT_INVALID);
-        return;
+        return _events.end();
     }
 
-    RemoveEvent(calendarEvent, remover);
+    return RemoveEvent(calendarEvent, remover, &current);
 }
 
-void CalendarMgr::RemoveEvent(CalendarEvent* calendarEvent, ObjectGuid remover)
-{
+CalendarEventStore::iterator CalendarMgr::RemoveEvent(CalendarEvent* calendarEvent, ObjectGuid remover, CalendarEventStore::iterator* currIt) {
     if (!calendarEvent)
     {
         SendCalendarCommandResult(remover, CALENDAR_ERROR_EVENT_INVALID);
-        return;
+        return _events.end();
     }
 
     SendCalendarEventRemovedAlert(*calendarEvent);
@@ -204,9 +204,22 @@ void CalendarMgr::RemoveEvent(CalendarEvent* calendarEvent, ObjectGuid remover)
     trans->Append(stmt);
     CharacterDatabase.CommitTransaction(trans);
 
-    _events.erase(calendarEvent);
     delete calendarEvent;
-    return;
+
+    CalendarEventStore::iterator tmpItr;
+    if (currIt == nullptr)
+    {
+        GetEvent(calendarEvent->GetEventId(), &tmpItr);
+        if (tmpItr != _events.end())
+            currIt = &tmpItr;
+    }
+
+    if (currIt)
+        return _events.erase(*currIt);
+
+    // Shouldn't reach here, but just incase.
+    _events.erase(calendarEvent);
+    return _events.begin();
 }
 
 void CalendarMgr::RemoveInvite(uint64 inviteId, uint64 eventId, ObjectGuid /*remover*/)
@@ -277,13 +290,12 @@ void CalendarMgr::RemoveAllPlayerEventsAndInvites(ObjectGuid guid)
 {
     for (CalendarEventStore::const_iterator itr = _events.begin(); itr != _events.end();)
     {
-        CalendarEvent* event = *itr;
-        ++itr;
-        if (event->GetCreatorGUID() == guid)
+        if (CalendarEvent* event = *itr; event->GetCreatorGUID() == guid)
         {
-            RemoveEvent(event, ObjectGuid::Empty);
+            itr = RemoveEvent(event, ObjectGuid::Empty, &itr);
             continue;
         }
+        ++itr;
     }
 
     CalendarInviteStore playerInvites = GetPlayerInvites(guid);
@@ -293,22 +305,33 @@ void CalendarMgr::RemoveAllPlayerEventsAndInvites(ObjectGuid guid)
 
 void CalendarMgr::RemovePlayerGuildEventsAndSignups(ObjectGuid guid, uint32 guildId)
 {
-    for (CalendarEventStore::const_iterator itr = _events.begin(); itr != _events.end(); ++itr)
+    for (CalendarEventStore::const_iterator itr = _events.begin(); itr != _events.end();)
+    {
         if ((*itr)->GetCreatorGUID() == guid && ((*itr)->IsGuildEvent() || (*itr)->IsGuildAnnouncement()))
-            RemoveEvent((*itr)->GetEventId(), guid);
+        {
+            itr = RemoveEvent((*itr)->GetEventId(), guid);
+            continue;
+        }
+        ++itr;
+    }
 
     CalendarInviteStore playerInvites = GetPlayerInvites(guid);
     for (CalendarInviteStore::const_iterator itr = playerInvites.begin(); itr != playerInvites.end(); ++itr)
-        if (CalendarEvent* calendarEvent = GetEvent((*itr)->GetEventId()))
+        if (CalendarEvent* calendarEvent = GetEvent((*itr)->GetEventId(), nullptr))
             if (calendarEvent->IsGuildEvent() && calendarEvent->GetGuildId() == guildId)
                 RemoveInvite((*itr)->GetInviteId(), (*itr)->GetEventId(), guid);
 }
 
-CalendarEvent* CalendarMgr::GetEvent(uint64 eventId)
+CalendarEvent* CalendarMgr::GetEvent(uint64 eventId, CalendarEventStore::iterator* it)
 {
     for (CalendarEventStore::iterator itr = _events.begin(); itr != _events.end(); ++itr)
         if ((*itr)->GetEventId() == eventId)
+        {
+            if (it)
+                *it = itr;
+
             return *itr;
+        }
 
     return nullptr;
 }
@@ -366,10 +389,12 @@ void CalendarMgr::DeleteOldEvents()
 
     for (CalendarEventStore::const_iterator itr = _events.begin(); itr != _events.end();)
     {
-        CalendarEvent* event = *itr;
+        if (CalendarEvent* event = *itr; event->GetEventTime() < oldEventsTime)
+        {
+            itr = RemoveEvent(event, ObjectGuid::Empty, &itr);
+            continue;
+        }
         ++itr;
-        if (event->GetEventTime() < oldEventsTime)
-            RemoveEvent(event, ObjectGuid::Empty);
     }
 }
 
