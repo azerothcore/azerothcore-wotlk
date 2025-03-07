@@ -974,7 +974,7 @@ public:
     /* Scorekeeping */
     bool UpdatePlayerScore(Player* player, uint32 type, uint32 value, bool doAddHonor = true) override;
 
-    void FillInitialWorldStates(WorldPacket& data) override;
+    void FillInitialWorldStates(WorldPackets::WorldState::InitWorldStates& packet) override;
 
     void HandlePlayerResurrect(Player* player) override;
 

@@ -475,7 +475,7 @@ public:
     bool SetupBattleground() override;
     void Init() override;
     /// Called for generate packet contain worldstate data
-    void FillInitialWorldStates(WorldPacket& data) override;
+    void FillInitialWorldStates(WorldPackets::WorldState::InitWorldStates& packet) override;
     /// Called when a player deal damage to building (door)
     void EventPlayerDamagedGO(Player* player, GameObject* go, uint32 eventType) override;
     /// Called when a player kill a unit in bg
