@@ -1,5 +1,5 @@
 -- add creature
-SET @CGUID := 452;
+SET @CGUID := 502;
 DELETE FROM `creature` WHERE `id1` = 26280 AND `guid` = @CGUID;
 INSERT INTO `creature` (`guid`, `id1`, `id2`, `id3`, `map`, `zoneId`, `areaId`, `spawnMask`, `phaseMask`, `equipment_id`, `position_x`, `position_y`, `position_z`, `orientation`, `spawntimesecs`, `wander_distance`, `currentwaypoint`, `curhealth`, `curmana`, `MovementType`, `npcflag`, `unit_flags`, `dynamicflags`, `ScriptName`, `VerifiedBuild`, `CreateObject`, `Comment`) VALUES
 (@CGUID, 26280, 0, 0, 571, 65, 4157, 1, 1, 1, 3373.642822265625, 2584.31494140625, 42.15882492065429687, 1.623156189918518066, 120, 0, 0, 9291, 3231, 0, 0, 0, 0, '', 58629, 0, 'has guid specific SAI');
@@ -9,7 +9,7 @@ DELETE FROM `creature_addon` WHERE (`guid` IN (@CGUID));
 INSERT INTO `creature_addon` (`guid`, `path_id`, `mount`, `bytes1`, `bytes2`, `emote`, `visibilityDistanceType`, `auras`) VALUES
 (@CGUID, 0, 0, 0, 1, 0, 0, '');
 
--- Dragonblight Mage Hunter with guid 452 smart ai
+-- Dragonblight Mage Hunter with guid 502 smart ai
 SET @ENTRY := -1 * @CGUID;
 UPDATE `creature_template` SET `AIName` = 'SmartAI', `ScriptName` = '' WHERE `entry` = 26280;
 DELETE FROM `smart_scripts` WHERE `source_type` = 0 AND `entryOrGuid` = @ENTRY;
@@ -33,12 +33,12 @@ DELETE FROM `smart_scripts` WHERE `source_type` = 9 AND `entryOrGuid` IN (@ENTRY
 INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `event_param6`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
 (@ENTRY, 0, 0, 0, 9, 0, 100, 0, 0, 0, 11000, 15000, 0, 20, 11, 51817, 0, 0, 0, 0, 0, 5, 0, 0, 0, 0, 0, 0, 0, 'Wind Trader Mu\'fah - Within 0-20 Range - Cast \'Typhoon\''),
 (@ENTRY, 0, 1, 0, 4, 0, 100, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 1, 0, 0, 0, 7, 0, 0, 0, 0, 0, 0, 0, 'On aggro - Self: Talk 1 to Attacked unit'),
-(@ENTRY, 0, 2, 3, 11, 0, 100, 0, 0, 0, 0, 0, 0, 0, 45, 0, 1, 0, 0, 0, 0, 10, @CGUID, 26280, 0, 0, 0, 0, 0, 'On respawn - Creature (26280) with guid 452 (fetching): Set creature data #0 to 1'),
+(@ENTRY, 0, 2, 3, 11, 0, 100, 0, 0, 0, 0, 0, 0, 0, 45, 0, 1, 0, 0, 0, 0, 10, @CGUID, 26280, 0, 0, 0, 0, 0, 'On respawn - Creature (26280) with guid 502 (fetching): Set creature data #0 to 1'),
 (@ENTRY, 0, 3, 0, 61, 0, 100, 0, 0, 0, 0, 0, 0, 0, 11, 12980, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 'Wind Trader Mu\'fah - On Respawn - Cast \'Simple Teleport\''),
 (@ENTRY, 0, 4, 0, 1, 0, 100, 0, 1000, 1000, 45000, 60000, 0, 0, 80, @ENTRY * 100, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 'Wind Trader Mu\'fah - Out of Combat - Run Script'),
 (@ENTRY * 100, 9, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 'Wind Trader Mu\'fah Talk 0 to invoker'),
-(@ENTRY * 100, 9, 1, 0, 0, 0, 100, 0, 8000, 8000, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 10, @CGUID, 26280, 0, 0, 0, 0, 0, 'Creature with guid 452 (fetching): Talk 0 to invoker'),
-(@ENTRY, 0, 5, 0, 21, 0, 100, 0, 0, 0, 0, 0, 0, 0, 45, 0, 1, 0, 0, 0, 0, 10, @CGUID, 26280, 0, 0, 0, 0, 0, 'On home reached - Creature (26280) with guid 452 (fetching): Set creature data #0 to 1'),
+(@ENTRY * 100, 9, 1, 0, 0, 0, 100, 0, 8000, 8000, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 10, @CGUID, 26280, 0, 0, 0, 0, 0, 'Creature with guid 502 (fetching): Talk 0 to invoker'),
+(@ENTRY, 0, 5, 0, 21, 0, 100, 0, 0, 0, 0, 0, 0, 0, 45, 0, 1, 0, 0, 0, 0, 10, @CGUID, 26280, 0, 0, 0, 0, 0, 'On home reached - Creature (26280) with guid 502 (fetching): Set creature data #0 to 1'),
 (@ENTRY, 0, 6, 0, 38, 0, 100, 0, 0, 1, 0, 0, 0, 0, 70, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 'On data[0] set to 1 - Self: Set respawn timer to 0 ms');
 
 DELETE FROM `conditions` WHERE `SourceTypeOrReferenceId` = 22 AND `SourceEntry` = @ENTRY AND `SourceId` = 0;
