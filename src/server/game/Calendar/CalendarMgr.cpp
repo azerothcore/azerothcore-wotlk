@@ -207,20 +207,13 @@ CalendarEventStore::iterator CalendarMgr::RemoveEvent(CalendarEvent* calendarEve
 
     delete calendarEvent;
 
-    CalendarEventStore::iterator tmpItr;
-    if (currIt == nullptr)
-    {
-        GetEvent(calendarEvent->GetEventId(), &tmpItr);
-        if (tmpItr != _events.end())
-            currIt = &tmpItr;
-    }
-
     if (currIt)
         return _events.erase(*currIt);
 
-    // Shouldn't reach here, but just incase.
-    _events.erase(calendarEvent);
-    return _events.begin();
+    if (auto it = _events.find(calendarEvent); it != _events.end())
+        return _events.erase(it);
+
+    return _events.end();
 }
 
 void CalendarMgr::RemoveInvite(uint64 inviteId, uint64 eventId, ObjectGuid /*remover*/)
