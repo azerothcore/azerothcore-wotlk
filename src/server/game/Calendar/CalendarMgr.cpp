@@ -168,7 +168,7 @@ CalendarEventStore::iterator CalendarMgr::RemoveEvent(uint64 eventId, ObjectGuid
     return RemoveEvent(calendarEvent, remover, &current);
 }
 
-CalendarEventStore::iterator CalendarMgr::RemoveEvent(CalendarEvent* calendarEvent, ObjectGuid remover, CalendarEventStore::iterator* currIt) {
+CalendarEventStore::iterator CalendarMgr::RemoveEvent(CalendarEvent* calendarEvent, ObjectGuid remover, CalendarEventStore::const_iterator* currIt) {
     if (!calendarEvent)
     {
         SendCalendarCommandResult(remover, CALENDAR_ERROR_EVENT_INVALID);

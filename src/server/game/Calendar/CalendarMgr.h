@@ -315,7 +315,7 @@ public:
 
     void AddEvent(CalendarEvent* calendarEvent, CalendarSendEventType sendType);
     CalendarEventStore::iterator RemoveEvent(uint64 eventId, ObjectGuid remover);
-    CalendarEventStore::iterator RemoveEvent(CalendarEvent* calendarEvent, ObjectGuid remover, CalendarEventStore::iterator* currIt = nullptr);
+    CalendarEventStore::iterator RemoveEvent(CalendarEvent* calendarEvent, ObjectGuid remover, CalendarEventStore::const_iterator* currIt = nullptr);
     void UpdateEvent(CalendarEvent* calendarEvent);
 
     void AddInvite(CalendarEvent* calendarEvent, CalendarInvite* invite, CharacterDatabaseTransaction trans = nullptr);
