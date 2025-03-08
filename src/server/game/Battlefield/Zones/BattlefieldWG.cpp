@@ -29,6 +29,7 @@
 #include "TemporarySummon.h"
 #include "Vehicle.h"
 #include "WorldSession.h"
+#include "WorldSessionMgr.h"
 #include "WorldStatePackets.h"
 
 BattlefieldWG::~BattlefieldWG()
@@ -936,16 +937,21 @@ uint32 BattlefieldWG::GetData(uint32 data) const
 
 void BattlefieldWG::FillInitialWorldStates(WorldPackets::WorldState::InitWorldStates& packet)
 {
-    packet.Worldstates.reserve(4+2+WG_MAX_OBJ+WG_MAX_WORKSHOP);
+    uint32 timer = GetTimer() / 1000;
+    bool iconActive = timer < 15 * MINUTE || IsWarTime();
+
+    packet.Worldstates.reserve(4+4+WG_MAX_OBJ+WG_MAX_WORKSHOP);
     packet.Worldstates.emplace_back(BATTLEFIELD_WG_WORLD_STATE_ATTACKER, GetAttackerTeam());
     packet.Worldstates.emplace_back(BATTLEFIELD_WG_WORLD_STATE_DEFENDER, GetDefenderTeam());
 
     // Note: cleanup these two, their names look awkward
     packet.Worldstates.emplace_back(BATTLEFIELD_WG_WORLD_STATE_ACTIVE, IsWarTime() ? 0 : 1);
     packet.Worldstates.emplace_back(BATTLEFIELD_WG_WORLD_STATE_SHOW_WORLDSTATE, IsWarTime() ? 1 : 0);
+    packet.Worldstates.emplace_back(BATTLEFIELD_WG_WORLD_STATE_CONTROL, m_DefenderTeam == TEAM_ALLIANCE ? 2 : 1); // Alliance 2, Hord 1
+    packet.Worldstates.emplace_back(BATTLEFIELD_WG_WORLD_STATE_ICON_ACTIVE, iconActive ? 1 : 0);
 
     for (uint32 i = 0; i < 2; ++i)
-        packet.Worldstates.emplace_back(ClockWorldState[i], GameTime::GetGameTime().count() + (m_Timer / 1000));
+        packet.Worldstates.emplace_back(ClockWorldState[i], GameTime::GetGameTime().count() + timer);
 
     packet.Worldstates.emplace_back(BATTLEFIELD_WG_WORLD_STATE_VEHICLE_H, GetData(BATTLEFIELD_WG_DATA_VEHICLE_H));
     packet.Worldstates.emplace_back(BATTLEFIELD_WG_WORLD_STATE_MAX_VEHICLE_H, GetData(BATTLEFIELD_WG_DATA_MAX_VEHICLE_H));
@@ -982,6 +988,34 @@ void BattlefieldWG::SendInitWorldStatesToAll()
         for (GuidUnorderedSet::iterator itr = m_players[team].begin(); itr != m_players[team].end(); ++itr)
             if (Player* player = ObjectAccessor::FindPlayer(*itr))
                 SendInitWorldStatesTo(player);
+}
+
+void BattlefieldWG::SendUpdateWorldStates(Player* player)
+{
+    uint32 timer = GetTimer() / 1000;
+    bool iconActive = timer < 15 * MINUTE || IsWarTime();
+
+    SendUpdateWorldStateMessage(BATTLEFIELD_WG_WORLD_STATE_ATTACKER, GetAttackerTeam(), player);
+    SendUpdateWorldStateMessage(BATTLEFIELD_WG_WORLD_STATE_DEFENDER, GetDefenderTeam(), player);
+    SendUpdateWorldStateMessage(BATTLEFIELD_WG_WORLD_STATE_ACTIVE, IsWarTime() ? 0 : 1, player);
+    SendUpdateWorldStateMessage(BATTLEFIELD_WG_WORLD_STATE_SHOW_WORLDSTATE, IsWarTime() ? 1 : 0, player);
+    SendUpdateWorldStateMessage(BATTLEFIELD_WG_WORLD_STATE_CONTROL, GetDefenderTeam() == TEAM_ALLIANCE ? 2 : 1, player);
+    SendUpdateWorldStateMessage(BATTLEFIELD_WG_WORLD_STATE_ICON_ACTIVE, iconActive ? 1 : 0, player);
+
+    for (uint32 i = 0; i < 2; ++i)
+        SendUpdateWorldStateMessage(ClockWorldState[i], uint32(GameTime::GetGameTime().count() + timer), player);
+}
+
+void BattlefieldWG::SendUpdateWorldStateMessage(uint32 variable, uint32 value, Player* player)
+{
+    WorldPackets::WorldState::UpdateWorldState worldState;
+    worldState.VariableID = variable;
+    worldState.Value = value;
+
+    if (player)
+        player->SendDirectMessage(worldState.Write());
+    else
+        sWorldSessionMgr->SendGlobalMessage(worldState.Write());
 }
 
 void BattlefieldWG::BrokenWallOrTower(TeamId  /*team*/)
