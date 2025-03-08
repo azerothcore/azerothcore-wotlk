@@ -7,8 +7,7 @@ git clone --depth=1 --branch=master https://github.com/azerothcore/mod-1v1-arena
 git clone --depth=1 --branch=master https://github.com/azerothcore/mod-account-mounts modules/mod-account-mounts
 git clone --depth=1 --branch=master https://github.com/azerothcore/mod-ah-bot modules/mod-ah-bot
 git clone --depth=1 --branch=master https://github.com/azerothcore/mod-anticheat modules/mod-anticheat
-# NOTE: disabled because it does not compile right now with latest AC
-# git clone --depth=1 --branch=master https://github.com/azerothcore/mod-antifarming modules/mod-antifarming
+git clone --depth=1 --branch=master https://github.com/azerothcore/mod-antifarming modules/mod-antifarming
 git clone --depth=1 --branch=master https://github.com/azerothcore/mod-arena-3v3-solo-queue modules/mod-arena-3v3-solo-queue
 git clone --depth=1 --branch=main   https://github.com/azerothcore/mod-arena-replay modules/mod-arena-replay
 git clone --depth=1 --branch=master https://github.com/azerothcore/mod-auto-revive modules/mod-auto-revive
