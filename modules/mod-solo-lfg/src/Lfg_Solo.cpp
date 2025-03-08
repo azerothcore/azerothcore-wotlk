@@ -18,13 +18,26 @@ class lfg_solo_announce : public PlayerScript
 public:
     lfg_solo_announce() : PlayerScript("lfg_solo_announce") {}
 
-    void OnLogin(Player* player)
+    void OnPlayerLogin(Player* player) override
     {
         // Announce Module
         if (sConfigMgr->GetOption<bool>("SoloLFG.Announce", true))
         {
             ChatHandler(player->GetSession()).SendSysMessage("This server is running the |cff4CFF00Solo Dungeon Finder |rmodule.");
         }
+    }
+
+    void OnPlayerRewardKillRewarder(Player* /*player*/, KillRewarder* /*rewarder*/, bool isDungeon, float& rate) override
+    {
+        if (!isDungeon
+            || !sConfigMgr->GetOption<bool>("SoloLFG.Enable", true)
+            || !sConfigMgr->GetOption<bool>("SoloLFG.FixedXP", true))
+        {
+            return;
+        }
+
+        // Force the rate to FixedXPRate regardless of group size, to encourage group play
+        rate = sConfigMgr->GetOption<float>("SoloLFG.FixedXPRate", 0.2);
     }
 };
 
@@ -44,6 +57,6 @@ public:
 
 void AddLfgSoloScripts()
 {
-	new lfg_solo_announce();
+    new lfg_solo_announce();
     new lfg_solo();
 }

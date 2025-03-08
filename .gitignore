@@ -97,6 +97,8 @@ local.properties
 #
 # ==================
 
+!modules/mod-mod-war-effort
+!modules/mod-solo-lfg
 !modules/mod-ah-bot
 !modules/mod-gain-honor-guard
 !modules/mod-individual-xp
