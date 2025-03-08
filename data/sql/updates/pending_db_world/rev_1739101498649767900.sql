@@ -20,7 +20,7 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 
 DELETE FROM `conditions` WHERE `SourceTypeOrReferenceId` = 22 AND `SourceEntry` = @ENTRY  AND `SourceId` = 0;
 INSERT INTO `conditions` (`SourceTypeOrReferenceId`, `SourceGroup`, `SourceEntry`, `SourceId`, `ElseGroup`, `ConditionTypeOrReference`, `ConditionTarget`, `ConditionValue1`, `ConditionValue2`, `ConditionValue3`, `NegativeCondition`, `Comment`) VALUES
-(22, 3, @ENTRY, 0, 0, 36, 1, 0, 0, 0, 1, 'Creatures are reborn when they die');
+(22, 3, @ENTRY, 0, 0, 36, 1, 0, 0, 0, 1, 'Dragonblight Mage Hunter must be dead to execute SAI (respawn)');
 
 -- 134217728 - CREATURE_FLAG_EXTRA_DONT_OVERRIDE_SAI_ENTRY
 UPDATE `creature_template` SET `flags_extra`=`flags_extra`|134217728 WHERE (`entry` = 26280);
@@ -43,7 +43,7 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 
 DELETE FROM `conditions` WHERE `SourceTypeOrReferenceId` = 22 AND `SourceEntry` = @ENTRY AND `SourceId` = 0;
 INSERT INTO `conditions` (`SourceTypeOrReferenceId`, `SourceGroup`, `SourceEntry`, `SourceId`, `ElseGroup`, `ConditionTypeOrReference`, `ConditionTarget`, `ConditionValue1`, `ConditionValue2`, `ConditionValue3`, `NegativeCondition`, `Comment`) VALUES
-(22, 7, @ENTRY, 0, 0, 36, 1, 0, 0, 0, 1, 'Creatures are reborn when they die');
+(22, 7, @ENTRY, 0, 0, 36, 1, 0, 0, 0, 1, 'Wind Trader Mu\'fah must be dead to execute SAI (respawn)');
 
 DELETE FROM `creature_text` WHERE `CreatureID` = 26496;
 INSERT INTO `creature_text` (`CreatureID`, `GroupID`, `ID`, `Text`, `Type`, `Language`, `Probability`, `Emote`, `Duration`, `Sound`, `BroadcastTextId`, `TextRange`, `comment`) VALUES
