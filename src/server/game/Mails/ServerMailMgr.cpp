@@ -302,7 +302,7 @@ void ServerMailMgr::SendServerMail(Player* player, uint32 id, uint32 money,
     CharacterDatabase.Execute(stmt);
 }
 
-ServerMailConditionType ServerMailMgr::GetServerMailConditionType(std::string_view conditionTypeStr)
+ServerMailConditionType ServerMailMgr::GetServerMailConditionType(std::string_view conditionTypeStr) const
 {
     for (auto const& pair : ServerMailConditionTypePairs)
         if (pair.first == conditionTypeStr)
@@ -311,7 +311,7 @@ ServerMailConditionType ServerMailMgr::GetServerMailConditionType(std::string_vi
     return ServerMailConditionType::Invalid;
 }
 
-bool ServerMailMgr::ConditionTypeUsesConditionState(ServerMailConditionType type)
+bool ServerMailMgr::ConditionTypeUsesConditionState(ServerMailConditionType type) const
 {
     switch (type)
     {

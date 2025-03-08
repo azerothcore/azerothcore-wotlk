@@ -186,14 +186,14 @@ public:
     * @param conditionTypeStr string value from DB of conditionType
     * @return ServerMailConditionType The corresponding value (see @ref ServerMailConditionType) or default to ServerMailConditionType::Invalid
     */
-    ServerMailConditionType GetServerMailConditionType(std::string_view conditionTypeStr);
+    ServerMailConditionType GetServerMailConditionType(std::string_view conditionTypeStr) const;
 
     /**
     * @brief Check if ConditionType should use ConditionState
     *
     * @return True if the ConditionType is allowed to use ConditionState, otherwise False.
     */
-    bool ConditionTypeUsesConditionState(ServerMailConditionType type);
+    bool ConditionTypeUsesConditionState(ServerMailConditionType type) const;
 
     /**
      * @brief Sends a server mail to a player if the template is active and the player is eligible.
