@@ -141,7 +141,7 @@ void ServerMailMgr::LoadMailServerTemplatesItems()
             _serverMailStore[templateID].itemsA.push_back(mailItem);
         else if (faction == "Horde")
             _serverMailStore[templateID].itemsH.push_back(mailItem);
-        else
+        else [[unlikely]]
         {
             LOG_ERROR("sql.sql", "Table `mail_server_template_items` has invalid faction value '{}' for templateID {}, skipped.", faction, templateID);
             continue;
@@ -178,7 +178,7 @@ void ServerMailMgr::LoadMailServerTemplatesConditions()
         // Get conditiontype from ServerMailConditionTypePairs
         ServerMailConditionType conditionType;
         conditionType = GetServerMailConditionType(conditionTypeStr);
-        if (conditionType == ServerMailConditionType::Invalid)
+        if (conditionType == ServerMailConditionType::Invalid) [[unlikely]]
         {
             LOG_ERROR("sql.sql", "Table `mail_server_template_conditions` has unknown conditionType '{}', skipped.", conditionTypeStr);
             continue;
@@ -345,7 +345,7 @@ bool ServerMailCondition::CheckCondition(Player* player) const
     case ServerMailConditionType::Class:
         return (player->getClassMask() & value) != 0;
     default:
-        LOG_ERROR("server.mail", "Unknown server mail condition type '{}'", static_cast<uint32>(type));
+        [[unlikely]] LOG_ERROR("server.mail", "Unknown server mail condition type '{}'", static_cast<uint32>(type));
         return false;
     }
 }
