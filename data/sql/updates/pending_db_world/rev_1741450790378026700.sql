@@ -598,7 +598,7 @@ UPDATE `reference_loot_template` SET `comment` = "Zulian Headdress" WHERE (`entr
 UPDATE `reference_loot_template` SET `comment` = "Band of Servitude" WHERE (`entry` = 30546 AND `item` = 22721);
 UPDATE `reference_loot_template` SET `comment` = "Seal of the Gurubashi Berserker" WHERE (`entry` = 30546 AND `item` = 22722);
 
--- `creature_loot_template` that are currently NULL
+-- `creature_loot_template` (reference) that are currently NULL
 UPDATE `creature_loot_template` SET `comment` = "Ragnaros - (ReferenceTable)" WHERE (`entry` = 11502 AND `item` = 30171);
 UPDATE `creature_loot_template` SET `comment` = "Ragnaros - (ReferenceTable)" WHERE (`entry` = 11502 AND `item` = 30484);
 UPDATE `creature_loot_template` SET `comment` = "Ragnaros - (ReferenceTable)" WHERE (`entry` = 11502 AND `item` = 30485);
@@ -658,10 +658,82 @@ UPDATE `creature_loot_template` SET `comment` = "Chromaggus - (ReferenceTable)" 
 UPDATE `creature_loot_template` SET `comment` = "Ebonroc - (ReferenceTable)" WHERE (`entry` = 14601 AND `item` = 30342);
 UPDATE `creature_loot_template` SET `comment` = "Ebonroc - (ReferenceTable)" WHERE (`entry` = 14601 AND `item` = 30395);
 
--- `creature_loot_template` that are currently empty
+-- `creature_loot_template` that are currently NULL
+UPDATE `creature_loot_template` SET `comment` = "Black Ravager - Darkwood Fishing Pole" WHERE (`entry` = 628 AND `item` = 6366 AND `reference` = 0);
+UPDATE `creature_loot_template` SET `comment` = "Young Black Ravager - Darkwood Fishing Pole" WHERE (`entry` = 923 AND `item` = 6366 AND `reference` = 0);
+UPDATE `creature_loot_template` SET `comment` = "Vampiric Duskbat - Duskbat Pelt" WHERE (`entry` = 1554 AND `item` = 2876 AND `reference` = 0);
+UPDATE `creature_loot_template` SET `comment` = "Vampiric Duskbat - Ruined Pelt" WHERE (`entry` = 1554 AND `item` = 4865 AND `reference` = 0);
+UPDATE `creature_loot_template` SET `comment` = "Vampiric Duskbat - Dried Bat Blood" WHERE (`entry` = 1554 AND `item` = 6293 AND `reference` = 0);
+UPDATE `creature_loot_template` SET `comment` = "Vampiric Duskbat - Patch of Bat Hair" WHERE (`entry` = 1554 AND `item` = 6296 AND `reference` = 0);
+UPDATE `creature_loot_template` SET `comment` = "Vampiric Duskbat - Broken Fang" WHERE (`entry` = 1554 AND `item` = 7073 AND `reference` = 0);
+UPDATE `creature_loot_template` SET `comment` = "Vampiric Duskbat - Chipped Claw" WHERE (`entry` = 1554 AND `item` = 7074 AND `reference` = 0);
+UPDATE `creature_loot_template` SET `comment` = "Vampiric Duskbat - Meaty Bat Wing" WHERE (`entry` = 1554 AND `item` = 12223 AND `reference` = 0);
+UPDATE `creature_loot_template` SET `comment` = "Worg - Darkwood Fishing Pole" WHERE (`entry` = 1765 AND `item` = 6366 AND `reference` = 0);
+UPDATE `creature_loot_template` SET `comment` = "Mottled Worg - Darkwood Fishing Pole" WHERE (`entry` = 1766 AND `item` = 6366 AND `reference` = 0);
+UPDATE `creature_loot_template` SET `comment` = "Bloodsnout Worg - Darkwood Fishing Pole" WHERE (`entry` = 1923 AND `item` = 6366 AND `reference` = 0);
+UPDATE `creature_loot_template` SET `comment` = "Ragnaros - Essence of Fire" WHERE (`entry` = 11502 AND `item` = 7078 AND `reference` = 0);
+UPDATE `creature_loot_template` SET `comment` = "Ragnaros - Eye of Sulfuras" WHERE (`entry` = 11502 AND `item` = 17204 AND `reference` = 0);
+UPDATE `creature_loot_template` SET `comment` = "Ragnaros - Essence of the Firelord" WHERE (`entry` = 11502 AND `item` = 19017 AND `reference` = 0);
+UPDATE `creature_loot_template` SET `comment` = "Ragnaros - Narain's Scrying Goggles" WHERE (`entry` = 11502 AND `item` = 20951 AND `reference` = 0);
+UPDATE `creature_loot_template` SET `comment` = "Ragnaros - Draconic for Dummies" WHERE (`entry` = 11502 AND `item` = 21110 AND `reference` = 0);
+UPDATE `creature_loot_template` SET `comment` = "Nefarian - Head of Nefarian" WHERE (`entry` = 11583 AND `item` = 19002 AND `reference` = 0);
+UPDATE `creature_loot_template` SET `comment` = "Nefarian - Head of Nefarian" WHERE (`entry` = 11583 AND `item` = 19003 AND `reference` = 0);
+UPDATE `creature_loot_template` SET `comment` = "Nefarian - Red Scepter Shard" WHERE (`entry` = 11583 AND `item` = 21138 AND `reference` = 0);
+UPDATE `creature_loot_template` SET `comment` = "Nefarian - From the Desk of Lord Victor Nefarius" WHERE (`entry` = 11583 AND `item` = 21142 AND `reference` = 0);
+UPDATE `creature_loot_template` SET `comment` = "Magmadar - Narain's Scrying Goggles" WHERE (`entry` = 11982 AND `item` = 20951 AND `reference` = 0);
+UPDATE `creature_loot_template` SET `comment` = "Golemagg the Incinerator - Core of Earth" WHERE (`entry` = 11988 AND `item` = 7075 AND `reference` = 0);
+UPDATE `creature_loot_template` SET `comment` = "Golemagg the Incinerator - Essence of Earth" WHERE (`entry` = 11988 AND `item` = 7076 AND `reference` = 0);
+UPDATE `creature_loot_template` SET `comment` = "Golemagg the Incinerator - Heart of Fire" WHERE (`entry` = 11988 AND `item` = 7077 AND `reference` = 0);
+UPDATE `creature_loot_template` SET `comment` = "Golemagg the Incinerator - Essence of Fire" WHERE (`entry` = 11988 AND `item` = 7078 AND `reference` = 0);
+UPDATE `creature_loot_template` SET `comment` = "Golemagg the Incinerator - Lava Core" WHERE (`entry` = 11988 AND `item` = 17011 AND `reference` = 0);
+UPDATE `creature_loot_template` SET `comment` = "Golemagg the Incinerator - Sulfuron Ingot" WHERE (`entry` = 11988 AND `item` = 17203 AND `reference` = 0);
+UPDATE `creature_loot_template` SET `comment` = "Golemagg the Incinerator - Narain's Scrying Goggles" WHERE (`entry` = 11988 AND `item` = 20951 AND `reference` = 0);
+UPDATE `creature_loot_template` SET `comment` = "Broodlord Lashlayer - Head of the Broodlord Lashlayer" WHERE (`entry` = 12017 AND `item` = 20383 AND `reference` = 0);
+UPDATE `creature_loot_template` SET `comment` = "Baron Geddon - Burning Pitch" WHERE (`entry` = 12056 AND `item` = 4787 AND `reference` = 0);
+UPDATE `creature_loot_template` SET `comment` = "Baron Geddon - Elemental Fire" WHERE (`entry` = 12056 AND `item` = 7068 AND `reference` = 0);
+UPDATE `creature_loot_template` SET `comment` = "Baron Geddon - Heart of Fire" WHERE (`entry` = 12056 AND `item` = 7077 AND `reference` = 0);
+UPDATE `creature_loot_template` SET `comment` = "Baron Geddon - Essence of Fire" WHERE (`entry` = 12056 AND `item` = 7078 AND `reference` = 0);
+UPDATE `creature_loot_template` SET `comment` = "Baron Geddon - Fiery Core" WHERE (`entry` = 12056 AND `item` = 17010 AND `reference` = 0);
+UPDATE `creature_loot_template` SET `comment` = "Baron Geddon - Bindings of the Windseeker" WHERE (`entry` = 12056 AND `item` = 18563 AND `reference` = 0);
+UPDATE `creature_loot_template` SET `comment` = "Baron Geddon - Narain's Scrying Goggles" WHERE (`entry` = 12056 AND `item` = 20951 AND `reference` = 0);
+UPDATE `creature_loot_template` SET `comment` = "Garr - Core of Earth" WHERE (`entry` = 12057 AND `item` = 7075 AND `reference` = 0);
+UPDATE `creature_loot_template` SET `comment` = "Garr - Essence of Earth" WHERE (`entry` = 12057 AND `item` = 7076 AND `reference` = 0);
+UPDATE `creature_loot_template` SET `comment` = "Garr - Deeprock Salt" WHERE (`entry` = 12057 AND `item` = 8150 AND `reference` = 0);
+UPDATE `creature_loot_template` SET `comment` = "Garr - Lava Core" WHERE (`entry` = 12057 AND `item` = 17011 AND `reference` = 0);
+UPDATE `creature_loot_template` SET `comment` = "Garr - Bindings of the Windseeker" WHERE (`entry` = 12057 AND `item` = 18564 AND `reference` = 0);
+UPDATE `creature_loot_template` SET `comment` = "Garr - Narain's Scrying Goggles" WHERE (`entry` = 12057 AND `item` = 20951 AND `reference` = 0);
+UPDATE `creature_loot_template` SET `comment` = "Sulfuron Harbinger - Elemental Fire" WHERE (`entry` = 12098 AND `item` = 7068 AND `reference` = 0);
+UPDATE `creature_loot_template` SET `comment` = "Sulfuron Harbinger - Heart of Fire" WHERE (`entry` = 12098 AND `item` = 7077 AND `reference` = 0);
+UPDATE `creature_loot_template` SET `comment` = "Sulfuron Harbinger - Essence of Fire" WHERE (`entry` = 12098 AND `item` = 7078 AND `reference` = 0);
+UPDATE `creature_loot_template` SET `comment` = "Sulfuron Harbinger - Hand of Sulfuron" WHERE (`entry` = 12098 AND `item` = 17330 AND `reference` = 0);
+UPDATE `creature_loot_template` SET `comment` = "Sulfuron Harbinger - Narain's Scrying Goggles" WHERE (`entry` = 12098 AND `item` = 20951 AND `reference` = 0);
+UPDATE `creature_loot_template` SET `comment` = "Lucifron - Elemental Fire" WHERE (`entry` = 12118 AND `item` = 7068 AND `reference` = 0);
+UPDATE `creature_loot_template` SET `comment` = "Lucifron - Heart of Fire" WHERE (`entry` = 12118 AND `item` = 7077 AND `reference` = 0);
+UPDATE `creature_loot_template` SET `comment` = "Lucifron - Essence of Fire" WHERE (`entry` = 12118 AND `item` = 7078 AND `reference` = 0);
+UPDATE `creature_loot_template` SET `comment` = "Lucifron - Hand of Lucifron" WHERE (`entry` = 12118 AND `item` = 17329 AND `reference` = 0);
+UPDATE `creature_loot_template` SET `comment` = "Lucifron - Narain's Scrying Goggles" WHERE (`entry` = 12118 AND `item` = 20951 AND `reference` = 0);
+UPDATE `creature_loot_template` SET `comment` = "Gehennas - Elemental Fire" WHERE (`entry` = 12259 AND `item` = 7068 AND `reference` = 0);
+UPDATE `creature_loot_template` SET `comment` = "Gehennas - Heart of Fire" WHERE (`entry` = 12259 AND `item` = 7077 AND `reference` = 0);
+UPDATE `creature_loot_template` SET `comment` = "Gehennas - Essence of Fire" WHERE (`entry` = 12259 AND `item` = 7078 AND `reference` = 0);
+UPDATE `creature_loot_template` SET `comment` = "Gehennas - Hand of Gehennas" WHERE (`entry` = 12259 AND `item` = 17331 AND `reference` = 0);
+UPDATE `creature_loot_template` SET `comment` = "Gehennas - Narain's Scrying Goggles" WHERE (`entry` = 12259 AND `item` = 20951 AND `reference` = 0);
+UPDATE `creature_loot_template` SET `comment` = "Shazzrah - Elemental Fire" WHERE (`entry` = 12264 AND `item` = 7068 AND `reference` = 0);
+UPDATE `creature_loot_template` SET `comment` = "Shazzrah - Heart of Fire" WHERE (`entry` = 12264 AND `item` = 7077 AND `reference` = 0);
+UPDATE `creature_loot_template` SET `comment` = "Shazzrah - Essence of Fire" WHERE (`entry` = 12264 AND `item` = 7078 AND `reference` = 0);
+UPDATE `creature_loot_template` SET `comment` = "Shazzrah - Hand of Shazzrah" WHERE (`entry` = 12264 AND `item` = 17332 AND `reference` = 0);
+UPDATE `creature_loot_template` SET `comment` = "Shazzrah - Narain's Scrying Goggles" WHERE (`entry` = 12264 AND `item` = 20951 AND `reference` = 0);
+
+
+-- `creature_loot_template` (reference) that are currently empty
 UPDATE `creature_loot_template` SET `comment` = "High Priest Venoxis - (ReferenceTable)" WHERE (`entry` = 14507 AND `item` = 30546);
 UPDATE `creature_loot_template` SET `comment` = "High Priest Thekal - (ReferenceTable)" WHERE (`entry` = 14509 AND `item` = 30546);
 UPDATE `creature_loot_template` SET `comment` = "High Priestess Mar'li - (ReferenceTable)" WHERE (`entry` = 14510 AND `item` = 30546);
 UPDATE `creature_loot_template` SET `comment` = "High Priestess Arlokk - (ReferenceTable)" WHERE (`entry` = 14515 AND `item` = 30546);
 UPDATE `creature_loot_template` SET `comment` = "High Priestess Jeklik - (ReferenceTable)" WHERE (`entry` = 14517 AND `item` = 30546);
 UPDATE `creature_loot_template` SET `comment` = "Hakkar - (ReferenceTable)" WHERE (`entry` = 14834 AND `item` = 30398);
+
+-- `creature_loot_template` that are currently empty
+UPDATE `creature_loot_template` SET `comment` = "Green Recluse - Green Carapace Shield" WHERE (`entry` = 569 AND `item` = 2021 AND `reference` = 0);
+UPDATE `creature_loot_template` SET `comment` = "Brain Eater - Black Metal War Axe" WHERE (`entry` = 570 AND `item` = 2015 AND `reference` = 0);
+
+--
