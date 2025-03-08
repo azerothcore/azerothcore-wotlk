@@ -165,7 +165,8 @@ CalendarEventStore::iterator CalendarMgr::RemoveEvent(uint64 eventId, ObjectGuid
         return _events.end();
     }
 
-    return RemoveEvent(calendarEvent, remover, &current);
+    CalendarEventStore::const_iterator constItr(current);
+    return RemoveEvent(calendarEvent, remover, &constItr);
 }
 
 CalendarEventStore::iterator CalendarMgr::RemoveEvent(CalendarEvent* calendarEvent, ObjectGuid remover, CalendarEventStore::const_iterator* currIt) {
