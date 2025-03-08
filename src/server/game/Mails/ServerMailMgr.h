@@ -212,6 +212,14 @@ public:
      */
     void SendServerMail(Player* player, uint32 id, uint32 money, std::vector<ServerMailItems> const& items, std::vector<ServerMailCondition> const& conditions, std::string const& subject, std::string const& body) const;
 
+    /**
+     * @brief Retrieves the entire server mail store.
+     *
+     * This function returns a constant reference to the internal
+     * `_serverMailStore` container, which holds all server mail data.
+     *
+     * @return A constant reference to the `ServerMailContainer` containing all stored server mail.
+     */
     [[nodiscard]] ServerMailContainer const& GetAllServerMailStore() const { return _serverMailStore; }
 
 private:
