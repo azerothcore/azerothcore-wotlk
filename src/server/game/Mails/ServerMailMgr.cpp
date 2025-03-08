@@ -56,7 +56,6 @@ void ServerMailMgr::LoadMailServerTemplates()
         uint32 id = fields[0].Get<uint32>();
 
         ServerMail& servMail = _serverMailStore[id];
-
         servMail.id          = id;
         servMail.moneyA      = fields[1].Get<uint32>();
         servMail.moneyH      = fields[2].Get<uint32>();
@@ -78,12 +77,13 @@ void ServerMailMgr::LoadMailServerTemplates()
     LoadMailServerTemplatesItems();
     LoadMailServerTemplatesConditions();
 
-    LOG_INFO("server.loading", ">> Loaded {} Mail Server Template in {} ms", _serverMailStore.size(), GetMSTimeDiffToNow(oldMSTime));
+    LOG_INFO("server.loading", ">> Loaded {} Mail Server definitions in {} ms", _serverMailStore.size(), GetMSTimeDiffToNow(oldMSTime));
     LOG_INFO("server.loading", " ");
 }
 
 void ServerMailMgr::LoadMailServerTemplatesItems()
 {
+    //                                                    0             1          2       3
     QueryResult result = CharacterDatabase.Query("SELECT `templateID`, `faction`, `item`, `itemCount` FROM `mail_server_template_items`");
     if (!result)
     {
@@ -95,10 +95,10 @@ void ServerMailMgr::LoadMailServerTemplatesItems()
     {
         Field* fields = result->Fetch();
 
-        uint32 templateID = fields[0].Get<uint32>();
+        uint32 templateID        = fields[0].Get<uint32>();
         std::string_view faction = fields[1].Get<std::string_view>();
-        uint32 item = fields[2].Get<uint32>();
-        uint32 itemCount = fields[3].Get<uint32>();
+        uint32 item              = fields[2].Get<uint32>();
+        uint32 itemCount         = fields[3].Get<uint32>();
 
         if (_serverMailStore.find(templateID) == _serverMailStore.end())
         {
@@ -134,7 +134,7 @@ void ServerMailMgr::LoadMailServerTemplatesItems()
         }
 
         ServerMailItems mailItem;
-        mailItem.item = item;
+        mailItem.item      = item;
         mailItem.itemCount = itemCount;
 
         if (faction == "Alliance")
@@ -152,6 +152,7 @@ void ServerMailMgr::LoadMailServerTemplatesItems()
 
 void ServerMailMgr::LoadMailServerTemplatesConditions()
 {
+    //                                                    0             1                2                 3
     QueryResult result = CharacterDatabase.Query("SELECT `templateID`, `conditionType`, `conditionValue`, `conditionState` FROM `mail_server_template_conditions`");
     if (!result)
     {
@@ -163,10 +164,10 @@ void ServerMailMgr::LoadMailServerTemplatesConditions()
     {
         Field* fields = result->Fetch();
 
-        uint32 templateID = fields[0].Get<uint32>();
+        uint32 templateID                 = fields[0].Get<uint32>();
         std::string_view conditionTypeStr = fields[1].Get<std::string_view>();
-        uint32 conditionValue = fields[2].Get<uint32>();
-        uint32 conditionState = fields[3].Get<uint32>();
+        uint32 conditionValue             = fields[2].Get<uint32>();
+        uint32 conditionState             = fields[3].Get<uint32>();
 
         if (_serverMailStore.find(templateID) == _serverMailStore.end())
         {
