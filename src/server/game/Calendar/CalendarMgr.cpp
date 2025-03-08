@@ -205,14 +205,19 @@ CalendarEventStore::iterator CalendarMgr::RemoveEvent(CalendarEvent* calendarEve
     trans->Append(stmt);
     CharacterDatabase.CommitTransaction(trans);
 
-    delete calendarEvent;
-
     if (currIt)
+    {
+        delete calendarEvent;
         return _events.erase(*currIt);
+    }
 
     if (auto it = _events.find(calendarEvent); it != _events.end())
+    {
+        delete calendarEvent;
         return _events.erase(it);
+    }
 
+    delete calendarEvent;
     return _events.end();
 }
 
