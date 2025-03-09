@@ -1,3 +1,4 @@
+-- DB update 2025_03_08_01 -> 2025_03_09_00
 -- add creature
 SET @CGUID := 502;
 DELETE FROM `creature` WHERE `id1` = 26280 AND `guid` = @CGUID;
