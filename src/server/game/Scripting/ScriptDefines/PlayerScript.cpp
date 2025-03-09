@@ -915,6 +915,11 @@ bool ScriptMgr::OnPlayerCanResurrect(Player* player)
     CALL_ENABLED_BOOLEAN_HOOKS(PlayerScript, PLAYERHOOK_CAN_RESURRECT, !script->OnPlayerCanResurrect(player));
 }
 
+void ScriptMgr::OnPlayerSendInventoryList(Player* player, ObjectGuid vendorGuid, uint32 vendorEntry)
+{
+    CALL_ENABLED_HOOKS(PlayerScript, PLAYERHOOK_ON_SEND_INVENTORY_LIST, script->OnPlayerSendInventoryList(player, vendorGuid, vendorEntry));
+}
+
 PlayerScript::PlayerScript(const char* name, std::vector<uint16> enabledHooks)
     : ScriptObject(name, PLAYERHOOK_END)
 {

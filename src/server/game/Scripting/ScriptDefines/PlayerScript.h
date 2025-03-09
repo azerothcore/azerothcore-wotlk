@@ -208,6 +208,7 @@ enum PlayerHook
     PLAYERHOOK_ON_BEFORE_UPDATE_SKILL,
     PLAYERHOOK_ON_UPDATE_SKILL,
     PLAYERHOOK_CAN_RESURRECT,
+    PLAYERHOOK_ON_SEND_INVENTORY_LIST,
     PLAYERHOOK_END
 };
 
@@ -782,6 +783,8 @@ public:
      * @return true if player is authorized to resurect
      */
     virtual bool OnPlayerCanResurrect(Player* /*player*/) { return true; }
+
+    virtual void OnPlayerSendInventoryList(Player*, ObjectGuid, uint32) {}
 };
 
 #endif

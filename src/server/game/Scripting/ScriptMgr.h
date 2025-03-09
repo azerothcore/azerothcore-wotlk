@@ -463,6 +463,7 @@ public: /* PlayerScript */
     void OnPlayerBeforeUpdateSkill(Player* player, uint32 skill_id, uint32& value, uint32 max, uint32 step);
     void OnPlayerUpdateSkill(Player* player, uint32 skillId, uint32 value, uint32 max, uint32 step, uint32 newValue);
     bool OnPlayerCanResurrect(Player* player);
+    void OnPlayerSendInventoryList(Player* player, ObjectGuid vendorGuid, uint32 vendorEntry);
 
     // Anti cheat
     void AnticheatSetCanFlybyServer(Player* player, bool apply);
