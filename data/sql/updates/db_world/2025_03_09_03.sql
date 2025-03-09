@@ -1,3 +1,4 @@
+-- DB update 2025_03_09_02 -> 2025_03_09_03
 --
 -- `reference_loot_template` that are currently NULL
 UPDATE `reference_loot_template` SET `comment` = "Finkle's Lava Dredger" WHERE (`entry` = 12000 AND `item` = 18803);
