@@ -723,7 +723,6 @@ UPDATE `creature_loot_template` SET `comment` = "Shazzrah - Essence of Fire" WHE
 UPDATE `creature_loot_template` SET `comment` = "Shazzrah - Hand of Shazzrah" WHERE (`entry` = 12264 AND `item` = 17332 AND `reference` = 0);
 UPDATE `creature_loot_template` SET `comment` = "Shazzrah - Narain's Scrying Goggles" WHERE (`entry` = 12264 AND `item` = 20951 AND `reference` = 0);
 
-
 -- `creature_loot_template` (reference) that are currently empty
 UPDATE `creature_loot_template` SET `comment` = "High Priest Venoxis - (ReferenceTable)" WHERE (`entry` = 14507 AND `item` = 30546);
 UPDATE `creature_loot_template` SET `comment` = "High Priest Thekal - (ReferenceTable)" WHERE (`entry` = 14509 AND `item` = 30546);
