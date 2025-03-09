@@ -15,9 +15,11 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "CreatureScript.h"
 #include "InstanceMapScript.h"
 #include "InstanceScript.h"
 #include "Player.h"
+#include "ScriptedCreature.h"
 #include "SpellScript.h"
 #include "SpellScriptLoader.h"
 #include "sunwell_plateau.h"
@@ -148,8 +150,106 @@ class spell_cataclysm_breath : public SpellScript
     }
 };
 
+enum SunbladeScout
+{
+    NPC_SUNBLADE_PROTECTOR               = 25507,
+    SAY_AGGRO                            = 0, // Enemies spotted! Attack while I try to activate a Protector!
+    SPELL_ACTIVATE_SUNBLADE_PROTECTOR    = 46475,
+    SPELL_COSMETIC_STUN_IMMUNE_PERMANENT = 59123,
+    SPELL_FELBLOOD_CHANNEL               = 46319,
+    SPELL_SINISTER_STRIKE                = 46558,
+};
+
+struct npc_sunblade_scout : public ScriptedAI
+{
+    npc_sunblade_scout(Creature* creature) : ScriptedAI(creature) { }
+
+    void Reset() override
+    {
+        scheduler.CancelAll();
+        ScheduleOOC();
+        me->SetCombatMovement(false);
+        me->SetReactState(REACT_AGGRESSIVE);
+        _protectorGUID.Clear();
+    }
+
+    void JustEngagedWith(Unit* /*who*/) override
+    {
+        scheduler.CancelAll();
+        me->CallForHelp(30.0f);
+        Talk(SAY_AGGRO);
+        std::list<Creature*> protectors;
+        GetCreatureListWithEntryInGrid(protectors, me, NPC_SUNBLADE_PROTECTOR, 100.0f); // range unknown
+        // Skip already activated protectors
+        protectors.remove_if([](Creature* trigger) {return !trigger->HasAura(SPELL_COSMETIC_STUN_IMMUNE_PERMANENT);});
+        protectors.sort(Acore::ObjectDistanceOrderPred(me));
+        if (protectors.empty())
+            ScheduleCombat();
+        Creature* closestProtector = protectors.front();
+        me->GetMotionMaster()->MoveFollow(closestProtector, 0.0f, 0.0f);
+        _protectorGUID = closestProtector->GetGUID();
+        me->ClearTarget();
+        me->SetReactState(REACT_PASSIVE);
+        scheduler.Schedule(1s, [this](TaskContext context)
+        {
+            if (_protectorGUID)
+                if (Creature* protector = ObjectAccessor::GetCreature(*me, _protectorGUID))
+                {
+                    if (me->IsWithinRange(protector, 25.0f))
+                    {
+                        me->SetFacingToObject(protector);
+                        DoCastSelf(SPELL_ACTIVATE_SUNBLADE_PROTECTOR);
+                        scheduler.Schedule(5s, [this](TaskContext /*context*/)
+                        {
+                            ScheduleCombat();
+                        });
+                        return;
+                    }
+                    context.Repeat(1s);
+                    return;
+                }
+            ScheduleCombat();
+        });
+    }
+
+    void ScheduleCombat()
+    {
+        me->SetReactState(REACT_AGGRESSIVE);
+        me->SetCombatMovement(true);
+        if (Unit* victim = me->GetVictim())
+            me->GetMotionMaster()->MoveChase(victim);
+        scheduler.Schedule(2s, 5s, [this](TaskContext context)
+        {
+            DoCastVictim(SPELL_SINISTER_STRIKE);
+            context.Repeat(7s, 8s);
+        });
+    }
+
+    void ScheduleOOC()
+    {
+        scheduler.Schedule(45s, [this](TaskContext context)
+        {
+            DoCastAOE(SPELL_FELBLOOD_CHANNEL);
+            context.Repeat();
+        });
+    }
+
+    void UpdateAI(uint32 diff) override
+    {
+        scheduler.Update(diff);
+
+        if (!me->IsCombatMovementAllowed() || !UpdateVictim())
+            return;
+
+        DoMeleeAttackIfReady();
+    }
+private:
+    ObjectGuid _protectorGUID;
+};
+
 void AddSC_instance_sunwell_plateau()
 {
     new instance_sunwell_plateau();
     RegisterSpellScript(spell_cataclysm_breath);
+    RegisterSunwellPlateauCreatureAI(npc_sunblade_scout);
 }
