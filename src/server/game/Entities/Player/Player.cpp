@@ -2476,7 +2476,7 @@ void Player::GiveLevel(uint8 level)
     if (level == oldLevel)
         return;
 
-    if (!sScriptMgr->OnPlayerCanChangeLevel(this, level))
+    if (!sScriptMgr->OnPlayerCanGiveLevel(this, level))
         return;
 
     if (Guild* guild = GetGuild())
