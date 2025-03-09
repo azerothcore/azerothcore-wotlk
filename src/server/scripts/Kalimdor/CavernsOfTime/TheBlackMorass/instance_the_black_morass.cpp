@@ -205,10 +205,12 @@ public:
                     {
                         if (_availableRiftPositions.size() > 1)
                         {
-                            spawnPos = Acore::Containers::SelectRandomContainerElementIf(_availableRiftPositions, [&](Position pos) -> bool
+                            auto spawnPosItr = Acore::Containers::SelectRandomContainerElementIf(_availableRiftPositions, [&](Position const& pos) -> bool
                             {
                                 return pos != lastPosition;
                             });
+                            if (spawnPosItr != _availableRiftPositions.end())
+                                spawnPos = *spawnPosItr;
                         }
                         else
                         {

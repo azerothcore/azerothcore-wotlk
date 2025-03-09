@@ -237,7 +237,7 @@ bool Pet::LoadPetFromDB(Player* owner, uint32 petEntry, uint32 petnumber, bool c
         return false;
 
     bool forceLoadFromDB = false;
-    sScriptMgr->OnBeforeLoadPetFromDB(owner, petEntry, petnumber, current, forceLoadFromDB);
+    sScriptMgr->OnPlayerBeforeLoadPetFromDB(owner, petEntry, petnumber, current, forceLoadFromDB);
 
     if (!forceLoadFromDB && (owner->IsClass(CLASS_DEATH_KNIGHT, CLASS_CONTEXT_PET) && !owner->CanSeeDKPet())) // DK Pet exception
         return false;
@@ -1033,7 +1033,7 @@ bool Guardian::InitStatsForLevel(uint8 petlevel)
     PetType petType = MAX_PET_TYPE;
     if (owner->IsPlayer())
     {
-        sScriptMgr->OnBeforeGuardianInitStatsForLevel(owner->ToPlayer(), this, cinfo, petType);
+        sScriptMgr->OnPlayerBeforeGuardianInitStatsForLevel(owner->ToPlayer(), this, cinfo, petType);
 
         if (IsPet())
         {
@@ -1427,7 +1427,7 @@ bool Guardian::InitStatsForLevel(uint8 petlevel)
     SetPower(POWER_MANA, GetMaxPower(POWER_MANA));
 
     if (owner->IsPlayer())
-        sScriptMgr->OnAfterGuardianInitStatsForLevel(owner->ToPlayer(), this);
+        sScriptMgr->OnPlayerAfterGuardianInitStatsForLevel(owner->ToPlayer(), this);
 
     return true;
 }

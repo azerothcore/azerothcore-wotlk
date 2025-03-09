@@ -581,7 +581,7 @@ void AchievementMgr::SaveToDB(CharacterDatabaseTransaction trans)
 
             iter->second.changed = false;
 
-            sScriptMgr->OnAchievementSave(trans, GetPlayer(), iter->first, iter->second);
+            sScriptMgr->OnPlayerAchievementSave(trans, GetPlayer(), iter->first, iter->second);
         }
     }
 
@@ -610,7 +610,7 @@ void AchievementMgr::SaveToDB(CharacterDatabaseTransaction trans)
 
             iter->second.changed = false;
 
-            sScriptMgr->OnCriteriaSave(trans, GetPlayer(), iter->first, iter->second);
+            sScriptMgr->OnPlayerCriteriaSave(trans, GetPlayer(), iter->first, iter->second);
         }
     }
 }
@@ -2099,7 +2099,7 @@ void AchievementMgr::SetCriteriaProgress(AchievementCriteriaEntry const* entry, 
     if (entry->timeLimit && timedIter == _timedAchievements.end())
         return;
 
-    if (!sScriptMgr->OnBeforeCriteriaProgress(GetPlayer(), entry))
+    if (!sScriptMgr->OnPlayerBeforeCriteriaProgress(GetPlayer(), entry))
     {
         return;
     }
@@ -2165,7 +2165,7 @@ void AchievementMgr::SetCriteriaProgress(AchievementCriteriaEntry const* entry, 
 
     SendCriteriaUpdate(entry, progress, timeElapsed, true);
 
-    sScriptMgr->OnCriteriaProgress(GetPlayer(), entry);
+    sScriptMgr->OnPlayerCriteriaProgress(GetPlayer(), entry);
 }
 
 void AchievementMgr::RemoveCriteriaProgress(const AchievementCriteriaEntry* entry)
@@ -2273,7 +2273,7 @@ void AchievementMgr::CompletedAchievement(AchievementEntry const* achievement)
         return;
     }
 
-    if (!sScriptMgr->OnBeforeAchievementComplete(GetPlayer(), achievement))
+    if (!sScriptMgr->OnPlayerBeforeAchievementComplete(GetPlayer(), achievement))
     {
         return;
     }
@@ -2288,7 +2288,7 @@ void AchievementMgr::CompletedAchievement(AchievementEntry const* achievement)
     ca.date = GameTime::GetGameTime().count();
     ca.changed = true;
 
-    sScriptMgr->OnAchievementComplete(GetPlayer(), achievement);
+    sScriptMgr->OnPlayerAchievementComplete(GetPlayer(), achievement);
 
     // pussywizard: set all progress counters to 0, so progress will be deleted from db during save
     {

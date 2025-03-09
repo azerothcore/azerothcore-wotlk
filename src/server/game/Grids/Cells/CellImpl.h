@@ -47,8 +47,8 @@ inline CellArea Cell::CalculateCellArea(float x, float y, float radius)
         return CellArea(center, center);
     }
 
-    CellCoord centerX = Acore::ComputeCellCoord(x - radius, y - radius).normalize();
-    CellCoord centerY = Acore::ComputeCellCoord(x + radius, y + radius).normalize();
+    CellCoord centerX = Acore::ComputeCellCoord(x + radius, y + radius).normalize();
+    CellCoord centerY = Acore::ComputeCellCoord(x - radius, y - radius).normalize();
 
     return CellArea(centerX, centerY);
 }
@@ -99,6 +99,8 @@ inline void Cell::Visit(CellCoord const& standing_cell, TypeContainerVisitor<T, 
     }
 
     // loop the cell range
+    ASSERT(area.high_bound.x_coord >= area.low_bound.x_coord);
+    ASSERT(area.high_bound.y_coord >= area.low_bound.y_coord);
     for (uint32 x = area.low_bound.x_coord; x <= area.high_bound.x_coord; ++x)
     {
         for (uint32 y = area.low_bound.y_coord; y <= area.high_bound.y_coord; ++y)

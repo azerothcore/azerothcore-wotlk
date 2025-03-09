@@ -30,7 +30,7 @@ void GridTerrainLoader::LoadMap()
     }
 
     // map file name
-    std::string const mapFileName = Acore::StringFormat("{}maps/{:03}{:02}{:02}.map", sWorld->GetDataPath(), _map->GetId(), GetX(), GetY());
+    std::string const mapFileName = Acore::StringFormat("{}maps/{:03}{:02}{:02}.map", sWorld->GetDataPath(), _map->GetId(), _grid.GetX(), _grid.GetY());
 
     // loading data
     LOG_DEBUG("maps", "Loading map {}", mapFileName);
@@ -46,25 +46,25 @@ void GridTerrainLoader::LoadMap()
             LOG_DEBUG("maps", "Error (result: {}) loading map file: {}", uint32(loadResult), mapFileName);
     }
 
-    sScriptMgr->OnLoadGridMap(_map, _grid.GetTerrainData(), GetX(), GetY());
+    sScriptMgr->OnLoadGridMap(_map, _grid.GetTerrainData(), _grid.GetX(), _grid.GetY());
 }
 
 void GridTerrainLoader::LoadVMap()
 {
-    int vmapLoadResult = VMAP::VMapFactory::createOrGetVMapMgr()->loadMap((sWorld->GetDataPath() + "vmaps").c_str(), _map->GetId(), GetX(), GetY());
+    int vmapLoadResult = VMAP::VMapFactory::createOrGetVMapMgr()->loadMap((sWorld->GetDataPath() + "vmaps").c_str(), _map->GetId(), _grid.GetX(), _grid.GetY());
     switch (vmapLoadResult)
     {
     case VMAP::VMAP_LOAD_RESULT_OK:
         LOG_DEBUG("maps", "VMAP loaded name:{}, id:{}, x:{}, y:{} (vmap rep.: x:{}, y:{})",
-            _map->GetMapName(), _map->GetId(), GetX(), GetY(), GetX(), GetY());
+            _map->GetMapName(), _map->GetId(), _grid.GetX(), _grid.GetY(), _grid.GetX(), _grid.GetY());
         break;
     case VMAP::VMAP_LOAD_RESULT_ERROR:
         LOG_DEBUG("maps", "Could not load VMAP name:{}, id:{}, x:{}, y:{} (vmap rep.: x:{}, y:{})",
-            _map->GetMapName(), _map->GetId(), GetX(), GetY(), GetX(), GetY());
+            _map->GetMapName(), _map->GetId(), _grid.GetX(), _grid.GetY(), _grid.GetX(), _grid.GetY());
         break;
     case VMAP::VMAP_LOAD_RESULT_IGNORED:
         LOG_DEBUG("maps", "Ignored VMAP name:{}, id:{}, x:{}, y:{} (vmap rep.: x:{}, y:{})",
-            _map->GetMapName(), _map->GetId(), GetX(), GetY(), GetX(), GetY());
+            _map->GetMapName(), _map->GetId(), _grid.GetX(), _grid.GetY(), _grid.GetX(), _grid.GetY());
         break;
     }
 }
@@ -74,20 +74,20 @@ void GridTerrainLoader::LoadMMap()
     if (!DisableMgr::IsPathfindingEnabled(_map))
         return;
 
-    int mmapLoadResult = MMAP::MMapFactory::createOrGetMMapMgr()->loadMap(_map->GetId(), GetX(), GetY());
+    int mmapLoadResult = MMAP::MMapFactory::createOrGetMMapMgr()->loadMap(_map->GetId(), _grid.GetX(), _grid.GetY());
     switch (mmapLoadResult)
     {
     case MMAP::MMAP_LOAD_RESULT_OK:
         LOG_DEBUG("maps", "MMAP loaded name:{}, id:{}, x:{}, y:{} (vmap rep.: x:{}, y:{})",
-            _map->GetMapName(), _map->GetId(), GetX(), GetY(), GetX(), GetY());
+            _map->GetMapName(), _map->GetId(), _grid.GetX(), _grid.GetY(), _grid.GetX(), _grid.GetY());
         break;
     case MMAP::MMAP_LOAD_RESULT_ERROR:
         LOG_DEBUG("maps", "Could not load MMAP name:{}, id:{}, x:{}, y:{} (vmap rep.: x:{}, y:{})",
-            _map->GetMapName(), _map->GetId(), GetX(), GetY(), GetX(), GetY());
+            _map->GetMapName(), _map->GetId(), _grid.GetX(), _grid.GetY(), _grid.GetX(), _grid.GetY());
         break;
     case MMAP::MMAP_LOAD_RESULT_IGNORED:
         LOG_DEBUG("maps", "Ignored MMAP name:{}, id:{}, x:{}, y:{} (vmap rep.: x:{}, y:{})",
-            _map->GetMapName(), _map->GetId(), GetX(), GetY(), GetX(), GetY());
+            _map->GetMapName(), _map->GetId(), _grid.GetX(), _grid.GetY(), _grid.GetX(), _grid.GetY());
         break;
     }
 }
@@ -152,9 +152,6 @@ void GridTerrainUnloader::UnloadTerrain()
     if (_map->GetInstanceId() != 0)
         return;
 
-    int gx = (MAX_NUMBER_OF_GRIDS - 1) - _grid.GetX();
-    int gy = (MAX_NUMBER_OF_GRIDS - 1) - _grid.GetY();
-
-    VMAP::VMapFactory::createOrGetVMapMgr()->unloadMap(_map->GetId(), gx, gy);
-    MMAP::MMapFactory::createOrGetMMapMgr()->unloadMap(_map->GetId(), gx, gy);
+    VMAP::VMapFactory::createOrGetVMapMgr()->unloadMap(_map->GetId(), _grid.GetX(), _grid.GetY());
+    MMAP::MMapFactory::createOrGetMMapMgr()->unloadMap(_map->GetId(), _grid.GetX(), _grid.GetY());
 }

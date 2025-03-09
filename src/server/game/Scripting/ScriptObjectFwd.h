@@ -67,6 +67,7 @@ class SpellCastTargets;
 class SpellInfo;
 class SpellScript;
 class TempSummon;
+class TicketMgr;
 class Transport;
 class Unit;
 class Vehicle;

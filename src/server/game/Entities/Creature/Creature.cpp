@@ -3181,7 +3181,8 @@ bool Creature::IsDungeonBoss() const
     if (GetOwnerGUID().IsPlayer())
         return false;
 
-    return HasFlagsExtra(CREATURE_FLAG_EXTRA_DUNGEON_BOSS);
+    CreatureTemplate const* cinfo = sObjectMgr->GetCreatureTemplate(GetEntry());
+    return cinfo && cinfo->HasFlagsExtra(CREATURE_FLAG_EXTRA_DUNGEON_BOSS);
 }
 
 bool Creature::IsImmuneToKnockback() const
@@ -3189,7 +3190,8 @@ bool Creature::IsImmuneToKnockback() const
     if (GetOwnerGUID().IsPlayer())
         return false;
 
-    return HasFlagsExtra(CREATURE_FLAG_EXTRA_IMMUNITY_KNOCKBACK);
+    CreatureTemplate const* cinfo = sObjectMgr->GetCreatureTemplate(GetEntry());
+    return cinfo && cinfo->HasFlagsExtra(CREATURE_FLAG_EXTRA_IMMUNITY_KNOCKBACK);
 }
 
 bool Creature::HasWeapon(WeaponAttackType type) const
