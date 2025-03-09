@@ -735,5 +735,3 @@ UPDATE `creature_loot_template` SET `comment` = "Hakkar - (ReferenceTable)" WHER
 -- `creature_loot_template` that are currently empty
 UPDATE `creature_loot_template` SET `comment` = "Green Recluse - Green Carapace Shield" WHERE (`entry` = 569 AND `item` = 2021 AND `reference` = 0);
 UPDATE `creature_loot_template` SET `comment` = "Brain Eater - Black Metal War Axe" WHERE (`entry` = 570 AND `item` = 2015 AND `reference` = 0);
-
---
