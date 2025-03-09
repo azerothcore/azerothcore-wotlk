@@ -1,3 +1,4 @@
+-- DB update 2025_02_16_00 -> 2025_03_09_00
 --
 DROP TABLE IF EXISTS `mail_server_template_items`;
 CREATE TABLE `mail_server_template_items` (
