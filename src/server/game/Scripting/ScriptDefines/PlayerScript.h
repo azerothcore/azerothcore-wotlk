@@ -788,6 +788,7 @@ public:
      * @brief This hook is called, to cancel the normal level up flow
      *
      * @param player Contains information about the Player
+     * @param newLevel The new level the player is about to be given
      *
      * @return true if player is allowed to gain the new level
      */
