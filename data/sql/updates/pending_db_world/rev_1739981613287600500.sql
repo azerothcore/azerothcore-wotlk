@@ -40,7 +40,8 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 (28603, 0, 3, 0, 24, 0, 100, 0, 51966, 0, 100, 100, 0, 0, 28, 51966, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Blightguard - On Target Has \'Scourge Disguise\' Aura - Remove \'Scourge Disguise\'[51966]'),
 (28603, 0, 4, 0, 24, 0, 100, 0, 52192, 0, 100, 100, 0, 0, 28, 52192, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Blightguard - On Target Has \'Scourge Disguise\' Aura - Remove \'Scourge Disguise\'[52192]');
 
--- Update Blightguard spawn location (thanks to guys from Triniti Core)
+-- Original commit: https://github.com/TrinityCore/TrinityCore/commit/d96482b2d49c61fe26533def461276a8038db4ab
+-- Update Blightguard spawn location (thanks to @Killyana)
 DELETE FROM `creature` WHERE `id1` = 28603;
 INSERT INTO `creature` (`guid`, `id1`, `id2`, `id3`, `map`, `zoneId`, `areaId`, `spawnMask`, `phaseMask`, `equipment_id`, `position_x`, `position_y`, `position_z`, `orientation`, `spawntimesecs`, `wander_distance`, `currentwaypoint`, `curhealth`, `curmana`, `MovementType`, `npcflag`, `unit_flags`, `dynamicflags`, `ScriptName`, `VerifiedBuild`, `CreateObject`, `Comment`) VALUES
 (245704, 28603, 0, 0, 571, 0, 0, 1, 1, 0, 6022.67, -2049.14, 238.189, 1.46482, 600, 10, 0, 0, 0, 1, 0, 0, 0, '', 0, 0, NULL),
