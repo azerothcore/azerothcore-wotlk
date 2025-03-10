@@ -204,7 +204,7 @@ void TempSummon::InitStats(uint32 duration)
     Unit* owner = GetSummonerUnit();
     if (owner)
         if (Player* player = owner->ToPlayer())
-            sScriptMgr->OnBeforeTempSummonInitStats(player, this, duration);
+            sScriptMgr->OnPlayerBeforeTempSummonInitStats(player, this, duration);
 
     m_timer = duration;
     m_lifetime = duration;
@@ -310,13 +310,9 @@ void TempSummon::UnSummon(uint32 msTime)
     if (WorldObject* owner = GetSummoner())
     {
         if (owner->IsCreature() && owner->ToCreature()->IsAIEnabled)
-        {
             owner->ToCreature()->AI()->SummonedCreatureDespawn(this);
-        }
         else if (owner->IsGameObject() && owner->ToGameObject()->AI())
-        {
             owner->ToGameObject()->AI()->SummonedCreatureDespawn(this);
-        }
     }
 
     AddObjectToRemoveList();

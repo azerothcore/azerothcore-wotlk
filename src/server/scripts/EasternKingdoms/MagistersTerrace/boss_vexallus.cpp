@@ -21,61 +21,87 @@
 
 enum Yells
 {
-    SAY_AGGRO                       = 0,
-    SAY_ENERGY                      = 1,
-    SAY_OVERLOAD                    = 2,
-    SAY_KILL                        = 3,
-    EMOTE_DISCHARGE_ENERGY          = 4
+    SAY_AGGRO                       = 0,    // Combat start
+    SAY_ENERGY                      = 1,    // Pure energy spawn
+    SAY_OVERLOAD                    = 2,    // Final phase
+    SAY_KILL                        = 3,    // Player kill
+    EMOTE_DISCHARGE_ENERGY          = 4,    // Energy discharge warning
+    EMOTE_OVERLOAD                  = 5     // Overload emote
 };
 
 enum Spells
 {
-    // Pure energy spell info
-    SPELL_ENERGY_FEEDBACK_CHANNEL   = 44328,
-    SPELL_ENERGY_FEEDBACK           = 44335,
-
-    // Vexallus spell info
-    SPELL_CHAIN_LIGHTNING           = 44318,
-    SPELL_OVERLOAD                  = 44352,
-    SPELL_ARCANE_SHOCK              = 44319,
-
-    SPELL_SUMMON_PURE_ENERGY_N      = 44322,
-    SPELL_SUMMON_PURE_ENERGY_H1     = 46154,
-    SPELL_SUMMON_PURE_ENERGY_H2     = 46159
-};
-
-enum Misc
-{
-    NPC_PURE_ENERGY                 = 24745
+    SPELL_ENERGY_FEEDBACK_CHANNEL   = 44328, // Pure energy channel
+    SPELL_ENERGY_FEEDBACK           = 44335, // Pure energy death effect
+    SPELL_CHAIN_LIGHTNING           = 44318, // Basic attack
+    SPELL_OVERLOAD                  = 44352, // Enrage ability
+    SPELL_ARCANE_SHOCK              = 44319, // Basic attack
+    SPELL_SUMMON_PURE_ENERGY_N      = 44322, // Normal mode summon
+    SPELL_SUMMON_PURE_ENERGY_H1     = 46154, // Heroic mode summon 1
+    SPELL_SUMMON_PURE_ENERGY_H2     = 46159  // Heroic mode summon 2
 };
 
 struct boss_vexallus : public BossAI
 {
-    boss_vexallus(Creature* creature) : BossAI(creature, DATA_VEXALLUS) { }
+    boss_vexallus(Creature* creature) : BossAI(creature, DATA_VEXALLUS), _energyCooldown(false), _energyCount(0) { }
 
     void Reset() override
     {
         _Reset();
+        _energyCooldown = false;
+        _energyCount = 0;
 
-        ScheduleHealthCheckEvent({ 85, 70, 55, 40 }, [&]
+        ScheduleHealthCheckEvent({ 85, 70, 55, 40, 25 }, [&]
         {
-            Talk(SAY_ENERGY);
-            Talk(EMOTE_DISCHARGE_ENERGY);
-
-            if (IsHeroic())
+            scheduler.Schedule(1s, [this](TaskContext context)
             {
-                DoCastSelf(SPELL_SUMMON_PURE_ENERGY_H1);
-                DoCastSelf(SPELL_SUMMON_PURE_ENERGY_H2);
-            }
-            else
-                DoCastSelf(SPELL_SUMMON_PURE_ENERGY_N);
+                if (!_energyCooldown)
+                {
+                    Talk(SAY_ENERGY);
+                    Talk(EMOTE_DISCHARGE_ENERGY);
+                    if (IsHeroic())
+                    {
+                        DoCastSelf(SPELL_SUMMON_PURE_ENERGY_H1);
+                        DoCastSelf(SPELL_SUMMON_PURE_ENERGY_H2);
+                    }
+                    else
+                        DoCastSelf(SPELL_SUMMON_PURE_ENERGY_N);
+
+                    _energyCooldown = true;
+                    ++_energyCount;
+
+                    me->m_Events.AddEventAtOffset([&]
+                    {
+                        _energyCooldown = false;
+                    }, 5s);
+                }
+                else
+                    context.Repeat(5s);
+
+            });
         });
 
         ScheduleHealthCheckEvent(20, [&]
         {
-            scheduler.CancelAll();
-            DoCastSelf(SPELL_OVERLOAD, true);
+            scheduler.Schedule(1s, [this](TaskContext context)
+            {
+                if (_energyCount == 5 && !_energyCooldown)
+                {
+                    scheduler.CancelAll();
+                    Talk(SAY_OVERLOAD);
+                    Talk(EMOTE_OVERLOAD);
+                    DoCastSelf(SPELL_OVERLOAD, true);
+                }
+                else
+                    context.Repeat(5s);
+            });
         });
+    }
+
+    void JustDied(Unit*) override
+    {
+        _JustDied();
+        instance->DoRemoveAurasDueToSpellOnPlayers(SPELL_ENERGY_FEEDBACK);
     }
 
     void KilledUnit(Unit* victim) override
@@ -84,29 +110,31 @@ struct boss_vexallus : public BossAI
             Talk(SAY_KILL);
     }
 
-    void JustEngagedWith(Unit* /*who*/) override
+    void JustEngagedWith(Unit*) override
     {
         _JustEngagedWith();
         Talk(SAY_AGGRO);
 
-        ScheduleTimedEvent(8s, [&]
+        ScheduleTimedEvent(5s, [&]
         {
             DoCastRandomTarget(SPELL_CHAIN_LIGHTNING);
-        }, 8s, 8s);
+        }, 8s);
 
         ScheduleTimedEvent(5s, [&]
         {
             DoCastRandomTarget(SPELL_ARCANE_SHOCK);
-        }, 8s, 8s);
+        }, 5s);
     }
 
     void JustSummoned(Creature* summon) override
     {
         if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0))
         {
+            summon->SetReactState(REACT_PASSIVE);
             summon->GetMotionMaster()->MoveFollow(target, 0.0f, 0.0f);
             summon->CastSpell(target, SPELL_ENERGY_FEEDBACK_CHANNEL, false);
         }
+
         summons.Summon(summon);
     }
 
@@ -117,6 +145,10 @@ struct boss_vexallus : public BossAI
         if (killer)
             killer->CastSpell(killer, SPELL_ENERGY_FEEDBACK, true, 0, 0, summon->GetGUID());
     }
+
+private:
+    bool _energyCooldown;
+    uint8 _energyCount;
 };
 
 void AddSC_boss_vexallus()

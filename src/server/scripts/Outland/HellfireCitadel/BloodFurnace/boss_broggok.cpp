@@ -101,15 +101,10 @@ public:
     bool OnGossipHello(Player* /*player*/, GameObject* go) override
     {
         if (InstanceScript* instance = go->GetInstanceScript())
-        {
             if (instance->GetBossState(DATA_BROGGOK) == NOT_STARTED)
-            {
                 if (Creature* broggok = instance->GetCreature(DATA_BROGGOK))
-                {
                     broggok->AI()->DoAction(ACTION_PREPARE_BROGGOK);
-                }
-            }
-        }
+
         go->UseDoorOrButton();
         return false;
     }

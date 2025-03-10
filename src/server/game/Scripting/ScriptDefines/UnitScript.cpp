@@ -148,6 +148,11 @@ void ScriptMgr::OnUnitDeath(Unit* unit, Unit* killer)
     CALL_ENABLED_HOOKS(UnitScript, UNITHOOK_ON_UNIT_DEATH, script->OnUnitDeath(unit, killer));
 }
 
+void ScriptMgr::OnUnitSetShapeshiftForm(Unit* unit, uint8 form)
+{
+    CALL_ENABLED_HOOKS(UnitScript, UNITHOOK_ON_UNIT_SET_SHAPESHIFT_FORM, script->OnUnitSetShapeshiftForm(unit, form));
+}
+
 UnitScript::UnitScript(const char* name, bool addToScripts, std::vector<uint16> enabledHooks)
     : ScriptObject(name, UNITHOOK_END)
 {
