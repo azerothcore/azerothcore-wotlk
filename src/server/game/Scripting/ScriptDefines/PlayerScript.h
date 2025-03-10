@@ -783,6 +783,14 @@ public:
      * @return true if player is authorized to resurect
      */
     virtual bool OnPlayerCanResurrect(Player* /*player*/) { return true; }
+
+    /**
+     * @brief This hook is called, to cancel the normal level up flow
+     *
+     * @param player Contains information about the Player
+     *
+     * @return true if player is allowed to gain the new level
+     */
     virtual bool OnPlayerCanGiveLevel(Player* /*player*/, uint8 /*newLevel*/) { return true; }
 };
 
