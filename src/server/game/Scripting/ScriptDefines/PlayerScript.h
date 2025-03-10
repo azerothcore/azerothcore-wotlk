@@ -784,6 +784,11 @@ public:
      */
     virtual bool OnPlayerCanResurrect(Player* /*player*/) { return true; }
 
+    /**
+     * @brief This hook is called whenever a player interacts with a vendor, and is then shown the vendor list
+     *
+     * @param player Contains information about the Player
+     */
     virtual void OnPlayerSendInventoryList(Player*, ObjectGuid, uint32) {}
 };
 
