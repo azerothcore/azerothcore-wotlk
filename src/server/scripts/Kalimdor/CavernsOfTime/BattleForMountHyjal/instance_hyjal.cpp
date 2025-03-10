@@ -192,7 +192,7 @@ public:
                     if (creature->IsSummon() && _bossWave != TO_BE_DECIDED)
                     {
                         if (_currentWave == 0 && _initialWaves)
-                            creature->SetDisableReputationGain(true);
+                            creature->SetReputationRewardDisabled(true);
                         DoUpdateWorldState(WORLD_STATE_ENEMYCOUNT, ++_trash);    // Update the instance wave count on new trash spawn
                         _encounterNPCs.insert(creature->GetGUID());             // Used for despawning on wipe
                     }
