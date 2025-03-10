@@ -149,13 +149,13 @@ public:
         return DoTeleport(handler, { spawnpoint->posX, spawnpoint->posY, spawnpoint->posZ }, spawnpoint->mapid);
     }
 
-    static bool HandleGoCreatureScriptCommand(ChatHandler* handler, Tail name)
+    static bool HandleGoCreatureScriptCommand(ChatHandler* handler, std::string_view scriptname)
     {
-        if (!name.data())
+        if (!scriptname.data())
             return false;
 
         // Make sure we don't pass double quotes into the SQL query. Otherwise it causes a MySQL error
-        std::string str = name.data(); // Making subtractions to the last character does not with in string_view
+        std::string str = scriptname.data(); // Making subtractions to the last character does not with in string_view
         if (str.front() == '"')
             str = str.substr(1);
         if (str.back() == '"')
