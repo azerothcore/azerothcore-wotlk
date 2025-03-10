@@ -587,14 +587,14 @@ public:
         GuidSet _roaringFlameHorde;
         bool _initialWaves;
 
-          void ResetWaves()
-          {
-              if (Creature* jaina = GetCreature(DATA_JAINA))
-                  jaina->SetNpcFlag(UNIT_NPC_FLAG_GOSSIP);
-              if (Creature* thrall = GetCreature(DATA_THRALL))
-                  thrall->SetNpcFlag(UNIT_NPC_FLAG_GOSSIP);
-              SetData(DATA_RESET_WAVES, 1);
-          }
+        void ResetWaves()
+        {
+            if (Creature* jaina = GetCreature(DATA_JAINA))
+                jaina->SetNpcFlag(UNIT_NPC_FLAG_GOSSIP);
+            if (Creature* thrall = GetCreature(DATA_THRALL))
+                thrall->SetNpcFlag(UNIT_NPC_FLAG_GOSSIP);
+            SetData(DATA_RESET_WAVES, 1);
+        }
     };
 };
 
