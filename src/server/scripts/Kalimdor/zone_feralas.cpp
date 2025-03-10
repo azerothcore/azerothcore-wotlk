@@ -52,40 +52,7 @@ class spell_gordunni_trap : public SpellScript
     }
 };
 
-enum ZAPPED_GIANTS
-{
-    NPC_SHORE_STRIDER = 5359,
-    NPC_DEEP_STRIDER = 5360,
-    NPC_LAND_WALKER = 5357,
-    NPC_WAVE_STRIDER = 5361,
-    NPC_CLIFF_GIANT = 5358
-};
-
-class spell_transmogrify : public SpellScript
-{
-    PrepareSpellScript(spell_transmogrify);
-
-    SpellCastResult CheckTarget()
-    {
-        Unit* target = GetExplTargetUnit();
-
-        std::unordered_set<uint32> validCreatureIds = { NPC_SHORE_STRIDER, NPC_DEEP_STRIDER, NPC_LAND_WALKER, NPC_WAVE_STRIDER, NPC_CLIFF_GIANT };
-
-        // Validate the target
-        if (!target || !validCreatureIds.contains(target->GetEntry()))
-            return SPELL_FAILED_BAD_TARGETS;
-
-        return SPELL_CAST_OK;
-    }
-
-    void Register() override
-    {
-        OnCheckCast += SpellCheckCastFn(spell_transmogrify::CheckTarget);
-    }
-};
-
 void AddSC_feralas()
 {
     RegisterSpellScript(spell_gordunni_trap);
-    RegisterSpellScript(spell_transmogrify);
 }
