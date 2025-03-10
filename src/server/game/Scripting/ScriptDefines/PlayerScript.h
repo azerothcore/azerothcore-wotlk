@@ -788,8 +788,10 @@ public:
      * @brief This hook is called whenever a player interacts with a vendor, and is then shown the vendor list
      *
      * @param player Contains information about the Player
+     * @param vendorGuid Guid of the vendor player is interacting with
+     * @param vendorEntry Entry of the vendor player is interacting with
      */
-    virtual void OnPlayerSendInventoryList(Player*, ObjectGuid, uint32) {}
+    virtual void OnPlayerSendInventoryList(Player* /*player*/, ObjectGuid /*vendorGuid*/, uint32 /*vendorEntry*/) {}
 };
 
 #endif
