@@ -65,7 +65,7 @@ ObjectData const creatureData[] =
     { NPC_JANALAI,          DATA_JANALAI        },
     { NPC_SPIRIT_LYNX,      DATA_SPIRIT_LYNX    },
     { NPC_HARRISON_JONES,   DATA_HARRISON_JONES },
-    { NPC_AMINISHI_LOOKOUT, DATA_LOOKOUT        },
+    { NPC_AMANISHI_LOOKOUT, DATA_LOOKOUT        },
     { 0,                    0                   }
 };
 
@@ -115,11 +115,13 @@ public:
 
             for (uint8 i = 0; i < RAND_VENDOR; ++i)
                 RandVendor[i] = NOT_STARTED;
+
+            StorePersistentData(DATA_TIMED_RUN, 0);
         }
 
         void OnPlayerEnter(Player* /*player*/) override
         {
-            if (!scheduler.IsGroupScheduled(GROUP_TIMED_RUN))
+            if (!scheduler.IsGroupScheduled(GROUP_TIMED_RUN) && GetPersistentData(DATA_TIMED_RUN))
                 DoAction(ACTION_START_TIMED_RUN);
         }
 
@@ -127,13 +129,18 @@ public:
         {
             switch (creature->GetEntry())
             {
+                case NPC_AMANISHI_GUARDIAN:
+                case NPC_AMANISHI_SAVAGE:
+                    if (creature->GetPositionY() >= 1500.0f) // gate
+                        creature->SetImmuneToAll(true);
+                    break;
                 // Akil'zon gauntlet
-                case NPC_AMINISHI_TEMPEST:
+                case NPC_AMANISHI_TEMPEST:
                     if (creature->GetPositionZ() >= 50.0f) // excludes Tempest in Hexlord Malacrass' trash
                         AkilzonTrash.insert(creature->GetGUID());
                     break;
-                case NPC_AMINISHI_LOOKOUT:
-                case NPC_AMINISHI_PROTECTOR:
+                case NPC_AMANISHI_LOOKOUT:
+                case NPC_AMANISHI_PROTECTOR:
                 case NPC_EAGLE_TRASH_AGGRO_TRIGGER:
                     AkilzonTrash.insert(creature->GetGUID());
                     break;
@@ -226,8 +233,8 @@ public:
                         case NPC_EAGLE_TRASH_AGGRO_TRIGGER:
                             creature->DisappearAndDie();
                             break;
-                        case NPC_AMINISHI_LOOKOUT:
-                        case NPC_AMINISHI_TEMPEST:
+                        case NPC_AMANISHI_LOOKOUT:
+                        case NPC_AMANISHI_TEMPEST:
                             creature->AI()->DoAction(ACTION_START_AKILZON_GAUNTLET);
                             break;
                         default:
@@ -243,7 +250,7 @@ public:
                 {
                     if (!creature->IsAlive())
                         creature->Respawn();
-                    else if (creature->GetEntry() == NPC_AMINISHI_TEMPEST)
+                    else if (creature->GetEntry() == NPC_AMANISHI_TEMPEST)
                         creature->AI()->DoAction(ACTION_RESET_AKILZON_GAUNTLET);
                 }
             if (Creature* creature = GetCreature(DATA_LOOKOUT))
@@ -259,7 +266,7 @@ public:
 
             switch (creature->GetEntry())
             {
-                case NPC_AMINISHI_PROTECTOR:
+                case NPC_AMANISHI_PROTECTOR:
                 case NPC_AMANISHI_WIND_WALKER:
                     if (_akilzonGauntlet == NOT_STARTED && AkilzonTrash.contains(creature->GetGUID()))
                         creature->DespawnOrUnsummon(30s, 1s);
@@ -272,8 +279,8 @@ public:
         {
             switch (creature->GetEntry())
             {
-                case NPC_AMINISHI_TEMPEST:
-                case NPC_AMINISHI_PROTECTOR:
+                case NPC_AMANISHI_TEMPEST:
+                case NPC_AMANISHI_PROTECTOR:
                 case NPC_AMANISHI_WIND_WALKER:
                     if (AkilzonTrash.contains(creature->GetGUID()))
                         ResetAkilzonGauntlet();
@@ -288,53 +295,36 @@ public:
             if (!InstanceScript::SetBossState(type, state))
                 return false;
 
-            switch (type)
+            if (state == DONE)
             {
-                case DATA_NALORAKK:
-                    if (state == DONE)
-                    {
+                switch (type)
+                {
+                    case DATA_NALORAKK:
                         if (uint32 timer = GetPersistentData(DATA_TIMED_RUN))
                         {
                             StorePersistentData(DATA_TIMED_RUN, timer += 15);
                             DoUpdateWorldState(WORLDSTATE_TIME_TO_SACRIFICE, timer);
                         }
-                        SummonHostage(0);
-                    }
-                    break;
-                case DATA_AKILZON:
-                    if (state == DONE)
-                    {
+                        SummonHostage(type);
+                        break;
+                    case DATA_AKILZON:
                         if (uint32 timer = GetPersistentData(DATA_TIMED_RUN))
                         {
                             StorePersistentData(DATA_TIMED_RUN, timer += 10);
                             DoUpdateWorldState(WORLDSTATE_TIME_TO_SACRIFICE, timer);
                         }
-                        SummonHostage(1);
-                    }
-                    break;
-                case DATA_JANALAI:
-                    if (state == DONE)
-                        SummonHostage(2);
-                    break;
-                case DATA_HALAZZI:
-                    if (state == DONE)
-                        SummonHostage(3);
-                    break;
-                case DATA_HEXLORD:
-                    if (state == IN_PROGRESS)
-                        HandleGameObject(ObjectGuid::Empty, false, GetGameObject(DATA_HEXLORD_GATE));
-                    else if (state == NOT_STARTED)
-                        CheckInstanceStatus();
-                    else if (state == DONE)
-                    {
+                        SummonHostage(type);
+                        break;
+                    case DATA_JANALAI:
+                    case DATA_HALAZZI:
+                        SummonHostage(type);
+                        break;
+                    case DATA_HEXLORD:
                         if (GameObject* zuljinGate = GetGameObject(DATA_ZULJIN_GATE))
                             zuljinGate->RemoveGameObjectFlag(GO_FLAG_LOCKED);
-                    }
-                    break;
-            }
+                        break;
+                }
 
-            if (state == DONE)
-            {
                 if (GetPersistentData(DATA_TIMED_RUN) && AllBossesDone({ DATA_NALORAKK, DATA_AKILZON, DATA_JANALAI, DATA_HALAZZI }))
                 {
                     StorePersistentData(DATA_TIMED_RUN, 0);
@@ -342,6 +332,16 @@ public:
                 }
 
                 CheckInstanceStatus();
+            }
+            else
+            {
+                if (type == DATA_HEXLORD)
+                {
+                    if (state == IN_PROGRESS)
+                        HandleGameObject(ObjectGuid::Empty, false, GetGameObject(DATA_HEXLORD_GATE));
+                    else if (state == NOT_STARTED)
+                        CheckInstanceStatus();
+                }
             }
 
             return true;

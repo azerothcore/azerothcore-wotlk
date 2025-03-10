@@ -70,10 +70,11 @@ public:
     void SetCorpseDelay(uint32 delay) { m_corpseDelay = delay; }
     void SetCorpseRemoveTime(uint32 delay);
     [[nodiscard]] uint32 GetCorpseDelay() const { return m_corpseDelay; }
+    [[nodiscard]] bool HasFlagsExtra(uint32 flag) const { return GetCreatureTemplate()->HasFlagsExtra(flag); }
     [[nodiscard]] bool IsRacialLeader() const { return GetCreatureTemplate()->RacialLeader; }
-    [[nodiscard]] bool IsCivilian() const { return GetCreatureTemplate()->flags_extra & CREATURE_FLAG_EXTRA_CIVILIAN; }
-    [[nodiscard]] bool IsTrigger() const { return GetCreatureTemplate()->flags_extra & CREATURE_FLAG_EXTRA_TRIGGER; }
-    [[nodiscard]] bool IsGuard() const { return GetCreatureTemplate()->flags_extra & CREATURE_FLAG_EXTRA_GUARD; }
+    [[nodiscard]] bool IsCivilian() const { return HasFlagsExtra(CREATURE_FLAG_EXTRA_CIVILIAN); }
+    [[nodiscard]] bool IsTrigger() const { return HasFlagsExtra(CREATURE_FLAG_EXTRA_TRIGGER); }
+    [[nodiscard]] bool IsGuard() const { return HasFlagsExtra(CREATURE_FLAG_EXTRA_GUARD); }
     CreatureMovementData const& GetMovementTemplate() const;
     [[nodiscard]] bool CanWalk() const { return GetMovementTemplate().IsGroundAllowed(); }
     [[nodiscard]] bool CanSwim() const override;
@@ -127,7 +128,7 @@ public:
 
     [[nodiscard]] bool IsDungeonBoss() const;
     [[nodiscard]] bool IsImmuneToKnockback() const;
-    [[nodiscard]] bool IsAvoidingAOE() const { return GetCreatureTemplate()->flags_extra & CREATURE_FLAG_EXTRA_AVOID_AOE; }
+    [[nodiscard]] bool IsAvoidingAOE() const { return HasFlagsExtra(CREATURE_FLAG_EXTRA_AVOID_AOE); }
 
     uint8 getLevelForTarget(WorldObject const* target) const override; // overwrite Unit::getLevelForTarget for boss level support
 
@@ -186,6 +187,9 @@ public:
     void UpdateMaxPower(Powers power) override;
     void UpdateAttackPowerAndDamage(bool ranged = false) override;
     void CalculateMinMaxDamage(WeaponAttackType attType, bool normalized, bool addTotalPct, float& minDamage, float& maxDamage, uint8 damageIndex) override;
+
+    void LoadSparringPct();
+    [[nodiscard]] float GetSparringPct() const { return _sparringPct; }
 
     bool HasWeapon(WeaponAttackType type) const override;
     bool HasWeaponForAttack(WeaponAttackType type) const override { return (Unit::HasWeaponForAttack(type) && HasWeapon(type)); }
@@ -269,7 +273,7 @@ public:
     bool HasSearchedAssistance() { return m_AlreadySearchedAssistance; }
     bool CanAssistTo(Unit const* u, Unit const* enemy, bool checkfaction = true) const;
     bool _IsTargetAcceptable(Unit const* target) const;
-    [[nodiscard]] bool CanIgnoreFeignDeath() const { return (GetCreatureTemplate()->flags_extra & CREATURE_FLAG_EXTRA_IGNORE_FEIGN_DEATH) != 0; }
+    [[nodiscard]] bool CanIgnoreFeignDeath() const { return HasFlagsExtra(CREATURE_FLAG_EXTRA_IGNORE_FEIGN_DEATH); }
 
     // pussywizard: Updated at faction change, disable move in line of sight if actual faction is not hostile to anyone
     void UpdateMoveInLineOfSightState();
@@ -356,8 +360,10 @@ public:
 
     Unit* SelectVictim();
 
-    void SetDisableReputationGain(bool disable) { DisableReputationGain = disable; }
-    [[nodiscard]] bool IsReputationGainDisabled() const { return DisableReputationGain; }
+    void SetReputationRewardDisabled(bool disable) { DisableReputationReward = disable; }
+    [[nodiscard]] bool IsReputationRewardDisabled() const { return DisableReputationReward; }
+    void SetLootRewardDisabled(bool disable) { DisableLootReward = disable; }
+    [[nodiscard]] bool IsLootRewardDisabled() const { return DisableLootReward; }
     [[nodiscard]] bool IsDamageEnoughForLootingAndReward() const;
     void LowerPlayerDamageReq(uint32 unDamage, bool damagedByPlayer = true);
     void ResetPlayerDamageReq();
@@ -475,13 +481,16 @@ protected:
     Position m_homePosition;
     Position m_transportHomePosition;
 
-    bool DisableReputationGain;
+    bool DisableReputationReward;
+    bool DisableLootReward;
 
     CreatureTemplate const* m_creatureInfo;   // in difficulty mode > 0 can different from sObjectMgr->GetCreatureTemplate(GetEntry())
     CreatureData const* m_creatureData;
 
     float m_detectionDistance;
     uint16 m_LootMode;  // bitmask, default LOOT_MODE_DEFAULT, determines what loot will be lootable
+
+    float _sparringPct;
 
     [[nodiscard]] bool IsInvisibleDueToDespawn() const override;
     bool CanAlwaysSee(WorldObject const* obj) const override;
