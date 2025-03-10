@@ -247,8 +247,7 @@ public:
                         break;
                     case NPC_WINTERCHILL:
                         _initialWaves = false;
-                        ResetWaves();
-                        break;
+                        [[fallthrough]];
                     case NPC_ANETHERON:
                     case NPC_KAZROGAL:
                     case NPC_AZGALOR:
