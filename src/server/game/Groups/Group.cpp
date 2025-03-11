@@ -1350,6 +1350,8 @@ void Group::GroupLoot(Loot* loot, WorldObject* pLootedObject)
 
             if (member->IsAtLootRewardDistance(pLootedObject))
             {
+                r->totalPlayersRolling++;
+
                 RollVote vote = NOT_EMITED_YET;
                 if (!CanRollOnItem(*i, member, loot))
                 {
