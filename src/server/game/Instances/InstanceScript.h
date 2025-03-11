@@ -23,6 +23,7 @@
 #include "TaskScheduler.h"
 #include "World.h"
 #include "ZoneScript.h"
+#include "WorldStatePackets.h"
 #include <set>
 
 #define OUT_SAVE_INST_DATA             LOG_DEBUG("scripts.ai", "Saving Instance Data for Instance {} (Map {}, Instance Id {})", instance->GetMapName(), instance->GetId(), instance->GetInstanceId())
@@ -203,6 +204,9 @@ public:
     //Respawns a GO having negative spawntimesecs in gameobject-table
     void DoRespawnGameObject(ObjectGuid guid, uint32 timeToDespawn = MINUTE);
 
+    // Respawns a GO by instance storage index
+    void DoRespawnGameObject(uint32 type);
+
     // Respawns a creature.
     void DoRespawnCreature(ObjectGuid guid, bool force = false);
 
@@ -257,7 +261,7 @@ public:
 
     void SendEncounterUnit(uint32 type, Unit* unit = nullptr, uint8 param1 = 0, uint8 param2 = 0);
 
-    virtual void FillInitialWorldStates(WorldPacket& /*data*/) {}
+    virtual void FillInitialWorldStates(WorldPackets::WorldState::InitWorldStates& /*packet*/) { }
 
     uint32 GetEncounterCount() const { return bosses.size(); }
 
@@ -281,6 +285,10 @@ public:
     [[nodiscard]] bool IsBossDone(uint32 bossId) const { return GetBossState(bossId) == DONE; };
     [[nodiscard]] bool AllBossesDone() const;
     [[nodiscard]] bool AllBossesDone(std::initializer_list<uint32> bossIds) const;
+
+    TeamId GetTeamIdInInstance() const { return _teamIdInInstance; }
+    void SetTeamIdInInstance(TeamId teamId) { _teamIdInInstance = teamId; }
+    bool IsTwoFactionInstance() const;
 
     TaskScheduler scheduler;
 protected:
@@ -321,9 +329,6 @@ protected:
     void WriteSaveDataBossStates(std::ostringstream& data);
     void WritePersistentData(std::ostringstream& data);
     virtual void WriteSaveDataMore(std::ostringstream& /*data*/) { }
-
-    TeamId GetTeamIdInInstance() const { return _teamIdInInstance; }
-    bool IsTwoFactionInstance() const;
 
 private:
     static void LoadObjectData(ObjectData const* creatureData, ObjectInfoMap& objectInfo);

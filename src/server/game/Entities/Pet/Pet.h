@@ -158,7 +158,7 @@ protected:
 
     std::unique_ptr<DeclinedName> m_declinedname;
 
-    Unit*      m_tempspellTarget;
+    ObjectGuid m_tempspellTarget;
     ObjectGuid m_tempoldTarget;
     bool       m_tempspellIsPositive;
     uint32     m_tempspell;

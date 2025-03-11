@@ -819,7 +819,7 @@ uint32 Unit::DealDamage(Unit* attacker, Unit* victim, uint32 damage, CleanDamage
             victim->GetAI()->DamageTaken(attacker, damage, damagetype, damageSchoolMask);
 
         if (attacker && attacker->IsAIEnabled)
-            attacker->GetAI()->DamageDealt(victim, damage, damagetype);
+            attacker->GetAI()->DamageDealt(victim, damage, damagetype, damageSchoolMask);
     }
 
     // Hook for OnDamage Event
@@ -1030,6 +1030,17 @@ uint32 Unit::DealDamage(Unit* attacker, Unit* victim, uint32 damage, CleanDamage
             bool damagedByPlayer = unDamage && attacker && (attacker->IsPlayer() || attacker->m_movedByPlayer != nullptr);
             victim->ToCreature()->LowerPlayerDamageReq(unDamage, damagedByPlayer);
         }
+    }
+
+    // Sparring
+    if (victim->CanSparringWith(attacker))
+    {
+        if (damage >= victim->GetHealth())
+            damage = 0;
+
+        uint32 sparringHealth = victim->GetHealth() * (victim->ToCreature()->GetSparringPct() / 100);
+        if (victim->GetHealth() - damage <= sparringHealth)
+            damage = 0;
     }
 
     if (health <= damage)
@@ -2635,6 +2646,10 @@ void Unit::AttackerStateUpdate(Unit* victim, WeaponAttackType attType /*= BASE_A
             Unit::DealDamageMods(victim, damageInfo.damages[i].damage, &damageInfo.damages[i].absorb);
         }
 
+        // Related to sparring system. Allow attack animations even if there are no damages
+        if (victim->CanSparringWith(damageInfo.attacker))
+            damageInfo.HitInfo |= HITINFO_FAKE_DAMAGE;
+
         SendAttackStateUpdate(&damageInfo);
 
         //TriggerAurasProcOnEvent(damageInfo);
@@ -2841,7 +2856,7 @@ MeleeHitOutcome Unit::RollMeleeOutcomeAgainst(Unit const* victim, WeaponAttackTy
         //LOG_DEBUG("entities.unit", "RollMeleeOutcomeAgainst: attack came from behind and victim was a player.");
     }
     // Xinef: do not allow to dodge with CREATURE_FLAG_EXTRA_NO_DODGE flag
-    else if (victim->IsPlayer() || !(victim->ToCreature()->GetCreatureTemplate()->flags_extra & CREATURE_FLAG_EXTRA_NO_DODGE))
+    else if (victim->IsPlayer() || !(victim->ToCreature()->HasFlagsExtra(CREATURE_FLAG_EXTRA_NO_DODGE)))
     {
         // Reduce dodge chance by attacker expertise rating
         if (IsPlayer())
@@ -2883,7 +2898,7 @@ MeleeHitOutcome Unit::RollMeleeOutcomeAgainst(Unit const* victim, WeaponAttackTy
         else
             parry_chance -= GetTotalAuraModifier(SPELL_AURA_MOD_EXPERTISE) * 25;
 
-        if (victim->IsPlayer() || !(victim->ToCreature()->GetCreatureTemplate()->flags_extra & CREATURE_FLAG_EXTRA_NO_PARRY))
+        if (victim->IsPlayer() || !(victim->ToCreature()->HasFlagsExtra(CREATURE_FLAG_EXTRA_NO_PARRY)))
         {
             tmp = parry_chance;
 
@@ -2900,7 +2915,7 @@ MeleeHitOutcome Unit::RollMeleeOutcomeAgainst(Unit const* victim, WeaponAttackTy
             }
         }
 
-        if (victim->IsPlayer() || !(victim->ToCreature()->GetCreatureTemplate()->flags_extra & CREATURE_FLAG_EXTRA_NO_BLOCK))
+        if (victim->IsPlayer() || !(victim->ToCreature()->HasFlagsExtra(CREATURE_FLAG_EXTRA_NO_BLOCK)))
         {
             tmp = block_chance;
 
@@ -2942,7 +2957,7 @@ MeleeHitOutcome Unit::RollMeleeOutcomeAgainst(Unit const* victim, WeaponAttackTy
     if (getLevelForTarget(victim) >= victim->getLevelForTarget(this) + 4 &&
             // can be from by creature (if can) or from controlled player that considered as creature
             !IsControlledByPlayer() &&
-            !(IsCreature() && ToCreature()->GetCreatureTemplate()->flags_extra & CREATURE_FLAG_EXTRA_NO_CRUSHING_BLOWS))
+            !(IsCreature() && ToCreature()->HasFlagsExtra(CREATURE_FLAG_EXTRA_NO_CRUSHING_BLOWS)))
     {
         // when their weapon skill is 15 or more above victim's defense skill
         tmp = victimDefenseSkill;
@@ -2969,10 +2984,8 @@ MeleeHitOutcome Unit::RollMeleeOutcomeAgainst(Unit const* victim, WeaponAttackTy
     if (tmp > 0 && roll < (sum += tmp))
     {
         LOG_DEBUG("entities.unit", "RollMeleeOutcomeAgainst: CRIT <{}, {})", sum - tmp, sum);
-        if (IsCreature() && (ToCreature()->GetCreatureTemplate()->flags_extra & CREATURE_FLAG_EXTRA_NO_CRIT))
-        {
+        if (IsCreature() && (ToCreature()->HasFlagsExtra(CREATURE_FLAG_EXTRA_NO_CRIT)))
             LOG_DEBUG("entities.unit", "RollMeleeOutcomeAgainst: CRIT DISABLED)");
-        }
         else
             return MELEE_HIT_CRIT;
     }
@@ -3107,7 +3120,7 @@ bool Unit::isSpellBlocked(Unit* victim, SpellInfo const* spellProto, WeaponAttac
     {
         // Check creatures flags_extra for disable block
         if (victim->IsCreature() &&
-                victim->ToCreature()->GetCreatureTemplate()->flags_extra & CREATURE_FLAG_EXTRA_NO_BLOCK)
+                victim->ToCreature()->HasFlagsExtra(CREATURE_FLAG_EXTRA_NO_BLOCK))
             return false;
 
         float blockChance = victim->GetUnitBlockChance();
@@ -3915,7 +3928,7 @@ void Unit::_UpdateAutoRepeatSpell()
     static uint32 const HUNTER_AUTOSHOOT = 75;
 
     // Check "realtime" interrupts
-    if ((IsPlayer() && ToPlayer()->isMoving()) || IsNonMeleeSpellCast(false, false, true, spellProto->Id == HUNTER_AUTOSHOOT))
+    if ((IsPlayer() && ToPlayer()->isMoving() && spellProto->Id != HUNTER_AUTOSHOOT) || IsNonMeleeSpellCast(false, false, true, spellProto->Id == HUNTER_AUTOSHOOT))
     {
         // cancel wand shoot
         if (spellProto->Id != HUNTER_AUTOSHOOT)
@@ -3924,7 +3937,8 @@ void Unit::_UpdateAutoRepeatSpell()
         return;
     }
 
-    if (m_AutoRepeatFirstCast && getAttackTimer(RANGED_ATTACK) < 500)
+    // Apply delay (Hunter's autoshoot not affected)
+    if (m_AutoRepeatFirstCast && getAttackTimer(RANGED_ATTACK) < 500 && spellProto->Id != HUNTER_AUTOSHOOT)
     {
         setAttackTimer(RANGED_ATTACK, 500);
     }
@@ -3952,6 +3966,24 @@ void Unit::_UpdateAutoRepeatSpell()
         // Reset attack
         resetAttackTimer(RANGED_ATTACK);
     }
+}
+
+bool Unit::CanSparringWith(Unit const* attacker) const
+{
+    if (!IsCreature() || IsCharmedOwnedByPlayerOrPlayer())
+        return false;
+
+    if (!attacker)
+        return false;
+
+    if (!attacker->IsCreature() || attacker->IsCharmedOwnedByPlayerOrPlayer())
+        return false;
+
+    if (Creature const* creature = ToCreature())
+        if (!creature->GetSparringPct())
+            return false;
+
+    return true;
 }
 
 void Unit::SetCurrentCastedSpell(Spell* pSpell)
@@ -8381,37 +8413,25 @@ bool Unit::HandleDummyAuraProc(Unit* victim, uint32 damage, AuraEffect* triggere
                     if (!procSpell || !IsPlayer() || !victim)
                         return false;
 
+                    uint32 spell = 45284;
+
+                    // chain lightning only procs 1/3 of the time
+                    if (procSpell->SpellFamilyFlags[0] & 0x2)
+                    {
+                        if (!roll_chance_i(33))
+                            return false;
+                        spell = 45297;
+                    }
+
                     if (procEx & PROC_EX_CRITICAL_HIT)
                         damage /= 2;
 
-                    // do not proc off from itself
-                    if (procSpell->Id == 45297 || procSpell->Id == 45284)
-                    {
-                        return false;
-                    }
+                    // do not reduce damage-spells have correct basepoints
+                    damage /= 2;
+                    int32 dmg = damage;
 
-                    do
-                    {
-                        uint32 spell = 0;
-
-                        if (procSpell->SpellFamilyFlags[0] & 0x2)
-                        {
-                            // 1/3 of 33% if 11%
-                            if (!roll_chance_i(33))
-                                return false;
-
-                            spell = 45297;
-                        }
-                        else
-                            spell = 45284;
-
-                        // do not reduce damage-spells have correct basepoints
-                        damage /= 2;
-                        int32 dmg = damage;
-
-                        // Cast
-                        CastCustomSpell(victim, spell, &dmg, 0, 0, true, castItem, triggeredByAura);
-                    } while (roll_chance_i(33));
+                    // Cast
+                    CastCustomSpell(victim, spell, &dmg, 0, 0, true, castItem, triggeredByAura);
                     return true;
                 }
                 // Static Shock
@@ -10403,10 +10423,9 @@ bool Unit::Attack(Unit* victim, bool meleeAttack)
         creature->SendAIReaction(AI_REACTION_HOSTILE);
 
         /// @todo: Implement aggro range, detection range and assistance range templates
-        if (!(creature->GetCreatureTemplate()->flags_extra & CREATURE_FLAG_EXTRA_DONT_CALL_ASSISTANCE))
-        {
+        if (!(creature->HasFlagsExtra(CREATURE_FLAG_EXTRA_DONT_CALL_ASSISTANCE)))
             creature->CallAssistance();
-        }
+
         creature->SetAssistanceTimer(sWorld->getIntConfig(CONFIG_CREATURE_FAMILY_ASSISTANCE_PERIOD));
 
         SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_ONESHOT_NONE);
@@ -15094,7 +15113,7 @@ float Unit::ApplyDiminishingToDuration(DiminishingGroup group, int32& duration, 
         Unit const* source = casterOwner ? casterOwner : caster;
 
         if ((target->IsPlayer()
-                || target->ToCreature()->GetCreatureTemplate()->flags_extra & CREATURE_FLAG_EXTRA_ALL_DIMINISH)
+                || target->ToCreature()->HasFlagsExtra(CREATURE_FLAG_EXTRA_ALL_DIMINISH))
                 && source->IsPlayer())
             duration = limitduration;
     }
@@ -15103,7 +15122,7 @@ float Unit::ApplyDiminishingToDuration(DiminishingGroup group, int32& duration, 
 
     if (group == DIMINISHING_TAUNT)
     {
-        if (IsCreature() && (ToCreature()->GetCreatureTemplate()->flags_extra & CREATURE_FLAG_EXTRA_OBEYS_TAUNT_DIMINISHING_RETURNS))
+        if (IsCreature() && (ToCreature()->HasFlagsExtra(CREATURE_FLAG_EXTRA_OBEYS_TAUNT_DIMINISHING_RETURNS)))
         {
             DiminishingLevels diminish = Level;
             switch (diminish)
@@ -15130,7 +15149,7 @@ float Unit::ApplyDiminishingToDuration(DiminishingGroup group, int32& duration, 
     // Some diminishings applies to mobs too (for example, Stun)
     else if ((GetDiminishingReturnsGroupType(group) == DRTYPE_PLAYER
               && ((targetOwner ? (targetOwner->IsPlayer()) : (IsPlayer()))
-                  || (IsCreature() && ToCreature()->GetCreatureTemplate()->flags_extra & CREATURE_FLAG_EXTRA_ALL_DIMINISH)))
+                  || (IsCreature() && ToCreature()->HasFlagsExtra(CREATURE_FLAG_EXTRA_ALL_DIMINISH))))
              || GetDiminishingReturnsGroupType(group) == DRTYPE_ALL)
     {
         DiminishingLevels diminish = Level;
@@ -17748,7 +17767,7 @@ void Unit::Kill(Unit* killer, Unit* victim, bool durabilityLoss, WeaponAttackTyp
     bool isRewardAllowed = true;
     if (creature)
     {
-        isRewardAllowed = creature->IsDamageEnoughForLootingAndReward();
+        isRewardAllowed = (creature->IsDamageEnoughForLootingAndReward() && !creature->IsLootRewardDisabled());
         if (!isRewardAllowed)
             creature->SetLootRecipient(nullptr);
     }
@@ -17850,7 +17869,7 @@ void Unit::Kill(Unit* killer, Unit* victim, bool durabilityLoss, WeaponAttackTyp
         if (Unit* owner = killer->GetOwner())
         {
             Unit::ProcDamageAndSpell(owner, victim, PROC_FLAG_KILL, PROC_FLAG_NONE, PROC_EX_NONE, 0, attackType, spellProto, nullptr, -1, spell);
-            sScriptMgr->OnCreatureKilledByPet( killer->GetCharmerOrOwnerPlayerOrPlayerItself(), victim->ToCreature());
+            sScriptMgr->OnPlayerCreatureKilledByPet( killer->GetCharmerOrOwnerPlayerOrPlayerItself(), victim->ToCreature());
         }
 
     if (killer != victim)
@@ -18005,7 +18024,7 @@ void Unit::Kill(Unit* killer, Unit* victim, bool durabilityLoss, WeaponAttackTyp
 
             if (instanceMap->IsDungeon() && player)
                 if (instanceMap->IsRaidOrHeroicDungeon())
-                    if (creature->GetCreatureTemplate()->flags_extra & CREATURE_FLAG_EXTRA_INSTANCE_BIND)
+                    if (creature->HasFlagsExtra(CREATURE_FLAG_EXTRA_INSTANCE_BIND))
                         instanceMap->ToInstanceMap()->PermBindAllPlayers();
         }
     }
@@ -18050,9 +18069,9 @@ void Unit::Kill(Unit* killer, Unit* victim, bool durabilityLoss, WeaponAttackTyp
         if (Player* killerPlr = killer->ToPlayer())
         {
             if (Player* killedPlr = victim->ToPlayer())
-                sScriptMgr->OnPVPKill(killerPlr, killedPlr);
+                sScriptMgr->OnPlayerPVPKill(killerPlr, killedPlr);
             else if (Creature* killedCre = victim->ToCreature())
-                sScriptMgr->OnCreatureKill(killerPlr, killedCre);
+                sScriptMgr->OnPlayerCreatureKill(killerPlr, killedCre);
         }
         else if (Creature* killerCre = killer->ToCreature())
         {
@@ -20380,7 +20399,7 @@ void Unit::PetSpellFail(SpellInfo const* spellInfo, Unit* target, uint32 result)
     if (!charmInfo || !IsCreature())
         return;
 
-    if ((DisableMgr::IsPathfindingEnabled(GetMap()) || result != SPELL_FAILED_LINE_OF_SIGHT) && target)
+    if ((sDisableMgr->IsPathfindingEnabled(GetMap()) || result != SPELL_FAILED_LINE_OF_SIGHT) && target)
     {
         if ((result == SPELL_FAILED_LINE_OF_SIGHT || result == SPELL_FAILED_OUT_OF_RANGE) || !ToCreature()->HasReactState(REACT_PASSIVE))
             if (Unit* owner = GetOwner())
@@ -20504,6 +20523,8 @@ void Unit::ExecuteDelayedUnitRelocationEvent()
                 active->m_last_notify_position.Relocate(active->GetPositionX(), active->GetPositionY(), active->GetPositionZ());
             }
         }
+
+        GetMap()->LoadGridsInRange(*player, MAX_VISIBILITY_DISTANCE);
 
         Acore::PlayerRelocationNotifier relocateNoLarge(*player, false); // visit only objects which are not large; default distance
         Cell::VisitAllObjects(viewPoint, relocateNoLarge, player->GetSightRange() + VISIBILITY_INC_FOR_GOBJECTS);
@@ -20933,16 +20954,12 @@ void Unit::PatchValuesUpdate(ByteBuffer& valuesUpdateBuf, BuildValuesCachePosPoi
                             break;
                         }
 
-            if (cinfo->flags_extra & CREATURE_FLAG_EXTRA_TRIGGER)
+            if (cinfo->HasFlagsExtra(CREATURE_FLAG_EXTRA_TRIGGER))
             {
                 if (target->IsGameMaster() && target->GetSession()->IsGMAccount())
-                {
                     displayId = cinfo->GetFirstVisibleModel()->CreatureDisplayID;
-                }
                 else
-                {
                     displayId = cinfo->GetFirstInvisibleModel()->CreatureDisplayID;
-                }
             }
         }
 
@@ -21289,6 +21306,12 @@ bool Unit::CanRestoreMana(SpellInfo const* spellInfo) const
     }
 
     return false;
+}
+
+void Unit::SetShapeshiftForm(ShapeshiftForm form)
+{
+    SetByteValue(UNIT_FIELD_BYTES_2, 3, form);
+    sScriptMgr->OnUnitSetShapeshiftForm((Unit*)this, form);
 }
 
 bool Unit::IsInDisallowedMountForm() const

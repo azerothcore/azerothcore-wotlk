@@ -145,15 +145,10 @@ public:
     struct boss_kelthuzadAI : public BossAI
     {
         explicit boss_kelthuzadAI(Creature* c) : BossAI(c, BOSS_KELTHUZAD), summons(me)
-        {
-            pInstance = me->GetInstanceScript();
-            _justSpawned = true;
-        }
+        {}
 
         EventMap events;
         SummonList summons;
-        InstanceScript* pInstance;
-        bool _justSpawned;
 
         float NormalizeOrientation(float o)
         {
@@ -224,35 +219,23 @@ public:
             summons.DespawnAll();
             me->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_DISABLE_MOVE);
             me->SetReactState(REACT_AGGRESSIVE);
-            if (GameObject* go = me->GetMap()->GetGameObject(pInstance->GetGuidData(DATA_KELTHUZAD_FLOOR)))
+            if (GameObject* go = instance->GetGameObject(DATA_KELTHUZAD_FLOOR))
             {
                 go->SetPhaseMask(1, true);
                 go->SetGoState(GO_STATE_READY);
             }
-            if (GameObject* go = me->GetMap()->GetGameObject(pInstance->GetGuidData(DATA_KELTHUZAD_GATE)))
-            {
-                if (!_justSpawned) // Don't open the door if we just spawned and are still doing the conversation
-                {
-                    go->SetGoState(GO_STATE_ACTIVE);
-                }
-            }
-            _justSpawned = false;
-            if (GameObject* go = me->GetMap()->GetGameObject(pInstance->GetGuidData(DATA_KELTHUZAD_PORTAL_1)))
-            {
+
+            if (GameObject* go = instance->GetGameObject(DATA_KELTHUZAD_PORTAL_1))
                 go->SetGoState(GO_STATE_READY);
-            }
-            if (GameObject* go = me->GetMap()->GetGameObject(pInstance->GetGuidData(DATA_KELTHUZAD_PORTAL_2)))
-            {
+
+            if (GameObject* go = instance->GetGameObject(DATA_KELTHUZAD_PORTAL_2))
                 go->SetGoState(GO_STATE_READY);
-            }
-            if (GameObject* go = me->GetMap()->GetGameObject(pInstance->GetGuidData(DATA_KELTHUZAD_PORTAL_3)))
-            {
+
+            if (GameObject* go = instance->GetGameObject(DATA_KELTHUZAD_PORTAL_3))
                 go->SetGoState(GO_STATE_READY);
-            }
-            if (GameObject* go = me->GetMap()->GetGameObject(pInstance->GetGuidData(DATA_KELTHUZAD_PORTAL_4)))
-            {
+
+            if (GameObject* go = instance->GetGameObject(DATA_KELTHUZAD_PORTAL_4))
                 go->SetGoState(GO_STATE_READY);
-            }
         }
 
         void EnterEvadeMode(EvadeReason why) override
@@ -267,10 +250,7 @@ public:
                 return;
 
             Talk(SAY_SLAY);
-            if (pInstance)
-            {
-                pInstance->SetData(DATA_IMMORTAL_FAIL, 0);
-            }
+            instance->StorePersistentData(PERSISTENT_DATA_IMMORTAL_FAIL, 1);
         }
 
         void JustDied(Unit*  killer) override
@@ -282,13 +262,6 @@ public:
                 guardian->AI()->Talk(EMOTE_GUARDIAN_FLEE);
             }
             Talk(SAY_DEATH);
-            if (pInstance)
-            {
-                if (GameObject* go = me->GetMap()->GetGameObject(pInstance->GetGuidData(DATA_KELTHUZAD_GATE)))
-                {
-                    go->SetGoState(GO_STATE_ACTIVE);
-                }
-            }
         }
 
         void MoveInLineOfSight(Unit* who) override
@@ -312,17 +285,11 @@ public:
             events.ScheduleEvent(EVENT_SUMMON_SOUL_WEAVER, 12s);
             events.ScheduleEvent(EVENT_PHASE_2, 228s);
             events.ScheduleEvent(EVENT_ENRAGE, 15min);
-            if (pInstance)
+
+            if (GameObject* go = instance->GetGameObject(DATA_KELTHUZAD_FLOOR))
             {
-                if (GameObject* go = me->GetMap()->GetGameObject(pInstance->GetGuidData(DATA_KELTHUZAD_FLOOR)))
-                {
-                    events.ScheduleEvent(EVENT_FLOOR_CHANGE, 15s);
-                    go->SetGoState(GO_STATE_ACTIVE);
-                }
-            }
-            if (GameObject* go = me->GetMap()->GetGameObject(pInstance->GetGuidData(DATA_KELTHUZAD_GATE)))
-            {
-                go->SetGoState(GO_STATE_READY);
+                events.ScheduleEvent(EVENT_FLOOR_CHANGE, 15s);
+                go->SetGoState(GO_STATE_ACTIVE);
             }
         }
 
@@ -354,14 +321,11 @@ public:
             switch (events.ExecuteEvent())
             {
                 case EVENT_FLOOR_CHANGE:
-                    if (pInstance)
+                    if (GameObject* go = instance->GetGameObject(DATA_KELTHUZAD_FLOOR))
                     {
-                        if (GameObject* go = me->GetMap()->GetGameObject(pInstance->GetGuidData(DATA_KELTHUZAD_FLOOR)))
-                        {
-                            events.ScheduleEvent(EVENT_FLOOR_CHANGE, 15s);
-                            go->SetGoState(GO_STATE_READY);
-                            go->SetPhaseMask(2, true);
-                        }
+                        events.ScheduleEvent(EVENT_FLOOR_CHANGE, 15s);
+                        go->SetGoState(GO_STATE_READY);
+                        go->SetPhaseMask(2, true);
                     }
                     break;
                 case EVENT_SPAWN_POOL:
@@ -465,39 +429,32 @@ public:
                         Talk(SAY_REQUEST_AID);
                         events.DelayEvents(5500ms);
                         events.ScheduleEvent(EVENT_P3_LICH_KING_SAY, 5s);
-                        if (GameObject* go = me->GetMap()->GetGameObject(pInstance->GetGuidData(DATA_KELTHUZAD_PORTAL_1)))
-                        {
+                        if (GameObject* go = instance->GetGameObject(DATA_KELTHUZAD_PORTAL_1))
                             go->SetGoState(GO_STATE_ACTIVE);
-                        }
-                        if (GameObject* go = me->GetMap()->GetGameObject(pInstance->GetGuidData(DATA_KELTHUZAD_PORTAL_2)))
-                        {
+
+                        if (GameObject* go = instance->GetGameObject(DATA_KELTHUZAD_PORTAL_2))
                             go->SetGoState(GO_STATE_ACTIVE);
-                        }
-                        if (GameObject* go = me->GetMap()->GetGameObject(pInstance->GetGuidData(DATA_KELTHUZAD_PORTAL_3)))
-                        {
+
+                        if (GameObject* go = instance->GetGameObject(DATA_KELTHUZAD_PORTAL_3))
                             go->SetGoState(GO_STATE_ACTIVE);
-                        }
-                        if (GameObject* go = me->GetMap()->GetGameObject(pInstance->GetGuidData(DATA_KELTHUZAD_PORTAL_4)))
-                        {
+
+                        if (GameObject* go = instance->GetGameObject(DATA_KELTHUZAD_PORTAL_4))
                             go->SetGoState(GO_STATE_ACTIVE);
-                        }
+
                         break;
                     }
                     events.Repeat(1s);
                     break;
                 case EVENT_P3_LICH_KING_SAY:
-                    if (pInstance)
-                    {
-                        if (Creature* cr = ObjectAccessor::GetCreature(*me, pInstance->GetGuidData(DATA_LICH_KING_BOSS)))
-                        {
-                            cr->AI()->Talk(SAY_ANSWER_REQUEST);
-                        }
-                    }
+                {
+                    if (Creature* cr = instance->GetCreature(DATA_LICH_KING_BOSS))
+                        cr->AI()->Talk(SAY_ANSWER_REQUEST);
+
                     for (uint8 i = 0 ; i < RAID_MODE(2, 4); ++i)
-                    {
                         events.ScheduleEvent(EVENT_SUMMON_GUARDIAN_OF_ICECROWN, 10000 + (i * 5000));
-                    }
+
                     break;
+                }
                 case EVENT_SUMMON_GUARDIAN_OF_ICECROWN:
                     if (Creature* cr = me->SummonCreature(NPC_GUARDIAN_OF_ICECROWN, SpawnPool[RAND(0, 1, 3, 4)]))
                     {
@@ -573,10 +530,8 @@ public:
 
         void JustDied(Unit* /*killer*/) override
         {
-            if (me->GetEntry() == NPC_UNSTOPPABLE_ABOMINATION && me->GetInstanceScript())
-            {
+            if (me->GetEntry() == NPC_UNSTOPPABLE_ABOMINATION)
                 me->GetInstanceScript()->SetData(DATA_ABOMINATION_KILLED, 0);
-            }
         }
 
         void AttackStart(Unit* who) override
@@ -618,10 +573,8 @@ public:
 
         void KilledUnit(Unit* who) override
         {
-            if (who->IsPlayer() && me->GetInstanceScript())
-            {
-                me->GetInstanceScript()->SetData(DATA_IMMORTAL_FAIL, 0);
-            }
+            if (who->IsPlayer())
+                me->GetInstanceScript()->StorePersistentData(PERSISTENT_DATA_IMMORTAL_FAIL, 1);
         }
 
         void JustReachedHome() override

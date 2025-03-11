@@ -44,16 +44,12 @@ enum DataTypes
     DATA_SATHROVARR                         = 10,
     DATA_KJ_CONTROLLER                      = 11,
     DATA_ANVEENA                            = 12,
-    DATA_KALECGOS_KJ                        = 13
-};
-
-enum DataTypesObjects
-{
-    DATA_ORB_OF_THE_BLUE_DRAGONFLIGHT_1     = 0,
-    DATA_ORB_OF_THE_BLUE_DRAGONFLIGHT_2     = 1,
-    DATA_ORB_OF_THE_BLUE_DRAGONFLIGHT_3     = 2,
-    DATA_ORB_OF_THE_BLUE_DRAGONFLIGHT_4     = 3,
-    DATA_ICEBARRIER                         = 4,
+    DATA_KALECGOS_KJ                        = 13,
+    DATA_ORB_OF_THE_BLUE_DRAGONFLIGHT_1     = 14,
+    DATA_ORB_OF_THE_BLUE_DRAGONFLIGHT_2     = 15,
+    DATA_ORB_OF_THE_BLUE_DRAGONFLIGHT_3     = 16,
+    DATA_ORB_OF_THE_BLUE_DRAGONFLIGHT_4     = 17,
+    DATA_ICEBARRIER                         = 18,
 };
 
 enum CreatureIds
@@ -108,7 +104,7 @@ enum GameObjectIds
 
 enum SpellIds
 {
-    SPELL_SUNWELL_RADIANCE                  = 45769,
+    SPELL_SUMMON_FELBLAZE                    = 45069 // Felblaze? Summons Felmyst
 };
 
 template <class AI, class T>

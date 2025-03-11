@@ -455,14 +455,14 @@ void PlayerMenu::SendQuestGiverQuestDetails(Quest const* quest, ObjectGuid npcGU
 
         uint32 moneyRew = 0;
         Player* player = _session->GetPlayer();
-        if (player && (player->GetLevel() >= sWorld->getIntConfig(CONFIG_MAX_PLAYER_LEVEL) || sScriptMgr->ShouldBeRewardedWithMoneyInsteadOfExp(player)))
+        if (player && (player->GetLevel() >= sWorld->getIntConfig(CONFIG_MAX_PLAYER_LEVEL) || sScriptMgr->OnPlayerShouldBeRewardedWithMoneyInsteadOfExp(player)))
         {
             moneyRew = quest->GetRewMoneyMaxLevel();
         }
         moneyRew += quest->GetRewOrReqMoney(player ? player->GetLevel() : 0); // reward money (below max lvl)
         data << moneyRew;
         uint32 questXp;
-        if (player && !sScriptMgr->ShouldBeRewardedWithMoneyInsteadOfExp(player))
+        if (player && !sScriptMgr->OnPlayerShouldBeRewardedWithMoneyInsteadOfExp(player))
         {
             questXp = player->CalculateQuestRewardXP(quest);
         }
@@ -470,7 +470,7 @@ void PlayerMenu::SendQuestGiverQuestDetails(Quest const* quest, ObjectGuid npcGU
         {
             questXp = 0;
         }
-        sScriptMgr->OnQuestComputeXP(player, quest, questXp);
+        sScriptMgr->OnPlayerQuestComputeXP(player, quest, questXp);
         data << questXp;
     }
 
@@ -555,7 +555,7 @@ void PlayerMenu::SendQuestQueryResponse(Quest const* quest) const
     {
         uint32 moneyRew = 0;
         Player* player = _session->GetPlayer();
-        if (player && (player->GetLevel() >= sWorld->getIntConfig(CONFIG_MAX_PLAYER_LEVEL) || sScriptMgr->ShouldBeRewardedWithMoneyInsteadOfExp(player)))
+        if (player && (player->GetLevel() >= sWorld->getIntConfig(CONFIG_MAX_PLAYER_LEVEL) || sScriptMgr->OnPlayerShouldBeRewardedWithMoneyInsteadOfExp(player)))
         {
             moneyRew = quest->GetRewMoneyMaxLevel();
         }
@@ -707,14 +707,14 @@ void PlayerMenu::SendQuestGiverOfferReward(Quest const* quest, ObjectGuid npcGUI
 
     uint32 moneyRew = 0;
     Player* player = _session->GetPlayer();
-    if (player && (player->GetLevel() >= sWorld->getIntConfig(CONFIG_MAX_PLAYER_LEVEL) || sScriptMgr->ShouldBeRewardedWithMoneyInsteadOfExp(player)))
+    if (player && (player->GetLevel() >= sWorld->getIntConfig(CONFIG_MAX_PLAYER_LEVEL) || sScriptMgr->OnPlayerShouldBeRewardedWithMoneyInsteadOfExp(player)))
     {
         moneyRew = quest->GetRewMoneyMaxLevel();
     }
     moneyRew += quest->GetRewOrReqMoney(player ? player->GetLevel() : 0); // reward money (below max lvl)
     data << moneyRew;
     uint32 questXp;
-    if (player && !sScriptMgr->ShouldBeRewardedWithMoneyInsteadOfExp(player))
+    if (player && !sScriptMgr->OnPlayerShouldBeRewardedWithMoneyInsteadOfExp(player))
     {
         questXp = player->CalculateQuestRewardXP(quest);
     }
@@ -722,7 +722,7 @@ void PlayerMenu::SendQuestGiverOfferReward(Quest const* quest, ObjectGuid npcGUI
     {
         questXp = 0;
     }
-    sScriptMgr->OnQuestComputeXP(player, quest, questXp);
+    sScriptMgr->OnPlayerQuestComputeXP(player, quest, questXp);
     data << questXp;
 
     // rewarded honor points. Multiply with 10 to satisfy client
