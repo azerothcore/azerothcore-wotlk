@@ -1,3 +1,4 @@
+-- DB update 2025_03_11_00 -> 2025_03_11_01
 
 -- Add RLT for Pendants
 DELETE FROM `reference_loot_template` WHERE (`Entry`= 34081) AND (`Item` IN (35292, 35291, 35290));
