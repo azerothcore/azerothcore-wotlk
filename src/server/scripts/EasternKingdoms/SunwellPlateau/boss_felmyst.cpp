@@ -396,11 +396,14 @@ struct npc_demonic_vapor_trail : public NullCreatureAI
         me->CastSpell(me, SPELL_DEMONIC_VAPOR_TRAIL_PERIODIC, true);
     }
 
+    // Script Deactivated. Doesn't work as intended.
+    /*
     void SpellHitTarget(Unit*, SpellInfo const* spellInfo) override
     {
         if (spellInfo->Id == SPELL_DEMONIC_VAPOR)
             me->CastSpell(me, SPELL_SUMMON_BLAZING_DEAD, true);
     }
+    */
 
     void UpdateAI(uint32 diff) override
     {
