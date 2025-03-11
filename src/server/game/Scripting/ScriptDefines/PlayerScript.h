@@ -802,7 +802,7 @@ public:
      * @param vendorGuid Guid of the vendor player is interacting with
      * @param vendorEntry Entry of the vendor player is interacting with
      */
-    virtual void OnPlayerSendListInventory(Player* /*player*/, ObjectGuid /*vendorGuid*/, uint32 /*vendorEntry*/) {}
+    virtual void OnPlayerSendListInventory(Player* /*player*/, ObjectGuid /*vendorGuid*/, uint32& /*vendorEntry*/) {}
 };
 
 #endif
