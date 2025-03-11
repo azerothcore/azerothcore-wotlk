@@ -6,7 +6,9 @@
 #include "AuctionHouseBotCommon.h"
 #include "AuctionHouseBotMailScript.h"
 
-AHBot_MailScript::AHBot_MailScript() : MailScript("AHBot_MailScript")
+AHBot_MailScript::AHBot_MailScript() : MailScript("AHBot_MailScript", {
+    MAILHOOK_ON_BEFORE_MAIL_DRAFT_SEND_MAIL_TO
+})
 {
 
 }

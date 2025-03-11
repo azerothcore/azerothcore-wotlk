@@ -244,8 +244,11 @@ void AuctionHouseBot::Buy(Player* AHBplayer, AHBConfig* config, WorldSession* se
         LOG_INFO("module", "AHBot [{}]: Considering {} auctions per interval to bid on.", _id, config->GetBidsPerInterval());
     }
 
-    for (uint32 count = 1; count <= config->GetBidsPerInterval(); ++count)
-    {
+    for (
+        uint32 count = 1;
+        count <= config->GetBidsPerInterval() && !auctionsGuidsToConsider.empty();
+        ++count
+    ) {
         //
         // Choose a random auction from possible auctions
         //
@@ -458,7 +461,7 @@ void AuctionHouseBot::Buy(Player* AHBplayer, AHBConfig* config, WorldSession* se
             //
             // update/save the auction into database
             //
-            //CharacterDatabase.DirectExecute("UPDATE auctionhouse SET buyguid = '{}', lastbid = '{}' WHERE id = '{}'", auction->bidder.GetCounter(), auction->bid, auction->Id);
+            CharacterDatabase.Execute("UPDATE auctionhouse SET buyguid = '{}', lastbid = '{}' WHERE id = '{}'", auction->bidder.GetCounter(), auction->bid, auction->Id);
 
             if (config->TraceBuyer)
             {
