@@ -80,21 +80,20 @@ struct npc_forest_frog : public ScriptedAI
             me->DespawnOrUnsummon(1000);
     }
 
-    Player* PlayerCaster() { return ObjectAccessor::GetPlayer(me->GetMap(), PlayerGUID); }
-
     void UpdateAI(uint32 diff) override
     {
         events.Update(diff);
         if (eventTimer)
         {
+            Player* player = ObjectAccessor::GetPlayer(me->GetMap(), PlayerGUID);
             switch (events.ExecuteEvent())
             {
             case 1:
 
                 if (me->GetEntry() == NPC_ADARRAH)
-                    Talk(SAY_THANKS_FREED + 1, PlayerCaster());
+                    Talk(SAY_THANKS_FREED + 1, player);
                 else
-                    Talk(SAY_THANKS_FREED, PlayerCaster());
+                    Talk(SAY_THANKS_FREED, player);
 
                 eventTimer = 2;
                 events.ScheduleEvent(eventTimer, urand(4000, 5000));
@@ -109,28 +108,28 @@ struct npc_forest_frog : public ScriptedAI
                 case NPC_DEEZ:
                 case NPC_GALATHRYN:
                     DoCastSelf(SPELL_SUMMON_AMANI_CHARM_CHEST_2, true);
-                    Talk(SAY_CHEST_SPAWN, PlayerCaster());
+                    Talk(SAY_CHEST_SPAWN, player);
                     break;
                 case NPC_ADARRAH:
                     DoCastSelf(SPELL_SUMMON_AMANI_CHARM_CHEST_2, true);
-                    Talk(SAY_CHEST_SPAWN + 1, PlayerCaster());
+                    Talk(SAY_CHEST_SPAWN + 1, player);
                     break;
                 case NPC_DARWEN:
                 case NPC_FUDGERICK:
                     DoCastSelf(SPELL_SUMMON_MONEY_BAG, true);
                     me->LoadEquipment(0, true);
-                    Talk(SAY_CHEST_SPAWN, PlayerCaster());
+                    Talk(SAY_CHEST_SPAWN, player);
                     break;
                 case NPC_KYREN:
                 case NPC_GUNTER:
-                    Talk(SAY_CHEST_SPAWN, PlayerCaster());
+                    Talk(SAY_CHEST_SPAWN, player);
                     break;
                 case NPC_MITZI:
                 case NPC_CHRISTIAN:
                 case NPC_BRENNAN:
                 case NPC_HOLLEE:
                     DoCastSelf(SPELL_SUMMON_AMANI_CHARM_CHEST_1, true);
-                    Talk(SAY_CHEST_SPAWN, PlayerCaster());
+                    Talk(SAY_CHEST_SPAWN, player);
                     break;
                 }
                 eventTimer = 3;
@@ -140,9 +139,9 @@ struct npc_forest_frog : public ScriptedAI
                 me->SetStandState(EMOTE_ONESHOT_NONE);
 
                 if (me->GetEntry() == NPC_ADARRAH)
-                    Talk(SAY_CHEST_TALK + 1, PlayerCaster());
+                    Talk(SAY_CHEST_TALK + 1, player);
                 else
-                    Talk(SAY_CHEST_TALK, PlayerCaster());
+                    Talk(SAY_CHEST_TALK, player);
 
                 eventTimer = 4;
                 if (me->GetEntry() == NPC_GUNTER || me->GetEntry() == NPC_KYREN)
@@ -154,9 +153,9 @@ struct npc_forest_frog : public ScriptedAI
                 me->HandleEmoteCommand(EMOTE_ONESHOT_WAVE);
 
                 if (me->GetEntry() == NPC_ADARRAH)
-                    Talk(SAY_GOODBYE + 1, PlayerCaster());
+                    Talk(SAY_GOODBYE + 1, player);
                 else
-                    Talk(SAY_GOODBYE, PlayerCaster());
+                    Talk(SAY_GOODBYE, player);
 
                 eventTimer = 5;
                 events.ScheduleEvent(eventTimer, 2000);
@@ -203,7 +202,7 @@ struct npc_forest_frog : public ScriptedAI
 
         me->UpdateEntry(cEntry);
 
-        if (Player* player = PlayerCaster())
+        if (Player* player = ObjectAccessor::GetPlayer(me->GetMap(), PlayerGUID))
             me->SetFacingToObject(player);
     }
 
