@@ -140,30 +140,19 @@ public:
     }
 };
 
-class spell_uldaman_sub_boss_agro_keepers : public SpellScriptLoader
+class spell_uldaman_sub_boss_agro_keepers : public SpellScript
 {
-public:
-    spell_uldaman_sub_boss_agro_keepers() : SpellScriptLoader("spell_uldaman_sub_boss_agro_keepers") { }
+    PrepareSpellScript(spell_uldaman_sub_boss_agro_keepers);
 
-    class spell_uldaman_sub_boss_agro_keepers_SpellScript : public SpellScript
+    void HandleSendEvent(SpellEffIndex  /*effIndex*/)
     {
-        PrepareSpellScript(spell_uldaman_sub_boss_agro_keepers_SpellScript);
+        if (Creature* keeper = GetCaster()->FindNearestCreature(NPC_STONE_KEEPER, 100.0f, true))
+            keeper->AI()->SetData(1, 1);
+    }
 
-        void HandleSendEvent(SpellEffIndex  /*effIndex*/)
-        {
-            if (Creature* keeper = GetCaster()->FindNearestCreature(NPC_STONE_KEEPER, 100.0f, true))
-                keeper->AI()->SetData(1, 1);
-        }
-
-        void Register() override
-        {
-            OnEffectLaunch += SpellEffectFn(spell_uldaman_sub_boss_agro_keepers_SpellScript::HandleSendEvent, EFFECT_0, SPELL_EFFECT_SEND_EVENT);
-        }
-    };
-
-    SpellScript* GetSpellScript() const override
+    void Register() override
     {
-        return new spell_uldaman_sub_boss_agro_keepers_SpellScript();
+        OnEffectLaunch += SpellEffectFn(spell_uldaman_sub_boss_agro_keepers::HandleSendEvent, EFFECT_0, SPELL_EFFECT_SEND_EVENT);
     }
 };
 
@@ -172,84 +161,62 @@ enum UldamanStonedEnum
     MAP_ULDAMAN = 70
 };
 
-class spell_uldaman_stoned : public SpellScriptLoader
+class spell_uldaman_stoned_aura : public AuraScript
 {
-public:
-    spell_uldaman_stoned() : SpellScriptLoader("spell_uldaman_stoned") { }
+    PrepareAuraScript(spell_uldaman_stoned_aura);
 
-    class spell_uldaman_stoned_AuraScript : public AuraScript
+    bool Load() override
     {
-        PrepareAuraScript(spell_uldaman_stoned_AuraScript);
+        return GetUnitOwner()->IsCreature() && GetUnitOwner()->GetMapId() == MAP_ULDAMAN;
+    }
 
-        bool Load() override
-        {
-            return GetUnitOwner()->IsCreature() && GetUnitOwner()->GetMapId() == MAP_ULDAMAN;
-        }
-
-        void HandleEffectApply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
-        {
-            Creature* target = GetUnitOwner()->ToCreature();
-            target->SetReactState(REACT_PASSIVE);
-            target->SetImmuneToAll(true);
-        }
-
-        void HandleEffectRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
-        {
-            Creature* target = GetUnitOwner()->ToCreature();
-            target->SetReactState(REACT_AGGRESSIVE);
-            target->SetImmuneToAll(false);
-        }
-
-        void Register() override
-        {
-            OnEffectApply += AuraEffectApplyFn(spell_uldaman_stoned_AuraScript::HandleEffectApply, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
-            OnEffectRemove += AuraEffectRemoveFn(spell_uldaman_stoned_AuraScript::HandleEffectRemove, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
-        }
-    };
-
-    AuraScript* GetAuraScript() const override
+    void HandleEffectApply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
     {
-        return new spell_uldaman_stoned_AuraScript();
+        Creature* target = GetUnitOwner()->ToCreature();
+        target->SetReactState(REACT_PASSIVE);
+        target->SetImmuneToAll(true);
+    }
+
+    void HandleEffectRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
+    {
+        Creature* target = GetUnitOwner()->ToCreature();
+        target->SetReactState(REACT_AGGRESSIVE);
+        target->SetImmuneToAll(false);
+    }
+
+    void Register() override
+    {
+        OnEffectApply += AuraEffectApplyFn(spell_uldaman_stoned_aura::HandleEffectApply, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
+        OnEffectRemove += AuraEffectRemoveFn(spell_uldaman_stoned_aura::HandleEffectRemove, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
     }
 };
 
-class spell_uldaman_boss_agro_archaedas : public SpellScriptLoader
+class spell_uldaman_boss_agro_archaedas : public SpellScript
 {
-public:
-    spell_uldaman_boss_agro_archaedas() : SpellScriptLoader("spell_uldaman_boss_agro_archaedas") { }
+    PrepareSpellScript(spell_uldaman_boss_agro_archaedas);
 
-    class spell_uldaman_boss_agro_archaedas_SpellScript : public SpellScript
+    void HandleSendEvent(SpellEffIndex  /*effIndex*/)
     {
-        PrepareSpellScript(spell_uldaman_boss_agro_archaedas_SpellScript);
+        InstanceScript* instance = GetCaster()->GetInstanceScript();
 
-        void HandleSendEvent(SpellEffIndex  /*effIndex*/)
-        {
-            InstanceScript* instance = GetCaster()->GetInstanceScript();
+        if (!instance || instance->GetData(DATA_ARCHAEDAS) == IN_PROGRESS || instance->GetData(DATA_ARCHAEDAS) == DONE)
+            return;
 
-            if (!instance || instance->GetData(DATA_ARCHAEDAS) == IN_PROGRESS || instance->GetData(DATA_ARCHAEDAS) == DONE)
-                return;
+        instance->SetData(DATA_ARCHAEDAS, IN_PROGRESS);
+        if (Creature* archaedas = GetCaster()->FindNearestCreature(NPC_ARCHAEDAS, 100.0f, true))
+            archaedas->AI()->SetData(1, 1);
+    }
 
-            instance->SetData(DATA_ARCHAEDAS, IN_PROGRESS);
-            if (Creature* archaedas = GetCaster()->FindNearestCreature(NPC_ARCHAEDAS, 100.0f, true))
-                archaedas->AI()->SetData(1, 1);
-        }
-
-        void Register() override
-        {
-            OnEffectLaunch += SpellEffectFn(spell_uldaman_boss_agro_archaedas_SpellScript::HandleSendEvent, EFFECT_0, SPELL_EFFECT_SEND_EVENT);
-        }
-    };
-
-    SpellScript* GetSpellScript() const override
+    void Register() override
     {
-        return new spell_uldaman_boss_agro_archaedas_SpellScript();
+        OnEffectLaunch += SpellEffectFn(spell_uldaman_boss_agro_archaedas::HandleSendEvent, EFFECT_0, SPELL_EFFECT_SEND_EVENT);
     }
 };
 
 void AddSC_instance_uldaman()
 {
     new instance_uldaman();
-    new spell_uldaman_sub_boss_agro_keepers();
-    new spell_uldaman_stoned();
-    new spell_uldaman_boss_agro_archaedas();
+    RegisterSpellScript(spell_uldaman_sub_boss_agro_keepers);
+    RegisterSpellScript(spell_uldaman_stoned_aura);
+    RegisterSpellScript(spell_uldaman_boss_agro_archaedas);
 }

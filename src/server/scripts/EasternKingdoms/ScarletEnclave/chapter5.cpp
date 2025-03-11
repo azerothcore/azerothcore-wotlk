@@ -1177,75 +1177,53 @@ public:
     };
 };
 
-class spell_chapter5_light_of_dawn_aura : public SpellScriptLoader
+class spell_chapter5_light_of_dawn_aura : public AuraScript
 {
-public:
-    spell_chapter5_light_of_dawn_aura() : SpellScriptLoader("spell_chapter5_light_of_dawn_aura") { }
+    PrepareAuraScript(spell_chapter5_light_of_dawn_aura);
 
-    class spell_chapter5_light_of_dawn_aura_AuraScript : public AuraScript
+    void OnApply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
     {
-        PrepareAuraScript(spell_chapter5_light_of_dawn_aura_AuraScript);
+        GetUnitOwner()->Dismount();
+        GetUnitOwner()->SetCanFly(true);
+        GetUnitOwner()->SetDisableGravity(true);
+        GetUnitOwner()->AddUnitMovementFlag(MOVEMENTFLAG_FLYING);
+    }
 
-        void OnApply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
-        {
-            GetUnitOwner()->Dismount();
-            GetUnitOwner()->SetCanFly(true);
-            GetUnitOwner()->SetDisableGravity(true);
-            GetUnitOwner()->AddUnitMovementFlag(MOVEMENTFLAG_FLYING);
-        }
-
-        void OnRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
-        {
-            GetUnitOwner()->SetCanFly(false);
-            GetUnitOwner()->SetDisableGravity(false);
-            GetUnitOwner()->RemoveUnitMovementFlag(MOVEMENTFLAG_FLYING);
-            GetUnitOwner()->GetMotionMaster()->MoveFall();
-        }
-
-        void Register() override
-        {
-            OnEffectApply += AuraEffectApplyFn(spell_chapter5_light_of_dawn_aura_AuraScript::OnApply, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
-            OnEffectRemove += AuraEffectRemoveFn(spell_chapter5_light_of_dawn_aura_AuraScript::OnRemove, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
-        }
-    };
-
-    AuraScript* GetAuraScript() const override
+    void OnRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
     {
-        return new spell_chapter5_light_of_dawn_aura_AuraScript();
+        GetUnitOwner()->SetCanFly(false);
+        GetUnitOwner()->SetDisableGravity(false);
+        GetUnitOwner()->RemoveUnitMovementFlag(MOVEMENTFLAG_FLYING);
+        GetUnitOwner()->GetMotionMaster()->MoveFall();
+    }
+
+    void Register() override
+    {
+        OnEffectApply += AuraEffectApplyFn(spell_chapter5_light_of_dawn_aura::OnApply, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
+        OnEffectRemove += AuraEffectRemoveFn(spell_chapter5_light_of_dawn_aura::OnRemove, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
     }
 };
 
-class spell_chapter5_rebuke : public SpellScriptLoader
+class spell_chapter5_rebuke : public SpellScript
 {
-public:
-    spell_chapter5_rebuke() : SpellScriptLoader("spell_chapter5_rebuke") { }
+    PrepareSpellScript(spell_chapter5_rebuke);
 
-    class spell_chapter5_rebuke_SpellScript : public SpellScript
+    void HandleLeapBack(SpellEffIndex effIndex)
     {
-        PrepareSpellScript(spell_chapter5_rebuke_SpellScript);
+        PreventHitEffect(effIndex);
+        if (Unit* unitTarget = GetHitUnit())
+            unitTarget->KnockbackFrom(2282.86f, -5263.45f, 40.0f, 8.0f);
+    }
 
-        void HandleLeapBack(SpellEffIndex effIndex)
-        {
-            PreventHitEffect(effIndex);
-            if (Unit* unitTarget = GetHitUnit())
-                unitTarget->KnockbackFrom(2282.86f, -5263.45f, 40.0f, 8.0f);
-        }
-
-        void Register() override
-        {
-            OnEffectLaunchTarget += SpellEffectFn(spell_chapter5_rebuke_SpellScript::HandleLeapBack, EFFECT_0, SPELL_EFFECT_LEAP_BACK);
-        }
-    };
-
-    SpellScript* GetSpellScript() const override
+    void Register() override
     {
-        return new spell_chapter5_rebuke_SpellScript();
+        OnEffectLaunchTarget += SpellEffectFn(spell_chapter5_rebuke::HandleLeapBack, EFFECT_0, SPELL_EFFECT_LEAP_BACK);
     }
 };
 
 void AddSC_the_scarlet_enclave_c5()
 {
     new npc_highlord_darion_mograine();
-    new spell_chapter5_light_of_dawn_aura();
-    new spell_chapter5_rebuke();
+    RegisterSpellScript(spell_chapter5_light_of_dawn_aura);
+    RegisterSpellScript(spell_chapter5_rebuke);
 }

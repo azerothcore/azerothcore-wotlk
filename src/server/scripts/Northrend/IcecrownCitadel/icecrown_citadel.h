@@ -21,14 +21,9 @@
 #include "Chat.h"
 #include "Creature.h"
 #include "CreatureScript.h"
-#include "InstanceScript.h"
-#include "Map.h"
-#include "PassiveAI.h"
 #include "Player.h"
 #include "ScriptedCreature.h"
-#include "SpellAuraEffects.h"
 #include "SpellScript.h"
-#include "SpellScriptLoader.h"
 
 #define DataHeader "IC"
 

@@ -32,6 +32,7 @@
 #include "Timer.h"
 #include "Transport.h"
 #include "World.h"
+#include "WorldSessionMgr.h"
 
 uint16 InstanceSaveMgr::ResetTimeDelay[] = {3600, 900, 300, 60, 0};
 PlayerBindStorage InstanceSaveMgr::playerBindStorage;
@@ -494,7 +495,9 @@ void InstanceSaveMgr::Update()
     {
         LOG_INFO("instance.save", "Instance ID reset occurred, sending updated calendar and raid info to all players!");
         WorldPacket dummy;
-        for (SessionMap::const_iterator itr = sWorld->GetAllSessions().begin(); itr != sWorld->GetAllSessions().end(); ++itr)
+
+        WorldSessionMgr::SessionMap const& sessionMap = sWorldSessionMgr->GetAllSessions();
+        for (WorldSessionMgr::SessionMap::const_iterator itr = sessionMap.begin(); itr != sessionMap.end(); ++itr)
             if (Player* plr = itr->second->GetPlayer())
             {
                 itr->second->HandleCalendarGetCalendar(dummy);

@@ -484,7 +484,7 @@ Unit* PetAI::SelectNextTarget(bool allowAutoSelect) const
             return myAttacker;
 
     // Check pet's attackers first to prevent dragging mobs back to owner
-    if (me->HasAuraType(SPELL_AURA_MOD_TAUNT))
+    if (me->HasTauntAura())
     {
         const Unit::AuraEffectList& tauntAuras = me->GetAuraEffectsByType(SPELL_AURA_MOD_TAUNT);
         if (!tauntAuras.empty())

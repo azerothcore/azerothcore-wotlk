@@ -15,12 +15,11 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef ACORE_DISABLEMGR_H
-#define ACORE_DISABLEMGR_H
+#ifndef _DISABLEMGR_H
+#define _DISABLEMGR_H
 
 #include "Define.h"
 #include "Map.h"
-#include "VMapMgr2.h"
 
 class Unit;
 
@@ -36,7 +35,8 @@ enum DisableType
     DISABLE_TYPE_GO_LOS                 = 7,
     DISABLE_TYPE_LFG_MAP                = 8,
     DISABLE_TYPE_GAME_EVENT             = 9,
-    DISABLE_TYPE_LOOT                   = 10
+    DISABLE_TYPE_LOOT                   = 10,
+    MAX_DISABLE_TYPES
 };
 
 enum SpellDisableTypes
@@ -48,18 +48,43 @@ enum SpellDisableTypes
     SPELL_DISABLE_MAP               = 0x10,
     SPELL_DISABLE_AREA              = 0x20,
     SPELL_DISABLE_LOS               = 0x40,
-    MAX_SPELL_DISABLE_TYPE = (  SPELL_DISABLE_PLAYER | SPELL_DISABLE_CREATURE | SPELL_DISABLE_PET |
-                                SPELL_DISABLE_DEPRECATED_SPELL | SPELL_DISABLE_MAP | SPELL_DISABLE_AREA |
-                                SPELL_DISABLE_LOS)
+    MAX_SPELL_DISABLE_TYPE          = (SPELL_DISABLE_PLAYER | SPELL_DISABLE_CREATURE | SPELL_DISABLE_PET |
+                                       SPELL_DISABLE_DEPRECATED_SPELL | SPELL_DISABLE_MAP | SPELL_DISABLE_AREA |
+                                       SPELL_DISABLE_LOS)
 };
 
-namespace DisableMgr
+struct DisableData
 {
-    void LoadDisables();
-    bool IsDisabledFor(DisableType type, uint32 entry, Unit const* unit, uint8 flags = 0);
-    void CheckQuestDisables();
-    bool IsVMAPDisabledFor(uint32 entry, uint8 flags);
-    bool IsPathfindingEnabled(const Map* map);
-}
+    uint8 flags;
+    std::set<uint32> params[2];                             // params0, params1
+};
 
-#endif //ACORE_DISABLEMGR_H
+class DisableMgr
+{
+private:
+    DisableMgr();
+    ~DisableMgr();
+
+public:
+    static DisableMgr* instance();
+
+    void LoadDisables();
+    void AddDisable(DisableType type, uint32 entry, uint8 flags, std::string const& param0, std::string const& param1);
+    bool HandleDisableType(DisableType type, uint32 entry, uint8 flags, std::string const& params_0, std::string const& params_1, DisableData& data);
+    static bool IsDisabledFor(DisableType type, uint32 entry, Unit const* unit, uint8 flags = 0);
+    void CheckQuestDisables();
+    static bool IsVMAPDisabledFor(uint32 entry, uint8 flags);
+    static bool IsPathfindingEnabled(Map const* map);
+
+    // single disables here with optional data
+    typedef std::unordered_map<uint32, DisableData> DisableTypeMap;
+    // global disable map by source
+    typedef std::array<DisableTypeMap, MAX_DISABLE_TYPES> DisableMap;
+
+private:
+    static DisableMap m_DisableMap;
+};
+
+#define sDisableMgr DisableMgr::instance()
+
+#endif //_DISABLEMGR_H

@@ -83,7 +83,9 @@ enum LocaleConstant
 
 AC_COMMON_API extern char const* localeNames[TOTAL_LOCALES];
 
+AC_COMMON_API bool IsLocaleValid(std::string const& locale);
 AC_COMMON_API LocaleConstant GetLocaleByName(const std::string& name);
+AC_COMMON_API const std::string GetNameByLocaleConstant(LocaleConstant localeConstant);
 AC_COMMON_API void CleanStringForMysqlQuery(std::string& str);
 
 #define MAX_QUERY_LEN 32*1024

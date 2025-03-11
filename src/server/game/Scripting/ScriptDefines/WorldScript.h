@@ -18,6 +18,7 @@
 #ifndef SCRIPT_OBJECT_WORLD_SCRIPT_H_
 #define SCRIPT_OBJECT_WORLD_SCRIPT_H_
 
+#include "Common.h"
 #include "ScriptObject.h"
 #include <vector>
 
@@ -58,7 +59,7 @@ public:
     virtual void OnBeforeConfigLoad(bool /*reload*/) { }
 
     // Called before the message of the day is changed.
-    virtual void OnMotdChange(std::string& /*newMotd*/) { }
+    virtual void OnMotdChange(std::string& /*newMotd*/, LocaleConstant& /*locale*/) { }
 
     // Called when a world shutdown is initiated.
     virtual void OnShutdownInitiate(ShutdownExitCode /*code*/, ShutdownMask /*mask*/) { }

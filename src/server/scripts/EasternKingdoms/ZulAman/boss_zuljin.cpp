@@ -15,29 +15,27 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-/* ScriptData
-SDName: Boss_ZulJin
-SD%Complete: 85%
-SDComment:
-EndScriptData */
-
+#include "CreatureGroups.h"
 #include "CreatureScript.h"
+#include "Player.h"
 #include "ScriptedCreature.h"
 #include "SpellInfo.h"
+#include "SpellScript.h"
+#include "SpellScriptLoader.h"
 #include "zulaman.h"
 
 enum Says
 {
-    YELL_INTRO                    = 0,
-    YELL_AGGRO                    = 1,
-    YELL_TRANSFORM_TO_BEAR        = 2,
-    YELL_TRANSFORM_TO_EAGLE       = 3,
-    YELL_TRANSFORM_TO_LYNX        = 4,
-    YELL_TRANSFORM_TO_DRAGONHAWK  = 5,
-    YELL_FIRE_BREATH              = 6,
-    YELL_BERSERK                  = 7,
-    YELL_KILL                     = 8,
-    YELL_DEATH                    = 9
+    SAY_INTRO                    = 0,
+    SAY_AGGRO                    = 1,
+    SAY_TRANSFORM_TO_BEAR        = 2,
+    SAY_TRANSFORM_TO_EAGLE       = 3,
+    SAY_TRANSFORM_TO_LYNX        = 4,
+    SAY_TRANSFORM_TO_DRAGONHAWK  = 5,
+    SAY_FIRE_BREATH              = 6,
+    SAY_BERSERK                  = 7,
+    SAY_KILL                     = 8,
+    SAY_DEATH                    = 9
 };
 
 enum Spells
@@ -57,8 +55,8 @@ enum Spells
     SPELL_CYCLONE_VISUAL          = 43119, // trigger 43147 visual
     SPELL_CYCLONE_PASSIVE         = 43120, // trigger 43121 (4y aoe) every second
     // Lynx Form
-    SPELL_CLAW_RAGE_HASTE         = 42583,
-    SPELL_CLAW_RAGE_TRIGGER       = 43149,
+    SPELL_CLAW_RAGE_CHARGE        = 42583,
+    SPELL_CLAW_RAGE_AURA          = 43149,
     SPELL_CLAW_RAGE_DAMAGE        = 43150,
     SPELL_LYNX_RUSH_HASTE         = 43152,
     SPELL_LYNX_RUSH_DAMAGE        = 43153,
@@ -70,7 +68,7 @@ enum Spells
     SPELL_PILLAR_TRIGGER          = 43218, // trigger 43217
     // Cosmetic
     SPELL_SPIRIT_AURA             = 42466,
-    SPELL_SIPHON_SOUL             = 43501,
+    SPELL_SPIRIT_DRAIN            = 42542,
     // Transforms:
     SPELL_SHAPE_OF_THE_BEAR       = 42594, // 15% dmg
     SPELL_SHAPE_OF_THE_EAGLE      = 42606,
@@ -89,521 +87,382 @@ enum Phase
     PHASE_TROLL                   = 4
 };
 
-//coords for going for changing form
-#define CENTER_X 120.148811f
-#define CENTER_Y 703.713684f
-#define CENTER_Z 45.111477f
+enum Misc
+{
+    GUID_CHARGE_TARGET            = 0,
+    GROUP_LYNX                    = 1,
+    POINT_CENTER                  = 0
+};
+
+enum CreatureEntries
+{
+    NPC_SPIRIT_BEAR       = 23878,
+    NPC_SPIRIT_EAGLE      = 23880,
+    NPC_SPIRIT_LYNX_ZJ    = 23877,
+    NPC_SPIRIT_DRAGONHAWK = 23879
+};
+
+const Position CenterPosition = { 120.148811f, 703.713684f, 45.111477f };
 
 struct SpiritInfoStruct
 {
     uint32 entry;
-    float x, y, z, orient;
+    Position pos;
 };
 
 static SpiritInfoStruct SpiritInfo[4] =
 {
-    {23878, 147.87f, 706.51f, 45.11f, 3.04f},
-    {23880, 88.95f, 705.49f, 45.11f, 6.11f},
-    {23877, 137.23f, 725.98f, 45.11f, 3.71f},
-    {23879, 104.29f, 726.43f, 45.11f, 5.43f}
+    { NPC_SPIRIT_LYNX_ZJ,    { 147.87f, 706.51f, 45.11f, 3.04f } },
+    { NPC_SPIRIT_DRAGONHAWK, { 88.95f,  705.49f, 45.11f, 6.11f } },
+    { NPC_SPIRIT_BEAR,       { 137.23f, 725.98f, 45.11f, 3.71f } },
+    { NPC_SPIRIT_EAGLE,      { 104.29f, 726.43f, 45.11f, 5.43f } }
 };
 
 struct TransformStruct
 {
     uint8  text;
-    uint32 spell, unaura;
+    uint32 spell;
+    uint32 unaura;
+    uint32 spiritEntry;
 };
 
 static TransformStruct Transform[4] =
 {
-    {YELL_TRANSFORM_TO_BEAR, SPELL_SHAPE_OF_THE_BEAR, SPELL_WHIRLWIND},
-    {YELL_TRANSFORM_TO_EAGLE, SPELL_SHAPE_OF_THE_EAGLE, SPELL_SHAPE_OF_THE_BEAR},
-    {YELL_TRANSFORM_TO_LYNX, SPELL_SHAPE_OF_THE_LYNX, SPELL_SHAPE_OF_THE_EAGLE},
-    {YELL_TRANSFORM_TO_DRAGONHAWK, SPELL_SHAPE_OF_THE_DRAGONHAWK, SPELL_SHAPE_OF_THE_LYNX}
+    { SAY_TRANSFORM_TO_BEAR,       SPELL_SHAPE_OF_THE_BEAR,       SPELL_WHIRLWIND,          NPC_SPIRIT_BEAR       },
+    { SAY_TRANSFORM_TO_EAGLE,      SPELL_SHAPE_OF_THE_EAGLE,      SPELL_SHAPE_OF_THE_BEAR,  NPC_SPIRIT_EAGLE      },
+    { SAY_TRANSFORM_TO_LYNX,       SPELL_SHAPE_OF_THE_LYNX,       SPELL_SHAPE_OF_THE_EAGLE, NPC_SPIRIT_LYNX_ZJ    },
+    { SAY_TRANSFORM_TO_DRAGONHAWK, SPELL_SHAPE_OF_THE_DRAGONHAWK, SPELL_SHAPE_OF_THE_LYNX,  NPC_SPIRIT_DRAGONHAWK }
 };
 
-class boss_zuljin : public CreatureScript
+struct boss_zuljin : public BossAI
 {
-public:
-    boss_zuljin()
-        : CreatureScript("boss_zuljin")
+    boss_zuljin(Creature* creature) : BossAI(creature, DATA_ZULJIN) { }
+
+    void Reset() override
     {
+        _Reset();
+        me->SetUInt32Value(UNIT_VIRTUAL_ITEM_SLOT_ID, 33975);
+        me->SetCombatMovement(true);
+        me->m_Events.KillAllEvents(false);
+        _nextPhase = 0;
+
+        if (CreatureGroup* formation = me->GetFormation())
+            formation->RespawnFormation(true);
     }
 
-    struct boss_zuljinAI : public ScriptedAI
+    void JustEngagedWith(Unit* /*who*/) override
     {
-        boss_zuljinAI(Creature* creature) : ScriptedAI(creature), Summons(me)
+        _JustEngagedWith();
+        DoZoneInCombat();
+
+        Talk(SAY_INTRO);
+        SpawnAdds();
+
+        Talk(SAY_AGGRO, 37s);
+
+        // Phase 1: Default (troll)
+        ScheduleTimedEvent(12s, 29s, [&] {
+            DoCastAOE(SPELL_WHIRLWIND);
+        }, 12s, 29s);
+
+        ScheduleTimedEvent(7s, 23s, [&] {
+            DoCastRandomTarget(SPELL_GRIEVOUS_THROW, 0, 100.0f);
+        }, 7s, 23s);
+
+        me->m_Events.AddEventAtOffset([&]() {
+            DoCastSelf(SPELL_BERSERK, true);
+            Talk(SAY_BERSERK);
+        }, 10min);
+
+        // Phase 2: Bear Form.
+        ScheduleHealthCheckEvent({ 80 }, [&] {
+            EnterPhase(PHASE_BEAR);
+            ScheduleTimedEvent(8s, [&] {
+                DoCastAOE(SPELL_CREEPING_PARALYSIS);
+            }, 26s, 30s);
+
+            ScheduleTimedEvent(1s, [&] {
+                if (!me->HasSpellCooldown(SPELL_OVERPOWER) && me->GetVictim() && me->GetComboPoints())
+                    if (DoCastVictim(SPELL_OVERPOWER) == SPELL_CAST_OK)
+                        me->AddSpellCooldown(SPELL_OVERPOWER, 0, 5000);
+            }, 1s);
+        });
+
+        // Phase 3: Eagle Form.
+        ScheduleHealthCheckEvent({ 60 }, [&] {
+            EnterPhase(PHASE_EAGLE);
+        });
+
+        // Phase 4: Lynx Form.
+        ScheduleHealthCheckEvent({ 40 }, [&] {
+            EnterPhase(PHASE_LYNX);
+            me->RemoveAurasDueToSpell(SPELL_ENERGY_STORM);
+            me->RemoveOwnedAura(SPELL_ENERGY_STORM);
+            summons.DespawnEntry(CREATURE_FEATHER_VORTEX);
+            me->ResumeChasingVictim();
+
+            ScheduleTimedEvent(5s, [&] {
+                if (me->HasAura(SPELL_LYNX_RUSH_HASTE))
+                    return;
+
+                DoCastRandomTarget(SPELL_CLAW_RAGE_CHARGE, 1);
+            }, 15s, 20s);
+
+            ScheduleTimedEvent(14s, [&] {
+                if (me->HasAura(SPELL_CLAW_RAGE_AURA))
+                    return;
+
+                DoCastSelf(SPELL_LYNX_RUSH_HASTE);
+
+                for (int8 count = 0; count <= 8; ++count)
+                {
+                    me->m_Events.AddEventAtOffset([&] {
+                        DoCastRandomTarget(SPELL_LYNX_RUSH_DAMAGE);
+                    }, Seconds(1 * count), Seconds(1 * count), GROUP_LYNX);
+                }
+
+            }, 15s, 20s);
+        });
+
+        // Phase 5: Dragonhawk Form.
+        ScheduleHealthCheckEvent({ 20 }, [&] {
+            me->m_Events.CancelEventGroup(GROUP_LYNX);
+            EnterPhase(PHASE_DRAGONHAWK);
+
+            ScheduleTimedEvent(12s, 26s, [&] {
+                DoCastSelf(SPELL_FLAME_WHIRL);
+            }, 12s, 26s);
+
+            ScheduleTimedEvent(11s, 42s, [&] {
+                DoCastRandomTarget(SPELL_SUMMON_PILLAR);
+            }, 5s, 25s);
+
+            ScheduleTimedEvent(16s, 26s, [&] {
+                DoCastAOE(SPELL_FLAME_BREATH);
+            }, 6s, 25s);
+        });
+    }
+
+    void EnterEvadeMode(EvadeReason /*why*/) override
+    {
+        if (CreatureGroup* formation = me->GetFormation())
         {
-            instance = creature->GetInstanceScript();
+            for (auto const& itr : formation->GetMembers())
+            {
+                if (itr.first && itr.first != me)
+                    itr.first->DespawnOnEvade(2min);
+            }
         }
-        InstanceScript* instance;
 
-        ObjectGuid SpiritGUID[4];
-        ObjectGuid ClawTargetGUID;
-        ObjectGuid TankGUID;
+        me->DespawnOnEvade(2min);
+        _EnterEvadeMode();
+    }
 
-        uint32 Phase;
-        uint32 health_20;
-
-        uint32 Intro_Timer;
-        uint32 Berserk_Timer;
-
-        uint32 Whirlwind_Timer;
-        uint32 Grievous_Throw_Timer;
-
-        uint32 Creeping_Paralysis_Timer;
-        uint32 Overpower_Timer;
-
-        uint32 Claw_Rage_Timer;
-        uint32 Lynx_Rush_Timer;
-        uint32 Claw_Counter;
-        uint32 Claw_Loop_Timer;
-
-        uint32 Flame_Whirl_Timer;
-        uint32 Flame_Breath_Timer;
-        uint32 Pillar_Of_Fire_Timer;
-
-        SummonList Summons;
-
-        void Reset() override
+    void SpellHitTarget(Unit* target, SpellInfo const* spellInfo) override
+    {
+        if (spellInfo->Id == SPELL_CLAW_RAGE_CHARGE && target != me)
         {
-            instance->SetData(DATA_ZULJINEVENT, NOT_STARTED);
-
-            Phase = 0;
-
-            health_20 = me->CountPctFromMaxHealth(20);
-
-            Intro_Timer = 37000;
-            Berserk_Timer = 600000;
-
-            Whirlwind_Timer = 7000;
-            Grievous_Throw_Timer = 8000;
-
-            Creeping_Paralysis_Timer = 7000;
-            Overpower_Timer = 0;
-
-            Claw_Rage_Timer = 5000;
-            Lynx_Rush_Timer = 14000;
-            Claw_Loop_Timer = 0;
-            Claw_Counter = 0;
-
-            Flame_Whirl_Timer = 5000;
-            Flame_Breath_Timer = 6000;
-            Pillar_Of_Fire_Timer = 7000;
-
-            ClawTargetGUID.Clear();
-            TankGUID.Clear();
-
-            Summons.DespawnAll();
-
-            me->SetUInt32Value(UNIT_VIRTUAL_ITEM_SLOT_ID, 33975);
-            //me->SetUInt32Value(UNIT_VIRTUAL_ITEM_INFO, 218172674);
-            //me->SetByteValue(UNIT_FIELD_BYTES_2, 0, SHEATH_STATE_MELEE);
+            DoCastSelf(SPELL_CLAW_RAGE_AURA);
+            _chargeTargetGUID = target->GetGUID();
         }
+    }
 
-        void JustEngagedWith(Unit* /*who*/) override
+    void KilledUnit(Unit* /*victim*/) override
+    {
+        Talk(SAY_KILL);
+    }
+
+    ObjectGuid GetGUID(int32 index) const override
+    {
+        if (index == GUID_CHARGE_TARGET)
+            return _chargeTargetGUID;
+
+        return ObjectGuid::Empty;
+    }
+
+    void JustDied(Unit* /*killer*/) override
+    {
+        instance->SetBossState(DATA_ZULJIN, DONE);
+        Talk(SAY_DEATH);
+        summons.DespawnEntry(CREATURE_COLUMN_OF_FIRE);
+
+        me->m_Events.AddEventAtOffset( [this] {
+            summons.DespawnAll();
+        }, 3s);
+    }
+
+    void SpawnAdds()
+    {
+        for (auto const& spiritInfo : SpiritInfo)
         {
-            instance->SetData(DATA_ZULJINEVENT, IN_PROGRESS);
-
-            DoZoneInCombat();
-
-            Talk(YELL_INTRO);
-            SpawnAdds();
-            EnterPhase(0);
+            if (Creature* creature = me->SummonCreature(spiritInfo.entry, spiritInfo.pos, TEMPSUMMON_DEAD_DESPAWN, 0))
+            {
+                creature->m_Events.AddEventAtOffset([creature] {
+                    creature->CastSpell(creature, SPELL_SPIRIT_AURA);
+                }, 1s);
+            }
         }
+    }
 
-        void KilledUnit(Unit* /*victim*/) override
+    void MovementInform(uint32 type, uint32 id) override
+    {
+        if (type == POINT_MOTION_TYPE && id == POINT_CENTER)
         {
-            if (Intro_Timer)
-                return;
+            if (Creature* spirit = summons.GetCreatureWithEntry(Transform[_nextPhase].spiritEntry))
+            {
+                spirit->CastSpell(me, SPELL_SPIRIT_DRAIN, false);
+                me->SetFacingToObject(spirit);
+            }
 
-            Talk(YELL_KILL);
+            if (_nextPhase)
+                if (Creature* spirit = summons.GetCreatureWithEntry(Transform[_nextPhase - 1].spiritEntry))
+                {
+                    spirit->CastStop();
+                    spirit->SetUInt32Value(UNIT_FIELD_BYTES_1, UNIT_STAND_STATE_DEAD);
+                }
+
+            Talk(Transform[_nextPhase].text);
+
+            me->m_Events.AddEventAtOffset([&] {
+                DoCastSelf(Transform[_nextPhase].spell);
+                DoResetThreatList();
+
+                if (_nextPhase == PHASE_EAGLE)
+                {
+                    me->SetCombatMovement(false);
+                    DoCastSelf(SPELL_ENERGY_STORM, true); // enemy aura
+                    DoCastAOE(SPELL_SUMMON_CYCLONE, true);
+                    me->SetFacingTo(me->GetHomePosition().GetOrientation());
+                }
+                else
+                {
+                    me->SetReactState(REACT_AGGRESSIVE);
+                    me->SetCombatMovement(true);
+                    me->ResumeChasingVictim();
+                }
+            }, 2s);
         }
+    }
 
-        void JustDied(Unit* /*killer*/) override
+    void EnterPhase(uint32 NextPhase)
+    {
+        scheduler.CancelAll();
+        me->SetReactState(REACT_PASSIVE);
+        DoStopAttack();
+        me->GetMotionMaster()->Clear();
+
+        me->SetUInt32Value(UNIT_VIRTUAL_ITEM_SLOT_ID, 0);
+        me->RemoveAurasDueToSpell(Transform[NextPhase].unaura);
+
+        me->m_Events.AddEventAtOffset([&] {
+            me->GetMotionMaster()->MovePoint(POINT_CENTER, CenterPosition);
+        }, 1s);
+
+        _nextPhase = NextPhase;
+    }
+
+    private:
+        ObjectGuid _chargeTargetGUID;
+        uint8 _nextPhase;
+};
+
+struct npc_zuljin_vortex : public ScriptedAI
+{
+    npc_zuljin_vortex(Creature* creature) : ScriptedAI(creature) { }
+
+    void Reset() override
+    {
+        if (WorldObject* summoner = GetSummoner())
+            if (Creature* zuljin = summoner->ToCreature())
+                me->SetLevel(zuljin->GetLevel());
+
+        DoCastSelf(SPELL_CYCLONE_PASSIVE, true);
+        DoCastSelf(SPELL_CYCLONE_VISUAL, true);
+        me->SetSpeed(MOVE_RUN, 1.0f);
+        me->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
+        DoZoneInCombat();
+        // Start attacking random target
+        ChangeToNewPlayer();
+    }
+
+    void ChangeToNewPlayer()
+    {
+        DoResetThreatList();
+        if (WorldObject* summoner = GetSummoner())
+            if (Creature* zuljin = summoner->ToCreature())
+                if (Unit* target = zuljin->AI()->SelectTarget(SelectTargetMethod::Random, 0, 80.0f, true))
+                    me->AddThreat(target, 10000000.0f);
+    }
+
+    void UpdateAI(uint32 /*diff*/) override
+    {
+        UpdateVictim();
+
+        //if the vortex reach the target, it change his target to another player
+        if (me->IsWithinMeleeRange(me->GetVictim()))
+            ChangeToNewPlayer();
+    }
+};
+
+// 43149 - Claw Rage
+class spell_claw_rage_aura : public AuraScript
+{
+    PrepareAuraScript(spell_claw_rage_aura);
+
+    bool Validate(SpellInfo const* /*spellInfo*/) override
+    {
+        return ValidateSpellInfo({ SPELL_CLAW_RAGE_DAMAGE });
+    }
+
+    void OnPeriodic(AuraEffect const* /*aurEff*/)
+    {
+        if (Creature* caster = GetCaster()->ToCreature())
         {
-            instance->SetData(DATA_ZULJINEVENT, DONE);
-
-            Talk(YELL_DEATH);
-            Summons.DespawnEntry(CREATURE_COLUMN_OF_FIRE);
-
-            if (Unit* Temp = ObjectAccessor::GetUnit(*me, SpiritGUID[3]))
-                Temp->SetUInt32Value(UNIT_FIELD_BYTES_1, UNIT_STAND_STATE_DEAD);
-        }
-
-        void AttackStart(Unit* who) override
-        {
-            if (Phase == 2)
-                AttackStartNoMove(who);
+            if (Player* target = ObjectAccessor::GetPlayer(*caster, caster->AI()->GetGUID(GUID_CHARGE_TARGET)))
+            {
+                if (target->isTargetableForAttack(true, caster))
+                    GetCaster()->CastSpell(target, SPELL_CLAW_RAGE_DAMAGE);
+                else
+                    GetCaster()->RemoveAurasDueToSpell(SPELL_CLAW_RAGE_AURA);
+            }
             else
-                ScriptedAI::AttackStart(who);
+                GetCaster()->RemoveAurasDueToSpell(SPELL_CLAW_RAGE_AURA);
         }
+    }
 
-        void DoMeleeAttackIfReady()
-        {
-            if (!me->IsNonMeleeSpellCast(false))
-            {
-                if (me->isAttackReady() && me->IsWithinMeleeRange(me->GetVictim()))
-                {
-                    if (Phase == 1 && !Overpower_Timer)
-                    {
-                        uint32 health = me->GetVictim()->GetHealth();
-                        me->AttackerStateUpdate(me->GetVictim());
-                        if (me->GetVictim() && health == me->GetVictim()->GetHealth())
-                        {
-                            DoCastVictim(SPELL_OVERPOWER, false);
-                            Overpower_Timer = 5000;
-                        }
-                    }
-                    else me->AttackerStateUpdate(me->GetVictim());
-                    me->resetAttackTimer();
-                }
-            }
-        }
-
-        void SpawnAdds()
-        {
-            for (uint8 i = 0; i < 4; ++i)
-            {
-                Creature* creature = me->SummonCreature(SpiritInfo[i].entry, SpiritInfo[i].x, SpiritInfo[i].y, SpiritInfo[i].z, SpiritInfo[i].orient, TEMPSUMMON_DEAD_DESPAWN, 0);
-                if (creature)
-                {
-                    creature->CastSpell(creature, SPELL_SPIRIT_AURA, true);
-                    creature->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
-                    creature->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
-                    SpiritGUID[i] = creature->GetGUID();
-                }
-            }
-        }
-
-        void DespawnAdds()
-        {
-            for (uint8 i = 0; i < 4; ++i)
-            {
-                if (SpiritGUID[i])
-                {
-                    if (Unit* temp = ObjectAccessor::GetUnit(*me, SpiritGUID[i]))
-                    {
-                        temp->SetVisible(false);
-                        temp->setDeathState(DeathState::Dead);
-                    }
-                }
-                SpiritGUID[i].Clear();
-            }
-        }
-
-        void JustSummoned(Creature* summon) override
-        {
-            Summons.Summon(summon);
-        }
-
-        void SummonedCreatureDespawn(Creature* summon) override
-        {
-            Summons.Despawn(summon);
-        }
-
-        void EnterPhase(uint32 NextPhase)
-        {
-            switch (NextPhase)
-            {
-                case 0:
-                    break;
-                case 1:
-                case 2:
-                case 3:
-                case 4:
-                    me->NearTeleportTo(CENTER_X, CENTER_Y, CENTER_Z, me->GetOrientation());
-                    DoResetThreatList();
-                    me->SetUInt32Value(UNIT_VIRTUAL_ITEM_SLOT_ID, 0);
-                    me->RemoveAurasDueToSpell(Transform[Phase].unaura);
-                    DoCast(me, Transform[Phase].spell);
-                    Talk(Transform[Phase].text);
-                    if (Phase > 0)
-                    {
-                        if (Unit* Temp = ObjectAccessor::GetUnit(*me, SpiritGUID[Phase - 1]))
-                            Temp->SetUInt32Value(UNIT_FIELD_BYTES_1, UNIT_STAND_STATE_DEAD);
-                    }
-                    if (Unit* Temp = ObjectAccessor::GetUnit(*me, SpiritGUID[NextPhase - 1]))
-                        Temp->CastSpell(me, SPELL_SIPHON_SOUL, false); // should m cast on temp
-                    if (NextPhase == 2)
-                    {
-                        me->GetMotionMaster()->Clear();
-                        DoCast(me, SPELL_ENERGY_STORM, true); // enemy aura
-                        for (uint8 i = 0; i < 4; ++i)
-                        {
-                            Creature* Vortex = DoSpawnCreature(CREATURE_FEATHER_VORTEX, 0, 0, 0, 0, TEMPSUMMON_CORPSE_DESPAWN, 0);
-                            if (Vortex)
-                            {
-                                Vortex->CastSpell(Vortex, SPELL_CYCLONE_PASSIVE, true);
-                                Vortex->CastSpell(Vortex, SPELL_CYCLONE_VISUAL, true);
-                                Vortex->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
-                                Vortex->SetSpeed(MOVE_RUN, 1.0f);
-                                Vortex->AI()->AttackStart(SelectTarget(SelectTargetMethod::Random, 0));
-                                DoZoneInCombat(Vortex);
-                            }
-                        }
-                    }
-                    else
-                        AttackStart(me->GetVictim());
-                    if (NextPhase == 3)
-                    {
-                        me->RemoveAurasDueToSpell(SPELL_ENERGY_STORM);
-                        Summons.DespawnEntry(CREATURE_FEATHER_VORTEX);
-                        me->GetMotionMaster()->MoveChase(me->GetVictim());
-                    }
-                    break;
-                default:
-                    break;
-            }
-            Phase = NextPhase;
-        }
-
-        void UpdateAI(uint32 diff) override
-        {
-            if (!TankGUID)
-            {
-                if (!UpdateVictim())
-                    return;
-
-                if (me->GetHealth() < health_20 * (4 - Phase))
-                    EnterPhase(Phase + 1);
-            }
-
-            if (Berserk_Timer <= diff)
-            {
-                DoCast(me, SPELL_BERSERK, true);
-                Talk(YELL_BERSERK);
-                Berserk_Timer = 60000;
-            }
-            else Berserk_Timer -= diff;
-
-            switch (Phase)
-            {
-                case 0:
-                    if (Intro_Timer)
-                    {
-                        if (Intro_Timer <= diff)
-                        {
-                            Talk(YELL_AGGRO);
-                            Intro_Timer = 0;
-                        }
-                        else Intro_Timer -= diff;
-                    }
-
-                    if (Whirlwind_Timer <= diff)
-                    {
-                        DoCast(me, SPELL_WHIRLWIND);
-                        Whirlwind_Timer = urand(15000, 20000);
-                    }
-                    else Whirlwind_Timer -= diff;
-
-                    if (Grievous_Throw_Timer <= diff)
-                    {
-                        if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 100, true))
-                            DoCast(target, SPELL_GRIEVOUS_THROW, false);
-                        Grievous_Throw_Timer = 10000;
-                    }
-                    else Grievous_Throw_Timer -= diff;
-                    break;
-
-                case 1:
-                    if (Creeping_Paralysis_Timer <= diff)
-                    {
-                        DoCast(me, SPELL_CREEPING_PARALYSIS);
-                        Creeping_Paralysis_Timer = 20000;
-                    }
-                    else Creeping_Paralysis_Timer -= diff;
-
-                    if (Overpower_Timer <= diff)
-                    {
-                        // implemented in DoMeleeAttackIfReady()
-                        Overpower_Timer = 0;
-                    }
-                    else Overpower_Timer -= diff;
-                    break;
-
-                case 2:
-                    return;
-
-                case 3:
-                    if (Claw_Rage_Timer <= diff)
-                    {
-                        if (!TankGUID)
-                        {
-                            if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0))
-                            {
-                                TankGUID = me->GetVictim()->GetGUID();
-                                me->SetSpeed(MOVE_RUN, 5.0f);
-                                AttackStart(target); // change victim
-                                Claw_Rage_Timer = 0;
-                                Claw_Loop_Timer = 500;
-                                Claw_Counter = 0;
-                            }
-                        }
-                        else if (!Claw_Rage_Timer) // do not do this when Lynx_Rush
-                        {
-                            if (Claw_Loop_Timer <= diff)
-                            {
-                                Unit* target = me->GetVictim();
-                                if (!target || !target->isTargetableForAttack()) target = ObjectAccessor::GetUnit(*me, TankGUID);
-                                if (!target || !target->isTargetableForAttack()) target = SelectTarget(SelectTargetMethod::Random, 0);
-                                if (target)
-                                {
-                                    AttackStart(target);
-                                    if (me->IsWithinMeleeRange(target))
-                                    {
-                                        DoCast(target, SPELL_CLAW_RAGE_DAMAGE, true);
-                                        ++Claw_Counter;
-                                        if (Claw_Counter == 12)
-                                        {
-                                            Claw_Rage_Timer = urand(15000, 20000);
-                                            me->SetSpeed(MOVE_RUN, 1.2f);
-                                            AttackStart(ObjectAccessor::GetUnit(*me, TankGUID));
-                                            TankGUID.Clear();
-                                            return;
-                                        }
-                                        else
-                                            Claw_Loop_Timer = 500;
-                                    }
-                                }
-                                else
-                                {
-                                    EnterEvadeMode(); // if (target)
-                                    return;
-                                }
-                            }
-                            else Claw_Loop_Timer -= diff;
-                        } //if (TankGUID)
-                    }
-                    else Claw_Rage_Timer -= diff;
-
-                    if (Lynx_Rush_Timer <= diff)
-                    {
-                        if (!TankGUID)
-                        {
-                            if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0))
-                            {
-                                TankGUID = me->GetVictim()->GetGUID();
-                                me->SetSpeed(MOVE_RUN, 5.0f);
-                                AttackStart(target); // change victim
-                                Lynx_Rush_Timer = 0;
-                                Claw_Counter = 0;
-                            }
-                        }
-                        else if (!Lynx_Rush_Timer)
-                        {
-                            Unit* target = me->GetVictim();
-                            if (!target || !target->isTargetableForAttack())
-                            {
-                                target = SelectTarget(SelectTargetMethod::Random, 0);
-                                AttackStart(target);
-                            }
-                            if (target)
-                            {
-                                if (me->IsWithinMeleeRange(target))
-                                {
-                                    DoCast(target, SPELL_LYNX_RUSH_DAMAGE, true);
-                                    ++Claw_Counter;
-                                    if (Claw_Counter == 9)
-                                    {
-                                        Lynx_Rush_Timer = urand(15000, 20000);
-                                        me->SetSpeed(MOVE_RUN, 1.2f);
-                                        AttackStart(ObjectAccessor::GetUnit(*me, TankGUID));
-                                        TankGUID.Clear();
-                                    }
-                                    else
-                                        AttackStart(SelectTarget(SelectTargetMethod::Random, 0));
-                                }
-                            }
-                            else
-                            {
-                                EnterEvadeMode(); // if (target)
-                                return;
-                            }
-                        } //if (TankGUID)
-                    }
-                    else Lynx_Rush_Timer -= diff;
-
-                    break;
-                case 4:
-                    if (Flame_Whirl_Timer <= diff)
-                    {
-                        DoCast(me, SPELL_FLAME_WHIRL);
-                        Flame_Whirl_Timer = 12000;
-                    }
-                    Flame_Whirl_Timer -= diff;
-
-                    if (Pillar_Of_Fire_Timer <= diff)
-                    {
-                        if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0))
-                            DoCast(target, SPELL_SUMMON_PILLAR);
-                        Pillar_Of_Fire_Timer = 10000;
-                    }
-                    else Pillar_Of_Fire_Timer -= diff;
-
-                    if (Flame_Breath_Timer <= diff)
-                    {
-                        if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0))
-                            me->SetInFront(target);
-                        DoCast(me, SPELL_FLAME_BREATH);
-                        Flame_Breath_Timer = 10000;
-                    }
-                    else Flame_Breath_Timer -= diff;
-                    break;
-
-                default:
-                    break;
-            }
-
-            if (!TankGUID)
-                DoMeleeAttackIfReady();
-        }
-    };
-
-    CreatureAI* GetAI(Creature* creature) const override
+    void Register() override
     {
-        return GetZulAmanAI<boss_zuljinAI>(creature);
+        OnEffectPeriodic += AuraEffectPeriodicFn(spell_claw_rage_aura::OnPeriodic, EFFECT_0, SPELL_AURA_PERIODIC_TRIGGER_SPELL);
     }
 };
 
-class npc_zuljin_vortex : public CreatureScript
+// 42577 - Zap
+class spell_zuljin_zap : public SpellScript
 {
-public:
-    npc_zuljin_vortex()
-        : CreatureScript("npc_zuljin_vortex")
+    PrepareSpellScript(spell_zuljin_zap);
+
+    bool Validate(SpellInfo const* /*spell*/) override
     {
+        return ValidateSpellInfo({ SPELL_ZAP_DAMAGE });
     }
 
-    struct npc_zuljin_vortexAI : public ScriptedAI
+    void HandleScript(SpellEffIndex effIndex)
     {
-        npc_zuljin_vortexAI(Creature* creature) : ScriptedAI(creature) { }
+        PreventHitDefaultEffect(effIndex);
+        if (Unit* victim = GetHitUnit())
+            victim->CastSpell(GetCaster(), SPELL_ZAP_DAMAGE, true);
+    }
 
-        void Reset() override { }
-
-        void JustEngagedWith(Unit* /*target*/) override { }
-
-        void SpellHit(Unit* caster, SpellInfo const* spell) override
-        {
-            if (spell->Id == SPELL_ZAP_INFORM)
-                DoCast(caster, SPELL_ZAP_DAMAGE, true);
-        }
-
-        void UpdateAI(uint32 /*diff*/) override
-        {
-            //if the vortex reach the target, it change his target to another player
-            if (me->IsWithinMeleeRange(me->GetVictim()))
-                AttackStart(SelectTarget(SelectTargetMethod::Random, 0));
-        }
-    };
-
-    CreatureAI* GetAI(Creature* creature) const override
+    void Register() override
     {
-        return GetZulAmanAI<npc_zuljin_vortexAI>(creature);
+        OnEffectHitTarget += SpellEffectFn(spell_zuljin_zap::HandleScript, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
     }
 };
 
 void AddSC_boss_zuljin()
 {
-    new boss_zuljin();
-    new npc_zuljin_vortex();
+    RegisterZulAmanCreatureAI(boss_zuljin);
+    RegisterZulAmanCreatureAI(npc_zuljin_vortex);
+    RegisterSpellScript(spell_claw_rage_aura);
+    RegisterSpellScript(spell_zuljin_zap);
 }

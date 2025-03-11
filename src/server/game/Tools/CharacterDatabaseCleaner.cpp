@@ -19,6 +19,7 @@
 #include "DBCStores.h"
 #include "Database/DatabaseEnv.h"
 #include "Log.h"
+#include "QueryResult.h"
 #include "SpellMgr.h"
 #include "World.h"
 

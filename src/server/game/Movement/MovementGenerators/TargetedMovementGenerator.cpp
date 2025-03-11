@@ -158,13 +158,13 @@ bool ChaseMovementGenerator<T>::DoUpdate(T* owner, uint32 time_diff)
         i_leashExtensionTimer.Update(time_diff);
         if (i_leashExtensionTimer.Passed())
         {
-            i_leashExtensionTimer.Reset(1500);
+            i_leashExtensionTimer.Reset(5000);
             if (cOwner)
                 cOwner->UpdateLeashExtensionTime();
         }
     }
     else if (i_recalculateTravel)
-        i_leashExtensionTimer.Reset(1500);
+        i_leashExtensionTimer.Reset(5000);
 
     // if the target moved, we have to consider whether to adjust
     if (!_lastTargetPosition || target->GetPosition() != _lastTargetPosition.value() || mutualChase != _mutualChase || !owner->IsWithinLOSInMap(target))

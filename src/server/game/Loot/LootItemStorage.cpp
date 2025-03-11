@@ -19,6 +19,8 @@
 #include "DatabaseEnv.h"
 #include "ObjectMgr.h"
 #include "PreparedStatement.h"
+#include "QueryResult.h"
+#include "Timer.h"
 
 LootItemStorage::LootItemStorage()
 {
@@ -248,7 +250,7 @@ void LootItemStorage::RemoveStoredLootItem(ObjectGuid containerGUID, uint32 item
 
     // loot with empty itemList but unlootedCount > 0
     // must be deleted manually by the player or traded
-    if (!loot->unlootedCount)
+    if (!loot->unlootedCount && !loot->gold)
         lootItemStore.erase(itr);
 }
 

@@ -82,13 +82,10 @@ public:
     struct boss_razuviousAI : public BossAI
     {
         explicit boss_razuviousAI(Creature* c) : BossAI(c, BOSS_RAZUVIOUS), summons(me)
-        {
-            pInstance = me->GetInstanceScript();
-        }
+        {}
 
         EventMap events;
         SummonList summons;
-        InstanceScript* pInstance;
 
         void SpawnHelpers()
         {
@@ -210,13 +207,10 @@ public:
         void KilledUnit(Unit* who) override
         {
             if (roll_chance_i(30))
-            {
                 Talk(SAY_SLAY);
-            }
-            if (who->IsPlayer() && pInstance)
-            {
-                pInstance->SetData(DATA_IMMORTAL_FAIL, 0);
-            }
+
+            if (who->IsPlayer())
+                instance->StorePersistentData(PERSISTENT_DATA_IMMORTAL_FAIL, 1);
         }
 
         void DamageTaken(Unit* who, uint32& damage, DamageEffectType, SpellSchoolMask) override
@@ -331,17 +325,16 @@ public:
             switch (action)
             {
                 case ACTION_FACE_ME:
+                {
                     scheduler.CancelGroup(GROUP_OOC_RP);
                     me->SetSheath(SHEATH_STATE_UNARMED);
                     me->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_STATE_NONE);
-                    if (InstanceScript* instance = me->GetInstanceScript())
-                    {
-                        if (Creature* creature = instance->GetCreature(DATA_RAZUVIOUS))
-                        {
-                            me->SetFacingToObject(creature);
-                        }
-                    }
+
+                    if (Creature* creature = me->GetInstanceScript()->GetCreature(DATA_RAZUVIOUS_BOSS))
+                        me->SetFacingToObject(creature);
+
                     break;
+                }
                 case ACTION_TALK:
                     Talk(SAY_DEATH_KNIGHT_UNDERSTUDY);
                     break;
@@ -360,22 +353,18 @@ public:
 
         void KilledUnit(Unit* who) override
         {
-            if (who->IsPlayer() && me->GetInstanceScript())
-            {
-                me->GetInstanceScript()->SetData(DATA_IMMORTAL_FAIL, 0);
-            }
+            if (who->IsPlayer())
+                me->GetInstanceScript()->StorePersistentData(PERSISTENT_DATA_IMMORTAL_FAIL, 1);
         }
 
         void JustEngagedWith(Unit* who) override
         {
             scheduler.CancelGroup(GROUP_OOC_RP);
-            if (InstanceScript* instance = me->GetInstanceScript())
+
+            if (Creature* creature = me->GetInstanceScript()->GetCreature(DATA_RAZUVIOUS_BOSS))
             {
-                if (Creature* creature = instance->GetCreature(DATA_RAZUVIOUS))
-                {
-                    creature->SetInCombatWithZone();
-                    creature->AI()->AttackStart(who);
-                }
+                creature->SetInCombatWithZone();
+                creature->AI()->AttackStart(who);
             }
         }
 

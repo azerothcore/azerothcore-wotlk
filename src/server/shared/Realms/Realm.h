@@ -20,7 +20,7 @@
 
 #include "AsioHacksFwd.h"
 #include "Common.h"
-#include <memory>
+#include <memory> // NOTE: this import is NEEDED (even though some IDEs report it as unused)
 
 enum RealmFlags
 {

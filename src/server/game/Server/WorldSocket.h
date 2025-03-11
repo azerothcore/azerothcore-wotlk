@@ -21,7 +21,6 @@
 #include "AuthCrypt.h"
 #include "Common.h"
 #include "MPSCQueue.h"
-#include "ServerPktHeader.h"
 #include "Socket.h"
 #include "Util.h"
 #include "WorldPacket.h"

@@ -17,7 +17,6 @@
 
 #include "adtfile.h"
 #include "vmapexport.h"
-#include <algorithm>
 #include <cstdio>
 
 #ifdef WIN32

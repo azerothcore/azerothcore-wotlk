@@ -20,7 +20,6 @@
 
 #include "Common.h"
 #include "G3D/Vector3.h"
-#include <cmath>
 
 class ByteBuffer;
 
@@ -61,6 +60,11 @@ struct Position
     bool operator==(Position const& a) const;
 
     inline bool operator!=(Position const& a)
+    {
+        return !(operator==(a));
+    }
+
+    inline bool operator!=(Position const& a) const
     {
         return !(operator==(a));
     }

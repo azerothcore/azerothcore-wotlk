@@ -597,7 +597,7 @@ struct npc_pet_gen_wind_rider_cub : public NullCreatureAI
             checkTimer2 = 0;
             if (Unit* owner = me->GetOwner())
             {
-                if (owner->HasAuraType(SPELL_AURA_MOD_INCREASE_MOUNTED_FLIGHT_SPEED) || owner->HasAuraType(SPELL_AURA_MOD_INCREASE_MOUNTED_SPEED))
+                if (owner->HasIncreaseMountedFlightSpeedAura() || owner->HasIncreaseMountedSpeedAura())
                 {
                     isFlying = true;
                     me->SetCanFly(true);

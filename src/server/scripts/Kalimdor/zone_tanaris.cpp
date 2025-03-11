@@ -242,16 +242,28 @@ public:
                         break;
                     case 24:
                         Talk(WHISPER_CUSTODIAN_14, player);
-                        DoCast(player, 34883);
-                        // below here is temporary workaround, to be removed when spell works properly
-                        player->AreaExploredOrEventHappens(10277);
+                        if (Group* group = player->GetGroup())
+                        {
+                            for (GroupReference* itr = group->GetFirstMember(); itr != nullptr; itr = itr->next())
+                            {
+                                Player* player = itr->GetSource();
+
+                                // for any leave or dead (with not released body) group member at appropriate distance
+                                if (player && player->IsAtGroupRewardDistance(me) && !player->GetCorpse())
+                                    DoCast(player, 34883); // QID 10277
+
+                            }
+                        }
+                        else
+                        {
+                            DoCast(player, 34883); // QID 10277
+                        }
                         break;
                 }
             }
         }
 
         void MoveInLineOfSight(Unit* who) override
-
         {
             if (HasEscortState(STATE_ESCORT_ESCORTING))
                 return;

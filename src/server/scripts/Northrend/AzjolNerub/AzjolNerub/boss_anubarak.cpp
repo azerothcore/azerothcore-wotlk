@@ -20,6 +20,7 @@
 #include "SpellScriptLoader.h"
 #include "azjol_nerub.h"
 #include "SpellInfo.h"
+#include "SpellMgr.h"
 #include "SpellScript.h"
 
 enum Spells

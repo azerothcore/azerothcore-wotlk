@@ -42,7 +42,6 @@ void AutobroadcastMgr::LoadAutobroadcasts()
     if (!result)
     {
         LOG_WARN("autobroadcast", ">> Loaded 0 autobroadcasts definitions. DB table `autobroadcast` is empty for this realm!");
-        LOG_INFO("autobroadcast", " ");
         return;
     }
 
@@ -54,34 +53,65 @@ void AutobroadcastMgr::LoadAutobroadcasts()
         _announceType = AnnounceType::World;
     }
 
-    uint32 count = 0;
+    do
+    {
+        Field* fields = result->Fetch();
+        uint8 textId = fields[0].Get<uint8>();
+
+        ObjectMgr::AddLocaleString(fields[2].Get<std::string>(), DEFAULT_LOCALE, _autobroadcasts[textId]);
+        _autobroadcastsWeights[textId] = fields[1].Get<uint8>();
+
+    } while (result->NextRow());
+
+    LOG_INFO("server.loading", ">> Loaded {} Autobroadcast Definitions in {} ms", _autobroadcasts.size(), GetMSTimeDiffToNow(oldMSTime));
+}
+
+void AutobroadcastMgr::LoadAutobroadcastsLocalized()
+{
+    uint32 oldMSTime = getMSTime();
+    uint32 realmId = sConfigMgr->GetOption<int32>("RealmID", 0);
+
+    if (_autobroadcasts.empty())
+        return;
+
+    LoginDatabasePreparedStatement* stmt = LoginDatabase.GetPreparedStatement(LOGIN_SEL_AUTOBROADCAST_LOCALIZED);
+    stmt->SetData(0, realmId);
+    PreparedQueryResult result = LoginDatabase.Query(stmt);
+
+    if (!result)
+    {
+        LOG_WARN("server.loading", ">> Loaded 0 localized autobroadcasts definitions. DB table `autobroadcast_localized` is empty for this realm!");
+        LOG_INFO("server.loading", " ");
+        return;
+    }
+
+    uint8 count = 0;
 
     do
     {
         Field* fields = result->Fetch();
-        uint8 id = fields[0].Get<uint8>();
+        uint8 textId = fields[0].Get<uint8>();
+        LocaleConstant locale = GetLocaleByName(fields[1].Get<std::string>());
 
-        _autobroadcasts[id] = fields[2].Get<std::string>();
-        _autobroadcastsWeights[id] = fields[1].Get<uint8>();
+        if (locale == DEFAULT_LOCALE || ObjectMgr::GetLocaleString(_autobroadcasts[textId], DEFAULT_LOCALE).empty())
+            continue;
 
-        ++count;
+        ObjectMgr::AddLocaleString(fields[2].Get<std::string>(), locale, _autobroadcasts[textId]);
+        count++;
     } while (result->NextRow());
 
-    LOG_INFO("autobroadcast", ">> Loaded {} Autobroadcast Definitions in {} ms", count, GetMSTimeDiffToNow(oldMSTime));
-    LOG_INFO("autobroadcast", " ");
+    LOG_INFO("server.loading", ">> Loaded {} Localized Autobroadcast Definitions in {} ms", count, GetMSTimeDiffToNow(oldMSTime));
+    LOG_INFO("server.loading", " ");
 }
 
 void AutobroadcastMgr::SendAutobroadcasts()
 {
     if (_autobroadcasts.empty())
-    {
         return;
-    }
 
     uint32 weight = 0;
+    uint8 textId = 0;
     AutobroadcastsWeightMap selectionWeights;
-
-    std::string msg;
 
     for (AutobroadcastsWeightMap::const_iterator it = _autobroadcastsWeights.begin(); it != _autobroadcastsWeights.end(); ++it)
     {
@@ -101,42 +131,78 @@ void AutobroadcastMgr::SendAutobroadcasts()
             weight += it->second;
             if (selectedWeight < weight)
             {
-                msg = _autobroadcasts[it->first];
+                textId = it->first;
                 break;
             }
         }
     }
     else
     {
-        msg = _autobroadcasts[urand(0, _autobroadcasts.size())];
+        textId = urand(0, _autobroadcasts.size());
     }
 
     switch (_announceType)
     {
     case AnnounceType::World:
-        SendWorldAnnouncement(msg);
+        SendWorldAnnouncement(textId);
         break;
     case AnnounceType::Notification:
-        SendNotificationAnnouncement(msg);
+        SendNotificationAnnouncement(textId);
         break;
     case AnnounceType::Both:
-        SendWorldAnnouncement(msg);
-        SendNotificationAnnouncement(msg);
+        SendWorldAnnouncement(textId);
+        SendNotificationAnnouncement(textId);
     default:
         break;
     }
 
-    LOG_DEBUG("autobroadcast", "AutobroadcastMgr::SendAutobroadcasts: '{}'", msg);
+    LOG_DEBUG("autobroadcast", "AutobroadcastMgr::SendAutobroadcasts: '{}'", textId);
 }
 
-void AutobroadcastMgr::SendWorldAnnouncement(std::string msg)
+void AutobroadcastMgr::SendWorldAnnouncement(uint8 textId)
 {
-    ChatHandler(nullptr).SendWorldTextOptional(LANG_AUTO_BROADCAST, ANNOUNCER_FLAG_DISABLE_AUTOBROADCAST, msg.data());
+    // Send localized messages to all sessions
+    ChatHandler(nullptr).DoForAllValidSessions([&](Player* player)
+    {
+        // Get player's locale
+        LocaleConstant locale = player->GetSession()->GetSessionDbLocaleIndex();
+
+        if (!_autobroadcasts.empty())
+            return;
+
+        std::string_view localizedMessage = ObjectMgr::GetLocaleString(_autobroadcasts[textId], locale);
+
+        // Check if there is a localized message if not use default one.
+        if (localizedMessage.empty())
+            localizedMessage = ObjectMgr::GetLocaleString(_autobroadcasts[textId], DEFAULT_LOCALE);
+
+        // Send the localized or fallback message
+        ChatHandler(player->GetSession()).SendWorldTextOptional(localizedMessage, ANNOUNCER_FLAG_DISABLE_AUTOBROADCAST);
+    });
 }
 
-void AutobroadcastMgr::SendNotificationAnnouncement(std::string msg)
+void AutobroadcastMgr::SendNotificationAnnouncement(uint8 textId)
 {
-    WorldPacket data(SMSG_NOTIFICATION, (msg.size() + 1));
-    data << msg.data();
-    sWorld->SendGlobalMessage(&data);
+    ChatHandler(nullptr).DoForAllValidSessions([&](Player* player)
+    {
+        // Retrieve player's locale
+        LocaleConstant locale = player->GetSession()->GetSessionDbLocaleIndex();
+
+        if (!_autobroadcasts.count(textId))
+            return;
+
+        // Get localized message
+        std::string_view localizedMessage = ObjectMgr::GetLocaleString(_autobroadcasts[textId], locale);
+
+        // Check if there is a localized message if not use default one.
+        if (localizedMessage.empty())
+            localizedMessage = ObjectMgr::GetLocaleString(_autobroadcasts[textId], DEFAULT_LOCALE);
+
+        // Prepare the WorldPacket
+        WorldPacket data(SMSG_NOTIFICATION, (localizedMessage.size() + 1));
+        data << localizedMessage;
+
+        // Send packet to the player
+        player->GetSession()->SendPacket(&data);
+    });
 }

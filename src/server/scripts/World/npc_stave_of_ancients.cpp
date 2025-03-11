@@ -999,14 +999,10 @@ public:
         void SpellHit(Unit* /*Caster*/, SpellInfo const* Spell) override
         {
             if (InNormalForm())
-            {
                 return;
-            }
 
-            if (me->HasAura(NELSON_SPELL_SOUL_FLAME) && me->HasAura(NELSON_WEAKNESS_FROST_TRAP))
-            {
+            if (me->HasAllAuras(NELSON_SPELL_SOUL_FLAME, NELSON_WEAKNESS_FROST_TRAP))
                 me->RemoveAura(NELSON_SPELL_SOUL_FLAME);
-            }
 
             if (!me->HasAura(NELSON_SPELL_CRIPPLING_CLIP) && Spell->Id == NELSON_WEAKNESS_WING_CLIP)
             {

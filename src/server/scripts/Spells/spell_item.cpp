@@ -23,6 +23,7 @@
 #include "ScriptedCreature.h"
 #include "SkillDiscovery.h"
 #include "SpellAuraEffects.h"
+#include "SpellMgr.h"
 #include "SpellScript.h"
 #include "SpellScriptLoader.h"
 #include "WorldSession.h"
@@ -2880,7 +2881,7 @@ class spell_item_reindeer_transformation : public SpellScript
     void HandleDummy(SpellEffIndex /* effIndex */)
     {
         Unit* caster = GetCaster();
-        if (caster->HasAuraType(SPELL_AURA_MOUNTED))
+        if (caster->HasMountedAura())
         {
             float flyspeed = caster->GetSpeedRate(MOVE_FLIGHT);
             float speed = caster->GetSpeedRate(MOVE_RUN);
@@ -3171,7 +3172,7 @@ class spell_item_brewfest_mount_transformation : public SpellScript
             return;
         }
 
-        if (caster->HasAuraType(SPELL_AURA_MOUNTED))
+        if (caster->HasMountedAura())
         {
             caster->RemoveAurasByType(SPELL_AURA_MOUNTED);
             uint32 spell_id;
@@ -4091,6 +4092,100 @@ class spell_item_skyguard_blasting_charges : public SpellScript
     }
 };
 
+// 23595 - Luffa
+class spell_item_luffa : public SpellScript
+{
+    PrepareSpellScript(spell_item_luffa);
+
+    SpellCastResult CheckCast()
+    {
+        if (GetCaster())
+        {
+            Unit::AuraApplicationMap const& auras = GetCaster()->GetAppliedAuras();
+            for (Unit::AuraApplicationMap::const_iterator itr = auras.begin(); itr != auras.end(); ++itr)
+            {
+                Aura const* aura = itr->second->GetBase();
+                if (!(aura->GetSpellInfo()->GetAllEffectsMechanicMask() & (1 << MECHANIC_BLEED)) || aura->GetCasterLevel() > 60 || aura->GetSpellInfo()->IsPositive())
+                    continue;
+
+                return SPELL_CAST_OK;
+            }
+        }
+
+        return SPELL_FAILED_NOTHING_TO_DISPEL;
+    }
+
+    void HandleEffect(SpellEffIndex effIndex)
+    {
+        PreventHitDefaultEffect(effIndex);
+
+        if (Player* player = GetCaster()->ToPlayer())
+        {
+            Unit::AuraApplicationMap const& auras = player->GetAppliedAuras();
+            for (Unit::AuraApplicationMap::const_iterator itr = auras.begin(); itr != auras.end(); ++itr)
+            {
+                Aura const* aura = itr->second->GetBase();
+                if (!(aura->GetSpellInfo()->GetAllEffectsMechanicMask() & (1 << MECHANIC_BLEED)) || aura->GetCasterLevel() > 60 || aura->GetSpellInfo()->IsPositive())
+                    continue;
+
+                player->RemoveAurasDueToSpell(aura->GetId(), aura->GetCasterGUID());
+                return;
+            }
+        }
+    }
+
+    void Register() override
+    {
+        OnCheckCast += SpellCheckCastFn(spell_item_luffa::CheckCast);
+        OnEffectHitTarget += SpellEffectFn(spell_item_luffa::HandleEffect, EFFECT_0, SPELL_EFFECT_DISPEL_MECHANIC);
+    }
+};
+
+// 23097 - Fire Reflector
+// 23131 - Frost Reflector
+// 23132 - Shadow Reflector
+class spell_item_spell_reflectors: public AuraScript
+{
+    PrepareAuraScript(spell_item_spell_reflectors);
+
+    void CalculateAmount(AuraEffect const* /*aurEff*/, int32& amount, bool& /*canBeRecalculated*/)
+    {
+        if (GetCaster()->GetLevel() > 70)
+            amount = 4;
+        else if (GetCaster()->GetLevel() > 60)
+            amount = 50;
+    }
+
+    void Register() override
+    {
+        DoEffectCalcAmount += AuraEffectCalcAmountFn(spell_item_spell_reflectors::CalculateAmount, EFFECT_0, SPELL_AURA_REFLECT_SPELLS_SCHOOL);
+    }
+};
+
+// 46273 - Multiphase Goggles
+class spell_item_multiphase_goggles : public AuraScript
+{
+    PrepareAuraScript(spell_item_multiphase_goggles);
+
+    void OnApply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
+    {
+        if (Player* player = GetTarget()->ToPlayer())
+            player->SetFlag(PLAYER_TRACK_CREATURES, uint32(1) << (CREATURE_TYPE_GAS_CLOUD - 1));
+    }
+
+    void OnRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
+    {
+        if (Player* player = GetTarget()->ToPlayer())
+            player->RemoveFlag(PLAYER_TRACK_CREATURES, uint32(1) << (CREATURE_TYPE_GAS_CLOUD - 1));
+    }
+
+    void Register() override
+    {
+        OnEffectApply += AuraEffectApplyFn(spell_item_multiphase_goggles::OnApply, EFFECT_0, SPELL_AURA_MOD_INVISIBILITY_DETECT , AURA_EFFECT_HANDLE_REAL);
+        OnEffectRemove += AuraEffectRemoveFn(spell_item_multiphase_goggles::OnRemove, EFFECT_0, SPELL_AURA_MOD_INVISIBILITY_DETECT , AURA_EFFECT_HANDLE_REAL);
+    }
+};
+
 void AddSC_item_spell_scripts()
 {
     RegisterSpellScript(spell_item_massive_seaforium_charge);
@@ -4216,4 +4311,7 @@ void AddSC_item_spell_scripts()
     RegisterSpellScript(spell_item_fel_mana_potion);
     RegisterSpellScript(spell_item_gor_dreks_ointment);
     RegisterSpellScript(spell_item_skyguard_blasting_charges);
+    RegisterSpellScript(spell_item_luffa);
+    RegisterSpellScript(spell_item_spell_reflectors);
+    RegisterSpellScript(spell_item_multiphase_goggles);
 }

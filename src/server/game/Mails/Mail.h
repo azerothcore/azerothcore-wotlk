@@ -22,7 +22,6 @@
 #include "DatabaseEnvFwd.h"
 #include "ObjectGuid.h"
 #include <map>
-#include <utility>
 
 struct AuctionEntry;
 struct CalendarEvent;
@@ -209,23 +208,6 @@ struct Mail
     [[nodiscard]] bool IsSentByGM() const { return stationery == MAIL_STATIONERY_GM; }
     [[nodiscard]] bool IsCODPayment() const { return checked & MAIL_CHECK_MASK_COD_PAYMENT; }
     [[nodiscard]] bool IsReturnedMail() const { return checked & MAIL_CHECK_MASK_RETURNED; }
-};
-
-struct ServerMail
-{
-    ServerMail() = default;
-    uint32 id{ 0 };
-    uint8 reqLevel{ 0 };
-    uint32 reqPlayTime{ 0 };
-    uint32 moneyA{ 0 };
-    uint32 moneyH{ 0 };
-    uint32 itemA{ 0 };
-    uint32 itemCountA{ 0 };
-    uint32 itemH{ 0 };
-    uint32 itemCountH{ 0 };
-    std::string subject;
-    std::string body;
-    uint8 active{ 0 };
 };
 
 #endif

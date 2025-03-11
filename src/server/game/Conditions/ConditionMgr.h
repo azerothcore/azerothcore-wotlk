@@ -19,7 +19,6 @@
 #define ACORE_CONDITIONMGR_H
 
 #include "Define.h"
-#include "Errors.h"
 #include <list>
 #include <map>
 
@@ -87,7 +86,9 @@ enum ConditionTypes
     CONDITION_AC_START                 = 100,
     CONDITION_QUEST_SATISFY_EXCLUSIVE  = 101,           // quest_id         0              0                  true if satisfied exclusive group
     CONDITION_HAS_AURA_TYPE            = 102,           // aura_type        0              0                  true if has aura type
-    CONDITION_AC_END                   = 103            // placeholder
+    CONDITION_WORLD_SCRIPT             = 103,           // conditionId      state          0                  true if WorldState::IsConditionFulfilled returns true
+
+    CONDITION_AC_END                   = 104            // placeholder
 };
 
 /*! Documentation on implementing a new ConditionSourceType:

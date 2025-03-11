@@ -19,7 +19,6 @@
 #define DBCFILE_H
 #include <cassert>
 #include <string>
-#include <utility>
 
 // cppcheck-suppress ctuOneDefinitionRuleViolation
 class DBCFile

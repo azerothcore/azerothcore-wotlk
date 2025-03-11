@@ -153,30 +153,19 @@ public:
     };
 };
 
-class spell_gnomeregan_radiation_bolt : public SpellScriptLoader
+class spell_gnomeregan_radiation_bolt : public SpellScript
 {
-public:
-    spell_gnomeregan_radiation_bolt() : SpellScriptLoader("spell_gnomeregan_radiation_bolt") { }
+    PrepareSpellScript(spell_gnomeregan_radiation_bolt);
 
-    class spell_gnomeregan_radiation_bolt_SpellScript : public SpellScript
+    void HandleTriggerSpell(SpellEffIndex effIndex)
     {
-        PrepareSpellScript(spell_gnomeregan_radiation_bolt_SpellScript);
+        if (roll_chance_i(80))
+            PreventHitDefaultEffect(effIndex);
+    }
 
-        void HandleTriggerSpell(SpellEffIndex effIndex)
-        {
-            if (roll_chance_i(80))
-                PreventHitDefaultEffect(effIndex);
-        }
-
-        void Register() override
-        {
-            OnEffectHit += SpellEffectFn(spell_gnomeregan_radiation_bolt_SpellScript::HandleTriggerSpell, EFFECT_1, SPELL_EFFECT_TRIGGER_SPELL);
-        }
-    };
-
-    SpellScript* GetSpellScript() const override
+    void Register() override
     {
-        return new spell_gnomeregan_radiation_bolt_SpellScript;
+        OnEffectHit += SpellEffectFn(spell_gnomeregan_radiation_bolt::HandleTriggerSpell, EFFECT_1, SPELL_EFFECT_TRIGGER_SPELL);
     }
 };
 
@@ -184,5 +173,5 @@ void AddSC_instance_gnomeregan()
 {
     new instance_gnomeregan();
     new npc_kernobee();
-    new spell_gnomeregan_radiation_bolt();
+    RegisterSpellScript(spell_gnomeregan_radiation_bolt);
 }

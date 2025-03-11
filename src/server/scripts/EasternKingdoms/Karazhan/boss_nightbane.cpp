@@ -124,7 +124,7 @@ struct boss_nightbane : public BossAI
         _triggerCountTakeOffWhileFlying = 0;
         _airPhasesCompleted = 0;
 
-        me->SetSpeed(MOVE_RUN, me->GetCreatureTemplate()->speed_run);
+        me->SetSpeed(MOVE_RUN, 2.0f);
         me->SetCanFly(true);
         me->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
         me->SetReactState(REACT_PASSIVE);
@@ -172,7 +172,6 @@ struct boss_nightbane : public BossAI
     {
         if (action == ACTION_START_INTRO)
         {
-            me->GetMap()->LoadGrid(-11260.0f, -1771.0f); // load grid at far end of intro path
             me->GetMap()->SetVisibilityRange(DEFAULT_VISIBILITY_INSTANCE + 100.0f); // see nightbane
             me->AddUnitState(UNIT_STATE_IGNORE_PATHFINDING);
             _phase = PHASE_INTRO;
@@ -300,7 +299,6 @@ struct boss_nightbane : public BossAI
             {
                 me->ClearUnitState(UNIT_STATE_IGNORE_PATHFINDING);
                 me->GetMotionMaster()->MovePoint(POINT_INTRO_LAND, introLandPos);
-                me->SetSpeed(MOVE_RUN, 2.0f);
             }).Schedule(3s, [this](TaskContext /*context*/)
             {
                 me->SetDisableGravity(false);

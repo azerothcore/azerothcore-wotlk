@@ -20,6 +20,7 @@
 #include "Player.h"
 #include "ScriptedCreature.h"
 #include "Spell.h"
+#include "SpellMgr.h"
 
 /*#####
 # item_only_for_flight

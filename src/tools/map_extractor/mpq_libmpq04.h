@@ -20,7 +20,6 @@
 
 #include "libmpq/mpq.h"
 #include "loadlib/loadlib.h"
-#include <cctype>
 #include <cstring>
 #include <deque>
 #include <iostream>

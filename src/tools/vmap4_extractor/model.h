@@ -21,7 +21,6 @@
 #include "loadlib/loadlib.h"
 #include "modelheaders.h"
 #include "vec3d.h"
-#include <vector>
 
 class MPQFile;
 struct WMODoodadData;

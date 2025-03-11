@@ -19,6 +19,7 @@
 #include "Define.h"
 #include "SmartEnum.h"
 #include <stdexcept>
+#include <vector>
 
 namespace Acore::Impl::EnumUtilsImpl
 {

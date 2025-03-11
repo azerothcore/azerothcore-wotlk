@@ -21,7 +21,6 @@
 #include "ScriptedCreature.h"
 #include "ScriptedEscortAI.h"
 #include "ScriptedGossip.h"
-#include "TaskScheduler.h"
 
 /*
 ##################################################

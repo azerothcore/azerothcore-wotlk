@@ -25,6 +25,7 @@
 #include "GameGraveyard.h"
 #include "GameTime.h"
 #include "GridNotifiers.h"
+#include "GridTerrainLoader.h"
 #include "Group.h"
 #include "GuildMgr.h"
 #include "IPLocation.h"
@@ -34,6 +35,7 @@
 #include "Language.h"
 #include "MapMgr.h"
 #include "MiscPackets.h"
+#include "MMapFactory.h"
 #include "MovementGenerator.h"
 #include "ObjectAccessor.h"
 #include "Pet.h"
@@ -44,6 +46,7 @@
 #include "TargetedMovementGenerator.h"
 #include "Tokenize.h"
 #include "WeatherMgr.h"
+#include "WorldSessionMgr.h"
 
 /// @todo: this import is not necessary for compilation and marked as unused by the IDE
 //  however, for some reasons removing it would cause a damn linking issue
@@ -145,7 +148,8 @@ public:
             { "playall",           HandlePlayAllCommand,           SEC_GAMEMASTER,         Console::No  },
             { "skirmish",          HandleSkirmishCommand,          SEC_ADMINISTRATOR,      Console::No  },
             { "mailbox",           HandleMailBoxCommand,           SEC_MODERATOR,          Console::No  },
-            { "string",            HandleStringCommand,            SEC_GAMEMASTER,         Console::No  }
+            { "string",            HandleStringCommand,            SEC_GAMEMASTER,         Console::No  },
+            { "opendoor",          HandleOpenDoorCommand,          SEC_GAMEMASTER,         Console::No  }
         };
 
         return commandTable;
@@ -278,7 +282,7 @@ public:
                 break;
             }
 
-            if (plr->isUsingLfg())
+            if (plr->IsUsingLfg())
             {
                 error = 4;
                 break;
@@ -563,7 +567,8 @@ public:
             return false;
         }
 
-        Cell cell(Acore::ComputeCellCoord(object->GetPositionX(), object->GetPositionY()));
+        CellCoord const cellCoord = Acore::ComputeCellCoord(object->GetPositionX(), object->GetPositionY());
+        Cell cell(cellCoord);
 
         uint32 zoneId, areaId;
         object->GetZoneAndAreaId(zoneId, areaId);
@@ -580,14 +585,8 @@ public:
         float groundZ = object->GetMapHeight(object->GetPositionX(), object->GetPositionY(), MAX_HEIGHT);
         float floorZ = object->GetMapHeight(object->GetPositionX(), object->GetPositionY(), object->GetPositionZ());
 
-        GridCoord gridCoord = Acore::ComputeGridCoord(object->GetPositionX(), object->GetPositionY());
-
-        // 63? WHY?
-        int gridX = 63 - gridCoord.x_coord;
-        int gridY = 63 - gridCoord.y_coord;
-
-        uint32 haveMap = Map::ExistMap(object->GetMapId(), gridX, gridY) ? 1 : 0;
-        uint32 haveVMap = Map::ExistVMap(object->GetMapId(), gridX, gridY) ? 1 : 0;
+        uint32 haveMap = GridTerrainLoader::ExistMap(object->GetMapId(), cell.GridX(), cell.GridY()) ? 1 : 0;
+        uint32 haveVMap = GridTerrainLoader::ExistVMap(object->GetMapId(), cell.GridX(), cell.GridY()) ? 1 : 0;
         uint32 haveMMAP = MMAP::MMapFactory::createOrGetMMapMgr()->GetNavMesh(handler->GetSession()->GetPlayer()->GetMapId()) ? 1 : 0;
 
         if (haveVMap)
@@ -1157,19 +1156,15 @@ public:
     static bool HandleReviveCommand(ChatHandler* handler, Optional<PlayerIdentifier> target)
     {
         if (!target)
-        {
             target = PlayerIdentifier::FromTargetOrSelf(handler);
-        }
 
         if (!target)
-        {
             return false;
-        }
 
         if (target->IsConnected())
         {
             auto targetPlayer = target->GetConnectedPlayer();
-
+            targetPlayer->RemoveAurasDueToSpell(27827); // Spirit of Redemption
             targetPlayer->ResurrectPlayer(!AccountMgr::IsPlayerAccount(targetPlayer->GetSession()->GetSecurity()) ? 1.0f : 0.5f);
             targetPlayer->SpawnCorpseBones();
             targetPlayer->SaveToDB(false, false);
@@ -1994,8 +1989,8 @@ public:
         uint32 mapId;
         uint32 areaId;
         uint32 phase            = 0;
-        char const* areaName    = nullptr;
-        char const* zoneName    = nullptr;
+        std::string areaName    = "";
+        std::string zoneName    = "";
 
         // Guild data print variables defined so that they exist, but are not necessarily used
         uint32 guildId           = 0;
@@ -2327,19 +2322,13 @@ public:
             }
         }
 
-        if (!zoneName)
-        {
+        if (zoneName.empty())
             zoneName = handler->GetAcoreString(LANG_UNKNOWN);
-        }
 
-        if (areaName)
-        {
+        if (!areaName.empty())
             handler->PSendSysMessage(LANG_PINFO_CHR_MAP_WITH_AREA, map->name[locale], zoneName, areaName);
-        }
         else
-        {
             handler->PSendSysMessage(LANG_PINFO_CHR_MAP, map->name[locale], zoneName);
-        }
 
         // Output XVII. - XVIX. if they are not empty
         if (!guildName.empty())
@@ -2411,10 +2400,6 @@ public:
     {
         Player* player = handler->GetSession()->GetPlayer();
 
-        CellCoord p(Acore::ComputeCellCoord(player->GetPositionX(), player->GetPositionY()));
-        Cell cell(p);
-        cell.SetNoCreate();
-
         Acore::RespawnDo u_do;
         Acore::WorldObjectWorker<Acore::RespawnDo> worker(player, u_do);
         Cell::VisitGridObjects(player, worker, player->GetGridActivationRange());
@@ -2459,7 +2444,7 @@ public:
 
         // find only player from same account if any
         if (!target)
-            if (WorldSession* session = sWorld->FindSession(accountId))
+            if (WorldSession* session = sWorldSessionMgr->FindSession(accountId))
             {
                 target = session->GetPlayer();
             }
@@ -2565,7 +2550,7 @@ public:
         // find only player from same account if any
         if (!playerTarget)
         {
-            if (WorldSession* session = sWorld->FindSession(accountId))
+            if (WorldSession* session = sWorldSessionMgr->FindSession(accountId))
             {
                 playerTarget = session->GetPlayer();
             }
@@ -2954,7 +2939,7 @@ public:
             return false;
         }
 
-        sWorld->SendGlobalMessage(WorldPackets::Misc::Playsound(soundId).Write());
+        sWorldSessionMgr->SendGlobalMessage(WorldPackets::Misc::Playsound(soundId).Write());
 
         handler->PSendSysMessage(LANG_COMMAND_PLAYED_TO_ALL, soundId);
         return true;
@@ -3024,18 +3009,22 @@ public:
             return false;
         }
 
-        const char* str = sObjectMgr->GetAcoreString(id, locale ? static_cast<LocaleConstant>(*locale) : DEFAULT_LOCALE);
+        std::string str = sObjectMgr->GetAcoreString(id, locale ? static_cast<LocaleConstant>(*locale) : DEFAULT_LOCALE);
+        handler->SendSysMessage(str);
+        return true;
+    }
 
-        if (!strcmp(str, "<error>"))
+    static bool HandleOpenDoorCommand(ChatHandler* handler, Optional<float> range)
+    {
+        if (GameObject* go = handler->GetPlayer()->FindNearestGameObjectOfType(GAMEOBJECT_TYPE_DOOR, range ? *range : 5.0f))
         {
-            handler->PSendSysMessage(LANG_NO_ACORE_STRING_FOUND, id);
+            go->SetGoState(GO_STATE_ACTIVE);
+            handler->PSendSysMessage(LANG_CMD_DOOR_OPENED, go->GetName(), go->GetEntry());
             return true;
         }
-        else
-        {
-            handler->SendSysMessage(str);
-            return true;
-        }
+
+        handler->SendErrorMessage(LANG_CMD_NO_DOOR_FOUND, range ? *range : 5.0f);
+        return false;
     }
 };
 

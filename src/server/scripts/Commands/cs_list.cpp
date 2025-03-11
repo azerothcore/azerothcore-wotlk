@@ -32,7 +32,6 @@ EndScriptData */
 #include "MapMgr.h"
 #include "ObjectMgr.h"
 #include "Player.h"
-#include "Random.h"
 #include "SpellAuraEffects.h"
 
 using namespace Acore::ChatCommands;
@@ -461,8 +460,8 @@ public:
 
         wstrToLower(namePart);
 
-        char const* talentStr = handler->GetAcoreString(LANG_TALENT);
-        char const* passiveStr = handler->GetAcoreString(LANG_PASSIVE);
+        std::string talentStr = handler->GetAcoreString(LANG_TALENT);
+        std::string passiveStr = handler->GetAcoreString(LANG_PASSIVE);
 
         Unit::AuraApplicationMap const& auras = unit->GetAppliedAuras();
         handler->PSendSysMessage(LANG_COMMAND_TARGET_LISTAURAS, auras.size());

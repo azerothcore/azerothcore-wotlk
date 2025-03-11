@@ -38,7 +38,7 @@ void Player::_LoadCharacterSettings(PreparedQueryResult result)
         {
             Field* fields = result->Fetch();
 
-            std::string source = fields[0].Get<std::string>();;
+            std::string source = fields[0].Get<std::string>();
             std::string data = fields[1].Get<std::string>();
 
             std::vector<std::string_view> tokens = Acore::Tokenize(data, ' ', false);

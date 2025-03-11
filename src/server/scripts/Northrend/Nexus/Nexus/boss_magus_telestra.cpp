@@ -79,159 +79,146 @@ enum Events
     EVENT_KILL_TALK                 = 9
 };
 
-class boss_magus_telestra : public CreatureScript
+struct boss_magus_telestra : public BossAI
 {
-public:
-    boss_magus_telestra() : CreatureScript("boss_magus_telestra") { }
+    boss_magus_telestra(Creature* creature) : BossAI(creature, DATA_MAGUS_TELESTRA_EVENT) { }
 
-    CreatureAI* GetAI(Creature* creature) const override
+    uint8 copiesDied;
+    bool achievement;
+
+    void Reset() override
     {
-        return GetNexusAI<boss_magus_telestraAI>(creature);
+        BossAI::Reset();
+        copiesDied = 0;
+        achievement = true;
+
+        if (IsHeroic() && sGameEventMgr->IsActiveEvent(GAME_EVENT_WINTER_VEIL) && !me->HasAura(SPELL_WEAR_CHRISTMAS_HAT))
+            me->AddAura(SPELL_WEAR_CHRISTMAS_HAT, me);
     }
 
-    struct boss_magus_telestraAI : public BossAI
+    uint32 GetData(uint32 data) const override
     {
-        boss_magus_telestraAI(Creature* creature) : BossAI(creature, DATA_MAGUS_TELESTRA_EVENT)
+        if (data == me->GetEntry())
+            return achievement;
+        return 0;
+    }
+
+    void JustEngagedWith(Unit* who) override
+    {
+        BossAI::JustEngagedWith(who);
+        Talk(SAY_AGGRO);
+
+        events.ScheduleEvent(EVENT_MAGUS_ICE_NOVA, 10s);
+        events.ScheduleEvent(EVENT_MAGUS_FIREBOMB, 0ms);
+        events.ScheduleEvent(EVENT_MAGUS_GRAVITY_WELL, 20s);
+        events.ScheduleEvent(EVENT_MAGUS_HEALTH1, 1s);
+        if (IsHeroic())
+            events.ScheduleEvent(EVENT_MAGUS_HEALTH2, 1s);
+    }
+
+    void AttackStart(Unit* who) override
+    {
+        if (who && me->Attack(who, true))
+            me->GetMotionMaster()->MoveChase(who, 20.0f);
+    }
+
+    void JustDied(Unit* killer) override
+    {
+        BossAI::JustDied(killer);
+        Talk(SAY_DEATH);
+    }
+
+    void KilledUnit(Unit*) override
+    {
+        if (events.GetNextEventTime(EVENT_KILL_TALK) == 0)
         {
+            Talk(SAY_KILL);
+            events.ScheduleEvent(EVENT_KILL_TALK, 6s);
         }
+    }
 
-        uint8 copiesDied;
-        bool achievement;
+    void JustSummoned(Creature* summon) override
+    {
+        summons.Summon(summon);
+        summon->SetInCombatWithZone();
+    }
 
-        void Reset() override
+    void SpellHit(Unit* caster, SpellInfo const* spellInfo) override
+    {
+        if (spellInfo->Id >= SPELL_FIRE_MAGUS_DEATH && spellInfo->Id <= SPELL_ARCANE_MAGUS_DEATH && caster->ToCreature())
         {
-            BossAI::Reset();
-            copiesDied = 0;
-            achievement = true;
+            events.ScheduleEvent(EVENT_MAGUS_FAIL_ACHIEVEMENT, 5s);
+            caster->ToCreature()->DespawnOrUnsummon(1000);
 
-            if (IsHeroic() && sGameEventMgr->IsActiveEvent(GAME_EVENT_WINTER_VEIL) && !me->HasAura(SPELL_WEAR_CHRISTMAS_HAT))
-                me->AddAura(SPELL_WEAR_CHRISTMAS_HAT, me);
+            if (++copiesDied >= 3)
+            {
+                copiesDied = 0;
+                events.CancelEvent(EVENT_MAGUS_FAIL_ACHIEVEMENT);
+                events.ScheduleEvent(EVENT_MAGUS_MERGED, 5s);
+                me->CastSpell(me, SPELL_BURNING_WINDS, true);
+            }
         }
+    }
 
-        uint32 GetData(uint32 data) const override
+    void UpdateAI(uint32 diff) override
+    {
+        if (!UpdateVictim())
+            return;
+
+        events.Update(diff);
+        if (me->HasUnitState(UNIT_STATE_CASTING))
+            return;
+
+        switch (events.ExecuteEvent())
         {
-            if (data == me->GetEntry())
-                return achievement;
-            return 0;
-        }
-
-        void JustEngagedWith(Unit* who) override
-        {
-            BossAI::JustEngagedWith(who);
-            Talk(SAY_AGGRO);
-
-            events.ScheduleEvent(EVENT_MAGUS_ICE_NOVA, 10s);
-            events.ScheduleEvent(EVENT_MAGUS_FIREBOMB, 0ms);
-            events.ScheduleEvent(EVENT_MAGUS_GRAVITY_WELL, 20s);
+        case EVENT_MAGUS_HEALTH1:
+            if (me->HealthBelowPct(51))
+            {
+                me->CastSpell(me, SPELL_START_SUMMON_CLONES, false);
+                events.ScheduleEvent(EVENT_MAGUS_RELOCATE, 3500ms);
+                Talk(SAY_SPLIT);
+                break;
+            }
             events.ScheduleEvent(EVENT_MAGUS_HEALTH1, 1s);
-            if (IsHeroic())
-                events.ScheduleEvent(EVENT_MAGUS_HEALTH2, 1s);
-        }
-
-        void AttackStart(Unit* who) override
-        {
-            if (who && me->Attack(who, true))
-                me->GetMotionMaster()->MoveChase(who, 20.0f);
-        }
-
-        void JustDied(Unit* killer) override
-        {
-            BossAI::JustDied(killer);
-            Talk(SAY_DEATH);
-        }
-
-        void KilledUnit(Unit*) override
-        {
-            if (events.GetNextEventTime(EVENT_KILL_TALK) == 0)
+            break;
+        case EVENT_MAGUS_HEALTH2:
+            if (me->HealthBelowPct(11))
             {
-                Talk(SAY_KILL);
-                events.ScheduleEvent(EVENT_KILL_TALK, 6s);
+                me->CastSpell(me, SPELL_START_SUMMON_CLONES, false);
+                events.ScheduleEvent(EVENT_MAGUS_RELOCATE, 3500ms);
+                Talk(SAY_SPLIT);
+                break;
             }
+            events.ScheduleEvent(EVENT_MAGUS_HEALTH2, 1s);
+            break;
+        case EVENT_MAGUS_FIREBOMB:
+            if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0))
+                me->CastSpell(target, SPELL_FIREBOMB, false);
+            events.ScheduleEvent(EVENT_MAGUS_FIREBOMB, 3s);
+            break;
+        case EVENT_MAGUS_ICE_NOVA:
+            me->CastSpell(me, SPELL_ICE_NOVA, false);
+            events.ScheduleEvent(EVENT_MAGUS_ICE_NOVA, 15s);
+            break;
+        case EVENT_MAGUS_GRAVITY_WELL:
+            me->CastSpell(me, SPELL_GRAVITY_WELL, false);
+            events.ScheduleEvent(EVENT_MAGUS_GRAVITY_WELL, 15s);
+            break;
+        case EVENT_MAGUS_FAIL_ACHIEVEMENT:
+            achievement = false;
+            break;
+        case EVENT_MAGUS_RELOCATE:
+            me->NearTeleportTo(505.04f, 88.915f, -16.13f, 2.98f);
+            break;
+        case EVENT_MAGUS_MERGED:
+            me->CastSpell(me, SPELL_TELESTRA_BACK, true);
+            me->RemoveAllAuras();
+            Talk(SAY_MERGE);
+            break;
         }
 
-        void JustSummoned(Creature* summon) override
-        {
-            summons.Summon(summon);
-            summon->SetInCombatWithZone();
-        }
-
-        void SpellHit(Unit* caster, SpellInfo const* spellInfo) override
-        {
-            if (spellInfo->Id >= SPELL_FIRE_MAGUS_DEATH && spellInfo->Id <= SPELL_ARCANE_MAGUS_DEATH && caster->ToCreature())
-            {
-                events.ScheduleEvent(EVENT_MAGUS_FAIL_ACHIEVEMENT, 5s);
-                caster->ToCreature()->DespawnOrUnsummon(1000);
-
-                if (++copiesDied >= 3)
-                {
-                    copiesDied = 0;
-                    events.CancelEvent(EVENT_MAGUS_FAIL_ACHIEVEMENT);
-                    events.ScheduleEvent(EVENT_MAGUS_MERGED, 5s);
-                    me->CastSpell(me, SPELL_BURNING_WINDS, true);
-                }
-            }
-        }
-
-        void UpdateAI(uint32 diff) override
-        {
-            if (!UpdateVictim())
-                return;
-
-            events.Update(diff);
-            if (me->HasUnitState(UNIT_STATE_CASTING))
-                return;
-
-            switch (events.ExecuteEvent())
-            {
-                case EVENT_MAGUS_HEALTH1:
-                    if (me->HealthBelowPct(51))
-                    {
-                        me->CastSpell(me, SPELL_START_SUMMON_CLONES, false);
-                        events.ScheduleEvent(EVENT_MAGUS_RELOCATE, 3500ms);
-                        Talk(SAY_SPLIT);
-                        break;
-                    }
-                    events.ScheduleEvent(EVENT_MAGUS_HEALTH1, 1s);
-                    break;
-                case EVENT_MAGUS_HEALTH2:
-                    if (me->HealthBelowPct(11))
-                    {
-                        me->CastSpell(me, SPELL_START_SUMMON_CLONES, false);
-                        events.ScheduleEvent(EVENT_MAGUS_RELOCATE, 3500ms);
-                        Talk(SAY_SPLIT);
-                        break;
-                    }
-                    events.ScheduleEvent(EVENT_MAGUS_HEALTH2, 1s);
-                    break;
-                case EVENT_MAGUS_FIREBOMB:
-                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0))
-                        me->CastSpell(target, SPELL_FIREBOMB, false);
-                    events.ScheduleEvent(EVENT_MAGUS_FIREBOMB, 3s);
-                    break;
-                case EVENT_MAGUS_ICE_NOVA:
-                    me->CastSpell(me, SPELL_ICE_NOVA, false);
-                    events.ScheduleEvent(EVENT_MAGUS_ICE_NOVA, 15s);
-                    break;
-                case EVENT_MAGUS_GRAVITY_WELL:
-                    me->CastSpell(me, SPELL_GRAVITY_WELL, false);
-                    events.ScheduleEvent(EVENT_MAGUS_GRAVITY_WELL, 15s);
-                    break;
-                case EVENT_MAGUS_FAIL_ACHIEVEMENT:
-                    achievement = false;
-                    break;
-                case EVENT_MAGUS_RELOCATE:
-                    me->NearTeleportTo(505.04f, 88.915f, -16.13f, 2.98f);
-                    break;
-                case EVENT_MAGUS_MERGED:
-                    me->CastSpell(me, SPELL_TELESTRA_BACK, true);
-                    me->RemoveAllAuras();
-                    Talk(SAY_MERGE);
-                    break;
-            }
-
-            DoMeleeAttackIfReady();
-        }
-    };
+        DoMeleeAttackIfReady();
+    }
 };
 
 class spell_boss_magus_telestra_summon_telestra_clones_aura : public AuraScript
@@ -331,7 +318,7 @@ public:
 
 void AddSC_boss_magus_telestra()
 {
-    new boss_magus_telestra();
+    RegisterNexusCreatureAI(boss_magus_telestra);
     RegisterSpellScript(spell_boss_magus_telestra_summon_telestra_clones_aura);
     RegisterSpellScript(spell_boss_magus_telestra_gravity_well);
     new achievement_split_personality();

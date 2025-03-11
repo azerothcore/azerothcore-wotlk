@@ -21,6 +21,7 @@
 #include "PassiveAI.h"
 #include "Player.h"
 #include "SpellAuraEffects.h"
+#include "SpellMgr.h"
 #include "SpellScript.h"
 #include "SpellScriptLoader.h"
 #include "Vehicle.h"
@@ -500,7 +501,14 @@ class spell_pilgrims_bounty_feast_on_generic : public SpellScript
 
                     // Cast spirit of sharing
                     if (count >= 5)
+                    {
+                        player->RemoveAurasDueToSpell(SPELL_PLAYER_TURKEY);
+                        player->RemoveAurasDueToSpell(SPELL_PLAYER_STUFFING);
+                        player->RemoveAurasDueToSpell(SPELL_PLAYER_PIE);
+                        player->RemoveAurasDueToSpell(SPELL_PLAYER_CRANBERRY);
+                        player->RemoveAurasDueToSpell(SPELL_PLAYER_SWEET_POTATOES);
                         player->CastSpell(player, SPELL_SPIRIT_OF_SHARING, true);
+                    }
                 }
             }
         }

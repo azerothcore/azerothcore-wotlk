@@ -23,7 +23,6 @@
 #include "Player.h"
 #include "SpellAuraEffects.h"
 #include "SpellAuras.h"
-#include "Types.h"
 #include "World.h"
 
 bool ArenaSpectator::HandleSpectatorSpectateCommand(ChatHandler* handler, std::string const& name)
@@ -86,7 +85,7 @@ bool ArenaSpectator::HandleSpectatorSpectateCommand(ChatHandler* handler, std::s
     if (player->IsInCombat())
         errors.push_back("Can't be in combat.");
 
-    if (player->isUsingLfg())
+    if (player->IsUsingLfg())
         errors.push_back("Can't spectate while using LFG system.");
 
     if (player->InBattlegroundQueue())

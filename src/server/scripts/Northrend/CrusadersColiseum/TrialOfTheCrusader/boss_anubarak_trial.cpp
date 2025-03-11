@@ -829,41 +829,35 @@ public:
     };
 };
 
-class spell_pursuing_spikes : public SpellScriptLoader
+class spell_pursuing_spikes_aura : public AuraScript
 {
-public:
-    spell_pursuing_spikes() : SpellScriptLoader("spell_pursuing_spikes") { }
+    PrepareAuraScript(spell_pursuing_spikes_aura);
 
-    class spell_pursuing_spikesAuraScript : public AuraScript
+    bool Validate(SpellInfo const* /*spellInfo*/) override
     {
-        PrepareAuraScript(spell_pursuing_spikesAuraScript)
+        return ValidateSpellInfo({ SPELL_SPIKE_FAIL, SPELL_IMPALE });
+    }
 
-        void HandleEffectPeriodic(AuraEffect const*   /*aurEff*/)
+    void HandleEffectPeriodic(AuraEffect const*   /*aurEff*/)
+    {
+        if (Unit* target = GetTarget())
         {
-            if (Unit* target = GetTarget())
+            if (Creature* c = target->FindNearestCreature(NPC_FROST_SPHERE, 8.0f, true))
             {
-                if (Creature* c = target->FindNearestCreature(NPC_FROST_SPHERE, 8.0f, true))
-                {
-                    target->UpdatePosition(*c, false);
-                    target->CastCustomSpell(SPELL_SPIKE_FAIL, SPELLVALUE_MAX_TARGETS, 1);
-                    if (target->IsCreature())
-                        target->ToCreature()->AI()->DoAction(-1);
-                    Remove();
-                    return;
-                }
-                target->CastSpell((Unit*)nullptr, SPELL_IMPALE, true);
+                target->UpdatePosition(*c, false);
+                target->CastCustomSpell(SPELL_SPIKE_FAIL, SPELLVALUE_MAX_TARGETS, 1);
+                if (target->IsCreature())
+                    target->ToCreature()->AI()->DoAction(-1);
+                Remove();
+                return;
             }
+            target->CastSpell((Unit*)nullptr, SPELL_IMPALE, true);
         }
+    }
 
-        void Register() override
-        {
-            OnEffectPeriodic += AuraEffectPeriodicFn(spell_pursuing_spikesAuraScript::HandleEffectPeriodic, EFFECT_0, SPELL_AURA_PERIODIC_DUMMY);
-        }
-    };
-
-    AuraScript* GetAuraScript() const override
+    void Register() override
     {
-        return new spell_pursuing_spikesAuraScript();
+        OnEffectPeriodic += AuraEffectPeriodicFn(spell_pursuing_spikes_aura::HandleEffectPeriodic, EFFECT_0, SPELL_AURA_PERIODIC_DUMMY);
     }
 };
 
@@ -874,73 +868,56 @@ enum eLeechingSwarmSpells
     SPELL_LEECHING_SWARM_HEAL   = 66125,
 };
 
-class spell_gen_leeching_swarm : public SpellScriptLoader
+class spell_gen_leeching_swarm_aura : public AuraScript
 {
-public:
-    spell_gen_leeching_swarm() : SpellScriptLoader("spell_gen_leeching_swarm") { }
+    PrepareAuraScript(spell_gen_leeching_swarm_aura);
 
-    class spell_gen_leeching_swarm_AuraScript : public AuraScript
+    bool Validate(SpellInfo const* /*spellInfo*/) override
     {
-        PrepareAuraScript(spell_gen_leeching_swarm_AuraScript);
+        return ValidateSpellInfo({ SPELL_LEECHING_SWARM_DMG, SPELL_LEECHING_SWARM_HEAL });
+    }
 
-        bool Validate(SpellInfo const* /*spellInfo*/) override
-        {
-            return ValidateSpellInfo({ SPELL_LEECHING_SWARM_DMG, SPELL_LEECHING_SWARM_HEAL });
-        }
-
-        void HandleEffectPeriodic(AuraEffect const* aurEff)
-        {
-            if (Unit* caster = GetCaster())
-            {
-                int32 lifeLeeched = GetTarget()->CountPctFromCurHealth(aurEff->GetAmount());
-                if (lifeLeeched < 250)
-                    lifeLeeched = 250;
-                // Damage
-                caster->CastCustomSpell(GetTarget(), SPELL_LEECHING_SWARM_DMG, &lifeLeeched, 0, 0, true);
-                // Heal is handled in damage spell. It has to heal the same amount, but some of the dmg can be resisted.
-            }
-        }
-
-        void Register() override
-        {
-            OnEffectPeriodic += AuraEffectPeriodicFn(spell_gen_leeching_swarm_AuraScript::HandleEffectPeriodic, EFFECT_0, SPELL_AURA_PERIODIC_DUMMY);
-        }
-    };
-
-    AuraScript* GetAuraScript() const override
+    void HandleEffectPeriodic(AuraEffect const* aurEff)
     {
-        return new spell_gen_leeching_swarm_AuraScript();
+        if (Unit* caster = GetCaster())
+        {
+            int32 lifeLeeched = GetTarget()->CountPctFromCurHealth(aurEff->GetAmount());
+            if (lifeLeeched < 250)
+                lifeLeeched = 250;
+            // Damage
+            caster->CastCustomSpell(GetTarget(), SPELL_LEECHING_SWARM_DMG, &lifeLeeched, 0, 0, true);
+            // Heal is handled in damage spell. It has to heal the same amount, but some of the dmg can be resisted.
+        }
+    }
+
+    void Register() override
+    {
+        OnEffectPeriodic += AuraEffectPeriodicFn(spell_gen_leeching_swarm_aura::HandleEffectPeriodic, EFFECT_0, SPELL_AURA_PERIODIC_DUMMY);
     }
 };
 
-class spell_gen_leeching_swarm_dmg : public SpellScriptLoader
+class spell_gen_leeching_swarm_dmg : public SpellScript
 {
-public:
-    spell_gen_leeching_swarm_dmg() : SpellScriptLoader("spell_gen_leeching_swarm_dmg") {}
+    PrepareSpellScript(spell_gen_leeching_swarm_dmg);
 
-    class spell_gen_leeching_swarm_dmg_SpellScript : public SpellScript
+    bool Validate(SpellInfo const* /*spellInfo*/) override
     {
-        PrepareSpellScript(spell_gen_leeching_swarm_dmg_SpellScript);
+        return ValidateSpellInfo({ SPELL_LEECHING_SWARM_HEAL });
+    }
 
-        void HandleAfterHit()
-        {
-            if (Unit* caster = GetCaster())
-                if (GetHitDamage() > 0)
-                {
-                    int32 damage = GetHitDamage();
-                    caster->CastCustomSpell(caster, SPELL_LEECHING_SWARM_HEAL, &damage, 0, 0, true);
-                }
-        }
-
-        void Register() override
-        {
-            AfterHit += SpellHitFn(spell_gen_leeching_swarm_dmg_SpellScript::HandleAfterHit);
-        }
-    };
-
-    SpellScript* GetSpellScript() const override
+    void HandleAfterHit()
     {
-        return new spell_gen_leeching_swarm_dmg_SpellScript();
+        if (Unit* caster = GetCaster())
+            if (GetHitDamage() > 0)
+            {
+                int32 damage = GetHitDamage();
+                caster->CastCustomSpell(caster, SPELL_LEECHING_SWARM_HEAL, &damage, 0, 0, true);
+            }
+    }
+
+    void Register() override
+    {
+        AfterHit += SpellHitFn(spell_gen_leeching_swarm_dmg::HandleAfterHit);
     }
 };
 
@@ -951,7 +928,7 @@ void AddSC_boss_anubarak_trial()
     new npc_frost_sphere();
     new npc_nerubian_burrower();
     new npc_anubarak_spike();
-    new spell_pursuing_spikes();
-    new spell_gen_leeching_swarm();
-    new spell_gen_leeching_swarm_dmg();
+    RegisterSpellScript(spell_pursuing_spikes_aura);
+    RegisterSpellScript(spell_gen_leeching_swarm_aura);
+    RegisterSpellScript(spell_gen_leeching_swarm_dmg);
 }

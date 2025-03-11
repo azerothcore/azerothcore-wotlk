@@ -506,6 +506,9 @@ bool Acore::Impl::ChatCommands::ChatCommandNode::IsInvokerVisible(ChatHandler co
     if (!_invoker)
         return false;
 
+    if (!sScriptMgr->OnBeforeIsInvokerVisible(_name, _permission, who))
+        return true;
+
     if (who.IsConsole() && (_permission.AllowConsole == Acore::ChatCommands::Console::No))
         return false;
 

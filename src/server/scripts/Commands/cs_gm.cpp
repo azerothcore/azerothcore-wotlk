@@ -92,22 +92,31 @@ public:
         return false;
     }
 
-    static bool HandleGMFlyCommand(ChatHandler* handler, bool enable)
+    static bool HandleGMFlyCommand(ChatHandler* handler, Optional<bool> enable)
     {
         Player* target = handler->getSelectedPlayer();
         if (!target)
             target = handler->GetSession()->GetPlayer();
 
         WorldPacket data(12);
-        if (enable)
-            data.SetOpcode(SMSG_MOVE_SET_CAN_FLY);
+
+        bool canFly = false;
+        if (enable.has_value())
+        {
+            data.SetOpcode(*enable ? SMSG_MOVE_SET_CAN_FLY : SMSG_MOVE_UNSET_CAN_FLY);
+            canFly = *enable;
+        }
         else
-            data.SetOpcode(SMSG_MOVE_UNSET_CAN_FLY);
+        {
+            canFly = handler->GetSession()->GetPlayer()->CanFly();
+            data.SetOpcode(canFly ? SMSG_MOVE_UNSET_CAN_FLY : SMSG_MOVE_SET_CAN_FLY);
+            canFly = !canFly;
+        }
 
         data << target->GetPackGUID();
         data << uint32(0);                                      // unknown
         target->SendMessageToSet(&data, true);
-        handler->PSendSysMessage(LANG_COMMAND_FLYMODE_STATUS, handler->GetNameLink(target), enable ? "on" : "off");
+        handler->PSendSysMessage(LANG_COMMAND_FLYMODE_STATUS, handler->GetNameLink(target), canFly ? "on" : "off");
         return true;
     }
 

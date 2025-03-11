@@ -137,42 +137,31 @@ public:
     };
 };
 
-class spell_shadowfang_keep_haunting_spirits : public SpellScriptLoader
+class spell_shadowfang_keep_haunting_spirits_aura : public AuraScript
 {
-public:
-    spell_shadowfang_keep_haunting_spirits() : SpellScriptLoader("spell_shadowfang_keep_haunting_spirits") { }
+    PrepareAuraScript(spell_shadowfang_keep_haunting_spirits_aura);
 
-    class spell_shadowfang_keep_haunting_spirits_AuraScript : public AuraScript
+    void CalcPeriodic(AuraEffect const* /*aurEff*/, bool& isPeriodic, int32& amplitude)
     {
-        PrepareAuraScript(spell_shadowfang_keep_haunting_spirits_AuraScript);
+        isPeriodic = true;
+        amplitude = irand(30 * IN_MILLISECONDS, 90 * IN_MILLISECONDS);
+    }
 
-        void CalcPeriodic(AuraEffect const* /*aurEff*/, bool& isPeriodic, int32& amplitude)
-        {
-            isPeriodic = true;
-            amplitude = irand(30 * IN_MILLISECONDS, 90 * IN_MILLISECONDS);
-        }
-
-        void HandleDummyTick(AuraEffect const* aurEff)
-        {
-            GetTarget()->CastSpell((Unit*)nullptr, aurEff->GetAmount(), true);
-        }
-
-        void HandleUpdatePeriodic(AuraEffect* aurEff)
-        {
-            aurEff->CalculatePeriodic(GetCaster());
-        }
-
-        void Register() override
-        {
-            DoEffectCalcPeriodic += AuraEffectCalcPeriodicFn(spell_shadowfang_keep_haunting_spirits_AuraScript::CalcPeriodic, EFFECT_0, SPELL_AURA_DUMMY);
-            OnEffectPeriodic += AuraEffectPeriodicFn(spell_shadowfang_keep_haunting_spirits_AuraScript::HandleDummyTick, EFFECT_0, SPELL_AURA_DUMMY);
-            OnEffectUpdatePeriodic += AuraEffectUpdatePeriodicFn(spell_shadowfang_keep_haunting_spirits_AuraScript::HandleUpdatePeriodic, EFFECT_0, SPELL_AURA_DUMMY);
-        }
-    };
-
-    AuraScript* GetAuraScript() const override
+    void HandleDummyTick(AuraEffect const* aurEff)
     {
-        return new spell_shadowfang_keep_haunting_spirits_AuraScript();
+        GetTarget()->CastSpell((Unit*)nullptr, aurEff->GetAmount(), true);
+    }
+
+    void HandleUpdatePeriodic(AuraEffect* aurEff)
+    {
+        aurEff->CalculatePeriodic(GetCaster());
+    }
+
+    void Register() override
+    {
+        DoEffectCalcPeriodic += AuraEffectCalcPeriodicFn(spell_shadowfang_keep_haunting_spirits_aura::CalcPeriodic, EFFECT_0, SPELL_AURA_DUMMY);
+        OnEffectPeriodic += AuraEffectPeriodicFn(spell_shadowfang_keep_haunting_spirits_aura::HandleDummyTick, EFFECT_0, SPELL_AURA_DUMMY);
+        OnEffectUpdatePeriodic += AuraEffectUpdatePeriodicFn(spell_shadowfang_keep_haunting_spirits_aura::HandleUpdatePeriodic, EFFECT_0, SPELL_AURA_DUMMY);
     }
 };
 
@@ -182,58 +171,70 @@ enum ForsakenSpells
     SPELL_FORSAKEN_SKILL_SHADOW         = 7053
 };
 
-class spell_shadowfang_keep_forsaken_skills : public SpellScriptLoader
+class spell_shadowfang_keep_forsaken_skills_aura : public AuraScript
 {
-public:
-    spell_shadowfang_keep_forsaken_skills() : SpellScriptLoader("spell_shadowfang_keep_forsaken_skills") { }
+    PrepareAuraScript(spell_shadowfang_keep_forsaken_skills_aura);
 
-    class spell_shadowfang_keep_forsaken_skills_AuraScript : public AuraScript
+    bool Validate(SpellInfo const* /*spellInfo*/) override
     {
-        PrepareAuraScript(spell_shadowfang_keep_forsaken_skills_AuraScript);
-
-        bool Load() override
-        {
-            _forsakenSpell = 0;
-            return true;
-        }
-
-        void OnApply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
-        {
-            _forsakenSpell = urand(SPELL_FORSAKEN_SKILL_SWORD, SPELL_FORSAKEN_SKILL_SHADOW);
-            if (_forsakenSpell == SPELL_FORSAKEN_SKILL_SHADOW - 1)
-                ++_forsakenSpell;
-            GetUnitOwner()->CastSpell(GetUnitOwner(), _forsakenSpell, true);
-        }
-
-        void HandleDummyTick(AuraEffect const*  /*aurEff*/)
-        {
-            PreventDefaultAction();
-            GetUnitOwner()->RemoveAurasDueToSpell(_forsakenSpell);
-            _forsakenSpell = urand(SPELL_FORSAKEN_SKILL_SWORD, SPELL_FORSAKEN_SKILL_SHADOW);
-            if (_forsakenSpell == SPELL_FORSAKEN_SKILL_SHADOW - 1)
-                ++_forsakenSpell;
-            GetUnitOwner()->CastSpell(GetUnitOwner(), _forsakenSpell, true);
-        }
-
-        void Register() override
-        {
-            OnEffectApply += AuraEffectApplyFn(spell_shadowfang_keep_forsaken_skills_AuraScript::OnApply, EFFECT_0, SPELL_AURA_PERIODIC_DUMMY, AURA_EFFECT_HANDLE_REAL);
-            OnEffectPeriodic += AuraEffectPeriodicFn(spell_shadowfang_keep_forsaken_skills_AuraScript::HandleDummyTick, EFFECT_0, SPELL_AURA_PERIODIC_DUMMY);
-        }
-
-    private:
-        uint32 _forsakenSpell;
-    };
-
-    AuraScript* GetAuraScript() const override
-    {
-        return new spell_shadowfang_keep_forsaken_skills_AuraScript();
+        return ValidateSpellInfo(
+            {
+                SPELL_FORSAKEN_SKILL_SWORD,
+                SPELL_FORSAKEN_SKILL_SWORD+1,
+                SPELL_FORSAKEN_SKILL_SWORD+2,
+                SPELL_FORSAKEN_SKILL_SWORD+3,
+                SPELL_FORSAKEN_SKILL_SWORD+4,
+                SPELL_FORSAKEN_SKILL_SWORD+5,
+                SPELL_FORSAKEN_SKILL_SWORD+6,
+                SPELL_FORSAKEN_SKILL_SWORD+7,
+                SPELL_FORSAKEN_SKILL_SWORD+8,
+                SPELL_FORSAKEN_SKILL_SWORD+9,
+                SPELL_FORSAKEN_SKILL_SWORD+10,
+                SPELL_FORSAKEN_SKILL_SWORD+11,
+                SPELL_FORSAKEN_SKILL_SWORD+12,
+                SPELL_FORSAKEN_SKILL_SWORD+13,
+                // SPELL_FORSAKEN_SKILL_SHADOW-1, // not used
+                SPELL_FORSAKEN_SKILL_SHADOW,
+            });
     }
+
+    bool Load() override
+    {
+        _forsakenSpell = 0;
+        return true;
+    }
+
+    void OnApply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
+    {
+        _forsakenSpell = urand(SPELL_FORSAKEN_SKILL_SWORD, SPELL_FORSAKEN_SKILL_SHADOW);
+        if (_forsakenSpell == SPELL_FORSAKEN_SKILL_SHADOW - 1)
+            ++_forsakenSpell;
+        GetUnitOwner()->CastSpell(GetUnitOwner(), _forsakenSpell, true);
+    }
+
+    void HandleDummyTick(AuraEffect const*  /*aurEff*/)
+    {
+        PreventDefaultAction();
+        GetUnitOwner()->RemoveAurasDueToSpell(_forsakenSpell);
+        _forsakenSpell = urand(SPELL_FORSAKEN_SKILL_SWORD, SPELL_FORSAKEN_SKILL_SHADOW);
+        if (_forsakenSpell == SPELL_FORSAKEN_SKILL_SHADOW - 1)
+            ++_forsakenSpell;
+        GetUnitOwner()->CastSpell(GetUnitOwner(), _forsakenSpell, true);
+    }
+
+    void Register() override
+    {
+        OnEffectApply += AuraEffectApplyFn(spell_shadowfang_keep_forsaken_skills_aura::OnApply, EFFECT_0, SPELL_AURA_PERIODIC_DUMMY, AURA_EFFECT_HANDLE_REAL);
+        OnEffectPeriodic += AuraEffectPeriodicFn(spell_shadowfang_keep_forsaken_skills_aura::HandleDummyTick, EFFECT_0, SPELL_AURA_PERIODIC_DUMMY);
+    }
+
+private:
+    uint32 _forsakenSpell;
 };
 
 void AddSC_instance_shadowfang_keep()
 {
     new instance_shadowfang_keep();
-    new spell_shadowfang_keep_haunting_spirits();
-    new spell_shadowfang_keep_forsaken_skills();
+    RegisterSpellScript(spell_shadowfang_keep_haunting_spirits_aura);
+    RegisterSpellScript(spell_shadowfang_keep_forsaken_skills_aura);
 }

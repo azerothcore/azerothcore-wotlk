@@ -1389,18 +1389,6 @@ void SpellMgr::LoadSpellInfoCorrections()
         spellInfo->RangeEntry = sSpellRangeStore.LookupEntry(13); // 50000yd
     });
 
-    // A'dal's Song of Battle
-    ApplySpellFix({ 39953 }, [](SpellInfo* spellInfo)
-    {
-        spellInfo->Effects[EFFECT_0].TargetA = SpellImplicitTargetInfo(TARGET_SRC_CASTER);
-        spellInfo->Effects[EFFECT_1].TargetA = SpellImplicitTargetInfo(TARGET_SRC_CASTER);
-        spellInfo->Effects[EFFECT_2].TargetA = SpellImplicitTargetInfo(TARGET_SRC_CASTER);
-        spellInfo->Effects[EFFECT_0].TargetB = SpellImplicitTargetInfo(TARGET_UNIT_SRC_AREA_ALLY);
-        spellInfo->Effects[EFFECT_1].TargetB = SpellImplicitTargetInfo(TARGET_UNIT_SRC_AREA_ALLY);
-        spellInfo->Effects[EFFECT_2].TargetB = SpellImplicitTargetInfo(TARGET_UNIT_SRC_AREA_ALLY);
-        spellInfo->DurationEntry = sSpellDurationStore.LookupEntry(367); // 2 Hours
-    });
-
     ApplySpellFix({
         57607,  // WintergraspCatapult - Spell Plague Barrel - EffectRadiusIndex
         57619,  // WintergraspDemolisher - Spell Hourl Boulder - EffectRadiusIndex
@@ -1614,6 +1602,7 @@ void SpellMgr::LoadSpellInfoCorrections()
     ApplySpellFix({ 44335 }, [](SpellInfo* spellInfo)
     {
         spellInfo->AuraInterruptFlags |= AURA_INTERRUPT_FLAG_CHANGE_MAP;
+        spellInfo->AttributesCu |= SPELL_ATTR0_CU_SINGLE_AURA_STACK;
     });
 
     ApplySpellFix({
@@ -3118,6 +3107,7 @@ void SpellMgr::LoadSpellInfoCorrections()
     // Tail Smash (Sindragosa)
     ApplySpellFix({ 71077 }, [](SpellInfo* spellInfo)
     {
+        spellInfo->AttributesEx2 |= SPELL_ATTR2_IGNORE_LINE_OF_SIGHT;
         spellInfo->Effects[EFFECT_0].TargetA = SpellImplicitTargetInfo(TARGET_DEST_CASTER_BACK);
         spellInfo->Effects[EFFECT_0].TargetB = SpellImplicitTargetInfo(TARGET_UNIT_DEST_AREA_ENEMY);
         spellInfo->Effects[EFFECT_1].TargetA = SpellImplicitTargetInfo(TARGET_DEST_CASTER_BACK);
@@ -3352,6 +3342,7 @@ void SpellMgr::LoadSpellInfoCorrections()
     {
         spellInfo->Effects[EFFECT_0].RadiusEntry = sSpellRadiusStore.LookupEntry(EFFECT_RADIUS_20_YARDS); // 20yd
         spellInfo->Effects[EFFECT_1].RadiusEntry = sSpellRadiusStore.LookupEntry(EFFECT_RADIUS_20_YARDS); // 20yd
+        spellInfo->Effects[EFFECT_2].RadiusEntry = sSpellRadiusStore.LookupEntry(EFFECT_RADIUS_20_YARDS); // 20yd
     });
 
     // Rallying Shout
@@ -3687,12 +3678,6 @@ void SpellMgr::LoadSpellInfoCorrections()
         spellInfo->AttributesEx5 |= SPELL_ATTR5_ALWAYS_AOE_LINE_OF_SIGHT;
     });
 
-    //Crushing the Crown
-    ApplySpellFix({ 71024 }, [](SpellInfo* spellInfo)
-    {
-        spellInfo->Effects[EFFECT_0].TargetA = SpellImplicitTargetInfo(TARGET_DEST_DYNOBJ_NONE);
-    });
-
     // Battle for the Undercity
     ApplySpellFix({
         59892   // Cyclone fall
@@ -3991,19 +3976,6 @@ void SpellMgr::LoadSpellInfoCorrections()
     {
         spellInfo->Effects[EFFECT_0].ApplyAuraName = SPELL_AURA_MOD_DECREASE_SPEED;
         spellInfo->Effects[EFFECT_0].BasePoints = -25;
-    });
-
-    // Focused Eyebeam Summon Trigger
-    ApplySpellFix({ 63342 }, [](SpellInfo* spellInfo)
-    {
-        spellInfo->MaxAffectedTargets = 1;
-        spellInfo->Effects[EFFECT_0].TargetB = SpellImplicitTargetInfo();
-    });
-
-    // Luffa
-    ApplySpellFix({ 23595 }, [](SpellInfo* spellInfo)
-    {
-        spellInfo->Effects[EFFECT_0].BasePoints = 1; // Remove only 1 bleed effect
     });
 
     // Eye of Kilrogg Passive (DND)
@@ -4854,6 +4826,63 @@ void SpellMgr::LoadSpellInfoCorrections()
     ApplySpellFix({ 63106 }, [](SpellInfo* spellInfo)
     {
         spellInfo->AttributesEx3 |= SPELL_ATTR3_SUPPRESS_CASTER_PROCS;
+    });
+
+    // Fury
+    ApplySpellFix({ 40601 }, [](SpellInfo* spellInfo)
+    {
+        spellInfo->AttributesEx3 |= SPELL_ATTR3_SUPPRESS_CASTER_PROCS;
+    });
+
+    // Claw Rage
+    ApplySpellFix({ 43149 }, [](SpellInfo* spellInfo)
+    {
+        spellInfo->Effects[EFFECT_0].TriggerSpell = 0;
+    });
+
+    // Black Qiraji Battle Tank
+    ApplySpellFix({ 26655, 26656 }, [](SpellInfo* spellInfo)
+    {
+        spellInfo->AuraInterruptFlags &= ~(AURA_INTERRUPT_FLAG_CHANGE_MAP | AURA_INTERRUPT_FLAG_TELEPORTED);
+    });
+
+    // Summon Cyclone
+    ApplySpellFix({ 43112 }, [](SpellInfo* spellInfo)
+    {
+        spellInfo->RequiresSpellFocus = 0;
+    });
+
+    // Booming Voice
+    ApplySpellFix({ 40080 }, [](SpellInfo* spellInfo)
+    {
+        spellInfo->Effects[EFFECT_0].RealPointsPerLevel = 0;
+    });
+
+    // Mangle (Nalorakk)
+    ApplySpellFix({ 42389 }, [](SpellInfo* spellInfo)
+    {
+        spellInfo->SchoolMask = SPELL_SCHOOL_MASK_NATURE;
+    });
+
+    // Event food, fixes to give correct stamina and spirit of 25% of the character level
+    ApplySpellFix({ 24870 }, [](SpellInfo* spellInfo)
+    {
+        spellInfo->Effects[EFFECT_1].BasePoints = 0;
+        spellInfo->Effects[EFFECT_0].RealPointsPerLevel = 0.25;
+        spellInfo->Effects[EFFECT_1].RealPointsPerLevel = 0.25;
+    });
+
+    // Smash
+    // Dark Smash
+    ApplySpellFix({ 42669, 59706, 42723, 59709 }, [](SpellInfo* spellInfo)
+    {
+        spellInfo->AttributesEx2 &= ~SPELL_ATTR2_IGNORE_LINE_OF_SIGHT;
+    });
+
+    // Swoop (Moth hunter pet) root effect fix
+    ApplySpellFix({ 52825 }, [](SpellInfo* spellInfo)
+    {
+        spellInfo->Effects[EFFECT_2].TargetA = SpellImplicitTargetInfo(TARGET_UNIT_TARGET_ENEMY);
     });
 
     for (uint32 i = 0; i < GetSpellInfoStoreSize(); ++i)

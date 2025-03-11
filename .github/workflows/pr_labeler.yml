@@ -6,7 +6,7 @@ jobs:
   triage:
     runs-on: ubuntu-24.04
     permissions: write-all
-    if: github.repository == 'azerothcore/azerothcore-wotlk'
+    if: github.repository == 'azerothcore/azerothcore-wotlk' && !github.event.pull_request.draft
     steps:
       - uses: actions/checkout@v4
         with:

@@ -23,6 +23,7 @@
 #include "SharedDefines.h"
 #include "SpellInfo.h"
 #include "SpellMgr.h"
+#include "World.h"
 
 using namespace Acore::Hyperlinks;
 

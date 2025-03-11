@@ -48,6 +48,7 @@ enum Spells
     SPELL_FRENZIED_BLOODTHIRST_VISUAL       = 71949,
     SPELL_VAMPIRIC_BITE                     = 71726,
     SPELL_VAMPIRIC_BITE_DUMMY               = 71837,
+    SPELL_ESSENCE_OF_BLOOD_QUEEN            = 70867,
     SPELL_ESSENCE_OF_THE_BLOOD_QUEEN_PLR    = 70879,
     SPELL_ESSENCE_OF_THE_BLOOD_QUEEN_HEAL   = 70872,
     SPELL_FRENZIED_BLOODTHIRST              = 70877,
@@ -79,25 +80,10 @@ enum Shadowmourne
     SPELL_THIRST_QUENCHED                   = 72154,
 };
 
-#define ESSENCE_OF_BLOOD_QUEEN     RAID_MODE<uint32>(70867, 71473, 71532, 71533)
-#define ESSENCE_OF_BLOOD_QUEEN_PLR RAID_MODE<uint32>(70879, 71525, 71530, 71531)
-#define FRENZIED_BLOODTHIRST       RAID_MODE<uint32>(70877, 71474, 70877, 71474)
-#define DELIRIOUS_SLASH            RAID_MODE<uint32>(71623, 71624, 71625, 71626)
-#define PRESENCE_OF_THE_DARKFALLEN RAID_MODE<uint32>(70994, 71962, 71963, 71964)
-
-uint32 const vampireAuras[3][MAX_DIFFICULTY] =
-{
-    {70867, 71473, 71532, 71533},
-    {70879, 71525, 71530, 71531},
-    {70877, 71474, 70877, 71474},
-};
-
 bool IsVampire(Unit const* unit)
 {
-    uint8 spawnMode = unit->GetMap()->GetSpawnMode();
-    for (uint8 i = 0; i < 3; ++i)
-        if (unit->HasAura(vampireAuras[i][spawnMode]))
-            return true;
+    if (unit->HasAnyAuras(SPELL_ESSENCE_OF_BLOOD_QUEEN, SPELL_ESSENCE_OF_THE_BLOOD_QUEEN_PLR, SPELL_FRENZIED_BLOODTHIRST))
+        return true;
     return false;
 }
 
@@ -133,6 +119,31 @@ enum Points
 Position const centerPos  = {4595.7090f, 2769.4190f, 400.6368f, 0.000000f};
 Position const airPos     = {4595.7090f, 2769.4190f, 422.3893f, 0.000000f};
 Position const mincharPos = {4629.3711f, 2782.6089f, 424.6390f, 0.000000f};
+
+struct VampiricBiteTargetSelector
+{
+public:
+    VampiricBiteTargetSelector(Creature* source) : _source(source) { }
+    bool operator()(Unit const* target) const
+    {
+        if (!target)
+            return false;
+
+        if (!target->IsPlayer())
+            return false;
+
+        if (target->HasAura(SPELL_BLOOD_MIRROR_DAMAGE))
+            return false;
+
+        if (IsVampire(target))
+            return false;
+
+        return target != _source->GetVictim();
+    }
+
+private:
+    Creature const* _source;
+};
 
 class boss_blood_queen_lana_thel : public CreatureScript
 {
@@ -327,22 +338,7 @@ public:
                     break;
                 case EVENT_VAMPIRIC_BITE:
                     {
-                        Player* target = nullptr;
-                        float maxThreat = 0.0f;
-                        const Map::PlayerList& pl = me->GetMap()->GetPlayers();
-                        for (Map::PlayerList::const_iterator itr = pl.begin(); itr != pl.end(); ++itr)
-                            if (Player* p = itr->GetSource())
-                                if (p->IsAlive() && p != me->GetVictim() && p->GetGUID() != _offtankGUID && !p->IsGameMaster() && p->GetDistance(me) < 70.0f)
-                                {
-                                    float th = me->GetThreatMgr().getThreatWithoutTemp(p);
-                                    if (!target || th > maxThreat)
-                                    {
-                                        target = p;
-                                        maxThreat = th;
-                                    }
-                                }
-
-                        if (target)
+                        if (Unit* target = SelectTarget(SelectTargetMethod::MaxThreat, 0, VampiricBiteTargetSelector(me)))
                         {
                             me->CastSpell(target, SPELL_VAMPIRIC_BITE, false);
                             me->CastSpell((Unit*)nullptr, SPELL_VAMPIRIC_BITE_DUMMY, true);
@@ -513,17 +509,17 @@ public:
 
         void CleanAuras()
         {
-            instance->DoRemoveAurasDueToSpellOnPlayers(ESSENCE_OF_BLOOD_QUEEN);
-            instance->DoRemoveAurasDueToSpellOnPlayers(ESSENCE_OF_BLOOD_QUEEN_PLR);
-            instance->DoRemoveAurasDueToSpellOnPlayers(FRENZIED_BLOODTHIRST);
+            instance->DoRemoveAurasDueToSpellOnPlayers(SPELL_ESSENCE_OF_BLOOD_QUEEN);
+            instance->DoRemoveAurasDueToSpellOnPlayers(SPELL_ESSENCE_OF_THE_BLOOD_QUEEN_PLR);
+            instance->DoRemoveAurasDueToSpellOnPlayers(SPELL_FRENZIED_BLOODTHIRST);
             instance->DoRemoveAurasDueToSpellOnPlayers(SPELL_FRENZIED_BLOODTHIRST_VISUAL);
             instance->DoRemoveAurasDueToSpellOnPlayers(SPELL_UNCONTROLLABLE_FRENZY);
             instance->DoRemoveAurasDueToSpellOnPlayers(SPELL_BLOOD_MIRROR_DAMAGE);
             instance->DoRemoveAurasDueToSpellOnPlayers(SPELL_BLOOD_MIRROR_VISUAL);
             instance->DoRemoveAurasDueToSpellOnPlayers(SPELL_BLOOD_MIRROR_DUMMY);
-            instance->DoRemoveAurasDueToSpellOnPlayers(DELIRIOUS_SLASH);
+            instance->DoRemoveAurasDueToSpellOnPlayers(SPELL_DELIRIOUS_SLASH);
             instance->DoRemoveAurasDueToSpellOnPlayers(SPELL_PACT_OF_THE_DARKFALLEN);
-            instance->DoRemoveAurasDueToSpellOnPlayers(PRESENCE_OF_THE_DARKFALLEN);
+            instance->DoRemoveAurasDueToSpellOnPlayers(SPELL_PRESENCE_OF_THE_DARKFALLEN_DUMMY);
         }
 
         bool WasVampire(ObjectGuid guid)

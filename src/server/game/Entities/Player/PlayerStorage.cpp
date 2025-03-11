@@ -22,7 +22,6 @@
 #include "Battlefield.h"
 #include "Battleground.h"
 #include "BattlegroundMgr.h"
-#include "Channel.h"
 #include "CharacterDatabaseCleaner.h"
 #include "Chat.h"
 #include "Common.h"
@@ -46,7 +45,6 @@
 #include "ObjectMgr.h"
 #include "Opcodes.h"
 #include "OutdoorPvP.h"
-#include "OutdoorPvPMgr.h"
 #include "Pet.h"
 #include "Player.h"
 #include "QueryHolder.h"
@@ -1813,7 +1811,7 @@ InventoryResult Player::CanEquipItem(uint8 slot, uint16& dest, Item* pItem, bool
         ItemTemplate const* pProto = pItem->GetTemplate();
         if (pProto)
         {
-            if (!sScriptMgr->CanEquipItem(const_cast<Player*>(this), slot, dest, pItem, swap, not_loading))
+            if (!sScriptMgr->OnPlayerCanEquipItem(const_cast<Player*>(this), slot, dest, pItem, swap, not_loading))
                 return EQUIP_ERR_CANT_DO_RIGHT_NOW;
 
             // item used
@@ -1985,7 +1983,7 @@ InventoryResult Player::CanEquipItem(uint8 slot, uint16& dest, Item* pItem, bool
 
 InventoryResult Player::CanUnequipItem(uint16 pos, bool swap) const
 {
-    if (!sScriptMgr->CanUnequipItem(const_cast<Player*>(this), pos, swap))
+    if (!sScriptMgr->OnPlayerCanUnequipItem(const_cast<Player*>(this), pos, swap))
         return EQUIP_ERR_CANT_DO_RIGHT_NOW;
 
     // Applied only to equipped items and bank bags
@@ -2328,7 +2326,7 @@ InventoryResult Player::CanUseItem(ItemTemplate const* proto) const
 
     InventoryResult result = EQUIP_ERR_OK;
 
-    if (!sScriptMgr->CanUseItem(const_cast<Player*>(this), proto, result))
+    if (!sScriptMgr->OnPlayerCanUseItem(const_cast<Player*>(this), proto, result))
     {
         return result;
     }
@@ -2568,7 +2566,7 @@ Item* Player::StoreNewItem(ItemPosCountVec const& dest, uint32 item, bool update
             CharacterDatabase.Execute(stmt);
         }
 
-        sScriptMgr->OnStoreNewItem(this, pItem, count);
+        sScriptMgr->OnPlayerStoreNewItem(this, pItem, count);
     }
     return pItem;
 }
@@ -2712,7 +2710,7 @@ Item* Player::EquipNewItem(uint16 pos, uint32 item, bool update)
     if (!_item)
         return nullptr;
 
-    if (!IsEquipmentPos(pos) || sScriptMgr->CanSaveEquipNewItem(this, _item, pos, update))
+    if (!IsEquipmentPos(pos) || sScriptMgr->OnPlayerCanSaveEquipNewItem(this, _item, pos, update))
     {
         // pussywizard: obtaining blue or better items saves to db
         if (ItemTemplate const* pProto = sObjectMgr->GetItemTemplate(item))
@@ -2821,7 +2819,7 @@ Item* Player::EquipItem(uint16 pos, Item* pItem, bool update)
         pItem2->SetState(ITEM_CHANGED, this);
 
         ApplyEquipCooldown(pItem2);
-        sScriptMgr->OnEquip(this, pItem2, bag, slot, update);
+        sScriptMgr->OnPlayerEquip(this, pItem2, bag, slot, update);
         return pItem2;
     }
 
@@ -2829,7 +2827,7 @@ Item* Player::EquipItem(uint16 pos, Item* pItem, bool update)
     UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_EQUIP_ITEM, pItem->GetEntry());
     UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_EQUIP_EPIC_ITEM, pItem->GetEntry(), slot);
 
-    sScriptMgr->OnEquip(this, pItem, bag, slot, update);
+    sScriptMgr->OnPlayerEquip(this, pItem, bag, slot, update);
     UpdateForQuestWorldObjects();
     return pItem;
 }
@@ -2853,7 +2851,7 @@ void Player::QuickEquipItem(uint16 pos, Item* pItem)
         UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_EQUIP_ITEM, pItem->GetEntry());
         UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_EQUIP_EPIC_ITEM, pItem->GetEntry(), slot);
 
-        sScriptMgr->OnEquip(this, pItem, (pos >> 8), slot, true);
+        sScriptMgr->OnPlayerEquip(this, pItem, (pos >> 8), slot, true);
     }
 }
 
@@ -2871,7 +2869,7 @@ void Player::SetVisibleItemSlot(uint8 slot, Item* pItem)
         SetUInt32Value(PLAYER_VISIBLE_ITEM_1_ENCHANTMENT + (slot * 2), 0);
     }
 
-    sScriptMgr->OnAfterPlayerSetVisibleItemSlot(this, slot, pItem);
+    sScriptMgr->OnPlayerAfterSetVisibleItemSlot(this, slot, pItem);
 }
 
 void Player::VisualizeItem(uint8 slot, Item* pItem)
@@ -2992,7 +2990,7 @@ void Player::MoveItemFromInventory(uint8 bag, uint8 slot, bool update)
             it->DestroyForPlayer(this);
         }
 
-        sScriptMgr->OnAfterPlayerMoveItemFromInventory(this, it, bag, slot, update);
+        sScriptMgr->OnPlayerAfterMoveItemFromInventory(this, it, bag, slot, update);
     }
 }
 
@@ -4087,7 +4085,7 @@ void Player::SendSellError(SellResult msg, Creature* creature, ObjectGuid guid, 
     GetSession()->SendPacket(&data);
 }
 
-void Player::TradeCancel(bool sendback)
+void Player::TradeCancel(bool sendback, TradeStatus status /*= TRADE_STATUS_TRADE_CANCELED*/)
 {
     if (m_trade)
     {
@@ -4095,9 +4093,9 @@ void Player::TradeCancel(bool sendback)
 
         // send yellow "Trade canceled" message to both traders
         if (sendback)
-            GetSession()->SendCancelTrade();
+            GetSession()->SendCancelTrade(status);
 
-        trader->GetSession()->SendCancelTrade();
+        trader->GetSession()->SendCancelTrade(status);
 
         // cleanup
         delete m_trade;
@@ -4328,7 +4326,7 @@ void Player::ApplyEnchantment(Item* item, EnchantmentSlot slot, bool apply, bool
     if (pEnchant->requiredSkill > 0 && pEnchant->requiredSkillValue > GetSkillValue(pEnchant->requiredSkill))
         return;
 
-    if (!sScriptMgr->CanApplyEnchantment(this, item, slot, apply, apply_dur, ignore_condition))
+    if (!sScriptMgr->OnPlayerCanApplyEnchantment(this, item, slot, apply, apply_dur, ignore_condition))
         return;
 
     // If we're dealing with a gem inside a prismatic socket we need to check the prismatic socket requirements
@@ -4435,7 +4433,7 @@ void Player::ApplyEnchantment(Item* item, EnchantmentSlot slot, bool apply, bool
                         }
                     }
 
-                    sScriptMgr->OnApplyEnchantmentItemModsBefore(this, item, slot, apply, enchant_spell_id, enchant_amount);
+                    sScriptMgr->OnPlayerApplyEnchantmentItemModsBefore(this, item, slot, apply, enchant_spell_id, enchant_amount);
 
                     LOG_DEBUG("entities.player.items", "Adding {} to stat nb {}", enchant_amount, enchant_spell_id);
                     switch (enchant_spell_id)
@@ -5134,7 +5132,7 @@ bool Player::LoadFromDB(ObjectGuid playerGuid, CharacterDatabaseQueryHolder cons
     {
         // xinef: resurrect player, cant log in dead without corpse
         {
-            if (HasAuraType(SPELL_AURA_SPIRIT_OF_REDEMPTION))
+            if (HasSpiritOfRedemptionAura())
                 RemoveAurasByType(SPELL_AURA_MOD_SHAPESHIFT);
             if (!IsAlive())
                 ResurrectPlayer(1.0f);
@@ -5621,7 +5619,7 @@ bool Player::LoadFromDB(ObjectGuid playerGuid, CharacterDatabaseQueryHolder cons
 
 bool Player::isAllowedToLoot(Creature const* creature)
 {
-    if (!creature->isDead() || !creature->IsDamageEnoughForLootingAndReward())
+    if (!creature->isDead() || !creature->IsDamageEnoughForLootingAndReward() || creature->IsLootRewardDisabled())
         return false;
 
     if (HasPendingBind())
@@ -5689,7 +5687,8 @@ void Player::_LoadActions(PreparedQueryResult result)
                 ab->uState = ACTIONBUTTON_UNCHANGED;
             else
             {
-                LOG_ERROR("entities.player", "ActionButton loading problem, will be deleted from db...");
+
+                LOG_ERROR("entities.player", "ActionButton loading problem, will be deleted from db. player: {}, guid: {}, button: {}, action: {}, type: {}", GetName(), GetGUID().GetCounter(), button, action, type);
 
                 // Will deleted in DB at next save (it can create data until save but marked as deleted)
                 m_actionButtons[button].uState = ACTIONBUTTON_DELETED;
@@ -5877,7 +5876,7 @@ void Player::_LoadInventory(PreparedQueryResult result, uint32 timeDiff)
                     else if (IsEquipmentPos(INVENTORY_SLOT_BAG_0, slot))
                     {
                         uint16 dest;
-                        if (sScriptMgr->CheckItemInSlotAtLoadInventory(this, item, slot, err, dest))
+                        if (sScriptMgr->OnPlayerCheckItemInSlotAtLoadInventory(this, item, slot, err, dest))
                             err = CanEquipItem(slot, dest, item, false, false);
                         if (err == EQUIP_ERR_OK)
                             QuickEquipItem(dest, item);
@@ -6067,7 +6066,7 @@ Item* Player::_LoadItem(CharacterDatabaseTransaction trans, uint32 zoneId, uint3
                 GameEventMgr::ActiveEvents const& activeEventsList = sGameEventMgr->GetActiveEventList();
                 for (GameEventMgr::ActiveEvents::const_iterator itr = activeEventsList.begin(); itr != activeEventsList.end(); ++itr)
                 {
-                    if (uint32(events[*itr].holiday_id) == proto->HolidayId)
+                    if (uint32(events[*itr].HolidayId) == proto->HolidayId)
                     {
                         remove = false;
                         break;
@@ -6723,9 +6722,9 @@ bool Player::Satisfy(DungeonProgressionRequirements const* ar, uint32 target_map
                 LevelMax = ar->levelMax;
         }
 
-        if (DisableMgr::IsDisabledFor(DISABLE_TYPE_MAP, target_map, this))
+        if (sDisableMgr->IsDisabledFor(DISABLE_TYPE_MAP, target_map, this))
         {
-            GetSession()->SendAreaTriggerMessage("%s", GetSession()->GetAcoreString(LANG_INSTANCE_CLOSED));
+            GetSession()->SendAreaTriggerMessage(LANG_INSTANCE_CLOSED);
             return false;
         }
 
@@ -6827,7 +6826,7 @@ bool Player::Satisfy(DungeonProgressionRequirements const* ar, uint32 target_map
             || missingPlayerItems.size() || missingPlayerQuests.size() || missingPlayerAchievements.size()
             || missingLeaderItems.size() || missingLeaderQuests.size() || missingLeaderAchievements.size())
         {
-            if (!sScriptMgr->NotAvoidSatisfy(partyLeader, ar, target_map, report))
+            if (!sScriptMgr->OnPlayerNotAvoidSatisfy(partyLeader, ar, target_map, report))
                 return true;
 
             if (report)
@@ -6863,11 +6862,11 @@ bool Player::Satisfy(DungeonProgressionRequirements const* ar, uint32 target_map
                         {
                             ObjectMgr::GetLocaleString(il->Name, loc_idx, name);
                         }
-                        GetSession()->SendAreaTriggerMessage(GetSession()->GetAcoreString(LANG_LEVEL_MINREQUIRED_AND_ITEM), ar->levelMin, name.c_str());
+                        GetSession()->SendAreaTriggerMessage(LANG_LEVEL_MINREQUIRED_AND_ITEM, ar->levelMin, name);
                     }
                     else if (LevelMin)
                     {
-                        GetSession()->SendAreaTriggerMessage(GetSession()->GetAcoreString(LANG_LEVEL_MINREQUIRED), LevelMin);
+                        GetSession()->SendAreaTriggerMessage(LANG_LEVEL_MINREQUIRED, LevelMin);
                     }
                     else if (ilvlRequirementNotMet)
                     {
@@ -6925,11 +6924,11 @@ bool Player::Satisfy(DungeonProgressionRequirements const* ar, uint32 target_map
 
                     if (LevelMin)
                     {
-                        GetSession()->SendAreaTriggerMessage(GetSession()->GetAcoreString(LANG_LEVEL_MINREQUIRED), LevelMin);
+                        GetSession()->SendAreaTriggerMessage(LANG_LEVEL_MINREQUIRED, LevelMin);
                     }
                     else if (LevelMax)
                     {
-                        GetSession()->SendAreaTriggerMessage(GetSession()->GetAcoreString(LANG_ACCESS_REQUIREMENT_MAX_LEVEL), LevelMax);
+                        GetSession()->SendAreaTriggerMessage(LANG_ACCESS_REQUIREMENT_MAX_LEVEL, LevelMax);
                     }
                     else if (mapDiff->hasErrorMessage && !errorAlreadyPrinted)
                     {

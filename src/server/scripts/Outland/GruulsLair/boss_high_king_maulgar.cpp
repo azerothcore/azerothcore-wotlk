@@ -19,6 +19,7 @@
 #include "ScriptedCreature.h"
 #include "TaskScheduler.h"
 #include "gruuls_lair.h"
+#include "SpellMgr.h"
 
 enum HighKingMaulgar
 {
