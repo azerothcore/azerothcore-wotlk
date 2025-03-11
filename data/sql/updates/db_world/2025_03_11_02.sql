@@ -1,3 +1,4 @@
+-- DB update 2025_03_11_01 -> 2025_03_11_02
 -- Update gameobject 'Orb of the Blue Flight' with sniffed values
 -- new spawns
 DELETE FROM `gameobject` WHERE (`id` IN (188415)) AND (`guid` IN (257, 258, 259, 260));
