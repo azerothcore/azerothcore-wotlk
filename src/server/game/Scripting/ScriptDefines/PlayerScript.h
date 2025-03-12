@@ -209,6 +209,7 @@ enum PlayerHook
     PLAYERHOOK_ON_UPDATE_SKILL,
     PLAYERHOOK_CAN_RESURRECT,
     PLAYERHOOK_ON_CAN_GIVE_LEVEL,
+    PLAYERHOOK_ON_SEND_LIST_INVENTORY,
     PLAYERHOOK_END
 };
 
@@ -793,6 +794,15 @@ public:
      * @return true if player is allowed to gain the new level
      */
     virtual bool OnPlayerCanGiveLevel(Player* /*player*/, uint8 /*newLevel*/) { return true; }
+
+    /**
+     * @brief This hook is called whenever a player interacts with a vendor, and is then shown the vendor list
+     *
+     * @param player Contains information about the Player
+     * @param vendorGuid Guid of the vendor player is interacting with
+     * @param vendorEntry Entry of the vendor player is interacting with
+     */
+    virtual void OnPlayerSendListInventory(Player* /*player*/, ObjectGuid /*vendorGuid*/, uint32& /*vendorEntry*/) {}
 };
 
 #endif
