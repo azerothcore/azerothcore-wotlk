@@ -86,6 +86,12 @@ struct npc_forest_frog : public ScriptedAI
         if (eventTimer)
         {
             Player* player = ObjectAccessor::GetPlayer(me->GetMap(), PlayerGUID);
+            if (!player)
+            {
+                events.CancelEvent(eventTimer);
+                eventTimer = 0;
+                return;
+            }
             switch (events.ExecuteEvent())
             {
             case 1:
