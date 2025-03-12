@@ -489,77 +489,70 @@ enum Jenny
     NPC_FEZZIX_GEARTWIST                            = 25849
 };
 
-class npc_jenny : public CreatureScript
+struct npc_jenny : public FollowerAI
 {
-public:
-    npc_jenny() : CreatureScript("npc_jenny") {}
-
-    struct npc_jennyAI : public FollowerAI
+    npc_jenny(Creature* creature) : FollowerAI(creature)
     {
-        npc_jennyAI(Creature* creature) : FollowerAI(creature)
-        {
-            Initialize();
-        }
-
-        void Initialize()
-        {
-            me->SetReactState(REACT_PASSIVE);
-            me->CastSpell(me, SPELL_CRATES_CARRIED);
-            // This NPC only moves at its fixed speed_run rate in the db
-            if (TempSummon* summon = me->ToTempSummon())
-                summon->m_InheritsOwnerSpeed = false;
-            if (Player* summoner = me->ToTempSummon()->GetSummonerUnit()->ToPlayer())
-                StartFollow(summoner);
-        }
-
-        void DamageTaken(Unit* /*attacker*/, uint32& /*damage*/, DamageEffectType /*type*/, SpellSchoolMask /*school*/) override
-        {
-            if (me->HasAura(SPELL_CRATES_CARRIED))
-                me->CastSpell(me, SPELL_DROP_CRATE);
-            else
-                me->DespawnOrUnsummon();
-        }
-
-        void UpdateFollowerAI(uint32 diff) override
-        {
-            _events.Update(diff);
-
-            if (uint32 eventId = _events.ExecuteEvent())
-            {
-                switch (eventId)
-                {
-                    case EVENT_JENNY_MOVE_TO_FEZZIX:
-                        me->SetWalk(true);
-                        me->GetMotionMaster()->MovePoint(0, _fezzix);
-                        _events.ScheduleEvent(EVENT_JENNY_DESPAWN, 7s);
-                        break;
-                    case EVENT_JENNY_DESPAWN:
-                        me->DespawnOrUnsummon();
-                        break;
-                }
-            }
-        }
-
-        void MoveInLineOfSight(Unit* who) override
-        {
-            if (who->GetEntry() == NPC_FEZZIX_GEARTWIST && me->IsWithinDistInMap(who, 15.0f))
-            {
-                if (Player* summoner = me->ToTempSummon()->GetSummonerUnit()->ToPlayer())
-                    me->CastSpell(summoner, SPELL_GIVE_JENNY_CREDIT);
-                SetFollowComplete(true);
-                _fezzix = who->GetPosition();
-                _events.ScheduleEvent(EVENT_JENNY_MOVE_TO_FEZZIX, 1s);
-            }
-        }
-    private:
-        EventMap _events;
-        Position _fezzix;
-    };
-
-    CreatureAI* GetAI(Creature* creature) const override
-    {
-        return new npc_jennyAI(creature);
+        Initialize();
     }
+
+    void Initialize()
+    {
+        me->SetReactState(REACT_PASSIVE);
+        me->CastSpell(me, SPELL_CRATES_CARRIED);
+        // This NPC only moves at its fixed speed_run rate in the db
+        if (TempSummon* summon = me->ToTempSummon())
+        {
+            summon->m_InheritsOwnerSpeed = false;
+
+            if (Unit* summonerUnit = summon->GetSummonerUnit())
+                if (Player* summoner = summonerUnit->ToPlayer())
+                    StartFollow(summoner);
+        }
+    }
+
+    void DamageTaken(Unit* /*attacker*/, uint32& /*damage*/, DamageEffectType /*type*/, SpellSchoolMask /*school*/) override
+    {
+        if (me->HasAura(SPELL_CRATES_CARRIED))
+            me->CastSpell(me, SPELL_DROP_CRATE);
+        else
+            me->DespawnOrUnsummon();
+    }
+
+    void UpdateFollowerAI(uint32 diff) override
+    {
+        _events.Update(diff);
+
+        if (uint32 eventId = _events.ExecuteEvent())
+        {
+            switch (eventId)
+            {
+                case EVENT_JENNY_MOVE_TO_FEZZIX:
+                    me->SetWalk(true);
+                    me->GetMotionMaster()->MovePoint(0, _fezzix);
+                    _events.ScheduleEvent(EVENT_JENNY_DESPAWN, 7s);
+                    break;
+                case EVENT_JENNY_DESPAWN:
+                    me->DespawnOrUnsummon();
+                    break;
+            }
+        }
+    }
+
+    void MoveInLineOfSight(Unit* who) override
+    {
+        if (who->GetEntry() == NPC_FEZZIX_GEARTWIST && me->IsWithinDistInMap(who, 15.0f))
+        {
+            if (Player* summoner = me->ToTempSummon()->GetSummonerUnit()->ToPlayer())
+                me->CastSpell(summoner, SPELL_GIVE_JENNY_CREDIT);
+            SetFollowComplete(true);
+            _fezzix = who->GetPosition();
+            _events.ScheduleEvent(EVENT_JENNY_MOVE_TO_FEZZIX, 1s);
+        }
+    }
+private:
+    EventMap _events;
+    Position _fezzix;
 };
 
 /*######
