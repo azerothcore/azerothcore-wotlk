@@ -86,6 +86,12 @@ struct npc_forest_frog : public ScriptedAI
         if (eventTimer)
         {
             Player* player = ObjectAccessor::GetPlayer(me->GetMap(), PlayerGUID);
+            if (!player)
+            {
+                events.CancelEvent(eventTimer);
+                eventTimer = 0;
+                return;
+            }
             switch (events.ExecuteEvent())
             {
             case 1:
@@ -141,7 +147,7 @@ struct npc_forest_frog : public ScriptedAI
                 if (me->GetEntry() == NPC_ADARRAH)
                     Talk(SAY_CHEST_TALK + 1, player);
                 else
-                    Talk(SAY_CHEST_TALK);
+                    Talk(SAY_CHEST_TALK, player);
 
                 eventTimer = 4;
                 if (me->GetEntry() == NPC_GUNTER || me->GetEntry() == NPC_KYREN)
@@ -155,7 +161,7 @@ struct npc_forest_frog : public ScriptedAI
                 if (me->GetEntry() == NPC_ADARRAH)
                     Talk(SAY_GOODBYE + 1, player);
                 else
-                    Talk(SAY_GOODBYE);
+                    Talk(SAY_GOODBYE, player);
 
                 eventTimer = 5;
                 events.ScheduleEvent(eventTimer, 2000);
@@ -201,6 +207,9 @@ struct npc_forest_frog : public ScriptedAI
         events.ScheduleEvent(eventTimer, 3000);
 
         me->UpdateEntry(cEntry);
+
+        if (Player* player = ObjectAccessor::GetPlayer(me->GetMap(), PlayerGUID))
+            me->SetFacingToObject(player);
     }
 
     void SpellHit(Unit* caster, SpellInfo const* spell) override
@@ -208,7 +217,6 @@ struct npc_forest_frog : public ScriptedAI
         if (spell->Id == SPELL_REMOVE_AMANI_CURSE && caster->IsPlayer() && me->GetEntry() == NPC_FOREST_FROG)
         {
             me->GetMotionMaster()->MoveIdle();
-            me->SetFacingToObject(caster);
             PlayerGUID = caster->GetGUID();
 
             if (roll_chance_i(2))
@@ -223,7 +231,6 @@ struct npc_forest_frog : public ScriptedAI
 
     private:
         InstanceScript* instance;
-        EventMap events;
         uint8 eventTimer;
         ObjectGuid PlayerGUID;
 };
