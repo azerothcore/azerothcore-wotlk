@@ -49,11 +49,12 @@ OPvPCapturePointGH::OPvPCapturePointGH(OutdoorPvP* pvp) : OPvPCapturePoint(pvp)
     SetCapturePointData(189310, 571, 2483.68f, -1873.6f, 10.6877f, -0.104719f, 0.0f, 0.0f, 0.0f, 1.0f);
 }
 
-void OPvPCapturePointGH::FillInitialWorldStates(WorldPacket& data)
+void OPvPCapturePointGH::FillInitialWorldStates(WorldPackets::WorldState::InitWorldStates& packet)
 {
-    data << GH_UI_SLIDER_DISPLAY << uint32(0);
-    data << GH_UI_SLIDER_POS << uint32(50);
-    data << GH_UI_SLIDER_N << uint32(20);
+    packet.Worldstates.reserve(3);
+    packet.Worldstates.emplace_back(GH_UI_SLIDER_DISPLAY, 0);
+    packet.Worldstates.emplace_back(GH_UI_SLIDER_POS, 50);
+    packet.Worldstates.emplace_back(GH_UI_SLIDER_N, 20);
 }
 
 void OPvPCapturePointGH::SendChangePhase()

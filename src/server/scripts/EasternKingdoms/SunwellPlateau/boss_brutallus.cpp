@@ -91,10 +91,10 @@ struct boss_brutallus : public BossAI
             Talk(YELL_LOVE);
         }, 30s);
 
-        ScheduleTimedEvent(45s, [&] {
+        ScheduleTimedEvent(20s, [&] {
             if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 100.0f, true, true, -SPELL_BURN_DAMAGE))
                 DoCast(target, SPELL_BURN);
-        }, 1min);
+        }, 20s);
 
         me->m_Events.AddEventAtOffset([&] {
             DoCastSelf(SPELL_BERSERK, true);
@@ -137,6 +137,7 @@ enum eMadrigosa
     EVENT_MAD_6                     = 6,
     EVENT_MAD_7                     = 7,
     EVENT_MAD_8                     = 8,
+    EVENT_MAD_8_1                   = 800,
     EVENT_MAD_9                     = 9,
     EVENT_MAD_10                    = 10,
     EVENT_MAD_11                    = 11,
@@ -166,7 +167,7 @@ enum eMadrigosa
 
     SPELL_BRUTALLUS_CHARGE          = 44884,
     SPELL_BRUTALLUS_FEL_FIREBALL    = 44844,
-    SPELL_BRUTALLUS_FLAME_RING      = 44874,
+    SPELL_BRUTALLUS_FLAME_RING      = 44873,
     SPELL_BRUTALLUS_BREAK_ICE       = 46637,
 };
 
@@ -261,6 +262,7 @@ struct npc_madrigosa : public NullCreatureAI
             me->CastSpell(me, SPELL_MADRIGOSA_FROST_BLAST, false);
             events.ScheduleEvent(EVENT_MAD_8, 3000);
             events.ScheduleEvent(EVENT_MAD_8, 5000);
+            events.ScheduleEvent(EVENT_MAD_8_1, 6000);
             events.ScheduleEvent(EVENT_MAD_8, 6500);
             events.ScheduleEvent(EVENT_MAD_8, 7500);
             events.ScheduleEvent(EVENT_MAD_8, 8500);
@@ -273,10 +275,13 @@ struct npc_madrigosa : public NullCreatureAI
             if (Creature* brutallus = instance->GetCreature(DATA_BRUTALLUS))
                 me->CastSpell(brutallus, SPELL_MADRIGOSA_FROSTBOLT, false);
             break;
+        case EVENT_MAD_8_1:
+            if (Creature* brutallus = instance->GetCreature(DATA_BRUTALLUS))
+                brutallus->CastSpell(brutallus, SPELL_BRUTALLUS_FLAME_RING, false);
+            break;
         case EVENT_MAD_9:
             if (Creature* brutallus = instance->GetCreature(DATA_BRUTALLUS))
             {
-                brutallus->CastSpell(brutallus, SPELL_BRUTALLUS_FLAME_RING, true);
                 brutallus->RemoveAllAuras();
                 brutallus->CastSpell(brutallus, SPELL_BRUTALLUS_FEL_FIREBALL, false);
                 brutallus->AI()->Talk(YELL_INTRO_BREAK_ICE);
@@ -354,9 +359,8 @@ struct npc_madrigosa : public NullCreatureAI
             }
             break;
         case EVENT_SPAWN_FELMYST:
+            DoCastAOE(SPELL_SUMMON_FELBLAZE, true);
             me->DespawnOrUnsummon(1);
-            if (Creature* felmyst = instance->GetCreature(DATA_FELMYST))
-                felmyst->AI()->DoAction(ACTION_START_EVENT);
             break;
         }
     }

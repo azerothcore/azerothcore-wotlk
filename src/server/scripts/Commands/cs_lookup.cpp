@@ -269,17 +269,13 @@ public:
     static bool HandleLookupEventCommand(ChatHandler* handler, Tail namePart)
     {
         if (namePart.empty())
-        {
             return false;
-        }
 
         std::wstring wNamePart;
 
         // converting string that we try to find to lower case
         if (!Utf8toWStr(namePart, wNamePart))
-        {
             return false;
-        }
 
         wstrToLower(wNamePart);
 
@@ -294,11 +290,9 @@ public:
         {
             GameEventData const& eventData = events[id];
 
-            std::string descr = eventData.description;
+            std::string descr = eventData.Description;
             if (descr.empty())
-            {
                 continue;
-            }
 
             if (Utf8FitTo(descr, wNamePart))
             {
@@ -311,25 +305,17 @@ public:
                 std::string active = activeEvents.find(id) != activeEvents.end() ? handler->GetAcoreString(LANG_ACTIVE) : "";
 
                 if (handler->GetSession())
-                {
-                    handler->PSendSysMessage(LANG_EVENT_ENTRY_LIST_CHAT, id, id, eventData.description, active);
-                }
+                    handler->PSendSysMessage(LANG_EVENT_ENTRY_LIST_CHAT, id, id, eventData.Description, active);
                 else
-                {
-                    handler->PSendSysMessage(LANG_EVENT_ENTRY_LIST_CONSOLE, id, eventData.description, active);
-                }
+                    handler->PSendSysMessage(LANG_EVENT_ENTRY_LIST_CONSOLE, id, eventData.Description, active);
 
                 if (!found)
-                {
                     found = true;
-                }
             }
         }
 
         if (!found)
-        {
             handler->SendSysMessage(LANG_NOEVENTFOUND);
-        }
 
         return true;
     }

@@ -28,7 +28,7 @@
 #include "VMapMgr2.h"
 #include "World.h"
 
-std::map<DisableType, std::map<uint32, DisableData>> DisableMgr::m_DisableMap;
+DisableMgr::DisableMap DisableMgr::m_DisableMap;
 
 DisableMgr::DisableMgr() {}
 DisableMgr::~DisableMgr() {}
@@ -44,10 +44,8 @@ void DisableMgr::LoadDisables()
     uint32 oldMSTime = getMSTime();
 
     // reload case
-    for (DisableMap::iterator itr = m_DisableMap.begin(); itr != m_DisableMap.end(); ++itr)
-        itr->second.clear();
-
-    m_DisableMap.clear();
+    for (DisableTypeMap& disableTypeMap : m_DisableMap)
+        disableTypeMap.clear();
 
     QueryResult result = WorldDatabase.Query("SELECT sourceType, entry, flags, params_0, params_1 FROM disables");
 
@@ -99,7 +97,7 @@ void DisableMgr::LoadDisables()
 * @param param0 MapId if DISABLE_TYPE_SPELL used, 0 for all maps.
 * @param param1 AreaId if DISABLE_TYPE_SPELL used, 0 for all areas.
 */
-void DisableMgr::AddDisable(DisableType type, uint32 entry, uint8 flags, std::string param0, std::string param1)
+void DisableMgr::AddDisable(DisableType type, uint32 entry, uint8 flags, std::string const& param0, std::string const& param1)
 {
     if (type >= MAX_DISABLE_TYPES)
     {

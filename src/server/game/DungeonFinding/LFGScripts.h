@@ -34,11 +34,11 @@ namespace lfg
         LFGPlayerScript();
 
         // Player Hooks
-        void OnLevelChanged(Player* player, uint8 oldLevel) override;
-        void OnLogout(Player* player) override;
-        void OnLogin(Player* player) override;
-        void OnBindToInstance(Player* player, Difficulty difficulty, uint32 mapId, bool permanent) override;
-        void OnMapChanged(Player* player) override;
+        void OnPlayerLevelChanged(Player* player, uint8 oldLevel) override;
+        void OnPlayerLogout(Player* player) override;
+        void OnPlayerLogin(Player* player) override;
+        void OnPlayerBindToInstance(Player* player, Difficulty difficulty, uint32 mapId, bool permanent) override;
+        void OnPlayerMapChanged(Player* player) override;
     };
 
     class LFGGroupScript : public GroupScript

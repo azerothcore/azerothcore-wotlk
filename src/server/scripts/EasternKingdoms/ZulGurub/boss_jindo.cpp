@@ -153,24 +153,6 @@ struct boss_jindo : public BossAI
         DoMeleeAttackIfReady();
     }
 
-    bool CanAIAttack(Unit const* target) const override
-    {
-        if (me->GetThreatMgr().GetThreatListSize() > 1)
-        {
-            ThreatContainer::StorageType::const_iterator lastRef = me->GetThreatMgr().GetOnlineContainer().GetThreatList().end();
-            --lastRef;
-            if (Unit* lastTarget = (*lastRef)->getTarget())
-            {
-                if (lastTarget != target)
-                {
-                    return !target->HasAura(SPELL_HEX);
-                }
-            }
-        }
-
-        return true;
-    }
-
 private:
     TaskScheduler _scheduler;
 };
