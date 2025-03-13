@@ -543,8 +543,10 @@ struct npc_jenny : public FollowerAI
     {
         if (who->GetEntry() == NPC_FEZZIX_GEARTWIST && me->IsWithinDistInMap(who, 15.0f))
         {
-            if (Player* summoner = me->ToTempSummon()->GetSummonerUnit()->ToPlayer())
-                me->CastSpell(summoner, SPELL_GIVE_JENNY_CREDIT);
+            if (TempSummon* s = me->ToTempSummon())
+                if (Unit* u = s->GetSummonerUnit())
+                    if (Player* p = u->ToPlayer())
+                        me->CastSpell(p, SPELL_GIVE_JENNY_CREDIT);
             SetFollowComplete(true);
             _fezzix = who->GetPosition();
             _events.ScheduleEvent(EVENT_JENNY_MOVE_TO_FEZZIX, 1s);
