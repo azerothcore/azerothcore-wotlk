@@ -1265,6 +1265,8 @@ void Guild::HandleQuery(WorldSession* session)
 
     response.Info.GuildName = m_name;
 
+    sScriptMgr->OnGuildNameQueryOpcode(this, session, response.Info.GuildName);
+
     session->SendPacket(response.Write());
     LOG_DEBUG("guild", "SMSG_GUILD_QUERY_RESPONSE [{}]", session->GetPlayerInfo());
 }
@@ -1773,6 +1775,8 @@ void Guild::SendInfo(WorldSession* session) const
     guildInfo.CreateDate = m_createdDate;
     guildInfo.NumMembers = int32(m_members.size());
     guildInfo.NumAccounts = m_accountsNumber;
+
+    sScriptMgr->OnGuildNameQueryOpcode(this, session, guildInfo.GuildName);
 
     session->SendPacket(guildInfo.Write());
     LOG_DEBUG("guild", "SMSG_GUILD_INFO [{}]", session->GetPlayerInfo());
