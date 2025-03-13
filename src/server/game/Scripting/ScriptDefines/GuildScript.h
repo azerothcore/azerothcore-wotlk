@@ -81,7 +81,7 @@ public:
 
     [[nodiscard]] virtual bool CanGuildSendBankList(Guild const* /*guild*/, WorldSession* /*session*/, uint8 /*tabId*/, bool /*sendAllSlots*/) { return true; }
 
-    virtual void OnNameQueryOpcode(Guild const* guild, WorldSession* session, std::string& name) {}
+    virtual void OnNameQueryOpcode(Guild const* /*guild*/, WorldSession* /*session*/, std::string& /*name*/) {}
 };
 
 #endif
