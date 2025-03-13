@@ -124,7 +124,7 @@ Map::Map(uint32 id, uint32 InstanceId, uint8 SpawnMode, Map* _parent) :
             setNGrid(nullptr, idx, j);
         }
     }
-      
+
     _zonePlayerCountMap.clear();
 
     //lets initialize visibility distance for map

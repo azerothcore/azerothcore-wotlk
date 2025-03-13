@@ -177,11 +177,10 @@ void World::LoadConfigSettings(bool reload)
             LOG_ERROR("server.loading", "World settings reload fail: can't read settings.");
             return;
         }
-        
+
         sLog->LoadFromConfig();
         sMetric->LoadFromConfigs();
     }
-
 
     // Set realm id and enable db logging
     sLog->SetRealmId(realm.Id.Realm);
