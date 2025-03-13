@@ -16,10 +16,10 @@
  */
 
 #include "CreatureScript.h"
-#include "ObjectMgr.h"
 #include "Player.h"
 #include "PlayerScript.h"
 #include "QueryResult.h"
+#include "ServerMailMgr.h"
 
 class ServerMailReward : public PlayerScript
 {
@@ -27,16 +27,17 @@ public:
     ServerMailReward() : PlayerScript("ServerMailReward", {PLAYERHOOK_ON_LOGIN}) { }
 
     // CHARACTER_LOGIN = 8
-    void OnLogin(Player* player) override
+    void OnPlayerLogin(Player* player) override
     {
         // Retrieve all server mail records and session only once
-        auto const& serverMailStore = sObjectMgr->GetAllServerMailStore();
+        auto const& serverMailStore = sServerMailMgr->GetAllServerMailStore();
         WorldSession* session = player->GetSession();
         // We should always have a session, just incase
         if (!session)
             return;
 
         uint32 playerGUID = player->GetGUID().GetCounter();
+        bool isAlliance = player->GetTeamId() == TEAM_ALLIANCE;
 
         for (auto const& [mailId, servMail] : serverMailStore)
         {
@@ -45,26 +46,24 @@ public:
             stmt->SetData(1, mailId);
 
             // Capture servMail by value
-            auto callback = [session, servMailWrapper = std::reference_wrapper<ServerMail const>(servMail)](PreparedQueryResult result)
+            auto callback = [session, servMailWrapper = std::reference_wrapper<ServerMail const>(servMail), isAlliance](PreparedQueryResult result)
                 {
-                     ServerMail const& servMail = servMailWrapper.get();  // Dereference the wrapper to get the original object
+                    ServerMail const& servMail = servMailWrapper.get();  // Dereference the wrapper to get the original object
 
                     if (!result)
                     {
-                        sObjectMgr->SendServerMail(
+                        uint32 money = isAlliance ? servMail.moneyA : servMail.moneyH;
+                        std::vector<ServerMailItems> const& items = isAlliance ? servMail.itemsA : servMail.itemsH;
+                        std::vector<ServerMailCondition> const& conditions = servMail.conditions;
+
+                        sServerMailMgr->SendServerMail(
                             session->GetPlayer(),
                             servMail.id,
-                            servMail.reqLevel,
-                            servMail.reqPlayTime,
-                            servMail.moneyA,
-                            servMail.moneyH,
-                            servMail.itemA,
-                            servMail.itemCountA,
-                            servMail.itemH,
-                            servMail.itemCountH,
+                            money,
+                            items,
+                            conditions,
                             servMail.subject,
-                            servMail.body,
-                            servMail.active
+                            servMail.body
                         );
                     }
                 };

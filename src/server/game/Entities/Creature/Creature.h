@@ -70,10 +70,11 @@ public:
     void SetCorpseDelay(uint32 delay) { m_corpseDelay = delay; }
     void SetCorpseRemoveTime(uint32 delay);
     [[nodiscard]] uint32 GetCorpseDelay() const { return m_corpseDelay; }
+    [[nodiscard]] bool HasFlagsExtra(uint32 flag) const { return GetCreatureTemplate()->HasFlagsExtra(flag); }
     [[nodiscard]] bool IsRacialLeader() const { return GetCreatureTemplate()->RacialLeader; }
-    [[nodiscard]] bool IsCivilian() const { return GetCreatureTemplate()->flags_extra & CREATURE_FLAG_EXTRA_CIVILIAN; }
-    [[nodiscard]] bool IsTrigger() const { return GetCreatureTemplate()->flags_extra & CREATURE_FLAG_EXTRA_TRIGGER; }
-    [[nodiscard]] bool IsGuard() const { return GetCreatureTemplate()->flags_extra & CREATURE_FLAG_EXTRA_GUARD; }
+    [[nodiscard]] bool IsCivilian() const { return HasFlagsExtra(CREATURE_FLAG_EXTRA_CIVILIAN); }
+    [[nodiscard]] bool IsTrigger() const { return HasFlagsExtra(CREATURE_FLAG_EXTRA_TRIGGER); }
+    [[nodiscard]] bool IsGuard() const { return HasFlagsExtra(CREATURE_FLAG_EXTRA_GUARD); }
     CreatureMovementData const& GetMovementTemplate() const;
     [[nodiscard]] bool CanWalk() const { return GetMovementTemplate().IsGroundAllowed(); }
     [[nodiscard]] bool CanSwim() const override;
@@ -127,7 +128,7 @@ public:
 
     [[nodiscard]] bool IsDungeonBoss() const;
     [[nodiscard]] bool IsImmuneToKnockback() const;
-    [[nodiscard]] bool IsAvoidingAOE() const { return GetCreatureTemplate()->flags_extra & CREATURE_FLAG_EXTRA_AVOID_AOE; }
+    [[nodiscard]] bool IsAvoidingAOE() const { return HasFlagsExtra(CREATURE_FLAG_EXTRA_AVOID_AOE); }
 
     uint8 getLevelForTarget(WorldObject const* target) const override; // overwrite Unit::getLevelForTarget for boss level support
 
@@ -272,7 +273,7 @@ public:
     bool HasSearchedAssistance() { return m_AlreadySearchedAssistance; }
     bool CanAssistTo(Unit const* u, Unit const* enemy, bool checkfaction = true) const;
     bool _IsTargetAcceptable(Unit const* target) const;
-    [[nodiscard]] bool CanIgnoreFeignDeath() const { return (GetCreatureTemplate()->flags_extra & CREATURE_FLAG_EXTRA_IGNORE_FEIGN_DEATH) != 0; }
+    [[nodiscard]] bool CanIgnoreFeignDeath() const { return HasFlagsExtra(CREATURE_FLAG_EXTRA_IGNORE_FEIGN_DEATH); }
 
     // pussywizard: Updated at faction change, disable move in line of sight if actual faction is not hostile to anyone
     void UpdateMoveInLineOfSightState();

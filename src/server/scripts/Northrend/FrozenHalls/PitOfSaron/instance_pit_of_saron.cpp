@@ -78,7 +78,6 @@ public:
         {
             InstanceScript::OnPlayerEnter(player);
 
-            instance->LoadGrid(LeaderIntroPos.GetPositionX(), LeaderIntroPos.GetPositionY());
             if (Creature* c = instance->GetCreature(GetGuidData(DATA_LEADER_FIRST_GUID)))
                 c->AI()->SetData(DATA_START_INTRO, 0);
         }

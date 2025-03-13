@@ -106,11 +106,8 @@ public:
     struct boss_maexxnaAI : public BossAI
     {
         explicit boss_maexxnaAI(Creature* c) : BossAI(c, BOSS_MAEXXNA), summons(me)
-        {
-            pInstance = me->GetInstanceScript();
-        }
+        {}
 
-        InstanceScript* pInstance;
         EventMap events;
         SummonList summons;
 
@@ -131,13 +128,6 @@ public:
             BossAI::Reset();
             events.Reset();
             summons.DespawnAll();
-            if (pInstance)
-            {
-                if (GameObject* go = me->GetMap()->GetGameObject(pInstance->GetGuidData(DATA_MAEXXNA_GATE)))
-                {
-                    go->SetGoState(GO_STATE_ACTIVE);
-                }
-            }
         }
 
         void JustEngagedWith(Unit* who) override
@@ -150,13 +140,6 @@ public:
             events.ScheduleEvent(EVENT_NECROTIC_POISON, 5s);
             events.ScheduleEvent(EVENT_HEALTH_CHECK, 1s);
             events.ScheduleEvent(EVENT_SUMMON_SPIDERLINGS, 30s);
-            if (pInstance)
-            {
-                if (GameObject* go = me->GetMap()->GetGameObject(pInstance->GetGuidData(DATA_MAEXXNA_GATE)))
-                {
-                    go->SetGoState(GO_STATE_READY);
-                }
-            }
         }
 
         void JustSummoned(Creature* cr) override
@@ -174,10 +157,8 @@ public:
 
         void KilledUnit(Unit* who) override
         {
-            if (who->IsPlayer() && pInstance)
-            {
-                pInstance->SetData(DATA_IMMORTAL_FAIL, 0);
-            }
+            if (who->IsPlayer())
+                instance->StorePersistentData(PERSISTENT_DATA_IMMORTAL_FAIL, 1);
         }
 
         void JustDied(Unit*  killer) override
