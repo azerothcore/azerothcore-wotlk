@@ -1,7 +1,6 @@
 -- Update gameobject 'SWP / MGT' with sniffed values
 -- updated spawns
-DELETE FROM `gameobject` WHERE (`id` IN (188116, 188115, 188114, 187869, 188523, 188075, 188081, 188165, 188166, 188173, 187979, 187990, 187764, 187765, 187766, 187770, 188064, 188065, 187578, 188118, 187896))
-AND (`guid` IN (268109, 268110, 268111, 268112, 50437, 50442, 50452, 99798, 99799, 99800, 99802, 99803, 99804, 99805, 99806, 99807, 99808, 99809, 99810, 99811, 99812, 99813));
+DELETE FROM `gameobject` WHERE (`id` IN (188116, 188115, 188114, 187869, 188523, 188075, 188081, 188165, 188166, 188173, 187979, 187990, 187764, 187765, 187766, 187770, 188064, 188065, 187578, 188118, 187896)) AND (`guid` IN (268109, 268110, 268111, 268112, 50437, 50442, 50452, 99798, 99799, 99800, 99802, 99803, 99804, 99805, 99806, 99807, 99808, 99809, 99810, 99811, 99812, 99813));
 INSERT INTO `gameobject` (`guid`, `id`, `map`, `zoneId`, `areaId`, `spawnMask`, `phaseMask`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecs`, `animprogress`, `state`, `ScriptName`, `VerifiedBuild`, `Comment`) VALUES
 -- Orb of the Blue Flight
 -- was 187869 before
@@ -50,8 +49,7 @@ INSERT INTO `gameobject` (`guid`, `id`, `map`, `zoneId`, `areaId`, `spawnMask`, 
 (99813, 187896, 585, 0, 0, 3, 1, 231.232269287109375, -236.829681396484375, 0.579834997653961181, 4.712389945983886718, 0, 0, -0.70710659027099609, 0.707106947898864746, 7200, 255, 1, "", 49345, NULL);
 
 -- new spawns
-DELETE FROM `gameobject` WHERE (`id` IN (188075, 188119, 188421, 188523, 188524))
-AND (`guid` IN (468, 469, 470, 471, 472));
+DELETE FROM `gameobject` WHERE (`id` IN (188075, 188119, 188421, 188523, 188524)) AND (`guid` IN (468, 469, 470, 471, 472));
 INSERT INTO `gameobject` (`guid`, `id`, `map`, `zoneId`, `areaId`, `spawnMask`, `phaseMask`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecs`, `animprogress`, `state`, `ScriptName`, `VerifiedBuild`, `Comment`) VALUES
 -- Doodad_Sunwell_Fire_Barrier_ext01
 (468, 188075, 585, 0, 0, 3, 1, 45.91571044921875, -797.59228515625, -52.4864501953125, 5.663594245910644531, 0, 0, -0.30486392974853515, 0.952395915985107421, 7200, 255, 1, "", 49345, NULL),
