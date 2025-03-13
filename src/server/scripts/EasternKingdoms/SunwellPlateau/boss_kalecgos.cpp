@@ -224,7 +224,7 @@ struct boss_kalecgos : public BossAI
     {
         BossAI::JustEngagedWith(who);
 
-        ScheduleTimedEvent(6s, [&] {
+        ScheduleTimedEvent(8s, [&] {
             DoCastAOE(SPELL_ARCANE_BUFFET);
         }, 8s);
 
@@ -232,17 +232,17 @@ struct boss_kalecgos : public BossAI
             DoCastVictim(SPELL_FROST_BREATH);
         }, 15s);
 
-        ScheduleTimedEvent(10s, [&] {
+        ScheduleTimedEvent(6s, [&] {
             me->CastCustomSpell(RAND(44978, 45001, 45002, 45004, 45006, 45010), SPELLVALUE_MAX_TARGETS, 1, me, false);
-        }, 20s);
+        }, 6s, 7s);
 
         ScheduleTimedEvent(25s, [&] {
             DoCastVictim(SPELL_TAIL_LASH);
         }, 15s);
 
-        ScheduleTimedEvent(20s, [&] {
+        ScheduleTimedEvent(13s, [&] {
             DoCastAOE(SPELL_SPECTRAL_BLAST);
-        }, 15s, 25s);
+        }, 20s, 30s);
 
         scheduler.Schedule(16s, [this](TaskContext)
         {
@@ -345,9 +345,9 @@ struct boss_sathrovarr : public ScriptedAI
             DoCastVictim(SPELL_SHADOW_BOLT);
         }, 9s);
 
-        ScheduleTimedEvent(20s, [&] {
+        ScheduleTimedEvent(40s, [&] {
             me->CastCustomSpell(SPELL_CURSE_OF_BOUNDLESS_AGONY, SPELLVALUE_MAX_TARGETS, 1, me, false);
-        }, 30s);
+        }, 40s);
 
         ScheduleTimedEvent(20s, [&] {
             if (roll_chance_i(20))
