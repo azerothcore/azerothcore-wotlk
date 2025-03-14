@@ -117,7 +117,7 @@ bool OutdoorPvPSI::HandleAreaTrigger(Player* player, uint32 trigger)
                 player->RewardHonor(nullptr, 1, 19);
                 // add 20 cenarion circle repu
                 float reputation = 20.f;
-                sScriptMgr->OnPlayerBeforeReputationChange(player, 609, reputation, ReputationSource::PvP);
+                sScriptMgr->OnPlayerBeforeReputationChange(player, 609, reputation, ReputationSource::PvP, nullptr, nullptr, nullptr);
                 player->GetReputationMgr().ModifyReputation(sFactionStore.LookupEntry(609), reputation);
                 // complete quest
                 player->KilledMonsterCredit(SI_TURNIN_QUEST_CM_A);
@@ -145,7 +145,7 @@ bool OutdoorPvPSI::HandleAreaTrigger(Player* player, uint32 trigger)
                 player->RewardHonor(nullptr, 1, 19);
                 // add 20 cenarion circle repu
                 float reputation = 20.f;
-                sScriptMgr->OnPlayerBeforeReputationChange(player, 609, reputation, ReputationSource::PvP);
+                sScriptMgr->OnPlayerBeforeReputationChange(player, 609, reputation, ReputationSource::PvP, nullptr, nullptr, nullptr);
                 player->GetReputationMgr().ModifyReputation(sFactionStore.LookupEntry(609), reputation);
                 // complete quest
                 player->KilledMonsterCredit(SI_TURNIN_QUEST_CM_H);

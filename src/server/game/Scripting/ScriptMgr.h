@@ -321,47 +321,10 @@ public: /* PlayerScript */
     * @param[in,out] amount the amount of reputation the player gets or loses
     * @param[in] victim the unit which was killed to gain reputation
     *
-    * @remark avoid hooking both versions of this event ReputationSource is a more generic one.<br />
-    * ReputationSource is called first.
+    * @remark victim, quest and spell might be a nullpointer />
     */
-    void OnPlayerBeforeReputationChange(Player* player, uint32 factionId, float& amount, Unit* victim);
+    void OnPlayerBeforeReputationChange(Player* /*player*/, uint32 /*factionId*/, float& /*amount*/, ReputationSource /*reputationSource*/, Unit const* /*victim*/, Quest const* /*quest*/, Spell const* /*spell*/);
 
-    /**
-    * @brief Called before a player gains or looses Reputation
-    *
-    * @param [in] player instance of the current player
-    * @param [in] factionId id of the faction which reputation changes
-    * @param[in,out] amount the amount of reputation the player gets or loses
-    * @param[in] quest the quest which was turn in to gain reputation
-    * @remark avoid hooking both versions of this event ReputationSource is a more generic one.<br />
-    * ReputationSource is called first.
-    */
-    void OnPlayerBeforeReputationChange(Player* player, uint32 factionId, float& amount, Quest const* quest);
-
-    /**
-    * @brief Called before a player gains or looses Reputation
-    *
-    * @param [in] player instance of the current player
-    * @param [in] factionId id of the faction which reputation changes
-    * @param[in,out] amount the amount of reputation the player gets or loses
-    * @param[in] spell the spell which was used to gain reputation
-    * @remark avoid hooking both versions of this event ReputationSource is a more generic one.<br />
-    * ReputationSource is called first.
-    */
-    void OnPlayerBeforeReputationChange(Player* player, uint32 factionId, float& amount, Spell* spell);
-
-    /**
-    * @brief Called before a player gains or looses Reputation
-    *
-    * @param [in] player instance of the current player
-    * @param [in] factionId id of the faction which reputation changes
-    * @param[in,out] amount the amount of reputation the player gets or loses
-    * @param[in] reputationSource an enum which determinate the source used to gain or loose reputation
-    *
-    * @remark avoid hooking both versions of this event ReputationSource is a more generic one.<br />
-    * ReputationSource is called first.
-    */
-    void OnPlayerBeforeReputationChange(Player* player, uint32 factionId, float& amount, ReputationSource reputationSource);
     bool OnPlayerReputationChange(Player* player, uint32 factionID, int32& standing, bool incremental);
     void OnPlayerReputationRankChange(Player* player, uint32 factionID, ReputationRank newRank, ReputationRank oldRank, bool increased);
     void OnPlayerLearnSpell(Player* player, uint32 spellID);

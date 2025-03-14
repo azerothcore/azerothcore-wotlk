@@ -4748,8 +4748,7 @@ void Spell::EffectReputation(SpellEffIndex effIndex)
         return;
 
     repChange = player->CalculateReputationGain(ReputationSource::Spell, 0, repChange, factionId);
-    ScriptMgr::instance()->OnPlayerBeforeReputationChange(player, factionId, repChange, ReputationSource::Spell);
-    ScriptMgr::instance()->OnPlayerBeforeReputationChange(player, factionId, repChange, this);
+    sScriptMgr->OnPlayerBeforeReputationChange(player, factionId, repChange, ReputationSource::Spell, nullptr, nullptr, this);
     player->GetReputationMgr().ModifyReputation(factionEntry, repChange);
 }
 

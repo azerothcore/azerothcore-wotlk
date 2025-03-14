@@ -1024,8 +1024,8 @@ void WorldSession::HandlePlayerLoginFromDB(LoginQueryHolder const& holder)
                 {
                     auto faction = sFactionStore.LookupEntry(itr);
                     float reputation = 42999.f;
-                    ScriptMgr::instance()->OnPlayerBeforeReputationChange(pCurrChar, faction->ID, reputation, ReputationSource::Config);
-                    repMgr.SetOneFactionReputation(sFactionStore.LookupEntry(itr), reputation, false);
+                    sScriptMgr->OnPlayerBeforeReputationChange(pCurrChar, faction->ID, reputation, ReputationSource::Config, nullptr, nullptr, nullptr);
+                    repMgr.SetOneFactionReputation(faction, reputation, false);
                 }
             };
 

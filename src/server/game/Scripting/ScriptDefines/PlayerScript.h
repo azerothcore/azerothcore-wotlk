@@ -49,10 +49,7 @@ enum PlayerHook
     PLAYERHOOK_ON_MONEY_CHANGED,
     PLAYERHOOK_ON_BEFORE_LOOT_MONEY,
     PLAYERHOOK_ON_GIVE_EXP,
-    PLAYERHOOK_ON_BEFORE_REPUTATION_CHANGE_UNIT,
-    PLAYERHOOK_ON_BEFORE_REPUTATION_CHANGE_QUEST,
-    PLAYERHOOK_ON_BEFORE_REPUTATION_CHANGE_SPELL,
-    PLAYERHOOK_ON_BEFORE_REPUTATION_CHANGE_SOURCE,
+    PLAYERHOOK_ON_BEFORE_REPUTATION_CHANGE,
     PLAYERHOOK_ON_REPUTATION_CHANGE,
     PLAYERHOOK_ON_REPUTATION_RANK_CHANGE,
     PLAYERHOOK_ON_LEARN_SPELL,
@@ -286,47 +283,14 @@ public:
     * @param [in] player instance of the current player
     * @param [in] factionId id of the faction which reputation changes
     * @param[in,out] amount the amount of reputation the player gets or loses
+    * @param[in] reputationSource an enum which determinate the source used to gain or loose reputation
     * @param[in] victim the unit which was killed to gain reputation
-    * @remark avoid hooking both versions of this event ReputationSource is a more generic one.<br />
-    * ReputationSource is called first.
-    */
-    virtual void OnPlayerBeforeReputationChange(Player* /*player*/, uint32 /*factionId*/, float& /*amount*/, Unit* /*victim*/ ) {}
-
-    /**
-    * @brief Called before a player gains or looses Reputation
-    *
-    * @param [in] player instance of the current player
-    * @param [in] factionId id of the faction which reputation changes
-    * @param[in,out] amount the amount of reputation the player gets or loses
     * @param[in] quest the quest which was turn in to gain reputation
-    * @remark avoid hooking both versions of this event ReputationSource is a more generic one.<br />
-    * ReputationSource is called first.
-    */
-    virtual void OnPlayerBeforeReputationChange(Player* /*player*/, uint32 /*factionId*/ , float& /*amount*/, Quest const* /*quest*/) {}
-
-    /**
-    * @brief Called before a player gains or looses Reputation
-    *
-    * @param [in] player instance of the current player
-    * @param [in] factionId id of the faction which reputation changes
-    * @param[in,out] amount the amount of reputation the player gets or loses
     * @param[in] spell the spell which was used to gain reputation
     * @remark avoid hooking both versions of this event ReputationSource is a more generic one.<br />
     * ReputationSource is called first.
     */
-    virtual void OnPlayerBeforeReputationChange(Player* /*player*/, uint32 /*factionId*/, float& /*amount*/ , Spell* /*spell*/) {}
-
-    /**
-    * @brief Called before a player gains or looses Reputation
-    *
-    * @param [in] player instance of the current player
-    * @param [in] factionId id of the faction which reputation changes
-    * @param[in,out] amount the amount of reputation the player gets or loses
-    * @param[in] reputationSource an enum which determinate the source used to gain or loose reputation
-    * @remark avoid hooking both versions of this event ReputationSource is a more generic one.<br />
-    * ReputationSource is called first.
-    */
-    virtual void OnPlayerBeforeReputationChange(Player* /*player*/, uint32 /*factionId*/, float& /*amount*/, ReputationSource /*reputationSource*/) {}
+    virtual void OnPlayerBeforeReputationChange(Player* /*player*/, uint32 /*factionId*/, float& /*amount*/, ReputationSource /*reputationSource*/, Unit const* /*victim*/, Quest const* /*quest*/, Spell const* /*spell*/) {}
 
     // Called when a player's reputation changes (before it is actually changed)
     virtual bool OnPlayerReputationChange(Player* /*player*/, uint32 /*factionID*/, int32& /*standing*/, bool /*incremental*/) { return true; }
