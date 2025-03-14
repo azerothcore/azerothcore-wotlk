@@ -210,6 +210,7 @@ enum PlayerHook
     PLAYERHOOK_CAN_RESURRECT,
     PLAYERHOOK_ON_CAN_GIVE_LEVEL,
     PLAYERHOOK_ON_SEND_LIST_INVENTORY,
+    PLAYERHOOK_ON_GET_XP_FOR_LEVEL,
     PLAYERHOOK_END
 };
 
@@ -803,6 +804,15 @@ public:
      * @param vendorEntry Entry of the vendor player is interacting with
      */
     virtual void OnPlayerSendListInventory(Player* /*player*/, ObjectGuid /*vendorGuid*/, uint32& /*vendorEntry*/) {}
+
+    /**
+     * @brief This hook is called whenever a players required xp is calculated, allowing to overwrite it
+     *
+     * @param player Contains information about the Player
+     * @param level The players current level
+     * @param xp The amount of xp the player requires to level up
+     */
+    virtual void OnPlayerGetXpForLevel(Player* /*player*/, uint8 /*level*/, uint32& /*xp*/) {}
 };
 
 #endif
