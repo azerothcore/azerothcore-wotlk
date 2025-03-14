@@ -287,8 +287,7 @@ public:
     * @param[in] victim the unit which was killed to gain reputation
     * @param[in] quest the quest which was turn in to gain reputation
     * @param[in] spell the spell which was used to gain reputation
-    * @remark avoid hooking both versions of this event ReputationSource is a more generic one.<br />
-    * ReputationSource is called first.
+    * @remark victim, quest and spell might be null, check reputationSource first 
     */
     virtual void OnPlayerBeforeReputationChange(Player* /*player*/, uint32 /*factionId*/, float& /*amount*/, ReputationSource /*reputationSource*/, Unit const* /*victim*/, Quest const* /*quest*/, Spell const* /*spell*/) {}
 
