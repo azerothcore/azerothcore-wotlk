@@ -1,0 +1,14 @@
+-- Add Relic of Ulduar to loot tables
+DELETE FROM creature_loot_template WHERE Entry IN (27960, 27961, 27962, 27963, 27964, 27965, 27966, 27969, 27970, 27971, 27972) AND Item = 42780;
+INSERT INTO creature_loot_template (Entry, Item, Reference, Chance, QuestRequired, LootMode, GroupId, MinCount, MaxCount, Comment) VALUES
+(27960, 42780, 0, 25, 0, 1, 0, 1, 1, 'Dark Rune Warrior - Relic of Ulduar'),
+(27961, 42780, 0, 25, 0, 1, 0, 1, 1, 'Dark Rune Worker - Relic of Ulduar'),
+(27962, 42780, 0, 25, 0, 1, 0, 1, 1, 'Dark Rune Elementalist - Relic of Ulduar'),
+(27963, 42780, 0, 25, 0, 1, 0, 1, 1, 'Dark Rune Theurgist - Relic of Ulduar'),
+(27964, 42780, 0, 25, 0, 1, 0, 1, 1, 'Dark Rune Scholar - Relic of Ulduar'),
+(27965, 42780, 0, 25, 0, 1, 0, 1, 1, 'Dark Rune Shaper - Relic of Ulduar'),
+(27966, 42780, 0, 25, 0, 1, 0, 1, 1, 'Dark Rune Controller - Relic of Ulduar'),
+(27969, 42780, 0, 25, 0, 1, 0, 1, 1, 'Dark Rune Giant - Relic of Ulduar'),
+(27970, 42780, 0, 25, 0, 1, 0, 1, 1, 'Raging Construct - Relic of Ulduar'),
+(27971, 42780, 0, 25, 0, 1, 0, 1, 1, 'Unrelenting Construct - Relic of Ulduar'),
+(27972, 42780, 0, 25, 0, 1, 0, 1, 1, 'Lightning Construct - Relic of Ulduar');
