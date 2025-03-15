@@ -84,7 +84,7 @@ struct boss_brutallus : public BossAI
 
         ScheduleTimedEvent(11s, [&] {
             DoCastVictim(SPELL_METEOR_SLASH);
-        }, 10s);
+        }, 12s);
 
         ScheduleTimedEvent(30s, [&] {
             DoCastVictim(SPELL_STOMP);
