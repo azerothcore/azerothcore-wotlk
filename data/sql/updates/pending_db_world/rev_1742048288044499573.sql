@@ -1,7 +1,7 @@
 -- Add Relic of Ulduar to loot tables Halls of Lightning
--- DELETE FROM creature_loot_template WHERE Entry IN (28547, 28578, 28579, 28580, 28581, 28582, 28583, 28584, 28826, 28835, 28836, 28837, 28838, 28920, 28961, 28965) AND Item = 42780;
+-- DELETE FROM `creature_loot_template` WHERE `Entry` IN (28547, 28578, 28579, 28580, 28581, 28582, 28583, 28584, 28826, 28835, 28836, 28837, 28838, 28920, 28961, 28965) AND `Item` = 42780;
 -- Used ON DUPLICATE KEY UPDATE for safe INSERT
-INSERT INTO creature_loot_template (Entry, Item, Reference, Chance, QuestRequired, LootMode, GroupId, MinCount, MaxCount, Comment) VALUES
+INSERT INTO `creature_loot_template` (`Entry`, `Item`, `Reference`, `Chance`, `QuestRequired`, `LootMode`, `GroupId`, `MinCount`, `MaxCount`, `Comment`) VALUES
 (28547, 42780, 0, 23, 0, 1, 0, 1, 3, 'Storming Vortex - Relic of Ulduar'),
 (28578, 42780, 0, 29, 0, 1, 0, 1, 3, 'Hardened Steel Reaver - Relic of Ulduar'),
 (28579, 42780, 0, 28, 0, 1, 0, 1, 3, 'Hardened Steel Berserker - Relic of Ulduar'),
