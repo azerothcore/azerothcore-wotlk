@@ -1,0 +1,82 @@
+#
+# Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
+#
+
+[worldserver]
+
+########################################
+# My module configuration
+########################################
+#
+#    ModWarEffort.Enable
+#        Description: Enables the module
+#        Default:     0 - Disabled
+#                     1 - Enabled
+#
+
+ModWarEffort.Enable = 0
+
+#
+#    ModWarEffort.Id
+#        Description: The ID of the iteration of the event being run. Change this if you run it a second time.
+#        Default:     1
+#
+
+ModWarEffort.Id = 1
+
+#
+#    ModWarEffort.Goal.Faction.XXX
+#        Description: The goal for each material and the different stages. There are 5 stages total.
+#
+
+ModWarEffort.Goal.Horde.Bandages.01 = 5
+ModWarEffort.Goal.Horde.Bandages.02 = 10
+ModWarEffort.Goal.Horde.Bandages.03 = 15
+ModWarEffort.Goal.Horde.Bandages.04 = 20
+ModWarEffort.Goal.Horde.Bandages.05 = 25
+ModWarEffort.Goal.Horde.Food.01 = 5
+ModWarEffort.Goal.Horde.Food.02 = 10
+ModWarEffort.Goal.Horde.Food.03 = 15
+ModWarEffort.Goal.Horde.Food.04 = 20
+ModWarEffort.Goal.Horde.Food.05 = 25
+ModWarEffort.Goal.Horde.Herbs.01 = 5
+ModWarEffort.Goal.Horde.Herbs.02 = 10
+ModWarEffort.Goal.Horde.Herbs.03 = 15
+ModWarEffort.Goal.Horde.Herbs.04 = 20
+ModWarEffort.Goal.Horde.Herbs.05 = 25
+ModWarEffort.Goal.Horde.Metal.01 = 5
+ModWarEffort.Goal.Horde.Metal.02 = 10
+ModWarEffort.Goal.Horde.Metal.03 = 15
+ModWarEffort.Goal.Horde.Metal.04 = 20
+ModWarEffort.Goal.Horde.Metal.05 = 25
+ModWarEffort.Goal.Horde.Leather.01 = 5
+ModWarEffort.Goal.Horde.Leather.02 = 10
+ModWarEffort.Goal.Horde.Leather.03 = 15
+ModWarEffort.Goal.Horde.Leather.04 = 20
+ModWarEffort.Goal.Horde.Leather.05 = 25
+
+ModWarEffort.Goal.Alliance.Bandages.01 = 5
+ModWarEffort.Goal.Alliance.Bandages.02 = 10
+ModWarEffort.Goal.Alliance.Bandages.03 = 15
+ModWarEffort.Goal.Alliance.Bandages.04 = 20
+ModWarEffort.Goal.Alliance.Bandages.05 = 25
+ModWarEffort.Goal.Alliance.Food.01 = 5
+ModWarEffort.Goal.Alliance.Food.02 = 10
+ModWarEffort.Goal.Alliance.Food.03 = 15
+ModWarEffort.Goal.Alliance.Food.04 = 20
+ModWarEffort.Goal.Alliance.Food.05 = 25
+ModWarEffort.Goal.Alliance.Herbs.01 = 5
+ModWarEffort.Goal.Alliance.Herbs.02 = 10
+ModWarEffort.Goal.Alliance.Herbs.03 = 15
+ModWarEffort.Goal.Alliance.Herbs.04 = 20
+ModWarEffort.Goal.Alliance.Herbs.05 = 25
+ModWarEffort.Goal.Alliance.Metal.01 = 5
+ModWarEffort.Goal.Alliance.Metal.02 = 10
+ModWarEffort.Goal.Alliance.Metal.03 = 15
+ModWarEffort.Goal.Alliance.Metal.04 = 20
+ModWarEffort.Goal.Alliance.Metal.05 = 25
+ModWarEffort.Goal.Alliance.Leather.01 = 5
+ModWarEffort.Goal.Alliance.Leather.02 = 10
+ModWarEffort.Goal.Alliance.Leather.03 = 15
+ModWarEffort.Goal.Alliance.Leather.04 = 20
+ModWarEffort.Goal.Alliance.Leather.05 = 25
