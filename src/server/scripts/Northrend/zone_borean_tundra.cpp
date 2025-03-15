@@ -481,8 +481,9 @@ public:
 // NPC 25969: Jenny
 enum Jenny
 {
-    EVENT_JENNY_MOVE_TO_FEZZIX                      = 1,
-    EVENT_JENNY_DESPAWN                             = 2,
+    EVENT_JENNY_START_FOLLOW                        = 1,
+    EVENT_JENNY_MOVE_TO_FEZZIX                      = 2,
+    EVENT_JENNY_DESPAWN                             = 3,
     SPELL_CRATES_CARRIED                            = 46340,
     SPELL_DROP_CRATE                                = 46342,
     SPELL_GIVE_JENNY_CREDIT                         = 46358,
@@ -500,15 +501,9 @@ struct npc_jenny : public FollowerAI
     {
         me->SetReactState(REACT_PASSIVE);
         me->CastSpell(me, SPELL_CRATES_CARRIED);
-        // This NPC only moves at its fixed speed_run rate in the db
-        if (TempSummon* summon = me->ToTempSummon())
-        {
-            summon->m_InheritsOwnerSpeed = false;
 
-            if (Unit* summonerUnit = summon->GetSummonerUnit())
-                if (Player* summoner = summonerUnit->ToPlayer())
-                    StartFollow(summoner);
-        }
+        // can't update follow here, call later
+        _events.ScheduleEvent(EVENT_JENNY_START_FOLLOW, 1s);
     }
 
     void DamageTaken(Unit* /*attacker*/, uint32& /*damage*/, DamageEffectType /*type*/, SpellSchoolMask /*school*/) override
@@ -527,6 +522,14 @@ struct npc_jenny : public FollowerAI
         {
             switch (eventId)
             {
+                case EVENT_JENNY_START_FOLLOW:
+                    // This NPC only moves at its fixed speed_run rate in the db
+                    // and does not inherit the speed of the target
+                    if (TempSummon* summon = me->ToTempSummon())
+                        if (Unit* summonerUnit = summon->GetSummonerUnit())
+                            if (Player* summoner = summonerUnit->ToPlayer())
+                                StartFollow(summoner, 0, nullptr, true, false);
+                break;
                 case EVENT_JENNY_MOVE_TO_FEZZIX:
                     me->SetWalk(true);
                     me->GetMotionMaster()->MovePoint(0, _fezzix);
