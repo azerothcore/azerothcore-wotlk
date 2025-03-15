@@ -1,5 +1,5 @@
 -- Add Relic of Ulduar to loot tables
-DELETE FROM `creature_loot_template` WHERE `Entry` IN (27960, 27961, 27962, 27963, 27964, 27965, 27966, 27969, 27970, 27971, 27972) AND `Item` = 42780;
+-- DELETE FROM `creature_loot_template` WHERE `Entry` IN (27960, 27961, 27962, 27963, 27964, 27965, 27966, 27969, 27970, 27971, 27972) AND `Item` = 42780;
 INSERT INTO `creature_loot_template` (`Entry`, `Item`, `Reference`, `Chance`, `QuestRequired`, `LootMode`, `GroupId`, `MinCount`, `MaxCount`, `Comment`) VALUES
 (27960, 42780, 0, 35, 0, 1, 0, 1, 3, 'Dark Rune Warrior - Relic of Ulduar'),
 (27961, 42780, 0, 36, 0, 1, 0, 1, 3, 'Dark Rune Worker - Relic of Ulduar'),
