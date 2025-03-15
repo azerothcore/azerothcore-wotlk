@@ -40,6 +40,10 @@
 #include <memory>
 #include <shared_mutex>
 
+#if defined(MOD_ELUNA)
+class Eluna;
+#endif
+
 class Unit;
 class WorldPacket;
 class InstanceScript;
@@ -229,6 +233,7 @@ public:
     [[nodiscard]] uint32 GetId() const { return i_mapEntry->MapID; }
 
     [[nodiscard]] Map const* GetParent() const { return m_parentMap; }
+    bool IsParentMap() const { return GetParent() == this; }
 
     // pussywizard: movemaps, mmaps
     [[nodiscard]] std::shared_mutex& GetMMapLock() const { return *(const_cast<std::shared_mutex*>(&MMapLock)); }
@@ -506,6 +511,16 @@ public:
     }
 
     virtual std::string GetDebugInfo() const;
+
+#if defined(MOD_ELUNA)
+    std::unique_ptr<Eluna> eluna;
+    Eluna* GetEluna() const;
+#endif
+
+private:
+    void LoadMapAndVMap(int gx, int gy);
+    void LoadVMap(int gx, int gy);
+    void LoadMap(int gx, int gy, bool reload = false);
 
     uint32 GetCreatedGridsCount();
     uint32 GetLoadedGridsCount();
