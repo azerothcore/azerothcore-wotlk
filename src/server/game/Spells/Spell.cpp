@@ -5408,7 +5408,11 @@ void Spell::TakeAmmo()
             }
         }
         else if (uint32 ammo = m_caster->ToPlayer()->GetUInt32Value(PLAYER_AMMO_ID))
-            m_caster->ToPlayer()->DestroyItemCount(ammo, 1, true);
+            // Handling of explosive shot ticks
+            if (!(m_spellInfo->Id == 53352))
+            {
+                m_caster->ToPlayer()->DestroyItemCount(ammo, 1, true);
+            }
     }
 }
 
@@ -8276,6 +8280,13 @@ void Spell::HandleLaunchPhase()
     }
 
     PrepareTargetProcessing();
+
+    // Handling of explosive shot initial cast without LnL proc
+    if ((m_spellInfo->SpellFamilyFlags[1] & 0x80000000) != 0 && !m_caster->HasAura(56453))
+    {
+        TakeAmmo();
+        usesAmmo = false;
+    }
 
     for (std::list<TargetInfo>::iterator ihit = m_UniqueTargetInfo.begin(); ihit != m_UniqueTargetInfo.end(); ++ihit)
     {
