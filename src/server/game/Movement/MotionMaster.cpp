@@ -277,7 +277,7 @@ void MotionMaster::MoveTargetedHome(bool walk /*= false*/)
         if (target)
         {
             LOG_DEBUG("movement.motionmaster", "Following {} ({})", target->IsPlayer() ? "player" : "creature", target->GetGUID().ToString());
-            Mutate(new FollowMovementGenerator<Creature>(target, PET_FOLLOW_DIST, _owner->GetFollowAngle(),true,true), MOTION_SLOT_ACTIVE);
+            Mutate(new FollowMovementGenerator<Creature>(target, PET_FOLLOW_DIST, _owner->GetFollowAngle(), true, true), MOTION_SLOT_ACTIVE);
         }
     }
     else
