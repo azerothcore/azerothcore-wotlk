@@ -395,20 +395,17 @@ private:
 
 struct npc_demonic_vapor_trail : public NullCreatureAI
 {
-    npc_demonic_vapor_trail(Creature* creature) : NullCreatureAI(creature), _lastMSTime{0}, _timer{1} { }
+    npc_demonic_vapor_trail(Creature* creature) : NullCreatureAI(creature), _timer{1} { }
 
     void Reset() override
     {
         me->CastSpell(me, SPELL_DEMONIC_VAPOR_TRAIL_PERIODIC, true);
     }
 
-    void SpellHitTarget(Unit*, SpellInfo const* spellInfo) override
+    void SpellHitTarget(Unit* /*unit*/, SpellInfo const* spellInfo) override
     {
-        if (spellInfo->Id == SPELL_DEMONIC_VAPOR && GetMSTimeDiffToNow(_lastMSTime) >= 5000)
-        {
-            me->CastSpell(me, SPELL_SUMMON_BLAZING_DEAD, true);
-            _lastMSTime = getMSTime();
-        }
+        if (spellInfo->Id == SPELL_DEMONIC_VAPOR && !_timer)
+            _timer = 1;
     }
 
     void UpdateAI(uint32 diff) override
@@ -416,7 +413,7 @@ struct npc_demonic_vapor_trail : public NullCreatureAI
         if (_timer)
         {
             _timer += diff;
-            if (_timer >= 6000)
+            if (_timer >= 5000)
             {
                 _timer = 0;
                 me->CastSpell(me, SPELL_SUMMON_BLAZING_DEAD, true);
@@ -430,7 +427,6 @@ struct npc_demonic_vapor_trail : public NullCreatureAI
         summon->AI()->AttackStart(summon->AI()->SelectTarget(SelectTargetMethod::Random, 0, 100.0f));
     }
 private:
-    uint32 _lastMSTime;
     uint32 _timer;
 };
 
