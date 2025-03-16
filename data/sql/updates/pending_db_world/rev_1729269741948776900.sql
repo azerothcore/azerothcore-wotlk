@@ -7,5 +7,5 @@ UPDATE `creature_template` SET `AIName` = '', `ScriptName` = 'npc_jenny' WHERE (
 -- spell 46340 Crates Carried
 -- add custom attribute SPELL_ATTR0_CU_IGNORE_EVADE
 DELETE FROM `spell_custom_attr` WHERE `spell_id` = 46340;
-INSERT INTO `spell_custom_attr` (spell_id, `attributes`) VALUES
+INSERT INTO `spell_custom_attr` (`spell_id`, `attributes`) VALUES
 (46340, 2048);
