@@ -85,12 +85,14 @@ struct boss_magus_telestra : public BossAI
 
     uint8 copiesDied;
     bool achievement;
+    bool preventDeath;
 
     void Reset() override
     {
         BossAI::Reset();
         copiesDied = 0;
         achievement = true;
+        preventDeath = false;
 
         if (IsHeroic() && sGameEventMgr->IsActiveEvent(GAME_EVENT_WINTER_VEIL) && !me->HasAura(SPELL_WEAR_CHRISTMAS_HAT))
             me->AddAura(SPELL_WEAR_CHRISTMAS_HAT, me);
@@ -160,6 +162,12 @@ struct boss_magus_telestra : public BossAI
         }
     }
 
+    void DamageTaken(Unit* /*attacker*/, uint32& damage, DamageEffectType /*type*/, SpellSchoolMask /*school*/) override
+    {
+        if (damage >= me->GetHealth() && preventDeath)
+            damage = me->GetHealth() - 1;
+    }
+
     void UpdateAI(uint32 diff) override
     {
         if (!UpdateVictim())
@@ -184,6 +192,7 @@ struct boss_magus_telestra : public BossAI
         case EVENT_MAGUS_HEALTH2:
             if (me->HealthBelowPct(11))
             {
+                preventDeath = true;
                 me->CastSpell(me, SPELL_START_SUMMON_CLONES, false);
                 events.ScheduleEvent(EVENT_MAGUS_RELOCATE, 3500ms);
                 Talk(SAY_SPLIT);
@@ -214,6 +223,7 @@ struct boss_magus_telestra : public BossAI
             me->CastSpell(me, SPELL_TELESTRA_BACK, true);
             me->RemoveAllAuras();
             Talk(SAY_MERGE);
+            preventDeath = false;
             break;
         }
 
