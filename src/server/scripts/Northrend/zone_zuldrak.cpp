@@ -898,14 +898,18 @@ class spell_scourge_disguise_instability : public AuraScript
 
     void HandleRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
     {
-        if(Unit* caster = GetCaster())
+        if (Unit* caster = GetCaster())
+        {
             if (Player* player = caster->ToPlayer())
+            {
                 if (player->HasAnyAuras(SPELL_SCOURGE_DISGUISE, SPELL_SCOURGE_DISGUISE_INSTANT_CAST))
                 {
                     uint32 textId = Acore::Containers::SelectRandomContainerElement(scourgeDisguiseTextIDs);
                     player->Unit::Whisper(textId, player, true);
                     player->CastSpell(player, SPELL_SCOURGE_DISGUISE_EXPIRING, true);
                 }
+            }
+        }
     }
 
     void Register() override
