@@ -360,17 +360,25 @@ struct boss_felmyst : public BossAI
 
 struct npc_demonic_vapor : public NullCreatureAI
 {
-    npc_demonic_vapor(Creature* creature) : NullCreatureAI(creature) { }
+    npc_demonic_vapor(Creature* creature) : NullCreatureAI(creature), _timer{1} { }
 
     void Reset() override
     {
         me->CastSpell(me, SPELL_DEMONIC_VAPOR_SPAWN_TRIGGER, true);
-        me->CastSpell(me, SPELL_DEMONIC_VAPOR_PERIODIC, true);
     }
 
-    void UpdateAI(uint32  /*diff*/) override
+    void UpdateAI(uint32 diff) override
     {
-        if (me->GetMotionMaster()->GetMotionSlotType(MOTION_SLOT_CONTROLLED) == NULL_MOTION_TYPE)
+        if (_timer)
+        {
+            _timer += diff;
+            if (_timer >= 2000)
+            {
+                me->CastSpell(me, SPELL_DEMONIC_VAPOR_PERIODIC, true);
+                _timer = 0;
+            }
+        }
+        else if (me->GetMotionMaster()->GetMotionSlotType(MOTION_SLOT_CONTROLLED) == NULL_MOTION_TYPE)
         {
             Map::PlayerList const& players = me->GetMap()->GetPlayers();
             for (Map::PlayerList::const_iterator itr = players.begin(); itr != players.end(); ++itr)
@@ -381,36 +389,34 @@ struct npc_demonic_vapor : public NullCreatureAI
                 }
         }
     }
+private:
+    uint32 _timer;
 };
 
 struct npc_demonic_vapor_trail : public NullCreatureAI
 {
-    npc_demonic_vapor_trail(Creature* creature) : NullCreatureAI(creature)
-    {
-        timer = 1;
-    }
+    npc_demonic_vapor_trail(Creature* creature) : NullCreatureAI(creature), _timer{1} { }
 
-    uint32 timer;
     void Reset() override
     {
         me->CastSpell(me, SPELL_DEMONIC_VAPOR_TRAIL_PERIODIC, true);
         me->DespawnOrUnsummon(20000);
     }
 
-    void SpellHitTarget(Unit*, SpellInfo const* spellInfo) override
+    void SpellHitTarget(Unit* /*unit*/, SpellInfo const* spellInfo) override
     {
-        if (spellInfo->Id == SPELL_DEMONIC_VAPOR)
-            me->CastSpell(me, SPELL_SUMMON_BLAZING_DEAD, true);
+        if (spellInfo->Id == SPELL_DEMONIC_VAPOR && !_timer)
+            _timer = 1;
     }
 
     void UpdateAI(uint32 diff) override
     {
-        if (timer)
+        if (_timer)
         {
-            timer += diff;
-            if (timer >= 6000)
+            _timer += diff;
+            if (_timer >= 5000)
             {
-                timer = 0;
+                _timer = 0;
                 me->CastSpell(me, SPELL_SUMMON_BLAZING_DEAD, true);
             }
         }
@@ -421,6 +427,8 @@ struct npc_demonic_vapor_trail : public NullCreatureAI
         summon->SetInCombatWithZone();
         summon->AI()->AttackStart(summon->AI()->SelectTarget(SelectTargetMethod::Random, 0, 100.0f));
     }
+private:
+    uint32 _timer;
 };
 
 class spell_felmyst_fog_of_corruption : public SpellScript
