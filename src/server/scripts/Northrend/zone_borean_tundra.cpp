@@ -529,7 +529,7 @@ struct npc_jenny : public FollowerAI
                         if (Unit* summonerUnit = summon->GetSummonerUnit())
                             if (Player* summoner = summonerUnit->ToPlayer())
                                 StartFollow(summoner, 0, nullptr, true, false);
-                break;
+                    break;
                 case EVENT_JENNY_MOVE_TO_FEZZIX:
                     me->SetWalk(true);
                     me->GetMotionMaster()->MovePoint(0, _fezzix);
