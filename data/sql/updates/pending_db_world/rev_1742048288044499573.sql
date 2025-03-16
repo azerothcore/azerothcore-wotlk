@@ -18,7 +18,7 @@ INSERT INTO `creature_loot_template` (`Entry`, `Item`, `Reference`, `Chance`, `Q
 (28920, 42780, 0, 33, 0, 1, 0, 1, 3, 'Stormforged Giant - Relic of Ulduar'),
 (28961, 42780, 0, 34, 0, 1, 0, 1, 3, 'Titanium Siegebreaker - Relic of Ulduar'),
 (28965, 42780, 0, 31, 0, 1, 0, 1, 3, 'Titanium Thunderer - Relic of Ulduar'),
-ON DUPLICATE KEY UPDATE 
+ON DUPLICATE KEY UPDATE
     Reference = VALUES(Reference),
     Chance = VALUES(Chance),
     QuestRequired = VALUES(QuestRequired),
