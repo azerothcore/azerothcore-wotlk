@@ -1,3 +1,4 @@
+-- DB update 2025_03_16_01 -> 2025_03_16_02
 -- Add Relic of Ulduar to loot tables Halls of Lightning
 DELETE FROM `creature_loot_template` WHERE `Entry` IN (28547, 28578, 28579, 28580, 28581, 28582, 28583, 28584, 28826, 28835, 28836, 28837, 28838, 28920, 28961, 28965) AND `Item` = 42780;
 INSERT INTO `creature_loot_template` (`Entry`, `Item`, `Reference`, `Chance`, `QuestRequired`, `LootMode`, `GroupId`, `MinCount`, `MaxCount`, `Comment`) VALUES
