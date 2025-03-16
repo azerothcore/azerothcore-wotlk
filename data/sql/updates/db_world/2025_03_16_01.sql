@@ -1,3 +1,4 @@
+-- DB update 2025_03_16_00 -> 2025_03_16_01
 -- Add Relic of Ulduar to loot tables
 DELETE FROM `creature_loot_template` WHERE `Entry` IN (27960, 27961, 27962, 27963, 27964, 27965, 27969, 27970, 27971, 27972) AND `Item` = 42780;
 INSERT INTO `creature_loot_template` (`Entry`, `Item`, `Reference`, `Chance`, `QuestRequired`, `LootMode`, `GroupId`, `MinCount`, `MaxCount`, `Comment`) VALUES
