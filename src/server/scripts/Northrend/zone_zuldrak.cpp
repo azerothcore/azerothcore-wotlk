@@ -879,7 +879,17 @@ std::vector<uint32> const scourgeDisguiseTextIDs = { SCOURGE_DISGUISE_FAILING_ME
 
 class spell_scourge_disguise_instability : public AuraScript
 {
-    PrepareAuraScript(spell_scourge_disguise_instability)
+    PrepareAuraScript(spell_scourge_disguise_instability);
+
+    bool Validate(SpellInfo const* /*spellInfo*/) override
+    {
+        return ValidateSpellInfo(
+            {
+                SPELL_SCOURGE_DISGUISE,
+                SPELL_SCOURGE_DISGUISE_INSTANT_CAST,
+                SPELL_SCOURGE_DISGUISE_EXPIRING
+            });
+    }
 
     void HandleApply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
     {
@@ -888,18 +898,14 @@ class spell_scourge_disguise_instability : public AuraScript
 
     void HandleRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
     {
-        Unit* caster = GetCaster();
-        if (caster && caster->IsPlayer())
-        {
-            Player* player = caster->ToPlayer();
-            if (player->HasAura(SPELL_SCOURGE_DISGUISE) || player->HasAura(SPELL_SCOURGE_DISGUISE_INSTANT_CAST))
-            {
-                uint32 textId = Acore::Containers::SelectRandomContainerElement(scourgeDisguiseTextIDs);
-                player->Unit::Whisper(textId, player, true);
-
-                player->CastSpell(player, SPELL_SCOURGE_DISGUISE_EXPIRING, true);
-            }
-        }
+        if(Unit* caster = GetCaster())
+            if (Player* player = caster->ToPlayer())
+                if (player->HasAnyAuras(SPELL_SCOURGE_DISGUISE, SPELL_SCOURGE_DISGUISE_INSTANT_CAST))
+                {
+                    uint32 textId = Acore::Containers::SelectRandomContainerElement(scourgeDisguiseTextIDs);
+                    player->Unit::Whisper(textId, player, true);
+                    player->CastSpell(player, SPELL_SCOURGE_DISGUISE_EXPIRING, true);
+                }
     }
 
     void Register() override
