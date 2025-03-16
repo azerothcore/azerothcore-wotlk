@@ -883,12 +883,7 @@ class spell_scourge_disguise_instability : public AuraScript
 
     bool Validate(SpellInfo const* /*spellInfo*/) override
     {
-        return ValidateSpellInfo(
-            {
-                SPELL_SCOURGE_DISGUISE,
-                SPELL_SCOURGE_DISGUISE_INSTANT_CAST,
-                SPELL_SCOURGE_DISGUISE_EXPIRING
-            });
+        return ValidateSpellInfo({ SPELL_SCOURGE_DISGUISE_EXPIRING });
     }
 
     void HandleApply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
