@@ -4,7 +4,7 @@ INSERT INTO `creature_loot_template` (`Entry`, `Item`, `Reference`, `Chance`, `Q
 (28547, 42780, 0, 23, 0, 1, 0, 1, 3, 'Storming Vortex - Relic of Ulduar'),
 (28578, 42780, 0, 29, 0, 1, 0, 1, 3, 'Hardened Steel Reaver - Relic of Ulduar'),
 (28579, 42780, 0, 28, 0, 1, 0, 1, 3, 'Hardened Steel Berserker - Relic of Ulduar'),
-(28579, 42780, 0, 28, 0, 1, 0, 1, 3, 'Hardened Steel Skycaller - Relic of Ulduar'),
+(28580, 42780, 0, 27, 0, 1, 0, 1, 3, 'Hardened Steel Skycaller - Relic of Ulduar'),
 (28581, 42780, 0, 30, 0, 1, 0, 1, 3, 'Stormforged Tactician - Relic of Ulduar'),
 (28582, 42780, 0, 30, 0, 1, 0, 1, 3, 'Stormforged Mender - Relic of Ulduar'),
 (28583, 42780, 0, 23, 0, 1, 0, 1, 3, 'Blistering Steamrager - Relic of Ulduar'),
