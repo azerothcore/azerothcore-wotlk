@@ -6013,7 +6013,7 @@ void Player::RewardReputation(Unit* victim)
     if (Rep->RepFaction1 && (!Rep->TeamDependent || teamId == TEAM_ALLIANCE))
     {
         float donerep1 = CalculateReputationGain(ReputationSource::Kill, victim->GetLevel(), static_cast<float>(Rep->RepValue1), ChampioningFaction ? ChampioningFaction : Rep->RepFaction1);
-        sScriptMgr->OnPlayerBeforeReputationChange(this, static_cast<float>(Rep->RepValue1), donerep1, ReputationSource::Kill, victim, nullptr, nullptr);
+        sScriptMgr->OnPlayerBeforeReputationChange(this, Rep->RepFaction1, donerep1, ReputationSource::Kill, victim, nullptr, nullptr);
 
         FactionEntry const* factionEntry1 = sFactionStore.LookupEntry(ChampioningFaction ? ChampioningFaction : Rep->RepFaction1);
         if (factionEntry1)
@@ -6025,7 +6025,7 @@ void Player::RewardReputation(Unit* victim)
     if (Rep->RepFaction2 && (!Rep->TeamDependent || teamId == TEAM_HORDE))
     {
         float donerep2 = CalculateReputationGain(ReputationSource::Kill, victim->GetLevel(), static_cast<float>(Rep->RepValue2), ChampioningFaction ? ChampioningFaction : Rep->RepFaction2);
-        sScriptMgr->OnPlayerBeforeReputationChange(this, static_cast<float>(Rep->RepValue1), donerep2, ReputationSource::Kill, victim, nullptr, nullptr);
+        sScriptMgr->OnPlayerBeforeReputationChange(this, Rep->RepFaction1, donerep2, ReputationSource::Kill, victim, nullptr, nullptr);
 
         FactionEntry const* factionEntry2 = sFactionStore.LookupEntry(ChampioningFaction ? ChampioningFaction : Rep->RepFaction2);
         if (factionEntry2)
