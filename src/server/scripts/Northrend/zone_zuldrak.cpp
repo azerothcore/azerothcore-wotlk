@@ -23,6 +23,8 @@
 #include "ScriptedGossip.h"
 #include "SpellAuras.h"
 #include "SpellInfo.h"
+#include "SpellScript.h"
+#include "SpellScriptLoader.h"
 #include "Vehicle.h"
 
 // Ours
@@ -240,6 +242,7 @@ enum overlordDrakuru
     SPELL_THROW_BRIGHT_CRYSTAL          = 54087,
     SPELL_TELEPORT_EFFECT               = 52096,
     SPELL_SCOURGE_DISGUISE              = 51966,
+    SPELL_SCOURGE_DISGUISE_INSTANT_CAST = 52192,
     SPELL_BLIGHT_FOG                    = 54104,
     SPELL_THROW_PORTAL_CRYSTAL          = 54209,
     SPELL_ARTHAS_PORTAL                 = 51807,
@@ -866,6 +869,51 @@ public:
     }
 };
 
+enum ScourgeDisguiseInstability
+{
+    SCOURGE_DISGUISE_FAILING_MESSAGE_1       = 28552, // Scourge Disguise Failing! Find a safe place!
+    SCOURGE_DISGUISE_FAILING_MESSAGE_2       = 28758, // Scourge Disguise Failing! Run for cover!
+    SCOURGE_DISGUISE_FAILING_MESSAGE_3       = 28759, // Scourge Disguise Failing! Hide quickly!
+};
+std::vector<uint32> const scourgeDisguiseTextIDs = { SCOURGE_DISGUISE_FAILING_MESSAGE_1, SCOURGE_DISGUISE_FAILING_MESSAGE_2, SCOURGE_DISGUISE_FAILING_MESSAGE_3 };
+
+class spell_scourge_disguise_instability : public AuraScript
+{
+    PrepareAuraScript(spell_scourge_disguise_instability);
+
+    bool Validate(SpellInfo const* /*spellInfo*/) override
+    {
+        return ValidateSpellInfo({ SPELL_SCOURGE_DISGUISE_EXPIRING });
+    }
+
+    void HandleApply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
+    {
+        SetDuration(urand(3 * MINUTE * IN_MILLISECONDS, 5 * MINUTE * IN_MILLISECONDS));
+    }
+
+    void HandleRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
+    {
+        if (Unit* caster = GetCaster())
+        {
+            if (Player* player = caster->ToPlayer())
+            {
+                if (player->HasAnyAuras(SPELL_SCOURGE_DISGUISE, SPELL_SCOURGE_DISGUISE_INSTANT_CAST))
+                {
+                    uint32 textId = Acore::Containers::SelectRandomContainerElement(scourgeDisguiseTextIDs);
+                    player->Unit::Whisper(textId, player, true);
+                    player->CastSpell(player, SPELL_SCOURGE_DISGUISE_EXPIRING, true);
+                }
+            }
+        }
+    }
+
+    void Register() override
+    {
+        OnEffectApply += AuraEffectApplyFn(spell_scourge_disguise_instability::HandleApply, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
+        OnEffectRemove += AuraEffectRemoveFn(spell_scourge_disguise_instability::HandleRemove, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
+    }
+};
+
 void AddSC_zuldrak()
 {
     // Ours
@@ -880,4 +928,6 @@ void AddSC_zuldrak()
     new npc_crusade_recruit();
     new go_scourge_enclosure();
     new npc_storm_cloud();
+
+    RegisterSpellScript(spell_scourge_disguise_instability);
 }
