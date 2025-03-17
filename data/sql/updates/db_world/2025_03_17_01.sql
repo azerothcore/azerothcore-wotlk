@@ -1,3 +1,4 @@
+-- DB update 2025_03_17_00 -> 2025_03_17_01
 -- Declare variables for item IDs
 SET @item_severed_arm = 45323;
 SET @item_bloated_slippery_eel = 45328;
