@@ -819,7 +819,7 @@ uint32 Unit::DealDamage(Unit* attacker, Unit* victim, uint32 damage, CleanDamage
             victim->GetAI()->DamageTaken(attacker, damage, damagetype, damageSchoolMask);
 
         if (attacker && attacker->IsAIEnabled)
-            attacker->GetAI()->DamageDealt(victim, damage, damagetype);
+            attacker->GetAI()->DamageDealt(victim, damage, damagetype, damageSchoolMask);
     }
 
     // Hook for OnDamage Event
@@ -3928,7 +3928,7 @@ void Unit::_UpdateAutoRepeatSpell()
     static uint32 const HUNTER_AUTOSHOOT = 75;
 
     // Check "realtime" interrupts
-    if ((IsPlayer() && ToPlayer()->isMoving()) || IsNonMeleeSpellCast(false, false, true, spellProto->Id == HUNTER_AUTOSHOOT))
+    if ((IsPlayer() && ToPlayer()->isMoving() && spellProto->Id != HUNTER_AUTOSHOOT) || IsNonMeleeSpellCast(false, false, true, spellProto->Id == HUNTER_AUTOSHOOT))
     {
         // cancel wand shoot
         if (spellProto->Id != HUNTER_AUTOSHOOT)
@@ -3937,7 +3937,8 @@ void Unit::_UpdateAutoRepeatSpell()
         return;
     }
 
-    if (m_AutoRepeatFirstCast && getAttackTimer(RANGED_ATTACK) < 500)
+    // Apply delay (Hunter's autoshoot not affected)
+    if (m_AutoRepeatFirstCast && getAttackTimer(RANGED_ATTACK) < 500 && spellProto->Id != HUNTER_AUTOSHOOT)
     {
         setAttackTimer(RANGED_ATTACK, 500);
     }
@@ -8412,37 +8413,25 @@ bool Unit::HandleDummyAuraProc(Unit* victim, uint32 damage, AuraEffect* triggere
                     if (!procSpell || !IsPlayer() || !victim)
                         return false;
 
+                    uint32 spell = 45284;
+
+                    // chain lightning only procs 1/3 of the time
+                    if (procSpell->SpellFamilyFlags[0] & 0x2)
+                    {
+                        if (!roll_chance_i(33))
+                            return false;
+                        spell = 45297;
+                    }
+
                     if (procEx & PROC_EX_CRITICAL_HIT)
                         damage /= 2;
 
-                    // do not proc off from itself
-                    if (procSpell->Id == 45297 || procSpell->Id == 45284)
-                    {
-                        return false;
-                    }
+                    // do not reduce damage-spells have correct basepoints
+                    damage /= 2;
+                    int32 dmg = damage;
 
-                    do
-                    {
-                        uint32 spell = 0;
-
-                        if (procSpell->SpellFamilyFlags[0] & 0x2)
-                        {
-                            // 1/3 of 33% if 11%
-                            if (!roll_chance_i(33))
-                                return false;
-
-                            spell = 45297;
-                        }
-                        else
-                            spell = 45284;
-
-                        // do not reduce damage-spells have correct basepoints
-                        damage /= 2;
-                        int32 dmg = damage;
-
-                        // Cast
-                        CastCustomSpell(victim, spell, &dmg, 0, 0, true, castItem, triggeredByAura);
-                    } while (roll_chance_i(33));
+                    // Cast
+                    CastCustomSpell(victim, spell, &dmg, 0, 0, true, castItem, triggeredByAura);
                     return true;
                 }
                 // Static Shock
@@ -17880,7 +17869,7 @@ void Unit::Kill(Unit* killer, Unit* victim, bool durabilityLoss, WeaponAttackTyp
         if (Unit* owner = killer->GetOwner())
         {
             Unit::ProcDamageAndSpell(owner, victim, PROC_FLAG_KILL, PROC_FLAG_NONE, PROC_EX_NONE, 0, attackType, spellProto, nullptr, -1, spell);
-            sScriptMgr->OnCreatureKilledByPet( killer->GetCharmerOrOwnerPlayerOrPlayerItself(), victim->ToCreature());
+            sScriptMgr->OnPlayerCreatureKilledByPet( killer->GetCharmerOrOwnerPlayerOrPlayerItself(), victim->ToCreature());
         }
 
     if (killer != victim)
@@ -18080,9 +18069,9 @@ void Unit::Kill(Unit* killer, Unit* victim, bool durabilityLoss, WeaponAttackTyp
         if (Player* killerPlr = killer->ToPlayer())
         {
             if (Player* killedPlr = victim->ToPlayer())
-                sScriptMgr->OnPVPKill(killerPlr, killedPlr);
+                sScriptMgr->OnPlayerPVPKill(killerPlr, killedPlr);
             else if (Creature* killedCre = victim->ToCreature())
-                sScriptMgr->OnCreatureKill(killerPlr, killedCre);
+                sScriptMgr->OnPlayerCreatureKill(killerPlr, killedCre);
         }
         else if (Creature* killerCre = killer->ToCreature())
         {
@@ -20534,6 +20523,8 @@ void Unit::ExecuteDelayedUnitRelocationEvent()
                 active->m_last_notify_position.Relocate(active->GetPositionX(), active->GetPositionY(), active->GetPositionZ());
             }
         }
+
+        GetMap()->LoadGridsInRange(*player, MAX_VISIBILITY_DISTANCE);
 
         Acore::PlayerRelocationNotifier relocateNoLarge(*player, false); // visit only objects which are not large; default distance
         Cell::VisitAllObjects(viewPoint, relocateNoLarge, player->GetSightRange() + VISIBILITY_INC_FOR_GOBJECTS);

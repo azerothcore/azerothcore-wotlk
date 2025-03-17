@@ -53,8 +53,9 @@ ObjectData const creatureData[] =
 
 ObjectData const objectData[] =
 {
-    { GO_PORTCULLIS_CHROMAGGUS, DATA_GO_CHROMAGGUS_DOOR },
-    { GO_PORTCULLIS_CHROMAGGUS_EXIT, DATA_GO_CHROMAGGUS_DOOR_EXIT }
+    { GO_PORTCULLIS_CHROMAGGUS,      DATA_GO_CHROMAGGUS_DOOR      },
+    { GO_PORTCULLIS_CHROMAGGUS_EXIT, DATA_GO_CHROMAGGUS_DOOR_EXIT },
+    { 0,                             0                            }
 };
 
 Position const SummonPosition[8] =

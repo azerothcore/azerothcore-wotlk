@@ -115,11 +115,10 @@ public:
     bool IsActiveEvent(uint16 eventId) { return (_activeEvents.find(eventId) != _activeEvents.end()); }
     uint32 StartSystem();
     void Initialize();
-    void StartArenaSeason();
-    void StartInternalEvent(uint16 eventId);
-    bool StartEvent(uint16 eventId, bool overwrite = false);
-    void StopEvent(uint16 eventId, bool overwrite = false);
-    void HandleQuestComplete(uint32 questId);  // called on world event type quest completions
+    void StartInternalEvent(uint16 event_id);
+    bool StartEvent(uint16 event_id, bool overwrite = false);
+    void StopEvent(uint16 event_id, bool overwrite = false);
+    void HandleQuestComplete(uint32 quest_id);  // called on world event type quest completions
     uint32 GetNPCFlag(Creature* cr);
     // Load the game event npc vendor table from the DB
     void LoadEventVendors();

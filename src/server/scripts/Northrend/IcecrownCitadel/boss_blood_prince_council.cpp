@@ -342,7 +342,7 @@ public:
             }
         }
 
-        void DamageDealt(Unit* target, uint32& damage, DamageEffectType  /*damageType*/) override
+        void DamageDealt(Unit* target, uint32& damage, DamageEffectType  /*damageType*/, SpellSchoolMask /*damageSchoolMask*/) override
         {
             if (!target->IsPlayer())
                 return;
@@ -612,7 +612,7 @@ public:
             }
         }
 
-        void DamageDealt(Unit* target, uint32& damage, DamageEffectType  /*damageType*/) override
+        void DamageDealt(Unit* target, uint32& damage, DamageEffectType  /*damageType*/, SpellSchoolMask /*damageSchoolMask*/) override
         {
             if (!target->IsPlayer())
                 return;
@@ -906,7 +906,7 @@ public:
             }
         }
 
-        void DamageDealt(Unit* target, uint32& damage, DamageEffectType  /*damageType*/) override
+        void DamageDealt(Unit* target, uint32& damage, DamageEffectType  /*damageType*/, SpellSchoolMask /*damageSchoolMask*/) override
         {
             if (!target->IsPlayer())
                 return;
@@ -1334,7 +1334,7 @@ public:
             me->DespawnOrUnsummon(1);
         }
 
-        void DamageDealt(Unit* target, uint32& damage, DamageEffectType  /*damageType*/) override
+        void DamageDealt(Unit* target, uint32& damage, DamageEffectType  /*damageType*/, SpellSchoolMask /*damageSchoolMask*/) override
         {
             if (!target->IsPlayer())
             {

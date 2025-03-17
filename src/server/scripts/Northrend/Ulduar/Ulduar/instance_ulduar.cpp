@@ -22,6 +22,7 @@
 #include "ScriptedCreature.h"
 #include "Transport.h"
 #include "WorldPacket.h"
+#include "WorldStatePackets.h"
 #include "ulduar.h"
 
 class instance_ulduar : public InstanceMapScript
@@ -169,16 +170,16 @@ public:
             m_mimironTramUsed       = false;
         }
 
-        void FillInitialWorldStates(WorldPacket& packet) override
+        void FillInitialWorldStates(WorldPackets::WorldState::InitWorldStates& packet) override
         {
-            packet << uint32(WORLD_STATE_ALGALON_TIMER_ENABLED) << uint32(m_algalonTimer && m_algalonTimer <= 60);
-            packet << uint32(WORLD_STATE_ALGALON_DESPAWN_TIMER) << uint32(std::min<uint32>(m_algalonTimer, 60));
+            packet.Worldstates.reserve(2);
+            packet.Worldstates.emplace_back(WORLD_STATE_ALGALON_TIMER_ENABLED, (m_algalonTimer && m_algalonTimer <= 60) ? 1 : 0);
+            packet.Worldstates.emplace_back(WORLD_STATE_ALGALON_DESPAWN_TIMER, std::min<int32>(m_algalonTimer, 60));
         }
 
         void OnPlayerEnter(Player* player) override
         {
             // mimiron tram:
-            instance->LoadGrid(2307.0f, 284.632f);
             if (GameObject* MimironTram = instance->GetGameObject(m_mimironTramGUID))
             {
                 player->UpdateVisibilityOf(MimironTram);
@@ -537,10 +538,7 @@ public:
                     break;
                 case GO_KEEPERS_GATE:
                     if (GetData(TYPE_MIMIRON) == DONE && GetData(TYPE_FREYA) == DONE && GetData(TYPE_HODIR) == DONE && GetData(TYPE_THORIM) == DONE)
-                    {
-                        instance->LoadGrid(1903.0f, 248.0f);
                         gameObject->RemoveGameObjectFlag(GO_FLAG_LOCKED);
-                    }
 
                     m_keepersgateGUID = gameObject->GetGUID();
                     break;
@@ -752,8 +750,6 @@ public:
                 case EVENT_TOWER_OF_FROST_DESTROYED:
                 case EVENT_TOWER_OF_FLAMES_DESTROYED:
                     {
-                        instance->LoadGrid(364.0f, -16.0f); //make sure leviathan is loaded
-                        instance->LoadGrid(364.0f, 32.0f); //make sure Mimiron's and Thorim's Targetting Crystal are loaded
                         m_leviathanTowers[type - EVENT_TOWER_OF_LIFE_DESTROYED] = data;
                         for (uint8 i = 0; i < 2; ++i)
                         {

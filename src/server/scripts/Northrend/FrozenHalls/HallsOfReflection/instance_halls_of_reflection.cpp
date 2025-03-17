@@ -15,12 +15,12 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "Group.h"
 #include "InstanceMapScript.h"
+#include "InstanceScript.h"
 #include "MapMgr.h"
 #include "Transport.h"
 #include "halls_of_reflection.h"
-#include "InstanceScript.h"
-#include "Group.h"
 
 class UtherBatteredHiltEvent : public BasicEvent
 {
@@ -325,7 +325,6 @@ public:
                     }
                     else
                     {
-                        instance->LoadGrid(PathWaypoints[PATH_WP_COUNT - 1].GetPositionX(), PathWaypoints[PATH_WP_COUNT - 1].GetPositionY());
                         creature->UpdatePosition(PathWaypoints[PATH_WP_COUNT - 1], true);
                         creature->StopMovingOnCurrentPos();
                     }
@@ -515,7 +514,6 @@ public:
                     {
                         break;
                     }
-                    instance->LoadGrid(LeaderEscapePos.GetPositionX(), LeaderEscapePos.GetPositionY());
                     if (Creature* c = instance->GetCreature(NPC_LeaderGUID))
                     {
                         if (!c->IsAlive())
@@ -567,7 +565,6 @@ public:
                 case DATA_LICH_KING:
                     if (data == DONE)
                     {
-                        instance->LoadGrid(PathWaypoints[0].GetPositionX(), PathWaypoints[0].GetPositionY());
                         EncounterMask |= (1 << DATA_LICH_KING);
                         if (Creature* c = instance->GetCreature(NPC_LeaderGUID))
                             c->setActive(false);
