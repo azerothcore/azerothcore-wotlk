@@ -249,11 +249,11 @@ class spell_dru_omen_of_clarity : public AuraScript
         // Revitalize
         if (spellInfo->SpellIconID == SPELL_ICON_REVITALIZE)
             return false;
- 
+
         // Furor 210
         if (spellInfo->SpellIconID == SPELL_ICON_FUROR)
             return false;
- 
+
         return true;
     }
 
