@@ -367,9 +367,7 @@ class spell_herald_volzaj_insanity : public SpellScript
         }
 
         if (targets.empty())
-        {
             return;
-        }
 
         // Start channel visual and set self as unnattackable
         caster->ToCreature()->AI()->Talk(SAY_INSANITY);
@@ -386,16 +384,12 @@ class spell_herald_volzaj_insanity : public SpellScript
         {
             WorldObject* targetObj = *itr;
             if (!targetObj)
-            {
                 continue;
-            }
 
             Player* plrTarget = targetObj->ToPlayer();
             // This should never happen, spell has attribute SPELL_ATTR3_ONLY_TARGET_PLAYERS
             if (!plrTarget)
-            {
                 continue;
-            }
 
             // phase mask
             plrTarget->CastSpell(plrTarget, InsanitySpells.at(insanityCounter), true);
@@ -406,9 +400,7 @@ class spell_herald_volzaj_insanity : public SpellScript
                 // Should not make clone of current player target
                 Player* plrClone = *itr2 ? (*itr2)->ToPlayer() : nullptr;
                 if (!plrClone || plrClone == plrTarget || !plrClone->IsAlive())
-                {
                     continue;
-                }
 
                 if (Unit* summon = caster->SummonCreature(NPC_TWISTED_VISAGE, plrClone->GetPosition(), TEMPSUMMON_CORPSE_DESPAWN, 0))
                 {
