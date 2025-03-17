@@ -5408,11 +5408,11 @@ void Spell::TakeAmmo()
             }
         }
         else if (uint32 ammo = m_caster->ToPlayer()->GetUInt32Value(PLAYER_AMMO_ID))
-            // Handling of explosive shot ticks
+        {
+            // 53352 Explosive Shot
             if (!(m_spellInfo->Id == 53352))
-            {
                 m_caster->ToPlayer()->DestroyItemCount(ammo, 1, true);
-            }
+        }
     }
 }
 
@@ -8282,6 +8282,7 @@ void Spell::HandleLaunchPhase()
     PrepareTargetProcessing();
 
     // Handling of explosive shot initial cast without LnL proc
+    // 56453 Lock and Load
     if ((m_spellInfo->SpellFamilyFlags[1] & 0x80000000) != 0 && !m_caster->HasAura(56453))
     {
         TakeAmmo();
