@@ -15,12 +15,12 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "Group.h"
 #include "InstanceMapScript.h"
+#include "InstanceScript.h"
 #include "MapMgr.h"
 #include "Transport.h"
 #include "halls_of_reflection.h"
-#include "InstanceScript.h"
-#include "Group.h"
 
 class UtherBatteredHiltEvent : public BasicEvent
 {

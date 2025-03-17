@@ -147,7 +147,7 @@ Map* MapInstanced::CreateInstanceForPlayer(const uint32 mapId, Player* player)
 
             map = FindInstanceMap(destInstId);
             if (!map)
-                map = CreateInstance(destInstId, pSave, realdiff);
+                map = CreateInstance(destInstId, pSave, realdiff, player);
             else if (IsSharedDifficultyMap(mapId) && !map->HavePlayers() && map->GetDifficulty() != realdiff)
             {
                 if (player->isBeingLoaded()) // pussywizard: crashfix (assert(passengers.empty) fail in ~transport), could be added to a transport during loading from db
@@ -160,7 +160,7 @@ Map* MapInstanced::CreateInstanceForPlayer(const uint32 mapId, Player* player)
                     if (i->first == destInstId)
                     {
                         DestroyInstance(i);
-                        map = CreateInstance(destInstId, pSave, realdiff);
+                        map = CreateInstance(destInstId, pSave, realdiff, player);
                         break;
                     }
             }
@@ -170,14 +170,14 @@ Map* MapInstanced::CreateInstanceForPlayer(const uint32 mapId, Player* player)
             uint32 newInstanceId = sMapMgr->GenerateInstanceId();
             ASSERT(!FindInstanceMap(newInstanceId)); // pussywizard: instance with new id can't exist
             Difficulty diff = player->GetGroup() ? player->GetGroup()->GetDifficulty(IsRaid()) : player->GetDifficulty(IsRaid());
-            map = CreateInstance(newInstanceId, nullptr, diff);
+            map = CreateInstance(newInstanceId, nullptr, diff, player);
         }
     }
 
     return map;
 }
 
-InstanceMap* MapInstanced::CreateInstance(uint32 InstanceId, InstanceSave* save, Difficulty difficulty)
+InstanceMap* MapInstanced::CreateInstance(uint32 InstanceId, InstanceSave* save, Difficulty difficulty, Player* player)
 {
     // load/create a map
     std::lock_guard<std::mutex> guard(Lock);
@@ -212,6 +212,16 @@ InstanceMap* MapInstanced::CreateInstance(uint32 InstanceId, InstanceSave* save,
         map->CreateInstanceScript(true, save->GetInstanceData(), save->GetCompletedEncounterMask());
     else
         map->CreateInstanceScript(false, "", 0);
+
+    if (map->GetInstanceScript() && map->GetInstanceScript()->IsTwoFactionInstance()
+        && map->GetInstanceScript()->GetTeamIdInInstance() == TEAM_NEUTRAL)
+    {
+        ASSERT(player); // Player should exist, as checked by in MapInstanced::CreateInstanceForPlayer
+        map->GetInstanceScript()->SetTeamIdInInstance(player->GetTeamId());
+        if (Group* group = player->GetGroup())
+            if (Player* leader = ObjectAccessor::FindConnectedPlayer(group->GetLeaderGUID()))
+                map->GetInstanceScript()->SetTeamIdInInstance(leader->GetTeamId());
+    }
 
     map->OnCreateMap();
 

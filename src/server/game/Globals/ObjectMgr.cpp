@@ -2362,7 +2362,7 @@ void ObjectMgr::RemoveCreatureFromGrid(ObjectGuid::LowType guid, CreatureData co
     }
 }
 
-uint32 ObjectMgr::AddGOData(uint32 entry, uint32 mapId, float x, float y, float z, float o, uint32 spawntimedelay, float rotation0, float rotation1, float rotation2, float rotation3)
+ObjectGuid::LowType ObjectMgr::AddGOData(uint32 entry, uint32 mapId, float x, float y, float z, float o, uint32 spawntimedelay, float rotation0, float rotation1, float rotation2, float rotation3)
 {
     GameObjectTemplate const* goinfo = GetGameObjectTemplate(entry);
     if (!goinfo)
@@ -2413,7 +2413,7 @@ uint32 ObjectMgr::AddGOData(uint32 entry, uint32 mapId, float x, float y, float 
     return spawnId;
 }
 
-uint32 ObjectMgr::AddCreData(uint32 entry, uint32 mapId, float x, float y, float z, float o, uint32 spawntimedelay)
+ObjectGuid::LowType ObjectMgr::AddCreData(uint32 entry, uint32 mapId, float x, float y, float z, float o, uint32 spawntimedelay)
 {
     CreatureTemplate const* cInfo = GetCreatureTemplate(entry);
     if (!cInfo)
@@ -2454,7 +2454,7 @@ uint32 ObjectMgr::AddCreData(uint32 entry, uint32 mapId, float x, float y, float
     AddCreatureToGrid(spawnId, &data);
 
     // Spawn if necessary (loaded grids only)
-    if (!map->Instanceable() && !map->IsGridCreated(x, y))
+    if (!map->Instanceable() && map->IsGridLoaded(x, y))
     {
         Creature* creature = new Creature();
         if (!creature->LoadCreatureFromDB(spawnId, map, true, true))
@@ -5848,7 +5848,11 @@ void ObjectMgr::LoadPageTextLocales()
     QueryResult result = WorldDatabase.Query("SELECT ID, locale, Text FROM page_text_locale");
 
     if (!result)
+    {
+        LOG_WARN("server.loading", ">> Loaded 0 page texts. DB table `page_text_locale` is empty!");
+        LOG_INFO("server.loading", " ");
         return;
+    }
 
     do
     {
@@ -5876,7 +5880,7 @@ void ObjectMgr::LoadInstanceTemplate()
 
     if (!result)
     {
-        LOG_WARN("server.loading", ">> Loaded 0 instance templates. DB table `page_text` is empty!");
+        LOG_WARN("server.loading", ">> Loaded 0 instance templates. DB table `instance_template` is empty!");
         LOG_INFO("server.loading", " ");
         return;
     }
@@ -10292,117 +10296,4 @@ uint32 ObjectMgr::GetQuestMoneyReward(uint8 level, uint32 questMoneyDifficulty) 
     }
 
     return 0;
-}
-
-void ObjectMgr::SendServerMail(Player* player, uint32 id, uint32 reqLevel, uint32 reqPlayTime, uint32 rewardMoneyA, uint32 rewardMoneyH, uint32 rewardItemA, uint32 rewardItemCountA, uint32 rewardItemH, uint32 rewardItemCountH, std::string subject, std::string body, uint8 active) const
-{
-    if (active)
-    {
-        if (player->GetLevel() < reqLevel)
-            return;
-
-        if (player->GetTotalPlayedTime() < reqPlayTime)
-            return;
-
-        CharacterDatabaseTransaction trans = CharacterDatabase.BeginTransaction();
-
-        MailSender sender(MAIL_NORMAL, player->GetGUID().GetCounter(), MAIL_STATIONERY_GM);
-        MailDraft draft(subject, body);
-
-        draft.AddMoney(player->GetTeamId() == TEAM_ALLIANCE ? rewardMoneyA : rewardMoneyH);
-        if (Item* mailItem = Item::CreateItem(player->GetTeamId() == TEAM_ALLIANCE ? rewardItemA : rewardItemH, player->GetTeamId() == TEAM_ALLIANCE ? rewardItemCountA : rewardItemCountH))
-        {
-            mailItem->SaveToDB(trans);
-            draft.AddItem(mailItem);
-        }
-
-        draft.SendMailTo(trans, MailReceiver(player), sender);
-        CharacterDatabase.CommitTransaction(trans);
-
-        CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_REP_MAIL_SERVER_CHARACTER);
-        stmt->SetData(0, player->GetGUID().GetCounter());
-        stmt->SetData(1, id);
-        CharacterDatabase.Execute(stmt);
-
-        LOG_DEBUG("entities.player", "ObjectMgr::SendServerMail() Sent mail id {} to {}", id, player->GetGUID().ToString());
-    }
-}
-
-void ObjectMgr::LoadMailServerTemplates()
-{
-    uint32 oldMSTime = getMSTime();
-
-    _serverMailStore.clear(); // for reload case
-
-    //                                                    0     1           2              3         4         5        6             7       8             9          10      11
-    QueryResult result = CharacterDatabase.Query("SELECT `id`, `reqLevel`, `reqPlayTime`, `moneyA`, `moneyH`, `itemA`, `itemCountA`, `itemH`,`itemCountH`, `subject`, `body`, `active` FROM `mail_server_template`");
-    if (!result)
-    {
-        LOG_INFO("sql.sql", ">> Loaded 0 server mail rewards. DB table `mail_server_template` is empty.");
-        LOG_INFO("server.loading", " ");
-        return;
-    }
-
-    _serverMailStore.rehash(result->GetRowCount());
-
-    do
-    {
-        Field* fields = result->Fetch();
-
-        uint32 id = fields[0].Get<uint32>();
-
-        ServerMail& servMail = _serverMailStore[id];
-
-        servMail.id          = id;
-        servMail.reqLevel    = fields[1].Get<uint8>();
-        servMail.reqPlayTime = fields[2].Get<uint32>();
-        servMail.moneyA      = fields[3].Get<uint32>();
-        servMail.moneyH      = fields[4].Get<uint32>();
-        servMail.itemA       = fields[5].Get<uint32>();
-        servMail.itemCountA  = fields[6].Get<uint32>();
-        servMail.itemH       = fields[7].Get<uint32>();
-        servMail.itemCountH  = fields[8].Get<uint32>();
-        servMail.subject     = fields[9].Get<std::string>();
-        servMail.body        = fields[10].Get<std::string>();
-        servMail.active      = fields[11].Get<uint8>();
-
-        if (servMail.reqLevel > sWorld->getIntConfig(CONFIG_MAX_PLAYER_LEVEL))
-        {
-            LOG_ERROR("sql.sql", "Table `mail_server_template` has reqLevel {} but max level is {} for id {}, skipped.", servMail.reqLevel, sWorld->getIntConfig(CONFIG_MAX_PLAYER_LEVEL), servMail.id);
-            return;
-        }
-
-        if (servMail.moneyA > MAX_MONEY_AMOUNT || servMail.moneyH > MAX_MONEY_AMOUNT)
-        {
-            LOG_ERROR("sql.sql", "Table `mail_server_template` has moneyA {} or moneyH {} larger than MAX_MONEY_AMOUNT {} for id {}, skipped.", servMail.moneyA, servMail.moneyH, MAX_MONEY_AMOUNT, servMail.id);
-            return;
-        }
-
-        ItemTemplate const* itemTemplateA = sObjectMgr->GetItemTemplate(servMail.itemA);
-        if (!itemTemplateA && servMail.itemA)
-        {
-            LOG_ERROR("sql.sql", "Table `mail_server_template` has invalid item in itemA {} for id {}, skipped.", servMail.itemA, servMail.id);
-            return;
-        }
-        ItemTemplate const* itemTemplateH = sObjectMgr->GetItemTemplate(servMail.itemH);
-        if (!itemTemplateH && servMail.itemH)
-        {
-            LOG_ERROR("sql.sql", "Table `mail_server_template` has invalid item in itemH {} for id {}, skipped.", servMail.itemH, servMail.id);
-            return;
-        }
-
-        if (!servMail.itemA && servMail.itemCountA)
-        {
-            LOG_ERROR("sql.sql", "Table `mail_server_template` has itemCountA {} with no ItemA, set to 0", servMail.itemCountA);
-            servMail.itemCountA = 0;
-        }
-        if (!servMail.itemH && servMail.itemCountH)
-        {
-            LOG_ERROR("sql.sql", "Table `mail_server_template` has itemCountH {} with no ItemH, set to 0", servMail.itemCountH);
-            servMail.itemCountH = 0;
-        }
-    } while (result->NextRow());
-
-    LOG_INFO("server.loading", ">> Loaded {} Mail Server Template in {} ms", _serverMailStore.size(), GetMSTimeDiffToNow(oldMSTime));
-    LOG_INFO("server.loading", " ");
 }

@@ -3342,6 +3342,7 @@ void SpellMgr::LoadSpellInfoCorrections()
     {
         spellInfo->Effects[EFFECT_0].RadiusEntry = sSpellRadiusStore.LookupEntry(EFFECT_RADIUS_20_YARDS); // 20yd
         spellInfo->Effects[EFFECT_1].RadiusEntry = sSpellRadiusStore.LookupEntry(EFFECT_RADIUS_20_YARDS); // 20yd
+        spellInfo->Effects[EFFECT_2].RadiusEntry = sSpellRadiusStore.LookupEntry(EFFECT_RADIUS_20_YARDS); // 20yd
     });
 
     // Rallying Shout
@@ -3677,12 +3678,6 @@ void SpellMgr::LoadSpellInfoCorrections()
         spellInfo->AttributesEx5 |= SPELL_ATTR5_ALWAYS_AOE_LINE_OF_SIGHT;
     });
 
-    //Crushing the Crown
-    ApplySpellFix({ 71024 }, [](SpellInfo* spellInfo)
-    {
-        spellInfo->Effects[EFFECT_0].TargetA = SpellImplicitTargetInfo(TARGET_DEST_DYNOBJ_NONE);
-    });
-
     // Battle for the Undercity
     ApplySpellFix({
         59892   // Cyclone fall
@@ -3981,13 +3976,6 @@ void SpellMgr::LoadSpellInfoCorrections()
     {
         spellInfo->Effects[EFFECT_0].ApplyAuraName = SPELL_AURA_MOD_DECREASE_SPEED;
         spellInfo->Effects[EFFECT_0].BasePoints = -25;
-    });
-
-    // Focused Eyebeam Summon Trigger
-    ApplySpellFix({ 63342 }, [](SpellInfo* spellInfo)
-    {
-        spellInfo->MaxAffectedTargets = 1;
-        spellInfo->Effects[EFFECT_0].TargetB = SpellImplicitTargetInfo();
     });
 
     // Eye of Kilrogg Passive (DND)
@@ -4882,6 +4870,19 @@ void SpellMgr::LoadSpellInfoCorrections()
         spellInfo->Effects[EFFECT_1].BasePoints = 0;
         spellInfo->Effects[EFFECT_0].RealPointsPerLevel = 0.25;
         spellInfo->Effects[EFFECT_1].RealPointsPerLevel = 0.25;
+    });
+
+    // Smash
+    // Dark Smash
+    ApplySpellFix({ 42669, 59706, 42723, 59709 }, [](SpellInfo* spellInfo)
+    {
+        spellInfo->AttributesEx2 &= ~SPELL_ATTR2_IGNORE_LINE_OF_SIGHT;
+    });
+
+    // Swoop (Moth hunter pet) root effect fix
+    ApplySpellFix({ 52825 }, [](SpellInfo* spellInfo)
+    {
+        spellInfo->Effects[EFFECT_2].TargetA = SpellImplicitTargetInfo(TARGET_UNIT_TARGET_ENEMY);
     });
 
     for (uint32 i = 0; i < GetSpellInfoStoreSize(); ++i)

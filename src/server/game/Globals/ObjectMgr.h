@@ -56,7 +56,7 @@ struct PlayerLevelInfo;
 struct PageText
 {
     std::string Text;
-    uint16 NextPage;
+    uint32 NextPage;
 };
 
 /// Key for storing temp summon data in TempSummonDataContainer
@@ -665,7 +665,6 @@ typedef std::map<std::pair<uint32, uint8>, QuestGreeting> QuestGreetingContainer
 
 typedef std::unordered_map<uint32, VendorItemData> CacheVendorItemContainer;
 typedef std::unordered_map<uint32, TrainerSpellData> CacheTrainerSpellContainer;
-typedef std::unordered_map<uint32, ServerMail> ServerMailContainer;
 
 typedef std::vector<uint32> CreatureCustomIDsContainer;
 
@@ -1055,7 +1054,6 @@ public:
     void LoadInstanceTemplate();
     void LoadInstanceEncounters();
     void LoadMailLevelRewards();
-    void LoadMailServerTemplates();
     void LoadVehicleTemplateAccessories();
     void LoadVehicleAccessories();
     void LoadVehicleSeatAddon();
@@ -1187,8 +1185,6 @@ public:
 
         return nullptr;
     }
-
-    [[nodiscard]] ServerMailContainer const& GetAllServerMailStore() const { return _serverMailStore; }
 
     [[nodiscard]] BroadcastText const* GetBroadcastText(uint32 id) const
     {
@@ -1324,8 +1320,8 @@ public:
     void RemoveCreatureFromGrid(ObjectGuid::LowType guid, CreatureData const* data);
     void AddGameobjectToGrid(ObjectGuid::LowType guid, GameObjectData const* data);
     void RemoveGameobjectFromGrid(ObjectGuid::LowType guid, GameObjectData const* data);
-    uint32 AddGOData(uint32 entry, uint32 map, float x, float y, float z, float o, uint32 spawntimedelay = 0, float rotation0 = 0, float rotation1 = 0, float rotation2 = 0, float rotation3 = 0);
-    uint32 AddCreData(uint32 entry, uint32 map, float x, float y, float z, float o, uint32 spawntimedelay = 0);
+    ObjectGuid::LowType AddGOData(uint32 entry, uint32 map, float x, float y, float z, float o, uint32 spawntimedelay = 0, float rotation0 = 0, float rotation1 = 0, float rotation2 = 0, float rotation3 = 0);
+    ObjectGuid::LowType AddCreData(uint32 entry, uint32 map, float x, float y, float z, float o, uint32 spawntimedelay = 0);
 
     // reserved names
     void LoadReservedPlayerNamesDB();
@@ -1449,7 +1445,6 @@ public:
     }
 
     [[nodiscard]] uint32 GetQuestMoneyReward(uint8 level, uint32 questMoneyDifficulty) const;
-    void SendServerMail(Player* player, uint32 id, uint32 reqLevel, uint32 reqPlayTime, uint32 rewardMoneyA, uint32 rewardMoneyH, uint32 rewardItemA, uint32 rewardItemCountA, uint32 rewardItemH, uint32 rewardItemCountH, std::string subject, std::string body, uint8 active) const;
 private:
     // first free id for selected id type
     uint32 _auctionId; // pussywizard: accessed by a single thread
@@ -1613,8 +1608,6 @@ private:
 
     CacheVendorItemContainer _cacheVendorItemStore;
     CacheTrainerSpellContainer _cacheTrainerSpellStore;
-
-    ServerMailContainer _serverMailStore;
 
     std::set<uint32> _difficultyEntries[MAX_DIFFICULTY - 1]; // already loaded difficulty 1 value in creatures, used in CheckCreatureTemplate
     std::set<uint32> _hasDifficultyEntries[MAX_DIFFICULTY - 1]; // already loaded creatures with difficulty 1 values, used in CheckCreatureTemplate
