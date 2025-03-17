@@ -915,6 +915,16 @@ bool ScriptMgr::OnPlayerCanResurrect(Player* player)
     CALL_ENABLED_BOOLEAN_HOOKS(PlayerScript, PLAYERHOOK_CAN_RESURRECT, !script->OnPlayerCanResurrect(player));
 }
 
+bool ScriptMgr::OnPlayerCanGiveLevel(Player* player, uint8 newLevel)
+{
+    CALL_ENABLED_BOOLEAN_HOOKS(PlayerScript, PLAYERHOOK_ON_CAN_GIVE_LEVEL, !script->OnPlayerCanGiveLevel(player, newLevel));
+}
+
+void ScriptMgr::OnPlayerSendListInventory(Player* player, ObjectGuid vendorGuid, uint32& vendorEntry)
+{
+    CALL_ENABLED_HOOKS(PlayerScript, PLAYERHOOK_ON_SEND_LIST_INVENTORY, script->OnPlayerSendListInventory(player, vendorGuid, vendorEntry));
+}
+
 PlayerScript::PlayerScript(const char* name, std::vector<uint16> enabledHooks)
     : ScriptObject(name, PLAYERHOOK_END)
 {
