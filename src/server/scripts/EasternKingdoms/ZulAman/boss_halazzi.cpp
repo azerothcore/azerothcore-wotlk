@@ -55,10 +55,9 @@ enum PhaseHalazzi
 {
     PHASE_NONE                   = 0,
     PHASE_LYNX                   = 1,
-    PHASE_SPLIT                  = 2,
-    PHASE_HUMAN                  = 3,
-    PHASE_MERGE                  = 4,
-    PHASE_ENRAGE                 = 5
+    PHASE_HUMAN                  = 2,
+    PHASE_MERGE                  = 3,
+    PHASE_ENRAGE                 = 4
 };
 
 enum Yells
@@ -118,15 +117,15 @@ struct boss_halazzi : public BossAI
     {
         BossAI::DamageTaken(attacker, damage, damagetype, damageSchoolMask);
 
-        if (_phase == PHASE_LYNX || _phase == PHASE_ENRAGE)
+        if (_phase == PHASE_LYNX)
         {
             uint32 _healthCheckPercentage = 25 * (3 - _transformCount);
-            if (!HealthAbovePct(_healthCheckPercentage))
-                EnterPhase(PHASE_SPLIT);
+            if (me->HealthBelowPctDamaged(_healthCheckPercentage, damage))
+                EnterPhase(PHASE_HUMAN);
         }
         else if (_phase == PHASE_HUMAN)
         {
-            if (!HealthAbovePct(20))
+            if (me->HealthBelowPctDamaged(20, damage))
                 EnterPhase(PHASE_MERGE);
         }
     }
@@ -153,20 +152,12 @@ struct boss_halazzi : public BossAI
 
     void EnterPhase(PhaseHalazzi nextPhase)
     {
+        _phase = nextPhase;
+
         switch (nextPhase)
         {
-            case PHASE_ENRAGE:
-                SetInvincibility(false);
-                scheduler.Schedule(12s, GROUP_LYNX, [this](TaskContext context)
-                {
-                    DoCastSelf(SPELL_SUMMON_TOTEM);
-                    context.Repeat(20s);
-                });
-                [[fallthrough]];
             case PHASE_LYNX:
             {
-                if (_phase == PHASE_MERGE)
-                    me->ResumeChasingVictim();
                 summons.DespawnAll();
 
                 if (_transformCount)
@@ -188,6 +179,8 @@ struct boss_halazzi : public BossAI
                     }
                 }
 
+                me->ResumeChasingVictim();
+
                 scheduler.CancelGroup(GROUP_MERGE);
                 scheduler.Schedule(5s, 15s, GROUP_LYNX, [this](TaskContext context)
                 {
@@ -201,16 +194,15 @@ struct boss_halazzi : public BossAI
                 });
                 break;
             }
-            case PHASE_SPLIT:
+            case PHASE_HUMAN:
                 Talk(SAY_SPLIT);
                 DoCastSelf(SPELL_TRANSFIGURE, true);
                 scheduler.Schedule(3s, GROUP_SPLIT, [this](TaskContext /*context*/)
                 {
                     DoCastSelf(SPELL_SUMMON_LYNX, true);
                 });
-                nextPhase = PHASE_HUMAN;
-                [[fallthrough]];
-            case PHASE_HUMAN:
+                _phase = PHASE_HUMAN;
+
                 scheduler.CancelGroup(GROUP_MERGE);
                 scheduler.CancelGroup(GROUP_LYNX);
                 scheduler.Schedule(10s, GROUP_HUMAN, [this](TaskContext context)
@@ -240,24 +232,35 @@ struct boss_halazzi : public BossAI
                     me->GetMotionMaster()->Clear();
                     me->GetMotionMaster()->MoveFollow(lynx, 0, 0);
                     ++_transformCount;
-                    scheduler.Schedule(2s, GROUP_MERGE, [this](TaskContext context)
+                    scheduler.Schedule(2s, GROUP_MERGE, [this, lynx](TaskContext context)
                     {
-                        if (Creature* lynx = instance->GetCreature(DATA_SPIRIT_LYNX))
+                        if (lynx)
+                        {
                             if (me->IsWithinDistInMap(lynx, 6.0f))
                             {
-                                if (_transformCount < 3)
-                                    EnterPhase(PHASE_LYNX);
-                                else
-                                    EnterPhase(PHASE_ENRAGE);
+                                EnterPhase(PHASE_LYNX);
+
+                                // Enrage phase
+                                if (_transformCount == 3)
+                                {
+                                    _phase = PHASE_ENRAGE;
+                                    SetInvincibility(false);
+                                    scheduler.Schedule(12s, GROUP_LYNX, [this](TaskContext context)
+                                    {
+                                        DoCastSelf(SPELL_SUMMON_TOTEM);
+                                        context.Repeat(20s);
+                                    });
+                                }
                             }
-                        context.Repeat(2s);
+                            else
+                                context.Repeat(2s);
+                        }
                     });
                 }
                 break;
             default:
                 break;
         }
-        _phase = nextPhase;
     }
 
     void KilledUnit(Unit* victim) override

@@ -1,0 +1,9 @@
+-- DB update 2024_12_26_02 -> 2024_12_28_00
+--
+DELETE FROM `spelldifficulty_dbc` WHERE `ID` IN (70867, 70879, 70877, 71623, 70994);
+INSERT INTO `spelldifficulty_dbc` (`ID`, `DifficultySpellID_1`, `DifficultySpellID_2`, `DifficultySpellID_3`, `DifficultySpellID_4`) VALUES
+(70867, 70867, 71473, 71532, 71533),
+(70879, 70879, 71525, 71530, 71531),
+(70877, 70877, 71474, 70877, 71474),
+(71623, 71623, 71624, 71625, 71626),
+(70994, 70994, 71962, 71963, 71964);

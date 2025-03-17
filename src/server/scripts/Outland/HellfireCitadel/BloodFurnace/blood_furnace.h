@@ -33,12 +33,8 @@ enum bloodFurnace
     DATA_KELIDAN                = 2,
     MAX_ENCOUNTER               = 3,
 
-    DATA_DOOR1                  = 10,
-    DATA_DOOR2                  = 11,
-    DATA_DOOR3                  = 12,
     DATA_BROGGOK_REAR_DOOR      = 13,
     DATA_BROGGOK_LEVER          = 14,
-    DATA_DOOR6                  = 15,
 
     DATA_PRISON_CELL1           = 20,
     DATA_PRISON_CELL2           = 21,
@@ -62,7 +58,11 @@ enum BloodFurnaceGO
 {
     GO_BROGGOK_DOOR_FRONT      = 181822,
     GO_BROGGOK_DOOR_REAR       = 181819,
-    GO_BROGGOK_LEVER           = 181982
+    GO_BROGGOK_LEVER           = 181982,
+    GO_KELIDAN_DOOR_EXIT1      = 181823,
+    GO_KELIDAN_DOOR_EXIT2      = 181766,
+    GO_MAKER_DOOR_FRONT        = 181811,
+    GO_MAKER_DOOR_REAR         = 181812
 };
 
 template <class AI, class T>

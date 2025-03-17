@@ -340,7 +340,8 @@ private:
 /* 55640 - Lightweave Embroidery
    67698 - Item - Coliseum 25 Normal Healer Trinket
    67752 - Item - Coliseum 25 Heroic Healer Trinket
-   69762 - Unchained Magic */
+   69762 - Unchained Magic
+   43983 - Energy Storm */
 class spell_gen_allow_proc_from_spells_with_cost : public AuraScript
 {
     PrepareAuraScript(spell_gen_allow_proc_from_spells_with_cost);
@@ -5320,6 +5321,117 @@ class spell_gen_set_health : public SpellScript
     }
 };
 
+// 67561 - Serverside - Pet Scaling - Master Spell 06 - Spell Hit, Expertise, Spell Penetration
+class spell_pet_spellhit_expertise_spellpen_scaling : public AuraScript
+{
+    PrepareAuraScript(spell_pet_spellhit_expertise_spellpen_scaling)
+
+    int32 CalculatePercent(float hitChance, float cap, float maxChance)
+    {
+        return (hitChance / cap) * maxChance;
+    }
+
+    void CalculateSpellHitAmount(AuraEffect const* /*aurEff*/, int32& amount, bool& /*canBeRecalculated*/)
+    {
+        if (Player* modOwner = GetUnitOwner()->GetSpellModOwner())
+            amount = CalculatePercent(modOwner->m_modMeleeHitChance, 8.0f, 17.0f);
+    }
+
+    void CalculateExpertiseAmount(AuraEffect const* /*aurEff*/, int32& amount, bool& /*canBeRecalculated*/)
+    {
+        if (Player* modOwner = GetUnitOwner()->GetSpellModOwner())
+            amount = CalculatePercent(modOwner->m_modMeleeHitChance, 8.0f, 26.0f);
+    }
+
+    void CalculateSpellPenAmount(AuraEffect const* /*aurEff*/, int32& amount, bool& /*canBeRecalculated*/)
+    {
+        if (Player* modOwner = GetUnitOwner()->GetSpellModOwner())
+            amount = modOwner->GetTotalAuraModifierByMiscMask(SPELL_AURA_MOD_TARGET_RESISTANCE, SPELL_SCHOOL_MASK_SPELL);
+    }
+
+    void HandleEffectApply(AuraEffect const* aurEff, AuraEffectHandleModes /*mode*/)
+    {
+        GetUnitOwner()->ApplySpellImmune(GetId(), IMMUNITY_STATE, aurEff->GetAuraType(), true, SPELL_BLOCK_TYPE_POSITIVE);
+    }
+
+    void CalcPeriodic(AuraEffect const* /*aurEff*/, bool& isPeriodic, int32& amplitude)
+    {
+        if (!GetUnitOwner()->IsPet())
+            return;
+
+        isPeriodic = true;
+        amplitude = 3 * IN_MILLISECONDS;
+    }
+
+    void HandlePeriodic(AuraEffect const* aurEff)
+    {
+        PreventDefaultAction();
+        GetEffect(aurEff->GetEffIndex())->RecalculateAmount();
+    }
+
+    void Register() override
+    {
+        DoEffectCalcAmount += AuraEffectCalcAmountFn(spell_pet_spellhit_expertise_spellpen_scaling::CalculateSpellHitAmount, EFFECT_0, SPELL_AURA_MOD_SPELL_HIT_CHANCE);
+        DoEffectCalcAmount += AuraEffectCalcAmountFn(spell_pet_spellhit_expertise_spellpen_scaling::CalculateExpertiseAmount, EFFECT_1, SPELL_AURA_MOD_EXPERTISE);
+        DoEffectCalcAmount += AuraEffectCalcAmountFn(spell_pet_spellhit_expertise_spellpen_scaling::CalculateSpellPenAmount, EFFECT_2, SPELL_AURA_MOD_TARGET_RESISTANCE);
+        OnEffectApply += AuraEffectApplyFn(spell_pet_spellhit_expertise_spellpen_scaling::HandleEffectApply, EFFECT_ALL, SPELL_AURA_ANY, AURA_EFFECT_HANDLE_REAL);
+        DoEffectCalcPeriodic += AuraEffectCalcPeriodicFn(spell_pet_spellhit_expertise_spellpen_scaling::CalcPeriodic, EFFECT_ALL, SPELL_AURA_ANY);
+        OnEffectPeriodic += AuraEffectPeriodicFn(spell_pet_spellhit_expertise_spellpen_scaling::HandlePeriodic, EFFECT_ALL, SPELL_AURA_ANY);
+    }
+};
+
+// 7098 - Curse of Mending
+// 39647 - Curse of Mending
+class spell_gen_proc_on_victim : public AuraScript
+{
+    PrepareAuraScript(spell_gen_proc_on_victim);
+
+    void OnProc(AuraEffect const* /*aurEff*/, ProcEventInfo& eventInfo)
+    {
+        PreventDefaultAction();
+
+        if (Unit* target = eventInfo.GetActionTarget())
+            GetUnitOwner()->CastSpell(target, GetSpellInfo()->Effects[EFFECT_0].TriggerSpell, true);
+    }
+
+    void Register() override
+    {
+        OnEffectProc += AuraEffectProcFn(spell_gen_proc_on_victim::OnProc, EFFECT_0, SPELL_AURA_PROC_TRIGGER_SPELL);
+    }
+};
+
+enum TranslocateSpells
+{
+    SPELL_TRANSLOCATION_DOWN = 45368,
+    SPELL_TRANSLOCATION_UP   = 45371
+};
+
+class spell_gen_translocate : public SpellScript
+{
+    PrepareSpellScript(spell_gen_translocate);
+
+public:
+    spell_gen_translocate(uint32 spellId) : SpellScript(), _spellId(spellId) {}
+
+    bool Validate(SpellInfo const* /*spellInfo*/) override
+    {
+        return ValidateSpellInfo({ _spellId });
+    }
+
+    void HandleScript()
+    {
+        GetCaster()->CastSpell(GetCaster(), _spellId);
+    }
+
+    void Register() override
+    {
+        AfterCast += SpellCastFn(spell_gen_translocate::HandleScript);
+    }
+
+private:
+    uint32 _spellId;
+};
+
 void AddSC_generic_spell_scripts()
 {
     RegisterSpellScript(spell_silithyst);
@@ -5478,4 +5590,8 @@ void AddSC_generic_spell_scripts()
     RegisterSpellScript(spell_gen_sober_up);
     RegisterSpellScript(spell_gen_steal_weapon);
     RegisterSpellScript(spell_gen_set_health);
+    RegisterSpellScript(spell_pet_spellhit_expertise_spellpen_scaling);
+    RegisterSpellScript(spell_gen_proc_on_victim);
+    RegisterSpellScriptWithArgs(spell_gen_translocate, "spell_gen_translocate_down", SPELL_TRANSLOCATION_DOWN);
+    RegisterSpellScriptWithArgs(spell_gen_translocate, "spell_gen_translocate_up", SPELL_TRANSLOCATION_UP);
 }

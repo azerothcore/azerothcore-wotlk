@@ -26,6 +26,8 @@
 #include "Player.h"
 #include "World.h"
 #include "WorldPacket.h"
+#include "WorldSessionMgr.h"
+#include "WorldStatePackets.h"
 
 OutdoorPvPTF::OutdoorPvPTF()
 {
@@ -50,34 +52,34 @@ OPvPCapturePointTF::OPvPCapturePointTF(OutdoorPvP* pvp, OutdoorPvPTF_TowerType t
     SetCapturePointData(TFCapturePoints[type].entry, TFCapturePoints[type].map, TFCapturePoints[type].x, TFCapturePoints[type].y, TFCapturePoints[type].z, TFCapturePoints[type].o, TFCapturePoints[type].rot0, TFCapturePoints[type].rot1, TFCapturePoints[type].rot2, TFCapturePoints[type].rot3);
 }
 
-void OPvPCapturePointTF::FillInitialWorldStates(WorldPacket& data)
+void OPvPCapturePointTF::FillInitialWorldStates(WorldPackets::WorldState::InitWorldStates& packet)
 {
-    data << uint32(TFTowerWorldStates[m_TowerType].n) << uint32(bool(m_TowerState & TF_TOWERSTATE_N));
-    data << uint32(TFTowerWorldStates[m_TowerType].h) << uint32(bool(m_TowerState & TF_TOWERSTATE_H));
-    data << uint32(TFTowerWorldStates[m_TowerType].a) << uint32(bool(m_TowerState & TF_TOWERSTATE_A));
+    packet.Worldstates.reserve(3);
+    packet.Worldstates.emplace_back(TFTowerWorldStates[m_TowerType].n, (m_TowerState & TF_TOWERSTATE_N) != 0 ? 1 : 0);
+    packet.Worldstates.emplace_back(TFTowerWorldStates[m_TowerType].h, (m_TowerState & TF_TOWERSTATE_H) != 0 ? 1 : 0);
+    packet.Worldstates.emplace_back(TFTowerWorldStates[m_TowerType].a, (m_TowerState & TF_TOWERSTATE_A) != 0 ? 1 : 0);
 }
 
-void OutdoorPvPTF::FillInitialWorldStates(WorldPacket& data)
+void OutdoorPvPTF::FillInitialWorldStates(WorldPackets::WorldState::InitWorldStates& packet)
 {
-    data << TF_UI_TOWER_SLIDER_POS << uint32(50);
-    data << TF_UI_TOWER_SLIDER_N << uint32(100);
-    data << TF_UI_TOWER_SLIDER_DISPLAY << uint32(0);
+    packet.Worldstates.reserve(12);
+    packet.Worldstates.emplace_back(TF_UI_TOWER_SLIDER_POS, 50);
+    packet.Worldstates.emplace_back(TF_UI_TOWER_SLIDER_N, 100);
+    packet.Worldstates.emplace_back(TF_UI_TOWER_SLIDER_DISPLAY, 0);
 
-    data << TF_UI_TOWER_COUNT_H << m_HordeTowersControlled;
-    data << TF_UI_TOWER_COUNT_A << m_AllianceTowersControlled;
-    data << TF_UI_TOWERS_CONTROLLED_DISPLAY << uint32(!m_IsLocked);
-
-    data << TF_UI_LOCKED_TIME_MINUTES_FIRST_DIGIT << first_digit;
-    data << TF_UI_LOCKED_TIME_MINUTES_SECOND_DIGIT << second_digit;
-    data << TF_UI_LOCKED_TIME_HOURS << hours_left;
-
-    data << TF_UI_LOCKED_DISPLAY_NEUTRAL << uint32(m_IsLocked && !m_HordeTowersControlled && !m_AllianceTowersControlled);
-    data << TF_UI_LOCKED_DISPLAY_HORDE << uint32(m_IsLocked && (m_HordeTowersControlled > m_AllianceTowersControlled));
-    data << TF_UI_LOCKED_DISPLAY_ALLIANCE << uint32(m_IsLocked && (m_HordeTowersControlled < m_AllianceTowersControlled));
+    packet.Worldstates.emplace_back(TF_UI_TOWER_COUNT_H, m_HordeTowersControlled);
+    packet.Worldstates.emplace_back(TF_UI_TOWER_COUNT_A, m_AllianceTowersControlled);
+    packet.Worldstates.emplace_back(TF_UI_TOWERS_CONTROLLED_DISPLAY, !m_IsLocked);
+    packet.Worldstates.emplace_back(TF_UI_LOCKED_TIME_MINUTES_FIRST_DIGIT, first_digit);
+    packet.Worldstates.emplace_back(TF_UI_LOCKED_TIME_MINUTES_SECOND_DIGIT, second_digit);
+    packet.Worldstates.emplace_back(TF_UI_LOCKED_TIME_HOURS, hours_left);
+    packet.Worldstates.emplace_back(TF_UI_LOCKED_DISPLAY_NEUTRAL, (m_IsLocked && !m_HordeTowersControlled && !m_AllianceTowersControlled) ? 1 : 0);
+    packet.Worldstates.emplace_back(TF_UI_LOCKED_DISPLAY_HORDE, (m_IsLocked && (m_HordeTowersControlled > m_AllianceTowersControlled)) ? 1 : 0);
+    packet.Worldstates.emplace_back(TF_UI_LOCKED_DISPLAY_ALLIANCE, (m_IsLocked && (m_HordeTowersControlled < m_AllianceTowersControlled)) ? 1 : 0);
 
     for (OPvPCapturePointMap::iterator itr = _capturePoints.begin(); itr != _capturePoints.end(); ++itr)
     {
-        itr->second->FillInitialWorldStates(data);
+        itr->second->FillInitialWorldStates(packet);
     }
 }
 
@@ -397,14 +399,14 @@ void OPvPCapturePointTF::ChangeState()
     {
         if (uint32 alliance_towers = ((OutdoorPvPTF*)_pvp)->GetAllianceTowersControlled())
             ((OutdoorPvPTF*)_pvp)->SetAllianceTowersControlled(--alliance_towers);
-        sWorld->SendZoneText(OutdoorPvPTFBuffZones[0], sObjectMgr->GetAcoreStringForDBCLocale(LANG_OPVP_TF_LOSE_A));
+        sWorldSessionMgr->SendZoneText(OutdoorPvPTFBuffZones[0], sObjectMgr->GetAcoreStringForDBCLocale(LANG_OPVP_TF_LOSE_A));
     }
     // if changing from controlling horde to alliance
     else if (_oldState == OBJECTIVESTATE_HORDE)
     {
         if (uint32 horde_towers = ((OutdoorPvPTF*)_pvp)->GetHordeTowersControlled())
             ((OutdoorPvPTF*)_pvp)->SetHordeTowersControlled(--horde_towers);
-        sWorld->SendZoneText(OutdoorPvPTFBuffZones[0], sObjectMgr->GetAcoreStringForDBCLocale(LANG_OPVP_TF_LOSE_H));
+        sWorldSessionMgr->SendZoneText(OutdoorPvPTFBuffZones[0], sObjectMgr->GetAcoreStringForDBCLocale(LANG_OPVP_TF_LOSE_H));
     }
 
     uint32 artkit = 21;
@@ -419,7 +421,7 @@ void OPvPCapturePointTF::ChangeState()
                 if (alliance_towers < TF_TOWER_NUM)
                     ((OutdoorPvPTF*)_pvp)->SetAllianceTowersControlled(++alliance_towers);
 
-                sWorld->SendZoneText(OutdoorPvPTFBuffZones[0], sObjectMgr->GetAcoreStringForDBCLocale(LANG_OPVP_TF_CAPTURE_A));
+                sWorldSessionMgr->SendZoneText(OutdoorPvPTFBuffZones[0], sObjectMgr->GetAcoreStringForDBCLocale(LANG_OPVP_TF_CAPTURE_A));
 
                 for (PlayerSet::iterator itr = _activePlayers[0].begin(); itr != _activePlayers[0].end(); ++itr)
                     if (Player* player = ObjectAccessor::FindPlayer(*itr))
@@ -434,7 +436,7 @@ void OPvPCapturePointTF::ChangeState()
                 if (horde_towers < TF_TOWER_NUM)
                     ((OutdoorPvPTF*)_pvp)->SetHordeTowersControlled(++horde_towers);
 
-                sWorld->SendZoneText(OutdoorPvPTFBuffZones[0], sObjectMgr->GetAcoreStringForDBCLocale(LANG_OPVP_TF_CAPTURE_H));
+                sWorldSessionMgr->SendZoneText(OutdoorPvPTFBuffZones[0], sObjectMgr->GetAcoreStringForDBCLocale(LANG_OPVP_TF_CAPTURE_H));
 
                 for (PlayerSet::iterator itr = _activePlayers[1].begin(); itr != _activePlayers[1].end(); ++itr)
                     if (Player* player = ObjectAccessor::FindPlayer(*itr))

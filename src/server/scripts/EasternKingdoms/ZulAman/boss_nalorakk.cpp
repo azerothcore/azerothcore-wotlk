@@ -72,10 +72,11 @@ enum Phases
 enum NalorakkGroups
 {
     GROUP_CHECK_DEAD            = 1,
-    GROUP_MOVE                  = 2,
-    GROUP_BERSERK               = 3,
-    GROUP_HUMAN                 = 4,
-    GROUP_BEAR                  = 5
+    GROUP_CHECK_EVADE           = 2,
+    GROUP_MOVE                  = 3,
+    GROUP_BERSERK               = 4,
+    GROUP_HUMAN                 = 5,
+    GROUP_BEAR                  = 6
 };
 
 struct boss_nalorakk : public BossAI
@@ -109,7 +110,7 @@ struct boss_nalorakk : public BossAI
 
     void MoveInLineOfSight(Unit* who) override
     {
-        if (who->IsPlayer() && _phase < PHASE_START_COMBAT && _active)
+        if (who->IsPlayer() && !who->ToPlayer()->IsGameMaster() && _phase < PHASE_START_COMBAT && _active)
         {
             _active = false;
             switch (_phase)
@@ -199,6 +200,25 @@ struct boss_nalorakk : public BossAI
                     me->SetHomePosition(me->GetPosition());
                     break;
             }
+            _introScheduler.Schedule(10s, GROUP_CHECK_EVADE, [this](TaskContext context)
+            {
+                if (CheckAnyEvadeGroup(_waveList))
+                {
+                    _introScheduler.CancelGroup(GROUP_CHECK_DEAD);
+                    _introScheduler.Schedule(5s, GROUP_CHECK_EVADE, [this](TaskContext context)
+                    {
+                        for (Creature* member : _waveList)
+                            if (member->isMoving())
+                            {
+                                context.Repeat(1s);
+                                return;
+                            }
+                        _active = true;
+                    });
+                }
+                else
+                    context.Repeat(10s);
+            });
         }
         BossAI::MoveInLineOfSight(who);
     }
@@ -310,7 +330,7 @@ struct boss_nalorakk : public BossAI
         BossAI::UpdateAI(diff);
     }
 
-    bool CheckFullyDeadGroup(std::list<Creature* > groupToCheck)
+    bool CheckFullyDeadGroup(std::list<Creature*> groupToCheck)
     {
         for (Creature* member : groupToCheck)
         {
@@ -320,6 +340,14 @@ struct boss_nalorakk : public BossAI
             }
         }
         return true;
+    }
+
+    bool CheckAnyEvadeGroup(std::list<Creature*> groupToCheck)
+    {
+        for (Creature* member : groupToCheck)
+            if (member->IsAlive() && !member->IsInCombat())
+                return true;
+        return false;
     }
 
     void JustDied(Unit* killer) override

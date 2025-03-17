@@ -747,8 +747,6 @@ public:
                 me->setActive(true);
                 me->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
                 me->SetImmuneToAll(true);
-                // Load Grid with Sister Svalna
-                me->GetMap()->LoadGrid(4356.71f, 2484.33f);
                 if (Creature* svalna = ObjectAccessor::GetCreature(*me, _instance->GetGuidData(DATA_SISTER_SVALNA)))
                     svalna->AI()->DoAction(ACTION_START_GAUNTLET);
                 for (uint32 i = 0; i < 4; ++i)
@@ -1835,7 +1833,7 @@ public:
     {
         if (InstanceScript* instance = creature->GetInstanceScript())
             if (instance->GetBossState(DATA_ROTFACE) == DONE && instance->GetBossState(DATA_FESTERGUT) == DONE && !creature->FindCurrentSpellBySpellId(SPELL_HARVEST_BLIGHT_SPECIMEN) && !creature->FindCurrentSpellBySpellId(SPELL_HARVEST_BLIGHT_SPECIMEN25))
-                if (player->HasAura(SPELL_ORANGE_BLIGHT_RESIDUE) && player->HasAura(SPELL_GREEN_BLIGHT_RESIDUE))
+                if (player->HasAllAuras(SPELL_ORANGE_BLIGHT_RESIDUE, SPELL_GREEN_BLIGHT_RESIDUE))
                     creature->CastSpell(creature, SPELL_HARVEST_BLIGHT_SPECIMEN, false);
         return false;
     }

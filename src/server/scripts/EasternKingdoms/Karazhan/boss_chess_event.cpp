@@ -1424,6 +1424,7 @@ struct npc_chesspiece : public ScriptedAI
         _instance = creature->GetInstanceScript();
 
         _currentOrientation = GetDefaultOrientationForTeam();
+        _homePosition = creature->GetPosition();
 
         _nextMoveTimer = urand(8 * IN_MILLISECONDS, 20 * IN_MILLISECONDS);
 
@@ -1457,6 +1458,8 @@ struct npc_chesspiece : public ScriptedAI
         {
             me->SetResistance(SpellSchools(i), 0);
         }
+
+        me->NearTeleportTo(_homePosition);
     }
 
     void EnterEvadeMode(EvadeReason /*why*/) override
@@ -2044,6 +2047,7 @@ private:
     KarazhanChessOrientationType _currentOrientation;
 
     bool _teamControlledByRaid;
+    Position _homePosition;
 };
 
 struct npc_chess_move_trigger : public ScriptedAI

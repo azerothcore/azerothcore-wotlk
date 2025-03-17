@@ -558,6 +558,12 @@ enum CommandStates : uint8
     COMMAND_ABANDON = 3
 };
 
+enum class SearchMethod
+{
+    MatchAll,
+    MatchAny
+};
+
 typedef std::list<Player*> SharedVisionList;
 
 struct AttackPosition {
@@ -719,6 +725,9 @@ public:
     void SetUnitFlag2(UnitFlags2 flags) { SetFlag(UNIT_FIELD_FLAGS_2, flags); }
     void RemoveUnitFlag2(UnitFlags2 flags) { RemoveFlag(UNIT_FIELD_FLAGS_2, flags); }
     void ReplaceAllUnitFlags2(UnitFlags2 flags) { SetUInt32Value(UNIT_FIELD_FLAGS_2, flags); }
+
+    void SetEmoteState(Emote emoteState) { SetUInt32Value(UNIT_NPC_EMOTESTATE, emoteState); }  /// @brief Sets emote state (looping emote). Emotes available in SharedDefines.h
+    void ClearEmoteState() { SetEmoteState(EMOTE_ONESHOT_NONE); }  /// @brief Clears emote state (looping emote)
 
     // NPC flags
     NPCFlags GetNpcFlags() const { return NPCFlags(GetUInt32Value(UNIT_NPC_FLAGS)); }
@@ -1367,6 +1376,50 @@ public:
 
     [[nodiscard]] bool HasAuraEffect(uint32 spellId, uint8 effIndex, ObjectGuid caster = ObjectGuid::Empty) const;
     [[nodiscard]] uint32 GetAuraCount(uint32 spellId) const;
+
+    /**
+    * @brief Check if unit has ANY or ALL specified auras.
+    *
+    * @param sm The search method to use
+    *           - SearchMethod::MatchAll : The function checks for all of the spell id's on the unit.
+    *           - SearchMethod::MatchAny : The function checks for any of the spell id's on the unit.
+    *
+    * @param spellIds List of spell id's to check for on the unit.
+    *
+    * @return Returns true if the search method condition is met. Otherwise false.
+    */
+    bool HasAuras(SearchMethod sm, std::vector<uint32>& spellIds) const;
+
+    /**
+     * @brief Checks if the unit has ANY specified auras.
+     *
+     * @tparam Auras Can be any type convertible to uint32.
+     * @param spellIds List of spell id's to check for on the unit.
+     *
+     * @return Returns true if the unit has ANY of the specified auras. Otherwise false.
+     */
+    template <typename... Auras>
+    bool HasAnyAuras(Auras... spellIds) const
+    {
+        std::vector<uint32> spellList = { static_cast<uint32>(spellIds)... };
+        return HasAuras(SearchMethod::MatchAny, spellList);
+    }
+
+    /**
+     * @brief Checks if the unit has ALL specified auras.
+     *
+     * @tparam Auras Can be any type convertible to uint32.
+     * @param spellIds List of spell id's to check for on the unit.
+     *
+     * @return Returns true if the unit has ALL of the specified auras. Otherwise false.
+     */
+    template <typename... Auras>
+    bool HasAllAuras(Auras... spellIds) const
+    {
+        std::vector<uint32> spellList = { static_cast<uint32>(spellIds)... };
+        return HasAuras(SearchMethod::MatchAll, spellList);
+    }
+
     [[nodiscard]] bool HasAura(uint32 spellId, ObjectGuid casterGUID = ObjectGuid::Empty, ObjectGuid itemCasterGUID = ObjectGuid::Empty, uint8 reqEffMask = 0) const;
     [[nodiscard]] bool HasAuraType(AuraType auraType) const;
     [[nodiscard]] bool HasAuraTypeWithCaster(AuraType auratype, ObjectGuid caster) const;
@@ -1815,10 +1868,7 @@ public:
 
     // ShapeShitForm (use by druid)
     [[nodiscard]] ShapeshiftForm GetShapeshiftForm() const { return ShapeshiftForm(GetByteValue(UNIT_FIELD_BYTES_2, 3)); }
-    void SetShapeshiftForm(ShapeshiftForm form)
-    {
-        SetByteValue(UNIT_FIELD_BYTES_2, 3, form);
-    }
+    void SetShapeshiftForm(ShapeshiftForm form);
     bool IsAttackSpeedOverridenShapeShift() const;
     [[nodiscard]] bool IsInFeralForm() const
     {
@@ -1987,6 +2037,8 @@ protected:
     void _DeleteRemovedAuras();
 
     void _UpdateAutoRepeatSpell();
+
+    bool CanSparringWith(Unit const* attacker) const;   ///@brief: Check if unit is eligible for sparring damages. Work only if attacker and victim are creatures.
 
     bool IsAlwaysVisibleFor(WorldObject const* seer) const override;
     bool IsAlwaysDetectableFor(WorldObject const* seer) const override;

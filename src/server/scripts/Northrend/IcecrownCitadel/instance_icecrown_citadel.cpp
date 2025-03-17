@@ -218,7 +218,6 @@ public:
             LoadBossBoundaries(boundaries);
             LoadObjectData(creatureData, nullptr);
             LoadDoorData(doorData);
-            TeamIdInInstance = TEAM_NEUTRAL;
             HeroicAttempts = MaxHeroicAttempts;
             IsBonedEligible = true;
             IsOozeDanceEligible = true;
@@ -231,16 +230,14 @@ public:
             IsSindragosaIntroDone = false;
         }
 
-        void FillInitialWorldStates(WorldPacket& data) override
+        void FillInitialWorldStates(WorldPackets::WorldState::InitWorldStates& packet) override
         {
-            if (instance->IsHeroic())
-            {
-                data << uint32(WORLDSTATE_SHOW_TIMER) << uint32(BloodQuickeningState == IN_PROGRESS);
-                data << uint32(WORLDSTATE_EXECUTION_TIME) << uint32(BloodQuickeningMinutes);
-                data << uint32(WORLDSTATE_SHOW_ATTEMPTS) << uint32(1);
-                data << uint32(WORLDSTATE_ATTEMPTS_REMAINING) << uint32(HeroicAttempts);
-                data << uint32(WORLDSTATE_ATTEMPTS_MAX) << uint32(MaxHeroicAttempts);
-            }
+            packet.Worldstates.reserve(5);
+            packet.Worldstates.emplace_back(WORLDSTATE_SHOW_TIMER, BloodQuickeningState == IN_PROGRESS ? 1 : 0);
+            packet.Worldstates.emplace_back(WORLDSTATE_EXECUTION_TIME, BloodQuickeningMinutes);
+            packet.Worldstates.emplace_back(WORLDSTATE_SHOW_ATTEMPTS, 1); // instance->IsHeroic() ? 1 : 0
+            packet.Worldstates.emplace_back(WORLDSTATE_ATTEMPTS_REMAINING, HeroicAttempts);
+            packet.Worldstates.emplace_back(WORLDSTATE_ATTEMPTS_MAX, MaxHeroicAttempts);
         }
 
         void OnPlayerAreaUpdate(Player* player, uint32  /*oldArea*/, uint32 newArea) override
@@ -261,9 +258,7 @@ public:
 
         void OnPlayerEnter(Player* player) override
         {
-            if (TeamIdInInstance == TEAM_NEUTRAL)
-                TeamIdInInstance = player->GetTeamId();
-
+            InstanceScript::OnPlayerEnter(player);
             // for professor putricide hc
             DoRemoveAurasDueToSpellOnPlayers(SPELL_GAS_VARIABLE);
             DoRemoveAurasDueToSpellOnPlayers(SPELL_OOZE_VARIABLE);
@@ -295,14 +290,6 @@ public:
 
         void OnCreatureCreate(Creature* creature) override
         {
-            if (TeamIdInInstance == TEAM_NEUTRAL)
-            {
-                Map::PlayerList const& players = instance->GetPlayers();
-                if (!players.IsEmpty())
-                    if (Player* player = players.begin()->GetSource())
-                        TeamIdInInstance = player->GetTeamId();
-            }
-
             // apply ICC buff to pets/summons
             if (GetData(DATA_BUFF_AVAILABLE) && creature->GetOwnerGUID().IsPlayer() && creature->HasUnitTypeMask(UNIT_MASK_MINION | UNIT_MASK_GUARDIAN | UNIT_MASK_CONTROLABLE_GUARDIAN) && creature->CanHaveThreatList())
                 if (Unit* owner = creature->GetOwner())
@@ -348,39 +335,39 @@ public:
             switch (creature->GetEntry())
             {
                 case NPC_KOR_KRON_GENERAL:
-                    if (TeamIdInInstance == TEAM_ALLIANCE)
+                    if (GetTeamIdInInstance() == TEAM_ALLIANCE)
                         creature->UpdateEntry(NPC_ALLIANCE_COMMANDER);
                     break;
                 case NPC_KOR_KRON_LIEUTENANT:
-                    if (TeamIdInInstance == TEAM_ALLIANCE)
+                    if (GetTeamIdInInstance() == TEAM_ALLIANCE)
                         creature->UpdateEntry(NPC_SKYBREAKER_LIEUTENANT);
                     break;
                 case NPC_TORTUNOK:
-                    if (TeamIdInInstance == TEAM_ALLIANCE)
+                    if (GetTeamIdInInstance() == TEAM_ALLIANCE)
                         creature->UpdateEntry(NPC_ALANA_MOONSTRIKE);
                     break;
                 case NPC_GERARDO_THE_SUAVE:
-                    if (TeamIdInInstance == TEAM_ALLIANCE)
+                    if (GetTeamIdInInstance() == TEAM_ALLIANCE)
                         creature->UpdateEntry(NPC_TALAN_MOONSTRIKE);
                     break;
                 case NPC_UVLUS_BANEFIRE:
-                    if (TeamIdInInstance == TEAM_ALLIANCE)
+                    if (GetTeamIdInInstance() == TEAM_ALLIANCE)
                         creature->UpdateEntry(NPC_MALFUS_GRIMFROST);
                     break;
                 case NPC_IKFIRUS_THE_VILE:
-                    if (TeamIdInInstance == TEAM_ALLIANCE)
+                    if (GetTeamIdInInstance() == TEAM_ALLIANCE)
                         creature->UpdateEntry(NPC_YILI);
                     break;
                 case NPC_VOL_GUK:
-                    if (TeamIdInInstance == TEAM_ALLIANCE)
+                    if (GetTeamIdInInstance() == TEAM_ALLIANCE)
                         creature->UpdateEntry(NPC_JEDEBIA);
                     break;
                 case NPC_HARAGG_THE_UNSEEN:
-                    if (TeamIdInInstance == TEAM_ALLIANCE)
+                    if (GetTeamIdInInstance() == TEAM_ALLIANCE)
                         creature->UpdateEntry(NPC_NIBY_THE_ALMIGHTY);
                     break;
                 case NPC_GARROSH_HELLSCREAM:
-                    if (TeamIdInInstance == TEAM_ALLIANCE)
+                    if (GetTeamIdInInstance() == TEAM_ALLIANCE)
                         creature->UpdateEntry(NPC_KING_VARIAN_WRYNN);
 
                     // Xinef: summon in case of instance unload
@@ -399,7 +386,7 @@ public:
                     DeathbringerSaurfangGUID = creature->GetGUID();
                     break;
                 case NPC_SE_HIGH_OVERLORD_SAURFANG:
-                    if (TeamIdInInstance == TEAM_ALLIANCE)
+                    if (GetTeamIdInInstance() == TEAM_ALLIANCE)
                     {
                         creature->UpdateEntry(NPC_SE_MURADIN_BRONZEBEARD, true);
                         creature->LoadEquipment();
@@ -411,14 +398,14 @@ public:
                     DeathbringerSaurfangEventGUID = creature->GetGUID();
                     break;
                 case NPC_HIGH_OVERLORD_SAURFANG_DUMMY:
-                    if (TeamIdInInstance == TEAM_ALLIANCE)
+                    if (GetTeamIdInInstance() == TEAM_ALLIANCE)
                     {
                         creature->UpdateEntry(NPC_MURADIN_BRONZEBEARD_DUMMY, creature->GetCreatureData());
                         creature->LoadEquipment();
                     }
                     break;
                 case NPC_SE_KOR_KRON_REAVER:
-                    if (TeamIdInInstance == TEAM_ALLIANCE)
+                    if (GetTeamIdInInstance() == TEAM_ALLIANCE)
                         creature->UpdateEntry(NPC_SE_SKYBREAKER_MARINE);
                     break;
                 case NPC_FESTERGUT:
@@ -537,6 +524,7 @@ public:
             }
 
             InstanceScript::OnCreatureCreate(creature);
+
         }
 
         void OnCreatureRemove(Creature* creature) override
@@ -549,42 +537,34 @@ public:
 
         uint32 GetCreatureEntry(ObjectGuid::LowType /*guidLow*/, CreatureData const* data) override
         {
-            if (TeamIdInInstance == TEAM_NEUTRAL)
-            {
-                Map::PlayerList const& players = instance->GetPlayers();
-                if (!players.IsEmpty())
-                    if (Player* player = players.begin()->GetSource())
-                        TeamIdInInstance = player->GetTeamId();
-            }
-
             uint32 entry = data->id1;
             switch (entry)
             {
                 case NPC_HORDE_GUNSHIP_CANNON:
                 case NPC_ORGRIMS_HAMMER_CREW:
                 case NPC_SKY_REAVER_KORM_BLACKSCAR:
-                    if (TeamIdInInstance == TEAM_ALLIANCE)
+                    if (GetTeamIdInInstance() == TEAM_ALLIANCE)
                         return 0;
                     break;
                 case NPC_ALLIANCE_GUNSHIP_CANNON:
                 case NPC_SKYBREAKER_DECKHAND:
                 case NPC_HIGH_CAPTAIN_JUSTIN_BARTLETT:
-                    if (TeamIdInInstance == TEAM_HORDE)
+                    if (GetTeamIdInInstance() == TEAM_HORDE)
                         return 0;
                     break;
                 case NPC_ZAFOD_BOOMBOX:
                     if (GameObjectTemplate const* go = sObjectMgr->GetGameObjectTemplate(GO_THE_SKYBREAKER_A))
-                        if ((TeamIdInInstance == TEAM_ALLIANCE && data->mapid == go->moTransport.mapID) ||
-                                (TeamIdInInstance == TEAM_HORDE && data->mapid != go->moTransport.mapID))
+                        if ((GetTeamIdInInstance() == TEAM_ALLIANCE && data->mapid == go->moTransport.mapID) ||
+                                (GetTeamIdInInstance() == TEAM_HORDE && data->mapid != go->moTransport.mapID))
                             return entry;
                     return 0;
                 case NPC_IGB_MURADIN_BRONZEBEARD:
-                    if ((TeamIdInInstance == TEAM_ALLIANCE && data->posX > 10.0f) ||
-                            (TeamIdInInstance == TEAM_HORDE && data->posX < 10.0f))
+                    if ((GetTeamIdInInstance() == TEAM_ALLIANCE && data->posX > 10.0f) ||
+                            (GetTeamIdInInstance() == TEAM_HORDE && data->posX < 10.0f))
                         return entry;
                     return 0;
                 case NPC_SPIRE_FROSTWYRM:
-                    if ((TeamIdInInstance == TEAM_ALLIANCE && data->posY < 2200.0f) || (TeamIdInInstance == TEAM_HORDE && data->posY > 2200.0f))
+                    if ((GetTeamIdInInstance() == TEAM_ALLIANCE && data->posY < 2200.0f) || (GetTeamIdInInstance() == TEAM_HORDE && data->posY > 2200.0f))
                         return 0;
                     break;
             }
@@ -594,28 +574,20 @@ public:
 
         uint32 GetGameObjectEntry(ObjectGuid::LowType /*guidLow*/, uint32 entry) override
         {
-            if (TeamIdInInstance == TEAM_NEUTRAL)
-            {
-                Map::PlayerList const& players = instance->GetPlayers();
-                if (!players.IsEmpty())
-                    if (Player* player = players.begin()->GetSource())
-                        TeamIdInInstance = player->GetTeamId();
-            }
-
             switch (entry)
             {
                 case GO_GUNSHIP_ARMORY_H_10N:
                 case GO_GUNSHIP_ARMORY_H_25N:
                 case GO_GUNSHIP_ARMORY_H_10H:
                 case GO_GUNSHIP_ARMORY_H_25H:
-                    if (TeamIdInInstance == TEAM_ALLIANCE)
+                    if (GetTeamIdInInstance() == TEAM_ALLIANCE)
                         return 0;
                     break;
                 case GO_GUNSHIP_ARMORY_A_10N:
                 case GO_GUNSHIP_ARMORY_A_25N:
                 case GO_GUNSHIP_ARMORY_A_10H:
                 case GO_GUNSHIP_ARMORY_A_25H:
-                    if (TeamIdInInstance == TEAM_HORDE)
+                    if (GetTeamIdInInstance() == TEAM_HORDE)
                         return 0;
                     break;
             }
@@ -677,7 +649,6 @@ public:
                         FrostwyrmGUIDs.erase(creature->GetSpawnId());
                         if (FrostwyrmGUIDs.empty())
                         {
-                            instance->LoadGrid(SindragosaSpawnPos.GetPositionX(), SindragosaSpawnPos.GetPositionY());
                             if (Creature* boss = instance->SummonCreature(NPC_SINDRAGOSA, SindragosaSpawnPos))
                                 boss->AI()->DoAction(ACTION_START_FROSTWYRM);
                         }
@@ -698,14 +669,6 @@ public:
 
         void OnGameObjectCreate(GameObject* go) override
         {
-            if (TeamIdInInstance == TEAM_NEUTRAL)
-            {
-                Map::PlayerList const& players = instance->GetPlayers();
-                if (!players.IsEmpty())
-                    if (Player* player = players.begin()->GetSource())
-                        TeamIdInInstance = player->GetTeamId();
-            }
-
             switch (go->GetEntry())
             {
                 case GO_SPIRIT_ALARM_1:
@@ -961,7 +924,7 @@ public:
                 case DATA_COLDFLAME_JETS:
                     return ColdflameJetsState;
                 case DATA_TEAMID_IN_INSTANCE:
-                    return TeamIdInInstance;
+                    return GetTeamIdInInstance();
                 case DATA_BLOOD_QUICKENING_STATE:
                     return BloodQuickeningState;
                 case DATA_HEROIC_ATTEMPTS:
@@ -1195,17 +1158,6 @@ public:
                     {
                         IsSindragosaIntroDone = true;
                         HandleDropAttempt();
-                        if (instance->IsHeroic())
-                        {
-                            if (HeroicAttempts)
-                            {
-                                Events.ScheduleEvent(EVENT_RESPAWN_SINDRAGOSA, 30s);
-                            }
-                        }
-                        else
-                        {
-                            Events.ScheduleEvent(EVENT_RESPAWN_SINDRAGOSA, 30s);
-                        }
                     }
                     if (state == DONE && !instance->IsHeroic() && LichKingHeroicAvailable)
                     {
@@ -1235,7 +1187,6 @@ public:
                             if (GameObject* pillars = instance->GetGameObject(PillarsUnchainedGUID))
                                 pillars->SetRespawnTime(7 * DAY);
 
-                            instance->LoadGrid(JainaSpawnPos.GetPositionX(), JainaSpawnPos.GetPositionY());
                             instance->SummonCreature(NPC_LADY_JAINA_PROUDMOORE_QUEST, JainaSpawnPos);
                             instance->SummonCreature(NPC_MURADIN_BRONZEBEARD_QUEST, MuradinSpawnPos);
                             instance->SummonCreature(NPC_UTHER_THE_LIGHTBRINGER_QUEST, UtherSpawnPos);
@@ -1255,7 +1206,7 @@ public:
             if (!GunshipGUID && instance->HavePlayers())
             {
                 SetBossState(DATA_ICECROWN_GUNSHIP_BATTLE, NOT_STARTED);
-                uint32 gunshipEntry = TeamIdInInstance == TEAM_HORDE ? GO_ORGRIMS_HAMMER_H : GO_THE_SKYBREAKER_A;
+                uint32 gunshipEntry = GetTeamIdInInstance() == TEAM_HORDE ? GO_ORGRIMS_HAMMER_H : GO_THE_SKYBREAKER_A;
                 if (MotionTransport* gunship = sTransportMgr->CreateTransport(gunshipEntry, 0, instance))
                 {
                     GunshipGUID = gunship->GetGUID();
@@ -1820,7 +1771,7 @@ public:
                     }
                     break;
                 case EVENT_ENEMY_GUNSHIP_COMBAT:
-                    if (Creature* captain = source->FindNearestCreature(TeamIdInInstance == TEAM_HORDE ? NPC_IGB_HIGH_OVERLORD_SAURFANG : NPC_IGB_MURADIN_BRONZEBEARD, 200.0f))
+                    if (Creature* captain = source->FindNearestCreature(GetTeamIdInInstance() == TEAM_HORDE ? NPC_IGB_HIGH_OVERLORD_SAURFANG : NPC_IGB_MURADIN_BRONZEBEARD, 200.0f))
                     {
                         captain->AI()->DoAction(ACTION_ENEMY_GUNSHIP_TALK);
                     }
@@ -1840,7 +1791,7 @@ public:
                             //After movement is stopped remove the backpack
                             RemoveBackPack();
                         }
-                    if (Creature* captain = source->FindNearestCreature(TeamIdInInstance == TEAM_HORDE ? NPC_IGB_HIGH_OVERLORD_SAURFANG : NPC_IGB_MURADIN_BRONZEBEARD, 200.0f))
+                    if (Creature* captain = source->FindNearestCreature(GetTeamIdInInstance() == TEAM_HORDE ? NPC_IGB_HIGH_OVERLORD_SAURFANG : NPC_IGB_MURADIN_BRONZEBEARD, 200.0f))
                         captain->AI()->DoAction(ACTION_EXIT_SHIP);
                     break;
 
@@ -2006,7 +1957,6 @@ public:
         ObjectGuid FrozenBolvarGUID;
         ObjectGuid PillarsChainedGUID;
         ObjectGuid PillarsUnchainedGUID;
-        TeamId TeamIdInInstance;
         uint32 ColdflameJetsState;
         std::set<ObjectGuid::LowType> FrostwyrmGUIDs;
         std::set<ObjectGuid::LowType> SpinestalkerTrash;
