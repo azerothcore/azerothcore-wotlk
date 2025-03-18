@@ -22,6 +22,7 @@
 #include "PCQueue.h"
 #include <condition_variable>
 #include <thread>
+#include <atomic>
 
 class Map;
 class UpdateRequest;
@@ -32,6 +33,7 @@ public:
     MapUpdater();
     ~MapUpdater() = default;
 
+    void schedule_task(UpdateRequest* request);
     void schedule_update(Map& map, uint32 diff, uint32 s_diff);
     void schedule_lfg_update(uint32 diff);
     void wait();
@@ -42,15 +44,12 @@ public:
 
 private:
     void WorkerThread();
-
     ProducerConsumerQueue<UpdateRequest*> _queue;
-
+    std::atomic<int> pending_requests;  // Use std::atomic for pending_requests to avoid lock contention
+    std::atomic<bool> _cancelationToken;  // Atomic flag for cancellation to avoid race conditions
     std::vector<std::thread> _workerThreads;
-    std::atomic<bool> _cancelationToken;
-
-    std::mutex _lock;
+    std::mutex _lock; // Mutex and condition variable for synchronization
     std::condition_variable _condition;
-    std::size_t pending_requests;
 };
 
 #endif //_MAP_UPDATER_H_INCLUDED

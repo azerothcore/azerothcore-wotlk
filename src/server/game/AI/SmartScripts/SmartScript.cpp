@@ -2696,7 +2696,7 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
         }
         case SMART_ACTION_PLAYER_TALK:
         {
-            char const* text = sObjectMgr->GetAcoreString(e.action.playerTalk.textId, DEFAULT_LOCALE);
+            std::string text = sObjectMgr->GetAcoreString(e.action.playerTalk.textId, DEFAULT_LOCALE);
 
             if (!targets.empty())
                 for (WorldObject* target : targets)
@@ -3280,6 +3280,16 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
         case SMART_ACTION_WORLD_SCRIPT:
         {
             sWorldState->HandleExternalEvent(static_cast<WorldStateEvent>(e.action.worldStateScript.eventId), e.action.worldStateScript.param);
+            break;
+        }
+        case SMART_ACTION_DISABLE_REWARD:
+        {
+            for (WorldObject* target : targets)
+                if (IsCreature(target))
+                {
+                    target->ToCreature()->SetReputationRewardDisabled(static_cast<bool>(e.action.reward.reputation));
+                    target->ToCreature()->SetLootRewardDisabled(static_cast<bool>(e.action.reward.loot));
+                }
             break;
         }
         default:

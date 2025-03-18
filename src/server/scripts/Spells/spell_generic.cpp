@@ -340,7 +340,8 @@ private:
 /* 55640 - Lightweave Embroidery
    67698 - Item - Coliseum 25 Normal Healer Trinket
    67752 - Item - Coliseum 25 Heroic Healer Trinket
-   69762 - Unchained Magic */
+   69762 - Unchained Magic
+   43983 - Energy Storm */
 class spell_gen_allow_proc_from_spells_with_cost : public AuraScript
 {
     PrepareAuraScript(spell_gen_allow_proc_from_spells_with_cost);
@@ -5379,6 +5380,58 @@ class spell_pet_spellhit_expertise_spellpen_scaling : public AuraScript
     }
 };
 
+// 7098 - Curse of Mending
+// 39647 - Curse of Mending
+class spell_gen_proc_on_victim : public AuraScript
+{
+    PrepareAuraScript(spell_gen_proc_on_victim);
+
+    void OnProc(AuraEffect const* /*aurEff*/, ProcEventInfo& eventInfo)
+    {
+        PreventDefaultAction();
+
+        if (Unit* target = eventInfo.GetActionTarget())
+            GetUnitOwner()->CastSpell(target, GetSpellInfo()->Effects[EFFECT_0].TriggerSpell, true);
+    }
+
+    void Register() override
+    {
+        OnEffectProc += AuraEffectProcFn(spell_gen_proc_on_victim::OnProc, EFFECT_0, SPELL_AURA_PROC_TRIGGER_SPELL);
+    }
+};
+
+enum TranslocateSpells
+{
+    SPELL_TRANSLOCATION_DOWN = 45368,
+    SPELL_TRANSLOCATION_UP   = 45371
+};
+
+class spell_gen_translocate : public SpellScript
+{
+    PrepareSpellScript(spell_gen_translocate);
+
+public:
+    spell_gen_translocate(uint32 spellId) : SpellScript(), _spellId(spellId) {}
+
+    bool Validate(SpellInfo const* /*spellInfo*/) override
+    {
+        return ValidateSpellInfo({ _spellId });
+    }
+
+    void HandleScript()
+    {
+        GetCaster()->CastSpell(GetCaster(), _spellId);
+    }
+
+    void Register() override
+    {
+        AfterCast += SpellCastFn(spell_gen_translocate::HandleScript);
+    }
+
+private:
+    uint32 _spellId;
+};
+
 void AddSC_generic_spell_scripts()
 {
     RegisterSpellScript(spell_silithyst);
@@ -5538,4 +5591,7 @@ void AddSC_generic_spell_scripts()
     RegisterSpellScript(spell_gen_steal_weapon);
     RegisterSpellScript(spell_gen_set_health);
     RegisterSpellScript(spell_pet_spellhit_expertise_spellpen_scaling);
+    RegisterSpellScript(spell_gen_proc_on_victim);
+    RegisterSpellScriptWithArgs(spell_gen_translocate, "spell_gen_translocate_down", SPELL_TRANSLOCATION_DOWN);
+    RegisterSpellScriptWithArgs(spell_gen_translocate, "spell_gen_translocate_up", SPELL_TRANSLOCATION_UP);
 }

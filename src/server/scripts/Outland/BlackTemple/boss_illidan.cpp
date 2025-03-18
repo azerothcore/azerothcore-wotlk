@@ -207,7 +207,7 @@ struct boss_illidan_stormrage : public BossAI
         _canTalk = true;
         _dying = false;
         _inCutscene = false;
-        beamPosId = urand(0, MAX_EYE_BEAM_POS);
+        beamPosId = urand(0, MAX_EYE_BEAM_POS - 1);
         me->ReplaceAllUnitFlags(UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
         me->SetDisableGravity(false);
         me->SetHover(false);
@@ -696,11 +696,11 @@ private:
 
     void CycleBeamPos(uint8 &beamPosId)
     {
-        uint8 _incumbentBeamPos = urand(0, MAX_EYE_BEAM_POS);
-        if (_incumbentBeamPos == beamPosId)
-            CycleBeamPos(beamPosId);
-        else
-            beamPosId = _incumbentBeamPos;
+        uint8 newPos;
+        do {
+            newPos = urand(0, MAX_EYE_BEAM_POS - 1);
+        } while (newPos == beamPosId);
+        beamPosId = newPos;
     }
 };
 

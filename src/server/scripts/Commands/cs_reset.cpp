@@ -29,6 +29,7 @@ EndScriptData */
 #include "Pet.h"
 #include "Player.h"
 #include "ScriptMgr.h"
+#include "WorldSessionMgr.h"
 
 using namespace Acore::ChatCommands;
 
@@ -302,7 +303,7 @@ public:
         stmt->SetData(0, uint16(atLogin));
         CharacterDatabase.Execute(stmt);
 
-        sWorld->DoForAllOnlinePlayers([&] (Player* player){
+        sWorldSessionMgr->DoForAllOnlinePlayers([&] (Player* player){
             player->SetAtLoginFlag(atLogin);
         });
 
