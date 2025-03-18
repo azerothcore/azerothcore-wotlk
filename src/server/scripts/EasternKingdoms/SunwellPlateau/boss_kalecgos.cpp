@@ -47,32 +47,36 @@ enum Yells
 
 enum Spells
 {
-    SPELL_SPECTRAL_EXHAUSTION           = 44867,
-    SPELL_SPECTRAL_BLAST                = 44869,
-    SPELL_SPECTRAL_BLAST_PORTAL         = 44866,
-    SPELL_SPECTRAL_BLAST_AA             = 46648,
-    SPELL_TELEPORT_SPECTRAL             = 46019,
+    SPELL_SPECTRAL_EXHAUSTION              = 44867,
+    SPELL_SPECTRAL_BLAST                   = 44869,
+    SPELL_SPECTRAL_BLAST_PORTAL            = 44866,
+    SPELL_SPECTRAL_BLAST_AA                = 46648,
+    SPELL_TELEPORT_SPECTRAL                = 46019,
 
-    SPELL_TELEPORT_NORMAL_REALM         = 46020,
-    SPELL_SPECTRAL_REALM                = 46021,
-    SPELL_SPECTRAL_INVISIBILITY         = 44801,
-    SPELL_DEMONIC_VISUAL                = 44800,
+    SPELL_TELEPORT_NORMAL_REALM            = 46020,
+    SPELL_SPECTRAL_REALM                   = 46021,
+    SPELL_SPECTRAL_INVISIBILITY            = 44801,
+    SPELL_DEMONIC_VISUAL                   = 44800,
 
-    SPELL_ARCANE_BUFFET                 = 45018,
-    SPELL_FROST_BREATH                  = 44799,
-    SPELL_TAIL_LASH                     = 45122,
+    SPELL_ARCANE_BUFFET                    = 45018,
+    SPELL_FROST_BREATH                     = 44799,
+    SPELL_TAIL_LASH                        = 45122,
 
-    SPELL_BANISH                        = 44836,
-    SPELL_TRANSFORM_KALEC               = 44670,
-    SPELL_CRAZED_RAGE                   = 44807,
+    SPELL_BANISH                           = 44836,
+    SPELL_TRANSFORM_KALEC                  = 44670,
+    SPELL_CRAZED_RAGE                      = 44807,
 
-    SPELL_CORRUPTION_STRIKE             = 45029,
-    SPELL_CURSE_OF_BOUNDLESS_AGONY      = 45032,
-    SPELL_CURSE_OF_BOUNDLESS_AGONY_PLR  = 45034,
-    SPELL_SHADOW_BOLT                   = 45031,
+    SPELL_CORRUPTION_STRIKE                = 45029,
+    SPELL_CURSE_OF_BOUNDLESS_AGONY         = 45032,
+    SPELL_CURSE_OF_BOUNDLESS_AGONY_PLR     = 45034,
+    SPELL_CURSE_OF_BOUNDLESS_AGONY_REMOVE  = 45050,
+    SPELL_CURSE_OF_BOUNDLESS_AGONY_DUMMY_1 = 45083,
+    SPELL_CURSE_OF_BOUNDLESS_AGONY_DUMMY_2 = 45085,
+    SPELL_CURSE_OF_BOUNDLESS_AGONY_DUMMY_3 = 45084,
+    SPELL_SHADOW_BOLT                      = 45031,
 
-    SPELL_HEROIC_STRIKE                 = 45026,
-    SPELL_REVITALIZE                    = 45027
+    SPELL_HEROIC_STRIKE                    = 45026,
+    SPELL_REVITALIZE                       = 45027
 };
 
 enum SWPActions
@@ -388,6 +392,7 @@ struct boss_sathrovarr : public ScriptedAI
 
     void JustDied(Unit* /*killer*/) override
     {
+        DoCastSelf(SPELL_CURSE_OF_BOUNDLESS_AGONY_REMOVE, true);
         Talk(SAY_SATH_DEATH);
     }
 
@@ -464,10 +469,10 @@ class spell_kalecgos_curse_of_boundless_agony_aura : public AuraScript
 
     bool Validate(SpellInfo const* /*spellInfo*/) override
     {
-        return ValidateSpellInfo({ SPELL_CURSE_OF_BOUNDLESS_AGONY_PLR });
+        return ValidateSpellInfo({ SPELL_CURSE_OF_BOUNDLESS_AGONY_PLR, SPELL_CURSE_OF_BOUNDLESS_AGONY_DUMMY_1, SPELL_CURSE_OF_BOUNDLESS_AGONY_DUMMY_2, SPELL_CURSE_OF_BOUNDLESS_AGONY_DUMMY_3 });
     }
 
-    void OnRemove(AuraEffect const*  /*aurEff*/, AuraEffectHandleModes /*mode*/)
+    void OnRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
     {
         if (InstanceScript* instance = GetUnitOwner()->GetInstanceScript())
             if (instance->IsEncounterInProgress())
@@ -476,8 +481,18 @@ class spell_kalecgos_curse_of_boundless_agony_aura : public AuraScript
 
     void OnPeriodic(AuraEffect const* aurEff)
     {
-        if (aurEff->GetTickNumber() > 1 && aurEff->GetTickNumber() % 5 == 1)
+        uint32 tickNumber = aurEff->GetTickNumber();
+        if (tickNumber > 1 && tickNumber % 5 == 1)
             GetAura()->GetEffect(aurEff->GetEffIndex())->SetAmount(aurEff->GetAmount() * 2);
+
+        uint32 spellId = 0;
+        if (tickNumber <= 10)
+            spellId = SPELL_CURSE_OF_BOUNDLESS_AGONY_DUMMY_1;
+        else if (tickNumber <= 20)
+            spellId = SPELL_CURSE_OF_BOUNDLESS_AGONY_DUMMY_2;
+        else
+            spellId = SPELL_CURSE_OF_BOUNDLESS_AGONY_DUMMY_3;
+        GetTarget()->CastSpell(GetTarget(), spellId, true);
     }
 
     void Register() override
