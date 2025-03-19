@@ -1,3 +1,4 @@
+-- DB update 2025_03_19_00 -> 2025_03_19_01
 
 -- Add creature formation for the last pack before Kalecgos
 DELETE FROM `creature_formations` WHERE `leaderGUID` = 54834;
