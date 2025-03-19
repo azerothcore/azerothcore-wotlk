@@ -113,8 +113,16 @@ public:
         std::list<Creature*> creatureList;
         _caster->GetCreaturesWithEntryInRange(creatureList, 70.0f, NPC_FOG_TRIGGER);
         for (auto const& creature : creatureList)
+        {
             if (_caster->GetExactDist2d(creature) <= 11.0f)
+            {
                 creature->CastSpell(creature, SPELL_FOG_OF_CORRUPTION, true);
+                continue;
+            }
+
+            if (creature->GetPositionX() > 1510.0f)
+                creature->CastSpell(creature, SPELL_FOG_OF_CORRUPTION, true);
+        }
         return true;
     }
 
@@ -283,7 +291,7 @@ struct boss_felmyst : public BossAI
                         me->GetMotionMaster()->MovePoint(POINT_LANE, RightSideLanes[_currentLane], false);
                     else
                         me->GetMotionMaster()->MovePoint(POINT_LANE, LeftSideLanes[_currentLane], false);
-                }, 2s);
+                }, 5s);
                 break;
             case POINT_LANE:
                 Talk(EMOTE_BREATH);
