@@ -1,3 +1,4 @@
+-- DB update 2025_03_17_03 -> 2025_03_19_00
 --
 DELETE FROM `spell_script_names` WHERE `spell_id` = 45034;
 INSERT INTO `spell_script_names` (`spell_id`, `ScriptName`) VALUES(45034, 'spell_kalecgos_curse_of_boundless_agony_aura');
