@@ -106,20 +106,29 @@ const Position LandingPos = { 1476.77f, 665.094f, 20.6423f };
 class CorruptTriggers : public BasicEvent
 {
 public:
-    CorruptTriggers(Unit* caster) : _caster(caster) { }
+    CorruptTriggers(Unit* caster, uint8 currentLane) : _caster(caster), _currentLane(currentLane) { }
 
     bool Execute(uint64 /*execTime*/, uint32 /*diff*/) override
     {
         std::list<Creature*> creatureList;
         _caster->GetCreaturesWithEntryInRange(creatureList, 70.0f, NPC_FOG_TRIGGER);
         for (auto const& creature : creatureList)
+        {
             if (_caster->GetExactDist2d(creature) <= 11.0f)
+            {
                 creature->CastSpell(creature, SPELL_FOG_OF_CORRUPTION, true);
+                continue;
+            }
+
+            if (!_currentLane && creature->GetPositionX() > 1510.0f)
+                creature->CastSpell(creature, SPELL_FOG_OF_CORRUPTION, true);
+        }
         return true;
     }
 
 private:
     Unit* _caster;
+    uint8 _currentLane;
 };
 
 struct boss_felmyst : public BossAI
@@ -283,20 +292,20 @@ struct boss_felmyst : public BossAI
                         me->GetMotionMaster()->MovePoint(POINT_LANE, RightSideLanes[_currentLane], false);
                     else
                         me->GetMotionMaster()->MovePoint(POINT_LANE, LeftSideLanes[_currentLane], false);
-                }, 2s);
+                }, 5s);
                 break;
             case POINT_LANE:
                 Talk(EMOTE_BREATH);
                 me->m_Events.AddEventAtOffset([&] {
-                    me->m_Events.AddEvent(new CorruptTriggers(me), me->m_Events.CalculateTime(0));
-                    me->m_Events.AddEvent(new CorruptTriggers(me), me->m_Events.CalculateTime(500));
-                    me->m_Events.AddEvent(new CorruptTriggers(me), me->m_Events.CalculateTime(1000));
-                    me->m_Events.AddEvent(new CorruptTriggers(me), me->m_Events.CalculateTime(1500));
-                    me->m_Events.AddEvent(new CorruptTriggers(me), me->m_Events.CalculateTime(2000));
-                    me->m_Events.AddEvent(new CorruptTriggers(me), me->m_Events.CalculateTime(2500));
-                    me->m_Events.AddEvent(new CorruptTriggers(me), me->m_Events.CalculateTime(3000));
-                    me->m_Events.AddEvent(new CorruptTriggers(me), me->m_Events.CalculateTime(3500));
-                    me->m_Events.AddEvent(new CorruptTriggers(me), me->m_Events.CalculateTime(4000));
+                    me->m_Events.AddEvent(new CorruptTriggers(me, _currentLane), me->m_Events.CalculateTime(0));
+                    me->m_Events.AddEvent(new CorruptTriggers(me, _currentLane), me->m_Events.CalculateTime(500));
+                    me->m_Events.AddEvent(new CorruptTriggers(me, _currentLane), me->m_Events.CalculateTime(1000));
+                    me->m_Events.AddEvent(new CorruptTriggers(me, _currentLane), me->m_Events.CalculateTime(1500));
+                    me->m_Events.AddEvent(new CorruptTriggers(me, _currentLane), me->m_Events.CalculateTime(2000));
+                    me->m_Events.AddEvent(new CorruptTriggers(me, _currentLane), me->m_Events.CalculateTime(2500));
+                    me->m_Events.AddEvent(new CorruptTriggers(me, _currentLane), me->m_Events.CalculateTime(3000));
+                    me->m_Events.AddEvent(new CorruptTriggers(me, _currentLane), me->m_Events.CalculateTime(3500));
+                    me->m_Events.AddEvent(new CorruptTriggers(me, _currentLane), me->m_Events.CalculateTime(4000));
                 }, 5s);
 
                 me->m_Events.AddEventAtOffset([&] {
