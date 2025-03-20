@@ -748,7 +748,10 @@ void Battleground::RewardReputationToTeam(uint32 factionId, uint32 reputation, T
             AddPct(repGain, itr->second->GetTotalAuraModifier(SPELL_AURA_MOD_REPUTATION_GAIN));
             AddPct(repGain, itr->second->GetTotalAuraModifierByMiscValue(SPELL_AURA_MOD_FACTION_REPUTATION_GAIN, realFactionId));
             if (FactionEntry const* factionEntry = sFactionStore.LookupEntry(realFactionId))
+            {
+                sScriptMgr->OnPlayerBeforeReputationChange(itr->second, realFactionId, repGain, ReputationSource::PvP, nullptr, nullptr, nullptr);
                 itr->second->GetReputationMgr().ModifyReputation(factionEntry, repGain);
+            }
         }
 }
 

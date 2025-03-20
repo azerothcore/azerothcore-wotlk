@@ -129,6 +129,11 @@ void ScriptMgr::OnPlayerGiveXP(Player* player, uint32& amount, Unit* victim, uin
     CALL_ENABLED_HOOKS(PlayerScript, PLAYERHOOK_ON_GIVE_EXP, script->OnPlayerGiveXP(player, amount, victim, xpSource));
 }
 
+void ScriptMgr::OnPlayerBeforeReputationChange(Player* player, uint32 factionId, float& amount, ReputationSource reputationSource, Unit const* victim, Quest const* quest, Spell const* spell)
+{
+    CALL_ENABLED_HOOKS(PlayerScript, PLAYERHOOK_ON_BEFORE_REPUTATION_CHANGE, script->OnPlayerBeforeReputationChange(player, factionId, amount, reputationSource, victim, quest, spell));
+}
+
 bool ScriptMgr::OnPlayerReputationChange(Player* player, uint32 factionID, int32& standing, bool incremental)
 {
     CALL_ENABLED_BOOLEAN_HOOKS(PlayerScript, PLAYERHOOK_ON_REPUTATION_CHANGE, !script->OnPlayerReputationChange(player, factionID, standing, incremental));
