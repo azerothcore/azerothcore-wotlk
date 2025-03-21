@@ -248,7 +248,7 @@ struct boss_kalecgos : public BossAI
             DoCastAOE(SPELL_SPECTRAL_BLAST);
         }, 20s, 30s);
 
-        scheduler.Schedule(16s, [this](TaskContext)
+        scheduler.Schedule(9s, [this](TaskContext)
         {
             if (Creature* kalec = me->SummonCreature(NPC_KALEC, 1702.21f, 931.7f, -74.56f, 5.07f, TEMPSUMMON_MANUAL_DESPAWN))
                 kalec->CastSpell(kalec, SPELL_SPECTRAL_INVISIBILITY, true);
