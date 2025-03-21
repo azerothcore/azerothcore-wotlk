@@ -376,6 +376,16 @@ struct npc_demonic_vapor : public NullCreatureAI
         me->CastSpell(me, SPELL_DEMONIC_VAPOR_SPAWN_TRIGGER, true);
     }
 
+    void IsSummonedBy(WorldObject* summoner) override
+    {
+        if (!summoner || !summoner->ToUnit())
+            return;
+
+        me->m_Events.AddEventAtOffset([this, summoner] {
+            me->GetMotionMaster()->MoveFollow(summoner->ToUnit(), 0.0f, 0.0f, MOTION_SLOT_CONTROLLED);
+        }, 2s);
+    }
+
     void UpdateAI(uint32 diff) override
     {
         if (_timer)
@@ -386,16 +396,6 @@ struct npc_demonic_vapor : public NullCreatureAI
                 me->CastSpell(me, SPELL_DEMONIC_VAPOR_PERIODIC, true);
                 _timer = 0;
             }
-        }
-        else if (me->GetMotionMaster()->GetMotionSlotType(MOTION_SLOT_CONTROLLED) == NULL_MOTION_TYPE)
-        {
-            Map::PlayerList const& players = me->GetMap()->GetPlayers();
-            for (Map::PlayerList::const_iterator itr = players.begin(); itr != players.end(); ++itr)
-                if (me->GetDistance2d(itr->GetSource()) < 20.0f && itr->GetSource()->IsAlive())
-                {
-                    me->GetMotionMaster()->MoveFollow(itr->GetSource(), 0.0f, 0.0f, MOTION_SLOT_CONTROLLED);
-                    break;
-                }
         }
     }
 private:
