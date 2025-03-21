@@ -381,7 +381,9 @@ struct npc_demonic_vapor : public NullCreatureAI
         if (!summoner || !summoner->ToUnit())
             return;
 
-        me->GetMotionMaster()->MoveFollow(summoner->ToUnit(), 0.0f, 0.0f, MOTION_SLOT_CONTROLLED);
+        me->m_Events.AddEventAtOffset([this, summoner] {
+            me->GetMotionMaster()->MoveFollow(summoner->ToUnit(), 0.0f, 0.0f, MOTION_SLOT_CONTROLLED);
+        }, 2s);
     }
 
     void UpdateAI(uint32 diff) override
