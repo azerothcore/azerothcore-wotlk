@@ -1,29 +1,29 @@
 -- Fix invalid banner name
-UPDATE `gameobject_template` SET `name` = 'Alliance Banner' WHERE (`entry` = 192269);
+UPDATE `gameobject_template` SET `name` = 'Alliance Banner' WHERE (`entry` = 192269 AND `name` = 'Horde Banner');
 
 -- Rotate existing banners
-UPDATE `gameobject` SET `orientation` = 4.71, `rotation2` = 0, `rotation3` = 0 WHERE (`guid` = 75186);
-UPDATE `gameobject` SET `orientation` = 4.71, `rotation2` = 0, `rotation3` = 0 WHERE (`guid` = 75190);
-UPDATE `gameobject` SET `orientation` = 4.71, `rotation2` = 0, `rotation3` = 0 WHERE (`guid` = 75191);
-UPDATE `gameobject` SET `orientation` = 4.71, `rotation2` = 0, `rotation3` = 0 WHERE (`guid` = 75179);
+UPDATE `gameobject` SET `orientation` = 4.71, `rotation2` = 0, `rotation3` = 0 WHERE (`guid` = 75179 AND `id` = 192415);
+UPDATE `gameobject` SET `orientation` = 4.71, `rotation2` = 0, `rotation3` = 0 WHERE (`guid` = 75186 AND `id` = 192441);
+UPDATE `gameobject` SET `orientation` = 4.71, `rotation2` = 0, `rotation3` = 0 WHERE (`guid` = 75190 AND `id` = 192449);
+UPDATE `gameobject` SET `orientation` = 4.71, `rotation2` = 0, `rotation3` = 0 WHERE (`guid` = 75191 AND `id` = 192450);
 
 -- Add missing Fortress banners
-DELETE FROM `gameobject` WHERE (`id` = 192487 AND `guid` IN (74696, 74706, 74683));
+DELETE FROM `gameobject` WHERE (`guid` IN (74696, 74706) AND `id` = 192487);
 INSERT INTO `gameobject` (`guid`, `id`, `map`, `zoneId`, `areaId`, `spawnMask`, `phaseMask`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecs`, `animprogress`, `state`, `ScriptName`, `VerifiedBuild`, `Comment`) VALUES
 (74696, 192487, 571, 0, 0, 1, 128, 5158.81, 2883.13, 431.618, 3.14159, 0, 0, 0, 0, 0, 0, 0, '', 0, NULL),
 (74706, 192487, 571, 0, 0, 1, 128, 5160.34, 2798.61, 430.769, 3.14159, 0, 0, 0, 0, 0, 0, 0, '', 0, NULL);
-DELETE FROM `gameobject` WHERE (`id` = 192488 AND `guid` IN (74696, 74706, 74683));
+DELETE FROM `gameobject` WHERE (`guid` = 74683 AND `id` = 192488);
 INSERT INTO `gameobject` (`guid`, `id`, `map`, `zoneId`, `areaId`, `spawnMask`, `phaseMask`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecs`, `animprogress`, `state`, `ScriptName`, `VerifiedBuild`, `Comment`) VALUES
 (74683, 192488, 571, 0, 0, 1, 64, 5280.89, 3064.95, 431.976, 1.55334, 0, 0, 0, 0, 0, 0, 0, '', 0, NULL);
 
 -- Add missing Workshop banners
-DELETE FROM `gameobject` WHERE (`id` = 192430 AND `guid` IN (75195, 75196));
+DELETE FROM `gameobject` WHERE (`guid` IN (75195, 75196) AND `id` = 192430);
 INSERT INTO `gameobject` (`guid`, `id`, `map`, `zoneId`, `areaId`, `spawnMask`, `phaseMask`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecs`, `animprogress`, `state`, `ScriptName`, `VerifiedBuild`, `Comment`) VALUES
 (75195, 192430, 571, 0, 0, 1, 64, 4438.38, 3361.01, 371.814, 0.0348707, 0, 0, -0.017452, 0.999848, 0, 0, 0, '', 0, NULL),
 (75196, 192430, 571, 0, 0, 1, 64, 4416.8, 2414.04, 377.487, 0.00895035, 0, 0, 0.004363, 0.99999, 0, 0, 0, '', 0, NULL);
 
 -- Add missing Tower banners
-DELETE FROM `gameobject` WHERE (`id` = 192501 AND `guid` IN (76031, 76032, 76033, 76034, 76035, 76036, 76037, 76038, 76039, 76040, 76041, 76042));
+DELETE FROM `gameobject` WHERE (`guid` IN (76031, 76032, 76033, 76034, 76035, 76036, 76037, 76038, 76039, 76040, 76041, 76042) and `id` = 192501);
 INSERT INTO `gameobject` (`guid`, `id`, `map`, `zoneId`, `areaId`, `spawnMask`, `phaseMask`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecs`, `animprogress`, `state`, `ScriptName`, `VerifiedBuild`, `Comment`) VALUES
 (76031, 192501, 571, 0, 0, 1, 64, 4398.82, 2804.7, 429.792, -1.58825, 0, 0, 0, 1, 180, 0, 1, '', 0, NULL),
 (76032, 192501, 571, 0, 0, 1, 64, 4416, 2822.67, 429.851, -0.017452, 0, 0, 0, 1, 180, 0, 1, '', 0, NULL),
