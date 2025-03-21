@@ -26,6 +26,7 @@
 class Group;
 class BattlefieldWG;
 class WintergraspCapturePoint;
+class TugOfWarWG;
 
 struct BfWGGameObjectBuilding;
 struct WGWorkshop;
@@ -83,8 +84,8 @@ enum WintergraspSpells
     SPELL_HORDE_CONTROLS_FACTORY_PHASE_SHIFT    = 56618,// ADDS PHASE 16
     SPELL_ALLIANCE_CONTROLS_FACTORY_PHASE_SHIFT = 56617,// ADDS PHASE 32
 
-    SPELL_HORDE_CONTROL_PHASE_SHIFT             = 55773,// ADDS PHASE 64
-    SPELL_ALLIANCE_CONTROL_PHASE_SHIFT          = 55774,// ADDS PHASE 128
+    SPELL_HORDE_CONTROL_PHASE_SHIFT             = 55773,// ADDS PHASE 65 (64 + 1)
+    SPELL_ALLIANCE_CONTROL_PHASE_SHIFT          = 55774,// ADDS PHASE 129 (128 + 1)
 };
 
 enum WintergraspData
@@ -271,6 +272,35 @@ protected:
 };
 
 /* ######################### *
+ * WinterGrasp Tug-of-War    *
+ * ######################### */
+
+enum TugOfWarWorldstates
+{
+    TUG_OF_WAR_SCALE = 99000,
+    TUG_OF_WAR_DEFENSE_STREAK = 99001,
+};
+
+class TugOfWarWG
+{
+public:
+    ~TugOfWarWG();
+    TugOfWarWG(BattlefieldWG* WG);
+
+    int16 GetScale() { return m_Scale; }
+    void OnBattleStart();
+    void OnBattleEnd(bool endByTimer);
+    bool CanFastPromoteToCorporal() { return m_FastCorporal; }
+    bool CanFastPromoteToLieutenant() { return m_FastLieutenant; }
+protected:
+    BattlefieldWG* m_WG;
+    int16 m_Scale;
+    uint32 m_DefenseStreak;
+    bool m_FastCorporal;
+    bool m_FastLieutenant;
+};
+
+/* ######################### *
  * WinterGrasp Battlefield   *
  * ######################### */
 
@@ -354,6 +384,7 @@ public:
      */
     void OnCreatureRemove(Creature* creature) override;
 
+    int8 GetRelatedWorkshopId(uint32 GoEntry);
     /**
      * \brief Called when a gameobject is created
      */
@@ -428,6 +459,8 @@ public:
 
     uint32 GetData(uint32 data) const override;
 
+    TeamId DetermineWorkshopControl(uint8 workshopId);
+
     bool IsKeepNpc(uint32 entry)
     {
         switch (entry)
@@ -460,6 +493,7 @@ public:
     }
 protected:
     bool m_isRelicInteractible;
+    std::unique_ptr<TugOfWarWG> m_TugOfWar;
 
     Workshop WorkshopsList;
 
@@ -805,21 +839,19 @@ struct WintergraspTowerData
 };
 
 uint8 const WG_MAX_ATTACKTOWERS = 3;
-// 192414 : 0 in sql, 1 in header
-// 192278 : 0 in sql, 3 in header
 const WintergraspTowerData AttackTowers[WG_MAX_ATTACKTOWERS] =
 {
     // West tower
     {
         190356,
-        6,
+        0,
         {
-            { 4559.109863f, 3606.219971f, 419.998993f, -1.483530f, 192488, 192501 },    // Flag on tower
-            { 4539.419922f, 3622.489990f, 420.033997f, -3.071770f, 192488, 192501 },    // Flag on tower
-            { 4555.259766f, 3641.649902f, 419.973999f, 1.675510f, 192488, 192501 },     // Flag on tower
-            { 4574.870117f, 3625.909912f, 420.079010f, 0.080117f, 192488, 192501 },     // Flag on tower
-            { 4433.899902f, 3534.139893f, 360.274994f, -1.850050f, 192269, 192278 },    // Flag near workshop
-            { 4572.930176f, 3475.520020f, 363.009003f, 1.42240f, 192269, 192278 }       // Flag near bridge
+            { 0, 0, 0, 0, 0, 0 },
+            { 0, 0, 0, 0, 0, 0 },
+            { 0, 0, 0, 0, 0, 0 },
+            { 0, 0, 0, 0, 0, 0 },
+            { 0, 0, 0, 0, 0, 0 },
+            { 0, 0, 0, 0, 0, 0 },
         },
         6,
         {
@@ -846,13 +878,13 @@ const WintergraspTowerData AttackTowers[WG_MAX_ATTACKTOWERS] =
     // South Tower
     {
         190357,
-        5,
+        0,
         {
-            { 4416.000000f, 2822.669922f, 429.851013f, -0.017452f, 192488, 192501 },    // Flag on tower
-            { 4398.819824f, 2804.699951f, 429.791992f, -1.588250f, 192488, 192501 },    // Flag on tower
-            { 4387.620117f, 2719.570068f, 389.934998f, -1.544620f, 192366, 192414 },    // Flag near tower
-            { 4464.120117f, 2855.449951f, 406.110992f, 0.829032f, 192366, 192429 },     // Flag near tower
-            { 4526.459961f, 2810.179932f, 391.200012f, -2.993220f, 192269, 192278 },    // Flag near bridge
+            { 0, 0, 0, 0, 0, 0 },
+            { 0, 0, 0, 0, 0, 0 },
+            { 0, 0, 0, 0, 0, 0 },
+            { 0, 0, 0, 0, 0, 0 },
+            { 0, 0, 0, 0, 0, 0 },
             { 0, 0, 0, 0, 0, 0 },
         },
         6,
@@ -880,12 +912,12 @@ const WintergraspTowerData AttackTowers[WG_MAX_ATTACKTOWERS] =
     // East Tower
     {
         190358,
-        4,
+        0,
         {
-            { 4466.790039f, 1960.420044f, 459.144012f, 1.151920f, 192488, 192501 },     // Flag on tower
-            { 4475.350098f, 1937.030029f, 459.070007f, -0.43633f, 192488, 192501 },     // Flag on tower
-            { 4451.759766f, 1928.099976f, 459.075989f, -2.00713f, 192488, 192501 },     // Flag on tower
-            { 4442.990234f, 1951.900024f, 459.092987f, 2.740160f, 192488, 192501 },     // Flag on tower
+            { 0, 0, 0, 0, 0, 0 },
+            { 0, 0, 0, 0, 0, 0 },
+            { 0, 0, 0, 0, 0, 0 },
+            { 0, 0, 0, 0, 0, 0 },
             { 0, 0, 0, 0, 0, 0 },
             { 0, 0, 0, 0, 0, 0 },
         },
