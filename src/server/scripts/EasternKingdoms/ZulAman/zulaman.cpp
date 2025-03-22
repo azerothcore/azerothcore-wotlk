@@ -757,7 +757,10 @@ struct npc_amanishi_scout : public ScriptedAI
         triggers.remove_if([](Creature* trigger) {return !IsDrum(trigger);});
         triggers.sort(Acore::ObjectDistanceOrderPred(me));
         if (triggers.empty())
+        {
             ScheduleCombat();
+            return;
+        }
         Creature* closestDrum = triggers.front();
         me->GetMotionMaster()->MoveFollow(closestDrum, 0.0f, 0.0f);
         _drumGUID = closestDrum->GetGUID();
