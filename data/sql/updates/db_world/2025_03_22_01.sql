@@ -1,3 +1,4 @@
+-- DB update 2025_03_22_00 -> 2025_03_22_01
 
 -- Pack after Eredar Twins
 DELETE FROM `creature_formations` WHERE `leaderGUID` = 47607;
