@@ -50,6 +50,7 @@ enum Spells
     SPELL_ENRAGE                = 46587,
     SPELL_EMPOWER               = 45366,
     SPELL_DARK_FLAME            = 45345,
+    SPELL_FIREBLAST             = 45232,
 
     //Lady Sacrolash spells
     SPELL_SHADOWFORM            = 45455,
@@ -77,6 +78,21 @@ enum Misc
 struct boss_sacrolash : public BossAI
 {
     boss_sacrolash(Creature* creature) : BossAI(creature, DATA_EREDAR_TWINS), _isSisterDead(false) {}
+
+    bool CheckInRoom() override
+    {
+        if (me->GetExactDist2d(me->GetHomePosition()) >= 50.f)
+        {
+            DoCastAOE(SPELL_FIREBLAST, true);
+
+            if (Creature* alythess = instance->GetCreature(DATA_ALYTHESS))
+                alythess->AI()->DoCastAOE(SPELL_FIREBLAST, true);
+
+            return false;
+        }
+
+        return true;
+    }
 
     void Reset() override
     {
