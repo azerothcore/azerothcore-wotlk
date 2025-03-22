@@ -99,6 +99,10 @@
 #include <boost/asio/ip/address.hpp>
 #include <cmath>
 
+#if defined(MOD_ELUNA)
+    #include "LuaEngine.h"
+#endif
+
 std::atomic_long World::_stopEvent = false;
 uint8 World::_exitCode = SHUTDOWN_EXIT_CODE;
 uint32 World::m_worldLoopCounter = 0;
@@ -2814,3 +2818,7 @@ CliCommandHolder::~CliCommandHolder()
 {
     free(m_command);
 }
+
+#if defined(MOD_ELUNA)
+    Eluna* World::GetEluna() const { return eluna.get(); }
+#endif

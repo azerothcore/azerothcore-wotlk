@@ -52,6 +52,11 @@
 #include "World.h"
 #include "WorldPacket.h"
 
+#if defined(MOD_ELUNA)
+#include "LuaEngine.h"
+#include "ElunaConfig.h"
+#endif
+
 /// @todo: this import is not necessary for compilation and marked as unused by the IDE
 //  however, for some reasons removing it would cause a damn linking issue
 //  there is probably some underlying problem with imports which should properly addressed
@@ -3222,3 +3227,13 @@ void WorldObject::RemoveAllowedLooter(ObjectGuid guid)
 {
     _allowedLooters.erase(guid);
 }
+
+#if defined(MOD_ELUNA)
+Eluna* WorldObject::GetEluna() const
+{
+    if (Map * map = FindMap())
+        return map->GetEluna();
+
+    return nullptr;
+}
+#endif
