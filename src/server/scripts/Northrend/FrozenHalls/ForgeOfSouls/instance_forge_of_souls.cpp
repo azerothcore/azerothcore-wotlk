@@ -46,7 +46,6 @@ public:
         }
 
         uint32 m_auiEncounter[MAX_ENCOUNTER];
-        TeamId teamIdInInstance;
         std::string str_data;
         ObjectGuid NPC_BronjahmGUID;
         ObjectGuid NPC_DevourerGUID;
@@ -59,7 +58,6 @@ public:
         void Initialize() override
         {
             memset(&m_auiEncounter, 0, sizeof(m_auiEncounter));
-            teamIdInInstance = TEAM_NEUTRAL;
         }
 
         bool IsEncounterInProgress() const override
@@ -72,21 +70,7 @@ public:
 
         void OnPlayerEnter(Player* player) override
         {
-            if (teamIdInInstance == TEAM_NEUTRAL)
-            {
-                if (Group* group = player->GetGroup())
-                {
-                    if (Player* gLeader = ObjectAccessor::FindPlayer(group->GetLeaderGUID()))
-                        teamIdInInstance = Player::TeamIdForRace(gLeader->getRace());
-                    else
-                        teamIdInInstance = player->GetTeamId();
-                }
-                else
-                    teamIdInInstance = player->GetTeamId();
-            }
-
-            if (sWorld->getBoolConfig(CONFIG_ALLOW_TWO_SIDE_INTERACTION_GROUP))
-                player->SetFaction((teamIdInInstance == TEAM_HORDE) ? 1610 : 1);
+            InstanceScript::OnPlayerEnter(player);
 
             // this will happen only after crash and loading the instance from db
             if (m_auiEncounter[0] == DONE && m_auiEncounter[1] == DONE && (!NPC_LeaderSecondGUID || !instance->GetCreature(NPC_LeaderSecondGUID)))
@@ -98,24 +82,6 @@ public:
 
         void OnCreatureCreate(Creature* creature) override
         {
-            if (teamIdInInstance == TEAM_NEUTRAL)
-            {
-                Map::PlayerList const& players = instance->GetPlayers();
-                if (!players.IsEmpty())
-                    if (Player* player = players.begin()->GetSource())
-                    {
-                        if (Group* group = player->GetGroup())
-                        {
-                            if (Player* gLeader = ObjectAccessor::FindPlayer(group->GetLeaderGUID()))
-                                teamIdInInstance = Player::TeamIdForRace(gLeader->getRace());
-                            else
-                                teamIdInInstance = player->GetTeamId();
-                        }
-                        else
-                            teamIdInInstance = player->GetTeamId();
-                    }
-            }
-
             switch (creature->GetEntry())
             {
                 case NPC_BRONJAHM:
@@ -125,7 +91,7 @@ public:
                     NPC_DevourerGUID = creature->GetGUID();
                     break;
                 case NPC_SYLVANAS_PART1:
-                    if (teamIdInInstance == TEAM_ALLIANCE)
+                    if (GetTeamIdInInstance() == TEAM_ALLIANCE)
                         creature->UpdateEntry(NPC_JAINA_PART1);
                     NPC_LeaderFirstGUID = creature->GetGUID();
 
@@ -133,12 +99,12 @@ public:
                         creature->SetVisible(false);
                     break;
                 case NPC_SYLVANAS_PART2:
-                    if (teamIdInInstance == TEAM_ALLIANCE)
+                    if (GetTeamIdInInstance() == TEAM_ALLIANCE)
                         creature->UpdateEntry(NPC_JAINA_PART2);
                     NPC_LeaderSecondGUID = creature->GetGUID();
                     break;
                 case NPC_LORALEN:
-                    if (teamIdInInstance == TEAM_ALLIANCE)
+                    if (GetTeamIdInInstance() == TEAM_ALLIANCE)
                         creature->UpdateEntry(NPC_ELANDRA);
                     if (!NPC_GuardFirstGUID)
                     {
@@ -148,7 +114,7 @@ public:
                     }
                     break;
                 case NPC_KALIRA:
-                    if (teamIdInInstance == TEAM_ALLIANCE)
+                    if (GetTeamIdInInstance() == TEAM_ALLIANCE)
                         creature->UpdateEntry(NPC_KORELN);
                     if (!NPC_GuardSecondGUID)
                     {
@@ -170,9 +136,12 @@ public:
                         leader->GetMotionMaster()->MovePoint(1, boss->GetPositionX() + 10.0f * cos(angle), boss->GetPositionY() + 10.0f * std::sin(angle), boss->GetPositionZ());
                     }
 
-            for (int8 i = 0; outroPositions[i].entry[teamIdInInstance] != 0; ++i)
-                if (Creature* summon = instance->SummonCreature(outroPositions[i].entry[teamIdInInstance], outroPositions[i].startPosition))
-                    summon->GetMotionMaster()->MovePath(outroPositions[i].pathId, false);
+            if (GetTeamIdInInstance() < TEAM_NEUTRAL) // Shouldn't happen, but just in case.
+            {
+                for (int8 i = 0; outroPositions[i].entry[GetTeamIdInInstance()] != 0; ++i)
+                    if (Creature* summon = instance->SummonCreature(outroPositions[i].entry[GetTeamIdInInstance()], outroPositions[i].startPosition))
+                        summon->GetMotionMaster()->MovePath(outroPositions[i].pathId, false);
+            }
         }
 
         void SetData(uint32 type, uint32 data) override

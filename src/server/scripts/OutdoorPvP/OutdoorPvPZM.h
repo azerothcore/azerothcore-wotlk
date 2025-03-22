@@ -175,7 +175,7 @@ public:
 
     void SendChangePhase() override;
 
-    void FillInitialWorldStates(WorldPacket& data) override;
+    void FillInitialWorldStates(WorldPackets::WorldState::InitWorldStates& packet) override;
 
     // used when player is activated/inactivated in the area
     bool HandlePlayerEnter(Player* player) override;
@@ -188,23 +188,23 @@ protected:
     uint32 m_TowerState;
 };
 
-enum ZM_GraveYardState
+enum Zm_GraveyardState
 {
     ZM_GRAVEYARD_N = 1,
     ZM_GRAVEYARD_A = 2,
     ZM_GRAVEYARD_H = 4
 };
 
-class OPvPCapturePointZM_GraveYard : public OPvPCapturePoint
+class OPvPCapturePointZM_Graveyard : public OPvPCapturePoint
 {
 public:
-    OPvPCapturePointZM_GraveYard(OutdoorPvP* pvp);
+    OPvPCapturePointZM_Graveyard(OutdoorPvP* pvp);
 
     bool Update(uint32 diff) override;
 
     void ChangeState() override {}
 
-    void FillInitialWorldStates(WorldPacket& data) override;
+    void FillInitialWorldStates(WorldPackets::WorldState::InitWorldStates& packet) override;
 
     void UpdateTowerState();
 
@@ -218,10 +218,10 @@ public:
 
     bool CanTalkTo(Player* player, Creature* creature, GossipMenuItems const& gso) override;
 
-    uint32 GetGraveYardState() const;
+    uint32 GetGraveyardState() const;
 
 private:
-    uint32 m_GraveYardState;
+    uint32 m_GraveyardState;
 
 protected:
     TeamId m_BothControllingFactionId;
@@ -240,7 +240,7 @@ public:
 
     bool Update(uint32 diff) override;
 
-    void FillInitialWorldStates(WorldPacket& data) override;
+    void FillInitialWorldStates(WorldPackets::WorldState::InitWorldStates& packet) override;
 
     void SendRemoveWorldStates(Player* player) override;
 
@@ -253,7 +253,7 @@ public:
     void SetHordeTowersControlled(uint32 count);
 
 private:
-    OPvPCapturePointZM_GraveYard* m_GraveYard;
+    OPvPCapturePointZM_Graveyard* m_Graveyard;
 
     uint32 m_AllianceTowersControlled;
     uint32 m_HordeTowersControlled;

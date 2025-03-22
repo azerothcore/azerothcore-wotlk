@@ -157,7 +157,7 @@ public:
     {
     }
 
-    void OnUpdateZone(Player* player, uint32 newZone, uint32 /*newArea*/) override
+    void OnPlayerUpdateZone(Player* player, uint32 newZone, uint32 /*newArea*/) override
     {
         if (!IsHolidayActive(HOLIDAY_FIRE_FESTIVAL))
             return;

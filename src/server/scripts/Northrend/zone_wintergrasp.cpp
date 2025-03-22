@@ -279,7 +279,7 @@ enum eWgQueue
     NPC_ARCANIST_BRAEDIN            = 32169,
     NPC_MAGISTER_SURDIEL            = 32170,
 
-    SPELL_FROST_ARMOR               = 31256
+    SPELL_FROST_ARMOR               = 12544
 };
 
 class npc_wg_queue : public CreatureScript

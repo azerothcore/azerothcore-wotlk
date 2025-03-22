@@ -99,7 +99,6 @@ public:
             if (type == DATA_ENTERED_ROOM && data == DATA_ENTERED_ROOM && RescueTimer == 100 * MINUTE * IN_MILLISECONDS)
             {
                 DoCastSpellOnPlayers(SPELL_KARGATHS_EXECUTIONER_1);
-                instance->LoadGrid(230, -80);
 
                 if (Creature* kargath = GetCreature(DATA_KARGATH))
                     sCreatureTextMgr->SendChat(kargath, GetTeamIdInInstance() == TEAM_ALLIANCE ? 3 : 4, nullptr, CHAT_MSG_ADDON, LANG_ADDON, TEXT_RANGE_MAP);

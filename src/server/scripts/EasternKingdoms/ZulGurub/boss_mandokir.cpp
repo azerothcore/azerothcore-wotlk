@@ -294,7 +294,7 @@ public:
             }
         }
 
-        void DamageDealt(Unit* doneTo, uint32& damage, DamageEffectType /*damagetype*/) override
+        void DamageDealt(Unit* doneTo, uint32& damage, DamageEffectType /*damagetype*/, SpellSchoolMask /*damageSchoolMask*/) override
         {
             if (doneTo && doneTo == me->GetVictim())
             {

@@ -20,6 +20,7 @@
 #include "LFGMgr.h"
 #include "Player.h"
 #include "ScriptedCreature.h"
+#include "WorldStatePackets.h"
 #include "oculus.h"
 
 class instance_oculus : public InstanceMapScript

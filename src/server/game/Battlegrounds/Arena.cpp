@@ -25,7 +25,8 @@
 #include "ScriptMgr.h"
 #include "World.h"
 #include "WorldSession.h"
-//#include "WorldStatePackets.h"
+#include "WorldSessionMgr.h"
+#include "WorldStatePackets.h"
 
 void ArenaScore::AppendToPacket(WorldPacket& data)
 {
@@ -146,10 +147,11 @@ void Arena::RemovePlayer(Player* /*player*/)
     CheckWinConditions();
 }
 
-void Arena::FillInitialWorldStates(WorldPacket& data)
+void Arena::FillInitialWorldStates(WorldPackets::WorldState::InitWorldStates& packet)
 {
-    data << uint32(ARENA_WORLD_STATE_ALIVE_PLAYERS_GREEN) << uint32(GetAlivePlayersCountByTeam(TEAM_HORDE));
-    data << uint32(ARENA_WORLD_STATE_ALIVE_PLAYERS_GOLD) << uint32(GetAlivePlayersCountByTeam(TEAM_ALLIANCE));
+    packet.Worldstates.reserve(2);
+    packet.Worldstates.emplace_back(ARENA_WORLD_STATE_ALIVE_PLAYERS_GREEN, GetAlivePlayersCountByTeam(TEAM_HORDE));
+    packet.Worldstates.emplace_back(ARENA_WORLD_STATE_ALIVE_PLAYERS_GOLD, GetAlivePlayersCountByTeam(TEAM_ALLIANCE));
 }
 
 void Arena::UpdateArenaWorldState()
@@ -224,7 +226,7 @@ void Arena::EndBattleground(TeamId winnerTeamId)
         {
             // pussywizard: arena logs in database
             uint32 fightId = sArenaTeamMgr->GetNextArenaLogId();
-            uint32 currOnline = sWorld->GetActiveSessionCount();
+            uint32 currOnline = sWorldSessionMgr->GetActiveSessionCount();
 
             CharacterDatabaseTransaction trans = CharacterDatabase.BeginTransaction();
             CharacterDatabasePreparedStatement* stmt2 = CharacterDatabase.GetPreparedStatement(CHAR_INS_ARENA_LOG_FIGHT);

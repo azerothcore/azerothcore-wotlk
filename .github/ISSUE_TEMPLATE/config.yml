@@ -1,4 +1,4 @@
-blank_issues_enabled: true
+blank_issues_enabled: false
 contact_links:
   - name: Website
     url: https://www.azerothcore.org
@@ -6,9 +6,6 @@ contact_links:
   - name: Wiki
     url: https://www.azerothcore.org/wiki
     about: You can find plenty of information on our Wiki.
-  - name: How to ask for help
-    url: https://www.azerothcore.org/wiki/How-to-ask-for-help
-    about: Before submitting an issue we'd love if you take a minute to read this.
   - name: FAQ
     url: https://www.azerothcore.org/wiki/faq
     about: Frequently asked questions.

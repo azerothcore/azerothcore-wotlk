@@ -32,34 +32,11 @@ class WorldMock: public IWorld
 {
 public:
     ~WorldMock() override { }
-    MOCK_METHOD(WorldSession*, FindSession, (uint32 id), (const));
-    MOCK_METHOD(WorldSession*, FindOfflineSession, (uint32 id), (const));
-    MOCK_METHOD(WorldSession*, FindOfflineSessionForCharacterGUID, (ObjectGuid::LowType guidLow),(const));
-    MOCK_METHOD(void, AddSession, (WorldSession* s), ());
-    MOCK_METHOD(bool, KickSession, (uint32 id), ());
-    MOCK_METHOD(void, UpdateMaxSessionCounters, ());
-    MOCK_METHOD(const SessionMap&, GetAllSessions, (), (const));
-    MOCK_METHOD(uint32, GetActiveAndQueuedSessionCount, (), (const));
-    MOCK_METHOD(uint32, GetActiveSessionCount, (), (const));
-    MOCK_METHOD(uint32, GetQueuedSessionCount, (), (const));
-    MOCK_METHOD(uint32, GetMaxQueuedSessionCount, (), (const));
-    MOCK_METHOD(uint32, GetMaxActiveSessionCount, (), (const));
-    MOCK_METHOD(uint32, GetPlayerCount, (), (const));
-    MOCK_METHOD(uint32, GetMaxPlayerCount, (), (const));
-    MOCK_METHOD(void, IncreasePlayerCount, ());
-    MOCK_METHOD(void, DecreasePlayerCount, ());
-    MOCK_METHOD(Player*, FindPlayerInZone, (uint32 zone), ());
     MOCK_METHOD(bool, IsClosed, (), (const));
     MOCK_METHOD(void, SetClosed, (bool val), ());
     MOCK_METHOD(AccountTypes, GetPlayerSecurityLimit, (), (const));
     MOCK_METHOD(void, SetPlayerSecurityLimit, (AccountTypes sec), ());
     MOCK_METHOD(void, LoadDBAllowedSecurityLevel, ());
-    MOCK_METHOD(void, SetPlayerAmountLimit, (uint32 limit), ());
-    MOCK_METHOD(uint32, GetPlayerAmountLimit, (), (const));
-    MOCK_METHOD(void, AddQueuedPlayer, (WorldSession*), ());
-    MOCK_METHOD(bool, RemoveQueuedPlayer, (WorldSession* session), ());
-    MOCK_METHOD(int32, GetQueuePos, (WorldSession*), ());
-    MOCK_METHOD(bool, HasRecentlyDisconnected, (WorldSession*), ());
     MOCK_METHOD(bool, getAllowMovement, (), (const));
     MOCK_METHOD(void, SetAllowMovement, (bool allow), ());
     MOCK_METHOD(void, SetNewCharString, (std::string const& str), ());
@@ -72,18 +49,12 @@ public:
     MOCK_METHOD(uint16, GetConfigMaxSkillValue, (), (const));
     MOCK_METHOD(void, SetInitialWorldSettings, ());
     MOCK_METHOD(void, LoadConfigSettings, (bool reload), ());
-    MOCK_METHOD(void, SendGlobalMessage, (WorldPacket const* packet, WorldSession* self, TeamId teamId), ());
-    MOCK_METHOD(void, SendGlobalGMMessage, (WorldPacket const* packet, WorldSession* self, TeamId teamId), ());
-    MOCK_METHOD(bool, SendZoneMessage, (uint32 zone, WorldPacket const* packet, WorldSession* self, TeamId teamId), ());
-    MOCK_METHOD(void, SendZoneText, (uint32 zone, std::string text, WorldSession* self, TeamId teamId), ());
-    MOCK_METHOD(void, SendServerMessage, (ServerMessageType messageID, std::string stringParam, Player* player));
     MOCK_METHOD(bool, IsShuttingDown, (), (const));
     MOCK_METHOD(uint32, GetShutDownTimeLeft, (), (const));
     MOCK_METHOD(void, ShutdownServ, (uint32 time, uint32 options, uint8 exitcode, const std::string& reason), ());
     MOCK_METHOD(void, ShutdownCancel, ());
     MOCK_METHOD(void, ShutdownMsg, (bool show, Player* player, const std::string& reason), ());
     MOCK_METHOD(void, Update, (uint32 diff), ());
-    MOCK_METHOD(void, UpdateSessions, (uint32 diff), ());
     MOCK_METHOD(void, setRate, (Rates rate, float value), ());
     MOCK_METHOD(float, getRate, (Rates rate), (const));
     MOCK_METHOD(void, setBoolConfig, (WorldBoolConfigs index, bool value), ());
@@ -97,8 +68,6 @@ public:
     MOCK_METHOD(void, LoadWorldStates, ());
     MOCK_METHOD(bool, IsPvPRealm, (), (const));
     MOCK_METHOD(bool, IsFFAPvPRealm, (), (const));
-    MOCK_METHOD(void, KickAll, ());
-    MOCK_METHOD(void, KickAllLess, (AccountTypes sec), ());
     MOCK_METHOD(uint32, GetNextWhoListUpdateDelaySecs, ());
     MOCK_METHOD(void, ProcessCliCommands, ());
     MOCK_METHOD(void, QueueCliCommand, (CliCommandHolder* commandHolder), ());
@@ -116,7 +85,6 @@ public:
     MOCK_METHOD(std::string const&, GetRealmName, (), (const));
     MOCK_METHOD(void, SetRealmName, (std::string name), ());
     MOCK_METHOD(void, RemoveOldCorpses, ());
-    MOCK_METHOD(void, DoForAllOnlinePlayers, (std::function<void(Player*)> exec));
 };
 #pragma GCC diagnostic pop
 

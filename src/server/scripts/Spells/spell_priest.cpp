@@ -49,6 +49,8 @@ enum PriestSpells
     SPELL_PRIEST_T9_HEALING_2P                      = 67201,
     SPELL_PRIEST_VAMPIRIC_TOUCH_DISPEL              = 64085,
     SPELL_PRIEST_T4_4P_FLEXIBILITY                  = 37565,
+    SPELL_PRIEST_GLYPH_OF_SHADOWFIEND               = 58228,
+    SPELL_PRIEST_GLYPH_OF_SHADOWFIEND_MANA          = 58227,
 
     SPELL_GENERIC_ARENA_DAMPENING                   = 74410,
     SPELL_GENERIC_BATTLEGROUND_DAMPENING            = 74411,
@@ -949,6 +951,38 @@ class spell_pri_t4_4p_bonus : public AuraScript
     }
 };
 
+// 57989 - Shadowfiend Death
+class spell_pri_shadowfiend_death : public AuraScript
+{
+    PrepareAuraScript(spell_pri_shadowfiend_death);
+
+    bool Validate(SpellInfo const* /*spellInfo*/) override
+    {
+        return ValidateSpellInfo({ SPELL_PRIEST_GLYPH_OF_SHADOWFIEND_MANA });
+    }
+
+    bool AfterCheckProc(ProcEventInfo& eventInfo, bool isTriggeredAtSpellProcEvent)
+    {
+        if (!isTriggeredAtSpellProcEvent)
+            return false;
+        return eventInfo.GetTypeMask() & PROC_FLAG_KILLED;
+    }
+
+    void HandleProc(AuraEffect const* /*aurEff*/, ProcEventInfo& /*eventInfo*/)
+    {
+        PreventDefaultAction();
+        if (Unit* owner = GetTarget()->GetOwner())
+            if (owner->HasAura(SPELL_PRIEST_GLYPH_OF_SHADOWFIEND))
+                owner->CastSpell(owner, SPELL_PRIEST_GLYPH_OF_SHADOWFIEND_MANA, true);
+    }
+
+    void Register() override
+    {
+        DoAfterCheckProc += AuraAfterCheckProcFn(spell_pri_shadowfiend_death::AfterCheckProc);
+        OnEffectProc += AuraEffectProcFn(spell_pri_shadowfiend_death::HandleProc, EFFECT_0, SPELL_AURA_DUMMY);
+    }
+};
+
 void AddSC_priest_spell_scripts()
 {
     RegisterSpellScript(spell_pri_shadowfiend_scaling);
@@ -973,4 +1007,5 @@ void AddSC_priest_spell_scripts()
     RegisterSpellScript(spell_pri_vampiric_touch);
     RegisterSpellScript(spell_pri_mind_control);
     RegisterSpellScript(spell_pri_t4_4p_bonus);
+    RegisterSpellScript(spell_pri_shadowfiend_death);
 }

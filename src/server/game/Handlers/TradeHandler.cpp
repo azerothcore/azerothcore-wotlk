@@ -70,14 +70,12 @@ void WorldSession::SendTradeStatus(TradeStatus status)
 
 void WorldSession::HandleIgnoreTradeOpcode(WorldPacket& /*recvPacket*/)
 {
-    LOG_DEBUG("network", "WORLD: Ignore Trade {}", _player->GetGUID().ToString());
-    // recvPacket.print_storage();
+    _player->TradeCancel(true, TRADE_STATUS_IGNORE_YOU);
 }
 
 void WorldSession::HandleBusyTradeOpcode(WorldPacket& /*recvPacket*/)
 {
-    LOG_DEBUG("network", "WORLD: Busy Trade {}", _player->GetGUID().ToString());
-    // recvPacket.print_storage();
+    _player->TradeCancel(true, TRADE_STATUS_BUSY);
 }
 
 void WorldSession::SendUpdateTrade(bool trader_data /*= true*/)
@@ -526,12 +524,12 @@ void WorldSession::HandleBeginTradeOpcode(WorldPacket& /*recvPacket*/)
     SendTradeStatus(TRADE_STATUS_OPEN_WINDOW);
 }
 
-void WorldSession::SendCancelTrade()
+void WorldSession::SendCancelTrade(TradeStatus status)
 {
     if (PlayerRecentlyLoggedOut() || PlayerLogout())
         return;
 
-    SendTradeStatus(TRADE_STATUS_TRADE_CANCELED);
+    SendTradeStatus(status);
 }
 
 void WorldSession::HandleCancelTradeOpcode(WorldPacket& /*recvPacket*/)
@@ -620,12 +618,6 @@ void WorldSession::HandleInitiateTradeOpcode(WorldPacket& recvPacket)
         return;
     }
 
-    if (pOther->GetSocial()->HasIgnore(GetPlayer()->GetGUID()))
-    {
-        SendTradeStatus(TRADE_STATUS_IGNORE_YOU);
-        return;
-    }
-
     if (!sWorld->getBoolConfig(CONFIG_ALLOW_TWO_SIDE_TRADE) && pOther->GetTeamId() != _player->GetTeamId())
     {
         SendTradeStatus(TRADE_STATUS_WRONG_FACTION);
@@ -644,7 +636,7 @@ void WorldSession::HandleInitiateTradeOpcode(WorldPacket& recvPacket)
         return;
     }
 
-    if (!sScriptMgr->CanInitTrade(_player, pOther))
+    if (!sScriptMgr->OnPlayerCanInitTrade(_player, pOther))
         return;
 
     // OK start trade
@@ -710,7 +702,7 @@ void WorldSession::HandleSetTradeItemOpcode(WorldPacket& recvPacket)
     }
 
     // PlayerScript Hook for checking traded items if we want to filter them in a custom module
-    if (!sScriptMgr->CanSetTradeItem(_player, item, tradeSlot))
+    if (!sScriptMgr->OnPlayerCanSetTradeItem(_player, item, tradeSlot))
     {
         // Do not send TRADE_STATUS_TRADE_CANCELED because it will cause double display of "Transaction canceled" notification
         // On the trade initiator screen

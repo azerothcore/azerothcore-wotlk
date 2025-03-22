@@ -20,7 +20,8 @@
 
 #include "Common.h"
 #include "MapDefines.h"
-#include "NGrid.h"
+#include "GridCell.h"
+#include "MapGrid.h"
 
 // Forward class definitions
 class Corpse;
@@ -30,8 +31,6 @@ class GameObject;
 class Pet;
 class Player;
 class ObjectGuid;
-
-#define MAX_NUMBER_OF_CELLS     8
 
 #define CENTER_GRID_ID          (MAX_NUMBER_OF_GRIDS/2)
 
@@ -73,8 +72,8 @@ enum GridMapTypeMask
     GRID_MAP_TYPE_MASK_ALL              = 0x1F
 };
 
-typedef Grid<Player, AllWorldObjectTypes, AllGridObjectTypes> GridType;
-typedef NGrid<MAX_NUMBER_OF_CELLS, Player, AllWorldObjectTypes, AllGridObjectTypes> NGridType;
+typedef GridCell<AllWorldObjectTypes, AllGridObjectTypes> GridCellType;
+typedef MapGrid<AllWorldObjectTypes, AllGridObjectTypes> MapGridType;
 
 typedef TypeMapContainer<AllGridObjectTypes> GridTypeMapContainer;
 typedef TypeMapContainer<AllWorldObjectTypes> WorldTypeMapContainer;
@@ -171,37 +170,29 @@ typedef CoordPair<TOTAL_NUMBER_OF_CELLS_PER_MAP> CellCoord;
 namespace Acore
 {
     template<class RET_TYPE, int CENTER_VAL>
-    inline RET_TYPE Compute(float x, float y, float center_offset, float size)
+    inline RET_TYPE Compute(float x, float y, float size)
     {
-        // calculate and store temporary values in double format for having same result as same mySQL calculations
-        double x_offset = (double(x) - center_offset) / size;
-        double y_offset = (double(y) - center_offset) / size;
+        int gx = (int)(CENTER_VAL - x / size);
+        int gy = (int)(CENTER_VAL - y / size);
 
-        int x_val = int(x_offset + CENTER_VAL + 0.5f);
-        int y_val = int(y_offset + CENTER_VAL + 0.5f);
-        return RET_TYPE(x_val, y_val);
+        return RET_TYPE(gx, gy);
     }
 
     inline GridCoord ComputeGridCoord(float x, float y)
     {
-        return Compute<GridCoord, CENTER_GRID_ID>(x, y, CENTER_GRID_OFFSET, SIZE_OF_GRIDS);
+        return Compute<GridCoord, CENTER_GRID_ID>(x, y, SIZE_OF_GRIDS);
+    }
+
+    inline GridCoord ComputeGridCoordSimple(float x, float y)
+    {
+        int gx = (int)(CENTER_GRID_ID - x / SIZE_OF_GRIDS);
+        int gy = (int)(CENTER_GRID_ID - y / SIZE_OF_GRIDS);
+        return GridCoord((MAX_NUMBER_OF_GRIDS - 1) - gx, (MAX_NUMBER_OF_GRIDS - 1) - gy);
     }
 
     inline CellCoord ComputeCellCoord(float x, float y)
     {
-        return Compute<CellCoord, CENTER_GRID_CELL_ID>(x, y, CENTER_GRID_CELL_OFFSET, SIZE_OF_GRID_CELL);
-    }
-
-    inline CellCoord ComputeCellCoord(float x, float y, float& x_off, float& y_off)
-    {
-        double x_offset = (double(x) - CENTER_GRID_CELL_OFFSET) / SIZE_OF_GRID_CELL;
-        double y_offset = (double(y) - CENTER_GRID_CELL_OFFSET) / SIZE_OF_GRID_CELL;
-
-        int x_val = int(x_offset + CENTER_GRID_CELL_ID + 0.5f);
-        int y_val = int(y_offset + CENTER_GRID_CELL_ID + 0.5f);
-        x_off = (float(x_offset) - x_val + CENTER_GRID_CELL_ID) * SIZE_OF_GRID_CELL;
-        y_off = (float(y_offset) - y_val + CENTER_GRID_CELL_ID) * SIZE_OF_GRID_CELL;
-        return CellCoord(x_val, y_val);
+        return Compute<CellCoord, CENTER_GRID_CELL_ID>(x, y, SIZE_OF_GRID_CELL);
     }
 
     inline void NormalizeMapCoord(float& c)

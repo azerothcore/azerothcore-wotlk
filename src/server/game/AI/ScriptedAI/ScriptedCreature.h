@@ -485,6 +485,12 @@ public:
     void ScheduleHealthCheckEvent(uint32 healthPct, std::function<void()> exec);
     void ScheduleHealthCheckEvent(std::initializer_list<uint8> healthPct, std::function<void()> exec);
 
+    // @brief Casts the spell after the fixed time and says the text id if provided. Timer will run even if the creature is casting or out of combat.
+    // @param spellId The spell to cast.
+    // @param timer The time to wait before casting the spell.
+    // @param textId The text id to say.
+    void ScheduleEnrageTimer(uint32 spellId, Milliseconds timer, uint8 textId = 0);
+
     // Hook used to execute events scheduled into EventMap without the need
     // to override UpdateAI
     // note: You must re-schedule the event within this method if the event

@@ -387,8 +387,8 @@ void CreatureTextMgr::SendNonChatPacket(WorldObject* source, WorldPacket const* 
             }
         case TEXT_RANGE_WORLD:
             {
-                SessionMap const& smap = sWorld->GetAllSessions();
-                for (SessionMap::const_iterator itr = smap.begin(); itr != smap.end(); ++itr)
+                WorldSessionMgr::SessionMap const& sessionMap = sWorldSessionMgr->GetAllSessions();
+                for (WorldSessionMgr::SessionMap::const_iterator itr = sessionMap.begin(); itr != sessionMap.end(); ++itr)
                     if (Player* player = itr->second->GetPlayer())
                         if ((teamId == TEAM_NEUTRAL || player->GetTeamId() == teamId) && (!gmOnly || player->IsGameMaster()))
                             player->GetSession()->SendPacket(data);

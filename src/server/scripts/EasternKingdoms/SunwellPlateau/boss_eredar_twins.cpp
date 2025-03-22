@@ -22,6 +22,7 @@
 #include "SpellInfo.h"
 #include "SpellScript.h"
 #include "SpellScriptLoader.h"
+#include "SpellAuraEffects.h"
 #include "sunwell_plateau.h"
 
 enum Quotes
@@ -83,7 +84,10 @@ struct boss_sacrolash : public BossAI
         _isSisterDead = false;
         BossAI::Reset();
         me->SetLootMode(0);
-        me->m_Events.KillAllEvents(false);
+
+        if (Creature* alythess = instance->GetCreature(DATA_ALYTHESS))
+            if (!alythess->IsAlive())
+                alythess->Respawn(true);
     }
 
     void DoAction(int32 param) override
@@ -105,18 +109,6 @@ struct boss_sacrolash : public BossAI
         }
     }
 
-    void EnterEvadeMode(EvadeReason why) override
-    {
-        BossAI::EnterEvadeMode(why);
-        if (Creature* alythess = instance->GetCreature(DATA_ALYTHESS))
-        {
-            if (!alythess->IsAlive())
-                alythess->Respawn(true);
-            else if (!alythess->IsInEvadeMode())
-                alythess->AI()->EnterEvadeMode(why);
-        }
-    }
-
     void JustEngagedWith(Unit* who) override
     {
         BossAI::JustEngagedWith(who);
@@ -124,10 +116,7 @@ struct boss_sacrolash : public BossAI
             if (alythess->IsAlive() && !alythess->IsInCombat())
                 alythess->AI()->AttackStart(who);
 
-        me->m_Events.AddEventAtOffset([&] {
-            Talk(YELL_BERSERK);
-            DoCastSelf(SPELL_ENRAGE, true);
-        }, 6min);
+        ScheduleEnrageTimer(SPELL_ENRAGE, 6min, YELL_BERSERK);
 
         ScheduleTimedEvent(10s, [&] {
             DoCastSelf(SPELL_SHADOW_BLADES);
@@ -195,7 +184,10 @@ struct boss_alythess : public BossAI
         _isSisterDead = false;
         BossAI::Reset();
         me->SetLootMode(0);
-        me->m_Events.KillAllEvents(false);
+
+        if (Creature* sacrolash = instance->GetCreature(DATA_SACROLASH))
+            if (!sacrolash->IsAlive())
+                sacrolash->Respawn(true);
     }
 
     void DoAction(int32 param) override
@@ -217,18 +209,6 @@ struct boss_alythess : public BossAI
         }
     }
 
-    void EnterEvadeMode(EvadeReason why) override
-    {
-        BossAI::EnterEvadeMode(why);
-        if (Creature* sacrolash = instance->GetCreature(DATA_SACROLASH))
-        {
-            if (!sacrolash->IsAlive())
-                sacrolash->Respawn(true);
-            else if (!sacrolash->IsInEvadeMode())
-                sacrolash->AI()->EnterEvadeMode(why);
-        }
-    }
-
     void JustEngagedWith(Unit* who) override
     {
         BossAI::JustEngagedWith(who);
@@ -236,10 +216,7 @@ struct boss_alythess : public BossAI
             if (sacrolash->IsAlive() && !sacrolash->IsInCombat())
                 sacrolash->AI()->AttackStart(who);
 
-        me->m_Events.AddEventAtOffset([&] {
-            Talk(YELL_BERSERK);
-            DoCastSelf(SPELL_ENRAGE, true);
-        }, 6min);
+        ScheduleEnrageTimer(SPELL_ENRAGE, 6min, YELL_BERSERK);
 
         ScheduleTimedEvent(1s, [&] {
             DoCastVictim(SPELL_BLAZE);
@@ -377,6 +354,42 @@ class spell_eredar_twins_blaze : public SpellScript
     }
 };
 
+class spell_eredar_twins_handle_touch_periodic : public AuraScript
+{
+    PrepareAuraScript(spell_eredar_twins_handle_touch_periodic);
+
+public:
+    spell_eredar_twins_handle_touch_periodic(uint32 touchSpell, uint8 effIndex, uint8 aura) : AuraScript(), _touchSpell(touchSpell), _effectIndex(effIndex), _aura(aura) {}
+
+    bool Validate(SpellInfo const* /*spellInfo*/) override
+    {
+        return ValidateSpellInfo({ _touchSpell });
+    }
+
+    void OnPeriodic(AuraEffect const* aurEff)
+    {
+        if (aurEff->GetId() == SPELL_FLAME_SEAR)
+        {
+            uint32 tick = aurEff->GetTickNumber();
+            if (tick % 2 != 0 || tick > 10)
+                return;
+        }
+
+        if (Unit* owner = GetOwner()->ToUnit())
+            owner->CastSpell(owner, _touchSpell, true);
+    }
+
+    void Register() override
+    {
+        OnEffectPeriodic += AuraEffectPeriodicFn(spell_eredar_twins_handle_touch_periodic::OnPeriodic, _effectIndex, _aura);
+    }
+
+private:
+    uint32 _touchSpell;
+    uint8 _effectIndex;
+    uint8 _aura;
+};
+
 class at_sunwell_eredar_twins : public OnlyOnceAreaTriggerScript
 {
 public:
@@ -404,5 +417,8 @@ void AddSC_boss_eredar_twins()
     RegisterSpellScriptWithArgs(spell_eredar_twins_apply_touch, "spell_eredar_twins_apply_flame_touched", SPELL_FLAME_TOUCHED);
     RegisterSpellScript(spell_eredar_twins_handle_touch);
     RegisterSpellScript(spell_eredar_twins_blaze);
+    RegisterSpellScriptWithArgs(spell_eredar_twins_handle_touch_periodic, "spell_eredar_twins_handle_dark_touched_periodic", SPELL_DARK_TOUCHED, EFFECT_1, SPELL_AURA_PERIODIC_DAMAGE);
+    RegisterSpellScriptWithArgs(spell_eredar_twins_handle_touch_periodic, "spell_eredar_twins_handle_flame_touched_periodic", SPELL_FLAME_TOUCHED, EFFECT_2, SPELL_AURA_PERIODIC_TRIGGER_SPELL);
+    RegisterSpellScriptWithArgs(spell_eredar_twins_handle_touch_periodic, "spell_eredar_twins_handle_flame_touched_flame_sear", SPELL_FLAME_TOUCHED, EFFECT_1, SPELL_AURA_PERIODIC_DAMAGE);
     new at_sunwell_eredar_twins();
 }

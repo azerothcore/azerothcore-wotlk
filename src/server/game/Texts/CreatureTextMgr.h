@@ -23,6 +23,7 @@
 #include "ObjectAccessor.h"
 #include "SharedDefines.h"
 #include "WorldSession.h"
+#include "WorldSessionMgr.h"
 
 enum CreatureTextRange
 {
@@ -232,8 +233,8 @@ void CreatureTextMgr::SendChatPacket(WorldObject* source, Builder const& builder
             }
         case TEXT_RANGE_WORLD:
             {
-                SessionMap const& smap = sWorld->GetAllSessions();
-                for (SessionMap::const_iterator itr = smap.begin(); itr != smap.end(); ++itr)
+                WorldSessionMgr::SessionMap const& smap = sWorldSessionMgr->GetAllSessions();
+                for (WorldSessionMgr::SessionMap::const_iterator itr = smap.begin(); itr != smap.end(); ++itr)
                     if (Player* player = itr->second->GetPlayer())
                         if ((teamId == TEAM_NEUTRAL || player->GetTeamId() == teamId) && (!gmOnly || player->IsGameMaster()))
                             localizer(player);

@@ -174,6 +174,7 @@ struct npc_deathstalker_fearleia : public ScriptedAI
         {
             _playerGUID.Clear();
             _summons.DespawnAll();
+            me->SetNpcFlag(UNIT_NPC_FLAG_QUESTGIVER);
         }
     }
 
@@ -183,6 +184,7 @@ struct npc_deathstalker_fearleia : public ScriptedAI
         {
             _questInProgress = true;
             _playerGUID = player->GetGUID();
+            me->RemoveNpcFlag(UNIT_NPC_FLAG_QUESTGIVER);
         }
 
         Talk(NPCSAY_INIT, player);
@@ -204,7 +206,6 @@ struct npc_deathstalker_fearleia : public ScriptedAI
                     SummonCreatureWithRandomTarget(2065, 0);
                     break;
                 case 4:
-                    SummonCreatureWithRandomTarget(2066, 1);
                     SummonCreatureWithRandomTarget(2066, 1);
                     SummonCreatureWithRandomTarget(2067, 0);
                     SummonCreatureWithRandomTarget(2068, 2);

@@ -173,7 +173,7 @@ struct boss_janalai : public BossAI
         BossAI::JustSummoned(summon);
     }
 
-    void DamageDealt(Unit* target, uint32& damage, DamageEffectType /*damagetype*/) override
+    void DamageDealt(Unit* target, uint32& damage, DamageEffectType /*damagetype*/, SpellSchoolMask /*damageSchoolMask*/) override
     {
         if (_isFlameBreathing)
         {

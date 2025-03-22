@@ -64,7 +64,6 @@ public:
 
             if (type == TYPE_LORD_COBRAHN && _encounters[TYPE_LORD_SERPENTIS] != DONE)
             {
-                instance->LoadGrid(-120.163f, -24.624f);
                 if (Creature* serpentis = instance->GetCreature(SerpentisGUID))
                     serpentis->AI()->Talk(SAY_SERPENTIS);
             }
@@ -72,7 +71,6 @@ public:
             if (type != TYPE_MUTANUS && _encounters[TYPE_LORD_COBRAHN] == DONE && _encounters[TYPE_LORD_PYTHAS] == DONE &&
                     _encounters[TYPE_LADY_ANACONDRA] == DONE && _encounters[TYPE_LORD_SERPENTIS] == DONE)
             {
-                instance->LoadGrid(-134.97f, 125.402f);
                 if (Creature* disciple = instance->GetCreature(DiscipleOfNaralexGUID))
                     disciple->AI()->Talk(SAY_DISCIPLE);
             }

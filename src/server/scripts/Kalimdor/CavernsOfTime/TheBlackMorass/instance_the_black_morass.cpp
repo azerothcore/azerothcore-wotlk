@@ -74,7 +74,6 @@ public:
             // prevent getting stuck if event fails during boss break
             _noBossSpawnDelay = true;
 
-            instance->LoadGrid(-2023.0f, 7121.0f);
             if (Creature* medivh = GetCreature(DATA_MEDIVH))
             {
                 medivh->Respawn();
@@ -206,10 +205,12 @@ public:
                     {
                         if (_availableRiftPositions.size() > 1)
                         {
-                            spawnPos = Acore::Containers::SelectRandomContainerElementIf(_availableRiftPositions, [&](Position pos) -> bool
+                            auto spawnPosItr = Acore::Containers::SelectRandomContainerElementIf(_availableRiftPositions, [&](Position const& pos) -> bool
                             {
                                 return pos != lastPosition;
                             });
+                            if (spawnPosItr != _availableRiftPositions.end())
+                                spawnPos = *spawnPosItr;
                         }
                         else
                         {

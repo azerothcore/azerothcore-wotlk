@@ -424,7 +424,7 @@ void WorldSession::HandleQuestLogRemoveQuest(WorldPacket& recvData)
             _player->RemoveActiveQuest(questId);
             _player->RemoveTimedAchievement(ACHIEVEMENT_TIMED_TYPE_QUEST, questId);
 
-            sScriptMgr->OnQuestAbandon(_player, questId);
+            sScriptMgr->OnPlayerQuestAbandon(_player, questId);
 
             LOG_DEBUG("network.opcode", "Player {} abandoned quest {}", _player->GetGUID().ToString(), questId);
             // check if Quest Tracker is enabled

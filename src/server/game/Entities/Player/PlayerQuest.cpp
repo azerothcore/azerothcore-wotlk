@@ -602,7 +602,7 @@ void Player::CompleteQuest(uint32 quest_id)
         return;
     }
 
-    if (!sScriptMgr->OnBeforePlayerQuestComplete(this, quest_id))
+    if (!sScriptMgr->OnPlayerBeforeQuestComplete(this, quest_id))
     {
         return;
     }
@@ -699,7 +699,7 @@ void Player::RewardQuest(Quest const* quest, uint32 reward, Object* questGiver, 
                 Item* item = StoreNewItem(dest, itemId, true);
                 SendNewItem(item, quest->RewardChoiceItemCount[reward], true, false, false, false);
 
-                sScriptMgr->OnQuestRewardItem(this, item, quest->RewardChoiceItemCount[reward]);
+                sScriptMgr->OnPlayerQuestRewardItem(this, item, quest->RewardChoiceItemCount[reward]);
             }
             else
             {
@@ -720,7 +720,7 @@ void Player::RewardQuest(Quest const* quest, uint32 reward, Object* questGiver, 
                     Item* item = StoreNewItem(dest, itemId, true);
                     SendNewItem(item, quest->RewardItemIdCount[i], true, false, false, false);
 
-                    sScriptMgr->OnQuestRewardItem(this, item, quest->RewardItemIdCount[i]);
+                    sScriptMgr->OnPlayerQuestRewardItem(this, item, quest->RewardItemIdCount[i]);
                 }
                 else
                     problematicItems.emplace_back(itemId, quest->RewardItemIdCount[i]);
@@ -745,15 +745,15 @@ void Player::RewardQuest(Quest const* quest, uint32 reward, Object* questGiver, 
     // Not give XP in case already completed once repeatable quest
     uint32 XP = rewarded ? 0 : CalculateQuestRewardXP(quest);
 
-    sScriptMgr->OnQuestComputeXP(this, quest, XP);
+    sScriptMgr->OnPlayerQuestComputeXP(this, quest, XP);
     int32 moneyRew = 0;
-    if (GetLevel() >= sWorld->getIntConfig(CONFIG_MAX_PLAYER_LEVEL) || sScriptMgr->ShouldBeRewardedWithMoneyInsteadOfExp(this))
+    if (GetLevel() >= sWorld->getIntConfig(CONFIG_MAX_PLAYER_LEVEL) || sScriptMgr->OnPlayerShouldBeRewardedWithMoneyInsteadOfExp(this))
     {
         moneyRew = quest->GetRewMoneyMaxLevel();
     }
     else
     {
-        sScriptMgr->OnGivePlayerXP(this, XP, nullptr, isLFGReward ? PlayerXPSource::XPSOURCE_QUEST_DF : PlayerXPSource::XPSOURCE_QUEST);
+        sScriptMgr->OnPlayerGiveXP(this, XP, nullptr, isLFGReward ? PlayerXPSource::XPSOURCE_QUEST_DF : PlayerXPSource::XPSOURCE_QUEST);
         GiveXP(XP, nullptr, 1.0f, isLFGReward);
     }
 
@@ -1953,7 +1953,7 @@ void Player::KilledMonsterCredit(uint32 entry, ObjectGuid guid)
         if (q_status.Status == QUEST_STATUS_INCOMPLETE && (!GetGroup() || !GetGroup()->isRaidGroup() || qInfo->IsAllowedInRaid(GetMap()->GetDifficulty()) ||
                                                            (qInfo->IsPVPQuest() && (GetGroup()->isBFGroup() || GetGroup()->isBGGroup()))))
         {
-            if (!sScriptMgr->PassedQuestKilledMonsterCredit(this, qInfo, entry, real_entry, guid))
+            if (!sScriptMgr->OnPlayerPassedQuestKilledMonsterCredit(this, qInfo, entry, real_entry, guid))
                 continue;
 
             if (qInfo->HasSpecialFlag(QUEST_SPECIAL_FLAGS_KILL) /*&& !qInfo->HasSpecialFlag(QUEST_SPECIAL_FLAGS_CAST)*/)

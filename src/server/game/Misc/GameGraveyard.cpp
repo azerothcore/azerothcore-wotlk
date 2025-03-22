@@ -97,7 +97,7 @@ GraveyardStruct const* Graveyard::GetDefaultGraveyard(TeamId teamId)
 GraveyardStruct const* Graveyard::GetClosestGraveyard(Player* player, TeamId teamId, bool nearCorpse)
 {
     uint32 graveyardOverride = 0;
-    sScriptMgr->OnBeforeChooseGraveyard(player, teamId, nearCorpse, graveyardOverride);
+    sScriptMgr->OnPlayerBeforeChooseGraveyard(player, teamId, nearCorpse, graveyardOverride);
     if (graveyardOverride)
     {
         return sGraveyard->GetGraveyard(graveyardOverride);

@@ -17,7 +17,8 @@
 
 #ifndef Random_h__
 #define Random_h__
-
+#undef max
+#undef min
 #include "Define.h"
 #include "Duration.h"
 #include <limits>

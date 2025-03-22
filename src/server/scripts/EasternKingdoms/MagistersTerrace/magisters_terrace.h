@@ -69,6 +69,11 @@ enum MovementData
     PATH_KALECGOS_FLIGHT = 248440
 };
 
+enum CreatureTexts
+{
+    SAY_KALECGOS_SPAWN   = 0
+};
+
 template <class AI, class T>
 inline AI* GetMagistersTerraceAI(T* obj)
 {

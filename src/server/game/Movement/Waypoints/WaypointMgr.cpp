@@ -20,6 +20,7 @@
 #include "GridDefines.h"
 #include "Log.h"
 #include "QueryResult.h"
+#include "Timer.h"
 
 WaypointMgr::WaypointMgr()
 {

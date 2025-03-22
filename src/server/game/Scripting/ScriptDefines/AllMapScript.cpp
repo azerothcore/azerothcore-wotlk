@@ -134,10 +134,9 @@ void ScriptMgr::OnDestroyMap(Map* map)
     });
 }
 
-void ScriptMgr::OnLoadGridMap(Map* map, GridMap* gmap, uint32 gx, uint32 gy)
+void ScriptMgr::OnLoadGridMap(Map* map, GridTerrainData* gmap, uint32 gx, uint32 gy)
 {
     ASSERT(map);
-    ASSERT(gmap);
 
     ForeachMaps<WorldMapScript>(map,
     [&](WorldMapScript* script)
@@ -158,7 +157,7 @@ void ScriptMgr::OnLoadGridMap(Map* map, GridMap* gmap, uint32 gx, uint32 gy)
     });
 }
 
-void ScriptMgr::OnUnloadGridMap(Map* map, GridMap* gmap, uint32 gx, uint32 gy)
+void ScriptMgr::OnUnloadGridMap(Map* map, GridTerrainData* gmap, uint32 gx, uint32 gy)
 {
     ASSERT(map);
     ASSERT(gmap);
@@ -191,7 +190,7 @@ void ScriptMgr::OnPlayerEnterMap(Map* map, Player* player)
 
     ExecuteScript<PlayerScript>([=](PlayerScript* script)
     {
-        script->OnMapChanged(player);
+        script->OnPlayerMapChanged(player);
     });
 
     ForeachMaps<WorldMapScript>(map,

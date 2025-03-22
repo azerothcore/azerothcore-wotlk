@@ -523,7 +523,7 @@ namespace lfg
         if (grp && (grp->isBGGroup() || grp->isBFGroup()))
             return;
 
-        if (!sScriptMgr->CanJoinLfg(player, roles, dungeons, comment))
+        if (!sScriptMgr->OnPlayerCanJoinLfg(player, roles, dungeons, comment))
             return;
 
         // pussywizard: can't join LFG/LFR while using LFR

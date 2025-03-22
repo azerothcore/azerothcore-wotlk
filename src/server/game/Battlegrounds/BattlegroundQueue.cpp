@@ -1355,11 +1355,11 @@ bool BGQueueRemoveEvent::Execute(uint64 /*e_time*/, uint32 /*p_time*/)
                     CharacterDatabase.Execute(stmt);
                 }
 
-                sScriptMgr->OnBattlegroundDesertion(player, BG_DESERTION_TYPE_NO_ENTER_BUTTON);
+                sScriptMgr->OnPlayerBattlegroundDesertion(player, BG_DESERTION_TYPE_NO_ENTER_BUTTON);
             }
 
             if (bg && bg->isArena() && (bg->GetStatus() == STATUS_IN_PROGRESS || bg->GetStatus() == STATUS_WAIT_JOIN))
-                sScriptMgr->OnBattlegroundDesertion(player, ARENA_DESERTION_TYPE_NO_ENTER_BUTTON);
+                sScriptMgr->OnPlayerBattlegroundDesertion(player, ARENA_DESERTION_TYPE_NO_ENTER_BUTTON);
 
             LOG_DEBUG("bg.battleground", "Battleground: removing player {} from bg queue for instance {} because of not pressing enter battle in time.", player->GetGUID().ToString(), m_BgInstanceGUID);
 

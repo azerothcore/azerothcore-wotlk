@@ -28,6 +28,8 @@
 #include "Transport.h"
 #include "World.h"
 #include "WorldPacket.h"
+#include "WorldSessionMgr.h"
+#include "WorldStatePackets.h"
 
 OutdoorPvPSI::OutdoorPvPSI()
 {
@@ -37,11 +39,12 @@ OutdoorPvPSI::OutdoorPvPSI()
     m_LastController = TEAM_NEUTRAL;
 }
 
-void OutdoorPvPSI::FillInitialWorldStates(WorldPacket& data)
+void OutdoorPvPSI::FillInitialWorldStates(WorldPackets::WorldState::InitWorldStates& packet)
 {
-    data << SI_GATHERED_A << m_Gathered_A;
-    data << SI_GATHERED_H << m_Gathered_H;
-    data << SI_SILITHYST_MAX << SI_MAX_RESOURCES;
+    packet.Worldstates.reserve(3);
+    packet.Worldstates.emplace_back(SI_GATHERED_A, m_Gathered_A);
+    packet.Worldstates.emplace_back(SI_GATHERED_H, m_Gathered_H);
+    packet.Worldstates.emplace_back(SI_SILITHYST_MAX, SI_MAX_RESOURCES);
 }
 
 void OutdoorPvPSI::SendRemoveWorldStates(Player* player)
@@ -102,7 +105,7 @@ bool OutdoorPvPSI::HandleAreaTrigger(Player* player, uint32 trigger)
                 if (m_Gathered_A >= SI_MAX_RESOURCES)
                 {
                     TeamApplyBuff(TEAM_ALLIANCE, SI_CENARION_FAVOR, 0, player);
-                    sWorld->SendZoneText(OutdoorPvPSIBuffZones[0], sObjectMgr->GetAcoreStringForDBCLocale(LANG_OPVP_SI_CAPTURE_A));
+                    sWorldSessionMgr->SendZoneText(OutdoorPvPSIBuffZones[0], sObjectMgr->GetAcoreStringForDBCLocale(LANG_OPVP_SI_CAPTURE_A));
                     m_LastController = TEAM_ALLIANCE;
                     m_Gathered_A = 0;
                     m_Gathered_H = 0;
@@ -128,7 +131,7 @@ bool OutdoorPvPSI::HandleAreaTrigger(Player* player, uint32 trigger)
                 if (m_Gathered_H >= SI_MAX_RESOURCES)
                 {
                     TeamApplyBuff(TEAM_HORDE, SI_CENARION_FAVOR, 0, player);
-                    sWorld->SendZoneText(OutdoorPvPSIBuffZones[0], sObjectMgr->GetAcoreStringForDBCLocale(LANG_OPVP_SI_CAPTURE_H));
+                    sWorldSessionMgr->SendZoneText(OutdoorPvPSIBuffZones[0], sObjectMgr->GetAcoreStringForDBCLocale(LANG_OPVP_SI_CAPTURE_H));
                     m_LastController = TEAM_HORDE;
                     m_Gathered_A = 0;
                     m_Gathered_H = 0;

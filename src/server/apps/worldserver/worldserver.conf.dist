@@ -4,7 +4,7 @@
 [worldserver]
 
 ###################################################################################################
-# SECTION INDEX-快速索引
+# SECTION INDEX
 #
 #  SERVER SYSTEM SETTINGS
 #    DATABASE & CONNECTIONS
@@ -67,6 +67,7 @@
 #    PLAYER DUMP
 #    CUSTOM
 #    DEBUG
+#    DYNAMIC RESPAWN SETTINGS
 #
 ###################################################################################################
 
@@ -80,15 +81,15 @@
 # DATABASE & CONNECTIONS
 #
 #    RealmID
-#        Description:使用此配置的RealmdID。
-#        重要提示:RealmID必须与auth数据库中的realmlist匹配。
+#        Description: ID of the Realm using this config.
+#        Important:   RealmID must match the realmlist inside the auth database.
 #        Default:     1
 
 RealmID = 1
 
 #
 #    WorldServerPort
-#        Description: world 服务器的TCP端口。
+#        Description: TCP port to reach the world server.
 #        Default:     8085
 
 WorldServerPort = 8085
@@ -104,7 +105,7 @@ BindIP = "0.0.0.0"
 #    LoginDatabaseInfo
 #    WorldDatabaseInfo
 #    CharacterDatabaseInfo
-#        Description: 世界服务器的数据库连接设置。
+#        Description: Database connection settings for the world server.
 #        Example:     "hostname;port;username;password;database"
 #                     ".;somenumber;username;password;database" - (Use named pipes on Windows
 #                                                                 "enable-named-pipe" to [mysqld]
@@ -115,17 +116,17 @@ BindIP = "0.0.0.0"
 #                     "127.0.0.1;3306;acore;acore;acore_world"      - (WorldDatabaseInfo)
 #                     "127.0.0.1;3306;acore;acore;acore_characters" - (CharacterDatabaseInfo)
 
-LoginDatabaseInfo     = "172.16.0.9;3306;root;A111111a!;auth"
-WorldDatabaseInfo     = "172.16.0.9;3306;root;A111111a!;world"
-CharacterDatabaseInfo = "172.16.0.9;3306;root;A111111a!;characters"
+LoginDatabaseInfo     = "127.0.0.1;3306;acore;acore;acore_auth"
+WorldDatabaseInfo     = "127.0.0.1;3306;acore;acore;acore_world"
+CharacterDatabaseInfo = "127.0.0.1;3306;acore;acore;acore_characters"
 
 #
 #    LoginDatabase.WorkerThreads
 #    WorldDatabase.WorkerThreads
 #    CharacterDatabase.WorkerThreads
-#        Description: 用于处理异步(延迟)MySQL语句的工作线程数量。
-#                     每个工作线程都有自己到MySQL服务器的连接。
-#                     和自己在MySQL服务器上的线程。
+#        Description: The amount of worker threads spawned to handle asynchronous (delayed) MySQL
+#                     statements. Each worker thread is mirrored with its own connection to the
+#                     MySQL server and their own thread on the MySQL server.
 #        Default:     1 - (LoginDatabase.WorkerThreads)
 #                     1 - (WorldDatabase.WorkerThreads)
 #                     1 - (CharacterDatabase.WorkerThreads)
@@ -149,7 +150,7 @@ CharacterDatabase.SynchThreads = 1
 
 #
 #    MaxPingTime
-#        Description: 数据库ping之间的时间(分钟)。
+#        Description: Time (in minutes) between database pings.
 #        Default:     30
 
 MaxPingTime = 30
@@ -158,9 +159,9 @@ MaxPingTime = 30
 #    Database.Reconnect.Seconds
 #    Database.Reconnect.Attempts
 #
-#        Description: 每次重新连接尝试之间间隔多少秒
-#                     以及总共将执行多少次尝试
-#        Default:     每15秒尝试20次
+#        Description: How many seconds between every reconnection attempt
+#                     and how many attempts will be performed in total
+#        Default:     20 attempts every 15 seconds
 #
 
 Database.Reconnect.Seconds = 15
@@ -202,8 +203,8 @@ TempDir = ""
 
 #
 #    CMakeCommand
-#        Description: CMake二进制文件的路径。
-#                     如果路径为空，则使用内置的CMAKE_COMMAND命令。
+#        Description: The path to your CMake binary.
+#                     If the path is left empty, the built-in CMAKE_COMMAND is used.
 #        Example:     "C:/Program Files/CMake/bin/cmake.exe"
 #                     "/usr/bin/cmake"
 #        Default:     ""
@@ -212,26 +213,26 @@ CMakeCommand = ""
 
 #
 #    BuildDirectory
-#        Description: 生成目录的路径。
-#                     如果路径为空，则使用内置的CMAKE_BINARY_DIR。
+#        Description: The path to your build directory.
+#                     If the path is left empty, the built-in CMAKE_BINARY_DIR is used.
 #        Example:     "../AzerothCore"
 #        Default:     ""
 
-BuildDirectory = "/home/server/"
+BuildDirectory = ""
 
 #
 #    SourceDirectory
-#        Description: AzerothCore源目录的路径。
-#                     如果路径为空，则使用内置的CMAKE_SOURCE_DIR。
+#        Description: The path to your AzerothCore source directory.
+#                     If the path is left empty, the built-in CMAKE_SOURCE_DIR is used.
 #        Example:     "../azerothcore-wotlk"
 #        Default:     ""
 
-SourceDirectory = "/home/azerothcore-wotlk"
+SourceDirectory = ""
 
 #
 #    MySQLExecutable
-#        Description: MySQL CLI 二进制文件的路径。
-#                     如果路径为空，则使用来自 cmake 的内置路径。
+#        Description: The path to your MySQL CLI binary.
+#                     If the path is left empty, built-in path from cmake is used.
 #        Example:     "C:/Program Files/MySQL/MySQL Server 8.0/bin/mysql.exe"
 #                     "mysql.exe"
 #                     "/usr/bin/mysql"
@@ -241,11 +242,11 @@ MySQLExecutable = ""
 
 #
 #    PidFile
-#        Description: 世界守护进程PID文件。
+#        Description: World daemon PID file.
 #        Example:     "./world.pid" - (Enabled)
 #        Default:     ""            - (Disabled)
 
-PidFile = "./world.pid"
+PidFile = ""
 
 #
 ###################################################################################################
@@ -262,7 +263,7 @@ Console.Enable = 1
 
 #
 #    BeepAtStart
-#        Description: 当世界服务器完成启动时发出哔声(Unix/Linux系统)。
+#        Description: Beep when the world server finished starting (Unix/Linux systems).
 #        Default:     1 - (Enabled)
 #                     0 - (Disabled)
 
@@ -270,7 +271,7 @@ BeepAtStart = 1
 
 #
 #    FlashAtStart
-#        Description: 当世界服务器完成启动时在任务栏中闪烁。(仅适用于Windows)
+#        Description: Flashes in taskbar when the world server finished starting. (Works on Windows only)
 #        Default:     1 - (Enabled)
 #                     0 - (Disabled)
 
@@ -285,12 +286,12 @@ FlashAtStart = 1
 #    Updates.EnableDatabases
 #        Description: A mask that describes which databases should be updated.
 #
-#        以下标志可用
-#           DATABASE_LOGIN     = 1, // 身份验证数据库
-#           DATABASE_CHARACTER = 2, // 角色数据库
-#           DATABASE_WORLD     = 4, // World数据库
+#        Following flags are available
+#           DATABASE_LOGIN     = 1, // Auth database
+#           DATABASE_CHARACTER = 2, // Character database
+#           DATABASE_WORLD     = 4, // World database
 #
-#        Default:     7 - (All enabled)
+#        Default:     7  - (All enabled)
 #                     4  - (Enable world only)
 #                     0  - (All disabled)
 
@@ -298,7 +299,7 @@ Updates.EnableDatabases = 7
 
 #
 #    Updates.AutoSetup
-#        Description: 自动填充空数据库。
+#        Description: Auto populate empty databases.
 #        Default:     1 - (Enabled)
 #                     0 - (Disabled)
 
@@ -306,8 +307,8 @@ Updates.AutoSetup   = 1
 
 #
 #    Updates.Redundancy
-#        Description: 通过哈希执行数据冗余检查
-#                     检测SQL更新上的更改并重新应用它。
+#        Description: Perform data redundancy checks through hashing
+#                     to detect changes on sql updates and reapply it.
 #        Default:     1 - (Enabled)
 #                     0 - (Disabled)
 
@@ -315,7 +316,7 @@ Updates.Redundancy  = 1
 
 #
 #    Updates.ArchivedRedundancy
-#        Description: 检查存档更新的哈希值(减慢启动)。
+#        Description: Check hashes of archived updates (slows down startup).
 #        Default:     0 - (Disabled)
 #                     1 - (Enabled)
 
@@ -323,8 +324,8 @@ Updates.ArchivedRedundancy = 0
 
 #
 #    Updates.AllowRehash
-#        Description: 如果当前文件散列为空，则将其插入到数据库中。
-#                     如果你想标记一个文件为应用，但你不知道它的哈希。
+#        Description: Inserts the current file hash in the database if it is left empty.
+#                     Useful if you want to mark a file as applied but you don't know its hash.
 #        Default:     1 - (Enabled)
 #                     0 - (Disabled)
 
@@ -333,9 +334,9 @@ Updates.AllowRehash = 1
 #
 #    Updates.CleanDeadRefMaxCount
 #        Description: Cleans dead/ orphaned references that occur if an update was removed or renamed and edited in one step.
-#                     它只在缺少更新的数量低于或等于更新的时候才开始清理.CleanDeadRefMaxCount value.
-#                     这样可以防止由于错误的源目录状态(可能是错误的分支或错误的修订)而删除更新历史。
-#                     如果您想知道数据库是否处于可能的"dirty state"，请禁用此选项。
+#                     It only starts the clean up if the count of the missing updates is below or equal the Updates.CleanDeadRefMaxCount value.
+#                     This way prevents erasing of the update history due to wrong source directory state (maybe wrong branch or bad revision).
+#                     Disable this if you want to know if the database is in a possible "dirty state".
 #        Default:     3 - (Enabled)
 #                     0 - (Disabled)
 #                    -1 - (Enabled - unlimited)
@@ -1118,17 +1119,6 @@ PreventAFKLogout = 0
 ###################################################################################################
 # PACKET SPOOF PROTECTION SETTINGS
 #
-# These settings determine which action to take when harmful packet spoofing is detected.
-#
-#    PacketSpoof.Policy
-#        Description: Determines the course of action when packet spoofing is detected.
-#        Values:     0 - Log only
-#                    1 - Log + kick
-#                    2 - Log + kick + ban
-
-PacketSpoof.Policy = 1
-
-#
 #    PacketSpoof.BanMode
 #        Description: If PacketSpoof.Policy equals 2, this will determine the ban mode.
 #        Values:     0 - Ban Account
@@ -1154,7 +1144,7 @@ PacketSpoof.BanDuration = 86400
 # WARDEN SETTINGS
 #
 #    Warden.Enabled
-#        Description: 启用Warden反作弊系统.
+#        Description: Enable Warden anti-cheat system.
 #        Default:     1 - (Enabled)
 #                     0 - (Disabled)
 
@@ -1162,7 +1152,7 @@ Warden.Enabled = 1
 
 #
 #    Warden.NumMemChecks
-#        Description: 每个周期发送到客户端的Warden内存检查数。
+#        Description: Number of Warden memory checks that are sent to the client each cycle.
 #        Default:     3 - (Enabled)
 #                     0 - (Disabled)
 
@@ -1170,7 +1160,7 @@ Warden.NumMemChecks = 3
 
 #
 #    Warden.NumLuaChecks
-#        Description: 每个周期发送到客户端的Warden LUA检查的数量。
+#        Description: Number of Warden LUA checks that are sent to the client each cycle.
 #        Default:     1 - (Enabled)
 #                     0 - (Disabled)
 
@@ -1178,8 +1168,8 @@ Warden.NumLuaChecks = 1
 
 #
 #    Warden.NumOtherChecks
-#        Description: 除了已添加到请求中的内存检查以外，其他Warden检查数量
-#                     每个检查周期。
+#        Description: Number of Warden checks other than memory checks that are added to request
+#                     each checking cycle.
 #        Default:     7 - (Enabled)
 #                     0 - (Disabled)
 
@@ -1187,16 +1177,16 @@ Warden.NumOtherChecks = 7
 
 #
 #    Warden.ClientResponseDelay
-#        Description: 客户端因无响应而断开连接之前的时间（以秒为单位）。
+#        Description: Time (in seconds) before client is getting disconnecting for not responding.
 #        Default:     600 - (10 Minutes)
-#                     0 - (Disabled, 客户端不会被踢)
+#                     0 - (Disabled, client won't be kicked)
 
 Warden.ClientResponseDelay = 600
 
 #
 #    Warden.ClientCheckHoldOff
-#        Description: 发送下一个检查请求到客户端之前等待的时间(秒)。
-#                     较低的数字会增加客户端和服务器端的流量和负载。
+#        Description: Time (in seconds) to wait before sending the next check request to the client.
+#                     A low number increases traffic and load on client and server side.
 #        Default:     30 - (30 Seconds)
 #                     0  - (Send check as soon as possible)
 
@@ -1204,19 +1194,19 @@ Warden.ClientCheckHoldOff = 30
 
 #
 #    Warden.ClientCheckFailAction
-#        Description: 如果客户端检查失败，将采取默认操作。
-#                     通过角色数据库中的warden_action表，
-#                     可以覆盖每个检查的动作。
-#        Default:     0 - (Disabled, 仅记录)
-#                     1 - (踢)
-#                     2 - (禁止)
+#        Description: Default action being taken if a client check failed. Actions can be
+#                     overwritten for each single check via warden_action table in characters
+#                     database.
+#        Default:     0 - (Disabled, Logging only)
+#                     1 - (Kick)
+#                     2 - (Ban)
 
-Warden.ClientCheckFailAction = 1
+Warden.ClientCheckFailAction = 0
 
 #
 #    Warden.BanDuration
-#        Description: 如果设置了禁用ClientCheckFailAction，
-#                     则该帐户将被禁用的时间(秒)。 
+#        Description: Time (in seconds) an account will be banned if ClientCheckFailAction is set
+#                     to ban.
 #        Default:     86400 - (24 hours)
 #                     0     - (Permanent ban)
 
@@ -2819,7 +2809,7 @@ MonsterSight = 50.000000
 
 #
 #    Rate.Creature.Aggro
-#        Description: 仇恨半径百分比。
+#        Description: Aggro radius percentage.
 #        Default:     1   - (Enabled, 100%)
 #                     1.5 - (Enabled, 150%)
 #                     0   - (Disabled, 0%)
@@ -2828,7 +2818,7 @@ Rate.Creature.Aggro = 1
 
 #
 #    CreatureFamilyFleeAssistanceRadius
-#        Description: 逃离的生物向其他生物寻求帮助的距离。
+#        Description: Distance for fleeing creatures seeking assistance from other creatures.
 #        Default:     30 - (Enabled)
 #                     0  - (Disabled)
 
@@ -2836,8 +2826,8 @@ CreatureFamilyFleeAssistanceRadius = 30
 
 #
 #    CreatureFamilyAssistanceRadius
-#        Description: 生物在不移动的情况下
-#                     向其他生物求救的距离。
+#        Description: Distance for creatures calling for assistance from other creatures without
+#                     moving.
 #        Default:     10 - (Enabled)
 #                     0  - (Disabled)
 
@@ -2845,30 +2835,30 @@ CreatureFamilyAssistanceRadius = 10
 
 #
 #    CreatureFamilyAssistanceDelay
-#        Description: 生物发出援助呼叫前的时间(以毫秒为单位)。
-#        Default:     2000 - (2 秒)
+#        Description: Time (in milliseconds) before creature assistance call.
+#        Default:     2000 - (2 Seconds)
 
 CreatureFamilyAssistanceDelay = 2000
 
 #
 #    CreatureFamilyAssistancePeriod
-#        Description: 下一次生物援助呼叫前的时间(以毫秒为单位)。
-#        Default:     3000 - (3 秒)
+#        Description: Time (in milliseconds) before next creature assistance call.
+#        Default:     3000 - (3 Seconds)
 #                     0    - (Disabled)
 
 CreatureFamilyAssistancePeriod = 3000
 
 #
 #    CreatureFamilyFleeDelay
-#        Description: 在没有帮助的情况下，
-#                     生物可以逃跑的时间(以毫秒为单位)。
-#        Default:     7000 (7 秒)
+#        Description: Time (in milliseconds) during which creature can flee if no assistance was
+#                     found.
+#        Default:     7000 (7 Seconds)
 
 CreatureFamilyFleeDelay = 7000
 
 #
 #    WorldBossLevelDiff
-#        Description: 世界BOSS的等级差异
+#        Description: World boss level difference.
 #        Default:     3
 
 WorldBossLevelDiff = 3
@@ -2879,7 +2869,7 @@ WorldBossLevelDiff = 3
 #    Corpse.Decay.ELITE
 #    Corpse.Decay.RAREELITE
 #    Corpse.Decay.WORLDBOSS
-#        Description: 生物尸体在没有被掠夺或剥皮的情况下腐烂的时间(秒)。
+#        Description: Time (in seconds) until creature corpse will decay if not looted or skinned.
 #        Default:     60   - (1 Minute, Corpse.Decay.NORMAL)
 #                     300  - (5 Minutes, Corpse.Decay.RARE)
 #                     300  - (5 Minutes, Corpse.Decay.ELITE)
@@ -2894,7 +2884,7 @@ Corpse.Decay.WORLDBOSS = 3600
 
 #
 #    Rate.Corpse.Decay.Looted
-#        Description: Corpse.Decay.* 的倍数，用于配置生物尸体停留的时间
+#        Description: Multiplier for Corpse.Decay.* to configure how long creature corpses stay
 #                     after they have been looted.
 #         Default:    0.5
 
@@ -2906,7 +2896,7 @@ Rate.Corpse.Decay.Looted = 0.5
 #    Rate.Creature.Elite.RARE.Damage
 #    Rate.Creature.Elite.RAREELITE.Damage
 #    Rate.Creature.Elite.WORLDBOSS.Damage
-#        Description: 生物近战伤害的倍数。
+#        Description: Multiplier for creature melee damage.
 #        Default:     1 - (Rate.Creature.Normal.Damage)
 #                     1 - (Rate.Creature.Elite.Elite.Damage)
 #                     1 - (Rate.Creature.Elite.RARE.Damage)
@@ -2926,7 +2916,7 @@ Rate.Creature.Elite.WORLDBOSS.Damage = 1
 #    Rate.Creature.Elite.RARE.SpellDamage
 #    Rate.Creature.Elite.RAREELITE.SpellDamage
 #    Rate.Creature.Elite.WORLDBOSS.SpellDamage
-#        Description: 生物法术伤害的倍数。
+#        Description: Multiplier for creature spell damage.
 #        Default:     1 - (Rate.Creature.Normal.SpellDamage)
 #                     1 - (Rate.Creature.Elite.Elite.SpellDamage)
 #                     1 - (Rate.Creature.Elite.RARE.SpellDamage)
@@ -2945,7 +2935,7 @@ Rate.Creature.Elite.WORLDBOSS.SpellDamage = 1
 #    Rate.Creature.Elite.RARE.HP
 #    Rate.Creature.Elite.RAREELITE.HP
 #    Rate.Creature.Elite.WORLDBOSS.HP
-#        Description: 生物生命值的倍数。
+#        Description: Multiplier for creature health.
 #        Default:     1 - (Rate.Creature.Normal.HP)
 #                     1 - (Rate.Creature.Elite.Elite.HP)
 #                     1 - (Rate.Creature.Elite.RARE.HP)
@@ -2960,52 +2950,52 @@ Rate.Creature.Elite.WORLDBOSS.HP = 1
 
 #
 #    ListenRange.Say
-#        Description: 玩家能够阅读来自生物
-#                     或游戏物体的信息的距离。
+#        Description: Distance in which players can read say messages from creatures or
+#                     gameobjects.
 #        Default:     40
 
 ListenRange.Say = 40
 
 #
 #    ListenRange.TextEmote
-#        Description: 玩家可以从生物或游戏对象中读取情感的距离。
+#        Description: Distance in which players can read emotes from creatures or gameobjects.
 #        Default:     40
 
 ListenRange.TextEmote = 40
 
 #
 #    ListenRange.Yell
-#        Description: 玩家可以阅读来自生物
-#                     或游戏物体的吼叫信息的距离。
+#        Description: Distance in which players can read yell messages from creatures or
+#                     gameobjects.
 #        Default:     300
 
 ListenRange.Yell = 300
 
 #
 #    Creature.MovingStopTimeForPlayer
-#        Description: 与玩家互动后生物不移动的时间
-#                     (以毫秒计)。
+#        Description: Time (in milliseconds) during which creature will not move after
+#                     interaction with player.
 #        Default: 180000
 
 Creature.MovingStopTimeForPlayer = 180000
 
 #    WaypointMovementStopTimeForPlayer
-#        Description: 指定路径点移动生物在玩家与之交互后等待的时间
-#                     (以秒为单位)。
+#        Description: Specifies the time (in seconds) that a creature with waypoint
+#                     movement will wait after a player interacts with it.
 #        default:     120
 
 WaypointMovementStopTimeForPlayer = 120
 
 #    NpcEvadeIfTargetIsUnreachable
-#        Description: 指定一个生物被攻击的时间(以秒为单位)
-#                     无法进入逃避模式。
+#        Description: Specifies the time (in seconds) that a creature whom target
+#                     is unreachable to end up in evade mode.
 #        Default:     5
 
 NpcEvadeIfTargetIsUnreachable = 5
 
 #    NpcRegenHPIfTargetIsUnreachable
-#        Description: 在副本中，如果生物不能到达目标，将恢复他们的生命值。
-#                     如果您遇到mmap /路径问题，请保持禁用。
+#        Description: Regenerates HP for Creatures in Raids if they cannot reach the target.
+#                     Keep disabled if you are experiencing mmaps/pathing issues.
 #
 #        Default:     1 - (Enabled)
 #                     0 - (Disabled)
@@ -3013,17 +3003,17 @@ NpcEvadeIfTargetIsUnreachable = 5
 NpcRegenHPIfTargetIsUnreachable = 1
 
 #    NpcRegenHPTimeIfTargetIsUnreachable
-#        Description: 指定攻击目标的时间(以秒为单位)
-#                     在团队中无法到达以恢复生命值。
+#        Description: Specifies the time (in seconds) that a creature whom target
+#                     is unreachable in raid to end up regenerate health.
 #        Default:     10
 
 NpcRegenHPTimeIfTargetIsUnreachable = 10
 
 #    Creatures.CustomIDs
-#        Description: 自定义生物的列表与八卦对话硬编码在核心，
-#                     用","分隔，不带空格。
-#                     这意味着你不需要使用来自"gossip_menu"表的数据来处理这些NPC对话。
-#                     服务器将在定义验证过程中跳过这些id。
+#        Description: The list of custom creatures with gossip dialogues hardcoded in core,
+#                     divided by "," without spaces.
+#                     It is implied that you do not use for these NPC dialogs data from "gossip_menu" table.
+#                     Server will skip these IDs during the definitions validation process.
 #        Example:     Creatures.CustomIDs = "190010,55005,999991,25462,98888,601014" - Npcs for Transmog, Guild-zone, 1v1-arena, Skip Dk,
 #                                                                                      Racial Trait Swap, NPC - All Mounts Modules
 #        Default:     ""
@@ -3044,7 +3034,7 @@ Creatures.CustomIDs = "190010,55005,999991,25462,98888,601014,34567,34568"
 #    Rate.SellValue.Item.Legendary
 #    Rate.SellValue.Item.Artifact
 #    Rate.SellValue.Item.Heirloom
-#        Description: 物品销售基于销售价值的价值比率。
+#        Description: Item Sale Value rates based on quality.
 #        Default:     1 - (Rate.SellValue.Item.Poor)
 #                     1 - (Rate.SellValue.Item.Normal)
 #                     1 - (Rate.SellValue.Item.Uncommon)
@@ -3072,7 +3062,7 @@ Rate.SellValue.Item.Heirloom         = 1
 #    Rate.BuyValue.Item.Legendary
 #    Rate.BuyValue.Item.Artifact
 #    Rate.BuyValue.Item.Heirloom
-#        Description: 物品销售基于质量的价值比率。
+#        Description: Item Sale Value rates based on quality.
 #        Default:     1 - (Rate.BuyValue.Item.Poor)
 #                     1 - (Rate.BuyValue.Item.Normal)
 #                     1 - (Rate.BuyValue.Item.Uncommon)
@@ -3093,7 +3083,7 @@ Rate.BuyValue.Item.Heirloom         = 1
 
 #
 #    Rate.RepairCost
-#        Description: 维修成本率。
+#        Description: Repair cost rate.
 #        Default:     1
 
 Rate.RepairCost = 1
@@ -3171,10 +3161,10 @@ Instance.ResetTimeRelativeTimestamp = 1135814400
 
 #
 #    Rate.InstanceResetTime
-#        Description: 全局raid/英雄实例重置的倍数(dbc值)。 
-#                     数值越大，重置间隔时间越长，
-#                     数值越低，时间越短，
-#                     你需要在characters db中清除instance_reset，以便让新值工作。
+#        Description: Multiplier for the rate between global raid/heroic instance resets
+#                     (dbc value). Higher value increases the time between resets,
+#                     lower value lowers the time, you need clean instance_reset in
+#                     characters db in order to let new values work.
 #        Default:     1
 
 Rate.InstanceResetTime = 1
@@ -3396,7 +3386,7 @@ Guild.BankInitialTabs = 0
 
 #
 #     Guild.BankTabCost0-5
-#        Description: 改变公会标签的价格。请注意，客户端仍将显示默认值。
+#        Description: Changes the price of the guild tabs. Note that the client will still show the default values.
 #        Default:     1000000  - (100 Gold)
 #                     2500000  - (250 Gold)
 #                     5000000  - (500 Gold)
@@ -3494,7 +3484,7 @@ Wintergrasp.CrashRestartTimer = 10
 # BATTLEGROUND
 #
 #    Battleground.CastDeserter
-#        Description: 对正在离开战场的玩家施放逃兵debuff。
+#        Description: Cast Deserter spell at players who leave battlegrounds in progress.
 #        Default:     1 - (Enabled)
 #                     0 - (Disabled)
 
@@ -3502,7 +3492,7 @@ Battleground.CastDeserter = 1
 
 #
 #    Battleground.QueueAnnouncer.Enable
-#        Description: 在聊天频道中宣布战场队列状态。
+#        Description: Announce battleground queue status to chat.
 #        Default:     0 - (Disabled)
 #                     1 - (Enabled)
 
@@ -3510,11 +3500,11 @@ Battleground.QueueAnnouncer.Enable = 0
 
 #
 #    Battleground.QueueAnnouncer.Limit.MinLevel
-#        Description: 从某个级别开始限制 QueueAnnouncer。
-#                     当有限时，它只有在至少有 MinPlayers 排队时才会宣布（见下文）
-#                     80级只限制RBG，低级只限制战歌峡谷。
-#        Default:     0 - (Disabled, 没有限制)
-#                     10 - (Enabled for all, 因为BGs从10开始)
+#        Description: Limit the QueueAnnouncer starting from a certain level.
+#                     When limited, it announces only if there are at least MinPlayers queued (see below)
+#                     At 80 it only limits RBG, at lower level only limits Warsong Gulch.
+#        Default:     0 - (Disabled, no limits)
+#                     10 - (Enabled for all, because BGs start at 10)
 #                     20 - (Enabled for 20 and higher)
 #                     80 - (Enabled only for 80)
 
@@ -3522,15 +3512,15 @@ Battleground.QueueAnnouncer.Limit.MinLevel = 0
 
 #
 #    Battleground.QueueAnnouncer.Limit.MinPlayers
-#        Description: 当 Battleground.QueueAnnouncer.Limit.MinLevel 限制被启用时（不是 0）
-#                     仅在至少有 MinPlayers 排队时显示。
-#        Default:     3 - (仅在 3 个或更多玩家排队时显示)
+#        Description: When the Battleground.QueueAnnouncer.Limit.MinLevel limit is enabled (not 0)
+#                     only show when at least MinPlayers are queued.
+#        Default:     3 - (Show only when 3 or more players are queued)
 
 Battleground.QueueAnnouncer.Limit.MinPlayers = 3
 
 #
 #    Battleground.QueueAnnouncer.SpamProtection.Delay
-#        Description: 如果玩家在 sec 后重新加入队列，则显示通知
+#        Description: Show announce if player rejoined in queue after sec
 #        Default:     30
 #
 
@@ -3538,24 +3528,24 @@ Battleground.QueueAnnouncer.SpamProtection.Delay = 30
 
 #
 #    Battleground.QueueAnnouncer.PlayerOnly
-#        Description: 战场队列公告类型。
-#        Default:     0 - (系统消息，任何人都可以看到)
-#                     1 - (私人的，只有排队的玩家才能看到它)
+#        Description: Battleground queue announcement type.
+#        Default:     0 - (System message, Anyone can see it)
+#                     1 - (Private, Only queued players can see it)
 
-Battleground.QueueAnnouncer.PlayerOnly = 1
+Battleground.QueueAnnouncer.PlayerOnly = 0
 
 #
 #    Battleground.QueueAnnouncer.Timed
-#        Description: 启用基于计时器的战场队列公告
+#        Description: Enabled battleground queue announcements based on timer
 #        Default:     0 - (Disabled)
-#                     1 - (启用 - 设置 Arena.QueueAnnouncer.Timer)
+#                     1 - (Enabled - Set Arena.QueueAnnouncer.Timer)
 #
 
-Battleground.QueueAnnouncer.Timed = 1
+Battleground.QueueAnnouncer.Timed = 0
 
 #
 #    Battleground.QueueAnnouncer.Timer
-#        Description: 设置队列公告定时器
+#        Description: Set timer for queue announcements
 #        Default:     30000 (30 sec)
 #
 
@@ -3563,47 +3553,47 @@ Battleground.QueueAnnouncer.Timer = 30000
 
 #
 #    Battleground.PrematureFinishTimer
-#        Description: 如果有的话，战场提前结束的时间(毫秒)
-#                     一个队的队员不够多。(数值在战场模板中定义)
-#        Default:     300000 - (Enabled, 5 分钟)
-#                     0      - (Disabled, 不建议)
+#        Description: Time (in milliseconds) before battleground will end prematurely if there are
+#                     not enough players on one team. (Values defined in battleground template)
+#        Default:     300000 - (Enabled, 5 minutes)
+#                     0      - (Disabled, Not recommended)
 
 Battleground.PrematureFinishTimer = 300000
 
 #
 #    Battleground.PremadeGroupWaitForMatch
-#        Description: 一个预先制作的群组必须等待其他派别的匹配群组。
-#                     时间(以毫秒为单位)
-#        Default:     1800000 - (Enabled, 30 分钟)
-#                     0       - (Disabled, 不建议)
+#        Description: Time (in milliseconds) a pre-made group has to wait for matching group of the
+#                     other faction.
+#        Default:     1800000 - (Enabled, 30 minutes)
+#                     0       - (Disabled, Not recommended)
 
 Battleground.PremadeGroupWaitForMatch = 1800000
 
 #
 #    Battleground.GiveXPForKills
-#        Description: 在战场上获得荣誉击杀的经验。
+#        Description: Give experience for honorable kills in battlegrounds.
 #        Default:     0 - (Disabled)
 #                     1 - (Enabled)
 
-Battleground.GiveXPForKills = 1
+Battleground.GiveXPForKills = 0
 
 #
 #    Battleground.Random.ResetHour
-#        Description: 全局副本重置发生的一天中的某个小时。
+#        Description: Hour of the day when the global instance resets occur.
 #        Range:       0-23
 #        Default:     6 - (06:00 AM)
 
 Battleground.Random.ResetHour = 6
 
 #    Battleground.StoreStatistics.Enable
-#        Description: 在数据库中存储战场得分。
+#        Description: Store Battleground scores in the database.
 #        Default:     0 - (Disabled)
 #                     1 - (Enabled)
 
 Battleground.StoreStatistics.Enable = 0
 
 #    Battleground.TrackDeserters.Enable
-#        Description: 追踪战场上的逃兵。
+#        Description: Track deserters of Battlegrounds.
 #        Default:     0 - (Disabled)
 #                     1 - (Enabled)
 
@@ -3611,32 +3601,32 @@ Battleground.TrackDeserters.Enable = 0
 
 #
 #    Battleground.InvitationType
-#        Description: 设置战场邀请类型。
-#        Default:     0 - (正常情况下，邀请的玩家数量和排队的一样多，
-#                          不要在意平衡)
-#                     1 - (实验性，不允许邀请更多玩家
-#                          同一个阵营)
-#                     2 - (实验性的，试着让团队更均衡)
+#        Description: Set Battleground invitation type.
+#        Default:     0 - (Normal, Invite as much players to battlegrounds as queued,
+#                          Don't bother with balance)
+#                     1 - (Experimental, Don't allow to invite much more players
+#                          of one faction)
+#                     2 - (Experimental, Try to have even teams)
 
 Battleground.InvitationType = 0
 
 #
 #    Battleground.ReportAFK.Timer
-#         Description: 战斗开始几分钟后，你可以投票玩家。
+#         Description: After a few minutes that battle started you can report the player.
 #         Default:     4
 
 Battleground.ReportAFK.Timer = 4
 
 #
 #    Battleground.ReportAFK
-#        Description: 将某人从战场上踢出AFK所需的投票数量。
+#        Description: Number of reports needed to kick someone AFK from Battleground.
 #        Range:       1-9
 #        Default:     3
 
 Battleground.ReportAFK = 3
 
 #    Battleground.DisableQuestShareInBG
-#        Description: 禁止在战场上共享任务。
+#        Description: Disables the ability to share quests while in a Battleground.
 #        Default:     0 - (Disabled)
 #                     1 - (Enabled)
 
@@ -3644,7 +3634,7 @@ Battleground.DisableQuestShareInBG = 0
 
 #
 #    Battleground.DisableReadyCheckInBG
-#        Description: 在战场上禁用发送一个就绪检查调查的能力。
+#        Description: Disables the ability to send a Ready Check survey while in a Battleground.
 #        Default:     0 - (Disabled)
 #                     1 - (Enabled)
 
@@ -3657,7 +3647,7 @@ Battleground.DisableReadyCheckInBG = 0
 #     Battleground.RewardWinnerArenaLast
 #     Battleground.RewardLoserHonorFirst
 #     Battleground.RewardLoserHonorLast
-#        Description: 随机战场/召唤武器奖励
+#        Description: Random Battlegrounds / call to the arms rewards
 #        Default:     30 - Battleground.RewardWinnerHonorFirst
 #                     25 - Battleground.RewardWinnerArenaFirst
 #                     15 - Battleground.RewardWinnerHonorLast
@@ -3675,28 +3665,28 @@ Battleground.RewardLoserHonorLast   = 5
 
 #
 #    Battleground.PlayerRespawn
-#        Description: 战场玩家复活间隔（以秒为单位）。
+#        Description: Battleground player resurrection interval (in seconds).
 #        Default:     30
 
 Battleground.PlayerRespawn = 30
 
 #
 #    Battleground.RestorationBuffRespawn
-#        Description: 战场恢复buff重生时间（以秒为单位）。
+#        Description: Battleground restoration buff respawn time (in seconds).
 #        Default:     20 (Recommended 10+)
 
 Battleground.RestorationBuffRespawn = 20
 
 #
 #    Battleground.BerserkingBuffRespawn
-#        Description: 战场狂暴buff重生时间（以秒为单位）。
+#        Description: Battleground berserking buff respawn time (in seconds).
 #        Default:     120 (Recommended 10+)
 
 Battleground.BerserkingBuffRespawn = 120
 
 #
 #    Battleground.SpeedBuffRespawn
-#        Description: 战场速度buff重生时间（以秒为单位）。
+#        Description: Battleground speed buff respawn time (in seconds).
 #        Default:     150 (Recommended 10+)
 
 Battleground.SpeedBuffRespawn = 150
@@ -3709,13 +3699,57 @@ Battleground.SpeedBuffRespawn = 150
 Battleground.Override.LowLevels.MinPlayers = 0
 
 #
+#    Battleground.Warsong.Flags
+#        Description: Set the number of flags required for a team to win in Warsong battleground
+#        Default:     3 (Blizzlike)
+#                     1 (Minimum)
+
+Battleground.Warsong.Flags = 3
+
+#
+#    Battleground.Arathi.CapturePoints
+#        Description: Set the number of capture points required for a team to win in Arathi battleground
+#        Default:     1600 (WotLK)
+#                     2000 (Vanilla)
+
+Battleground.Arathi.CapturePoints = 1600
+
+#
+#    Battleground.Alterac.Reinforcements
+#        Description: Set the number of total reinforcements for each teams in Alterac battleground
+#                     (It is necessary to restart the server after changing the Reinforcements value)
+#        Default:     600 (Enabled, WotLK)
+#                     500 (Enabled, MoP)
+#                     0   (Disabled, early Vanilla, victory only on boss death)
+
+Battleground.Alterac.Reinforcements = 600
+
+#
+#    Battleground.Alterac.ReputationOnBossDeath
+#        Description: Set the number of rep point given for a boss killed in Alterac battleground
+#                     (It is necessary to restart the server after changing the ReputationOnBossDeath value)
+#        Default:     350 (WotLK)
+#                     389 (Vanilla)
+
+Battleground.Alterac.ReputationOnBossDeath = 350
+
+#
+#    Battleground.EyeOfTheStorm.CapturePoints
+#        Description: Set the number of capture points required for a team to win in Eye of the Storm battleground
+#                     (The UI part of the max team score will not be compliant with this parameter without client modification)
+#        Default:     1600 (WotLK, UI compliant)
+#                     2000 (TBC, not UI compliant)
+
+Battleground.EyeOfTheStorm.CapturePoints = 1600
+
+#
 ###################################################################################################
 
 ###################################################################################################
 # ARENA
 #
 #    Arena.MaxRatingDifference
-#        Description: 两队在评分比赛中的最大评分差异。
+#        Description: Maximum rating difference between two teams in rated matches.
 #        Default:     150 - (Enabled)
 #                     0   - (Disabled)
 
@@ -3723,16 +3757,16 @@ Arena.MaxRatingDifference = 150
 
 #
 #    Arena.RatingDiscardTimer
-#        Description: 设置匹配时忽略评级差异的时间
-#                     (以毫秒为单位)。
-#        Default:     600000 - (Enabled, 10 分钟)
+#        Description: Time (in milliseconds) after which rating differences are ignored when
+#                     setting up matches.
+#        Default:     600000 - (Enabled, 10 minutes)
 #                     0      - (Disabled)
 
 Arena.RatingDiscardTimer = 600000
 
 #
 #    Arena.PreviousOpponentsDiscardTimer
-#        Description: 忽略之前的对手的时间（以毫秒为单位）。
+#        Description: Time (in milliseconds) after which the previous opponents will be ignored.
 #        Default:     120000 - (Enabled, 2 minutes - Blizzlike)
 #                     0      - (Disabled)
 
@@ -3740,7 +3774,7 @@ Arena.PreviousOpponentsDiscardTimer = 120000
 
 #
 #    Arena.AutoDistributePoints
-#        Description: 自动分配竞技场点数。
+#        Description: Automatically distribute arena points.
 #        Default:     0 - (Disabled)
 #                     1 - (Enabled)
 
@@ -3748,26 +3782,26 @@ Arena.AutoDistributePoints = 0
 
 #
 #    Arena.AutoDistributeInterval
-#        Description: 时间(以天为单位)如果启用了自动分配，
-#                     竞技场点数应该多久分配一次。
+#        Description: Time (in days) how often arena points should be distributed if automatic
+#                     distribution is enabled.
 #        Default:     7 - (Weekly)
 
 Arena.AutoDistributeInterval = 7
 
 #
 #    Arena.GamesRequired
-#        Description: 参赛队伍必须参加多少场比赛才有资格获得竞技场积分。
+#        Description: Number of arena matches teams must participate in to be eligible for arena point distribution.
 #        Default:     10
 
 Arena.GamesRequired = 10
 
 #
 #    Arena.QueueAnnouncer.Enable
-#        Description: 宣布竞技场队列状态到聊天频道。
+#        Description: Announce arena queue status to chat.
 #        Default:     0 - (Disabled)
 #                     1 - (Enabled)
 
-Arena.QueueAnnouncer.Enable = 1
+Arena.QueueAnnouncer.Enable = 0
 
 #
 #    Arena.QueueAnnouncer.PlayerOnly
@@ -3776,7 +3810,7 @@ Arena.QueueAnnouncer.Enable = 1
 #                     1 - (Private, Only queued players can see it)
 #
 
-Arena.QueueAnnouncer.PlayerOnly = 1
+Arena.QueueAnnouncer.PlayerOnly = 0
 
 #
 #    Arena.QueueAnnouncer.Detail
@@ -3790,69 +3824,54 @@ Arena.QueueAnnouncer.PlayerOnly = 1
 Arena.QueueAnnouncer.Detail = 3
 
 #
-#    Arena.ArenaSeason.ID
-#        Description: 当前竞技场赛季id显示在客户端。
-#        Default:     8
-
-Arena.ArenaSeason.ID = 1
-
-#
-#    Arena.ArenaSeason.InProgress
-#        Description: 当前竞技场赛季的状态。
-#        Default:     1 - (进行中)
-#                     0 - (完结)
-
-Arena.ArenaSeason.InProgress = 1
-
-#
 #    Arena.ArenaStartRating
-#        Description: 为新的竞技场队伍开始评分。
+#        Description: Start rating for new arena teams.
 #        Default:     0
 
 Arena.ArenaStartRating = 0
 
 #
 #    Arena.ArenaStartPersonalRating
-#        Description: 加入团队时开始个人评分。
+#        Description: Start personal rating when joining a team.
 #        Default:     0
 
 Arena.ArenaStartPersonalRating = 0
 
 #
 #    Arena.ArenaStartMatchmakerRating
-#        Description: 玩家初始评分。
+#        Description: Start matchmaker rating for players.
 #        Default:     1500
 
 Arena.ArenaStartMatchmakerRating = 1500
 
 #
 #    Arena.ArenaWinRatingModifier1
-#        Description: 当获胜队伍的评分低于1300时，
-#                     注意从1000到1300会自动减少一半评分
-#                     (增加这个值会得到更高的评分)。
+#        Description: Modifier of rating addition when winner team rating is less than 1300
+#                     be aware that from 1000 to 1300 it gradually decreases automatically down to the half of it
+#                     (increasing this value will give more rating)
 #        Default:     48
 
 Arena.ArenaWinRatingModifier1 = 48
 
 #
 #    Arena.ArenaWinRatingModifier2
-#        Description: 当获胜团队的等级等于或超过1300时，等级增加的修正值
-#                     (增加这个值会增加等级) 
+#        Description: Modifier of rating addition when winner team rating is equal or more than 1300
+#                     (increasing this value will give more rating)
 #        Default:     24
 
 Arena.ArenaWinRatingModifier2 = 24
 
 #
 #    Arena.ArenaLoseRatingModifier
-#        Description: 失败者团队的减分修改项
-#                     (增加此值将减少更多评级)
+#        Description: Modifier of rating subtraction for loser team
+#                     (increasing this value will subtract more rating)
 #        Default:     24
 
 Arena.ArenaLoseRatingModifier = 24
 
 #
 #    Arena.ArenaMatchmakerRatingModifier
-#        Description: 评分等级调整
+#        Description: Modifier of matchmaker rating
 #        Default:     24
 
 Arena.ArenaMatchmakerRatingModifier = 24
@@ -3893,7 +3912,7 @@ MailDeliveryDelay = 3600
 
 #
 #     LevelReq.Mail
-#        Description:角色可以发送和接收邮件的等级要求。
+#        Description: Level requirement for characters to be able to send and receive mails.
 #        Default:     1
 
 LevelReq.Mail = 1
@@ -3931,15 +3950,15 @@ IsPreloadedContinentTransport.Enabled = 0
 # CHAT CHANNEL
 #
 #    StrictChannelNames
-#        Description: 将通道名限制为语言特定的符号集。
-#                     防止使用不允许的符号创建频道。
-#        Default:     0 - (禁用，有限的服务器时区依赖的客户端检查)
-#                     1 - (启用，严格的基本拉丁字符)
-#                     2 - (启用，严格指定领域区域，请参见RealmZone设置，
-#                         注意:客户端需要安装支持的字体
-#                         字符集。对于非官方的本地化，需要自定义字体
-#                         放置在clientdir/Fonts中.
-#                     3 - (启用，基本拉丁字符+服务器时区特定)
+#        Description: Limit channel names to language specific symbol set.
+#                     Prevents charter creation if not allowed symbols are used.
+#        Default:     0 - (Disable, Limited server timezone dependent client check)
+#                     1 - (Enabled, Strictly basic Latin characters)
+#                     2 - (Enabled, Strictly realm zone specific, See RealmZone setting,
+#                         Note: Client needs to have the appropriate fonts installed which support
+#                         the charset. For non-official localization, custom fonts need to be
+#                         placed in clientdir/Fonts.
+#                     3 - (Enabled, Basic Latin characters + server timezone specific)
 
 StrictChannelNames = 0
 
@@ -4248,27 +4267,27 @@ ChangeFaction.MaxMoney = 0
 ###################################################################################################
 
 ###################################################################################################
-# RECRUIT A FRIEND/招募朋友
+# RECRUIT A FRIEND
 #
 #    RecruitAFriend.MaxLevel
-#        Description: 角色可以从招募朋友经验倍数中
-#                     获益的最高等级。
+#        Description: Highest level up to which a character can benefit from the Recruit-A-Friend
+#                     experience multiplier.
 #        Default:     60
 
 RecruitAFriend.MaxLevel = 60
 
 #
 #    RecruitAFriend.MaxDifference
-#        Description: 招募朋友和角色受益之间的最大等级差
-#                     招募朋友的经验倍数。
+#        Description: Highest level difference between linked Recruiter and Friend benefit from
+#                     the Recruit-A-Friend experience multiplier.
 #        Default:     4
 
 RecruitAFriend.MaxDifference = 4
 
 #
 #    MaxRecruitAFriendBonusDistance
-#        Description: 人物和团队之间的最大距离，
-#                     以获得招募朋友的经验值倍数。
+#        Description: Max distance between character and and group to gain the Recruit-A-Friend
+#                     XP multiplier.
 #        Default:     100
 
 MaxRecruitAFriendBonusDistance = 100
@@ -4277,10 +4296,10 @@ MaxRecruitAFriendBonusDistance = 100
 ###################################################################################################
 
 ###################################################################################################
-# CALENDAR/日历
+# CALENDAR
 #
 #    Calendar.DeleteOldEventsHour
-#        Description: 每天删除旧日历事件的时间。
+#        Description: Hour of the day when the daily deletion of old calendar events occurs.
 #        Range:       0-23
 #        Default:     6 - (06:00 AM)
 
@@ -4290,14 +4309,14 @@ Calendar.DeleteOldEventsHour = 6
 ###################################################################################################
 
 ###################################################################################################
-# GAME EVENT/游戏事件
+# GAME EVENT
 #
 #    Event.Announce
-#        Description: 宣布事件。
+#        Description: Announce events.
 #        Default:     0 - (Disabled)
 #                     1 - (Enabled)
 
-Event.Announce = 1
+Event.Announce = 0
 
 #
 ###################################################################################################
@@ -4326,7 +4345,7 @@ AuctionHouse.WorkerThreads = 1
 
 #
 #     LevelReq.Auction
-#        Description: 人物使用拍卖行的等级要求。
+#        Description: Level requirement for characters to be able to use the auction house.
 #        Default:     1
 
 LevelReq.Auction = 1
@@ -4335,8 +4354,8 @@ LevelReq.Auction = 1
 #    Rate.Auction.Time
 #    Rate.Auction.Deposit
 #    Rate.Auction.Cut
-#        Description: 拍卖价格(拍卖时间、拍卖开始时的保证金,
-#                     拍卖结束时的拍卖价格)
+#        Description: Auction rates (auction time, deposit get at auction start,
+#                     auction cut from price at auction end)
 #        Default:     1 - (Rate.Auction.Time)
 #                     1 - (Rate.Auction.Deposit)
 #                     1 - (Rate.Auction.Cut)
@@ -4352,14 +4371,14 @@ Rate.Auction.Cut     = 1
 # PLAYER DUMP
 #
 #     PlayerDump.DisallowPaths
-#        Description: 不允许在PlayerDump输出文件中使用路径
+#        Description: Disallow using paths in PlayerDump output files
 #        Default:     1
 
 PlayerDump.DisallowPaths = 1
 
 #
 #     PlayerDump.DisallowOverwrite
-#        Description: 不允许用PlayerDump覆盖现有文件
+#        Description: Disallow overwriting existing files with PlayerDump
 #        Default:     1
 
 PlayerDump.DisallowOverwrite = 1
@@ -4372,23 +4391,23 @@ PlayerDump.DisallowOverwrite = 1
 #
 #    ICC Buff
 #       Description: Specify ICC buff
-#                    (在改变值后，有必要重新启动服务器!)
+#                    (It is necessary to restart the server after changing the values!)
 #       Default:     ICC.Buff.Horde    = 73822
 #                    ICC.Buff.Alliance = 73828
 #
 #                    Spell IDs for the auras:
-#                    73816 -  5% buff 部落
-#                    73818 - 10% buff 部落
-#                    73819 - 15% buff 部落
-#                    73820 - 20% buff 部落
-#                    73821 - 25% buff 部落
-#                    73822 - 30% buff 部落
-#                    73762 -  5% buff 联盟
-#                    73824 - 10% buff 联盟
-#                    73825 - 15% buff 联盟
-#                    73826 - 20% buff 联盟
-#                    73827 - 25% buff 联盟
-#                    73828 - 30% buff 联盟
+#                    73816 -  5% buff Horde
+#                    73818 - 10% buff Horde
+#                    73819 - 15% buff Horde
+#                    73820 - 20% buff Horde
+#                    73821 - 25% buff Horde
+#                    73822 - 30% buff Horde
+#                    73762 -  5% buff Alliance
+#                    73824 - 10% buff Alliance
+#                    73825 - 15% buff Alliance
+#                    73826 - 20% buff Alliance
+#                    73827 - 25% buff Alliance
+#                    73828 - 30% buff Alliance
 
 ICC.Buff.Horde    = 73822
 ICC.Buff.Alliance = 73828
@@ -4402,37 +4421,37 @@ WipeGunshipBlizzlike.Enable = 1
 
 #
 #     Minigob.Manabonk.Enable
-#        Description: 启用/禁用Minigob Manabonk
+#        Description: Enable/ Disable Minigob Manabonk
 #        Default:     1
 
 Minigob.Manabonk.Enable = 1
 
 #
 #     Calculate.Creature.Zone.Area.Data
-#        Description: 在加载生物Zone Id /AreaId时计算并保存在生物表中(警告:世界服务器启动缓慢)
-#        Default:     0  - (不要显示)
+#        Description: Calculate at loading creature zoneId / areaId and save in creature table (WARNING: SLOW WORLD SERVER STARTUP)
+#        Default:     0  - (Do not show)
 #
 
 Calculate.Creature.Zone.Area.Data = 0
 
 #
 #     Calculate.Gameoject.Zone.Area.Data
-#        Description: 加载游戏对象时计算Zone Id / Area Id并保存在游戏对象表中(警告:世界服务器启动缓慢)
-#        Default:     0  - (不要显示)
+#        Description: Calculate at loading gameobject zoneId / areaId and save in gameobject table (WARNING: SLOW WORLD SERVER STARTUP)
+#        Default:     0  - (Do not show)
 #
 
 Calculate.Gameoject.Zone.Area.Data = 0
 
 #
 #    TeleportTimeoutNear
-#       Description:  没有描述
+#       Description:  No description
 #       Default:  25
 
 TeleportTimeoutNear = 25
 
 #
 #    TeleportTimeoutFar
-#       Description:  没有描述
+#       Description:  No description
 #       Default:  45
 
 TeleportTimeoutFar = 45
@@ -4465,7 +4484,7 @@ Daze.Enabled = 1
 # DEBUG
 #
 #    Debug.Battleground
-#        战场1v0模式启用或禁用。(如果启用，则禁用游戏中命令。)
+#        Description: Enable or disable Battleground 1v0 mode. (If enabled, the in-game command is disabled.)
 #        Default: 0 - (Disabled)
 #                 1 - (Enabled)
 
@@ -4473,7 +4492,7 @@ Debug.Battleground = 0
 
 #
 #    Debug.Arena
-#        Description:开启或关闭Arena 1v1模式。(如果启用，则禁用游戏中命令。)
+#        Description: Enable or disable Arena 1v1 mode. (If enabled, the in-game command is disabled.)
 #        Default: 0 - (Disabled)
 #                 1 - (Enabled)
 
@@ -4483,7 +4502,53 @@ Debug.Arena = 0
 ###################################################################################################
 
 ###################################################################################################
+# DYNAMIC RESPAWN SETTINGS
+#
+#
+#    Respawn.DynamicRateCreature
+#        Description: Controls how creature respawn times adjust based on player count in a zone.
+#                     The respawn time is unchanged up to the configured number of players.
+#                     As player count exceeds this value, respawn times decrease proportionally
+#                     (e.g., at double the player count, respawn times are halved; at triple the player count, respawns happen three times as fast).
+#                     Does not affect instanced creatures, bosses, or quest givers.
+#                     Formula: adjustFactor = rate / playerCount
+#                              RespawnTime = RespawnTime * adjustFactor
+#        Default:     1 (Disabled)
+
+Respawn.DynamicRateCreature = 1
+
+#
+#    Respawn.DynamicMinimumCreature
+#        Description: The minimum respawn time for a creature under dynamic scaling.
+#        Default:     10 - (10 seconds)
+
+Respawn.DynamicMinimumCreature = 10
+
+#
+#    Respawn.DynamicRateGameObject
+#        Description: Controls how gameobject respawn times adjust based on player count in a zone.
+#                     The respawn time is unchanged up to the configured number of players.
+#                     As player count exceeds this value, respawn times decrease proportionally
+#                     (e.g., at double the player count, respawn times are halved; at triple the player count, respawns happen three times as fast).
+#                     Does not affect instanced objects or quest givers.
+#                     Formula: adjustFactor = rate / playerCount
+#                              RespawnTime = RespawnTime * adjustFactor
+#        Default:     1 (Disabled)
+
+Respawn.DynamicRateGameObject = 1
+
+#
+#    Respawn.DynamicMinimumGameObject
+#        Description: The minimum respawn time for a gameobject under dynamic scaling.
+#        Default:     10 - (10 seconds)
+
+Respawn.DynamicMinimumGameObject = 10
+
+#
+###################################################################################################
+
+###################################################################################################
 #                                                                                                 #
-# 游戏设置结束                                                                              	  #
+# GAME SETTINGS END                                                                               #
 #                                                                                                 #
 ###################################################################################################

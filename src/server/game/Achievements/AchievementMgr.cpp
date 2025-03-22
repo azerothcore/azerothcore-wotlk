@@ -44,6 +44,7 @@
 #include "SpellMgr.h"
 #include "World.h"
 #include "WorldPacket.h"
+#include "WorldSessionMgr.h"
 
 bool AchievementCriteriaData::IsValid(AchievementCriteriaEntry const* criteria)
 {
@@ -580,7 +581,7 @@ void AchievementMgr::SaveToDB(CharacterDatabaseTransaction trans)
 
             iter->second.changed = false;
 
-            sScriptMgr->OnAchievementSave(trans, GetPlayer(), iter->first, iter->second);
+            sScriptMgr->OnPlayerAchievementSave(trans, GetPlayer(), iter->first, iter->second);
         }
     }
 
@@ -609,7 +610,7 @@ void AchievementMgr::SaveToDB(CharacterDatabaseTransaction trans)
 
             iter->second.changed = false;
 
-            sScriptMgr->OnCriteriaSave(trans, GetPlayer(), iter->first, iter->second);
+            sScriptMgr->OnPlayerCriteriaSave(trans, GetPlayer(), iter->first, iter->second);
         }
     }
 }
@@ -728,7 +729,7 @@ void AchievementMgr::SendAchievementEarned(AchievementEntry const* achievement) 
             data << GetPlayer()->GetGUID();
             data << uint32(achievement->ID);
             data << uint32(0);                                  // display name as plain string in chat (always 0 for guild)
-            sWorld->SendGlobalMessage(&data);
+            sWorldSessionMgr->SendGlobalMessage(&data);
         }
         else
         {
@@ -741,20 +742,15 @@ void AchievementMgr::SendAchievementEarned(AchievementEntry const* achievement) 
             data << uint32(achievement->ID);
             std::size_t linkTypePos = data.wpos();
             data << uint32(1);                                  // display name as clickable link in chat
-            sWorld->SendGlobalMessage(&data, nullptr, teamId);
+            sWorldSessionMgr->SendGlobalMessage(&data, nullptr, teamId);
 
             data.put<uint32>(linkTypePos, 0);                   // display name as plain string in chat
-            sWorld->SendGlobalMessage(&data, nullptr, teamId == TEAM_ALLIANCE ? TEAM_HORDE : TEAM_ALLIANCE);
+            sWorldSessionMgr->SendGlobalMessage(&data, nullptr, teamId == TEAM_ALLIANCE ? TEAM_HORDE : TEAM_ALLIANCE);
         }
     }
     // if player is in world he can tell his friends about new achievement
     else if (GetPlayer()->IsInWorld())
     {
-        CellCoord p = Acore::ComputeCellCoord(GetPlayer()->GetPositionX(), GetPlayer()->GetPositionY());
-
-        Cell cell(p);
-        cell.SetNoCreate();
-
         Acore::BroadcastTextBuilder _builder(GetPlayer(), CHAT_MSG_ACHIEVEMENT, BROADCAST_TEXT_ACHIEVEMENT_EARNED, GetPlayer()->getGender(), GetPlayer(), achievement->ID);
         Acore::LocalizedPacketDo<Acore::BroadcastTextBuilder> _localizer(_builder);
         Acore::PlayerDistWorker<Acore::LocalizedPacketDo<Acore::BroadcastTextBuilder>> _worker(GetPlayer(), sWorld->getFloatConfig(CONFIG_LISTEN_RANGE_SAY), _localizer);
@@ -2103,7 +2099,7 @@ void AchievementMgr::SetCriteriaProgress(AchievementCriteriaEntry const* entry, 
     if (entry->timeLimit && timedIter == _timedAchievements.end())
         return;
 
-    if (!sScriptMgr->OnBeforeCriteriaProgress(GetPlayer(), entry))
+    if (!sScriptMgr->OnPlayerBeforeCriteriaProgress(GetPlayer(), entry))
     {
         return;
     }
@@ -2169,7 +2165,7 @@ void AchievementMgr::SetCriteriaProgress(AchievementCriteriaEntry const* entry, 
 
     SendCriteriaUpdate(entry, progress, timeElapsed, true);
 
-    sScriptMgr->OnCriteriaProgress(GetPlayer(), entry);
+    sScriptMgr->OnPlayerCriteriaProgress(GetPlayer(), entry);
 }
 
 void AchievementMgr::RemoveCriteriaProgress(const AchievementCriteriaEntry* entry)
@@ -2277,7 +2273,7 @@ void AchievementMgr::CompletedAchievement(AchievementEntry const* achievement)
         return;
     }
 
-    if (!sScriptMgr->OnBeforeAchievementComplete(GetPlayer(), achievement))
+    if (!sScriptMgr->OnPlayerBeforeAchievementComplete(GetPlayer(), achievement))
     {
         return;
     }
@@ -2292,7 +2288,7 @@ void AchievementMgr::CompletedAchievement(AchievementEntry const* achievement)
     ca.date = GameTime::GetGameTime().count();
     ca.changed = true;
 
-    sScriptMgr->OnAchievementComplete(GetPlayer(), achievement);
+    sScriptMgr->OnPlayerAchievementComplete(GetPlayer(), achievement);
 
     // pussywizard: set all progress counters to 0, so progress will be deleted from db during save
     {

@@ -34,4 +34,14 @@ public:
     virtual InstanceScript* GetInstanceScript(InstanceMap* /*map*/) const { return nullptr; }
 };
 
+template<typename IS>
+class GenericInstanceMapScript : public InstanceMapScript
+{
+public:
+    GenericInstanceMapScript(char const* name, uint32 mapId) : InstanceMapScript(name, mapId) { }
+    InstanceScript* GetInstanceScript(InstanceMap* map) const override { return new IS(map); }
+};
+
+#define RegisterInstanceScript(script_name, mapId) new GenericInstanceMapScript<script_name>(#script_name, mapId)
+
 #endif

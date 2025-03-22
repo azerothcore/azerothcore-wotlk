@@ -8,7 +8,9 @@
 #include "inflate.h"
 #include "inffast.h"
 
-#ifndef ASMINF
+#ifdef ASMINF
+#  pragma message("Assembler code may have bugs -- use at your own risk")
+#else
 
 /*
    Decode literal, length, and distance codes and write out the resulting
@@ -21,8 +23,8 @@
    Entry assumptions:
 
         state->mode == LEN
-        strm->avail_in >= INFLATE_FAST_MIN_INPUT
-        strm->avail_out >= INFLATE_FAST_MIN_OUTPUT
+        strm->avail_in >= 6
+        strm->avail_out >= 258
         start >= strm->avail_out
         state->bits < 8
 
@@ -45,7 +47,10 @@
       requires strm->avail_out >= 258 for each loop to avoid checking for
       output space.
  */
-void ZLIB_INTERNAL inflate_fast(z_streamp strm, unsigned start) {
+void ZLIB_INTERNAL inflate_fast(strm, start)
+z_streamp strm;
+unsigned start;         /* inflate()'s starting value for strm->avail_out */
+{
     struct inflate_state FAR *state;
     z_const unsigned char FAR *in;      /* local strm->next_in */
     z_const unsigned char FAR *last;    /* have enough input while in < last */
@@ -75,10 +80,10 @@ void ZLIB_INTERNAL inflate_fast(z_streamp strm, unsigned start) {
     /* copy state to local variables */
     state = (struct inflate_state FAR *)strm->state;
     in = strm->next_in;
-    last = in + (strm->avail_in - (INFLATE_FAST_MIN_INPUT - 1));
+    last = in + (strm->avail_in - 5);
     out = strm->next_out;
     beg = out - (start - strm->avail_out);
-    end = out + (strm->avail_out - (INFLATE_FAST_MIN_OUTPUT - 1));
+    end = out + (strm->avail_out - 257);
 #ifdef INFLATE_STRICT
     dmax = state->dmax;
 #endif
@@ -293,12 +298,9 @@ void ZLIB_INTERNAL inflate_fast(z_streamp strm, unsigned start) {
     /* update state and return */
     strm->next_in = in;
     strm->next_out = out;
-    strm->avail_in = (unsigned)(in < last ?
-        (INFLATE_FAST_MIN_INPUT - 1) + (last - in) :
-        (INFLATE_FAST_MIN_INPUT - 1) - (in - last));
+    strm->avail_in = (unsigned)(in < last ? 5 + (last - in) : 5 - (in - last));
     strm->avail_out = (unsigned)(out < end ?
-        (INFLATE_FAST_MIN_OUTPUT - 1) + (end - out) :
-        (INFLATE_FAST_MIN_OUTPUT - 1) - (out - end));
+                                 257 + (end - out) : 257 - (out - end));
     state->hold = hold;
     state->bits = bits;
     return;

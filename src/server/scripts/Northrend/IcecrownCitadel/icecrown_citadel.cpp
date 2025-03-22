@@ -747,8 +747,6 @@ public:
                 me->setActive(true);
                 me->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
                 me->SetImmuneToAll(true);
-                // Load Grid with Sister Svalna
-                me->GetMap()->LoadGrid(4356.71f, 2484.33f);
                 if (Creature* svalna = ObjectAccessor::GetCreature(*me, _instance->GetGuidData(DATA_SISTER_SVALNA)))
                     svalna->AI()->DoAction(ACTION_START_GAUNTLET);
                 for (uint32 i = 0; i < 4; ++i)

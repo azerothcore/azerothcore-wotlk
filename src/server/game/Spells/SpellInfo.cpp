@@ -2529,6 +2529,10 @@ SpellInfo const* SpellInfo::GetAuraRankForLevel(uint8 level) const
     //if (IsPassive())
     //    return this;
 
+    // Client ignores spell with these attributes (sub_53D9D0)
+    if (HasAttribute(SPELL_ATTR0_COOLDOWN_ON_EVENT) || HasAttribute(SPELL_ATTR2_ALLOW_LOW_LEVEL_BUFF) || HasAttribute(SPELL_ATTR3_ONLY_PROC_ON_CASTER))
+        return this;
+
     bool needRankSelection = false;
     for (uint8 i = 0; i < MAX_SPELL_EFFECTS; ++i)
     {

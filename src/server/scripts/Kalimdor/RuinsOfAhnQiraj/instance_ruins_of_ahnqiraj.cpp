@@ -87,7 +87,6 @@ public:
                 _rajaxWaveCounter == 0 &&                       // if non-zero, encounter is in progress
                 !_andorovGUID)                                  // cleared if he is dead
             {
-                instance->LoadGrid(-8538.17f, 1486.09f); // Andorov run path grid
                 if (Creature* creature = player->SummonCreature(NPC_ANDOROV, -8538.177f, 1486.0956f, 32.39054f, 3.7638654f, TEMPSUMMON_CORPSE_DESPAWN, 0))
                 {
                     creature->setActive(true);

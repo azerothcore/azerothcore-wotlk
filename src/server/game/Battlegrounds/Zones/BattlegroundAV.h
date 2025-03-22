@@ -21,14 +21,14 @@
 #include "Battleground.h"
 #include "BattlegroundScore.h"
 
-#define BG_AV_CAPTIME                    240000  //4:00
-#define BG_AV_SNOWFALL_FIRSTCAP          300000  //5:00 but i also have seen 4:05
+#define BG_AV_CAPTIME                   240000  //4:00
+#define BG_AV_SNOWFALL_FIRSTCAP         300000  //5:00 but i also have seen 4:05
 
-#define BG_AV_SCORE_INITIAL_POINTS       600
-#define SEND_MSG_NEAR_LOSE               120
+#define BG_AV_SCORE_INITIAL_POINTS      (sWorld->getIntConfig(CONFIG_BATTLEGROUND_ALTERAC_REINFORCEMENTS)) // Blizzlike default is 600
+#define SEND_MSG_NEAR_LOSE              120
 
 #define BG_AV_KILL_BOSS                 4
-#define BG_AV_REP_BOSS                  350
+#define BG_AV_REP_BOSS                  (sWorld->getIntConfig(CONFIG_BATTLEGROUND_ALTERAC_REP_ONBOSSDEATH)) // Blizzlike default is 350
 
 #define BG_AV_KILL_CAPTAIN              3
 #define BG_AV_REP_CAPTAIN               125
@@ -38,7 +38,7 @@
 #define BG_AV_REP_TOWER                 12
 #define BG_AV_RES_TOWER                 75
 
-#define BG_AV_GET_COMMANDER            1 //for a safely returned wingcommander
+#define BG_AV_GET_COMMANDER             1 //for a safely returned wingcommander
 //bonushonor at the end
 #define BG_AV_KILL_SURVIVING_TOWER      2
 #define BG_AV_REP_SURVIVING_TOWER       12
@@ -1936,7 +1936,7 @@ private:
     void ChangeMineOwner(uint8 mine, TeamId teamId, bool initial = false);
 
     /*worldstates*/
-    void FillInitialWorldStates(WorldPacket& data) override;
+    void FillInitialWorldStates(WorldPackets::WorldState::InitWorldStates& packet) override;
     uint8 GetWorldStateType(uint8 state, TeamId teamId);
     void SendMineWorldStates(uint32 mine);
     void UpdateNodeWorldState(BG_AV_Nodes node);
