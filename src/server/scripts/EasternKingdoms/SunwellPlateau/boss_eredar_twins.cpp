@@ -120,7 +120,11 @@ struct boss_sacrolash : public BossAI
                 Unit* target = SelectTarget(SelectTargetMethod::MaxThreat, 1, 100.0f);
                 if (!target)
                     target = me->GetVictim();
-                me->CastSpell(target, SPELL_CONFLAGRATION, false);
+
+                DoCast(target, SPELL_CONFLAGRATION);
+
+                if (Creature* alythess = instance->GetCreature(DATA_ALYTHESS))
+                    alythess->AI()->Talk(EMOTE_CONFLAGRATION, target);
             }, 30s, 35s);
         }
     }
@@ -221,6 +225,10 @@ struct boss_alythess : public BossAI
                 if (!target)
                     target = me->GetVictim();
                 DoCast(target, SPELL_SHADOW_NOVA);
+
+                if (Creature * sacrolash = instance->GetCreature(DATA_SACROLASH))
+                    sacrolash->AI()->Talk(EMOTE_SHADOW_NOVA, target);
+
             }, 30s, 35s);
         }
     }
