@@ -449,7 +449,8 @@ struct boss_kiljaeden : public BossAI
     {
         if (me->GetReactState() == REACT_PASSIVE)
             return;
-        ScriptedAI::EnterEvadeMode(why);
+
+        me->DespawnOrUnsummon();
     }
 
     void AttackStart(Unit* who) override
