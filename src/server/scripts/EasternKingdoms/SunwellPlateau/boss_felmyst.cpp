@@ -49,6 +49,12 @@ enum Spells
     SPELL_ENCAPSULATE_CHANNEL                   = 45661,
 
     //Flight phase
+    SPELL_TRIGGER_TOP_STRAFE                    = 45586,
+    SPELL_TRIGGER_MIDDLE_STRAFE                 = 45622,
+    SPELL_TRIGGER_BOTTOM_STRAFE                 = 45623,
+    SPELL_STRAFE_TOP                            = 45585,
+    SPELL_STRAFE_MIDDLE                         = 45633,
+    SPELL_STRAFE_BOTTOM                         = 45635,
     SPELL_SUMMON_DEMONIC_VAPOR                  = 45391,
     SPELL_DEMONIC_VAPOR_SPAWN_TRIGGER           = 45388, // Triggers visual beam
     SPELL_DEMONIC_VAPOR_PERIODIC                = 45411, // Spawns cloud and deals damage
@@ -106,20 +112,28 @@ const Position LandingPos = { 1476.77f, 665.094f, 20.6423f };
 class CorruptTriggers : public BasicEvent
 {
 public:
-    CorruptTriggers(Unit* caster) : _caster(caster) { }
+    CorruptTriggers(Unit* caster, uint8 currentLane) : _caster(caster), _currentLane(currentLane) { }
 
     bool Execute(uint64 /*execTime*/, uint32 /*diff*/) override
     {
-        std::list<Creature*> creatureList;
-        _caster->GetCreaturesWithEntryInRange(creatureList, 70.0f, NPC_FOG_TRIGGER);
-        for (auto const& creature : creatureList)
-            if (_caster->GetExactDist2d(creature) <= 11.0f)
-                creature->CastSpell(creature, SPELL_FOG_OF_CORRUPTION, true);
+        switch (_currentLane)
+        {
+            case 0: // top
+                _caster->CastSpell(_caster, SPELL_STRAFE_TOP, true);
+                break;
+            case 1: // middle
+                _caster->CastSpell(_caster, SPELL_STRAFE_MIDDLE, true);
+                break;
+            case 2: // bottom
+                _caster->CastSpell(_caster, SPELL_STRAFE_BOTTOM, true);
+                break;
+        }
         return true;
     }
 
 private:
     Unit* _caster;
+    uint8 _currentLane;
 };
 
 struct boss_felmyst : public BossAI
@@ -172,6 +186,12 @@ struct boss_felmyst : public BossAI
     {
         if (victim->IsPlayer() && roll_chance_i(50))
             Talk(YELL_KILL);
+    }
+
+    void SpellHitTarget(Unit* target, const SpellInfo* spell) override
+    {
+        if (spell->Id == SPELL_STRAFE_TOP || spell->Id == SPELL_STRAFE_MIDDLE || spell->Id == SPELL_STRAFE_BOTTOM)
+            target->CastSpell(target, SPELL_FOG_OF_CORRUPTION, true);
     }
 
     void JustDied(Unit* killer) override
@@ -283,20 +303,13 @@ struct boss_felmyst : public BossAI
                         me->GetMotionMaster()->MovePoint(POINT_LANE, RightSideLanes[_currentLane], false);
                     else
                         me->GetMotionMaster()->MovePoint(POINT_LANE, LeftSideLanes[_currentLane], false);
-                }, 2s);
+                }, 5s);
                 break;
             case POINT_LANE:
                 Talk(EMOTE_BREATH);
                 me->m_Events.AddEventAtOffset([&] {
-                    me->m_Events.AddEvent(new CorruptTriggers(me), me->m_Events.CalculateTime(0));
-                    me->m_Events.AddEvent(new CorruptTriggers(me), me->m_Events.CalculateTime(500));
-                    me->m_Events.AddEvent(new CorruptTriggers(me), me->m_Events.CalculateTime(1000));
-                    me->m_Events.AddEvent(new CorruptTriggers(me), me->m_Events.CalculateTime(1500));
-                    me->m_Events.AddEvent(new CorruptTriggers(me), me->m_Events.CalculateTime(2000));
-                    me->m_Events.AddEvent(new CorruptTriggers(me), me->m_Events.CalculateTime(2500));
-                    me->m_Events.AddEvent(new CorruptTriggers(me), me->m_Events.CalculateTime(3000));
-                    me->m_Events.AddEvent(new CorruptTriggers(me), me->m_Events.CalculateTime(3500));
-                    me->m_Events.AddEvent(new CorruptTriggers(me), me->m_Events.CalculateTime(4000));
+                    for (uint8 i = 0; i < 16; ++i)
+                        me->m_Events.AddEvent(new CorruptTriggers(me, _currentLane), me->m_Events.CalculateTime(i*250));
                 }, 5s);
 
                 me->m_Events.AddEventAtOffset([&] {
@@ -360,57 +373,63 @@ struct boss_felmyst : public BossAI
 
 struct npc_demonic_vapor : public NullCreatureAI
 {
-    npc_demonic_vapor(Creature* creature) : NullCreatureAI(creature) { }
+    npc_demonic_vapor(Creature* creature) : NullCreatureAI(creature), _timer{1} { }
 
     void Reset() override
     {
         me->CastSpell(me, SPELL_DEMONIC_VAPOR_SPAWN_TRIGGER, true);
-        me->CastSpell(me, SPELL_DEMONIC_VAPOR_PERIODIC, true);
     }
 
-    void UpdateAI(uint32  /*diff*/) override
+    void IsSummonedBy(WorldObject* summoner) override
     {
-        if (me->GetMotionMaster()->GetMotionSlotType(MOTION_SLOT_CONTROLLED) == NULL_MOTION_TYPE)
+        if (!summoner || !summoner->ToUnit())
+            return;
+
+        me->m_Events.AddEventAtOffset([this, summoner] {
+            me->GetMotionMaster()->MoveFollow(summoner->ToUnit(), 0.0f, 0.0f, MOTION_SLOT_CONTROLLED);
+        }, 2s);
+    }
+
+    void UpdateAI(uint32 diff) override
+    {
+        if (_timer)
         {
-            Map::PlayerList const& players = me->GetMap()->GetPlayers();
-            for (Map::PlayerList::const_iterator itr = players.begin(); itr != players.end(); ++itr)
-                if (me->GetDistance2d(itr->GetSource()) < 20.0f && itr->GetSource()->IsAlive())
-                {
-                    me->GetMotionMaster()->MoveFollow(itr->GetSource(), 0.0f, 0.0f, MOTION_SLOT_CONTROLLED);
-                    break;
-                }
+            _timer += diff;
+            if (_timer >= 2000)
+            {
+                me->CastSpell(me, SPELL_DEMONIC_VAPOR_PERIODIC, true);
+                _timer = 0;
+            }
         }
     }
+private:
+    uint32 _timer;
 };
 
 struct npc_demonic_vapor_trail : public NullCreatureAI
 {
-    npc_demonic_vapor_trail(Creature* creature) : NullCreatureAI(creature)
-    {
-        timer = 1;
-    }
+    npc_demonic_vapor_trail(Creature* creature) : NullCreatureAI(creature), _timer{1} { }
 
-    uint32 timer;
     void Reset() override
     {
         me->CastSpell(me, SPELL_DEMONIC_VAPOR_TRAIL_PERIODIC, true);
         me->DespawnOrUnsummon(20000);
     }
 
-    void SpellHitTarget(Unit*, SpellInfo const* spellInfo) override
+    void SpellHitTarget(Unit* /*unit*/, SpellInfo const* spellInfo) override
     {
-        if (spellInfo->Id == SPELL_DEMONIC_VAPOR)
-            me->CastSpell(me, SPELL_SUMMON_BLAZING_DEAD, true);
+        if (spellInfo->Id == SPELL_DEMONIC_VAPOR && !_timer)
+            _timer = 1;
     }
 
     void UpdateAI(uint32 diff) override
     {
-        if (timer)
+        if (_timer)
         {
-            timer += diff;
-            if (timer >= 6000)
+            _timer += diff;
+            if (_timer >= 5000)
             {
-                timer = 0;
+                _timer = 0;
                 me->CastSpell(me, SPELL_SUMMON_BLAZING_DEAD, true);
             }
         }
@@ -421,6 +440,8 @@ struct npc_demonic_vapor_trail : public NullCreatureAI
         summon->SetInCombatWithZone();
         summon->AI()->AttackStart(summon->AI()->SelectTarget(SelectTargetMethod::Random, 0, 100.0f));
     }
+private:
+    uint32 _timer;
 };
 
 class spell_felmyst_fog_of_corruption : public SpellScript

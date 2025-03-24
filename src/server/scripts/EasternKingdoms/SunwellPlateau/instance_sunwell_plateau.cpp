@@ -184,7 +184,10 @@ struct npc_sunblade_scout : public ScriptedAI
         protectors.remove_if([](Creature* trigger) {return !trigger->HasAura(SPELL_COSMETIC_STUN_IMMUNE_PERMANENT);});
         protectors.sort(Acore::ObjectDistanceOrderPred(me));
         if (protectors.empty())
+        {
             ScheduleCombat();
+            return;
+        }
         Creature* closestProtector = protectors.front();
         me->GetMotionMaster()->MoveFollow(closestProtector, 0.0f, 0.0f);
         _protectorGUID = closestProtector->GetGUID();
