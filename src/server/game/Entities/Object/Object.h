@@ -40,6 +40,9 @@
 #include "UpdateFields.h"
 
 class ElunaEventProcessor;
+#if defined(MOD_ELUNA)
+class Eluna;
+#endif
 
 enum TempSummonType
 {
@@ -629,6 +632,10 @@ public:
     void RemoveAllowedLooter(ObjectGuid guid);
 
     std::string GetDebugInfo() const override;
+
+#if defined(MOD_ELUNA)
+    Eluna* GetEluna() const;
+#endif
 
     // Event handler
     ElunaEventProcessor* elunaEvents;

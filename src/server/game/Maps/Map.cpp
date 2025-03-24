@@ -44,6 +44,27 @@
 #include "VMapMgr2.h"
 #include "Weather.h"
 
+#if defined(MOD_ELUNA)
+#include "LuaEngine.h"
+#include "ElunaConfig.h"
+#include "ElunaLoader.h"
+#endif
+
+union u_map_magic
+{
+    char asChar[4];
+    uint32 asUInt;
+};
+
+u_map_magic MapMagic        = { {'M', 'A', 'P', 'S'} };
+uint32 MapVersionMagic      = 9;
+u_map_magic MapAreaMagic    = { {'A', 'R', 'E', 'A'} };
+u_map_magic MapHeightMagic  = { {'M', 'H', 'G', 'T'} };
+u_map_magic MapLiquidMagic  = { {'M', 'L', 'I', 'Q'} };
+
+static uint16 const holetab_h[4] = { 0x1111, 0x2222, 0x4444, 0x8888 };
+static uint16 const holetab_v[4] = { 0x000F, 0x00F0, 0x0F00, 0xF000 };
+
 #define MAP_INVALID_ZONE        0xFFFFFFFF
 
 ZoneDynamicInfo::ZoneDynamicInfo() : MusicId(0), WeatherId(WEATHER_STATE_FINE),
@@ -51,6 +72,9 @@ ZoneDynamicInfo::ZoneDynamicInfo() : MusicId(0), WeatherId(WEATHER_STATE_FINE),
 
 Map::~Map()
 {
+#if defined(MOD_ELUNA)
+    eluna.reset(nullptr);
+#endif
     // UnloadAll must be called before deleting the map
 
     sScriptMgr->OnDestroyMap(this);
@@ -78,6 +102,28 @@ Map::Map(uint32 id, uint32 InstanceId, uint8 SpawnMode, Map* _parent) :
     _transportsUpdateIter(_transports.end()), i_scriptLock(false), _defaultLight(GetDefaultMapLight(id))
 {
     m_parentMap = (_parent ? _parent : this);
+
+    // lua state begins uninitialized
+#if defined(MOD_ELUNA)
+    eluna.reset();
+    if (sElunaConfig->IsElunaEnabled() &&
+        !sElunaConfig->IsElunaCompatibilityMode() &&
+        sElunaConfig->ShouldMapLoadEluna(id))
+    {
+        if (!IsParentMap() || (IsParentMap() && !Instanceable()))
+            eluna = std::make_unique<Eluna>(this);
+    }
+#endif
+
+    for (unsigned int idx = 0; idx < MAX_NUMBER_OF_GRIDS; ++idx)
+    {
+        for (unsigned int j = 0; j < MAX_NUMBER_OF_GRIDS; ++j)
+        {
+            //z code
+            GridMaps[idx][j] = nullptr;
+            setNGrid(nullptr, idx, j);
+        }
+    }
 
     _zonePlayerCountMap.clear();
 
@@ -1834,6 +1880,16 @@ void Map::AddObjectToRemoveList(WorldObject* obj)
 {
     ASSERT(obj->GetMapId() == GetId() && obj->GetInstanceId() == GetInstanceId());
 
+#if defined(MOD_ELUNA)
+    if (Eluna* E = GetEluna())
+    {
+        if (Creature* creature = obj->ToCreature())
+            E->OnRemove(creature);
+        else if (GameObject* gameobject = obj->ToGameObject())
+            E->OnRemove(gameobject);
+    }
+#endif
+
     obj->CleanupsBeforeDelete(false);                            // remove or simplify at least cross referenced links
 
     i_objectsToRemove.insert(obj);
@@ -3278,3 +3334,13 @@ std::string InstanceMap::GetDebugInfo() const
         << "ScriptId: " << GetScriptId() << " ScriptName: " << GetScriptName();
     return sstr.str();
 }
+
+#if defined(MOD_ELUNA)
+Eluna* Map::GetEluna() const
+{
+    if (sElunaConfig->IsElunaCompatibilityMode())
+        return sWorld->GetEluna();
+
+    return eluna.get();
+}
+#endif
