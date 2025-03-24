@@ -1,5 +1,5 @@
 
--- Southshore Crier 
+-- Southshore Crier
 UPDATE `creature_template` SET `AIName` = 'SmartAI' WHERE `entry` = 2435;
 
 DELETE FROM `smart_scripts` WHERE (`source_type` = 0 AND `entryorguid` = 2435);
