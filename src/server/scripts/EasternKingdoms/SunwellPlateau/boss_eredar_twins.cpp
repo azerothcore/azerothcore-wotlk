@@ -210,6 +210,13 @@ struct boss_alythess : public BossAI
                 sacrolash->Respawn(true);
     }
 
+    void AttackStart(Unit* who) override
+    {
+        if (who && who->isTargetableForAttack() && me->GetReactState() != REACT_PASSIVE)
+            if (me->Attack(who, false))
+                me->AddThreat(who, 0.0f);
+    }
+
     void DoAction(int32 param) override
     {
         if (param == ACTION_SISTER_DIED)
