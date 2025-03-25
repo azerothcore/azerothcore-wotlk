@@ -1,3 +1,4 @@
+-- DB update 2025_03_25_00 -> 2025_03_25_01
 -- Update Alumeth the Ascended 32300 to repeat around psychicscream ~20 sec
 UPDATE `creature_template` SET `AIName` = 'SmartAI' WHERE `entry` = 32300;
 DELETE FROM `smart_scripts` WHERE (`source_type` = 0 AND `entryorguid` = 32300);
