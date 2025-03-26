@@ -4,9 +4,9 @@ DELETE FROM `reference_loot_template` WHERE (`Entry` = 34068) AND (`Item` IN (31
 -- Create new reference table with just tokens tokens
 DELETE FROM `reference_loot_template` WHERE (`Entry` = 1276884) AND (`Item` IN (31095, 31096, 31097));
 INSERT INTO `reference_loot_template` (`Entry`, `Item`, `Reference`, `Chance`, `QuestRequired`, `LootMode`, `GroupId`, `MinCount`, `MaxCount`, `Comment`) VALUES
-(1276884, 31095, 0, 100, 0, 1, 0, 1, 1, 'Helm of the Forgotten Protector'),
-(1276884, 31096, 0, 100, 0, 1, 0, 1, 1, 'Helm of the Forgotten Vanquisher'),
-(1276884, 31097, 0, 100, 0, 1, 0, 1, 1, 'Helm of the Forgotten Conqueror');
+(1276884, 31095, 0, 0, 0, 1, 0, 1, 1, 'Helm of the Forgotten Protector'),
+(1276884, 31096, 0, 0, 0, 1, 0, 1, 1, 'Helm of the Forgotten Vanquisher'),
+(1276884, 31097, 0, 0, 0, 1, 0, 1, 1, 'Helm of the Forgotten Conqueror');
 
 -- Set chance of 100 with seperate groups (2/3)
 -- Chance for regular items 2/2
