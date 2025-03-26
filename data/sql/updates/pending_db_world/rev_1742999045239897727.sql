@@ -1,18 +1,5 @@
--- Remove tokens from original ref table and set groupid of rest to group 0
-DELETE FROM `reference_loot_template` WHERE (`Entry` = 34068) AND (`Item` IN (30902, 30903, 30904, 30905, 30906, 30907, 30908, 30909, 30910, 30911, 30912, 30913, 31095, 31096, 31097));
-INSERT INTO `reference_loot_template` (`Entry`, `Item`, `Reference`, `Chance`, `QuestRequired`, `LootMode`, `GroupId`, `MinCount`, `MaxCount`, `Comment`) VALUES
-(34068, 30902, 0, 0, 0, 1, 0, 1, 1, 'Cataclysms Edge'),
-(34068, 30903, 0, 0, 0, 1, 0, 1, 1, 'Legguards of Endless Rage'),
-(34068, 30904, 0, 0, 0, 1, 0, 1, 1, 'Saviors Grasp'),
-(34068, 30905, 0, 0, 0, 1, 0, 1, 1, 'Midnight Chestguard'),
-(34068, 30906, 0, 0, 0, 1, 0, 1, 1, 'Bristleblitz Striker'),
-(34068, 30907, 0, 0, 0, 1, 0, 1, 1, 'Mail of Fevered Pursuit'),
-(34068, 30908, 0, 0, 0, 1, 0, 1, 1, 'Apostle of Argus'),
-(34068, 30909, 0, 0, 0, 1, 0, 1, 1, 'Antonidas Aegis of Rapt Concentration'),
-(34068, 30910, 0, 0, 0, 1, 0, 1, 1, 'Tempest of Chaos'),
-(34068, 30911, 0, 0, 0, 1, 0, 1, 1, 'Scepter of Purification'),
-(34068, 30912, 0, 0, 0, 1, 0, 1, 1, 'Leggings of Eternity'),
-(34068, 30913, 0, 0, 0, 1, 0, 1, 1, 'Robes of Rhonin');
+-- Remove tokens from original ref table
+DELETE FROM `reference_loot_template` WHERE (`Entry` = 34068) AND (`Item` IN (31095, 31096, 31097));
 
 -- Create new reference table with just tokens tokens
 DELETE FROM `reference_loot_template` WHERE (`Entry` = 1276884) AND (`Item` IN (31095, 31096, 31097));
