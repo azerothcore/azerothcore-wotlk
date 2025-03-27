@@ -19,6 +19,7 @@
 #include "Chat.h"
 #include "DatabaseEnv.h"
 #include "GridDefines.h"
+#include "GridTerrainLoader.h"
 #include "Group.h"
 #include "InstanceSaveMgr.h"
 #include "LFGMgr.h"
@@ -83,13 +84,17 @@ Map* MapMgr::CreateBaseMap(uint32 id)
             if (entry->Instanceable())
                 map = new MapInstanced(id);
             else
-            {
                 map = new Map(id, 0, REGULAR_DIFFICULTY);
+
+            i_maps[id] = map;
+
+            if (!entry->Instanceable())
+            {
                 map->LoadRespawnTimes();
                 map->LoadCorpseData();
             }
 
-            i_maps[id] = map;
+            map->OnCreateMap();
         }
     }
 
@@ -156,7 +161,7 @@ Map::EnterState MapMgr::PlayerCannotEnter(uint32 mapid, Player* player, bool log
 
     char const* mapName = entry->name[player->GetSession()->GetSessionDbcLocale()];
 
-    if (!sScriptMgr->CanEnterMap(player, entry, instance, mapDiff, loginCheck))
+    if (!sScriptMgr->OnPlayerCanEnterMap(player, entry, instance, mapDiff, loginCheck))
         return Map::CANNOT_ENTER_UNSPECIFIED_REASON;
 
     Group* group = player->GetGroup();
@@ -299,11 +304,7 @@ void MapMgr::DoDelayedMovesAndRemoves()
 bool MapMgr::ExistMapAndVMap(uint32 mapid, float x, float y)
 {
     GridCoord p = Acore::ComputeGridCoord(x, y);
-
-    int gx = 63 - p.x_coord;
-    int gy = 63 - p.y_coord;
-
-    return Map::ExistMap(mapid, gx, gy) && Map::ExistVMap(mapid, gx, gy);
+    return GridTerrainLoader::ExistMap(mapid, p.x_coord, p.y_coord) && GridTerrainLoader::ExistVMap(mapid, p.x_coord, p.y_coord);
 }
 
 bool MapMgr::IsValidMAP(uint32 mapid, bool startUp)

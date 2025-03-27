@@ -431,7 +431,7 @@ void WorldState::AddSunsReachProgress(uint32 questId)
             break;
         case QUEST_SANCTUM_WARDS:
             counter = COUNTER_SANCTUM_WARDS;
-            otherCounter = COUNTER_SANCTUM_WARDS;
+            otherCounter = COUNTER_ERRATIC_BEHAVIOR;
             worldState = WORLD_STATE_QUEL_DANAS_SANCTUM;
             break;
         case QUEST_BATTLE_FOR_THE_SUNS_REACH_ARMORY:
@@ -1035,7 +1035,7 @@ uint32 SunsReachReclamationData::GetSunwellGatePercentage(uint32 gate)
     return percentage < 0 ? 0 : uint32(percentage);
 }
 
-void WorldState::FillInitialWorldStates(ByteBuffer& data, uint32 zoneId, uint32 /*areaId*/)
+void WorldState::FillInitialWorldStates(WorldPackets::WorldState::InitWorldStates& packet, uint32 zoneId, uint32 /*areaId*/)
 {
     switch (zoneId)
     {
@@ -1048,38 +1048,38 @@ void WorldState::FillInitialWorldStates(ByteBuffer& data, uint32 zoneId, uint32 
             switch (m_sunsReachData.m_phase)
             {
                 case SUNS_REACH_PHASE_1_STAGING_AREA:
-                    data << WORLD_STATE_QUEL_DANAS_SANCTUM << m_sunsReachData.GetPhasePercentage(m_sunsReachData.m_phase);
+                    packet.Worldstates.emplace_back(WORLD_STATE_QUEL_DANAS_SANCTUM, m_sunsReachData.GetPhasePercentage(m_sunsReachData.m_phase));
                     break;
                 case SUNS_REACH_PHASE_2_SANCTUM:
-                    data << WORLD_STATE_QUEL_DANAS_ARMORY << m_sunsReachData.GetPhasePercentage(m_sunsReachData.m_phase);
+                    packet.Worldstates.emplace_back(WORLD_STATE_QUEL_DANAS_ARMORY, m_sunsReachData.GetPhasePercentage(m_sunsReachData.m_phase));
                     break;
                 case SUNS_REACH_PHASE_3_ARMORY:
-                    data << WORLD_STATE_QUEL_DANAS_HARBOR << m_sunsReachData.GetPhasePercentage(m_sunsReachData.m_phase);
+                    packet.Worldstates.emplace_back(WORLD_STATE_QUEL_DANAS_HARBOR, m_sunsReachData.GetPhasePercentage(m_sunsReachData.m_phase));
                     break;
                 case SUNS_REACH_PHASE_4_HARBOR:
                     if ((m_sunsReachData.m_subphaseMask & SUBPHASE_ALCHEMY_LAB) == 0)
-                        data << WORLD_STATE_QUEL_DANAS_ALCHEMY_LAB << m_sunsReachData.GetSubPhasePercentage(SUBPHASE_ALCHEMY_LAB);
+                        packet.Worldstates.emplace_back(WORLD_STATE_QUEL_DANAS_ALCHEMY_LAB, m_sunsReachData.GetSubPhasePercentage(SUBPHASE_ALCHEMY_LAB));
                     if ((m_sunsReachData.m_subphaseMask & SUBPHASE_MONUMENT) == 0)
-                        data << WORLD_STATE_QUEL_DANAS_MONUMENT << m_sunsReachData.GetSubPhasePercentage(SUBPHASE_MONUMENT);
+                        packet.Worldstates.emplace_back(WORLD_STATE_QUEL_DANAS_MONUMENT, m_sunsReachData.GetSubPhasePercentage(SUBPHASE_MONUMENT));
                     break;
             }
             if (m_sunsReachData.m_phase >= SUNS_REACH_PHASE_2_SANCTUM && (m_sunsReachData.m_subphaseMask & SUBPHASE_PORTAL) == 0)
-                data << WORLD_STATE_QUEL_DANAS_PORTAL << m_sunsReachData.GetSubPhasePercentage(SUBPHASE_PORTAL);
+                packet.Worldstates.emplace_back(WORLD_STATE_QUEL_DANAS_PORTAL, m_sunsReachData.GetSubPhasePercentage(SUBPHASE_PORTAL));
             if (m_sunsReachData.m_phase >= SUNS_REACH_PHASE_3_ARMORY && (m_sunsReachData.m_subphaseMask & SUBPHASE_ANVIL) == 0)
-                data << WORLD_STATE_QUEL_DANAS_ANVIL << m_sunsReachData.GetSubPhasePercentage(SUBPHASE_ANVIL);
-            data << WORLD_STATE_QUEL_DANAS_MUSIC << m_sunsReachData.m_phase;
+                packet.Worldstates.emplace_back(WORLD_STATE_QUEL_DANAS_ANVIL, m_sunsReachData.GetSubPhasePercentage(SUBPHASE_ANVIL));
+            packet.Worldstates.emplace_back(WORLD_STATE_QUEL_DANAS_MUSIC, m_sunsReachData.m_phase);
 
             // Sunwell Gates
             switch (m_sunsReachData.m_gate)
             {
                 case SUNWELL_ALL_GATES_CLOSED:
-                    data << WORLD_STATE_AGAMATH_THE_FIRST_GATE_HEALTH << m_sunsReachData.GetSunwellGatePercentage(m_sunsReachData.m_gate);
+                    packet.Worldstates.emplace_back(WORLD_STATE_AGAMATH_THE_FIRST_GATE_HEALTH, m_sunsReachData.GetSunwellGatePercentage(m_sunsReachData.m_gate));
                     break;
                 case SUNWELL_AGAMATH_GATE1_OPEN:
-                    data << WORLD_STATE_ROHENDOR_THE_SECOND_GATE_HEALTH << m_sunsReachData.GetSunwellGatePercentage(m_sunsReachData.m_gate);
+                    packet.Worldstates.emplace_back(WORLD_STATE_ROHENDOR_THE_SECOND_GATE_HEALTH, m_sunsReachData.GetSunwellGatePercentage(m_sunsReachData.m_gate));
                     break;
                 case SUNWELL_ROHENDOR_GATE2_OPEN:
-                    data << WORLD_STATE_ARCHONISUS_THE_FINAL_GATE_HEALTH << m_sunsReachData.GetSunwellGatePercentage(m_sunsReachData.m_gate);
+                    packet.Worldstates.emplace_back(WORLD_STATE_ARCHONISUS_THE_FINAL_GATE_HEALTH, m_sunsReachData.GetSunwellGatePercentage(m_sunsReachData.m_gate));
                     break;
             }
             break;
