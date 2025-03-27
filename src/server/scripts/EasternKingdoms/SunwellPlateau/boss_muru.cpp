@@ -65,7 +65,6 @@ struct boss_muru : public BossAI
         me->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
         me->SetVisible(true);
         me->m_Events.KillAllEvents(false);
-        me->SetFullHealth();
     }
 
     void JustEngagedWith(Unit* who) override
