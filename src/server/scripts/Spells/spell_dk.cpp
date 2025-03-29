@@ -319,7 +319,7 @@ class spell_dk_death_and_decay : public SpellScript
 
         // Xinef: include AOE damage reducing auras
         if (target)
-            damage = target->CalculateAOEDamageReduction(damage, GetSpellInfo()->SchoolMask, caster);
+            damage = target->CalculateAOEDamageReduction(damage, GetSpellInfo()->SchoolMask, false);
 
         SetHitDamage(damage);
     }
