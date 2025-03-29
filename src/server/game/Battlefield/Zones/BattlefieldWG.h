@@ -36,10 +36,10 @@ typedef std::set<WGWorkshop*> Workshop;
 typedef std::set<Group*> GroupSet;
 //typedef std::set<WintergraspCapturePoint *> CapturePointSet; unused ?
 
-const uint32 VehNumWorldState[2] = { 3680, 3490 };
-const uint32 MaxVehNumWorldState[2] = { 3681, 3491 };
-const uint32 ClockWorldState[2] = { 3781, 4354 };
-const uint32 WintergraspFaction[3] = { 1, 2, 35 };
+uint32 const VehNumWorldState[2] = { 3680, 3490 };
+uint32 const MaxVehNumWorldState[2] = { 3681, 3491 };
+uint32 const ClockWorldState[2] = { 3781, 4354 };
+uint32 const WintergraspFaction[3] = { 1, 2, 35 };
 float const WintergraspStalkerPos[4]    = { 4948.985f, 2937.789f, 550.5172f, 1.815142f };
 
 enum WintergraspSpells
@@ -235,13 +235,14 @@ struct BfWGCoordGY
     TeamId startcontrol;
 };
 
-const uint32 WGQuest[2][6] =
+uint32 const WGQuest[2][6] =
 {
     { 13186, 13181, 13222, 13538, 13177, 13179 },
     { 13185, 13183, 13223, 13539, 13178, 13180 },
 };
+
 // 7 in sql, 7 in header
-const BfWGCoordGY WGGraveyard[BATTLEFIELD_WG_GRAVEYARD_MAX] =
+BfWGCoordGY const WGGraveyard[BATTLEFIELD_WG_GRAVEYARD_MAX] =
 {
     { 5104.750f, 2300.940f, 368.579f, 0.733038f, 1329, BATTLEFIELD_WG_GY_WORKSHOP_NE, BATTLEFIELD_WG_GOSSIPTEXT_GY_NE, TEAM_NEUTRAL },
     { 5099.120f, 3466.036f, 368.484f, 5.317802f, 1330, BATTLEFIELD_WG_GY_WORKSHOP_NW, BATTLEFIELD_WG_GOSSIPTEXT_GY_NW, TEAM_NEUTRAL },
@@ -480,12 +481,12 @@ protected:
     ObjectGuid m_titansRelic;
 };
 
-const uint8 WG_MAX_OBJ = 32;
-const uint8 WG_MAX_TURRET = 16;
-const uint8 WG_MAX_KEEP_NPC = 45;
-const uint8 WG_MAX_OUTSIDE_NPC = 14;
-const uint8 WG_OUTSIDE_ALLIANCE_NPC = 7;
-const uint8 WG_MAX_TELEPORTER = 12;
+uint8 const WG_MAX_OBJ = 32;
+uint8 const WG_MAX_TURRET = 16;
+uint8 const WG_MAX_KEEP_NPC = 45;
+uint8 const WG_MAX_OUTSIDE_NPC = 14;
+uint8 const WG_OUTSIDE_ALLIANCE_NPC = 7;
+uint8 const WG_MAX_TELEPORTER = 12;
 
 enum WintergraspGameObjectBuildingType
 {
@@ -614,7 +615,7 @@ struct WintergraspBuildingSpawnData
     uint32 destroyText;
 };
 
-const WintergraspBuildingSpawnData WGGameObjectBuilding[WG_MAX_OBJ] =
+WintergraspBuildingSpawnData const WGGameObjectBuilding[WG_MAX_OBJ] =
 {
     // Wall (Not spawned in db)
     // Entry  WS    X        Y        Z        O         type                          NameID
@@ -662,28 +663,28 @@ const WintergraspBuildingSpawnData WGGameObjectBuilding[WG_MAX_OBJ] =
     { 191810, 3773, 5397.11f, 2841.54f, 425.899f, 3.14159f, BATTLEFIELD_WG_OBJECTTYPE_DOOR_LAST, 0, 0 },
 };
 
-const Position WGTurret[WG_MAX_TURRET] =
+Position const WGTurret[WG_MAX_TURRET] =
 {
-    { 5391.19f, 3060.8f,  419.616f, 1.69557f },
-    { 5266.75f, 2976.5f,  421.067f, 3.20354f },
-    { 5234.86f, 2948.8f,  420.88f,  1.61311f },
-    { 5323.05f, 2923.7f,  421.645f, 1.5817f },
-    { 5363.82f, 2923.87f, 421.709f, 1.60527f },
-    { 5264.04f, 2861.34f, 421.587f, 3.21142f },
-    { 5264.68f, 2819.78f, 421.656f, 3.15645f },
-    { 5322.16f, 2756.69f, 421.646f, 4.69978f },
-    { 5363.78f, 2756.77f, 421.629f, 4.78226f },
-    { 5236.2f,  2732.68f, 421.649f, 4.72336f },
-    { 5265.02f, 2704.63f, 421.7f,   3.12507f },
-    { 5350.87f, 2616.03f, 421.243f, 4.72729f },
-    { 5390.95f, 2615.5f,  421.126f, 4.6409f },
-    { 5148.8f,  2820.24f, 421.621f, 3.16043f },
-    { 5147.98f, 2861.93f, 421.63f,  3.18792f },
-    { 5352.22f, 3061.46f, 421.102f, 1.52235f }
+    { 5391.08251953125f, 3061.720947265625f, 419.699462890625f, 1.570796370506286621f }, // VerifiedBuild 51666
+    { 5265.90966796875f, 2976.45849609375f, 421.149261474609375f, 2.984513044357299804f }, // VerifiedBuild 51666
+    { 5234.7861328125f, 2948.731689453125f, 420.96331787109375f, 1.623156189918518066f }, // VerifiedBuild 51666
+    { 5322.8662109375f, 2923.34326171875f, 421.7288818359375f, 1.466076612472534179f }, // VerifiedBuild 51666
+    { 5363.857421875f, 2923.782470703125f, 421.79150390625f, 1.48352980613708496f }, // VerifiedBuild 51666
+    { 5264.23583984375f, 2861.381103515625f, 421.66876220703125f, 3.124139308929443359f }, // VerifiedBuild 51666
+    { 5264.58544921875f, 2819.799560546875f, 421.738494873046875f, 3.106686115264892578f }, // VerifiedBuild 51666
+    { 5322.18408203125f, 2756.658203125f, 421.72845458984375f, 4.520402908325195312f }, // VerifiedBuild 51666
+    { 5363.7685546875f, 2756.81689453125f, 421.712127685546875f, 4.572762489318847656f }, // VerifiedBuild 51666
+    { 5236.1044921875f, 2732.7265625f, 421.73175048828125f, 4.642575740814208984f }, // VerifiedBuild 51666
+    { 5264.88720703125f, 2704.792236328125f, 421.782623291015625f, 3.211405754089355468f }, // VerifiedBuild 51666
+    { 5350.78125f, 2615.8466796875f, 421.32568359375f, 4.747295379638671875f }, // VerifiedBuild 51666
+    { 5390.77490234375f, 2615.3251953125f, 421.208984375f, 4.607669353485107421f }, // VerifiedBuild 51666
+    { 5148.5634765625f, 2820.538330078125f, 421.70361328125f, 3.368485450744628906f }, // VerifiedBuild 51666
+    { 5147.75f, 2861.8681640625f, 421.713165283203125f, 3.141592741012573242f }, // VerifiedBuild 51666
+    { 5352.21923828125f, 3061.62158203125f, 421.184600830078125f, 1.675516128540039062f } // VerifiedBuild 51666
 };
 
 // Here there is all npc keeper spawn point
-const WintergraspObjectPositionData WGKeepNPC[WG_MAX_KEEP_NPC] =
+WintergraspObjectPositionData const WGKeepNPC[WG_MAX_KEEP_NPC] =
 {
     // X          Y            Z           O         horde                          alliance
     // North East
@@ -742,7 +743,7 @@ const WintergraspObjectPositionData WGKeepNPC[WG_MAX_KEEP_NPC] =
     { 5316.770996f, 2619.430176f, 409.027740f, 5.363431f, BATTLEFIELD_WG_NPC_GUARD_H, BATTLEFIELD_WG_NPC_GUARD_A }        // Standing Guard
 };
 
-const WintergraspObjectPositionData WGOutsideNPC[WG_MAX_OUTSIDE_NPC] =
+WintergraspObjectPositionData const WGOutsideNPC[WG_MAX_OUTSIDE_NPC] =
 {
     { 5032.04f, 3681.79f, 362.980f, 4.210f, BATTLEFIELD_WG_NPC_VIERON_BLAZEFEATHER, 0 },
     { 5020.71f, 3626.19f, 360.150f, 4.640f, BATTLEFIELD_WG_NPC_HOODOO_MASTER_FU_JIN, 0 },
@@ -769,7 +770,7 @@ struct WintergraspTeleporterData
     float o;
 };
 
-const WintergraspTeleporterData WGPortalDefenderData[WG_MAX_TELEPORTER] =
+WintergraspTeleporterData const WGPortalDefenderData[WG_MAX_TELEPORTER] =
 {
     // Player teleporter
     { 190763, 5153.41f, 2901.35f, 409.191f, -0.069f },
@@ -805,9 +806,10 @@ struct WintergraspTowerData
 };
 
 uint8 const WG_MAX_ATTACKTOWERS = 3;
+
 // 192414 : 0 in sql, 1 in header
 // 192278 : 0 in sql, 3 in header
-const WintergraspTowerData AttackTowers[WG_MAX_ATTACKTOWERS] =
+WintergraspTowerData const AttackTowers[WG_MAX_ATTACKTOWERS] =
 {
     // West tower
     {
@@ -921,9 +923,9 @@ struct WintergraspTowerCannonData
     Position TurretTop[5];
 };
 
-const uint8 WG_MAX_TOWER_CANNON = 7;
+uint8 const WG_MAX_TOWER_CANNON = 7;
 
-const WintergraspTowerCannonData TowerCannon[WG_MAX_TOWER_CANNON] =
+WintergraspTowerCannonData const TowerCannon[WG_MAX_TOWER_CANNON] =
 {
     {
         190221,
@@ -937,8 +939,8 @@ const WintergraspTowerCannonData TowerCannon[WG_MAX_TOWER_CANNON] =
         },
         2,
         {
-            { 5255.88f, 3047.63f, 438.499f, 3.13677f },
-            { 5280.9f, 3071.32f, 438.499f, 1.62879f },
+            { 5254.158203125f, 3047.79541015625f, 438.58270263671875f, 3.141592741012573242f }, // VerifiedBuild 51666
+            { 5280.96923828125f, 3073.374267578125f, 438.58270263671875f, 1.65806281566619873f }, // VerifiedBuild 51666
             { 0, 0, 0, 0 },
             { 0, 0, 0, 0 },
             { 0, 0, 0, 0 },
@@ -956,8 +958,8 @@ const WintergraspTowerCannonData TowerCannon[WG_MAX_TOWER_CANNON] =
         },
         2,
         {
-            { 5138.59f, 2935.16f, 439.845f, 3.11723f },
-            { 5163.06f, 2959.52f, 439.846f, 1.47258f },
+            { 5136.8427734375f, 2935.2646484375f, 439.929718017578125f, 3.106686115264892578f }, // VerifiedBuild 51666
+            { 5163.5087890625f, 2960.82080078125f, 439.929718017578125f, 1.605702877044677734f }, // VerifiedBuild 51666
             { 0, 0, 0, 0 },
             { 0, 0, 0, 0 },
             { 0, 0, 0, 0 },
@@ -975,8 +977,8 @@ const WintergraspTowerCannonData TowerCannon[WG_MAX_TOWER_CANNON] =
         },
         2,
         {
-            { 5163.84f, 2723.74f, 439.844f, 4.7115f },
-            { 5139.69f, 2747.4f, 439.844f, 3.17221f },
+            { 5163.86279296875f, 2721.9326171875f, 439.927734375f, 4.642575740814208984f }, // VerifiedBuild 51666
+            { 5137.888671875f, 2747.526611328125f, 439.927734375f, 3.159045934677124023f }, // VerifiedBuild 51666
             { 0, 0, 0, 0 },
             { 0, 0, 0, 0 },
             { 0, 0, 0, 0 },
@@ -994,8 +996,8 @@ const WintergraspTowerCannonData TowerCannon[WG_MAX_TOWER_CANNON] =
         },
         2,
         {
-            { 5278.21f, 2607.23f, 439.755f, 4.71944f },
-            { 5255.01f, 2631.98f, 439.755f, 3.15257f },
+            { 5278.27001953125f, 2605.745361328125f, 439.837890625f, 4.817108631134033203f }, // VerifiedBuild 51666
+            { 5252.43603515625f, 2632.1494140625f, 439.837890625f, 3.193952560424804687f }, // VerifiedBuild 51666
             { 0, 0, 0, 0 },
             { 0, 0, 0, 0 },
             { 0, 0, 0, 0 },
@@ -1003,58 +1005,58 @@ const WintergraspTowerCannonData TowerCannon[WG_MAX_TOWER_CANNON] =
     },
     {
         190356,
-        2,
+        4,
         {
-            {4537.380371f, 3599.531738f, 402.886993f, 3.998462f},
-            {4581.497559f, 3604.087158f, 402.886963f, 5.651723f},
-            {0, 0, 0, 0},
-            {0, 0, 0, 0},
-            {0, 0, 0, 0},
+            { 4538.8867f, 3601.4148f, 402.886993f, 3.998462f }, // VerifiedBuild 0
+            { 4579.6943f, 3605.6738f, 402.886993f, 5.651723f }, // VerifiedBuild 0
+            { 4534.7104f, 3642.0645f, 402.886993f, 2.455163f }, // VerifiedBuild 0
+            { 4575.2915f, 3646.363f, 402.886993f, 0.884366f }, // VerifiedBuild 0
+            { 0, 0, 0, 0 },
         },
-        2,
+        4,
         {
-            {4469.448242f, 1966.623779f, 465.647217f, 1.153573f},
-            {4581.895996f, 3626.438477f, 426.539062f, 0.117806f},
-            {0, 0, 0, 0},
-            {0, 0, 0, 0},
-            {0, 0, 0, 0},
+            { 4583.152f, 3626.6692f, 426.539062f, 0.117806f }, // VerifiedBuild 0
+            { 4559.8447f, 3598.097f, 426.539062f, 4.780807f }, // VerifiedBuild 0
+            { 4531.4473f, 3621.2424f, 426.539062f, 3.268910f }, // VerifiedBuild 0
+            { 4554.4956f, 3649.5588f, 426.539062f, 1.657981f }, // VerifiedBuild 0
+            { 0, 0, 0, 0 },
         },
     },
     {
         190357,
-        2,
+        4,
         {
-            { 4421.640137f, 2799.935791f, 412.630920f, 5.459298f },
-            { 4420.263184f, 2845.340332f, 412.630951f, 0.742197f },
-            { 0, 0, 0, 0 },
-            { 0, 0, 0, 0 },
+            { 4419.017578125f, 2802.616455078125f, 412.71405029296875f, 5.550147056579589843f }, // VerifiedBuild 51666
+            { 4418.22314453125f, 2843.650146484375f, 412.71405029296875f, 0.820304751396179199f }, // VerifiedBuild 51666
+            { 4377.2593f, 2842.6213f, 412.71405029296875f, 2.376623f }, // VerifiedBuild 0
+            { 4377.91943359375f, 2801.678955078125f, 412.71405029296875f, 3.979350566864013671f }, // VerifiedBuild 51666
             { 0, 0, 0, 0 },
         },
-        3,
+        4,
         {
-            { 4423.430664f, 2822.762939f, 436.283142f, 6.223487f },
-            { 4397.825684f, 2847.629639f, 436.283325f, 1.579430f },
-            { 4398.814941f, 2797.266357f, 436.283051f, 4.703747f },
-            { 0, 0, 0, 0 },
+            { 4424.33642578125f, 2822.9638671875f, 436.36627197265625f, 6.161012172698974609f }, // VerifiedBuild 51666
+            { 4397.763f, 2848.164f, 436.36627197265625f, 1.579430f }, // VerifiedBuild 0
+            { 4398.64404296875f, 2796.262939453125f, 436.36627197265625f, 4.78220224380493164f }, // VerifiedBuild 51666
+            { 4372.1884765625f, 2822.0888671875f, 436.36627197265625f, 3.263765573501586914f }, // VerifiedBuild 51666
             { 0, 0, 0, 0 },
         },
     },
     {
         190358,
-        2,
+        4,
         {
-            { 4448.138184f, 1974.998779f, 441.995911f, 1.967238f },
-            { 4486.3257f, 1954.6545f, 442.0783f, 0.349065840244293212f },
-            { 0, 0, 0, 0 },
-            { 0, 0, 0, 0 },
+            { 4448.80712890625f, 1971.795166015625f, 442.07830810546875f, 2.0245819091796875f }, // VerifiedBuild 51666
+            { 4486.32568359375f, 1954.654541015625f, 442.07830810546875f, 0.349065840244293212f }, // VerifiedBuild 51666
+            { 4469.431640625f, 1917.064208984375f, 442.07830810546875f, 5.078907966613769531f }, // VerifiedBuild 51666
+            { 4431.83056640625f, 1934.13720703125f, 442.07830810546875f, 3.647738218307495117f }, // VerifiedBuild 51666
             { 0, 0, 0, 0 },
         },
-        2,
+        4,
         {
-            { 4469.448242f, 1966.623779f, 465.647217f, 1.153573f },
-            { 4481.996582f, 1933.658325f, 465.647186f, 5.873029f },
-            { 0, 0, 0, 0 },
-            { 0, 0, 0, 0 },
+            { 4469.7724609375f, 1967.2432861328125f, 465.73052978515625f, 1.221730470657348632f }, // VerifiedBuild 51666
+            { 4482.228515625f, 1933.906494140625f, 465.73052978515625f, 5.951572895050048828f }, // VerifiedBuild 51666
+            { 4436.2080078125f, 1954.7906494140625f, 465.73052978515625f, 2.740166902542114257f }, // VerifiedBuild 51666
+            { 4448.705078125f, 1921.1121826171875f, 465.73052978515625f, 4.398229598999023437f }, // VerifiedBuild 51666
             { 0, 0, 0, 0 },
         },
     },
@@ -1074,7 +1076,7 @@ struct WGWorkshopData
     uint8 takenText;
 };
 
-const WGWorkshopData WorkshopsData[WG_MAX_WORKSHOP] =
+WGWorkshopData const WorkshopsData[WG_MAX_WORKSHOP] =
 {
     // NE
     {BATTLEFIELD_WG_WORKSHOP_NE, WORLDSTATE_WORKSHOP_NE, BATTLEFIELD_WG_TEXT_WORKSHOP_NE_ATTACK, BATTLEFIELD_WG_TEXT_WORKSHOP_NE_TAKEN},
