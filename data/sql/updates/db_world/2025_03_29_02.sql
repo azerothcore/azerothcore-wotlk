@@ -1,3 +1,4 @@
+-- DB update 2025_03_29_01 -> 2025_03_29_02
 
 -- Southshore Crier
 UPDATE `creature_template` SET `AIName` = 'SmartAI' WHERE `entry` = 2435;

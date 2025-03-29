@@ -1,3 +1,4 @@
+-- DB update 2025_03_29_00 -> 2025_03_29_01
 
 -- Set Wander Distance and Movement Type
 UPDATE `creature` SET `wander_distance` = 0, `MovementType` = 0 WHERE (`id1` = 28557) AND (`guid` IN (128755, 128761, 128763));
