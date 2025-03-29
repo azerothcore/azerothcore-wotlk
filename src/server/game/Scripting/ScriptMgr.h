@@ -465,6 +465,7 @@ public: /* PlayerScript */
     bool OnPlayerCanResurrect(Player* player);
     bool OnPlayerCanGiveLevel(Player* player, uint8 newLevel);
     void OnPlayerSendListInventory(Player* player, ObjectGuid vendorGuid, uint32& vendorEntry);
+    void OnPlayerSendNameQueryOpcode(Player* player, std::string& name);
 
     // Anti cheat
     void AnticheatSetCanFlybyServer(Player* player, bool apply);
@@ -500,6 +501,7 @@ public: /* GuildScript */
     void OnGuildEvent(Guild* guild, uint8 eventType, ObjectGuid::LowType playerGuid1, ObjectGuid::LowType playerGuid2, uint8 newRank);
     void OnGuildBankEvent(Guild* guild, uint8 eventType, uint8 tabId, ObjectGuid::LowType playerGuid, uint32 itemOrMoney, uint16 itemStackCount, uint8 destTabId);
     bool CanGuildSendBankList(Guild const* guild, WorldSession* session, uint8 tabId, bool sendAllSlots);
+    void OnGuildNameQueryOpcode(Guild const* guild, WorldSession* session, std::string& name);
 
 public: /* GroupScript */
     void OnGroupAddMember(Group* group, ObjectGuid guid);
