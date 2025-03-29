@@ -6711,6 +6711,23 @@ bool Unit::HandleDummyAuraProc(Unit* victim, uint32 damage, AuraEffect* triggere
                             target = this;
                             break;
                         }
+
+                        case 240033:
+                        {
+                            triggered_spell_id = 52724;
+                            basepoints0 = damage / 20;
+                            target = this;
+                            break;
+                        }
+                    case 240034:
+                        {
+                            triggered_spell_id = 52724;
+                            basepoints0 = damage / 10;
+                            target = this;
+                            break;
+                        }                        
+
+
                     // Aura of Madness (Darkmoon Card: Madness trinket)
                     //=====================================================
                     // 39511 Sociopath: +35 strength (Paladin, Rogue, Druid, Warrior)
