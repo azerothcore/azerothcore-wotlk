@@ -1,5 +1,5 @@
 
--- Update invicibility to 1%.
+-- Update invicibility to 1% and attack.
 UPDATE `creature_template` SET `AIName` = 'SmartAI' WHERE `entry` = 25744;
 
 DELETE FROM `smart_scripts` WHERE (`entryorguid` = 25744) AND (`source_type` = 0) AND (`id` IN (3, 4));
