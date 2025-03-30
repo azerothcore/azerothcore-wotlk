@@ -68,6 +68,7 @@ UPDATE `creature` SET  `position_x` = 2190.8645, `position_y` = -5681.077, `posi
 UPDATE `creature` SET  `position_x` = 2428.2505, `position_y` = -5779.307, `position_z` = 144.81055, `MovementType` = 2 WHERE (`id1` = 28709) AND (`guid` IN (128497));
 UPDATE `creature` SET  `position_x` = 2419.8975, `position_y` = -5778.0996, `position_z` = 146.97415, `MovementType` = 2 WHERE (`id1` = 28709) AND (`guid` IN (128496));
 UPDATE `creature` SET  `position_x` = 2194.7139, `position_y` = -5682.186, `position_z` = 111.8599, `MovementType` = 2 WHERE (`id1` = 28709) AND (`guid` IN (128494));
+UPDATE `creature` SET  `wander_distance` = 5, `MovementType` = 1 WHERE (`id1` = 28709) AND (`guid` IN (128488, 128489));
 UPDATE `creature` SET `wander_distance` = 0, `MovementType` = 2 WHERE (`id1` = 28709) AND (`guid` IN (128486));
 
 -- Configure Waypoints
