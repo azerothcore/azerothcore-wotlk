@@ -1,0 +1,2 @@
+-- Removes "Rod of Lianthe" and "Nightmare Vine" from "Eclipsion Hawkstrider"'s Loot
+DELETE FROM `creature_loot_template` WHERE (`Entry` = 21627) AND (`Item` IN (22792, 31317));
