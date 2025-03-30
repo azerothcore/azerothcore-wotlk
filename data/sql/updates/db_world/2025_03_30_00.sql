@@ -1,3 +1,4 @@
+-- DB update 2025_03_29_02 -> 2025_03_30_00
 
 -- Add Waypoints for 5 Geists
 DELETE FROM `waypoint_data` WHERE `id` IN (12849500);
