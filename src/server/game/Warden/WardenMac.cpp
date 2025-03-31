@@ -27,6 +27,21 @@
 #include "WorldPacket.h"
 #include "WorldSession.h"
 
+// Constant-time byte comparison function to prevent timing attacks
+static bool ConstantTimeCompare(const void* a, const void* b, size_t size)
+{
+    const unsigned char* a_ptr = static_cast<const unsigned char*>(a);
+    const unsigned char* b_ptr = static_cast<const unsigned char*>(b);
+    unsigned char result = 0;
+    for (size_t i = 0; i < size; ++i)
+    {
+        // CRYPTO_memcmp implementation
+        result |= a_ptr[i] ^ b_ptr[i];
+    }
+    // Will be 0 only if all bytes match
+    return (result == 0);
+}
+
 WardenMac::WardenMac() : Warden()
 {
 }
@@ -152,8 +167,8 @@ void WardenMac::HandleHashResult(ByteBuffer& buff)
 
     //const uint8 validHash[20] = { 0x56, 0x8C, 0x05, 0x4C, 0x78, 0x1A, 0x97, 0x2A, 0x60, 0x37, 0xA2, 0x29, 0x0C, 0x22, 0xB5, 0x25, 0x71, 0xA0, 0x6F, 0x4E };
 
-    // Verify key
-    if (memcmp(buff.contents() + 1, sha1.GetDigest().data(), 20) != 0)
+    // Verify key using constant-time comparison
+    if (!ConstantTimeCompare(buff.contents() + 1, sha1.GetDigest().data(), 20))
     {
         LOG_DEBUG("warden", "Request hash reply: failed");
         ApplyPenalty(0, "Request hash reply: failed");
