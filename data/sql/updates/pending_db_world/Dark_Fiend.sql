@@ -1,5 +1,5 @@
 
--- Remove flags (sniffed)
+-- Remove flags and edit walk and run speed (sniffed)
 UPDATE `creature_template` SET `unit_flags` = `unit_flags`& ~131072, `unit_flags2` = `unit_flags2`& ~2048, `flags_extra` = `flags_extra`& ~2, `speed_walk` = 1.2, `speed_run` = 0.4 WHERE (`entry` = 25744);
 
 -- Update invicibility to 1% and attack.
