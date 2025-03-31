@@ -363,7 +363,7 @@ INSERT INTO `spell_cooldown_overrides` (`Id`, `RecoveryTime`, `CategoryRecoveryT
 (15091, 15000, 18000, 0, 0, 'Scarlet Magus, Spellbinder Maryana - Blast Wave'),
 (15096, 5000, 8000, 0, 0, 'Twilight''s Hammer Ambassador, Firebrand Pyromancer - Flame Shock'),
 (15122, 10000, 15000, 0, 0, 'Scarshield Spellbinder, Scarlet Archmage, Scholomance Occultist - Counterspell'),
-(15123, 3000, 6000, 0, 0, 'Scarshield Spellbinder - Resist Fire'),
+(15123, 40000, 40000, 0, 0, 'Scarshield Spellbinder - Resist Fire'),
 (15128, 30000, 30000, 0, 0, 'Mark of Flames'),
 (15228, 2400, 3800, 0, 0, 'Fireball'),
 (15230, 1500, 1500, 0, 0, 'Crimson Sorcerer - Arcane Bolt'),
