@@ -18,7 +18,6 @@
 #include "WardenMac.h"
 #include "ByteBuffer.h"
 #include "CryptoHash.h"
-#include <openssl/crypto.h>
 #include "Log.h"
 #include "Opcodes.h"
 #include "Player.h"
@@ -27,6 +26,7 @@
 #include "WardenModuleMac.h"
 #include "WorldPacket.h"
 #include "WorldSession.h"
+#include <openssl/crypto.h>
 
 WardenMac::WardenMac() : Warden()
 {
