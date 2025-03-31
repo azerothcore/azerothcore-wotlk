@@ -19,7 +19,6 @@
 #include "ByteBuffer.h"
 #include "Common.h"
 #include "CryptoRandom.h"
-#include <openssl/crypto.h>
 #include "GameTime.h"
 #include "HMAC.h"
 #include "Log.h"
@@ -32,6 +31,7 @@
 #include "World.h"
 #include "WorldPacket.h"
 #include "WorldSession.h"
+#include <openssl/crypto.h>
 
 // GUILD is the shortest string that has no client validation (RAID only sends if in a raid group)
 static constexpr char _luaEvalPrefix[] = "local S,T,R=SendAddonMessage,function()";
