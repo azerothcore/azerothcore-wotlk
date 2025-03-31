@@ -38,13 +38,11 @@ static bool ConstantTimeCompare(const void* a, const void* b, size_t size)
     const unsigned char* a_ptr = static_cast<const unsigned char*>(a);
     const unsigned char* b_ptr = static_cast<const unsigned char*>(b);
     unsigned char result = 0;
-    
     for (size_t i = 0; i < size; ++i)
     {
         // CRYPTO_memcmp implementation
         result |= a_ptr[i] ^ b_ptr[i];
     }
-    
     // Will be 0 only if all bytes match
     return (result == 0);
 }
