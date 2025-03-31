@@ -212,18 +212,18 @@ struct boss_felmyst : public BossAI
             DoCastVictim(SPELL_CLEAVE);
         }, 7500ms);
 
-        ScheduleTimedEvent(12s, [&] {
-            DoCastVictim(SPELL_CORROSION);
-        }, 20s);
-
-        ScheduleTimedEvent(18s, [&] {
+        ScheduleTimedEvent(13s, 30s, [&] {
             Talk(YELL_BREATH);
-            DoCastSelf(SPELL_GAS_NOVA);
-        }, 20s);
+            DoCastVictim(SPELL_CORROSION);
+        }, 30s, 39s);
 
-        ScheduleTimedEvent(25s, [&] {
+        ScheduleTimedEvent(18s, 43s, [&] {
+            DoCastSelf(SPELL_GAS_NOVA);
+        }, 18s, 43s);
+
+        ScheduleTimedEvent(26s, 53s, [&] {
             DoCastRandomTarget(SPELL_ENCAPSULATE_CHANNEL, 0, 50.0f);
-        }, 25s);
+        }, 26s, 53s);
 
         me->m_Events.AddEventAtOffset([&] {
             Talk(YELL_TAKEOFF);
