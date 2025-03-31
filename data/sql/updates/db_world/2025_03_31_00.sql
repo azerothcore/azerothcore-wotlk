@@ -1,3 +1,4 @@
+-- DB update 2025_03_30_02 -> 2025_03_31_00
 
 -- Add sniffed Spawn Points
 DELETE FROM `creature` WHERE (`id1` = 28406) AND (`guid` IN (129520, 129529, 129530, 129531, 129532, 129546, 129547, 129556));
