@@ -1,3 +1,4 @@
+-- DB update 2025_03_31_00 -> 2025_03_31_01
 DELETE FROM `quest_template_locale` WHERE (`locale` = 'ruRU' AND `ID` IN (117, 149, 152, 161, 199, 217, 25, 255, 278, 280, 283, 32, 5441, 786, 792));
 INSERT INTO `quest_template_locale` (`ID`,`locale`,`Title`,`Details`,`Objectives`,`EndText`,`CompletedText`,`ObjectiveText1`,`ObjectiveText2`,`ObjectiveText3`,`ObjectiveText4`,`VerifiedBuild`)
 VALUES
