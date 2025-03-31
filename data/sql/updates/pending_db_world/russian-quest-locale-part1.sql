@@ -1,4 +1,4 @@
-DELETE FROM `quest_template_locale` WHERE (locale = 'ruRU' AND ID IN (117, 149, 152, 161, 199, 217, 25, 255, 278, 280, 283, 32, 5441, 786, 792));
+DELETE FROM `quest_template_locale` WHERE (`locale` = 'ruRU' AND `ID` IN (117, 149, 152, 161, 199, 217, 25, 255, 278, 280, 283, 32, 5441, 786, 792));
 INSERT INTO `quest_template_locale` (`ID`,`locale`,`Title`,`Details`,`Objectives`,`EndText`,`CompletedText`,`ObjectiveText1`,`ObjectiveText2`,`ObjectiveText3`,`ObjectiveText4`,`VerifiedBuild`)
 VALUES
   (792,'ruRU','Злобные фамильяры',
@@ -119,9 +119,8 @@ VALUES
 '',
 '','','','',0);
 
-
 DELETE FROM `quest_request_items_locale`
-WHERE (locale = 'ruRU'
+WHERE (`locale` = 'ruRU'
   AND ID IN (
     10, 101, 102, 103, 104, 11, 113, 114, 115, 116,
     117, 118, 119, 12, 120, 121, 122, 123, 124, 125,
@@ -340,7 +339,7 @@ VALUES
   (301, 'ruRU', 'Представители моего клана терпеть не могут, когда нас беспокоят по пустякам, |3-6($C). Надеюсь, твои вести стоят моего драгоценного внимания.', 0);
 
 DELETE FROM `quest_offer_reward_locale`
-WHERE (locale = 'ruRU'
+WHERE (`locale` = 'ruRU'
   AND ID IN (
     10, 101, 102, 103, 104, 106, 107, 109, 11, 110,
     111, 112, 113, 114, 115, 116, 117, 118, 119, 12,
@@ -642,7 +641,7 @@ VALUES
   (301, 'ruRU', 'Проклятый Железняк! Я послал ему целый воз пороха еще неделю назад, но он не потрудился упомянуть об этом в отчете.$b$bТак... куда делся порох?!?', 0),
   (302, 'ruRU', 'Что? Грозовая Вершина хочет, чтобы ты лично $Gпроследил:проследила; за доставкой груза к Железняку?$b$bЯ... думаю, это неплохая идея, но беда в том, что Хальдар и носильщики, Миран и Сайан, уже вышли. Вы чуть-чуть разминулись, я отправил их совсем недавно.', 0);
 
-DELETE FROM `quest_greeting_locale` WHERE locale = 'ruRU' AND ID IN (3188);
+DELETE FROM `quest_greeting_locale` WHERE (`locale` = 'ruRU' AND `ID` IN (3188));
 INSERT INTO `quest_greeting_locale` (`ID`,`type`,`locale`,`Greeting`,`VerifiedBuild`)
 VALUES
   (3188, 0, 'ruRU', 'Если ты хочешь поговорить о чем-то, |3-6($c)... то, заходи, посиди со мной.', 0);
