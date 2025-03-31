@@ -160,7 +160,7 @@ static PlayerAbilityStruct PlayerAbility[13][3] =
 {
     // 0 UNK class (should never be set)
     {
-        // Warrior as default behavior if for some reason UNK class
+        // Warrior as fallback behavior if for some reason UNK class
         { SPELL_WR_SPELL_REFLECT, ABILITY_TARGET_SELF,   10000ms },
         { SPELL_WR_WHIRLWIND,     ABILITY_TARGET_SELF,   10000ms },
         { SPELL_WR_MORTAL_STRIKE, ABILITY_TARGET_VICTIM, 6000ms  }
@@ -213,7 +213,7 @@ static PlayerAbilityStruct PlayerAbility[13][3] =
     },
     // 10 UNK class (should never be set)
     {
-        // Warrior as default behavior if for some reason UNK class
+        // Warrior as fallback behavior if for some reason UNK class
         { SPELL_WR_SPELL_REFLECT, ABILITY_TARGET_SELF,   10000ms },
         { SPELL_WR_WHIRLWIND,     ABILITY_TARGET_SELF,   10000ms },
         { SPELL_WR_MORTAL_STRIKE, ABILITY_TARGET_VICTIM, 6000ms  }
