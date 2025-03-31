@@ -397,13 +397,13 @@ DELETE FROM `quest_offer_reward_locale` WHERE (`ID` = 38 AND `locale` = 'ruRU');
 INSERT INTO `quest_offer_reward_locale` (`ID`,`locale`,`RewardText`,`VerifiedBuild`)
 VALUES (38, 'ruRU', 'Окра отлично загустит бульон! А теперь мы просто добавим жилистого мяса стервятника, несколько глаз мурлока и эти вкуснейшие рыла жутеклыка. И вот все готово! За оказанную помощь, $N, я предлагаю тебе отведать первую порцию похлебки Западного Края.', 0);
 
--- Add Russian locale for QuestID: 33
+-- Fix Russian locale for QuestID: 33
 DELETE FROM `quest_request_items_locale` WHERE (`ID` = 33 AND `locale` = 'ruRU');
 INSERT INTO `quest_request_items_locale` (`ID`,`locale`,`CompletionText`,`VerifiedBuild`)
-VALUES (33, 'ruRU', 'Эй, $N! Я уж проголодался... Ты $Gпринес:принесла; волчатину?', 0);
+VALUE (33, 'ruRU', 'Хэй, $N. Как идёт охота на заражённых волков?', 0);
 DELETE FROM `quest_offer_reward_locale` WHERE (`ID` = 33 AND `locale` = 'ruRU');
 INSERT INTO `quest_offer_reward_locale` (`ID`,`locale`,`RewardText`,`VerifiedBuild`)
-VALUES (33, 'ruRU', 'Ну, ты на славу $Gпостарался:постаралась;! Прямо не терпится поджарить волчатинки...$b$bУ меня есть кое-что интересное для тебя – выбирай!', 0);
+VALUE (33, 'ruRU', 'Мрачное было дельцо, но ты $Gвыполнил:выполнила; свою часть уговора.', 0);
 
 -- Add Russian locale for QuestID: 57
 DELETE FROM `quest_offer_reward_locale` WHERE (`ID` = 57 AND `locale` = 'ruRU');
