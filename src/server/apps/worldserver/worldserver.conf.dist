@@ -67,6 +67,7 @@
 #    PLAYER DUMP
 #    CUSTOM
 #    DEBUG
+#    DYNAMIC RESPAWN SETTINGS
 #
 ###################################################################################################
 
@@ -290,7 +291,7 @@ FlashAtStart = 1
 #           DATABASE_CHARACTER = 2, // Character database
 #           DATABASE_WORLD     = 4, // World database
 #
-#        Default:     7 - (All enabled)
+#        Default:     7  - (All enabled)
 #                     4  - (Enable world only)
 #                     0  - (All disabled)
 
@@ -1117,17 +1118,6 @@ PreventAFKLogout = 0
 
 ###################################################################################################
 # PACKET SPOOF PROTECTION SETTINGS
-#
-# These settings determine which action to take when harmful packet spoofing is detected.
-#
-#    PacketSpoof.Policy
-#        Description: Determines the course of action when packet spoofing is detected.
-#        Values:     0 - Log only
-#                    1 - Log + kick
-#                    2 - Log + kick + ban
-
-PacketSpoof.Policy = 1
-
 #
 #    PacketSpoof.BanMode
 #        Description: If PacketSpoof.Policy equals 2, this will determine the ban mode.
@@ -2045,11 +2035,18 @@ WaterBreath.Timer = 180000
 EnableLowLevelRegenBoost = 1
 
 #
-#    Rate.MoveSpeed
-#        Description: Movement speed rate.
+#    Rate.MoveSpeed.Player
+#        Description: Movement speed rate for players.
 #        Default:     1
 
-Rate.MoveSpeed = 1
+Rate.MoveSpeed.Player = 1
+
+#
+#    Rate.MoveSpeed.NPC
+#        Description: Movement speed rate for NPCs.
+#        Default:     1
+
+Rate.MoveSpeed.NPC = 1
 
 #
 #    Rate.Damage.Fall
@@ -2106,14 +2103,17 @@ Rate.Loyalty           = 1
 #    Rate.Rest.InGame
 #    Rate.Rest.Offline.InTavernOrCity
 #    Rate.Rest.Offline.InWilderness
+#    Rate.Rest.MaxBonus
 #        Description: Resting points grow rates.
 #        Default:     1 - (Rate.Rest.InGame)
 #                     1 - (Rate.Rest.Offline.InTavernOrCity)
 #                     1 - (Rate.Rest.Offline.InWilderness)
+#                     1.5 - (Rate.Rest.MaxBonus)
 
 Rate.Rest.InGame                 = 1
 Rate.Rest.Offline.InTavernOrCity = 1
 Rate.Rest.Offline.InWilderness   = 1
+Rate.Rest.MaxBonus               = 1.5
 
 #
 #    Rate.MissChanceMultiplier.Creature
@@ -2162,6 +2162,21 @@ NoResetTalentsCost = 0
 #
 
 ToggleXP.Cost = 100000
+
+#
+#    SpellQueue.Enabled
+#        Description: Enable SpellQueue.
+#        Default:     0 - (Disabled)
+#                     1 - (Enabled)
+
+SpellQueue.Enabled = 1
+
+#
+#    SpellQueue.Window
+#        Description: Time (in milliseconds) for spells to be queued.
+#        Default:     400 - (400ms)
+
+SpellQueue.Window = 400
 
 #
 ###################################################################################################
@@ -3684,6 +3699,50 @@ Battleground.SpeedBuffRespawn = 150
 Battleground.Override.LowLevels.MinPlayers = 0
 
 #
+#    Battleground.Warsong.Flags
+#        Description: Set the number of flags required for a team to win in Warsong battleground
+#        Default:     3 (Blizzlike)
+#                     1 (Minimum)
+
+Battleground.Warsong.Flags = 3
+
+#
+#    Battleground.Arathi.CapturePoints
+#        Description: Set the number of capture points required for a team to win in Arathi battleground
+#        Default:     1600 (WotLK)
+#                     2000 (Vanilla)
+
+Battleground.Arathi.CapturePoints = 1600
+
+#
+#    Battleground.Alterac.Reinforcements
+#        Description: Set the number of total reinforcements for each teams in Alterac battleground
+#                     (It is necessary to restart the server after changing the Reinforcements value)
+#        Default:     600 (Enabled, WotLK)
+#                     500 (Enabled, MoP)
+#                     0   (Disabled, early Vanilla, victory only on boss death)
+
+Battleground.Alterac.Reinforcements = 600
+
+#
+#    Battleground.Alterac.ReputationOnBossDeath
+#        Description: Set the number of rep point given for a boss killed in Alterac battleground
+#                     (It is necessary to restart the server after changing the ReputationOnBossDeath value)
+#        Default:     350 (WotLK)
+#                     389 (Vanilla)
+
+Battleground.Alterac.ReputationOnBossDeath = 350
+
+#
+#    Battleground.EyeOfTheStorm.CapturePoints
+#        Description: Set the number of capture points required for a team to win in Eye of the Storm battleground
+#                     (The UI part of the max team score will not be compliant with this parameter without client modification)
+#        Default:     1600 (WotLK, UI compliant)
+#                     2000 (TBC, not UI compliant)
+
+Battleground.EyeOfTheStorm.CapturePoints = 1600
+
+#
 ###################################################################################################
 
 ###################################################################################################
@@ -3763,21 +3822,6 @@ Arena.QueueAnnouncer.PlayerOnly = 0
 #
 
 Arena.QueueAnnouncer.Detail = 3
-
-#
-#    Arena.ArenaSeason.ID
-#        Description: Current arena season id shown in clients.
-#        Default:     8
-
-Arena.ArenaSeason.ID = 8
-
-#
-#    Arena.ArenaSeason.InProgress
-#        Description: State of current arena season.
-#        Default:     1 - (Active)
-#                     0 - (Finished)
-
-Arena.ArenaSeason.InProgress = 1
 
 #
 #    Arena.ArenaStartRating
@@ -4278,13 +4322,26 @@ Event.Announce = 0
 ###################################################################################################
 
 ###################################################################################################
+# WORLD STATE
+#
+#    Sunsreach.CounterMax
+#        Description: Counter value to be reached to transition phases
+#                     during the Sun's Reach Reclamation event.
+#        Default:     10000
+
+Sunsreach.CounterMax = 10000
+
+#
+###################################################################################################
+
+###################################################################################################
 # AUCTION HOUSE
 #
-#     AuctionHouse.SearchTimeout
-#        Description: Time (in milliseconds) after which an auction house search is discarded.
-#        Default:     1000 - (1 second)
+#     AuctionHouse.WorkerThreads
+#        Description: Count of auctionhouse searcher worker threads to spawn
+#        Default:     1
 
-AuctionHouse.SearchTimeout = 1000
+AuctionHouse.WorkerThreads = 1
 
 #
 #     LevelReq.Auction
@@ -4440,6 +4497,52 @@ Debug.Battleground = 0
 #                 1 - (Enabled)
 
 Debug.Arena = 0
+
+#
+###################################################################################################
+
+###################################################################################################
+# DYNAMIC RESPAWN SETTINGS
+#
+#
+#    Respawn.DynamicRateCreature
+#        Description: Controls how creature respawn times adjust based on player count in a zone.
+#                     The respawn time is unchanged up to the configured number of players.
+#                     As player count exceeds this value, respawn times decrease proportionally
+#                     (e.g., at double the player count, respawn times are halved; at triple the player count, respawns happen three times as fast).
+#                     Does not affect instanced creatures, bosses, or quest givers.
+#                     Formula: adjustFactor = rate / playerCount
+#                              RespawnTime = RespawnTime * adjustFactor
+#        Default:     1 (Disabled)
+
+Respawn.DynamicRateCreature = 1
+
+#
+#    Respawn.DynamicMinimumCreature
+#        Description: The minimum respawn time for a creature under dynamic scaling.
+#        Default:     10 - (10 seconds)
+
+Respawn.DynamicMinimumCreature = 10
+
+#
+#    Respawn.DynamicRateGameObject
+#        Description: Controls how gameobject respawn times adjust based on player count in a zone.
+#                     The respawn time is unchanged up to the configured number of players.
+#                     As player count exceeds this value, respawn times decrease proportionally
+#                     (e.g., at double the player count, respawn times are halved; at triple the player count, respawns happen three times as fast).
+#                     Does not affect instanced objects or quest givers.
+#                     Formula: adjustFactor = rate / playerCount
+#                              RespawnTime = RespawnTime * adjustFactor
+#        Default:     1 (Disabled)
+
+Respawn.DynamicRateGameObject = 1
+
+#
+#    Respawn.DynamicMinimumGameObject
+#        Description: The minimum respawn time for a gameobject under dynamic scaling.
+#        Default:     10 - (10 seconds)
+
+Respawn.DynamicMinimumGameObject = 10
 
 #
 ###################################################################################################

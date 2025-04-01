@@ -153,12 +153,12 @@ void WorldSession::HandleCalendarGetCalendar(WorldPacket& /*recvData*/)
     data.append(dataBuffer);
 
     /// @todo: Fix this, how we do know how many and what holidays to send?
-    data << uint32(sGameEventMgr->modifiedHolidays.size());
-    for (uint32 entry : sGameEventMgr->modifiedHolidays)
+    data << uint32(sGameEventMgr->ModifiedHolidays.size());
+    for (uint32 entry : sGameEventMgr->ModifiedHolidays)
     {
         HolidaysEntry const* holiday = sHolidaysStore.LookupEntry(entry);
 
-        if (DisableMgr::IsDisabledFor(DISABLE_TYPE_GAME_EVENT, sGameEventMgr->GetHolidayEventId(holiday->Id), nullptr))
+        if (sDisableMgr->IsDisabledFor(DISABLE_TYPE_GAME_EVENT, sGameEventMgr->GetHolidayEventId(holiday->Id), nullptr))
         {
             continue;
         }

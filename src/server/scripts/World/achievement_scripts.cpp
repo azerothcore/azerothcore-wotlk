@@ -267,7 +267,7 @@ class achievement_flirt_with_disaster_perf_check : public AchievementCriteriaScr
             if (!player)
                 return false;
 
-            if (player->HasAura(AURA_PERFUME_FOREVER) || player->HasAura(AURA_PERFUME_ENCHANTRESS) || player->HasAura(AURA_PERFUME_VICTORY))
+            if (player->HasAnyAuras(AURA_PERFUME_FOREVER, AURA_PERFUME_ENCHANTRESS, AURA_PERFUME_VICTORY))
                 return true;
 
             return false;

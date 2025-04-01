@@ -33,7 +33,6 @@ enum Spells
     // INSANITY
     SPELL_INSANITY                          = 57496, //Dummy
     INSANITY_VISUAL                         = 57561,
-    SPELL_INSANITY_TARGET                   = 57508,
     SPELL_CLONE_PLAYER                      = 57507, //casted on player during insanity
     SPELL_INSANITY_PHASING_1                = 57508,
     SPELL_INSANITY_PHASING_2                = 57509,
@@ -362,15 +361,13 @@ class spell_herald_volzaj_insanity : public SpellScript
         {
             targets.remove_if([this](WorldObject* targetObj) -> bool
             {
-                return !targetObj || !targetObj->IsPlayer() || !targetObj->ToPlayer()->IsInCombatWith(GetCaster()) ||
+                return !targetObj || !targetObj->IsPlayer() || !GetCaster()->IsInCombatWith(targetObj->ToPlayer()) ||
                         targetObj->GetDistance(GetCaster()) >= (MAX_VISIBILITY_DISTANCE * 2);
             });
         }
 
         if (targets.empty())
-        {
             return;
-        }
 
         // Start channel visual and set self as unnattackable
         caster->ToCreature()->AI()->Talk(SAY_INSANITY);
@@ -387,16 +384,12 @@ class spell_herald_volzaj_insanity : public SpellScript
         {
             WorldObject* targetObj = *itr;
             if (!targetObj)
-            {
                 continue;
-            }
 
             Player* plrTarget = targetObj->ToPlayer();
             // This should never happen, spell has attribute SPELL_ATTR3_ONLY_TARGET_PLAYERS
             if (!plrTarget)
-            {
                 continue;
-            }
 
             // phase mask
             plrTarget->CastSpell(plrTarget, InsanitySpells.at(insanityCounter), true);
@@ -405,19 +398,17 @@ class spell_herald_volzaj_insanity : public SpellScript
             for (std::list<WorldObject*>::const_iterator itr2 = targets.begin(); itr2 != targets.end(); ++itr2)
             {
                 // Should not make clone of current player target
-                Player const* plrClone = *itr2 ? (*itr2)->ToPlayer() : nullptr;
-                if (!plrClone || plrClone == plrTarget)
-                {
+                Player* plrClone = *itr2 ? (*itr2)->ToPlayer() : nullptr;
+                if (!plrClone || plrClone == plrTarget || !plrClone->IsAlive())
                     continue;
-                }
 
                 if (Unit* summon = caster->SummonCreature(NPC_TWISTED_VISAGE, plrClone->GetPosition(), TEMPSUMMON_CORPSE_DESPAWN, 0))
                 {
+                    plrClone->CastSpell(summon, SPELL_CLONE_PLAYER, true);
+
                     summon->AddThreat(plrTarget, 0.0f);
                     summon->SetInCombatWith(plrTarget);
                     plrTarget->SetInCombatWith(summon);
-
-                    plrTarget->CastSpell(summon, SPELL_CLONE_PLAYER, true);
                     summon->SetPhaseMask(1 | (1 << (4 + insanityCounter)), true);
                     summon->SetUInt32Value(UNIT_FIELD_MINDAMAGE, plrClone->GetUInt32Value(UNIT_FIELD_MINDAMAGE));
                     summon->SetUInt32Value(UNIT_FIELD_MAXDAMAGE, plrClone->GetUInt32Value(UNIT_FIELD_MAXDAMAGE));

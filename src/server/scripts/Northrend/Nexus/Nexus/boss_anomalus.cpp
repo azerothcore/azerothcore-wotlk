@@ -67,146 +67,131 @@ private:
     Creature* _caster;
 };
 
-class boss_anomalus : public CreatureScript
+struct boss_anomalus : public BossAI
 {
-public:
-    boss_anomalus() : CreatureScript("boss_anomalus") { }
+    boss_anomalus(Creature* creature) : BossAI(creature, DATA_ANOMALUS_EVENT) { }
 
-    CreatureAI* GetAI(Creature* creature) const override
+    bool achievement;
+    uint16 activeRifts;
+
+    void Reset() override
     {
-        return GetNexusAI<boss_anomalusAI>(creature);
+        BossAI::Reset();
+        achievement = true;
+        me->CastSpell(me, SPELL_CLOSE_RIFTS, true);
     }
 
-    struct boss_anomalusAI : public BossAI
+    uint32 GetData(uint32 data) const override
     {
-        boss_anomalusAI(Creature* creature) : BossAI(creature, DATA_ANOMALUS_EVENT)
-        {
-        }
+        if (data == me->GetEntry())
+            return achievement;
+        return 0;
+    }
 
-        bool achievement;
-        uint16 activeRifts;
-
-        void Reset() override
+    void SetData(uint32 type, uint32) override
+    {
+        if (type == me->GetEntry())
         {
-            BossAI::Reset();
-            achievement = true;
-            me->CastSpell(me, SPELL_CLOSE_RIFTS, true);
-        }
-
-        uint32 GetData(uint32 data) const override
-        {
-            if (data == me->GetEntry())
-                return achievement;
-            return 0;
-        }
-
-        void SetData(uint32 type, uint32) override
-        {
-            if (type == me->GetEntry())
+            if (activeRifts > 0 && --activeRifts == 0 && me->HasAura(SPELL_RIFT_SHIELD))
             {
-                if (activeRifts > 0 && --activeRifts == 0 && me->HasAura(SPELL_RIFT_SHIELD))
-                {
-                    events.DelayEvents(me->GetAura(SPELL_RIFT_SHIELD)->GetDuration() - 46000);
-                    me->RemoveAura(SPELL_RIFT_SHIELD);
-                    me->InterruptNonMeleeSpells(false);
-                }
-                achievement = false;
+                events.DelayEvents(me->GetAura(SPELL_RIFT_SHIELD)->GetDuration() - 46000);
+                me->RemoveAura(SPELL_RIFT_SHIELD);
+                me->InterruptNonMeleeSpells(false);
             }
+            achievement = false;
         }
+    }
 
-        void JustSummoned(Creature* summon) override
+    void JustSummoned(Creature* summon) override
+    {
+        summons.Summon(summon);
+        activeRifts++;
+    }
+
+    void JustEngagedWith(Unit* who) override
+    {
+        Talk(SAY_AGGRO);
+        BossAI::JustEngagedWith(who);
+
+        activeRifts = 0;
+        events.SetTimer(45000);
+        events.ScheduleEvent(EVENT_ANOMALUS_SPARK, 5s);
+        events.ScheduleEvent(EVENT_ANOMALUS_HEALTH, 1s);
+        events.ScheduleEvent(EVENT_ANOMALUS_SPAWN_RIFT, IsHeroic() ? 15s : 25s);
+        if (IsHeroic())
+            events.ScheduleEvent(EVENT_ANOMALUS_ARCANE_ATTRACTION, 8s);
+    }
+
+    void JustDied(Unit* killer) override
+    {
+        Talk(SAY_DEATH);
+        BossAI::JustDied(killer);
+        me->CastSpell(me, SPELL_CLOSE_RIFTS, true);
+    }
+
+    void UpdateAI(uint32 diff) override
+    {
+        if (!UpdateVictim())
+            return;
+
+        events.Update(diff);
+        if (me->HasUnitState(UNIT_STATE_CASTING))
+            return;
+
+        switch (events.ExecuteEvent())
         {
-            summons.Summon(summon);
-            activeRifts++;
-        }
-
-        void JustEngagedWith(Unit* who) override
-        {
-            Talk(SAY_AGGRO);
-            BossAI::JustEngagedWith(who);
-
-            activeRifts = 0;
-            events.SetTimer(45000);
+        case EVENT_ANOMALUS_SPARK:
+            me->CastSpell(me->GetVictim(), SPELL_SPARK, false);
             events.ScheduleEvent(EVENT_ANOMALUS_SPARK, 5s);
-            events.ScheduleEvent(EVENT_ANOMALUS_HEALTH, 1s);
-            events.ScheduleEvent(EVENT_ANOMALUS_SPAWN_RIFT, IsHeroic() ? 15s : 25s);
-            if (IsHeroic())
-                events.ScheduleEvent(EVENT_ANOMALUS_ARCANE_ATTRACTION, 8s);
-        }
-
-        void JustDied(Unit* killer) override
-        {
-            Talk(SAY_DEATH);
-            BossAI::JustDied(killer);
-            me->CastSpell(me, SPELL_CLOSE_RIFTS, true);
-        }
-
-        void UpdateAI(uint32 diff) override
-        {
-            if (!UpdateVictim())
-                return;
-
-            events.Update(diff);
-            if (me->HasUnitState(UNIT_STATE_CASTING))
-                return;
-
-            switch (events.ExecuteEvent())
+            break;
+        case EVENT_ANOMALUS_HEALTH:
+            if (me->HealthBelowPct(51))
             {
-                case EVENT_ANOMALUS_SPARK:
-                    me->CastSpell(me->GetVictim(), SPELL_SPARK, false);
-                    events.ScheduleEvent(EVENT_ANOMALUS_SPARK, 5s);
-                    break;
-                case EVENT_ANOMALUS_HEALTH:
-                    if (me->HealthBelowPct(51))
-                    {
-                        //First time we reach 51%, the next rift going to be empowered following timings.
-                        events.CancelEvent(EVENT_ANOMALUS_SPAWN_RIFT);
-                        events.ScheduleEvent(EVENT_ANOMALUS_SPAWN_RIFT_EMPOWERED, 1s);
-                        break;
-                    }
-                    events.ScheduleEvent(EVENT_ANOMALUS_HEALTH, 1s);
-                    break;
-                case EVENT_ANOMALUS_ARCANE_ATTRACTION:
-                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 50.0f, true))
-                        me->CastSpell(target, SPELL_ARCANE_ATTRACTION, false);
-                    events.ScheduleEvent(EVENT_ANOMALUS_ARCANE_ATTRACTION, 15s);
-                    break;
-                case EVENT_ANOMALUS_SPAWN_RIFT:
-                    Talk(SAY_RIFT);
-                    Talk(EMOTE_RIFT);
-                    me->CastSpell(me, SPELL_CREATE_RIFT, false);
-                    //Once we hit 51% hp mark, after each rift we spawn an empowered
-                    events.ScheduleEvent(me->HealthBelowPct(51) ? EVENT_ANOMALUS_SPAWN_RIFT_EMPOWERED : EVENT_ANOMALUS_SPAWN_RIFT, IsHeroic() ? 15000 : 25000);
-                    break;
-                case EVENT_ANOMALUS_SPAWN_RIFT_EMPOWERED:
-                    Talk(SAY_RIFT);
-                    Talk(EMOTE_RIFT);
-
-                    me->CastSpell(me, SPELL_CREATE_RIFT, false);
-                    me->CastSpell(me, SPELL_RIFT_SHIELD, true);
-                    me->m_Events.AddEvent(new ChargeRifts(me), me->m_Events.CalculateTime(1000));
-                    events.DelayEvents(46s);
-                    //As we just spawned an empowered spawn a normal one
-                    events.ScheduleEvent(EVENT_ANOMALUS_SPAWN_RIFT, IsHeroic() ? 15s : 25s);
-                    break;
+                //First time we reach 51%, the next rift going to be empowered following timings.
+                events.CancelEvent(EVENT_ANOMALUS_SPAWN_RIFT);
+                events.ScheduleEvent(EVENT_ANOMALUS_SPAWN_RIFT_EMPOWERED, 1s);
+                break;
             }
+            events.ScheduleEvent(EVENT_ANOMALUS_HEALTH, 1s);
+            break;
+        case EVENT_ANOMALUS_ARCANE_ATTRACTION:
+            if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 50.0f, true))
+                me->CastSpell(target, SPELL_ARCANE_ATTRACTION, false);
+            events.ScheduleEvent(EVENT_ANOMALUS_ARCANE_ATTRACTION, 15s);
+            break;
+        case EVENT_ANOMALUS_SPAWN_RIFT:
+            Talk(SAY_RIFT);
+            Talk(EMOTE_RIFT);
+            me->CastSpell(me, SPELL_CREATE_RIFT, false);
+            //Once we hit 51% hp mark, after each rift we spawn an empowered
+            events.ScheduleEvent(me->HealthBelowPct(51) ? EVENT_ANOMALUS_SPAWN_RIFT_EMPOWERED : EVENT_ANOMALUS_SPAWN_RIFT, IsHeroic() ? 15000 : 25000);
+            break;
+        case EVENT_ANOMALUS_SPAWN_RIFT_EMPOWERED:
+            Talk(SAY_RIFT);
+            Talk(EMOTE_RIFT);
 
-            DoMeleeAttackIfReady();
+            me->CastSpell(me, SPELL_CREATE_RIFT, false);
+            me->CastSpell(me, SPELL_RIFT_SHIELD, true);
+            me->m_Events.AddEvent(new ChargeRifts(me), me->m_Events.CalculateTime(1000));
+            events.DelayEvents(46s);
+            //As we just spawned an empowered spawn a normal one
+            events.ScheduleEvent(EVENT_ANOMALUS_SPAWN_RIFT, IsHeroic() ? 15s : 25s);
+            break;
         }
 
-        bool CheckEvadeIfOutOfCombatArea() const override
-        {
-            return me->GetHomePosition().GetExactDist2d(me) > 60.0f;
-        }
-    };
+        DoMeleeAttackIfReady();
+    }
+
+    bool CheckEvadeIfOutOfCombatArea() const override
+    {
+        return me->GetHomePosition().GetExactDist2d(me) > 60.0f;
+    }
 };
 
 class achievement_chaos_theory : public AchievementCriteriaScript
 {
 public:
-    achievement_chaos_theory() : AchievementCriteriaScript("achievement_chaos_theory")
-    {
-    }
+    achievement_chaos_theory() : AchievementCriteriaScript("achievement_chaos_theory") { }
 
     bool OnCheck(Player* /*player*/, Unit* target, uint32 /*criteria_id*/) override
     {
@@ -219,6 +204,6 @@ public:
 
 void AddSC_boss_anomalus()
 {
-    new boss_anomalus();
+    RegisterNexusCreatureAI(boss_anomalus);
     new achievement_chaos_theory();
 }

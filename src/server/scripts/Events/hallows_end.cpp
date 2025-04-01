@@ -725,7 +725,7 @@ struct npc_hallows_end_soh : public ScriptedAI
                     bool checkBurningTriggers = false;
                     for (ObjectGuid const& guid : unitList)
                         if (Unit* c = ObjectAccessor::GetUnit(*me, guid))
-                            if (c->HasAuraType(SPELL_AURA_PERIODIC_DUMMY))
+                            if (c->HasPeriodicDummyAura())
                             {
                                 checkBurningTriggers = true;
                                 break;
@@ -743,7 +743,7 @@ struct npc_hallows_end_soh : public ScriptedAI
                         bool failed = false;
                         for (ObjectGuid const& guid : unitList)
                             if (Unit* c = ObjectAccessor::GetUnit(*me, guid))
-                                if (c->HasAuraType(SPELL_AURA_PERIODIC_DUMMY))
+                                if (c->HasPeriodicDummyAura())
                                 {
                                     failed = true;
                                     break;
@@ -791,7 +791,7 @@ struct npc_hallows_end_soh : public ScriptedAI
         {
             if (Unit* c = ObjectAccessor::GetUnit(*me, guid))
             {
-                if (!c->HasAuraType(SPELL_AURA_PERIODIC_DUMMY))
+                if (!c->HasPeriodicDummyAura())
                 {
                     tmpList.push_back(c);
                 }

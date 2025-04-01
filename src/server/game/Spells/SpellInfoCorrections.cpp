@@ -1602,6 +1602,7 @@ void SpellMgr::LoadSpellInfoCorrections()
     ApplySpellFix({ 44335 }, [](SpellInfo* spellInfo)
     {
         spellInfo->AuraInterruptFlags |= AURA_INTERRUPT_FLAG_CHANGE_MAP;
+        spellInfo->AttributesCu |= SPELL_ATTR0_CU_SINGLE_AURA_STACK;
     });
 
     ApplySpellFix({
@@ -3106,6 +3107,7 @@ void SpellMgr::LoadSpellInfoCorrections()
     // Tail Smash (Sindragosa)
     ApplySpellFix({ 71077 }, [](SpellInfo* spellInfo)
     {
+        spellInfo->AttributesEx2 |= SPELL_ATTR2_IGNORE_LINE_OF_SIGHT;
         spellInfo->Effects[EFFECT_0].TargetA = SpellImplicitTargetInfo(TARGET_DEST_CASTER_BACK);
         spellInfo->Effects[EFFECT_0].TargetB = SpellImplicitTargetInfo(TARGET_UNIT_DEST_AREA_ENEMY);
         spellInfo->Effects[EFFECT_1].TargetA = SpellImplicitTargetInfo(TARGET_DEST_CASTER_BACK);
@@ -3340,6 +3342,7 @@ void SpellMgr::LoadSpellInfoCorrections()
     {
         spellInfo->Effects[EFFECT_0].RadiusEntry = sSpellRadiusStore.LookupEntry(EFFECT_RADIUS_20_YARDS); // 20yd
         spellInfo->Effects[EFFECT_1].RadiusEntry = sSpellRadiusStore.LookupEntry(EFFECT_RADIUS_20_YARDS); // 20yd
+        spellInfo->Effects[EFFECT_2].RadiusEntry = sSpellRadiusStore.LookupEntry(EFFECT_RADIUS_20_YARDS); // 20yd
     });
 
     // Rallying Shout
@@ -3675,12 +3678,6 @@ void SpellMgr::LoadSpellInfoCorrections()
         spellInfo->AttributesEx5 |= SPELL_ATTR5_ALWAYS_AOE_LINE_OF_SIGHT;
     });
 
-    //Crushing the Crown
-    ApplySpellFix({ 71024 }, [](SpellInfo* spellInfo)
-    {
-        spellInfo->Effects[EFFECT_0].TargetA = SpellImplicitTargetInfo(TARGET_DEST_DYNOBJ_NONE);
-    });
-
     // Battle for the Undercity
     ApplySpellFix({
         59892   // Cyclone fall
@@ -3979,13 +3976,6 @@ void SpellMgr::LoadSpellInfoCorrections()
     {
         spellInfo->Effects[EFFECT_0].ApplyAuraName = SPELL_AURA_MOD_DECREASE_SPEED;
         spellInfo->Effects[EFFECT_0].BasePoints = -25;
-    });
-
-    // Focused Eyebeam Summon Trigger
-    ApplySpellFix({ 63342 }, [](SpellInfo* spellInfo)
-    {
-        spellInfo->MaxAffectedTargets = 1;
-        spellInfo->Effects[EFFECT_0].TargetB = SpellImplicitTargetInfo();
     });
 
     // Eye of Kilrogg Passive (DND)
@@ -4854,6 +4844,64 @@ void SpellMgr::LoadSpellInfoCorrections()
     ApplySpellFix({ 26655, 26656 }, [](SpellInfo* spellInfo)
     {
         spellInfo->AuraInterruptFlags &= ~(AURA_INTERRUPT_FLAG_CHANGE_MAP | AURA_INTERRUPT_FLAG_TELEPORTED);
+    });
+
+    // Summon Cyclone
+    ApplySpellFix({ 43112 }, [](SpellInfo* spellInfo)
+    {
+        spellInfo->RequiresSpellFocus = 0;
+    });
+
+    // Booming Voice
+    ApplySpellFix({ 40080 }, [](SpellInfo* spellInfo)
+    {
+        spellInfo->Effects[EFFECT_0].RealPointsPerLevel = 0;
+    });
+
+    // Mangle (Nalorakk)
+    ApplySpellFix({ 42389 }, [](SpellInfo* spellInfo)
+    {
+        spellInfo->SchoolMask = SPELL_SCHOOL_MASK_NATURE;
+    });
+
+    // Event food, fixes to give correct stamina and spirit of 25% of the character level
+    ApplySpellFix({ 24870 }, [](SpellInfo* spellInfo)
+    {
+        spellInfo->Effects[EFFECT_1].BasePoints = 0;
+        spellInfo->Effects[EFFECT_0].RealPointsPerLevel = 0.25;
+        spellInfo->Effects[EFFECT_1].RealPointsPerLevel = 0.25;
+    });
+
+    // Smash
+    // Dark Smash
+    ApplySpellFix({ 42669, 59706, 42723, 59709 }, [](SpellInfo* spellInfo)
+    {
+        spellInfo->AttributesEx2 &= ~SPELL_ATTR2_IGNORE_LINE_OF_SIGHT;
+    });
+
+    // Swoop (Moth hunter pet) root effect fix
+    ApplySpellFix({ 52825 }, [](SpellInfo* spellInfo)
+    {
+        spellInfo->Effects[EFFECT_2].TargetA = SpellImplicitTargetInfo(TARGET_UNIT_TARGET_ENEMY);
+    });
+
+    // Felmyst Strafe (Top)
+    ApplySpellFix({ 45585 }, [](SpellInfo* spellInfo)
+    {
+        spellInfo->MaxAffectedTargets = 3;
+        spellInfo->Effects[EFFECT_0].RadiusEntry = sSpellRadiusStore.LookupEntry(EFFECT_RADIUS_70_YARDS);
+    });
+
+    // Felmyst Strafe (Middle, Bottom)
+    ApplySpellFix({ 45633, 45635 }, [](SpellInfo* spellInfo)
+    {
+        spellInfo->Effects[EFFECT_0].RadiusEntry = sSpellRadiusStore.LookupEntry(EFFECT_RADIUS_70_YARDS);
+    });
+
+    // Encapsulate
+    ApplySpellFix({ 45662 }, [](SpellInfo* spellInfo)
+    {
+        spellInfo->AttributesEx7 |= SPELL_ATTR7_TREAT_AS_NPC_AOE;
     });
 
     for (uint32 i = 0; i < GetSpellInfoStoreSize(); ++i)

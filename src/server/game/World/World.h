@@ -58,7 +58,6 @@ enum ShutdownExitCode : uint8
 /// Timers for different object refresh rates
 enum WorldTimers
 {
-    WUPDATE_AUCTIONS,
     WUPDATE_WEATHERS,
     WUPDATE_UPTIME,
     WUPDATE_CORPSES,
@@ -156,34 +155,6 @@ public:
 
     static uint32 m_worldLoopCounter;
 
-    [[nodiscard]] WorldSession* FindSession(uint32 id) const override;
-    [[nodiscard]] WorldSession* FindOfflineSession(uint32 id) const override;
-    [[nodiscard]] WorldSession* FindOfflineSessionForCharacterGUID(ObjectGuid::LowType guidLow) const override;
-    void AddSession(WorldSession* s) override;
-    bool KickSession(uint32 id) override;
-    /// Get the number of current active sessions
-    void UpdateMaxSessionCounters() override;
-    [[nodiscard]] const SessionMap& GetAllSessions() const override { return _sessions; }
-    [[nodiscard]] uint32 GetActiveAndQueuedSessionCount() const override { return _sessions.size(); }
-    [[nodiscard]] uint32 GetActiveSessionCount() const override { return _sessions.size() - _queuedPlayer.size(); }
-    [[nodiscard]] uint32 GetQueuedSessionCount() const override { return _queuedPlayer.size(); }
-    /// Get the maximum number of parallel sessions on the server since last reboot
-    [[nodiscard]] uint32 GetMaxQueuedSessionCount() const override { return _maxQueuedSessionCount; }
-    [[nodiscard]] uint32 GetMaxActiveSessionCount() const override { return _maxActiveSessionCount; }
-    /// Get number of players
-    [[nodiscard]] inline uint32 GetPlayerCount() const override { return _playerCount; }
-    [[nodiscard]] inline uint32 GetMaxPlayerCount() const override { return _maxPlayerCount; }
-
-    /// Increase/Decrease number of players
-    inline void IncreasePlayerCount() override
-    {
-        _playerCount++;
-        _maxPlayerCount = std::max(_maxPlayerCount, _playerCount);
-    }
-    inline void DecreasePlayerCount() override { _playerCount--; }
-
-    Player* FindPlayerInZone(uint32 zone) override;
-
     /// Deny clients?
     [[nodiscard]] bool IsClosed() const override;
 
@@ -194,17 +165,6 @@ public:
     [[nodiscard]] AccountTypes GetPlayerSecurityLimit() const override { return _allowedSecurityLevel; }
     void SetPlayerSecurityLimit(AccountTypes sec) override;
     void LoadDBAllowedSecurityLevel() override;
-
-    /// Active session server limit
-    void SetPlayerAmountLimit(uint32 limit) override { _playerLimit = limit; }
-    [[nodiscard]] uint32 GetPlayerAmountLimit() const override { return _playerLimit; }
-
-    //player Queue
-    typedef std::list<WorldSession*> Queue;
-    void AddQueuedPlayer(WorldSession*) override;
-    bool RemoveQueuedPlayer(WorldSession* session) override;
-    int32 GetQueuePos(WorldSession*) override;
-    bool HasRecentlyDisconnected(WorldSession*) override;
 
     /// \todo Actions on m_allowMovement still to be implemented
     /// Is movement allowed?
@@ -237,25 +197,18 @@ public:
     void SetInitialWorldSettings() override;
     void LoadConfigSettings(bool reload = false) override;
 
-    void SendGlobalMessage(WorldPacket const* packet, WorldSession* self = nullptr, TeamId teamId = TEAM_NEUTRAL) override;
-    void SendGlobalGMMessage(WorldPacket const* packet, WorldSession* self = nullptr, TeamId teamId = TEAM_NEUTRAL) override;
-    bool SendZoneMessage(uint32 zone, WorldPacket const* packet, WorldSession* self = nullptr, TeamId teamId = TEAM_NEUTRAL) override;
-    void SendZoneText(uint32 zone, const char* text, WorldSession* self = nullptr, TeamId teamId = TEAM_NEUTRAL) override;
-    void SendServerMessage(ServerMessageType messageID, std::string stringParam = "", Player* player = nullptr) override;
-
     /// Are we in the middle of a shutdown?
     [[nodiscard]] bool IsShuttingDown() const override { return _shutdownTimer > 0; }
     [[nodiscard]] uint32 GetShutDownTimeLeft() const override { return _shutdownTimer; }
-    void ShutdownServ(uint32 time, uint32 options, uint8 exitcode, const std::string& reason = std::string()) override;
+    void ShutdownServ(uint32 time, uint32 options, uint8 exitcode, std::string const& reason = std::string()) override;
     void ShutdownCancel() override;
-    void ShutdownMsg(bool show = false, Player* player = nullptr, const std::string& reason = std::string()) override;
+    void ShutdownMsg(bool show = false, Player* player = nullptr, std::string const& reason = std::string()) override;
     static uint8 GetExitCode() { return _exitCode; }
     static void StopNow(uint8 exitcode) { _stopEvent = true; _exitCode = exitcode; }
     static bool IsStopped() { return _stopEvent; }
 
     void Update(uint32 diff) override;
 
-    void UpdateSessions(uint32 diff) override;
     /// Set a server rate (see #Rates)
     void setRate(Rates rate, float value) override { _rate_values[rate] = value; }
     /// Get a server rate (see #Rates)
@@ -308,9 +261,6 @@ public:
     [[nodiscard]] bool IsPvPRealm() const override;
     [[nodiscard]] bool IsFFAPvPRealm() const override;
 
-    void KickAll() override;
-    void KickAllLess(AccountTypes sec) override;
-
     // for max speed access
     static float GetMaxVisibleDistanceOnContinents()    { return _maxVisibleDistanceOnContinents; }
     static float GetMaxVisibleDistanceInInstances()     { return _maxVisibleDistanceInInstances;  }
@@ -343,12 +293,10 @@ public:
 
     void RemoveOldCorpses() override;
 
-    void DoForAllOnlinePlayers(std::function<void(Player*)> exec) override;
-
 protected:
     void _UpdateGameTime();
     // callback for UpdateRealmCharacters
-    void _UpdateRealmCharCount(PreparedQueryResult resultCharCount);
+    void _UpdateRealmCharCount(PreparedQueryResult resultCharCount,uint32 accountId);
 
     void InitDailyQuestResetTime();
     void InitWeeklyQuestResetTime();
@@ -367,6 +315,7 @@ private:
     static uint8 _exitCode;
     uint32 _shutdownTimer;
     uint32 _shutdownMask;
+    std::string _shutdownReason;
 
     uint32 _cleaningFlags;
 
@@ -374,15 +323,6 @@ private:
 
     IntervalTimer _timers[WUPDATE_COUNT];
     Seconds _mail_expire_check_timer;
-
-    SessionMap _sessions;
-    SessionMap _offlineSessions;
-    typedef std::unordered_map<uint32, time_t> DisconnectMap;
-    DisconnectMap _disconnects;
-    uint32 _maxActiveSessionCount;
-    uint32 _maxQueuedSessionCount;
-    uint32 _playerCount;
-    uint32 _maxPlayerCount;
 
     std::string _newCharString;
 
@@ -392,7 +332,6 @@ private:
     float _float_configs[FLOAT_CONFIG_VALUE_COUNT];
     typedef std::map<uint32, uint64> WorldStatesMap;
     WorldStatesMap _worldstates;
-    uint32 _playerLimit;
     AccountTypes _allowedSecurityLevel;
     LocaleConstant _defaultDbcLocale;                     // from config for one from loaded DBC locales
     uint32 _availableDbcLocaleMask;                       // by loaded DBC
@@ -417,13 +356,6 @@ private:
     Seconds _nextRandomBGReset;
     Seconds _nextCalendarOldEventsDeletionTime;
     Seconds _nextGuildReset;
-
-    //Player Queue
-    Queue _queuedPlayer;
-
-    // sessions that are added async
-    void AddSession_(WorldSession* s);
-    LockedQueue<WorldSession*> _addSessQueue;
 
     // used versions
     std::string _dbVersion;

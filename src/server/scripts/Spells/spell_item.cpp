@@ -2881,7 +2881,7 @@ class spell_item_reindeer_transformation : public SpellScript
     void HandleDummy(SpellEffIndex /* effIndex */)
     {
         Unit* caster = GetCaster();
-        if (caster->HasAuraType(SPELL_AURA_MOUNTED))
+        if (caster->HasMountedAura())
         {
             float flyspeed = caster->GetSpeedRate(MOVE_FLIGHT);
             float speed = caster->GetSpeedRate(MOVE_RUN);
@@ -3172,7 +3172,7 @@ class spell_item_brewfest_mount_transformation : public SpellScript
             return;
         }
 
-        if (caster->HasAuraType(SPELL_AURA_MOUNTED))
+        if (caster->HasMountedAura())
         {
             caster->RemoveAurasByType(SPELL_AURA_MOUNTED);
             uint32 spell_id;

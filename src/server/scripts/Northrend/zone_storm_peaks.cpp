@@ -350,7 +350,7 @@ public:
 
         void EnterEvadeMode(EvadeReason why) override
         {
-            if (switching || me->HasAuraType(SPELL_AURA_CONTROL_VEHICLE))
+            if (switching || me->HasControlVehicleAura())
                 return;
             ScriptedAI::EnterEvadeMode(why);
         }

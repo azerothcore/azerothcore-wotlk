@@ -1765,7 +1765,7 @@ void Spell::DoCreateItem(uint8 /*effIndex*/, uint32 itemId)
         // send info to the client
         player->SendNewItem(pItem, addNumber, true, SelfCast);
 
-        sScriptMgr->OnCreateItem(player, pItem, addNumber);
+        sScriptMgr->OnPlayerCreateItem(player, pItem, addNumber);
 
         // we succeeded in creating at least one item, so a levelup is possible
         if (SelfCast)
@@ -2332,6 +2332,10 @@ void Spell::EffectSummonType(SpellEffIndex effIndex)
         return;
 
     uint32 entry = m_spellInfo->Effects[effIndex].MiscValue;
+
+    if (m_spellValue->MiscVal[effIndex])
+        entry = m_spellValue->MiscVal[effIndex];
+
     if (!entry)
         return;
 
@@ -3494,7 +3498,7 @@ void Spell::EffectWeaponDmg(SpellEffIndex effIndex)
 
                     // Glyph of Blood Strike
                     if (m_caster->GetAuraEffect(59332, EFFECT_0))
-                        if (unitTarget->HasAuraType(SPELL_AURA_MOD_DECREASE_SPEED))
+                        if (unitTarget->HasDecreaseSpeedAura())
                             AddPct(totalDamagePercentMod, 20.0f);
                     break;
                 }
@@ -4195,7 +4199,7 @@ void Spell::EffectStuck(SpellEffIndex /*effIndex*/)
     // xinef: if player is dead - teleport to graveyard
     if (!target->IsAlive())
     {
-        if (target->HasAuraType(SPELL_AURA_PREVENT_RESURRECTION))
+        if (target->HasPreventResurectionAura())
             return;
 
         // xinef: player is in corpse
@@ -5582,6 +5586,10 @@ void Spell::EffectSkinPlayerCorpse(SpellEffIndex /*effIndex*/)
         return;
 
     unitTarget->ToPlayer()->RemovedInsignia(m_caster->ToPlayer());
+
+    // We have a corpse object as the target.
+    // This target was deleted in RemovedInsignia() -> ConvertCorpseToBones().
+    m_targets.RemoveObjectTarget();
 }
 
 void Spell::EffectStealBeneficialBuff(SpellEffIndex effIndex)

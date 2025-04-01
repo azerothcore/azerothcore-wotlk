@@ -30,6 +30,7 @@
 #include "ScriptMgr.h"
 #include "World.h"
 #include "WorldSession.h"
+#include "WorldSessionMgr.h"
 #include "zlib.h"
 #include <memory>
 
@@ -476,7 +477,7 @@ WorldSocket::ReadDataHandlerResult WorldSocket::ReadDataHandler()
     OpcodeHandler const* handler = opcodeTable[opcode];
     if (!handler)
     {
-        LOG_ERROR("network.opcode", "No defined handler for opcode {} sent by {}", GetOpcodeNameForLogging(static_cast<OpcodeClient>(packet.GetOpcode())), _worldSession->GetPlayerInfo());
+        LOG_ERROR("network.opcode", "No defined handler for opcode {} sent by {}", GetOpcodeNameForLogging(static_cast<OpcodeClient>(packetToQueue->GetOpcode())), _worldSession->GetPlayerInfo());
         delete packetToQueue;
         return ReadDataHandlerResult::Error;
     }
@@ -713,7 +714,7 @@ void WorldSocket::HandleAuthSessionCallback(std::shared_ptr<AuthSession> authSes
         _worldSession->InitWarden(account.SessionKey, account.OS);
     }
 
-    sWorld->AddSession(_worldSession);
+    sWorldSessionMgr->AddSession(_worldSession);
 
     AsyncRead();
 }

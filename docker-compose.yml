@@ -8,7 +8,7 @@
 services:
   ac-database:
     container_name: ac-database
-    image: mysql:8.3
+    image: mysql:8.4
     networks:
       - ac-network
     ports:
@@ -188,6 +188,8 @@ services:
       AC_LOGIN_DATABASE_INFO: "ac-database;3306;root;${DOCKER_DB_ROOT_PASSWORD:-password};acore_auth"
       AC_WORLD_DATABASE_INFO: "ac-database;3306;root;${DOCKER_DB_ROOT_PASSWORD:-password};acore_world"
       AC_CHARACTER_DATABASE_INFO: "ac-database;3306;root;${DOCKER_DB_ROOT_PASSWORD:-password};acore_characters"
+    networks:
+      - ac-network
     ports:
       - ${DOCKER_AUTH_EXTERNAL_PORT:-3724}:3724
       - ${DOCKER_WORLD_EXTERNAL_PORT:-8085}:8085

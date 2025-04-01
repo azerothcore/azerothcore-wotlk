@@ -157,6 +157,8 @@ public:
                     return goMarnakGUID;
                 case GO_ABEDNEUM:
                     return goAbedneumGUID;
+                case GO_SKY_FLOOR:
+                    return goSkyRoomFloorGUID;
 
                 case NPC_SJONNIR:
                     return SjonnirGUID;
@@ -210,23 +212,91 @@ public:
                 if (GameObject* tribunalDoor = instance->GetGameObject(goTribunalDoorGUID))
                     tribunalDoor->SetGoState(GO_STATE_ACTIVE);
 
+            if (type == BOSS_TRIBUNAL_OF_AGES && data == SPECIAL)
+            {
+                if (GameObject* pSkyRoomFloor = instance->GetGameObject(goSkyRoomFloorGUID))
+                    pSkyRoomFloor->SetGoState(GO_STATE_READY);
+            }
+
             if (type == BOSS_TRIBUNAL_OF_AGES && data == DONE)
             {
-                if (GameObject* pA = instance->GetGameObject(goAbedneumGUID))
-                    pA->SetGoState(GO_STATE_ACTIVE);
-                if (GameObject* pF = instance->GetGameObject(goSkyRoomFloorGUID))
-                    pF->SetGoState(GO_STATE_ACTIVE);
+                GameObject* pAbedneum = instance->GetGameObject(goAbedneumGUID);
+                GameObject* pKaddrak = instance->GetGameObject(goKaddrakGUID);
+                GameObject* pMarnak = instance->GetGameObject(goMarnakGUID);
+
+                GameObject* pSkyRoomFloor = instance->GetGameObject(goSkyRoomFloorGUID);
+                bool skyRoomDown = false;
+
+                if (pAbedneum && pKaddrak && pMarnak && pSkyRoomFloor)
+                {
+                    if (pAbedneum->GetGoState() != GO_STATE_ACTIVE)
+                    {
+                        if (pKaddrak->GetGoState() != GO_STATE_ACTIVE && pMarnak->GetGoState() != GO_STATE_ACTIVE)
+                        {
+                            //Abedneum first talk
+                            pAbedneum->SetGoState(GO_STATE_ACTIVE);
+                        }
+                        else if (pMarnak->GetGoState() == GO_STATE_ACTIVE)
+                        {
+                            //Abedneum second talk
+                            pAbedneum->SetGoState(GO_STATE_ACTIVE);
+                            pMarnak->SetGoState(GO_STATE_READY);
+                            pSkyRoomFloor->SetGoState(GO_STATE_READY);
+                            skyRoomDown = true;
+                        }
+                        else
+                        {
+                            //Marnak talk
+                            if (pKaddrak->GetGoState() == GO_STATE_ACTIVE)
+                            {
+                                pMarnak->SetGoState(GO_STATE_ACTIVE);
+                                pKaddrak->SetGoState(GO_STATE_READY);
+                                pSkyRoomFloor->SetGoState(GO_STATE_READY);
+                            }
+                        }
+                    }
+                    else
+                    {
+                        //Kaddrak talk
+                        if (pKaddrak->GetGoState() != GO_STATE_ACTIVE)
+                        {
+                            pAbedneum->SetGoState(GO_STATE_READY);
+                            pKaddrak->SetGoState(GO_STATE_ACTIVE);
+                            pSkyRoomFloor->SetGoState(GO_STATE_READY);
+                        }
+                    }
+
+                    if (!skyRoomDown)
+                        pSkyRoomFloor->SetGoState(GO_STATE_ACTIVE);
+                }
 
                 // Make sjonnir attackable
-                if (Creature* cr = instance->GetCreature(SjonnirGUID))
-                    cr->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
+                if (Creature* cSjonnir = instance->GetCreature(SjonnirGUID))
+                    cSjonnir->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
             }
+
             if (type == BOSS_TRIBUNAL_OF_AGES && data == NOT_STARTED)
             {
-                if (GameObject* pA = instance->GetGameObject(goAbedneumGUID))
-                    pA->SetGoState(GO_STATE_READY);
-                if (GameObject* pF = instance->GetGameObject(goSkyRoomFloorGUID))
-                    pF->SetGoState(GO_STATE_READY);
+                if (GameObject* pAbedneum = instance->GetGameObject(goAbedneumGUID))
+                    pAbedneum->SetGoState(GO_STATE_READY);
+                if (GameObject* pKaddrak = instance->GetGameObject(goKaddrakGUID))
+                    pKaddrak->SetGoState(GO_STATE_READY);
+                if (GameObject* pMarnak = instance->GetGameObject(goMarnakGUID))
+                    pMarnak->SetGoState(GO_STATE_READY);
+                if (GameObject* pSkyRoomFloor = instance->GetGameObject(goSkyRoomFloorGUID))
+                    pSkyRoomFloor->SetGoState(GO_STATE_READY);
+            }
+
+            if (type == BOSS_TRIBUNAL_OF_AGES && data == FAIL)
+            {
+                if (GameObject* pAbedneum = instance->GetGameObject(goAbedneumGUID))
+                    pAbedneum->SetGoState(GO_STATE_ACTIVE);
+                if (GameObject* pKaddrak = instance->GetGameObject(goKaddrakGUID))
+                    pKaddrak->SetGoState(GO_STATE_ACTIVE);
+                if (GameObject* pMarnak = instance->GetGameObject(goMarnakGUID))
+                    pMarnak->SetGoState(GO_STATE_ACTIVE);
+                if (GameObject* pSkyRoomFloor = instance->GetGameObject(goSkyRoomFloorGUID))
+                    pSkyRoomFloor->SetGoState(GO_STATE_READY);
             }
 
             if (type == DATA_BRANN_ACHIEVEMENT)

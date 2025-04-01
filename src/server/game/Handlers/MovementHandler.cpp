@@ -932,7 +932,8 @@ void WorldSession::ComputeNewClockDelta()
     uint32 sampleSizeAfterFiltering = 0;
     for (auto& pair : _timeSyncClockDeltaQueue.content())
     {
-        if (pair.second <= latencyMedian + latencyStandardDeviation) {
+        if (pair.second <= latencyMedian + latencyStandardDeviation)
+        {
             clockDeltasAfterFiltering.push_back(pair.first);
             sampleSizeAfterFiltering++;
         }

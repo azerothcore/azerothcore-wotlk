@@ -416,7 +416,7 @@ public:
 
     bool OnGossipHello(Player* player, GameObject* /*go*/) override
     {
-        if (player->HasAura(SPELL_MIND_EXHAUSTION) || player->HasAura(SPELL_SHADOW_GRASP))
+        if (player->HasAnyAuras(SPELL_MIND_EXHAUSTION, SPELL_SHADOW_GRASP))
             return true;
 
         if (Creature* trigger = player->FindNearestCreature(NPC_HELLFIRE_RAID_TRIGGER, 10.0f))

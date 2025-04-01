@@ -45,6 +45,7 @@ public:
     virtual void InitStats(uint32 lifetime);
     virtual void InitSummon();
     virtual void UnSummon(uint32 msTime = 0);
+    void UpdateObjectVisibilityOnCreate() override;
     void RemoveFromWorld() override;
     void SetTempSummonType(TempSummonType type);
     void SaveToDB(uint32 /*mapid*/, uint8 /*spawnMask*/, uint32 /*phaseMask*/) override {}

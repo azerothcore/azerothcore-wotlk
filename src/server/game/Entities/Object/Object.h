@@ -20,6 +20,7 @@
 
 #include "Common.h"
 #include "DataMap.h"
+#include "EventProcessor.h"
 #include "G3D/Vector3.h"
 #include "GridDefines.h"
 #include "GridReference.h"
@@ -95,6 +96,8 @@ struct PositionFullTerrainStatus;
 
 typedef std::unordered_map<Player*, UpdateData> UpdateDataMapType;
 typedef GuidUnorderedSet UpdatePlayerSet;
+
+static constexpr Milliseconds HEARTBEAT_INTERVAL = 5s + 200ms;
 
 class Object
 {
@@ -219,6 +222,8 @@ public:
     [[nodiscard]] DynamicObject const* ToDynObject() const { if (IsDynamicObject()) return reinterpret_cast<DynamicObject const*>(this); else return nullptr; }
 
     [[nodiscard]] inline bool IsItem() const { return GetTypeId() == TYPEID_ITEM; }
+
+    virtual void Heartbeat() {}
 
     virtual std::string GetDebugInfo() const;
 
@@ -408,7 +413,7 @@ protected:
 public:
     ~WorldObject() override;
 
-    virtual void Update(uint32 /*time_diff*/);
+    virtual void Update(uint32 diff);
 
     void _Create(ObjectGuid::LowType guidlow, HighGuid guidhigh, uint32 phaseMask);
 
@@ -553,6 +558,7 @@ public:
 
     void DestroyForNearbyPlayers();
     virtual void UpdateObjectVisibility(bool forced = true, bool fromUpdate = false);
+    virtual void UpdateObjectVisibilityOnCreate() { UpdateObjectVisibility(true); }
     void BuildUpdate(UpdateDataMapType& data_map, UpdatePlayerSet& player_set) override;
     void GetCreaturesWithEntryInRange(std::list<Creature*>& creatureList, float radius, uint32 entry);
 
@@ -584,14 +590,6 @@ public:
     {
         return GetMapId() == 571 && GetPositionX() > 3733.33331f && GetPositionX() < 5866.66663f && GetPositionY() > 1599.99999f && GetPositionY() < 4799.99997f;
     }
-
-#ifdef MAP_BASED_RAND_GEN
-    int32 irand(int32 min, int32 max) const     { return int32 (GetMap()->mtRand.randInt(max - min)) + min; }
-    uint32 urand(uint32 min, uint32 max) const  { return GetMap()->mtRand.randInt(max - min) + min;}
-    int32 rand32() const                        { return GetMap()->mtRand.randInt();}
-    double rand_norm() const                    { return GetMap()->mtRand.randExc();}
-    double rand_chance() const                  { return GetMap()->mtRand.randExc(100.0);}
-#endif
 
     uint32  LastUsedScriptID;
 
@@ -632,7 +630,9 @@ public:
 
     std::string GetDebugInfo() const override;
 
+    // Event handler
     ElunaEventProcessor* elunaEvents;
+    EventProcessor m_Events;
 
 protected:
     std::string m_name;
@@ -666,7 +666,7 @@ protected:
     virtual bool IsAlwaysDetectableFor(WorldObject const* /*seer*/) const { return false; }
 private:
     Map* m_currMap;                                    //current object's Map location
-
+    Milliseconds _heartbeatTimer;
     //uint32 m_mapId;                                     // object at map with map_id
     uint32 m_InstanceId;                                // in map copy with instance id
     uint32 m_phaseMask;                                 // in area phase state

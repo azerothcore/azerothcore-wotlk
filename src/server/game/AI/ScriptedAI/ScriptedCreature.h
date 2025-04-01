@@ -442,10 +442,15 @@ struct ScriptedAI : public CreatureAI
     void SetInvincibility(bool apply) { _invincible = apply; };
     [[nodiscard]] bool IsInvincible() const { return _invincible; };
 
+    // Disables creature auto attacks.
+    void SetAutoAttackAllowed(bool allow) { _canAutoAttack = allow; };
+    [[nodiscard]] bool IsAutoAttackAllowed() const { return _canAutoAttack; };
+
 private:
     Difficulty _difficulty;
     bool _isHeroic;
     bool _invincible;
+    bool _canAutoAttack;
     std::unordered_set<uint32> _uniqueTimedEvents;
 };
 
@@ -479,6 +484,12 @@ public:
 
     void ScheduleHealthCheckEvent(uint32 healthPct, std::function<void()> exec);
     void ScheduleHealthCheckEvent(std::initializer_list<uint8> healthPct, std::function<void()> exec);
+
+    // @brief Casts the spell after the fixed time and says the text id if provided. Timer will run even if the creature is casting or out of combat.
+    // @param spellId The spell to cast.
+    // @param timer The time to wait before casting the spell.
+    // @param textId The text id to say.
+    void ScheduleEnrageTimer(uint32 spellId, Milliseconds timer, uint8 textId = 0);
 
     // Hook used to execute events scheduled into EventMap without the need
     // to override UpdateAI

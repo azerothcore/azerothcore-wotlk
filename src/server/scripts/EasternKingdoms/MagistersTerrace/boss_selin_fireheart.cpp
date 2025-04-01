@@ -41,16 +41,6 @@ enum Spells
     SPELL_DRAIN_MANA                = 46153
 };
 
-enum Events
-{
-    EVENT_SPELL_DRAIN_LIFE          = 1,
-    EVENT_SPELL_FEL_EXPLOSION       = 2,
-    EVENT_SPELL_DRAIN_MANA          = 3,
-    EVENT_DRAIN_CRYSTAL             = 4,
-    EVENT_EMPOWER                   = 5,
-    EVENT_RESTORE_COMBAT            = 6
-};
-
 const Position crystalSummons[5] =
 {
     {248.053f, 14.592f, 3.74882f, 3.94444f},
@@ -82,16 +72,10 @@ struct boss_selin_fireheart : public BossAI
             me->SummonCreature(NPC_FEL_CRYSTAL, pos, TEMPSUMMON_CORPSE_DESPAWN);
     }
 
-    void JustSummoned(Creature* summon) override
-    {
-        BossAI::JustSummoned(summon);
-        summon->SetReactState(REACT_PASSIVE);
-    }
-
     void SummonedCreatureDies(Creature* summon, Unit* killer) override
     {
         BossAI::SummonedCreatureDies(summon, killer);
-        me->GetMotionMaster()->MoveChase(me->GetVictim());
+        me->ResumeChasingVictim();
     }
 
     void OnPowerUpdate(Powers /*power*/, int32 /*gain*/, int32 /*updateVal*/, uint32 currentPower) override
@@ -100,9 +84,9 @@ struct boss_selin_fireheart : public BossAI
         {
             Talk(SAY_EMPOWERED);
             if (Creature* crystal = SelectNearestCrystal(false))
-                crystal->Kill(crystal, crystal);
+                crystal->KillSelf();
             scheduler.DelayAll(10s);
-            me->GetMotionMaster()->MoveChase(me->GetVictim());
+            me->ResumeChasingVictim();
         }
     }
 
@@ -125,7 +109,7 @@ struct boss_selin_fireheart : public BossAI
             ScheduleTimedEvent(7500ms, [&]{
                 if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, PowerUsersSelector(me, POWER_MANA, 40.0f, false)))
                     DoCast(target, SPELL_DRAIN_MANA);
-            }, 10000ms);
+            }, 10s);
         }
     }
 
@@ -177,12 +161,13 @@ struct boss_selin_fireheart : public BossAI
             if (Creature* crystal = SelectNearestCrystal(false))
             {
                 Talk(EMOTE_CRYSTAL);
-                crystal->ReplaceAllUnitFlags(UNIT_FLAG_NONE);
+                crystal->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
+                crystal->SetInCombatWithZone();
                 crystal->AI()->DoCast(me, SPELL_MANA_RAGE, true);
                 DoCast(crystal, SPELL_FEL_CRYSTAL_COSMETIC, true);
             }
             else
-                me->GetMotionMaster()->MoveChase(me->GetVictim());
+                me->ResumeChasingVictim();
         }
     }
 };

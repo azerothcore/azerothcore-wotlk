@@ -1457,7 +1457,7 @@ SpellCastResult SpellInfo::CheckShapeshift(uint32 form) const
             LOG_ERROR("spells", "GetErrorAtShapeshiftedCast: unknown shapeshift {}", form);
             return SPELL_CAST_OK;
         }
-        actAsShifted = !(shapeInfo->flags1 & 1);            // shapeshift acts as normal form for spells
+        actAsShifted = !(shapeInfo->flags1 & SHAPESHIFT_FLAG_STANCE);            // shapeshift acts as normal form for spells
     }
 
     if (actAsShifted)
@@ -1477,7 +1477,7 @@ SpellCastResult SpellInfo::CheckShapeshift(uint32 form) const
     // Check if stance disables cast of not-stance spells
     // Example: cannot cast any other spells in zombie or ghoul form
     /// @todo: Find a way to disable use of these spells clientside
-    if (shapeInfo && shapeInfo->flags1 & 0x400)
+    if (shapeInfo && (shapeInfo->flags1 & SHAPESHIFT_FLAG_CAN_ONLY_CAST_SHAPESHIFT_SPELLS))
     {
         if (!(stanceMask & Stances))
             return SPELL_FAILED_ONLY_SHAPESHIFT;
@@ -1775,11 +1775,11 @@ SpellCastResult SpellInfo::CheckTarget(Unit const* caster, WorldObject const* ta
             return SPELL_FAILED_TARGET_AFFECTING_COMBAT;
 
         // only spells with SPELL_ATTR3_ONLY_ON_GHOSTS can target ghosts
-        if (((IsRequiringDeadTarget() != 0) != unitTarget->HasAuraType(SPELL_AURA_GHOST)) && !(IsDeathPersistent() && IsAllowingDeadTarget()))
+        if (IsRequiringDeadTarget())
         {
-            if (AttributesEx3 & SPELL_ATTR3_ONLY_ON_GHOSTS)
+            if (!unitTarget->HasGhostAura())
                 return SPELL_FAILED_TARGET_NOT_GHOST;
-            else
+            if (!IsDeathPersistent() && !IsAllowingDeadTarget())
                 return SPELL_FAILED_BAD_TARGETS;
         }
 
@@ -1923,7 +1923,7 @@ SpellCastResult SpellInfo::CheckTarget(Unit const* caster, WorldObject const* ta
     if (ExcludeTargetAuraSpell && unitTarget->HasAura(sSpellMgr->GetSpellIdForDifficulty(ExcludeTargetAuraSpell, caster)))
         return SPELL_FAILED_TARGET_AURASTATE;
 
-    if (unitTarget->HasAuraType(SPELL_AURA_PREVENT_RESURRECTION) && !HasAttribute(SPELL_ATTR7_BYPASS_NO_RESURRECTION_AURA))
+    if (unitTarget->HasPreventResurectionAura() && !HasAttribute(SPELL_ATTR7_BYPASS_NO_RESURRECTION_AURA))
         if (HasEffect(SPELL_EFFECT_SELF_RESURRECT) || HasEffect(SPELL_EFFECT_RESURRECT) || HasEffect(SPELL_EFFECT_RESURRECT_NEW))
             return SPELL_FAILED_TARGET_CANNOT_BE_RESURRECTED;
 
@@ -2529,6 +2529,10 @@ SpellInfo const* SpellInfo::GetAuraRankForLevel(uint8 level) const
     //if (IsPassive())
     //    return this;
 
+    // Client ignores spell with these attributes (sub_53D9D0)
+    if (HasAttribute(SPELL_ATTR0_COOLDOWN_ON_EVENT) || HasAttribute(SPELL_ATTR2_ALLOW_LOW_LEVEL_BUFF) || HasAttribute(SPELL_ATTR3_ONLY_PROC_ON_CASTER))
+        return this;
+
     bool needRankSelection = false;
     for (uint8 i = 0; i < MAX_SPELL_EFFECTS; ++i)
     {
@@ -2644,8 +2648,6 @@ bool SpellInfo::_IsPositiveEffect(uint8 effIndex, bool deep) const
             // some explicitly required dummy effect sets
             switch (Id)
             {
-                case 28441:
-                    return false; // AB Effect 000
                 default:
                     break;
             }

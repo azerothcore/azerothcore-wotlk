@@ -21,6 +21,8 @@
 #include "GridNotifiersImpl.h"
 #include "PassiveAI.h"
 #include "ScriptedCreature.h"
+#include "SpellScript.h"
+#include "SpellScriptLoader.h"
 #include "zulaman.h"
 
 enum Yells
@@ -42,6 +44,7 @@ enum Spells
     SPELL_FLAME_BREATH          = 43140,
     SPELL_FIRE_WALL             = 43113,
     SPELL_ENRAGE                = 44779,
+    SPELL_SUMMON_PLAYERS_DUMMY  = 43096,
     SPELL_SUMMON_PLAYERS        = 43097,
     SPELL_TELE_TO_CENTER        = 43098, // coord
     SPELL_HATCH_ALL             = 43144,
@@ -109,8 +112,9 @@ enum HatchActions
 enum Misc
 {
     MAX_BOMB_COUNT              = 40,
-
-    SCHEDULER_GROUP_HATCHING    = 1
+    GROUP_ENRAGE                = 1,
+    GROUP_HATCHING              = 2,
+    DATA_ALL_EGGS_HATCHED       = 0
 };
 
 struct boss_janalai : public BossAI
@@ -139,11 +143,15 @@ struct boss_janalai : public BossAI
             DoCastAOE(SPELL_HATCH_ALL);
         });
 
-        ScheduleHealthCheckEvent(25, [&] {
-            DoCastSelf(SPELL_ENRAGE, true);
+        ScheduleHealthCheckEvent(20, [&] {
+            if (!me->HasAura(SPELL_ENRAGE))
+                DoCastSelf(SPELL_ENRAGE, true);
+            me->m_Events.CancelEventGroup(GROUP_ENRAGE);
         });
 
         me->m_Events.KillAllEvents(false);
+        _sideHatched[0] = false;
+        _sideHatched[1] = false;
     }
 
     void JustDied(Unit* killer) override
@@ -165,7 +173,7 @@ struct boss_janalai : public BossAI
         BossAI::JustSummoned(summon);
     }
 
-    void DamageDealt(Unit* target, uint32& damage, DamageEffectType /*damagetype*/) override
+    void DamageDealt(Unit* target, uint32& damage, DamageEffectType /*damagetype*/, SpellSchoolMask /*damageSchoolMask*/) override
     {
         if (_isFlameBreathing)
         {
@@ -182,14 +190,33 @@ struct boss_janalai : public BossAI
         ScheduleTimedEvent(30s, [&]{
             StartBombing();
         }, 20s, 40s);
-        ScheduleTimedEvent(10s, [&]{
-            if (HatchAllEggs(HATCH_RESET))
+
+        scheduler.Schedule(10s, GROUP_HATCHING, [this](TaskContext context)
+        {
+            if (_sideHatched[0] && _sideHatched[1])
+                return;
+
+            Talk(SAY_SUMMON_HATCHER);
+
+            if (_sideHatched[0] && !_sideHatched[1])
             {
-                Talk(SAY_SUMMON_HATCHER);
+                me->SummonCreature(NPC_AMANI_HATCHER, hatcherway[1][0], TEMPSUMMON_CORPSE_TIMED_DESPAWN, 10000);
+                me->SummonCreature(NPC_AMANI_HATCHER, hatcherway[1][0], TEMPSUMMON_CORPSE_TIMED_DESPAWN, 10000);
+            }
+            else if (!_sideHatched[0] && _sideHatched[1])
+            {
+                me->SummonCreature(NPC_AMANI_HATCHER, hatcherway[0][0], TEMPSUMMON_CORPSE_TIMED_DESPAWN, 10000);
+                me->SummonCreature(NPC_AMANI_HATCHER, hatcherway[0][0], TEMPSUMMON_CORPSE_TIMED_DESPAWN, 10000);
+            }
+            else
+            {
                 me->SummonCreature(NPC_AMANI_HATCHER, hatcherway[0][0], TEMPSUMMON_CORPSE_TIMED_DESPAWN, 10000);
                 me->SummonCreature(NPC_AMANI_HATCHER, hatcherway[1][0], TEMPSUMMON_CORPSE_TIMED_DESPAWN, 10000);
             }
-        }, 90s);
+
+            context.Repeat(90s);
+        });
+
         ScheduleTimedEvent(8s, [&]{
             if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0))
             {
@@ -207,9 +234,19 @@ struct boss_janalai : public BossAI
         }, 8s);
 
         me->m_Events.AddEventAtOffset([&] {
+            DoCastSelf(SPELL_ENRAGE, true);
+        }, 5min, 5min, GROUP_ENRAGE);
+
+        me->m_Events.AddEventAtOffset([&] {
             Talk(SAY_BERSERK);
             DoCastSelf(SPELL_BERSERK);
-        }, 5min);
+        }, 10min);
+    }
+
+    void SetData(uint32 index, uint32 data) override
+    {
+        if (index == DATA_ALL_EGGS_HATCHED)
+            _sideHatched[data] = true;
     }
 
     bool HatchAllEggs(uint32 hatchAction)
@@ -289,11 +326,9 @@ struct boss_janalai : public BossAI
         SpawnBombs();
         _isBombing = true;
 
-        me->GetMap()->DoForAllPlayers([&](Player* player)
-        {
-            if (player->IsAlive())
-                DoTeleportPlayer(player, janalainPos.GetPositionX() - 5 + rand() % 10, janalainPos.GetPositionY() - 5 + rand() % 10, janalainPos.GetPositionZ(), 0.0f);
-        });
+        DoCastSelf(SPELL_TELE_TO_CENTER);
+        DoCastAOE(SPELL_SUMMON_PLAYERS_DUMMY, true);
+
         //DoCast(Temp, SPELL_SUMMON_PLAYERS, true) // core bug, spell does not work if too far
         ThrowBombs();
 
@@ -334,6 +369,7 @@ struct boss_janalai : public BossAI
 private:
     bool _isBombing;
     bool _isFlameBreathing;
+    bool _sideHatched[2];
 };
 
 struct npc_janalai_hatcher : public ScriptedAI
@@ -346,6 +382,7 @@ struct npc_janalai_hatcher : public ScriptedAI
         scheduler.CancelAll();
         _side = (me->GetPositionY() < 1150);
         _waypoint = 0;
+        _repeatCount = 1;
         _isHatching = false;
         me->GetMotionMaster()->Clear();
         me->GetMotionMaster()->MovePoint(0, hatcherway[_side][0]);
@@ -357,19 +394,24 @@ struct npc_janalai_hatcher : public ScriptedAI
         {
             _isHatching = true;
 
-            scheduler.Schedule(1500ms, SCHEDULER_GROUP_HATCHING, [this](TaskContext context)
+            scheduler.Schedule(1500ms, [this](TaskContext context)
             {
-                me->CastCustomSpell(SPELL_HATCH_EGG_ALL, SPELLVALUE_MAX_TARGETS, context.GetRepeatCounter() + 1);
+                me->CastCustomSpell(SPELL_HATCH_EGG_ALL, SPELLVALUE_MAX_TARGETS, _repeatCount);
+
+                ++_repeatCount;
 
                 if (me->FindNearestCreature(NPC_EGG, 100.0f))
-                    context.Repeat(4s);
+                    context.Repeat(5s);
                 else
                 {
+                    if (WorldObject* summoner = GetSummoner())
+                        if (Creature* janalai = summoner->ToCreature())
+                            janalai->AI()->SetData(DATA_ALL_EGGS_HATCHED, _side);
+
                     _side = _side ? 0 : 1;
                     _isHatching = false;
                     _waypoint = 3;
                     MoveToNewWaypoint(_waypoint);
-                    context.CancelGroup(SCHEDULER_GROUP_HATCHING);
                 }
             });
         }
@@ -404,11 +446,43 @@ struct npc_janalai_hatcher : public ScriptedAI
 private:
     uint8 _side;
     uint8 _waypoint;
+    uint32 _repeatCount;
     bool _isHatching;
+};
+
+class spell_summon_all_players_dummy: public SpellScript
+{
+    PrepareSpellScript(spell_summon_all_players_dummy);
+
+    bool Validate(SpellInfo const* /*spell*/) override
+    {
+        return ValidateSpellInfo({ SPELL_SUMMON_PLAYERS });
+    }
+
+    void FilterTargets(std::list<WorldObject*>& targets)
+    {
+        Position pos = GetCaster()->GetPosition();
+        targets.remove_if([&, pos](WorldObject* target) -> bool
+        {
+            return target->IsWithinBox(pos, 22.0f, 28.0f, 28.0f);
+        });
+    }
+
+    void OnHit(SpellEffIndex /*effIndex*/)
+    {
+        GetCaster()->CastSpell(GetHitUnit(), SPELL_SUMMON_PLAYERS, true);
+    }
+
+    void Register() override
+    {
+        OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_summon_all_players_dummy::FilterTargets, EFFECT_0, TARGET_UNIT_SRC_AREA_ENEMY);
+        OnEffectHitTarget += SpellEffectFn(spell_summon_all_players_dummy::OnHit, EFFECT_0, SPELL_EFFECT_DUMMY);
+    }
 };
 
 void AddSC_boss_janalai()
 {
     RegisterZulAmanCreatureAI(boss_janalai);
     RegisterZulAmanCreatureAI(npc_janalai_hatcher);
+    RegisterSpellScript(spell_summon_all_players_dummy);
 }

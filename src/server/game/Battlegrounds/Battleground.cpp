@@ -58,7 +58,8 @@ namespace Acore
 
         void operator()(WorldPacket& data, LocaleConstant loc_idx)
         {
-            char const* text = sObjectMgr->GetAcoreString(_textId, loc_idx);
+            std::string strtext = sObjectMgr->GetAcoreString(_textId, loc_idx);
+            char const* text = strtext.c_str();
             if (_args)
             {
                 // we need copy va_list before use or original va_list will corrupted
@@ -95,9 +96,12 @@ namespace Acore
 
         void operator()(WorldPacket& data, LocaleConstant loc_idx)
         {
-            char const* text = sObjectMgr->GetAcoreString(_textId, loc_idx);
-            char const* arg1str = _arg1 ? sObjectMgr->GetAcoreString(_arg1, loc_idx) : "";
-            char const* arg2str = _arg2 ? sObjectMgr->GetAcoreString(_arg2, loc_idx) : "";
+            std::string strtext = sObjectMgr->GetAcoreString(_textId, loc_idx);
+            char const* text = strtext.c_str();
+            std::string stragr1str = sObjectMgr->GetAcoreString(_arg1, loc_idx);
+            char const* arg1str = _arg1 ? stragr1str.c_str() : "";
+            std::string strarg2str = sObjectMgr->GetAcoreString(_arg2, loc_idx);
+            char const* arg2str = _arg2 ? strarg2str.c_str() : "";
 
             char str[2048];
             snprintf(str, 2048, text, arg1str, arg2str);
@@ -844,7 +848,7 @@ void Battleground::EndBattleground(PvPTeamId winnerTeamId)
         TeamId bgTeamId = player->GetBgTeamId();
 
         // should remove spirit of redemption
-        if (player->HasAuraType(SPELL_AURA_SPIRIT_OF_REDEMPTION))
+        if (player->HasSpiritOfRedemptionAura())
             player->RemoveAurasByType(SPELL_AURA_MOD_SHAPESHIFT);
 
         if (!player->IsAlive())
@@ -1008,7 +1012,7 @@ void Battleground::RemovePlayerAtLeave(Player* player)
     RemovePlayer(player);
 
     // should remove spirit of redemption
-    if (player->HasAuraType(SPELL_AURA_SPIRIT_OF_REDEMPTION))
+    if (player->HasSpiritOfRedemptionAura())
         player->RemoveAurasByType(SPELL_AURA_MOD_SHAPESHIFT);
 
     // if the player was a match participant
@@ -1657,13 +1661,6 @@ void Battleground::EndNow()
     RemoveFromBGFreeSlotQueue();
     SetStatus(STATUS_WAIT_LEAVE);
     SetEndTime(0);
-}
-
-// To be removed
-char const* Battleground::GetAcoreString(int32 entry)
-{
-    // FIXME: now we have different DBC locales and need localized message for each target client
-    return sObjectMgr->GetAcoreStringForDBCLocale(entry);
 }
 
 void Battleground::HandleTriggerBuff(GameObject* gameObject)

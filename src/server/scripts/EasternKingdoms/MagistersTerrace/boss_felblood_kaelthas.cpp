@@ -31,7 +31,8 @@ enum Says
     SAY_GRAVITY_LAPSE           = 3,
     SAY_TIRED                   = 4,
     SAY_RECAST_GRAVITY          = 5,
-    SAY_DEATH                   = 6
+    SAY_DEATH                   = 6,
+    SAY_AGGRO_2                 = 7
 };
 
 enum Spells
@@ -51,25 +52,16 @@ enum Spells
     SPELL_GRAVITY_LAPSE_FLY         = 44227,
     SPELL_GRAVITY_LAPSE_DOT         = 44226,
     SPELL_GRAVITY_LAPSE_CHANNEL     = 44251,
-    SPELL_POWER_FEEDBACK            = 44233
+    SPELL_POWER_FEEDBACK            = 44233,
+    SPELL_CLEAR_FLIGHT              = 44232, // Does nothing currently
+
+    SPELL_EMOTE_EXCLAMATION         = 48348,
+    SPELL_EMOTE_POINT               = 48349,
+    SPELL_EMOTE_ROAR                = 48350
 };
 
 enum Misc
 {
-    EVENT_INIT_COMBAT           = 1,
-    EVENT_SPELL_FIREBALL        = 2,
-    EVENT_SPELL_PHOENIX         = 3,
-    EVENT_SPELL_FLAMESTRIKE     = 4,
-    EVENT_SPELL_SHOCK_BARRIER   = 5,
-    EVENT_CHECK_HEALTH          = 6,
-    EVENT_GRAVITY_LAPSE_1_1     = 7,
-    EVENT_GRAVITY_LAPSE_1_2     = 8,
-    EVENT_GRAVITY_LAPSE_2       = 9,
-    EVENT_GRAVITY_LAPSE_3       = 10,
-    EVENT_GRAVITY_LAPSE_4       = 11,
-    EVENT_GRAVITY_LAPSE_5       = 12,
-    EVENT_FINISH_TALK           = 13,
-
     ACTION_TELEPORT_PLAYERS     = 1,
     ACTION_KNOCKUP              = 2,
     ACTION_ALLOW_FLY            = 3,
@@ -78,216 +70,184 @@ enum Misc
     CREATURE_ARCANE_SPHERE      = 24708
 };
 
-struct boss_felblood_kaelthas : public ScriptedAI
+struct boss_felblood_kaelthas : public BossAI
 {
-    boss_felblood_kaelthas(Creature* creature) : ScriptedAI(creature), summons(me)
-    {
-        instance = creature->GetInstanceScript();
-        introSpeak = false;
-    }
-
-    InstanceScript* instance;
-    EventMap events;
-    EventMap events2;
-    SummonList summons;
-    bool introSpeak;
+    boss_felblood_kaelthas(Creature* creature) : BossAI(creature, DATA_KAELTHAS) { }
 
     void Reset() override
     {
-        events.Reset();
-        summons.DespawnAll();
+        BossAI::Reset();
+        _gravityLapseCounter = 0;
         me->ApplySpellImmune(0, IMMUNITY_EFFECT, SPELL_EFFECT_INTERRUPT_CAST, false);
-        instance->SetBossState(DATA_KAELTHAS, NOT_STARTED);
-        me->SetImmuneToAll(false);
+
+        ScheduleHealthCheckEvent(50, [&]{
+            me->CastStop();
+            me->ApplySpellImmune(0, IMMUNITY_EFFECT, SPELL_EFFECT_INTERRUPT_CAST, true);
+            DoCastSelf(SPELL_TELEPORT_CENTER, true);
+            scheduler.CancelAll();
+
+            me->StopMoving();
+            me->GetMotionMaster()->Clear();
+            me->GetMotionMaster()->MoveIdle();
+            ScheduleTimedEvent(5s, [&]{
+                summons.DoForAllSummons([&](WorldObject* summon){
+                    if (Unit* player = SelectTarget(SelectTargetMethod::Random, 0, 0.0f, true))
+                        if (Creature* summonedCreature = summon->ToCreature())
+                            summonedCreature->GetMotionMaster()->MoveChase(player);
+                });
+            }, 10s, 15s);
+            GravityLapseSequence(true);
+        });
     }
 
-    void JustSummoned(Creature* summon) override
+    void GravityLapseSequence(bool firstTime)
     {
-        for (SummonList::const_iterator itr = summons.begin(); itr != summons.end(); ++itr)
-            if (*itr == summon->GetGUID())
-                return;
-        summons.Summon(summon);
+        Talk(firstTime ? SAY_GRAVITY_LAPSE : SAY_RECAST_GRAVITY);
+        DoCastSelf(SPELL_GRAVITY_LAPSE_INITIAL);
+        scheduler.Schedule(2s, [this](TaskContext){
+            LapseAction(ACTION_TELEPORT_PLAYERS);
+        }).Schedule(3s, [this](TaskContext){
+            LapseAction(ACTION_KNOCKUP);
+        }).Schedule(4s, [this](TaskContext){
+            LapseAction(ACTION_ALLOW_FLY);
+            for (uint8 i = 0; i < 3; ++i)
+                DoCastSelf(SPELL_SUMMON_ARCANE_SPHERE, true);
+            DoCastSelf(SPELL_GRAVITY_LAPSE_CHANNEL);
+            scheduler.Schedule(30s, [this](TaskContext){
+                LapseAction(ACTION_REMOVE_FLY);
+                me->InterruptNonMeleeSpells(false);
+                Talk(SAY_TIRED);
+                DoCastSelf(SPELL_POWER_FEEDBACK);
+                scheduler.Schedule(10s, [this](TaskContext){
+                    GravityLapseSequence(false);
+                });
+            });
+        });
     }
 
-    void InitializeAI() override
+    void JustDied(Unit* killer) override
     {
-        ScriptedAI::InitializeAI();
-        me->SetImmuneToAll(true);
-    }
-
-    void JustDied(Unit*) override
-    {
-        instance->SetBossState(DATA_KAELTHAS, DONE);
-        summons.DespawnAll();
-
+        BossAI::JustDied(killer);
         if (GameObject* orb = instance->GetGameObject(DATA_ESCAPE_ORB))
             orb->RemoveGameObjectFlag(GO_FLAG_NOT_SELECTABLE);
     }
 
-    void JustEngagedWith(Unit* /*who*/) override
+    void JustEngagedWith(Unit* who) override
     {
-        instance->SetBossState(DATA_KAELTHAS, IN_PROGRESS);
-        me->SetInCombatWithZone();
+        BossAI::JustEngagedWith(who);
 
-        events.ScheduleEvent(EVENT_SPELL_FIREBALL, 0);
-        events.ScheduleEvent(EVENT_SPELL_PHOENIX, 15000);
-        events.ScheduleEvent(EVENT_SPELL_FLAMESTRIKE, 22000);
-        events.ScheduleEvent(EVENT_CHECK_HEALTH, 1000);
+        ScheduleTimedEvent(0ms, [&]{
+            DoCastVictim(SPELL_FIREBALL);
+        }, 3000ms, 4500ms);
+        ScheduleTimedEvent(15s, [&]{
+            Talk(SAY_PHOENIX);
+            DoCastSelf(SPELL_PHOENIX);
+        }, 60s);
+        ScheduleTimedEvent(22s, [&]{
+            DoCastRandomTarget(SPELL_FLAMESTRIKE_SUMMON, 0, 100.0f);
+            Talk(SAY_FLAMESTRIKE);
+        }, 25s);
 
         if (IsHeroic())
-            events.ScheduleEvent(EVENT_SPELL_SHOCK_BARRIER, 50000);
+            ScheduleTimedEvent(50s, [&]{
+                DoCastSelf(SPELL_SHOCK_BARRIER, true);
+                me->CastCustomSpell(SPELL_PYROBLAST, SPELLVALUE_MAX_TARGETS, 1, (Unit*)nullptr, false);
+            }, 50s);
     }
 
-    void MoveInLineOfSight(Unit* who) override
+    void DoAction(int32 actionId) override
     {
-        if (!introSpeak && me->IsWithinDistInMap(who, 40.0f) && who->IsPlayer())
+        if (actionId == DATA_KAEL_INTRO)
         {
-            Talk(SAY_AGGRO);
-            introSpeak = true;
-            events2.ScheduleEvent(EVENT_INIT_COMBAT, 35000);
-        }
+            uint32 counter = instance->GetPersistentData(DATA_KAEL_INTRO);
+            instance->StorePersistentData(DATA_KAEL_INTRO, ++counter);
 
-        ScriptedAI::MoveInLineOfSight(who);
+            if (counter == 6 && !me->IsInCombat())
+            {
+                me->SetEmoteState(EMOTE_STATE_TALK);
+                Talk(SAY_AGGRO);
+
+                me->m_Events.AddEventAtOffset([&] {
+                    me->HandleEmoteCommand(EMOTE_ONESHOT_LAUGH_NO_SHEATHE);
+                }, 15s);
+
+                Talk(SAY_AGGRO_2, 20s);
+                me->SetImmuneToAll(true);
+
+                me->m_Events.AddEventAtOffset([&] {
+                    me->ClearEmoteState();
+                    me->SetReactState(REACT_AGGRESSIVE);
+                    me->SetImmuneToAll(false);
+                }, 35s);
+            }
+        }
     }
 
-    void DamageTaken(Unit*, uint32& damage, DamageEffectType, SpellSchoolMask) override
+    void DamageTaken(Unit* attacker, uint32& damage, DamageEffectType damagetype, SpellSchoolMask damageSchoolMask) override
     {
         if (damage >= me->GetHealth())
         {
             damage = me->GetHealth() - 1;
             if (me->isRegeneratingHealth())
             {
+                me->CombatStop();
+                me->CastStop();
                 me->SetRegeneratingHealth(false);
                 me->SetUnitFlag(UNIT_FLAG_DISABLE_MOVE);
                 me->SetImmuneToAll(true);
-                me->CombatStop();
                 me->SetReactState(REACT_PASSIVE);
                 LapseAction(ACTION_REMOVE_FLY);
-                events.Reset();
-                events2.ScheduleEvent(EVENT_FINISH_TALK, 6000);
+                scheduler.CancelAll();
+                summons.DespawnAll();
+
                 Talk(SAY_DEATH);
+                DoCastSelf(SPELL_EMOTE_EXCLAMATION);
+
+                me->m_Events.AddEventAtOffset([&] {
+                    DoCastSelf(SPELL_EMOTE_POINT);
+                }, 3s);
+
+                me->m_Events.AddEventAtOffset([&] {
+                    DoCastSelf(SPELL_EMOTE_ROAR);
+                }, 7s);
+
+                me->m_Events.AddEventAtOffset([&] {
+                    DoCastSelf(SPELL_EMOTE_ROAR);
+                    DoCastSelf(SPELL_CLEAR_FLIGHT);
+                }, 9s);
+
+                me->m_Events.AddEventAtOffset([&] {
+                    me->KillSelf();
+                }, 11s);
             }
         }
+        BossAI::DamageTaken(attacker, damage, damagetype, damageSchoolMask);
     }
 
     void LapseAction(uint8 action)
     {
-        uint8 counter = 0;
-        Map::PlayerList const& playerList = me->GetMap()->GetPlayers();
-        for (Map::PlayerList::const_iterator itr = playerList.begin(); itr != playerList.end(); ++itr, ++counter)
-            if (Player* player = itr->GetSource())
-            {
-                if (action == ACTION_TELEPORT_PLAYERS)
-                    me->CastSpell(player, SPELL_GRAVITY_LAPSE_PLAYER + counter, true);
-                else if (action == ACTION_KNOCKUP)
-                    player->CastSpell(player, SPELL_GRAVITY_LAPSE_DOT, true, nullptr, nullptr, me->GetGUID());
-                else if (action == ACTION_ALLOW_FLY)
-                    player->CastSpell(player, SPELL_GRAVITY_LAPSE_FLY, true, nullptr, nullptr, me->GetGUID());
-                else if (action == ACTION_REMOVE_FLY)
-                {
-                    player->RemoveAurasDueToSpell(SPELL_GRAVITY_LAPSE_FLY);
-                    player->RemoveAurasDueToSpell(SPELL_GRAVITY_LAPSE_DOT);
-                }
-            }
-    }
-
-    void UpdateAI(uint32 diff) override
-    {
-        events2.Update(diff);
-        switch (events2.ExecuteEvent())
+        _gravityLapseCounter = 0;
+        me->GetMap()->DoForAllPlayers([&](Player* player)
         {
-        case EVENT_INIT_COMBAT:
-            me->SetImmuneToAll(false);
-            if (Unit* target = SelectTargetFromPlayerList(50.0f))
-                AttackStart(target);
-            return;
-        case EVENT_FINISH_TALK:
-            me->KillSelf();
-            return;
-        }
+            if (player->IsGameMaster())
+                return;
 
-        if (!UpdateVictim())
-            return;
-
-        events.Update(diff);
-        if (me->HasUnitState(UNIT_STATE_CASTING))
-            return;
-
-        switch (uint32 eventId = events.ExecuteEvent())
-        {
-        case EVENT_SPELL_FIREBALL:
-            me->CastSpell(me->GetVictim(), SPELL_FIREBALL, false);
-            events.ScheduleEvent(EVENT_SPELL_FIREBALL, urand(3000, 4500));
-            break;
-        case EVENT_SPELL_FLAMESTRIKE:
-            if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 100, true))
+            if (action == ACTION_TELEPORT_PLAYERS)
+                DoCast(player, SPELL_GRAVITY_LAPSE_PLAYER + _gravityLapseCounter, true);
+            else if (action == ACTION_KNOCKUP)
+                player->CastSpell(player, SPELL_GRAVITY_LAPSE_DOT, true, nullptr, nullptr, me->GetGUID());
+            else if (action == ACTION_ALLOW_FLY)
+                player->CastSpell(player, SPELL_GRAVITY_LAPSE_FLY, true, nullptr, nullptr, me->GetGUID());
+            else if (action == ACTION_REMOVE_FLY)
             {
-                me->CastSpell(target, SPELL_FLAMESTRIKE_SUMMON, true);
-                Talk(SAY_FLAMESTRIKE);
+                player->RemoveAurasDueToSpell(SPELL_GRAVITY_LAPSE_FLY);
+                player->RemoveAurasDueToSpell(SPELL_GRAVITY_LAPSE_DOT);
             }
-            events.ScheduleEvent(EVENT_SPELL_FLAMESTRIKE, 25000);
-            break;
-        case EVENT_SPELL_SHOCK_BARRIER:
-            me->CastSpell(me, SPELL_SHOCK_BARRIER, true);
-            me->CastCustomSpell(SPELL_PYROBLAST, SPELLVALUE_MAX_TARGETS, 1, (Unit*)nullptr, false);
-            events.ScheduleEvent(EVENT_SPELL_SHOCK_BARRIER, 50000);
-            break;
-        case EVENT_SPELL_PHOENIX:
-            Talk(SAY_PHOENIX);
-            me->CastSpell(me, SPELL_PHOENIX, false);
-            events.ScheduleEvent(EVENT_SPELL_PHOENIX, 60000);
-            break;
-        case EVENT_CHECK_HEALTH:
-            if (HealthBelowPct(50))
-            {
-                me->ApplySpellImmune(0, IMMUNITY_EFFECT, SPELL_EFFECT_INTERRUPT_CAST, true);
-                me->CastSpell(me, SPELL_TELEPORT_CENTER, true);
-                events.Reset();
-
-                me->StopMoving();
-                me->GetMotionMaster()->Clear();
-                me->GetMotionMaster()->MoveIdle();
-
-                events.SetPhase(1);
-                events.ScheduleEvent(EVENT_GRAVITY_LAPSE_1_1, 0);
-                break;
-            }
-            events.ScheduleEvent(EVENT_CHECK_HEALTH, 500);
-            break;
-        case EVENT_GRAVITY_LAPSE_1_1:
-        case EVENT_GRAVITY_LAPSE_1_2:
-            Talk(eventId == EVENT_GRAVITY_LAPSE_1_1 ? SAY_GRAVITY_LAPSE : SAY_RECAST_GRAVITY);
-            me->CastSpell(me, SPELL_GRAVITY_LAPSE_INITIAL, false);
-            events.ScheduleEvent(EVENT_GRAVITY_LAPSE_2, 2000);
-            break;
-        case EVENT_GRAVITY_LAPSE_2:
-            LapseAction(ACTION_TELEPORT_PLAYERS);
-            events.ScheduleEvent(EVENT_GRAVITY_LAPSE_3, 1000);
-            break;
-        case EVENT_GRAVITY_LAPSE_3:
-            LapseAction(ACTION_KNOCKUP);
-            events.ScheduleEvent(EVENT_GRAVITY_LAPSE_4, 1000);
-            break;
-        case EVENT_GRAVITY_LAPSE_4:
-            LapseAction(ACTION_ALLOW_FLY);
-            for (uint8 i = 0; i < 3; ++i)
-                me->CastSpell(me, SPELL_SUMMON_ARCANE_SPHERE, true);
-
-            me->CastSpell(me, SPELL_GRAVITY_LAPSE_CHANNEL, false);
-            events.ScheduleEvent(EVENT_GRAVITY_LAPSE_5, 30000);
-            break;
-        case EVENT_GRAVITY_LAPSE_5:
-            LapseAction(ACTION_REMOVE_FLY);
-            me->InterruptNonMeleeSpells(false);
-            Talk(SAY_TIRED);
-            me->CastSpell(me, SPELL_POWER_FEEDBACK, false);
-            events.ScheduleEvent(EVENT_GRAVITY_LAPSE_1_2, 10000);
-            break;
-        }
-
-        if (events.GetPhaseMask() == 0)
-            DoMeleeAttackIfReady();
+            ++_gravityLapseCounter;
+        });
     }
+private:
+    uint8 _gravityLapseCounter;
 };
 
 class spell_mt_phoenix_burn : public SpellScript

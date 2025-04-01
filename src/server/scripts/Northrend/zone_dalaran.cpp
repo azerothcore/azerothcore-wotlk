@@ -444,7 +444,9 @@ public:
 
         void MoveInLineOfSight(Unit* who) override
         {
-            if (!who || !who->IsInWorld() || who->GetZoneId() != 4395)
+            // 4395 Dalaran
+            // 4569 Sewer Exit Pipe
+            if (!who || !who->IsInWorld()|| who->GetZoneId() != 4395 || who->GetAreaId() == 4569)
                 return;
 
             if (!me->IsWithinDist(who, 5.0f, false))
@@ -454,8 +456,7 @@ public:
 
             if (!player || player->IsGameMaster() || player->IsBeingTeleported() || (player->GetPositionZ() > 670 && player->GetVehicle()) ||
                     // If player has Disguise aura for quest A Meeting With The Magister or An Audience With The Arcanist, do not teleport it away but let it pass
-                    player->HasAura(SPELL_SUNREAVER_DISGUISE_FEMALE) || player->HasAura(SPELL_SUNREAVER_DISGUISE_MALE) ||
-                    player->HasAura(SPELL_SILVER_COVENANT_DISGUISE_FEMALE) || player->HasAura(SPELL_SILVER_COVENANT_DISGUISE_MALE))
+                    player->HasAnyAuras(SPELL_SUNREAVER_DISGUISE_FEMALE, SPELL_SUNREAVER_DISGUISE_MALE, SPELL_SILVER_COVENANT_DISGUISE_FEMALE, SPELL_SILVER_COVENANT_DISGUISE_MALE))
                 return;
 
             switch (me->GetEntry())

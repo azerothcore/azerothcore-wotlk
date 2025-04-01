@@ -201,7 +201,7 @@ struct boss_illidari_council : public BossAI
         if (!me->isActiveObject())
             return;
 
-        if (!SelectTargetFromPlayerList(115.0f))
+        if (!SelectTargetFromPlayerList(150.0f))
         {
             EnterEvadeMode(EVADE_REASON_NO_HOSTILES);
             return;

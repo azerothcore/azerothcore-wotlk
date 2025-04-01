@@ -41,8 +41,6 @@ private:
     void WorkerThread();
     std::thread _workerThread;
 
-    std::atomic<bool> _cancelationToken;
-
     DatabaseWorker(DatabaseWorker const& right) = delete;
     DatabaseWorker& operator=(DatabaseWorker const& right) = delete;
 };

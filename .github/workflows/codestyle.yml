@@ -1,6 +1,10 @@
 name: Codestyle
 on:
   pull_request:
+    types:
+      - opened
+      - reopened
+      - synchronize
     paths:
       - src/**
       - "!README.md"
@@ -10,7 +14,7 @@ jobs:
   triage:
     runs-on: ubuntu-latest
     name: C++
-    if: github.repository == 'azerothcore/azerothcore-wotlk'
+    if: github.repository == 'azerothcore/azerothcore-wotlk' && !github.event.pull_request.draft
     steps:
       - uses: actions/checkout@v4
       - name: Setup python
@@ -18,7 +22,7 @@ jobs:
         with:
           python-version: '3.10'
       - name: AzerothCore codestyle
-        run: python ./apps/codestyle/codestyle.py
+        run: python ./apps/codestyle/codestyle-cpp.py
       - name: C++ Advanced
         run: |
           sudo apt update -y

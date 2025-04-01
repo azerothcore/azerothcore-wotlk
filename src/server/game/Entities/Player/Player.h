@@ -65,7 +65,7 @@ class SpellCastTargets;
 class UpdateMask;
 
 typedef std::deque<Mail*> PlayerMails;
-typedef void(*bgZoneRef)(Battleground*, WorldPacket&);
+typedef void(*bgZoneRef)(Battleground*, WorldPackets::WorldState::InitWorldStates&);
 
 #define PLAYER_MAX_SKILLS           127
 #define PLAYER_MAX_DAILY_QUESTS     25
@@ -243,6 +243,11 @@ enum ReputationSource
     REPUTATION_SOURCE_MONTHLY_QUEST,
     REPUTATION_SOURCE_REPEATABLE_QUEST,
     REPUTATION_SOURCE_SPELL
+};
+
+enum QuestSound
+{
+    QUEST_SOUND_FAILURE = 847
 };
 
 #define ACTION_BUTTON_ACTION(X) (uint32(X) & 0x00FFFFFF)
@@ -439,7 +444,7 @@ struct Runes
 
 struct EnchantDuration
 {
-    EnchantDuration()  = default;;
+    EnchantDuration()  = default;
     EnchantDuration(Item* _item, EnchantmentSlot _slot, uint32 _leftduration) : item(_item), slot(_slot),
         leftduration(_leftduration) { ASSERT(item); };
 
@@ -1060,6 +1065,18 @@ struct EntryPointData
     [[nodiscard]] bool HasTaxiPath() const { return taxiPath[0] && taxiPath[1]; }
 };
 
+struct PendingSpellCastRequest
+{
+    uint32 spellId;
+    uint32 category;
+    WorldPacket requestPacket;
+    bool isItem = false;
+    bool cancelInProgress = false;
+
+    PendingSpellCastRequest(uint32 spellId, uint32 category, WorldPacket&& packet, bool item = false, bool cancel = false)
+        : spellId(spellId), category(category), requestPacket(std::move(packet)), isItem(item) , cancelInProgress(cancel) {}
+};
+
 class Player : public Unit, public GridObject<Player>
 {
     friend class WorldSession;
@@ -1192,7 +1209,7 @@ public:
     void RemoveRestState();
     uint32 GetXPRestBonus(uint32 xp);
     [[nodiscard]] float GetRestBonus() const { return _restBonus; }
-    void SetRestBonus(float rest_bonus_new);
+    void SetRestBonus(float restBonusNew);
 
     [[nodiscard]] bool HasRestFlag(RestFlag restFlag) const { return (_restFlagMask & restFlag) != 0; }
     void SetRestFlag(RestFlag restFlag, uint32 triggerId = 0);
@@ -1368,7 +1385,7 @@ public:
 
     [[nodiscard]] Player* GetTrader() const { return m_trade ? m_trade->GetTrader() : nullptr; }
     [[nodiscard]] TradeData* GetTradeData() const { return m_trade; }
-    void TradeCancel(bool sendback);
+    void TradeCancel(bool sendback, TradeStatus status = TRADE_STATUS_TRADE_CANCELED);
 
     CinematicMgr* GetCinematicMgr() const { return _cinematicMgr; }
 
@@ -1721,6 +1738,10 @@ public:
     [[nodiscard]] bool HasTalent(uint32 spell_id, uint8 spec) const;
 
     [[nodiscard]] uint32 CalculateTalentsPoints() const;
+    void SetBonusTalentCount(uint32 count) { m_extraBonusTalentCount = count; };
+    uint32 GetBonusTalentCount() { return m_extraBonusTalentCount; };
+    void AddBonusTalent(uint32 count) { m_extraBonusTalentCount += count; };
+    void RemoveBonusTalent(uint32 count) { m_extraBonusTalentCount -= count; };
 
     // Dual Spec
     void UpdateSpecCount(uint8 count);
@@ -1761,6 +1782,9 @@ public:
 
     [[nodiscard]] SpellCooldowns const& GetSpellCooldownMap() const { return m_spellCooldowns; }
     SpellCooldowns&       GetSpellCooldownMap()       { return m_spellCooldowns; }
+
+    SkillStatusMap const& GetSkillStatusMap() const { return mSkillStatus; }
+    SkillStatusMap& GetSkillStatusMap() { return mSkillStatus; }
 
     void AddSpellMod(SpellModifier* mod, bool apply);
     bool IsAffectedBySpellmod(SpellInfo const* spellInfo, SpellModifier* mod, Spell* spell = nullptr);
@@ -2051,6 +2075,7 @@ public:
     void LeftChannel(Channel* c);
     void CleanupChannels();
     void ClearChannelWatch();
+    void UpdateLFGChannel();
     void UpdateLocalChannels(uint32 newZone);
 
     void UpdateDefense();
@@ -2211,7 +2236,7 @@ public:
     void SetEquipmentSet(uint32 index, EquipmentSet eqset);
     void DeleteEquipmentSet(uint64 setGuid);
 
-    void SendInitWorldStates(uint32 zone, uint32 area);
+    void SendInitWorldStates(uint32 zoneId, uint32 areaId);
     void SendUpdateWorldState(uint32 variable, uint32 value) const;
     void SendDirectMessage(WorldPacket const* data) const;
     void SendBGWeekendWorldStates();
@@ -2386,7 +2411,7 @@ public:
     void SetAtLoginFlag(AtLoginFlags f) { m_atLoginFlags |= f; }
     void RemoveAtLoginFlag(AtLoginFlags flags, bool persist = false);
 
-    bool isUsingLfg();
+    bool IsUsingLfg();
     bool inRandomLfgDungeon();
 
     typedef std::set<uint32> DFQuestsDoneList;
@@ -2615,7 +2640,21 @@ public:
 
     std::string GetDebugInfo() const override;
 
- protected:
+    /*********************************************************/
+    /***               SPELL QUEUE SYSTEM                  ***/
+    /*********************************************************/
+protected:
+    uint32 GetSpellQueueWindow() const;
+    void ProcessSpellQueue();
+
+public:
+    std::deque<PendingSpellCastRequest> SpellQueue;
+    const PendingSpellCastRequest* GetCastRequest(uint32 category) const;
+    bool CanExecutePendingSpellCastRequest(SpellInfo const* spellInfo);
+    void ExecuteOrCancelSpellCastRequest(PendingSpellCastRequest* castRequest, bool isCancel = false);
+    bool CanRequestSpellCast(SpellInfo const* spellInfo);
+
+protected:
     // Gamemaster whisper whitelist
     WhisperListContainer WhisperList;
 

@@ -80,12 +80,16 @@ float summons[3][4] =
     {NPC_PHANTASMAL_CLOUDSCRAPER, NPC_PHANTASMAL_CLOUDSCRAPER, NPC_PHANTASMAL_MAMMOTH, NPC_PHANTASMAL_WOLF}
 };
 
-float cords[4][4] =
+float cords[5][4] =
 {
     {1177.47f, 937.722f, 527.405f, 2.21657f},
     {968.66f, 1042.53f, 527.32f, 0.077f},
     {1164.02f, 1170.85f, 527.321f, 3.66f},
-    {1118.31f, 1080.377f, 508.361f, 4.25f}
+    {1118.31f, 1080.377f, 508.361f, 4.25f},
+    // There are 4 phases but with the code like this:
+    // me->SetHomePosition(cords[phase + 1][0], cords[phase + 1][1], cords[phase + 1][2], cords[phase + 1][3]);
+    // lets provide fallback position.
+    {1177.47f, 937.722f, 527.405f, 2.21657f}
 };
 
 class boss_urom : public CreatureScript
@@ -107,7 +111,7 @@ public:
 
         InstanceScript* pInstance;
         EventMap events;
-        bool lock;
+        bool lock, inCenter;
         float x, y, z;
         int32 releaseLockTimer;
 
@@ -134,6 +138,7 @@ public:
             me->CastSpell(me, SPELL_EVOCATION, true);
             events.Reset();
             lock = false;
+            inCenter = false;
             x = 0.0f;
             y = 0.0f;
             z = 0.0f;
@@ -222,9 +227,14 @@ public:
             {
                 pInstance->SetData(DATA_UROM, DONE);
             }
-            me->SetCanFly(false);
-            me->SetDisableGravity(false);
-            me->NearTeleportTo(x, y, z, 0.0f);
+
+            // Body teleportation required only when boss is flying in the center
+            if (inCenter)
+            {
+                me->SetCanFly(false);
+                me->SetDisableGravity(false);
+                me->NearTeleportTo(x, y, z, 0.0f);
+            }
         }
 
         void KilledUnit(Unit* /*victim*/) override
@@ -281,6 +291,7 @@ public:
                     me->SetCanFly(true);
                     me->SetDisableGravity(true);
                     me->NearTeleportTo(1103.69f, 1048.76f, 512.279f, 1.16f);
+                    inCenter = true;
 
                     Talk(SAY_ARCANE_EXPLOSION);
                     Talk(EMOTE_ARCANE_EXPLOSION);
@@ -356,6 +367,7 @@ public:
                     me->SetControlled(false, UNIT_STATE_ROOT);
                     me->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
                     me->GetMotionMaster()->MoveChase(me->GetVictim());
+                    inCenter = false;
                     break;
             }
         }
@@ -365,6 +377,7 @@ public:
             me->SetCanFly(false);
             me->SetDisableGravity(false);
             me->SetControlled(false, UNIT_STATE_ROOT);
+            inCenter = false;
             ScriptedAI::EnterEvadeMode(why);
         }
     };

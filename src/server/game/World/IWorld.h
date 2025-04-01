@@ -48,8 +48,6 @@ private:
     CliCommandHolder& operator=(CliCommandHolder const& right) = delete;
 };
 
-typedef std::unordered_map<uint32, WorldSession*> SessionMap;
-
 // ServerMessages.dbc
 enum ServerMessageType
 {
@@ -116,7 +114,6 @@ enum WorldBoolConfigs
     CONFIG_BATTLEGROUND_TRACK_DESERTERS,
     CONFIG_BG_XP_FOR_KILL,
     CONFIG_ARENA_AUTO_DISTRIBUTE_POINTS,
-    CONFIG_ARENA_SEASON_IN_PROGRESS,
     CONFIG_ARENA_QUEUE_ANNOUNCER_ENABLE,
     CONFIG_ARENA_QUEUE_ANNOUNCER_PLAYERONLY,
     CONFIG_OFFHAND_CHECK_AT_SPELL_UNLEARN,
@@ -183,6 +180,7 @@ enum WorldBoolConfigs
     CONFIG_ALLOWS_RANK_MOD_FOR_PET_HEALTH,
     CONFIG_MUNCHING_BLIZZLIKE,
     CONFIG_ENABLE_DAZE,
+    CONFIG_SPELL_QUEUE_ENABLED,
     BOOL_CONFIG_VALUE_COUNT
 };
 
@@ -201,6 +199,8 @@ enum WorldFloatConfigs
     CONFIG_ARENA_WIN_RATING_MODIFIER_2,
     CONFIG_ARENA_LOSE_RATING_MODIFIER,
     CONFIG_ARENA_MATCHMAKER_RATING_MODIFIER,
+    CONFIG_RESPAWN_DYNAMICRATE_GAMEOBJECT,
+    CONFIG_RESPAWN_DYNAMICRATE_CREATURE,
     FLOAT_CONFIG_VALUE_COUNT
 };
 
@@ -318,13 +318,17 @@ enum WorldIntConfigs
     CONFIG_BATTLEGROUND_SPEED_BUFF_RESPAWN,
     CONFIG_BATTLEGROUND_QUEUE_ANNOUNCER_LIMIT_MIN_LEVEL,
     CONFIG_BATTLEGROUND_QUEUE_ANNOUNCER_LIMIT_MIN_PLAYERS,
+    CONFIG_BATTLEGROUND_WARSONG_FLAGS,
+    CONFIG_BATTLEGROUND_ARATHI_CAPTUREPOINTS,
+    CONFIG_BATTLEGROUND_ALTERAC_REINFORCEMENTS,
+    CONFIG_BATTLEGROUND_ALTERAC_REP_ONBOSSDEATH,
+    CONFIG_BATTLEGROUND_EYEOFTHESTORM_CAPTUREPOINTS,
     CONFIG_WINTERGRASP_ENABLE,
     CONFIG_ARENA_MAX_RATING_DIFFERENCE,
     CONFIG_ARENA_RATING_DISCARD_TIMER,
     CONFIG_ARENA_PREV_OPPONENTS_DISCARD_TIMER,
     CONFIG_ARENA_AUTO_DISTRIBUTE_INTERVAL_DAYS,
     CONFIG_ARENA_GAMES_REQUIRED,
-    CONFIG_ARENA_SEASON_ID,
     CONFIG_ARENA_START_RATING,
     CONFIG_LEGACY_ARENA_POINTS_CALC,
     CONFIG_ARENA_START_PERSONAL_RATING,
@@ -367,7 +371,6 @@ enum WorldIntConfigs
     CONFIG_WINTERGRASP_BATTLETIME,
     CONFIG_WINTERGRASP_NOBATTLETIME,
     CONFIG_WINTERGRASP_RESTART_AFTER_CRASH,
-    CONFIG_PACKET_SPOOF_POLICY,
     CONFIG_PACKET_SPOOF_BANMODE,
     CONFIG_PACKET_SPOOF_BANDURATION,
     CONFIG_WARDEN_CLIENT_RESPONSE_DELAY,
@@ -417,8 +420,12 @@ enum WorldIntConfigs
     CONFIG_LFG_KICK_PREVENTION_TIMER,
     CONFIG_CHANGE_FACTION_MAX_MONEY,
     CONFIG_WATER_BREATH_TIMER,
-    CONFIG_AUCTION_HOUSE_SEARCH_TIMEOUT,
     CONFIG_DAILY_RBG_MIN_LEVEL_AP_REWARD,
+    CONFIG_AUCTIONHOUSE_WORKERTHREADS,
+    CONFIG_SPELL_QUEUE_WINDOW,
+    CONFIG_SUNSREACH_COUNTER_MAX,
+    CONFIG_RESPAWN_DYNAMICMINIMUM_GAMEOBJECT,
+    CONFIG_RESPAWN_DYNAMICMINIMUM_CREATURE,
     INT_CONFIG_VALUE_COUNT
 };
 
@@ -499,6 +506,7 @@ enum Rates
     RATE_REST_INGAME,
     RATE_REST_OFFLINE_IN_TAVERN_OR_CITY,
     RATE_REST_OFFLINE_IN_WILDERNESS,
+    RATE_REST_MAX_BONUS,
     RATE_DAMAGE_FALL,
     RATE_AUCTION_TIME,
     RATE_AUCTION_DEPOSIT,
@@ -514,7 +522,8 @@ enum Rates
     RATE_DURABILITY_LOSS_PARRY,
     RATE_DURABILITY_LOSS_ABSORB,
     RATE_DURABILITY_LOSS_BLOCK,
-    RATE_MOVESPEED,
+    RATE_MOVESPEED_PLAYER,
+    RATE_MOVESPEED_NPC,
     RATE_MISS_CHANCE_MULTIPLIER_TARGET_CREATURE,
     RATE_MISS_CHANCE_MULTIPLIER_TARGET_PLAYER,
     MAX_RATES
@@ -524,34 +533,11 @@ class IWorld
 {
 public:
     virtual ~IWorld() = default;
-    [[nodiscard]] virtual WorldSession* FindSession(uint32 id) const = 0;
-    [[nodiscard]] virtual WorldSession* FindOfflineSession(uint32 id) const = 0;
-    [[nodiscard]] virtual WorldSession* FindOfflineSessionForCharacterGUID(ObjectGuid::LowType guidLow) const = 0;
-    virtual void AddSession(WorldSession* s) = 0;
-    virtual bool KickSession(uint32 id) = 0;
-    virtual void UpdateMaxSessionCounters() = 0;
-    [[nodiscard]] virtual const SessionMap& GetAllSessions() const = 0;
-    [[nodiscard]] virtual uint32 GetActiveAndQueuedSessionCount() const = 0;
-    [[nodiscard]] virtual uint32 GetActiveSessionCount() const = 0;
-    [[nodiscard]] virtual uint32 GetQueuedSessionCount() const = 0;
-    [[nodiscard]] virtual uint32 GetMaxQueuedSessionCount() const = 0;
-    [[nodiscard]] virtual uint32 GetMaxActiveSessionCount() const = 0;
-    [[nodiscard]] virtual uint32 GetPlayerCount() const = 0;
-    [[nodiscard]] virtual uint32 GetMaxPlayerCount() const = 0;
-    virtual void IncreasePlayerCount() = 0;
-    virtual void DecreasePlayerCount() = 0;
-    virtual Player* FindPlayerInZone(uint32 zone) = 0;
     [[nodiscard]] virtual bool IsClosed() const = 0;
     virtual void SetClosed(bool val) = 0;
     [[nodiscard]] virtual AccountTypes GetPlayerSecurityLimit() const = 0;
     virtual void SetPlayerSecurityLimit(AccountTypes sec) = 0;
     virtual void LoadDBAllowedSecurityLevel() = 0;
-    virtual void SetPlayerAmountLimit(uint32 limit) = 0;
-    [[nodiscard]] virtual uint32 GetPlayerAmountLimit() const = 0;
-    virtual void AddQueuedPlayer(WorldSession*) = 0;
-    virtual bool RemoveQueuedPlayer(WorldSession* session) = 0;
-    virtual int32 GetQueuePos(WorldSession*) = 0;
-    virtual bool HasRecentlyDisconnected(WorldSession*) = 0;
     [[nodiscard]] virtual bool getAllowMovement() const = 0;
     virtual void SetAllowMovement(bool allow) = 0;
     virtual void SetNewCharString(std::string const& str) = 0;
@@ -564,18 +550,12 @@ public:
     [[nodiscard]] virtual uint16 GetConfigMaxSkillValue() const = 0;
     virtual void SetInitialWorldSettings() = 0;
     virtual void LoadConfigSettings(bool reload = false) = 0;
-    virtual void SendGlobalMessage(WorldPacket const* packet, WorldSession* self = nullptr, TeamId teamId = TEAM_NEUTRAL) = 0;
-    virtual void SendGlobalGMMessage(WorldPacket const* packet, WorldSession* self = nullptr, TeamId teamId = TEAM_NEUTRAL) = 0;
-    virtual bool SendZoneMessage(uint32 zone, WorldPacket const* packet, WorldSession* self = nullptr, TeamId teamId = TEAM_NEUTRAL) = 0;
-    virtual void SendZoneText(uint32 zone, const char* text, WorldSession* self = nullptr, TeamId teamId = TEAM_NEUTRAL) = 0;
-    virtual void SendServerMessage(ServerMessageType messageID, std::string stringParam = "", Player* player = nullptr) = 0;
     [[nodiscard]] virtual bool IsShuttingDown() const = 0;
     [[nodiscard]] virtual uint32 GetShutDownTimeLeft() const = 0;
     virtual void ShutdownServ(uint32 time, uint32 options, uint8 exitcode, const std::string& reason = std::string()) = 0;
     virtual void ShutdownCancel() = 0;
     virtual void ShutdownMsg(bool show = false, Player* player = nullptr, const std::string& reason = std::string()) = 0;
     virtual void Update(uint32 diff) = 0;
-    virtual void UpdateSessions(uint32 diff) = 0;
     virtual void setRate(Rates rate, float value) = 0;
     [[nodiscard]] virtual float getRate(Rates rate) const = 0;
     virtual void setBoolConfig(WorldBoolConfigs index, bool value) = 0;
@@ -589,8 +569,6 @@ public:
     virtual void LoadWorldStates() = 0;
     [[nodiscard]] virtual bool IsPvPRealm() const = 0;
     [[nodiscard]] virtual bool IsFFAPvPRealm() const = 0;
-    virtual void KickAll() = 0;
-    virtual void KickAllLess(AccountTypes sec) = 0;
     virtual uint32 GetNextWhoListUpdateDelaySecs() = 0;
     virtual void ProcessCliCommands() = 0;
     virtual void QueueCliCommand(CliCommandHolder* commandHolder) = 0;
@@ -606,7 +584,6 @@ public:
     [[nodiscard]] virtual std::string const& GetRealmName() const = 0;
     virtual void SetRealmName(std::string name) = 0;
     virtual void RemoveOldCorpses() = 0;
-    virtual void DoForAllOnlinePlayers(std::function<void(Player*)> exec) = 0;
 };
 
 #endif //AZEROTHCORE_IWORLD_H

@@ -61,7 +61,7 @@ struct boss_muru : public BossAI
     void Reset() override
     {
         BossAI::Reset();
-        me->SetReactState(REACT_AGGRESSIVE);
+        me->SetReactState(REACT_PASSIVE);
         me->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
         me->SetVisible(true);
         me->m_Events.KillAllEvents(false);
@@ -81,6 +81,14 @@ struct boss_muru : public BossAI
             if (Creature* entropius = summons.GetCreatureWithEntry(NPC_ENTROPIUS))
                 entropius->CastSpell(entropius, SPELL_ENRAGE, true);
         }, 10min);
+    }
+
+    void JustSummoned(Creature* creature) override
+    {
+        if (creature->GetEntry() == NPC_ENTROPIUS)
+            creature->SetInCombatWithZone();
+        else
+            BossAI::JustSummoned(creature);
     }
 
     void DamageTaken(Unit*, uint32& damage, DamageEffectType, SpellSchoolMask) override
@@ -285,7 +293,7 @@ class spell_entropius_void_zone_visual_aura : public AuraScript
     void Register() override
     {
         OnEffectApply += AuraEffectApplyFn(spell_entropius_void_zone_visual_aura::HandleApply, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
-        OnEffectRemove += AuraEffectRemoveFn(spell_entropius_void_zone_visual_aura::HandleApply, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
+        OnEffectRemove += AuraEffectRemoveFn(spell_entropius_void_zone_visual_aura::HandleRemove, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
     }
 };
 
@@ -334,7 +342,7 @@ class spell_entropius_negative_energy_periodic : public AuraScript
     void PeriodicTick(AuraEffect const* aurEff)
     {
         PreventDefaultAction();
-        uint32 targetCount = aurEff->GetTickNumber() > 12 ? 1 : aurEff->GetTickNumber() / 12;
+        uint32 targetCount = (aurEff->GetTickNumber() + 11) / 12;
         GetTarget()->CastCustomSpell(aurEff->GetSpellInfo()->Effects[EFFECT_0].TriggerSpell, SPELLVALUE_MAX_TARGETS, targetCount);
     }
 

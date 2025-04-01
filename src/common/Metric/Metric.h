@@ -21,6 +21,7 @@
 #include "Define.h"
 #include "Duration.h"
 #include "MPSCQueue.h"
+#include <boost/asio/steady_timer.hpp>
 #include <functional>
 #include <memory> // NOTE: this import is NEEDED (even though some IDEs report it as unused)
 #include <string>
@@ -30,7 +31,6 @@
 namespace Acore::Asio
 {
     class IoContext;
-    class DeadlineTimer;
 }
 
 enum MetricDataType
@@ -62,8 +62,8 @@ private:
     std::iostream& GetDataStream() { return *_dataStream; }
     std::unique_ptr<std::iostream> _dataStream;
     MPSCQueue<MetricData> _queuedData;
-    std::unique_ptr<Acore::Asio::DeadlineTimer> _batchTimer;
-    std::unique_ptr<Acore::Asio::DeadlineTimer> _overallStatusTimer;
+    std::unique_ptr<boost::asio::steady_timer> _batchTimer;
+    std::unique_ptr<boost::asio::steady_timer> _overallStatusTimer;
     int32 _updateInterval = 0;
     int32 _overallStatusTimerInterval = 0;
     bool _enabled = false;

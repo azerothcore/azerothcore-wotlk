@@ -4,7 +4,10 @@ on:
     branches:
       - 'master'
   pull_request:
-    types: ['opened', 'synchronize', 'reopened']
+    types:
+      - opened
+      - reopened
+      - synchronize
 
 concurrency:
   group: ${{ github.head_ref }} || concat(${{ github.ref }}, ${{ github.workflow }})
