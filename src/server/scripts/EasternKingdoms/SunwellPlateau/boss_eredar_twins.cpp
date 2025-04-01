@@ -146,9 +146,9 @@ struct boss_sacrolash : public BossAI
             DoCastVictim(SPELL_CONFOUNDING_BLOW);
         }, 20s, 25s);
 
-        ScheduleTimedEvent(20s, [&] {
-            me->SummonCreature(NPC_SHADOW_IMAGE, me->GetPosition(), TEMPSUMMON_TIMED_DESPAWN, 12000);
-        }, 6s);
+        ScheduleTimedEvent(8s, 16s, [&] {
+            me->SummonCreature(NPC_SHADOW_IMAGE, me->GetPosition(), TEMPSUMMON_TIMED_DESPAWN, 10000);
+        }, 8s, 12s);
 
         scheduler.Schedule(36s, GROUP_SPECIAL_ABILITY, [this](TaskContext context) {
             Unit* target = SelectTarget(SelectTargetMethod::MaxThreat, 1, 100.0f);
@@ -253,9 +253,9 @@ struct boss_alythess : public BossAI
             DoCastVictim(SPELL_BLAZE);
         }, 3800ms);
 
-        ScheduleTimedEvent(15s, [&] {
+        ScheduleTimedEvent(21s, 34s, [&] {
             DoCastSelf(SPELL_PYROGENICS);
-        }, 15s);
+        }, 21s, 34s);
 
         ScheduleTimedEvent(10s, 15s, [&] {
             me->CastCustomSpell(SPELL_FLAME_SEAR, SPELLVALUE_MAX_TARGETS, urand(4, 5), me, TRIGGERED_NONE);
