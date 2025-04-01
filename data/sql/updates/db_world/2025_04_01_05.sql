@@ -1,3 +1,4 @@
+-- DB update 2025_04_01_04 -> 2025_04_01_05
 
 -- Edit max range from 4 to 1
 UPDATE `creature_template` SET `AIName` = 'SmartAI' WHERE `entry` = 25744;
