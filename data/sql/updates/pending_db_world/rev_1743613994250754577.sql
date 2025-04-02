@@ -13,7 +13,7 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 (25632, 0, 2, 0, 62, 0, 100, 0, 9286, 5, 0, 0, 0, 0, 11, 46880, 0, 0, 0, 0, 0, 7, 0, 0, 0, 0, 0, 0, 0, 0, 'Vindicator Moorba - On Gossip Option 5 Selected - Cast \'Teleport to Sunwell Plateau\'');
 
 DELETE FROM `spell_script_names` WHERE `spell_id` IN (46877, 46879, 46880);
-INSERT INTO spell_script_names (spell_id, ScriptName) VALUES
+INSERT INTO `spell_script_names` (`spell_id`, `ScriptName`) VALUES
 (46877, "spell_teleport_to_apex_point"),
 (46879, "spell_teleport_to_witchs_sanctum"),
 (46880, "spell_teleport_to_sunwell_plateau");
