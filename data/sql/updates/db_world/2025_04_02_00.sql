@@ -1,3 +1,4 @@
+-- DB update 2025_04_01_07 -> 2025_04_02_00
 
 -- Set Flag Don't Override SAI
 UPDATE `creature_template` SET `flags_extra` = `flags_extra` |134217728 WHERE (`entry` IN(28941, 28942));
