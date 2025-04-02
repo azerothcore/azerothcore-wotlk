@@ -1,3 +1,4 @@
+-- DB update 2025_04_02_00 -> 2025_04_02_01
 DELETE FROM `conditions` WHERE (`SourceTypeOrReferenceId` = 1 AND `SourceGroup` = 21004 AND `SourceEntry` = 31656);
 INSERT INTO `conditions` (`SourceTypeOrReferenceId`, `SourceGroup`, `SourceEntry`, `SourceId`, `ElseGroup`, `ConditionTypeOrReference`, `ConditionTarget`, `ConditionValue1`, `ConditionValue2`, `ConditionValue3`, `NegativeCondition`, `ErrorTextId`, `ScriptName`, `Comment`)
 VALUES
