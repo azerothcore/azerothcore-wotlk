@@ -1,3 +1,4 @@
+-- DB update 2025_04_02_03 -> 2025_04_02_04
 --
 DELETE FROM `gossip_menu_option` WHERE (`MenuID` = 9286) AND (`OptionID` IN (3, 4, 5));
 INSERT INTO `gossip_menu_option` (`MenuID`, `OptionID`, `OptionIcon`, `OptionText`, `OptionBroadcastTextID`, `OptionType`, `OptionNpcFlag`, `ActionMenuID`, `ActionPoiID`, `BoxCoded`, `BoxMoney`, `BoxText`, `BoxBroadcastTextID`, `VerifiedBuild`) VALUES
