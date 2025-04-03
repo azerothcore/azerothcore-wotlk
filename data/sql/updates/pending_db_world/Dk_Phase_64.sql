@@ -1,0 +1,267 @@
+
+-- Remove Wrong Guids
+DELETE FROM `creature` WHERE (`id1` = 29102) AND (`guid` IN (130558, 130559, 130565, 130566, 130569, 130577, 130587, 130603, 130609, 130613, 130616, 130637, 130641, 130642, 130663, 130664, 130665, 130666, 130667, 130668, 130669, 130670, 130671, 130672, 130673, 130674, 130675, 130676, 130677, 130678, 130679, 130680, 130681, 130684, 130685, 130686, 130687, 130691, 130692, 130694, 130696, 130697, 130698, 130701, 130702, 130703, 130704, 130705, 130708, 130709));
+DELETE FROM `creature_addon` WHERE (`guid` IN (130558, 130559, 130565, 130566, 130569, 130577, 130587, 130603, 130609, 130613, 130616, 130637, 130641, 130642, 130663, 130664, 130665, 130666, 130667, 130668, 130669, 130670, 130671, 130672, 130673, 130674, 130675, 130676, 130677, 130678, 130679, 130680, 130681, 130684, 130685, 130686, 130687, 130691, 130692, 130694, 130696, 130697, 130698, 130701, 130702, 130703, 130704, 130705, 130708, 130709));
+
+DELETE FROM `creature` WHERE (`id1` = 29103) AND (`guid` IN (130710, 130716, 130717, 130718, 130719, 130720, 130734, 130739, 130745, 130746, 130766, 130779, 130799, 130800, 130801, 130802, 130803, 130804, 130805, 130806, 130807, 130808, 130809, 130810, 130811, 130812, 130813, 130814, 130816, 130817, 130818, 130819, 130820, 130821, 130822, 130823, 130824, 130825, 130832, 130834, 130835, 130836, 130838, 130842, 130845, 130847, 130848, 130849, 130850, 130852, 130853, 130855, 130856));
+DELETE FROM `creature_addon` WHERE (`guid` IN (130710, 130716, 130717, 130718, 130719, 130720, 130734, 130739, 130745, 130746, 130766, 130779, 130799, 130800, 130801, 130802, 130803, 130804, 130805, 130806, 130807, 130808, 130809, 130810, 130811, 130812, 130813, 130814, 130816, 130817, 130818, 130819, 130820, 130821, 130822, 130823, 130824, 130825, 130832, 130834, 130835, 130836, 130838, 130842, 130845, 130847, 130848, 130849, 130850, 130852, 130853, 130855, 130856));
+
+-- Edit Spawn Time for Hearthglen and Tirisfal Crusaders and Scarlet Ballista
+UPDATE `creature` SET `spawntimesecs` = 30 WHERE `id1` = 29102 AND (`guid` IN (130555, 130556, 130557, 130560, 130561, 130562, 130563, 130564, 130567, 130568, 130570, 130571, 130572, 130573, 130575, 130576, 130578, 130579, 130580, 130581, 130582, 130583, 130584, 130585, 130586, 130588, 130589, 130590, 130591, 130592, 130593, 130594, 130595, 130596, 130597, 130598, 130599, 130600, 130601, 130604, 130605, 130606, 130607, 130608, 130610, 130611, 130612, 130614, 130615, 130617, 130618, 130619, 130620, 130621, 130622, 130623, 130624, 130625, 130626, 130627, 130628, 130629, 130630, 130631, 130632, 130633, 130634, 130635, 130636, 130638, 130639, 130640, 130643, 130644, 130645, 130646, 130647, 130648, 130649, 130650, 130651, 130652, 130653, 130654, 130655, 130656, 130657, 130659, 130661, 130662, 130682, 130688, 130693, 130699, 130700, 130706, 130707
+));
+UPDATE `creature` SET `spawntimesecs` = 30 WHERE `id1` = 29103 AND (`guid` IN (130711, 130712, 130713, 130714, 130715, 130723, 130724, 130725, 130726, 130727, 130728, 130729, 130730, 130731, 130732, 130735, 130736, 130737, 130738, 130740, 130741, 130742, 130743, 130744, 130747, 130748, 130749, 130750, 130751, 130752, 130753, 130754, 130755, 130756, 130757, 130758, 130759, 130760, 130761, 130762, 130763, 130764, 130765, 130767, 130768, 130769, 130770, 130771, 130772, 130773, 130774, 130775, 130776, 130777, 130778, 130780, 130781, 130782, 130783, 130784, 130785, 130786, 130787, 130788, 130789, 130790, 130791, 130792, 130794, 130796, 130798, 130827, 130829, 130830, 130831, 130833, 130837, 130839, 130840, 130841, 130843, 130844, 130846, 130851, 130854));
+UPDATE `creature` SET `spawntimesecs` = 30 WHERE `id1` = 29103 AND (`guid` IN (130857, 130858, 130859, 130860, 130861, 130862, 130863, 130864, 130865, 130866, 130867, 130868, 130869, 130870, 130871, 130872, 130873, 130874, 130875, 130876, 130877, 130878));
+
+-- Remove Dazed auras from Crusaders
+UPDATE `creature_addon` SET `auras` = '' WHERE (`guid` IN (130749, 130789, 130799));
+
+-- Remove Spell from Tirisfal and Hearthglen Crusaders
+DELETE FROM `creature_template_spell` WHERE (`CreatureID` IN (29102, 29103));
+
+-- Hearthglen Crusader SmartAI
+UPDATE `creature_template` SET `AIName` = 'SmartAI' WHERE `entry` = 29102;
+
+DELETE FROM `smart_scripts` WHERE (`source_type` = 0 AND `entryorguid` = 29102);
+INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `event_param6`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
+(29102, 0, 0, 0, 25, 0, 100, 0, 0, 0, 0, 0, 0, 0, 22, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Hearthglen Crusader - On Reset - Set Event Phase 1'),
+(29102, 0, 1, 0, 9, 1, 100, 0, 2000, 4000, 4000, 6000, 40, 150, 11, 53345, 0, 0, 1, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Hearthglen Crusader - Within 40-150 Range - Cast \'Arrow Assault\' (Phase 1)'),
+(29102, 0, 2, 0, 75, 0, 100, 0, 0, 29104, 50, 1000, 0, 0, 22, 2, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Hearthglen Crusader - On Distance 50y To Creature - Set Event Phase 2'),
+(29102, 0, 3, 0, 1, 2, 100, 0, 1000, 1000, 1000, 1000, 0, 0, 21, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Hearthglen Crusader - Out of Combat - Disable Combat Movement (Phase 2)'),
+(29102, 0, 4, 0, 0, 2, 100, 0, 2000, 4000, 4000, 6000, 0, 0, 11, 53348, 0, 0, 1, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Hearthglen Crusader - In Combat - Cast \'Arrow Assault\' (Phase 2)');
+
+-- Tirisfal Crusader SmartAI
+UPDATE `creature_template` SET `AIName` = 'SmartAI' WHERE `entry` = 29103;
+
+DELETE FROM `smart_scripts` WHERE (`source_type` = 0 AND `entryorguid` = 29103);
+INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `event_param6`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
+(29103, 0, 0, 0, 25, 0, 100, 0, 0, 0, 0, 0, 0, 0, 22, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Tirisfal Crusader - On Reset - Set Event Phase 1'),
+(29103, 0, 1, 0, 9, 1, 100, 0, 2000, 4000, 4000, 6000, 40, 150, 11, 53345, 0, 0, 1, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Tirisfal Crusader - Within 40-150 Range - Cast \'Arrow Assault\' (Phase 1)'),
+(29103, 0, 2, 0, 75, 0, 100, 0, 0, 29104, 50, 1000, 0, 0, 22, 2, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Tirisfal Crusader - On Distance 50y To Creature - Set Event Phase 2'),
+(29103, 0, 3, 0, 1, 2, 100, 0, 1000, 1000, 1000, 1000, 0, 0, 21, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Tirisfal Crusader - Out of Combat - Disable Combat Movement (Phase 2)'),
+(29103, 0, 4, 0, 0, 2, 100, 0, 2000, 4000, 4000, 6000, 0, 0, 11, 53348, 0, 0, 1, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Tirisfal Crusader - In Combat - Cast \'Arrow Assault\' (Phase 2)');
+
+-- Add Disable Gravity and Rooted to Scarlet Ballista
+DELETE FROM `creature_template_movement` WHERE (`CreatureId` = 29104);
+INSERT INTO `creature_template_movement` (`CreatureId`, `Ground`, `Swim`, `Flight`, `Rooted`, `Chase`, `Random`, `InteractionPauseTimer`) VALUES
+(29104, 0, 0, 1, 1, 0, 0, 0);
+
+-- Remove spell from Scarlet Ballista
+DELETE FROM `creature_template_spell` WHERE `CreatureID` = 29104;
+
+-- Scarlet Ballista SmartAI
+UPDATE `creature_template` SET `AIName` = 'SmartAI' WHERE `entry` = 29104;
+
+DELETE FROM `smart_scripts` WHERE (`source_type` = 0 AND `entryorguid` = 29104);
+INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `event_param6`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
+(29104, 0, 0, 0, 25, 0, 100, 0, 0, 0, 0, 0, 0, 0, 205, 250, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Scarlet Ballista - On Reset - Set combat distance to 250'),
+(29104, 0, 1, 0, 1, 0, 100, 1, 1000, 1000, 1000, 1000, 0, 0, 21, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Scarlet Ballista - Out of Combat - Disable Combat Movement (No Repeat)'),
+(29104, 0, 2, 0, 0, 0, 100, 0, 2000, 3000, 4000, 5000, 0, 0, 11, 53117, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Scarlet Ballista - In Combat - Cast \'Ballista Assault\'');
+
+-- Update Already existing Waypoints
+DELETE FROM `waypoint_data` WHERE `id` IN (1305670);
+INSERT INTO `waypoint_data` (`id`, `point`, `position_x`, `position_y`, `position_z`, `orientation`, `delay`, `move_type`, `action`, `action_chance`, `wpguid`) VALUES
+(1305670, 1, 2423.54, -5882.78, 104.605, 1.47296, 0, 1, 0, 100, 0),
+(1305670, 2, 2433.82, -5857.11, 108.447, 1.36237, 0, 1, 0, 100, 0),
+(1305670, 3, 2436.81, -5823.62, 119.25, 1.61762, 0, 1, 0, 100, 0),
+(1305670, 4, 2431.98, -5802.78, 130.28, 1.82575, 0, 1, 0, 100, 0),
+(1305670, 5, 2424, -5775.7, 146.81, 1.97498, 0, 1, 0, 100, 0);
+
+DELETE FROM `waypoint_data` WHERE `id` IN (1305700);
+INSERT INTO `waypoint_data` (`id`, `point`, `position_x`, `position_y`, `position_z`, `orientation`, `delay`, `move_type`, `action`, `action_chance`, `wpguid`) VALUES
+(1305700, 1, 2418.47, -5866.83, 104.969, 0.950663, 0, 1, 0, 100, 0),
+(1305700, 2, 2430.8, -5848.82, 109.521, 1.01422, 0, 1, 0, 100, 0),
+(1305700, 3, 2433.39, -5830.24, 115.967, 1.52315, 0, 1, 0, 100, 0),
+(1305700, 4, 2433.82, -5819, 120.777, 1.75249, 0, 1, 0, 100, 0),
+(1305700, 5, 2432.49, -5800.23, 132.063, 1.57577, 0, 1, 0, 100, 0),
+(1305700, 6, 2426.62, -5784.07, 142.837, 2.06665, 0, 1, 0, 100, 0),
+(1305700, 7, 2410.1, -5757.59, 153.412, 2.16482, 0, 1, 0, 100, 0);
+
+DELETE FROM `waypoint_data` WHERE `id` IN (1306080);
+INSERT INTO `waypoint_data` (`id`, `point`, `position_x`, `position_y`, `position_z`, `orientation`, `delay`, `move_type`, `action`, `action_chance`, `wpguid`) VALUES
+(1306080, 1, 2408.25, -5881.06, 104.594, 0.957659, 0, 1, 0, 100, 0),
+(1306080, 2, 2423.95, -5856.89, 106.491, 1.16523, 0, 1, 0, 100, 0),
+(1306080, 3, 2433.64, -5834, 114.61, 1.48489, 0, 1, 0, 100, 0),
+(1306080, 4, 2433.44, -5812.11, 124.299, 1.63019, 0, 1, 0, 100, 0),
+(1306080, 5, 2425.49, -5779.39, 145.143, 2.05038, 0, 1, 0, 100, 0);
+
+DELETE FROM `waypoint_data` WHERE `id` IN (1306610);
+INSERT INTO `waypoint_data` (`id`, `point`, `position_x`, `position_y`, `position_z`, `orientation`, `delay`, `move_type`, `action`, `action_chance`, `wpguid`) VALUES
+(1306610, 1, 2147.33, -5708.85, 102.006, 0.499547, 0, 1, 0, 100, 0),
+(1306610, 2, 2172.61, -5683.99, 109.826, 0.77912, 0, 1, 0, 100, 0),
+(1306610, 3, 2199.89, -5659.37, 119.516, 0.684872, 0, 1, 0, 100, 0),
+(1306610, 4, 2223.32, -5646.06, 128.413, 0.377782, 0, 1, 0, 100, 0),
+(1306610, 5, 2251.14, -5644.13, 135.913, 0.0549819, 0, 1, 0, 100, 0),
+(1306610, 6, 2282.16, -5654.42, 144.602, 5.97689, 0, 1, 0, 100, 0);
+
+DELETE FROM `waypoint_data` WHERE `id` IN (1306820);
+INSERT INTO `waypoint_data` (`id`, `point`, `position_x`, `position_y`, `position_z`, `orientation`, `delay`, `move_type`, `action`, `action_chance`, `wpguid`) VALUES
+(1306820, 1, 2161, -5725.64, 101.333, 1.15301, 0, 1, 0, 100, 0),
+(1306820, 2, 2175.47, -5690.91, 108.545, 0.956659, 0, 1, 0, 100, 0),
+(1306820, 3, 2198.8, -5668.79, 116.512, 0.721039, 0, 1, 0, 100, 0),
+(1306820, 4, 2221.04, -5654.31, 126.426, 0.481493, 0, 1, 0, 100, 0),
+(1306820, 5, 2243.41, -5649.02, 132.889, 0.163406, 0, 1, 0, 100, 0),
+(1306820, 6, 2277.84, -5647.74, 143.051, 0.00239992, 0, 1, 0, 100, 0);
+
+DELETE FROM `waypoint_data` WHERE `id` IN (1307430);
+INSERT INTO `waypoint_data` (`id`, `point`, `position_x`, `position_y`, `position_z`, `orientation`, `delay`, `move_type`, `action`, `action_chance`, `wpguid`) VALUES
+(1307430, 1, 2404.13, -5842.26, 109.903, 6.24425, 0, 1, 0, 100, 0),
+(1307430, 2, 2425.5, -5847.68, 108.85, 0.772094, 0, 1, 0, 100, 0),
+(1307430, 3, 2430.1, -5838.91, 112.438, 1.23234, 0, 1, 0, 100, 0),
+(1307430, 4, 2430.68, -5821.38, 119.77, 1.71614, 0, 1, 0, 100, 0),
+(1307430, 5, 2428.18, -5809.46, 126.166, 1.80646, 0, 1, 0, 100, 0),
+(1307430, 6, 2426.04, -5787.39, 141.243, 1.66902, 0, 1, 0, 100, 0),
+(1307430, 7, 2409.18, -5760.7, 152.965, 2.32483, 0, 1, 0, 100, 0);
+
+DELETE FROM `waypoint_data` WHERE `id` IN (1307920);
+INSERT INTO `waypoint_data` (`id`, `point`, `position_x`, `position_y`, `position_z`, `orientation`, `delay`, `move_type`, `action`, `action_chance`, `wpguid`) VALUES
+(1307920, 1, 2433.58, -5882.05, 104.646, 1.99054, 0, 1, 0, 100, 0),
+(1307920, 2, 2432.74, -5862.93, 107.076, 1.56086, 0, 1, 0, 100, 0),
+(1307920, 3, 2438.97, -5840.58, 113.607, 1.36843, 0, 1, 0, 100, 0),
+(1307920, 4, 2436.82, -5817.06, 121.897, 1.69437, 0, 1, 0, 100, 0),
+(1307920, 5, 2436.44, -5803.47, 130.055, 1.50588, 0, 1, 0, 100, 0),
+(1307920, 6, 2435.01, -5791.9, 138.069, 2.21117, 0, 1, 0, 100, 0),
+(1307920, 7, 2410.08, -5768.17, 152.083, 2.47427, 0, 1, 0, 100, 0);
+
+DELETE FROM `waypoint_data` WHERE `id` IN (1307940);
+INSERT INTO `waypoint_data` (`id`, `point`, `position_x`, `position_y`, `position_z`, `orientation`, `delay`, `move_type`, `action`, `action_chance`, `wpguid`) VALUES
+(1307940, 1, 2114.59, -5697.8, 100.391, 6.0342, 0, 1, 0, 100, 0),
+(1307940, 2, 2157.63, -5689.16, 106.345, 0.323566, 0, 1, 0, 100, 0),
+(1307940, 3, 2167.83, -5690.44, 107.717, 0.39582, 0, 1, 0, 100, 0),
+(1307940, 4, 2190.97, -5669.45, 115.191, 0.753176, 0, 1, 0, 100, 0),
+(1307940, 5, 2216.44, -5653.29, 125.529, 0.497921, 0, 1, 0, 100, 0),
+(1307940, 6, 2240.74, -5645.78, 132.926, 0.250521, 0, 1, 0, 100, 0),
+(1307940, 7, 2282.69, -5645.59, 144.297, 0.00704718, 0, 1, 0, 100, 0);
+
+DELETE FROM `waypoint_data` WHERE `id` IN (1307960);
+INSERT INTO `waypoint_data` (`id`, `point`, `position_x`, `position_y`, `position_z`, `orientation`, `delay`, `move_type`, `action`, `action_chance`, `wpguid`) VALUES
+(1307960, 1, 2144.62, -5672.69, 110.442, 0.335399, 0, 1, 0, 100, 0),
+(1307960, 2, 2152.14, -5670.07, 107.855, 0.335399, 0, 1, 0, 100, 0),
+(1307960, 3, 2185.46, -5659.7, 117.721, 0.249005, 0, 1, 0, 100, 0),
+(1307960, 4, 2220.1, -5657.21, 125.484, 0.0369478, 0, 1, 0, 100, 0),
+(1307960, 5, 2248.78, -5655.03, 133.863, 0.131196, 0, 1, 0, 100, 0),
+(1307960, 6, 2281.57, -5648.59, 143.968, 0.256859, 0, 1, 0, 100, 0);
+
+DELETE FROM `waypoint_data` WHERE `id` IN (1307980);
+INSERT INTO `waypoint_data` (`id`, `point`, `position_x`, `position_y`, `position_z`, `orientation`, `delay`, `move_type`, `action`, `action_chance`, `wpguid`) VALUES
+(1307980, 1, 2150.97, -5712.69, 101.91, 0.783094, 0, 1, 0, 100, 0),
+(1307980, 2, 2179.7, -5682.61, 110.924, 0.790948, 0, 1, 0, 100, 0),
+(1307980, 3, 2203.85, -5662.88, 119.445, 0.661357, 0, 1, 0, 100, 0),
+(1307980, 4, 2223, -5649.27, 127.826, 0.246667, 0, 1, 0, 100, 0),
+(1307980, 5, 2248.94, -5651.66, 134.06, 6.15286, 0, 1, 0, 100, 0),
+(1307980, 6, 2277.4, -5655.15, 143.306, 6.25889, 0, 1, 0, 100, 0);
+
+DELETE FROM `waypoint_data` WHERE `id` IN (1308270);
+INSERT INTO `waypoint_data` (`id`, `point`, `position_x`, `position_y`, `position_z`, `orientation`, `delay`, `move_type`, `action`, `action_chance`, `wpguid`) VALUES
+(1308270, 1, 2126.6, -5688.54, 101.156, 0.204981, 0, 1, 0, 100, 0),
+(1308270, 2, 2158.87, -5673.12, 109.316, 0.711562, 0, 1, 0, 100, 0),
+(1308270, 3, 2174.26, -5662.13, 114.756, 0.511285, 0, 1, 0, 100, 0),
+(1308270, 4, 2199.97, -5651.31, 121.689, 0.456308, 0, 1, 0, 100, 0),
+(1308270, 5, 2226.78, -5642.05, 130.179, 0.142148, 0, 1, 0, 100, 0),
+(1308270, 6, 2246.62, -5640.31, 135.689, 0.0636083, 0, 1, 0, 100, 0),
+(1308270, 7, 2279.48, -5641.56, 144.101, 0.0478973, 0, 1, 0, 100, 0);
+
+DELETE FROM `waypoint_data` WHERE `id` IN (1308290);
+INSERT INTO `waypoint_data` (`id`, `point`, `position_x`, `position_y`, `position_z`, `orientation`, `delay`, `move_type`, `action`, `action_chance`, `wpguid`) VALUES
+(1308290, 1, 2196.45, -5701.93, 112.392, 1.22368, 0, 1, 0, 100, 0),
+(1308290, 2, 2198.34, -5693.86, 110.321, 1.28573, 0, 1, 0, 100, 0),
+(1308290, 3, 2206.89, -5672.37, 117.232, 1.0611, 0, 1, 0, 100, 0),
+(1308290, 4, 2218.14, -5658.96, 124.59, 0.812133, 0, 1, 0, 100, 0),
+(1308290, 5, 2236.62, -5648.38, 131.373, 0.218372, 0, 1, 0, 100, 0),
+(1308290, 6, 2284.18, -5642.92, 144.844, 6.24866, 0, 1, 0, 100, 0);
+
+DELETE FROM `waypoint_data` WHERE `id` IN (1308300);
+INSERT INTO `waypoint_data` (`id`, `point`, `position_x`, `position_y`, `position_z`, `orientation`, `delay`, `move_type`, `action`, `action_chance`, `wpguid`) VALUES
+(1308300, 1, 2205.81, -5731.66, 102.209, 1.47266, 0, 1, 0, 100, 0),
+(1308300, 2, 2208.49, -5705.15, 102.799, 1.7774, 0, 1, 0, 100, 0),
+(1308300, 3, 2206.62, -5688.95, 110.31, 1.20799, 0, 1, 0, 100, 0),
+(1308300, 4, 2213.77, -5676.03, 118.232, 1.02342, 0, 1, 0, 100, 0),
+(1308300, 5, 2224.66, -5670, 124.341, 0.375463, 0, 1, 0, 100, 0),
+(1308300, 6, 2240.25, -5670.29, 134.257, 6.15207, 0, 1, 0, 100, 0),
+(1308300, 7, 2248.5, -5671.39, 139.033, 0.109213, 0, 1, 0, 100, 0),
+(1308300, 8, 2256.87, -5669.47, 139.138, 0.524688, 0, 1, 0, 100, 0),
+(1308300, 9, 2276.56, -5651.09, 142.69, 0.764235, 0, 1, 0, 100, 0);
+
+-- Set Extra Flag DONT_OVERRIDE_SAI_ENTRY
+UPDATE `creature_template` SET `flags_extra` = `flags_extra` |134217728 WHERE (`entry` IN (29102, 29103));
+
+-- Update Comments
+UPDATE `creature` SET `Comment` = "has guid specific SAI" WHERE (`id1` IN (29102, 29103)) AND (`guid` IN (130567, 130570, 130608, 130661, 130682, 130743, 130792, 130794, 130796, 130798, 130827, 130829, 130830));
+
+-- Set Guid SmartAI
+DELETE FROM `smart_scripts` WHERE (`entryorguid` = -130567) AND (`source_type` = 0) AND (`id` IN (5, 6, 7));
+INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `event_param6`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
+(-130567, 0, 5, 0, 11, 0, 100, 0, 0, 0, 0, 0, 0, 0, 232, 1305670, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Hearthglen Crusader - On Respawn - Start Path 1308300'),
+(-130567, 0, 6, 0, 109, 0, 100, 0, 0, 1305670, 0, 0, 0, 0, 41, 2000, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Hearthglen Crusader - On Path 1308300 Finished - Despawn In 2000 ms'),
+(-130567, 0, 7, 0, 6, 0, 100, 0, 0, 0, 0, 0, 0, 0, 41, 2000, 5, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Hearthglen Crusader - On Just Died - Despawn In 2000 ms');
+
+DELETE FROM `smart_scripts` WHERE (`entryorguid` = -130570) AND (`source_type` = 0) AND (`id` IN (5, 6, 7));
+INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `event_param6`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
+(-130570, 0, 5, 0, 11, 0, 100, 0, 0, 0, 0, 0, 0, 0, 232, 1305700, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Hearthglen Crusader - On Respawn - Start Path 1308300'),
+(-130570, 0, 6, 0, 109, 0, 100, 0, 0, 1305700, 0, 0, 0, 0, 41, 2000, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Hearthglen Crusader - On Path 1308300 Finished - Despawn In 2000 ms'),
+(-130570, 0, 7, 0, 6, 0, 100, 0, 0, 0, 0, 0, 0, 0, 41, 2000, 5, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Hearthglen Crusader - On Just Died - Despawn In 2000 ms');
+
+DELETE FROM `smart_scripts` WHERE (`entryorguid` = -130608) AND (`source_type` = 0) AND (`id` IN (5, 6, 7));
+INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `event_param6`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
+(-130608, 0, 5, 0, 11, 0, 100, 0, 0, 0, 0, 0, 0, 0, 232, 1306080, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Hearthglen Crusader - On Respawn - Start Path 1308300'),
+(-130608, 0, 6, 0, 109, 0, 100, 0, 0, 1306080, 0, 0, 0, 0, 41, 2000, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Hearthglen Crusader - On Path 1308300 Finished - Despawn In 2000 ms'),
+(-130608, 0, 7, 0, 6, 0, 100, 0, 0, 0, 0, 0, 0, 0, 41, 2000, 5, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Hearthglen Crusader - On Just Died - Despawn In 2000 ms');
+
+DELETE FROM `smart_scripts` WHERE (`entryorguid` = -130661) AND (`source_type` = 0) AND (`id` IN (5, 6, 7));
+INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `event_param6`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
+(-130661, 0, 5, 0, 11, 0, 100, 0, 0, 0, 0, 0, 0, 0, 232, 1306610, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Hearthglen Crusader - On Respawn - Start Path 1308300'),
+(-130661, 0, 6, 0, 109, 0, 100, 0, 0, 1306610, 0, 0, 0, 0, 41, 2000, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Hearthglen Crusader - On Path 1308300 Finished - Despawn In 2000 ms'),
+(-130661, 0, 7, 0, 6, 0, 100, 0, 0, 0, 0, 0, 0, 0, 41, 2000, 5, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Hearthglen Crusader - On Just Died - Despawn In 2000 ms');
+
+DELETE FROM `smart_scripts` WHERE (`entryorguid` = -130682) AND (`source_type` = 0) AND (`id` IN (5, 6, 7));
+INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `event_param6`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
+(-130682, 0, 5, 0, 11, 0, 100, 0, 0, 0, 0, 0, 0, 0, 232, 1306820, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Hearthglen Crusader - On Respawn - Start Path 1308300'),
+(-130682, 0, 6, 0, 109, 0, 100, 0, 0, 1306820, 0, 0, 0, 0, 41, 2000, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Hearthglen Crusader - On Path 1308300 Finished - Despawn In 2000 ms'),
+(-130682, 0, 7, 0, 6, 0, 100, 0, 0, 0, 0, 0, 0, 0, 41, 2000, 5, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Hearthglen Crusader - On Just Died - Despawn In 2000 ms');
+
+DELETE FROM `smart_scripts` WHERE (`entryorguid` = -130743) AND (`source_type` = 0) AND (`id` IN (5, 6, 7));
+INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `event_param6`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
+(-130743, 0, 5, 0, 11, 0, 100, 0, 0, 0, 0, 0, 0, 0, 232, 1307430, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Tirisfal Crusader - On Respawn - Start Path 1308300'),
+(-130743, 0, 6, 0, 109, 0, 100, 0, 0, 1307430, 0, 0, 0, 0, 41, 2000, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Tirisfal Crusader - On Path 1308300 Finished - Despawn In 2000 ms'),
+(-130743, 0, 7, 0, 6, 0, 100, 0, 0, 0, 0, 0, 0, 0, 41, 2000, 5, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Tirisfal Crusader - On Just Died - Despawn In 2000 ms');
+
+DELETE FROM `smart_scripts` WHERE (`entryorguid` = -130792) AND (`source_type` = 0) AND (`id` IN (5, 6, 7));
+INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `event_param6`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
+(-130792, 0, 5, 0, 11, 0, 100, 0, 0, 0, 0, 0, 0, 0, 232, 1307920, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Tirisfal Crusader - On Respawn - Start Path 1308300'),
+(-130792, 0, 6, 0, 109, 0, 100, 0, 0, 1307920, 0, 0, 0, 0, 41, 2000, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Tirisfal Crusader - On Path 1308300 Finished - Despawn In 2000 ms'),
+(-130792, 0, 7, 0, 6, 0, 100, 0, 0, 0, 0, 0, 0, 0, 41, 2000, 5, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Tirisfal Crusader - On Just Died - Despawn In 2000 ms');
+
+DELETE FROM `smart_scripts` WHERE (`entryorguid` = -130794) AND (`source_type` = 0) AND (`id` IN (5, 6, 7));
+INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `event_param6`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
+(-130794, 0, 5, 0, 11, 0, 100, 0, 0, 0, 0, 0, 0, 0, 232, 1307940, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Tirisfal Crusader - On Respawn - Start Path 1308300'),
+(-130794, 0, 6, 0, 109, 0, 100, 0, 0, 1307940, 0, 0, 0, 0, 41, 2000, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Tirisfal Crusader - On Path 1308300 Finished - Despawn In 2000 ms'),
+(-130794, 0, 7, 0, 6, 0, 100, 0, 0, 0, 0, 0, 0, 0, 41, 2000, 5, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Tirisfal Crusader - On Just Died - Despawn In 2000 ms');
+
+DELETE FROM `smart_scripts` WHERE (`entryorguid` = -130796) AND (`source_type` = 0) AND (`id` IN (5, 6, 7));
+INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `event_param6`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
+(-130796, 0, 5, 0, 11, 0, 100, 0, 0, 0, 0, 0, 0, 0, 232, 1307960, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Tirisfal Crusader - On Respawn - Start Path 1308300'),
+(-130796, 0, 6, 0, 109, 0, 100, 0, 0, 1307960, 0, 0, 0, 0, 41, 2000, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Tirisfal Crusader - On Path 1308300 Finished - Despawn In 2000 ms'),
+(-130796, 0, 7, 0, 6, 0, 100, 0, 0, 0, 0, 0, 0, 0, 41, 2000, 5, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Tirisfal Crusader - On Just Died - Despawn In 2000 ms');
+
+DELETE FROM `smart_scripts` WHERE (`entryorguid` = -130798) AND (`source_type` = 0) AND (`id` IN (5, 6, 7));
+INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `event_param6`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
+(-130798, 0, 5, 0, 11, 0, 100, 0, 0, 0, 0, 0, 0, 0, 232, 1307980, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Tirisfal Crusader - On Respawn - Start Path 1308300'),
+(-130798, 0, 6, 0, 109, 0, 100, 0, 0, 1307980, 0, 0, 0, 0, 41, 2000, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Tirisfal Crusader - On Path 1308300 Finished - Despawn In 2000 ms'),
+(-130798, 0, 7, 0, 6, 0, 100, 0, 0, 0, 0, 0, 0, 0, 41, 2000, 5, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Tirisfal Crusader - On Just Died - Despawn In 2000 ms');
+
+DELETE FROM `smart_scripts` WHERE (`entryorguid` = -130827) AND (`source_type` = 0) AND (`id` IN (5, 6, 7));
+INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `event_param6`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
+(-130827, 0, 5, 0, 11, 0, 100, 0, 0, 0, 0, 0, 0, 0, 232, 1308270, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Tirisfal Crusader - On Respawn - Start Path 1308300'),
+(-130827, 0, 6, 0, 109, 0, 100, 0, 0, 1308270, 0, 0, 0, 0, 41, 2000, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Tirisfal Crusader - On Path 1308300 Finished - Despawn In 2000 ms'),
+(-130827, 0, 7, 0, 6, 0, 100, 0, 0, 0, 0, 0, 0, 0, 41, 2000, 5, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Tirisfal Crusader - On Just Died - Despawn In 2000 ms');
+
+DELETE FROM `smart_scripts` WHERE (`entryorguid` = -130829) AND (`source_type` = 0) AND (`id` IN (5, 6, 7));
+INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `event_param6`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
+(-130829, 0, 5, 0, 11, 0, 100, 0, 0, 0, 0, 0, 0, 0, 232, 1308290, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Tirisfal Crusader - On Respawn - Start Path 1308300'),
+(-130829, 0, 6, 0, 109, 0, 100, 0, 0, 1308290, 0, 0, 0, 0, 41, 2000, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Tirisfal Crusader - On Path 1308300 Finished - Despawn In 2000 ms'),
+(-130829, 0, 7, 0, 6, 0, 100, 0, 0, 0, 0, 0, 0, 0, 41, 2000, 5, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Tirisfal Crusader - On Just Died - Despawn In 2000 ms');
+
+DELETE FROM `smart_scripts` WHERE (`entryorguid` = -130830) AND (`source_type` = 0) AND (`id` IN (5, 6, 7));
+INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `event_param6`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
+(-130830, 0, 5, 0, 11, 0, 100, 0, 0, 0, 0, 0, 0, 0, 232, 1308300, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Tirisfal Crusader - On Respawn - Start Path 1308300'),
+(-130830, 0, 6, 0, 109, 0, 100, 0, 0, 1308300, 0, 0, 0, 0, 41, 2000, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Tirisfal Crusader - On Path 1308300 Finished - Despawn In 2000 ms'),
+(-130830, 0, 7, 0, 6, 0, 100, 0, 0, 0, 0, 0, 0, 0, 41, 2000, 5, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Tirisfal Crusader - On Just Died - Despawn In 2000 ms');
