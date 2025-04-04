@@ -621,8 +621,200 @@ public:
     }
 };
 
+
+enum Verog_the_dervish
+{
+    SAY_Death                   = 0,
+
+    SPELL_Battle_Roar           = 9128,
+    SPELL_Hit                   = 11976,
+    SPELL_Bloodthirsty          = 6742,
+    SPELL_Corruption            = 172,
+};
+
+uint32 percent = 0;//Initialization probability
+
+class quest_Kolkar_Pack_Runner : public CreatureScript
+{
+public:
+    quest_Kolkar_Pack_Runner() : CreatureScript("quest_Kolkar_Pack_Runner") { }
+
+    CreatureAI* GetAI(Creature* creature) const override
+    {
+        return new quest_Kolkar_Pack_RunnerAI(creature);
+    }
+
+    struct quest_Kolkar_Pack_RunnerAI : public ScriptedAI
+    {
+        quest_Kolkar_Pack_RunnerAI(Creature* creature) : ScriptedAI(creature) {}
+
+        void JustDied(Unit* /*who*/) override
+        {
+            percent += 2;  //Cumulative probability
+
+            if (percent > 100)//Prevent overflow
+                percent = 100;
+
+            //Attempt to summon based on the accumulated probability		
+            if (roll_chance_i(percent)) {
+                //Summoned successfully
+                me->AI()->Talk(SAY_Death);//death say
+                me->SummonCreature(3395, -1210.5857, -2725.839, 106.782524, 4.9567f, TEMPSUMMON_TIMED_DESPAWN, 300000);//Summon continuously for 5 minutes
+                percent = 0;//Initialize summoning probability after successful summoning
+            }
+        }
+        //Combat script
+        void JustEngagedWith(Unit* who) override
+        {
+            events.ScheduleEvent(1, 3s);//Battle roar in 3 seconds
+        }
+
+        void UpdateAI(uint32 diff) override
+        {
+
+            events.Update(diff);
+            switch (events.ExecuteEvent())
+            {
+
+            case 1: //Not repeat
+                me->CastSpell(me, SPELL_Battle_Roar, false); //Battle roar
+                break;
+            default:
+                break;
+            }
+            DoMeleeAttackIfReady();//Prepare for melee attack
+        }
+    };
+
+};
+
+
+class quest_Kolkar_Marauder : public CreatureScript
+{
+public:
+    quest_Kolkar_Marauder() : CreatureScript("quest_Kolkar_Marauder") { }
+
+    CreatureAI* GetAI(Creature* creature) const override
+    {
+        return new quest_Kolkar_MarauderAI(creature);
+    }
+
+    struct quest_Kolkar_MarauderAI : public ScriptedAI
+    {
+        quest_Kolkar_MarauderAI(Creature* creature) : ScriptedAI(creature) {}
+
+        void JustDied(Unit* /*who*/) override
+        {
+            percent += 2;  //Cumulative probability
+
+            if (percent > 100)//Prevent overflow
+                percent = 100;
+
+            //Attempt to summon based on the accumulated probability				
+            if (roll_chance_i(percent)) {
+                //Summoned successfully
+                me->AI()->Talk(SAY_Death);//death say
+                me->SummonCreature(3395, -1210.5857, -2725.839, 106.782524, 4.9567f, TEMPSUMMON_TIMED_DESPAWN, 300000);//Summon continuously for 5 minutes
+                percent = 0;//Initialize summoning probability after successful summoning
+            }
+        }
+        //Combat script
+        void JustEngagedWith(Unit* who) override
+        {
+            events.ScheduleEvent(1, 12s);// Why do we start after 12 seconds?
+
+        }
+
+        void UpdateAI(uint32 diff) override
+        {
+
+            events.Update(diff);
+            switch (events.ExecuteEvent())
+            {
+
+            case 1: //Repeat hit spell
+                if(me->GetVictim())
+                me->CastSpell(me->GetVictim(), SPELL_Hit, false); //Hit spell
+                events.ScheduleEvent(1, 7s);//Repeat
+                break;
+            default:
+                break;
+            }
+            DoMeleeAttackIfReady();//Prepare for melee attack
+        }
+    };
+
+};
+
+class quest_Kolkar_Bloodcharger : public CreatureScript
+{
+public:
+    quest_Kolkar_Bloodcharger() : CreatureScript("quest_Kolkar_Bloodcharger") { }
+
+    CreatureAI* GetAI(Creature* creature) const override
+    {
+        return new quest_Kolkar_BloodchargerAI(creature);
+    }
+
+    struct quest_Kolkar_BloodchargerAI : public ScriptedAI
+    {
+        quest_Kolkar_BloodchargerAI(Creature* creature) : ScriptedAI(creature) {}
+
+        void JustDied(Unit* /*who*/) override
+        {
+            percent += 2;  //Cumulative probability
+
+            if (percent > 100)//Prevent overflow
+                percent = 100;
+
+            //Attempt to summon based on the accumulated probability	
+            if (roll_chance_i(percent)) {
+                //Summoned successfully
+                me->AI()->Talk(SAY_Death);//death say
+                me->SummonCreature(3395, -1210.5857, -2725.839, 106.782524, 4.9567f, TEMPSUMMON_TIMED_DESPAWN, 300000);//Summon continuously for 5 minutes
+                percent = 0;//Initialize summoning probability after successful summoning
+            }
+        }
+        //Combat script
+        void JustEngagedWith(Unit* who) override
+        {
+            events.ScheduleEvent(1, 10s);//bloodthirsty
+            events.ScheduleEvent(2, 5s);//Corruption
+        }
+
+        void UpdateAI(uint32 diff) override
+        {
+
+            events.Update(diff);
+            switch (events.ExecuteEvent())
+            {
+
+            case 1: //bloodthirsty
+                me->CastSpell(me, SPELL_Bloodthirsty, false); 
+                events.ScheduleEvent(1, 60s);
+                break;
+            case 2: //Corruption
+                if (me->GetVictim())
+                me->CastSpell(me, SPELL_Corruption, false); 
+                events.ScheduleEvent(2, 20s);
+                break;
+            default:
+                break;
+            }
+            DoMeleeAttackIfReady();//Prepare for melee attack
+        }
+    };
+
+};
+
 void AddSC_the_barrens()
 {
+    //modifies the summoning probability accumulation path
+    new quest_Kolkar_Pack_Runner();
+    new quest_Kolkar_Marauder();
+    new quest_Kolkar_Bloodcharger();
+
+    
     new npc_gilthares();
     new npc_taskmaster_fizzule();
     new npc_twiggy_flathead();
