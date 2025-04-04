@@ -352,6 +352,29 @@ class spell_entropius_negative_energy_periodic : public AuraScript
     }
 };
 
+class spell_muru_blackhole : public SpellScript
+{
+    PrepareSpellScript(spell_muru_blackhole);
+
+    void ChangeSummonPos(SpellEffIndex /*effIndex*/)
+    {
+        if (!GetCaster())
+            return;
+
+        WorldLocation summonPos = *GetExplTargetDest();
+        float destZ = summonPos.GetPositionZ() - GetCaster()->GetMapWaterOrGroundLevel(GetCaster()->GetPosition());
+        Position offset = { 0.0f, 0.0f, -destZ, 0.0f};
+        summonPos.RelocateOffset(offset);
+        SetExplTargetDest(summonPos);
+        GetHitDest()->RelocateOffset(offset);
+    }
+
+    void Register() override
+    {
+        OnEffectHit += SpellEffectFn(spell_muru_blackhole::ChangeSummonPos, EFFECT_0, SPELL_EFFECT_SUMMON);
+    }
+};
+
 void AddSC_boss_muru()
 {
     RegisterSunwellPlateauCreatureAI(boss_muru);
@@ -363,4 +386,5 @@ void AddSC_boss_muru()
     RegisterSpellScript(spell_entropius_void_zone_visual_aura);
     RegisterSpellScript(spell_entropius_black_hole_effect);
     RegisterSpellScript(spell_entropius_negative_energy_periodic);
+    RegisterSpellScript(spell_muru_blackhole);
 }
