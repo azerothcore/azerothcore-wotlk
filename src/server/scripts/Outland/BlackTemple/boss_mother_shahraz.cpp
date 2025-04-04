@@ -309,7 +309,7 @@ class spell_mother_shahraz_fatal_attraction : public SpellScript
         if (validTeleportPositions.empty())
         {
             LOG_ERROR("scripts", "spell_mother_shahraz_fatal_attraction: No valid teleport positions found (Map: {} X: {} Y: {} Z: {})",
-                GetCaster()->GetMap(), GetCaster()->GetPositionX(), GetCaster()->GetPositionY(), GetCaster()->GetPositionZ());
+                GetCaster()->GetMap()->GetId(), GetCaster()->GetPositionX(), GetCaster()->GetPositionY(), GetCaster()->GetPositionZ());
             return;
          }
         Position finalDest = validTeleportPositions[urand(0, validTeleportPositions.size() - 1)];
