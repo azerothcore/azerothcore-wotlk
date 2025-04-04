@@ -102,7 +102,7 @@ struct boss_mother_shahraz : public BossAI
 
         ScheduleTimedEvent(50s, [&] {
             Talk(SAY_SPELL);
-            me->CastCustomSpell(SPELL_FATAL_ATTRACTION, SPELLVALUE_MAX_TARGETS, 3, me, false);
+            me->CastSpell(me, SPELL_FATAL_ATTRACTION);
         }, 1min);
 
         me->m_Events.AddEventAtOffset([&] {
