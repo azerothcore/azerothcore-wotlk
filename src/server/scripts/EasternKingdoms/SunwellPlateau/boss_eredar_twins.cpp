@@ -157,10 +157,8 @@ struct boss_sacrolash : public BossAI
             Talk(EMOTE_SHADOW_NOVA, target);
             Talk(YELL_SHADOW_NOVA);
 
-            if (DoCast(target, SPELL_SHADOW_NOVA) != SPELL_CAST_OK)
-                context.Repeat(1s);
-            else
-                context.Repeat(30s, 35s);
+            DoCast(target, SPELL_SHADOW_NOVA);
+            context.Repeat(30s, 35s);
         });
     }
 
