@@ -156,6 +156,7 @@ struct boss_sacrolash : public BossAI
                 target = me->GetVictim();
             Talk(EMOTE_SHADOW_NOVA, target);
             Talk(YELL_SHADOW_NOVA);
+
             DoCast(target, SPELL_SHADOW_NOVA);
             context.Repeat(30s, 35s);
         });
@@ -227,16 +228,20 @@ struct boss_alythess : public BossAI
             me->CastSpell(me, SPELL_EMPOWER, true);
 
             scheduler.CancelGroup(GROUP_SPECIAL_ABILITY);
-            ScheduleTimedEvent(20s, 26s, [&] {
+
+            scheduler.Schedule(20s, 26s, [this](TaskContext context) {
                 Unit* target = SelectTarget(SelectTargetMethod::MaxThreat, 1, 100.0f);
                 if (!target)
                     target = me->GetVictim();
-                DoCast(target, SPELL_SHADOW_NOVA);
 
-                if (Creature * sacrolash = instance->GetCreature(DATA_SACROLASH))
+                if (Creature* sacrolash = instance->GetCreature(DATA_SACROLASH))
                     sacrolash->AI()->Talk(EMOTE_SHADOW_NOVA, target);
 
-            }, 20s, 26s);
+                if (DoCast(target, SPELL_SHADOW_NOVA) != SPELL_CAST_OK)
+                    context.Repeat(1s);
+                else
+                    context.Repeat(20s, 26s);
+            });
         }
     }
 
