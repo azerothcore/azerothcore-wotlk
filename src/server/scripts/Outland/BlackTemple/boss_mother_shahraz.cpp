@@ -102,7 +102,11 @@ struct boss_mother_shahraz : public BossAI
 
         ScheduleTimedEvent(50s, [&] {
             Talk(SAY_SPELL);
-            me->CastCustomSpell(SPELL_FATAL_ATTRACTION, SPELLVALUE_MAX_TARGETS, 3, me, false);
+            // weights for 1, 2, or 3 targets
+            static double chances[] = {5.0, 15.0, 80.0};
+            uint32 selectedIndex = urandweighted(3, chances);
+            uint32 numTargets = selectedIndex + 1;
+            me->CastCustomSpell(SPELL_FATAL_ATTRACTION, SPELLVALUE_MAX_TARGETS, numTargets, me, false);
         }, 1min);
 
         me->m_Events.AddEventAtOffset([&] {
@@ -197,26 +201,91 @@ class spell_mother_shahraz_saber_lash_aura : public AuraScript
     }
 };
 
-const Position validTeleportStairsPos[9] =
+constexpr float minTeleportDistSq = 30.f * 30.f;
+constexpr float maxTeleportDistSq = 50.f * 50.f;
+
+const Position teleportPositions[79] =
 {
-    //Platform teleports
-
-    {945.00f, 149.17f, 197.07483},
-    {956.92f, 153.20f, 197.07483},
-    {933.69f, 154.15f, 197.07483},
-
-    //Floor teleports
-
-    {966.87f, 184.45f, 192.84f},
-    {927.22f, 187.04f, 192.84f},
-    {922.54f, 110.09f, 192.84f},
-    {958.01f, 110.47f, 192.84f},
-    {939.95f, 108.29f, 192.84f},
-    {945.68f, 205.74f, 192.84f}
-};
-
-constexpr float minTeleportDist = 30.f;
-constexpr float maxTeleportDist = 50.f;
+    {918.581, 110.065, 192.849},
+    {943.493, 108.279, 192.847},
+    {964.335, 109.774, 192.836},
+    {971.987, 148.678, 192.820},
+    {956.107, 146.804, 197.075},
+    {934.990, 144.492, 197.075},
+    {916.477, 143.932, 192.829},
+    {921.147, 167.942, 192.827},
+    {925.678, 184.302, 192.838},
+    {940.993, 181.637, 192.463},
+    {948.525, 193.635, 191.906},
+    {965.403, 179.717, 192.832},
+    {966.440, 197.428, 192.840},
+    {959.519, 218.769, 192.846},
+    {943.849, 208.796, 191.209},
+    {931.741, 199.204, 192.846},
+    {931.808, 220.284, 192.845},
+    {945.203, 232.269, 191.208},
+    {966.960, 236.315, 192.842},
+    {966.079, 258.634, 192.822},
+    {945.193, 252.556, 191.208},
+    {924.433, 235.585, 192.842},
+    {919.422, 250.186, 192.820},
+    {923.024, 271.408, 192.368},
+    {928.982, 283.581, 192.368},
+    {923.807, 302.435, 192.854},
+    {925.547, 316.368, 192.830},
+    {922.124, 330.724, 192.842},
+    {926.061, 343.538, 192.848},
+    {947.211, 351.582, 191.208},
+    {965.287, 351.110, 192.850},
+    {964.311, 340.715, 192.850},
+    {971.435, 328.932, 192.850},
+    {979.385, 318.413, 192.843},
+    {962.361, 304.283, 192.839},
+    {964.359, 287.723, 192.835},
+    {961.600, 270.791, 192.829},
+    {945.802, 267.542, 191.208},
+    {948.130, 284.002, 191.208},
+    {940.823, 299.090, 191.208},
+    {949.039, 314.410, 191.208},
+    {941.133, 334.733, 191.208},
+    {956.045, 329.034, 192.834},
+    {956.605, 247.336, 192.828},
+    {931.937, 244.108, 192.819},
+    {938.510, 158.778, 197.075},
+    {928.364, 208.923, 192.847},
+    {962.436, 205.330, 192.847},
+    {955.670, 346.279, 192.849},
+    {931.286, 324.910, 192.819},
+    {962.375, 317.202, 192.838},
+    {956.159, 292.589, 192.834},
+    {934.550, 274.786, 192.368},
+    {921.056, 287.731, 192.368},
+    {956.248, 262.074, 192.829},
+    {955.738, 231.656, 192.836},
+    {934.566, 231.991, 192.838},
+    {956.050, 198.811, 192.841},
+    {939.707, 193.020, 191.923},
+    {940.500, 259.348, 191.208},
+    {948.237, 304.773, 191.208},
+    {923.764, 176.246, 192.832},
+    {960.474, 187.324, 192.833},
+    {968.408, 168.684, 192.825},
+    {967.788, 126.891, 192.822},
+    {930.301, 118.605, 192.847},
+    {952.902, 159.420, 197.075},
+    {931.728, 291.711, 192.368},
+    {950.031, 276.024, 191.208},
+    {943.486, 243.084, 191.208},
+    {950.499, 223.192, 191.208},
+    {940.605, 218.999, 191.208},
+    {949.264, 183.562, 192.380},
+    {950.100, 207.404, 191.241},
+    {969.982, 187.897, 192.837},
+    {931.661, 185.178, 192.831},
+    {924.498, 193.739, 192.847},
+    {966.774, 226.680, 192.847},
+    {953.118, 121.170, 192.822},
+ };
 
 class spell_mother_shahraz_fatal_attraction : public SpellScript
 {
@@ -234,43 +303,20 @@ class spell_mother_shahraz_fatal_attraction : public SpellScript
 
     void SetDest(SpellDestination& dest)
     {
-        Position finalDest;
-
-        // Check if the boss is near stairs to avoid players falling through the platform with random teleports.
-        if (GetCaster()->GetPositionY() < 194.f)
-            finalDest = validTeleportStairsPos[urand(0, 8)];
-        else
+        Position casterPos = GetCaster()->GetPosition();
+        std::vector<Position> validTeleportPositions;
+        std::copy_if(std::begin(teleportPositions), std::end(teleportPositions), std::back_inserter(validTeleportPositions),
+            [&](Position const& pos) {
+            float distanceSq = pos.GetExactDist2dSq(casterPos);
+            return minTeleportDistSq <= distanceSq  && distanceSq <= maxTeleportDistSq;
+        });
+        if (validTeleportPositions.empty())
         {
-            finalDest = GetCaster()->GetNearPosition(frand(minTeleportDist, maxTeleportDist), static_cast<float>(rand_norm()) * static_cast<float>(2 * M_PI), true);
-
-            // Maybe not necessary but just in case to avoid LOS issues with an object
-            if (!GetCaster()->IsWithinLOS(finalDest.GetPositionX(), finalDest.GetPositionY(), finalDest.GetPositionZ()))
-                finalDest = GetCaster()->GetNearPosition(frand(minTeleportDist, maxTeleportDist), static_cast<float>(rand_norm()) * static_cast<float>(2 * M_PI), true);
-
-            /* @note: To avoid teleporting players near a walls, we will define a safe area.
-             * As the boss have an area boudary around y: 320.f. We will limit the safe area to this value, avoiding wird issues.
-             * x limit: 932.f/960.f | y limit: 224.f/320.f
-             */
-            if (finalDest.m_positionX < 932.f)
-                finalDest.m_positionX = 932.f;
-            else if (finalDest.m_positionX > 960.f)
-                finalDest.m_positionX = 960.f;
-
-            if (finalDest.m_positionY < 224.f)
-                finalDest.m_positionY = 224.f;
-            else if (finalDest.m_positionY > 320.f)
-                finalDest.m_positionY = 320.f;
-
-            // After relocate a finalDest outside the safe area, we need to recheck the distance with the boss
-            if (GetCaster()->GetExactDist2d(finalDest) < minTeleportDist)
-            {
-                if (finalDest.m_positionX == 932.f || finalDest.m_positionX == 960.f)
-                    finalDest.m_positionY = finalDest.m_positionY + (minTeleportDist - GetCaster()->GetExactDist2d(finalDest));
-                else if (finalDest.m_positionY == 224.f || finalDest.m_positionY == 320.f)
-                    finalDest.m_positionX = finalDest.m_positionX + (minTeleportDist - GetCaster()->GetExactDist2d(finalDest));
-            }
-        }
-
+            LOG_ERROR("scripts", "spell_mother_shahraz_fatal_attraction: No valid teleport positions found (Map: {} X: {} Y: {} Z: {})",
+                GetCaster()->GetMap()->GetId(), GetCaster()->GetPositionX(), GetCaster()->GetPositionY(), GetCaster()->GetPositionZ());
+            return;
+         }
+        Position finalDest = validTeleportPositions[urand(0, validTeleportPositions.size() - 1)];
         dest.Relocate(finalDest);
     }
 
@@ -283,7 +329,7 @@ class spell_mother_shahraz_fatal_attraction : public SpellScript
     void Register() override
     {
         OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_mother_shahraz_fatal_attraction::FilterTargets, EFFECT_ALL, TARGET_UNIT_SRC_AREA_ENEMY);
-        OnDestinationTargetSelect += SpellDestinationTargetSelectFn(spell_mother_shahraz_fatal_attraction::SetDest, EFFECT_1, TARGET_DEST_CASTER_RANDOM);
+        OnDestinationTargetSelect += SpellDestinationTargetSelectFn(spell_mother_shahraz_fatal_attraction::SetDest, EFFECT_1, TARGET_DEST_CASTER);
         OnEffectHitTarget += SpellEffectFn(spell_mother_shahraz_fatal_attraction::HandleTeleportUnits, EFFECT_1, SPELL_EFFECT_TELEPORT_UNITS);
     }
 };

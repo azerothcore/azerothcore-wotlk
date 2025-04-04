@@ -4810,6 +4810,12 @@ void SpellMgr::LoadSpellInfoCorrections()
     });
 
     // Fatal Attraction
+    ApplySpellFix({ 40869 }, [](SpellInfo* spellInfo)
+    {
+        spellInfo->Effects[EFFECT_1].TargetB = SpellImplicitTargetInfo(TARGET_DEST_CASTER); // target set by script
+    });
+
+    // Fatal Attraction
     ApplySpellFix({ 40870 }, [](SpellInfo* spellInfo)
     {
         spellInfo->MaxAffectedTargets = 1;
