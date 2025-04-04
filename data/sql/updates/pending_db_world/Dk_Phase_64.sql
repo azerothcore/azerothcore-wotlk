@@ -10,7 +10,7 @@ UPDATE `creature` SET `spawntimesecs` = 30 WHERE (`id1` IN (29102, 29103, 29104)
 -- Remove Dazed auras from Crusaders
 UPDATE `creature_addon` SET `auras` = '' WHERE (`guid` IN (130749, 130789, 130799));
 
--- Remove Spell from Tirisfal/Hearthglen Crusaders and Scarlet Ballista 
+-- Remove Spell from Tirisfal/Hearthglen Crusaders and Scarlet Ballista
 DELETE FROM `creature_template_spell` WHERE (`CreatureID` IN (29102, 29103, 29104));
 
 -- Add Disable Gravity and Rooted to Scarlet Ballista
@@ -18,7 +18,7 @@ DELETE FROM `creature_template_movement` WHERE (`CreatureId` = 29104);
 INSERT INTO `creature_template_movement` (`CreatureId`, `Ground`, `Swim`, `Flight`, `Rooted`, `Chase`, `Random`, `InteractionPauseTimer`) VALUES
 (29104, 0, 0, 1, 1, 0, 0, 0);
 
--- Add SmartAI for Tirisfal/Hearthglen Crusaders and Scarlet Ballista 
+-- Add SmartAI for Tirisfal/Hearthglen Crusaders and Scarlet Ballista
 UPDATE `creature_template` SET `AIName` = 'SmartAI' WHERE (`entry` IN (29102, 29103, 29104));
 
 DELETE FROM `smart_scripts` WHERE (`source_type` = 0 AND (`entryorguid` IN (29102, 29103, 29104)));
