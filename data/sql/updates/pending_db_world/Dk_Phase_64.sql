@@ -147,6 +147,7 @@ UPDATE `creature` SET `spawntimesecs` = 30 WHERE (`id1` IN (29102, 29103, 29104)
 
 -- Delete a Rampaging Abomination
 DELETE FROM `creature` WHERE (`id1` = 29115) AND (`guid` IN (130903));
+DELETE FROM `creature_addon` WHERE (`guid` IN (130903));
 
 -- Set spawn point for Rampaging Abomination
 UPDATE `creature` SET `position_x` = 2145.9106, `position_y` = -5734.6055, `position_z` = 100.45424, `wander_distance` = 0, `MovementType` = 2 WHERE `id1` = 29115 AND `guid` = 130899;
