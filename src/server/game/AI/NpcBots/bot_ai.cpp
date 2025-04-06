@@ -13067,7 +13067,7 @@ void bot_ai::_removeEquipment(uint8 slot)
     {
         if (me->CanDualWield())
             me->SetCanDualWield(false);
-        if (!(me->HasFlagsExtra(CREATURE_FLAG_EXTRA_NO_BLOCK)))
+        if (!(me->GetCreatureTemplate()->flags_extra & CREATURE_FLAG_EXTRA_NO_BLOCK))
             const_cast<CreatureTemplate*>(me->GetCreatureTemplate())->flags_extra |= CREATURE_FLAG_EXTRA_NO_BLOCK;
     }
 
@@ -13257,7 +13257,7 @@ BotEquipResult bot_ai::_equip(uint8 slot, Item* newItem, ObjectGuid receiver, bo
         }
         else if (proto->Class == ITEM_CLASS_ARMOR && proto->SubClass == ITEM_SUBCLASS_ARMOR_SHIELD)
         {
-            if (me->HasFlagsExtra(CREATURE_FLAG_EXTRA_NO_BLOCK))
+            if (me->GetCreatureTemplate()->flags_extra & CREATURE_FLAG_EXTRA_NO_BLOCK)
                 const_cast<CreatureTemplate*>(me->GetCreatureTemplate())->flags_extra &= ~CREATURE_FLAG_EXTRA_NO_BLOCK;
         }
     }
@@ -15748,7 +15748,7 @@ void bot_ai::InitEquips()
             }
             else if (proto->Class == ITEM_CLASS_ARMOR && proto->SubClass == ITEM_SUBCLASS_ARMOR_SHIELD)
             {
-                if (me->HasFlagsExtra(CREATURE_FLAG_EXTRA_NO_BLOCK))
+                if (me->GetCreatureTemplate()->flags_extra & CREATURE_FLAG_EXTRA_NO_BLOCK)
                     const_cast<CreatureTemplate*>(me->GetCreatureTemplate())->flags_extra &= ~CREATURE_FLAG_EXTRA_NO_BLOCK;
             }
         }
@@ -15801,7 +15801,7 @@ void bot_ai::InitEquips()
                     }
                     else if (proto->Class == ITEM_CLASS_ARMOR && proto->SubClass == ITEM_SUBCLASS_ARMOR_SHIELD)
                     {
-                        if (me->HasFlagsExtra(CREATURE_FLAG_EXTRA_NO_BLOCK))
+                        if (me->GetCreatureTemplate()->flags_extra & CREATURE_FLAG_EXTRA_NO_BLOCK)
                             const_cast<CreatureTemplate*>(me->GetCreatureTemplate())->flags_extra &= ~CREATURE_FLAG_EXTRA_NO_BLOCK;
                     }
                 }
@@ -21349,7 +21349,7 @@ void bot_ai::StartPotionTimer()
 bool bot_ai::CanBlock() const
 {
     return me->CanUseAttackType(OFF_ATTACK) &&
-        (_botclass == BOT_CLASS_SPELLBREAKER || !(me->HasFlagsExtra(CREATURE_FLAG_EXTRA_NO_BLOCK)));
+        (_botclass == BOT_CLASS_SPELLBREAKER || !(me->GetCreatureTemplate()->flags_extra & CREATURE_FLAG_EXTRA_NO_BLOCK));
 }
 bool bot_ai::CanParry() const
 {

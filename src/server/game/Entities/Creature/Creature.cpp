@@ -4040,7 +4040,7 @@ bool Creature::IsDamageEnoughForLootingAndReward() const
 {
     //npcbot
     if (IsNPCBotOrPet())
-        return m_creatureInfo->HasFlagsExtra(CREATURE_FLAG_EXTRA_NO_PLAYER_DAMAGE_REQ) || _playerDamageReq == 0;
+        return (m_creatureInfo->flags_extra & CREATURE_FLAG_EXTRA_NO_PLAYER_DAMAGE_REQ) || _playerDamageReq == 0;
     //end npcbot
     return m_creatureInfo->HasFlagsExtra(CREATURE_FLAG_EXTRA_NO_PLAYER_DAMAGE_REQ) || (_playerDamageReq == 0 && _damagedByPlayer);
 }

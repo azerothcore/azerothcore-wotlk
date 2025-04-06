@@ -1341,24 +1341,7 @@ WorldSession::DosProtection::Policy WorldSession::DosProtection::EvaluateOpcode(
     if (!policy)
         return WorldSession::DosProtection::Policy::Process; // Return true if there is no policy for the opcode
 
-    //npcbot: prevent kicks when too many bots spawned in one spot. The new DOS policy uses values from the antidos_opcode_policies table in the DB. 
-    //Currently there is no policy set for CMSG_GET_MIRRORIMAGE_DATA: dec:1025  hex:0x401 in that table so it should process as there is no limit. 
-	uint32 maxPacketCounterAllowedBot = 0;
-    if (p.GetOpcode() == 1025 && BotMgr::GetBotInfoPacketsLimit() > -1)
-    {
-        //Does nothing unless NpcBot.InfoPacketsLimit is set higher than the -1 (default) in the worldserver.conf file
-        maxPacketCounterAllowedBot = BotMgr::GetBotInfoPacketsLimit();
-    }
-    else
-    {
-        maxPacketCounterAllowedBot = policy->MaxAllowedCount;        
-    }
-
-    uint32 const maxPacketCounterAllowed = maxPacketCounterAllowedBot;
-    //uint32 const maxPacketCounterAllowed = policy->MaxAllowedCount;
-    //end npcbot
-
-
+    uint32 const maxPacketCounterAllowed = policy->MaxAllowedCount;
     if (!maxPacketCounterAllowed)
         return WorldSession::DosProtection::Policy::Process; // Return true if there no limit for the opcode
 
