@@ -232,7 +232,7 @@ void WorldSession::HandlePetActionHelper(Unit* pet, ObjectGuid guid1, uint32 spe
                                     return;
 
                         // Not let attack through obstructions
-                        bool checkLos = !DisableMgr::IsPathfindingEnabled(pet->GetMap()) ||
+                        bool checkLos = !sDisableMgr->IsPathfindingEnabled(pet->GetMap()) ||
                                         (TargetUnit->IsCreature() && (TargetUnit->ToCreature()->isWorldBoss() || TargetUnit->ToCreature()->IsDungeonBoss()));
 
                         if (checkLos && !pet->IsWithinLOSInMap(TargetUnit))
@@ -432,8 +432,14 @@ void WorldSession::HandlePetActionHelper(Unit* pet, ObjectGuid guid1, uint32 spe
 
                     spell->prepare(&(spell->m_targets));
 
-                    charmInfo->SetForcedSpell(0);
-                    charmInfo->SetForcedTargetGUID();
+                    // spell->prepare() can delete charm info.
+                    // Let's refresh the pointer.
+                    charmInfo = pet->GetCharmInfo();
+                    if (charmInfo)
+                    {
+                        charmInfo->SetForcedSpell(0);
+                        charmInfo->SetForcedTargetGUID();
+                    }
                 }
                 else if (pet->ToPet() && (result == SPELL_FAILED_LINE_OF_SIGHT || result == SPELL_FAILED_OUT_OF_RANGE))
                 {
@@ -441,7 +447,10 @@ void WorldSession::HandlePetActionHelper(Unit* pet, ObjectGuid guid1, uint32 spe
                     bool haspositiveeffect = false;
 
                     if (!unit_target)
+                    {
+                        delete spell;
                         return;
+                    }
 
                     // search positive effects for spell
                     for (uint8 i = 0; i < MAX_SPELL_EFFECTS; ++i)

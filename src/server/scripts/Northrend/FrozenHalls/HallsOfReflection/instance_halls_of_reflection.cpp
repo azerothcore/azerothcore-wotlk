@@ -15,11 +15,12 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "Group.h"
 #include "InstanceMapScript.h"
+#include "InstanceScript.h"
 #include "MapMgr.h"
 #include "Transport.h"
 #include "halls_of_reflection.h"
-#include "InstanceScript.h"
 
 class UtherBatteredHiltEvent : public BasicEvent
 {
@@ -143,7 +144,6 @@ public:
         };
 
         uint32 EncounterMask;
-        TeamId TeamIdInInstance;
         ObjectGuid NPC_FalricGUID;
         ObjectGuid NPC_MarwynGUID;
         ObjectGuid NPC_LichKingIntroGUID;
@@ -189,7 +189,6 @@ public:
         void Initialize() override
         {
             EncounterMask = 0;
-            TeamIdInInstance = TEAM_NEUTRAL;
             memset(&TrashActive, 0, sizeof(TrashActive));
             TrashCounter = 0;
             memset(&chosenComposition, 0, sizeof(chosenComposition));
@@ -215,26 +214,13 @@ public:
 
         void OnCreatureCreate(Creature* creature) override
         {
-            if (TeamIdInInstance == TEAM_NEUTRAL)
-            {
-                Map::PlayerList const& players = instance->GetPlayers();
-                if (!players.IsEmpty())
-                    for (Map::PlayerList::const_iterator itr = players.begin(); itr != players.end(); ++itr)
-                        if (Player* p = itr->GetSource())
-                            if (!p->IsGameMaster())
-                            {
-                                TeamIdInInstance = p->GetTeamId();
-                                break;
-                            }
-            }
-
             switch (creature->GetEntry())
             {
                 case NPC_SYLVANAS_PART1:
                     creature->SetVisible(false);
                     creature->SetSpeed(MOVE_RUN, 1.1);
                     NPC_LeaderIntroGUID = creature->GetGUID();
-                    if (TeamIdInInstance == TEAM_ALLIANCE)
+                    if (GetTeamIdInInstance() == TEAM_ALLIANCE)
                         creature->UpdateEntry(NPC_JAINA_PART1);
                     creature->RemoveNpcFlag(UNIT_NPC_FLAG_GOSSIP | UNIT_NPC_FLAG_QUESTGIVER);
                     creature->RemoveUnitMovementFlag(MOVEMENTFLAG_WALKING);
@@ -242,7 +228,7 @@ public:
                 case NPC_DARK_RANGER_LORALEN:
                     creature->SetVisible(false);
                     NPC_GuardGUID = creature->GetGUID();
-                    if (TeamIdInInstance == TEAM_ALLIANCE)
+                    if (GetTeamIdInInstance() == TEAM_ALLIANCE)
                         creature->UpdateEntry(NPC_ARCHMAGE_KORELN);
                     break;
                 case NPC_UTHER:
@@ -303,7 +289,7 @@ public:
                         creature->CastSpell(creature, SPELL_SOUL_REAPER, true);
                     }
                     else if (!(EncounterMask & (1 << DATA_LICH_KING)))
-                        creature->AddAura(TeamIdInInstance == TEAM_ALLIANCE ? SPELL_JAINA_ICE_PRISON : SPELL_SYLVANAS_DARK_BINDING, creature);
+                        creature->AddAura(GetTeamIdInInstance() == TEAM_ALLIANCE ? SPELL_JAINA_ICE_PRISON : SPELL_SYLVANAS_DARK_BINDING, creature);
                     else
                         creature->SetVisible(false);
 
@@ -317,7 +303,7 @@ public:
                     NPC_LeaderGUID = creature->GetGUID();
                     creature->SetWalk(false);
                     creature->SetSheath(SHEATH_STATE_MELEE);
-                    if (TeamIdInInstance == TEAM_ALLIANCE)
+                    if (GetTeamIdInInstance() == TEAM_ALLIANCE)
                         creature->UpdateEntry(NPC_JAINA_PART2);
                     creature->SetWalk(false);
                     creature->SetHealth(creature->GetMaxHealth() / 20);
@@ -326,9 +312,9 @@ public:
                     if (!(EncounterMask & (1 << DATA_LK_INTRO)))
                     {
                         creature->SetSheath(SHEATH_STATE_MELEE);
-                        creature->SetUInt32Value(UNIT_NPC_EMOTESTATE, TeamIdInInstance == TEAM_ALLIANCE ? EMOTE_ONESHOT_ATTACK2HTIGHT : EMOTE_ONESHOT_ATTACK1H); //the fight cannot be in the form of an emote, it is causing bugs.
+                        creature->SetUInt32Value(UNIT_NPC_EMOTESTATE, GetTeamIdInInstance() == TEAM_ALLIANCE ? EMOTE_ONESHOT_ATTACK2HTIGHT : EMOTE_ONESHOT_ATTACK1H); //the fight cannot be in the form of an emote, it is causing bugs.
                         creature->RemoveNpcFlag(UNIT_NPC_FLAG_GOSSIP | UNIT_NPC_FLAG_QUESTGIVER);
-                        creature->CastSpell(creature, TeamIdInInstance == TEAM_ALLIANCE ? SPELL_JAINA_ICE_BARRIER : SPELL_SYLVANAS_CLOAK_OF_DARKNESS, true);
+                        creature->CastSpell(creature, GetTeamIdInInstance() == TEAM_ALLIANCE ? SPELL_JAINA_ICE_BARRIER : SPELL_SYLVANAS_CLOAK_OF_DARKNESS, true);
                     }
                     else if (!(EncounterMask & (1 << DATA_LICH_KING)))
                     {
@@ -339,7 +325,6 @@ public:
                     }
                     else
                     {
-                        instance->LoadGrid(PathWaypoints[PATH_WP_COUNT - 1].GetPositionX(), PathWaypoints[PATH_WP_COUNT - 1].GetPositionY());
                         creature->UpdatePosition(PathWaypoints[PATH_WP_COUNT - 1], true);
                         creature->StopMovingOnCurrentPos();
                     }
@@ -529,13 +514,12 @@ public:
                     {
                         break;
                     }
-                    instance->LoadGrid(LeaderEscapePos.GetPositionX(), LeaderEscapePos.GetPositionY());
                     if (Creature* c = instance->GetCreature(NPC_LeaderGUID))
                     {
                         if (!c->IsAlive())
                         {
                             c->Respawn();
-                            if (TeamIdInInstance == TEAM_ALLIANCE)
+                            if (GetTeamIdInInstance() == TEAM_ALLIANCE)
                                 c->UpdateEntry(NPC_JAINA_PART2);
                         }
                         c->GetThreatMgr().ClearAllThreat();
@@ -563,7 +547,7 @@ public:
                         c->UpdatePosition(c->GetHomePosition(), true);
                         c->StopMovingOnCurrentPos();
                         c->RemoveAllAuras();
-                        c->AddAura(TeamIdInInstance == TEAM_ALLIANCE ? SPELL_JAINA_ICE_PRISON : SPELL_SYLVANAS_DARK_BINDING, c);
+                        c->AddAura(GetTeamIdInInstance() == TEAM_ALLIANCE ? SPELL_JAINA_ICE_PRISON : SPELL_SYLVANAS_DARK_BINDING, c);
                         c->AI()->Reset();
                         c->setActive(false);
                         c->RemoveUnitMovementFlag(MOVEMENTFLAG_WALKING);
@@ -581,7 +565,6 @@ public:
                 case DATA_LICH_KING:
                     if (data == DONE)
                     {
-                        instance->LoadGrid(PathWaypoints[0].GetPositionX(), PathWaypoints[0].GetPositionY());
                         EncounterMask |= (1 << DATA_LICH_KING);
                         if (Creature* c = instance->GetCreature(NPC_LeaderGUID))
                             c->setActive(false);
@@ -1084,18 +1067,18 @@ public:
                             break;
                         case 2:
                             {
-                                uint32 entry = TeamIdInInstance == TEAM_ALLIANCE ? GO_THE_SKYBREAKER : GO_ORGRIMS_HAMMER;
+                                uint32 entry = GetTeamIdInInstance() == TEAM_ALLIANCE ? GO_THE_SKYBREAKER : GO_ORGRIMS_HAMMER;
                                 T1 = sTransportMgr->CreateTransport(entry, 0, instance);
 
                                 ++outroStep;
-                                outroTimer = TeamIdInInstance == TEAM_ALLIANCE ? 10000 : 10500;
+                                outroTimer = GetTeamIdInInstance() == TEAM_ALLIANCE ? 10000 : 10500;
                             }
                             break;
                         case 3:
                             if (T1)
                                 T1->EnableMovement(false);
                             if (Creature* c = instance->GetCreature(NPC_ShipCaptainGUID))
-                                c->AI()->Talk(TeamIdInInstance == TEAM_ALLIANCE ? SAY_FIRE_ALLY : SAY_FIRE_HORDE);
+                                c->AI()->Talk(GetTeamIdInInstance() == TEAM_ALLIANCE ? SAY_FIRE_ALLY : SAY_FIRE_HORDE);
                             if (Creature* c = instance->GetCreature(NPC_LeaderGUID))
                             {
                                 c->RemoveAllAuras();
@@ -1143,10 +1126,10 @@ public:
                                 T1->EnableMovement(false);
                             if (Creature* leader = instance->GetCreature(NPC_LeaderGUID))
                             {
-                                uint8 index = TeamIdInInstance == TEAM_ALLIANCE ? 0 : 1;
+                                uint8 index = GetTeamIdInInstance() == TEAM_ALLIANCE ? 0 : 1;
                                 for (uint8 i = 0; i < 3; ++i)
                                     if (StairsPos[index][i].GetPositionX())
-                                        if (GameObject* go = leader->SummonGameObject(TeamIdInInstance == TEAM_ALLIANCE ? GO_STAIRS_ALLIANCE : GO_STAIRS_HORDE, StairsPos[index][i].GetPositionX(), StairsPos[index][i].GetPositionY(), StairsPos[index][i].GetPositionZ(), StairsPos[index][i].GetOrientation(), 0.0f, 0.0f, 0.0f, 0.0f, 86400, false))
+                                        if (GameObject* go = leader->SummonGameObject(GetTeamIdInInstance() == TEAM_ALLIANCE ? GO_STAIRS_ALLIANCE : GO_STAIRS_HORDE, StairsPos[index][i].GetPositionX(), StairsPos[index][i].GetPositionY(), StairsPos[index][i].GetPositionZ(), StairsPos[index][i].GetOrientation(), 0.0f, 0.0f, 0.0f, 0.0f, 86400, false))
                                             go->SetGameObjectFlag(GO_FLAG_INTERACT_COND | GO_FLAG_NOT_SELECTABLE);
                                 //Position pos = TeamIdInInstance == TEAM_ALLIANCE ? AllyPortalPos : HordePortalPos;
                                 //leader->SummonGameObject(GO_PORTAL_TO_DALARAN, pos.GetPositionX(), pos.GetPositionY(), pos.GetPositionZ(), pos.GetOrientation(), 0.0f, 0.0f, 0.0f, 0.0f, 86400);
@@ -1158,7 +1141,7 @@ public:
                             break;
                         case 8:
                             if (Creature* c = instance->GetCreature(NPC_ShipCaptainGUID))
-                                c->AI()->Talk(TeamIdInInstance == TEAM_ALLIANCE ? SAY_ONBOARD_ALLY : SAY_ONBOARD_HORDE);
+                                c->AI()->Talk(GetTeamIdInInstance() == TEAM_ALLIANCE ? SAY_ONBOARD_ALLY : SAY_ONBOARD_HORDE);
                             if (Creature* c = instance->GetCreature(NPC_LeaderGUID))
                             {
                                 c->AddUnitMovementFlag(MOVEMENTFLAG_WALKING);
@@ -1170,7 +1153,7 @@ public:
                             break;
                         case 9:
                             if (Creature* c = instance->GetCreature(NPC_LeaderGUID))
-                                c->AI()->Talk(TeamIdInInstance == TEAM_ALLIANCE ? SAY_JAINA_FINAL_1 : SAY_SYLVANA_FINAL);
+                                c->AI()->Talk(GetTeamIdInInstance() == TEAM_ALLIANCE ? SAY_JAINA_FINAL_1 : SAY_SYLVANA_FINAL);
                             HandleGameObject(GO_CaveInGUID, true);
                             ++outroStep;
                             outroTimer = 11000;
@@ -1181,7 +1164,7 @@ public:
                             for (Map::PlayerList::const_iterator itr = instance->GetPlayers().begin(); itr != instance->GetPlayers().end(); ++itr)
                                 if (Player* p = itr->GetSource())
                                     p->KilledMonsterCredit(NPC_WRATH_OF_THE_LICH_KING_CREDIT);
-                            if (TeamIdInInstance == TEAM_ALLIANCE)
+                            if (GetTeamIdInInstance() == TEAM_ALLIANCE)
                                 if (Creature* c = instance->GetCreature(NPC_LeaderGUID))
                                 {
                                     c->AI()->Talk(SAY_JAINA_FINAL_2);

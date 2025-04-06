@@ -91,7 +91,7 @@ void WorldSession::HandleGroupInviteOpcode(WorldPacket& recvData)
         return;
     }
 
-    if (!sScriptMgr->CanGroupInvite(invitingPlayer, membername))
+    if (!sScriptMgr->OnPlayerCanGroupInvite(invitingPlayer, membername))
         return;
 
     if (invitingPlayer->IsSpectator() || invitedPlayer->IsSpectator())
@@ -236,7 +236,7 @@ void WorldSession::HandleGroupAcceptOpcode(WorldPacket& recvData)
         return;
     }
 
-    if (!sScriptMgr->CanGroupAccept(GetPlayer(), group))
+    if (!sScriptMgr->OnPlayerCanGroupAccept(GetPlayer(), group))
         return;
 
     if (group->GetLeaderGUID() == GetPlayer()->GetGUID())

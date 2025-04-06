@@ -807,8 +807,8 @@ public:
 
             if (!result)
             {
-                handler->SendSysMessage(LANG_WAYPOINT_NOTFOUNDDBPROBLEM);
-                return true;
+                handler->SendErrorMessage(LANG_WAYPOINT_NOTFOUNDDBPROBLEM, target->GetSpawnId());
+                return false;
             }
 
             handler->SendSysMessage("|cff00ffffDEBUG: wp show info:|r");
@@ -912,15 +912,16 @@ public:
                     return false;
                 }
 
+                wpCreature->SaveToDB(map->GetId(), (1 << map->GetSpawnMode()), chr->GetPhaseMaskForSpawn());
+
                 // Set "wpguid" column to the visual waypoint
                 WorldDatabasePreparedStatement* stmt = WorldDatabase.GetPreparedStatement(WORLD_UPD_WAYPOINT_DATA_WPGUID);
-                stmt->SetData(0, int32(wpCreature->GetSpawnId()));
+                stmt->SetData(0, wpCreature->GetSpawnId());
                 stmt->SetData(1, pathid);
                 stmt->SetData(2, point);
 
                 WorldDatabase.Execute(stmt);
 
-                wpCreature->SaveToDB(map->GetId(), (1 << map->GetSpawnMode()), chr->GetPhaseMaskForSpawn());
                 // To call _LoadGoods(); _LoadQuests(); CreateTrainerSpells();
                 if (!wpCreature->LoadCreatureFromDB(wpCreature->GetSpawnId(), map, true, true))
                 {

@@ -6802,9 +6802,17 @@ void AuraEffect::HandlePeriodicDamageAurasTick(Unit* target, Unit* caster) const
     //End NpcBot
 
     // Auras reducing damage from AOE spells
-    if (GetSpellInfo()->Effects[GetEffIndex()].IsAreaAuraEffect() || GetSpellInfo()->Effects[GetEffIndex()].IsTargetingArea() || GetSpellInfo()->Effects[GetEffIndex()].Effect == SPELL_EFFECT_PERSISTENT_AREA_AURA) // some persistent area auras have targets like A=53 B=28
+    if (!GetSpellInfo()->HasAttribute(SPELL_ATTR4_IGNORE_DAMAGE_TAKEN_MODIFIERS))
     {
-        damage = target->CalculateAOEDamageReduction(damage, GetSpellInfo()->SchoolMask, caster);
+        if (GetSpellInfo()->Effects[GetEffIndex()].IsAreaAuraEffect() ||
+            GetSpellInfo()->Effects[GetEffIndex()].IsTargetingArea() ||
+            GetSpellInfo()->Effects[GetEffIndex()].Effect == SPELL_EFFECT_PERSISTENT_AREA_AURA || // some persistent area auras have targets like A=53 B=28
+            GetSpellInfo()->HasAttribute(SPELL_ATTR5_TREAT_AS_AREA_EFFECT) ||
+            GetSpellInfo()->HasAttribute(SPELL_ATTR7_TREAT_AS_NPC_AOE))
+        {
+            bool npcCaster = (caster && !caster->IsControlledByPlayer()) || GetSpellInfo()->HasAttribute(SPELL_ATTR7_TREAT_AS_NPC_AOE);
+            damage = target->CalculateAOEDamageReduction(damage, GetSpellInfo()->SchoolMask, npcCaster);
+        }
     }
 
     int32 dmg = damage;

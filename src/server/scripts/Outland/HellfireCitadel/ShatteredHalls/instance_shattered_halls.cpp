@@ -21,6 +21,7 @@
 #include "InstanceMapScript.h"
 #include "InstanceScript.h"
 #include "shattered_halls.h"
+#include "Group.h"
 
 ObjectData const creatureData[] =
 {
@@ -58,28 +59,11 @@ public:
             SetBossNumber(ENCOUNTER_COUNT);
             LoadObjectData(creatureData, nullptr);
             LoadDoorData(doorData);
-
-            TeamIdInInstance = TEAM_NEUTRAL;
             RescueTimer = 100 * MINUTE * IN_MILLISECONDS;
-        }
-
-        void OnPlayerEnter(Player* player) override
-        {
-            if (TeamIdInInstance == TEAM_NEUTRAL)
-                TeamIdInInstance = player->GetTeamId();
-
         }
 
         void OnCreatureCreate(Creature* creature) override
         {
-            if (TeamIdInInstance == TEAM_NEUTRAL)
-            {
-                Map::PlayerList const& players = instance->GetPlayers();
-                if (!players.IsEmpty())
-                    if (Player* player = players.begin()->GetSource())
-                        TeamIdInInstance = player->GetTeamId();
-            }
-
             switch (creature->GetEntry())
             {
                 case NPC_SHATTERED_EXECUTIONER:
@@ -88,22 +72,22 @@ public:
                     ExecutionerGUID = creature->GetGUID();
                     break;
                 case NPC_RIFLEMAN_BROWNBEARD:
-                    if (TeamIdInInstance == TEAM_HORDE)
+                    if (GetTeamIdInInstance() == TEAM_HORDE)
                         creature->UpdateEntry(NPC_KORAG_PROUDMANE);
                     PrisonerGUID[0] = creature->GetGUID();
                     break;
                 case NPC_CAPTAIN_ALINA:
-                    if (TeamIdInInstance == TEAM_HORDE)
+                    if (GetTeamIdInInstance() == TEAM_HORDE)
                         creature->UpdateEntry(NPC_CAPTAIN_BONESHATTER);
                     PrisonerGUID[1] = creature->GetGUID();
                     break;
                 case NPC_PRIVATE_JACINT:
-                    if (TeamIdInInstance == TEAM_HORDE)
+                    if (GetTeamIdInInstance() == TEAM_HORDE)
                         creature->UpdateEntry(NPC_SCOUT_ORGARR);
                     PrisonerGUID[2] = creature->GetGUID();
                     break;
                 case NPC_RANDY_WHIZZLESPROCKET:
-                    if (TeamIdInInstance == TEAM_HORDE)
+                    if (GetTeamIdInInstance() == TEAM_HORDE)
                         creature->UpdateEntry(NPC_DRISELLA);
                     break;
             }
@@ -115,10 +99,9 @@ public:
             if (type == DATA_ENTERED_ROOM && data == DATA_ENTERED_ROOM && RescueTimer == 100 * MINUTE * IN_MILLISECONDS)
             {
                 DoCastSpellOnPlayers(SPELL_KARGATHS_EXECUTIONER_1);
-                instance->LoadGrid(230, -80);
 
                 if (Creature* kargath = GetCreature(DATA_KARGATH))
-                    sCreatureTextMgr->SendChat(kargath, TeamIdInInstance == TEAM_ALLIANCE ? 3 : 4, nullptr, CHAT_MSG_ADDON, LANG_ADDON, TEXT_RANGE_MAP);
+                    sCreatureTextMgr->SendChat(kargath, GetTeamIdInInstance() == TEAM_ALLIANCE ? 3 : 4, nullptr, CHAT_MSG_ADDON, LANG_ADDON, TEXT_RANGE_MAP);
 
                 RescueTimer = 80 * MINUTE * IN_MILLISECONDS;
             }
@@ -184,7 +167,6 @@ public:
         ObjectGuid ExecutionerGUID;
         ObjectGuid PrisonerGUID[3];
         uint32 RescueTimer;
-        TeamId TeamIdInInstance;
     };
 };
 

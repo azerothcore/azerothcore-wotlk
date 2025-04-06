@@ -12143,7 +12143,7 @@ void bot_ai::_autoLootCreatureGold(Creature* creature) const
 {
     Loot* loot = &creature->loot;
 
-    sScriptMgr->OnBeforeLootMoney(master, loot);
+    sScriptMgr->OnPlayerBeforeLootMoney(master, loot);
     loot->NotifyMoneyRemoved();
     Group const* gr = master->GetGroup();
     if (!gr)
@@ -16488,7 +16488,7 @@ void bot_ai::AttackStart(Unit* /*u*/)
 {
 }
 
-void bot_ai::DamageDealt(Unit* victim, uint32& damage, DamageEffectType /*damageType*/)
+void bot_ai::DamageDealt(Unit* victim, uint32& damage, DamageEffectType /*damageType*/, SpellSchoolMask /*damageSchoolMask*/)
 {
     if (victim == me)
         return;

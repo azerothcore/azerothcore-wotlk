@@ -52,17 +52,21 @@ You can check the [authors](https://github.com/azerothcore/azerothcore-wotlk/blo
 
 - [Website](http://www.azerothcore.org/)
 - [AzerothCore catalogue](http://www.azerothcore.org/catalogue.html  "Modules, tools, and other stuff for AzerothCore") (modules, tools, etc...)
-- [AzerothCore Discord server](https://discord.gg/gkt4y2x)
-- [AzerothCore wiki](http://www.azerothcore.org/wiki "Easy to use and developed by AzerothCore founder")
-- [AzerothCore forum](https://github.com/azerothcore/azerothcore-wotlk/discussions/)
-- [AzerothCore Facebook page](https://www.facebook.com/AzerothCore/)
-- [AzerothCore LinkedIn page](https://www.linkedin.com/company/azerothcore/)
-
+- [Our Discord server](https://discord.gg/gkt4y2x)
+- [Our wiki](http://www.azerothcore.org/wiki "Easy to use and developed by AzerothCore founder")
+- [Our forum](https://github.com/azerothcore/azerothcore-wotlk/discussions/)
+- [Our Facebook page](https://www.facebook.com/AzerothCore/)
+- [Our LinkedIn page](https://www.linkedin.com/company/azerothcore/)
 
 ## License
 
 - The new AzerothCore source components are released under the [GNU AGPL v3](https://www.gnu.org/licenses/agpl-3.0.en.html)
 - The old sources based on MaNGOS/TrinityCore are released under the [GNU GPL v2](https://www.gnu.org/licenses/old-licenses/gpl-2.0.en.html)
 
+It's important to note that AzerothCore is not an official Blizzard Entertainment product, and it is not affiliated with or endorsed by World of Warcraft or Blizzard Entertainment. AzerothCore does not in any case sponsor nor support illegal public servers. If you use this project to run an illegal public server and not for testing and learning it is your own personal choice.
+
+## Special thanks
 
 It's important to note that AzerothCore is not an official Blizzard Entertainment product, and it is not affiliated with or endorsed by World of Warcraft or Blizzard Entertainment. AzerothCore does not in any case sponsor nor support illegal public servers. If you use this project to run an illegal public server and not for testing and learning it is your own personal choice.
+
+[![JetBrains logo.](https://resources.jetbrains.com/storage/products/company/brand/logos/jetbrains.svg)](https://jb.gg/OpenSourceSupport)

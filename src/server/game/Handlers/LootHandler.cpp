@@ -97,7 +97,7 @@ void WorldSession::HandleAutostoreLootItemOpcode(WorldPacket& recvData)
         loot = &creature->loot;
     }
 
-    sScriptMgr->OnAfterCreatureLoot(player);
+    sScriptMgr->OnPlayerAfterCreatureLoot(player);
 
     InventoryResult msg;
     LootItem* lootItem = player->StoreLootItem(lootSlot, loot, msg);
@@ -183,7 +183,7 @@ void WorldSession::HandleLootMoneyOpcode(WorldPacket& /*recvData*/)
 
     if (loot)
     {
-        sScriptMgr->OnBeforeLootMoney(player, loot);
+        sScriptMgr->OnPlayerBeforeLootMoney(player, loot);
         loot->NotifyMoneyRemoved();
         //npcbot
         if (shareMoney && player->GetGroup() && BotMgr::GetNpcBotMoneyShareEnabled())
@@ -259,7 +259,7 @@ void WorldSession::HandleLootMoneyOpcode(WorldPacket& /*recvData*/)
         }
         else
         {
-            sScriptMgr->OnAfterCreatureLootMoney(player);
+            sScriptMgr->OnPlayerAfterCreatureLootMoney(player);
             player->ModifyMoney(loot->gold);
             player->UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_LOOT_MONEY, loot->gold);
 

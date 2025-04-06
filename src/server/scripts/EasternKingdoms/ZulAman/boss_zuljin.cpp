@@ -388,8 +388,10 @@ struct npc_zuljin_vortex : public ScriptedAI
     void ChangeToNewPlayer()
     {
         DoResetThreatList();
-        if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 100.0f, true))
-            me->AddThreat(target, 10000000.0f);
+        if (WorldObject* summoner = GetSummoner())
+            if (Creature* zuljin = summoner->ToCreature())
+                if (Unit* target = zuljin->AI()->SelectTarget(SelectTargetMethod::Random, 0, 80.0f, true))
+                    me->AddThreat(target, 10000000.0f);
     }
 
     void UpdateAI(uint32 /*diff*/) override

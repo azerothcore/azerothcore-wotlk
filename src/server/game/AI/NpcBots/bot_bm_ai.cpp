@@ -766,7 +766,7 @@ public:
             OnSpellHitTarget(target, spell);
         }
 
-        void DamageDealt(Unit* victim, uint32& damage, DamageEffectType damageType) override
+        void DamageDealt(Unit* victim, uint32& damage, DamageEffectType damageType, SpellSchoolMask damageSchoolMask) override
         {
             //Illusions deal no damage
             if (IsTempBot())
@@ -778,7 +778,7 @@ public:
                 damage = 0;
             }
 
-            bot_ai::DamageDealt(victim, damage, damageType);
+            bot_ai::DamageDealt(victim, damage, damageType, damageSchoolMask);
         }
 
         void DamageTaken(Unit* u, uint32& damage, DamageEffectType /*damageType*/, SpellSchoolMask /*schoolMask*/) override

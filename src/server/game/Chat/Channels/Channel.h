@@ -181,7 +181,7 @@ public:
     [[nodiscard]] uint32 GetChannelDBId() const { return _channelDBId; }
     [[nodiscard]] bool IsConstant() const { return _channelId != 0; }
     [[nodiscard]] bool IsAnnounce() const { return _announce; }
-    [[nodiscard]] bool IsLFG() const { return GetFlags() & CHANNEL_FLAG_LFG; }
+    [[nodiscard]] bool IsLFG() const { return HasFlag(CHANNEL_FLAG_LFG); }
     [[nodiscard]] std::string const& GetPassword() const { return _password; }
     void SetPassword(std::string const& npassword) { _password = npassword; }
     [[nodiscard]] uint32 GetNumPlayers() const { return playersStore.size(); }

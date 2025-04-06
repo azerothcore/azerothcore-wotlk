@@ -2105,9 +2105,9 @@ public:
             OnSpellHit(caster, spell);
         }
 
-        void DamageDealt(Unit* victim, uint32& damage, DamageEffectType damageType) override
+        void DamageDealt(Unit* victim, uint32& damage, DamageEffectType damageType, SpellSchoolMask damageSchoolMask) override
         {
-            bot_ai::DamageDealt(victim, damage, damageType);
+            bot_ai::DamageDealt(victim, damage, damageType, damageSchoolMask);
         }
 
         void OnBotDamageTaken(Unit* /*attacker*/, uint32 damage, CleanDamage const* /*cleanDamage*/, DamageEffectType /*damagetype*/, SpellInfo const* spellInfo) override
