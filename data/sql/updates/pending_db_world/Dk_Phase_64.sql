@@ -301,3 +301,6 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 (29106, 0, 1, 0, 0, 0, 100, 0, 3000, 5000, 8000, 12000, 0, 0, 11, 52373, 32, 0, 1, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Death Knight Champion - In Combat - Cast \'Plague Strike\''),
 (29106, 0, 2, 0, 0, 0, 100, 0, 4000, 8000, 4000, 8000, 0, 0, 11, 52374, 0, 0, 1, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Death Knight Champion - In Combat - Cast \'Blood Strike\''),
 (29106, 0, 3, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 11, 52375, 0, 0, 1, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Death Knight Champion - In Combat - Cast \'Death Coil\'');
+
+-- Set Detection range for Baron Rivendare
+UPDATE `creature_template` SET `detection_range` = 20 WHERE (`entry` = 29109);
