@@ -8374,7 +8374,7 @@ bool Unit::HandleDummyAuraProc(Unit* victim, uint32 damage, AuraEffect* triggere
                                 return false;
                             }
 
-                            uint32 effectiveHeal = healInfo->GetEffectiveHeal();
+                            uint32 effectiveHeal = healInfo->GetHeal();
                             if (effectiveHeal)
                             {
                                 // heal amount
