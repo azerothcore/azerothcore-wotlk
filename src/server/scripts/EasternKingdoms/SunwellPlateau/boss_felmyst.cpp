@@ -139,7 +139,13 @@ private:
 
 struct boss_felmyst : public BossAI
 {
-    boss_felmyst(Creature* creature) : BossAI(creature, DATA_FELMYST), _currentLane(0), _strafeCount(0) { }
+    boss_felmyst(Creature* creature) : BossAI(creature, DATA_FELMYST), _currentLane(0), _strafeCount(0)
+    {
+        scheduler.SetValidator([this]
+        {
+            return !me->HasUnitState(UNIT_STATE_CASTING);
+        });
+    }
 
     void InitializeAI() override
     {
