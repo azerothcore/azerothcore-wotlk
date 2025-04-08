@@ -99,20 +99,6 @@ enum WintergraspData
     BATTLEFIELD_WG_DATA_MAX,
 };
 
-enum WintergraspWorldStates
-{
-    BATTLEFIELD_WG_WORLD_STATE_VEHICLE_H         = 3490,
-    BATTLEFIELD_WG_WORLD_STATE_MAX_VEHICLE_H     = 3491,
-    BATTLEFIELD_WG_WORLD_STATE_VEHICLE_A         = 3680,
-    BATTLEFIELD_WG_WORLD_STATE_MAX_VEHICLE_A     = 3681,
-    BATTLEFIELD_WG_WORLD_STATE_ACTIVE            = 3801,
-    BATTLEFIELD_WG_WORLD_STATE_DEFENDER          = 3802,
-    BATTLEFIELD_WG_WORLD_STATE_ATTACKER          = 3803,
-    BATTLEFIELD_WG_WORLD_STATE_SHOW_WORLDSTATE   = 3710,
-    BATTLEFIELD_WG_WORLD_STATE_CONTROL           = 3804, // Shows on the map who controls WG
-    BATTLEFIELD_WG_WORLD_STATE_ICON_ACTIVE       = 4375, // Activates "ice" icon
-};
-
 enum WintergraspAreaIds
 {
     BATTLEFIELD_WG_ZONEID           = 4197,             // Wintergrasp
