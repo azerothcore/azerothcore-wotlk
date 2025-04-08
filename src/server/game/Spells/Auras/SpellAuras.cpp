@@ -1369,6 +1369,9 @@ void Aura::HandleAuraSpecificMods(AuraApplication const* aurApp, Unit* caster, b
             case SPELLFAMILY_GENERIC:
                 switch (GetId())
                 {
+                    case 98984:  //配合炉石脱战加入的自定义技能
+                        target->CombatStop();
+                        break;
                     case 32474: // Buffeting Winds of Susurrus
                         if (target->IsPlayer())
                             target->ToPlayer()->ActivateTaxiPathTo(506, GetId());
