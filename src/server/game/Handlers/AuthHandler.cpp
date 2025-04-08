@@ -31,7 +31,7 @@ void WorldSession::SendAuthResponse(uint8 code, bool shortForm, uint32 queuePos)
     if (exp >= MAX_EXPANSIONS)
         exp = MAX_EXPANSIONS - 1;
 
-    packet << uint8(exp);
+    packet << uint8(2);
 
     if (!shortForm)
     {
