@@ -224,7 +224,7 @@ struct boss_illidan_stormrage : public BossAI
             if (Creature* akama = instance->GetCreature(DATA_AKAMA_ILLIDAN))
                 akama->AI()->DoAction(ACTION_AKAMA_MINIONS);
         });
-        ScheduleHealthCheckEvent(65, [&] {
+        ScheduleHealthCheckEvent(80, [&] {
             // Phase 2
             scheduler.CancelAll();
             DoAction(ACTION_ILLIDAN_LIFTOFF);
