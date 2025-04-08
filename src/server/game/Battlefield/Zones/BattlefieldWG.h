@@ -21,6 +21,7 @@
 #include "Battlefield.h"
 #include "Log.h"
 #include "World.h"
+#include "WorldStateDefines.h"
 #include "WorldStatePackets.h"
 
 class Group;
@@ -36,9 +37,9 @@ typedef std::set<WGWorkshop*> Workshop;
 typedef std::set<Group*> GroupSet;
 //typedef std::set<WintergraspCapturePoint *> CapturePointSet; unused ?
 
-uint32 const VehNumWorldState[2] = { 3680, 3490 };
-uint32 const MaxVehNumWorldState[2] = { 3681, 3491 };
-uint32 const ClockWorldState[2] = { 3781, 4354 };
+uint32 const VehNumWorldState[2] = { WORLD_STATE_BATTLEFIELD_WG_VEHICLE_A, WORLD_STATE_BATTLEFIELD_WG_VEHICLE_H };
+uint32 const MaxVehNumWorldState[2] = { WORLD_STATE_BATTLEFIELD_WG_MAX_VEHICLE_A, WORLD_STATE_BATTLEFIELD_WG_MAX_VEHICLE_H };
+uint32 const ClockWorldState[2] = { WORLD_STATE_BATTLEFIELD_WG_CLOCK, WORLD_STATE_BATTLEFIELD_WG_CLOCK_TEXTS };
 uint32 const WintergraspFaction[3] = { 1, 2, 35 };
 float const WintergraspStalkerPos[4]    = { 4948.985f, 2937.789f, 550.5172f, 1.815142f };
 
