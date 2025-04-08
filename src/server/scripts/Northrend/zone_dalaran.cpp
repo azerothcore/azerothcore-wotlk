@@ -444,7 +444,9 @@ public:
 
         void MoveInLineOfSight(Unit* who) override
         {
-            if (!who || !who->IsInWorld() || who->GetZoneId() != 4395)
+            // 4395 Dalaran
+            // 4569 Sewer Exit Pipe
+            if (!who || !who->IsInWorld()|| who->GetZoneId() != 4395 || who->GetAreaId() == 4569)
                 return;
 
             if (!me->IsWithinDist(who, 5.0f, false))

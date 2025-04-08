@@ -47,32 +47,36 @@ enum Yells
 
 enum Spells
 {
-    SPELL_SPECTRAL_EXHAUSTION           = 44867,
-    SPELL_SPECTRAL_BLAST                = 44869,
-    SPELL_SPECTRAL_BLAST_PORTAL         = 44866,
-    SPELL_SPECTRAL_BLAST_AA             = 46648,
-    SPELL_TELEPORT_SPECTRAL             = 46019,
+    SPELL_SPECTRAL_EXHAUSTION              = 44867,
+    SPELL_SPECTRAL_BLAST                   = 44869,
+    SPELL_SPECTRAL_BLAST_PORTAL            = 44866,
+    SPELL_SPECTRAL_BLAST_AA                = 46648,
+    SPELL_TELEPORT_SPECTRAL                = 46019,
 
-    SPELL_TELEPORT_NORMAL_REALM         = 46020,
-    SPELL_SPECTRAL_REALM                = 46021,
-    SPELL_SPECTRAL_INVISIBILITY         = 44801,
-    SPELL_DEMONIC_VISUAL                = 44800,
+    SPELL_TELEPORT_NORMAL_REALM            = 46020,
+    SPELL_SPECTRAL_REALM                   = 46021,
+    SPELL_SPECTRAL_INVISIBILITY            = 44801,
+    SPELL_DEMONIC_VISUAL                   = 44800,
 
-    SPELL_ARCANE_BUFFET                 = 45018,
-    SPELL_FROST_BREATH                  = 44799,
-    SPELL_TAIL_LASH                     = 45122,
+    SPELL_ARCANE_BUFFET                    = 45018,
+    SPELL_FROST_BREATH                     = 44799,
+    SPELL_TAIL_LASH                        = 45122,
 
-    SPELL_BANISH                        = 44836,
-    SPELL_TRANSFORM_KALEC               = 44670,
-    SPELL_CRAZED_RAGE                   = 44807,
+    SPELL_BANISH                           = 44836,
+    SPELL_TRANSFORM_KALEC                  = 44670,
+    SPELL_CRAZED_RAGE                      = 44807,
 
-    SPELL_CORRUPTION_STRIKE             = 45029,
-    SPELL_CURSE_OF_BOUNDLESS_AGONY      = 45032,
-    SPELL_CURSE_OF_BOUNDLESS_AGONY_PLR  = 45034,
-    SPELL_SHADOW_BOLT                   = 45031,
+    SPELL_CORRUPTION_STRIKE                = 45029,
+    SPELL_CURSE_OF_BOUNDLESS_AGONY         = 45032,
+    SPELL_CURSE_OF_BOUNDLESS_AGONY_PLR     = 45034,
+    SPELL_CURSE_OF_BOUNDLESS_AGONY_REMOVE  = 45050,
+    SPELL_CURSE_OF_BOUNDLESS_AGONY_DUMMY_1 = 45083,
+    SPELL_CURSE_OF_BOUNDLESS_AGONY_DUMMY_2 = 45085,
+    SPELL_CURSE_OF_BOUNDLESS_AGONY_DUMMY_3 = 45084,
+    SPELL_SHADOW_BOLT                      = 45031,
 
-    SPELL_HEROIC_STRIKE                 = 45026,
-    SPELL_REVITALIZE                    = 45027
+    SPELL_HEROIC_STRIKE                    = 45026,
+    SPELL_REVITALIZE                       = 45027
 };
 
 enum SWPActions
@@ -104,12 +108,6 @@ struct boss_kalecgos : public BossAI
             return false;
 
         return true;
-    }
-
-    void JustReachedHome() override
-    {
-        BossAI::JustReachedHome();
-        me->SetVisible(true);
     }
 
     void Reset() override
@@ -175,7 +173,6 @@ struct boss_kalecgos : public BossAI
             }, 4s);
 
             me->m_Events.AddEventAtOffset([&] {
-                me->SetVisible(false);
                 EnterEvadeMode();
             }, 9s);
 
@@ -231,7 +228,7 @@ struct boss_kalecgos : public BossAI
     {
         BossAI::JustEngagedWith(who);
 
-        ScheduleTimedEvent(6s, [&] {
+        ScheduleTimedEvent(8s, [&] {
             DoCastAOE(SPELL_ARCANE_BUFFET);
         }, 8s);
 
@@ -239,22 +236,25 @@ struct boss_kalecgos : public BossAI
             DoCastVictim(SPELL_FROST_BREATH);
         }, 15s);
 
-        ScheduleTimedEvent(10s, [&] {
+        ScheduleTimedEvent(6s, [&] {
             me->CastCustomSpell(RAND(44978, 45001, 45002, 45004, 45006, 45010), SPELLVALUE_MAX_TARGETS, 1, me, false);
-        }, 20s);
+        }, 6s, 7s);
 
         ScheduleTimedEvent(25s, [&] {
             DoCastVictim(SPELL_TAIL_LASH);
         }, 15s);
 
-        ScheduleTimedEvent(20s, [&] {
+        ScheduleTimedEvent(13s, [&] {
             DoCastAOE(SPELL_SPECTRAL_BLAST);
-        }, 15s, 25s);
+        }, 20s, 30s);
 
-        me->m_Events.AddEventAtOffset([&] {
-            me->SummonCreature(NPC_KALEC, 1702.21f, 931.7f, -74.56f, 5.07f, TEMPSUMMON_MANUAL_DESPAWN);
+        scheduler.Schedule(9s, [this](TaskContext)
+        {
+            if (Creature* kalec = me->SummonCreature(NPC_KALEC, 1702.21f, 931.7f, -74.56f, 5.07f, TEMPSUMMON_MANUAL_DESPAWN))
+                kalec->CastSpell(kalec, SPELL_SPECTRAL_INVISIBILITY, true);
+
             me->SummonCreature(NPC_SATHROVARR, 1704.62f, 927.78f, -73.9f, 2.0f, TEMPSUMMON_MANUAL_DESPAWN);
-        }, 16s);
+        });
 
         me->SetStandState(UNIT_STAND_STATE_STAND);
         Talk(SAY_EVIL_AGGRO);
@@ -270,51 +270,9 @@ struct boss_kalecgos : public BossAI
         bool _sathBanished;
 };
 
-enum Kalec
-{
-    SPELL_OPEN_BRUTALLUS_BACK_DOOR = 46650,
-    MODEL_KALECGOS_DRAGON       = 23487,
-
-    EVENT_KALEC_SCENE_1         = 101,
-    EVENT_KALEC_SCENE_2         = 102,
-    EVENT_KALEC_SCENE_3         = 103
-};
-
 struct boss_kalec : public ScriptedAI
 {
-    boss_kalec(Creature* creature) : ScriptedAI(creature)
-    {
-        SetInvincibility(true);
-    }
-
-    void Reset() override
-    {
-        if (me->GetPositionY() < 750.0f)
-        {
-            me->SetSpeed(MOVE_RUN, 2.4f);
-            me->SetDisplayId(MODEL_KALECGOS_DRAGON);
-            me->SetDisableGravity(true);
-            me->GetMotionMaster()->MovePoint(0, 1483.30f, 657.99f, 28.0f, false, true);
-
-            me->m_Events.AddEventAtOffset([&] {
-                Talk(SAY_GOOD_MADRIGOSA);
-                me->GetMotionMaster()->MovePoint(0, 1509.0f, 560.0f, 30.0f, false, true);
-            }, 9s);
-
-            me->m_Events.AddEventAtOffset([&] {
-                DoCastAOE(SPELL_OPEN_BRUTALLUS_BACK_DOOR, true);
-                me->GetInstanceScript()->SetBossState(DATA_FELMYST_DOORS, NOT_STARTED);
-                me->GetInstanceScript()->SetBossState(DATA_FELMYST_DOORS, DONE);
-            }, 16s);
-
-            me->m_Events.AddEventAtOffset([&] {
-                me->GetMotionMaster()->MovePoint(0, 1400.0f, 630.0f, 90.0f, false, true);
-                me->DespawnOrUnsummon(6000);
-            }, 22s);
-        }
-        else
-            DoCastSelf(SPELL_SPECTRAL_INVISIBILITY, true);
-    }
+    boss_kalec(Creature* creature) : ScriptedAI(creature) { }
 
     void JustEngagedWith(Unit*) override
     {
@@ -391,9 +349,9 @@ struct boss_sathrovarr : public ScriptedAI
             DoCastVictim(SPELL_SHADOW_BOLT);
         }, 9s);
 
-        ScheduleTimedEvent(20s, [&] {
+        ScheduleTimedEvent(40s, [&] {
             me->CastCustomSpell(SPELL_CURSE_OF_BOUNDLESS_AGONY, SPELLVALUE_MAX_TARGETS, 1, me, false);
-        }, 30s);
+        }, 40s);
 
         ScheduleTimedEvent(20s, [&] {
             if (roll_chance_i(20))
@@ -434,6 +392,7 @@ struct boss_sathrovarr : public ScriptedAI
 
     void JustDied(Unit* /*killer*/) override
     {
+        DoCastSelf(SPELL_CURSE_OF_BOUNDLESS_AGONY_REMOVE, true);
         Talk(SAY_SATH_DEATH);
     }
 
@@ -510,10 +469,10 @@ class spell_kalecgos_curse_of_boundless_agony_aura : public AuraScript
 
     bool Validate(SpellInfo const* /*spellInfo*/) override
     {
-        return ValidateSpellInfo({ SPELL_CURSE_OF_BOUNDLESS_AGONY_PLR });
+        return ValidateSpellInfo({ SPELL_CURSE_OF_BOUNDLESS_AGONY_PLR, SPELL_CURSE_OF_BOUNDLESS_AGONY_DUMMY_1, SPELL_CURSE_OF_BOUNDLESS_AGONY_DUMMY_2, SPELL_CURSE_OF_BOUNDLESS_AGONY_DUMMY_3 });
     }
 
-    void OnRemove(AuraEffect const*  /*aurEff*/, AuraEffectHandleModes /*mode*/)
+    void OnRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
     {
         if (InstanceScript* instance = GetUnitOwner()->GetInstanceScript())
             if (instance->IsEncounterInProgress())
@@ -522,8 +481,18 @@ class spell_kalecgos_curse_of_boundless_agony_aura : public AuraScript
 
     void OnPeriodic(AuraEffect const* aurEff)
     {
-        if (aurEff->GetTickNumber() > 1 && aurEff->GetTickNumber() % 5 == 1)
+        uint32 tickNumber = aurEff->GetTickNumber();
+        if (tickNumber > 1 && tickNumber % 5 == 1)
             GetAura()->GetEffect(aurEff->GetEffIndex())->SetAmount(aurEff->GetAmount() * 2);
+
+        uint32 spellId = 0;
+        if (tickNumber <= 10)
+            spellId = SPELL_CURSE_OF_BOUNDLESS_AGONY_DUMMY_1;
+        else if (tickNumber <= 20)
+            spellId = SPELL_CURSE_OF_BOUNDLESS_AGONY_DUMMY_2;
+        else
+            spellId = SPELL_CURSE_OF_BOUNDLESS_AGONY_DUMMY_3;
+        GetTarget()->CastSpell(GetTarget(), spellId, true);
     }
 
     void Register() override

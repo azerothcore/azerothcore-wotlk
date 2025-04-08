@@ -22,6 +22,7 @@
 #include "SpellInfo.h"
 #include "SpellScript.h"
 #include "SpellScriptLoader.h"
+#include "SpellAuraEffects.h"
 #include "sunwell_plateau.h"
 
 enum Quotes
@@ -49,6 +50,7 @@ enum Spells
     SPELL_ENRAGE                = 46587,
     SPELL_EMPOWER               = 45366,
     SPELL_DARK_FLAME            = 45345,
+    SPELL_FIREBLAST             = 45232,
 
     //Lady Sacrolash spells
     SPELL_SHADOWFORM            = 45455,
@@ -77,13 +79,31 @@ struct boss_sacrolash : public BossAI
 {
     boss_sacrolash(Creature* creature) : BossAI(creature, DATA_EREDAR_TWINS), _isSisterDead(false) {}
 
+    bool CheckInRoom() override
+    {
+        if (me->GetExactDist2d(me->GetHomePosition()) >= 50.f)
+        {
+            DoCastAOE(SPELL_FIREBLAST, true);
+
+            if (Creature* alythess = instance->GetCreature(DATA_ALYTHESS))
+                alythess->AI()->DoCastAOE(SPELL_FIREBLAST, true);
+
+            return false;
+        }
+
+        return true;
+    }
+
     void Reset() override
     {
         DoCastSelf(SPELL_SHADOWFORM, true);
         _isSisterDead = false;
         BossAI::Reset();
         me->SetLootMode(0);
-        me->m_Events.KillAllEvents(false);
+
+        if (Creature* alythess = instance->GetCreature(DATA_ALYTHESS))
+            if (!alythess->IsAlive())
+                alythess->Respawn(true);
     }
 
     void DoAction(int32 param) override
@@ -100,20 +120,12 @@ struct boss_sacrolash : public BossAI
                 Unit* target = SelectTarget(SelectTargetMethod::MaxThreat, 1, 100.0f);
                 if (!target)
                     target = me->GetVictim();
-                me->CastSpell(target, SPELL_CONFLAGRATION, false);
-            }, 30s, 35s);
-        }
-    }
 
-    void EnterEvadeMode(EvadeReason why) override
-    {
-        BossAI::EnterEvadeMode(why);
-        if (Creature* alythess = instance->GetCreature(DATA_ALYTHESS))
-        {
-            if (!alythess->IsAlive())
-                alythess->Respawn(true);
-            else if (!alythess->IsInEvadeMode())
-                alythess->AI()->EnterEvadeMode(why);
+                DoCast(target, SPELL_CONFLAGRATION);
+
+                if (Creature* alythess = instance->GetCreature(DATA_ALYTHESS))
+                    alythess->AI()->Talk(EMOTE_CONFLAGRATION, target);
+            }, 30s, 35s);
         }
     }
 
@@ -124,10 +136,7 @@ struct boss_sacrolash : public BossAI
             if (alythess->IsAlive() && !alythess->IsInCombat())
                 alythess->AI()->AttackStart(who);
 
-        me->m_Events.AddEventAtOffset([&] {
-            Talk(YELL_BERSERK);
-            DoCastSelf(SPELL_ENRAGE, true);
-        }, 6min);
+        ScheduleEnrageTimer(SPELL_ENRAGE, 6min, YELL_BERSERK);
 
         ScheduleTimedEvent(10s, [&] {
             DoCastSelf(SPELL_SHADOW_BLADES);
@@ -137,9 +146,9 @@ struct boss_sacrolash : public BossAI
             DoCastVictim(SPELL_CONFOUNDING_BLOW);
         }, 20s, 25s);
 
-        ScheduleTimedEvent(20s, [&] {
-            me->SummonCreature(NPC_SHADOW_IMAGE, me->GetPosition(), TEMPSUMMON_TIMED_DESPAWN, 12000);
-        }, 6s);
+        ScheduleTimedEvent(8s, 16s, [&] {
+            me->SummonCreature(NPC_SHADOW_IMAGE, me->GetPosition(), TEMPSUMMON_TIMED_DESPAWN, 10000);
+        }, 8s, 12s);
 
         scheduler.Schedule(36s, GROUP_SPECIAL_ABILITY, [this](TaskContext context) {
             Unit* target = SelectTarget(SelectTargetMethod::MaxThreat, 1, 100.0f);
@@ -195,7 +204,17 @@ struct boss_alythess : public BossAI
         _isSisterDead = false;
         BossAI::Reset();
         me->SetLootMode(0);
-        me->m_Events.KillAllEvents(false);
+
+        if (Creature* sacrolash = instance->GetCreature(DATA_SACROLASH))
+            if (!sacrolash->IsAlive())
+                sacrolash->Respawn(true);
+    }
+
+    void AttackStart(Unit* who) override
+    {
+        if (who && who->isTargetableForAttack() && me->GetReactState() != REACT_PASSIVE)
+            if (me->Attack(who, false))
+                me->AddThreat(who, 0.0f);
     }
 
     void DoAction(int32 param) override
@@ -208,24 +227,16 @@ struct boss_alythess : public BossAI
             me->CastSpell(me, SPELL_EMPOWER, true);
 
             scheduler.CancelGroup(GROUP_SPECIAL_ABILITY);
-            ScheduleTimedEvent(20s, [&] {
+            ScheduleTimedEvent(20s, 26s, [&] {
                 Unit* target = SelectTarget(SelectTargetMethod::MaxThreat, 1, 100.0f);
                 if (!target)
                     target = me->GetVictim();
                 DoCast(target, SPELL_SHADOW_NOVA);
-            }, 30s, 35s);
-        }
-    }
 
-    void EnterEvadeMode(EvadeReason why) override
-    {
-        BossAI::EnterEvadeMode(why);
-        if (Creature* sacrolash = instance->GetCreature(DATA_SACROLASH))
-        {
-            if (!sacrolash->IsAlive())
-                sacrolash->Respawn(true);
-            else if (!sacrolash->IsInEvadeMode())
-                sacrolash->AI()->EnterEvadeMode(why);
+                if (Creature * sacrolash = instance->GetCreature(DATA_SACROLASH))
+                    sacrolash->AI()->Talk(EMOTE_SHADOW_NOVA, target);
+
+            }, 20s, 26s);
         }
     }
 
@@ -236,22 +247,19 @@ struct boss_alythess : public BossAI
             if (sacrolash->IsAlive() && !sacrolash->IsInCombat())
                 sacrolash->AI()->AttackStart(who);
 
-        me->m_Events.AddEventAtOffset([&] {
-            Talk(YELL_BERSERK);
-            DoCastSelf(SPELL_ENRAGE, true);
-        }, 6min);
+        ScheduleEnrageTimer(SPELL_ENRAGE, 6min, YELL_BERSERK);
 
         ScheduleTimedEvent(1s, [&] {
             DoCastVictim(SPELL_BLAZE);
         }, 3800ms);
 
-        ScheduleTimedEvent(15s, [&] {
+        ScheduleTimedEvent(21s, 34s, [&] {
             DoCastSelf(SPELL_PYROGENICS);
-        }, 15s);
+        }, 21s, 34s);
 
-        ScheduleTimedEvent(20s, [&] {
-            me->CastCustomSpell(SPELL_FLAME_SEAR, SPELLVALUE_MAX_TARGETS, 5, me, TRIGGERED_NONE);
-        }, 15s);
+        ScheduleTimedEvent(10s, 15s, [&] {
+            me->CastCustomSpell(SPELL_FLAME_SEAR, SPELLVALUE_MAX_TARGETS, urand(4, 5), me, TRIGGERED_NONE);
+        }, 10s, 15s);
 
         scheduler.Schedule(20s, GROUP_SPECIAL_ABILITY, [this](TaskContext context) {
             Unit* target = SelectTarget(SelectTargetMethod::MaxThreat, 1, 100.0f);
@@ -377,6 +385,42 @@ class spell_eredar_twins_blaze : public SpellScript
     }
 };
 
+class spell_eredar_twins_handle_touch_periodic : public AuraScript
+{
+    PrepareAuraScript(spell_eredar_twins_handle_touch_periodic);
+
+public:
+    spell_eredar_twins_handle_touch_periodic(uint32 touchSpell, uint8 effIndex, uint8 aura) : AuraScript(), _touchSpell(touchSpell), _effectIndex(effIndex), _aura(aura) {}
+
+    bool Validate(SpellInfo const* /*spellInfo*/) override
+    {
+        return ValidateSpellInfo({ _touchSpell });
+    }
+
+    void OnPeriodic(AuraEffect const* aurEff)
+    {
+        if (aurEff->GetId() == SPELL_FLAME_SEAR)
+        {
+            uint32 tick = aurEff->GetTickNumber();
+            if (tick % 2 != 0 || tick > 10)
+                return;
+        }
+
+        if (Unit* owner = GetOwner()->ToUnit())
+            owner->CastSpell(owner, _touchSpell, true);
+    }
+
+    void Register() override
+    {
+        OnEffectPeriodic += AuraEffectPeriodicFn(spell_eredar_twins_handle_touch_periodic::OnPeriodic, _effectIndex, _aura);
+    }
+
+private:
+    uint32 _touchSpell;
+    uint8 _effectIndex;
+    uint8 _aura;
+};
+
 class at_sunwell_eredar_twins : public OnlyOnceAreaTriggerScript
 {
 public:
@@ -404,5 +448,8 @@ void AddSC_boss_eredar_twins()
     RegisterSpellScriptWithArgs(spell_eredar_twins_apply_touch, "spell_eredar_twins_apply_flame_touched", SPELL_FLAME_TOUCHED);
     RegisterSpellScript(spell_eredar_twins_handle_touch);
     RegisterSpellScript(spell_eredar_twins_blaze);
+    RegisterSpellScriptWithArgs(spell_eredar_twins_handle_touch_periodic, "spell_eredar_twins_handle_dark_touched_periodic", SPELL_DARK_TOUCHED, EFFECT_1, SPELL_AURA_PERIODIC_DAMAGE);
+    RegisterSpellScriptWithArgs(spell_eredar_twins_handle_touch_periodic, "spell_eredar_twins_handle_flame_touched_periodic", SPELL_FLAME_TOUCHED, EFFECT_2, SPELL_AURA_PERIODIC_TRIGGER_SPELL);
+    RegisterSpellScriptWithArgs(spell_eredar_twins_handle_touch_periodic, "spell_eredar_twins_handle_flame_touched_flame_sear", SPELL_FLAME_TOUCHED, EFFECT_1, SPELL_AURA_PERIODIC_DAMAGE);
     new at_sunwell_eredar_twins();
 }

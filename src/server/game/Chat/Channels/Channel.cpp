@@ -185,10 +185,7 @@ void Channel::JoinChannel(Player* player, std::string const& pass)
         return;
     }
 
-    if (HasFlag(CHANNEL_FLAG_LFG) &&
-            sWorld->getBoolConfig(CONFIG_RESTRICTED_LFG_CHANNEL) &&
-            AccountMgr::IsPlayerAccount(player->GetSession()->GetSecurity()) &&
-            player->GetGroup())
+    if (IsLFG() && sWorld->getBoolConfig(CONFIG_RESTRICTED_LFG_CHANNEL) && !player->IsUsingLfg())
     {
         WorldPacket data;
         MakeNotInLfg(&data);

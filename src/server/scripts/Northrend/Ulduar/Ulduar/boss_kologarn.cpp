@@ -155,7 +155,6 @@ public:
         boss_kologarnAI(Creature* pCreature) : ScriptedAI(pCreature), vehicle(me->GetVehicleKit()), summons(me), breathReady(false)
         {
             m_pInstance = me->GetInstanceScript();
-            eyebeamTarget = nullptr;
             assert(vehicle);
             me->SetStandState(UNIT_STAND_STATE_SUBMERGED);
         }
@@ -166,8 +165,6 @@ public:
         ObjectGuid _left, _right;
         EventMap events;
         SummonList summons;
-
-        Unit* eyebeamTarget;
 
         bool _looksAchievement, breathReady;
         uint8 _rubbleAchievement;
@@ -236,6 +233,7 @@ public:
             _rubbleAchievement = 0;
             _looksAchievement = true;
 
+            me->GetMotionMaster()->MoveTargetedHome();
             me->SetDisableGravity(true);
             me->DisableRotate(true);
 
@@ -295,6 +293,24 @@ public:
                 summons.Summon(cr);
         }
 
+        void SummonedCreatureDespawn(Creature* cr) override
+        {
+            if (m_pInstance->GetData(TYPE_KOLOGARN) > NOT_STARTED)
+                return;
+
+            if (cr->GetEntry() == NPC_LEFT_ARM)
+            {
+                _left.Clear();
+                AttachLeftArm();
+            }
+
+            if (cr->GetEntry() == NPC_RIGHT_ARM)
+            {
+                _right.Clear();
+                AttachRightArm();
+            }
+        }
+
         void JustDied(Unit*) override
         {
             summons.DespawnAll();
@@ -340,7 +356,7 @@ public:
 
         void PassengerBoarded(Unit* who, int8  /*seatId*/, bool apply) override
         {
-            if (!me->IsAlive())
+            if (!me->IsAlive() || m_pInstance->GetData(TYPE_KOLOGARN) != IN_PROGRESS)
                 return;
 
             if (!apply)
@@ -408,10 +424,7 @@ public:
         void UpdateAI(uint32 diff) override
         {
             if (!UpdateVictim())
-            {
-                EnterEvadeMode(EVADE_REASON_OTHER);
                 return;
-            }
 
             events.Update(diff);
             if (me->HasUnitState(UNIT_STATE_CASTING))
@@ -465,12 +478,7 @@ public:
                 case EVENT_FOCUSED_EYEBEAM:
                 {
                     events.ScheduleEvent(EVENT_FOCUSED_EYEBEAM, 20s);
-
-                    if ((eyebeamTarget = SelectTarget(SelectTargetMethod::MinDistance, 0, 0, true)))
-                    {
-                        me->CastSpell(eyebeamTarget, SPELL_FOCUSED_EYEBEAM_SUMMON, false);
-                    }
-
+                    me->CastSpell(me, SPELL_FOCUSED_EYEBEAM_SUMMON, false);
                     Talk(EMOTE_EYES);
                     return;
                 }
@@ -621,16 +629,16 @@ public:
     }
     struct boss_kologarn_eyebeamAI : public ScriptedAI
     {
-        boss_kologarn_eyebeamAI(Creature* c) : ScriptedAI(c), _timer(1), _damaged(false), justSpawned(true)
+        boss_kologarn_eyebeamAI(Creature* c) : ScriptedAI(c), _timer(1), _damaged(false)
         {
             m_pInstance = (InstanceScript*)c->GetInstanceScript();
         }
 
         InstanceScript* m_pInstance;
         uint32 _timer;
-        bool _damaged, justSpawned;
+        bool _damaged;
 
-        void DamageDealt(Unit* /*victim*/, uint32& damage, DamageEffectType /*damageType*/) override
+        void DamageDealt(Unit* /*victim*/, uint32& damage, DamageEffectType /*damageType*/, SpellSchoolMask /*damageSchoolMask*/) override
         {
             if (damage > 0 && !_damaged && me->GetInstanceScript())
             {
@@ -640,29 +648,85 @@ public:
             }
         }
 
-        void UpdateAI(uint32 diff) override
+        void IsSummonedBy(WorldObject* summoner) override
         {
-            if (justSpawned)
+            if (!summoner)
             {
-                me->DespawnOrUnsummon(10000);
+                return;
+            }
+
+            // Should only work on playable characters
+            if (Player* player = summoner->ToPlayer())
+            {
+                me->Attack(player, false);
+                me->GetMotionMaster()->MoveChase(player);
+
                 if (Creature* cr = ObjectAccessor::GetCreature(*me, m_pInstance->GetGuidData(TYPE_KOLOGARN)))
                 {
                     me->CastSpell(cr, me->GetEntry() == NPC_EYE_LEFT ? SPELL_FOCUSED_EYEBEAM_LEFT : SPELL_FOCUSED_EYEBEAM_RIGHT, true);
                 }
-                me->CastSpell(me, SPELL_FOCUSED_EYEBEAM, true);
-                justSpawned = false;
             }
+        }
+
+        void UpdateAI(uint32 diff) override
+        {
             if (_timer)
             {
                 _timer += diff;
                 if (_timer >= 2000)
                 {
-                    me->CastSpell(me, (me->GetMap()->Is25ManRaid() ? SPELL_FOCUSED_EYEBEAM_25 : SPELL_FOCUSED_EYEBEAM_10), true);
+                    me->CastSpell(me, SPELL_FOCUSED_EYEBEAM, true);
                     _timer = 0;
                 }
             }
         }
     };
+};
+
+class spell_kologarn_focused_eyebeam : public SpellScript
+{
+    PrepareSpellScript(spell_kologarn_focused_eyebeam);
+
+    bool Load() override
+    {
+        return GetCaster()->IsCreature();
+    }
+
+    void FilterTargetsInitial(std::list<WorldObject*>& targets)
+    {
+        std::list<Unit*> newTargets;
+        Creature* creature = GetCaster()->ToCreature();
+        // Select 3 most distant targets
+        GetCaster()->GetAI()->SelectTargetList(newTargets, 3, SelectTargetMethod::MaxDistance, 0, NonTankTargetSelector(creature, true));
+
+        // If no distant targets available, get 1 target from original list
+        if (newTargets.empty())
+        {
+            if (!targets.empty())
+            {
+                while (1 < targets.size())
+                {
+                    std::list<WorldObject*>::iterator itr = targets.begin();
+                    advance(itr, urand(0, targets.size() - 1));
+                    targets.erase(itr);
+                }
+            }
+            return;
+        }
+
+        // Clear original targets
+        targets.clear();
+
+        // Select a random target
+        std::list<Unit*>::iterator head = newTargets.begin();
+        advance(head, urand(0, newTargets.size() - 1));
+        targets.push_back(*head);
+    }
+
+    void Register() override
+    {
+        OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_kologarn_focused_eyebeam::FilterTargetsInitial, EFFECT_ALL, TARGET_UNIT_SRC_AREA_ENEMY);
+    }
 };
 
 struct boss_kologarn_pit_kill_bunny : public NullCreatureAI
@@ -724,18 +788,16 @@ class spell_ulduar_stone_grip_cast_target : public SpellScript
 
     bool Load() override
     {
-        if (!GetCaster()->IsCreature())
-            return false;
-        return true;
+        return GetCaster()->IsCreature();
     }
 
     void FilterTargetsInitial(std::list<WorldObject*>& targets)
     {
         // Remove "main tank" and non-player targets
-        targets.remove_if (StoneGripTargetSelector(GetCaster()->ToCreature(), GetCaster()->GetVictim()));
+        targets.remove_if(StoneGripTargetSelector(GetCaster()->ToCreature(), GetCaster()->GetVictim()));
         // Maximum affected targets per difficulty mode
         uint32 maxTargets = 1;
-        if (GetSpellInfo()->Id == 63981)
+        if (GetSpellInfo()->Id == SPELL_STONE_GRIP_25)
             maxTargets = 3;
 
         // Return a random amount of targets based on maxTargets
@@ -882,6 +944,7 @@ void AddSC_boss_kologarn()
     RegisterSpellScript(spell_ulduar_stone_grip_cast_target);
     RegisterSpellScript(spell_ulduar_stone_grip_aura);
     RegisterSpellScript(spell_ulduar_squeezed_lifeless);
+    RegisterSpellScript(spell_kologarn_focused_eyebeam);
     RegisterSpellAndAuraScriptPair(spell_kologarn_stone_shout, spell_kologarn_stone_shout_aura);
 
     // Achievements
