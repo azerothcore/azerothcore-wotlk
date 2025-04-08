@@ -310,7 +310,7 @@ void WorldSession::HandleCharCreateOpcode(WorldPacket& recvData)
         LOG_ERROR("network.opcode", "Race ({}) not found in DBC while creating new char for account (ID: {}): wrong DBC files or cheater?", createInfo->Race, GetAccountId());
         return;
     }
-
+/*
     // prevent character creating Expansion race without Expansion account
     if (raceEntry->expansion > Expansion())
     {
@@ -326,7 +326,7 @@ void WorldSession::HandleCharCreateOpcode(WorldPacket& recvData)
         LOG_ERROR("network.opcode", "Expansion {} account:[{}] tried to Create character with expansion {} class ({})", Expansion(), GetAccountId(), classEntry->expansion, createInfo->Class);
         return;
     }
-
+*/
     if (AccountMgr::IsPlayerAccount(GetSecurity()))
     {
         uint32 raceMaskDisabled = sWorld->getIntConfig(CONFIG_CHARACTER_CREATING_DISABLED_RACEMASK);
