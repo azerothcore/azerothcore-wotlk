@@ -1,3 +1,4 @@
+-- DB update 2025_04_08_00 -> 2025_04_09_00
 
 -- Add gold drop
 UPDATE `creature_template` SET `mingold` = 173, `maxgold` = 231 WHERE (`entry` = 23386);
