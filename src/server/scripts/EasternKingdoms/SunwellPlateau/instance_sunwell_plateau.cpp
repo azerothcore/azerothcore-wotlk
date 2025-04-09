@@ -250,9 +250,44 @@ private:
     ObjectGuid _protectorGUID;
 };
 
+enum SunwellTeleportSpells
+{
+    SPELL_TELEPORT_TO_APEX_POINT = 46881,
+    SPELL_TELEPORT_TO_WITCHS_SANCTUM = 46883,
+    SPELL_TELEPORT_TO_SUNWELL_PLATEAU = 46884,
+};
+class spell_sunwell_teleport : public SpellScript
+{
+    PrepareSpellScript(spell_sunwell_teleport);
+public:
+    spell_sunwell_teleport(uint32 triggeredSpellId) : SpellScript(), _triggeredSpellId(triggeredSpellId) { }
+
+    bool Validate(SpellInfo const* /*spellInfo*/) override
+    {
+        return ValidateSpellInfo({ _triggeredSpellId });
+    }
+
+    void HandleScript(SpellEffIndex effIndex)
+    {
+        PreventHitDefaultEffect(effIndex);
+        if (Player* target = GetHitPlayer())
+            target->CastSpell(target, _triggeredSpellId, true);
+    }
+
+    void Register() override
+    {
+        OnEffectHitTarget += SpellEffectFn(spell_sunwell_teleport::HandleScript, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
+    }
+private:
+    uint32 _triggeredSpellId;
+};
+
 void AddSC_instance_sunwell_plateau()
 {
     new instance_sunwell_plateau();
     RegisterSpellScript(spell_cataclysm_breath);
     RegisterSunwellPlateauCreatureAI(npc_sunblade_scout);
+    RegisterSpellScriptWithArgs(spell_sunwell_teleport, "spell_teleport_to_apex_point", SPELL_TELEPORT_TO_APEX_POINT);
+    RegisterSpellScriptWithArgs(spell_sunwell_teleport, "spell_teleport_to_witchs_sanctum", SPELL_TELEPORT_TO_WITCHS_SANCTUM);
+    RegisterSpellScriptWithArgs(spell_sunwell_teleport, "spell_teleport_to_sunwell_plateau", SPELL_TELEPORT_TO_SUNWELL_PLATEAU);
 }
