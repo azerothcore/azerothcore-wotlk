@@ -86,6 +86,7 @@
 #include "WorldSession.h"
 #include "WorldSessionMgr.h"
 #include "WorldState.h"
+#include "WorldStateDefines.h"
 #include "WorldStatePackets.h"
 #include <cmath>
 
@@ -8244,17 +8245,17 @@ void Player::SendInitWorldStates(uint32 zoneId, uint32 areaId)
     packet.AreaID = areaId;
 
     packet.Worldstates.reserve(8);
-    packet.Worldstates.emplace_back(0x8d8, 0); // SCOURGE_EVENT_WORLDSTATE_EASTERN_PLAGUELANDS
-    packet.Worldstates.emplace_back(0x8d7, 0); // SCOURGE_EVENT_WORLDSTATE_TANARIS
-    packet.Worldstates.emplace_back(0x8d6, 0); // SCOURGE_EVENT_WORLDSTATE_BURNING_STEPPES
-    packet.Worldstates.emplace_back(0x8d5, 0); // SCOURGE_EVENT_WORLDSTATE_BLASTED_LANDS
-    packet.Worldstates.emplace_back(0x8d4, 0); // SCOURGE_EVENT_WORLDSTATE_AZSHARA
-    packet.Worldstates.emplace_back(0x8d3, 0); // SCOURGE_EVENT_WORLDSTATE_WINTERSPRING
+    packet.Worldstates.emplace_back(WORLD_STATE_SCOURGE_INVASION_WINTERSPRING, 0);
+    packet.Worldstates.emplace_back(WORLD_STATE_SCOURGE_INVASION_AZSHARA, 0);
+    packet.Worldstates.emplace_back(WORLD_STATE_SCOURGE_INVASION_BLASTED_LANDS, 0);
+    packet.Worldstates.emplace_back(WORLD_STATE_SCOURGE_INVASION_BURNING_STEPPES, 0);
+    packet.Worldstates.emplace_back(WORLD_STATE_SCOURGE_INVASION_TANARIS, 0);
+    packet.Worldstates.emplace_back(WORLD_STATE_SCOURGE_INVASION_EASTERN_PLAGUELANDS, 0);
 
     // 7 1 - Arena season in progress, 0 - end of season
-    packet.Worldstates.emplace_back(0xc77, sArenaSeasonMgr->GetSeasonState() == ARENA_SEASON_STATE_IN_PROGRESS);
+    packet.Worldstates.emplace_back(WORLD_STATE_ARENA_SEASON_PROGRESS, sArenaSeasonMgr->GetSeasonState() == ARENA_SEASON_STATE_IN_PROGRESS);
     // 8 Arena season id
-    packet.Worldstates.emplace_back(0xf3d, sArenaSeasonMgr->GetCurrentSeason());
+    packet.Worldstates.emplace_back(WORLD_STATE_ARENA_SEASON_ID, sArenaSeasonMgr->GetCurrentSeason());
 
     if (mapId == 530) // Outland
     {
