@@ -723,7 +723,7 @@ public:
                     case EVENT_FOLLOW_PLAYER:
                         if (TempSummon* tempSummon = me->ToTempSummon())
                         {
-                            if (Unit* summoner = tempSummon->GetSummonerUnit())
+                            if (Player* summoner = tempSummon->GetSummonerUnit()->ToPlayer())
                             {
                                 StartFollow(summoner);
                             }
