@@ -712,13 +712,10 @@ public:
                     case EVENT_ADD_ARCANE_CHAINS:
                         if (TempSummon* tempSummon = me->ToTempSummon())
                         {
-                            if (Unit* summonerUnit = tempSummon->GetSummonerUnit())
+                            if (Unit* summoner = tempSummon->GetSummonerUnit())
                             {
-                                if (Player* summoner = summonerUnit->ToPlayer())
-                                {
-                                    summoner->CastSpell(summoner, SPELL_ARCANE_CHAINS_CHANNEL_II, TriggerCastFlags(TRIGGERED_FULL_MASK & ~TRIGGERED_IGNORE_AURA_INTERRUPT_FLAGS & ~TRIGGERED_IGNORE_CAST_ITEM & ~TRIGGERED_IGNORE_POWER_AND_REAGENT_COST & ~TRIGGERED_IGNORE_GCD));
-                                    _events.ScheduleEvent(EVENT_FOLLOW_PLAYER, 1s);
-                                }
+                                summoner->CastSpell(summoner, SPELL_ARCANE_CHAINS_CHANNEL_II, TriggerCastFlags(TRIGGERED_FULL_MASK & ~TRIGGERED_IGNORE_AURA_INTERRUPT_FLAGS & ~TRIGGERED_IGNORE_CAST_ITEM & ~TRIGGERED_IGNORE_POWER_AND_REAGENT_COST & ~TRIGGERED_IGNORE_GCD));
+                                _events.ScheduleEvent(EVENT_FOLLOW_PLAYER, 1s);
                             }
                         }
                         break;
@@ -726,7 +723,7 @@ public:
                     case EVENT_FOLLOW_PLAYER:
                         if (TempSummon* tempSummon = me->ToTempSummon())
                         {
-                            if (Player* summoner = tempSummon->GetSummonerUnit()->ToPlayer())
+                            if (Unit* summoner = tempSummon->GetSummonerUnit())
                             {
                                 StartFollow(summoner);
                             }
