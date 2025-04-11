@@ -73,7 +73,8 @@ enum TwinPhases
 {
     ACTION_SISTER_DIED          = 1,
     GROUP_SPECIAL_ABILITY       = 1,
-    GROUP_PYROGENICS            = 2
+    GROUP_PYROGENICS            = 2,
+    GROUP_FLAME_SEAR            = 3
 };
 
 struct boss_sacrolash : public BossAI
@@ -229,20 +230,27 @@ struct boss_alythess : public BossAI
 
             scheduler.CancelGroup(GROUP_SPECIAL_ABILITY);
             scheduler.CancelGroup(GROUP_PYROGENICS);
+            scheduler.CancelGroup(GROUP_FLAME_SEAR);
+            
             // Phase 2
             scheduler.Schedule(16s, GROUP_PYROGENICS, [this](TaskContext context) {
                 DoCastSelf(SPELL_PYROGENICS);
                 context.Repeat(16s, 28s);
             });
+            
+            // Schedule Flame Sear with faster timer for phase 2
+            ScheduleTimedEvent(8s, 10s, [&] {
+                me->CastCustomSpell(SPELL_FLAME_SEAR, SPELLVALUE_MAX_TARGETS, urand(4, 5), me, TRIGGERED_NONE);
+            }, 8s, 10s, GROUP_FLAME_SEAR);
+            
             ScheduleTimedEvent(20s, 26s, [&] {
                 Unit* target = SelectTarget(SelectTargetMethod::MaxThreat, 1, 100.0f);
                 if (!target)
                     target = me->GetVictim();
                 DoCast(target, SPELL_SHADOW_NOVA);
 
-                if (Creature * sacrolash = instance->GetCreature(DATA_SACROLASH))
+                if (Creature* sacrolash = instance->GetCreature(DATA_SACROLASH))
                     sacrolash->AI()->Talk(EMOTE_SHADOW_NOVA, target);
-
             }, 20s, 26s);
         }
     }
@@ -266,9 +274,10 @@ struct boss_alythess : public BossAI
             context.Repeat(21s, 34s);
         });
 
+        // Phase 1 Flame Sear timer - 10-15s
         ScheduleTimedEvent(10s, 15s, [&] {
             me->CastCustomSpell(SPELL_FLAME_SEAR, SPELLVALUE_MAX_TARGETS, urand(4, 5), me, TRIGGERED_NONE);
-        }, 10s, 15s);
+        }, 10s, 15s, GROUP_FLAME_SEAR);
 
         scheduler.Schedule(20s, GROUP_SPECIAL_ABILITY, [this](TaskContext context) {
             Unit* target = SelectTarget(SelectTargetMethod::MaxThreat, 1, 100.0f);
