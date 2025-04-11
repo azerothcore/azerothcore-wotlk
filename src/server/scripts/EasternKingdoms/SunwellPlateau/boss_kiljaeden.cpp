@@ -453,7 +453,7 @@ struct boss_kiljaeden : public BossAI
         for (auto* orb : shieldOrbs)
         {
             orb->DespawnOrUnsummon();
-        }    
+        }
         me->DespawnOrUnsummon();
     }
 
