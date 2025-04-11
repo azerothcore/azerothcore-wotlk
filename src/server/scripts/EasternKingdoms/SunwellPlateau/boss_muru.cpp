@@ -181,20 +181,23 @@ struct npc_singularity : public NullCreatureAI
     void Reset() override
     {
         me->DespawnOrUnsummon(18000);
-        DoCastSelf(SPELL_BLACK_HOLE_SUMMON_VISUAL, true);
-
-        me->m_Events.AddEventAtOffset([&] {
-            DoCastSelf(SPELL_BLACK_HOLE_SUMMON_VISUAL2, true);
-        }, 2s);
 
         me->m_Events.AddEventAtOffset([&] {
             DoCastSelf(SPELL_BLACK_HOLE_SUMMON_VISUAL, true);
+        }, 2s);
+
+        me->m_Events.AddEventAtOffset([&] {
+            DoCastSelf(SPELL_BLACK_HOLE_SUMMON_VISUAL2, true);
         }, 4s);
+
+        me->m_Events.AddEventAtOffset([&] {
+            DoCastSelf(SPELL_BLACK_HOLE_SUMMON_VISUAL, true);
+        }, 6s);
 
         me->m_Events.AddEventAtOffset([&] {
             DoCastSelf(SPELL_BLACK_HOLE_VISUAL2, true);
             DoCastSelf(SPELL_BLACK_HOLE_PASSIVE, true);
-        }, 6s);
+        }, 8s);
 
         me->m_Events.AddEventAtOffset([&] {
             me->KillSelf();
