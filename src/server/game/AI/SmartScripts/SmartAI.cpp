@@ -848,6 +848,7 @@ void SmartAI::AttackStart(Unit* who)
             {
                 me->GetMotionMaster()->MovementExpired();
                 me->StopMoving();
+                me->GetMotionMaster()->Clear(false);
             }
 
             me->GetMotionMaster()->MoveChase(who);
