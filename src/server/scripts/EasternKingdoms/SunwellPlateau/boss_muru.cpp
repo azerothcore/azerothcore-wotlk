@@ -183,7 +183,6 @@ struct npc_singularity : public NullCreatureAI
         me->DespawnOrUnsummon(18000);
         DoCastSelf(SPELL_BLACK_HOLE_SUMMON_VISUAL, true);
 
-        // Proper animation sequence
         me->m_Events.AddEventAtOffset([&] {
             DoCastSelf(SPELL_BLACK_HOLE_SUMMON_VISUAL2, true);
         }, 2s);
@@ -201,7 +200,6 @@ struct npc_singularity : public NullCreatureAI
             me->KillSelf();
         }, 17s);
 
-        // Start movement after 8 seconds
         scheduler.Schedule(8s, [this](TaskContext context)
         {
             auto const& playerList = me->GetMap()->GetPlayers();
