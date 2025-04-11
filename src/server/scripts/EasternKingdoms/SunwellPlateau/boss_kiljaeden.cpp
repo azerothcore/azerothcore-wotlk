@@ -447,13 +447,9 @@ struct boss_kiljaeden : public BossAI
 
     void EnterEvadeMode(EvadeReason why) override
     {
-        BossAI::EnterEvadeMode(why);
-        std::list<Creature*> shieldOrbs;
-        me->GetCreatureListWithEntryInGrid(shieldOrbs, NPC_SHIELD_ORB, 100.0f);
-        for (auto* orb : shieldOrbs)
-        {
-            orb->DespawnOrUnsummon();
-        }
+        if (me->GetReactState() == REACT_PASSIVE)
+            return;
+        ScriptedAI::EnterEvadeMode(why);
         me->DespawnOrUnsummon();
     }
 
