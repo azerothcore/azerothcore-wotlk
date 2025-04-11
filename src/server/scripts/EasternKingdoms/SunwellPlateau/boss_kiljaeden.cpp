@@ -171,7 +171,7 @@ struct npc_kiljaeden_controller : public NullCreatureAI
 
     void JustSummoned(Creature* summon) override
     {
-        summons.Summon(summon);
+        BossAI::JustSummoned(summon);
         if (summon->GetEntry() == NPC_SINISTER_REFLECTION)
             summon->SetInCombatWithZone();
         else if (summon->GetEntry() == NPC_KALECGOS_KJ)
@@ -484,7 +484,7 @@ struct boss_kiljaeden : public BossAI
 
     void JustSummoned(Creature* summon) override
     {
-        summons.Summon(summon);
+        BossAI::JustSummoned(summon);
         if (summon->GetEntry() == NPC_ARMAGEDDON_TARGET)
         {
             summon->SetCanFly(true);
@@ -691,7 +691,7 @@ struct npc_kalecgos_kj : public NullCreatureAI
 
     void JustSummoned(Creature* summon) override
     {
-        summons.Summon(summon);
+        BossAI::JustSummoned(summon);
         if (summon->GetEntry() == NPC_SHATTERED_SUN_RIFTWAKER)
         {
             summon->CastSpell(summon, SPELL_TELEPORT_VISUAL, true);
