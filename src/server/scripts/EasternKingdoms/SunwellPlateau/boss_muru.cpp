@@ -199,7 +199,7 @@ struct npc_singularity : public NullCreatureAI
             DoCastSelf(SPELL_BLACK_HOLE_PASSIVE, true);
         }, 8s);
 
-        me->m_Events.AddEventAtOffset([&] { 
+        me->m_Events.AddEventAtOffset([&] {
             me->KillSelf();
         }, 17s);
 
