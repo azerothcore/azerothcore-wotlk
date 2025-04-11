@@ -229,7 +229,6 @@ struct boss_alythess : public BossAI
 
             scheduler.CancelGroup(GROUP_SPECIAL_ABILITY);
             scheduler.CancelGroup(GROUP_PYROGENICS);
-            
             // Phase 2
             scheduler.Schedule(16s, GROUP_PYROGENICS, [this](TaskContext context) {
                 DoCastSelf(SPELL_PYROGENICS);
