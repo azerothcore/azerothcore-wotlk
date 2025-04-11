@@ -231,18 +231,15 @@ struct boss_alythess : public BossAI
             scheduler.CancelGroup(GROUP_SPECIAL_ABILITY);
             scheduler.CancelGroup(GROUP_PYROGENICS);
             scheduler.CancelGroup(GROUP_FLAME_SEAR);
-            
             // PYROGENICS Phase 2
             scheduler.Schedule(16s, GROUP_PYROGENICS, [this](TaskContext context) {
                 DoCastSelf(SPELL_PYROGENICS);
                 context.Repeat(16s, 28s);
             });
-            
             // FLAME_SEAR phase 2
             ScheduleTimedEvent(8s, 10s, [&] {
                 me->CastCustomSpell(SPELL_FLAME_SEAR, SPELLVALUE_MAX_TARGETS, urand(4, 5), me, TRIGGERED_NONE);
             }, 8s, 10s, GROUP_FLAME_SEAR);
-            
             ScheduleTimedEvent(20s, 26s, [&] {
                 Unit* target = SelectTarget(SelectTargetMethod::MaxThreat, 1, 100.0f);
                 if (!target)
