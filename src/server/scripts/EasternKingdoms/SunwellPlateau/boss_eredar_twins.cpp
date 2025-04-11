@@ -234,7 +234,6 @@ struct boss_alythess : public BossAI
                 DoCastSelf(SPELL_PYROGENICS);
                 context.Repeat(16s, 28s);
             });
-            
             ScheduleTimedEvent(20s, 26s, [&] {
                 Unit* target = SelectTarget(SelectTargetMethod::MaxThreat, 1, 100.0f);
                 if (!target)
