@@ -447,9 +447,17 @@ struct boss_kiljaeden : public BossAI
 
     void EnterEvadeMode(EvadeReason why) override
     {
-        if (me->GetReactState() == REACT_PASSIVE)
-            return;
-        ScriptedAI::EnterEvadeMode(why);
+        // Fix: Allow evade even when in passive state to ensure proper cleanup
+        BossAI::EnterEvadeMode(why);
+        
+        // Make sure all Shield Orbs are properly despawned
+        std::list<Creature*> shieldOrbs;
+        me->GetCreatureListWithEntryInGrid(shieldOrbs, NPC_SHIELD_ORB, 100.0f);
+        for (auto* orb : shieldOrbs)
+        {
+            orb->DespawnOrUnsummon();
+        }
+        
         me->DespawnOrUnsummon();
     }
 
@@ -482,6 +490,22 @@ struct boss_kiljaeden : public BossAI
         }
     }
 
+    void JustSummoned(Creature* summon) override
+    {
+        // Register all summoned creatures to ensure proper cleanup on reset
+        summons.Summon(summon);
+        
+        if (summon->GetEntry() == NPC_ARMAGEDDON_TARGET)
+        {
+            summon->SetCanFly(true);
+            summon->SetDisableGravity(true);
+            summon->CastSpell(summon, SPELL_ARMAGEDDON_VISUAL, true);
+            summon->SetPosition(summon->GetPositionX(), summon->GetPositionY(), summon->GetPositionZ() + 20.0f, 0.0f);
+            summon->m_Events.AddEvent(new CastArmageddon(summon), summon->m_Events.CalculateTime(6000));
+            summon->DespawnOrUnsummon(10000);
+        }
+    }
+
     void JustDied(Unit* /*killer*/) override
     {
         Talk(SAY_KJ_DEATH);
@@ -509,19 +533,6 @@ struct boss_kiljaeden : public BossAI
 
         Talk(SAY_KJ_EMERGE);
         ScheduleBasicAbilities();
-    }
-
-    void JustSummoned(Creature* summon) override
-    {
-        if (summon->GetEntry() == NPC_ARMAGEDDON_TARGET)
-        {
-            summon->SetCanFly(true);
-            summon->SetDisableGravity(true);
-            summon->CastSpell(summon, SPELL_ARMAGEDDON_VISUAL, true);
-            summon->SetPosition(summon->GetPositionX(), summon->GetPositionY(), summon->GetPositionZ() + 20.0f, 0.0f);
-            summon->m_Events.AddEvent(new CastArmageddon(summon), summon->m_Events.CalculateTime(6000));
-            summon->DespawnOrUnsummon(10000);
-        }
     }
 
     void UpdateAI(uint32 diff) override
