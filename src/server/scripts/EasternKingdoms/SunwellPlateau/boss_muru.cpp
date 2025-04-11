@@ -205,7 +205,7 @@ struct npc_singularity : public NullCreatureAI
             for (auto const& playerRef : playerList)
             {
                 if (Player* player = playerRef.GetSource())
-                    if (me->GetDistance2d(player) < 15.0f && player->GetPositionZ() < 72.0f && player->IsAlive() && !player->HasAura(SPELL_BLACK_HOLE_EFFECT))
+                    if (me->IsWithinLOSInMap(player) && player->IsAlive() && !player->HasAura(SPELL_BLACK_HOLE_EFFECT))
                     {
                         me->GetMotionMaster()->MovePoint(0, player->GetPositionX(), player->GetPositionY(), player->GetPositionZ(), false, true);
                         context.Repeat();
