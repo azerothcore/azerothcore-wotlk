@@ -447,10 +447,7 @@ struct boss_kiljaeden : public BossAI
 
     void EnterEvadeMode(EvadeReason why) override
     {
-        // Fix: Allow evade even when in passive state to ensure proper cleanup
         BossAI::EnterEvadeMode(why);
-        
-        // Make sure all Shield Orbs are properly despawned
         std::list<Creature*> shieldOrbs;
         me->GetCreatureListWithEntryInGrid(shieldOrbs, NPC_SHIELD_ORB, 100.0f);
         for (auto* orb : shieldOrbs)
@@ -492,9 +489,7 @@ struct boss_kiljaeden : public BossAI
 
     void JustSummoned(Creature* summon) override
     {
-        // Register all summoned creatures to ensure proper cleanup on reset
         summons.Summon(summon);
-        
         if (summon->GetEntry() == NPC_ARMAGEDDON_TARGET)
         {
             summon->SetCanFly(true);
