@@ -484,7 +484,7 @@ struct boss_kiljaeden : public BossAI
 
     void JustSummoned(Creature* summon) override
     {
-        summons.Summon(summon);
+        BossAI::JustSummoned(summon);
         if (summon->GetEntry() == NPC_ARMAGEDDON_TARGET)
         {
             summon->SetCanFly(true);
