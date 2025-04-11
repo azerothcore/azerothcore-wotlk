@@ -232,13 +232,13 @@ struct boss_alythess : public BossAI
             scheduler.CancelGroup(GROUP_PYROGENICS);
             scheduler.CancelGroup(GROUP_FLAME_SEAR);
             
-            // Phase 2
+            // PYROGENICS Phase 2
             scheduler.Schedule(16s, GROUP_PYROGENICS, [this](TaskContext context) {
                 DoCastSelf(SPELL_PYROGENICS);
                 context.Repeat(16s, 28s);
             });
             
-            // Schedule Flame Sear with faster timer for phase 2
+            // FLAME_SEAR phase 2
             ScheduleTimedEvent(8s, 10s, [&] {
                 me->CastCustomSpell(SPELL_FLAME_SEAR, SPELLVALUE_MAX_TARGETS, urand(4, 5), me, TRIGGERED_NONE);
             }, 8s, 10s, GROUP_FLAME_SEAR);
@@ -268,13 +268,13 @@ struct boss_alythess : public BossAI
             DoCastVictim(SPELL_BLAZE);
         }, 3800ms);
 
-        // Phase 1
+        // PYROGENICS Phase 1
         scheduler.Schedule(21s, GROUP_PYROGENICS, [this](TaskContext context) {
             DoCastSelf(SPELL_PYROGENICS);
             context.Repeat(21s, 34s);
         });
 
-        // Phase 1 Flame Sear timer - 10-15s
+        // FLAME_SEAR Phase 1
         ScheduleTimedEvent(10s, 15s, [&] {
             me->CastCustomSpell(SPELL_FLAME_SEAR, SPELLVALUE_MAX_TARGETS, urand(4, 5), me, TRIGGERED_NONE);
         }, 10s, 15s, GROUP_FLAME_SEAR);
