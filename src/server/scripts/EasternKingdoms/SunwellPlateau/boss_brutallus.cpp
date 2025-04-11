@@ -110,8 +110,8 @@ struct boss_brutallus : public BossAI
 
     void JustDied(Unit* killer) override
     {
-        BossAI::JustDied(killer);
         me->SetCorpseDelay(180);
+        BossAI::JustDied(killer);
         Talk(YELL_DEATH);
 
         DoCastAOE(SPELL_SUMMON_BRUTALLUS_DEATH_CLOUD, true);
