@@ -199,6 +199,10 @@ struct npc_singularity : public NullCreatureAI
             DoCastSelf(SPELL_BLACK_HOLE_PASSIVE, true);
         }, 8s);
 
+        me->m_Events.AddEventAtOffset([&] { 
+            me->KillSelf();
+        }, 17s);
+
         scheduler.Schedule(8s, [this](TaskContext context)
         {
             auto const& playerList = me->GetMap()->GetPlayers();
