@@ -198,24 +198,27 @@ struct npc_dark_fiend : public ScriptedAI
 
     void UpdateAI(uint32 diff) override
     {
-        // Check if victim has changed or disappeared
-        if (!_victimGUID.IsEmpty())
-        {
-            Unit* victim = ObjectAccessor::GetUnit(*me, _victimGUID);
-            if (!victim || victim->isDead() || !victim->IsInWorld())
-            {
-                me->DespawnOrUnsummon();
-                return;
-            }
+        Unit* currentVictim = me->GetVictim();
+        ObjectGuid currentVictimGUID = currentVictim ? currentVictim->GetGUID() : ObjectGuid::Empty;
 
-            if (me->GetVictim() != victim)
-                AttackStart(victim);
+        if (_lastVictimGUID != currentVictimGUID)
+        {
+            // If had a victim before but now it's gone (Vanish, Feign Death, etc.)
+            if (!_lastVictimGUID.IsEmpty() && currentVictimGUID.IsEmpty())
+                me->DespawnOrUnsummon();
+
+            _lastVictimGUID = currentVictimGUID;
+        }
+
+        if (!UpdateVictim())
+            return;
+
+        DoMeleeAttackIfReady();
     }
 
-    if (!UpdateVictim())
-        return;
-    DoMeleeAttackIfReady();
-}
+private:
+    ObjectGuid _lastVictimGUID;
+};
 
 private:
     ObjectGuid _lastVictimGUID;
