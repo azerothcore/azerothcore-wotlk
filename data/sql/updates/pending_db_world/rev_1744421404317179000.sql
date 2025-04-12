@@ -1,7 +1,7 @@
 --
-UPDATE `creature_template` SET 
+UPDATE `creature_template` SET
 `ScriptName` = 'npc_sunblade_arch_mage',
-`AIName` = '' 
+`AIName` = ''
 WHERE `entry` = 25367;
 
 DELETE FROM `creature_template_spell` WHERE `CreatureID` = 25367 AND `Index` IN (0, 1, 2);
