@@ -179,6 +179,7 @@ struct npc_dark_fiend : public ScriptedAI
     npc_dark_fiend(Creature* creature) : ScriptedAI(creature)
     {
         me->SetReactState(REACT_PASSIVE);
+        SetInvincibility(true);
     }
 
     void Reset() override
@@ -187,30 +188,34 @@ struct npc_dark_fiend : public ScriptedAI
 
         me->m_Events.AddEventAtOffset([this]() {
             me->SetReactState(REACT_AGGRESSIVE);
-            if (Unit* target = SelectTargetFromPlayerList(200.0f))
+            if (Unit* target = SelectTargetFromPlayerList(200.0f, 0, true))
+            {
                 AttackStart(target);
-        }, 1000ms, 2000ms);
+                me->AddThreat(target, 100000.0f);
+            }
+        }, 1s, 2s);
     }
 
-    void UpdateAI(uint32 /*diff*/) override
+    void UpdateAI(uint32 diff) override
     {
-        Unit* currentVictim = me->GetVictim();
-        ObjectGuid currentVictimGUID = currentVictim ? currentVictim->GetGUID() : ObjectGuid::Empty;
-
-        if (_lastVictimGUID != currentVictimGUID)
+        // Check if victim has changed or disappeared
+        if (!_victimGUID.IsEmpty())
         {
-            // If had a victim before but now it's gone (Vanish, Feign Death, etc.)
-            if (!_lastVictimGUID.IsEmpty() && currentVictimGUID.IsEmpty())
+            Unit* victim = ObjectAccessor::GetUnit(*me, _victimGUID);
+            if (!victim || victim->isDead() || !victim->IsInWorld())
+            {
                 me->DespawnOrUnsummon();
+                return;
+            }
 
-            _lastVictimGUID = currentVictimGUID;
-        }
-
-        if (!UpdateVictim())
-            return;
-
-        DoMeleeAttackIfReady();
+            if (me->GetVictim() != victim)
+                AttackStart(victim);
     }
+
+    if (!UpdateVictim())
+        return;
+    DoMeleeAttackIfReady();
+}
 
 private:
     ObjectGuid _lastVictimGUID;
