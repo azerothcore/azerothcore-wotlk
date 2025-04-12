@@ -246,8 +246,7 @@ struct npc_dark_fiend : public ScriptedAI
 
         if (!_spellCast && currentVictim && me->IsWithinMeleeRange(currentVictim, 1.0f))
         {
-            me->AddAura(SPELL_DARK_FIEND_TRIGGER, currentVictim);
-            DoCast(me, SPELL_DARK_FIEND_TRIGGER); // Visual effect
+            DoCast(me, SPELL_DARK_FIEND_TRIGGER);
             _spellCast = true;
             me->m_Events.AddEventAtOffset([this]() {
                 me->DespawnOrUnsummon();
