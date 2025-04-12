@@ -1862,7 +1862,7 @@ public:
                 itr->SetPvP(state);
     }
     void UpdatePvP(bool state, bool _override = false);
-    void UpdateZone(uint32 newZone, uint32 newArea);
+    void UpdateZone(uint32 newZone, uint32 newArea, bool force = false);
     void UpdateArea(uint32 newArea);
     void SetNeedZoneUpdate(bool needUpdate) { m_needZoneUpdate = needUpdate; }
 
