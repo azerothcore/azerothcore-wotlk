@@ -117,7 +117,7 @@ struct boss_sacrolash : public BossAI
             Talk(YELL_SISTER_ALYTHESS_DEAD);
             me->CastSpell(me, SPELL_EMPOWER, true);
 
-            scheduler.CancelAll();
+            scheduler.CancelGroup(GROUP_SPECIAL_ABILITY);
             ScheduleTimedEvent(20s, [&] {
                 Unit* target = SelectTarget(SelectTargetMethod::MaxThreat, 1, 100.0f);
                 if (!target)
