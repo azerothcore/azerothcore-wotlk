@@ -226,7 +226,7 @@ struct npc_dark_fiend : public ScriptedAI
             _spellCast = true;
             me->m_Events.AddEventAtOffset([this]() {
                 me->DespawnOrUnsummon();
-            }, 50ms);
+            }, 1s);
         }
             
         DoMeleeAttackIfReady();
