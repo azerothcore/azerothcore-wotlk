@@ -319,24 +319,8 @@ struct npc_sunblade_arch_mage : public ScriptedAI
             {
                 me->NearTeleportTo(target->GetPositionX(), target->GetPositionY(), target->GetPositionZ(), me->GetAngle(target));
                 DoCast(me, SPELL_BLINK, true);
-                
-                ObjectGuid targetGuid = target->GetGUID();
-                scheduler.Schedule(50ms, [this, targetGuid](TaskContext /*context*/)
-                {
-                    if (Unit* stunTarget = ObjectAccessor::GetUnit(*me, targetGuid))
-                    {
-                        if (stunTarget->IsAlive())
-                        {
-                            me->CastSpell(stunTarget, SPELL_STUN, true);
-                            
-                            // Cast Frost Nova right after the stun
-                            scheduler.Schedule(100ms, [this](TaskContext /*context*/)
-                            {
-                                DoCastAOE(SPELL_FROST_NOVA);
-                            });
-                        }
-                    }
-                });
+                DoCastAOE(SPELL_FROST_NOVA, true);
+                target->AddAura(SPELL_STUN, target);
             }
             context.Repeat(20s, 25s);
         });
