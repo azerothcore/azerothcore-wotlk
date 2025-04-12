@@ -192,7 +192,7 @@ struct npc_dark_fiend : public ScriptedAI
         }, 1000ms, 2000ms);
     }
 
-    void UpdateAI(uint32 diff) override
+    void UpdateAI(uint32 /*diff*/) override
     {
         Unit* currentVictim = me->GetVictim();
         ObjectGuid currentVictimGUID = currentVictim ? currentVictim->GetGUID() : ObjectGuid::Empty;
