@@ -8299,29 +8299,29 @@ void Player::SendInitWorldStates(uint32 zoneId, uint32 areaId)
                     packet.Worldstates.emplace_back(WORLD_STATE_OPVP_EP_CROWNGUARDTOWER_N, 1);
                     packet.Worldstates.emplace_back(WORLD_STATE_OPVP_EP_CROWNGUARDTOWER_N_A, 0);
                     packet.Worldstates.emplace_back(WORLD_STATE_OPVP_EP_CROWNGUARDTOWER_N_H, 0);
-                    packet.Worldstates.emplace_back(0x948, 0);  // GENERAL_WORLDSTATES_04
-                    packet.Worldstates.emplace_back(0x949, 0);  // GENERAL_WORLDSTATES_05
+                    packet.Worldstates.emplace_back(WORLD_STATE_OPVP_EP_UNK_7, 0);
+                    packet.Worldstates.emplace_back(WORLD_STATE_OPVP_EP_UNK_8, 0);
                     packet.Worldstates.emplace_back(WORLD_STATE_OPVP_EP_CROWNGUARDTOWER_A, 0);
                     packet.Worldstates.emplace_back(WORLD_STATE_OPVP_EP_CROWNGUARDTOWER_H, 0);
                     packet.Worldstates.emplace_back(WORLD_STATE_OPVP_EP_EASTWALLTOWER_A, 0);
                     packet.Worldstates.emplace_back(WORLD_STATE_OPVP_EP_EASTWALLTOWER_H, 0);
-                    packet.Worldstates.emplace_back(0x935, 0);  // GENERAL_WORLDSTATES_06
-                    packet.Worldstates.emplace_back(0x936, 0);  // GENERAL_WORLDSTATES_07
+                    packet.Worldstates.emplace_back(WORLD_STATE_OPVP_EP_UNK_0, 0);
+                    packet.Worldstates.emplace_back(WORLD_STATE_OPVP_EP_UNK_1, 0);
                     packet.Worldstates.emplace_back(WORLD_STATE_OPVP_EP_EASTWALLTOWER_N_A, 0);
                     packet.Worldstates.emplace_back(WORLD_STATE_OPVP_EP_EASTWALLTOWER_N_H, 0);
                     packet.Worldstates.emplace_back(WORLD_STATE_OPVP_EP_EASTWALLTOWER_N, 1);
                     packet.Worldstates.emplace_back(WORLD_STATE_OPVP_EP_NORTHPASSTOWER_N, 1);
                     packet.Worldstates.emplace_back(WORLD_STATE_OPVP_EP_NORTHPASSTOWER_N_A, 0);
                     packet.Worldstates.emplace_back(WORLD_STATE_OPVP_EP_NORTHPASSTOWER_N_H, 0);
-                    packet.Worldstates.emplace_back(0x93c, 0);  // GENERAL_WORLDSTATES_09
-                    packet.Worldstates.emplace_back(0x93d, 0);  // GENERAL_WORLDSTATES_10
+                    packet.Worldstates.emplace_back(WORLD_STATE_OPVP_EP_UNK_2, 0);
+                    packet.Worldstates.emplace_back(WORLD_STATE_OPVP_EP_UNK_3, 0);
                     packet.Worldstates.emplace_back(WORLD_STATE_OPVP_EP_NORTHPASSTOWER_A, 0);
                     packet.Worldstates.emplace_back(WORLD_STATE_OPVP_EP_NORTHPASSTOWER_H, 0);
                     packet.Worldstates.emplace_back(WORLD_STATE_OPVP_EP_PLAGUEWOODTOWER_N, 1);
                     packet.Worldstates.emplace_back(WORLD_STATE_OPVP_EP_PLAGUEWOODTOWER_N_A, 0);
-                    //packet.Worldstates.emplace_back(0x93f, 1); // GENERAL_WORLDSTATES_13 grey horde not in dbc!
-                    packet.Worldstates.emplace_back(0x940, 0);  // GENERAL_WORLDSTATES_11
-                    packet.Worldstates.emplace_back(0x941, 0);  // GENERAL_WORLDSTATES_12
+                    //packet.Worldstates.emplace_back(WORLD_STATE_OPVP_EP_UNK_4, 1);
+                    packet.Worldstates.emplace_back(WORLD_STATE_OPVP_EP_UNK_5, 0);
+                    packet.Worldstates.emplace_back(WORLD_STATE_OPVP_EP_UNK_6, 0);
                     packet.Worldstates.emplace_back(WORLD_STATE_OPVP_EP_PLAGUEWOODTOWER_A, 0);
                     packet.Worldstates.emplace_back(WORLD_STATE_OPVP_EP_PLAGUEWOODTOWER_H, 0);
 
