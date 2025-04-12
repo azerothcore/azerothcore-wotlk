@@ -216,10 +216,6 @@ private:
     ObjectGuid _lastVictimGUID;
 };
 
-private:
-    ObjectGuid _lastVictimGUID;
-};
-
 struct npc_singularity : public NullCreatureAI
 {
     npc_singularity(Creature* creature) : NullCreatureAI(creature) { }
