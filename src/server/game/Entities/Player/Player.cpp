@@ -8349,81 +8349,81 @@ void Player::SendInitWorldStates(uint32 zoneId, uint32 areaId)
                 else
                 {
                     packet.Worldstates.reserve(75);
-                    packet.Worldstates.emplace_back(0x7ae, 1); // AV_SNOWFALL_N
-                    packet.Worldstates.emplace_back(0x532, 1); // AV_FROSTWOLFHUT_H_C
-                    packet.Worldstates.emplace_back(0x531, 0); // AV_FROSTWOLFHUT_A_C
-                    packet.Worldstates.emplace_back(0x52e, 0); // AV_AID_A_A
-                    packet.Worldstates.emplace_back(0x571, 0); // East Frostwolf Tower Horde Assaulted - UNUSED
-                    packet.Worldstates.emplace_back(0x570, 0); // West Frostwolf Tower Horde Assaulted - UNUSED
-                    packet.Worldstates.emplace_back(0x567, 1); // AV_FROSTWOLFE_CONTROLLED
-                    packet.Worldstates.emplace_back(0x566, 1); // AV_FROSTWOLFW_CONTROLLED
-                    packet.Worldstates.emplace_back(0x550, 1); // AV_N_MINE_N
-                    packet.Worldstates.emplace_back(0x544, 0); // AV_ICEBLOOD_A_A
-                    packet.Worldstates.emplace_back(0x536, 0); // AV_PIKEGRAVE_H_C
-                    packet.Worldstates.emplace_back(0x535, 1); // AV_PIKEGRAVE_A_C
-                    packet.Worldstates.emplace_back(0x518, 0); // AV_STONEHEART_A_A
-                    packet.Worldstates.emplace_back(0x517, 0); // AV_STONEHEART_H_A
-                    packet.Worldstates.emplace_back(0x574, 0); // unk
-                    packet.Worldstates.emplace_back(0x573, 0); // Iceblood Tower Horde Assaulted - UNUSED
-                    packet.Worldstates.emplace_back(0x572, 0); // Towerpoint Horde Assaulted - UNUSED
-                    packet.Worldstates.emplace_back(0x56f, 0); // unk
-                    packet.Worldstates.emplace_back(0x56e, 0); // AV_ICEBLOOD_ASSAULTED
-                    packet.Worldstates.emplace_back(0x56d, 0); // AV_TOWERPOINT_ASSAULTED
-                    packet.Worldstates.emplace_back(0x56c, 0); // AV_FROSTWOLFE_ASSAULTED
-                    packet.Worldstates.emplace_back(0x56b, 0); // AV_FROSTWOLFW_ASSAULTED
-                    packet.Worldstates.emplace_back(0x56a, 1); // unk
-                    packet.Worldstates.emplace_back(0x569, 1); // AV_ICEBLOOD_CONTROLLED
-                    packet.Worldstates.emplace_back(0x568, 1); // AV_TOWERPOINT_CONTROLLED
-                    packet.Worldstates.emplace_back(0x565, 0); // AV_STONEH_ASSAULTED
-                    packet.Worldstates.emplace_back(0x564, 0); // AV_ICEWING_ASSAULTED
-                    packet.Worldstates.emplace_back(0x563, 0); // AV_DUNN_ASSAULTED
-                    packet.Worldstates.emplace_back(0x562, 0); // AV_DUNS_ASSAULTED
-                    packet.Worldstates.emplace_back(0x561, 0); // Stoneheart Bunker Alliance Assaulted - UNUSED
-                    packet.Worldstates.emplace_back(0x560, 0); // Icewing Bunker Alliance Assaulted - UNUSED
-                    packet.Worldstates.emplace_back(0x55f, 0); // Dunbaldar South Alliance Assaulted - UNUSED
-                    packet.Worldstates.emplace_back(0x55e, 0); // Dunbaldar North Alliance Assaulted - UNUSED
-                    packet.Worldstates.emplace_back(0x55d, 0); // AV_STONEH_DESTROYED
-                    packet.Worldstates.emplace_back(0x3c6, 0);  // AV_UNK_02
-                    packet.Worldstates.emplace_back(0x3c4, 0);  // AV_UNK_01
-                    packet.Worldstates.emplace_back(0x3c2, 0);  // AV_STORMPIKE_COMMANDERS
-                    packet.Worldstates.emplace_back(0x516, 1); // AV_STONEHEART_A_C
-                    packet.Worldstates.emplace_back(0x515, 0); // AV_STONEHEART_H_C
-                    packet.Worldstates.emplace_back(0x3b6, 0);  // AV_STORMPIKE_LIEUTENANTS
-                    packet.Worldstates.emplace_back(0x55c, 0); // AV_ICEWING_DESTROYED
-                    packet.Worldstates.emplace_back(0x55b, 0); // AV_DUNN_DESTROYED
-                    packet.Worldstates.emplace_back(0x55a, 0); // AV_DUNS_DESTROYED
-                    packet.Worldstates.emplace_back(0x559, 0); // unk
-                    packet.Worldstates.emplace_back(0x558, 0); // AV_ICEBLOOD_DESTROYED
-                    packet.Worldstates.emplace_back(0x557, 0); // AV_TOWERPOINT_DESTROYED
-                    packet.Worldstates.emplace_back(0x556, 0); // AV_FROSTWOLFE_DESTROYED
-                    packet.Worldstates.emplace_back(0x555, 0); // AV_FROSTWOLFW_DESTROYED
-                    packet.Worldstates.emplace_back(0x554, 1); // AV_STONEH_CONTROLLED
-                    packet.Worldstates.emplace_back(0x553, 1); // AV_ICEWING_CONTROLLED
-                    packet.Worldstates.emplace_back(0x552, 1); // AV_DUNN_CONTROLLED
-                    packet.Worldstates.emplace_back(0x551, 1); // AV_DUNS_CONTROLLED
-                    packet.Worldstates.emplace_back(0x54f, 0); // AV_N_MINE_H
-                    packet.Worldstates.emplace_back(0x54e, 0); // AV_N_MINE_A
-                    packet.Worldstates.emplace_back(0x54d, 1); // AV_S_MINE_N
-                    packet.Worldstates.emplace_back(0x54c, 0); // AV_S_MINE_H
-                    packet.Worldstates.emplace_back(0x54b, 0); // AV_S_MINE_A
-                    packet.Worldstates.emplace_back(0x545, 0); // AV_ICEBLOOD_H_A
-                    packet.Worldstates.emplace_back(0x543, 1); // AV_ICEBLOOD_H_C
-                    packet.Worldstates.emplace_back(0x542, 0); // AV_ICEBLOOD_A_C
-                    packet.Worldstates.emplace_back(0x540, 0); // AV_SNOWFALL_H_A
-                    packet.Worldstates.emplace_back(0x53f, 0); // AV_SNOWFALL_A_A
-                    packet.Worldstates.emplace_back(0x53e, 0); // AV_SNOWFALL_H_C
-                    packet.Worldstates.emplace_back(0x53d, 0); // AV_SNOWFALL_A_C
-                    packet.Worldstates.emplace_back(0x53c, 0); // AV_FROSTWOLF_H_A
-                    packet.Worldstates.emplace_back(0x53b, 0); // AV_FROSTWOLF_A_A
-                    packet.Worldstates.emplace_back(0x53a, 1); // AV_FROSTWOLF_H_C
-                    packet.Worldstates.emplace_back(0x539, 0); // AV_FROSTWOLF_A_C
-                    packet.Worldstates.emplace_back(0x538, 0); // AV_PIKEGRAVE_H_A
-                    packet.Worldstates.emplace_back(0x537, 0); // AV_PIKEGRAVE_A_A
-                    packet.Worldstates.emplace_back(0x534, 0); // AV_FROSTWOLFHUT_H_A
-                    packet.Worldstates.emplace_back(0x533, 0); // AV_FROSTWOLFHUT_A_A
-                    packet.Worldstates.emplace_back(0x530, 0); // AV_AID_H_A
-                    packet.Worldstates.emplace_back(0x52f, 0); // AV_AID_H_C
-                    packet.Worldstates.emplace_back(0x52d, 1); // AV_AID_A_C
+                    packet.Worldstates.emplace_back(WORLD_STATE_BATTLEGROUND_AV_SNOWFALL_N, 1);
+                    packet.Worldstates.emplace_back(WORLD_STATE_BATTLEGROUND_AV_FROSTWOLFHUT_H_C, 1);
+                    packet.Worldstates.emplace_back(WORLD_STATE_BATTLEGROUND_AV_FROSTWOLFHUT_A_C, 0);
+                    packet.Worldstates.emplace_back(WORLD_STATE_BATTLEGROUND_AV_AID_A_A, 0);
+                    packet.Worldstates.emplace_back(WORLD_STATE_BATTLEGROUND_AV_FROSTWOLFE_UNUSED, 0);
+                    packet.Worldstates.emplace_back(WORLD_STATE_BATTLEGROUND_AV_FROSTWOLFW_UNUSED, 0);
+                    packet.Worldstates.emplace_back(WORLD_STATE_BATTLEGROUND_AV_FROSTWOLFE_CONTROLLED, 1);
+                    packet.Worldstates.emplace_back(WORLD_STATE_BATTLEGROUND_AV_FROSTWOLFW_CONTROLLED, 1);
+                    packet.Worldstates.emplace_back(WORLD_STATE_BATTLEGROUND_AV_N_MINE_N, 1);
+                    packet.Worldstates.emplace_back(WORLD_STATE_BATTLEGROUND_AV_ICEBLOOD_A_A, 0);
+                    packet.Worldstates.emplace_back(WORLD_STATE_BATTLEGROUND_AV_PIKEGRAVE_H_C, 0);
+                    packet.Worldstates.emplace_back(WORLD_STATE_BATTLEGROUND_AV_PIKEGRAVE_A_C, 1);
+                    packet.Worldstates.emplace_back(WORLD_STATE_BATTLEGROUND_AV_STONEHEART_A_A, 0);
+                    packet.Worldstates.emplace_back(WORLD_STATE_BATTLEGROUND_AV_STONEHEART_H_A, 0);
+                    packet.Worldstates.emplace_back(WORLD_STATE_BATTLEGROUND_AV_UNK_0, 0);
+                    packet.Worldstates.emplace_back(WORLD_STATE_BATTLEGROUND_AV_ICEBLOOD_UNUSED, 0);
+                    packet.Worldstates.emplace_back(WORLD_STATE_BATTLEGROUND_AV_TOWERPOINT_UNUSED, 0);
+                    packet.Worldstates.emplace_back(WORLD_STATE_BATTLEGROUND_AV_UNK_1, 0);
+                    packet.Worldstates.emplace_back(WORLD_STATE_BATTLEGROUND_AV_ICEBLOOD_ASSAULTED, 0);
+                    packet.Worldstates.emplace_back(WORLD_STATE_BATTLEGROUND_AV_TOWERPOINT_ASSAULTED, 0);
+                    packet.Worldstates.emplace_back(WORLD_STATE_BATTLEGROUND_AV_FROSTWOLFE_ASSAULTED, 0);
+                    packet.Worldstates.emplace_back(WORLD_STATE_BATTLEGROUND_AV_FROSTWOLFW_ASSAULTED, 0);
+                    packet.Worldstates.emplace_back(WORLD_STATE_BATTLEGROUND_AV_UNK_2, 1);
+                    packet.Worldstates.emplace_back(WORLD_STATE_BATTLEGROUND_AV_ICEBLOOD_CONTROLLED, 1);
+                    packet.Worldstates.emplace_back(WORLD_STATE_BATTLEGROUND_AV_TOWERPOINT_CONTROLLED, 1);
+                    packet.Worldstates.emplace_back(WORLD_STATE_BATTLEGROUND_AV_STONEH_ASSAULTED, 0);
+                    packet.Worldstates.emplace_back(WORLD_STATE_BATTLEGROUND_AV_ICEWING_ASSAULTED, 0);
+                    packet.Worldstates.emplace_back(WORLD_STATE_BATTLEGROUND_AV_DUNN_ASSAULTED, 0);
+                    packet.Worldstates.emplace_back(WORLD_STATE_BATTLEGROUND_AV_DUNS_ASSAULTED, 0);
+                    packet.Worldstates.emplace_back(WORLD_STATE_BATTLEGROUND_AV_STONEH_UNUSED, 0);
+                    packet.Worldstates.emplace_back(WORLD_STATE_BATTLEGROUND_AV_ICEWING_UNUSED, 0);
+                    packet.Worldstates.emplace_back(WORLD_STATE_BATTLEGROUND_AV_DUNS_UNUSED, 0);
+                    packet.Worldstates.emplace_back(WORLD_STATE_BATTLEGROUND_AV_DUNN_UNUSED, 0);
+                    packet.Worldstates.emplace_back(WORLD_STATE_BATTLEGROUND_AV_STONEH_DESTROYED, 0);
+                    packet.Worldstates.emplace_back(WORLD_STATE_BATTLEGROUND_AV_UNK_3, 0);
+                    packet.Worldstates.emplace_back(WORLD_STATE_BATTLEGROUND_AV_UNK_4, 0);
+                    packet.Worldstates.emplace_back(WORLD_STATE_BATTLEGROUND_AV_STORMPIKE_COMMANDERS, 0);
+                    packet.Worldstates.emplace_back(WORLD_STATE_BATTLEGROUND_AV_STONEHEART_A_C, 1);
+                    packet.Worldstates.emplace_back(WORLD_STATE_BATTLEGROUND_AV_STONEHEART_H_C, 0);
+                    packet.Worldstates.emplace_back(WORLD_STATE_BATTLEGROUND_AV_STORMPIKE_LIEUTENANTS, 0);
+                    packet.Worldstates.emplace_back(WORLD_STATE_BATTLEGROUND_AV_ICEWING_DESTROYED, 0);
+                    packet.Worldstates.emplace_back(WORLD_STATE_BATTLEGROUND_AV_DUNN_DESTROYED, 0);
+                    packet.Worldstates.emplace_back(WORLD_STATE_BATTLEGROUND_AV_DUNS_DESTROYED, 0);
+                    packet.Worldstates.emplace_back(WORLD_STATE_BATTLEGROUND_AV_UNK_5, 0);
+                    packet.Worldstates.emplace_back(WORLD_STATE_BATTLEGROUND_AV_ICEBLOOD_DESTROYED, 0);
+                    packet.Worldstates.emplace_back(WORLD_STATE_BATTLEGROUND_AV_TOWERPOINT_DESTROYED, 0);
+                    packet.Worldstates.emplace_back(WORLD_STATE_BATTLEGROUND_AV_FROSTWOLFE_DESTROYED, 0);
+                    packet.Worldstates.emplace_back(WORLD_STATE_BATTLEGROUND_AV_FROSTWOLFW_DESTROYED, 0);
+                    packet.Worldstates.emplace_back(WORLD_STATE_BATTLEGROUND_AV_STONEH_CONTROLLED, 1);
+                    packet.Worldstates.emplace_back(WORLD_STATE_BATTLEGROUND_AV_ICEWING_CONTROLLED, 1);
+                    packet.Worldstates.emplace_back(WORLD_STATE_BATTLEGROUND_AV_DUNN_CONTROLLED, 1);
+                    packet.Worldstates.emplace_back(WORLD_STATE_BATTLEGROUND_AV_DUNS_CONTROLLED, 1);
+                    packet.Worldstates.emplace_back(WORLD_STATE_BATTLEGROUND_AV_N_MINE_H, 0);
+                    packet.Worldstates.emplace_back(WORLD_STATE_BATTLEGROUND_AV_N_MINE_A, 0);
+                    packet.Worldstates.emplace_back(WORLD_STATE_BATTLEGROUND_AV_S_MINE_N, 1);
+                    packet.Worldstates.emplace_back(WORLD_STATE_BATTLEGROUND_AV_S_MINE_H, 0);
+                    packet.Worldstates.emplace_back(WORLD_STATE_BATTLEGROUND_AV_S_MINE_A, 0);
+                    packet.Worldstates.emplace_back(WORLD_STATE_BATTLEGROUND_AV_ICEBLOOD_H_A, 0);
+                    packet.Worldstates.emplace_back(WORLD_STATE_BATTLEGROUND_AV_ICEBLOOD_H_C, 1);
+                    packet.Worldstates.emplace_back(WORLD_STATE_BATTLEGROUND_AV_ICEBLOOD_A_C, 0);
+                    packet.Worldstates.emplace_back(WORLD_STATE_BATTLEGROUND_AV_SNOWFALL_H_A, 0);
+                    packet.Worldstates.emplace_back(WORLD_STATE_BATTLEGROUND_AV_SNOWFALL_A_A, 0);
+                    packet.Worldstates.emplace_back(WORLD_STATE_BATTLEGROUND_AV_SNOWFALL_H_C, 0);
+                    packet.Worldstates.emplace_back(WORLD_STATE_BATTLEGROUND_AV_SNOWFALL_A_C, 0);
+                    packet.Worldstates.emplace_back(WORLD_STATE_BATTLEGROUND_AV_FROSTWOLF_H_A, 0);
+                    packet.Worldstates.emplace_back(WORLD_STATE_BATTLEGROUND_AV_FROSTWOLF_A_A, 0);
+                    packet.Worldstates.emplace_back(WORLD_STATE_BATTLEGROUND_AV_FROSTWOLF_H_C, 1);
+                    packet.Worldstates.emplace_back(WORLD_STATE_BATTLEGROUND_AV_FROSTWOLF_A_C, 0);
+                    packet.Worldstates.emplace_back(WORLD_STATE_BATTLEGROUND_AV_PIKEGRAVE_H_A, 0);
+                    packet.Worldstates.emplace_back(WORLD_STATE_BATTLEGROUND_AV_PIKEGRAVE_A_A, 0);
+                    packet.Worldstates.emplace_back(WORLD_STATE_BATTLEGROUND_AV_FROSTWOLFHUT_H_A, 0);
+                    packet.Worldstates.emplace_back(WORLD_STATE_BATTLEGROUND_AV_FROSTWOLFHUT_A_A, 0);
+                    packet.Worldstates.emplace_back(WORLD_STATE_BATTLEGROUND_AV_AID_H_A, 0);
+                    packet.Worldstates.emplace_back(WORLD_STATE_BATTLEGROUND_AV_AID_H_C, 0);
+                    packet.Worldstates.emplace_back(WORLD_STATE_BATTLEGROUND_AV_AID_A_C, 1);
                 }
                 break;
             case 3277: // Warsong Gulch
