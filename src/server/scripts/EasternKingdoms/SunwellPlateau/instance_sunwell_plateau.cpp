@@ -291,19 +291,19 @@ enum SunbladeArchMageSpells
 
 struct npc_sunblade_arch_mage : public ScriptedAI
 {
-    npc_sunblade_arch_mage(Creature* creature) : ScriptedAI(creature) 
+    npc_sunblade_arch_mage(Creature* creature) : ScriptedAI(creature)
     {
         scheduler.SetValidator([this]
         {
             return !me->HasUnitState(UNIT_STATE_CASTING);
         });
     }
-    
+
     void Reset() override
     {
         scheduler.CancelAll();
     }
-    
+
     void JustEngagedWith(Unit* /*who*/) override
     {
         scheduler.Schedule(6s, 12s, [this](TaskContext context)
@@ -322,16 +322,16 @@ struct npc_sunblade_arch_mage : public ScriptedAI
             context.Repeat(20s, 25s);
         });
     }
-    
+
     void UpdateAI(uint32 diff) override
     {
         if (!UpdateVictim())
             return;
-        
+
         scheduler.Update(diff);
         DoMeleeAttackIfReady();
     }
-    
+
 private:
     TaskScheduler scheduler;
 };
