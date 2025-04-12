@@ -209,12 +209,6 @@ struct npc_dark_fiend : public ScriptedAI
             damage = me->GetHealth() - me->GetMaxHealth() * 0.01f;
     }
 
-    void AuraRemoved(AuraEffect const* aurEff, AuraEffectHandleModes /*mode*/) override
-    {
-        if (aurEff->GetId() == SPELL_DARK_FIEND_APPEARANCE)
-            me->DespawnOrUnsummon();
-    }
-
     void UpdateAI(uint32 /*diff*/) override
     {
         // Check if victim has changed or disappeared
