@@ -75,7 +75,7 @@ struct boss_muru : public BossAI
     void MoveInLineOfSight(Unit* who) override
     {
         // Radius of room is ~38.5f this might need adjusting a bit
-        if (!me->IsInCombat() && who->IsPlayer() && me->IsWithinDistInMap(who, 38.0f))
+        if (!me->IsInCombat() && who->IsPlayer() && me->IsWithinDistInMap(who, 37.0f))
         {
             me->SetInCombatWithZone();
         }
