@@ -947,7 +947,7 @@ void BattlefieldWG::FillInitialWorldStates(WorldPackets::WorldState::InitWorldSt
 
     // Note: cleanup these two, their names look awkward
     packet.Worldstates.emplace_back(WORLD_STATE_BATTLEFIELD_WG_ACTIVE, IsWarTime() ? 0 : 1);
-    packet.Worldstates.emplace_back(WORLD_STATE_BATTLEFIELD_WG_SHOW_WORLDSTATE, IsWarTime() ? 1 : 0);
+    packet.Worldstates.emplace_back(WORLD_STATE_BATTLEFIELD_WG_SHOW, IsWarTime() ? 1 : 0);
     packet.Worldstates.emplace_back(WORLD_STATE_BATTLEFIELD_WG_CONTROL, m_DefenderTeam == TEAM_ALLIANCE ? 2 : 1); // Alliance 2, Hord 1
     packet.Worldstates.emplace_back(WORLD_STATE_BATTLEFIELD_WG_ICON_ACTIVE, iconActive ? 1 : 0);
 
@@ -999,7 +999,7 @@ void BattlefieldWG::SendUpdateWorldStates(Player* player)
     SendUpdateWorldStateMessage(WORLD_STATE_BATTLEFIELD_WG_ATTACKER, GetAttackerTeam(), player);
     SendUpdateWorldStateMessage(WORLD_STATE_BATTLEFIELD_WG_DEFENDER, GetDefenderTeam(), player);
     SendUpdateWorldStateMessage(WORLD_STATE_BATTLEFIELD_WG_ACTIVE, IsWarTime() ? 0 : 1, player);
-    SendUpdateWorldStateMessage(WORLD_STATE_BATTLEFIELD_WG_SHOW_WORLDSTATE, IsWarTime() ? 1 : 0, player);
+    SendUpdateWorldStateMessage(WORLD_STATE_BATTLEFIELD_WG_SHOW, IsWarTime() ? 1 : 0, player);
     SendUpdateWorldStateMessage(WORLD_STATE_BATTLEFIELD_WG_CONTROL, GetDefenderTeam() == TEAM_ALLIANCE ? 2 : 1, player);
     SendUpdateWorldStateMessage(WORLD_STATE_BATTLEFIELD_WG_ICON_ACTIVE, iconActive ? 1 : 0, player);
 
