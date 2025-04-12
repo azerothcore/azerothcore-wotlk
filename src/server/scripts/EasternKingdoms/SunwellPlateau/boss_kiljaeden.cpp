@@ -335,6 +335,19 @@ struct boss_kiljaeden : public BossAI
 
         ScheduleHealthCheckEvent(25, [&] {
             _phase = PHASE_SACRIFICE;
+
+            me->m_Events.AddEventAtOffset([&] {
+                Talk(SAY_KJ_REFLECTION);
+                me->CastCustomSpell(SPELL_SINISTER_REFLECTION, SPELLVALUE_MAX_TARGETS, 1, me, TRIGGERED_NONE);
+                me->CastCustomSpell(SPELL_SINISTER_REFLECTION, SPELLVALUE_MAX_TARGETS, 1, me, TRIGGERED_NONE);
+                me->CastCustomSpell(SPELL_SINISTER_REFLECTION, SPELLVALUE_MAX_TARGETS, 1, me, TRIGGERED_NONE);
+                me->CastCustomSpell(SPELL_SINISTER_REFLECTION, SPELLVALUE_MAX_TARGETS, 1, me, TRIGGERED_NONE);
+            }, 1s);
+
+            me->m_Events.AddEventAtOffset([&] {
+                DoCastSelf(SPELL_SHADOW_SPIKE);
+            }, 2s);
+
             if (Creature* kalec = instance->GetCreature(DATA_KALECGOS_KJ))
             {
                 kalec->AI()->Talk(SAY_KALECGOS_FOCUS, 8s);
@@ -371,15 +384,7 @@ struct boss_kiljaeden : public BossAI
 
                         ScheduleBasicAbilities();
 
-                        me->m_Events.AddEventAtOffset([&] {
-                            Talk(SAY_KJ_REFLECTION);
-                            me->CastCustomSpell(SPELL_SINISTER_REFLECTION, SPELLVALUE_MAX_TARGETS, 1, me, TRIGGERED_NONE);
-                            me->CastCustomSpell(SPELL_SINISTER_REFLECTION, SPELLVALUE_MAX_TARGETS, 1, me, TRIGGERED_NONE);
-                            me->CastCustomSpell(SPELL_SINISTER_REFLECTION, SPELLVALUE_MAX_TARGETS, 1, me, TRIGGERED_NONE);
-                            me->CastCustomSpell(SPELL_SINISTER_REFLECTION, SPELLVALUE_MAX_TARGETS, 1, me, TRIGGERED_NONE);
-                        }, 1s);
-
-                        ScheduleTimedEvent(15s, [&] {
+                        ScheduleTimedEvent(25s, [&] {
                             Talk(EMOTE_KJ_DARKNESS);
                             DoCastAOE(SPELL_DARKNESS_OF_A_THOUSAND_SOULS);
                         }, 25s);
