@@ -117,7 +117,7 @@ struct boss_sacrolash : public BossAI
             Talk(YELL_SISTER_ALYTHESS_DEAD);
             me->CastSpell(me, SPELL_EMPOWER, true);
 
-            scheduler.CancelGroup(GROUP_SPECIAL_ABILITY);
+            scheduler.CancelAll();
             ScheduleTimedEvent(20s, [&] {
                 Unit* target = SelectTarget(SelectTargetMethod::MaxThreat, 1, 100.0f);
                 if (!target)
@@ -228,9 +228,7 @@ struct boss_alythess : public BossAI
             Talk(YELL_SISTER_SACROLASH_DEAD);
             me->CastSpell(me, SPELL_EMPOWER, true);
 
-            scheduler.CancelGroup(GROUP_SPECIAL_ABILITY);
-            scheduler.CancelGroup(GROUP_PYROGENICS);
-            scheduler.CancelGroup(GROUP_FLAME_SEAR);
+            scheduler.CancelAll();
             // PYROGENICS Phase 2
             scheduler.Schedule(16s, GROUP_PYROGENICS, [this](TaskContext context) {
                 DoCastSelf(SPELL_PYROGENICS);
