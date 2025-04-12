@@ -176,7 +176,7 @@ struct boss_entropius : public ScriptedAI
 
 struct npc_dark_fiend : public ScriptedAI
 {
-    npc_dark_fiend(Creature* creature) : ScriptedAI(creature) 
+    npc_dark_fiend(Creature* creature) : ScriptedAI(creature)
     {
         me->SetReactState(REACT_PASSIVE);
     }
@@ -184,7 +184,7 @@ struct npc_dark_fiend : public ScriptedAI
     void Reset() override
     {
         _lastVictimGUID.Clear();
-        
+
         me->m_Events.AddEventAtOffset([this]() {
             me->SetReactState(REACT_AGGRESSIVE);
             if (Unit* target = SelectTargetFromPlayerList(200.0f))
@@ -197,22 +197,22 @@ struct npc_dark_fiend : public ScriptedAI
         // Check if victim has changed or disappeared
         Unit* currentVictim = me->GetVictim();
         ObjectGuid currentVictimGUID = currentVictim ? currentVictim->GetGUID() : ObjectGuid::Empty;
-        
+
         if (_lastVictimGUID != currentVictimGUID)
         {
             // If had a victim before but now it's gone (Vanish, Feign Death, etc.)
             if (!_lastVictimGUID.IsEmpty() && currentVictimGUID.IsEmpty())
                 me->DespawnOrUnsummon();
-                
+
             _lastVictimGUID = currentVictimGUID;
         }
-        
+
         if (!UpdateVictim())
             return;
-            
+
         DoMeleeAttackIfReady();
     }
-    
+
 private:
     ObjectGuid _lastVictimGUID;
 };
