@@ -1,3 +1,4 @@
+-- DB update 2025_04_11_01 -> 2025_04_12_00
 --
 UPDATE `creature_template` SET
 `ScriptName` = 'npc_sunblade_arch_mage',
