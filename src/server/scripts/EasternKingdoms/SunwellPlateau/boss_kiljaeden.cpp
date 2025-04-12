@@ -346,7 +346,7 @@ struct boss_kiljaeden : public BossAI
 
             me->m_Events.AddEventAtOffset([&] {
                 DoCastSelf(SPELL_SHADOW_SPIKE);
-            }, 3s);
+            }, 2s);
 
             if (Creature* kalec = instance->GetCreature(DATA_KALECGOS_KJ))
             {
