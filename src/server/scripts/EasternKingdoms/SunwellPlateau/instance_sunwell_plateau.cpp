@@ -73,7 +73,7 @@ ObjectData const summonData[] =
     { NPC_SHIELD_ORB,             DATA_KJ_CONTROLLER },
     { NPC_SINISTER_REFLECTION,    DATA_KJ_CONTROLLER },
     { 0,                          0                  }
-};DoCast(me, SPELL_BLINK, true);
+};
 
 class instance_sunwell_plateau : public InstanceMapScript
 {
