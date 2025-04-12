@@ -285,7 +285,7 @@ private:
 enum SunbladeArchMageSpells
 {
     SPELL_ARCANE_EXPLOSION    = 46553,
-    SPELL_BLINK               = 46573,
+    SPELL_BLINK               = 29208,
     SPELL_FROST_NOVA          = 46555
 };
 
@@ -316,7 +316,7 @@ struct npc_sunblade_arch_mage : public ScriptedAI
         {
             if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 30.0f, true))
             {
-                DoCast(target, SPELL_BLINK, true);
+                DoCast(me, SPELL_BLINK, true);
                 DoCastAOE(SPELL_FROST_NOVA, true);
             }
             context.Repeat(20s, 25s);
