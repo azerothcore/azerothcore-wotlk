@@ -8488,38 +8488,38 @@ void Player::SendInitWorldStates(uint32 zoneId, uint32 areaId)
                 else
                 {
                     packet.Worldstates.reserve(32);
-                    packet.Worldstates.emplace_back(0xac1, 0);   // Horde Bases
-                    packet.Worldstates.emplace_back(0xac0, 0);   // Alliance Bases
-                    packet.Worldstates.emplace_back(0xab6, 0);   // Mage Tower - Horde conflict
-                    packet.Worldstates.emplace_back(0xab5, 0);   // Mage Tower - Alliance conflict
-                    packet.Worldstates.emplace_back(0xab4, 0);   // Fel Reaver - Horde conflict
-                    packet.Worldstates.emplace_back(0xab3, 0);   // Fel Reaver - Alliance conflict
-                    packet.Worldstates.emplace_back(0xab2, 0);   // Draenei - Alliance conflict
-                    packet.Worldstates.emplace_back(0xab1, 0);   // Draenei - Horde conflict
-                    packet.Worldstates.emplace_back(0xab0, 0);   // unk (0 at start)
-                    packet.Worldstates.emplace_back(0xaaf, 0);   // unk (0 at start)
-                    packet.Worldstates.emplace_back(0xaad, 0);   // Draenei - Horde control
-                    packet.Worldstates.emplace_back(0xaac, 0);   // Draenei - Alliance control
-                    packet.Worldstates.emplace_back(0xaab, 1);   // Draenei uncontrolled (1 - yes, 0 - no)
-                    packet.Worldstates.emplace_back(0xaaa, 0);   // Mage Tower - Alliance control
-                    packet.Worldstates.emplace_back(0xaa9, 0);   // Mage Tower - Horde control
-                    packet.Worldstates.emplace_back(0xaa8, 1);   // Mage Tower uncontrolled (1 - yes, 0 - no)
-                    packet.Worldstates.emplace_back(0xaa7, 0);   // Fel Reaver - Horde control
-                    packet.Worldstates.emplace_back(0xaa6, 0);   // Fel Reaver - Alliance control
-                    packet.Worldstates.emplace_back(0xaa5, 1);   // Fel Reaver uncontrolled (1 - yes, 0 - no)
-                    packet.Worldstates.emplace_back(0xaa4, 0);   // Boold Elf - Horde control
-                    packet.Worldstates.emplace_back(0xaa3, 0);   // Boold Elf - Alliance control
-                    packet.Worldstates.emplace_back(0xaa2, 1);   // Boold Elf uncontrolled (1 - yes, 0 - no)
-                    packet.Worldstates.emplace_back(0xac5, 1);   // Flag (1 - show, 0 - hide) - doesn't work exactly this way!
-                    packet.Worldstates.emplace_back(0xad2, 1);   // Horde top-stats (1 - show, 0 - hide) // 02 -> horde picked up the flag
-                    packet.Worldstates.emplace_back(0xad1, 1);   // Alliance top-stats (1 - show, 0 - hide) // 02 -> alliance picked up the flag
-                    packet.Worldstates.emplace_back(0xabe, 0);   // Horde resources
-                    packet.Worldstates.emplace_back(0xabd, 0);   // Alliance resources
-                    packet.Worldstates.emplace_back(0xa05, 142); // unk, constant?
-                    packet.Worldstates.emplace_back(0xaa0, 0);   // Capturing progress-bar (100 -> empty (only grey), 0 -> blue|red (no grey), default 0)
-                    packet.Worldstates.emplace_back(0xa9f, 0);   // Capturing progress-bar (0 - left, 100 - right)
-                    packet.Worldstates.emplace_back(0xa9e, 0);   // Capturing progress-bar (1 - show, 0 - hide)
-                    packet.Worldstates.emplace_back(0xc0d, 379); // unk, constant?
+                    packet.Worldstates.emplace_back(WORLD_STATE_BATTLEGROUND_EY_HORDE_BASE, 0);
+                    packet.Worldstates.emplace_back(WORLD_STATE_BATTLEGROUND_EY_ALLIANCE_BASE, 0);
+                    packet.Worldstates.emplace_back(WORLD_STATE_BATTLEGROUND_EY_MAGE_TOWER_HORDE_CONFLICT, 0);
+                    packet.Worldstates.emplace_back(WORLD_STATE_BATTLEGROUND_EY_MAGE_TOWER_ALLIANCE_CONFLICT, 0);
+                    packet.Worldstates.emplace_back(WORLD_STATE_BATTLEGROUND_EY_FEL_REAVER_HORDE_CONFLICT, 0);
+                    packet.Worldstates.emplace_back(WORLD_STATE_BATTLEGROUND_EY_FEL_REAVER_ALLIANCE_CONFLICT, 0);
+                    packet.Worldstates.emplace_back(WORLD_STATE_BATTLEGROUND_EY_DRAENEI_RUINS_ALLIANCE_CONFLICT, 0);
+                    packet.Worldstates.emplace_back(WORLD_STATE_BATTLEGROUND_EY_DRAENEI_RUINS_HORDE_CONFLICT, 0);
+                    packet.Worldstates.emplace_back(WORLD_STATE_BATTLEGROUND_EY_UNK_2, 0);
+                    packet.Worldstates.emplace_back(WORLD_STATE_BATTLEGROUND_EY_UNK_1, 0);
+                    packet.Worldstates.emplace_back(WORLD_STATE_BATTLEGROUND_EY_DRAENEI_RUINS_HORDE_CONTROL, 0);
+                    packet.Worldstates.emplace_back(WORLD_STATE_BATTLEGROUND_EY_DRAENEI_RUINS_ALLIANCE_CONTROL, 0);
+                    packet.Worldstates.emplace_back(WORLD_STATE_BATTLEGROUND_EY_DRAENEI_RUINS_UNCONTROL, 1);
+                    packet.Worldstates.emplace_back(WORLD_STATE_BATTLEGROUND_EY_MAGE_TOWER_ALLIANCE_CONTROL, 0);
+                    packet.Worldstates.emplace_back(WORLD_STATE_BATTLEGROUND_EY_MAGE_TOWER_HORDE_CONTROL, 0);
+                    packet.Worldstates.emplace_back(WORLD_STATE_BATTLEGROUND_EY_MAGE_TOWER_UNCONTROL, 1);
+                    packet.Worldstates.emplace_back(WORLD_STATE_BATTLEGROUND_EY_FEL_REAVER_HORDE_CONTROL, 0);
+                    packet.Worldstates.emplace_back(WORLD_STATE_BATTLEGROUND_EY_FEL_REAVER_ALLIANCE_CONTROL, 0);
+                    packet.Worldstates.emplace_back(WORLD_STATE_BATTLEGROUND_EY_FEL_REAVER_UNCONTROL, 1);
+                    packet.Worldstates.emplace_back(WORLD_STATE_BATTLEGROUND_EY_BLOOD_ELF_HORDE_CONTROL, 0);
+                    packet.Worldstates.emplace_back(WORLD_STATE_BATTLEGROUND_EY_BLOOD_ELF_ALLIANCE_CONTROL, 0);
+                    packet.Worldstates.emplace_back(WORLD_STATE_BATTLEGROUND_EY_BLOOD_ELF_UNCONTROL, 1);
+                    packet.Worldstates.emplace_back(WORLD_STATE_BATTLEGROUND_EY_FLAG, 1);
+                    packet.Worldstates.emplace_back(WORLD_STATE_BATTLEGROUND_EY_FLAG_STATE_HORDE, 1);
+                    packet.Worldstates.emplace_back(WORLD_STATE_BATTLEGROUND_EY_FLAG_STATE_ALLIANCE, 1);
+                    packet.Worldstates.emplace_back(WORLD_STATE_BATTLEGROUND_EY_HORDE_RESOURCES, 0);
+                    packet.Worldstates.emplace_back(WORLD_STATE_BATTLEGROUND_EY_ALLIANCE_RESOURCES, 0);
+                    packet.Worldstates.emplace_back(WORLD_STATE_BATTLEGROUND_EY_UNK_0, 142);
+                    packet.Worldstates.emplace_back(WORLD_STATE_BATTLEGROUND_EY_PROGRESS_BAR_PERCENT_GREY, 0);
+                    packet.Worldstates.emplace_back(WORLD_STATE_BATTLEGROUND_EY_PROGRESS_BAR_STATUS, 0);
+                    packet.Worldstates.emplace_back(WORLD_STATE_BATTLEGROUND_EY_PROGRESS_BAR_SHOW, 0);
+                    packet.Worldstates.emplace_back(WORLD_STATE_BATTLEGROUND_EY_UNK_3, 379);
                     // missing unknowns
                 }
                 break;
