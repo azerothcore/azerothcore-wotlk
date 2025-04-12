@@ -287,7 +287,7 @@ enum SunbladeArchMageSpells
     SPELL_ARCANE_EXPLOSION    = 46553,
     SPELL_BLINK               = 46573,
     SPELL_FROST_NOVA          = 46555,
-    SPELL_STUN                = 46441  // Placeholder stun spell this doesn't seem to work right now anyways
+    SPELL_STUN                = 46441  // Placeholder stun spell
 };
 
 struct npc_sunblade_arch_mage : public ScriptedAI
