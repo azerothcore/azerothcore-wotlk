@@ -51,7 +51,11 @@ enum Spells
     SPELL_BLACK_HOLE_SUMMON_VISUAL2     = 46247,
     SPELL_BLACK_HOLE_VISUAL2            = 46235,
     SPELL_BLACK_HOLE_PASSIVE            = 46228,
-    SPELL_BLACK_HOLE_EFFECT             = 46230
+    SPELL_BLACK_HOLE_EFFECT             = 46230,
+
+    // Dark Fiend Spells
+    SPELL_DARK_FIEND_APPEARANCE         = 45934,
+    SPELL_DARK_FIEND_AURA               = 45944
 };
 
 struct boss_muru : public BossAI
@@ -180,6 +184,7 @@ struct npc_dark_fiend : public ScriptedAI
     {
         me->SetReactState(REACT_PASSIVE);
         SetInvincibility(true);
+        DoCast(me, SPELL_DARK_FIEND_APPEARANCE);
     }
 
     void Reset() override
