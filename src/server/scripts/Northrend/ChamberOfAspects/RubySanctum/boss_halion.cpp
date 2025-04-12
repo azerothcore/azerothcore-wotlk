@@ -715,8 +715,8 @@ public:
                     break;
             }
 
-            _instance->DoUpdateWorldState(WORLDSTATE_CORPOREALITY_MATERIAL, _corporeality * 10);
-            _instance->DoUpdateWorldState(WORLDSTATE_CORPOREALITY_TWILIGHT, 100 - _corporeality * 10);
+            _instance->DoUpdateWorldState(WORLD_STATE_RUBY_SANCTUM_CORPOREALITY_MATERIAL, _corporeality * 10);
+            _instance->DoUpdateWorldState(WORLD_STATE_RUBY_SANCTUM_CORPOREALITY_TWILIGHT, 100 - _corporeality * 10);
 
             if (Creature* twilightHalion = ObjectAccessor::GetCreature(*me, _instance->GetGuidData(NPC_TWILIGHT_HALION)))
             {
@@ -1272,9 +1272,9 @@ class spell_halion_twilight_division : public SpellScript
         if (GameObject* gobject = halion->FindNearestGameObject(GO_HALION_PORTAL_1, 100.0f))
             gobject->Delete();
 
-        instance->DoUpdateWorldState(WORLDSTATE_CORPOREALITY_TOGGLE, 1);
-        instance->DoUpdateWorldState(WORLDSTATE_CORPOREALITY_MATERIAL, 50);
-        instance->DoUpdateWorldState(WORLDSTATE_CORPOREALITY_TWILIGHT, 50);
+        instance->DoUpdateWorldState(WORLD_STATE_RUBY_SANCTUM_CORPOREALITY_TOGGLE, 1);
+        instance->DoUpdateWorldState(WORLD_STATE_RUBY_SANCTUM_CORPOREALITY_MATERIAL, 50);
+        instance->DoUpdateWorldState(WORLD_STATE_RUBY_SANCTUM_CORPOREALITY_TWILIGHT, 50);
     }
 
     void Register() override

@@ -418,7 +418,7 @@ void OutdoorPvPZM::SetHordeTowersControlled(uint32 count)
 
 void OutdoorPvPZM::FillInitialWorldStates(WorldPackets::WorldState::InitWorldStates& packet)
 {
-    packet.Worldstates.emplace_back(WORLD_STATE_OPVP_ZM_WORLDSTATE_UNK_1, 1);
+    packet.Worldstates.emplace_back(WORLD_STATE_OPVP_ZM_UNK, 1);
     for (OPvPCapturePointMap::iterator itr = _capturePoints.begin(); itr != _capturePoints.end(); ++itr)
     {
         itr->second->FillInitialWorldStates(packet);
@@ -433,7 +433,7 @@ void OutdoorPvPZM::SendRemoveWorldStates(Player* player)
     player->SendUpdateWorldState(WORLD_STATE_OPVP_ZM_UI_TOWER_SLIDER_N_E, 0);
     player->SendUpdateWorldState(WORLD_STATE_OPVP_ZM_UI_TOWER_SLIDER_POS_E, 0);
     player->SendUpdateWorldState(WORLD_STATE_OPVP_ZM_UI_TOWER_SLIDER_DISPLAY_E, 0);
-    player->SendUpdateWorldState(WORLD_STATE_OPVP_ZM_WORLDSTATE_UNK_1, 1);
+    player->SendUpdateWorldState(WORLD_STATE_OPVP_ZM_UNK, 1);
     player->SendUpdateWorldState(WORLD_STATE_OPVP_ZM_UI_TOWER_EAST_N, 0);
     player->SendUpdateWorldState(WORLD_STATE_OPVP_ZM_UI_TOWER_EAST_H, 0);
     player->SendUpdateWorldState(WORLD_STATE_OPVP_ZM_UI_TOWER_EAST_A, 0);

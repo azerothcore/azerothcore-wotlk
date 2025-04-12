@@ -8778,9 +8778,9 @@ void Player::SendInitWorldStates(uint32 zoneId, uint32 areaId)
                 else
                 {
                     packet.Worldstates.reserve(3);
-                    packet.Worldstates.emplace_back(0x13b9, 50); // WORLDSTATE_CORPOREALITY_MATERIAL
-                    packet.Worldstates.emplace_back(0x13ba, 50); // WORLDSTATE_CORPOREALITY_TWILIGHT
-                    packet.Worldstates.emplace_back(0x13bb, 0);  // WORLDSTATE_CORPOREALITY_TOGGLE
+                    packet.Worldstates.emplace_back(WORLD_STATE_RUBY_SANCTUM_CORPOREALITY_MATERIAL, 50);
+                    packet.Worldstates.emplace_back(WORLD_STATE_RUBY_SANCTUM_CORPOREALITY_TWILIGHT, 50);
+                    packet.Worldstates.emplace_back(WORLD_STATE_RUBY_SANCTUM_CORPOREALITY_TOGGLE, 0);
                 }
                 break;
             case 4812: // Icecrown Citadel
@@ -8789,11 +8789,11 @@ void Player::SendInitWorldStates(uint32 zoneId, uint32 areaId)
                 else
                 {
                     packet.Worldstates.reserve(5);
-                    packet.Worldstates.emplace_back(0x1327, 0);  // WORLDSTATE_SHOW_TIMER (Blood Quickening weekly)
-                    packet.Worldstates.emplace_back(0x1328, 30); // WORLDSTATE_EXECUTION_TIME
-                    packet.Worldstates.emplace_back(0x134c, 0);  // WORLDSTATE_SHOW_ATTEMPTS
-                    packet.Worldstates.emplace_back(0x134d, 50); // WORLDSTATE_ATTEMPTS_REMAINING
-                    packet.Worldstates.emplace_back(0x134e, 50); // WORLDSTATE_ATTEMPTS_MAX
+                    packet.Worldstates.emplace_back(WORLD_STATE_ICECROWN_CITADEL_SHOW_TIMER, 0);
+                    packet.Worldstates.emplace_back(WORLD_STATE_ICECROWN_CITADEL_EXECUTION_TIME, 30);
+                    packet.Worldstates.emplace_back(WORLD_STATE_ICECROWN_CITADEL_SHOW_ATTEMPTS, 0);
+                    packet.Worldstates.emplace_back(WORLD_STATE_ICECROWN_CITADEL_ATTEMPTS_REMAINING, 50);
+                    packet.Worldstates.emplace_back(WORLD_STATE_ICECROWN_CITADEL_ATTEMPTS_MAX, 50);
                 }
                 break;
             case 4100: // The Culling of Stratholme
@@ -8802,11 +8802,11 @@ void Player::SendInitWorldStates(uint32 zoneId, uint32 areaId)
                 else
                 {
                     packet.Worldstates.reserve(5);
-                    packet.Worldstates.emplace_back(0xd97, 0);  // WORLDSTATE_SHOW_CRATES
-                    packet.Worldstates.emplace_back(0xd98, 0);  // WORLDSTATE_CRATES_REVEALED
-                    packet.Worldstates.emplace_back(0xdb0, 0);  // WORLDSTATE_WAVE_COUNT
-                    packet.Worldstates.emplace_back(0xf5b, 25); // WORLDSTATE_TIME_GUARDIAN
-                    packet.Worldstates.emplace_back(0xf5c, 0);  // WORLDSTATE_TIME_GUARDIAN_SHOW
+                    packet.Worldstates.emplace_back(WORLD_STATE_CULLING_OF_STRATHOLME_SHOW_CRATES, 0);
+                    packet.Worldstates.emplace_back(WORLD_STATE_CULLING_OF_STRATHOLME_CRATES_REVEALED, 0);
+                    packet.Worldstates.emplace_back(WORLD_STATE_CULLING_OF_STRATHOLME_WAVE_COUNT, 0);
+                    packet.Worldstates.emplace_back(WORLD_STATE_CULLING_OF_STRATHOLME_TIME_GUARDIAN, 25);
+                    packet.Worldstates.emplace_back(WORLD_STATE_CULLING_OF_STRATHOLME_TIME_GUARDIAN_SHOW, 0);
                 }
                 break;
             case 4228: // The Oculus
@@ -8815,8 +8815,8 @@ void Player::SendInitWorldStates(uint32 zoneId, uint32 areaId)
                 else
                 {
                     packet.Worldstates.reserve(2);
-                    packet.Worldstates.emplace_back(0xdc4, 0); // WORLD_STATE_CENTRIFUGE_CONSTRUCT_SHOW
-                    packet.Worldstates.emplace_back(0xd9e, 0); // WORLD_STATE_CENTRIFUGE_CONSTRUCT_AMOUNT
+                    packet.Worldstates.emplace_back(WORLD_STATE_OCULUS_CENTRIFUGE_CONSTRUCT_SHOW, 0);
+                    packet.Worldstates.emplace_back(WORLD_STATE_OCULUS_CENTRIFUGE_CONSTRUCT_AMOUNT, 0);
                 }
                 break;
             case 4273: // Ulduar
@@ -8825,8 +8825,8 @@ void Player::SendInitWorldStates(uint32 zoneId, uint32 areaId)
                 else
                 {
                     packet.Worldstates.reserve(2);
-                    packet.Worldstates.emplace_back(0x1024, 0); // WORLDSTATE_ALGALON_TIMER_ENABLED
-                    packet.Worldstates.emplace_back(0x1023, 0); // WORLDSTATE_ALGALON_DESPAWN_TIMER
+                    packet.Worldstates.emplace_back(WORLD_STATE_ULDUAR_ALGALON_TIMER_ENABLED, 0);
+                    packet.Worldstates.emplace_back(WORLD_STATE_ULDUAR_ALGALON_DESPAWN_TIMER, 0);
                 }
                 break;
             case 4415: // Violet Hold
@@ -8835,9 +8835,9 @@ void Player::SendInitWorldStates(uint32 zoneId, uint32 areaId)
                 else
                 {
                     packet.Worldstates.reserve(3);
-                    packet.Worldstates.emplace_back(0xee8, 0);   // WORLD_STATE_VH_SHOW
-                    packet.Worldstates.emplace_back(0xee7, 100); // WORLD_STATE_VH_PRISON_STATE
-                    packet.Worldstates.emplace_back(0xee2, 0);   // WORLD_STATE_VH_WAVE_COUNT
+                    packet.Worldstates.emplace_back(WORLD_STATE_VIOLET_HOLD_SHOW, 0);
+                    packet.Worldstates.emplace_back(WORLD_STATE_VIOLET_HOLD_PRISON_STATE, 100);
+                    packet.Worldstates.emplace_back(WORLD_STATE_VIOLET_HOLD_WAVE_COUNT, 0);
                 }
                 break;
             case 4820: // Halls of Refection
@@ -8846,8 +8846,8 @@ void Player::SendInitWorldStates(uint32 zoneId, uint32 areaId)
                 else
                 {
                     packet.Worldstates.reserve(2);
-                    packet.Worldstates.emplace_back(0x1314, 0); // WORLD_STATE_HOR_WAVES_ENABLED
-                    packet.Worldstates.emplace_back(0x1312, 0); // WORLD_STATE_HOR_WAVE_COUNT
+                    packet.Worldstates.emplace_back(WORLD_STATE_HALLS_OF_REFLECTION_WAVES_ENABLED, 0);
+                    packet.Worldstates.emplace_back(WORLD_STATE_HALLS_OF_REFLECTION_WAVE_COUNT, 0);
                 }
                 break;
             case 4298: // Scarlet Enclave (DK starting zone)
@@ -8875,10 +8875,10 @@ void Player::SendInitWorldStates(uint32 zoneId, uint32 areaId)
                 [[fallthrough]];
             default:
                 packet.Worldstates.reserve(4);
-                packet.Worldstates.emplace_back(0x914, 0);
-                packet.Worldstates.emplace_back(0x913, 0);
-                packet.Worldstates.emplace_back(0x912, 0);
-                packet.Worldstates.emplace_back(0x915, 0);
+                packet.Worldstates.emplace_back(WORLD_STATE_GENERIC_UNK_2, 0);
+                packet.Worldstates.emplace_back(WORLD_STATE_GENERIC_UNK_1, 0);
+                packet.Worldstates.emplace_back(WORLD_STATE_GENERIC_UNK_0, 0);
+                packet.Worldstates.emplace_back(WORLD_STATE_GENERIC_UNK_3, 0);
                 break;
             }
         }
