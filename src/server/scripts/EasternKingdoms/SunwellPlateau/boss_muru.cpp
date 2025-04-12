@@ -185,12 +185,11 @@ struct npc_dark_fiend : public ScriptedAI
     {
         _lastVictimGUID.Clear();
         
-        // Start attacking after 1-2s as per SmartAI
         me->m_Events.AddEventAtOffset([this]() {
             me->SetReactState(REACT_AGGRESSIVE);
             if (Unit* target = SelectTargetFromPlayerList(200.0f))
                 AttackStart(target);
-        }, 1500ms);
+        }, 1000ms, 2000ms);
     }
 
     void UpdateAI(uint32 diff) override
