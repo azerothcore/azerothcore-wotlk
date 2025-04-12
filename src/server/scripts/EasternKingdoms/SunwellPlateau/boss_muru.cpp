@@ -174,6 +174,50 @@ struct boss_entropius : public ScriptedAI
     }
 };
 
+struct npc_dark_fiend : public ScriptedAI
+{
+    npc_dark_fiend(Creature* creature) : ScriptedAI(creature) 
+    {
+        me->SetReactState(REACT_PASSIVE);
+    }
+
+    void Reset() override
+    {
+        _lastVictimGUID.Clear();
+        
+        // Start attacking after 1-2s as per SmartAI
+        me->m_Events.AddEventAtOffset([this]() {
+            me->SetReactState(REACT_AGGRESSIVE);
+            if (Unit* target = SelectTargetFromPlayerList(200.0f))
+                AttackStart(target);
+        }, 1500ms);
+    }
+
+    void UpdateAI(uint32 diff) override
+    {
+        // Check if victim has changed or disappeared
+        Unit* currentVictim = me->GetVictim();
+        ObjectGuid currentVictimGUID = currentVictim ? currentVictim->GetGUID() : ObjectGuid::Empty;
+        
+        if (_lastVictimGUID != currentVictimGUID)
+        {
+            // If had a victim before but now it's gone (Vanish, Feign Death, etc.)
+            if (!_lastVictimGUID.IsEmpty() && currentVictimGUID.IsEmpty())
+                me->DespawnOrUnsummon();
+                
+            _lastVictimGUID = currentVictimGUID;
+        }
+        
+        if (!UpdateVictim())
+            return;
+            
+        DoMeleeAttackIfReady();
+    }
+    
+private:
+    ObjectGuid _lastVictimGUID;
+};
+
 struct npc_singularity : public NullCreatureAI
 {
     npc_singularity(Creature* creature) : NullCreatureAI(creature) { }
@@ -270,7 +314,8 @@ class spell_muru_darkness_aura : public AuraScript
 
     void OnPeriodic(AuraEffect const* aurEff)
     {
-        if (aurEff->GetTickNumber() == 3)
+        // Change from tick 3 to tick 2 for faster spawn in Phase 1
+        if (aurEff->GetTickNumber() == 2)
             for (uint8 i = 0; i < 8; ++i)
                 GetUnitOwner()->CastSpell(GetUnitOwner(), SPELL_SUMMON_DARK_FIEND + i, true);
     }
@@ -390,6 +435,7 @@ void AddSC_boss_muru()
     RegisterSunwellPlateauCreatureAI(boss_muru);
     RegisterSunwellPlateauCreatureAI(boss_entropius);
     RegisterSunwellPlateauCreatureAI(npc_singularity);
+    RegisterSunwellPlateauCreatureAI(npc_dark_fiend);
 
     RegisterSpellScript(spell_muru_summon_blood_elves_periodic_aura);
     RegisterSpellScript(spell_muru_darkness_aura);
