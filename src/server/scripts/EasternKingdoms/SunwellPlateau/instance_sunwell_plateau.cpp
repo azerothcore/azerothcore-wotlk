@@ -285,7 +285,7 @@ private:
 enum SunbladeArchMageSpells
 {
     SPELL_ARCANE_EXPLOSION    = 46553,
-    SPELL_BLINK               = 29208,
+    SPELL_BLINK               = 28401,
     SPELL_FROST_NOVA          = 46555
 };
 
