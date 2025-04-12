@@ -2243,6 +2243,7 @@ class spell_dragonblight_corrosive_spit : public AuraScript
     }
 };
 
+//Lanny NPCbot
 /*######
 ## Quest 12260: The Perfect Dissemblance
 ######*/
@@ -2273,7 +2274,6 @@ class spell_dragonblight_cancel_banshees_magic_mirror : public SpellScript
     }
 };
 
-//Lanny NPCbot
 /*######
 ## Quest 12274: A Fall From Grace
 ######*/
