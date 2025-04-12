@@ -8705,34 +8705,33 @@ void Player::SendInitWorldStates(uint32 zoneId, uint32 areaId)
                 else
                 {
                     packet.Worldstates.reserve(24);
-                    // 1-3 A defend, 4-6 H defend, 7-9 unk defend, 1 - ok, 2 - half destroyed, 3 - destroyed
-                    packet.Worldstates.emplace_back(0xf09, 0); // Gate of Temple
-                    packet.Worldstates.emplace_back(0xe36, 0); // Gate of Yellow Moon
-                    packet.Worldstates.emplace_back(0xe27, 0); // Gate of Green Emerald
-                    packet.Worldstates.emplace_back(0xe24, 0); // Gate of Blue Sapphire
-                    packet.Worldstates.emplace_back(0xe21, 0); // Gate of Red Sun
-                    packet.Worldstates.emplace_back(0xe1e, 0); // Gate of Purple Ametyst
-                    packet.Worldstates.emplace_back(0xdf3, 0); // bonus timer (1 - on, 0 - off)
-                    packet.Worldstates.emplace_back(0xded, 0); // Horde Attacker
-                    packet.Worldstates.emplace_back(0xdec, 0); // Alliance Attacker
+                    packet.Worldstates.emplace_back(WORLD_STATE_BATTLEGROUND_SA_ANCIENT_GATE, 0);
+                    packet.Worldstates.emplace_back(WORLD_STATE_BATTLEGROUND_SA_YELLOW_GATE, 0);
+                    packet.Worldstates.emplace_back(WORLD_STATE_BATTLEGROUND_SA_GREEN_GATE, 0);
+                    packet.Worldstates.emplace_back(WORLD_STATE_BATTLEGROUND_SA_BLUE_GATE, 0);
+                    packet.Worldstates.emplace_back(WORLD_STATE_BATTLEGROUND_SA_RED_GATE, 0);
+                    packet.Worldstates.emplace_back(WORLD_STATE_BATTLEGROUND_SA_PURPLE_GATE, 0);
+                    packet.Worldstates.emplace_back(WORLD_STATE_BATTLEGROUND_SA_BONUS_TIMER, 0);
+                    packet.Worldstates.emplace_back(WORLD_STATE_BATTLEGROUND_SA_HORDE_ATTACKER, 0);
+                    packet.Worldstates.emplace_back(WORLD_STATE_BATTLEGROUND_SA_ENABLE_TIMER, 0);
 
                     // End Round timer, example: 19:59 -> A:BC
-                    packet.Worldstates.emplace_back(0xde9, 0); // C
-                    packet.Worldstates.emplace_back(0xde8, 0); // B
-                    packet.Worldstates.emplace_back(0xde7, 0); // A
+                    packet.Worldstates.emplace_back(WORLD_STATE_BATTLEGROUND_SA_TIMER_SECONDS_SECOND_DIGIT, 0); // C
+                    packet.Worldstates.emplace_back(WORLD_STATE_BATTLEGROUND_SA_TIMER_SECONDS_FIRST_DIGIT, 0); // B
+                    packet.Worldstates.emplace_back(WORLD_STATE_BATTLEGROUND_SA_TIMER_MINUTES, 0); // A
 
-                    packet.Worldstates.emplace_back(0xe35, 0); // BG_SA_CENTER_GY_ALLIANCE
-                    packet.Worldstates.emplace_back(0xe34, 0); // BG_SA_RIGHT_GY_ALLIANCE
-                    packet.Worldstates.emplace_back(0xe33, 0); // BG_SA_LEFT_GY_ALLIANCE
-                    packet.Worldstates.emplace_back(0xe32, 0); // BG_SA_CENTER_GY_HORDE
-                    packet.Worldstates.emplace_back(0xe31, 0); // BG_SA_LEFT_GY_HORDE
-                    packet.Worldstates.emplace_back(0xe30, 0); // BG_SA_RIGHT_GY_HORDE
-                    packet.Worldstates.emplace_back(0xe2f, 0); // BG_SA_HORDE_DEFENCE_TOKEN
-                    packet.Worldstates.emplace_back(0xe2e, 0); // BG_SA_ALLIANCE_DEFENCE_TOKEN
-                    packet.Worldstates.emplace_back(0xe2d, 0); // BG_SA_LEFT_ATT_TOKEN_HRD
-                    packet.Worldstates.emplace_back(0xe2c, 0); // BG_SA_RIGHT_ATT_TOKEN_HRD
-                    packet.Worldstates.emplace_back(0xe2b, 0); // BG_SA_RIGHT_ATT_TOKEN_ALL
-                    packet.Worldstates.emplace_back(0xe2a, 0); // BG_SA_LEFT_ATT_TOKEN_ALL
+                    packet.Worldstates.emplace_back(WORLD_STATE_BATTLEGROUND_SA_CENTER_GY_ALLIANCE, 0);
+                    packet.Worldstates.emplace_back(WORLD_STATE_BATTLEGROUND_SA_RIGHT_GY_ALLIANCE, 0);
+                    packet.Worldstates.emplace_back(WORLD_STATE_BATTLEGROUND_SA_LEFT_GY_ALLIANCE, 0);
+                    packet.Worldstates.emplace_back(WORLD_STATE_BATTLEGROUND_SA_CENTER_GY_HORDE, 0);
+                    packet.Worldstates.emplace_back(WORLD_STATE_BATTLEGROUND_SA_LEFT_GY_HORDE, 0);
+                    packet.Worldstates.emplace_back(WORLD_STATE_BATTLEGROUND_SA_RIGHT_GY_HORDE, 0);
+                    packet.Worldstates.emplace_back(WORLD_STATE_BATTLEGROUND_SA_HORDE_DEFENSE_TOKEN, 0);
+                    packet.Worldstates.emplace_back(WORLD_STATE_BATTLEGROUND_SA_ALLIANCE_DEFENSE_TOKEN, 0);
+                    packet.Worldstates.emplace_back(WORLD_STATE_BATTLEGROUND_SA_LEFT_ATTACK_TOKEN_HORDE, 0);
+                    packet.Worldstates.emplace_back(WORLD_STATE_BATTLEGROUND_SA_RIGHT_ATTACK_TOKEN_HORDE, 0);
+                    packet.Worldstates.emplace_back(WORLD_STATE_BATTLEGROUND_SA_RIGHT_ATTACK_TOKEN_ALLIANCE, 0);
+                    packet.Worldstates.emplace_back(WORLD_STATE_BATTLEGROUND_SA_LEFT_ATTACK_TOKEN_ALLIANCE, 0);
                     // missing unknowns
                 }
                 break;
@@ -8753,24 +8752,24 @@ void Player::SendInitWorldStates(uint32 zoneId, uint32 areaId)
                 else
                 {
                     packet.Worldstates.reserve(18);
-                    packet.Worldstates.emplace_back(0x107d, 1);   // BG_IC_ALLIANCE_RENFORT_SET
-                    packet.Worldstates.emplace_back(0x107e, 1);   // BG_IC_HORDE_RENFORT_SET
-                    packet.Worldstates.emplace_back(0x1082, 300); // BG_IC_ALLIANCE_RENFORT
-                    packet.Worldstates.emplace_back(0x1083, 300); // BG_IC_HORDE_RENFORT
-                    packet.Worldstates.emplace_back(0x10e2, 1);   // BG_IC_GATE_FRONT_H_WS_OPEN
-                    packet.Worldstates.emplace_back(0x10e1, 1);   // BG_IC_GATE_WEST_H_WS_OPEN
-                    packet.Worldstates.emplace_back(0x10e0, 1);   // BG_IC_GATE_EAST_H_WS_OPEN
-                    packet.Worldstates.emplace_back(0x10e3, 1);   // BG_IC_GATE_FRONT_A_WS_OPEN
-                    packet.Worldstates.emplace_back(0x10e4, 1);   // BG_IC_GATE_WEST_A_WS_OPEN
-                    packet.Worldstates.emplace_back(0x10e5, 1);   // BG_IC_GATE_EAST_A_WS_OPEN
-                    packet.Worldstates.emplace_back(0x10dd, 1);   // unk
-                    packet.Worldstates.emplace_back(0x10cd, 1);   // BG_IC_DOCKS_UNCONTROLLED
-                    packet.Worldstates.emplace_back(0x10c8, 1);   // BG_IC_HANGAR_UNCONTROLLED
-                    packet.Worldstates.emplace_back(0x10d2, 1);   // BG_IC_QUARRY_UNCONTROLLED
-                    packet.Worldstates.emplace_back(0x10d7, 1);   // BG_IC_REFINERY_UNCONTROLLED
-                    packet.Worldstates.emplace_back(0x10c6, 1);   // BG_IC_WORKSHOP_UNCONTROLLED
-                    packet.Worldstates.emplace_back(0x1093, 1);   // unk
-                    packet.Worldstates.emplace_back(0x10f9, 1);   // unk
+                    packet.Worldstates.emplace_back(WORLD_STATE_BATTLEGROUND_IC_ALLIANCE_REINFORCEMENT_SET, 1);
+                    packet.Worldstates.emplace_back(WORLD_STATE_BATTLEGROUND_IC_HORDE_REINFORCEMENT_SET, 1);
+                    packet.Worldstates.emplace_back(WORLD_STATE_BATTLEGROUND_IC_ALLIANCE_REINFORCEMENT, 300);
+                    packet.Worldstates.emplace_back(WORLD_STATE_BATTLEGROUND_IC_HORDE_REINFORCEMENT, 300);
+                    packet.Worldstates.emplace_back(WORLD_STATE_BATTLEGROUND_IC_GATE_FRONT_H_WS_OPEN, 1);
+                    packet.Worldstates.emplace_back(WORLD_STATE_BATTLEGROUND_IC_GATE_WEST_H_WS_OPEN, 1);
+                    packet.Worldstates.emplace_back(WORLD_STATE_BATTLEGROUND_IC_GATE_EAST_H_WS_OPEN, 1);
+                    packet.Worldstates.emplace_back(WORLD_STATE_BATTLEGROUND_IC_GATE_FRONT_A_WS_OPEN, 1);
+                    packet.Worldstates.emplace_back(WORLD_STATE_BATTLEGROUND_IC_GATE_WEST_A_WS_OPEN, 1);
+                    packet.Worldstates.emplace_back(WORLD_STATE_BATTLEGROUND_IC_GATE_EAST_A_WS_OPEN, 1);
+                    packet.Worldstates.emplace_back(WORLD_STATE_BATTLEGROUND_IC_GATE_FRONT_H_WS_CLOSED, 1);
+                    packet.Worldstates.emplace_back(WORLD_STATE_BATTLEGROUND_IC_DOCKS_UNCONTROLLED, 1);
+                    packet.Worldstates.emplace_back(WORLD_STATE_BATTLEGROUND_IC_HANGAR_UNCONTROLLED, 1);
+                    packet.Worldstates.emplace_back(WORLD_STATE_BATTLEGROUND_IC_QUARRY_UNCONTROLLED, 1);
+                    packet.Worldstates.emplace_back(WORLD_STATE_BATTLEGROUND_IC_REFINERY_UNCONTROLLED, 1);
+                    packet.Worldstates.emplace_back(WORLD_STATE_BATTLEGROUND_IC_WORKSHOP_UNCONTROLLED, 1);
+                    packet.Worldstates.emplace_back(WORLD_STATE_BATTLEGROUND_IC_UNK, 1);
+                    packet.Worldstates.emplace_back(WORLD_STATE_BATTLEGROUND_IC_HORDE_KEEP_CONTROLLED_H, 1);
                 }
                 break;
             case 4987: // The Ruby Sanctum
