@@ -22,6 +22,7 @@
 #include "SpellScript.h"
 #include "SpellScriptLoader.h"
 #include "WorldPacket.h"
+#include "WorldStateDefines.h"
 #include "WorldStatePackets.h"
 #include "ruby_sanctum.h"
 

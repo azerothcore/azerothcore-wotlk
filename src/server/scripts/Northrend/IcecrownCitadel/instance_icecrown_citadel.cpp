@@ -27,6 +27,7 @@
 #include "Transport.h"
 #include "WorldPacket.h"
 #include "WorldSession.h"
+#include "WorldStateDefines.h"
 #include "icecrown_citadel.h"
 
 enum EventIds

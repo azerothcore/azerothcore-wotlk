@@ -26,6 +26,7 @@
 #include "SpellScript.h"
 #include "SpellScriptLoader.h"
 #include "Vehicle.h"
+#include "WorldStateDefines.h"
 #include "ruby_sanctum.h"
 
 enum Texts
