@@ -56,7 +56,7 @@ enum Spells
     // Dark Fiend Spells
     SPELL_DARK_FIEND_APPEARANCE         = 45934,
     SPELL_DARK_FIEND_SECONDARY          = 45936,
-    SPELL_DARK_FIEND_AURA               = 45944
+    SPELL_DARK_FIEND_TRIGGER            = 45944
 };
 
 struct boss_muru : public BossAI
@@ -193,6 +193,7 @@ struct npc_dark_fiend : public ScriptedAI
         _lastVictimGUID.Clear();
         _spellCast = false;
 
+        // Schedule targeting and attacking after 1-2 seconds
         me->m_Events.AddEventAtOffset([this]() {
             me->SetReactState(REACT_AGGRESSIVE);
             if (Unit* target = SelectTargetFromPlayerList(200.0f, 0, true))
@@ -211,34 +212,41 @@ struct npc_dark_fiend : public ScriptedAI
 
     void UpdateAI(uint32 /*diff*/) override
     {
+        if (!me->HasAura(SPELL_DARK_FIEND_APPEARANCE))
+        {
+            me->DespawnOrUnsummon();
+            return;
+        }
+
         // Check if victim has changed or disappeared
         Unit* currentVictim = me->GetVictim();
         ObjectGuid currentVictimGUID = currentVictim ? currentVictim->GetGUID() : ObjectGuid::Empty;
 
         if (_lastVictimGUID != currentVictimGUID)
         {
-            // If had a victim before but now it's gone (Vanish, Feign Death, etc.)
+            // If had a victim before but now it's gone
             if (!_lastVictimGUID.IsEmpty() && currentVictimGUID.IsEmpty())
                 me->DespawnOrUnsummon();
-    
+
             _lastVictimGUID = currentVictimGUID;
         }
 
         if (!UpdateVictim())
             return;
 
-        if (!_spellCast && me->IsWithinMeleeRange(me->GetVictim(), 1.0f))
+        if (!_spellCast && me->IsWithinMeleeRange(me->GetVictim(), 2.0f))
         {
-            DoCast(me, SPELL_DARK_FIEND_AURA);
+            DoCast(me, SPELL_DARK_FIEND_TRIGGER);
             _spellCast = true;
+
             me->m_Events.AddEventAtOffset([this]() {
                 me->DespawnOrUnsummon();
             }, 1s);
         }
-            
+
         DoMeleeAttackIfReady();
     }
-    
+
 private:
     ObjectGuid _lastVictimGUID;
     bool _spellCast;
