@@ -8661,9 +8661,9 @@ void Player::SendInitWorldStates(uint32 zoneId, uint32 areaId)
                 else
                 {
                     packet.Worldstates.reserve(3);
-                    packet.Worldstates.emplace_back(0xa0f, 0); // BATTLEGROUND_NAGRAND_ARENA_GOLD
-                    packet.Worldstates.emplace_back(0xa10, 0); // BATTLEGROUND_NAGRAND_ARENA_GREEN
-                    packet.Worldstates.emplace_back(0xa11, 0); // BATTLEGROUND_NAGRAND_ARENA_SHOW
+                    packet.Worldstates.emplace_back(WORLD_STATE_BATTLEGROUND_NA_ARENA_GOLD, 0);
+                    packet.Worldstates.emplace_back(WORLD_STATE_BATTLEGROUND_NA_ARENA_GREEN, 0);
+                    packet.Worldstates.emplace_back(WORLD_STATE_BATTLEGROUND_NA_ARENA_SHOW, 0);
                 }
                 break;
             case 3702: // Blade's Edge Arena
@@ -8672,9 +8672,9 @@ void Player::SendInitWorldStates(uint32 zoneId, uint32 areaId)
                 else
                 {
                     packet.Worldstates.reserve(3);
-                    packet.Worldstates.emplace_back(0x9f0, 0); // BATTLEGROUND_BLADES_EDGE_ARENA_GOLD
-                    packet.Worldstates.emplace_back(0x9f1, 0); // BATTLEGROUND_BLADES_EDGE_ARENA_GREEN
-                    packet.Worldstates.emplace_back(0x9f3, 0); // BATTLEGROUND_BLADES_EDGE_ARENA_SHOW
+                    packet.Worldstates.emplace_back(WORLD_STATE_BATTLEGROUND_BE_ARENA_GOLD, 0);
+                    packet.Worldstates.emplace_back(WORLD_STATE_BATTLEGROUND_BE_ARENA_GREEN, 0);
+                    packet.Worldstates.emplace_back(WORLD_STATE_BATTLEGROUND_BE_ARENA_SHOW, 0);
                 }
                 break;
             case 3968: // Ruins of Lordaeron
@@ -8683,9 +8683,9 @@ void Player::SendInitWorldStates(uint32 zoneId, uint32 areaId)
                 else
                 {
                     packet.Worldstates.reserve(3);
-                    packet.Worldstates.emplace_back(0xbb8, 0); // BATTELGROUND_RUINS_OF_LORDAERNON_GOLD
-                    packet.Worldstates.emplace_back(0xbb9, 0); // BATTELGROUND_RUINS_OF_LORDAERNON_GREEN
-                    packet.Worldstates.emplace_back(0xbba, 0); // BATTELGROUND_RUINS_OF_LORDAERNON_SHOW
+                    packet.Worldstates.emplace_back(WORLD_STATE_BATTLEGROUND_RL_ARENA_GOLD, 0);
+                    packet.Worldstates.emplace_back(WORLD_STATE_BATTLEGROUND_RL_ARENA_GREEN, 0);
+                    packet.Worldstates.emplace_back(WORLD_STATE_BATTLEGROUND_RL_ARENA_SHOW, 0);
                 }
                 break;
             case 4378: // Dalaran Sewers
@@ -8694,9 +8694,9 @@ void Player::SendInitWorldStates(uint32 zoneId, uint32 areaId)
                 else
                 {
                     packet.Worldstates.reserve(3);
-                    packet.Worldstates.emplace_back(0xe11, 0); // ARENA_WORLD_STATE_ALIVE_PLAYERS_GOLD
-                    packet.Worldstates.emplace_back(0xe10, 0); // ARENA_WORLD_STATE_ALIVE_PLAYERS_GREEN
-                    packet.Worldstates.emplace_back(0xe1a, 0); // ARENA_WORLD_STATE_ALIVE_PLAYERS_SHOW
+                    packet.Worldstates.emplace_back(WORLD_STATE_BATTLEGROUND_DS_ARENA_GOLD, 0);
+                    packet.Worldstates.emplace_back(WORLD_STATE_BATTLEGROUND_DS_ARENA_GREEN, 0);
+                    packet.Worldstates.emplace_back(WORLD_STATE_BATTLEGROUND_DS_ARENA_SHOW, 0);
                 }
                 break;
             case 4384: // Strand of the Ancients
@@ -8742,9 +8742,9 @@ void Player::SendInitWorldStates(uint32 zoneId, uint32 areaId)
                 else
                 {
                     packet.Worldstates.reserve(3);
-                    packet.Worldstates.emplace_back(0xe10, 0); // ARENA_WORLD_STATE_ALIVE_PLAYERS_GREEN
-                    packet.Worldstates.emplace_back(0xe11, 0); // ARENA_WORLD_STATE_ALIVE_PLAYERS_GOLD
-                    packet.Worldstates.emplace_back(0xe1a, 0); // ARENA_WORLD_STATE_ALIVE_PLAYERS_SHOW
+                    packet.Worldstates.emplace_back(WORLD_STATE_BATTLEGROUND_RV_ARENA_GREEN, 0);
+                    packet.Worldstates.emplace_back(WORLD_STATE_BATTLEGROUND_RV_ARENA_GOLD, 0);
+                    packet.Worldstates.emplace_back(WORLD_STATE_BATTLEGROUND_RV_ARENA_SHOW, 0);
                 }
                 break;
             case 4710: // Isle of Conquest
