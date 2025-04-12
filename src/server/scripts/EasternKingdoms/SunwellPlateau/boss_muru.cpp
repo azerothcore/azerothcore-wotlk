@@ -48,7 +48,7 @@ enum Spells
 
     //Black Hole Spells
     SPELL_BLACK_HOLE_SUMMON_VISUAL      = 46242,
-    SPELL_BLACK_HOLE_SUMMON_VISUAL2     = 46248,
+    SPELL_BLACK_HOLE_SUMMON_VISUAL2     = 46247,
     SPELL_BLACK_HOLE_VISUAL2            = 46235,
     SPELL_BLACK_HOLE_PASSIVE            = 46228,
     SPELL_BLACK_HOLE_EFFECT             = 46230
@@ -169,6 +169,7 @@ struct boss_entropius : public ScriptedAI
         if (!UpdateVictim())
             return;
 
+        DoMeleeAttackIfReady();
         scheduler.Update(diff);
     }
 };
@@ -180,26 +181,35 @@ struct npc_singularity : public NullCreatureAI
     void Reset() override
     {
         me->DespawnOrUnsummon(18000);
-        DoCastSelf(SPELL_BLACK_HOLE_SUMMON_VISUAL, true);
-        DoCastSelf(SPELL_BLACK_HOLE_SUMMON_VISUAL2, true);
+
+        me->m_Events.AddEventAtOffset([&] {
+            DoCastSelf(SPELL_BLACK_HOLE_SUMMON_VISUAL, true);
+        }, 2s);
+
+        me->m_Events.AddEventAtOffset([&] {
+            DoCastSelf(SPELL_BLACK_HOLE_SUMMON_VISUAL2, true);
+        }, 4s);
+
+        me->m_Events.AddEventAtOffset([&] {
+            DoCastSelf(SPELL_BLACK_HOLE_SUMMON_VISUAL, true);
+        }, 6s);
+
+        me->m_Events.AddEventAtOffset([&] {
+            DoCastSelf(SPELL_BLACK_HOLE_VISUAL2, true);
+            DoCastSelf(SPELL_BLACK_HOLE_PASSIVE, true);
+        }, 8s);
 
         me->m_Events.AddEventAtOffset([&] {
             me->KillSelf();
         }, 17s);
 
-        me->m_Events.AddEventAtOffset([&] {
-            me->RemoveAurasDueToSpell(SPELL_BLACK_HOLE_SUMMON_VISUAL2);
-            DoCastSelf(SPELL_BLACK_HOLE_VISUAL2, true);
-            DoCastSelf(SPELL_BLACK_HOLE_PASSIVE, true);
-        }, 3500ms);
-
-        scheduler.Schedule(5s, [this](TaskContext context)
+        scheduler.Schedule(8s, [this](TaskContext context)
         {
             auto const& playerList = me->GetMap()->GetPlayers();
             for (auto const& playerRef : playerList)
             {
                 if (Player* player = playerRef.GetSource())
-                    if (me->GetDistance2d(player) < 15.0f && player->GetPositionZ() < 72.0f && player->IsAlive() && !player->HasAura(SPELL_BLACK_HOLE_EFFECT))
+                    if (me->IsWithinLOSInMap(player) && player->IsAlive() && !player->HasAura(SPELL_BLACK_HOLE_EFFECT))
                     {
                         me->GetMotionMaster()->MovePoint(0, player->GetPositionX(), player->GetPositionY(), player->GetPositionZ(), false, true);
                         context.Repeat();
