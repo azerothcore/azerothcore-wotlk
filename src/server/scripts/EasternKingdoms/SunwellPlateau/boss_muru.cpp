@@ -183,7 +183,6 @@ struct npc_dark_fiend : public ScriptedAI
     npc_dark_fiend(Creature* creature) : ScriptedAI(creature)
     {
         me->SetReactState(REACT_PASSIVE);
-        SetInvincibility(true);
         DoCast(me, SPELL_DARK_FIEND_APPEARANCE);
     }
 
@@ -200,6 +199,12 @@ struct npc_dark_fiend : public ScriptedAI
                 me->AddThreat(target, 100000.0f);
             }
         }, 1s, 2s);
+    }
+
+    void DamageTaken(Unit* /*attacker*/, uint32& damage, DamageEffectType /*damagetype*/, SpellSchoolMask /*schoolMask*/) override
+    {
+        if (damage >= me->GetHealth())
+            damage = me->GetHealth() - me->GetMaxHealth() * 0.01f;
     }
 
     void UpdateAI(uint32 /*diff*/) override
