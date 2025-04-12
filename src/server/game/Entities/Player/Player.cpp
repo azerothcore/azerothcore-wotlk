@@ -8448,38 +8448,38 @@ void Player::SendInitWorldStates(uint32 zoneId, uint32 areaId)
                 else
                 {
                     packet.Worldstates.reserve(32);
-                    packet.Worldstates.emplace_back(0x6e7, 0);    // stables alliance
-                    packet.Worldstates.emplace_back(0x6e8, 0);    // stables horde
-                    packet.Worldstates.emplace_back(0x6e9, 0);    // stables alliance controlled
-                    packet.Worldstates.emplace_back(0x6ea, 0);    // stables horde controlled
-                    packet.Worldstates.emplace_back(0x6ec, 0);    // farm alliance
-                    packet.Worldstates.emplace_back(0x6ed, 0);    // farm horde
-                    packet.Worldstates.emplace_back(0x6ee, 0);    // farm alliance controlled
-                    packet.Worldstates.emplace_back(0x6ef, 0);    // farm horde controlled
-                    packet.Worldstates.emplace_back(0x6f0, 0);    // alliance resources
-                    packet.Worldstates.emplace_back(0x6f1, 0);    // horde resources
-                    packet.Worldstates.emplace_back(0x6f2, 0);    // horde bases
-                    packet.Worldstates.emplace_back(0x6f3, 0);    // alliance bases
-                    packet.Worldstates.emplace_back(0x6f4, 1600); // max resources (1600)
-                    packet.Worldstates.emplace_back(0x6f6, 0);    // blacksmith alliance
-                    packet.Worldstates.emplace_back(0x6f7, 0);    // blacksmith horde
-                    packet.Worldstates.emplace_back(0x6f8, 0);    // blacksmith alliance controlled
-                    packet.Worldstates.emplace_back(0x6f9, 0);    // blacksmith horde controlled
-                    packet.Worldstates.emplace_back(0x6fb, 0);    // gold mine alliance
-                    packet.Worldstates.emplace_back(0x6fc, 0);    // gold mine horde
-                    packet.Worldstates.emplace_back(0x6fd, 0);    // gold mine alliance controlled
-                    packet.Worldstates.emplace_back(0x6fe, 0);    // gold mine horde controlled
-                    packet.Worldstates.emplace_back(0x700, 0);    // lumber mill alliance
-                    packet.Worldstates.emplace_back(0x701, 0);    // lumber mill horde
-                    packet.Worldstates.emplace_back(0x702, 0);    // lumber mill alliance controlled
-                    packet.Worldstates.emplace_back(0x703, 0);    // lumber mill horde controlled
-                    packet.Worldstates.emplace_back(0x732, 1);    // stables (1 - uncontrolled)
-                    packet.Worldstates.emplace_back(0x733, 1);    // gold mine (1 - uncontrolled)
-                    packet.Worldstates.emplace_back(0x734, 1);    // lumber mill (1 - uncontrolled)
-                    packet.Worldstates.emplace_back(0x735, 1);    // farm (1 - uncontrolled)
-                    packet.Worldstates.emplace_back(0x736, 1);    // blacksmith (1 - uncontrolled)
-                    packet.Worldstates.emplace_back(0x745, 2);    // unk
-                    packet.Worldstates.emplace_back(0x7a3, 1400); // warning limit (1400)
+                    packet.Worldstates.emplace_back(WORLD_STATE_BATTLEGROUND_AB_STABLE_STATE_ALLIANCE, 0);
+                    packet.Worldstates.emplace_back(WORLD_STATE_BATTLEGROUND_AB_STABLE_STATE_HORDE, 0);
+                    packet.Worldstates.emplace_back(WORLD_STATE_BATTLEGROUND_AB_STABLE_STATE_CONTROLLED_ALLIANCE, 0);
+                    packet.Worldstates.emplace_back(WORLD_STATE_BATTLEGROUND_AB_STABLE_STATE_CONTROLLED_HORDE, 0);
+                    packet.Worldstates.emplace_back(WORLD_STATE_BATTLEGROUND_AB_FARM_STATE_ALLIANCE, 0);
+                    packet.Worldstates.emplace_back(WORLD_STATE_BATTLEGROUND_AB_FARM_STATE_HORDE, 0);
+                    packet.Worldstates.emplace_back(WORLD_STATE_BATTLEGROUND_AB_FARM_STATE_CONTROLLED_ALLIANCE, 0);
+                    packet.Worldstates.emplace_back(WORLD_STATE_BATTLEGROUND_AB_FARM_STATE_CONTROLLED_HORDE, 0);
+                    packet.Worldstates.emplace_back(WORLD_STATE_BATTLEGROUND_AB_RESOURCES_ALLIANCE, 0);
+                    packet.Worldstates.emplace_back(WORLD_STATE_BATTLEGROUND_AB_RESOURCES_HORDE, 0);
+                    packet.Worldstates.emplace_back(WORLD_STATE_BATTLEGROUND_AB_OCCUPIED_BASES_HORDE, 0);
+                    packet.Worldstates.emplace_back(WORLD_STATE_BATTLEGROUND_AB_OCCUPIED_BASES_ALLIANCE, 0);
+                    packet.Worldstates.emplace_back(WORLD_STATE_BATTLEGROUND_AB_RESOURCES_MAX, 1600);
+                    packet.Worldstates.emplace_back(WORLD_STATE_BATTLEGROUND_AB_BLACKSMITH_STATE_ALLIANCE, 0);
+                    packet.Worldstates.emplace_back(WORLD_STATE_BATTLEGROUND_AB_BLACKSMITH_STATE_HORDE, 0);
+                    packet.Worldstates.emplace_back(WORLD_STATE_BATTLEGROUND_AB_BLACKSMITH_STATE_CONTROLLED_ALLIANCE, 0);
+                    packet.Worldstates.emplace_back(WORLD_STATE_BATTLEGROUND_AB_BLACKSMITH_STATE_CONTROLLED_HORDE, 0);
+                    packet.Worldstates.emplace_back(WORLD_STATE_BATTLEGROUND_AB_GOLDMINE_STATE_ALLIANCE, 0);
+                    packet.Worldstates.emplace_back(WORLD_STATE_BATTLEGROUND_AB_GOLDMINE_STATE_HORDE, 0);
+                    packet.Worldstates.emplace_back(WORLD_STATE_BATTLEGROUND_AB_GOLDMINE_STATE_CONTROLLED_ALLIANCE, 0);
+                    packet.Worldstates.emplace_back(WORLD_STATE_BATTLEGROUND_AB_GOLDMINE_STATE_CONTROLLED_HORDE, 0);
+                    packet.Worldstates.emplace_back(WORLD_STATE_BATTLEGROUND_AB_LUMBERMILL_STATE_ALLIANCE, 0);
+                    packet.Worldstates.emplace_back(WORLD_STATE_BATTLEGROUND_AB_LUMBERMILL_STATE_HORDE, 0);
+                    packet.Worldstates.emplace_back(WORLD_STATE_BATTLEGROUND_AB_LUMBERMILL_STATE_CONTROLLED_ALLIANCE, 0);
+                    packet.Worldstates.emplace_back(WORLD_STATE_BATTLEGROUND_AB_LUMBERMILL_STATE_CONTROLLED_HORDE, 0);
+                    packet.Worldstates.emplace_back(WORLD_STATE_BATTLEGROUND_AB_STABLE_ICON, 1);
+                    packet.Worldstates.emplace_back(WORLD_STATE_BATTLEGROUND_AB_GOLDMINE_ICON, 1);
+                    packet.Worldstates.emplace_back(WORLD_STATE_BATTLEGROUND_AB_LUMBERMILL_ICON, 1);
+                    packet.Worldstates.emplace_back(WORLD_STATE_BATTLEGROUND_AB_FARM_ICON, 1);
+                    packet.Worldstates.emplace_back(WORLD_STATE_BATTLEGROUND_AB_BLACKSMITH_ICON, 1);
+                    packet.Worldstates.emplace_back(WORLD_STATE_BATTLEGROUND_AB_UNK, 2);
+                    packet.Worldstates.emplace_back(WORLD_STATE_BATTLEGROUND_AB_RESOURCES_WARNING, 1400); // warning limit (1400)
                 }
                 break;
             case 3820: // Eye of the Storm
