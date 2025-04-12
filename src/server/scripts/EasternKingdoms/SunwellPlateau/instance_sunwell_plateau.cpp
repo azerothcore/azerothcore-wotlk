@@ -286,8 +286,7 @@ enum SunbladeArchMageSpells
 {
     SPELL_ARCANE_EXPLOSION    = 46553,
     SPELL_BLINK               = 46573,
-    SPELL_FROST_NOVA          = 46555,
-    SPELL_STUN                = 46441  // Placeholder stun spell
+    SPELL_FROST_NOVA          = 46555
 };
 
 struct npc_sunblade_arch_mage : public ScriptedAI
@@ -299,12 +298,12 @@ struct npc_sunblade_arch_mage : public ScriptedAI
             return !me->HasUnitState(UNIT_STATE_CASTING);
         });
     }
-
+    
     void Reset() override
     {
         scheduler.CancelAll();
     }
-
+    
     void JustEngagedWith(Unit* /*who*/) override
     {
         scheduler.Schedule(6s, 12s, [this](TaskContext context)
@@ -312,30 +311,27 @@ struct npc_sunblade_arch_mage : public ScriptedAI
             DoCastAOE(SPELL_ARCANE_EXPLOSION);
             context.Repeat(12s, 18s);
         });
-
+        
         scheduler.Schedule(8s, 15s, [this](TaskContext context)
         {
             if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 30.0f, true))
             {
-                me->NearTeleportTo(target->GetPositionX(), target->GetPositionY(), target->GetPositionZ(), me->GetAngle(target));
-                DoCast(me, SPELL_BLINK, true);
+                DoCast(target, SPELL_BLINK, true);
                 DoCastAOE(SPELL_FROST_NOVA, true);
-                target->AddAura(SPELL_STUN, target);
             }
             context.Repeat(20s, 25s);
         });
     }
-
+    
     void UpdateAI(uint32 diff) override
     {
         if (!UpdateVictim())
             return;
-
+        
         scheduler.Update(diff);
-
         DoMeleeAttackIfReady();
     }
-
+    
 private:
     TaskScheduler scheduler;
 };
