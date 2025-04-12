@@ -313,7 +313,6 @@ class spell_muru_darkness_aura : public AuraScript
 
     void OnPeriodic(AuraEffect const* aurEff)
     {
-        // Change from tick 3 to tick 2 for faster spawn in Phase 1
         if (aurEff->GetTickNumber() == 2)
             for (uint8 i = 0; i < 8; ++i)
                 GetUnitOwner()->CastSpell(GetUnitOwner(), SPELL_SUMMON_DARK_FIEND + i, true);
