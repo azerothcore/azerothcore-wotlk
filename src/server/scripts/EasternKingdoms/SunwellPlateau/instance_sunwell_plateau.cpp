@@ -311,7 +311,7 @@ struct npc_sunblade_arch_mage : public ScriptedAI
             DoCastAOE(SPELL_ARCANE_EXPLOSION);
             context.Repeat(12s, 18s);
         });
-        
+
         scheduler.Schedule(8s, 15s, [this](TaskContext context)
         {
             if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 30.0f, true))
