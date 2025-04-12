@@ -8338,10 +8338,10 @@ void Player::SendInitWorldStates(uint32 zoneId, uint32 areaId)
                 }
                 // unknown, aq opening?
                 packet.Worldstates.reserve(4);
-                packet.Worldstates.emplace_back(0x912, 0); // AQ_SANDWORM_N
-                packet.Worldstates.emplace_back(0x913, 0); // AQ_SANDWORM_S
-                packet.Worldstates.emplace_back(0x914, 0); // AQ_SANDWORM_SW
-                packet.Worldstates.emplace_back(0x915, 0); // AQ_SANDWORM_E
+                packet.Worldstates.emplace_back(WORLD_STATE_AHNQIRAJ_SANDWORM_N, 0);
+                packet.Worldstates.emplace_back(WORLD_STATE_AHNQIRAJ_SANDWORM_S, 0);
+                packet.Worldstates.emplace_back(WORLD_STATE_AHNQIRAJ_SANDWORM_SW, 0);
+                packet.Worldstates.emplace_back(WORLD_STATE_AHNQIRAJ_SANDWORM_E, 0);
                 break;
             case 2597: // Alterac Valley
                 if (battleground && battleground->GetBgTypeID(true) == BATTLEGROUND_AV)
