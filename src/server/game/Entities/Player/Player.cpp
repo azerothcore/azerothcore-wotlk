@@ -8630,7 +8630,7 @@ void Player::SendInitWorldStates(uint32 zoneId, uint32 areaId)
                     packet.Worldstates.emplace_back(WORLD_STATE_OPVP_ZM_UI_TOWER_SLIDER_N_W, 0);
                     packet.Worldstates.emplace_back(WORLD_STATE_OPVP_ZM_UI_TOWER_SLIDER_POS_W, 0);
                     packet.Worldstates.emplace_back(WORLD_STATE_OPVP_ZM_UI_TOWER_SLIDER_DISPLAY_W, 0);
-                    packet.Worldstates.emplace_back(WORLD_STATE_OPVP_ZM_WORLDSTATE_UNK_1, 1);
+                    packet.Worldstates.emplace_back(WORLD_STATE_OPVP_ZM_WORLDSTATE_UNK, 1);
                     packet.Worldstates.emplace_back(WORLD_STATE_OPVP_ZM_MAP_TOWER_EAST_N, 0);
                     packet.Worldstates.emplace_back(WORLD_STATE_OPVP_ZM_MAP_TOWER_EAST_H, 1);
                     packet.Worldstates.emplace_back(WORLD_STATE_OPVP_ZM_MAP_TOWER_EAST_A, 0);
