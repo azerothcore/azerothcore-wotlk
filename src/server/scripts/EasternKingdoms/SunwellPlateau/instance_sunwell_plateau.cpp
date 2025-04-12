@@ -282,10 +282,65 @@ private:
     uint32 _triggeredSpellId;
 };
 
+enum SunbladeArchMageSpells
+{
+    SPELL_ARCANE_EXPLOSION    = 46553,
+    SPELL_BLINK               = 28401,
+    SPELL_FROST_NOVA          = 46555
+};
+
+struct npc_sunblade_arch_mage : public ScriptedAI
+{
+    npc_sunblade_arch_mage(Creature* creature) : ScriptedAI(creature)
+    {
+        scheduler.SetValidator([this]
+        {
+            return !me->HasUnitState(UNIT_STATE_CASTING);
+        });
+    }
+
+    void Reset() override
+    {
+        scheduler.CancelAll();
+    }
+
+    void JustEngagedWith(Unit* /*who*/) override
+    {
+        scheduler.Schedule(6s, 12s, [this](TaskContext context)
+        {
+            DoCastAOE(SPELL_ARCANE_EXPLOSION);
+            context.Repeat(12s, 18s);
+        });
+
+        scheduler.Schedule(8s, 15s, [this](TaskContext context)
+        {
+            if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 30.0f, true))
+            {
+                DoCast(target, SPELL_BLINK, true);
+                DoCastAOE(SPELL_FROST_NOVA, true);
+            }
+            context.Repeat(20s, 25s);
+        });
+    }
+
+    void UpdateAI(uint32 diff) override
+    {
+        if (!UpdateVictim())
+            return;
+
+        scheduler.Update(diff);
+        DoMeleeAttackIfReady();
+    }
+
+private:
+    TaskScheduler scheduler;
+};
+
 void AddSC_instance_sunwell_plateau()
 {
     new instance_sunwell_plateau();
     RegisterSpellScript(spell_cataclysm_breath);
+    RegisterSunwellPlateauCreatureAI(npc_sunblade_arch_mage);
     RegisterSunwellPlateauCreatureAI(npc_sunblade_scout);
     RegisterSpellScriptWithArgs(spell_sunwell_teleport, "spell_teleport_to_apex_point", SPELL_TELEPORT_TO_APEX_POINT);
     RegisterSpellScriptWithArgs(spell_sunwell_teleport, "spell_teleport_to_witchs_sanctum", SPELL_TELEPORT_TO_WITCHS_SANCTUM);
