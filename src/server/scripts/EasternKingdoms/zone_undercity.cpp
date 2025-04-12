@@ -37,6 +37,7 @@ EndContentData */
 #include "SpellAuraEffects.h"
 #include "SpellScript.h"
 #include "SpellScriptLoader.h"
+#include "WorldStateDefines.h"
 
 /*######
 ## npc_lady_sylvanas_windrunner

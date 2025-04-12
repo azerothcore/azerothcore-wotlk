@@ -594,6 +594,16 @@ enum WorldStateIDs
     WORLD_STATE_GENERIC_UNK_1 = 2323,
     WORLD_STATE_GENERIC_UNK_2 = 2324,
     WORLD_STATE_GENERIC_UNK_3 = 2325,
+
+	// Custom
+    WORLD_STATE_CUSTOM_ARENA_DISTRIBUTION_TIME                 = 20001, // Next arena distribution time
+    WORLD_STATE_CUSTOM_WEEKLY_QUEST_RESET_TIME                 = 20002, // Next weekly reset time
+    WORLD_STATE_CUSTOM_BG_DAILY_RESET_TIME                     = 20003, // Next daily BG reset time
+    WORLD_STATE_CUSTOM_CLEANING_FLAGS                          = 20004, // Cleaning Flags
+    WORLD_STATE_CUSTOM_DAILY_QUEST_RESET_TIME                  = 20005, // Next daily reset time
+    WORLD_STATE_CUSTOM_GUILD_DAILY_RESET_TIME                  = 20006, // Next guild cap reset time
+    WORLD_STATE_CUSTOM_MONTHLY_QUEST_RESET_TIME                = 20007, // Next monthly reset time
+    WORLD_STATE_CUSTOM_DAILY_CALENDAR_DELETION_OLD_EVENTS_TIME = 20008,  // Next daily calendar deletions of old events time
 };
 
 #endif
