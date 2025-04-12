@@ -8857,12 +8857,12 @@ void Player::SendInitWorldStates(uint32 zoneId, uint32 areaId)
                     if (CreatureAI* mograineAI = mograine->AI())
                     {
                         packet.Worldstates.reserve(6);
-                        packet.Worldstates.emplace_back(0xe06, mograineAI->GetData(3590));
-                        packet.Worldstates.emplace_back(0xe07, mograineAI->GetData(3591));
-                        packet.Worldstates.emplace_back(0xe08, mograineAI->GetData(3592));
-                        packet.Worldstates.emplace_back(0xe13, mograineAI->GetData(3603));
-                        packet.Worldstates.emplace_back(0xe14, mograineAI->GetData(3604));
-                        packet.Worldstates.emplace_back(0xe15, mograineAI->GetData(3605));
+                        packet.Worldstates.emplace_back(WORLD_STATE_BATTLE_FOR_LIGHTS_HOPE_DEFENDERS_COUNT, mograineAI->GetData(3590));
+                        packet.Worldstates.emplace_back(WORLD_STATE_BATTLE_FOR_LIGHTS_HOPE_SCOURGE_COUNT, mograineAI->GetData(3591));
+                        packet.Worldstates.emplace_back(WORLD_STATE_BATTLE_FOR_LIGHTS_HOPE_SOLDIERS_ENABLE, mograineAI->GetData(3592));
+                        packet.Worldstates.emplace_back(WORLD_STATE_BATTLE_FOR_LIGHTS_HOPE_COUNTDOWN_ENABLE, mograineAI->GetData(3603));
+                        packet.Worldstates.emplace_back(WORLD_STATE_BATTLE_FOR_LIGHTS_HOPE_COUNTDOWN_TIME, mograineAI->GetData(3604));
+                        packet.Worldstates.emplace_back(WORLD_STATE_BATTLE_FOR_LIGHTS_HOPE_EVENT_BEGIN_ENABLE, mograineAI->GetData(3605));
                     }
                 }
                 break;
