@@ -55,6 +55,7 @@ enum Spells
 
     // Dark Fiend Spells
     SPELL_DARK_FIEND_APPEARANCE         = 45934,
+    SPELL_DARK_FIEND_SECONDARY          = 45936,
     SPELL_DARK_FIEND_AURA               = 45944
 };
 
@@ -184,6 +185,7 @@ struct npc_dark_fiend : public ScriptedAI
     {
         me->SetReactState(REACT_PASSIVE);
         DoCast(me, SPELL_DARK_FIEND_APPEARANCE);
+        DoCast(me, SPELL_DARK_FIEND_SECONDARY);
     }
 
     void Reset() override
@@ -205,6 +207,12 @@ struct npc_dark_fiend : public ScriptedAI
     {
         if (damage >= me->GetHealth())
             damage = me->GetHealth() - me->GetMaxHealth() * 0.01f;
+    }
+
+    void AuraRemoved(AuraEffect const* aurEff, AuraEffectHandleModes /*mode*/) override
+    {
+        if (aurEff->GetId() == SPELL_DARK_FIEND_APPEARANCE)
+            me->DespawnOrUnsummon();
     }
 
     void UpdateAI(uint32 /*diff*/) override
