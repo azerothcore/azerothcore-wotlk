@@ -8260,9 +8260,9 @@ void Player::SendInitWorldStates(uint32 zoneId, uint32 areaId)
     if (mapId == 530) // Outland
     {
         packet.Worldstates.reserve(3);
-        packet.Worldstates.emplace_back(0x9bf, 0);  // NA_UI_OUTLAND_01 "Progress: %2494w"
-        packet.Worldstates.emplace_back(0x9bd, 15); // NA_UI_GUARDS_MAX
-        packet.Worldstates.emplace_back(0x9bb, 15); // NA_UI_GUARDS_LEFT
+        packet.Worldstates.emplace_back(WORLD_STATE_OPVP_NA_UI_TOWER_SLIDER_DISPLAY, 0);
+        packet.Worldstates.emplace_back(WORLD_STATE_OPVP_NA_UI_GUARDS_MAX, 15);
+        packet.Worldstates.emplace_back(WORLD_STATE_OPVP_NA_UI_GUARDS_LEFT, 15);
     }
 
     if (Player::bgZoneIdToFillWorldStates.find(zoneId) != Player::bgZoneIdToFillWorldStates.end())
@@ -8291,39 +8291,39 @@ void Player::SendInitWorldStates(uint32 zoneId, uint32 areaId)
                 else
                 {
                     packet.Worldstates.reserve(32);
-                    packet.Worldstates.emplace_back(0x97a, 0);  // GENERAL_WORLDSTATES_01 "Progress: %2427w"
-                    packet.Worldstates.emplace_back(0x917, 0);  // EP_UI_TOWER_COUNT_A
-                    packet.Worldstates.emplace_back(0x918, 0);  // EP_UI_TOWER_COUNT_H
-                    packet.Worldstates.emplace_back(0x97b, 50); // GENERAL_WORLDSTATES_02
-                    packet.Worldstates.emplace_back(0x97c, 50); // GENERAL_WORLDSTATES_03
-                    packet.Worldstates.emplace_back(0x933, 1);  // EP_CGT_N
-                    packet.Worldstates.emplace_back(0x946, 0);  // EP_CGT_N_A
-                    packet.Worldstates.emplace_back(0x947, 0);  // EP_CGT_N_H
+                    packet.Worldstates.emplace_back(WORLD_STATE_OPVP_EP_UI_TOWER_SLIDER_DISPLAY, 0);
+                    packet.Worldstates.emplace_back(WORLD_STATE_OPVP_EP_UI_TOWER_COUNT_A, 0);
+                    packet.Worldstates.emplace_back(WORLD_STATE_OPVP_EP_UI_TOWER_COUNT_H, 0);
+                    packet.Worldstates.emplace_back(WORLD_STATE_OPVP_EP_UI_TOWER_SLIDER_POS, 50);
+                    packet.Worldstates.emplace_back(WORLD_STATE_OPVP_EP_UI_TOWER_SLIDER_N, 50);
+                    packet.Worldstates.emplace_back(WORLD_STATE_OPVP_EP_CROWNGUARDTOWER_N, 1);
+                    packet.Worldstates.emplace_back(WORLD_STATE_OPVP_EP_CROWNGUARDTOWER_N_A, 0);
+                    packet.Worldstates.emplace_back(WORLD_STATE_OPVP_EP_CROWNGUARDTOWER_N_H, 0);
                     packet.Worldstates.emplace_back(0x948, 0);  // GENERAL_WORLDSTATES_04
                     packet.Worldstates.emplace_back(0x949, 0);  // GENERAL_WORLDSTATES_05
-                    packet.Worldstates.emplace_back(0x94a, 0);  // EP_CGT_A
-                    packet.Worldstates.emplace_back(0x94b, 0);  // EP_CGT_H
-                    packet.Worldstates.emplace_back(0x932, 0);  // EP_EWT_A
-                    packet.Worldstates.emplace_back(0x934, 0);  // EP_EWT_H
+                    packet.Worldstates.emplace_back(WORLD_STATE_OPVP_EP_CROWNGUARDTOWER_A, 0);
+                    packet.Worldstates.emplace_back(WORLD_STATE_OPVP_EP_CROWNGUARDTOWER_H, 0);
+                    packet.Worldstates.emplace_back(WORLD_STATE_OPVP_EP_EASTWALLTOWER_A, 0);
+                    packet.Worldstates.emplace_back(WORLD_STATE_OPVP_EP_EASTWALLTOWER_H, 0);
                     packet.Worldstates.emplace_back(0x935, 0);  // GENERAL_WORLDSTATES_06
                     packet.Worldstates.emplace_back(0x936, 0);  // GENERAL_WORLDSTATES_07
-                    packet.Worldstates.emplace_back(0x937, 0);  // EP_EWT_N_A
-                    packet.Worldstates.emplace_back(0x938, 0);  // EP_EWT_N_H
-                    packet.Worldstates.emplace_back(0x939, 1);  // EP_EWT_N
-                    packet.Worldstates.emplace_back(0x930, 1);  // EP_NPT_N
-                    packet.Worldstates.emplace_back(0x93a, 0);  // EP_NPT_N_A
-                    packet.Worldstates.emplace_back(0x93b, 0);  // GENERAL_WORLDSTATES_08
+                    packet.Worldstates.emplace_back(WORLD_STATE_OPVP_EP_EASTWALLTOWER_N_A, 0);
+                    packet.Worldstates.emplace_back(WORLD_STATE_OPVP_EP_EASTWALLTOWER_N_H, 0);
+                    packet.Worldstates.emplace_back(WORLD_STATE_OPVP_EP_EASTWALLTOWER_N, 1);
+                    packet.Worldstates.emplace_back(WORLD_STATE_OPVP_EP_NORTHPASSTOWER_N, 1);
+                    packet.Worldstates.emplace_back(WORLD_STATE_OPVP_EP_NORTHPASSTOWER_N_A, 0);
+                    packet.Worldstates.emplace_back(WORLD_STATE_OPVP_EP_NORTHPASSTOWER_N_H, 0);
                     packet.Worldstates.emplace_back(0x93c, 0);  // GENERAL_WORLDSTATES_09
                     packet.Worldstates.emplace_back(0x93d, 0);  // GENERAL_WORLDSTATES_10
-                    packet.Worldstates.emplace_back(0x944, 0);  // EP_NPT_A
-                    packet.Worldstates.emplace_back(0x945, 0);  // EP_NPT_H
-                    packet.Worldstates.emplace_back(0x931, 1);  // EP_PWT_N
-                    packet.Worldstates.emplace_back(0x93e, 0);  // EP_PWT_N_A
+                    packet.Worldstates.emplace_back(WORLD_STATE_OPVP_EP_NORTHPASSTOWER_A, 0);
+                    packet.Worldstates.emplace_back(WORLD_STATE_OPVP_EP_NORTHPASSTOWER_H, 0);
+                    packet.Worldstates.emplace_back(WORLD_STATE_OPVP_EP_PLAGUEWOODTOWER_N, 1);
+                    packet.Worldstates.emplace_back(WORLD_STATE_OPVP_EP_PLAGUEWOODTOWER_N_A, 0);
                     //packet.Worldstates.emplace_back(0x93f, 1); // GENERAL_WORLDSTATES_13 grey horde not in dbc!
                     packet.Worldstates.emplace_back(0x940, 0);  // GENERAL_WORLDSTATES_11
                     packet.Worldstates.emplace_back(0x941, 0);  // GENERAL_WORLDSTATES_12
-                    packet.Worldstates.emplace_back(0x942, 0);  // EP_PWT_A
-                    packet.Worldstates.emplace_back(0x943, 0);  // EP_PWT_H
+                    packet.Worldstates.emplace_back(WORLD_STATE_OPVP_EP_PLAGUEWOODTOWER_A, 0);
+                    packet.Worldstates.emplace_back(WORLD_STATE_OPVP_EP_PLAGUEWOODTOWER_H, 0);
 
                 break;
             case 1377: // Silithus
@@ -8332,9 +8332,9 @@ void Player::SendInitWorldStates(uint32 zoneId, uint32 areaId)
                 else
                 {
                     packet.Worldstates.reserve(3);
-                    packet.Worldstates.emplace_back(0x909, 0); // SI_GATHERED_A
-                    packet.Worldstates.emplace_back(0x90a, 0); // SI_GATHERED_H
-                    packet.Worldstates.emplace_back(0x90d, 0); // SI_SILITHYST_MAX
+                    packet.Worldstates.emplace_back(WORLD_STATE_OPVP_SI_GATHERED_A, 0);
+                    packet.Worldstates.emplace_back(WORLD_STATE_OPVP_SI_GATHERED_H, 0);
+                    packet.Worldstates.emplace_back(WORLD_STATE_OPVP_SI_SILITHYST_MAX, 0);
                 }
                 // unknown, aq opening?
                 packet.Worldstates.reserve(4);
@@ -8531,22 +8531,22 @@ void Player::SendInitWorldStates(uint32 zoneId, uint32 areaId)
                 else
                 {
                     packet.Worldstates.reserve(16);
-                    packet.Worldstates.emplace_back(0x9ba, 1);   // add ally tower main gui icon       // maybe should be sent only on login?
-                    packet.Worldstates.emplace_back(0x9b9, 1);   // add horde tower main gui icon      // maybe should be sent only on login?
-                    packet.Worldstates.emplace_back(0x9b5, 0);   // show neutral broken hill icon
-                    packet.Worldstates.emplace_back(0x9b4, 1);   // show icon above broken hill
-                    packet.Worldstates.emplace_back(0x9b3, 0);   // show ally broken hill icon
-                    packet.Worldstates.emplace_back(0x9b2, 0);   // show neutral overlook icon
-                    packet.Worldstates.emplace_back(0x9b1, 1);   // show the overlook arrow
-                    packet.Worldstates.emplace_back(0x9b0, 0);   // show ally overlook icon
-                    packet.Worldstates.emplace_back(0x9ae, 0);   // horde pvp objectives captured
-                    packet.Worldstates.emplace_back(0x9ac, 0);   // ally pvp objectives captured
-                    packet.Worldstates.emplace_back(0x9ab, 100); //: ally / horde slider grey area                              // show only in direct vicinity!
-                    packet.Worldstates.emplace_back(0x9aa, 50);  //: ally / horde slider percentage, 100 for ally, 0 for horde  // show only in direct vicinity!
-                    packet.Worldstates.emplace_back(0x9a9, 0);   //: ally / horde slider display                                // show only in direct vicinity!
-                    packet.Worldstates.emplace_back(0x9a8, 0);   // show the neutral stadium icon
-                    packet.Worldstates.emplace_back(0x9a7, 0);   // show the ally stadium icon
-                    packet.Worldstates.emplace_back(0x9a6, 1);   // show the horde stadium icon
+                    packet.Worldstates.emplace_back(WORLD_STATE_OPVP_HP_UI_TOWER_DISPLAY_A, 1);
+                    packet.Worldstates.emplace_back(WORLD_STATE_OPVP_HP_UI_TOWER_DISPLAY_H, 1);
+                    packet.Worldstates.emplace_back(WORLD_STATE_OPVP_HP_BROKENHILL_N, 0);
+                    packet.Worldstates.emplace_back(WORLD_STATE_OPVP_HP_BROKENHILL_H, 1);
+                    packet.Worldstates.emplace_back(WORLD_STATE_OPVP_HP_BROKENHILL_A, 0);
+                    packet.Worldstates.emplace_back(WORLD_STATE_OPVP_HP_OVERLOOK_N, 0);
+                    packet.Worldstates.emplace_back(WORLD_STATE_OPVP_HP_OVERLOOK_H, 1);
+                    packet.Worldstates.emplace_back(WORLD_STATE_OPVP_HP_OVERLOOK_A, 0);
+                    packet.Worldstates.emplace_back(WORLD_STATE_OPVP_HP_UI_TOWER_COUNT_H, 0);
+                    packet.Worldstates.emplace_back(WORLD_STATE_OPVP_HP_UI_TOWER_COUNT_A, 0);
+                    packet.Worldstates.emplace_back(WORLD_STATE_OPVP_HP_UI_TOWER_SLIDER_N, 100);
+                    packet.Worldstates.emplace_back(WORLD_STATE_OPVP_HP_UI_TOWER_SLIDER_POS, 50);
+                    packet.Worldstates.emplace_back(WORLD_STATE_OPVP_HP_UI_TOWER_SLIDER_DISPLAY, 0);
+                    packet.Worldstates.emplace_back(WORLD_STATE_OPVP_HP_STADIUM_N, 0);
+                    packet.Worldstates.emplace_back(WORLD_STATE_OPVP_HP_STADIUM_A, 0);
+                    packet.Worldstates.emplace_back(WORLD_STATE_OPVP_HP_STADIUM_H, 1);
                 }
                 break;
         case 3518: // Nagrand
@@ -8555,34 +8555,34 @@ void Player::SendInitWorldStates(uint32 zoneId, uint32 areaId)
             else
             {
                 packet.Worldstates.reserve(28);
-                packet.Worldstates.emplace_back(0x9c7, 0); // NA_UI_HORDE_GUARDS_SHOW
-                packet.Worldstates.emplace_back(0x9c6, 0); // NA_UI_ALLIANCE_GUARDS_SHOW
-                packet.Worldstates.emplace_back(0x9bd, 0); // NA_UI_GUARDS_MAX
-                packet.Worldstates.emplace_back(0x9bb, 0); // NA_UI_GUARDS_LEFT
-                packet.Worldstates.emplace_back(0x9bf, 0); // NA_UI_OUTLAND_01
-                packet.Worldstates.emplace_back(0x9be, 0); // NA_UI_UNK_1
-                packet.Worldstates.emplace_back(0x9c1, 0); // NA_UI_UNK_2
-                packet.Worldstates.emplace_back(0xaca, 0); // NA_MAP_WYVERN_NORTH_NEU_H
-                packet.Worldstates.emplace_back(0xa66, 0); // NA_MAP_WYVERN_NORTH_NEU_A
-                packet.Worldstates.emplace_back(0xa67, 0); // NA_MAP_WYVERN_NORTH_H
-                packet.Worldstates.emplace_back(0xa68, 0); // NA_MAP_WYVERN_NORTH_A
-                packet.Worldstates.emplace_back(0xac8, 0); // NA_MAP_WYVERN_SOUTH_NEU_H
-                packet.Worldstates.emplace_back(0xa6e, 0); // NA_MAP_WYVERN_SOUTH_NEU_A
-                packet.Worldstates.emplace_back(0xa6c, 0); // NA_MAP_WYVERN_SOUTH_H
-                packet.Worldstates.emplace_back(0xa6d, 0); // NA_MAP_WYVERN_SOUTH_A
-                packet.Worldstates.emplace_back(0xac9, 0); // NA_MAP_WYVERN_WEST_NEU_H
-                packet.Worldstates.emplace_back(0xa6b, 0); // NA_MAP_WYVERN_WEST_NEU_A
-                packet.Worldstates.emplace_back(0xa69, 0); // NA_MAP_WYVERN_WEST_H
-                packet.Worldstates.emplace_back(0xa6a, 0); // NA_MAP_WYVERN_WEST_A
-                packet.Worldstates.emplace_back(0xacb, 0); // NA_MAP_WYVERN_EAST_NEU_H
-                packet.Worldstates.emplace_back(0xa63, 0); // NA_MAP_WYVERN_EAST_NEU_A
-                packet.Worldstates.emplace_back(0xa64, 0); // NA_MAP_WYVERN_EAST_H
-                packet.Worldstates.emplace_back(0xa65, 0); // NA_MAP_WYVERN_EAST_A
-                packet.Worldstates.emplace_back(0xa6f, 0); // NA_MAP_HALAA_NEUTRAL
-                packet.Worldstates.emplace_back(0xa74, 0); // NA_MAP_HALAA_NEU_A
-                packet.Worldstates.emplace_back(0xa75, 0); // NA_MAP_HALAA_NEU_H
-                packet.Worldstates.emplace_back(0xa70, 0); // NA_MAP_HALAA_HORDE
-                packet.Worldstates.emplace_back(0xa71, 0); // NA_MAP_HALAA_ALLIANCE
+                packet.Worldstates.emplace_back(WORLD_STATE_OPVP_NA_UI_HORDE_GUARDS_SHOW, 0);
+                packet.Worldstates.emplace_back(WORLD_STATE_OPVP_NA_UI_ALLIANCE_GUARDS_SHOW, 0);
+                packet.Worldstates.emplace_back(WORLD_STATE_OPVP_NA_UI_GUARDS_MAX, 0);
+                packet.Worldstates.emplace_back(WORLD_STATE_OPVP_NA_UI_GUARDS_LEFT, 0);
+                packet.Worldstates.emplace_back(WORLD_STATE_OPVP_NA_UI_TOWER_SLIDER_DISPLAY, 0);
+                packet.Worldstates.emplace_back(WORLD_STATE_OPVP_NA_UI_TOWER_SLIDER_POS, 0);
+                packet.Worldstates.emplace_back(WORLD_STATE_OPVP_NA_UI_SLIDER_N, 0);
+                packet.Worldstates.emplace_back(WORLD_STATE_OPVP_NA_MAP_WYVERN_NORTH_NEU_H, 0);
+                packet.Worldstates.emplace_back(WORLD_STATE_OPVP_NA_MAP_WYVERN_NORTH_NEU_A, 0);
+                packet.Worldstates.emplace_back(WORLD_STATE_OPVP_NA_MAP_WYVERN_NORTH_H, 0);
+                packet.Worldstates.emplace_back(WORLD_STATE_OPVP_NA_MAP_WYVERN_NORTH_A, 0);
+                packet.Worldstates.emplace_back(WORLD_STATE_OPVP_NA_MAP_WYVERN_SOUTH_NEU_H, 0);
+                packet.Worldstates.emplace_back(WORLD_STATE_OPVP_NA_MAP_WYVERN_SOUTH_NEU_A, 0);
+                packet.Worldstates.emplace_back(WORLD_STATE_OPVP_NA_MAP_WYVERN_SOUTH_H, 0);
+                packet.Worldstates.emplace_back(WORLD_STATE_OPVP_NA_MAP_WYVERN_SOUTH_A, 0);
+                packet.Worldstates.emplace_back(WORLD_STATE_OPVP_NA_MAP_WYVERN_WEST_NEU_H, 0);
+                packet.Worldstates.emplace_back(WORLD_STATE_OPVP_NA_MAP_WYVERN_WEST_NEU_A, 0);
+                packet.Worldstates.emplace_back(WORLD_STATE_OPVP_NA_MAP_WYVERN_WEST_H, 0);
+                packet.Worldstates.emplace_back(WORLD_STATE_OPVP_NA_MAP_WYVERN_WEST_A, 0);
+                packet.Worldstates.emplace_back(WORLD_STATE_OPVP_NA_MAP_WYVERN_EAST_NEU_H, 0);
+                packet.Worldstates.emplace_back(WORLD_STATE_OPVP_NA_MAP_WYVERN_EAST_NEU_A, 0);
+                packet.Worldstates.emplace_back(WORLD_STATE_OPVP_NA_MAP_WYVERN_EAST_H, 0);
+                packet.Worldstates.emplace_back(WORLD_STATE_OPVP_NA_MAP_WYVERN_EAST_A, 0);
+                packet.Worldstates.emplace_back(WORLD_STATE_OPVP_NA_MAP_HALAA_NEUTRAL, 0);
+                packet.Worldstates.emplace_back(WORLD_STATE_OPVP_NA_MAP_HALAA_NEU_A, 0);
+                packet.Worldstates.emplace_back(WORLD_STATE_OPVP_NA_MAP_HALAA_NEU_H, 0);
+                packet.Worldstates.emplace_back(WORLD_STATE_OPVP_NA_MAP_HALAA_HORDE, 0);
+                packet.Worldstates.emplace_back(WORLD_STATE_OPVP_NA_MAP_HALAA_ALLIANCE, 0);
             }
                 break;
             case 3519: // Terokkar Forest
@@ -8591,34 +8591,34 @@ void Player::SendInitWorldStates(uint32 zoneId, uint32 areaId)
                 else
                 {
                     packet.Worldstates.reserve(28);
-                    packet.Worldstates.emplace_back(0xa41, 0);  // TF_UI_CAPTURE_BAR_POS
-                    packet.Worldstates.emplace_back(0xa40, 20); // TF_UI_CAPTURE_BAR_NEUTRAL
-                    packet.Worldstates.emplace_back(0xa3f, 0);  // TF_UI_SHOW CAPTURE BAR
-                    packet.Worldstates.emplace_back(0xa3e, 0);  // TF_UI_TOWER_COUNT_H
-                    packet.Worldstates.emplace_back(0xa3d, 5);  // TF_UI_TOWER_COUNT_A
-                    packet.Worldstates.emplace_back(0xa3c, 0);  // TF_UI_TOWERS_CONTROLLED_DISPLAY
-                    packet.Worldstates.emplace_back(0xa88, 0);  // TF_TOWER_NUM_15 - SE Neutral
-                    packet.Worldstates.emplace_back(0xa87, 0);  // TF_TOWER_NUM_14 - SE Horde
-                    packet.Worldstates.emplace_back(0xa86, 0);  // TF_TOWER_NUM_13 - SE Alliance
-                    packet.Worldstates.emplace_back(0xa85, 0);  // TF_TOWER_NUM_12 - S Neutral
-                    packet.Worldstates.emplace_back(0xa84, 0);  // TF_TOWER_NUM_11 - S Horde
-                    packet.Worldstates.emplace_back(0xa83, 0);  // TF_TOWER_NUM_10 - S Alliance
-                    packet.Worldstates.emplace_back(0xa82, 0);  // TF_TOWER_NUM_09 - NE Neutral
-                    packet.Worldstates.emplace_back(0xa81, 0);  // TF_TOWER_NUM_08 - NE Horde
-                    packet.Worldstates.emplace_back(0xa80, 0);  // TF_TOWER_NUM_07 - NE Alliance
-                    packet.Worldstates.emplace_back(0xa7f, 0);  // TF_TOWER_NUM_16 - unk
-                    packet.Worldstates.emplace_back(0xa7e, 0);  // TF_TOWER_NUM_06 - N Neutral
-                    packet.Worldstates.emplace_back(0xa7d, 0);  // TF_TOWER_NUM_05 - N Horde
-                    packet.Worldstates.emplace_back(0xa7c, 0);  // TF_TOWER_NUM_04 - N Alliance
-                    packet.Worldstates.emplace_back(0xa7b, 0);  // TF_TOWER_NUM_03 - NW Alliance
-                    packet.Worldstates.emplace_back(0xa7a, 0);  // TF_TOWER_NUM_02 - NW Horde
-                    packet.Worldstates.emplace_back(0xa79, 0);  // TF_TOWER_NUM_01 - NW Neutral
-                    packet.Worldstates.emplace_back(0x9d0, 5);  // TF_UI_LOCKED_TIME_MINUTES_FIRST_DIGIT
-                    packet.Worldstates.emplace_back(0x9ce, 0);  // TF_UI_LOCKED_TIME_MINUTES_SECOND_DIGIT
-                    packet.Worldstates.emplace_back(0x9cd, 0);  // TF_UI_LOCKED_TIME_HOURS
-                    packet.Worldstates.emplace_back(0x9cc, 0);  // TF_UI_LOCKED_DISPLAY_NEUTRAL
-                    packet.Worldstates.emplace_back(0xad0, 0);  // TF_UI_LOCKED_DISPLAY_HORDE
-                    packet.Worldstates.emplace_back(0xacf, 1);  // TF_UI_LOCKED_DISPLAY_ALLIANCE
+                    packet.Worldstates.emplace_back(WORLD_STATE_OPVP_TF_UI_TOWER_SLIDER_POS, 0);
+                    packet.Worldstates.emplace_back(WORLD_STATE_OPVP_TF_UI_TOWER_SLIDER_N, 20);
+                    packet.Worldstates.emplace_back(WORLD_STATE_OPVP_TF_UI_TOWER_SLIDER_DISPLAY, 0);
+                    packet.Worldstates.emplace_back(WORLD_STATE_OPVP_TF_UI_TOWER_COUNT_H, 0);
+                    packet.Worldstates.emplace_back(WORLD_STATE_OPVP_TF_UI_TOWER_COUNT_A, 5);
+                    packet.Worldstates.emplace_back(WORLD_STATE_OPVP_TF_UI_TOWERS_CONTROLLED_DISPLAY, 0);
+                    packet.Worldstates.emplace_back(WORLD_STATE_OPVP_TF_TOWER_NUM_14, 0);
+                    packet.Worldstates.emplace_back(WORLD_STATE_OPVP_TF_TOWER_NUM_13, 0);
+                    packet.Worldstates.emplace_back(WORLD_STATE_OPVP_TF_TOWER_NUM_12, 0);
+                    packet.Worldstates.emplace_back(WORLD_STATE_OPVP_TF_TOWER_NUM_11, 0);
+                    packet.Worldstates.emplace_back(WORLD_STATE_OPVP_TF_TOWER_NUM_10, 0);
+                    packet.Worldstates.emplace_back(WORLD_STATE_OPVP_TF_TOWER_NUM_09, 0);
+                    packet.Worldstates.emplace_back(WORLD_STATE_OPVP_TF_TOWER_NUM_08, 0);
+                    packet.Worldstates.emplace_back(WORLD_STATE_OPVP_TF_TOWER_NUM_07, 0);
+                    packet.Worldstates.emplace_back(WORLD_STATE_OPVP_TF_TOWER_NUM_06, 0);
+                    packet.Worldstates.emplace_back(WORLD_STATE_OPVP_TF_TOWER_NUM_15, 0);
+                    packet.Worldstates.emplace_back(WORLD_STATE_OPVP_TF_TOWER_NUM_05, 0);
+                    packet.Worldstates.emplace_back(WORLD_STATE_OPVP_TF_TOWER_NUM_04, 0);
+                    packet.Worldstates.emplace_back(WORLD_STATE_OPVP_TF_TOWER_NUM_03, 0);
+                    packet.Worldstates.emplace_back(WORLD_STATE_OPVP_TF_TOWER_NUM_02, 0);
+                    packet.Worldstates.emplace_back(WORLD_STATE_OPVP_TF_TOWER_NUM_01, 0);
+                    packet.Worldstates.emplace_back(WORLD_STATE_OPVP_TF_TOWER_NUM_00, 0);
+                    packet.Worldstates.emplace_back(WORLD_STATE_OPVP_TF_UI_LOCKED_TIME_MINUTES_FIRST_DIGIT, 5);
+                    packet.Worldstates.emplace_back(WORLD_STATE_OPVP_TF_UI_LOCKED_TIME_MINUTES_SECOND_DIGIT, 0);
+                    packet.Worldstates.emplace_back(WORLD_STATE_OPVP_TF_UI_LOCKED_TIME_HOURS, 0);
+                    packet.Worldstates.emplace_back(WORLD_STATE_OPVP_TF_UI_LOCKED_DISPLAY_NEUTRAL, 0);
+                    packet.Worldstates.emplace_back(WORLD_STATE_OPVP_TF_UI_LOCKED_DISPLAY_HORDE, 0);
+                    packet.Worldstates.emplace_back(WORLD_STATE_OPVP_TF_UI_LOCKED_DISPLAY_ALLIANCE, 1);
                 }
                 break;
             case 3521: // Zangarmarsh
@@ -8627,32 +8627,32 @@ void Player::SendInitWorldStates(uint32 zoneId, uint32 areaId)
                 else
                 {
                     packet.Worldstates.reserve(26);
-                    packet.Worldstates.emplace_back(0x9e1, 0); // ZM_UNK_1
-                    packet.Worldstates.emplace_back(0x9e0, 0); // ZM_UNK_2
-                    packet.Worldstates.emplace_back(0x9df, 0); // ZM_UNK_3
-                    packet.Worldstates.emplace_back(0xa5d, 1); // ZM_WORLDSTATE_UNK_1
-                    packet.Worldstates.emplace_back(0xa5c, 0); // ZM_MAP_TOWER_EAST_N
-                    packet.Worldstates.emplace_back(0xa5b, 1); // ZM_MAP_TOWER_EAST_H
-                    packet.Worldstates.emplace_back(0xa5a, 0); // ZM_MAP_TOWER_EAST_A
-                    packet.Worldstates.emplace_back(0xa59, 1); // ZM_MAP_GRAVEYARD_H - Twin spire graveyard horde
-                    packet.Worldstates.emplace_back(0xa58, 0); // ZM_MAP_GRAVEYARD_A
-                    packet.Worldstates.emplace_back(0xa57, 0); // ZM_MAP_GRAVEYARD_N
-                    packet.Worldstates.emplace_back(0xa56, 0); // ZM_MAP_TOWER_WEST_N
-                    packet.Worldstates.emplace_back(0xa55, 1); // ZM_MAP_TOWER_WEST_H
-                    packet.Worldstates.emplace_back(0xa54, 0); // ZM_MAP_TOWER_WEST_A
-                    packet.Worldstates.emplace_back(0x9e7, 0); // ZM_UNK_4
-                    packet.Worldstates.emplace_back(0x9e6, 0); // ZM_UNK_5
-                    packet.Worldstates.emplace_back(0x9e5, 0); // ZM_UNK_6
-                    packet.Worldstates.emplace_back(0xa00, 0); // ZM_UI_TOWER_EAST_N
-                    packet.Worldstates.emplace_back(0x9ff, 1); // ZM_UI_TOWER_EAST_H
-                    packet.Worldstates.emplace_back(0x9fe, 0); // ZM_UI_TOWER_EAST_A
-                    packet.Worldstates.emplace_back(0x9fd, 0); // ZM_UI_TOWER_WEST_N
-                    packet.Worldstates.emplace_back(0x9fc, 1); // ZM_UI_TOWER_WEST_H
-                    packet.Worldstates.emplace_back(0x9fb, 0); // ZM_UI_TOWER_WEST_A
-                    packet.Worldstates.emplace_back(0xa62, 0); // ZM_MAP_HORDE_FLAG_READY
-                    packet.Worldstates.emplace_back(0xa61, 1); // ZM_MAP_HORDE_FLAG_NOT_READY
-                    packet.Worldstates.emplace_back(0xa60, 1); // ZM_MAP_ALLIANCE_FLAG_NOT_READY
-                    packet.Worldstates.emplace_back(0xa5f, 0); // ZM_MAP_ALLIANCE_FLAG_READY
+                    packet.Worldstates.emplace_back(WORLD_STATE_OPVP_ZM_UI_TOWER_SLIDER_N_W, 0);
+                    packet.Worldstates.emplace_back(WORLD_STATE_OPVP_ZM_UI_TOWER_SLIDER_POS_W, 0);
+                    packet.Worldstates.emplace_back(WORLD_STATE_OPVP_ZM_UI_TOWER_SLIDER_DISPLAY_W, 0);
+                    packet.Worldstates.emplace_back(WORLD_STATE_OPVP_ZM_WORLDSTATE_UNK_1, 1);
+                    packet.Worldstates.emplace_back(WORLD_STATE_OPVP_ZM_MAP_TOWER_EAST_N, 0);
+                    packet.Worldstates.emplace_back(WORLD_STATE_OPVP_ZM_MAP_TOWER_EAST_H, 1);
+                    packet.Worldstates.emplace_back(WORLD_STATE_OPVP_ZM_MAP_TOWER_EAST_A, 0);
+                    packet.Worldstates.emplace_back(WORLD_STATE_OPVP_ZM_MAP_GRAVEYARD_H, 1);
+                    packet.Worldstates.emplace_back(WORLD_STATE_OPVP_ZM_MAP_GRAVEYARD_A, 0);
+                    packet.Worldstates.emplace_back(WORLD_STATE_OPVP_ZM_MAP_GRAVEYARD_N, 0);
+                    packet.Worldstates.emplace_back(WORLD_STATE_OPVP_ZM_MAP_TOWER_WEST_N, 0);
+                    packet.Worldstates.emplace_back(WORLD_STATE_OPVP_ZM_MAP_TOWER_WEST_H, 1);
+                    packet.Worldstates.emplace_back(WORLD_STATE_OPVP_ZM_MAP_TOWER_WEST_A, 0);
+                    packet.Worldstates.emplace_back(WORLD_STATE_OPVP_ZM_UI_TOWER_SLIDER_N_E, 0);
+                    packet.Worldstates.emplace_back(WORLD_STATE_OPVP_ZM_UI_TOWER_SLIDER_POS_E, 0);
+                    packet.Worldstates.emplace_back(WORLD_STATE_OPVP_ZM_UI_TOWER_SLIDER_DISPLAY_E, 0);
+                    packet.Worldstates.emplace_back(WORLD_STATE_OPVP_ZM_UI_TOWER_EAST_N, 0);
+                    packet.Worldstates.emplace_back(WORLD_STATE_OPVP_ZM_UI_TOWER_EAST_H, 1);
+                    packet.Worldstates.emplace_back(WORLD_STATE_OPVP_ZM_UI_TOWER_EAST_A, 0);
+                    packet.Worldstates.emplace_back(WORLD_STATE_OPVP_ZM_UI_TOWER_WEST_N, 0);
+                    packet.Worldstates.emplace_back(WORLD_STATE_OPVP_ZM_UI_TOWER_WEST_H, 1);
+                    packet.Worldstates.emplace_back(WORLD_STATE_OPVP_ZM_UI_TOWER_WEST_A, 0);
+                    packet.Worldstates.emplace_back(WORLD_STATE_OPVP_ZM_MAP_HORDE_FLAG_READY, 0);
+                    packet.Worldstates.emplace_back(WORLD_STATE_OPVP_ZM_MAP_HORDE_FLAG_NOT_READY, 1);
+                    packet.Worldstates.emplace_back(WORLD_STATE_OPVP_ZM_MAP_ALLIANCE_FLAG_NOT_READY, 1);
+                    packet.Worldstates.emplace_back(WORLD_STATE_OPVP_ZM_MAP_ALLIANCE_FLAG_READY, 0);
                 }
                 break;
             case 3698: // Nagrand Arena

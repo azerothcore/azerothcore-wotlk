@@ -254,7 +254,7 @@ void BattlegroundAB::FillInitialWorldStates(WorldPackets::WorldState::InitWorldS
     packet.Worldstates.emplace_back(WORLD_STATE_BATTLEGROUND_AB_RESOURCES_WARNING, BG_AB_WARNING_NEAR_VICTORY_SCORE);
     packet.Worldstates.emplace_back(WORLD_STATE_BATTLEGROUND_AB_RESOURCES_ALLIANCE, m_TeamScores[TEAM_ALLIANCE]);
     packet.Worldstates.emplace_back(WORLD_STATE_BATTLEGROUND_AB_RESOURCES_HORDE, m_TeamScores[TEAM_HORDE]);
-    packet.Worldstates.emplace_back(0x745, 2);
+    packet.Worldstates.emplace_back(WORLD_STATE_BATTLEGROUND_AB_UNK, 2);
 }
 
 void BattlegroundAB::SendNodeUpdate(uint8 node)
