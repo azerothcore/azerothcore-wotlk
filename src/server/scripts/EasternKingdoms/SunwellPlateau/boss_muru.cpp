@@ -72,6 +72,15 @@ struct boss_muru : public BossAI
         me->m_Events.KillAllEvents(false);
     }
 
+    void MoveInLineOfSight(Unit* who) override
+    {
+        // Radius of room is ~38.5f this might need adjusting a bit
+        if (!me->IsInCombat() && who->IsPlayer() && me->IsWithinDistInMap(who, 38.0f))
+        {
+            me->SetInCombatWithZone();
+        }
+    }
+
     void JustEngagedWith(Unit* who) override
     {
         BossAI::JustEngagedWith(who);
