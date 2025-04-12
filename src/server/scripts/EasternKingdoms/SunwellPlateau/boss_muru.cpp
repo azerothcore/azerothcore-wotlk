@@ -204,7 +204,6 @@ struct npc_dark_fiend : public ScriptedAI
         _lastVictimGUID.Clear();
         _spellCast = false;
 
-        // Schedule targeting and attacking after 1-2 seconds
         me->m_Events.AddEventAtOffset([this]() {
             me->SetReactState(REACT_AGGRESSIVE);
             if (Unit* target = SelectTargetFromPlayerList(200.0f, 0, true))
