@@ -1,3 +1,4 @@
+-- DB update 2025_04_12_00 -> 2025_04_12_01
 
 -- Add Waypoints (sniffed)
 DELETE FROM `waypoint_data` WHERE `id` IN (13080000, 13080001, 13080002, 13080003, 13080004, 13080005, 13080006);
