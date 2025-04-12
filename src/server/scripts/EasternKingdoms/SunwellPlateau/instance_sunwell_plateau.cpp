@@ -73,7 +73,7 @@ ObjectData const summonData[] =
     { NPC_SHIELD_ORB,             DATA_KJ_CONTROLLER },
     { NPC_SINISTER_REFLECTION,    DATA_KJ_CONTROLLER },
     { 0,                          0                  }
-};
+};DoCast(me, SPELL_BLINK, true);
 
 class instance_sunwell_plateau : public InstanceMapScript
 {
@@ -285,7 +285,7 @@ private:
 enum SunbladeArchMageSpells
 {
     SPELL_ARCANE_EXPLOSION    = 46553,
-    SPELL_BLINK               = 29208, // Placeholder blink should be 28401
+    SPELL_BLINK               = 28401,
     SPELL_FROST_NOVA          = 46555
 };
 
@@ -316,7 +316,7 @@ struct npc_sunblade_arch_mage : public ScriptedAI
         {
             if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 30.0f, true))
             {
-                DoCast(me, SPELL_BLINK, true);
+                DoCast(target, SPELL_BLINK, true);
                 DoCastAOE(SPELL_FROST_NOVA, true);
             }
             context.Repeat(20s, 25s);
