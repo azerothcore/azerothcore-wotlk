@@ -372,7 +372,7 @@ class spell_muru_blackhole : public SpellScript
             return;
 
         WorldLocation summonPos = *GetExplTargetDest();
-        float destZ = summonPos.GetPositionZ() - GetCaster()->GetMapWaterOrGroundLevel(GetCaster()->GetPosition());
+        float destZ = summonPos.GetPositionZ() - GetCaster()->GetMapWaterOrGroundLevel(summonPos);
         Position offset = { 0.0f, 0.0f, -destZ, 0.0f};
         summonPos.RelocateOffset(offset);
         SetExplTargetDest(summonPos);
