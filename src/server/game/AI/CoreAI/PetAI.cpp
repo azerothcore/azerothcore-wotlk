@@ -517,9 +517,13 @@ Unit* PetAI::SelectNextTarget(bool allowAutoSelect) const
         if (!me->GetCharmInfo()->IsReturning() || me->GetCharmInfo()->IsFollowing() || me->GetCharmInfo()->IsAtStay())
             if (Unit* nearTarget = me->ToCreature()->SelectNearestTargetInAttackDistance(MAX_AGGRO_RADIUS))
                 if (nearTarget->IsPlayer() && nearTarget->ToPlayer()->IsPvP() && !owner->IsPvP()) // If owner is not PvP flagged and target is PvP flagged, do not attack
+                {
                     return nullptr; /// @todo: try for another target
+                }
                 else
+                {
                     return nearTarget;
+                }
 
     // Default - no valid targets
     return nullptr;
