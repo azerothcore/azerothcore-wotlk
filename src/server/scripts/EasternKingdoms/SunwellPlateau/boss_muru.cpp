@@ -199,7 +199,7 @@ struct npc_dark_fiend : public ScriptedAI
         DoCast(me, SPELL_DARK_FIEND_SECONDARY);
         me->m_Events.AddEventAtOffset([this]() {
             me->DespawnOrUnsummon();
-        }, 20s);
+        }, 15s);
     }
 
     void Reset() override
