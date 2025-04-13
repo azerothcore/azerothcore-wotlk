@@ -514,8 +514,11 @@ Unit* PetAI::SelectNextTarget(bool allowAutoSelect) const
     // To prevent aggressive pets from chain selecting targets and running off, we
     // only select a random target if certain conditions are met.
     if (allowAutoSelect)
+    {
         if (!me->GetCharmInfo()->IsReturning() || me->GetCharmInfo()->IsFollowing() || me->GetCharmInfo()->IsAtStay())
+        {
             if (Unit* nearTarget = me->ToCreature()->SelectNearestTargetInAttackDistance(MAX_AGGRO_RADIUS))
+            {
                 if (nearTarget->IsPlayer() && nearTarget->ToPlayer()->IsPvP() && !owner->IsPvP()) // If owner is not PvP flagged and target is PvP flagged, do not attack
                 {
                     return nullptr; /// @todo: try for another target
@@ -524,6 +527,9 @@ Unit* PetAI::SelectNextTarget(bool allowAutoSelect) const
                 {
                     return nearTarget;
                 }
+            }
+        }
+    }
 
     // Default - no valid targets
     return nullptr;
