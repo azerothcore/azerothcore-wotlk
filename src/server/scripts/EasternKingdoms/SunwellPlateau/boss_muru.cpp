@@ -197,6 +197,9 @@ struct npc_dark_fiend : public ScriptedAI
         me->SetReactState(REACT_PASSIVE);
         DoCast(me, SPELL_DARK_FIEND_APPEARANCE);
         DoCast(me, SPELL_DARK_FIEND_SECONDARY);
+        me->m_Events.AddEventAtOffset([this]() {
+            me->DespawnOrUnsummon();
+        }, 20s);
     }
 
     void Reset() override
