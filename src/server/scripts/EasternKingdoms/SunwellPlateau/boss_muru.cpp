@@ -129,9 +129,6 @@ struct boss_entropius : public ScriptedAI
 
         me->SetReactState(REACT_PASSIVE);
 
-        me->ApplySpellImmune(0, IMMUNITY_STATE, SPELL_AURA_MOD_TAUNT, true);
-        me->ApplySpellImmune(0, IMMUNITY_EFFECT, SPELL_EFFECT_ATTACK_ME, true);
-
         me->m_Events.AddEventAtOffset([&] {
             me->SetReactState(REACT_AGGRESSIVE);
             me->SetInCombatWithZone();
