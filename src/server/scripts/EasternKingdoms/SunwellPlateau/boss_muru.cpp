@@ -56,9 +56,9 @@ enum Spells
     // Dark Fiend Spells
     SPELL_DARK_FIEND_APPEARANCE         = 45934,
     SPELL_DARK_FIEND_SECONDARY          = 45936,
-    SPELL_DARK_FIEND_TRIGGER            = 45944,
+    SPELL_DARK_FIEND_TRIGGER            = 45944
     // It is currently unkown why Dark Fiend Casts this or what it should do
-    //SPELL_DARK_FIEND_TRIGGER_SINGLE   = 45943; 
+    //SPELL_DARK_FIEND_TRIGGER_SINGLE   = 45943 
 };
 
 struct boss_muru : public BossAI
