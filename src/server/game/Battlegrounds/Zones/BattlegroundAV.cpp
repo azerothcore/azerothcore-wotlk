@@ -57,26 +57,13 @@ BattlegroundAV::BattlegroundAV()
 
     m_Mine_Timer = 0;
 
-    if (sBattlegroundMgr->IsBGWeekend(GetBgTypeID(true)))
-    {
-        _reputationTower = 18;
-        _reputationCaptain = 185;
-        _reputationBoss = 525;
-        _reputationPerOwnedGraveyard = 18;
-        _reputationSurvivingCaptain = 175;
-        _reputationSurvivingTower = 18;
-        _reputationPerOwnedMine = 36;
-    }
-    else
-    {
-        _reputationTower = 12;
-        _reputationCaptain = 125;
-        _reputationBoss = sWorld->getIntConfig(CONFIG_BATTLEGROUND_ALTERAC_REP_ONBOSSDEATH);
-        _reputationPerOwnedGraveyard = 12;
-        _reputationSurvivingCaptain = 125;
-        _reputationSurvivingTower = 12;
-        _reputationPerOwnedMine = 24;
-    }
+    _reputationTower = 0;
+    _reputationCaptain = 0;
+    _reputationBoss = 0;
+    _reputationPerOwnedGraveyard = 0;
+    _reputationSurvivingCaptain = 0;
+    _reputationSurvivingTower = 0;
+    _reputationPerOwnedMine = 0;
 
     for (BG_AV_Nodes i = BG_AV_NODES_FIRSTAID_STATION; i < BG_AV_NODES_MAX; ++i)
         InitNode(i, TEAM_NEUTRAL, false);
@@ -1253,6 +1240,27 @@ GraveyardStruct const* BattlegroundAV::GetClosestGraveyard(Player* player)
 
 bool BattlegroundAV::SetupBattleground()
 {
+    if (sBattlegroundMgr->IsBGWeekend(GetBgTypeID(true)))
+    {
+        _reputationTower = 18;
+        _reputationCaptain = 185;
+        _reputationBoss = 525;
+        _reputationPerOwnedGraveyard = 18;
+        _reputationSurvivingCaptain = 175;
+        _reputationSurvivingTower = 18;
+        _reputationPerOwnedMine = 36;
+    }
+    else
+    {
+        _reputationTower = 12;
+        _reputationCaptain = 125;
+        _reputationBoss = sWorld->getIntConfig(CONFIG_BATTLEGROUND_ALTERAC_REP_ONBOSSDEATH);
+        _reputationPerOwnedGraveyard = 12;
+        _reputationSurvivingCaptain = 125;
+        _reputationSurvivingTower = 12;
+        _reputationPerOwnedMine = 24;
+    }
+
     // Create starting objects
 
     //spawn node-objects
