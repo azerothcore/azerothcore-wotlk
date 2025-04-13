@@ -244,7 +244,7 @@ struct npc_dark_fiend : public ScriptedAI
         if (!UpdateVictim())
             return;
 
-        if (!_spellCast && currentVictim && me->IsWithinMeleeRange(currentVictim, 1.0f))
+        if (!_spellCast && currentVictim && me->IsWithinMeleeRange(currentVictim, 2.0f))
         {
             DoCast(me, SPELL_DARK_FIEND_TRIGGER);
             _spellCast = true;
