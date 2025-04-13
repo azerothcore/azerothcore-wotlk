@@ -212,7 +212,7 @@ struct npc_singularity : public NullCreatureAI
         scheduler.Schedule(1s, [this](TaskContext context)
         {
             Player* target = nullptr;
-    
+
             auto const& playerList = me->GetMap()->GetPlayers();
             for (auto const& playerRef : playerList)
             {
@@ -225,12 +225,12 @@ struct npc_singularity : public NullCreatureAI
                     }
                 }
             }
-    
+
             if (target)
             {
                 me->GetMotionMaster()->Clear();
                 me->GetMotionMaster()->MoveFollow(target, 0.0f, 0.0f);
-    
+
                 scheduler.Schedule(6s, [this](TaskContext)
                 {
                     FindAndFollowTarget();
