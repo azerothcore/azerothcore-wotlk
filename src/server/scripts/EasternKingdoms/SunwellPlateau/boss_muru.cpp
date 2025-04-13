@@ -322,8 +322,8 @@ class spell_entropius_black_hole_effect : public SpellScript
         if (target->GetDistance(GetCaster()) < 5.0f)
         {
             float o = frand(0, 2 * M_PI);
-            pos.Relocate(GetCaster()->GetPositionX() + 8.0f * cos(o), 
-                         GetCaster()->GetPositionY() + 8.0f * std::sin(o), 
+            pos.Relocate(GetCaster()->GetPositionX() + 8.0f * cos(o),
+                         GetCaster()->GetPositionY() + 8.0f * std::sin(o),
                          GetCaster()->GetPositionZ() + frand(2.0f, 5.0f));
         }
         else
