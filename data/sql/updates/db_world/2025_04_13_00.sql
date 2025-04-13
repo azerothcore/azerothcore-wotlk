@@ -1,3 +1,4 @@
+-- DB update 2025_04_12_01 -> 2025_04_13_00
 
 -- Add more sniffed SP
 DELETE FROM `creature` WHERE (`id1` = 28406) AND (`guid` IN (129500, 129501, 129502, 129503));
