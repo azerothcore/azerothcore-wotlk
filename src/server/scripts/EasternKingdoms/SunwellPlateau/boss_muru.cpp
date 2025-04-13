@@ -197,27 +197,50 @@ struct npc_singularity : public NullCreatureAI
         me->m_Events.AddEventAtOffset([&] {
             DoCastSelf(SPELL_BLACK_HOLE_VISUAL2, true);
             DoCastSelf(SPELL_BLACK_HOLE_PASSIVE, true);
+
+            // Start following players after visuals are complete
+            FindAndFollowTarget();
         }, 8s);
 
         me->m_Events.AddEventAtOffset([&] {
             me->KillSelf();
         }, 17s);
+    }
 
-        scheduler.Schedule(8s, [this](TaskContext context)
+    void FindAndFollowTarget()
+    {
+        scheduler.Schedule(1s, [this](TaskContext context)
         {
+            Player* target = nullptr;
+    
             auto const& playerList = me->GetMap()->GetPlayers();
             for (auto const& playerRef : playerList)
             {
                 if (Player* player = playerRef.GetSource())
+                {
                     if (me->IsWithinLOSInMap(player) && player->IsAlive() && !player->HasAura(SPELL_BLACK_HOLE_EFFECT))
                     {
-                        me->GetMotionMaster()->MovePoint(0, player->GetPositionX(), player->GetPositionY(), player->GetPositionZ(), false, true);
-                        context.Repeat();
-                        return;
+                        target = player;
+                        break;
                     }
+                }
             }
-
-            context.Repeat(1s);
+    
+            if (target)
+            {
+                me->GetMotionMaster()->Clear();
+                me->GetMotionMaster()->MoveFollow(target, 0.0f, 0.0f);
+    
+                scheduler.Schedule(6s, [this](TaskContext)
+                {
+                    FindAndFollowTarget();
+                });
+            }
+            else
+            {
+                // No valid target found, check again soon
+                context.Repeat(1s);
+            }
         });
     }
 
