@@ -197,8 +197,6 @@ struct npc_dark_fiend : public ScriptedAI
     npc_dark_fiend(Creature* creature) : ScriptedAI(creature)
     {
         me->SetReactState(REACT_PASSIVE);
-        DoCast(me, SPELL_DARK_FIEND_APPEARANCE);
-        DoCast(me, SPELL_DARK_FIEND_SECONDARY);
     }
 
     void Reset() override
@@ -206,6 +204,9 @@ struct npc_dark_fiend : public ScriptedAI
         _lastVictimGUID.Clear();
         _spellCast = false;
 
+        DoCast(me, SPELL_DARK_FIEND_APPEARANCE);
+        DoCast(me, SPELL_DARK_FIEND_SECONDARY);
+        
         me->m_Events.AddEventAtOffset([this]() {
             me->SetReactState(REACT_AGGRESSIVE);
             if (Unit* target = SelectTargetFromPlayerList(200.0f, 0, true))
