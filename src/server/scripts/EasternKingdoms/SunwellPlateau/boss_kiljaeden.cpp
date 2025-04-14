@@ -537,8 +537,7 @@ struct boss_kiljaeden : public BossAI
             summon->CastSpell(summon, SPELL_ARMAGEDDON_VISUAL, true);
             summon->SetPosition(summon->GetPositionX(), summon->GetPositionY(), summon->GetPositionZ() + 20.0f, 0.0f);
             summon->m_Events.AddEvent(new CastArmageddon(summon), summon->m_Events.CalculateTime(6000));
-            
-            // Use m_Events to schedule despawn between 8-10 seconds
+
             summon->m_Events.AddEventAtOffset([summon]() {
                 summon->DespawnOrUnsummon();
             }, 8s, 10s);
