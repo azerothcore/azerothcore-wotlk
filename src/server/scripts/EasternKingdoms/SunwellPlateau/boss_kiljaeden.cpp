@@ -1087,15 +1087,19 @@ class spell_kiljaeden_armageddon_periodic_aura : public AuraScript
     void HandlePeriodic(AuraEffect const* aurEff)
     {
         PreventDefaultAction();
+        Unit* caster = GetUnitOwner();
 
         std::list<Creature*> armageddons;
-        GetUnitOwner()->GetCreatureListWithEntryInGrid(armageddons, NPC_ARMAGEDDON_TARGET, 100.0f);
-
+        caster->GetCreatureListWithEntryInGrid(armageddons, NPC_ARMAGEDDON_TARGET, 100.0f);
         if (armageddons.size() >= 3)
             return;
 
-        if (Unit* target = GetUnitOwner()->GetAI()->SelectTarget(SelectTargetMethod::Random, 0, 60.0f, true))
-            GetUnitOwner()->CastSpell(target, GetSpellInfo()->Effects[aurEff->GetEffIndex()].TriggerSpell, true);
+        Spell* currentSpell = caster->GetCurrentSpell(CURRENT_GENERIC_SPELL);
+        if (currentSpell && currentSpell->GetSpellInfo()->Id == SPELL_DARKNESS_OF_A_THOUSAND_SOULS)
+            return;
+
+        if (Unit* target = caster->GetAI()->SelectTarget(SelectTargetMethod::Random, 0, 60.0f, true))
+            caster->CastSpell(target, GetSpellInfo()->Effects[aurEff->GetEffIndex()].TriggerSpell, true);
     }
 
     void Register() override
