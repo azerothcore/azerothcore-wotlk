@@ -24,6 +24,7 @@
 #include "Opcodes.h"
 #include "Pet.h"
 #include "Player.h"
+#include "ScriptMgr.h"
 #include "World.h"
 #include "WorldPacket.h"
 #include "WorldSession.h"
@@ -43,8 +44,11 @@ void WorldSession::SendNameQueryOpcode(ObjectGuid guid)
 
     Player* player = ObjectAccessor::FindConnectedPlayer(guid);
 
+    std::string name = playerData->Name;
+    sScriptMgr->OnPlayerSendNameQueryOpcode(player, name);
+
     data << uint8(0);                               // name known
-    data << playerData->Name;                       // played name
+    data << name;                                   // player name
     data << uint8(0);                               // realm name - only set for cross realm interaction (such as Battlegrounds)
     data << uint8(player ? player->getRace() : playerData->Race);
     data << uint8(playerData->Sex);
