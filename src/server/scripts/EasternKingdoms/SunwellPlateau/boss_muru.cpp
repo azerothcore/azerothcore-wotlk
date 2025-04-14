@@ -194,16 +194,14 @@ struct boss_entropius : public ScriptedAI
 
 struct npc_dark_fiend : public ScriptedAI
 {
-    npc_dark_fiend(Creature* creature) : ScriptedAI(creature)
-    {
-        me->SetReactState(REACT_PASSIVE);
-    }
+    npc_dark_fiend(Creature* creature) : ScriptedAI(creature) { }
 
     void Reset() override
     {
         _lastVictimGUID.Clear();
         _spellCast = false;
 
+        me->SetReactState(REACT_PASSIVE);
         DoCast(me, SPELL_DARK_FIEND_APPEARANCE);
         DoCast(me, SPELL_DARK_FIEND_SECONDARY);
 
