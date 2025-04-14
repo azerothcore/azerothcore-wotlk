@@ -206,7 +206,7 @@ struct npc_dark_fiend : public ScriptedAI
 
         DoCast(me, SPELL_DARK_FIEND_APPEARANCE);
         DoCast(me, SPELL_DARK_FIEND_SECONDARY);
-        
+
         me->m_Events.AddEventAtOffset([this]() {
             me->SetReactState(REACT_AGGRESSIVE);
             if (Unit* target = SelectTargetFromPlayerList(200.0f, 0, true))
