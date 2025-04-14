@@ -324,11 +324,10 @@ struct boss_kiljaeden : public BossAI
             });
 
             ScheduleTimedEvent(15s, [&] {
-                me->RemoveAurasDueToSpell(SPELL_ARMAGEDDON_PERIODIC); // Remove Armageddon aura
+                me->RemoveAurasDueToSpell(SPELL_ARMAGEDDON_PERIODIC);
                 Talk(EMOTE_KJ_DARKNESS);
                 DoCastAOE(SPELL_DARKNESS_OF_A_THOUSAND_SOULS);
-                
-                // Reapply Armageddon after Darkness finishes (8.5s cast)
+
                 me->m_Events.AddEventAtOffset([this]() {
                     if (me->IsAlive() && me->IsInCombat())
                         DoCastSelf(SPELL_ARMAGEDDON_PERIODIC, true);
@@ -392,11 +391,10 @@ struct boss_kiljaeden : public BossAI
                         ScheduleBasicAbilities();
 
                         ScheduleTimedEvent(25s, [&] {
-                            me->RemoveAurasDueToSpell(SPELL_ARMAGEDDON_PERIODIC); // Remove Armageddon aura
+                            me->RemoveAurasDueToSpell(SPELL_ARMAGEDDON_PERIODIC);
                             Talk(EMOTE_KJ_DARKNESS);
                             DoCastAOE(SPELL_DARKNESS_OF_A_THOUSAND_SOULS);
-                            
-                            // Reapply Armageddon after Darkness finishes
+
                             me->m_Events.AddEventAtOffset([this]() {
                                 if (me->IsAlive() && me->IsInCombat())
                                     DoCastSelf(SPELL_ARMAGEDDON_PERIODIC, true);
@@ -1107,15 +1105,9 @@ class spell_kiljaeden_armageddon_periodic_aura : public AuraScript
         PreventDefaultAction();
         Unit* caster = GetUnitOwner();
         
-        // Don't spawn if already 3 Armageddons active
         std::list<Creature*> armageddons;
         caster->GetCreatureListWithEntryInGrid(armageddons, NPC_ARMAGEDDON_TARGET, 100.0f);
         if (armageddons.size() >= 3)
-            return;
-            
-        // Don't spawn if Darkness of a Thousand Souls is being cast
-        Spell* currentSpell = caster->GetCurrentSpell(CURRENT_GENERIC_SPELL);
-        if (currentSpell && currentSpell->GetSpellInfo()->Id == SPELL_DARKNESS_OF_A_THOUSAND_SOULS)
             return;
         
         if (Unit* target = caster->GetAI()->SelectTarget(SelectTargetMethod::Random, 0, 60.0f, true))
