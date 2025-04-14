@@ -266,55 +266,7 @@ struct boss_kiljaeden : public BossAI
                     kalec->AI()->Talk(SAY_KALECGOS_READY1);
                 EmpowerOrb(false);
             }, 35s);
-ScheduleHealthCheckEvent(55, [&] {
-    _phase = PHASE_ARMAGEDDON;
-    if (Creature* kalec = instance->GetCreature(DATA_KALECGOS_KJ))
-        kalec->AI()->Talk(SAY_KALECGOS_LETGO, 16s);
 
-    if (Creature* anveena = instance->GetCreature(DATA_ANVEENA))
-        anveena->AI()->Talk(SAY_ANVEENA_LOST, 22s);
-
-    Talk(SAY_KJ_PHASE4, 28s);
-
-    scheduler.CancelAll();
-
-    ScheduleBasicAbilities();
-
-    me->m_Events.AddEventAtOffset([&] {
-        if (Creature* kalec = instance->GetCreature(DATA_KALECGOS_KJ))
-            kalec->AI()->Talk(SAY_KALECGOS_READY2);
-        EmpowerOrb(false);
-    }, 35s);
-
-    me->m_Events.AddEventAtOffset([&] {
-        Talk(SAY_KJ_REFLECTION);
-        me->CastCustomSpell(SPELL_SINISTER_REFLECTION, SPELLVALUE_MAX_TARGETS, 1, me, TRIGGERED_NONE);
-        me->CastCustomSpell(SPELL_SINISTER_REFLECTION, SPELLVALUE_MAX_TARGETS, 1, me, TRIGGERED_NONE);
-        me->CastCustomSpell(SPELL_SINISTER_REFLECTION, SPELLVALUE_MAX_TARGETS, 1, me, TRIGGERED_NONE);
-        me->CastCustomSpell(SPELL_SINISTER_REFLECTION, SPELLVALUE_MAX_TARGETS, 1, me, TRIGGERED_NONE);
-    }, 1s);
-
-    scheduler.Schedule(1s + 200ms, [this](TaskContext)
-    {
-        DoCastSelf(SPELL_SHADOW_SPIKE);
-    });
-
-    ScheduleTimedEvent(15s, [&] {
-        me->RemoveAurasDueToSpell(SPELL_ARMAGEDDON_PERIODIC); // Remove Armageddon aura
-        Talk(EMOTE_KJ_DARKNESS);
-        DoCastAOE(SPELL_DARKNESS_OF_A_THOUSAND_SOULS);
-        
-        // Reapply Armageddon after Darkness finishes (8.5s cast)
-        me->m_Events.AddEventAtOffset([this]() {
-            if (me->IsAlive() && me->IsInCombat())
-                DoCastSelf(SPELL_ARMAGEDDON_PERIODIC, true);
-        }, 9s);
-    }, 45s);
-
-    ScheduleTimedEvent(10s, [&] {
-        DoCastSelf(SPELL_ARMAGEDDON_PERIODIC, true);
-    }, 40s);
-});
             me->m_Events.AddEventAtOffset([&] {
                 Talk(SAY_KJ_REFLECTION);
                 me->CastCustomSpell(SPELL_SINISTER_REFLECTION, SPELLVALUE_MAX_TARGETS, 1, me, TRIGGERED_NONE);
@@ -372,8 +324,15 @@ ScheduleHealthCheckEvent(55, [&] {
             });
 
             ScheduleTimedEvent(15s, [&] {
+                me->RemoveAurasDueToSpell(SPELL_ARMAGEDDON_PERIODIC); // Remove Armageddon aura
                 Talk(EMOTE_KJ_DARKNESS);
                 DoCastAOE(SPELL_DARKNESS_OF_A_THOUSAND_SOULS);
+                
+                // Reapply Armageddon after Darkness finishes (8.5s cast)
+                me->m_Events.AddEventAtOffset([this]() {
+                    if (me->IsAlive() && me->IsInCombat())
+                        DoCastSelf(SPELL_ARMAGEDDON_PERIODIC, true);
+                }, 9s);
             }, 45s);
 
             ScheduleTimedEvent(10s, [&] {
@@ -433,8 +392,15 @@ ScheduleHealthCheckEvent(55, [&] {
                         ScheduleBasicAbilities();
 
                         ScheduleTimedEvent(25s, [&] {
+                            me->RemoveAurasDueToSpell(SPELL_ARMAGEDDON_PERIODIC); // Remove Armageddon aura
                             Talk(EMOTE_KJ_DARKNESS);
                             DoCastAOE(SPELL_DARKNESS_OF_A_THOUSAND_SOULS);
+                            
+                            // Reapply Armageddon after Darkness finishes
+                            me->m_Events.AddEventAtOffset([this]() {
+                                if (me->IsAlive() && me->IsInCombat())
+                                    DoCastSelf(SPELL_ARMAGEDDON_PERIODIC, true);
+                            }, 9s);
                         }, 25s);
 
                         ScheduleTimedEvent(1500ms, [&] {
@@ -573,7 +539,11 @@ ScheduleHealthCheckEvent(55, [&] {
             summon->CastSpell(summon, SPELL_ARMAGEDDON_VISUAL, true);
             summon->SetPosition(summon->GetPositionX(), summon->GetPositionY(), summon->GetPositionZ() + 20.0f, 0.0f);
             summon->m_Events.AddEvent(new CastArmageddon(summon), summon->m_Events.CalculateTime(6000));
-            summon->DespawnOrUnsummon(10000);
+            
+            // Use m_Events to schedule despawn between 8-10 seconds
+            summon->m_Events.AddEventAtOffset([summon]() {
+                summon->DespawnOrUnsummon();
+            }, 8s, 10s);
         }
     }
 
@@ -1136,12 +1106,18 @@ class spell_kiljaeden_armageddon_periodic_aura : public AuraScript
     {
         PreventDefaultAction();
         Unit* caster = GetUnitOwner();
-
+        
+        // Don't spawn if already 3 Armageddons active
         std::list<Creature*> armageddons;
         caster->GetCreatureListWithEntryInGrid(armageddons, NPC_ARMAGEDDON_TARGET, 100.0f);
         if (armageddons.size() >= 3)
             return;
-
+            
+        // Don't spawn if Darkness of a Thousand Souls is being cast
+        Spell* currentSpell = caster->GetCurrentSpell(CURRENT_GENERIC_SPELL);
+        if (currentSpell && currentSpell->GetSpellInfo()->Id == SPELL_DARKNESS_OF_A_THOUSAND_SOULS)
+            return;
+        
         if (Unit* target = caster->GetAI()->SelectTarget(SelectTargetMethod::Random, 0, 60.0f, true))
             caster->CastSpell(target, GetSpellInfo()->Effects[aurEff->GetEffIndex()].TriggerSpell, true);
     }
