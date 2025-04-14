@@ -1103,12 +1103,12 @@ class spell_kiljaeden_armageddon_periodic_aura : public AuraScript
     {
         PreventDefaultAction();
         Unit* caster = GetUnitOwner();
-        
+
         std::list<Creature*> armageddons;
         caster->GetCreatureListWithEntryInGrid(armageddons, NPC_ARMAGEDDON_TARGET, 100.0f);
         if (armageddons.size() >= 3)
             return;
-        
+
         if (Unit* target = caster->GetAI()->SelectTarget(SelectTargetMethod::Random, 0, 60.0f, true))
             caster->CastSpell(target, GetSpellInfo()->Effects[aurEff->GetEffIndex()].TriggerSpell, true);
     }
