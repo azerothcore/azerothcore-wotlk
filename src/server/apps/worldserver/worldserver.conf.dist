@@ -3437,9 +3437,9 @@ Wintergrasp.Enable = 1
 #
 #     Wintergrasp.PlayerMax
 #         Description: Maximum number of players allowed in Wintergrasp.
-#         Default:     100
+#         Default:     240
 
-Wintergrasp.PlayerMax = 100
+Wintergrasp.PlayerMax = 240
 
 #
 #     Wintergrasp.PlayerMin
@@ -3451,9 +3451,9 @@ Wintergrasp.PlayerMin = 0
 #
 #     Wintergrasp.PlayerMinLvl
 #         Description: Required character level for the Wintergrasp battle.
-#         Default:     77
+#         Default:     75
 
-Wintergrasp.PlayerMinLvl = 77
+Wintergrasp.PlayerMinLvl = 75
 
 #
 #     Wintergrasp.BattleTimer
