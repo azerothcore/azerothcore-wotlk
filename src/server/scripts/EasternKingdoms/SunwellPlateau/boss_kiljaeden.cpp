@@ -537,8 +537,7 @@ struct boss_kiljaeden : public BossAI
             summon->CastSpell(summon, SPELL_ARMAGEDDON_VISUAL, true);
             summon->SetPosition(summon->GetPositionX(), summon->GetPositionY(), summon->GetPositionZ() + 20.0f, 0.0f);
             summon->m_Events.AddEvent(new CastArmageddon(summon), summon->m_Events.CalculateTime(6000));
-
-summon->DespawnOrUnsummon(urand(8000, 10000));
+            summon->DespawnOrUnsummon(urand(8000, 10000));
         }
     }
 
