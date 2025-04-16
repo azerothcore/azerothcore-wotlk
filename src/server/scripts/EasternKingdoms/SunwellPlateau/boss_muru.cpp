@@ -215,6 +215,11 @@ struct npc_dark_fiend : public ScriptedAI
         }, 1s, 2s);
     }
 
+    void EnterEvadeMode(EvadeReason /*why*/) override
+    {
+        me->DespawnOrUnsummon();
+    }
+
     void DamageTaken(Unit* /*attacker*/, uint32& damage, DamageEffectType /*damagetype*/, SpellSchoolMask /*schoolMask*/) override
     {
         if (damage >= me->GetHealth())
