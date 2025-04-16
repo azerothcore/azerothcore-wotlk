@@ -487,6 +487,20 @@ struct boss_kiljaeden : public BossAI
         }
     }
 
+    void JustSummoned(Creature* summon) override
+    {
+        BossAI::JustSummoned(summon);
+        if (summon->GetEntry() == NPC_ARMAGEDDON_TARGET)
+        {
+            summon->SetCanFly(true);
+            summon->SetDisableGravity(true);
+            summon->CastSpell(summon, SPELL_ARMAGEDDON_VISUAL, true);
+            summon->SetPosition(summon->GetPositionX(), summon->GetPositionY(), summon->GetPositionZ() + 20.0f, 0.0f);
+            summon->m_Events.AddEvent(new CastArmageddon(summon), summon->m_Events.CalculateTime(6000));
+            summon->DespawnOrUnsummon(10000);
+        }
+    }
+
     void JustDied(Unit* /*killer*/) override
     {
         Talk(SAY_KJ_DEATH);
@@ -514,19 +528,6 @@ struct boss_kiljaeden : public BossAI
 
         Talk(SAY_KJ_EMERGE);
         ScheduleBasicAbilities();
-    }
-
-    void JustSummoned(Creature* summon) override
-    {
-        if (summon->GetEntry() == NPC_ARMAGEDDON_TARGET)
-        {
-            summon->SetCanFly(true);
-            summon->SetDisableGravity(true);
-            summon->CastSpell(summon, SPELL_ARMAGEDDON_VISUAL, true);
-            summon->SetPosition(summon->GetPositionX(), summon->GetPositionY(), summon->GetPositionZ() + 20.0f, 0.0f);
-            summon->m_Events.AddEvent(new CastArmageddon(summon), summon->m_Events.CalculateTime(6000));
-            summon->DespawnOrUnsummon(10000);
-        }
     }
 
     void UpdateAI(uint32 diff) override
