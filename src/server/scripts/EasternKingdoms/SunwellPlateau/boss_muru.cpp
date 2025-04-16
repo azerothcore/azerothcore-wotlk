@@ -79,7 +79,7 @@ struct boss_muru : public BossAI
         // Radius of room is ~38.5f this might need adjusting a bit
         // Radius ~36.0 is right inside
         // Radius 20.0 is outer circle
-        if (!me->IsInCombat() && who->IsPlayer() && me->IsWithinDistInMap(who, 25.0f))
+        if (!me->IsInCombat() && who->IsPlayer() && player->GetPositionZ() < 72.0f && me->IsWithinDistInMap(who, 25.0f))
         {
             me->SetInCombatWithZone();
         }
@@ -306,7 +306,7 @@ struct npc_singularity : public NullCreatureAI
             {
                 if (Player* player = playerRef.GetSource())
                 {
-                    if (me->IsWithinLOSInMap(player) && player->GetPositionZ() < 72.0f && player->IsAlive() && !player->HasAura(SPELL_BLACK_HOLE_EFFECT))
+                    if (me->IsWithinLOSInMap(player) && player->IsAlive() && !player->HasAura(SPELL_BLACK_HOLE_EFFECT))
                     {
                         target = player;
                         break;
