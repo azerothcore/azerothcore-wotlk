@@ -79,7 +79,7 @@ struct boss_muru : public BossAI
         // Radius of room is ~38.5f this might need adjusting a bit
         // Radius ~36.0 is right inside
         // Radius 20.0 is outer circle
-        if (!me->IsInCombat() && who->IsPlayer() && me->IsWithinDistInMap(who, 25.0f))
+        if (!me->IsInCombat() && who->IsPlayer() && who->GetPositionZ() > 69.0f && me->IsWithinDistInMap(who, 25.0f))
         {
             me->SetInCombatWithZone();
         }
