@@ -306,7 +306,7 @@ struct npc_singularity : public NullCreatureAI
             {
                 if (Player* player = playerRef.GetSource())
                 {
-                    if (me->IsWithinLOSInMap(player) && player->IsAlive() && !player->HasAura(SPELL_BLACK_HOLE_EFFECT))
+                    if (me->IsWithinLOSInMap(player) && player->GetPositionZ() < 72.0f && player->IsAlive() && !player->HasAura(SPELL_BLACK_HOLE_EFFECT))
                     {
                         target = player;
                         break;
