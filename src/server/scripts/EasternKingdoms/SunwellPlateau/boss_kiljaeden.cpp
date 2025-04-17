@@ -268,11 +268,7 @@ struct boss_kiljaeden : public BossAI
             }, 35s);
 
             me->m_Events.AddEventAtOffset([&] {
-                Talk(SAY_KJ_REFLECTION);
-                me->CastCustomSpell(SPELL_SINISTER_REFLECTION, SPELLVALUE_MAX_TARGETS, 1, me, TRIGGERED_NONE);
-                me->CastCustomSpell(SPELL_SINISTER_REFLECTION, SPELLVALUE_MAX_TARGETS, 1, me, TRIGGERED_NONE);
-                me->CastCustomSpell(SPELL_SINISTER_REFLECTION, SPELLVALUE_MAX_TARGETS, 1, me, TRIGGERED_NONE);
-                me->CastCustomSpell(SPELL_SINISTER_REFLECTION, SPELLVALUE_MAX_TARGETS, 1, me, TRIGGERED_NONE);
+                CastSinisterReflections();
             }, 1s);
 
             scheduler.Schedule(1s+200ms, [this](TaskContext)
@@ -311,11 +307,7 @@ struct boss_kiljaeden : public BossAI
             }, 35s);
 
             me->m_Events.AddEventAtOffset([&] {
-                Talk(SAY_KJ_REFLECTION);
-                me->CastCustomSpell(SPELL_SINISTER_REFLECTION, SPELLVALUE_MAX_TARGETS, 1, me, TRIGGERED_NONE);
-                me->CastCustomSpell(SPELL_SINISTER_REFLECTION, SPELLVALUE_MAX_TARGETS, 1, me, TRIGGERED_NONE);
-                me->CastCustomSpell(SPELL_SINISTER_REFLECTION, SPELLVALUE_MAX_TARGETS, 1, me, TRIGGERED_NONE);
-                me->CastCustomSpell(SPELL_SINISTER_REFLECTION, SPELLVALUE_MAX_TARGETS, 1, me, TRIGGERED_NONE);
+                CastSinisterReflections();
             }, 1s);
 
             scheduler.Schedule(1s + 200ms, [this](TaskContext)
@@ -343,11 +335,7 @@ struct boss_kiljaeden : public BossAI
             _phase = PHASE_SACRIFICE;
 
             me->m_Events.AddEventAtOffset([&] {
-                Talk(SAY_KJ_REFLECTION);
-                me->CastCustomSpell(SPELL_SINISTER_REFLECTION, SPELLVALUE_MAX_TARGETS, 1, me, TRIGGERED_NONE);
-                me->CastCustomSpell(SPELL_SINISTER_REFLECTION, SPELLVALUE_MAX_TARGETS, 1, me, TRIGGERED_NONE);
-                me->CastCustomSpell(SPELL_SINISTER_REFLECTION, SPELLVALUE_MAX_TARGETS, 1, me, TRIGGERED_NONE);
-                me->CastCustomSpell(SPELL_SINISTER_REFLECTION, SPELLVALUE_MAX_TARGETS, 1, me, TRIGGERED_NONE);
+                CastSinisterReflections();
             }, 1s);
 
             me->m_Events.AddEventAtOffset([&] {
@@ -578,6 +566,16 @@ struct boss_kiljaeden : public BossAI
 
     private:
         uint8 _phase;
+
+    void CastSinisterReflections()
+    {
+        Talk(SAY_KJ_REFLECTION);
+        if (Unit* victim = SelectTarget(SelectTargetMethod::Random, 0, 60.0f, true))
+        {
+            for (uint8 i = 0; i < 4; ++i)
+                CastCustomSpell(SPELL_SINISTER_REFLECTION, SPELLVALUE_MAX_TARGETS, 1, victim, TRIGGERED_NONE);
+        }
+    }
 };
 
 enum postEvent
