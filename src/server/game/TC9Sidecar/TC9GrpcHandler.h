@@ -43,8 +43,8 @@ public:
     // Battlegrounds
     static BattlegroundStartResponse StartBattleground(BattlegroundStartRequest* request);
     static BattlegroundErrorCode AddPlayersToBattleground(BattlegroundAddPlayersRequest* request);
-    static BattlegroundJoinCheckErrorCode CanPlayerJoinBattlgroundQueue(uint64 player);
-    static BattlegroundJoinCheckErrorCode CanPlayerTeleportToBattlground(uint64 player);
+    static BattlegroundJoinCheckErrorCode CanPlayerJoinBattlegroundQueue(uint64 player);
+    static BattlegroundJoinCheckErrorCode CanPlayerTeleportToBattleground(uint64 player);
 };
 
 #endif // _TC9_GRPC_HANDLER_H

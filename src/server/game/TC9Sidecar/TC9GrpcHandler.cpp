@@ -42,7 +42,7 @@ GetPlayerItemsByGuidsResponse ToCloud9GrpcHandler::GetPlayerItemsByGuids(uint64 
     }
 
     // Don't forget to delete on "that" side.
-    PlayerItem* itemsResult = (PlayerItem*)malloc(sizeof(PlayerItem) * itemsFound);
+    PlayerItem* itemsResult = static_cast<PlayerItem *>(malloc(sizeof(PlayerItem) * itemsFound));
     int itemsResultsItr = 0;
     for (int i = 0; i < itemsLen; i++)
     {
@@ -320,7 +320,7 @@ BattlegroundErrorCode ToCloud9GrpcHandler::AddPlayersToBattleground(Battleground
     return BattlegroundErrorCodeNoError;
 }
 
-BattlegroundJoinCheckErrorCode ToCloud9GrpcHandler::CanPlayerJoinBattlgroundQueue(uint64 playerGuid)
+BattlegroundJoinCheckErrorCode ToCloud9GrpcHandler::CanPlayerJoinBattlegroundQueue(uint64 playerGuid)
 {
     Player *player = ObjectAccessor::FindPlayer(ObjectGuid(playerGuid));
     if (!player)
@@ -337,7 +337,7 @@ BattlegroundJoinCheckErrorCode ToCloud9GrpcHandler::CanPlayerJoinBattlgroundQueu
     return BattlegroundJoinCheckErrorCodeOK;
 }
 
-BattlegroundJoinCheckErrorCode ToCloud9GrpcHandler::CanPlayerTeleportToBattlground(uint64 playerGuid)
+BattlegroundJoinCheckErrorCode ToCloud9GrpcHandler::CanPlayerTeleportToBattleground(uint64 playerGuid)
 {
     Player *player = ObjectAccessor::FindPlayer(ObjectGuid(playerGuid));
     if (!player)

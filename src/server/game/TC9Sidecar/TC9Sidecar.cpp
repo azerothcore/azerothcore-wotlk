@@ -108,8 +108,8 @@ void ToCloud9Sidecar::SetupGrpcHandlers()
 
     TC9SetBattlegroundStartHandler(&ToCloud9GrpcHandler::StartBattleground);
     TC9SetBattlegroundAddPlayersHandler(&ToCloud9GrpcHandler::AddPlayersToBattleground);
-    TC9SetCanPlayerJoinBattlegroundQueueHandler(&ToCloud9GrpcHandler::CanPlayerJoinBattlgroundQueue);
-    TC9SetCanPlayerTeleportToBattlegroundHandler(&ToCloud9GrpcHandler::CanPlayerTeleportToBattlground);
+    TC9SetCanPlayerJoinBattlegroundQueueHandler(&ToCloud9GrpcHandler::CanPlayerJoinBattlegroundQueue);
+    TC9SetCanPlayerTeleportToBattlegroundHandler(&ToCloud9GrpcHandler::CanPlayerTeleportToBattleground);
 
     TC9SetMonitoringDataCollectorHandler(&HandleMonitoringRequest);
 }
