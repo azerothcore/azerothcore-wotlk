@@ -324,8 +324,14 @@ struct boss_kiljaeden : public BossAI
             });
 
             ScheduleTimedEvent(15s, [&] {
+                me->RemoveAurasDueToSpell(SPELL_ARMAGEDDON_PERIODIC);
                 Talk(EMOTE_KJ_DARKNESS);
                 DoCastAOE(SPELL_DARKNESS_OF_A_THOUSAND_SOULS);
+
+                me->m_Events.AddEventAtOffset([this]() {
+                    if (me->IsAlive() && me->IsInCombat())
+                        DoCastSelf(SPELL_ARMAGEDDON_PERIODIC, true);
+                }, 9s);
             }, 45s);
 
             ScheduleTimedEvent(10s, [&] {
@@ -385,8 +391,14 @@ struct boss_kiljaeden : public BossAI
                         ScheduleBasicAbilities();
 
                         ScheduleTimedEvent(25s, [&] {
+                            me->RemoveAurasDueToSpell(SPELL_ARMAGEDDON_PERIODIC);
                             Talk(EMOTE_KJ_DARKNESS);
                             DoCastAOE(SPELL_DARKNESS_OF_A_THOUSAND_SOULS);
+
+                            me->m_Events.AddEventAtOffset([this]() {
+                                if (me->IsAlive() && me->IsInCombat())
+                                    DoCastSelf(SPELL_ARMAGEDDON_PERIODIC, true);
+                            }, 9s);
                         }, 25s);
 
                         ScheduleTimedEvent(1500ms, [&] {
@@ -525,7 +537,7 @@ struct boss_kiljaeden : public BossAI
             summon->CastSpell(summon, SPELL_ARMAGEDDON_VISUAL, true);
             summon->SetPosition(summon->GetPositionX(), summon->GetPositionY(), summon->GetPositionZ() + 20.0f, 0.0f);
             summon->m_Events.AddEvent(new CastArmageddon(summon), summon->m_Events.CalculateTime(6000));
-            summon->DespawnOrUnsummon(10000);
+            summon->DespawnOrUnsummon(urand(8000, 10000));
         }
     }
 
@@ -1087,8 +1099,15 @@ class spell_kiljaeden_armageddon_periodic_aura : public AuraScript
     void HandlePeriodic(AuraEffect const* aurEff)
     {
         PreventDefaultAction();
-        if (Unit* target = GetUnitOwner()->GetAI()->SelectTarget(SelectTargetMethod::Random, 0, 60.0f, true))
-            GetUnitOwner()->CastSpell(target, GetSpellInfo()->Effects[aurEff->GetEffIndex()].TriggerSpell, true);
+        Unit* caster = GetUnitOwner();
+
+        std::list<Creature*> armageddons;
+        caster->GetCreatureListWithEntryInGrid(armageddons, NPC_ARMAGEDDON_TARGET, 100.0f);
+        if (armageddons.size() >= 3)
+            return;
+
+        if (Unit* target = caster->GetAI()->SelectTarget(SelectTargetMethod::Random, 0, 60.0f, true))
+            caster->CastSpell(target, GetSpellInfo()->Effects[aurEff->GetEffIndex()].TriggerSpell, true);
     }
 
     void Register() override
