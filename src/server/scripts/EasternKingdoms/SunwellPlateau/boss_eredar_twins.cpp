@@ -229,15 +229,20 @@ struct boss_alythess : public BossAI
             me->CastSpell(me, SPELL_EMPOWER, true);
 
             scheduler.CancelAll();
-            // PYROGENICS Phase 2
+
+            ScheduleTimedEvent(1s, [&] {
+                DoCastVictim(SPELL_BLAZE);
+            }, 3800ms);
+
             scheduler.Schedule(16s, GROUP_PYROGENICS, [this](TaskContext context) {
                 DoCastSelf(SPELL_PYROGENICS);
                 context.Repeat(16s, 28s);
             });
-            // FLAME_SEAR phase 2
+
             ScheduleTimedEvent(8s, 10s, [&] {
                 me->CastCustomSpell(SPELL_FLAME_SEAR, SPELLVALUE_MAX_TARGETS, urand(4, 5), me, TRIGGERED_NONE);
-            }, 8s, 10s, GROUP_FLAME_SEAR);
+            }, 8s, 10s);
+
             ScheduleTimedEvent(20s, 26s, [&] {
                 Unit* target = SelectTarget(SelectTargetMethod::MaxThreat, 1, 100.0f);
                 if (!target)
@@ -272,7 +277,7 @@ struct boss_alythess : public BossAI
         // FLAME_SEAR Phase 1
         ScheduleTimedEvent(10s, 15s, [&] {
             me->CastCustomSpell(SPELL_FLAME_SEAR, SPELLVALUE_MAX_TARGETS, urand(4, 5), me, TRIGGERED_NONE);
-        }, 10s, 15s, GROUP_FLAME_SEAR);
+        }, 10s, 15s);
 
         scheduler.Schedule(20s, GROUP_SPECIAL_ABILITY, [this](TaskContext context) {
             Unit* target = SelectTarget(SelectTargetMethod::MaxThreat, 1, 100.0f);
