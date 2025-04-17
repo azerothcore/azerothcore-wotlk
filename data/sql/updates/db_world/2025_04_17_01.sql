@@ -1,3 +1,4 @@
+-- DB update 2025_04_17_00 -> 2025_04_17_01
 
 -- Add Creature Formations
 DELETE FROM `creature_formations` WHERE `leaderGUID` = 54835;
