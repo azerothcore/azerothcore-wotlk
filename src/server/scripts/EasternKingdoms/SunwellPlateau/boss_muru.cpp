@@ -422,6 +422,24 @@ class spell_entropius_black_hole_effect : public SpellScript
 {
     PrepareSpellScript(spell_entropius_black_hole_effect);
 
+    float RaycastToObstacle(Unit* unit, float angle, float maxDist = 20.0f, float stepSize = 3.0f)
+    {
+        float baseX = unit->GetPositionX();
+        float baseY = unit->GetPositionY();
+        float baseZ = unit->GetPositionZ();
+
+        for (float dist = stepSize; dist <= maxDist; dist += stepSize)
+        {
+            float testX = baseX + dist * cos(angle);
+            float testY = baseY + dist * sin(angle);
+
+            // If LOS is broken, we found an obstacle
+            if (!unit->IsWithinLOS(testX, testY, baseZ))
+                return dist - stepSize; // Return the last safe distance
+        }
+
+        return maxDist; // No obstacle found within range
+    }
     void HandlePull(SpellEffIndex effIndex)
     {
         PreventHitDefaultEffect(effIndex);
@@ -433,8 +451,11 @@ class spell_entropius_black_hole_effect : public SpellScript
         if (target->GetDistance(GetCaster()) < 5.0f)
         {
             float o = frand(0, 2 * M_PI);
-            pos.Relocate(GetCaster()->GetPositionX() + 8.0f * cos(o),
-                         GetCaster()->GetPositionY() + 8.0f * std::sin(o),
+            float safeDistance = RaycastToObstacle(target, o, 10.0f);
+            float actualDistance = std::min(8.0f, safeDistance * 0.8f);
+
+            pos.Relocate(GetCaster()->GetPositionX() + actualDistance * cos(o),
+                         GetCaster()->GetPositionY() + actualDistance * sin(o),
                          GetCaster()->GetPositionZ() + frand(2.0f, 5.0f));
         }
         else
