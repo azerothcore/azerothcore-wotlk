@@ -98,7 +98,7 @@ struct boss_akilzon : public BossAI
         });
 
         ScheduleTimedEvent(20s, 30s, [&] {
-            if (scheduler.GetNextGroupOcurrence(GROUP_ELECTRICAL_STORM) > 5s)
+            if (scheduler.GetNextGroupOccurrence(GROUP_ELECTRICAL_STORM) > 5s)
                 DoCastRandomTarget(SPELL_GUST_OF_WIND, 1);
         }, 20s, 30s);
 
