@@ -230,6 +230,10 @@ struct boss_alythess : public BossAI
 
             scheduler.CancelAll();
 
+            ScheduleTimedEvent(1s, [&] {
+                DoCastVictim(SPELL_BLAZE);
+            }, 3800ms);
+
             scheduler.Schedule(16s, GROUP_PYROGENICS, [this](TaskContext context) {
                 DoCastSelf(SPELL_PYROGENICS);
                 context.Repeat(16s, 28s);
