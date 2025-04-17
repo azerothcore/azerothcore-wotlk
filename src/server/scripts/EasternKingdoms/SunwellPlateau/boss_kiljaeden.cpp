@@ -268,6 +268,7 @@ struct boss_kiljaeden : public BossAI
             }, 35s);
 
             me->m_Events.AddEventAtOffset([&] {
+                Talk(SAY_KJ_REFLECTION);
                 if (Unit* victim = me->GetAI()->SelectTarget(SelectTargetMethod::Random, 0, 60.0f, true))
                 {
                     for (uint8 i = 0; i < 4; ++i)
@@ -311,6 +312,7 @@ struct boss_kiljaeden : public BossAI
             }, 35s);
 
             me->m_Events.AddEventAtOffset([&] {
+                Talk(SAY_KJ_REFLECTION);
                 if (Unit* victim = me->GetAI()->SelectTarget(SelectTargetMethod::Random, 0, 60.0f, true))
                 {
                      for (uint8 i = 0; i < 4; ++i)
@@ -343,6 +345,7 @@ struct boss_kiljaeden : public BossAI
             _phase = PHASE_SACRIFICE;
 
             me->m_Events.AddEventAtOffset([&] {
+                Talk(SAY_KJ_REFLECTION);
                 if (Unit* victim = me->GetAI()->SelectTarget(SelectTargetMethod::Random, 0, 60.0f, true))
                 {
                     for (uint8 i = 0; i < 4; ++i)
