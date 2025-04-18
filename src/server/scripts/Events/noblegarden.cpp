@@ -15,7 +15,6 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "GameObjectScript.h"
 #include "Player.h"
 #include "SpellScript.h"
 #include "SpellScriptLoader.h"
