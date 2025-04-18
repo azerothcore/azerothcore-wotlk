@@ -26,7 +26,7 @@
 #include "TC9GrpcHandler.h"
 #include "TC9GuildHooks.h"
 #include "UpdateTime.h"
-#include "World.h"
+#include "WorldSessionMgr.h"
 
 #define AVAILABLE_MAPS_ALL_MAPS ""
 
@@ -213,6 +213,6 @@ MonitoringDataCollectorResponse HandleMonitoringRequest()
     res.diff95Percentile  = sWorldUpdateTime.GetPercentile(95);
     res.diff99Percentile  = sWorldUpdateTime.GetPercentile(99);
     res.diffMaxPercentile = sWorldUpdateTime.GetPercentile(100);
-    res.connectedPlayers  = sWorld->GetActiveSessionCount();
+    res.connectedPlayers  = sWorldSessionMgr->GetActiveSessionCount();
     return res;
 }
