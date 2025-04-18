@@ -26,6 +26,7 @@
 #include "GameObjectModel.h"
 #include "GridDefines.h"
 #include "GridRefMgr.h"
+#include "Timer.h"
 #include "MapGridManager.h"
 #include "MapRefMgr.h"
 #include "ObjectDefines.h"
