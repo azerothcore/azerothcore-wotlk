@@ -18,15 +18,15 @@
 #ifndef ObjectGuid_h__
 #define ObjectGuid_h__
 
-#include "ByteBuffer.h"
-#include "Define.h"
-#include "TC9Sidecar.h"
 #include <deque>
 #include <functional>
 #include <list>
 #include <set>
 #include <unordered_set>
 #include <vector>
+#include "ByteBuffer.h"
+#include "Define.h"
+#include "TC9Sidecar.h"
 
 enum TypeID
 {

@@ -16,9 +16,11 @@
  */
 
 #include "Transport.h"
+#include <chrono>
 #include "Cell.h"
 #include "CellImpl.h"
 #include "Common.h"
+#include "Config.h"
 #include "DBCStores.h"
 #include "GameObjectAI.h"
 #include "GameTime.h"
@@ -30,8 +32,6 @@
 #include "Spell.h"
 #include "Vehicle.h"
 #include "WorldModel.h"
-#include "Config.h"
-#include <chrono>
 
 namespace
 {

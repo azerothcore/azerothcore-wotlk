@@ -918,7 +918,7 @@ void WorldSession::HandlePlayerLoginFromDB(LoginQueryHolder const& holder)
         stmt->SetData(0, pCurrChar->GetGUID().GetCounter());
         CharacterDatabase.Execute(stmt);
     }
-    
+
     LoginDatabasePreparedStatement* loginStmt = LoginDatabase.GetPreparedStatement(LOGIN_UPD_ACCOUNT_ONLINE);
     loginStmt->SetData(0, realm.Id.Realm);
     loginStmt->SetData(1, GetAccountId());

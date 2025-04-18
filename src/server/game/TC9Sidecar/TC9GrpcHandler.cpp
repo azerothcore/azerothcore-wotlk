@@ -210,7 +210,8 @@ ModifyMoneyForPlayerResponse ToCloud9GrpcHandler::ModifyMoneyForPlayer(uint64 pl
         return resp;
     }
 
-    if (!player->ModifyMoney(value, true)) {
+    if (!player->ModifyMoney(value, true))
+    {
         ModifyMoneyForPlayerResponse resp;
         resp.errorCode = PlayerMoneyErrorCodeToMuchMoney;
         resp.newMoneyValue = player->GetMoney();

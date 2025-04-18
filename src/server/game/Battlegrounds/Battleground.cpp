@@ -39,6 +39,7 @@
 #include "ObjectMgr.h"
 #include "Pet.h"
 #include "Player.h"
+#include "Realm.h"
 #include "ReputationMgr.h"
 #include "ScriptMgr.h"
 #include "SpellAuras.h"
@@ -47,7 +48,6 @@
 #include "World.h"
 #include "WorldPacket.h"
 #include "WorldStatePackets.h"
-#include "Realm.h"
 
 namespace Acore
 {

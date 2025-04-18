@@ -460,11 +460,11 @@ void InstanceSaveMgr::LoadCharacterBinds()
 void InstanceSaveMgr::LoadInstanceSavesAndBindsForMapIDs(std::vector<uint32> mapIDs, InstanceSaveHashMap &instanceSaveStorage, PlayerBindStorage &localPlayerBindStorage)
 {
     std::stringstream mapIDsStr;
-    for (size_t i = 0; i < mapIDs.size(); ++i) {
+    for (size_t i = 0; i < mapIDs.size(); ++i)
+    {
         mapIDsStr << mapIDs[i];
-        if (i < mapIDs.size() - 1) {
+        if (i < mapIDs.size() - 1)
             mapIDsStr << ",";
-        }
     }
 
     QueryResult result = CharacterDatabase.Query("SELECT id, map, resettime, difficulty, completedEncounters, data FROM instance WHERE map IN ({}) ORDER BY id ASC", mapIDsStr.str());

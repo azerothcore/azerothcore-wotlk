@@ -20,11 +20,13 @@
 */
 
 #include "World.h"
+#include <cmath>
+#include <boost/asio/ip/address.hpp>
 #include "AccountMgr.h"
 #include "AchievementMgr.h"
 #include "AddonMgr.h"
-#include "ArenaTeamMgr.h"
 #include "ArenaSeasonMgr.h"
+#include "ArenaTeamMgr.h"
 #include "AuctionHouseMgr.h"
 #include "AutobroadcastMgr.h"
 #include "BattlefieldMgr.h"
@@ -41,8 +43,8 @@
 #include "CreatureAIRegistry.h"
 #include "CreatureGroups.h"
 #include "CreatureTextMgr.h"
-#include "DBCStores.h"
 #include "DatabaseEnv.h"
+#include "DBCStores.h"
 #include "DisableMgr.h"
 #include "DynamicVisibility.h"
 #include "GameEventMgr.h"
@@ -52,17 +54,17 @@
 #include "GridNotifiersImpl.h"
 #include "GroupMgr.h"
 #include "GuildMgr.h"
-#include "IPLocation.h"
 #include "InstanceSaveMgr.h"
+#include "IPLocation.h"
 #include "ItemEnchantmentMgr.h"
 #include "LFGMgr.h"
 #include "Log.h"
 #include "LootItemStorage.h"
 #include "LootMgr.h"
 #include "M2Stores.h"
-#include "MMapFactory.h"
 #include "MapMgr.h"
 #include "Metric.h"
+#include "MMapFactory.h"
 #include "MotdMgr.h"
 #include "ObjectMgr.h"
 #include "Opcodes.h"
@@ -79,6 +81,7 @@
 #include "SmartAI.h"
 #include "SpellMgr.h"
 #include "TaskScheduler.h"
+#include "TC9Sidecar.h"
 #include "TicketMgr.h"
 #include "Transport.h"
 #include "TransportMgr.h"
@@ -96,9 +99,6 @@
 #include "WorldSession.h"
 #include "WorldSessionMgr.h"
 #include "WorldState.h"
-#include "TC9Sidecar.h"
-#include <boost/asio/ip/address.hpp>
-#include <cmath>
 
 std::atomic_long World::_stopEvent = false;
 uint8 World::_exitCode = SHUTDOWN_EXIT_CODE;
@@ -2771,7 +2771,7 @@ void World::setWorldState(uint32 index, uint64 timeValue)
 {
     if (sToCloud9Sidecar->IsCrossrealm())
         return;
-    
+
     auto const& it = _worldstates.find(index);
     if (it != _worldstates.end())
     {
