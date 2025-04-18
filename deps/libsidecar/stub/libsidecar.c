@@ -58,7 +58,7 @@ void TC9ProcessEventsHooks() { panicWithTC9Unavailable("TC9ProcessEventsHooks");
 
 // TC9ProcessGRPCOrHTTPRequests calls all grpc or http handlers in queue.
 //
-void TC9ProcessGRPCOrHTTPRequests(GoInt realmID) { panicWithTC9Unavailable("TC9ProcessGRPCOrHTTPRequests"); }
+void TC9ProcessGRPCOrHTTPRequests() { panicWithTC9Unavailable("TC9ProcessGRPCOrHTTPRequests"); }
 
 // TC9GetNextAvailableCharacterGuid returns next available characters GUID. Thread unsafe.
 GoUint64 TC9GetNextAvailableCharacterGuid(GoInt realmID) { panicWithTC9Unavailable("TC9GetNextAvailableCharacterGuid"); return 0; }
