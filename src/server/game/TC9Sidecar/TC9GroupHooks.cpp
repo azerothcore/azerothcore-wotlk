@@ -6,9 +6,9 @@
 //
 
 #include "TC9GroupHooks.h"
-#include "Log.h"
 #include "Group.h"
 #include "GroupMgr.h"
+#include "Log.h"
 
 void ToCloud9GroupHooks::OnGroupCreated(EventObjectGroup *group)
 {

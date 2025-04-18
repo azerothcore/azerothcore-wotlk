@@ -16,15 +16,15 @@
  */
 
 #include "TC9Sidecar.h"
+#include "Config.h"
+#include "InstanceSaveMgr.h"
 #include "libsidecar.h"
-#include "TC9GuildHooks.h"
-#include "TC9GroupHooks.h"
-#include "TC9GrpcHandler.h"
+#include "Log.h"
 #include "MapMgr.h"
 #include "Player.h"
-#include "Config.h"
-#include "Log.h"
-#include "InstanceSaveMgr.h"
+#include "TC9GroupHooks.h"
+#include "TC9GrpcHandler.h"
+#include "TC9GuildHooks.h"
 #include "UpdateTime.h"
 #include "World.h"
 

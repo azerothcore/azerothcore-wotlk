@@ -16,11 +16,11 @@
  */
 
 #include "TC9GrpcHandler.h"
-#include "ObjectAccessor.h"
-#include "Item.h"
 #include "Bag.h"
-#include "Player.h"
 #include "BattlegroundMgr.h"
+#include "Item.h"
+#include "ObjectAccessor.h"
+#include "Player.h"
 
 GetPlayerItemsByGuidsResponse ToCloud9GrpcHandler::GetPlayerItemsByGuids(uint64 playerGuid, uint64* items, int itemsLen)
 {

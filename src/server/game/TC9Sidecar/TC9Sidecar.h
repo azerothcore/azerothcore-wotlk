@@ -18,9 +18,9 @@
 #ifndef _TC9_SIDECAR_H
 #define _TC9_SIDECAR_H
 
-#include "Common.h"
-#include "AsyncTask.h"
 #include "AsyncCallbackProcessor.h"
+#include "AsyncTask.h"
+#include "Common.h"
 
 #define MAX_MAP_ID 800 // Probably too much, but let's lean towards caution.
 #define DEFAULT_NON_CROSSREALM_REALM_ID 0
