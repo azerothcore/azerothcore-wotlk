@@ -3443,7 +3443,7 @@ Wintergrasp.PlayerMax = 120
 
 #
 #     Wintergrasp.PlayerMin
-#         Description: Minimum number of players required for Wintergrasp.
+#         Description: Minimum number of players required for Wintergrasp per team.
 #         Default:     0
 
 Wintergrasp.PlayerMin = 0
