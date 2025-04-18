@@ -17,21 +17,46 @@
 
 #include "GameObjectScript.h"
 #include "Player.h"
+#include "SpellScript.h"
+#include "SpellScriptLoader.h"
 
-class go_noblegarden_colored_egg : public GameObjectScript
+enum eNoblegarden
 {
-public:
-    go_noblegarden_colored_egg() : GameObjectScript("go_noblegarden_colored_egg") { }
+    SPELL_NOBLEGARDEN_BUNNY = 61734
+};
 
-    bool OnGossipHello(Player* player, GameObject* /*go*/) override
+// 61712 Summon Noblegarden Bunny Controller
+class spell_summon_noblegarden_bunny_controller : public SpellScript
+{
+    PrepareSpellScript(spell_summon_noblegarden_bunny_controller);
+
+    bool Validate(SpellInfo const* /*spellInfo*/) override
+    {
+        return ValidateSpellInfo({ SPELL_NOBLEGARDEN_BUNNY });
+    }
+
+    void HandleDummy(SpellEffIndex /*effIndex*/)
+    {
+        if (Player* player = GetHitPlayer())
+            player->CastSpell(player, SPELL_NOBLEGARDEN_BUNNY, true);
+    }
+
+    SpellCastResult CheckCast()
     {
         if (roll_chance_i(5))
-            player->CastSpell(player, 61734, true); // SPELL NOBLEGARDEN BUNNY
-        return false;
+            return SPELL_CAST_OK;
+
+        return SPELL_FAILED_UNKNOWN;
+    }
+
+    void Register() override
+    {
+        OnEffectHitTarget += SpellEffectFn(spell_summon_noblegarden_bunny_controller::HandleDummy, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
+        OnCheckCast += SpellCheckCastFn(spell_summon_noblegarden_bunny_controller::CheckCast);
     }
 };
 
 void AddSC_event_noblegarden_scripts()
 {
-    new go_noblegarden_colored_egg();
+    RegisterSpellScript(spell_summon_noblegarden_bunny_controller);
 }
