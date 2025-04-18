@@ -85,6 +85,7 @@ enum Misc
 
     GROUP_START_INTRO           = 0,
     GROUP_BREATH                = 1,
+    GROUP_TAKEOFF               = 2,
 
     NPC_FOG_TRIGGER             = 23472,
     NPC_KALECGOS_FELMYST        = 24844, // Same as Magister's Terrace
@@ -214,19 +215,25 @@ struct boss_felmyst : public BossAI
         }, 7500ms);
 
         ScheduleTimedEvent(13s, 30s, [&] {
-            Talk(YELL_BREATH);
-            DoCastVictim(SPELL_CORROSION);
+            if (scheduler.GetNextGroupOccurrence(GROUP_TAKEOFF) > 2s)
+            {
+                Talk(YELL_BREATH);
+                DoCastVictim(SPELL_CORROSION);
+            }
         }, 30s, 39s);
 
         ScheduleTimedEvent(18s, 43s, [&] {
-            DoCastSelf(SPELL_GAS_NOVA);
+            if (scheduler.GetNextGroupOccurrence(GROUP_TAKEOFF) > 2s)
+                DoCastSelf(SPELL_GAS_NOVA);
         }, 18s, 43s);
 
         ScheduleTimedEvent(26s, 53s, [&] {
-            DoCastRandomTarget(SPELL_ENCAPSULATE_CHANNEL, 0, 50.0f);
+            if (scheduler.GetNextGroupOccurrence(GROUP_TAKEOFF) > 9s)
+                DoCastRandomTarget(SPELL_ENCAPSULATE_CHANNEL, 0, 50.0f);
         }, 26s, 53s);
 
-        me->m_Events.AddEventAtOffset([&] {
+        scheduler.Schedule(1min, GROUP_TAKEOFF, [&](TaskContext)
+        {
             Talk(YELL_TAKEOFF);
             scheduler.CancelAll();
             me->SetReactState(REACT_PASSIVE);
@@ -241,7 +248,7 @@ struct boss_felmyst : public BossAI
             SetInvincibility(true);
             me->HandleEmoteCommand(EMOTE_ONESHOT_LIFTOFF);
             me->GetMotionMaster()->MovePoint(POINT_TAKEOFF, me->GetPositionX(), me->GetPositionY(), me->GetPositionZ() + 20.0f);
-        }, 1min);
+        });
     }
 
     void MovementInform(uint32 type, uint32 point) override

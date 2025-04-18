@@ -4640,7 +4640,7 @@ void Player::ResurrectPlayer(float restore_percent, bool applySickness)
     // trigger update zone for alive state zone updates
     uint32 newzone, newarea;
     GetZoneAndAreaId(newzone, newarea);
-    UpdateZone(newzone, newarea);
+    UpdateZone(newzone, newarea, true);
     sOutdoorPvPMgr->HandlePlayerResurrects(this, newzone);
 
     if (Battleground* bg = GetBattleground())

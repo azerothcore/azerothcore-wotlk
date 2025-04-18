@@ -65,7 +65,10 @@ enum Misc
 
 struct boss_brutallus : public BossAI
 {
-    boss_brutallus(Creature* creature) : BossAI(creature, DATA_BRUTALLUS) { }
+    boss_brutallus(Creature* creature) : BossAI(creature, DATA_BRUTALLUS)
+    {
+        me->SetCorpseDelay(360);
+    }
 
     void Reset() override
     {
