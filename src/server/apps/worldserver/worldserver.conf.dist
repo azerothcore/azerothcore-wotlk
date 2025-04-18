@@ -3436,10 +3436,10 @@ Wintergrasp.Enable = 1
 
 #
 #     Wintergrasp.PlayerMax
-#         Description: Maximum number of players allowed in Wintergrasp.
-#         Default:     240
+#         Description: Maximum number of players allowed in Wintergrasp per team.
+#         Default:     120
 
-Wintergrasp.PlayerMax = 240
+Wintergrasp.PlayerMax = 120
 
 #
 #     Wintergrasp.PlayerMin
