@@ -371,7 +371,7 @@ public:
     void SetRandomTypeID(BattlegroundTypeId TypeID) { m_RandomTypeID = TypeID; }
     void SetBracket(PvPDifficultyEntry const* bracketEntry);
     void SetInstanceID(uint32 InstanceID) { m_InstanceID = InstanceID; }
-    void SetStatus(BattlegroundStatus Status) { m_Status = Status; }
+    void SetStatus(BattlegroundStatus Status);
     void SetClientInstanceID(uint32 InstanceID) { m_ClientInstanceID = InstanceID; }
     void SetStartTime(uint32 Time) { m_StartTime = Time; }
     void SetEndTime(uint32 Time) { m_EndTime = Time; }

@@ -404,6 +404,9 @@ void MapMgr::RegisterInstanceId(uint32 instanceId)
 
 uint32 MapMgr::GenerateInstanceId()
 {
+    if (sToCloud9Sidecar->ClusterModeEnabled())
+        return sToCloud9Sidecar->GenerateInstanceGuid();
+
     uint32 newInstanceId = _nextInstanceId;
 
     // find the lowest available id starting from the current _nextInstanceId

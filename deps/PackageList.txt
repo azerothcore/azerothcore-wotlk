@@ -59,3 +59,7 @@ recastnavigation (Recast is state of the art navigation mesh construction toolse
 {fmt} is an open-source formatting library providing a fast and safe alternative to C stdio and C++ iostreams.
   https://github.com/fmtlib/fmt
   Version: 7.1.3
+
+libsidecar (enables interaction with other components when the worldserver is running in cluster mode. It requires building a shared library first and putting it in the corresponding folder.)
+  https://github.com/walkline/ToCloud9/tree/master/game-server/libsidecar
+  Version: master

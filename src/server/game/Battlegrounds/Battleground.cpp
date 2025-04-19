@@ -39,6 +39,7 @@
 #include "ObjectMgr.h"
 #include "Pet.h"
 #include "Player.h"
+#include "Realm.h"
 #include "ReputationMgr.h"
 #include "ScriptMgr.h"
 #include "SpellAuras.h"
@@ -272,6 +273,7 @@ void Battleground::Update(uint32 diff)
         if (!GetInvitedCount(TEAM_HORDE) && !GetInvitedCount(TEAM_ALLIANCE))
         {
             m_SetDeleteThis = true;
+            SetStatus(STATUS_WAIT_LEAVE);
         }
 
         return;
@@ -1018,6 +1020,11 @@ void Battleground::RemovePlayerAtLeave(Player* player)
     // if the player was a match participant
     if (participant)
     {
+        if (sToCloud9Sidecar->ClusterModeEnabled())
+            sToCloud9Sidecar->OnPlayerLeftBattleground(player->GetGUID().GetCounter(),
+                                                       player->GetGUID().GetRealmID(),
+                                                       GetInstanceID());
+
         player->ClearAfkReports();
 
         WorldPacket data;
@@ -1849,4 +1856,12 @@ void Battleground::RewardXPAtKill(Player* killer, Player* victim)
 uint8 Battleground::GetUniqueBracketId() const
 {
     return GetMaxLevel() / 10;
+}
+
+void Battleground::SetStatus(BattlegroundStatus Status)
+{
+    m_Status = Status;
+
+    if (sToCloud9Sidecar->ClusterModeEnabled() && GetInstanceID() != 0)
+        sToCloud9Sidecar->OnBattlegroundStatusChanged(GetInstanceID(), Status);
 }
