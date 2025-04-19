@@ -23,16 +23,15 @@
 #include "CreatureScript.h"
 #include "PetAI.h"
 #include "ScriptedCreature.h"
-#include "TotemAI.h"
 
 enum PriestSpells
 {
     SPELL_PRIEST_LIGHTWELL_CHARGES          = 59907,
 };
 
-struct npc_pet_pri_lightwell : public TotemAI
+struct npc_pet_pri_lightwell : public ScriptedAI
 {
-    npc_pet_pri_lightwell(Creature* creature) : TotemAI(creature) { }
+    npc_pet_pri_lightwell(Creature* creature) : ScriptedAI(creature) { }
 
     void InitializeAI() override
     {
@@ -48,7 +47,6 @@ struct npc_pet_pri_lightwell : public TotemAI
         }
 
         me->CastSpell(me, SPELL_PRIEST_LIGHTWELL_CHARGES, false); // Spell for Lightwell Charges
-        TotemAI::InitializeAI();
     }
 };
 
