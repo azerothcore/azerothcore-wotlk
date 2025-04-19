@@ -14,12 +14,12 @@ INSERT INTO `arena_season_reward_group` (`id`, `arena_season`, `criteria_type`, 
 (30, 3, 'pct', 10, 35, 0, '', '', 0),
 -- Season 2 (Merciless)
 (31, 2, 'abs', 1, 1, 0, '', '', 0),
-(32, 2, 'pct', 0, 0.5, 182, '', '', 0), -- Mail needs verification
+(32, 2, 'pct', 0, 0.5, 0, 'Congratulations!', 'On behalf of the Steamwheedle Fighting Circuit, we congratulate you for your successes in this arena season.$B$BIn recognition of your skill and savagery, we hereby bestow upon you this Merciless Nether Drake.  May it serve you well.', 0),
 (33, 2, 'pct', 0.5, 3, 0, '', '', 0),
 (34, 2, 'pct', 3, 10, 0, '', '', 0),
 (35, 2, 'pct', 10, 35, 0, '', '', 0),
 -- Season 1
-(36, 1, 'pct', 0, 0.5, 182, '', '', 0), -- Mail needs verification
+(36, 1, 'pct', 0, 0.5, 0, 'Congratulations!', 'On behalf of the Steamwheedle Fighting Circuit, we congratulate you for your successes in this arena season.$B$BIn recognition of your skill and savagery, we hereby bestow upon you this Swift Nether Drake.  May it serve you well.', 0),
 (37, 1, 'pct', 0.5, 3, 0, '', '', 0),
 (38, 1, 'pct', 3, 10, 0, '', '', 0),
 (39, 1, 'pct', 10, 35, 0, '', '', 0);
