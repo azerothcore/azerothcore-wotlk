@@ -40,46 +40,6 @@ enum BG_AB_Events
     BG_AB_EVENT_HORDE_TICK                  = 12
 };
 
-enum BG_AB_WorldStates
-{
-    BG_AB_OP_OCCUPIED_BASES_HORDE       = 1778,
-    BG_AB_OP_OCCUPIED_BASES_ALLY        = 1779,
-    BG_AB_OP_RESOURCES_ALLY             = 1776,
-    BG_AB_OP_RESOURCES_HORDE            = 1777,
-    BG_AB_OP_RESOURCES_MAX              = 1780,
-    BG_AB_OP_RESOURCES_WARNING          = 1955,
-
-    BG_AB_OP_STABLE_ICON                = 1842,             //Stable map icon (NONE)
-    BG_AB_OP_STABLE_STATE_ALIENCE       = 1767,             //Stable map state (ALIENCE)
-    BG_AB_OP_STABLE_STATE_HORDE         = 1768,             //Stable map state (HORDE)
-    BG_AB_OP_STABLE_STATE_CON_ALI       = 1769,             //Stable map state (CON ALIENCE)
-    BG_AB_OP_STABLE_STATE_CON_HOR       = 1770,             //Stable map state (CON HORDE)
-
-    BG_AB_OP_FARM_ICON                  = 1845,             //Farm map icon (NONE)
-    BG_AB_OP_FARM_STATE_ALIENCE         = 1772,             //Farm state (ALIENCE)
-    BG_AB_OP_FARM_STATE_HORDE           = 1773,             //Farm state (HORDE)
-    BG_AB_OP_FARM_STATE_CON_ALI         = 1774,             //Farm state (CON ALIENCE)
-    BG_AB_OP_FARM_STATE_CON_HOR         = 1775,             //Farm state (CON HORDE)
-
-    BG_AB_OP_BLACKSMITH_ICON            = 1846,             //Blacksmith map icon (NONE)
-    BG_AB_OP_BLACKSMITH_STATE_ALIENCE   = 1782,             //Blacksmith map state (ALIENCE)
-    BG_AB_OP_BLACKSMITH_STATE_HORDE     = 1783,             //Blacksmith map state (HORDE)
-    BG_AB_OP_BLACKSMITH_STATE_CON_ALI   = 1784,             //Blacksmith map state (CON ALIENCE)
-    BG_AB_OP_BLACKSMITH_STATE_CON_HOR   = 1785,             //Blacksmith map state (CON HORDE)
-
-    BG_AB_OP_LUMBERMILL_ICON            = 1844,             //Lumber Mill map icon (NONE)
-    BG_AB_OP_LUMBERMILL_STATE_ALIENCE   = 1792,             //Lumber Mill map state (ALIENCE)
-    BG_AB_OP_LUMBERMILL_STATE_HORDE     = 1793,             //Lumber Mill map state (HORDE)
-    BG_AB_OP_LUMBERMILL_STATE_CON_ALI   = 1794,             //Lumber Mill map state (CON ALIENCE)
-    BG_AB_OP_LUMBERMILL_STATE_CON_HOR   = 1795,             //Lumber Mill map state (CON HORDE)
-
-    BG_AB_OP_GOLDMINE_ICON              = 1843,             //Gold Mine map icon (NONE)
-    BG_AB_OP_GOLDMINE_STATE_ALIENCE     = 1787,             //Gold Mine map state (ALIENCE)
-    BG_AB_OP_GOLDMINE_STATE_HORDE       = 1788,             //Gold Mine map state (HORDE)
-    BG_AB_OP_GOLDMINE_STATE_CON_ALI     = 1789,             //Gold Mine map state (CON ALIENCE
-    BG_AB_OP_GOLDMINE_STATE_CON_HOR     = 1790,             //Gold Mine map state (CON HORDE)
-};
-
 enum BG_AB_ObjectIds
 {
     BG_AB_OBJECTID_NODE_BANNER_0        = 180087,       // Stables banner

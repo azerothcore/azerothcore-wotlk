@@ -37,6 +37,7 @@ EndContentData */
 #include "SpellAuraEffects.h"
 #include "SpellScript.h"
 #include "SpellScriptLoader.h"
+#include "WorldStateDefines.h"
 
 /*######
 ## npc_lady_sylvanas_windrunner
@@ -723,31 +724,6 @@ enum QuestMisc
     ZONE_UNDERCITY = 1497
 };
 
-enum Worldstates
-{
-    // Alliance
-    WORLD_STATE_MANHUNT_COUNTDOWN_A = 3958,
-    WORLD_STATE_MANHUNT_STARTS_A = 3966,
-    WORLD_STATE_SEWERS_FIGHT_A = 3962,
-    WORLD_STATE_SEWERS_DONE_A = 3964,
-    WORLD_STATE_APOTHECARIUM_FIGHT_A = 3972,
-    WORLD_STATE_APOTHECARIUM_DONE_A = 3971,
-    WORLD_STATE_FAIL_A = 3963,
-
-    // Horde
-    WORLD_STATE_BATTLE_COUNTDOWN_H = 3876,
-    WORLD_STATE_BATTLE_START_H = 3875,
-    WORLD_STATE_COURTYARD_FIGHT_H = 3885,
-    WORLD_STATE_COURTYARD_DONE_H = 3886,
-    WORLD_STATE_INNER_SANKTUM_FIGHT_H = 3887,
-    WORLD_STATE_INNER_SANKTUM_DONE_H = 3888,
-    WORLD_STATE_APOTHECARIUM_FIGHT_H = 3891, // unused
-    WORLD_STATE_APOTHECARIUM_DONE_H = 3892, // unused
-    WORLD_STATE_ROYAL_QUARTER_FIGHT_H = 3889,
-    WORLD_STATE_ROYAL_QUARTER_DONE_H = 3890,
-    WORLD_STATE_FAIL_H = 3878
-};
-
 struct LocationXYZO {
     float x, y, z, o;
 };
@@ -1131,13 +1107,13 @@ public:
             switch (summon->GetEntry())
             {
                 case NPC_BLIGHTWORM:
-                    UpdateWorldState(me->GetMap(), WORLD_STATE_SEWERS_FIGHT_A, 0);
-                    UpdateWorldState(me->GetMap(), WORLD_STATE_SEWERS_DONE_A, 1);
+                    UpdateWorldState(me->GetMap(), WORLD_STATE_BATTLE_FOR_UNDERCITY_SEWERS_FIGHT_A, 0);
+                    UpdateWorldState(me->GetMap(), WORLD_STATE_BATTLE_FOR_UNDERCITY_SEWERS_DONE_A, 1);
                     bStepping = true;
                     break;
                 case NPC_PUTRESS:
-                    UpdateWorldState(me->GetMap(), WORLD_STATE_APOTHECARIUM_FIGHT_A, 0);
-                    UpdateWorldState(me->GetMap(), WORLD_STATE_APOTHECARIUM_DONE_A, 1);
+                    UpdateWorldState(me->GetMap(), WORLD_STATE_BATTLE_FOR_UNDERCITY_APOTHECARIUM_FIGHT_A, 0);
+                    UpdateWorldState(me->GetMap(), WORLD_STATE_BATTLE_FOR_UNDERCITY_APOTHECARIUM_DONE_A, 1);
                     bStepping = true;
                     break;
                 default:
@@ -1536,7 +1512,7 @@ public:
                         //Preparation
                         case 0:
                             me->setActive(true);
-                            UpdateWorldState(me->GetMap(), WORLD_STATE_MANHUNT_COUNTDOWN_A, 1);
+                            UpdateWorldState(me->GetMap(), WORLD_STATE_BATTLE_FOR_UNDERCITY_MANHUNT_COUNTDOWN_A, 1);
                             Talk(WRYNN_SAY_PREP_1);
                             JumpToNextStep(10 * IN_MILLISECONDS);
                             break;
@@ -1553,8 +1529,8 @@ public:
                             JumpToNextStep(20 * IN_MILLISECONDS);
                             break;
                         case 4:
-                            UpdateWorldState(me->GetMap(), WORLD_STATE_MANHUNT_COUNTDOWN_A, 0);
-                            UpdateWorldState(me->GetMap(), WORLD_STATE_MANHUNT_STARTS_A, 1);
+                            UpdateWorldState(me->GetMap(), WORLD_STATE_BATTLE_FOR_UNDERCITY_MANHUNT_COUNTDOWN_A, 0);
+                            UpdateWorldState(me->GetMap(), WORLD_STATE_BATTLE_FOR_UNDERCITY_MANHUNT_STARTS_A, 1);
                             Talk(WRYNN_SAY_PREP_5);
                             JumpToNextStep(10 * IN_MILLISECONDS);
                             break;
@@ -1600,8 +1576,8 @@ public:
                             break;
                         case 12:
                             SetEscortPaused(false);
-                            UpdateWorldState(me->GetMap(), WORLD_STATE_MANHUNT_STARTS_A, 0);
-                            UpdateWorldState(me->GetMap(), WORLD_STATE_SEWERS_FIGHT_A, 1);
+                            UpdateWorldState(me->GetMap(), WORLD_STATE_BATTLE_FOR_UNDERCITY_MANHUNT_STARTS_A, 0);
+                            UpdateWorldState(me->GetMap(), WORLD_STATE_BATTLE_FOR_UNDERCITY_SEWERS_FIGHT_A, 1);
                             JumpToNextStep(1 * IN_MILLISECONDS);
                             break;
                         case 13:
@@ -1692,7 +1668,7 @@ public:
                             JumpToNextStep(1.5 * IN_MILLISECONDS);
                             break;
                         case 30:
-                            UpdateWorldState(me->GetMap(), WORLD_STATE_APOTHECARIUM_FIGHT_A, 1);
+                            UpdateWorldState(me->GetMap(), WORLD_STATE_BATTLE_FOR_UNDERCITY_APOTHECARIUM_FIGHT_A, 1);
                             if (Creature* putress = ObjectAccessor::GetCreature(*me, putressGUID))
                                 putress->AI()->Talk(PUTRESS_SAY_1);
                             if (Player* player = GetPlayerForEscort())
@@ -2018,9 +1994,9 @@ public:
                                     }
                                 }
                             }
-                            UpdateWorldState(me->GetMap(), WORLD_STATE_MANHUNT_STARTS_A, 0);
-                            UpdateWorldState(me->GetMap(), WORLD_STATE_SEWERS_DONE_A, 0);
-                            UpdateWorldState(me->GetMap(), WORLD_STATE_APOTHECARIUM_DONE_A, 0);
+                            UpdateWorldState(me->GetMap(), WORLD_STATE_BATTLE_FOR_UNDERCITY_MANHUNT_STARTS_A, 0);
+                            UpdateWorldState(me->GetMap(), WORLD_STATE_BATTLE_FOR_UNDERCITY_SEWERS_DONE_A, 0);
+                            UpdateWorldState(me->GetMap(), WORLD_STATE_BATTLE_FOR_UNDERCITY_APOTHECARIUM_DONE_A, 0);
                             me->DespawnOrUnsummon();
                             break;
                     }
@@ -2471,14 +2447,14 @@ public:
             switch (summon->GetEntry())
             {
                 case NPC_BLIGHT_ABBERATION:
-                    UpdateWorldState(me->GetMap(), WORLD_STATE_COURTYARD_FIGHT_H, 0);
-                    UpdateWorldState(me->GetMap(), WORLD_STATE_COURTYARD_DONE_H, 1);
+                    UpdateWorldState(me->GetMap(), WORLD_STATE_BATTLE_FOR_UNDERCITY_COURTYARD_FIGHT_H, 0);
+                    UpdateWorldState(me->GetMap(), WORLD_STATE_BATTLE_FOR_UNDERCITY_COURTYARD_DONE_H, 1);
                     bStepping = true;
                     break;
                 case NPC_KHANOK:
                     {
-                        UpdateWorldState(me->GetMap(), WORLD_STATE_INNER_SANKTUM_FIGHT_H, 0);
-                        UpdateWorldState(me->GetMap(), WORLD_STATE_INNER_SANKTUM_DONE_H, 1);
+                        UpdateWorldState(me->GetMap(), WORLD_STATE_BATTLE_FOR_UNDERCITY_INNER_SANCTUM_FIGHT_H, 0);
+                        UpdateWorldState(me->GetMap(), WORLD_STATE_BATTLE_FOR_UNDERCITY_INNER_SANCTUM_DONE_H, 1);
                         FollowThrall();
                         SetEscortPaused(false);
                         std::list<Creature*> SanktumList;
@@ -2497,8 +2473,8 @@ public:
                     }
                 case NPC_VARIMATHRAS:
                     {
-                        UpdateWorldState(me->GetMap(), WORLD_STATE_ROYAL_QUARTER_FIGHT_H, 0);
-                        UpdateWorldState(me->GetMap(), WORLD_STATE_ROYAL_QUARTER_DONE_H, 1);
+                        UpdateWorldState(me->GetMap(), WORLD_STATE_BATTLE_FOR_UNDERCITY_ROYAL_QUARTER_FIGHT_H, 0);
+                        UpdateWorldState(me->GetMap(), WORLD_STATE_BATTLE_FOR_UNDERCITY_ROYAL_QUARTER_DONE_H, 1);
                         std::list<Creature*> ThroneList;
                         me->GetCreatureListWithEntryInGrid(ThroneList, NPC_LEGION_OVERLORD, 1000.0f);
                         me->GetCreatureListWithEntryInGrid(ThroneList, NPC_LEGION_INVADER, 1000.0f);
@@ -2874,7 +2850,7 @@ public:
                     break;
                 case 36:
                     Talk(THRALL_SAY_SANCTUM_1);
-                    UpdateWorldState(me->GetMap(), WORLD_STATE_INNER_SANKTUM_FIGHT_H, 1);
+                    UpdateWorldState(me->GetMap(), WORLD_STATE_BATTLE_FOR_UNDERCITY_ROYAL_QUARTER_FIGHT_H, 1);
                     break;
                 case 46:
                     SetHoldState(true);
@@ -2951,7 +2927,7 @@ public:
                             JumpToNextStep(3 * IN_MILLISECONDS);
                             break;
                         case 1:
-                            UpdateWorldState(me->GetMap(), WORLD_STATE_BATTLE_COUNTDOWN_H, 1);
+                            UpdateWorldState(me->GetMap(), WORLD_STATE_BATTLE_FOR_UNDERCITY_COUNTDOWN_H, 1);
                             Talk(THRALL_SAY_PREP_1);
                             JumpToNextStep(6 * IN_MILLISECONDS);
                             break;
@@ -2995,8 +2971,8 @@ public:
                             break;
                         // Start Event
                         case 11:
-                            UpdateWorldState(me->GetMap(), WORLD_STATE_BATTLE_COUNTDOWN_H, 0);
-                            UpdateWorldState(me->GetMap(), WORLD_STATE_BATTLE_START_H, 1);
+                            UpdateWorldState(me->GetMap(), WORLD_STATE_BATTLE_FOR_UNDERCITY_COUNTDOWN_H, 0);
+                            UpdateWorldState(me->GetMap(), WORLD_STATE_BATTLE_FOR_UNDERCITY_START_H, 1);
                             Talk(THRALL_SAY_PREP_8);
                             SetEscortPaused(false);
                             bStepping = false;
@@ -3108,8 +3084,8 @@ public:
                             bStepping = false;
                             SetRun(true);
                             Talk(THRALL_SAY_COURTYARD_4);
-                            UpdateWorldState(me->GetMap(), WORLD_STATE_BATTLE_START_H, 0);
-                            UpdateWorldState(me->GetMap(), WORLD_STATE_COURTYARD_FIGHT_H, 1);
+                            UpdateWorldState(me->GetMap(), WORLD_STATE_BATTLE_FOR_UNDERCITY_START_H, 0);
+                            UpdateWorldState(me->GetMap(), WORLD_STATE_BATTLE_FOR_UNDERCITY_COURTYARD_FIGHT_H, 1);
                             JumpToNextStep(0);
                             break;
                         case 28:
@@ -3548,7 +3524,7 @@ public:
                             }
                         case 116:
                             Talk(THRALL_SAY_SANCTUM_7);
-                            UpdateWorldState(me->GetMap(), WORLD_STATE_ROYAL_QUARTER_FIGHT_H, 1);
+                            UpdateWorldState(me->GetMap(), WORLD_STATE_BATTLE_FOR_UNDERCITY_ROYAL_QUARTER_FIGHT_H, 1);
                             FollowThrall();
                             SetEscortPaused(false);
                             bStepping = false;
@@ -3885,9 +3861,9 @@ public:
                             me->SetNpcFlag(UNIT_NPC_FLAG_GOSSIP);
                             me->SetNpcFlag(UNIT_NPC_FLAG_QUESTGIVER);
                             Talk(THRALL_SAY_THRONE_11);
-                            UpdateWorldState(me->GetMap(), WORLD_STATE_ROYAL_QUARTER_FIGHT_H, 0);
-                            UpdateWorldState(me->GetMap(), WORLD_STATE_INNER_SANKTUM_FIGHT_H, 0);
-                            UpdateWorldState(me->GetMap(), WORLD_STATE_COURTYARD_FIGHT_H, 0);
+                            UpdateWorldState(me->GetMap(), WORLD_STATE_BATTLE_FOR_UNDERCITY_ROYAL_QUARTER_FIGHT_H, 0);
+                            UpdateWorldState(me->GetMap(), WORLD_STATE_BATTLE_FOR_UNDERCITY_INNER_SANCTUM_FIGHT_H, 0);
+                            UpdateWorldState(me->GetMap(), WORLD_STATE_BATTLE_FOR_UNDERCITY_COURTYARD_FIGHT_H, 0);
                             std::list<Creature*> HelperList;
                             me->GetCreatureListWithEntryInGrid(HelperList, NPC_SYLVANAS, 100.0f);
                             me->GetCreatureListWithEntryInGrid(HelperList, NPC_OVERLORD_SAURFANG, 100.0f);

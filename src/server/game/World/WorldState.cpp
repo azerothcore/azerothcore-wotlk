@@ -21,6 +21,7 @@
 #include "SharedDefines.h"
 #include "Weather.h"
 #include "WorldState.h"
+#include "WorldStateDefines.h"
 
 WorldState* WorldState::instance()
 {

@@ -20,6 +20,7 @@
 #include "InstanceMapScript.h"
 #include "Player.h"
 #include "ScriptedCreature.h"
+#include "WorldStateDefines.h"
 #include "trial_of_the_crusader.h"
 
 std::map<uint32, bool> validDedicatedInsanityItems;
@@ -283,7 +284,7 @@ public:
                         Map::PlayerList const& pl = instance->GetPlayers();
                         for( Map::PlayerList::const_iterator itr = pl.begin(); itr != pl.end(); ++itr )
                             if (Player* plr = itr->GetSource())
-                                plr->SendUpdateWorldState(UPDATE_STATE_UI_COUNT, AttemptsLeft);
+                                plr->SendUpdateWorldState(WORLD_STATE_TRIAL_OF_THE_CRUSADER_UI_COUNT, AttemptsLeft);
                     }
                     InstanceCleanup(true);
                     SaveToDB();
@@ -1379,11 +1380,11 @@ public:
 
             if (instance->IsHeroic())
             {
-                plr->SendUpdateWorldState(UPDATE_STATE_UI_SHOW, 1);
-                plr->SendUpdateWorldState(UPDATE_STATE_UI_COUNT, AttemptsLeft);
+                plr->SendUpdateWorldState(WORLD_STATE_TRIAL_OF_THE_CRUSADER_UI_SHOW, 1);
+                plr->SendUpdateWorldState(WORLD_STATE_TRIAL_OF_THE_CRUSADER_UI_COUNT, AttemptsLeft);
             }
             else
-                plr->SendUpdateWorldState(UPDATE_STATE_UI_SHOW, 0);
+                plr->SendUpdateWorldState(WORLD_STATE_TRIAL_OF_THE_CRUSADER_UI_SHOW, 0);
 
             if (DoNeedCleanup(plr))
             {
@@ -1555,7 +1556,7 @@ public:
                 Map::PlayerList const& pl = instance->GetPlayers();
                 for( Map::PlayerList::const_iterator itr = pl.begin(); itr != pl.end(); ++itr )
                     if (Player* plr = itr->GetSource())
-                        plr->SendUpdateWorldState(UPDATE_STATE_UI_COUNT, AttemptsLeft);
+                        plr->SendUpdateWorldState(WORLD_STATE_TRIAL_OF_THE_CRUSADER_UI_COUNT, AttemptsLeft);
             }
 
             if (instance->IsHeroic() && AttemptsLeft == 0 )

@@ -19,6 +19,7 @@
 #include "InstanceMapScript.h"
 #include "Player.h"
 #include "ScriptedCreature.h"
+#include "WorldStateDefines.h"
 #include "violet_hold.h"
 
 enum vYells
@@ -235,7 +236,7 @@ public:
                         CLEANED = false;
                         InstanceCleanup();
                     }
-                    DoUpdateWorldState(WORLD_STATE_VH_PRISON_STATE, (uint32)GateHealth);
+                    DoUpdateWorldState(WORLD_STATE_VIOLET_HOLD_PRISON_STATE, (uint32)GateHealth);
                     break;
                 case DATA_RELEASE_BOSS:
                     if (WaveCount == 6)
@@ -253,7 +254,7 @@ public:
                         m_auiEncounter[2] = DONE;
                         EncounterStatus = DONE;
                         HandleGameObject(GO_MainGateGUID, true);
-                        DoUpdateWorldState(WORLD_STATE_VH_SHOW, 0);
+                        DoUpdateWorldState(WORLD_STATE_VIOLET_HOLD_SHOW, 0);
                         if (Creature* c = instance->GetCreature(NPC_SinclariGUID))
                         {
                             c->AI()->Talk(SAY_SINCLARI_COMPLETE);
@@ -458,9 +459,9 @@ public:
                         }
                         GateHealth = 100;
                         HandleGameObject(GO_MainGateGUID, false);
-                        DoUpdateWorldState(WORLD_STATE_VH_SHOW, 1);
-                        DoUpdateWorldState(WORLD_STATE_VH_PRISON_STATE, (uint32)GateHealth);
-                        DoUpdateWorldState(WORLD_STATE_VH_WAVE_COUNT, (uint32)WaveCount);
+                        DoUpdateWorldState(WORLD_STATE_VIOLET_HOLD_SHOW, 1);
+                        DoUpdateWorldState(WORLD_STATE_VIOLET_HOLD_PRISON_STATE, (uint32)GateHealth);
+                        DoUpdateWorldState(WORLD_STATE_VIOLET_HOLD_WAVE_COUNT, (uint32)WaveCount);
 
                         for (ObjectGuid const& guid : GO_ActivationCrystalGUID)
                             if (GameObject* go = instance->GetGameObject(guid))
@@ -473,7 +474,7 @@ public:
                     break;
                 case EVENT_SUMMON_PORTAL:
                     ++WaveCount;
-                    DoUpdateWorldState(WORLD_STATE_VH_WAVE_COUNT, (uint32)WaveCount);
+                    DoUpdateWorldState(WORLD_STATE_VIOLET_HOLD_WAVE_COUNT, (uint32)WaveCount);
                     SetData(DATA_PORTAL_LOCATION, (GetData(DATA_PORTAL_LOCATION) + urand(1, 5)) % 6);
                     if (Creature* c = instance->GetCreature(NPC_SinclariGUID))
                     {
@@ -527,12 +528,12 @@ public:
 
             if (EncounterStatus == IN_PROGRESS)
             {
-                plr->SendUpdateWorldState(WORLD_STATE_VH_SHOW, 1);
-                plr->SendUpdateWorldState(WORLD_STATE_VH_PRISON_STATE, (uint32)GateHealth);
-                plr->SendUpdateWorldState(WORLD_STATE_VH_WAVE_COUNT, (uint32)WaveCount);
+                plr->SendUpdateWorldState(WORLD_STATE_VIOLET_HOLD_SHOW, 1);
+                plr->SendUpdateWorldState(WORLD_STATE_VIOLET_HOLD_PRISON_STATE, (uint32)GateHealth);
+                plr->SendUpdateWorldState(WORLD_STATE_VIOLET_HOLD_WAVE_COUNT, (uint32)WaveCount);
             }
             else
-                plr->SendUpdateWorldState(WORLD_STATE_VH_SHOW, 0);
+                plr->SendUpdateWorldState(WORLD_STATE_VIOLET_HOLD_SHOW, 0);
 
             events.RescheduleEvent(EVENT_CHECK_PLAYERS, 5s);
         }
@@ -625,7 +626,7 @@ public:
             }
 
             // reinitialize variables and events
-            DoUpdateWorldState(WORLD_STATE_VH_SHOW, 0);
+            DoUpdateWorldState(WORLD_STATE_VIOLET_HOLD_SHOW, 0);
             EncounterStatus = NOT_STARTED;
             GateHealth = 100;
             WaveCount = 0;

@@ -19,6 +19,7 @@
 #define OUTDOOR_PVP_HP_
 
 #include "OutdoorPvP.h"
+#include "WorldStateDefines.h"
 
 #define OutdoorPvPHPBuffZonesNum 6
 //  HP, citadel, ramparts, blood furnace, shattered halls, mag's lair
@@ -46,24 +47,11 @@ const uint32 HP_CREDITMARKER[HP_TOWER_NUM] = {19032, 19028, 19029};
 
 //const uint32 HP_CapturePointEvent_Leave[HP_TOWER_NUM] = {11403, 11395, 11387};
 
-enum OutdoorPvPHPWorldStates
-{
-    HP_UI_TOWER_DISPLAY_A = 0x9ba,
-    HP_UI_TOWER_DISPLAY_H = 0x9b9,
+const uint32 HP_MAP_N[HP_TOWER_NUM] = {WORLD_STATE_OPVP_HP_BROKENHILL_N, WORLD_STATE_OPVP_HP_OVERLOOK_N, WORLD_STATE_OPVP_HP_STADIUM_N };
 
-    HP_UI_TOWER_COUNT_H = 0x9ae,
-    HP_UI_TOWER_COUNT_A = 0x9ac,
+const uint32 HP_MAP_A[HP_TOWER_NUM] = {WORLD_STATE_OPVP_HP_BROKENHILL_A, WORLD_STATE_OPVP_HP_OVERLOOK_A, WORLD_STATE_OPVP_HP_STADIUM_A };
 
-    HP_UI_TOWER_SLIDER_N = 2475,
-    HP_UI_TOWER_SLIDER_POS = 2474,
-    HP_UI_TOWER_SLIDER_DISPLAY = 2473
-};
-
-const uint32 HP_MAP_N[HP_TOWER_NUM] = {0x9b5, 0x9b2, 0x9a8};
-
-const uint32 HP_MAP_A[HP_TOWER_NUM] = {0x9b3, 0x9b0, 0x9a7};
-
-const uint32 HP_MAP_H[HP_TOWER_NUM] = {0x9b4, 0x9b1, 0x9a6};
+const uint32 HP_MAP_H[HP_TOWER_NUM] = {WORLD_STATE_OPVP_HP_BROKENHILL_H, WORLD_STATE_OPVP_HP_OVERLOOK_H, WORLD_STATE_OPVP_HP_STADIUM_H };
 
 const uint32 HP_TowerArtKit_A[HP_TOWER_NUM] = {65, 62, 67};
 

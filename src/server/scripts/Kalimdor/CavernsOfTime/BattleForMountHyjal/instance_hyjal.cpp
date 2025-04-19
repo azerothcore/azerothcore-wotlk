@@ -19,6 +19,7 @@
 #include "InstanceMapScript.h"
 #include "InstanceScript.h"
 #include "Player.h"
+#include "WorldStateDefines.h"
 #include "hyjal.h"
 
 /* Battle of Mount Hyjal encounters:
@@ -193,7 +194,7 @@ public:
                     {
                         if (_currentWave == 0 && _initialWaves)
                             creature->SetReputationRewardDisabled(true);
-                        DoUpdateWorldState(WORLD_STATE_ENEMYCOUNT, ++_trash);    // Update the instance wave count on new trash spawn
+                        DoUpdateWorldState(WORLD_STATE_HYJAL_ENEMY_COUNT, ++_trash);    // Update the instance wave count on new trash spawn
                         _encounterNPCs.insert(creature->GetGUID());             // Used for despawning on wipe
                     }
                     break;
@@ -231,7 +232,7 @@ public:
                         {
                             if (_bossWave != TO_BE_DECIDED)
                             {
-                                DoUpdateWorldState(WORLD_STATE_ENEMYCOUNT, --_trash);    // Update the instance wave count on new trash death
+                                DoUpdateWorldState(WORLD_STATE_HYJAL_ENEMY_COUNT, --_trash);    // Update the instance wave count on new trash death
                                 _encounterNPCs.erase(creature->GetGUID());    // Used for despawning on wipe
 
                                 if (_trash == 0) // It can reach negatives if trash spawned after a retreat are killed, it shouldn't affect anything. Also happens on retail
@@ -406,7 +407,7 @@ public:
 
                     if (_bossWave != TO_BE_DECIDED)
                     {
-                        DoUpdateWorldState(WORLD_STATE_WAVES, 0);
+                        DoUpdateWorldState(WORLD_STATE_HYJAL_WAVES, 0);
                         scheduler.Schedule(30s, [this](TaskContext context)
                         {
                             if (IsEncounterInProgress())
@@ -491,9 +492,9 @@ public:
                     _trash = 0;
                     _bossWave = TO_BE_DECIDED;
                     _retreat = 0;
-                    DoUpdateWorldState(WORLD_STATE_WAVES, _currentWave);
-                    DoUpdateWorldState(WORLD_STATE_ENEMY, _trash);
-                    DoUpdateWorldState(WORLD_STATE_ENEMYCOUNT, _trash);
+                    DoUpdateWorldState(WORLD_STATE_HYJAL_WAVES, _currentWave);
+                    DoUpdateWorldState(WORLD_STATE_HYJAL_ENEMY, _trash);
+                    DoUpdateWorldState(WORLD_STATE_HYJAL_ENEMY_COUNT, _trash);
                     break;
             }
 
@@ -548,8 +549,8 @@ public:
                     context.Repeat(timerptr[_currentWave]);
                     if (++_currentWave < maxWaves && _bossWave != TO_BE_DECIDED)
                     {
-                        DoUpdateWorldState(WORLD_STATE_WAVES, _currentWave);
-                        DoUpdateWorldState(WORLD_STATE_ENEMY, 1);
+                        DoUpdateWorldState(WORLD_STATE_HYJAL_WAVES, _currentWave);
+                        DoUpdateWorldState(WORLD_STATE_HYJAL_ENEMY, 1);
                     }
 
                     context.SetGroup(CONTEXT_GROUP_WAVES);

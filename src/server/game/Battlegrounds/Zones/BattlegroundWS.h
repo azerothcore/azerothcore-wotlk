@@ -86,17 +86,6 @@ enum BG_WS_SpellId
     BG_WS_SPELL_BRUTAL_ASSAULT          = 46393
 };
 
-enum BG_WS_WorldStates
-{
-    BG_WS_FLAG_CAPTURES_ALLIANCE  = 1581,
-    BG_WS_FLAG_CAPTURES_HORDE     = 1582,
-    BG_WS_FLAG_CAPTURES_MAX       = 1601,
-    BG_WS_FLAG_STATE_HORDE        = 2338,
-    BG_WS_FLAG_STATE_ALLIANCE     = 2339,
-    BG_WS_STATE_TIMER             = 4248,
-    BG_WS_STATE_TIMER_ACTIVE      = 4247
-};
-
 enum BG_WS_ObjectTypes
 {
     BG_WS_OBJECT_DOOR_A_1       = 0,

@@ -38,12 +38,6 @@ enum ArenaSpellIds
     SPELL_LAST_MAN_STANDING                 = 26549  // Achievement Credit
 };
 
-enum ArenaWorldStates
-{
-    ARENA_WORLD_STATE_ALIVE_PLAYERS_GREEN   = 3600,
-    ARENA_WORLD_STATE_ALIVE_PLAYERS_GOLD    = 3601
-};
-
 class AC_GAME_API Arena : public Battleground
 {
 protected:

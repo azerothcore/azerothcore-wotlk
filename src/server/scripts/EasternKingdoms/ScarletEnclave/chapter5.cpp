@@ -21,6 +21,7 @@
 #include "ScriptedGossip.h"
 #include "SpellScript.h"
 #include "SpellScriptLoader.h"
+#include "WorldStateDefines.h"
 
 enum LightOfDawnSays
 {
@@ -198,13 +199,6 @@ enum LightOfDawnEncounter
     ENCOUNTER_TOTAL_DEFENDERS           = 300,
     ENCOUNTER_TOTAL_SCOURGE             = 10000,
 
-    WORLD_STATE_DEFENDERS_COUNT         = 3590,
-    WORLD_STATE_SCOURGE_COUNT           = 3591,
-    WORLD_STATE_SOLDIERS_ENABLE         = 3592,
-    WORLD_STATE_COUNTDOWN_ENABLE        = 3603,
-    WORLD_STATE_COUNTDOWN_TIME          = 3604,
-    WORLD_STATE_EVENT_BEGIN_ENABLE      = 3605,
-
     ENCOUNTER_STATE_NONE                = 0,
     ENCOUNTER_STATE_FIGHT               = 1,
     ENCOUNTER_STATE_OUTRO               = 2,
@@ -343,7 +337,7 @@ public:
         if (creature->IsQuestGiver())
             player->PrepareQuestMenu(creature->GetGUID());
 
-        if (player->GetQuestStatus(12801) == QUEST_STATUS_INCOMPLETE && !creature->AI()->GetData(WORLD_STATE_SOLDIERS_ENABLE))
+        if (player->GetQuestStatus(12801) == QUEST_STATUS_INCOMPLETE && !creature->AI()->GetData(WORLD_STATE_BATTLE_FOR_LIGHTS_HOPE_SOLDIERS_ENABLE))
             AddGossipItemFor(player, 9795, 0, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
 
         SendGossipMenuFor(player, player->GetGossipTextId(creature), creature->GetGUID());
@@ -414,17 +408,17 @@ public:
         {
             switch (type)
             {
-                case WORLD_STATE_DEFENDERS_COUNT:
+                case WORLD_STATE_BATTLE_FOR_LIGHTS_HOPE_DEFENDERS_COUNT:
                     return defendersRemaining;
-                case WORLD_STATE_SCOURGE_COUNT:
+                case WORLD_STATE_BATTLE_FOR_LIGHTS_HOPE_SCOURGE_COUNT:
                     return scourgeRemaining;
-                case WORLD_STATE_SOLDIERS_ENABLE:
+                case WORLD_STATE_BATTLE_FOR_LIGHTS_HOPE_SOLDIERS_ENABLE:
                     return me->IsAlive() && (startTimeRemaining || battleStarted);
-                case WORLD_STATE_COUNTDOWN_ENABLE:
+                case WORLD_STATE_BATTLE_FOR_LIGHTS_HOPE_COUNTDOWN_ENABLE:
                     return me->IsAlive() && startTimeRemaining;
-                case WORLD_STATE_COUNTDOWN_TIME:
+                case WORLD_STATE_BATTLE_FOR_LIGHTS_HOPE_COUNTDOWN_TIME:
                     return startTimeRemaining;
-                case WORLD_STATE_EVENT_BEGIN_ENABLE:
+                case WORLD_STATE_BATTLE_FOR_LIGHTS_HOPE_EVENT_BEGIN_ENABLE:
                     return me->IsAlive() && !startTimeRemaining && battleStarted;
             }
             return 0;
@@ -442,12 +436,12 @@ public:
 
         void SendInitialWorldStates()
         {
-            SendUpdateWorldState(WORLD_STATE_DEFENDERS_COUNT, GetData(WORLD_STATE_DEFENDERS_COUNT));
-            SendUpdateWorldState(WORLD_STATE_SCOURGE_COUNT, GetData(WORLD_STATE_SCOURGE_COUNT));
-            SendUpdateWorldState(WORLD_STATE_SOLDIERS_ENABLE, GetData(WORLD_STATE_SOLDIERS_ENABLE));
-            SendUpdateWorldState(WORLD_STATE_COUNTDOWN_ENABLE, GetData(WORLD_STATE_COUNTDOWN_ENABLE));
-            SendUpdateWorldState(WORLD_STATE_COUNTDOWN_TIME, GetData(WORLD_STATE_COUNTDOWN_TIME));
-            SendUpdateWorldState(WORLD_STATE_EVENT_BEGIN_ENABLE, GetData(WORLD_STATE_EVENT_BEGIN_ENABLE));
+            SendUpdateWorldState(WORLD_STATE_BATTLE_FOR_LIGHTS_HOPE_DEFENDERS_COUNT, GetData(WORLD_STATE_BATTLE_FOR_LIGHTS_HOPE_DEFENDERS_COUNT));
+            SendUpdateWorldState(WORLD_STATE_BATTLE_FOR_LIGHTS_HOPE_SCOURGE_COUNT, GetData(WORLD_STATE_BATTLE_FOR_LIGHTS_HOPE_SCOURGE_COUNT));
+            SendUpdateWorldState(WORLD_STATE_BATTLE_FOR_LIGHTS_HOPE_SOLDIERS_ENABLE, GetData(WORLD_STATE_BATTLE_FOR_LIGHTS_HOPE_SOLDIERS_ENABLE));
+            SendUpdateWorldState(WORLD_STATE_BATTLE_FOR_LIGHTS_HOPE_COUNTDOWN_ENABLE, GetData(WORLD_STATE_BATTLE_FOR_LIGHTS_HOPE_COUNTDOWN_ENABLE));
+            SendUpdateWorldState(WORLD_STATE_BATTLE_FOR_LIGHTS_HOPE_COUNTDOWN_TIME, GetData(WORLD_STATE_BATTLE_FOR_LIGHTS_HOPE_COUNTDOWN_TIME));
+            SendUpdateWorldState(WORLD_STATE_BATTLE_FOR_LIGHTS_HOPE_EVENT_BEGIN_ENABLE, GetData(WORLD_STATE_BATTLE_FOR_LIGHTS_HOPE_EVENT_BEGIN_ENABLE));
         }
 
         void JustSummoned(Creature* cr) override
@@ -482,12 +476,12 @@ public:
             if (creature->GetEntry() >= NPC_RAMPAGING_ABOMINATION)
             {
                 --scourgeRemaining;
-                SendUpdateWorldState(WORLD_STATE_SCOURGE_COUNT, GetData(WORLD_STATE_SCOURGE_COUNT));
+                SendUpdateWorldState(WORLD_STATE_BATTLE_FOR_LIGHTS_HOPE_SCOURGE_COUNT, GetData(WORLD_STATE_BATTLE_FOR_LIGHTS_HOPE_SCOURGE_COUNT));
             }
             else
             {
                 --defendersRemaining;
-                SendUpdateWorldState(WORLD_STATE_DEFENDERS_COUNT, GetData(WORLD_STATE_DEFENDERS_COUNT));
+                SendUpdateWorldState(WORLD_STATE_BATTLE_FOR_LIGHTS_HOPE_DEFENDERS_COUNT, GetData(WORLD_STATE_BATTLE_FOR_LIGHTS_HOPE_DEFENDERS_COUNT));
 
                 if (defendersRemaining == 200)
                     FinishFight();
@@ -610,25 +604,25 @@ public:
             switch (eventId)
             {
                 case EVENT_START_COUNTDOWN_1:
-                    SendUpdateWorldState(WORLD_STATE_COUNTDOWN_TIME, 4);
+                    SendUpdateWorldState(WORLD_STATE_BATTLE_FOR_LIGHTS_HOPE_COUNTDOWN_TIME, 4);
                     break;
                 case EVENT_START_COUNTDOWN_2:
-                    SendUpdateWorldState(WORLD_STATE_COUNTDOWN_TIME, 3);
+                    SendUpdateWorldState(WORLD_STATE_BATTLE_FOR_LIGHTS_HOPE_COUNTDOWN_TIME, 3);
                     break;
                 case EVENT_START_COUNTDOWN_3:
-                    SendUpdateWorldState(WORLD_STATE_COUNTDOWN_TIME, 2);
+                    SendUpdateWorldState(WORLD_STATE_BATTLE_FOR_LIGHTS_HOPE_COUNTDOWN_TIME, 2);
                     break;
                 case EVENT_START_COUNTDOWN_4:
                     Talk(SAY_LIGHT_OF_DAWN02);
-                    SendUpdateWorldState(WORLD_STATE_COUNTDOWN_TIME, 1);
+                    SendUpdateWorldState(WORLD_STATE_BATTLE_FOR_LIGHTS_HOPE_COUNTDOWN_TIME, 1);
                     break;
                 case EVENT_START_COUNTDOWN_5:
                     battleStarted = ENCOUNTER_STATE_FIGHT;
                     me->ReplaceAllNpcFlags(UNIT_NPC_FLAG_NONE);
                     Talk(SAY_LIGHT_OF_DAWN04); // Wrong order in DB!
-                    SendUpdateWorldState(WORLD_STATE_COUNTDOWN_TIME, 0);
-                    SendUpdateWorldState(WORLD_STATE_COUNTDOWN_ENABLE, 0);
-                    SendUpdateWorldState(WORLD_STATE_EVENT_BEGIN_ENABLE, 1);
+                    SendUpdateWorldState(WORLD_STATE_BATTLE_FOR_LIGHTS_HOPE_COUNTDOWN_TIME, 0);
+                    SendUpdateWorldState(WORLD_STATE_BATTLE_FOR_LIGHTS_HOPE_COUNTDOWN_ENABLE, 0);
+                    SendUpdateWorldState(WORLD_STATE_BATTLE_FOR_LIGHTS_HOPE_EVENT_BEGIN_ENABLE, 1);
                     break;
                 case EVENT_START_COUNTDOWN_6:
                 case EVENT_START_COUNTDOWN_7:

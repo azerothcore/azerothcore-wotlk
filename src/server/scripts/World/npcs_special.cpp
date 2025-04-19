@@ -34,6 +34,7 @@
 #include "TaskScheduler.h"
 #include "WaypointMgr.h"
 #include "World.h"
+#include "WorldStateDefines.h"
 
 /// @todo: this import is not necessary for compilation and marked as unused by the IDE
 //  however, for some reasons removing it would cause a damn linking issue
@@ -186,17 +187,6 @@ public:
     }
 };
 
-/*
- * Stranglethorn Vale Fishing Extravaganza World States
- */
-enum FishingExtravaganzaWorldStates
-{
-    STV_FISHING_PREV_WIN_TIME           = 197,
-    STV_FISHING_HAS_WINNER              = 198,
-    STV_FISHING_ANNOUNCE_EVENT_BEGIN    = 199,
-    STV_FISHING_ANNOUNCE_POOLS_DESPAN   = 200
-};
-
 enum RiggleBassbait
 {
     RIGGLE_SAY_START            = 0,
@@ -222,13 +212,13 @@ public:
         npc_riggle_bassbaitAI(Creature* c) : ScriptedAI(c)
         {
             m_uiTimer = 0;
-            auto prevWinTime = sWorld->getWorldState(STV_FISHING_PREV_WIN_TIME);
+            auto prevWinTime = sWorld->getWorldState(WORLD_STATE_STRANGLETHORN_VALE_FISHING_PREV_WIN_TIME);
             if (GameTime::GetGameTime().count() - prevWinTime > DAY)
             {
                 // reset all after 1 day
-                sWorld->setWorldState(STV_FISHING_ANNOUNCE_EVENT_BEGIN, 1);
-                sWorld->setWorldState(STV_FISHING_ANNOUNCE_POOLS_DESPAN, 0);
-                sWorld->setWorldState(STV_FISHING_HAS_WINNER, 0);
+                sWorld->setWorldState(WORLD_STATE_STRANGLETHORN_VALE_FISHING_ANNOUNCE_EVENT_BEGIN, 1);
+                sWorld->setWorldState(WORLD_STATE_STRANGLETHORN_VALE_FISHING_ANNOUNCE_POOLS_DESPAWN, 0);
+                sWorld->setWorldState(WORLD_STATE_STRANGLETHORN_VALE_FISHING_HAS_WINNER, 0);
             }
         }
 
@@ -236,16 +226,16 @@ public:
 
         void CheckTournamentState() const
         {
-            if (sGameEventMgr->IsActiveEvent(EVENT_FISHING_TURN_INS) && !sWorld->getWorldState(STV_FISHING_HAS_WINNER))
+            if (sGameEventMgr->IsActiveEvent(EVENT_FISHING_TURN_INS) && !sWorld->getWorldState(WORLD_STATE_STRANGLETHORN_VALE_FISHING_HAS_WINNER))
             {
                 if (!me->IsQuestGiver())
                 {
                     me->SetNpcFlag(UNIT_NPC_FLAG_QUESTGIVER);
                 }
-                if (sWorld->getWorldState(STV_FISHING_ANNOUNCE_EVENT_BEGIN))
+                if (sWorld->getWorldState(WORLD_STATE_STRANGLETHORN_VALE_FISHING_ANNOUNCE_EVENT_BEGIN))
                 {
                     me->AI()->Talk(RIGGLE_SAY_START);
-                    sWorld->setWorldState(STV_FISHING_ANNOUNCE_EVENT_BEGIN, 0);
+                    sWorld->setWorldState(WORLD_STATE_STRANGLETHORN_VALE_FISHING_ANNOUNCE_EVENT_BEGIN, 0);
                 }
             }
             else
@@ -258,14 +248,14 @@ public:
             if (sGameEventMgr->IsActiveEvent(EVENT_FISHING_POOLS))
             {
                 // enable announcement: when pools despawn
-                sWorld->setWorldState(STV_FISHING_ANNOUNCE_POOLS_DESPAN, 1);
+                sWorld->setWorldState(WORLD_STATE_STRANGLETHORN_VALE_FISHING_ANNOUNCE_POOLS_DESPAWN, 1);
             }
             else
             {
-                if (sWorld->getWorldState(STV_FISHING_ANNOUNCE_POOLS_DESPAN))
+                if (sWorld->getWorldState(WORLD_STATE_STRANGLETHORN_VALE_FISHING_ANNOUNCE_POOLS_DESPAWN))
                 {
                     me->AI()->Talk(RIGGLE_SAY_POOLS_END);
-                    sWorld->setWorldState(STV_FISHING_ANNOUNCE_POOLS_DESPAN, 0);
+                    sWorld->setWorldState(WORLD_STATE_STRANGLETHORN_VALE_FISHING_ANNOUNCE_POOLS_DESPAWN, 0);
                 }
             }
         }
@@ -291,7 +281,7 @@ public:
             player->PrepareQuestMenu(creature->GetGUID());
         }
 
-        if (sWorld->getWorldState(STV_FISHING_HAS_WINNER))
+        if (sWorld->getWorldState(WORLD_STATE_STRANGLETHORN_VALE_FISHING_HAS_WINNER))
         {
             SendGossipMenuFor(player, GOSSIP_EVENT_OVER, creature->GetGUID());
         }
@@ -308,8 +298,8 @@ public:
         {
             creature->RemoveNpcFlag(UNIT_NPC_FLAG_QUESTGIVER);
             creature->AI()->Talk(RIGGLE_SAY_WINNER, player);
-            sWorld->setWorldState(STV_FISHING_PREV_WIN_TIME, GameTime::GetGameTime().count());
-            sWorld->setWorldState(STV_FISHING_HAS_WINNER, 1);
+            sWorld->setWorldState(WORLD_STATE_STRANGLETHORN_VALE_FISHING_PREV_WIN_TIME, GameTime::GetGameTime().count());
+            sWorld->setWorldState(WORLD_STATE_STRANGLETHORN_VALE_FISHING_HAS_WINNER, 1);
         }
         return true;
     }

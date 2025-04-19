@@ -23,6 +23,7 @@
 #include "ScriptedEscortAI.h"
 #include "ScriptedGossip.h"
 #include "SpellInfo.h"
+#include "WorldStateDefines.h"
 
 enum Says
 {
@@ -924,7 +925,7 @@ public:
                         break;
                     case EVENT_ACTION_PHASE2+9:
                         if (pInstance)
-                            pInstance->DoUpdateWorldState(WORLDSTATE_WAVE_COUNT, 0);
+                            pInstance->DoUpdateWorldState(WORLD_STATE_CULLING_OF_STRATHOLME_WAVE_COUNT, 0);
 
                         Talk(SAY_PHASE210);
                         eventInRun = false;
@@ -1274,7 +1275,7 @@ void npc_arthas::npc_arthasAI::ReorderInstance(uint32 data)
             else // if (data == COS_PROGRESS_KILLED_SALRAMM)
             {
                 if (pInstance)
-                    pInstance->DoUpdateWorldState(WORLDSTATE_WAVE_COUNT, 10);
+                    pInstance->DoUpdateWorldState(WORLD_STATE_CULLING_OF_STRATHOLME_WAVE_COUNT, 10);
                 DoAction(ACTION_KILLED_SALRAMM);
             }
             break;
@@ -1331,7 +1332,7 @@ void npc_arthas::npc_arthasAI::SendNextWave(uint32 entry)
         else
             SummonNextWave();
 
-        pInstance->DoUpdateWorldState(WORLDSTATE_WAVE_COUNT, waveGroupId + 1);
+        pInstance->DoUpdateWorldState(WORLD_STATE_CULLING_OF_STRATHOLME_WAVE_COUNT, waveGroupId + 1);
     }
 }
 

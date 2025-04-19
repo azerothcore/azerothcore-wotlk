@@ -28,6 +28,7 @@
 #include "World.h"
 #include "WorldPacket.h"
 #include "WorldSessionMgr.h"
+#include "WorldStateDefines.h"
 #include "WorldStatePackets.h"
 
 OPvPCapturePointEP_EWT::OPvPCapturePointEP_EWT(OutdoorPvP* pvp)
@@ -101,41 +102,41 @@ void OPvPCapturePointEP_EWT::ChangeState()
 void OPvPCapturePointEP_EWT::SendChangePhase()
 {
     // send this too, sometimes the slider disappears, dunno why :(
-    SendUpdateWorldState(EP_UI_TOWER_SLIDER_DISPLAY, 1);
+    SendUpdateWorldState(WORLD_STATE_OPVP_EP_UI_TOWER_SLIDER_DISPLAY, 1);
     // send these updates to only the ones in this objective
     uint32 phase = (uint32)ceil((_value + _maxValue) / (2 * _maxValue) * 100.0f);
-    SendUpdateWorldState(EP_UI_TOWER_SLIDER_POS, phase);
+    SendUpdateWorldState(WORLD_STATE_OPVP_EP_UI_TOWER_SLIDER_POS, phase);
     // send this too, sometimes it resets :S
-    SendUpdateWorldState(EP_UI_TOWER_SLIDER_N, _neutralValuePct);
+    SendUpdateWorldState(WORLD_STATE_OPVP_EP_UI_TOWER_SLIDER_N, _neutralValuePct);
 }
 
 void OPvPCapturePointEP_EWT::FillInitialWorldStates(WorldPackets::WorldState::InitWorldStates& packet)
 {
     packet.Worldstates.reserve(5);
-    packet.Worldstates.emplace_back(EP_EWT_A, (m_TowerState & EP_TS_A) != 0 ? 1 : 0);
-    packet.Worldstates.emplace_back(EP_EWT_H, (m_TowerState & EP_TS_H) != 0 ? 1 : 0);
-    packet.Worldstates.emplace_back(EP_EWT_N_A, (m_TowerState & EP_TS_N_A) != 0 ? 1 : 0);
-    packet.Worldstates.emplace_back(EP_EWT_N_H, (m_TowerState & EP_TS_N_H) != 0 ? 1 : 0);
-    packet.Worldstates.emplace_back(EP_EWT_N, (m_TowerState & EP_TS_N) != 0 ? 1 : 0);
+    packet.Worldstates.emplace_back(WORLD_STATE_OPVP_EP_EASTWALLTOWER_A, (m_TowerState & EP_TS_A) != 0 ? 1 : 0);
+    packet.Worldstates.emplace_back(WORLD_STATE_OPVP_EP_EASTWALLTOWER_H, (m_TowerState & EP_TS_H) != 0 ? 1 : 0);
+    packet.Worldstates.emplace_back(WORLD_STATE_OPVP_EP_EASTWALLTOWER_N_A, (m_TowerState & EP_TS_N_A) != 0 ? 1 : 0);
+    packet.Worldstates.emplace_back(WORLD_STATE_OPVP_EP_EASTWALLTOWER_N_H, (m_TowerState & EP_TS_N_H) != 0 ? 1 : 0);
+    packet.Worldstates.emplace_back(WORLD_STATE_OPVP_EP_EASTWALLTOWER_N, (m_TowerState & EP_TS_N) != 0 ? 1 : 0);
 }
 
 void OPvPCapturePointEP_EWT::UpdateTowerState()
 {
-    _pvp->SendUpdateWorldState(EP_EWT_A, bool(m_TowerState & EP_TS_A));
-    _pvp->SendUpdateWorldState(EP_EWT_H, bool(m_TowerState & EP_TS_H));
-    _pvp->SendUpdateWorldState(EP_EWT_N_A, bool(m_TowerState & EP_TS_N_A));
-    _pvp->SendUpdateWorldState(EP_EWT_N_H, bool(m_TowerState & EP_TS_N_H));
-    _pvp->SendUpdateWorldState(EP_EWT_N, bool(m_TowerState & EP_TS_N));
+    _pvp->SendUpdateWorldState(WORLD_STATE_OPVP_EP_EASTWALLTOWER_A, bool(m_TowerState & EP_TS_A));
+    _pvp->SendUpdateWorldState(WORLD_STATE_OPVP_EP_EASTWALLTOWER_H, bool(m_TowerState & EP_TS_H));
+    _pvp->SendUpdateWorldState(WORLD_STATE_OPVP_EP_EASTWALLTOWER_N_A, bool(m_TowerState & EP_TS_N_A));
+    _pvp->SendUpdateWorldState(WORLD_STATE_OPVP_EP_EASTWALLTOWER_N_H, bool(m_TowerState & EP_TS_N_H));
+    _pvp->SendUpdateWorldState(WORLD_STATE_OPVP_EP_EASTWALLTOWER_N, bool(m_TowerState & EP_TS_N));
 }
 
 bool OPvPCapturePointEP_EWT::HandlePlayerEnter(Player* player)
 {
     if (OPvPCapturePoint::HandlePlayerEnter(player))
     {
-        player->SendUpdateWorldState(EP_UI_TOWER_SLIDER_DISPLAY, 1);
+        player->SendUpdateWorldState(WORLD_STATE_OPVP_EP_UI_TOWER_SLIDER_DISPLAY, 1);
         uint32 phase = (uint32)ceil((_value + _maxValue) / (2 * _maxValue) * 100.0f);
-        player->SendUpdateWorldState(EP_UI_TOWER_SLIDER_POS, phase);
-        player->SendUpdateWorldState(EP_UI_TOWER_SLIDER_N, _neutralValuePct);
+        player->SendUpdateWorldState(WORLD_STATE_OPVP_EP_UI_TOWER_SLIDER_POS, phase);
+        player->SendUpdateWorldState(WORLD_STATE_OPVP_EP_UI_TOWER_SLIDER_N, _neutralValuePct);
         return true;
     }
     return false;
@@ -143,7 +144,7 @@ bool OPvPCapturePointEP_EWT::HandlePlayerEnter(Player* player)
 
 void OPvPCapturePointEP_EWT::HandlePlayerLeave(Player* player)
 {
-    player->SendUpdateWorldState(EP_UI_TOWER_SLIDER_DISPLAY, 0);
+    player->SendUpdateWorldState(WORLD_STATE_OPVP_EP_UI_TOWER_SLIDER_DISPLAY, 0);
     OPvPCapturePoint::HandlePlayerLeave(player);
 }
 
@@ -244,41 +245,41 @@ void OPvPCapturePointEP_NPT::ChangeState()
 void OPvPCapturePointEP_NPT::SendChangePhase()
 {
     // send this too, sometimes the slider disappears, dunno why :(
-    SendUpdateWorldState(EP_UI_TOWER_SLIDER_DISPLAY, 1);
+    SendUpdateWorldState(WORLD_STATE_OPVP_EP_UI_TOWER_SLIDER_DISPLAY, 1);
     // send these updates to only the ones in this objective
     uint32 phase = (uint32)ceil((_value + _maxValue) / (2 * _maxValue) * 100.0f);
-    SendUpdateWorldState(EP_UI_TOWER_SLIDER_POS, phase);
+    SendUpdateWorldState(WORLD_STATE_OPVP_EP_UI_TOWER_SLIDER_POS, phase);
     // send this too, sometimes it resets :S
-    SendUpdateWorldState(EP_UI_TOWER_SLIDER_N, _neutralValuePct);
+    SendUpdateWorldState(WORLD_STATE_OPVP_EP_UI_TOWER_SLIDER_N, _neutralValuePct);
 }
 
 void OPvPCapturePointEP_NPT::FillInitialWorldStates(WorldPackets::WorldState::InitWorldStates& packet)
 {
     packet.Worldstates.reserve(5);
-    packet.Worldstates.emplace_back(EP_NPT_A, (m_TowerState & EP_TS_A) != 0 ? 1 : 0);
-    packet.Worldstates.emplace_back(EP_NPT_H, (m_TowerState & EP_TS_H) != 0 ? 1 : 0);
-    packet.Worldstates.emplace_back(EP_NPT_N_A, (m_TowerState & EP_TS_N_A) != 0 ? 1 : 0);
-    packet.Worldstates.emplace_back(EP_NPT_N_H, (m_TowerState & EP_TS_N_H) != 0 ? 1 : 0);
-    packet.Worldstates.emplace_back(EP_NPT_N, (m_TowerState & EP_TS_N) != 0 ? 1 : 0);
+    packet.Worldstates.emplace_back(WORLD_STATE_OPVP_EP_NORTHPASSTOWER_A, (m_TowerState & EP_TS_A) != 0 ? 1 : 0);
+    packet.Worldstates.emplace_back(WORLD_STATE_OPVP_EP_NORTHPASSTOWER_H, (m_TowerState & EP_TS_H) != 0 ? 1 : 0);
+    packet.Worldstates.emplace_back(WORLD_STATE_OPVP_EP_NORTHPASSTOWER_N_A, (m_TowerState & EP_TS_N_A) != 0 ? 1 : 0);
+    packet.Worldstates.emplace_back(WORLD_STATE_OPVP_EP_NORTHPASSTOWER_N_H, (m_TowerState & EP_TS_N_H) != 0 ? 1 : 0);
+    packet.Worldstates.emplace_back(WORLD_STATE_OPVP_EP_NORTHPASSTOWER_N, (m_TowerState & EP_TS_N) != 0 ? 1 : 0);
 }
 
 void OPvPCapturePointEP_NPT::UpdateTowerState()
 {
-    _pvp->SendUpdateWorldState(EP_NPT_A, bool(m_TowerState & EP_TS_A));
-    _pvp->SendUpdateWorldState(EP_NPT_H, bool(m_TowerState & EP_TS_H));
-    _pvp->SendUpdateWorldState(EP_NPT_N_A, bool(m_TowerState & EP_TS_N_A));
-    _pvp->SendUpdateWorldState(EP_NPT_N_H, bool(m_TowerState & EP_TS_N_H));
-    _pvp->SendUpdateWorldState(EP_NPT_N, bool(m_TowerState & EP_TS_N));
+    _pvp->SendUpdateWorldState(WORLD_STATE_OPVP_EP_NORTHPASSTOWER_A, bool(m_TowerState & EP_TS_A));
+    _pvp->SendUpdateWorldState(WORLD_STATE_OPVP_EP_NORTHPASSTOWER_H, bool(m_TowerState & EP_TS_H));
+    _pvp->SendUpdateWorldState(WORLD_STATE_OPVP_EP_NORTHPASSTOWER_N_A, bool(m_TowerState & EP_TS_N_A));
+    _pvp->SendUpdateWorldState(WORLD_STATE_OPVP_EP_NORTHPASSTOWER_N_H, bool(m_TowerState & EP_TS_N_H));
+    _pvp->SendUpdateWorldState(WORLD_STATE_OPVP_EP_NORTHPASSTOWER_N, bool(m_TowerState & EP_TS_N));
 }
 
 bool OPvPCapturePointEP_NPT::HandlePlayerEnter(Player* player)
 {
     if (OPvPCapturePoint::HandlePlayerEnter(player))
     {
-        player->SendUpdateWorldState(EP_UI_TOWER_SLIDER_DISPLAY, 1);
+        player->SendUpdateWorldState(WORLD_STATE_OPVP_EP_UI_TOWER_SLIDER_DISPLAY, 1);
         uint32 phase = (uint32)ceil((_value + _maxValue) / (2 * _maxValue) * 100.0f);
-        player->SendUpdateWorldState(EP_UI_TOWER_SLIDER_POS, phase);
-        player->SendUpdateWorldState(EP_UI_TOWER_SLIDER_N, _neutralValuePct);
+        player->SendUpdateWorldState(WORLD_STATE_OPVP_EP_UI_TOWER_SLIDER_POS, phase);
+        player->SendUpdateWorldState(WORLD_STATE_OPVP_EP_UI_TOWER_SLIDER_N, _neutralValuePct);
         return true;
     }
     return false;
@@ -286,7 +287,7 @@ bool OPvPCapturePointEP_NPT::HandlePlayerEnter(Player* player)
 
 void OPvPCapturePointEP_NPT::HandlePlayerLeave(Player* player)
 {
-    player->SendUpdateWorldState(EP_UI_TOWER_SLIDER_DISPLAY, 0);
+    player->SendUpdateWorldState(WORLD_STATE_OPVP_EP_UI_TOWER_SLIDER_DISPLAY, 0);
     OPvPCapturePoint::HandlePlayerLeave(player);
 }
 
@@ -377,41 +378,41 @@ void OPvPCapturePointEP_CGT::ChangeState()
 void OPvPCapturePointEP_CGT::SendChangePhase()
 {
     // send this too, sometimes the slider disappears, dunno why :(
-    SendUpdateWorldState(EP_UI_TOWER_SLIDER_DISPLAY, 1);
+    SendUpdateWorldState(WORLD_STATE_OPVP_EP_UI_TOWER_SLIDER_DISPLAY, 1);
     // send these updates to only the ones in this objective
     uint32 phase = (uint32)ceil((_value + _maxValue) / (2 * _maxValue) * 100.0f);
-    SendUpdateWorldState(EP_UI_TOWER_SLIDER_POS, phase);
+    SendUpdateWorldState(WORLD_STATE_OPVP_EP_UI_TOWER_SLIDER_POS, phase);
     // send this too, sometimes it resets :S
-    SendUpdateWorldState(EP_UI_TOWER_SLIDER_N, _neutralValuePct);
+    SendUpdateWorldState(WORLD_STATE_OPVP_EP_UI_TOWER_SLIDER_N, _neutralValuePct);
 }
 
 void OPvPCapturePointEP_CGT::FillInitialWorldStates(WorldPackets::WorldState::InitWorldStates& packet)
 {
     packet.Worldstates.reserve(5);
-    packet.Worldstates.emplace_back(EP_CGT_A, (m_TowerState & EP_TS_A) != 0 ? 1 : 0);
-    packet.Worldstates.emplace_back(EP_CGT_H, (m_TowerState & EP_TS_H) != 0 ? 1 : 0);
-    packet.Worldstates.emplace_back(EP_CGT_N_A, (m_TowerState & EP_TS_N_A) != 0 ? 1 : 0);
-    packet.Worldstates.emplace_back(EP_CGT_N_H, (m_TowerState & EP_TS_N_H) != 0 ? 1 : 0);
-    packet.Worldstates.emplace_back(EP_CGT_N, (m_TowerState & EP_TS_N) != 0 ? 1 : 0);
+    packet.Worldstates.emplace_back(WORLD_STATE_OPVP_EP_CROWNGUARDTOWER_A, (m_TowerState & EP_TS_A) != 0 ? 1 : 0);
+    packet.Worldstates.emplace_back(WORLD_STATE_OPVP_EP_CROWNGUARDTOWER_H, (m_TowerState & EP_TS_H) != 0 ? 1 : 0);
+    packet.Worldstates.emplace_back(WORLD_STATE_OPVP_EP_CROWNGUARDTOWER_N_A, (m_TowerState & EP_TS_N_A) != 0 ? 1 : 0);
+    packet.Worldstates.emplace_back(WORLD_STATE_OPVP_EP_CROWNGUARDTOWER_N_H, (m_TowerState & EP_TS_N_H) != 0 ? 1 : 0);
+    packet.Worldstates.emplace_back(WORLD_STATE_OPVP_EP_CROWNGUARDTOWER_N, (m_TowerState & EP_TS_N) != 0 ? 1 : 0);
 }
 
 void OPvPCapturePointEP_CGT::UpdateTowerState()
 {
-    _pvp->SendUpdateWorldState(EP_CGT_A, bool(m_TowerState & EP_TS_A));
-    _pvp->SendUpdateWorldState(EP_CGT_H, bool(m_TowerState & EP_TS_H));
-    _pvp->SendUpdateWorldState(EP_CGT_N_A, bool(m_TowerState & EP_TS_N_A));
-    _pvp->SendUpdateWorldState(EP_CGT_N_H, bool(m_TowerState & EP_TS_N_H));
-    _pvp->SendUpdateWorldState(EP_CGT_N, bool(m_TowerState & EP_TS_N));
+    _pvp->SendUpdateWorldState(WORLD_STATE_OPVP_EP_CROWNGUARDTOWER_A, bool(m_TowerState & EP_TS_A));
+    _pvp->SendUpdateWorldState(WORLD_STATE_OPVP_EP_CROWNGUARDTOWER_H, bool(m_TowerState & EP_TS_H));
+    _pvp->SendUpdateWorldState(WORLD_STATE_OPVP_EP_CROWNGUARDTOWER_N_A, bool(m_TowerState & EP_TS_N_A));
+    _pvp->SendUpdateWorldState(WORLD_STATE_OPVP_EP_CROWNGUARDTOWER_N_H, bool(m_TowerState & EP_TS_N_H));
+    _pvp->SendUpdateWorldState(WORLD_STATE_OPVP_EP_CROWNGUARDTOWER_N, bool(m_TowerState & EP_TS_N));
 }
 
 bool OPvPCapturePointEP_CGT::HandlePlayerEnter(Player* player)
 {
     if (OPvPCapturePoint::HandlePlayerEnter(player))
     {
-        player->SendUpdateWorldState(EP_UI_TOWER_SLIDER_DISPLAY, 1);
+        player->SendUpdateWorldState(WORLD_STATE_OPVP_EP_UI_TOWER_SLIDER_DISPLAY, 1);
         uint32 phase = (uint32)ceil((_value + _maxValue) / (2 * _maxValue) * 100.0f);
-        player->SendUpdateWorldState(EP_UI_TOWER_SLIDER_POS, phase);
-        player->SendUpdateWorldState(EP_UI_TOWER_SLIDER_N, _neutralValuePct);
+        player->SendUpdateWorldState(WORLD_STATE_OPVP_EP_UI_TOWER_SLIDER_POS, phase);
+        player->SendUpdateWorldState(WORLD_STATE_OPVP_EP_UI_TOWER_SLIDER_N, _neutralValuePct);
         return true;
     }
     return false;
@@ -419,7 +420,7 @@ bool OPvPCapturePointEP_CGT::HandlePlayerEnter(Player* player)
 
 void OPvPCapturePointEP_CGT::HandlePlayerLeave(Player* player)
 {
-    player->SendUpdateWorldState(EP_UI_TOWER_SLIDER_DISPLAY, 0);
+    player->SendUpdateWorldState(WORLD_STATE_OPVP_EP_UI_TOWER_SLIDER_DISPLAY, 0);
     OPvPCapturePoint::HandlePlayerLeave(player);
 }
 
@@ -515,41 +516,41 @@ void OPvPCapturePointEP_PWT::ChangeState()
 void OPvPCapturePointEP_PWT::SendChangePhase()
 {
     // send this too, sometimes the slider disappears, dunno why :(
-    SendUpdateWorldState(EP_UI_TOWER_SLIDER_DISPLAY, 1);
+    SendUpdateWorldState(WORLD_STATE_OPVP_EP_UI_TOWER_SLIDER_DISPLAY, 1);
     // send these updates to only the ones in this objective
     uint32 phase = (uint32)ceil((_value + _maxValue) / (2 * _maxValue) * 100.0f);
-    SendUpdateWorldState(EP_UI_TOWER_SLIDER_POS, phase);
+    SendUpdateWorldState(WORLD_STATE_OPVP_EP_UI_TOWER_SLIDER_POS, phase);
     // send this too, sometimes it resets :S
-    SendUpdateWorldState(EP_UI_TOWER_SLIDER_N, _neutralValuePct);
+    SendUpdateWorldState(WORLD_STATE_OPVP_EP_UI_TOWER_SLIDER_N, _neutralValuePct);
 }
 
 void OPvPCapturePointEP_PWT::FillInitialWorldStates(WorldPackets::WorldState::InitWorldStates& packet)
 {
     packet.Worldstates.reserve(5);
-    packet.Worldstates.emplace_back(EP_PWT_A, (m_TowerState & EP_TS_A) != 0 ? 1 : 0);
-    packet.Worldstates.emplace_back(EP_PWT_H, (m_TowerState & EP_TS_H) != 0 ? 1 : 0);
-    packet.Worldstates.emplace_back(EP_PWT_N_A, (m_TowerState & EP_TS_N_A) != 0 ? 1 : 0);
-    packet.Worldstates.emplace_back(EP_PWT_N_H, (m_TowerState & EP_TS_N_H) != 0 ? 1 : 0);
-    packet.Worldstates.emplace_back(EP_PWT_N, (m_TowerState & EP_TS_N) != 0 ? 1 : 0);
+    packet.Worldstates.emplace_back(WORLD_STATE_OPVP_EP_PLAGUEWOODTOWER_A, (m_TowerState & EP_TS_A) != 0 ? 1 : 0);
+    packet.Worldstates.emplace_back(WORLD_STATE_OPVP_EP_PLAGUEWOODTOWER_H, (m_TowerState & EP_TS_H) != 0 ? 1 : 0);
+    packet.Worldstates.emplace_back(WORLD_STATE_OPVP_EP_PLAGUEWOODTOWER_N_A, (m_TowerState & EP_TS_N_A) != 0 ? 1 : 0);
+    packet.Worldstates.emplace_back(WORLD_STATE_OPVP_EP_PLAGUEWOODTOWER_N_H, (m_TowerState & EP_TS_N_H) != 0 ? 1 : 0);
+    packet.Worldstates.emplace_back(WORLD_STATE_OPVP_EP_PLAGUEWOODTOWER_N, (m_TowerState & EP_TS_N) != 0 ? 1 : 0);
 }
 
 void OPvPCapturePointEP_PWT::UpdateTowerState()
 {
-    _pvp->SendUpdateWorldState(EP_PWT_A, bool(m_TowerState & EP_TS_A));
-    _pvp->SendUpdateWorldState(EP_PWT_H, bool(m_TowerState & EP_TS_H));
-    _pvp->SendUpdateWorldState(EP_PWT_N_A, bool(m_TowerState & EP_TS_N_A));
-    _pvp->SendUpdateWorldState(EP_PWT_N_H, bool(m_TowerState & EP_TS_N_H));
-    _pvp->SendUpdateWorldState(EP_PWT_N, bool(m_TowerState & EP_TS_N));
+    _pvp->SendUpdateWorldState(WORLD_STATE_OPVP_EP_PLAGUEWOODTOWER_A, bool(m_TowerState & EP_TS_A));
+    _pvp->SendUpdateWorldState(WORLD_STATE_OPVP_EP_PLAGUEWOODTOWER_H, bool(m_TowerState & EP_TS_H));
+    _pvp->SendUpdateWorldState(WORLD_STATE_OPVP_EP_PLAGUEWOODTOWER_N_A, bool(m_TowerState & EP_TS_N_A));
+    _pvp->SendUpdateWorldState(WORLD_STATE_OPVP_EP_PLAGUEWOODTOWER_N_H, bool(m_TowerState & EP_TS_N_H));
+    _pvp->SendUpdateWorldState(WORLD_STATE_OPVP_EP_PLAGUEWOODTOWER_N, bool(m_TowerState & EP_TS_N));
 }
 
 bool OPvPCapturePointEP_PWT::HandlePlayerEnter(Player* player)
 {
     if (OPvPCapturePoint::HandlePlayerEnter(player))
     {
-        player->SendUpdateWorldState(EP_UI_TOWER_SLIDER_DISPLAY, 1);
+        player->SendUpdateWorldState(WORLD_STATE_OPVP_EP_UI_TOWER_SLIDER_DISPLAY, 1);
         uint32 phase = (uint32)ceil((_value + _maxValue) / (2 * _maxValue) * 100.0f);
-        player->SendUpdateWorldState(EP_UI_TOWER_SLIDER_POS, phase);
-        player->SendUpdateWorldState(EP_UI_TOWER_SLIDER_N, _neutralValuePct);
+        player->SendUpdateWorldState(WORLD_STATE_OPVP_EP_UI_TOWER_SLIDER_POS, phase);
+        player->SendUpdateWorldState(WORLD_STATE_OPVP_EP_UI_TOWER_SLIDER_N, _neutralValuePct);
         return true;
     }
     return false;
@@ -557,7 +558,7 @@ bool OPvPCapturePointEP_PWT::HandlePlayerEnter(Player* player)
 
 void OPvPCapturePointEP_PWT::HandlePlayerLeave(Player* player)
 {
-    player->SendUpdateWorldState(EP_UI_TOWER_SLIDER_DISPLAY, 0);
+    player->SendUpdateWorldState(WORLD_STATE_OPVP_EP_UI_TOWER_SLIDER_DISPLAY, 0);
     OPvPCapturePoint::HandlePlayerLeave(player);
 }
 
@@ -647,8 +648,8 @@ bool OutdoorPvPEP::Update(uint32 diff)
                 ++m_AllianceTowersControlled;
             else if (EP_ControlsId[i] == TEAM_HORDE)
                 ++m_HordeTowersControlled;
-            SendUpdateWorldState(EP_UI_TOWER_COUNT_A, m_AllianceTowersControlled);
-            SendUpdateWorldState(EP_UI_TOWER_COUNT_H, m_HordeTowersControlled);
+            SendUpdateWorldState(WORLD_STATE_OPVP_EP_UI_TOWER_COUNT_A, m_AllianceTowersControlled);
+            SendUpdateWorldState(WORLD_STATE_OPVP_EP_UI_TOWER_COUNT_H, m_HordeTowersControlled);
             BuffTeams();
         }
         return true;
@@ -720,11 +721,11 @@ void OutdoorPvPEP::SetControlledState(uint32 index, TeamId teamId)
 void OutdoorPvPEP::FillInitialWorldStates(WorldPackets::WorldState::InitWorldStates& packet)
 {
     packet.Worldstates.reserve(5);
-    packet.Worldstates.emplace_back(EP_UI_TOWER_COUNT_A, m_AllianceTowersControlled);
-    packet.Worldstates.emplace_back(EP_UI_TOWER_COUNT_H, m_HordeTowersControlled);
-    packet.Worldstates.emplace_back(EP_UI_TOWER_SLIDER_DISPLAY, 0);
-    packet.Worldstates.emplace_back(EP_UI_TOWER_SLIDER_POS, 50);
-    packet.Worldstates.emplace_back(EP_UI_TOWER_SLIDER_N, 100);
+    packet.Worldstates.emplace_back(WORLD_STATE_OPVP_EP_UI_TOWER_COUNT_A, m_AllianceTowersControlled);
+    packet.Worldstates.emplace_back(WORLD_STATE_OPVP_EP_UI_TOWER_COUNT_H, m_HordeTowersControlled);
+    packet.Worldstates.emplace_back(WORLD_STATE_OPVP_EP_UI_TOWER_SLIDER_DISPLAY, 0);
+    packet.Worldstates.emplace_back(WORLD_STATE_OPVP_EP_UI_TOWER_SLIDER_POS, 50);
+    packet.Worldstates.emplace_back(WORLD_STATE_OPVP_EP_UI_TOWER_SLIDER_N, 100);
 
     for (OPvPCapturePointMap::iterator itr = _capturePoints.begin(); itr != _capturePoints.end(); ++itr)
     {
@@ -734,35 +735,35 @@ void OutdoorPvPEP::FillInitialWorldStates(WorldPackets::WorldState::InitWorldSta
 
 void OutdoorPvPEP::SendRemoveWorldStates(Player* player)
 {
-    player->SendUpdateWorldState(EP_UI_TOWER_COUNT_A, 0);
-    player->SendUpdateWorldState(EP_UI_TOWER_COUNT_H, 0);
-    player->SendUpdateWorldState(EP_UI_TOWER_SLIDER_DISPLAY, 0);
-    player->SendUpdateWorldState(EP_UI_TOWER_SLIDER_POS, 0);
-    player->SendUpdateWorldState(EP_UI_TOWER_SLIDER_N, 0);
+    player->SendUpdateWorldState(WORLD_STATE_OPVP_EP_UI_TOWER_COUNT_A, 0);
+    player->SendUpdateWorldState(WORLD_STATE_OPVP_EP_UI_TOWER_COUNT_H, 0);
+    player->SendUpdateWorldState(WORLD_STATE_OPVP_EP_UI_TOWER_SLIDER_DISPLAY, 0);
+    player->SendUpdateWorldState(WORLD_STATE_OPVP_EP_UI_TOWER_SLIDER_POS, 0);
+    player->SendUpdateWorldState(WORLD_STATE_OPVP_EP_UI_TOWER_SLIDER_N, 0);
 
-    player->SendUpdateWorldState(EP_EWT_A, 0);
-    player->SendUpdateWorldState(EP_EWT_H, 0);
-    player->SendUpdateWorldState(EP_EWT_N, 0);
-    player->SendUpdateWorldState(EP_EWT_N_A, 0);
-    player->SendUpdateWorldState(EP_EWT_N_H, 0);
+    player->SendUpdateWorldState(WORLD_STATE_OPVP_EP_EASTWALLTOWER_A, 0);
+    player->SendUpdateWorldState(WORLD_STATE_OPVP_EP_EASTWALLTOWER_H, 0);
+    player->SendUpdateWorldState(WORLD_STATE_OPVP_EP_EASTWALLTOWER_N, 0);
+    player->SendUpdateWorldState(WORLD_STATE_OPVP_EP_EASTWALLTOWER_N_A, 0);
+    player->SendUpdateWorldState(WORLD_STATE_OPVP_EP_EASTWALLTOWER_N_H, 0);
 
-    player->SendUpdateWorldState(EP_PWT_A, 0);
-    player->SendUpdateWorldState(EP_PWT_H, 0);
-    player->SendUpdateWorldState(EP_PWT_N, 0);
-    player->SendUpdateWorldState(EP_PWT_N_A, 0);
-    player->SendUpdateWorldState(EP_PWT_N_H, 0);
+    player->SendUpdateWorldState(WORLD_STATE_OPVP_EP_PLAGUEWOODTOWER_A, 0);
+    player->SendUpdateWorldState(WORLD_STATE_OPVP_EP_PLAGUEWOODTOWER_H, 0);
+    player->SendUpdateWorldState(WORLD_STATE_OPVP_EP_PLAGUEWOODTOWER_N, 0);
+    player->SendUpdateWorldState(WORLD_STATE_OPVP_EP_PLAGUEWOODTOWER_N_A, 0);
+    player->SendUpdateWorldState(WORLD_STATE_OPVP_EP_PLAGUEWOODTOWER_N_H, 0);
 
-    player->SendUpdateWorldState(EP_NPT_A, 0);
-    player->SendUpdateWorldState(EP_NPT_H, 0);
-    player->SendUpdateWorldState(EP_NPT_N, 0);
-    player->SendUpdateWorldState(EP_NPT_N_A, 0);
-    player->SendUpdateWorldState(EP_NPT_N_H, 0);
+    player->SendUpdateWorldState(WORLD_STATE_OPVP_EP_NORTHPASSTOWER_A, 0);
+    player->SendUpdateWorldState(WORLD_STATE_OPVP_EP_NORTHPASSTOWER_H, 0);
+    player->SendUpdateWorldState(WORLD_STATE_OPVP_EP_NORTHPASSTOWER_N, 0);
+    player->SendUpdateWorldState(WORLD_STATE_OPVP_EP_NORTHPASSTOWER_N_A, 0);
+    player->SendUpdateWorldState(WORLD_STATE_OPVP_EP_NORTHPASSTOWER_N_H, 0);
 
-    player->SendUpdateWorldState(EP_CGT_A, 0);
-    player->SendUpdateWorldState(EP_CGT_H, 0);
-    player->SendUpdateWorldState(EP_CGT_N, 0);
-    player->SendUpdateWorldState(EP_CGT_N_A, 0);
-    player->SendUpdateWorldState(EP_CGT_N_H, 0);
+    player->SendUpdateWorldState(WORLD_STATE_OPVP_EP_CROWNGUARDTOWER_A, 0);
+    player->SendUpdateWorldState(WORLD_STATE_OPVP_EP_CROWNGUARDTOWER_H, 0);
+    player->SendUpdateWorldState(WORLD_STATE_OPVP_EP_CROWNGUARDTOWER_N, 0);
+    player->SendUpdateWorldState(WORLD_STATE_OPVP_EP_CROWNGUARDTOWER_N_A, 0);
+    player->SendUpdateWorldState(WORLD_STATE_OPVP_EP_CROWNGUARDTOWER_N_H, 0);
 }
 
 class OutdoorPvP_eastern_plaguelands : public OutdoorPvPScript

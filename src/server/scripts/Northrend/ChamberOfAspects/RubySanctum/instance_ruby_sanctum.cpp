@@ -22,6 +22,7 @@
 #include "SpellScript.h"
 #include "SpellScriptLoader.h"
 #include "WorldPacket.h"
+#include "WorldStateDefines.h"
 #include "WorldStatePackets.h"
 #include "ruby_sanctum.h"
 
@@ -208,9 +209,9 @@ public:
                             halionController->AI()->DoAction(ACTION_INTRO_HALION);
                     break;
                 case DATA_HALION:
-                    DoUpdateWorldState(WORLDSTATE_CORPOREALITY_TOGGLE, 0);
-                    DoUpdateWorldState(WORLDSTATE_CORPOREALITY_TWILIGHT, 0);
-                    DoUpdateWorldState(WORLDSTATE_CORPOREALITY_MATERIAL, 0);
+                    DoUpdateWorldState(WORLD_STATE_RUBY_SANCTUM_CORPOREALITY_TOGGLE, 0);
+                    DoUpdateWorldState(WORLD_STATE_RUBY_SANCTUM_CORPOREALITY_TWILIGHT, 0);
+                    DoUpdateWorldState(WORLD_STATE_RUBY_SANCTUM_CORPOREALITY_MATERIAL, 0);
                     HandleGameObject(FlameRingGUID, true);
                     break;
             }
@@ -221,9 +222,9 @@ public:
         void FillInitialWorldStates(WorldPackets::WorldState::InitWorldStates& packet) override
         {
             packet.Worldstates.reserve(3);
-            packet.Worldstates.emplace_back(WORLDSTATE_CORPOREALITY_MATERIAL, 50);
-            packet.Worldstates.emplace_back(WORLDSTATE_CORPOREALITY_TWILIGHT, 50);
-            packet.Worldstates.emplace_back(WORLDSTATE_CORPOREALITY_TOGGLE, 0);
+            packet.Worldstates.emplace_back(WORLD_STATE_RUBY_SANCTUM_CORPOREALITY_MATERIAL, 50);
+            packet.Worldstates.emplace_back(WORLD_STATE_RUBY_SANCTUM_CORPOREALITY_TWILIGHT, 50);
+            packet.Worldstates.emplace_back(WORLD_STATE_RUBY_SANCTUM_CORPOREALITY_TOGGLE, 0);
         }
 
     protected:

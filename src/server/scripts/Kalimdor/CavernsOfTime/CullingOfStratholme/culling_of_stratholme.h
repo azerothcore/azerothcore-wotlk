@@ -73,15 +73,6 @@ enum GameObjects
     GO_PLAGUED_CRATE                    = 190095,
 };
 
-enum WorldStatesCoT
-{
-    WORLDSTATE_SHOW_CRATES              = 3479,
-    WORLDSTATE_CRATES_REVEALED          = 3480,
-    WORLDSTATE_WAVE_COUNT               = 3504,
-    WORLDSTATE_TIME_GUARDIAN            = 3931,
-    WORLDSTATE_TIME_GUARDIAN_SHOW       = 3932,
-};
-
 enum CrateSpells
 {
     SPELL_CRATES_CREDIT                 = 58109,
