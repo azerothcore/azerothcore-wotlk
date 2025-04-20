@@ -108,8 +108,8 @@ const Position RightSideLanes[3] =
 
 const Position RightSide = { 1458.5555f, 502.1995f, 59.899513f, 1.605702f };
 const Position LeftSide = { 1469.0642f, 729.5854f, 59.823853f, 4.6774f };
-const Position LandingRightPos = { 1476.77f, 665.094f, 20.6423f };
-const Position LandingLeftPos = { 1469.93f, 557.009f, 22.631699f };
+const Position LandingLeftPos = { 1476.77f, 665.094f, 20.6423f };
+const Position LandingRightPos = { 1469.93f, 557.009f, 22.631699f };
 
 class CorruptTriggers : public BasicEvent
 {
