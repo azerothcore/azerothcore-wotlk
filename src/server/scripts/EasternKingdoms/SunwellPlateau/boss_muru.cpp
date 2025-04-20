@@ -79,7 +79,7 @@ struct boss_muru : public BossAI
         // Radius of room is ~38.5f this might need adjusting a bit
         // Radius ~36.0 is right inside
         // Radius 20.0 is outer circle
-        if (!me->IsInCombat() && who->IsPlayer() && me->IsWithinDistInMap(who, 25.0f))
+        if (!me->IsInCombat() && who->IsPlayer() && who->GetPositionZ() > 69.0f && me->IsWithinDistInMap(who, 25.0f))
         {
             me->SetInCombatWithZone();
         }
@@ -475,9 +475,9 @@ class spell_entropius_negative_energy_periodic : public AuraScript
     }
 };
 
-class spell_muru_blackhole : public SpellScript
+class spell_gen_summon_target_floor : public SpellScript
 {
-    PrepareSpellScript(spell_muru_blackhole);
+    PrepareSpellScript(spell_gen_summon_target_floor);
 
     void ChangeSummonPos(SpellEffIndex /*effIndex*/)
     {
@@ -494,7 +494,7 @@ class spell_muru_blackhole : public SpellScript
 
     void Register() override
     {
-        OnEffectHit += SpellEffectFn(spell_muru_blackhole::ChangeSummonPos, EFFECT_0, SPELL_EFFECT_SUMMON);
+        OnEffectHit += SpellEffectFn(spell_gen_summon_target_floor::ChangeSummonPos, EFFECT_0, SPELL_EFFECT_SUMMON);
     }
 };
 
@@ -510,5 +510,5 @@ void AddSC_boss_muru()
     RegisterSpellScript(spell_entropius_void_zone_visual_aura);
     RegisterSpellScript(spell_entropius_black_hole_effect);
     RegisterSpellScript(spell_entropius_negative_energy_periodic);
-    RegisterSpellScript(spell_muru_blackhole);
+    RegisterSpellScript(spell_gen_summon_target_floor);
 }
