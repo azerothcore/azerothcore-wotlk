@@ -383,8 +383,8 @@ protected:
     uint32 m_ZoneId;                                        // ZoneID of Wintergrasp = 4197
     uint32 m_MapId;                                         // MapId where is Battlefield
     Map* m_Map;
-    uint32 m_MaxPlayer;                                     // Maximum number of player that participated to Battlefield
-    uint32 m_MinPlayer;                                     // Minimum number of player for Battlefield start
+    uint32 m_MaxPlayer;                                     // Maximum number of players per team that participated to Battlefield
+    uint32 m_MinPlayer;                                     // Minimum number of players per team for Battlefield start
     uint32 m_MinLevel;                                      // Required level to participate at Battlefield
     uint32 m_BattleTime;                                    // Length of a battle
     uint32 m_NoWarBattleTime;                               // Time between two battles
