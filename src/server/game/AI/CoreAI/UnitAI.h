@@ -294,18 +294,12 @@ public:
         }
         else
         {
-            Unit* currentVictim = mgr.GetCurrentVictim();
-            if (currentVictim)
-                targetList.push_back(currentVictim);
-
             for (ThreatReference const* ref : mgr.GetSortedThreatList())
             {
                 if (ref->IsOffline())
                     continue;
 
-                Unit* thisTarget = ref->GetVictim();
-                if (thisTarget != currentVictim)
-                    targetList.push_back(thisTarget);
+                targetList.push_back(ref->GetVictim());
             }
         }
 
