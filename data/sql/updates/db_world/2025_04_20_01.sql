@@ -1,3 +1,4 @@
+-- DB update 2025_04_20_00 -> 2025_04_20_01
 DELETE FROM `arena_season_reward_group` WHERE `arena_season` IN (1, 2, 3, 4);
 INSERT INTO `arena_season_reward_group` (`id`, `arena_season`, `criteria_type`, `min_criteria`, `max_criteria`, `reward_mail_template_id`, `reward_mail_subject`, `reward_mail_body`, `gold_reward`) VALUES
 -- Season 4 (Brutal)
