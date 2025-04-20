@@ -133,9 +133,13 @@ void Object::_InitValues()
 
 void Object::_Create(ObjectGuid::LowType guidlow, uint32 entry, HighGuid guidhigh)
 {
+    _Create(ObjectGuid(guidhigh, entry, guidlow));
+}
+
+void Object::_Create(ObjectGuid guid)
+{
     if (!m_uint32Values) _InitValues();
 
-    ObjectGuid guid(guidhigh, entry, guidlow);
     SetGuidValue(OBJECT_FIELD_GUID, guid);
     SetUInt32Value(OBJECT_FIELD_TYPE, m_objectType);
     m_PackGUID.Set(guid);

@@ -234,6 +234,7 @@ protected:
 
     void _InitValues();
     void _Create(ObjectGuid::LowType guidlow, uint32 entry, HighGuid guidhigh);
+    void _Create(ObjectGuid guid);
     [[nodiscard]] std::string _ConcatFields(uint16 startIndex, uint16 size) const;
     bool _LoadIntoDataField(std::string const& data, uint32 startOffset, uint32 count);
 

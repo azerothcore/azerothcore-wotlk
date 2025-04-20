@@ -121,6 +121,12 @@ else()
   message("* Use GIT revision hash           : Yes (default)")
 endif()
 
+if ( USE_REAL_LIBSIDECAR )
+  message("* Use stub for libsidecar         : No")
+else()
+  message("* Use stub for libsidecar         : Yes")
+endif()
+
 if ( NOJEM )
   message("")
   message(" *** NOJEM - WARNING!")

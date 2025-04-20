@@ -616,6 +616,13 @@ void CharacterDatabaseConnection::DoPrepareStatements()
         "ON DUPLICATE KEY UPDATE state = VALUES(state)", CONNECTION_ASYNC);
     PrepareStatement(CHAR_DELETE_INSTANCE_SAVED_DATA, "DELETE FROM instance_saved_go_state_data WHERE id = ?", CONNECTION_ASYNC);
     PrepareStatement(CHAR_SANITIZE_INSTANCE_SAVED_DATA, "DELETE FROM instance_saved_go_state_data WHERE id NOT IN (SELECT instance.id FROM instance)", CONNECTION_ASYNC);
+
+    // CHAR_NO_OP_PROVIDE_REALM_CONTEXT is a no-op query that accepts a single parameter: the realm ID.
+    // This query is used specifically in cross-realm scenarios when the database transaction
+    // lacks sufficient context to determine which realm's database the query should target.
+    // By providing the realm ID explicitly, this ensures that mysql reverse proxy will use
+    // correct realm database for the transaction.
+    PrepareStatement(CHAR_NO_OP_PROVIDE_REALM_CONTEXT, "SELECT ? AS no_op", CONNECTION_ASYNC);
 }
 
 CharacterDatabaseConnection::CharacterDatabaseConnection(MySQLConnectionInfo& connInfo) : MySQLConnection(connInfo)

@@ -717,6 +717,8 @@ void Map::Update(const uint32 t_diff, const uint32 s_diff, bool  /*thread*/)
 
     HandleDelayedVisibility();
 
+    UpdatePlayersRedirectKickEvent(t_diff);
+
     sScriptMgr->OnMapUpdate(this, t_diff);
 
     METRIC_VALUE("map_creatures", uint64(GetObjectsStore().Size<Creature>()),
@@ -1722,7 +1724,7 @@ void Map::SendInitTransports(Player* player)
     // Hack to send out transports
     UpdateData transData;
     for (TransportsContainer::const_iterator itr = _transports.begin(); itr != _transports.end(); ++itr)
-        if (*itr != player->GetTransport())
+        if (*itr != player->GetTransport() && player->InSamePhase(*itr))
             (*itr)->BuildCreateUpdateBlockForPlayer(&transData, player);
 
     WorldPacket packet;
@@ -1937,6 +1939,50 @@ void Map::SendToPlayers(WorldPacket const* data) const
 {
     for (MapRefMgr::const_iterator itr = m_mapRefMgr.begin(); itr != m_mapRefMgr.end(); ++itr)
         itr->GetSource()->GetSession()->SendPacket(data);
+}
+
+void Map::StartPlayersRedirectKickTimer()
+{
+    for (MapRefMgr::iterator itr = m_mapRefMgr.begin(); itr != m_mapRefMgr.end(); ++itr)
+        itr->GetSource()->SendSystemMessage("Preparing to enter parallel dimension... One minute!\nAccelerate transfer: Teleport or type \"/ready\" in chat.");
+
+    _redirectKickTimer.Reset(60 * SECOND * IN_MILLISECONDS);
+    _lastAnnounceRedirectKickTimer.Reset(55 * SECOND * IN_MILLISECONDS);
+
+    _lastAnnounceRedirectKickTimer.Update(1);
+
+}
+
+void Map::StopPlayersRedirectKickTimer()
+{
+    _redirectKickTimer.Reset(0);
+    _lastAnnounceRedirectKickTimer.Reset(0);
+}
+
+void Map::UpdatePlayersRedirectKickEvent(uint32 diff)
+{
+    if (_redirectKickTimer.Passed())
+        return;
+
+    _redirectKickTimer.Update(diff);
+
+    if (_redirectKickTimer.Passed())
+    {
+        auto emptyPacket = WorldPacket();
+        for (MapRefMgr::iterator itr = m_mapRefMgr.begin(); itr != m_mapRefMgr.end(); ++itr)
+            itr->GetSource()->GetSession()->HandleTC9PrepareForRedirect(emptyPacket);
+
+        return;
+    }
+
+    if (_lastAnnounceRedirectKickTimer.Passed())
+        return;
+
+    _lastAnnounceRedirectKickTimer.Update(diff);
+
+    if (_lastAnnounceRedirectKickTimer.Passed())
+        for (MapRefMgr::iterator itr = m_mapRefMgr.begin(); itr != m_mapRefMgr.end(); ++itr)
+            itr->GetSource()->SendSystemMessage("Dimensional shift incoming! Prepare to transition in 5 seconds...");
 }
 
 template<class T>

@@ -46,3 +46,5 @@ if (BUILD_TOOLS_MAPS)
   add_subdirectory(bzip2)
   add_subdirectory(libmpq)
 endif()
+
+add_subdirectory(libsidecar)

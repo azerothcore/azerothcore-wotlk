@@ -69,6 +69,8 @@
 #    DEBUG
 #    DYNAMIC RESPAWN SETTINGS
 #
+#  CLUSTER SETTINGS
+#
 ###################################################################################################
 
 ###################################################################################################
@@ -4550,5 +4552,52 @@ Respawn.DynamicMinimumGameObject = 10
 ###################################################################################################
 #                                                                                                 #
 # GAME SETTINGS END                                                                               #
+#                                                                                                 #
+###################################################################################################
+
+###################################################################################################
+#                                                                                                 #
+# CLUSTER SETTINGS BEGIN                                                                          #
+#                                                                                                 #
+###################################################################################################
+
+###################################################################################################
+# CLUSTER SETTINGS
+#
+# This feature is experimental and still under development. It enables cluster mode, allowing multiple
+# worldservers to run for a single realm, distributing the load between them. Alongside worldservers,
+# additional services are required for proper functionality. If you encounter any issues, please report
+# them to the ToCloud9 project: https://github.com/walkline/ToCloud9.
+#
+#    Cluster.Enabled
+#        Description: Enables/disables cluster mode.
+#        Default: 0 - (Disabled)
+#                 1 - (Enabled)
+
+Cluster.Enabled=0
+
+#
+#    Cluster.AvailableMaps
+#        Description: List of available maps id on this server.
+#        Examples:    "" - (Can handle any map)
+#                     "0,1,573"
+
+Cluster.AvailableMaps=""
+
+#
+#    Cluster.IsCrossrealm
+#        Description: Enables cross-realm functionality for a cross-realm setup.
+#                     When enabled, a connection to a MySQL cross-realm reverse proxy is required.
+#        Default: 0 - (Disabled)
+#                 1 - (Enabled)
+
+Cluster.IsCrossrealm=0
+
+#
+###################################################################################################
+
+###################################################################################################
+#                                                                                                 #
+# CLUSTER SETTINGS END                                                                            #
 #                                                                                                 #
 ###################################################################################################
