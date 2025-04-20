@@ -29,6 +29,7 @@ INSERT INTO `reference_loot_template` (`Entry`, `Item`, `Reference`, `Chance`, `
 (34091, 35210, 0, 0, 0, 1, 1, 1, 1, 'Plans: Sunblessed Breastplate'),
 (34091, 35211, 0, 0, 0, 1, 1, 1, 1, 'Plans: Hard Khorium Battleplate'),
 (34091, 35212, 0, 0, 0, 1, 1, 1, 1, 'Pattern: Leather Gauntlets of the Sun'),
+(34091, 35213, 0, 0, 0, 1, 1, 1, 1, 'Pattern: Flethcher''s Gloves of the Phoenix'),
 (34091, 35214, 0, 0, 0, 1, 1, 1, 1, 'Pattern: Gloves of Immortal Dusk'),
 (34091, 35215, 0, 0, 0, 1, 1, 1, 1, 'Pattern: Sun-Drenched Scale Gloves'),
 (34091, 35216, 0, 0, 0, 1, 1, 1, 1, 'Pattern: Leather Chestguard of the Sun'),
