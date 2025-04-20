@@ -1,3 +1,4 @@
+-- DB update 2025_04_19_00 -> 2025_04_20_00
 DELETE FROM `creature_loot_template` WHERE `Reference` = 34092;
 UPDATE `creature_loot_template` SET `Chance` = 10 WHERE `Reference` = 34091;
 
