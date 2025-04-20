@@ -157,7 +157,7 @@ struct boss_sacrolash : public BossAI
             if (Creature* alythess = instance->GetCreature(DATA_ALYTHESS))
             {
                 std::list<Unit*> targets;
-                alythess->AI()->SelectTargetList(targets, 6, SelectTargetMethod::MaxThreat, 1, 100.0f);
+                alythess->AI()->SelectTargetList(targets, 5, SelectTargetMethod::MaxThreat, 1, 100.0f);
                 target = Acore::Containers::SelectRandomContainerElement(targets);
             }
             if (!target)
@@ -290,7 +290,7 @@ struct boss_alythess : public BossAI
             if (Creature* sacrolash = instance->GetCreature(DATA_SACROLASH))
             {
                 std::list<Unit*> targets;
-                sacrolash->AI()->SelectTargetList(targets, 6, SelectTargetMethod::MaxThreat, 1, 100.0f);
+                sacrolash->AI()->SelectTargetList(targets, 5, SelectTargetMethod::MaxThreat, 1, 100.0f);
                 target = Acore::Containers::SelectRandomContainerElement(targets);
             }
             if (!target)
