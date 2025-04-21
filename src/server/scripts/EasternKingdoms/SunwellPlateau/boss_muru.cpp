@@ -422,24 +422,27 @@ class spell_entropius_black_hole_effect : public SpellScript
 {
     PrepareSpellScript(spell_entropius_black_hole_effect);
 
-    float RaycastToObstacle(Unit* unit, float angle, float maxDist = 20.0f, float stepSize = 3.0f)
+    float RaycastToObstacle(Unit* unit, float angle, float maxDist = 20.0f)
     {
         float baseX = unit->GetPositionX();
         float baseY = unit->GetPositionY();
         float baseZ = unit->GetPositionZ();
 
-        for (float dist = stepSize; dist <= maxDist; dist += stepSize)
-        {
-            float testX = baseX + dist * cos(angle);
-            float testY = baseY + dist * sin(angle);
+        float targetX = baseX + maxDist * cos(angle);
+        float targetY = baseY + maxDist * sin(angle);
+        float targetZ = baseZ;
 
-            // If LOS is broken, we found an obstacle
-            if (!unit->IsWithinLOS(testX, testY, baseZ))
-                return dist - stepSize; // Return the last safe distance
+        float hitX, hitY, hitZ;
+
+        if (VMAP::VMapFactory::createOrGetVMapMgr()->GetObjectHitPos(unit->GetMapId(), baseX, baseY, baseZ, targetX, targetY, targetZ, hitX, hitY, hitZ, 0.0f))
+        {
+            // Compute actual distance to the obstacle
+            return std::hypot(hitX - baseX, hitY - baseY);
         }
 
         return maxDist; // No obstacle found within range
     }
+
     void HandlePull(SpellEffIndex effIndex)
     {
         PreventHitDefaultEffect(effIndex);
