@@ -2290,7 +2290,7 @@ TempSummon* Map::SummonCreature(uint32 entry, Position const& pos, SummonPropert
     }
 
     //npcbot: totem emul step 2
-    if (summoner && summoner->IsNPCBot())
+    if (summoner && summoner->IsNPCBot() && !summon->IsTempBot())
     {
         summon->SetCreatorGUID(summoner->GetGUID()); // see TempSummon::InitStats()
         if (mask == UNIT_MASK_TOTEM)
