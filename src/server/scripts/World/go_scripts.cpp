@@ -28,21 +28,6 @@
 #include "Spell.h"
 
 // Ours
-/*######
-## go_noblegarden_colored_egg
-######*/
-class go_noblegarden_colored_egg : public GameObjectScript
-{
-public:
-    go_noblegarden_colored_egg() : GameObjectScript("go_noblegarden_colored_egg") { }
-
-    bool OnGossipHello(Player* player, GameObject* /*go*/) override
-    {
-        if (roll_chance_i(5))
-            player->CastSpell(player, 61734, true); // SPELL NOBLEGARDEN BUNNY
-        return false;
-    }
-};
 
 class go_seer_of_zebhalak : public GameObjectScript
 {
@@ -1948,7 +1933,6 @@ public:
 void AddSC_go_scripts()
 {
     // Ours
-    new go_noblegarden_colored_egg();
     new go_seer_of_zebhalak();
     new go_mistwhisper_treasure();
     new go_witherbark_totem_bundle();
