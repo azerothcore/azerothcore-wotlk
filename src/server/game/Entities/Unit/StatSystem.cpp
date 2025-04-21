@@ -901,11 +901,11 @@ void Player::UpdateExpertise(WeaponAttackType attack)
     {
         case BASE_ATTACK:
             m_Expertise = expertise;
-            SetInt32Value(PLAYER_EXPERTISE, int32(expertise));
+            SetUInt32Value(PLAYER_EXPERTISE, int32(expertise));
             break;
         case OFF_ATTACK:
             m_OffhandExpertise = expertise;
-            SetInt32Value(PLAYER_OFFHAND_EXPERTISE, int32(expertise));
+            SetUInt32Value(PLAYER_OFFHAND_EXPERTISE, int32(expertise));
             break;
         default:
             break;
