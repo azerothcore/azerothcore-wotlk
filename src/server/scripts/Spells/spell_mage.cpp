@@ -979,35 +979,38 @@ class spell_mage_fingers_of_frost_proc_aura : public AuraScript
         {
             _chance = 100.f;
             _spell = eventInfo.GetProcSpell();
+            _procSpellDelayMoment = std::nullopt;
 
             if (!_spell || _spell->GetDelayMoment() <= 0)
-            {
                 PreventDefaultAction();
-            }
+
+            if (_spell)
+                _procSpellDelayMoment = _spell->GetDelayMoment();
         }
         else
         {
-            if (eventInfo.GetSpellPhaseMask() == PROC_SPELL_PHASE_FINISH || ((_spell && _spell->GetDelayMoment() > 0) || !eventInfo.GetDamageInfo()))
-            {
+            if (eventInfo.GetSpellPhaseMask() == PROC_SPELL_PHASE_FINISH || (_procSpellDelayMoment.value_or(0) > 0 || !eventInfo.GetDamageInfo()))
                 PreventDefaultAction();
-            }
 
-            _chance = 0.f;
-            _spell = nullptr;
+            ResetProcState();
         }
     }
 
     void HandleAfterEffectProc(AuraEffect const* /*aurEff*/, ProcEventInfo& eventInfo)
     {
-        if (eventInfo.GetSpellPhaseMask() == PROC_SPELL_PHASE_HIT)
+        switch (eventInfo.GetSpellPhaseMask())
         {
-            _chance = 100.f;
+            case PROC_SPELL_PHASE_HIT:    _chance = 100.f; break;
+            case PROC_SPELL_PHASE_FINISH: ResetProcState(); break;
+            default: break;
         }
-        else if (eventInfo.GetSpellPhaseMask() == PROC_SPELL_PHASE_FINISH)
-        {
-            _chance = 0.f;
-            _spell = nullptr;
-        }
+    }
+
+    void ResetProcState()
+    {
+        _chance = 0.f;
+        _spell = nullptr;
+        _procSpellDelayMoment = std::nullopt;
     }
 
     void Register()
@@ -1019,10 +1022,15 @@ class spell_mage_fingers_of_frost_proc_aura : public AuraScript
     }
 
 public:
+    // May point to a deleted object.
+    // Dereferencing is unsafe unless validity is guaranteed by the caller.
     Spell const* GetProcSpell() const { return _spell; }
 
 private:
     float _chance = 0.f;
+    std::optional<uint64> _procSpellDelayMoment = std::nullopt;
+
+    // May be dangling; points to memory that might no longer be valid.
     Spell const* _spell = nullptr;
 };
 

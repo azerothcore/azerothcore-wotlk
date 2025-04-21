@@ -39,6 +39,7 @@ enum ForestFrog
     SPELL_SUMMON_AMANI_CHARM_CHEST_2  = 43756, // Amani Charm Box (186734)
     SPELL_SUMMON_MONEY_BAG            = 43774, // Money Bag (186736)
     SPELL_STEALTH_                    = 34189,
+    SPELL_FIXATE                      = 43360,
 
     // Creatures
     NPC_FOREST_FROG                   = 24396,
@@ -757,7 +758,10 @@ struct npc_amanishi_scout : public ScriptedAI
         triggers.remove_if([](Creature* trigger) {return !IsDrum(trigger);});
         triggers.sort(Acore::ObjectDistanceOrderPred(me));
         if (triggers.empty())
+        {
             ScheduleCombat();
+            return;
+        }
         Creature* closestDrum = triggers.front();
         me->GetMotionMaster()->MoveFollow(closestDrum, 0.0f, 0.0f);
         _drumGUID = closestDrum->GetGUID();
@@ -881,6 +885,26 @@ class spell_summon_amanishi_sentries : public SpellScript
     }
 };
 
+class spell_call_of_the_beast : public SpellScript
+{
+    PrepareSpellScript(spell_call_of_the_beast);
+
+    bool Validate(SpellInfo const* /*spellInfo*/) override
+    {
+        return ValidateSpellInfo({ SPELL_FIXATE });
+    }
+
+    void HandleEffect(SpellEffIndex /*effIndex*/)
+    {
+        GetHitUnit()->CastSpell(GetHitUnit(), SPELL_FIXATE, true);
+    }
+
+    void Register() override
+    {
+        OnEffectHitTarget += SpellEffectFn(spell_call_of_the_beast::HandleEffect, EFFECT_0, SPELL_EFFECT_APPLY_AURA);
+    }
+};
+
 void AddSC_zulaman()
 {
     RegisterZulAmanCreatureAI(npc_forest_frog);
@@ -893,4 +917,5 @@ void AddSC_zulaman()
     RegisterZulAmanCreatureAI(npc_amanishi_scout);
     RegisterSpellScript(spell_alert_drums);
     RegisterSpellScript(spell_summon_amanishi_sentries);
+    RegisterSpellScript(spell_call_of_the_beast);
 }

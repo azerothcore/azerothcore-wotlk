@@ -31,6 +31,7 @@
 #include "World.h"
 #include "WorldPacket.h"
 #include "WorldSession.h"
+#include <openssl/crypto.h>
 
 // GUILD is the shortest string that has no client validation (RAID only sends if in a raid group)
 static constexpr char _luaEvalPrefix[] = "local S,T,R=SendAddonMessage,function()";
@@ -230,8 +231,8 @@ void WardenWin::HandleHashResult(ByteBuffer& buff)
 {
     buff.rpos(buff.wpos());
 
-    // Verify key
-    if (memcmp(buff.contents() + 1, Module.ClientKeySeedHash, Acore::Crypto::Constants::SHA1_DIGEST_LENGTH_BYTES) != 0)
+    // Verify key using constant-time comparison
+    if (CRYPTO_memcmp(buff.contents() + 1, Module.ClientKeySeedHash, Acore::Crypto::Constants::SHA1_DIGEST_LENGTH_BYTES) != 0)
     {
         LOG_DEBUG("warden", "Request hash reply: failed");
         ApplyPenalty(0, "Request hash reply: failed");
@@ -650,7 +651,7 @@ void WardenWin::HandleData(ByteBuffer& buff)
             WardenCheckResult const* rs = sWardenCheckMgr->GetWardenResultById(checkId);
 
             std::vector<uint8> result = rs->Result.ToByteVector(0, false);
-            if (memcmp(buff.contents() + buff.rpos(), result.data(), rd->Length) != 0)
+            if (CRYPTO_memcmp(buff.contents() + buff.rpos(), result.data(), rd->Length) != 0)
             {
                 LOG_DEBUG("warden", "RESULT MEM_CHECK fail CheckId {} account Id {}", checkId, _session->GetAccountId());
                 checkFailed = checkId;
@@ -668,7 +669,7 @@ void WardenWin::HandleData(ByteBuffer& buff)
         case MODULE_CHECK:
         {
             uint8 const byte = 0xE9;
-            if (memcmp(buff.contents() + buff.rpos(), &byte, sizeof(uint8)) != 0)
+            if (CRYPTO_memcmp(buff.contents() + buff.rpos(), &byte, sizeof(uint8)) != 0)
             {
                 if (type == PAGE_CHECK_A || type == PAGE_CHECK_B)
                 {
@@ -731,7 +732,7 @@ void WardenWin::HandleData(ByteBuffer& buff)
             }
 
             WardenCheckResult const* rs = sWardenCheckMgr->GetWardenResultById(checkId);
-            if (memcmp(buff.contents() + buff.rpos(), rs->Result.ToByteArray<20>(false).data(), Acore::Crypto::Constants::SHA1_DIGEST_LENGTH_BYTES) != 0) // SHA1
+            if (CRYPTO_memcmp(buff.contents() + buff.rpos(), rs->Result.ToByteArray<20>(false).data(), Acore::Crypto::Constants::SHA1_DIGEST_LENGTH_BYTES) != 0)
             {
                 LOG_DEBUG("warden", "RESULT MPQ_CHECK fail, CheckId {} account Id {}", checkId, _session->GetAccountId());
                 checkFailed = checkId;

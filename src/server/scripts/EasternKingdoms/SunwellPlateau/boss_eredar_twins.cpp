@@ -50,6 +50,7 @@ enum Spells
     SPELL_ENRAGE                = 46587,
     SPELL_EMPOWER               = 45366,
     SPELL_DARK_FLAME            = 45345,
+    SPELL_FIREBLAST             = 45232,
 
     //Lady Sacrolash spells
     SPELL_SHADOWFORM            = 45455,
@@ -68,15 +69,32 @@ enum Spells
     SPELL_BLAZE_SUMMON          = 45236
 };
 
-enum Misc
+enum TwinPhases
 {
     ACTION_SISTER_DIED          = 1,
-    GROUP_SPECIAL_ABILITY       = 1
+    GROUP_SPECIAL_ABILITY       = 1,
+    GROUP_PYROGENICS            = 2,
+    GROUP_FLAME_SEAR            = 3
 };
 
 struct boss_sacrolash : public BossAI
 {
     boss_sacrolash(Creature* creature) : BossAI(creature, DATA_EREDAR_TWINS), _isSisterDead(false) {}
+
+    bool CheckInRoom() override
+    {
+        if (me->GetExactDist2d(me->GetHomePosition()) >= 50.f)
+        {
+            DoCastAOE(SPELL_FIREBLAST, true);
+
+            if (Creature* alythess = instance->GetCreature(DATA_ALYTHESS))
+                alythess->AI()->DoCastAOE(SPELL_FIREBLAST, true);
+
+            return false;
+        }
+
+        return true;
+    }
 
     void Reset() override
     {
@@ -104,7 +122,11 @@ struct boss_sacrolash : public BossAI
                 Unit* target = SelectTarget(SelectTargetMethod::MaxThreat, 1, 100.0f);
                 if (!target)
                     target = me->GetVictim();
-                me->CastSpell(target, SPELL_CONFLAGRATION, false);
+
+                DoCast(target, SPELL_CONFLAGRATION);
+
+                if (Creature* alythess = instance->GetCreature(DATA_ALYTHESS))
+                    alythess->AI()->Talk(EMOTE_CONFLAGRATION, target);
             }, 30s, 35s);
         }
     }
@@ -126,9 +148,9 @@ struct boss_sacrolash : public BossAI
             DoCastVictim(SPELL_CONFOUNDING_BLOW);
         }, 20s, 25s);
 
-        ScheduleTimedEvent(20s, [&] {
-            me->SummonCreature(NPC_SHADOW_IMAGE, me->GetPosition(), TEMPSUMMON_TIMED_DESPAWN, 12000);
-        }, 6s);
+        ScheduleTimedEvent(8s, 16s, [&] {
+            me->SummonCreature(NPC_SHADOW_IMAGE, me->GetPosition(), TEMPSUMMON_TIMED_DESPAWN, 10000);
+        }, 8s, 12s);
 
         scheduler.Schedule(36s, GROUP_SPECIAL_ABILITY, [this](TaskContext context) {
             Unit* target = SelectTarget(SelectTargetMethod::MaxThreat, 1, 100.0f);
@@ -190,6 +212,13 @@ struct boss_alythess : public BossAI
                 sacrolash->Respawn(true);
     }
 
+    void AttackStart(Unit* who) override
+    {
+        if (who && who->isTargetableForAttack() && me->GetReactState() != REACT_PASSIVE)
+            if (me->Attack(who, false))
+                me->AddThreat(who, 0.0f);
+    }
+
     void DoAction(int32 param) override
     {
         if (param == ACTION_SISTER_DIED)
@@ -199,13 +228,30 @@ struct boss_alythess : public BossAI
             Talk(YELL_SISTER_SACROLASH_DEAD);
             me->CastSpell(me, SPELL_EMPOWER, true);
 
-            scheduler.CancelGroup(GROUP_SPECIAL_ABILITY);
-            ScheduleTimedEvent(20s, [&] {
+            scheduler.CancelAll();
+
+            ScheduleTimedEvent(1s, [&] {
+                DoCastVictim(SPELL_BLAZE);
+            }, 3800ms);
+
+            scheduler.Schedule(16s, GROUP_PYROGENICS, [this](TaskContext context) {
+                DoCastSelf(SPELL_PYROGENICS);
+                context.Repeat(16s, 28s);
+            });
+
+            ScheduleTimedEvent(8s, 10s, [&] {
+                me->CastCustomSpell(SPELL_FLAME_SEAR, SPELLVALUE_MAX_TARGETS, urand(4, 5), me, TRIGGERED_NONE);
+            }, 8s, 10s);
+
+            ScheduleTimedEvent(20s, 26s, [&] {
                 Unit* target = SelectTarget(SelectTargetMethod::MaxThreat, 1, 100.0f);
                 if (!target)
                     target = me->GetVictim();
                 DoCast(target, SPELL_SHADOW_NOVA);
-            }, 30s, 35s);
+
+                if (Creature* sacrolash = instance->GetCreature(DATA_SACROLASH))
+                    sacrolash->AI()->Talk(EMOTE_SHADOW_NOVA, target);
+            }, 20s, 26s);
         }
     }
 
@@ -222,13 +268,16 @@ struct boss_alythess : public BossAI
             DoCastVictim(SPELL_BLAZE);
         }, 3800ms);
 
-        ScheduleTimedEvent(15s, [&] {
+        // PYROGENICS Phase 1
+        scheduler.Schedule(21s, GROUP_PYROGENICS, [this](TaskContext context) {
             DoCastSelf(SPELL_PYROGENICS);
-        }, 15s);
+            context.Repeat(21s, 34s);
+        });
 
-        ScheduleTimedEvent(20s, [&] {
-            me->CastCustomSpell(SPELL_FLAME_SEAR, SPELLVALUE_MAX_TARGETS, 5, me, TRIGGERED_NONE);
-        }, 15s);
+        // FLAME_SEAR Phase 1
+        ScheduleTimedEvent(10s, 15s, [&] {
+            me->CastCustomSpell(SPELL_FLAME_SEAR, SPELLVALUE_MAX_TARGETS, urand(4, 5), me, TRIGGERED_NONE);
+        }, 10s, 15s);
 
         scheduler.Schedule(20s, GROUP_SPECIAL_ABILITY, [this](TaskContext context) {
             Unit* target = SelectTarget(SelectTargetMethod::MaxThreat, 1, 100.0f);

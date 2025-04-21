@@ -1431,7 +1431,16 @@ void Spell::SelectImplicitCasterDestTargets(SpellEffIndex effIndex, SpellImplici
                 float destx = pos.GetPositionX() + distance * cos(pos.GetOrientation());
                 float desty = pos.GetPositionY() + distance * sin(pos.GetOrientation());
 
-                float ground = map->GetHeight(phasemask, pos.GetPositionX(), pos.GetPositionY(), pos.GetPositionZ());
+                // Added GROUND_HEIGHT_TOLERANCE to account for cases where, during a jump,
+                // the Z position may be slightly below the vmap ground level.
+                // Without this tolerance, a ray trace might incorrectly attempt to find ground
+                // beneath the actual surface.
+                //
+                // Example:
+                //    actual vmap ground: -56.342392
+                //    Z position:         -56.347195
+                float searchGroundZPos = pos.GetPositionZ()+GROUND_HEIGHT_TOLERANCE;
+                float ground = map->GetHeight(phasemask, pos.GetPositionX(), pos.GetPositionY(), searchGroundZPos);
 
                 bool isCasterInWater = m_caster->IsInWater();
                 if (!m_caster->HasUnitMovementFlag(MOVEMENTFLAG_FALLING) || (pos.GetPositionZ() - ground < distance))
@@ -8343,7 +8352,8 @@ void Spell::DoAllEffectOnLaunchTarget(TargetInfo& targetInfo, float* multiplier)
                 // Xinef: Area Auras, AoE Targetting spells AND Chain Target spells (cleave etc.)
                 if (m_spellInfo->Effects[i].IsAreaAuraEffect() || m_spellInfo->Effects[i].IsTargetingArea() || (m_spellInfo->Effects[i].ChainTarget > 1 && m_spellInfo->DmgClass != SPELL_DAMAGE_CLASS_MAGIC))
                 {
-                    m_damage = unit->CalculateAOEDamageReduction(m_damage, m_spellInfo->SchoolMask, m_caster);
+                    bool npcCaster = (m_caster && !m_caster->IsControlledByPlayer()) || GetSpellInfo()->HasAttribute(SPELL_ATTR7_TREAT_AS_NPC_AOE);
+                    m_damage = unit->CalculateAOEDamageReduction(m_damage, m_spellInfo->SchoolMask, npcCaster);
                     if (m_caster->IsPlayer())
                     {
                         uint32 targetAmount = m_UniqueTargetInfo.size();
