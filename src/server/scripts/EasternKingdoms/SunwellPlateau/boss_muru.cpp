@@ -24,6 +24,7 @@
 #include "SpellScriptLoader.h"
 #include "sunwell_plateau.h"
 #include "VMapFactory.h"
+#include "VMapMgr2.h"
 
 enum Spells
 {
