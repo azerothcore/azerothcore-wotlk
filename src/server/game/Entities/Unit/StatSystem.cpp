@@ -897,7 +897,6 @@ void Player::UpdateExpertise(WeaponAttackType attack)
     if (expertise < 0)
         expertise = 0;
 
-
     switch (attack)
     {
         case BASE_ATTACK:
