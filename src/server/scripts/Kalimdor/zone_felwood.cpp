@@ -50,8 +50,7 @@ enum RiverbreezeAndSilversky
     // Texts
     GOSSIP_MENU_RIVERBREEZE = 21400,
     GOSSIP_MENU_SILVERSKY = 2208,
-    GOSSIP_OPTION_BEACON = 0,
-    GOSSIP_OPTION_PLANTS = 1
+    GOSSIP_OPTION_BEACON = 0
 };
 
 class npcs_riverbreeze_and_silversky : public CreatureScript
