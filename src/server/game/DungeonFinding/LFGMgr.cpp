@@ -2266,6 +2266,11 @@ namespace lfg
                 player->RemoveAurasDueToSpell(LFG_SPELL_DUNGEON_COOLDOWN);
             }
 
+            if (dungeon && dungeon->type == LFG_TYPE_RANDOM)
+            {
+               sInstanceSaveMgr->PlayerUnbindInstance(player->GetGUID(), dungeon->map, player->GetDungeonDifficulty(), true);
+            }
+
             // Xinef: Update achievements, set correct amount of randomly grouped players
             if (dungeon->difficulty == DUNGEON_DIFFICULTY_HEROIC)
                 if (uint8 count = GetRandomPlayersCount(player->GetGUID()))
