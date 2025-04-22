@@ -440,7 +440,7 @@ class spell_entropius_black_hole_effect : public SpellScript
             return std::sqrt(
                 std::pow(hitX - baseX, 2) +
                 std::pow(hitY - baseY, 2) +
-                std::pow(hitZ - z, 2)  // Changed baseZ to z
+                std::pow(hitZ - z, 2)
             );
         }
         return maxDist;
@@ -457,7 +457,7 @@ class spell_entropius_black_hole_effect : public SpellScript
         {
             float o = frand(0, 2 * M_PI);
             float z = GetCaster()->GetPositionZ() + frand(2.0f, 5.0f);
-            float safeDistance = RaycastToObstacle(GetCaster(), o, z, 10.0f); // try caster, not target
+            float safeDistance = RaycastToObstacle(GetCaster(), o, z, 10.0f);
             float actualDistance = std::min(8.0f, safeDistance * 0.8f);
 
             pos.Relocate(
