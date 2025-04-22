@@ -119,7 +119,10 @@ struct boss_sacrolash : public BossAI
 
             scheduler.CancelGroup(GROUP_SPECIAL_ABILITY);
             ScheduleTimedEvent(20s, [&] {
-                Unit* target = SelectTarget(SelectTargetMethod::Random, 1, 100.0f);
+                Unit* target = nullptr;
+                std::list<Unit*> targets;
+                SelectTargetList(targets, 5, SelectTargetMethod::MaxThreat, 0, 100.0f, true, false);
+                target = Acore::Containers::SelectRandomContainerElement(targets);
                 if (!target)
                     target = me->GetVictim();
 
@@ -250,7 +253,10 @@ struct boss_alythess : public BossAI
             }, 8s, 10s);
 
             ScheduleTimedEvent(20s, 26s, [&] {
-                Unit* target = SelectTarget(SelectTargetMethod::Random, 1, 100.0f);
+                Unit* target = nullptr;
+                std::list<Unit*> targets;
+                SelectTargetList(targets, 5, SelectTargetMethod::MaxThreat, 0, 100.0f, true, false);
+                target = Acore::Containers::SelectRandomContainerElement(targets);
                 if (!target)
                     target = me->GetVictim();
                 DoCast(target, SPELL_SHADOW_NOVA);
