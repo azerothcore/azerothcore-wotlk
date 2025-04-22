@@ -432,10 +432,10 @@ class spell_entropius_black_hole_effect : public SpellScript
         float targetY = baseY + maxDist * sin(angle);
         float hitX, hitY, hitZ;
         if (VMAP::VMapFactory::createOrGetVMapMgr()->GetObjectHitPos(
-                unit->GetMapId(), 
-                baseX, baseY, baseZ, 
-                targetX, targetY, targetZ, 
-                hitX, hitY, hitZ, 
+                unit->GetMapId(),
+                baseX, baseY, baseZ,
+                targetX, targetY, targetZ,
+                hitX, hitY, hitZ,
                 0.0f))
         {
             return std::sqrt(
