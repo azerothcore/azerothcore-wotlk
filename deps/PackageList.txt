@@ -1,6 +1,6 @@
 AzerothCore uses (parts of or in whole) the following opensource software:
 
-argon2
+argon2 (The password hash Argon2)
   https://github.com/P-H-C/phc-winner-argon2
   Version: 62358ba
 
@@ -16,14 +16,14 @@ G3D (a commercial-grade C++ 3D engine available as Open Source (BSD License)
   http://g3d.sourceforge.net/
   Version: v9.0 hotfix7
 
-gperftools
+gperftools (Google Performance Tools)
   Version: external
 
 jemalloc (a general-purpose scalable concurrent malloc-implementation)
   http://www.canonware.com/jemalloc/
   Version: 5.2.1
 
-jsonpath
+jsonpath (JSONPath implementation in Bash for filtering, merging and modifying JSON)
   https://github.com/mclarkson/JSONPath.sh.git
   Version: 0.0.14
 
@@ -43,7 +43,7 @@ MySQL (the world's most popular open source database software)
   http://www.mysql.com/
   Version: external
 
-semver_bash
+semver_bash (bash parser for semantic versioning)
   https://github.com/cloudflare/semver_bash/tree/master
   Version: c1133faf0efe17767b654b213f212c326df73fa3
 
@@ -51,12 +51,12 @@ SFMT (SIMD-oriented Fast Mersenne Twister)
   Based on http://agner.org/random/
   Version: 1.5
 
-sse2neon
+sse2neon (A translator from Intel SSE intrinsics to Arm/Aarch64 NEON implementation)
   https://github.com/DLTcollab/sse2neon
   Location: deps\argon2\argon2\blake2\sse2neon.h
   Version: 0c0dee02bb9d9848c294db1179fc278a4649979d
 
-stdfs
+stdfs (filesystem library)
   Version: external
 
 threads
