@@ -53,8 +53,8 @@ SFMT (SIMD-oriented Fast Mersenne Twister)
 
 sse2neon
   https://github.com/DLTcollab/sse2neon
-  Version: ???
--> deps\argon2\argon2\blake2\sse2neon.h
+  Location: deps\argon2\argon2\blake2\sse2neon.h
+  Version: 0c0dee02bb9d9848c294db1179fc278a4649979d
 
 stdfs
   Version: external
