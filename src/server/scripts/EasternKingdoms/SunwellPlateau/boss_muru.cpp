@@ -74,6 +74,12 @@ struct boss_muru : public BossAI
         me->m_Events.KillAllEvents(false);
     }
 
+    void EnterEvadeMode(EvadeReason why) override
+    {
+        summons.DespawnAll();
+        BossAI::EnterEvadeMode(why);
+    }
+
     void MoveInLineOfSight(Unit* who) override
     {
         // Radius of room is ~38.5f this might need adjusting a bit
