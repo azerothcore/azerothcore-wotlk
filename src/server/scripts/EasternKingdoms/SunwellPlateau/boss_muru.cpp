@@ -439,21 +439,21 @@ class spell_entropius_black_hole_effect : public SpellScript
                 0.0f))
         {
             return std::sqrt(
-                std::pow(hitX - baseX, 2) + 
-                std::pow(hitY - baseY, 2) + 
+                std::pow(hitX - baseX, 2) +
+                std::pow(hitY - baseY, 2) +
                 std::pow(hitZ - baseZ, 2)
             );
         }
         return maxDist;
     }
-    
+
     void HandlePull(SpellEffIndex effIndex)
     {
         PreventHitDefaultEffect(effIndex);
         Unit* target = GetHitUnit();
         if (!target)
             return;
-        
+
         Position pos;
         if (target->GetDistance(GetCaster()) < 5.0f)
         {
@@ -461,7 +461,7 @@ class spell_entropius_black_hole_effect : public SpellScript
             float z = GetCaster()->GetPositionZ() + frand(2.0f, 5.0f);
             float safeDistance = RaycastToObstacle(target, o, z, 10.0f);
             float actualDistance = std::min(8.0f, safeDistance * 0.8f);
-            
+
             pos.Relocate(
                 GetCaster()->GetPositionX() + actualDistance * cos(o),
                 GetCaster()->GetPositionY() + actualDistance * sin(o),
@@ -470,12 +470,12 @@ class spell_entropius_black_hole_effect : public SpellScript
         }
         else
             pos.Relocate(GetCaster()->GetPositionX(), GetCaster()->GetPositionY(), GetCaster()->GetPositionZ() + 1.0f);
-        
+
         float speedXY = float(GetSpellInfo()->Effects[effIndex].MiscValue) * 0.1f;
         float speedZ = target->GetDistance(pos) / speedXY * 0.5f * Movement::gravity;
         target->GetMotionMaster()->MoveJump(pos.GetPositionX(), pos.GetPositionY(), pos.GetPositionZ(), speedXY, speedZ);
     }
-    
+
     void Register() override
     {
         OnEffectHitTarget += SpellEffectFn(spell_entropius_black_hole_effect::HandlePull, EFFECT_0, SPELL_EFFECT_PULL_TOWARDS_DEST);
