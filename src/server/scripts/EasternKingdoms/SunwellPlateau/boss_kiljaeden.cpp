@@ -357,7 +357,6 @@ struct boss_kiljaeden : public BossAI
                 me->CastCustomSpell(SPELL_SINISTER_REFLECTION, SPELLVALUE_MAX_TARGETS, 1, me, TRIGGERED_NONE);
             });
 
-
             scheduler.Schedule(2s, [this](TaskContext)
             {
                 DoCastSelf(SPELL_SHADOW_SPIKE);
