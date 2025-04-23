@@ -223,6 +223,11 @@ struct boss_kiljaeden : public BossAI
     boss_kiljaeden(Creature* creature) : BossAI(creature, DATA_KILJAEDEN)
     {
         me->SetReactState(REACT_PASSIVE);
+
+        scheduler.SetValidator([this]
+        {
+            return !me->HasUnitState(UNIT_STATE_CASTING);
+        });
     }
 
     void InitializeAI() override
@@ -310,13 +315,14 @@ struct boss_kiljaeden : public BossAI
                 EmpowerOrb(false);
             }, 35s);
 
-            me->m_Events.AddEventAtOffset([&] {
+            scheduler.Schedule(1s, [this](TaskContext)
+            {
                 Talk(SAY_KJ_REFLECTION);
                 me->CastCustomSpell(SPELL_SINISTER_REFLECTION, SPELLVALUE_MAX_TARGETS, 1, me, TRIGGERED_NONE);
                 me->CastCustomSpell(SPELL_SINISTER_REFLECTION, SPELLVALUE_MAX_TARGETS, 1, me, TRIGGERED_NONE);
                 me->CastCustomSpell(SPELL_SINISTER_REFLECTION, SPELLVALUE_MAX_TARGETS, 1, me, TRIGGERED_NONE);
                 me->CastCustomSpell(SPELL_SINISTER_REFLECTION, SPELLVALUE_MAX_TARGETS, 1, me, TRIGGERED_NONE);
-            }, 1s);
+            });
 
             scheduler.Schedule(1s + 200ms, [this](TaskContext)
             {
@@ -342,17 +348,20 @@ struct boss_kiljaeden : public BossAI
         ScheduleHealthCheckEvent(25, [&] {
             _phase = PHASE_SACRIFICE;
 
-            me->m_Events.AddEventAtOffset([&] {
+            scheduler.Schedule(1s, [this](TaskContext)
+            {
                 Talk(SAY_KJ_REFLECTION);
                 me->CastCustomSpell(SPELL_SINISTER_REFLECTION, SPELLVALUE_MAX_TARGETS, 1, me, TRIGGERED_NONE);
                 me->CastCustomSpell(SPELL_SINISTER_REFLECTION, SPELLVALUE_MAX_TARGETS, 1, me, TRIGGERED_NONE);
                 me->CastCustomSpell(SPELL_SINISTER_REFLECTION, SPELLVALUE_MAX_TARGETS, 1, me, TRIGGERED_NONE);
                 me->CastCustomSpell(SPELL_SINISTER_REFLECTION, SPELLVALUE_MAX_TARGETS, 1, me, TRIGGERED_NONE);
-            }, 1s);
+            });
 
-            me->m_Events.AddEventAtOffset([&] {
+
+            scheduler.Schedule(2s, [this](TaskContext)
+            {
                 DoCastSelf(SPELL_SHADOW_SPIKE);
-            }, 2s);
+            });
 
             if (Creature* kalec = instance->GetCreature(DATA_KALECGOS_KJ))
             {
