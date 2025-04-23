@@ -1,0 +1,40 @@
+-- DB update 2025_04_19_00 -> 2025_04_20_00
+DELETE FROM `creature_loot_template` WHERE `Reference` = 34092;
+UPDATE `creature_loot_template` SET `Chance` = 10 WHERE `Reference` = 34091;
+
+DELETE FROM `reference_loot_template` WHERE `Entry` IN (34091, 34092);
+INSERT INTO `reference_loot_template` (`Entry`, `Item`, `Reference`, `Chance`, `QuestRequired`, `LootMode`, `GroupId`, `MinCount`, `MaxCount`, `Comment`) VALUES
+(34091, 35186, 0, 0, 0, 1, 1, 1, 1, 'Schematic: Annihilator Holo-Gogs'),
+(34091, 35187, 0, 0, 0, 1, 1, 1, 1, 'Schematic: Justicebringer 3000 Specs'),
+(34091, 35189, 0, 0, 0, 1, 1, 1, 1, 'Schematic: Powerheal 9000 Lens'),
+(34091, 35190, 0, 0, 0, 1, 1, 1, 1, 'Schematic: Hyper-Magnified Moon Specs'),
+(34091, 35191, 0, 0, 0, 1, 1, 1, 1, 'Schematic: Wonderheal XT68 Shades'),
+(34091, 35192, 0, 0, 0, 1, 1, 1, 1, 'Schematic: Primal-Attuned Goggles'),
+(34091, 35193, 0, 0, 0, 1, 1, 1, 1, 'Schematic: Lightning Etched Specs'),
+(34091, 35194, 0, 0, 0, 1, 1, 1, 1, 'Schematic: Surestrike Goggles v3.0'),
+(34091, 35195, 0, 0, 0, 1, 1, 1, 1, 'Schematic: Mayhem Projection Goggles'),
+(34091, 35196, 0, 0, 0, 1, 1, 1, 1, 'Schematic: Hard Khorium Goggles'),
+(34091, 35197, 0, 0, 0, 1, 1, 1, 1, 'Schematic: Quad Deathblow X44 Goggles'),
+(34091, 35198, 0, 0, 0, 1, 1, 1, 1, 'Design: Loop of Forged Power'),
+(34091, 35199, 0, 0, 0, 1, 1, 1, 1, 'Design: Ring of Flowing Life'),
+(34091, 35200, 0, 0, 0, 1, 1, 1, 1, 'Design: Hard Khorium Band'),
+(34091, 35201, 0, 0, 0, 1, 1, 1, 1, 'Design: Pendant of Sunfire'),
+(34091, 35202, 0, 0, 0, 1, 1, 1, 1, 'Design: Amulet of Flowing Life'),
+(34091, 35203, 0, 0, 0, 1, 1, 1, 1, 'Design: Hard Khorium Choker'),
+(34091, 35204, 0, 0, 0, 1, 1, 1, 1, 'Pattern: Sunfire Handwraps'),
+(34091, 35205, 0, 0, 0, 1, 1, 1, 1, 'Pattern: Hands of Eternal Light'),
+(34091, 35206, 0, 0, 0, 1, 1, 1, 1, 'Pattern: Sunfire Robe'),
+(34091, 35207, 0, 0, 0, 1, 1, 1, 1, 'Pattern: Robe of Eternal Light'),
+(34091, 35208, 0, 0, 0, 1, 1, 1, 1, 'Plans: Sunblessed Gauntlets'),
+(34091, 35209, 0, 0, 0, 1, 1, 1, 1, 'Plans: Hard Khorium Battlefists'),
+(34091, 35210, 0, 0, 0, 1, 1, 1, 1, 'Plans: Sunblessed Breastplate'),
+(34091, 35211, 0, 0, 0, 1, 1, 1, 1, 'Plans: Hard Khorium Battleplate'),
+(34091, 35212, 0, 0, 0, 1, 1, 1, 1, 'Pattern: Leather Gauntlets of the Sun'),
+(34091, 35213, 0, 0, 0, 1, 1, 1, 1, 'Pattern: Flethcher''s Gloves of the Phoenix'),
+(34091, 35214, 0, 0, 0, 1, 1, 1, 1, 'Pattern: Gloves of Immortal Dusk'),
+(34091, 35215, 0, 0, 0, 1, 1, 1, 1, 'Pattern: Sun-Drenched Scale Gloves'),
+(34091, 35216, 0, 0, 0, 1, 1, 1, 1, 'Pattern: Leather Chestguard of the Sun'),
+(34091, 35217, 0, 0, 0, 1, 1, 1, 1, 'Pattern: Embrace of the Phoenix'),
+(34091, 35218, 0, 0, 0, 1, 1, 1, 1, 'Pattern: Carapace of Sun and Shadow'),
+(34091, 35219, 0, 0, 0, 1, 1, 1, 1, 'Pattern: Sun-Drenched Scale Chestguard'),
+(34091, 35273, 0, 0, 0, 1, 1, 1, 1, 'Study of Advanced Smelting');

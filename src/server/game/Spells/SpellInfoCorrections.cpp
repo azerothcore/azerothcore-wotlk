@@ -4810,6 +4810,12 @@ void SpellMgr::LoadSpellInfoCorrections()
     });
 
     // Fatal Attraction
+    ApplySpellFix({ 40869 }, [](SpellInfo* spellInfo)
+    {
+        spellInfo->Effects[EFFECT_1].TargetB = SpellImplicitTargetInfo(TARGET_DEST_CASTER); // target set by script
+    });
+
+    // Fatal Attraction
     ApplySpellFix({ 40870 }, [](SpellInfo* spellInfo)
     {
         spellInfo->MaxAffectedTargets = 1;
@@ -4902,6 +4908,12 @@ void SpellMgr::LoadSpellInfoCorrections()
     ApplySpellFix({ 45662 }, [](SpellInfo* spellInfo)
     {
         spellInfo->AttributesEx7 |= SPELL_ATTR7_TREAT_AS_NPC_AOE;
+    });
+
+    // Heal (Crystal Spire of Karabor)
+    ApplySpellFix({ 40972 }, [](SpellInfo* spellInfo)
+    {
+        spellInfo->AttributesEx3 |= SPELL_ATTR3_SUPPRESS_CASTER_PROCS;
     });
 
     for (uint32 i = 0; i < GetSpellInfoStoreSize(); ++i)
