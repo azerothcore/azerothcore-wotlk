@@ -80,7 +80,7 @@ enum Spells
     SPELL_SINISTER_REFLECTION_CLASS             = 45893,
     SPELL_SINISTER_REFLECTION_CLONE             = 45785,
     // These should be applied to target of SPELL_SINISTER_REFLECTION_SUMMON but not implemented
-    //SPELL_SINISTER_COPY_WEAPON                  = 41054, 
+    //SPELL_SINISTER_COPY_WEAPON                  = 41054,
     //SPELL_SINISTER_COPY_OFFHAND_WEAPON          = 45205,
 
     // Misc
