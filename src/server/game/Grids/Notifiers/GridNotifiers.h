@@ -1457,6 +1457,24 @@ namespace Acore
         float m_fRange;
     };
 
+    class AllGameObjectsMatchingOneEntryInRange
+    {
+    public:
+        AllGameObjectsMatchingOneEntryInRange(WorldObject const* object, std::vector<uint32> entries, float maxRange) : m_pObject(object), m_uiEntries(entries), m_fRange(maxRange) {}
+        bool operator()(GameObject *go)
+        {
+            if (std::ranges::any_of( m_uiEntries, [go](uint32 entry) { return go->GetEntry() == entry; }) && m_pObject->IsWithinDist(go, m_fRange, false))
+                return true;
+
+            return false;
+        }
+
+    private:
+        WorldObject const* m_pObject;
+        std::vector<uint32> m_uiEntries;
+        float m_fRange;
+    };
+
     class AllCreaturesOfEntryInRange
     {
     public:
@@ -1472,6 +1490,24 @@ namespace Acore
     private:
         WorldObject const* m_pObject;
         uint32 m_uiEntry;
+        float m_fRange;
+    };
+
+    class AllCreaturesMatchingOneEntryInRange
+    {
+    public:
+        AllCreaturesMatchingOneEntryInRange(WorldObject const* object, std::vector<uint32> entries, float maxRange) : m_pObject(object), m_uiEntries(entries), m_fRange(maxRange) {}
+        bool operator()(Unit* unit)
+        {
+            if (std::ranges::any_of(m_uiEntries, [unit](uint32 entry) { return unit->GetEntry() == entry; }) && m_pObject->IsWithinDist(unit, m_fRange, false))
+                return true;
+
+            return false;
+        }
+
+    private:
+        WorldObject const* m_pObject;
+        std::vector<uint32> m_uiEntries;
         float m_fRange;
     };
 
