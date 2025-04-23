@@ -554,7 +554,9 @@ public:
 
     [[nodiscard]] Player* SelectNearestPlayer(float distance = 0) const;
     void GetGameObjectListWithEntryInGrid(std::list<GameObject*>& lList, uint32 uiEntry, float fMaxSearchRange) const;
+    void GetGameObjectListWithEntryInGrid(std::list<GameObject*>& gameobjectList, std::vector<uint32> const& entries, float maxSearchRange) const;
     void GetCreatureListWithEntryInGrid(std::list<Creature*>& lList, uint32 uiEntry, float fMaxSearchRange) const;
+    void GetCreatureListWithEntryInGrid(std::list<Creature*>& creatureList, std::vector<uint32> const& entries, float maxSearchRange) const;
     void GetDeadCreatureListInGrid(std::list<Creature*>& lList, float maxSearchRange, bool alive = false) const;
 
     void DestroyForNearbyPlayers();
