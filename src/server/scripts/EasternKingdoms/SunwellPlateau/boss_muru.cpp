@@ -110,7 +110,7 @@ struct boss_muru : public BossAI
         {
             std::list<Creature*> voidSpawns;
             GetCreatureListWithEntryInGrid(voidSpawns, me, 25824, 100.0f);
-        
+
             for (Creature* spawn : voidSpawns)
             {
                 bool alreadyRegistered = false;
@@ -122,7 +122,7 @@ struct boss_muru : public BossAI
                         break;
                     }
                 }
-            
+
                 if (!alreadyRegistered)
                     summons.Summon(spawn);
             }
