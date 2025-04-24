@@ -87,6 +87,8 @@ enum Spells
     SPELL_VENGEANCE_OF_THE_BLUE_FLIGHT          = 45839,
     SPELL_POSSESS_DRAKE_IMMUNITY                = 45838,
     SPELL_SACRIFICE_OF_ANVEENA                  = 46474,
+    SPELL_BREATH_HASTE                          = 45856,
+    SPELL_BREATH_HASTE_EFFECT                   = 49725
 };
 
 enum Misc
@@ -1147,6 +1149,22 @@ class spell_kiljaeden_dragon_breath : public SpellScript
     }
 };
 
+class spell_kiljaeden_breath_haste : public SpellScript
+{
+    PrepareSpellScript(spell_kiljaeden_breath_haste);
+
+    void HandleDummy(SpellEffIndex /*effIndex*/)
+    {
+        if (Unit* caster = GetCaster())
+            caster->CastSpell(caster, SPELL_BREATH_HASTE_EFFECT, true);
+    }
+
+    void Register() override
+    {
+        OnEffectHitTarget += SpellEffectFn(spell_kiljaeden_breath_haste::HandleDummy, EFFECT_0, SPELL_EFFECT_DUMMY);
+    }
+};
+
 void AddSC_boss_kiljaeden()
 {
     RegisterSunwellPlateauCreatureAI(npc_kiljaeden_controller);
@@ -1162,4 +1180,5 @@ void AddSC_boss_kiljaeden()
     RegisterSpellScript(spell_kiljaeden_armageddon_periodic_aura);
     RegisterSpellScript(spell_kiljaeden_armageddon_missile);
     RegisterSpellScript(spell_kiljaeden_dragon_breath);
+    RegisterSpellScript(spell_kiljaeden_breath_haste);
 }
