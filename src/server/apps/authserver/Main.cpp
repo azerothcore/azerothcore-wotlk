@@ -246,7 +246,7 @@ void KeepDatabaseAliveHandler(std::weak_ptr<boost::asio::steady_timer> dbPingTim
     {
         if (std::shared_ptr<boost::asio::steady_timer> dbPingTimer = dbPingTimerRef.lock())
         {
-            LOG_INFO("server.authserver", "Ping MySQL to keep connection alive");
+            LOG_DEBUG("sql.driver", "Ping MySQL to keep connection alive");
             LoginDatabase.KeepAlive();
 
             dbPingTimer->expires_at(Acore::Asio::SteadyTimer::GetExpirationTime(dbPingInterval));
