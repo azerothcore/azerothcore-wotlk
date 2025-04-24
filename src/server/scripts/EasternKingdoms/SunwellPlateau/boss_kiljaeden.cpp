@@ -1153,7 +1153,7 @@ class spell_kiljaeden_breath_haste : public SpellScript
 {
     PrepareSpellScript(spell_kiljaeden_breath_haste);
 
-    void HandleDummy(SpellEffIndex /*effIndex*/)
+    void HandleScript(SpellEffIndex /*effIndex*/)
     {
         if (Unit* caster = GetCaster())
             caster->CastSpell(caster, SPELL_BREATH_HASTE_EFFECT, true);
@@ -1161,7 +1161,7 @@ class spell_kiljaeden_breath_haste : public SpellScript
 
     void Register() override
     {
-        OnEffectHitTarget += SpellEffectFn(spell_kiljaeden_breath_haste::HandleDummy, EFFECT_0, SPELL_EFFECT_DUMMY);
+        OnEffectHit += SpellEffectFn(spell_kiljaeden_breath_haste::HandleScript, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
     }
 };
 
