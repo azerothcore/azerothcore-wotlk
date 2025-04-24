@@ -45,7 +45,7 @@ enum Spells
     SPELL_ENTROPIUS_COSMETIC_SPAWN      = 46223,
     SPELL_NEGATIVE_ENERGY_PERIODIC      = 46284,
     SPELL_BLACK_HOLE                    = 46282,
-    SPELL_DARKNESS                      = 46268,
+    SPELL_DARKNESS                      = 46269,
     SPELL_SUMMON_DARK_FIEND_ENTROPIUS   = 46263,
 
     //Black Hole Spells
@@ -168,13 +168,13 @@ struct boss_entropius : public ScriptedAI
 
     void JustEngagedWith(Unit* /*who*/) override
     {
-        ScheduleTimedEvent(10s, [&] {
+        ScheduleTimedEvent(8s, 29s, [this]() {
             DoCastRandomTarget(SPELL_DARKNESS, 0, 50.0f, true, true);
-        }, 15s);
+        }, 8s, 29s);
 
-        ScheduleTimedEvent(15s, [&] {
-            DoCastRandomTarget(SPELL_BLACK_HOLE, 0, 50.0f, true, true);
-        }, 15s);
+        ScheduleTimedEvent(14s, 29s, [this]() {
+            DoCastRandomTarget(SPELL_BLACK_HOLE, 0, 50.0f, false, true);
+        }, 14s, 29s);
     }
 
     void JustDied(Unit* /*killer*/) override
@@ -329,7 +329,7 @@ struct npc_singularity : public NullCreatureAI
             else
             {
                 // No valid target found, check again soon
-                context.Repeat(1s);
+                context.Repeat();
             }
         });
     }
