@@ -108,12 +108,23 @@ struct boss_muru : public BossAI
         // Handle registration from Void Spawn SmartAI
         if (type == 1 && data == 1)
         {
-            if (Unit* sender = me->GetLastSeenOrCurrentAttacker())
+            std::list<Creature*> voidSpawns;
+            GetCreatureListWithEntryInGrid(voidSpawns, me, 25824, 100.0f);
+        
+            for (Creature* spawn : voidSpawns)
             {
-                if (sender->GetEntry() == 25824) // Void Spawn
+                bool alreadyRegistered = false;
+                for (SummonList::const_iterator itr = summons.begin(); itr != summons.end(); ++itr)
                 {
-                    summons.Summon(sender->ToCreature());
+                    if (*itr == spawn->GetGUID())
+                    {
+                        alreadyRegistered = true;
+                        break;
+                    }
                 }
+            
+                if (!alreadyRegistered)
+                    summons.Summon(spawn);
             }
         }
     }
