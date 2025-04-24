@@ -103,6 +103,21 @@ struct boss_muru : public BossAI
         }, 10min);
     }
 
+    void SetData(uint32 type, uint32 data) override
+    {
+        // Handle registration from Void Spawn SmartAI
+        if (type == 1 && data == 1)
+        {
+            if (Unit* sender = me->GetLastSeenOrCurrentAttacker())
+            {
+                if (sender->GetEntry() == 25824) // Void Spawn
+                {
+                    summons.Summon(sender->ToCreature());
+                }
+            }
+        }
+    }
+
     void JustSummoned(Creature* creature) override
     {
         if (creature->GetEntry() == NPC_ENTROPIUS)
