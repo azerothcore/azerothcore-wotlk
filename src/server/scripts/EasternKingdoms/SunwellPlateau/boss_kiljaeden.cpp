@@ -374,8 +374,6 @@ struct boss_kiljaeden : public BossAI
                 anveena->AI()->Talk(SAY_ANVEENA_GOODBYE, 25s);
             }
 
-            scheduler.CancelAll();
-
             me->m_Events.AddEventAtOffset([&] {
                 if (Creature* anveena = instance->GetCreature(DATA_ANVEENA))
                 {
@@ -390,7 +388,7 @@ struct boss_kiljaeden : public BossAI
                     anveena->CastSpell(anveena, SPELL_SACRIFICE_OF_ANVEENA, true);
                     DoCastSelf(SPELL_CUSTOM_08_STATE, true);
                     me->SetUnitFlag(UNIT_FLAG_PACIFIED);
-                    scheduler.DelayAll(7100ms);
+                    scheduler.CancelAll();
 
                     me->m_Events.AddEventAtOffset([&] {
                         me->RemoveAurasDueToSpell(SPELL_CUSTOM_08_STATE);
