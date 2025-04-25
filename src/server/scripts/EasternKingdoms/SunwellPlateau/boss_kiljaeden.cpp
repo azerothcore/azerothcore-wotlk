@@ -86,7 +86,7 @@ enum Spells
     SPELL_SUMMON_BLUE_DRAKE                     = 45836,
     SPELL_VENGEANCE_OF_THE_BLUE_FLIGHT          = 45839,
     SPELL_POSSESS_DRAKE_IMMUNITY                = 45838,
-    SPELL_SACRIFICE_OF_ANVEENA                  = 46474
+    SPELL_SACRIFICE_OF_ANVEENA                  = 46474,
 };
 
 enum Misc
