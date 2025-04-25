@@ -1153,6 +1153,11 @@ class spell_kiljaeden_breath_haste : public SpellScript
 {
     PrepareSpellScript(spell_kiljaeden_breath_haste);
 
+    bool Validate(SpellInfo const* /*spellInfo*/) override
+    {
+        return ValidateSpellInfo({ SPELL_BREATH_HASTE_EFFECT });
+    }
+
     void HandleAfterCast()
     {
         Unit* caster = GetCaster();
