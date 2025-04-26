@@ -1,3 +1,4 @@
+-- DB update 2025_04_25_01 -> 2025_04_26_00
 
 -- Set Not Selectable for dead bodies inside Scarlet Tavern
 UPDATE `creature` SET `unit_flags` = `unit_flags` |33554432 WHERE (`id1` IN(28610, 28939, 28940, 28941, 28942)) AND (`guid` IN(129664, 129682, 129683, 129727, 129769, 130001, 130002));
