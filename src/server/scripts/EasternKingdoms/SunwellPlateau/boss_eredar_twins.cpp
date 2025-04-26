@@ -119,9 +119,7 @@ struct boss_sacrolash : public BossAI
 
             scheduler.CancelGroup(GROUP_SPECIAL_ABILITY);
             ScheduleTimedEvent(20s, [&] {
-                std::list<Unit*> targets;
-                SelectTargetList(targets, 5, SelectTargetMethod::MaxThreat, 0, 100.0f, true, false);
-                Unit* target = Acore::Containers::SelectRandomContainerElement(targets);
+                Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 100.0f, true, false);
                 if (!target)
                     target = me->GetVictim();
 
@@ -160,7 +158,8 @@ struct boss_sacrolash : public BossAI
             {
                 std::list<Unit*> targets;
                 alythess->AI()->SelectTargetList(targets, 5, SelectTargetMethod::MaxThreat, 0, 100.0f, true, false);
-                target = Acore::Containers::SelectRandomContainerElement(targets);
+                if (!targets.empty())
+                    target = Acore::Containers::SelectRandomContainerElement(targets);
             }
             if (!target)
                 target = me->GetVictim();
@@ -252,9 +251,7 @@ struct boss_alythess : public BossAI
             }, 8s, 10s);
 
             ScheduleTimedEvent(20s, 26s, [&] {
-                std::list<Unit*> targets;
-                SelectTargetList(targets, 5, SelectTargetMethod::MaxThreat, 0, 100.0f, true, false);
-                Unit* target = Acore::Containers::SelectRandomContainerElement(targets);
+                Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 100.0f, true, false);
                 if (!target)
                     target = me->GetVictim();
                 DoCast(target, SPELL_SHADOW_NOVA);
@@ -295,7 +292,8 @@ struct boss_alythess : public BossAI
             {
                 std::list<Unit*> targets;
                 sacrolash->AI()->SelectTargetList(targets, 5, SelectTargetMethod::MaxThreat, 0, 100.0f, true, false);
-                target = Acore::Containers::SelectRandomContainerElement(targets);
+                if (!targets.empty())
+                    target = Acore::Containers::SelectRandomContainerElement(targets);
             }
             if (!target)
                 target = me->GetVictim();
