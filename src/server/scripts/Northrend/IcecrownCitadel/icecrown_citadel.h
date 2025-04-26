@@ -557,15 +557,6 @@ enum QuestsICC
     QUEST_A_FEAST_OF_SOULS                  = 24547
 };
 
-enum WorldStatesICC
-{
-    WORLDSTATE_SHOW_TIMER           = 4903,
-    WORLDSTATE_EXECUTION_TIME       = 4904,
-    WORLDSTATE_SHOW_ATTEMPTS        = 4940,
-    WORLDSTATE_ATTEMPTS_REMAINING   = 4941,
-    WORLDSTATE_ATTEMPTS_MAX         = 4942,
-};
-
 enum PutricideEventFlags
 {
     PUTRICIDE_EVENT_FLAG_FESTERGUT_VALVE    = 1,
