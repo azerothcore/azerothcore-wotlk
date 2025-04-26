@@ -85,6 +85,8 @@ struct boss_brutallus : public BossAI
         Talk(YELL_AGGRO);
         BossAI::JustEngagedWith(who);
 
+        ScheduleEnrageTimer(SPELL_BERSERK, 6min, YELL_BERSERK);
+
         ScheduleTimedEvent(11s, [&] {
             DoCastVictim(SPELL_METEOR_SLASH);
         }, 12s);
@@ -98,11 +100,6 @@ struct boss_brutallus : public BossAI
             if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 100.0f, true, true, -SPELL_BURN_DAMAGE))
                 DoCast(target, SPELL_BURN);
         }, 20s);
-
-        me->m_Events.AddEventAtOffset([&] {
-            DoCastSelf(SPELL_BERSERK, true);
-            Talk(YELL_BERSERK);
-        }, 6min);
     }
 
     void KilledUnit(Unit* victim) override
