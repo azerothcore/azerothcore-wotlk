@@ -237,7 +237,7 @@ struct npc_dark_fiend : public ScriptedAI
                         {
                             std::list<HostileReference*> const& threatList = entropius->GetThreatMgr().GetThreatList();
                             std::vector<Unit*> validTargets;
-    
+
                             for (HostileReference* ref : threatList)
                             {
                                 if (Unit* unit = ObjectAccessor::GetUnit(*entropius, ref->getUnitGuid()))
@@ -248,7 +248,7 @@ struct npc_dark_fiend : public ScriptedAI
                                     }
                                 }
                             }
-    
+
                             if (!validTargets.empty())
                                 target = validTargets[urand(0, validTargets.size() - 1)];
                         }
@@ -302,8 +302,6 @@ struct npc_dark_fiend : public ScriptedAI
                 me->DespawnOrUnsummon();
             }, 1s);
         }
-
-        // Removed DoMeleeAttackIfReady() to prevent melee damage
     }
 
 private:
