@@ -36,6 +36,10 @@ target_link_libraries(shared
   PUBLIC
     database)
 
+if (UNIX)
+  target_link_libraries(shared PUBLIC systemd)
+endif (UNIX)
+
 set_target_properties(shared
   PROPERTIES
     FOLDER

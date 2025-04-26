@@ -42,7 +42,7 @@ public:
         std::unique_ptr<AsyncAcceptor> acceptor;
         try
         {
-            acceptor = std::make_unique<AsyncAcceptor>(ioContext, bindIp, port);
+            acceptor = std::make_unique<AsyncAcceptor>(ioContext, bindIp, port, true);
         }
         catch (boost::system::system_error const& err)
         {
