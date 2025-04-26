@@ -714,7 +714,7 @@ void BattlegroundAB::RewardKillScore(TeamId teamId, uint32 amount)
     m_TeamScores[teamId] += amount;
     if (m_TeamScores[teamId] > BG_AB_MAX_TEAM_SCORE)
         m_TeamScores[teamId] = BG_AB_MAX_TEAM_SCORE;
-    UpdateWorldState(teamId == TEAM_ALLIANCE ? BG_AB_OP_RESOURCES_ALLY : BG_AB_OP_RESOURCES_HORDE, m_TeamScores[teamId]);
+    UpdateWorldState(teamId == TEAM_ALLIANCE ? WORLD_STATE_BATTLEGROUND_AB_RESOURCES_ALLIANCE : WORLD_STATE_BATTLEGROUND_AB_RESOURCES_HORDE, m_TeamScores[teamId]);
     if (m_TeamScores[teamId] >= BG_AB_MAX_TEAM_SCORE)
         EndBattleground(teamId);
 }
