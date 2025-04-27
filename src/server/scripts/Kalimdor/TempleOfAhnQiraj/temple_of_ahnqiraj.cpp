@@ -98,7 +98,7 @@ struct npc_anubisath_defender : public ScriptedAI
         {
             scheduler.Schedule(6s, 10s, [this](TaskContext context)
             {
-                if (Unit* target = SelectTarget(SelectTargetMethod::MaxThreat, 1))
+                if (Unit* target = SelectTarget(SelectTargetMethod::MaxThreat, 0, 0.0f, false, false))
                     DoCast(target, SPELL_PLAGUE, true);
                 context.Repeat(6s, 10s);
             });

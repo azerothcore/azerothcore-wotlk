@@ -207,7 +207,7 @@ public:
                         return;
                     }
                     events.ScheduleEvent(EVENT_IMPALING_CHARGE, 21s);
-                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 1, 100.0f, true))
+                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 100.0f, true, false))
                     {
                         me->CastSpell(target, SPELL_IMPALING_CHARGE, false);
                         impaledList.insert(target->GetGUID());

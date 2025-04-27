@@ -84,7 +84,7 @@ struct boss_akilzon : public BossAI
 
         scheduler.Schedule(10s, 20s, GROUP_STATIC_DISRUPTION, [this](TaskContext context)
         {
-            Unit* target = SelectTarget(SelectTargetMethod::Random, 1);
+            Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 0.0f, false, false);
             if (!target)
                 target = me->GetVictim();
             if (target)
