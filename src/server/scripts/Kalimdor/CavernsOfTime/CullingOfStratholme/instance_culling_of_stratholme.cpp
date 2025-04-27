@@ -22,6 +22,7 @@
 #include "ScriptedCreature.h"
 #include "SpellInfo.h"
 #include "TemporarySummon.h"
+#include "WorldStateDefines.h"
 #include "WorldStatePackets.h"
 #include "culling_of_stratholme.h"
 
@@ -57,11 +58,11 @@ public:
         void FillInitialWorldStates(WorldPackets::WorldState::InitWorldStates& packet) override
         {
             packet.Worldstates.reserve(5);
-            packet.Worldstates.emplace_back(WORLDSTATE_SHOW_CRATES, 0);
-            packet.Worldstates.emplace_back(WORLDSTATE_CRATES_REVEALED, _crateCount);
-            packet.Worldstates.emplace_back(WORLDSTATE_WAVE_COUNT, 0);
-            packet.Worldstates.emplace_back(WORLDSTATE_TIME_GUARDIAN, 25);
-            packet.Worldstates.emplace_back(WORLDSTATE_TIME_GUARDIAN_SHOW, 0);
+            packet.Worldstates.emplace_back(WORLD_STATE_CULLING_OF_STRATHOLME_SHOW_CRATES, 0);
+            packet.Worldstates.emplace_back(WORLD_STATE_CULLING_OF_STRATHOLME_CRATES_REVEALED, _crateCount);
+            packet.Worldstates.emplace_back(WORLD_STATE_CULLING_OF_STRATHOLME_WAVE_COUNT, 0);
+            packet.Worldstates.emplace_back(WORLD_STATE_CULLING_OF_STRATHOLME_TIME_GUARDIAN, 25);
+            packet.Worldstates.emplace_back(WORLD_STATE_CULLING_OF_STRATHOLME_TIME_GUARDIAN_SHOW, 0);
         }
 
         void OnPlayerEnter(Player* plr) override
@@ -112,13 +113,13 @@ public:
             switch (type)
             {
                 case DATA_SHOW_CRATES:
-                    DoUpdateWorldState(WORLDSTATE_SHOW_CRATES, data);
+                    DoUpdateWorldState(WORLD_STATE_CULLING_OF_STRATHOLME_SHOW_CRATES, data);
                     return;
                 case DATA_SHOW_INFINITE_TIMER:
                     if (!instance->IsHeroic() || !_guardianTimer)
                         return;
-                    DoUpdateWorldState(WORLDSTATE_TIME_GUARDIAN_SHOW, data);
-                    DoUpdateWorldState(WORLDSTATE_TIME_GUARDIAN, uint32(_guardianTimer / (MINUTE * IN_MILLISECONDS)));
+                    DoUpdateWorldState(WORLD_STATE_CULLING_OF_STRATHOLME_TIME_GUARDIAN_SHOW, data);
+                    DoUpdateWorldState(WORLD_STATE_CULLING_OF_STRATHOLME_TIME_GUARDIAN, uint32(_guardianTimer / (MINUTE * IN_MILLISECONDS)));
                     if (data == 0)
                     {
                         _guardianTimer = 0;
@@ -128,10 +129,10 @@ public:
                         instance->SummonCreature(NPC_INFINITE, EventPos[EVENT_SRC_CORRUPTOR]);
                     return;
                 case DATA_START_WAVES:
-                    DoUpdateWorldState(WORLDSTATE_WAVE_COUNT, 1);
+                    DoUpdateWorldState(WORLD_STATE_CULLING_OF_STRATHOLME_WAVE_COUNT, 1);
                     if (instance->IsHeroic())
                     {
-                        DoUpdateWorldState(WORLDSTATE_TIME_GUARDIAN_SHOW, true);
+                        DoUpdateWorldState(WORLD_STATE_CULLING_OF_STRATHOLME_TIME_GUARDIAN_SHOW, true);
                         _guardianTimer = 26 * MINUTE * IN_MILLISECONDS;
                         if (!_infiniteGUID)
                             instance->SummonCreature(NPC_INFINITE, EventPos[EVENT_SRC_CORRUPTOR]);
@@ -151,7 +152,7 @@ public:
                             SetData(DATA_ARTHAS_EVENT, COS_PROGRESS_CRATES_FOUND);
                     }
 
-                    DoUpdateWorldState(WORLDSTATE_CRATES_REVEALED, _crateCount);
+                    DoUpdateWorldState(WORLD_STATE_CULLING_OF_STRATHOLME_CRATES_REVEALED, _crateCount);
                     return;
                 case DATA_ARTHAS_EVENT:
                     // Start Event
@@ -256,7 +257,7 @@ public:
                 if (divAfter == 0)
                 {
                     _guardianTimer = 0;
-                    DoUpdateWorldState(WORLDSTATE_TIME_GUARDIAN_SHOW, 0);
+                    DoUpdateWorldState(WORLD_STATE_CULLING_OF_STRATHOLME_TIME_GUARDIAN_SHOW, 0);
 
                     // Inform infinite we run out of time
                     if (instance->IsHeroic() && _infiniteGUID)
@@ -270,7 +271,7 @@ public:
                     else if (divAfter == 1)
                         ChromieWhisper(2);
 
-                    DoUpdateWorldState(WORLDSTATE_TIME_GUARDIAN, divAfter);
+                    DoUpdateWorldState(WORLD_STATE_CULLING_OF_STRATHOLME_TIME_GUARDIAN, divAfter);
                     SaveToDB();
                 }
             }
@@ -290,7 +291,7 @@ public:
                     ChromieWhisper(0);
 
                     // hide crates count
-                    DoUpdateWorldState(WORLDSTATE_SHOW_CRATES, 0);
+                    DoUpdateWorldState(WORLD_STATE_CULLING_OF_STRATHOLME_SHOW_CRATES, 0);
                     _showCrateTimer = 0;
                     _encounterState = COS_PROGRESS_CRATES_FOUND;
                 }

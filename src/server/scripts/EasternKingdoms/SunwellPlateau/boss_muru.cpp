@@ -23,6 +23,8 @@
 #include "SpellScript.h"
 #include "SpellScriptLoader.h"
 #include "sunwell_plateau.h"
+#include "VMapFactory.h"
+#include "VMapMgr2.h"
 
 enum Spells
 {
@@ -43,7 +45,7 @@ enum Spells
     SPELL_ENTROPIUS_COSMETIC_SPAWN      = 46223,
     SPELL_NEGATIVE_ENERGY_PERIODIC      = 46284,
     SPELL_BLACK_HOLE                    = 46282,
-    SPELL_DARKNESS                      = 46268,
+    SPELL_DARKNESS                      = 46269,
     SPELL_SUMMON_DARK_FIEND_ENTROPIUS   = 46263,
 
     //Black Hole Spells
@@ -166,13 +168,13 @@ struct boss_entropius : public ScriptedAI
 
     void JustEngagedWith(Unit* /*who*/) override
     {
-        ScheduleTimedEvent(10s, [&] {
+        ScheduleTimedEvent(8s, 29s, [this]() {
             DoCastRandomTarget(SPELL_DARKNESS, 0, 50.0f, true, true);
-        }, 15s);
+        }, 8s, 29s);
 
-        ScheduleTimedEvent(15s, [&] {
-            DoCastRandomTarget(SPELL_BLACK_HOLE, 0, 50.0f, true, true);
-        }, 15s);
+        ScheduleTimedEvent(14s, 29s, [this]() {
+            DoCastRandomTarget(SPELL_BLACK_HOLE, 0, 50.0f, false, true);
+        }, 14s, 29s);
     }
 
     void JustDied(Unit* /*killer*/) override
@@ -327,7 +329,7 @@ struct npc_singularity : public NullCreatureAI
             else
             {
                 // No valid target found, check again soon
-                context.Repeat(1s);
+                context.Repeat();
             }
         });
     }
@@ -421,6 +423,28 @@ class spell_entropius_void_zone_visual_aura : public AuraScript
 class spell_entropius_black_hole_effect : public SpellScript
 {
     PrepareSpellScript(spell_entropius_black_hole_effect);
+    float RaycastToObstacle(Unit* unit, float angle, float z, float maxDist = 20.0f)
+    {
+        float baseX = unit->GetPositionX();
+        float baseY = unit->GetPositionY();
+        float targetX = baseX + maxDist * cos(angle);
+        float targetY = baseY + maxDist * sin(angle);
+        float hitX, hitY, hitZ;
+        if (VMAP::VMapFactory::createOrGetVMapMgr()->GetObjectHitPos(
+                unit->GetMapId(),
+                baseX, baseY, z,
+                targetX, targetY, z,
+                hitX, hitY, hitZ,
+                0.0f))
+        {
+            return std::sqrt(
+                std::pow(hitX - baseX, 2) +
+                std::pow(hitY - baseY, 2) +
+                std::pow(hitZ - z, 2)
+            );
+        }
+        return maxDist;
+    }
 
     void HandlePull(SpellEffIndex effIndex)
     {
@@ -428,21 +452,25 @@ class spell_entropius_black_hole_effect : public SpellScript
         Unit* target = GetHitUnit();
         if (!target)
             return;
-
         Position pos;
         if (target->GetDistance(GetCaster()) < 5.0f)
         {
             float o = frand(0, 2 * M_PI);
-            pos.Relocate(GetCaster()->GetPositionX() + 8.0f * cos(o),
-                         GetCaster()->GetPositionY() + 8.0f * std::sin(o),
-                         GetCaster()->GetPositionZ() + frand(2.0f, 5.0f));
+            float z = GetCaster()->GetPositionZ() + frand(1.0f, 2.0f);
+            float safeDistance = RaycastToObstacle(GetCaster(), o, z, 10.0f);
+            float actualDistance = std::min(8.0f, safeDistance * 0.8f);
+
+            pos.Relocate(
+                GetCaster()->GetPositionX() + actualDistance * cos(o),
+                GetCaster()->GetPositionY() + actualDistance * sin(o),
+                z
+            );
         }
         else
             pos.Relocate(GetCaster()->GetPositionX(), GetCaster()->GetPositionY(), GetCaster()->GetPositionZ() + 1.0f);
 
         float speedXY = float(GetSpellInfo()->Effects[effIndex].MiscValue) * 0.1f;
         float speedZ = target->GetDistance(pos) / speedXY * 0.5f * Movement::gravity;
-
         target->GetMotionMaster()->MoveJump(pos.GetPositionX(), pos.GetPositionY(), pos.GetPositionZ(), speedXY, speedZ);
     }
 
