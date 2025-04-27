@@ -43,7 +43,7 @@ public:
         _supportSocketActivation(supportSocketActivation)
     {
         #if AC_PLATFORM == AC_PLATFORM_UNIX
-        if(_supportSocketActivation && sd_listen_fds(0) > 0)
+        if (_supportSocketActivation && sd_listen_fds(0) > 0)
         {
             LOG_DEBUG("network", "Using socket from systemd socket activation");
             boost::system::error_code errorCode;
