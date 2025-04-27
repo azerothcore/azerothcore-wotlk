@@ -20,6 +20,7 @@
 #include "LFGMgr.h"
 #include "Player.h"
 #include "ScriptedCreature.h"
+#include "WorldStateDefines.h"
 #include "WorldStatePackets.h"
 #include "oculus.h"
 
@@ -112,13 +113,13 @@ public:
         {
             if (m_auiEncounter[DATA_DRAKOS] == DONE && m_auiEncounter[DATA_VAROS] != DONE)
             {
-                player->SendUpdateWorldState(WORLD_STATE_CENTRIFUGE_CONSTRUCT_SHOW, 1);
-                player->SendUpdateWorldState(WORLD_STATE_CENTRIFUGE_CONSTRUCT_AMOUNT, 10 - CentrifugeCount);
+                player->SendUpdateWorldState(WORLD_STATE_OCULUS_CENTRIFUGE_CONSTRUCT_SHOW, 1);
+                player->SendUpdateWorldState(WORLD_STATE_OCULUS_CENTRIFUGE_CONSTRUCT_AMOUNT, 10 - CentrifugeCount);
             }
             else
             {
-                player->SendUpdateWorldState(WORLD_STATE_CENTRIFUGE_CONSTRUCT_SHOW, 0);
-                player->SendUpdateWorldState(WORLD_STATE_CENTRIFUGE_CONSTRUCT_AMOUNT, 0);
+                player->SendUpdateWorldState(WORLD_STATE_OCULUS_CENTRIFUGE_CONSTRUCT_SHOW, 0);
+                player->SendUpdateWorldState(WORLD_STATE_OCULUS_CENTRIFUGE_CONSTRUCT_AMOUNT, 0);
             }
         }
 
@@ -136,8 +137,8 @@ public:
                     m_auiEncounter[DATA_DRAKOS] = data;
                     if (data == DONE)
                     {
-                        DoUpdateWorldState(WORLD_STATE_CENTRIFUGE_CONSTRUCT_SHOW, 1);
-                        DoUpdateWorldState(WORLD_STATE_CENTRIFUGE_CONSTRUCT_AMOUNT, 10 - CentrifugeCount);
+                        DoUpdateWorldState(WORLD_STATE_OCULUS_CENTRIFUGE_CONSTRUCT_SHOW, 1);
+                        DoUpdateWorldState(WORLD_STATE_OCULUS_CENTRIFUGE_CONSTRUCT_AMOUNT, 10 - CentrifugeCount);
 
                         if (instance->IsHeroic())
                             DoStartTimedAchievement(ACHIEVEMENT_TIMED_TYPE_EVENT, ACHIEV_MAKE_IT_COUNT_TIMED_EVENT);
@@ -147,7 +148,7 @@ public:
                     m_auiEncounter[DATA_VAROS] = data;
                     if (data == DONE)
                     {
-                        DoUpdateWorldState(WORLD_STATE_CENTRIFUGE_CONSTRUCT_SHOW, 0);
+                        DoUpdateWorldState(WORLD_STATE_OCULUS_CENTRIFUGE_CONSTRUCT_SHOW, 0);
 
                         if (Creature* urom = instance->GetCreature(uiUromGUID))
                             urom->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
@@ -178,7 +179,7 @@ public:
                     if (CentrifugeCount < 10)
                     {
                         ++CentrifugeCount;
-                        DoUpdateWorldState(WORLD_STATE_CENTRIFUGE_CONSTRUCT_AMOUNT, 10 - CentrifugeCount);
+                        DoUpdateWorldState(WORLD_STATE_OCULUS_CENTRIFUGE_CONSTRUCT_AMOUNT, 10 - CentrifugeCount);
                     }
                     if (CentrifugeCount >= 10)
                         if (Creature* varos = instance->GetCreature(uiVarosGUID))
