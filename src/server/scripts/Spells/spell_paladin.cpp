@@ -679,8 +679,12 @@ class spell_pal_glyph_of_holy_light : public SpellScript
 
     void FilterTargets(std::list<WorldObject*>& targets)
     {
-        uint32 const maxTargets = GetSpellInfo()->MaxAffectedTargets;
+        targets.remove_if([&](WorldObject const* target) -> bool
+        {
+            return target == GetExplTargetUnit();
+        });
 
+        uint32 const maxTargets = GetSpellInfo()->MaxAffectedTargets;
         if (targets.size() > maxTargets)
         {
             targets.sort(Acore::HealthPctOrderPred());
