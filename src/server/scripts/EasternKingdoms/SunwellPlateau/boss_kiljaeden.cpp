@@ -460,8 +460,14 @@ struct boss_kiljaeden : public BossAI
     void EnterEvadeMode(EvadeReason why) override
     {
         if (me->GetReactState() == REACT_PASSIVE)
-            return;
+             return;
+
         ScriptedAI::EnterEvadeMode(why);
+        if (InstanceScript* instance = me->GetInstanceScript())
+            if (Creature* controller = instance->GetCreature(DATA_KJ_CONTROLLER))
+                 if (controller->IsAIEnabled)
+                    controller->AI()->Reset();
+
         me->DespawnOrUnsummon();
     }
 
