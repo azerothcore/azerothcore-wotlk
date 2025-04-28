@@ -463,7 +463,7 @@ struct boss_kiljaeden : public BossAI
             return;
 
         DoCastAOE(SPELL_DESTROY_ALL_DRAKES, true);
-        
+
         ScriptedAI::EnterEvadeMode(why);
         if (InstanceScript* instance = me->GetInstanceScript())
             if (Creature* controller = instance->GetCreature(DATA_KJ_CONTROLLER))
