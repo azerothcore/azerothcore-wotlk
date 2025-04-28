@@ -25,7 +25,7 @@
 #include <boost/asio/ip/tcp.hpp>
 #include <functional>
 
-#ifdef ACORE_WITH_SYSTEMD
+#ifdef WITH_SYSTEMD
 #include <systemd/sd-daemon.h>
 #endif
 
@@ -43,7 +43,7 @@ public:
         _socket(ioContext), _closed(false), _socketFactory([this](){ return DefaultSocketFactory(); }),
         _supportSocketActivation(supportSocketActivation)
     {
-        #ifdef ACORE_WITH_SYSTEMD
+        #ifdef WITH_SYSTEMD
         if (_supportSocketActivation && sd_listen_fds(0) > 0)
         {
             LOG_DEBUG("network", "Using socket from systemd socket activation");
@@ -53,7 +53,6 @@ public:
             {
                 LOG_WARN("network", "Failed to assign socket {}", errorCode.message());
             }
-            _shouldBind = false;
         }
         #endif
     }
@@ -147,7 +146,6 @@ private:
     tcp::socket _socket;
     std::atomic<bool> _closed;
     std::function<std::pair<tcp::socket*, uint32>()> _socketFactory;
-    bool _shouldBind = true;
     bool _supportSocketActivation = false;
 };
 

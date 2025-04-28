@@ -36,11 +36,9 @@ target_link_libraries(shared
   PUBLIC
     database)
 
-set(ACORE_WITH_SYSTEMD OFF)
 find_library(WITH_SYSTEMD systemd)
 if(WITH_SYSTEMD)
   message("*** Building with SYSTEMD support")
-  set(ACORE_WITH_SYSTEMD ON)
   target_link_libraries(shared PUBLIC systemd)
 else(LINUX)
   message("*** Skipping SYSTEMD support")
