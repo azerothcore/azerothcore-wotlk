@@ -43,7 +43,7 @@ public:
         _socket(ioContext), _closed(false), _socketFactory([this](){ return DefaultSocketFactory(); }),
         _supportSocketActivation(supportSocketActivation)
     {
-        #ifdef WITH_SYSTEMD
+#ifdef WITH_SYSTEMD
         if (_supportSocketActivation && sd_listen_fds(0) > 0)
         {
             LOG_DEBUG("network", "Using socket from systemd socket activation");
@@ -54,7 +54,7 @@ public:
                 LOG_WARN("network", "Failed to assign socket {}", errorCode.message());
             }
         }
-        #endif
+#endif
     }
 
     template<class T>
@@ -100,14 +100,14 @@ public:
                 return false;
             }
 
-            #if AC_PLATFORM != AC_PLATFORM_WINDOWS
+#if AC_PLATFORM != AC_PLATFORM_WINDOWS
             _acceptor.set_option(boost::asio::ip::tcp::acceptor::reuse_address(true), errorCode);
             if (errorCode)
             {
                 LOG_INFO("network", "Failed to set reuse_address option on acceptor {}", errorCode.message());
                 return false;
             }
-            #endif
+#endif
 
             _acceptor.bind(_endpoint, errorCode);
             if (errorCode)
