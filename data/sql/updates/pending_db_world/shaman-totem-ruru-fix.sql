@@ -233,47 +233,47 @@ DELETE FROM `creature_template_locale` WHERE `entry`='31129' AND `locale`='ruRU'
 INSERT INTO `creature_template_locale` (`entry`, `locale`, `Name`, `Title`, `VerifiedBuild`) VALUES
 (31129, 'ruRU', 'Тотем силы земли VIII', '', 0);
 DELETE FROM `creature_template_locale` WHERE `entry`='7483' AND `locale`='ruRU';
-INSERT INTO `creature_template_locale` (`entry`, `locale`, `Name`, `Title`, `VerifiedBuild`) VALUES 
+INSERT INTO `creature_template_locale` (`entry`, `locale`, `Name`, `Title`, `VerifiedBuild`) VALUES
 (7483, 'ruRU', 'Тотем неистовства ветра II', '', 0);
 DELETE FROM `creature_template_locale` WHERE `entry`='7484' AND `locale`='ruRU';
-INSERT INTO `creature_template_locale` (`entry`, `locale`, `Name`, `Title`, `VerifiedBuild`) VALUES 
+INSERT INTO `creature_template_locale` (`entry`, `locale`, `Name`, `Title`, `VerifiedBuild`) VALUES
 (7484, 'ruRU', 'Тотем неистовства ветра III', '', 0);
 DELETE FROM `creature_template_locale` WHERE `entry`='15496' AND `locale`='ruRU';
-INSERT INTO `creature_template_locale` (`entry`, `locale`, `Name`, `Title`, `VerifiedBuild`) VALUES 
+INSERT INTO `creature_template_locale` (`entry`, `locale`, `Name`, `Title`, `VerifiedBuild`) VALUES
 (15496, 'ruRU', 'Тотем неистовства ветра IV', '', 0);
 DELETE FROM `creature_template_locale` WHERE `entry`='15497' AND `locale`='ruRU';
-INSERT INTO `creature_template_locale` (`entry`, `locale`, `Name`, `Title`, `VerifiedBuild`) VALUES 
+INSERT INTO `creature_template_locale` (`entry`, `locale`, `Name`, `Title`, `VerifiedBuild`) VALUES
 (15497, 'ruRU', 'Тотем неистовства ветра V', '', 0);
 DELETE FROM `creature_template_locale` WHERE `entry`='11100' AND `locale`='ruRU';
-INSERT INTO `creature_template_locale` (`entry`, `locale`, `Name`, `Title`, `VerifiedBuild`) VALUES 
+INSERT INTO `creature_template_locale` (`entry`, `locale`, `Name`, `Title`, `VerifiedBuild`) VALUES
 (11100, 'ruRU', 'Тотем прилива маны II', '', 0);
 DELETE FROM `creature_template_locale` WHERE `entry`='11101' AND `locale`='ruRU';
-INSERT INTO `creature_template_locale` (`entry`, `locale`, `Name`, `Title`, `VerifiedBuild`) VALUES 
+INSERT INTO `creature_template_locale` (`entry`, `locale`, `Name`, `Title`, `VerifiedBuild`) VALUES
 (11101, 'ruRU', 'Тотем прилива маны III', '', 0);
 DELETE FROM `creature_template_locale` WHERE `entry`='17061' AND `locale`='ruRU';
-INSERT INTO `creature_template_locale` (`entry`, `locale`, `Name`, `Title`, `VerifiedBuild`) VALUES 
+INSERT INTO `creature_template_locale` (`entry`, `locale`, `Name`, `Title`, `VerifiedBuild`) VALUES
 (17061, 'ruRU', 'Тотем прилива маны IV', '', 0);
 DELETE FROM `creature_template_locale` WHERE `entry`='7486' AND `locale`='ruRU';
-INSERT INTO `creature_template_locale` (`entry`, `locale`, `Name`, `Title`, `VerifiedBuild`) VALUES 
+INSERT INTO `creature_template_locale` (`entry`, `locale`, `Name`, `Title`, `VerifiedBuild`) VALUES
 (7486, 'ruRU', 'Тотем легкости воздуха', '', 0);
 DELETE FROM `creature_template_locale` WHERE `entry`='7487' AND `locale`='ruRU';
-INSERT INTO `creature_template_locale` (`entry`, `locale`, `Name`, `Title`, `VerifiedBuild`) VALUES 
+INSERT INTO `creature_template_locale` (`entry`, `locale`, `Name`, `Title`, `VerifiedBuild`) VALUES
 (7487, 'ruRU', 'Тотем легкости воздуха II', '', 0);
 DELETE FROM `creature_template_locale` WHERE `entry`='15463' AND `locale`='ruRU';
-INSERT INTO `creature_template_locale` (`entry`, `locale`, `Name`, `Title`, `VerifiedBuild`) VALUES 
+INSERT INTO `creature_template_locale` (`entry`, `locale`, `Name`, `Title`, `VerifiedBuild`) VALUES
 (15463, 'ruRU', 'Тотем легкости воздуха III', '', 0);
 DELETE FROM `creature_template_locale` WHERE `entry`='30654' AND `locale`='ruRU';
-INSERT INTO `creature_template_locale` (`entry`, `locale`, `Name`, `Title`, `VerifiedBuild`) VALUES 
+INSERT INTO `creature_template_locale` (`entry`, `locale`, `Name`, `Title`, `VerifiedBuild`) VALUES
 (30654, 'ruRU', 'Тотем гнева IV', '', 0);
 DELETE FROM `creature_template_locale` WHERE `entry`='9687' AND `locale`='ruRU';
-INSERT INTO `creature_template_locale` (`entry`, `locale`, `Name`, `Title`, `VerifiedBuild`) VALUES 
+INSERT INTO `creature_template_locale` (`entry`, `locale`, `Name`, `Title`, `VerifiedBuild`) VALUES
 (9687, 'ruRU', 'Тотем стены ветра', '', 0);
 DELETE FROM `creature_template_locale` WHERE `entry`='9688' AND `locale`='ruRU';
-INSERT INTO `creature_template_locale` (`entry`, `locale`, `Name`, `Title`, `VerifiedBuild`) VALUES 
+INSERT INTO `creature_template_locale` (`entry`, `locale`, `Name`, `Title`, `VerifiedBuild`) VALUES
 (9688, 'ruRU', 'Тотем стены ветра II', '', 0);
 DELETE FROM `creature_template_locale` WHERE `entry`='9689' AND `locale`='ruRU';
-INSERT INTO `creature_template_locale` (`entry`, `locale`, `Name`, `Title`, `VerifiedBuild`) VALUES 
+INSERT INTO `creature_template_locale` (`entry`, `locale`, `Name`, `Title`, `VerifiedBuild`) VALUES
 (9689, 'ruRU', 'Тотем стены ветра III', '', 0);
 DELETE FROM `creature_template_locale` WHERE `entry`='15492' AND `locale`='ruRU';
-INSERT INTO `creature_template_locale` (`entry`, `locale`, `Name`, `Title`, `VerifiedBuild`) VALUES 
+INSERT INTO `creature_template_locale` (`entry`, `locale`, `Name`, `Title`, `VerifiedBuild`) VALUES
 (15492, 'ruRU', 'Тотем стены ветра IV', '', 0);
