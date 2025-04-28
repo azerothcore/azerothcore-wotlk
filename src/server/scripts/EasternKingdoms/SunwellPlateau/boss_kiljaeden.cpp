@@ -105,6 +105,11 @@ enum Misc
     ACTION_NO_KILL_TALK             = 2
 };
 
+enum Creatures
+{
+    NPC_BLUE_FLIGHT_DRAKE           = 25653
+};
+
 class CastArmageddon : public BasicEvent
 {
 public:
@@ -471,7 +476,7 @@ struct boss_kiljaeden : public BossAI
                     controller->AI()->Reset();
 
         std::list<Creature*> drakes;
-        me->GetCreatureListWithEntryInGrid(drakes, 25653, 200.0f);
+        me->GetCreatureListWithEntryInGrid(drakes, NPC_BLUE_FLIGHT_DRAKE, 60.0f);
         for (std::list<Creature*>::iterator itr = drakes.begin(); itr != drakes.end(); ++itr)
         {
             if (!(*itr) || !(*itr)->IsInWorld())
