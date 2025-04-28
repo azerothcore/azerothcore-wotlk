@@ -20,11 +20,12 @@
 
 #include "IpAddress.h"
 #include "Log.h"
+#include "systemd.h"
 #include <atomic>
 #include <boost/asio/ip/tcp.hpp>
 #include <functional>
 
-#if AC_PLATFORM == AC_PLATFORM_UNIX
+#ifdef ACORE_WITH_SYSTEMD
 #include <systemd/sd-daemon.h>
 #endif
 
@@ -42,7 +43,7 @@ public:
         _socket(ioContext), _closed(false), _socketFactory([this](){ return DefaultSocketFactory(); }),
         _supportSocketActivation(supportSocketActivation)
     {
-        #if AC_PLATFORM == AC_PLATFORM_UNIX
+        #ifdef ACORE_WITH_SYSTEMD
         if (_supportSocketActivation && sd_listen_fds(0) > 0)
         {
             LOG_DEBUG("network", "Using socket from systemd socket activation");
