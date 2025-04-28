@@ -40,7 +40,7 @@ find_library(WITH_SYSTEMD systemd)
 if(WITH_SYSTEMD)
   message("*** Building with SYSTEMD support")
   target_link_libraries(shared PUBLIC systemd)
-else(LINUX)
+else(UNIX)
   message("*** Skipping SYSTEMD support")
 endif (WITH_SYSTEMD)
 
