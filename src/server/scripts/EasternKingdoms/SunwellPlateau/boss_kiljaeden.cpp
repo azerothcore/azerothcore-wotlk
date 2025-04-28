@@ -462,12 +462,24 @@ struct boss_kiljaeden : public BossAI
         if (me->GetReactState() == REACT_PASSIVE)
             return;
 
+        DoCastAOE(SPELL_DESTROY_ALL_DRAKES, true);
+        
         ScriptedAI::EnterEvadeMode(why);
         if (InstanceScript* instance = me->GetInstanceScript())
             if (Creature* controller = instance->GetCreature(DATA_KJ_CONTROLLER))
                 if (controller->IsAIEnabled)
                     controller->AI()->Reset();
 
+        std::list<Creature*> drakes;
+        me->GetCreatureListWithEntryInGrid(drakes, 25653, 200.0f);
+        for (std::list<Creature*>::iterator itr = drakes.begin(); itr != drakes.end(); ++itr)
+        {
+            if (!(*itr) || !(*itr)->IsInWorld())
+                continue;
+
+            (*itr)->RemoveCorpse();
+            (*itr)->AddObjectToRemoveList();
+        }
         me->DespawnOrUnsummon();
     }
 
