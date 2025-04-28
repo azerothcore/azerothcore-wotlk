@@ -12,22 +12,22 @@ INSERT INTO `creature_template_locale` (`entry`, `locale`, `Name`, `Title`, `Ver
 (15439, 'ruRU', 'Тотем элементаля огня', '', 18019);
 DELETE FROM `creature_template_locale` WHERE `entry`='5927' AND `locale`='ruRU';
 INSERT INTO `creature_template_locale` (`entry`, `locale`, `Name`, `Title`, `VerifiedBuild`) VALUES
-(5927, 'ruRU', 'Тотем защиты от огня', '', 18019);
+(5927, 'ruRU', 'Тотем сопротивления огню', '', 18019);
 DELETE FROM `creature_template_locale` WHERE `entry`='7424' AND `locale`='ruRU';
 INSERT INTO `creature_template_locale` (`entry`, `locale`, `Name`, `Title`, `VerifiedBuild`) VALUES
-(7424, 'ruRU', 'Тотем защиты от огня II', '', 18019);
+(7424, 'ruRU', 'Тотем сопротивления огню II', '', 18019);
 DELETE FROM `creature_template_locale` WHERE `entry`='7425' AND `locale`='ruRU';
 INSERT INTO `creature_template_locale` (`entry`, `locale`, `Name`, `Title`, `VerifiedBuild`) VALUES
-(7425, 'ruRU', 'Тотем защиты от огня III', '', 18019);
+(7425, 'ruRU', 'Тотем сопротивления огню III', '', 18019);
 DELETE FROM `creature_template_locale` WHERE `entry`='15487' AND `locale`='ruRU';
 INSERT INTO `creature_template_locale` (`entry`, `locale`, `Name`, `Title`, `VerifiedBuild`) VALUES
-(15487, 'ruRU', 'Тотем защиты от огня IV', '', 18019);
+(15487, 'ruRU', 'Тотем сопротивления огню IV', '', 18019);
 DELETE FROM `creature_template_locale` WHERE `entry`='31169' AND `locale`='ruRU';
 INSERT INTO `creature_template_locale` (`entry`, `locale`, `Name`, `Title`, `VerifiedBuild`) VALUES
-(31169, 'ruRU', 'Тотем защиты от огня V', '', 18019);
+(31169, 'ruRU', 'Тотем сопротивления огню V', '', 18019);
 DELETE FROM `creature_template_locale` WHERE `entry`='31170' AND `locale`='ruRU';
 INSERT INTO `creature_template_locale` (`entry`, `locale`, `Name`, `Title`, `VerifiedBuild`) VALUES
-(31170, 'ruRU', 'Тотем защиты от огня VI', '', 18019);
+(31170, 'ruRU', 'Тотем сопротивления огню VI', '', 18019);
 DELETE FROM `creature_template_locale` WHERE `entry`='5950' AND `locale`='ruRU';
 INSERT INTO `creature_template_locale` (`entry`, `locale`, `Name`, `Title`, `VerifiedBuild`) VALUES
 (5950, 'ruRU', 'Тотем языка пламени', '', 18019);
