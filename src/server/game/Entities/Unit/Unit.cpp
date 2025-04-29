@@ -17583,18 +17583,19 @@ bool Unit::IsTriggeredAtSpellProcEvent(Unit* victim, Aura* aura, WeaponAttackTyp
 
         if (attacker)
         {
+            //not melee or ranged strike spells
             if (procSpell && procSpell->StartRecoveryCategory == 133 && procSpell->StartRecoveryTime == 1500 && procSpell->DmgClass != SPELL_DAMAGE_CLASS_MELEE &&
                 procSpell->DmgClass != SPELL_DAMAGE_CLASS_RANGED && !procSpell->HasAttribute(SPELL_ATTR0_USES_RANGED_SLOT) && !procSpell->HasAttribute(SPELL_ATTR0_IS_ABILITY))
             {
+                //instant casts use a cast time of 1.5s
                 attackSpeed = procSpell->CastTimeEntry && procSpell->CastTimeEntry->CastTime > 0 ? procSpell->CastTimeEntry->CastTime : 1500;
             }
-            else {
+            else
+            {
                 attackSpeed = attacker->GetAttackTime(attType);
             }
         }
-        uint32 oldChance = GetPPMProcChance(attacker->GetAttackTime(attType), spellProcEvent->ppmRate, spellProto);
         chance = GetPPMProcChance(attackSpeed, spellProcEvent->ppmRate, spellProto);
-        LOG_INFO("server.worldserver", "PPM Spell: {} wants to proc with chance {}%, old chance was: {}%", spellProto->SpellName[0], chance, oldChance);
     }
 
     // Custom chances
