@@ -1,3 +1,4 @@
+-- DB update 2025_04_26_00 -> 2025_04_29_00
 
 -- Add Waypoint for Knight Commander Plaguefist (sniffed)
 DELETE FROM `waypoint_data` WHERE `id` IN (12994700);
