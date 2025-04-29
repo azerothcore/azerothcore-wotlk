@@ -17587,8 +17587,12 @@ bool Unit::IsTriggeredAtSpellProcEvent(Unit* victim, Aura* aura, WeaponAttackTyp
             if (procSpell && procSpell->StartRecoveryCategory == 133 && procSpell->StartRecoveryTime == 1500 && procSpell->DmgClass != SPELL_DAMAGE_CLASS_MELEE &&
                 procSpell->DmgClass != SPELL_DAMAGE_CLASS_RANGED && !procSpell->HasAttribute(SPELL_ATTR0_USES_RANGED_SLOT) && !procSpell->HasAttribute(SPELL_ATTR0_IS_ABILITY))
             {
-                //instant casts use a cast time of 1.5s
-                attackSpeed = procSpell->CastTimeEntry && procSpell->CastTimeEntry->CastTime > 0 ? procSpell->CastTimeEntry->CastTime : 1500;
+                if (procSpell->CastTimeEntry)
+                    attackSpeed = procSpell->CastTimeEntry->CastTime;
+
+                //instants and fast spells use 1.5s castspeed
+                if (attackSpeed < 1500)
+                    attackSpeed = 1500;
             }
             else
             {
