@@ -4909,6 +4909,12 @@ void SpellMgr::LoadSpellInfoCorrections()
         spellInfo->AttributesEx3 |= SPELL_ATTR3_SUPPRESS_CASTER_PROCS;
     });
 
+    // Torch (Death Knights near the Chapel)
+    ApplySpellFix({ 52953 }, [](SpellInfo* spellInfo)
+        {
+            spellInfo->MaxAffectedTargets = 1;
+        });
+
     // Missile Barrage
     ApplySpellFix({ 44401 }, [](SpellInfo* spellInfo)
     {
