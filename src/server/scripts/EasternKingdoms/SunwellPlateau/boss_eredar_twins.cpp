@@ -399,11 +399,6 @@ class spell_eredar_twins_flame_sear : public SpellScript
 {
     PrepareSpellScript(spell_eredar_twins_flame_sear);
 
-    bool Validate(SpellInfo const* /*spellInfo*/) override
-    {
-        return ValidateSpellInfo({ SPELL_FLAME_SEAR });
-    }
-
     void FilterTargets(std::list<WorldObject*>& targets)
     {
         Acore::Containers::RandomResize(targets,5);
