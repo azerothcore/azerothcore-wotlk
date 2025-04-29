@@ -17574,16 +17574,27 @@ bool Unit::IsTriggeredAtSpellProcEvent(Unit* victim, Aura* aura, WeaponAttackTyp
     // If PPM exist calculate chance from PPM
     if (spellProcEvent && spellProcEvent->ppmRate != 0)
     {
+        uint32 attackSpeed = 0;
+        Unit* attacker = nullptr;
         if (!isVictim)
-        {
-            uint32 WeaponSpeed = GetAttackTime(attType);
-            chance = GetPPMProcChance(WeaponSpeed, spellProcEvent->ppmRate, spellProto);
-        }
+            attacker = this;
         else if (victim)
+            attacker = victim;
+
+        if (attacker)
         {
-            uint32 WeaponSpeed = victim->GetAttackTime(attType);
-            chance = victim->GetPPMProcChance(WeaponSpeed, spellProcEvent->ppmRate, spellProto);
+            if (procSpell && procSpell->StartRecoveryCategory == 133 && procSpell->StartRecoveryTime == 1500 && procSpell->DmgClass != SPELL_DAMAGE_CLASS_MELEE &&
+                procSpell->DmgClass != SPELL_DAMAGE_CLASS_RANGED && !procSpell->HasAttribute(SPELL_ATTR0_USES_RANGED_SLOT) && !procSpell->HasAttribute(SPELL_ATTR0_IS_ABILITY))
+            {
+                attackSpeed = procSpell->CastTimeEntry && procSpell->CastTimeEntry->CastTime > 0 ? procSpell->CastTimeEntry->CastTime : 1500;
+            }
+            else {
+                attackSpeed = attacker->GetAttackTime(attType);
+            }
         }
+        uint32 oldChance = GetPPMProcChance(attacker->GetAttackTime(attType), spellProcEvent->ppmRate, spellProto);
+        chance = GetPPMProcChance(attackSpeed, spellProcEvent->ppmRate, spellProto);
+        LOG_INFO("server.worldserver", "PPM Spell: {} wants to proc with chance {}%, old chance was: {}%", spellProto->SpellName[0], chance, oldChance);
     }
 
     // Custom chances
