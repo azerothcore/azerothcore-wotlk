@@ -105,11 +105,6 @@ enum Misc
     ACTION_NO_KILL_TALK             = 2
 };
 
-enum Creatures
-{
-    NPC_BLUE_FLIGHT_DRAKE           = 25653
-};
-
 class CastArmageddon : public BasicEvent
 {
 public:
