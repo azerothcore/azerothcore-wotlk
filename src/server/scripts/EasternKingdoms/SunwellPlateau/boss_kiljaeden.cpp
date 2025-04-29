@@ -79,6 +79,10 @@ enum Spells
     SPELL_SINISTER_REFLECTION_SUMMON            = 45891,
     SPELL_SINISTER_REFLECTION_CLASS             = 45893,
     SPELL_SINISTER_REFLECTION_CLONE             = 45785,
+    // TODO
+    // These should be applied to target of SPELL_SINISTER_REFLECTION but not implemented
+    //SPELL_SINISTER_COPY_WEAPON                  = 41054,
+    //SPELL_SINISTER_COPY_OFFHAND_WEAPON          = 45205,
 
     // Misc
     SPELL_ANVEENA_ENERGY_DRAIN                  = 46410,
@@ -270,9 +274,6 @@ struct boss_kiljaeden : public BossAI
             me->m_Events.AddEventAtOffset([&] {
                 Talk(SAY_KJ_REFLECTION);
                 me->CastCustomSpell(SPELL_SINISTER_REFLECTION, SPELLVALUE_MAX_TARGETS, 1, me, TRIGGERED_NONE);
-                me->CastCustomSpell(SPELL_SINISTER_REFLECTION, SPELLVALUE_MAX_TARGETS, 1, me, TRIGGERED_NONE);
-                me->CastCustomSpell(SPELL_SINISTER_REFLECTION, SPELLVALUE_MAX_TARGETS, 1, me, TRIGGERED_NONE);
-                me->CastCustomSpell(SPELL_SINISTER_REFLECTION, SPELLVALUE_MAX_TARGETS, 1, me, TRIGGERED_NONE);
             }, 1s);
 
             scheduler.Schedule(1s+200ms, [this](TaskContext)
@@ -313,9 +314,6 @@ struct boss_kiljaeden : public BossAI
             me->m_Events.AddEventAtOffset([&] {
                 Talk(SAY_KJ_REFLECTION);
                 me->CastCustomSpell(SPELL_SINISTER_REFLECTION, SPELLVALUE_MAX_TARGETS, 1, me, TRIGGERED_NONE);
-                me->CastCustomSpell(SPELL_SINISTER_REFLECTION, SPELLVALUE_MAX_TARGETS, 1, me, TRIGGERED_NONE);
-                me->CastCustomSpell(SPELL_SINISTER_REFLECTION, SPELLVALUE_MAX_TARGETS, 1, me, TRIGGERED_NONE);
-                me->CastCustomSpell(SPELL_SINISTER_REFLECTION, SPELLVALUE_MAX_TARGETS, 1, me, TRIGGERED_NONE);
             }, 1s);
 
             scheduler.Schedule(1s + 200ms, [this](TaskContext)
@@ -324,8 +322,14 @@ struct boss_kiljaeden : public BossAI
             });
 
             ScheduleTimedEvent(15s, [&] {
+                me->RemoveAurasDueToSpell(SPELL_ARMAGEDDON_PERIODIC);
                 Talk(EMOTE_KJ_DARKNESS);
                 DoCastAOE(SPELL_DARKNESS_OF_A_THOUSAND_SOULS);
+
+                me->m_Events.AddEventAtOffset([this]() {
+                    if (me->IsAlive() && me->IsInCombat())
+                        DoCastSelf(SPELL_ARMAGEDDON_PERIODIC, true);
+                }, 9s);
             }, 45s);
 
             ScheduleTimedEvent(10s, [&] {
@@ -338,9 +342,6 @@ struct boss_kiljaeden : public BossAI
 
             me->m_Events.AddEventAtOffset([&] {
                 Talk(SAY_KJ_REFLECTION);
-                me->CastCustomSpell(SPELL_SINISTER_REFLECTION, SPELLVALUE_MAX_TARGETS, 1, me, TRIGGERED_NONE);
-                me->CastCustomSpell(SPELL_SINISTER_REFLECTION, SPELLVALUE_MAX_TARGETS, 1, me, TRIGGERED_NONE);
-                me->CastCustomSpell(SPELL_SINISTER_REFLECTION, SPELLVALUE_MAX_TARGETS, 1, me, TRIGGERED_NONE);
                 me->CastCustomSpell(SPELL_SINISTER_REFLECTION, SPELLVALUE_MAX_TARGETS, 1, me, TRIGGERED_NONE);
             }, 1s);
 
@@ -385,8 +386,14 @@ struct boss_kiljaeden : public BossAI
                         ScheduleBasicAbilities();
 
                         ScheduleTimedEvent(25s, [&] {
+                            me->RemoveAurasDueToSpell(SPELL_ARMAGEDDON_PERIODIC);
                             Talk(EMOTE_KJ_DARKNESS);
                             DoCastAOE(SPELL_DARKNESS_OF_A_THOUSAND_SOULS);
+
+                            me->m_Events.AddEventAtOffset([this]() {
+                                if (me->IsAlive() && me->IsInCombat())
+                                    DoCastSelf(SPELL_ARMAGEDDON_PERIODIC, true);
+                            }, 9s);
                         }, 25s);
 
                         ScheduleTimedEvent(1500ms, [&] {
@@ -525,7 +532,7 @@ struct boss_kiljaeden : public BossAI
             summon->CastSpell(summon, SPELL_ARMAGEDDON_VISUAL, true);
             summon->SetPosition(summon->GetPositionX(), summon->GetPositionY(), summon->GetPositionZ() + 20.0f, 0.0f);
             summon->m_Events.AddEvent(new CastArmageddon(summon), summon->m_Events.CalculateTime(6000));
-            summon->DespawnOrUnsummon(10000);
+            summon->DespawnOrUnsummon(urand(8000, 10000));
         }
     }
 
@@ -948,8 +955,14 @@ class spell_kiljaeden_sinister_reflection : public SpellScript
         PreventHitDefaultEffect(effIndex);
         if (Unit* target = GetHitUnit())
         {
-            target->CastSpell(target, SPELL_SINISTER_REFLECTION_SUMMON, true);
-            //target->CastSpell(target, SPELL_SINISTER_REFLECTION_CLONE, true);
+            for (uint8 i = 0; i < 4; ++i)
+            {
+                target->CastSpell(target, SPELL_SINISTER_REFLECTION_SUMMON, true);
+            }
+            // TODO implement these auras
+            //target->AddAura(SPELL_SINISTER_COPY_WEAPON, target);
+            //target->AddAura(SPELL_SINISTER_COPY_OFFHAND_WEAPON, target);
+            target->CastSpell(target, SPELL_SINISTER_REFLECTION_CLONE, true);
         }
     }
 
@@ -1087,8 +1100,15 @@ class spell_kiljaeden_armageddon_periodic_aura : public AuraScript
     void HandlePeriodic(AuraEffect const* aurEff)
     {
         PreventDefaultAction();
-        if (Unit* target = GetUnitOwner()->GetAI()->SelectTarget(SelectTargetMethod::Random, 0, 60.0f, true))
-            GetUnitOwner()->CastSpell(target, GetSpellInfo()->Effects[aurEff->GetEffIndex()].TriggerSpell, true);
+        Unit* caster = GetUnitOwner();
+
+        std::list<Creature*> armageddons;
+        caster->GetCreatureListWithEntryInGrid(armageddons, NPC_ARMAGEDDON_TARGET, 100.0f);
+        if (armageddons.size() >= 3)
+            return;
+
+        if (Unit* target = caster->GetAI()->SelectTarget(SelectTargetMethod::Random, 0, 60.0f, true))
+            caster->CastSpell(target, GetSpellInfo()->Effects[aurEff->GetEffIndex()].TriggerSpell, true);
     }
 
     void Register() override

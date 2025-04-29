@@ -119,7 +119,7 @@ struct boss_sacrolash : public BossAI
 
             scheduler.CancelGroup(GROUP_SPECIAL_ABILITY);
             ScheduleTimedEvent(20s, [&] {
-                Unit* target = SelectTarget(SelectTargetMethod::MaxThreat, 1, 100.0f);
+                Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 100.0f, true, false);
                 if (!target)
                     target = me->GetVictim();
 
@@ -153,7 +153,14 @@ struct boss_sacrolash : public BossAI
         }, 8s, 12s);
 
         scheduler.Schedule(36s, GROUP_SPECIAL_ABILITY, [this](TaskContext context) {
-            Unit* target = SelectTarget(SelectTargetMethod::MaxThreat, 1, 100.0f);
+            Unit* target = nullptr;
+            if (Creature* alythess = instance->GetCreature(DATA_ALYTHESS))
+            {
+                std::list<Unit*> targets;
+                alythess->AI()->SelectTargetList(targets, 6, SelectTargetMethod::MaxThreat, 0, 100.0f, true, false);
+                if (!targets.empty())
+                    target = Acore::Containers::SelectRandomContainerElement(targets);
+            }
             if (!target)
                 target = me->GetVictim();
             Talk(EMOTE_SHADOW_NOVA, target);
@@ -229,17 +236,22 @@ struct boss_alythess : public BossAI
             me->CastSpell(me, SPELL_EMPOWER, true);
 
             scheduler.CancelAll();
-            // PYROGENICS Phase 2
+
+            ScheduleTimedEvent(1s, [&] {
+                DoCastVictim(SPELL_BLAZE);
+            }, 3800ms);
+
             scheduler.Schedule(16s, GROUP_PYROGENICS, [this](TaskContext context) {
                 DoCastSelf(SPELL_PYROGENICS);
                 context.Repeat(16s, 28s);
             });
-            // FLAME_SEAR phase 2
+
             ScheduleTimedEvent(8s, 10s, [&] {
                 me->CastCustomSpell(SPELL_FLAME_SEAR, SPELLVALUE_MAX_TARGETS, urand(4, 5), me, TRIGGERED_NONE);
-            }, 8s, 10s, GROUP_FLAME_SEAR);
+            }, 8s, 10s);
+
             ScheduleTimedEvent(20s, 26s, [&] {
-                Unit* target = SelectTarget(SelectTargetMethod::MaxThreat, 1, 100.0f);
+                Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 100.0f, true, false);
                 if (!target)
                     target = me->GetVictim();
                 DoCast(target, SPELL_SHADOW_NOVA);
@@ -272,10 +284,17 @@ struct boss_alythess : public BossAI
         // FLAME_SEAR Phase 1
         ScheduleTimedEvent(10s, 15s, [&] {
             me->CastCustomSpell(SPELL_FLAME_SEAR, SPELLVALUE_MAX_TARGETS, urand(4, 5), me, TRIGGERED_NONE);
-        }, 10s, 15s, GROUP_FLAME_SEAR);
+        }, 10s, 15s);
 
         scheduler.Schedule(20s, GROUP_SPECIAL_ABILITY, [this](TaskContext context) {
-            Unit* target = SelectTarget(SelectTargetMethod::MaxThreat, 1, 100.0f);
+            Unit* target = nullptr;
+            if (Creature* sacrolash = instance->GetCreature(DATA_SACROLASH))
+            {
+                std::list<Unit*> targets;
+                sacrolash->AI()->SelectTargetList(targets, 6, SelectTargetMethod::MaxThreat, 0, 100.0f, true, false);
+                if (!targets.empty())
+                    target = Acore::Containers::SelectRandomContainerElement(targets);
+            }
             if (!target)
                 target = me->GetVictim();
             Talk(EMOTE_CONFLAGRATION, target);
