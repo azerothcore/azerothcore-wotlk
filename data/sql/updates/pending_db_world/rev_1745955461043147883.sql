@@ -1,2 +1,2 @@
 --
-DELETE FROM `spell_proc_event` WHERE `entry` IN (20186, 20185);
+UPDATE `spell_proc_event` SET `procFlags` = 0 WHERE `entry` IN (20186, 20185);
