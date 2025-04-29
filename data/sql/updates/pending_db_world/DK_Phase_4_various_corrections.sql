@@ -25,20 +25,20 @@ DELETE FROM `creature` WHERE (`id1` = 29038) AND (`guid` IN (129920, 129921, 129
 
 -- Update Triggers' positions (sniffed)
 UPDATE `creature` SET `wander_distance` = 0, `MovementType` = 0 WHERE (`id1` = 29038);
-UPDATE `creature` SET `position_x` = 1382.6744, `position_y` = -5700.4575, `position_z` = 156.20384, `orientation` = 2.40855 WHERE (`id1` IN(29038)) AND (`guid` IN(129906));
-UPDATE `creature` SET `position_x` = 1366.528, `position_y` = -5701.2534, `position_z` = 147.08313, `orientation` = 1.30899 WHERE (`id1` IN(29038)) AND (`guid` IN(129907));
-UPDATE `creature` SET `position_x` = 1365.096, `position_y` = -5699.7446, `position_z` = 138.45604, `orientation` = 5.04400 WHERE (`id1` IN(29038)) AND (`guid` IN(129908));
-UPDATE `creature` SET `position_x` = 1371.1465, `position_y` = -5705.8774, `position_z` = 136.49808, `orientation` = 5.25344 WHERE (`id1` IN(29038)) AND (`guid` IN(129909));
-UPDATE `creature` SET `position_x` = 1384.8456, `position_y` = -5699.0986, `position_z` = 138.05069, `orientation` = 1.78023 WHERE (`id1` IN(29038)) AND (`guid` IN(129910));
-UPDATE `creature` SET `position_x` = 1386.3185, `position_y` = -5704.4565, `position_z` = 137.52542, `orientation` = 2.16420 WHERE (`id1` IN(29038)) AND (`guid` IN(129911));
-UPDATE `creature` SET `position_x` = 1384.8456, `position_y` = -5699.0986, `position_z` = 138.05069, `orientation` = 1.78023 WHERE (`id1` IN(29038)) AND (`guid` IN(129912));
-UPDATE `creature` SET `position_x` = 1380.1602, `position_y` = -5701.692, `position_z` = 164.21506, `orientation` = 5.16617 WHERE (`id1` IN(29038)) AND (`guid` IN(129913));
-UPDATE `creature` SET `position_x` = 1375.4838, `position_y` = -5700.0117, `position_z` = 150.63083, `orientation` = 3.82227 WHERE (`id1` IN(29038)) AND (`guid` IN(129914));
-UPDATE `creature` SET `position_x` = 1376.7048, `position_y` = -5700.71, `position_z` = 138.45558, `orientation` = 3.49065 WHERE (`id1` IN(29038)) AND (`guid` IN(129915));
-UPDATE `creature` SET `position_x` = 1369.781, `position_y` = -5702.2817, `position_z` = 138.52371, `orientation` = 0.94247 WHERE (`id1` IN(29038)) AND (`guid` IN(129916));
-UPDATE `creature` SET `position_x` = 1370.8365, `position_y` = -5700.444, `position_z` = 148.90135, `orientation` = 5.68977 WHERE (`id1` IN(29038)) AND (`guid` IN(129917));
-UPDATE `creature` SET `position_x` = 1383.7201, `position_y` = -5700.9634, `position_z` = 145.79176, `orientation` = 1.46607 WHERE (`id1` IN(29038)) AND (`guid` IN(129918));
-UPDATE `creature` SET `position_x` = 1372.7944, `position_y` = -5705.7993, `position_z` = 147.11938, `orientation` = 2.72271 WHERE (`id1` IN(29038)) AND (`guid` IN(129919));
+UPDATE `creature` SET `position_x` = 1382.6744, `position_y` = -5700.4575, `position_z` = 156.20384, `orientation` = 2.40855, `VerifiedBuild` = 60192 WHERE (`id1` IN(29038)) AND (`guid` IN(129906));
+UPDATE `creature` SET `position_x` = 1366.528, `position_y` = -5701.2534, `position_z` = 147.08313, `orientation` = 1.30899, `VerifiedBuild` = 60192 WHERE (`id1` IN(29038)) AND (`guid` IN(129907));
+UPDATE `creature` SET `position_x` = 1365.096, `position_y` = -5699.7446, `position_z` = 138.45604, `orientation` = 5.04400, `VerifiedBuild` = 60192 WHERE (`id1` IN(29038)) AND (`guid` IN(129908));
+UPDATE `creature` SET `position_x` = 1371.1465, `position_y` = -5705.8774, `position_z` = 136.49808, `orientation` = 5.25344, `VerifiedBuild` = 60192 WHERE (`id1` IN(29038)) AND (`guid` IN(129909));
+UPDATE `creature` SET `position_x` = 1384.8456, `position_y` = -5699.0986, `position_z` = 138.05069, `orientation` = 1.78023, `VerifiedBuild` = 60192 WHERE (`id1` IN(29038)) AND (`guid` IN(129910));
+UPDATE `creature` SET `position_x` = 1386.3185, `position_y` = -5704.4565, `position_z` = 137.52542, `orientation` = 2.16420, `VerifiedBuild` = 60192 WHERE (`id1` IN(29038)) AND (`guid` IN(129911));
+UPDATE `creature` SET `position_x` = 1384.8456, `position_y` = -5699.0986, `position_z` = 138.05069, `orientation` = 1.78023, `VerifiedBuild` = 60192 WHERE (`id1` IN(29038)) AND (`guid` IN(129912));
+UPDATE `creature` SET `position_x` = 1380.1602, `position_y` = -5701.692, `position_z` = 164.21506, `orientation` = 5.16617, `VerifiedBuild` = 60192 WHERE (`id1` IN(29038)) AND (`guid` IN(129913));
+UPDATE `creature` SET `position_x` = 1375.4838, `position_y` = -5700.0117, `position_z` = 150.63083, `orientation` = 3.82227, `VerifiedBuild` = 60192 WHERE (`id1` IN(29038)) AND (`guid` IN(129914));
+UPDATE `creature` SET `position_x` = 1376.7048, `position_y` = -5700.71, `position_z` = 138.45558, `orientation` = 3.49065, `VerifiedBuild` = 60192 WHERE (`id1` IN(29038)) AND (`guid` IN(129915));
+UPDATE `creature` SET `position_x` = 1369.781, `position_y` = -5702.2817, `position_z` = 138.52371, `orientation` = 0.94247, `VerifiedBuild` = 60192 WHERE (`id1` IN(29038)) AND (`guid` IN(129916));
+UPDATE `creature` SET `position_x` = 1370.8365, `position_y` = -5700.444, `position_z` = 148.90135, `orientation` = 5.68977, `VerifiedBuild` = 60192 WHERE (`id1` IN(29038)) AND (`guid` IN(129917));
+UPDATE `creature` SET `position_x` = 1383.7201, `position_y` = -5700.9634, `position_z` = 145.79176, `orientation` = 1.46607, `VerifiedBuild` = 60192 WHERE (`id1` IN(29038)) AND (`guid` IN(129918));
+UPDATE `creature` SET `position_x` = 1372.7944, `position_y` = -5705.7993, `position_z` = 147.11938, `orientation` = 2.72271, `VerifiedBuild` = 60192 WHERE (`id1` IN(29038)) AND (`guid` IN(129919));
 
 -- Edit SmartAI for Triggers
 UPDATE `creature_template` SET `AIName` = 'SmartAI' WHERE `entry` = 29038;
