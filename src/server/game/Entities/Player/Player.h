@@ -2884,6 +2884,9 @@ protected:
     uint8 m_swingErrorMsg;
     float m_ammoDPS;
 
+    float m_Expertise;
+    float m_OffhandExpertise;
+
     ////////////////////Rest System/////////////////////
     time_t _restTime;
     uint32 _innTriggerId;
