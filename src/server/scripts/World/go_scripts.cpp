@@ -457,12 +457,18 @@ public:
 ####*/
 enum L70ETCMusic
 {
-    MUSIC_L70_ETC_MUSIC = 11803
+    MUSIC_L70_ETC_MUSIC = 11803,
+    MUSIC_L70_ETC_MUSIC_LOUD = 12868
 };
 
 enum L70ETCMusicEvents
 {
     EVENT_ETC_START_MUSIC = 1
+};
+
+enum L70ETCMusicAreas
+{
+    BLACKROCK_DEPTHS = 1584
 };
 
 class go_l70_etc_music : public GameObjectScript
@@ -485,7 +491,10 @@ public:
                 switch (eventId)
                 {
                 case EVENT_ETC_START_MUSIC:
-                    me->PlayDirectMusic(MUSIC_L70_ETC_MUSIC);
+                    if (me->GetAreaId() == BLACKROCK_DEPTHS)
+                        me->PlayDirectMusic(MUSIC_L70_ETC_MUSIC_LOUD);
+                    else
+                        me->PlayDirectMusic(MUSIC_L70_ETC_MUSIC);
                     _events.ScheduleEvent(EVENT_ETC_START_MUSIC, 1600);  // Every 1.6 seconds SMSG_PLAY_MUSIC packet (PlayDirectMusic) is pushed to the client (sniffed value)
                     break;
                 default:
