@@ -522,7 +522,7 @@ struct boss_kiljaeden : public BossAI
         Talk(SAY_KJ_EMERGE);
         ScheduleBasicAbilities();
     }
-    
+
     void JustSummoned(Creature* summon) override
     {
         BossAI::JustSummoned(summon);
