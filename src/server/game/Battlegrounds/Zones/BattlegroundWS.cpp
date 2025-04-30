@@ -281,7 +281,7 @@ void BattlegroundWS::EventBotCapturedFlag(Creature* bot)
     SpawnBGObject(BG_WS_OBJECT_H_FLAG, BG_WS_FLAG_RESPAWN_TIME);
     SpawnBGObject(BG_WS_OBJECT_A_FLAG, BG_WS_FLAG_RESPAWN_TIME);
 
-    UpdateWorldState(GetBotTeamId(bot->GetGUID()) == TEAM_ALLIANCE ? BG_WS_FLAG_CAPTURES_ALLIANCE : BG_WS_FLAG_CAPTURES_HORDE, GetTeamScore(GetBotTeamId(bot->GetGUID())));
+    UpdateWorldState(GetBotTeamId(bot->GetGUID()) == TEAM_ALLIANCE ? WORLD_STATE_BATTLEGROUND_WS_FLAG_CAPTURES_ALLIANCE : WORLD_STATE_BATTLEGROUND_WS_FLAG_CAPTURES_HORDE, GetTeamScore(GetBotTeamId(bot->GetGUID())));
     UpdateBotScore(bot, SCORE_FLAG_CAPTURES, 1);      // +1 flag captures
     _lastFlagCaptureTeam = GetBotTeamId(bot->GetGUID());
 
@@ -289,7 +289,7 @@ void BattlegroundWS::EventBotCapturedFlag(Creature* bot)
 
     if (GetTeamScore(TEAM_ALLIANCE) == BG_WS_MAX_TEAM_SCORE || GetTeamScore(TEAM_HORDE) == BG_WS_MAX_TEAM_SCORE)
     {
-        UpdateWorldState(BG_WS_STATE_TIMER_ACTIVE, 0);
+        UpdateWorldState(WORLD_STATE_BATTLEGROUND_WS_STATE_TIMER_ACTIVE, 0);
         EndBattleground(GetTeamScore(TEAM_HORDE) == BG_WS_MAX_TEAM_SCORE ? TEAM_HORDE : TEAM_ALLIANCE);
     }
     else

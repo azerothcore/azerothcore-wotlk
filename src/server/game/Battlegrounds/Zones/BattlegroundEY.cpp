@@ -624,7 +624,7 @@ void BattlegroundEY::EventBotClickedOnFlag(Creature* bot, GameObject* target_obj
     bot->RemoveAurasWithInterruptFlags(AURA_INTERRUPT_FLAG_ENTER_PVP_COMBAT);
 
     PlaySoundToAll(botteamid == TEAM_ALLIANCE ? BG_EY_SOUND_FLAG_PICKED_UP_ALLIANCE : BG_EY_SOUND_FLAG_PICKED_UP_HORDE);
-    UpdateWorldState(NETHERSTORM_FLAG, 0);
+    UpdateWorldState(WORLD_STATE_BATTLEGROUND_EY_FLAG, 0);
 
     if (botteamid == TEAM_ALLIANCE)
         SendBroadcastText(BG_EY_TEXT_TAKEN_FLAG, CHAT_MSG_BG_SYSTEM_ALLIANCE, bot);
