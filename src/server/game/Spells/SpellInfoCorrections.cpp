@@ -272,18 +272,11 @@ void SpellMgr::LoadSpellInfoCorrections()
         54741,  // Firestarter
         64823,  // Item - Druid T8 Balance 4P Bonus
         34477,  // Misdirection
-        44401,  // Missile Barrage
-        18820   // Insight
+        18820,  // Insight
+        57761   // Fireball!
         }, [](SpellInfo* spellInfo)
     {
         spellInfo->ProcCharges = 1;
-    });
-
-    // Fireball
-    ApplySpellFix({ 57761 }, [](SpellInfo* spellInfo)
-    {
-        spellInfo->ProcCharges = 1;
-        spellInfo->SpellPriority = 50;
     });
 
     // Tidal Wave
@@ -4921,6 +4914,13 @@ void SpellMgr::LoadSpellInfoCorrections()
         {
             spellInfo->MaxAffectedTargets = 1;
         });
+
+    // Missile Barrage
+    ApplySpellFix({ 44401 }, [](SpellInfo* spellInfo)
+    {
+        spellInfo->ProcCharges = 1;
+        spellInfo->SpellPriority = 100;
+    });
 
     for (uint32 i = 0; i < GetSpellInfoStoreSize(); ++i)
     {
