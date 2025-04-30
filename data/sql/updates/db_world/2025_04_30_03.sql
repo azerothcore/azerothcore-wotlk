@@ -1,3 +1,4 @@
+-- DB update 2025_04_30_02 -> 2025_04_30_03
 --
 DELETE FROM `spell_group` WHERE `id` = 1024;
 DELETE FROM `spell_group_stack_rules` WHERE `group_id` = 1024;
