@@ -247,7 +247,7 @@ struct boss_alythess : public BossAI
             });
 
             ScheduleTimedEvent(8s, 10s, [&] {
-                me->CastCustomSpell(SPELL_FLAME_SEAR, SPELLVALUE_MAX_TARGETS, urand(4, 5), me, TRIGGERED_NONE);
+                DoCast(SPELL_FLAME_SEAR);
             }, 8s, 10s);
 
             ScheduleTimedEvent(20s, 26s, [&] {
@@ -283,7 +283,7 @@ struct boss_alythess : public BossAI
 
         // FLAME_SEAR Phase 1
         ScheduleTimedEvent(10s, 15s, [&] {
-            me->CastCustomSpell(SPELL_FLAME_SEAR, SPELLVALUE_MAX_TARGETS, urand(4, 5), me, TRIGGERED_NONE);
+            DoCast(SPELL_FLAME_SEAR);
         }, 10s, 15s);
 
         scheduler.Schedule(20s, GROUP_SPECIAL_ABILITY, [this](TaskContext context) {
@@ -395,6 +395,22 @@ class spell_eredar_twins_handle_touch : public SpellScript
     }
 };
 
+class spell_eredar_twins_flame_sear : public SpellScript
+{
+    PrepareSpellScript(spell_eredar_twins_flame_sear);
+
+    void FilterTargets(std::list<WorldObject*>& targets)
+    {
+        Acore::Containers::RandomResize(targets,5);
+        targets.remove(GetCaster()->GetVictim());
+    }
+
+    void Register() override
+    {
+        OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_eredar_twins_flame_sear::FilterTargets, EFFECT_ALL, TARGET_UNIT_SRC_AREA_ENEMY);
+    }
+};
+
 class spell_eredar_twins_blaze : public SpellScript
 {
     PrepareSpellScript(spell_eredar_twins_blaze);
@@ -480,6 +496,7 @@ void AddSC_boss_eredar_twins()
     RegisterSpellScriptWithArgs(spell_eredar_twins_apply_touch, "spell_eredar_twins_apply_flame_touched", SPELL_FLAME_TOUCHED);
     RegisterSpellScript(spell_eredar_twins_handle_touch);
     RegisterSpellScript(spell_eredar_twins_blaze);
+    RegisterSpellScript(spell_eredar_twins_flame_sear);
     RegisterSpellScriptWithArgs(spell_eredar_twins_handle_touch_periodic, "spell_eredar_twins_handle_dark_touched_periodic", SPELL_DARK_TOUCHED, EFFECT_1, SPELL_AURA_PERIODIC_DAMAGE);
     RegisterSpellScriptWithArgs(spell_eredar_twins_handle_touch_periodic, "spell_eredar_twins_handle_flame_touched_periodic", SPELL_FLAME_TOUCHED, EFFECT_2, SPELL_AURA_PERIODIC_TRIGGER_SPELL);
     RegisterSpellScriptWithArgs(spell_eredar_twins_handle_touch_periodic, "spell_eredar_twins_handle_flame_touched_flame_sear", SPELL_FLAME_TOUCHED, EFFECT_1, SPELL_AURA_PERIODIC_DAMAGE);
