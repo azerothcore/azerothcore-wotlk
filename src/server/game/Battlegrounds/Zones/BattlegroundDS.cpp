@@ -22,7 +22,6 @@
 #include "ObjectAccessor.h"
 #include "Player.h"
 #include "WorldPacket.h"
-#include "WorldStateDefines.h"
 #include "WorldStatePackets.h"
 
 BattlegroundDS::BattlegroundDS()
@@ -177,7 +176,7 @@ bool BattlegroundDS::HandlePlayerUnderMap(Player* player)
 
 void BattlegroundDS::FillInitialWorldStates(WorldPackets::WorldState::InitWorldStates& packet)
 {
-    packet.Worldstates.emplace_back(WORLD_STATE_BATTLEGROUND_RV_ARENA_SHOW, 1); // Wrong worldstate used
+    packet.Worldstates.emplace_back(0xe1a, 1); // ARENA_WORLD_STATE_ALIVE_PLAYERS_SHOW
     Arena::FillInitialWorldStates(packet);
 }
 

@@ -879,7 +879,7 @@ void Player::UpdateExpertise(WeaponAttackType attack)
     if (attack == RANGED_ATTACK)
         return;
 
-    float expertise = GetRatingBonusValue(CR_EXPERTISE);
+    int32 expertise = int32(GetRatingBonusValue(CR_EXPERTISE));
 
     Item* weapon = GetWeaponForAttack(attack, true);
 
@@ -900,12 +900,10 @@ void Player::UpdateExpertise(WeaponAttackType attack)
     switch (attack)
     {
         case BASE_ATTACK:
-            m_Expertise = expertise;
-            SetUInt32Value(PLAYER_EXPERTISE, int32(expertise));
+            SetUInt32Value(PLAYER_EXPERTISE, expertise);
             break;
         case OFF_ATTACK:
-            m_OffhandExpertise = expertise;
-            SetUInt32Value(PLAYER_OFFHAND_EXPERTISE, int32(expertise));
+            SetUInt32Value(PLAYER_OFFHAND_EXPERTISE, expertise);
             break;
         default:
             break;

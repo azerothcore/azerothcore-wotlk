@@ -20,7 +20,6 @@
 #include "Player.h"
 #include "WorldPacket.h"
 #include "WorldStatePackets.h"
-#include "WorldStateDefines.h"
 
 BattlegroundBE::BattlegroundBE()
 {
@@ -91,7 +90,7 @@ void BattlegroundBE::HandleAreaTrigger(Player* player, uint32 trigger)
 
 void BattlegroundBE::FillInitialWorldStates(WorldPackets::WorldState::InitWorldStates& packet)
 {
-    packet.Worldstates.emplace_back(WORLD_STATE_BATTLEGROUND_BE_ARENA_SHOW, 1);
+    packet.Worldstates.emplace_back(0x9f3, 1); // BATTLEGROUND_BLADES_EDGE_ARENA_SHOW
     Arena::FillInitialWorldStates(packet);
 }
 

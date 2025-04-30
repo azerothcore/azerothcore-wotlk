@@ -29,7 +29,6 @@
 #include "World.h"
 #include "WorldPacket.h"
 #include "WorldSessionMgr.h"
-#include "WorldStateDefines.h"
 #include "WorldStatePackets.h"
 
 OutdoorPvPSI::OutdoorPvPSI()
@@ -43,23 +42,23 @@ OutdoorPvPSI::OutdoorPvPSI()
 void OutdoorPvPSI::FillInitialWorldStates(WorldPackets::WorldState::InitWorldStates& packet)
 {
     packet.Worldstates.reserve(3);
-    packet.Worldstates.emplace_back(WORLD_STATE_OPVP_SI_GATHERED_A, m_Gathered_A);
-    packet.Worldstates.emplace_back(WORLD_STATE_OPVP_SI_GATHERED_H, m_Gathered_H);
-    packet.Worldstates.emplace_back(WORLD_STATE_OPVP_SI_SILITHYST_MAX, SI_MAX_RESOURCES);
+    packet.Worldstates.emplace_back(SI_GATHERED_A, m_Gathered_A);
+    packet.Worldstates.emplace_back(SI_GATHERED_H, m_Gathered_H);
+    packet.Worldstates.emplace_back(SI_SILITHYST_MAX, SI_MAX_RESOURCES);
 }
 
 void OutdoorPvPSI::SendRemoveWorldStates(Player* player)
 {
-    player->SendUpdateWorldState(WORLD_STATE_OPVP_SI_GATHERED_A, 0);
-    player->SendUpdateWorldState(WORLD_STATE_OPVP_SI_GATHERED_H, 0);
-    player->SendUpdateWorldState(WORLD_STATE_OPVP_SI_SILITHYST_MAX, 0);
+    player->SendUpdateWorldState(SI_GATHERED_A, 0);
+    player->SendUpdateWorldState(SI_GATHERED_H, 0);
+    player->SendUpdateWorldState(SI_SILITHYST_MAX, 0);
 }
 
 void OutdoorPvPSI::UpdateWorldState()
 {
-    SendUpdateWorldState(WORLD_STATE_OPVP_SI_GATHERED_A, m_Gathered_A);
-    SendUpdateWorldState(WORLD_STATE_OPVP_SI_GATHERED_H, m_Gathered_H);
-    SendUpdateWorldState(WORLD_STATE_OPVP_SI_SILITHYST_MAX, SI_MAX_RESOURCES);
+    SendUpdateWorldState(SI_GATHERED_A, m_Gathered_A);
+    SendUpdateWorldState(SI_GATHERED_H, m_Gathered_H);
+    SendUpdateWorldState(SI_SILITHYST_MAX, SI_MAX_RESOURCES);
 }
 
 bool OutdoorPvPSI::SetupOutdoorPvP()

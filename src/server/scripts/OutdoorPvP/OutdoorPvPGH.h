@@ -26,6 +26,10 @@ enum OutdoorPvPGHenum
     GH_HORDE_DEFENSE_EVENT              = 66,
 
     GH_ZONE                             = 394,
+
+    GH_UI_SLIDER_DISPLAY                = 3466,
+    GH_UI_SLIDER_POS                    = 3467,
+    GH_UI_SLIDER_N                      = 3468,
 };
 
 class Unit;

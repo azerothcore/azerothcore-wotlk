@@ -69,6 +69,7 @@ enum GobjectIds
 
 enum MiscIds
 {
+    WORLD_STATE_BARRELS_PLANTED     = 2436,
     SKARLOC_MOUNT_MODEL             = 18223,
 
     ENCOUNTER_PROGRESS_NONE             = 0,
