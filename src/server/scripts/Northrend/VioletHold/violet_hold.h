@@ -89,13 +89,6 @@ enum Bosses
     BOSS_CYANIGOSA
 };
 
-enum VHWorldStates
-{
-    WORLD_STATE_VH_SHOW             = 3816,
-    WORLD_STATE_VH_PRISON_STATE     = 3815,
-    WORLD_STATE_VH_WAVE_COUNT       = 3810,
-};
-
 enum Spells
 {
     SPELL_CONTROL_CRYSTAL_ACTIVATION   = 57804,

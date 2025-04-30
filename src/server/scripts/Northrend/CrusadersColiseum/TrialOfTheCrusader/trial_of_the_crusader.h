@@ -379,12 +379,6 @@ enum eAchievementCriteria
     ACHIEV_CRITERIA_REALM_FIRST_GRAND_CRUSADER              = 12350,
 };
 
-enum euiWorldStates
-{
-    UPDATE_STATE_UI_SHOW                                    = 4390,
-    UPDATE_STATE_UI_COUNT                                   = 4389,
-};
-
 const uint32 dIIc = 405;
 const uint32 dedicatedInsanityItems[405] =
 {
