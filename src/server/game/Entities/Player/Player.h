@@ -191,6 +191,7 @@ struct SpellModifier
     flag96 mask;
     uint32 spellId{0};
     Aura* const ownerAura;
+    uint32 priority{0};
 };
 
 typedef std::unordered_map<uint32, PlayerTalent*> PlayerTalentMap;
