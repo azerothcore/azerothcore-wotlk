@@ -28,6 +28,12 @@ INSERT INTO `waypoint_data` (`id`, `point`, `position_x`, `position_y`, `positio
 ("12921000", 7, 2228.4097, -5858.6533, 101.26566, NULL, 0, 0, 0, 100, 0),
 ("12921000", 8, 2233.331, -5851.655, 101.59271, NULL, 0, 0, 0, 100, 0);
 
+-- Remove Wrong guids (Havenshire Stallion, Mare, Colt).
+DELETE FROM `creature` WHERE (`id1` = 28605) AND (`guid` IN (129216, 129217));
+DELETE FROM `creature` WHERE (`id1` = 28606) AND (`guid` IN (129237));
+DELETE FROM `creature` WHERE (`id1` = 28607) AND (`guid` IN (129252));
+DELETE FROM `creature_addon` WHERE (`guid` IN (129237, 129252));
+
 -- Set MT waypoint for Pack Leader
 UPDATE `creature` SET `MovementType` = 2 WHERE (`id1` = 28605) AND (`guid` IN (129212));
 
