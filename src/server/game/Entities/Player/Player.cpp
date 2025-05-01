@@ -1933,27 +1933,8 @@ void Player::Regenerate(Powers power)
                 }
             }
             break;
-        case POWER_ENERGY:
-            {
-                float baseRegenRate = 10.0f * sWorld->getRate(RATE_POWER_ENERGY);
-                float hasteModifier = 1.0f;
-
-                // Apply Vitality
-                if (HasAura(61329))
-                    hasteModifier += 0.25f;
-
-                // Apply Overkill
-                if (HasAura(58426))
-                    hasteModifier += 0.30f;
-
-                // Apply Adrenaline Rush
-                if (HasAura(13750))
-                    hasteModifier += 1.0f;
-
-                float adjustedRegenRate = baseRegenRate * hasteModifier;
-
-                addvalue += adjustedRegenRate * 0.001f * m_regenTimer;
-            }
+        case POWER_ENERGY:                                  // Regenerate energy (rogue)
+            addvalue += 0.01f * m_regenTimer * sWorld->getRate(RATE_POWER_ENERGY);
             break;
         case POWER_RUNIC_POWER:
             {
