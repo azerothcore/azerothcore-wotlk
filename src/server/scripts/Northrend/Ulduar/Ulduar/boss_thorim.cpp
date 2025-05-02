@@ -187,17 +187,20 @@ enum ThorimEvents
     EVENT_THORIM_CHARGE_ORB                 = 3,
     EVENT_THORIM_LIGHTNING_ORB              = 4,
     EVENT_THORIM_NOT_REACH_IN_TIME          = 5,
-    EVENT_THORIM_FILL_ARENA                 = 6,
-    EVENT_THORIM_UNBALANCING_STRIKE         = 7,
-    EVENT_THORIM_LIGHTNING_CHARGE           = 8,
-    EVENT_THORIM_CHAIN_LIGHTNING            = 9,
-    EVENT_THORIM_BERSERK                    = 10,
-    EVENT_THORIM_AGGRO                      = 11,
-    EVENT_THORIM_AGGRO2                     = 12,
-    EVENT_THORIM_OUTRO1                     = 13,
-    EVENT_THORIM_OUTRO2                     = 14,
-    EVENT_THORIM_OUTRO3                     = 15,
-    EVENT_THORIM_OUTRO4                     = 16,
+    EVENT_THORIM_ARENA_SPAWN_WARBRINGER     = 6,
+    EVENT_THORIM_ARENA_SPAWN_EVOKER         = 7,
+    EVENT_THORIM_ARENA_SPAWN_COMMONER       = 8,
+    EVENT_THORIM_ARENA_SPAWN_CHAMPION       = 9,
+    EVENT_THORIM_UNBALANCING_STRIKE         = 10,
+    EVENT_THORIM_LIGHTNING_CHARGE           = 11,
+    EVENT_THORIM_CHAIN_LIGHTNING            = 12,
+    EVENT_THORIM_BERSERK                    = 13,
+    EVENT_THORIM_AGGRO                      = 14,
+    EVENT_THORIM_AGGRO2                     = 15,
+    EVENT_THORIM_OUTRO1                     = 16,
+    EVENT_THORIM_OUTRO2                     = 17,
+    EVENT_THORIM_OUTRO3                     = 18,
+    EVENT_THORIM_OUTRO4                     = 19,
 
     EVENT_DR_ACOLYTE_GH                     = 20,
     EVENT_DR_ACOLYTE_HS                     = 21,
@@ -561,7 +564,7 @@ public:
                     me->AddThreat(player, 1000.0f);
             }
 
-            if (damage >= me->GetHealth())
+            if (damage >= me->GetHealth()|| me->GetHealth()<2)
             {
                 damage = 0;
                 if (!_encounterFinished)
@@ -604,21 +607,22 @@ public:
             }
         }
 
-        void SpawnArenaNPCs()
+        void SpawnAnArenaNPC(uint32 arenaNpc)
         {
             Creature* cr;
-            uint8 rnd;
-            if (_spawnCommoners || urand(0, 2))
-                _spawnCommoners = !_spawnCommoners;
+            uint8 rnd = urand(0,13);
+            if ((cr = me->SummonCreature(arenaNpc, ArenaNPCs[rnd], TEMPSUMMON_CORPSE_TIMED_DESPAWN, 5000)))
+            cr->GetMotionMaster()->MoveJump(
+                Middle.GetPositionX() + urand(19, 24) * cos(Middle.GetAngle(cr)),
+                Middle.GetPositionY() + urand(19, 24) * std::sin(Middle.GetAngle(cr)),
+                Middle.GetPositionZ(), 20, 20);
+        }
 
-            for (uint8 i = 0; i < (_spawnCommoners ? 7 : 2); ++i)
-            {
-                rnd = urand(0, 13);
-                if ((cr = me->SummonCreature((_spawnCommoners ? NPC_DARK_RUNE_COMMONER : RollTable[urand(0, 2)]), ArenaNPCs[rnd], TEMPSUMMON_CORPSE_TIMED_DESPAWN, 5000)))
-                    cr->GetMotionMaster()->MoveJump(
-                        Middle.GetPositionX() + urand(19, 24) * cos(Middle.GetAngle(cr)),
-                        Middle.GetPositionY() + urand(19, 24) * std::sin(Middle.GetAngle(cr)),
-                        Middle.GetPositionZ(), 20, 20);
+        void SpawnCommoners()
+        {
+            uint8 rnd = urand(6,7);
+            for (uint8 i = 0; i < rnd; ++i){
+                SpawnAnArenaNPC(NPC_DARK_RUNE_COMMONER);
             }
         }
 
@@ -685,10 +689,12 @@ public:
                     {
                         events.ScheduleEvent(EVENT_THORIM_STORMHAMMER, 8s, 0, EVENT_PHASE_START);
                         events.ScheduleEvent(EVENT_THORIM_CHARGE_ORB, 14s, 0, EVENT_PHASE_START);
-                        events.ScheduleEvent(EVENT_THORIM_FILL_ARENA, 0ms, 0, EVENT_PHASE_START);
+                        events.ScheduleEvent(EVENT_THORIM_ARENA_SPAWN_WARBRINGER, 0ms, 0, EVENT_PHASE_START);
+                        events.ScheduleEvent(EVENT_THORIM_ARENA_SPAWN_EVOKER, 5s, 0, EVENT_PHASE_START);
+                        events.ScheduleEvent(EVENT_THORIM_ARENA_SPAWN_COMMONER, 7s, 0, EVENT_PHASE_START);
+                        events.ScheduleEvent(EVENT_THORIM_ARENA_SPAWN_CHAMPION, 10s, 0, EVENT_PHASE_START);
                         events.ScheduleEvent(EVENT_THORIM_LIGHTNING_ORB, 5s, 0, EVENT_PHASE_START); // checked every 5 secs if there are players on arena
                         events.ScheduleEvent(EVENT_THORIM_NOT_REACH_IN_TIME, 5min, 0, EVENT_PHASE_START);
-
                         EntryCheckPredicate pred(NPC_SIF);
                         summons.DoAction(ACTION_SIF_START_DOMINION, pred);
                         break;
@@ -724,9 +730,21 @@ public:
                     me->CastSpell(me, SPELL_BERSERK_FRIENDS, true);
                     me->SummonCreature(NPC_LIGHTNING_ORB, me->GetPositionX(), me->GetPositionY(), me->GetPositionZ());
                     break;
-                case EVENT_THORIM_FILL_ARENA:
-                    SpawnArenaNPCs();
-                    events.Repeat(10s);
+                case EVENT_THORIM_ARENA_SPAWN_WARBRINGER:
+                    SpawnAnArenaNPC(NPC_DARK_RUNE_WARBRINGER);
+                    events.Repeat(15s);
+                    break;
+                case EVENT_THORIM_ARENA_SPAWN_EVOKER:
+                    SpawnAnArenaNPC(NPC_DARK_RUNE_EVOKER);
+                    events.Repeat(20s);
+                    break;
+                case EVENT_THORIM_ARENA_SPAWN_COMMONER:
+                    SpawnCommoners();
+                    events.Repeat(21s);
+                    break;
+                case EVENT_THORIM_ARENA_SPAWN_CHAMPION:
+                    SpawnAnArenaNPC(NPC_DARK_RUNE_CHAMPION);
+                    events.Repeat(25s);
                     break;
                 case EVENT_THORIM_UNBALANCING_STRIKE:
                     me->CastSpell(me->GetVictim(), SPELL_UNBALANCING_STRIKE, false);
@@ -1601,9 +1619,9 @@ public:
             }
             else if (me->GetEntry() == NPC_DARK_RUNE_EVOKER)
             {
-                events.ScheduleEvent(EVENT_DR_EVOKER_RL, 2500ms);
-                events.ScheduleEvent(EVENT_DR_EVOKER_RM, 4s);
-                events.ScheduleEvent(EVENT_DR_EVOKER_RS, 10s);
+                events.ScheduleEvent(EVENT_DR_EVOKER_RL, 6500ms);
+                events.ScheduleEvent(EVENT_DR_EVOKER_RM, 8s);
+                events.ScheduleEvent(EVENT_DR_EVOKER_RS, 12s);
             }
             else if (me->GetEntry() == NPC_DARK_RUNE_CHAMPION)
             {
@@ -1644,9 +1662,7 @@ public:
             {
                 AttackStart(target);
                 me->AddThreat(target, 500.0f);
-                if (me->GetEntry() == NPC_DARK_RUNE_EVOKER && urand(0, 1))
-                    me->CastSpell(me, SPELL_RUNIC_SHIELD, false);
-                else if (me->GetEntry() == NPC_DARK_RUNE_CHAMPION && !urand(0, 2))
+                if (me->GetEntry() == NPC_DARK_RUNE_CHAMPION && !urand(0, 2))
                     me->CastSpell(target, SPELL_CHARGE, false);
                 return true;
             }
