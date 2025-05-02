@@ -156,10 +156,14 @@ struct boss_sacrolash : public BossAI
             Unit* target = nullptr;
             if (Creature* alythess = instance->GetCreature(DATA_ALYTHESS))
             {
+                LOG_INFO("server.worldserver", "Hello I'm {}", alythess->GetName());
                 std::list<Unit*> targets;
                 alythess->AI()->SelectTargetList(targets, 6, SelectTargetMethod::MaxThreat, 0, 100.0f, true, false);
-                if (!targets.empty())
+                if (!targets.empty()){
                     target = Acore::Containers::SelectRandomContainerElement(targets);
+                    LOG_INFO("server.worldserver", "Selected {}", target->GetName());
+                }
+
             }
             if (!target)
                 target = me->GetVictim();
