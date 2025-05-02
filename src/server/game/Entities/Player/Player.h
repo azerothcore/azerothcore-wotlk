@@ -187,6 +187,7 @@ struct SpellModifier
     flag96 mask;
     uint32 spellId{0};
     Aura* const ownerAura;
+    uint32 priority{0};
 };
 
 typedef std::unordered_map<uint32, PlayerTalent*> PlayerTalentMap;
@@ -2876,6 +2877,9 @@ protected:
     bool m_canTitanGrip;
     uint8 m_swingErrorMsg;
     float m_ammoDPS;
+
+    float m_Expertise;
+    float m_OffhandExpertise;
 
     ////////////////////Rest System/////////////////////
     time_t _restTime;

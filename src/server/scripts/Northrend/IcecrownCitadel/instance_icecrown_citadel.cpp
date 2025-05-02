@@ -27,6 +27,7 @@
 #include "Transport.h"
 #include "WorldPacket.h"
 #include "WorldSession.h"
+#include "WorldStateDefines.h"
 #include "icecrown_citadel.h"
 
 enum EventIds
@@ -233,11 +234,11 @@ public:
         void FillInitialWorldStates(WorldPackets::WorldState::InitWorldStates& packet) override
         {
             packet.Worldstates.reserve(5);
-            packet.Worldstates.emplace_back(WORLDSTATE_SHOW_TIMER, BloodQuickeningState == IN_PROGRESS ? 1 : 0);
-            packet.Worldstates.emplace_back(WORLDSTATE_EXECUTION_TIME, BloodQuickeningMinutes);
-            packet.Worldstates.emplace_back(WORLDSTATE_SHOW_ATTEMPTS, 1); // instance->IsHeroic() ? 1 : 0
-            packet.Worldstates.emplace_back(WORLDSTATE_ATTEMPTS_REMAINING, HeroicAttempts);
-            packet.Worldstates.emplace_back(WORLDSTATE_ATTEMPTS_MAX, MaxHeroicAttempts);
+            packet.Worldstates.emplace_back(WORLD_STATE_ICECROWN_CITADEL_SHOW_TIMER, BloodQuickeningState == IN_PROGRESS ? 1 : 0);
+            packet.Worldstates.emplace_back(WORLD_STATE_ICECROWN_CITADEL_EXECUTION_TIME, BloodQuickeningMinutes);
+            packet.Worldstates.emplace_back(WORLD_STATE_ICECROWN_CITADEL_SHOW_ATTEMPTS, 1); // instance->IsHeroic() ? 1 : 0
+            packet.Worldstates.emplace_back(WORLD_STATE_ICECROWN_CITADEL_ATTEMPTS_REMAINING, HeroicAttempts);
+            packet.Worldstates.emplace_back(WORLD_STATE_ICECROWN_CITADEL_ATTEMPTS_MAX, MaxHeroicAttempts);
         }
 
         void OnPlayerAreaUpdate(Player* player, uint32  /*oldArea*/, uint32 newArea) override
@@ -252,7 +253,7 @@ public:
             }
             else
             {
-                player->SendUpdateWorldState(WORLDSTATE_SHOW_ATTEMPTS, 0);
+                player->SendUpdateWorldState(WORLD_STATE_ICECROWN_CITADEL_SHOW_ATTEMPTS, 0);
             }
         }
 
@@ -1021,7 +1022,7 @@ public:
             if (drop && HeroicAttempts)
             {
                 --HeroicAttempts;
-                DoUpdateWorldState(WORLDSTATE_ATTEMPTS_REMAINING, HeroicAttempts);
+                DoUpdateWorldState(WORLD_STATE_ICECROWN_CITADEL_ATTEMPTS_REMAINING, HeroicAttempts);
                 SaveToDB();
             }
             if (HeroicAttempts)
@@ -1350,13 +1351,13 @@ public:
                             case IN_PROGRESS:
                                 Events.ScheduleEvent(EVENT_UPDATE_EXECUTION_TIME, 1min);
                                 BloodQuickeningMinutes = 30;
-                                DoUpdateWorldState(WORLDSTATE_SHOW_TIMER, 1);
-                                DoUpdateWorldState(WORLDSTATE_EXECUTION_TIME, BloodQuickeningMinutes);
+                                DoUpdateWorldState(WORLD_STATE_ICECROWN_CITADEL_SHOW_TIMER, 1);
+                                DoUpdateWorldState(WORLD_STATE_ICECROWN_CITADEL_EXECUTION_TIME, BloodQuickeningMinutes);
                                 break;
                             case DONE:
                                 Events.CancelEvent(EVENT_UPDATE_EXECUTION_TIME);
                                 BloodQuickeningMinutes = 0;
-                                DoUpdateWorldState(WORLDSTATE_SHOW_TIMER, 0);
+                                DoUpdateWorldState(WORLD_STATE_ICECROWN_CITADEL_SHOW_TIMER, 0);
                                 break;
                             default:
                                 break;
@@ -1616,8 +1617,8 @@ public:
             if (BloodQuickeningState == IN_PROGRESS)
             {
                 Events.ScheduleEvent(EVENT_UPDATE_EXECUTION_TIME, 1min);
-                DoUpdateWorldState(WORLDSTATE_SHOW_TIMER, 1);
-                DoUpdateWorldState(WORLDSTATE_EXECUTION_TIME, BloodQuickeningMinutes);
+                DoUpdateWorldState(WORLD_STATE_ICECROWN_CITADEL_SHOW_TIMER, 1);
+                DoUpdateWorldState(WORLD_STATE_ICECROWN_CITADEL_EXECUTION_TIME, BloodQuickeningMinutes);
             }
 
             data >> WeeklyQuestId10;
@@ -1695,13 +1696,13 @@ public:
                             if (BloodQuickeningMinutes)
                             {
                                 Events.ScheduleEvent(EVENT_UPDATE_EXECUTION_TIME, 1min);
-                                DoUpdateWorldState(WORLDSTATE_SHOW_TIMER, 1);
-                                DoUpdateWorldState(WORLDSTATE_EXECUTION_TIME, BloodQuickeningMinutes);
+                                DoUpdateWorldState(WORLD_STATE_ICECROWN_CITADEL_SHOW_TIMER, 1);
+                                DoUpdateWorldState(WORLD_STATE_ICECROWN_CITADEL_EXECUTION_TIME, BloodQuickeningMinutes);
                             }
                             else
                             {
                                 BloodQuickeningState = DONE;
-                                DoUpdateWorldState(WORLDSTATE_SHOW_TIMER, 0);
+                                DoUpdateWorldState(WORLD_STATE_ICECROWN_CITADEL_SHOW_TIMER, 0);
                                 if (Creature* bq = instance->GetCreature(BloodQueenLanaThelGUID))
                                     bq->AI()->DoAction(ACTION_KILL_MINCHAR);
                             }

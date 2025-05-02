@@ -19,6 +19,7 @@
 #include "InstanceMapScript.h"
 #include "InstanceScript.h"
 #include "Player.h"
+#include "WorldStateDefines.h"
 #include "old_hillsbrad.h"
 
 static Position const instancePositions[INSTANCE_POSITIONS_COUNT] =
@@ -70,7 +71,7 @@ public:
                 CleanupInstance();
 
             if (_encounterProgress < ENCOUNTER_PROGRESS_BARRELS)
-                player->SendUpdateWorldState(WORLD_STATE_BARRELS_PLANTED, _barrelCount);
+                player->SendUpdateWorldState(WORLD_STATE_OLD_HILLSBRAD_BARRELS_PLANTED, _barrelCount);
         }
 
         void CleanupInstance()
@@ -153,7 +154,7 @@ public:
                         if (_barrelCount >= 5 || _encounterProgress > ENCOUNTER_PROGRESS_NONE)
                             return;
 
-                        DoUpdateWorldState(WORLD_STATE_BARRELS_PLANTED, ++_barrelCount);
+                        DoUpdateWorldState(WORLD_STATE_OLD_HILLSBRAD_BARRELS_PLANTED, ++_barrelCount);
                         if (_barrelCount == 5)
                         {
                             _events.ScheduleEvent(EVENT_INITIAL_BARRELS_FLAME, 4000);
@@ -237,7 +238,7 @@ public:
                                     orc->HandleEmoteCommand(EMOTE_ONESHOT_CHEER);
 
                         SetData(DATA_ESCORT_PROGRESS, ENCOUNTER_PROGRESS_BARRELS);
-                        DoUpdateWorldState(WORLD_STATE_BARRELS_PLANTED, 0);
+                        DoUpdateWorldState(WORLD_STATE_OLD_HILLSBRAD_BARRELS_PLANTED, 0);
                         break;
                     }
                 case EVENT_SUMMON_LIEUTENANT:
