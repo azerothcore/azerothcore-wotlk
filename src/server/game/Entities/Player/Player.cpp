@@ -1954,7 +1954,6 @@ void Player::Regenerate(Powers power)
     addvalue += m_powerFraction[power];
     uint32 integerValue = uint32(std::fabs(addvalue));
 
-    bool forcedUpdate = false;
     if (addvalue < 0.0f)
     {
         if (curValue > integerValue)
@@ -1966,7 +1965,6 @@ void Player::Regenerate(Powers power)
         {
             curValue = 0;
             m_powerFraction[power] = 0;
-            forcedUpdate = true;
         }
     }
     else
@@ -1977,13 +1975,12 @@ void Player::Regenerate(Powers power)
         {
             curValue = maxValue;
             m_powerFraction[power] = 0;
-            forcedUpdate = true;
         }
         else
             m_powerFraction[power] = addvalue - integerValue;
     }
 
-    if (m_regenTimerCount >= 2000 || forcedUpdate)
+    if (m_regenTimerCount >= 2000 || curValue == 0 || curValue == maxValue)
         SetPower(power, curValue, true, true);
     else
         UpdateUInt32Value(UNIT_FIELD_POWER1 + AsUnderlyingType(power), curValue);
