@@ -620,7 +620,8 @@ public:
 
         void SpawnCommoners()
         {
-            for (uint8 i = 0; i < 7; ++i){
+            uint8 rnd = urand(6,7);
+            for (uint8 i = 0; i < rnd; ++i){
                 SpawnAnArenaNPC(NPC_DARK_RUNE_COMMONER);
             }
         }
