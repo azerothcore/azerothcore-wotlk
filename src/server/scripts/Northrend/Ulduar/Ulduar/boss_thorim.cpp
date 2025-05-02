@@ -326,8 +326,6 @@ enum Misc
 
 const Position Middle = {2134.68f, -263.13f, 419.44f, M_PI * 1.5f};
 
-const uint32 RollTable[3] = { 32877, 32878, 32876 };
-
 class boss_thorim : public CreatureScript
 {
 public:
@@ -621,9 +619,8 @@ public:
         void SpawnCommoners()
         {
             uint8 rnd = urand(6,7);
-            for (uint8 i = 0; i < rnd; ++i){
+            for (uint8 i = 0; i < rnd; ++i)
                 SpawnAnArenaNPC(NPC_DARK_RUNE_COMMONER);
-            }
         }
 
         void SpellHit(Unit* caster, SpellInfo const* spellInfo) override
@@ -1619,9 +1616,9 @@ public:
             }
             else if (me->GetEntry() == NPC_DARK_RUNE_EVOKER)
             {
-                events.ScheduleEvent(EVENT_DR_EVOKER_RL, 6500ms);
-                events.ScheduleEvent(EVENT_DR_EVOKER_RM, 8s);
-                events.ScheduleEvent(EVENT_DR_EVOKER_RS, 12s);
+                events.ScheduleEvent(EVENT_DR_EVOKER_RL, 2500ms);
+                events.ScheduleEvent(EVENT_DR_EVOKER_RM, 4s);
+                events.ScheduleEvent(EVENT_DR_EVOKER_RS, 10s);
             }
             else if (me->GetEntry() == NPC_DARK_RUNE_CHAMPION)
             {
@@ -1662,7 +1659,9 @@ public:
             {
                 AttackStart(target);
                 me->AddThreat(target, 500.0f);
-                if (me->GetEntry() == NPC_DARK_RUNE_CHAMPION && !urand(0, 2))
+                if (me->GetEntry() == NPC_DARK_RUNE_EVOKER && urand(0, 1))
+                    me->CastSpell(me, SPELL_RUNIC_SHIELD, false);
+                else if (me->GetEntry() == NPC_DARK_RUNE_CHAMPION && !urand(0, 2))
                     me->CastSpell(target, SPELL_CHARGE, false);
                 return true;
             }
