@@ -292,7 +292,6 @@ const Position LightOfDawnPos[] =
     {2270.99f, -5278.00f, 81.89f, 0}            // 15 Tirion Fordring loc4
 };
 
-// Expanded fight positions for better spreading
 const Position LightOfDawnFightPos[] =
 {
     {2279.68f, -5256.75f, 79.79f, 4.8f},
