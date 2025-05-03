@@ -295,7 +295,6 @@ const Position LightOfDawnPos[] =
 // Expanded fight positions for better spreading
 const Position LightOfDawnFightPos[] =
 {
-    // Original positions
     {2279.68f, -5256.75f, 79.79f, 4.8f},
     {2280.40f, -5276.56f, 82.11f, 4.8f},
     {2256.43f, -5281.3f, 82.29f, 5.0f},
@@ -306,17 +305,6 @@ const Position LightOfDawnFightPos[] =
     {2289.72f, -5299.65f, 83.49f, 3.2f},
     {2274.02f, -5303.58f, 85.05f, 1.4f},
     {2258.42f, -5307.72f, 81.98f, 0.1f},
-    // Additional positions for better spread
-    {2265.50f, -5265.00f, 80.50f, 4.9f},
-    {2290.75f, -5290.25f, 82.85f, 3.8f},
-    {2305.10f, -5275.60f, 82.33f, 3.0f},
-    {2248.95f, -5290.15f, 82.10f, 5.5f},
-    {2270.35f, -5295.80f, 83.25f, 2.1f},
-    {2285.60f, -5260.90f, 80.75f, 4.2f},
-    {2298.80f, -5295.45f, 83.10f, 2.7f},
-    {2260.15f, -5270.35f, 80.90f, 5.3f},
-    {2275.90f, -5285.70f, 82.65f, 1.8f},
-    {2240.50f, -5275.20f, 79.80f, 0.5f}
 };
 
 // Position for Duke Nicholas Zverenhoff
