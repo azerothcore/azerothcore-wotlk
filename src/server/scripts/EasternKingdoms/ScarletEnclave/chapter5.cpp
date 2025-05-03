@@ -684,6 +684,22 @@ public:
                     SendUpdateWorldState(WORLD_STATE_BATTLE_FOR_LIGHTS_HOPE_COUNTDOWN_TIME, 0);
                     SendUpdateWorldState(WORLD_STATE_BATTLE_FOR_LIGHTS_HOPE_COUNTDOWN_ENABLE, 0);
                     SendUpdateWorldState(WORLD_STATE_BATTLE_FOR_LIGHTS_HOPE_EVENT_BEGIN_ENABLE, 1);
+                    
+                    // Ensure Might of Mograine buff is applied/reapplied on battle start
+                    Map::PlayerList const& players = me->GetMap()->GetPlayers();
+                    for (Map::PlayerList::const_iterator itr = players.begin(); itr != players.end(); ++itr)
+                    {
+                        if (Player* player = itr->GetSource())
+                        {
+                            if (player->GetPhaseMask() & 128 && me->IsWithinDistInMap(player, 100.0f))
+                            {
+                                if (!player->HasAura(SPELL_THE_MIGHT_OF_MOGRAINE))
+                                {
+                                    me->CastSpell(player, SPELL_THE_MIGHT_OF_MOGRAINE, true);
+                                }
+                            }
+                        }
+                    }
                     break;
                 case EVENT_START_COUNTDOWN_6:
                 case EVENT_START_COUNTDOWN_7:
@@ -728,6 +744,22 @@ public:
                 case EVENT_START_COUNTDOWN_14:
                     me->SetImmuneToAll(false);
                     me->SummonCreatureGroup(5);
+                    
+                    // Check and reapply buff one more time when combat actually starts
+                    Map::PlayerList const& players = me->GetMap()->GetPlayers();
+                    for (Map::PlayerList::const_iterator itr = players.begin(); itr != players.end(); ++itr)
+                    {
+                        if (Player* player = itr->GetSource())
+                        {
+                            if (player->GetPhaseMask() & 128 && me->IsWithinDistInMap(player, 100.0f))
+                            {
+                                if (!player->HasAura(SPELL_THE_MIGHT_OF_MOGRAINE))
+                                {
+                                    me->CastSpell(player, SPELL_THE_MIGHT_OF_MOGRAINE, true);
+                                }
+                            }
+                        }
+                    }
                     return;
                 case EVENT_FINISH_FIGHT_1:
                     summons.DespawnEntry(NPC_DEFENDER_OF_THE_LIGHT);
