@@ -453,10 +453,8 @@ public:
 
             if (me->IsInCombat() && cr->GetEntry() != NPC_HIGHLORD_TIRION_FORDRING && battleStarted == ENCOUNTER_STATE_FIGHT)
             {
-                // Set behavior based on creature type
-                if (cr->GetEntry() >= NPC_RAMPAGING_ABOMINATION && cr->GetEntry() <= NPC_FLESH_BEHEMOTH) // Scourge units
+                if (cr->GetEntry() >= NPC_RAMPAGING_ABOMINATION && cr->GetEntry() <= NPC_FLESH_BEHEMOTH)
                 {
-                    // Find a non-player target first
                     Unit* target = nullptr;
                     std::list<Creature*> targetList;
                     cr->GetCreatureListWithEntryInGrid(targetList, NPC_DEFENDER_OF_THE_LIGHT, 50.0f);
@@ -474,22 +472,18 @@ public:
                         cr->AI()->AttackStart(target);
                     }
                     
-                    // Only attack player if no other targets found and player gets too close
                     if (!target)
                     {
                         cr->SetReactState(REACT_DEFENSIVE);
-                        // Set the threat radius to a smaller value to prevent attacking from range
-                        cr->m_SightDistance = 10.0f; // Reduce sight distance
-                        cr->m_CombatDistance = 10.0f; // Also reduce combat distance
+                        cr->m_SightDistance = 10.0f;
+                        cr->m_CombatDistance = 10.0f;
                     }
                     
-                    // Move to random position
                     Position pos = LightOfDawnFightPos[urand(0, 9)];
                     cr->GetMotionMaster()->MoveCharge(pos.GetPositionX(), pos.GetPositionY(), pos.GetPositionZ(), me->GetSpeed(MOVE_RUN));
                 }
-                else // Defender units
+                else
                 {
-                    // Find a scourge target
                     Unit* target = nullptr;
                     std::list<Creature*> targetList;
                     cr->GetCreatureListWithEntryInGrid(targetList, NPC_RAMPAGING_ABOMINATION, 50.0f);
@@ -503,15 +497,13 @@ public:
                         cr->AI()->AttackStart(target);
                     }
                     
-                    // Only attack player if no other targets found
                     if (!target)
                     {
                         cr->SetReactState(REACT_DEFENSIVE);
-                        cr->m_SightDistance = 10.0f; // Reduce sight distance
-                        cr->m_CombatDistance = 10.0f; // Also reduce combat distance
+                        cr->m_SightDistance = 10.0f;
+                        cr->m_CombatDistance = 10.0f;
                     }
                     
-                    // Move to random position
                     Position pos = LightOfDawnFightPos[urand(0, 9)];
                     cr->GetMotionMaster()->MoveCharge(pos.GetPositionX(), pos.GetPositionY(), pos.GetPositionZ(), me->GetSpeed(MOVE_RUN));
                 }
@@ -525,7 +517,6 @@ public:
                 cr->HandleEmoteCommand(EMOTE_STATE_READY1H);
             }
             
-            // Special handling for Duke Nicholas Zverenhoff
             if (cr->GetEntry() == NPC_DUKE_NICHOLAS_ZVERENHOFF && battleStarted == ENCOUNTER_STATE_OUTRO)
             {
                 cr->SetReactState(REACT_PASSIVE);
@@ -963,14 +954,13 @@ public:
                 case EVENT_OUTRO_SCENE_26:
                     if (Creature* lk = GetEntryFromSummons(NPC_THE_LICH_KING))
                     {
-                        // Calculate a position 3 yards in front of the Lich King
                         float angle = lk->GetAngle(me);
-                        float dist = 3.0f; // Distance in front of Lich King
+                        float dist = 3.0f;
                         float x = lk->GetPositionX() + dist * cos(angle);
                         float y = lk->GetPositionY() + dist * std::sin(angle);
                         float z = lk->GetPositionZ();
                         
-                        me->GetMotionMaster()->MoveCharge(x, y, z, 42.0f);
+                        me->CastSpell(x, y, z, SPELL_MOGRAINE_CHARGE, false);
                     }
                     break;
                 case EVENT_OUTRO_SCENE_27:
