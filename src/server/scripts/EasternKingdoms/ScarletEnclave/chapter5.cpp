@@ -303,7 +303,7 @@ const Position LightOfDawnFightPos[] =
     {2314.2f, -5268.1f, 82.43f, 3.6f},
     {2289.72f, -5299.65f, 83.49f, 3.2f},
     {2274.02f, -5303.58f, 85.05f, 1.4f},
-    {2258.42f, -5307.72f, 81.98f, 0.1f},
+    {2258.42f, -5307.72f, 81.98f, 0.1f}
 };
 
 // Position for Duke Nicholas Zverenhoff
