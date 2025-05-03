@@ -467,17 +467,7 @@ public:
             SendUpdateWorldState(WORLD_STATE_BATTLE_FOR_LIGHTS_HOPE_EVENT_BEGIN_ENABLE, GetData(WORLD_STATE_BATTLE_FOR_LIGHTS_HOPE_EVENT_BEGIN_ENABLE));
         }
 
-        Position GetRandomizedPosition(Position const& basePos, float variance = 3.0f)
-        {
-            Position pos = basePos;
-            float angle = frand(0.0f, 2.0f * M_PI);
-            float dist = frand(0.5f, variance);
-            pos.m_positionX += dist * cos(angle);
-            pos.m_positionY += dist * sin(angle);
-            return pos;
-        }
-
-       void JustSummoned(Creature* cr) override
+        void JustSummoned(Creature* cr) override
         {
             summons.Summon(cr);
 
