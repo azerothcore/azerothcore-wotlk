@@ -465,20 +465,20 @@ public:
                     cr->GetCreatureListWithEntryInGrid(targetList, NPC_DUKE_NICHOLAS_ZVERENHOFF, 50.0f);
                     cr->GetCreatureListWithEntryInGrid(targetList, NPC_RAYNE, 50.0f);
                     cr->GetCreatureListWithEntryInGrid(targetList, NPC_RIMBLAT_EARTHSHATTER, 50.0f);
-                    
+
                     if (!targetList.empty())
                     {
                         target = targetList.front();
                         cr->AI()->AttackStart(target);
                     }
-                    
+
                     if (!target)
                     {
                         cr->SetReactState(REACT_DEFENSIVE);
                         cr->m_SightDistance = 10.0f;
                         cr->m_CombatDistance = 10.0f;
                     }
-                    
+
                     Position pos = LightOfDawnFightPos[urand(0, 9)];
                     cr->GetMotionMaster()->MoveCharge(pos.GetPositionX(), pos.GetPositionY(), pos.GetPositionZ(), me->GetSpeed(MOVE_RUN));
                 }
@@ -490,20 +490,20 @@ public:
                     cr->GetCreatureListWithEntryInGrid(targetList, NPC_ACHERUS_GHOUL, 50.0f);
                     cr->GetCreatureListWithEntryInGrid(targetList, NPC_WARRIOR_OF_THE_FROZEN_WASTES, 50.0f);
                     cr->GetCreatureListWithEntryInGrid(targetList, NPC_FLESH_BEHEMOTH, 50.0f);
-                    
+
                     if (!targetList.empty())
                     {
                         target = targetList.front();
                         cr->AI()->AttackStart(target);
                     }
-                    
+
                     if (!target)
                     {
                         cr->SetReactState(REACT_DEFENSIVE);
                         cr->m_SightDistance = 10.0f;
                         cr->m_CombatDistance = 10.0f;
                     }
-                    
+
                     Position pos = LightOfDawnFightPos[urand(0, 9)];
                     cr->GetMotionMaster()->MoveCharge(pos.GetPositionX(), pos.GetPositionY(), pos.GetPositionZ(), me->GetSpeed(MOVE_RUN));
                 }
