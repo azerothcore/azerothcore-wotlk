@@ -828,6 +828,7 @@ public:
                     }
                     break;
                 case EVENT_FINISH_FIGHT_5:
+                {
                     me->SetWalk(true);
                     me->SetHomePosition(*me);
                     me->RemoveAllAuras();
@@ -836,7 +837,17 @@ public:
 
                     if (Creature* tirion = GetEntryFromSummons(NPC_HIGHLORD_TIRION_FORDRING))
                         tirion->AI()->Talk(SAY_LIGHT_OF_DAWN26);
+                    
+                    Map::PlayerList const& players = me->GetMap()->GetPlayers();
+                    for (Map::PlayerList::const_iterator itr = players.begin(); itr != players.end(); ++itr)
+                    {
+                        if (Player* player = itr->GetSource())
+                        {
+                            player->RemoveAurasDueToSpell(SPELL_THE_MIGHT_OF_MOGRAINE);
+                        }
+                    }
                     break;
+                }
                 case EVENT_OUTRO_SCENE_1:
                     me->SetStandState(UNIT_STAND_STATE_KNEEL);
                     me->SetFacingTo(4.8f);
