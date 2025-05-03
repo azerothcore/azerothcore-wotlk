@@ -490,74 +490,17 @@ public:
             return pos;
         }
 
-        void JustSummoned(Creature* cr) override
+       void JustSummoned(Creature* cr) override
         {
             summons.Summon(cr);
 
             if (me->IsInCombat() && cr->GetEntry() != NPC_HIGHLORD_TIRION_FORDRING && battleStarted == ENCOUNTER_STATE_FIGHT)
             {
-                if (cr->GetEntry() >= NPC_RAMPAGING_ABOMINATION && cr->GetEntry() <= NPC_FLESH_BEHEMOTH)
-                {
-                    Unit* target = nullptr;
-                    std::list<Creature*> targetList;
-                    cr->GetCreatureListWithEntryInGrid(targetList, NPC_DEFENDER_OF_THE_LIGHT, 50.0f);
-                    cr->GetCreatureListWithEntryInGrid(targetList, NPC_KORFAX_CHAMPION_OF_THE_LIGHT, 50.0f);
-                    cr->GetCreatureListWithEntryInGrid(targetList, NPC_COMMANDER_ELIGOR_DAWNBRINGER, 50.0f);
-                    cr->GetCreatureListWithEntryInGrid(targetList, NPC_LORD_MAXWELL_TYROSUS, 50.0f);
-                    cr->GetCreatureListWithEntryInGrid(targetList, NPC_LEONID_BARTHALOMEW_THE_REVERED, 50.0f);
-                    cr->GetCreatureListWithEntryInGrid(targetList, NPC_DUKE_NICHOLAS_ZVERENHOFF, 50.0f);
-                    cr->GetCreatureListWithEntryInGrid(targetList, NPC_RAYNE, 50.0f);
-                    cr->GetCreatureListWithEntryInGrid(targetList, NPC_RIMBLAT_EARTHSHATTER, 50.0f);
-                    
-                    if (!targetList.empty())
-                    {
-                        // Pick a random target from the list
-                        std::list<Creature*>::const_iterator it = targetList.begin();
-                        std::advance(it, urand(0, targetList.size() - 1));
-                        target = *it;
-                        cr->AI()->AttackStart(target);
-                    }
-                    
-                    if (!target)
-                    {
-                        cr->SetReactState(REACT_DEFENSIVE);
-                        cr->m_SightDistance = 20.0f;
-                        cr->m_CombatDistance = 20.0f;
-                    }
-                    
-                    // Use expanded position array with randomization
-                    Position pos = GetRandomizedPosition(LightOfDawnFightPos[urand(0, 19)], 5.0f);
-                    cr->GetMotionMaster()->MovePoint(0, pos.GetPositionX(), pos.GetPositionY(), pos.GetPositionZ(), true);
-                }
-                else
-                {
-                    Unit* target = nullptr;
-                    std::list<Creature*> targetList;
-                    cr->GetCreatureListWithEntryInGrid(targetList, NPC_RAMPAGING_ABOMINATION, 50.0f);
-                    cr->GetCreatureListWithEntryInGrid(targetList, NPC_ACHERUS_GHOUL, 50.0f);
-                    cr->GetCreatureListWithEntryInGrid(targetList, NPC_WARRIOR_OF_THE_FROZEN_WASTES, 50.0f);
-                    cr->GetCreatureListWithEntryInGrid(targetList, NPC_FLESH_BEHEMOTH, 50.0f);
-                    
-                    if (!targetList.empty())
-                    {
-                        // Pick a random target from the list
-                        std::list<Creature*>::const_iterator it = targetList.begin();
-                        std::advance(it, urand(0, targetList.size() - 1));
-                        target = *it;
-                        cr->AI()->AttackStart(target);
-                    }
-                    
-                    if (!target)
-                    {
-                        cr->SetReactState(REACT_DEFENSIVE);
-                        cr->m_SightDistance = 20.0f;
-                        cr->m_CombatDistance = 20.0f;
-                    }
-                    
-                    // Use expanded position array with randomization
-                    Position pos = GetRandomizedPosition(LightOfDawnFightPos[urand(0, 19)], 5.0f);
-                    cr->GetMotionMaster()->MovePoint(0, pos.GetPositionX(), pos.GetPositionY(), pos.GetPositionZ(), true);
-                }
+                Position pos = LightOfDawnFightPos[urand(0, 9)];
+                if (Unit* target = cr->SelectNearbyTarget(nullptr, 10.0f))
+                    if (target->IsCreature())
+                        target->GetMotionMaster()->MoveCharge(pos.GetPositionX(), pos.GetPositionY(), pos.GetPositionZ(), me->GetSpeed(MOVE_RUN));
+                cr->GetMotionMaster()->MoveCharge(pos.GetPositionX(), pos.GetPositionY(), pos.GetPositionZ(), me->GetSpeed(MOVE_RUN));
             }
 
             if (battleStarted == ENCOUNTER_STATE_OUTRO && cr->GetEntry() == NPC_DEFENDER_OF_THE_LIGHT)
@@ -566,13 +509,6 @@ public:
                 cr->SetImmuneToAll(true);
                 cr->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_STATE_READY1H);
                 cr->HandleEmoteCommand(EMOTE_STATE_READY1H);
-            }
-            
-            if (cr->GetEntry() == NPC_DUKE_NICHOLAS_ZVERENHOFF && battleStarted == ENCOUNTER_STATE_OUTRO)
-            {
-                cr->SetReactState(REACT_PASSIVE);
-                cr->SetImmuneToAll(true);
-                cr->GetMotionMaster()->MovePoint(0, DukeNicholasPos);
             }
         }
 
