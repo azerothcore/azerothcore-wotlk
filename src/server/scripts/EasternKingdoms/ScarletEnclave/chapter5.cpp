@@ -678,25 +678,6 @@ public:
 
         void UpdateAI(uint32 diff) override
         {
-            // Force Might of Mograine buff on all players during fight
-            if (battleStarted == ENCOUNTER_STATE_FIGHT)
-            {
-                Map::PlayerList const& players = me->GetMap()->GetPlayers();
-                for (Map::PlayerList::const_iterator itr = players.begin(); itr != players.end(); ++itr)
-                {
-                    if (Player* player = itr->GetSource())
-                    {
-                        if (player->GetPhaseMask() & 128 && me->IsWithinDistInMap(player, 100.0f))
-                        {
-                            if (!player->HasAura(SPELL_THE_MIGHT_OF_MOGRAINE))
-                            {
-                                me->CastSpell(player, SPELL_THE_MIGHT_OF_MOGRAINE, true);
-                            }
-                        }
-                    }
-                }
-            }
-
             events.Update(diff);
             uint32 eventId = events.ExecuteEvent();
 
