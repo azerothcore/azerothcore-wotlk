@@ -516,7 +516,7 @@ public:
                 cr->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_STATE_READY1H);
                 cr->HandleEmoteCommand(EMOTE_STATE_READY1H);
             }
-            
+
             if (cr->GetEntry() == NPC_DUKE_NICHOLAS_ZVERENHOFF && battleStarted == ENCOUNTER_STATE_OUTRO)
             {
                 cr->SetReactState(REACT_PASSIVE);
@@ -685,8 +685,7 @@ public:
                     SendUpdateWorldState(WORLD_STATE_BATTLE_FOR_LIGHTS_HOPE_COUNTDOWN_TIME, 0);
                     SendUpdateWorldState(WORLD_STATE_BATTLE_FOR_LIGHTS_HOPE_COUNTDOWN_ENABLE, 0);
                     SendUpdateWorldState(WORLD_STATE_BATTLE_FOR_LIGHTS_HOPE_EVENT_BEGIN_ENABLE, 1);
-                    
-                    // Ensure Might of Mograine buff is applied/reapplied on battle start
+
                     Map::PlayerList const& players = me->GetMap()->GetPlayers();
                     for (Map::PlayerList::const_iterator itr = players.begin(); itr != players.end(); ++itr)
                     {
@@ -747,8 +746,7 @@ public:
                 {
                     me->SetImmuneToAll(false);
                     me->SummonCreatureGroup(5);
-                    
-                    // Check and reapply buff one more time when combat actually starts
+
                     Map::PlayerList const& combatPlayers = me->GetMap()->GetPlayers();
                     for (Map::PlayerList::const_iterator itr = combatPlayers.begin(); itr != combatPlayers.end(); ++itr)
                     {
@@ -837,7 +835,7 @@ public:
 
                     if (Creature* tirion = GetEntryFromSummons(NPC_HIGHLORD_TIRION_FORDRING))
                         tirion->AI()->Talk(SAY_LIGHT_OF_DAWN26);
-                    
+
                     Map::PlayerList const& players = me->GetMap()->GetPlayers();
                     for (Map::PlayerList::const_iterator itr = players.begin(); itr != players.end(); ++itr)
                     {
@@ -1006,7 +1004,7 @@ public:
                         float x = lk->GetPositionX() + dist * cos(angle);
                         float y = lk->GetPositionY() + dist * std::sin(angle);
                         float z = lk->GetPositionZ();
-                        
+
                         me->CastSpell(x, y, z, SPELL_MOGRAINE_CHARGE, false);
                     }
                     break;
