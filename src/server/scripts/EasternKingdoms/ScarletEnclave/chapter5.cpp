@@ -305,6 +305,9 @@ const Position LightOfDawnFightPos[] =
     {2258.42f, -5307.72f, 81.98f, 0.1f}
 };
 
+// Position for Duke Nicholas Zverenhoff
+const Position DukeNicholasPos = {2277.67f, -5275.34f, 82.18f, 5.37f};
+
 class DelayedSummonEvent : public BasicEvent
 {
 public:
@@ -450,11 +453,68 @@ public:
 
             if (me->IsInCombat() && cr->GetEntry() != NPC_HIGHLORD_TIRION_FORDRING && battleStarted == ENCOUNTER_STATE_FIGHT)
             {
-                Position pos = LightOfDawnFightPos[urand(0, 9)];
-                if (Unit* target = cr->SelectNearbyTarget(nullptr, 10.0f))
-                    if (target->IsCreature())
-                        target->GetMotionMaster()->MoveCharge(pos.GetPositionX(), pos.GetPositionY(), pos.GetPositionZ(), me->GetSpeed(MOVE_RUN));
-                cr->GetMotionMaster()->MoveCharge(pos.GetPositionX(), pos.GetPositionY(), pos.GetPositionZ(), me->GetSpeed(MOVE_RUN));
+                // Set behavior based on creature type
+                if (cr->GetEntry() >= NPC_RAMPAGING_ABOMINATION && cr->GetEntry() <= NPC_FLESH_BEHEMOTH) // Scourge units
+                {
+                    // Find a non-player target first
+                    Unit* target = nullptr;
+                    std::list<Creature*> targetList;
+                    cr->GetCreatureListWithEntryInGrid(targetList, NPC_DEFENDER_OF_THE_LIGHT, 50.0f);
+                    cr->GetCreatureListWithEntryInGrid(targetList, NPC_KORFAX_CHAMPION_OF_THE_LIGHT, 50.0f);
+                    cr->GetCreatureListWithEntryInGrid(targetList, NPC_COMMANDER_ELIGOR_DAWNBRINGER, 50.0f);
+                    cr->GetCreatureListWithEntryInGrid(targetList, NPC_LORD_MAXWELL_TYROSUS, 50.0f);
+                    cr->GetCreatureListWithEntryInGrid(targetList, NPC_LEONID_BARTHALOMEW_THE_REVERED, 50.0f);
+                    cr->GetCreatureListWithEntryInGrid(targetList, NPC_DUKE_NICHOLAS_ZVERENHOFF, 50.0f);
+                    cr->GetCreatureListWithEntryInGrid(targetList, NPC_RAYNE, 50.0f);
+                    cr->GetCreatureListWithEntryInGrid(targetList, NPC_RIMBLAT_EARTHSHATTER, 50.0f);
+                    
+                    if (!targetList.empty())
+                    {
+                        target = targetList.front();
+                        cr->AI()->AttackStart(target);
+                    }
+                    
+                    // Only attack player if no other targets found and player gets too close
+                    if (!target)
+                    {
+                        cr->SetReactState(REACT_DEFENSIVE);
+                        // Set the threat radius to a smaller value to prevent attacking from range
+                        cr->m_SightDistance = 10.0f; // Reduce sight distance
+                        cr->m_CombatDistance = 10.0f; // Also reduce combat distance
+                    }
+                    
+                    // Move to random position
+                    Position pos = LightOfDawnFightPos[urand(0, 9)];
+                    cr->GetMotionMaster()->MoveCharge(pos.GetPositionX(), pos.GetPositionY(), pos.GetPositionZ(), me->GetSpeed(MOVE_RUN));
+                }
+                else // Defender units
+                {
+                    // Find a scourge target
+                    Unit* target = nullptr;
+                    std::list<Creature*> targetList;
+                    cr->GetCreatureListWithEntryInGrid(targetList, NPC_RAMPAGING_ABOMINATION, 50.0f);
+                    cr->GetCreatureListWithEntryInGrid(targetList, NPC_ACHERUS_GHOUL, 50.0f);
+                    cr->GetCreatureListWithEntryInGrid(targetList, NPC_WARRIOR_OF_THE_FROZEN_WASTES, 50.0f);
+                    cr->GetCreatureListWithEntryInGrid(targetList, NPC_FLESH_BEHEMOTH, 50.0f);
+                    
+                    if (!targetList.empty())
+                    {
+                        target = targetList.front();
+                        cr->AI()->AttackStart(target);
+                    }
+                    
+                    // Only attack player if no other targets found
+                    if (!target)
+                    {
+                        cr->SetReactState(REACT_DEFENSIVE);
+                        cr->m_SightDistance = 10.0f; // Reduce sight distance
+                        cr->m_CombatDistance = 10.0f; // Also reduce combat distance
+                    }
+                    
+                    // Move to random position
+                    Position pos = LightOfDawnFightPos[urand(0, 9)];
+                    cr->GetMotionMaster()->MoveCharge(pos.GetPositionX(), pos.GetPositionY(), pos.GetPositionZ(), me->GetSpeed(MOVE_RUN));
+                }
             }
 
             if (battleStarted == ENCOUNTER_STATE_OUTRO && cr->GetEntry() == NPC_DEFENDER_OF_THE_LIGHT)
@@ -463,6 +523,14 @@ public:
                 cr->SetImmuneToAll(true);
                 cr->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_STATE_READY1H);
                 cr->HandleEmoteCommand(EMOTE_STATE_READY1H);
+            }
+            
+            // Special handling for Duke Nicholas Zverenhoff
+            if (cr->GetEntry() == NPC_DUKE_NICHOLAS_ZVERENHOFF && battleStarted == ENCOUNTER_STATE_OUTRO)
+            {
+                cr->SetReactState(REACT_PASSIVE);
+                cr->SetImmuneToAll(true);
+                cr->GetMotionMaster()->MovePoint(0, DukeNicholasPos);
             }
         }
 
@@ -501,6 +569,8 @@ public:
             {
                 tirion->LoadEquipment(0, true);
                 tirion->AI()->Talk(SAY_LIGHT_OF_DAWN25);
+                // Ensure Tirion is dismounted
+                tirion->Dismount();
                 events.Reset();
                 events.ScheduleEvent(EVENT_FINISH_FIGHT_1, 10s);
                 events.ScheduleEvent(EVENT_FINISH_FIGHT_2, 20s);
@@ -891,7 +961,17 @@ public:
                         lk->GetMotionMaster()->MovePoint(0, LightOfDawnPos[13].GetPositionX(), LightOfDawnPos[13].GetPositionY(), LightOfDawnPos[13].GetPositionZ());
                     break;
                 case EVENT_OUTRO_SCENE_26:
-                    me->CastSpell(me, SPELL_MOGRAINE_CHARGE, false);
+                    if (Creature* lk = GetEntryFromSummons(NPC_THE_LICH_KING))
+                    {
+                        // Calculate a position 3 yards in front of the Lich King
+                        float angle = lk->GetAngle(me);
+                        float dist = 3.0f; // Distance in front of Lich King
+                        float x = lk->GetPositionX() + dist * cos(angle);
+                        float y = lk->GetPositionY() + dist * std::sin(angle);
+                        float z = lk->GetPositionZ();
+                        
+                        me->GetMotionMaster()->MoveCharge(x, y, z, 42.0f);
+                    }
                     break;
                 case EVENT_OUTRO_SCENE_27:
                     if (Creature* lk = GetEntryFromSummons(NPC_THE_LICH_KING))
@@ -1015,13 +1095,18 @@ public:
                     break;
                 case EVENT_OUTRO_SCENE_42:
                     if (Creature* tirion = GetEntryFromSummons(NPC_HIGHLORD_TIRION_FORDRING))
+                    {
                         tirion->AI()->Talk(SAY_LIGHT_OF_DAWN56);
+                        // Make Tirion take a ready stance after his threat
+                        tirion->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_STATE_READY2H);
+                        tirion->HandleEmoteCommand(EMOTE_STATE_READY2H);
+                    }
                     break;
                 case EVENT_OUTRO_SCENE_43:
                     if (Creature* tirion = GetEntryFromSummons(NPC_HIGHLORD_TIRION_FORDRING))
                     {
                         tirion->CastSpell(tirion, SPELL_TIRION_CHARGE, true);
-                        tirion->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_STATE_READY2H);
+                        // Emote state already set in previous event
                         tirion->SetImmuneToAll(true);
                     }
                     break;
@@ -1206,7 +1291,7 @@ class spell_chapter5_rebuke : public SpellScript
     {
         PreventHitEffect(effIndex);
         if (Unit* unitTarget = GetHitUnit())
-            unitTarget->KnockbackFrom(2282.86f, -5263.45f, 40.0f, 8.0f);
+            unitTarget->KnockbackFrom(2281.523f, -5261.058f, 40.0f, 8.0f);
     }
 
     void Register() override
