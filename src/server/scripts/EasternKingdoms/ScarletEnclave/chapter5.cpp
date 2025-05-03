@@ -390,6 +390,24 @@ public:
                 SendInitialWorldStates();
 
                 events.Reset();
+                // Fast countdown for testing
+                events.ScheduleEvent(EVENT_START_COUNTDOWN_1, 2s);
+                events.ScheduleEvent(EVENT_START_COUNTDOWN_2, 4s);
+                events.ScheduleEvent(EVENT_START_COUNTDOWN_3, 6s);
+                events.ScheduleEvent(EVENT_START_COUNTDOWN_4, 8s);
+                events.ScheduleEvent(EVENT_START_COUNTDOWN_5, 10s);
+                events.ScheduleEvent(EVENT_START_COUNTDOWN_6, 11s);
+                events.ScheduleEvent(EVENT_START_COUNTDOWN_7, 12s);
+                events.ScheduleEvent(EVENT_START_COUNTDOWN_8, 13s);
+                events.ScheduleEvent(EVENT_START_COUNTDOWN_9, 14s);
+                events.ScheduleEvent(EVENT_START_COUNTDOWN_10, 15s);
+                events.ScheduleEvent(EVENT_START_COUNTDOWN_11, 16s);
+                events.ScheduleEvent(EVENT_START_COUNTDOWN_12, 17s);
+                events.ScheduleEvent(EVENT_START_COUNTDOWN_13, 18s);
+                events.ScheduleEvent(EVENT_START_COUNTDOWN_14, 19s);
+                
+                // Normal countdown
+                /*
                 events.ScheduleEvent(EVENT_START_COUNTDOWN_1, 60s);
                 events.ScheduleEvent(EVENT_START_COUNTDOWN_2, 120s);
                 events.ScheduleEvent(EVENT_START_COUNTDOWN_3, 180s);
@@ -404,6 +422,7 @@ public:
                 events.ScheduleEvent(EVENT_START_COUNTDOWN_12, 335s);
                 events.ScheduleEvent(EVENT_START_COUNTDOWN_13, 337s + 500ms);
                 events.ScheduleEvent(EVENT_START_COUNTDOWN_14, 345s);
+                */
             }
         }
 
@@ -465,20 +484,20 @@ public:
                     cr->GetCreatureListWithEntryInGrid(targetList, NPC_DUKE_NICHOLAS_ZVERENHOFF, 50.0f);
                     cr->GetCreatureListWithEntryInGrid(targetList, NPC_RAYNE, 50.0f);
                     cr->GetCreatureListWithEntryInGrid(targetList, NPC_RIMBLAT_EARTHSHATTER, 50.0f);
-
+                    
                     if (!targetList.empty())
                     {
                         target = targetList.front();
                         cr->AI()->AttackStart(target);
                     }
-
+                    
                     if (!target)
                     {
                         cr->SetReactState(REACT_DEFENSIVE);
                         cr->m_SightDistance = 10.0f;
                         cr->m_CombatDistance = 10.0f;
                     }
-
+                    
                     Position pos = LightOfDawnFightPos[urand(0, 9)];
                     cr->GetMotionMaster()->MoveCharge(pos.GetPositionX(), pos.GetPositionY(), pos.GetPositionZ(), me->GetSpeed(MOVE_RUN));
                 }
@@ -490,20 +509,20 @@ public:
                     cr->GetCreatureListWithEntryInGrid(targetList, NPC_ACHERUS_GHOUL, 50.0f);
                     cr->GetCreatureListWithEntryInGrid(targetList, NPC_WARRIOR_OF_THE_FROZEN_WASTES, 50.0f);
                     cr->GetCreatureListWithEntryInGrid(targetList, NPC_FLESH_BEHEMOTH, 50.0f);
-
+                    
                     if (!targetList.empty())
                     {
                         target = targetList.front();
                         cr->AI()->AttackStart(target);
                     }
-
+                    
                     if (!target)
                     {
                         cr->SetReactState(REACT_DEFENSIVE);
                         cr->m_SightDistance = 10.0f;
                         cr->m_CombatDistance = 10.0f;
                     }
-
+                    
                     Position pos = LightOfDawnFightPos[urand(0, 9)];
                     cr->GetMotionMaster()->MoveCharge(pos.GetPositionX(), pos.GetPositionY(), pos.GetPositionZ(), me->GetSpeed(MOVE_RUN));
                 }
@@ -516,7 +535,7 @@ public:
                 cr->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_STATE_READY1H);
                 cr->HandleEmoteCommand(EMOTE_STATE_READY1H);
             }
-
+            
             if (cr->GetEntry() == NPC_DUKE_NICHOLAS_ZVERENHOFF && battleStarted == ENCOUNTER_STATE_OUTRO)
             {
                 cr->SetReactState(REACT_PASSIVE);
@@ -659,6 +678,25 @@ public:
 
         void UpdateAI(uint32 diff) override
         {
+            // Force Might of Mograine buff on all players during fight
+            if (battleStarted == ENCOUNTER_STATE_FIGHT)
+            {
+                Map::PlayerList const& players = me->GetMap()->GetPlayers();
+                for (Map::PlayerList::const_iterator itr = players.begin(); itr != players.end(); ++itr)
+                {
+                    if (Player* player = itr->GetSource())
+                    {
+                        if (player->GetPhaseMask() & 128 && me->IsWithinDistInMap(player, 100.0f))
+                        {
+                            if (!player->HasAura(SPELL_THE_MIGHT_OF_MOGRAINE))
+                            {
+                                me->CastSpell(player, SPELL_THE_MIGHT_OF_MOGRAINE, true);
+                            }
+                        }
+                    }
+                }
+            }
+
             events.Update(diff);
             uint32 eventId = events.ExecuteEvent();
 
@@ -685,7 +723,8 @@ public:
                     SendUpdateWorldState(WORLD_STATE_BATTLE_FOR_LIGHTS_HOPE_COUNTDOWN_TIME, 0);
                     SendUpdateWorldState(WORLD_STATE_BATTLE_FOR_LIGHTS_HOPE_COUNTDOWN_ENABLE, 0);
                     SendUpdateWorldState(WORLD_STATE_BATTLE_FOR_LIGHTS_HOPE_EVENT_BEGIN_ENABLE, 1);
-
+                    
+                    // Ensure Might of Mograine buff is applied/reapplied on battle start
                     Map::PlayerList const& players = me->GetMap()->GetPlayers();
                     for (Map::PlayerList::const_iterator itr = players.begin(); itr != players.end(); ++itr)
                     {
@@ -746,7 +785,8 @@ public:
                 {
                     me->SetImmuneToAll(false);
                     me->SummonCreatureGroup(5);
-
+                    
+                    // Check and reapply buff one more time when combat actually starts
                     Map::PlayerList const& combatPlayers = me->GetMap()->GetPlayers();
                     for (Map::PlayerList::const_iterator itr = combatPlayers.begin(); itr != combatPlayers.end(); ++itr)
                     {
@@ -835,7 +875,7 @@ public:
 
                     if (Creature* tirion = GetEntryFromSummons(NPC_HIGHLORD_TIRION_FORDRING))
                         tirion->AI()->Talk(SAY_LIGHT_OF_DAWN26);
-
+                    
                     Map::PlayerList const& players = me->GetMap()->GetPlayers();
                     for (Map::PlayerList::const_iterator itr = players.begin(); itr != players.end(); ++itr)
                     {
@@ -1004,7 +1044,7 @@ public:
                         float x = lk->GetPositionX() + dist * cos(angle);
                         float y = lk->GetPositionY() + dist * std::sin(angle);
                         float z = lk->GetPositionZ();
-
+                        
                         me->CastSpell(x, y, z, SPELL_MOGRAINE_CHARGE, false);
                     }
                     break;
