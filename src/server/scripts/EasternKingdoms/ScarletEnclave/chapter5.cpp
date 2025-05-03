@@ -560,7 +560,6 @@ public:
             {
                 tirion->LoadEquipment(0, true);
                 tirion->AI()->Talk(SAY_LIGHT_OF_DAWN25);
-                // Ensure Tirion is dismounted
                 tirion->Dismount();
                 events.Reset();
                 events.ScheduleEvent(EVENT_FINISH_FIGHT_1, 10s);
@@ -685,7 +684,6 @@ public:
                     SendUpdateWorldState(WORLD_STATE_BATTLE_FOR_LIGHTS_HOPE_COUNTDOWN_ENABLE, 0);
                     SendUpdateWorldState(WORLD_STATE_BATTLE_FOR_LIGHTS_HOPE_EVENT_BEGIN_ENABLE, 1);
                     
-                    // Ensure Might of Mograine buff is applied/reapplied on battle start
                     Map::PlayerList const& players = me->GetMap()->GetPlayers();
                     for (Map::PlayerList::const_iterator itr = players.begin(); itr != players.end(); ++itr)
                     {
@@ -744,8 +742,7 @@ public:
                 case EVENT_START_COUNTDOWN_14:
                     me->SetImmuneToAll(false);
                     me->SummonCreatureGroup(5);
-                    
-                    // Check and reapply buff one more time when combat actually starts
+
                     Map::PlayerList const& players = me->GetMap()->GetPlayers();
                     for (Map::PlayerList::const_iterator itr = players.begin(); itr != players.end(); ++itr)
                     {
