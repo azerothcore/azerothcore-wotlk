@@ -1,3 +1,4 @@
+-- DB update 2025_05_04_00 -> 2025_05_04_01
 -- Embalming Slime
 SET @GUID := 128103;
 DELETE FROM `creature_formations` WHERE `leaderGUID` = @GUID AND `memberGUID` BETWEEN @GUID AND @GUID+15;
