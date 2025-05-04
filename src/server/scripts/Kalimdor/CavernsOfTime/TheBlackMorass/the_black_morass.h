@@ -40,13 +40,6 @@ enum DataTypes
     DATA_RIFT_NUMBER                    = 14
 };
 
-enum WorldStateIds
-{
-    WORLD_STATE_BM                      = 2541,
-    WORLD_STATE_BM_SHIELD               = 2540,
-    WORLD_STATE_BM_RIFT                 = 2784
-};
-
 enum EventStatus
 {
     EVENT_PREPARE                       = 0,
