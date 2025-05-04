@@ -286,7 +286,7 @@ class spell_ionar_static_overload : public AuraScript
         return ValidateSpellInfo({ SPELL_STATIC_OVERLOAD_KNOCK_N, SPELL_STATIC_OVERLOAD_KNOCK_H });
     }
 
-    void OnRemove(AuraEffect const* aurEff, AuraEffectHandleModes /*mode*/)
+    void OnRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
     {
         if (GetTargetApplication()->GetRemoveMode() != AURA_REMOVE_BY_EXPIRE)
             return;
