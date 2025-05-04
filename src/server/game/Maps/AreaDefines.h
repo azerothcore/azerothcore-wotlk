@@ -18,7 +18,7 @@
 #ifndef ACORE_AREA_DEFINES_H
 #define ACORE_AREA_DEFINES_H
 
-enum AreaTableIDs
+enum AreaTableIDs : uint32
 {
     AREA_DUN_MOROGH                                          = 1,
     AREA_DUSKWOOD                                            = 10,
