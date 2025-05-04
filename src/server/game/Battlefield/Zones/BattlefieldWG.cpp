@@ -19,6 +19,7 @@
 /// @todo: Use spell victory/defeat in wg instead of RewardMarkOfHonor() && RewardHonor
 /// @todo: Add proper implement of achievement
 
+#include "AreaDefines.h"
 #include "BattlefieldWG.h"
 #include "Chat.h"
 #include "GameTime.h"
@@ -46,7 +47,7 @@ bool BattlefieldWG::SetupBattlefield()
 {
     m_TypeId = BATTLEFIELD_WG;                              // See enum BattlefieldTypes
     m_BattleId = BATTLEFIELD_BATTLEID_WG;
-    m_ZoneId = BATTLEFIELD_WG_ZONEID;
+    m_ZoneId = AREA_WINTERGRASP;
     m_MapId = BATTLEFIELD_WG_MAPID;
     m_Map = sMapMgr->FindMap(m_MapId, 0);
 
@@ -523,9 +524,9 @@ uint8 BattlefieldWG::GetSpiritGraveyardId(uint32 areaId) const
             return BATTLEFIELD_WG_GY_WORKSHOP_NE;
         case AREA_THE_BROKEN_TEMPLE:
             return BATTLEFIELD_WG_GY_WORKSHOP_NW;
-        case AREA_WESTPARK_WORKSHOP:
+        case AREA_WESTSPARK_WORKSHOP:
             return BATTLEFIELD_WG_GY_WORKSHOP_SW;
-        case AREA_EASTPARK_WORKSHOP:
+        case AREA_EASTSPARK_WORKSHOP:
             return BATTLEFIELD_WG_GY_WORKSHOP_SE;
         case AREA_WINTERGRASP:
             return BATTLEFIELD_WG_GY_ALLIANCE;
@@ -548,9 +549,9 @@ uint32 BattlefieldWG::GetAreaByGraveyardId(uint8 gId) const
         case BATTLEFIELD_WG_GY_WORKSHOP_NW:
             return AREA_THE_BROKEN_TEMPLE;
         case BATTLEFIELD_WG_GY_WORKSHOP_SW:
-            return AREA_WESTPARK_WORKSHOP;
+            return AREA_WESTSPARK_WORKSHOP;
         case BATTLEFIELD_WG_GY_WORKSHOP_SE:
-            return AREA_EASTPARK_WORKSHOP;
+            return AREA_EASTSPARK_WORKSHOP;
     }
 
     return 0;
@@ -926,8 +927,8 @@ uint32 BattlefieldWG::GetData(uint32 data) const
         // See: SpellArea::IsFitToRequirements
         case AREA_THE_SUNKEN_RING:
         case AREA_THE_BROKEN_TEMPLE:
-        case AREA_WESTPARK_WORKSHOP:
-        case AREA_EASTPARK_WORKSHOP:
+        case AREA_WESTSPARK_WORKSHOP:
+        case AREA_EASTSPARK_WORKSHOP:
             // Graveyards and Workshops are controlled by the same team.
             if (BfGraveyard const* graveyard = GetGraveyardById(GetSpiritGraveyardId(data)))
                 return graveyard->GetControlTeamId();

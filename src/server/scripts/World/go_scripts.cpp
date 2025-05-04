@@ -1720,22 +1720,6 @@ enum BellHourlySoundFX
     LIGHTHOUSEFOGHORN  = 7197
 };
 
-enum BellHourlySoundZones
-{
-    TIRISFAL_ZONE            = 85,
-    UNDERCITY_ZONE           = 1497,
-    DUN_MOROGH_ZONE          = 1,
-    IRONFORGE_ZONE           = 1537,
-    TELDRASSIL_ZONE          = 141,
-    DARNASSUS_ZONE           = 1657,
-    ASHENVALE_ZONE           = 331,
-    HILLSBRAD_FOOTHILLS_ZONE = 267,
-    DUSKWOOD_ZONE            = 10,
-    WESTFALL_ZONE            = 40,
-    DUSTWALLOW_MARSH_ZONE    = 15,
-    SHATTRATH_ZONE           = 3703
-};
-
 enum BellHourlyObjects
 {
     GO_HORDE_BELL     = 175885,
@@ -1767,10 +1751,10 @@ public:
             {
                 switch (zoneId)
                 {
-                case TIRISFAL_ZONE:
-                case UNDERCITY_ZONE:
-                case HILLSBRAD_FOOTHILLS_ZONE:
-                case DUSKWOOD_ZONE:
+                case AREA_TIRISFAL_GLADES:
+                case AREA_UNDERCITY:
+                case AREA_HILLSBRAD_FOOTHILLS:
+                case AREA_DUSKWOOD:
                     _soundId = BELLTOLLHORDE;
                     break;
                 default:
@@ -1783,17 +1767,17 @@ public:
             {
                 switch (zoneId)
                 {
-                case IRONFORGE_ZONE:
-                case DUN_MOROGH_ZONE:
+                case AREA_IRONFORGE:
+                case AREA_DUN_MOROGH:
                     _soundId = BELLTOLLDWARFGNOME;
                     break;
-                case DARNASSUS_ZONE:
-                case TELDRASSIL_ZONE:
-                case ASHENVALE_ZONE:
-                case SHATTRATH_ZONE:
+                case AREA_DARNASSUS:
+                case AREA_TELDRASSIL:
+                case AREA_ASHENVALE:
+                case AREA_SHATTRATH_CITY:
                     _soundId = BELLTOLLNIGHTELF;
                     break;
-                case WESTFALL_ZONE:
+                case AREA_WESTFALL:
                     if (go->GetAreaId() == AREA_WESTFALL_LIGHTHOUSE)
                     {
                         _soundId = LIGHTHOUSEFOGHORN;
@@ -1803,7 +1787,7 @@ public:
                         _soundId = BELLTOLLALLIANCE;
                     }
                     break;
-                case DUSTWALLOW_MARSH_ZONE:
+                case AREA_DUSTWALLOW_MARSH:
                     if (go->GetAreaId() == AREA_ALCAZ_ISLAND)
                     {
                         _soundId = LIGHTHOUSEFOGHORN;

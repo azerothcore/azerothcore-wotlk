@@ -500,8 +500,6 @@ public:
 
 enum MinigobData
 {
-    ZONE_DALARAN            = 4395,
-
     SPELL_MANABONKED        = 61834,
     SPELL_TELEPORT_VISUAL   = 51347,
     SPELL_IMPROVED_BLINK    = 61995,
@@ -538,7 +536,7 @@ struct npc_minigob_manabonk : public ScriptedAI
 
         me->GetMap()->DoForAllPlayers([&](Player* player)
             {
-                if (player->GetZoneId() == ZONE_DALARAN && !player->IsFlying() && !player->IsMounted() && !player->IsGameMaster())
+                if (player->GetZoneId() == AREA_DALARAN && !player->IsFlying() && !player->IsMounted() && !player->IsGameMaster())
                     playerInDalaranList.push_back(player);
             });
 

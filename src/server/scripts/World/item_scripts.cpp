@@ -136,8 +136,7 @@ public:
 
 enum PetrovClusterBombs
 {
-    SPELL_PETROV_BOMB           = 42406,
-    ZONE_ID_HOWLING             = 495
+    SPELL_PETROV_BOMB           = 42406
 };
 
 class item_petrov_cluster_bombs : public ItemScript
@@ -147,7 +146,7 @@ public:
 
     bool OnUse(Player* player, Item* item, const SpellCastTargets& /*targets*/) override
     {
-        if (player->GetZoneId() != ZONE_ID_HOWLING)
+        if (player->GetZoneId() != AREA_HOWLING_FJORD)
             return false;
 
         if (!player->GetTransport() || player->GetAreaId() != AREA_SHATTERED_STRAITS)

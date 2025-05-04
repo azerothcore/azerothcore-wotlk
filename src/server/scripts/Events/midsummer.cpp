@@ -15,6 +15,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "AreaDefines.h"
 #include "CreatureScript.h"
 #include "GameEventMgr.h"
 #include "GameObjectScript.h"
@@ -1254,22 +1255,22 @@ class spell_midsummer_summon_ahune_lieutenant : public SpellScript
 
         switch (zoneId)
         {
-        case 331: // Ashenvale
+        case AREA_ASHENVALE:
             npcEntry = 26116; // Frostwave Lieutenant
             break;
-        case 405: // Desolace
+        case AREA_DESOLACE:
             npcEntry = 26178; // Hailstone Lieutenant
             break;
-        case 33: // Stranglethorn Vale
+        case AREA_STRANGLETHORN_VALE:
             npcEntry = 26204; // Chillwind Lieutenant
             break;
-        case 51: // Searing Gorge
+        case AREA_SEARING_GORGE:
             npcEntry = 26214; // Frigid Lieutenant
             break;
-        case 1377: // Silithus
+        case AREA_SILITHUS:
             npcEntry = 26215; // Glacial Lieutenant
             break;
-        case 3483: // Hellfire Peninsula
+        case AREA_HELLFIRE_PENINSULA:
             npcEntry = 26216; // Glacial Templar
             break;
         }
