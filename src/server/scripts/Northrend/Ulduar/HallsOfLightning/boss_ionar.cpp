@@ -18,6 +18,8 @@
 #include "CreatureScript.h"
 #include "Player.h"
 #include "ScriptedCreature.h"
+#include "SpellScript.h"
+#include "SpellScriptLoader.h"
 #include "SpellInfo.h"
 #include "halls_of_lightning.h"
 
@@ -27,6 +29,8 @@ enum IonarSpells
     SPELL_BALL_LIGHTNING_H          = 59800,
     SPELL_STATIC_OVERLOAD_N         = 52658,
     SPELL_STATIC_OVERLOAD_H         = 59795,
+    SPELL_STATIC_OVERLOAD_KNOCK_N   = 53337,
+    SPELL_STATIC_OVERLOAD_KNOCK_H   = 59798,
 
     SPELL_DISPERSE                  = 52770,
     SPELL_SUMMON_SPARK              = 52746,
@@ -272,8 +276,34 @@ public:
     };
 };
 
+// 52658, 59795 - Static Overload
+class spell_ionar_static_overload : public AuraScript
+{
+    PrepareAuraScript(spell_ionar_static_overload);
+
+    bool Validate(SpellInfo const* /*spellInfo*/) override
+    {
+        return ValidateSpellInfo({ SPELL_STATIC_OVERLOAD_KNOCK_N, SPELL_STATIC_OVERLOAD_KNOCK_H });
+    }
+
+    void OnRemove(AuraEffect const* aurEff, AuraEffectHandleModes /*mode*/)
+    {
+        if (GetTargetApplication()->GetRemoveMode() != AURA_REMOVE_BY_EXPIRE)
+            return;
+
+        if (Unit* target = GetTarget())
+            target->CastSpell(target, target->GetMap()->IsHeroic() ? SPELL_STATIC_OVERLOAD_KNOCK_H : SPELL_STATIC_OVERLOAD_KNOCK_N, true);
+    }
+
+    void Register() override
+    {
+        OnEffectRemove += AuraEffectRemoveFn(spell_ionar_static_overload::OnRemove, EFFECT_0, SPELL_AURA_PERIODIC_TRIGGER_SPELL, AURA_EFFECT_HANDLE_REAL);
+    }
+};
+
 void AddSC_boss_ionar()
 {
     new boss_ionar();
     new npc_spark_of_ionar();
+    RegisterSpellScript(spell_ionar_static_overload);
 }
