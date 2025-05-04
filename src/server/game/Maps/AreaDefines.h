@@ -18,6 +18,8 @@
 #ifndef ACORE_AREA_DEFINES_H
 #define ACORE_AREA_DEFINES_H
 
+#include "Define.h"
+
 enum AreaTableIDs : uint32
 {
     AREA_DUN_MOROGH                                          = 1,
