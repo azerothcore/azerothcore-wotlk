@@ -40,8 +40,6 @@ const uint32 NA_HALAA_GRAVEYARD = 993;
 
 const uint32 NA_HALAA_GRAVEYARD_ZONE = 3518; // need to add zone id, not area id
 
-uint32 const NA_HALAA_ZONE_ID = 3628; // halaa zone id
-
 const uint32 NA_RESPAWN_TIME = 3600000; // one hour to capture after defeating all guards
 
 const uint32 NA_GUARD_CHECK_TIME = 500; // every half second

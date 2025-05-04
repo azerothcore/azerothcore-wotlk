@@ -15,6 +15,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "AreaDefines.h"
 #include "CreatureScript.h"
 #include "MoveSplineInit.h"
 #include "Player.h"
@@ -444,9 +445,7 @@ public:
 
         void MoveInLineOfSight(Unit* who) override
         {
-            // 4395 Dalaran
-            // 4569 Sewer Exit Pipe
-            if (!who || !who->IsInWorld()|| who->GetZoneId() != 4395 || who->GetAreaId() == 4569)
+            if (!who || !who->IsInWorld()|| who->GetZoneId() != AREA_DALARAN || who->GetAreaId() == AREA_SEWER_EXIT_PIPE)
                 return;
 
             if (!me->IsWithinDist(who, 5.0f, false))

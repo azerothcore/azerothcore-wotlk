@@ -15,6 +15,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "AreaDefines.h"
 #include "CreatureScript.h"
 #include "GameTime.h"
 #include "InstanceMapScript.h"
@@ -1091,7 +1092,7 @@ public:
                     if (Creature* algalon = instance->GetCreature(m_uiAlgalonGUID))
                         algalon->AI()->DoAction(ACTION_FEEDS_ON_TEARS_FAILED);
             }
-            else if (unit->IsCreature() && unit->GetAreaId() == 4656 /*Conservatory of Life*/)
+            else if (unit->IsCreature() && unit->GetAreaId() == AREA_THE_CONSERVATORY_OF_LIFE)
             {
                 if (GameTime::GetGameTime().count() > (m_conspeedatoryAttempt + DAY))
                 {

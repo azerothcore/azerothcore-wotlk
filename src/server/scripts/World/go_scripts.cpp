@@ -15,6 +15,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "AreaDefines.h"
 #include "CellImpl.h"
 #include "Chat.h"
 #include "CreatureScript.h"
@@ -529,21 +530,6 @@ enum BrewfestMusicTime
     EVENT_BREWFESTGOBLIN03_TIME = 28000
 };
 
-enum BrewfestMusicAreas
-{
-    SILVERMOON = 3430, // Horde
-    UNDERCITY = 1497,
-    ORGRIMMAR_1 = 1296,
-    ORGRIMMAR_2 = 14,
-    THUNDERBLUFF = 1638,
-    IRONFORGE_1 = 809, // Alliance
-    IRONFORGE_2 = 1,
-    STORMWIND = 12,
-    EXODAR = 3557,
-    DARNASSUS = 1657,
-    SHATTRATH = 3703 // General
-};
-
 enum BrewfestMusicEvents
 {
     EVENT_BM_SELECT_MUSIC = 1,
@@ -581,7 +567,7 @@ public:
                             //Restart the current selected music
                             _currentMusicEvent = 0;
                             //Check zone to play correct music
-                            if (me->GetAreaId() == SILVERMOON || me->GetAreaId() == UNDERCITY || me->GetAreaId() == ORGRIMMAR_1 || me->GetAreaId() == ORGRIMMAR_2 || me->GetAreaId() == THUNDERBLUFF)
+                            if (me->GetAreaId() == AREA_EVERSONG_WOODS || me->GetAreaId() == AREA_UNDERCITY || me->GetAreaId() == AREA_ROCKTUSK_FARM || me->GetAreaId() == AREA_DUROTAR || me->GetAreaId() == AREA_THUNDER_BLUFF)
                             {
                                 switch (rnd)
                                 {
@@ -601,7 +587,7 @@ public:
                                         break;
                                 }
                             }
-                            else if (me->GetAreaId() == IRONFORGE_1 || me->GetAreaId() == IRONFORGE_2 || me->GetAreaId() == STORMWIND || me->GetAreaId() == EXODAR || me->GetAreaId() == DARNASSUS)
+                            else if (me->GetAreaId() == AREA_GATES_OF_IRONFORGE || me->GetAreaId() == AREA_DUN_MOROGH || me->GetAreaId() == AREA_ELWYNN_FOREST || me->GetAreaId() == AREA_THE_EXODAR || me->GetAreaId() == AREA_DARNASSUS)
                             {
                                 switch (rnd)
                                 {
@@ -621,7 +607,7 @@ public:
                                         break;
                                 }
                             }
-                            else if (me->GetAreaId() == SHATTRATH)
+                            else if (me->GetAreaId() == AREA_SHATTRATH_CITY)
                             {
                                 rnd = urand(0, 5);
                                 switch (rnd)
@@ -1748,12 +1734,6 @@ enum BellHourlySoundZones
     WESTFALL_ZONE            = 40,
     DUSTWALLOW_MARSH_ZONE    = 15,
     SHATTRATH_ZONE           = 3703
-};
-
-enum LightHouseAreas
-{
-    AREA_ALCAZ_ISLAND        = 2079,
-    AREA_WESTFALL_LIGHTHOUSE = 115
 };
 
 enum BellHourlyObjects

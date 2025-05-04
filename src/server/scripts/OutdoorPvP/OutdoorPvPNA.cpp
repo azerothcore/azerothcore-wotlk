@@ -16,6 +16,7 @@
  */
 
 #include "OutdoorPvPNA.h"
+#include "AreaDefines.h"
 #include "CreatureScript.h"
 #include "GameGraveyard.h"
 #include "GridNotifiers.h"
@@ -59,7 +60,7 @@ void OutdoorPvPNA::HandleKill(Player* killer, Unit* killed)
 
             // creature kills must be notified, even if not inside objective / not outdoor pvp active
             // player kills only count if active and inside objective
-            if ((groupGuy->IsOutdoorPvPActive() && groupGuy->GetAreaId() == NA_HALAA_ZONE_ID) || killed->IsCreature())
+            if ((groupGuy->IsOutdoorPvPActive() && groupGuy->GetAreaId() == AREA_HALAA) || killed->IsCreature())
             {
                 HandleKillImpl(groupGuy, killed);
             }
@@ -68,7 +69,7 @@ void OutdoorPvPNA::HandleKill(Player* killer, Unit* killed)
     else
     {
         // creature kills must be notified, even if not inside objective / not outdoor pvp active
-        if (killer && ((killer->IsOutdoorPvPActive() && killer->ToPlayer()->GetAreaId() == NA_HALAA_ZONE_ID) || killed->IsCreature()))
+        if (killer && ((killer->IsOutdoorPvPActive() && killer->ToPlayer()->GetAreaId() == AREA_HALAA) || killed->IsCreature()))
         {
             HandleKillImpl(killer, killed);
         }

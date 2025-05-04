@@ -15,6 +15,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "AreaDefines.h"
 #include "Battlefield.h"
 #include "BattlefieldMgr.h"
 #include "Battleground.h"
@@ -1901,8 +1902,6 @@ class spell_gen_feign_death_no_prevent_emotes : public AuraScript
 
 enum Teleporting
 {
-    AREA_VIOLET_CITADEL_SPIRE   = 4637,
-
     SPELL_TELEPORT_SPIRE_DOWN   = 59316,
     SPELL_TELEPORT_SPIRE_UP     = 59314
 };
@@ -1923,7 +1922,7 @@ class spell_gen_teleporting : public SpellScript
             return;
 
         // return from top
-        if (target->ToPlayer()->GetAreaId() == AREA_VIOLET_CITADEL_SPIRE)
+        if (target->ToPlayer()->GetAreaId() == AREA_VARGOTHS_RETREAT)
             target->CastSpell(target, SPELL_TELEPORT_SPIRE_DOWN, true);
             // teleport atop
         else
