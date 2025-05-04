@@ -32,7 +32,7 @@
 #include "Timer.h"
 
 // <mapId, zoneId>, show
-std::map<std::pair<uint32, uint32>, FireworkShow const *> const FireworkShowStore = { // guh
+std::map<std::pair<uint32, uint32>, FireworkShow const *> const FireworkShowStore = {
     { { 0,   AREA_DUN_MOROGH         }, &fireworkShowIronforge    },
     { { 0,   AREA_STRANGLETHORN_VALE }, &fireworkShowBootyBay     },
     { { 0,   AREA_UNDERCITY          }, &fireworkShowUndercity    },
