@@ -2919,6 +2919,7 @@ Position WorldObject::GetFirstCollisionPosition(float destX, float destY, float 
     MovePositionToFirstCollision(pos, distance, ang);
     return pos;
 }
+
 //NPCBot
 Position WorldObject::GetFirstCollisionPosition(float dist, float angle) const
 //End NPCBot
@@ -2927,6 +2928,7 @@ Position WorldObject::GetFirstCollisionPosition(float dist, float angle) const
     MovePositionToFirstCollision(pos, dist, angle);
     return pos;
 }
+
 //NPCBot
 void WorldObject::MovePositionToFirstCollision(Position& pos, float dist, float angle) const
 //End NPCBot

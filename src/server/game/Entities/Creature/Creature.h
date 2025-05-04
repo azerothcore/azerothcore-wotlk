@@ -169,11 +169,13 @@ public:
     } _spellFocusInfo;
 
     [[nodiscard]] uint32 GetShieldBlockValue() const override
-    ;/* NPCbot
+    //NPCbot
+    ;/*
     {
         return (GetLevel() / 2 + uint32(GetStat(STAT_STRENGTH) / 20));
     }
     */
+    //End NPCbot
 
     [[nodiscard]] SpellSchoolMask GetMeleeDamageSchoolMask(WeaponAttackType /*attackType*/ = BASE_ATTACK, uint8 /*damageIndex*/ = 0) const override { return m_meleeDamageSchoolMask; }
     void SetMeleeDamageSchool(SpellSchools school) { m_meleeDamageSchoolMask = SpellSchoolMask(1 << school); }

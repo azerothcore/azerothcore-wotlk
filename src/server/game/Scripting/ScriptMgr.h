@@ -40,9 +40,10 @@
 
 // Add support old api modules
 #include "AllScriptsObjects.h"
-//NPCBots
+//NPCBot
 #define MOD_PRESENT_NPCBOTS 1
-//End NPCbots
+//End NPCbot
+
 
 class AuctionHouseObject;
 class AuraScript;

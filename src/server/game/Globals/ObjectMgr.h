@@ -141,7 +141,7 @@ struct GameTele
 
 typedef std::unordered_map<uint32, GameTele > GameTeleContainer;
 
-// NPCbot
+//NPCbot
 #define MAX_CREATURE_OUTFIT_DISPLAYS 11
 struct CreatureOutfit
 {
@@ -157,7 +157,7 @@ struct CreatureOutfit
 
 typedef std::unordered_map<uint32, CreatureOutfit > CreatureOutfitContainer;
 
-// End NPCbot
+//End NPCbot
 enum ScriptsType
 {
     SCRIPTS_FIRST = 1,
@@ -1373,7 +1373,8 @@ public:
     [[nodiscard]] GameTeleContainer const& GetGameTeleMap() const { return _gameTeleStore; }
     bool AddGameTele(GameTele& data);
     bool DeleteGameTele(std::string_view name);
-//NPCbot
+
+//NPCBot
     CreatureOutfitContainer const& GetCreatureOutfitMap() const { return _creatureOutfitStore; }
 
     [[nodiscard]] TrainerSpellData const* GetNpcTrainerSpells(uint32 entry) const
@@ -1548,7 +1549,8 @@ private:
 
     PageTextContainer _pageTextStore;
     InstanceTemplateContainer _instanceTemplateStore;
-//NPCbot
+
+//NPCBot
     CreatureOutfitContainer _creatureOutfitStore;
 
     CreatureSparringContainer _creatureSparringStore;

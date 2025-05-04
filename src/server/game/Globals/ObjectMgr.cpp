@@ -9014,7 +9014,6 @@ void ObjectMgr::LoadCreatureOutfits()
 
     LOG_INFO("server.loading", ">> Loaded {} creature outfits in {} ms", count, GetMSTimeDiffToNow(oldMSTime));
 }
-
 //end NPCBOT
 
 void ObjectMgr::LoadGameTele()

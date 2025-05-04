@@ -3329,7 +3329,7 @@ enum SummonSlot
 
 #define MAX_TOTEM_SLOT      5
 #define MAX_GAMEOBJECT_SLOT 4
-// End NPCbot
+//End NPCbot
 
 enum EventId
 {

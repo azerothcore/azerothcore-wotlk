@@ -519,7 +519,7 @@ class spell_dk_rune_of_the_fallen_crusader : public SpellScript
     {
         std::list<TargetInfo>* targetsInfo = GetSpell()->GetUniqueTargetInfo();
         for (std::list<TargetInfo>::iterator ihit = targetsInfo->begin(); ihit != targetsInfo->end(); ++ihit)
-		//NPCBOT added Bracket
+        //NPCBot
         {
             if (ihit->targetGUID == GetCaster()->GetGUID())
             {
@@ -529,7 +529,6 @@ class spell_dk_rune_of_the_fallen_crusader : public SpellScript
                 else
                 //end npcbot
                 ihit->crit = roll_chance_f(GetCaster()->GetFloatValue(PLAYER_CRIT_PERCENTAGE));
-			//NPCBot Added Brackets
             }
         }
 		//End NPCBot
@@ -932,8 +931,8 @@ class spell_dk_anti_magic_shell_raid : public AuraScript
     {
         /// @todo: this should absorb limited amount of damage, but no info on calculation formula
         amount = -1;
-        
-        //npcbot
+
+        //NPCBot
         SpellInfo const* talentSpell = sSpellMgr->AssertSpellInfo(SPELL_DK_ANTI_MAGIC_SHELL_TALENT);
         Unit* owner = GetCaster()->GetOwner();
         if (!owner)
