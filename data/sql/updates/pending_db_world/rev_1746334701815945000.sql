@@ -1,6 +1,6 @@
 -- Embalming Slime
 SET @GUID := 128103;
-DELETE FROM `creature_formations` WHERE `memberGUID` BETWEEN @GUID AND @GUID+15;
+DELETE FROM `creature_formations` WHERE `leaderGUID` = @GUID AND `memberGUID` BETWEEN @GUID AND @GUID+15;
 INSERT INTO `creature_formations` (`leaderGUID`, `memberGUID`, `dist`, `angle`, `groupAI`, `point_1`, `point_2`) VALUES
 (@GUID, @GUID+0, 0, 0, 3, 0, 0),
 (@GUID, @GUID+1, 0, 0, 3, 0, 0),
