@@ -23,19 +23,6 @@
 #include "SpellInfo.h"
 #include "SpellScript.h"
 #include "SpellScriptLoader.h"
-/* ScriptData
-SDName: Isle_of_Queldanas
-SD%Complete: 100
-SDComment: Quest support: 11524, 11525, 11532, 11533, 11542, 11543, 11541
-SDCategory: Isle Of Quel'Danas
-EndScriptData */
-
-/* ContentData
-npc_converted_sentry
-npc_greengill_slave
-EndContentData */
-
-/*###### OUR: ######*/
 
 enum ThalorienNpcs
 {
@@ -677,13 +664,38 @@ public:
     };
 };
 
+// 45396, 45398 - Weapon Coating Enchant
+enum WeaponCoatingAreas
+{
+    ZONE_ISLE_OF_QUEL      = 4080,
+    ZONE_SUNWELL_PLATEAU   = 4075,
+    ZONE_MAGISTER_TERRACE  = 4131
+};
+
+class spell_gen_weapon_coating_enchant : public AuraScript
+{
+    PrepareAuraScript(spell_gen_weapon_coating_enchant);
+
+    bool CheckProc(ProcEventInfo& eventInfo)
+    {
+        Unit* caster = eventInfo.GetActor();
+        if (!caster)
+            return false;
+
+        return (caster->GetZoneId() == ZONE_ISLE_OF_QUEL || caster->GetZoneId() == ZONE_SUNWELL_PLATEAU || caster->GetZoneId() == ZONE_MAGISTER_TERRACE);
+    }
+
+    void Register() override
+    {
+        DoCheckProc += AuraCheckProcFn(spell_gen_weapon_coating_enchant::CheckProc);
+    }
+};
+
 void AddSC_isle_of_queldanas()
 {
-    // OUR:
     new npc_bh_thalorien_dawnseeker();
     RegisterSpellScript(spell_bh_cleanse_quel_delar);
     new npc_grand_magister_rommath();
-
-    // THEIR:
     new npc_greengill_slave();
+    RegisterSpellScript(spell_gen_weapon_coating_enchant);
 }
