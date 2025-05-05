@@ -205,7 +205,7 @@ struct boss_zuljin : public BossAI
                 if (me->HasAura(SPELL_LYNX_RUSH_HASTE))
                     return;
 
-                DoCastRandomTarget(SPELL_CLAW_RAGE_CHARGE, 1);
+                DoCastRandomTarget(SPELL_CLAW_RAGE_CHARGE, 0, 0.0f, true, false, true);
             }, 15s, 20s);
 
             ScheduleTimedEvent(14s, [&] {

@@ -627,7 +627,7 @@ public:
                 switch (eventId)
                 {
                     case EVENT_DEATH_PLAGUE:
-                        if (Unit* target = SelectTarget(SelectTargetMethod::Random, 1, 0.0f, true, true, -SPELL_RECENTLY_INFECTED))
+                        if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 0.0f, true, false, -SPELL_RECENTLY_INFECTED))
                         {
                             Talk(EMOTE_DEATH_PLAGUE_WARNING, target);
                             DoCast(target, SPELL_DEATH_PLAGUE);
@@ -1161,7 +1161,7 @@ public:
                     Talk(SAY_SVALNA_AGGRO);
                     break;
                 case EVENT_IMPALING_SPEAR:
-                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 1, 0.0f, true, true, -SPELL_IMPALING_SPEAR))
+                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 0.0f, true, false, -SPELL_IMPALING_SPEAR))
                     {
                         DoCast(me, SPELL_AETHER_SHIELD);
                         me->AddAura(70203, me);
@@ -1347,7 +1347,7 @@ public:
                     Events.ScheduleEvent(EVENT_ARNATH_SMITE, 4s, 7s);
                     break;
                 case EVENT_ARNATH_DOMINATE_MIND:
-                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 1, 0.0f, true, true, -SPELL_DOMINATE_MIND))
+                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 0.0f, true, false, -SPELL_DOMINATE_MIND))
                         DoCast(target, SPELL_DOMINATE_MIND);
                     Events.ScheduleEvent(EVENT_ARNATH_DOMINATE_MIND, 28s, 37s);
                     break;
@@ -1425,7 +1425,7 @@ public:
                         Events.ScheduleEvent(EVENT_BRANDON_JUDGEMENT_OF_COMMAND, 8s, 13s);
                         break;
                     case EVENT_BRANDON_HAMMER_OF_BETRAYAL:
-                        if (Unit* target = SelectTarget(SelectTargetMethod::Random, 1, 0.0f, true))
+                        if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 0.0f, true, false))
                             DoCast(target, SPELL_HAMMER_OF_BETRAYAL);
                         Events.ScheduleEvent(EVENT_BRANDON_HAMMER_OF_BETRAYAL, 45s, 60s);
                         break;
@@ -1552,12 +1552,12 @@ public:
                         Events.ScheduleEvent(EVENT_RUPERT_FEL_IRON_BOMB, 15s, 20s);
                         break;
                     case EVENT_RUPERT_MACHINE_GUN:
-                        if (Unit* target = SelectTarget(SelectTargetMethod::Random, 1))
+                        if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 0.0f, false, false))
                             DoCast(target, SPELL_MACHINE_GUN);
                         Events.ScheduleEvent(EVENT_RUPERT_MACHINE_GUN, 25s, 30s);
                         break;
                     case EVENT_RUPERT_ROCKET_LAUNCH:
-                        if (Unit* target = SelectTarget(SelectTargetMethod::Random, 1))
+                        if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 0.0f, false, false))
                             DoCast(target, SPELL_ROCKET_LAUNCH);
                         Events.ScheduleEvent(EVENT_RUPERT_ROCKET_LAUNCH, 10s, 15s);
                         break;
