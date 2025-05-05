@@ -1,3 +1,4 @@
+-- DB update 2025_05_04_04 -> 2025_05_05_00
 
 -- Set Don't Override SmartAI on the Stallions
 UPDATE `creature_template` SET `flags_extra` = `flags_extra` |134217728 WHERE (`entry` IN(28605));
