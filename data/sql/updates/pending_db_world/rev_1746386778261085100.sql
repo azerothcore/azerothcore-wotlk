@@ -11,7 +11,7 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 
 DELETE FROM `creature_template_spell` WHERE (`CreatureID` = 30645);
 INSERT INTO `creature_template_spell` (`CreatureID`, `Index`, `Spell`, `VerifiedBuild`) VALUES
-(30645, 3, 57668, 12340),
-(30645, 1, 57652, 12340),
-(30645, 0, 57665, 12340),
-(30645, 2, 57643, 12340);
+(30645, 3, 57668, 0),
+(30645, 1, 57652, 0),
+(30645, 0, 57665, 0),
+(30645, 2, 57643, 0);
