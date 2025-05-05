@@ -47,6 +47,7 @@
 #include "SharedDefines.h"
 #include "World.h"
 #include "WorldPacket.h"
+#include "WorldStateDefines.h"
 #include <unordered_map>
 
 bool BattlegroundTemplate::IsArena() const
@@ -182,7 +183,7 @@ void BattlegroundMgr::Update(uint32 diff)
             {
                 sArenaTeamMgr->DistributeArenaPoints();
                 m_NextAutoDistributionTime = GameTime::GetGameTime() + Seconds(DAY * sWorld->getIntConfig(CONFIG_ARENA_AUTO_DISTRIBUTE_INTERVAL_DAYS));
-                sWorld->setWorldState(WS_ARENA_DISTRIBUTION_TIME, m_NextAutoDistributionTime.count());
+                sWorld->setWorldState(WORLD_STATE_CUSTOM_ARENA_DISTRIBUTION_TIME, m_NextAutoDistributionTime.count());
             }
             m_AutoDistributionTimeChecker = 600000; // 10 minutes check
         }
@@ -561,7 +562,7 @@ void BattlegroundMgr::InitAutomaticArenaPointDistribution()
     if (!sWorld->getBoolConfig(CONFIG_ARENA_AUTO_DISTRIBUTE_POINTS))
         return;
 
-    Seconds wstime = Seconds(sWorld->getWorldState(WS_ARENA_DISTRIBUTION_TIME));
+    Seconds wstime = Seconds(sWorld->getWorldState(WORLD_STATE_CUSTOM_ARENA_DISTRIBUTION_TIME));
     Seconds curtime = GameTime::GetGameTime();
 
     LOG_INFO("server.loading", "Initializing Automatic Arena Point Distribution");

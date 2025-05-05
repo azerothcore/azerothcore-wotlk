@@ -19,6 +19,7 @@
 #define OUTDOOR_PVP_TF_
 
 #include "OutdoorPvP.h"
+#include "WorldStateDefines.h"
 
 const uint8 OutdoorPvPTFBuffZonesNum = 5;
 
@@ -71,11 +72,11 @@ struct tf_tower_world_state
 
 const tf_tower_world_state TFTowerWorldStates[TF_TOWER_NUM] =
 {
-    {0xa79, 0xa7a, 0xa7b},
-    {0xa7e, 0xa7d, 0xa7c},
-    {0xa82, 0xa81, 0xa80},
-    {0xa88, 0xa87, 0xa86},
-    {0xa85, 0xa84, 0xa83}
+    {WORLD_STATE_OPVP_TF_TOWER_NUM_00, WORLD_STATE_OPVP_TF_TOWER_NUM_01, WORLD_STATE_OPVP_TF_TOWER_NUM_02},
+    {WORLD_STATE_OPVP_TF_TOWER_NUM_05, WORLD_STATE_OPVP_TF_TOWER_NUM_04, WORLD_STATE_OPVP_TF_TOWER_NUM_03},
+    {WORLD_STATE_OPVP_TF_TOWER_NUM_08, WORLD_STATE_OPVP_TF_TOWER_NUM_07, WORLD_STATE_OPVP_TF_TOWER_NUM_06},
+    {WORLD_STATE_OPVP_TF_TOWER_NUM_14, WORLD_STATE_OPVP_TF_TOWER_NUM_13, WORLD_STATE_OPVP_TF_TOWER_NUM_12},
+    {WORLD_STATE_OPVP_TF_TOWER_NUM_11, WORLD_STATE_OPVP_TF_TOWER_NUM_10, WORLD_STATE_OPVP_TF_TOWER_NUM_09}
 };
 
 //const uint32 TFTowerPlayerEnterEvents[TF_TOWER_NUM] =
@@ -95,24 +96,6 @@ const tf_tower_world_state TFTowerWorldStates[TF_TOWER_NUM] =
 //    12498,
 //    12500
 //};
-
-enum TFWorldStates
-{
-    TF_UI_TOWER_SLIDER_POS = 0xa41,
-    TF_UI_TOWER_SLIDER_N = 0xa40,
-    TF_UI_TOWER_SLIDER_DISPLAY = 0xa3f,
-
-    TF_UI_TOWER_COUNT_H = 0xa3e,
-    TF_UI_TOWER_COUNT_A = 0xa3d,
-    TF_UI_TOWERS_CONTROLLED_DISPLAY = 0xa3c,
-
-    TF_UI_LOCKED_TIME_MINUTES_FIRST_DIGIT = 0x9d0,
-    TF_UI_LOCKED_TIME_MINUTES_SECOND_DIGIT = 0x9ce,
-    TF_UI_LOCKED_TIME_HOURS = 0x9cd,
-    TF_UI_LOCKED_DISPLAY_NEUTRAL = 0x9cc,
-    TF_UI_LOCKED_DISPLAY_HORDE = 0xad0,
-    TF_UI_LOCKED_DISPLAY_ALLIANCE = 0xacf
-};
 
 enum TFTowerStates
 {

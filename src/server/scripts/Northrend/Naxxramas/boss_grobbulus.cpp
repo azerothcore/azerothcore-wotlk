@@ -173,7 +173,7 @@ public:
                     events.Repeat(20s);
                     break;
                 case EVENT_MUTATING_INJECTION:
-                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 1, 100.0f, true, true, -SPELL_MUTATING_INJECTION))
+                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 100.0f, true, false, -SPELL_MUTATING_INJECTION))
                     {
                         me->CastSpell(target, SPELL_MUTATING_INJECTION, false);
                     }

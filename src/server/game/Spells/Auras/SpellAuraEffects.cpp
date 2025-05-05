@@ -701,6 +701,7 @@ void AuraEffect::CalculateSpellMod()
                 m_spellmod->spellId = GetId();
                 m_spellmod->mask = GetSpellInfo()->Effects[GetEffIndex()].SpellClassMask;
                 m_spellmod->charges = GetBase()->GetCharges();
+                m_spellmod->priority = GetSpellInfo()->SpellPriority;
             }
             m_spellmod->value = GetAmount();
             break;
@@ -4663,6 +4664,8 @@ void AuraEffect::HandleModPowerRegen(AuraApplication const* aurApp, uint8 mode, 
     // Update manaregen value
     if (GetMiscValue() == POWER_MANA)
         target->ToPlayer()->UpdateManaRegen();
+    else if (GetMiscValue() == POWER_ENERGY)
+        target->ToPlayer()->UpdateEnergyRegen();
     else if (GetMiscValue() == POWER_RUNE)
         target->ToPlayer()->UpdateRuneRegen(RuneType(GetMiscValueB()));
     // other powers are not immediate effects - implemented in Player::Regenerate, Creature::Regenerate

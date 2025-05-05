@@ -79,6 +79,10 @@ enum Spells
     SPELL_SINISTER_REFLECTION_SUMMON            = 45891,
     SPELL_SINISTER_REFLECTION_CLASS             = 45893,
     SPELL_SINISTER_REFLECTION_CLONE             = 45785,
+    // TODO
+    // These should be applied to target of SPELL_SINISTER_REFLECTION but not implemented
+    //SPELL_SINISTER_COPY_WEAPON                  = 41054,
+    //SPELL_SINISTER_COPY_OFFHAND_WEAPON          = 45205,
 
     // Misc
     SPELL_ANVEENA_ENERGY_DRAIN                  = 46410,
@@ -275,9 +279,6 @@ struct boss_kiljaeden : public BossAI
             me->m_Events.AddEventAtOffset([&] {
                 Talk(SAY_KJ_REFLECTION);
                 me->CastCustomSpell(SPELL_SINISTER_REFLECTION, SPELLVALUE_MAX_TARGETS, 1, me, TRIGGERED_NONE);
-                me->CastCustomSpell(SPELL_SINISTER_REFLECTION, SPELLVALUE_MAX_TARGETS, 1, me, TRIGGERED_NONE);
-                me->CastCustomSpell(SPELL_SINISTER_REFLECTION, SPELLVALUE_MAX_TARGETS, 1, me, TRIGGERED_NONE);
-                me->CastCustomSpell(SPELL_SINISTER_REFLECTION, SPELLVALUE_MAX_TARGETS, 1, me, TRIGGERED_NONE);
             }, 1s);
 
             scheduler.Schedule(1s+200ms, [this](TaskContext)
@@ -319,9 +320,6 @@ struct boss_kiljaeden : public BossAI
             {
                 Talk(SAY_KJ_REFLECTION);
                 me->CastCustomSpell(SPELL_SINISTER_REFLECTION, SPELLVALUE_MAX_TARGETS, 1, me, TRIGGERED_NONE);
-                me->CastCustomSpell(SPELL_SINISTER_REFLECTION, SPELLVALUE_MAX_TARGETS, 1, me, TRIGGERED_NONE);
-                me->CastCustomSpell(SPELL_SINISTER_REFLECTION, SPELLVALUE_MAX_TARGETS, 1, me, TRIGGERED_NONE);
-                me->CastCustomSpell(SPELL_SINISTER_REFLECTION, SPELLVALUE_MAX_TARGETS, 1, me, TRIGGERED_NONE);
             });
 
             scheduler.Schedule(1s + 200ms, [this](TaskContext)
@@ -347,15 +345,12 @@ struct boss_kiljaeden : public BossAI
 
         ScheduleHealthCheckEvent(25, [&] {
             _phase = PHASE_SACRIFICE;
-
+            
             scheduler.Schedule(1s, [this](TaskContext)
             {
                 scheduler.Schedule(1s, [this](TaskContext)
                 {
                     Talk(SAY_KJ_REFLECTION);
-                    me->CastCustomSpell(SPELL_SINISTER_REFLECTION, SPELLVALUE_MAX_TARGETS, 1, me, TRIGGERED_NONE);
-                    me->CastCustomSpell(SPELL_SINISTER_REFLECTION, SPELLVALUE_MAX_TARGETS, 1, me, TRIGGERED_NONE);
-                    me->CastCustomSpell(SPELL_SINISTER_REFLECTION, SPELLVALUE_MAX_TARGETS, 1, me, TRIGGERED_NONE);
                     me->CastCustomSpell(SPELL_SINISTER_REFLECTION, SPELLVALUE_MAX_TARGETS, 1, me, TRIGGERED_NONE);
                 });
 
@@ -539,6 +534,7 @@ struct boss_kiljaeden : public BossAI
 
     void JustSummoned(Creature* summon) override
     {
+        BossAI::JustSummoned(summon);
         if (summon->GetEntry() == NPC_ARMAGEDDON_TARGET)
         {
             summon->SetCanFly(true);
@@ -969,8 +965,14 @@ class spell_kiljaeden_sinister_reflection : public SpellScript
         PreventHitDefaultEffect(effIndex);
         if (Unit* target = GetHitUnit())
         {
-            target->CastSpell(target, SPELL_SINISTER_REFLECTION_SUMMON, true);
-            //target->CastSpell(target, SPELL_SINISTER_REFLECTION_CLONE, true);
+            for (uint8 i = 0; i < 4; ++i)
+            {
+                target->CastSpell(target, SPELL_SINISTER_REFLECTION_SUMMON, true);
+            }
+            // TODO implement these auras
+            //target->AddAura(SPELL_SINISTER_COPY_WEAPON, target);
+            //target->AddAura(SPELL_SINISTER_COPY_OFFHAND_WEAPON, target);
+            target->CastSpell(target, SPELL_SINISTER_REFLECTION_CLONE, true);
         }
     }
 

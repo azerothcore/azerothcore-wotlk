@@ -115,7 +115,7 @@ struct boss_sartura : public BossAI
             switch (eventId)
             {
                 case EVENT_SARTURA_WHIRLWIND:
-                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 1, 100.0f, true))
+                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 100.0f, true, false))
                     {
                         me->GetThreatMgr().ResetAllThreat();
                         me->AddThreat(target, 1000.0f);
@@ -199,7 +199,7 @@ struct npc_sartura_royal_guard : public ScriptedAI
             switch (eventid)
             {
                 case EVENT_GUARD_WHIRLWIND:
-                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 1, 100.0f, true))
+                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 100.0f, true, false))
                     {
                         me->GetThreatMgr().ResetAllThreat();
                         me->AddThreat(target, 1000.0f);
