@@ -40,7 +40,6 @@ public:
             { "badge",             HandleBadgeCommand,             SEC_ADMINISTRATOR,      Console::No  }
         };
 
-
         static ChatCommandTable commandTable =
         {
             { "dev",   devCommandTable                                                                  }
