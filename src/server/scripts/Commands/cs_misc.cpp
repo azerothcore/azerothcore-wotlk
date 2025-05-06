@@ -99,7 +99,6 @@ public:
         static ChatCommandTable commandTable =
         {
             { "commentator",       HandleCommentatorCommand,       SEC_MODERATOR,          Console::No  },
-            { "dev",               HandleDevCommand,               SEC_ADMINISTRATOR,      Console::No  },
             { "gps",               HandleGPSCommand,               SEC_MODERATOR,          Console::No  },
             { "aura",              auraCommandTable                                                     },
             { "unaura",            HandleUnAuraCommand,            SEC_GAMEMASTER,         Console::No  },
@@ -491,51 +490,6 @@ public:
         else
         {
             SetCommentatorMod(false);
-            return true;
-        }
-
-        handler->SendErrorMessage(LANG_USE_BOL);
-        return false;
-    }
-
-    static bool HandleDevCommand(ChatHandler* handler, Optional<bool> enableArg)
-    {
-        WorldSession* session = handler->GetSession();
-
-        if (!session)
-        {
-            return false;
-        }
-
-        auto SetDevMod = [&](bool enable)
-        {
-            handler->SendNotification(enable ? LANG_DEV_ON : LANG_DEV_OFF);
-            session->GetPlayer()->SetDeveloper(enable);
-            sScriptMgr->OnHandleDevCommand(handler->GetSession()->GetPlayer(), enable);
-        };
-
-        if (!enableArg)
-        {
-            if (!AccountMgr::IsPlayerAccount(session->GetSecurity()) && session->GetPlayer()->IsDeveloper())
-            {
-                SetDevMod(true);
-            }
-            else
-            {
-                SetDevMod(false);
-            }
-
-            return true;
-        }
-
-        if (*enableArg)
-        {
-            SetDevMod(true);
-            return true;
-        }
-        else
-        {
-            SetDevMod(false);
             return true;
         }
 

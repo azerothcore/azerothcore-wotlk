@@ -20,6 +20,7 @@
 #include "Creature.h"
 #include "Language.h"
 #include "Player.h"
+#include "ScriptMgr.h"
 #include "SpellInfo.h"
 #include "SpellMgr.h"
 
@@ -32,9 +33,17 @@ public:
 
     ChatCommandTable GetCommands() const override
     {
+
+        static ChatCommandTable devCommandTable =
+        {
+            { "formation",         HandleFormationCommand,         SEC_ADMINISTRATOR,      Console::No  },
+            { "badge",             HandleBadgeCommand,             SEC_ADMINISTRATOR,      Console::No  }
+        };
+
+
         static ChatCommandTable commandTable =
         {
-            { "formation",   HandleFormationCommand,  SEC_GAMEMASTER, Console::No }
+            { "dev",   devCommandTable                                                                  }
         };
 
         return commandTable;
@@ -83,6 +92,51 @@ public:
         LOG_INFO("sql.dev", "({}, {}, 0, 0, {}, 0, 0),", leaderGUID, target->ToCreature()->GetSpawnId(), groupAI);
         handler->SendErrorMessage(LANG_COMMAND_DEV_FORMATION);
         return true;
+    }
+
+    static bool HandleBadgeCommand(ChatHandler* handler, Optional<bool> enableArg)
+    {
+        WorldSession* session = handler->GetSession();
+
+        if (!session)
+        {
+            return false;
+        }
+
+        auto SetDevMod = [&](bool enable)
+        {
+            handler->SendNotification(enable ? LANG_DEV_ON : LANG_DEV_OFF);
+            session->GetPlayer()->SetDeveloper(enable);
+            sScriptMgr->OnHandleDevCommand(handler->GetSession()->GetPlayer(), enable);
+        };
+
+        if (!enableArg)
+        {
+            if (!AccountMgr::IsPlayerAccount(session->GetSecurity()) && session->GetPlayer()->IsDeveloper())
+            {
+                SetDevMod(true);
+            }
+            else
+            {
+                SetDevMod(false);
+            }
+
+            return true;
+        }
+
+        if (*enableArg)
+        {
+            SetDevMod(true);
+            return true;
+        }
+        else
+        {
+            SetDevMod(false);
+            return true;
+        }
+
+        handler->SendErrorMessage(LANG_USE_BOL);
+        return false;
     }
 };
 
