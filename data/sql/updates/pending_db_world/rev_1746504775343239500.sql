@@ -1,4 +1,4 @@
--- Captain Arathyn & Azurebeak 
+-- Captain Arathyn & Azurebeak
 DELETE FROM `smart_scripts` WHERE (`source_type` = 0 AND `entryorguid` = 19635 AND `id` IN (5,6,7,8));
 DELETE FROM `smart_scripts` WHERE (`source_type` = 0 AND `entryorguid` = 21005);
 
