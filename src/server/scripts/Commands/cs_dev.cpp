@@ -36,8 +36,8 @@ public:
 
         static ChatCommandTable devCommandTable =
         {
-            { "formation",         HandleFormationCommand,         SEC_ADMINISTRATOR,      Console::No  },
-            { "badge",             HandleBadgeCommand,             SEC_ADMINISTRATOR,      Console::No  }
+            { "formation",         HandleDevFormationCommand,         SEC_ADMINISTRATOR,      Console::No  },
+            { "badge",             HandleDevBadgeCommand,             SEC_ADMINISTRATOR,      Console::No  }
         };
 
         static ChatCommandTable commandTable =
@@ -48,7 +48,7 @@ public:
         return commandTable;
     }
 
-    static bool HandleFormationCommand(ChatHandler* handler, uint32 leaderGUID, uint32 groupAI)
+    static bool HandleDevFormationCommand(ChatHandler* handler, uint32 leaderGUID, uint32 groupAI)
     {
         if (!leaderGUID)
         {
@@ -93,7 +93,7 @@ public:
         return true;
     }
 
-    static bool HandleBadgeCommand(ChatHandler* handler, Optional<bool> enableArg)
+    static bool HandleDevBadgeCommand(ChatHandler* handler, Optional<bool> enableArg)
     {
         WorldSession* session = handler->GetSession();
 
