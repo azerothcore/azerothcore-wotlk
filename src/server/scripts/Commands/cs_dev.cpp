@@ -87,7 +87,7 @@ public:
             return false;
         }
 
-        // creature_formations - leaderGUID, memberGUIDdist, angle, groupAI, point_1, point_2
+        // creature_formations - leaderGUID, memberGUID, dist, angle, groupAI, point_1, point_2
         LOG_INFO("sql.dev", "({}, {}, 0, 0, {}, 0, 0),", leaderGUID, target->ToCreature()->GetSpawnId(), groupAI);
         handler->SendErrorMessage(LANG_COMMAND_DEV_FORMATION);
         return true;
