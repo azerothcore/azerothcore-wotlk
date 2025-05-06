@@ -665,13 +665,6 @@ public:
 };
 
 // 45396, 45398 - Weapon Coating Enchant
-enum WeaponCoatingAreas
-{
-    ZONE_ISLE_OF_QUEL      = 4080,
-    ZONE_SUNWELL_PLATEAU   = 4075,
-    ZONE_MAGISTER_TERRACE  = 4131
-};
-
 class spell_gen_weapon_coating_enchant : public AuraScript
 {
     PrepareAuraScript(spell_gen_weapon_coating_enchant);
@@ -682,7 +675,7 @@ class spell_gen_weapon_coating_enchant : public AuraScript
         if (!caster)
             return false;
 
-        return (caster->GetZoneId() == ZONE_ISLE_OF_QUEL || caster->GetZoneId() == ZONE_SUNWELL_PLATEAU || caster->GetZoneId() == ZONE_MAGISTER_TERRACE);
+        return (caster->GetZoneId() == AREA_ISLE_OF_QUEL_DANAS || caster->GetZoneId() == AREA_SUNWELL_PLATEAU || caster->GetZoneId() == AREA_MAGISTERS_TERRACE);
     }
 
     void Register() override
