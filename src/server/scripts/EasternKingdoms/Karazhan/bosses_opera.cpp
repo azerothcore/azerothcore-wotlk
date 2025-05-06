@@ -1210,7 +1210,7 @@ struct boss_romulo : public ScriptedAI
 
         _scheduler.Schedule(15s, GROUP_COMBAT, [this](TaskContext context)
         {
-            if (Unit* target = SelectTarget(SelectTargetMethod::Random, 1, 100, true))
+            if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 100, true, false))
             {
                 if (target && !me->HasInArc(M_PI, target))
                 {
