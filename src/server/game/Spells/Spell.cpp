@@ -6895,9 +6895,9 @@ SpellCastResult Spell::CheckCasterAuras(bool preventionOnly) const
     bool usableInStun = m_spellInfo->HasAttribute(SPELL_ATTR5_ALLOW_WHILE_STUNNED);
 
     // Glyph of Pain Suppression
-    /// @todo Add a proper function to bypass stuns
-    if (m_spellInfo->Id == 33206 && m_caster->HasAura(63248))
-        usableInStun = true;
+    // there is no other way to handle it
+    if (m_spellInfo->Id == 33206 && !m_caster->HasAura(63248))
+        usableInStun = false;
 
     // Check whether the cast should be prevented by any state you might have.
     SpellCastResult prevented_reason = SPELL_CAST_OK;
@@ -6920,9 +6920,6 @@ SpellCastResult Spell::CheckCasterAuras(bool preventionOnly) const
                 // Hand of Freedom, can be used while sapped
                 if (m_spellInfo->Id == 1044)
                     mask |= 1 << MECHANIC_SAPPED;
-                // Glyph of Pain Suppression, can be used while stunned (Seduction is a charm mechanic)
-                if (m_spellInfo->Id == 33206)
-                    mask |= (1 << MECHANIC_CHARM);
                 Unit::AuraEffectList const& stunAuras = m_caster->GetAuraEffectsByType(SPELL_AURA_MOD_STUN);
                 for (Unit::AuraEffectList::const_iterator i = stunAuras.begin(); i != stunAuras.end(); ++i)
                 {
