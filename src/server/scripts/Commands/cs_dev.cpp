@@ -84,7 +84,6 @@ public:
         handler->SendErrorMessage(LANG_COMMAND_DEV_FORMATION);
         return true;
     }
-
 };
 
 void AddSC_dev_commandscript()
