@@ -15,6 +15,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "AreaDefines.h"
 #include "CreatureScript.h"
 #include "InstanceMapScript.h"
 #include "InstanceScript.h"
@@ -295,7 +296,7 @@ class spell_serpentshrine_cavern_coilfang_water : public AuraScript
     {
         PreventDefaultAction();
         InstanceScript* instance = GetUnitOwner()->GetInstanceScript();
-        if (!instance || GetUnitOwner()->GetMapId() != 548)
+        if (!instance || GetUnitOwner()->GetMapId() != MAP_COILFANG_SERPENTSHRINE_CAVERN)
         {
             SetDuration(0);
             return;

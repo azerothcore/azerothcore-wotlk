@@ -33,16 +33,16 @@
 
 // <mapId, zoneId>, show
 std::map<std::pair<uint32, uint32>, FireworkShow const *> const FireworkShowStore = {
-    { { 0,   AREA_DUN_MOROGH         }, &fireworkShowIronforge    },
-    { { 0,   AREA_STRANGLETHORN_VALE }, &fireworkShowBootyBay     },
-    { { 0,   AREA_UNDERCITY          }, &fireworkShowUndercity    },
-    { { 0,   AREA_STORMWIND_CITY     }, &fireworkShowStormwind    },
-    { { 1,   AREA_TELDRASSIL         }, &fireworkShowTeldrassil   },
-    { { 1,   AREA_ORGRIMMAR          }, &fireworkShowOrgrimmar    },
-    { { 1,   AREA_THUNDER_BLUFF      }, &fireworkShowThunderBluff },
-    { { 530, AREA_EVERSONG_WOODS     }, &fireworkShowSilvermoon   },
-    { { 530, AREA_THE_EXODAR         }, &fireworkShowExodar       },
-    { { 530, AREA_SHATTRATH_CITY     }, &fireworkShowShattrath    },
+    { { MAP_EASTERN_KINGDOMS, AREA_DUN_MOROGH         }, &fireworkShowIronforge    },
+    { { MAP_EASTERN_KINGDOMS, AREA_STRANGLETHORN_VALE }, &fireworkShowBootyBay     },
+    { { MAP_EASTERN_KINGDOMS, AREA_UNDERCITY          }, &fireworkShowUndercity    },
+    { { MAP_EASTERN_KINGDOMS, AREA_STORMWIND_CITY     }, &fireworkShowStormwind    },
+    { { MAP_KALIMDOR,         AREA_TELDRASSIL         }, &fireworkShowTeldrassil   },
+    { { MAP_KALIMDOR,         AREA_ORGRIMMAR          }, &fireworkShowOrgrimmar    },
+    { { MAP_KALIMDOR,         AREA_THUNDER_BLUFF      }, &fireworkShowThunderBluff },
+    { { MAP_OUTLAND,          AREA_EVERSONG_WOODS     }, &fireworkShowSilvermoon   },
+    { { MAP_OUTLAND,          AREA_THE_EXODAR         }, &fireworkShowExodar       },
+    { { MAP_OUTLAND,          AREA_SHATTRATH_CITY     }, &fireworkShowShattrath    },
 };
 
 struct go_firework_show : public GameObjectAI

@@ -540,9 +540,9 @@ class spell_gen_rallying_cry_of_the_dragonslayer : public SpellScript
     {
         targets.clear();
 
-        uint32 zoneId = 1519;
-        if (GetCaster()->GetMapId() == 1) // Kalimdor
-            zoneId = 1637;
+        uint32 zoneId = AREA_STORMWIND_CITY;
+        if (GetCaster()->GetMapId() == MAP_KALIMDOR)
+            zoneId = AREA_ORGRIMMAR;
 
         Map::PlayerList const& pList = GetCaster()->GetMap()->GetPlayers();
         for (Map::PlayerList::const_iterator itr = pList.begin(); itr != pList.end(); ++itr)
@@ -4050,7 +4050,7 @@ public:
             // Triggered spell id dependent on riding skill and zone
             bool canFly = false;
             uint32 map = GetVirtualMapForMapAndZone(target->GetMapId(), target->GetZoneId());
-            if (map == 530 || (map == 571 && target->HasSpell(SPELL_COLD_WEATHER_FLYING)))
+            if (map == MAP_OUTLAND || (map == MAP_NORTHREND && target->HasSpell(SPELL_COLD_WEATHER_FLYING)))
                 canFly = true;
 
             AreaTableEntry const* area = sAreaTableStore.LookupEntry(target->GetAreaId());

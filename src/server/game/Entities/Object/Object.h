@@ -18,6 +18,7 @@
 #ifndef _OBJECT_H
 #define _OBJECT_H
 
+#include "AreaDefines.h"
 #include "Common.h"
 #include "DataMap.h"
 #include "EventProcessor.h"
@@ -588,7 +589,7 @@ public:
 
     [[nodiscard]] bool IsInWintergrasp() const
     {
-        return GetMapId() == 571 && GetPositionX() > 3733.33331f && GetPositionX() < 5866.66663f && GetPositionY() > 1599.99999f && GetPositionY() < 4799.99997f;
+        return GetMapId() == MAP_NORTHREND && GetPositionX() > 3733.33331f && GetPositionX() < 5866.66663f && GetPositionY() > 1599.99999f && GetPositionY() < 4799.99997f;
     }
 
     uint32  LastUsedScriptID;
