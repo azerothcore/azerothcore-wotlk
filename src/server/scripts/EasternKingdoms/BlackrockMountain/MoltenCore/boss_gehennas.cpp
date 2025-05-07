@@ -74,7 +74,7 @@ public:
                 {
                     if (urand(0, 1))
                     {
-                        if (Unit* target = SelectTarget(SelectTargetMethod::Random, 1, 0.0f, true))
+                        if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 0.0f, true, false))
                         {
                             DoCast(target, SPELL_SHADOW_BOLT_RANDOM);
                         }

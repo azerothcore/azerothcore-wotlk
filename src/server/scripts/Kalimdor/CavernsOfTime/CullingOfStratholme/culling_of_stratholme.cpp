@@ -955,7 +955,7 @@ public:
                         eventInRun = false;
                         ScheduleNextEvent(currentEvent, 0);
                         break;
-                    //After waypoint 23
+                    // After waypoint 23
                     case EVENT_ACTION_PHASE3+3:
                         SetRun(true);
                         if (Creature* cr = GetEventNpc(NPC_CITY_MAN3))
@@ -971,10 +971,12 @@ public:
                             cr->AI()->Talk(SAY_PHASE305);
                         ScheduleNextEvent(currentEvent, 1000);
                         break;
+                    // Trio citizen transformation right as we enter Town Hall
                     case EVENT_ACTION_PHASE3+6:
                         if (Creature* cr = GetEventNpc(NPC_CITY_MAN))
                         {
                             cr->UpdateEntry(NPC_INFINITE_HUNTER, nullptr, false);
+                            cr->SetFullHealth();
                             cr->SetImmuneToAll(true);
                             cr->SetReactState(REACT_PASSIVE);
                         }
@@ -984,6 +986,7 @@ public:
                         if (Creature* cr = GetEventNpc(NPC_CITY_MAN4))
                         {
                             cr->UpdateEntry(NPC_INFINITE_AGENT, nullptr, false);
+                            cr->SetFullHealth();
                             cr->SetImmuneToAll(true);
                             cr->SetReactState(REACT_PASSIVE);
                         }
@@ -993,18 +996,19 @@ public:
                         if (Creature* cr = GetEventNpc(NPC_CITY_MAN3))
                         {
                             cr->UpdateEntry(NPC_INFINITE_ADVERSARY, nullptr, false);
+                            cr->SetFullHealth();
                             cr->SetReactState(REACT_AGGRESSIVE);
                             cr->SetInCombatWithZone();
                             cr->AddThreat(me, 0.0f);
                         }
-                        if (Creature* cr = GetEventNpc(NPC_INFINITE_AGENT)) // it is infinite agent now :)
+                        if (Creature* cr = GetEventNpc(NPC_INFINITE_AGENT))
                         {
                             cr->SetImmuneToAll(false);
                             cr->SetReactState(REACT_AGGRESSIVE);
                             cr->SetInCombatWithZone();
                             cr->AddThreat(me, 0.0f);
                         }
-                        if (Creature* cr = GetEventNpc(NPC_INFINITE_HUNTER)) // it is infinite hunter now :)
+                        if (Creature* cr = GetEventNpc(NPC_INFINITE_HUNTER))
                         {
                             cr->SetImmuneToAll(false);
                             cr->SetReactState(REACT_AGGRESSIVE);
