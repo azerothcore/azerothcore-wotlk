@@ -345,6 +345,8 @@ struct boss_kiljaeden : public BossAI
         ScheduleHealthCheckEvent(25, [&] {
             _phase = PHASE_SACRIFICE;
 
+            scheduler.CancelAll();
+
             scheduler.Schedule(1s, [this](TaskContext)
             {
                 scheduler.Schedule(1s, [this](TaskContext)
