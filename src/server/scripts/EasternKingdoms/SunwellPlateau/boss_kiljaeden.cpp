@@ -308,8 +308,6 @@ struct boss_kiljaeden : public BossAI
 
             scheduler.CancelAll();
 
-            ScheduleBasicAbilities();
-
             me->m_Events.AddEventAtOffset([&] {
                 if (Creature* kalec = instance->GetCreature(DATA_KALECGOS_KJ))
                     kalec->AI()->Talk(SAY_KALECGOS_READY2);
@@ -325,6 +323,7 @@ struct boss_kiljaeden : public BossAI
             scheduler.Schedule(1s + 200ms, [this](TaskContext)
             {
                 DoCastSelf(SPELL_SHADOW_SPIKE);
+                ScheduleBasicAbilities();
             });
 
             ScheduleTimedEvent(15s, [&] {
