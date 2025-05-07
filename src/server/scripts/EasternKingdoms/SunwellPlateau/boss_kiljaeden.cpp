@@ -471,8 +471,12 @@ struct boss_kiljaeden : public BossAI
     {
         if (me->GetReactState() == REACT_PASSIVE)
             return;
+
         ScriptedAI::EnterEvadeMode(why);
-        me->DespawnOrUnsummon();
+        if (InstanceScript* instance = me->GetInstanceScript())
+            if (Creature* controller = instance->GetCreature(DATA_KJ_CONTROLLER))
+                if (controller->IsAIEnabled)
+                    controller->AI()->Reset();
     }
 
     void AttackStart(Unit* who) override
