@@ -17481,7 +17481,6 @@ bool Unit::IsTriggeredAtSpellProcEvent(Unit* victim, Aura* aura, WeaponAttackTyp
     {
         if (!spellProto->HasAttribute(SPELL_ATTR3_CAN_PROC_FROM_PROCS))
             return false;
-
     }
 
     // Xinef: additional check for player auras - only player spells can trigger player proc auras
