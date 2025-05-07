@@ -9,7 +9,7 @@ DELETE FROM `spell_group` WHERE `id` = 1004 AND `spell_id` IN (702, 50274, 16231
 INSERT INTO `spell_group` VALUES (1004, 702, 0), (1004, 50274, 0), (1004, 99, 0), (1004, 1160, 0), (1004, 67, 0), (1004, 24423, 0);
 
 -- rename
-UPDATE `spell_group_stack_rules` SET `stack_rule` = 17 , `description` = 'Group of minor Armor reducing, hit increase and AP reducing debuffs, effect exclusive' WHERE `group_id` = 1004;
+UPDATE `spell_group_stack_rules` SET `description` = 'Group of minor Armor reducing, hit increase and AP reducing debuffs, effect exclusive' WHERE `group_id` = 1004;
 
 -- remove old ap debuff group
 DELETE FROM `spell_group` WHERE `id` = 1017;
