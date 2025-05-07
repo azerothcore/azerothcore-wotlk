@@ -2,13 +2,18 @@
 DELETE FROM `spell_group` WHERE `id` = 1010 AND `spell_id` IN (17800);
 INSERT INTO `spell_group` VALUES (1010, 17800, 0);
 
--- curse of weakness and spore cloud into low armor% debuff
-DELETE FROM `spell_group` WHERE `id` = 1004 AND `spell_id` IN (702, 50274);
-INSERT INTO `spell_group` VALUES (1004, 702, 0), (1004, 50274, 0);
+-- curse of weakness and spore cloud into low armor% debuff, remove curse of recklessness
+-- combine low armor% and attack power debuff because of curse of weakness
+-- add vindication and demoralizing screech
+DELETE FROM `spell_group` WHERE `id` = 1004 AND `spell_id` IN (702, 50274, 16231, 99, 1160, 67, 24423);
+INSERT INTO `spell_group` VALUES (1004, 702, 0), (1004, 50274, 0), (1004, 99, 0), (1004, 1160, 0), (1004, 67, 0), (1004, 24423, 0);
 
--- vindication and demoralizing screech into attack power debuff
-DELETE FROM `spell_group` WHERE `id` = 1017 AND `spell_id` IN (67, 55487);
-INSERT INTO `spell_group` VALUES (1017, 67, 0),(1017,55487,0);
+-- rename
+UPDATE `spell_group_stack_rules` SET `stack_rule` = 17 , `description` = 'Group of minor Armor reducing, hit increase and AP reducing debuffs, effect exclusive' WHERE `group_id` = 1004;
+
+-- remove old ap debuff group
+DELETE FROM `spell_group` WHERE `id` = 1017;
+DELETE FROM `spell_group_stack_rules` WHERE `group_id` = 1017;
 
 -- stampede into bleed debuff
 DELETE FROM `spell_group` WHERE `id` = 1008 AND `spell_id` IN (57386);
