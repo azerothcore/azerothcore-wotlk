@@ -95,7 +95,9 @@ enum PaladinSpells
     SPELL_PALADIN_HOLY_VENGEANCE                 = 31803,
     SPELL_PALADIN_BLOOD_CORRUPTION               = 53742,
     SPELL_PALADIN_SEAL_OF_VENGEANCE_EFFECT       = 42463,
-    SPELL_PALADIN_SEAL_OF_CORRUPTION_EFFECT      = 53739
+    SPELL_PALADIN_SEAL_OF_CORRUPTION_EFFECT      = 53739,
+
+    SPELL_PALADIN_HAND_OF_PROTECTION             = 1022
 };
 
 enum PaladinSpellIcons
@@ -1150,6 +1152,35 @@ class spell_pal_seal_of_vengeance : public SpellScript
     }
 };
 
+// 1022 - Hand of Protection
+class spell_pal_hand_of_protection : public SpellScript
+{
+    PrepareSpellScript(spell_pal_hand_of_protection);
+
+    bool Validate(SpellInfo const* /*spellInfo*/) override
+    {
+        return ValidateSpellInfo({ SPELL_PALADIN_HAND_OF_PROTECTION });
+    }
+
+    SpellCastResult CheckCast()
+    {
+        Unit* caster = GetCaster();
+
+        if (!caster->HasStunAura())
+            return SPELL_CAST_OK;
+
+        if (caster->GetTarget() != caster->GetGUID())
+            return SPELL_FAILED_STUNNED;
+
+        return SPELL_CAST_OK;
+    }
+
+    void Register() override
+    {
+        OnCheckCast += SpellCheckCastFn(spell_pal_hand_of_protection::CheckCast);
+    }
+};
+
 void AddSC_paladin_spell_scripts()
 {
     RegisterSpellAndAuraScriptPair(spell_pal_seal_of_command, spell_pal_seal_of_command_aura);
@@ -1178,4 +1209,5 @@ void AddSC_paladin_spell_scripts()
     RegisterSpellScript(spell_pal_righteous_defense);
     RegisterSpellScript(spell_pal_seal_of_righteousness);
     RegisterSpellScript(spell_pal_seal_of_vengeance);
+    RegisterSpellScript(spell_pal_hand_of_protection);
 }
