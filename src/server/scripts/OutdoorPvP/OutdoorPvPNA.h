@@ -34,11 +34,11 @@ const uint32 NA_CREDIT_MARKER = 24867;
 
 const uint32 NA_GUARDS_MAX = 15;
 
-const uint32 NA_BUFF_ZONE = 3518;
+const uint32 NA_BUFF_ZONE = AREA_NAGRAND;
 
 const uint32 NA_HALAA_GRAVEYARD = 993;
 
-const uint32 NA_HALAA_GRAVEYARD_ZONE = 3518; // need to add zone id, not area id
+const uint32 NA_HALAA_GRAVEYARD_ZONE = AREA_NAGRAND; // need to add zone id, not area id
 
 const uint32 NA_RESPAWN_TIME = 3600000; // one hour to capture after defeating all guards
 

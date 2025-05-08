@@ -53,7 +53,7 @@ enum Gilthares
     SAY_GIL_SWEET               = 6,
     SAY_GIL_FREED               = 7,
 
-    QUEST_FREE_FROM_HOLD        = 898,
+    QUEST_FREE_FROM_HOLD        = 898
 };
 
 class npc_gilthares : public CreatureScript

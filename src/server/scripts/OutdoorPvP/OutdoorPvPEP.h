@@ -36,7 +36,12 @@ const uint32 EP_CGT_CM = 17689;
 const uint32 EP_NPT_CM = 17696;
 const uint32 EP_PWT_CM = 17698;
 
-const uint32 EPBuffZones[EPBuffZonesNum] = { AREA_EASTERN_PLAGUELANDS, AREA_STRATHOLME, AREA_SCHOLOMANCE };
+const uint32 EPBuffZones[EPBuffZonesNum] =
+{
+    AREA_EASTERN_PLAGUELANDS,
+    AREA_STRATHOLME,
+    AREA_SCHOLOMANCE
+};
 
 //enum EP_TaxiNodes
 //{

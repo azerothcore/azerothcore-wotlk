@@ -24,7 +24,14 @@
 const uint8 OutdoorPvPZMBuffZonesNum = 5;
 
 // the buff is cast in these zones
-const uint32 OutdoorPvPZMBuffZones[OutdoorPvPZMBuffZonesNum] = { AREA_ZANGARMARSH, AREA_SERPENTSHRINE_CAVERN, AREA_THE_SLAVE_PENS, AREA_THE_STEAMVAULT, AREA_THE_UNDERBOG };
+const uint32 OutdoorPvPZMBuffZones[OutdoorPvPZMBuffZonesNum] =
+{
+    AREA_ZANGARMARSH,
+    AREA_SERPENTSHRINE_CAVERN,
+    AREA_THE_SLAVE_PENS,
+    AREA_THE_STEAMVAULT,
+    AREA_THE_UNDERBOG
+};
 
 // linked when the central tower is controlled
 const uint32 ZM_GRAVEYARD_ZONE = AREA_ZANGARMARSH;
