@@ -265,7 +265,7 @@ OPvPCapturePointNA::OPvPCapturePointNA(OutdoorPvP* pvp) :
     m_WyvernStateNorth(0), m_WyvernStateSouth(0), m_WyvernStateEast(0), m_WyvernStateWest(0),
     m_HalaaState(HALAA_N), m_RespawnTimer(NA_RESPAWN_TIME), m_GuardCheckTimer(NA_GUARD_CHECK_TIME), m_canRecap(true)
 {
-    SetCapturePointData(182210, 530, -1572.57f, 7945.3f, -22.475f, 2.05949f, 0.0f, 0.0f, 0.857167f, 0.515038f);
+    SetCapturePointData(182210, MAP_OUTLAND, -1572.57f, 7945.3f, -22.475f, 2.05949f, 0.0f, 0.0f, 0.857167f, 0.515038f);
 }
 
 bool OutdoorPvPNA::SetupOutdoorPvP()
@@ -816,7 +816,7 @@ void OPvPCapturePointNA::ChangeState()
             break;
     }
 
-    auto bounds = sMapMgr->FindMap(530, 0)->GetGameObjectBySpawnIdStore().equal_range(m_capturePointSpawnId);
+    auto bounds = sMapMgr->FindMap(MAP_OUTLAND, 0)->GetGameObjectBySpawnIdStore().equal_range(m_capturePointSpawnId);
     for (auto itr = bounds.first; itr != bounds.second; ++itr)
         itr->second->SetGoArtKit(artkit);
 

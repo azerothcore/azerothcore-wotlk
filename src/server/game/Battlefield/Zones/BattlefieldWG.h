@@ -100,11 +100,6 @@ enum WintergraspData
     BATTLEFIELD_WG_DATA_MAX,
 };
 
-enum WintergraspAreaIds
-{
-    BATTLEFIELD_WG_MAPID            = 571,              // Northrend
-};
-
 /*#########################
  *####### Graveyards ######
  *#########################*/

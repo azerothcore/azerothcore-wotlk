@@ -1486,7 +1486,7 @@ bool Player::TeleportTo(uint32 mapid, float x, float y, float z, float orientati
     }
     else
     {
-        if (IsClass(CLASS_DEATH_KNIGHT, CLASS_CONTEXT_TELEPORT) && GetMapId() == 609 && !IsGameMaster() && !HasSpell(50977))
+        if (IsClass(CLASS_DEATH_KNIGHT, CLASS_CONTEXT_TELEPORT) && GetMapId() == MAP_EBON_HOLD && !IsGameMaster() && !HasSpell(50977))
         {
             SendTransferAborted(mapid, TRANSFER_ABORT_UNIQUE_MESSAGE, 1);
             return false;
@@ -13624,7 +13624,7 @@ bool Player::canFlyInZone(uint32 mapid, uint32 zone, SpellInfo const* bySpell)
 
     // continent checked in SpellInfo::CheckLocation at cast and area update
     uint32 v_map = GetVirtualMapForMapAndZone(mapid, zone);
-    if (v_map == 571 && !bySpell->HasAttribute(SPELL_ATTR7_IGNORES_COLD_WEATHER_FLYING_REQUIREMENT))
+    if (v_map == MAP_NORTHREND && !bySpell->HasAttribute(SPELL_ATTR7_IGNORES_COLD_WEATHER_FLYING_REQUIREMENT))
     {
         if (!HasSpell(54197)) // 54197 = Cold Weather Flying
         {

@@ -1307,8 +1307,8 @@ void World::SetInitialWorldSettings()
                 || !MapMgr::ExistMapAndVMap(1, 10311.3f, 832.463f)
                 || !MapMgr::ExistMapAndVMap(1, -2917.58f, -257.98f)
                 || (_int_configs[CONFIG_EXPANSION] && (
-                        !MapMgr::ExistMapAndVMap(530, 10349.6f, -6357.29f) ||
-                        !MapMgr::ExistMapAndVMap(530, -3961.64f, -13931.2f))))
+                        !MapMgr::ExistMapAndVMap(MAP_OUTLAND, 10349.6f, -6357.29f) ||
+                        !MapMgr::ExistMapAndVMap(MAP_OUTLAND, -3961.64f, -13931.2f))))
         {
             LOG_ERROR("server.loading", "Failed to find map files for starting areas");
             exit(1);
