@@ -138,7 +138,7 @@ class spell_shadow_sickle_periodic_damage : public AuraScript
             return;
 
         if (Unit* target = caster->GetAI()->SelectTarget(SelectTargetMethod::Random, 0, 40.0f)) // Unknown if it targets only players
-            caster->CastSpell(target, target->GetMap()->IsHeroic() ? SPELL_SHADOW_SICKLE_H : SPELL_SHADOW_SICKLE, true);
+            caster->CastSpell(target, SPELL_SHADOW_SICKLE, true);
     }
 
     void Register() override

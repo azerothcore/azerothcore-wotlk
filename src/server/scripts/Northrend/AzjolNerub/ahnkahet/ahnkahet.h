@@ -48,8 +48,7 @@ enum AhnKahetCreatures
 
 enum AhnkahetSpells
 {
-    SPELL_SHADOW_SICKLE             = 56701, // Shadow Sickle Normal
-    SPELL_SHADOW_SICKLE_H           = 59104, // Shadow Sickle Heroic
+    SPELL_SHADOW_SICKLE             = 56701, // Shadow Sickle
 };
 
 enum AhnkahetObjects
