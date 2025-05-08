@@ -25,7 +25,7 @@ const uint32 EP_AllianceBuffs[4] = {11413, 11414, 11415, 1386};
 
 const uint32 EP_HordeBuffs[4] = {30880, 30683, 30682, 29520};
 
-const uint32 EP_GraveyardZone = 139;
+const uint32 EP_GraveyardZone = AREA_EASTERN_PLAGUELANDS;
 
 const uint32 EP_GraveyardId = 927;
 
@@ -36,7 +36,7 @@ const uint32 EP_CGT_CM = 17689;
 const uint32 EP_NPT_CM = 17696;
 const uint32 EP_PWT_CM = 17698;
 
-const uint32 EPBuffZones[EPBuffZonesNum] = {139, 2017, 2057};
+const uint32 EPBuffZones[EPBuffZonesNum] = { AREA_EASTERN_PLAGUELANDS, AREA_STRATHOLME, AREA_SCHOLOMANCE };
 
 //enum EP_TaxiNodes
 //{

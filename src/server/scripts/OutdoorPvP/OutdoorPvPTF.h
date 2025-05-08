@@ -25,11 +25,11 @@ const uint8 OutdoorPvPTFBuffZonesNum = 5;
 
 const uint32 OutdoorPvPTFBuffZones[OutdoorPvPTFBuffZonesNum] =
 {
-    3519 /*Terokkar Forest*/,
-    3791 /*Sethekk Halls*/,
-    3789 /*Shadow Labyrinth*/,
-    3792 /*Mana-Tombs*/,
-    3790 /*Auchenai Crypts*/
+    AREA_TEROKKAR_FOREST,
+    AREA_SETHEKK_HALLS,
+    AREA_SHADOW_LABYRINTH,
+    AREA_MANA_TOMBS,
+    AREA_AUCHENAI_CRYPTS,
 };
 
 // locked for 6 hours after capture

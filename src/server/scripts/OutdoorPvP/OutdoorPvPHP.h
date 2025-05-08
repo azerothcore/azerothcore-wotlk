@@ -22,8 +22,8 @@
 #include "WorldStateDefines.h"
 
 #define OutdoorPvPHPBuffZonesNum 6
-//  HP, citadel, ramparts, blood furnace, shattered halls, mag's lair
-const uint32 OutdoorPvPHPBuffZones[OutdoorPvPHPBuffZonesNum] = { 3483, 3563, 3562, 3713, 3714, 3836 };
+
+const uint32 OutdoorPvPHPBuffZones[OutdoorPvPHPBuffZonesNum] = { AREA_HELLFIRE_PENINSULA, AREA_HELLFIRE_CITADEL, AREA_HELLFIRE_RAMPARTS, AREA_THE_BLOOD_FURNACE, AREA_THE_SHATTERED_HALLS, AREA_MAGTHERIDONS_LAIR };
 
 enum OutdoorPvPHPSpells
 {
