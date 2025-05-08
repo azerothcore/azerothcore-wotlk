@@ -21,6 +21,7 @@
 #include "Battlefield.h"
 #include "Log.h"
 #include "World.h"
+#include "WorldState.h"
 #include "WorldStateDefines.h"
 #include "WorldStatePackets.h"
 
@@ -1238,7 +1239,7 @@ struct BfWGGameObjectBuilding
                 break;
         }
 
-        m_State = sWorld->getWorldState(m_WorldState);
+        m_State = sWorldState->getWorldState(m_WorldState);
         if (gobj)
         {
             switch (m_State)
@@ -1418,7 +1419,7 @@ struct BfWGGameObjectBuilding
 
     void Save()
     {
-        sWorld->setWorldState(m_WorldState, m_State);
+        sWorldState->setWorldState(m_WorldState, m_State);
     }
 };
 
@@ -1503,7 +1504,7 @@ struct WGWorkshop
 
     void Save()
     {
-        sWorld->setWorldState(WorkshopsData[workshopId].worldstate, state);
+        sWorldState->setWorldState(WorkshopsData[workshopId].worldstate, state);
     }
 };
 

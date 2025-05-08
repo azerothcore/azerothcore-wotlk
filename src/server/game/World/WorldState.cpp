@@ -95,6 +95,57 @@ void WorldState::Load()
     HandleSunsReachSubPhaseTransition(m_sunsReachData.m_subphaseMask, true);
 }
 
+void WorldState::LoadWorldStates()
+{
+    uint32 oldMSTime = getMSTime();
+
+    QueryResult result = CharacterDatabase.Query("SELECT entry, value FROM worldstates");
+
+    if (!result)
+    {
+        LOG_WARN("server.loading", ">> Loaded 0 world states. DB table `worldstates` is empty!");
+        LOG_INFO("server.loading", " ");
+        return;
+    }
+
+    do
+    {
+        Field* fields = result->Fetch();
+        _worldstates[fields[0].Get<uint32>()] = fields[1].Get<uint32>();
+    } while (result->NextRow());
+
+    LOG_INFO("server.loading", ">> Loaded {} World States in {} ms", _worldstates.size(), GetMSTimeDiffToNow(oldMSTime));
+    LOG_INFO("server.loading", " ");
+}
+
+// Setting a worldstate will save it to DB
+void WorldState::setWorldState(uint32 index, uint64 timeValue)
+{
+    auto const& it = _worldstates.find(index);
+    if (it != _worldstates.end())
+    {
+        CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_UPD_WORLDSTATE);
+        stmt->SetData(0, uint32(timeValue));
+        stmt->SetData(1, index);
+        CharacterDatabase.Execute(stmt);
+    }
+    else
+    {
+        CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_INS_WORLDSTATE);
+        stmt->SetData(0, index);
+        stmt->SetData(1, uint32(timeValue));
+        CharacterDatabase.Execute(stmt);
+    }
+
+    _worldstates[index] = timeValue;
+}
+
+uint64 WorldState::getWorldState(uint32 index) const
+{
+    auto const& itr = _worldstates.find(index);
+    return itr != _worldstates.end() ? itr->second : 0;
+}
+
 void WorldState::Save(WorldStateSaveIds saveId)
 {
     switch (saveId)
@@ -233,6 +284,7 @@ void WorldState::HandlePlayerEnterZone(Player* player, WorldStateZoneId zoneId)
             break;
     }
 };
+
 void WorldState::HandlePlayerLeaveZone(Player* player, WorldStateZoneId zoneId)
 {
     std::lock_guard<std::mutex> guard(_mutex);
