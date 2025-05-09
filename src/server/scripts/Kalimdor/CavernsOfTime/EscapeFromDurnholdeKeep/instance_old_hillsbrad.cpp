@@ -41,7 +41,7 @@ const Position thrallPositions[THRALL_POSITIONS_COUNT] =
 class instance_old_hillsbrad : public InstanceMapScript
 {
 public:
-    instance_old_hillsbrad() : InstanceMapScript("instance_old_hillsbrad", 560) { }
+    instance_old_hillsbrad() : InstanceMapScript("instance_old_hillsbrad", MAP_THE_ESCAPE_FROM_DURNHOLDE) { }
 
     InstanceScript* GetInstanceScript(InstanceMap* map) const override
     {
