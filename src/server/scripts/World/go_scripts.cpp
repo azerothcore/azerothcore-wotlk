@@ -458,7 +458,7 @@ public:
 ####*/
 enum L70ETCMusic
 {
-    MUSIC_L70_ETC_MUSIC = 11803,
+    MUSIC_L70_ETC_MUSIC      = 11803,
     MUSIC_L70_ETC_MUSIC_LOUD = 12868
 };
 
