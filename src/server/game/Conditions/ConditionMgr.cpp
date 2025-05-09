@@ -409,7 +409,7 @@ bool Condition::Meets(ConditionSourceInfo& sourceInfo)
     }
     case CONDITION_WORLD_STATE:
     {
-        condMeets = ConditionValue2 == sWorld->getWorldState(ConditionValue1);
+        condMeets = ConditionValue2 == sWorldState->getWorldState(ConditionValue1);
         break;
     }
     case CONDITION_PHASEMASK:

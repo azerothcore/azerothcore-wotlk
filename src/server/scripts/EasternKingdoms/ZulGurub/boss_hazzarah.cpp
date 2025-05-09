@@ -122,7 +122,7 @@ struct boss_hazzarah : public BossAI
                 case EVENT_CHAIN_BURN:
                     if (me->GetPowerPct(POWER_MANA) > 5.f) // totally guessed
                     {
-                        if (Unit* target = SelectTarget(SelectTargetMethod::Random, 1, [&](Unit* u) { return u && !u->IsPet() && u->getPowerType() == POWER_MANA; }))
+                        if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, [&](Unit* u) { return u && !u->IsPet() && u->getPowerType() == POWER_MANA && u != me->GetVictim(); }))
                         {
                             DoCast(target, SPELL_CHAIN_BURN);
                         }
