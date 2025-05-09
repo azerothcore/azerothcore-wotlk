@@ -382,7 +382,7 @@ public:
                     events.Repeat(25s);
                     break;
                 case EVENT_FROST_BLAST:
-                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, RAID_MODE(1, 0), 0, true))
+                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 0, true, RAID_MODE(false, true)))
                     {
                         me->CastSpell(target, SPELL_FROST_BLAST, false);
                     }
@@ -392,7 +392,7 @@ public:
                 case EVENT_CHAINS:
                     for (uint8 i = 0; i < 3; ++i)
                     {
-                        if (Unit* target = SelectTarget(SelectTargetMethod::Random, 1, 200, true, true, -SPELL_CHAINS_OF_KELTHUZAD))
+                        if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 200, true, false, -SPELL_CHAINS_OF_KELTHUZAD))
                         {
                             me->CastSpell(target, SPELL_CHAINS_OF_KELTHUZAD, true);
                         }
