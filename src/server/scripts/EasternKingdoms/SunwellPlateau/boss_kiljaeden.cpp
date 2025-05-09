@@ -227,6 +227,11 @@ struct boss_kiljaeden : public BossAI
     boss_kiljaeden(Creature* creature) : BossAI(creature, DATA_KILJAEDEN)
     {
         me->SetReactState(REACT_PASSIVE);
+
+        scheduler.SetValidator([this]
+        {
+            return !me->HasUnitState(UNIT_STATE_CASTING);
+        });
     }
 
     void InitializeAI() override
@@ -303,22 +308,22 @@ struct boss_kiljaeden : public BossAI
 
             scheduler.CancelAll();
 
-            ScheduleBasicAbilities();
-
             me->m_Events.AddEventAtOffset([&] {
                 if (Creature* kalec = instance->GetCreature(DATA_KALECGOS_KJ))
                     kalec->AI()->Talk(SAY_KALECGOS_READY2);
                 EmpowerOrb(false);
             }, 35s);
 
-            me->m_Events.AddEventAtOffset([&] {
+            scheduler.Schedule(1s, [this](TaskContext)
+            {
                 Talk(SAY_KJ_REFLECTION);
                 me->CastCustomSpell(SPELL_SINISTER_REFLECTION, SPELLVALUE_MAX_TARGETS, 1, me, TRIGGERED_NONE);
-            }, 1s);
+            });
 
             scheduler.Schedule(1s + 200ms, [this](TaskContext)
             {
                 DoCastSelf(SPELL_SHADOW_SPIKE);
+                ScheduleBasicAbilities();
             });
 
             ScheduleTimedEvent(15s, [&] {
@@ -340,75 +345,80 @@ struct boss_kiljaeden : public BossAI
         ScheduleHealthCheckEvent(25, [&] {
             _phase = PHASE_SACRIFICE;
 
-            me->m_Events.AddEventAtOffset([&] {
-                Talk(SAY_KJ_REFLECTION);
-                me->CastCustomSpell(SPELL_SINISTER_REFLECTION, SPELLVALUE_MAX_TARGETS, 1, me, TRIGGERED_NONE);
-            }, 1s);
-
-            me->m_Events.AddEventAtOffset([&] {
-                DoCastSelf(SPELL_SHADOW_SPIKE);
-            }, 2s);
-
-            if (Creature* kalec = instance->GetCreature(DATA_KALECGOS_KJ))
-            {
-                kalec->AI()->Talk(SAY_KALECGOS_FOCUS, 8s);
-                kalec->AI()->Talk(SAY_KALECGOS_FATE, 20s + 200ms);
-            }
-
-            if (Creature* anveena = instance->GetCreature(DATA_ANVEENA))
-            {
-                anveena->AI()->Talk(SAY_ANVEENA_KALEC, 18s);
-                anveena->AI()->Talk(SAY_ANVEENA_GOODBYE, 25s);
-            }
-
             scheduler.CancelAll();
 
-            me->m_Events.AddEventAtOffset([&] {
-                if (Creature* anveena = instance->GetCreature(DATA_ANVEENA))
+            scheduler.Schedule(1s, [this](TaskContext)
+            {
+                scheduler.Schedule(1s, [this](TaskContext)
                 {
-                    anveena->RemoveAllAuras();
-                    anveena->DespawnOrUnsummon(3500);
-                }
-            }, 28s);
+                    Talk(SAY_KJ_REFLECTION);
+                    me->CastCustomSpell(SPELL_SINISTER_REFLECTION, SPELLVALUE_MAX_TARGETS, 1, me, TRIGGERED_NONE);
+                });
 
-            me->m_Events.AddEventAtOffset([&] {
-                if (Creature* anveena = instance->GetCreature(DATA_ANVEENA))
+                scheduler.Schedule(2s, [this](TaskContext)
                 {
-                    anveena->CastSpell(anveena, SPELL_SACRIFICE_OF_ANVEENA, true);
-                    DoCastSelf(SPELL_CUSTOM_08_STATE, true);
-                    me->SetUnitFlag(UNIT_FLAG_PACIFIED);
-                    scheduler.DelayAll(7100ms);
+                    DoCastSelf(SPELL_SHADOW_SPIKE);
+                });
 
-                    me->m_Events.AddEventAtOffset([&] {
-                        me->RemoveAurasDueToSpell(SPELL_CUSTOM_08_STATE);
-                        me->RemoveUnitFlag(UNIT_FLAG_PACIFIED);
-
-                        ScheduleBasicAbilities();
-
-                        ScheduleTimedEvent(25s, [&] {
-                            me->RemoveAurasDueToSpell(SPELL_ARMAGEDDON_PERIODIC);
-                            Talk(EMOTE_KJ_DARKNESS);
-                            DoCastAOE(SPELL_DARKNESS_OF_A_THOUSAND_SOULS);
-
-                            me->m_Events.AddEventAtOffset([this]() {
-                                if (me->IsAlive() && me->IsInCombat())
-                                    DoCastSelf(SPELL_ARMAGEDDON_PERIODIC, true);
-                            }, 9s);
-                        }, 25s);
-
-                        ScheduleTimedEvent(1500ms, [&] {
-                            DoCastSelf(SPELL_ARMAGEDDON_PERIODIC, true);
-                        }, 20s);
-                    }, 7s);
-                }
-                Talk(SAY_KJ_PHASE5);
-            }, 30s);
-
-            me->m_Events.AddEventAtOffset([&] {
                 if (Creature* kalec = instance->GetCreature(DATA_KALECGOS_KJ))
-                    kalec->AI()->Talk(SAY_KALECGOS_READY_ALL);
-                EmpowerOrb(true);
-            }, 61s);
+                {
+                    kalec->AI()->Talk(SAY_KALECGOS_FOCUS, 8s);
+                    kalec->AI()->Talk(SAY_KALECGOS_FATE, 20s + 200ms);
+                }
+
+                if (Creature* anveena = instance->GetCreature(DATA_ANVEENA))
+                {
+                    anveena->AI()->Talk(SAY_ANVEENA_KALEC, 18s);
+                    anveena->AI()->Talk(SAY_ANVEENA_GOODBYE, 25s);
+                }
+
+                me->m_Events.AddEventAtOffset([&] {
+                    if (Creature* anveena = instance->GetCreature(DATA_ANVEENA))
+                    {
+                        anveena->RemoveAllAuras();
+                        anveena->DespawnOrUnsummon(3500);
+                    }
+                }, 28s);
+
+                me->m_Events.AddEventAtOffset([&] {
+                    if (Creature* anveena = instance->GetCreature(DATA_ANVEENA))
+                    {
+                        anveena->CastSpell(anveena, SPELL_SACRIFICE_OF_ANVEENA, true);
+                        DoCastSelf(SPELL_CUSTOM_08_STATE, true);
+                        me->SetUnitFlag(UNIT_FLAG_PACIFIED);
+                        scheduler.CancelAll();
+
+                        me->m_Events.AddEventAtOffset([&] {
+                            me->RemoveAurasDueToSpell(SPELL_CUSTOM_08_STATE);
+                            me->RemoveUnitFlag(UNIT_FLAG_PACIFIED);
+
+                            ScheduleBasicAbilities();
+
+                            ScheduleTimedEvent(25s, [&] {
+                                me->RemoveAurasDueToSpell(SPELL_ARMAGEDDON_PERIODIC);
+                                Talk(EMOTE_KJ_DARKNESS);
+                                DoCastAOE(SPELL_DARKNESS_OF_A_THOUSAND_SOULS);
+
+                                me->m_Events.AddEventAtOffset([this]() {
+                                    if (me->IsAlive() && me->IsInCombat())
+                                        DoCastSelf(SPELL_ARMAGEDDON_PERIODIC, true);
+                                }, 9s);
+                            }, 25s);
+
+                            ScheduleTimedEvent(1500ms, [&] {
+                                DoCastSelf(SPELL_ARMAGEDDON_PERIODIC, true);
+                            }, 20s);
+                        }, 7s);
+                    }
+                    Talk(SAY_KJ_PHASE5);
+                }, 30s);
+
+                me->m_Events.AddEventAtOffset([&] {
+                    if (Creature* kalec = instance->GetCreature(DATA_KALECGOS_KJ))
+                        kalec->AI()->Talk(SAY_KALECGOS_READY_ALL);
+                    EmpowerOrb(true);
+                }, 61s);
+            });
         });
     }
 
@@ -461,8 +471,12 @@ struct boss_kiljaeden : public BossAI
     {
         if (me->GetReactState() == REACT_PASSIVE)
             return;
+
         ScriptedAI::EnterEvadeMode(why);
-        me->DespawnOrUnsummon();
+        if (InstanceScript* instance = me->GetInstanceScript())
+            if (Creature* controller = instance->GetCreature(DATA_KJ_CONTROLLER))
+                if (controller->IsAIEnabled)
+                    controller->AI()->Reset();
     }
 
     void AttackStart(Unit* who) override

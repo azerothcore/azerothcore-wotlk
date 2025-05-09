@@ -94,7 +94,7 @@ BossBoundaryData const boundaries =
 class instance_black_temple : public InstanceMapScript
 {
 public:
-    instance_black_temple() : InstanceMapScript("instance_black_temple", 564) { }
+    instance_black_temple() : InstanceMapScript("instance_black_temple", MAP_BLACK_TEMPLE) { }
 
     struct instance_black_temple_InstanceMapScript : public InstanceScript
     {
