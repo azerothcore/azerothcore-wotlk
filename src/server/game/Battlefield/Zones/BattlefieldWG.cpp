@@ -19,6 +19,7 @@
 /// @todo: Use spell victory/defeat in wg instead of RewardMarkOfHonor() && RewardHonor
 /// @todo: Add proper implement of achievement
 
+#include "AreaDefines.h"
 #include "BattlefieldWG.h"
 #include "Chat.h"
 #include "GameTime.h"
@@ -46,8 +47,8 @@ bool BattlefieldWG::SetupBattlefield()
 {
     m_TypeId = BATTLEFIELD_WG;                              // See enum BattlefieldTypes
     m_BattleId = BATTLEFIELD_BATTLEID_WG;
-    m_ZoneId = BATTLEFIELD_WG_ZONEID;
-    m_MapId = BATTLEFIELD_WG_MAPID;
+    m_ZoneId = AREA_WINTERGRASP;
+    m_MapId = MAP_NORTHREND;
     m_Map = sMapMgr->FindMap(m_MapId, 0);
 
     // init stalker AFTER setting map id... we spawn it at map=random memory value?...
@@ -280,7 +281,7 @@ void BattlefieldWG::OnBattleStart()
                 float x, y, z;
                 player->GetPosition(x, y, z);
                 if (5500 > x && x > 5392 && y < 2880 && y > 2800 && z < 480)
-                    player->TeleportTo(571, 5349.8686f, 2838.481f, 409.240f, 0.046328f);
+                    player->TeleportTo(MAP_NORTHREND, 5349.8686f, 2838.481f, 409.240f, 0.046328f);
                 SendInitWorldStatesTo(player);
             }
         }
@@ -523,9 +524,9 @@ uint8 BattlefieldWG::GetSpiritGraveyardId(uint32 areaId) const
             return BATTLEFIELD_WG_GY_WORKSHOP_NE;
         case AREA_THE_BROKEN_TEMPLE:
             return BATTLEFIELD_WG_GY_WORKSHOP_NW;
-        case AREA_WESTPARK_WORKSHOP:
+        case AREA_WESTSPARK_WORKSHOP:
             return BATTLEFIELD_WG_GY_WORKSHOP_SW;
-        case AREA_EASTPARK_WORKSHOP:
+        case AREA_EASTSPARK_WORKSHOP:
             return BATTLEFIELD_WG_GY_WORKSHOP_SE;
         case AREA_WINTERGRASP:
             return BATTLEFIELD_WG_GY_ALLIANCE;
@@ -548,9 +549,9 @@ uint32 BattlefieldWG::GetAreaByGraveyardId(uint8 gId) const
         case BATTLEFIELD_WG_GY_WORKSHOP_NW:
             return AREA_THE_BROKEN_TEMPLE;
         case BATTLEFIELD_WG_GY_WORKSHOP_SW:
-            return AREA_WESTPARK_WORKSHOP;
+            return AREA_WESTSPARK_WORKSHOP;
         case BATTLEFIELD_WG_GY_WORKSHOP_SE:
-            return AREA_EASTPARK_WORKSHOP;
+            return AREA_EASTSPARK_WORKSHOP;
     }
 
     return 0;
@@ -852,13 +853,13 @@ void BattlefieldWG::OnPlayerJoinWar(Player* player)
     AddUpdateTenacity(player);
 
     if (player->GetTeamId() == GetDefenderTeam())
-        player->TeleportTo(571, 5345, 2842, 410, 3.14f);
+        player->TeleportTo(MAP_NORTHREND, 5345, 2842, 410, 3.14f);
     else
     {
         if (player->GetTeamId() == TEAM_HORDE)
-            player->TeleportTo(571, 5025.857422f, 3674.628906f, 362.737122f, 4.135169f);
+            player->TeleportTo(MAP_NORTHREND, 5025.857422f, 3674.628906f, 362.737122f, 4.135169f);
         else
-            player->TeleportTo(571, 5101.284f, 2186.564f, 365.549f, 3.812f);
+            player->TeleportTo(MAP_NORTHREND, 5101.284f, 2186.564f, 365.549f, 3.812f);
     }
 
     if (player->GetTeamId() == GetAttackerTeam())
@@ -926,8 +927,8 @@ uint32 BattlefieldWG::GetData(uint32 data) const
         // See: SpellArea::IsFitToRequirements
         case AREA_THE_SUNKEN_RING:
         case AREA_THE_BROKEN_TEMPLE:
-        case AREA_WESTPARK_WORKSHOP:
-        case AREA_EASTPARK_WORKSHOP:
+        case AREA_WESTSPARK_WORKSHOP:
+        case AREA_EASTSPARK_WORKSHOP:
             // Graveyards and Workshops are controlled by the same team.
             if (BfGraveyard const* graveyard = GetGraveyardById(GetSpiritGraveyardId(data)))
                 return graveyard->GetControlTeamId();

@@ -1300,15 +1300,15 @@ void World::SetInitialWorldSettings()
     if (!sConfigMgr->isDryRun())
     {
         ///- Check the existence of the map files for all starting areas.
-        if (!MapMgr::ExistMapAndVMap(0, -6240.32f, 331.033f)
-                || !MapMgr::ExistMapAndVMap(0, -8949.95f, -132.493f)
-                || !MapMgr::ExistMapAndVMap(1, -618.518f, -4251.67f)
-                || !MapMgr::ExistMapAndVMap(0, 1676.35f, 1677.45f)
-                || !MapMgr::ExistMapAndVMap(1, 10311.3f, 832.463f)
-                || !MapMgr::ExistMapAndVMap(1, -2917.58f, -257.98f)
+        if (!MapMgr::ExistMapAndVMap(MAP_EASTERN_KINGDOMS, -6240.32f, 331.033f)
+                || !MapMgr::ExistMapAndVMap(MAP_EASTERN_KINGDOMS, -8949.95f, -132.493f)
+                || !MapMgr::ExistMapAndVMap(MAP_KALIMDOR, -618.518f, -4251.67f)
+                || !MapMgr::ExistMapAndVMap(MAP_EASTERN_KINGDOMS, 1676.35f, 1677.45f)
+                || !MapMgr::ExistMapAndVMap(MAP_KALIMDOR, 10311.3f, 832.463f)
+                || !MapMgr::ExistMapAndVMap(MAP_KALIMDOR, -2917.58f, -257.98f)
                 || (_int_configs[CONFIG_EXPANSION] && (
-                        !MapMgr::ExistMapAndVMap(530, 10349.6f, -6357.29f) ||
-                        !MapMgr::ExistMapAndVMap(530, -3961.64f, -13931.2f))))
+                        !MapMgr::ExistMapAndVMap(MAP_OUTLAND, 10349.6f, -6357.29f) ||
+                        !MapMgr::ExistMapAndVMap(MAP_OUTLAND, -3961.64f, -13931.2f))))
         {
             LOG_ERROR("server.loading", "Failed to find map files for starting areas");
             exit(1);

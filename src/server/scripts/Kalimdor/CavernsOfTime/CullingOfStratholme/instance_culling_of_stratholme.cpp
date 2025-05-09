@@ -29,7 +29,7 @@
 class instance_culling_of_stratholme : public InstanceMapScript
 {
 public:
-    instance_culling_of_stratholme() : InstanceMapScript("instance_culling_of_stratholme", 595) { }
+    instance_culling_of_stratholme() : InstanceMapScript("instance_culling_of_stratholme", MAP_THE_CULLING_OF_STRATHOLME) { }
 
     InstanceScript* GetInstanceScript(InstanceMap* pMap) const override
     {
