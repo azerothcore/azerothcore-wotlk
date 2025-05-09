@@ -467,11 +467,6 @@ enum L70ETCMusicEvents
     EVENT_ETC_START_MUSIC = 1
 };
 
-enum L70ETCMusicAreas
-{
-    BLACKROCK_DEPTHS = 1584
-};
-
 class go_l70_etc_music : public GameObjectScript
 {
 public:
@@ -492,7 +487,7 @@ public:
                 switch (eventId)
                 {
                 case EVENT_ETC_START_MUSIC:
-                    if (me->GetAreaId() == BLACKROCK_DEPTHS)
+                    if (me->GetMapId() == MAP_BLACKROCK_DEPTHS)
                         me->PlayDirectMusic(MUSIC_L70_ETC_MUSIC_LOUD);
                     else
                         me->PlayDirectMusic(MUSIC_L70_ETC_MUSIC);
