@@ -176,7 +176,7 @@ enum AreaTableIDs : uint32
     AREA_PUTRICIDES_LABORATORY_OF_ALCHEMICAL_HORRORS_AND_FUN = 4890,
     AREA_THE_SANCTUM_OF_BLOOD                                = 4891,
     AREA_FROSTMOURNE                                         = 4910,
-    AREA_THE_RUBY_SANCTUM                                    = 4987,
+    AREA_THE_RUBY_SANCTUM                                    = 4987
 };
 
 enum MapIDs : uint32
@@ -267,7 +267,7 @@ enum MapIDs : uint32
     MAP_TRIAL_OF_THE_CHAMPION                = 650,
     MAP_PIT_OF_SARON                         = 658,
     MAP_HALLS_OF_REFLECTION                  = 668,
-    MAP_THE_RUBY_SANCTUM                     = 724,
+    MAP_THE_RUBY_SANCTUM                     = 724
 };
 
 #endif
