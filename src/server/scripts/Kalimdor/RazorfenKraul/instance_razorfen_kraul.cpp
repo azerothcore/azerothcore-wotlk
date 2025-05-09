@@ -21,7 +21,7 @@
 class instance_razorfen_kraul : public InstanceMapScript
 {
 public:
-    instance_razorfen_kraul() : InstanceMapScript("instance_razorfen_kraul", 47) { }
+    instance_razorfen_kraul() : InstanceMapScript("instance_razorfen_kraul", MAP_RAZORFEN_KRAUL) { }
 
     InstanceScript* GetInstanceScript(InstanceMap* map) const override
     {

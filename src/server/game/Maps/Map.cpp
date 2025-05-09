@@ -106,10 +106,10 @@ void Map::InitVisibilityDistance()
 
     switch (GetId())
     {
-        case 609: // Scarlet Enclave (DK starting zone)
+        case MAP_EBON_HOLD: // Scarlet Enclave (DK starting zone)
             m_VisibleDistance = 125.0f;
             break;
-        case 25: // Scott Test (box map)
+        case MAP_SCOTT_TEST: // (box map)
             m_VisibleDistance = 200.0f;
             break;
     }
@@ -1392,7 +1392,7 @@ LiquidData const Map::GetLiquidData(uint32 phaseMask, float x, float y, float z,
         if (liquid_level > ground_level && G3D::fuzzyGe(z, ground_level - GROUND_HEIGHT_TOLERANCE))
         {
             // hardcoded in client like this
-            if (GetId() == 530 && liquid_type == 2)
+            if (GetId() == MAP_OUTLAND && liquid_type == 2)
                 liquid_type = 15;
 
             uint32 liquidFlagType = 0;
@@ -1448,7 +1448,7 @@ LiquidData const Map::GetLiquidData(uint32 phaseMask, float x, float y, float z,
             {
                 // hardcoded in client like this
                 uint32 liquidEntry = map_data.Entry;
-                if (GetId() == 530 && liquidEntry == 2)
+                if (GetId() == MAP_OUTLAND && liquidEntry == 2)
                     liquidEntry = 15;
 
                 liquidData = map_data;
@@ -1545,7 +1545,7 @@ void Map::GetFullTerrainStatusForPosition(uint32 /*phaseMask*/, float x, float y
     if (wmoData && wmoData->liquidInfo && wmoData->liquidInfo->level > wmoData->floorZ)
     {
         uint32 liquidType = wmoData->liquidInfo->type;
-        if (GetId() == 530 && liquidType == 2) // gotta love blizzard hacks
+        if (GetId() == MAP_OUTLAND && liquidType == 2) // gotta love blizzard hacks
             liquidType = 15;
 
         uint32 liquidFlagType = 0;
@@ -1594,7 +1594,7 @@ void Map::GetFullTerrainStatusForPosition(uint32 /*phaseMask*/, float x, float y
         if (gridLiquidData.Status != LIQUID_MAP_NO_WATER && (!wmoData || gridLiquidData.Level > wmoData->floorZ))
         {
             uint32 liquidEntry = gridLiquidData.Entry;
-            if (GetId() == 530 && liquidEntry == 2)
+            if (GetId() == MAP_OUTLAND && liquidEntry == 2)
                 liquidEntry = 15;
 
             data.liquidInfo = gridLiquidData;

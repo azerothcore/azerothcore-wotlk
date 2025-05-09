@@ -15,6 +15,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "AreaDefines.h"
 #include "CreatureScript.h"
 #include "GameObjectAI.h"
 #include "MapMgr.h"
@@ -187,7 +188,7 @@ public:
     bool Execute(uint64 /*execTime*/, uint32 /*diff*/) override
     {
         InstanceScript* instance = _owner->GetInstanceScript();
-        if (!instance || _owner->GetMapId() != 724)
+        if (!instance || _owner->GetMapId() != MAP_THE_RUBY_SANCTUM)
             return true;
 
         if (instance->GetBossState(DATA_HALION) != IN_PROGRESS)
@@ -950,7 +951,7 @@ public:
         if (GetTargetApplication()->GetRemoveMode() != AURA_REMOVE_BY_EXPIRE)
             return;
 
-        if (!GetTarget()->GetInstanceScript() || !GetTarget()->GetInstanceScript()->IsEncounterInProgress() || GetTarget()->GetMapId() != 724)
+        if (!GetTarget()->GetInstanceScript() || !GetTarget()->GetInstanceScript()->IsEncounterInProgress() || GetTarget()->GetMapId() != MAP_THE_RUBY_SANCTUM)
             return;
 
         GetTarget()->CastCustomSpell(_summonSpellId, SPELLVALUE_BASE_POINT1, GetAura()->GetStackAmount(), GetTarget(), TRIGGERED_FULL_MASK, nullptr, nullptr, GetCasterGUID());
