@@ -31,7 +31,7 @@ enum Spells
 class instance_shadowfang_keep : public InstanceMapScript
 {
 public:
-    instance_shadowfang_keep() : InstanceMapScript("instance_shadowfang_keep", 33) { }
+    instance_shadowfang_keep() : InstanceMapScript("instance_shadowfang_keep", MAP_SHADOWFANG_KEEP) { }
 
     InstanceScript* GetInstanceScript(InstanceMap* map) const override
     {

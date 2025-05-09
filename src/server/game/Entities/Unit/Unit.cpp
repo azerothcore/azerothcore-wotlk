@@ -17,6 +17,7 @@
 
 #include "Unit.h"
 #include "AccountMgr.h"
+#include "AreaDefines.h"
 #include "ArenaSpectator.h"
 #include "Battlefield.h"
 #include "BattlefieldMgr.h"
@@ -4224,7 +4225,7 @@ bool Unit::isInBackInMap(Unit const* target, float distance, float arc) const
 
 bool Unit::isInAccessiblePlaceFor(Creature const* c) const
 {
-    if (c->GetMapId() == 618) // Ring of Valor
+    if (c->GetMapId() == MAP_THE_RING_OF_VALOR)
     {
         // skip transport check, check for being below floor level
         if (this->GetPositionZ() < 28.0f)
@@ -4234,7 +4235,7 @@ bool Unit::isInAccessiblePlaceFor(Creature const* c) const
                 if (bg->GetStartTime() < 80133) // 60000ms preparation time + 20133ms elevator rise time
                     return false;
     }
-    else if (c->GetMapId() == 631) // Icecrown Citadel
+    else if (c->GetMapId() == MAP_ICECROWN_CITADEL)
     {
         // if static transport doesn't match - return false
         if (c->GetTransport() != this->GetTransport() && ((c->GetTransport() && c->GetTransport()->IsStaticTransport()) || (this->GetTransport() && this->GetTransport()->IsStaticTransport())))

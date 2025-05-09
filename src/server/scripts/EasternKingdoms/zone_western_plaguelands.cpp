@@ -27,6 +27,7 @@ npc_the_scourge_cauldron
 npc_andorhal_tower
 EndContentData */
 
+#include "AreaDefines.h"
 #include "CreatureScript.h"
 #include "Player.h"
 #include "ScriptedCreature.h"
@@ -74,7 +75,7 @@ public:
 
             switch (me->GetAreaId())
             {
-                case 199:                                   //felstone
+                case AREA_FELSTONE_FIELD:
                     if (player->GetQuestStatus(5216) == QUEST_STATUS_INCOMPLETE ||
                             player->GetQuestStatus(5229) == QUEST_STATUS_INCOMPLETE)
                     {
@@ -82,7 +83,7 @@ public:
                         DoDie();
                     }
                     break;
-                case 200:                                   //dalson
+                case AREA_DALSONS_TEARS:
                     if (player->GetQuestStatus(5219) == QUEST_STATUS_INCOMPLETE ||
                             player->GetQuestStatus(5231) == QUEST_STATUS_INCOMPLETE)
                     {
@@ -90,7 +91,7 @@ public:
                         DoDie();
                     }
                     break;
-                case 201:                                   //gahrron
+                case AREA_GAHRRONS_WITHERING:
                     if (player->GetQuestStatus(5225) == QUEST_STATUS_INCOMPLETE ||
                             player->GetQuestStatus(5235) == QUEST_STATUS_INCOMPLETE)
                     {
@@ -98,7 +99,7 @@ public:
                         DoDie();
                     }
                     break;
-                case 202:                                   //writhing
+                case AREA_THE_WRITHING_HAUNT:
                     if (player->GetQuestStatus(5222) == QUEST_STATUS_INCOMPLETE ||
                             player->GetQuestStatus(5233) == QUEST_STATUS_INCOMPLETE)
                     {

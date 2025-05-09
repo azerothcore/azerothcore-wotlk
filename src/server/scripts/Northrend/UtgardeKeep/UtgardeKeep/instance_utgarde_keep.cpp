@@ -33,7 +33,7 @@ ObjectData const creatureData[] =
 class instance_utgarde_keep : public InstanceMapScript
 {
 public:
-    instance_utgarde_keep() : InstanceMapScript("instance_utgarde_keep", 574) { }
+    instance_utgarde_keep() : InstanceMapScript("instance_utgarde_keep", MAP_UTGARDE_KEEP) { }
 
     InstanceScript* GetInstanceScript(InstanceMap* pMap) const override
     {
