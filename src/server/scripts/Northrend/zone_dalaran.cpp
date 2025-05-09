@@ -15,6 +15,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "AreaDefines.h"
 #include "CreatureScript.h"
 #include "MoveSplineInit.h"
 #include "Player.h"
@@ -444,9 +445,7 @@ public:
 
         void MoveInLineOfSight(Unit* who) override
         {
-            // 4395 Dalaran
-            // 4569 Sewer Exit Pipe
-            if (!who || !who->IsInWorld()|| who->GetZoneId() != 4395 || who->GetAreaId() == 4569)
+            if (!who || !who->IsInWorld()|| who->GetZoneId() != AREA_DALARAN || who->GetAreaId() == AREA_SEWER_EXIT_PIPE)
                 return;
 
             if (!me->IsWithinDist(who, 5.0f, false))
@@ -501,8 +500,6 @@ public:
 
 enum MinigobData
 {
-    ZONE_DALARAN            = 4395,
-
     SPELL_MANABONKED        = 61834,
     SPELL_TELEPORT_VISUAL   = 51347,
     SPELL_IMPROVED_BLINK    = 61995,
@@ -539,7 +536,7 @@ struct npc_minigob_manabonk : public ScriptedAI
 
         me->GetMap()->DoForAllPlayers([&](Player* player)
             {
-                if (player->GetZoneId() == ZONE_DALARAN && !player->IsFlying() && !player->IsMounted() && !player->IsGameMaster())
+                if (player->GetZoneId() == AREA_DALARAN && !player->IsFlying() && !player->IsMounted() && !player->IsGameMaster())
                     playerInDalaranList.push_back(player);
             });
 

@@ -22,7 +22,7 @@
 class instance_hellfire_ramparts : public InstanceMapScript
 {
 public:
-    instance_hellfire_ramparts() : InstanceMapScript("instance_hellfire_ramparts", 543) { }
+    instance_hellfire_ramparts() : InstanceMapScript("instance_hellfire_ramparts", MAP_HELLFIRE_CITADEL_RAMPARTS) { }
 
     struct instance_hellfire_ramparts_InstanceMapScript : public InstanceScript
     {
