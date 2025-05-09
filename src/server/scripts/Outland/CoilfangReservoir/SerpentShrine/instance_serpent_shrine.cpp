@@ -73,7 +73,7 @@ ObjectData const summonData[] =
 class instance_serpent_shrine : public InstanceMapScript
 {
 public:
-    instance_serpent_shrine() : InstanceMapScript("instance_serpent_shrine", 548) { }
+    instance_serpent_shrine() : InstanceMapScript("instance_serpent_shrine", MAP_COILFANG_SERPENTSHRINE_CAVERN) { }
 
     struct instance_serpentshrine_cavern_InstanceMapScript : public InstanceScript
     {

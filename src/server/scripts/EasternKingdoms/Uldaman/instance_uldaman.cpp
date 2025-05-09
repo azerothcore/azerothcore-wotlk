@@ -37,7 +37,7 @@ enum Events
 class instance_uldaman : public InstanceMapScript
 {
 public:
-    instance_uldaman() : InstanceMapScript("instance_uldaman", 70) { }
+    instance_uldaman() : InstanceMapScript("instance_uldaman", MAP_ULDAMAN) { }
 
     struct instance_uldaman_InstanceMapScript : public InstanceScript
     {

@@ -200,7 +200,7 @@ private:
 class instance_icecrown_citadel : public InstanceMapScript
 {
 public:
-    instance_icecrown_citadel() : InstanceMapScript(ICCScriptName, 631) { }
+    instance_icecrown_citadel() : InstanceMapScript(ICCScriptName, MAP_ICECROWN_CITADEL) { }
 
     struct instance_icecrown_citadel_InstanceMapScript : public InstanceScript
     {

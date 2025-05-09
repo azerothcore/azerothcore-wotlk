@@ -43,7 +43,7 @@ DoorData const doorData[] =
 class instance_shattered_halls : public InstanceMapScript
 {
 public:
-    instance_shattered_halls() : InstanceMapScript("instance_shattered_halls", 540) { }
+    instance_shattered_halls() : InstanceMapScript("instance_shattered_halls", MAP_HELLFIRE_CITADEL_THE_SHATTERED_HALLS) { }
 
     InstanceScript* GetInstanceScript(InstanceMap* map) const override
     {

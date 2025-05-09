@@ -56,7 +56,7 @@ constexpr uint8 SAY_SPAWN = 1;
 class instance_molten_core : public InstanceMapScript
 {
 public:
-    instance_molten_core() : InstanceMapScript(MCScriptName, 409) {}
+    instance_molten_core() : InstanceMapScript(MCScriptName, MAP_MOLTEN_CORE) {}
 
     struct instance_molten_core_InstanceMapScript : public InstanceScript
     {

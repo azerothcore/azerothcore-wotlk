@@ -30,7 +30,7 @@
 class instance_ulduar : public InstanceMapScript
 {
 public:
-    instance_ulduar() : InstanceMapScript("instance_ulduar", 603) { }
+    instance_ulduar() : InstanceMapScript("instance_ulduar", MAP_ULDUAR) { }
 
     InstanceScript* GetInstanceScript(InstanceMap* pMap) const override
     {

@@ -75,7 +75,7 @@ uint32 const Entry[3] = { 12422, 12416, 12420 };
 class instance_blackwing_lair : public InstanceMapScript
 {
 public:
-    instance_blackwing_lair() : InstanceMapScript(BWLScriptName, 469) { }
+    instance_blackwing_lair() : InstanceMapScript(BWLScriptName, MAP_BLACKWING_LAIR) { }
 
     struct instance_blackwing_lair_InstanceMapScript : public InstanceScript
     {
