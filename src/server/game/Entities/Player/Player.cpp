@@ -18,6 +18,7 @@
 #include "Player.h"
 #include "AccountMgr.h"
 #include "AchievementMgr.h"
+#include "AreaDefines.h"
 #include "ArenaSpectator.h"
 #include "ArenaTeam.h"
 #include "ArenaTeamMgr.h"
@@ -1485,7 +1486,7 @@ bool Player::TeleportTo(uint32 mapid, float x, float y, float z, float orientati
     }
     else
     {
-        if (IsClass(CLASS_DEATH_KNIGHT, CLASS_CONTEXT_TELEPORT) && GetMapId() == 609 && !IsGameMaster() && !HasSpell(50977))
+        if (IsClass(CLASS_DEATH_KNIGHT, CLASS_CONTEXT_TELEPORT) && GetMapId() == MAP_EBON_HOLD && !IsGameMaster() && !HasSpell(50977))
         {
             SendTransferAborted(mapid, TRANSFER_ABORT_UNIQUE_MESSAGE, 1);
             return false;
@@ -1730,7 +1731,7 @@ void Player::RemoveFromWorld()
             m_session->DoLootRelease(lguid);
         sOutdoorPvPMgr->HandlePlayerLeaveZone(this, m_zoneUpdateId);
         sBattlefieldMgr->HandlePlayerLeaveZone(this, m_zoneUpdateId);
-        sWorldState->HandlePlayerLeaveZone(this, static_cast<WorldStateZoneId>(m_zoneUpdateId));
+        sWorldState->HandlePlayerLeaveZone(this, static_cast<AreaTableIDs>(m_zoneUpdateId));
     }
 
     // Remove items from world before self - player must be found in Item::RemoveFromObjectUpdate
@@ -2402,7 +2403,7 @@ void Player::GiveXP(uint32 xp, Unit* victim, float group_rate, bool isLFGReward)
     // Favored experience increase START
     uint32 zone = GetZoneId();
     float favored_exp_mult = 0;
-    if ((zone == 3483 || zone == 3562 || zone == 3836 || zone == 3713 || zone == 3714) && HasAnyAuras(32096 /*Thrallmar's Favor*/, 32098 /*Honor Hold's Favor*/))
+    if ((zone == AREA_HELLFIRE_PENINSULA || zone == AREA_HELLFIRE_RAMPARTS || zone == AREA_MAGTHERIDONS_LAIR || zone == AREA_THE_BLOOD_FURNACE || zone == AREA_THE_SHATTERED_HALLS) && HasAnyAuras(32096 /*Thrallmar's Favor*/, 32098 /*Honor Hold's Favor*/))
         favored_exp_mult = 0.05f; // Thrallmar's Favor and Honor Hold's Favor
 
     xp = uint32(xp * (1 + favored_exp_mult));
@@ -8236,7 +8237,7 @@ void Player::SendInitWorldStates(uint32 zoneId, uint32 areaId)
     // 8 Arena season id
     packet.Worldstates.emplace_back(WORLD_STATE_ARENA_SEASON_ID, sArenaSeasonMgr->GetCurrentSeason());
 
-    if (mapId == 530) // Outland
+    if (mapId == MAP_OUTLAND)
     {
         packet.Worldstates.reserve(3);
         packet.Worldstates.emplace_back(WORLD_STATE_OPVP_NA_UI_TOWER_SLIDER_DISPLAY, 0);
@@ -8253,18 +8254,18 @@ void Player::SendInitWorldStates(uint32 zoneId, uint32 areaId)
         // insert <field> <value>
         switch (zoneId)
         {
-            case 1: // Dun Morogh
-            case 11: // Wetlands
-            case 12: // Elwynn Forest
-            case 38: // Loch Modan
-            case 40: // Westfall
-            case 51: // Searing Gorge
-            case 1519: // Stormwind City
-            case 1537: // Ironforge
-            case 2257: // Deeprun Tram
-            case 3703: // Shattrath City
+            case AREA_DUN_MOROGH:
+            case AREA_WETLANDS:
+            case AREA_ELWYNN_FOREST:
+            case AREA_LOCH_MODAN:
+            case AREA_WESTFALL:
+            case AREA_SEARING_GORGE:
+            case AREA_STORMWIND_CITY:
+            case AREA_IRONFORGE:
+            case AREA_DEEPRUN_TRAM:
+            case AREA_SHATTRATH_CITY:
                 break;
-            case 139: // Eastern Plaguelands
+            case AREA_EASTERN_PLAGUELANDS:
                 if (outdoorPvP && outdoorPvP->GetTypeId() == OUTDOOR_PVP_EP)
                     outdoorPvP->FillInitialWorldStates(packet);
                 else
@@ -8305,7 +8306,7 @@ void Player::SendInitWorldStates(uint32 zoneId, uint32 areaId)
                     packet.Worldstates.emplace_back(WORLD_STATE_OPVP_EP_PLAGUEWOODTOWER_H, 0);
 
                 break;
-            case 1377: // Silithus
+            case AREA_SILITHUS:
                 if (outdoorPvP && outdoorPvP->GetTypeId() == OUTDOOR_PVP_SI)
                     outdoorPvP->FillInitialWorldStates(packet);
                 else
@@ -8322,7 +8323,7 @@ void Player::SendInitWorldStates(uint32 zoneId, uint32 areaId)
                 packet.Worldstates.emplace_back(WORLD_STATE_AHNQIRAJ_SANDWORM_SW, 0);
                 packet.Worldstates.emplace_back(WORLD_STATE_AHNQIRAJ_SANDWORM_E, 0);
                 break;
-            case 2597: // Alterac Valley
+            case AREA_ALTERAC_VALLEY:
                 if (battleground && battleground->GetBgTypeID(true) == BATTLEGROUND_AV)
                     battleground->FillInitialWorldStates(packet);
                 else
@@ -8405,7 +8406,7 @@ void Player::SendInitWorldStates(uint32 zoneId, uint32 areaId)
                     packet.Worldstates.emplace_back(WORLD_STATE_BATTLEGROUND_AV_AID_A_C, 1);
                 }
                 break;
-            case 3277: // Warsong Gulch
+            case AREA_WARSONG_GULCH:
                 if (battleground && battleground->GetBgTypeID(true) == BATTLEGROUND_WS)
                     battleground->FillInitialWorldStates(packet);
                 else
@@ -8421,7 +8422,7 @@ void Player::SendInitWorldStates(uint32 zoneId, uint32 areaId)
                     packet.Worldstates.emplace_back(WORLD_STATE_BATTLEGROUND_WS_FLAG_STATE_ALLIANCE, 1);
                 }
                 break;
-            case 3358: // Arathi Basin
+            case AREA_ARATHI_BASIN:
                 if (battleground && battleground->GetBgTypeID(true) == BATTLEGROUND_AB)
                     battleground->FillInitialWorldStates(packet);
                 else
@@ -8461,7 +8462,7 @@ void Player::SendInitWorldStates(uint32 zoneId, uint32 areaId)
                     packet.Worldstates.emplace_back(WORLD_STATE_BATTLEGROUND_AB_RESOURCES_WARNING, 1400); // warning limit (1400)
                 }
                 break;
-            case 3820: // Eye of the Storm
+            case AREA_EYE_OF_THE_STORM:
                 if (battleground && battleground->GetBgTypeID(true) == BATTLEGROUND_EY)
                     battleground->FillInitialWorldStates(packet);
                 else
@@ -8504,7 +8505,7 @@ void Player::SendInitWorldStates(uint32 zoneId, uint32 areaId)
                 break;
             // any of these needs change! the client remembers the prev setting!
             // ON EVERY ZONE LEAVE, RESET THE OLD ZONE'S WORLD STATE, BUT AT LEAST THE UI STUFF!
-            case 3483: // Hellfire Peninsula
+            case AREA_HELLFIRE_PENINSULA:
                 if (outdoorPvP && outdoorPvP->GetTypeId() == OUTDOOR_PVP_HP)
                     outdoorPvP->FillInitialWorldStates(packet);
                 else
@@ -8528,7 +8529,7 @@ void Player::SendInitWorldStates(uint32 zoneId, uint32 areaId)
                     packet.Worldstates.emplace_back(WORLD_STATE_OPVP_HP_STADIUM_H, 1);
                 }
                 break;
-        case 3518: // Nagrand
+        case AREA_NAGRAND:
             if (outdoorPvP && outdoorPvP->GetTypeId() == OUTDOOR_PVP_NA)
                 outdoorPvP->FillInitialWorldStates(packet);
             else
@@ -8564,7 +8565,7 @@ void Player::SendInitWorldStates(uint32 zoneId, uint32 areaId)
                 packet.Worldstates.emplace_back(WORLD_STATE_OPVP_NA_MAP_HALAA_ALLIANCE, 0);
             }
                 break;
-            case 3519: // Terokkar Forest
+            case AREA_TEROKKAR_FOREST:
                 if (outdoorPvP && outdoorPvP->GetTypeId() == OUTDOOR_PVP_TF)
                     outdoorPvP->FillInitialWorldStates(packet);
                 else
@@ -8600,7 +8601,7 @@ void Player::SendInitWorldStates(uint32 zoneId, uint32 areaId)
                     packet.Worldstates.emplace_back(WORLD_STATE_OPVP_TF_UI_LOCKED_DISPLAY_ALLIANCE, 1);
                 }
                 break;
-            case 3521: // Zangarmarsh
+            case AREA_ZANGARMARSH:
                 if (outdoorPvP && outdoorPvP->GetTypeId() == OUTDOOR_PVP_ZM)
                     outdoorPvP->FillInitialWorldStates(packet);
                 else
@@ -8634,7 +8635,7 @@ void Player::SendInitWorldStates(uint32 zoneId, uint32 areaId)
                     packet.Worldstates.emplace_back(WORLD_STATE_OPVP_ZM_MAP_ALLIANCE_FLAG_READY, 0);
                 }
                 break;
-            case 3698: // Nagrand Arena
+            case AREA_NAGRAND_ARENA:
                 if (battleground && battleground->GetBgTypeID(true) == BATTLEGROUND_NA)
                     battleground->FillInitialWorldStates(packet);
                 else
@@ -8645,7 +8646,7 @@ void Player::SendInitWorldStates(uint32 zoneId, uint32 areaId)
                     packet.Worldstates.emplace_back(WORLD_STATE_BATTLEGROUND_NA_ARENA_SHOW, 0);
                 }
                 break;
-            case 3702: // Blade's Edge Arena
+            case AREA_BLADES_EDGE_ARENA:
                 if (battleground && battleground->GetBgTypeID(true) == BATTLEGROUND_BE)
                     battleground->FillInitialWorldStates(packet);
                 else
@@ -8656,7 +8657,7 @@ void Player::SendInitWorldStates(uint32 zoneId, uint32 areaId)
                     packet.Worldstates.emplace_back(WORLD_STATE_BATTLEGROUND_BE_ARENA_SHOW, 0);
                 }
                 break;
-            case 3968: // Ruins of Lordaeron
+            case AREA_RUINS_OF_LORDAERON:
                 if (battleground && battleground->GetBgTypeID(true) == BATTLEGROUND_RL)
                     battleground->FillInitialWorldStates(packet);
                 else
@@ -8667,7 +8668,7 @@ void Player::SendInitWorldStates(uint32 zoneId, uint32 areaId)
                     packet.Worldstates.emplace_back(WORLD_STATE_BATTLEGROUND_RL_ARENA_SHOW, 0);
                 }
                 break;
-            case 4378: // Dalaran Sewers
+            case AREA_DALARAN_ARENA:
                 if (battleground && battleground->GetBgTypeID(true) == BATTLEGROUND_DS)
                     battleground->FillInitialWorldStates(packet);
                 else
@@ -8678,7 +8679,7 @@ void Player::SendInitWorldStates(uint32 zoneId, uint32 areaId)
                     packet.Worldstates.emplace_back(WORLD_STATE_BATTLEGROUND_DS_ARENA_SHOW, 0);
                 }
                 break;
-            case 4384: // Strand of the Ancients
+            case AREA_STRAND_OF_THE_ANCIENTS:
                 if (battleground && battleground->GetBgTypeID(true) == BATTLEGROUND_SA)
                     battleground->FillInitialWorldStates(packet);
                 else
@@ -8714,7 +8715,7 @@ void Player::SendInitWorldStates(uint32 zoneId, uint32 areaId)
                     // missing unknowns
                 }
                 break;
-            case 4406: // Ring of Valor
+            case ARENA_THE_RING_OF_VALOR:
                 if (battleground && battleground->GetBgTypeID(true) == BATTLEGROUND_RV)
                     battleground->FillInitialWorldStates(packet);
                 else
@@ -8725,7 +8726,7 @@ void Player::SendInitWorldStates(uint32 zoneId, uint32 areaId)
                     packet.Worldstates.emplace_back(WORLD_STATE_BATTLEGROUND_RV_ARENA_SHOW, 0);
                 }
                 break;
-            case 4710: // Isle of Conquest
+            case AREA_ISLE_OF_CONQUEST:
                 if (battleground && battleground->GetBgTypeID(true) == BATTLEGROUND_IC)
                     battleground->FillInitialWorldStates(packet);
                 else
@@ -8751,7 +8752,7 @@ void Player::SendInitWorldStates(uint32 zoneId, uint32 areaId)
                     packet.Worldstates.emplace_back(WORLD_STATE_BATTLEGROUND_IC_HORDE_KEEP_CONTROLLED_H, 1);
                 }
                 break;
-            case 4987: // The Ruby Sanctum
+            case AREA_THE_RUBY_SANCTUM:
                 if (instance)
                     instance->FillInitialWorldStates(packet);
                 else
@@ -8762,8 +8763,8 @@ void Player::SendInitWorldStates(uint32 zoneId, uint32 areaId)
                     packet.Worldstates.emplace_back(WORLD_STATE_RUBY_SANCTUM_CORPOREALITY_TOGGLE, 0);
                 }
                 break;
-            case 4812: // Icecrown Citadel
-                if (instance && mapId == 631)
+            case AREA_ICECROWN_CITADEL:
+                if (instance && mapId == MAP_ICECROWN_CITADEL)
                     instance->FillInitialWorldStates(packet);
                 else
                 {
@@ -8775,8 +8776,8 @@ void Player::SendInitWorldStates(uint32 zoneId, uint32 areaId)
                     packet.Worldstates.emplace_back(WORLD_STATE_ICECROWN_CITADEL_ATTEMPTS_MAX, 50);
                 }
                 break;
-            case 4100: // The Culling of Stratholme
-                if (instance && mapId == 595)
+            case AREA_THE_CULLING_OF_STRATHOLME:
+                if (instance && mapId == MAP_THE_CULLING_OF_STRATHOLME)
                     instance->FillInitialWorldStates(packet);
                 else
                 {
@@ -8788,8 +8789,8 @@ void Player::SendInitWorldStates(uint32 zoneId, uint32 areaId)
                     packet.Worldstates.emplace_back(WORLD_STATE_CULLING_OF_STRATHOLME_TIME_GUARDIAN_SHOW, 0);
                 }
                 break;
-            case 4228: // The Oculus
-                if (instance && mapId == 578)
+            case AREA_THE_OCULUS:
+                if (instance && mapId == MAP_THE_OCULUS)
                     instance->FillInitialWorldStates(packet);
                 else
                 {
@@ -8798,8 +8799,8 @@ void Player::SendInitWorldStates(uint32 zoneId, uint32 areaId)
                     packet.Worldstates.emplace_back(WORLD_STATE_OCULUS_CENTRIFUGE_CONSTRUCT_AMOUNT, 0);
                 }
                 break;
-            case 4273: // Ulduar
-                if (instance && mapId == 603)
+            case AREA_ULDUAR:
+                if (instance && mapId == MAP_ULDUAR)
                     instance->FillInitialWorldStates(packet);
                 else
                 {
@@ -8808,7 +8809,7 @@ void Player::SendInitWorldStates(uint32 zoneId, uint32 areaId)
                     packet.Worldstates.emplace_back(WORLD_STATE_ULDUAR_ALGALON_DESPAWN_TIMER, 0);
                 }
                 break;
-            case 4415: // Violet Hold
+            case AREA_THE_VIOLET_HOLD:
                 if (instance)
                     instance->FillInitialWorldStates(packet);
                 else
@@ -8819,8 +8820,8 @@ void Player::SendInitWorldStates(uint32 zoneId, uint32 areaId)
                     packet.Worldstates.emplace_back(WORLD_STATE_VIOLET_HOLD_WAVE_COUNT, 0);
                 }
                 break;
-            case 4820: // Halls of Refection
-                if (instance && mapId == 668)
+            case AREA_HALLS_OF_REFLECTION:
+                if (instance && mapId == MAP_HALLS_OF_REFLECTION)
                     instance->FillInitialWorldStates(packet);
                 else
                 {
@@ -8829,7 +8830,7 @@ void Player::SendInitWorldStates(uint32 zoneId, uint32 areaId)
                     packet.Worldstates.emplace_back(WORLD_STATE_HALLS_OF_REFLECTION_WAVE_COUNT, 0);
                 }
                 break;
-            case 4298: // Scarlet Enclave (DK starting zone)
+            case AREA_PLAGUELANDS_THE_SCARLET_ENCLAVE: // (DK starting zone)
                 // Get Mograine, GUID and ENTRY should NEVER change
                 if (Creature* mograine = ObjectAccessor::GetCreature(*this, ObjectGuid::Create<HighGuid::Unit>(29173, 130956)))
                 {
@@ -8845,7 +8846,7 @@ void Player::SendInitWorldStates(uint32 zoneId, uint32 areaId)
                     }
                 }
                 break;
-            case 4197: // Wintergrasp
+            case AREA_WINTERGRASP:
                 if (battlefield && battlefield->GetTypeId() == BATTLEFIELD_WG)
                 {
                     battlefield->FillInitialWorldStates(packet);
@@ -13594,7 +13595,7 @@ uint32 Player::CalculateTalentsPoints() const
     uint32 base_talent = GetLevel() < 10 ? 0 : GetLevel() - 9;
 
     uint32 talentPointsForLevel = 0;
-    if (!IsClass(CLASS_DEATH_KNIGHT, CLASS_CONTEXT_TALENT_POINT_CALC) || GetMapId() != 609)
+    if (!IsClass(CLASS_DEATH_KNIGHT, CLASS_CONTEXT_TALENT_POINT_CALC) || GetMapId() != MAP_EBON_HOLD)
     {
         talentPointsForLevel = base_talent;
     }
@@ -13623,7 +13624,7 @@ bool Player::canFlyInZone(uint32 mapid, uint32 zone, SpellInfo const* bySpell)
 
     // continent checked in SpellInfo::CheckLocation at cast and area update
     uint32 v_map = GetVirtualMapForMapAndZone(mapid, zone);
-    if (v_map == 571 && !bySpell->HasAttribute(SPELL_ATTR7_IGNORES_COLD_WEATHER_FLYING_REQUIREMENT))
+    if (v_map == MAP_NORTHREND && !bySpell->HasAttribute(SPELL_ATTR7_IGNORES_COLD_WEATHER_FLYING_REQUIREMENT))
     {
         if (!HasSpell(54197)) // 54197 = Cold Weather Flying
         {

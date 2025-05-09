@@ -15,6 +15,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "AreaDefines.h"
 #include "CombatAI.h"
 #include "CreatureScript.h"
 #include "Player.h"
@@ -800,8 +801,6 @@ public:
 enum FreedProtoDrake
 {
     NPC_DRAKE                           = 29709,
-
-    AREA_VALLEY_OF_ANCIENT_WINTERS      = 4437,
 
     TEXT_EMOTE                          = 0,
 
