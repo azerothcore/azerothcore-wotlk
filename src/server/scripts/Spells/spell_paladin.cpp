@@ -1157,20 +1157,21 @@ class spell_pal_hand_of_protection : public SpellScript
 {
     PrepareSpellScript(spell_pal_hand_of_protection);
 
-    bool Validate(SpellInfo const* /*spellInfo*/) override
-    {
-        return ValidateSpellInfo({ SPELL_PALADIN_HAND_OF_PROTECTION });
-    }
-
     SpellCastResult CheckCast()
     {
         Unit* caster = GetCaster();
 
-        if (!caster->HasStunAura())
+        if (!caster->GetTarget() || caster->GetTarget() == caster->GetGUID())
             return SPELL_CAST_OK;
 
-        if (caster->GetTarget() != caster->GetGUID())
+        if (caster->HasStunAura())
             return SPELL_FAILED_STUNNED;
+
+        if (caster->HasConfuseAura())
+            return SPELL_FAILED_CONFUSED;
+
+        if (caster->GetUnitFlags() & UNIT_FLAG_FLEEING)
+            return SPELL_FAILED_FLEEING;
 
         return SPELL_CAST_OK;
     }
