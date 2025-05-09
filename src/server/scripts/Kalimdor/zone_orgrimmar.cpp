@@ -27,6 +27,7 @@ npc_shenthul
 npc_thrall_warchief
 EndContentData */
 
+#include "AreaDefines.h"
 #include "CreatureScript.h"
 #include "Player.h"
 #include "ScriptedCreature.h"
@@ -147,11 +148,6 @@ enum ThrallWarchief : uint32
 
     SAY_THRALL_ON_QUEST_REWARD_0   = 0,
     SAY_THRALL_ON_QUEST_REWARD_1   = 1,
-
-    AREA_ORGRIMMAR                 = 1637,
-    AREA_RAZOR_HILL                = 362,
-    AREA_CAMP_TAURAJO              = 378,
-    AREA_CROSSROADS                = 380,
 
     GO_UNADORNED_SPIKE             = 175787,
 
@@ -279,7 +275,7 @@ public:
                     {
                         if (player->IsAlive() && !player->IsGameMaster())
                         {
-                            if (player->GetAreaId() == AREA_CROSSROADS)
+                            if (player->GetAreaId() == AREA_THE_CROSSROADS)
                             {
                                 player->CastSpell(player, SPELL_WARCHIEF_BLESSING, true);
                             }

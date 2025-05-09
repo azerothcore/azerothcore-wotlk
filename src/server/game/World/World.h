@@ -241,10 +241,6 @@ public:
         return index < INT_CONFIG_VALUE_COUNT ? _int_configs[index] : 0;
     }
 
-    void setWorldState(uint32 index, uint64 value) override;
-    [[nodiscard]] uint64 getWorldState(uint32 index) const override;
-    void LoadWorldStates() override;
-
     /// Are we on a "Player versus Player" server?
     [[nodiscard]] bool IsPvPRealm() const override;
     [[nodiscard]] bool IsFFAPvPRealm() const override;
@@ -318,8 +314,6 @@ private:
     uint32 _int_configs[INT_CONFIG_VALUE_COUNT];
     bool _bool_configs[BOOL_CONFIG_VALUE_COUNT];
     float _float_configs[FLOAT_CONFIG_VALUE_COUNT];
-    typedef std::map<uint32, uint64> WorldStatesMap;
-    WorldStatesMap _worldstates;
     AccountTypes _allowedSecurityLevel;
     LocaleConstant _defaultDbcLocale;                     // from config for one from loaded DBC locales
     uint32 _availableDbcLocaleMask;                       // by loaded DBC

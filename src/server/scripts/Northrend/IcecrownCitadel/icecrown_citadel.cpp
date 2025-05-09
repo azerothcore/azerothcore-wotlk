@@ -16,6 +16,7 @@
  */
 
 #include "icecrown_citadel.h"
+#include "AreaDefines.h"
 #include "AreaTriggerScript.h"
 #include "Cell.h"
 #include "CellImpl.h"
@@ -2397,7 +2398,7 @@ class spell_icc_yd_summon_undead : public SpellScript
     void HandleDummyLaunch(SpellEffIndex /*effIndex*/)
     {
         if (Unit* c = GetCaster())
-            if (c->GetMapId() == 631)
+            if (c->GetMapId() == MAP_ICECROWN_CITADEL)
                 for (uint8 i = 0; i < 5; ++i)
                     c->CastSpell(c, 71302, true);
     }

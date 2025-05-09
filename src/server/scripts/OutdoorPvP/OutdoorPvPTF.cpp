@@ -27,6 +27,7 @@
 #include "World.h"
 #include "WorldPacket.h"
 #include "WorldSessionMgr.h"
+#include "WorldState.h"
 #include "WorldStatePackets.h"
 
 OutdoorPvPTF::OutdoorPvPTF()
@@ -111,14 +112,14 @@ void OutdoorPvPTF::SendRemoveWorldStates(Player* player)
 
 void OutdoorPvPTF::SaveRequiredWorldStates() const
 {
-    sWorld->setWorldState(WORLD_STATE_OPVP_TF_UI_TOWER_COUNT_H, m_HordeTowersControlled);
-    sWorld->setWorldState(WORLD_STATE_OPVP_TF_UI_TOWER_COUNT_A, m_AllianceTowersControlled);
+    sWorldState->setWorldState(WORLD_STATE_OPVP_TF_UI_TOWER_COUNT_H, m_HordeTowersControlled);
+    sWorldState->setWorldState(WORLD_STATE_OPVP_TF_UI_TOWER_COUNT_A, m_AllianceTowersControlled);
 
-    sWorld->setWorldState(WORLD_STATE_OPVP_TF_UI_TOWERS_CONTROLLED_DISPLAY, m_IsLocked);
+    sWorldState->setWorldState(WORLD_STATE_OPVP_TF_UI_TOWERS_CONTROLLED_DISPLAY, m_IsLocked);
 
     // Save expiry as unix
     uint32 const lockExpireTime = GameTime::GetGameTime().count() + (m_LockTimer / IN_MILLISECONDS);
-    sWorld->setWorldState(WORLD_STATE_OPVP_TF_UI_LOCKED_TIME_HOURS, lockExpireTime);
+    sWorldState->setWorldState(WORLD_STATE_OPVP_TF_UI_LOCKED_TIME_HOURS, lockExpireTime);
 }
 
 void OutdoorPvPTF::ResetZoneToTeamControlled(TeamId team)
@@ -335,7 +336,7 @@ bool OutdoorPvPTF::SetupOutdoorPvP()
     m_AllianceTowersControlled = 0;
     m_HordeTowersControlled = 0;
 
-    m_IsLocked = bool(sWorld->getWorldState(WORLD_STATE_OPVP_TF_UI_TOWERS_CONTROLLED_DISPLAY));
+    m_IsLocked = bool(sWorldState->getWorldState(WORLD_STATE_OPVP_TF_UI_TOWERS_CONTROLLED_DISPLAY));
     m_JustLocked = false;
     m_LockTimer = TF_LOCK_TIME;
     m_LockTimerUpdate = 0;
@@ -359,14 +360,14 @@ bool OutdoorPvPTF::SetupOutdoorPvP()
     {
         // Core shutdown while locked -- init from latest known data in WorldState
         // Convert from unix
-        int32 const lockRemainingTime = int32((sWorld->getWorldState(WORLD_STATE_OPVP_TF_UI_LOCKED_TIME_HOURS) - GameTime::GetGameTime().count()) * IN_MILLISECONDS);
+        int32 const lockRemainingTime = int32((sWorldState->getWorldState(WORLD_STATE_OPVP_TF_UI_LOCKED_TIME_HOURS) - GameTime::GetGameTime().count()) * IN_MILLISECONDS);
         if (lockRemainingTime > 0)
         {
             m_LockTimer = lockRemainingTime;
             RecalculateClientUILockTime();
 
-            uint32 const hordeTowers = uint32(sWorld->getWorldState(WORLD_STATE_OPVP_TF_UI_TOWER_COUNT_H));
-            uint32 const allianceTowers = uint32(sWorld->getWorldState(WORLD_STATE_OPVP_TF_UI_TOWER_COUNT_A));
+            uint32 const hordeTowers = uint32(sWorldState->getWorldState(WORLD_STATE_OPVP_TF_UI_TOWER_COUNT_H));
+            uint32 const allianceTowers = uint32(sWorldState->getWorldState(WORLD_STATE_OPVP_TF_UI_TOWER_COUNT_A));
             TeamId const controllingTeam = hordeTowers > allianceTowers ? TEAM_HORDE : TEAM_ALLIANCE;
 
             ResetZoneToTeamControlled(controllingTeam);
@@ -452,7 +453,7 @@ void OPvPCapturePointTF::ChangeState()
             break;
     }
 
-    auto bounds = sMapMgr->FindMap(530, 0)->GetGameObjectBySpawnIdStore().equal_range(m_capturePointSpawnId);
+    auto bounds = sMapMgr->FindMap(MAP_OUTLAND, 0)->GetGameObjectBySpawnIdStore().equal_range(m_capturePointSpawnId);
     for (auto itr = bounds.first; itr != bounds.second; ++itr)
         itr->second->SetGoArtKit(artkit);
 

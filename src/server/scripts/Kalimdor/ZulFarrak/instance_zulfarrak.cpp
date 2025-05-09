@@ -106,7 +106,7 @@ static PyramidEventData pyramidSpawns[pyramidSpawnTotal] =
 class instance_zulfarrak : public InstanceMapScript
 {
 public:
-    instance_zulfarrak() : InstanceMapScript(ZFScriptName, 209) {}
+    instance_zulfarrak() : InstanceMapScript(ZFScriptName, MAP_ZUL_FARRAK) {}
 
     InstanceScript* GetInstanceScript(InstanceMap* map) const override
     {
