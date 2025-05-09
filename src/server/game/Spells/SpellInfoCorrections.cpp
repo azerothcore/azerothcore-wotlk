@@ -5014,9 +5014,27 @@ void SpellMgr::LoadSpellInfoCorrections()
     // Heart of the Crusader
     ApplySpellFix({ 20335, 20336, 20337 }, [](SpellInfo* spellInfo)
     {
-        spellInfo->Effects[EFFECT_2].Effect = SPELL_EFFECT_APPLY_AURA;
-        spellInfo->Effects[EFFECT_2].TargetA = SpellImplicitTargetInfo(TARGET_UNIT_TARGET_ENEMY);
-        spellInfo->Effects[EFFECT_2].ApplyAuraName = SPELL_AURA_DUMMY;
+        spellInfo->Effects[EFFECT_1].Effect = SPELL_EFFECT_APPLY_AURA;
+        spellInfo->Effects[EFFECT_1].TargetA = SpellImplicitTargetInfo(TARGET_UNIT_TARGET_ENEMY);
+        spellInfo->Effects[EFFECT_1].ApplyAuraName = SPELL_AURA_DUMMY;
+    });
+
+    // Heart of the Crusader (Rank 1)
+    ApplySpellFix({ 20335 }, [](SpellInfo* spellInfo)
+    {
+        spellInfo->Effects[EFFECT_1].TriggerSpell = 21183; // Heart of the Crusader (Rank 1)
+    });
+
+    // Heart of the Crusader (Rank 2)
+    ApplySpellFix({ 20336 }, [](SpellInfo* spellInfo)
+    {
+        spellInfo->Effects[EFFECT_1].TriggerSpell = 54498; // Heart of the Crusader (Rank 2)
+    });
+
+    // Heart of the Crusader (Rank 3)
+    ApplySpellFix({ 20337 }, [](SpellInfo* spellInfo)
+    {
+        spellInfo->Effects[EFFECT_1].TriggerSpell = 54499; // Heart of the Crusader (Rank 3)
     });
 
     // Gordok Ogre Suit
