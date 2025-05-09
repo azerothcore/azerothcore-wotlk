@@ -42,7 +42,7 @@ const uint32 anzuSummonEventId = 14797;
 class instance_sethekk_halls : public InstanceMapScript
 {
 public:
-    instance_sethekk_halls() : InstanceMapScript("instance_sethekk_halls", 556) { }
+    instance_sethekk_halls() : InstanceMapScript("instance_sethekk_halls", MAP_AUCHINDOUN_SETHEKK_HALLS) { }
 
     InstanceScript* GetInstanceScript(InstanceMap* map) const override
     {
