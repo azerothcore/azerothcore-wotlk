@@ -124,7 +124,7 @@ struct boss_anzu : public BossAI
             scheduler.DelayAll(3s);
         }).Schedule(8s, [this](TaskContext context)
         {
-            if (Unit* target = SelectTarget(SelectTargetMethod::Random, 1, 45.0f, true))
+            if (Unit* target = SelectTarget(SelectTargetMethod::Random, 9, 45.0f, true, false))
             {
                 DoCast(target, SPELL_CYCLONE);
             }
