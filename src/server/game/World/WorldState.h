@@ -177,6 +177,9 @@ class WorldState
         virtual ~WorldState();
         static WorldState* instance();
         void Load();
+        void LoadWorldStates();
+        void setWorldState(uint32 index, uint64 value);
+        [[nodiscard]] uint64 getWorldState(uint32 index) const;
         void Save(WorldStateSaveIds saveId);
         void SaveHelper(std::string& stringToSave, WorldStateSaveIds saveId);
         void HandlePlayerEnterZone(Player* player, WorldStateZoneId zoneId);
@@ -195,6 +198,8 @@ class WorldState
         void HandleSunwellGateTransition(uint32 newGate);
         void SetSunwellGateCounter(SunwellGateCounters index, uint32 value);
     private:
+        typedef std::map<uint32, uint64> WorldStatesMap;
+        WorldStatesMap _worldstates;
         void SendWorldstateUpdate(std::mutex& mutex, GuidVector const& guids, uint32 value, uint32 worldStateId);
         void StopSunsReachPhase(bool forward);
         void StartSunsReachPhase(bool initial = false);
