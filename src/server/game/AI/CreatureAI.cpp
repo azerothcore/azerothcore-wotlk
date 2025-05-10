@@ -29,6 +29,7 @@
 #include "TemporarySummon.h"
 #include "Vehicle.h"
 #include "ZoneScript.h"
+#include <functional>
 
 //Disable CreatureAI when charmed
 void CreatureAI::OnCharmed(bool /*apply*/)
@@ -384,25 +385,27 @@ void CreatureAI::MoveBackwardsChecks()
     me->GetMotionMaster()->MoveBackwards(victim, moveDist);
 }
 
-static const uint32 BOUNDARY_VISUALIZE_CREATURE = 15425;
-static const float BOUNDARY_VISUALIZE_CREATURE_SCALE = 0.25f;
-static const int8 BOUNDARY_VISUALIZE_STEP_SIZE = 2;
-static const int32 BOUNDARY_VISUALIZE_FAILSAFE_LIMIT = 500;
-static const float BOUNDARY_VISUALIZE_SPAWN_HEIGHT = 5.0f;
-
-int32 CreatureAI::VisualizeBoundary(uint32 duration, Unit* owner, bool fill) const
+int32 CreatureAI::VisualizeBoundary(uint32 duration, Unit* owner, bool fill, bool checkZ) const
 {
-    typedef std::pair<int32, int32> coordinate;
+    static constexpr float BOUNDARY_STEP = 5.0f;
+    static constexpr uint32 BOUNDARY_VISUALIZE_CREATURE = 21659; // Floaty Flavor Eye
+    static constexpr float BOUNDARY_VISUALIZE_CREATURE_SCALE = 0.25f;
+    static constexpr uint32 BOUNDARY_MAX_SPAWNS = 8000;
+    static constexpr float BOUNDARY_MAX_DISTANCE = MAX_SEARCHER_DISTANCE;
+    static Position const BOUNDARY_DIRECTIONS[6] = {
+        {BOUNDARY_STEP,  0,              0             },
+        {-BOUNDARY_STEP, 0,              0             },
+        {0,              BOUNDARY_STEP,  0             },
+        {0,              -BOUNDARY_STEP, 0             },
+        {0,              0,              BOUNDARY_STEP },
+        {0,              0,              -BOUNDARY_STEP}
+    };
 
     if (!owner)
         return -1;
 
     if (!_boundary || _boundary->empty())
         return LANG_CREATURE_MOVEMENT_NOT_BOUNDED;
-
-    std::queue<coordinate> Q;
-    std::unordered_set<coordinate> alreadyChecked;
-    std::unordered_set<coordinate> outOfBounds;
 
     Position startPosition = owner->GetPosition();
     if (!IsInBoundary(&startPosition)) // fall back to creature position
@@ -415,54 +418,77 @@ int32 CreatureAI::VisualizeBoundary(uint32 duration, Unit* owner, bool fill) con
                 return LANG_CREATURE_NO_INTERIOR_POINT_FOUND;
         }
     }
-    float spawnZ = startPosition.GetPositionZ() + BOUNDARY_VISUALIZE_SPAWN_HEIGHT;
 
-    bool boundsWarning = false;
-    Q.push({ 0,0 });
-    while (!Q.empty())
+    // Helper to spawn visualization creature
+    auto spawnVisualizationCreature = [owner, duration, checkZ](Position const& pos)
     {
-        coordinate front = Q.front();
-        bool hasOutOfBoundsNeighbor = false;
-        for (coordinate const& off : std::list<coordinate>{ {1, 0}, {0, 1}, {-1, 0}, {0, -1} })
+        if (TempSummon* summon =
+                owner->SummonCreature(BOUNDARY_VISUALIZE_CREATURE, pos, TEMPSUMMON_TIMED_DESPAWN, duration))
         {
-            coordinate next(front.first + off.first, front.second + off.second);
-            if (next.first > BOUNDARY_VISUALIZE_FAILSAFE_LIMIT || next.first < -BOUNDARY_VISUALIZE_FAILSAFE_LIMIT || next.second > BOUNDARY_VISUALIZE_FAILSAFE_LIMIT || next.second < -BOUNDARY_VISUALIZE_FAILSAFE_LIMIT)
-            {
-                boundsWarning = true;
-                continue;
-            }
-
-            if (alreadyChecked.find(next) == alreadyChecked.end()) // never check a coordinate twice
-            {
-                Position nextPos(startPosition.GetPositionX() + next.first*BOUNDARY_VISUALIZE_STEP_SIZE, startPosition.GetPositionY() + next.second*BOUNDARY_VISUALIZE_STEP_SIZE, startPosition.GetPositionZ());
-                if (IsInBoundary(&nextPos))
-                    Q.push(next);
-                else
-                {
-                    outOfBounds.insert(next);
-                    hasOutOfBoundsNeighbor = true;
-                }
-                alreadyChecked.insert(next);
-            }
-            else if (outOfBounds.find(next) != outOfBounds.end())
-                hasOutOfBoundsNeighbor = true;
+            summon->SetObjectScale(BOUNDARY_VISUALIZE_CREATURE_SCALE);
+            summon->SetUnitFlag(UNIT_FLAG_STUNNED);
+            summon->SetImmuneToAll(true);
+            summon->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE_2);
+            if (!checkZ)
+                summon->SetDisableGravity(false);
         }
+    };
 
-        if (fill || hasOutOfBoundsNeighbor)
+    struct PositionHash
+    {
+        std::size_t operator()(Position const& pos) const
         {
-            if (TempSummon* point = owner->SummonCreature(BOUNDARY_VISUALIZE_CREATURE, Position(startPosition.GetPositionX() + front.first * BOUNDARY_VISUALIZE_STEP_SIZE, startPosition.GetPositionY() + front.second * BOUNDARY_VISUALIZE_STEP_SIZE, spawnZ, 0), TEMPSUMMON_TIMED_DESPAWN, duration))
-            {
-                point->SetObjectScale(BOUNDARY_VISUALIZE_CREATURE_SCALE);
-                point->SetUnitFlag(UNIT_FLAG_STUNNED);
-                point->SetImmuneToAll(true);
-                if (!hasOutOfBoundsNeighbor)
-                    point->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE_2);
-            }
-        }
+            // Convert to fixed precision coordinates.
+            // We lose precision here, but we don't care about the exact position
+            int32 x = int32(pos.m_positionX);
+            int32 y = int32(pos.m_positionY);
+            int32 z = int32(pos.m_positionZ);
 
-        Q.pop();
+            return std::hash<int32_t>()(x) ^ std::hash<int32_t>()(y) ^ std::hash<int32_t>()(z);
+        }
+    };
+
+    std::unordered_set<Position, PositionHash> visited;
+    std::queue<Position> queue;
+    queue.push(startPosition);
+    visited.insert(startPosition);
+    uint8 maxDirections = checkZ ? 6 : 4;
+    uint32 spawns = 0;
+
+    while (!queue.empty())
+    {
+        Position currentPosition = queue.front();
+        queue.pop();
+
+        for (uint8 i = 0; i < maxDirections; ++i)
+        {
+            Position const& direction = BOUNDARY_DIRECTIONS[i];
+            Position nextPosition = currentPosition;
+            nextPosition.RelocateOffset(direction);
+
+            if (startPosition.GetExactDist(&nextPosition) > BOUNDARY_MAX_DISTANCE)
+                break;
+
+            if (visited.find(nextPosition) != visited.end())
+                continue; // already visited
+
+            visited.insert(nextPosition);
+
+            bool isInBoundary = IsInBoundary(&nextPosition);
+
+            if ((isInBoundary && fill) || !isInBoundary)
+            {
+                spawnVisualizationCreature(currentPosition);
+                ++spawns;
+                if (spawns > BOUNDARY_MAX_SPAWNS)
+                    return LANG_CREATURE_MOVEMENT_MAYBE_UNBOUNDED;
+            }
+
+            if (isInBoundary)
+                queue.push(nextPosition); // continue visiting
+        }
     }
-    return boundsWarning ? LANG_CREATURE_MOVEMENT_MAYBE_UNBOUNDED : 0;
+    return 0;
 }
 
 bool CreatureAI::IsInBoundary(Position const* who) const

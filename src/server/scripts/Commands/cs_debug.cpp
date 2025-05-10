@@ -1390,7 +1390,7 @@ public:
         return true;
     }
 
-    static bool HandleDebugBoundaryCommand(ChatHandler* handler, Optional<EXACT_SEQUENCE("fill")> fill, Optional<uint32> durationArg)
+    static bool HandleDebugBoundaryCommand(ChatHandler* handler, Optional<EXACT_SEQUENCE("fill")> fill, Optional<uint32> durationArg, Optional<EXACT_SEQUENCE("z")> checkZ)
     {
         Player* player = handler->GetPlayer();
         if (!player)
@@ -1400,11 +1400,11 @@ public:
         if (!target || !target->IsAIEnabled)
             return false;
 
-        uint32 duration = durationArg.value_or(60);
-        if ((duration <= 0 || duration >= 1800)) // arbitrary upper limit
-            duration = 180;
+        uint32 duration = durationArg.value_or(5 * IN_MILLISECONDS);
+        if (duration > 180 * IN_MILLISECONDS) // arbitrary upper limit
+            duration = 180 * IN_MILLISECONDS;
 
-        int32 errMsg = target->AI()->VisualizeBoundary(duration, player, fill.has_value());
+        int32 errMsg = target->AI()->VisualizeBoundary(duration, player, fill.has_value(), checkZ.has_value());
         if (errMsg > 0)
             handler->PSendSysMessage(errMsg);
 
