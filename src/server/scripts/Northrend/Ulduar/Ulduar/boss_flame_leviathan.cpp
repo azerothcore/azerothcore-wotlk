@@ -16,6 +16,7 @@
  */
 
 #include "AchievementCriteriaScript.h"
+#include "AreaDefines.h"
 #include "CellImpl.h"
 #include "CombatAI.h"
 #include "CreatureScript.h"
@@ -1575,11 +1576,6 @@ class spell_systems_shutdown_aura : public AuraScript
 
 class FlameLeviathanPursuedTargetSelector
 {
-    enum Area
-    {
-        AREA_FORMATION_GROUNDS = 4652,
-    };
-
 public:
     explicit FlameLeviathanPursuedTargetSelector() {};
 

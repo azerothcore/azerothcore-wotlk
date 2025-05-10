@@ -75,7 +75,7 @@ struct boss_thorngrin_the_tender : public BossAI
 
         scheduler.Schedule(6s, [this](TaskContext context)
         {
-            if (DoCastRandomTarget(SPELL_SACRIFICE, 1) == SPELL_CAST_OK)
+            if (DoCastRandomTarget(SPELL_SACRIFICE, 0, 0.0f, true, false, false) == SPELL_CAST_OK)
             {
                 Talk(SAY_CAST_SACRIFICE);
             }

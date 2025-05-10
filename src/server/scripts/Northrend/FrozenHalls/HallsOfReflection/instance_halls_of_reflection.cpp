@@ -130,7 +130,7 @@ private:
 class instance_halls_of_reflection : public InstanceMapScript
 {
 public:
-    instance_halls_of_reflection() : InstanceMapScript("instance_halls_of_reflection", 668) { }
+    instance_halls_of_reflection() : InstanceMapScript("instance_halls_of_reflection", MAP_HALLS_OF_REFLECTION) { }
 
     InstanceScript* GetInstanceScript(InstanceMap* pMap) const override
     {

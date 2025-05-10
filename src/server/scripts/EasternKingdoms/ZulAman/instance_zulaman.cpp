@@ -96,7 +96,7 @@ BossBoundaryData const boundaries =
 class instance_zulaman : public InstanceMapScript
 {
 public:
-    instance_zulaman() : InstanceMapScript("instance_zulaman", 568) { }
+    instance_zulaman() : InstanceMapScript("instance_zulaman", MAP_ZUL_AMAN) { }
 
     struct instance_zulaman_InstanceMapScript : public InstanceScript
     {

@@ -16,6 +16,7 @@
  */
 
 #include "AchievementCriteriaScript.h"
+#include "AreaDefines.h"
 #include "CreatureScript.h"
 #include "PassiveAI.h"
 #include "Player.h"
@@ -1244,7 +1245,7 @@ class spell_hodir_biting_cold_player_aura : public AuraScript
     {
         if (Unit* target = GetTarget())
         {
-            if (target->GetMapId() == 603)
+            if (target->GetMapId() == MAP_ULDUAR)
                 SetDuration(GetMaxDuration());
             if (target->HasAura(SPELL_FLASH_FREEZE_TRAPPED_PLAYER))
                 return;

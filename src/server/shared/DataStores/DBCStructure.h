@@ -18,6 +18,7 @@
 #ifndef ACORE_DBCSTRUCTURE_H
 #define ACORE_DBCSTRUCTURE_H
 
+#include "AreaDefines.h"
 #include "DBCEnums.h"
 #include "Define.h"
 #include "Util.h"
@@ -531,7 +532,7 @@ struct AreaTableEntry
     // helpers
     [[nodiscard]] bool IsSanctuary() const
     {
-        if (mapid == 609)
+        if (mapid == MAP_EBON_HOLD)
             return true;
         return (flags & AREA_FLAG_SANCTUARY);
     }
@@ -1369,7 +1370,7 @@ struct MapEntry
 
     [[nodiscard]] bool IsContinent() const
     {
-        return MapID == 0 || MapID == 1 || MapID == 530 || MapID == 571;
+        return MapID == MAP_EASTERN_KINGDOMS || MapID == MAP_KALIMDOR || MapID == MAP_OUTLAND || MapID == MAP_NORTHREND;
     }
 
     [[nodiscard]] bool IsDynamicDifficultyMap() const { return Flags & MAP_FLAG_DYNAMIC_DIFFICULTY; }
