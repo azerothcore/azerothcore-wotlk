@@ -1390,7 +1390,7 @@ public:
         return true;
     }
 
-    static bool HandleDebugBoundaryCommand(ChatHandler* handler, Optional<EXACT_SEQUENCE("fill")> fill, Optional<uint32> durationArg, Optional<EXACT_SEQUENCE("z")> checkZ)
+    static bool HandleDebugBoundaryCommand(ChatHandler* handler, Optional<uint32> durationArg, Optional<EXACT_SEQUENCE("fill")> fill, Optional<EXACT_SEQUENCE("z")> checkZ)
     {
         Player* player = handler->GetPlayer();
         if (!player)
