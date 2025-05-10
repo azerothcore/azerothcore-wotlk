@@ -271,6 +271,7 @@ public:
                             king->SetDisableGravity(true);
                             me->RemoveUnitFlag(UNIT_FLAG_DISABLE_MOVE);
                             me->GetMotionMaster()->MoveChase(me->GetVictim());
+                            events.CancelEventGroup(1);
                             switch (BoatOrder[BoatNum - 1])
                             {
                                 case 0:
