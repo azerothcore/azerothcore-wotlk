@@ -105,7 +105,8 @@ public:
             { "unitstate",      HandleDebugUnitStateCommand,           SEC_ADMINISTRATOR, Console::No },
             { "objectcount",    HandleDebugObjectCountCommand,         SEC_ADMINISTRATOR, Console::Yes},
             { "dummy",          HandleDebugDummyCommand,               SEC_ADMINISTRATOR, Console::No },
-            { "mapdata",        HandleDebugMapDataCommand,             SEC_ADMINISTRATOR, Console::No }
+            { "mapdata",        HandleDebugMapDataCommand,             SEC_ADMINISTRATOR, Console::No },
+            { "boundary",       HandleDebugBoundaryCommand,            SEC_ADMINISTRATOR, Console::No }
         };
         static ChatCommandTable commandTable =
         {
@@ -1386,6 +1387,27 @@ public:
         handler->PSendSysMessage("Loaded Grids: {} / {}", map->GetLoadedGridsCount(), MAX_NUMBER_OF_GRIDS * MAX_NUMBER_OF_GRIDS);
         handler->PSendSysMessage("Created Cells In Grid: {} / {}", map->GetCreatedCellsInGridCount(cell.GridX(), cell.GridY()), MAX_NUMBER_OF_CELLS * MAX_NUMBER_OF_CELLS);
         handler->PSendSysMessage("Created Cells In Map: {} / {}", map->GetCreatedCellsInMapCount(), TOTAL_NUMBER_OF_CELLS_PER_MAP * TOTAL_NUMBER_OF_CELLS_PER_MAP);
+        return true;
+    }
+
+    static bool HandleDebugBoundaryCommand(ChatHandler* handler, Optional<EXACT_SEQUENCE("fill")> fill, Optional<uint32> durationArg)
+    {
+        Player* player = handler->GetPlayer();
+        if (!player)
+            return false;
+
+        Creature* target = handler->getSelectedCreature();
+        if (!target || !target->IsAIEnabled)
+            return false;
+
+        uint32 duration = durationArg.value_or(60);
+        if ((duration <= 0 || duration >= 1800)) // arbitrary upper limit
+            duration = 180;
+
+        int32 errMsg = target->AI()->VisualizeBoundary(duration, player, fill.has_value());
+        if (errMsg > 0)
+            handler->PSendSysMessage(errMsg);
+
         return true;
     }
 };
