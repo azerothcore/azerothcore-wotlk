@@ -16,6 +16,7 @@
  */
 
 #include "OutdoorPvPNA.h"
+#include "AreaDefines.h"
 #include "CreatureScript.h"
 #include "GameGraveyard.h"
 #include "GridNotifiers.h"
@@ -59,7 +60,7 @@ void OutdoorPvPNA::HandleKill(Player* killer, Unit* killed)
 
             // creature kills must be notified, even if not inside objective / not outdoor pvp active
             // player kills only count if active and inside objective
-            if ((groupGuy->IsOutdoorPvPActive() && groupGuy->GetAreaId() == NA_HALAA_ZONE_ID) || killed->IsCreature())
+            if ((groupGuy->IsOutdoorPvPActive() && groupGuy->GetAreaId() == AREA_HALAA) || killed->IsCreature())
             {
                 HandleKillImpl(groupGuy, killed);
             }
@@ -68,7 +69,7 @@ void OutdoorPvPNA::HandleKill(Player* killer, Unit* killed)
     else
     {
         // creature kills must be notified, even if not inside objective / not outdoor pvp active
-        if (killer && ((killer->IsOutdoorPvPActive() && killer->ToPlayer()->GetAreaId() == NA_HALAA_ZONE_ID) || killed->IsCreature()))
+        if (killer && ((killer->IsOutdoorPvPActive() && killer->ToPlayer()->GetAreaId() == AREA_HALAA) || killed->IsCreature()))
         {
             HandleKillImpl(killer, killed);
         }
@@ -264,7 +265,7 @@ OPvPCapturePointNA::OPvPCapturePointNA(OutdoorPvP* pvp) :
     m_WyvernStateNorth(0), m_WyvernStateSouth(0), m_WyvernStateEast(0), m_WyvernStateWest(0),
     m_HalaaState(HALAA_N), m_RespawnTimer(NA_RESPAWN_TIME), m_GuardCheckTimer(NA_GUARD_CHECK_TIME), m_canRecap(true)
 {
-    SetCapturePointData(182210, 530, -1572.57f, 7945.3f, -22.475f, 2.05949f, 0.0f, 0.0f, 0.857167f, 0.515038f);
+    SetCapturePointData(182210, MAP_OUTLAND, -1572.57f, 7945.3f, -22.475f, 2.05949f, 0.0f, 0.0f, 0.857167f, 0.515038f);
 }
 
 bool OutdoorPvPNA::SetupOutdoorPvP()
@@ -815,7 +816,7 @@ void OPvPCapturePointNA::ChangeState()
             break;
     }
 
-    auto bounds = sMapMgr->FindMap(530, 0)->GetGameObjectBySpawnIdStore().equal_range(m_capturePointSpawnId);
+    auto bounds = sMapMgr->FindMap(MAP_OUTLAND, 0)->GetGameObjectBySpawnIdStore().equal_range(m_capturePointSpawnId);
     for (auto itr = bounds.first; itr != bounds.second; ++itr)
         itr->second->SetGoArtKit(artkit);
 

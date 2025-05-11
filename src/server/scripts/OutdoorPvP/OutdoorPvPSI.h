@@ -32,7 +32,12 @@ const uint32 SI_MAX_RESOURCES = 200;
 
 const uint8 OutdoorPvPSIBuffZonesNum = 3;
 
-const uint32 OutdoorPvPSIBuffZones[OutdoorPvPSIBuffZonesNum] = { 1377, 3428, 3429 };
+const uint32 OutdoorPvPSIBuffZones[OutdoorPvPSIBuffZonesNum] =
+{
+    AREA_SILITHUS,
+    AREA_AHN_QIRAJ,
+    AREA_RUINS_OF_AHN_QIRAJ
+};
 
 const uint32 SI_AREATRIGGER_H = 4168;
 

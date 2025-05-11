@@ -95,6 +95,57 @@ void WorldState::Load()
     HandleSunsReachSubPhaseTransition(m_sunsReachData.m_subphaseMask, true);
 }
 
+void WorldState::LoadWorldStates()
+{
+    uint32 oldMSTime = getMSTime();
+
+    QueryResult result = CharacterDatabase.Query("SELECT entry, value FROM worldstates");
+
+    if (!result)
+    {
+        LOG_WARN("server.loading", ">> Loaded 0 world states. DB table `worldstates` is empty!");
+        LOG_INFO("server.loading", " ");
+        return;
+    }
+
+    do
+    {
+        Field* fields = result->Fetch();
+        _worldstates[fields[0].Get<uint32>()] = fields[1].Get<uint32>();
+    } while (result->NextRow());
+
+    LOG_INFO("server.loading", ">> Loaded {} World States in {} ms", _worldstates.size(), GetMSTimeDiffToNow(oldMSTime));
+    LOG_INFO("server.loading", " ");
+}
+
+// Setting a worldstate will save it to DB
+void WorldState::setWorldState(uint32 index, uint64 timeValue)
+{
+    auto const& it = _worldstates.find(index);
+    if (it != _worldstates.end())
+    {
+        CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_UPD_WORLDSTATE);
+        stmt->SetData(0, uint32(timeValue));
+        stmt->SetData(1, index);
+        CharacterDatabase.Execute(stmt);
+    }
+    else
+    {
+        CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_INS_WORLDSTATE);
+        stmt->SetData(0, index);
+        stmt->SetData(1, uint32(timeValue));
+        CharacterDatabase.Execute(stmt);
+    }
+
+    _worldstates[index] = timeValue;
+}
+
+uint64 WorldState::getWorldState(uint32 index) const
+{
+    auto const& itr = _worldstates.find(index);
+    return itr != _worldstates.end() ? itr->second : 0;
+}
+
 void WorldState::Save(WorldStateSaveIds saveId)
 {
     switch (saveId)
@@ -196,32 +247,32 @@ void WorldState::Update(uint32 diff)
     }
 }
 
-void WorldState::HandlePlayerEnterZone(Player* player, WorldStateZoneId zoneId)
+void WorldState::HandlePlayerEnterZone(Player* player, AreaTableIDs zoneId)
 {
     std::lock_guard<std::mutex> guard(_mutex);
     switch (zoneId)
     {
-        case ZONEID_SHATTRATH:
-        case ZONEID_BOTANICA:
-        case ZONEID_MECHANAR:
-        case ZONEID_ARCATRAZ:
+        case AREA_SHATTRATH_CITY:
+        case AREA_THE_BOTANICA:
+        case AREA_THE_MECHANAR:
+        case AREA_THE_ARCATRAZ:
             if (_adalSongOfBattleTimer)
                 player->CastSpell(player, SPELL_ADAL_SONG_OF_BATTLE, true);
             break;
-        case ZONEID_HELLFIRE_PENINSULA:
-        case ZONEID_HELLFIRE_RAMPARTS:
-        case ZONEID_HELLFIRE_CITADEL:
-        case ZONEID_BLOOD_FURNACE:
-        case ZONEID_SHATTERED_HALLS:
-        case ZONEID_MAGTHERIDON_LAIR:
+        case AREA_HELLFIRE_PENINSULA:
+        case AREA_HELLFIRE_RAMPARTS:
+        case AREA_HELLFIRE_CITADEL:
+        case AREA_THE_BLOOD_FURNACE:
+        case AREA_THE_SHATTERED_HALLS:
+        case AREA_MAGTHERIDONS_LAIR:
             if (_isMagtheridonHeadSpawnedAlliance && player->GetTeamId() == TEAM_ALLIANCE)
                 player->CastSpell(player, SPELL_TROLLBANES_COMMAND, true);
             else if (_isMagtheridonHeadSpawnedHorde && player->GetTeamId() == TEAM_HORDE)
                 player->CastSpell(player, SPELL_NAZGRELS_FAVOR, true);
             break;
-        case ZONEID_ISLE_OF_QUEL_DANAS:
-        case ZONEID_MAGISTERS_TERRACE:
-        case ZONEID_SUNWELL_PLATEAU:
+        case AREA_ISLE_OF_QUEL_DANAS:
+        case AREA_MAGISTERS_TERRACE:
+        case AREA_SUNWELL_PLATEAU:
         {
             std::lock_guard<std::mutex> guard(m_sunsReachData.m_sunsReachReclamationMutex);
             m_sunsReachData.m_sunsReachReclamationPlayers.push_back(player->GetGUID());
@@ -233,32 +284,32 @@ void WorldState::HandlePlayerEnterZone(Player* player, WorldStateZoneId zoneId)
             break;
     }
 };
-void WorldState::HandlePlayerLeaveZone(Player* player, WorldStateZoneId zoneId)
+void WorldState::HandlePlayerLeaveZone(Player* player, AreaTableIDs zoneId)
 {
     std::lock_guard<std::mutex> guard(_mutex);
     switch (zoneId)
     {
-        case ZONEID_SHATTRATH:
-        case ZONEID_BOTANICA:
-        case ZONEID_MECHANAR:
-        case ZONEID_ARCATRAZ:
+        case AREA_SHATTRATH_CITY:
+        case AREA_THE_BOTANICA:
+        case AREA_THE_MECHANAR:
+        case AREA_THE_ARCATRAZ:
             if (!_adalSongOfBattleTimer)
                 player->RemoveAurasDueToSpell(SPELL_ADAL_SONG_OF_BATTLE);
             break;
-        case ZONEID_HELLFIRE_PENINSULA:
-        case ZONEID_HELLFIRE_RAMPARTS:
-        case ZONEID_HELLFIRE_CITADEL:
-        case ZONEID_BLOOD_FURNACE:
-        case ZONEID_SHATTERED_HALLS:
-        case ZONEID_MAGTHERIDON_LAIR:
+        case AREA_HELLFIRE_PENINSULA:
+        case AREA_HELLFIRE_RAMPARTS:
+        case AREA_HELLFIRE_CITADEL:
+        case AREA_THE_BLOOD_FURNACE:
+        case AREA_THE_SHATTERED_HALLS:
+        case AREA_MAGTHERIDONS_LAIR:
             if (player->GetTeamId() == TEAM_ALLIANCE)
                 player->RemoveAurasDueToSpell(SPELL_TROLLBANES_COMMAND);
             else if (player->GetTeamId() == TEAM_HORDE)
                 player->RemoveAurasDueToSpell(SPELL_NAZGRELS_FAVOR);
             break;
-        case ZONEID_ISLE_OF_QUEL_DANAS:
-        case ZONEID_MAGISTERS_TERRACE:
-        case ZONEID_SUNWELL_PLATEAU:
+        case AREA_ISLE_OF_QUEL_DANAS:
+        case AREA_MAGISTERS_TERRACE:
+        case AREA_SUNWELL_PLATEAU:
         {
             std::lock_guard<std::mutex> guard(m_sunsReachData.m_sunsReachReclamationMutex);
             player->RemoveAurasDueToSpell(SPELL_KIRU_SONG_OF_VICTORY);
@@ -278,19 +329,19 @@ void WorldState::BuffMagtheridonTeam(TeamId team)
     {
         switch (map->GetId())
         {
-            case 530: // Outland
+            case MAP_OUTLAND:
                 map->DoForAllPlayers([&](Player* player)
                 {
-                    if (player->GetZoneId() == ZONEID_HELLFIRE_PENINSULA && player->GetTeamId() == TEAM_ALLIANCE && team == TEAM_ALLIANCE)
+                    if (player->GetZoneId() == AREA_HELLFIRE_PENINSULA && player->GetTeamId() == TEAM_ALLIANCE && team == TEAM_ALLIANCE)
                         player->CastSpell(player, SPELL_TROLLBANES_COMMAND, true);
-                    else if (player->GetZoneId() == ZONEID_HELLFIRE_PENINSULA && player->GetTeamId() == TEAM_HORDE && team == TEAM_HORDE)
+                    else if (player->GetZoneId() == AREA_HELLFIRE_PENINSULA && player->GetTeamId() == TEAM_HORDE && team == TEAM_HORDE)
                         player->CastSpell(player, SPELL_NAZGRELS_FAVOR, true);
                 });
                 break;
-            case 540: // The Shattered Halls
-            case 542: // The Blood Furnace
-            case 543: // Ramparts
-            case 544: // Magtheridon's Lair
+            case MAP_HELLFIRE_CITADEL_THE_SHATTERED_HALLS:
+            case MAP_HELLFIRE_CITADEL_THE_BLOOD_FURNACE:
+            case MAP_HELLFIRE_CITADEL_RAMPARTS:
+            case MAP_MAGTHERIDONS_LAIR:
                 map->DoForAllPlayers([&](Player* player)
                 {
                     if (player->GetTeamId() == TEAM_ALLIANCE && team == TEAM_ALLIANCE)
@@ -311,19 +362,19 @@ void WorldState::DispelMagtheridonTeam(TeamId team)
     {
         switch (map->GetId())
         {
-            case 530: // Outland
+            case MAP_OUTLAND:
                 map->DoForAllPlayers([&](Player* player)
                 {
-                    if (player->GetZoneId() == ZONEID_HELLFIRE_PENINSULA && player->GetTeamId() == TEAM_ALLIANCE && team == TEAM_ALLIANCE)
+                    if (player->GetZoneId() == AREA_HELLFIRE_PENINSULA && player->GetTeamId() == TEAM_ALLIANCE && team == TEAM_ALLIANCE)
                         player->RemoveAurasDueToSpell(SPELL_TROLLBANES_COMMAND);
-                    else if (player->GetZoneId() == ZONEID_HELLFIRE_PENINSULA && player->GetTeamId() == TEAM_HORDE && team == TEAM_HORDE)
+                    else if (player->GetZoneId() == AREA_HELLFIRE_PENINSULA && player->GetTeamId() == TEAM_HORDE && team == TEAM_HORDE)
                         player->RemoveAurasDueToSpell(SPELL_NAZGRELS_FAVOR);
                 });
                 break;
-            case 540: // The Shattered Halls
-            case 542: // The Blood Furnace
-            case 543: // Ramparts
-            case 544: // Magtheridon's Lair
+            case MAP_HELLFIRE_CITADEL_THE_SHATTERED_HALLS:
+            case MAP_HELLFIRE_CITADEL_THE_BLOOD_FURNACE:
+            case MAP_HELLFIRE_CITADEL_RAMPARTS:
+            case MAP_MAGTHERIDONS_LAIR:
                 map->DoForAllPlayers([&](Player* player)
                 {
                     if (player->GetTeamId() == TEAM_ALLIANCE && team == TEAM_ALLIANCE)
@@ -344,16 +395,16 @@ void WorldState::BuffAdalsSongOfBattle()
     {
         switch (map->GetId())
         {
-            case 530: // Outland
+            case MAP_OUTLAND:
                 map->DoForAllPlayers([&](Player* player)
                 {
-                    if (player->GetZoneId() == ZONEID_SHATTRATH)
+                    if (player->GetZoneId() == AREA_SHATTRATH_CITY)
                         player->CastSpell(player, SPELL_ADAL_SONG_OF_BATTLE, true);
                 });
                 break;
-            case 552: // Arcatraz
-            case 553: // Botanica
-            case 554: // Mechanar
+            case MAP_TEMPEST_KEEP_THE_ARCATRAZ:
+            case MAP_TEMPEST_KEEP_THE_BOTANICA:
+            case MAP_TEMPEST_KEEP_THE_MECHANAR:
                 map->DoForAllPlayers([&](Player* player)
                 {
                     player->CastSpell(player, SPELL_ADAL_SONG_OF_BATTLE, true);
@@ -371,16 +422,16 @@ void WorldState::DispelAdalsSongOfBattle()
     {
         switch (map->GetId())
         {
-            case 530: // Outland
+            case MAP_OUTLAND:
                 map->DoForAllPlayers([&](Player* player)
                 {
-                    if (player->GetZoneId() == ZONEID_SHATTRATH)
+                    if (player->GetZoneId() == AREA_SHATTRATH_CITY)
                         player->RemoveAurasDueToSpell(SPELL_ADAL_SONG_OF_BATTLE);
                 });
                 break;
-            case 552: // Arcatraz
-            case 553: // Botanica
-            case 554: // Mechanar
+            case MAP_TEMPEST_KEEP_THE_ARCATRAZ:
+            case MAP_TEMPEST_KEEP_THE_BOTANICA:
+            case MAP_TEMPEST_KEEP_THE_MECHANAR:
                 map->DoForAllPlayers([&](Player* player)
                 {
                     player->RemoveAurasDueToSpell(SPELL_ADAL_SONG_OF_BATTLE);
@@ -771,22 +822,22 @@ void WorldState::StartSunsReachPhase(bool initial)
     {
         case SUNS_REACH_PHASE_1_STAGING_AREA:
             sGameEventMgr->StartEvent(GAME_EVENT_QUEL_DANAS_PHASE_1);
-            if (Map* map = sMapMgr->FindBaseNonInstanceMap(530))
-                map->SetZoneWeather(ZONEID_ISLE_OF_QUEL_DANAS, WEATHER_STATE_MEDIUM_RAIN, 0.75f);
+            if (Map* map = sMapMgr->FindBaseNonInstanceMap(MAP_OUTLAND))
+                map->SetZoneWeather(AREA_ISLE_OF_QUEL_DANAS, WEATHER_STATE_MEDIUM_RAIN, 0.75f);
             break;
         case SUNS_REACH_PHASE_2_SANCTUM:
             sGameEventMgr->StartEvent(GAME_EVENT_QUEL_DANAS_PHASE_2_ONLY);
             sGameEventMgr->StartEvent(GAME_EVENT_QUEL_DANAS_PHASE_2_PERMANENT);
-            if (Map* map = sMapMgr->FindBaseNonInstanceMap(530))
-                map->SetZoneWeather(ZONEID_ISLE_OF_QUEL_DANAS, WEATHER_STATE_LIGHT_RAIN, 0.5f);
+            if (Map* map = sMapMgr->FindBaseNonInstanceMap(MAP_OUTLAND))
+                map->SetZoneWeather(AREA_ISLE_OF_QUEL_DANAS, WEATHER_STATE_LIGHT_RAIN, 0.5f);
             break;
         case SUNS_REACH_PHASE_3_ARMORY:
             if (initial)
                 sGameEventMgr->StartEvent(GAME_EVENT_QUEL_DANAS_PHASE_2_PERMANENT);
             sGameEventMgr->StartEvent(GAME_EVENT_QUEL_DANAS_PHASE_3_ONLY); sGameEventMgr->StartEvent(GAME_EVENT_QUEL_DANAS_PHASE_3_PERMANENT);
             // TODO: Should be id 2 0.25f?
-            if (Map* map = sMapMgr->FindBaseNonInstanceMap(530))
-                map->SetZoneWeather(ZONEID_ISLE_OF_QUEL_DANAS, WEATHER_STATE_LIGHT_RAIN, 0.25f);
+            if (Map* map = sMapMgr->FindBaseNonInstanceMap(MAP_OUTLAND))
+                map->SetZoneWeather(AREA_ISLE_OF_QUEL_DANAS, WEATHER_STATE_LIGHT_RAIN, 0.25f);
             break;
         case SUNS_REACH_PHASE_4_HARBOR:
             if (initial)
@@ -795,8 +846,8 @@ void WorldState::StartSunsReachPhase(bool initial)
                 sGameEventMgr->StartEvent(GAME_EVENT_QUEL_DANAS_PHASE_3_PERMANENT);
             }
             sGameEventMgr->StartEvent(GAME_EVENT_QUEL_DANAS_PHASE_4);
-            if (Map* map = sMapMgr->FindBaseNonInstanceMap(530))
-                map->SetZoneWeather(ZONEID_ISLE_OF_QUEL_DANAS, WEATHER_STATE_FINE, 0.0f);
+            if (Map* map = sMapMgr->FindBaseNonInstanceMap(MAP_OUTLAND))
+                map->SetZoneWeather(AREA_ISLE_OF_QUEL_DANAS, WEATHER_STATE_FINE, 0.0f);
             break;
         default: break;
     }
@@ -1040,10 +1091,10 @@ void WorldState::FillInitialWorldStates(WorldPackets::WorldState::InitWorldState
 {
     switch (zoneId)
     {
-        case ZONEID_ISLE_OF_QUEL_DANAS:
-        case ZONEID_MAGISTERS_TERRACE:
-        case ZONEID_SUNWELL_PLATEAU:
-        case ZONEID_SHATTRATH:
+        case AREA_ISLE_OF_QUEL_DANAS:
+        case AREA_MAGISTERS_TERRACE:
+        case AREA_SUNWELL_PLATEAU:
+        case AREA_SHATTRATH_CITY:
         {
             // Sunwell Reclamation
             switch (m_sunsReachData.m_phase)

@@ -16,6 +16,7 @@
  */
 
 #include "AccountMgr.h"
+#include "AreaDefines.h"
 #include "CreatureTextMgr.h"
 #include "Group.h"
 #include "InstanceMapScript.h"
@@ -199,7 +200,7 @@ private:
 class instance_icecrown_citadel : public InstanceMapScript
 {
 public:
-    instance_icecrown_citadel() : InstanceMapScript(ICCScriptName, 631) { }
+    instance_icecrown_citadel() : InstanceMapScript(ICCScriptName, MAP_ICECROWN_CITADEL) { }
 
     struct instance_icecrown_citadel_InstanceMapScript : public InstanceScript
     {
@@ -243,11 +244,11 @@ public:
 
         void OnPlayerAreaUpdate(Player* player, uint32  /*oldArea*/, uint32 newArea) override
         {
-            if (newArea == 4890 /*Putricide's Laboratory of Alchemical Horrors and Fun*/ ||
-                    newArea == 4891 /*The Sanctum of Blood*/ ||
-                    newArea == 4889 /*The Frost Queen's Lair*/ ||
-                    newArea == 4859 /*The Frozen Throne*/ ||
-                    newArea == 4910 /*Frostmourne*/)
+            if (newArea == AREA_PUTRICIDES_LABORATORY_OF_ALCHEMICAL_HORRORS_AND_FUN ||
+                    newArea == AREA_THE_SANCTUM_OF_BLOOD ||
+                    newArea == AREA_THE_FROST_QUEENS_LAIR ||
+                    newArea == AREA_THE_FROZEN_THRONE ||
+                    newArea == AREA_FROSTMOURNE)
             {
                 player->SendInitWorldStates(player->GetZoneId(), player->GetAreaId());
             }

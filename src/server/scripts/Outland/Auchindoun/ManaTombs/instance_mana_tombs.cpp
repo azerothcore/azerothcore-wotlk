@@ -23,7 +23,7 @@
 class instance_mana_tombs : public InstanceMapScript
 {
 public:
-    instance_mana_tombs() : InstanceMapScript(MTScriptName, 557) { }
+    instance_mana_tombs() : InstanceMapScript(MTScriptName, MAP_AUCHINDOUN_MANA_TOMBS) { }
 
     struct instance_mana_tombs_InstanceMapScript : public InstanceScript
     {
