@@ -3,7 +3,6 @@ SET @flag := 4194304;
 
 -- Utgarde Pinnacle
 DELETE FROM `spell_custom_attr` WHERE `spell_id` IN (48880,59239,49165,61549,59608,31551,59605,50535,61460,33661,61509,61510,49710,58461,52352,58758,69130,50661,70393,69579,57759,27807,54326,30113,54772,28467);
-
 INSERT INTO `spell_custom_attr` (`spell_id`, `attributes`) VALUES
 (48880, @flag), -- Rend
 (59239, @flag),
