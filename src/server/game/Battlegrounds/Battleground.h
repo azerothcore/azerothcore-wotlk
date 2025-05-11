@@ -618,7 +618,7 @@ protected:
     void _CheckSafePositions(uint32 diff);
 
     bool m_AnnouncementsMade[5];  // Array to track which announcements have been made
-    
+
     // Absolute announcement times (in milliseconds)
     static constexpr uint32 BG_ANNOUNCEMENT_TWO_MINUTE          = 120000;  // 2 minutes
     static constexpr uint32 BG_ANNOUNCEMENT_ONE_MINUTE          = 60000;   // 1 minute
