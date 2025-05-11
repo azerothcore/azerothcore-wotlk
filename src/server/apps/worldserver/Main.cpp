@@ -48,6 +48,7 @@
 #include "SecretMgr.h"
 #include "SharedDefines.h"
 #include "SteadyTimer.h"
+#include "systemd.h"
 #include "World.h"
 #include "WorldSessionMgr.h"
 #include "WorldSocket.h"
@@ -75,6 +76,10 @@ int m_ServiceStatus = -1;
 
 #include <boost/dll/shared_library.hpp>
 #include <timeapi.h>
+#endif
+
+#ifdef WITH_SYSTEMD
+#include <systemd/sd-daemon.h>
 #endif
 
 #ifndef _ACORE_CORE_CONFIG
@@ -406,7 +411,12 @@ int main(int argc, char** argv)
     sScriptMgr->OnShutdown();
 
     // set server offline
+#ifdef WITH_SYSTEMD
+    if (sd_listen_fds(0) <= 0)
+        LoginDatabase.DirectExecute("UPDATE realmlist SET flag = flag | {} WHERE id = '{}'", REALM_FLAG_OFFLINE, realm.Id.Realm);
+#else
     LoginDatabase.DirectExecute("UPDATE realmlist SET flag = flag | {} WHERE id = '{}'", REALM_FLAG_OFFLINE, realm.Id.Realm);
+#endif
 
     LOG_INFO("server.worldserver", "Halting process...");
 
