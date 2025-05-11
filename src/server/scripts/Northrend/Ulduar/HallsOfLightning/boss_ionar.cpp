@@ -29,8 +29,7 @@ enum IonarSpells
     SPELL_BALL_LIGHTNING_H          = 59800,
     SPELL_STATIC_OVERLOAD_N         = 52658,
     SPELL_STATIC_OVERLOAD_H         = 59795,
-    SPELL_STATIC_OVERLOAD_KNOCK_N   = 53337,
-    SPELL_STATIC_OVERLOAD_KNOCK_H   = 59798,
+    SPELL_STATIC_OVERLOAD_KNOCK     = 53337,
 
     SPELL_DISPERSE                  = 52770,
     SPELL_SUMMON_SPARK              = 52746,
@@ -292,7 +291,7 @@ class spell_ionar_static_overload : public AuraScript
             return;
 
         if (Unit* target = GetTarget())
-            target->CastSpell(target, target->GetMap()->IsHeroic() ? SPELL_STATIC_OVERLOAD_KNOCK_H : SPELL_STATIC_OVERLOAD_KNOCK_N, true);
+            target->CastSpell(target, SPELL_STATIC_OVERLOAD_KNOCK, true);
     }
 
     void Register() override
