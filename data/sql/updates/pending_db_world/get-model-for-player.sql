@@ -17,6 +17,7 @@ CREATE TABLE IF NOT EXISTS `player_totem_model` (
   PRIMARY KEY (`TotemID`, `RaceID`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 PACK_KEYS=0;
 
+DELETE FROM `player_shapeshift_model`;
 INSERT INTO `player_shapeshift_model` (`ShapeshiftID`, `RaceID`, `CustomizationID`, `GenderID`, `ModelID`) VALUES
 -- Cat Form
 -- Night Elf
@@ -143,7 +144,7 @@ INSERT INTO `player_shapeshift_model` (`ShapeshiftID`, `RaceID`, `CustomizationI
 (29, 4, 255, 2, 20857),
 (29, 6, 255, 2, 20872);
 
-
+DELETE FROM `player_totem_model`;
 INSERT INTO `player_totem_model` (`TotemID`, `RaceID`, `ModelID`) VALUES
 -- Orc
 (1, 2, 30758), -- Fire
