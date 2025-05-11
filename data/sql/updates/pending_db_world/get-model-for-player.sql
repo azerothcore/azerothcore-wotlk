@@ -8,14 +8,14 @@ CREATE TABLE IF NOT EXISTS `player_shapeshift_model` (
   `GenderID` TINYINT unsigned NOT NULL,
   `ModelID` INT unsigned NOT NULL,
   PRIMARY KEY (`ShapeshiftID`, `RaceID`, `CustomizationID`, `GenderID`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 PACK_KEYS=0;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 PACK_KEYS=0;
 
 CREATE TABLE IF NOT EXISTS `player_totem_model` (
   `TotemID` TINYINT unsigned NOT NULL,
   `RaceID` TINYINT unsigned NOT NULL,
   `ModelID` INT unsigned NOT NULL,
   PRIMARY KEY (`TotemID`, `RaceID`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 PACK_KEYS=0;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 PACK_KEYS=0;
 
 DELETE FROM `player_shapeshift_model`;
 INSERT INTO `player_shapeshift_model` (`ShapeshiftID`, `RaceID`, `CustomizationID`, `GenderID`, `ModelID`) VALUES
