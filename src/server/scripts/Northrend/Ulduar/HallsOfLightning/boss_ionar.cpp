@@ -282,7 +282,7 @@ class spell_ionar_static_overload : public AuraScript
 
     bool Validate(SpellInfo const* /*spellInfo*/) override
     {
-        return ValidateSpellInfo({ SPELL_STATIC_OVERLOAD_KNOCK_N, SPELL_STATIC_OVERLOAD_KNOCK_H });
+        return ValidateSpellInfo({ SPELL_STATIC_OVERLOAD_KNOCK });
     }
 
     void OnRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
