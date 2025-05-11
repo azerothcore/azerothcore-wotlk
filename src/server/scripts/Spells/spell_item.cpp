@@ -15,6 +15,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "AreaDefines.h"
 #include "Battleground.h"
 #include "CreatureScript.h"
 #include "ObjectMgr.h"
@@ -2995,7 +2996,7 @@ class spell_item_socrethars_stone : public SpellScript
 
     bool Load() override
     {
-        return (GetCaster()->GetAreaId() == 3900 || GetCaster()->GetAreaId() == 3742);
+        return (GetCaster()->GetAreaId() == AREA_INVASION_POINT_OVERLORD || GetCaster()->GetAreaId() == AREA_SOCRETHARS_SEAT);
     }
 
     bool Validate(SpellInfo const* /*spell*/) override
@@ -3008,10 +3009,10 @@ class spell_item_socrethars_stone : public SpellScript
         Unit* caster = GetCaster();
         switch (caster->GetAreaId())
         {
-            case 3900:
+            case AREA_INVASION_POINT_OVERLORD:
                 caster->CastSpell(caster, SPELL_SOCRETHAR_TO_SEAT, true);
                 break;
-            case 3742:
+            case AREA_SOCRETHARS_SEAT:
                 caster->CastSpell(caster, SPELL_SOCRETHAR_FROM_SEAT, true);
                 break;
             default:

@@ -47,7 +47,7 @@ ObjectData const creatureData[] =
 class instance_zulgurub : public InstanceMapScript
 {
 public:
-    instance_zulgurub(): InstanceMapScript(ZGScriptName, 309) { }
+    instance_zulgurub(): InstanceMapScript(ZGScriptName, MAP_ZUL_GURUB) { }
 
     struct instance_zulgurub_InstanceMapScript : public InstanceScript
     {

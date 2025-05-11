@@ -49,7 +49,7 @@ DoorData const doorData[] =
 class instance_ruby_sanctum : public InstanceMapScript
 {
 public:
-    instance_ruby_sanctum() : InstanceMapScript("instance_ruby_sanctum", 724) { }
+    instance_ruby_sanctum() : InstanceMapScript("instance_ruby_sanctum", MAP_THE_RUBY_SANCTUM) { }
 
     struct instance_ruby_sanctum_InstanceMapScript : public InstanceScript
     {

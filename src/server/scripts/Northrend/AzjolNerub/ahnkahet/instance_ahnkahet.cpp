@@ -41,7 +41,7 @@ DoorData const doorData[] =
 class instance_ahnkahet : public InstanceMapScript
 {
 public:
-    instance_ahnkahet() : InstanceMapScript(AhnKahetScriptName, 619) { }
+    instance_ahnkahet() : InstanceMapScript(AhnKahetScriptName, MAP_AHN_KAHET_THE_OLD_KINGDOM) { }
 
     struct instance_ahnkahet_InstanceScript : public InstanceScript
     {

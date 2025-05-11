@@ -33,7 +33,7 @@ enum vYells
 class instance_violet_hold : public InstanceMapScript
 {
 public:
-    instance_violet_hold() : InstanceMapScript("instance_violet_hold", 608) { }
+    instance_violet_hold() : InstanceMapScript("instance_violet_hold", MAP_VIOLET_HOLD) { }
 
     InstanceScript* GetInstanceScript(InstanceMap* pMap) const override
     {

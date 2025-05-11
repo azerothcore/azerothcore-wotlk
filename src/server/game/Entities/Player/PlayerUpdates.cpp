@@ -1258,8 +1258,8 @@ void Player::UpdateZone(uint32 newZone, uint32 newArea, bool force)
     {
         sOutdoorPvPMgr->HandlePlayerLeaveZone(this, m_zoneUpdateId);
         sOutdoorPvPMgr->HandlePlayerEnterZone(this, newZone);
-        sWorldState->HandlePlayerLeaveZone(this, static_cast<WorldStateZoneId>(m_zoneUpdateId));
-        sWorldState->HandlePlayerEnterZone(this, static_cast<WorldStateZoneId>(newZone));
+        sWorldState->HandlePlayerLeaveZone(this, static_cast<AreaTableIDs>(m_zoneUpdateId));
+        sWorldState->HandlePlayerEnterZone(this, static_cast<AreaTableIDs>(newZone));
     }
     if (m_zoneUpdateId != newZone)
     {

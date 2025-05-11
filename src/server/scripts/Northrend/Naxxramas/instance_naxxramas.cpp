@@ -61,7 +61,7 @@ static constexpr std::array<uint32, HorsemanCount> HorsemanDataGroup
 
 static WorldLocation const SapphironTeleportPos
 {
-    NaxxramasMapId, 3498.300049f, -5349.490234f, 144.968002f, 1.3698910f
+    MAP_NAXXRAMAS, 3498.300049f, -5349.490234f, 144.968002f, 1.3698910f
 };
 
 static DoorData const doorData[]
@@ -787,7 +787,7 @@ public:
 
 void AddSC_instance_naxxramas()
 {
-    RegisterInstanceScript(instance_naxxramas, NaxxramasMapId);
+    RegisterInstanceScript(instance_naxxramas, MAP_NAXXRAMAS);
     RegisterNaxxramasCreatureAI(npc_mr_bigglesworth);
     RegisterNaxxramasCreatureAI(npc_living_poison);
     RegisterNaxxramasCreatureAI(npc_naxxramas_trigger);

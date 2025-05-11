@@ -564,9 +564,6 @@ public:
     [[nodiscard]] virtual float getFloatConfig(WorldFloatConfigs index) const = 0;
     virtual void setIntConfig(WorldIntConfigs index, uint32 value) = 0;
     [[nodiscard]] virtual uint32 getIntConfig(WorldIntConfigs index) const = 0;
-    virtual void setWorldState(uint32 index, uint64 value) = 0;
-    [[nodiscard]] virtual uint64 getWorldState(uint32 index) const = 0;
-    virtual void LoadWorldStates() = 0;
     [[nodiscard]] virtual bool IsPvPRealm() const = 0;
     [[nodiscard]] virtual bool IsFFAPvPRealm() const = 0;
     virtual uint32 GetNextWhoListUpdateDelaySecs() = 0;

@@ -28,7 +28,7 @@ std::map<uint32, bool> validDedicatedInsanityItems;
 class instance_trial_of_the_crusader : public InstanceMapScript
 {
 public:
-    instance_trial_of_the_crusader() : InstanceMapScript("instance_trial_of_the_crusader", 649) { }
+    instance_trial_of_the_crusader() : InstanceMapScript("instance_trial_of_the_crusader", MAP_TRIAL_OF_THE_CRUSADER) { }
 
     struct instance_trial_of_the_crusader_InstanceMapScript : public InstanceScript
     {

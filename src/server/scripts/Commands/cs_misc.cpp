@@ -2903,7 +2903,7 @@ public:
             return false;
         }
 
-        handler->GetSession()->GetPlayer()->CastSpell(unit, 530, true);
+        handler->GetSession()->GetPlayer()->CastSpell(unit, MAP_OUTLAND, true);
         return true;
     }
 
