@@ -497,11 +497,11 @@ inline void Battleground::_ProcessJoin(uint32 diff)
         }
 
         StartingEventCloseDoors();
-        
+
         // Set the initial delay based on configuration
         uint32 initialDelay = isArena() ? GetArenaPrepTime() * IN_MILLISECONDS : GetBattlegroundPrepTime() * IN_MILLISECONDS;
         SetStartDelayTime(initialDelay);
-        
+
         // Initialize which announcements should be skipped based on the initial delay
         if (!isArena())
         {
@@ -509,11 +509,11 @@ inline void Battleground::_ProcessJoin(uint32 diff)
             // If initial delay is less than 2 minutes, mark the 2-minute announcement as already made
             if (initialDelay < BG_ANNOUNCEMENT_TWO_MINUTE)
                 m_AnnouncementsMade[0] = true;
-                
+
             // If initial delay is less than 1 minute, mark the 1-minute announcement as already made
             if (initialDelay < BG_ANNOUNCEMENT_ONE_MINUTE)
                 m_AnnouncementsMade[1] = true;
-                
+
             // If initial delay is less than 30 seconds, mark the 30-second announcement as already made
             if (initialDelay < BG_ANNOUNCEMENT_HALF_MINUTE)
                 m_AnnouncementsMade[2] = true;
@@ -524,11 +524,11 @@ inline void Battleground::_ProcessJoin(uint32 diff)
             // If initial delay is less than 1 minute, mark the 1-minute announcement as already made
             if (initialDelay < BG_ANNOUNCEMENT_ONE_MINUTE)
                 m_AnnouncementsMade[1] = true;
-                
+
             // If initial delay is less than 30 seconds, mark the 30-second announcement as already made
             if (initialDelay < BG_ANNOUNCEMENT_HALF_MINUTE)
                 m_AnnouncementsMade[2] = true;
-                
+
             // If initial delay is less than 15 seconds, mark the 15-second announcement as already made
             if (initialDelay < BG_ANNOUNCEMENT_QUARTER_MINUTE)
                 m_AnnouncementsMade[3] = true;
@@ -542,24 +542,21 @@ inline void Battleground::_ProcessJoin(uint32 diff)
     if (!isArena())
     {
         // Battleground announcements at 120s, 60s, 30s, 0s
-        
+
         // Two minute announcement (120s)
-        if (!m_AnnouncementsMade[0] && currentTime <= BG_ANNOUNCEMENT_TWO_MINUTE && 
-            currentTime > BG_ANNOUNCEMENT_ONE_MINUTE)
+        if (!m_AnnouncementsMade[0] && currentTime <= BG_ANNOUNCEMENT_TWO_MINUTE && currentTime > BG_ANNOUNCEMENT_ONE_MINUTE)
         {
             m_AnnouncementsMade[0] = true;
             SendBroadcastText(BG_TEXT_START_TWO_MINUTES, CHAT_MSG_BG_SYSTEM_NEUTRAL);
         }
         // One minute announcement (60s)
-        else if (!m_AnnouncementsMade[1] && currentTime <= BG_ANNOUNCEMENT_ONE_MINUTE && 
-                 currentTime > BG_ANNOUNCEMENT_HALF_MINUTE)
+        else if (!m_AnnouncementsMade[1] && currentTime <= BG_ANNOUNCEMENT_ONE_MINUTE && currentTime > BG_ANNOUNCEMENT_HALF_MINUTE)
         {
             m_AnnouncementsMade[1] = true;
             SendBroadcastText(BG_TEXT_START_ONE_MINUTE, CHAT_MSG_BG_SYSTEM_NEUTRAL);
         }
         // Thirty seconds announcement (30s)
-        else if (!m_AnnouncementsMade[2] && currentTime <= BG_ANNOUNCEMENT_HALF_MINUTE && 
-                 currentTime > 0)
+        else if (!m_AnnouncementsMade[2] && currentTime <= BG_ANNOUNCEMENT_HALF_MINUTE && currentTime > 0)
         {
             m_AnnouncementsMade[2] = true;
             SendBroadcastText(BG_TEXT_START_HALF_MINUTE, CHAT_MSG_BG_SYSTEM_NEUTRAL);
@@ -568,24 +565,21 @@ inline void Battleground::_ProcessJoin(uint32 diff)
     else
     {
         // Arena announcements at 60s, 30s, 15s, 0s
-        
+
         // One minute announcement (60s)
-        if (!m_AnnouncementsMade[1] && currentTime <= BG_ANNOUNCEMENT_ONE_MINUTE && 
-            currentTime > BG_ANNOUNCEMENT_HALF_MINUTE)
+        if (!m_AnnouncementsMade[1] && currentTime <= BG_ANNOUNCEMENT_ONE_MINUTE && currentTime > BG_ANNOUNCEMENT_HALF_MINUTE)
         {
             m_AnnouncementsMade[1] = true;
             SendBroadcastText(ARENA_TEXT_START_ONE_MINUTE, CHAT_MSG_BG_SYSTEM_NEUTRAL);
         }
         // Thirty seconds announcement (30s)
-        else if (!m_AnnouncementsMade[2] && currentTime <= BG_ANNOUNCEMENT_HALF_MINUTE && 
-                 currentTime > BG_ANNOUNCEMENT_QUARTER_MINUTE)
+        else if (!m_AnnouncementsMade[2] && currentTime <= BG_ANNOUNCEMENT_HALF_MINUTE && currentTime > BG_ANNOUNCEMENT_QUARTER_MINUTE)
         {
             m_AnnouncementsMade[2] = true;
             SendBroadcastText(ARENA_TEXT_START_THIRTY_SECONDS, CHAT_MSG_BG_SYSTEM_NEUTRAL);
         }
         // Fifteen seconds announcement (15s)
-        else if (!m_AnnouncementsMade[3] && currentTime <= BG_ANNOUNCEMENT_QUARTER_MINUTE && 
-                 currentTime > 0)
+        else if (!m_AnnouncementsMade[3] && currentTime <= BG_ANNOUNCEMENT_QUARTER_MINUTE && currentTime > 0)
         {
             m_AnnouncementsMade[3] = true;
             SendBroadcastText(ARENA_TEXT_START_FIFTEEN_SECONDS, CHAT_MSG_BG_SYSTEM_NEUTRAL);
