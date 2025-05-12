@@ -1,3 +1,4 @@
+-- DB update 2025_05_12_00 -> 2025_05_12_01
 
 -- Update comments and edit row 2.
 UPDATE `creature_template` SET `AIName` = 'SmartAI' WHERE `entry` = 28529;
