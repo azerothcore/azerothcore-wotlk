@@ -290,7 +290,7 @@ struct boss_kiljaeden : public BossAI
                 DoCastSelf(SPELL_FLAME_DART);
             }, 20s);
 
-            ScheduleTimedEvent(50s, [&] {
+            ScheduleTimedEvent(55s, [&] {
                 Talk(EMOTE_KJ_DARKNESS);
                 DoCastAOE(SPELL_DARKNESS_OF_A_THOUSAND_SOULS);
             }, 45s);
@@ -330,7 +330,7 @@ struct boss_kiljaeden : public BossAI
                 DoCastSelf(SPELL_FLAME_DART);
             }, 20s);
 
-            ScheduleTimedEvent(50s, [&] {
+            ScheduleTimedEvent(64s, [&] {
                 me->RemoveAurasDueToSpell(SPELL_ARMAGEDDON_PERIODIC);
                 Talk(EMOTE_KJ_DARKNESS);
                 DoCastAOE(SPELL_DARKNESS_OF_A_THOUSAND_SOULS);
@@ -402,7 +402,7 @@ struct boss_kiljaeden : public BossAI
                                 DoCastSelf(SPELL_FLAME_DART);
                             }, 20s);
 
-                            ScheduleTimedEvent(30s, [&] {
+                            ScheduleTimedEvent(15s, [&] {
                                 me->RemoveAurasDueToSpell(SPELL_ARMAGEDDON_PERIODIC);
                                 Talk(EMOTE_KJ_DARKNESS);
                                 DoCastAOE(SPELL_DARKNESS_OF_A_THOUSAND_SOULS);
