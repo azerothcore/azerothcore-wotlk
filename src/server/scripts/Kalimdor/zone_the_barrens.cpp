@@ -31,6 +31,7 @@ npc_twiggy_flathead
 npc_wizzlecrank_shredder
 EndContentData */
 
+#include "AreaDefines.h"
 #include "CreatureScript.h"
 #include "Player.h"
 #include "ScriptedCreature.h"
@@ -52,8 +53,7 @@ enum Gilthares
     SAY_GIL_SWEET               = 6,
     SAY_GIL_FREED               = 7,
 
-    QUEST_FREE_FROM_HOLD        = 898,
-    AREA_MERCHANT_COAST         = 391
+    QUEST_FREE_FROM_HOLD        = 898
 };
 
 class npc_gilthares : public CreatureScript
@@ -124,7 +124,7 @@ public:
                 return;
 
             //only aggro text if not player and only in this area
-            if (!who->IsPlayer() && me->GetAreaId() == AREA_MERCHANT_COAST)
+            if (!who->IsPlayer() && me->GetAreaId() == AREA_THE_MERCHANT_COAST)
             {
                 //appears to be pretty much random (possible only if escorter not in combat with who yet?)
                 Talk(SAY_GIL_AGGRO, who);

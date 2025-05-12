@@ -22,6 +22,7 @@
 #include "QueryResult.h"
 #include "SpellMgr.h"
 #include "World.h"
+#include "WorldStateDefines.h"
 
 void CharacterDatabaseCleaner::CleanDatabase()
 {
@@ -34,7 +35,7 @@ void CharacterDatabaseCleaner::CleanDatabase()
     uint32 oldMSTime = getMSTime();
 
     // check flags which clean ups are necessary
-    QueryResult result = CharacterDatabase.Query("SELECT value FROM worldstates WHERE entry = {}", WS_CLEANING_FLAGS);
+    QueryResult result = CharacterDatabase.Query("SELECT value FROM worldstates WHERE entry = {}", WORLD_STATE_CUSTOM_CLEANING_FLAGS);
     if (!result)
         return;
 
@@ -59,7 +60,7 @@ void CharacterDatabaseCleaner::CleanDatabase()
     // NOTE: In order to have persistentFlags be set in worldstates for the next cleanup,
     // you need to define them at least once in worldstates.
     flags &= sWorld->getIntConfig(CONFIG_PERSISTENT_CHARACTER_CLEAN_FLAGS);
-    CharacterDatabase.DirectExecute("UPDATE worldstates SET value = {} WHERE entry = {}", flags, WS_CLEANING_FLAGS);
+    CharacterDatabase.DirectExecute("UPDATE worldstates SET value = {} WHERE entry = {}", flags, WORLD_STATE_CUSTOM_CLEANING_FLAGS);
 
     sWorld->SetCleaningFlags(flags);
 

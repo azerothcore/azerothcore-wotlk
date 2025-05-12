@@ -15,6 +15,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "AreaDefines.h"
 #include "CreatureScript.h"
 #include "PassiveAI.h"
 #include "Player.h"
@@ -710,16 +711,23 @@ public:
                 switch (eventId)
                 {
                     case EVENT_ADD_ARCANE_CHAINS:
-                        if (Player* summoner = me->ToTempSummon()->GetSummonerUnit()->ToPlayer())
+                        if (TempSummon* tempSummon = me->ToTempSummon())
                         {
-                            summoner->CastSpell(summoner, SPELL_ARCANE_CHAINS_CHANNEL_II, TriggerCastFlags(TRIGGERED_FULL_MASK & ~TRIGGERED_IGNORE_AURA_INTERRUPT_FLAGS & ~TRIGGERED_IGNORE_CAST_ITEM & ~TRIGGERED_IGNORE_POWER_AND_REAGENT_COST & ~TRIGGERED_IGNORE_GCD));
-                            _events.ScheduleEvent(EVENT_FOLLOW_PLAYER, 1s);
+                            if (Unit* summoner = tempSummon->GetSummonerUnit())
+                            {
+                                summoner->CastSpell(summoner, SPELL_ARCANE_CHAINS_CHANNEL_II, TriggerCastFlags(TRIGGERED_FULL_MASK & ~TRIGGERED_IGNORE_AURA_INTERRUPT_FLAGS & ~TRIGGERED_IGNORE_CAST_ITEM & ~TRIGGERED_IGNORE_POWER_AND_REAGENT_COST & ~TRIGGERED_IGNORE_GCD));
+                                _events.ScheduleEvent(EVENT_FOLLOW_PLAYER, 1s);
+                            }
                         }
                         break;
+
                     case EVENT_FOLLOW_PLAYER:
-                        if (Player* summoner = me->ToTempSummon()->GetSummonerUnit()->ToPlayer())
+                        if (TempSummon* tempSummon = me->ToTempSummon())
                         {
-                            StartFollow(summoner);
+                            if (Player* summoner = tempSummon->GetSummonerUnit()->ToPlayer())
+                            {
+                                StartFollow(summoner);
+                            }
                         }
                         break;
                 }
@@ -2036,7 +2044,6 @@ public:
 // NPC 25301: Counselor Talbot
 enum CounselorTalbot
 {
-    AREA_LAST_RITES     = 4128,
     SPELL_DEFLECTION    = 51009,
     SPELL_SOUL_BLAST    = 50992,
     SPELL_VAMPIRIC_BOLT = 51016,
@@ -2070,7 +2077,7 @@ public:
                 return;
             }
 
-            if (me->GetAreaId() == AREA_LAST_RITES)
+            if (me->GetAreaId() == AREA_NAXXANAR)
             {
                 _events.Update(diff);
 

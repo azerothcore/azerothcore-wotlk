@@ -67,7 +67,7 @@ std::array<uint32, 8> RajaxxWavesData[] =
 class instance_ruins_of_ahnqiraj : public InstanceMapScript
 {
 public:
-    instance_ruins_of_ahnqiraj() : InstanceMapScript("instance_ruins_of_ahnqiraj", 509) { }
+    instance_ruins_of_ahnqiraj() : InstanceMapScript("instance_ruins_of_ahnqiraj", MAP_RUINS_OF_AHN_QIRAJ) { }
 
     struct instance_ruins_of_ahnqiraj_InstanceMapScript : public InstanceScript
     {

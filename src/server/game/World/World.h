@@ -127,18 +127,6 @@ enum RealmZone
     REALM_ZONE_CN5_8         = 37                           // basic-Latin at create, any at login
 };
 
-enum WorldStates
-{
-    WS_ARENA_DISTRIBUTION_TIME                 = 20001,                     // Next arena distribution time
-    WS_WEEKLY_QUEST_RESET_TIME                 = 20002,                     // Next weekly reset time
-    WS_BG_DAILY_RESET_TIME                     = 20003,                     // Next daily BG reset time
-    WS_CLEANING_FLAGS                          = 20004,                     // Cleaning Flags
-    WS_DAILY_QUEST_RESET_TIME                  = 20005,                     // Next daily reset time
-    WS_GUILD_DAILY_RESET_TIME                  = 20006,                     // Next guild cap reset time
-    WS_MONTHLY_QUEST_RESET_TIME                = 20007,                     // Next monthly reset time
-    WS_DAILY_CALENDAR_DELETION_OLD_EVENTS_TIME = 20008                      // Next daily calendar deletions of old events time
-};
-
 // xinef: petitions storage
 struct PetitionData
 {
@@ -253,10 +241,6 @@ public:
         return index < INT_CONFIG_VALUE_COUNT ? _int_configs[index] : 0;
     }
 
-    void setWorldState(uint32 index, uint64 value) override;
-    [[nodiscard]] uint64 getWorldState(uint32 index) const override;
-    void LoadWorldStates() override;
-
     /// Are we on a "Player versus Player" server?
     [[nodiscard]] bool IsPvPRealm() const override;
     [[nodiscard]] bool IsFFAPvPRealm() const override;
@@ -330,8 +314,6 @@ private:
     uint32 _int_configs[INT_CONFIG_VALUE_COUNT];
     bool _bool_configs[BOOL_CONFIG_VALUE_COUNT];
     float _float_configs[FLOAT_CONFIG_VALUE_COUNT];
-    typedef std::map<uint32, uint64> WorldStatesMap;
-    WorldStatesMap _worldstates;
     AccountTypes _allowedSecurityLevel;
     LocaleConstant _defaultDbcLocale;                     // from config for one from loaded DBC locales
     uint32 _availableDbcLocaleMask;                       // by loaded DBC

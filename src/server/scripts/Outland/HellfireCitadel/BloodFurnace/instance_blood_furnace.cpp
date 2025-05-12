@@ -48,7 +48,7 @@ ObjectData const creatureData[] =
 class instance_blood_furnace : public InstanceMapScript
 {
 public:
-    instance_blood_furnace() : InstanceMapScript("instance_blood_furnace", 542) {}
+    instance_blood_furnace() : InstanceMapScript("instance_blood_furnace", MAP_HELLFIRE_CITADEL_THE_BLOOD_FURNACE) {}
 
     struct instance_blood_furnace_InstanceMapScript : public InstanceScript
     {
