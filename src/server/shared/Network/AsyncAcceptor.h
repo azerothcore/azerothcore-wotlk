@@ -25,7 +25,6 @@
 #include <boost/asio/ip/tcp.hpp>
 #include <functional>
 
-
 using boost::asio::ip::tcp;
 
 constexpr auto ACORE_MAX_LISTEN_CONNECTIONS = boost::asio::socket_base::max_listen_connections;

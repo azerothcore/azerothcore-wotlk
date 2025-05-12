@@ -78,10 +78,6 @@ int m_ServiceStatus = -1;
 #include <timeapi.h>
 #endif
 
-#ifdef WITH_SYSTEMD
-#include <systemd/sd-daemon.h>
-#endif
-
 #ifndef _ACORE_CORE_CONFIG
 #define _ACORE_CORE_CONFIG "worldserver.conf"
 #endif
