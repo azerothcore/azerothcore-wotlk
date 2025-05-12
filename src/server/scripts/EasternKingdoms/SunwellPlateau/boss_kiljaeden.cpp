@@ -398,7 +398,7 @@ struct boss_kiljaeden : public BossAI
 
                             ScheduleBasicAbilities();
 
-                            ScheduleTimedEvent(36s, [&] {
+                            ScheduleTimedEvent(16s, [&] {
                                 DoCastSelf(SPELL_FLAME_DART);
                             }, 20s);
 
