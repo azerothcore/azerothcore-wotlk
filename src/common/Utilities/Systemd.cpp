@@ -18,6 +18,7 @@
 #if defined(__linux__)
 #include <cstdlib>
 #include <unistd.h>
+#include <string>
 
 int get_listen_fds()
 {
