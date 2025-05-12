@@ -286,7 +286,7 @@ struct boss_kiljaeden : public BossAI
                 DoCastSelf(SPELL_SHADOW_SPIKE);
             });
 
-            ScheduleTimedEvent(6s, [&] {
+            ScheduleTimedEvent(31s, [&] {
                 DoCastSelf(SPELL_FLAME_DART);
             }, 20s);
 
