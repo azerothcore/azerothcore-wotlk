@@ -36,19 +36,6 @@ target_link_libraries(shared
   PUBLIC
     database)
 
-find_library(WITH_SYSTEMD systemd)
-if(WITH_SYSTEMD)
-  message("*** Building with SYSTEMD support")
-  target_link_libraries(shared PUBLIC systemd)
-else(UNIX)
-  message("*** Skipping SYSTEMD support")
-endif (WITH_SYSTEMD)
-
-configure_file(
-  "${CMAKE_SOURCE_DIR}/src/cmake/systemd.h.in.cmake"
-  "${BUILDDIR}/systemd.h"
-)
-
 set_target_properties(shared
   PROPERTIES
     FOLDER

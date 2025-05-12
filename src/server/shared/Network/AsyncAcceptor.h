@@ -20,14 +20,11 @@
 
 #include "IpAddress.h"
 #include "Log.h"
-#include "systemd.h"
+#include "Systemd.h"
 #include <atomic>
 #include <boost/asio/ip/tcp.hpp>
 #include <functional>
 
-#ifdef WITH_SYSTEMD
-#include <systemd/sd-daemon.h>
-#endif
 
 using boost::asio::ip::tcp;
 
@@ -43,18 +40,17 @@ public:
         _socket(ioContext), _closed(false), _socketFactory([this](){ return DefaultSocketFactory(); }),
         _supportSocketActivation(supportSocketActivation)
     {
-#ifdef WITH_SYSTEMD
-        if (_supportSocketActivation && sd_listen_fds(0) > 0)
+        int listen_fd = get_listen_fds();
+        if (_supportSocketActivation && listen_fd > 0)
         {
             LOG_DEBUG("network", "Using socket from systemd socket activation");
             boost::system::error_code errorCode;
-            _acceptor.assign(boost::asio::ip::tcp::v4(), SD_LISTEN_FDS_START, errorCode);
+            _acceptor.assign(boost::asio::ip::tcp::v4(), listen_fd, errorCode);
             if (errorCode)
             {
                 LOG_WARN("network", "Failed to assign socket {}", errorCode.message());
             }
         }
-#endif
     }
 
     template<class T>

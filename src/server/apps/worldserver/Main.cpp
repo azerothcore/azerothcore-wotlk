@@ -48,7 +48,7 @@
 #include "SecretMgr.h"
 #include "SharedDefines.h"
 #include "SteadyTimer.h"
-#include "systemd.h"
+#include "Systemd.h"
 #include "World.h"
 #include "WorldSessionMgr.h"
 #include "WorldSocket.h"
@@ -411,12 +411,8 @@ int main(int argc, char** argv)
     sScriptMgr->OnShutdown();
 
     // set server offline
-#ifdef WITH_SYSTEMD
-    if (sd_listen_fds(0) <= 0)
+    if (get_listen_fds() == 0)
         LoginDatabase.DirectExecute("UPDATE realmlist SET flag = flag | {} WHERE id = '{}'", REALM_FLAG_OFFLINE, realm.Id.Realm);
-#else
-    LoginDatabase.DirectExecute("UPDATE realmlist SET flag = flag | {} WHERE id = '{}'", REALM_FLAG_OFFLINE, realm.Id.Realm);
-#endif
 
     LOG_INFO("server.worldserver", "Halting process...");
 

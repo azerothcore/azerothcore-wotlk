@@ -66,8 +66,7 @@ runs:
         sudo apt-get -y install ccache clang cmake curl google-perftools \
           libmysqlclient-dev make unzip build-essential cmake-data  \
           libboost-all-dev libbz2-dev libncurses5-dev libmysql++-dev \
-          libreadline6-dev libssl-dev libtool openssl zlib1g-dev \
-          libsystemd-dev
+          libreadline6-dev libssl-dev libtool openssl zlib1g-dev
 
         # Account for https://github.com/actions/runner-images/issues/8659
         # based off of https://github.com/actions/runner-images/issues/8659#issuecomment-1852353116
