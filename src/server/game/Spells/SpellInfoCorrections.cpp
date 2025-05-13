@@ -4903,12 +4903,6 @@ void SpellMgr::LoadSpellInfoCorrections()
         spellInfo->AttributesEx7 |= SPELL_ATTR7_TREAT_AS_NPC_AOE;
     });
 
-    // Heal (Crystal Spire of Karabor)
-    ApplySpellFix({ 40972 }, [](SpellInfo* spellInfo)
-    {
-        spellInfo->AttributesEx3 |= SPELL_ATTR3_SUPPRESS_CASTER_PROCS;
-    });
-
     // Torch (Death Knights near the Chapel)
     ApplySpellFix({ 52953 }, [](SpellInfo* spellInfo)
         {
