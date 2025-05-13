@@ -286,9 +286,9 @@ struct boss_kiljaeden : public BossAI
                 DoCastSelf(SPELL_SHADOW_SPIKE);
             });
 
-            ScheduleTimedEvent(3s, [&] {
+            ScheduleTimedEvent(31s, [&] {
                 DoCastSelf(SPELL_FLAME_DART);
-            }, 10s);
+            }, 20s);
 
             ScheduleTimedEvent(55s, [&] {
                 Talk(EMOTE_KJ_DARKNESS);
@@ -325,6 +325,10 @@ struct boss_kiljaeden : public BossAI
                 DoCastSelf(SPELL_SHADOW_SPIKE);
                 ScheduleBasicAbilities();
             });
+
+            ScheduleTimedEvent(28s, [&] {
+                DoCastSelf(SPELL_FLAME_DART);
+            }, 20s);
 
             ScheduleTimedEvent(64s, [&] {
                 me->RemoveAurasDueToSpell(SPELL_ARMAGEDDON_PERIODIC);
@@ -393,6 +397,10 @@ struct boss_kiljaeden : public BossAI
                             me->RemoveUnitFlag(UNIT_FLAG_PACIFIED);
 
                             ScheduleBasicAbilities();
+
+                            ScheduleTimedEvent(16s, [&] {
+                                DoCastSelf(SPELL_FLAME_DART);
+                            }, 20s);
 
                             ScheduleTimedEvent(15s, [&] {
                                 me->RemoveAurasDueToSpell(SPELL_ARMAGEDDON_PERIODIC);
