@@ -346,7 +346,7 @@ struct boss_alar : public BossAI
         scheduler.Schedule(timer, GROUP_FLAME_BUFFET, [this](TaskContext context)
         {
             if (!me->SelectNearestTarget(me->GetCombatReach()) && !me->isMoving())
-                DoCastRandomTarget(SPELL_FLAME_BUFFET, 0, 200.f);
+                DoCastAOE(SPELL_FLAME_BUFFET);
 
             context.Repeat(2s);
         });
