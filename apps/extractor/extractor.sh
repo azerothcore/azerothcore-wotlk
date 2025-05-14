@@ -62,7 +62,7 @@ echo "4 - Extract all (may take hours)"
 echo "5 - EXIT"
 echo ""
 
-read -p "Type 1, 2, 3, 4 or 5 then press ENTER: " choice
+read -rp "Type 1, 2, 3, 4 or 5 then press ENTER: " choice
 
 case $choice in
     1) Base ;;
@@ -70,7 +70,7 @@ case $choice in
     3) MMaps ;;
     4) All ;;
     5) exit 0;;
-    *) echo "Invalid choice."; read -p "Type 1, 2, 3, 4 or 5 then press ENTER: " choice ;;
+    *) echo "Invalid choice."; read -rp "Type 1, 2, 3, 4 or 5 then press ENTER: " choice ;;
 esac
 }
 

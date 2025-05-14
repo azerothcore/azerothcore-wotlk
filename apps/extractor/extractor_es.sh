@@ -62,7 +62,7 @@ echo "4 - Extraer todo (puede llevar varias horas)"
 echo "5 - SALIR"
 echo ""
 
-read -p "Escriba 1, 2, 3, 4 o 5 y pulse ENTER: " choice
+read -rp "Escriba 1, 2, 3, 4 o 5 y pulse ENTER: " choice
 
 case $choice in
     1) Base ;;
@@ -70,7 +70,7 @@ case $choice in
     3) MMaps ;;
     4) All ;;
     5) exit 0;;
-    *) echo "Opción inválida."; read -p "Escriba 1, 2, 3, 4 o 5 y presione ENTER: " choice ;;
+    *) echo "Opción inválida."; read -rp "Escriba 1, 2, 3, 4 o 5 y presione ENTER: " choice ;;
 esac
 }
 
