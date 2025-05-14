@@ -1456,14 +1456,10 @@ public:
         {
             SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(7355);
             if (!spellInfo)
-            {
                 return false;
-            }
 
-            if (Player* caster = handler->GetSession()->GetPlayer())
-            {
-                Spell::SendCastResult(caster, spellInfo, 0, SPELL_FAILED_CANT_DO_THAT_RIGHT_NOW);
-            }
+            if (player)
+                Spell::SendCastResult(player, spellInfo, 0, SPELL_FAILED_CANT_DO_THAT_RIGHT_NOW);
 
             return false;
         }
@@ -2953,7 +2949,7 @@ public:
             return false;
         }
 
-        handler->GetSession()->GetPlayer()->CastSpell(unit, 530, true);
+        handler->GetSession()->GetPlayer()->CastSpell(unit, MAP_OUTLAND, true);
         return true;
     }
 

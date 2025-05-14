@@ -986,6 +986,13 @@ public:
 
         return false;
     }
+    [[nodiscard]] bool RespondsToCallForHelp() const
+    {
+        if (FactionTemplateEntry const* entry = GetFactionTemplateEntry())
+            return entry->FactionRespondsToCallForHelp();
+
+        return false;
+    }
     [[nodiscard]] bool IsInSanctuary() const { return HasByteFlag(UNIT_FIELD_BYTES_2, 1, UNIT_BYTE2_FLAG_SANCTUARY); }
     [[nodiscard]] bool IsPvP() const { return HasByteFlag(UNIT_FIELD_BYTES_2, 1, UNIT_BYTE2_FLAG_PVP); }
     [[nodiscard]] bool IsFFAPvP() const { return HasByteFlag(UNIT_FIELD_BYTES_2, 1, UNIT_BYTE2_FLAG_FFA_PVP); }
@@ -1187,7 +1194,7 @@ public:
     uint32 SpellDamageBonusTaken(Unit* caster, SpellInfo const* spellProto, uint32 pdamage, DamageEffectType damagetype, uint32 stack = 1);
 
     // AOE damages
-    int32 CalculateAOEDamageReduction(int32 damage, uint32 schoolMask, Unit* caster) const;
+    int32 CalculateAOEDamageReduction(int32 damage, uint32 schoolMask, bool npcCaster) const;
 
     // Armor reduction
     static bool IsDamageReducedByArmor(SpellSchoolMask damageSchoolMask, SpellInfo const* spellInfo = nullptr, uint8 effIndex = MAX_SPELL_EFFECTS);
