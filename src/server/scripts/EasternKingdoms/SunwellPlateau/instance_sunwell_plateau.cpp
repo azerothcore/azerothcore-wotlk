@@ -78,7 +78,7 @@ ObjectData const summonData[] =
 class instance_sunwell_plateau : public InstanceMapScript
 {
 public:
-    instance_sunwell_plateau() : InstanceMapScript("instance_sunwell_plateau", 580) { }
+    instance_sunwell_plateau() : InstanceMapScript("instance_sunwell_plateau", MAP_THE_SUNWELL) { }
 
     struct instance_sunwell_plateau_InstanceMapScript : public InstanceScript
     {

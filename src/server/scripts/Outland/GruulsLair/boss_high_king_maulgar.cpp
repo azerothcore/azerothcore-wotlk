@@ -286,16 +286,7 @@ struct boss_kiggler_the_crazed : public ScriptedAI
             context.Repeat(7200ms, 20600ms);
         }).Schedule(23s, [this](TaskContext context)
         {
-            //changed to work similarly to Ikiss poly
-            SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(SPELL_GREATER_POLYMORPH);
-            if (Unit* target = SelectTarget(SelectTargetMethod::MaxThreat, 1, [&]
-            (Unit* target) -> bool
-                {
-                    return target && !target->IsImmunedToSpell(spellInfo);
-                }))
-            {
-                DoCast(target, SPELL_GREATER_POLYMORPH);
-            }
+            DoCastVictim(SPELL_GREATER_POLYMORPH);
             context.Repeat(10900ms);
         }).Schedule(30s, [this](TaskContext context)
         {

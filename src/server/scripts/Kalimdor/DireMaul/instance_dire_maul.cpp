@@ -23,7 +23,7 @@
 class instance_dire_maul : public InstanceMapScript
 {
 public:
-    instance_dire_maul() : InstanceMapScript(DMScriptName, 429) { }
+    instance_dire_maul() : InstanceMapScript(DMScriptName, MAP_DIRE_MAUL) { }
 
     struct instance_dire_maul_InstanceMapScript : public InstanceScript
     {

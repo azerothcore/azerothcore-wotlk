@@ -15,6 +15,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "AreaDefines.h"
 #include "AreaTriggerScript.h"
 #include "CellImpl.h"
 #include "Chat.h"
@@ -656,8 +657,7 @@ enum WintergardeGryphon
     POINT_TAKE_OFF                              = 2,
 
     QUEST_FLIGHT_OF_THE_WINTERGARDE_DEFENDER    = 12237,
-    GO_TEMP_GRYPHON_STATION                     = 188679,
-    AREA_WINTERGARDE_KEEP                       = 4177
+    GO_TEMP_GRYPHON_STATION                     = 188679
 };
 
 class npc_wintergarde_gryphon : public VehicleAI
