@@ -1755,7 +1755,6 @@ void World::SetInitialWorldSettings()
 
     LOG_INFO("server.loading", "Loading WorldStates...");              // must be loaded before battleground, outdoor PvP and conditions
     sWorldState->LoadWorldStates();
-    sWorldState->Load();
 
     LOG_INFO("server.loading", "Loading Conditions...");
     sConditionMgr->LoadConditions();
@@ -1879,6 +1878,9 @@ void World::SetInitialWorldSettings()
     LOG_INFO("server.loading", " ");
     uint32 nextGameEvent = sGameEventMgr->StartSystem();
     _timers[WUPDATE_EVENTS].SetInterval(nextGameEvent);    //depend on next event
+
+    LOG_INFO("server.loading", "Loading WorldState...");
+    sWorldState->Load(); // must be called after loading game events
 
     // Delete all characters which have been deleted X days before
     Player::DeleteOldCharacters();
