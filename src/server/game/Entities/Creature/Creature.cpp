@@ -3733,10 +3733,9 @@ uint8 Creature::GetLeashTimer() const
     uint8 timerOffset = 11;
 
     uint8 timerModifier = uint8(GetLevel() / 10) - 2;
-    // Formula is likely not quite correct, but better than flat timer
-    uint8 finalTimer = std::max<uint8>(timerOffset, timerOffset + timerModifier);
 
-    return timerOffset + timerModifier;
+    // Formula is likely not quite correct, but better than flat timer
+    return std::max<uint8>(timerOffset, timerOffset + timerModifier);
 }
 
 bool Creature::CanPeriodicallyCallForAssistance() const
