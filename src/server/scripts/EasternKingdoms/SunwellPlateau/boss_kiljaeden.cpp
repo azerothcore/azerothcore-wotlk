@@ -471,7 +471,7 @@ struct boss_kiljaeden : public BossAI
                         init.Launch();
                     }
                 }
-            }, 40s);
+            }, 20s);
         }
     }
 
