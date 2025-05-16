@@ -443,7 +443,7 @@ struct boss_kiljaeden : public BossAI
         ScheduleTimedEvent(9s, [&] {
             me->CastCustomSpell(SPELL_FIRE_BLOOM, SPELLVALUE_MAX_TARGETS, 5, me, TRIGGERED_NONE);
             me->SetTarget(me->GetVictim()->GetGUID());
-        }, _phase == PHASE_SACRIFICE ? 20s : 20s);
+        }, 20s);
 
         if (_phase != PHASE_SACRIFICE)
         {
