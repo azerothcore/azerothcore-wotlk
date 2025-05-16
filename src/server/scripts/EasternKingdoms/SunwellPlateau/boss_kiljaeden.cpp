@@ -448,10 +448,12 @@ struct boss_kiljaeden : public BossAI
         PHASE_SACRIFICE                 = 5,
         */
         std::chrono::seconds fireBloomTimer = 20s;
-        if (_phase == PHASE_DARKNESS || _phase == PHASE_ARMAGEDDON) {
+        if (_phase == PHASE_DARKNESS || _phase == PHASE_ARMAGEDDON)
+        {
             fireBloomTimer = 50s; // P3/P4
         }
-        else if (_phase == PHASE_SACRIFICE) {
+        else if (_phase == PHASE_SACRIFICE)
+        {
             fireBloomTimer = 70s; // P5
         }
 
