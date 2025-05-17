@@ -623,7 +623,7 @@ protected:
     static constexpr uint32 BG_ANNOUNCEMENT_TWO_MINUTE          = 120000;  // 2 minutes
     static constexpr uint32 BG_ANNOUNCEMENT_ONE_MINUTE          = 60000;   // 1 minute
     static constexpr uint32 BG_ANNOUNCEMENT_HALF_MINUTE         = 30000;   // 30 seconds
-    static constexpr uint32 BG_ANNOUNCEMENT_QUARTER_MINUTE      = 15000;  // 15 seconds
+    static constexpr uint32 BG_ANNOUNCEMENT_QUARTER_MINUTE      = 15000;   // 15 seconds
 
     // Scorekeeping
     BattlegroundScoreMap PlayerScores;                // Player scores
