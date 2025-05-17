@@ -3483,6 +3483,13 @@ Wintergrasp.CrashRestartTimer = 10
 ###################################################################################################
 # BATTLEGROUND
 #
+#    Battleground.PrepTime
+#        Description: Time (in seconds) for battleground preparation phase.
+#        Default:     120
+
+Battleground.PrepTime = 120
+
+#
 #    Battleground.CastDeserter
 #        Description: Cast Deserter spell at players who leave battlegrounds in progress.
 #        Default:     1 - (Enabled)
@@ -3747,6 +3754,13 @@ Battleground.EyeOfTheStorm.CapturePoints = 1600
 
 ###################################################################################################
 # ARENA
+#
+#    Arena.PrepTime
+#        Description: Time (in seconds) for arena preparation phase.
+#        Default:     60
+
+Arena.PrepTime = 60
+
 #
 #    Arena.MaxRatingDifference
 #        Description: Maximum rating difference between two teams in rated matches.
