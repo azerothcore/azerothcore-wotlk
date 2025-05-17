@@ -4897,8 +4897,10 @@ void SpellMgr::LoadSpellInfoCorrections()
         spellInfo->Effects[EFFECT_0].RadiusEntry = sSpellRadiusStore.LookupEntry(EFFECT_RADIUS_70_YARDS);
     });
 
-    // Encapsulate
-    ApplySpellFix({ 45662 }, [](SpellInfo* spellInfo)
+    ApplySpellFix({
+        45662, // Encapsulate
+        45642  // Fire Bloom
+        }, [](SpellInfo* spellInfo)
     {
         spellInfo->AttributesEx7 |= SPELL_ATTR7_TREAT_AS_NPC_AOE;
     });

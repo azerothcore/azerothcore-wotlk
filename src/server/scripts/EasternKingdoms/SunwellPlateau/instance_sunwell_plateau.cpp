@@ -336,6 +336,22 @@ private:
     TaskScheduler scheduler;
 };
 
+class spell_spell_fury_aura : public AuraScript
+{
+    PrepareAuraScript(spell_spell_fury_aura);
+
+    void OnApply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
+    {
+        if (GetUnitOwner()->ToPlayer())
+            ModStackAmount(5);
+    }
+
+    void Register() override
+    {
+        OnEffectApply += AuraEffectApplyFn(spell_spell_fury_aura::OnApply, EFFECT_0, SPELL_AURA_MOD_CASTING_SPEED_NOT_STACK, AURA_EFFECT_HANDLE_REAL);
+    }
+};
+
 void AddSC_instance_sunwell_plateau()
 {
     new instance_sunwell_plateau();
@@ -345,4 +361,5 @@ void AddSC_instance_sunwell_plateau()
     RegisterSpellScriptWithArgs(spell_sunwell_teleport, "spell_teleport_to_apex_point", SPELL_TELEPORT_TO_APEX_POINT);
     RegisterSpellScriptWithArgs(spell_sunwell_teleport, "spell_teleport_to_witchs_sanctum", SPELL_TELEPORT_TO_WITCHS_SANCTUM);
     RegisterSpellScriptWithArgs(spell_sunwell_teleport, "spell_teleport_to_sunwell_plateau", SPELL_TELEPORT_TO_SUNWELL_PLATEAU);
+    RegisterSpellScript(spell_spell_fury_aura);
 }
