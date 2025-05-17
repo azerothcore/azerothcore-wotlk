@@ -152,7 +152,7 @@ class spell_sha_totemic_mastery : public AuraScript
     {
         PreventDefaultAction();
 
-        for (uint8 i = SUMMON_SLOT_TOTEM; i < MAX_TOTEM_SLOT; ++i)
+        for (uint8 i = SUMMON_SLOT_TOTEM_FIRE; i < MAX_TOTEM_SLOT; ++i)
             if (!GetTarget()->m_SummonSlot[i])
                 return;
 

@@ -1401,6 +1401,12 @@ void World::SetInitialWorldSettings()
     LOG_INFO("server.loading", "Loading SpellInfo Custom Attributes...");
     sSpellMgr->LoadSpellInfoCustomAttributes();
 
+    LOG_INFO("server.loading", "Loading Player Totem models...");
+    sObjectMgr->LoadPlayerTotemModels();
+
+    LOG_INFO("server.loading", "Loading Player Shapeshift models...");
+    sObjectMgr->LoadPlayerShapeshiftModels();
+
     LOG_INFO("server.loading", "Loading GameObject Models...");
     LoadGameObjectModelList(_dataPath);
 
