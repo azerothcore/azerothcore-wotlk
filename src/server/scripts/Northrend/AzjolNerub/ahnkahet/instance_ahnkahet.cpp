@@ -15,6 +15,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "AreaBoundary.h"
 #include "InstanceMapScript.h"
 #include "Player.h"
 #include "ScriptedCreature.h"
@@ -38,6 +39,11 @@ DoorData const doorData[] =
     { 0,                0,                    DOOR_TYPE_ROOM    }
 };
 
+BossBoundaryData const boundaries =
+{
+    { DATA_JEDOGA_SHADOWSEEKER, new ParallelogramBoundary(Position(460.365f, -661.997f, -20.985f), Position(364.958f,-790.211f, -14.207f), Position(347.436f,-657.978f,14.478f)) }
+};
+
 class instance_ahnkahet : public InstanceMapScript
 {
 public:
@@ -52,6 +58,7 @@ public:
             SetPersistentDataCount(MAX_PERSISTENT_DATA);
             LoadObjectData(creatureData, nullptr);
             LoadDoorData(doorData);
+            LoadBossBoundaries(boundaries);
         }
 
         void OnGameObjectCreate(GameObject* go) override
