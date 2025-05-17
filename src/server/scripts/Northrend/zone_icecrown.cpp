@@ -2131,9 +2131,31 @@ public:
     }
 };
 
+enum WaterTerror
+{
+    SPELL_WATER_TERROR_FROST_NOVA = 57668
+};
+
+// 57652 - Crashing Wave
+class spell_crashing_wave : public SpellScript
+{
+    PrepareSpellScript(spell_crashing_wave);
+
+    void RecalculateDamage()
+    {
+        if (Unit* target = GetHitUnit())
+            if (target->HasAura(SPELL_WATER_TERROR_FROST_NOVA))
+                SetHitDamage(GetHitDamage() * 2);
+    }
+
+    void Register() override
+    {
+        OnHit += SpellHitFn(spell_crashing_wave::RecalculateDamage);
+    }
+};
+
 void AddSC_icecrown()
 {
-    // Ours
     new npc_black_knight_graveyard();
     new npc_battle_at_valhalas();
     new npc_llod_generic();
@@ -2147,10 +2169,9 @@ void AddSC_icecrown()
     new npc_infra_green_bomber_generic();
     RegisterSpellScript(spell_onslaught_or_call_bone_gryphon);
     RegisterSpellScript(spell_deliver_gryphon);
-
-    // Theirs
     new npc_guardian_pavilion();
     new npc_tournament_training_dummy();
     new npc_blessed_banner();
     new npc_frostbrood_skytalon();
+    RegisterSpellScript(spell_crashing_wave);
 }
