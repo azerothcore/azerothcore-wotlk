@@ -2683,16 +2683,16 @@ bool Creature::CanCreatureAttack(Unit const* victim, bool skipDistCheck) const
     float x, y, z;
     GetMotionMaster()->GetMotionSlot(MOTION_SLOT_IDLE)->GetResetPosition(x, y, z);
 
-    if (!dist)
-        return true;
-
     if (Unit* unit = GetCharmerOrOwner())
     {
         dist = std::min<float>(GetMap()->GetVisibilityRange() + GetObjectSize() * 2, 150.0f);
         return IsWithinDist(unit, dist);
     }
-    else
-        return IsInDist2d(x, y, dist);
+
+    if (!dist)
+        return true;
+
+    return IsInDist2d(x, y, dist);
 }
 
 CreatureAddon const* Creature::GetCreatureAddon() const
