@@ -24,6 +24,7 @@
 #include "ObjectMgr.h"
 #include "Player.h"
 #include "SocialMgr.h"
+#include "VoiceChatMgr.h"
 #include "World.h"
 
 Channel::Channel(std::string const& name, uint32 channelId, uint32 channelDBId, TeamId teamId, bool announce, bool ownership):
@@ -212,6 +213,23 @@ void Channel::JoinChannel(Player* player, std::string const& pass)
     if (_channelRights.joinMessage.length())
         ChatHandler(player->GetSession()).PSendSysMessage("{}", _channelRights.joinMessage);
 
+    // join voice chat
+    if (!IsConstant() && HasFlag(CHANNEL_FLAG_CUSTOM) && sVoiceChatMgr.CanUseVoiceChat())
+    {
+        // first voice chat enabled member turns it on
+        // only proof is https://www.youtube.com/watch?v=h5oH4ER2cJ0 where voice chat is auto enabled on new channel
+        if (!IsVoiceEnabled())
+        {
+            if (player->GetSession()->IsVoiceChatEnabled())
+            {
+                // toggle voice and update player flags
+                ToggleVoice(player);
+            }
+        }
+        if (IsVoiceEnabled())
+            sVoiceChatMgr.AddToCustomVoiceChatChannel(guid, this->GetName(), player->GetTeamId());
+    }
+
     WorldPacket data;
     MakeYouJoined(&data);
     SendToOne(&data, guid);
@@ -310,6 +328,10 @@ void Channel::LeaveChannel(Player* player, bool send)
                 SetOwner(ObjectGuid::Empty);
         }
     }
+
+    // leave voice chat
+    if (IsVoiceEnabled())
+        sVoiceChatMgr.RemoveFromCustomVoiceChatChannel(guid, this->GetName(), player->GetTeamId());
 }
 
 void Channel::KickOrBan(Player const* player, std::string const& badname, bool ban)
@@ -683,6 +705,87 @@ void Channel::SendWhoOwner(ObjectGuid guid)
     else
         MakeNotMember(&data);
     SendToOne(&data, guid);
+}
+
+void Channel::AddVoiceChatMembersAfterCreate()
+{
+    // add voice enabled players to channel after it's created on voice server
+    for (PlayerContainer::const_iterator i = playersStore.begin(); i != playersStore.end(); ++i)
+        if (i->second.plrPtr->GetSession()->IsVoiceChatEnabled())
+            sVoiceChatMgr.AddToCustomVoiceChatChannel(i->second.plrPtr->GetGUID(), this->GetName(), i->second.plrPtr->GetTeamId());
+}
+
+void Channel::ToggleVoice(Player* player)
+{
+    // silently disable if voice server disconnected
+    if (!player)
+    {
+        m_voice = !m_voice;
+        if (m_voice)
+            _flags |= CHANNEL_FLAG_VOICE;
+        else
+            _flags &= ~CHANNEL_FLAG_VOICE;
+
+        return;
+    }
+
+    ObjectGuid guid = player->GetGUID();
+
+    if (!IsOn(guid))
+    {
+        WorldPacket data;
+        MakeNotMember(&data);
+        SendToOne(&data, guid);
+        return;
+    }
+
+    // const uint32 level = sWorld->getConfig(CONFIG_UINT32_GM_LEVEL_CHANNEL_MODERATION);
+    // const bool gm = (level && player->GetSession()->GetSecurity() >= level);
+    const bool gm = false;
+
+    if (!playersStore[guid].IsOwner() && !playersStore[guid].IsOwnerGM())
+    {
+        WorldPacket data;
+        MakeNotOwner(&data);
+        SendToOne(&data, guid);
+        return;
+    }
+
+    // toggle channel voice
+    m_voice = !m_voice;
+
+    WorldPacket data;
+    if (m_voice)
+        MakeVoiceOn(&data, guid);
+    else
+        MakeVoiceOff(&data ,guid);
+
+    SendToAll(&data);
+
+    if (m_voice)
+        _flags |= CHANNEL_FLAG_VOICE;
+    else
+        _flags &= ~CHANNEL_FLAG_VOICE;
+
+    // update player flags, maybe used in right click menu in chat UI
+    for (PlayerContainer::const_iterator i = playersStore.begin(); i != playersStore.end(); ++i)
+    {
+        if (Player* member = i->second.plrPtr)
+        {
+            if (WorldSession* session = member->GetSession())
+            {
+                if (session->IsVoiceChatEnabled())
+                {
+                    playersStore[i->first].SetVoiced(m_voice);
+                }
+            }
+        }
+    }
+
+    if (m_voice)
+    {
+        sVoiceChatMgr.AddToCustomVoiceChatChannel(guid, this->GetName(), player->GetTeamId());
+    }
 }
 
 void Channel::List(Player const* player)

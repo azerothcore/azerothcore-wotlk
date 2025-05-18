@@ -20,6 +20,7 @@
 #include "Player.h"
 #include "StringConvert.h"
 #include "Tokenize.h"
+#include "VoiceChatMgr.h"
 #include "World.h"
 
 ChannelMgr::~ChannelMgr()
@@ -60,7 +61,7 @@ void ChannelMgr::LoadChannels()
         return;
     }
 
-    std::vector<std::pair<std::string, uint32>> toDelete;
+    std::vector<std::pair<std::string, TeamId>> toDelete;
     do
     {
         Field* fields = result->Fetch();
@@ -108,6 +109,8 @@ void ChannelMgr::LoadChannels()
 
     for (auto& pair : toDelete)
     {
+        sVoiceChatMgr.DeleteCustomVoiceChatChannel(pair.first, pair.second);
+
         CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_CHANNEL);
         stmt->SetData(0, pair.first);
         stmt->SetData(1, pair.second);

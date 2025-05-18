@@ -540,6 +540,24 @@ public:
     uint32 GetRecruiterId() const { return recruiterId; }
     bool IsARecruiter() const { return isRecruiter; }
 
+    // Voice Chat
+    bool IsVoiceChatEnabled() const { return m_voiceEnabled; }
+    bool IsMicEnabled() const { return m_micEnabled; }
+    uint16 GetCurrentVoiceChannelId() const { return m_currentVoiceChannel; }
+    void SetCurrentVoiceChannelId(uint32 id) { m_currentVoiceChannel = id; }
+    static void HandleAddMutedOpcodeCallBack(QueryResult* result, uint32);
+    // Voice Chat
+    void HandleAddVoiceIgnoreOpcode(WorldPacket& recvData);
+    void HandleDelVoiceIgnoreOpcode(WorldPacket& recvData);
+    void HandleChannelSilenceOpcode(WorldPacket& recvData);
+    void HandleChannelUnsilenceOpcode(WorldPacket& recvData);
+    void HandlePartySilenceOpcode(WorldPacket& recvData);
+    void HandlePartyUnsilenceOpcode(WorldPacket& recvData);
+    void HandleChannelVoiceOnOpcode(WorldPacket& recv_data);
+    void HandleChannelVoiceOffOpcode(WorldPacket& recv_data);
+    void HandleVoiceSessionEnableOpcode(WorldPacket& recv_data);
+    void HandleSetActiveVoiceChannelOpcode(WorldPacket& recv_data);
+
     // Packets cooldown
     time_t GetCalendarEventCreationCooldown() const { return _calendarEventCreationCooldown; }
     void SetCalendarEventCreationCooldown(time_t cooldown) { _calendarEventCreationCooldown = cooldown; }
@@ -1008,8 +1026,6 @@ public:                                                 // opcodes handlers
     void HandleItemRefundInfoRequest(WorldPacket& recvData);
     void HandleItemRefund(WorldPacket& recvData);
 
-    void HandleChannelVoiceOnOpcode(WorldPacket& recvData);
-    void HandleVoiceSessionEnableOpcode(WorldPacket& recvData);
     void HandleSetActiveVoiceChannel(WorldPacket& recvData);
     void HandleSetTaxiBenchmarkOpcode(WorldPacket& recvData);
 
@@ -1188,6 +1204,11 @@ private:
     bool _kicked;
     // Packets cooldown
     time_t _calendarEventCreationCooldown;
+
+    // Voice Chat
+    bool m_micEnabled;
+    bool m_voiceEnabled;
+    uint16 m_currentVoiceChannel;
 
     // Addon Message count for Metric
     std::atomic<uint32> _addonMessageReceiveCount;

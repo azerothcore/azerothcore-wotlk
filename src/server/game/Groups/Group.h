@@ -230,6 +230,8 @@ public:
     bool IsLeader(ObjectGuid guid) const;
     ObjectGuid GetMemberGUID(const std::string& name);
     bool IsAssistant(ObjectGuid guid) const;
+    // bool IsMainTank(ObjectGuid guid) const;
+    bool IsMainAssistant(ObjectGuid guid) const;
 
     Player* GetInvited(ObjectGuid guid) const;
     Player* GetInvited(const std::string& name) const;
@@ -321,6 +323,9 @@ public:
     void DoForAllMembers(std::function<void(Player*)> const& worker);
 
     DataMap CustomData;
+
+    // hack to get a uint32 from 64bit GUID
+    uint32 GetId();
 
 protected:
     void _homebindIfInstance(Player* player);
