@@ -1,5 +1,7 @@
 -- Warp Storm (21322)
-UPDATE `creature_template_addon` SET `auras` = '36581' WHERE (`entry` = 21322);
+DELETE FROM `creature_template_addon` WHERE (`entry` = 21322);
+INSERT INTO `creature_template_addon` (`entry`, `path_id`, `mount`, `bytes1`, `bytes2`, `emote`, `visibilityDistanceType`, `auras`) VALUES
+(21322, 0, 0, 0, 0, 0, 0, '21322');
 UPDATE `creature_template` SET `AIName` = '', `unit_flags` = `unit_flags`&~(128|256) WHERE `entry` = 21322;
 DELETE FROM `smart_scripts` WHERE `entryorguid` IN (20516,21322) AND `source_type` = 0;
 DELETE FROM `smart_scripts` WHERE (`source_type` = 0 AND `entryorguid` = 18865 AND `id` = 4);
