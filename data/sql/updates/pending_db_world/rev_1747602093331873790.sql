@@ -1,4 +1,4 @@
--- DB update 2025_05_15_00 -> 2025_05_18_00
+--
 
 -- Reduce Aku'Mai Servant damage. Auto attack = 36-45 w 1.5k armor
 UPDATE `creature_template` SET `DamageModifier` = 1.7 WHERE `entry` = 4978 AND `type` = 4;
