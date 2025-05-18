@@ -1205,6 +1205,12 @@ class spell_dru_rejuvenation_moonglade_2_set : public AuraScript
         return ValidateSpellInfo({ SPELL_DRUID_MOONGLADE_2P_BONUS });
     }
 
+    bool Load() override
+    {
+        _casterGUID.Clear();
+        return true;
+    }
+
     void OnApply(AuraEffect const*  /*aurEff*/, AuraEffectHandleModes /*mode*/)
     {
         if (Player* caster = ObjectAccessor::FindPlayer(GetCasterGUID()))
@@ -1214,6 +1220,7 @@ class spell_dru_rejuvenation_moonglade_2_set : public AuraScript
                     if (!target)
                         return;
 
+                    _casterGUID = GetCasterGUID();
                     SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(SPELL_DRUID_MOONGLADE_2P_BONUS);
                     target->ApplyRatingMod(CR_DODGE, spellInfo->Effects[EFFECT_0].CalcValue(), true); // 35 rating
                 }
@@ -1221,16 +1228,15 @@ class spell_dru_rejuvenation_moonglade_2_set : public AuraScript
 
     void OnRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
     {
-        if (Player* caster = ObjectAccessor::FindPlayer(GetCasterGUID()))
-            if (caster->HasAura(SPELL_DRUID_MOONGLADE_2P_BONUS))
-            {
-                Player* target = GetTarget()->ToPlayer();
-                if (!target)
-                    return;
+        if (_casterGUID)
+        {
+            Player* target = GetTarget()->ToPlayer();
+            if (!target)
+                return;
 
-                SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(SPELL_DRUID_MOONGLADE_2P_BONUS);
-                target->ApplyRatingMod(CR_DODGE, spellInfo->Effects[EFFECT_0].CalcValue(), false); // 35 rating
-            }
+            SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(SPELL_DRUID_MOONGLADE_2P_BONUS);
+            target->ApplyRatingMod(CR_DODGE, spellInfo->Effects[EFFECT_0].CalcValue(), false); // 35 rating
+        }
     }
 
     void Register() override
@@ -1238,6 +1244,9 @@ class spell_dru_rejuvenation_moonglade_2_set : public AuraScript
         AfterEffectApply += AuraEffectApplyFn(spell_dru_rejuvenation_moonglade_2_set::OnApply, EFFECT_0, SPELL_AURA_PERIODIC_HEAL, AURA_EFFECT_HANDLE_REAL);
         AfterEffectRemove += AuraEffectRemoveFn(spell_dru_rejuvenation_moonglade_2_set::OnRemove, EFFECT_0, SPELL_AURA_PERIODIC_HEAL, AURA_EFFECT_HANDLE_REAL);
     }
+
+private:
+    ObjectGuid _casterGUID;
 };
 
 void AddSC_druid_spell_scripts()
