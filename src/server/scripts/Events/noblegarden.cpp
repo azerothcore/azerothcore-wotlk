@@ -21,7 +21,8 @@
 
 enum eNoblegarden
 {
-    SPELL_NOBLEGARDEN_BUNNY = 61734
+    SPELL_NOBLEGARDEN_BUNNY = 61734,
+    SPELL_WELL_FED          = 24870,
 };
 
 // 61712 Summon Noblegarden Bunny Controller
@@ -55,7 +56,34 @@ class spell_summon_noblegarden_bunny_controller : public SpellScript
     }
 };
 
+// 61874 - Food (Noblegarden Chocolate, item 44791)
+class spell_item_noblegarden_chocolate : public AuraScript
+{
+    PrepareAuraScript(spell_item_noblegarden_chocolate);
+
+    bool Validate(SpellInfo const* /*spellInfo*/) override
+    {
+        return ValidateSpellInfo({ SPELL_WELL_FED });
+    }
+
+    void HandlePeriodic(AuraEffect const* /*aurEff*/)
+    {
+        if (Unit* caster = GetCaster())
+        {
+                uint32 duration = static_cast<uint32>(GetDuration());
+                if (!caster->HasAura(SPELL_WELL_FED) && duration <= 14000)
+                    caster->CastSpell(caster, SPELL_WELL_FED, true);
+        }
+    }
+
+    void Register() override
+    {
+        OnEffectPeriodic += AuraEffectPeriodicFn(spell_item_noblegarden_chocolate::HandlePeriodic, EFFECT_0, SPELL_AURA_OBS_MOD_HEALTH);
+    }
+};
+
 void AddSC_event_noblegarden_scripts()
 {
     RegisterSpellScript(spell_summon_noblegarden_bunny_controller);
+    RegisterSpellScript(spell_item_noblegarden_chocolate);
 }
