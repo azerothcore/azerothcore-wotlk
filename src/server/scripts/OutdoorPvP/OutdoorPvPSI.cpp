@@ -25,6 +25,7 @@
 #include "OutdoorPvPScript.h"
 #include "Player.h"
 #include "ReputationMgr.h"
+#include "ScriptMgr.h"
 #include "Transport.h"
 #include "World.h"
 #include "WorldPacket.h"
@@ -118,7 +119,9 @@ bool OutdoorPvPSI::HandleAreaTrigger(Player* player, uint32 trigger)
                 // add 19 honor
                 player->RewardHonor(nullptr, 1, 19);
                 // add 20 cenarion circle repu
-                player->GetReputationMgr().ModifyReputation(sFactionStore.LookupEntry(609), 20.f);
+                float reputation = 20.f;
+                sScriptMgr->OnPlayerBeforeReputationChange(player, 609, reputation, ReputationSource::PvP, nullptr, nullptr, nullptr);
+                player->GetReputationMgr().ModifyReputation(sFactionStore.LookupEntry(609), reputation);
                 // complete quest
                 player->KilledMonsterCredit(SI_TURNIN_QUEST_CM_A);
             }
@@ -144,7 +147,9 @@ bool OutdoorPvPSI::HandleAreaTrigger(Player* player, uint32 trigger)
                 // add 19 honor
                 player->RewardHonor(nullptr, 1, 19);
                 // add 20 cenarion circle repu
-                player->GetReputationMgr().ModifyReputation(sFactionStore.LookupEntry(609), 20.f);
+                float reputation = 20.f;
+                sScriptMgr->OnPlayerBeforeReputationChange(player, 609, reputation, ReputationSource::PvP, nullptr, nullptr, nullptr);
+                player->GetReputationMgr().ModifyReputation(sFactionStore.LookupEntry(609), reputation);
                 // complete quest
                 player->KilledMonsterCredit(SI_TURNIN_QUEST_CM_H);
             }

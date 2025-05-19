@@ -18,6 +18,7 @@
 #ifndef SCRIPT_OBJECT_PLAYER_SCRIPT_H_
 #define SCRIPT_OBJECT_PLAYER_SCRIPT_H_
 
+#include "Player.h"
 #include "ScriptObject.h"
 #include "SharedDefines.h"
 #include <vector>
@@ -48,6 +49,7 @@ enum PlayerHook
     PLAYERHOOK_ON_MONEY_CHANGED,
     PLAYERHOOK_ON_BEFORE_LOOT_MONEY,
     PLAYERHOOK_ON_GIVE_EXP,
+    PLAYERHOOK_ON_BEFORE_REPUTATION_CHANGE,
     PLAYERHOOK_ON_REPUTATION_CHANGE,
     PLAYERHOOK_ON_REPUTATION_RANK_CHANGE,
     PLAYERHOOK_ON_LEARN_SPELL,
@@ -276,6 +278,20 @@ public:
 
     // Called when a player gains XP (before anything is given)
     virtual void OnPlayerGiveXP(Player* /*player*/, uint32& /*amount*/, Unit* /*victim*/, uint8 /*xpSource*/) { }
+
+    /**
+    * @brief Called before a player gains or looses Reputation
+    *
+    * @param [in] player instance of the current player
+    * @param [in] factionId id of the faction which reputation changes
+    * @param[in,out] amount the amount of reputation the player gets or loses
+    * @param[in] reputationSource an enum which determinate the source used to gain or loose reputation
+    * @param[in] victim the unit which was killed to gain reputation
+    * @param[in] quest the quest which was turn in to gain reputation
+    * @param[in] spell the spell which was used to gain reputation
+    * @remark victim, quest and spell might be null, check reputationSource first
+    */
+    virtual void OnPlayerBeforeReputationChange(Player* /*player*/, uint32 /*factionId*/, float& /*amount*/, ReputationSource /*reputationSource*/, Unit const* /*victim*/, Quest const* /*quest*/, Spell const* /*spell*/) {}
 
     // Called when a player's reputation changes (before it is actually changed)
     virtual bool OnPlayerReputationChange(Player* /*player*/, uint32 /*factionID*/, int32& /*standing*/, bool /*incremental*/) { return true; }
