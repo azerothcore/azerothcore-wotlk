@@ -70,9 +70,9 @@ class spell_item_noblegarden_chocolate : public AuraScript
     {
         if (Unit* caster = GetCaster())
         {
-                uint32 duration = static_cast<uint32>(GetDuration());
-                if (!caster->HasAura(SPELL_WELL_FED) && duration <= 14000)
-                    caster->CastSpell(caster, SPELL_WELL_FED, true);
+            uint32 duration = static_cast<uint32>(GetDuration());
+            if (duration <= 14000 && duration >= 13000)
+                caster->CastSpell(caster, SPELL_WELL_FED, true);
         }
     }
 
