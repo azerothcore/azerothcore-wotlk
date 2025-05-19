@@ -8852,7 +8852,6 @@ void Player::SendInitWorldStates(uint32 zoneId, uint32 areaId)
                     battlefield->FillInitialWorldStates(packet);
                     break;
                 }
-                [[fallthrough]];
             default:
                 break;
             }
