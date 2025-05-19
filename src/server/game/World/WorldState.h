@@ -18,6 +18,7 @@
 #ifndef WORLD_STATE_H
 #define WORLD_STATE_H
 
+#include "AreaDefines.h"
 #include "Player.h"
 #include <atomic>
 
@@ -41,25 +42,6 @@ enum WorldStateEvent
     WORLD_STATE_CUSTOM_EVENT_ON_ADALS_SONG_OF_BATTLE     = 39953,
     WORLD_STATE_CUSTOM_EVENT_ON_MAGTHERIDON_HEAD_SPAWN   = 184640,
     WORLD_STATE_CUSTOM_EVENT_ON_MAGTHERIDON_HEAD_DESPAWN = 184641,
-};
-
-enum WorldStateZoneId
-{
-    ZONEID_SHATTRATH    = 3703,
-    ZONEID_BOTANICA     = 3847,
-    ZONEID_ARCATRAZ     = 3848,
-    ZONEID_MECHANAR     = 3849,
-
-    ZONEID_HELLFIRE_PENINSULA   = 3483,
-    ZONEID_HELLFIRE_RAMPARTS    = 3562,
-    ZONEID_HELLFIRE_CITADEL     = 3563,
-    ZONEID_BLOOD_FURNACE        = 3713,
-    ZONEID_SHATTERED_HALLS      = 3714,
-    ZONEID_MAGTHERIDON_LAIR     = 3836,
-
-    ZONEID_ISLE_OF_QUEL_DANAS   = 4080,
-    ZONEID_MAGISTERS_TERRACE    = 4131,
-    ZONEID_SUNWELL_PLATEAU      = 4075,
 };
 
 enum WorldStateSpells
@@ -177,10 +159,13 @@ class WorldState
         virtual ~WorldState();
         static WorldState* instance();
         void Load();
+        void LoadWorldStates();
+        void setWorldState(uint32 index, uint64 value);
+        [[nodiscard]] uint64 getWorldState(uint32 index) const;
         void Save(WorldStateSaveIds saveId);
         void SaveHelper(std::string& stringToSave, WorldStateSaveIds saveId);
-        void HandlePlayerEnterZone(Player* player, WorldStateZoneId zoneId);
-        void HandlePlayerLeaveZone(Player* player, WorldStateZoneId zoneId);
+        void HandlePlayerEnterZone(Player* player, AreaTableIDs zoneId);
+        void HandlePlayerLeaveZone(Player* player, AreaTableIDs zoneId);
         bool IsConditionFulfilled(WorldStateCondition conditionId, WorldStateConditionState state = WORLD_STATE_CONDITION_STATE_NONE) const;
         void HandleConditionStateChange(WorldStateCondition conditionId, WorldStateConditionState state);
         void HandleExternalEvent(WorldStateEvent eventId, uint32 param);
@@ -195,6 +180,8 @@ class WorldState
         void HandleSunwellGateTransition(uint32 newGate);
         void SetSunwellGateCounter(SunwellGateCounters index, uint32 value);
     private:
+        typedef std::map<uint32, uint64> WorldStatesMap;
+        WorldStatesMap _worldstates;
         void SendWorldstateUpdate(std::mutex& mutex, GuidVector const& guids, uint32 value, uint32 worldStateId);
         void StopSunsReachPhase(bool forward);
         void StartSunsReachPhase(bool initial = false);

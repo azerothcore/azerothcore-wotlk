@@ -137,12 +137,16 @@ struct PowerUsersSelector : public Acore::unary_function<Unit*, bool>
     Powers const _power;
     float const _dist;
     bool const _playerOnly;
+    bool const _withTank;
 
-    PowerUsersSelector(Unit const* unit, Powers power, float dist, bool playerOnly) : _me(unit), _power(power), _dist(dist), _playerOnly(playerOnly) { }
+    PowerUsersSelector(Unit const* unit, Powers power, float dist, bool playerOnly, bool withTank = true) : _me(unit), _power(power), _dist(dist), _playerOnly(playerOnly), _withTank(withTank) { }
 
     bool operator()(Unit const* target) const
     {
         if (!_me || !target)
+            return false;
+
+        if (!_withTank && target == _me->GetThreatMgr().GetCurrentVictim())
             return false;
 
         if (target->getPowerType() != _power)
@@ -294,18 +298,12 @@ public:
         }
         else
         {
-            Unit* currentVictim = mgr.GetCurrentVictim();
-            if (currentVictim)
-                targetList.push_back(currentVictim);
-
             for (ThreatReference const* ref : mgr.GetSortedThreatList())
             {
                 if (ref->IsOffline())
                     continue;
 
-                Unit* thisTarget = ref->GetVictim();
-                if (thisTarget != currentVictim)
-                    targetList.push_back(thisTarget);
+                targetList.push_back(ref->GetVictim());
             }
         }
 

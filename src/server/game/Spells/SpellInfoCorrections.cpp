@@ -4897,16 +4897,12 @@ void SpellMgr::LoadSpellInfoCorrections()
         spellInfo->Effects[EFFECT_0].RadiusEntry = sSpellRadiusStore.LookupEntry(EFFECT_RADIUS_70_YARDS);
     });
 
-    // Encapsulate
-    ApplySpellFix({ 45662 }, [](SpellInfo* spellInfo)
+    ApplySpellFix({
+        45662, // Encapsulate
+        45642  // Fire Bloom
+        }, [](SpellInfo* spellInfo)
     {
         spellInfo->AttributesEx7 |= SPELL_ATTR7_TREAT_AS_NPC_AOE;
-    });
-
-    // Heal (Crystal Spire of Karabor)
-    ApplySpellFix({ 40972 }, [](SpellInfo* spellInfo)
-    {
-        spellInfo->AttributesEx3 |= SPELL_ATTR3_SUPPRESS_CASTER_PROCS;
     });
 
     // Torch (Death Knights near the Chapel)
@@ -5014,9 +5010,27 @@ void SpellMgr::LoadSpellInfoCorrections()
     // Heart of the Crusader
     ApplySpellFix({ 20335, 20336, 20337 }, [](SpellInfo* spellInfo)
     {
-        spellInfo->Effects[EFFECT_2].Effect = SPELL_EFFECT_APPLY_AURA;
-        spellInfo->Effects[EFFECT_2].TargetA = SpellImplicitTargetInfo(TARGET_UNIT_TARGET_ENEMY);
-        spellInfo->Effects[EFFECT_2].ApplyAuraName = SPELL_AURA_DUMMY;
+        spellInfo->Effects[EFFECT_1].Effect = SPELL_EFFECT_APPLY_AURA;
+        spellInfo->Effects[EFFECT_1].TargetA = SpellImplicitTargetInfo(TARGET_UNIT_TARGET_ENEMY);
+        spellInfo->Effects[EFFECT_1].ApplyAuraName = SPELL_AURA_DUMMY;
+    });
+
+    // Heart of the Crusader (Rank 1)
+    ApplySpellFix({ 20335 }, [](SpellInfo* spellInfo)
+    {
+        spellInfo->Effects[EFFECT_1].TriggerSpell = 21183; // Heart of the Crusader (Rank 1)
+    });
+
+    // Heart of the Crusader (Rank 2)
+    ApplySpellFix({ 20336 }, [](SpellInfo* spellInfo)
+    {
+        spellInfo->Effects[EFFECT_1].TriggerSpell = 54498; // Heart of the Crusader (Rank 2)
+    });
+
+    // Heart of the Crusader (Rank 3)
+    ApplySpellFix({ 20337 }, [](SpellInfo* spellInfo)
+    {
+        spellInfo->Effects[EFFECT_1].TriggerSpell = 54499; // Heart of the Crusader (Rank 3)
     });
 
     // Gordok Ogre Suit

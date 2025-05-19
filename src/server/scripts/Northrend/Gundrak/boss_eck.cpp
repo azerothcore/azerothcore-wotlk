@@ -123,7 +123,7 @@ public:
                     events.ScheduleEvent(EVENT_ECK_SPIT, 10s);
                     break;
                 case EVENT_ECK_SPRING:
-                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 1, 30.0f, true))
+                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 30.0f, true, false))
                     {
                         me->GetThreatMgr().ResetAllThreat();
                         me->AddThreat(target, 500.0f);

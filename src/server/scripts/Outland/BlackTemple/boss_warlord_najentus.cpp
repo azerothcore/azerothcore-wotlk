@@ -91,7 +91,7 @@ struct boss_najentus : public BossAI
 
         ScheduleTimedEvent(21s, [&]
         {
-            if (Unit* target = SelectTarget(SelectTargetMethod::Random, 1))
+            if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 0.0f, false, false))
             {
                 DoCast(target, SPELL_IMPALING_SPINE);
                 target->CastSpell(target, SPELL_SUMMON_IMPALING_SPINE, true);
