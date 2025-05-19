@@ -68,7 +68,7 @@ class spell_item_noblegarden_chocolate : public AuraScript
 
     bool Load() override
     {
-        bool _buffGiven = false;
+        _buffGiven = false;
         return true;
     }
 
