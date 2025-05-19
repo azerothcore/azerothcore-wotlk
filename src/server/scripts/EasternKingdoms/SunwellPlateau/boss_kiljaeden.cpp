@@ -450,11 +450,11 @@ struct boss_kiljaeden : public BossAI
         std::chrono::seconds fireBloomTimer = 20s;
         if (_phase == PHASE_DARKNESS || _phase == PHASE_ARMAGEDDON)
         {
-            fireBloomTimer = 50s; // P3/P4
+            fireBloomTimer = 25s; // P3/P4
         }
         else if (_phase == PHASE_SACRIFICE)
         {
-            fireBloomTimer = 70s; // P5
+            fireBloomTimer = 40s; // P5
         }
 
         ScheduleTimedEvent(9s, [&] {
@@ -1204,3 +1204,4 @@ void AddSC_boss_kiljaeden()
     RegisterSpellScript(spell_kiljaeden_armageddon_missile);
     RegisterSpellScript(spell_kiljaeden_dragon_breath);
 }
+
