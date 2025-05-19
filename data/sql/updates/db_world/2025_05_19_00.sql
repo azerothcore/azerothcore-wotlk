@@ -1,3 +1,4 @@
+-- DB update 2025_05_18_00 -> 2025_05_19_00
 -- Deletes `Dalaran Wizard's Robe` (5110) from References: `World Drop - White World Drop - NPC Levels` 14-15 (1011415), 15-15 (1011515), 15-16 (1011516), 16-16 (1011616)
 DELETE FROM `reference_loot_template` WHERE `Item` = 5110;
 
