@@ -2,7 +2,6 @@
 DELETE FROM `reference_loot_template` WHERE `Item` = 5110;
 
 DELETE FROM `creature_loot_template` WHERE `Item` = 5110;
-
 INSERT INTO `creature_loot_template` (`Entry`, `Item`, `Reference`, `Chance`, `QuestRequired`, `LootMode`, `GroupId`, `MinCount`, `MaxCount`, `Comment`) VALUES
 (1867, 5110, 0, 3, 0, 1, 0, 1, 1, 'Dalaran Apprentice - Dalaran Wizard\'s Robe'),
 (1888, 5110, 0, 4, 0, 1, 0, 1, 1, 'Dalaran Watcher - Dalaran Wizard\'s Robe'),
