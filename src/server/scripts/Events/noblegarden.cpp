@@ -66,13 +66,22 @@ class spell_item_noblegarden_chocolate : public AuraScript
         return ValidateSpellInfo({ SPELL_WELL_FED });
     }
 
+    bool Load() override
+    {
+        bool _buffGiven = false;
+        return true;
+    }
+
     void HandlePeriodic(AuraEffect const* /*aurEff*/)
     {
         if (Unit* caster = GetCaster())
         {
             uint32 duration = static_cast<uint32>(GetDuration());
-            if (duration <= 14000 && duration >= 13000)
+            if ((duration <= 14000 && duration >= 13000) && !_buffGiven)
+            {
+                _buffGiven = true;
                 caster->CastSpell(caster, SPELL_WELL_FED, true);
+            }
         }
     }
 
@@ -80,6 +89,9 @@ class spell_item_noblegarden_chocolate : public AuraScript
     {
         OnEffectPeriodic += AuraEffectPeriodicFn(spell_item_noblegarden_chocolate::HandlePeriodic, EFFECT_0, SPELL_AURA_OBS_MOD_HEALTH);
     }
+
+private:
+    bool _buffGiven;
 };
 
 void AddSC_event_noblegarden_scripts()
