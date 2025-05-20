@@ -82,7 +82,7 @@ public:
    * @param connection rawSocket
    * @param ec         The boost::system::error_code returned by async_connect.
    */
-  void HandleConnect(std::shared_ptr<tcp::socket> rawSocket, const boost::system::error_code& ec)
+  void HandleConnect(const std::shared_ptr<tcp::socket>& rawSocket, const boost::system::error_code& ec)
   {
       if (!ec)
       {
@@ -98,7 +98,6 @@ public:
           }
       }
   }
-
 
 private:
   // Use Acore::Asio::IoContext instead of a raw boost::asio::io_context

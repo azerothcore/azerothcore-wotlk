@@ -20,6 +20,7 @@
 
 #include "SharedDefines.h"
 #include "VoiceChatDefines.h"
+#include "WorldSession.h"
 
 struct VoiceChatMember;
 typedef std::unordered_map<uint8, VoiceChatMember> VoiceChatMembers;
@@ -46,7 +47,7 @@ public:
     uint8 GenerateUserId(ObjectGuid guid);
 
     uint64 GetSessionId() const { return m_session_id; }
-    
+
     // send info to client
     void SendAvailableVoiceChatChannel(WorldSession* session);
     void SendVoiceRosterUpdate(bool empty = false, bool toAll = false, ObjectGuid toPlayer = ObjectGuid());

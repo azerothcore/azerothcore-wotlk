@@ -133,11 +133,13 @@ WorldSession::WorldSession(uint32 id, std::string&& name, std::shared_ptr<WorldS
     isRecruiter(isARecruiter),
     m_currentVendorEntry(0),
     _calendarEventCreationCooldown(0),
+    m_micEnabled(false),
+    m_voiceEnabled(false),
+    m_currentVoiceChannel(0),
     _addonMessageReceiveCount(0),
     _timeSyncClockDeltaQueue(6),
     _timeSyncClockDelta(0),
     _pendingTimeSyncRequests()
-    , m_voiceEnabled(false), m_micEnabled(false), m_currentVoiceChannel(0)
 {
     memset(m_Tutorials, 0, sizeof(m_Tutorials));
 

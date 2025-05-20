@@ -24,7 +24,7 @@
 #include "ObjectMgr.h"
 #include "Player.h"
 #include "SocialMgr.h"
-#include "VoiceChatMgr.h"
+#include "VoiceChat/VoiceChatMgr.h"
 #include "World.h"
 
 Channel::Channel(std::string const& name, uint32 channelId, uint32 channelDBId, TeamId teamId, bool announce, bool ownership):
@@ -710,9 +710,9 @@ void Channel::SendWhoOwner(ObjectGuid guid)
 void Channel::AddVoiceChatMembersAfterCreate()
 {
     // add voice enabled players to channel after it's created on voice server
-    for (PlayerContainer::const_iterator i = playersStore.begin(); i != playersStore.end(); ++i)
-        if (i->second.plrPtr->GetSession()->IsVoiceChatEnabled())
-            sVoiceChatMgr.AddToCustomVoiceChatChannel(i->second.plrPtr->GetGUID(), this->GetName(), i->second.plrPtr->GetTeamId());
+    for (auto const& playerStore : playersStore)
+        if (playerStore.second.plrPtr->GetSession()->IsVoiceChatEnabled())
+            sVoiceChatMgr.AddToCustomVoiceChatChannel(playerStore.second.plrPtr->GetGUID(), this->GetName(), playerStore.second.plrPtr->GetTeamId());
 }
 
 void Channel::ToggleVoice(Player* player)
@@ -768,15 +768,15 @@ void Channel::ToggleVoice(Player* player)
         _flags &= ~CHANNEL_FLAG_VOICE;
 
     // update player flags, maybe used in right click menu in chat UI
-    for (PlayerContainer::const_iterator i = playersStore.begin(); i != playersStore.end(); ++i)
+    for (auto const& playerStore : playersStore)
     {
-        if (Player* member = i->second.plrPtr)
+        if (Player* member = playerStore.second.plrPtr)
         {
             if (WorldSession* session = member->GetSession())
             {
                 if (session->IsVoiceChatEnabled())
                 {
-                    playersStore[i->first].SetVoiced(m_voice);
+                    playersStore[playerStore.first].SetVoiced(m_voice);
                 }
             }
         }

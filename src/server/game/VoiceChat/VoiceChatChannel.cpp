@@ -349,10 +349,10 @@ void VoiceChatChannel::RemoveVoiceChatMember(ObjectGuid guid)
         {
             uint32 channelId = GetChannelId();
             sVoiceChatMgr.GetEventEmitter() += [channelId, session](VoiceChatMgr* mgr)
-                {
-                    if (session->GetCurrentVoiceChannelId() == channelId)
-                        session->SetCurrentVoiceChannelId(0);
-                };
+            {
+                if (session->GetCurrentVoiceChannelId() == channelId)
+                    session->SetCurrentVoiceChannelId(0);
+            };
 
             if (session->GetCurrentVoiceChannelId() == channelId)
                 session->SetCurrentVoiceChannelId(0);
@@ -411,7 +411,7 @@ void VoiceChatChannel::AddMembersAfterCreate()
         {
             if (Battleground* bg = sBattlegroundMgr->GetBattleground(GetGroupId(), BATTLEGROUND_TYPE_NONE))
             {
-                for (const auto& itr : bg->GetPlayers())
+                for (auto const& itr : bg->GetPlayers())
                 {
                     if (Player* bgMember = ObjectAccessor::FindPlayer(itr.first))
                     {

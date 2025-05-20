@@ -381,7 +381,6 @@ int main(int argc, char** argv)
         // sVoiceChatSocketMgr.StopNetwork();
     // });
 
-
     // if (!sVoiceChatSocketMgr.StartNetwork(*ioContext, "127.0.0.1", 3725, 1))
     // {
     //     LOG_ERROR("server.worldserver", "Failed to initialize network");

@@ -29,6 +29,7 @@
 #include "EventEmitter.h"
 #include "VoiceChatChannel.h"
 #include <chrono>
+#include <map>
 
 class VoiceChatMgr
 {

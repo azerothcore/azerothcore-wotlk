@@ -15,23 +15,21 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "ChannelMgr.h"
+#include "Group.h"
+#include "Language.h"
 #include "Log.h"
 #include "Opcodes.h"
+#include "Player.h"
+#include "SocialMgr.h"
+#include "VoiceChat/VoiceChatChannel.h"
+#include "VoiceChat/VoiceChatMgr.h"
+#include "World/World.h"
 #include "WorldPacket.h"
 #include "WorldSession.h"
-
-#include "Common.h"
-#include "Group.h"
-#include "Player.h"
-#include "VoiceChatChannel.h"
-#include "VoiceChatMgr.h"
-#include "ChannelMgr.h"
-#include "SocialMgr.h"
-#include "World/World.h"
 #include "WorldSession.h"
-#include "Language.h"
 
-void WorldSession::HandleVoiceSessionEnableOpcode(WorldPacket& recvData)
+void WorldSession::HandleVoiceSessionEnableOpcode(WorldPacket& recv_data)
 {
     LOG_DEBUG("network", "WORLD: CMSG_VOICE_SESSION_ENABLE");
     LOG_ERROR("sql.sql", "WORLD: Received CMSG_VOICE_SESSION_ENABLE");
@@ -42,10 +40,10 @@ void WorldSession::HandleVoiceSessionEnableOpcode(WorldPacket& recvData)
     // comes from in game voice chat settings
     // is sent during login or when changing settings
     uint8 voiceEnabled, micEnabled;
-    recvData >> voiceEnabled;
-    recvData >> micEnabled;
+    recv_data >> voiceEnabled;
+    recv_data >> micEnabled;
 
-    if(!voiceEnabled)
+    if (!voiceEnabled)
     {
         if (_player)
         {
@@ -140,7 +138,7 @@ void WorldSession::HandleSetActiveVoiceChannel(WorldPacket& recvData)
     recvData.read_skip<char*>();
 }
 
-void WorldSession::HandleSetActiveVoiceChannelOpcode(WorldPacket & recvData)
+void WorldSession::HandleSetActiveVoiceChannelOpcode(WorldPacket& recv_data)
 {
     LOG_ERROR("sql.sql", "WORLD: Received CMSG_SET_ACTIVE_VOICE_CHANNEL");
 
@@ -152,7 +150,7 @@ void WorldSession::HandleSetActiveVoiceChannelOpcode(WorldPacket & recvData)
 
     uint32 type;
     std::string name;
-    recvData >> type;
+    recv_data >> type;
 
     // leave current voice channel if player selects different one
     VoiceChatChannel* current_channel = nullptr;
@@ -163,16 +161,11 @@ void WorldSession::HandleSetActiveVoiceChannelOpcode(WorldPacket & recvData)
     {
         case VOICECHAT_CHANNEL_CUSTOM:
         {
-            recvData >> name;
+            recv_data >> name;
             // custom channel
             auto cMgr = ChannelMgr(_player->GetTeamId());
-            if (&cMgr)
-            {
-                Channel* chan = cMgr.GetChannel(name, nullptr, false);
-                if (!chan || !chan->IsOn(_player->GetGUID()) || chan->IsBanned(_player->GetGUID()) || !chan->IsVoiceEnabled())
-                    return;
-            }
-            else
+            Channel* chan = cMgr.GetChannel(name, nullptr, false);
+            if (!chan || !chan->IsOn(_player->GetGUID()) || chan->IsBanned(_player->GetGUID()) || !chan->IsVoiceEnabled())
                 return;
 
             if (VoiceChatChannel* v_channel = sVoiceChatMgr.GetCustomVoiceChatChannel(name, _player->GetTeamId()))
@@ -308,7 +301,7 @@ void WorldSession::HandleSetActiveVoiceChannelOpcode(WorldPacket & recvData)
     }
 }
 
-void WorldSession::HandleChannelVoiceOffOpcode(WorldPacket& recvData)
+void WorldSession::HandleChannelVoiceOffOpcode(WorldPacket& recv_data)
 {
     LOG_ERROR("sql.sql", "WORLD: Received CMSG_CHANNEL_VOICE_OFF");
 
@@ -337,7 +330,7 @@ void WorldSession::HandleAddVoiceIgnoreOpcode(WorldPacket& recvData)
 
     // CharacterDatabase.AsyncQuery(&WorldSession::HandleAddMutedOpcodeCallBack, GetAccountId(), "SELECT guid FROM characters WHERE name = '{}'", IgnoreName.c_str());
     // _queryProcessor.AddCallback(CharacterDatabase.AsyncQuery(stmt).WithPreparedCallback(std::bind(&WorldSession::HandleAddMutedOpcodeCallBack, this, std::placeholders::_1)));
-    
+
     if (!_player)
         return;
 

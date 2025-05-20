@@ -24,7 +24,7 @@ struct VoiceChatServerPktHeader {
   uint16 cmd;
   uint16 size;
 
-  const char *data() const { return reinterpret_cast<const char *>(this); }
+  char const* data() const { return reinterpret_cast<const char *>(this); }
 
   std::size_t headerSize() const { return sizeof(VoiceChatServerPktHeader); }
 };
@@ -106,11 +106,13 @@ bool VoiceChatSocket::ProcessIncomingData() {
     return false;
 
   // Read header
-  if (GetReadBuffer().GetActiveSize() < sizeof(VoiceChatServerPktHeader)) {
-    LOG_ERROR("sql.sql", "Not enough data for header ({} < {})",
-              GetReadBuffer().GetActiveSize(),
-              sizeof(VoiceChatServerPktHeader));
-    return false;
+  if (GetReadBuffer().GetActiveSize() < sizeof(VoiceChatServerPktHeader))
+  {
+      LOG_ERROR("sql.sql",
+          "Not enough data for header ({} < {})",
+          GetReadBuffer().GetActiveSize(),
+          sizeof(VoiceChatServerPktHeader));
+      return false;
   }
 
   VoiceChatServerPktHeader header;
@@ -120,12 +122,16 @@ bool VoiceChatSocket::ProcessIncomingData() {
   LOG_ERROR("sql.sql", "Processing packet: cmd={}, size={}", header.cmd,
             header.size);
 
-  if (header.size < 2 || header.size > 0x2800) {
-    // actual error
-    LOG_ERROR("sql.sql", "VoiceChatServerSocket::ProcessIncomingData: client sent "
-     "malformed packet size = {} , cmd = {}", header.size, header.cmd);
-    CloseSocket();
-    return false;
+  if (header.size < 2 || header.size > 0x2800)
+  {
+      // actual error
+      LOG_ERROR("sql.sql",
+          "VoiceChatServerSocket::ProcessIncomingData: client sent "
+          "malformed packet size = {} , cmd = {}",
+          header.size,
+          header.cmd);
+      CloseSocket();
+      return false;
   }
 
   // Read payload
