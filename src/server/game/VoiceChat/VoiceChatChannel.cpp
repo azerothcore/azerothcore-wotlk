@@ -220,7 +220,6 @@ void VoiceChatChannel::SendLeaveVoiceChatSession(WorldSession* session) const
     session->SendPacket(&data);
 }
 
-// not used currently
 void VoiceChatChannel::SendLeaveVoiceChatSession(ObjectGuid guid)
 {
     for (auto& memb : m_members)

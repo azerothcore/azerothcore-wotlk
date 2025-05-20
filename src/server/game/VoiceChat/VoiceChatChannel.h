@@ -52,7 +52,7 @@ public:
     void SendAvailableVoiceChatChannel(WorldSession* session);
     void SendVoiceRosterUpdate(bool empty = false, bool toAll = false, ObjectGuid toPlayer = ObjectGuid());
     void SendLeaveVoiceChatSession(WorldSession* session) const;
-    void SendLeaveVoiceChatSession(ObjectGuid guid); // not used currently
+    void SendLeaveVoiceChatSession(ObjectGuid guid);
 
     void ConvertToRaid();
 
