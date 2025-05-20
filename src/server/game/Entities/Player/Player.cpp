@@ -7193,18 +7193,6 @@ void Player::ApplyEquipSpell(SpellInfo const* spellInfo, Item* item, bool apply,
             RemoveAurasDueToItemSpell(spellInfo->Id, item->GetGUID());  // un-apply all spells, not only at-equipped
         else
             RemoveAurasDueToSpell(spellInfo->Id);           // un-apply spell (item set case)
-
-        // Xinef: Remove Proc Spells and Summons
-        for (uint8 i = EFFECT_0; i < MAX_SPELL_EFFECTS; ++i)
-        {
-            // Xinef: Remove procs
-            if (spellInfo->Effects[i].TriggerSpell)
-                RemoveAurasDueToSpell(spellInfo->Effects[i].TriggerSpell);
-
-            // Xinef: remove minions summoned by item
-            if (spellInfo->Effects[i].Effect == SPELL_EFFECT_SUMMON)
-                RemoveAllMinionsByEntry(spellInfo->Effects[i].MiscValue);
-        }
     }
 }
 
