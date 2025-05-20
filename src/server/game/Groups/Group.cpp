@@ -765,6 +765,13 @@ void Group::ChangeLeader(ObjectGuid newLeaderGuid)
         sInstanceSaveMgr->CopyBinds(m_leaderGuid, newLeaderGuid, newLeader);
     }
 
+    VoiceChatChannel* voiceChannel = sVoiceChatMgr.GetGroupVoiceChatChannel(GetId());
+    if (voiceChannel && voiceChannel->GetType() != VOICECHAT_CHANNEL_CUSTOM)
+    {
+        voiceChannel->GetVoiceChatMember(m_leaderGuid)->SetLowPriority();
+        voiceChannel->GetVoiceChatMember(newLeaderGuid)->SetHighPriority();
+    }
+
     if (Player* oldLeader = ObjectAccessor::FindConnectedPlayer(m_leaderGuid))
         oldLeader->RemovePlayerFlag(PLAYER_FLAGS_GROUP_LEADER);
 
