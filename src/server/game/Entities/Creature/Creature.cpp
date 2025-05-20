@@ -2683,10 +2683,10 @@ bool Creature::CanCreatureAttack(Unit const* victim, bool skipDistCheck) const
     float x, y, z;
     GetMotionMaster()->GetMotionSlot(MOTION_SLOT_IDLE)->GetResetPosition(x, y, z);
 
-    if (Unit* unit = GetCharmerOrOwner())
+    if (GetCharmerOrOwner())
     {
         dist = std::min<float>(GetMap()->GetVisibilityRange() + GetObjectSize() * 2, 150.0f);
-        return IsWithinDist(unit, dist);
+        return IsWithinDist(victim, dist);
     }
 
     if (!dist)
