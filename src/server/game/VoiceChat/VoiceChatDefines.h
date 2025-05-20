@@ -79,14 +79,14 @@ struct VoiceChatMember
         m_guid = guid;
         user_id = userId;
         flags = userFlags;
-        flags_unk = 0x80;
+        priority = 0xC8;
     }
 
-    // TODO: Check proper names from client - MemberGUID, NetworkId, Flags and for unk it's Priority
+    // TODO: Check proper names from client - MemberGUID, NetworkId, Flags, and Priority
     ObjectGuid m_guid;
     uint8 user_id;
     uint8 flags;
-    uint8 flags_unk;
+    uint8 priority;
 
     inline bool HasFlag(uint8 flag) const { return (flags & flag) != 0; }
     void SetFlag(uint8 flag, bool state) { if (state) flags |= flag; else flags &= ~flag; }
@@ -98,6 +98,9 @@ struct VoiceChatMember
     inline void SetMuted(bool state) { SetFlag(VOICECHAT_MEMBER_FLAG_MIC_MUTED, state); }
     inline bool IsForceMuted() const { return HasFlag(VOICECHAT_MEMBER_FLAG_FORCE_MUTED); }
     inline void SetForceMuted(bool state) { SetFlag(VOICECHAT_MEMBER_FLAG_FORCE_MUTED, state); }
+    inline void SetPriority(uint8 newPriority) { priority = newPriority; }
+    inline void SetHighPriority() { SetPriority(0x80); } // Magic number, ask Burlex
+    inline void SetLowPriority() { SetPriority(0xCA); } // Magic number, ask Burlex
 };
 
 class VoiceChatServerPacket : public ByteBuffer

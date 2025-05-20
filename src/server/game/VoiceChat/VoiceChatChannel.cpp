@@ -190,7 +190,7 @@ void VoiceChatChannel::SendVoiceRosterUpdate(bool empty, bool toAll, ObjectGuid 
 
             data << j.second.m_guid;
             data << j.second.user_id;
-            data << j.second.flags_unk;
+            data << j.second.priority;
             data << j.second.flags;
         }
 
@@ -312,6 +312,10 @@ void VoiceChatChannel::AddVoiceChatMember(ObjectGuid guid)
     member.SetEnabled(true);
     member.SetVoiced(false);
     member.SetMuted(!sess->IsMicEnabled());
+
+    if (plr->GetGroup()->IsLeader(plr->GetGUID()))
+        member.SetHighPriority();
+
     m_members[user_id] = member;
 
     // activate slot on voice server
