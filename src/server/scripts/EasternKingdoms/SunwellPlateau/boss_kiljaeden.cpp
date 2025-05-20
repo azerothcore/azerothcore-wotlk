@@ -1204,4 +1204,3 @@ void AddSC_boss_kiljaeden()
     RegisterSpellScript(spell_kiljaeden_armageddon_missile);
     RegisterSpellScript(spell_kiljaeden_dragon_breath);
 }
-
