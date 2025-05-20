@@ -141,6 +141,7 @@ struct npc_kiljaeden_controller : public NullCreatureAI
 
     void Reset() override
     {
+        scheduler.CancelAll();
         instance->SetBossState(DATA_KILJAEDEN, NOT_STARTED);
         summons.DespawnAll();
         ResetOrbs();
@@ -286,11 +287,11 @@ struct boss_kiljaeden : public BossAI
                 DoCastSelf(SPELL_SHADOW_SPIKE);
             });
 
-            ScheduleTimedEvent(3s, [&] {
+            ScheduleTimedEvent(31s, [&] {
                 DoCastSelf(SPELL_FLAME_DART);
-            }, 10s);
+            }, 20s);
 
-            ScheduleTimedEvent(50s, [&] {
+            ScheduleTimedEvent(55s, [&] {
                 Talk(EMOTE_KJ_DARKNESS);
                 DoCastAOE(SPELL_DARKNESS_OF_A_THOUSAND_SOULS);
             }, 45s);
@@ -326,7 +327,11 @@ struct boss_kiljaeden : public BossAI
                 ScheduleBasicAbilities();
             });
 
-            ScheduleTimedEvent(50s, [&] {
+            ScheduleTimedEvent(28s, [&] {
+                DoCastSelf(SPELL_FLAME_DART);
+            }, 20s);
+
+            ScheduleTimedEvent(64s, [&] {
                 me->RemoveAurasDueToSpell(SPELL_ARMAGEDDON_PERIODIC);
                 Talk(EMOTE_KJ_DARKNESS);
                 DoCastAOE(SPELL_DARKNESS_OF_A_THOUSAND_SOULS);
@@ -394,7 +399,11 @@ struct boss_kiljaeden : public BossAI
 
                             ScheduleBasicAbilities();
 
-                            ScheduleTimedEvent(30s, [&] {
+                            ScheduleTimedEvent(16s, [&] {
+                                DoCastSelf(SPELL_FLAME_DART);
+                            }, 20s);
+
+                            ScheduleTimedEvent(15s, [&] {
                                 me->RemoveAurasDueToSpell(SPELL_ARMAGEDDON_PERIODIC);
                                 Talk(EMOTE_KJ_DARKNESS);
                                 DoCastAOE(SPELL_DARKNESS_OF_A_THOUSAND_SOULS);
