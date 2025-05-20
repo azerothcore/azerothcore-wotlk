@@ -17564,9 +17564,11 @@ bool Unit::IsTriggeredAtSpellProcEvent(Unit* victim, Aura* aura, WeaponAttackTyp
 
         if (attacker)
         {
-            //not melee or ranged strike spells
-            if (procSpell && procSpell->StartRecoveryCategory == 133 && procSpell->StartRecoveryTime == 1500 && procSpell->DmgClass != SPELL_DAMAGE_CLASS_MELEE &&
-                procSpell->DmgClass != SPELL_DAMAGE_CLASS_RANGED && !procSpell->HasAttribute(SPELL_ATTR0_USES_RANGED_SLOT) && !procSpell->HasAttribute(SPELL_ATTR0_IS_ABILITY))
+            if (!procSpell || procSpell->DmgClass == SPELL_DAMAGE_CLASS_MELEE || procSpell->IsRangedWeaponSpell())
+            {
+                attackSpeed = attacker->GetAttackTime(attType);
+            }
+            else //spells user their casttime for ppm calculations https://github.com/ClassicWoWCommunity/cata-classic-bugs/issues/66#issuecomment-1182017571
             {
                 if (procSpell->CastTimeEntry)
                     attackSpeed = procSpell->CastTimeEntry->CastTime;
@@ -17574,10 +17576,6 @@ bool Unit::IsTriggeredAtSpellProcEvent(Unit* victim, Aura* aura, WeaponAttackTyp
                 //instants and fast spells use 1.5s castspeed
                 if (attackSpeed < 1500)
                     attackSpeed = 1500;
-            }
-            else
-            {
-                attackSpeed = attacker->GetAttackTime(attType);
             }
         }
         chance = GetPPMProcChance(attackSpeed, spellProcEvent->ppmRate, spellProto);
