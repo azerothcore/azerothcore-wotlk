@@ -2680,9 +2680,6 @@ bool Creature::CanCreatureAttack(Unit const* victim, bool skipDistCheck) const
 
     float dist = sWorld->getFloatConfig(CONFIG_CREATURE_LEASH_RADIUS);
 
-    float x, y, z;
-    GetMotionMaster()->GetMotionSlot(MOTION_SLOT_IDLE)->GetResetPosition(x, y, z);
-
     if (GetCharmerOrOwner())
     {
         dist = std::min<float>(GetMap()->GetVisibilityRange() + GetObjectSize() * 2, 150.0f);
@@ -2691,6 +2688,9 @@ bool Creature::CanCreatureAttack(Unit const* victim, bool skipDistCheck) const
 
     if (!dist)
         return true;
+
+    float x, y, z;
+    GetMotionMaster()->GetMotionSlot(MOTION_SLOT_IDLE)->GetResetPosition(x, y, z);
 
     return IsInDist2d(x, y, dist);
 }
