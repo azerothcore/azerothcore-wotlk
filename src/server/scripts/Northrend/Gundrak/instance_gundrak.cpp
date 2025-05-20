@@ -32,7 +32,7 @@ DoorData const doorData[] =
 class instance_gundrak : public InstanceMapScript
 {
 public:
-    instance_gundrak() : InstanceMapScript("instance_gundrak", 604) { }
+    instance_gundrak() : InstanceMapScript("instance_gundrak", MAP_GUNDRAK) { }
 
     InstanceScript* GetInstanceScript(InstanceMap* pMap) const override
     {

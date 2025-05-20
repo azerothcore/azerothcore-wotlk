@@ -17,6 +17,7 @@
 
 #include "Unit.h"
 #include "AccountMgr.h"
+#include "AreaDefines.h"
 #include "ArenaSpectator.h"
 #include "Battlefield.h"
 #include "BattlefieldMgr.h"
@@ -4224,7 +4225,7 @@ bool Unit::isInBackInMap(Unit const* target, float distance, float arc) const
 
 bool Unit::isInAccessiblePlaceFor(Creature const* c) const
 {
-    if (c->GetMapId() == 618) // Ring of Valor
+    if (c->GetMapId() == MAP_THE_RING_OF_VALOR)
     {
         // skip transport check, check for being below floor level
         if (this->GetPositionZ() < 28.0f)
@@ -4234,7 +4235,7 @@ bool Unit::isInAccessiblePlaceFor(Creature const* c) const
                 if (bg->GetStartTime() < 80133) // 60000ms preparation time + 20133ms elevator rise time
                     return false;
     }
-    else if (c->GetMapId() == 631) // Icecrown Citadel
+    else if (c->GetMapId() == MAP_ICECROWN_CITADEL)
     {
         // if static transport doesn't match - return false
         if (c->GetTransport() != this->GetTransport() && ((c->GetTransport() && c->GetTransport()->IsStaticTransport()) || (this->GetTransport() && this->GetTransport()->IsStaticTransport())))
@@ -7825,7 +7826,7 @@ bool Unit::HandleDummyAuraProc(Unit* victim, uint32 damage, AuraEffect* triggere
                     // Judgement of Light
                     case 20185:
                         {
-                            if (!victim || !victim->IsAlive() || victim->HasSpellCooldown(20267))
+                            if (!victim || !victim->IsAlive())
                                 return false;
 
                             auto* caster = triggeredByAura->GetBase()->GetCaster();
@@ -7835,13 +7836,12 @@ bool Unit::HandleDummyAuraProc(Unit* victim, uint32 damage, AuraEffect* triggere
                             // 2% of base health
                             basepoints0 = int32(victim->CountPctFromMaxHealth(2));
                             victim->CastCustomSpell(victim, 20267, &basepoints0, 0, 0, true, 0, triggeredByAura);
-                            victim->AddSpellCooldown(20267, 0, 4 * IN_MILLISECONDS);
                             return true;
                         }
                     // Judgement of Wisdom
                     case 20186:
                         {
-                            if (!victim || !victim->IsAlive() || !victim->HasActivePowerType(POWER_MANA) || victim->HasSpellCooldown(20268))
+                            if (!victim || !victim->IsAlive() || !victim->HasActivePowerType(POWER_MANA))
                                 return false;
 
                             auto* caster = triggeredByAura->GetBase()->GetCaster();
@@ -7851,7 +7851,6 @@ bool Unit::HandleDummyAuraProc(Unit* victim, uint32 damage, AuraEffect* triggere
                             // 2% of base mana
                             basepoints0 = int32(CalculatePct(victim->GetCreateMana(), 2));
                             victim->CastCustomSpell(victim, 20268, &basepoints0, nullptr, nullptr, true, 0, triggeredByAura);
-                            victim->AddSpellCooldown(20268, 0, 4 * IN_MILLISECONDS);
                             return true;
                         }
                     // Holy Power (Redemption Armor set)
@@ -15618,29 +15617,23 @@ void Unit::SetMaxHealth(uint32 val)
 void Unit::SetPower(Powers power, uint32 val, bool withPowerUpdate /*= true*/, bool fromRegenerate /* = false */)
 {
     if (!fromRegenerate && GetPower(power) == val)
-    {
         return;
-    }
 
     uint32 maxPower = GetMaxPower(power);
     if (maxPower < val)
-    {
         val = maxPower;
-    }
 
     if (fromRegenerate)
     {
-        UpdateUInt32Value(static_cast<uint16>(UNIT_FIELD_POWER1) + power, val);
+        UpdateUInt32Value(UNIT_FIELD_POWER1 + AsUnderlyingType(power), val);
         AddToObjectUpdateIfNeeded();
     }
     else
-    {
-        SetStatInt32Value(static_cast<uint16>(UNIT_FIELD_POWER1) + power, val);
-    }
+        SetStatInt32Value(UNIT_FIELD_POWER1 + AsUnderlyingType(power), val);
 
     if (withPowerUpdate)
     {
-        WorldPacket data(SMSG_POWER_UPDATE);
+        WorldPacket data(SMSG_POWER_UPDATE, 8 + 1 + 4);
         data << GetPackGUID();
         data << uint8(power);
         data << uint32(val);
@@ -15652,14 +15645,10 @@ void Unit::SetPower(Powers power, uint32 val, bool withPowerUpdate /*= true*/, b
     {
         Player* player = ToPlayer();
         if (getPowerType() == power && player->NeedSendSpectatorData())
-        {
             ArenaSpectator::SendCommand_UInt32Value(FindMap(), GetGUID(), "CPW", power == POWER_RAGE || power == POWER_RUNIC_POWER ? val / 10 : val);
-        }
 
         if (player->GetGroup())
-        {
             player->SetGroupUpdateFlag(GROUP_UPDATE_FLAG_CUR_POWER);
-        }
     }
     else if (Pet* pet = ToCreature()->ToPet())
     {
@@ -15667,16 +15656,12 @@ void Unit::SetPower(Powers power, uint32 val, bool withPowerUpdate /*= true*/, b
         {
             Unit* owner = GetOwner();
             if (owner && (owner->IsPlayer()) && owner->ToPlayer()->GetGroup())
-            {
                 owner->ToPlayer()->SetGroupUpdateFlag(GROUP_UPDATE_FLAG_PET_CUR_POWER);
-            }
         }
 
         // Update the pet's character sheet with happiness damage bonus
         if (pet->getPetType() == HUNTER_PET && power == POWER_HAPPINESS)
-        {
             pet->UpdateDamagePhysical(BASE_ATTACK);
-        }
     }
 }
 
@@ -16246,10 +16231,6 @@ void Unit::ProcDamageAndSpellFor(bool isVictim, Unit* target, uint32 procFlag, u
         {
             continue;
         }
-
-        // Triggered spells not triggering additional spells
-        //bool triggered = !spellProto->HasAttribute(SPELL_ATTR3_CAN_PROC_FROM_PROCS) ?
-        //    (procExtra & PROC_EX_INTERNAL_TRIGGERED && !(procFlag & PROC_FLAG_DONE_TRAP_ACTIVATION)) : false;
 
         bool hasTriggeredProc = false;
         for (uint8 i = 0; i < MAX_SPELL_EFFECTS; ++i)
@@ -17495,11 +17476,11 @@ bool Unit::IsTriggeredAtSpellProcEvent(Unit* victim, Aura* aura, WeaponAttackTyp
         return false;
 
     // Additional checks for triggered spells (ignore trap casts)
-    //if (procExtra & PROC_EX_INTERNAL_TRIGGERED && !(procFlag & PROC_FLAG_DONE_TRAP_ACTIVATION))
-    //{
-    //    if (!spellProto->HasAttribute(SPELL_ATTR3_CAN_PROC_TRIGGERED))
-    //        return false;
-    //}
+    if (eventInfo.GetHitMask() & PROC_EX_INTERNAL_TRIGGERED && !(EventProcFlag & PROC_FLAG_DONE_TRAP_ACTIVATION))
+    {
+        if (!spellProto->HasAttribute(SPELL_ATTR3_CAN_PROC_FROM_PROCS))
+            return false;
+    }
 
     // Xinef: additional check for player auras - only player spells can trigger player proc auras
     // Xinef: skip victim auras

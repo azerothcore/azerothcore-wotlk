@@ -15,6 +15,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "AreaDefines.h"
 #include "CombatAI.h"
 #include "CreatureScript.h"
 #include "MoveSplineInit.h"
@@ -1469,9 +1470,6 @@ class spell_deliver_gryphon : public SpellScript
 enum GuardianPavilion
 {
     SPELL_TRESPASSER_H                            = 63987,
-    AREA_SUNREAVER_PAVILION                       = 4676,
-
-    AREA_SILVER_COVENANT_PAVILION                 = 4677,
     SPELL_TRESPASSER_A                            = 63986,
 };
 

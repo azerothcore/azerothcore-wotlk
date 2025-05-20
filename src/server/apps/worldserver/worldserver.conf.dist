@@ -4207,7 +4207,8 @@ AllowTwoSide.Interaction.Arena = 0
 
 #
 #    AllowTwoSide.Interaction.Auction
-#        Description: Allow auctions between factions.
+#        Description: Allow auctions between factions. This flags all auction houses as Neutral,
+#                     and would also take a Neutral auction house cut from auctions.
 #        Default:     0 - (Disabled)
 #                     1 - (Enabled)
 

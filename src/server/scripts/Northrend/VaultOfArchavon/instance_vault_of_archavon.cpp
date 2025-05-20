@@ -34,7 +34,7 @@
 class instance_vault_of_archavon : public InstanceMapScript
 {
 public:
-    instance_vault_of_archavon() : InstanceMapScript("instance_vault_of_archavon", 624) { }
+    instance_vault_of_archavon() : InstanceMapScript("instance_vault_of_archavon", MAP_VAULT_OF_ARCHAVON) { }
 
     struct instance_vault_of_archavon_InstanceMapScript : public InstanceScript
     {
