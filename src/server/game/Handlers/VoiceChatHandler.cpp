@@ -162,7 +162,7 @@ void WorldSession::HandleSetActiveVoiceChannelOpcode(WorldPacket& recv_data)
         case VOICECHAT_CHANNEL_CUSTOM:
         {
             recv_data >> name;
-            // custom channel
+
             auto cMgr = ChannelMgr(_player->GetTeamId());
             Channel* chan = cMgr.GetChannel(name, nullptr, false);
             if (!chan || !chan->IsOn(_player->GetGUID()) || chan->IsBanned(_player->GetGUID()) || !chan->IsVoiceEnabled())
@@ -202,7 +202,6 @@ void WorldSession::HandleSetActiveVoiceChannelOpcode(WorldPacket& recv_data)
         case VOICECHAT_CHANNEL_GROUP:
         case VOICECHAT_CHANNEL_RAID:
         {
-            // group
             Group* grp = _player->GetGroup();
             if (grp && (grp->isBGGroup() || grp->isBFGroup()))
                 grp = _player->GetOriginalGroup();
@@ -249,7 +248,6 @@ void WorldSession::HandleSetActiveVoiceChannelOpcode(WorldPacket& recv_data)
         }
         case VOICECHAT_CHANNEL_BG:
         {
-            // bg
             if (_player->InBattleground())
             {
                 VoiceChatChannel* v_channel = sVoiceChatMgr.GetBattlegroundVoiceChatChannel(_player->GetBattlegroundId(), _player->GetBgTeamId());
