@@ -7134,18 +7134,17 @@ void Player::ApplyItemEquipSpell(Item* item, bool apply, bool form_change)
         // wrong triggering type
         if (apply)
         {
+            // Only apply "On Equip" spells
             if (spellData.SpellTrigger != ITEM_SPELLTRIGGER_ON_EQUIP)
-            {
                 continue;
-            }
         }
         else
         {
-            // Auras activated by use should not be removed on unequip (with no charges)
-            if (spellData.SpellTrigger == ITEM_SPELLTRIGGER_ON_USE && spellData.SpellCharges <= 0)
-            {
+            // Do not remove "Use" spells in these special cases:
+            // 1. During form changes (e.g., druid shapeshifting)
+            // 2. When the spell comes from an item with negative charges, which means its effect should persist after the item is consumed or removed.
+            if (spellData.SpellTrigger == ITEM_SPELLTRIGGER_ON_USE && (form_change || spellData.SpellCharges < 0))
                 continue;
-            }
         }
 
         // check if it is valid spell
