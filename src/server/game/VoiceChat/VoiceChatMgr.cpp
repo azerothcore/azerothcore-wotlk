@@ -813,7 +813,7 @@ void VoiceChatMgr::RestoreVoiceChatChannels()
                 {
                     if (Group* grp = player->GetGroup())
                     {
-                        if (!grp->isBGGroup())
+                        if (!grp->isBGGroup() && !grp->isBFGroup())
                             if (grp->isRaidGroup())
                                 sVoiceChatMgr.AddToRaidVoiceChatChannel(player->GetGUID(), grp->GetId());
                             else
@@ -823,7 +823,7 @@ void VoiceChatMgr::RestoreVoiceChatChannels()
                     }
                     if (Group* grp = player->GetOriginalGroup())
                     {
-                        if (!grp->isBGGroup())
+                        if (!grp->isBGGroup() && !grp->isBFGroup())
                             if (grp->isRaidGroup())
                                 sVoiceChatMgr.AddToRaidVoiceChatChannel(player->GetGUID(), grp->GetId());
                             else
@@ -1055,7 +1055,7 @@ void VoiceChatMgr::JoinAvailableVoiceChatChannels(WorldSession* session)
     {
         if (Group* grp = player->GetGroup())
         {
-            if (!grp->isBGGroup())
+            if (!grp->isBGGroup() && !grp->isBFGroup())
                 if (grp->isRaidGroup())
                     AddToRaidVoiceChatChannel(player->GetGUID(), grp->GetId());
                 else
@@ -1088,7 +1088,7 @@ void VoiceChatMgr::SendAvailableVoiceChatChannels(WorldSession* session)
     {
         if (Group* grp = player->GetGroup())
         {
-            if (!grp->isBGGroup())
+            if (!grp->isBGGroup() && !grp->isBFGroup())
             {
                 if (grp->isRaidGroup())
                 {

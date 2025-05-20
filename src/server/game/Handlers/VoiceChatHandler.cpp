@@ -204,7 +204,7 @@ void WorldSession::HandleSetActiveVoiceChannelOpcode(WorldPacket& recv_data)
         {
             // group
             Group* grp = _player->GetGroup();
-            if (grp && grp->isBGGroup())
+            if (grp && (grp->isBGGroup() || grp->isBFGroup()))
                 grp = _player->GetOriginalGroup();
 
             if (grp)
@@ -392,7 +392,7 @@ void WorldSession::HandlePartySilenceOpcode(WorldPacket& recvData)
         return;
 
     VoiceChatChannel* v_channel = nullptr;
-    if (!grp->isBGGroup())
+    if (!grp->isBGGroup() && !grp->isBFGroup())
     {
         if (grp->isRaidGroup())
             v_channel = sVoiceChatMgr.GetRaidVoiceChatChannel(grp->GetId());
@@ -432,7 +432,7 @@ void WorldSession::HandlePartyUnsilenceOpcode(WorldPacket& recvData)
         return;
 
     VoiceChatChannel* v_channel = nullptr;
-    if (!grp->isBGGroup())
+    if (!grp->isBGGroup() && !grp->isBFGroup())
     {
         if (grp->isRaidGroup())
             v_channel = sVoiceChatMgr.GetRaidVoiceChatChannel(grp->GetId());
