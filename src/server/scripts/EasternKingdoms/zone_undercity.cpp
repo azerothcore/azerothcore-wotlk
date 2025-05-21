@@ -15,19 +15,6 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-/* ScriptData
-SDName: Undercity
-SD%Complete: 95
-SDComment: Quest support: 6628, 9180(post-event).
-SDCategory: Undercity
-EndScriptData */
-
-/* ContentData
-npc_lady_sylvanas_windrunner
-npc_highborne_lamenter
-npc_parqual_fintallas
-EndContentData */
-
 #include "CreatureScript.h"
 #include "ObjectAccessor.h"
 #include "Player.h"
@@ -129,6 +116,11 @@ public:
             _events.ScheduleEvent(EVENT_BLACK_ARROW, 15s);
             _events.ScheduleEvent(EVENT_SHOOT, 8s);
             _events.ScheduleEvent(EVENT_MULTI_SHOT, 10s);
+        }
+
+        void JustDied(Unit* /*killer*/) override
+        {
+            DoRewardPlayersInArea();
         }
 
         void SetGUID(ObjectGuid guid, int32 type) override

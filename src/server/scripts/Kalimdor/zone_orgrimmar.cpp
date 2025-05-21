@@ -15,18 +15,6 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-/* ScriptData
-SDName: Orgrimmar
-SD%Complete: 100
-SDComment: Quest support: 2460, 6566
-SDCategory: Orgrimmar
-EndScriptData */
-
-/* ContentData
-npc_shenthul
-npc_thrall_warchief
-EndContentData */
-
 #include "AreaDefines.h"
 #include "CreatureScript.h"
 #include "Player.h"
@@ -236,6 +224,11 @@ public:
         }
 
         void JustEngagedWith(Unit* /*who*/) override { }
+
+        void JustDied(Unit* /*killer*/) override
+        {
+            DoRewardPlayersInArea();
+        }
 
         void DoAction(int32 action) override
         {

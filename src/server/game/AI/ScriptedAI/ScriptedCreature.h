@@ -305,6 +305,9 @@ struct ScriptedAI : public CreatureAI
     //Stop attack of current victim
     void DoStopAttack();
 
+    //Reward kill credit to all players from the oposing faction in the area (faction leaders)
+    void DoRewardPlayersInArea();
+
     //Cast spell by spell info
     void DoCastSpell(Unit* target, SpellInfo const* spellInfo, bool triggered = false);
 
