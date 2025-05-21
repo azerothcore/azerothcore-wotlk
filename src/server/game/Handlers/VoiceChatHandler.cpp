@@ -31,8 +31,7 @@
 
 void WorldSession::HandleVoiceSessionEnableOpcode(WorldPacket& recv_data)
 {
-    LOG_DEBUG("network", "WORLD: CMSG_VOICE_SESSION_ENABLE");
-    LOG_ERROR("sql.sql", "WORLD: Received CMSG_VOICE_SESSION_ENABLE");
+    LOG_DEBUG("network", "WORLD: Received CMSG_VOICE_SESSION_ENABLE");
 
     if (!sVoiceChatMgr.CanSeeVoiceChat())
         return;
@@ -94,9 +93,8 @@ void WorldSession::HandleVoiceSessionEnableOpcode(WorldPacket& recv_data)
 
 void WorldSession::HandleChannelVoiceOnOpcode(WorldPacket& recvData)
 {
-    LOG_DEBUG("network", "WORLD: CMSG_CHANNEL_VOICE_ON");
+    LOG_DEBUG("network", "WORLD: Received CMSG_CHANNEL_VOICE_ON");
     // Enable Voice button in channel context menu
-    LOG_ERROR("sql.sql", "WORLD: Received CMSG_CHANNEL_VOICE_ON");
 
     if (!sVoiceChatMgr.CanUseVoiceChat())
         return;
@@ -116,8 +114,7 @@ void WorldSession::HandleChannelVoiceOnOpcode(WorldPacket& recvData)
 
         if (chn->IsLFG() || chn->IsConstant())
         {
-            //actual error
-            LOG_ERROR("sql.sql", "VoiceChat: Channel is LFG or constant, can't use voice!");
+            LOG_ERROR("voice-chat", "Channel is LFG or constant, can't use voice!");
             return;
         }
 
@@ -133,14 +130,14 @@ void WorldSession::HandleChannelVoiceOnOpcode(WorldPacket& recvData)
 
 void WorldSession::HandleSetActiveVoiceChannel(WorldPacket& recvData)
 {
-    LOG_DEBUG("network", "WORLD: CMSG_SET_ACTIVE_VOICE_CHANNEL");
+    LOG_DEBUG("network", "WORLD: Received CMSG_SET_ACTIVE_VOICE_CHANNEL");
     recvData.read_skip<uint32>();
     recvData.read_skip<char*>();
 }
 
 void WorldSession::HandleSetActiveVoiceChannelOpcode(WorldPacket& recv_data)
 {
-    LOG_ERROR("sql.sql", "WORLD: Received CMSG_SET_ACTIVE_VOICE_CHANNEL");
+    LOG_DEBUG("network", "WORLD: Received CMSG_SET_ACTIVE_VOICE_CHANNEL");
 
     if (!sVoiceChatMgr.CanUseVoiceChat())
         return;
@@ -301,14 +298,14 @@ void WorldSession::HandleSetActiveVoiceChannelOpcode(WorldPacket& recv_data)
 
 void WorldSession::HandleChannelVoiceOffOpcode(WorldPacket& recv_data)
 {
-    LOG_ERROR("sql.sql", "WORLD: Received CMSG_CHANNEL_VOICE_OFF");
+    LOG_DEBUG("network", "WORLD: Received CMSG_CHANNEL_VOICE_OFF");
 
     // todo check if possible to send with chat commands
 }
 
 void WorldSession::HandleAddVoiceIgnoreOpcode(WorldPacket& recvData)
 {
-    LOG_ERROR("sql.sql", "WORLD: Received opcode CMSG_ADD_VOICE_IGNORE");
+    LOG_DEBUG("network", "WORLD: Received CMSG_ADD_VOICE_IGNORE");
 
     std::string IgnoreName = GetAcoreString(LANG_FRIEND_IGNORE_UNKNOWN);
 
@@ -319,7 +316,7 @@ void WorldSession::HandleAddVoiceIgnoreOpcode(WorldPacket& recvData)
 
     CharacterDatabase.EscapeString(IgnoreName);
 
-    LOG_ERROR("sql.sql", "WORLD: {} asked to Ignore: '{}'",
+    LOG_INFO("network", "WORLD: {} asked to Ignore: '{}'",
         _player->GetName(), IgnoreName.c_str());
 
     ObjectGuid ignoreGUID = sCharacterCache->GetCharacterGuidByName(IgnoreName);
@@ -348,14 +345,14 @@ void WorldSession::HandleAddVoiceIgnoreOpcode(WorldPacket& recvData)
 
     sSocialMgr->SendFriendStatus(_player, ignoreResult, ignoreGUID, false);
 
-    LOG_ERROR("sql.sql", "WORLD: Sent (SMSG_FRIEND_STATUS)");
+    LOG_DEBUG("network", "WORLD: Sent SMSG_FRIEND_STATUS");
 }
 
 void WorldSession::HandleDelVoiceIgnoreOpcode(WorldPacket& recvData)
 {
     ObjectGuid ignoreGUID;
 
-    LOG_ERROR("sql.sql", "WORLD: Received opcode CMSG_DEL_VOICE_IGNORE");
+    LOG_DEBUG("network", "WORLD: Received CMSG_DEL_VOICE_IGNORE");
 
     recvData >> ignoreGUID;
 
@@ -363,12 +360,12 @@ void WorldSession::HandleDelVoiceIgnoreOpcode(WorldPacket& recvData)
 
     sSocialMgr->SendFriendStatus(GetPlayer(), FRIEND_MUTE_REMOVED, ignoreGUID, false);
 
-    LOG_ERROR("sql.sql", "WORLD: Sent motd (SMSG_FRIEND_STATUS)");
+    LOG_DEBUG("network", "WORLD: Sent SMSG_FRIEND_STATUS");
 }
 
 void WorldSession::HandlePartySilenceOpcode(WorldPacket& recvData)
 {
-    LOG_ERROR("sql.sql", "WORLD: Received CMSG_PARTY_SILENCE");
+    LOG_DEBUG("network", "WORLD: Received CMSG_PARTY_SILENCE");
 
     if (!sVoiceChatMgr.CanUseVoiceChat())
         return;
@@ -408,7 +405,7 @@ void WorldSession::HandlePartySilenceOpcode(WorldPacket& recvData)
 
 void WorldSession::HandlePartyUnsilenceOpcode(WorldPacket& recvData)
 {
-    LOG_ERROR("sql.sql", "WORLD: Received CMSG_PARTY_UNSILENCE");
+    LOG_DEBUG("network", "WORLD: Received CMSG_PARTY_UNSILENCE");
 
     if (!sVoiceChatMgr.CanUseVoiceChat())
         return;
@@ -448,7 +445,7 @@ void WorldSession::HandlePartyUnsilenceOpcode(WorldPacket& recvData)
 
 void WorldSession::HandleChannelSilenceOpcode(WorldPacket& recvData)
 {
-    LOG_ERROR("sql.sql", "WORLD: Received CMSG_CHANNEL_SILENCE");
+    LOG_DEBUG("network", "WORLD: Received CMSG_CHANNEL_SILENCE");
 
     if (!sVoiceChatMgr.CanUseVoiceChat())
         return;
@@ -482,7 +479,7 @@ void WorldSession::HandleChannelSilenceOpcode(WorldPacket& recvData)
 
 void WorldSession::HandleChannelUnsilenceOpcode(WorldPacket& recvData)
 {
-    LOG_ERROR("sql.sql", "WORLD: Received CMSG_CHANNEL_UNSILENCE");
+    LOG_DEBUG("network", "WORLD: Received CMSG_CHANNEL_UNSILENCE");
 
     if (!sVoiceChatMgr.CanUseVoiceChat())
         return;

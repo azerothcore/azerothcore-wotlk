@@ -45,7 +45,6 @@ void VoiceChatSocket::Start() {
   // Initialize connection
   std::string ip_address = GetRemoteIpAddress().to_string();
   // LOG_TRACE("session", "Accepted connection from {}", ip_address);
-  LOG_ERROR("sql.sql", "Accepted connection from {}", ip_address);
   LOG_DEBUG("session", "Accepted connection from {}", ip_address);
   AsyncRead();
 }
@@ -80,14 +79,14 @@ void VoiceChatSocket::SendPacket(VoiceChatServerPacket pct)
     if (pct.size() > 0)
         buffer.Write(pct.contents(), pct.size());
 
-    LOG_ERROR("sql.sql", "Sending packet: opcode={}, size={}", header.cmd, header.size);
+    LOG_DEBUG("session", "Sending voice socket packet: opcode={}, size={}", header.cmd, header.size);
 
     // Log the raw packet data
     std::stringstream ss;
     const uint8* data = (const uint8*)buffer.GetReadPointer();
     for (size_t i = 0; i < buffer.GetActiveSize(); ++i)
         ss << std::hex << std::setw(2) << std::setfill('0') << (int)data[i] << " ";
-    LOG_ERROR("sql.sql", "Packet data: {}", ss.str());
+    LOG_DEBUG("session", "Voice socket packet data: {}", ss.str());
 
     // Queue the packet using Socket's QueuePacket method
     QueuePacket(std::move(buffer));
@@ -99,7 +98,7 @@ bool VoiceChatSocket::HandlePing() {
 }
 
 bool VoiceChatSocket::ProcessIncomingData() {
-  LOG_INFO("sql.sql", "VoiceChatSocket::ProcessIncomingData() Read Pong packet "
+  LOG_DEBUG("session", "VoiceChatSocket::ProcessIncomingData() Read Pong packet "
                       "sent from server"); // Log info for pong packets
   // Structured similar to VoiceChatServerSocket
   if (!IsOpen())
@@ -108,7 +107,7 @@ bool VoiceChatSocket::ProcessIncomingData() {
   // Read header
   if (GetReadBuffer().GetActiveSize() < sizeof(VoiceChatServerPktHeader))
   {
-      LOG_ERROR("sql.sql",
+      LOG_ERROR("session",
           "Not enough data for header ({} < {})",
           GetReadBuffer().GetActiveSize(),
           sizeof(VoiceChatServerPktHeader));
@@ -119,13 +118,12 @@ bool VoiceChatSocket::ProcessIncomingData() {
   std::memcpy(&header, GetReadBuffer().GetReadPointer(), sizeof(header));
   GetReadBuffer().ReadCompleted(sizeof(header));
 
-  LOG_ERROR("sql.sql", "Processing packet: cmd={}, size={}", header.cmd,
+  LOG_DEBUG("session", "Processing voice socket packet: cmd={}, size={}", header.cmd,
             header.size);
 
   if (header.size < 2 || header.size > 0x2800)
   {
-      // actual error
-      LOG_ERROR("sql.sql",
+      LOG_ERROR("session",
           "VoiceChatServerSocket::ProcessIncomingData: client sent "
           "malformed packet size = {} , cmd = {}",
           header.size,
@@ -152,7 +150,7 @@ bool VoiceChatSocket::ProcessIncomingData() {
 }
 
 void VoiceChatSocket::ReadHandler() {
-  LOG_ERROR("sql.sql", "ReadHandler called with {} bytes available",
+  LOG_DEBUG("session", "ReadHandler called with {} bytes available",
             GetReadBuffer().GetActiveSize());
 
   MessageBuffer &packet = GetReadBuffer();

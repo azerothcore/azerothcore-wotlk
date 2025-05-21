@@ -66,7 +66,7 @@ void VoiceChatMgr::VoiceSocketThread()
         std::string address = GetVoiceServerConnectAddressString();
         std::string port = std::to_string(GetVoiceServerConnectPort());
 
-        LOG_ERROR("sql.sql", "Attempting to connect to voice server at {}:{}", address, port);
+        LOG_INFO("voice-chat", "Attempting to connect to voice server at {}:{}", address, port);
 
         // Resolve endpoint
         boost::system::error_code resolveError;
@@ -74,7 +74,7 @@ void VoiceChatMgr::VoiceSocketThread()
 
         if (resolveError)
         {
-            LOG_ERROR("sql.sql", "Failed to resolve voice server address: {}", resolveError.message());
+            LOG_ERROR("voice-chat", "Failed to resolve voice server address: {}", resolveError.message());
             return;
         }
 
@@ -85,11 +85,11 @@ void VoiceChatMgr::VoiceSocketThread()
 
         if (connectError)
         {
-            LOG_ERROR("sql.sql", "Failed to connect to voice server: {}", connectError.message());
+            LOG_ERROR("voice-chat", "Failed to connect to voice server: {}", connectError.message());
             return;
         }
 
-        LOG_ERROR("sql.sql", "Successfully connected to voice server");
+        LOG_INFO("voice-chat", "Successfully connected to voice server");
 
         // Create voice chat session
         m_socket = std::make_shared<VoiceChatSocket>(std::move(socket));
@@ -102,20 +102,20 @@ void VoiceChatMgr::VoiceSocketThread()
         }
         else
         {
-            LOG_ERROR("sql.sql", "Failed to create voice chat session");
+            LOG_ERROR("voice-chat", "Failed to create voice chat session");
         }
     }
     catch (boost::system::system_error const& e)
     {
-        LOG_ERROR("sql.sql", "Boost system error in voice chat thread: {}", e.what());
+        LOG_ERROR("voice-chat", "Boost system error in voice chat thread: {}", e.what());
     }
     catch (std::exception const& e)
     {
-        LOG_ERROR("sql.sql", "Exception in voice chat thread: {}", e.what());
+        LOG_ERROR("voice-chat", "Exception in voice chat thread: {}", e.what());
     }
     catch (...)
     {
-        LOG_ERROR("sql.sql", "Unknown exception in voice chat thread");
+        LOG_ERROR("voice-chat", "Unknown exception in voice chat thread");
     }
 }
 
@@ -146,7 +146,7 @@ void VoiceChatMgr::Init(Acore::Asio::IoContext& ioContext)
     state = enabled ? VOICECHAT_NOT_CONNECTED : VOICECHAT_DISCONNECTED;
 
     // Attempt an asynchronous connection to the voice server
-    LOG_ERROR("sql.sql", "Connecting to voice server at {}:{}", server_address_string, server_port);
+    LOG_INFO("voice-chat", "Connecting to voice server at {}:{}", server_address_string, server_port);
     new AsyncConnector<VoiceChatSocket>(ioContext, server_address_string, server_port, false);
 
     // FIX: Store the connector
@@ -161,7 +161,7 @@ void VoiceChatMgr::Update()
     if (!enabled)
         return;
 
-    LOG_ERROR("sql.sql", "VoiceChatMgr::Update state: {}", state);
+    LOG_DEBUG("voice-chat", "VoiceChatMgr::Update state: {}", state);
 
     m_eventEmitter(this);
 
@@ -181,7 +181,7 @@ void VoiceChatMgr::Update()
 
         try
         {
-            LOG_ERROR("sql.sql",
+            LOG_DEBUG("voice-chat",
                 "VoiceChatMgr::Update Read Pong packet sent from server"); // Log info
                                                                            // for pong
                                                                            // packets
@@ -189,7 +189,7 @@ void VoiceChatMgr::Update()
         }
         catch (ByteBufferException const&)
         {
-            LOG_ERROR("sql.sql",
+            LOG_ERROR("voice-chat",
                 "VoiceChatMgr::Update EXCEPTION Read Pong packet "
                 "sent from server"); // Log info for pong packets
             ProcessByteBufferException(*packet);
@@ -217,7 +217,7 @@ void VoiceChatMgr::Update()
     {
         if (state == VOICECHAT_CONNECTED)
         {
-            LOG_ERROR("sql.sql", "VoiceChatMgr: !m_socket but connected -> Socket disconnected");
+            LOG_ERROR("voice-chat", "No socket but connected state, disconnecting socket");
             SocketDisconnected();
             SendVoiceChatServiceDisconnect();
             state = VOICECHAT_RECONNECTING;
@@ -230,9 +230,9 @@ void VoiceChatMgr::Update()
             if (maxConnectAttempts >= 0 && curReconnectAttempts >= maxConnectAttempts)
             {
                 if (maxConnectAttempts > 0)
-                    LOG_ERROR("sql.sql", "VoiceChatMgr: Disconnected! Max reconnect attempts reached");
+                    LOG_ERROR("voice-chat", "Disconnected! Max reconnect attempts reached");
                 else
-                    LOG_ERROR("sql.sql", "VoiceChatMgr: Disconnected! Reconnecting disabled");
+                    LOG_ERROR("voice-chat", "Disconnected! Reconnecting disabled");
 
                 DeleteAllChannels();
                 SendVoiceChatStatus(false);
@@ -251,9 +251,9 @@ void VoiceChatMgr::Update()
             if (curReconnectAttempts > 0)
             {
                 if (state == VOICECHAT_NOT_CONNECTED)
-                    LOG_ERROR("sql.sql", "VoiceChatMgr: Connect failed, will try again later");
+                    LOG_ERROR("voice-chat", "Connect failed, will try again later");
                 if (state == VOICECHAT_RECONNECTING)
-                    LOG_ERROR("sql.sql", "VoiceChatMgr: Reconnect failed, will try again later");
+                    LOG_ERROR("voice-chat", "Reconnect failed, will try again later");
             }
 
             if (state == VOICECHAT_NOT_CONNECTED || state == VOICECHAT_RECONNECTING)
@@ -269,7 +269,7 @@ void VoiceChatMgr::Update()
         {
             if (state == VOICECHAT_CONNECTED)
             {
-                LOG_ERROR("sql.sql", "VoiceChatMgr: !open but connected -> Socket disconnected");
+                LOG_ERROR("voice-chat", "Socket not open but connected state, disconnecting socket");
                 SocketDisconnected();
                 SendVoiceChatServiceDisconnect();
                 state = VOICECHAT_RECONNECTING;
@@ -291,13 +291,13 @@ void VoiceChatMgr::Update()
         if (state == VOICECHAT_NOT_CONNECTED || state == VOICECHAT_RECONNECTING)
         {
             if (state == VOICECHAT_NOT_CONNECTED)
-                LOG_ERROR("sql.sql",
-                    "VoiceChatMgr: Connected to {}:{}.",
+                LOG_INFO("voice-chat",
+                    "Connected to {}:{}.",
                     m_socket->GetRemoteIpAddress().to_string(),
                     m_socket->GetRemotePort());
             if (state == VOICECHAT_RECONNECTING)
-                LOG_ERROR("sql.sql",
-                    "VoiceChatMgr: Reconnected to {}:{}",
+                LOG_INFO("voice-chat",
+                    "Reconnected to {}:{}",
                     m_socket->GetRemoteIpAddress().to_string(),
                     m_socket->GetRemotePort());
 
@@ -314,7 +314,7 @@ void VoiceChatMgr::Update()
         {
             if (now >= next_ping)
             {
-                LOG_ERROR("sql.sql", "VoiceChatMgr: Sending ping");
+                LOG_DEBUG("voice-chat", "Sending ping");
                 next_ping = now + std::chrono::seconds(5);
                 VoiceChatServerPacket data(VOICECHAT_CMSG_PING, 4);
                 data << uint32(0);
@@ -323,7 +323,7 @@ void VoiceChatMgr::Update()
 
             if (m_socket && (now - last_pong) > std::chrono::seconds(10))
             {
-                LOG_ERROR("sql.sql", "VoiceChatMgr: Ping timeout!");
+                LOG_ERROR("voice-chat", "Ping timeout!");
                 SocketDisconnected();
                 // SendVoiceChatServiceDisconnect();
                 state = VOICECHAT_RECONNECTING;
@@ -340,7 +340,7 @@ void VoiceChatMgr::HandleVoiceChatServerPacket(VoiceChatServerPacket& pck)
     uint8 error;
     uint16 channel_id;
 
-    LOG_ERROR("sql.sql", "VoiceChatMgr::HandleVoiceChatServerPacket Received {}", pck.GetOpcode());
+    LOG_DEBUG("voice-chat", "VoiceChatMgr::HandleVoiceChatServerPacket Received {}", pck.GetOpcode());
 
     switch (pck.GetOpcode())
     {
@@ -364,7 +364,7 @@ void VoiceChatMgr::HandleVoiceChatServerPacket(VoiceChatServerPacket& pck)
                     }
                     else
                     {
-                        LOG_ERROR("sql.sql", "VoiceChatMgr: Error creating voice channel");
+                        LOG_ERROR("voice-chat", "Error creating voice channel");
                         request = m_requests.erase(request);
                         return;
                     }
@@ -426,7 +426,7 @@ void VoiceChatMgr::HandleVoiceChatServerPacket(VoiceChatServerPacket& pck)
         }
         default:
         {
-            LOG_ERROR("sql.sql", "VoiceChatMgr: received unknown opcode {}!\n", pck.GetOpcode());
+            LOG_ERROR("voice-chat", "received unknown opcode {}!\n", pck.GetOpcode());
             break;
         }
     }
@@ -435,7 +435,7 @@ void VoiceChatMgr::HandleVoiceChatServerPacket(VoiceChatServerPacket& pck)
 void VoiceChatMgr::SocketDisconnected()
 {
     // sLog->outBasic("VoiceChatMgr: VoiceChatServerSocket disconnected");
-    LOG_ERROR("sql.sql", "VoiceChatMgr: VoiceChatServerSocket disconnected");
+    LOG_ERROR("voice-chat", "VoiceChatServerSocket disconnected");
 
     // we close somewher eelse
     // if (m_socket)
@@ -492,7 +492,7 @@ void VoiceChatMgr::QueuePacket(std::unique_ptr<VoiceChatServerPacket> new_packet
 
 void VoiceChatMgr::ProcessByteBufferException(VoiceChatServerPacket const& packet)
 {
-    LOG_ERROR("sql.sql",
+    LOG_ERROR("voice-chat",
         "VoiceChatMgr::Update ByteBufferException occured while parsing a "
         "packet (opcode: {}).",
         packet.GetOpcode());
@@ -500,11 +500,11 @@ void VoiceChatMgr::ProcessByteBufferException(VoiceChatServerPacket const& packe
     // if (sLog->HasLogLevelOrHigher(LOG_LVL_DEBUG))
     {
         // DEBUG_LOG("Dumping error-causing voice server packet:");
-        LOG_ERROR("sql.sql", "Dumping error-causing voice server packet:");
+        LOG_ERROR("voice-chat", "Dumping error-causing voice server packet:");
         packet.hexlike();
     }
 
-    LOG_ERROR("sql.sql",
+    LOG_ERROR("voice-chat",
         "Disconnecting voice server [address {}] for badly formatted packet.",
         GetVoiceServerConnectAddressString());
     // DETAIL_LOG("Disconnecting voice server [address {}] for badly formatted
@@ -557,8 +557,8 @@ void VoiceChatMgr::CreateVoiceChatChannel(
     if (IsVoiceChatChannelBeingCreated(type, groupId, name, newTeam))
         return;
 
-    LOG_ERROR("sql.sql",
-        "VoiceChatMgr: CreateVoiceChannel type: {}, name: {}, team: {}, group: {}",
+    LOG_INFO("voice-chat",
+        "CreateVoiceChannel type: {}, name: {}, team: {}, group: {}",
         type,
         name.c_str(),
         newTeam,
@@ -583,8 +583,7 @@ void VoiceChatMgr::DeleteVoiceChatChannel(VoiceChatChannel* channel)
     if (!channel)
         return;
 
-    LOG_ERROR(
-        "sql.sql", "VoiceChatMgr: DeleteVoiceChannel id: {} type: {}", channel->GetChannelId(), channel->GetType());
+    LOG_INFO("voice-chat", "DeleteVoiceChannel id: {} type: {}", channel->GetChannelId(), channel->GetType());
 
     uint8 type = channel->GetType();
     uint16 id = channel->GetChannelId();
@@ -965,11 +964,11 @@ void VoiceChatMgr::EnableChannelSlot(uint16 channel_id, uint8 slot_id)
 {
     if (!m_socket)
     {
-        LOG_ERROR("sql.sql", "fug");
+        LOG_ERROR("voice-chat", "Channel enabled with no socket!");
         return;
     }
 
-    LOG_ERROR("sql.sql", "VoiceChatMgr: Channel {} activate slot {}", (int)channel_id, (int)slot_id);
+    LOG_INFO("voice-chat", "Channel {} activate slot {}", (int)channel_id, (int)slot_id);
 
     VoiceChatServerPacket data(VOICECHAT_CMSG_ADD_MEMBER, 5);
     data << channel_id;
@@ -981,9 +980,12 @@ void VoiceChatMgr::EnableChannelSlot(uint16 channel_id, uint8 slot_id)
 void VoiceChatMgr::DisableChannelSlot(uint16 channel_id, uint8 slot_id)
 {
     if (!m_socket)
+    {
+        LOG_ERROR("voice-chat", "Channel disabled with no socket!");
         return;
+    }
 
-    LOG_ERROR("sql.sql", "VoiceChatMgr: Channel {} deactivate slot {}", (int)channel_id, (int)slot_id);
+    LOG_INFO("voice-chat", "Channel {} deactivate slot {}", (int)channel_id, (int)slot_id);
 
     VoiceChatServerPacket data(VOICECHAT_CMSG_REMOVE_MEMBER, 5);
     data << channel_id;
@@ -995,9 +997,12 @@ void VoiceChatMgr::DisableChannelSlot(uint16 channel_id, uint8 slot_id)
 void VoiceChatMgr::VoiceChannelSlot(uint16 channel_id, uint8 slot_id)
 {
     if (!m_socket)
+    {
+        LOG_ERROR("voice-chat", "Slot voiced with no socket!");
         return;
+    }
 
-    LOG_ERROR("sql.sql", "VoiceChatMgr: Channel {} voice slot {}", (int)channel_id, (int)slot_id);
+    LOG_ERROR("voice-chat", "Channel {} voice slot {}", (int)channel_id, (int)slot_id);
 
     VoiceChatServerPacket data(VOICECHAT_CMSG_VOICE_MEMBER, 5);
     data << channel_id;
@@ -1009,9 +1014,12 @@ void VoiceChatMgr::VoiceChannelSlot(uint16 channel_id, uint8 slot_id)
 void VoiceChatMgr::DevoiceChannelSlot(uint16 channel_id, uint8 slot_id)
 {
     if (!m_socket)
+    {
+        LOG_ERROR("voice-chat", "Slot devoiced with no socket!");
         return;
+    }
 
-    LOG_ERROR("sql.sql", "VoiceChatMgr: Channel {} devoice slot {}", (int)channel_id, (int)slot_id);
+    LOG_INFO("voice-chat", "Channel {} devoice slot {}", (int)channel_id, (int)slot_id);
 
     VoiceChatServerPacket data(VOICECHAT_CMSG_DEVOICE_MEMBER, 5);
     data << channel_id;
@@ -1022,9 +1030,12 @@ void VoiceChatMgr::DevoiceChannelSlot(uint16 channel_id, uint8 slot_id)
 void VoiceChatMgr::MuteChannelSlot(uint16 channel_id, uint8 slot_id)
 {
     if (!m_socket)
+    {
+        LOG_ERROR("voice-chat", "Slot muted with no socket!");
         return;
+    }
 
-    LOG_ERROR("sql.sql", "VoiceChatMgr: Channel {} mute slot {}", (int)channel_id, (int)slot_id);
+    LOG_INFO("voice-chat", "Channel {} mute slot {}", (int)channel_id, (int)slot_id);
 
     VoiceChatServerPacket data(VOICECHAT_CMSG_MUTE_MEMBER, 5);
     data << channel_id;
@@ -1035,9 +1046,12 @@ void VoiceChatMgr::MuteChannelSlot(uint16 channel_id, uint8 slot_id)
 void VoiceChatMgr::UnmuteChannelSlot(uint16 channel_id, uint8 slot_id)
 {
     if (!m_socket)
+    {
+        LOG_ERROR("voice-chat", "Slot unmuted with no socket!");
         return;
+    }
 
-    LOG_ERROR("sql.sql", "VoiceChatMgr: Channel {} unmute slot {}", (int)channel_id, (int)slot_id);
+    LOG_INFO("voice-chat", "Channel {} unmute slot {}", (int)channel_id, (int)slot_id);
 
     VoiceChatServerPacket data(VOICECHAT_CMSG_UNMUTE_MEMBER, 5);
     data << channel_id;
