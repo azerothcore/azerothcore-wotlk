@@ -5115,7 +5115,7 @@ void SpellMgr::LoadSpellInfoCorrections()
     // The Green Tower
     ApplySpellFix({ 18097 }, [](SpellInfo* spellInfo)
     {
-        spellInfo->DurationEntry = sSpellDurationStore.LookupEntry(21);
+        spellInfo->DurationEntry = sSpellDurationStore.LookupEntry(21); // -1
     });
 
     for (uint32 i = 0; i < GetSpellInfoStoreSize(); ++i)
