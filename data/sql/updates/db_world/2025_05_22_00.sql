@@ -1,3 +1,4 @@
+-- DB update 2025_05_21_01 -> 2025_05_22_00
 
 -- Set Attack Delay on spawn and update comments.
 UPDATE `creature_template` SET `AIName` = 'SmartAI' WHERE `entry` = 25708;
