@@ -8235,7 +8235,7 @@ bool Unit::HandleDummyAuraProc(Unit* victim, uint32 damage, AuraEffect* triggere
                     // Judgement of Light
                     case 20185:
                         {
-                            if (!victim || !victim->IsAlive())
+                            if (!victim || !victim->IsAlive() || victim->HasSpellCooldown(20267))
                                 return false;
 
                             auto* caster = triggeredByAura->GetBase()->GetCaster();
@@ -8244,13 +8244,14 @@ bool Unit::HandleDummyAuraProc(Unit* victim, uint32 damage, AuraEffect* triggere
 
                             // 2% of base health
                             basepoints0 = int32(victim->CountPctFromMaxHealth(2));
+                            victim->AddSpellCooldown(20267, 0, 4 * IN_MILLISECONDS);
                             victim->CastCustomSpell(victim, 20267, &basepoints0, 0, 0, true, 0, triggeredByAura);
                             return true;
                         }
                     // Judgement of Wisdom
                     case 20186:
                         {
-                            if (!victim || !victim->IsAlive() || !victim->HasActivePowerType(POWER_MANA))
+                            if (!victim || !victim->IsAlive() || !victim->HasActivePowerType(POWER_MANA) || victim->HasSpellCooldown(20268))
                                 return false;
 
                             auto* caster = triggeredByAura->GetBase()->GetCaster();
