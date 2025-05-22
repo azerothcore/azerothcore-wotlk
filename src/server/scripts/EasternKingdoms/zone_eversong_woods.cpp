@@ -227,7 +227,7 @@ struct npc_lor_themar_theron : public ScriptedAI
         DoRewardPlayersInArea();
     }
 
-    void UpdateAI(uint32 diff) override
+    void UpdateAI(uint32 /*diff*/) override
     {
         if (!UpdateVictim())
             return;

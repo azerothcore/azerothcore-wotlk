@@ -574,7 +574,7 @@ struct npc_prophet_velen : public ScriptedAI
         DoRewardPlayersInArea();
     }
 
-    void UpdateAI(uint32 diff) override
+    void UpdateAI(uint32 /*diff*/) override
     {
         if (!UpdateVictim())
             return;

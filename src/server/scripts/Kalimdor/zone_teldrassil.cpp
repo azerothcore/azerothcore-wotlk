@@ -29,7 +29,7 @@ struct npc_tyrande_whisperwind : public ScriptedAI
         DoRewardPlayersInArea();
     }
 
-    void UpdateAI(uint32 diff) override
+    void UpdateAI(uint32 /*diff*/) override
     {
         if (!UpdateVictim())
             return;

@@ -468,7 +468,7 @@ struct npc_king_varian_wrynn : public ScriptedAI
         DoRewardPlayersInArea();
     }
 
-    void UpdateAI(uint32 diff) override
+    void UpdateAI(uint32 /*diff*/) override
     {
         if (!UpdateVictim())
             return;
