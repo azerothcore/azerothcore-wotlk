@@ -652,6 +652,9 @@ class spell_karazhan_wrath_titans_aura : public AuraScript
         if (GetFirstSchoolInMask(eventInfo.GetSpellInfo()->GetSchoolMask()) == SPELL_SCHOOL_NORMAL)
             return false;
 
+        if (GetFirstSchoolInMask(eventInfo.GetSpellInfo()->GetSchoolMask()) == SPELL_SCHOOL_HOLY)
+            return false;
+
         return true;
     }
 
