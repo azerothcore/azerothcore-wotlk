@@ -7136,37 +7136,26 @@ void Player::ApplyItemEquipSpell(Item* item, bool apply, bool form_change)
     if (!proto)
         return;
 
-    for (uint8 i = 0; i < MAX_ITEM_PROTO_SPELLS; ++i)
+    for (auto const& spellData : proto->Spells)
     {
-        _Spell const& spellData = proto->Spells[i];
-
-        // no spell
+         // no spell
         if (!spellData.SpellId)
             continue;
-
-        // Spells that should stay on the caster after removing the item.
-        constexpr std::array<int32, 2> spellExceptions =
-        {
-            11826,  //Electromagnetic Gigaflux Reactivator
-            17490   //Book of the Dead - Summon Skeleton
-        };
-        const auto found = std::find(std::begin(spellExceptions), std::end(spellExceptions), spellData.SpellId);
 
         // wrong triggering type
         if (apply)
         {
+            // Only apply "On Equip" spells
             if (spellData.SpellTrigger != ITEM_SPELLTRIGGER_ON_EQUIP)
-            {
                 continue;
-            }
         }
         else
         {
-            // If the spell is an exception do not remove it.
-            if (found != std::end(spellExceptions))
-            {
+            // Do not remove "Use" spells in these special cases:
+            // 1. During form changes (e.g., druid shapeshifting)
+            // 2. When the spell comes from an item with negative charges, which means its effect should persist after the item is consumed or removed.
+            if (spellData.SpellTrigger == ITEM_SPELLTRIGGER_ON_USE && (form_change || spellData.SpellCharges < 0))
                 continue;
-            }
         }
 
         // check if it is valid spell
@@ -7215,18 +7204,6 @@ void Player::ApplyEquipSpell(SpellInfo const* spellInfo, Item* item, bool apply,
             RemoveAurasDueToItemSpell(spellInfo->Id, item->GetGUID());  // un-apply all spells, not only at-equipped
         else
             RemoveAurasDueToSpell(spellInfo->Id);           // un-apply spell (item set case)
-
-        // Xinef: Remove Proc Spells and Summons
-        for (uint8 i = EFFECT_0; i < MAX_SPELL_EFFECTS; ++i)
-        {
-            // Xinef: Remove procs
-            if (spellInfo->Effects[i].TriggerSpell)
-                RemoveAurasDueToSpell(spellInfo->Effects[i].TriggerSpell);
-
-            // Xinef: remove minions summoned by item
-            if (spellInfo->Effects[i].Effect == SPELL_EFFECT_SUMMON)
-                RemoveAllMinionsByEntry(spellInfo->Effects[i].MiscValue);
-        }
     }
 }
 
