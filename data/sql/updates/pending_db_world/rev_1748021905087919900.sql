@@ -17,7 +17,20 @@ UPDATE `areatrigger_teleport` SET `Name` = "Blackrock Spire Entrance", `target_p
 UPDATE `areatrigger_teleport` SET `Name` = "Maraudon, The Wicked Grotto [Purple Wing] (Exit)" WHERE `ID` = 3126;
 UPDATE `areatrigger_teleport` SET `Name` = "Maraudon, Foulspore Cavern [Orange Wing] (Exit)" WHERE `ID` = 3131;
 
-UPDATE `areatrigger_teleport` SET `Name` = "Maraudon (Inside) - Purple Wing: The Wicked Grotto" WHERE `ID` = 3134;
-UPDATE `areatrigger_teleport` SET `Name` = "Maraudon (Inside) - Orange Wing: Foulspore Cavern" WHERE `ID` = 3133;
+UPDATE `areatrigger_teleport` SET `Name` = "Maraudon, The Wicked Grotto [Purple Wing] (Entrance)" WHERE `ID` = 3134;
+UPDATE `areatrigger_teleport` SET `Name` = "Maraudon, Foulspore Cavern [Orange Wing] (Entrance)" WHERE `ID` = 3133;
 
 -- Dire Maul
+UPDATE `areatrigger_teleport` SET `Name` = "Dire Maul, West Wing [South] (Exit)" WHERE `ID` = 3190;
+UPDATE `areatrigger_teleport` SET `Name` = "Dire Maul, West Wing [North](Exit)" WHERE `ID` = 3191;
+UPDATE `areatrigger_teleport` SET `Name` = "Dire Maul, North Wing (Exit)" WHERE `ID` = 3193;
+UPDATE `areatrigger_teleport` SET `Name` = "Dire Maul, East Wing [West] (Exit)" WHERE `ID` = 3194;
+UPDATE `areatrigger_teleport` SET `Name` = "Dire Maul, East Wing [South] (Exit)" WHERE `ID` = 3195;
+UPDATE `areatrigger_teleport` SET `Name` = "Dire Maul, East Wing [East] (Exit)" WHERE `ID` = 3196;
+UPDATE `areatrigger_teleport` SET `Name` = "Dire Maul, Alzzin the Wildshaper's broken wall [1-Way] (Exit)" WHERE `ID` = 3197;
+UPDATE `areatrigger_teleport` SET `Name` = "Dire Maul, East Wing [West] (Entrance)" WHERE `ID` = 3183;
+UPDATE `areatrigger_teleport` SET `Name` = "Dire Maul, East Wing [South] (Entrance)" WHERE `ID` = 3184;
+UPDATE `areatrigger_teleport` SET `Name` = "Dire Maul, East Wing [East] (Entrance)" WHERE `ID` = 3185;
+UPDATE `areatrigger_teleport` SET `Name` = "Dire Maul, West Wing [South] (Entrance)" WHERE `ID` = 3186;
+UPDATE `areatrigger_teleport` SET `Name` = "Dire Maul, West Wing [North] (Entrance)" WHERE `ID` = 3187;
+UPDATE `areatrigger_teleport` SET `Name` = "Dire Maul, North Wing (Entrance)" WHERE `ID` = 3189;
