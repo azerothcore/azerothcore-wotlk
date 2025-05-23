@@ -1,3 +1,4 @@
+-- DB update 2025_05_23_05 -> 2025_05_23_06
 -- Warp Storm (21322)
 DELETE FROM `creature_template_addon` WHERE (`entry` = 21322);
 INSERT INTO `creature_template_addon` (`entry`, `path_id`, `mount`, `bytes1`, `bytes2`, `emote`, `visibilityDistanceType`, `auras`) VALUES
