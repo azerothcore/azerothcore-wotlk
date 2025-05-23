@@ -16,7 +16,6 @@ UPDATE `areatrigger_teleport` SET `Name` = "Blackrock Spire Entrance", `target_p
 -- Maraudon 
 UPDATE `areatrigger_teleport` SET `Name` = "Maraudon, The Wicked Grotto [Purple Wing] (Exit)" WHERE `ID` = 3126;
 UPDATE `areatrigger_teleport` SET `Name` = "Maraudon, Foulspore Cavern [Orange Wing] (Exit)" WHERE `ID` = 3131;
-
 UPDATE `areatrigger_teleport` SET `Name` = "Maraudon, The Wicked Grotto [Purple Wing] (Entrance)" WHERE `ID` = 3134;
 UPDATE `areatrigger_teleport` SET `Name` = "Maraudon, Foulspore Cavern [Orange Wing] (Entrance)" WHERE `ID` = 3133;
 
