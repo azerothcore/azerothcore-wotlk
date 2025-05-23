@@ -13,7 +13,7 @@ UPDATE `areatrigger_teleport` SET `Name` = "Blackrock Spire, Exit (from inside o
 -- Blackrock Spire - Searing Gorge Instance
 UPDATE `areatrigger_teleport` SET `Name` = "Blackrock Spire Entrance", `target_position_x` = -7524.65, `target_position_y` = -1229.13, `target_position_z` = 285.731, `target_orientation` = 2.0943952 WHERE `ID` = 1470;
 
--- Maraudon 
+-- Maraudon
 UPDATE `areatrigger_teleport` SET `Name` = "Maraudon, The Wicked Grotto [Purple Wing] (Exit)" WHERE `ID` = 3126;
 UPDATE `areatrigger_teleport` SET `Name` = "Maraudon, Foulspore Cavern [Orange Wing] (Exit)" WHERE `ID` = 3131;
 UPDATE `areatrigger_teleport` SET `Name` = "Maraudon, The Wicked Grotto [Purple Wing] (Entrance)" WHERE `ID` = 3134;
