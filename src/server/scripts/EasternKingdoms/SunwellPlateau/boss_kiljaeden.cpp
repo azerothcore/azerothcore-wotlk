@@ -141,6 +141,7 @@ struct npc_kiljaeden_controller : public NullCreatureAI
 
     void Reset() override
     {
+        scheduler.CancelAll();
         instance->SetBossState(DATA_KILJAEDEN, NOT_STARTED);
         summons.DespawnAll();
         ResetOrbs();
