@@ -33,3 +33,14 @@ UPDATE `areatrigger_teleport` SET `Name` = "Dire Maul, East Wing [East] (Entranc
 UPDATE `areatrigger_teleport` SET `Name` = "Dire Maul, West Wing [South] (Entrance)" WHERE `ID` = 3186;
 UPDATE `areatrigger_teleport` SET `Name` = "Dire Maul, West Wing [North] (Entrance)" WHERE `ID` = 3187;
 UPDATE `areatrigger_teleport` SET `Name` = "Dire Maul, North Wing (Entrance)" WHERE `ID` = 3189;
+
+-- Naxxramas
+UPDATE `areatrigger_teleport` SET `Name` = "Naxxramas, East (Entrance)" WHERE `ID` = 5191;
+UPDATE `areatrigger_teleport` SET `Name` = "Naxxramas, North (Entrance)" WHERE `ID` = 5192;
+UPDATE `areatrigger_teleport` SET `Name` = "Naxxramas, West (Entrance)" WHERE `ID` = 5193;
+UPDATE `areatrigger_teleport` SET `Name` = "Naxxramas, South (Entrance)" WHERE `ID` = 5194;
+
+UPDATE `areatrigger_teleport` SET `Name` = "Naxxramas, North-East (Exit)" WHERE `ID` = 5196;
+UPDATE `areatrigger_teleport` SET `Name` = "Naxxramas, North-West (Exit)" WHERE `ID` = 5197;
+UPDATE `areatrigger_teleport` SET `Name` = "Naxxramas, South-East (Exit)" WHERE `ID` = 5198;
+UPDATE `areatrigger_teleport` SET `Name` = "Naxxramas, South-West (Exit)" WHERE `ID` = 5199;
