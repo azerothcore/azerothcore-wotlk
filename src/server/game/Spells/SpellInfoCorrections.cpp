@@ -4959,8 +4959,10 @@ void SpellMgr::LoadSpellInfoCorrections()
         spellInfo->Effects[EFFECT_0].RadiusEntry = sSpellRadiusStore.LookupEntry(EFFECT_RADIUS_70_YARDS);
     });
 
-    // Encapsulate
-    ApplySpellFix({ 45662 }, [](SpellInfo* spellInfo)
+    ApplySpellFix({
+        45662, // Encapsulate
+        45642  // Fire Bloom
+        }, [](SpellInfo* spellInfo)
     {
         spellInfo->AttributesEx7 |= SPELL_ATTR7_TREAT_AS_NPC_AOE;
     });
@@ -5170,6 +5172,17 @@ void SpellMgr::LoadSpellInfoCorrections()
     {
         spellInfo->Attributes &= ~(SPELL_ATTR0_IS_ABILITY | SPELL_ATTR0_NOT_SHAPESHIFTED | SPELL_ATTR0_DO_NOT_SHEATH);
         spellInfo->Attributes |= SPELL_ATTR0_ALLOW_ITEM_SPELL_IN_PVP;
+    });
+
+    ApplySpellFix({
+        43444, // Explosive Trap (Hex Lord Malacrass)
+        43447, // Freezing Trap (Hex Lord Malacrass)
+        43449, // Snake Trap (Hex Lord Malacrass)
+        45236, // Blaze
+        50745  // Blaze
+        }, [](SpellInfo* spellInfo)
+    {
+        spellInfo->Effects[EFFECT_0].Effect = SPELL_EFFECT_SUMMON_OBJECT_SLOT1;
     });
 
     for (uint32 i = 0; i < GetSpellInfoStoreSize(); ++i)
