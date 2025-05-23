@@ -1,3 +1,4 @@
+-- DB update 2025_05_23_02 -> 2025_05_23_03
 -- Crashing Wave
 DELETE FROM `spell_script_names` WHERE `spell_id`=57652 AND `ScriptName`='spell_crashing_wave';
 INSERT INTO `spell_script_names` (`spell_id`, `ScriptName`) VALUES (57652, 'spell_crashing_wave');
