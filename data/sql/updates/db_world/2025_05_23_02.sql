@@ -1,3 +1,4 @@
+-- DB update 2025_05_23_01 -> 2025_05_23_02
 --
 
 -- Reduce Aku'Mai Servant damage. Auto attack = 36-45 w 1.5k armor
