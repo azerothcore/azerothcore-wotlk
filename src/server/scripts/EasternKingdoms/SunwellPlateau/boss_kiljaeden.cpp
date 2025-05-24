@@ -141,6 +141,7 @@ struct npc_kiljaeden_controller : public NullCreatureAI
 
     void Reset() override
     {
+        scheduler.CancelAll();
         instance->SetBossState(DATA_KILJAEDEN, NOT_STARTED);
         summons.DespawnAll();
         ResetOrbs();
@@ -286,9 +287,9 @@ struct boss_kiljaeden : public BossAI
                 DoCastSelf(SPELL_SHADOW_SPIKE);
             });
 
-            ScheduleTimedEvent(3s, [&] {
+            ScheduleTimedEvent(31s, [&] {
                 DoCastSelf(SPELL_FLAME_DART);
-            }, 10s);
+            }, 20s);
 
             ScheduleTimedEvent(55s, [&] {
                 Talk(EMOTE_KJ_DARKNESS);
@@ -325,6 +326,10 @@ struct boss_kiljaeden : public BossAI
                 DoCastSelf(SPELL_SHADOW_SPIKE);
                 ScheduleBasicAbilities();
             });
+
+            ScheduleTimedEvent(28s, [&] {
+                DoCastSelf(SPELL_FLAME_DART);
+            }, 20s);
 
             ScheduleTimedEvent(64s, [&] {
                 me->RemoveAurasDueToSpell(SPELL_ARMAGEDDON_PERIODIC);
@@ -393,6 +398,10 @@ struct boss_kiljaeden : public BossAI
                             me->RemoveUnitFlag(UNIT_FLAG_PACIFIED);
 
                             ScheduleBasicAbilities();
+
+                            ScheduleTimedEvent(16s, [&] {
+                                DoCastSelf(SPELL_FLAME_DART);
+                            }, 20s);
 
                             ScheduleTimedEvent(15s, [&] {
                                 me->RemoveAurasDueToSpell(SPELL_ARMAGEDDON_PERIODIC);
@@ -994,6 +1003,9 @@ class spell_kiljaeden_sinister_reflection_clone : public SpellScript
 
     void FilterTargets(std::list<WorldObject*>& targets)
     {
+        if (targets.empty())
+            return;
+
         targets.sort(Acore::ObjectDistanceOrderPred(GetCaster()));
         WorldObject* target = targets.front();
 
@@ -1148,6 +1160,8 @@ class spell_kiljaeden_armageddon_missile : public SpellScript
     }
 };
 
+// 45856 - Breath: Haste
+// 45860 - Breath: Revitalize
 class spell_kiljaeden_dragon_breath : public SpellScript
 {
     PrepareSpellScript(spell_kiljaeden_dragon_breath);
@@ -1157,9 +1171,16 @@ class spell_kiljaeden_dragon_breath : public SpellScript
         targets.remove_if(Acore::UnitAuraCheck(true, SPELL_VENGEANCE_OF_THE_BLUE_FLIGHT));
     }
 
+    void HandleHit(SpellEffIndex /*effindex*/)
+    {
+        if (Unit* target = GetHitUnit())
+            target->RemoveMovementImpairingAuras(false);
+    }
+
     void Register() override
     {
         OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_kiljaeden_dragon_breath::FilterTargets, EFFECT_ALL, TARGET_UNIT_CONE_ALLY);
+        OnEffectHitTarget += SpellEffectFn(spell_kiljaeden_dragon_breath::HandleHit, EFFECT_ALL, SPELL_EFFECT_ANY);
     }
 };
 
