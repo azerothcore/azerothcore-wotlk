@@ -793,6 +793,7 @@ void World::LoadConfigSettings(bool reload)
 
     _int_configs[CONFIG_EVENT_ANNOUNCE] = sConfigMgr->GetOption<int32>("Event.Announce", 0);
 
+    _float_configs[CONFIG_CREATURE_LEASH_RADIUS]                  = sConfigMgr->GetOption<float>("CreatureLeashRadius", 30.0f);
     _float_configs[CONFIG_CREATURE_FAMILY_FLEE_ASSISTANCE_RADIUS] = sConfigMgr->GetOption<float>("CreatureFamilyFleeAssistanceRadius", 30.0f);
     _float_configs[CONFIG_CREATURE_FAMILY_ASSISTANCE_RADIUS]      = sConfigMgr->GetOption<float>("CreatureFamilyAssistanceRadius", 10.0f);
     _int_configs[CONFIG_CREATURE_FAMILY_ASSISTANCE_DELAY]         = sConfigMgr->GetOption<int32>("CreatureFamilyAssistanceDelay", 2000);
@@ -1755,7 +1756,6 @@ void World::SetInitialWorldSettings()
 
     LOG_INFO("server.loading", "Loading WorldStates...");              // must be loaded before battleground, outdoor PvP and conditions
     sWorldState->LoadWorldStates();
-    sWorldState->Load();
 
     LOG_INFO("server.loading", "Loading Conditions...");
     sConditionMgr->LoadConditions();
@@ -1879,6 +1879,9 @@ void World::SetInitialWorldSettings()
     LOG_INFO("server.loading", " ");
     uint32 nextGameEvent = sGameEventMgr->StartSystem();
     _timers[WUPDATE_EVENTS].SetInterval(nextGameEvent);    //depend on next event
+
+    LOG_INFO("server.loading", "Loading WorldState...");
+    sWorldState->Load(); // must be called after loading game events
 
     // Delete all characters which have been deleted X days before
     Player::DeleteOldCharacters();
