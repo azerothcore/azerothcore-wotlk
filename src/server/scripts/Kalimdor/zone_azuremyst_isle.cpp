@@ -558,6 +558,31 @@ public:
     }
 };
 
+// 7999 - Tyrande Whisperwind
+/// @todo add abilities/timers
+struct npc_prophet_velen : public ScriptedAI
+{
+    npc_prophet_velen(Creature* creature) : ScriptedAI(creature) { }
+
+    void Reset() override
+    {
+        me->setActive(true);
+    }
+
+    void JustDied(Unit* /*killer*/) override
+    {
+        DoRewardPlayersInArea();
+    }
+
+    void UpdateAI(uint32 /*diff*/) override
+    {
+        if (!UpdateVictim())
+            return;
+
+        DoMeleeAttackIfReady();
+    }
+};
+
 void AddSC_azuremyst_isle()
 {
     new npc_draenei_survivor();
@@ -568,4 +593,5 @@ void AddSC_azuremyst_isle()
     new npc_stillpine_capitive();
     new go_bristlelimb_cage();
     RegisterSpellScript(spell_inoculate_nestlewood_owlkin);
+    RegisterCreatureAI(npc_prophet_velen);
 }
