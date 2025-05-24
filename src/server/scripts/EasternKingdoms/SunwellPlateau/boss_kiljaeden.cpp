@@ -1003,6 +1003,9 @@ class spell_kiljaeden_sinister_reflection_clone : public SpellScript
 
     void FilterTargets(std::list<WorldObject*>& targets)
     {
+        if (targets.empty())
+            return;
+
         targets.sort(Acore::ObjectDistanceOrderPred(GetCaster()));
         WorldObject* target = targets.front();
 
