@@ -9,3 +9,6 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 (29103, 0, 1, 0, 24, 1, 100, 0, 52196, 1, 1000, 2000, 0, 0, 11, 53348, 0, 0, 1, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Tirisfal Crusader - On Target Buffed With \'Frostbrood Vanquisher\' - Cast \'Arrow Assault\' (Phase 1)'),
 (29103, 0, 2, 0, 9, 1, 100, 0, 2000, 4000, 4000, 6000, 40, 150, 11, 53345, 64, 0, 1, 0, 0, 9, 0, 40, 150, 0, 0, 0, 0, 0, 'Tirisfal Crusader - Within 40-150 Range - Cast \'Arrow Assault\' (Phase 1)'),
 (29103, 0, 3, 0, 8, 0, 100, 0, 53110, 0, 0, 0, 0, 0, 22, 2, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Tirisfal Crusader - On Spellhit \'Devour Humanoid\' - Set Event Phase 2');
+
+DELETE FROM `spell_script_names` WHERE `spell_id`=53111 AND `ScriptName`='spell_q12779_an_end_to_all_things_devour_aura';
+INSERT INTO `spell_script_names` (`spell_id`, `ScriptName`) VALUES (53111, 'spell_q12779_an_end_to_all_things_devour_aura');

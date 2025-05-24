@@ -17,6 +17,7 @@
 
 #include "CreatureScript.h"
 #include "ScriptedCreature.h"
+#include "SpellAuras.h"
 #include "SpellInfo.h"
 #include "SpellScript.h"
 #include "SpellScriptLoader.h"
@@ -58,7 +59,33 @@ class spell_q12779_an_end_to_all_things : public SpellScript
     }
 };
 
+// 53111 - Devour Humanoid (casted by the devoured creature)
+class spell_q12779_an_end_to_all_things_devour_aura : public AuraScript
+{
+    PrepareAuraScript(spell_q12779_an_end_to_all_things_devour_aura);
+
+    void OnRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
+    {
+        Unit* caster = GetCaster();
+        Unit* target = GetTarget();
+        if (!caster || !target)
+            return;
+
+        if (GetTargetApplication()->GetRemoveMode() == AURA_REMOVE_BY_EXPIRE)
+        {
+            caster->SetDisableGravity(true);
+            Unit::Kill(target, caster);
+        }
+    }
+
+    void Register() override
+    {
+        AfterEffectRemove += AuraEffectRemoveFn(spell_q12779_an_end_to_all_things_devour_aura::OnRemove, EFFECT_0, SPELL_AURA_CONTROL_VEHICLE, AURA_EFFECT_HANDLE_REAL);
+    }
+};
+
 void AddSC_the_scarlet_enclave_c3()
 {
     RegisterSpellScript(spell_q12779_an_end_to_all_things);
+    RegisterSpellScript(spell_q12779_an_end_to_all_things_devour_aura);
 }
