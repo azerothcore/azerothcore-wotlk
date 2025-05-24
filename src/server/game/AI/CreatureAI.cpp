@@ -392,13 +392,16 @@ int32 CreatureAI::VisualizeBoundary(uint32 duration, Unit* owner, bool fill, boo
     static constexpr float BOUNDARY_VISUALIZE_CREATURE_SCALE = 0.25f;
     static constexpr uint32 BOUNDARY_MAX_SPAWNS = 8000;
     static constexpr float BOUNDARY_MAX_DISTANCE = MAX_SEARCHER_DISTANCE;
-    static Position const BOUNDARY_DIRECTIONS[6] = {
-        {BOUNDARY_STEP,  0,              0             },
-        {-BOUNDARY_STEP, 0,              0             },
-        {0,              BOUNDARY_STEP,  0             },
-        {0,              -BOUNDARY_STEP, 0             },
-        {0,              0,              BOUNDARY_STEP },
-        {0,              0,              -BOUNDARY_STEP}
+
+    float boundaryStep = fill && checkZ ? BOUNDARY_STEP * 2 : BOUNDARY_STEP;
+
+    Position const boundaryDirections[6] = {
+        {boundaryStep,  0,             0            },
+        {-boundaryStep, 0,             0            },
+        {0,             boundaryStep,  0            },
+        {0,             -boundaryStep, 0            },
+        {0,             0,             boundaryStep },
+        {0,             0,             -boundaryStep}
     };
 
     if (!owner)
@@ -462,7 +465,7 @@ int32 CreatureAI::VisualizeBoundary(uint32 duration, Unit* owner, bool fill, boo
 
         for (uint8 i = 0; i < maxDirections; ++i)
         {
-            Position const& direction = BOUNDARY_DIRECTIONS[i];
+            Position const& direction = boundaryDirections[i];
             Position nextPosition = currentPosition;
             nextPosition.RelocateOffset(direction);
 
