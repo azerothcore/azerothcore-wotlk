@@ -15,6 +15,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "AreaDefines.h"
 #include "Chat.h"
 #include "InstanceMapScript.h"
 #include "InstanceScript.h"
@@ -72,7 +73,7 @@ Milliseconds hyjalNightElfWaveTimers[1][MAX_WAVES_NIGHT_ELF]
 class instance_hyjal : public InstanceMapScript
 {
 public:
-    instance_hyjal() : InstanceMapScript("instance_hyjal", 534) { }
+    instance_hyjal() : InstanceMapScript("instance_hyjal", MAP_THE_BATTLE_FOR_MOUNT_HYJAL) { }
 
     InstanceScript* GetInstanceScript(InstanceMap* map) const override
     {

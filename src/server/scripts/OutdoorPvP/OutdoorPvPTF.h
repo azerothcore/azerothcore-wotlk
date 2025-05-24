@@ -25,11 +25,11 @@ const uint8 OutdoorPvPTFBuffZonesNum = 5;
 
 const uint32 OutdoorPvPTFBuffZones[OutdoorPvPTFBuffZonesNum] =
 {
-    3519 /*Terokkar Forest*/,
-    3791 /*Sethekk Halls*/,
-    3789 /*Shadow Labyrinth*/,
-    3792 /*Mana-Tombs*/,
-    3790 /*Auchenai Crypts*/
+    AREA_TEROKKAR_FOREST,
+    AREA_SETHEKK_HALLS,
+    AREA_SHADOW_LABYRINTH,
+    AREA_MANA_TOMBS,
+    AREA_AUCHENAI_CRYPTS,
 };
 
 // locked for 6 hours after capture
@@ -56,11 +56,11 @@ enum OutdoorPvPTF_TowerType
 
 const go_type TFCapturePoints[TF_TOWER_NUM] =
 {
-    {183104, 530, -3081.65f, 5335.03f, 17.1853f, -2.14675f, 0.0f, 0.0f, 0.878817f, -0.477159f},
-    {183411, 530, -2939.9f, 4788.73f, 18.987f, 2.77507f, 0.0f, 0.0f, 0.983255f, 0.182236f},
-    {183412, 530, -3174.94f, 4440.97f, 16.2281f, 1.86750f, 0.0f, 0.0f, 0.803857f, 0.594823f},
-    {183413, 530, -3603.31f, 4529.15f, 20.9077f, 0.994838f, 0.0f, 0.0f, 0.477159f, 0.878817f},
-    {183414, 530, -3812.37f, 4899.3f, 17.7249f, 0.087266f, 0.0f, 0.0f, 0.043619f, 0.999048f}
+    {183104, MAP_OUTLAND, -3081.65f, 5335.03f, 17.1853f, -2.14675f, 0.0f, 0.0f, 0.878817f, -0.477159f},
+    {183411, MAP_OUTLAND, -2939.9f, 4788.73f, 18.987f, 2.77507f, 0.0f, 0.0f, 0.983255f, 0.182236f},
+    {183412, MAP_OUTLAND, -3174.94f, 4440.97f, 16.2281f, 1.86750f, 0.0f, 0.0f, 0.803857f, 0.594823f},
+    {183413, MAP_OUTLAND, -3603.31f, 4529.15f, 20.9077f, 0.994838f, 0.0f, 0.0f, 0.477159f, 0.878817f},
+    {183414, MAP_OUTLAND, -3812.37f, 4899.3f, 17.7249f, 0.087266f, 0.0f, 0.0f, 0.043619f, 0.999048f}
 };
 
 struct tf_tower_world_state

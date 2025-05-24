@@ -49,7 +49,7 @@ BossBoundaryData const boundaries =
 class instance_azjol_nerub : public InstanceMapScript
 {
 public:
-    instance_azjol_nerub() : InstanceMapScript("instance_azjol_nerub", 601) { }
+    instance_azjol_nerub() : InstanceMapScript("instance_azjol_nerub", MAP_AZJOL_NERUB) { }
 
     struct instance_azjol_nerub_InstanceScript : public InstanceScript
     {

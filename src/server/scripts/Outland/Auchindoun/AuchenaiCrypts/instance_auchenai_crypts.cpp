@@ -23,7 +23,7 @@
 class instance_auchenai_crypts : public InstanceMapScript
 {
 public:
-    instance_auchenai_crypts() : InstanceMapScript(ACScriptName, 558) { }
+    instance_auchenai_crypts() : InstanceMapScript(ACScriptName, MAP_AUCHINDOUN_AUCHENAI_CRYPTS) { }
 
     struct instance_auchenai_crypts_InstanceMapScript : public InstanceScript
     {
