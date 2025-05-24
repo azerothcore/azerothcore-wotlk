@@ -16,6 +16,7 @@
  */
 
 #include "CreatureScript.h"
+#include "ScriptedCreature.h"
 #include "SpellInfo.h"
 #include "SpellScript.h"
 #include "SpellScriptLoader.h"
