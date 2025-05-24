@@ -67,7 +67,7 @@ DoorData const doorData[] =
 class instance_karazhan : public InstanceMapScript
 {
 public:
-    instance_karazhan() : InstanceMapScript("instance_karazhan", 532) { }
+    instance_karazhan() : InstanceMapScript("instance_karazhan", MAP_KARAZHAN) { }
 
     InstanceScript* GetInstanceScript(InstanceMap* map) const override
     {

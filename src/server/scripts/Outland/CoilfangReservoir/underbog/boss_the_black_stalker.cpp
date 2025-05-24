@@ -100,7 +100,7 @@ struct boss_the_black_stalker : public BossAI
 
     void JustSummoned(Creature* summon) override
     {
-        if (Unit* target = SelectTarget(SelectTargetMethod::Random, 1))
+        if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 0.0f, false, false))
             summon->AI()->AttackStart(target);
         else if (me->GetVictim())
             summon->AI()->AttackStart(me->GetVictim());

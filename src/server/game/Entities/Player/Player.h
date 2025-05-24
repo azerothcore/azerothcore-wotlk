@@ -1996,6 +1996,7 @@ public:
     void ApplyManaRegenBonus(int32 amount, bool apply);
     void ApplyHealthRegenBonus(int32 amount, bool apply);
     void UpdateManaRegen();
+    void UpdateEnergyRegen();
     void UpdateRuneRegen(RuneType rune);
 
     [[nodiscard]] ObjectGuid GetLootGUID() const { return m_lootGuid; }

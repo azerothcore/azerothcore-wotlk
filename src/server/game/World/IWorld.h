@@ -192,6 +192,7 @@ enum WorldFloatConfigs
     CONFIG_LISTEN_RANGE_SAY,
     CONFIG_LISTEN_RANGE_TEXTEMOTE,
     CONFIG_LISTEN_RANGE_YELL,
+    CONFIG_CREATURE_LEASH_RADIUS,
     CONFIG_CREATURE_FAMILY_FLEE_ASSISTANCE_RADIUS,
     CONFIG_CREATURE_FAMILY_ASSISTANCE_RADIUS,
     CONFIG_CHANCE_OF_GM_SURVEY,
@@ -564,9 +565,6 @@ public:
     [[nodiscard]] virtual float getFloatConfig(WorldFloatConfigs index) const = 0;
     virtual void setIntConfig(WorldIntConfigs index, uint32 value) = 0;
     [[nodiscard]] virtual uint32 getIntConfig(WorldIntConfigs index) const = 0;
-    virtual void setWorldState(uint32 index, uint64 value) = 0;
-    [[nodiscard]] virtual uint64 getWorldState(uint32 index) const = 0;
-    virtual void LoadWorldStates() = 0;
     [[nodiscard]] virtual bool IsPvPRealm() const = 0;
     [[nodiscard]] virtual bool IsFFAPvPRealm() const = 0;
     virtual uint32 GetNextWhoListUpdateDelaySecs() = 0;
