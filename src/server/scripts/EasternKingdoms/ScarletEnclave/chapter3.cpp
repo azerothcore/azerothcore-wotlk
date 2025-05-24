@@ -32,10 +32,10 @@ class spell_q12779_an_end_to_all_things : public SpellScript
 
     SpellCastResult CheckCast()
     {
-            if (Unit* caster = GetCaster())
-                if (caster->FindNearestCreature(NPC_HEARTHGLEN_CRUSADER, 15.0f, true) || caster->FindNearestCreature(NPC_TIRISFAL_CRUSADER, 15.0f, true))
-                    return SPELL_CAST_OK;
-            
+        if (Unit* caster = GetCaster())
+            if (caster->FindNearestCreature(NPC_HEARTHGLEN_CRUSADER, 15.0f, true) || caster->FindNearestCreature(NPC_TIRISFAL_CRUSADER, 15.0f, true))
+                return SPELL_CAST_OK;
+
         return SPELL_FAILED_BAD_TARGETS;
     }
 
