@@ -5112,6 +5112,23 @@ void SpellMgr::LoadSpellInfoCorrections()
         spellInfo->Attributes |= SPELL_ATTR0_ALLOW_ITEM_SPELL_IN_PVP;
     });
 
+    ApplySpellFix({
+        43444, // Explosive Trap (Hex Lord Malacrass)
+        43447, // Freezing Trap (Hex Lord Malacrass)
+        43449, // Snake Trap (Hex Lord Malacrass)
+        45236, // Blaze
+        50745  // Blaze
+        }, [](SpellInfo* spellInfo)
+    {
+        spellInfo->Effects[EFFECT_0].Effect = SPELL_EFFECT_SUMMON_OBJECT_SLOT1;
+    });
+
+    // Siphon Bloodgem
+    ApplySpellFix({ 34367 }, [](SpellInfo* spellInfo)
+    {
+        spellInfo->ChannelInterruptFlags &= ~AURA_INTERRUPT_FLAG_TURNING;
+    });
+
     for (uint32 i = 0; i < GetSpellInfoStoreSize(); ++i)
     {
         SpellInfo* spellInfo = mSpellInfoMap[i];
