@@ -246,7 +246,6 @@ enum LightOfDawnSpells
     SPELL_CAMERA_SHAKE_INIT             = 36455,
     SPELL_CAMERA_SHAKE                  = 39983,
     SPELL_THE_MIGHT_OF_MOGRAINE         = 53642,
-    SPELL_THE_MIGHT_OF_MOGRAINE_2       = 58361,
 
     // Mograine Fight
     SPELL_ANTI_MAGIC_ZONE1              = 52893,
@@ -473,11 +472,60 @@ public:
 
             if (me->IsInCombat() && cr->GetEntry() != NPC_HIGHLORD_TIRION_FORDRING && battleStarted == ENCOUNTER_STATE_FIGHT)
             {
-                Position pos = LightOfDawnFightPos[urand(0, 9)];
-                if (Unit* target = cr->SelectNearbyTarget(nullptr, 10.0f))
-                    if (target->IsCreature())
-                        target->GetMotionMaster()->MoveCharge(pos.GetPositionX(), pos.GetPositionY(), pos.GetPositionZ(), me->GetSpeed(MOVE_RUN));
-                cr->GetMotionMaster()->MoveCharge(pos.GetPositionX(), pos.GetPositionY(), pos.GetPositionZ(), me->GetSpeed(MOVE_RUN));
+                if (cr->GetEntry() >= NPC_RAMPAGING_ABOMINATION && cr->GetEntry() <= NPC_FLESH_BEHEMOTH)
+                {
+                    Unit* target = nullptr;
+                    std::list<Creature*> targetList;
+                    cr->GetCreatureListWithEntryInGrid(targetList, NPC_DEFENDER_OF_THE_LIGHT, 50.0f);
+                    cr->GetCreatureListWithEntryInGrid(targetList, NPC_KORFAX_CHAMPION_OF_THE_LIGHT, 50.0f);
+                    cr->GetCreatureListWithEntryInGrid(targetList, NPC_COMMANDER_ELIGOR_DAWNBRINGER, 50.0f);
+                    cr->GetCreatureListWithEntryInGrid(targetList, NPC_LORD_MAXWELL_TYROSUS, 50.0f);
+                    cr->GetCreatureListWithEntryInGrid(targetList, NPC_LEONID_BARTHALOMEW_THE_REVERED, 50.0f);
+                    cr->GetCreatureListWithEntryInGrid(targetList, NPC_DUKE_NICHOLAS_ZVERENHOFF, 50.0f);
+                    cr->GetCreatureListWithEntryInGrid(targetList, NPC_RAYNE, 50.0f);
+                    cr->GetCreatureListWithEntryInGrid(targetList, NPC_RIMBLAT_EARTHSHATTER, 50.0f);
+                    
+                    if (!targetList.empty())
+                    {
+                        target = targetList.front();
+                        cr->AI()->AttackStart(target);
+                    }
+                    
+                    if (!target)
+                    {
+                        cr->SetReactState(REACT_DEFENSIVE);
+                        cr->m_SightDistance = 10.0f;
+                        cr->m_CombatDistance = 10.0f;
+                    }
+                    
+                    Position pos = LightOfDawnFightPos[urand(0, 9)];
+                    cr->GetMotionMaster()->MoveCharge(pos.GetPositionX(), pos.GetPositionY(), pos.GetPositionZ(), me->GetSpeed(MOVE_RUN));
+                }
+                else
+                {
+                    Unit* target = nullptr;
+                    std::list<Creature*> targetList;
+                    cr->GetCreatureListWithEntryInGrid(targetList, NPC_RAMPAGING_ABOMINATION, 50.0f);
+                    cr->GetCreatureListWithEntryInGrid(targetList, NPC_ACHERUS_GHOUL, 50.0f);
+                    cr->GetCreatureListWithEntryInGrid(targetList, NPC_WARRIOR_OF_THE_FROZEN_WASTES, 50.0f);
+                    cr->GetCreatureListWithEntryInGrid(targetList, NPC_FLESH_BEHEMOTH, 50.0f);
+                    
+                    if (!targetList.empty())
+                    {
+                        target = targetList.front();
+                        cr->AI()->AttackStart(target);
+                    }
+                    
+                    if (!target)
+                    {
+                        cr->SetReactState(REACT_DEFENSIVE);
+                        cr->m_SightDistance = 10.0f;
+                        cr->m_CombatDistance = 10.0f;
+                    }
+                    
+                    Position pos = LightOfDawnFightPos[urand(0, 9)];
+                    cr->GetMotionMaster()->MoveCharge(pos.GetPositionX(), pos.GetPositionY(), pos.GetPositionZ(), me->GetSpeed(MOVE_RUN));
+                }
             }
 
             if (battleStarted == ENCOUNTER_STATE_OUTRO && cr->GetEntry() == NPC_DEFENDER_OF_THE_LIGHT)
@@ -486,6 +534,13 @@ public:
                 cr->SetImmuneToAll(true);
                 cr->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_STATE_READY1H);
                 cr->HandleEmoteCommand(EMOTE_STATE_READY1H);
+            }
+            
+            if (cr->GetEntry() == NPC_DUKE_NICHOLAS_ZVERENHOFF && battleStarted == ENCOUNTER_STATE_OUTRO)
+            {
+                cr->SetReactState(REACT_PASSIVE);
+                cr->SetImmuneToAll(true);
+                cr->GetMotionMaster()->MovePoint(0, DukeNicholasPos);
             }
         }
 
@@ -623,39 +678,6 @@ public:
 
         void UpdateAI(uint32 diff) override
         {
-            // Apply Might of Mograine as an emanating aura during fight
-            if (battleStarted == ENCOUNTER_STATE_FIGHT)
-            {
-                Map::PlayerList const& players = me->GetMap()->GetPlayers();
-                for (Map::PlayerList::const_iterator itr = players.begin(); itr != players.end(); ++itr)
-                {
-                    if (Player* player = itr->GetSource())
-                    {
-                        // Check if player is in the right phase and within range
-                        if (player->GetPhaseMask() & 128 && me->IsWithinDistInMap(player, 100.0f))
-                        {
-                            // Apply buffs if not present (including for players who just revived)
-                            if (!player->HasAura(SPELL_THE_MIGHT_OF_MOGRAINE))
-                            {
-                                me->CastSpell(player, SPELL_THE_MIGHT_OF_MOGRAINE, true);
-                            }
-                            if (!player->HasAura(SPELL_THE_MIGHT_OF_MOGRAINE_2))
-                            {
-                                me->CastSpell(player, SPELL_THE_MIGHT_OF_MOGRAINE_2, true);
-                            }
-                        }
-                        else
-                        {
-                            // Remove buffs if player is out of range or wrong phase
-                            if (player->HasAura(SPELL_THE_MIGHT_OF_MOGRAINE))
-                                player->RemoveAurasDueToSpell(SPELL_THE_MIGHT_OF_MOGRAINE);
-                            if (player->HasAura(SPELL_THE_MIGHT_OF_MOGRAINE_2))
-                                player->RemoveAurasDueToSpell(SPELL_THE_MIGHT_OF_MOGRAINE_2);
-                        }
-                    }
-                }
-            }
-
             events.Update(diff);
             uint32 eventId = events.ExecuteEvent();
 
@@ -683,7 +705,7 @@ public:
                     SendUpdateWorldState(WORLD_STATE_BATTLE_FOR_LIGHTS_HOPE_COUNTDOWN_ENABLE, 0);
                     SendUpdateWorldState(WORLD_STATE_BATTLE_FOR_LIGHTS_HOPE_EVENT_BEGIN_ENABLE, 1);
                     
-                    // Initial application of Might of Mograine buffs
+                    // Ensure Might of Mograine buff is applied/reapplied on battle start
                     Map::PlayerList const& players = me->GetMap()->GetPlayers();
                     for (Map::PlayerList::const_iterator itr = players.begin(); itr != players.end(); ++itr)
                     {
@@ -691,8 +713,10 @@ public:
                         {
                             if (player->GetPhaseMask() & 128 && me->IsWithinDistInMap(player, 100.0f))
                             {
-                                me->CastSpell(player, SPELL_THE_MIGHT_OF_MOGRAINE, true);
-                                me->CastSpell(player, SPELL_THE_MIGHT_OF_MOGRAINE_2, true);
+                                if (!player->HasAura(SPELL_THE_MIGHT_OF_MOGRAINE))
+                                {
+                                    me->CastSpell(player, SPELL_THE_MIGHT_OF_MOGRAINE, true);
+                                }
                             }
                         }
                     }
@@ -736,13 +760,28 @@ public:
                         me->SetWalk(false);
                         me->GetMotionMaster()->MovePoint(1, pos.GetPositionX(), pos.GetPositionY(), pos.GetPositionZ(), true, true);
                         me->CastSpell(me, SPELL_THE_MIGHT_OF_MOGRAINE, true);
-                        me->CastSpell(me, SPELL_THE_MIGHT_OF_MOGRAINE_2, true);
                         break;
                     }
                 case EVENT_START_COUNTDOWN_14:
                 {
                     me->SetImmuneToAll(false);
                     me->SummonCreatureGroup(5);
+                    
+                    // Check and reapply buff one more time when combat actually starts
+                    Map::PlayerList const& combatPlayers = me->GetMap()->GetPlayers();
+                    for (Map::PlayerList::const_iterator itr = combatPlayers.begin(); itr != combatPlayers.end(); ++itr)
+                    {
+                        if (Player* player = itr->GetSource())
+                        {
+                            if (player->GetPhaseMask() & 128 && me->IsWithinDistInMap(player, 100.0f))
+                            {
+                                if (!player->HasAura(SPELL_THE_MIGHT_OF_MOGRAINE))
+                                {
+                                    me->CastSpell(player, SPELL_THE_MIGHT_OF_MOGRAINE, true);
+                                }
+                            }
+                        }
+                    }
                     return;
                 }
                 case EVENT_FINISH_FIGHT_1:
@@ -818,14 +857,12 @@ public:
                     if (Creature* tirion = GetEntryFromSummons(NPC_HIGHLORD_TIRION_FORDRING))
                         tirion->AI()->Talk(SAY_LIGHT_OF_DAWN26);
                     
-                    // Remove Might of Mograine buffs from all players when fight ends
                     Map::PlayerList const& players = me->GetMap()->GetPlayers();
                     for (Map::PlayerList::const_iterator itr = players.begin(); itr != players.end(); ++itr)
                     {
                         if (Player* player = itr->GetSource())
                         {
                             player->RemoveAurasDueToSpell(SPELL_THE_MIGHT_OF_MOGRAINE);
-                            player->RemoveAurasDueToSpell(SPELL_THE_MIGHT_OF_MOGRAINE_2);
                         }
                     }
                     break;
