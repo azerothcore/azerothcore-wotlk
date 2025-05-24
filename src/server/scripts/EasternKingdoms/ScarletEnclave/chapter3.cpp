@@ -19,18 +19,39 @@
 #include "SpellScript.h"
 #include "SpellScriptLoader.h"
 
+enum DevourHumanoid
+{
+    NPC_HEARTHGLEN_CRUSADER = 29102,
+    NPC_TIRISFAL_CRUSADER   = 29103
+};
+
+// 53110 - Devour Humanoid
 class spell_q12779_an_end_to_all_things : public SpellScript
 {
     PrepareSpellScript(spell_q12779_an_end_to_all_things);
 
+    SpellCastResult CheckCast()
+    {
+            if (Unit* caster = GetCaster())
+                if (caster->FindNearestCreature(NPC_HEARTHGLEN_CRUSADER, 15.0f, true) || caster->FindNearestCreature(NPC_TIRISFAL_CRUSADER, 15.0f, true))
+                    return SPELL_CAST_OK;
+            
+        return SPELL_FAILED_BAD_TARGETS;
+    }
+
     void HandleScriptEffect(SpellEffIndex /*effIndex*/)
     {
-        if (GetHitUnit())
-            GetHitUnit()->CastSpell(GetCaster(), GetEffectValue(), true);
+        if (Creature* c = GetHitUnit()->ToCreature())
+            if (Unit* caster = GetCaster())
+            {
+                c->AI()->AttackStart(caster);
+                c->CastSpell(caster, GetEffectValue(), true); // 53111
+            }
     }
 
     void Register() override
     {
+        OnCheckCast += SpellCheckCastFn(spell_q12779_an_end_to_all_things::CheckCast);
         OnEffectHitTarget += SpellEffectFn(spell_q12779_an_end_to_all_things::HandleScriptEffect, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
     }
 };
