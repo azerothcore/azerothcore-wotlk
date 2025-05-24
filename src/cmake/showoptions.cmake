@@ -156,6 +156,12 @@ if(WITH_STRICT_DATABASE_TYPE_CHECKS)
   add_definitions(-DACORE_STRICT_DATABASE_TYPE_CHECKS)
 endif()
 
+if(BUILD_VOICECHAT)
+  message("* Build VoiceChat                 : Yes")
+else()
+  message("* Build VoiceChat                 : No  (Default)")
+endif()
+
 if(WITHOUT_METRICS)
   message("")
   message(" *** WITHOUT_METRICS - WARNING!")

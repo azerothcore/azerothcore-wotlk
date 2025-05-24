@@ -4556,6 +4556,48 @@ Respawn.DynamicMinimumGameObject = 10
 #
 ###################################################################################################
 
+###################################################################################################################
+# VOICE CHAT CONFIG
+#
+#    VoiceChat.Enabled
+#         Enable Voice Chat
+#         Default: 0 - off
+#                  1 - on
+#
+#    VoiceChat.ServerPort
+#         TCP port that world server should use to connect to voice chat server
+#         Default: 3725
+#
+#    VoiceChat.ServerAddress
+#         IP that world server should use to connect to voice chat server
+#         Default: 127.0.0.1
+#
+#    VoiceChat.VoicePort
+#         UDP port that game client should use to connect to voice chat server, should be available for client
+#         Default: 3724
+#
+#    VoiceChat.VoiceAddress
+#         IP that game client should use to connect to voice chat server, should be available for client
+#         Default: 127.0.0.1
+#
+#    VoiceChat.MaxConnectAttempts
+#         Maximum attempts to connect/reconnect to voice chat server
+#         Default: -1 (infinite)
+#                   0 (disabled)
+#                   1+ (limited attempts)
+#
+###################################################################################################################
+
+VoiceChat.Enabled = 0
+VoiceChat.ServerPort = 3725
+VoiceChat.ServerAddress = 127.0.0.1
+VoiceChat.VoicePort = 3724
+VoiceChat.VoiceAddress = 127.0.0.1
+VoiceChat.MaxConnectAttempts = -1
+
+#
+###################################################################################################
+
 ###################################################################################################
 #                                                                                                 #
 # GAME SETTINGS END                                                                               #
