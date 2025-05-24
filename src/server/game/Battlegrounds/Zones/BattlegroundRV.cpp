@@ -96,7 +96,7 @@ void BattlegroundRV::PostUpdateImpl(uint32 diff)
                     if (player->GetPositionZ() < 27.0f)
                         TeleportUnitToNewZ(player, 28.28f, true);
 
-                    for (uint8 i = SUMMON_SLOT_TOTEM; i < MAX_TOTEM_SLOT; ++i)
+                    for (uint8 i = SUMMON_SLOT_TOTEM_FIRE; i < MAX_TOTEM_SLOT; ++i)
                         if (player->m_SummonSlot[i])
                             if (Creature* totem = GetBgMap()->GetCreature(player->m_SummonSlot[i]))
                                 if (totem->GetPositionZ() < 28.0f)
