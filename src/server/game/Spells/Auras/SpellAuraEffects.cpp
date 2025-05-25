@@ -16,6 +16,7 @@
  */
 
 #include "SpellAuraEffects.h"
+#include "AreaDefines.h"
 #include "BattlefieldMgr.h"
 #include "Battleground.h"
 #include "CellImpl.h"
@@ -2018,7 +2019,7 @@ void AuraEffect::HandleAuraModShapeshift(AuraApplication const* aurApp, uint8 mo
         if (modelid > 0)
         {
             bool allow = true;
-            if (target->getTransForm() && !(target->GetMapId() == 560 /*The Escape From Durnholde*/))
+            if (target->getTransForm() && !(target->GetMapId() == MAP_THE_ESCAPE_FROM_DURNHOLDE))
                 if (SpellInfo const* transformSpellInfo = sSpellMgr->GetSpellInfo(target->getTransForm()))
                     if (transformSpellInfo->HasAttribute(SPELL_ATTR0_NO_IMMUNITIES) || !transformSpellInfo->IsPositive())
                         allow = false;
@@ -3678,13 +3679,6 @@ void AuraEffect::HandleAuraControlVehicle(AuraApplication const* aurApp, uint8 m
     }
     else
     {
-        if (GetId() == 53111) // Devour Humanoid
-        {
-            Unit::Kill(target, caster);
-            if (caster->IsCreature())
-                caster->ToCreature()->RemoveCorpse();
-        }
-
         caster->_ExitVehicle();
         // some SPELL_AURA_CONTROL_VEHICLE auras have a dummy effect on the player - remove them
         caster->RemoveAurasDueToSpell(GetId());

@@ -32,6 +32,7 @@
 #include "UnitAI.h"
 #include "World.h"
 #include "WorldSessionMgr.h"
+#include "WorldState.h"
 #include "WorldStatePackets.h"
 #include <time.h>
 
@@ -156,7 +157,7 @@ bool GameEventMgr::StartEvent(uint16 eventId, bool overwrite)
         auto itr = _gameEventSeasonalQuestsMap.find(eventId);
         if (itr != _gameEventSeasonalQuestsMap.end() && !itr->second.empty())
         {
-            sWorld->setWorldState(eventId, GameTime::GetGameTime().count());
+            sWorldState->setWorldState(eventId, GameTime::GetGameTime().count());
         }
 
         return false;
@@ -198,7 +199,7 @@ void GameEventMgr::StopEvent(uint16 eventId, bool overwrite)
     UnApplyEvent(eventId);
 
      // When event is stopped, clean up its worldstate
-    sWorld->setWorldState(eventId, 0);
+    sWorldState->setWorldState(eventId, 0);
 
     if (overwrite && !serverwide_evt)
     {
@@ -1205,7 +1206,7 @@ uint32 GameEventMgr::Update()                               // return the next e
         else
         {
             // If event is inactive, periodically clean up its worldstate
-            sWorld->setWorldState(itr, 0);
+            sWorldState->setWorldState(itr, 0);
 
             if (IsActiveEvent(itr))
             {
@@ -1296,7 +1297,7 @@ void GameEventMgr::ApplyNewEvent(uint16 eventId)
 
     // If event's worldstate is 0, it means the event hasn't been started yet. In that case, reset seasonal quests.
     // When event ends (if it expires or if it's stopped via commands) worldstate will be set to 0 again, ready for another seasonal quest reset.
-    if (sWorld->getWorldState(eventId) == 0)
+    if (sWorldState->getWorldState(eventId) == 0)
     {
         sWorld->ResetEventSeasonalQuests(eventId);
     }

@@ -15,6 +15,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "AreaDefines.h"
 #include "CreatureScript.h"
 #include "PetDefines.h"
 #include "Player.h"
@@ -1382,7 +1383,7 @@ class spell_dk_death_grip : public SpellScript
                         target->InterruptNonMeleeSpells(false, 0, false);
                 }
 
-                if (target->GetMapId() == 618) // for Ring of Valor
+                if (target->GetMapId() == MAP_THE_RING_OF_VALOR)
                     gripPos.m_positionZ = std::max(casterZ + 0.2f, 28.5f);
 
                 target->CastSpell(gripPos.GetPositionX(), gripPos.GetPositionY(), gripPos.GetPositionZ(), 57604, true);
