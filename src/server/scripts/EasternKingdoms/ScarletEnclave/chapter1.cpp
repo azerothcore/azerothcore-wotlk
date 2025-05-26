@@ -69,6 +69,7 @@ struct npc_eye_of_acherus : public ScriptedAI
     {
         DoCastSelf(SPELL_ROOT_SELF); // Use SetControlled
         DoCastSelf(SPELL_EYE_OF_ACHERUS_VISUAL);
+        DoCastSelf(SPELL_EYE_OF_ACHERUS_FLIGHT);
         _events.ScheduleEvent(EVENT_ANNOUNCE_LAUNCH_TO_DESTINATION, 400ms);
     }
 
@@ -128,7 +129,6 @@ struct npc_eye_of_acherus : public ScriptedAI
                     Talk(SAY_EYE_UNDER_CONTROL, owner);  // This is wrong, should be when last pointId is reached
                 }
                 me->RemoveAurasDueToSpell(SPELL_ROOT_SELF);
-                DoCastSelf(SPELL_EYE_OF_ACHERUS_FLIGHT);
                 me->RemoveAurasDueToSpell(SPELL_EYE_OF_ACHERUS_FLIGHT_BOOST);
                 break;
             default:
