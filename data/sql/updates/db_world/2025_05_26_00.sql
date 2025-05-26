@@ -1,3 +1,4 @@
+-- DB update 2025_05_24_02 -> 2025_05_26_00
 -- Eye of Acherus
 DELETE FROM `creature_template_spell` WHERE (`CreatureID` = 28511);
 INSERT INTO `creature_template_spell` (`CreatureID`, `Index`, `Spell`, `VerifiedBuild`) VALUES
