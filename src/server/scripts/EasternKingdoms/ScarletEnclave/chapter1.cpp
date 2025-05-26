@@ -126,7 +126,7 @@ struct npc_eye_of_acherus : public ScriptedAI
             case EVENT_GRANT_CONTROL:
                 if (Unit* owner = me->GetCharmerOrOwner())
                 {
-                    Talk(SAY_EYE_UNDER_CONTROL, owner);  // This is wrong, should be when last pointId is reached
+                    Talk(SAY_EYE_UNDER_CONTROL, owner);  // This is wrong, should be when last pointId is reached.
                 }
                 me->RemoveAurasDueToSpell(SPELL_ROOT_SELF);
                 me->RemoveAurasDueToSpell(SPELL_EYE_OF_ACHERUS_FLIGHT_BOOST);
