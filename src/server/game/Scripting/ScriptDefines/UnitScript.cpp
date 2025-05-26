@@ -61,7 +61,7 @@ uint32 ScriptMgr::DealDamage(Unit* AttackerUnit, Unit* pVictim, uint32 damage, D
         auto const& dmg = script->DealDamage(AttackerUnit, pVictim, damage, damagetype);
         if (dmg != damage)
         {
-            return damage;
+            return dmg;
         }
     }
 
