@@ -1,3 +1,4 @@
+-- DB update 2025_05_27_00 -> 2025_05_27_01
 DROP TABLE IF EXISTS `player_shapeshift_model`;
 DROP TABLE IF EXISTS `player_totem_model`;
 
