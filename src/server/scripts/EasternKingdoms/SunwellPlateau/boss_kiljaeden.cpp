@@ -441,13 +441,6 @@ struct boss_kiljaeden : public BossAI
             DoCastRandomTarget(SPELL_LEGION_LIGHTNING, 0, 40.0f);
         }, _phase == PHASE_SACRIFICE ? 15s : 30s);
 
-        /* Phase names for reference
-        PHASE_DECEIVERS                 = 1,
-        PHASE_NORMAL                    = 2,
-        PHASE_DARKNESS                  = 3,
-        PHASE_ARMAGEDDON                = 4,
-        PHASE_SACRIFICE                 = 5,
-        */
         std::chrono::seconds fireBloomTimer = 20s;
         if (_phase == PHASE_DARKNESS || _phase == PHASE_ARMAGEDDON)
         {
