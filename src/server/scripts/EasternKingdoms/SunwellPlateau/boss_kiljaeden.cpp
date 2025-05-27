@@ -1058,6 +1058,9 @@ class spell_kiljaeden_darkness_aura : public AuraScript
         if (GetUnitOwner()->IsCreature())
             GetUnitOwner()->ToCreature()->AI()->DoAction(ACTION_NO_KILL_TALK);
 
+        if (GetTargetApplication()->GetRemoveMode() == AURA_REMOVE_BY_DEATH)
+            return;
+
         GetUnitOwner()->CastSpell(GetUnitOwner(), SPELL_DARKNESS_OF_A_THOUSAND_SOULS_DAMAGE, true);
     }
 
