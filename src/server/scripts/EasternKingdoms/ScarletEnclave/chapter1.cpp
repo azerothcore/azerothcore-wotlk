@@ -62,14 +62,14 @@ struct npc_eye_of_acherus : public ScriptedAI
 {
     npc_eye_of_acherus(Creature* creature) : ScriptedAI(creature)
     {
-        creature->SetDisplayFromModel(0);
         creature->SetReactState(REACT_PASSIVE);
     }
 
     void InitializeAI() override
     {
-        DoCastSelf(SPELL_ROOT_SELF);
+        DoCastSelf(SPELL_ROOT_SELF); // Use SetControlled
         DoCastSelf(SPELL_EYE_OF_ACHERUS_VISUAL);
+        DoCastSelf(SPELL_EYE_OF_ACHERUS_FLIGHT);
         _events.ScheduleEvent(EVENT_ANNOUNCE_LAUNCH_TO_DESTINATION, 400ms);
     }
 
@@ -126,10 +126,9 @@ struct npc_eye_of_acherus : public ScriptedAI
             case EVENT_GRANT_CONTROL:
                 if (Unit* owner = me->GetCharmerOrOwner())
                 {
-                    Talk(SAY_EYE_UNDER_CONTROL, owner);
+                    Talk(SAY_EYE_UNDER_CONTROL, owner);  // This is wrong, should be when last pointId is reached.
                 }
                 me->RemoveAurasDueToSpell(SPELL_ROOT_SELF);
-                DoCastSelf(SPELL_EYE_OF_ACHERUS_FLIGHT);
                 me->RemoveAurasDueToSpell(SPELL_EYE_OF_ACHERUS_FLIGHT_BOOST);
                 break;
             default:
@@ -159,28 +158,58 @@ private:
 
 enum DeathComesFromOnHigh
 {
-    SUMMON_GHOULS_ON_SCARLET_CRUSADE = 54522
+    SPELL_CALL_OF_THE_DEAD = 51900
 };
 
+// 51904 - Summon Ghouls On Scarlet Crusade
 class spell_q12641_death_comes_from_on_high_summon_ghouls : public SpellScript
 {
     PrepareSpellScript(spell_q12641_death_comes_from_on_high_summon_ghouls);
 
     bool Validate(SpellInfo const* /*spellInfo*/) override
     {
-        return ValidateSpellInfo({ SUMMON_GHOULS_ON_SCARLET_CRUSADE });
+        return ValidateSpellInfo({ SPELL_CALL_OF_THE_DEAD });
     }
 
     void HandleScriptEffect(SpellEffIndex effIndex)
     {
         PreventHitEffect(effIndex);
         if (Unit* target = GetHitUnit())
-            GetCaster()->CastSpell(target->GetPositionX(), target->GetPositionY(), target->GetPositionZ(), SUMMON_GHOULS_ON_SCARLET_CRUSADE, true);
+            target->CastSpell(target, SPELL_CALL_OF_THE_DEAD, true);
     }
 
     void Register() override
     {
         OnEffectHitTarget += SpellEffectFn(spell_q12641_death_comes_from_on_high_summon_ghouls::HandleScriptEffect, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
+    }
+};
+
+// 52694 - Recall Eye of Acherus
+class spell_q12641_death_comes_from_on_high_recall_eye : public SpellScript
+{
+    PrepareSpellScript(spell_q12641_death_comes_from_on_high_recall_eye);
+
+    bool Validate(SpellInfo const* /*spellInfo*/) override
+    {
+        return ValidateSpellInfo({ SPELL_THE_EYE_OF_ACHERUS });
+    }
+
+    void HandleScriptEffect(SpellEffIndex effIndex)
+    {
+        PreventHitEffect(effIndex);
+        Unit* caster = GetCaster();
+        Unit* owner = caster->GetCharmerOrOwner();
+
+        if (!caster || !owner)
+            return;
+
+        if (owner->HasAura(SPELL_THE_EYE_OF_ACHERUS))
+            owner->RemoveAurasDueToSpell(SPELL_THE_EYE_OF_ACHERUS);
+    }
+
+    void Register() override
+    {
+        OnEffectHitTarget += SpellEffectFn(spell_q12641_death_comes_from_on_high_recall_eye::HandleScriptEffect, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
     }
 };
 
@@ -1302,6 +1331,7 @@ void AddSC_the_scarlet_enclave_c1()
     // Ours
     RegisterCreatureAI(npc_eye_of_acherus);
     RegisterSpellScript(spell_q12641_death_comes_from_on_high_summon_ghouls);
+    RegisterSpellScript(spell_q12641_death_comes_from_on_high_recall_eye);
     new npc_death_knight_initiate();
     RegisterSpellScript(spell_item_gift_of_the_harvester);
     RegisterSpellScript(spell_q12698_the_gift_that_keeps_on_giving);
