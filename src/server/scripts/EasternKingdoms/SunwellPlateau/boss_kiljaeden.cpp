@@ -1055,6 +1055,9 @@ class spell_kiljaeden_darkness_aura : public AuraScript
 
     void HandleRemove(AuraEffect const*  /*aurEff*/, AuraEffectHandleModes /*mode*/)
     {
+        if (GetTargetApplication()->GetRemoveMode() != AURA_REMOVE_BY_EXPIRE)
+            return;
+
         if (GetUnitOwner()->IsCreature())
             GetUnitOwner()->ToCreature()->AI()->DoAction(ACTION_NO_KILL_TALK);
 
