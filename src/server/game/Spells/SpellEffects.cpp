@@ -3620,7 +3620,12 @@ void Spell::EffectWeaponDmg(SpellEffIndex effIndex)
     }
     else
     {
-        weaponDamage = m_caster->CalculateDamage(m_attackType, normalized, true);
+        //Abilities that deal magic damage based on weapon percent damage interact with percent damage modifiers incorrectly in CalculateDamage()
+        //This is the lowest risk way to fix this bug, but if someone who understands CalculateDamage() very well wants to see why this happens that would be better
+        bool isPhysical = true;
+        if (const SpellInfo* spellInfo = GetSpellInfo())
+            isPhysical = spellInfo->GetSchoolMask() == SpellSchoolMask::SPELL_SCHOOL_MASK_NORMAL;
+        weaponDamage = m_caster->CalculateDamage(m_attackType, normalized, isPhysical);
     }
 
     // Sequence is important
