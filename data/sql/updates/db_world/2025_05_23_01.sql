@@ -1,3 +1,4 @@
+-- DB update 2025_05_23_00 -> 2025_05_23_01
 
 -- Mine Car
 UPDATE `creature_template` SET `AIName` = 'SmartAI' WHERE `entry` = 28821;
