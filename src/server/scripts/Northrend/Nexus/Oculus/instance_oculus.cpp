@@ -27,7 +27,7 @@
 class instance_oculus : public InstanceMapScript
 {
 public:
-    instance_oculus() : InstanceMapScript("instance_oculus", 578) { }
+    instance_oculus() : InstanceMapScript("instance_oculus", MAP_THE_OCULUS) { }
 
     InstanceScript* GetInstanceScript(InstanceMap* pMap) const override
     {

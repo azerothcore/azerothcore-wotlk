@@ -30,7 +30,7 @@ BossBoundaryData const boundaries =
 class instance_forge_of_souls : public InstanceMapScript
 {
 public:
-    instance_forge_of_souls() : InstanceMapScript("instance_forge_of_souls", 632) { }
+    instance_forge_of_souls() : InstanceMapScript("instance_forge_of_souls", MAP_THE_FORGE_OF_SOULS) { }
 
     InstanceScript* GetInstanceScript(InstanceMap* map) const override
     {
