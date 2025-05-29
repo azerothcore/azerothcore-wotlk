@@ -1,3 +1,4 @@
+-- DB update 2025_05_27_02 -> 2025_05_29_00
 -- Adds SAI to the missing NPCs and SAI Event to execute the Timed Actionlist
 UPDATE `creature_template` SET `AIName` = "SmartAI" WHERE `entry` IN (23853, 23852, 23854, 23855, 23845);
 
