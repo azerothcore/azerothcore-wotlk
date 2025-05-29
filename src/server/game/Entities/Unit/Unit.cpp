@@ -13194,7 +13194,8 @@ uint32 Unit::MeleeDamageBonusDone(Unit* victim, uint32 pdamage, WeaponAttackType
             if (!spellProto || (spellProto->ValidateAttribute6SpellDamageMods(this, *i, false) &&
                 sScriptMgr->IsNeedModMeleeDamagePercent(this, *i, DoneTotalMod, spellProto)))
             {
-                if (((*i)->GetMiscValue() & damageSchoolMask))
+                int32 bonusSchoolMask = (*i)->GetMiscValue();
+                if (!(bonusSchoolMask & SPELL_SCHOOL_MASK_NORMAL) && (bonusSchoolMask & damageSchoolMask))
                 {
                     if ((*i)->GetSpellInfo()->EquippedItemClass == -1)
                         AddPct(DoneTotalMod, (*i)->GetAmount());
