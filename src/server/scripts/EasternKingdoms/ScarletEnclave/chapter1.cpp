@@ -39,7 +39,6 @@ enum EyeOfAcherusMisc
     SPELL_THE_EYE_OF_ACHERUS = 51852,
 };
 
-
 enum DeathComesFromOnHigh
 {
     SPELL_CALL_OF_THE_DEAD = 51900
