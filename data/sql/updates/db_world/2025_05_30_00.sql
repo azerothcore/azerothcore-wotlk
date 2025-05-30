@@ -1,3 +1,4 @@
+-- DB update 2025_05_29_01 -> 2025_05_30_00
 
 -- Death Knight Champions
 DELETE FROM `smart_scripts` WHERE (`entryorguid` = 29106) AND (`source_type` = 0) AND (`id` IN (4));
