@@ -1,4 +1,7 @@
 
+-- Remove Flight flag
+UPDATE `creature_template_movement` SET `Flight` = 0 WHERE (`CreatureId` = 28511);
+
 -- Add Waypoint
 DELETE FROM `waypoint_data` WHERE `id` IN ("2851100");
 INSERT INTO `waypoint_data` (`id`, `point`, `position_x`, `position_y`, `position_z`, `orientation`, `delay`, `move_type`, `action`, `action_chance`, `wpguid`) VALUES
