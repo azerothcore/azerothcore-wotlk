@@ -262,14 +262,10 @@ public:
     static bool HandleGroupReviveCommand(ChatHandler* handler, Optional<PlayerIdentifier> target)
     {
         if (!target)
-        {
             target = PlayerIdentifier::FromTargetOrSelf(handler);
-        }
 
         if (!target)
-        {
             return false;
-        }
 
         Player* targetPlayer = target->GetConnectedPlayer();
         Group* group = targetPlayer->GetGroup();
