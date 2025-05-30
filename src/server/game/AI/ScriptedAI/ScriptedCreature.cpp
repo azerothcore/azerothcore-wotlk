@@ -251,6 +251,20 @@ void ScriptedAI::DoStopAttack()
         me->AttackStop();
 }
 
+void ScriptedAI::DoRewardPlayersInArea()
+{
+    me->GetMap()->DoForAllPlayers([&](Player* player)
+    {
+        if (player->GetFaction() != me->GetCreatureTemplate()->faction && !player->IsGameMaster())
+        {
+            if (player->GetAreaId() == me->GetAreaId())
+            {
+                player->KilledMonsterCredit(me->GetEntry());
+            }
+        }
+    });
+}
+
 void ScriptedAI::DoCastSpell(Unit* target, SpellInfo const* spellInfo, bool triggered)
 {
     if (!target || me->IsNonMeleeSpellCast(false))
