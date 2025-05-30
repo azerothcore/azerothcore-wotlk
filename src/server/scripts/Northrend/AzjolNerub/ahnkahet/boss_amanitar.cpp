@@ -104,7 +104,6 @@ struct boss_amanitar : public BossAI
 {
     boss_amanitar(Creature* creature) : BossAI(creature, DATA_AMANITAR), mushroomsSummoned(false)
     {
-        creature->SetMeleeDamageSchool(SPELL_SCHOOL_NATURE);
     }
 
     void Reset() override
