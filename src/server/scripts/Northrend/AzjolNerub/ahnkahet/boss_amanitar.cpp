@@ -102,9 +102,7 @@ Position const MushroomPositions[MAX_MUSHROOMS_COUNT] =
 
 struct boss_amanitar : public BossAI
 {
-    boss_amanitar(Creature* creature) : BossAI(creature, DATA_AMANITAR), mushroomsSummoned(false)
-    {
-    }
+    boss_amanitar(Creature* creature) : BossAI(creature, DATA_AMANITAR), mushroomsSummoned(false) { }
 
     void Reset() override
     {
