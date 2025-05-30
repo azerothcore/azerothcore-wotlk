@@ -1,3 +1,4 @@
+-- DB update 2025_05_30_04 -> 2025_05_30_05
 --
 DELETE FROM `command` WHERE `name`IN('debug boundary');
 INSERT INTO `command` (`name`, `security`, `help`) VALUES
