@@ -1,3 +1,4 @@
+-- DB update 2025_05_30_07 -> 2025_05_30_08
 
 -- Edit Spell Timers
 UPDATE `creature_template` SET `AIName` = 'SmartAI' WHERE `entry` = 25708;
