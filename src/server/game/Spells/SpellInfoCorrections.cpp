@@ -5111,7 +5111,7 @@ void SpellMgr::LoadSpellInfoCorrections()
             spellInfo->Effects[EFFECT_0].ApplyAuraName = SPELL_AURA_MOD_INCREASE_FLIGHT_SPEED;
             spellInfo->Effects[EFFECT_0].TargetA = SpellImplicitTargetInfo(TARGET_UNIT_CASTER);
         });
-    
+
     // Shattering Throw
     ApplySpellFix({ 64382 }, [](SpellInfo* spellInfo)
     {
