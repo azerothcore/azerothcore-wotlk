@@ -280,17 +280,12 @@ public:
         for (GroupReference* it = group->GetFirstMember(); it != nullptr; it = it->next())
         {
             Player* target = it->GetSource();
-            if (target && target->GetSession())
+            if (target)
             {
                 target->RemoveAurasDueToSpell(27827); // Spirit of Redemption
                 target->ResurrectPlayer(!AccountMgr::IsPlayerAccount(target->GetSession()->GetSecurity()) ? 1.0f : 0.5f);
                 target->SpawnCorpseBones();
                 target->SaveToDB(false, false);
-            }
-            else if (target)
-            {
-                CharacterDatabaseTransaction trans(nullptr);
-                Player::OfflineResurrect(it->GetSource()->GetGUID(), trans);
             }
         }
 
