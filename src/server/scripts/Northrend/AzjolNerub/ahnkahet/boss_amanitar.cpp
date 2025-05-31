@@ -125,14 +125,10 @@ struct boss_amanitar : public BossAI
             }
         }, 40s, 60s);
 
-        scheduler.Schedule(1s, [this](TaskContext context) {
-            if (!mushroomsSummoned)
-            {
-                mushroomsSummoned = true;
-                for (Position pos : MushroomPositions)
-                    SummonMushroom(pos);
-            }
+        for (Position pos : MushroomPositions)
+            SummonMushroom(pos);
 
+        scheduler.Schedule(25s, 32s, [this](TaskContext context) {
             if (SelectTarget(SelectTargetMethod::Random, 0, 0.0f, true, true, -SPELL_MINI))
             {
                 DoCastSelf(SPELL_REMOVE_MUSHROOM_POWER, true);
@@ -146,7 +142,7 @@ struct boss_amanitar : public BossAI
             }
             else
             {
-                context.Repeat();
+                context.Repeat(30s, 45s);
             }
         });
     }
@@ -279,9 +275,7 @@ class spell_amanitar_remove_mushroom_power : public AuraScript
     void HandleApply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
     {
         if (Unit* target = GetTarget())
-        {
             target->RemoveAurasDueToSpell(SPELL_HEALTHY_MUSHROOM_POTENT_FUNGUS);
-        }
     }
 
     void Register() override
