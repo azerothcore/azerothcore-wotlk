@@ -464,7 +464,7 @@ void Unit::Update(uint32 p_time)
             {
                 ClearInCombat();
 
-                for (uint8 i = SUMMON_SLOT_TOTEM; i != MAX_TOTEM_SLOT; ++i)
+                for (uint8 i = SUMMON_SLOT_TOTEM_FIRE; i != MAX_TOTEM_SLOT; ++i)
                     if (ObjectGuid totemGuid = m_SummonSlot[i])
                         if (Unit* totem = ObjectAccessor::GetCreature(*this, m_SummonSlot[i]))
                             totem->ClearInCombat();
