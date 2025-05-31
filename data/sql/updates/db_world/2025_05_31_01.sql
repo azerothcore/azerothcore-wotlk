@@ -1,3 +1,4 @@
+-- DB update 2025_05_31_00 -> 2025_05_31_01
 
 -- Remove Flight flag
 UPDATE `creature_template_movement` SET `Flight` = 0 WHERE (`CreatureId` = 28511);
