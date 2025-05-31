@@ -138,11 +138,11 @@ struct boss_amanitar : public BossAI
                     DoCastAOE(SPELL_REMOVE_MUSHROOM_POWER, true);
                 });
 
-                context.Repeat(30s);
+                context.Repeat(30s, 45s);
             }
             else
             {
-                context.Repeat(30s, 45s);
+                context.Repeat(1s);
             }
         });
     }
