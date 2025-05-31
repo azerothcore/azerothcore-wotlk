@@ -218,7 +218,11 @@ public:
                     {
                         EncounterStatus = IN_PROGRESS;
                         if (Creature* c = instance->GetCreature(NPC_SinclariGUID))
+                        {
+                            c->RemoveNpcFlag(UNIT_NPC_FLAG_GOSSIP);
                             c->AI()->Talk(SAY_SINCLARI_LEAVING);
+                            /// @todo: Missing orientation for Sinclari's movement and "interaction" animation with the nearby crystal.
+                        }
                         events.RescheduleEvent(EVENT_GUARDS_FALL_BACK, 4s);
                     }
                     break;
@@ -451,6 +455,7 @@ public:
                     {
                         if (Creature* c = instance->GetCreature(NPC_SinclariGUID))
                         {
+                            c->SetNpcFlag(UNIT_NPC_FLAG_GOSSIP);
                             c->AI()->Talk(SAY_SINCLARI_DOOR_LOCK);
                         }
                         if (Creature* c = instance->GetCreature(NPC_DoorSealGUID))
@@ -568,7 +573,13 @@ public:
                 }
 
             // reset positions of Sinclari and Guards
-            if (Creature* c = instance->GetCreature(NPC_SinclariGUID)) { c->DespawnOrUnsummon(); c->SetRespawnTime(3); }
+            if (Creature* c = instance->GetCreature(NPC_SinclariGUID))
+            {
+                c->SetNpcFlag(UNIT_NPC_FLAG_GOSSIP);
+                c->DespawnOrUnsummon();
+                c->SetRespawnTime(3);
+            }
+
             for (uint8 i = 0; i < 4; ++i)
                 if (Creature* c = instance->GetCreature(NPC_GuardGUID[i]))
                 {
