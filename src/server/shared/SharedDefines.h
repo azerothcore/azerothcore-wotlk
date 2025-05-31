@@ -3315,13 +3315,13 @@ enum SummonType
 
 enum SummonSlot
 {
-    SUMMON_SLOT_PET                 = 0,
-    SUMMON_SLOT_TOTEM_FIRE          = 1,
-    SUMMON_SLOT_TOTEM_EARTH         = 2,
-    SUMMON_SLOT_TOTEM_WATER         = 3,
-    SUMMON_SLOT_TOTEM_AIR           = 4,
-    SUMMON_SLOT_MINIPET             = 5,
-    SUMMON_SLOT_QUEST               = 6,
+    SUMMON_SLOT_PET = 0,
+    SUMMON_SLOT_TOTEM_FIRE = 1,
+    SUMMON_SLOT_TOTEM_EARTH = 2,
+    SUMMON_SLOT_TOTEM_WATER = 3,
+    SUMMON_SLOT_TOTEM_AIR = 4,
+    SUMMON_SLOT_MINIPET = 5,
+    SUMMON_SLOT_QUEST = 6,
 
     MAX_SUMMON_SLOT
 };
