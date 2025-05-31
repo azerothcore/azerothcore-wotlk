@@ -37,123 +37,6 @@
 enum EyeOfAcherusMisc
 {
     SPELL_THE_EYE_OF_ACHERUS = 51852,
-    SPELL_EYE_OF_ACHERUS_VISUAL = 51892,
-    SPELL_EYE_OF_ACHERUS_FLIGHT_BOOST = 51923,
-    SPELL_EYE_OF_ACHERUS_FLIGHT = 51890,
-    SPELL_ROOT_SELF = 51860,
-
-    EVENT_ANNOUNCE_LAUNCH_TO_DESTINATION = 1,
-    EVENT_UNROOT = 2,
-    EVENT_LAUNCH_TOWARDS_DESTINATION = 3,
-    EVENT_GRANT_CONTROL = 4,
-
-    SAY_LAUNCH_TOWARDS_DESTINATION = 0,
-    SAY_EYE_UNDER_CONTROL = 1,
-
-    POINT_NEW_AVALON = 1,
-
-    EYE_POINT_DESTINATION_0 = 0,
-    EYE_POINT_DESTINATION_1 = 1,
-    EYE_POINT_DESTINATION_2 = 2,
-    EYE_POINT_DESTINATION_3 = 3
-};
-
-struct npc_eye_of_acherus : public ScriptedAI
-{
-    npc_eye_of_acherus(Creature* creature) : ScriptedAI(creature)
-    {
-        creature->SetReactState(REACT_PASSIVE);
-    }
-
-    void InitializeAI() override
-    {
-        DoCastSelf(SPELL_ROOT_SELF); // Use SetControlled
-        DoCastSelf(SPELL_EYE_OF_ACHERUS_VISUAL);
-        DoCastSelf(SPELL_EYE_OF_ACHERUS_FLIGHT);
-        _events.ScheduleEvent(EVENT_ANNOUNCE_LAUNCH_TO_DESTINATION, 400ms);
-    }
-
-    void OnCharmed(bool apply) override
-    {
-        if (!apply)
-        {
-            me->GetCharmerOrOwner()->RemoveAurasDueToSpell(SPELL_THE_EYE_OF_ACHERUS);
-            me->GetCharmerOrOwner()->RemoveAurasDueToSpell(SPELL_EYE_OF_ACHERUS_FLIGHT_BOOST);
-        }
-    }
-
-    void UpdateAI(uint32 diff) override
-    {
-        _events.Update(diff);
-
-        while (uint32 eventId = _events.ExecuteEvent())
-        {
-            switch (eventId)
-            {
-            case EVENT_ANNOUNCE_LAUNCH_TO_DESTINATION:
-                if (Unit* owner = me->GetCharmerOrOwner())
-                {
-                    Talk(SAY_LAUNCH_TOWARDS_DESTINATION, owner);
-                }
-                _events.ScheduleEvent(EVENT_UNROOT, 400ms);
-                break;
-            case EVENT_UNROOT:
-                me->RemoveAurasDueToSpell(SPELL_ROOT_SELF);
-                DoCastSelf(SPELL_EYE_OF_ACHERUS_FLIGHT_BOOST);
-                _events.ScheduleEvent(EVENT_LAUNCH_TOWARDS_DESTINATION, 1s + 200ms);
-                break;
-            case EVENT_LAUNCH_TOWARDS_DESTINATION:
-            {
-                Position const EYE_DESTINATION_1 = { 2361.21f,  -5660.45f,  496.744f, 0.0f };
-                Position const EYE_DESTINATION_2 = { 2341.571f, -5672.797f, 538.3942f, 0.0f };
-                Position const EYE_DESTINATION_3 = { 1957.4f,   -5844.1f,   273.867f, 0.0f };
-                Position const EYE_DESTINATION_4 = { 1758.01f,  -5876.79f,  166.867f, 0.0f };
-
-                Movement::MoveSplineInit init(me);
-                init.SetFly();
-                if (Unit* owner = me->GetCharmerOrOwner())
-                {
-                    init.SetVelocity(owner->GetSpeed(MOVE_RUN));
-                }
-
-                me->GetMotionMaster()->MovePoint(EYE_POINT_DESTINATION_0, EYE_DESTINATION_1);
-                me->GetMotionMaster()->MovePoint(EYE_POINT_DESTINATION_1, EYE_DESTINATION_2);
-                me->GetMotionMaster()->MovePoint(EYE_POINT_DESTINATION_2, EYE_DESTINATION_3);
-                me->GetMotionMaster()->MovePoint(EYE_POINT_DESTINATION_3, EYE_DESTINATION_4);
-                _events.ScheduleEvent(EVENT_GRANT_CONTROL, 22s);
-                break;
-            }
-            case EVENT_GRANT_CONTROL:
-                if (Unit* owner = me->GetCharmerOrOwner())
-                {
-                    Talk(SAY_EYE_UNDER_CONTROL, owner);  // This is wrong, should be when last pointId is reached.
-                }
-                me->RemoveAurasDueToSpell(SPELL_ROOT_SELF);
-                me->RemoveAurasDueToSpell(SPELL_EYE_OF_ACHERUS_FLIGHT_BOOST);
-                break;
-            default:
-                break;
-            }
-        }
-    }
-
-    void MovementInform(uint32 movementType, uint32 pointId) override
-    {
-        if (movementType != POINT_MOTION_TYPE)
-            return;
-
-        switch (pointId)
-        {
-        case POINT_NEW_AVALON:
-            DoCastSelf(SPELL_ROOT_SELF);
-            break;
-        default:
-            break;
-        }
-    }
-
-private:
-    EventMap _events;
 };
 
 enum DeathComesFromOnHigh
@@ -1329,7 +1212,6 @@ class spell_lich_king_whisper : public SpellScript
 void AddSC_the_scarlet_enclave_c1()
 {
     // Ours
-    RegisterCreatureAI(npc_eye_of_acherus);
     RegisterSpellScript(spell_q12641_death_comes_from_on_high_summon_ghouls);
     RegisterSpellScript(spell_q12641_death_comes_from_on_high_recall_eye);
     new npc_death_knight_initiate();
