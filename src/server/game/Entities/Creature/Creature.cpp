@@ -3734,7 +3734,7 @@ uint8 Creature::GetLeashTimer() const
 { // Based on testing on Classic, seems to range from ~11s for low level mobs (1-5) to ~16s for high level mobs (70+)
     uint8 timerOffset = 11;
 
-    uint8 timerModifier = uint8(GetLevel() / 10) - 2;
+    uint8 timerModifier = uint8(GetCreatureTemplate()->minlevel / 10) - 2;
 
     // Formula is likely not quite correct, but better than flat timer
     return std::max<uint8>(timerOffset, timerOffset + timerModifier);
