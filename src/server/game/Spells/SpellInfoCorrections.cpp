@@ -5178,8 +5178,6 @@ void SpellMgr::LoadSpellInfoCorrections()
         43444, // Explosive Trap (Hex Lord Malacrass)
         43447, // Freezing Trap (Hex Lord Malacrass)
         43449, // Snake Trap (Hex Lord Malacrass)
-        45236, // Blaze
-        50745  // Blaze
         }, [](SpellInfo* spellInfo)
     {
         spellInfo->Effects[EFFECT_0].Effect = SPELL_EFFECT_SUMMON_OBJECT_SLOT1;
