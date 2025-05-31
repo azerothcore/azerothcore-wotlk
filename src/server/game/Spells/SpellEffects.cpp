@@ -3342,7 +3342,6 @@ void Spell::EffectWeaponDmg(SpellEffIndex effIndex)
     float totalDamagePercentMod  = 100.0f;                  // applied to final bonus+weapon damage
     int32 spell_bonus = 0;                                  // bonus specific for spell
     bool normalized = false;
-    float weaponDamagePercentMod = 0.0f;
 
     switch (m_spellInfo->SpellFamilyName)
     {
@@ -3533,7 +3532,7 @@ void Spell::EffectWeaponDmg(SpellEffIndex effIndex)
                 // Blood-Caked Strike - Blood-Caked Blade
                 if (m_spellInfo->SpellIconID == 1736)
                 {
-                    weaponDamagePercentMod += std::min(uint32(3), unitTarget->GetDiseasesByCaster(m_caster->GetGUID())) * 12.5f;
+                    AddPct(totalDamagePercentMod, unitTarget->GetDiseasesByCaster(m_caster->GetGUID()) * 50.0f);
                     break;
                 }
                 // Heart Strike
@@ -3557,6 +3556,7 @@ void Spell::EffectWeaponDmg(SpellEffIndex effIndex)
             }
     }
 
+    float weaponDamagePercentMod = 100.0f;
     int32 fixed_bonus = 0;
 
     for (int j = 0; j < MAX_SPELL_EFFECTS; ++j)
@@ -3572,7 +3572,7 @@ void Spell::EffectWeaponDmg(SpellEffIndex effIndex)
                 normalized = true;
                 break;
             case SPELL_EFFECT_WEAPON_PERCENT_DAMAGE:
-                weaponDamagePercentMod += CalculateSpellDamage(j, unitTarget);
+                ApplyPct(weaponDamagePercentMod, CalculateSpellDamage(j, unitTarget));
                 break;
             default:
                 break;                                      // not weapon damage effect, just skip
