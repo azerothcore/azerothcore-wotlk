@@ -115,8 +115,5 @@
         "xutility": "cpp",
         "*.ipp": "cpp",
         "resumable": "cpp"
-    },
-    "deno.enable": true,
-    "deno.path": "deps/deno/bin/deno",
-    "deno.lint": true
+    }
 }
