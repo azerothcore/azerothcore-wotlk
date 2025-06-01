@@ -7641,6 +7641,14 @@ uint32 ObjectMgr::GetXPForLevel(uint8 level) const
     return 0;
 }
 
+uint32 ObjectMgr::GetXPForLevel(Player* player) const
+{
+    uint8 level = player->GetLevel();
+    uint32 xpForNextLevel = GetXPForLevel(level);
+    sScriptMgr->OnPlayerGetXpForLevel(player, level, xpForNextLevel);
+    return xpForNextLevel;
+}
+
 void ObjectMgr::LoadPetNames()
 {
     uint32 oldMSTime = getMSTime();
