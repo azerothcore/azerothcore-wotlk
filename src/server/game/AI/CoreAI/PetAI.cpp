@@ -31,7 +31,7 @@
 
 int32 PetAI::Permissible(Creature const* creature)
 {
-    if (creature->HasUnitTypeMask(UNIT_MASK_CONTROLABLE_GUARDIAN))
+    if (creature->HasUnitTypeMask(UNIT_MASK_CONTROLLABLE_GUARDIAN))
     {
         if (reinterpret_cast<Guardian const*>(creature)->GetOwner()->IsPlayer())
             return PERMIT_BASE_PROACTIVE;
