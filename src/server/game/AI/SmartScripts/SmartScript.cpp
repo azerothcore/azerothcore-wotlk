@@ -2508,7 +2508,7 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
                          std::back_inserter(waypoints), [](uint32 wp) { return wp != 0; });
 
             float distanceToClosest = std::numeric_limits<float>::max();
-            uint32 closestWp;
+            uint32 closestWp = 0;
 
             for (WorldObject* target : targets)
             {
