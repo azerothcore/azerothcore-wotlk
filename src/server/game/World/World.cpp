@@ -794,6 +794,7 @@ void World::LoadConfigSettings(bool reload)
 
     _int_configs[CONFIG_EVENT_ANNOUNCE] = sConfigMgr->GetOption<int32>("Event.Announce", 0);
 
+    _float_configs[CONFIG_CREATURE_LEASH_RADIUS]                  = sConfigMgr->GetOption<float>("CreatureLeashRadius", 30.0f);
     _float_configs[CONFIG_CREATURE_FAMILY_FLEE_ASSISTANCE_RADIUS] = sConfigMgr->GetOption<float>("CreatureFamilyFleeAssistanceRadius", 30.0f);
     _float_configs[CONFIG_CREATURE_FAMILY_ASSISTANCE_RADIUS]      = sConfigMgr->GetOption<float>("CreatureFamilyAssistanceRadius", 10.0f);
     _int_configs[CONFIG_CREATURE_FAMILY_ASSISTANCE_DELAY]         = sConfigMgr->GetOption<int32>("CreatureFamilyAssistanceDelay", 2000);
@@ -1401,6 +1402,12 @@ void World::SetInitialWorldSettings()
 
     LOG_INFO("server.loading", "Loading SpellInfo Custom Attributes...");
     sSpellMgr->LoadSpellInfoCustomAttributes();
+
+    LOG_INFO("server.loading", "Loading Player Totem models...");
+    sObjectMgr->LoadPlayerTotemModels();
+
+    LOG_INFO("server.loading", "Loading Player Shapeshift models...");
+    sObjectMgr->LoadPlayerShapeshiftModels();
 
     LOG_INFO("server.loading", "Loading GameObject Models...");
     LoadGameObjectModelList(_dataPath);

@@ -8840,13 +8840,7 @@ void Player::SendInitWorldStates(uint32 zoneId, uint32 areaId)
                     battlefield->FillInitialWorldStates(packet);
                     break;
                 }
-                [[fallthrough]];
             default:
-                packet.Worldstates.reserve(4);
-                packet.Worldstates.emplace_back(WORLD_STATE_GENERIC_UNK_2, 0);
-                packet.Worldstates.emplace_back(WORLD_STATE_GENERIC_UNK_1, 0);
-                packet.Worldstates.emplace_back(WORLD_STATE_GENERIC_UNK_0, 0);
-                packet.Worldstates.emplace_back(WORLD_STATE_GENERIC_UNK_3, 0);
                 break;
             }
         }

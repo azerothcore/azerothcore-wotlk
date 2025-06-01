@@ -964,7 +964,7 @@ Expansion = 2
 #    ClientCacheVersion
 #        Description: Client cache version for client cache data reset. Use any value different
 #                     from DB and not recently been used to trigger client side cache reset.
-#        Default:     0 - (Use DB value from world DB db_version.cache_id field)
+#        Default:     0 - (Use DB value from world DB version.cache_id field)
 
 ClientCacheVersion = 0
 
@@ -2825,6 +2825,14 @@ Rate.Creature.Aggro = 1
 #                     0  - (Disabled)
 
 CreatureFamilyFleeAssistanceRadius = 30
+
+#
+#    CreatureLeashRadius
+#        Description: Distance (in yards) for default leash due to being too far from pulled position.
+#        Default:     30 - (Enabled)
+#                     0  - (Disabled)
+
+CreatureLeashRadius = 30
 
 #
 #    CreatureFamilyAssistanceRadius
