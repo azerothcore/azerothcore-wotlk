@@ -11686,7 +11686,7 @@ uint32 Unit::SpellDamageBonusDone(Unit* victim, SpellInfo const* spellProto, uin
     int32 DoneTotal = 0;
     float DoneTotalMod = TotalMod ? TotalMod : SpellPctDamageModsDone(victim, spellProto, damagetype);
 
-    // Config : RATE_CREATURE_X_SPELLDAMAGE & Do Not Modify Pet/Guardian/Mind Controled Damage
+    // Config : RATE_CREATURE_X_SPELLDAMAGE & Do Not Modify Pet/Guardian/Mind Controlled Damage
     if (IsCreature() && (!ToCreature()->IsPet() || !ToCreature()->IsGuardian() || !ToCreature()->IsControlledByPlayer()))
         DoneTotalMod *= ToCreature()->GetSpellDamageMod(ToCreature()->GetCreatureTemplate()->rank);
 
@@ -19980,11 +19980,11 @@ void Unit::StopAttackingInvalidTarget()
                 attacker->ToPlayer()->SendAttackSwingCancelAttack();
             }
 
-            for (Unit* controled : attacker->m_Controlled)
+            for (Unit* controlled : attacker->m_Controlled)
             {
-                if (controled->GetVictim() == this && !controled->IsValidAttackTarget(this))
+                if (controlled->GetVictim() == this && !controlled->IsValidAttackTarget(this))
                 {
-                    controled->AttackStop();
+                    controlled->AttackStop();
                 }
             }
 
