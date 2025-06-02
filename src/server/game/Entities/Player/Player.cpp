@@ -393,7 +393,6 @@ Player::Player(WorldSession* session): Unit(true), m_mover(this)
     m_achievementMgr = new AchievementMgr(this);
     m_reputationMgr = new ReputationMgr(this);
 
-    // Ours
     m_NeedToSaveGlyphs = false;
     m_MountBlockId = 0;
     m_realDodge = 0.0f;

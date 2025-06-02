@@ -19,26 +19,7 @@
 #include "GameTime.h"
 #include "Player.h"
 #include "ScriptedCreature.h"
-/* ScriptData
-SDName: Areatrigger_Scripts
-SD%Complete: 100
-SDComment: Scripts for areatriggers
-SDCategory: Areatrigger
-EndScriptData */
 
-/* ContentData
-at_coilfang_waterfall           4591
-at_legion_teleporter            4560 Teleporter TO Invasion Point: Cataclysm
-at_stormwright_shelf            q12741
-at_last_rites                   q12019
-at_sholazar_waygate             q12548
-at_nats_landing                 q11209
-at_bring_your_orphan_to         q910 q910 q1800 q1479 q1687 q1558 q10951 q10952
-at_brewfest
-at_area_52_entrance
-EndContentData */
-
-// Ours
 class AreaTrigger_at_voltarus_middle : public AreaTriggerScript
 {
 public:
@@ -60,7 +41,6 @@ public:
     }
 };
 
-// Theirs
 /*######
 ## at_coilfang_waterfall
 ######*/
@@ -436,10 +416,7 @@ private:
 
 void AddSC_areatrigger_scripts()
 {
-    // Ours
     new AreaTrigger_at_voltarus_middle();
-
-    // Theirs
     new AreaTrigger_at_coilfang_waterfall();
     new AreaTrigger_at_legion_teleporter();
     new AreaTrigger_at_stormwright_shelf();

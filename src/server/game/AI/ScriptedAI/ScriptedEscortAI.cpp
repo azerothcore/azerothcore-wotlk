@@ -15,13 +15,6 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-/* ScriptData
-SDName: Npc_EscortAI
-SD%Complete: 100
-SDComment:
-SDCategory: Npc
-EndScriptData */
-
 #include "ScriptedEscortAI.h"
 #include "Group.h"
 #include "Player.h"
