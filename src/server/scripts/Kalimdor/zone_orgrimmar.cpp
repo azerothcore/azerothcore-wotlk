@@ -210,17 +210,19 @@ public:
 
     bool OnQuestReward(Player* player, Creature* creature, Quest const* quest, uint32 /*item*/) override
     {
-        if (quest->GetQuestId() == QUEST_FOR_THE_HORDE)
+        switch (quest->GetQuestId())
         {
-            if (creature && creature->AI())
-            {
-                creature->AI()->DoAction(ACTION_START_TALKING);
-            }
-        }
-
-        if (quest->GetQuestId() == QUEST_WARCHIEFS_BLESSING)
-        {
-            sLFGMgr->InitializeLockedDungeons(player);
+            case (QUEST_FOR_THE_HORDE):
+                if (creature && creature->AI())
+                {
+                    creature->AI()->DoAction(ACTION_START_TALKING);
+                }
+                break;
+            case (QUEST_WARCHIEFS_BLESSING):
+                sLFGMgr->InitializeLockedDungeons(player);
+                break;
+            default:
+                break;
         }
 
         return true;
