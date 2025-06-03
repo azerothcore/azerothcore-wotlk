@@ -3580,7 +3580,7 @@ void SpellMgr::LoadSpellInfoCorrections()
     // That's Abominable
     ApplySpellFix({ 59565 }, [](SpellInfo* spellInfo)
     {
-        spellInfo->Effects[EFFECT_0].MiscValueB = 1721; // controlable guardian
+        spellInfo->Effects[EFFECT_0].MiscValueB = 1721; // controllable guardian
     });
 
     // Investigate the Blue Recluse (1920)
