@@ -49,14 +49,6 @@ enum Creatures
 
 enum Events
 {
-    // Boss
-    EVENT_RESPAWN                           = 1,
-    EVENT_ROOTS,
-    EVENT_BASH,
-    EVENT_BOLT,
-    EVENT_REMOVE_MUSHROOM_POWER,
-    EVENT_MINI,
-
     // Mushroom
     EVENT_GROW,
     EVENT_CHECK_PLAYER,
@@ -113,22 +105,52 @@ struct boss_amanitar : public BossAI
 
     void JustEngagedWith(Unit* /*attacker*/) override
     {
-        events.ScheduleEvent(EVENT_ROOTS, 5s, 9s);
-        events.ScheduleEvent(EVENT_BASH, 10s, 14s);
-        events.ScheduleEvent(EVENT_BOLT, 15s, 20s);
-        events.ScheduleEvent(EVENT_MINI, 1s);
-        events.ScheduleEvent(EVENT_RESPAWN, 40s, 60s);
+        ScheduleTimedEvent(5s, 9s, [&]{
+            DoCastRandomTarget(SPELL_ENTANGLING_ROOTS, 1, 100.0f);
+        }, 10s, 15s);
+
+        ScheduleTimedEvent(10s, 14s, [&] {
+            DoCastVictim(SPELL_BASH, false);
+        }, 15s, 20s);
+
+        ScheduleTimedEvent(15s, 20s, [&] {
+            DoCastAOE(SPELL_VENOM_BOLT_VOLLEY);
+        }, 15s, 20s);
+
+        ScheduleTimedEvent(40s, 60s, [&] {
+            while (!_mushroomsDeque.empty())
+            {
+                SummonMushroom(_mushroomsDeque.front());
+                _mushroomsDeque.pop_front();
+            }
+        }, 40s, 60s);
+
+        for (Position pos : MushroomPositions)
+            SummonMushroom(pos);
+
+        scheduler.Schedule(25s, 32s, [this](TaskContext context) {
+            if (SelectTarget(SelectTargetMethod::Random, 0, 0.0f, true, true, -SPELL_MINI))
+            {
+                DoCastSelf(SPELL_REMOVE_MUSHROOM_POWER, true);
+                DoCastAOE(SPELL_MINI);
+                scheduler.Schedule(29s, [this](TaskContext)
+                {
+                    DoCastAOE(SPELL_REMOVE_MUSHROOM_POWER, true);
+                });
+
+                context.Repeat(30s, 45s);
+            }
+            else
+            {
+                context.Repeat(1s);
+            }
+        });
     }
 
     void JustDied(Unit* /*killer*/) override
     {
         _JustDied();
         instance->DoRemoveAurasDueToSpellOnPlayers(SPELL_MINI);
-    }
-
-    void JustSummoned(Creature* summon) override
-    {
-        summons.Summon(summon);
     }
 
     void SummonedCreatureDies(Creature* summon, Unit* killer) override
@@ -141,80 +163,6 @@ struct boss_amanitar : public BossAI
     {
         instance->DoRemoveAurasDueToSpellOnPlayers(SPELL_MINI);
         BossAI::EnterEvadeMode(why);
-    }
-
-    void ExecuteEvent(uint32 eventId) override
-    {
-        switch (eventId)
-        {
-            case EVENT_RESPAWN:
-            {
-                while (!_mushroomsDeque.empty())
-                {
-                    SummonMushroom(_mushroomsDeque.front());
-                    _mushroomsDeque.pop_front();
-                }
-
-                events.Repeat(40s, 60s);
-                break;
-            }
-            case EVENT_ROOTS:
-            {
-                if (Unit* pTarget = SelectTarget(SelectTargetMethod::Random, 0, 100, true))
-                {
-                    DoCast(pTarget, SPELL_ENTANGLING_ROOTS, false);
-                }
-
-                events.Repeat(10s, 15s);
-                break;
-            }
-            case EVENT_BASH:
-            {
-                DoCastVictim(SPELL_BASH, false);
-                events.Repeat(15s, 20s);
-                break;
-            }
-            case EVENT_BOLT:
-            {
-                if (Unit* pTarget = SelectTarget(SelectTargetMethod::Random, 0, 100, true))
-                {
-                    DoCast(pTarget, SPELL_VENOM_BOLT_VOLLEY, false);
-                }
-
-                events.Repeat(15s, 20s);
-                break;
-            }
-            case EVENT_REMOVE_MUSHROOM_POWER:
-            {
-                DoCastAOE(SPELL_REMOVE_MUSHROOM_POWER, true);
-                events.RescheduleEvent(EVENT_MINI, 1s);
-                break;
-            }
-            case EVENT_MINI:
-            {
-                if (!mushroomsSummoned)
-                {
-                    mushroomsSummoned = true;
-                    for (uint8 i = 0; i < MAX_MUSHROOMS_COUNT; ++i)
-                    {
-                        SummonMushroom(MushroomPositions[i]);
-                    }
-                }
-
-                if (SelectTarget(SelectTargetMethod::Random, 0, 0.0f, true, true, -SPELL_MINI))
-                {
-                    DoCastSelf(SPELL_REMOVE_MUSHROOM_POWER, true);
-                    DoCastAOE(SPELL_MINI);
-                    events.RescheduleEvent(EVENT_REMOVE_MUSHROOM_POWER, 29s);
-                }
-                else
-                {
-                    events.RepeatEvent(1000);
-                }
-
-                break;
-            }
-        }
     }
 
 private:
@@ -327,9 +275,7 @@ class spell_amanitar_remove_mushroom_power : public AuraScript
     void HandleApply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
     {
         if (Unit* target = GetTarget())
-        {
             target->RemoveAurasDueToSpell(SPELL_HEALTHY_MUSHROOM_POTENT_FUNGUS);
-        }
     }
 
     void Register() override

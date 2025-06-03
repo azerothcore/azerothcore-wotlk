@@ -2590,7 +2590,7 @@ bool Creature::_IsTargetAcceptable(Unit const* target) const
 void Creature::UpdateMoveInLineOfSightState()
 {
     // xinef: pets, guardians and units with scripts / smartAI should be skipped
-    if (IsPet() || HasUnitTypeMask(UNIT_MASK_MINION | UNIT_MASK_SUMMON | UNIT_MASK_GUARDIAN | UNIT_MASK_CONTROLABLE_GUARDIAN) ||
+    if (IsPet() || HasUnitTypeMask(UNIT_MASK_MINION | UNIT_MASK_SUMMON | UNIT_MASK_GUARDIAN | UNIT_MASK_CONTROLLABLE_GUARDIAN) ||
             GetScriptId() || GetAIName() == "SmartAI")
     {
         m_moveInLineOfSightStrictlyDisabled = false;
