@@ -501,4 +501,5 @@ void AddSC_stormwind_city()
     new npc_tyrion_spybot();
     new npc_lord_gregor_lescovar();
     new npc_marzon_silent_blade();
+    new npc_king_varian_wrynn();
 }
