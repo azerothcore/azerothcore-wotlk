@@ -231,6 +231,7 @@ public:
                     me->RemoveAllAuras();
                     me->CastSpell(attacker, SPELL_DUEL_VICTORY, true);
                     me->RestoreFaction();
+                    me->DespawnOrUnsummon(10000);
                 }
             }
         }
