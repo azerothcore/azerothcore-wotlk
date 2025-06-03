@@ -458,7 +458,7 @@ Guardian::Guardian(SummonPropertiesEntry const* properties, ObjectGuid owner, bo
     m_unitTypeMask |= UNIT_MASK_GUARDIAN;
     if (properties && (properties->Type == SUMMON_TYPE_PET || properties->Category == SUMMON_CATEGORY_PET))
     {
-        m_unitTypeMask |= UNIT_MASK_CONTROLABLE_GUARDIAN;
+        m_unitTypeMask |= UNIT_MASK_CONTROLLABLE_GUARDIAN;
         InitCharmInfo();
     }
 }
@@ -471,7 +471,7 @@ void Guardian::InitStats(uint32 duration)
     {
         InitStatsForLevel(m_owner->GetLevel());
 
-        if (m_owner->IsPlayer() && HasUnitTypeMask(UNIT_MASK_CONTROLABLE_GUARDIAN))
+        if (m_owner->IsPlayer() && HasUnitTypeMask(UNIT_MASK_CONTROLLABLE_GUARDIAN))
             m_charmInfo->InitCharmCreateSpells();
     }
 
