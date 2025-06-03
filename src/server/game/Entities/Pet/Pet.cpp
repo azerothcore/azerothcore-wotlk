@@ -60,9 +60,9 @@ Pet::Pet(Player* owner, PetType type) : Guardian(nullptr, owner ? owner->GetGUID
     if (type == HUNTER_PET)
         m_unitTypeMask |= UNIT_MASK_HUNTER_PET;
 
-    if (!(m_unitTypeMask & UNIT_MASK_CONTROLABLE_GUARDIAN))
+    if (!(m_unitTypeMask & UNIT_MASK_CONTROLLABLE_GUARDIAN))
     {
-        m_unitTypeMask |= UNIT_MASK_CONTROLABLE_GUARDIAN;
+        m_unitTypeMask |= UNIT_MASK_CONTROLLABLE_GUARDIAN;
         InitCharmInfo();
     }
 
