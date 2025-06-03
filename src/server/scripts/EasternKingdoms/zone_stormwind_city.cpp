@@ -472,6 +472,30 @@ public:
     }
 };
 
+
+enum KingVarianWrynn : uint32
+{
+    // Deathknight Starting Zone End
+    QUEST_WHERE_KINGS_WALK       = 13188,
+};
+
+class npc_king_varian_wrynn : public CreatureScript
+{
+public:
+    npc_king_varian_wrynn() : CreatureScript("npc_king_varian_wrynn") { }
+
+    bool OnQuestReward(Player* player, Creature* /*creature*/, Quest const* quest, uint32 /*item*/) override
+    {
+
+        if (quest->GetQuestId() == QUEST_WHERE_KINGS_WALK)
+        {
+            sLFGMgr->InitializeLockedDungeons(player);
+        }
+
+        return true;
+    }
+};
+
 void AddSC_stormwind_city()
 {
     new npc_tyrion();

@@ -33,6 +33,7 @@ EndContentData */
 #include "ScriptedCreature.h"
 #include "ScriptedGossip.h"
 #include "TaskScheduler.h"
+#include "LFGMgr.h"
 
 /*######
 ## npc_shenthul
@@ -152,9 +153,12 @@ enum ThrallWarchief : uint32
     GO_UNADORNED_SPIKE             = 175787,
 
     // What the Wind Carries (ID: 6566)
-    QUEST_WHAT_THE_WIND_CARRIES     = 6566,
-    GOSSIP_MENU_THRALL              = 3664,
-    GOSSIP_RESPONSE_THRALL_FIRST    = 5733,
+    QUEST_WHAT_THE_WIND_CARRIES    = 6566,
+    GOSSIP_MENU_THRALL             = 3664,
+    GOSSIP_RESPONSE_THRALL_FIRST   = 5733,
+
+    // Deathknight Starting Zone End
+    QUEST_WARCHIEFS_BLESSING       = 13189,
 };
 
 const Position heraldOfThrallPos = { -462.404f, -2637.68f, 96.0656f, 5.8606f };
@@ -204,7 +208,7 @@ public:
         return true;
     }
 
-    bool OnQuestReward(Player* /*player*/, Creature* creature, Quest const* quest, uint32 /*item*/) override
+    bool OnQuestReward(Player* player, Creature* creature, Quest const* quest, uint32 /*item*/) override
     {
         if (quest->GetQuestId() == QUEST_FOR_THE_HORDE)
         {
@@ -212,6 +216,11 @@ public:
             {
                 creature->AI()->DoAction(ACTION_START_TALKING);
             }
+        }
+
+        if (quest->GetQuestId() == QUEST_WARCHIEFS_BLESSING)
+        {
+            sLFGMgr->InitializeLockedDungeons(player);
         }
 
         return true;
