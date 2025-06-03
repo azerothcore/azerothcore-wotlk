@@ -472,7 +472,6 @@ public:
     }
 };
 
-
 enum KingVarianWrynn : uint32
 {
     // Deathknight Starting Zone End
