@@ -500,7 +500,7 @@ inline void Battleground::_ProcessJoin(uint32 diff)
 
         // Set the initial delay based on configuration
         uint32 initialDelay;
-            
+
         // Special case for Strand of the Ancients - always use 120 seconds due to boat timing mechanics
         if (GetBgTypeID() == BATTLEGROUND_SA)
         {
@@ -510,7 +510,7 @@ inline void Battleground::_ProcessJoin(uint32 diff)
         {
             initialDelay = isArena() ? GetArenaPrepTime() * IN_MILLISECONDS : GetBattlegroundPrepTime() * IN_MILLISECONDS;
         }
-            
+
         SetStartDelayTime(initialDelay);
 
         // Initialize which announcements should be skipped based on the initial delay
