@@ -131,7 +131,6 @@ public:
             if (creature->AI()->GetData(DATA_IN_PROGRESS))
                 return true;
 
-            creature->SetImmuneToPC(false);
             creature->RemoveUnitFlag(UNIT_FLAG_SWIMMING);
 
             player->CastSpell(creature, SPELL_DUEL, false);
