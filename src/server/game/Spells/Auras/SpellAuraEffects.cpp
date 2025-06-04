@@ -7001,7 +7001,8 @@ void AuraEffect::HandlePeriodicHealAurasTick(Unit* target, Unit* caster) const
     SpellPeriodicAuraLogInfo pInfo(this, healInfo.GetHeal(), healInfo.GetHeal() - healInfo.GetEffectiveHeal(), healInfo.GetAbsorb(), 0, 0.0f, crit);
     target->SendPeriodicAuraLog(&pInfo);
 
-    if (caster) {
+    if (caster)
+    {
         float threat = float(gain) * 0.5f;
         if (caster->IsClass(CLASS_PALADIN))
             threat *= 0.5f;
