@@ -638,6 +638,7 @@ public:
             phase = PHASE_CHAINED;
             events.Reset();
             me->SetFaction(FACTION_CREATURE);
+            me->SetImmuneToPC(true);
             me->SetUInt32Value(UNIT_FIELD_BYTES_1, 8);
             me->LoadEquipment(0, true);
         }
