@@ -3493,7 +3493,7 @@ Wintergrasp.CrashRestartTimer = 10
 #
 #    Battleground.PrepTime
 #        Description: Time (in seconds) for battleground preparation phase. Strand of the Ancients will be
-#        the exception and always use the default 120 seconds timer, due to its boat timing mechanic.
+#        the exception and will always use the default 120 seconds timer, due to its boat timing mechanic.
 #        Default:     120
 
 Battleground.PrepTime = 120
