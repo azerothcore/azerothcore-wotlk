@@ -7009,7 +7009,6 @@ void AuraEffect::HandlePeriodicHealAurasTick(Unit* target, Unit* caster) const
         target->getHostileRefMgr().threatAssist(caster, threat, GetSpellInfo());
     }
 
-
     bool haveCastItem = GetBase()->GetCastItemGUID();
 
     // Health Funnel
