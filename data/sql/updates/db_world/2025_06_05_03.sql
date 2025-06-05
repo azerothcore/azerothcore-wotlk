@@ -1,3 +1,4 @@
+-- DB update 2025_06_05_02 -> 2025_06_05_03
 -- Gundrak formations
 DELETE FROM `creature_formations` WHERE `leaderGUID` IN (127026,127009,127021,127059,127113);
 INSERT INTO `creature_formations` (`leaderGUID`, `memberGUID`, `dist`, `angle`, `groupAI`, `point_1`, `point_2`) VALUES
