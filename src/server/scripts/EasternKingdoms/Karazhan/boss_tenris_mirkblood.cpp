@@ -20,6 +20,36 @@
 #include "SpellInfo.h"
 #include "karazhan.h"
 
+enum Spells
+{
+    SPELL_BLOOD_MIRROR = 50844, // clone, proc 1206
+    SPELL_BLOOD_MIRROR = 50845, // script, dummy, dummy
+    SPELL_BLOOD_MIRROR_TARGET_PICKER = 50883, // script
+    SPELL_BLOOD_MIRROR_TRANSITION_VISUAL = 50910, // dummy
+    SPELL_BLOOD_MIRROR_DAMAGE = 50846, // damage
+
+    SPELL_BLOOD_TAP = 51135, // drain health
+
+    SPELL_BLOOD_SWOOP = 50922, // charge, periodic damage, trigger 50925
+    SPELL_DASH_GASH_PRE_SPELL = 50923, // script, trigger 50922
+    SPELL_DASH_GASH_RETURN_TO_TANK = 50924, // charge
+    SPELL_DASH_GASH_RETURN_TO_TANK_PRE_SPELL = 50925, // null
+    SPELL_DASH_GASH_RETURN_TO_TANK_PRE_SPELL_ROOT = 50932, // null
+
+    SPELL_DESPAWN_SANGUINE_SPIRIT_VISUAL = 51214, // dummy
+    SPELL_DESPAWN_SANGUINE_SPIRITS = 51212, // script, dummy
+    SPELL_SANGUINE_SPIRIT_AURA = 50993, // dummy, periodic trigger 51013
+    SPELL_SANGUINE_SPIRIT_PRE_AURA = 51282, // dummy
+    SPELL_SANGUINE_SPIRIT_PRE_AURA2 = 51283, // size mod
+    SPELL_SUMMON_SANGUINE_SPIRIT = 50996, // null
+    SPELL_SUMMON_SANGUINE_SPIRIT = 50998, // trigger missile 50996
+    SPELL_SUMMON_SANGUINE_SPIRIT = 51204, // trigger missile 50996
+    SPELL_SUMMON_SANGUINE_SPIRIT_MISSILE_BURST = 51208, // periodic trigger 50998
+    SPELL_SUMMON_SANGUINE_SPIRIT_SHORT_MISSILE_BURST = 51280, // periodic trigger 50998
+    SPELL_SUMMON_SANGUINE_SPIRIT_ON_KILL = 51205, // dummy
+    SPELL_EXSANGUINATE = 51013, // damage
+};
+
 struct boss_tenris_mirkblood : public BossAI
 {
     boss_tenris_mirkblood(Creature* creature) : BossAI(creature, DATA_MIRKBLOOD)
