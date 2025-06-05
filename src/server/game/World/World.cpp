@@ -793,6 +793,7 @@ void World::LoadConfigSettings(bool reload)
 
     _int_configs[CONFIG_EVENT_ANNOUNCE] = sConfigMgr->GetOption<int32>("Event.Announce", 0);
 
+    _float_configs[CONFIG_CREATURE_LEASH_RADIUS]                  = sConfigMgr->GetOption<float>("CreatureLeashRadius", 30.0f);
     _float_configs[CONFIG_CREATURE_FAMILY_FLEE_ASSISTANCE_RADIUS] = sConfigMgr->GetOption<float>("CreatureFamilyFleeAssistanceRadius", 30.0f);
     _float_configs[CONFIG_CREATURE_FAMILY_ASSISTANCE_RADIUS]      = sConfigMgr->GetOption<float>("CreatureFamilyAssistanceRadius", 10.0f);
     _int_configs[CONFIG_CREATURE_FAMILY_ASSISTANCE_DELAY]         = sConfigMgr->GetOption<int32>("CreatureFamilyAssistanceDelay", 2000);
@@ -842,6 +843,8 @@ void World::LoadConfigSettings(bool reload)
     _int_configs[CONFIG_GUILD_BANK_TAB_COST_3] = sConfigMgr->GetOption<int32>("Guild.BankTabCost3", 10000000);
     _int_configs[CONFIG_GUILD_BANK_TAB_COST_4] = sConfigMgr->GetOption<int32>("Guild.BankTabCost4", 25000000);
     _int_configs[CONFIG_GUILD_BANK_TAB_COST_5] = sConfigMgr->GetOption<int32>("Guild.BankTabCost5", 50000000);
+
+    _int_configs[CONFIG_GUILD_MEMBER_LIMIT] = sConfigMgr->GetOption<uint32>("Guild.MemberLimit", 0);
 
     _bool_configs[CONFIG_DETECT_POS_COLLISION] = sConfigMgr->GetOption<bool>("DetectPosCollision", true);
 
@@ -1400,6 +1403,12 @@ void World::SetInitialWorldSettings()
 
     LOG_INFO("server.loading", "Loading SpellInfo Custom Attributes...");
     sSpellMgr->LoadSpellInfoCustomAttributes();
+
+    LOG_INFO("server.loading", "Loading Player Totem models...");
+    sObjectMgr->LoadPlayerTotemModels();
+
+    LOG_INFO("server.loading", "Loading Player Shapeshift models...");
+    sObjectMgr->LoadPlayerShapeshiftModels();
 
     LOG_INFO("server.loading", "Loading GameObject Models...");
     LoadGameObjectModelList(_dataPath);

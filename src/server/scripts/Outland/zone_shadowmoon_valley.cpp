@@ -23,28 +23,7 @@
 #include "ScriptedGossip.h"
 #include "SpellScript.h"
 #include "SpellScriptLoader.h"
-/* ScriptData
-SDName: Shadowmoon_Valley
-SD%Complete: 100
-SDComment: Quest support: 10519, 10583, 10601, 10804, 10854, 10458, 10481, 10480, 10781. Vendor Drake Dealer Hurlunk.
-SDCategory: Shadowmoon Valley
-EndScriptData */
 
-/* ContentData
-npc_mature_netherwing_drake
-npc_enslaved_netherwing_drake
-npc_drake_dealer_hurlunk
-npcs_flanis_swiftwing_and_kagrosh
-npc_karynaku
-npc_oronok_tornheart
-npc_torloth_the_magnificent
-npc_illidari_spawn
-npc_lord_illidan_stormrage
-go_crystal_prison
-npc_enraged_spirit
-EndContentData */
-
-// Ours
 enum TheFelAndTheFurious
 {
     SPELL_ROCKET_LAUNCHER = 38083
@@ -123,7 +102,6 @@ class spell_q10563_q10596_to_legion_hold_aura : public AuraScript
     }
 };
 
-// Theirs
 /*#####
 # npc_invis_infernal_caster
 #####*/
@@ -805,14 +783,6 @@ public:
 /*#####
 # Quest: Battle of the crimson watch
 #####*/
-
-/* ContentData
-Battle of the crimson watch - creatures, gameobjects and defines
-npc_illidari_spawn : Adds that are summoned in the Crimson Watch battle.
-npc_torloth_the_magnificent : Final Creature that players have to face before quest is completed
-npc_lord_illidan_stormrage : Creature that controls the event.
-go_crystal_prison : GameObject that begins the event and hands out quest
-EndContentData */
 
 #define QUEST_BATTLE_OF_THE_CRIMSON_WATCH 10781
 #define EVENT_AREA_RADIUS 65 //65yds
@@ -2241,11 +2211,8 @@ struct dragonmaw_race_npc : public ScriptedAI
 
 void AddSC_shadowmoon_valley()
 {
-    // Ours
     RegisterSpellScript(spell_q10612_10613_the_fel_and_the_furious);
     RegisterSpellScript(spell_q10563_q10596_to_legion_hold_aura);
-
-    // Theirs
     RegisterCreatureAI(dragonmaw_race_npc);
     new npc_invis_infernal_caster();
     new npc_infernal_attacker();

@@ -686,7 +686,7 @@ void WorldSession::HandleTotemDestroyed(WorldPackets::Totem::TotemDestroyed& tot
         return;
 
     uint8 slotId = totemDestroyed.Slot;
-    slotId += SUMMON_SLOT_TOTEM;
+    slotId += SUMMON_SLOT_TOTEM_FIRE;
 
     if (slotId >= MAX_TOTEM_SLOT)
         return;
