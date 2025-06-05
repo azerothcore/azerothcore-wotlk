@@ -214,9 +214,7 @@ public:
         {
             case (QUEST_FOR_THE_HORDE):
                 if (creature && creature->AI())
-                {
                     creature->AI()->DoAction(ACTION_START_TALKING);
-                }
                 break;
             case (QUEST_WARCHIEFS_BLESSING):
                 sLFGMgr->InitializeLockedDungeons(player);
