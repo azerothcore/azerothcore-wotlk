@@ -20,6 +20,14 @@
 #include "SpellInfo.h"
 #include "karazhan.h"
 
+enum Text
+{
+    SAY_APPROACH,
+    SAY_AGGRO,
+    SAY_SUMMON,
+    SAY_DEATH
+};
+
 enum Spells
 {
     SPELL_BLOOD_MIRROR = 50844, // clone, proc 1206
