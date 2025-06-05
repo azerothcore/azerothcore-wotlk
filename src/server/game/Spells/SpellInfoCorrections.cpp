@@ -5131,6 +5131,12 @@ void SpellMgr::LoadSpellInfoCorrections()
         spellInfo->ChannelInterruptFlags &= ~AURA_INTERRUPT_FLAG_TURNING;
     });
 
+    // The Green Tower
+    ApplySpellFix({ 18097 }, [](SpellInfo* spellInfo)
+    {
+        spellInfo->DurationEntry = sSpellDurationStore.LookupEntry(21); // -1
+    });
+
     for (uint32 i = 0; i < GetSpellInfoStoreSize(); ++i)
     {
         SpellInfo* spellInfo = mSpellInfoMap[i];
