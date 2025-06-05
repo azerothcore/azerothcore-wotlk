@@ -1,3 +1,4 @@
+-- DB update 2025_06_05_01 -> 2025_06_05_02
 -- Link pre-spawned Ethereal Beacons to Nexus-Prince Shaffar so they respawn on reset
 SET @SHAFFAR_GUID := 91162;
 SET @AI_FLAGS := 1 | 2 | 8 | 16;
