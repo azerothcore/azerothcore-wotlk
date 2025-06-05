@@ -487,9 +487,7 @@ public:
     {
 
         if (quest->GetQuestId() == QUEST_WHERE_KINGS_WALK)
-        {
             sLFGMgr->InitializeLockedDungeons(player);
-        }
 
         return true;
     }
