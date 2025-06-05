@@ -1,4 +1,4 @@
--- Gundrak formations source https://www.youtube.com/watch?v=IufAi8GMfHg / https://www.youtube.com/watch?v=QfS2FaA3TpM&
+-- Gundrak formations
 DELETE FROM `creature_formations` WHERE `leaderGUID` IN (127026,127009,127021,127059,127113);
 INSERT INTO `creature_formations` (`leaderGUID`, `memberGUID`, `dist`, `angle`, `groupAI`, `point_1`, `point_2`) VALUES
 (127026, 127026, 0, 0, 3, 0, 0), -- Cobras
