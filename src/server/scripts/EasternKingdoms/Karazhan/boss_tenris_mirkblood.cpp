@@ -22,10 +22,9 @@
 
 enum Text
 {
-    SAY_APPROACH,
-    SAY_AGGRO,
-    SAY_SUMMON,
-    SAY_DEATH
+    SAY_APPROACH = 0,
+    SAY_AGGRO = 1,
+    SAY_SUMMON = 2
 };
 
 enum Spells
@@ -59,7 +58,7 @@ enum Spells
 };
 
 struct boss_tenris_mirkblood : public BossAI
-{
+{ // AREA TRIGGER 5014 CAUSES SAY_APPROACH, AREA TRIGGER 5015 MAY ENGAGE OR JUST RELEASE NOT_SELECTABLE FLAG
     boss_tenris_mirkblood(Creature* creature) : BossAI(creature, DATA_MIRKBLOOD)
     {
         scheduler.SetValidator([this]
@@ -71,10 +70,6 @@ struct boss_tenris_mirkblood : public BossAI
     void Reset() override
     {
         _Reset();
-    }
-
-    void SpellHit(Unit* /*caster*/, SpellInfo const* spell) override
-    {
     }
 
     void JustEngagedWith(Unit* /*who*/) override
