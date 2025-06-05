@@ -33,7 +33,6 @@
 #include "SpellScriptLoader.h"
 #include "Vehicle.h"
 
-// Ours
 /********
 QUEST Conversing With the Depths (12032)
 ********/
@@ -1664,8 +1663,6 @@ public:
     };
 };
 
-// Theirs
-
 /*#####
 # npc_commander_eligor_dawnbringer
 #####*/
@@ -2245,7 +2242,6 @@ class spell_dragonblight_corrosive_spit : public AuraScript
 
 void AddSC_dragonblight()
 {
-    // Ours
     new npc_conversing_with_the_depths_trigger();
     new go_the_pearl_of_the_depths();
     new npc_hourglass_of_eternity();
@@ -2266,12 +2262,9 @@ void AddSC_dragonblight()
     new npc_q24545_vegard_dummy();
     new npc_q24545_vegard();
     new npc_spiritual_insight();
-
-    // Theirs
     new npc_commander_eligor_dawnbringer();
     RegisterSpellScript(spell_q12096_q12092_dummy);
     RegisterSpellScript(spell_q12096_q12092_bark);
     new npc_torturer_lecraft();
-
     RegisterSpellScript(spell_dragonblight_corrosive_spit);
 }

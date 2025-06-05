@@ -28,8 +28,6 @@
 #include "ScriptedGossip.h"
 #include "Spell.h"
 
-// Ours
-
 class go_seer_of_zebhalak : public GameObjectScript
 {
 public:
@@ -508,7 +506,6 @@ public:
     }
 };
 
-// Theirs
 /*####
 ## go_brewfest_music
 ####*/
@@ -1900,7 +1897,6 @@ public:
 
 void AddSC_go_scripts()
 {
-    // Ours
     new go_seer_of_zebhalak();
     new go_mistwhisper_treasure();
     new go_witherbark_totem_bundle();
@@ -1914,8 +1910,6 @@ void AddSC_go_scripts()
     new go_bear_trap();
     new go_duskwither_spire_power_source();
     new go_l70_etc_music();
-
-    // Theirs
     new go_brewfest_music();
     new go_pirate_day_music();
     new go_darkmoon_faire_music();

@@ -15,21 +15,6 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-/* ScriptData
-SDName: Stormwind_City
-SD%Complete: 100
-SDComment: Quest support: 1447, 4185, 11223, 434.
-SDCategory: Stormwind City
-EndScriptData */
-
-/* ContentData
-npc_archmage_malin
-npc_tyrion
-npc_tyrion_spybot
-npc_marzon_silent_blade
-npc_lord_gregor_lescovar
-EndContentData */
-
 #include "CreatureScript.h"
 #include "Player.h"
 #include "ScriptedCreature.h"
