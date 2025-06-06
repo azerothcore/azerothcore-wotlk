@@ -15,6 +15,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "AreaDefines.h"
 #include "CellImpl.h"
 #include "Chat.h"
 #include "CombatAI.h"
@@ -34,6 +35,8 @@
 #include "TaskScheduler.h"
 #include "WaypointMgr.h"
 #include "World.h"
+#include "WorldState.h"
+#include "WorldStateDefines.h"
 
 /// @todo: this import is not necessary for compilation and marked as unused by the IDE
 //  however, for some reasons removing it would cause a damn linking issue
@@ -186,17 +189,6 @@ public:
     }
 };
 
-/*
- * Stranglethorn Vale Fishing Extravaganza World States
- */
-enum FishingExtravaganzaWorldStates
-{
-    STV_FISHING_PREV_WIN_TIME           = 197,
-    STV_FISHING_HAS_WINNER              = 198,
-    STV_FISHING_ANNOUNCE_EVENT_BEGIN    = 199,
-    STV_FISHING_ANNOUNCE_POOLS_DESPAN   = 200
-};
-
 enum RiggleBassbait
 {
     RIGGLE_SAY_START            = 0,
@@ -222,13 +214,13 @@ public:
         npc_riggle_bassbaitAI(Creature* c) : ScriptedAI(c)
         {
             m_uiTimer = 0;
-            auto prevWinTime = sWorld->getWorldState(STV_FISHING_PREV_WIN_TIME);
+            auto prevWinTime = sWorldState->getWorldState(WORLD_STATE_STRANGLETHORN_VALE_FISHING_PREV_WIN_TIME);
             if (GameTime::GetGameTime().count() - prevWinTime > DAY)
             {
                 // reset all after 1 day
-                sWorld->setWorldState(STV_FISHING_ANNOUNCE_EVENT_BEGIN, 1);
-                sWorld->setWorldState(STV_FISHING_ANNOUNCE_POOLS_DESPAN, 0);
-                sWorld->setWorldState(STV_FISHING_HAS_WINNER, 0);
+                sWorldState->setWorldState(WORLD_STATE_STRANGLETHORN_VALE_FISHING_ANNOUNCE_EVENT_BEGIN, 1);
+                sWorldState->setWorldState(WORLD_STATE_STRANGLETHORN_VALE_FISHING_ANNOUNCE_POOLS_DESPAWN, 0);
+                sWorldState->setWorldState(WORLD_STATE_STRANGLETHORN_VALE_FISHING_HAS_WINNER, 0);
             }
         }
 
@@ -236,16 +228,16 @@ public:
 
         void CheckTournamentState() const
         {
-            if (sGameEventMgr->IsActiveEvent(EVENT_FISHING_TURN_INS) && !sWorld->getWorldState(STV_FISHING_HAS_WINNER))
+            if (sGameEventMgr->IsActiveEvent(EVENT_FISHING_TURN_INS) && !sWorldState->getWorldState(WORLD_STATE_STRANGLETHORN_VALE_FISHING_HAS_WINNER))
             {
                 if (!me->IsQuestGiver())
                 {
                     me->SetNpcFlag(UNIT_NPC_FLAG_QUESTGIVER);
                 }
-                if (sWorld->getWorldState(STV_FISHING_ANNOUNCE_EVENT_BEGIN))
+                if (sWorldState->getWorldState(WORLD_STATE_STRANGLETHORN_VALE_FISHING_ANNOUNCE_EVENT_BEGIN))
                 {
                     me->AI()->Talk(RIGGLE_SAY_START);
-                    sWorld->setWorldState(STV_FISHING_ANNOUNCE_EVENT_BEGIN, 0);
+                    sWorldState->setWorldState(WORLD_STATE_STRANGLETHORN_VALE_FISHING_ANNOUNCE_EVENT_BEGIN, 0);
                 }
             }
             else
@@ -258,14 +250,14 @@ public:
             if (sGameEventMgr->IsActiveEvent(EVENT_FISHING_POOLS))
             {
                 // enable announcement: when pools despawn
-                sWorld->setWorldState(STV_FISHING_ANNOUNCE_POOLS_DESPAN, 1);
+                sWorldState->setWorldState(WORLD_STATE_STRANGLETHORN_VALE_FISHING_ANNOUNCE_POOLS_DESPAWN, 1);
             }
             else
             {
-                if (sWorld->getWorldState(STV_FISHING_ANNOUNCE_POOLS_DESPAN))
+                if (sWorldState->getWorldState(WORLD_STATE_STRANGLETHORN_VALE_FISHING_ANNOUNCE_POOLS_DESPAWN))
                 {
                     me->AI()->Talk(RIGGLE_SAY_POOLS_END);
-                    sWorld->setWorldState(STV_FISHING_ANNOUNCE_POOLS_DESPAN, 0);
+                    sWorldState->setWorldState(WORLD_STATE_STRANGLETHORN_VALE_FISHING_ANNOUNCE_POOLS_DESPAWN, 0);
                 }
             }
         }
@@ -291,7 +283,7 @@ public:
             player->PrepareQuestMenu(creature->GetGUID());
         }
 
-        if (sWorld->getWorldState(STV_FISHING_HAS_WINNER))
+        if (sWorldState->getWorldState(WORLD_STATE_STRANGLETHORN_VALE_FISHING_HAS_WINNER))
         {
             SendGossipMenuFor(player, GOSSIP_EVENT_OVER, creature->GetGUID());
         }
@@ -308,8 +300,8 @@ public:
         {
             creature->RemoveNpcFlag(UNIT_NPC_FLAG_QUESTGIVER);
             creature->AI()->Talk(RIGGLE_SAY_WINNER, player);
-            sWorld->setWorldState(STV_FISHING_PREV_WIN_TIME, GameTime::GetGameTime().count());
-            sWorld->setWorldState(STV_FISHING_HAS_WINNER, 1);
+            sWorldState->setWorldState(WORLD_STATE_STRANGLETHORN_VALE_FISHING_PREV_WIN_TIME, GameTime::GetGameTime().count());
+            sWorldState->setWorldState(WORLD_STATE_STRANGLETHORN_VALE_FISHING_HAS_WINNER, 1);
         }
         return true;
     }
@@ -439,7 +431,6 @@ public:
     }
 };
 
-// Theirs
 /*########
 # npc_air_force_bots
 #########*/
@@ -2118,7 +2109,6 @@ enum Fireworks
     SPELL_LUNAR_FORTUNE     = 26522,
 
     ANIM_GO_LAUNCH_FIREWORK = 3,
-    ZONE_MOONGLADE          = 493,
 };
 
 Position omenSummonPos = {7558.993f, -2839.999f, 450.0214f, 4.46f};
@@ -2305,7 +2295,7 @@ public:
             if (isCluster())
             {
                 // Check if we are near Elune'ara lake south, if so try to summon Omen or a minion
-                if (me->GetZoneId() == ZONE_MOONGLADE)
+                if (me->GetZoneId() == AREA_MOONGLADE)
                 {
                     if (!me->FindNearestCreature(NPC_OMEN, 100.0f, false) && me->GetDistance2d(omenSummonPos.GetPositionX(), omenSummonPos.GetPositionY()) <= 100.0f)
                     {
@@ -2694,14 +2684,11 @@ struct npc_controller : public PossessedAI
 
 void AddSC_npcs_special()
 {
-    // Ours
     new npc_elder_clearwater();
     new npc_riggle_bassbait();
     new npc_target_dummy();
     new npc_training_dummy();
     new npc_venomhide_hatchling();
-
-    // Theirs
     new npc_air_force_bots();
     new npc_chicken_cluck();
     new npc_dancing_flames();

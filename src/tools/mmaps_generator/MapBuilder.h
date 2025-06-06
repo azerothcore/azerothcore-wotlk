@@ -20,12 +20,10 @@
 
 #include <atomic>
 #include <list>
-#include <map>
 #include <set>
 #include <thread>
 #include <vector>
 
-#include "IntermediateValues.h"
 #include "Optional.h"
 #include "TerrainBuilder.h"
 

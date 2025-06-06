@@ -15,13 +15,6 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-/* ScriptData
-Name: reload_commandscript
-%Complete: 100
-Comment: All reload related commands
-Category: commandscripts
-EndScriptData */
-
 #include "AchievementMgr.h"
 #include "AuctionHouseMgr.h"
 #include "AutobroadcastMgr.h"
@@ -31,12 +24,14 @@ EndScriptData */
 #include "CreatureTextMgr.h"
 #include "DisableMgr.h"
 #include "GameGraveyard.h"
+#include "ItemEnchantmentMgr.h"
 #include "LFGMgr.h"
 #include "Language.h"
 #include "MapMgr.h"
 #include "MotdMgr.h"
 #include "ObjectMgr.h"
 #include "ScriptMgr.h"
+#include "ServerMailMgr.h"
 #include "SkillDiscovery.h"
 #include "SkillExtraItems.h"
 #include "SmartAI.h"
@@ -46,6 +41,7 @@ EndScriptData */
 #include "Tokenize.h"
 #include "WardenCheckMgr.h"
 #include "WaypointMgr.h"
+#include "WorldGlobals.h"
 
 using namespace Acore::ChatCommands;
 
@@ -72,6 +68,7 @@ public:
         };
         static ChatCommandTable reloadCommandTable =
         {
+            { "antidos_opcode_policies",       HandleReloadAntiDosOpcodePoliciesCommand,      SEC_ADMINISTRATOR, Console::Yes },
             { "auctions",                      HandleReloadAuctionsCommand,                   SEC_ADMINISTRATOR, Console::Yes },
             { "dungeon_access_template",       HandleReloadDungeonAccessCommand,              SEC_ADMINISTRATOR, Console::Yes },
             { "dungeon_access_requirements",   HandleReloadDungeonAccessCommand,              SEC_ADMINISTRATOR, Console::Yes },
@@ -134,6 +131,7 @@ public:
             { "npc_spellclick_spells",         HandleReloadSpellClickSpellsCommand,           SEC_ADMINISTRATOR, Console::Yes },
             { "npc_trainer",                   HandleReloadNpcTrainerCommand,                 SEC_ADMINISTRATOR, Console::Yes },
             { "npc_vendor",                    HandleReloadNpcVendorCommand,                  SEC_ADMINISTRATOR, Console::Yes },
+            { "game_event_npc_vendor",         HandleReloadGameEventNPCVendorCommand,         SEC_ADMINISTRATOR, Console::Yes },
             { "page_text",                     HandleReloadPageTextsCommand,                  SEC_ADMINISTRATOR, Console::Yes },
             { "pickpocketing_loot_template",   HandleReloadLootTemplatesPickpocketingCommand, SEC_ADMINISTRATOR, Console::Yes },
             { "points_of_interest",            HandleReloadPointsOfInterestCommand,           SEC_ADMINISTRATOR, Console::Yes },
@@ -413,7 +411,12 @@ public:
         LOG_INFO("server.loading", "Reloading Motd...");
         sMotdMgr->LoadMotd();
         handler->SendGlobalGMSysMessage("DB table `motd` reloaded.");
-        handler->SendGlobalSysMessage(sMotdMgr->GetMotd());
+        LocaleConstant locale = DEFAULT_LOCALE;
+
+        if (Player* player = handler->GetPlayer())
+            locale = player->GetSession()->GetSessionDbLocaleIndex();
+
+        handler->SendGlobalSysMessage(sMotdMgr->GetMotd(locale));
         return true;
     }
 
@@ -759,6 +762,14 @@ public:
         return true;
     }
 
+    static bool HandleReloadGameEventNPCVendorCommand(ChatHandler* handler)
+    {
+        LOG_INFO("server.loading", "Reloading `game_event_npc_vendor` Table!");
+        sGameEventMgr->LoadEventVendors();
+        handler->SendGlobalGMSysMessage("DB table `game_event_npc_vendor` reloaded.");
+        return true;
+    }
+
     static bool HandleReloadPointsOfInterestCommand(ChatHandler* handler)
     {
         LOG_INFO("server.loading", "Reloading `points_of_interest` Table!");
@@ -1048,9 +1059,9 @@ public:
     static bool HandleReloadDisablesCommand(ChatHandler* handler)
     {
         LOG_INFO("server.loading", "Reloading disables table...");
-        DisableMgr::LoadDisables();
+        sDisableMgr->LoadDisables();
         LOG_INFO("server.loading", "Checking quest disables...");
-        DisableMgr::CheckQuestDisables();
+        sDisableMgr->CheckQuestDisables();
         handler->SendGlobalGMSysMessage("DB table `disables` reloaded.");
         return true;
     }
@@ -1179,8 +1190,16 @@ public:
     static bool HandleReloadMailServerTemplateCommand(ChatHandler* handler)
     {
         LOG_INFO("server.loading", "Reloading `server_mail_template` table");
-        sObjectMgr->LoadMailServerTemplates();
+        sServerMailMgr->LoadMailServerTemplates();
         handler->SendGlobalGMSysMessage("DB table `server_mail_template` reloaded.");
+        return true;
+    }
+
+    static bool HandleReloadAntiDosOpcodePoliciesCommand(ChatHandler* handler)
+    {
+        LOG_INFO("server.loading", "Reloading AntiDos opcode policies...");
+        sWorldGlobals->LoadAntiDosOpcodePolicies();
+        handler->SendGlobalGMSysMessage("AntiDos opcode policies reloaded.");
         return true;
     }
 

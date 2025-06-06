@@ -22,6 +22,7 @@
 #include "ScriptedGossip.h"
 #include "Spell.h"
 #include "icecrown_citadel.h"
+#include "SpellMgr.h"
 
 #define GOSSIP_SENDER_ICC_PORT 631
 

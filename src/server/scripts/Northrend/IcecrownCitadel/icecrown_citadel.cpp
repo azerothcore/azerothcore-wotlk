@@ -16,6 +16,7 @@
  */
 
 #include "icecrown_citadel.h"
+#include "AreaDefines.h"
 #include "AreaTriggerScript.h"
 #include "Cell.h"
 #include "CellImpl.h"
@@ -627,7 +628,7 @@ public:
                 switch (eventId)
                 {
                     case EVENT_DEATH_PLAGUE:
-                        if (Unit* target = SelectTarget(SelectTargetMethod::Random, 1, 0.0f, true, true, -SPELL_RECENTLY_INFECTED))
+                        if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 0.0f, true, false, -SPELL_RECENTLY_INFECTED))
                         {
                             Talk(EMOTE_DEATH_PLAGUE_WARNING, target);
                             DoCast(target, SPELL_DEATH_PLAGUE);
@@ -747,8 +748,6 @@ public:
                 me->setActive(true);
                 me->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
                 me->SetImmuneToAll(true);
-                // Load Grid with Sister Svalna
-                me->GetMap()->LoadGrid(4356.71f, 2484.33f);
                 if (Creature* svalna = ObjectAccessor::GetCreature(*me, _instance->GetGuidData(DATA_SISTER_SVALNA)))
                     svalna->AI()->DoAction(ACTION_START_GAUNTLET);
                 for (uint32 i = 0; i < 4; ++i)
@@ -1163,7 +1162,7 @@ public:
                     Talk(SAY_SVALNA_AGGRO);
                     break;
                 case EVENT_IMPALING_SPEAR:
-                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 1, 0.0f, true, true, -SPELL_IMPALING_SPEAR))
+                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 0.0f, true, false, -SPELL_IMPALING_SPEAR))
                     {
                         DoCast(me, SPELL_AETHER_SHIELD);
                         me->AddAura(70203, me);
@@ -1349,7 +1348,7 @@ public:
                     Events.ScheduleEvent(EVENT_ARNATH_SMITE, 4s, 7s);
                     break;
                 case EVENT_ARNATH_DOMINATE_MIND:
-                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 1, 0.0f, true, true, -SPELL_DOMINATE_MIND))
+                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 0.0f, true, false, -SPELL_DOMINATE_MIND))
                         DoCast(target, SPELL_DOMINATE_MIND);
                     Events.ScheduleEvent(EVENT_ARNATH_DOMINATE_MIND, 28s, 37s);
                     break;
@@ -1427,7 +1426,7 @@ public:
                         Events.ScheduleEvent(EVENT_BRANDON_JUDGEMENT_OF_COMMAND, 8s, 13s);
                         break;
                     case EVENT_BRANDON_HAMMER_OF_BETRAYAL:
-                        if (Unit* target = SelectTarget(SelectTargetMethod::Random, 1, 0.0f, true))
+                        if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 0.0f, true, false))
                             DoCast(target, SPELL_HAMMER_OF_BETRAYAL);
                         Events.ScheduleEvent(EVENT_BRANDON_HAMMER_OF_BETRAYAL, 45s, 60s);
                         break;
@@ -1554,12 +1553,12 @@ public:
                         Events.ScheduleEvent(EVENT_RUPERT_FEL_IRON_BOMB, 15s, 20s);
                         break;
                     case EVENT_RUPERT_MACHINE_GUN:
-                        if (Unit* target = SelectTarget(SelectTargetMethod::Random, 1))
+                        if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 0.0f, false, false))
                             DoCast(target, SPELL_MACHINE_GUN);
                         Events.ScheduleEvent(EVENT_RUPERT_MACHINE_GUN, 25s, 30s);
                         break;
                     case EVENT_RUPERT_ROCKET_LAUNCH:
-                        if (Unit* target = SelectTarget(SelectTargetMethod::Random, 1))
+                        if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 0.0f, false, false))
                             DoCast(target, SPELL_ROCKET_LAUNCH);
                         Events.ScheduleEvent(EVENT_RUPERT_ROCKET_LAUNCH, 10s, 15s);
                         break;
@@ -1684,7 +1683,7 @@ public:
 
             events.Update(diff);
 
-            if (me->HasUnitState(UNIT_STATE_CASTING) || me->isFeared() || me->isFrozen() || me->HasUnitState(UNIT_STATE_STUNNED) || me->HasUnitState(UNIT_STATE_CONFUSED) || ((me->GetEntry() == NPC_YMIRJAR_DEATHBRINGER || me->GetEntry() == NPC_YMIRJAR_FROSTBINDER) && me->HasUnitFlag(UNIT_FLAG_SILENCED)))
+            if (me->HasUnitState(UNIT_STATE_CASTING) || me->HasFearAura() || me->isFrozen() || me->HasUnitState(UNIT_STATE_STUNNED) || me->HasUnitState(UNIT_STATE_CONFUSED) || ((me->GetEntry() == NPC_YMIRJAR_DEATHBRINGER || me->GetEntry() == NPC_YMIRJAR_FROSTBINDER) && me->HasUnitFlag(UNIT_FLAG_SILENCED)))
                 return;
 
             switch (events.ExecuteEvent())
@@ -1835,7 +1834,7 @@ public:
     {
         if (InstanceScript* instance = creature->GetInstanceScript())
             if (instance->GetBossState(DATA_ROTFACE) == DONE && instance->GetBossState(DATA_FESTERGUT) == DONE && !creature->FindCurrentSpellBySpellId(SPELL_HARVEST_BLIGHT_SPECIMEN) && !creature->FindCurrentSpellBySpellId(SPELL_HARVEST_BLIGHT_SPECIMEN25))
-                if (player->HasAura(SPELL_ORANGE_BLIGHT_RESIDUE) && player->HasAura(SPELL_GREEN_BLIGHT_RESIDUE))
+                if (player->HasAllAuras(SPELL_ORANGE_BLIGHT_RESIDUE, SPELL_GREEN_BLIGHT_RESIDUE))
                     creature->CastSpell(creature, SPELL_HARVEST_BLIGHT_SPECIMEN, false);
         return false;
     }
@@ -2399,7 +2398,7 @@ class spell_icc_yd_summon_undead : public SpellScript
     void HandleDummyLaunch(SpellEffIndex /*effIndex*/)
     {
         if (Unit* c = GetCaster())
-            if (c->GetMapId() == 631)
+            if (c->GetMapId() == MAP_ICECROWN_CITADEL)
                 for (uint8 i = 0; i < 5; ++i)
                     c->CastSpell(c, 71302, true);
     }
@@ -3024,14 +3023,16 @@ struct npc_icc_spire_frostwyrm : public ScriptedAI
         bool _canResetFlyingEffects;
 };
 
-#define VENGEFUL_WP_COUNT 6
+#define VENGEFUL_WP_COUNT 8
 const Position VengefulWP[VENGEFUL_WP_COUNT] =
 {
     {4432.21f, 3041.5f, 372.783f, 0.0f},
+    {4408.67f, 3041.81f, 372.48f, 0.0f},
     {4370.50f, 3042.00f, 372.80f, 0.0f},
     {4370.37f, 3059.16f, 371.69f, 0.0f},
     {4342.53f, 3058.97f, 371.68f, 0.0f},
     {4342.51f, 3041.24f, 372.80f, 0.0f},
+    {4304.75f, 3041.57f, 372.43f, 0.0f},
     {4281.30f, 3041.77f, 372.78f, 0.0f},
 };
 
@@ -3065,6 +3066,8 @@ public:
             me->SetWalk(false);
             events.Reset();
             events.ScheduleEvent(1, 3s, 6s); // leaping face maul
+            if (currPipeWP != VENGEFUL_WP_COUNT)
+                needMove = true;
         }
 
         void JustReachedHome() override
@@ -3132,7 +3135,7 @@ public:
                         --currPipeWP;
                 }
                 me->SetHomePosition(VengefulWP[currPipeWP].GetPositionX(), VengefulWP[currPipeWP].GetPositionY(), VengefulWP[currPipeWP].GetPositionZ(), me->GetOrientation());
-                if ((forward && currPipeWP == 3) || (!forward && currPipeWP == 2))
+                if ((forward && currPipeWP == 4) || (!forward && currPipeWP == 3))
                     me->GetMotionMaster()->MoveJump(VengefulWP[currPipeWP].GetPositionX(), VengefulWP[currPipeWP].GetPositionY(), VengefulWP[currPipeWP].GetPositionZ(), 10.0f, 6.0f, 1);
                 else
                     me->GetMotionMaster()->MovePoint(1, VengefulWP[currPipeWP].GetPositionX(), VengefulWP[currPipeWP].GetPositionY(), VengefulWP[currPipeWP].GetPositionZ());

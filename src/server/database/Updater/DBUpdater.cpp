@@ -23,6 +23,7 @@
 #include "Log.h"
 #include "StartProcess.h"
 #include "UpdateFetcher.h"
+#include "QueryResult.h"
 #include <filesystem>
 #include <fstream>
 #include <iostream>

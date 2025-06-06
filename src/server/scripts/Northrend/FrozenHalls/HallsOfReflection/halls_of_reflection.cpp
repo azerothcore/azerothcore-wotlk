@@ -957,7 +957,7 @@ public:
 
             events.Update(diff);
 
-            if (me->HasUnitState(UNIT_STATE_CASTING) || me->isFeared() || me->IsCharmed() || me->isFrozen() || me->HasUnitState(UNIT_STATE_STUNNED) || me->HasUnitState(UNIT_STATE_CONFUSED))
+            if (me->HasUnitState(UNIT_STATE_CASTING) || me->HasFearAura() || me->IsCharmed() || me->isFrozen() || me->HasUnitState(UNIT_STATE_STUNNED) || me->HasUnitState(UNIT_STATE_CONFUSED))
                 return;
 
             switch (events.ExecuteEvent())
@@ -1065,7 +1065,7 @@ public:
 
             events.Update(diff);
 
-            if (me->HasUnitState(UNIT_STATE_CASTING) || me->isFeared() || me->IsCharmed() || me->isFrozen() || me->HasUnitState(UNIT_STATE_STUNNED) || me->HasUnitState(UNIT_STATE_CONFUSED))
+            if (me->HasUnitState(UNIT_STATE_CASTING) || me->HasFearAura() || me->IsCharmed() || me->isFrozen() || me->HasUnitState(UNIT_STATE_STUNNED) || me->HasUnitState(UNIT_STATE_CONFUSED))
                 return;
 
             switch (events.ExecuteEvent())
@@ -1219,7 +1219,7 @@ public:
 
             events.Update(diff);
 
-            if (me->HasUnitState(UNIT_STATE_CASTING) || me->isFeared() || me->IsCharmed() || me->isFrozen() || me->HasUnitState(UNIT_STATE_STUNNED) || me->HasUnitState(UNIT_STATE_CONFUSED))
+            if (me->HasUnitState(UNIT_STATE_CASTING) || me->HasFearAura() || me->IsCharmed() || me->isFrozen() || me->HasUnitState(UNIT_STATE_STUNNED) || me->HasUnitState(UNIT_STATE_CONFUSED))
                 return;
 
             switch (events.ExecuteEvent())
@@ -1324,7 +1324,7 @@ public:
 
             events.Update(diff);
 
-            if (me->HasUnitState(UNIT_STATE_CASTING) || me->isFeared() || me->IsCharmed() || me->isFrozen() || me->HasUnitState(UNIT_STATE_STUNNED) || me->HasUnitState(UNIT_STATE_CONFUSED))
+            if (me->HasUnitState(UNIT_STATE_CASTING) || me->HasFearAura() || me->IsCharmed() || me->isFrozen() || me->HasUnitState(UNIT_STATE_STUNNED) || me->HasUnitState(UNIT_STATE_CONFUSED))
                 return;
 
             switch (events.ExecuteEvent())
@@ -1418,7 +1418,7 @@ public:
 
             events.Update(diff);
 
-            if (me->HasUnitState(UNIT_STATE_CASTING) || me->isFeared() || me->IsCharmed() || me->isFrozen() || me->HasUnitState(UNIT_STATE_STUNNED) || me->HasUnitState(UNIT_STATE_CONFUSED))
+            if (me->HasUnitState(UNIT_STATE_CASTING) || me->HasFearAura() || me->IsCharmed() || me->isFrozen() || me->HasUnitState(UNIT_STATE_STUNNED) || me->HasUnitState(UNIT_STATE_CONFUSED))
                 return;
 
             switch (events.ExecuteEvent())
@@ -2152,7 +2152,7 @@ public:
             if (!UpdateVictim())
                 return;
 
-            if (me->HasUnitState(UNIT_STATE_CASTING) || me->isFeared() || me->IsCharmed() || me->isFrozen() || me->HasUnitState(UNIT_STATE_STUNNED) || me->HasUnitState(UNIT_STATE_CONFUSED))
+            if (me->HasUnitState(UNIT_STATE_CASTING) || me->HasFearAura() || me->IsCharmed() || me->isFrozen() || me->HasUnitState(UNIT_STATE_STUNNED) || me->HasUnitState(UNIT_STATE_CONFUSED))
                 return;
 
             if (!leaped)
@@ -2211,7 +2211,7 @@ public:
 
             events.Update(diff);
 
-            if (me->HasUnitState(UNIT_STATE_CASTING) || me->isFeared() || me->IsCharmed() || me->isFrozen() || me->HasUnitState(UNIT_STATE_STUNNED) || me->HasUnitState(UNIT_STATE_CONFUSED))
+            if (me->HasUnitState(UNIT_STATE_CASTING) || me->HasFearAura() || me->IsCharmed() || me->isFrozen() || me->HasUnitState(UNIT_STATE_STUNNED) || me->HasUnitState(UNIT_STATE_CONFUSED))
                 return;
 
             switch (events.ExecuteEvent())
@@ -2280,7 +2280,7 @@ public:
 
             events.Update(diff);
 
-            if (me->HasUnitState(UNIT_STATE_CASTING) || me->isFeared() || me->IsCharmed() || me->isFrozen() || me->HasUnitState(UNIT_STATE_STUNNED) || me->HasUnitState(UNIT_STATE_CONFUSED))
+            if (me->HasUnitState(UNIT_STATE_CASTING) || me->HasFearAura() || me->IsCharmed() || me->isFrozen() || me->HasUnitState(UNIT_STATE_STUNNED) || me->HasUnitState(UNIT_STATE_CONFUSED))
                 return;
 
             switch (events.ExecuteEvent())

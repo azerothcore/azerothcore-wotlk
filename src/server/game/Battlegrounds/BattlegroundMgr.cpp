@@ -47,6 +47,8 @@
 #include "SharedDefines.h"
 #include "World.h"
 #include "WorldPacket.h"
+#include "WorldState.h"
+#include "WorldStateDefines.h"
 #include <unordered_map>
 
 bool BattlegroundTemplate::IsArena() const
@@ -182,7 +184,7 @@ void BattlegroundMgr::Update(uint32 diff)
             {
                 sArenaTeamMgr->DistributeArenaPoints();
                 m_NextAutoDistributionTime = GameTime::GetGameTime() + Seconds(DAY * sWorld->getIntConfig(CONFIG_ARENA_AUTO_DISTRIBUTE_INTERVAL_DAYS));
-                sWorld->setWorldState(WS_ARENA_DISTRIBUTION_TIME, m_NextAutoDistributionTime.count());
+                sWorldState->setWorldState(WORLD_STATE_CUSTOM_ARENA_DISTRIBUTION_TIME, m_NextAutoDistributionTime.count());
             }
             m_AutoDistributionTimeChecker = 600000; // 10 minutes check
         }
@@ -334,6 +336,18 @@ Battleground* BattlegroundMgr::GetBattlegroundTemplate(BattlegroundTypeId bgType
     return bgs.empty() ? nullptr : bgs.begin()->second;
 }
 
+std::vector<Battleground const*> BattlegroundMgr::GetActiveBattlegrounds()
+{
+    std::vector<Battleground const*> result;
+
+    for (auto const& [bgType, bgData] : bgDataStore)
+        for (auto const& [id, bg] : bgData._Battlegrounds)
+            if (bg->GetStatus() == STATUS_WAIT_JOIN || bg->GetStatus() == STATUS_IN_PROGRESS)
+                result.push_back(static_cast<const Battleground*>(bg));
+
+    return result;
+}
+
 uint32 BattlegroundMgr::CreateClientVisibleInstanceId(BattlegroundTypeId bgTypeId, BattlegroundBracketId bracket_id)
 {
     if (IsArenaType(bgTypeId))
@@ -467,7 +481,7 @@ void BattlegroundMgr::LoadBattlegroundTemplates()
 
         BattlegroundTypeId bgTypeId = static_cast<BattlegroundTypeId>(fields[0].Get<uint32>());
 
-        if (DisableMgr::IsDisabledFor(DISABLE_TYPE_BATTLEGROUND, bgTypeId, nullptr))
+        if (sDisableMgr->IsDisabledFor(DISABLE_TYPE_BATTLEGROUND, bgTypeId, nullptr))
             continue;
 
         // can be overwrite by values from DB
@@ -549,7 +563,7 @@ void BattlegroundMgr::InitAutomaticArenaPointDistribution()
     if (!sWorld->getBoolConfig(CONFIG_ARENA_AUTO_DISTRIBUTE_POINTS))
         return;
 
-    Seconds wstime = Seconds(sWorld->getWorldState(WS_ARENA_DISTRIBUTION_TIME));
+    Seconds wstime = Seconds(sWorldState->getWorldState(WORLD_STATE_CUSTOM_ARENA_DISTRIBUTION_TIME));
     Seconds curtime = GameTime::GetGameTime();
 
     LOG_INFO("server.loading", "Initializing Automatic Arena Point Distribution");

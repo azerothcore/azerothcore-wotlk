@@ -15,13 +15,6 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
- /* ScriptData
- Name: instance_commandscript
- %Complete: 100
- Comment: All instance related commands
- Category: commandscripts
- EndScriptData */
-
 #include "Chat.h"
 #include "CommandScript.h"
 #include "GameTime.h"
@@ -206,7 +199,7 @@ public:
         return true;
     }
 
-    static bool HandleInstanceGetBossStateCommand(ChatHandler* handler, uint32 encounterId, Optional<PlayerIdentifier> player)
+    static bool HandleInstanceGetBossStateCommand(ChatHandler* handler, Optional<PlayerIdentifier> player)
     {
         // Character name must be provided when using this from console.
         if (!player && !handler->GetSession())
@@ -237,15 +230,13 @@ public:
             return false;
         }
 
-        if (encounterId > map->GetInstanceScript()->GetEncounterCount())
+        for (uint8 i = 0; i < map->GetInstanceScript()->GetEncounterCount(); ++i)
         {
-            handler->SendErrorMessage(LANG_BAD_VALUE);
-            return false;
+            uint32 state = map->GetInstanceScript()->GetBossState(i);
+            std::string stateName = InstanceScript::GetBossStateName(state);
+            handler->PSendSysMessage(LANG_COMMAND_INST_GET_BOSS_STATE, i, state, stateName);
         }
 
-        uint32 state = map->GetInstanceScript()->GetBossState(encounterId);
-        std::string stateName = InstanceScript::GetBossStateName(state);
-        handler->PSendSysMessage(LANG_COMMAND_INST_GET_BOSS_STATE, encounterId, state, stateName);
         return true;
     }
 };

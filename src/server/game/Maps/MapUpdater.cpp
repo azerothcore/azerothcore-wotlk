@@ -67,7 +67,7 @@ private:
     uint32 m_diff;
 };
 
-MapUpdater::MapUpdater(): pending_requests(0)
+MapUpdater::MapUpdater() : pending_requests(0), _cancelationToken(false)
 {
 }
 
@@ -84,10 +84,11 @@ void MapUpdater::deactivate()
 {
     _cancelationToken = true;
 
-    wait();
+    wait();  // This is where we wait for tasks to complete
 
-    _queue.Cancel();
+    _queue.Cancel();  // Cancel the queue to prevent further task processing
 
+    // Join all worker threads
     for (auto& thread : _workerThreads)
     {
         if (thread.joinable())
@@ -99,44 +100,45 @@ void MapUpdater::deactivate()
 
 void MapUpdater::wait()
 {
-    std::unique_lock<std::mutex> guard(_lock);
+    std::unique_lock<std::mutex> guard(_lock);  // Guard lock for safe waiting
 
-    while (pending_requests > 0)
-        _condition.wait(guard);
+    // Wait until there are no pending requests
+    _condition.wait(guard, [this] {
+        return pending_requests.load(std::memory_order_acquire) == 0;
+    });
+}
 
-    guard.unlock();
+void MapUpdater::schedule_task(UpdateRequest* request)
+{
+    // Atomic increment for pending_requests
+    pending_requests.fetch_add(1, std::memory_order_release);
+    _queue.Push(request);
 }
 
 void MapUpdater::schedule_update(Map& map, uint32 diff, uint32 s_diff)
 {
-    std::lock_guard<std::mutex> guard(_lock);
-
-    ++pending_requests;
-
-    _queue.Push(new MapUpdateRequest(map, *this, diff, s_diff));
+    schedule_task(new MapUpdateRequest(map, *this, diff, s_diff));
 }
 
 void MapUpdater::schedule_lfg_update(uint32 diff)
 {
-    std::lock_guard<std::mutex> guard(_lock);
-
-    ++pending_requests;
-
-    _queue.Push(new LFGUpdateRequest(*this, diff));
+    schedule_task(new LFGUpdateRequest(*this, diff));
 }
 
 bool MapUpdater::activated()
 {
-    return _workerThreads.size() > 0;
+    return !_workerThreads.empty();
 }
 
 void MapUpdater::update_finished()
 {
-    std::lock_guard<std::mutex> lock(_lock);
-
-    --pending_requests;
-
-    _condition.notify_all();
+    // Atomic decrement for pending_requests
+    if (pending_requests.fetch_sub(1, std::memory_order_acquire) == 1)
+    {
+        // Only notify when pending_requests becomes 0 (i.e., all tasks are finished)
+        std::lock_guard<std::mutex> lock(_lock);  // Lock only for condition variable notification
+        _condition.notify_all();  // Notify waiting threads that all requests are complete
+    }
 }
 
 void MapUpdater::WorkerThread()
@@ -145,16 +147,16 @@ void MapUpdater::WorkerThread()
     CharacterDatabase.WarnAboutSyncQueries(true);
     WorldDatabase.WarnAboutSyncQueries(true);
 
-    while (1)
+    while (!_cancelationToken)
     {
         UpdateRequest* request = nullptr;
 
-        _queue.WaitAndPop(request);
-        if (_cancelationToken)
-            return;
+        _queue.WaitAndPop(request);  // Wait for and pop a request from the queue
 
-        request->call();
-
-        delete request;
+        if (!_cancelationToken && request)
+        {
+            request->call();  // Execute the request
+            delete request;  // Clean up after processing
+        }
     }
 }

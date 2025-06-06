@@ -70,8 +70,6 @@ struct Cell
     [[nodiscard]] uint32 CellY() const { return data.Part.cell_y; }
     [[nodiscard]] uint32 GridX() const { return data.Part.grid_x; }
     [[nodiscard]] uint32 GridY() const { return data.Part.grid_y; }
-    [[nodiscard]] bool NoCreate() const { return data.Part.nocreate; }
-    void SetNoCreate() { data.Part.nocreate = 1; }
 
     [[nodiscard]] CellCoord GetCellCoord() const
     {
@@ -92,12 +90,10 @@ struct Cell
     {
         struct
         {
-            unsigned grid_x : 6;
-            unsigned grid_y : 6;
-            unsigned cell_x : 6;
-            unsigned cell_y : 6;
-            unsigned nocreate : 1;
-            unsigned reserved : 7;
+            unsigned grid_x : 8;
+            unsigned grid_y : 8;
+            unsigned cell_x : 8;
+            unsigned cell_y : 8;
         } Part;
         uint32 All;
     } data;
@@ -107,13 +103,13 @@ struct Cell
 
     static CellArea CalculateCellArea(float x, float y, float radius);
 
-    template<class T> static void VisitGridObjects(WorldObject const* obj, T& visitor, float radius, bool dont_load = true);
-    template<class T> static void VisitWorldObjects(WorldObject const* obj, T& visitor, float radius, bool dont_load = true);
-    template<class T> static void VisitAllObjects(WorldObject const* obj, T& visitor, float radius, bool dont_load = true);
+    template<class T> static void VisitGridObjects(WorldObject const* obj, T& visitor, float radius);
+    template<class T> static void VisitWorldObjects(WorldObject const* obj, T& visitor, float radius);
+    template<class T> static void VisitAllObjects(WorldObject const* obj, T& visitor, float radius);
 
-    template<class T> static void VisitGridObjects(float x, float y, Map* map, T& visitor, float radius, bool dont_load = true);
-    template<class T> static void VisitWorldObjects(float x, float y, Map* map, T& visitor, float radius, bool dont_load = true);
-    template<class T> static void VisitAllObjects(float x, float y, Map* map, T& visitor, float radius, bool dont_load = true);
+    template<class T> static void VisitGridObjects(float x, float y, Map* map, T& visitor, float radius);
+    template<class T> static void VisitWorldObjects(float x, float y, Map* map, T& visitor, float radius);
+    template<class T> static void VisitAllObjects(float x, float y, Map* map, T& visitor, float radius);
 
 private:
     template<class T, class CONTAINER> void VisitCircle(TypeContainerVisitor<T, CONTAINER>&, Map&, CellCoord const&, CellCoord const&) const;

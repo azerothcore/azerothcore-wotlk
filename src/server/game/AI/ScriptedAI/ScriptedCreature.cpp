@@ -194,6 +194,8 @@ ScriptedAI::ScriptedAI(Creature* creature) : CreatureAI(creature),
 {
     _isHeroic = me->GetMap()->IsHeroic();
     _difficulty = Difficulty(me->GetMap()->GetSpawnMode());
+    _invincible = false;
+    _canAutoAttack = true;
 }
 
 void ScriptedAI::AttackStartNoMove(Unit* who)
@@ -219,7 +221,14 @@ void ScriptedAI::UpdateAI(uint32 /*diff*/)
     if (!UpdateVictim())
         return;
 
-    DoMeleeAttackIfReady();
+    if (IsAutoAttackAllowed())
+        DoMeleeAttackIfReady();
+}
+
+void ScriptedAI::DamageTaken(Unit* /*attacker*/, uint32& damage, DamageEffectType /*damagetype*/, SpellSchoolMask /*damageSchoolMask*/)
+{
+    if (IsInvincible() && damage >= me->GetHealth())
+        damage = me->GetHealth() - 1;
 }
 
 void ScriptedAI::DoStartMovement(Unit* victim, float distance, float angle)
@@ -617,10 +626,14 @@ void BossAI::_Reset()
     if (!me->IsAlive())
         return;
 
+    if (me->IsEngaged())
+        return;
+
     me->SetCombatPulseDelay(0);
     me->ResetLootMode();
     events.Reset();
     scheduler.CancelAll();
+    me->m_Events.KillAllEvents(false);
     summons.DespawnAll();
     ClearUniqueTimedEventsDone();
     _healthCheckEvents.clear();
@@ -729,11 +742,14 @@ void BossAI::UpdateAI(uint32 diff)
         }
     }
 
-    DoMeleeAttackIfReady();
+    if (IsAutoAttackAllowed())
+        DoMeleeAttackIfReady();
 }
 
-void BossAI::DamageTaken(Unit* /*attacker*/, uint32& damage, DamageEffectType /*damagetype*/, SpellSchoolMask /*damageSchoolMask*/)
+void BossAI::DamageTaken(Unit* attacker, uint32& damage, DamageEffectType damagetype, SpellSchoolMask damageSchoolMask)
 {
+    ScriptedAI::DamageTaken(attacker, damage, damagetype, damageSchoolMask);
+
     if (_nextHealthCheck._valid)
         if (me->HealthBelowPctDamaged(_nextHealthCheck._healthPct, damage))
         {
@@ -770,6 +786,20 @@ void BossAI::ScheduleHealthCheckEvent(std::initializer_list<uint8> healthPct, st
     }
 
     _nextHealthCheck = _healthCheckEvents.front();
+}
+
+void BossAI::ScheduleEnrageTimer(uint32 spellId, Milliseconds timer, uint8 textId /*= 0*/)
+{
+    me->m_Events.AddEventAtOffset([this, spellId, textId]
+    {
+        if (!me->IsAlive())
+            return;
+
+        if (textId)
+            Talk(textId);
+
+        DoCastSelf(spellId, true);
+    }, timer);
 }
 
 // WorldBossAI - for non-instanced bosses

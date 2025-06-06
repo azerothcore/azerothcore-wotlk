@@ -18,7 +18,8 @@
 #ifndef _CHARMINFO_H
 #define _CHARMINFO_H
 
-#include "Object.h"
+#include "Define.h"
+#include "ObjectGuid.h"
 
 #define MAX_SPELL_CHARM         4
 #define MAX_SPELL_VEHICLE       6
@@ -82,6 +83,7 @@ public:
 
 public:
     bool HasGlobalCooldown(SpellInfo const* spellInfo) const;
+    uint32 GetGlobalCooldown(SpellInfo const* spellInfo) const;
     void AddGlobalCooldown(SpellInfo const* spellInfo, uint32 gcd);
     void CancelGlobalCooldown(SpellInfo const* spellInfo);
 

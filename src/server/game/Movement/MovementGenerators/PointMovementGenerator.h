@@ -18,7 +18,7 @@
 #ifndef ACORE_POINTMOVEMENTGENERATOR_H
 #define ACORE_POINTMOVEMENTGENERATOR_H
 
-#include "FollowerReference.h"
+#include "Creature.h"
 #include "MovementGenerator.h"
 
 template<class T>

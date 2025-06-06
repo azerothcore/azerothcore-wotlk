@@ -15,9 +15,11 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "CreatureScript.h"
 #include "InstanceMapScript.h"
 #include "InstanceScript.h"
 #include "Player.h"
+#include "ScriptedCreature.h"
 #include "SpellScript.h"
 #include "SpellScriptLoader.h"
 #include "sunwell_plateau.h"
@@ -33,10 +35,50 @@ DoorData const doorData[] =
     { 0,                   0,             DOOR_TYPE_ROOM   } // END
 };
 
+ObjectData const creatureData[] =
+{
+    { NPC_KALECGOS,               DATA_KALECGOS      },
+    { NPC_BRUTALLUS,              DATA_BRUTALLUS     },
+    { NPC_FELMYST,                DATA_FELMYST       },
+    { NPC_MURU,                   DATA_MURU          },
+    { NPC_LADY_SACROLASH,         DATA_SACROLASH     },
+    { NPC_GRAND_WARLOCK_ALYTHESS, DATA_ALYTHESS      },
+    { NPC_MADRIGOSA,              DATA_MADRIGOSA     },
+    { NPC_SATHROVARR,             DATA_SATHROVARR    },
+    { NPC_KILJAEDEN_CONTROLLER,   DATA_KJ_CONTROLLER },
+    { NPC_ANVEENA,                DATA_ANVEENA       },
+    { NPC_KALECGOS_KJ,            DATA_KALECGOS_KJ   },
+    { 0,                          0                  }
+};
+
+ObjectData const gameObjectData[] =
+{
+    { GO_ICE_BARRIER,                   DATA_ICEBARRIER                     },
+    { GO_ORB_OF_THE_BLUE_DRAGONFLIGHT1, DATA_ORB_OF_THE_BLUE_DRAGONFLIGHT_1 },
+    { GO_ORB_OF_THE_BLUE_DRAGONFLIGHT2, DATA_ORB_OF_THE_BLUE_DRAGONFLIGHT_2 },
+    { GO_ORB_OF_THE_BLUE_DRAGONFLIGHT3, DATA_ORB_OF_THE_BLUE_DRAGONFLIGHT_3 },
+    { GO_ORB_OF_THE_BLUE_DRAGONFLIGHT4, DATA_ORB_OF_THE_BLUE_DRAGONFLIGHT_4 },
+    { 0,                                0                                   }
+};
+
+ObjectData const summonData[] =
+{
+    { NPC_DEMONIC_VAPOR_TRAIL,    DATA_FELMYST       },
+    { NPC_UNYIELDING_DEAD,        DATA_FELMYST       },
+    { NPC_DARKNESS,               DATA_MURU          },
+    { NPC_VOID_SENTINEL,          DATA_MURU          },
+    { NPC_VOID_SPAWN,             DATA_MURU          },
+    { NPC_FELFIRE_PORTAL,         DATA_KJ_CONTROLLER },
+    { NPC_VOLATILE_FELFIRE_FIEND, DATA_KJ_CONTROLLER },
+    { NPC_SHIELD_ORB,             DATA_KJ_CONTROLLER },
+    { NPC_SINISTER_REFLECTION,    DATA_KJ_CONTROLLER },
+    { 0,                          0                  }
+};
+
 class instance_sunwell_plateau : public InstanceMapScript
 {
 public:
-    instance_sunwell_plateau() : InstanceMapScript("instance_sunwell_plateau", 580) { }
+    instance_sunwell_plateau() : InstanceMapScript("instance_sunwell_plateau", MAP_THE_SUNWELL) { }
 
     struct instance_sunwell_plateau_InstanceMapScript : public InstanceScript
     {
@@ -45,213 +87,27 @@ public:
             SetHeaders(DataHeader);
             SetBossNumber(MAX_ENCOUNTERS);
             LoadDoorData(doorData);
+            LoadObjectData(creatureData, gameObjectData);
+            LoadSummonData(summonData);
+        }
+
+        void Load(char const* data) override
+        {
+            InstanceScript::Load(data);
+
+            scheduler.Schedule(3s, [this](TaskContext /*context*/)
+            {
+                if (IsBossDone(DATA_BRUTALLUS) && !IsBossDone(DATA_FELMYST))
+                    if (Creature* madrigosa = GetCreature(DATA_MADRIGOSA))
+                        madrigosa->CastSpell((Unit*)nullptr, SPELL_SUMMON_FELBLAZE, true);
+            });
         }
 
         void OnPlayerEnter(Player* player) override
         {
-            instance->LoadGrid(1477.94f, 643.22f);
-            instance->LoadGrid(1641.45f, 988.08f);
-            if (GameObject* gobj = instance->GetGameObject(IceBarrierGUID))
+            if (GameObject* gobj = GetGameObject(DATA_ICEBARRIER))
                 gobj->SendUpdateToPlayer(player);
         }
-
-        Player const* GetPlayerInMap() const
-        {
-            Map::PlayerList const& players = instance->GetPlayers();
-
-            if (!players.IsEmpty())
-            {
-                for (Map::PlayerList::const_iterator itr = players.begin(); itr != players.end(); ++itr)
-                {
-                    Player* player = itr->GetSource();
-                    if (player && !player->HasAura(45839))
-                        return player;
-                }
-            }
-            //else
-            //    LOG_DEBUG("scripts", "Instance Sunwell Plateau: GetPlayerInMap, but PlayerList is empty!");
-
-            return nullptr;
-        }
-
-        void OnCreatureCreate(Creature* creature) override
-        {
-            if (creature->GetSpawnId() > 0 || !creature->GetOwnerGUID().IsPlayer())
-                creature->CastSpell(creature, SPELL_SUNWELL_RADIANCE, true);
-
-            switch (creature->GetEntry())
-            {
-                case NPC_KALECGOS:
-                    KalecgosDragonGUID = creature->GetGUID();
-                    break;
-                case NPC_SATHROVARR:
-                    SathrovarrGUID = creature->GetGUID();
-                    break;
-                case NPC_BRUTALLUS:
-                    BrutallusGUID = creature->GetGUID();
-                    break;
-                case NPC_MADRIGOSA:
-                    MadrigosaGUID = creature->GetGUID();
-                    break;
-                case NPC_FELMYST:
-                    FelmystGUID = creature->GetGUID();
-                    break;
-                case NPC_GRAND_WARLOCK_ALYTHESS:
-                    AlythessGUID = creature->GetGUID();
-                    break;
-                case NPC_LADY_SACROLASH:
-                    SacrolashGUID = creature->GetGUID();
-                    break;
-                case NPC_MURU:
-                    MuruGUID = creature->GetGUID();
-                    break;
-                case NPC_KILJAEDEN:
-                    KilJaedenGUID = creature->GetGUID();
-                    break;
-                case NPC_KILJAEDEN_CONTROLLER:
-                    KilJaedenControllerGUID = creature->GetGUID();
-                    break;
-                case NPC_ANVEENA:
-                    AnveenaGUID = creature->GetGUID();
-                    break;
-                case NPC_KALECGOS_KJ:
-                    KalecgosKjGUID = creature->GetGUID();
-                    break;
-
-                // Xinef: Felmyst encounter
-                case NPC_DEMONIC_VAPOR_TRAIL:
-                case NPC_UNYIELDING_DEAD:
-                    if (Creature* felmyst = instance->GetCreature(FelmystGUID))
-                        felmyst->AI()->JustSummoned(creature);
-                    break;
-
-                // Xinef: M'uru encounter
-                case NPC_DARKNESS:
-                case NPC_VOID_SENTINEL:
-                case NPC_VOID_SPAWN:
-                    if (Creature* muru = instance->GetCreature(MuruGUID))
-                        muru->AI()->JustSummoned(creature);
-                    break;
-
-                // Xinef: Kil'jaeden encounter
-                case NPC_FELFIRE_PORTAL:
-                case NPC_VOLATILE_FELFIRE_FIEND:
-                case NPC_SHIELD_ORB:
-                case NPC_SINISTER_REFLECTION:
-                    if (Creature* kiljaedenC = instance->GetCreature(KilJaedenControllerGUID))
-                        kiljaedenC->AI()->JustSummoned(creature);
-                    break;
-                default:
-                    break;
-            }
-        }
-
-        void OnGameObjectCreate(GameObject* go) override
-        {
-            switch (go->GetEntry())
-            {
-                case GO_FORCE_FIELD:
-                case GO_BOSS_COLLISION_1:
-                case GO_BOSS_COLLISION_2:
-                case GO_FIRE_BARRIER:
-                case GO_MURUS_GATE_1:
-                case GO_MURUS_GATE_2:
-                    AddDoor(go);
-                    break;
-                case GO_ICE_BARRIER:
-                    IceBarrierGUID = go->GetGUID();
-                    go->setActive(true);
-                    break;
-                case GO_ORB_OF_THE_BLUE_DRAGONFLIGHT1:
-                    blueFlightOrbGUID[0] = go->GetGUID();
-                    break;
-                case GO_ORB_OF_THE_BLUE_DRAGONFLIGHT2:
-                    blueFlightOrbGUID[1] = go->GetGUID();
-                    break;
-                case GO_ORB_OF_THE_BLUE_DRAGONFLIGHT3:
-                    blueFlightOrbGUID[2] = go->GetGUID();
-                    break;
-                case GO_ORB_OF_THE_BLUE_DRAGONFLIGHT4:
-                    blueFlightOrbGUID[3] = go->GetGUID();
-                    break;
-                default:
-                    break;
-            }
-        }
-
-        void OnGameObjectRemove(GameObject* go) override
-        {
-            switch (go->GetEntry())
-            {
-                case GO_FIRE_BARRIER:
-                case GO_MURUS_GATE_1:
-                case GO_MURUS_GATE_2:
-                case GO_BOSS_COLLISION_1:
-                case GO_BOSS_COLLISION_2:
-                case GO_FORCE_FIELD:
-                    RemoveDoor(go);
-                    break;
-                default:
-                    break;
-            }
-        }
-
-        ObjectGuid GetGuidData(uint32 id) const override
-        {
-            switch (id)
-            {
-                case NPC_KALECGOS:
-                    return KalecgosDragonGUID;
-                case NPC_SATHROVARR:
-                    return SathrovarrGUID;
-                case NPC_BRUTALLUS:
-                    return BrutallusGUID;
-                case NPC_MADRIGOSA:
-                    return MadrigosaGUID;
-                case NPC_FELMYST:
-                    return FelmystGUID;
-                case NPC_GRAND_WARLOCK_ALYTHESS:
-                    return AlythessGUID;
-                case NPC_LADY_SACROLASH:
-                    return SacrolashGUID;
-                case NPC_MURU:
-                    return MuruGUID;
-                case NPC_ANVEENA:
-                    return AnveenaGUID;
-                case NPC_KALECGOS_KJ:
-                    return KalecgosKjGUID;
-                case NPC_KILJAEDEN_CONTROLLER:
-                    return KilJaedenControllerGUID;
-                case NPC_KILJAEDEN:
-                    return KilJaedenGUID;
-
-                // Orbs
-                case DATA_ORB_OF_THE_BLUE_DRAGONFLIGHT_1:
-                case DATA_ORB_OF_THE_BLUE_DRAGONFLIGHT_2:
-                case DATA_ORB_OF_THE_BLUE_DRAGONFLIGHT_3:
-                case DATA_ORB_OF_THE_BLUE_DRAGONFLIGHT_4:
-                    return blueFlightOrbGUID[id - DATA_ORB_OF_THE_BLUE_DRAGONFLIGHT_1];
-            }
-
-            return ObjectGuid::Empty;
-        }
-
-    protected:
-        ObjectGuid KalecgosDragonGUID;
-        ObjectGuid SathrovarrGUID;
-        ObjectGuid BrutallusGUID;
-        ObjectGuid MadrigosaGUID;
-        ObjectGuid FelmystGUID;
-        ObjectGuid AlythessGUID;
-        ObjectGuid SacrolashGUID;
-        ObjectGuid MuruGUID;
-        ObjectGuid KilJaedenGUID;
-        ObjectGuid KilJaedenControllerGUID;
-        ObjectGuid AnveenaGUID;
-        ObjectGuid KalecgosKjGUID;
-
-        ObjectGuid IceBarrierGUID;
-        ObjectGuid blueFlightOrbGUID[4];
     };
 
     InstanceScript* GetInstanceScript(InstanceMap* map) const override
@@ -294,8 +150,216 @@ class spell_cataclysm_breath : public SpellScript
     }
 };
 
+enum SunbladeScout
+{
+    NPC_SUNBLADE_PROTECTOR               = 25507,
+    SAY_AGGRO                            = 0, // Enemies spotted! Attack while I try to activate a Protector!
+    SPELL_ACTIVATE_SUNBLADE_PROTECTOR    = 46475,
+    SPELL_COSMETIC_STUN_IMMUNE_PERMANENT = 59123,
+    SPELL_FELBLOOD_CHANNEL               = 46319,
+    SPELL_SINISTER_STRIKE                = 46558,
+};
+
+struct npc_sunblade_scout : public ScriptedAI
+{
+    npc_sunblade_scout(Creature* creature) : ScriptedAI(creature) { }
+
+    void Reset() override
+    {
+        scheduler.CancelAll();
+        ScheduleOOC();
+        me->SetCombatMovement(false);
+        me->SetReactState(REACT_AGGRESSIVE);
+        _protectorGUID.Clear();
+    }
+
+    void JustEngagedWith(Unit* /*who*/) override
+    {
+        scheduler.CancelAll();
+        me->CallForHelp(30.0f);
+        Talk(SAY_AGGRO);
+        std::list<Creature*> protectors;
+        GetCreatureListWithEntryInGrid(protectors, me, NPC_SUNBLADE_PROTECTOR, 100.0f); // range unknown
+        // Skip already activated protectors
+        protectors.remove_if([](Creature* trigger) {return !trigger->HasAura(SPELL_COSMETIC_STUN_IMMUNE_PERMANENT);});
+        protectors.sort(Acore::ObjectDistanceOrderPred(me));
+        if (protectors.empty())
+        {
+            ScheduleCombat();
+            return;
+        }
+        Creature* closestProtector = protectors.front();
+        me->GetMotionMaster()->MoveFollow(closestProtector, 0.0f, 0.0f);
+        _protectorGUID = closestProtector->GetGUID();
+        me->ClearTarget();
+        me->SetReactState(REACT_PASSIVE);
+        scheduler.Schedule(1s, [this](TaskContext context)
+        {
+            if (_protectorGUID)
+                if (Creature* protector = ObjectAccessor::GetCreature(*me, _protectorGUID))
+                {
+                    if (me->IsWithinRange(protector, 25.0f))
+                    {
+                        me->SetFacingToObject(protector);
+                        DoCastSelf(SPELL_ACTIVATE_SUNBLADE_PROTECTOR);
+                        scheduler.Schedule(5s, [this](TaskContext /*context*/)
+                        {
+                            ScheduleCombat();
+                        });
+                        return;
+                    }
+                    context.Repeat(1s);
+                    return;
+                }
+            ScheduleCombat();
+        });
+    }
+
+    void ScheduleCombat()
+    {
+        me->SetReactState(REACT_AGGRESSIVE);
+        me->SetCombatMovement(true);
+        if (Unit* victim = me->GetVictim())
+            me->GetMotionMaster()->MoveChase(victim);
+        scheduler.Schedule(2s, 5s, [this](TaskContext context)
+        {
+            DoCastVictim(SPELL_SINISTER_STRIKE);
+            context.Repeat(7s, 8s);
+        });
+    }
+
+    void ScheduleOOC()
+    {
+        scheduler.Schedule(45s, [this](TaskContext context)
+        {
+            DoCastAOE(SPELL_FELBLOOD_CHANNEL);
+            context.Repeat();
+        });
+    }
+
+    void UpdateAI(uint32 diff) override
+    {
+        scheduler.Update(diff);
+
+        if (!me->IsCombatMovementAllowed() || !UpdateVictim())
+            return;
+
+        DoMeleeAttackIfReady();
+    }
+private:
+    ObjectGuid _protectorGUID;
+};
+
+enum SunwellTeleportSpells
+{
+    SPELL_TELEPORT_TO_APEX_POINT = 46881,
+    SPELL_TELEPORT_TO_WITCHS_SANCTUM = 46883,
+    SPELL_TELEPORT_TO_SUNWELL_PLATEAU = 46884,
+};
+class spell_sunwell_teleport : public SpellScript
+{
+    PrepareSpellScript(spell_sunwell_teleport);
+public:
+    spell_sunwell_teleport(uint32 triggeredSpellId) : SpellScript(), _triggeredSpellId(triggeredSpellId) { }
+
+    bool Validate(SpellInfo const* /*spellInfo*/) override
+    {
+        return ValidateSpellInfo({ _triggeredSpellId });
+    }
+
+    void HandleScript(SpellEffIndex effIndex)
+    {
+        PreventHitDefaultEffect(effIndex);
+        if (Player* target = GetHitPlayer())
+            target->CastSpell(target, _triggeredSpellId, true);
+    }
+
+    void Register() override
+    {
+        OnEffectHitTarget += SpellEffectFn(spell_sunwell_teleport::HandleScript, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
+    }
+private:
+    uint32 _triggeredSpellId;
+};
+
+enum SunbladeArchMageSpells
+{
+    SPELL_ARCANE_EXPLOSION    = 46553,
+    SPELL_BLINK               = 28401,
+    SPELL_FROST_NOVA          = 46555
+};
+
+struct npc_sunblade_arch_mage : public ScriptedAI
+{
+    npc_sunblade_arch_mage(Creature* creature) : ScriptedAI(creature)
+    {
+        scheduler.SetValidator([this]
+        {
+            return !me->HasUnitState(UNIT_STATE_CASTING);
+        });
+    }
+
+    void Reset() override
+    {
+        scheduler.CancelAll();
+    }
+
+    void JustEngagedWith(Unit* /*who*/) override
+    {
+        scheduler.Schedule(6s, 12s, [this](TaskContext context)
+        {
+            DoCastAOE(SPELL_ARCANE_EXPLOSION);
+            context.Repeat(12s, 18s);
+        });
+
+        scheduler.Schedule(8s, 15s, [this](TaskContext context)
+        {
+            if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 30.0f, true))
+            {
+                DoCast(target, SPELL_BLINK, true);
+                DoCastAOE(SPELL_FROST_NOVA, true);
+            }
+            context.Repeat(20s, 25s);
+        });
+    }
+
+    void UpdateAI(uint32 diff) override
+    {
+        if (!UpdateVictim())
+            return;
+
+        scheduler.Update(diff);
+        DoMeleeAttackIfReady();
+    }
+
+private:
+    TaskScheduler scheduler;
+};
+
+class spell_spell_fury_aura : public AuraScript
+{
+    PrepareAuraScript(spell_spell_fury_aura);
+
+    void OnApply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
+    {
+        if (GetUnitOwner()->ToPlayer())
+            ModStackAmount(5);
+    }
+
+    void Register() override
+    {
+        OnEffectApply += AuraEffectApplyFn(spell_spell_fury_aura::OnApply, EFFECT_0, SPELL_AURA_MOD_CASTING_SPEED_NOT_STACK, AURA_EFFECT_HANDLE_REAL);
+    }
+};
+
 void AddSC_instance_sunwell_plateau()
 {
     new instance_sunwell_plateau();
     RegisterSpellScript(spell_cataclysm_breath);
+    RegisterSunwellPlateauCreatureAI(npc_sunblade_arch_mage);
+    RegisterSunwellPlateauCreatureAI(npc_sunblade_scout);
+    RegisterSpellScriptWithArgs(spell_sunwell_teleport, "spell_teleport_to_apex_point", SPELL_TELEPORT_TO_APEX_POINT);
+    RegisterSpellScriptWithArgs(spell_sunwell_teleport, "spell_teleport_to_witchs_sanctum", SPELL_TELEPORT_TO_WITCHS_SANCTUM);
+    RegisterSpellScriptWithArgs(spell_sunwell_teleport, "spell_teleport_to_sunwell_plateau", SPELL_TELEPORT_TO_SUNWELL_PLATEAU);
+    RegisterSpellScript(spell_spell_fury_aura);
 }

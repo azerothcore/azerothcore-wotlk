@@ -61,7 +61,6 @@ enum Spells
 enum Misc
 {
     EVENT_SPELL_BERSERK             = 1,
-
     GROUP_DELAY                     = 1
 };
 
@@ -100,9 +99,10 @@ struct boss_gurtogg_bloodboil : public BossAI
         }, 15s);
 
         ScheduleTimedEvent(1min, [&] {
-            if (Unit* target = SelectTarget(SelectTargetMethod::Random, 1, 40.0f, true))
+            if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 40.0f, true, false))
             {
                 me->RemoveAurasByType(SPELL_AURA_MOD_TAUNT);
+                me->RemoveAurasDueToSpell(SPELL_ACIDIC_WOUND);
                 DoCastSelf(SPELL_FEL_RAGE_SELF, true);
                 DoCast(target, SPELL_FEL_RAGE_TARGET, true);
                 DoCast(target, SPELL_FEL_RAGE_2, true);
@@ -117,6 +117,10 @@ struct boss_gurtogg_bloodboil : public BossAI
                 me->m_Events.AddEventAtOffset([&] {
                     DoCastVictim(SPELL_CHARGE);
                 }, 2s);
+
+                me->m_Events.AddEventAtOffset([&] {
+                    DoCastSelf(SPELL_ACIDIC_WOUND, true);
+                }, 28s);
 
                 scheduler.DelayGroup(GROUP_DELAY, 30s);
             }
@@ -139,7 +143,7 @@ struct boss_gurtogg_bloodboil : public BossAI
         return !who->IsImmunedToDamage(SPELL_SCHOOL_MASK_ALL) && !who->HasUnitState(UNIT_STATE_CONFUSED);
     }
 
-    void KilledUnit(Unit*  /*victim*/) override
+    void KilledUnit(Unit* /*victim*/) override
     {
         if (!_recentlySpoken)
         {

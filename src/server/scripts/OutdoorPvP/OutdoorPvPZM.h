@@ -24,10 +24,17 @@
 const uint8 OutdoorPvPZMBuffZonesNum = 5;
 
 // the buff is cast in these zones
-const uint32 OutdoorPvPZMBuffZones[OutdoorPvPZMBuffZonesNum] = {3521, 3607, 3717, 3715, 3716};
+const uint32 OutdoorPvPZMBuffZones[OutdoorPvPZMBuffZonesNum] =
+{
+    AREA_ZANGARMARSH,
+    AREA_SERPENTSHRINE_CAVERN,
+    AREA_THE_SLAVE_PENS,
+    AREA_THE_STEAMVAULT,
+    AREA_THE_UNDERBOG
+};
 
 // linked when the central tower is controlled
-const uint32 ZM_GRAVEYARD_ZONE = 3521;
+const uint32 ZM_GRAVEYARD_ZONE = AREA_ZANGARMARSH;
 
 // linked when the central tower is controlled
 const uint32 ZM_GRAVEYARD_ID = 969;
@@ -47,15 +54,15 @@ enum OutdoorPvPZMSpells
 };
 
 // banners 182527, 182528, 182529, gotta check them ingame
-const go_type ZM_Banner_A = { 182527, 530, 253.54f, 7083.81f, 36.7728f, -0.017453f, 0.0f, 0.0f, 0.008727f, -0.999962f };
-const go_type ZM_Banner_H = { 182528, 530, 253.54f, 7083.81f, 36.7728f, -0.017453f, 0.0f, 0.0f, 0.008727f, -0.999962f };
-const go_type ZM_Banner_N = { 182529, 530, 253.54f, 7083.81f, 36.7728f, -0.017453f, 0.0f, 0.0f, 0.008727f, -0.999962f };
+const go_type ZM_Banner_A = { 182527, MAP_OUTLAND, 253.54f, 7083.81f, 36.7728f, -0.017453f, 0.0f, 0.0f, 0.008727f, -0.999962f };
+const go_type ZM_Banner_H = { 182528, MAP_OUTLAND, 253.54f, 7083.81f, 36.7728f, -0.017453f, 0.0f, 0.0f, 0.008727f, -0.999962f };
+const go_type ZM_Banner_N = { 182529, MAP_OUTLAND, 253.54f, 7083.81f, 36.7728f, -0.017453f, 0.0f, 0.0f, 0.008727f, -0.999962f };
 
 // horde field scout spawn data
-const creature_type ZM_HordeFieldScout = {18564, 530, 296.625f, 7818.4f, 42.6294f, 5.18363f};
+const creature_type ZM_HordeFieldScout = {18564, MAP_OUTLAND, 296.625f, 7818.4f, 42.6294f, 5.18363f};
 
 // alliance field scout spawn data
-const creature_type ZM_AllianceFieldScout = {18581, 530, 374.395f, 6230.08f, 22.8351f, 0.593412f};
+const creature_type ZM_AllianceFieldScout = {18581, MAP_OUTLAND, 374.395f, 6230.08f, 22.8351f, 0.593412f};
 
 enum ZMCreatureTypes
 {
@@ -118,43 +125,8 @@ const uint32 ZMBeaconLoseH[ZM_NUM_BEACONS] =
 
 const go_type ZMCapturePoints[ZM_NUM_BEACONS] =
 {
-    {182523, 530, 303.243f, 6841.36f, 40.1245f, -1.58825f, 0.0f, 0.0f, 0.71325f, -0.700909f},
-    {182522, 530, 336.466f, 7340.26f, 41.4984f, -1.58825f, 0.0f, 0.0f, 0.71325f, -0.700909f}
-};
-
-enum OutdoorPvPZMWorldStates
-{
-    ZM_UI_TOWER_SLIDER_N_W = 2529,
-    ZM_UI_TOWER_SLIDER_POS_W = 2528,
-    ZM_UI_TOWER_SLIDER_DISPLAY_W = 2527,
-
-    ZM_UI_TOWER_SLIDER_N_E = 2535,
-    ZM_UI_TOWER_SLIDER_POS_E = 2534,
-    ZM_UI_TOWER_SLIDER_DISPLAY_E = 2533,
-
-    ZM_WORLDSTATE_UNK_1 = 2653,
-
-    ZM_UI_TOWER_EAST_N = 2560,
-    ZM_UI_TOWER_EAST_H = 2559,
-    ZM_UI_TOWER_EAST_A = 2558,
-    ZM_UI_TOWER_WEST_N = 2557,
-    ZM_UI_TOWER_WEST_H = 2556,
-    ZM_UI_TOWER_WEST_A = 2555,
-
-    ZM_MAP_TOWER_EAST_N = 2652,
-    ZM_MAP_TOWER_EAST_H = 2651,
-    ZM_MAP_TOWER_EAST_A = 2650,
-    ZM_MAP_GRAVEYARD_H = 2649,
-    ZM_MAP_GRAVEYARD_A = 2648,
-    ZM_MAP_GRAVEYARD_N = 2647,
-    ZM_MAP_TOWER_WEST_N = 2646,
-    ZM_MAP_TOWER_WEST_H = 2645,
-    ZM_MAP_TOWER_WEST_A = 2644,
-
-    ZM_MAP_HORDE_FLAG_READY = 2658,
-    ZM_MAP_HORDE_FLAG_NOT_READY = 2657,
-    ZM_MAP_ALLIANCE_FLAG_NOT_READY = 2656,
-    ZM_MAP_ALLIANCE_FLAG_READY = 2655
+    {182523, MAP_OUTLAND, 303.243f, 6841.36f, 40.1245f, -1.58825f, 0.0f, 0.0f, 0.71325f, -0.700909f},
+    {182522, MAP_OUTLAND, 336.466f, 7340.26f, 41.4984f, -1.58825f, 0.0f, 0.0f, 0.71325f, -0.700909f}
 };
 
 enum ZM_TowerStateMask
@@ -175,7 +147,7 @@ public:
 
     void SendChangePhase() override;
 
-    void FillInitialWorldStates(WorldPacket& data) override;
+    void FillInitialWorldStates(WorldPackets::WorldState::InitWorldStates& packet) override;
 
     // used when player is activated/inactivated in the area
     bool HandlePlayerEnter(Player* player) override;
@@ -188,23 +160,23 @@ protected:
     uint32 m_TowerState;
 };
 
-enum ZM_GraveYardState
+enum Zm_GraveyardState
 {
     ZM_GRAVEYARD_N = 1,
     ZM_GRAVEYARD_A = 2,
     ZM_GRAVEYARD_H = 4
 };
 
-class OPvPCapturePointZM_GraveYard : public OPvPCapturePoint
+class OPvPCapturePointZM_Graveyard : public OPvPCapturePoint
 {
 public:
-    OPvPCapturePointZM_GraveYard(OutdoorPvP* pvp);
+    OPvPCapturePointZM_Graveyard(OutdoorPvP* pvp);
 
     bool Update(uint32 diff) override;
 
     void ChangeState() override {}
 
-    void FillInitialWorldStates(WorldPacket& data) override;
+    void FillInitialWorldStates(WorldPackets::WorldState::InitWorldStates& packet) override;
 
     void UpdateTowerState();
 
@@ -218,10 +190,10 @@ public:
 
     bool CanTalkTo(Player* player, Creature* creature, GossipMenuItems const& gso) override;
 
-    uint32 GetGraveYardState() const;
+    uint32 GetGraveyardState() const;
 
 private:
-    uint32 m_GraveYardState;
+    uint32 m_GraveyardState;
 
 protected:
     TeamId m_BothControllingFactionId;
@@ -240,7 +212,7 @@ public:
 
     bool Update(uint32 diff) override;
 
-    void FillInitialWorldStates(WorldPacket& data) override;
+    void FillInitialWorldStates(WorldPackets::WorldState::InitWorldStates& packet) override;
 
     void SendRemoveWorldStates(Player* player) override;
 
@@ -253,7 +225,7 @@ public:
     void SetHordeTowersControlled(uint32 count);
 
 private:
-    OPvPCapturePointZM_GraveYard* m_GraveYard;
+    OPvPCapturePointZM_Graveyard* m_Graveyard;
 
     uint32 m_AllianceTowersControlled;
     uint32 m_HordeTowersControlled;

@@ -15,6 +15,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "AreaDefines.h"
 #include "CombatAI.h"
 #include "CreatureScript.h"
 #include "MoveSplineInit.h"
@@ -29,7 +30,6 @@
 #include "SpellScriptLoader.h"
 #include "Vehicle.h"
 
-// Ours
 enum eBKG
 {
     QUEST_BLACK_KNIGHT_CURSE            = 14016,
@@ -1461,7 +1461,6 @@ class spell_deliver_gryphon : public SpellScript
     }
 };
 
-// Theirs
 /*######
 ## npc_guardian_pavilion
 ######*/
@@ -1469,9 +1468,6 @@ class spell_deliver_gryphon : public SpellScript
 enum GuardianPavilion
 {
     SPELL_TRESPASSER_H                            = 63987,
-    AREA_SUNREAVER_PAVILION                       = 4676,
-
-    AREA_SILVER_COVENANT_PAVILION                 = 4677,
     SPELL_TRESPASSER_A                            = 63986,
 };
 
@@ -1496,7 +1492,7 @@ public:
             if (!who || !who->IsPlayer() || !me->IsHostileTo(who) || !me->isInBackInMap(who, 5.0f))
                 return;
 
-            if (who->HasAura(SPELL_TRESPASSER_H) || who->HasAura(SPELL_TRESPASSER_A))
+            if (who->HasAnyAuras(SPELL_TRESPASSER_H, SPELL_TRESPASSER_A))
                 return;
 
             if (who->ToPlayer()->GetTeamId() == TEAM_ALLIANCE)
@@ -2133,9 +2129,31 @@ public:
     }
 };
 
+enum WaterTerror
+{
+    SPELL_WATER_TERROR_FROST_NOVA = 57668
+};
+
+// 57652 - Crashing Wave
+class spell_crashing_wave : public SpellScript
+{
+    PrepareSpellScript(spell_crashing_wave);
+
+    void RecalculateDamage()
+    {
+        if (Unit* target = GetHitUnit())
+            if (target->HasAura(SPELL_WATER_TERROR_FROST_NOVA))
+                SetHitDamage(GetHitDamage() * 2);
+    }
+
+    void Register() override
+    {
+        OnHit += SpellHitFn(spell_crashing_wave::RecalculateDamage);
+    }
+};
+
 void AddSC_icecrown()
 {
-    // Ours
     new npc_black_knight_graveyard();
     new npc_battle_at_valhalas();
     new npc_llod_generic();
@@ -2149,10 +2167,9 @@ void AddSC_icecrown()
     new npc_infra_green_bomber_generic();
     RegisterSpellScript(spell_onslaught_or_call_bone_gryphon);
     RegisterSpellScript(spell_deliver_gryphon);
-
-    // Theirs
     new npc_guardian_pavilion();
     new npc_tournament_training_dummy();
     new npc_blessed_banner();
     new npc_frostbrood_skytalon();
+    RegisterSpellScript(spell_crashing_wave);
 }

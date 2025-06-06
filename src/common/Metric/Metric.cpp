@@ -17,8 +17,8 @@
 
 #include "Metric.h"
 #include "Config.h"
-#include "DeadlineTimer.h"
 #include "Log.h"
+#include "SteadyTimer.h"
 #include "Strand.h"
 #include "Tokenize.h"
 #include <boost/algorithm/string/replace.hpp>
@@ -42,8 +42,8 @@ void Metric::Initialize(std::string const& realmName, Acore::Asio::IoContext& io
 {
     _dataStream = std::make_unique<boost::asio::ip::tcp::iostream>();
     _realmName = FormatInfluxDBTagValue(realmName);
-    _batchTimer = std::make_unique<Acore::Asio::DeadlineTimer>(ioContext);
-    _overallStatusTimer = std::make_unique<Acore::Asio::DeadlineTimer>(ioContext);
+    _batchTimer = std::make_unique<boost::asio::steady_timer>(ioContext);
+    _overallStatusTimer = std::make_unique<boost::asio::steady_timer>(ioContext);
     _overallStatusLogger = overallStatusLogger;
     LoadFromConfigs();
 }
@@ -247,7 +247,7 @@ void Metric::ScheduleSend()
 {
     if (_enabled)
     {
-        _batchTimer->expires_from_now(boost::posix_time::seconds(_updateInterval));
+        _batchTimer->expires_at(Acore::Asio::SteadyTimer::GetExpirationTime(_updateInterval));
         _batchTimer->async_wait(std::bind(&Metric::SendBatch, this));
     }
     else
@@ -280,7 +280,7 @@ void Metric::ScheduleOverallStatusLog()
 {
     if (_enabled)
     {
-        _overallStatusTimer->expires_from_now(boost::posix_time::seconds(_overallStatusTimerInterval));
+        _overallStatusTimer->expires_at(Acore::Asio::SteadyTimer::GetExpirationTime(_overallStatusTimerInterval));
         _overallStatusTimer->async_wait([this](const boost::system::error_code&)
         {
             _overallStatusTimerTriggered = true;

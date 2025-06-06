@@ -18,7 +18,6 @@
 #ifndef _THREATMANAGER
 #define _THREATMANAGER
 
-#include "Common.h"
 #include "IteratorPair.h"
 #include "ObjectGuid.h"
 #include "Reference.h"

@@ -81,7 +81,7 @@ public:
 
     virtual ~BfCapturePoint() { }
 
-    virtual void FillInitialWorldStates(WorldPacket& /*data*/) {}
+    virtual void FillInitialWorldStates(WorldPackets::WorldState::InitWorldStates& /*packet*/) { }
 
     // Send world state update to all players present
     void SendUpdateWorldState(uint32 field, uint32 value);
@@ -334,7 +334,8 @@ public:
 
     /// Send all worldstate data to all player in zone.
     virtual void SendInitWorldStatesToAll() = 0;
-    virtual void FillInitialWorldStates(WorldPacket& /*data*/) = 0;
+    virtual void FillInitialWorldStates(WorldPackets::WorldState::InitWorldStates& /*packet*/) = 0;
+    virtual void SendUpdateWorldStates(Player* player = nullptr) = 0;
 
     /// Return if we can use mount in battlefield
     bool CanFlyIn() { return !m_isActive; }
@@ -382,8 +383,8 @@ protected:
     uint32 m_ZoneId;                                        // ZoneID of Wintergrasp = 4197
     uint32 m_MapId;                                         // MapId where is Battlefield
     Map* m_Map;
-    uint32 m_MaxPlayer;                                     // Maximum number of player that participated to Battlefield
-    uint32 m_MinPlayer;                                     // Minimum number of player for Battlefield start
+    uint32 m_MaxPlayer;                                     // Maximum number of players per team that participated to Battlefield
+    uint32 m_MinPlayer;                                     // Minimum number of players per team for Battlefield start
     uint32 m_MinLevel;                                      // Required level to participate at Battlefield
     uint32 m_BattleTime;                                    // Length of a battle
     uint32 m_NoWarBattleTime;                               // Time between two battles

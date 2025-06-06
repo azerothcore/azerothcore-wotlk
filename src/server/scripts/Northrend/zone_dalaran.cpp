@@ -15,6 +15,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "AreaDefines.h"
 #include "CreatureScript.h"
 #include "MoveSplineInit.h"
 #include "Player.h"
@@ -23,7 +24,6 @@
 #include "TaskScheduler.h"
 #include "World.h"
 
-// Ours
 class npc_steam_powered_auctioneer : public CreatureScript
 {
 public:
@@ -398,7 +398,6 @@ public:
     };
 };
 
-// Theirs
 /*******************************************************
  * npc_mageguard_dalaran
  *******************************************************/
@@ -444,7 +443,7 @@ public:
 
         void MoveInLineOfSight(Unit* who) override
         {
-            if (!who || !who->IsInWorld() || who->GetZoneId() != 4395)
+            if (!who || !who->IsInWorld()|| who->GetZoneId() != AREA_DALARAN || who->GetAreaId() == AREA_SEWER_EXIT_PIPE)
                 return;
 
             if (!me->IsWithinDist(who, 5.0f, false))
@@ -454,8 +453,7 @@ public:
 
             if (!player || player->IsGameMaster() || player->IsBeingTeleported() || (player->GetPositionZ() > 670 && player->GetVehicle()) ||
                     // If player has Disguise aura for quest A Meeting With The Magister or An Audience With The Arcanist, do not teleport it away but let it pass
-                    player->HasAura(SPELL_SUNREAVER_DISGUISE_FEMALE) || player->HasAura(SPELL_SUNREAVER_DISGUISE_MALE) ||
-                    player->HasAura(SPELL_SILVER_COVENANT_DISGUISE_FEMALE) || player->HasAura(SPELL_SILVER_COVENANT_DISGUISE_MALE))
+                    player->HasAnyAuras(SPELL_SUNREAVER_DISGUISE_FEMALE, SPELL_SUNREAVER_DISGUISE_MALE, SPELL_SILVER_COVENANT_DISGUISE_FEMALE, SPELL_SILVER_COVENANT_DISGUISE_MALE))
                 return;
 
             switch (me->GetEntry())
@@ -500,8 +498,6 @@ public:
 
 enum MinigobData
 {
-    ZONE_DALARAN            = 4395,
-
     SPELL_MANABONKED        = 61834,
     SPELL_TELEPORT_VISUAL   = 51347,
     SPELL_IMPROVED_BLINK    = 61995,
@@ -538,7 +534,7 @@ struct npc_minigob_manabonk : public ScriptedAI
 
         me->GetMap()->DoForAllPlayers([&](Player* player)
             {
-                if (player->GetZoneId() == ZONE_DALARAN && !player->IsFlying() && !player->IsMounted() && !player->IsGameMaster())
+                if (player->GetZoneId() == AREA_DALARAN && !player->IsFlying() && !player->IsMounted() && !player->IsGameMaster())
                     playerInDalaranList.push_back(player);
             });
 

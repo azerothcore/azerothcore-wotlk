@@ -20,6 +20,7 @@
 #include "SpellScript.h"
 #include "SpellScriptLoader.h"
 #include "sethekk_halls.h"
+#include "SpellMgr.h"
 
 enum Text
 {
@@ -102,9 +103,9 @@ struct boss_talon_king_ikiss : public BossAI
         }).Schedule(8s, [this](TaskContext context)
         {
             SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(SPELL_POLYMORPH);
-            if (Unit* target = SelectTarget(SelectTargetMethod::Random, 1, [&](Unit* target) -> bool
+            if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, [&](Unit* target) -> bool
                 {
-                    return target && !target->IsImmunedToSpell(spellInfo);
+                    return target && !target->IsImmunedToSpell(spellInfo) && target != me->GetThreatMgr().GetCurrentVictim();
                 }))
             {
                 DoCast(target, SPELL_POLYMORPH);

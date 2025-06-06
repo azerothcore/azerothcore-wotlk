@@ -16,6 +16,7 @@
  */
 
 #include "AchievementCriteriaScript.h"
+#include "AreaDefines.h"
 #include "Config.h"
 #include "CreatureScript.h"
 #include "CreatureTextMgr.h"
@@ -28,6 +29,8 @@
 #include "TransportMgr.h"
 #include "Vehicle.h"
 #include "icecrown_citadel.h"
+#include "PassiveAI.h"
+#include "SpellAuraEffects.h"
 
 enum Texts
 {

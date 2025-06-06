@@ -28,7 +28,7 @@ enum SpellInterruptFlags
     SPELL_INTERRUPT_FLAG_UNK3         = 0x04, // any info?
     SPELL_INTERRUPT_FLAG_INTERRUPT    = 0x08, // interrupt
     SPELL_INTERRUPT_FLAG_ABORT_ON_DMG = 0x10,               // _complete_ interrupt on direct damage
-    //SPELL_INTERRUPT_UNK             = 0x20                // unk, 564 of 727 spells having this spell start with "Glyph"
+    SPELL_INTERRUPT_UNK               = 0x20                // unk, 564 of 727 spells having this spell start with "Glyph"
 };
 
 // See SpellAuraInterruptFlags for other values definitions
@@ -117,7 +117,10 @@ enum SpellValueMod
     SPELLVALUE_MAX_TARGETS,
     SPELLVALUE_AURA_STACK,
     SPELLVALUE_AURA_DURATION,
-    SPELLVALUE_FORCED_CRIT_RESULT
+    SPELLVALUE_FORCED_CRIT_RESULT,
+    SPELLVALUE_MISCVALUE0,
+    SPELLVALUE_MISCVALUE1,
+    SPELLVALUE_MISCVALUE2,
 };
 
 enum SpellFacingFlags

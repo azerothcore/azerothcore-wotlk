@@ -1276,7 +1276,7 @@ void Aura::HandleAuraSpecificMods(AuraApplication const* aurApp, Unit* caster, b
         for (SpellAreaForAreaMap::const_iterator itr = saBounds.first; itr != saBounds.second; ++itr)
         {
             // some auras remove at aura remove
-            if (!itr->second->IsFitToRequirements(target->ToPlayer(), zone, area))
+            if (!itr->second->IsFitToRequirements(target->ToPlayer(), zone, area) && !apply)
                 target->RemoveAurasDueToSpell(itr->second->spellId);
             // some auras applied at aura apply
             else if (itr->second->autocast)
@@ -1659,7 +1659,7 @@ void Aura::HandleAuraSpecificMods(AuraApplication const* aurApp, Unit* caster, b
                         if (removeMode != AURA_REMOVE_BY_EXPIRE || aurApp->GetBase()->IsExpired())
                             break;
                         if (target->HasAura(70752)) // Item - Mage T10 2P Bonus
-                            target->CastSpell(target, 70753, true);
+                            target->CastSpell(target, 70753, true); // Pushing the Limit
                         break;
                     default:
                         break;

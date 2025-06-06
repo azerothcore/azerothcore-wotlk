@@ -33,7 +33,7 @@ ObjectData const creatureData[] =
 class instance_utgarde_keep : public InstanceMapScript
 {
 public:
-    instance_utgarde_keep() : InstanceMapScript("instance_utgarde_keep", 574) { }
+    instance_utgarde_keep() : InstanceMapScript("instance_utgarde_keep", MAP_UTGARDE_KEEP) { }
 
     InstanceScript* GetInstanceScript(InstanceMap* pMap) const override
     {
@@ -44,6 +44,8 @@ public:
     {
         instance_utgarde_keep_InstanceMapScript(Map* pMap) : InstanceScript(pMap)
         {
+            SetHeaders(DataHeader);
+            SetBossNumber(EncounterCount);
             LoadObjectData(creatureData, nullptr);
         }
 
@@ -69,10 +71,24 @@ public:
 
         bool IsEncounterInProgress() const override
         {
+            if (InstanceScript::IsEncounterInProgress())
+                return true;
+
             for (uint8 i = 0; i < MAX_ENCOUNTER; ++i)
                 if (m_auiEncounter[i] == IN_PROGRESS) return true;
 
             return false;
+        }
+
+        bool SetBossState(uint32 type, EncounterState state) override
+        {
+            if (!InstanceScript::SetBossState(type, state))
+                return false;
+
+            if (type == DATA_KELESETH && state == NOT_STARTED)
+                bRocksAchiev = true;
+
+            return true;
         }
 
         void OnPlayerEnter(Player* plr) override
@@ -160,11 +176,6 @@ public:
         {
             switch (type)
             {
-                case DATA_KELESETH:
-                    m_auiEncounter[0] = data;
-                    if (data == NOT_STARTED)
-                        bRocksAchiev = true;
-                    break;
                 case DATA_ON_THE_ROCKS_ACHIEV:
                     bRocksAchiev = false;
                     break;

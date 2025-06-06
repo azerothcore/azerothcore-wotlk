@@ -46,11 +46,11 @@ void Graveyard::LoadGraveyardFromDB()
 
     do
     {
-        Field* fields = result->Fetch();
-        uint32 ID = fields[0].Get<uint32>();
-
         GraveyardStruct Graveyard;
 
+        Field* fields = result->Fetch();
+
+        Graveyard.ID = fields[0].Get<uint32>();
         Graveyard.Map = fields[1].Get<uint32>();
         Graveyard.x = fields[2].Get<float>();
         Graveyard.y = fields[3].Get<float>();
@@ -59,13 +59,13 @@ void Graveyard::LoadGraveyardFromDB()
 
         if (!Utf8toWStr(Graveyard.name, Graveyard.wnameLow))
         {
-            LOG_ERROR("sql.sql", "Wrong UTF8 name for id {} in `game_graveyard` table, ignoring.", ID);
+            LOG_ERROR("sql.sql", "Wrong UTF8 name for id {} in `game_graveyard` table, ignoring.", Graveyard.ID);
             continue;
         }
 
         wstrToLower(Graveyard.wnameLow);
 
-        _graveyardStore[ID] = Graveyard;
+        _graveyardStore[Graveyard.ID] = std::move(Graveyard);
 
         ++Count;
     } while (result->NextRow());
@@ -97,7 +97,7 @@ GraveyardStruct const* Graveyard::GetDefaultGraveyard(TeamId teamId)
 GraveyardStruct const* Graveyard::GetClosestGraveyard(Player* player, TeamId teamId, bool nearCorpse)
 {
     uint32 graveyardOverride = 0;
-    sScriptMgr->OnBeforeChooseGraveyard(player, teamId, nearCorpse, graveyardOverride);
+    sScriptMgr->OnPlayerBeforeChooseGraveyard(player, teamId, nearCorpse, graveyardOverride);
     if (graveyardOverride)
     {
         return sGraveyard->GetGraveyard(graveyardOverride);

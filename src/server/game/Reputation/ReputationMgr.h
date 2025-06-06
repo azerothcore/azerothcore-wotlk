@@ -18,10 +18,9 @@
 #ifndef __ACORE_REPUTATION_MGR_H
 #define __ACORE_REPUTATION_MGR_H
 
-#include "Common.h"
+#include "DatabaseEnvFwd.h"
 #include "DBCStructure.h"
 #include "Language.h"
-#include "QueryResult.h"
 #include "SharedDefines.h"
 #include <map>
 

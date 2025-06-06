@@ -54,6 +54,8 @@
 #include <boost/algorithm/string.hpp>
 #include <numeric>
 
+#include "ItemEnchantmentMgr.h"
+
 ScriptMapMap sSpellScripts;
 ScriptMapMap sEventScripts;
 ScriptMapMap sWaypointScripts;
@@ -1649,7 +1651,7 @@ CreatureModel const* ObjectMgr::ChooseDisplayId(CreatureTemplate const* cinfo, C
         if (CreatureModel const* model = cinfo->GetModelWithDisplayId(data->displayid))
             return model;
 
-    if (!(cinfo->flags_extra & CREATURE_FLAG_EXTRA_TRIGGER))
+    if (!cinfo->HasFlagsExtra(CREATURE_FLAG_EXTRA_TRIGGER))
         if (CreatureModel const* model = cinfo->GetRandomValidModel())
             return model;
 
@@ -1781,6 +1783,139 @@ void ObjectMgr::LoadCreatureModelInfo()
 
     LOG_INFO("server.loading", ">> Loaded {} Creature Model Based Info in {} ms", count, GetMSTimeDiffToNow(oldMSTime));
     LOG_INFO("server.loading", " ");
+}
+
+void ObjectMgr::LoadPlayerTotemModels()
+{
+    uint32 oldMSTime = getMSTime();
+
+    QueryResult result = WorldDatabase.Query("SELECT TotemID, RaceID, ModelID from player_totem_model");
+
+    if (!result)
+    {
+        LOG_INFO("server.loading", ">> Loaded 0 player totem model records. DB table `player_totem_model` is empty.");
+        return;
+    }
+
+    uint32 count = 0;
+    do
+    {
+        Field* fields = result->Fetch();
+
+        SummonSlot totemSlot = SummonSlot(fields[0].Get<uint8>());
+        uint8 race = fields[1].Get<uint8>();
+        uint32 displayId = fields[2].Get<uint32>();
+
+        if (totemSlot < SUMMON_SLOT_TOTEM_FIRE || totemSlot >= MAX_TOTEM_SLOT)
+        {
+            LOG_ERROR("sql.sql", "Wrong TotemSlot {} in `player_totem_model` table, skipped.", totemSlot);
+            continue;
+        }
+
+        ChrRacesEntry const* raceEntry = sChrRacesStore.LookupEntry(race);
+        if (!raceEntry)
+        {
+            LOG_ERROR("sql.sql", "Race {} defined in `player_totem_model` does not exists, skipped.", uint32(race));
+            continue;
+        }
+
+        CreatureDisplayInfoEntry const* displayEntry = sCreatureDisplayInfoStore.LookupEntry(displayId);
+        if (!displayEntry)
+        {
+            LOG_ERROR("sql.sql", "TotemSlot: {} defined in `player_totem_model` has non-existing model ({}), skipped.", totemSlot, displayId);
+            continue;
+        }
+
+        _playerTotemModel[std::make_pair(totemSlot, Races(race))] = displayId;
+        ++count;
+    } while (result->NextRow());
+
+    LOG_INFO("server.loading", ">> Loaded {} player totem model records in {} ms", count, GetMSTimeDiffToNow(oldMSTime));
+    LOG_INFO("server.loading", " ");
+}
+
+uint32 ObjectMgr::GetModelForTotem(SummonSlot totemSlot, Races race) const
+{
+    auto itr = _playerTotemModel.find(std::make_pair(totemSlot, race));
+    if (itr != _playerTotemModel.end())
+        return itr->second;
+
+    LOG_ERROR("misc", "TotemSlot {} with RaceID ({}) have no totem model data defined, set to default model.", totemSlot, race);
+    return 0;
+}
+
+void ObjectMgr::LoadPlayerShapeshiftModels()
+{
+    uint32 oldMSTime = getMSTime();
+
+    QueryResult result = WorldDatabase.Query("SELECT ShapeshiftID, RaceID, CustomizationID, GenderID, ModelID from player_shapeshift_model");
+
+    if (!result)
+    {
+        LOG_INFO("server.loading", ">> Loaded 0 player shapeshift model records. DB table `player_shapeshift_model` is empty.");
+        return;
+    }
+
+    uint32 count = 0;
+    do
+    {
+        Field* fields = result->Fetch();
+
+        ShapeshiftForm shapeshiftForm = ShapeshiftForm(fields[0].Get<uint8>());
+        uint8 race = fields[1].Get<uint8>();
+        uint8 customizationID = fields[2].Get<uint8>();
+        uint8 genderID = Gender(fields[3].Get<uint8>());
+        uint32 modelId = fields[4].Get<uint32>();
+
+        ChrRacesEntry const* raceEntry = sChrRacesStore.LookupEntry(race);
+        if (!raceEntry)
+        {
+            LOG_ERROR("sql.sql", "Race {} defined in `player_shapeshift_model` does not exists, skipped.", uint32(race));
+            continue;
+        }
+
+        CreatureDisplayInfoEntry const* displayEntry = sCreatureDisplayInfoStore.LookupEntry(modelId);
+        if (!displayEntry)
+        {
+            LOG_ERROR("sql.sql", "ShapeshiftForm: {}, Race: {} defined in `player_shapeshift_model` has non-existing model ({}), skipped.", shapeshiftForm, race, modelId);
+            continue;
+        }
+
+        _playerShapeshiftModel[std::make_tuple(shapeshiftForm, race, customizationID, genderID)] = modelId;
+        ++count;
+    } while (result->NextRow());
+
+    LOG_INFO("server.loading", ">> Loaded {} player totem model records in {} ms", count, GetMSTimeDiffToNow(oldMSTime));
+    LOG_INFO("server.loading", " ");
+}
+
+uint32 ObjectMgr::GetModelForShapeshift(ShapeshiftForm form, Player* player) const
+{
+    uint8 customizationID;
+
+    if (player->GetTeamId() == TEAM_ALLIANCE)
+        customizationID = player->GetByteValue(PLAYER_BYTES, 3); // Use Hair Color
+    else
+        customizationID = player->GetByteValue(PLAYER_BYTES, 0); // Use Skin Color
+
+    auto itr = _playerShapeshiftModel.find(std::make_tuple(form, player->getRace(), customizationID, player->getGender()));
+    if (itr != _playerShapeshiftModel.end())
+        return itr->second; // Explicit combination
+
+    itr = _playerShapeshiftModel.find(std::make_tuple(form, player->getRace(), customizationID, GENDER_NONE));
+    if (itr != _playerShapeshiftModel.end())
+        return itr->second; // Combination applied to both genders
+
+    itr = _playerShapeshiftModel.find(std::make_tuple(form, player->getRace(), 255, player->getGender()));
+    if (itr != _playerShapeshiftModel.end())
+        return itr->second; // Default gender-dependent model
+
+    itr = _playerShapeshiftModel.find(std::make_tuple(form, player->getRace(), 255, GENDER_NONE));
+    if (itr != _playerShapeshiftModel.end())
+        return itr->second; // Last resort
+
+    LOG_DEBUG("entities.player", "ShapeshiftForm {} with RaceID ({}) have no shapeshift model data defined, using fallback data.", form, player->getRace());
+    return 0;
 }
 
 void ObjectMgr::LoadLinkedRespawn()
@@ -2231,7 +2366,7 @@ void ObjectMgr::LoadCreatures()
                 data.equipmentId = 0;
             }
         }
-        if ((cInfo->flags_extra & CREATURE_FLAG_EXTRA_INSTANCE_BIND) || (data.id2 && cInfo2->flags_extra & CREATURE_FLAG_EXTRA_INSTANCE_BIND) || (data.id3 && cInfo3->flags_extra & CREATURE_FLAG_EXTRA_INSTANCE_BIND))
+        if (cInfo->HasFlagsExtra(CREATURE_FLAG_EXTRA_INSTANCE_BIND) || (data.id2 && cInfo2->HasFlagsExtra(CREATURE_FLAG_EXTRA_INSTANCE_BIND)) || (data.id3 && cInfo3->HasFlagsExtra(CREATURE_FLAG_EXTRA_INSTANCE_BIND)))
         {
             if (!mapEntry->IsDungeon())
                 LOG_ERROR("sql.sql", "Table `creature` have creature (SpawnId: {} Entries: {}, {}, {}) with a `creature_template`.`flags_extra` in one or more entries including CREATURE_FLAG_EXTRA_INSTANCE_BIND but creature are not in instance.",
@@ -2296,6 +2431,42 @@ void ObjectMgr::LoadCreatures()
     LOG_INFO("server.loading", " ");
 }
 
+void ObjectMgr::LoadCreatureSparring()
+{
+    uint32 oldMSTime = getMSTime();
+
+    QueryResult result = WorldDatabase.Query("SELECT GUID, SparringPCT FROM creature_sparring");
+
+    if (!result)
+    {
+        LOG_WARN("server.loading", ">> Loaded 0 sparring data. DB table `creature_sparring` is empty.");
+        LOG_INFO("server.loading", " ");
+        return;
+    }
+
+    uint32 count = 0;
+    do
+    {
+        Field* fields = result->Fetch();
+
+        ObjectGuid::LowType spawnId     = fields[0].Get<uint32>();
+        float sparringHealthPct         = fields[1].Get<float>();
+
+        if (!sObjectMgr->GetCreatureData(spawnId))
+        {
+            LOG_ERROR("sql.sql", "Entry {} has a record in `creature_sparring` but doesn't exist in `creatures` table");
+            continue;
+        }
+
+        _creatureSparringStore[spawnId].push_back(sparringHealthPct);
+
+        ++count;
+    } while (result->NextRow());
+
+    LOG_INFO("server.loading", ">> Loaded {} sparring data in {} ms", count, GetMSTimeDiffToNow(oldMSTime));
+    LOG_INFO("server.loading", " ");
+}
+
 void ObjectMgr::AddCreatureToGrid(ObjectGuid::LowType guid, CreatureData const* data)
 {
     uint8 mask = data->spawnMask;
@@ -2303,8 +2474,8 @@ void ObjectMgr::AddCreatureToGrid(ObjectGuid::LowType guid, CreatureData const* 
     {
         if (mask & 1)
         {
-            CellCoord cellCoord = Acore::ComputeCellCoord(data->posX, data->posY);
-            CellObjectGuids& cell_guids = _mapObjectGuidsStore[MAKE_PAIR32(data->mapid, i)][cellCoord.GetId()];
+            GridCoord gridCoord = Acore::ComputeGridCoord(data->posX, data->posY);
+            CellObjectGuids& cell_guids = _mapObjectGuidsStore[MAKE_PAIR32(data->mapid, i)][gridCoord.GetId()];
             cell_guids.creatures.insert(guid);
         }
     }
@@ -2317,14 +2488,14 @@ void ObjectMgr::RemoveCreatureFromGrid(ObjectGuid::LowType guid, CreatureData co
     {
         if (mask & 1)
         {
-            CellCoord cellCoord = Acore::ComputeCellCoord(data->posX, data->posY);
-            CellObjectGuids& cell_guids = _mapObjectGuidsStore[MAKE_PAIR32(data->mapid, i)][cellCoord.GetId()];
+            GridCoord gridCoord = Acore::ComputeGridCoord(data->posX, data->posY);
+            CellObjectGuids& cell_guids = _mapObjectGuidsStore[MAKE_PAIR32(data->mapid, i)][gridCoord.GetId()];
             cell_guids.creatures.erase(guid);
         }
     }
 }
 
-uint32 ObjectMgr::AddGOData(uint32 entry, uint32 mapId, float x, float y, float z, float o, uint32 spawntimedelay, float rotation0, float rotation1, float rotation2, float rotation3)
+ObjectGuid::LowType ObjectMgr::AddGOData(uint32 entry, uint32 mapId, float x, float y, float z, float o, uint32 spawntimedelay, float rotation0, float rotation1, float rotation2, float rotation3)
 {
     GameObjectTemplate const* goinfo = GetGameObjectTemplate(entry);
     if (!goinfo)
@@ -2375,7 +2546,7 @@ uint32 ObjectMgr::AddGOData(uint32 entry, uint32 mapId, float x, float y, float 
     return spawnId;
 }
 
-uint32 ObjectMgr::AddCreData(uint32 entry, uint32 mapId, float x, float y, float z, float o, uint32 spawntimedelay)
+ObjectGuid::LowType ObjectMgr::AddCreData(uint32 entry, uint32 mapId, float x, float y, float z, float o, uint32 spawntimedelay)
 {
     CreatureTemplate const* cInfo = GetCreatureTemplate(entry);
     if (!cInfo)
@@ -2416,7 +2587,7 @@ uint32 ObjectMgr::AddCreData(uint32 entry, uint32 mapId, float x, float y, float
     AddCreatureToGrid(spawnId, &data);
 
     // Spawn if necessary (loaded grids only)
-    if (!map->Instanceable() && !map->IsRemovalGrid(x, y))
+    if (!map->Instanceable() && map->IsGridLoaded(x, y))
     {
         Creature* creature = new Creature();
         if (!creature->LoadCreatureFromDB(spawnId, map, true, true))
@@ -2606,8 +2777,8 @@ void ObjectMgr::AddGameobjectToGrid(ObjectGuid::LowType guid, GameObjectData con
     {
         if (mask & 1)
         {
-            CellCoord cellCoord = Acore::ComputeCellCoord(data->posX, data->posY);
-            CellObjectGuids& cell_guids = _mapObjectGuidsStore[MAKE_PAIR32(data->mapid, i)][cellCoord.GetId()];
+            GridCoord gridCoord = Acore::ComputeGridCoord(data->posX, data->posY);
+            CellObjectGuids& cell_guids = _mapObjectGuidsStore[MAKE_PAIR32(data->mapid, i)][gridCoord.GetId()];
             cell_guids.gameobjects.insert(guid);
         }
     }
@@ -2620,8 +2791,8 @@ void ObjectMgr::RemoveGameobjectFromGrid(ObjectGuid::LowType guid, GameObjectDat
     {
         if (mask & 1)
         {
-            CellCoord cellCoord = Acore::ComputeCellCoord(data->posX, data->posY);
-            CellObjectGuids& cell_guids = _mapObjectGuidsStore[MAKE_PAIR32(data->mapid, i)][cellCoord.GetId()];
+            GridCoord gridCoord = Acore::ComputeGridCoord(data->posX, data->posY);
+            CellObjectGuids& cell_guids = _mapObjectGuidsStore[MAKE_PAIR32(data->mapid, i)][gridCoord.GetId()];
             cell_guids.gameobjects.erase(guid);
         }
     }
@@ -3034,7 +3205,7 @@ void ObjectMgr::LoadItemTemplates()
             else if (itemTemplate.Spells[1].SpellId != -1)
             {
                 SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(itemTemplate.Spells[1].SpellId);
-                if (!spellInfo && !DisableMgr::IsDisabledFor(DISABLE_TYPE_SPELL, itemTemplate.Spells[1].SpellId, nullptr))
+                if (!spellInfo && !sDisableMgr->IsDisabledFor(DISABLE_TYPE_SPELL, itemTemplate.Spells[1].SpellId, nullptr))
                 {
                     LOG_ERROR("sql.sql", "Item (Entry: {}) has wrong (not existing) spell in spellid_{} ({})", entry, 1 + 1, itemTemplate.Spells[1].SpellId);
                     itemTemplate.Spells[0].SpellId = 0;
@@ -3082,7 +3253,7 @@ void ObjectMgr::LoadItemTemplates()
                 if (itemTemplate.Spells[j].SpellId && itemTemplate.Spells[j].SpellId != -1)
                 {
                     SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(itemTemplate.Spells[j].SpellId);
-                    if (!spellInfo && !DisableMgr::IsDisabledFor(DISABLE_TYPE_SPELL, itemTemplate.Spells[j].SpellId, nullptr))
+                    if (!spellInfo && !sDisableMgr->IsDisabledFor(DISABLE_TYPE_SPELL, itemTemplate.Spells[j].SpellId, nullptr))
                     {
                         LOG_ERROR("sql.sql", "Item (Entry: {}) has wrong (not existing) spell in spellid_{} ({})", entry, j + 1, itemTemplate.Spells[j].SpellId);
                         itemTemplate.Spells[j].SpellId = 0;
@@ -3514,20 +3685,20 @@ void ObjectMgr::LoadVehicleSeatAddon()
 
         if (!sVehicleSeatStore.LookupEntry(seatID))
         {
-            LOG_ERROR("sql.sql", "Table `vehicle_seat_addon`: SeatID: %u does not exist in VehicleSeat.dbc. Skipping entry.", seatID);
+            LOG_ERROR("sql.sql", "Table `vehicle_seat_addon`: SeatID: {} does not exist in VehicleSeat.dbc. Skipping entry.", seatID);
             continue;
         }
 
         // Sanitizing values
         if (orientation > float(M_PI * 2))
         {
-            LOG_ERROR("sql.sql", "Table `vehicle_seat_addon`: SeatID: %u is using invalid angle offset value (%f). Set Value to 0.", seatID, orientation);
+            LOG_ERROR("sql.sql", "Table `vehicle_seat_addon`: SeatID: {} is using invalid angle offset value ({}). Set Value to 0.", seatID, orientation);
             orientation = 0.0f;
         }
 
         if (exitParam >= AsUnderlyingType(VehicleExitParameters::VehicleExitParamMax))
         {
-            LOG_ERROR("sql.sql", "Table `vehicle_seat_addon`: SeatID: %u is using invalid exit parameter value (%u). Setting to 0 (none).", seatID, exitParam);
+            LOG_ERROR("sql.sql", "Table `vehicle_seat_addon`: SeatID: {} is using invalid exit parameter value ({}). Setting to 0 (none).", seatID, exitParam);
             continue;
         }
 
@@ -3536,7 +3707,7 @@ void ObjectMgr::LoadVehicleSeatAddon()
         ++count;
     } while (result->NextRow());
 
-    LOG_INFO("server.loading", ">> Loaded %u Vehicle Seat Addon entries in %u ms", count, GetMSTimeDiffToNow(oldMSTime));
+    LOG_INFO("server.loading", ">> Loaded {} Vehicle Seat Addon entries in {} ms", count, GetMSTimeDiffToNow(oldMSTime));
 }
 
 void ObjectMgr::LoadPetLevelInfo()
@@ -4578,7 +4749,7 @@ void ObjectMgr::LoadQuests()
     for (QuestMap::iterator iter = _questTemplates.begin(); iter != _questTemplates.end(); ++iter)
     {
         // skip post-loading checks for disabled quests
-        if (DisableMgr::IsDisabledFor(DISABLE_TYPE_QUEST, iter->first, nullptr))
+        if (sDisableMgr->IsDisabledFor(DISABLE_TYPE_QUEST, iter->first, nullptr))
             continue;
 
         Quest* qinfo = iter->second;
@@ -5810,7 +5981,11 @@ void ObjectMgr::LoadPageTextLocales()
     QueryResult result = WorldDatabase.Query("SELECT ID, locale, Text FROM page_text_locale");
 
     if (!result)
+    {
+        LOG_WARN("server.loading", ">> Loaded 0 page texts. DB table `page_text_locale` is empty!");
+        LOG_INFO("server.loading", " ");
         return;
+    }
 
     do
     {
@@ -5838,7 +6013,7 @@ void ObjectMgr::LoadInstanceTemplate()
 
     if (!result)
     {
-        LOG_WARN("server.loading", ">> Loaded 0 instance templates. DB table `page_text` is empty!");
+        LOG_WARN("server.loading", ">> Loaded 0 instance templates. DB table `instance_template` is empty!");
         LOG_INFO("server.loading", " ");
         return;
     }
@@ -8686,7 +8861,7 @@ bool ObjectMgr::LoadModuleStringsLocale()
 std::string const* ObjectMgr::GetModuleString(std::string module, uint32 id, LocaleConstant locale) const
 {
     ModuleString const* ms = GetModuleString(module, id);
-    if (ms->Content.size())
+    if (ms && !ms->Content.empty())
     {
         if (ms->Content.size() > size_t(locale) && !ms->Content[locale].empty())
             return &ms->Content[locale];
@@ -8732,19 +8907,20 @@ bool ObjectMgr::LoadAcoreStrings()
     return true;
 }
 
-char const* ObjectMgr::GetAcoreString(uint32 entry, LocaleConstant locale) const
+std::string ObjectMgr::GetAcoreString(uint32 entry, LocaleConstant locale) const
 {
-    if (AcoreString const* ts = GetAcoreString(entry))
+    AcoreString const* as = GetAcoreString(entry);
+    if (as && !as->Content.empty())
     {
-        if (ts->Content.size() > std::size_t(locale) && !ts->Content[locale].empty())
-            return ts->Content[locale].c_str();
+        if (as->Content.size() > std::size_t(locale) && !as->Content[locale].empty())
+            return as->Content[locale];
 
-        return ts->Content[DEFAULT_LOCALE].c_str();
+        return as->Content[DEFAULT_LOCALE];
     }
 
-    LOG_ERROR("sql.sql", "Acore string entry {} not found in DB.", entry);
-
-    return "<error>";
+    std::string msg = Acore::StringFormat("No entry for acore_string ({}) in DB.", entry);
+    LOG_ERROR("sql.sql", msg);
+    return msg;
 }
 
 void ObjectMgr::LoadFishingBaseSkillLevel()
@@ -8943,7 +9119,7 @@ void ObjectMgr::LoadGameTele()
     LOG_INFO("server.loading", " ");
 }
 
-GameTele const* ObjectMgr::GetGameTele(std::string_view name) const
+GameTele const* ObjectMgr::GetGameTele(std::string_view name, bool exactSearch) const
 {
     // explicit name case
     std::wstring wname;
@@ -8959,7 +9135,7 @@ GameTele const* ObjectMgr::GetGameTele(std::string_view name) const
     {
         if (itr->second.wnameLow == wname)
             return &itr->second;
-        else if (!alt && itr->second.wnameLow.find(wname) != std::wstring::npos)
+        else if (!exactSearch && !alt && itr->second.wnameLow.find(wname) != std::wstring::npos)
             alt = &itr->second;
     }
 
@@ -10253,117 +10429,4 @@ uint32 ObjectMgr::GetQuestMoneyReward(uint8 level, uint32 questMoneyDifficulty) 
     }
 
     return 0;
-}
-
-void ObjectMgr::SendServerMail(Player* player, uint32 id, uint32 reqLevel, uint32 reqPlayTime, uint32 rewardMoneyA, uint32 rewardMoneyH, uint32 rewardItemA, uint32 rewardItemCountA, uint32 rewardItemH, uint32 rewardItemCountH, std::string subject, std::string body, uint8 active) const
-{
-    if (active)
-    {
-        if (player->GetLevel() < reqLevel)
-            return;
-
-        if (player->GetTotalPlayedTime() < reqPlayTime)
-            return;
-
-        CharacterDatabaseTransaction trans = CharacterDatabase.BeginTransaction();
-
-        MailSender sender(MAIL_NORMAL, player->GetGUID().GetCounter(), MAIL_STATIONERY_GM);
-        MailDraft draft(subject, body);
-
-        draft.AddMoney(player->GetTeamId() == TEAM_ALLIANCE ? rewardMoneyA : rewardMoneyH);
-        if (Item* mailItem = Item::CreateItem(player->GetTeamId() == TEAM_ALLIANCE ? rewardItemA : rewardItemH, player->GetTeamId() == TEAM_ALLIANCE ? rewardItemCountA : rewardItemCountH))
-        {
-            mailItem->SaveToDB(trans);
-            draft.AddItem(mailItem);
-        }
-
-        draft.SendMailTo(trans, MailReceiver(player), sender);
-        CharacterDatabase.CommitTransaction(trans);
-
-        CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_REP_MAIL_SERVER_CHARACTER);
-        stmt->SetData(0, player->GetGUID().GetCounter());
-        stmt->SetData(1, id);
-        CharacterDatabase.Execute(stmt);
-
-        LOG_DEBUG("entities.player", "ObjectMgr::SendServerMail() Sent mail id {} to {}", id, player->GetGUID().ToString());
-    }
-}
-
-void ObjectMgr::LoadMailServerTemplates()
-{
-    uint32 oldMSTime = getMSTime();
-
-    _serverMailStore.clear(); // for reload case
-
-    //                                                    0     1           2              3         4         5        6             7       8             9          10      11
-    QueryResult result = CharacterDatabase.Query("SELECT `id`, `reqLevel`, `reqPlayTime`, `moneyA`, `moneyH`, `itemA`, `itemCountA`, `itemH`,`itemCountH`, `subject`, `body`, `active` FROM `mail_server_template`");
-    if (!result)
-    {
-        LOG_INFO("sql.sql", ">> Loaded 0 server mail rewards. DB table `mail_server_template` is empty.");
-        LOG_INFO("server.loading", " ");
-        return;
-    }
-
-    _serverMailStore.rehash(result->GetRowCount());
-
-    do
-    {
-        Field* fields = result->Fetch();
-
-        uint32 id = fields[0].Get<uint32>();
-
-        ServerMail& servMail = _serverMailStore[id];
-
-        servMail.id          = id;
-        servMail.reqLevel    = fields[1].Get<uint8>();
-        servMail.reqPlayTime = fields[2].Get<uint32>();
-        servMail.moneyA      = fields[3].Get<uint32>();
-        servMail.moneyH      = fields[4].Get<uint32>();
-        servMail.itemA       = fields[5].Get<uint32>();
-        servMail.itemCountA  = fields[6].Get<uint32>();
-        servMail.itemH       = fields[7].Get<uint32>();
-        servMail.itemCountH  = fields[8].Get<uint32>();
-        servMail.subject     = fields[9].Get<std::string>();
-        servMail.body        = fields[10].Get<std::string>();
-        servMail.active      = fields[11].Get<uint8>();
-
-        if (servMail.reqLevel > sWorld->getIntConfig(CONFIG_MAX_PLAYER_LEVEL))
-        {
-            LOG_ERROR("sql.sql", "Table `mail_server_template` has reqLevel {} but max level is {} for id {}, skipped.", servMail.reqLevel, sWorld->getIntConfig(CONFIG_MAX_PLAYER_LEVEL), servMail.id);
-            return;
-        }
-
-        if (servMail.moneyA > MAX_MONEY_AMOUNT || servMail.moneyH > MAX_MONEY_AMOUNT)
-        {
-            LOG_ERROR("sql.sql", "Table `mail_server_template` has moneyA {} or moneyH {} larger than MAX_MONEY_AMOUNT {} for id {}, skipped.", servMail.moneyA, servMail.moneyH, MAX_MONEY_AMOUNT, servMail.id);
-            return;
-        }
-
-        ItemTemplate const* itemTemplateA = sObjectMgr->GetItemTemplate(servMail.itemA);
-        if (!itemTemplateA && servMail.itemA)
-        {
-            LOG_ERROR("sql.sql", "Table `mail_server_template` has invalid item in itemA {} for id {}, skipped.", servMail.itemA, servMail.id);
-            return;
-        }
-        ItemTemplate const* itemTemplateH = sObjectMgr->GetItemTemplate(servMail.itemH);
-        if (!itemTemplateH && servMail.itemH)
-        {
-            LOG_ERROR("sql.sql", "Table `mail_server_template` has invalid item in itemH {} for id {}, skipped.", servMail.itemH, servMail.id);
-            return;
-        }
-
-        if (!servMail.itemA && servMail.itemCountA)
-        {
-            LOG_ERROR("sql.sql", "Table `mail_server_template` has itemCountA {} with no ItemA, set to 0", servMail.itemCountA);
-            servMail.itemCountA = 0;
-        }
-        if (!servMail.itemH && servMail.itemCountH)
-        {
-            LOG_ERROR("sql.sql", "Table `mail_server_template` has itemCountH {} with no ItemH, set to 0", servMail.itemCountH);
-            servMail.itemCountH = 0;
-        }
-    } while (result->NextRow());
-
-    LOG_INFO("server.loading", ">> Loaded {} Mail Server Template in {} ms", _serverMailStore.size(), GetMSTimeDiffToNow(oldMSTime));
-    LOG_INFO("server.loading", " ");
 }

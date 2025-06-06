@@ -15,13 +15,6 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-/* ScriptData
-Name: ticket_commandscript
-%Complete: 100
-Comment: All ticket related commands
-Category: commandscripts
-EndScriptData */
-
 #include "AccountMgr.h"
 #include "Chat.h"
 #include "CommandScript.h"
@@ -117,7 +110,7 @@ public:
         CharacterDatabaseTransaction trans = CharacterDatabaseTransaction(nullptr);
         ticket->SetAssignedTo(targetGuid, AccountMgr::IsAdminAccount(targetGmLevel));
         ticket->SaveToDB(trans);
-        sTicketMgr->UpdateLastChange();
+        sTicketMgr->UpdateLastChange(ticket);
 
         std::string msg = ticket->FormatMessageString(*handler, nullptr, target.c_str(), nullptr, nullptr);
         handler->SendGlobalGMSysMessage(msg.c_str());
@@ -143,7 +136,7 @@ public:
         }
 
         sTicketMgr->ResolveAndCloseTicket(ticket->GetId(), player ? player->GetGUID() : ObjectGuid::Empty);
-        sTicketMgr->UpdateLastChange();
+        sTicketMgr->UpdateLastChange(ticket);
 
         std::string msg = ticket->FormatMessageString(*handler, player ? player->GetName().c_str() : "Console", nullptr, nullptr, nullptr);
         handler->SendGlobalGMSysMessage(msg.c_str());
@@ -182,7 +175,7 @@ public:
         CharacterDatabaseTransaction trans = CharacterDatabaseTransaction(nullptr);
         ticket->SetComment(comment.data());
         ticket->SaveToDB(trans);
-        sTicketMgr->UpdateLastChange();
+        sTicketMgr->UpdateLastChange(ticket);
 
         std::string const assignedName = ticket->GetAssignedToName();
         std::string msg = ticket->FormatMessageString(*handler, assignedName.empty() ? nullptr : assignedName.c_str(), nullptr, nullptr, nullptr);
@@ -199,7 +192,7 @@ public:
         return true;
     }
 
-    static bool HandleGMTicketCompleteCommand(ChatHandler* handler, uint32 ticketId)
+    static bool HandleGMTicketCompleteCommand(ChatHandler* handler, uint32 ticketId, std::optional<std::string> response)
     {
         GmTicket* ticket = sTicketMgr->GetTicket(ticketId);
         if (!ticket || ticket->IsClosed() || ticket->IsCompleted())
@@ -217,9 +210,8 @@ public:
             return true;
         }
 
-        char* response = strtok(nullptr, "\n");
         if (response)
-            ticket->AppendResponse(response);
+            ticket->AppendResponse(response.value());
 
         if (Player* player2 = ticket->GetPlayer())
         {
@@ -237,7 +229,7 @@ public:
         std::string msg = ticket->FormatMessageString(*handler, nullptr, nullptr, nullptr, nullptr);
         msg += handler->PGetParseString(LANG_COMMAND_TICKETCOMPLETED, gm ? gm->GetName().c_str() : "Console");
         handler->SendGlobalGMSysMessage(msg.c_str());
-        sTicketMgr->UpdateLastChange();
+        sTicketMgr->UpdateLastChange(ticket);
         return true;
     }
 
@@ -260,7 +252,7 @@ public:
         handler->SendGlobalGMSysMessage(msg.c_str());
 
         sTicketMgr->RemoveTicket(ticket->GetId());
-        sTicketMgr->UpdateLastChange();
+        sTicketMgr->UpdateLastChange(ticket);
 
         if (Player* player = ticket->GetPlayer())
         {
@@ -287,7 +279,7 @@ public:
         if (Player* player = ticket->GetPlayer())
             sTicketMgr->SendTicket(player->GetSession(), ticket);
 
-        sTicketMgr->UpdateLastChange();
+        sTicketMgr->UpdateLastChange(ticket);
         return true;
     }
 
@@ -373,7 +365,7 @@ public:
         CharacterDatabaseTransaction trans = CharacterDatabaseTransaction(nullptr);
         ticket->SetUnassigned();
         ticket->SaveToDB(trans);
-        sTicketMgr->UpdateLastChange();
+        sTicketMgr->UpdateLastChange(ticket);
 
         std::string msg = ticket->FormatMessageString(*handler, nullptr, assignedTo.c_str(),
                           handler->GetSession() ? handler->GetSession()->GetPlayer()->GetName().c_str() : "Console", nullptr);
@@ -464,7 +456,7 @@ public:
             ticket->AppendResponse("\n");
         ticket->AppendResponse(response);
         ticket->SaveToDB(trans);
-        sTicketMgr->UpdateLastChange();
+        sTicketMgr->UpdateLastChange(ticket);
 
         std::string msg = ticket->FormatMessageString(*handler, nullptr, nullptr, nullptr, nullptr);
         msg += handler->PGetParseString(LANG_COMMAND_TICKETRESPONSEAPPENDED, response);
@@ -505,7 +497,7 @@ public:
         CharacterDatabaseTransaction trans = CharacterDatabaseTransaction(nullptr);
         ticket->DeleteResponse();
         ticket->SaveToDB(trans);
-        sTicketMgr->UpdateLastChange();
+        sTicketMgr->UpdateLastChange(ticket);
 
         std::string msg = ticket->FormatMessageString(*handler, nullptr, nullptr, nullptr, nullptr);
         msg += handler->PGetParseString(LANG_COMMAND_TICKETRESPONSEDELETED, player ? player->GetName() : "Console");

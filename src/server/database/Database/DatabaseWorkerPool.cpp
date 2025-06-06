@@ -112,7 +112,11 @@ uint32 DatabaseWorkerPool<T>::Open()
 template <class T>
 void DatabaseWorkerPool<T>::Close()
 {
-    LOG_INFO("sql.driver", "Closing down DatabasePool '{}'.", GetDatabaseName());
+    LOG_INFO("sql.driver", "Closing down DatabasePool '{}'. Waiting for {} queries to finish...", GetDatabaseName(), _queue->Size());
+
+    // Gracefully close async query queue, worker threads will block when the destructor
+    // is called from the .clear() functions below until the queue is empty
+    _queue->Shutdown();
 
     //! Closes the actualy MySQL connection.
     _connections[IDX_ASYNC].clear();
@@ -432,6 +436,7 @@ uint32 DatabaseWorkerPool<T>::OpenConnections(InternalIndex type, uint8 numConne
         if (uint32 error = connection->Open())
         {
             // Failed to open a connection or invalid version, abort and cleanup
+            _queue->Cancel();
             _connections[type].clear();
             return error;
         }

@@ -26,10 +26,6 @@ enum OutdoorPvPGHenum
     GH_HORDE_DEFENSE_EVENT              = 66,
 
     GH_ZONE                             = 394,
-
-    GH_UI_SLIDER_DISPLAY                = 3466,
-    GH_UI_SLIDER_POS                    = 3467,
-    GH_UI_SLIDER_N                      = 3468,
 };
 
 class Unit;
@@ -52,7 +48,7 @@ public:
     void ChangeState() override;
     void SendChangePhase() override;
 
-    void FillInitialWorldStates(WorldPacket& data) override;
+    void FillInitialWorldStates(WorldPackets::WorldState::InitWorldStates& packet) override;
 
     bool HandlePlayerEnter(Player* player) override;
     void HandlePlayerLeave(Player* player) override;

@@ -1,133 +1,149 @@
--- --------------------------------------------------------
--- Host:                         127.0.0.1
--- Server version:               8.1.0 - MySQL Community Server - GPL
--- Server OS:                    Win64
--- HeidiSQL Version:             12.3.0.6589
--- --------------------------------------------------------
+-- MySQL dump 10.13  Distrib 8.0.34, for Win64 (x86_64)
+--
+-- Host: 127.0.0.1    Database: acore_world
+-- ------------------------------------------------------
+-- Server version	8.0.34
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
-/*!40101 SET NAMES utf8 */;
+/*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
+/*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
 /*!50503 SET NAMES utf8mb4 */;
-/*!40103 SET @OLD_TIME_ZONE=@@TIME_ZONE */;
-/*!40103 SET TIME_ZONE='+00:00' */;
+/*!40014 SET @OLD_UNIQUE_CHECKS=@@UNIQUE_CHECKS, UNIQUE_CHECKS=0 */;
 /*!40014 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0 */;
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
--- Dumping structure for table acore_world.gtbarbershopcostbase_dbc
+--
+-- Table structure for table `gtbarbershopcostbase_dbc`
+--
+
 DROP TABLE IF EXISTS `gtbarbershopcostbase_dbc`;
-CREATE TABLE IF NOT EXISTS `gtbarbershopcostbase_dbc` (
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `gtbarbershopcostbase_dbc` (
   `ID` int NOT NULL DEFAULT '0',
   `Data` float NOT NULL DEFAULT '0',
   PRIMARY KEY (`ID`) USING BTREE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
 
--- Dumping data for table acore_world.gtbarbershopcostbase_dbc: ~100 rows (approximately)
-DELETE FROM `gtbarbershopcostbase_dbc`;
-INSERT INTO `gtbarbershopcostbase_dbc` (`ID`, `Data`) VALUES
-	(0, 0),
-	(1, 3),
-	(2, 4),
-	(3, 4),
-	(4, 4),
-	(5, 6),
-	(6, 12),
-	(7, 23),
-	(8, 40),
-	(9, 65),
-	(10, 100),
-	(11, 146),
-	(12, 204),
-	(13, 276),
-	(14, 364),
-	(15, 469),
-	(16, 592),
-	(17, 735),
-	(18, 900),
-	(19, 1088),
-	(20, 1300),
-	(21, 1538),
-	(22, 1804),
-	(23, 2099),
-	(24, 2424),
-	(25, 2781),
-	(26, 3172),
-	(27, 3598),
-	(28, 4060),
-	(29, 4560),
-	(30, 5100),
-	(31, 5681),
-	(32, 6304),
-	(33, 6971),
-	(34, 7684),
-	(35, 8444),
-	(36, 9252),
-	(37, 10110),
-	(38, 11020),
-	(39, 11983),
-	(40, 13000),
-	(41, 14073),
-	(42, 15204),
-	(43, 16394),
-	(44, 17644),
-	(45, 18956),
-	(46, 20332),
-	(47, 21773),
-	(48, 23280),
-	(49, 24855),
-	(50, 26500),
-	(51, 28216),
-	(52, 30004),
-	(53, 31866),
-	(54, 33804),
-	(55, 35819),
-	(56, 37912),
-	(57, 40085),
-	(58, 42340),
-	(59, 44678),
-	(60, 47100),
-	(61, 49608),
-	(62, 52204),
-	(63, 54889),
-	(64, 57664),
-	(65, 60531),
-	(66, 63492),
-	(67, 66548),
-	(68, 69700),
-	(69, 72950),
-	(70, 76300),
-	(71, 79751),
-	(72, 83304),
-	(73, 86961),
-	(74, 90724),
-	(75, 94594),
-	(76, 98572),
-	(77, 102660),
-	(78, 106860),
-	(79, 111173),
-	(80, 115600),
-	(81, 120143),
-	(82, 124804),
-	(83, 129584),
-	(84, 134484),
-	(85, 139506),
-	(86, 144652),
-	(87, 149923),
-	(88, 155320),
-	(89, 160845),
-	(90, 166500),
-	(91, 172286),
-	(92, 178204),
-	(93, 184256),
-	(94, 190444),
-	(95, 196769),
-	(96, 203232),
-	(97, 209835),
-	(98, 216580),
-	(99, 223468);
+--
+-- Dumping data for table `gtbarbershopcostbase_dbc`
+--
 
-/*!40103 SET TIME_ZONE=IFNULL(@OLD_TIME_ZONE, 'system') */;
-/*!40101 SET SQL_MODE=IFNULL(@OLD_SQL_MODE, '') */;
-/*!40014 SET FOREIGN_KEY_CHECKS=IFNULL(@OLD_FOREIGN_KEY_CHECKS, 1) */;
+LOCK TABLES `gtbarbershopcostbase_dbc` WRITE;
+/*!40000 ALTER TABLE `gtbarbershopcostbase_dbc` DISABLE KEYS */;
+INSERT INTO `gtbarbershopcostbase_dbc` VALUES
+(0,0),
+(1,3),
+(2,4),
+(3,4),
+(4,4),
+(5,6),
+(6,12),
+(7,23),
+(8,40),
+(9,65),
+(10,100),
+(11,146),
+(12,204),
+(13,276),
+(14,364),
+(15,469),
+(16,592),
+(17,735),
+(18,900),
+(19,1088),
+(20,1300),
+(21,1538),
+(22,1804),
+(23,2099),
+(24,2424),
+(25,2781),
+(26,3172),
+(27,3598),
+(28,4060),
+(29,4560),
+(30,5100),
+(31,5681),
+(32,6304),
+(33,6971),
+(34,7684),
+(35,8444),
+(36,9252),
+(37,10110),
+(38,11020),
+(39,11983),
+(40,13000),
+(41,14073),
+(42,15204),
+(43,16394),
+(44,17644),
+(45,18956),
+(46,20332),
+(47,21773),
+(48,23280),
+(49,24855),
+(50,26500),
+(51,28216),
+(52,30004),
+(53,31866),
+(54,33804),
+(55,35819),
+(56,37912),
+(57,40085),
+(58,42340),
+(59,44678),
+(60,47100),
+(61,49608),
+(62,52204),
+(63,54889),
+(64,57664),
+(65,60531),
+(66,63492),
+(67,66548),
+(68,69700),
+(69,72950),
+(70,76300),
+(71,79751),
+(72,83304),
+(73,86961),
+(74,90724),
+(75,94594),
+(76,98572),
+(77,102660),
+(78,106860),
+(79,111173),
+(80,115600),
+(81,120143),
+(82,124804),
+(83,129584),
+(84,134484),
+(85,139506),
+(86,144652),
+(87,149923),
+(88,155320),
+(89,160845),
+(90,166500),
+(91,172286),
+(92,178204),
+(93,184256),
+(94,190444),
+(95,196769),
+(96,203232),
+(97,209835),
+(98,216580),
+(99,223468);
+/*!40000 ALTER TABLE `gtbarbershopcostbase_dbc` ENABLE KEYS */;
+UNLOCK TABLES;
+
+/*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
+/*!40014 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS */;
+/*!40014 SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS */;
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
-/*!40111 SET SQL_NOTES=IFNULL(@OLD_SQL_NOTES, 1) */;
+/*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
+/*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
+/*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
+
+-- Dump completed on 2024-12-17 22:33:57
+

@@ -15,13 +15,6 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-/* ScriptData
-Name: guild_commandscript
-%Complete: 100
-Comment: All guild related commands
-Category: commandscripts
-EndScriptData */
-
 #include "Chat.h"
 #include "CommandScript.h"
 #include "Guild.h"

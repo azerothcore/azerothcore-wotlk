@@ -20,6 +20,7 @@
 #include "InstanceMapScript.h"
 #include "Player.h"
 #include "ScriptedCreature.h"
+#include "WorldStateDefines.h"
 #include "trial_of_the_crusader.h"
 
 std::map<uint32, bool> validDedicatedInsanityItems;
@@ -27,7 +28,7 @@ std::map<uint32, bool> validDedicatedInsanityItems;
 class instance_trial_of_the_crusader : public InstanceMapScript
 {
 public:
-    instance_trial_of_the_crusader() : InstanceMapScript("instance_trial_of_the_crusader", 649) { }
+    instance_trial_of_the_crusader() : InstanceMapScript("instance_trial_of_the_crusader", MAP_TRIAL_OF_THE_CRUSADER) { }
 
     struct instance_trial_of_the_crusader_InstanceMapScript : public InstanceScript
     {
@@ -41,7 +42,6 @@ public:
         uint32 EncounterStatus;
         uint32 InstanceProgress;
         uint32 AttemptsLeft;
-        TeamId TeamIdInInstance;
         uint8 Counter;
         uint8 northrendBeastsMask;
         uint32 AchievementTimer;
@@ -168,7 +168,6 @@ public:
             EncounterStatus = NOT_STARTED;
             InstanceProgress = INSTANCE_PROGRESS_INITIAL;
             AttemptsLeft = 50;
-            TeamIdInInstance = TEAM_NEUTRAL;
             Counter = 0;
             northrendBeastsMask = 0;
             AchievementTimer = 0;
@@ -285,7 +284,7 @@ public:
                         Map::PlayerList const& pl = instance->GetPlayers();
                         for( Map::PlayerList::const_iterator itr = pl.begin(); itr != pl.end(); ++itr )
                             if (Player* plr = itr->GetSource())
-                                plr->SendUpdateWorldState(UPDATE_STATE_UI_COUNT, AttemptsLeft);
+                                plr->SendUpdateWorldState(WORLD_STATE_TRIAL_OF_THE_CRUSADER_UI_COUNT, AttemptsLeft);
                     }
                     InstanceCleanup(true);
                     SaveToDB();
@@ -475,7 +474,7 @@ public:
                 case TYPE_FACTION_CHAMPIONS_PLAYER_DIED:
                     if (urand(0, 2) == 0 )
                     {
-                        if (TeamIdInInstance == TEAM_HORDE)
+                        if (GetTeamIdInInstance() == TEAM_HORDE)
                         {
                             if (Creature* pTemp = instance->GetCreature(NPC_VarianGUID))
                                 pTemp->AI()->Talk(SAY_VARIAN_KILL_HORDE_PLAYER_1);
@@ -971,16 +970,7 @@ public:
                     }
                 case EVENT_SCENE_202:
                     {
-                        Map::PlayerList const& pl = instance->GetPlayers();
-                        for( Map::PlayerList::const_iterator itr = pl.begin(); itr != pl.end(); ++itr )
-                            if (Player* plr = itr->GetSource())
-                                if (!plr->IsGameMaster())
-                                {
-                                    TeamIdInInstance = plr->GetTeamId();
-                                    break;
-                                }
-
-                        if (TeamIdInInstance == TEAM_ALLIANCE)
+                        if (GetTeamIdInInstance() == TEAM_ALLIANCE)
                         {
                             if (Creature* c = instance->GetCreature(NPC_GarroshGUID))
                                 c->AI()->Talk(SAY_STAGE_2_02h);
@@ -1004,7 +994,7 @@ public:
                     }
                 case EVENT_SCENE_204:
                     {
-                        if (TeamIdInInstance == TEAM_ALLIANCE)
+                        if (GetTeamIdInInstance() == TEAM_ALLIANCE)
                         {
                             if (Creature* c = instance->GetCreature(NPC_GarroshGUID))
                                 c->AI()->Talk(SAY_STAGE_2_04h);
@@ -1022,26 +1012,26 @@ public:
                     }
                 case EVENT_SCENE_205:
                     {
-                        if (Creature* c = instance->GetCreature(TeamIdInInstance == TEAM_ALLIANCE ? NPC_VarianGUID : NPC_GarroshGUID))
-                            c->AI()->Talk(TeamIdInInstance == TEAM_ALLIANCE ? SAY_STAGE_2_05a : SAY_STAGE_2_05h);
+                        if (Creature* c = instance->GetCreature(GetTeamIdInInstance() == TEAM_ALLIANCE ? NPC_VarianGUID : NPC_GarroshGUID))
+                            c->AI()->Talk(GetTeamIdInInstance() == TEAM_ALLIANCE ? SAY_STAGE_2_05a : SAY_STAGE_2_05h);
 
                         break;
                     }
                 case EVENT_SUMMON_CHAMPIONS:
                     {
                         std::vector<uint32> vHealerEntries;
-                        vHealerEntries.push_back(TeamIdInInstance == TEAM_ALLIANCE ? NPC_HORDE_DRUID_RESTORATION : NPC_ALLIANCE_DRUID_RESTORATION);
-                        vHealerEntries.push_back(TeamIdInInstance == TEAM_ALLIANCE ? NPC_HORDE_PALADIN_HOLY : NPC_ALLIANCE_PALADIN_HOLY);
-                        vHealerEntries.push_back(TeamIdInInstance == TEAM_ALLIANCE ? NPC_HORDE_PRIEST_DISCIPLINE : NPC_ALLIANCE_PRIEST_DISCIPLINE);
-                        vHealerEntries.push_back(TeamIdInInstance == TEAM_ALLIANCE ? NPC_HORDE_SHAMAN_RESTORATION : NPC_ALLIANCE_SHAMAN_RESTORATION);
+                        vHealerEntries.push_back(GetTeamIdInInstance() == TEAM_ALLIANCE ? NPC_HORDE_DRUID_RESTORATION : NPC_ALLIANCE_DRUID_RESTORATION);
+                        vHealerEntries.push_back(GetTeamIdInInstance() == TEAM_ALLIANCE ? NPC_HORDE_PALADIN_HOLY : NPC_ALLIANCE_PALADIN_HOLY);
+                        vHealerEntries.push_back(GetTeamIdInInstance() == TEAM_ALLIANCE ? NPC_HORDE_PRIEST_DISCIPLINE : NPC_ALLIANCE_PRIEST_DISCIPLINE);
+                        vHealerEntries.push_back(GetTeamIdInInstance() == TEAM_ALLIANCE ? NPC_HORDE_SHAMAN_RESTORATION : NPC_ALLIANCE_SHAMAN_RESTORATION);
 
                         std::vector<uint32> vOtherEntries;
-                        vOtherEntries.push_back(TeamIdInInstance == TEAM_ALLIANCE ? NPC_HORDE_DEATH_KNIGHT : NPC_ALLIANCE_DEATH_KNIGHT);
-                        vOtherEntries.push_back(TeamIdInInstance == TEAM_ALLIANCE ? NPC_HORDE_HUNTER : NPC_ALLIANCE_HUNTER);
-                        vOtherEntries.push_back(TeamIdInInstance == TEAM_ALLIANCE ? NPC_HORDE_MAGE : NPC_ALLIANCE_MAGE);
-                        vOtherEntries.push_back(TeamIdInInstance == TEAM_ALLIANCE ? NPC_HORDE_ROGUE : NPC_ALLIANCE_ROGUE);
-                        vOtherEntries.push_back(TeamIdInInstance == TEAM_ALLIANCE ? NPC_HORDE_WARLOCK : NPC_ALLIANCE_WARLOCK);
-                        vOtherEntries.push_back(TeamIdInInstance == TEAM_ALLIANCE ? NPC_HORDE_WARRIOR : NPC_ALLIANCE_WARRIOR);
+                        vOtherEntries.push_back(GetTeamIdInInstance() == TEAM_ALLIANCE ? NPC_HORDE_DEATH_KNIGHT : NPC_ALLIANCE_DEATH_KNIGHT);
+                        vOtherEntries.push_back(GetTeamIdInInstance() == TEAM_ALLIANCE ? NPC_HORDE_HUNTER : NPC_ALLIANCE_HUNTER);
+                        vOtherEntries.push_back(GetTeamIdInInstance() == TEAM_ALLIANCE ? NPC_HORDE_MAGE : NPC_ALLIANCE_MAGE);
+                        vOtherEntries.push_back(GetTeamIdInInstance() == TEAM_ALLIANCE ? NPC_HORDE_ROGUE : NPC_ALLIANCE_ROGUE);
+                        vOtherEntries.push_back(GetTeamIdInInstance() == TEAM_ALLIANCE ? NPC_HORDE_WARLOCK : NPC_ALLIANCE_WARLOCK);
+                        vOtherEntries.push_back(GetTeamIdInInstance() == TEAM_ALLIANCE ? NPC_HORDE_WARRIOR : NPC_ALLIANCE_WARRIOR);
 
                         uint8 healersSubtracted = 2;
                         if (instance->GetSpawnMode() == RAID_DIFFICULTY_25MAN_NORMAL || instance->GetSpawnMode() == RAID_DIFFICULTY_25MAN_HEROIC )
@@ -1089,11 +1079,11 @@ public:
                         uint8 pos2 = 10;
                         for( std::vector<uint32>::iterator itr = vOtherEntries.begin(); itr != vOtherEntries.end(); ++itr )
                         {
-                            if (Creature* pTemp = instance->SummonCreature(*itr, FactionChampionLoc[urand(0, 4) + (TeamIdInInstance == TEAM_ALLIANCE ? 0 : 5)]))
+                            if (Creature* pTemp = instance->SummonCreature(*itr, FactionChampionLoc[urand(0, 4) + (GetTeamIdInInstance() == TEAM_ALLIANCE ? 0 : 5)]))
                             {
                                 NPC_ChampionGUIDs.push_back(pTemp->GetGUID());
-                                pTemp->SetHomePosition((TeamIdInInstance == TEAM_ALLIANCE ? FactionChampionLoc[pos2].GetPositionX() : (Locs[LOC_CENTER].GetPositionX() * 2 - FactionChampionLoc[pos2].GetPositionX())), FactionChampionLoc[pos2].GetPositionY(), FactionChampionLoc[pos2].GetPositionZ(), 0.0f);
-                                pTemp->GetMotionMaster()->MoveJump((TeamIdInInstance == TEAM_ALLIANCE ? FactionChampionLoc[pos2].GetPositionX() : (Locs[LOC_CENTER].GetPositionX() * 2 - FactionChampionLoc[pos2].GetPositionX())), FactionChampionLoc[pos2].GetPositionY(), FactionChampionLoc[pos2].GetPositionZ(), 20.0f, 20.0f);
+                                pTemp->SetHomePosition((GetTeamIdInInstance() == TEAM_ALLIANCE ? FactionChampionLoc[pos2].GetPositionX() : (Locs[LOC_CENTER].GetPositionX() * 2 - FactionChampionLoc[pos2].GetPositionX())), FactionChampionLoc[pos2].GetPositionY(), FactionChampionLoc[pos2].GetPositionZ(), 0.0f);
+                                pTemp->GetMotionMaster()->MoveJump((GetTeamIdInInstance() == TEAM_ALLIANCE ? FactionChampionLoc[pos2].GetPositionX() : (Locs[LOC_CENTER].GetPositionX() * 2 - FactionChampionLoc[pos2].GetPositionX())), FactionChampionLoc[pos2].GetPositionY(), FactionChampionLoc[pos2].GetPositionZ(), 20.0f, 20.0f);
                             }
                             ++pos2;
                         }
@@ -1196,19 +1186,8 @@ public:
                     }
                 case EVENT_SCENE_VALKYR_DEAD:
                     {
-                        if (TeamIdInInstance == TEAM_NEUTRAL)
-                        {
-                            Map::PlayerList const& pl = instance->GetPlayers();
-                            for( Map::PlayerList::const_iterator itr = pl.begin(); itr != pl.end(); ++itr )
-                                if (Player* plr = itr->GetSource())
-                                    if (!plr->IsGameMaster())
-                                    {
-                                        TeamIdInInstance = plr->GetTeamId();
-                                        break;
-                                    }
-                        }
-                        if (Creature* c = instance->GetCreature(TeamIdInInstance == TEAM_ALLIANCE ? NPC_VarianGUID : NPC_GarroshGUID))
-                            c->AI()->Talk((TeamIdInInstance == TEAM_ALLIANCE ? SAY_STAGE_3_03a : SAY_STAGE_3_03h));
+                        if (Creature* c = instance->GetCreature(GetTeamIdInInstance() == TEAM_ALLIANCE ? NPC_VarianGUID : NPC_GarroshGUID))
+                            c->AI()->Talk((GetTeamIdInInstance() == TEAM_ALLIANCE ? SAY_STAGE_3_03a : SAY_STAGE_3_03h));
 
                         events.RescheduleEvent(EVENT_SCENE_401, 60000);
                         break;
@@ -1397,13 +1376,15 @@ public:
 
         void OnPlayerEnter(Player* plr) override
         {
+            InstanceScript::OnPlayerEnter(plr);
+
             if (instance->IsHeroic())
             {
-                plr->SendUpdateWorldState(UPDATE_STATE_UI_SHOW, 1);
-                plr->SendUpdateWorldState(UPDATE_STATE_UI_COUNT, AttemptsLeft);
+                plr->SendUpdateWorldState(WORLD_STATE_TRIAL_OF_THE_CRUSADER_UI_SHOW, 1);
+                plr->SendUpdateWorldState(WORLD_STATE_TRIAL_OF_THE_CRUSADER_UI_COUNT, AttemptsLeft);
             }
             else
-                plr->SendUpdateWorldState(UPDATE_STATE_UI_SHOW, 0);
+                plr->SendUpdateWorldState(WORLD_STATE_TRIAL_OF_THE_CRUSADER_UI_SHOW, 0);
 
             if (DoNeedCleanup(plr))
             {
@@ -1575,7 +1556,7 @@ public:
                 Map::PlayerList const& pl = instance->GetPlayers();
                 for( Map::PlayerList::const_iterator itr = pl.begin(); itr != pl.end(); ++itr )
                     if (Player* plr = itr->GetSource())
-                        plr->SendUpdateWorldState(UPDATE_STATE_UI_COUNT, AttemptsLeft);
+                        plr->SendUpdateWorldState(WORLD_STATE_TRIAL_OF_THE_CRUSADER_UI_COUNT, AttemptsLeft);
             }
 
             if (instance->IsHeroic() && AttemptsLeft == 0 )

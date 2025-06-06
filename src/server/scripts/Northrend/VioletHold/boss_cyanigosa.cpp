@@ -34,18 +34,11 @@ enum Yells
 enum eSpells
 {
     SPELL_ARCANE_VACUUM                             = 58694,
-    SPELL_BLIZZARD_N                                = 58693,
-    SPELL_BLIZZARD_H                                = 59369,
+    SPELL_BLIZZARD                                  = 58693,
     SPELL_MANA_DESTRUCTION                          = 59374,
-    SPELL_TAIL_SWEEP_N                              = 58690,
-    SPELL_TAIL_SWEEP_H                              = 59283,
-    SPELL_UNCONTROLLABLE_ENERGY_N                   = 58688,
-    SPELL_UNCONTROLLABLE_ENERGY_H                   = 59281,
+    SPELL_TAIL_SWEEP                                = 58690,
+    SPELL_UNCONTROLLABLE_ENERGY                     = 58688
 };
-
-#define SPELL_BLIZZARD                              DUNGEON_MODE(SPELL_BLIZZARD_N, SPELL_BLIZZARD_H)
-#define SPELL_TAIL_SWEEP                            DUNGEON_MODE(SPELL_TAIL_SWEEP_N, SPELL_TAIL_SWEEP_H)
-#define SPELL_UNCONTROLLABLE_ENERGY                 DUNGEON_MODE(SPELL_UNCONTROLLABLE_ENERGY_N, SPELL_UNCONTROLLABLE_ENERGY_H)
 
 enum eEvents
 {

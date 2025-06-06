@@ -26,7 +26,6 @@
 #include "SpellInfo.h"
 #include "SpellScript.h"
 
-// Ours
 enum saeed
 {
     NPC_PROTECTORATE_AVENGER        = 21805,
@@ -289,7 +288,6 @@ public:
     }
 };
 
-// Theirs
 /*######
 ## npc_commander_dawnforge
 ######*/
@@ -731,7 +729,7 @@ public:
                     }
                     break;
                 case 36: //return and quest_complete
-                    player->CompleteQuest(QUEST_MARK_V_IS_ALIVE);
+                    player->GroupEventHappens(QUEST_MARK_V_IS_ALIVE, me);
                     break;
             }
         }
@@ -858,10 +856,7 @@ public:
 
 void AddSC_netherstorm()
 {
-    // Ours
     new npc_captain_saeed();
-
-    // Theirs
     new npc_commander_dawnforge();
     new at_commander_dawnforge();
     new npc_bessy();

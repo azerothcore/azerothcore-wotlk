@@ -18,7 +18,9 @@
 #ifndef ACORE_FLEEINGMOVEMENTGENERATOR_H
 #define ACORE_FLEEINGMOVEMENTGENERATOR_H
 
+#include "Creature.h"
 #include "MovementGenerator.h"
+#include "Timer.h"
 
 template<class T>
 class FleeingMovementGenerator : public MovementGeneratorMedium< T, FleeingMovementGenerator<T> >

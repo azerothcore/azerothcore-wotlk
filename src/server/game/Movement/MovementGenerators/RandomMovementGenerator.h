@@ -20,6 +20,7 @@
 
 #include "MovementGenerator.h"
 #include "PathGenerator.h"
+#include "Timer.h"
 
 #define RANDOM_POINTS_NUMBER        12
 #define RANDOM_LINKS_COUNT          7
@@ -61,7 +62,7 @@ private:
     TimeTrackerSmall _nextMoveTime;
     uint8 _moveCount;
     float _wanderDistance;
-    PathGenerator* _pathGenerator;
+    std::unique_ptr<PathGenerator> _pathGenerator;
     std::vector<G3D::Vector3> _destinationPoints;
     std::vector<uint8> _validPointsVector[RANDOM_POINTS_NUMBER + 1];
     uint8 _currentPoint;

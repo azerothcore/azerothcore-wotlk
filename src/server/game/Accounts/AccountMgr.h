@@ -32,7 +32,7 @@ enum AccountOpResult
     AOR_DB_INTERNAL_ERROR
 };
 
-#define MAX_ACCOUNT_STR 20
+#define MAX_ACCOUNT_STR 17
 #define MAX_PASS_STR 16
 #define MAX_EMAIL_STR 255
 

@@ -25,6 +25,8 @@
 #include "ScriptedCreature.h"
 #include "SpellScriptLoader.h"
 #include "icecrown_citadel.h"
+#include "PassiveAI.h"
+#include "SpellAuraEffects.h"
 
 enum Texts
 {
@@ -258,7 +260,7 @@ public:
         if (target->HasAura(SPELL_FROST_IMBUED_BLADE))
             return false;
 
-        if (target->IsImmunedToDamageOrSchool(SPELL_SCHOOL_MASK_ALL) || target->HasAura(SPELL_ICE_TOMB_UNTARGETABLE) || target->HasAura(SPELL_ICE_TOMB_DAMAGE) || target->HasAura(SPELL_TANK_MARKER_AURA) || target->HasAuraType(SPELL_AURA_SPIRIT_OF_REDEMPTION))
+        if (target->IsImmunedToDamageOrSchool(SPELL_SCHOOL_MASK_ALL) || target->HasAnyAuras(SPELL_ICE_TOMB_UNTARGETABLE, SPELL_ICE_TOMB_DAMAGE, SPELL_TANK_MARKER_AURA) || target->HasSpiritOfRedemptionAura())
             return false;
 
         return target != _source->GetVictim();
@@ -1112,10 +1114,9 @@ public:
                 return !_caster->IsWithinLOSInMap(unit);
 
         // for players and pets check only dynamic los (ice block gameobjects)
-        float ox, oy, oz;
-        _caster->GetPosition(ox, oy, oz);
-        DynamicMapTree const& dTree = unit->GetMap()->GetDynamicMapTree();
-        return !dTree.isInLineOfSight(unit->GetPositionX(), unit->GetPositionY(), unit->GetPositionZ() + 2.f, ox, oy, oz + 2.f, unit->GetPhaseMask(), VMAP::ModelIgnoreFlags::Nothing);
+        if (unit->IsUnit() && unit->ToUnit()->HasUnitState(UNIT_STATE_MELEE_ATTACKING) && unit->ToUnit()->IsWithinMeleeRange(_caster))
+            return false;
+        return !_caster->IsWithinLOSInMap(unit, VMAP::ModelIgnoreFlags::Nothing, LINEOFSIGHT_CHECK_GOBJECT_M2, 0, _caster->GetCombatReach() * 0.7);
     }
 
 private:
@@ -1536,7 +1537,6 @@ public:
 
             if (!instance->GetData(DATA_SINDRAGOSA_FROSTWYRMS) && instance->GetBossState(DATA_SINDRAGOSA) != IN_PROGRESS)
             {
-                player->GetMap()->LoadGrid(SindragosaSpawnPos.GetPositionX(), SindragosaSpawnPos.GetPositionY());
                 if (Creature* sindragosa = ObjectAccessor::GetCreature(*player, instance->GetGuidData(DATA_SINDRAGOSA)))
                     sindragosa->AI()->DoAction(ACTION_START_FROSTWYRM);
             }

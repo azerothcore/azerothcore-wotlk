@@ -39,10 +39,7 @@
 
 enum HunterSpells
 {
-    // Ours
     SPELL_HUNTER_WYVERN_STING_DOT                   = 24131,
-
-    // Theirs
     SPELL_HUNTER_ASPECT_OF_THE_BEAST                = 13161,
     SPELL_HUNTER_ASPECT_OF_THE_BEAST_PET            = 61669,
     SPELL_HUNTER_ASPECT_OF_THE_VIPER                = 34074,
@@ -887,8 +884,11 @@ class spell_hun_misdirection : public AuraScript
             GetTarget()->ResetRedirectThreat();
     }
 
-    bool CheckProc(ProcEventInfo& /*eventInfo*/)
+    bool CheckProc(ProcEventInfo& eventInfo)
     {
+        // Do not trigger from Mend Pet
+        if (eventInfo.GetProcSpell() && (eventInfo.GetProcSpell()->GetSpellInfo()->SpellFamilyFlags[0] & 0x800000))
+            return false;
         return GetTarget()->GetRedirectThreatTarget();
     }
 

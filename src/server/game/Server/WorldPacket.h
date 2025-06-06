@@ -19,7 +19,6 @@
 #define _WORLDPACKET_H_
 
 #include "ByteBuffer.h"
-#include "Common.h"
 #include "Duration.h"
 #include "Opcodes.h"
 

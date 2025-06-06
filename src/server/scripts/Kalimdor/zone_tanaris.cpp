@@ -15,21 +15,6 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-/* ScriptData
-SDName: Tanaris
-SD%Complete: 80
-SDComment: Quest support: 1560, 2954, 4005, 10277, 10279(Special flight path). Noggenfogger vendor
-SDCategory: Tanaris
-EndScriptData */
-
-/* ContentData
-npc_aquementas
-npc_custodian_of_time
-npc_steward_of_time
-npc_stone_watcher_of_norgannon
-npc_tooga
-EndContentData */
-
 #include "CreatureScript.h"
 #include "Player.h"
 #include "ScriptedCreature.h"
@@ -242,16 +227,28 @@ public:
                         break;
                     case 24:
                         Talk(WHISPER_CUSTODIAN_14, player);
-                        DoCast(player, 34883);
-                        // below here is temporary workaround, to be removed when spell works properly
-                        player->AreaExploredOrEventHappens(10277);
+                        if (Group* group = player->GetGroup())
+                        {
+                            for (GroupReference* itr = group->GetFirstMember(); itr != nullptr; itr = itr->next())
+                            {
+                                Player* player = itr->GetSource();
+
+                                // for any leave or dead (with not released body) group member at appropriate distance
+                                if (player && player->IsAtGroupRewardDistance(me) && !player->GetCorpse())
+                                    DoCast(player, 34883); // QID 10277
+
+                            }
+                        }
+                        else
+                        {
+                            DoCast(player, 34883); // QID 10277
+                        }
                         break;
                 }
             }
         }
 
         void MoveInLineOfSight(Unit* who) override
-
         {
             if (HasEscortState(STATE_ESCORT_ESCORTING))
                 return;
