@@ -292,15 +292,6 @@ void SpellMgr::LoadSpellInfoCorrections()
         spellInfo->MaxAffectedTargets = 4;
     });
 
-    ApplySpellFix({
-        20424,  // Seal of Command
-        42463,  // Seal of Vengeance
-        53739   // Seal of Corruption
-        }, [](SpellInfo* spellInfo)
-    {
-        spellInfo->AttributesEx3 |= SPELL_ATTR3_IGNORE_CASTER_MODIFIERS;
-    });
-
     // Spitfire Totem
     ApplySpellFix({ 38296 }, [](SpellInfo* spellInfo)
     {
@@ -5200,6 +5191,12 @@ void SpellMgr::LoadSpellInfoCorrections()
     ApplySpellFix({ 34367 }, [](SpellInfo* spellInfo)
     {
         spellInfo->ChannelInterruptFlags &= ~AURA_INTERRUPT_FLAG_TURNING;
+    });
+
+    // The Green Tower
+    ApplySpellFix({ 18097 }, [](SpellInfo* spellInfo)
+    {
+        spellInfo->DurationEntry = sSpellDurationStore.LookupEntry(21); // -1
     });
 
     for (uint32 i = 0; i < GetSpellInfoStoreSize(); ++i)

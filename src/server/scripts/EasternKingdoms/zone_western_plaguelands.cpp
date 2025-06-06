@@ -15,18 +15,6 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-/* ScriptData
-SDName: Western_Plaguelands
-SD%Complete: 90
-SDComment: Quest support: 5097, 5098, 5216, 5219, 5222, 5225, 5229, 5231, 5233, 5235. To obtain Vitreous Focuser (could use more spesifics about gossip items)
-SDCategory: Western Plaguelands
-EndScriptData */
-
-/* ContentData
-npc_the_scourge_cauldron
-npc_andorhal_tower
-EndContentData */
-
 #include "AreaDefines.h"
 #include "CreatureScript.h"
 #include "Player.h"
