@@ -4,6 +4,7 @@ SET @SAY_APPROACH := 0,
 
 UPDATE `creature_template` SET `ScriptName` = 'boss_tenris_mirkblood' WHERE `entry` = 28194;
 
+DELETE FROM `creature_text` WHERE `CreatureID` = 28167;
 INSERT INTO `creature_text` (`CreatureID`, `GroupID`, `ID`, `Text`, `Type`, `Language`, `Probability`, `Emote`, `Duration`, `Sound`, `BroadcastTextId`, `TextRange`, `comment`) VALUES
 (28167, @SAY_APPROACH, 0, 'I smell... $r.  Delicious!', 14, 0, 100, 0, 0, 0, 27780, 0, 'Prince Tenris Mirkblood - SAY_APPROACH'), -- Nothing sniffed, types need verification
 (28167, @SAY_AGGRO, 0, 'I shall consume you!', 14, 0, 100, 0, 0, 0, 27781, 0, 'Prince Tenris Mirkblood - SAY_AGGRO'),

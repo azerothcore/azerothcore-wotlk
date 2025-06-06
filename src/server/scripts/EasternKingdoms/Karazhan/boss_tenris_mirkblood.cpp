@@ -71,7 +71,7 @@ struct boss_tenris_mirkblood : public BossAI
     {
         _Reset();
         ScheduleHealthCheckEvent(50, [&] {
-            // SPELL_SUMMON_SANGUINE_SPIRIT_MISSILE_BURST
+            DoCast(SPELL_SUMMON_SANGUINE_SPIRIT_MISSILE_BURST);
             });
         scheduler.CancelAll();
     }
