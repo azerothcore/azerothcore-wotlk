@@ -48,7 +48,7 @@
 #include "SecretMgr.h"
 #include "SharedDefines.h"
 #include "SteadyTimer.h"
-#include "VoiceChat/VoiceChatMgr.h"
+#include "VoiceChatMgr.h"
 #include "World.h"
 #include "WorldSessionMgr.h"
 #include "WorldSocket.h"

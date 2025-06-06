@@ -41,8 +41,8 @@ public:
     }
 
     VoiceChatMgr()
-      : m_socket(nullptr),
-        m_requestSocket(nullptr),
+      : _socket(nullptr),
+        _requestSocket(nullptr),
         new_request_id(1),
         new_session_id(std::chrono::system_clock::now().time_since_epoch().count()),
         server_address(0),
@@ -144,7 +144,7 @@ public:
 
     uint64 GetNewSessionId() { return new_session_id++; }
 
-    EventEmitter<void(VoiceChatMgr*)>& GetEventEmitter() { return m_eventEmitter; }
+    EventEmitter<void(VoiceChatMgr*)>& GetEventEmitter() { return _eventEmitter; }
 
     // Command Handlers
     void DisableVoiceChat();
@@ -163,9 +163,9 @@ private:
     void ProcessByteBufferException(VoiceChatServerPacket const& packet);
 
     // socket to voice server
-    std::shared_ptr<VoiceChatSocket> m_socket;
-    std::shared_ptr<VoiceChatSocket> m_requestSocket;
-    std::vector<VoiceChatChannelRequest> m_requests;
+    std::shared_ptr<VoiceChatSocket> _socket;
+    std::shared_ptr<VoiceChatSocket> _requestSocket;
+    std::vector<VoiceChatChannelRequest> _requests;
     uint32 new_request_id;
     uint64 new_session_id;
 
@@ -192,7 +192,7 @@ private:
     uint8 curReconnectAttempts;
 
     // voice channels
-    std::map<uint16, VoiceChatChannel*> m_VoiceChatChannels;
+    std::map<uint16, VoiceChatChannel*> _VoiceChatChannels;
 
     // state of connection
     VoiceChatState state;
@@ -200,13 +200,13 @@ private:
     std::chrono::system_clock::time_point lastUpdate;
 
     // Thread safety mechanisms
-    std::mutex m_recvQueueLock;
-    std::deque<std::unique_ptr<VoiceChatServerPacket>> m_recvQueue;
+    std::mutex _recvQueueLock;
+    std::deque<std::unique_ptr<VoiceChatServerPacket>> _recvQueue;
 
     std::unique_ptr<AsyncConnector<VoiceChatSocket>> _connector;
 
-    EventEmitter<void(VoiceChatMgr*)> m_eventEmitter;
-    boost::asio::io_context m_voiceService;
+    EventEmitter<void(VoiceChatMgr*)> _eventEmitter;
+    boost::asio::io_context _voiceService;
 };
 
 #define sVoiceChatMgr VoiceChatMgr::Instance()

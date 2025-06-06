@@ -541,10 +541,10 @@ public:
     bool IsARecruiter() const { return isRecruiter; }
 
     // Voice Chat
-    bool IsVoiceChatEnabled() const { return m_voiceEnabled; }
-    bool IsMicEnabled() const { return m_micEnabled; }
-    uint16 GetCurrentVoiceChannelId() const { return m_currentVoiceChannel; }
-    void SetCurrentVoiceChannelId(uint32 id) { m_currentVoiceChannel = id; }
+    bool IsVoiceChatEnabled() const { return _voiceEnabled; }
+    bool IsMicEnabled() const { return _micEnabled; }
+    uint16 GetCurrentVoiceChannelId() const { return _currentVoiceChannel; }
+    void SetCurrentVoiceChannelId(uint32 id) { _currentVoiceChannel = id; }
     static void HandleAddMutedOpcodeCallBack(QueryResult* result, uint32);
     // Voice Chat
     void HandleAddVoiceIgnoreOpcode(WorldPacket& recvData);
@@ -1206,9 +1206,9 @@ private:
     time_t _calendarEventCreationCooldown;
 
     // Voice Chat
-    bool m_micEnabled;
-    bool m_voiceEnabled;
-    uint16 m_currentVoiceChannel;
+    bool _micEnabled;
+    bool _voiceEnabled;
+    uint16 _currentVoiceChannel;
 
     // Addon Message count for Metric
     std::atomic<uint32> _addonMessageReceiveCount;

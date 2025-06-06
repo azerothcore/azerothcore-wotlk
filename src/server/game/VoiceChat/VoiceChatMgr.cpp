@@ -92,12 +92,12 @@ void VoiceChatMgr::VoiceSocketThread()
         LOG_INFO("voice-chat", "Successfully connected to voice server");
 
         // Create voice chat session
-        m_socket = std::make_shared<VoiceChatSocket>(std::move(socket));
+        _socket = std::make_shared<VoiceChatSocket>(std::move(socket));
 
         // Start processing
-        if (m_socket)
+        if (_socket)
         {
-            m_socket->Start();
+            _socket->Start();
             ioContext.run();
         }
         else
@@ -163,18 +163,18 @@ void VoiceChatMgr::Update()
 
     LOG_DEBUG("voice-chat", "VoiceChatMgr::Update state: {}", state);
 
-    m_eventEmitter(this);
+    _eventEmitter(this);
 
-    if (m_socket)
-        m_socket->Update(); // yep, that's it
+    if (_socket)
+        _socket->Update(); // yep, that's it
 
     std::deque<std::unique_ptr<VoiceChatServerPacket>> recvQueueCopy;
     {
-        std::lock_guard<std::mutex> guard(m_recvQueueLock);
-        std::swap(recvQueueCopy, m_recvQueue);
+        std::lock_guard<std::mutex> guard(_recvQueueLock);
+        std::swap(recvQueueCopy, _recvQueue);
     }
 
-    while (m_socket && m_socket->IsOpen() && !recvQueueCopy.empty())
+    while (_socket && _socket->IsOpen() && !recvQueueCopy.empty())
     {
         auto const packet = std::move(recvQueueCopy.front());
         recvQueueCopy.pop_front();
@@ -205,15 +205,15 @@ void VoiceChatMgr::Update()
 
     lastUpdate = now;
 
-    if (m_requestSocket)
+    if (_requestSocket)
     {
-        m_socket = m_requestSocket;
-        m_requestSocket = nullptr;
+        _socket = _requestSocket;
+        _requestSocket = nullptr;
         return;
     }
 
     // connecting / reconnecting
-    if (!m_socket)
+    if (!_socket)
     {
         if (state == VOICECHAT_CONNECTED)
         {
@@ -265,7 +265,7 @@ void VoiceChatMgr::Update()
     }
     else
     {
-        if (!m_socket->IsOpen())
+        if (!_socket->IsOpen())
         {
             if (state == VOICECHAT_CONNECTED)
             {
@@ -278,7 +278,7 @@ void VoiceChatMgr::Update()
 
             if (now > next_connect)
             {
-                if (!m_requestSocket && (state == VOICECHAT_NOT_CONNECTED || state == VOICECHAT_RECONNECTING))
+                if (!_requestSocket && (state == VOICECHAT_NOT_CONNECTED || state == VOICECHAT_RECONNECTING))
                 {
                     ActivateVoiceSocketThread();
                     next_connect = now + std::chrono::seconds(5);
@@ -293,13 +293,13 @@ void VoiceChatMgr::Update()
             if (state == VOICECHAT_NOT_CONNECTED)
                 LOG_INFO("voice-chat",
                     "Connected to {}:{}.",
-                    m_socket->GetRemoteIpAddress().to_string(),
-                    m_socket->GetRemotePort());
+                    _socket->GetRemoteIpAddress().to_string(),
+                    _socket->GetRemotePort());
             if (state == VOICECHAT_RECONNECTING)
                 LOG_INFO("voice-chat",
                     "Reconnected to {}:{}",
-                    m_socket->GetRemoteIpAddress().to_string(),
-                    m_socket->GetRemotePort());
+                    _socket->GetRemoteIpAddress().to_string(),
+                    _socket->GetRemotePort());
 
             SendVoiceChatStatus(true);
             RestoreVoiceChatChannels();
@@ -318,10 +318,10 @@ void VoiceChatMgr::Update()
                 next_ping = now + std::chrono::seconds(5);
                 VoiceChatServerPacket data(VOICECHAT_CMSG_PING, 4);
                 data << uint32(0);
-                m_socket->SendPacket(data);
+                _socket->SendPacket(data);
             }
 
-            if (m_socket && (now - last_pong) > std::chrono::seconds(10))
+            if (_socket && (now - last_pong) > std::chrono::seconds(10))
             {
                 LOG_ERROR("voice-chat", "Ping timeout!");
                 SocketDisconnected();
@@ -354,7 +354,7 @@ void VoiceChatMgr::HandleVoiceChatServerPacket(VoiceChatServerPacket& pck)
             pck >> request_id;
             pck >> error;
 
-            for (auto request = m_requests.begin(); request != m_requests.end();)
+            for (auto request = _requests.begin(); request != _requests.end();)
             {
                 if (request->id == request_id)
                 {
@@ -365,7 +365,7 @@ void VoiceChatMgr::HandleVoiceChatServerPacket(VoiceChatServerPacket& pck)
                     else
                     {
                         LOG_ERROR("voice-chat", "Error creating voice channel");
-                        request = m_requests.erase(request);
+                        request = _requests.erase(request);
                         return;
                     }
 
@@ -378,7 +378,7 @@ void VoiceChatMgr::HandleVoiceChatServerPacket(VoiceChatServerPacket& pck)
                             {
                                 auto* v_channel = new VoiceChatChannel(
                                     VoiceChatChannelTypes(request->type), channel_id, grp->GetId());
-                                m_VoiceChatChannels.insert(std::make_pair((uint32)channel_id, v_channel));
+                                _VoiceChatChannels.insert(std::make_pair((uint32)channel_id, v_channel));
                                 v_channel->AddMembersAfterCreate();
                             }
                         }
@@ -394,7 +394,7 @@ void VoiceChatMgr::HandleVoiceChatServerPacket(VoiceChatServerPacket& pck)
                                     request->groupid,
                                     "",
                                     request->team);
-                                m_VoiceChatChannels.insert(std::make_pair((uint32)channel_id, v_channel));
+                                _VoiceChatChannels.insert(std::make_pair((uint32)channel_id, v_channel));
                                 v_channel->AddMembersAfterCreate();
                             }
                         }
@@ -411,13 +411,13 @@ void VoiceChatMgr::HandleVoiceChatServerPacket(VoiceChatServerPacket& pck)
                                     0,
                                     request->channel_name,
                                     request->team);
-                                m_VoiceChatChannels.insert(std::make_pair((uint32)channel_id, v_channel));
+                                _VoiceChatChannels.insert(std::make_pair((uint32)channel_id, v_channel));
                                 v_channel->AddMembersAfterCreate();
                             }
                         }
                     }
 
-                    request = m_requests.erase(request);
+                    request = _requests.erase(request);
                 }
                 else
                     request++;
@@ -438,16 +438,16 @@ void VoiceChatMgr::SocketDisconnected()
     LOG_ERROR("voice-chat", "VoiceChatServerSocket disconnected");
 
     // we close somewher eelse
-    // if (m_socket)
+    // if (_socket)
     // {
-    //     if (m_socket->IsOpen())
-    //         m_socket->CloseSocket();
+    //     if (_socket->IsOpen())
+    //         _socket->CloseSocket();
     // }
 
-    // m_socket.reset();
-    // m_voiceService.stop();
-    // m_socket = nullptr;
-    m_requests.clear();
+    // _socket.reset();
+    // _voiceService.stop();
+    // _socket = nullptr;
+    _requests.clear();
 
     DeleteAllChannels();
 
@@ -456,13 +456,13 @@ void VoiceChatMgr::SocketDisconnected()
 
 bool VoiceChatMgr::NeedConnect()
 {
-    return enabled && !m_socket && !m_requestSocket && state == VOICECHAT_NOT_CONNECTED &&
+    return enabled && !_socket && !_requestSocket && state == VOICECHAT_NOT_CONNECTED &&
            std::chrono::system_clock::now() > next_connect;
 }
 
 bool VoiceChatMgr::NeedReconnect()
 {
-    return enabled && !m_socket && !m_requestSocket && state == VOICECHAT_RECONNECTING &&
+    return enabled && !_socket && !_requestSocket && state == VOICECHAT_RECONNECTING &&
            std::chrono::system_clock::now() > next_connect;
 }
 
@@ -476,18 +476,18 @@ int32 VoiceChatMgr::GetReconnectAttempts() const
 
 bool VoiceChatMgr::RequestNewSocket(VoiceChatSocket* socket)
 {
-    if (m_requestSocket)
+    if (_requestSocket)
         return false;
 
-    m_requestSocket = socket->shared_from_this();
+    _requestSocket = socket->shared_from_this();
     return true;
 }
 
 // Add an incoming packet to the queue
 void VoiceChatMgr::QueuePacket(std::unique_ptr<VoiceChatServerPacket> new_packet)
 {
-    std::lock_guard<std::mutex> guard(m_recvQueueLock);
-    m_recvQueue.push_back(std::move(new_packet));
+    std::lock_guard<std::mutex> guard(_recvQueueLock);
+    _recvQueue.push_back(std::move(new_packet));
 }
 
 void VoiceChatMgr::ProcessByteBufferException(VoiceChatServerPacket const& packet)
@@ -512,26 +512,26 @@ void VoiceChatMgr::ProcessByteBufferException(VoiceChatServerPacket const& packe
     //    );
 
     // Replace Messager with EventEmitter callback
-    m_eventEmitter += [](VoiceChatMgr* mgr) { mgr->SocketDisconnected(); };
+    _eventEmitter += [](VoiceChatMgr* mgr) { mgr->SocketDisconnected(); };
 }
 
 //
 // void VoiceChatMgr::VoiceSocketThread()
 // {
-//     m_voiceService.stop();
-//     m_voiceService.restart();
+//     _voiceService.stop();
+//     _voiceService.restart();
 //     std::unique_ptr<MaNGOS::AsyncConnector<VoiceChatServerSocket>>
 //     voiceSocket; voiceSocket =
-//     std::make_unique<MaNGOS::AsyncConnector<VoiceChatServerSocket>>(m_voiceService,
+//     std::make_unique<MaNGOS::AsyncConnector<VoiceChatServerSocket>>(_voiceService,
 //     sVoiceChatMgr.GetVoiceServerConnectAddressString(),
 //     int32(sVoiceChatMgr.GetVoiceServerConnectPort()), false);
-//     m_voiceService.run();
+//     _voiceService.run();
 // }
 //
 // enabled and connected to voice server
 bool VoiceChatMgr::CanUseVoiceChat()
 {
-    return (enabled && m_socket);
+    return (enabled && _socket);
 }
 
 // enabled and is connected or trying to connect to voice server
@@ -543,7 +543,7 @@ bool VoiceChatMgr::CanSeeVoiceChat()
 void VoiceChatMgr::CreateVoiceChatChannel(
     VoiceChatChannelTypes type, uint32 groupId, std::string const& name, TeamId team)
 {
-    if (!m_socket)
+    if (!_socket)
         return;
 
     if (type == VOICECHAT_CHANNEL_NONE)
@@ -569,12 +569,12 @@ void VoiceChatMgr::CreateVoiceChatChannel(
     req.channel_name = name;
     req.team = newTeam;
     req.groupid = groupId;
-    m_requests.push_back(req);
+    _requests.push_back(req);
 
     VoiceChatServerPacket data(VOICECHAT_CMSG_CREATE_CHANNEL, 5);
     data << req.type;
     data << req.id;
-    m_socket->SendPacket(data);
+    _socket->SendPacket(data);
 }
 
 //
@@ -601,15 +601,15 @@ void VoiceChatMgr::DeleteVoiceChatChannel(VoiceChatChannel* channel)
         }
     }
 
-    m_VoiceChatChannels.erase(channel->GetChannelId());
+    _VoiceChatChannels.erase(channel->GetChannelId());
     delete channel;
 
-    if (m_socket)
+    if (_socket)
     {
         VoiceChatServerPacket data(VOICECHAT_CMSG_DELETE_CHANNEL, 5);
         data << type;
         data << id;
-        m_socket->SendPacket(data);
+        _socket->SendPacket(data);
     }
 }
 
@@ -617,7 +617,7 @@ void VoiceChatMgr::DeleteVoiceChatChannel(VoiceChatChannel* channel)
 bool VoiceChatMgr::IsVoiceChatChannelBeingCreated(
     VoiceChatChannelTypes type, uint32 groupId, std::string const& name, TeamId team)
 {
-    return std::ranges::any_of(m_requests,
+    return std::ranges::any_of(_requests,
         [&](const auto& req)
     {
         if (req.type != type)
@@ -709,8 +709,8 @@ void VoiceChatMgr::ConvertToRaidChannel(uint32 groupId)
 
 VoiceChatChannel* VoiceChatMgr::GetVoiceChatChannel(uint16 channel_id)
 {
-    auto itr = m_VoiceChatChannels.find(channel_id);
-    if (itr == m_VoiceChatChannels.end())
+    auto itr = _VoiceChatChannels.find(channel_id);
+    if (itr == _VoiceChatChannels.end())
         return nullptr;
 
     return itr->second;
@@ -719,7 +719,7 @@ VoiceChatChannel* VoiceChatMgr::GetVoiceChatChannel(uint16 channel_id)
 //
 VoiceChatChannel* VoiceChatMgr::GetGroupVoiceChatChannel(uint32 group_id)
 {
-    for (auto& channel : m_VoiceChatChannels)
+    for (auto& channel : _VoiceChatChannels)
     {
         VoiceChatChannel* chn = channel.second;
         if (chn->GetType() == VOICECHAT_CHANNEL_GROUP && chn->GetGroupId() == group_id)
@@ -732,7 +732,7 @@ VoiceChatChannel* VoiceChatMgr::GetGroupVoiceChatChannel(uint32 group_id)
 //
 VoiceChatChannel* VoiceChatMgr::GetRaidVoiceChatChannel(uint32 group_id)
 {
-    for (auto& channel : m_VoiceChatChannels)
+    for (auto& channel : _VoiceChatChannels)
     {
         VoiceChatChannel* chn = channel.second;
         if (chn->GetType() == VOICECHAT_CHANNEL_RAID && chn->GetGroupId() == group_id)
@@ -744,7 +744,7 @@ VoiceChatChannel* VoiceChatMgr::GetRaidVoiceChatChannel(uint32 group_id)
 
 VoiceChatChannel* VoiceChatMgr::GetBattlegroundVoiceChatChannel(uint32 instanceId, TeamId team)
 {
-    for (auto& channel : m_VoiceChatChannels)
+    for (auto& channel : _VoiceChatChannels)
     {
         // for BG use bg's instanceID as groupID
         VoiceChatChannel* chn = channel.second;
@@ -757,7 +757,7 @@ VoiceChatChannel* VoiceChatMgr::GetBattlegroundVoiceChatChannel(uint32 instanceI
 
 VoiceChatChannel* VoiceChatMgr::GetCustomVoiceChatChannel(std::string const& name, TeamId team)
 {
-    for (auto& channels : m_VoiceChatChannels)
+    for (auto& channels : _VoiceChatChannels)
     {
         VoiceChatChannel* v_chan = channels.second;
         if (v_chan->GetType() == VOICECHAT_CHANNEL_CUSTOM && v_chan->GetChannelName() == name &&
@@ -777,7 +777,7 @@ std::vector<VoiceChatChannel*> VoiceChatMgr::GetPossibleVoiceChatChannels(Object
     if (!plr)
         return channel_list;
 
-    for (auto& channel : m_VoiceChatChannels)
+    for (auto& channel : _VoiceChatChannels)
     {
         VoiceChatChannel* chn = channel.second;
         if (chn->GetType() != VOICECHAT_CHANNEL_CUSTOM)
@@ -838,9 +838,9 @@ void VoiceChatMgr::RestoreVoiceChatChannels()
 
 void VoiceChatMgr::DeleteAllChannels()
 {
-    for (auto& channel : m_VoiceChatChannels)
+    for (auto& channel : _VoiceChatChannels)
         DeleteVoiceChatChannel(channel.second);
-    m_VoiceChatChannels.clear();
+    _VoiceChatChannels.clear();
 }
 
 // if cross faction channels are enabled, team is always ALLIANCE
@@ -962,7 +962,7 @@ void VoiceChatMgr::RemoveFromCustomVoiceChatChannel(ObjectGuid guid, std::string
 //
 void VoiceChatMgr::EnableChannelSlot(uint16 channel_id, uint8 slot_id)
 {
-    if (!m_socket)
+    if (!_socket)
     {
         LOG_ERROR("voice-chat", "Channel enabled with no socket!");
         return;
@@ -973,13 +973,13 @@ void VoiceChatMgr::EnableChannelSlot(uint16 channel_id, uint8 slot_id)
     VoiceChatServerPacket data(VOICECHAT_CMSG_ADD_MEMBER, 5);
     data << channel_id;
     data << slot_id;
-    m_socket->SendPacket(data);
+    _socket->SendPacket(data);
 }
 
 //
 void VoiceChatMgr::DisableChannelSlot(uint16 channel_id, uint8 slot_id)
 {
-    if (!m_socket)
+    if (!_socket)
     {
         LOG_ERROR("voice-chat", "Channel disabled with no socket!");
         return;
@@ -990,13 +990,13 @@ void VoiceChatMgr::DisableChannelSlot(uint16 channel_id, uint8 slot_id)
     VoiceChatServerPacket data(VOICECHAT_CMSG_REMOVE_MEMBER, 5);
     data << channel_id;
     data << slot_id;
-    m_socket->SendPacket(data);
+    _socket->SendPacket(data);
 }
 
 //
 void VoiceChatMgr::VoiceChannelSlot(uint16 channel_id, uint8 slot_id)
 {
-    if (!m_socket)
+    if (!_socket)
     {
         LOG_ERROR("voice-chat", "Slot voiced with no socket!");
         return;
@@ -1007,13 +1007,13 @@ void VoiceChatMgr::VoiceChannelSlot(uint16 channel_id, uint8 slot_id)
     VoiceChatServerPacket data(VOICECHAT_CMSG_VOICE_MEMBER, 5);
     data << channel_id;
     data << slot_id;
-    m_socket->SendPacket(data);
+    _socket->SendPacket(data);
 }
 
 //
 void VoiceChatMgr::DevoiceChannelSlot(uint16 channel_id, uint8 slot_id)
 {
-    if (!m_socket)
+    if (!_socket)
     {
         LOG_ERROR("voice-chat", "Slot devoiced with no socket!");
         return;
@@ -1024,12 +1024,12 @@ void VoiceChatMgr::DevoiceChannelSlot(uint16 channel_id, uint8 slot_id)
     VoiceChatServerPacket data(VOICECHAT_CMSG_DEVOICE_MEMBER, 5);
     data << channel_id;
     data << slot_id;
-    m_socket->SendPacket(data);
+    _socket->SendPacket(data);
 }
 
 void VoiceChatMgr::MuteChannelSlot(uint16 channel_id, uint8 slot_id)
 {
-    if (!m_socket)
+    if (!_socket)
     {
         LOG_ERROR("voice-chat", "Slot muted with no socket!");
         return;
@@ -1040,12 +1040,12 @@ void VoiceChatMgr::MuteChannelSlot(uint16 channel_id, uint8 slot_id)
     VoiceChatServerPacket data(VOICECHAT_CMSG_MUTE_MEMBER, 5);
     data << channel_id;
     data << slot_id;
-    m_socket->SendPacket(data);
+    _socket->SendPacket(data);
 }
 
 void VoiceChatMgr::UnmuteChannelSlot(uint16 channel_id, uint8 slot_id)
 {
-    if (!m_socket)
+    if (!_socket)
     {
         LOG_ERROR("voice-chat", "Slot unmuted with no socket!");
         return;
@@ -1056,7 +1056,7 @@ void VoiceChatMgr::UnmuteChannelSlot(uint16 channel_id, uint8 slot_id)
     VoiceChatServerPacket data(VOICECHAT_CMSG_UNMUTE_MEMBER, 5);
     data << channel_id;
     data << slot_id;
-    m_socket->SendPacket(data);
+    _socket->SendPacket(data);
 }
 
 void VoiceChatMgr::JoinAvailableVoiceChatChannels(WorldSession* session)
@@ -1143,7 +1143,7 @@ void VoiceChatMgr::SendAvailableVoiceChatChannels(WorldSession* session)
 
 void VoiceChatMgr::RemoveFromVoiceChatChannels(ObjectGuid guid)
 {
-    for (auto const& channel : m_VoiceChatChannels)
+    for (auto const& channel : _VoiceChatChannels)
     {
         VoiceChatChannel* chn = channel.second;
         chn->RemoveVoiceChatMember(guid);
@@ -1168,7 +1168,7 @@ void VoiceChatMgr::SendVoiceChatServiceMessage(Opcodes opcode)
 // command handlers
 void VoiceChatMgr::DisableVoiceChat()
 {
-    if (!m_voiceService.stopped() || (m_socket && m_socket->IsOpen()))
+    if (!_voiceService.stopped() || (_socket && _socket->IsOpen()))
         SocketDisconnected();
 
     enabled = false;
@@ -1191,7 +1191,7 @@ VoiceChatStatistics VoiceChatMgr::GetStatistics()
     VoiceChatStatistics stats {};
 
     // amount of channels
-    stats.channels = m_VoiceChatChannels.size();
+    stats.channels = _VoiceChatChannels.size();
 
     // amount of active users
     stats.active_users = 0;

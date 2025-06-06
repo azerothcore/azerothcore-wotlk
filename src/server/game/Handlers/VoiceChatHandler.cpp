@@ -22,8 +22,8 @@
 #include "Opcodes.h"
 #include "Player.h"
 #include "SocialMgr.h"
-#include "VoiceChat/VoiceChatChannel.h"
-#include "VoiceChat/VoiceChatMgr.h"
+#include "VoiceChatChannel.h"
+#include "VoiceChatMgr.h"
 #include "World/World.h"
 #include "WorldPacket.h"
 #include "WorldSession.h"
@@ -53,11 +53,11 @@ void WorldSession::HandleVoiceSessionEnableOpcode(WorldPacket& recv_data)
     else
     {
         // send available voice channels
-        if (_player && _player->IsInWorld() && !m_voiceEnabled)
+        if (_player && _player->IsInWorld() && !_voiceEnabled)
         {
             // enable it here to allow joining channels
-            m_voiceEnabled = voiceEnabled;
-            m_micEnabled = micEnabled;
+            _voiceEnabled = voiceEnabled;
+            _micEnabled = micEnabled;
             sVoiceChatMgr.JoinAvailableVoiceChatChannels(this);
         }
     }
@@ -87,8 +87,8 @@ void WorldSession::HandleVoiceSessionEnableOpcode(WorldPacket& recv_data)
         }
     }
 
-    m_micEnabled = micEnabled;
-    m_voiceEnabled = voiceEnabled;
+    _micEnabled = micEnabled;
+    _voiceEnabled = voiceEnabled;
 }
 
 void WorldSession::HandleChannelVoiceOnOpcode(WorldPacket& recvData)

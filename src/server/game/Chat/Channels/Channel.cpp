@@ -24,7 +24,7 @@
 #include "ObjectMgr.h"
 #include "Player.h"
 #include "SocialMgr.h"
-#include "VoiceChat/VoiceChatMgr.h"
+#include "VoiceChatMgr.h"
 #include "World.h"
 
 Channel::Channel(std::string const& name, uint32 channelId, uint32 channelDBId, TeamId teamId, bool announce, bool ownership):
@@ -720,8 +720,8 @@ void Channel::ToggleVoice(Player* player)
     // silently disable if voice server disconnected
     if (!player)
     {
-        m_voice = !m_voice;
-        if (m_voice)
+        _voice = !_voice;
+        if (_voice)
             _flags |= CHANNEL_FLAG_VOICE;
         else
             _flags &= ~CHANNEL_FLAG_VOICE;
@@ -752,17 +752,17 @@ void Channel::ToggleVoice(Player* player)
     }
 
     // toggle channel voice
-    m_voice = !m_voice;
+    _voice = !_voice;
 
     WorldPacket data;
-    if (m_voice)
+    if (_voice)
         MakeVoiceOn(&data, guid);
     else
         MakeVoiceOff(&data ,guid);
 
     SendToAll(&data);
 
-    if (m_voice)
+    if (_voice)
         _flags |= CHANNEL_FLAG_VOICE;
     else
         _flags &= ~CHANNEL_FLAG_VOICE;
@@ -776,13 +776,13 @@ void Channel::ToggleVoice(Player* player)
             {
                 if (session->IsVoiceChatEnabled())
                 {
-                    playersStore[playerStore.first].SetVoiced(m_voice);
+                    playersStore[playerStore.first].SetVoiced(_voice);
                 }
             }
         }
     }
 
-    if (m_voice)
+    if (_voice)
     {
         sVoiceChatMgr.AddToCustomVoiceChatChannel(guid, this->GetName(), player->GetTeamId());
     }

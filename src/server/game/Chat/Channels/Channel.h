@@ -153,34 +153,44 @@ class Channel
         [[nodiscard]] bool IsOwner() const { return flags & MEMBER_FLAG_OWNER; }
         void SetOwner(bool state)
         {
-            if (state) flags |= MEMBER_FLAG_OWNER;
-            else flags &= ~MEMBER_FLAG_OWNER;
+            if (state)
+                flags |= MEMBER_FLAG_OWNER;
+            else
+                flags &= ~MEMBER_FLAG_OWNER;
         }
         [[nodiscard]] bool IsOwnerGM() const { return _gmStatus; }
         void SetOwnerGM(bool on) { _gmStatus = on; }
         [[nodiscard]] bool IsModerator() const { return flags & MEMBER_FLAG_MODERATOR; }
         void SetModerator(bool state)
         {
-            if (state) flags |= MEMBER_FLAG_MODERATOR;
-            else flags &= ~MEMBER_FLAG_MODERATOR;
+            if (state)
+                flags |= MEMBER_FLAG_MODERATOR;
+            else
+                flags &= ~MEMBER_FLAG_MODERATOR;
         }
         [[nodiscard]] bool IsMuted() const { return flags & MEMBER_FLAG_MUTED; }
         void SetMuted(bool state)
         {
-            if (state) flags |= MEMBER_FLAG_MUTED;
-            else flags &= ~MEMBER_FLAG_MUTED;
+            if (state)
+                flags |= MEMBER_FLAG_MUTED;
+            else
+                flags &= ~MEMBER_FLAG_MUTED;
         }
         [[nodiscard]] bool IsMicMuted() const { return flags & MEMBER_FLAG_MIC_MUTED; }
         void SetMicMuted(bool state)
         {
-            if (state) flags |= MEMBER_FLAG_MIC_MUTED;
-            else flags &= ~MEMBER_FLAG_MIC_MUTED;
+            if (state)
+                flags |= MEMBER_FLAG_MIC_MUTED;
+            else
+                flags &= ~MEMBER_FLAG_MIC_MUTED;
         }
         [[nodiscard]] bool IsVoiced() const { return flags & MEMBER_FLAG_VOICED; }
         void SetVoiced(bool state)
         {
-            if (state) flags |= MEMBER_FLAG_VOICED;
-            else flags &= ~MEMBER_FLAG_VOICED;
+            if (state)
+                flags |= MEMBER_FLAG_VOICED;
+            else
+                flags &= ~MEMBER_FLAG_VOICED;
         }
     private:
         bool _gmStatus = false;
@@ -346,7 +356,7 @@ private:
     ObjectGuid _ownerGUID;
     std::string _name;
     std::string _password;
-    bool m_voice = false;
+    bool _voice = false;
     ChannelRights _channelRights;
     PlayerContainer playersStore;
     BannedContainer bannedStore;
