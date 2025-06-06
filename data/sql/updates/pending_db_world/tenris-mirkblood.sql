@@ -2,6 +2,11 @@ SET @SAY_APPROACH = 0,
 @SAY_AGGRO = 1,
 @SAY_SUMMON = 2;
 
+DELETE FROM `areatrigger_scripts` WHERE `entry` IN (5014, 5015);
+INSERT INTO `areatrigger_scripts` (`entry`, `ScriptName`) VALUES
+(5014, 'at_karazhan_mirkblood_approach'),
+(5015, 'at_karazhan_mirkblood_entrance');
+
 UPDATE `creature_template` SET `ScriptName` = 'boss_tenris_mirkblood' WHERE `entry` = 28194;
 
 DELETE FROM `creature_text` WHERE `CreatureID` = 28194;
