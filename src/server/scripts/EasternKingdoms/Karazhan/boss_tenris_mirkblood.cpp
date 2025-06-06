@@ -70,12 +70,34 @@ struct boss_tenris_mirkblood : public BossAI
     void Reset() override
     {
         _Reset();
+        ScheduleHealthCheckEvent(50, [&] {
+            // SPELL_SUMMON_SANGUINE_SPIRIT_MISSILE_BURST
+            });
+        scheduler.CancelAll();
     }
 
     void JustEngagedWith(Unit* /*who*/) override
     {
         Talk(SAY_AGGRO);
         DoZoneInCombat();
+
+        scheduler.Schedule(1s, 5s, [this](TaskContext context)
+            { // Blood Mirror
+                
+                context.Repeat(20s, 50s);
+            }).Schedule(30s, [this](TaskContext context)
+            { // Blood Swoop
+                
+                context.Repeat(15s, 40s);
+            }).Schedule(10s, 15s, [this](TaskContext context)
+            { // Blood Tap
+                
+                context.Repeat(15s, 40s);
+            }).Schedule(6s, 15s, [this](TaskContext context)
+            { // Sanguine Spirits
+                
+                context.Repeat(6s, 15s);
+            });
     }
 
     void JustSummoned(Creature* summoned) override
