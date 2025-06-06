@@ -86,16 +86,16 @@ struct boss_tenris_mirkblood : public BossAI
                 
                 context.Repeat(20s, 50s);
             }).Schedule(30s, [this](TaskContext context)
-            { // Blood Swoop
-                
+            {
+                DoCast(SPELL_DASH_GASH_PRE_SPELL);
                 context.Repeat(15s, 40s);
             }).Schedule(10s, 15s, [this](TaskContext context)
-            { // Blood Tap
-                
+            {
+                DoCast(SPELL_BLOOD_TAP);
                 context.Repeat(15s, 40s);
             }).Schedule(6s, 15s, [this](TaskContext context)
-            { // Sanguine Spirits
-                
+            {
+                DoCast(SPELL_SUMMON_SANGUINE_SPIRIT_SHORT_MISSILE_BURST);
                 context.Repeat(6s, 15s);
             });
     }
