@@ -610,10 +610,10 @@ public:
             Creature* cr;
             uint8 rnd = urand(0,13);
             if ((cr = me->SummonCreature(arenaNpc, ArenaNPCs[rnd], TEMPSUMMON_CORPSE_TIMED_DESPAWN, 5000)))
-            cr->GetMotionMaster()->MoveJump(
-                Middle.GetPositionX() + urand(19, 24) * cos(Middle.GetAngle(cr)),
-                Middle.GetPositionY() + urand(19, 24) * std::sin(Middle.GetAngle(cr)),
-                Middle.GetPositionZ(), 20, 20);
+                cr->GetMotionMaster()->MoveJump(
+                    Middle.GetPositionX() + urand(19, 24) * cos(Middle.GetAngle(cr)),
+                    Middle.GetPositionY() + urand(19, 24) * std::sin(Middle.GetAngle(cr)),
+                    Middle.GetPositionZ(), 20, 20);
         }
 
         void SpawnCommoners()
