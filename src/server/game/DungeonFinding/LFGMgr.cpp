@@ -422,6 +422,8 @@ namespace lfg
                 lockData = LFG_LOCKSTATUS_TOO_HIGH_LEVEL;
             else if (dungeon->seasonal && !IsSeasonActive(dungeon->id))
                 lockData = LFG_LOCKSTATUS_NOT_IN_SEASON;
+            else if (player->IsClass(CLASS_DEATH_KNIGHT) && !player->IsGameMaster() &&!(player->IsQuestRewarded(13188) || player->IsQuestRewarded(13189)))
+                lockData = LFG_LOCKSTATUS_QUEST_NOT_COMPLETED;
             else if (ar)
             {
                 // Check required items
