@@ -29,8 +29,8 @@ enum Text
 
 enum Spells
 {
-    SPELL_BLOOD_MIRROR = 50844, // clone, proc 1206
-    SPELL_BLOOD_MIRROR = 50845, // script, dummy, dummy
+    SPELL_BLOOD_MIRROR0 = 50844, // clone, proc 1206
+    SPELL_BLOOD_MIRROR1 = 50845, // script, dummy, dummy
     SPELL_BLOOD_MIRROR_TARGET_PICKER = 50883, // script
     SPELL_BLOOD_MIRROR_TRANSITION_VISUAL = 50910, // dummy
     SPELL_BLOOD_MIRROR_DAMAGE = 50846, // damage
@@ -48,9 +48,9 @@ enum Spells
     SPELL_SANGUINE_SPIRIT_AURA = 50993, // dummy, periodic trigger 51013
     SPELL_SANGUINE_SPIRIT_PRE_AURA = 51282, // dummy
     SPELL_SANGUINE_SPIRIT_PRE_AURA2 = 51283, // size mod
-    SPELL_SUMMON_SANGUINE_SPIRIT = 50996, // null
-    SPELL_SUMMON_SANGUINE_SPIRIT = 50998, // trigger missile 50996
-    SPELL_SUMMON_SANGUINE_SPIRIT = 51204, // trigger missile 50996
+    SPELL_SUMMON_SANGUINE_SPIRIT0 = 50996, // null
+    SPELL_SUMMON_SANGUINE_SPIRIT1 = 50998, // trigger missile 50996
+    SPELL_SUMMON_SANGUINE_SPIRIT2 = 51204, // trigger missile 50996
     SPELL_SUMMON_SANGUINE_SPIRIT_MISSILE_BURST = 51208, // periodic trigger 50998
     SPELL_SUMMON_SANGUINE_SPIRIT_SHORT_MISSILE_BURST = 51280, // periodic trigger 50998
     SPELL_SUMMON_SANGUINE_SPIRIT_ON_KILL = 51205, // dummy
@@ -74,7 +74,7 @@ struct boss_tenris_mirkblood : public BossAI
 
     void JustEngagedWith(Unit* /*who*/) override
     {
-        // Talk(SAY_AGGRO);
+        Talk(SAY_AGGRO);
         DoZoneInCombat();
     }
 
@@ -89,7 +89,20 @@ struct boss_tenris_mirkblood : public BossAI
     void JustDied(Unit* /*killer*/) override
     {
         _JustDied();
-        // Talk(SAY_DEATH);
+    }
+
+    void DoAction(int32 actionId) override
+    {
+        ObjectGuid guid = ObjectGuid::Create<HighGuid::Player>(instance->GetPersistentData(DATA_MIRKBLOOD_APPROACH));
+        if (!guid)
+            return;
+
+        if (actionId == DATA_MIRKBLOOD_APPROACH)
+            Talk(SAY_APPROACH, ObjectAccessor::FindPlayer(guid)); // @todo: talk at AT target
+        else if (actionId == DATA_MIRKBLOOD_ENTRANCE)
+        {
+            // guh
+        }
     }
 };
 
