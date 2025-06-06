@@ -612,7 +612,7 @@ public:
 class at_karazhan_mirkblood_entrance : public OnlyOnceAreaTriggerScript
 {
 public:
-    at_karazhan_mirkblood_entrance() : OnlyOnceAreaTriggerScript("at_karazhan_side_entrance") {}
+    at_karazhan_mirkblood_entrance() : OnlyOnceAreaTriggerScript("at_karazhan_mirkblood_entrance") {}
 
     bool _OnTrigger(Player* player, AreaTrigger const* /*trigger*/) override
     {
