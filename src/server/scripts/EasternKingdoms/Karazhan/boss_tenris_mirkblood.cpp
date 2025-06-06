@@ -58,7 +58,7 @@ enum Spells
 };
 
 struct boss_tenris_mirkblood : public BossAI
-{ // AREA TRIGGER 5014 CAUSES SAY_APPROACH, AREA TRIGGER 5015 MAY ENGAGE OR JUST RELEASE NOT_SELECTABLE FLAG
+{
     boss_tenris_mirkblood(Creature* creature) : BossAI(creature, DATA_MIRKBLOOD)
     {
         scheduler.SetValidator([this]
@@ -98,10 +98,10 @@ struct boss_tenris_mirkblood : public BossAI
             return;
 
         if (actionId == DATA_MIRKBLOOD_APPROACH)
-            Talk(SAY_APPROACH, ObjectAccessor::FindPlayer(guid)); // @todo: talk at AT target
+            Talk(SAY_APPROACH, ObjectAccessor::FindPlayer(guid));
         else if (actionId == DATA_MIRKBLOOD_ENTRANCE)
         {
-            // guh
+            // AREA TRIGGER 5015 MAY ENGAGE OR JUST RELEASE NOT_SELECTABLE FLAG
         }
     }
 };
