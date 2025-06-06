@@ -15,24 +15,13 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-/* ScriptData
-SDName: Orgrimmar
-SD%Complete: 100
-SDComment: Quest support: 2460, 6566
-SDCategory: Orgrimmar
-EndScriptData */
-
-/* ContentData
-npc_shenthul
-npc_thrall_warchief
-EndContentData */
-
 #include "AreaDefines.h"
 #include "CreatureScript.h"
 #include "Player.h"
 #include "ScriptedCreature.h"
 #include "ScriptedGossip.h"
 #include "TaskScheduler.h"
+#include "LFGMgr.h"
 
 /*######
 ## npc_shenthul
@@ -152,9 +141,12 @@ enum ThrallWarchief : uint32
     GO_UNADORNED_SPIKE             = 175787,
 
     // What the Wind Carries (ID: 6566)
-    QUEST_WHAT_THE_WIND_CARRIES     = 6566,
-    GOSSIP_MENU_THRALL              = 3664,
-    GOSSIP_RESPONSE_THRALL_FIRST    = 5733,
+    QUEST_WHAT_THE_WIND_CARRIES    = 6566,
+    GOSSIP_MENU_THRALL             = 3664,
+    GOSSIP_RESPONSE_THRALL_FIRST   = 5733,
+
+    // Deathknight Starting Zone End
+    QUEST_WARCHIEFS_BLESSING       = 13189,
 };
 
 const Position heraldOfThrallPos = { -462.404f, -2637.68f, 96.0656f, 5.8606f };
@@ -204,14 +196,19 @@ public:
         return true;
     }
 
-    bool OnQuestReward(Player* /*player*/, Creature* creature, Quest const* quest, uint32 /*item*/) override
+    bool OnQuestReward(Player* player, Creature* creature, Quest const* quest, uint32 /*item*/) override
     {
-        if (quest->GetQuestId() == QUEST_FOR_THE_HORDE)
+        switch (quest->GetQuestId())
         {
-            if (creature && creature->AI())
-            {
-                creature->AI()->DoAction(ACTION_START_TALKING);
-            }
+            case (QUEST_FOR_THE_HORDE):
+                if (creature && creature->AI())
+                    creature->AI()->DoAction(ACTION_START_TALKING);
+                break;
+            case (QUEST_WARCHIEFS_BLESSING):
+                sLFGMgr->InitializeLockedDungeons(player);
+                break;
+            default:
+                break;
         }
 
         return true;

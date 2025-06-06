@@ -15,18 +15,6 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-/* ScriptData
-SDName: Darkshore
-SD%Complete: 100
-SDComment: Quest support: 731, 2078, 5321
-SDCategory: Darkshore
-EndScriptData */
-
-/* ContentData
-npc_kerlonian
-npc_prospector_remtravel
-EndContentData */
-
 #include "CreatureScript.h"
 #include "Player.h"
 #include "ScriptedCreature.h"
@@ -35,7 +23,6 @@ EndContentData */
 #include "ScriptedGossip.h"
 #include "SpellInfo.h"
 
-// Ours
 enum murkdeep
 {
     NPC_GREYMIST_HUNTER      = 2206,
@@ -159,7 +146,6 @@ public:
     };
 };
 
-// Theirs
 /*####
 # npc_kerlonian
 ####*/
@@ -643,12 +629,9 @@ public:
 
 void AddSC_darkshore()
 {
-    // Ours
     new npc_murkdeep();
     new npc_rabid_thistle_bear();
     new npc_tharnarian();
-
-    // Theirs
     new npc_kerlonian();
     new npc_prospector_remtravel();
 }

@@ -15,28 +15,12 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-/* ScriptData
-SDName: Eastern_Plaguelands
-SD%Complete: 100
-SDComment: Quest support: 5211, 5742. Special vendor Augustus the Touched
-SDCategory: Eastern Plaguelands
-EndScriptData */
-
-/* ContentData
-npc_ghoul_flayer
-npc_augustus_the_touched
-npc_darrowshire_spirit
-npc_tirion_fordring
-EndContentData */
-
 #include "CreatureScript.h"
 #include "PassiveAI.h"
 #include "Player.h"
 #include "ScriptedCreature.h"
 #include "ScriptedGossip.h"
 #include "SpellInfo.h"
-
-// Ours
 
 enum eEris
 {
@@ -312,7 +296,6 @@ public:
     };
 };
 
-// Theirs
 /*######
 ## npc_augustus_the_touched
 ######*/
@@ -345,10 +328,7 @@ public:
 
 void AddSC_eastern_plaguelands()
 {
-    // Ours
     new npc_eris_hevenfire();
     new npc_balance_of_light_and_shadow();
-
-    // Theirs
     new npc_augustus_the_touched();
 }

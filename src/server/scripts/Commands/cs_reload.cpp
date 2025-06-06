@@ -15,13 +15,6 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-/* ScriptData
-Name: reload_commandscript
-%Complete: 100
-Comment: All reload related commands
-Category: commandscripts
-EndScriptData */
-
 #include "AchievementMgr.h"
 #include "AuctionHouseMgr.h"
 #include "AutobroadcastMgr.h"
