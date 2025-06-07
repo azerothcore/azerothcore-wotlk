@@ -330,22 +330,22 @@ void VoiceChatChannel::RemoveVoiceChatMember(ObjectGuid guid)
     }
 
     Player* plr = ObjectAccessor::FindPlayer(guid);
-    if (!plr)
-        return;
-
-    if (WorldSession* session = plr->GetSession())
+    if (plr)
     {
-        uint32 channelId = GetChannelId();
-        sVoiceChatMgr.GetEventEmitter() += [channelId, session](VoiceChatMgr* /*mgr*/)
+        if (WorldSession* session = plr->GetSession())
         {
+            uint32 channelId = GetChannelId();
+            sVoiceChatMgr.GetEventEmitter() += [channelId, session](VoiceChatMgr* /*mgr*/)
+                {
+                    if (session->GetCurrentVoiceChannelId() == channelId)
+                        session->SetCurrentVoiceChannelId(0);
+                };
+
             if (session->GetCurrentVoiceChannelId() == channelId)
                 session->SetCurrentVoiceChannelId(0);
-        };
 
-        if (session->GetCurrentVoiceChannelId() == channelId)
-            session->SetCurrentVoiceChannelId(0);
-
-        SendLeaveVoiceChatSession(session);
+            SendLeaveVoiceChatSession(session);
+        }
     }
 
     SendLeaveVoiceChatSession(guid);
