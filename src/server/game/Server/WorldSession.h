@@ -36,6 +36,7 @@
 #include <memory>
 #include <utility>
 
+class AuctionEntry;
 class Creature;
 class GameObject;
 class InstanceSave;
@@ -53,7 +54,6 @@ class WorldPacket;
 class WorldSocket;
 class AsynchPetSummon;
 struct AreaTableEntry;
-struct AuctionEntry;
 struct DeclinedName;
 struct ItemTemplate;
 struct MovementInfo;
