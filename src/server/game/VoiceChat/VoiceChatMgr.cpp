@@ -26,8 +26,6 @@
 #include "SharedDefines.h"
 #include "WorldSession.h"
 #include "WorldSessionMgr.h"
-// #include "Chat/ChannelMgr.h"
-// #include "BattleGround/BattleGroundMgr.h"
 // #include "World/World.h"
 // #include "Config/Config.h"
 
@@ -1149,7 +1147,6 @@ void VoiceChatMgr::RemoveFromVoiceChatChannels(ObjectGuid guid)
     }
 }
 
-//
 void VoiceChatMgr::SendVoiceChatStatus(bool status)
 {
     WorldPacket data(SMSG_VOICE_CHAT_STATUS, 1);
@@ -1157,7 +1154,6 @@ void VoiceChatMgr::SendVoiceChatStatus(bool status)
     sWorldSessionMgr->SendGlobalMessage(&data);
 }
 
-//
 void VoiceChatMgr::SendVoiceChatServiceMessage(Opcodes opcode)
 {
     WorldPacket data(opcode);
