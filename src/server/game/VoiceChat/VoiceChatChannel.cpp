@@ -145,10 +145,7 @@ void VoiceChatChannel::SendVoiceRosterUpdate(bool empty, bool toAll, ObjectGuid 
     {
         // clean up if disconnected
         Player* plr = ObjectAccessor::FindPlayer(m_member.second.Guid);
-        if (!plr)
-            return;
-
-        if (!ObjectAccessor::FindConnectedPlayer(m_member.second.Guid))
+        if (!plr || !ObjectAccessor::FindConnectedPlayer(m_member.second.Guid))
         {
             _isDeleting = true;
 
@@ -171,10 +168,7 @@ void VoiceChatChannel::SendVoiceRosterUpdate(bool empty, bool toAll, ObjectGuid 
 
             // clean up if disconnected
             Player* other_plr = ObjectAccessor::FindPlayer(j.second.Guid);
-            if (!other_plr)
-                return;
-
-            if (!ObjectAccessor::FindConnectedPlayer(j.second.Guid))
+            if (!other_plr || !ObjectAccessor::FindConnectedPlayer(j.second.Guid))
             {
                 _isDeleting = true;
 

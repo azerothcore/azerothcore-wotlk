@@ -18,14 +18,13 @@
 #ifndef __ASYNCCONNECT_H_
 #define __ASYNCCONNECT_H_
 
+#include "Asio/IoContext.h"
+#include "Asio/IpAddress.h"
+#include "Log.h"
 #include <boost/asio.hpp>
 #include <boost/system/error_code.hpp>
 #include <memory>
 #include <string>
-
-#include "Asio/IoContext.h"
-#include "Asio/IpAddress.h"
-#include "Log.h"
 
 using boost::asio::ip::tcp;
 
@@ -70,9 +69,7 @@ public:
     catch (boost::system::system_error const& error)
     {
         if (!_silent)
-        {
             LOG_ERROR("network", "AsyncConnector::Connect() - Exception in async_connect: {}", error.what());
-        }
     }
   }
 
@@ -93,9 +90,7 @@ public:
       else
       {
           if (!_silent)
-          {
               LOG_ERROR("network", "AsyncConnector::HandleConnect - Failed to connect: {}", ec.message());
-          }
       }
   }
 
