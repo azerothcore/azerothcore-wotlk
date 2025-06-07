@@ -16,11 +16,11 @@
  */
 
 #include "VoiceChatChannel.h"
-#include "GroupMgr.h"
-#include "VoiceChatMgr.h"
-#include "ChannelMgr.h"
-#include "Player.h"
 #include "BattlegroundMgr.h"
+#include "ChannelMgr.h"
+#include "GroupMgr.h"
+#include "Player.h"
+#include "VoiceChatMgr.h"
 
 VoiceChatChannel::VoiceChatChannel(VoiceChatChannelTypes type, uint32 id, uint32 groupId, std::string name, TeamId team)
 {
@@ -32,10 +32,8 @@ VoiceChatChannel::VoiceChatChannel(VoiceChatChannelTypes type, uint32 id, uint32
     m_is_deleting = false;
     m_is_mass_adding = false;
 
-    for (uint8 i = 1; i < 250; ++i)
-    {
+    for (uint8 i = 1; i < MAX_VOICECHAT_CHANNEL_MEMBERS; ++i)
         m_members_guids[i] = ObjectGuid();
-    }
 
     GenerateSessionId();
     GenerateEncryptionKey();
@@ -45,9 +43,7 @@ VoiceChatChannel::~VoiceChatChannel()
 {
     m_is_deleting = true;
     for (const auto & m_member : m_members)
-    {
         RemoveVoiceChatMember(m_member.second.m_guid);
-    }
 }
 
 void VoiceChatChannel::GenerateSessionId()
@@ -65,7 +61,7 @@ void VoiceChatChannel::GenerateEncryptionKey()
 
 uint8 VoiceChatChannel::GenerateUserId(ObjectGuid guid)
 {
-    /*for (uint8 i = 1; i < 250; ++i)
+    /*for (uint8 i = 1; i < MAX_VOICECHAT_CHANNEL_MEMBERS; ++i)
         {
             if (m_members.find(i) == m_members.end())
                 return i;
@@ -80,7 +76,7 @@ uint8 VoiceChatChannel::GenerateUserId(ObjectGuid guid)
 
     // check if already has id
     uint8 freeId = 0;
-    for (uint8 i = 1; i < 250; ++i)
+    for (uint8 i = 1; i < MAX_VOICECHAT_CHANNEL_MEMBERS; ++i)
     {
         if (m_members_guids[i] == guid)
             return i;
@@ -151,7 +147,8 @@ void VoiceChatChannel::SendVoiceRosterUpdate(bool empty, bool toAll, ObjectGuid 
         Player* plr = ObjectAccessor::FindPlayer(m_member.second.m_guid);
         if (!plr)
             return;
-        if (!plr || !ObjectAccessor::FindConnectedPlayer(m_member.second.m_guid))
+
+        if (!ObjectAccessor::FindConnectedPlayer(m_member.second.m_guid))
         {
             m_is_deleting = true;
 
@@ -176,7 +173,8 @@ void VoiceChatChannel::SendVoiceRosterUpdate(bool empty, bool toAll, ObjectGuid 
             Player* other_plr = ObjectAccessor::FindPlayer(j.second.m_guid);
             if (!other_plr)
                 return;
-            if (!other_plr || !ObjectAccessor::FindConnectedPlayer(j.second.m_guid))
+
+            if (!ObjectAccessor::FindConnectedPlayer(j.second.m_guid))
             {
                 m_is_deleting = true;
 
@@ -341,25 +339,22 @@ void VoiceChatChannel::RemoveVoiceChatMember(ObjectGuid guid)
     if (!plr)
         return;
 
-    if (plr)
+    if (WorldSession* session = plr->GetSession())
     {
-        if (WorldSession* session = plr->GetSession())
+        uint32 channelId = GetChannelId();
+        sVoiceChatMgr.GetEventEmitter() += [channelId, session](VoiceChatMgr* mgr)
         {
-            uint32 channelId = GetChannelId();
-            sVoiceChatMgr.GetEventEmitter() += [channelId, session](VoiceChatMgr* mgr)
-            {
-                if (session->GetCurrentVoiceChannelId() == channelId)
-                    session->SetCurrentVoiceChannelId(0);
-            };
-
             if (session->GetCurrentVoiceChannelId() == channelId)
                 session->SetCurrentVoiceChannelId(0);
+        };
 
-            SendLeaveVoiceChatSession(session);
-        }
+        if (session->GetCurrentVoiceChannelId() == channelId)
+            session->SetCurrentVoiceChannelId(0);
 
-        SendLeaveVoiceChatSession(guid);
+        SendLeaveVoiceChatSession(session);
     }
+
+    SendLeaveVoiceChatSession(guid);
 
     sVoiceChatMgr.DisableChannelSlot(m_channel_id, member->user_id);
 
@@ -396,9 +391,7 @@ void VoiceChatChannel::AddMembersAfterCreate()
                         if (WorldSession* session = groupMember->GetSession())
                         {
                             if (session->IsVoiceChatEnabled())
-                            {
                                 AddVoiceChatMember(groupMember->GetGUID());
-                            }
                         }
                     }
                 }
@@ -419,9 +412,7 @@ void VoiceChatChannel::AddMembersAfterCreate()
                         if (WorldSession* session = bgMember->GetSession())
                         {
                             if (session->IsVoiceChatEnabled())
-                            {
                                 AddVoiceChatMember(itr.first);
-                            }
                         }
                     }
                 }
@@ -434,9 +425,7 @@ void VoiceChatChannel::AddMembersAfterCreate()
             {
                 Channel* chan = cMgr->GetChannel(GetChannelName(), nullptr, false);
                 if (chan)
-                {
                     chan->AddVoiceChatMembersAfterCreate();
-                }
             }
         }
         case VOICECHAT_CHANNEL_NONE:

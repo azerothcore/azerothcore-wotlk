@@ -22,6 +22,8 @@
 #include "VoiceChatDefines.h"
 #include "WorldSession.h"
 
+#define MAX_VOICECHAT_CHANNEL_MEMBERS 250
+
 struct VoiceChatMember;
 typedef std::unordered_map<uint8, VoiceChatMember> VoiceChatMembers;
 typedef std::unordered_map<uint8, ObjectGuid> VoiceChatMembersGuids;

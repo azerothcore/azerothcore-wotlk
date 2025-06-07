@@ -24,12 +24,11 @@
 #include "SocialMgr.h"
 #include "VoiceChatChannel.h"
 #include "VoiceChatMgr.h"
-#include "World/World.h"
+#include "World.h"
 #include "WorldPacket.h"
 #include "WorldSession.h"
-#include "WorldSession.h"
 
-void WorldSession::HandleVoiceSessionEnableOpcode(WorldPacket& recv_data)
+void WorldSession::HandleVoiceSessionEnableOpcode(WorldPacket& recvData)
 {
     LOG_DEBUG("network", "WORLD: Received CMSG_VOICE_SESSION_ENABLE");
 
@@ -39,21 +38,25 @@ void WorldSession::HandleVoiceSessionEnableOpcode(WorldPacket& recv_data)
     // comes from in game voice chat settings
     // is sent during login or when changing settings
     uint8 voiceEnabled, micEnabled;
-    recv_data >> voiceEnabled;
-    recv_data >> micEnabled;
+    recvData >> voiceEnabled;
+    recvData >> micEnabled;
+
+    if (!_player)
+    {
+        _micEnabled = micEnabled;
+        _voiceEnabled = voiceEnabled;
+        return;
+    }
 
     if (!voiceEnabled)
     {
-        if (_player)
-        {
-            sVoiceChatMgr.RemoveFromVoiceChatChannels(_player->GetGUID());
-            SetCurrentVoiceChannelId(0);
-        }
+        sVoiceChatMgr.RemoveFromVoiceChatChannels(_player->GetGUID());
+        SetCurrentVoiceChannelId(0);
     }
     else
     {
         // send available voice channels
-        if (_player && _player->IsInWorld() && !_voiceEnabled)
+        if (_player->IsInWorld() && !_voiceEnabled)
         {
             // enable it here to allow joining channels
             _voiceEnabled = voiceEnabled;
@@ -62,28 +65,15 @@ void WorldSession::HandleVoiceSessionEnableOpcode(WorldPacket& recv_data)
         }
     }
 
-    if (!micEnabled)
+    if (GetCurrentVoiceChannelId())
     {
-        if (_player)
+        VoiceChatChannel* current_channel = sVoiceChatMgr.GetVoiceChatChannel(GetCurrentVoiceChannelId());
+        if (current_channel)
         {
-            if (GetCurrentVoiceChannelId())
-            {
-                VoiceChatChannel* current_channel = sVoiceChatMgr.GetVoiceChatChannel(GetCurrentVoiceChannelId());
-                if (current_channel)
-                    current_channel->MuteMember(_player->GetGUID());
-            }
-        }
-    }
-    else
-    {
-        if (_player)
-        {
-            if (GetCurrentVoiceChannelId())
-            {
-                VoiceChatChannel* current_channel = sVoiceChatMgr.GetVoiceChatChannel(GetCurrentVoiceChannelId());
-                if (current_channel)
-                    current_channel->UnmuteMember(_player->GetGUID());
-            }
+            if (!micEnabled)
+                current_channel->MuteMember(_player->GetGUID());
+            else
+                current_channel->UnmuteMember(_player->GetGUID());
         }
     }
 
@@ -135,7 +125,7 @@ void WorldSession::HandleSetActiveVoiceChannel(WorldPacket& recvData)
     recvData.read_skip<char*>();
 }
 
-void WorldSession::HandleSetActiveVoiceChannelOpcode(WorldPacket& recv_data)
+void WorldSession::HandleSetActiveVoiceChannelOpcode(WorldPacket& recvData)
 {
     LOG_DEBUG("network", "WORLD: Received CMSG_SET_ACTIVE_VOICE_CHANNEL");
 
@@ -147,7 +137,7 @@ void WorldSession::HandleSetActiveVoiceChannelOpcode(WorldPacket& recv_data)
 
     uint32 type;
     std::string name;
-    recv_data >> type;
+    recvData >> type;
 
     // leave current voice channel if player selects different one
     VoiceChatChannel* current_channel = nullptr;
@@ -158,7 +148,7 @@ void WorldSession::HandleSetActiveVoiceChannelOpcode(WorldPacket& recv_data)
     {
         case VOICECHAT_CHANNEL_CUSTOM:
         {
-            recv_data >> name;
+            recvData >> name;
 
             auto cMgr = ChannelMgr(_player->GetTeamId());
             Channel* chan = cMgr.GetChannel(name, nullptr, false);
@@ -284,9 +274,8 @@ void WorldSession::HandleSetActiveVoiceChannelOpcode(WorldPacket& recv_data)
         {
             // leave current channel
             if (current_channel)
-            {
                 current_channel->DevoiceMember(_player->GetGUID());
-            }
+
             SetCurrentVoiceChannelId(0);
 
             break;
@@ -296,7 +285,7 @@ void WorldSession::HandleSetActiveVoiceChannelOpcode(WorldPacket& recv_data)
     }
 }
 
-void WorldSession::HandleChannelVoiceOffOpcode(WorldPacket& recv_data)
+void WorldSession::HandleChannelVoiceOffOpcode(WorldPacket& recvData)
 {
     LOG_DEBUG("network", "WORLD: Received CMSG_CHANNEL_VOICE_OFF");
 
@@ -307,6 +296,9 @@ void WorldSession::HandleAddVoiceIgnoreOpcode(WorldPacket& recvData)
 {
     LOG_DEBUG("network", "WORLD: Received CMSG_ADD_VOICE_IGNORE");
 
+    if (!_player)
+        return;
+
     std::string IgnoreName = GetAcoreString(LANG_FRIEND_IGNORE_UNKNOWN);
 
     recvData >> IgnoreName;
@@ -316,18 +308,15 @@ void WorldSession::HandleAddVoiceIgnoreOpcode(WorldPacket& recvData)
 
     CharacterDatabase.EscapeString(IgnoreName);
 
-    LOG_INFO("network", "WORLD: {} asked to Ignore: '{}'",
-        _player->GetName(), IgnoreName.c_str());
-
     ObjectGuid ignoreGUID = sCharacterCache->GetCharacterGuidByName(IgnoreName);
     if (!ignoreGUID)
         return;
 
+    LOG_INFO("network", "WORLD: {} asked to Ignore: '{}'",
+        _player->GetName(), IgnoreName.c_str());
+
     // CharacterDatabase.AsyncQuery(&WorldSession::HandleAddMutedOpcodeCallBack, GetAccountId(), "SELECT guid FROM characters WHERE name = '{}'", IgnoreName.c_str());
     // _queryProcessor.AddCallback(CharacterDatabase.AsyncQuery(stmt).WithPreparedCallback(std::bind(&WorldSession::HandleAddMutedOpcodeCallBack, this, std::placeholders::_1)));
-
-    if (!_player)
-        return;
 
     FriendsResult ignoreResult = FRIEND_MUTE_NOT_FOUND;
     if (ignoreGUID == _player->GetGUID())
@@ -350,15 +339,18 @@ void WorldSession::HandleAddVoiceIgnoreOpcode(WorldPacket& recvData)
 
 void WorldSession::HandleDelVoiceIgnoreOpcode(WorldPacket& recvData)
 {
-    ObjectGuid ignoreGUID;
-
     LOG_DEBUG("network", "WORLD: Received CMSG_DEL_VOICE_IGNORE");
+
+    if (!_player)
+        return;
+
+    ObjectGuid ignoreGUID;
 
     recvData >> ignoreGUID;
 
     _player->GetSocial()->RemoveFromSocialList(ignoreGUID, SOCIAL_FLAG_MUTED);
 
-    sSocialMgr->SendFriendStatus(GetPlayer(), FRIEND_MUTE_REMOVED, ignoreGUID, false);
+    sSocialMgr->SendFriendStatus(_player, FRIEND_MUTE_REMOVED, ignoreGUID, false);
 
     LOG_DEBUG("network", "WORLD: Sent SMSG_FRIEND_STATUS");
 }
@@ -367,14 +359,14 @@ void WorldSession::HandlePartySilenceOpcode(WorldPacket& recvData)
 {
     LOG_DEBUG("network", "WORLD: Received CMSG_PARTY_SILENCE");
 
+    if (!_player)
+        return;
+
     if (!sVoiceChatMgr.CanUseVoiceChat())
         return;
 
     ObjectGuid ignoreGUID;
     recvData >> ignoreGUID;
-
-    if (!_player)
-        return;
 
     Group* grp = _player->GetGroup();
     if (!grp)

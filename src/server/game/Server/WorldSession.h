@@ -553,10 +553,10 @@ public:
     void HandleChannelUnsilenceOpcode(WorldPacket& recvData);
     void HandlePartySilenceOpcode(WorldPacket& recvData);
     void HandlePartyUnsilenceOpcode(WorldPacket& recvData);
-    void HandleChannelVoiceOnOpcode(WorldPacket& recv_data);
-    void HandleChannelVoiceOffOpcode(WorldPacket& recv_data);
-    void HandleVoiceSessionEnableOpcode(WorldPacket& recv_data);
-    void HandleSetActiveVoiceChannelOpcode(WorldPacket& recv_data);
+    void HandleChannelVoiceOnOpcode(WorldPacket& recvData);
+    void HandleChannelVoiceOffOpcode(WorldPacket& recvData);
+    void HandleVoiceSessionEnableOpcode(WorldPacket& recvData);
+    void HandleSetActiveVoiceChannelOpcode(WorldPacket& recvData);
 
     // Packets cooldown
     time_t GetCalendarEventCreationCooldown() const { return _calendarEventCreationCooldown; }

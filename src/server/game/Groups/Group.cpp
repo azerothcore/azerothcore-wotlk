@@ -317,9 +317,7 @@ void Group::ConvertToRaid()
         sLFGMgr->LeaveLfg(GetLeaderGUID());
 
     if (!isBGGroup() && !isBFGroup())
-    {
         sVoiceChatMgr.ConvertToRaidChannel(GetId());
-    }
 }
 
 bool Group::AddInvite(Player* player)
@@ -350,9 +348,7 @@ bool Group::AddInvite(Player* player)
                 sVoiceChatMgr.AddToGroupVoiceChatChannel(player->GetGUID(), GetId());
         }
         else
-        {
             sVoiceChatMgr.AddToBattlegroundVoiceChatChannel(player->GetGUID());
-        }
     }
 
     return true;
@@ -699,9 +695,7 @@ bool Group::RemoveMember(ObjectGuid guid, const RemoveMethod& method /*= GROUP_R
             sVoiceChatMgr.RemoveFromRaidVoiceChatChannel(guid, GetId());
         }
         else
-        {
             sVoiceChatMgr.RemoveFromBattlegroundVoiceChatChannel(guid);
-        }
 
         if (!validLeader)
         {

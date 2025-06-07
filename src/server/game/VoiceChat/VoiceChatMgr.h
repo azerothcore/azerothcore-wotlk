@@ -24,7 +24,6 @@
 #include "VoiceChatSocketMgr.h"
 #include "VoiceChatDefines.h"
 #include "Opcodes.h"
-#include "VoiceChatSocket.h"
 #include <boost/asio/io_context.hpp>
 #include "EventEmitter.h"
 #include "VoiceChatChannel.h"
