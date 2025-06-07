@@ -15,10 +15,13 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "karazhan.h"
 #include "CreatureScript.h"
 #include "ScriptedCreature.h"
 #include "SpellInfo.h"
-#include "karazhan.h"
+#include "SpellScript.h"
+#include "SpellScriptLoader.h"
+#include "UnitAI.h"
 
 enum Text
 {
@@ -93,7 +96,7 @@ struct boss_tenris_mirkblood : public BossAI
 
         scheduler.Schedule(1s, 5s, [this](TaskContext context)
             { // Blood Mirror
-                DoCast(SPELL_BLOOD_MIRROR1);
+                DoCast(SPELL_BLOOD_MIRROR_TARGET_PICKER);
                 context.Repeat(20s, 50s);
             }).Schedule(30s, [this](TaskContext context)
             { // Blood Swoop
@@ -114,6 +117,19 @@ struct boss_tenris_mirkblood : public BossAI
     {
     }
 
+    void DamageTaken(Unit* /*attacker*/, uint32& damage, DamageEffectType /*damagetype*/, SpellSchoolMask /*damageSchoolMask*/) override
+    {
+        if (!me->HasAura(SPELL_BLOOD_MIRROR0))
+            return;
+
+        if (!_mirrorTarget)
+            return;
+
+        int32 damageTaken = damage;
+
+        me->CastCustomSpell(_mirrorTarget, SPELL_BLOOD_MIRROR_DAMAGE, &damageTaken, &damageTaken, &damageTaken, true, nullptr, nullptr, me->GetGUID());
+    }
+
     void JustDied(Unit* /*killer*/) override
     {
         _JustDied();
@@ -132,9 +148,123 @@ struct boss_tenris_mirkblood : public BossAI
             // AREA TRIGGER 5015 MAY ENGAGE OR JUST RELEASE NOT_SELECTABLE FLAG
         }
     }
+
+    void SpellHitTarget(Unit* target, SpellInfo const* spell) override
+    {
+        if (spell->Id == SPELL_BLOOD_MIRROR1 && target != me)
+            _mirrorTarget = target;
+    }
+
+private:
+    Unit* _mirrorTarget = nullptr;
+};
+
+class spell_mirkblood_blood_mirror : public SpellScript
+{
+    PrepareSpellScript(spell_mirkblood_blood_mirror)
+
+    void HandleCast()
+    {
+        LOG_ERROR("sql.sql", "blood mirror hit");
+
+        if (!GetCaster())
+            return;
+    }
+
+    void Register() override
+    {
+        OnCast += SpellCastFn(spell_mirkblood_blood_mirror::HandleCast);
+    }
+};
+
+class spell_mirkblood_blood_mirror_target_picker : public SpellScript
+{
+    PrepareSpellScript(spell_mirkblood_blood_mirror_target_picker)
+
+    bool Validate(SpellInfo const* /*spell*/) override
+    {
+        return ValidateSpellInfo({ SPELL_BLOOD_MIRROR0, SPELL_BLOOD_MIRROR1, SPELL_BLOOD_MIRROR_TRANSITION_VISUAL });
+    }
+
+    void HandleHit()
+    {
+        LOG_ERROR("sql.sql", "target picker hit");
+
+        Unit* caster = GetCaster();
+
+        if (!caster->ToCreature())
+            return;
+
+        Unit* target = caster->GetAI()->SelectTarget(SelectTargetMethod::Random, caster->GetThreatMgr().GetThreatListSize(), 0.0f, true, false);
+
+        if (!target) // Only Blood Mirror the tank if they're the only one around
+            target = caster->GetVictim();
+
+        if (!target)
+            return;
+
+        caster->CastSpell(caster, SPELL_BLOOD_MIRROR_TRANSITION_VISUAL); // Idk
+        caster->CastSpell(target, SPELL_BLOOD_MIRROR_TRANSITION_VISUAL);
+
+        caster->CastSpell(caster, SPELL_BLOOD_MIRROR1); // I also don't know
+        caster->CastSpell(target, SPELL_BLOOD_MIRROR1);
+
+        target->CastSpell(caster, SPELL_BLOOD_MIRROR0); // Clone player
+    }
+
+    void Register() override
+    {
+        OnCast += SpellCastFn(spell_mirkblood_blood_mirror_target_picker::HandleHit);
+    }
+};
+
+class spell_mirkblood_dash_gash_return_to_tank_pre_spell : public SpellScript
+{
+    PrepareSpellScript(spell_mirkblood_dash_gash_return_to_tank_pre_spell)
+
+    bool Validate(SpellInfo const* /*spell*/) override
+    {
+        return ValidateSpellInfo({ SPELL_DASH_GASH_RETURN_TO_TANK });
+    }
+
+    void HandleCast()
+    {
+        LOG_ERROR("sql.sql", "dash gash hit");
+        if (!GetCaster() || !GetCaster()->GetThreatMgr().GetCurrentVictim())
+            return;
+        // Probably wrong, maybe don't charge if would charge the same target?
+        if (GetCaster()->GetDistance2d(GetCaster()->GetThreatMgr().GetCurrentVictim()) < 5.0f)
+            return;
+
+        GetCaster()->CastSpell(GetCaster()->GetVictim(), SPELL_DASH_GASH_RETURN_TO_TANK);
+    }
+
+    void Register() override
+    {
+        OnCast += SpellCastFn(spell_mirkblood_dash_gash_return_to_tank_pre_spell::HandleCast);
+    }
+};
+
+class spell_mirkblood_summon_sanguine_spirit : public SpellScript
+{
+    PrepareSpellScript(spell_mirkblood_summon_sanguine_spirit)
+
+    void HandleSummon(SpellEffIndex /*effIndex*/)
+    {
+        LOG_ERROR("sql.sql", "sanguine spirit hit");
+    }
+
+    void Register() override
+    {
+        OnEffectHit += SpellEffectFn(spell_mirkblood_summon_sanguine_spirit::HandleSummon, EFFECT_ALL, 0);
+    }
 };
 
 void AddSC_boss_tenris_mirkblood()
 {
     RegisterKarazhanCreatureAI(boss_tenris_mirkblood);
+    RegisterSpellScript(spell_mirkblood_blood_mirror);
+    RegisterSpellScript(spell_mirkblood_blood_mirror_target_picker);
+    RegisterSpellScript(spell_mirkblood_dash_gash_return_to_tank_pre_spell);
+    RegisterSpellScript(spell_mirkblood_summon_sanguine_spirit);
 }
