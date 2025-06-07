@@ -150,10 +150,11 @@ struct boss_tenris_mirkblood : public BossAI
         }
     }
 
-    void SpellHitTarget(Unit* target, SpellInfo const* spell) override
+    void SpellHit(Unit* caster, SpellInfo const* spell) override
     {
-        if (spell->Id == SPELL_BLOOD_MIRROR0 && target != me)
-            _mirrorTarget = target;
+        LOG_ERROR("sql.sql", "spell hit!");
+        if (spell->Id == SPELL_BLOOD_MIRROR0 && caster != me)
+            _mirrorTarget = caster;
     }
 
 private:
@@ -210,7 +211,7 @@ class spell_mirkblood_blood_mirror_target_picker : public SpellScript
         caster->AddAura(SPELL_BLOOD_MIRROR1, caster); // I also don't know
         caster->AddAura(SPELL_BLOOD_MIRROR1, target);
 
-        target->CastSpell(caster, SPELL_BLOOD_MIRROR0, TRIGGERED_FULL_MASK); // Clone player
+        target->CastSpell(caster, SPELL_BLOOD_MIRROR0); // Clone player
     }
 
     void Register() override
