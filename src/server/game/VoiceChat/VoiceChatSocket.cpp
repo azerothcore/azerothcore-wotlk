@@ -19,6 +19,7 @@
 #include "Log.h"
 #include "VoiceChatDefines.h"
 #include "VoiceChatMgr.h"
+#include <iomanip>
 
 struct VoiceChatServerPktHeader {
   uint16 cmd;
