@@ -15,10 +15,10 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "VoiceChatMgr.h"
-#include "VoiceChatChannel.h"
 #include "Chat.h"
 #include "CommandScript.h"
+#include "VoiceChatChannel.h"
+#include "VoiceChatMgr.h"
 
 using namespace Acore::ChatCommands;
 
@@ -56,17 +56,11 @@ public:
 
         int32 reconnectAttempts = sVoiceChatMgr.GetReconnectAttempts();
         if (reconnectAttempts == 0)
-        {
             handler->PSendSysMessage("Voice Chat server disconnected!");
-        }
         else if (reconnectAttempts < 0)
-        {
             handler->PSendSysMessage("Voice Chat server disconnected, reconnect enabled (infinite attempts)");
-        }
         else if (reconnectAttempts > 0)
-        {
             handler->PSendSysMessage("Voice Chat server disconnected, reconnect enabled ({} attempts)", reconnectAttempts);
-        }
         return true;
     }
 
@@ -105,7 +99,7 @@ public:
         }
 
         VoiceChatStatistics stats = sVoiceChatMgr.GetStatistics();
-        handler->PSendSysMessage("Voice Chat: channels: {}, active users: {}, voice chat enabled: {}, microphone enabled: {}", stats.channels, stats.active_users, stats.totalVoiceChatEnabled, stats.totalVoiceMicEnabled);
+        handler->PSendSysMessage("Voice Chat: channels: {}, active users: {}, voice chat enabled: {}, microphone enabled: {}", stats.channels, stats.activeUsers, stats.totalVoiceChatEnabled, stats.totalVoiceMicEnabled);
         return true;
     }
 

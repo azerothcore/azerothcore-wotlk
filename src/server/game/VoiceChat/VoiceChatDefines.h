@@ -18,8 +18,8 @@
 #ifndef _VOICECHATDEFINES_H
 #define _VOICECHATDEFINES_H
 
-#include "SharedDefines.h"
 #include "ObjectGuid.h"
+#include "SharedDefines.h"
 
 enum VoiceChatServerOpcodes
 {
@@ -42,8 +42,8 @@ struct VoiceChatChannelRequest
 {
     uint32 id;
     uint8 type;
-    uint32 groupid;
-    std::string channel_name;
+    uint32 groupId;
+    std::string channelName;
     TeamId team;
 };
 
@@ -133,7 +133,7 @@ protected:
 struct VoiceChatStatistics
 {
     uint32 channels;
-    uint32 active_users;
+    uint32 activeUsers;
     uint32 totalVoiceChatEnabled;
     uint32 totalVoiceMicEnabled;
 };

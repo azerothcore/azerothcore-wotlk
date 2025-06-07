@@ -19,14 +19,14 @@
 #define _VOICECHATMGR_H
 
 #include "AsyncConnector.h"
+#include "EventEmitter.h"
+#include "Opcodes.h"
 #include "SharedDefines.h"
+#include "VoiceChatChannel.h"
+#include "VoiceChatDefines.h"
 #include "VoiceChatSocket.h"
 #include "VoiceChatSocketMgr.h"
-#include "VoiceChatDefines.h"
-#include "Opcodes.h"
 #include <boost/asio/io_context.hpp>
-#include "EventEmitter.h"
-#include "VoiceChatChannel.h"
 #include <chrono>
 #include <map>
 
@@ -42,19 +42,19 @@ public:
     VoiceChatMgr()
       : _socket(nullptr),
         _requestSocket(nullptr),
-        new_request_id(1),
-        new_session_id(std::chrono::system_clock::now().time_since_epoch().count()),
-        server_address(0),
-        server_port(0),
-        voice_port(0),
-        next_connect(std::chrono::system_clock::now()),
-        next_ping(std::chrono::system_clock::now() + std::chrono::seconds(5)),
-        last_pong(std::chrono::system_clock::now()),
-        enabled(false),
-        maxConnectAttempts(0),
-        curReconnectAttempts(0),
-        state(VOICECHAT_DISCONNECTED),
-        lastUpdate(std::chrono::system_clock::now())
+        _newRequestId(1),
+        _newSessionId(std::chrono::system_clock::now().time_since_epoch().count()),
+        _serverAddress(0),
+        _serverPort(0),
+        _voicePort(0),
+        _nextConnect(std::chrono::system_clock::now()),
+        _nextPing(std::chrono::system_clock::now() + std::chrono::seconds(5)),
+        _lastPong(std::chrono::system_clock::now()),
+        _enabled(false),
+        _maxConnectAttempts(0),
+        _curReconnectAttempts(0),
+        _state(VOICECHAT_DISCONNECTED),
+        _lastUpdate(std::chrono::system_clock::now())
     {
     }
 
@@ -73,16 +73,16 @@ public:
     bool NeedReconnect();
     int32 GetReconnectAttempts() const;
 
-    bool IsEnabled() const { return enabled; }
+    bool IsEnabled() const { return _enabled; }
     bool CanUseVoiceChat();
     bool CanSeeVoiceChat();
 
     // configs
-    uint32 GetVoiceServerConnectAddress() const { return server_address; }
-    uint16 GetVoiceServerConnectPort() const { return server_port; }
-    uint32 GetVoiceServerVoiceAddress() const { return voice_address; }
-    uint16 GetVoiceServerVoicePort() const { return voice_port; }
-    std::string GetVoiceServerConnectAddressString() { return server_address_string; }
+    uint32 GetVoiceServerConnectAddress() const { return _serverAddress; }
+    uint16 GetVoiceServerConnectPort() const { return _serverPort; }
+    uint32 GetVoiceServerVoiceAddress() const { return _voiceAddress; }
+    uint16 GetVoiceServerVoicePort() const { return _voicePort; }
+    std::string GetVoiceServerConnectAddressString() { return _serverAddressString; }
 
     // manage voice channels
     void CreateVoiceChatChannel(VoiceChatChannelTypes type, uint32 groupId = 0, const std::string& name = "", TeamId team = TEAM_NEUTRAL);
@@ -141,7 +141,7 @@ public:
     // remove from all channels
     void RemoveFromVoiceChatChannels(ObjectGuid guid);
 
-    uint64 GetNewSessionId() { return new_session_id++; }
+    uint64 GetNewSessionId() { return _newSessionId++; }
 
     EventEmitter<void(VoiceChatMgr*)>& GetEventEmitter() { return _eventEmitter; }
 
@@ -165,38 +165,38 @@ private:
     std::shared_ptr<VoiceChatSocket> _socket;
     std::shared_ptr<VoiceChatSocket> _requestSocket;
     std::vector<VoiceChatChannelRequest> _requests;
-    uint32 new_request_id;
-    uint64 new_session_id;
+    uint32 _newRequestId;
+    uint64 _newSessionId;
 
     // configs
-    uint32 server_address;
-    uint16 server_port;
-    std::string server_address_string;
+    uint32 _serverAddress;
+    uint16 _serverPort;
+    std::string _serverAddressString;
 
     // voice server address and udp port for client
-    uint32 voice_address;
-    uint16 voice_port;
+    uint32 _voiceAddress;
+    uint16 _voicePort;
 
     // next connect attempt
-    std::chrono::system_clock::time_point next_connect;
-    std::chrono::system_clock::time_point next_ping;
-    std::chrono::system_clock::time_point last_pong;
+    std::chrono::system_clock::time_point _nextConnect;
+    std::chrono::system_clock::time_point _nextPing;
+    std::chrono::system_clock::time_point _lastPong;
 
     // enabled in config
-    bool enabled;
+    bool _enabled;
 
     // how many attemps to reconnect
-    int8 maxConnectAttempts;
+    int8 _maxConnectAttempts;
     // how many reconnect attempts have been made
-    uint8 curReconnectAttempts;
+    uint8 _curReconnectAttempts;
 
     // voice channels
-    std::map<uint16, VoiceChatChannel*> _VoiceChatChannels;
+    std::map<uint16, VoiceChatChannel*> _voiceChatChannels;
 
     // state of connection
-    VoiceChatState state;
-
-    std::chrono::system_clock::time_point lastUpdate;
+    VoiceChatState _state;
+    
+    std::chrono::system_clock::time_point _lastUpdate;
 
     // Thread safety mechanisms
     std::mutex _recvQueueLock;

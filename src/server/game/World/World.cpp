@@ -86,6 +86,7 @@
 #include "Util.h"
 #include "VMapFactory.h"
 #include "VMapMgr2.h"
+#include "VoiceChatMgr.h"
 #include "Warden.h"
 #include "WardenCheckMgr.h"
 #include "WaypointMovementGenerator.h"
@@ -99,8 +100,6 @@
 #include "WorldStateDefines.h"
 #include <boost/asio/ip/address.hpp>
 #include <cmath>
-
-#include "VoiceChatMgr.h"
 
 std::atomic_long World::_stopEvent = false;
 uint8 World::_exitCode = SHUTDOWN_EXIT_CODE;
