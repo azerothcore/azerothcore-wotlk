@@ -152,7 +152,7 @@ struct boss_tenris_mirkblood : public BossAI
 
     void SpellHitTarget(Unit* target, SpellInfo const* spell) override
     {
-        if (spell->Id == SPELL_BLOOD_MIRROR1 && target != me)
+        if (spell->Id == SPELL_BLOOD_MIRROR0 && target != me)
             _mirrorTarget = target;
     }
 
@@ -204,13 +204,13 @@ class spell_mirkblood_blood_mirror_target_picker : public SpellScript
         if (!target)
             return;
 
-        caster->CastSpell(caster, SPELL_BLOOD_MIRROR_TRANSITION_VISUAL); // Idk
-        target->CastSpell(target, SPELL_BLOOD_MIRROR_TRANSITION_VISUAL);
+        caster->CastSpell(caster, SPELL_BLOOD_MIRROR_TRANSITION_VISUAL, TRIGGERED_FULL_MASK); // Idk
+        caster->CastSpell(target, SPELL_BLOOD_MIRROR_TRANSITION_VISUAL, TRIGGERED_FULL_MASK);
+        
+        caster->AddAura(SPELL_BLOOD_MIRROR1, caster); // I also don't know
+        caster->AddAura(SPELL_BLOOD_MIRROR1, target);
 
-        target->CastSpell(caster, SPELL_BLOOD_MIRROR1); // I also don't know
-        target->CastSpell(target, SPELL_BLOOD_MIRROR1);
-
-        target->CastSpell(caster, SPELL_BLOOD_MIRROR0); // Clone player
+        target->CastSpell(caster, SPELL_BLOOD_MIRROR0, TRIGGERED_FULL_MASK); // Clone player
     }
 
     void Register() override
@@ -257,7 +257,7 @@ class spell_mirkblood_summon_sanguine_spirit : public SpellScript
 
     void Register() override
     {
-        OnEffectHit += SpellEffectFn(spell_mirkblood_summon_sanguine_spirit::HandleSummon, EFFECT_ALL, 0);
+        OnEffectHit += SpellEffectFn(spell_mirkblood_summon_sanguine_spirit::HandleSummon, EFFECT_ALL, SPELL_EFFECT_SUMMON);
     }
 };
 

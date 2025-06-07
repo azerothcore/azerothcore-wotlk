@@ -36,7 +36,7 @@ INSERT INTO `creature_template_addon` (`entry`, `path_id`, `mount`, `bytes1`, `b
 
 DELETE FROM `creature_template_movement` WHERE `CreatureId` IN (28485, 28493);
 INSERT INTO `creature_template_movement` (`CreatureId`, `Ground`, `Swim`, `Flight`, `Rooted`, `Chase`, `Random`, `InteractionPauseTimer`) VALUES
-(28485, 0, 0, 1, 0, 0, 0, NULL);
+(28485, 0, 0, 1, 0, 0, 0, NULL),
 (28493, 0, 0, 1, 0, 0, 0, NULL);
 
 DELETE FROM `creature` WHERE `guid` BETWEEN @GUID+0 AND @GUID+9 AND `id1` IN (28485, 28493);
@@ -72,3 +72,5 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 DELETE FROM `conditions` WHERE `SourceTypeOrReferenceId` = 13 AND `SourceEntry` = 51773 AND `ConditionTypeOrReference` = 31 AND `ConditionValue2` = 28485;
 INSERT INTO `conditions` (`SourceTypeOrReferenceId`, `SourceGroup`, `SourceEntry`, `SourceId`, `ElseGroup`, `ConditionTypeOrReference`, `ConditionTarget`, `ConditionValue1`, `ConditionValue2`, `ConditionValue3`, `NegativeCondition`, `ErrorType`, `ErrorTextId`, `ScriptName`, `Comment`) VALUES
 (13, 1, 51773, 0, 0, 31, 0, 3, 28485, 0, 0, 0, 0, '', 'Target must be unit Blood Vat Bunny');
+
+UPDATE `spell_dbc` SET `Effect_1` = 28, `EffectMiscValue_1` = 28232, `EffectMiscValueB_1` = 64 WHERE `ID` = 50996;
