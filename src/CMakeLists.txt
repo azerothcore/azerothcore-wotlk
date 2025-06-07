@@ -44,7 +44,7 @@ if(BUILD_VOICECHAT)
 
   FetchContent_Declare(
     voicechat-server
-    GIT_REPOSITORY "https://github.com/celguar/voicechat-server.git"
+    GIT_REPOSITORY "https://github.com/azerothcore/voicechat-server.git"
   GIT_TAG "main"
   )
 
