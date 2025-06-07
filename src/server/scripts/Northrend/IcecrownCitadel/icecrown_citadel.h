@@ -565,12 +565,6 @@ enum PutricideEventFlags
     PUTRICIDE_EVENT_FLAG_TRAP_FINISHED      = 8,
 };
 
-enum AreaIds
-{
-    AREA_ICECROWN_CITADEL   = 4812,
-    AREA_THE_FROZEN_THRONE  = 4859,
-};
-
 enum ItemIds
 {
     ITEM_GOBLIN_ROCKET_PACK = 49278

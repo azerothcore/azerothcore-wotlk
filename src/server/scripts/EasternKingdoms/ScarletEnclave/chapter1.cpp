@@ -37,150 +37,62 @@
 enum EyeOfAcherusMisc
 {
     SPELL_THE_EYE_OF_ACHERUS = 51852,
-    SPELL_EYE_OF_ACHERUS_VISUAL = 51892,
-    SPELL_EYE_OF_ACHERUS_FLIGHT_BOOST = 51923,
-    SPELL_EYE_OF_ACHERUS_FLIGHT = 51890,
-    SPELL_ROOT_SELF = 51860,
-
-    EVENT_ANNOUNCE_LAUNCH_TO_DESTINATION = 1,
-    EVENT_UNROOT = 2,
-    EVENT_LAUNCH_TOWARDS_DESTINATION = 3,
-    EVENT_GRANT_CONTROL = 4,
-
-    SAY_LAUNCH_TOWARDS_DESTINATION = 0,
-    SAY_EYE_UNDER_CONTROL = 1,
-
-    POINT_NEW_AVALON = 1,
-
-    EYE_POINT_DESTINATION_0 = 0,
-    EYE_POINT_DESTINATION_1 = 1,
-    EYE_POINT_DESTINATION_2 = 2,
-    EYE_POINT_DESTINATION_3 = 3
-};
-
-struct npc_eye_of_acherus : public ScriptedAI
-{
-    npc_eye_of_acherus(Creature* creature) : ScriptedAI(creature)
-    {
-        creature->SetDisplayFromModel(0);
-        creature->SetReactState(REACT_PASSIVE);
-    }
-
-    void InitializeAI() override
-    {
-        DoCastSelf(SPELL_ROOT_SELF);
-        DoCastSelf(SPELL_EYE_OF_ACHERUS_VISUAL);
-        _events.ScheduleEvent(EVENT_ANNOUNCE_LAUNCH_TO_DESTINATION, 400ms);
-    }
-
-    void OnCharmed(bool apply) override
-    {
-        if (!apply)
-        {
-            me->GetCharmerOrOwner()->RemoveAurasDueToSpell(SPELL_THE_EYE_OF_ACHERUS);
-            me->GetCharmerOrOwner()->RemoveAurasDueToSpell(SPELL_EYE_OF_ACHERUS_FLIGHT_BOOST);
-        }
-    }
-
-    void UpdateAI(uint32 diff) override
-    {
-        _events.Update(diff);
-
-        while (uint32 eventId = _events.ExecuteEvent())
-        {
-            switch (eventId)
-            {
-            case EVENT_ANNOUNCE_LAUNCH_TO_DESTINATION:
-                if (Unit* owner = me->GetCharmerOrOwner())
-                {
-                    Talk(SAY_LAUNCH_TOWARDS_DESTINATION, owner);
-                }
-                _events.ScheduleEvent(EVENT_UNROOT, 400ms);
-                break;
-            case EVENT_UNROOT:
-                me->RemoveAurasDueToSpell(SPELL_ROOT_SELF);
-                DoCastSelf(SPELL_EYE_OF_ACHERUS_FLIGHT_BOOST);
-                _events.ScheduleEvent(EVENT_LAUNCH_TOWARDS_DESTINATION, 1s + 200ms);
-                break;
-            case EVENT_LAUNCH_TOWARDS_DESTINATION:
-            {
-                Position const EYE_DESTINATION_1 = { 2361.21f,  -5660.45f,  496.744f, 0.0f };
-                Position const EYE_DESTINATION_2 = { 2341.571f, -5672.797f, 538.3942f, 0.0f };
-                Position const EYE_DESTINATION_3 = { 1957.4f,   -5844.1f,   273.867f, 0.0f };
-                Position const EYE_DESTINATION_4 = { 1758.01f,  -5876.79f,  166.867f, 0.0f };
-
-                Movement::MoveSplineInit init(me);
-                init.SetFly();
-                if (Unit* owner = me->GetCharmerOrOwner())
-                {
-                    init.SetVelocity(owner->GetSpeed(MOVE_RUN));
-                }
-
-                me->GetMotionMaster()->MovePoint(EYE_POINT_DESTINATION_0, EYE_DESTINATION_1);
-                me->GetMotionMaster()->MovePoint(EYE_POINT_DESTINATION_1, EYE_DESTINATION_2);
-                me->GetMotionMaster()->MovePoint(EYE_POINT_DESTINATION_2, EYE_DESTINATION_3);
-                me->GetMotionMaster()->MovePoint(EYE_POINT_DESTINATION_3, EYE_DESTINATION_4);
-                _events.ScheduleEvent(EVENT_GRANT_CONTROL, 22s);
-                break;
-            }
-            case EVENT_GRANT_CONTROL:
-                if (Unit* owner = me->GetCharmerOrOwner())
-                {
-                    Talk(SAY_EYE_UNDER_CONTROL, owner);
-                }
-                me->RemoveAurasDueToSpell(SPELL_ROOT_SELF);
-                DoCastSelf(SPELL_EYE_OF_ACHERUS_FLIGHT);
-                me->RemoveAurasDueToSpell(SPELL_EYE_OF_ACHERUS_FLIGHT_BOOST);
-                break;
-            default:
-                break;
-            }
-        }
-    }
-
-    void MovementInform(uint32 movementType, uint32 pointId) override
-    {
-        if (movementType != POINT_MOTION_TYPE)
-            return;
-
-        switch (pointId)
-        {
-        case POINT_NEW_AVALON:
-            DoCastSelf(SPELL_ROOT_SELF);
-            break;
-        default:
-            break;
-        }
-    }
-
-private:
-    EventMap _events;
 };
 
 enum DeathComesFromOnHigh
 {
-    SUMMON_GHOULS_ON_SCARLET_CRUSADE = 54522
+    SPELL_CALL_OF_THE_DEAD = 51900
 };
 
+// 51904 - Summon Ghouls On Scarlet Crusade
 class spell_q12641_death_comes_from_on_high_summon_ghouls : public SpellScript
 {
     PrepareSpellScript(spell_q12641_death_comes_from_on_high_summon_ghouls);
 
     bool Validate(SpellInfo const* /*spellInfo*/) override
     {
-        return ValidateSpellInfo({ SUMMON_GHOULS_ON_SCARLET_CRUSADE });
+        return ValidateSpellInfo({ SPELL_CALL_OF_THE_DEAD });
     }
 
     void HandleScriptEffect(SpellEffIndex effIndex)
     {
         PreventHitEffect(effIndex);
         if (Unit* target = GetHitUnit())
-            GetCaster()->CastSpell(target->GetPositionX(), target->GetPositionY(), target->GetPositionZ(), SUMMON_GHOULS_ON_SCARLET_CRUSADE, true);
+            target->CastSpell(target, SPELL_CALL_OF_THE_DEAD, true);
     }
 
     void Register() override
     {
         OnEffectHitTarget += SpellEffectFn(spell_q12641_death_comes_from_on_high_summon_ghouls::HandleScriptEffect, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
+    }
+};
+
+// 52694 - Recall Eye of Acherus
+class spell_q12641_death_comes_from_on_high_recall_eye : public SpellScript
+{
+    PrepareSpellScript(spell_q12641_death_comes_from_on_high_recall_eye);
+
+    bool Validate(SpellInfo const* /*spellInfo*/) override
+    {
+        return ValidateSpellInfo({ SPELL_THE_EYE_OF_ACHERUS });
+    }
+
+    void HandleScriptEffect(SpellEffIndex effIndex)
+    {
+        PreventHitEffect(effIndex);
+        Unit* caster = GetCaster();
+        Unit* owner = caster->GetCharmerOrOwner();
+
+        if (!caster || !owner)
+            return;
+
+        if (owner->HasAura(SPELL_THE_EYE_OF_ACHERUS))
+            owner->RemoveAurasDueToSpell(SPELL_THE_EYE_OF_ACHERUS);
+    }
+
+    void Register() override
+    {
+        OnEffectHitTarget += SpellEffectFn(spell_q12641_death_comes_from_on_high_recall_eye::HandleScriptEffect, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
     }
 };
 
@@ -219,7 +131,6 @@ public:
             if (creature->AI()->GetData(DATA_IN_PROGRESS))
                 return true;
 
-            creature->SetImmuneToPC(false);
             creature->RemoveUnitFlag(UNIT_FLAG_SWIMMING);
 
             player->CastSpell(creature, SPELL_DUEL, false);
@@ -319,6 +230,7 @@ public:
                     me->RemoveAllAuras();
                     me->CastSpell(attacker, SPELL_DUEL_VICTORY, true);
                     me->RestoreFaction();
+                    me->DespawnOrUnsummon(10000);
                 }
             }
         }
@@ -633,7 +545,6 @@ public:
     };
 };
 
-// Theirs
 /*######
 ##Quest 12848
 ######*/
@@ -1299,25 +1210,20 @@ class spell_lich_king_whisper : public SpellScript
 
 void AddSC_the_scarlet_enclave_c1()
 {
-    // Ours
-    RegisterCreatureAI(npc_eye_of_acherus);
     RegisterSpellScript(spell_q12641_death_comes_from_on_high_summon_ghouls);
+    RegisterSpellScript(spell_q12641_death_comes_from_on_high_recall_eye);
     new npc_death_knight_initiate();
     RegisterSpellScript(spell_item_gift_of_the_harvester);
     RegisterSpellScript(spell_q12698_the_gift_that_keeps_on_giving);
     new npc_scarlet_ghoul();
     new npc_dkc1_gothik();
     new npc_scarlet_cannon();
-
-    // Theirs
     new npc_unworthy_initiate();
     new npc_unworthy_initiate_anchor();
     new go_acherus_soul_prison();
-
     new npc_scarlet_miner();
     new npc_scarlet_miner_cart();
     new go_inconspicuous_mine_car();
-
     RegisterSpellScript(spell_death_knight_initiate_visual);
     RegisterSpellScript(spell_lich_king_whisper);
     RegisterSpellScript(spell_lich_king_vo_blocker);

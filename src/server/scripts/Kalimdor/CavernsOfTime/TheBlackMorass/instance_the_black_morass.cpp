@@ -38,7 +38,7 @@ ObjectData const creatureData[] =
 class instance_the_black_morass : public InstanceMapScript
 {
 public:
-    instance_the_black_morass() : InstanceMapScript("instance_the_black_morass", 269) { }
+    instance_the_black_morass() : InstanceMapScript("instance_the_black_morass", MAP_OPENING_OF_THE_DARK_PORTAL) { }
 
     InstanceScript* GetInstanceScript(InstanceMap* map) const override
     {
