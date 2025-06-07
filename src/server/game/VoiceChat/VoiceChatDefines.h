@@ -40,11 +40,11 @@ enum VoiceChatServerOpcodes
 
 struct VoiceChatChannelRequest
 {
-    uint32 id;
-    uint8 type;
-    uint32 groupId;
-    std::string channelName;
-    TeamId team;
+    uint32 Id;
+    uint8 Type;
+    uint32 GroupId;
+    std::string ChannelName;
+    TeamId Team;
 };
 
 enum VoiceChatMemberFlags

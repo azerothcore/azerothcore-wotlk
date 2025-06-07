@@ -354,7 +354,7 @@ void VoiceChatMgr::HandleVoiceChatServerPacket(VoiceChatServerPacket& pck)
 
             for (auto request = _requests.begin(); request != _requests.end();)
             {
-                if (request->id == request_id)
+                if (request->Id == request_id)
                 {
                     if (error == 0)
                         pck >> channel_id;
@@ -365,48 +365,48 @@ void VoiceChatMgr::HandleVoiceChatServerPacket(VoiceChatServerPacket& pck)
                         return;
                     }
 
-                    if (request->groupId)
+                    if (request->GroupId)
                     {
-                        if (request->type == VOICECHAT_CHANNEL_GROUP || request->type == VOICECHAT_CHANNEL_RAID)
+                        if (request->Type == VOICECHAT_CHANNEL_GROUP || request->Type == VOICECHAT_CHANNEL_RAID)
                         {
-                            Group* grp = sGroupMgr->GetGroupByGUID(request->groupId);
+                            Group* grp = sGroupMgr->GetGroupByGUID(request->GroupId);
                             if (grp)
                             {
                                 auto* v_channel = new VoiceChatChannel(
-                                    VoiceChatChannelTypes(request->type), channel_id, grp->GetId());
+                                    VoiceChatChannelTypes(request->Type), channel_id, grp->GetId());
                                 _voiceChatChannels.insert(std::make_pair((uint32)channel_id, v_channel));
                                 v_channel->AddMembersAfterCreate();
                             }
                         }
-                        else if (request->type == VOICECHAT_CHANNEL_BG)
+                        else if (request->Type == VOICECHAT_CHANNEL_BG)
                         {
                             Battleground* bg =
-                                sBattlegroundMgr->GetBattleground(request->groupId, BATTLEGROUND_TYPE_NONE);
+                                sBattlegroundMgr->GetBattleground(request->GroupId, BATTLEGROUND_TYPE_NONE);
                             if (bg)
                             {
                                 // for BG use bg's instanceID as groupID
-                                auto* v_channel = new VoiceChatChannel(VoiceChatChannelTypes(request->type),
+                                auto* v_channel = new VoiceChatChannel(VoiceChatChannelTypes(request->Type),
                                     channel_id,
-                                    request->groupId,
+                                    request->GroupId,
                                     "",
-                                    request->team);
+                                    request->Team);
                                 _voiceChatChannels.insert(std::make_pair((uint32)channel_id, v_channel));
                                 v_channel->AddMembersAfterCreate();
                             }
                         }
                     }
-                    else if (request->type == VOICECHAT_CHANNEL_CUSTOM)
+                    else if (request->Type == VOICECHAT_CHANNEL_CUSTOM)
                     {
-                        if (ChannelMgr* cMgr = ChannelMgr::forTeam(request->team))
+                        if (ChannelMgr* cMgr = ChannelMgr::forTeam(request->Team))
                         {
-                            Channel* chan = cMgr->GetChannel(request->channelName, nullptr, false);
+                            Channel* chan = cMgr->GetChannel(request->ChannelName, nullptr, false);
                             if (chan)
                             {
-                                auto* v_channel = new VoiceChatChannel(VoiceChatChannelTypes(request->type),
+                                auto* v_channel = new VoiceChatChannel(VoiceChatChannelTypes(request->Type),
                                     channel_id,
                                     0,
-                                    request->channelName,
-                                    request->team);
+                                    request->ChannelName,
+                                    request->Team);
                                 _voiceChatChannels.insert(std::make_pair((uint32)channel_id, v_channel));
                                 v_channel->AddMembersAfterCreate();
                             }
@@ -560,16 +560,16 @@ void VoiceChatMgr::CreateVoiceChatChannel(
         newTeam,
         groupId);
     VoiceChatChannelRequest req;
-    req.id = _newRequestId++;
-    req.type = type;
-    req.channelName = name;
-    req.team = newTeam;
-    req.groupId = groupId;
+    req.Id = _newRequestId++;
+    req.Type = type;
+    req.ChannelName = name;
+    req.Team = newTeam;
+    req.GroupId = groupId;
     _requests.push_back(req);
 
     VoiceChatServerPacket data(VOICECHAT_CMSG_CREATE_CHANNEL, 5);
-    data << req.type;
-    data << req.id;
+    data << req.Type;
+    data << req.Id;
     _socket->SendPacket(data);
 }
 
@@ -616,13 +616,13 @@ bool VoiceChatMgr::IsVoiceChatChannelBeingCreated(
     return std::ranges::any_of(_requests,
         [&](auto const& req)
     {
-        if (req.type != type)
+        if (req.Type != type)
             return false;
-        if (groupId && req.groupId != groupId)
+        if (groupId && req.GroupId != groupId)
             return false;
-        if (!name.empty() && req.channelName != name)
+        if (!name.empty() && req.ChannelName != name)
             return false;
-        if (req.team != team)
+        if (req.Team != team)
             return false;
         return true;
     });
