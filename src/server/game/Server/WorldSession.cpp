@@ -47,6 +47,7 @@
 #include "Transport.h"
 #include "Tokenize.h"
 #include "Vehicle.h"
+#include "VoiceChatChannel.h"
 #include "VoiceChatMgr.h"
 #include "WardenWin.h"
 #include "World.h"

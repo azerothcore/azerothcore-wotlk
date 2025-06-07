@@ -31,7 +31,6 @@
 #include "GossipDef.h"
 #include "Packet.h"
 #include "SharedDefines.h"
-#include "VoiceChatChannel.h"
 #include "World.h"
 #include <map>
 #include <memory>
@@ -49,6 +48,7 @@ class Player;
 class Quest;
 class SpellCastTargets;
 class Unit;
+class VoiceChatChannel;
 class Warden;
 class WorldPacket;
 class WorldSocket;
