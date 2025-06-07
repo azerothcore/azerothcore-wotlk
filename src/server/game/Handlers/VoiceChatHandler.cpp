@@ -155,34 +155,9 @@ void WorldSession::HandleSetActiveVoiceChannelOpcode(WorldPacket& recvData)
             if (!chan || !chan->IsOn(_player->GetGUID()) || chan->IsBanned(_player->GetGUID()) || !chan->IsVoiceEnabled())
                 return;
 
-            if (VoiceChatChannel* v_channel = sVoiceChatMgr.GetCustomVoiceChatChannel(name, _player->GetTeamId()))
-            {
-                if (current_channel)
-                {
-                    // if same channel, just update roster
-                    if (v_channel == current_channel)
-                    {
-                        v_channel->SendVoiceRosterUpdate();
-                        return;
-                    }
-                    else
-                        current_channel->DevoiceMember(_player->GetGUID());
-                }
+            VoiceChatChannel* v_channel = sVoiceChatMgr.GetCustomVoiceChatChannel(name, _player->GetTeamId());
 
-                v_channel->AddVoiceChatMember(_player->GetGUID());
-                if (v_channel->IsOn(_player->GetGUID()))
-                {
-                    // change speaker icon from grey to color
-                    v_channel->VoiceMember(_player->GetGUID());
-                    // allow to speak depending on settings
-                    if (IsMicEnabled())
-                        v_channel->UnmuteMember(_player->GetGUID());
-                    else
-                        v_channel->MuteMember(_player->GetGUID());
-
-                    SetCurrentVoiceChannelId(v_channel->GetChannelId());
-                }
-            }
+            SetActiveVoiceChannel(v_channel, current_channel, _player);
 
             break;
         }
@@ -201,34 +176,7 @@ void WorldSession::HandleSetActiveVoiceChannelOpcode(WorldPacket& recvData)
                 else
                     v_channel = sVoiceChatMgr.GetGroupVoiceChatChannel(grp->GetId());
 
-                if (v_channel)
-                {
-                    if (current_channel)
-                    {
-                        // if same channel, just update roster
-                        if (v_channel == current_channel)
-                        {
-                            v_channel->SendVoiceRosterUpdate();
-                            return;
-                        }
-                        else
-                            current_channel->DevoiceMember(_player->GetGUID());
-                    }
-
-                    v_channel->AddVoiceChatMember(_player->GetGUID());
-                    if (v_channel->IsOn(_player->GetGUID()))
-                    {
-                        // change speaker icon from grey to color
-                        v_channel->VoiceMember(_player->GetGUID());
-                        // allow to speak depending on settings
-                        if (IsMicEnabled())
-                            v_channel->UnmuteMember(_player->GetGUID());
-                        else
-                            v_channel->MuteMember(_player->GetGUID());
-
-                        SetCurrentVoiceChannelId(v_channel->GetChannelId());
-                    }
-                }
+                SetActiveVoiceChannel(v_channel, current_channel, _player);
             }
 
             break;
@@ -238,34 +186,8 @@ void WorldSession::HandleSetActiveVoiceChannelOpcode(WorldPacket& recvData)
             if (_player->InBattleground())
             {
                 VoiceChatChannel* v_channel = sVoiceChatMgr.GetBattlegroundVoiceChatChannel(_player->GetBattlegroundId(), _player->GetBgTeamId());
-                if (v_channel)
-                {
-                    if (current_channel)
-                    {
-                        // if same channel, just update roster
-                        if (v_channel == current_channel)
-                        {
-                            v_channel->SendVoiceRosterUpdate();
-                            return;
-                        }
-                        else
-                            current_channel->DevoiceMember(_player->GetGUID());
-                    }
 
-                    v_channel->AddVoiceChatMember(_player->GetGUID());
-                    if (v_channel->IsOn(_player->GetGUID()))
-                    {
-                        // change speaker icon from grey to color
-                        v_channel->VoiceMember(_player->GetGUID());
-                        // allow to speak depending on settings
-                        if (IsMicEnabled())
-                            v_channel->UnmuteMember(_player->GetGUID());
-                        else
-                            v_channel->MuteMember(_player->GetGUID());
-
-                        SetCurrentVoiceChannelId(v_channel->GetChannelId());
-                    }
-                }
+                SetActiveVoiceChannel(v_channel, current_channel, _player);
             }
 
             break;
@@ -500,6 +422,38 @@ void WorldSession::HandleChannelUnsilenceOpcode(WorldPacket& recvData)
                     // chan->SetMicMute(_player, playerName.c_str(), false);
                 }
             }
+        }
+    }
+}
+
+void WorldSession::SetActiveVoiceChannel(VoiceChatChannel* v_channel, VoiceChatChannel* current_channel, Player* player)
+{
+    if (v_channel)
+    {
+        if (current_channel)
+        {
+            // if same channel, just update roster
+            if (v_channel == current_channel)
+            {
+                v_channel->SendVoiceRosterUpdate();
+                return;
+            }
+            else
+                current_channel->DevoiceMember(player->GetGUID());
+        }
+
+        v_channel->AddVoiceChatMember(player->GetGUID());
+        if (v_channel->IsOn(player->GetGUID()))
+        {
+            // change speaker icon from grey to color
+            v_channel->VoiceMember(player->GetGUID());
+            // allow to speak depending on settings
+            if (player->GetSession()->IsMicEnabled())
+                v_channel->UnmuteMember(player->GetGUID());
+            else
+                v_channel->MuteMember(player->GetGUID());
+
+            player->GetSession()->SetCurrentVoiceChannelId(v_channel->GetChannelId());
         }
     }
 }

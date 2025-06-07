@@ -31,6 +31,7 @@
 #include "GossipDef.h"
 #include "Packet.h"
 #include "SharedDefines.h"
+#include "VoiceChatChannel.h"
 #include "World.h"
 #include <map>
 #include <memory>
@@ -557,6 +558,7 @@ public:
     void HandleChannelVoiceOffOpcode(WorldPacket& recvData);
     void HandleVoiceSessionEnableOpcode(WorldPacket& recvData);
     void HandleSetActiveVoiceChannelOpcode(WorldPacket& recvData);
+    void SetActiveVoiceChannel(VoiceChatChannel* v_channel, VoiceChatChannel* current_channel, Player* player);
 
     // Packets cooldown
     time_t GetCalendarEventCreationCooldown() const { return _calendarEventCreationCooldown; }
