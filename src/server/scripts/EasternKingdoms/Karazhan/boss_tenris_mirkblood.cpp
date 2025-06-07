@@ -204,10 +204,10 @@ class spell_mirkblood_blood_mirror_target_picker : public SpellScript
             return;
 
         caster->CastSpell(caster, SPELL_BLOOD_MIRROR_TRANSITION_VISUAL); // Idk
-        caster->CastSpell(target, SPELL_BLOOD_MIRROR_TRANSITION_VISUAL);
+        target->CastSpell(target, SPELL_BLOOD_MIRROR_TRANSITION_VISUAL);
 
-        caster->CastSpell(caster, SPELL_BLOOD_MIRROR1); // I also don't know
-        caster->CastSpell(target, SPELL_BLOOD_MIRROR1);
+        target->CastSpell(caster, SPELL_BLOOD_MIRROR1); // I also don't know
+        target->CastSpell(target, SPELL_BLOOD_MIRROR1);
 
         target->CastSpell(caster, SPELL_BLOOD_MIRROR0); // Clone player
     }

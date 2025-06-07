@@ -593,12 +593,16 @@ public:
 
     bool OnTrigger(Player* player, AreaTrigger const* /*trigger*/) override
     {
+        LOG_ERROR("sql.sql", "hit approach");
         if (InstanceScript* instance = player->GetInstanceScript())
         {
+            LOG_ERROR("sql.sql", "approach-script");
             if (instance->GetBossState(DATA_MIRKBLOOD) != DONE)
             {
+                LOG_ERROR("sql.sql", "approach-state");
                 if (Creature* mirkblood = instance->GetCreature(DATA_MIRKBLOOD))
                 {
+                    LOG_ERROR("sql.sql", "approach-creature");
                     instance->SetData(DATA_MIRKBLOOD_APPROACH, player->GetGUID().GetCounter());
                     mirkblood->AI()->DoAction(DATA_MIRKBLOOD_APPROACH);
                 }
@@ -616,12 +620,16 @@ public:
 
     bool _OnTrigger(Player* player, AreaTrigger const* /*trigger*/) override
     {
+        LOG_ERROR("sql.sql", "hit entrance");
         if (InstanceScript* instance = player->GetInstanceScript())
         {
+            LOG_ERROR("sql.sql", "entrance-script");
             if (instance->GetBossState(DATA_MIRKBLOOD) != DONE)
             {
+                LOG_ERROR("sql.sql", "entrance-state");
                 if (Creature* mirkblood = instance->GetCreature(DATA_MIRKBLOOD))
                 {
+                    LOG_ERROR("sql.sql", "entrance-script");
                     instance->SetData(DATA_MIRKBLOOD_ENTRANCE, player->GetGUID().GetCounter());
                     mirkblood->AI()->DoAction(DATA_MIRKBLOOD_ENTRANCE);
                 }
