@@ -741,7 +741,6 @@ void Channel::ToggleVoice(Player* player)
 
     // const uint32 level = sWorld->getConfig(CONFIG_UINT32_GM_LEVEL_CHANNEL_MODERATION);
     // const bool gm = (level && player->GetSession()->GetSecurity() >= level);
-    const bool gm = false;
 
     if (!playersStore[guid].IsOwner() && !playersStore[guid].IsOwnerGM())
     {
@@ -775,17 +774,13 @@ void Channel::ToggleVoice(Player* player)
             if (WorldSession* session = member->GetSession())
             {
                 if (session->IsVoiceChatEnabled())
-                {
                     playersStore[playerStore.first].SetVoiced(_voice);
-                }
             }
         }
     }
 
     if (_voice)
-    {
         sVoiceChatMgr.AddToCustomVoiceChatChannel(guid, this->GetName(), player->GetTeamId());
-    }
 }
 
 void Channel::List(Player const* player)
