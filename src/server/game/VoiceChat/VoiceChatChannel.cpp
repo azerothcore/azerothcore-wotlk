@@ -42,7 +42,7 @@ VoiceChatChannel::VoiceChatChannel(VoiceChatChannelTypes type, uint32 id, uint32
 VoiceChatChannel::~VoiceChatChannel()
 {
     m_is_deleting = true;
-    for (const auto & m_member : m_members)
+    for (auto const& m_member : m_members)
         RemoveVoiceChatMember(m_member.second.m_guid);
 }
 
@@ -141,7 +141,7 @@ void VoiceChatChannel::SendVoiceRosterUpdate(bool empty, bool toAll, ObjectGuid 
 
     // send each member a list of that member plus others
     size_t pos = data.wpos();
-    for (const auto & m_member : m_members)
+    for (auto const& m_member : m_members)
     {
         // clean up if disconnected
         Player* plr = ObjectAccessor::FindPlayer(m_member.second.m_guid);
@@ -164,7 +164,7 @@ void VoiceChatChannel::SendVoiceRosterUpdate(bool empty, bool toAll, ObjectGuid 
         data << m_member.second.user_id;
         data << m_member.second.flags;
 
-        for (const auto & j : m_members)
+        for (auto const& j : m_members)
         {
             if (j.first == m_member.first)
                 continue;

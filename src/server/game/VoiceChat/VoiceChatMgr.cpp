@@ -618,7 +618,7 @@ bool VoiceChatMgr::IsVoiceChatChannelBeingCreated(
     VoiceChatChannelTypes type, uint32 groupId, std::string const& name, TeamId team)
 {
     return std::ranges::any_of(_requests,
-        [&](const auto& req)
+        [&](auto const& req)
     {
         if (req.type != type)
             return false;
