@@ -131,7 +131,6 @@ public:
             if (creature->AI()->GetData(DATA_IN_PROGRESS))
                 return true;
 
-            creature->SetImmuneToPC(false);
             creature->RemoveUnitFlag(UNIT_FLAG_SWIMMING);
 
             player->CastSpell(creature, SPELL_DUEL, false);
@@ -231,6 +230,7 @@ public:
                     me->RemoveAllAuras();
                     me->CastSpell(attacker, SPELL_DUEL_VICTORY, true);
                     me->RestoreFaction();
+                    me->DespawnOrUnsummon(10000);
                 }
             }
         }
@@ -545,7 +545,6 @@ public:
     };
 };
 
-// Theirs
 /*######
 ##Quest 12848
 ######*/
@@ -1211,7 +1210,6 @@ class spell_lich_king_whisper : public SpellScript
 
 void AddSC_the_scarlet_enclave_c1()
 {
-    // Ours
     RegisterSpellScript(spell_q12641_death_comes_from_on_high_summon_ghouls);
     RegisterSpellScript(spell_q12641_death_comes_from_on_high_recall_eye);
     new npc_death_knight_initiate();
@@ -1220,16 +1218,12 @@ void AddSC_the_scarlet_enclave_c1()
     new npc_scarlet_ghoul();
     new npc_dkc1_gothik();
     new npc_scarlet_cannon();
-
-    // Theirs
     new npc_unworthy_initiate();
     new npc_unworthy_initiate_anchor();
     new go_acherus_soul_prison();
-
     new npc_scarlet_miner();
     new npc_scarlet_miner_cart();
     new go_inconspicuous_mine_car();
-
     RegisterSpellScript(spell_death_knight_initiate_visual);
     RegisterSpellScript(spell_lich_king_whisper);
     RegisterSpellScript(spell_lich_king_vo_blocker);
