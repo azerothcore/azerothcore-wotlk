@@ -76,20 +76,20 @@ struct VoiceChatMember
 {
     explicit VoiceChatMember(ObjectGuid guid = ObjectGuid(), uint8 userId = 0, uint8 userFlags = VOICECHAT_MEMBER_FLAG_ENABLED)
     {
-        m_guid = guid;
-        user_id = userId;
-        flags = userFlags;
-        priority = 0xC8;
+        Guid = guid;
+        UserId = userId;
+        Flags = userFlags;
+        Priority = 0xC8;
     }
 
     // TODO: Check proper names from client - MemberGUID, NetworkId, Flags, and Priority
-    ObjectGuid m_guid;
-    uint8 user_id;
-    uint8 flags;
-    uint8 priority;
+    ObjectGuid Guid;
+    uint8 UserId;
+    uint8 Flags;
+    uint8 Priority;
 
-    inline bool HasFlag(uint8 flag) const { return (flags & flag) != 0; }
-    void SetFlag(uint8 flag, bool state) { if (state) flags |= flag; else flags &= ~flag; }
+    inline bool HasFlag(uint8 flag) const { return (Flags & flag) != 0; }
+    void SetFlag(uint8 flag, bool state) { if (state) Flags |= flag; else Flags &= ~flag; }
     inline bool IsEnabled() const { return HasFlag(VOICECHAT_MEMBER_FLAG_ENABLED); }
     inline void SetEnabled(bool state) { SetFlag(VOICECHAT_MEMBER_FLAG_ENABLED, state); }
     inline bool IsVoiced() const { return HasFlag(VOICECHAT_MEMBER_FLAG_VOICED); }
@@ -98,7 +98,7 @@ struct VoiceChatMember
     inline void SetMuted(bool state) { SetFlag(VOICECHAT_MEMBER_FLAG_MIC_MUTED, state); }
     inline bool IsForceMuted() const { return HasFlag(VOICECHAT_MEMBER_FLAG_FORCE_MUTED); }
     inline void SetForceMuted(bool state) { SetFlag(VOICECHAT_MEMBER_FLAG_FORCE_MUTED, state); }
-    inline void SetPriority(uint8 newPriority) { priority = newPriority; }
+    inline void SetPriority(uint8 newPriority) { Priority = newPriority; }
     inline void SetHighPriority() { SetPriority(0x80); } // Magic number, ask Burlex
     inline void SetLowPriority() { SetPriority(0xCA); } // Magic number, ask Burlex
 };
@@ -107,12 +107,12 @@ class VoiceChatServerPacket : public ByteBuffer
 {
 public:
     // just container for later use
-    VoiceChatServerPacket() : ByteBuffer(0), m_opcode(VOICECHAT_NULL_ACTION)
+    VoiceChatServerPacket() : ByteBuffer(0), _opcode(VOICECHAT_NULL_ACTION)
     {
     }
-    explicit VoiceChatServerPacket(VoiceChatServerOpcodes opcode, size_t res = 200) : ByteBuffer(res), m_opcode(opcode) { }
+    explicit VoiceChatServerPacket(VoiceChatServerOpcodes opcode, size_t res = 200) : ByteBuffer(res), _opcode(opcode) { }
     // copy constructor
-    VoiceChatServerPacket(const VoiceChatServerPacket& packet) : ByteBuffer(packet), m_opcode(packet.m_opcode)
+    VoiceChatServerPacket(const VoiceChatServerPacket& packet) : ByteBuffer(packet), _opcode(packet._opcode)
     {
     }
 
@@ -120,22 +120,22 @@ public:
     {
         clear();
         reserve(newres);
-        m_opcode = opcode;
+        _opcode = opcode;
     }
 
-    VoiceChatServerOpcodes GetOpcode() const { return m_opcode; }
-    void SetOpcode(VoiceChatServerOpcodes opcode) { m_opcode = opcode; }
+    VoiceChatServerOpcodes GetOpcode() const { return _opcode; }
+    void SetOpcode(VoiceChatServerOpcodes opcode) { _opcode = opcode; }
 
 protected:
-    VoiceChatServerOpcodes m_opcode;
+    VoiceChatServerOpcodes _opcode;
 };
 
 struct VoiceChatStatistics
 {
-    uint32 channels;
-    uint32 activeUsers;
-    uint32 totalVoiceChatEnabled;
-    uint32 totalVoiceMicEnabled;
+    uint32 Channels;
+    uint32 ActiveUsers;
+    uint32 TotalVoiceChatEnabled;
+    uint32 TotalVoiceMicEnabled;
 };
 
 #endif

@@ -99,7 +99,7 @@ public:
         }
 
         VoiceChatStatistics stats = sVoiceChatMgr.GetStatistics();
-        handler->PSendSysMessage("Voice Chat: channels: {}, active users: {}, voice chat enabled: {}, microphone enabled: {}", stats.channels, stats.activeUsers, stats.totalVoiceChatEnabled, stats.totalVoiceMicEnabled);
+        handler->PSendSysMessage("Voice Chat: channels: {}, active users: {}, voice chat enabled: {}, microphone enabled: {}", stats.Channels, stats.ActiveUsers, stats.TotalVoiceChatEnabled, stats.TotalVoiceMicEnabled);
         return true;
     }
 

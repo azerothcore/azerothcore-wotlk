@@ -195,7 +195,7 @@ private:
 
     // state of connection
     VoiceChatState _state;
-    
+
     std::chrono::system_clock::time_point _lastUpdate;
 
     // Thread safety mechanisms

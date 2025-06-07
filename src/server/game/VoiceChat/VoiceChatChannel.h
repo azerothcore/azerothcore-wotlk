@@ -34,13 +34,13 @@ public:
     explicit VoiceChatChannel(VoiceChatChannelTypes type, uint32 id = 0, uint32 groupId = 0, std::string name = "", TeamId team = TEAM_NEUTRAL);
     ~VoiceChatChannel();
 
-    void SetChannelId(uint16 id) { m_channel_id = id; }
-    uint16 GetChannelId() const { return m_channel_id; }
-    void SetType(VoiceChatChannelTypes type) { m_type = type; }
-    VoiceChatChannelTypes GetType() { return m_type; }
-    uint32 GetGroupId() const { return m_group_id; }
-    TeamId GetTeam() { return m_team; }
-    std::string GetChannelName() { return m_channel_name; }
+    void SetChannelId(uint16 id) { _channelId = id; }
+    uint16 GetChannelId() const { return _channelId; }
+    void SetType(VoiceChatChannelTypes type) { _type = type; }
+    VoiceChatChannelTypes GetType() { return _type; }
+    uint32 GetGroupId() const { return _groupId; }
+    TeamId GetTeam() { return _team; }
+    std::string GetChannelName() { return _channelName; }
 
     void GenerateSessionId();
 
@@ -48,7 +48,7 @@ public:
 
     uint8 GenerateUserId(ObjectGuid guid);
 
-    uint64 GetSessionId() const { return m_session_id; }
+    uint64 GetSessionId() const { return _sessionId; }
 
     // send info to client
     void SendAvailableVoiceChatChannel(WorldSession* session);
@@ -75,17 +75,17 @@ public:
     void ForceUnmuteMember(ObjectGuid guid);
 
 private:
-    bool m_is_deleting;
-    bool m_is_mass_adding;
-    uint8 m_encryption_key[16];
-    uint64 m_session_id;
-    uint16 m_channel_id;
-    VoiceChatChannelTypes m_type;
-    uint32 m_group_id;
-    std::string m_channel_name;
-    TeamId m_team;
-    VoiceChatMembers m_members;
-    VoiceChatMembersGuids m_members_guids;
+    bool _isDeleting;
+    bool _isMassAdding;
+    uint8 _encryptionKey[16];
+    uint64 _sessionId;
+    uint16 _channelId;
+    VoiceChatChannelTypes _type;
+    uint32 _groupId;
+    std::string _channelName;
+    TeamId _team;
+    VoiceChatMembers _members;
+    VoiceChatMembersGuids _membersGuids;
 };
 
 #endif

@@ -24,16 +24,16 @@
 
 VoiceChatChannel::VoiceChatChannel(VoiceChatChannelTypes type, uint32 id, uint32 groupId, std::string name, TeamId team)
 {
-    m_channel_id = id;
-    m_type = type;
-    m_channel_name = name;
-    m_group_id = groupId;
-    m_team = team;
-    m_is_deleting = false;
-    m_is_mass_adding = false;
+    _channelId = id;
+    _type = type;
+    _channelName = name;
+    _groupId = groupId;
+    _team = team;
+    _isDeleting = false;
+    _isMassAdding = false;
 
     for (uint8 i = 1; i < MAX_VOICECHAT_CHANNEL_MEMBERS; ++i)
-        m_members_guids[i] = ObjectGuid();
+        _membersGuids[i] = ObjectGuid();
 
     GenerateSessionId();
     GenerateEncryptionKey();
@@ -41,22 +41,22 @@ VoiceChatChannel::VoiceChatChannel(VoiceChatChannelTypes type, uint32 id, uint32
 
 VoiceChatChannel::~VoiceChatChannel()
 {
-    m_is_deleting = true;
-    for (auto const& m_member : m_members)
-        RemoveVoiceChatMember(m_member.second.m_guid);
+    _isDeleting = true;
+    for (auto const& m_member : _members)
+        RemoveVoiceChatMember(m_member.second.Guid);
 }
 
 void VoiceChatChannel::GenerateSessionId()
 {
     // don't know what it should be so use time(nullptr) and increment to make it always different
-    m_session_id = sVoiceChatMgr.GetNewSessionId();
+    _sessionId = sVoiceChatMgr.GetNewSessionId();
 }
 
 void VoiceChatChannel::GenerateEncryptionKey()
 {
     // todo figure out encryption key
     for (auto i = 0; i < 16; i++)
-        m_encryption_key[i] = 0x00;
+        _encryptionKey[i] = 0x00;
 }
 
 uint8 VoiceChatChannel::GenerateUserId(ObjectGuid guid)
@@ -78,12 +78,12 @@ uint8 VoiceChatChannel::GenerateUserId(ObjectGuid guid)
     uint8 freeId = 0;
     for (uint8 i = 1; i < MAX_VOICECHAT_CHANNEL_MEMBERS; ++i)
     {
-        if (m_members_guids[i] == guid)
+        if (_membersGuids[i] == guid)
             return i;
 
-        if (!m_members_guids[i])
+        if (!_membersGuids[i])
         {
-            m_members_guids[i] = guid;
+            _membersGuids[i] = guid;
             freeId = i;
             break;
         }
@@ -102,10 +102,10 @@ void VoiceChatChannel::SendAvailableVoiceChatChannel(WorldSession* session)
     LOG_DEBUG("network", "Sending SMSG_AVAILABLE_VOICE_CHANNEL for player {}", plr->GetGUID().ToString());
 
     WorldPacket data(SMSG_AVAILABLE_VOICE_CHANNEL);
-    data << m_session_id;
-    data << uint8(m_type);
-    if (m_type == VOICECHAT_CHANNEL_CUSTOM)
-        data << m_channel_name;
+    data << _sessionId;
+    data << uint8(_type);
+    if (_type == VOICECHAT_CHANNEL_CUSTOM)
+        data << _channelName;
     else
         data << uint8(0);
     data << plr->GetGUID();
@@ -116,80 +116,80 @@ void VoiceChatChannel::SendAvailableVoiceChatChannel(WorldSession* session)
 void VoiceChatChannel::SendVoiceRosterUpdate(bool empty, bool toAll, ObjectGuid toPlayer)
 {
     // don't send while deleting channel and members
-    if (m_is_deleting)
+    if (_isDeleting)
         return;
 
     // don't send while massively adding members after channel create
-    if (m_is_mass_adding)
+    if (_isMassAdding)
         return;
 
-    WorldPacket data(SMSG_VOICE_SESSION_ROSTER_UPDATE, 31 + (m_members.size() * 11));
-    data << uint64(m_session_id);
-    data << uint16(m_channel_id);
-    data << uint8(m_type);
-    if (m_type == VOICECHAT_CHANNEL_CUSTOM)
-        data << m_channel_name;
+    WorldPacket data(SMSG_VOICE_SESSION_ROSTER_UPDATE, 31 + (_members.size() * 11));
+    data << uint64(_sessionId);
+    data << uint16(_channelId);
+    data << uint8(_type);
+    if (_type == VOICECHAT_CHANNEL_CUSTOM)
+        data << _channelName;
     else
         data << uint8(0);
-    data.append(m_encryption_key, 16);
+    data.append(_encryptionKey, 16);
     data << uint32(htonl(sVoiceChatMgr.GetVoiceServerVoiceAddress()));
     data << uint16(sVoiceChatMgr.GetVoiceServerVoicePort());
 
     size_t count_pos = data.wpos();
-    uint8 count = empty ? 1 : m_members.size();
+    uint8 count = empty ? 1 : _members.size();
     data << uint8(count);
 
     // send each member a list of that member plus others
     size_t pos = data.wpos();
-    for (auto const& m_member : m_members)
+    for (auto const& m_member : _members)
     {
         // clean up if disconnected
-        Player* plr = ObjectAccessor::FindPlayer(m_member.second.m_guid);
+        Player* plr = ObjectAccessor::FindPlayer(m_member.second.Guid);
         if (!plr)
             return;
 
-        if (!ObjectAccessor::FindConnectedPlayer(m_member.second.m_guid))
+        if (!ObjectAccessor::FindConnectedPlayer(m_member.second.Guid))
         {
-            m_is_deleting = true;
+            _isDeleting = true;
 
-            RemoveVoiceChatMember(m_member.second.m_guid);
+            RemoveVoiceChatMember(m_member.second.Guid);
             if (!empty && count)
                 count--;
 
-            m_is_deleting = false;
+            _isDeleting = false;
             continue;
         }
 
-        data << m_member.second.m_guid;
-        data << m_member.second.user_id;
-        data << m_member.second.flags;
+        data << m_member.second.Guid;
+        data << m_member.second.UserId;
+        data << m_member.second.Flags;
 
-        for (auto const& j : m_members)
+        for (auto const& j : _members)
         {
             if (j.first == m_member.first)
                 continue;
 
             // clean up if disconnected
-            Player* other_plr = ObjectAccessor::FindPlayer(j.second.m_guid);
+            Player* other_plr = ObjectAccessor::FindPlayer(j.second.Guid);
             if (!other_plr)
                 return;
 
-            if (!ObjectAccessor::FindConnectedPlayer(j.second.m_guid))
+            if (!ObjectAccessor::FindConnectedPlayer(j.second.Guid))
             {
-                m_is_deleting = true;
+                _isDeleting = true;
 
-                RemoveVoiceChatMember(j.second.m_guid);
+                RemoveVoiceChatMember(j.second.Guid);
                 if (!empty && count)
                     count--;
 
-                m_is_deleting = false;
+                _isDeleting = false;
                 continue;
             }
 
-            data << j.second.m_guid;
-            data << j.second.user_id;
-            data << j.second.priority;
-            data << j.second.flags;
+            data << j.second.Guid;
+            data << j.second.UserId;
+            data << j.second.Priority;
+            data << j.second.Flags;
         }
 
         if (!empty)
@@ -214,21 +214,21 @@ void VoiceChatChannel::SendLeaveVoiceChatSession(WorldSession* session) const
 
     WorldPacket data(SMSG_VOICE_SESSION_LEAVE, 16);
     data << plr->GetGUID();
-    data << m_session_id;
+    data << _sessionId;
     session->SendPacket(&data);
 }
 
 void VoiceChatChannel::SendLeaveVoiceChatSession(ObjectGuid guid)
 {
-    for (auto& memb : m_members)
+    for (auto& memb : _members)
     {
-        if (Player* plr = ObjectAccessor::FindPlayer(memb.second.m_guid))
+        if (Player* plr = ObjectAccessor::FindPlayer(memb.second.Guid))
         {
             if (WorldSession* session = plr->GetSession())
             {
                 WorldPacket data(SMSG_VOICE_SESSION_LEAVE, 16);
                 data << guid;
-                data << m_session_id;
+                data << _sessionId;
                 session->SendPacket(&data);
             }
         }
@@ -246,9 +246,9 @@ void VoiceChatChannel::ConvertToRaid()
 
 VoiceChatMember* VoiceChatChannel::GetVoiceChatMember(ObjectGuid guid)
 {
-    for (auto& memb : m_members)
+    for (auto& memb : _members)
     {
-        if (memb.second.m_guid == guid)
+        if (memb.second.Guid == guid)
             return &memb.second;
     }
     return nullptr;
@@ -256,9 +256,9 @@ VoiceChatMember* VoiceChatChannel::GetVoiceChatMember(ObjectGuid guid)
 
 bool VoiceChatChannel::IsOn(ObjectGuid guid)
 {
-    for (VoiceChatMembers::const_iterator i = m_members.begin(); i != m_members.end(); ++i)
+    for (VoiceChatMembers::const_iterator i = _members.begin(); i != _members.end(); ++i)
     {
-        if (i->second.m_guid == guid)
+        if (i->second.Guid == guid)
             return true;
     }
     return false;
@@ -269,7 +269,7 @@ void VoiceChatChannel::AddVoiceChatMember(ObjectGuid guid)
     if (IsOn(guid))
         return;
 
-    if (m_is_deleting)
+    if (_isDeleting)
         return;
 
     Player* plr = ObjectAccessor::FindPlayer(guid);
@@ -292,8 +292,8 @@ void VoiceChatChannel::AddVoiceChatMember(ObjectGuid guid)
         return;
     }
 
-    uint8 user_id = GenerateUserId(guid);
-    if (!user_id)
+    uint8 userId = GenerateUserId(guid);
+    if (!userId)
     {
         LOG_INFO("voice-chat", "Could not add voice member, no free slots!");
         WorldPacket data(SMSG_VOICESESSION_FULL);
@@ -301,7 +301,7 @@ void VoiceChatChannel::AddVoiceChatMember(ObjectGuid guid)
         return;
     }
 
-    VoiceChatMember member = VoiceChatMember(guid, user_id);
+    VoiceChatMember member = VoiceChatMember(guid, userId);
     member.SetEnabled(true);
     member.SetVoiced(false);
     member.SetMuted(!sess->IsMicEnabled());
@@ -309,15 +309,15 @@ void VoiceChatChannel::AddVoiceChatMember(ObjectGuid guid)
     if (plr->GetGroup()->IsLeader(plr->GetGUID()))
         member.SetHighPriority();
 
-    m_members[user_id] = member;
+    _members[userId] = member;
 
     // activate slot on voice server
-    sVoiceChatMgr.EnableChannelSlot(m_channel_id, user_id);
+    sVoiceChatMgr.EnableChannelSlot(_channelId, userId);
     // notify voice server that mic is disabled
     if (member.IsMuted())
-        sVoiceChatMgr.MuteChannelSlot(m_channel_id, user_id);
+        sVoiceChatMgr.MuteChannelSlot(_channelId, userId);
 
-    if (!m_is_mass_adding)
+    if (!_isMassAdding)
         SendVoiceRosterUpdate();
 
     SendAvailableVoiceChatChannel(sess);
@@ -356,13 +356,13 @@ void VoiceChatChannel::RemoveVoiceChatMember(ObjectGuid guid)
 
     SendLeaveVoiceChatSession(guid);
 
-    sVoiceChatMgr.DisableChannelSlot(m_channel_id, member->user_id);
+    sVoiceChatMgr.DisableChannelSlot(_channelId, member->UserId);
 
-    LOG_INFO("voice-chat", "User #{} removed from channel #{}", member->user_id, m_channel_id);
+    LOG_INFO("voice-chat", "User #{} removed from channel #{}", member->UserId, _channelId);
 
-    m_members.erase(member->user_id);
+    _members.erase(member->UserId);
 
-    if (!m_members.empty())
+    if (!_members.empty())
         SendVoiceRosterUpdate();
 }
 
@@ -372,10 +372,10 @@ void VoiceChatChannel::AddMembersAfterCreate()
         return;
 
     // add all possible members to this channel
-    LOG_DEBUG("voice-chat", "Adding voice chat enabled members after create, channel #{}, type #{}", m_channel_id, m_type);
+    LOG_DEBUG("voice-chat", "Adding voice chat enabled members after create, channel #{}, type #{}", _channelId, _type);
 
     // disable sending voice roster update while adding
-    m_is_mass_adding = true;
+    _isMassAdding = true;
 
     switch (GetType())
     {
@@ -433,7 +433,7 @@ void VoiceChatChannel::AddMembersAfterCreate()
         }
 
     // enable sending voice roster update
-    m_is_mass_adding = false;
+    _isMassAdding = false;
 }
 
 void VoiceChatChannel::VoiceMember(ObjectGuid guid)
@@ -452,9 +452,9 @@ void VoiceChatChannel::VoiceMember(ObjectGuid guid)
 
     SendVoiceRosterUpdate();
 
-    sVoiceChatMgr.VoiceChannelSlot(m_channel_id, member->user_id);
+    sVoiceChatMgr.VoiceChannelSlot(_channelId, member->UserId);
 
-    LOG_INFO("voice-chat", "User #{} voiced in channel #{}", member->user_id, m_channel_id);
+    LOG_INFO("voice-chat", "User #{} voiced in channel #{}", member->UserId, _channelId);
 }
 
 void VoiceChatChannel::DevoiceMember(ObjectGuid guid)
@@ -476,9 +476,9 @@ void VoiceChatChannel::DevoiceMember(ObjectGuid guid)
     // send proper roster to other players
     SendVoiceRosterUpdate();
 
-    sVoiceChatMgr.DevoiceChannelSlot(m_channel_id, member->user_id);
+    sVoiceChatMgr.DevoiceChannelSlot(_channelId, member->UserId);
 
-    LOG_INFO("voice-chat", "User #{} devoiced in channel #{}", member->user_id, m_channel_id);
+    LOG_INFO("voice-chat", "User #{} devoiced in channel #{}", member->UserId, _channelId);
 }
 
 void VoiceChatChannel::MuteMember(ObjectGuid guid)
@@ -497,9 +497,9 @@ void VoiceChatChannel::MuteMember(ObjectGuid guid)
 
     SendVoiceRosterUpdate();
 
-    sVoiceChatMgr.MuteChannelSlot(m_channel_id, member->user_id);
+    sVoiceChatMgr.MuteChannelSlot(_channelId, member->UserId);
 
-    LOG_INFO("voice-chat", "User #{} muted in channel #{}", member->user_id, m_channel_id);
+    LOG_INFO("voice-chat", "User #{} muted in channel #{}", member->UserId, _channelId);
 }
 
 void VoiceChatChannel::UnmuteMember(ObjectGuid guid)
@@ -520,9 +520,9 @@ void VoiceChatChannel::UnmuteMember(ObjectGuid guid)
 
     // only allow leader to unmute force muted members
     if (!member->IsForceMuted())
-        sVoiceChatMgr.UnmuteChannelSlot(m_channel_id, member->user_id);
+        sVoiceChatMgr.UnmuteChannelSlot(_channelId, member->UserId);
 
-    LOG_INFO("voice-chat", "User #{} unmuted in channel #{}", member->user_id, m_channel_id);
+    LOG_INFO("voice-chat", "User #{} unmuted in channel #{}", member->UserId, _channelId);
 }
 
 void VoiceChatChannel::ForceMuteMember(ObjectGuid guid)
@@ -541,9 +541,9 @@ void VoiceChatChannel::ForceMuteMember(ObjectGuid guid)
 
     SendVoiceRosterUpdate();
 
-    sVoiceChatMgr.MuteChannelSlot(m_channel_id, member->user_id);
+    sVoiceChatMgr.MuteChannelSlot(_channelId, member->UserId);
 
-    LOG_INFO("voice-chat", "User #{} force muted in channel #{}", member->user_id, m_channel_id);
+    LOG_INFO("voice-chat", "User #{} force muted in channel #{}", member->UserId, _channelId);
 }
 
 void VoiceChatChannel::ForceUnmuteMember(ObjectGuid guid)
@@ -568,7 +568,7 @@ void VoiceChatChannel::ForceUnmuteMember(ObjectGuid guid)
 
     // do not let speak if mic disabled by client
     if (micEnabled)
-        sVoiceChatMgr.UnmuteChannelSlot(m_channel_id, member->user_id);
+        sVoiceChatMgr.UnmuteChannelSlot(_channelId, member->UserId);
 
-    LOG_INFO("voice-chat", "User #{} force unmuted in channel #{}", member->user_id, m_channel_id);
+    LOG_INFO("voice-chat", "User #{} force unmuted in channel #{}", member->UserId, _channelId);
 }

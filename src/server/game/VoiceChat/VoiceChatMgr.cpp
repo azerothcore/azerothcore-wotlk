@@ -1190,20 +1190,20 @@ VoiceChatStatistics VoiceChatMgr::GetStatistics()
     VoiceChatStatistics stats {};
 
     // amount of channels
-    stats.channels = _voiceChatChannels.size();
+    stats.Channels = _voiceChatChannels.size();
 
     // amount of active users
-    stats.activeUsers = 0;
-    stats.totalVoiceChatEnabled = 0;
-    stats.totalVoiceMicEnabled = 0;
+    stats.ActiveUsers = 0;
+    stats.TotalVoiceChatEnabled = 0;
+    stats.TotalVoiceMicEnabled = 0;
     ChatHandler(nullptr).DoForAllValidSessions([&](Player* player)
     {
         if (player->GetSession()->IsVoiceChatEnabled())
-            stats.totalVoiceChatEnabled++;
+            stats.TotalVoiceChatEnabled++;
         if (player->GetSession()->IsMicEnabled())
-            stats.totalVoiceMicEnabled++;
+            stats.TotalVoiceMicEnabled++;
         if (player->GetSession()->GetCurrentVoiceChannelId())
-            stats.activeUsers++;
+            stats.ActiveUsers++;
     });
 
     return stats;
