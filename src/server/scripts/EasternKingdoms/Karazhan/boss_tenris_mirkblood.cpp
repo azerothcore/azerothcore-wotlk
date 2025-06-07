@@ -75,6 +75,7 @@ struct boss_tenris_mirkblood : public BossAI
         _Reset();
 
         ScheduleHealthCheckEvent(50, [&] {
+            Talk(SAY_SUMMON);
             DoCast(SPELL_SUMMON_SANGUINE_SPIRIT_MISSILE_BURST);
             });
 
