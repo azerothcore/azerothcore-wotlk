@@ -342,7 +342,7 @@ void VoiceChatChannel::RemoveVoiceChatMember(ObjectGuid guid)
     if (WorldSession* session = plr->GetSession())
     {
         uint32 channelId = GetChannelId();
-        sVoiceChatMgr.GetEventEmitter() += [channelId, session](VoiceChatMgr* mgr)
+        sVoiceChatMgr.GetEventEmitter() += [channelId, session](VoiceChatMgr* /*mgr*/)
         {
             if (session->GetCurrentVoiceChannelId() == channelId)
                 session->SetCurrentVoiceChannelId(0);

@@ -285,7 +285,7 @@ void WorldSession::HandleSetActiveVoiceChannelOpcode(WorldPacket& recvData)
     }
 }
 
-void WorldSession::HandleChannelVoiceOffOpcode(WorldPacket& recvData)
+void WorldSession::HandleChannelVoiceOffOpcode(WorldPacket& /*recvData*/)
 {
     LOG_DEBUG("network", "WORLD: Received CMSG_CHANNEL_VOICE_OFF");
 

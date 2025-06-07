@@ -801,7 +801,7 @@ std::vector<VoiceChatChannel*> VoiceChatMgr::GetPossibleVoiceChatChannels(Object
 void VoiceChatMgr::RestoreVoiceChatChannels()
 {
     // Replace Messager with EventEmitter
-    sVoiceChatMgr.GetEventEmitter() += [](VoiceChatMgr* world)
+    sVoiceChatMgr.GetEventEmitter() += [](VoiceChatMgr* /*world*/)
     {
         ChatHandler(nullptr).DoForAllValidSessions([](Player* player)
         {
