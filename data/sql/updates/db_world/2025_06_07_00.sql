@@ -1,3 +1,4 @@
+-- DB update 2025_06_06_01 -> 2025_06_07_00
 --
 UPDATE `command` SET `help`='Syntax: .wchange #weathertype #grade
 Set current weather to #weathertype with an intensity of #grade.
