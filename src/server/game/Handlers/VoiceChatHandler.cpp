@@ -15,28 +15,445 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "ChannelMgr.h"
+#include "Group.h"
+#include "Language.h"
 #include "Log.h"
 #include "Opcodes.h"
+#include "Player.h"
+#include "SocialMgr.h"
+#include "VoiceChatChannel.h"
+#include "VoiceChatMgr.h"
+#include "World.h"
 #include "WorldPacket.h"
 #include "WorldSession.h"
 
 void WorldSession::HandleVoiceSessionEnableOpcode(WorldPacket& recvData)
 {
-    LOG_DEBUG("network", "WORLD: CMSG_VOICE_SESSION_ENABLE");
-    // uint8 isVoiceEnabled, uint8 isMicrophoneEnabled
-    recvData.read_skip<uint8>();
-    recvData.read_skip<uint8>();
+    LOG_DEBUG("network", "WORLD: Received CMSG_VOICE_SESSION_ENABLE");
+
+    if (!sVoiceChatMgr.CanSeeVoiceChat())
+        return;
+
+    // comes from in game voice chat settings
+    // is sent during login or when changing settings
+    uint8 voiceEnabled, micEnabled;
+    recvData >> voiceEnabled;
+    recvData >> micEnabled;
+
+    if (!_player)
+    {
+        _micEnabled = micEnabled;
+        _voiceEnabled = voiceEnabled;
+        return;
+    }
+
+    if (!voiceEnabled)
+    {
+        sVoiceChatMgr.RemoveFromVoiceChatChannels(_player->GetGUID());
+        SetCurrentVoiceChannelId(0);
+    }
+    else
+    {
+        // send available voice channels
+        if (_player->IsInWorld() && !_voiceEnabled)
+        {
+            // enable it here to allow joining channels
+            _voiceEnabled = voiceEnabled;
+            _micEnabled = micEnabled;
+            sVoiceChatMgr.JoinAvailableVoiceChatChannels(this);
+        }
+    }
+
+    if (GetCurrentVoiceChannelId())
+    {
+        VoiceChatChannel* current_channel = sVoiceChatMgr.GetVoiceChatChannel(GetCurrentVoiceChannelId());
+        if (current_channel)
+        {
+            if (!micEnabled)
+                current_channel->MuteMember(_player->GetGUID());
+            else
+                current_channel->UnmuteMember(_player->GetGUID());
+        }
+    }
+
+    _micEnabled = micEnabled;
+    _voiceEnabled = voiceEnabled;
 }
 
-void WorldSession::HandleChannelVoiceOnOpcode(WorldPacket& /*recvData*/)
+void WorldSession::HandleChannelVoiceOnOpcode(WorldPacket& recvData)
 {
-    LOG_DEBUG("network", "WORLD: CMSG_CHANNEL_VOICE_ON");
+    LOG_DEBUG("network", "WORLD: Received CMSG_CHANNEL_VOICE_ON");
     // Enable Voice button in channel context menu
+
+    if (!sVoiceChatMgr.CanUseVoiceChat())
+        return;
+
+    std::string name;
+    recvData >> name;
+
+    if (!_player)
+        return;
+
+    // custom channel
+    auto cMgr = ChannelMgr(_player->GetTeamId());
+    {
+        Channel* chn = cMgr.GetChannel(name, _player);
+        if (!chn)
+            return;
+
+        if (chn->IsLFG() || chn->IsConstant())
+        {
+            LOG_ERROR("voice-chat", "Channel is LFG or constant, can't use voice!");
+            return;
+        }
+
+        // already enabled
+        if (chn->IsVoiceEnabled())
+            return;
+
+        chn->ToggleVoice(_player);
+
+        sVoiceChatMgr.CreateCustomVoiceChatChannel(chn->GetName(), _player->GetTeamId());
+    }
 }
 
 void WorldSession::HandleSetActiveVoiceChannel(WorldPacket& recvData)
 {
-    LOG_DEBUG("network", "WORLD: CMSG_SET_ACTIVE_VOICE_CHANNEL");
+    LOG_DEBUG("network", "WORLD: Received CMSG_SET_ACTIVE_VOICE_CHANNEL");
     recvData.read_skip<uint32>();
     recvData.read_skip<char*>();
+}
+
+void WorldSession::HandleSetActiveVoiceChannelOpcode(WorldPacket& recvData)
+{
+    LOG_DEBUG("network", "WORLD: Received CMSG_SET_ACTIVE_VOICE_CHANNEL");
+
+    if (!sVoiceChatMgr.CanUseVoiceChat())
+        return;
+
+    if (!_player || !_player->IsInWorld())
+        return;
+
+    uint32 type;
+    std::string name;
+    recvData >> type;
+
+    // leave current voice channel if player selects different one
+    VoiceChatChannel* current_channel = nullptr;
+    if (GetCurrentVoiceChannelId())
+        current_channel = sVoiceChatMgr.GetVoiceChatChannel(GetCurrentVoiceChannelId());
+
+    switch (type)
+    {
+        case VOICECHAT_CHANNEL_CUSTOM:
+        {
+            recvData >> name;
+
+            auto cMgr = ChannelMgr(_player->GetTeamId());
+            Channel* chan = cMgr.GetChannel(name, nullptr, false);
+            if (!chan || !chan->IsOn(_player->GetGUID()) || chan->IsBanned(_player->GetGUID()) || !chan->IsVoiceEnabled())
+                return;
+
+            VoiceChatChannel* v_channel = sVoiceChatMgr.GetCustomVoiceChatChannel(name, _player->GetTeamId());
+
+            SetActiveVoiceChannel(v_channel, current_channel, _player);
+
+            break;
+        }
+        case VOICECHAT_CHANNEL_GROUP:
+        case VOICECHAT_CHANNEL_RAID:
+        {
+            Group* grp = _player->GetGroup();
+            if (grp && (grp->isBGGroup() || grp->isBFGroup()))
+                grp = _player->GetOriginalGroup();
+
+            if (grp)
+            {
+                VoiceChatChannel* v_channel = nullptr;
+                if (grp->isRaidGroup())
+                    v_channel = sVoiceChatMgr.GetRaidVoiceChatChannel(grp->GetId());
+                else
+                    v_channel = sVoiceChatMgr.GetGroupVoiceChatChannel(grp->GetId());
+
+                SetActiveVoiceChannel(v_channel, current_channel, _player);
+            }
+
+            break;
+        }
+        case VOICECHAT_CHANNEL_BG:
+        {
+            if (_player->InBattleground())
+            {
+                VoiceChatChannel* v_channel = sVoiceChatMgr.GetBattlegroundVoiceChatChannel(_player->GetBattlegroundId(), _player->GetBgTeamId());
+
+                SetActiveVoiceChannel(v_channel, current_channel, _player);
+            }
+
+            break;
+        }
+        case VOICECHAT_CHANNEL_NONE:
+        {
+            // leave current channel
+            if (current_channel)
+                current_channel->DevoiceMember(_player->GetGUID());
+
+            SetCurrentVoiceChannelId(0);
+
+            break;
+        }
+        default:
+            break;
+    }
+}
+
+void WorldSession::HandleChannelVoiceOffOpcode(WorldPacket& /*recvData*/)
+{
+    LOG_DEBUG("network", "WORLD: Received CMSG_CHANNEL_VOICE_OFF");
+
+    // todo check if possible to send with chat commands
+}
+
+void WorldSession::HandleAddVoiceIgnoreOpcode(WorldPacket& recvData)
+{
+    LOG_DEBUG("network", "WORLD: Received CMSG_ADD_VOICE_IGNORE");
+
+    if (!_player)
+        return;
+
+    std::string IgnoreName = GetAcoreString(LANG_FRIEND_IGNORE_UNKNOWN);
+
+    recvData >> IgnoreName;
+
+    if (!normalizePlayerName(IgnoreName))
+        return;
+
+    CharacterDatabase.EscapeString(IgnoreName);
+
+    ObjectGuid ignoreGUID = sCharacterCache->GetCharacterGuidByName(IgnoreName);
+    if (!ignoreGUID)
+        return;
+
+    LOG_INFO("network", "WORLD: {} asked to Ignore: '{}'",
+        _player->GetName(), IgnoreName.c_str());
+
+    // CharacterDatabase.AsyncQuery(&WorldSession::HandleAddMutedOpcodeCallBack, GetAccountId(), "SELECT guid FROM characters WHERE name = '{}'", IgnoreName.c_str());
+    // _queryProcessor.AddCallback(CharacterDatabase.AsyncQuery(stmt).WithPreparedCallback(std::bind(&WorldSession::HandleAddMutedOpcodeCallBack, this, std::placeholders::_1)));
+
+    FriendsResult ignoreResult = FRIEND_MUTE_NOT_FOUND;
+    if (ignoreGUID == _player->GetGUID())
+        ignoreResult = FRIEND_MUTE_SELF;
+    else if (_player->GetSocial()->HasMute(ignoreGUID))
+        ignoreResult = FRIEND_MUTE_ALREADY;
+    else
+    {
+        ignoreResult = FRIEND_MUTE_ADDED;
+
+        // mute list full
+        if (!_player->GetSocial()->AddToSocialList(ignoreGUID, SOCIAL_FLAG_MUTED))
+            ignoreResult = FRIEND_MUTE_FULL;
+    }
+
+    sSocialMgr->SendFriendStatus(_player, ignoreResult, ignoreGUID, false);
+
+    LOG_DEBUG("network", "WORLD: Sent SMSG_FRIEND_STATUS");
+}
+
+void WorldSession::HandleDelVoiceIgnoreOpcode(WorldPacket& recvData)
+{
+    LOG_DEBUG("network", "WORLD: Received CMSG_DEL_VOICE_IGNORE");
+
+    if (!_player)
+        return;
+
+    ObjectGuid ignoreGUID;
+
+    recvData >> ignoreGUID;
+
+    _player->GetSocial()->RemoveFromSocialList(ignoreGUID, SOCIAL_FLAG_MUTED);
+
+    sSocialMgr->SendFriendStatus(_player, FRIEND_MUTE_REMOVED, ignoreGUID, false);
+
+    LOG_DEBUG("network", "WORLD: Sent SMSG_FRIEND_STATUS");
+}
+
+void WorldSession::HandlePartySilenceOpcode(WorldPacket& recvData)
+{
+    LOG_DEBUG("network", "WORLD: Received CMSG_PARTY_SILENCE");
+
+    if (!_player)
+        return;
+
+    if (!sVoiceChatMgr.CanUseVoiceChat())
+        return;
+
+    ObjectGuid ignoreGUID;
+    recvData >> ignoreGUID;
+
+    Group* grp = _player->GetGroup();
+    if (!grp)
+        return;
+
+    if (!grp->IsMember(ignoreGUID))
+        return;
+
+    if (!grp->IsLeader(_player->GetGUID()) && grp->IsMainAssistant(_player->GetGUID()))
+        return;
+
+    VoiceChatChannel* v_channel = nullptr;
+    if (!grp->isBGGroup() && !grp->isBFGroup())
+    {
+        if (grp->isRaidGroup())
+            v_channel = sVoiceChatMgr.GetRaidVoiceChatChannel(grp->GetId());
+        else
+            v_channel = sVoiceChatMgr.GetGroupVoiceChatChannel(grp->GetId());
+    }
+    else if (_player->InBattleground())
+        v_channel = sVoiceChatMgr.GetBattlegroundVoiceChatChannel(_player->GetBattlegroundId(), _player->GetBgTeamId());
+
+    if (!v_channel)
+        return;
+
+    v_channel->ForceMuteMember(ignoreGUID);
+}
+
+void WorldSession::HandlePartyUnsilenceOpcode(WorldPacket& recvData)
+{
+    LOG_DEBUG("network", "WORLD: Received CMSG_PARTY_UNSILENCE");
+
+    if (!sVoiceChatMgr.CanUseVoiceChat())
+        return;
+
+    ObjectGuid ignoreGUID;
+    recvData >> ignoreGUID;
+
+    if (!_player)
+        return;
+
+    Group* grp = _player->GetGroup();
+    if (!grp)
+        return;
+
+    if (!grp->IsMember(ignoreGUID))
+        return;
+
+    if (!grp->IsLeader(_player->GetGUID()) && !grp->IsMainAssistant(_player->GetGUID()))
+        return;
+
+    VoiceChatChannel* v_channel = nullptr;
+    if (!grp->isBGGroup() && !grp->isBFGroup())
+    {
+        if (grp->isRaidGroup())
+            v_channel = sVoiceChatMgr.GetRaidVoiceChatChannel(grp->GetId());
+        else
+            v_channel = sVoiceChatMgr.GetGroupVoiceChatChannel(grp->GetId());
+    }
+    else if (_player->InBattleground())
+        v_channel = sVoiceChatMgr.GetBattlegroundVoiceChatChannel(_player->GetBattlegroundId(), _player->GetBgTeamId());
+
+    if (!v_channel)
+        return;
+
+    v_channel->ForceUnmuteMember(ignoreGUID);
+}
+
+void WorldSession::HandleChannelSilenceOpcode(WorldPacket& recvData)
+{
+    LOG_DEBUG("network", "WORLD: Received CMSG_CHANNEL_SILENCE");
+
+    if (!sVoiceChatMgr.CanUseVoiceChat())
+        return;
+
+    if (!_player)
+        return;
+
+    std::string channelName, playerName;
+    recvData >> channelName >> playerName;
+
+    auto cMgr = ChannelMgr(_player->GetTeamId());
+    {
+        Channel* chan = cMgr.GetChannel(channelName, nullptr, false);
+        if (chan && chan->IsVoiceEnabled())
+        {
+            ObjectGuid plrGuid = sCharacterCache->GetCharacterGuidByName(playerName);
+            if (!plrGuid)
+                return;
+
+            if (VoiceChatChannel* v_channel = sVoiceChatMgr.GetCustomVoiceChatChannel(channelName, _player->GetTeamId()))
+            {
+                if (v_channel->IsOn(plrGuid))
+                {
+                    v_channel->ForceMuteMember(plrGuid);
+                    // chan->SetMicMute(_player, playerName.c_str(), true);
+                }
+            }
+        }
+    }
+}
+
+void WorldSession::HandleChannelUnsilenceOpcode(WorldPacket& recvData)
+{
+    LOG_DEBUG("network", "WORLD: Received CMSG_CHANNEL_UNSILENCE");
+
+    if (!sVoiceChatMgr.CanUseVoiceChat())
+        return;
+
+    if (!_player)
+        return;
+
+    std::string channelName, playerName;
+    recvData >> channelName >> playerName;
+
+    auto cMgr = ChannelMgr(_player->GetTeamId());
+    {
+        Channel* chan = cMgr.GetChannel(channelName, nullptr, false);
+        if (chan && chan->IsVoiceEnabled())
+        {
+
+            ObjectGuid plrGuid = sCharacterCache->GetCharacterGuidByName(playerName);
+            if (!plrGuid)
+                return;
+
+            if (VoiceChatChannel* v_channel = sVoiceChatMgr.GetCustomVoiceChatChannel(channelName, _player->GetTeamId()))
+            {
+                if (v_channel->IsOn(plrGuid))
+                {
+                    v_channel->ForceUnmuteMember(plrGuid);
+                    // chan->SetMicMute(_player, playerName.c_str(), false);
+                }
+            }
+        }
+    }
+}
+
+void WorldSession::SetActiveVoiceChannel(VoiceChatChannel* v_channel, VoiceChatChannel* current_channel, Player* player)
+{
+    if (v_channel)
+    {
+        if (current_channel)
+        {
+            // if same channel, just update roster
+            if (v_channel == current_channel)
+            {
+                v_channel->SendVoiceRosterUpdate();
+                return;
+            }
+            else
+                current_channel->DevoiceMember(player->GetGUID());
+        }
+
+        v_channel->AddVoiceChatMember(player->GetGUID());
+        if (v_channel->IsOn(player->GetGUID()))
+        {
+            // change speaker icon from grey to color
+            v_channel->VoiceMember(player->GetGUID());
+            // allow to speak depending on settings
+            if (player->GetSession()->IsMicEnabled())
+                v_channel->UnmuteMember(player->GetGUID());
+            else
+                v_channel->MuteMember(player->GetGUID());
+
+            player->GetSession()->SetCurrentVoiceChannelId(v_channel->GetChannelId());
+        }
+    }
 }

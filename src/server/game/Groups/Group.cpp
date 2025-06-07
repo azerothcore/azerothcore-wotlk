@@ -35,6 +35,7 @@
 #include "SharedDefines.h"
 #include "UpdateFieldFlags.h"
 #include "Util.h"
+#include "VoiceChatMgr.h"
 #include "World.h"
 #include "WorldPacket.h"
 #include "WorldSession.h"
@@ -314,6 +315,9 @@ void Group::ConvertToRaid()
     // pussywizard: client automatically clears df "eye" near minimap, so remove from raid browser
     if (sLFGMgr->GetState(GetLeaderGUID()) == lfg::LFG_STATE_RAIDBROWSER)
         sLFGMgr->LeaveLfg(GetLeaderGUID());
+
+    if (!isBGGroup() && !isBFGroup())
+        sVoiceChatMgr.ConvertToRaidChannel(GetId());
 }
 
 bool Group::AddInvite(Player* player)
@@ -333,6 +337,19 @@ bool Group::AddInvite(Player* player)
     player->SetGroupInvite(this);
 
     sScriptMgr->OnGroupInviteMember(this, player->GetGUID());
+
+    if (player->GetSession()->IsVoiceChatEnabled())
+    {
+        if (!isBGGroup() && !isBFGroup())
+        {
+            if (isRaidGroup())
+                sVoiceChatMgr.AddToRaidVoiceChatChannel(player->GetGUID(), GetId());
+            else
+                sVoiceChatMgr.AddToGroupVoiceChatChannel(player->GetGUID(), GetId());
+        }
+        else
+            sVoiceChatMgr.AddToBattlegroundVoiceChatChannel(player->GetGUID());
+    }
 
     return true;
 }
@@ -672,6 +689,14 @@ bool Group::RemoveMember(ObjectGuid guid, const RemoveMethod& method /*= GROUP_R
 
         SendUpdate();
 
+        if (!isBGGroup() && !isBFGroup())
+        {
+            sVoiceChatMgr.RemoveFromGroupVoiceChatChannel(guid, GetId());
+            sVoiceChatMgr.RemoveFromRaidVoiceChatChannel(guid, GetId());
+        }
+        else
+            sVoiceChatMgr.RemoveFromBattlegroundVoiceChatChannel(guid);
+
         if (!validLeader)
         {
             // pussywizard: temp do nothing, something causes crashes in MakeNewGroup
@@ -732,6 +757,13 @@ void Group::ChangeLeader(ObjectGuid newLeaderGuid)
         CharacterDatabase.CommitTransaction(trans);
 
         sInstanceSaveMgr->CopyBinds(m_leaderGuid, newLeaderGuid, newLeader);
+    }
+
+    VoiceChatChannel* voiceChannel = sVoiceChatMgr.GetGroupVoiceChatChannel(GetId());
+    if (voiceChannel && voiceChannel->GetType() != VOICECHAT_CHANNEL_CUSTOM)
+    {
+        voiceChannel->GetVoiceChatMember(m_leaderGuid)->SetLowPriority();
+        voiceChannel->GetVoiceChatMember(newLeaderGuid)->SetHighPriority();
     }
 
     if (Player* oldLeader = ObjectAccessor::FindConnectedPlayer(m_leaderGuid))
@@ -840,6 +872,19 @@ void Group::Disband(bool hideDestroy /* = false */)
 
     // Cleaning up instance saved data for gameobjects when a group is disbanded
     sInstanceSaveMgr->DeleteInstanceSavedData(instanceId);
+
+    if (!isBGGroup() && !isBFGroup())
+    {
+        sVoiceChatMgr.DeleteGroupVoiceChatChannel(GetId());
+        sVoiceChatMgr.DeleteRaidVoiceChatChannel(GetId());
+    }
+    else
+    {
+        if (m_bgGroup->GetBgRaid(TEAM_ALLIANCE) == this)
+            sVoiceChatMgr.DeleteBattlegroundVoiceChatChannel(m_bgGroup->GetInstanceID(), TEAM_ALLIANCE);
+        else if (m_bgGroup->GetBgRaid(TEAM_HORDE) == this)
+            sVoiceChatMgr.DeleteBattlegroundVoiceChatChannel(m_bgGroup->GetInstanceID(), TEAM_HORDE);
+    }
 
     sGroupMgr->RemoveGroup(this);
     delete this;
@@ -2359,6 +2404,14 @@ bool Group::IsAssistant(ObjectGuid guid) const
     return mslot->flags & MEMBER_FLAG_ASSISTANT;
 }
 
+bool Group::IsMainAssistant(ObjectGuid guid) const
+{
+    member_citerator mslot = _getMemberCSlot(guid);
+    if (mslot == m_memberSlots.end())
+        return false;
+    return mslot->flags & MEMBER_FLAG_MAINASSIST;
+}
+
 bool Group::SameSubGroup(ObjectGuid guid1, ObjectGuid guid2) const
 {
     member_citerator mslot2 = _getMemberCSlot(guid2);
@@ -2549,4 +2602,9 @@ void Group::DoForAllMembers(std::function<void(Player*)> const& worker)
 
         worker(member);
     }
+}
+
+uint32 Group::GetId()
+{
+    return GetGUID().GetCounter();
 }
