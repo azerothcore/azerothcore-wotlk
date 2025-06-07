@@ -742,13 +742,16 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
 
                     if (e.action.cast.castFlags & SMARTCAST_COMBAT_MOVE)
                     {
-                        // If cast flag SMARTCAST_COMBAT_MOVE is set combat movement will not be allowed unless target is outside spell range, out of mana, or LOS.
-                        if (result == SPELL_FAILED_OUT_OF_RANGE)
-                            // if we are just out of range, we only chase until we are back in spell range.
-                            CAST_AI(SmartAI, me->AI())->SetCombatMove(true, std::max(spellMaxRange - NOMINAL_MELEE_RANGE, 0.0f));
-                        else
-                            // if spell fail for any other reason, we chase to melee range, or stay where we are if spellcast was successful.
-                            CAST_AI(SmartAI, me->AI())->SetCombatMove(spellCastFailed);
+                        if (!me->isMoving()) // Don't try to reposition while we are moving
+                        {
+                            // If cast flag SMARTCAST_COMBAT_MOVE is set combat movement will not be allowed unless target is outside spell range, out of mana, or LOS.
+                            if (result == SPELL_FAILED_OUT_OF_RANGE)
+                                // if we are just out of range, we only chase until we are back in spell range.
+                                CAST_AI(SmartAI, me->AI())->SetCombatMove(true, std::max(spellMaxRange - NOMINAL_MELEE_RANGE, 0.0f));
+                            else
+                                // if spell fail for any other reason, we chase to melee range, or stay where we are if spellcast was successful.
+                                CAST_AI(SmartAI, me->AI())->SetCombatMove(spellCastFailed);
+                        }
                     }
 
                     if (spellCastFailed)
