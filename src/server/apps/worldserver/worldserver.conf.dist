@@ -179,7 +179,7 @@ Database.Reconnect.Attempts = 20
 #        Example:     "@prefix@\home\youruser\azerothcore\data"
 #        Default:     "."
 
-DataDir = "."
+DataDir = "./Data"
 
 #
 #    LogsDir
