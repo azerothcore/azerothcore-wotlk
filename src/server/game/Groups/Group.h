@@ -325,7 +325,7 @@ public:
     DataMap CustomData;
 
     // hack to get a uint32 from 64bit GUID
-    uint32 GetId();
+    uint32 GetGroupId();
 
 protected:
     void _homebindIfInstance(Player* player);

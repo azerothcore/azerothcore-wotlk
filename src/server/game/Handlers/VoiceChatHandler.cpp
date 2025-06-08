@@ -172,9 +172,9 @@ void WorldSession::HandleSetActiveVoiceChannelOpcode(WorldPacket& recvData)
             {
                 VoiceChatChannel* voiceChannel = nullptr;
                 if (group->isRaidGroup())
-                    voiceChannel = sVoiceChatMgr.GetRaidVoiceChatChannel(group->GetId());
+                    voiceChannel = sVoiceChatMgr.GetRaidVoiceChatChannel(group->GetGroupId());
                 else
-                    voiceChannel = sVoiceChatMgr.GetGroupVoiceChatChannel(group->GetId());
+                    voiceChannel = sVoiceChatMgr.GetGroupVoiceChatChannel(group->GetGroupId());
 
                 SetActiveVoiceChannel(voiceChannel, currentChannel, _player);
             }
@@ -304,9 +304,9 @@ void WorldSession::HandlePartySilenceOpcode(WorldPacket& recvData)
     if (!group->isBGGroup() && !group->isBFGroup())
     {
         if (group->isRaidGroup())
-            voiceChannel = sVoiceChatMgr.GetRaidVoiceChatChannel(group->GetId());
+            voiceChannel = sVoiceChatMgr.GetRaidVoiceChatChannel(group->GetGroupId());
         else
-            voiceChannel = sVoiceChatMgr.GetGroupVoiceChatChannel(group->GetId());
+            voiceChannel = sVoiceChatMgr.GetGroupVoiceChatChannel(group->GetGroupId());
     }
     else if (_player->InBattleground())
         voiceChannel = sVoiceChatMgr.GetBattlegroundVoiceChatChannel(_player->GetBattlegroundId(), _player->GetBgTeamId());
@@ -344,9 +344,9 @@ void WorldSession::HandlePartyUnsilenceOpcode(WorldPacket& recvData)
     if (!group->isBGGroup() && !group->isBFGroup())
     {
         if (group->isRaidGroup())
-            voiceChannel = sVoiceChatMgr.GetRaidVoiceChatChannel(group->GetId());
+            voiceChannel = sVoiceChatMgr.GetRaidVoiceChatChannel(group->GetGroupId());
         else
-            voiceChannel = sVoiceChatMgr.GetGroupVoiceChatChannel(group->GetId());
+            voiceChannel = sVoiceChatMgr.GetGroupVoiceChatChannel(group->GetGroupId());
     }
     else if (_player->InBattleground())
         voiceChannel = sVoiceChatMgr.GetBattlegroundVoiceChatChannel(_player->GetBattlegroundId(), _player->GetBgTeamId());

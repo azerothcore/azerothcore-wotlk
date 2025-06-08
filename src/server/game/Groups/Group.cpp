@@ -317,7 +317,7 @@ void Group::ConvertToRaid()
         sLFGMgr->LeaveLfg(GetLeaderGUID());
 
     if (!isBGGroup() && !isBFGroup())
-        sVoiceChatMgr.ConvertToRaidChannel(GetId());
+        sVoiceChatMgr.ConvertToRaidChannel(GetGroupId());
 }
 
 bool Group::AddInvite(Player* player)
@@ -343,9 +343,9 @@ bool Group::AddInvite(Player* player)
         if (!isBGGroup() && !isBFGroup())
         {
             if (isRaidGroup())
-                sVoiceChatMgr.AddToRaidVoiceChatChannel(player->GetGUID(), GetId());
+                sVoiceChatMgr.AddToRaidVoiceChatChannel(player->GetGUID(), GetGroupId());
             else
-                sVoiceChatMgr.AddToGroupVoiceChatChannel(player->GetGUID(), GetId());
+                sVoiceChatMgr.AddToGroupVoiceChatChannel(player->GetGUID(), GetGroupId());
         }
         else
             sVoiceChatMgr.AddToBattlegroundVoiceChatChannel(player->GetGUID());
@@ -691,8 +691,8 @@ bool Group::RemoveMember(ObjectGuid guid, const RemoveMethod& method /*= GROUP_R
 
         if (!isBGGroup() && !isBFGroup())
         {
-            sVoiceChatMgr.RemoveFromGroupVoiceChatChannel(guid, GetId());
-            sVoiceChatMgr.RemoveFromRaidVoiceChatChannel(guid, GetId());
+            sVoiceChatMgr.RemoveFromGroupVoiceChatChannel(guid, GetGroupId());
+            sVoiceChatMgr.RemoveFromRaidVoiceChatChannel(guid, GetGroupId());
         }
         else
             sVoiceChatMgr.RemoveFromBattlegroundVoiceChatChannel(guid);
@@ -759,7 +759,7 @@ void Group::ChangeLeader(ObjectGuid newLeaderGuid)
         sInstanceSaveMgr->CopyBinds(m_leaderGuid, newLeaderGuid, newLeader);
     }
 
-    VoiceChatChannel* voiceChannel = sVoiceChatMgr.GetGroupVoiceChatChannel(GetId());
+    VoiceChatChannel* voiceChannel = sVoiceChatMgr.GetGroupVoiceChatChannel(GetGroupId());
     if (voiceChannel && voiceChannel->GetType() != VOICECHAT_CHANNEL_CUSTOM)
     {
         voiceChannel->GetVoiceChatMember(m_leaderGuid)->SetLowPriority();
@@ -875,8 +875,8 @@ void Group::Disband(bool hideDestroy /* = false */)
 
     if (!isBGGroup() && !isBFGroup())
     {
-        sVoiceChatMgr.DeleteGroupVoiceChatChannel(GetId());
-        sVoiceChatMgr.DeleteRaidVoiceChatChannel(GetId());
+        sVoiceChatMgr.DeleteGroupVoiceChatChannel(GetGroupId());
+        sVoiceChatMgr.DeleteRaidVoiceChatChannel(GetGroupId());
     }
     else
     {
@@ -2604,7 +2604,7 @@ void Group::DoForAllMembers(std::function<void(Player*)> const& worker)
     }
 }
 
-uint32 Group::GetId()
+uint32 Group::GetGroupId()
 {
     return GetGUID().GetCounter();
 }

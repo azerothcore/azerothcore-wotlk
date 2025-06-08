@@ -370,7 +370,7 @@ void VoiceChatMgr::HandleVoiceChatServerPacket(VoiceChatServerPacket& pck)
                             if (group)
                             {
                                 auto* voiceChannel = new VoiceChatChannel(
-                                    VoiceChatChannelTypes(request->Type), channelId, group->GetId());
+                                    VoiceChatChannelTypes(request->Type), channelId, group->GetGroupId());
                                 _voiceChatChannels.insert(std::make_pair((uint32)channelId, voiceChannel));
                                 voiceChannel->AddMembersAfterCreate();
                             }
@@ -801,9 +801,9 @@ void VoiceChatMgr::RestoreVoiceChatChannels()
                         if (!grp->isBGGroup() && !grp->isBFGroup())
                         {
                             if (grp->isRaidGroup())
-                                sVoiceChatMgr.AddToRaidVoiceChatChannel(player->GetGUID(), grp->GetId());
+                                sVoiceChatMgr.AddToRaidVoiceChatChannel(player->GetGUID(), grp->GetGroupId());
                             else
-                                sVoiceChatMgr.AddToGroupVoiceChatChannel(player->GetGUID(), grp->GetId());
+                                sVoiceChatMgr.AddToGroupVoiceChatChannel(player->GetGUID(), grp->GetGroupId());
                         }
                         else
                             sVoiceChatMgr.AddToBattlegroundVoiceChatChannel(player->GetGUID());
@@ -813,9 +813,9 @@ void VoiceChatMgr::RestoreVoiceChatChannels()
                         if (!grp->isBGGroup() && !grp->isBFGroup())
                         {
                             if (grp->isRaidGroup())
-                                sVoiceChatMgr.AddToRaidVoiceChatChannel(player->GetGUID(), grp->GetId());
+                                sVoiceChatMgr.AddToRaidVoiceChatChannel(player->GetGUID(), grp->GetGroupId());
                             else
-                                sVoiceChatMgr.AddToGroupVoiceChatChannel(player->GetGUID(), grp->GetId());
+                                sVoiceChatMgr.AddToGroupVoiceChatChannel(player->GetGUID(), grp->GetGroupId());
                         }
                         else
                             sVoiceChatMgr.AddToBattlegroundVoiceChatChannel(player->GetGUID());
@@ -1056,9 +1056,9 @@ void VoiceChatMgr::JoinAvailableVoiceChatChannels(WorldSession* session)
             if (!group->isBGGroup() && !group->isBFGroup())
             {
                 if (group->isRaidGroup())
-                    AddToRaidVoiceChatChannel(player->GetGUID(), group->GetId());
+                    AddToRaidVoiceChatChannel(player->GetGUID(), group->GetGroupId());
                 else
-                    AddToGroupVoiceChatChannel(player->GetGUID(), group->GetId());
+                    AddToGroupVoiceChatChannel(player->GetGUID(), group->GetGroupId());
             }
             else
                 AddToBattlegroundVoiceChatChannel(player->GetGUID());
@@ -1066,9 +1066,9 @@ void VoiceChatMgr::JoinAvailableVoiceChatChannels(WorldSession* session)
         if (Group* group = player->GetOriginalGroup())
         {
             if (group->isRaidGroup())
-                AddToRaidVoiceChatChannel(player->GetGUID(), group->GetId());
+                AddToRaidVoiceChatChannel(player->GetGUID(), group->GetGroupId());
             else
-                AddToGroupVoiceChatChannel(player->GetGUID(), group->GetId());
+                AddToGroupVoiceChatChannel(player->GetGUID(), group->GetGroupId());
         }
 
         std::vector<VoiceChatChannel*> channel_list = GetPossibleVoiceChatChannels(player->GetGUID());
@@ -1092,12 +1092,12 @@ void VoiceChatMgr::SendAvailableVoiceChatChannels(WorldSession* session)
             {
                 if (group->isRaidGroup())
                 {
-                    if (VoiceChatChannel* voiceChannel = GetRaidVoiceChatChannel(group->GetId()))
+                    if (VoiceChatChannel* voiceChannel = GetRaidVoiceChatChannel(group->GetGroupId()))
                         voiceChannel->SendAvailableVoiceChatChannel(session);
                 }
                 else
                 {
-                    if (VoiceChatChannel* voiceChannel = GetGroupVoiceChatChannel(group->GetId()))
+                    if (VoiceChatChannel* voiceChannel = GetGroupVoiceChatChannel(group->GetGroupId()))
                         voiceChannel->SendAvailableVoiceChatChannel(session);
                 }
             }
@@ -1108,12 +1108,12 @@ void VoiceChatMgr::SendAvailableVoiceChatChannels(WorldSession* session)
         {
             if (group->isRaidGroup())
             {
-                if (VoiceChatChannel* voiceChannel = GetRaidVoiceChatChannel(group->GetId()))
+                if (VoiceChatChannel* voiceChannel = GetRaidVoiceChatChannel(group->GetGroupId()))
                     voiceChannel->SendAvailableVoiceChatChannel(session);
             }
             else
             {
-                if (VoiceChatChannel* voiceChannel = GetGroupVoiceChatChannel(group->GetId()))
+                if (VoiceChatChannel* voiceChannel = GetGroupVoiceChatChannel(group->GetGroupId()))
                     voiceChannel->SendAvailableVoiceChatChannel(session);
             }
         }
