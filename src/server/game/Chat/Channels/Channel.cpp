@@ -783,7 +783,7 @@ void Channel::ToggleVoice(Player* player)
         sVoiceChatMgr.AddToCustomVoiceChatChannel(guid, this->GetName(), player->GetTeamId());
 }
 
-void Channel::List(Player const* player)
+void Channel::List(Player const* player, bool display)
 {
     ObjectGuid guid = player->GetGUID();
 
@@ -797,22 +797,21 @@ void Channel::List(Player const* player)
 
     LOG_DEBUG("chat.system", "SMSG_CHANNEL_LIST {} Channel: {}", player->GetSession()->GetPlayerInfo(), GetName());
     WorldPacket data(SMSG_CHANNEL_LIST, 1 + (GetName().size() + 1) + 1 + 4 + playersStore.size() * (8 + 1));
-    data << uint8(1);                                   // channel type?
+    data << uint8(display);                             // 0 = chat query, 1 = display list query
     data << GetName();                                  // channel name
     data << uint8(GetFlags());                          // channel flags?
 
     std::size_t pos = data.wpos();
     data << uint32(0);                                  // size of list, placeholder
 
-    uint32 count  = 0;
-    if (!(_channelRights.flags & CHANNEL_RIGHT_CANT_SPEAK))
-        for (PlayerContainer::const_iterator i = playersStore.begin(); i != playersStore.end(); ++i)
-            if (AccountMgr::IsPlayerAccount(i->second.plrPtr->GetSession()->GetSecurity()))
-            {
-                data << i->first;
-                data << uint8(i->second.flags); // flags seems to be changed...
-                ++count;
-            }
+    uint32 count = 0;
+    for (PlayerContainer::const_iterator i = playersStore.begin(); i != playersStore.end(); ++i)
+        if (AccountMgr::IsPlayerAccount(i->second.plrPtr->GetSession()->GetSecurity()))
+        {
+            data << i->first;
+            data << uint8(i->second.flags); // flags seems to be changed...
+            ++count;
+        }
 
     data.put<uint32>(pos, count);
 

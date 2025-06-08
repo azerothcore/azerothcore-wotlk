@@ -229,7 +229,7 @@ public:
     void UnsetMute(Player const* player, std::string const& newname) { SetMode(player, newname, false, false); }
     // inline void SetMicMute(Player* player, const char* targetName, bool set) { SetModeFlags(player, targetName, MEMBER_FLAG_MIC_MUTED, set); }
     // inline void SetVoiced(Player* player, const char* targetName, bool set) { SetModeFlags(player, targetName, MEMBER_FLAG_VOICED, set); } // Not used
-    void List(Player const* player);
+    void List(Player const* player, bool display = false);
     void Announce(Player const* player);
     void Say(ObjectGuid guid, std::string const& what, uint32 lang);
     void Invite(Player const* player, std::string const& newp);
