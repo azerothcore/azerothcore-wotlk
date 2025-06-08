@@ -64,7 +64,7 @@ public:
     void Update();
     void SocketDisconnected();
     bool RequestNewSocket(VoiceChatSocket* socket);
-    void QueuePacket(std::unique_ptr<VoiceChatServerPacket> new_packet);
+    void QueuePacket(std::unique_ptr<VoiceChatServerPacket> newPacket);
 
     void ActivateVoiceSocketThread();
     void VoiceSocketThread();
@@ -101,9 +101,9 @@ public:
 
     void ConvertToRaidChannel(uint32 groupId);
 
-    VoiceChatChannel* GetVoiceChatChannel(uint16 channel_id);
-    VoiceChatChannel* GetGroupVoiceChatChannel(uint32 group_id);
-    VoiceChatChannel* GetRaidVoiceChatChannel(uint32 group_id);
+    VoiceChatChannel* GetVoiceChatChannel(uint16 channelId);
+    VoiceChatChannel* GetGroupVoiceChatChannel(uint32 groupId);
+    VoiceChatChannel* GetRaidVoiceChatChannel(uint32 groupId);
     VoiceChatChannel* GetBattlegroundVoiceChatChannel(uint32 instanceId, TeamId team);
     VoiceChatChannel* GetCustomVoiceChatChannel(const std::string& name, TeamId team);
     std::vector<VoiceChatChannel*> GetPossibleVoiceChatChannels(ObjectGuid guid);
@@ -128,12 +128,12 @@ public:
     void RemoveFromCustomVoiceChatChannel(ObjectGuid guid, const std::string& name, TeamId team);
 
     // change user state on voice server
-    void EnableChannelSlot(uint16 channel_id, uint8 slot_id);
-    void DisableChannelSlot(uint16 channel_id, uint8 slot_id);
-    void VoiceChannelSlot(uint16 channel_id, uint8 slot_id);
-    void DevoiceChannelSlot(uint16 channel_id, uint8 slot_id);
-    void MuteChannelSlot(uint16 channel_id, uint8 slot_id);
-    void UnmuteChannelSlot(uint16 channel_id, uint8 slot_id);
+    void EnableChannelSlot(uint16 channelId, uint8 slotId);
+    void DisableChannelSlot(uint16 channelId, uint8 slotId);
+    void VoiceChannelSlot(uint16 channelId, uint8 slotId);
+    void DevoiceChannelSlot(uint16 channelId, uint8 slotId);
+    void MuteChannelSlot(uint16 channelId, uint8 slotId);
+    void UnmuteChannelSlot(uint16 channelId, uint8 slotId);
 
     void JoinAvailableVoiceChatChannels(WorldSession* session);
     void SendAvailableVoiceChatChannels(WorldSession* session); // Not used currently
@@ -158,7 +158,7 @@ private:
     static void SendVoiceChatServiceConnectFail() { SendVoiceChatServiceMessage(SMSG_COMSAT_CONNECT_FAIL); }
     static void SendVoiceChatServiceReconnected() { SendVoiceChatServiceMessage(SMSG_COMSAT_RECONNECT_TRY); }
 
-    void HandleVoiceChatServerPacket(VoiceChatServerPacket& pck);
+    void HandleVoiceChatServerPacket(VoiceChatServerPacket& packet);
     void ProcessByteBufferException(VoiceChatServerPacket const& packet);
 
     // socket to voice server

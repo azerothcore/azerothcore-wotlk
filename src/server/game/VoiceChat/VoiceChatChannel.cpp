@@ -135,21 +135,21 @@ void VoiceChatChannel::SendVoiceRosterUpdate(bool empty, bool toAll, ObjectGuid 
     data << uint32(htonl(sVoiceChatMgr.GetVoiceServerVoiceAddress()));
     data << uint16(sVoiceChatMgr.GetVoiceServerVoicePort());
 
-    size_t count_pos = data.wpos();
+    size_t countPos = data.wpos();
     uint8 count = empty ? 1 : _members.size();
     data << uint8(count);
 
     // send each member a list of that member plus others
     size_t pos = data.wpos();
-    for (auto const& m_member : _members)
+    for (auto const& member : _members)
     {
         // clean up if disconnected
-        Player* plr = ObjectAccessor::FindPlayer(m_member.second.Guid);
-        if (!plr || !ObjectAccessor::FindConnectedPlayer(m_member.second.Guid))
+        Player* player = ObjectAccessor::FindPlayer(member.second.Guid);
+        if (!player || !ObjectAccessor::FindConnectedPlayer(member.second.Guid))
         {
             _isDeleting = true;
 
-            RemoveVoiceChatMember(m_member.second.Guid);
+            RemoveVoiceChatMember(member.second.Guid);
             if (!empty && count)
                 count--;
 
@@ -157,18 +157,18 @@ void VoiceChatChannel::SendVoiceRosterUpdate(bool empty, bool toAll, ObjectGuid 
             continue;
         }
 
-        data << m_member.second.Guid;
-        data << m_member.second.UserId;
-        data << m_member.second.Flags;
+        data << member.second.Guid;
+        data << member.second.UserId;
+        data << member.second.Flags;
 
         for (auto const& j : _members)
         {
-            if (j.first == m_member.first)
+            if (j.first == member.first)
                 continue;
 
             // clean up if disconnected
-            Player* other_plr = ObjectAccessor::FindPlayer(j.second.Guid);
-            if (!other_plr || !ObjectAccessor::FindConnectedPlayer(j.second.Guid))
+            Player* otherPlayer = ObjectAccessor::FindPlayer(j.second.Guid);
+            if (!otherPlayer || !ObjectAccessor::FindConnectedPlayer(j.second.Guid))
             {
                 _isDeleting = true;
 
@@ -187,11 +187,11 @@ void VoiceChatChannel::SendVoiceRosterUpdate(bool empty, bool toAll, ObjectGuid 
         }
 
         if (!empty)
-            data.put<uint8>(count_pos, count);
+            data.put<uint8>(countPos, count);
 
         // do not send to not active users by default, don't know if it's okay
-        if ((!toPlayer && m_member.second.IsVoiced()) || toAll || plr->GetGUID() == toPlayer)
-            plr->GetSession()->SendPacket(&data);
+        if ((!toPlayer && member.second.IsVoiced()) || toAll || player->GetGUID() == toPlayer)
+            player->GetSession()->SendPacket(&data);
 
         data.wpos(pos);
     }

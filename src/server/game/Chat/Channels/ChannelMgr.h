@@ -38,7 +38,7 @@ public:
 
     static ChannelMgr* forTeam(TeamId teamId);
 
-    Channel* GetJoinChannel(std::string const& name, uint32 channel_id);
+    Channel* GetJoinChannel(std::string const& name, uint32 channelId);
     Channel* GetChannel(std::string const& name, Player* p, bool pkt = true);
     static void LoadChannels();
 

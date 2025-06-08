@@ -558,7 +558,7 @@ public:
     void HandleChannelVoiceOffOpcode(WorldPacket& recvData);
     void HandleVoiceSessionEnableOpcode(WorldPacket& recvData);
     void HandleSetActiveVoiceChannelOpcode(WorldPacket& recvData);
-    void SetActiveVoiceChannel(VoiceChatChannel* v_channel, VoiceChatChannel* current_channel, Player* player);
+    void SetActiveVoiceChannel(VoiceChatChannel* voiceChannel, VoiceChatChannel* currentChannel, Player* player);
 
     // Packets cooldown
     time_t GetCalendarEventCreationCooldown() const { return _calendarEventCreationCooldown; }
