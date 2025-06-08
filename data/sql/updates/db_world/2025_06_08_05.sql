@@ -1,3 +1,4 @@
+-- DB update 2025_06_08_04 -> 2025_06_08_05
 --
 -- Alliance, Horde Captains and Shattered Hand Executioner NPCs
 UPDATE `creature_template` SET `AIName` = 'SmartAI' WHERE `entry` = 17290;

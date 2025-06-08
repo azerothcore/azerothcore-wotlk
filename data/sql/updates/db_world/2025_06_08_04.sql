@@ -1,3 +1,4 @@
+-- DB update 2025_06_08_03 -> 2025_06_08_04
 -- Blackrock Mountain - Searing Gorge Instance?
 UPDATE `areatrigger_teleport` SET `Name` = "Blackrock Depths Entrance", `target_position_x` = 456.929, `target_position_y` = 34.0923, `target_position_z` = -68.0896, `target_orientation` = 4.712389 WHERE `ID` = 1466;
 
