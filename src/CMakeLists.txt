@@ -40,30 +40,25 @@ endif()
 
 # Voice Chat server and handlers
 if(BUILD_VOICECHAT)
-  include(FetchContent)
+  set(LOCAL_VOICECHAT_DIR "${CMAKE_SOURCE_DIR}/voicechat-server")
 
-  FetchContent_Declare(
-    voicechat-server
-    GIT_REPOSITORY "https://github.com/azerothcore/voicechat-server.git"
-  GIT_TAG "main"
-  )
+  if(EXISTS "${LOCAL_VOICECHAT_DIR}/CMakeLists.txt")
+    message(STATUS "Using local voicechat-server directory: ${LOCAL_VOICECHAT_DIR}")
+    add_subdirectory(${LOCAL_VOICECHAT_DIR} ${CMAKE_BINARY_DIR}/voicechat-server-build)
+  else()
+    include(FetchContent)
 
-  if(NOT voicechat-server_POPULATED)
-  message(STATUS "Fetching VoiceChat server...")
+    FetchContent_Declare(
+      voicechat-server
+      GIT_REPOSITORY "https://github.com/azerothcore/voicechat-server.git"
+      GIT_TAG "main"
+    )
 
-    FetchContent_Populate(voicechat-server)
-
-  if(EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/voicechat-server)
-      file(REMOVE_RECURSE ${CMAKE_CURRENT_SOURCE_DIR}/voicechat-server)
+    message(STATUS "Fetching VoiceChat server...")
+    FetchContent_MakeAvailable(voicechat-server)
   endif()
-
-  file(COPY ${voicechat-server_SOURCE_DIR}/. DESTINATION ${CMAKE_CURRENT_SOURCE_DIR}/voicechat-server)
-    message(STATUS "VoiceChat Server fetched and populated in ${CMAKE_CURRENT_SOURCE_DIR}/voicechat-server")
-  endif()
-
-  add_subdirectory(voicechat-server)
 else()
-  if(EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/voicechat-server)
-    file(REMOVE_RECURSE ${CMAKE_CURRENT_SOURCE_DIR}/voicechat-server)
+  if(EXISTS ${CMAKE_SOURCE_DIR}/voicechat-server AND NOT IS_DIRECTORY ${CMAKE_SOURCE_DIR}/voicechat-server/.git)
+    file(REMOVE_RECURSE ${CMAKE_SOURCE_DIR}/voicechat-server)
   endif()
 endif()
