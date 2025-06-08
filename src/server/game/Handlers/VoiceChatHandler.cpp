@@ -230,8 +230,8 @@ void WorldSession::HandleAddVoiceIgnoreOpcode(WorldPacket& recvData)
 
     CharacterDatabase.EscapeString(ignoreName);
 
-    ObjectGuid ignoreGUID = sCharacterCache->GetCharacterGuidByName(ignoreName);
-    if (!ignoreGUID)
+    ObjectGuid ignoreGuid = sCharacterCache->GetCharacterGuidByName(ignoreName);
+    if (!ignoreGuid)
         return;
 
     LOG_INFO("network", "WORLD: {} asked to Ignore: '{}'",
@@ -241,20 +241,20 @@ void WorldSession::HandleAddVoiceIgnoreOpcode(WorldPacket& recvData)
     // _queryProcessor.AddCallback(CharacterDatabase.AsyncQuery(stmt).WithPreparedCallback(std::bind(&WorldSession::HandleAddMutedOpcodeCallBack, this, std::placeholders::_1)));
 
     FriendsResult ignoreResult = FRIEND_MUTE_NOT_FOUND;
-    if (ignoreGUID == _player->GetGUID())
+    if (ignoreGuid == _player->GetGUID())
         ignoreResult = FRIEND_MUTE_SELF;
-    else if (_player->GetSocial()->HasMute(ignoreGUID))
+    else if (_player->GetSocial()->HasMute(ignoreGuid))
         ignoreResult = FRIEND_MUTE_ALREADY;
     else
     {
         ignoreResult = FRIEND_MUTE_ADDED;
 
         // mute list full
-        if (!_player->GetSocial()->AddToSocialList(ignoreGUID, SOCIAL_FLAG_MUTED))
+        if (!_player->GetSocial()->AddToSocialList(ignoreGuid, SOCIAL_FLAG_MUTED))
             ignoreResult = FRIEND_MUTE_FULL;
     }
 
-    sSocialMgr->SendFriendStatus(_player, ignoreResult, ignoreGUID, false);
+    sSocialMgr->SendFriendStatus(_player, ignoreResult, ignoreGuid, false);
 
     LOG_DEBUG("network", "WORLD: Sent SMSG_FRIEND_STATUS");
 }
@@ -266,13 +266,13 @@ void WorldSession::HandleDelVoiceIgnoreOpcode(WorldPacket& recvData)
     if (!_player)
         return;
 
-    ObjectGuid ignoreGUID;
+    ObjectGuid ignoreGuid;
 
-    recvData >> ignoreGUID;
+    recvData >> ignoreGuid;
 
-    _player->GetSocial()->RemoveFromSocialList(ignoreGUID, SOCIAL_FLAG_MUTED);
+    _player->GetSocial()->RemoveFromSocialList(ignoreGuid, SOCIAL_FLAG_MUTED);
 
-    sSocialMgr->SendFriendStatus(_player, FRIEND_MUTE_REMOVED, ignoreGUID, false);
+    sSocialMgr->SendFriendStatus(_player, FRIEND_MUTE_REMOVED, ignoreGuid, false);
 
     LOG_DEBUG("network", "WORLD: Sent SMSG_FRIEND_STATUS");
 }
