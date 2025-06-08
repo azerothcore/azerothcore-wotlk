@@ -1,3 +1,4 @@
+-- DB update 2025_06_08_02 -> 2025_06_08_03
 -- Remove tokens from original ref table
 DELETE FROM `reference_loot_template` WHERE (`Entry` = 34068) AND (`Item` IN (31095, 31096, 31097));
 
