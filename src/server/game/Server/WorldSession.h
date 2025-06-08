@@ -547,7 +547,6 @@ public:
     uint16 GetCurrentVoiceChannelId() const { return _currentVoiceChannel; }
     void SetCurrentVoiceChannelId(uint32 id) { _currentVoiceChannel = id; }
     static void HandleAddMutedOpcodeCallBack(QueryResult* result, uint32);
-    // Voice Chat
     void HandleAddVoiceIgnoreOpcode(WorldPacket& recvData);
     void HandleDelVoiceIgnoreOpcode(WorldPacket& recvData);
     void HandleChannelSilenceOpcode(WorldPacket& recvData);
