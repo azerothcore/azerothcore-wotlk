@@ -292,15 +292,6 @@ void SpellMgr::LoadSpellInfoCorrections()
         spellInfo->MaxAffectedTargets = 4;
     });
 
-    ApplySpellFix({
-        20424,  // Seal of Command
-        42463,  // Seal of Vengeance
-        53739   // Seal of Corruption
-        }, [](SpellInfo* spellInfo)
-    {
-        spellInfo->AttributesEx3 |= SPELL_ATTR3_IGNORE_CASTER_MODIFIERS;
-    });
-
     // Spitfire Totem
     ApplySpellFix({ 38296 }, [](SpellInfo* spellInfo)
     {
@@ -3642,7 +3633,7 @@ void SpellMgr::LoadSpellInfoCorrections()
     // That's Abominable
     ApplySpellFix({ 59565 }, [](SpellInfo* spellInfo)
     {
-        spellInfo->Effects[EFFECT_0].MiscValueB = 1721; // controlable guardian
+        spellInfo->Effects[EFFECT_0].MiscValueB = 1721; // controllable guardian
     });
 
     // Investigate the Blue Recluse (1920)
@@ -5167,6 +5158,13 @@ void SpellMgr::LoadSpellInfoCorrections()
         spellInfo->AttributesEx6 |= SPELL_ATTR6_ALLOW_WHILE_RIDING_VEHICLE;
     });
 
+        // Eye of Acherus Flight (Boost)
+    ApplySpellFix({ 51923 }, [](SpellInfo* spellInfo)
+        {
+            spellInfo->Effects[EFFECT_0].ApplyAuraName = SPELL_AURA_MOD_INCREASE_FLIGHT_SPEED;
+            spellInfo->Effects[EFFECT_0].TargetA = SpellImplicitTargetInfo(TARGET_UNIT_CASTER);
+        });
+
     // Shattering Throw
     ApplySpellFix({ 64382 }, [](SpellInfo* spellInfo)
     {
@@ -5178,8 +5176,6 @@ void SpellMgr::LoadSpellInfoCorrections()
         43444, // Explosive Trap (Hex Lord Malacrass)
         43447, // Freezing Trap (Hex Lord Malacrass)
         43449, // Snake Trap (Hex Lord Malacrass)
-        45236, // Blaze
-        50745  // Blaze
         }, [](SpellInfo* spellInfo)
     {
         spellInfo->Effects[EFFECT_0].Effect = SPELL_EFFECT_SUMMON_OBJECT_SLOT1;
@@ -5195,6 +5191,12 @@ void SpellMgr::LoadSpellInfoCorrections()
     ApplySpellFix({ 34367 }, [](SpellInfo* spellInfo)
     {
         spellInfo->ChannelInterruptFlags &= ~AURA_INTERRUPT_FLAG_TURNING;
+    });
+
+    // The Green Tower
+    ApplySpellFix({ 18097 }, [](SpellInfo* spellInfo)
+    {
+        spellInfo->DurationEntry = sSpellDurationStore.LookupEntry(21); // -1
     });
 
     for (uint32 i = 0; i < GetSpellInfoStoreSize(); ++i)

@@ -441,7 +441,7 @@ void Unit::Update(uint32 p_time)
         SendThreatListUpdate();
 
     // update combat timer only for players and pets (only pets with PetAI)
-    if (IsInCombat() && (IsPlayer() || ((IsPet() || HasUnitTypeMask(UNIT_MASK_CONTROLABLE_GUARDIAN)) && IsControlledByPlayer())))
+    if (IsInCombat() && (IsPlayer() || ((IsPet() || HasUnitTypeMask(UNIT_MASK_CONTROLLABLE_GUARDIAN)) && IsControlledByPlayer())))
     {
         // Check UNIT_STATE_MELEE_ATTACKING or UNIT_STATE_CHASE (without UNIT_STATE_FOLLOW in this case) so pets can reach far away
         // targets without stopping half way there and running off.
@@ -11449,7 +11449,7 @@ void Unit::SetMinion(Minion* minion, bool apply)
             }
         }
 
-        if (minion->HasUnitTypeMask(UNIT_MASK_CONTROLABLE_GUARDIAN))
+        if (minion->HasUnitTypeMask(UNIT_MASK_CONTROLLABLE_GUARDIAN))
         {
             AddGuidValue(UNIT_FIELD_SUMMON, minion->GetGUID());
         }
@@ -11544,7 +11544,7 @@ void Unit::SetMinion(Minion* minion, bool apply)
                     }
                     ASSERT((*itr)->IsCreature());
 
-                    if (!(*itr)->HasUnitTypeMask(UNIT_MASK_CONTROLABLE_GUARDIAN))
+                    if (!(*itr)->HasUnitTypeMask(UNIT_MASK_CONTROLLABLE_GUARDIAN))
                         continue;
 
                     if (AddGuidValue(UNIT_FIELD_SUMMON, (*itr)->GetGUID()))
@@ -12389,12 +12389,12 @@ uint32 Unit::SpellDamageBonusDone(Unit* victim, SpellInfo const* spellProto, uin
     int32 DoneTotal = 0;
     float DoneTotalMod = TotalMod ? TotalMod : SpellPctDamageModsDone(victim, spellProto, damagetype);
 
+    // Config : RATE_CREATURE_X_SPELLDAMAGE & Do Not Modify Pet/Guardian/Mind Controlled Damage
     //npcbot: do not affect bots
     if (IsNPCBotOrPet())
     { /*do nothing*/ }
     else
     //end npcbot
-    // Config : RATE_CREATURE_X_SPELLDAMAGE & Do Not Modify Pet/Guardian/Mind Controled Damage
     if (IsCreature() && (!ToCreature()->IsPet() || !ToCreature()->IsGuardian() || !ToCreature()->IsControlledByPlayer()))
         DoneTotalMod *= ToCreature()->GetSpellDamageMod(ToCreature()->GetCreatureTemplate()->rank);
 
@@ -15668,7 +15668,7 @@ bool Unit::CanHaveThreatList(bool skipAliveCheck) const
         return false;
 
     // summons can not have a threat list, unless they are controlled by a creature
-    if (HasUnitTypeMask(UNIT_MASK_MINION | UNIT_MASK_GUARDIAN | UNIT_MASK_CONTROLABLE_GUARDIAN) && ((Pet*)this)->GetOwnerGUID().IsPlayer())
+    if (HasUnitTypeMask(UNIT_MASK_MINION | UNIT_MASK_GUARDIAN | UNIT_MASK_CONTROLLABLE_GUARDIAN) && ((Pet*)this)->GetOwnerGUID().IsPlayer())
         return false;
 
     //npcbots: npcbots and their pets cannot have threatlist
@@ -15829,7 +15829,7 @@ Unit* Creature::SelectVictim()
     // it in combat but attacker not make any damage and not enter to aggro radius to have record in threat list
     // Note: creature does not have targeted movement generator but has attacker in this case
     for (AttackerSet::const_iterator itr = m_attackers.begin(); itr != m_attackers.end(); ++itr)
-        if ((*itr) && CanCreatureAttack(*itr) && !(*itr)->IsPlayer() && !(*itr)->ToCreature()->HasUnitTypeMask(UNIT_MASK_CONTROLABLE_GUARDIAN))
+        if ((*itr) && CanCreatureAttack(*itr) && !(*itr)->IsPlayer() && !(*itr)->ToCreature()->HasUnitTypeMask(UNIT_MASK_CONTROLLABLE_GUARDIAN))
             return nullptr;
 
     if (GetVehicle())
@@ -21486,11 +21486,11 @@ void Unit::StopAttackingInvalidTarget()
                 attacker->ToPlayer()->SendAttackSwingCancelAttack();
             }
 
-            for (Unit* controled : attacker->m_Controlled)
+            for (Unit* controlled : attacker->m_Controlled)
             {
-                if (controled->GetVictim() == this && !controled->IsValidAttackTarget(this))
+                if (controlled->GetVictim() == this && !controlled->IsValidAttackTarget(this))
                 {
-                    controled->AttackStop();
+                    controlled->AttackStop();
                 }
             }
 
