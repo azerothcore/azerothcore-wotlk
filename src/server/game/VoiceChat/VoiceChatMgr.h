@@ -58,7 +58,6 @@ public:
     {
     }
 
-    // VoiceChatMgr();
     void Init(Acore::Asio::IoContext& ioContext);
     void LoadConfigs();
     void Update();

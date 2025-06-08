@@ -44,7 +44,7 @@ namespace
     {
         sVoiceChatMgr.VoiceSocketThread();
     }
-} // namespace
+}
 
 void VoiceChatMgr::ActivateVoiceSocketThread()
 {
@@ -508,7 +508,6 @@ void VoiceChatMgr::ProcessByteBufferException(VoiceChatServerPacket const& packe
     _eventEmitter += [](VoiceChatMgr* mgr) { mgr->SocketDisconnected(); };
 }
 
-//
 // void VoiceChatMgr::VoiceSocketThread()
 // {
 //     _voiceService.stop();
@@ -520,7 +519,7 @@ void VoiceChatMgr::ProcessByteBufferException(VoiceChatServerPacket const& packe
 //     int32(sVoiceChatMgr.GetVoiceServerConnectPort()), false);
 //     _voiceService.run();
 // }
-//
+
 // enabled and connected to voice server
 bool VoiceChatMgr::CanUseVoiceChat()
 {
@@ -570,7 +569,6 @@ void VoiceChatMgr::CreateVoiceChatChannel(
     _socket->SendPacket(data);
 }
 
-//
 void VoiceChatMgr::DeleteVoiceChatChannel(VoiceChatChannel* channel)
 {
     if (!channel)
@@ -607,8 +605,7 @@ void VoiceChatMgr::DeleteVoiceChatChannel(VoiceChatChannel* channel)
 }
 
 // check if channel request has already been created
-bool VoiceChatMgr::IsVoiceChatChannelBeingCreated(
-    VoiceChatChannelTypes type, uint32 groupId, std::string const& name, TeamId team)
+bool VoiceChatMgr::IsVoiceChatChannelBeingCreated(VoiceChatChannelTypes type, uint32 groupId, std::string const& name, TeamId team)
 {
     return std::ranges::any_of(_requests,
         [&](auto const& req)
@@ -657,7 +654,6 @@ void VoiceChatMgr::CreateCustomVoiceChatChannel(std::string const& name, TeamId 
     CreateVoiceChatChannel(VOICECHAT_CHANNEL_CUSTOM, 0, name, team);
 }
 
-//
 void VoiceChatMgr::DeleteGroupVoiceChatChannel(uint32 groupId)
 {
     if (!groupId)
@@ -709,26 +705,24 @@ VoiceChatChannel* VoiceChatMgr::GetVoiceChatChannel(uint16 channelId)
     return itr->second;
 }
 
-//
-VoiceChatChannel* VoiceChatMgr::GetGroupVoiceChatChannel(uint32 group_id)
+VoiceChatChannel* VoiceChatMgr::GetGroupVoiceChatChannel(uint32 groupId)
 {
     for (auto& channel : _voiceChatChannels)
     {
         VoiceChatChannel* chn = channel.second;
-        if (chn->GetType() == VOICECHAT_CHANNEL_GROUP && chn->GetGroupId() == group_id)
+        if (chn->GetType() == VOICECHAT_CHANNEL_GROUP && chn->GetGroupId() == groupId)
             return chn;
     }
 
     return nullptr;
 }
 
-//
-VoiceChatChannel* VoiceChatMgr::GetRaidVoiceChatChannel(uint32 group_id)
+VoiceChatChannel* VoiceChatMgr::GetRaidVoiceChatChannel(uint32 groupId)
 {
     for (auto& channel : _voiceChatChannels)
     {
         VoiceChatChannel* chn = channel.second;
-        if (chn->GetType() == VOICECHAT_CHANNEL_RAID && chn->GetGroupId() == group_id)
+        if (chn->GetType() == VOICECHAT_CHANNEL_RAID && chn->GetGroupId() == groupId)
             return chn;
     }
 
@@ -913,7 +907,6 @@ void VoiceChatMgr::AddToCustomVoiceChatChannel(ObjectGuid guid, std::string cons
     voiceChannel->AddVoiceChatMember(guid);
 }
 
-//
 void VoiceChatMgr::RemoveFromGroupVoiceChatChannel(ObjectGuid guid, uint32 groupId)
 {
     if (!groupId)
@@ -970,7 +963,6 @@ void VoiceChatMgr::EnableChannelSlot(uint16 channelId, uint8 slotId)
     _socket->SendPacket(data);
 }
 
-//
 void VoiceChatMgr::DisableChannelSlot(uint16 channelId, uint8 slotId)
 {
     if (!_socket)
@@ -987,7 +979,6 @@ void VoiceChatMgr::DisableChannelSlot(uint16 channelId, uint8 slotId)
     _socket->SendPacket(data);
 }
 
-//
 void VoiceChatMgr::VoiceChannelSlot(uint16 channelId, uint8 slotId)
 {
     if (!_socket)
@@ -1004,7 +995,6 @@ void VoiceChatMgr::VoiceChannelSlot(uint16 channelId, uint8 slotId)
     _socket->SendPacket(data);
 }
 
-//
 void VoiceChatMgr::DevoiceChannelSlot(uint16 channelId, uint8 slotId)
 {
     if (!_socket)

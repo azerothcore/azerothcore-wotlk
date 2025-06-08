@@ -58,4 +58,4 @@ protected:
 
 #define sVoiceChatSocketMgr VoiceChatSocketMgr::Instance()
 
-#endif // VoiceChatSocketMgr_h__
+#endif
