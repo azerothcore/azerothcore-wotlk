@@ -28,7 +28,6 @@
 #include "SpellScript.h"
 #include "SpellScriptLoader.h"
 
-// Ours
 enum eDrakeHunt
 {
     SPELL_DRAKE_HATCHLING_SUBDUED       = 46691,
@@ -73,7 +72,6 @@ class spell_q11919_q11940_drake_hunt_aura : public AuraScript
     }
 };
 
-// Theirs
 /*######
 ## npc_sinkhole_kill_credit
 ######*/
@@ -2128,14 +2126,11 @@ public:
 
 void AddSC_borean_tundra()
 {
-    // Ours
     RegisterSpellScript(spell_q11919_q11940_drake_hunt_aura);
     new npc_thassarian();
     new npc_thassarian2();
     new npc_leryssa();
     new npc_counselor_talbot();
-
-    // Theirs
     new npc_sinkhole_kill_credit();
     new npc_khunok_the_behemoth();
     new npc_iruk();
