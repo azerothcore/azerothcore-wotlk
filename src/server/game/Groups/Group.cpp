@@ -766,6 +766,8 @@ void Group::ChangeLeader(ObjectGuid newLeaderGuid)
             oldLeader->SetLowPriority();
         if (VoiceChatMember* newLeader = voiceChannel->GetVoiceChatMember(newLeaderGuid))
             newLeader->SetLowPriority();
+
+        voiceChannel->SendVoiceRosterUpdate(false, true);
     }
 
     if (Player* oldLeader = ObjectAccessor::FindConnectedPlayer(m_leaderGuid))
