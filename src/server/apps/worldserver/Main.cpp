@@ -321,7 +321,7 @@ int main(int argc, char** argv)
     });
 
     // initialize VoiceChatMgr with the same ioContext
-    sVoiceChatMgr.Init(*ioContext);
+    sVoiceChatMgr.Init();
 
     // Start the Remote Access port (acceptor) if enabled
     std::unique_ptr<AsyncAcceptor> raAcceptor;

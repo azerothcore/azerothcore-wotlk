@@ -59,7 +59,7 @@ public:
     }
     ~VoiceChatMgr();
 
-    void Init(Acore::Asio::IoContext& ioContext);
+    void Init();
     void LoadConfigs();
     void Update();
     void SocketDisconnected();

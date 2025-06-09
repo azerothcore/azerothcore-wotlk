@@ -191,7 +191,7 @@ void VoiceChatMgr::LoadConfigs()
     _maxConnectAttempts = sWorld->getIntConfig(CONFIG_VOICE_CHAT_MAX_CONNECT_ATTEMPTS);
 }
 
-void VoiceChatMgr::Init(Acore::Asio::IoContext& ioContext)
+void VoiceChatMgr::Init()
 {
     LoadConfigs();
 
