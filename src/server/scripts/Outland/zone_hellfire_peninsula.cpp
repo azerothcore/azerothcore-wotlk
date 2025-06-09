@@ -60,7 +60,6 @@ class spell_q10935_the_exorcism_of_colonel_jules : public SpellScript
     }
 };
 
-// Theirs
 /*######
 ## npc_aeranas
 ######*/
@@ -625,10 +624,7 @@ struct go_magtheridons_head : public GameObjectAI
 
 void AddSC_hellfire_peninsula()
 {
-    // Ours
     RegisterSpellScript(spell_q10935_the_exorcism_of_colonel_jules);
-
-    // Theirs
     new npc_aeranas();
     new npc_ancestral_wolf();
     new npc_wounded_blood_elf();

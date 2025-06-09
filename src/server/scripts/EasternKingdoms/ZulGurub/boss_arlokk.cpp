@@ -15,15 +15,6 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-/* ScriptData
-TCName: Boss_Arlokk
-TC%Complete: 95
-TCComment: Wrong cleave and red aura is missing not yet added.
-TCComment: Prowlers moving through wall hopefully mmaps will fix.
-TCComment: Can't test LOS until mmaps.
-TCCategory: Zul'Gurub
-EndScriptData */
-
 #include "CreatureScript.h"
 #include "GameObjectScript.h"
 #include "ScriptedCreature.h"
