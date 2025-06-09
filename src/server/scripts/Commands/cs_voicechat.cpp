@@ -31,10 +31,10 @@ public:
     {
         static ChatCommandTable voicechatcommandTable =
         {
-            { "disconnect", HandleVoiceChatDisconnectCommand, SEC_ADMINISTRATOR, Console::No },
-            { "disable",    HandleVoiceChatDisableCommand,    SEC_ADMINISTRATOR, Console::No },
-            { "enable",     HandleVoiceChatEnableCommand,     SEC_ADMINISTRATOR, Console::No },
-            { "stats",      HandleVoiceChatStatsCommand,      SEC_ADMINISTRATOR, Console::No },
+            { "disconnect", HandleVoiceChatDisconnectCommand, SEC_ADMINISTRATOR, Console::Yes },
+            { "disable",    HandleVoiceChatDisableCommand,    SEC_ADMINISTRATOR, Console::Yes },
+            { "enable",     HandleVoiceChatEnableCommand,     SEC_ADMINISTRATOR, Console::Yes },
+            { "stats",      HandleVoiceChatStatsCommand,      SEC_ADMINISTRATOR, Console::Yes },
         };
 
         static ChatCommandTable commandTable =
@@ -69,7 +69,7 @@ public:
         if (!sVoiceChatMgr.IsEnabled())
         {
             handler->PSendSysMessage("Voice Chat is already disabled");
-            return false;
+            return true;
         }
 
         sVoiceChatMgr.DisableVoiceChat();
@@ -82,7 +82,7 @@ public:
         if (sVoiceChatMgr.IsEnabled())
         {
             handler->PSendSysMessage("Voice Chat is already enabled");
-            return false;
+            return true;
         }
 
         sVoiceChatMgr.EnableVoiceChat();
