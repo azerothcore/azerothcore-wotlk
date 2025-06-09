@@ -1,3 +1,4 @@
+-- DB update 2025_06_08_06 -> 2025_06_09_00
 -- Leaping Hatchling
 UPDATE `creature_template` SET `AIName` = 'SmartAI' WHERE `entry` = 35387;
 
