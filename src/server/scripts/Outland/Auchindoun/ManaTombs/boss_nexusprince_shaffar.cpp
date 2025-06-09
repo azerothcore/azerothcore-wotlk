@@ -66,13 +66,7 @@ struct boss_nexusprince_shaffar : public BossAI
     void Reset() override
     {
         _Reset();
-        float dist = 8.0f;
-        float posX, posY, posZ, angle;
-        me->GetHomePosition(posX, posY, posZ, angle);
         summons.DespawnAll();
-        me->SummonCreature(NPC_BEACON, posX - dist, posY - dist, posZ, angle, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 7200000);
-        me->SummonCreature(NPC_BEACON, posX - dist, posY + dist, posZ, angle, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 7200000);
-        me->SummonCreature(NPC_BEACON, posX + dist, posY, posZ, angle, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 7200000);
     }
 
     void MoveInLineOfSight(Unit* who) override

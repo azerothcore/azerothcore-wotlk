@@ -27,7 +27,6 @@
 #include "SpellScriptLoader.h"
 #include "Vehicle.h"
 
-// Ours
 enum AlchemistItemRequirements
 {
     QUEST_ALCHEMIST_APPRENTICE      = 12541,
@@ -672,7 +671,6 @@ public:
     }
 };
 
-// Theirs
 /*####
 ## npc_released_offspring_harkoa
 ####*/
@@ -916,14 +914,11 @@ class spell_scourge_disguise_instability : public AuraScript
 
 void AddSC_zuldrak()
 {
-    // Ours
     new npc_finklestein();
     new go_finklestein_cauldron();
     new npc_overlord_drakuru_betrayal();
     new npc_drakuru_shackles();
     new npc_captured_rageclaw();
-
-    // Theirs
     new npc_released_offspring_harkoa();
     new npc_crusade_recruit();
     new go_scourge_enclosure();

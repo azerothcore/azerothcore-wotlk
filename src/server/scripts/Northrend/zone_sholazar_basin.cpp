@@ -29,7 +29,6 @@
 #include "Vehicle.h"
 #include "WaypointMgr.h"
 
-// Ours
 enum songOfWindandWater
 {
     NPC_SOWAW_WATER_ELEMENTAL           = 28999,
@@ -522,7 +521,6 @@ public:
     }
 };
 
-// Theirs
 /*######
 ## npc_vekjik
 ######*/
@@ -1489,15 +1487,12 @@ class spell_q12611_deathbolt : public SpellScript
 
 void AddSC_sholazar_basin()
 {
-    // Ours
     RegisterSpellScript(spell_q12726_song_of_wind_and_water);
     new npc_artruis_the_hearthless();
     new npc_still_at_it_trigger();
     new npc_mcmanus();
     new go_pressure_valve();
     new go_brazier();
-
-    // Theirs
     new npc_vekjik();
     new npc_avatar_of_freya();
     new npc_bushwhacker();
