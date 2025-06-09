@@ -65,13 +65,16 @@ void VoiceChatSocket::SendPacket(VoiceChatServerPacket pct)
     if (pct.size() > 0)
         buffer.Write(pct.contents(), pct.size());
 
-    LOG_DEBUG("session", "Sending voice socket packet: opcode={}, size={}", header.cmd, header.size);
+    if (sLog->ShouldLog("session", LogLevel::LOG_LEVEL_DEBUG))
+    {
+        LOG_DEBUG("session", "Sending voice socket packet: opcode={}, size={}", header.cmd, header.size);
 
-    std::stringstream ss;
-    const uint8* data = (const uint8*)buffer.GetReadPointer();
-    for (size_t i = 0; i < buffer.GetActiveSize(); ++i)
-        ss << std::hex << std::setw(2) << std::setfill('0') << (int)data[i] << " ";
-    LOG_DEBUG("session", "Voice socket packet data: {}", ss.str());
+        std::stringstream ss;
+        const uint8* data = (const uint8*)buffer.GetReadPointer();
+        for (size_t i = 0; i < buffer.GetActiveSize(); ++i)
+            ss << std::hex << std::setw(2) << std::setfill('0') << (int)data[i] << " ";
+        LOG_DEBUG("session", "Voice socket packet data: {}", ss.str());
+    }
 
     QueuePacket(std::move(buffer));
 }
