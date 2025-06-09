@@ -21,6 +21,9 @@
 #include "ObjectGuid.h"
 #include "SharedDefines.h"
 
+#define HIGH_VOICE_PRIORITY 0x80 // Magic number, ask Burlex
+#define LOW_VOICE_PRIORITY 0xCA // Magic number, ask Burlex
+
 enum VoiceChatServerOpcodes
 {
     VOICECHAT_NULL_ACTION = 0,
@@ -99,8 +102,8 @@ struct VoiceChatMember
     inline bool IsForceMuted() const { return HasFlag(VOICECHAT_MEMBER_FLAG_FORCE_MUTED); }
     inline void SetForceMuted(bool state) { SetFlag(VOICECHAT_MEMBER_FLAG_FORCE_MUTED, state); }
     inline void SetPriority(uint8 newPriority) { Priority = newPriority; }
-    inline void SetHighPriority() { SetPriority(0x80); } // Magic number, ask Burlex
-    inline void SetLowPriority() { SetPriority(0xCA); } // Magic number, ask Burlex
+    inline void SetHighPriority() { SetPriority(HIGH_VOICE_PRIORITY); }
+    inline void SetLowPriority() { SetPriority(LOW_VOICE_PRIORITY); }
 };
 
 class VoiceChatServerPacket : public ByteBuffer
