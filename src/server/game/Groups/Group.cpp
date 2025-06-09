@@ -762,8 +762,10 @@ void Group::ChangeLeader(ObjectGuid newLeaderGuid)
     VoiceChatChannel* voiceChannel = sVoiceChatMgr.GetGroupVoiceChatChannel(GetGroupId());
     if (voiceChannel && voiceChannel->GetType() != VOICECHAT_CHANNEL_CUSTOM)
     {
-        voiceChannel->GetVoiceChatMember(m_leaderGuid)->SetLowPriority();
-        voiceChannel->GetVoiceChatMember(newLeaderGuid)->SetHighPriority();
+        if (VoiceChatMember* oldLeader = voiceChannel->GetVoiceChatMember(m_leaderGuid))
+            oldLeader->SetLowPriority();
+        if (VoiceChatMember* newLeader = voiceChannel->GetVoiceChatMember(newLeaderGuid))
+            newLeader->SetLowPriority();
     }
 
     if (Player* oldLeader = ObjectAccessor::FindConnectedPlayer(m_leaderGuid))
