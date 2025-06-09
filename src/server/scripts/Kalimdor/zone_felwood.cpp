@@ -15,17 +15,6 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-/* ScriptData
-SDName: Felwood
-SD%Complete: 95
-SDComment: Quest support: 4101, 4102
-SDCategory: Felwood
-EndScriptData */
-
-/* ContentData
-npcs_riverbreeze_and_silversky
-EndContentData */
-
 #include "AreaTriggerScript.h"
 #include "CreatureScript.h"
 #include "Player.h"

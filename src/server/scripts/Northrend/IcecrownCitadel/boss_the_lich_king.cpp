@@ -16,6 +16,7 @@
  */
 
 #include "AchievementCriteriaScript.h"
+#include "AreaDefines.h"
 #include "Cell.h"
 #include "CellImpl.h"
 #include "CreatureScript.h"

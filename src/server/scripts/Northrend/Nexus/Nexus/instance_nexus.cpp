@@ -33,7 +33,7 @@ DoorData const doorData[] =
 class instance_nexus : public InstanceMapScript
 {
 public:
-    instance_nexus() : InstanceMapScript("instance_nexus", 576) { }
+    instance_nexus() : InstanceMapScript("instance_nexus", MAP_THE_NEXUS) { }
 
     InstanceScript* GetInstanceScript(InstanceMap* map) const override
     {

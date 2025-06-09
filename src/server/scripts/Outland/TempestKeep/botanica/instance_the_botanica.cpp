@@ -26,7 +26,7 @@
 class instance_the_botanica : public InstanceMapScript
 {
 public:
-    instance_the_botanica() : InstanceMapScript("instance_the_botanica", 553) { }
+    instance_the_botanica() : InstanceMapScript("instance_the_botanica", MAP_TEMPEST_KEEP_THE_BOTANICA) { }
 
     struct instance_the_botanica_InstanceMapScript : public InstanceScript
     {

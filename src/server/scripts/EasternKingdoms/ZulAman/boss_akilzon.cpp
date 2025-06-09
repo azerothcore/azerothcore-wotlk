@@ -84,7 +84,7 @@ struct boss_akilzon : public BossAI
 
         scheduler.Schedule(10s, 20s, GROUP_STATIC_DISRUPTION, [this](TaskContext context)
         {
-            Unit* target = SelectTarget(SelectTargetMethod::Random, 1);
+            Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 0.0f, false, false);
             if (!target)
                 target = me->GetVictim();
             if (target)
@@ -99,7 +99,7 @@ struct boss_akilzon : public BossAI
 
         ScheduleTimedEvent(20s, 30s, [&] {
             if (scheduler.GetNextGroupOccurrence(GROUP_ELECTRICAL_STORM) > 5s)
-                DoCastRandomTarget(SPELL_GUST_OF_WIND, 1);
+                DoCastRandomTarget(SPELL_GUST_OF_WIND, 0, 0.0f, true, false, false);
         }, 20s, 30s);
 
         ScheduleTimedEvent(10s, 20s, [&] {

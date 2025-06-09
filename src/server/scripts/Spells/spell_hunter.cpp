@@ -39,10 +39,7 @@
 
 enum HunterSpells
 {
-    // Ours
     SPELL_HUNTER_WYVERN_STING_DOT                   = 24131,
-
-    // Theirs
     SPELL_HUNTER_ASPECT_OF_THE_BEAST                = 13161,
     SPELL_HUNTER_ASPECT_OF_THE_BEAST_PET            = 61669,
     SPELL_HUNTER_ASPECT_OF_THE_VIPER                = 34074,

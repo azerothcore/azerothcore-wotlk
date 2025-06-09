@@ -71,7 +71,7 @@ float const CATHEDRAL_PULL_RANGE = 80.0f; // Distance from the Cathedral doors t
 class instance_scarlet_monastery : public InstanceMapScript
 {
 public:
-    instance_scarlet_monastery() : InstanceMapScript("instance_scarlet_monastery", 189) {}
+    instance_scarlet_monastery() : InstanceMapScript("instance_scarlet_monastery", MAP_SCARLET_MONASTERY) {}
 
     InstanceScript* GetInstanceScript(InstanceMap* map) const override
     {
