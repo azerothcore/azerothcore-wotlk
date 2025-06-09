@@ -26,12 +26,6 @@
 #include "SharedDefines.h"
 #include "WorldSession.h"
 #include "WorldSessionMgr.h"
-// #include "World/World.h"
-// #include "Config/Config.h"
-
-// #include "Network/AsyncConnector.hpp"
-// #include <boost/thread/thread.hpp>
-// #include <memory>
 #include <boost/asio.hpp>
 #include <thread>
 

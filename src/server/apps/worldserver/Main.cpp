@@ -61,8 +61,6 @@
 #include <openssl/crypto.h>
 #include <openssl/opensslv.h>
 
-// #include "VoiceChatMgr.h"
-
 #if AC_PLATFORM == AC_PLATFORM_WINDOWS
 #include "ServiceWin32.h"
 char serviceName[] = "worldserver";
