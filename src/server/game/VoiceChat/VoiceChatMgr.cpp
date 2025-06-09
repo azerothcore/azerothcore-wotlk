@@ -46,6 +46,19 @@ namespace
     }
 }
 
+VoiceChatMgr::~VoiceChatMgr()
+{
+    // Ensure proper cleanup
+    SocketDisconnected();
+
+    // Clear any remaining channels
+    DeleteAllChannels();
+
+    // Stop the voice service if it's running
+    if (!_voiceService.stopped())
+        _voiceService.stop();
+}
+
 void VoiceChatMgr::ActivateVoiceSocketThread()
 {
     std::thread t(VoiceSocketThreadHelper);
@@ -54,65 +67,113 @@ void VoiceChatMgr::ActivateVoiceSocketThread()
 
 void VoiceChatMgr::VoiceSocketThread()
 {
-    try
+    LOG_INFO("voice-chat", "Voice socket thread started");
+
+    // Keep trying to connect/reconnect while voice chat is enabled
+    while (_enabled)
     {
-        // Create IO context and resolver
-        boost::asio::io_context ioContext;
-        tcp::resolver resolver(ioContext);
-
-        // Get connection details
-        std::string address = GetVoiceServerConnectAddressString();
-        std::string port = std::to_string(GetVoiceServerConnectPort());
-
-        LOG_INFO("voice-chat", "Attempting to connect to voice server at {}:{}", address, port);
-
-        // Resolve endpoint
-        boost::system::error_code resolveError;
-        auto endpoints = resolver.resolve(address, port, resolveError);
-
-        if (resolveError)
+        try
         {
-            LOG_ERROR("voice-chat", "Failed to resolve voice server address: {}", resolveError.message());
-            return;
+            // Only attempt connection when we need to connect or reconnect
+            if (!NeedConnect() && !NeedReconnect())
+            {
+                std::this_thread::sleep_for(std::chrono::seconds(1));
+                continue;
+            }
+
+            if (_state == VOICECHAT_NOT_CONNECTED)
+                LOG_INFO("voice-chat", "Voice socket thread attempting initial connection...");
+            else
+                LOG_INFO("voice-chat", "Voice socket thread attempting reconnection (attempt {})...", _curReconnectAttempts + 1);
+
+            // Create IO context and resolver
+            boost::asio::io_context ioContext;
+            tcp::resolver resolver(ioContext);
+
+            // Get connection details
+            std::string address = GetVoiceServerConnectAddressString();
+            std::string port = std::to_string(GetVoiceServerConnectPort());
+
+            LOG_INFO("voice-chat", "Attempting to connect to voice server at {}:{}", address, port);
+
+            // Resolve endpoint
+            boost::system::error_code resolveError;
+            auto endpoints = resolver.resolve(address, port, resolveError);
+
+            if (resolveError)
+            {
+                LOG_ERROR("voice-chat", "Failed to resolve voice server address: {}", resolveError.message());
+                HandleConnectionFailure();
+                continue;
+            }
+
+            // Create and connect socket
+            tcp::socket socket(ioContext);
+            boost::system::error_code connectError;
+            boost::asio::connect(socket, endpoints, connectError);
+
+            if (connectError)
+            {
+                LOG_ERROR("voice-chat", "Failed to connect to voice server: {}", connectError.message());
+                HandleConnectionFailure();
+                continue;
+            }
+
+            LOG_INFO("voice-chat", "Successfully connected to voice server");
+
+            // Create voice chat session
+            auto voiceChatSocket = std::make_shared<VoiceChatSocket>(std::move(socket));
+
+            if (voiceChatSocket && voiceChatSocket->IsOpen())
+            {
+                // Request the socket to be used by VoiceChatMgr
+                if (RequestNewSocket(voiceChatSocket.get()))
+                {
+                    LOG_INFO("voice-chat", "Socket requested successfully, starting socket operations");
+                    voiceChatSocket->Start();
+
+                    // Run the IO context - this will block until disconnection
+                    ioContext.run();
+
+                    LOG_WARN("voice-chat", "Voice server connection lost");
+                }
+                else
+                    LOG_ERROR("voice-chat", "Failed to request new socket");
+            }
+            else
+                LOG_ERROR("voice-chat", "Failed to create voice chat session or socket is not open");
+
+            // Connection lost, clean up and prepare for reconnect
+            if (_enabled) // Only set reconnecting state if still enabled
+            {
+                LOG_INFO("voice-chat", "Preparing for reconnection...");
+                HandleConnectionLoss();
+            }
+        }
+        catch (boost::system::system_error const& e)
+        {
+            LOG_ERROR("voice-chat", "Boost system error in voice chat thread: {}", e.what());
+            if (_enabled)
+                HandleConnectionFailure();
+        }
+        catch (std::exception const& e)
+        {
+            LOG_ERROR("voice-chat", "Exception in voice chat thread: {}", e.what());
+            if (_enabled)
+                HandleConnectionFailure();
+        }
+        catch (...)
+        {
+            LOG_ERROR("voice-chat", "Unknown exception in voice chat thread");
+            if (_enabled)
+                HandleConnectionFailure();
         }
 
-        // Create and connect socket
-        tcp::socket socket(ioContext);
-        boost::system::error_code connectError;
-        boost::asio::connect(socket, endpoints, connectError);
-
-        if (connectError)
-        {
-            LOG_ERROR("voice-chat", "Failed to connect to voice server: {}", connectError.message());
-            return;
-        }
-
-        LOG_INFO("voice-chat", "Successfully connected to voice server");
-
-        // Create voice chat session
-        _socket = std::make_shared<VoiceChatSocket>(std::move(socket));
-
-        // Start processing
-        if (_socket)
-        {
-            _socket->Start();
-            ioContext.run();
-        }
-        else
-            LOG_ERROR("voice-chat", "Failed to create voice chat session");
+        // Small delay before next iteration
+        std::this_thread::sleep_for(std::chrono::milliseconds(100));
     }
-    catch (boost::system::system_error const& e)
-    {
-        LOG_ERROR("voice-chat", "Boost system error in voice chat thread: {}", e.what());
-    }
-    catch (std::exception const& e)
-    {
-        LOG_ERROR("voice-chat", "Exception in voice chat thread: {}", e.what());
-    }
-    catch (...)
-    {
-        LOG_ERROR("voice-chat", "Unknown exception in voice chat thread");
-    }
+
+    LOG_INFO("voice-chat", "Voice socket thread exiting");
 }
 
 void VoiceChatMgr::LoadConfigs()
@@ -139,17 +200,20 @@ void VoiceChatMgr::Init(Acore::Asio::IoContext& ioContext)
     _lastUpdate = std::chrono::system_clock::now();
     _curReconnectAttempts = 0;
 
-    _state = _enabled ? VOICECHAT_NOT_CONNECTED : VOICECHAT_DISCONNECTED;
+    if (_enabled)
+    {
+        _state = VOICECHAT_NOT_CONNECTED;
+        _nextConnect = std::chrono::system_clock::now();
 
-    // Attempt an asynchronous connection to the voice server
-    LOG_INFO("voice-chat", "Connecting to voice server at {}:{}", _serverAddressString, _serverPort);
-    new AsyncConnector<VoiceChatSocket>(ioContext, _serverAddressString, _serverPort, false);
-
-    // FIX: Store the connector
-    _connector =
-        std::make_unique<AsyncConnector<VoiceChatSocket>>(ioContext, _serverAddressString, _serverPort, false);
-
-    // Optionally store a reference to ioContext in VoiceChatMgr if needed
+        // Auto-start the voice chat connection thread
+        LOG_INFO("voice-chat", "Voice chat is enabled, starting connection thread");
+        ActivateVoiceSocketThread();
+    }
+    else
+    {
+        _state = VOICECHAT_DISCONNECTED;
+        LOG_INFO("voice-chat", "Voice chat is disabled");
+    }
 }
 
 void VoiceChatMgr::Update()
@@ -161,33 +225,31 @@ void VoiceChatMgr::Update()
 
     _eventEmitter(this);
 
-    if (_socket)
-        _socket->Update(); // yep, that's it
+    auto currentSocket = _socket.lock();
 
+    if (currentSocket)
+        currentSocket->Update();
+
+    // Process received packets
     std::deque<std::unique_ptr<VoiceChatServerPacket>> recvQueueCopy;
     {
         std::lock_guard<std::mutex> guard(_recvQueueLock);
         std::swap(recvQueueCopy, _recvQueue);
     }
 
-    while (_socket && _socket->IsOpen() && !recvQueueCopy.empty())
+    while (currentSocket && currentSocket->IsOpen() && !recvQueueCopy.empty())
     {
         auto const packet = std::move(recvQueueCopy.front());
         recvQueueCopy.pop_front();
 
         try
         {
-            LOG_DEBUG("voice-chat",
-                "VoiceChatMgr::Update Read Pong packet sent from server"); // Log info
-                                                                           // for pong
-                                                                           // packets
+            LOG_DEBUG("voice-chat", "Processing packet from server, opcode: {}", packet->GetOpcode());
             HandleVoiceChatServerPacket(*packet);
         }
         catch (ByteBufferException const&)
         {
-            LOG_ERROR("voice-chat",
-                "VoiceChatMgr::Update EXCEPTION Read Pong packet "
-                "sent from server"); // Log info for pong packets
+            LOG_ERROR("voice-chat", "ByteBufferException processing packet");
             ProcessByteBufferException(*packet);
         }
     }
@@ -201,130 +263,101 @@ void VoiceChatMgr::Update()
 
     _lastUpdate = now;
 
-    if (_requestSocket)
+    // Handle new socket assignment
+    if (!_requestSocket.expired())
     {
-        _socket = _requestSocket;
-        _requestSocket = nullptr;
-        return;
-    }
-
-    // connecting / reconnecting
-    if (!_socket)
-    {
-        if (_state == VOICECHAT_CONNECTED)
+        auto newSocket = _requestSocket.lock();
+        if (newSocket && newSocket->IsOpen())
         {
-            LOG_ERROR("voice-chat", "No socket but connected state, disconnecting socket");
-            SocketDisconnected();
-            SendVoiceChatServiceDisconnect();
+            LOG_INFO("voice-chat", "Assigning new socket from request");
+            _socket = newSocket;
+            _requestSocket.reset();
+            currentSocket = newSocket;
+        }
+        else
+        {
+            LOG_ERROR("voice-chat", "Request socket is invalid or closed");
+            _requestSocket.reset();
+            if (_state == VOICECHAT_CONNECTED)
+            {
+                SocketDisconnected();
+                SendVoiceChatServiceDisconnect();
+            }
             _state = VOICECHAT_RECONNECTING;
             _nextConnect = std::chrono::system_clock::now() + std::chrono::seconds(10);
             return;
         }
-
-        if (_state == VOICECHAT_RECONNECTING)
-        {
-            if (_maxConnectAttempts >= 0 && _curReconnectAttempts >= _maxConnectAttempts)
-            {
-                if (_maxConnectAttempts > 0)
-                    LOG_ERROR("voice-chat", "Disconnected! Max reconnect attempts reached");
-                else
-                    LOG_ERROR("voice-chat", "Disconnected! Reconnecting disabled");
-
-                DeleteAllChannels();
-                SendVoiceChatStatus(false);
-                SendVoiceChatServiceConnectFail();
-                _curReconnectAttempts = 0;
-                _state = VOICECHAT_DISCONNECTED;
-                return;
-            }
-        }
-
-        if (now > _nextConnect)
-        {
-            if (NeedConnect() || NeedReconnect())
-                ActivateVoiceSocketThread();
-
-            if (_curReconnectAttempts > 0)
-            {
-                if (_state == VOICECHAT_NOT_CONNECTED)
-                    LOG_ERROR("voice-chat", "Connect failed, will try again later");
-                if (_state == VOICECHAT_RECONNECTING)
-                    LOG_ERROR("voice-chat", "Reconnect failed, will try again later");
-            }
-
-            if (_state == VOICECHAT_NOT_CONNECTED || _state == VOICECHAT_RECONNECTING)
-                _curReconnectAttempts++;
-
-            _nextConnect = now + std::chrono::seconds(10);
-            return;
-        }
     }
-    else
+
+    // Check connection state
+    if (!currentSocket)
     {
-        if (!_socket->IsOpen())
+        if (_state == VOICECHAT_CONNECTED)
         {
-            if (_state == VOICECHAT_CONNECTED)
-            {
-                LOG_ERROR("voice-chat", "Socket not open but connected state, disconnecting socket");
-                SocketDisconnected();
-                SendVoiceChatServiceDisconnect();
-                _state = VOICECHAT_RECONNECTING;
-                return;
-            }
+            LOG_ERROR("voice-chat", "No socket but connected state, disconnecting");
+            SocketDisconnected();
+            SendVoiceChatServiceDisconnect();
+            _state = VOICECHAT_RECONNECTING;
+            _nextConnect = std::chrono::system_clock::now() + std::chrono::seconds(10);
+        }
+        return;
+    }
 
-            if (now > _nextConnect)
-            {
-                if (!_requestSocket && (_state == VOICECHAT_NOT_CONNECTED || _state == VOICECHAT_RECONNECTING))
-                {
-                    ActivateVoiceSocketThread();
-                    _nextConnect = now + std::chrono::seconds(5);
-                }
-            }
-            return;
+    if (!currentSocket->IsOpen())
+    {
+        if (_state == VOICECHAT_CONNECTED)
+        {
+            LOG_ERROR("voice-chat", "Socket not open but connected state, disconnecting");
+            SocketDisconnected();
+            SendVoiceChatServiceDisconnect();
+            _state = VOICECHAT_RECONNECTING;
+        }
+        return;
+    }
+
+    // Socket is open and valid - handle state transitions
+    if (_state == VOICECHAT_NOT_CONNECTED || _state == VOICECHAT_RECONNECTING)
+    {
+        bool wasReconnecting = (_state == VOICECHAT_RECONNECTING);
+
+        if (_state == VOICECHAT_NOT_CONNECTED)
+            LOG_INFO("voice-chat", "Connected to {}:{}", currentSocket->GetRemoteIpAddress().to_string(), currentSocket->GetRemotePort());
+        if (_state == VOICECHAT_RECONNECTING)
+            LOG_INFO("voice-chat", "Reconnected to {}:{}", currentSocket->GetRemoteIpAddress().to_string(), currentSocket->GetRemotePort());
+
+        // Update state first
+        _state = VOICECHAT_CONNECTED;
+        _curReconnectAttempts = 0;
+        _lastPong = now;
+
+        // Send status to all clients
+        SendVoiceChatStatus(true);
+
+        // Restore/recreate channels
+        RestoreVoiceChatChannels();
+        if (wasReconnecting)
+            SendVoiceChatServiceReconnected();
+    }
+    else if (_state == VOICECHAT_CONNECTED)
+    {
+        // Handle ping/pong logic
+        if (now >= _nextPing)
+        {
+            LOG_DEBUG("voice-chat", "Sending ping");
+            _nextPing = now + std::chrono::seconds(5);
+            VoiceChatServerPacket data(VOICECHAT_CMSG_PING, 4);
+            data << uint32(0);
+            currentSocket->SendPacket(data);
         }
 
-        // socket is open
-        if (_state == VOICECHAT_NOT_CONNECTED || _state == VOICECHAT_RECONNECTING)
+        if ((now - _lastPong) > std::chrono::seconds(15))
         {
-            if (_state == VOICECHAT_NOT_CONNECTED)
-                LOG_INFO("voice-chat",
-                    "Connected to {}:{}.",
-                    _socket->GetRemoteIpAddress().to_string(),
-                    _socket->GetRemotePort());
-            if (_state == VOICECHAT_RECONNECTING)
-                LOG_INFO("voice-chat",
-                    "Reconnected to {}:{}",
-                    _socket->GetRemoteIpAddress().to_string(),
-                    _socket->GetRemotePort());
-
-            SendVoiceChatStatus(true);
-            RestoreVoiceChatChannels();
-            if (_state == VOICECHAT_RECONNECTING)
-                SendVoiceChatServiceReconnected();
-
-            _state = VOICECHAT_CONNECTED;
-            _curReconnectAttempts = 0;
-            _lastPong = now;
-        }
-        else
-        {
-            if (now >= _nextPing)
-            {
-                LOG_DEBUG("voice-chat", "Sending ping");
-                _nextPing = now + std::chrono::seconds(5);
-                VoiceChatServerPacket data(VOICECHAT_CMSG_PING, 4);
-                data << uint32(0);
-                _socket->SendPacket(data);
-            }
-
-            if (_socket && (now - _lastPong) > std::chrono::seconds(10))
-            {
-                LOG_ERROR("voice-chat", "Ping timeout!");
-                SocketDisconnected();
-                // SendVoiceChatServiceDisconnect();
-                _state = VOICECHAT_RECONNECTING;
-                // next_connect = now + std::chrono::seconds(10);
-            }
+            LOG_ERROR("voice-chat", "Ping timeout! Last pong was {} seconds ago",
+                std::chrono::duration_cast<std::chrono::seconds>(now - _lastPong).count());
+            SocketDisconnected();
+            SendVoiceChatServiceDisconnect();
+            _state = VOICECHAT_RECONNECTING;
+            _nextConnect = std::chrono::system_clock::now() + std::chrono::seconds(5);
         }
     }
 }
@@ -427,35 +460,33 @@ void VoiceChatMgr::HandleVoiceChatServerPacket(VoiceChatServerPacket& pck)
 
 void VoiceChatMgr::SocketDisconnected()
 {
-    // sLog->outBasic("VoiceChatMgr: VoiceChatServerSocket disconnected");
-    LOG_ERROR("voice-chat", "VoiceChatServerSocket disconnected");
+    LOG_WARN("voice-chat", "VoiceChatServerSocket disconnected - cleaning up");
 
-    // we close somewher eelse
-    // if (_socket)
-    // {
-    //     if (_socket->IsOpen())
-    //         _socket->CloseSocket();
-    // }
+    // Clear socket references
+    _socket.reset();
+    _requestSocket.reset();
 
-    // _socket.reset();
-    // _voiceService.stop();
-    // _socket = nullptr;
     _requests.clear();
 
-    DeleteAllChannels();
-
+    // Don't delete channels here - let reconnection handle restoration
     _curReconnectAttempts = 0;
 }
 
 bool VoiceChatMgr::NeedConnect()
 {
-    return _enabled && !_socket && !_requestSocket && _state == VOICECHAT_NOT_CONNECTED &&
+    auto currentSocket = _socket.lock();
+    auto currentRequestSocket = _requestSocket.lock();
+
+    return _enabled && !currentSocket && !currentRequestSocket && _state == VOICECHAT_NOT_CONNECTED &&
            std::chrono::system_clock::now() > _nextConnect;
 }
 
 bool VoiceChatMgr::NeedReconnect()
 {
-    return _enabled && !_socket && !_requestSocket && _state == VOICECHAT_RECONNECTING &&
+    auto currentSocket = _socket.lock();
+    auto currentRequestSocket = _requestSocket.lock();
+
+    return _enabled && !currentSocket && !currentRequestSocket && _state == VOICECHAT_RECONNECTING &&
            std::chrono::system_clock::now() > _nextConnect;
 }
 
@@ -469,10 +500,22 @@ int32 VoiceChatMgr::GetReconnectAttempts() const
 
 bool VoiceChatMgr::RequestNewSocket(VoiceChatSocket* socket)
 {
-    if (_requestSocket)
+    if (!socket || !socket->IsOpen())
+    {
+        LOG_ERROR("voice-chat", "Attempted to request invalid or closed socket");
         return false;
+    }
 
+    // Check if we already have a request socket
+    if (!_requestSocket.expired())
+    {
+        LOG_WARN("voice-chat", "Request socket already exists, rejecting new request");
+        return false;
+    }
+
+    // Store as weak_ptr
     _requestSocket = socket->shared_from_this();
+    LOG_INFO("voice-chat", "New socket requested successfully");
     return true;
 }
 
@@ -490,40 +533,20 @@ void VoiceChatMgr::ProcessByteBufferException(VoiceChatServerPacket const& packe
         "packet (opcode: {}).",
         packet.GetOpcode());
 
-    // if (sLog->HasLogLevelOrHigher(LOG_LVL_DEBUG))
-    {
-        // DEBUG_LOG("Dumping error-causing voice server packet:");
-        LOG_ERROR("voice-chat", "Dumping error-causing voice server packet:");
-        packet.hexlike();
-    }
+    LOG_ERROR("voice-chat", "Dumping error-causing voice server packet:");
+    packet.hexlike();
 
-    LOG_ERROR("voice-chat",
-        "Disconnecting voice server [address {}] for badly formatted packet.",
-        GetVoiceServerConnectAddressString());
-    // DETAIL_LOG("Disconnecting voice server [address {}] for badly formatted
-    // packet.",
-    //    );
+    LOG_ERROR("voice-chat", "Disconnecting voice server [address {}] for badly formatted packet.", GetVoiceServerConnectAddressString());
 
-    // Replace Messager with EventEmitter callback
     _eventEmitter += [](VoiceChatMgr* mgr) { mgr->SocketDisconnected(); };
 }
-
-// void VoiceChatMgr::VoiceSocketThread()
-// {
-//     _voiceService.stop();
-//     _voiceService.restart();
-//     std::unique_ptr<MaNGOS::AsyncConnector<VoiceChatServerSocket>>
-//     voiceSocket; voiceSocket =
-//     std::make_unique<MaNGOS::AsyncConnector<VoiceChatServerSocket>>(_voiceService,
-//     sVoiceChatMgr.GetVoiceServerConnectAddressString(),
-//     int32(sVoiceChatMgr.GetVoiceServerConnectPort()), false);
-//     _voiceService.run();
-// }
 
 // enabled and connected to voice server
 bool VoiceChatMgr::CanUseVoiceChat()
 {
-    return (_enabled && _socket);
+    auto currentSocket = _socket.lock();
+
+    return (_enabled && currentSocket && currentSocket->IsOpen());
 }
 
 // enabled and is connected or trying to connect to voice server
@@ -532,11 +555,15 @@ bool VoiceChatMgr::CanSeeVoiceChat()
     return (_enabled && _state != VOICECHAT_DISCONNECTED);
 }
 
-void VoiceChatMgr::CreateVoiceChatChannel(
-    VoiceChatChannelTypes type, uint32 groupId, std::string const& name, TeamId team)
+void VoiceChatMgr::CreateVoiceChatChannel(VoiceChatChannelTypes type, uint32 groupId, std::string const& name, TeamId team)
 {
-    if (!_socket)
+    auto currentSocket = _socket.lock();
+
+    if (!currentSocket || !currentSocket->IsOpen() || _state != VOICECHAT_CONNECTED)
+    {
+        LOG_ERROR("voice-chat", "Cannot create voice channel - invalid socket state");
         return;
+    }
 
     if (type == VOICECHAT_CHANNEL_NONE)
         return;
@@ -549,24 +576,26 @@ void VoiceChatMgr::CreateVoiceChatChannel(
     if (IsVoiceChatChannelBeingCreated(type, groupId, name, newTeam))
         return;
 
-    LOG_INFO("voice-chat",
-        "CreateVoiceChannel type: {}, name: {}, team: {}, group: {}",
-        type,
-        name.c_str(),
-        newTeam,
-        groupId);
-    VoiceChatChannelRequest req;
-    req.Id = _newRequestId++;
-    req.Type = type;
-    req.ChannelName = name;
-    req.Team = newTeam;
-    req.GroupId = groupId;
-    _requests.push_back(req);
+    try
+    {
+        LOG_INFO("voice-chat", "CreateVoiceChannel type: {}, name: {}, team: {}, group: {}", type, name.c_str(), newTeam, groupId);
+        VoiceChatChannelRequest req;
+        req.Id = _newRequestId++;
+        req.Type = type;
+        req.ChannelName = name;
+        req.Team = newTeam;
+        req.GroupId = groupId;
+        _requests.push_back(req);
 
-    VoiceChatServerPacket data(VOICECHAT_CMSG_CREATE_CHANNEL, 5);
-    data << req.Type;
-    data << req.Id;
-    _socket->SendPacket(data);
+        VoiceChatServerPacket data(VOICECHAT_CMSG_CREATE_CHANNEL, 5);
+        data << req.Type;
+        data << req.Id;
+        currentSocket->SendPacket(data);
+    }
+    catch (const std::exception& e)
+    {
+        LOG_ERROR("voice-chat", "Exception sending packet: {}", e.what());
+    }
 }
 
 void VoiceChatMgr::DeleteVoiceChatChannel(VoiceChatChannel* channel)
@@ -582,26 +611,37 @@ void VoiceChatMgr::DeleteVoiceChatChannel(VoiceChatChannel* channel)
     // disable voice in custom channel
     if (type == VOICECHAT_CHANNEL_CUSTOM)
     {
+        auto cMgr = ChannelMgr(channel->GetTeam());
+        if (Channel* chn = cMgr.GetChannel(channel->GetChannelName(), nullptr, false))
         {
-            auto cMgr = ChannelMgr(channel->GetTeam());
-            if (Channel* chn = cMgr.GetChannel(channel->GetChannelName(), nullptr, false))
-            {
-                if (chn->IsVoiceEnabled())
-                    chn->ToggleVoice();
-            }
+            if (chn->IsVoiceEnabled())
+                chn->ToggleVoice();
         }
     }
 
     _voiceChatChannels.erase(channel->GetChannelId());
     delete channel;
 
-    if (_socket)
+    auto currentSocket = _socket.lock();
+
+    // Only send delete packet if we're connected
+    if (currentSocket && currentSocket->IsOpen() && _state == VOICECHAT_CONNECTED)
     {
-        VoiceChatServerPacket data(VOICECHAT_CMSG_DELETE_CHANNEL, 5);
-        data << type;
-        data << id;
-        _socket->SendPacket(data);
+        try
+        {
+            VoiceChatServerPacket data(VOICECHAT_CMSG_DELETE_CHANNEL, 5);
+            data << type;
+            data << id;
+            currentSocket->SendPacket(data);
+            LOG_DEBUG("voice-chat", "Sent delete channel packet for channel {}", id);
+        }
+        catch (const std::exception& e)
+        {
+            LOG_ERROR("voice-chat", "Exception sending delete channel packet: {}", e.what());
+        }
     }
+    else
+        LOG_DEBUG("voice-chat", "Skipping delete channel packet - not connected to voice server");
 }
 
 // check if channel request has already been created
@@ -786,44 +826,96 @@ std::vector<VoiceChatChannel*> VoiceChatMgr::GetPossibleVoiceChatChannels(Object
 // create group/raid/bg channels after (re)connect to voice server
 void VoiceChatMgr::RestoreVoiceChatChannels()
 {
-    // Replace Messager with EventEmitter
-    sVoiceChatMgr.GetEventEmitter() += [](VoiceChatMgr* /*world*/)
+    LOG_INFO("voice-chat", "Restoring voice chat channels after connection");
+
+    std::vector<std::pair<VoiceChatChannelTypes, uint32>> groupChannels;
+    std::vector<std::pair<VoiceChatChannelTypes, uint32>> raidChannels;
+    std::vector<std::tuple<std::string, TeamId>> customChannels;
+    std::vector<std::tuple<uint32, TeamId>> bgChannels;
+
+    // Collect existing channel info before clearing
+    for (auto& channel : _voiceChatChannels)
     {
-        ChatHandler(nullptr).DoForAllValidSessions([](Player* player)
+        VoiceChatChannel* chn = channel.second;
+        if (!chn) continue;
+
+        switch (chn->GetType())
+        {
+        case VOICECHAT_CHANNEL_GROUP:
+            groupChannels.emplace_back(VOICECHAT_CHANNEL_GROUP, chn->GetGroupId());
+            break;
+        case VOICECHAT_CHANNEL_RAID:
+            raidChannels.emplace_back(VOICECHAT_CHANNEL_RAID, chn->GetGroupId());
+            break;
+        case VOICECHAT_CHANNEL_CUSTOM:
+            customChannels.emplace_back(chn->GetChannelName(), chn->GetTeam());
+            break;
+        case VOICECHAT_CHANNEL_BG:
+            bgChannels.emplace_back(chn->GetGroupId(), chn->GetTeam());
+            break;
+        }
+    }
+
+    DeleteAllChannels();
+
+    // Recreate channels from active players
+    ChatHandler(nullptr).DoForAllValidSessions([this](Player* player)
         {
             WorldSession const* sess = player->GetSession();
-            if (sess->IsVoiceChatEnabled())
+            if (!sess->IsVoiceChatEnabled())
+                return;
+
+            if (Group* grp = player->GetGroup())
             {
-                if (player)
+                if (!grp->isBGGroup() && !grp->isBFGroup())
                 {
-                    if (Group* grp = player->GetGroup())
-                    {
-                        if (!grp->isBGGroup() && !grp->isBFGroup())
-                        {
-                            if (grp->isRaidGroup())
-                                sVoiceChatMgr.AddToRaidVoiceChatChannel(player->GetGUID(), grp->GetGroupId());
-                            else
-                                sVoiceChatMgr.AddToGroupVoiceChatChannel(player->GetGUID(), grp->GetGroupId());
-                        }
-                        else
-                            sVoiceChatMgr.AddToBattlegroundVoiceChatChannel(player->GetGUID());
-                    }
-                    if (Group* grp = player->GetOriginalGroup())
-                    {
-                        if (!grp->isBGGroup() && !grp->isBFGroup())
-                        {
-                            if (grp->isRaidGroup())
-                                sVoiceChatMgr.AddToRaidVoiceChatChannel(player->GetGUID(), grp->GetGroupId());
-                            else
-                                sVoiceChatMgr.AddToGroupVoiceChatChannel(player->GetGUID(), grp->GetGroupId());
-                        }
-                        else
-                            sVoiceChatMgr.AddToBattlegroundVoiceChatChannel(player->GetGUID());
-                    }
+                    if (grp->isRaidGroup())
+                        CreateRaidVoiceChatChannel(grp->GetGroupId());
+                    else
+                        CreateGroupVoiceChatChannel(grp->GetGroupId());
+                }
+                else
+                    CreateBattlegroundVoiceChatChannel(player->GetBattlegroundId(), player->GetBgTeamId());
+            }
+
+            if (Group* grp = player->GetOriginalGroup())
+            {
+                if (!grp->isBGGroup() && !grp->isBFGroup())
+                {
+                    if (grp->isRaidGroup())
+                        CreateRaidVoiceChatChannel(grp->GetGroupId());
+                    else
+                        CreateGroupVoiceChatChannel(grp->GetGroupId());
                 }
             }
         });
-    };
+
+    // Recreate custom channels that still have active users
+    for (auto& customChannel : customChannels)
+    {
+        std::string channelName = std::get<0>(customChannel);
+        TeamId team = std::get<1>(customChannel);
+
+        // Check if channel still has users
+        bool hasUsers = false;
+        ChatHandler(nullptr).DoForAllValidSessions([&](Player* player)
+            {
+                if (!hasUsers && player->GetSession()->IsVoiceChatEnabled())
+                {
+                    auto cMgr = ChannelMgr(player->GetTeamId());
+                    Channel* channel = cMgr.GetChannel(channelName, nullptr, false);
+                    if (channel && channel->IsOn(player->GetGUID()) && channel->IsVoiceEnabled())
+                        hasUsers = true;
+                }
+            });
+
+        if (hasUsers)
+        {
+            CreateCustomVoiceChatChannel(channelName, team);
+        }
+    }
+
+    LOG_INFO("voice-chat", "Voice chat channels restoration completed");
 }
 
 void VoiceChatMgr::DeleteAllChannels()
@@ -949,98 +1041,152 @@ void VoiceChatMgr::RemoveFromCustomVoiceChatChannel(ObjectGuid guid, std::string
 
 void VoiceChatMgr::EnableChannelSlot(uint16 channelId, uint8 slotId)
 {
-    if (!_socket)
+    auto currentSocket = _socket.lock();
+
+    if (!currentSocket || !currentSocket->IsOpen() || _state != VOICECHAT_CONNECTED)
     {
-        LOG_ERROR("voice-chat", "Channel enabled with no socket!");
+        LOG_ERROR("voice-chat", "Cannot enable channel slot - invalid socket state");
         return;
     }
 
-    LOG_INFO("voice-chat", "Channel {} activate slot {}", (int)channelId, (int)slotId);
+    try
+    {
+        LOG_INFO("voice-chat", "Channel {} activate slot {}", (int)channelId, (int)slotId);
 
-    VoiceChatServerPacket data(VOICECHAT_CMSG_ADD_MEMBER, 5);
-    data << channelId;
-    data << slotId;
-    _socket->SendPacket(data);
+        VoiceChatServerPacket data(VOICECHAT_CMSG_ADD_MEMBER, 5);
+        data << channelId;
+        data << slotId;
+        currentSocket->SendPacket(data);
+    }
+    catch (const std::exception& e)
+    {
+        LOG_ERROR("voice-chat", "Exception sending packet: {}", e.what());
+    }
 }
 
 void VoiceChatMgr::DisableChannelSlot(uint16 channelId, uint8 slotId)
 {
-    if (!_socket)
+    auto currentSocket = _socket.lock();
+
+    if (!currentSocket || !currentSocket->IsOpen() || _state != VOICECHAT_CONNECTED)
     {
-        LOG_ERROR("voice-chat", "Channel disabled with no socket!");
+        LOG_ERROR("voice-chat", "Cannot disable channel voice slot - invalid socket state");
         return;
     }
 
-    LOG_INFO("voice-chat", "Channel {} deactivate slot {}", (int)channelId, (int)slotId);
+    try
+    {
+        LOG_INFO("voice-chat", "Channel {} deactivate slot {}", (int)channelId, (int)slotId);
 
-    VoiceChatServerPacket data(VOICECHAT_CMSG_REMOVE_MEMBER, 5);
-    data << channelId;
-    data << slotId;
-    _socket->SendPacket(data);
+        VoiceChatServerPacket data(VOICECHAT_CMSG_REMOVE_MEMBER, 5);
+        data << channelId;
+        data << slotId;
+        currentSocket->SendPacket(data);
+    }
+    catch (const std::exception& e)
+    {
+        LOG_ERROR("voice-chat", "Exception sending packet: {}", e.what());
+    }
 }
 
 void VoiceChatMgr::VoiceChannelSlot(uint16 channelId, uint8 slotId)
 {
-    if (!_socket)
+    auto currentSocket = _socket.lock();
+
+    if (!currentSocket || !currentSocket->IsOpen() || _state != VOICECHAT_CONNECTED)
     {
-        LOG_ERROR("voice-chat", "Slot voiced with no socket!");
+        LOG_ERROR("voice-chat", "Cannot voice channel slot - invalid socket state");
         return;
     }
 
-    LOG_ERROR("voice-chat", "Channel {} voice slot {}", (int)channelId, (int)slotId);
+    try
+    {
+        LOG_ERROR("voice-chat", "Channel {} voice slot {}", (int)channelId, (int)slotId);
 
-    VoiceChatServerPacket data(VOICECHAT_CMSG_VOICE_MEMBER, 5);
-    data << channelId;
-    data << slotId;
-    _socket->SendPacket(data);
+        VoiceChatServerPacket data(VOICECHAT_CMSG_VOICE_MEMBER, 5);
+        data << channelId;
+        data << slotId;
+        currentSocket->SendPacket(data);
+    }
+    catch (const std::exception& e)
+    {
+        LOG_ERROR("voice-chat", "Exception sending packet: {}", e.what());
+    }
 }
 
 void VoiceChatMgr::DevoiceChannelSlot(uint16 channelId, uint8 slotId)
 {
-    if (!_socket)
+    auto currentSocket = _socket.lock();
+
+    if (!currentSocket || !currentSocket->IsOpen() || _state != VOICECHAT_CONNECTED)
     {
-        LOG_ERROR("voice-chat", "Slot devoiced with no socket!");
+        LOG_ERROR("voice-chat", "Cannot devoice channel slot - invalid socket state");
         return;
     }
 
-    LOG_INFO("voice-chat", "Channel {} devoice slot {}", (int)channelId, (int)slotId);
+    try
+    {
+        LOG_INFO("voice-chat", "Channel {} devoice slot {}", (int)channelId, (int)slotId);
 
-    VoiceChatServerPacket data(VOICECHAT_CMSG_DEVOICE_MEMBER, 5);
-    data << channelId;
-    data << slotId;
-    _socket->SendPacket(data);
+        VoiceChatServerPacket data(VOICECHAT_CMSG_DEVOICE_MEMBER, 5);
+        data << channelId;
+        data << slotId;
+        currentSocket->SendPacket(data);
+    }
+    catch (const std::exception& e)
+    {
+        LOG_ERROR("voice-chat", "Exception sending packet: {}", e.what());
+    }
 }
 
 void VoiceChatMgr::MuteChannelSlot(uint16 channelId, uint8 slotId)
 {
-    if (!_socket)
+    auto currentSocket = _socket.lock();
+
+    if (!currentSocket || !currentSocket->IsOpen() || _state != VOICECHAT_CONNECTED)
     {
-        LOG_ERROR("voice-chat", "Slot muted with no socket!");
+        LOG_ERROR("voice-chat", "Cannot mute channel voice slot - invalid socket state");
         return;
     }
 
-    LOG_INFO("voice-chat", "Channel {} mute slot {}", (int)channelId, (int)slotId);
+    try
+    {
+        LOG_INFO("voice-chat", "Channel {} mute slot {}", (int)channelId, (int)slotId);
 
-    VoiceChatServerPacket data(VOICECHAT_CMSG_MUTE_MEMBER, 5);
-    data << channelId;
-    data << slotId;
-    _socket->SendPacket(data);
+        VoiceChatServerPacket data(VOICECHAT_CMSG_MUTE_MEMBER, 5);
+        data << channelId;
+        data << slotId;
+        currentSocket->SendPacket(data);
+    }
+    catch (const std::exception& e)
+    {
+        LOG_ERROR("voice-chat", "Exception sending packet: {}", e.what());
+    }
 }
 
 void VoiceChatMgr::UnmuteChannelSlot(uint16 channelId, uint8 slotId)
 {
-    if (!_socket)
+    auto currentSocket = _socket.lock();
+
+    if (!currentSocket || !currentSocket->IsOpen() || _state != VOICECHAT_CONNECTED)
     {
-        LOG_ERROR("voice-chat", "Slot unmuted with no socket!");
+        LOG_ERROR("voice-chat", "Cannot unmute channel voice slot - invalid socket state");
         return;
     }
 
-    LOG_INFO("voice-chat", "Channel {} unmute slot {}", (int)channelId, (int)slotId);
+    try
+    {
+        LOG_INFO("voice-chat", "Channel {} unmute slot {}", (int)channelId, (int)slotId);
 
-    VoiceChatServerPacket data(VOICECHAT_CMSG_UNMUTE_MEMBER, 5);
-    data << channelId;
-    data << slotId;
-    _socket->SendPacket(data);
+        VoiceChatServerPacket data(VOICECHAT_CMSG_UNMUTE_MEMBER, 5);
+        data << channelId;
+        data << slotId;
+        currentSocket->SendPacket(data);
+    }
+    catch (const std::exception& e)
+    {
+        LOG_ERROR("voice-chat", "Exception sending packet: {}", e.what());
+    }
 }
 
 void VoiceChatMgr::JoinAvailableVoiceChatChannels(WorldSession* session)
@@ -1149,12 +1295,23 @@ void VoiceChatMgr::SendVoiceChatServiceMessage(Opcodes opcode)
 // command handlers
 void VoiceChatMgr::DisableVoiceChat()
 {
-    if (!_voiceService.stopped() || (_socket && _socket->IsOpen()))
-        SocketDisconnected();
+    if (!_enabled)
+        return;
+
+    LOG_INFO("voice-chat", "Disabling voice chat");
 
     _enabled = false;
     _state = VOICECHAT_DISCONNECTED;
+
+    SendVoiceChatServiceDisconnect();
+
+    SocketDisconnected();
+
+    DeleteAllChannels();
+
     SendVoiceChatStatus(false);
+
+    LOG_INFO("voice-chat", "Voice chat disabled");
 }
 
 void VoiceChatMgr::EnableVoiceChat()
@@ -1162,9 +1319,18 @@ void VoiceChatMgr::EnableVoiceChat()
     if (_enabled)
         return;
 
+    LOG_INFO("voice-chat", "Enabling voice chat");
+
     _enabled = true;
-    // Init(m_ioContext);
+    _state = VOICECHAT_NOT_CONNECTED;
+    _nextConnect = std::chrono::system_clock::now();
+    _curReconnectAttempts = 0;
+
+    // Start the socket thread
+    ActivateVoiceSocketThread();
+
     SendVoiceChatStatus(true);
+    LOG_INFO("voice-chat", "Voice chat enabled, connection thread started");
 }
 
 VoiceChatStatistics VoiceChatMgr::GetStatistics()
@@ -1189,4 +1355,35 @@ VoiceChatStatistics VoiceChatMgr::GetStatistics()
     });
 
     return stats;
+}
+
+void VoiceChatMgr::HandleConnectionFailure()
+{
+    _curReconnectAttempts++;
+
+    if (_maxConnectAttempts > 0 && _curReconnectAttempts >= _maxConnectAttempts)
+    {
+        LOG_ERROR("voice-chat", "Max reconnection attempts ({}) reached, disabling voice chat", _maxConnectAttempts);
+        DisableVoiceChat();
+        return;
+    }
+
+    _state = (_state == VOICECHAT_NOT_CONNECTED) ? VOICECHAT_NOT_CONNECTED : VOICECHAT_RECONNECTING;
+    _nextConnect = std::chrono::system_clock::now() + std::chrono::seconds(10);
+}
+
+void VoiceChatMgr::HandleConnectionLoss()
+{
+    // Notify users about disconnection
+    SendVoiceChatServiceDisconnect();
+
+    _state = VOICECHAT_RECONNECTING;
+    _nextConnect = std::chrono::system_clock::now() + std::chrono::seconds(5);
+    _curReconnectAttempts++;
+
+    if (_maxConnectAttempts > 0 && _curReconnectAttempts >= _maxConnectAttempts)
+    {
+        LOG_ERROR("voice-chat", "Max reconnection attempts reached after connection loss, disabling voice chat");
+        DisableVoiceChat();
+    }
 }

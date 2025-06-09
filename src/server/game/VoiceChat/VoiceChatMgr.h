@@ -40,8 +40,8 @@ public:
     }
 
     VoiceChatMgr()
-      : _socket(nullptr),
-        _requestSocket(nullptr),
+      : _socket(),
+        _requestSocket(),
         _newRequestId(1),
         _newSessionId(std::chrono::system_clock::now().time_since_epoch().count()),
         _serverAddress(0),
@@ -57,6 +57,7 @@ public:
         _lastUpdate(std::chrono::system_clock::now())
     {
     }
+    ~VoiceChatMgr();
 
     void Init(Acore::Asio::IoContext& ioContext);
     void LoadConfigs();
@@ -108,7 +109,7 @@ public:
     std::vector<VoiceChatChannel*> GetPossibleVoiceChatChannels(ObjectGuid guid);
 
     // restore after reconnect
-    static void RestoreVoiceChatChannels();
+    void RestoreVoiceChatChannels();
     // delete after disconnect
     void DeleteAllChannels();
 
@@ -149,6 +150,10 @@ public:
     void EnableVoiceChat();
     VoiceChatStatistics GetStatistics();
 
+    void HandleConnectionFailure();
+    void HandleConnectionLoss();
+    void SendClientSetup();
+
 private:
 
     static void SendVoiceChatStatus(bool status);
@@ -161,8 +166,8 @@ private:
     void ProcessByteBufferException(VoiceChatServerPacket const& packet);
 
     // socket to voice server
-    std::shared_ptr<VoiceChatSocket> _socket;
-    std::shared_ptr<VoiceChatSocket> _requestSocket;
+    std::weak_ptr<VoiceChatSocket> _socket;
+    std::weak_ptr<VoiceChatSocket> _requestSocket;
     std::vector<VoiceChatChannelRequest> _requests;
     uint32 _newRequestId;
     uint64 _newSessionId;

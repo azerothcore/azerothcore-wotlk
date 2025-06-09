@@ -338,19 +338,6 @@ bool Group::AddInvite(Player* player)
 
     sScriptMgr->OnGroupInviteMember(this, player->GetGUID());
 
-    if (player->GetSession()->IsVoiceChatEnabled())
-    {
-        if (!isBGGroup() && !isBFGroup())
-        {
-            if (isRaidGroup())
-                sVoiceChatMgr.AddToRaidVoiceChatChannel(player->GetGUID(), GetGroupId());
-            else
-                sVoiceChatMgr.AddToGroupVoiceChatChannel(player->GetGUID(), GetGroupId());
-        }
-        else
-            sVoiceChatMgr.AddToBattlegroundVoiceChatChannel(player->GetGUID());
-    }
-
     return true;
 }
 
@@ -554,6 +541,19 @@ bool Group::AddMember(Player* player)
 
         if (m_maxEnchantingLevel < player->GetSkillValue(SKILL_ENCHANTING))
             m_maxEnchantingLevel = player->GetSkillValue(SKILL_ENCHANTING);
+
+        if (player->GetSession()->IsVoiceChatEnabled())
+        {
+            if (!isBGGroup() && !isBFGroup())
+            {
+                if (isRaidGroup())
+                    sVoiceChatMgr.AddToRaidVoiceChatChannel(player->GetGUID(), GetGroupId());
+                else
+                    sVoiceChatMgr.AddToGroupVoiceChatChannel(player->GetGUID(), GetGroupId());
+            }
+            else
+                sVoiceChatMgr.AddToBattlegroundVoiceChatChannel(player->GetGUID());
+        }
     }
 
     return true;

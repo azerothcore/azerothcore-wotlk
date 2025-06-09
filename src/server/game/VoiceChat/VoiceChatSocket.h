@@ -40,6 +40,7 @@ protected:
 private:
   bool HandlePing();
   bool ProcessIncomingData();
+  bool IsValidAndOpen() const;
   // bool HandleChannelCreated();
   // Add other handlers as needed
 };
