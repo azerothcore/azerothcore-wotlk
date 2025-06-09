@@ -103,7 +103,8 @@ bool VoiceChatSocket::HandlePing()
 
 bool VoiceChatSocket::ProcessIncomingData()
 {
-    try {
+    try
+    {
         LOG_DEBUG("session", "VoiceChatSocket::ProcessIncomingData() Read Pong packet "
             "sent from server"); // Log info for pong packets
         // Structured similar to VoiceChatServerSocket
@@ -154,14 +155,16 @@ bool VoiceChatSocket::ProcessIncomingData()
 
         return true;
     }
-    catch (const std::exception& e) {
+    catch (const std::exception& e)
+    {
         LOG_ERROR("voice-chat", "Exception in ProcessIncomingData: {}", e.what());
         CloseSocket();
         return false;
     }
 }
 
-void VoiceChatSocket::ReadHandler() {
+void VoiceChatSocket::ReadHandler()
+{
   LOG_DEBUG("session", "ReadHandler called with {} bytes available",
             GetReadBuffer().GetActiveSize());
 
