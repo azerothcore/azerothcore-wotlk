@@ -234,11 +234,7 @@ void WorldSession::HandleAddVoiceIgnoreOpcode(WorldPacket& recvData)
     if (!ignoreGuid)
         return;
 
-    LOG_INFO("network", "WORLD: {} asked to Ignore: '{}'",
-        _player->GetName(), ignoreName.c_str());
-
-    // CharacterDatabase.AsyncQuery(&WorldSession::HandleAddMutedOpcodeCallBack, GetAccountId(), "SELECT guid FROM characters WHERE name = '{}'", IgnoreName.c_str());
-    // _queryProcessor.AddCallback(CharacterDatabase.AsyncQuery(stmt).WithPreparedCallback(std::bind(&WorldSession::HandleAddMutedOpcodeCallBack, this, std::placeholders::_1)));
+    LOG_INFO("network", "WORLD: {} asked to Ignore: '{}'", _player->GetName(), ignoreName.c_str());
 
     FriendsResult ignoreResult = FRIEND_MUTE_NOT_FOUND;
     if (ignoreGuid == _player->GetGUID())

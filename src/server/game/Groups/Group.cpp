@@ -2406,10 +2406,10 @@ bool Group::IsAssistant(ObjectGuid guid) const
 
 bool Group::IsMainAssistant(ObjectGuid guid) const
 {
-    member_citerator mslot = _getMemberCSlot(guid);
-    if (mslot == m_memberSlots.end())
+    member_citerator mSlot = _getMemberCSlot(guid);
+    if (mSlot == m_memberSlots.end())
         return false;
-    return mslot->flags & MEMBER_FLAG_MAINASSIST;
+    return mSlot->flags & MEMBER_FLAG_MAINASSIST;
 }
 
 bool Group::SameSubGroup(ObjectGuid guid1, ObjectGuid guid2) const

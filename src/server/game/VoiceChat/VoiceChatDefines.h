@@ -22,7 +22,7 @@
 #include "SharedDefines.h"
 
 #define HIGH_VOICE_PRIORITY 0x80 // Magic number, ask Burlex
-#define LOW_VOICE_PRIORITY 0xCA // Magic number, ask Burlex
+#define LOW_VOICE_PRIORITY 0xC8 // Magic number, ask Burlex
 
 enum VoiceChatServerOpcodes
 {
@@ -82,7 +82,7 @@ struct VoiceChatMember
         Guid = guid;
         UserId = userId;
         Flags = userFlags;
-        Priority = 0xC8;
+        Priority = LOW_VOICE_PRIORITY;
     }
 
     // TODO: Check proper names from client - MemberGUID, NetworkId, Flags, and Priority

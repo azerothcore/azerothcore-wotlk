@@ -739,9 +739,6 @@ void Channel::ToggleVoice(Player* player)
         return;
     }
 
-    // const uint32 level = sWorld->getConfig(CONFIG_UINT32_GM_LEVEL_CHANNEL_MODERATION);
-    // const bool gm = (level && player->GetSession()->GetSecurity() >= level);
-
     if (!playersStore[guid].IsOwner() && !playersStore[guid].IsOwnerGM())
     {
         WorldPacket data;

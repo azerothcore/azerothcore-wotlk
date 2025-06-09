@@ -329,11 +329,3 @@ void WorldSession::HandleClearChannelWatch(WorldPacket& recvPacket)
         if (Channel* channel = cMgr->GetChannel(channelName, nullptr, false))
             channel->RemoveWatching(GetPlayer());
 }
-
-// • VoiceChatMgr::DisableVoiceChat()
-// • VoiceChatMgr::EnableVoiceChat()
-// • VoiceChatMgr::GetStatistics()
-// • WorldSession::HandleChannelSilenceOpcode(...)
-// • WorldSession::HandleChannelUnsilenceOpcode(...)
-// • WorldSession::HandleChannelVoiceOffOpcode(...)
-// • Various VoiceChatChannel methods, like RemoveVoiceChatMember(...), AddVoiceChatMember(...), etc.
