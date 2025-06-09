@@ -1776,7 +1776,10 @@ void GameObject::Use(Unit* user)
                                 GameObject* ok = LookupFishingHoleAround(20.0f + CONTACT_DISTANCE);
                                 if (ok)
                                 {
-                                    ok->Use(player);
+                                    if (sScriptMgr->OnPlayerLootFishingPool(player, skill, zone_skill, chance, roll))
+                                    {
+                                        ok->Use(player);
+                                    }
                                     SetLootState(GO_JUST_DEACTIVATED);
                                 }
                                 else
