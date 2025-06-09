@@ -2232,7 +2232,7 @@ void World::Update(uint32 diff)
 
     {
         METRIC_TIMER("world_update_time", METRIC_TAG("type", "Voice chat update"));
-        sVoiceChatMgr.Update();
+        sVoiceChatMgr.Update(diff);
     }
 
     /// <li> Update uptime table

@@ -20,6 +20,7 @@
 
 #include "AsyncConnector.h"
 #include "EventEmitter.h"
+#include "GameTime.h"
 #include "Opcodes.h"
 #include "SharedDefines.h"
 #include "VoiceChatChannel.h"
@@ -43,25 +44,25 @@ public:
       : _socket(),
         _requestSocket(),
         _newRequestId(1),
-        _newSessionId(std::chrono::system_clock::now().time_since_epoch().count()),
+        _newSessionId(GameTime::GetGameTime().count()),
         _serverAddress(0),
         _serverPort(0),
         _voicePort(0),
-        _nextConnect(std::chrono::system_clock::now()),
-        _nextPing(std::chrono::system_clock::now() + std::chrono::seconds(5)),
-        _lastPong(std::chrono::system_clock::now()),
+        _nextConnectTimer(0),
+        _nextPingTimer(5 * SECOND * IN_MILLISECONDS),
+        _lastPongElapsed(0),
         _enabled(false),
         _maxConnectAttempts(0),
         _curReconnectAttempts(0),
         _state(VOICECHAT_DISCONNECTED),
-        _lastUpdate(std::chrono::system_clock::now())
+        _lastUpdateTimer(0)
     {
     }
     ~VoiceChatMgr();
 
     void Init();
     void LoadConfigs();
-    void Update();
+    void Update(uint32 diff);
     void SocketDisconnected();
     bool RequestNewSocket(VoiceChatSocket* socket);
     void QueuePacket(std::unique_ptr<VoiceChatServerPacket> newPacket);
@@ -69,8 +70,8 @@ public:
     void ActivateVoiceSocketThread();
     void VoiceSocketThread();
 
-    bool NeedConnect();
-    bool NeedReconnect();
+    bool NeedConnect(uint32 diff);
+    bool NeedReconnect(uint32 diff);
     int32 GetReconnectAttempts() const;
 
     bool IsEnabled() const { return _enabled; }
@@ -182,9 +183,9 @@ private:
     uint16 _voicePort;
 
     // next connect attempt
-    std::chrono::system_clock::time_point _nextConnect;
-    std::chrono::system_clock::time_point _nextPing;
-    std::chrono::system_clock::time_point _lastPong;
+    uint32 _nextConnectTimer;
+    uint32 _nextPingTimer;
+    uint32 _lastPongElapsed;
 
     // enabled in config
     bool _enabled;
@@ -200,7 +201,7 @@ private:
     // state of connection
     VoiceChatState _state;
 
-    std::chrono::system_clock::time_point _lastUpdate;
+    uint32 _lastUpdateTimer;
 
     // Thread safety mechanisms
     std::mutex _recvQueueLock;
