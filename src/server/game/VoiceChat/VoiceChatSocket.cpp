@@ -22,45 +22,31 @@
 #include <iomanip>
 
 struct VoiceChatServerPktHeader {
-  uint16 cmd;
-  uint16 size;
+    uint16 cmd;
+    uint16 size;
 
-  char const* data() const { return reinterpret_cast<const char *>(this); }
+    char const* data() const { return reinterpret_cast<const char *>(this); }
 
-  std::size_t headerSize() const { return sizeof(VoiceChatServerPktHeader); }
+    std::size_t headerSize() const { return sizeof(VoiceChatServerPktHeader); }
 };
-
-// ~VoiceChatSocket::VoiceChatSocket()
-// {
-//     LOG_DEBUG("voice.chat", "VoiceChatSocket destructor called");
-//     if (IsOpen())
-//     {
-//         LOG_DEBUG("voice.chat", "Socket was still open during destruction");
-//     }
-// }
 
 VoiceChatSocket::VoiceChatSocket(tcp::socket &&socket)
     : Socket<VoiceChatSocket>(std::move(socket)) {}
 
 void VoiceChatSocket::Start()
 {
-  // Initialize connection
-  std::string ip_address = GetRemoteIpAddress().to_string();
-  // LOG_TRACE("session", "Accepted connection from {}", ip_address);
-  LOG_DEBUG("session", "Accepted connection from {}", ip_address);
-  AsyncRead();
+    // Initialize connection
+    std::string ip_address = GetRemoteIpAddress().to_string();
+    LOG_DEBUG("session", "Accepted connection from {}", ip_address);
+    AsyncRead();
 }
 
 bool VoiceChatSocket::Update()
 {
-  if (!Socket<VoiceChatSocket>::Update())
-    return false;
+    if (!Socket<VoiceChatSocket>::Update())
+        return false;
 
-  // _queryProcessor.ProcessReadyCallbacks();
-    // Process any queued packets in parent class
-
-  // Add session-specific update logic
-  return true;
+    return true;
 }
 
 void VoiceChatSocket::SendPacket(VoiceChatServerPacket pct)
@@ -72,52 +58,43 @@ void VoiceChatSocket::SendPacket(VoiceChatServerPacket pct)
     header.cmd = pct.GetOpcode();
     header.size = static_cast<uint8>(pct.size());
 
-    // Create MessageBuffer with total size (header + payload)
     MessageBuffer buffer(header.headerSize() + pct.size());
 
-    // Write header
     buffer.Write(header.data(), header.headerSize());
 
-    // Write payload if any
     if (pct.size() > 0)
         buffer.Write(pct.contents(), pct.size());
 
     LOG_DEBUG("session", "Sending voice socket packet: opcode={}, size={}", header.cmd, header.size);
 
-    // Log the raw packet data
     std::stringstream ss;
     const uint8* data = (const uint8*)buffer.GetReadPointer();
     for (size_t i = 0; i < buffer.GetActiveSize(); ++i)
         ss << std::hex << std::setw(2) << std::setfill('0') << (int)data[i] << " ";
     LOG_DEBUG("session", "Voice socket packet data: {}", ss.str());
 
-    // Queue the packet using Socket's QueuePacket method
     QueuePacket(std::move(buffer));
 }
 
 bool VoiceChatSocket::HandlePing()
 {
-  // Handle ping packet
-  return true;
+    // Always handle ping packet
+    return true;
 }
 
 bool VoiceChatSocket::ProcessIncomingData()
 {
     try
     {
-        LOG_DEBUG("session", "VoiceChatSocket::ProcessIncomingData() Read Pong packet "
-            "sent from server"); // Log info for pong packets
-        // Structured similar to VoiceChatServerSocket
+        LOG_DEBUG("session", "VoiceChatSocket::ProcessIncomingData() Read Pong packet sent from server"); // Log info for pong packets
+
         if (!IsOpen())
             return false;
 
         // Read header
         if (GetReadBuffer().GetActiveSize() < sizeof(VoiceChatServerPktHeader))
         {
-            LOG_ERROR("session",
-                "Not enough data for header ({} < {})",
-                GetReadBuffer().GetActiveSize(),
-                sizeof(VoiceChatServerPktHeader));
+            LOG_ERROR("session", "Not enough data for header ({} < {})", GetReadBuffer().GetActiveSize(), sizeof(VoiceChatServerPktHeader));
             return false;
         }
 
@@ -125,16 +102,11 @@ bool VoiceChatSocket::ProcessIncomingData()
         std::memcpy(&header, GetReadBuffer().GetReadPointer(), sizeof(header));
         GetReadBuffer().ReadCompleted(sizeof(header));
 
-        LOG_DEBUG("session", "Processing voice socket packet: cmd={}, size={}", header.cmd,
-            header.size);
+        LOG_DEBUG("session", "Processing voice socket packet: cmd={}, size={}", header.cmd, header.size);
 
         if (header.size < 2 || header.size > 0x2800)
         {
-            LOG_ERROR("session",
-                "VoiceChatServerSocket::ProcessIncomingData: client sent "
-                "malformed packet size = {} , cmd = {}",
-                header.size,
-                header.cmd);
+            LOG_ERROR("session", "VoiceChatServerSocket::ProcessIncomingData: client sent malformed packet size = {} , cmd = {}", header.size, header.cmd);
             CloseSocket();
             return false;
         }
@@ -165,15 +137,14 @@ bool VoiceChatSocket::ProcessIncomingData()
 
 void VoiceChatSocket::ReadHandler()
 {
-  LOG_DEBUG("session", "ReadHandler called with {} bytes available",
-            GetReadBuffer().GetActiveSize());
+    LOG_DEBUG("session", "ReadHandler called with {} bytes available", GetReadBuffer().GetActiveSize());
 
-  MessageBuffer &packet = GetReadBuffer();
-  while (packet.GetActiveSize() > 0) // Loop while there's data in the buffer
-  {
-    if (!ProcessIncomingData()) // Process data until buffer is exhausted
-      break;                    // Break if processing fails
-  }
+    MessageBuffer &packet = GetReadBuffer();
+    while (packet.GetActiveSize() > 0) // Loop while there's data in the buffer
+    {
+        if (!ProcessIncomingData()) // Process data until buffer is exhausted
+            break;                  // Break if processing fails
+    }
 
-  AsyncRead(); // Queue the next async read
+    AsyncRead(); // Queue the next async read
 }

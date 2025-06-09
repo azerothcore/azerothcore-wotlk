@@ -318,7 +318,6 @@ int main(int argc, char** argv)
         sScriptMgr->OnAfterUnloadAllMaps();
     });
 
-    // initialize VoiceChatMgr with the same ioContext
     sVoiceChatMgr.Init();
 
     // Start the Remote Access port (acceptor) if enabled
@@ -370,28 +369,6 @@ int main(int argc, char** argv)
         ///- Clean database before leaving
         ClearOnlineAccounts();
     });
-
-    // std::shared_ptr<void> sVoiceChatSocketMgrHandle(nullptr, [](void*)
-    // {
-        // if (sVoiceChatMgr.CanUseVoiceChat())
-        // sVoiceChatMgr.SocketDisconnected();          // close voice socket and remove channels
-        // LOG_ERROR("server.worldserver", "VOICE CHAT SOCKET STOPNETWORK MAIN.CPP");
-        // sVoiceChatSocketMgr.StopNetwork();
-    // });
-
-    // if (!sVoiceChatSocketMgr.StartNetwork(*ioContext, "127.0.0.1", 3725, 1))
-    // {
-    //     LOG_ERROR("server.worldserver", "Failed to initialize network");
-    //     World::StopNow(ERROR_EXIT_CODE);
-    //     return 1;
-    // }
-    // else
-    // {
-    //     for (int i = 0; i < 50; ++i)
-    //     {
-    //         LOG_INFO("sql.sql", "Started voice server network!");
-    //     }
-    // }
 
     // Set server online (allow connecting now)
     LoginDatabase.DirectExecute("UPDATE realmlist SET flag = flag & ~{}, population = 0 WHERE id = '{}'", REALM_FLAG_VERSION_MISMATCH, realm.Id.Realm);
