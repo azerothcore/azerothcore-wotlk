@@ -17568,7 +17568,7 @@ bool Unit::IsTriggeredAtSpellProcEvent(Unit* victim, Aura* aura, WeaponAttackTyp
             {
                 attackSpeed = attacker->GetAttackTime(attType);
             }
-            else //spells user their casttime for ppm calculations https://github.com/ClassicWoWCommunity/cata-classic-bugs/issues/66#issuecomment-1182017571
+            else //spells user their casttime for ppm calculations
             {
                 if (procSpell->CastTimeEntry)
                     attackSpeed = procSpell->CastTimeEntry->CastTime;
