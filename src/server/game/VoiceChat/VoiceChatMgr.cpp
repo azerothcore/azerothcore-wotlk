@@ -853,6 +853,8 @@ void VoiceChatMgr::RestoreVoiceChatChannels()
         case VOICECHAT_CHANNEL_BG:
             bgChannels.emplace_back(chn->GetGroupId(), chn->GetTeam());
             break;
+        default:
+            break;
         }
     }
 
