@@ -482,7 +482,7 @@ bool VoiceChatMgr::NeedConnect(uint32 diff)
 {
     auto currentSocket = _socket.lock();
     auto currentRequestSocket = _requestSocket.lock();
-    
+
     return _enabled && !currentSocket && !currentRequestSocket && _state == VOICECHAT_NOT_CONNECTED &&
            diff >= _nextConnectTimer;
 }
@@ -491,7 +491,7 @@ bool VoiceChatMgr::NeedReconnect(uint32 diff)
 {
     auto currentSocket = _socket.lock();
     auto currentRequestSocket = _requestSocket.lock();
-    
+
     return _enabled && !currentSocket && !currentRequestSocket && _state == VOICECHAT_RECONNECTING &&
            diff >= _nextConnectTimer;
 }
