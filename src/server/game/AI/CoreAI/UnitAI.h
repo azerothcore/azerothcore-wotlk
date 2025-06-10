@@ -165,9 +165,10 @@ struct PowerUsersSelector : public Acore::unary_function<Unit*, bool>
     }
 };
 
-struct FarthestTargetSelector : public Acore::unary_function<Unit*, bool>
+// Simple selector based on range and Los
+struct RangeSelector : public Acore::unary_function<Unit*, bool>
 {
-    FarthestTargetSelector(Unit const* unit, float maxDist, bool playerOnly, bool inLos, float minDist = 0.f) : _me(unit), _minDist(minDist), _maxDist(maxDist), _playerOnly(playerOnly), _inLos(inLos) {}
+    RangeSelector(Unit const* unit, float maxDist, bool playerOnly, bool inLos, float minDist = 0.f) : _me(unit), _minDist(minDist), _maxDist(maxDist), _playerOnly(playerOnly), _inLos(inLos) {}
 
     bool operator()(Unit const* target) const
     {

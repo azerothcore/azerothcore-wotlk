@@ -213,7 +213,7 @@ struct npc_dark_fiend : public ScriptedAI
             Unit* target = nullptr;
             if (InstanceScript* instance = me->GetInstanceScript())
                 if (Creature* muru = instance->GetCreature(DATA_MURU))
-                    target = muru->GetAI()->SelectTarget(SelectTargetMethod::Random, 0, FarthestTargetSelector(me, 50.0f, true, true));
+                    target = muru->GetAI()->SelectTarget(SelectTargetMethod::Random, 0, RangeSelector(me, 50.0f, true, true));
 
             if (target)
             {
