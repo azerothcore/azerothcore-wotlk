@@ -246,44 +246,13 @@ public:
 
         void Reset() override
         {
-            if (!HasEscortState(STATE_ESCORT_ESCORTING))
-            {
-                m_uiWave = 0;
-                m_uiWave_Timer = 3000;
-                m_uiValrothGUID.Clear();
-                me->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
-                me->LoadEquipment(0, true);
-                me->RemoveAllAuras();
-                summons.DespawnAll();
-            }
-        }
-
-        void EnterEvadeMode(EvadeReason /*why*/) override
-        {
-            me->GetThreatMgr().ClearAllThreat();
-            me->CombatStop(false);
-            me->SetLootRecipient(nullptr);
-
-            if (HasEscortState(STATE_ESCORT_ESCORTING))
-            {
-                AddEscortState(STATE_ESCORT_RETURNING);
-                ReturnToLastPoint();
-                LOG_DEBUG("scripts.ai", "EscortAI has left combat and is now returning to last point");
-            }
-            else
-            {
-                me->GetMotionMaster()->MoveTargetedHome();
-                me->SetImmuneToNPC(true);
-                Reset();
-            }
-        }
-
-        void AttackStart(Unit* who) override
-        {
-            if (HasEscortState(STATE_ESCORT_PAUSED))
-                return;
-
-            npc_escortAI::AttackStart(who);
+            m_uiWave = 0;
+            m_uiWave_Timer = 3000;
+            m_uiValrothGUID.Clear();
+            me->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
+            me->LoadEquipment(0, true);
+            me->RemoveAllAuras();
+            summons.DespawnAll();
         }
 
         void WaypointReached(uint32 waypointId) override
