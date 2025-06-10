@@ -17,17 +17,17 @@ INSERT INTO `command` (`name`, `security`, `help`) VALUES
 
 SET
 @scourge_invasion            = 17,
-@scourge_boss_in_instance    = 89,
-@scourge_winterspring        = 90,
-@scourge_tanaris             = 91,
-@scourge_azshara             = 92,
-@scourge_blasted_lands       = 93,
-@scourge_eastern_plaguelands = 94,
-@scourge_burning_steppes     = 95,
-@scourge_50_invasions_done   = 96,
-@scourge_100_invasions_done  = 97,
-@scourge_150_invasions_done  = 98,
-@scourge_invasions_done      = 99;
+@scourge_boss_in_instance    = 120,
+@scourge_winterspring        = 121,
+@scourge_tanaris             = 122,
+@scourge_azshara             = 123,
+@scourge_blasted_lands       = 124,
+@scourge_eastern_plaguelands = 125,
+@scourge_burning_steppes     = 126,
+@scourge_50_invasions_done   = 127,
+@scourge_100_invasions_done  = 128,
+@scourge_150_invasions_done  = 129,
+@scourge_invasions_done      = 130;
 
 DELETE FROM `game_event` WHERE `eventEntry` IN (
     @scourge_boss_in_instance,  @scourge_winterspring, @scourge_tanaris, @scourge_azshara,
