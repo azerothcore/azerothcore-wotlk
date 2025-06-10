@@ -143,7 +143,7 @@ enum PlayerHook
     PLAYERHOOK_ON_UPDATE_GATHERING_SKILL,
     PLAYERHOOK_ON_UPDATE_CRAFTING_SKILL,
     PLAYERHOOK_ON_UPDATE_FISHING_SKILL,
-    PLAYERHOOK_ON_LOOT_FISHING_POOL,
+    PLAYERHOOK_CAN_LOOT_FISHING_POOL,
     PLAYERHOOK_CAN_AREA_EXPLORE_AND_OUTDOOR,
     PLAYERHOOK_ON_VICTIM_REWARD_BEFORE,
     PLAYERHOOK_ON_VICTIM_REWARD_AFTER,
@@ -541,7 +541,7 @@ public:
 
     [[nodiscard]] virtual bool OnPlayerUpdateFishingSkill(Player* /*player*/, int32 /*skill*/, int32 /*zone_skill*/, int32 /*chance*/, int32 /*roll*/) { return true; }
 
-    [[nodiscard]] virtual bool OnPlayerLootFishingPool(Player* /*player*/, int32 /*skill*/, int32 /*zone_skill*/, int32 /*chance*/, int32 /*roll*/) { return true; }
+    [[nodiscard]] virtual bool OnPlayerCanLootFishingPool(Player* /*player*/, int32 /*skill*/, int32 /*zone_skill*/, int32 /*chance*/, int32 /*roll*/) { return true; }
 
     [[nodiscard]] virtual bool OnPlayerCanAreaExploreAndOutdoor(Player* /*player*/) { return true; }
 
