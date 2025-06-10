@@ -2511,7 +2511,7 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
                          std::back_inserter(waypoints), [](uint32 wp) { return wp != 0; });
 
             float distanceToClosest = std::numeric_limits<float>::max();
-            uint32 closestWp = 0;
+            uint32 closestWpId = 0;
 
             for (WorldObject* target : targets)
             {
@@ -2525,23 +2525,24 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
                             if (!path || path->empty())
                                 continue;
 
+                            //waypoint pointid always starts at 1, never 0!
                             auto itrWp = path->find(1);
                             if (itrWp != path->end())
                             {
                                 if (WayPoint* wpData = itrWp->second)
                                 {
-                                    float distToThisPath = creature->GetExactDist(wpData->x, wpData->y, wpData->z);
+                                    float distToThisPath = creature->GetExactDistSq(wpData->x, wpData->y, wpData->z);
                                     if (distToThisPath < distanceToClosest)
                                     {
                                         distanceToClosest = distToThisPath;
-                                        closestWp = wp;
+                                        closestWpId = wp;
                                     }
                                 }
                             }
                         }
 
-                        if (closestWp)
-                            CAST_AI(SmartAI, creature->AI())->StartPath(false, closestWp, true);
+                        if (closestWpId)
+                            CAST_AI(SmartAI, creature->AI())->StartPath(false, closestWpId, true);
                     }
                 }
             }
