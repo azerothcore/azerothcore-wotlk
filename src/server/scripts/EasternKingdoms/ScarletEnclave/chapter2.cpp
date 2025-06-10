@@ -236,7 +236,7 @@ public:
     {
         npc_koltira_deathweaverAI(Creature* creature) : npc_escortAI(creature), summons(me)
         {
-            me->SetReactState(REACT_DEFENSIVE);
+            me->SetReactState(REACT_PASSIVE);
         }
 
         uint32 m_uiWave;
@@ -330,7 +330,6 @@ public:
             if (summoned->GetEntry() == NPC_HIGH_INQUISITOR_VALROTH)
                 m_uiValrothGUID = summoned->GetGUID();
 
-            summoned->AddThreat(me, 0.0f);
             summoned->SetImmuneToPC(false);
             summons.Summon(summoned);
         }
@@ -355,20 +354,102 @@ public:
                             Talk(SAY_BREAKOUT3);
                             SummonAcolyte(3);
                             m_uiWave_Timer = 20000;
+
+                            //1
+                            //[0] Position: X: 1640.6724 Y : -6032.0527 Z : 134.82213
+                            //    [0] Orientation : 4.654973506927490234
+
+                            //    [0][0] Points : X : 1640.7255 Y : -6031.129 Z : 134.9092
+                            //    [0][1] Points : X : 1640.6724 Y : -6032.0527 Z : 134.82213
+                            //    [0][2] Points : X : 1640.6193 Y : -6032.9766 Z : 134.73506
+                            //    [0][3] Points : X : 1639.9878 Y : -6043.9604 Z : 128.26712
+                            //    [0][4] Points : X : 1639.8875 Y : -6045.705 Z : 127.93819
+                            //    [0][5] Points : X : 1639.8494 Y : -6046.368 Z : 127.941864
+                            //    [0][6] Points : X : 1639.8494 Y : -6046.368 Z : 127.941864
+
+                            //2
+                            //    [1] Position: X: 1641.0055 Y : -6031.893 Z : 134.82211
+                            //    [1] Orientation : 0.401425719261169433
+                            //(MovementMonsterSpline)(MovementSpline)[0] Points: X: 1649.966 Y : -6042.5713 Z : 127.57849
+                            //    (MovementMonsterSpline)(MovementSpline)[0] WayPoints : X : 1640.2473 Y : -6043.659 Z : 128.38293
+                            //    (MovementMonsterSpline)(MovementSpline)[1] WayPoints : X : 1640.2473 Y : -6045.409 Z : 128.13293
+                            //    (MovementMonsterSpline)(MovementSpline)[2] WayPoints : X : 1639.9973 Y : -6046.159 Z : 128.13293
+                            //    (MovementMonsterSpline)(MovementSpline)[3] WayPoints : X : 1641.7473 Y : -6045.409 Z : 128.13293
+
+                            //    3
+                            //    [2] Position : X : 1639.7053 Y : -6031.7373 Z : 134.82213
+                            //    [2] Orientation : 2.443460941314697265
+
+                        //Points: X: 1640.6724 Y : -6032.0527 Z : 134.73506
                             break;
                         case 1:
                             Talk(SAY_BREAKOUT4);
                             SummonAcolyte(3);
                             m_uiWave_Timer = 20000;
+                            //4611538
+                            //[0] Position : X : 1640.7958 Y : -6030.307 Z : 134.82211
+                            //[0] Orientation : 4.65355682373046875
+
+                            //[0][0] Points : X : 1640.8951 Y : -6028.62 Z : 134.90918
+                            //[0][1] Points : X : 1640.7958 Y : -6030.307 Z : 134.82211
+                            //[0][2] Points : X : 1640.6964 Y : -6031.994 Z : 134.73505
+                            //[0][3] Points : X : 1640.6384 Y : -6032.978 Z : 134.73506
+                            //[0][4] Points : X : 1639.9912 Y : -6043.961 Z : 128.26712
+                            //[0][5] Points : X : 1639.8884 Y : -6045.7046 Z : 127.93819
+                            //[0][6] Points : X : 1639.8494 Y : -6046.368 Z : 127.941864
+                            //[0][7] Points : X : 1639.8494 Y : -6046.368 Z : 127.941864
+                            //
+                            // (MovementMonsterSpline) (MovementSpline) [0] Points: X: 1649.966 Y: -6042.5713 Z: 127.57849
+                            //(MovementMonsterSpline)(MovementSpline)[0] WayPoints: X: 1640.1323 Y : -6043.6577 Z : 128.70898
+                            //    (MovementMonsterSpline)(MovementSpline)[1] WayPoints : X : 1640.1323 Y : -6045.4077 Z : 128.45898
+                            //    (MovementMonsterSpline)(MovementSpline)[2] WayPoints : X : 1640.1323 Y : -6046.1577 Z : 128.45898
+                            //    (MovementMonsterSpline)(MovementSpline)[3] WayPoints : X : 1641.6323 Y : -6045.4077 Z : 128.45898
+                            //13000146
+                            //[1] Position : X : 1641.7305 Y : -6030.751 Z : 134.82211
+                            //[1] Orientation : 6.143558979034423828
+                            //
+                            //[0] Points: X: 1640.7958 Y: -6030.307 Z: 134.73505
+                            // 
+                            //21388754
+                            //[2] Position : X : 1639.4657 Y : -6030.404 Z : 134.82211
+                            //[2] Orientation : 4.502949237823486328
+                            //(MovementMonsterSpline)(MovementSpline)[0] Points: X: 1638.7998 Y : -6036.4976 Z : 132.57643
+                            //    (MovementMonsterSpline)(MovementSpline)[0] WayPoints : X : 1639.3828 Y : -6031.2007 Z : 134.94928
+                            //    (MovementMonsterSpline)(MovementSpline)[1] WayPoints : X : 1639.1328 Y : -6032.4507 Z : 134.94928
+                            //    (MovementMonsterSpline)(MovementSpline)[2] WayPoints : X : 1639.1328 Y : -6032.9507 Z : 134.94928
+
+                            //(MovementMonsterSpline)(MovementSpline)[0] Points: X: 1640.2987 Y : -6038.744 Z : 131.33873
                             break;
                         case 2:
                             Talk(SAY_BREAKOUT5);
                             SummonAcolyte(4);
                             m_uiWave_Timer = 20000;
+
+
+                            //[0] Position : X : 1641.3405 Y : -6031.436 Z : 134.82211
+                            //[0] Orientation : 4.612849712371826171
+
+                            //[0][0] Points : X : 1641.4899 Y : -6029.94 Z : 134.90916
+                            //[0][1] Points : X : 1641.3405 Y : -6031.436 Z : 134.82211
+                            //[0][2] Points : X : 1641.191 Y : -6032.932 Z : 134.73506
+                            //[0][3] Points : X : 1640.0889 Y : -6043.9697 Z : 128.26712
+                            //[0][4] Points : X : 1639.919 Y : -6045.672 Z : 127.93819
+                            //[0][5] Points : X : 1639.8494 Y : -6046.368 Z : 127.941864
+                            //[0][6] Points : X : 1639.8494 Y : -6046.368 Z : 127.941864
+
+                            //[1] Position : X : 1642.0404 Y : -6030.3843 Z : 134.82211
+                            //[1] Orientation : 1.378810048103332519
+
+                            //[2] Position : X : 1640.1162 Y : -6029.7817 Z : 134.82211
+                            //[2] Orientation : 5.707226753234863281
+
+                            //[3] Position : X : 1640.9948 Y : -6029.8027 Z : 134.82211
+                            //[3] Orientation : 1.605702877044677734
+
                             break;
                         case 3:
                             Talk(SAY_BREAKOUT6);
-                            me->SummonCreature(NPC_HIGH_INQUISITOR_VALROTH, 1642.329f, -6045.818f, 127.583f, 0.0f, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 1000);
+                            me->SummonCreature(NPC_HIGH_INQUISITOR_VALROTH, 1640.8596f, -6030.834f, 134.82211f, 4.606426715850830078f, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 1000);
                             m_uiWave_Timer = 1000;
                             break;
                         case 4:
@@ -382,14 +463,6 @@ public:
                                 }
                                 else
                                 {
-                                    // xinef: despawn check
-                                    Player* player = GetPlayerForEscort();
-                                    if (!player || me->GetDistance(player) > 60.0f)
-                                    {
-                                        me->DespawnOrUnsummon();
-                                        return;
-                                    }
-
                                     m_uiWave_Timer = 2500;
                                     return;                         //return, we don't want m_uiWave to increment now
                                 }
