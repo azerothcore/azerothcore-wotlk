@@ -173,7 +173,6 @@ struct npc_taldaram_flamesphere : public NullCreatureAI
 private:
     Position victimPos;
     InstanceScript* instance;
-    uint32 uiDespawnTimer;
     uint32 moveTimer;
 };
 
@@ -368,7 +367,7 @@ struct boss_taldaram : public BossAI
                     if (Unit* victim = me->GetVictim())
                     {
                         DoCast(victim, SPELL_CONJURE_FLAME_SPHERE);
-                        victimSperePos = *victim;
+                        victimSperePos = victim->GetPosition();
                     }
 
                     if (!events.GetNextEventTime(EVENT_PRINCE_VANISH))
