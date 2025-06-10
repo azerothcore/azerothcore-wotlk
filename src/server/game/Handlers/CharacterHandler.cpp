@@ -1019,11 +1019,14 @@ void WorldSession::HandlePlayerLoginFromDB(LoginQueryHolder const& holder)
         {
             ReputationMgr& repMgr = pCurrChar->GetReputationMgr();
 
-            auto SendFullReputation = [&repMgr](std::initializer_list<uint32> factionsList)
+            auto SendFullReputation = [&repMgr, pCurrChar](std::initializer_list<uint32> factionsList)
             {
                 for (auto const& itr : factionsList)
                 {
-                    repMgr.SetOneFactionReputation(sFactionStore.LookupEntry(itr), 42999.f, false);
+                    auto faction = sFactionStore.LookupEntry(itr);
+                    float reputation = 42999.f;
+                    sScriptMgr->OnPlayerBeforeReputationChange(pCurrChar, faction->ID, reputation, ReputationSource::Config, nullptr, nullptr, nullptr);
+                    repMgr.SetOneFactionReputation(faction, reputation, false);
                 }
             };
 
