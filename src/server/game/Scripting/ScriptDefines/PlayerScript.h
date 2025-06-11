@@ -541,7 +541,7 @@ public:
 
     [[nodiscard]] virtual bool OnPlayerUpdateFishingSkill(Player* /*player*/, int32 /*skill*/, int32 /*zone_skill*/, int32 /*chance*/, int32 /*roll*/) { return true; }
 
-    [[nodiscard]] virtual bool OnPlayerCanLootFishingPool(Player* /*player*/, int32 /*skill*/, int32 /*zone_skill*/, int32 /*chance*/, int32 /*roll*/) { return true; }
+    [[nodiscard]] virtual bool OnPlayerCanLootFishingPool(Player* /*player*/, int32 /*skill*/, int32 /*zone_skill*/, GameObject* /*fishing_pool*/) { return true; }
 
     [[nodiscard]] virtual bool OnPlayerCanAreaExploreAndOutdoor(Player* /*player*/) { return true; }
 
