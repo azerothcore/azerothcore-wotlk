@@ -1754,13 +1754,13 @@ class spell_dk_pestilence : public SpellScript
             // And spread them on target
             // Blood Plague
             if (Aura* disOld = target->GetAura(SPELL_DK_BLOOD_PLAGUE, caster->GetGUID()))
-                if(AuraEffect* effOld = disOld->GetEffect(EFFECT_0))
+                if (AuraEffect* effOld = disOld->GetEffect(EFFECT_0))
                 {
                     float pctMods = effOld->GetPctMods();
                     float crit = effOld->GetCritChance();
 
                     if (Aura* disNew = hitUnit->GetAura(SPELL_DK_BLOOD_PLAGUE, caster->GetGUID()))
-                        if(AuraEffect* effNew = disNew->GetEffect(EFFECT_0))
+                        if (AuraEffect* effNew = disNew->GetEffect(EFFECT_0))
                         {
                             effNew->SetPctMods(pctMods);
                             effNew->SetCritChance(crit);
@@ -1770,13 +1770,13 @@ class spell_dk_pestilence : public SpellScript
 
             // Frost Fever
             if (Aura* disOld = target->GetAura(SPELL_DK_FROST_FEVER, caster->GetGUID()))
-                if(AuraEffect* effOld = disOld->GetEffect(EFFECT_0))
+                if (AuraEffect* effOld = disOld->GetEffect(EFFECT_0))
                 {
                     float pctMods = effOld->GetPctMods();
                     float crit = effOld->GetCritChance();
 
                     if (Aura* disNew = hitUnit->GetAura(SPELL_DK_FROST_FEVER, caster->GetGUID()))
-                        if(AuraEffect* effNew = disNew->GetEffect(EFFECT_0))
+                        if (AuraEffect* effNew = disNew->GetEffect(EFFECT_0))
                         {
                             effNew->SetPctMods(pctMods);
                             effNew->SetCritChance(crit);
