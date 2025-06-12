@@ -753,6 +753,41 @@ class spell_rog_vanish : public SpellScript
     }
 };
 
+// 5374 - Mutilate, Main-Hand
+class spell_rog_mutilate : public SpellScript
+{
+    PrepareSpellScript(spell_rog_mutilate);
+
+    bool Load() override
+    {
+        HadColdBlood = false;
+        return true;
+    }
+
+    void CheckColdBlood()
+    {
+        if (Player* caster = GetCaster()->ToPlayer())
+            if (caster->HasAura(14177))
+                HadColdBlood = true;
+    }
+
+    void ReapplyColdBlood()
+    {
+        if (Player* caster = GetCaster()->ToPlayer())
+            if (HadColdBlood)
+                caster->AddAura(14177, caster);
+    }
+
+    void Register() override
+    {
+        BeforeCast += SpellCastFn(spell_rog_mutilate::CheckColdBlood);
+        AfterCast += SpellCastFn(spell_rog_mutilate::ReapplyColdBlood);
+    }
+
+private:
+    bool HadColdBlood;
+};
+
 void AddSC_rogue_spell_scripts()
 {
     RegisterSpellScript(spell_rog_savage_combat);
@@ -771,4 +806,5 @@ void AddSC_rogue_spell_scripts()
     RegisterSpellScript(spell_rog_pickpocket);
     RegisterSpellScript(spell_rog_vanish_purge);
     RegisterSpellScript(spell_rog_vanish);
+    RegisterSpellScript(spell_rog_mutilate);
 }
