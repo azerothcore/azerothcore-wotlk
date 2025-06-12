@@ -13503,7 +13503,7 @@ float Unit::GetPPMProcChance(uint32 WeaponSpeed, float PPM, SpellInfo const* spe
         if (Player* modOwner = GetSpellModOwner())
             modOwner->ApplySpellMod(spellProto->Id, SPELLMOD_PROC_PER_MINUTE, PPM);
 
-    return std::floor((WeaponSpeed * PPM) / 600.0f);   // result is chance in percents (probability = Speed_in_sec * (PPM / 60))
+    return (WeaponSpeed * PPM) / 600.0f;   // result is chance in percents (probability = Speed_in_sec * (PPM / 60))
 }
 
 void Unit::Mount(uint32 mount, uint32 VehicleId, uint32 creatureEntry)
@@ -17555,16 +17555,30 @@ bool Unit::IsTriggeredAtSpellProcEvent(Unit* victim, Aura* aura, WeaponAttackTyp
     // If PPM exist calculate chance from PPM
     if (spellProcEvent && spellProcEvent->ppmRate != 0)
     {
+        uint32 attackSpeed = 0;
+        Unit* attacker = nullptr;
         if (!isVictim)
-        {
-            uint32 WeaponSpeed = GetAttackTime(attType);
-            chance = GetPPMProcChance(WeaponSpeed, spellProcEvent->ppmRate, spellProto);
-        }
+            attacker = this;
         else if (victim)
+            attacker = victim;
+
+        if (attacker)
         {
-            uint32 WeaponSpeed = victim->GetAttackTime(attType);
-            chance = victim->GetPPMProcChance(WeaponSpeed, spellProcEvent->ppmRate, spellProto);
+            if (!procSpell || procSpell->DmgClass == SPELL_DAMAGE_CLASS_MELEE || procSpell->IsRangedWeaponSpell())
+            {
+                attackSpeed = attacker->GetAttackTime(attType);
+            }
+            else //spells user their casttime for ppm calculations
+            {
+                if (procSpell->CastTimeEntry)
+                    attackSpeed = procSpell->CastTimeEntry->CastTime;
+
+                //instants and fast spells use 1.5s castspeed
+                if (attackSpeed < 1500)
+                    attackSpeed = 1500;
+            }
         }
+        chance = GetPPMProcChance(attackSpeed, spellProcEvent->ppmRate, spellProto);
     }
 
     // Custom chances
