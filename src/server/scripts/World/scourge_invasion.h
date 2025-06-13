@@ -333,6 +333,7 @@ enum ScourgeInvasionTalk
     HERALD_OF_THE_LICH_KING_SAY_ATTACK_START    = 0,
     HERALD_OF_THE_LICH_KING_SAY_ATTACK_END      = 1,
     HERALD_OF_THE_LICH_KING_SAY_ATTACK_RANDOM   = 2,
+    PALLID_HORROR_SAY_RANDOM_YELL               = 0,
     SHADOW_OF_DOOM_SAY_AGGRO                    = 0
 };
 
