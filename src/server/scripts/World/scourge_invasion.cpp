@@ -41,51 +41,9 @@ class FlameshockerCheck
 public:
     bool operator()(Creature* creature)
     {
-        return !creature->IsCivilian();
+        return !creature->IsCivilian() && creature->GetEntry() != NPC_FLAMESHOCKER;
     }
 };
-
-// @todo replace CreatureListSearcher
-Unit* SelectRandomFlameshockerSpawnTarget(Creature* unit, Creature* except, float /*radius*/)
-{
-    std::list<Creature*> targets;
-
-    // remove current target
-    if (except)
-        targets.remove(except);
-
-    FlameshockerCheck check;
-    Acore::CreatureListSearcher<FlameshockerCheck> searcher(unit, targets, check);
-    if (except)
-        targets.remove(except);
-
-    for (auto const& target : targets)
-        target->AI()->DoAction(1); // ACTION_ENTER_COMBAT
-
-    for (auto it = targets.begin(); it != targets.end(); )
-    {
-        Creature* target = *it;
-        if (target->GetZoneId() != unit->GetZoneId() ||
-            unit->IsValidAttackTarget(target) ||
-            GetClosestCreatureWithEntry(target, NPC_FLAMESHOCKER, VISIBILITY_DISTANCE_TINY))
-        {
-            it = targets.erase(it);
-        }
-        else
-        {
-            ++it;
-        }
-    }
-
-    // no appropriate targets
-    if (targets.empty())
-        return nullptr;
-
-    // select random
-    Creature* randomTarget = Acore::Containers::SelectRandomContainerElement(targets);
-
-    return randomTarget;
-}
 
 /*
 Necropolis
@@ -111,10 +69,25 @@ struct npc_herald_of_the_lich_king : public ScriptedAI
     {
         //m_go->SetVisibilityModifier(3000.0f);
         me->setActive(true);
-        ScheduleTimedEvent(5s, [&]()
+        ScheduleTimedEvent(5s, [&]() { Talk(HERALD_OF_THE_LICH_KING_SAY_ATTACK_RANDOM); }, 150ms, 1h);
+    }
+
+    void UpdateWeather(bool startEvent)
+    {
+        if (Weather* weather = WeatherMgr::FindWeather(me->GetZoneId()))
         {
-            Talk(HERALD_OF_THE_LICH_KING_SAY_ATTACK_RANDOM);
-        }, 150ms, 1h);
+            if (startEvent)
+                weather->SetWeather(WEATHER_TYPE_STORM, 0.25f);
+            else
+                weather->SetWeather(WEATHER_TYPE_RAIN, 0.0f);
+        }
+        else if (Weather* weather = WeatherMgr::AddWeather(me->GetZoneId()))
+        {
+            if (startEvent)
+                weather->SetWeather(WEATHER_TYPE_STORM, 0.25f);
+            else
+                weather->SetWeather(WEATHER_TYPE_RAIN, 0.0f);
+        }
     }
 
     void DoAction(int32 action) override
@@ -123,30 +96,22 @@ struct npc_herald_of_the_lich_king : public ScriptedAI
         {
             Talk(HERALD_OF_THE_LICH_KING_SAY_ATTACK_START);
             ChangeZoneEventStatus(true);
-            if (Weather* weather = WeatherMgr::FindWeather(me->GetZoneId()))
-                weather->SetWeather(WEATHER_TYPE_STORM, 0.25f);
-            else if (Weather* weather = WeatherMgr::AddWeather(me->GetZoneId()))
-                weather->SetWeather(WEATHER_TYPE_STORM, 0.25f);
-
+            UpdateWeather(true);
         }
         else if (action == EVENT_HERALD_OF_THE_LICH_KING_ZONE_STOP)
         {
             Talk(HERALD_OF_THE_LICH_KING_SAY_ATTACK_END);
             ChangeZoneEventStatus(false);
-            if (Weather* weather = WeatherMgr::FindWeather(me->GetZoneId()))
-                weather->SetWeather(WEATHER_TYPE_RAIN, 0.0f);
-            else if (Weather* weather = WeatherMgr::AddWeather(me->GetZoneId()))
-                weather->SetWeather(WEATHER_TYPE_RAIN, 0.0f);
-            me->DespawnOrUnsummon();
+            UpdateWeather(false);
         }
     }
 
-    void ChangeZoneEventStatus(bool enable)
+    void ChangeZoneEventStatus(bool startEvent)
     {
         switch (me->GetZoneId())
         {
             case AREA_WINTERSPRING:
-                if (enable)
+                if (startEvent)
                 {
                     if (!sGameEventMgr->IsActiveEvent(GAME_EVENT_SCOURGE_INVASION_WINTERSPRING))
                         sGameEventMgr->StartEvent(GAME_EVENT_SCOURGE_INVASION_WINTERSPRING, true);
@@ -155,7 +120,7 @@ struct npc_herald_of_the_lich_king : public ScriptedAI
                     sGameEventMgr->StopEvent(GAME_EVENT_SCOURGE_INVASION_WINTERSPRING, true);
                 break;
             case AREA_TANARIS:
-                if (enable)
+                if (startEvent)
                 {
                     if (!sGameEventMgr->IsActiveEvent(GAME_EVENT_SCOURGE_INVASION_TANARIS))
                         sGameEventMgr->StartEvent(GAME_EVENT_SCOURGE_INVASION_TANARIS, true);
@@ -164,7 +129,7 @@ struct npc_herald_of_the_lich_king : public ScriptedAI
                     sGameEventMgr->StopEvent(GAME_EVENT_SCOURGE_INVASION_TANARIS, true);
                 break;
             case AREA_AZSHARA:
-                if (enable)
+                if (startEvent)
                 {
                     if (!sGameEventMgr->IsActiveEvent(GAME_EVENT_SCOURGE_INVASION_AZSHARA))
                         sGameEventMgr->StartEvent(GAME_EVENT_SCOURGE_INVASION_AZSHARA, true);
@@ -173,7 +138,7 @@ struct npc_herald_of_the_lich_king : public ScriptedAI
                     sGameEventMgr->StopEvent(GAME_EVENT_SCOURGE_INVASION_AZSHARA, true);
                 break;
             case AREA_BLASTED_LANDS:
-                if (enable)
+                if (startEvent)
                 {
                     if (!sGameEventMgr->IsActiveEvent(GAME_EVENT_SCOURGE_INVASION_BLASTED_LANDS))
                         sGameEventMgr->StartEvent(GAME_EVENT_SCOURGE_INVASION_BLASTED_LANDS, true);
@@ -182,7 +147,7 @@ struct npc_herald_of_the_lich_king : public ScriptedAI
                     sGameEventMgr->StopEvent(GAME_EVENT_SCOURGE_INVASION_BLASTED_LANDS, true);
                 break;
             case AREA_EASTERN_PLAGUELANDS:
-                if (enable)
+                if (startEvent)
                 {
                     if (!sGameEventMgr->IsActiveEvent(GAME_EVENT_SCOURGE_INVASION_EASTERN_PLAGUELANDS))
                         sGameEventMgr->StartEvent(GAME_EVENT_SCOURGE_INVASION_EASTERN_PLAGUELANDS, true);
@@ -191,7 +156,7 @@ struct npc_herald_of_the_lich_king : public ScriptedAI
                     sGameEventMgr->StopEvent(GAME_EVENT_SCOURGE_INVASION_EASTERN_PLAGUELANDS, true);
                 break;
             case AREA_BURNING_STEPPES:
-                if (enable)
+                if (startEvent)
                 {
                     if (!sGameEventMgr->IsActiveEvent(GAME_EVENT_SCOURGE_INVASION_BURNING_STEPPES))
                         sGameEventMgr->StartEvent(GAME_EVENT_SCOURGE_INVASION_BURNING_STEPPES, true);
@@ -349,14 +314,13 @@ struct npc_necropolis_health : public ScriptedAI
     void JustDied(Unit* /*killer*/) override
     {
         // if (Creature* necropolis = GetClosestCreatureWithEntry(me, NPC_NECROPOLIS, 20.0f)) // ATTACK_DISTANCE
-        if (Creature* necropolis = GetClosestCreatureWithEntry(me, NPC_NECROPOLIS, ATTACK_DISTANCE)) // ATTACK_DISTANCE
+        if (Creature* necropolis = GetClosestCreatureWithEntry(me, NPC_NECROPOLIS, ATTACK_DISTANCE))
             me->CastSpell(necropolis, SPELL_DESPAWNER_OTHER, true);
 
         SIRemaining remainingID;
 
         switch (me->GetZoneId())
         {
-            default:
             case AREA_TANARIS:
                 remainingID = SI_REMAINING_TANARIS;
                 break;
@@ -375,6 +339,8 @@ struct npc_necropolis_health : public ScriptedAI
             case AREA_AZSHARA:
                 remainingID = SI_REMAINING_AZSHARA;
                 break;
+            default:
+                return;
         }
 
         uint32 remaining = sWorldState->GetSIRemaining(remainingID);
@@ -430,10 +396,7 @@ struct npc_necropolis_proxy : public ScriptedAI
     {
         me->setActive(true);
         //m_creature->SetVisibilityModifier(3000.0f);
-        Reset();
     }
-
-    void Reset() override {}
 
     void SpellHit(Unit* /*caster*/, SpellInfo const* spellInfo) override
     {
@@ -448,6 +411,8 @@ struct npc_necropolis_proxy : public ScriptedAI
             case SPELL_COMMUNIQUE_CAMP_TO_RELAY_DEATH:
                 if (Creature* health = GetClosestCreatureWithEntry(me, NPC_NECROPOLIS_HEALTH, 200.0f))
                     me->CastSpell(health, SPELL_COMMUNIQUE_CAMP_TO_RELAY_DEATH, true);
+                break;
+            default:
                 break;
         }
     }
@@ -478,10 +443,7 @@ struct npc_necropolis_relay : public ScriptedAI
     npc_necropolis_relay(Creature* creature) : ScriptedAI(creature)
     {
         me->setActive(true);
-        Reset();
     }
-
-    void Reset() override {}
 
     void SpellHit(Unit* /*caster*/, SpellInfo const* spell) override
     {
@@ -496,6 +458,8 @@ struct npc_necropolis_relay : public ScriptedAI
             case SPELL_COMMUNIQUE_CAMP_TO_RELAY_DEATH:
                 if (Creature* pProxy = GetClosestCreatureWithEntry(me, NPC_NECROPOLIS_PROXY, 200.0f))
                     me->CastSpell(pProxy, SPELL_COMMUNIQUE_CAMP_TO_RELAY_DEATH, true);
+                break;
+            default:
                 break;
         }
     }
@@ -609,9 +573,8 @@ struct npc_necrotic_shard : public ScriptedAI
                 int8 nearbyNecropolisCount = 0;
                 for (ObjectGuid necropolisGUID : necropoli)
                     if (Creature* necropolis = me->GetMap()->GetCreature(necropolisGUID))
-                        if (necropolis->GetZoneId() == me->GetZoneId())
-                            if (necropolis && necropolis->IsAlive() && (me->GetDistance2d(necropolis) <= 350.f))
-                                nearbyNecropolisCount++;
+                        if (me->GetZoneId() && necropolis->GetZoneId() && necropolis->IsAlive() && me->GetDistance2d(necropolis) <= 350.f)
+                            nearbyNecropolisCount++;
 
                 if (nearbyNecropolisCount == 0)
                     despawnMe = true;
@@ -621,7 +584,6 @@ struct npc_necrotic_shard : public ScriptedAI
             {
                 DespawnEventDoodads();
                 me->DespawnOrUnsummon();
-                return;
             }
         }, 60s);
     }
@@ -632,7 +594,7 @@ struct npc_necrotic_shard : public ScriptedAI
         ScheduleTasks();
     }
 
-    inline bool HasCampTypeAura() { return me->HasAnyAuras( SPELL_CAMP_TYPE_GHOST_SKELETON, SPELL_CAMP_TYPE_GHOST_GHOUL, SPELL_CAMP_TYPE_GHOUL_SKELETON); };
+    bool HasCampTypeAura() { return me->HasAnyAuras( SPELL_CAMP_TYPE_GHOST_SKELETON, SPELL_CAMP_TYPE_GHOST_GHOUL, SPELL_CAMP_TYPE_GHOUL_SKELETON); };
 
     void SpellHit(Unit* caster, SpellInfo const* spell) override
     {
@@ -648,7 +610,7 @@ struct npc_necrotic_shard : public ScriptedAI
             }
             case SPELL_COMMUNIQUE_RELAY_TO_CAMP:
             {
-                me->CastSpell((Unit*)nullptr, SPELL_CAMP_RECEIVES_COMMUNIQUE, true);
+                me->CastSpell(static_cast<Unit*>(nullptr), SPELL_CAMP_RECEIVES_COMMUNIQUE, true);
                 break;
             }
             case SPELL_CHOOSE_CAMP_TYPE:
@@ -682,6 +644,8 @@ struct npc_necrotic_shard : public ScriptedAI
                     caster->CastSpell(caster, SPELL_PH_SUMMON_MINION_TRAP_GHOUL_SKELETON, true);
                 break;
             }
+            default:
+                break;
         }
     }
 
@@ -733,6 +697,8 @@ struct npc_necrotic_shard : public ScriptedAI
                 DespawnCultists(); // Despawn remaining Cultists (should never happen).
                 DespawnEventDoodads();
                 sWorldState->Save(SAVE_ID_SCOURGE_INVASION);
+                break;
+            default:
                 break;
         }
     }
@@ -1026,51 +992,27 @@ public:
     };
 };
 
-// @todo: city attack
 struct npc_flameshocker : public CombatAI
 {
-    npc_flameshocker(Creature* creature) : CombatAI(creature) // (creature, 999)
-    {
-        switch (me->GetEntry())
-        {
-            case NPC_FLAMESHOCKER:
-                // AddCombatAction(EVENT_MINION_FLAMESHOCKERS_TOUCH, 2000u);
-                // AddCustomAction(EVENT_MINION_FLAMESHOCKERS_DESPAWN, true, [&]()
-                // {
-                //     if (!m_creature->IsInCombat())
-                //         m_creature->CastSpell(m_creature, SPELL_DESPAWNER_SELF, TRIGGERED_OLD_TRIGGERED);
-                //     else
-                //         ResetCombatAction(EVENT_MINION_FLAMESHOCKERS_DESPAWN, 60000);
-                // });
-                // m_creature->CastSpell(m_creature, SPELL_FLAMESHOCKER_IMMOLATE_VISUAL, TRIGGERED_OLD_TRIGGERED);
-                break;
-        }
-    }
-
-    void JustEngagedWith(Unit* /*who*/) override
-    {
-    }
+    npc_flameshocker(Creature* creature) : CombatAI(creature) { }
 
     void Reset() override
     {
         scheduler.CancelAll();
+        scheduler.Schedule(2s, [this](TaskContext context)
+        {
+            DoCastVictim(RAND(SPELL_FLAMESHOCKERS_TOUCH, SPELL_FLAMESHOCKERS_TOUCH2), true);
+            context.Repeat(30s, 45s);
+        }).Schedule(60s, [this](TaskContext context)
+        {
+            if (!me->IsInCombat())
+                DoCastSelf(SPELL_DESPAWNER_SELF);
+            else
+                context.Repeat();
+        });
     }
 
-    void IsSummonedBy(WorldObject* /*summonerObject*/) override
-    {
-    }
-
-    // void ReceiveAIEvent(AIEventType eventType, Unit* /*sender*/, Unit* invoker, uint32 miscValue) override
-    // {
-    //     if (!invoker)
-    //         return;
-
-    //     if (eventType == AI_EVENT_CUSTOM_A)
-    //     {
-    //         if (miscValue == NPC_FLAMESHOCKER)
-    //             ResetCombatAction(EVENT_MINION_FLAMESHOCKERS_DESPAWN, 60000);
-    //     }
-    // }
+    // void IsSummonedBy(WorldObject* /*summonerObject*/) override { }
 
     void JustDied(Unit* /*pKiller*/) override
     {
@@ -1079,12 +1021,8 @@ struct npc_flameshocker : public CombatAI
 
     void SpellHit(Unit* /* caster */, SpellInfo const* spell) override
     {
-        switch (spell->Id)
-        {
-            case SPELL_SPIRIT_SPAWN_OUT:
-                me->DespawnOrUnsummon(3000);
-                break;
-        }
+        if (spell->Id == SPELL_SPIRIT_SPAWN_OUT)
+            me->DespawnOrUnsummon(3000);
     }
 
     void MoveInLineOfSight(Unit* who) override
@@ -1094,21 +1032,6 @@ struct npc_flameshocker : public CombatAI
                 who->GetAI()->AttackStart(me);
         CombatAI::MoveInLineOfSight(who);
     }
-
-    // void ExecuteAction(uint32 action) override
-    // {
-    //     switch (action)
-    //     {
-    //         case EVENT_MINION_FLAMESHOCKERS_TOUCH:
-    //         {
-    //             DoCastSpellIfCan(m_creature->GetVictim(), PickRandomValue(SPELL_FLAMESHOCKERS_TOUCH, SPELL_FLAMESHOCKERS_TOUCH2), CAST_TRIGGERED);
-    //             ResetCombatAction(EVENT_MINION_FLAMESHOCKERS_TOUCH, urand(30000, 45000));
-    //             break;
-    //         }
-    //         default:
-    //             break;
-    //     }
-    // }
 
     void UpdateAI(uint32 const diff) override
     {
@@ -1140,32 +1063,27 @@ struct npc_shadow_of_doom : public CombatAI
         me->SetImmuneToPC(false);
     }
 
-    void IsSummonedBy(WorldObject* summonerObject) override
+    void IsSummonedBy(WorldObject* summoner) override
     {
-        if (Unit* summoner = summonerObject->ToUnit())
+        if (!summoner)
+            return;
+
+        if (Player* player = summoner->ToPlayer())
         {
             me->SetImmuneToPC(true);
-            me->SetFacingToObject(summoner);
+            me->SetFacingToObject(player);
 
             // Pickup random emote like here: https://youtu.be/evOs9aJa2Jw?t=229
-            Talk(SHADOW_OF_DOOM_SAY_AGGRO, summoner);
+            Talk(SHADOW_OF_DOOM_SAY_AGGRO, player);
             me->CastSpell(me, SPELL_SPAWN_SMOKE, true);
 
-            scheduler.Schedule(5s, [this, summoner](const TaskContext& /*context*/)
+            scheduler.Schedule(5s, [this, player](const TaskContext& /*context*/)
             {
                 me->SetImmuneToPC(false);
-                if (me->CanStartAttack(summoner))
-                    AttackStart(summoner);
+                if (me->CanStartAttack(player))
+                    AttackStart(player);
             });
         }
-        scheduler.Schedule(8s, [this](TaskContext context)
-        {
-            // Instakill every mob nearby, except Players, Pets or NPCs with the same faction.
-            // m_creature->IsValidAttackTarget(m_creature->GetVictim(), true)
-            if (me->IsWithinDistInMap(me->GetVictim(), 30.0f) && !me->GetVictim()->IsControlledByPlayer() && me->CanCreatureAttack(me->GetVictim()), true)
-                DoCastVictim(SPELL_SCOURGE_STRIKE, true);
-            context.Repeat(5s, 10s);
-        });
     }
 
     void JustDied(Unit* /*pKiller*/) override
@@ -1175,12 +1093,8 @@ struct npc_shadow_of_doom : public CombatAI
 
     void SpellHit(Unit* /* caster */, SpellInfo const* spell) override
     {
-        switch (spell->Id)
-        {
-            case SPELL_SPIRIT_SPAWN_OUT:
-                me->DespawnOrUnsummon(3000);
-                break;
-        }
+        if (spell->Id == SPELL_SPIRIT_SPAWN_OUT)
+            me->DespawnOrUnsummon(3000);
     }
 
     void UpdateAI(uint32 const diff) override
@@ -1190,93 +1104,136 @@ struct npc_shadow_of_doom : public CombatAI
     }
 };
 
-// @todo: city attack
 struct npc_pallid_horror : public CombatAI
 {
-    std::set<ObjectGuid> m_flameshockers;
-    std::unordered_map<ObjectGuid, uint32> m_flameshockFollowers;
+    npc_pallid_horror(Creature* creature) : CombatAI(creature), _summons(me) { }
 
-    npc_pallid_horror(Creature* creature) : CombatAI(creature) // 999
+    void JustRespawned() override
     {
-        // AddCustomAction(25, 2500u, [&]() // Hacky solution for flameshockers to remain in formation
-        // {
-        //     for (std::pair<ObjectGuid, uint32> follower : m_flameshockFollowers)
-        //     {
-        //         if (Unit* f = m_creature->GetMap()->GetUnit(follower.first))
-        //         {
-        //             if (!f->IsInCombat() && f->GetMotionMaster()->GetCurrentMovementGeneratorType() != FOLLOW_MOTION_TYPE)
-        //             {
-        //                 float angle = (float(follower.second) * (M_PI_F / (float(m_flameshockFollowers.size()) / 2.f))) + m_creature->GetOrientation();
-        //                 f->GetMotionMaster()->Clear(true, true);
-        //                 f->GetMotionMaster()->MoveFollow(m_creature, 2.5f, angle);
-        //             }
-        //         }
-        //     }
-        //     ResetTimer(25, 2500u);
-        // });
-        uint32 amount = urand(5, 9); // sniffed are group sizes of 5-9 shockers on spawn.
-
-        if (me->GetHealthPct() == 100.0f)
-        {
-            for (uint32 i = 0; i < amount; ++i)
-            {
-                if (Creature* _flameshocker = me->SummonCreature(NPC_FLAMESHOCKER, me->GetPositionX(), me->GetPositionY(), me->GetPositionZ(), 0.0f, TEMPSUMMON_TIMED_OR_CORPSE_DESPAWN, HOUR * IN_MILLISECONDS))
-                {
-                    float angle = (float(i) * (M_PIf / (static_cast<float>(amount) / 2.f))) + me->GetOrientation();
-                    //pFlameshocker->JoinCreatureGroup(m_creature, 5.0f, angle - M_PI, OPTION_FORMATION_MOVE); // Perfect Circle around the Pallid.
-                    _flameshocker->GetMotionMaster()->Clear(true);
-                    _flameshocker->GetMotionMaster()->MoveFollow(me, 2.5f, angle);
-                    _flameshocker->CastSpell(_flameshocker, SPELL_MINION_SPAWN_IN, true);
-                    _flameshocker->SetWalk(false);
-                    m_flameshockers.insert(_flameshocker->GetGUID());
-                    m_flameshockFollowers.insert(std::pair<ObjectGuid, uint32>(_flameshocker->GetGUID(), i));
-                }
-            }
-        }
+        Reset();
+        _summons.DespawnAll();
+        SummonFlameshockers();
         me->SetCorpseDelay(10); // Corpse despawns 10 seconds after a crystal spawns.
-        // AddCombatAction(EVENT_PALLID_RANDOM_YELL, 5000u);
-        // AddCombatAction(EVENT_PALLID_SPELL_DAMAGE_VS_GUARDS, 5000u);
-        // AddCombatAction(EVENT_PALLID_SUMMON_FLAMESHOCKER, 5000u);
-        // AddCombatAction(25, 5000u);
-        // WEATHER_TYPE_STORM
-        if (Weather* weather = WeatherMgr::FindWeather(me->GetZoneId()))
-            weather->SetWeather(WEATHER_TYPE_STORM, 0.25f);
+        UpdateWeather(true);
     }
 
     void Reset() override
     {
         CombatAI::Reset();
-        //m_creature->AddAura(SPELL_AURA_OF_FEAR);
-
-        // DoCastSpellIfCan(nullptr, SPELL_AURA_OF_FEAR, CAST_TRIGGERED | CAST_AURA_NOT_PRESENT);
-        // ResetTimer(25, 0);
+        me->AddAura(SPELL_AURA_OF_FEAR, me);
         me->SetWalk(false);
+        ScheduleTasks();
     }
 
-    void MoveInLineOfSight(Unit* pWho) override
+    void ScheduleTasks()
     {
-        if (pWho->IsCreature() && me->IsWithinDistInMap(pWho, VISIBILITY_DISTANCE_TINY) && me->IsWithinLOSInMap(pWho) && !pWho->GetVictim())
-            if (IsGuardOrBoss(pWho) && pWho->GetAI())
-                pWho->GetAI()->AttackStart(me);
+        scheduler.Schedule(0s, [this](TaskContext context)
+        {
+            me->Say(PALLID_HORROR_SAY_RANDOM_YELL);
+            // @todo: update npc_text
+            // DoBroadcastText(PickRandomValue(BCT_PALLID_HORROR_YELL1, BCT_PALLID_HORROR_YELL2, BCT_PALLID_HORROR_YELL3, BCT_PALLID_HORROR_YELL4,
+            //     BCT_PALLID_HORROR_YELL5, BCT_PALLID_HORROR_YELL6, BCT_PALLID_HORROR_YELL7, BCT_PALLID_HORROR_YELL8), me, nullptr, CHAT_TYPE_ZONE_YELL);
+            context.Repeat(65s, 300s);
+        }).Schedule(11s, 81s, [this](TaskContext context)
+        {
+            DoCastVictim(SPELL_DAMAGE_VS_GUARDS, true);
+            context.Repeat();
+        }).Schedule(2s, [this](TaskContext context)
+        {
+            if (_summons.size() >= 30)
+            {
+                context.Repeat(10s);
+                return;
+            }
 
-        CombatAI::MoveInLineOfSight(pWho);
+            std::list<Creature*> targets;
+            FlameshockerCheck check;
+            Acore::CreatureListSearcher<FlameshockerCheck> searcher(me, targets, check);
+            Cell::VisitGridObjects(me, searcher, VISIBILITY_DISTANCE_NORMAL);
+
+            if (!targets.empty())
+            {
+                Creature* target = Acore::Containers::SelectRandomContainerElement(targets);
+
+                float x, y, z;
+                target->GetNearPoint(target, x, y, z, 5.0f, 5.0f, 0.0f);
+                if (Creature* creature = me->SummonCreature(NPC_FLAMESHOCKER, x, y, z, target->GetOrientation(), TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, IN_MILLISECONDS * HOUR))
+                    _summons.Summon(creature);
+            }
+            context.Repeat(2s);
+        });
+    }
+
+    void UpdateWeather(bool startEvent)
+    {
+        if (Weather* weather = WeatherMgr::FindWeather(me->GetZoneId()))
+        {
+            if (startEvent)
+                weather->SetWeather(WEATHER_TYPE_STORM, 0.25f);
+            else
+                weather->SetWeather(WEATHER_TYPE_RAIN, 0.0f);
+        }
+        else if (Weather* weather = WeatherMgr::AddWeather(me->GetZoneId()))
+        {
+            if (startEvent)
+                weather->SetWeather(WEATHER_TYPE_STORM, 0.25f);
+            else
+                weather->SetWeather(WEATHER_TYPE_RAIN, 0.0f);
+        }
+    }
+
+    void SummonFlameshockers()
+    {
+        uint32 const amount = urand(5, 9); // sniffed are group sizes of 5-9 shockers on spawn.
+        for (uint32 i = 0; i < amount; ++i)
+        {
+            if (Creature* summon = me->SummonCreature(NPC_FLAMESHOCKER, me->GetPositionX(), me->GetPositionY(), me->GetPositionZ(), 0.0f, TEMPSUMMON_TIMED_OR_CORPSE_DESPAWN, HOUR * IN_MILLISECONDS))
+            {
+                float angle = static_cast<float>(i) * (M_PIf / (static_cast<float>(amount) / 2.f)) + me->GetOrientation();
+                summon->GetMotionMaster()->Clear(true);
+                summon->GetMotionMaster()->MoveFollow(me, 2.5f, angle);
+                _summons.Summon(summon);
+            }
+        }
+    }
+
+    void JustSummoned(Creature* summon) override
+    {
+        summon->CastSpell(summon, SPELL_MINION_SPAWN_IN, true);
+        summon->SetWalk(false);
+    }
+
+    void MoveInLineOfSight(Unit* who) override
+    {
+        if (who->IsCreature() && me->IsWithinDistInMap(who, VISIBILITY_DISTANCE_TINY) && me->IsWithinLOSInMap(who) && !who->GetVictim())
+            if (IsGuardOrBoss(who) && who->GetAI())
+                who->GetAI()->AttackStart(me);
+
+        CombatAI::MoveInLineOfSight(who);
     }
 
     void JustDied(Unit* /*unit*/) override
     {
-        //if (Creature* creature = GetClosestCreatureWithEntry(me, NPC_HIGHLORD_BOLVAR_FORDRAGON, VISIBILITY_DISTANCE_NORMAL))
-        //    DoBroadcastText(BCT_STORMWIND_BOLVAR_2, creature, me, CHAT_TYPE_ZONE_YELL);
+        // @todo: update npc_text
+        if (Creature* creature = GetClosestCreatureWithEntry(me, NPC_HIGHLORD_BOLVAR_FORDRAGON, VISIBILITY_DISTANCE_NORMAL))
+            creature->Say(1);
+        // DoBroadcastText(BCT_STORMWIND_BOLVAR_2, creature, me, CHAT_TYPE_ZONE_YELL);
+        if (Creature* creature = GetClosestCreatureWithEntry(me, NPC_LADY_SYLVANAS_WINDRUNNER, VISIBILITY_DISTANCE_NORMAL))
+            creature->Say(1);
+            // DoBroadcastText(BCT_UNDERCITY_SYLVANAS_1, creature, me, CHAT_TYPE_ZONE_YELL);
 
-        //if (Creature* creature = GetClosestCreatureWithEntry(me, NPC_LADY_SYLVANAS_WINDRUNNER, VISIBILITY_DISTANCE_NORMAL))
-        //    DoBroadcastText(BCT_UNDERCITY_SYLVANAS_1, creature, me, CHAT_TYPE_ZONE_YELL);
+        // Kill all custom summoned Flameshockers.
+        _summons.DoForAllSummons([](WorldObject* summon)
+        {
+            if (Creature* creature = summon->ToCreature())
+                creature->KillSelf();
+        });
 
-        // Remove all custom summoned Flameshockers.
-        for (ObjectGuid const& guid : m_flameshockers)
-            if (Creature* flameshocker = me->GetMap()->GetCreature(guid))
-                flameshocker->KillSelf(); //pFlameshocker->DoKillUnit(pFlameshocker);
-
+        // Spawn necrotic crystal gobject
         me->CastSpell(me, (me->GetZoneId() == AREA_UNDERCITY ? SPELL_SUMMON_FAINT_NECROTIC_CRYSTAL : SPELL_SUMMON_CRACKED_NECROTIC_CRYSTAL), true);
-        me->RemoveAurasDueToSpell(SPELL_AURA_OF_FEAR);
+
+        // @todo: see if this is removed on death
+        // me->RemoveAurasDueToSpell(SPELL_AURA_OF_FEAR);
 
         // TimePoint now = me->GetMap()->GetCurrentClockTime();
         TimePoint now = std::chrono::steady_clock::now();
@@ -1287,79 +1244,25 @@ struct npc_pallid_horror : public CombatAI
         sWorldState->SetSITimer(index, nextAttack);
         sWorldState->SetPallidGuid(index, ObjectGuid());
 
-        if (Weather* weather = WeatherMgr::FindWeather(me->GetZoneId()))
-            weather->SetWeather(WEATHER_TYPE_RAIN, 0.0f);
+        UpdateWeather(false);
 
-        LOG_DEBUG("gameevent", "[Scourge Invasion Event] The Scourge has been defeated in {}, next attack starting in {} minutes", me->GetZoneId() == AREA_UNDERCITY ? "Undercity" : "Stormwind", timeToNextAttack);
-    }
-
-    void SummonedCreatureDies(Creature* unit, Unit* /*killer*/) override
-    {
-        // Remove dead Flameshockers here to respawn them if needed.
-        if (m_flameshockers.contains(unit->GetGUID()))
-            m_flameshockers.erase(unit->GetGUID());
-        if (m_flameshockFollowers.contains(unit->GetGUID()))
-            m_flameshockFollowers.erase(unit->GetGUID());
-    }
-
-    void SummonedCreatureDespawn(Creature* unit) override
-    {
-        // Remove despawned Flameshockers here to respawn them if needed.
-        if (m_flameshockers.contains(unit->GetGUID()))
-            m_flameshockers.erase(unit->GetGUID());
-        if (m_flameshockFollowers.contains(unit->GetGUID()))
-            m_flameshockFollowers.erase(unit->GetGUID());
+        LOG_INFO("gameevent", "[Scourge Invasion Event] The Scourge has been defeated in {}, next attack starting in {} minutes", me->GetZoneId() == AREA_UNDERCITY ? "Undercity" : "Stormwind", timeToNextAttack);
     }
 
     void CorpseRemoved(uint32& /*respawnDelay*/) override
     {
         // Remove all custom summoned Flameshockers.
-        for (auto const& guid : m_flameshockers)
-            if (Creature* flameshocker = me->GetMap()->GetCreature(guid))
-                // flameshocker->AddObjectToRemoveList();
-                flameshocker->DespawnOrUnsummon();
+        _summons.DespawnAll();
     }
 
-    void DoAction(int32 action) override
+    void UpdateAI(uint32 const diff) override
     {
-        switch (action)
-        {
-            case EVENT_PALLID_RANDOM_YELL:
-            {
-                // DoBroadcastText(PickRandomValue(BCT_PALLID_HORROR_YELL1, BCT_PALLID_HORROR_YELL2, BCT_PALLID_HORROR_YELL3, BCT_PALLID_HORROR_YELL4,
-                //     BCT_PALLID_HORROR_YELL5, BCT_PALLID_HORROR_YELL6, BCT_PALLID_HORROR_YELL7, BCT_PALLID_HORROR_YELL8), me, nullptr, CHAT_TYPE_ZONE_YELL);
-                // ResetCombatAction(EVENT_PALLID_RANDOM_YELL, urand(IN_MILLISECONDS * 65, IN_MILLISECONDS * 300));
-                break;
-            }
-            case EVENT_PALLID_SPELL_DAMAGE_VS_GUARDS:
-            {
-                // DoCastSpellIfCan(me->GetVictim(), SPELL_DAMAGE_VS_GUARDS, CAST_TRIGGERED);
-                // ResetCombatAction(EVENT_PALLID_SPELL_DAMAGE_VS_GUARDS, urand(11000, 81000));
-                break;
-            }
-            case EVENT_PALLID_SUMMON_FLAMESHOCKER:
-            {
-                if (m_flameshockers.size() < 30)
-                {
-                    if (Unit* target = SelectRandomFlameshockerSpawnTarget(me, nullptr, DEFAULT_VISIBILITY_BGARENAS))
-                    {
-                        float x, y, z;
-                        target->GetNearPoint(target, x, y, z, 5.0f, 5.0f, 0.0f);
-                        if (Creature* flameshocker = me->SummonCreature(NPC_FLAMESHOCKER, x, y, z, target->GetOrientation(), TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, IN_MILLISECONDS * HOUR))
-                        {
-                            m_flameshockers.insert(flameshocker->GetGUID());
-                            flameshocker->CastSpell(flameshocker, SPELL_MINION_SPAWN_IN, true);
-                            // flameshocker->AI()->SendAIEvent(AI_EVENT_CUSTOM_A, flameshocker, flameshocker, NPC_FLAMESHOCKER);
-                        }
-                    }
-                }
-                // ResetCombatAction(EVENT_PALLID_SUMMON_FLAMESHOCKER, 2000);
-                break;
-            }
-            default:
-                break;
-        }
+        scheduler.Update(diff);
+        DoMeleeAttackIfReady();
     }
+
+private:
+    SummonList _summons;
 };
 
 // 28091 - Despawner, self (server-side)
@@ -1398,7 +1301,7 @@ class spell_communique_trigger : public SpellScript
     void HandleDummy(SpellEffIndex /*effIndex*/)
     {
         if (Unit* target = GetHitUnit())
-            target->CastSpell((Unit*)nullptr, SPELL_COMMUNIQUE_CAMP_TO_RELAY, true);
+            target->CastSpell(static_cast<Unit*>(nullptr), SPELL_COMMUNIQUE_CAMP_TO_RELAY, true);
     }
 
     void Register() override

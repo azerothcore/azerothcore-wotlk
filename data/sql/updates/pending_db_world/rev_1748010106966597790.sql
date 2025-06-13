@@ -5833,8 +5833,6 @@ DELETE FROM `creature_template_addon` WHERE (`entry` = @LORD_BLACKWOOD_ENTRY);
 INSERT INTO `creature_template_addon` (`entry`, `path_id`, `mount`, `bytes1`, `bytes2`, `emote`, `visibilityDistanceType`, `auras`) VALUES
 (@LORD_BLACKWOOD_ENTRY, @LORD_BLACKWOOD_ENTRY*10, 0, 0, 0, 0, 0, '');
 
-UPDATE `creature_template` SET `ScriptName` = 'npc_pallid_horror' WHERE (`entry` IN (16382, 16394));
-UPDATE `creature_template` SET `ScriptName` = 'npc_flameshocker' WHERE (`entry` = 16383);
 UPDATE `creature_template` SET `ScriptName` = 'npc_shadow_of_doom' WHERE (`entry` = 16143);
 UPDATE `creature_template` SET `ScriptName` = 'npc_minion_spawner' WHERE (`entry` IN (16306, 16336, 16338));
 UPDATE `creature_template` SET `ScriptName` = 'npc_herald_of_the_lich_king' WHERE (`entry` = 16995);
@@ -5881,3 +5879,13 @@ INSERT INTO `creature_text` (`CreatureID`, `GroupID`, `ID`, `Text`, `Type`, `Lan
 (16995, 2, 1, 'As you fall in battle, we grow in strength. There is only one inevitable outcome. Prepare for your end!', 14, 0, 0, 0, 0, 0, 13124, 2, 'Zone Attack Random 2'),
 (16995, 2, 2, 'Despair, mortals! Your doom has come!', 14, 0, 0, 0, 0, 0, 13122, 2, 'Zone Attack Random 3'),
 (16995, 2, 3, 'Let this gloom serve to remind you: the shadow of the Scourge is all-encompassing! There is no escape!', 14, 0, 0, 0, 0, 0, 13123, 2, 'Zone Attack Random 4');
+
+-- City Attacks
+UPDATE `creature_template` SET `ScriptName` = 'npc_flameshocker' WHERE (`entry` = 16383);
+UPDATE `creature_template` SET `ScriptName` = 'npc_pallid_horror' WHERE (`entry` IN (16382, 16394));
+-- Pallid Horror, Patchwork Terror
+UPDATE `creature_template` SET `minlevel` = 70, `maxlevel` = 70 WHERE (`entry` IN (16394, 16382));
+DELETE FROM `creature_template_addon` WHERE (`entry` IN (16394, 16382));
+INSERT INTO `creature_template_addon` (`entry`, `path_id`, `mount`, `bytes1`, `bytes2`, `emote`, `visibilityDistanceType`, `auras`) VALUES
+(16394, 0, 0, 0, 0, 0, 0, '28126'),
+(16382, 0, 0, 0, 0, 0, 0, '28126');
