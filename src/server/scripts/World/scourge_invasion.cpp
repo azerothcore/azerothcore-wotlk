@@ -196,7 +196,7 @@ struct npc_necropolis : public ScriptedAI
             return;
 
         if (spell->Id == SPELL_COMMUNIQUE_PROXY_TO_NECROPOLIS)
-            me->CastSpell(me, SPELL_COMMUNIQUE_TIMER_NECROPOLIS, true);
+            DoCastSelf(SPELL_COMMUNIQUE_TIMER_NECROPOLIS, true);
     }
 
     void UpdateAI(uint32 const /*diff*/) override
@@ -303,7 +303,7 @@ struct npc_necropolis_health : public ScriptedAI
     void SpellHit(Unit* /* caster */, SpellInfo const* spell) override
     {
         if (spell->Id == SPELL_COMMUNIQUE_CAMP_TO_RELAY_DEATH)
-            me->CastSpell(me, SPELL_ZAP_NECROPOLIS, true); // deals damage to self
+            DoCastSelf(SPELL_ZAP_NECROPOLIS, true); // deals damage to self
 
         // Just to make sure it finally dies!
         if (spell->Id == SPELL_ZAP_NECROPOLIS)
@@ -403,10 +403,10 @@ struct npc_necropolis_proxy : public ScriptedAI
         switch (spellInfo->Id)
         {
             case SPELL_COMMUNIQUE_NECROPOLIS_TO_PROXIES:
-                me->CastSpell(me, SPELL_COMMUNIQUE_PROXY_TO_RELAY, true);
+                DoCastSelf(SPELL_COMMUNIQUE_PROXY_TO_RELAY, true);
                 break;
             case SPELL_COMMUNIQUE_RELAY_TO_PROXY:
-                me->CastSpell(me, SPELL_COMMUNIQUE_PROXY_TO_NECROPOLIS, true);
+                DoCastSelf(SPELL_COMMUNIQUE_PROXY_TO_NECROPOLIS, true);
                 break;
             case SPELL_COMMUNIQUE_CAMP_TO_RELAY_DEATH:
                 if (Creature* health = GetClosestCreatureWithEntry(me, NPC_NECROPOLIS_HEALTH, 200.0f))
@@ -450,14 +450,14 @@ struct npc_necropolis_relay : public ScriptedAI
         switch (spell->Id)
         {
             case SPELL_COMMUNIQUE_PROXY_TO_RELAY:
-                me->CastSpell(me, SPELL_COMMUNIQUE_RELAY_TO_CAMP, true);
+                DoCastSelf(SPELL_COMMUNIQUE_RELAY_TO_CAMP, true);
                 break;
             case SPELL_COMMUNIQUE_CAMP_TO_RELAY:
-                me->CastSpell(me, SPELL_COMMUNIQUE_RELAY_TO_PROXY, true);
+                DoCastSelf(SPELL_COMMUNIQUE_RELAY_TO_PROXY, true);
                 break;
             case SPELL_COMMUNIQUE_CAMP_TO_RELAY_DEATH:
-                if (Creature* pProxy = GetClosestCreatureWithEntry(me, NPC_NECROPOLIS_PROXY, 200.0f))
-                    me->CastSpell(pProxy, SPELL_COMMUNIQUE_CAMP_TO_RELAY_DEATH, true);
+                if (Creature* proxy = GetClosestCreatureWithEntry(me, NPC_NECROPOLIS_PROXY, 200.0f))
+                    me->CastSpell(proxy, SPELL_COMMUNIQUE_CAMP_TO_RELAY_DEATH, true);
                 break;
             default:
                 break;
@@ -616,7 +616,7 @@ struct npc_necrotic_shard : public ScriptedAI
             case SPELL_CHOOSE_CAMP_TYPE:
             {
                 _spellCampType = RAND(SPELL_CAMP_TYPE_GHOUL_SKELETON, SPELL_CAMP_TYPE_GHOST_GHOUL, SPELL_CAMP_TYPE_GHOST_SKELETON);
-                me->CastSpell(me, _spellCampType, true);
+                DoCastSelf(_spellCampType, true);
                 break;
             }
             case SPELL_CAMP_RECEIVES_COMMUNIQUE:
@@ -624,7 +624,7 @@ struct npc_necrotic_shard : public ScriptedAI
                 if (!HasCampTypeAura() && me->GetEntry() == NPC_NECROTIC_SHARD)
                 {
                     UpdateFindersAmount();
-                    me->CastSpell(me, SPELL_CHOOSE_CAMP_TYPE, true);
+                    DoCastSelf(SPELL_CHOOSE_CAMP_TYPE, true);
                     ScheduleMinionSpawnTask();
                 }
                 break;
@@ -690,7 +690,7 @@ struct npc_necrotic_shard : public ScriptedAI
                 break;
             case NPC_DAMAGED_NECROTIC_SHARD:
                 // Buff Players.
-                me->CastSpell(me, SPELL_SOUL_REVIVAL, true);
+                DoCastSelf(SPELL_SOUL_REVIVAL, true);
                 // Sending the Death Bolt.
                 if (Creature* relay = GetClosestCreatureWithEntry(me, NPC_NECROPOLIS_RELAY, 200.0f))
                     me->CastSpell(relay, SPELL_COMMUNIQUE_CAMP_TO_RELAY_DEATH, true);
@@ -937,59 +937,47 @@ struct npc_minion_spawner : public ScriptedAI
     }
 };
 
-class npc_cultist_engineer : public CreatureScript
+struct npc_cultist_engineer : public ScriptedAI
 {
-public:
-    npc_cultist_engineer() : CreatureScript("npc_cultist_engineer") { }
+    npc_cultist_engineer(Creature* creature) : ScriptedAI(creature) { }
 
-    bool OnGossipSelect(Player* player, Creature* creature, uint32 /*sender*/, uint32 /*action*/) override
+    void sGossipSelect(Player* player, uint32 /*sender*/, uint32 /*action*/) override
     {
         CloseGossipMenuFor(player);
         player->DestroyItemCount(ITEM_NECROTIC_RUNE, 8, true);
-        player->CastSpell((Unit*)nullptr, SPELL_SUMMON_BOSS, true); // Player summons a Shadow of Doom for 1 hour.
-        creature->CastSpell(creature, SPELL_QUIET_SUICIDE, true);
-        return true;
+        player->CastSpell(static_cast<Unit*>(nullptr), SPELL_SUMMON_BOSS, true); // Player summons a Shadow of Doom for 1 hour.
+        DoCastSelf(SPELL_QUIET_SUICIDE, true);
     }
 
-    CreatureAI* GetAI(Creature* creature) const override
+    void Reset() override
     {
-        return new npc_cultist_engineerAI(creature);
+        scheduler.CancelAll();
+        me->SetReactState(REACT_PASSIVE);
+        me->SetCorpseDelay(10); // Corpse despawns 10 seconds after a Shadow of Doom spawns.
+        scheduler.Schedule(0s, [this](const TaskContext& /*context*/)
+        {
+            DoCastSelf(SPELL_CREATE_SUMMONER_SHIELD, true);
+            DoCastSelf(SPELL_MINION_SPAWN_IN, true);
+        }).Schedule(1s, [this](const TaskContext& /*context*/)
+        {
+                DoCastSelf(SPELL_BUTTRESS_CHANNEL, true);
+        });
     }
 
-    struct npc_cultist_engineerAI : public ScriptedAI
+    void JustDied(Unit*) override
     {
-        npc_cultist_engineerAI(Creature* creature) : ScriptedAI(creature) { }
+        scheduler.CancelAll();
+        if (Creature* shard = GetClosestCreatureWithEntry(me, NPC_DAMAGED_NECROTIC_SHARD, 15.0f))
+            shard->CastSpell(shard, SPELL_DAMAGE_CRYSTAL, true);
 
-        void Reset() override
-        {
-            scheduler.CancelAll();
-            me->SetReactState(REACT_PASSIVE);
-            me->SetCorpseDelay(10); // Corpse despawns 10 seconds after a Shadow of Doom spawns.
-            scheduler.Schedule(0s, [this](const TaskContext& /*context*/)
-            {
-                me->CastSpell(me, SPELL_CREATE_SUMMONER_SHIELD, true);
-                me->CastSpell(me, SPELL_MINION_SPAWN_IN, true);
-            }).Schedule(1s, [this](const TaskContext& /*context*/)
-            {
-                    me->CastSpell(me, SPELL_BUTTRESS_CHANNEL, true);
-            });
-        }
+        if (GameObject* gameObject = GetClosestGameObjectWithEntry(me, GO_SUMMONER_SHIELD, CONTACT_DISTANCE))
+            gameObject->Delete();
+    }
 
-        void JustDied(Unit*) override
-        {
-            scheduler.CancelAll();
-            if (Creature* shard = GetClosestCreatureWithEntry(me, NPC_DAMAGED_NECROTIC_SHARD, 15.0f))
-                shard->CastSpell(shard, SPELL_DAMAGE_CRYSTAL, true);
-
-            if (GameObject* gameObject = GetClosestGameObjectWithEntry(me, GO_SUMMONER_SHIELD, CONTACT_DISTANCE))
-                gameObject->Delete();
-        }
-
-        void UpdateAI(uint32 diff) override
-        {
-            scheduler.Update(diff);
-        }
-    };
+    void UpdateAI(uint32 diff) override
+    {
+        scheduler.Update(diff);
+    }
 };
 
 struct npc_flameshocker : public CombatAI
@@ -1016,7 +1004,7 @@ struct npc_flameshocker : public CombatAI
 
     void JustDied(Unit* /*pKiller*/) override
     {
-        me->CastSpell(me, SPELL_FLAMESHOCKERS_REVENGE, true);
+        DoCastSelf(SPELL_FLAMESHOCKERS_REVENGE, true);
     }
 
     void SpellHit(Unit* /* caster */, SpellInfo const* spell) override
@@ -1075,7 +1063,7 @@ struct npc_shadow_of_doom : public CombatAI
 
             // Pickup random emote like here: https://youtu.be/evOs9aJa2Jw?t=229
             Talk(SHADOW_OF_DOOM_SAY_AGGRO, player);
-            me->CastSpell(me, SPELL_SPAWN_SMOKE, true);
+            DoCastSelf(SPELL_SPAWN_SMOKE, true);
 
             scheduler.Schedule(5s, [this, player](const TaskContext& /*context*/)
             {
@@ -1088,7 +1076,7 @@ struct npc_shadow_of_doom : public CombatAI
 
     void JustDied(Unit* /*pKiller*/) override
     {
-        me->CastSpell(me, SPELL_ZAP_CRYSTAL_CORPSE, true);
+        DoCastSelf(SPELL_ZAP_CRYSTAL_CORPSE, true);
     }
 
     void SpellHit(Unit* /* caster */, SpellInfo const* spell) override
@@ -1230,7 +1218,7 @@ struct npc_pallid_horror : public CombatAI
         });
 
         // Spawn necrotic crystal gobject
-        me->CastSpell(me, (me->GetZoneId() == AREA_UNDERCITY ? SPELL_SUMMON_FAINT_NECROTIC_CRYSTAL : SPELL_SUMMON_CRACKED_NECROTIC_CRYSTAL), true);
+        DoCastSelf((me->GetZoneId() == AREA_UNDERCITY ? SPELL_SUMMON_FAINT_NECROTIC_CRYSTAL : SPELL_SUMMON_CRACKED_NECROTIC_CRYSTAL), true);
 
         // @todo: see if this is removed on death
         // me->RemoveAurasDueToSpell(SPELL_AURA_OF_FEAR);
@@ -1340,7 +1328,7 @@ void AddSC_scourge_invasion()
     RegisterCreatureAI(npc_necrotic_shard);
     RegisterCreatureAI(npc_minion_spawner);
     RegisterCreatureAI(npc_pallid_horror);
-    new npc_cultist_engineer();
+    RegisterCreatureAI(npc_cultist_engineer);
     RegisterCreatureAI(npc_flameshocker);
     RegisterCreatureAI(npc_shadow_of_doom);
     RegisterSpellScript(spell_communique_trigger);
