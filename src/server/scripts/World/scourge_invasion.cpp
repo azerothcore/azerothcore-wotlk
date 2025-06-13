@@ -980,54 +980,6 @@ struct npc_cultist_engineer : public ScriptedAI
     }
 };
 
-struct npc_flameshocker : public CombatAI
-{
-    npc_flameshocker(Creature* creature) : CombatAI(creature) { }
-
-    void Reset() override
-    {
-        scheduler.CancelAll();
-        scheduler.Schedule(2s, [this](TaskContext context)
-        {
-            DoCastVictim(RAND(SPELL_FLAMESHOCKERS_TOUCH, SPELL_FLAMESHOCKERS_TOUCH2), true);
-            context.Repeat(30s, 45s);
-        }).Schedule(60s, [this](TaskContext context)
-        {
-            if (!me->IsInCombat())
-                DoCastSelf(SPELL_DESPAWNER_SELF);
-            else
-                context.Repeat();
-        });
-    }
-
-    // void IsSummonedBy(WorldObject* /*summonerObject*/) override { }
-
-    void JustDied(Unit* /*pKiller*/) override
-    {
-        DoCastSelf(SPELL_FLAMESHOCKERS_REVENGE, true);
-    }
-
-    void SpellHit(Unit* /* caster */, SpellInfo const* spell) override
-    {
-        if (spell->Id == SPELL_SPIRIT_SPAWN_OUT)
-            me->DespawnOrUnsummon(3000);
-    }
-
-    void MoveInLineOfSight(Unit* who) override
-    {
-        if (who->IsCreature() && me->IsWithinDistInMap(who, VISIBILITY_DISTANCE_TINY) && me->IsWithinLOSInMap(who) && !who->GetVictim())
-            if (IsGuardOrBoss(who) && who->GetAI())
-                who->GetAI()->AttackStart(me);
-        CombatAI::MoveInLineOfSight(who);
-    }
-
-    void UpdateAI(uint32 const diff) override
-    {
-        scheduler.Update(diff);
-        DoMeleeAttackIfReady();
-    }
-};
-
 struct npc_shadow_of_doom : public CombatAI
 {
     npc_shadow_of_doom(Creature* creature) : CombatAI(creature) { }
@@ -1092,35 +1044,77 @@ struct npc_shadow_of_doom : public CombatAI
     }
 };
 
-struct npc_pallid_horror : public CombatAI
+struct npc_flameshocker : public CombatAI
 {
-    npc_pallid_horror(Creature* creature) : CombatAI(creature), _summons(me) { }
-
-    void JustRespawned() override
-    {
-        Reset();
-        _summons.DespawnAll();
-        SummonFlameshockers();
-        me->SetCorpseDelay(10); // Corpse despawns 10 seconds after a crystal spawns.
-        UpdateWeather(true);
-    }
+    npc_flameshocker(Creature* creature) : CombatAI(creature) { }
 
     void Reset() override
     {
-        CombatAI::Reset();
+        scheduler.CancelAll();
+        scheduler.Schedule(2s, [this](TaskContext context)
+        {
+            DoCastVictim(RAND(SPELL_FLAMESHOCKERS_TOUCH, SPELL_FLAMESHOCKERS_TOUCH2), true);
+            context.Repeat(30s, 45s);
+        });
+    }
+
+    void JustDied(Unit* /*killer*/) override
+    {
+        DoCastSelf(SPELL_FLAMESHOCKERS_REVENGE, true);
+    }
+
+    // void SpellHit(Unit* /* caster */, SpellInfo const* spell) override
+    // {
+    //     if (spell->Id == SPELL_SPIRIT_SPAWN_OUT)
+    //         me->DespawnOrUnsummon(3000);
+    // }
+
+    // void MoveInLineOfSight(Unit* who) override
+    // {
+    //     if (who->IsCreature() && me->IsWithinDistInMap(who, VISIBILITY_DISTANCE_TINY) && me->IsWithinLOSInMap(who) && !who->GetVictim())
+    //         if (IsGuardOrBoss(who) && who->GetAI())
+    //             who->GetAI()->AttackStart(me);
+    //     CombatAI::MoveInLineOfSight(who);
+    // }
+
+    void UpdateAI(uint32 const diff) override
+    {
+        scheduler.Update(diff);
+        if (!UpdateVictim())
+            return;
+        DoMeleeAttackIfReady();
+    }
+};
+
+struct npc_pallid_horror : public ScriptedAI
+{
+    npc_pallid_horror(Creature* creature) : ScriptedAI(creature), _summons(me) { }
+
+    void InitializeAI() override
+    {
+        // Reset();
+        _summons.DespawnAll();
+        me->SetCorpseDelay(10); // Corpse despawns 10 seconds after a crystal spawns.
+        UpdateWeather(true);
+        ScheduleTasks();
         me->AddAura(SPELL_AURA_OF_FEAR, me);
         me->SetWalk(false);
-        ScheduleTasks();
+        // ScriptedAI::InitializeAI();
     }
+
+    // void Reset() override
+    // {
+    //     CombatAI::Reset();
+    // }
 
     void ScheduleTasks()
     {
-        scheduler.Schedule(0s, [this](TaskContext context)
+        scheduler.Schedule(0s, [this](const TaskContext& /*context*/)
         {
-            me->Say(PALLID_HORROR_SAY_RANDOM_YELL);
-            // @todo: update npc_text
-            // DoBroadcastText(PickRandomValue(BCT_PALLID_HORROR_YELL1, BCT_PALLID_HORROR_YELL2, BCT_PALLID_HORROR_YELL3, BCT_PALLID_HORROR_YELL4,
-            //     BCT_PALLID_HORROR_YELL5, BCT_PALLID_HORROR_YELL6, BCT_PALLID_HORROR_YELL7, BCT_PALLID_HORROR_YELL8), me, nullptr, CHAT_TYPE_ZONE_YELL);
+            SummonFlameshockers();
+        }).Schedule(1s, [this](TaskContext context)
+        {
+            Talk(PALLID_HORROR_SAY_RANDOM_YELL);
             context.Repeat(65s, 300s);
         }).Schedule(11s, 81s, [this](TaskContext context)
         {
@@ -1145,7 +1139,8 @@ struct npc_pallid_horror : public CombatAI
 
                 float x, y, z;
                 target->GetNearPoint(target, x, y, z, 5.0f, 5.0f, 0.0f);
-                if (Creature* creature = me->SummonCreature(NPC_FLAMESHOCKER, x, y, z, target->GetOrientation(), TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, IN_MILLISECONDS * HOUR))
+                // if (Creature* creature = me->SummonCreature(NPC_FLAMESHOCKER, x, y, z, target->GetOrientation(), TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, IN_MILLISECONDS * HOUR))
+                if (Creature* creature = me->SummonCreature(NPC_FLAMESHOCKER, x, y, z, target->GetOrientation(), TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 5 * IN_MILLISECONDS))
                     _summons.Summon(creature);
             }
             context.Repeat(2s);
@@ -1180,6 +1175,7 @@ struct npc_pallid_horror : public CombatAI
                 float angle = static_cast<float>(i) * (M_PIf / (static_cast<float>(amount) / 2.f)) + me->GetOrientation();
                 summon->GetMotionMaster()->Clear(true);
                 summon->GetMotionMaster()->MoveFollow(me, 2.5f, angle);
+                // summon->AI()->SetData(DATA_FLAMESHOCKER_IS_FOLLOWER, 1);
                 _summons.Summon(summon);
             }
         }
@@ -1191,24 +1187,22 @@ struct npc_pallid_horror : public CombatAI
         summon->SetWalk(false);
     }
 
-    void MoveInLineOfSight(Unit* who) override
-    {
-        if (who->IsCreature() && me->IsWithinDistInMap(who, VISIBILITY_DISTANCE_TINY) && me->IsWithinLOSInMap(who) && !who->GetVictim())
-            if (IsGuardOrBoss(who) && who->GetAI())
-                who->GetAI()->AttackStart(me);
+    // void MoveInLineOfSight(Unit* who) override
+    // {
+    //     if (who->IsCreature() && me->IsWithinDistInMap(who, VISIBILITY_DISTANCE_TINY) && me->IsWithinLOSInMap(who) && !who->GetVictim())
+    //         if (IsGuardOrBoss(who) && who->GetAI())
+    //             who->GetAI()->AttackStart(me);
 
-        CombatAI::MoveInLineOfSight(who);
-    }
+    //     CombatAI::MoveInLineOfSight(who);
+    // }
 
     void JustDied(Unit* /*unit*/) override
     {
         // @todo: update npc_text
-        if (Creature* creature = GetClosestCreatureWithEntry(me, NPC_HIGHLORD_BOLVAR_FORDRAGON, VISIBILITY_DISTANCE_NORMAL))
-            creature->Say(1);
-        // DoBroadcastText(BCT_STORMWIND_BOLVAR_2, creature, me, CHAT_TYPE_ZONE_YELL);
+        // if (Creature* creature = GetClosestCreatureWithEntry(me, NPC_VARIAN, VISIBILITY_DISTANCE_NORMAL))
+            // creature->Say(1);
         if (Creature* creature = GetClosestCreatureWithEntry(me, NPC_LADY_SYLVANAS_WINDRUNNER, VISIBILITY_DISTANCE_NORMAL))
-            creature->Say(1);
-            // DoBroadcastText(BCT_UNDERCITY_SYLVANAS_1, creature, me, CHAT_TYPE_ZONE_YELL);
+            creature->Say(SYLVANAS_SAY_ATTACK_END);
 
         // Kill all custom summoned Flameshockers.
         _summons.DoForAllSummons([](WorldObject* summon)
@@ -1219,9 +1213,6 @@ struct npc_pallid_horror : public CombatAI
 
         // Spawn necrotic crystal gobject
         DoCastSelf((me->GetZoneId() == AREA_UNDERCITY ? SPELL_SUMMON_FAINT_NECROTIC_CRYSTAL : SPELL_SUMMON_CRACKED_NECROTIC_CRYSTAL), true);
-
-        // @todo: see if this is removed on death
-        // me->RemoveAurasDueToSpell(SPELL_AURA_OF_FEAR);
 
         // TimePoint now = me->GetMap()->GetCurrentClockTime();
         TimePoint now = std::chrono::steady_clock::now();
@@ -1246,6 +1237,8 @@ struct npc_pallid_horror : public CombatAI
     void UpdateAI(uint32 const diff) override
     {
         scheduler.Update(diff);
+        if (!UpdateVictim())
+            return;
         DoMeleeAttackIfReady();
     }
 
@@ -1329,8 +1322,8 @@ void AddSC_scourge_invasion()
     RegisterCreatureAI(npc_minion_spawner);
     RegisterCreatureAI(npc_pallid_horror);
     RegisterCreatureAI(npc_cultist_engineer);
-    RegisterCreatureAI(npc_flameshocker);
     RegisterCreatureAI(npc_shadow_of_doom);
+    RegisterCreatureAI(npc_flameshocker);
     RegisterSpellScript(spell_communique_trigger);
     RegisterSpellScript(spell_despawner_self);
     RegisterSpellScript(spell_scourge_invasion_scourge_strike);

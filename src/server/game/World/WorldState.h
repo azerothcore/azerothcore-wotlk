@@ -349,7 +349,7 @@ class WorldState
         void StartNewCityAttack(uint32 zoneId);
         bool ResumeInvasion(ScourgeInvasionData::InvasionZone& zone);
         bool SummonMouth(Map* map, ScourgeInvasionData::InvasionZone& zone, Position position, bool newInvasion);
-        bool SummonPallid(Map* map, ScourgeInvasionData::CityAttack& zone, Position position, uint32 spawnLoc);
+        bool SummonPallid(Map* map, ScourgeInvasionData::CityAttack& zone, const Position& position, uint32 spawnLoc);
         void HandleActiveZone(uint32 attackTimeVar, uint32 zoneId, uint32 remainingVar, TimePoint now);
 
         Map* GetMap(uint32 mapId, Position const& invZone);

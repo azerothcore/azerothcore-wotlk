@@ -1634,13 +1634,15 @@ void WorldState::StartNewCityAttack(uint32 zoneId)
 
     ScourgeInvasionData::CityAttack& zone = m_siData.m_cityAttacks[zoneId];
 
-    uint32 SpawnLocationID = (urand(0, zone.pallid.size() - 1));
+    // @todo: enable others
+    // int32 SpawnLocationID = (urand(0, zone.pallid.size() - 1));
+    uint32 SpawnLocationID = 1;
 
-    Map* mapPtr = GetMap(zone.map, zone.pallid[SpawnLocationID]);
+    Map* map = GetMap(zone.map, zone.pallid[SpawnLocationID]);
 
     // If any of the required maps are not available we return. Will cause the invasion to be started
     // on next update instead
-    if (!mapPtr)
+    if (!map)
     {
         LOG_ERROR("gameevent", "ScourgeInvasionEvent::StartNewCityAttackIfTime unable to access required map (%{}). Retrying next update.", zone.map);
         return;
@@ -1652,7 +1654,7 @@ void WorldState::StartNewCityAttack(uint32 zoneId)
     /*if (!m_siData.m_attackPoints[zoneId].pallidGuid.IsEmpty())
         return;*/
 
-    if (mapPtr && SummonPallid(mapPtr, zone, zone.pallid[SpawnLocationID], SpawnLocationID))
+    if (map && SummonPallid(map, zone, zone.pallid[SpawnLocationID], SpawnLocationID))
         LOG_DEBUG("gameevent", "ScourgeInvasionEvent::StartNewCityAttackIfTime pallid spawned in {}.", zone.map);
     else
         LOG_DEBUG("gameevent", "ScourgeInvasionEvent::StartNewCityAttackIfTime unable to spawn pallid in {}.", zone.map);
@@ -1707,7 +1709,15 @@ bool WorldState::SummonMouth(Map* map, ScourgeInvasionData::InvasionZone& zone, 
     return true;
 }
 
-bool WorldState::SummonPallid(Map* map, ScourgeInvasionData::CityAttack& zone, Position position, uint32 spawnLoc)
+enum PallidHorrorPaths
+{
+    PATH_STORMWIND_KEEP           = 163941,
+    PATH_STORMWIND_TRADE_DISTRICT = 163942,
+    PATH_UNDERCITY_TRADE_QUARTER  = 163943,
+    PATH_UNDERCITY_ROYAL_QUARTER  = 163944,
+};
+
+bool WorldState::SummonPallid(Map* map, ScourgeInvasionData::CityAttack& zone, const Position& position, uint32 spawnLoc)
 {
     AddPendingPallid(zone.zoneId);
     // Remove old pallid if required.
@@ -1715,17 +1725,17 @@ bool WorldState::SummonPallid(Map* map, ScourgeInvasionData::CityAttack& zone, P
     if (Creature* existingPallid = map->GetCreature(zone.pallidGuid))
         existingPallid->AddObjectToRemoveList();
 
-    if (Creature* pallid = map->SummonCreature(RAND(NPC_PALLID_HORROR, NPC_PATCHWORK_TERROR), position))
+    // if (Creature* pallid = map->SummonCreature(RAND(NPC_PALLID_HORROR, NPC_PATCHWORK_TERROR), position))
+    // @todo: include patchwork terror?
+    if (Creature* pallid = map->SummonCreature(NPC_PALLID_HORROR, position))
     {
         pallid->GetMotionMaster()->Clear(false);
         if (pallid->GetZoneId() == AREA_UNDERCITY)
-            pathID = spawnLoc == 0 ? 1 : 0;
+            pathID = spawnLoc == 0 ? PATH_UNDERCITY_ROYAL_QUARTER : PATH_UNDERCITY_TRADE_QUARTER;
         else
-            pathID = spawnLoc == 0 ? 2 : 3;
+            pathID = spawnLoc == 0 ? PATH_STORMWIND_KEEP : PATH_STORMWIND_TRADE_DISTRICT;
 
-        // pallid->GetMotionMaster()->MoveWaypoint(pathID, PATH_FROM_ENTRY);
-        // pallid->GetMotionMaster()->MoveWaypoint(pathID, PATH_FROM_ENTRY, true);
-        pallid->LoadPath(pathID);
+        pallid->GetMotionMaster()->MovePath(pathID, false);
 
         sWorldState->SetPallidGuid(zone.zoneId, pallid->GetGUID());
     }
@@ -1767,7 +1777,7 @@ void WorldState::HandleActiveZone(uint32 attackTimeVar, uint32 zoneId, uint32 re
                 sWorldState->AddBattlesWon(1);
                 sWorldState->SetLastAttackZone(zoneId);
 
-                LOG_DEBUG("gameevent", "[Scourge Invasion Event] The Scourge has been defeated in {}, next attack starting in {} minutes.", zoneId, timeToNextAttack);
+                LOG_INFO("gameevent", "[Scourge Invasion Event] The Scourge has been defeated in {}, next attack starting in {} minutes.", zoneId, timeToNextAttack);
                 LOG_DEBUG("gameevent", "[Scourge Invasion Event] {} victories", sWorldState->GetBattlesWon());
 
                 if (mouth)

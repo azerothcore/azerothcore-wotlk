@@ -223,6 +223,7 @@ enum ScourgeInvasionNPC
     NPC_FAINT_NECROTIC_CRYSTAL                          = 16531,
     NPC_FLAMESHOCKER                                    = 16383,
     NPC_HIGHLORD_BOLVAR_FORDRAGON                       = 1748,
+    NPC_VARIAN                                          = 29611,
     NPC_LADY_SYLVANAS_WINDRUNNER                        = 10181,
     NPC_VARIMATHRAS                                     = 2425,
     NPC_ROYAL_DREADGUARD                                = 13839,
@@ -275,6 +276,7 @@ enum ScourgeInvasionObjects
 enum ScourgeInvasionMisc
 {
     ITEM_NECROTIC_RUNE                                  = 22484,
+    ACTION_FLAMESHOCKER_SCHEDULE_DESPAWN = 1, // Used by Flameshocker to schedule despawn.
 };
 
 enum ScourgeInvasionNPCEvents
@@ -334,7 +336,9 @@ enum ScourgeInvasionTalk
     HERALD_OF_THE_LICH_KING_SAY_ATTACK_END      = 1,
     HERALD_OF_THE_LICH_KING_SAY_ATTACK_RANDOM   = 2,
     PALLID_HORROR_SAY_RANDOM_YELL               = 0,
-    SHADOW_OF_DOOM_SAY_AGGRO                    = 0
+    SHADOW_OF_DOOM_SAY_AGGRO                    = 0,
+    SYLVANAS_SAY_ATTACK_END                     = 3,
+    VARIAN_SAY_ATTACK_END                       = 3
 };
 
 enum ScourgeInvasionLang
