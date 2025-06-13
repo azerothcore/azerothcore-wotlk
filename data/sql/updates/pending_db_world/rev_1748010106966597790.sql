@@ -5885,15 +5885,20 @@ UPDATE `creature_template` SET `ScriptName` = 'npc_flameshocker' WHERE (`entry` 
 UPDATE `creature_template` SET `ScriptName` = 'npc_pallid_horror' WHERE (`entry` IN (16382, 16394));
 -- Pallid Horror, Patchwork Terror
 UPDATE `creature_template` SET `minlevel` = 70, `maxlevel` = 70 WHERE (`entry` IN (16394, 16382));
+-- Flameshocker
+UPDATE `creature_template` SET `minlevel` = 73, `maxlevel` = 73 WHERE (`entry` = 16383);
 DELETE FROM `creature_template_addon` WHERE (`entry` IN (16394, 16382));
 INSERT INTO `creature_template_addon` (`entry`, `path_id`, `mount`, `bytes1`, `bytes2`, `emote`, `visibilityDistanceType`, `auras`) VALUES
 (16394, 0, 0, 0, 0, 0, 0, '28126'),
 (16382, 0, 0, 0, 0, 0, 0, '28126');
 
 -- Waypoints Pallid Horror, Patchwork Terror
--- Stormwind Keep
 SET @NPC_PALLID_HORROR := 16394;
 SET @PATH_ID:= @NPC_PALLID_HORROR * 10;
+UPDATE `creature_template_addon` SET `path_id` = @PATH_ID+1 WHERE (`entry` = 16394);
+-- UPDATE `creature_template_addon` SET `path_id` = 163941 WHERE (`entry` = 16394);
+UPDATE `creature_template` SET `MovementType` = 2 WHERE (`entry` = 16394);
+-- Stormwind Keep
 DELETE FROM `waypoint_data` WHERE `id` BETWEEN @PATH_ID+1 AND @PATH_ID+4;
 INSERT INTO `waypoint_data` (`id`, `point`, `position_x`, `position_y`, `position_z`, `orientation`, `delay`, `action`, `move_type`) VALUES
 (@PATH_ID+1, 1, -8571.98, 891.327, 90.7048, 100, 0, 0, 0),
@@ -6002,7 +6007,6 @@ INSERT INTO `waypoint_data` (`id`, `point`, `position_x`, `position_y`, `positio
 (@PATH_ID+3, 23, 1578.92, 273.572, -43.1027, 100, 0, 0, 0),
 (@PATH_ID+3, 24, 1585.38, 276.608, -43.1027, 100, 0, 0, 0),
 (@PATH_ID+3, 25, 1605.34, 276.451, -43.1027, 100, 0, 149713, 0);
-
 -- Undercity Royal Quarter
 INSERT INTO `waypoint_data` (`id`, `point`, `position_x`, `position_y`, `position_z`, `orientation`, `delay`, `action`, `move_type`) VALUES
 (@PATH_ID+4, 1, 1596.72, 423.488, -46.3713, 100, 0, 149720, 0),
@@ -6087,3 +6091,25 @@ INSERT INTO `waypoint_data` (`id`, `point`, `position_x`, `position_y`, `positio
 (@PATH_ID+4, 80, 1285.68, 329.953, -60.0831, 100, 0, 0, 0),
 (@PATH_ID+4, 81, 1296.77, 326.485, -59.4742, 100, 0, 0, 0),
 (@PATH_ID+4, 82, 1293.68, 320.572, -57.4819, 100, 0, 0, 0);
+
+DELETE FROM `creature_text` WHERE (`CreatureID` = 16394) AND (`GroupID` IN (0));
+INSERT INTO `creature_text` (`CreatureID`, `GroupID`, `ID`, `Text`, `Type`, `Language`, `Probability`, `Emote`, `Duration`, `Sound`, `BroadcastTextId`, `TextRange`, `comment`) VALUES
+(16394, 0, 0, 'What?  This not Naxxramas!  We not like this place... destroy!', 14, 0, 0, 0, 0, 0, 12329, 0, 'Pallid Horror Random 1'),
+(16394, 0, 1, 'Raaarrrrggghhh!  We come for you!', 14, 0, 0, 0, 0, 0, 12327, 0, 'Pallid Horror Random 2'),
+(16394, 0, 2, 'Kel''Thuzad say to tell you... DIE!', 14, 0, 0, 0, 0, 0, 12326, 0, 'Pallid Horror Random 3'),
+(16394, 0, 3, 'Why you run away? We make your corpse into Scourge.', 14, 0, 0, 0, 0, 0, 12342, 0, 'Pallid Horror Random 4'),
+(16394, 0, 4, 'No worry, we find you.', 14, 0, 0, 0, 0, 0, 12343, 0, 'Pallid Horror Random 5'),
+(16394, 0, 5, 'You spare parts!  We make more Scourge in necropolis.', 14, 0, 0, 0, 0, 0, 12330, 0, 'Pallid Horror Random 6'),
+(16394, 0, 6, 'Hahaha, your guards no match for Scourge!', 14, 0, 0, 0, 0, 0, 12328, 0, 'Pallid Horror Random 7'),
+(16394, 0, 7, 'We come destroy puny ones!', 14, 0, 0, 0, 0, 0, 12325, 0, 'Pallid Horror Random 8');
+
+DELETE FROM `creature_text` WHERE (`CreatureID` = 10181) AND (`GroupID` IN (3));
+INSERT INTO `creature_text` (`CreatureID`, `GroupID`, `ID`, `Text`, `Type`, `Language`, `Probability`, `Emote`, `Duration`, `Sound`, `BroadcastTextId`, `TextRange`, `comment`) VALUES
+(10181, 3, 0, 'The Scourge attack against my court has been eliminated.  You may go about your business.', 0, 0, 0, 0, 0, 0, 12331, 1, 'City Attack End');
+
+UPDATE `creature_template` SET `unit_flags` = 512 WHERE (`entry` = 5489);
+
+-- Set alliance quest to cracked
+DELETE FROM `creature_queststarter` WHERE (`quest` = 9292) AND (`id` IN (16531, 16431));
+INSERT INTO `creature_queststarter` (`id`, `quest`) VALUES
+(16431, 9292);
