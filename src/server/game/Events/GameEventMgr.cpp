@@ -512,7 +512,7 @@ void GameEventMgr::LoadEventCreatureData()
             Field* fields = result->Fetch();
 
             ObjectGuid::LowType guid = fields[0].Get<uint32>();
-            int16 eventId = fields[1].Get<int8>();
+            int16 eventId = fields[1].Get<int16>();
 
             CreatureData const* data = sObjectMgr->GetCreatureData(guid);
             if (!data)
@@ -562,7 +562,7 @@ void GameEventMgr::LoadEventGameObjectData()
             Field* fields = result->Fetch();
 
             ObjectGuid::LowType guid = fields[0].Get<uint32>();
-            int16 eventId = fields[1].Get<int8>();
+            int16 eventId = fields[1].Get<int16>();
 
             int32 internal_event_id = _gameEvent.size() + eventId - 1;
 
@@ -1020,7 +1020,7 @@ void GameEventMgr::LoadEventPoolData()
             Field* fields = result->Fetch();
 
             uint32 entry = fields[0].Get<uint32>();
-            int16 eventId = fields[1].Get<int8>();
+            int16 eventId = fields[1].Get<int16>();
 
             int32 internal_event_id = _gameEvent.size() + eventId - 1;
 
