@@ -2591,7 +2591,7 @@ bool Creature::_IsTargetAcceptable(Unit const* target) const
 void Creature::UpdateMoveInLineOfSightState()
 {
     // xinef: pets, guardians and units with scripts / smartAI should be skipped
-    if (IsPet() || HasUnitTypeMask(UNIT_MASK_MINION | UNIT_MASK_SUMMON | UNIT_MASK_GUARDIAN | UNIT_MASK_CONTROLABLE_GUARDIAN) ||
+    if (IsPet() || HasUnitTypeMask(UNIT_MASK_MINION | UNIT_MASK_SUMMON | UNIT_MASK_GUARDIAN | UNIT_MASK_CONTROLLABLE_GUARDIAN) ||
             GetScriptId() || GetAIName() == "SmartAI")
     {
         m_moveInLineOfSightStrictlyDisabled = false;
@@ -3735,7 +3735,7 @@ uint8 Creature::GetLeashTimer() const
 { // Based on testing on Classic, seems to range from ~11s for low level mobs (1-5) to ~16s for high level mobs (70+)
     uint8 timerOffset = 11;
 
-    uint8 timerModifier = uint8(GetLevel() / 10) - 2;
+    uint8 timerModifier = uint8(GetCreatureTemplate()->minlevel / 10) - 2;
 
     // Formula is likely not quite correct, but better than flat timer
     return std::max<uint8>(timerOffset, timerOffset + timerModifier);

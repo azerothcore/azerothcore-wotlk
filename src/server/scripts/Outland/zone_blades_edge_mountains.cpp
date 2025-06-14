@@ -26,18 +26,6 @@
 #include "SpellInfo.h"
 #include "SpellScript.h"
 #include "SpellScriptLoader.h"
-/* ScriptData
-SDName: Blades_Edge_Mountains
-SD%Complete: 90
-SDComment: Quest support: 10503, 10504, 10556, 10594, 10609, 10821. Ogri'la->Skettis Flight. (npc_daranelle needs bit more work before consider complete)
-SDCategory: Blade's Edge Mountains
-EndScriptData */
-
-/* ContentData
-npc_nether_drake
-npc_daranelle
-go_legion_obelisk
-EndContentData */
 
 /// @todo: this import is not necessary for compilation and marked as unused by the IDE
 //  however, for some reasons removing it would cause a damn linking issue
@@ -45,7 +33,6 @@ EndContentData */
 //  see: https://github.com/azerothcore/azerothcore-wotlk/issues/9766
 #include "GridNotifiersImpl.h"
 
-// Ours
 enum deathsdoorfell
 {
     SPELL_ARTILLERY_ON_THE_WRAP_GATE            = 39221,
@@ -248,8 +235,6 @@ class spell_npc22275_crystal_prison_aura : public AuraScript
         OnEffectPeriodic += AuraEffectPeriodicFn(spell_npc22275_crystal_prison_aura::OnPeriodic, EFFECT_0, SPELL_AURA_PERIODIC_DUMMY);
     }
 };
-
-// Theirs
 
 /*######
 ## npc_nether_drake
@@ -1161,11 +1146,9 @@ class spell_oscillating_field : public SpellScript
 
 void AddSC_blades_edge_mountains()
 {
-    // Ours
     new npc_deaths_door_fell_cannon_target_bunny();
     new npc_deaths_fel_cannon();
     RegisterSpellScript(spell_npc22275_crystal_prison_aura);
-    // Theirs
     new npc_nether_drake();
     new npc_daranelle();
     new npc_simon_bunny();

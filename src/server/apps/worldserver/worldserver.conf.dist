@@ -657,7 +657,7 @@ Appender.Console=1,4,0,"1 9 3 6 5 8"
 Appender.Server=2,5,0,Server.log,w
 Appender.Playerbots=2,5,0,Playerbots.log,w
 # Appender.GM=2,5,15,gm_%s.log
-Appender.Errors=2,5,0,Errors.log
+Appender.Errors=2,5,0,Errors.log,w
 # Appender.DB=3,5,0
 
 #  Logger config values: Given a logger "name"

@@ -845,6 +845,8 @@ void World::LoadConfigSettings(bool reload)
     _int_configs[CONFIG_GUILD_BANK_TAB_COST_4] = sConfigMgr->GetOption<int32>("Guild.BankTabCost4", 25000000);
     _int_configs[CONFIG_GUILD_BANK_TAB_COST_5] = sConfigMgr->GetOption<int32>("Guild.BankTabCost5", 50000000);
 
+    _int_configs[CONFIG_GUILD_MEMBER_LIMIT] = sConfigMgr->GetOption<uint32>("Guild.MemberLimit", 0);
+
     _bool_configs[CONFIG_DETECT_POS_COLLISION] = sConfigMgr->GetOption<bool>("DetectPosCollision", true);
 
     _bool_configs[CONFIG_RESTRICTED_LFG_CHANNEL]      = sConfigMgr->GetOption<bool>("Channel.RestrictedLfg", true);
