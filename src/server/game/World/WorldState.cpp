@@ -1717,7 +1717,6 @@ enum PallidHorrorPaths
     PATH_UNDERCITY_ROYAL_QUARTER  = 163944,
 };
 
-
 bool WorldState::SummonPallid(Map* map, ScourgeInvasionData::CityAttack& zone, const Position& position, uint32 spawnLoc)
 {
     AddPendingPallid(zone.zoneId);

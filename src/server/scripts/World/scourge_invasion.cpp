@@ -980,48 +980,6 @@ struct npc_cultist_engineer : public ScriptedAI
     }
 };
 
-struct npc_flameshocker : public CombatAI
-{
-    npc_flameshocker(Creature* creature) : CombatAI(creature) { }
-
-    void Reset() override
-    {
-        scheduler.CancelAll();
-        scheduler.Schedule(2s, [this](TaskContext context)
-        {
-            DoCastVictim(RAND(SPELL_FLAMESHOCKERS_TOUCH, SPELL_FLAMESHOCKERS_TOUCH2), true);
-            context.Repeat(30s, 45s);
-        });
-    }
-    
-    void JustDied(Unit* /*killer*/) override
-    {
-        DoCastSelf(SPELL_FLAMESHOCKERS_REVENGE, true);
-    }
-
-    // void SpellHit(Unit* /* caster */, SpellInfo const* spell) override
-    // {
-    //     if (spell->Id == SPELL_SPIRIT_SPAWN_OUT)
-    //         me->DespawnOrUnsummon(3000);
-    // }
-
-    // void MoveInLineOfSight(Unit* who) override
-    // {
-    //     if (who->IsCreature() && me->IsWithinDistInMap(who, VISIBILITY_DISTANCE_TINY) && me->IsWithinLOSInMap(who) && !who->GetVictim())
-    //         if (IsGuardOrBoss(who) && who->GetAI())
-    //             who->GetAI()->AttackStart(me);
-    //     CombatAI::MoveInLineOfSight(who);
-    // }
-
-    void UpdateAI(uint32 const diff) override
-    {
-        scheduler.Update(diff);
-        if (!UpdateVictim())
-            return;
-        DoMeleeAttackIfReady();
-    }
-};
-
 struct npc_shadow_of_doom : public CombatAI
 {
     npc_shadow_of_doom(Creature* creature) : CombatAI(creature) { }
@@ -1082,6 +1040,48 @@ struct npc_shadow_of_doom : public CombatAI
     void UpdateAI(uint32 const diff) override
     {
         scheduler.Update(diff);
+        DoMeleeAttackIfReady();
+    }
+};
+
+struct npc_flameshocker : public CombatAI
+{
+    npc_flameshocker(Creature* creature) : CombatAI(creature) { }
+
+    void Reset() override
+    {
+        scheduler.CancelAll();
+        scheduler.Schedule(2s, [this](TaskContext context)
+        {
+            DoCastVictim(RAND(SPELL_FLAMESHOCKERS_TOUCH, SPELL_FLAMESHOCKERS_TOUCH2), true);
+            context.Repeat(30s, 45s);
+        });
+    }
+
+    void JustDied(Unit* /*killer*/) override
+    {
+        DoCastSelf(SPELL_FLAMESHOCKERS_REVENGE, true);
+    }
+
+    // void SpellHit(Unit* /* caster */, SpellInfo const* spell) override
+    // {
+    //     if (spell->Id == SPELL_SPIRIT_SPAWN_OUT)
+    //         me->DespawnOrUnsummon(3000);
+    // }
+
+    // void MoveInLineOfSight(Unit* who) override
+    // {
+    //     if (who->IsCreature() && me->IsWithinDistInMap(who, VISIBILITY_DISTANCE_TINY) && me->IsWithinLOSInMap(who) && !who->GetVictim())
+    //         if (IsGuardOrBoss(who) && who->GetAI())
+    //             who->GetAI()->AttackStart(me);
+    //     CombatAI::MoveInLineOfSight(who);
+    // }
+
+    void UpdateAI(uint32 const diff) override
+    {
+        scheduler.Update(diff);
+        if (!UpdateVictim())
+            return;
         DoMeleeAttackIfReady();
     }
 };
@@ -1322,8 +1322,8 @@ void AddSC_scourge_invasion()
     RegisterCreatureAI(npc_minion_spawner);
     RegisterCreatureAI(npc_pallid_horror);
     RegisterCreatureAI(npc_cultist_engineer);
-    RegisterCreatureAI(npc_flameshocker);
     RegisterCreatureAI(npc_shadow_of_doom);
+    RegisterCreatureAI(npc_flameshocker);
     RegisterSpellScript(spell_communique_trigger);
     RegisterSpellScript(spell_despawner_self);
     RegisterSpellScript(spell_scourge_invasion_scourge_strike);
