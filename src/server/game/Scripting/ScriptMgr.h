@@ -405,6 +405,7 @@ public: /* PlayerScript */
     void OnPlayerUpdateGatheringSkill(Player* player, uint32 skillId, uint32 currentLevel, uint32 gray, uint32 green, uint32 yellow, uint32& gain);
     void OnPlayerUpdateCraftingSkill(Player* player, SkillLineAbilityEntry const* skill, uint32 currentLevel, uint32& gain);
     bool OnPlayerUpdateFishingSkill(Player* player, int32 skill, int32 zone_skill, int32 chance, int32 roll);
+    bool OnPlayerCanLootFishingPool(Player* player, int32 skill, int32 zone_skill, GameObject* fishing_pool);
     bool OnPlayerCanAreaExploreAndOutdoor(Player* player);
     void OnPlayerVictimRewardBefore(Player* player, Player* victim, uint32& killer_title, uint32& victim_title);
     void OnPlayerVictimRewardAfter(Player* player, Player* victim, uint32& killer_title, uint32& victim_rank, float& honor_f);
