@@ -47,6 +47,8 @@
 #include "Transport.h"
 #include "Tokenize.h"
 #include "Vehicle.h"
+#include "VoiceChatChannel.h"
+#include "VoiceChatMgr.h"
 #include "WardenWin.h"
 #include "World.h"
 #include "WorldGlobals.h"
@@ -132,6 +134,9 @@ WorldSession::WorldSession(uint32 id, std::string&& name, std::shared_ptr<WorldS
     isRecruiter(isARecruiter),
     m_currentVendorEntry(0),
     _calendarEventCreationCooldown(0),
+    _micEnabled(false),
+    _voiceEnabled(false),
+    _currentVoiceChannel(0),
     _addonMessageReceiveCount(0),
     _timeSyncClockDeltaQueue(6),
     _timeSyncClockDelta(0),
@@ -722,6 +727,9 @@ void WorldSession::LogoutPlayer(bool save)
         //! Broadcast a logout message to the player's friends
         sSocialMgr->SendFriendStatus(_player, FRIEND_OFFLINE, _player->GetGUID(), true);
         sSocialMgr->RemovePlayerSocial(_player->GetGUID());
+
+        // Leave voice chat if player disconnects
+        sVoiceChatMgr.RemoveFromVoiceChatChannels(_player->GetGUID());
 
         //! Call script hook before deletion
         sScriptMgr->OnPlayerLogout(_player);
