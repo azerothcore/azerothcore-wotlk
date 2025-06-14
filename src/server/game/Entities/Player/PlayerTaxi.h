@@ -65,7 +65,9 @@ public:
     [[nodiscard]] uint32 GetCurrentTaxiPath() const;
     uint32 NextTaxiDestination()
     {
-        m_TaxiDestinations.pop_front();
+        if (!m_TaxiDestinations.empty())
+            m_TaxiDestinations.pop_front();
+
         return GetTaxiDestination();
     }
 
