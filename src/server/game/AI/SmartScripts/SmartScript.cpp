@@ -2511,7 +2511,7 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
                          std::back_inserter(waypoints), [](uint32 wp) { return wp != 0; });
 
             float distanceToClosest = std::numeric_limits<float>::max();
-            WayPoint* closestWp = nullptr;
+            uint32 closestWpId = 0;
 
             for (WorldObject* target : targets)
             {
@@ -2525,23 +2525,24 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
                             if (!path || path->empty())
                                 continue;
 
-                            auto itrWp = path->find(0);
+                            //waypoint pointid always starts at 1, never 0!
+                            auto itrWp = path->find(1);
                             if (itrWp != path->end())
                             {
-                                if (WayPoint* wp = itrWp->second)
+                                if (WayPoint* wpData = itrWp->second)
                                 {
-                                    float distToThisPath = creature->GetDistance(wp->x, wp->y, wp->z);
+                                    float distToThisPath = creature->GetExactDistSq(wpData->x, wpData->y, wpData->z);
                                     if (distToThisPath < distanceToClosest)
                                     {
                                         distanceToClosest = distToThisPath;
-                                        closestWp = wp;
+                                        closestWpId = wp;
                                     }
                                 }
                             }
                         }
 
-                        if (closestWp)
-                            CAST_AI(SmartAI, creature->AI())->StartPath(false, closestWp->id, true);
+                        if (closestWpId)
+                            CAST_AI(SmartAI, creature->AI())->StartPath(false, closestWpId, true);
                     }
                 }
             }
