@@ -878,6 +878,7 @@ void World::LoadConfigSettings(bool reload)
     _float_configs[CONFIG_LISTEN_RANGE_TEXTEMOTE] = sConfigMgr->GetOption<float>("ListenRange.TextEmote", 25.0f);
     _float_configs[CONFIG_LISTEN_RANGE_YELL]      = sConfigMgr->GetOption<float>("ListenRange.Yell", 300.0f);
 
+    _int_configs[CONFIG_BATTLEGROUND_PREP_TIME]                            = sConfigMgr->GetOption<int32>("Battleground.PrepTime", 120);
     _int_configs[CONFIG_BATTLEGROUND_OVERRIDE_LOWLEVELS_MINPLAYERS]        = sConfigMgr->GetOption<uint32>("Battleground.Override.LowLevels.MinPlayers", 0);
     _bool_configs[CONFIG_BATTLEGROUND_DISABLE_QUEST_SHARE_IN_BG]           = sConfigMgr->GetOption<bool>("Battleground.DisableQuestShareInBG", false);
     _bool_configs[CONFIG_BATTLEGROUND_DISABLE_READY_CHECK_IN_BG]           = sConfigMgr->GetOption<bool>("Battleground.DisableReadyCheckInBG", false);
@@ -938,6 +939,7 @@ void World::LoadConfigSettings(bool reload)
     _int_configs[CONFIG_BATTLEGROUND_ALTERAC_REP_ONBOSSDEATH]              = sConfigMgr->GetOption<uint32>("Battleground.Alterac.ReputationOnBossDeath", 350);
     _int_configs[CONFIG_BATTLEGROUND_EYEOFTHESTORM_CAPTUREPOINTS]          = sConfigMgr->GetOption<uint32>("Battleground.EyeOfTheStorm.CapturePoints", 1600);
 
+    _int_configs[CONFIG_ARENA_PREP_TIME]                            = sConfigMgr->GetOption<int32>("Arena.PrepTime", 60);
     _int_configs[CONFIG_ARENA_MAX_RATING_DIFFERENCE]                = sConfigMgr->GetOption<uint32>("Arena.MaxRatingDifference", 150);
     _int_configs[CONFIG_ARENA_RATING_DISCARD_TIMER]                 = sConfigMgr->GetOption<uint32>("Arena.RatingDiscardTimer", 10 * MINUTE * IN_MILLISECONDS);
     _int_configs[CONFIG_ARENA_PREV_OPPONENTS_DISCARD_TIMER]         = sConfigMgr->GetOption<uint32>("Arena.PreviousOpponentsDiscardTimer", 2 * MINUTE * IN_MILLISECONDS);

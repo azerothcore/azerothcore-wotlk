@@ -190,6 +190,9 @@ Battleground::Battleground()
     m_TeamScores[TEAM_ALLIANCE]      = 0;
     m_TeamScores[TEAM_HORDE]         = 0;
 
+    for (int i = 0; i < 5; i++)
+        m_AnnouncementsMade[i] = false;
+
     m_PrematureCountDown = false;
     m_PrematureCountDownTimer = 0;
 
@@ -494,29 +497,105 @@ inline void Battleground::_ProcessJoin(uint32 diff)
         }
 
         StartingEventCloseDoors();
-        SetStartDelayTime(StartDelayTimes[BG_STARTING_EVENT_FIRST]);
 
-        // First start warning - 2 or 1 minute
-        if (StartMessageIds[BG_STARTING_EVENT_FIRST])
-            SendBroadcastText(StartMessageIds[BG_STARTING_EVENT_FIRST], CHAT_MSG_BG_SYSTEM_NEUTRAL);
+        // Set the initial delay based on configuration
+        uint32 initialDelay;
+
+        // Special case for Strand of the Ancients - always use 120 seconds due to boat timing mechanics
+        if (GetBgTypeID() == BATTLEGROUND_SA)
+        {
+            initialDelay = 120 * IN_MILLISECONDS;
+        }
+        else
+        {
+            initialDelay = isArena() ? GetArenaPrepTime() * IN_MILLISECONDS : GetBattlegroundPrepTime() * IN_MILLISECONDS;
+        }
+
+        SetStartDelayTime(initialDelay);
+
+        // Initialize which announcements should be skipped based on the initial delay
+        if (!isArena())
+        {
+            // For battlegrounds
+            // If initial delay is less than 2 minutes, mark the 2-minute announcement as already made
+            if (initialDelay < BG_ANNOUNCEMENT_TWO_MINUTE)
+                m_AnnouncementsMade[0] = true;
+
+            // If initial delay is less than 1 minute, mark the 1-minute announcement as already made
+            if (initialDelay < BG_ANNOUNCEMENT_ONE_MINUTE)
+                m_AnnouncementsMade[1] = true;
+
+            // If initial delay is less than 30 seconds, mark the 30-second announcement as already made
+            if (initialDelay < BG_ANNOUNCEMENT_HALF_MINUTE)
+                m_AnnouncementsMade[2] = true;
+        }
+        else
+        {
+            // For arenas
+            // If initial delay is less than 1 minute, mark the 1-minute announcement as already made
+            if (initialDelay < BG_ANNOUNCEMENT_ONE_MINUTE)
+                m_AnnouncementsMade[1] = true;
+
+            // If initial delay is less than 30 seconds, mark the 30-second announcement as already made
+            if (initialDelay < BG_ANNOUNCEMENT_HALF_MINUTE)
+                m_AnnouncementsMade[2] = true;
+
+            // If initial delay is less than 15 seconds, mark the 15-second announcement as already made
+            if (initialDelay < BG_ANNOUNCEMENT_QUARTER_MINUTE)
+                m_AnnouncementsMade[3] = true;
+        }
     }
-    // After 1 minute or 30 seconds, warning is signaled
-    else if (GetStartDelayTime() <= StartDelayTimes[BG_STARTING_EVENT_SECOND] && !(m_Events & BG_STARTING_EVENT_2))
-    {
-        m_Events |= BG_STARTING_EVENT_2;
 
-        if (StartMessageIds[BG_STARTING_EVENT_SECOND])
-            SendBroadcastText(StartMessageIds[BG_STARTING_EVENT_SECOND], CHAT_MSG_BG_SYSTEM_NEUTRAL);
+    // Get the current delay time
+    uint32 currentTime = GetStartDelayTime();
+
+    // Check for battleground announcements based on absolute time thresholds
+    if (!isArena())
+    {
+        // Battleground announcements at 120s, 60s, 30s, 0s
+
+        // Two minute announcement (120s)
+        if (!m_AnnouncementsMade[0] && currentTime <= BG_ANNOUNCEMENT_TWO_MINUTE && currentTime > BG_ANNOUNCEMENT_ONE_MINUTE)
+        {
+            m_AnnouncementsMade[0] = true;
+            SendBroadcastText(BG_TEXT_START_TWO_MINUTES, CHAT_MSG_BG_SYSTEM_NEUTRAL);
+        }
+        // One minute announcement (60s)
+        else if (!m_AnnouncementsMade[1] && currentTime <= BG_ANNOUNCEMENT_ONE_MINUTE && currentTime > BG_ANNOUNCEMENT_HALF_MINUTE)
+        {
+            m_AnnouncementsMade[1] = true;
+            SendBroadcastText(BG_TEXT_START_ONE_MINUTE, CHAT_MSG_BG_SYSTEM_NEUTRAL);
+        }
+        // Thirty seconds announcement (30s)
+        else if (!m_AnnouncementsMade[2] && currentTime <= BG_ANNOUNCEMENT_HALF_MINUTE && currentTime > 0)
+        {
+            m_AnnouncementsMade[2] = true;
+            SendBroadcastText(BG_TEXT_START_HALF_MINUTE, CHAT_MSG_BG_SYSTEM_NEUTRAL);
+        }
     }
-    // After 30 or 15 seconds, warning is signaled
-    else if (GetStartDelayTime() <= StartDelayTimes[BG_STARTING_EVENT_THIRD] && !(m_Events & BG_STARTING_EVENT_3))
+    else
     {
-        m_Events |= BG_STARTING_EVENT_3;
+        // Arena announcements at 60s, 30s, 15s, 0s
 
-        if (StartMessageIds[BG_STARTING_EVENT_THIRD])
-            SendBroadcastText(StartMessageIds[BG_STARTING_EVENT_THIRD], CHAT_MSG_BG_SYSTEM_NEUTRAL);
+        // One minute announcement (60s)
+        if (!m_AnnouncementsMade[1] && currentTime <= BG_ANNOUNCEMENT_ONE_MINUTE && currentTime > BG_ANNOUNCEMENT_HALF_MINUTE)
+        {
+            m_AnnouncementsMade[1] = true;
+            SendBroadcastText(ARENA_TEXT_START_ONE_MINUTE, CHAT_MSG_BG_SYSTEM_NEUTRAL);
+        }
+        // Thirty seconds announcement (30s)
+        else if (!m_AnnouncementsMade[2] && currentTime <= BG_ANNOUNCEMENT_HALF_MINUTE && currentTime > BG_ANNOUNCEMENT_QUARTER_MINUTE)
+        {
+            m_AnnouncementsMade[2] = true;
+            SendBroadcastText(ARENA_TEXT_START_THIRTY_SECONDS, CHAT_MSG_BG_SYSTEM_NEUTRAL);
+        }
+        // Fifteen seconds announcement (15s)
+        else if (!m_AnnouncementsMade[3] && currentTime <= BG_ANNOUNCEMENT_QUARTER_MINUTE && currentTime > 0)
+        {
+            m_AnnouncementsMade[3] = true;
+            SendBroadcastText(ARENA_TEXT_START_FIFTEEN_SECONDS, CHAT_MSG_BG_SYSTEM_NEUTRAL);
 
-        if (isArena())
+            // Remove the ready markers for arenas
             switch (GetBgTypeID())
             {
                 case BATTLEGROUND_NA:
@@ -542,12 +621,16 @@ inline void Battleground::_ProcessJoin(uint32 diff)
                 default:
                     break;
             }
+        }
     }
-    // Delay expired (after 2 or 1 minute)
-    else if (GetStartDelayTime() <= 0 && !(m_Events & BG_STARTING_EVENT_4))
+
+    // Delay expired (timer reached 0)
+    if (GetStartDelayTime() <= 0 && !(m_Events & BG_STARTING_EVENT_4))
     {
         m_Events |= BG_STARTING_EVENT_4;
+        m_AnnouncementsMade[4] = true;
 
+        // Start the battle
         StartingEventOpenDoors();
 
         if (StartMessageIds[BG_STARTING_EVENT_FOURTH])
@@ -1086,6 +1169,12 @@ void Battleground::Init()
     m_BgInvitedPlayers[TEAM_ALLIANCE] = 0;
     m_BgInvitedPlayers[TEAM_HORDE] = 0;
     _InBGFreeSlotQueue = false;
+
+    // Set the start delay based on configuration
+    if (isArena())
+        SetStartDelayTime(GetArenaPrepTime() * IN_MILLISECONDS);
+    else
+        SetStartDelayTime(GetBattlegroundPrepTime() * IN_MILLISECONDS);
 
     m_Players.clear();
 
