@@ -24,7 +24,6 @@
 #include "TaskScheduler.h"
 #include "World.h"
 
-// Ours
 class npc_steam_powered_auctioneer : public CreatureScript
 {
 public:
@@ -399,7 +398,6 @@ public:
     };
 };
 
-// Theirs
 /*******************************************************
  * npc_mageguard_dalaran
  *******************************************************/

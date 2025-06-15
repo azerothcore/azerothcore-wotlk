@@ -90,7 +90,6 @@ enum Points
     POINT_ORB,
 };
 
-constexpr float DATA_GROUND_POSITION_Z     = 11.308135f;
 constexpr float DATA_SPHERE_DISTANCE       = 25.0f;
 #define DATA_SPHERE_ANGLE_OFFSET            float(M_PI) / 2.0f
 
@@ -98,7 +97,6 @@ struct npc_taldaram_flamesphere : public NullCreatureAI
 {
     npc_taldaram_flamesphere(Creature *pCreature) : NullCreatureAI(pCreature),
         instance(pCreature->GetInstanceScript()),
-        uiDespawnTimer(13000),
         moveTimer(0)
     {
         pCreature->SetReactState(REACT_PASSIVE);
@@ -109,14 +107,6 @@ struct npc_taldaram_flamesphere : public NullCreatureAI
         if (action == ACTION_SPHERE)
         {
             moveTimer = 3000;
-        }
-    }
-
-    void MovementInform(uint32 type, uint32 id) override
-    {
-        if (type == POINT_MOTION_TYPE && id == POINT_ORB)
-        {
-            me->DisappearAndDie();
         }
     }
 
@@ -131,9 +121,6 @@ struct npc_taldaram_flamesphere : public NullCreatureAI
 
         DoCastSelf(SPELL_FLAME_SPHERE_SPAWN_EFFECT);
         DoCastSelf(SPELL_FLAME_SPHERE_VISUAL);
-
-        /// @todo: replace with DespawnOrUnsummon
-        uiDespawnTimer = 13000;
     }
 
     void JustDied(Unit* /*who*/) override
@@ -176,17 +163,6 @@ struct npc_taldaram_flamesphere : public NullCreatureAI
                 moveTimer -= diff;
             }
         }
-
-        if (uiDespawnTimer)
-        {
-            if (uiDespawnTimer <= diff)
-            {
-                me->DisappearAndDie();
-                uiDespawnTimer = 0;
-            }
-            else
-                uiDespawnTimer -= diff;
-        }
     }
 
     void SetVictimPos(Position const& pos)
@@ -197,7 +173,6 @@ struct npc_taldaram_flamesphere : public NullCreatureAI
 private:
     Position victimPos;
     InstanceScript* instance;
-    uint32 uiDespawnTimer;
     uint32 moveTimer;
 };
 
@@ -245,7 +220,7 @@ struct boss_taldaram : public BossAI
     {
         if (action == ACTION_REMOVE_PRISON || action == ACTION_REMOVE_PRISON_AT_RESET)
         {
-            me->SetHomePosition(me->GetPositionX(), me->GetPositionY(), DATA_GROUND_POSITION_Z, me->GetOrientation());
+            me->SetHomePosition(me->GetPositionX(), me->GetPositionY(), me->GetMapWaterOrGroundLevel(me->GetPosition()), me->GetOrientation());
             instance->HandleGameObject(instance->GetGuidData(DATA_PRINCE_TALDARAM_PLATFORM), true);
 
             if (action == ACTION_REMOVE_PRISON)
@@ -383,7 +358,7 @@ struct boss_taldaram : public BossAI
             {
                 case EVENT_PRINCE_BLOODTHIRST:
                 {
-                    DoCastSelf(SPELL_BLOODTHIRST);
+                    DoCastVictim(SPELL_BLOODTHIRST);
                     events.Repeat(10s);
                     break;
                 }
@@ -392,7 +367,7 @@ struct boss_taldaram : public BossAI
                     if (Unit* victim = me->GetVictim())
                     {
                         DoCast(victim, SPELL_CONJURE_FLAME_SPHERE);
-                        victimSperePos = *victim;
+                        victimSperePos = victim->GetPosition();
                     }
 
                     if (!events.GetNextEventTime(EVENT_PRINCE_VANISH))
@@ -531,7 +506,7 @@ class spell_prince_taldaram_flame_sphere_summon : public SpellScript
 
     void SetDest(SpellDestination& dest)
     {
-        dest._position.m_positionZ = DATA_GROUND_POSITION_Z + 5.5f;
+        dest._position.m_positionZ = GetCaster()->GetPositionZ() + 5.5f;
     }
 
     void Register() override
