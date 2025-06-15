@@ -121,6 +121,7 @@ enum LightOfDawnEncounter
     EVENT_SPELL_DEATH_STRIKE,
     EVENT_SPELL_DEATH_EMBRACE,
     EVENT_SPELL_UNHOLY_BLIGHT,
+    EVENT_SPELL_DARION_MOD_DAMAGE,
     EVENT_SPELL_TALK,
     // Positioning
     EVENT_FINISH_FIGHT_1,
@@ -253,6 +254,7 @@ enum LightOfDawnSpells
     SPELL_DEATH_EMBRACE                 = 53635,
     SPELL_ICY_TOUCH1                    = 49723,
     SPELL_UNHOLY_BLIGHT                 = 53640,
+    SPELL_DARION_MOD_DAMAGE             = 53645,
 
     // Outro
     SPELL_THE_LIGHT_OF_DAWN             = 53658,
@@ -524,6 +526,7 @@ public:
             events.RescheduleEvent(EVENT_SPELL_DEATH_STRIKE, 8000);
             events.RescheduleEvent(EVENT_SPELL_DEATH_EMBRACE, 5000);
             events.RescheduleEvent(EVENT_SPELL_UNHOLY_BLIGHT, 10000);
+            events.RescheduleEvent(EVENT_SPELL_DARION_MOD_DAMAGE, 12000);
             events.RescheduleEvent(EVENT_SPELL_TALK, 10000);
         }
 
@@ -1146,19 +1149,23 @@ public:
             {
                 case EVENT_SPELL_ANTI_MAGIC_ZONE:
                     DoCast(me, SPELL_ANTI_MAGIC_ZONE1);
-                    events.RescheduleEvent(eventId, 25s, 30s);
+                    events.RescheduleEvent(eventId, 30s, 45s);
                     break;
                 case EVENT_SPELL_DEATH_STRIKE:
                     DoCastVictim(SPELL_DEATH_STRIKE);
-                    events.RescheduleEvent(eventId, 5s, 10s);
+                    events.RescheduleEvent(eventId, 5s, 35s);
                     break;
                 case EVENT_SPELL_DEATH_EMBRACE:
                     DoCastVictim(SPELL_DEATH_EMBRACE);
-                    events.RescheduleEvent(eventId, 15s, 20s);
+                    events.RescheduleEvent(eventId, 45s, 60s);
                     break;
                 case EVENT_SPELL_UNHOLY_BLIGHT:
                     DoCast(me, SPELL_UNHOLY_BLIGHT);
                     events.RescheduleEvent(eventId, 60s);
+                    break;
+                case EVENT_SPELL_DARION_MOD_DAMAGE:
+                    DoCast(me, SPELL_DARION_MOD_DAMAGE);
+                    events.RescheduleEvent(eventId, 15s, 25s);
                     break;
                 case EVENT_SPELL_TALK:
                     Talk(SAY_LIGHT_OF_DAWN09);
