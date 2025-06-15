@@ -1276,8 +1276,9 @@ class spell_chapter5_return_to_capital : public SpellScript
                     creature->AI()->Talk(SAY_INSULT_TO_DK, player);
             }
         }
-        else /// @todo: Citizen NPCs also need to cast ReturnToCapitalSpells (missing creature texts)
-            creature->HandleEmoteCommand(EMOTE_ONESHOT_COWER);
+        else /// @todo: Needs to be checked for other creatures
+            if (creature->GetCreatureTemplate()->flags_extra & CREATURE_FLAG_EXTRA_CIVILIAN)
+                    creature->HandleEmoteCommand(EMOTE_ONESHOT_COWER);
     }
 
     void HanldeAfterHit()
@@ -1285,7 +1286,6 @@ class spell_chapter5_return_to_capital : public SpellScript
         if (Creature* creature = GetHitUnit()->ToCreature())
             creature->SetOrientation(creature->GetHomePosition().GetOrientation());
     }
-
 
     void Register() override
     {
