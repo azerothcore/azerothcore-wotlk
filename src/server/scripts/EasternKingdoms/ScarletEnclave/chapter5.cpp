@@ -1215,9 +1215,91 @@ class spell_chapter5_rebuke : public SpellScript
     }
 };
 
+// 58552 - Return to Orgrimmar
+// 58533 - Return to Stormwind
+enum ReturnToCapital
+{
+    SPELL_RETURN_TO_ORGRIMMAR_APPLE  = 58509,
+    SPELL_RETURN_TO_ORGRIMMAR_BANANA = 58513,
+    SPELL_RETURN_TO_ORGRIMMAR_SPIT   = 58520,
+
+    EMOTE_THROW_APPLE  = 2,
+    EMOTE_THROW_BANANA = 3,
+    EMOTE_THROW_SPIT   = 4,
+    SAY_INSULT_TO_DK   = 5,
+
+    NPC_SW_GUARD       = 68,
+    NPC_ROYAL_GUARD    = 1756,
+    NPC_CITY_PATROLLER = 1976,
+    NPC_OG_GUARD       = 3296,
+    NPC_KOR_ELITE      = 14304
+};
+
+uint32 ReturnToCapitalSpells[3] =
+{
+    58509, // Apple
+    58513, // Banana
+    58520  // Spit
+};
+
+class spell_chapter5_return_to_capital : public SpellScript
+{
+    PrepareSpellScript(spell_chapter5_return_to_capital);
+
+    bool Validate(SpellInfo const* /*spellInfo*/) override
+    {
+        return ValidateSpellInfo({ SPELL_RETURN_TO_ORGRIMMAR_APPLE, SPELL_RETURN_TO_ORGRIMMAR_BANANA, SPELL_RETURN_TO_ORGRIMMAR_SPIT});
+    }
+
+    void HandleHit(SpellEffIndex /*effIndex*/)
+    {
+        Creature* creature = GetHitUnit()->ToCreature();
+        Player* player = GetCaster()->ToPlayer();
+
+        if (!creature || !player || player->IsGameMaster() || !player->IsAlive() || !creature->IsAlive() || creature->IsInCombat())
+            return;
+
+        if (creature->GetEntry() == NPC_SW_GUARD || creature->GetEntry() == NPC_ROYAL_GUARD || creature->GetEntry() == NPC_CITY_PATROLLER || creature->GetEntry() == NPC_OG_GUARD || creature->GetEntry() == NPC_KOR_ELITE)
+        {
+            _emote = urand(2,4);
+            if (creature)
+            {
+                creature->PauseMovement(5000);
+                creature->SetFacingToObject(player);
+
+                if (roll_chance_i(30))
+                {
+                    creature->AI()->Talk(_emote, player);
+                    creature->CastSpell(player, ReturnToCapitalSpells[_emote - 2]);
+                }
+                else
+                    creature->AI()->Talk(SAY_INSULT_TO_DK, player);
+            }
+        }
+        else /// @todo: Citizen NPCs also need to cast ReturnToCapitalSpells (missing creature texts)
+            creature->HandleEmoteCommand(EMOTE_ONESHOT_COWER);
+    }
+
+    void HanldeAfterHit()
+    {
+        if (Creature* creature = GetHitUnit()->ToCreature())
+            creature->SetOrientation(creature->GetHomePosition().GetOrientation());
+    }
+
+
+    void Register() override
+    {
+        OnEffectHitTarget += SpellEffectFn(spell_chapter5_return_to_capital::HandleHit, EFFECT_0, SPELL_EFFECT_DUMMY);
+        AfterHit += SpellHitFn(spell_chapter5_return_to_capital::HanldeAfterHit);
+    }
+private:
+    uint8 _emote;
+};
+
 void AddSC_the_scarlet_enclave_c5()
 {
     new npc_highlord_darion_mograine();
     RegisterSpellScript(spell_chapter5_light_of_dawn_aura);
     RegisterSpellScript(spell_chapter5_rebuke);
+    RegisterSpellScript(spell_chapter5_return_to_capital);
 }
