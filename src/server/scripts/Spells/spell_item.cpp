@@ -4200,17 +4200,7 @@ class spell_item_bloodsail_admiral_hat : public AuraScript
     void OnRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
     {
         if (Player* player = GetCaster()->ToPlayer())
-        {
-            std::list<Creature*> parrot;
-            player->GetAllMinionsByEntry(parrot, NPC_ADMIRAL_HAT_PARROT);
-
-            if (parrot.empty())
-                return;
-            else
-                for (Creature* creature : parrot)
-                    if (creature)
-                        creature->DespawnOrUnsummon();
-        }
+            player->RemoveAllMinionsByEntry(NPC_ADMIRAL_HAT_PARROT);
     }
 
     void Register() override
