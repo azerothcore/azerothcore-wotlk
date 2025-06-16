@@ -38,7 +38,7 @@ AC_DATABASE_API extern DatabaseWorkerPool<LoginDatabaseConnection> LoginDatabase
 
 namespace DatabaseEnv
 {
-    void AsyncExecuteWebEvent(const std::string& type, const std::string& data, const std::string& start);
+    void AsyncExecuteWebEvent(const std::string& type, const std::string& data, const std::string& start, const std::string& end);
 } // namespace DatabaseEnv
 
 #endif

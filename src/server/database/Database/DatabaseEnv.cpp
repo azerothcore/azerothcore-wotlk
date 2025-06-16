@@ -27,7 +27,7 @@ DatabaseWorkerPool<LoginDatabaseConnection> LoginDatabase;
 
 namespace DatabaseEnv
 {
-    void AsyncExecuteWebEvent(const std::string& type, const std::string& data, const std::string& start)
+    void AsyncExecuteWebEvent(const std::string& type, const std::string& data, const std::string& start, const std::string& end)
     {
         // Using the variadic Execute method from DatabaseWorkerPool.
         // This uses Acore::StringFormat internally with fmtlib-style placeholders {}.
@@ -35,11 +35,11 @@ namespace DatabaseEnv
         // or that inputs are expected to be sanitized if they can come from untrusted sources.
         // For robust SQL injection prevention, true prepared statements (if an API existed for ad-hoc ones)
         // or manual escaping on parameters would be stricter.
-        CharacterDatabase.Execute("INSERT INTO web.event (type, data, start) VALUES ({}, {}, {})", type, data, start);
+        LoginDatabase.Execute("INSERT INTO acore_auth.web_events (type, data, start, end) VALUES ({}, {}, {}, {})", type, data, start, end);
 
         // Per instructions, "minimal logging is acceptable".
         // Adding actual log calls would require logger includes and setup, which is outside this scope.
         // A typical log line might look like:
-        // Log.info("AsyncExecuteWebEvent: type='{}', data='{}', start='{}'", type, data, start);
+        // Log.info("AsyncExecuteWebEvent: table=acore_auth.web_events, type='{}', data='{}', start='{}', end='{}'", type, data, start, end);
     }
 } // namespace DatabaseEnv
