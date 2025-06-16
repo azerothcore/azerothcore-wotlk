@@ -298,7 +298,6 @@ public:
             if (summoned->GetEntry() == NPC_HIGH_INQUISITOR_VALROTH)
                 m_uiValrothGUID = summoned->GetGUID();
 
-            summoned->SetImmuneToPC(false);
             summons.Summon(summoned);
         }
 
@@ -326,19 +325,37 @@ public:
                                 acolyte->GetMotionMaster()->MovePath(acolyte->GetEntry() * 10, false);
 
                             if (Creature* acolyte = me->SummonCreature(NPC_CRIMSON_ACOLYTE, 1641.0055f, -6031.893f, 134.82211f, 0.401425719261169433f, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 5000))
-                                acolyte->GetMotionMaster()->MovePath(acolyte->GetEntry() + 1 * 10, false);
+                                acolyte->GetMotionMaster()->MovePath((acolyte->GetEntry() + 1) * 10, false);
 
                             if (Creature* acolyte = me->SummonCreature(NPC_CRIMSON_ACOLYTE, 1639.7053f, -6031.7373f, 134.82213f, 2.443460941314697265f, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 5000))
-                                acolyte->GetMotionMaster()->MovePath(acolyte->GetEntry() + 2 * 10, false);
+                                acolyte->GetMotionMaster()->MovePath((acolyte->GetEntry() + 2) * 10, false);
                             break;
                         case 1:
                             Talk(SAY_BREAKOUT4);
-                            SummonAcolyte(3);
                             m_uiWave_Timer = 20000;
+
+                            if (Creature* acolyte = me->SummonCreature(NPC_CRIMSON_ACOLYTE, 1640.7958f, -6030.307f, 134.82211f, 4.65355682373046875f, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 5000))
+                                acolyte->GetMotionMaster()->MovePath((acolyte->GetEntry() + 3) * 10, false);
+
+                            if (Creature* acolyte = me->SummonCreature(NPC_CRIMSON_ACOLYTE, 1641.7305f, -6030.751f, 134.82211f, 6.143558979034423828f, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 5000))
+                                acolyte->GetMotionMaster()->MovePath((acolyte->GetEntry() + 4) * 10, false);
+
+                            if (Creature* acolyte = me->SummonCreature(NPC_CRIMSON_ACOLYTE, 1639.4657f, -6030.404f, 134.82211f, 4.502949237823486328f, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 5000))
+                                acolyte->GetMotionMaster()->MovePath((acolyte->GetEntry() + 5) * 10, false);
                             break;
                         case 2:
                             Talk(SAY_BREAKOUT5);
-                            SummonAcolyte(4);
+                            if (Creature* acolyte = me->SummonCreature(NPC_CRIMSON_ACOLYTE, 1641.3405f, -6031.436f, 134.82211f, 4.612849712371826171f, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 5000))
+                                acolyte->GetMotionMaster()->MovePath((acolyte->GetEntry() + 6) * 10, false);
+
+                            if (Creature* acolyte = me->SummonCreature(NPC_CRIMSON_ACOLYTE, 1642.0404f, -6030.3843f, 134.82211f, 1.378810048103332519f, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 5000))
+                                acolyte->GetMotionMaster()->MovePath((acolyte->GetEntry() + 7) * 10, false);
+
+                            if (Creature* acolyte = me->SummonCreature(NPC_CRIMSON_ACOLYTE, 1640.1162f, -6029.7817f, 134.82211f, 5.707226753234863281f, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 5000))
+                                acolyte->GetMotionMaster()->MovePath((acolyte->GetEntry() + 8) * 10, false);
+
+                            if (Creature* acolyte = me->SummonCreature(NPC_CRIMSON_ACOLYTE, 1640.9948f, -6029.8027f, 134.82211f, 1.605702877044677734f, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 5000))
+                                acolyte->GetMotionMaster()->MovePath((acolyte->GetEntry() + 9) * 10, false);
                             m_uiWave_Timer = 20000;
                             break;
                         case 3:
