@@ -122,7 +122,6 @@ enum LightOfDawnEncounter
     EVENT_SPELL_DEATH_EMBRACE,
     EVENT_SPELL_UNHOLY_BLIGHT,
     EVENT_SPELL_DARION_MOD_DAMAGE,
-    EVENT_SPELL_TALK,
     // Positioning
     EVENT_FINISH_FIGHT_1,
     EVENT_FINISH_FIGHT_2,
@@ -527,7 +526,6 @@ public:
             events.RescheduleEvent(EVENT_SPELL_DEATH_EMBRACE, 5000);
             events.RescheduleEvent(EVENT_SPELL_UNHOLY_BLIGHT, 10000);
             events.RescheduleEvent(EVENT_SPELL_DARION_MOD_DAMAGE, 12000);
-            events.RescheduleEvent(EVENT_SPELL_TALK, 10000);
         }
 
         void Reset() override
@@ -1165,11 +1163,8 @@ public:
                     break;
                 case EVENT_SPELL_DARION_MOD_DAMAGE:
                     DoCast(me, SPELL_DARION_MOD_DAMAGE);
-                    events.RescheduleEvent(eventId, 15s, 25s);
-                    break;
-                case EVENT_SPELL_TALK:
                     Talk(SAY_LIGHT_OF_DAWN09);
-                    events.RescheduleEvent(eventId, 15s, 20s);
+                    events.RescheduleEvent(eventId, 15s, 25s);
                     break;
             }
 
