@@ -1255,8 +1255,12 @@ class spell_chapter5_return_to_capital : public SpellScript
     {
         Creature* creature = GetHitUnit()->ToCreature();
         Player* player = GetCaster()->ToPlayer();
+        uint32 spellId = GetSpellInfo()->Id;
 
-        if (!creature || !player || player->IsGameMaster() || !player->IsAlive() || !creature->IsAlive() || creature->IsInCombat())
+        if (!spellId || !creature || !player || player->IsGameMaster() || !player->IsAlive() || !creature->IsAlive() || creature->IsInCombat())
+            return;
+
+        if (creature->HasSpellCooldown(spellId))
             return;
 
         if (creature->GetEntry() == NPC_SW_GUARD || creature->GetEntry() == NPC_ROYAL_GUARD || creature->GetEntry() == NPC_CITY_PATROLLER || creature->GetEntry() == NPC_OG_GUARD || creature->GetEntry() == NPC_KOR_ELITE)
@@ -1273,15 +1277,20 @@ class spell_chapter5_return_to_capital : public SpellScript
                     creature->CastSpell(player, ReturnToCapitalSpells[_emote - 2]);
                 }
                 else
+                {
                     creature->AI()->Talk(SAY_INSULT_TO_DK, player);
+                    creature->HandleEmoteCommand(RAND(EMOTE_ONESHOT_POINT,EMOTE_ONESHOT_RUDE));
+                }
             }
         }
         else /// @todo: Needs to be checked for other creatures
             if (creature->GetCreatureTemplate()->flags_extra & CREATURE_FLAG_EXTRA_CIVILIAN)
                     creature->HandleEmoteCommand(EMOTE_ONESHOT_COWER);
+
+        creature->AddSpellCooldown(spellId, 0, 30000);
     }
 
-    void HanldeAfterHit()
+    void HanldeAfterHit() /// @todo: Orientation doesn't always reset and should be, roughly, after 30 seconds.
     {
         if (Creature* creature = GetHitUnit()->ToCreature())
             creature->SetOrientation(creature->GetHomePosition().GetOrientation());
