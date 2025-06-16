@@ -149,3 +149,13 @@ INSERT INTO `waypoint_data` (`id`,`point`,`position_x`,`position_y`,`position_z`
 (@PATH,9,1641.9312,-6045.387,127.691315,0.583036780357360839,0,1,0,100,0),
 (@PATH,10,1641.9312,-6045.387,127.691315,0,0,1,0,100,0);
 -- 0x202F2C4C201C53C000084E0001C65DE7 .go xyz 1642.4694 -6029.949 134.73505
+
+UPDATE `creature_template` SET `AIName` = 'SmartAI' WHERE `entry` = 29007;
+
+DELETE FROM `smart_scripts` WHERE (`entryorguid` = 29007) AND (`source_type` = 0) AND (`id` IN (1, 2, 3));
+INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `event_param6`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
+(29007, 0, 1, 0, 0, 0, 100, 0, 1000, 4000, 4000, 6000, 0, 0, 11, 15498, 64, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Crimson Acolyte - In Combat - Cast \'Holy Smite\''),
+(29007, 0, 2, 0, 0, 0, 100, 0, 6000, 9000, 25000, 30000, 0, 0, 11, 19725, 64, 0, 0, 0, 0, 6, 0, 0, 0, 0, 0, 0, 0, 0, 'Crimson Acolyte - In Combat - Cast \'Turn Undead\''),
+(29007, 0, 3, 0, 109, 0, 100, 0, 0, 0, 0, 0, 0, 0, 19, 256, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Crimson Acolyte - On Path 0 Finished - Remove Flags Immune To Players');
+
+UPDATE `creature_template` SET `unit_flags` = `unit_flags`|256 WHERE `entry` = 29007;
