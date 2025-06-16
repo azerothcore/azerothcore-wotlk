@@ -661,7 +661,7 @@ public:
                         me->SetHomePosition(pos);
                         me->SetWalk(false);
                         me->GetMotionMaster()->MovePoint(1, pos.GetPositionX(), pos.GetPositionY(), pos.GetPositionZ(), true, true);
-                        me->CastSpell(me, SPELL_THE_MIGHT_OF_MOGRAINE, true);
+                        DoCastSelf(SPELL_THE_MIGHT_OF_MOGRAINE, true);
                         break;
                     }
                 case EVENT_START_COUNTDOWN_14:
