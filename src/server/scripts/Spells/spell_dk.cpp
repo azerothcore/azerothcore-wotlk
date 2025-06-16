@@ -1758,6 +1758,7 @@ class spell_dk_pestilence : public SpellScript
                 {
                     float pctMods = effOld->GetPctMods();
                     float crit = effOld->GetCritChance();
+                    caster->CastSpell(hitUnit, SPELL_DK_BLOOD_PLAGUE, true);
 
                     if (Aura* disNew = hitUnit->GetAura(SPELL_DK_BLOOD_PLAGUE, caster->GetGUID()))
                         if (AuraEffect* effNew = disNew->GetEffect(EFFECT_0))
@@ -1774,6 +1775,7 @@ class spell_dk_pestilence : public SpellScript
                 {
                     float pctMods = effOld->GetPctMods();
                     float crit = effOld->GetCritChance();
+                    caster->CastSpell(hitUnit, SPELL_DK_FROST_FEVER, true);
 
                     if (Aura* disNew = hitUnit->GetAura(SPELL_DK_FROST_FEVER, caster->GetGUID()))
                         if (AuraEffect* effNew = disNew->GetEffect(EFFECT_0))
