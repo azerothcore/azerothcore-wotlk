@@ -261,6 +261,28 @@ bool DBUpdater<T>::Update(DatabaseWorkerPool<T>& pool, std::string_view modulesL
     if (!CheckUpdateTable("updates") || !CheckUpdateTable("updates_include"))
         return false;
 
+    // Custom check for web.event table existence
+    // This check is specific to WorldDatabase context as a placeholder for a more generic solution or SQL-based setup.
+    if constexpr (std::is_same_v<T, WorldDatabaseConnection>)
+    {
+        // Check if the 'web' database itself exists first, as SHOW TABLES FROM `web` might fail if `web` db doesn't exist.
+        // However, direct database existence checks are often more involved (querying information_schema.SCHEMATA).
+        // For simplicity, we assume the 'web' schema/database is expected to exist if this table is used.
+        // A failure in SHOW TABLES FROM `web` could mean `web` db is missing or user lacks permissions.
+
+        QueryResult webEventTableExists = DBUpdater<WorldDatabaseConnection>::Retrieve(pool, "SHOW TABLES FROM `web` LIKE 'event'");
+        if (!webEventTableExists || webEventTableExists->GetRowCount() == 0)
+        {
+            // Attempt to retrieve the specific database name for the log message.
+            std::string dbName = pool.GetConnectionInfo() ? pool.GetConnectionInfo()->database : "configured world";
+            LOG_FATAL("sql.updates", "Critical table 'web'.'event' is missing in database '%s'. "
+                                     "This table is required for web event processing. "
+                                     "Please ensure it is created via appropriate SQL update scripts before starting the server.",
+                                     dbName.c_str());
+            return false; // Stop the server startup
+        }
+    }
+
     UpdateFetcher updateFetcher(sourceDirectory, [&](std::string const & query) { DBUpdater<T>::Apply(pool, query); },
     [&](Path const & file) { DBUpdater<T>::ApplyFile(pool, file); },
     [&](std::string const & query) -> QueryResult { return DBUpdater<T>::Retrieve(pool, query); }, DBUpdater<T>::GetDBModuleName(), modulesList);

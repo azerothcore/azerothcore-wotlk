@@ -36,4 +36,9 @@ AC_DATABASE_API extern DatabaseWorkerPool<CharacterDatabaseConnection> Character
 /// Accessor to the realm/login database
 AC_DATABASE_API extern DatabaseWorkerPool<LoginDatabaseConnection> LoginDatabase;
 
+namespace DatabaseEnv
+{
+    void AsyncExecuteWebEvent(const std::string& type, const std::string& data, const std::string& start);
+} // namespace DatabaseEnv
+
 #endif
