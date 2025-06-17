@@ -1230,8 +1230,8 @@ void Channel::ToggleModeration(Player* player)
         return;
     }
 
-    const uint32 level = sWorld->getIntConfig(CONFIG_GM_LEVEL_CHANNEL_MODERATION);
-    const bool gm = (level && player->GetSession()->GetSecurity() >= level);
+    const AccountTypes level = static_cast<AccountTypes>(sWorld->getIntConfig(CONFIG_GM_LEVEL_CHANNEL_MODERATION));
+    const bool gm = (player->GetSession()->GetSecurity() >= level);
 
     if (!playersStore[guid].IsModerator() && !gm)
     {

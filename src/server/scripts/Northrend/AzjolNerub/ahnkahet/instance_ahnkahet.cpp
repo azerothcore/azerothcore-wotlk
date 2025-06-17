@@ -133,15 +133,19 @@ public:
     }
 };
 
-// 56702 Shadow Sickle
-// 59103 Shadow Sickle
+// 56702, 59103 - Shadow Sickle
 class spell_shadow_sickle_periodic_damage : public AuraScript
 {
     PrepareAuraScript(spell_shadow_sickle_periodic_damage);
 
     void HandlePeriodic(AuraEffect const*  /*aurEff*/)
     {
-        GetCaster()->CastSpell(nullptr, SPELL_SHADOW_SICKLE);
+        Unit* caster = GetCaster();
+        if (!caster->IsCreature())
+            return;
+
+        if (Unit* target = caster->GetAI()->SelectTarget(SelectTargetMethod::Random, 0, 40.0f)) // Unknown if it targets only players
+            caster->CastSpell(target, SPELL_SHADOW_SICKLE, true);
     }
 
     void Register() override
