@@ -47,6 +47,7 @@ INSERT INTO `game_event` (`eventEntry`, `description`, `world_event`) VALUES
 (@scourge_100_invasions_done,  'Scourge Invasion - 100 Invasions Done', @GAMEEVENT_INTERNAL),
 (@scourge_150_invasions_done,  'Scourge Invasion - 150 Invasions Done', @GAMEEVENT_INTERNAL),
 (@scourge_invasions_done,      'Scourge Invasion - Invasions Done', @GAMEEVENT_INTERNAL);
+UPDATE `game_event` SET `world_event` = @GAMEEVENT_INTERNAL WHERE `eventEntry` = 17;
 
 -- Scourge Invasion - Boss in instance activation
 UPDATE `game_event_creature` SET `eventEntry` = @scourge_boss_in_instance WHERE `guid` IN (248653, 248650, 248654, 248651);
