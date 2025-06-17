@@ -606,7 +606,6 @@ class spell_gen_black_magic_enchant : public AuraScript
     }
 };
 
-// 53642 - The Might of Mograine
 // 64174 - Protective Gaze
 class spell_gen_area_aura_select_players : public AuraScript
 {
@@ -622,6 +621,7 @@ class spell_gen_area_aura_select_players : public AuraScript
     }
 };
 
+// 53642 - The Might of Mograine
 // 62650 - Fortitude of Frost
 // 62670 - Resilience of Nature
 // 62671 - Speed of Invention
