@@ -5,7 +5,7 @@
         "xaver.clang-format",
         "bbenoist.doxygen",
         "ms-vscode.cpptools",
-        "twxs.cmake",
+        "ms-vscode.cmake-tools",
         "mhutchie.git-graph",
         "github.vscode-pull-request-github",
         "eamodio.gitlens",
