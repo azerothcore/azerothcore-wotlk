@@ -5738,7 +5738,7 @@ DELETE FROM `conditions` WHERE (`SourceTypeOrReferenceId` = 15) AND (`SourceGrou
 INSERT INTO `conditions` (`SourceTypeOrReferenceId`, `SourceGroup`, `SourceEntry`, `SourceId`, `ElseGroup`, `ConditionTypeOrReference`, `ConditionTarget`, `ConditionValue1`, `ConditionValue2`, `ConditionValue3`, `NegativeCondition`, `ErrorType`, `ErrorTextId`, `ScriptName`, `Comment`) VALUES
 (15, 7166, 0, 0, 0, 2, 0, 22484, 8, 0, 0, 0, 0, '', 'must have at least 8 Necrotic Runes');
 -- gossip, IMMUNE_TO_PC IMMUNE_TO_NPC
-UPDATE `creature_template` SET `npcflag` = 1, `unit_flags` = `unit_flags` | (256 | 512) WHERE (`entry` = 16230);
+UPDATE `creature_template` SET `npcflag` = `npcflag` | 1, `unit_flags` = `unit_flags` | (256 | 512) WHERE (`entry` = 16230);
 DELETE FROM `creature_template_addon` WHERE (`entry` = 16230);
 INSERT INTO `creature_template_addon` (`entry`, `path_id`, `mount`, `bytes1`, `bytes2`, `emote`, `visibilityDistanceType`, `auras`) VALUES
 (16230, 0, 0, 0, 0, 0, 0, '29826');
@@ -5786,8 +5786,8 @@ UPDATE `creature_template` SET `npcflag` = `npcflag` | 2,  `unit_flags` = `unit_
 -- Argent Outfitter
 UPDATE `creature_template` SET `npcflag` = `npcflag` | 2 WHERE (`entry` = 16787);
 UPDATE `creature_template` SET `unit_flags` = `unit_flags` | 512 WHERE `entry` IN (16787,16281,16361);
--- Argent Emissary: enable gossip
-UPDATE `creature_template` SET `npcflag` = `npcflag` | 1 WHERE (`entry` = 16285);
+-- Argent Emissary: enable gossip, IMMUNE_TO_NPC
+UPDATE `creature_template` SET `npcflag` = `npcflag` | 1, `unit_flags` = `unit_flags` | 512 WHERE (`entry` = 16285);
 
 -- Update quests to reward mail
 DELETE FROM `mail_loot_template` WHERE `Entry` IN (171, 172, 173, 174, 175, 176, 177);
@@ -6113,3 +6113,94 @@ UPDATE `creature_template` SET `unit_flags` = 512 WHERE (`entry` = 5489);
 DELETE FROM `creature_queststarter` WHERE (`quest` = 9292) AND (`id` IN (16531, 16431));
 INSERT INTO `creature_queststarter` (`id`, `quest`) VALUES
 (16431, 9292);
+
+-- Argent Messenger
+UPDATE `creature_template` SET `npcflag` = `npcflag` | 1, `gossip_menu_id` = 7164 WHERE (`entry` = 16359);
+-- Argent Emissary
+UPDATE `creature_template` SET `gossip_menu_id` = 7164 WHERE (`entry` = 16285);
+DELETE FROM `gossip_menu` WHERE `MenuID` IN (7164, 7246, 7254, 7266, 7203, 7193, 7199, 7200, 7267, 7202, 7201);
+INSERT INTO `gossip_menu` (`MenuID`, `TextID`) VALUES
+(7164, 8434),
+(7193, 8471),
+-- Winterspring
+(7199, 8481),
+(7199, 8480),
+-- Tanaris
+(7200, 8481),
+(7200, 8482),
+-- Blasted Lands
+(7201, 8481),
+(7201, 8483),
+-- Burning Steppes
+(7202, 8481),
+(7202, 8484),
+(7203, 8486),
+-- How many battles have we won?
+(7246, 8551),
+(7246, 8554),
+(7246, 8555),
+--
+(7254, 8573),
+-- Azshara
+(7266, 8481),
+(7266, 8593),
+-- Eastern Plaguelands
+(7267, 8481),
+(7267, 8594);
+
+DELETE FROM `npc_text` WHERE (`ID` = 8554);
+INSERT INTO `npc_text` (`ID`, `text0_0`, `text0_1`, `BroadcastTextID0`, `lang0`, `Probability0`, `em0_0`, `em0_1`, `em0_2`, `em0_3`, `em0_4`, `em0_5`, `text1_0`, `text1_1`, `BroadcastTextID1`, `lang1`, `Probability1`, `em1_0`, `em1_1`, `em1_2`, `em1_3`, `em1_4`, `em1_5`, `text2_0`, `text2_1`, `BroadcastTextID2`, `lang2`, `Probability2`, `em2_0`, `em2_1`, `em2_2`, `em2_3`, `em2_4`, `em2_5`, `text3_0`, `text3_1`, `BroadcastTextID3`, `lang3`, `Probability3`, `em3_0`, `em3_1`, `em3_2`, `em3_3`, `em3_4`, `em3_5`, `text4_0`, `text4_1`, `BroadcastTextID4`, `lang4`, `Probability4`, `em4_0`, `em4_1`, `em4_2`, `em4_3`, `em4_4`, `em4_5`, `text5_0`, `text5_1`, `BroadcastTextID5`, `lang5`, `Probability5`, `em5_0`, `em5_1`, `em5_2`, `em5_3`, `em5_4`, `em5_5`, `text6_0`, `text6_1`, `BroadcastTextID6`, `lang6`, `Probability6`, `em6_0`, `em6_1`, `em6_2`, `em6_3`, `em6_4`, `em6_5`, `text7_0`, `text7_1`, `BroadcastTextID7`, `lang7`, `Probability7`, `em7_0`, `em7_1`, `em7_2`, `em7_3`, `em7_4`, `em7_5`, `VerifiedBuild`) VALUES
+(8554, 'We have won $2219W battles against the Scourge.  Take heart, $n.  While many battles lie ahead, heroes, heroes from every realm have risen to fight them.', '', 12402, 0, 1, 0, 0, 0, 0, 0, 0, '', '', 0, 0, 0, 0, 0, 0, 0, 0, 0, '', '', 0, 0, 0, 0, 0, 0, 0, 0, 0, '', '', 0, 0, 0, 0, 0, 0, 0, 0, 0, '', '', 0, 0, 0, 0, 0, 0, 0, 0, 0, '', '', 0, 0, 0, 0, 0, 0, 0, 0, 0, '', '', 0, 0, 0, 0, 0, 0, 0, 0, 0, '', '', 0, 255, 0, 0, 0, 0, 0, 0, 0, 0);
+
+DELETE FROM `conditions` WHERE (`SourceTypeOrReferenceId` = 14) AND (`SourceGroup` IN (7199, 7266, 7201, 7202, 7200, 7267)) AND (`SourceEntry` IN (8480, 8481, 8593, 8483, 8484, 8482, 8594)) AND (`SourceId` = 0) AND (`ElseGroup` = 0) AND (`ConditionTypeOrReference` = 103) AND (`ConditionTarget` = 0) AND (`ConditionValue2` = 0) AND (`ConditionValue3` = 0);
+INSERT INTO `conditions` (`SourceTypeOrReferenceId`, `SourceGroup`, `SourceEntry`, `SourceId`, `ElseGroup`, `ConditionTypeOrReference`, `ConditionTarget`, `ConditionValue1`, `ConditionValue2`, `ConditionValue3`, `NegativeCondition`, `ErrorType`, `ErrorTextId`, `ScriptName`, `Comment`) VALUES
+(14, 7199, 8480, 0, 0, 103, 0, 2259, 0, 0, 0, 0, 0, '', 'Winterspring Invasion must be in progress'),
+(14, 7266, 8593, 0, 0, 103, 0, 2260, 0, 0, 0, 0, 0, '', 'Azshara Invasion must be in progress'),
+(14, 7201, 8483, 0, 0, 103, 0, 2261, 0, 0, 0, 0, 0, '', 'Blasted Lands Invasion must be in progress'),
+(14, 7202, 8484, 0, 0, 103, 0, 2262, 0, 0, 0, 0, 0, '', 'Burning Steppes Invasion must be in progress'),
+(14, 7200, 8482, 0, 0, 103, 0, 2263, 0, 0, 0, 0, 0, '', 'Tanaris Invasion must be in progress'),
+(14, 7267, 8594, 0, 0, 103, 0, 2264, 0, 0, 0, 0, 0, '', 'Eastern Plaguelands must be in progress'),
+-- Add negative conditions
+(14, 7199, 8481, 0, 0, 103, 0, 2259, 0, 0, 1, 0, 0, '', 'Winterspring Invasion must not not be in progress'),
+(14, 7266, 8481, 0, 0, 103, 0, 2260, 0, 0, 1, 0, 0, '', 'Azshara Invasion must not be in progress'),
+(14, 7201, 8481, 0, 0, 103, 0, 2261, 0, 0, 1, 0, 0, '', 'Blasted Lands Invasion must not be in progress'),
+(14, 7202, 8481, 0, 0, 103, 0, 2262, 0, 0, 1, 0, 0, '', 'Burning Steppes Invasion must not be in progress'),
+(14, 7200, 8481, 0, 0, 103, 0, 2263, 0, 0, 1, 0, 0, '', 'Tanaris Invasion must not be in progress'),
+(14, 7267, 8481, 0, 0, 103, 0, 2264, 0, 0, 1, 0, 0, '', 'Eastern Plaguelands must not be in progress');
+
+-- How many battles have we won?
+DELETE FROM `conditions` WHERE (`SourceTypeOrReferenceId` = 14) AND (`SourceGroup` = 7246) AND (`SourceEntry` IN (8551, 8554, 8555)) AND (`SourceId` = 0) AND (`ElseGroup` = 0) AND (`ConditionTypeOrReference` = 12);
+INSERT INTO `conditions` (`SourceTypeOrReferenceId`, `SourceGroup`, `SourceEntry`, `SourceId`, `ElseGroup`, `ConditionTypeOrReference`, `ConditionTarget`, `ConditionValue1`, `ConditionValue2`, `ConditionValue3`, `NegativeCondition`, `ErrorType`, `ErrorTextId`, `ScriptName`, `Comment`) VALUES
+(14, 7246, 8554, 0, 0, 12, 0, 127, 0, 0, 1, 0, 0, '', '50 invasions event must not be active'),
+(14, 7246, 8554, 0, 0, 12, 0, 128, 0, 0, 1, 0, 0, '', '100 invasions event must not be active'),
+(14, 7246, 8551, 0, 0, 12, 0, 127, 0, 0, 0, 0, 0, '', '50 invasions event must be active'),
+(14, 7246, 8555, 0, 0, 12, 0, 128, 0, 0, 0, 0, 0, '', '100 invasions event must be active');
+
+DELETE FROM `gossip_menu_option` WHERE `MenuID` IN (7164, 7246, 7254, 7266, 7203, 7193, 7199, 7200, 7267, 7202, 7201);
+INSERT INTO `gossip_menu_option` (`MenuID`, `OptionID`, `OptionIcon`, `OptionText`, `OptionBroadcastTextID`, `OptionType`, `OptionNpcFlag`, `ActionMenuID`, `ActionPoiID`, `BoxCoded`, `BoxMoney`, `BoxText`, `BoxBroadcastTextID`, `VerifiedBuild`) VALUES
+(7164, 0, 0, 'What''s happening?', 12176, 1, 1, 7193, 0, 0, 0, '', 0, 0),
+(7164, 1, 0, 'What can I do?', 12207, 1, 1, 7203, 0, 0, 0, '', 0, 0),
+(7164, 2, 0, 'Where are we battling the Scourge?', 12434, 1, 1, 7254, 0, 0, 0, '', 0, 0),
+(7164, 3, 0, 'How many battles have we won?', 12398, 1, 1, 7246, 0, 0, 0, '', 0, 0),
+(7193, 0, 0, 'I have another question.', 12241, 1, 1, 7164, 0, 0, 0, '', 0, 0),
+(7199, 0, 0, 'Where else are we battling the Scourge?', 12479, 1, 1, 7254, 0, 0, 0, '', 0, 0),
+(7199, 1, 0, 'I have another question.', 12241, 1, 1, 7164, 0, 0, 0, '', 0, 0),
+(7200, 0, 0, 'Where else are we battling the Scourge?', 12479, 1, 1, 7254, 0, 0, 0, '', 0, 0),
+(7200, 1, 0, 'I have another question.', 12241, 1, 1, 7164, 0, 0, 0, '', 0, 0),
+(7201, 0, 0, 'Where else are we battling the Scourge?', 12479, 1, 1, 7254, 0, 0, 0, '', 0, 0),
+(7201, 1, 0, 'I have another question.', 12241, 1, 1, 7164, 0, 0, 0, '', 0, 0),
+(7202, 0, 0, 'Where else are we battling the Scourge?', 12479, 1, 1, 7254, 0, 0, 0, '', 0, 0),
+(7202, 1, 0, 'I have another question.', 12241, 1, 1, 7164, 0, 0, 0, '', 0, 0),
+(7203, 0, 0, 'I have another question.', 12241, 1, 1, 7164, 0, 0, 0, '', 0, 0),
+(7246, 0, 0, 'I have another question.', 12241, 1, 1, 7164, 0, 0, 0, '', 0, 0),
+(7254, 0, 0, 'Is Azshara currently under attack?', 12476, 1, 1, 7266, 0, 0, 0, '', 0, 0),
+(7254, 1, 0, 'Are the Blasted Lands currently under attack?', 12203, 1, 1, 7201, 0, 0, 0, '', 0, 0),
+(7254, 2, 0, 'Are the Burning Steppes currently under attack?', 12205, 1, 1, 7202, 0, 0, 0, '', 0, 0),
+(7254, 3, 0, 'Are the Eastern Plaguelands currently under attack?', 12477, 1, 1, 7267, 0, 0, 0, '', 0, 0),
+(7254, 4, 0, 'Is Tanaris currently under attack?', 12201, 1, 1, 7200, 0, 0, 0, '', 0, 0),
+(7254, 5, 0, 'Is Winterspring currently under attack?', 12198, 1, 1, 7199, 0, 0, 0, '', 0, 0),
+(7254, 6, 0, 'I have another question.', 12241, 1, 1, 7164, 0, 0, 0, '', 0, 0),
+(7266, 0, 0, 'Where else are we battling the Scourge?', 12479, 1, 1, 7254, 0, 0, 0, '', 0, 0),
+(7266, 1, 0, 'I have another question.', 12241, 1, 1, 7164, 0, 0, 0, '', 0, 0),
+(7267, 0, 0, 'Where else are we battling the Scourge?', 12479, 1, 1, 7254, 0, 0, 0, '', 0, 0),
+(7267, 1, 0, 'I have another question.', 12241, 1, 1, 7164, 0, 0, 0, '', 0, 0);
