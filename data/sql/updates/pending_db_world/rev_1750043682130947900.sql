@@ -159,3 +159,12 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 (29007, 0, 3, 0, 109, 0, 100, 0, 0, 0, 0, 0, 0, 0, 19, 256, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Crimson Acolyte - On Path 0 Finished - Remove Flags Immune To Players');
 
 UPDATE `creature_template` SET `unit_flags` = `unit_flags`|256 WHERE `entry` = 29007;
+
+-- Pathing for  Entry: 29001
+SET @NPC := 29001;
+SET @PATH := @NPC * 10;
+DELETE FROM `waypoint_data` WHERE `id`=@PATH;
+INSERT INTO `waypoint_data` (`id`,`point`,`position_x`,`position_y`,`position_z`,`orientation`,`delay`,`move_type`,`action`,`action_chance`,`wpguid`) VALUES
+(@PATH,1,1648.3103,-6043.6396,127.57861,0,0,1,0,100,0),
+(@PATH,2,1646.5052,-6041.8794,127.57814,0,0,1,0,100,0),
+(@PATH,3,1648.3103,-6043.6396,127.57861,0.892392218112945556,0,1,0,100,0);
