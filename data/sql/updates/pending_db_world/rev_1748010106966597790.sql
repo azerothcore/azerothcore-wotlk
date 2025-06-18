@@ -6205,3 +6205,42 @@ INSERT INTO `gossip_menu_option` (`MenuID`, `OptionID`, `OptionIcon`, `OptionTex
 (7266, 1, 0, 'I have another question.', 12241, 1, 1, 7164, 0, 0, 0, '', 0, 0),
 (7267, 0, 0, 'Where else are we battling the Scourge?', 12479, 1, 1, 7254, 0, 0, 0, '', 0, 0),
 (7267, 1, 0, 'I have another question.', 12241, 1, 1, 7164, 0, 0, 0, '', 0, 0);
+
+-- Argent Quartermaster
+-- Argent Outfitter
+-- In wrath, these are vendors through gossip, not quest givers.
+UPDATE `creature_template` SET `npcflag` = `npcflag` | 1 WHERE (`entry` IN (16787, 16786));
+UPDATE `creature_template` SET `npcflag` = `npcflag` & ~2 WHERE (`entry` IN (16787, 16786));
+UPDATE `creature_template` SET `npcflag` = `npcflag` | 128 WHERE (`entry` = 16787);
+
+UPDATE `creature_template` SET `npcflag` = `npcflag` | 2 WHERE (`entry` IN (16787, 16786));
+
+DELETE FROM `npc_vendor` WHERE (`entry` = 16787);
+INSERT INTO `npc_vendor` (`entry`, `slot`, `item`, `maxcount`, `incrtime`, `ExtendedCost`, `VerifiedBuild`) VALUES
+(16787, 0, 22999, 0, 0, 2520, 0),
+(16787, 0, 23122, 0, 0, 2520, 0),
+(16787, 0, 23123, 0, 0, 2520, 0),
+(16787, 0, 40492, 0, 0, 2522, 0),
+(16787, 0, 40593, 0, 0, 2521, 0),
+(16787, 0, 40601, 0, 0, 2520, 0),
+(16787, 0, 43068, 0, 0, 2518, 0),
+(16787, 0, 43070, 0, 0, 2518, 0),
+(16787, 0, 43073, 0, 0, 2518, 0),
+(16787, 0, 43074, 0, 0, 2518, 0),
+(16787, 0, 43077, 0, 0, 2518, 0),
+(16787, 0, 43078, 0, 0, 2518, 0),
+(16787, 0, 43081, 0, 0, 2518, 0),
+(16787, 0, 43082, 0, 0, 2518, 0),
+(16787, 0, 43530, 0, 0, 2519, 0),
+(16787, 0, 43531, 0, 0, 2519, 0);
+-- Vendor
+UPDATE `creature_template` SET `gossip_menu_id` = 7165 WHERE (`entry` IN (16786, 16787));
+DELETE FROM `gossip_menu` WHERE (`MenuID` = 7165) AND (`TextID` = 13915);
+INSERT INTO `gossip_menu` (`MenuID`, `TextID`) VALUES
+(7165, 13915);
+DELETE FROM `gossip_menu_option` WHERE (`MenuID` = 7165) AND (`OptionID` IN (0));
+INSERT INTO `gossip_menu_option` (`MenuID`, `OptionID`, `OptionIcon`, `OptionText`, `OptionBroadcastTextID`, `OptionType`, `OptionNpcFlag`, `ActionMenuID`, `ActionPoiID`, `BoxCoded`, `BoxMoney`, `BoxText`, `BoxBroadcastTextID`, `VerifiedBuild`) VALUES
+(7165, 0, 1, 'I would like to spend my runes.', 31735, 3, 128, 0, 0, 0, 0, '', 0, 0);
+DELETE FROM `conditions` WHERE (`SourceTypeOrReferenceId` = 15) AND (`SourceGroup` = 7165) AND  (`ConditionValue1` = 9153);
+INSERT INTO `conditions` (`SourceTypeOrReferenceId`, `SourceGroup`, `SourceEntry`, `SourceId`, `ElseGroup`, `ConditionTypeOrReference`, `ConditionTarget`, `ConditionValue1`, `ConditionValue2`, `ConditionValue3`, `NegativeCondition`, `ErrorType`, `ErrorTextId`, `ScriptName`, `Comment`) VALUES
+(15, 7165, 0, 0, 0, 8, 0, 9153, 0, 0, 0, 0, 0, '', 'Argent Quartermaster/Outfitter - Show gossip option if Quest Under the Shadow is rewarded');
