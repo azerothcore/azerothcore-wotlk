@@ -1283,15 +1283,14 @@ class spell_chapter5_return_to_capital : public SpellScript
                 }
             }
         }
-        /*  /// @todo: This needs to be further investigated as there are some "guard" npcs, that have civilian flags and non guard npcs should also insult the dk.
+        /*/// @todo: This needs to be further investigated as there are some "guard" npcs, that have civilian flags and non guard npcs should also insult the dk.
         else
             if (creature->GetCreatureTemplate()->flags_extra & CREATURE_FLAG_EXTRA_CIVILIAN)
             {
-                    creature->HandleEmoteCommand(EMOTE_STATE_COWER); // from sniff, emote 431 for a while, then reset (with "%s cowers in fear." text)
-                    creature->PlayDirectSound(14556);
+                creature->HandleEmoteCommand(EMOTE_STATE_COWER); // from sniff, emote 431 for a while, then reset (with "%s cowers in fear." text)
+                creature->PlayDirectSound(14556);
             }
-
-        */  
+        */
 
         creature->AddSpellCooldown(spellId, 0, 30000);
     }
