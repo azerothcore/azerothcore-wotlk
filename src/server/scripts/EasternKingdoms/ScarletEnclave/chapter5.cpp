@@ -1223,16 +1223,18 @@ enum ReturnToCapital
     SPELL_RETURN_TO_ORGRIMMAR_BANANA = 58513,
     SPELL_RETURN_TO_ORGRIMMAR_SPIT   = 58520,
 
-    EMOTE_THROW_APPLE  = 2,
-    EMOTE_THROW_BANANA = 3,
-    EMOTE_THROW_SPIT   = 4,
-    SAY_INSULT_TO_DK   = 5,
+    EMOTE_THROW_APPLE    = 2,
+    EMOTE_THROW_BANANA   = 3,
+    EMOTE_THROW_SPIT     = 4,
+    SAY_INSULT_TO_DK     = 5,
 
-    NPC_SW_GUARD       = 68,
-    NPC_ROYAL_GUARD    = 1756,
-    NPC_CITY_PATROLLER = 1976,
-    NPC_OG_GUARD       = 3296,
-    NPC_KOR_ELITE      = 14304
+    NPC_SW_GUARD         = 68,
+    NPC_ROYAL_GUARD      = 1756,
+    NPC_CITY_PATROLLER   = 1976,
+    NPC_OG_GUARD         = 3296,
+    NPC_KOR_ELITE        = 14304,
+
+    TEXT_BROADCAST_COWER = 31670 // "%s cowers in fear."
 };
 
 uint32 ReturnToCapitalSpells[3] =
@@ -1288,7 +1290,13 @@ class spell_chapter5_return_to_capital : public SpellScript
             if (creature->GetCreatureTemplate()->flags_extra & CREATURE_FLAG_EXTRA_CIVILIAN)
             {
                 creature->HandleEmoteCommand(EMOTE_STATE_COWER); // from sniff, emote 431 for a while, then reset (with "%s cowers in fear." text)
-                creature->PlayDirectSound(14556);
+                creature->PlayDirectSound(14556); // from sniff
+                if (player)
+                {
+                    LocaleConstant loc_idx = player->GetSession()->GetSessionDbLocaleIndex();
+                        if (BroadcastText const* bct = sObjectMgr->GetBroadcastText(TEXT_BROADCAST_COWER))
+                            creature->TextEmote(bct->GetText(loc_idx, creature->getGender()), creature);
+                }
             }
         */
 
