@@ -20090,9 +20090,8 @@ public:
 
     bool Execute(uint64 /*eventTime*/, uint32 /*updateTime*/) override
     {
-            if (_self.IsInWorld() && _self.FindMap())
+            if (_self.IsInWorld() && _self.FindMap() && _self.IsAlive() && !_self.IsInCombat())
             {
-                // Reset orientation to home position
                 _self.SetFacingTo(_self.GetHomePosition().GetOrientation());
             }
 
