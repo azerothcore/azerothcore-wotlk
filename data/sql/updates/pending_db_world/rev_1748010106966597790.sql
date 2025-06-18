@@ -5745,8 +5745,8 @@ INSERT INTO `creature_template_addon` (`entry`, `path_id`, `mount`, `bytes1`, `b
 (16230, 0, 0, 0, 0, 0, 0, '29826');
 
 -- Shadow of Doom
--- Necrotic Rune drops 30
-UPDATE `creature_loot_template` SET `MinCount` = 30, `MaxCount` = 30 WHERE (`Entry` = 16143) AND (`Item` = 22484);
+-- Necrotic Rune drops 30 with 100% chance
+UPDATE `creature_loot_template` SET `MinCount` = 30, `MaxCount` = 30, `Chance` = 100 WHERE (`Entry` = 16143) AND (`Item` = 22484);
 DELETE FROM `creature_text` WHERE (`CreatureID` = 16143) AND (`GroupID` IN (0));
 INSERT INTO `creature_text` (`CreatureID`, `GroupID`, `ID`, `Text`, `Type`, `Language`, `Probability`, `Emote`, `Duration`, `Sound`, `BroadcastTextId`, `TextRange`, `comment`) VALUES
 (16143, 0, 0, '', 12, 0, 0, 0, 0, 0, 12420, 0, 'Shadow of Doom Aggro 1'),
