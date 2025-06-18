@@ -1269,7 +1269,7 @@ class spell_chapter5_return_to_capital : public SpellScript
             if (creature)
             {
                 creature->PauseMovement(5000);
-                creature->SetFacingToObject(player);
+                creature->SetTimedFacingToObject(player, 30000);
 
                 if (roll_chance_i(30))
                 {
@@ -1283,23 +1283,22 @@ class spell_chapter5_return_to_capital : public SpellScript
                 }
             }
         }
-        else /// @todo: Needs to be checked for other creatures
+        /*  /// @todo: This needs to be further investigated as there are some "guard" npcs, that have civilian flags and non guard npcs should also insult the dk.
+        else
             if (creature->GetCreatureTemplate()->flags_extra & CREATURE_FLAG_EXTRA_CIVILIAN)
-                    creature->HandleEmoteCommand(EMOTE_ONESHOT_COWER);
+            {
+                    creature->HandleEmoteCommand(EMOTE_STATE_COWER); // from sniff, emote 431 for a while, then reset (with "%s cowers in fear." text)
+                    creature->PlayDirectSound(14556);
+            }
+
+        */  
 
         creature->AddSpellCooldown(spellId, 0, 30000);
-    }
-
-    void HanldeAfterHit() /// @todo: Orientation doesn't always reset and should be, roughly, after 30 seconds.
-    {
-        if (Creature* creature = GetHitUnit()->ToCreature())
-            creature->SetOrientation(creature->GetHomePosition().GetOrientation());
     }
 
     void Register() override
     {
         OnEffectHitTarget += SpellEffectFn(spell_chapter5_return_to_capital::HandleHit, EFFECT_0, SPELL_EFFECT_DUMMY);
-        AfterHit += SpellHitFn(spell_chapter5_return_to_capital::HanldeAfterHit);
     }
 private:
     uint8 _emote;
