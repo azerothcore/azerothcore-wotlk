@@ -223,11 +223,8 @@ SpellCastResult UnitAI::DoCast(uint32 spellId)
                 {
                     float range = spellInfo->GetMaxRange(false);
 
-                    DefaultTargetSelector targetSelector(me, range, false, true, -(int32)spellId);
-                    if (!(spellInfo->AuraInterruptFlags & AURA_INTERRUPT_FLAG_NOT_VICTIM) && targetSelector(me->GetVictim()))
-                        target = me->GetVictim();
-                    else
-                    target = SelectTarget(SelectTargetMethod::Random, 0, [&](Unit* target) {
+                    DefaultTargetSelector defaultTargetSelector(me, range, false, true, -(int32)spellId);
+                    auto targetSelector = [&](Unit* target) {
                         if (target->IsPlayer())
                         {
                             if (spellInfo->HasAttribute(SPELL_ATTR5_NOT_ON_PLAYER))
@@ -241,8 +238,13 @@ SpellCastResult UnitAI::DoCast(uint32 spellId)
                             if (spellInfo->HasAttribute(SPELL_ATTR5_NOT_ON_PLAYER_CONTROLLED_NPC) && target->IsControlledByPlayer())
                                 return false;
                         }
-                        return targetSelector(target);
-                    });
+                        return defaultTargetSelector(target);
+                    };
+
+                    if (!(spellInfo->AuraInterruptFlags & AURA_INTERRUPT_FLAG_NOT_VICTIM) && targetSelector(me->GetVictim()))
+                        target = me->GetVictim();
+                    else
+                       target = SelectTarget(SelectTargetMethod::Random, 0, targetSelector);
                 }
                 break;
             }
