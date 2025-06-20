@@ -163,8 +163,8 @@ void WorldState::Save(WorldStateSaveIds saveId)
 
 void WorldState::SaveHelper(std::string& stringToSave, WorldStateSaveIds saveId)
 {
-    CharacterDatabase.Execute("DELETE FROM world_state WHERE Id='{}'", saveId);
-    CharacterDatabase.Execute("INSERT INTO world_state(Id,Data) VALUES('{}','{}')", saveId, stringToSave.data());
+    CharacterDatabase.Execute("DELETE FROM worldstates WHERE entry='{}'", saveId);
+    CharacterDatabase.Execute("INSERT INTO worldstates(entry,value) VALUES('{}','{}')", saveId, stringToSave.data());
 }
 
 bool WorldState::IsConditionFulfilled(WorldStateCondition conditionId, WorldStateConditionState state) const
