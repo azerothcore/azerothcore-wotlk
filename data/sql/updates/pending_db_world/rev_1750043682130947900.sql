@@ -96,3 +96,35 @@ SET @PATH := @NPC * 10;
 DELETE FROM `waypoint_data` WHERE `id`=@PATH;
 INSERT INTO `waypoint_data` (`id`,`point`,`position_x`,`position_y`,`position_z`,`orientation`,`delay`,`move_type`,`action`,`action_chance`,`wpguid`) VALUES
 (@PATH,1,1648.3103,-6043.6396,127.57861,0,0,1,0,100,0);
+
+DELETE FROM `script_waypoint` WHERE `entry` = 28912;
+
+SET @NPC := 28912;
+SET @PATH := @NPC * 10;
+DELETE FROM `waypoint_data` WHERE `id`=@PATH;
+INSERT INTO `waypoint_data` (`id`,`point`,`position_x`,`position_y`,`position_z`,`orientation`,`delay`,`move_type`,`action`,`action_chance`,`wpguid`) VALUES
+(@PATH,1,1653.36,-6038.34,127.584,0,0,0,0,100,0),
+(@PATH,2,1653.7653,-6035.075,127.5844,1.596199,5000,0,0,100,0),
+(@PATH,3,1651.8898,-6037.1006,127.5844,0,0,0,0,100,0),
+(@PATH,4,1651.8898,-6037.1006,127.5844,3.839724302291870117,0,0,0,100,0);
+
+SET @PATH := (@NPC + 1) * 10;
+DELETE FROM `waypoint_data` WHERE `id`=@PATH;
+INSERT INTO `waypoint_data` (`id`,`point`,`position_x`,`position_y`,`position_z`,`orientation`,`delay`,`move_type`,`action`,`action_chance`,`wpguid`) VALUES
+(@PATH,5,1653.3759,-5971.8735,132.25667,0,0,1,0,100,0),
+(@PATH,6,1685.0416,-5887.038,116.1461,0,0,1,0,100,0);
+
+DELETE FROM `creature_text` WHERE `CreatureID` = 28912;
+INSERT INTO `creature_text` (`CreatureID`, `GroupID`, `ID`, `Text`, `Type`, `Language`, `Probability`, `Emote`, `Duration`, `Sound`, `BroadcastTextId`, `TextRange`, `comment`) VALUES
+(28912, 0, 0, 'Damn the Crusade! I think my ribs are broken and I might be bleeding internally.', 12, 0, 100, 0, 0, 0, 29197, 0, 'koltira deathweaver'),
+(28912, 1, 0, 'I\'ll need to get my runeblade and armor... Just need a little more time.', 12, 0, 100, 0, 0, 0, 29201, 0, 'koltira deathweaver'),
+(28912, 2, 0, 'I\'m still weak, but I think I can get an anti-magic barrier up. Stay inside it or you\'ll be destroyed by their spells.', 12, 0, 100, 0, 0, 0, 29203, 0, 'koltira deathweaver'),
+(28912, 3, 0, 'Maintaining this barrier will require all of my concentration. Kill them all!', 12, 0, 100, 0, 0, 0, 29205, 0, 'koltira deathweaver'),
+(28912, 4, 0, 'There are more coming. Defend yourself! Don\'t fall out of the anti-magic field! They\'ll tear you apart without its protection!', 12, 0, 100, 0, 0, 0, 29207, 0, 'koltira deathweaver'),
+(28912, 5, 0, 'I can\'t keep this barrier up much longer... Where is that coward?', 12, 0, 100, 0, 0, 0, 29208, 0, 'koltira deathweaver'),
+(28912, 6, 0, 'The High Inquisitor comes! Be ready, death knight! Do not let him draw you out of the protective bounds of my anti-magic field! Kill him and take his head!', 12, 0, 100, 0, 0, 0, 29210, 0, 'koltira deathweaver'),
+(28912, 7, 0, 'Stay in the anti-magic field! Make them come to you!', 12, 0, 100, 0, 0, 0, 29225, 0, 'koltira deathweaver'),
+(28912, 8, 0, 'The death of the High Inquisitor of New Avalon will not go unnoticed. You need to get out of here at once! Go, before more of them show up. I\'ll be fine on my own.', 12, 0, 100, 0, 0, 0, 29239, 0, 'koltira deathweaver'),
+(28912, 9, 0, 'I\'ll draw their fire, you make your escape behind me.', 12, 0, 100, 0, 0, 0, 29240, 0, 'koltira deathweaver'),
+(28912, 10, 0, 'Your High Inquisitor is nothing more than a pile of meat, Crusaders! There are none beyond the grasp of the Scourge!', 14, 0, 100, 0, 0, 0, 29241, 0, 'koltira deathweaver'),
+(28912, 11, 0, '%s collapses to the ground.', 41, 0, 100, 0, 0, 0, 29230, 0, 'koltira deathweaver');
