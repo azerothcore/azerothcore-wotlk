@@ -3833,10 +3833,17 @@ Arena.QueueAnnouncer.Detail = 3
 
 #
 #    Arena.ArenaStartRating
-#        Description: Start rating for new arena teams.
+#        Description: Start rating for new arena teams. (Applies to season 6 and higher)
 #        Default:     0
 
 Arena.ArenaStartRating = 0
+
+#
+#    Arena.LegacyArenaStartRating
+#        Description: Start rating for new arena teams. (Only applies to season 1 - 5)
+#        Default:     1500
+
+Arena.ArenaStartRating = 1500
 
 #
 #    Arena.ArenaStartPersonalRating
