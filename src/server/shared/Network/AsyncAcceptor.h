@@ -39,7 +39,7 @@ public:
         _socket(ioContext), _closed(false), _socketFactory([this](){ return DefaultSocketFactory(); }),
         _supportSocketActivation(supportSocketActivation)
     {
-        int listen_fd = get_listen_fds();
+        int const listen_fd = get_listen_fds();
         if (_supportSocketActivation && listen_fd > 0)
         {
             LOG_DEBUG("network", "Using socket from systemd socket activation");
@@ -47,7 +47,7 @@ public:
             _acceptor.assign(boost::asio::ip::tcp::v4(), listen_fd, errorCode);
             if (errorCode)
             {
-                LOG_WARN("network", "Failed to assign socket {}", errorCode.message());
+                LOG_WARN("network", "Failed to assign socket", errorCode.message());
             }
         }
     }
