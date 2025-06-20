@@ -441,10 +441,20 @@ struct boss_kiljaeden : public BossAI
             DoCastRandomTarget(SPELL_LEGION_LIGHTNING, 0, 40.0f);
         }, _phase == PHASE_SACRIFICE ? 15s : 30s);
 
+        std::chrono::seconds fireBloomTimer = 20s;
+        if (_phase == PHASE_DARKNESS || _phase == PHASE_ARMAGEDDON)
+        {
+            fireBloomTimer = 25s; // P3/P4
+        }
+        else if (_phase == PHASE_SACRIFICE)
+        {
+            fireBloomTimer = 40s; // P5
+        }
+
         ScheduleTimedEvent(9s, [&] {
             me->CastCustomSpell(SPELL_FIRE_BLOOM, SPELLVALUE_MAX_TARGETS, 5, me, TRIGGERED_NONE);
             me->SetTarget(me->GetVictim()->GetGUID());
-        }, _phase == PHASE_SACRIFICE ? 20s : 40s);
+        }, fireBloomTimer);
 
         if (_phase != PHASE_SACRIFICE)
         {
