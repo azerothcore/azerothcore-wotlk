@@ -2486,7 +2486,7 @@ void Player::GiveLevel(uint8 level)
 
     SendDirectMessage(packet.Write());
 
-    SetUInt32Value(PLAYER_NEXT_LEVEL_XP, sObjectMgr->GetXPForLevel(level));
+    SetUInt32Value(PLAYER_NEXT_LEVEL_XP, sObjectMgr->GetXPForLevel(this));
 
     //update level, max level of skills
     m_Played_time[PLAYED_TIME_LEVEL] = 0;                   // Level Played Time reset
@@ -2592,7 +2592,7 @@ void Player::InitStatsForLevel(bool reapplyMods)
     uint32 maxPlayerLevel = sWorld->getIntConfig(CONFIG_MAX_PLAYER_LEVEL);
     sScriptMgr->OnPlayerSetMaxLevel(this, maxPlayerLevel);
     SetUInt32Value(PLAYER_FIELD_MAX_LEVEL, maxPlayerLevel);
-    SetUInt32Value(PLAYER_NEXT_LEVEL_XP, sObjectMgr->GetXPForLevel(GetLevel()));
+    SetUInt32Value(PLAYER_NEXT_LEVEL_XP, sObjectMgr->GetXPForLevel(this));
 
     // reset before any aura state sources (health set/aura apply)
     SetUInt32Value(UNIT_FIELD_AURASTATE, 0);

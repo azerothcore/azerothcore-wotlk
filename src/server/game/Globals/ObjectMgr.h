@@ -1113,6 +1113,7 @@ public:
     std::string GeneratePetNameLocale(uint32 entry, LocaleConstant locale);
     uint32 GetBaseXP(uint8 level);
     [[nodiscard]] uint32 GetXPForLevel(uint8 level) const;
+    [[nodiscard]] uint32 GetXPForLevel(Player* player) const;
 
     [[nodiscard]] int32 GetFishingBaseSkillLevel(uint32 entry) const
     {
