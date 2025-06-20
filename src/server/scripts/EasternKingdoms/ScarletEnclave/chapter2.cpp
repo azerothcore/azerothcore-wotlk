@@ -330,9 +330,6 @@ public:
                         context.Repeat(20s);
                     });
                     break;
-                case 4:
-                    me->ApplySpellImmune(0, IMMUNITY_DAMAGE, SPELL_SCHOOL_MASK_ALL, false);
-                    break;
                 case 9:
                     me->Mount(MODEL_DEATH_KNIGHT_MOUNT);
                     break;
@@ -353,6 +350,8 @@ public:
                 scheduler.Schedule(11s, [this](TaskContext)
                 {
                     Talk(SAY_BREAKOUT10);
+                    SetInvincibility(true);
+                    me->RemoveUnitFlag(UNIT_FLAG_IMMUNE_TO_NPC);
                     me->GetMotionMaster()->MovePath((me->GetEntry() + 1) * 10, false);
                 });
             }
