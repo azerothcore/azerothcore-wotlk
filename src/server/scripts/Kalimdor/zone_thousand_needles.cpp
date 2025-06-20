@@ -22,20 +22,6 @@
 #include "ScriptedGossip.h"
 #include "SpellScript.h"
 #include "SpellScriptLoader.h"
-/* ScriptData
-SDName: Thousand Needles
-SD%Complete: 100
-SDComment: Support for Quest: 1950, 4770, 4904, 4966, 5151.
-SDCategory: Thousand Needles
-EndScriptData */
-
-/* ContentData
-npc_lakota_windsong
-npc_swiftmountain
-npc_plucky
-npc_enraged_panther
-go_panther_cage
-EndContentData */
 
 /*######
 # npc_lakota_windsong
