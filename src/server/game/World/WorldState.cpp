@@ -1921,13 +1921,13 @@ void WorldState::FillInitialWorldStates(WorldPackets::WorldState::InitWorldState
         uint32 remainingTanaris = GetSIRemaining(SI_REMAINING_TANARIS);
         uint32 remainingWinterspring = GetSIRemaining(SI_REMAINING_WINTERSPRING);
 
+        packet.Worldstates.reserve(13);
         packet.Worldstates.emplace_back(WORLD_STATE_SCOURGE_INVASION_AZSHARA, remainingAzshara > 0 ? 1 : 0);
         packet.Worldstates.emplace_back(WORLD_STATE_SCOURGE_INVASION_BLASTED_LANDS, remainingBlastedLands > 0 ? 1 : 0);
         packet.Worldstates.emplace_back(WORLD_STATE_SCOURGE_INVASION_BURNING_STEPPES, remainingBurningSteppes > 0 ? 1 : 0);
         packet.Worldstates.emplace_back(WORLD_STATE_SCOURGE_INVASION_EASTERN_PLAGUELANDS, remainingEasternPlaguelands > 0 ? 1 : 0);
         packet.Worldstates.emplace_back(WORLD_STATE_SCOURGE_INVASION_TANARIS, remainingTanaris > 0 ? 1 : 0);
         packet.Worldstates.emplace_back(WORLD_STATE_SCOURGE_INVASION_WINTERSPRING, remainingWinterspring > 0 ? 1 : 0);
-
         packet.Worldstates.emplace_back(WORLD_STATE_SCOURGE_INVASION_VICTORIES, victories);
         packet.Worldstates.emplace_back(WORLD_STATE_SCOURGE_INVASION_NECROPOLIS_AZSHARA, remainingAzshara);
         packet.Worldstates.emplace_back(WORLD_STATE_SCOURGE_INVASION_NECROPOLIS_BLASTED_LANDS, remainingBlastedLands);

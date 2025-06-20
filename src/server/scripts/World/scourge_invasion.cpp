@@ -15,8 +15,10 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "scourge_invasion.h"
 #include "AreaDefines.h"
 #include "CombatAI.h"
+#include "Duration.h"
 #include "GameEventMgr.h"
 #include "GameObjectAI.h"
 #include "GridNotifiers.h"
@@ -29,26 +31,8 @@
 #include "Weather.h"
 #include "WeatherMgr.h"
 #include "WorldState.h"
-#include "scourge_invasion.h"
+#include <chrono>
 
-inline bool IsGuardOrBoss(Unit const* unit) {
-    return unit->GetEntry() == NPC_ROYAL_DREADGUARD || unit->GetEntry() == NPC_STORMWIND_ROYAL_GUARD || unit->GetEntry() == NPC_UNDERCITY_ELITE_GUARDIAN || unit->GetEntry() == NPC_UNDERCITY_GUARDIAN || unit->GetEntry() == NPC_DEATHGUARD_ELITE ||
-        unit->GetEntry() == NPC_STORMWIND_CITY_GUARD || unit->GetEntry() == NPC_HIGHLORD_BOLVAR_FORDRAGON || unit->GetEntry() == NPC_LADY_SYLVANAS_WINDRUNNER || unit->GetEntry() == NPC_VARIMATHRAS;
-}
-
-class FlameshockerCheck
-{
-public:
-    bool operator()(Creature* creature)
-    {
-        return !creature->IsCivilian() && creature->GetEntry() != NPC_FLAMESHOCKER;
-    }
-};
-
-/*
-Necropolis
-*/
-// @todo: move to smartAI
 class go_necropolis : public GameObjectAI
 {
 public:
@@ -177,18 +161,12 @@ struct npc_herald_of_the_lich_king : public ScriptedAI
     }
 };
 
-/*
-Necropolis
-*/
 struct npc_necropolis : public ScriptedAI
 {
     npc_necropolis(Creature* creature) : ScriptedAI(creature)
     {
         me->setActive(true);
-        //m_creature->SetVisibilityModifier(3000.0f);
     }
-
-    void Reset() override {}
 
     void SpellHit(Unit* /* caster */, SpellInfo const* spell) override
     {
@@ -198,109 +176,16 @@ struct npc_necropolis : public ScriptedAI
         if (spell->Id == SPELL_COMMUNIQUE_PROXY_TO_NECROPOLIS)
             DoCastSelf(SPELL_COMMUNIQUE_TIMER_NECROPOLIS, true);
     }
-
-    void UpdateAI(uint32 const /*diff*/) override
-    {
-        // @todo: remove hack
-        // if (me && me->IsAlive() && me->GetPositionZ() < (me->GetHomePosition().GetPositionZ() - 10))
-        // {
-        //     Position respawn = me->GetHomePosition();
-        //     me->NearTeleportTo(respawn.GetPositionX(),respawn.GetPositionY(),respawn.GetPositionZ(), respawn.GetOrientation());
-        // }
-    }
 };
 
-/*
-Necropolis Health
-*/
 struct npc_necropolis_health : public ScriptedAI
 {
     explicit npc_necropolis_health(Creature* creature) : ScriptedAI(creature)
     {
         me->SetFullHealth(); // RegenHealth is disabled
-        ScheduleTimedEvent(5s, [&]
-        {
-            if (me->HealthAbovePct(99))
-            {
-                // @todo: what is this hack
-                // std::list<Creature*> proxies;
-                // GetCreatureListWithEntryInGrid(proxies, me, NPC_NECROPOLIS_PROXY, 200.f);
-
-                // for (Creature* proxy : proxies)
-                // {
-                //     if (proxy && !proxy->IsAlive())
-                //     {
-                //         proxy->SetRespawnTime(0);
-                //         proxy->Respawn();
-                //     }
-                // }
-
-                // std::vector<ObjectGuid> circles;
-                // // if (auto* continent = dynamic_cast<ScriptedIn*>(me->GetMap()->GetInstanceData()))
-                //     // continent->GetGameObjectGuidVectorFromStorage(GO_SUMMON_CIRCLE, circles);
-
-                // if (_ownedCircles.size() < 3)
-                // {
-                //     if (!circles.empty())
-                //     {
-                //         for (ObjectGuid circleGUID : circles)
-                //             if (GameObject* circle = me->GetMap()->GetGameObject(circleGUID))
-                //                 if (circle->GetZoneId() == me->GetZoneId())
-                //                     if (circle->GetDistance2d(me) <= 350.f)
-                //                         _ownedCircles.insert(circleGUID);
-
-                //     }
-                // }
-                // else if (_ownedCircles.size() > 3)
-                // {
-                //     for (auto itr = _ownedCircles.begin(); itr != _ownedCircles.end();)
-                //     {
-                //         if (!me->GetMap()->GetGameObject(*itr))
-                //         {
-                //             auto itr2 = itr;
-                //             _ownedCircles.erase(itr2);
-                //         }
-                //         itr++;
-                //     }
-                // }
-
-                // for (ObjectGuid circleGUID: _ownedCircles)
-                // {
-                //     if (GameObject* circle = me->GetMap()->GetGameObject(circleGUID))
-                //     {
-                //         if (!circle->isSpawned())
-                //         {
-                //             Creature* shard = GetClosestCreatureWithEntry(circle, NPC_NECROTIC_SHARD, 1.f);
-                //             if (_isFirstSpawn || (shard && shard->IsAlive()))
-                //             {
-                //                 circle->SetRespawnTime(0);
-                //                 circle->Respawn();
-                //                 _isFirstSpawn = false;
-                //             }
-                //         }
-                //     }
-                // }
-
-                // @todo: is this required?
-                // for (ScourgeInvasionObjects necropolisObjectEntry : {GO_NECROPOLIS_BIG, GO_NECROPOLIS_HUGE, GO_NECROPOLIS_MEDIUM, GO_NECROPOLIS_SMALL, GO_NECROPOLIS_TINY})
-                // {
-                //     if (GameObject* go = GetClosestGameObjectWithEntry(me, necropolisObjectEntry, 20.f))
-                //     {
-                //         if (!go->isSpawned())
-                //         {
-                //             go->SetRespawnTime(0);
-                //             go->Respawn();
-                //         }
-                //     }
-                // }
-
-            }
-        }, 60s);
     }
 
-    void Reset() override { }
-
-    void SpellHit(Unit* /* caster */, SpellInfo const* spell) override
+    void SpellHit(Unit* /*caster*/, SpellInfo const* spell) override
     {
         if (spell->Id == SPELL_COMMUNIQUE_CAMP_TO_RELAY_DEATH)
             DoCastSelf(SPELL_ZAP_NECROPOLIS, true); // deals damage to self
@@ -313,7 +198,6 @@ struct npc_necropolis_health : public ScriptedAI
 
     void JustDied(Unit* /*killer*/) override
     {
-        // if (Creature* necropolis = GetClosestCreatureWithEntry(me, NPC_NECROPOLIS, 20.0f)) // ATTACK_DISTANCE
         if (Creature* necropolis = GetClosestCreatureWithEntry(me, NPC_NECROPOLIS, ATTACK_DISTANCE))
             me->CastSpell(necropolis, SPELL_DESPAWNER_OTHER, true);
 
@@ -372,30 +256,15 @@ struct npc_necropolis_health : public ScriptedAI
             necropolis->DespawnOrUnsummon();
     }
 
-    // void UpdateAI(uint32 const diff) override
-    // {
-    //     ScriptedAI::UpdateAI(diff);
-    //     if (me && me->IsAlive() && me->GetPositionZ() < (me->GetHomePosition().GetPositionZ() - 10))
-    //     {
-    //         Position respawn = me->GetHomePosition();
-    //         me->NearTeleportTo(respawn.GetPositionX(), respawn.GetPositionY(), respawn.GetPositionZ(), respawn.GetOrientation());
-    //     }
-    // }
-
 private:
     int _zapCount = 0; // 3 = death.
-    // std::set<ObjectGuid> _ownedCircles;
 };
 
-/*
-Necropolis Proxy
-*/
 struct npc_necropolis_proxy : public ScriptedAI
 {
     npc_necropolis_proxy(Creature* creature) : ScriptedAI(creature)
     {
         me->setActive(true);
-        //m_creature->SetVisibilityModifier(3000.0f);
     }
 
     void SpellHit(Unit* /*caster*/, SpellInfo const* spellInfo) override
@@ -423,21 +292,8 @@ struct npc_necropolis_proxy : public ScriptedAI
         if (spellInfo->Id == SPELL_COMMUNIQUE_CAMP_TO_RELAY_DEATH)
             me->DespawnOrUnsummon();
     }
-
-    void UpdateAI(uint32 const /*diff*/) override
-    {
-        // @todo: remove hack
-        // if (me && me->IsAlive() && me->GetPositionZ() < (me->GetHomePosition().GetPositionZ() - 10))
-        // {
-        //     Position respawn = me->GetHomePosition();
-        //     me->NearTeleportTo(respawn.GetPositionX(), respawn.GetPositionY(), respawn.GetPositionZ(), respawn.GetOrientation());
-        // }
-    }
 };
 
-/*
-Necropolis Relay
-*/
 struct npc_necropolis_relay : public ScriptedAI
 {
     npc_necropolis_relay(Creature* creature) : ScriptedAI(creature)
@@ -466,40 +322,30 @@ struct npc_necropolis_relay : public ScriptedAI
 
     void SpellHitTarget(Unit* /*target*/, SpellInfo const* spell) override
     {
-        // Make sure m_creature despawn after SPELL_COMMUNIQUE_CAMP_TO_RELAY_DEATH hits the target to avoid getting hit by Purple bolt again.
+        // Make sure `me` despawns after SPELL_COMMUNIQUE_CAMP_TO_RELAY_DEATH hits the target to avoid getting hit by Purple bolt again.
         if (spell->Id == SPELL_COMMUNIQUE_CAMP_TO_RELAY_DEATH)
             me->DespawnOrUnsummon();
     }
-
-    void UpdateAI(uint32 const /*diff*/) override
-    {
-        // @todo: remove hack
-        // if (me && me->IsAlive() && me->GetPositionZ() < (me->GetHomePosition().GetPositionZ() - 5))
-        // {
-        //     Position respawn = me->GetHomePosition();
-        //     me->NearTeleportTo(respawn.GetPositionX(), respawn.GetPositionY(), respawn.GetPositionZ(), respawn.GetOrientation());
-        // }
-    }
 };
 
-/*
-Necrotic Shard
-*/
 struct npc_necrotic_shard : public ScriptedAI
 {
     npc_necrotic_shard(Creature* creature) : ScriptedAI(creature)
     {
         me->setActive(true);
         me->SetReactState(REACT_PASSIVE);
-        //m_creature->SetVisibilityModifier(3000.0f);
+        // No healing possible.
+        me->ApplySpellImmune(0, IMMUNITY_EFFECT, SPELL_EFFECT_HEAL, true);
+        me->ApplySpellImmune(0, IMMUNITY_EFFECT, SPELL_EFFECT_HEAL_PCT, true);
+        me->ApplySpellImmune(0, IMMUNITY_EFFECT, SPELL_EFFECT_HEAL_MAX_HEALTH, true);
+        me->ApplySpellImmune(0, IMMUNITY_STATE, SPELL_AURA_PERIODIC_HEAL, true);
     }
 
-    // Enable spawn task when destroyed or on receive communique.
     void ScheduleMinionSpawnTask()
     {
         scheduler.Schedule(5s, [this](TaskContext context) // Spawn Minions every 5 seconds.
         {
-            HandleShardMinionSpawnerSmall() ;
+            HandleShardMinionSpawnerSmall();
             context.Repeat(5s);
         });
     }
@@ -557,30 +403,10 @@ struct npc_necrotic_shard : public ScriptedAI
             ScheduleCultistSpawnTask();
         }
 
-        ScheduleTimedEvent(25s, [&]() -> void  // Check if there are a summoning circle and a necropolis nearby, otherwise despawn
+        ScheduleTimedEvent(25s,
+            [&]() -> void // Check if there are a summoning circle, otherwise despawn
         {
-            bool despawnMe = false;
-            if (!GetClosestGameObjectWithEntry(me, GO_SUMMON_CIRCLE, 2.f))
-                despawnMe = true;
-
-            std::vector<ObjectGuid> necropoli;
-
-            // if (auto* continent = dynamic_cast<ScriptedInstance*>(m_creature->GetMap()->GetInstanceData()))
-                // continent->GetCreatureGuidVectorFromStorage(NPC_NECROPOLIS_HEALTH, necropoli);
-
-            if (!despawnMe && !necropoli.empty())
-            {
-                int8 nearbyNecropolisCount = 0;
-                for (ObjectGuid necropolisGUID : necropoli)
-                    if (Creature* necropolis = me->GetMap()->GetCreature(necropolisGUID))
-                        if (me->GetZoneId() && necropolis->GetZoneId() && necropolis->IsAlive() && me->GetDistance2d(necropolis) <= 350.f)
-                            nearbyNecropolisCount++;
-
-                if (nearbyNecropolisCount == 0)
-                    despawnMe = true;
-            }
-
-            if (despawnMe)
+            if (!GetClosestGameObjectWithEntry(me, GO_SUMMON_CIRCLE, 2.0f))
             {
                 DespawnEventDoodads();
                 me->DespawnOrUnsummon();
@@ -594,7 +420,10 @@ struct npc_necrotic_shard : public ScriptedAI
         ScheduleTasks();
     }
 
-    bool HasCampTypeAura() { return me->HasAnyAuras( SPELL_CAMP_TYPE_GHOST_SKELETON, SPELL_CAMP_TYPE_GHOST_GHOUL, SPELL_CAMP_TYPE_GHOUL_SKELETON); };
+    bool HasCampTypeAura()
+    {
+        return me->HasAnyAuras(SPELL_CAMP_TYPE_GHOST_SKELETON, SPELL_CAMP_TYPE_GHOST_GHOUL, SPELL_CAMP_TYPE_GHOUL_SKELETON);
+    };
 
     void SpellHit(Unit* caster, SpellInfo const* spell) override
     {
@@ -635,13 +464,18 @@ struct npc_necrotic_shard : public ScriptedAI
                 if (_nearbyFinderCount < HasMinion(me, 60.0f))
                     return;
 
-                // Lets the finder spawn the associated spawner.
-                if (me->HasAura(SPELL_CAMP_TYPE_GHOST_SKELETON))
-                    caster->CastSpell(caster, SPELL_PH_SUMMON_MINION_TRAP_GHOST_SKELETON, true);
-                else if (me->HasAura(SPELL_CAMP_TYPE_GHOST_GHOUL))
-                    caster->CastSpell(caster, SPELL_PH_SUMMON_MINION_TRAP_GHOST_GHOUL, true);
-                else if (me->HasAura(SPELL_CAMP_TYPE_GHOUL_SKELETON))
-                    caster->CastSpell(caster, SPELL_PH_SUMMON_MINION_TRAP_GHOUL_SKELETON, true);
+                static constexpr std::pair<uint32, uint32> auraSpellMap[] = {
+                    {SPELL_CAMP_TYPE_GHOST_SKELETON, SPELL_PH_SUMMON_MINION_TRAP_GHOST_SKELETON},
+                    {SPELL_CAMP_TYPE_GHOST_GHOUL,    SPELL_PH_SUMMON_MINION_TRAP_GHOST_GHOUL   },
+                    {SPELL_CAMP_TYPE_GHOUL_SKELETON, SPELL_PH_SUMMON_MINION_TRAP_GHOUL_SKELETON}
+                };
+
+                for (auto const& [aura, spell] : auraSpellMap)
+                    if (me->HasAura(aura))
+                    {
+                        caster->CastSpell(caster, spell, true);
+                        break;
+                    }
                 break;
             }
             default:
@@ -665,26 +499,15 @@ struct npc_necrotic_shard : public ScriptedAI
             damage = 0;
     }
 
-    // No healing possible.
-    // @todo: is this needed? is there a way to heal the shard?
-    // void HealedBy(Unit* /*healer*/, uint32& uiHealedAmount) override
-    // {
-    //     uiHealedAmount = 0;
-    // }
-
     void JustDied(Unit* /*killer*/) override
     {
         switch (me->GetEntry())
         {
             case NPC_NECROTIC_SHARD:
-                if (Creature* shard = me->SummonCreature(NPC_DAMAGED_NECROTIC_SHARD, me->GetPositionX(), me->GetPositionY(), me->GetPositionZ(), me->GetOrientation(), TEMPSUMMON_MANUAL_DESPAWN, 0))
+                if (Creature* shard = me->SummonCreature(NPC_DAMAGED_NECROTIC_SHARD, me->GetPosition(), TEMPSUMMON_MANUAL_DESPAWN))
                 {
-                    // Get the camp type from the Necrotic Shard.
-                    if (_spellCampType)
-                        shard->CastSpell(shard, _spellCampType, true);
-                    else
-                        shard->CastSpell(shard, SPELL_CHOOSE_CAMP_TYPE, true);
-
+                    uint32 spellId = _spellCampType ? _spellCampType : SPELL_CHOOSE_CAMP_TYPE;
+                    shard->CastSpell(shard, spellId, true);
                     me->DespawnOrUnsummon();
                 }
                 break;
@@ -692,8 +515,7 @@ struct npc_necrotic_shard : public ScriptedAI
                 // Buff Players.
                 DoCastSelf(SPELL_SOUL_REVIVAL, true);
                 // Sending the Death Bolt.
-                if (Creature* relay = GetClosestCreatureWithEntry(me, NPC_NECROPOLIS_RELAY, 200.0f))
-                    me->CastSpell(relay, SPELL_COMMUNIQUE_CAMP_TO_RELAY_DEATH, true);
+                DoCastAOE(SPELL_COMMUNIQUE_CAMP_TO_RELAY_DEATH, true);
                 DespawnCultists(); // Despawn remaining Cultists (should never happen).
                 DespawnEventDoodads();
                 sWorldState->Save(SAVE_ID_SCOURGE_INVASION);
@@ -732,14 +554,13 @@ struct npc_necrotic_shard : public ScriptedAI
             if (HasMinion(finder))
                 continue;
 
-            /*
-            A finder disappears after summoning the spawner NPC (which summons the minion).
-            after 160-185 seconds a finder respawns on the same position as before.
-            */
+            // A finder disappears after summoning the spawner NPC (which summons the minion).
+            // after 160-185 seconds a finder respawns on the same position as before.
             if (finder->CastSpell(me, SPELL_FIND_CAMP_TYPE, true) == SPELL_CAST_OK)
             {
-                // finder->SetRespawnDelay(urand(150, 200)); // Values are from Sniffs (rounded). Shortest and Longest respawn time from a finder on the same spot.
-                finder->DespawnOrUnsummon(0s, 150s); // Delayed despawn to prevent stacked spawns
+                // Values are from Sniffs (rounded). Shortest and Longest respawn time from a finder on the same spot.
+                finder->DespawnOrUnsummon(0s, std::chrono::duration_cast<Seconds>(randtime(150s, 200s))); // Delayed despawn to prevent stacked spawns
+                // finder->DespawnOrUnsummon(0s, randtime(150s, 200s)); // Delayed despawn to prevent stacked spawns
                 spawned++;
             }
         }
@@ -771,7 +592,7 @@ struct npc_necrotic_shard : public ScriptedAI
     static uint32 HasMinion(Unit* searcher, float searchDistance = ATTACK_DISTANCE)
     {
         uint32 minionCounter = 0;
-        std::list<Creature*>  minionList;
+        std::list<Creature*> minionList;
 
         searcher->GetCreatureListWithEntryInGrid(
             minionList,
@@ -866,13 +687,12 @@ struct npc_minion_spawner : public ScriptedAI
         me->SetRespawnTime(0);
         me->SetCorpseDelay(0);
         summon->SetWanderDistance(1.0f);
-        // minion->GetMotionMaster()->MoveRandomAroundPoint(pMinion->GetPositionX(), pMinion->GetPositionY(), pMinion->GetPositionZ(), 1.0f); // pMinion->SetWanderDistance(1.0f); // Seems to be very low.
         DoCastAOE(SPELL_MINION_SPAWN_IN);
     }
 
     void Reset() override
     {
-        scheduler.Schedule(5s, [this](const TaskContext& /*context*/) // Spawn Minions every 5 seconds.
+        scheduler.Schedule(5s, [this](TaskContext const& /*context*/) // Spawn Minions every 5 seconds.
         {
             uint32 entry;
 
@@ -899,10 +719,9 @@ struct npc_minion_spawner : public ScriptedAI
                     entry = NPC_GHOUL_BERSERKER; // just in case.
                     break;
             }
-            if (Creature* minion = me->SummonCreature(entry, me->GetPositionX(), me->GetPositionY(), me->GetPositionZ(), me->GetOrientation(), TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, IN_MILLISECONDS * HOUR))
+            if (Creature* minion = me->SummonCreature(entry, me->GetPosition(), TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, IN_MILLISECONDS * HOUR))
             {
                 minion->SetWanderDistance(1.0f);
-                // minion->GetMotionMaster()->MoveRandomAroundPoint(pMinion->GetPositionX(), pMinion->GetPositionY(), pMinion->GetPositionZ(), 1.0f); // pMinion->SetWanderDistance(1.0f); // Seems to be very low.
                 DoCastAOE(SPELL_MINION_SPAWN_IN);
             }
         });
@@ -954,13 +773,13 @@ struct npc_cultist_engineer : public ScriptedAI
         scheduler.CancelAll();
         me->SetReactState(REACT_PASSIVE);
         me->SetCorpseDelay(10); // Corpse despawns 10 seconds after a Shadow of Doom spawns.
-        scheduler.Schedule(0s, [this](const TaskContext& /*context*/)
+        scheduler.Schedule(0s, [this](TaskContext const& /*context*/)
         {
             DoCastSelf(SPELL_CREATE_SUMMONER_SHIELD, true);
             DoCastSelf(SPELL_MINION_SPAWN_IN, true);
-        }).Schedule(1s, [this](const TaskContext& /*context*/)
+        }).Schedule(1s, [this](TaskContext const& /*context*/)
         {
-                DoCastSelf(SPELL_BUTTRESS_CHANNEL, true);
+             DoCastSelf(SPELL_BUTTRESS_CHANNEL, true);
         });
     }
 
@@ -1013,11 +832,10 @@ struct npc_shadow_of_doom : public CombatAI
             me->SetImmuneToPC(true);
             me->SetFacingToObject(player);
 
-            // Pickup random emote like here: https://youtu.be/evOs9aJa2Jw?t=229
             Talk(SHADOW_OF_DOOM_SAY_AGGRO, player);
             DoCastSelf(SPELL_SPAWN_SMOKE, true);
 
-            scheduler.Schedule(5s, [this, player](const TaskContext& /*context*/)
+            scheduler.Schedule(5s, [this, player](TaskContext const& /*context*/)
             {
                 me->SetImmuneToPC(false);
                 if (me->CanStartAttack(player))
@@ -1063,20 +881,6 @@ struct npc_flameshocker : public CombatAI
         DoCastSelf(SPELL_FLAMESHOCKERS_REVENGE, true);
     }
 
-    // void SpellHit(Unit* /* caster */, SpellInfo const* spell) override
-    // {
-    //     if (spell->Id == SPELL_SPIRIT_SPAWN_OUT)
-    //         me->DespawnOrUnsummon(3000);
-    // }
-
-    // void MoveInLineOfSight(Unit* who) override
-    // {
-    //     if (who->IsCreature() && me->IsWithinDistInMap(who, VISIBILITY_DISTANCE_TINY) && me->IsWithinLOSInMap(who) && !who->GetVictim())
-    //         if (IsGuardOrBoss(who) && who->GetAI())
-    //             who->GetAI()->AttackStart(me);
-    //     CombatAI::MoveInLineOfSight(who);
-    // }
-
     void UpdateAI(uint32 const diff) override
     {
         scheduler.Update(diff);
@@ -1092,20 +896,13 @@ struct npc_pallid_horror : public ScriptedAI
 
     void InitializeAI() override
     {
-        // Reset();
         _summons.DespawnAll();
         me->SetCorpseDelay(10); // Corpse despawns 10 seconds after a crystal spawns.
         UpdateWeather(true);
         ScheduleTasks();
         me->AddAura(SPELL_AURA_OF_FEAR, me);
         me->SetWalk(false);
-        // ScriptedAI::InitializeAI();
     }
-
-    // void Reset() override
-    // {
-    //     CombatAI::Reset();
-    // }
 
     void ScheduleTasks()
     {
@@ -1139,7 +936,6 @@ struct npc_pallid_horror : public ScriptedAI
 
                 float x, y, z;
                 target->GetNearPoint(target, x, y, z, 5.0f, 5.0f, 0.0f);
-                // if (Creature* creature = me->SummonCreature(NPC_FLAMESHOCKER, x, y, z, target->GetOrientation(), TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, IN_MILLISECONDS * HOUR))
                 if (Creature* creature = me->SummonCreature(NPC_FLAMESHOCKER, x, y, z, target->GetOrientation(), TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 5 * IN_MILLISECONDS))
                     _summons.Summon(creature);
             }
@@ -1147,30 +943,13 @@ struct npc_pallid_horror : public ScriptedAI
         });
     }
 
-    void UpdateWeather(bool startEvent)
-    {
-        if (Weather* weather = WeatherMgr::FindWeather(me->GetZoneId()))
-        {
-            if (startEvent)
-                weather->SetWeather(WEATHER_TYPE_STORM, 0.25f);
-            else
-                weather->SetWeather(WEATHER_TYPE_RAIN, 0.0f);
-        }
-        else if (Weather* weather = WeatherMgr::AddWeather(me->GetZoneId()))
-        {
-            if (startEvent)
-                weather->SetWeather(WEATHER_TYPE_STORM, 0.25f);
-            else
-                weather->SetWeather(WEATHER_TYPE_RAIN, 0.0f);
-        }
-    }
-
     void SummonFlameshockers()
     {
         uint32 const amount = urand(5, 9); // sniffed are group sizes of 5-9 shockers on spawn.
         for (uint32 i = 0; i < amount; ++i)
         {
-            if (Creature* summon = me->SummonCreature(NPC_FLAMESHOCKER, me->GetPositionX(), me->GetPositionY(), me->GetPositionZ(), 0.0f, TEMPSUMMON_TIMED_OR_CORPSE_DESPAWN, HOUR * IN_MILLISECONDS))
+            if (Creature* summon = me->SummonCreature(
+                    NPC_FLAMESHOCKER, me->GetPositionX(), me->GetPositionY(), me->GetPositionZ(), 0.0f, TEMPSUMMON_TIMED_OR_CORPSE_DESPAWN, HOUR * IN_MILLISECONDS))
             {
                 float angle = static_cast<float>(i) * (M_PIf / (static_cast<float>(amount) / 2.f)) + me->GetOrientation();
                 summon->GetMotionMaster()->Clear(true);
@@ -1187,18 +966,9 @@ struct npc_pallid_horror : public ScriptedAI
         summon->SetWalk(false);
     }
 
-    // void MoveInLineOfSight(Unit* who) override
-    // {
-    //     if (who->IsCreature() && me->IsWithinDistInMap(who, VISIBILITY_DISTANCE_TINY) && me->IsWithinLOSInMap(who) && !who->GetVictim())
-    //         if (IsGuardOrBoss(who) && who->GetAI())
-    //             who->GetAI()->AttackStart(me);
-
-    //     CombatAI::MoveInLineOfSight(who);
-    // }
-
     void JustDied(Unit* /*unit*/) override
     {
-        // @todo: update npc_text
+        // wrong Varian: missing special event Varian NPC that uses the old model
         // if (Creature* creature = GetClosestCreatureWithEntry(me, NPC_VARIAN, VISIBILITY_DISTANCE_NORMAL))
             // creature->Say(1);
         if (Creature* creature = GetClosestCreatureWithEntry(me, NPC_LADY_SYLVANAS_WINDRUNNER, VISIBILITY_DISTANCE_NORMAL))
@@ -1225,7 +995,10 @@ struct npc_pallid_horror : public ScriptedAI
 
         UpdateWeather(false);
 
-        LOG_INFO("gameevent", "[Scourge Invasion Event] The Scourge has been defeated in {}, next attack starting in {} minutes", me->GetZoneId() == AREA_UNDERCITY ? "Undercity" : "Stormwind", timeToNextAttack);
+        LOG_INFO("gameevent",
+            "[Scourge Invasion Event] The Scourge has been defeated in {}, next attack starting in {} minutes",
+            me->GetZoneId() == AREA_UNDERCITY ? "Undercity" : "Stormwind",
+            timeToNextAttack);
     }
 
     void CorpseRemoved(uint32& /*respawnDelay*/) override
@@ -1242,7 +1015,32 @@ struct npc_pallid_horror : public ScriptedAI
         DoMeleeAttackIfReady();
     }
 
+    void UpdateWeather(bool startEvent)
+    {
+        if (Weather* weather = WeatherMgr::FindWeather(me->GetZoneId()))
+        {
+            if (startEvent)
+                weather->SetWeather(WEATHER_TYPE_STORM, 0.25f);
+            else
+                weather->SetWeather(WEATHER_TYPE_RAIN, 0.0f);
+        }
+        else if (Weather* weather = WeatherMgr::AddWeather(me->GetZoneId()))
+        {
+            if (startEvent)
+                weather->SetWeather(WEATHER_TYPE_STORM, 0.25f);
+            else
+                weather->SetWeather(WEATHER_TYPE_RAIN, 0.0f);
+        }
+    }
+
 private:
+    struct FlameshockerCheck
+    {
+        bool operator()(Creature* creature)
+        {
+            return !creature->IsCivilian() && creature->GetEntry() != NPC_FLAMESHOCKER;
+        }
+    };
     SummonList _summons;
 };
 
@@ -1253,7 +1051,7 @@ class spell_despawner_self : public SpellScript
 
     bool Validate(SpellInfo const* /*spell*/) override
     {
-        return ValidateSpellInfo( { SPELL_SPIRIT_SPAWN_OUT });
+        return ValidateSpellInfo({SPELL_SPIRIT_SPAWN_OUT});
     }
 
     void HandleDummy(SpellEffIndex /*effIndex*/)
@@ -1276,7 +1074,7 @@ class spell_communique_trigger : public SpellScript
 
     bool Validate(SpellInfo const* /*spell*/) override
     {
-        return ValidateSpellInfo( { SPELL_COMMUNIQUE_CAMP_TO_RELAY });
+        return ValidateSpellInfo({SPELL_COMMUNIQUE_CAMP_TO_RELAY});
     }
 
     void HandleDummy(SpellEffIndex /*effIndex*/)
