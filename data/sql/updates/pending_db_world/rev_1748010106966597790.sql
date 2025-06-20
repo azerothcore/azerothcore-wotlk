@@ -6009,7 +6009,7 @@ INSERT INTO `waypoint_data` (`id`, `point`, `position_x`, `position_y`, `positio
 (@PATH_ID+3, 25, 1605.34, 276.451, -43.1027, 100, 0, 0, 0); -- action: 149713
 -- Undercity Royal Quarter
 INSERT INTO `waypoint_data` (`id`, `point`, `position_x`, `position_y`, `position_z`, `orientation`, `delay`, `action`, `move_type`) VALUES
-(@PATH_ID+4, 1, 1596.72, 423.488, -46.3713, 100, 0, , 0), -- action: 149720
+(@PATH_ID+4, 1, 1596.72, 423.488, -46.3713, 100, 0, 0, 0), -- action: 149720
 (@PATH_ID+4, 2, 1603.8, 423.409, -46.3814, 100, 0, 0, 0),
 (@PATH_ID+4, 3, 1615.01, 423.43, -53.2855, 100, 0, 0, 0),
 (@PATH_ID+4, 4, 1630.79, 417.648, -62.1775, 100, 0, 0, 0),
