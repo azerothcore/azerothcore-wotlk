@@ -559,8 +559,7 @@ struct npc_necrotic_shard : public ScriptedAI
             if (finder->CastSpell(me, SPELL_FIND_CAMP_TYPE, true) == SPELL_CAST_OK)
             {
                 // Values are from Sniffs (rounded). Shortest and Longest respawn time from a finder on the same spot.
-                finder->DespawnOrUnsummon(0s, std::chrono::duration_cast<Seconds>(randtime(150s, 200s))); // Delayed despawn to prevent stacked spawns
-                // finder->DespawnOrUnsummon(0s, randtime(150s, 200s)); // Delayed despawn to prevent stacked spawns
+                finder->DespawnOrUnsummon(0s, randtime(150s, 200s)); // Delayed despawn to prevent stacked spawns
                 spawned++;
             }
         }
