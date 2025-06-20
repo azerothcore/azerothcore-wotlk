@@ -305,6 +305,9 @@ const Position LightOfDawnFightPos[] =
     {2258.42f, -5307.72f, 81.98f, 0.1f}
 };
 
+// Position for Duke Nicholas Zverenhoff
+const Position DukeNicholasPos = {2277.67f, -5275.34f, 82.18f, 5.37f};
+
 class DelayedSummonEvent : public BasicEvent
 {
 public:
@@ -387,6 +390,24 @@ public:
                 SendInitialWorldStates();
 
                 events.Reset();
+                // Fast countdown for testing
+                events.ScheduleEvent(EVENT_START_COUNTDOWN_1, 2s);
+                events.ScheduleEvent(EVENT_START_COUNTDOWN_2, 4s);
+                events.ScheduleEvent(EVENT_START_COUNTDOWN_3, 6s);
+                events.ScheduleEvent(EVENT_START_COUNTDOWN_4, 8s);
+                events.ScheduleEvent(EVENT_START_COUNTDOWN_5, 10s);
+                events.ScheduleEvent(EVENT_START_COUNTDOWN_6, 11s);
+                events.ScheduleEvent(EVENT_START_COUNTDOWN_7, 12s);
+                events.ScheduleEvent(EVENT_START_COUNTDOWN_8, 13s);
+                events.ScheduleEvent(EVENT_START_COUNTDOWN_9, 14s);
+                events.ScheduleEvent(EVENT_START_COUNTDOWN_10, 15s);
+                events.ScheduleEvent(EVENT_START_COUNTDOWN_11, 16s);
+                events.ScheduleEvent(EVENT_START_COUNTDOWN_12, 17s);
+                events.ScheduleEvent(EVENT_START_COUNTDOWN_13, 18s);
+                events.ScheduleEvent(EVENT_START_COUNTDOWN_14, 19s);
+                
+                // Normal countdown
+                /*
                 events.ScheduleEvent(EVENT_START_COUNTDOWN_1, 60s);
                 events.ScheduleEvent(EVENT_START_COUNTDOWN_2, 120s);
                 events.ScheduleEvent(EVENT_START_COUNTDOWN_3, 180s);
@@ -401,6 +422,7 @@ public:
                 events.ScheduleEvent(EVENT_START_COUNTDOWN_12, 335s);
                 events.ScheduleEvent(EVENT_START_COUNTDOWN_13, 337s + 500ms);
                 events.ScheduleEvent(EVENT_START_COUNTDOWN_14, 345s);
+                */
             }
         }
 
@@ -450,11 +472,60 @@ public:
 
             if (me->IsInCombat() && cr->GetEntry() != NPC_HIGHLORD_TIRION_FORDRING && battleStarted == ENCOUNTER_STATE_FIGHT)
             {
-                Position pos = LightOfDawnFightPos[urand(0, 9)];
-                if (Unit* target = cr->SelectNearbyTarget(nullptr, 10.0f))
-                    if (target->IsCreature())
-                        target->GetMotionMaster()->MoveCharge(pos.GetPositionX(), pos.GetPositionY(), pos.GetPositionZ(), me->GetSpeed(MOVE_RUN));
-                cr->GetMotionMaster()->MoveCharge(pos.GetPositionX(), pos.GetPositionY(), pos.GetPositionZ(), me->GetSpeed(MOVE_RUN));
+                if (cr->GetEntry() >= NPC_RAMPAGING_ABOMINATION && cr->GetEntry() <= NPC_FLESH_BEHEMOTH)
+                {
+                    Unit* target = nullptr;
+                    std::list<Creature*> targetList;
+                    cr->GetCreatureListWithEntryInGrid(targetList, NPC_DEFENDER_OF_THE_LIGHT, 50.0f);
+                    cr->GetCreatureListWithEntryInGrid(targetList, NPC_KORFAX_CHAMPION_OF_THE_LIGHT, 50.0f);
+                    cr->GetCreatureListWithEntryInGrid(targetList, NPC_COMMANDER_ELIGOR_DAWNBRINGER, 50.0f);
+                    cr->GetCreatureListWithEntryInGrid(targetList, NPC_LORD_MAXWELL_TYROSUS, 50.0f);
+                    cr->GetCreatureListWithEntryInGrid(targetList, NPC_LEONID_BARTHALOMEW_THE_REVERED, 50.0f);
+                    cr->GetCreatureListWithEntryInGrid(targetList, NPC_DUKE_NICHOLAS_ZVERENHOFF, 50.0f);
+                    cr->GetCreatureListWithEntryInGrid(targetList, NPC_RAYNE, 50.0f);
+                    cr->GetCreatureListWithEntryInGrid(targetList, NPC_RIMBLAT_EARTHSHATTER, 50.0f);
+                    
+                    if (!targetList.empty())
+                    {
+                        target = targetList.front();
+                        cr->AI()->AttackStart(target);
+                    }
+                    
+                    if (!target)
+                    {
+                        cr->SetReactState(REACT_DEFENSIVE);
+                        cr->m_SightDistance = 10.0f;
+                        cr->m_CombatDistance = 10.0f;
+                    }
+                    
+                    Position pos = LightOfDawnFightPos[urand(0, 9)];
+                    cr->GetMotionMaster()->MoveCharge(pos.GetPositionX(), pos.GetPositionY(), pos.GetPositionZ(), me->GetSpeed(MOVE_RUN));
+                }
+                else
+                {
+                    Unit* target = nullptr;
+                    std::list<Creature*> targetList;
+                    cr->GetCreatureListWithEntryInGrid(targetList, NPC_RAMPAGING_ABOMINATION, 50.0f);
+                    cr->GetCreatureListWithEntryInGrid(targetList, NPC_ACHERUS_GHOUL, 50.0f);
+                    cr->GetCreatureListWithEntryInGrid(targetList, NPC_WARRIOR_OF_THE_FROZEN_WASTES, 50.0f);
+                    cr->GetCreatureListWithEntryInGrid(targetList, NPC_FLESH_BEHEMOTH, 50.0f);
+                    
+                    if (!targetList.empty())
+                    {
+                        target = targetList.front();
+                        cr->AI()->AttackStart(target);
+                    }
+                    
+                    if (!target)
+                    {
+                        cr->SetReactState(REACT_DEFENSIVE);
+                        cr->m_SightDistance = 10.0f;
+                        cr->m_CombatDistance = 10.0f;
+                    }
+                    
+                    Position pos = LightOfDawnFightPos[urand(0, 9)];
+                    cr->GetMotionMaster()->MoveCharge(pos.GetPositionX(), pos.GetPositionY(), pos.GetPositionZ(), me->GetSpeed(MOVE_RUN));
+                }
             }
 
             if (battleStarted == ENCOUNTER_STATE_OUTRO && cr->GetEntry() == NPC_DEFENDER_OF_THE_LIGHT)
@@ -463,6 +534,13 @@ public:
                 cr->SetImmuneToAll(true);
                 cr->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_STATE_READY1H);
                 cr->HandleEmoteCommand(EMOTE_STATE_READY1H);
+            }
+            
+            if (cr->GetEntry() == NPC_DUKE_NICHOLAS_ZVERENHOFF && battleStarted == ENCOUNTER_STATE_OUTRO)
+            {
+                cr->SetReactState(REACT_PASSIVE);
+                cr->SetImmuneToAll(true);
+                cr->GetMotionMaster()->MovePoint(0, DukeNicholasPos);
             }
         }
 
@@ -501,6 +579,8 @@ public:
             {
                 tirion->LoadEquipment(0, true);
                 tirion->AI()->Talk(SAY_LIGHT_OF_DAWN25);
+                // Ensure Tirion is dismounted
+                tirion->Dismount();
                 events.Reset();
                 events.ScheduleEvent(EVENT_FINISH_FIGHT_1, 10s);
                 events.ScheduleEvent(EVENT_FINISH_FIGHT_2, 20s);
@@ -617,13 +697,31 @@ public:
                     SendUpdateWorldState(WORLD_STATE_BATTLE_FOR_LIGHTS_HOPE_COUNTDOWN_TIME, 1);
                     break;
                 case EVENT_START_COUNTDOWN_5:
+                {
                     battleStarted = ENCOUNTER_STATE_FIGHT;
                     me->ReplaceAllNpcFlags(UNIT_NPC_FLAG_NONE);
                     Talk(SAY_LIGHT_OF_DAWN04); // Wrong order in DB!
                     SendUpdateWorldState(WORLD_STATE_BATTLE_FOR_LIGHTS_HOPE_COUNTDOWN_TIME, 0);
                     SendUpdateWorldState(WORLD_STATE_BATTLE_FOR_LIGHTS_HOPE_COUNTDOWN_ENABLE, 0);
                     SendUpdateWorldState(WORLD_STATE_BATTLE_FOR_LIGHTS_HOPE_EVENT_BEGIN_ENABLE, 1);
+                    
+                    // Ensure Might of Mograine buff is applied/reapplied on battle start
+                    Map::PlayerList const& players = me->GetMap()->GetPlayers();
+                    for (Map::PlayerList::const_iterator itr = players.begin(); itr != players.end(); ++itr)
+                    {
+                        if (Player* player = itr->GetSource())
+                        {
+                            if (player->GetPhaseMask() & 128 && me->IsWithinDistInMap(player, 100.0f))
+                            {
+                                if (!player->HasAura(SPELL_THE_MIGHT_OF_MOGRAINE))
+                                {
+                                    me->CastSpell(player, SPELL_THE_MIGHT_OF_MOGRAINE, true);
+                                }
+                            }
+                        }
+                    }
                     break;
+                }
                 case EVENT_START_COUNTDOWN_6:
                 case EVENT_START_COUNTDOWN_7:
                 case EVENT_START_COUNTDOWN_8:
@@ -665,9 +763,27 @@ public:
                         break;
                     }
                 case EVENT_START_COUNTDOWN_14:
+                {
                     me->SetImmuneToAll(false);
                     me->SummonCreatureGroup(5);
+                    
+                    // Check and reapply buff one more time when combat actually starts
+                    Map::PlayerList const& combatPlayers = me->GetMap()->GetPlayers();
+                    for (Map::PlayerList::const_iterator itr = combatPlayers.begin(); itr != combatPlayers.end(); ++itr)
+                    {
+                        if (Player* player = itr->GetSource())
+                        {
+                            if (player->GetPhaseMask() & 128 && me->IsWithinDistInMap(player, 100.0f))
+                            {
+                                if (!player->HasAura(SPELL_THE_MIGHT_OF_MOGRAINE))
+                                {
+                                    me->CastSpell(player, SPELL_THE_MIGHT_OF_MOGRAINE, true);
+                                }
+                            }
+                        }
+                    }
                     return;
+                }
                 case EVENT_FINISH_FIGHT_1:
                     summons.DespawnEntry(NPC_DEFENDER_OF_THE_LIGHT);
                     battleStarted = ENCOUNTER_STATE_OUTRO;
@@ -731,6 +847,7 @@ public:
                     }
                     break;
                 case EVENT_FINISH_FIGHT_5:
+                {
                     me->SetWalk(true);
                     me->SetHomePosition(*me);
                     me->RemoveAllAuras();
@@ -739,7 +856,17 @@ public:
 
                     if (Creature* tirion = GetEntryFromSummons(NPC_HIGHLORD_TIRION_FORDRING))
                         tirion->AI()->Talk(SAY_LIGHT_OF_DAWN26);
+                    
+                    Map::PlayerList const& players = me->GetMap()->GetPlayers();
+                    for (Map::PlayerList::const_iterator itr = players.begin(); itr != players.end(); ++itr)
+                    {
+                        if (Player* player = itr->GetSource())
+                        {
+                            player->RemoveAurasDueToSpell(SPELL_THE_MIGHT_OF_MOGRAINE);
+                        }
+                    }
                     break;
+                }
                 case EVENT_OUTRO_SCENE_1:
                     me->SetStandState(UNIT_STAND_STATE_KNEEL);
                     me->SetFacingTo(4.8f);
@@ -891,7 +1018,16 @@ public:
                         lk->GetMotionMaster()->MovePoint(0, LightOfDawnPos[13].GetPositionX(), LightOfDawnPos[13].GetPositionY(), LightOfDawnPos[13].GetPositionZ());
                     break;
                 case EVENT_OUTRO_SCENE_26:
-                    me->CastSpell(me, SPELL_MOGRAINE_CHARGE, false);
+                    if (Creature* lk = GetEntryFromSummons(NPC_THE_LICH_KING))
+                    {
+                        float angle = lk->GetAngle(me);
+                        float dist = 3.0f;
+                        float x = lk->GetPositionX() + dist * cos(angle);
+                        float y = lk->GetPositionY() + dist * std::sin(angle);
+                        float z = lk->GetPositionZ();
+                        
+                        me->CastSpell(x, y, z, SPELL_MOGRAINE_CHARGE, false);
+                    }
                     break;
                 case EVENT_OUTRO_SCENE_27:
                     if (Creature* lk = GetEntryFromSummons(NPC_THE_LICH_KING))
@@ -1015,13 +1151,18 @@ public:
                     break;
                 case EVENT_OUTRO_SCENE_42:
                     if (Creature* tirion = GetEntryFromSummons(NPC_HIGHLORD_TIRION_FORDRING))
+                    {
                         tirion->AI()->Talk(SAY_LIGHT_OF_DAWN56);
+                        // Make Tirion take a ready stance after his threat
+                        tirion->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_STATE_READY2H);
+                        tirion->HandleEmoteCommand(EMOTE_STATE_READY2H);
+                    }
                     break;
                 case EVENT_OUTRO_SCENE_43:
                     if (Creature* tirion = GetEntryFromSummons(NPC_HIGHLORD_TIRION_FORDRING))
                     {
                         tirion->CastSpell(tirion, SPELL_TIRION_CHARGE, true);
-                        tirion->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_STATE_READY2H);
+                        // Emote state already set in previous event
                         tirion->SetImmuneToAll(true);
                     }
                     break;
@@ -1206,7 +1347,7 @@ class spell_chapter5_rebuke : public SpellScript
     {
         PreventHitEffect(effIndex);
         if (Unit* unitTarget = GetHitUnit())
-            unitTarget->KnockbackFrom(2282.86f, -5263.45f, 40.0f, 8.0f);
+            unitTarget->KnockbackFrom(2281.523f, -5261.058f, 40.0f, 8.0f);
     }
 
     void Register() override
