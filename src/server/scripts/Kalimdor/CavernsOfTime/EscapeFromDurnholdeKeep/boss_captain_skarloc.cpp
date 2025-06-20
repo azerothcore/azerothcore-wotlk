@@ -58,6 +58,8 @@ struct boss_captain_skarloc : public BossAI
         {
             return !me->HasUnitState(UNIT_STATE_CASTING);
         });
+
+        me->SetReactState(REACT_PASSIVE);
     }
 
     SummonList summons;
@@ -140,6 +142,7 @@ struct boss_captain_skarloc : public BossAI
 
         if (me->movespline->Finalized())
         {
+            me->SetReactState(REACT_AGGRESSIVE);
             Talk(SAY_ENTER, 500ms);
 
             me->m_Events.AddEventAtOffset([this]()
