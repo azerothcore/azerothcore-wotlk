@@ -240,20 +240,11 @@ public:
 
     struct npc_koltira_deathweaverAI : public ScriptedAI
     {
-        npc_koltira_deathweaverAI(Creature* creature) : ScriptedAI(creature), summons(me) { }
-
-        uint32 m_uiWave;
-        uint32 m_uiWave_Timer;
-        ObjectGuid m_uiValrothGUID;
-        SummonList summons;
+        npc_koltira_deathweaverAI(Creature* creature) : ScriptedAI(creature) { }
 
         void Reset() override
         {
-            m_uiWave = 0;
-            m_uiWave_Timer = 3000;
-            m_uiValrothGUID.Clear();
             me->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
-            summons.DespawnAll();
         }
 
         void MovementInform(uint32 type, uint32 id) override
@@ -265,12 +256,13 @@ public:
                     break;
                 case 1:
                     me->SetStandState(UNIT_STAND_STATE_KNEEL);
-                    break;
-                case 2:
-                    me->SetStandState(UNIT_STAND_STATE_STAND);
-                    //me->UpdateEntry(NPC_KOLTIRA_ALT); //unclear if we must update or not
-                    DoCastSelf(SPELL_KOLTIRA_TRANSFORM);
-                    me->LoadEquipment();
+
+                    scheduler.Schedule(3s, [this](TaskContext)
+                    {
+                        //me->UpdateEntry(NPC_KOLTIRA_ALT); //unclear if we must update or not
+                        DoCastSelf(SPELL_KOLTIRA_TRANSFORM);
+                        me->LoadEquipment();
+                    });
                     break;
                 case 3:
                     me->SetStandState(UNIT_STAND_STATE_KNEEL);
@@ -354,12 +346,13 @@ public:
         {
             if (summon->GetEntry() == NPC_HIGH_INQUISITOR_VALROTH)
             {
-                Talk(SAY_BREAKOUT8);
                 me->m_Events.KillAllEvents(false);
-                scheduler.Schedule(5s, [this](TaskContext)
+                me->RemoveAurasDueToSpell(SPELL_ANTI_MAGIC_ZONE);
+                Talk(SAY_BREAKOUT8, 3s);
+                Talk(SAY_BREAKOUT9, 8s);
+                scheduler.Schedule(11s, [this](TaskContext)
                 {
-                    Talk(SAY_BREAKOUT9);
-                    me->RemoveAurasDueToSpell(SPELL_ANTI_MAGIC_ZONE);
+                    Talk(SAY_BREAKOUT10);
                     me->GetMotionMaster()->MovePath((me->GetEntry() + 1) * 10, false);
                 });
             }
@@ -368,23 +361,6 @@ public:
         void UpdateAI(uint32 diff) override
         {
             scheduler.Update(diff);
-
-            if (m_uiWave_Timer <= diff)
-            {
-                switch (m_uiWave)
-                {
-                case 5:
-
-                    // i do not know why the armor will also be removed
-                    m_uiWave_Timer = 2500;
-                    break;
-                case 6:
-                    Talk(SAY_BREAKOUT10);
-                    break;
-                }
-
-                ++m_uiWave;
-            }
         }
     };
 };
