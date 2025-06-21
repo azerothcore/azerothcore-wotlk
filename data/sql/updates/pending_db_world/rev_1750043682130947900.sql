@@ -111,8 +111,8 @@ INSERT INTO `waypoint_data` (`id`,`point`,`position_x`,`position_y`,`position_z`
 SET @PATH := (@NPC + 1) * 10;
 DELETE FROM `waypoint_data` WHERE `id`=@PATH;
 INSERT INTO `waypoint_data` (`id`,`point`,`position_x`,`position_y`,`position_z`,`orientation`,`delay`,`move_type`,`action`,`action_chance`,`wpguid`) VALUES
-(@PATH,5,1653.3759,-5971.8735,132.25667,0,0,1,0,100,0),
-(@PATH,6,1685.0416,-5887.038,116.1461,0,0,1,0,100,0);
+(@PATH,1,1653.3759,-5971.8735,132.25667,0,0,1,0,100,0),
+(@PATH,2,1685.0416,-5887.038,116.1461,0,0,1,0,100,0);
 
 DELETE FROM `creature_text` WHERE `CreatureID` = 28912;
 INSERT INTO `creature_text` (`CreatureID`, `GroupID`, `ID`, `Text`, `Type`, `Language`, `Probability`, `Emote`, `Duration`, `Sound`, `BroadcastTextId`, `TextRange`, `comment`) VALUES

@@ -208,30 +208,20 @@ enum Koltira
 
     //not sure about this id
     //NPC_DEATH_KNIGHT_MOUNT        = 29201,
-    MODEL_DEATH_KNIGHT_MOUNT        = 25278
+    MODEL_DEATH_KNIGHT_MOUNT        = 25278,
+
+    POINT_STAND_UP                  = 0,
+    POINT_BOX                       = 1,
+    POINT_ANTI_MAGIC_ZONE           = 2,
+
+    POINT_MOUNT                     = 0,
+    POINT_DESPAWN                   = 1
 };
 
 class npc_koltira_deathweaver : public CreatureScript
 {
 public:
     npc_koltira_deathweaver() : CreatureScript("npc_koltira_deathweaver") { }
-
-    bool OnQuestAccept(Player* player, Creature* creature, const Quest* quest) override
-    {
-        if (quest->GetQuestId() == QUEST_BREAKOUT)
-        {
-            creature->RemoveNpcFlag(UNIT_NPC_FLAG_GOSSIP);
-            creature->SetStandState(UNIT_STAND_STATE_SIT);
-            creature->setActive(true);
-
-            creature->AI()->Talk(SAY_BREAKOUT0);
-
-            creature->m_Events.AddEventAtOffset([creature]{
-                creature->GetMotionMaster()->MovePath(creature->GetEntry() * 10, false);
-            }, 5s);
-        }
-        return true;
-    }
 
     CreatureAI* GetAI(Creature* creature) const override
     {
@@ -244,27 +234,58 @@ public:
 
         void Reset() override
         {
-            me->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
+            me->SetUnitFlag(UNIT_FLAG_IMMUNE_TO_NPC);
+        }
+
+        void sQuestAccept(Player* player, Quest const* quest) override
+        {
+            if (quest->GetQuestId() == QUEST_BREAKOUT)
+            {
+                me->RemoveNpcFlag(UNIT_NPC_FLAG_GOSSIP);
+                me->SetStandState(UNIT_STAND_STATE_SIT);
+                me->setActive(true);
+
+                Talk(SAY_BREAKOUT0);
+
+                me->m_Events.AddEventAtOffset([&] {
+                    me->GetMotionMaster()->MovePath(me->GetEntry() * 10, false);
+                }, 5s);
+            }
         }
 
         void MovementInform(uint32 type, uint32 id) override
         {
+            if (type != WAYPOINT_MOTION_TYPE)
+                return;
+
+            if (!me->HasUnitFlag(UNIT_FLAG_IMMUNE_TO_NPC))
+            {
+                if (id == POINT_MOUNT)
+                    me->Mount(MODEL_DEATH_KNIGHT_MOUNT);
+                else if (id == POINT_DESPAWN)
+                {
+                    me->Dismount();
+                    me->DespawnOrUnsummon();
+                }
+
+                return;
+            }
+
             switch (id)
             {
-                case 0:
+                case POINT_STAND_UP:
                     Talk(SAY_BREAKOUT1);
                     break;
-                case 1:
+                case POINT_BOX:
                     me->SetStandState(UNIT_STAND_STATE_KNEEL);
 
                     scheduler.Schedule(3s, [this](TaskContext)
                     {
-                        //me->UpdateEntry(NPC_KOLTIRA_ALT); //unclear if we must update or not
                         DoCastSelf(SPELL_KOLTIRA_TRANSFORM);
                         me->LoadEquipment();
                     });
                     break;
-                case 3:
+                case POINT_ANTI_MAGIC_ZONE:
                     me->SetStandState(UNIT_STAND_STATE_KNEEL);
                     Talk(SAY_BREAKOUT2);
                     DoCast(me, SPELL_ANTI_MAGIC_ZONE);  // cast again that makes bubble up
@@ -330,12 +351,6 @@ public:
                         context.Repeat(20s);
                     });
                     break;
-                case 9:
-                    me->Mount(MODEL_DEATH_KNIGHT_MOUNT);
-                    break;
-                case 10:
-                    me->Dismount();
-                    break;
             }
         }
 
@@ -351,6 +366,7 @@ public:
                 {
                     Talk(SAY_BREAKOUT10);
                     SetInvincibility(true);
+                    me->SetReactState(REACT_PASSIVE);
                     me->RemoveUnitFlag(UNIT_FLAG_IMMUNE_TO_NPC);
                     me->GetMotionMaster()->MovePath((me->GetEntry() + 1) * 10, false);
                 });
