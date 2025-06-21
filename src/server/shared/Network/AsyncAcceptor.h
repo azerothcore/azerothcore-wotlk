@@ -46,9 +46,7 @@ public:
             boost::system::error_code errorCode;
             _acceptor.assign(boost::asio::ip::tcp::v4(), listen_fd, errorCode);
             if (errorCode)
-            {
-                LOG_WARN("network", "Failed to assign socket", errorCode.message());
-            }
+                LOG_WARN("network", "Failed to assign socket {}", errorCode.message());
         }
     }
 
