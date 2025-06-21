@@ -1,3 +1,4 @@
+-- DB update 2025_06_21_02 -> 2025_06_21_03
 
 -- Defender of the Light (update comments and edit Holy Wrath cd).
 UPDATE `creature_template` SET `AIName` = 'SmartAI' WHERE `entry` = 29174;
