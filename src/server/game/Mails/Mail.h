@@ -23,8 +23,8 @@
 #include "ObjectGuid.h"
 #include <map>
 
-struct AuctionEntry;
 struct CalendarEvent;
+class AuctionEntry;
 class Item;
 class Object;
 class Player;
