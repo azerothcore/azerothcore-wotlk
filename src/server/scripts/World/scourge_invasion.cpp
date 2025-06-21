@@ -506,7 +506,7 @@ struct npc_necrotic_shard : public ScriptedAI
             case NPC_NECROTIC_SHARD:
                 if (Creature* shard = me->SummonCreature(NPC_DAMAGED_NECROTIC_SHARD, me->GetPosition(), TEMPSUMMON_MANUAL_DESPAWN))
                 {
-                    uint32 spellId = _spellCampType ? _spellCampType : SPELL_CHOOSE_CAMP_TYPE;
+                    uint32 spellId = _spellCampType ? _spellCampType : static_cast<uint32>(SPELL_CHOOSE_CAMP_TYPE);
                     shard->CastSpell(shard, spellId, true);
                     me->DespawnOrUnsummon();
                 }
