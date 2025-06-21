@@ -366,6 +366,9 @@ public:
                             {
                                 Talk(EMOTE_KOLTIRA_COLLAPSES, me);
                                 me->KillSelf();
+
+                                if (Creature* valroth = ObjectAccessor::GetCreature(*me, _valrothGUID))
+                                    valroth->DespawnOrUnsummon();
                             }, 2min);
 
                             if (Creature* valroth = ObjectAccessor::GetCreature(*me, _valrothGUID))
