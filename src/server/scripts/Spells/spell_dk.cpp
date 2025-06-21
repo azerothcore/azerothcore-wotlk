@@ -526,31 +526,26 @@ class spell_dk_rune_of_the_fallen_crusader : public SpellScript
 };
 
 // 49222 - Bone Shield
-    class spell_dk_bone_shield : public AuraScript
+class spell_dk_bone_shield : public AuraScript
+{
+    PrepareAuraScript(spell_dk_bone_shield);
+    enum
+    {   // References a serverside spell which tracks the usage of Deathknight Bone Shield Charges and caps it's usage at once per 2 seconds.
+        SPELL_DK_BONE_SHIELD_ICD  = 49221,
+        SPELL_DK_BONE_SHIELD = 49222
+    };
+    void HandleProc(ProcEventInfo& eventInfo)
     {
-        PrepareAuraScript(spell_dk_bone_shield);
-
-        enum
-        {   // References a serverside spell which tracks the usage of Deathknight Bone Shield Charges and caps it's usage at once per 2 seconds.
-            SPELL_DK_BONE_SHIELD_ICD  = 49221,
-            SPELL_DK_BONE_SHIELD = 49222
-        };
-
-        void HandleProc(ProcEventInfo& eventInfo)
+        PreventDefaultAction();
+        Unit* target = GetTarget();
+        if (target->HasSpellCooldown(SPELL_DK_BONE_SHIELD_ICD))
+            return;
+        if (!eventInfo.GetSpellInfo() || !eventInfo.GetSpellInfo()->IsTargetingArea())
         {
-            PreventDefaultAction();
-
-            Unit* target = GetTarget();
-
-            if (target->HasSpellCooldown(SPELL_DK_BONE_SHIELD_ICD))
-                return;
-
-            if (!eventInfo.GetSpellInfo() || !eventInfo.GetSpellInfo()->IsTargetingArea())
-            {
-            DropCharge();
-            target->AddSpellCooldown(SPELL_DK_BONE_SHIELD_ICD, 0, 2000);
-            }
+        DropCharge();
+        target->AddSpellCooldown(SPELL_DK_BONE_SHIELD_ICD, 0, 2000);
         }
+    }
 
     void Register() override
     {
