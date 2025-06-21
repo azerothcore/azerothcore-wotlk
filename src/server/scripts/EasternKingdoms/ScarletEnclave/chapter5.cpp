@@ -525,7 +525,7 @@ public:
             events.RescheduleEvent(EVENT_SPELL_DEATH_STRIKE, 8000);
             events.RescheduleEvent(EVENT_SPELL_DEATH_EMBRACE, 5000);
             events.RescheduleEvent(EVENT_SPELL_UNHOLY_BLIGHT, 10000);
-            events.RescheduleEvent(EVENT_SPELL_DARION_MOD_DAMAGE, 12000);
+            events.RescheduleEvent(EVENT_SPELL_DARION_MOD_DAMAGE, 500);
         }
 
         void Reset() override
