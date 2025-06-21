@@ -243,6 +243,7 @@ public:
             scheduler.CancelAll();
             me->m_Events.KillAllEvents(false);
             me->SetUnitFlag(UNIT_FLAG_IMMUNE_TO_NPC);
+            me->setActive(false);
         }
 
         void StartEvent()
