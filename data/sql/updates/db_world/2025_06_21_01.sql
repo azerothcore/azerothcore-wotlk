@@ -1,3 +1,4 @@
+-- DB update 2025_06_21_00 -> 2025_06_21_01
 --
 -- Pathing for  Entry: 29007
 SET @NPC := 29007;
