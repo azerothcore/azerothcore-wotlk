@@ -2126,6 +2126,7 @@ AuraStateType SpellInfo::LoadAuraState() const
         case 20656:
         case 25602:
         case 32129:
+        case 49163: // Perpetual Instability (Element 115)
             return AURA_STATE_FAERIE_FIRE;
         default:
             break;
