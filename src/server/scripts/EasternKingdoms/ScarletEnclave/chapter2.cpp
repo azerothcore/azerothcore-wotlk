@@ -260,7 +260,7 @@ public:
             }, 5s);
         }
 
-        void sQuestAccept(Player* player, Quest const* quest) override
+        void sQuestAccept(Player* /*player*/, Quest const* quest) override
         {
             if (quest->GetQuestId() == QUEST_BREAKOUT)
                 StartEvent();
