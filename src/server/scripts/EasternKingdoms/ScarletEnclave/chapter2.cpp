@@ -389,7 +389,7 @@ public:
                 case POINT_ANTI_MAGIC_ZONE:
                     me->SetStandState(UNIT_STAND_STATE_KNEEL);
                     Talk(SAY_BREAKOUT2);
-                    DoCast(me, SPELL_ANTI_MAGIC_ZONE);  // cast again that makes bubble up
+                    DoCastSelf(SPELL_ANTI_MAGIC_ZONE);
                     break;
             }
         }
