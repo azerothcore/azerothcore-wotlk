@@ -86,6 +86,7 @@
 #include "Util.h"
 #include "VMapFactory.h"
 #include "VMapMgr2.h"
+#include "VoiceChatMgr.h"
 #include "Warden.h"
 #include "WardenCheckMgr.h"
 #include "WaypointMovementGenerator.h"
@@ -1270,6 +1271,12 @@ void World::LoadConfigSettings(bool reload)
 
     _int_configs[CONFIG_SUNSREACH_COUNTER_MAX] = sConfigMgr->GetOption<uint32>("Sunsreach.CounterMax", 10000);
 
+    // Voice Chat
+    _bool_configs[CONFIG_VOICE_CHAT_ENABLED] = sConfigMgr->GetOption<bool>("VoiceChat.Enabled", false);
+    _int_configs[CONFIG_VOICE_CHAT_SERVER_PORT] = sConfigMgr->GetOption<uint16>("VoiceChat.ServerPort", 3725);
+    _int_configs[CONFIG_VOICE_CHAT_VOICE_PORT] = sConfigMgr->GetOption<uint16>("VoiceChat.VoicePort", 3724);
+    _int_configs[CONFIG_VOICE_CHAT_MAX_CONNECT_ATTEMPTS] = sConfigMgr->GetOption<int32>("VoiceChat.MaxConnectAttempts", -1);
+
     // call ScriptMgr if we're reloading the configuration
     sScriptMgr->OnAfterConfigLoad(reload);
 }
@@ -2004,6 +2011,8 @@ void World::SetInitialWorldSettings()
 
     METRIC_EVENT("events", "World initialized", "World Initialized In " + std::to_string(startupDuration / 60000) + " Minutes " + std::to_string((startupDuration % 60000) / 1000) + " Seconds");
 
+    // sVoiceChatSocketMgr->Init();
+
     if (sConfigMgr->isDryRun())
     {
         sMapMgr->UnloadAll();
@@ -2228,6 +2237,11 @@ void World::Update(uint32 diff)
         METRIC_TIMER("world_update_time", METRIC_TAG("type", "Process query callbacks"));
         // execute callbacks from sql queries that were queued recently
         ProcessQueryCallbacks();
+    }
+
+    {
+        METRIC_TIMER("world_update_time", METRIC_TAG("type", "Voice chat update"));
+        sVoiceChatMgr.Update(diff);
     }
 
     /// <li> Update uptime table

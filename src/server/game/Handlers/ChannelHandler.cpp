@@ -75,12 +75,15 @@ void WorldSession::HandleChannelList(WorldPacket& recvPacket)
     std::string channelName;
     recvPacket >> channelName;
 
+    bool display = recvPacket.GetOpcode() == CMSG_CHANNEL_DISPLAY_LIST;
+
     LOG_DEBUG("chat.system", "{} {} Channel: {}",
-                   recvPacket.GetOpcode() == CMSG_CHANNEL_DISPLAY_LIST ? "CMSG_CHANNEL_DISPLAY_LIST" : "CMSG_CHANNEL_LIST",
+        display ? "CMSG_CHANNEL_DISPLAY_LIST" : "CMSG_CHANNEL_LIST",
                    GetPlayerInfo(), channelName);
+
     if (ChannelMgr* cMgr = ChannelMgr::forTeam(GetPlayer()->GetTeamId()))
         if (Channel* channel = cMgr->GetChannel(channelName, GetPlayer()))
-            channel->List(GetPlayer());
+            channel->List(GetPlayer(), display);
 }
 
 void WorldSession::HandleChannelPassword(WorldPacket& recvPacket)
