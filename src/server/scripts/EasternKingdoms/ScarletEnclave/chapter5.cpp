@@ -1215,9 +1215,106 @@ class spell_chapter5_rebuke : public SpellScript
     }
 };
 
+// 58552 - Return to Orgrimmar
+// 58533 - Return to Stormwind
+enum ReturnToCapital
+{
+    SPELL_RETURN_TO_ORGRIMMAR_APPLE  = 58509,
+    SPELL_RETURN_TO_ORGRIMMAR_BANANA = 58513,
+    SPELL_RETURN_TO_ORGRIMMAR_SPIT   = 58520,
+
+    EMOTE_THROW_APPLE    = 2,
+    EMOTE_THROW_BANANA   = 3,
+    EMOTE_THROW_SPIT     = 4,
+    SAY_INSULT_TO_DK     = 5,
+
+    NPC_SW_GUARD         = 68,
+    NPC_ROYAL_GUARD      = 1756,
+    NPC_CITY_PATROLLER   = 1976,
+    NPC_OG_GUARD         = 3296,
+    NPC_KOR_ELITE        = 14304,
+
+    TEXT_BROADCAST_COWER = 31670 // "%s cowers in fear."
+};
+
+uint32 ReturnToCapitalSpells[3] =
+{
+    58509, // Apple
+    58513, // Banana
+    58520  // Spit
+};
+
+class spell_chapter5_return_to_capital : public SpellScript
+{
+    PrepareSpellScript(spell_chapter5_return_to_capital);
+
+    bool Validate(SpellInfo const* /*spellInfo*/) override
+    {
+        return ValidateSpellInfo({ SPELL_RETURN_TO_ORGRIMMAR_APPLE, SPELL_RETURN_TO_ORGRIMMAR_BANANA, SPELL_RETURN_TO_ORGRIMMAR_SPIT});
+    }
+
+    void HandleHit(SpellEffIndex /*effIndex*/)
+    {
+        Creature* creature = GetHitUnit()->ToCreature();
+        Player* player = GetCaster()->ToPlayer();
+        uint32 spellId = GetSpellInfo()->Id;
+
+        if (!spellId || !creature || !player || player->IsGameMaster() || !player->IsAlive() || !creature->IsAlive() || creature->IsInCombat())
+            return;
+
+        if (creature->HasSpellCooldown(spellId))
+            return;
+
+        if (creature->GetEntry() == NPC_SW_GUARD || creature->GetEntry() == NPC_ROYAL_GUARD || creature->GetEntry() == NPC_CITY_PATROLLER || creature->GetEntry() == NPC_OG_GUARD || creature->GetEntry() == NPC_KOR_ELITE)
+        {
+            _emote = urand(2,4);
+            if (creature)
+            {
+                creature->PauseMovement(5000);
+                creature->SetTimedFacingToObject(player, 30000);
+
+                if (roll_chance_i(30))
+                {
+                    creature->AI()->Talk(_emote, player);
+                    creature->CastSpell(player, ReturnToCapitalSpells[_emote - 2]);
+                }
+                else
+                {
+                    creature->AI()->Talk(SAY_INSULT_TO_DK, player);
+                    creature->HandleEmoteCommand(RAND(EMOTE_ONESHOT_POINT,EMOTE_ONESHOT_RUDE));
+                }
+            }
+        }
+        /*/// @todo: This needs to be further investigated as there are some "guard" npcs, that have civilian flags and non guard npcs should also insult the dk.
+        else
+            if (creature->GetCreatureTemplate()->flags_extra & CREATURE_FLAG_EXTRA_CIVILIAN)
+            {
+                creature->HandleEmoteCommand(EMOTE_STATE_COWER); // from sniff, emote 431 for a while, then reset (with "%s cowers in fear." text)
+                creature->PlayDirectSound(14556); // from sniff
+                if (player)
+                {
+                    LocaleConstant loc_idx = player->GetSession()->GetSessionDbLocaleIndex();
+                        if (BroadcastText const* bct = sObjectMgr->GetBroadcastText(TEXT_BROADCAST_COWER))
+                            creature->TextEmote(bct->GetText(loc_idx, creature->getGender()), creature);
+                }
+            }
+        */
+
+        creature->AddSpellCooldown(spellId, 0, 30000);
+    }
+
+    void Register() override
+    {
+        OnEffectHitTarget += SpellEffectFn(spell_chapter5_return_to_capital::HandleHit, EFFECT_0, SPELL_EFFECT_DUMMY);
+    }
+private:
+    uint8 _emote;
+};
+
 void AddSC_the_scarlet_enclave_c5()
 {
     new npc_highlord_darion_mograine();
     RegisterSpellScript(spell_chapter5_light_of_dawn_aura);
     RegisterSpellScript(spell_chapter5_rebuke);
+    RegisterSpellScript(spell_chapter5_return_to_capital);
 }
