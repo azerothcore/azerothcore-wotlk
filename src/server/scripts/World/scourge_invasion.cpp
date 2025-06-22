@@ -15,22 +15,27 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "scourge_invasion.h"
 #include "AreaDefines.h"
+#include "CellImpl.h"
 #include "CombatAI.h"
+#include "CreatureScript.h"
 #include "Duration.h"
 #include "GameEventMgr.h"
 #include "GameObjectAI.h"
-#include "GridNotifiers.h"
+#include "GameObjectScript.h"
+#include "GridNotifiersImpl.h"
 #include "Object.h"
 #include "ObjectDefines.h"
-#include "ScriptedAI/ScriptedCreature.h"
+#include "ScriptedCreature.h"
+#include "ScriptedGossip.h"
 #include "SpellInfo.h"
+#include "SpellScript.h"
 #include "SpellScriptLoader.h"
 #include "Unit.h"
 #include "Weather.h"
 #include "WeatherMgr.h"
 #include "WorldState.h"
+#include "scourge_invasion.h"
 #include <chrono>
 
 class go_necropolis : public GameObjectAI
