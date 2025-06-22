@@ -244,7 +244,7 @@ SpellCastResult UnitAI::DoCast(uint32 spellId)
                     if (!(spellInfo->AuraInterruptFlags & AURA_INTERRUPT_FLAG_NOT_VICTIM) && targetSelector(me->GetVictim()))
                         target = me->GetVictim();
                     else
-                       target = SelectTarget(SelectTargetMethod::Random, 0, targetSelector);
+                        target = SelectTarget(SelectTargetMethod::Random, 0, targetSelector);
                 }
                 break;
             }
