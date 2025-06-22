@@ -4666,7 +4666,7 @@ void SmartScript::ProcessEvent(SmartScriptHolder& e, Unit* unit, uint32 var0, ui
             if (!targets.empty())
             {
                 for (WorldObject* target : targets)
-                    if (IsPlayer(target) && !target->ToPlayer()->IsGamemaster())
+                    if (IsPlayer(target) && !target->ToPlayer()->IsGameMaster())
                         playerCount++;
 
                     if (playerCount >= e.event.nearPlayer.minCount)
@@ -4684,7 +4684,7 @@ void SmartScript::ProcessEvent(SmartScriptHolder& e, Unit* unit, uint32 var0, ui
             if (!targets.empty())
             {
                 for (WorldObject* target : targets)
-                    if (IsPlayer(target) && !target->ToPlayer()->IsGamemaster())
+                    if (IsPlayer(target) && !target->ToPlayer()->IsGameMaster())
                         playerCount++;
 
                 if (playerCount < e.event.nearPlayerNegation.maxCount)
