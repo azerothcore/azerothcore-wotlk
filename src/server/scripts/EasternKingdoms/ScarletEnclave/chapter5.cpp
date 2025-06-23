@@ -121,7 +121,7 @@ enum LightOfDawnEncounter
     EVENT_SPELL_DEATH_STRIKE,
     EVENT_SPELL_DEATH_EMBRACE,
     EVENT_SPELL_UNHOLY_BLIGHT,
-    EVENT_SPELL_TALK,
+    EVENT_SPELL_DARION_MOD_DAMAGE,
     // Positioning
     EVENT_FINISH_FIGHT_1,
     EVENT_FINISH_FIGHT_2,
@@ -253,6 +253,7 @@ enum LightOfDawnSpells
     SPELL_DEATH_EMBRACE                 = 53635,
     SPELL_ICY_TOUCH1                    = 49723,
     SPELL_UNHOLY_BLIGHT                 = 53640,
+    SPELL_DARION_MOD_DAMAGE             = 53645,
 
     // Outro
     SPELL_THE_LIGHT_OF_DAWN             = 53658,
@@ -524,7 +525,7 @@ public:
             events.RescheduleEvent(EVENT_SPELL_DEATH_STRIKE, 8000);
             events.RescheduleEvent(EVENT_SPELL_DEATH_EMBRACE, 5000);
             events.RescheduleEvent(EVENT_SPELL_UNHOLY_BLIGHT, 10000);
-            events.RescheduleEvent(EVENT_SPELL_TALK, 10000);
+            events.RescheduleEvent(EVENT_SPELL_DARION_MOD_DAMAGE, 500);
         }
 
         void Reset() override
@@ -661,7 +662,7 @@ public:
                         me->SetHomePosition(pos);
                         me->SetWalk(false);
                         me->GetMotionMaster()->MovePoint(1, pos.GetPositionX(), pos.GetPositionY(), pos.GetPositionZ(), true, true);
-                        me->CastSpell(me, SPELL_THE_MIGHT_OF_MOGRAINE, true);
+                        DoCastSelf(SPELL_THE_MIGHT_OF_MOGRAINE, true);
                         break;
                     }
                 case EVENT_START_COUNTDOWN_14:
@@ -1146,23 +1147,24 @@ public:
             {
                 case EVENT_SPELL_ANTI_MAGIC_ZONE:
                     DoCast(me, SPELL_ANTI_MAGIC_ZONE1);
-                    events.RescheduleEvent(eventId, 25s, 30s);
+                    events.RescheduleEvent(eventId, 30s, 45s);
                     break;
                 case EVENT_SPELL_DEATH_STRIKE:
                     DoCastVictim(SPELL_DEATH_STRIKE);
-                    events.RescheduleEvent(eventId, 5s, 10s);
+                    events.RescheduleEvent(eventId, 5s, 35s);
                     break;
                 case EVENT_SPELL_DEATH_EMBRACE:
                     DoCastVictim(SPELL_DEATH_EMBRACE);
-                    events.RescheduleEvent(eventId, 15s, 20s);
+                    events.RescheduleEvent(eventId, 45s, 60s);
                     break;
                 case EVENT_SPELL_UNHOLY_BLIGHT:
                     DoCast(me, SPELL_UNHOLY_BLIGHT);
                     events.RescheduleEvent(eventId, 60s);
                     break;
-                case EVENT_SPELL_TALK:
+                case EVENT_SPELL_DARION_MOD_DAMAGE:
+                    DoCast(me, SPELL_DARION_MOD_DAMAGE);
                     Talk(SAY_LIGHT_OF_DAWN09);
-                    events.RescheduleEvent(eventId, 15s, 20s);
+                    events.RescheduleEvent(eventId, 15s, 25s);
                     break;
             }
 
@@ -1215,9 +1217,106 @@ class spell_chapter5_rebuke : public SpellScript
     }
 };
 
+// 58552 - Return to Orgrimmar
+// 58533 - Return to Stormwind
+enum ReturnToCapital
+{
+    SPELL_RETURN_TO_ORGRIMMAR_APPLE  = 58509,
+    SPELL_RETURN_TO_ORGRIMMAR_BANANA = 58513,
+    SPELL_RETURN_TO_ORGRIMMAR_SPIT   = 58520,
+
+    EMOTE_THROW_APPLE    = 2,
+    EMOTE_THROW_BANANA   = 3,
+    EMOTE_THROW_SPIT     = 4,
+    SAY_INSULT_TO_DK     = 5,
+
+    NPC_SW_GUARD         = 68,
+    NPC_ROYAL_GUARD      = 1756,
+    NPC_CITY_PATROLLER   = 1976,
+    NPC_OG_GUARD         = 3296,
+    NPC_KOR_ELITE        = 14304,
+
+    TEXT_BROADCAST_COWER = 31670 // "%s cowers in fear."
+};
+
+uint32 ReturnToCapitalSpells[3] =
+{
+    58509, // Apple
+    58513, // Banana
+    58520  // Spit
+};
+
+class spell_chapter5_return_to_capital : public SpellScript
+{
+    PrepareSpellScript(spell_chapter5_return_to_capital);
+
+    bool Validate(SpellInfo const* /*spellInfo*/) override
+    {
+        return ValidateSpellInfo({ SPELL_RETURN_TO_ORGRIMMAR_APPLE, SPELL_RETURN_TO_ORGRIMMAR_BANANA, SPELL_RETURN_TO_ORGRIMMAR_SPIT});
+    }
+
+    void HandleHit(SpellEffIndex /*effIndex*/)
+    {
+        Creature* creature = GetHitUnit()->ToCreature();
+        Player* player = GetCaster()->ToPlayer();
+        uint32 spellId = GetSpellInfo()->Id;
+
+        if (!spellId || !creature || !player || player->IsGameMaster() || !player->IsAlive() || !creature->IsAlive() || creature->IsInCombat())
+            return;
+
+        if (creature->HasSpellCooldown(spellId))
+            return;
+
+        if (creature->GetEntry() == NPC_SW_GUARD || creature->GetEntry() == NPC_ROYAL_GUARD || creature->GetEntry() == NPC_CITY_PATROLLER || creature->GetEntry() == NPC_OG_GUARD || creature->GetEntry() == NPC_KOR_ELITE)
+        {
+            _emote = urand(2,4);
+            if (creature)
+            {
+                creature->PauseMovement(5000);
+                creature->SetTimedFacingToObject(player, 30000);
+
+                if (roll_chance_i(30))
+                {
+                    creature->AI()->Talk(_emote, player);
+                    creature->CastSpell(player, ReturnToCapitalSpells[_emote - 2]);
+                }
+                else
+                {
+                    creature->AI()->Talk(SAY_INSULT_TO_DK, player);
+                    creature->HandleEmoteCommand(RAND(EMOTE_ONESHOT_POINT,EMOTE_ONESHOT_RUDE));
+                }
+            }
+        }
+        /*/// @todo: This needs to be further investigated as there are some "guard" npcs, that have civilian flags and non guard npcs should also insult the dk.
+        else
+            if (creature->GetCreatureTemplate()->flags_extra & CREATURE_FLAG_EXTRA_CIVILIAN)
+            {
+                creature->HandleEmoteCommand(EMOTE_STATE_COWER); // from sniff, emote 431 for a while, then reset (with "%s cowers in fear." text)
+                creature->PlayDirectSound(14556); // from sniff
+                if (player)
+                {
+                    LocaleConstant loc_idx = player->GetSession()->GetSessionDbLocaleIndex();
+                        if (BroadcastText const* bct = sObjectMgr->GetBroadcastText(TEXT_BROADCAST_COWER))
+                            creature->TextEmote(bct->GetText(loc_idx, creature->getGender()), creature);
+                }
+            }
+        */
+
+        creature->AddSpellCooldown(spellId, 0, 30000);
+    }
+
+    void Register() override
+    {
+        OnEffectHitTarget += SpellEffectFn(spell_chapter5_return_to_capital::HandleHit, EFFECT_0, SPELL_EFFECT_DUMMY);
+    }
+private:
+    uint8 _emote;
+};
+
 void AddSC_the_scarlet_enclave_c5()
 {
     new npc_highlord_darion_mograine();
     RegisterSpellScript(spell_chapter5_light_of_dawn_aura);
     RegisterSpellScript(spell_chapter5_rebuke);
+    RegisterSpellScript(spell_chapter5_return_to_capital);
 }
