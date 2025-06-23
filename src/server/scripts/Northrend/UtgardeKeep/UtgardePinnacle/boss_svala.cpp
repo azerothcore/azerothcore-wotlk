@@ -337,9 +337,6 @@ public:
                         DoTeleportPlayer(target, 296.632f, -346.075f, 90.63f, 4.6f);
                         me->NearTeleportTo(296.632f, -346.075f, 110.0f, 4.6f, false);
                         me->SetControlled(true, UNIT_STATE_ROOT);
-                        me->RemoveAurasByType(SPELL_AURA_PERIODIC_DAMAGE);
-                        me->RemoveAurasByType(SPELL_AURA_PERIODIC_DAMAGE_PERCENT);
-                        me->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
                     }
 
                     events.DelayEvents(25001); // +1 just to be sure

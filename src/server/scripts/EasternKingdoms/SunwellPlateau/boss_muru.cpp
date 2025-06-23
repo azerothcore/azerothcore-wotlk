@@ -209,52 +209,11 @@ struct npc_dark_fiend : public ScriptedAI
 
         me->m_Events.AddEventAtOffset([this]() {
             me->SetReactState(REACT_AGGRESSIVE);
+
             Unit* target = nullptr;
             if (InstanceScript* instance = me->GetInstanceScript())
-            {
                 if (Creature* muru = instance->GetCreature(DATA_MURU))
-                {
-                    if (muru->IsAlive() && !muru->HasUnitFlag(UNIT_FLAG_NOT_SELECTABLE))
-                    {
-                        std::list<HostileReference*> const& threatList = muru->GetThreatMgr().GetThreatList();
-                        std::vector<Unit*> validTargets;
-
-                        for (HostileReference* ref : threatList)
-                        {
-                            if (Unit* unit = ObjectAccessor::GetUnit(*muru, ref->getUnitGuid()))
-                            {
-                                if (unit->IsPlayer() && unit->IsAlive() && unit->IsWithinDist(me, 50.0f))
-                                    validTargets.push_back(unit);
-                            }
-                        }
-
-                        if (!validTargets.empty())
-                            target = validTargets[urand(0, validTargets.size() - 1)];
-                    }
-                    else
-                    {
-                        if (Creature* entropius = me->FindNearestCreature(NPC_ENTROPIUS, 100.0f))
-                        {
-                            std::list<HostileReference*> const& threatList = entropius->GetThreatMgr().GetThreatList();
-                            std::vector<Unit*> validTargets;
-
-                            for (HostileReference* ref : threatList)
-                            {
-                                if (Unit* unit = ObjectAccessor::GetUnit(*entropius, ref->getUnitGuid()))
-                                {
-                                    if (unit->IsPlayer() && unit->IsAlive() && unit->IsWithinDist(me, 50.0f))
-                                    {
-                                        validTargets.push_back(unit);
-                                    }
-                                }
-                            }
-
-                            if (!validTargets.empty())
-                                target = validTargets[urand(0, validTargets.size() - 1)];
-                        }
-                    }
-                }
-            }
+                    target = muru->GetAI()->SelectTarget(SelectTargetMethod::Random, 0, FarthestTargetSelector(me, 50.0f, true, true));
 
             if (target)
             {
