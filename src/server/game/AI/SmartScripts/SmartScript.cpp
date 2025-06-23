@@ -3707,10 +3707,12 @@ void SmartScript::GetTargets(ObjectVector& targets, SmartScriptHolder const& e, 
 
             if (!units.empty() && baseObject)
                 for (WorldObject* unit : units)
-                    if (IsPlayer(unit) && baseObject->IsInRange(unit, float(e.target.playerRange.minDist), float(e.target.playerRange.maxDist)))
+                    if (IsPlayer(unit) && !unit->ToPlayer()->IsGameMaster() && baseObject->IsInRange(unit, float(e.target.playerRange.minDist), float(e.target.playerRange.maxDist)))
                         targets.push_back(unit);
+
             if (e.target.playerRange.maxCount)
                 Acore::Containers::RandomResize(targets, e.target.playerRange.maxCount);
+
             break;
         }
         case SMART_TARGET_PLAYER_DISTANCE:
@@ -4664,12 +4666,11 @@ void SmartScript::ProcessEvent(SmartScriptHolder& e, Unit* unit, uint32 var0, ui
             if (!targets.empty())
             {
                 for (WorldObject* target : targets)
-                {
-                    if (IsPlayer(target))
+                    if (IsPlayer(target) && !target->ToPlayer()->IsGameMaster())
                         playerCount++;
-                }
-                    if (playerCount >= e.event.nearPlayer.minCount)
-                        ProcessAction(e, unit);
+
+                if (playerCount >= e.event.nearPlayer.minCount)
+                    ProcessAction(e, unit);
             }
             RecalcTimer(e, e.event.nearPlayer.repeatMin, e.event.nearPlayer.repeatMax);
             break;
@@ -4683,10 +4684,8 @@ void SmartScript::ProcessEvent(SmartScriptHolder& e, Unit* unit, uint32 var0, ui
             if (!targets.empty())
             {
                 for (WorldObject* target : targets)
-                {
-                    if (IsPlayer(target))
+                    if (IsPlayer(target) && !target->ToPlayer()->IsGameMaster())
                         playerCount++;
-                }
 
                 if (playerCount < e.event.nearPlayerNegation.maxCount)
                     ProcessAction(e, unit);
