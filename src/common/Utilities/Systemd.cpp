@@ -16,6 +16,7 @@
  */
 
 #if defined(__linux__)
+#include "StringConvert.h"
 #include <cstdlib>
 #include <unistd.h>
 #include <string>
@@ -27,11 +28,11 @@ int get_listen_fds()
     if (!listen_pid || !listen_fds)
         return 0;
 
-    pid_t pid = static_cast<pid_t>(std::stoi(listen_pid));
+    pid_t pid = Acore::StringTo<int>(listen_pid).value_or(0);
     if (pid != getpid())
         return 0;
 
-    if (std::stoi(listen_fds) <= 0)
+    if (Acore::StringTo<int>(listen_fds).value_or(0) <= 0)
         return 0;
 
     return 3;
