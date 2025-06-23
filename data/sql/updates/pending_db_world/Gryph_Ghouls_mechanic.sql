@@ -1,3 +1,4 @@
+
 -- Death Knight Initiates (Remove Wrong Guids)
 DELETE FROM `creature` WHERE (`id1` = 28406) AND (`guid` IN (129516, 129517, 129518, 129544, 129545, 129555));
 DELETE FROM `creature_addon` WHERE (`guid` IN (129516, 129517, 129518, 129544, 129545, 129555));
@@ -19,64 +20,54 @@ DELETE FROM `smart_scripts` WHERE (`entryorguid` = 28906) AND (`source_type` = 0
 UPDATE `creature_template` SET `AIName` = '' WHERE `entry` = 28890;
 DELETE FROM `smart_scripts` WHERE (`entryorguid` = 28890) AND (`source_type` = 0);
 DELETE FROM `smart_scripts` WHERE (`entryorguid` IN (2889000, 2889001, 2889002, 2889003)) AND (`source_type` = 9);
-DELETE FROM `creature_addon` WHERE (`guid` IN (130121));
+UPDATE `creature_addon` SET `path_id` = 13012100 WHERE (`guid` IN (130121));
 
--- Add Waypoints for Acherus Necromancers (sniffed)
-DELETE FROM `waypoints` WHERE `entry` IN ("13011800");
-INSERT INTO `waypoints` (`entry`, `pointid`, `position_x`, `position_y`, `position_z`, `orientation`, `delay`, `point_comment`) VALUES
-("13011800", 1, 2192.1294, -5926.655, 101.12373, NULL, 0, 'Acherus Necromancer 1'),
-("13011800", 2, 2163.8767, -5928.8013, 99.28386, NULL, 0, 'Acherus Necromancer 1'),
-("13011800", 3, 2137.0066, -5913.505, 100.69998, NULL, 0, 'Acherus Necromancer 1'),
-("13011800", 4, 2128.6396, -5891.006, 102.839355, NULL, 0, 'Acherus Necromancer 1'),
-("13011800", 5, 2121.2722, -5864.696, 102.14012, NULL, 0, 'Acherus Necromancer 1'),
-("13011800", 6, 2143.547, -5855.4814, 101.34996, NULL, 0, 'Acherus Necromancer 1'),
-("13011800", 7, 2161.3018, -5863.1533, 101.344574, NULL, 0, 'Acherus Necromancer 1'),
-("13011800", 8, 2180.6997, -5890.154, 100.975784, NULL, 0, 'Acherus Necromancer 1'),
-("13011800", 9, 2201.1484, -5914.511, 101.01622, NULL, 0, 'Acherus Necromancer 1');
-
-DELETE FROM `waypoints` WHERE `entry` IN ("13011900");
-INSERT INTO `waypoints` (`entry`, `pointid`, `position_x`, `position_y`, `position_z`, `orientation`, `delay`, `point_comment`) VALUES
-("13011900", 1, 2301.3235, -5846.832, 100.93423, NULL, 0, 'Acherus Necromancer 2'),
-("13011900", 2, 2346.4392, -5857.874, 101.7633, NULL, 0, 'Acherus Necromancer 2'),
-("13011900", 3, 2387.449, -5852.9507, 106.41135, NULL, 0, 'Acherus Necromancer 2'),
-("13011900", 4, 2374.95, -5877.5527, 104.83713, NULL, 0, 'Acherus Necromancer 2'),
-("13011900", 5, 2341.982, -5880.2476, 103.6744, NULL, 0, 'Acherus Necromancer 2'),
-("13011900", 6, 2299.1343, -5867.592, 100.96091, NULL, 0, 'Acherus Necromancer 2');
-
-DELETE FROM `waypoints` WHERE `entry` IN ("13012000");
-INSERT INTO `waypoints` (`entry`, `pointid`, `position_x`, `position_y`, `position_z`, `orientation`, `delay`, `point_comment`) VALUES
-("13012000", 1, 2121.3906, -5834.899, 101.629395, NULL, 0, 'Acherus Necromancer 3'),
-("13012000", 2, 2155.612, -5825.2485, 101.583824, NULL, 0, 'Acherus Necromancer 3'),
-("13012000", 3, 2168.8728, -5791.4727, 101.15188, NULL, 0, 'Acherus Necromancer 3'),
-("13012000", 4, 2201.668, -5760.944, 101.81218, NULL, 0, 'Acherus Necromancer 3'),
-("13012000", 5, 2190.6316, -5745.712, 102.219986, NULL, 0, 'Acherus Necromancer 3'),
-("13012000", 6, 2155.179, -5760.8345, 100.59677, NULL, 0, 'Acherus Necromancer 3'),
-("13012000", 7, 2122.3743, -5761.1772, 98.24538, NULL, 0, 'Acherus Necromancer 3'),
-("13012000", 8, 2101.5413, -5781.742, 99.2695, NULL, 0, 'Acherus Necromancer 3'),
-("13012000", 9, 2092.2913, -5813.873, 102.13019, NULL, 0, 'Acherus Necromancer 3');
-
--- Add New Waypoint for Gothik the Harvester (sniffed)
-DELETE FROM `waypoints` WHERE `entry` IN ("13012100");
-INSERT INTO `waypoints` (`entry`, `pointid`, `position_x`, `position_y`, `position_z`, `orientation`, `delay`, `point_comment`) VALUES
-("13012100", 1, 2199.8826, -5906.583, 100.88099, NULL, 0, 'Gothik the Harvester'),
-("13012100", 2, 2179.8838, -5893.7793, 100.85527, NULL, 0, 'Gothik the Harvester'),
-("13012100", 3, 2168.7725, -5866.6797, 101.337105, NULL, 0, 'Gothik the Harvester'),
-("13012100", 4, 2156.3, -5843.0005, 102.0316, NULL, 0, 'Gothik the Harvester'),
-("13012100", 5, 2139.4514, -5813.6753, 100.5411, NULL, 0, 'Gothik the Harvester'),
-("13012100", 6, 2125.513, -5785.7827, 98.66528, NULL, 0, 'Gothik the Harvester'),
-("13012100", 7, 2111.2576, -5763.4824, 98.55336, NULL, 0, 'Gothik the Harvester'),
-("13012100", 8, 2104.5195, -5735.549, 100.19841, NULL, 0, 'Gothik the Harvester'),
-("13012100", 9, 2126.6138, -5720.4775, 100.45774, NULL, 0, 'Gothik the Harvester'),
-("13012100", 10, 2159.1223, -5715.318, 102.24907, NULL, 0, 'Gothik the Harvester'),
-("13012100", 11, 2172.173, -5736.729, 101.68556, NULL, 0, 'Gothik the Harvester'),
-("13012100", 12, 2189.5996, -5760.0767, 101.66215, NULL, 0, 'Gothik the Harvester'),
-("13012100", 13, 2220.4363, -5784.1973, 101.70216, NULL, 0, 'Gothik the Harvester'),
-("13012100", 14, 2245.4631, -5803.29, 100.99215, NULL, 0, 'Gothik the Harvester'),
-("13012100", 15, 2261.9277, -5823.2, 100.949066, NULL, 0, 'Gothik the Harvester'),
-("13012100", 16, 2266.139, -5838.5776, 100.95463, NULL, 0, 'Gothik the Harvester'),
-("13012100", 17, 2259.798, -5867.397, 101.46121, NULL, 0, 'Gothik the Harvester'),
-("13012100", 18, 2238.359, -5890.6216, 101.02715, NULL, 0, 'Gothik the Harvester'),
-("13012100", 19, 2221.4436, -5905.7744, 101.2207, NULL, 0, 'Gothik the Harvester');
+-- Waypoints
+DELETE FROM `waypoint_data` WHERE `id` IN (13011800, 13011900, 13012000, 13012100);
+INSERT INTO `waypoint_data` (`id`, `point`, `position_x`, `position_y`, `position_z`, `orientation`, `delay`, `move_type`, `action`, `action_chance`, `wpguid`) VALUES
+("13011800", 1, 2192.1294, -5926.655, 101.12373, NULL, 0, 0, 0, 100, 0),
+("13011800", 2, 2163.8767, -5928.8013, 99.28386, NULL, 0, 0, 0, 100, 0),
+("13011800", 3, 2137.0066, -5913.505, 100.69998, NULL, 0, 0, 0, 100, 0),
+("13011800", 4, 2128.6396, -5891.006, 102.839355, NULL, 0, 0, 0, 100, 0),
+("13011800", 5, 2121.2722, -5864.696, 102.14012, NULL, 0, 0, 0, 100, 0),
+("13011800", 6, 2143.547, -5855.4814, 101.34996, NULL, 0, 0, 0, 100, 0),
+("13011800", 7, 2161.3018, -5863.1533, 101.344574, NULL, 0, 0, 0, 100, 0),
+("13011800", 8, 2180.6997, -5890.154, 100.975784, NULL, 0, 0, 0, 100, 0),
+("13011800", 9, 2201.1484, -5914.511, 101.01622, NULL, 0, 0, 0, 100, 0),
+("13011900", 1, 2301.3235, -5846.832, 100.93423, NULL, 0, 0, 0, 100, 0),
+("13011900", 2, 2346.4392, -5857.874, 101.7633, NULL, 0, 0, 0, 100, 0),
+("13011900", 3, 2387.449, -5852.9507, 106.41135, NULL, 0, 0, 0, 100, 0),
+("13011900", 4, 2374.95, -5877.5527, 104.83713, NULL, 0, 0, 0, 100, 0),
+("13011900", 5, 2341.982, -5880.2476, 103.6744, NULL, 0, 0, 0, 100, 0),
+("13011900", 6, 2299.1343, -5867.592, 100.96091, NULL, 0, 0, 0, 100, 0),
+("13012000", 1, 2121.3906, -5834.899, 101.629395, NULL, 0, 0, 0, 100, 0),
+("13012000", 2, 2155.612, -5825.2485, 101.583824, NULL, 0, 0, 0, 100, 0),
+("13012000", 3, 2168.8728, -5791.4727, 101.15188, NULL, 0, 0, 0, 100, 0),
+("13012000", 4, 2201.668, -5760.944, 101.81218, NULL, 0, 0, 0, 100, 0),
+("13012000", 5, 2190.6316, -5745.712, 102.219986, NULL, 0, 0, 0, 100, 0),
+("13012000", 6, 2155.179, -5760.8345, 100.59677, NULL, 0, 0, 0, 100, 0),
+("13012000", 7, 2122.3743, -5761.1772, 98.24538, NULL, 0, 0, 0, 100, 0),
+("13012000", 8, 2101.5413, -5781.742, 99.2695, NULL, 0, 0, 0, 100, 0),
+("13012000", 9, 2092.2913, -5813.873, 102.13019, NULL, 0, 0, 0, 100, 0),
+("13012100", 1, 2199.8826, -5906.583, 100.88099, NULL, 0, 0, 0, 100, 0),
+("13012100", 2, 2179.8838, -5893.7793, 100.85527, NULL, 0, 0, 0, 100, 0),
+("13012100", 3, 2168.7725, -5866.6797, 101.337105, NULL, 0, 0, 0, 100, 0),
+("13012100", 4, 2156.3, -5843.0005, 102.0316, NULL, 0, 0, 0, 100, 0),
+("13012100", 5, 2139.4514, -5813.6753, 100.5411, NULL, 0, 0, 0, 100, 0),
+("13012100", 6, 2125.513, -5785.7827, 98.66528, NULL, 0, 0, 0, 100, 0),
+("13012100", 7, 2111.2576, -5763.4824, 98.55336, NULL, 0, 0, 0, 100, 0),
+("13012100", 8, 2104.5195, -5735.549, 100.19841, NULL, 0, 0, 0, 100, 0),
+("13012100", 9, 2126.6138, -5720.4775, 100.45774, NULL, 0, 0, 0, 100, 0),
+("13012100", 10, 2159.1223, -5715.318, 102.24907, NULL, 0, 0, 0, 100, 0),
+("13012100", 11, 2172.173, -5736.729, 101.68556, NULL, 0, 0, 0, 100, 0),
+("13012100", 12, 2189.5996, -5760.0767, 101.66215, NULL, 0, 0, 0, 100, 0),
+("13012100", 13, 2220.4363, -5784.1973, 101.70216, NULL, 0, 0, 0, 100, 0),
+("13012100", 14, 2245.4631, -5803.29, 100.99215, NULL, 0, 0, 0, 100, 0),
+("13012100", 15, 2261.9277, -5823.2, 100.949066, NULL, 0, 0, 0, 100, 0),
+("13012100", 16, 2266.139, -5838.5776, 100.95463, NULL, 0, 0, 0, 100, 0),
+("13012100", 17, 2259.798, -5867.397, 101.46121, NULL, 0, 0, 0, 100, 0),
+("13012100", 18, 2238.359, -5890.6216, 101.02715, NULL, 0, 0, 0, 100, 0),
+("13012100", 19, 2221.4436, -5905.7744, 101.2207, NULL, 0, 0, 0, 100, 0);
 
 -- Update Spawn Position, MT and WD for Gluttonous Geists
 UPDATE `creature` SET `position_x` = 2388.3235, `position_y` = -5898.371, `position_z` = 108.7139 , `orientation` = 0.833046, `MovementType` = 1, `wander_distance` = 10 WHERE (`guid` IN (130297)) AND (`id1` IN (28905));
@@ -102,26 +93,16 @@ UPDATE `creature` SET `position_x` = 2183.372, `position_y` = -5923.872, `positi
 UPDATE `creature` SET `position_x` = 2249.3577, `position_y` = -5915.88, `position_z` = 99.13981, `orientation` = 1.57079, `MovementType` = 1, `wander_distance` = 10 WHERE (`guid` IN (130319)) AND (`id1` IN (28905));
 
 -- Update Spawn Position, MT and WD for Acherus Necromancers
-UPDATE `creature` SET `position_x` = 2190.7517, `position_y` = -5913.1743, `position_z` = 101.022514, `orientation` = 1.20243, `wander_distance` = 0, `MovementType` = 0, `Comment` = 'Has Guid SmartAI' WHERE (`guid` IN (130118)) AND (`id1` IN (28889));
-UPDATE `creature` SET `position_x` = 2299.1343, `position_y` = -5867.592, `position_z` = 100.96091, `orientation` = 0.84453, `wander_distance` = 0, `MovementType` = 0, `Comment` = 'Has Guid SmartAI' WHERE (`guid` IN (130119)) AND (`id1` IN (28889));
-UPDATE `creature` SET `position_x` = 2092.2913, `position_y` = -5813.873, `position_z` = 102.13019, `orientation` = 5.17755, `wander_distance` = 0, `MovementType` = 0, `Comment` = 'Has Guid SmartAI' WHERE (`guid` IN (130120)) AND (`id1` IN (28889));
+UPDATE `creature` SET `position_x` = 2190.7517, `position_y` = -5913.1743, `position_z` = 101.022514, `orientation` = 1.20243, `wander_distance` = 0, `MovementType` = 2 WHERE (`guid` IN (130118)) AND (`id1` IN (28889));
+UPDATE `creature` SET `position_x` = 2299.1343, `position_y` = -5867.592, `position_z` = 100.96091, `orientation` = 0.84453, `wander_distance` = 0, `MovementType` = 2 WHERE (`guid` IN (130119)) AND (`id1` IN (28889));
+UPDATE `creature` SET `position_x` = 2092.2913, `position_y` = -5813.873, `position_z` = 102.13019, `orientation` = 5.17755, `wander_distance` = 0, `MovementType` = 2 WHERE (`guid` IN (130120)) AND (`id1` IN (28889));
+
+-- Add creature addon for Acherus Necromancers
+DELETE FROM `creature_addon` WHERE (`guid` IN (130118, 130119, 130120));
+INSERT INTO `creature_addon` (`guid`, `path_id`, `mount`, `bytes1`, `bytes2`, `emote`, `visibilityDistanceType`, `auras`) VALUES
+(130118, 13011800, 0, 0, 0, 0, 0, ''),
+(130119, 13011900, 0, 0, 0, 0, 0, ''),
+(130120, 13012000, 0, 0, 0, 0, 0, '');
 
 -- Upate Spawn and MT for Gothik the Harvester
-UPDATE `creature` SET `position_x` = 2221.4436, `position_y` = -5905.7744, `position_z` = 101.2207, `orientation` = 3.2595, `wander_distance` = 0, `MovementType` = 0 WHERE (`guid` IN (130121)) AND (`id1` IN (28890));
-
--- Gothik the Harvester SmartAI (every 50 seconds).
-UPDATE `creature_template` SET `AIName` = 'SmartAI' WHERE `entry` = 28890;
-
-DELETE FROM `smart_scripts` WHERE (`source_type` = 0 AND `entryorguid` = 28890);
-INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `event_param6`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
-(28890, 0, 0, 0, 11, 0, 100, 0, 0, 0, 0, 0, 0, 0, 53, 0, 13012100, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Gothik the Harvester - On Respawn - Start Patrol Path 13012100');
-
--- Personal and General SmartAI for Acherus Necromancers
-UPDATE `creature_template` SET `flags_extra` = `flags_extra` |134217728 WHERE (`entry` = 28889);
-UPDATE `creature_template` SET `AIName` = 'SmartAI' WHERE (`entry` = 28889);
-
-DELETE FROM `smart_scripts` WHERE (`entryorguid` IN (-130118, -130119, -130120)) AND (`source_type` = 0) AND (`id` IN (0));
-INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `event_param6`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
-(-130118, 0, 0, 0, 11, 0, 100, 0, 0, 0, 0, 0, 0, 0, 53, 0, 13011800, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Acherus Necromancer - On Respawn - Start Patrol Path 13011800'),
-(-130119, 0, 0, 0, 11, 0, 100, 0, 0, 0, 0, 0, 0, 0, 53, 0, 13011900, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Acherus Necromancer - On Respawn - Start Patrol Path 13011900'),
-(-130120, 0, 0, 0, 11, 0, 100, 0, 0, 0, 0, 0, 0, 0, 53, 0, 13012000, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Acherus Necromancer - On Respawn - Start Patrol Path 13012000');
+UPDATE `creature` SET `position_x` = 2221.4436, `position_y` = -5905.7744, `position_z` = 101.2207, `orientation` = 3.2595, `wander_distance` = 0, `MovementType` = 2 WHERE (`guid` IN (130121)) AND (`id1` IN (28890));
