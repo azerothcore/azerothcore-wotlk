@@ -15,17 +15,6 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-/* ScriptData
-SDName: Desolace
-SD%Complete: 100
-SDComment: Quest support: 5561
-SDCategory: Desolace
-EndScriptData */
-
-/* ContentData
-npc_aged_dying_ancient_kodo
-EndContentData */
-
 #include "CreatureScript.h"
 #include "Player.h"
 #include "ScriptedCreature.h"
@@ -33,7 +22,6 @@ EndContentData */
 #include "ScriptedGossip.h"
 #include "SpellInfo.h"
 
-// Ours
 enum Caravan
 {
     QUEST_BODYGUARD_FOR_HIRE            = 5821,
@@ -420,7 +408,6 @@ public:
     };
 };
 
-// Theirs
 enum DyingKodo
 {
     SAY_SMEED_HOME                  = 0,
@@ -512,9 +499,6 @@ public:
 
 void AddSC_desolace()
 {
-    // Ours
     new npc_cork_gizelton();
-
-    // Theirs
     new npc_aged_dying_ancient_kodo();
 }
