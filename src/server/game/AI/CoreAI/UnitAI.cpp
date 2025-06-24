@@ -222,20 +222,21 @@ SpellCastResult UnitAI::DoCast(uint32 spellId)
                 if (SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(spellId))
                 {
                     float range = spellInfo->GetMaxRange(false);
+                    SpellInfo const sp = *spellInfo;
 
                     DefaultTargetSelector defaultTargetSelector(me, range, false, true, -(int32)spellId);
-                    auto targetSelector = [=](Unit* target) {
+                    auto targetSelector = [defaultTargetSelector,sp](Unit* target) {
                         if (target->IsPlayer())
                         {
-                            if (spellInfo->HasAttribute(SPELL_ATTR5_NOT_ON_PLAYER))
+                            if (sp.HasAttribute(SPELL_ATTR5_NOT_ON_PLAYER))
                                 return false;
                         }
                         else
                         {
-                            if (spellInfo->HasAttribute(SPELL_ATTR3_ONLY_ON_PLAYER))
+                            if (sp.HasAttribute(SPELL_ATTR3_ONLY_ON_PLAYER))
                                 return false;
 
-                            if (spellInfo->HasAttribute(SPELL_ATTR5_NOT_ON_PLAYER_CONTROLLED_NPC) && target->IsControlledByPlayer())
+                            if (sp.HasAttribute(SPELL_ATTR5_NOT_ON_PLAYER_CONTROLLED_NPC) && target->IsControlledByPlayer())
                                 return false;
                         }
                         return defaultTargetSelector(target);
