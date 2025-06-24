@@ -228,7 +228,7 @@ SpellCastResult UnitAI::DoCast(uint32 spellId)
 
                     DefaultTargetSelector defaultTargetSelector(me, range, false, true, -(int32)spellId);
                     auto targetSelector = [&](Unit* target) {
-                        if (!target){}
+                        if (!target)
                             return false;
 
                         if (target->IsPlayer())
