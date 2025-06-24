@@ -9,21 +9,16 @@ DELETE FROM `creature` WHERE `id1` = 28906;
 -- Remove Scarlet Ghouls
 DELETE FROM `creature` WHERE `id1` = 28897;
 
--- Gluttonous Geists (Remove Wrong Guids)
+-- Gluttonous Geists (Remove Wrong Guid)
 DELETE FROM `creature` WHERE (`id1` = 28905) AND (`guid` IN (130312));
 
--- Scourge Gryphons (remove wrong smartai)
-UPDATE `creature_template` SET `AIName` = '' WHERE `entry` = 28906;
-DELETE FROM `smart_scripts` WHERE (`entryorguid` = 28906) AND (`source_type` = 0);
-
--- Gothik the Harvester (Remove Wrong SmartAI, Actionlist and Addon)
+-- Gothik the Harvester (Remove Wrong SmartAI and Actionlist)
 UPDATE `creature_template` SET `AIName` = '' WHERE `entry` = 28890;
 DELETE FROM `smart_scripts` WHERE (`entryorguid` = 28890) AND (`source_type` = 0);
 DELETE FROM `smart_scripts` WHERE (`entryorguid` IN (2889000, 2889001, 2889002, 2889003)) AND (`source_type` = 9);
-UPDATE `creature_addon` SET `path_id` = 13012100 WHERE (`guid` IN (130121));
 
--- Waypoints
-DELETE FROM `waypoint_data` WHERE `id` IN (13011800, 13011900, 13012000, 13012100, 13022500, 13022600, 13027500, 2889700, 2889701, 2889702, 2889703, 2889704);
+-- Sniffed Waypoints
+DELETE FROM `waypoint_data` WHERE `id` IN (13011800, 13011900, 13012000, 13012100, 13022500, 13022600, 13027500, 2889700, 2889701, 2889702, 2889703, 2889704, 2890600, 2890601, 2890602, 2890603, 2890604);
 INSERT INTO `waypoint_data` (`id`, `point`, `position_x`, `position_y`, `position_z`, `orientation`, `delay`, `move_type`, `action`, `action_chance`, `wpguid`) VALUES
 
 -- Acherus Necromancers
@@ -118,7 +113,41 @@ INSERT INTO `waypoint_data` (`id`, `point`, `position_x`, `position_y`, `positio
 ("2889704", 2, 2058.0674, -5929.905, 105.883446, NULL, 0, 0, 0, 100, 0),
 ("2889704", 3, 1993.3854, -5934.4653, 103.23653, NULL, 0, 0, 0, 100, 0),
 ("2889704", 4, 1914.4014, -5934.455, 103.03427, NULL, 0, 0, 0, 100, 0),
-("2889704", 5, 1830.4172, -5918.243, 109.36247, NULL, 0, 0, 0, 100, 0);
+("2889704", 5, 1830.4172, -5918.243, 109.36247, NULL, 0, 0, 0, 100, 0),
+
+-- Scourge Gryphons (patrol)
+("2890600", 1, 1841.5955, -5838.637, 132.42058, NULL, 0, 2, 0, 100, 0),
+("2890600", 2, 1784.4916, -5822.41, 136.97614, NULL, 0, 2, 0, 100, 0),
+("2890600", 3, 1778.6383, -5898.7744, 135.94832, NULL, 0, 2, 0, 100, 0),
+("2890600", 4, 1799.5969, -5927.9746, 135.94832, NULL, 0, 2, 0, 100, 0),
+("2890600", 5, 1840.5508, -5923.3677, 135.94832, NULL, 0, 2, 0, 100, 0),
+("2890600", 6, 1851.1428, -5908.0063, 132.42058, NULL, 0, 2, 0, 100, 0),
+("2890601", 1, 1768.2115, -5862.899, 144.99065, NULL, 0, 2, 0, 100, 0),
+("2890601", 2, 1813.2302, -5876.425, 166.76842, NULL, 0, 2, 0, 100, 0),
+("2890601", 3, 1764.9922, -5872.4487, 160.85176, NULL, 0, 2, 0, 100, 0),
+("2890601", 4, 1743.6553, -5895.7915, 160.85176, NULL, 0, 2, 0, 100, 0),
+("2890601", 5, 1774.8065, -5966.014, 160.85176, NULL, 0, 2, 0, 100, 0),
+("2890601", 6, 1848.6844, -5976.056, 160.85176, NULL, 0, 2, 0, 100, 0),
+("2890601", 7, 1880.036, -5950.2583, 144.99065, NULL, 0, 2, 0, 100, 0),
+("2890601", 8, 1848.8954, -5893.6606, 118.93514, NULL, 0, 2, 0, 100, 0),
+("2890601", 9, 1832.9224, -5836.408, 125.35181, NULL, 0, 2, 0, 100, 0),
+("2890602", 1, 1776.9531, -5897.504, 138.92468, NULL, 0, 2, 0, 100, 0),
+("2890602", 2, 1868.4694, -5846.4653, 138.92468, NULL, 0, 2, 0, 100, 0),
+("2890602", 3, 1909.5326, -5854.746, 138.92468, NULL, 0, 2, 0, 100, 0),
+("2890602", 4, 1895.7626, -5905.596, 138.92468, NULL, 0, 2, 0, 100, 0),
+("2890602", 5, 1824.9314, -5931.985, 135.24397, NULL, 0, 2, 0, 100, 0),
+("2890602", 6, 1784.5319, -5930.701, 135.43845, NULL, 0, 2, 0, 100, 0),
+("2890603", 1, 1791.9382, -5823.7505, 134.85405, NULL, 0, 2, 0, 100, 0),
+("2890603", 2, 1835.8387, -5818.3184, 118.6983, NULL, 0, 2, 0, 100, 0),
+("2890603", 3, 1836.2428, -5921.221, 130.0594, NULL, 0, 2, 0, 100, 0),
+("2890603", 4, 1797.7716, -5938.2046, 130.0594, NULL, 0, 2, 0, 100, 0),
+("2890603", 5, 1774.739, -5878.426, 142.21509, NULL, 0, 2, 0, 100, 0),
+("2890604", 1, 1841.5955, -5838.637, 132.42058, NULL, 0, 2, 0, 100, 0),
+("2890604", 2, 1851.1428, -5908.0063, 132.42058, NULL, 0, 2, 0, 100, 0),
+("2890604", 3, 1840.5508, -5923.3677, 135.94832, NULL, 0, 2, 0, 100, 0),
+("2890604", 4, 1799.5969, -5927.9746, 135.94832, NULL, 0, 2, 0, 100, 0),
+("2890604", 5, 1778.6383, -5898.7744, 135.94832, NULL, 0, 2, 0, 100, 0),
+("2890604", 6, 1784.4916, -5822.41, 136.97614, NULL, 0, 2, 0, 100, 0);
 
 -- Update Spawn Position, MT and WD for Gluttonous Geists
 UPDATE `creature` SET `position_x` = 2388.3235, `position_y` = -5898.371, `position_z` = 108.7139 , `orientation` = 0.833046, `MovementType` = 1, `wander_distance` = 10 WHERE (`guid` IN (130297)) AND (`id1` IN (28905));
@@ -180,15 +209,36 @@ INSERT INTO `creature_addon` (`guid`, `path_id`, `mount`, `bytes1`, `bytes2`, `e
 -- Update Spawn and MT for Gothik the Harvester
 UPDATE `creature` SET `position_x` = 2221.4436, `position_y` = -5905.7744, `position_z` = 101.2207, `orientation` = 3.2595, `wander_distance` = 0, `MovementType` = 2 WHERE (`guid` IN (130121)) AND (`id1` IN (28890));
 
+-- Update Waypoint ID for Gothik the Harvester
+UPDATE `creature_addon` SET `path_id` = 13012100 WHERE (`guid` IN (130121));
+
 -- Update Scarlet Ghouls SmartAI/ActionList
 UPDATE `creature_template` SET `AIName` = 'SmartAI' WHERE `entry` = 28897;
 
 DELETE FROM `smart_scripts` WHERE (`source_type` = 0 AND `entryorguid` = 28897);
 INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `event_param6`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
-(28897, 0, 0, 0, 54, 0, 100, 512, 0, 0, 0, 0, 0, 0, 80, 2889700, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Scarlet Ghoul - On Just Summoned - Run Script'),
-(28897, 0, 1, 0, 58, 0, 100, 512, 0, 0, 0, 0, 0, 0, 89, 10, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Scarlet Ghoul - On Path 0 Finished - Start Random Movement');
+(28897, 0, 0, 0, 54, 0, 100, 0, 0, 0, 0, 0, 0, 0, 80, 2889700, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Scarlet Ghoul - On Just Summoned - Run Script'),
+(28897, 0, 1, 0, 54, 0, 100, 0, 0, 0, 0, 0, 0, 0, 37, 300000, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Scarlet Ghoul - On Just Summoned - Kill Self'),
+(28897, 0, 2, 0, 58, 0, 100, 0, 0, 0, 0, 0, 0, 0, 89, 10, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Scarlet Ghoul - On Path 0 Finished - Start Random Movement');
 
 DELETE FROM `smart_scripts` WHERE (`entryorguid` = 2889700) AND (`source_type` = 9) AND (`id` IN (0, 1));
 INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `event_param6`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
 (2889700, 9, 0, 0, 0, 0, 100, 0, 2000, 2000, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 23, 0, 0, 0, 0, 0, 0, 0, 0, 'Scarlet Ghoul - Actionlist - Say Line 0'),
 (2889700, 9, 1, 0, 0, 0, 100, 0, 3000, 3000, 0, 0, 0, 0, 113, 2889700, 2889701, 2889702, 2889703, 2889704, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Scarlet Ghoul - Actionlist - Pick Closest Waypoint 2889700 2889701 2889702 2889703 2889704 0');
+
+-- Update Scourge Gryphons SmartAI/ActionList
+UPDATE `creature_template` SET `AIName` = 'SmartAI' WHERE `entry` = 28906;
+
+DELETE FROM `smart_scripts` WHERE (`source_type` = 0 AND `entryorguid` = 28906);
+INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `event_param6`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
+(28906, 0, 0, 0, 54, 0, 100, 0, 0, 0, 0, 0, 0, 0, 87, 2890600, 2890601, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Scourge Gryphon - On Just Summoned - Run Random Script'),
+(28906, 0, 1, 0, 54, 0, 100, 0, 0, 0, 0, 0, 0, 0, 37, 300000, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Scourge Gryphon - On Just Summoned - Kill Self'),
+(28906, 0, 2, 0, 34, 0, 100, 0, 8, 1, 0, 0, 0, 0, 233, 2890600, 2890604, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Scourge Gryphon - On Reached Point 1 - Start Random Path 2890600-2890604');
+
+DELETE FROM `smart_scripts` WHERE (`source_type` = 9 AND `entryorguid` = 2890600);
+INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `event_param6`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
+(2890600, 9, 0, 0, 0, 0, 100, 0, 3000, 3000, 0, 0, 0, 0, 69, 1, 0, 0, 0, 0, 0, 8, 0, 0, 0, 0, 1805.06, -5810.82, 128.38, 0, 'Scourge Gryphon - Actionlist - Move To Position');
+
+DELETE FROM `smart_scripts` WHERE (`source_type` = 9 AND `entryorguid` = 2890601);
+INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `event_param6`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
+(2890601, 9, 0, 0, 0, 0, 100, 0, 3000, 3000, 0, 0, 0, 0, 69, 1, 0, 0, 0, 0, 0, 8, 0, 0, 0, 0, 1831.77, -5913.56, 129.329, 0, 'Scourge Gryphon - Actionlist - Move To Position');
