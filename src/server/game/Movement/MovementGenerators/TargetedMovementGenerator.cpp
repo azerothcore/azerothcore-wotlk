@@ -300,8 +300,8 @@ void ChaseMovementGenerator<Creature>::DoInitialize(Creature* owner)
     i_path = nullptr;
     _lastTargetPosition.reset();
     i_recheckDistance.Reset(0);
-    owner->SetWalk(false);
     i_leashExtensionTimer.Reset(owner->GetAttackTime(BASE_ATTACK));
+    owner->SetWalk(false);
     owner->AddUnitState(UNIT_STATE_CHASE);
 }
 
