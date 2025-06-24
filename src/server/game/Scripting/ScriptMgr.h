@@ -41,7 +41,6 @@
 // Add support old api modules
 #include "AllScriptsObjects.h"
 
-class AuctionEntry;
 class AuctionHouseObject;
 class AuraScript;
 class Battleground;
@@ -81,6 +80,7 @@ class CharacterCreateInfo;
 class SpellScriptLoader;
 
 struct AchievementCriteriaData;
+struct AuctionEntry;
 struct Condition;
 struct ConditionSourceInfo;
 struct DungeonProgressionRequirements;

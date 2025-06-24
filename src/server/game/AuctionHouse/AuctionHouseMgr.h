@@ -93,9 +93,8 @@ enum class AuctionHouseId : uint8
 
 #define MAX_AUCTION_HOUSE_FACTIONS 3
 
-class AuctionEntry
+struct AuctionEntry
 {
-public:
     uint32 Id;
     AuctionHouseId houseId;
     ObjectGuid item_guid;
