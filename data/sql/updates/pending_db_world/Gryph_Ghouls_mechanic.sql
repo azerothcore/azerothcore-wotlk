@@ -1,4 +1,3 @@
-
 -- Death Knight Initiates (Remove Wrong Guids)
 DELETE FROM `creature` WHERE (`id1` = 28406) AND (`guid` IN (129516, 129517, 129518, 129544, 129545, 129555));
 DELETE FROM `creature_addon` WHERE (`guid` IN (129516, 129517, 129518, 129544, 129545, 129555));
@@ -89,32 +88,6 @@ INSERT INTO `waypoint_data` (`id`, `point`, `position_x`, `position_y`, `positio
 ("13012100", 18, 2238.359, -5890.6216, 101.02715, NULL, 0, 0, 0, 100, 0),
 ("13012100", 19, 2221.4436, -5905.7744, 101.2207, NULL, 0, 0, 0, 100, 0),
 
--- Scarlet Ghouls
-("2889700", 1, 2195.3638, -6096.684, 1.9554013, NULL, 0, 0, 0, 100, 0),
-("2889700", 2, 2134.17, -6095.6626, 6.1250257, NULL, 0, 0, 0, 100, 0),
-("2889700", 3, 2093.4673, -6034.3447, 9.515682, NULL, 0, 0, 0, 100, 0),
-("2889700", 4, 2027.7562, -6003.44, 37.135815, NULL, 0, 0, 0, 100, 0),
-("2889700", 5, 1830.4075, -5918.2676, 109.342636, NULL, 0, 0, 0, 100, 0),
-("2889701", 1, 2134.1697, -6095.6597, 6.124254, NULL, 0, 0, 0, 100, 0),
-("2889701", 2, 2093.51, -6034.311, 9.494477, NULL, 0, 0, 0, 100, 0),
-("2889701", 3, 2026.1627, -6002.748, 38.027634, NULL, 0, 0, 0, 100, 0),
-("2889701", 4, 1803.1136, -5819.4585, 108.53935, NULL, 0, 0, 0, 100, 0),
-("2889702", 1, 2149.137, -5851.649, 101.358665, NULL, 0, 0, 0, 100, 0),
-("2889702", 2, 2053.9631, -5848.3438, 102.19084, NULL, 0, 0, 0, 100, 0),
-("2889702", 3, 1979.5673, -5854.149, 100.74358, NULL, 0, 0, 0, 100, 0),
-("2889702", 4, 1892.4893, -5856.9663, 101.901276, NULL, 0, 0, 0, 100, 0),
-("2889702", 5, 1804.9038, -5811.438, 108.21074, NULL, 0, 0, 0, 100, 0),
-("2889703", 1, 2137.5742, -5793.847, 99.60594, NULL, 0, 0, 0, 100, 0),
-("2889703", 2, 2061.7412, -5811.5776, 103.39335, NULL, 0, 0, 0, 100, 0),
-("2889703", 3, 1981.0283, -5807.502, 101.002556, NULL, 0, 0, 0, 100, 0),
-("2889703", 4, 1912.7769, -5768.238, 103.644135, NULL, 0, 0, 0, 100, 0),
-("2889703", 5, 1830.3524, -5917.68, 109.23609, NULL, 0, 0, 0, 100, 0),
-("2889704", 1, 2135.5713, -5917.6436, 99.79425, NULL, 0, 0, 0, 100, 0),
-("2889704", 2, 2058.0674, -5929.905, 105.883446, NULL, 0, 0, 0, 100, 0),
-("2889704", 3, 1993.3854, -5934.4653, 103.23653, NULL, 0, 0, 0, 100, 0),
-("2889704", 4, 1914.4014, -5934.455, 103.03427, NULL, 0, 0, 0, 100, 0),
-("2889704", 5, 1830.4172, -5918.243, 109.36247, NULL, 0, 0, 0, 100, 0),
-
 -- Scourge Gryphons (patrol)
 ("2890600", 1, 1841.5955, -5838.637, 132.42058, NULL, 0, 2, 0, 100, 0),
 ("2890600", 2, 1784.4916, -5822.41, 136.97614, NULL, 0, 2, 0, 100, 0),
@@ -148,6 +121,34 @@ INSERT INTO `waypoint_data` (`id`, `point`, `position_x`, `position_y`, `positio
 ("2890604", 4, 1799.5969, -5927.9746, 135.94832, NULL, 0, 2, 0, 100, 0),
 ("2890604", 5, 1778.6383, -5898.7744, 135.94832, NULL, 0, 2, 0, 100, 0),
 ("2890604", 6, 1784.4916, -5822.41, 136.97614, NULL, 0, 2, 0, 100, 0);
+
+-- Scarlet Ghouls waypoints (must be optimized).
+DELETE FROM `waypoints` WHERE `entry` IN (2889700, 2889701, 2889702, 2889703, 2889704);
+INSERT INTO `waypoints` (`entry`, `pointid`, `position_x`, `position_y`, `position_z`, `orientation`, `point_comment`) VALUES
+("2889700", 1, 2195.3638, -6096.684, 1.9554013, NULL, 'Scarlet Ghoul'),
+("2889700", 2, 2134.17, -6095.6626, 6.1250257, NULL, 'Scarlet Ghoul'),
+("2889700", 3, 2093.4673, -6034.3447, 9.515682, NULL, 'Scarlet Ghoul'),
+("2889700", 4, 2027.7562, -6003.44, 37.135815, NULL, 'Scarlet Ghoul'),
+("2889700", 5, 1830.4075, -5918.2676, 109.342636, NULL, 'Scarlet Ghoul'),
+("2889701", 1, 2134.1697, -6095.6597, 6.124254, NULL, 'Scarlet Ghoul'),
+("2889701", 2, 2093.51, -6034.311, 9.494477, NULL, 'Scarlet Ghoul'),
+("2889701", 3, 2026.1627, -6002.748, 38.027634, NULL, 'Scarlet Ghoul'),
+("2889701", 4, 1803.1136, -5819.4585, 108.53935, NULL, 'Scarlet Ghoul'),
+("2889702", 1, 2149.137, -5851.649, 101.358665, NULL, 'Scarlet Ghoul'),
+("2889702", 2, 2053.9631, -5848.3438, 102.19084, NULL, 'Scarlet Ghoul'),
+("2889702", 3, 1979.5673, -5854.149, 100.74358, NULL, 'Scarlet Ghoul'),
+("2889702", 4, 1892.4893, -5856.9663, 101.901276, NULL, 'Scarlet Ghoul'),
+("2889702", 5, 1804.9038, -5811.438, 108.21074, NULL, 'Scarlet Ghoul'),
+("2889703", 1, 2137.5742, -5793.847, 99.60594, NULL, 'Scarlet Ghoul'),
+("2889703", 2, 2061.7412, -5811.5776, 103.39335, NULL, 'Scarlet Ghoul'),
+("2889703", 3, 1981.0283, -5807.502, 101.002556, NULL, 'Scarlet Ghoul'),
+("2889703", 4, 1912.7769, -5768.238, 103.644135, NULL, 'Scarlet Ghoul'),
+("2889703", 5, 1830.3524, -5917.68, 109.23609, NULL, 'Scarlet Ghoul'),
+("2889704", 1, 2135.5713, -5917.6436, 99.79425, NULL, 'Scarlet Ghoul'),
+("2889704", 2, 2058.0674, -5929.905, 105.883446, NULL, 'Scarlet Ghoul'),
+("2889704", 3, 1993.3854, -5934.4653, 103.23653, NULL, 'Scarlet Ghoul'),
+("2889704", 4, 1914.4014, -5934.455, 103.03427, NULL, 'Scarlet Ghoul'),
+("2889704", 5, 1830.4172, -5918.243, 109.36247, NULL, 'Scarlet Ghoul');
 
 -- Update Spawn Position, MT and WD for Gluttonous Geists
 UPDATE `creature` SET `position_x` = 2388.3235, `position_y` = -5898.371, `position_z` = 108.7139 , `orientation` = 0.833046, `MovementType` = 1, `wander_distance` = 10 WHERE (`guid` IN (130297)) AND (`id1` IN (28905));
@@ -219,7 +220,8 @@ DELETE FROM `smart_scripts` WHERE (`source_type` = 0 AND `entryorguid` = 28897);
 INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `event_param6`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
 (28897, 0, 0, 0, 54, 0, 100, 0, 0, 0, 0, 0, 0, 0, 80, 2889700, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Scarlet Ghoul - On Just Summoned - Run Script'),
 (28897, 0, 1, 0, 54, 0, 100, 0, 0, 0, 0, 0, 0, 0, 37, 300000, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Scarlet Ghoul - On Just Summoned - Kill Self'),
-(28897, 0, 2, 0, 58, 0, 100, 0, 0, 0, 0, 0, 0, 0, 89, 10, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Scarlet Ghoul - On Path 0 Finished - Start Random Movement');
+(28897, 0, 2, 0, 39, 0, 100, 0, 0, 0, 0, 0, 0, 0, 59, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Scarlet Ghoul - On Path Any Started - Set Run On'),
+(28897, 0, 3, 0, 58, 0, 100, 0, 0, 0, 0, 0, 0, 0, 89, 10, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Scarlet Ghoul - On Path 0 Finished - Start Random Movement');
 
 DELETE FROM `smart_scripts` WHERE (`entryorguid` = 2889700) AND (`source_type` = 9) AND (`id` IN (0, 1));
 INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `event_param6`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
