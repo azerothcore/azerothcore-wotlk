@@ -35,6 +35,9 @@ namespace AccountMgr
         if (utf8length(password) > MAX_PASS_STR)
             return AOR_PASS_TOO_LONG;                           // password's too long
 
+        if (utf8length(email) > MAX_EMAIL_STR)
+            return AOR_EMAIL_TOO_LONG;                          // email is too long
+
         Utf8ToUpperOnlyLatin(username);
         Utf8ToUpperOnlyLatin(password);
         Utf8ToUpperOnlyLatin(email);
