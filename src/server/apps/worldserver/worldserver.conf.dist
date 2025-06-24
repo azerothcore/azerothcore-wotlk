@@ -3835,7 +3835,7 @@ Arena.ArenaStartRating = 0
 #        Description: Start rating for new arena teams. (Only applies to season 1 - 5)
 #        Default:     1500
 
-Arena.ArenaStartRating = 1500
+Arena.LegacyArenaStartRating = 1500
 
 #
 #    Arena.ArenaStartPersonalRating
