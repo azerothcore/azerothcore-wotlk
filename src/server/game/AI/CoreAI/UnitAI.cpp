@@ -224,7 +224,7 @@ SpellCastResult UnitAI::DoCast(uint32 spellId)
                     float range = spellInfo->GetMaxRange(false);
 
                     DefaultTargetSelector defaultTargetSelector(me, range, false, true, -(int32)spellId);
-                    auto targetSelector = [&](Unit* target) {
+                    auto targetSelector = [=](Unit* target) {
                         if (target->IsPlayer())
                         {
                             if (spellInfo->HasAttribute(SPELL_ATTR5_NOT_ON_PLAYER))
