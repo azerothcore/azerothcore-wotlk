@@ -824,6 +824,9 @@ Metric.Enable = 0
 #        For InfluxDB v2:
 #                     Fill in every field.
 #
+#        NOTE:        Currently, Grafana will not work with the provided json files to visualize
+#                     data from InfluxDB v2.
+#
 #        Example:
 #                     Metric.InfluxDB.Connection = "hostname;port"
 #                     Metric.InfluxDB.v2 = 0 - (Disabled)
