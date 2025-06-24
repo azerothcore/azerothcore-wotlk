@@ -193,6 +193,9 @@ SpellCastResult UnitAI::DoCast(uint32 spellId)
                 {
                     DefaultTargetSelector targetSelector(me, spellInfo->GetMaxRange(false), false, true, 0);
                     target = SelectTarget(SelectTargetMethod::Random, 0, [&](Unit* target) {
+                        if (!target)
+                            return false;
+
                         if (target->IsPlayer())
                         {
                             if (spellInfo->HasAttribute(SPELL_ATTR5_NOT_ON_PLAYER))
@@ -222,21 +225,23 @@ SpellCastResult UnitAI::DoCast(uint32 spellId)
                 if (SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(spellId))
                 {
                     float range = spellInfo->GetMaxRange(false);
-                    SpellInfo const sp = *spellInfo;
 
                     DefaultTargetSelector defaultTargetSelector(me, range, false, true, -(int32)spellId);
-                    auto targetSelector = [defaultTargetSelector,sp](Unit* target) {
+                    auto targetSelector = [&](Unit* target) {
+                        if (!target){}
+                            return false;
+
                         if (target->IsPlayer())
                         {
-                            if (sp.HasAttribute(SPELL_ATTR5_NOT_ON_PLAYER))
+                            if (spellInfo->HasAttribute(SPELL_ATTR5_NOT_ON_PLAYER))
                                 return false;
                         }
                         else
                         {
-                            if (sp.HasAttribute(SPELL_ATTR3_ONLY_ON_PLAYER))
+                            if (spellInfo->HasAttribute(SPELL_ATTR3_ONLY_ON_PLAYER))
                                 return false;
 
-                            if (sp.HasAttribute(SPELL_ATTR5_NOT_ON_PLAYER_CONTROLLED_NPC) && target->IsControlledByPlayer())
+                            if (spellInfo->HasAttribute(SPELL_ATTR5_NOT_ON_PLAYER_CONTROLLED_NPC) && target->IsControlledByPlayer())
                                 return false;
                         }
                         return defaultTargetSelector(target);
