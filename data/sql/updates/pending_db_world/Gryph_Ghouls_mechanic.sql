@@ -128,27 +128,71 @@ INSERT INTO `waypoints` (`entry`, `pointid`, `position_x`, `position_y`, `positi
 ("2889700", 1, 2195.3638, -6096.684, 1.9554013, NULL, 'Scarlet Ghoul'),
 ("2889700", 2, 2134.17, -6095.6626, 6.1250257, NULL, 'Scarlet Ghoul'),
 ("2889700", 3, 2093.4673, -6034.3447, 9.515682, NULL, 'Scarlet Ghoul'),
-("2889700", 4, 2027.7562, -6003.44, 37.135815, NULL, 'Scarlet Ghoul'),
-("2889700", 5, 1830.4075, -5918.2676, 109.342636, NULL, 'Scarlet Ghoul'),
-("2889701", 1, 2134.1697, -6095.6597, 6.124254, NULL, 'Scarlet Ghoul'),
-("2889701", 2, 2093.51, -6034.311, 9.494477, NULL, 'Scarlet Ghoul'),
-("2889701", 3, 2026.1627, -6002.748, 38.027634, NULL, 'Scarlet Ghoul'),
-("2889701", 4, 1803.1136, -5819.4585, 108.53935, NULL, 'Scarlet Ghoul'),
+("2889700", 4, 2071.7117, -6016.3516, 12.850294, NULL, 'Scarlet Ghoul'),
+("2889700", 5, 2055.4822, -6009.923, 18.771358, NULL, 'Scarlet Ghoul'),
+("2889700", 6, 2039.4476, -6003.6445, 26.167065, NULL, 'Scarlet Ghoul'),
+("2889700", 7, 2031.4705, -6000.2095, 32.67357, NULL, 'Scarlet Ghoul'),
+("2889700", 8, 2027.7562, -6003.44, 37.135815, NULL, 'Scarlet Ghoul'),
+("2889700", 9, 2011.0663, -5996.0796, 44.111214, NULL, 'Scarlet Ghoul'),
+("2889700", 10, 1997.2365, -5990.1543, 54.388668, NULL, 'Scarlet Ghoul'),
+("2889700", 11, 1982.8765, -5984.335, 66.13348, NULL, 'Scarlet Ghoul'),
+("2889700", 12, 1969.1548, -5978.072, 77.45486, NULL, 'Scarlet Ghoul'),
+("2889700", 13, 1956.6283, -5972.649, 88.85666, NULL, 'Scarlet Ghoul'),
+("2889700", 14, 1941.6298, -5965.9805, 100.383446, NULL, 'Scarlet Ghoul'),
+("2889700", 15, 1916.4559, -5952.4526, 101.24492, NULL, 'Scarlet Ghoul'),
+("2889700", 16, 1882.0538, -5938.461, 103.13395, NULL, 'Scarlet Ghoul'),
+("2889700", 17, 1830.4075, -5918.2676, 109.342636, NULL, 'Scarlet Ghoul'),
+("2889701", 1, 2134.17, -6095.6626, 6.1250257, NULL, 'Scarlet Ghoul'),
+("2889701", 2, 2093.4673, -6034.3447, 9.515682, NULL, 'Scarlet Ghoul'),
+("2889701", 3, 2071.7117, -6016.3516, 12.850294, NULL, 'Scarlet Ghoul'),
+("2889701", 4, 2055.4822, -6009.923, 18.771358, NULL, 'Scarlet Ghoul'),
+("2889701", 5, 2039.4476, -6003.6445, 26.167065, NULL, 'Scarlet Ghoul'),
+("2889701", 6, 2031.4705, -6000.2095, 32.67357, NULL, 'Scarlet Ghoul'),
+("2889701", 7, 2027.7562, -6003.44, 37.135815, NULL, 'Scarlet Ghoul'),
+("2889701", 8, 2011.0663, -5996.0796, 44.111214, NULL, 'Scarlet Ghoul'),
+("2889701", 9, 1997.2365, -5990.1543, 54.388668, NULL, 'Scarlet Ghoul'),
+("2889701", 10, 1982.8765, -5984.335, 66.13348, NULL, 'Scarlet Ghoul'),
+("2889701", 11, 1969.1548, -5978.072, 77.45486, NULL, 'Scarlet Ghoul'),
+("2889701", 12, 1956.6283, -5972.649, 88.85666, NULL, 'Scarlet Ghoul'),
+("2889701", 13, 1941.6298, -5965.9805, 100.383446, NULL, 'Scarlet Ghoul'),
+("2889701", 14, 1932.219, -5938.6284, 102.60785, NULL, 'Scarlet Ghoul'),
+("2889701", 15, 1922.8248, -5911.5547, 101.57721, NULL, 'Scarlet Ghoul'),
+("2889701", 16, 1904.4485, -5886.1274, 101.34244, NULL, 'Scarlet Ghoul'),
+("2889701", 17, 1885.0721, -5868.9033, 102.31583, NULL, 'Scarlet Ghoul'),
+("2889701", 18, 1865.0361, -5856.944, 102.96336, NULL, 'Scarlet Ghoul'),
+("2889701", 19, 1845.4574, -5845.153, 102.1159, NULL, 'Scarlet Ghoul'),
+("2889701", 20, 1827.5663, -5833.8936, 102.35004, NULL, 'Scarlet Ghoul'),
+("2889701", 21, 1815.0728, -5826.0312, 104.49583, NULL, 'Scarlet Ghoul'),
+("2889701", 22, 1803.1136, -5819.4585, 108.53935, NULL, 'Scarlet Ghoul'),
 ("2889702", 1, 2149.137, -5851.649, 101.358665, NULL, 'Scarlet Ghoul'),
 ("2889702", 2, 2053.9631, -5848.3438, 102.19084, NULL, 'Scarlet Ghoul'),
 ("2889702", 3, 1979.5673, -5854.149, 100.74358, NULL, 'Scarlet Ghoul'),
 ("2889702", 4, 1892.4893, -5856.9663, 101.901276, NULL, 'Scarlet Ghoul'),
-("2889702", 5, 1804.9038, -5811.438, 108.21074, NULL, 'Scarlet Ghoul'),
+("2889702", 5, 1876.3115, -5847.535, 102.11675, NULL, 'Scarlet Ghoul'),
+("2889702", 6, 1854.0287, -5836.069, 101.78623, NULL, 'Scarlet Ghoul'),
+("2889702", 7, 1835.2474, -5825.923, 100.77055, NULL, 'Scarlet Ghoul'),
+("2889702", 8, 1819.5686, -5818.2095, 104.0615, NULL, 'Scarlet Ghoul'),
+("2889702", 9, 1804.9038, -5811.438, 108.21074, NULL, 'Scarlet Ghoul'),
 ("2889703", 1, 2137.5742, -5793.847, 99.60594, NULL, 'Scarlet Ghoul'),
 ("2889703", 2, 2061.7412, -5811.5776, 103.39335, NULL, 'Scarlet Ghoul'),
 ("2889703", 3, 1981.0283, -5807.502, 101.002556, NULL, 'Scarlet Ghoul'),
 ("2889703", 4, 1912.7769, -5768.238, 103.644135, NULL, 'Scarlet Ghoul'),
-("2889703", 5, 1830.3524, -5917.68, 109.23609, NULL, 'Scarlet Ghoul'),
+("2889703", 5, 1904.1472, -5806.2334, 100.84862, NULL, 'Scarlet Ghoul'),
+("2889703", 6, 1896.8984, -5836.7305, 101.094154, NULL, 'Scarlet Ghoul'),
+("2889703", 7, 1892.4893, -5856.9663, 101.901276, NULL, 'Scarlet Ghoul'),
+("2889703", 8, 1887.3644, -5884.821, 102.246506, NULL, 'Scarlet Ghoul'),
+("2889703", 9, 1871.814, -5893.7964, 103.64108, NULL, 'Scarlet Ghoul'),
+("2889703", 10, 1857.1747, -5902.0386, 104.01655, NULL, 'Scarlet Ghoul'),
+("2889703", 11, 1830.3524, -5917.68, 109.23609, NULL, 'Scarlet Ghoul'),
 ("2889704", 1, 2135.5713, -5917.6436, 99.79425, NULL, 'Scarlet Ghoul'),
 ("2889704", 2, 2058.0674, -5929.905, 105.883446, NULL, 'Scarlet Ghoul'),
 ("2889704", 3, 1993.3854, -5934.4653, 103.23653, NULL, 'Scarlet Ghoul'),
 ("2889704", 4, 1914.4014, -5934.455, 103.03427, NULL, 'Scarlet Ghoul'),
-("2889704", 5, 1830.4172, -5918.243, 109.36247, NULL, 'Scarlet Ghoul');
+("2889704", 5, 1897.3982, -5930.1514, 103.310394, NULL, 'Scarlet Ghoul'),
+("2889704", 6, 1879.5057, -5926.649, 104.29986, NULL, 'Scarlet Ghoul'),
+("2889704", 7, 1859.5677, -5922.3164, 104.62177, NULL, 'Scarlet Ghoul'),
+("2889704", 8, 1844.7861, -5919.962, 106.564575, NULL, 'Scarlet Ghoul'),
+("2889704", 9, 1830.4172, -5918.243, 109.36247, NULL, 'Scarlet Ghoul');
 
 -- Update Spawn Position, MT and WD for Gluttonous Geists
 UPDATE `creature` SET `position_x` = 2388.3235, `position_y` = -5898.371, `position_z` = 108.7139 , `orientation` = 0.833046, `MovementType` = 1, `wander_distance` = 10 WHERE (`guid` IN (130297)) AND (`id1` IN (28905));
@@ -240,6 +284,11 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 DELETE FROM `smart_scripts` WHERE (`source_type` = 9 AND `entryorguid` = 2890600);
 INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `event_param6`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
 (2890600, 9, 0, 0, 0, 0, 100, 0, 3000, 3000, 0, 0, 0, 0, 69, 1, 0, 0, 0, 0, 0, 8, 0, 0, 0, 0, 1805.06, -5810.82, 128.38, 0, 'Scourge Gryphon - Actionlist - Move To Position');
+
+DELETE FROM `smart_scripts` WHERE (`source_type` = 9 AND `entryorguid` = 2890601);
+INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `event_param6`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
+(2890601, 9, 0, 0, 0, 0, 100, 0, 3000, 3000, 0, 0, 0, 0, 69, 1, 0, 0, 0, 0, 0, 8, 0, 0, 0, 0, 1831.77, -5913.56, 129.329, 0, 'Scourge Gryphon - Actionlist - Move To Position');
+
 
 DELETE FROM `smart_scripts` WHERE (`source_type` = 9 AND `entryorguid` = 2890601);
 INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `event_param6`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
