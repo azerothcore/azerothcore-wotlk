@@ -126,7 +126,6 @@ void Metric::LoadFromConfigs()
             if (_org.empty() || _bucket.empty() || _token.empty())
             {
                 LOG_ERROR("metric", "InfluxDB v2 parameters missing: org, bucket, or token.");
-                _enabled = false;
                 return;
             }
         }
