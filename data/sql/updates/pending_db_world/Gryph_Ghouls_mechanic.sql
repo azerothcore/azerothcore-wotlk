@@ -1,3 +1,4 @@
+
 -- Death Knight Initiates (Remove Wrong Guids)
 DELETE FROM `creature` WHERE (`id1` = 28406) AND (`guid` IN (129516, 129517, 129518, 129544, 129545, 129555));
 DELETE FROM `creature_addon` WHERE (`guid` IN (129516, 129517, 129518, 129544, 129545, 129555));
@@ -284,11 +285,6 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 DELETE FROM `smart_scripts` WHERE (`source_type` = 9 AND `entryorguid` = 2890600);
 INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `event_param6`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
 (2890600, 9, 0, 0, 0, 0, 100, 0, 3000, 3000, 0, 0, 0, 0, 69, 1, 0, 0, 0, 0, 0, 8, 0, 0, 0, 0, 1805.06, -5810.82, 128.38, 0, 'Scourge Gryphon - Actionlist - Move To Position');
-
-DELETE FROM `smart_scripts` WHERE (`source_type` = 9 AND `entryorguid` = 2890601);
-INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `event_param6`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
-(2890601, 9, 0, 0, 0, 0, 100, 0, 3000, 3000, 0, 0, 0, 0, 69, 1, 0, 0, 0, 0, 0, 8, 0, 0, 0, 0, 1831.77, -5913.56, 129.329, 0, 'Scourge Gryphon - Actionlist - Move To Position');
-
 
 DELETE FROM `smart_scripts` WHERE (`source_type` = 9 AND `entryorguid` = 2890601);
 INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `event_param6`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
