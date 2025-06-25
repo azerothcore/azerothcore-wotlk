@@ -115,4 +115,4 @@ local.properties
 !modules/mod-weekend-xp
 !modules/mod-server-auto-shutdown
 !modules/mod-war-effort
-
+!mod-bg-item-reward
