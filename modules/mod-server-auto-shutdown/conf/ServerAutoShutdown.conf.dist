@@ -24,6 +24,15 @@ ServerAutoShutdown.Enabled = 0
 ServerAutoShutdown.EveryDays = 1
 
 #
+#    ServerAutoShutdown.Weekday
+#        Description: If set (0-6, where 0=Sunday, 1=Monday, ... 6=Saturday), the server will restart on this weekday at the configured time.
+#                     Overrides ServerAutoShutdown.EveryDays if set to a valid value.
+#        Default:     -1 (disabled)
+#
+
+ServerAutoShutdown.Weekday = -1
+
+#
 #    ServerAutoShutdown.Time
 #        Description: Time (in HH:MM:SS) - 24 hours format
 #        Default:     04:00:00

@@ -15,6 +15,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "Common.h"
 #include "Config.h"
 #include "Duration.h"
 #include "GameEventMgr.h"
@@ -35,19 +36,43 @@ namespace
     // Scheduler - for update
     TaskScheduler scheduler;
 
-    time_t GetNextResetTime(time_t time, uint32 day, uint8 hour, uint8 minute, uint8 second)
+    time_t GetNextResetTime(time_t time, uint32 restartDays, uint8 restartHour, uint8 restartMinute, uint8 restartSecond)
     {
         tm timeLocal = Acore::Time::TimeBreakdown(time);
-        timeLocal.tm_hour = hour;
-        timeLocal.tm_min = minute;
-        timeLocal.tm_sec = second;
+        timeLocal.tm_hour = restartHour;
+        timeLocal.tm_min = restartMinute;
+        timeLocal.tm_sec = restartSecond;
 
         time_t midnightLocal = mktime(&timeLocal);
 
-        if (day > 1 || midnightLocal <= time)
-            midnightLocal += 86400 * day;
+        if (restartDays > 1 || midnightLocal <= time)
+            midnightLocal += DAY * restartDays;
 
         return midnightLocal;
+    }
+
+    // Returns the next time_t for the given weekday (0=Sunday, 1=Monday, ..., 6=Saturday) at the given hour/min/sec
+    time_t GetNextWeekdayTime(time_t now, int weekday, uint8 restartHour, uint8 restartMinute, uint8 restartSecond)
+    {
+        tm timeLocal = Acore::Time::TimeBreakdown(now);
+        int currentWeekday = timeLocal.tm_wday;
+        int daysUntil = (weekday - currentWeekday + 7) % 7;
+        if (daysUntil == 0)
+        {
+            // If today, check if the time has already passed
+            if (timeLocal.tm_hour > restartHour ||
+                (timeLocal.tm_hour == restartHour && timeLocal.tm_min > restartMinute) ||
+                (timeLocal.tm_hour == restartHour && timeLocal.tm_min == restartMinute && timeLocal.tm_sec >= restartSecond))
+            {
+                daysUntil = 7;
+            }
+        }
+        timeLocal.tm_mday += daysUntil;
+        timeLocal.tm_hour = restartHour;
+        timeLocal.tm_min = restartMinute;
+        timeLocal.tm_sec = restartSecond;
+        time_t result = mktime(&timeLocal);
+        return result;
     }
 }
 
@@ -91,41 +116,60 @@ void ServerAutoShutdown::Init()
         return;
     }
 
-    uint32 day =  sConfigMgr->GetOption<uint32>("ServerAutoShutdown.EveryDays", 1);
-    uint8 hour = *Acore::StringTo<uint8>(tokens.at(0));
-    uint8 minute = *Acore::StringTo<uint8>(tokens.at(1));
-    uint8 second = *Acore::StringTo<uint8>(tokens.at(2));
+    int weekday = sConfigMgr->GetOption<int>("ServerAutoShutdown.Weekday", -1);
+    uint32 restartDays =  sConfigMgr->GetOption<uint32>("ServerAutoShutdown.EveryDays", 1);
+    uint8 restartHour = *Acore::StringTo<uint8>(tokens.at(0));
+    uint8 restartMinute = *Acore::StringTo<uint8>(tokens.at(1));
+    uint8 restartSecond = *Acore::StringTo<uint8>(tokens.at(2));
 
-    if (day < 1 || day > 365)
+    auto nowTime = time(nullptr);
+    uint64 nextResetTime = 0;
+
+    if (weekday >= 0 && weekday <= 6)
     {
-        LOG_ERROR("module", "> ServerAutoShutdown: Incorrect day in config option 'ServerAutoShutdown.EveryDays' - '{}'", day);
+        nextResetTime = GetNextWeekdayTime(nowTime, weekday, restartHour, restartMinute, restartSecond);
+    }
+    else
+    {
+        if (restartDays < 1 || restartDays > 365)
+        {
+            LOG_ERROR("module", "> ServerAutoShutdown: Incorrect day in config option 'ServerAutoShutdown.EveryDays' - '{}'", restartDays);
+            _isEnableModule = false;
+            return;
+        }
+        nextResetTime = GetNextResetTime(nowTime, restartDays, restartHour, restartMinute, restartSecond);
+    }
+
+    if (restartDays < 1 || restartDays > 365)
+    {
+        LOG_ERROR("module", "> ServerAutoShutdown: Incorrect day in config option 'ServerAutoShutdown.EveryDays' - '{}'", restartDays);
         _isEnableModule = false;
     }
-    else if (hour > 23)
+    else if (restartHour > 23)
     {
         LOG_ERROR("module", "> ServerAutoShutdown: Incorrect hour in config option 'ServerAutoShutdown.Time' - '{}'", configTime);
         _isEnableModule = false;
     }
-    else if (minute >= 60)
+    else if (restartMinute >= 60)
     {
         LOG_ERROR("module", "> ServerAutoShutdown: Incorrect minute in config option 'ServerAutoShutdown.Time' - '{}'", configTime);
         _isEnableModule = false;
     }
-    else if (second >= 60)
+    else if (restartSecond >= 60)
     {
         LOG_ERROR("module", "> ServerAutoShutdown: Incorrect second in config option 'ServerAutoShutdown.Time' - '{}'", configTime);
         _isEnableModule = false;
     }
 
-    auto nowTime = time(nullptr);
-    //Seconds nowTime = GameTime::GetGameTime();
-    uint64 nextResetTime = GetNextResetTime(nowTime, day, hour, minute, second);
     uint32 diffToShutdown = nextResetTime - static_cast<uint32>(nowTime);
 
     if (diffToShutdown < 10)
     {
-        LOG_WARN("module", "> ServerAutoShutdown: Next time to shutdown < 10 seconds, Set next day");
-        nextResetTime += 86400 * day;
+        LOG_WARN("module", "> ServerAutoShutdown: Next time to shutdown < 10 seconds, Set next period");
+        if (weekday >= 0 && weekday <= 6)
+            nextResetTime += WEEK;
+        else
+            nextResetTime += DAY * restartDays;
         diffToShutdown = nextResetTime - static_cast<uint32>(nowTime);
     }
 
@@ -140,11 +184,11 @@ void ServerAutoShutdown::Init()
     LOG_INFO("module", "> ServerAutoShutdown: Remaining time to shutdown - {}", Acore::Time::ToTimeString<Seconds>(diffToShutdown));
     LOG_INFO("module", " ");
 
-    uint32 preAnnounceSeconds = sConfigMgr->GetOption<uint32>("ServerAutoShutdown.PreAnnounce.Seconds", 3600);
-    if (preAnnounceSeconds > 86400)
+    uint32 preAnnounceSeconds = sConfigMgr->GetOption<uint32>("ServerAutoShutdown.PreAnnounce.Seconds", HOUR);
+    if (preAnnounceSeconds > DAY)
     {
         LOG_ERROR("module", "> ServerAutoShutdown: Ahah, how could this happen? Time to preannouce has been set to more than 1 day? ({}). Change to 1 hour (3600)", preAnnounceSeconds);
-        preAnnounceSeconds = 3600;
+        preAnnounceSeconds = HOUR;
     }
 
     uint32 timeToPreAnnounce = static_cast<uint32>(nextResetTime) - preAnnounceSeconds;
