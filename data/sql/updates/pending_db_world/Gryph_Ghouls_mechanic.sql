@@ -185,7 +185,10 @@ INSERT INTO `waypoints` (`entry`, `pointid`, `position_x`, `position_y`, `positi
 ("2889703", 9, 1871.814, -5893.7964, 103.64108, NULL, 'Scarlet Ghoul'),
 ("2889703", 10, 1857.1747, -5902.0386, 104.01655, NULL, 'Scarlet Ghoul'),
 ("2889703", 11, 1830.3524, -5917.68, 109.23609, NULL, 'Scarlet Ghoul'),
+
+-- Must be optimized
 ("2889704", 1, 2135.5713, -5917.6436, 99.79425, NULL, 'Scarlet Ghoul'),
+-- 
 ("2889704", 2, 2058.0674, -5929.905, 105.883446, NULL, 'Scarlet Ghoul'),
 ("2889704", 3, 1993.3854, -5934.4653, 103.23653, NULL, 'Scarlet Ghoul'),
 ("2889704", 4, 1914.4014, -5934.455, 103.03427, NULL, 'Scarlet Ghoul'),
@@ -258,25 +261,24 @@ UPDATE `creature` SET `position_x` = 2221.4436, `position_y` = -5905.7744, `posi
 -- Update Waypoint ID for Gothik the Harvester
 UPDATE `creature_addon` SET `path_id` = 13012100 WHERE (`guid` IN (130121));
 
+-- Create Scarlet Ghouls template_movement.
+DELETE FROM `creature_template_movement` WHERE (`CreatureId` = 28897);
+INSERT INTO `creature_template_movement` (`CreatureId`, `Ground`, `Swim`, `Flight`, `Rooted`, `Chase`, `Random`, `InteractionPauseTimer`) VALUES
+(28897, 1, 0, 0, 0, 0, 2, 0);
+
 -- Update Scarlet Ghouls SmartAI/ActionList
 UPDATE `creature_template` SET `AIName` = 'SmartAI' WHERE `entry` = 28897;
 
 DELETE FROM `smart_scripts` WHERE (`source_type` = 0 AND `entryorguid` = 28897);
 INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `event_param6`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
 (28897, 0, 0, 0, 54, 0, 100, 0, 0, 0, 0, 0, 0, 0, 80, 2889700, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Scarlet Ghoul - On Just Summoned - Run Script'),
-(28897, 0, 1, 0, 39, 0, 100, 0, 0, 0, 0, 0, 0, 0, 59, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Scarlet Ghoul - On Path Any Started - Set Run On'),
-(28897, 0, 2, 0, 40, 0, 100, 0, 17, 2889700, 0, 0, 0, 0, 55, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Scarlet Ghoul - On Point 17 of Path 2889700 Reached - Stop Waypoint'), -- Action WP_STOP doesn't work properly
-(28897, 0, 3, 0, 40, 0, 100, 0, 22, 2889701, 0, 0, 0, 0, 55, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Scarlet Ghoul - On Point 22 of Path 2889701 Reached - Stop Waypoint'), -- Action WP_STOP doesn't work properly
-(28897, 0, 4, 0, 40, 0, 100, 0, 9, 2889702, 0, 0, 0, 0, 55, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Scarlet Ghoul - On Point 9 of Path 2889702 Reached - Stop Waypoint'), -- Action WP_STOP doesn't work properly
-(28897, 0, 5, 0, 40, 0, 100, 0, 11, 2889703, 0, 0, 0, 0, 55, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Scarlet Ghoul - On Point 11 of Path 2889703 Reached - Stop Waypoint'), -- Action WP_STOP doesn't work properly
-(28897, 0, 6, 0, 40, 0, 100, 0, 9, 2889704, 0, 0, 0, 0, 55, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Scarlet Ghoul - On Point 9 of Path 2889704 Reached - Stop Waypoint'), -- Action WP_STOP doesn't work properly
-(28897, 0, 7, 0, 57, 0, 100, 0, 0, 0, 0, 0, 0, 0, 89, 10, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Scarlet Ghoul - On Path 0 Stopped - Start Random Movement'), -- Action WP_STOP doesn't work properly, so this action never starts.
-(28897, 0, 8, 0, 54, 0, 100, 0, 0, 0, 0, 0, 0, 0, 37, 300000, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Scarlet Ghoul - On Just Summoned - Kill Self');
+(28897, 0, 1, 0, 54, 0, 100, 0, 0, 0, 0, 0, 0, 0, 37, 300000, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Scarlet Ghoul - On Just Summoned - Kill Self'),
+(28897, 0, 2, 0, 58, 0, 100, 0, 0, 0, 0, 0, 0, 0, 89, 30, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Scarlet Ghoul - On Path 0 Finished - Start Random Movement');
 
-DELETE FROM `smart_scripts` WHERE (`entryorguid` = 2889700) AND (`source_type` = 9) AND (`id` IN (0, 1));
+DELETE FROM `smart_scripts` WHERE (`source_type` = 9 AND `entryorguid` = 2889700);
 INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `event_param6`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
 (2889700, 9, 0, 0, 0, 0, 100, 0, 2000, 2000, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 23, 0, 0, 0, 0, 0, 0, 0, 0, 'Scarlet Ghoul - Actionlist - Say Line 0'),
-(2889700, 9, 1, 0, 0, 0, 100, 0, 3000, 3000, 0, 0, 0, 0, 113, 2889700, 2889701, 2889702, 2889703, 2889704, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Scarlet Ghoul - Actionlist - Pick Closest Waypoint 2889700 2889701 2889702 2889703 2889704 0');
+(2889700, 9, 1, 0, 0, 0, 100, 0, 3000, 3000, 0, 0, 0, 0, 113, 2889700, 2889704, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Scarlet Ghoul - Actionlist - Start Closest Waypoint 2889700-2889704');
 
 -- Update Scourge Gryphons SmartAI/ActionList
 UPDATE `creature_template` SET `AIName` = 'SmartAI' WHERE `entry` = 28906;
@@ -294,3 +296,14 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 DELETE FROM `smart_scripts` WHERE (`source_type` = 9 AND `entryorguid` = 2890601);
 INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `event_param6`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
 (2890601, 9, 0, 0, 0, 0, 100, 0, 3000, 3000, 0, 0, 0, 0, 69, 1, 0, 0, 0, 0, 0, 8, 0, 0, 0, 0, 1831.77, -5913.56, 129.329, 0, 'Scourge Gryphon - Actionlist - Move To Position');
+
+-- Acherus Dummies (disable gravity and set active)
+DELETE FROM `creature_template_movement` WHERE (`CreatureId` = 28935);
+INSERT INTO `creature_template_movement` (`CreatureId`, `Ground`, `Swim`, `Flight`, `Rooted`, `Chase`, `Random`, `InteractionPauseTimer`) VALUES
+(28935, 0, 0, 1, 0, 0, 0, 0);
+
+UPDATE `creature_template` SET `AIName` = 'SmartAI' WHERE `entry` = 28935;
+
+DELETE FROM `smart_scripts` WHERE (`source_type` = 0 AND `entryorguid` = 28935);
+INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `event_param6`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
+(28935, 0, 0, 0, 25, 0, 100, 0, 0, 0, 0, 0, 0, 0, 48, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Acherus Dummy - On Reset - Set Active On');
