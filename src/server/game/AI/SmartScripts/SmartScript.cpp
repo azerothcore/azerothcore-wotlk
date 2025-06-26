@@ -2506,46 +2506,50 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
         }
         case SMART_ACTION_START_CLOSEST_WAYPOINT:
         {
-            if (e.action.startClosestWaypoint.pathId1 && e.action.startClosestWaypoint.pathId2)
+            if (!e.action.startClosestWaypoint.pathId1 || !e.action.startClosestWaypoint.pathId2 || e.action.startClosestWaypoint.pathId2 < e.action.startClosestWaypoint.pathId1)
             {
-                float distanceToClosest = std::numeric_limits<float>::max();
-                uint32 closestWpId = 0;
+                LOG_ERROR("sql.sql", "SmartAIMgr: Entry {} SourceType {} Event {} Action {} has invalid pathId1 ({}) or pathId2 ({}), range is incorrect.",
+                    e.entryOrGuid, e.GetScriptType(), e.event_id, e.GetActionType(),
+                    e.action.startClosestWaypoint.pathId1, e.action.startClosestWaypoint.pathId2);
+                return;
+            }
 
-                for (WorldObject* target : targets)
+            float distanceToClosest = std::numeric_limits<float>::max();
+            uint32 closestWpId = 0;
+
+            for (WorldObject* target : targets)
+            {
+                if (Creature* creature = target->ToCreature())
                 {
-                    if (Creature* creature = target->ToCreature())
+                    if (IsSmart(creature))
                     {
-                        if (IsSmart(creature))
+                        for (uint32 wp = e.action.startClosestWaypoint.pathId1; wp <= e.action.startClosestWaypoint.pathId2; ++wp)
                         {
-                            for (uint32 wp = e.action.startClosestWaypoint.pathId1; wp <= e.action.startClosestWaypoint.pathId2; ++wp)
-                            {
-                                WPPath* path = sSmartWaypointMgr->GetPath(wp);
-                                if (!path || path->empty())
-                                    continue;
+                            WPPath* path = sSmartWaypointMgr->GetPath(wp);
+                            if (!path || path->empty())
+                                continue;
 
-                                auto itrWp = path->find(1);
-                                if (itrWp != path->end())
+                            auto itrWp = path->find(1);
+                            if (itrWp != path->end())
+                            {
+                                if (WayPoint* wpData = itrWp->second)
                                 {
-                                    if (WayPoint* wpData = itrWp->second)
+                                    float distToThisPath = creature->GetExactDistSq(wpData->x, wpData->y, wpData->z);
+                                    if (distToThisPath < distanceToClosest)
                                     {
-                                        float distToThisPath = creature->GetExactDistSq(wpData->x, wpData->y, wpData->z);
-                                        if (distToThisPath < distanceToClosest)
-                                        {
-                                            distanceToClosest = distToThisPath;
-                                            closestWpId = wp;
-                                        }
+                                        distanceToClosest = distToThisPath;
+                                        closestWpId = wp;
                                     }
                                 }
                             }
+                        }
 
-                            if (closestWpId)
-                            {
-                                CAST_AI(SmartAI, creature->AI())->StartPath(
-                                    e.action.startClosestWaypoint.repeat,
-                                    closestWpId,
-                                    e.action.startClosestWaypoint.run
-                                );
-                            }
+                        if (closestWpId)
+                        {
+                            bool repeat = e.action.startClosestWaypoint.repeat <= 1 ? e.action.startClosestWaypoint.repeat : 0;
+                            bool run = e.action.startClosestWaypoint.run <= 1 ? e.action.startClosestWaypoint.run : 0;
+
+                            CAST_AI(SmartAI, creature->AI())->StartPath(repeat, closestWpId, run);
                         }
                     }
                 }
