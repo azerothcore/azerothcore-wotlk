@@ -88,6 +88,15 @@ public:
 
     static bool HandleGoCreatureCIdCommand(ChatHandler* handler, Variant<Hyperlink<creature_entry>, uint32> cId, Optional<uint32> _pos)
     {
+        uint32 pos = *_pos;
+        if (!pos)
+            pos = 1;
+        if (pos < 1)
+        {
+            handler->SendErrorMessage(LANG_COMMAND_FACTION_INVPARAM,pos);
+            return false;
+        }
+
         std::vector<CreatureData const*> spawnpoints = GetCreatureDataList(*cId);
 
         if (spawnpoints.empty())
@@ -96,17 +105,13 @@ public:
             return false;
         }
 
-        uint32 pos = *_pos;
-        if (!pos)
-            pos = 0;
-
-        if (spawnpoints.size() <= pos)
+        if (spawnpoints.size() < pos)
         {
             handler->SendErrorMessage(LANG_COMMAND_GONOTENOUGHSPAWNS, pos, spawnpoints.size());
             return false;
         }
 
-        CreatureData const* spawnpoint = spawnpoints[pos];
+        CreatureData const* spawnpoint = spawnpoints[--pos];
 
         return DoTeleport(handler, { spawnpoint->posX, spawnpoint->posY, spawnpoint->posZ }, spawnpoint->mapid);
     }
@@ -167,6 +172,15 @@ public:
 
     static bool HandleGoGameObjectGOIdCommand(ChatHandler* handler, uint32 goId, Optional<uint32> _pos)
     {
+        uint32 pos = *_pos;
+        if (!pos)
+            pos = 1;
+        if (pos < 1)
+        {
+            handler->SendErrorMessage(LANG_COMMAND_FACTION_INVPARAM,pos);
+            return false;
+        }
+
         std::vector<GameObjectData const*> spawnpoints = GetGameObjectDataList(goId);
 
         if (spawnpoints.empty())
@@ -175,17 +189,13 @@ public:
             return false;
         }
 
-        uint32 pos = *_pos;
-        if (!pos)
-            pos = 0;
-
-        if (spawnpoints.size() <= pos)
+        if (spawnpoints.size() < pos)
         {
             handler->SendErrorMessage(LANG_COMMAND_GONOTENOUGHSPAWNS, pos, spawnpoints.size());
             return false;
         }
 
-        GameObjectData const* spawnpoint = spawnpoints[pos];
+        GameObjectData const* spawnpoint = spawnpoints[--pos];
 
         return DoTeleport(handler, { spawnpoint->posX, spawnpoint->posY, spawnpoint->posZ }, spawnpoint->mapid);
     }
