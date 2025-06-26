@@ -1,25 +1,25 @@
 -- The Aldor
 -- Venom Sac: From Hatred to Neutral
-UPDATE `quest_template_addon` SET `RequiredMinRepValue` = -42000, `RequiredMaxRepValue` = 0, RequiredMinRepFaction = 932, RequiredMaxRepFaction = 932 WHERE `id` IN (10017, 10019);
+UPDATE `quest_template_addon` SET `RequiredMinRepValue` = -42000, `RequiredMaxRepValue` = 0, `RequiredMinRepFaction` = 932, `RequiredMaxRepFaction` = 932 WHERE `id` IN (10017, 10019);
 
 -- Mark of Kil'jaden: From Neutral to Honoured
-UPDATE `quest_template_addon` SET `RequiredMinRepValue` = 0, `RequiredMaxRepValue` = 9000, RequiredMinRepFaction = 932, RequiredMaxRepFaction = 932 WHERE `id` IN (10017, 10019) WHERE `id` IN (10325, 10326, 10327);
+UPDATE `quest_template_addon` SET `RequiredMinRepValue` = 0, `RequiredMaxRepValue` = 9000, `RequiredMinRepFaction` = 932, `RequiredMaxRepFaction` = 932 WHERE `id` IN (10017, 10019) WHERE `id` IN (10325, 10326, 10327);
 
 -- Mark of Sargeras: From Neutral to Exalted
-UPDATE `quest_template_addon` SET `RequiredMinRepValue` = 0, `RequiredMaxRepValue` = 0, RequiredMinRepFaction = 932, RequiredMaxRepFaction = 932 WHERE `id` IN (10017, 10019) WHERE `id` IN (10653, 10654, 10655, 10826, 10827, 10828);
+UPDATE `quest_template_addon` SET `RequiredMinRepValue` = 0, `RequiredMaxRepValue` = 0, `RequiredMinRepFaction` = 932, `RequiredMaxRepFaction` = 932 WHERE `id` IN (10017, 10019) WHERE `id` IN (10653, 10654, 10655, 10826, 10827, 10828);
 
 -- 	Fel Armament: From Neutral to Exalted
-UPDATE `quest_template_addon` SET `RequiredMinRepValue` = 0, `RequiredMaxRepValue` = 0, RequiredMinRepFaction = 932, RequiredMaxRepFaction = 932 WHERE `id` IN (10017, 10019) WHERE `id` IN (10420, 10421);
+UPDATE `quest_template_addon` SET `RequiredMinRepValue` = 0, `RequiredMaxRepValue` = 0, `RequiredMinRepFaction` = 932, `RequiredMaxRepFaction` = 932 WHERE `id` IN (10017, 10019) WHERE `id` IN (10420, 10421);
 
 -- The Scryers
 -- Basilisk Eye: From Hatred to Neutral
-UPDATE `quest_template_addon` SET `RequiredMinRepValue` = -42000, `RequiredMaxRepValue` = 0, RequiredMinRepFaction = 934, RequiredMaxRepFaction = 934 WHERE `id` IN (10024, 10025);
+UPDATE `quest_template_addon` SET `RequiredMinRepValue` = -42000, `RequiredMaxRepValue` = 0, `RequiredMinRepFaction` = 934, `RequiredMaxRepFaction` = 934 WHERE `id` IN (10024, 10025);
 
 -- Firewing Signet: From Neutral to Honoured
-UPDATE `quest_template_addon` SET `RequiredMinRepValue` = 0, `RequiredMaxRepValue` = 9000, RequiredMinRepFaction = 934, RequiredMaxRepFaction = 934 WHERE `id` IN (10412, 10415, 10414);
+UPDATE `quest_template_addon` SET `RequiredMinRepValue` = 0, `RequiredMaxRepValue` = 9000, `RequiredMinRepFaction` = 934, `RequiredMaxRepFaction` = 934 WHERE `id` IN (10412, 10415, 10414);
 
 -- Sunfury Signet: From Neutral to Exalted
-UPDATE `quest_template_addon` SET `RequiredMinRepValue` = 0, `RequiredMaxRepValue` = 0, RequiredMinRepFaction = 934, RequiredMaxRepFaction = 934 WHERE `id` IN (10656, 10658, 10659, 10822, 10822, 10823, 10824);
+UPDATE `quest_template_addon` SET `RequiredMinRepValue` = 0, `RequiredMaxRepValue` = 0, `RequiredMinRepFaction` = 934, `RequiredMaxRepFaction` = 934 WHERE `id` IN (10656, 10658, 10659, 10822, 10822, 10823, 10824);
 
 -- 	Arcane Tome: From Neutral to Exalted
-UPDATE `quest_template_addon` SET `RequiredMinRepValue` = 0, `RequiredMaxRepValue` = 0, RequiredMinRepFaction = 934, RequiredMaxRepFaction = 934 WHERE `id` IN (10419, 10416);
+UPDATE `quest_template_addon` SET `RequiredMinRepValue` = 0, `RequiredMaxRepValue` = 0, `RequiredMinRepFaction` = 934, `RequiredMaxRepFaction` = 934 WHERE `id` IN (10419, 10416);
