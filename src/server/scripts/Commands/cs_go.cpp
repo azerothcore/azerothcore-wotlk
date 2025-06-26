@@ -93,7 +93,7 @@ public:
             pos = 1;
         if (pos < 1)
         {
-            handler->SendErrorMessage(LANG_COMMAND_FACTION_INVPARAM,pos);
+            handler->SendErrorMessage(LANG_COMMAND_FACTION_INVPARAM, pos);
             return false;
         }
 
@@ -177,7 +177,7 @@ public:
             pos = 1;
         if (pos < 1)
         {
-            handler->SendErrorMessage(LANG_COMMAND_FACTION_INVPARAM,pos);
+            handler->SendErrorMessage(LANG_COMMAND_FACTION_INVPARAM, pos);
             return false;
         }
 
@@ -185,7 +185,7 @@ public:
 
         if (spawnpoints.empty())
         {
-            handler->SendErrorMessage(LANG_COMMAND_GOCREATNOTFOUND);
+            handler->SendErrorMessage(LANG_COMMAND_GOOBJNOTFOUND);
             return false;
         }
 
