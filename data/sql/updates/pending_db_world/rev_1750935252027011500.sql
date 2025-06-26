@@ -1,6 +1,6 @@
 -- The Aldor
 -- Venom Sac: From Hatred to Neutral
-UPDATE `quest_template_addon` SET `RequiredMinRepValue` = 0, `RequiredMaxRepValue` = 0, `RequiredMinRepFaction` = 932, `RequiredMaxRepFaction` = 932 WHERE `id` IN (10017, 10019);
+UPDATE `quest_template_addon` SET `RequiredMaxRepValue` = 0, `RequiredMinRepFaction` = 932, `RequiredMaxRepFaction` = 932 WHERE `id` IN (10017, 10019);
 
 -- Mark of Kil'jaden: From Neutral to Honoured
 UPDATE `quest_template_addon` SET `RequiredMinRepValue` = 0, `RequiredMaxRepValue` = 9000, `RequiredMinRepFaction` = 932, `RequiredMaxRepFaction` = 932 WHERE `id` IN (10325, 10326, 10327);
@@ -13,7 +13,7 @@ UPDATE `quest_template_addon` SET `RequiredMinRepValue` = 0, `RequiredMaxRepValu
 
 -- The Scryers
 -- Basilisk Eye: From Hatred to Neutral
-UPDATE `quest_template_addon` SET `RequiredMinRepValue` = 0, `RequiredMaxRepValue` = 0, `RequiredMinRepFaction` = 934, `RequiredMaxRepFaction` = 934 WHERE `id` IN (10024, 10025);
+UPDATE `quest_template_addon` SET `RequiredMaxRepValue` = 0, `RequiredMinRepFaction` = 934, `RequiredMaxRepFaction` = 934 WHERE `id` IN (10024, 10025);
 
 -- Firewing Signet: From Neutral to Honoured
 UPDATE `quest_template_addon` SET `RequiredMinRepValue` = 0, `RequiredMaxRepValue` = 9000, `RequiredMinRepFaction` = 934, `RequiredMaxRepFaction` = 934 WHERE `id` IN (10412, 10415, 10414);
