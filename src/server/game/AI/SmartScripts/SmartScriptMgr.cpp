@@ -1543,6 +1543,13 @@ bool SmartAIMgr::IsEventValid(SmartScriptHolder& e)
                     e.entryOrGuid, e.GetScriptType(), e.event_id, e.GetActionType());
                 return false;
             }
+            if (e.action.startClosestWaypoint.repeat > 1 || e.action.startClosestWaypoint.run > 1)
+            {
+                LOG_ERROR("sql.sql", "SmartAIMgr: Entry {} SourceType {} Event {} Action {} has invalid repeat ({}) or run ({}) parameter, must be 0 or 1.",
+                    e.entryOrGuid, e.GetScriptType(), e.event_id, e.GetActionType(),
+                    e.action.startClosestWaypoint.repeat, e.action.startClosestWaypoint.run);
+                return false;
+            }
             break;
         }
         case SMART_ACTION_INVOKER_CAST:
