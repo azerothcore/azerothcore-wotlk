@@ -88,13 +88,15 @@ public:
 
     static bool HandleGoCreatureCIdCommand(ChatHandler* handler, Variant<Hyperlink<creature_entry>, uint32> cId, Optional<uint32> _pos)
     {
-        uint32 pos = *_pos;
-        if (!pos)
-            pos = 1;
-        if (pos < 1)
+        uint32 pos = 1;
+        if (_pos)
         {
-            handler->SendErrorMessage(LANG_COMMAND_FACTION_INVPARAM, pos);
-            return false;
+            pos = *_pos;
+            if (pos < 1)
+            {
+                handler->SendErrorMessage(LANG_COMMAND_FACTION_INVPARAM, pos);
+                return false;
+            }
         }
 
         std::vector<CreatureData const*> spawnpoints = GetCreatureDataList(*cId);
@@ -172,13 +174,15 @@ public:
 
     static bool HandleGoGameObjectGOIdCommand(ChatHandler* handler, uint32 goId, Optional<uint32> _pos)
     {
-        uint32 pos = *_pos;
-        if (!pos)
-            pos = 1;
-        if (pos < 1)
+        uint32 pos = 1;
+        if (_pos)
         {
-            handler->SendErrorMessage(LANG_COMMAND_FACTION_INVPARAM, pos);
-            return false;
+            pos = *_pos;
+            if (pos < 1)
+            {
+                handler->SendErrorMessage(LANG_COMMAND_FACTION_INVPARAM, pos);
+                return false;
+            }
         }
 
         std::vector<GameObjectData const*> spawnpoints = GetGameObjectDataList(goId);
