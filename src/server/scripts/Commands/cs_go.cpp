@@ -86,15 +86,34 @@ public:
         return true;
     }
 
-    static bool HandleGoCreatureCIdCommand(ChatHandler* handler, Variant<Hyperlink<creature_entry>, uint32> cId)
+    static bool HandleGoCreatureCIdCommand(ChatHandler* handler, Variant<Hyperlink<creature_entry>, uint32> cId, Optional<uint32> _pos)
     {
-        CreatureData const* spawnpoint = GetCreatureData(handler, *cId);
+        uint32 pos = 1;
+        if (_pos)
+        {
+            pos = *_pos;
+            if (pos < 1)
+            {
+                handler->SendErrorMessage(LANG_COMMAND_FACTION_INVPARAM, pos);
+                return false;
+            }
+        }
 
-        if (!spawnpoint)
+        std::vector<CreatureData const*> spawnpoints = GetCreatureDataList(*cId);
+
+        if (spawnpoints.empty())
         {
             handler->SendErrorMessage(LANG_COMMAND_GOCREATNOTFOUND);
             return false;
         }
+
+        if (spawnpoints.size() < pos)
+        {
+            handler->SendErrorMessage(LANG_COMMAND_GONOTENOUGHSPAWNS, pos, spawnpoints.size());
+            return false;
+        }
+
+        CreatureData const* spawnpoint = spawnpoints[--pos];
 
         return DoTeleport(handler, { spawnpoint->posX, spawnpoint->posY, spawnpoint->posZ }, spawnpoint->mapid);
     }
@@ -153,15 +172,34 @@ public:
         return DoTeleport(handler, { spawnpoint->posX, spawnpoint->posY, spawnpoint->posZ }, spawnpoint->mapid);
     }
 
-    static bool HandleGoGameObjectGOIdCommand(ChatHandler* handler, uint32 goId)
+    static bool HandleGoGameObjectGOIdCommand(ChatHandler* handler, uint32 goId, Optional<uint32> _pos)
     {
-        GameObjectData const* spawnpoint = GetGameObjectData(handler, goId);
+        uint32 pos = 1;
+        if (_pos)
+        {
+            pos = *_pos;
+            if (pos < 1)
+            {
+                handler->SendErrorMessage(LANG_COMMAND_FACTION_INVPARAM, pos);
+                return false;
+            }
+        }
 
-        if (!spawnpoint)
+        std::vector<GameObjectData const*> spawnpoints = GetGameObjectDataList(goId);
+
+        if (spawnpoints.empty())
         {
             handler->SendErrorMessage(LANG_COMMAND_GOOBJNOTFOUND);
             return false;
         }
+
+        if (spawnpoints.size() < pos)
+        {
+            handler->SendErrorMessage(LANG_COMMAND_GONOTENOUGHSPAWNS, pos, spawnpoints.size());
+            return false;
+        }
+
+        GameObjectData const* spawnpoint = spawnpoints[--pos];
 
         return DoTeleport(handler, { spawnpoint->posX, spawnpoint->posY, spawnpoint->posZ }, spawnpoint->mapid);
     }
@@ -509,6 +547,22 @@ public:
         return spawnpoint;
     }
 
+    static std::vector<CreatureData const*> GetCreatureDataList(uint32 entry)
+    {
+        std::vector<CreatureData const*> spawnpoints;
+        for (auto const& pair : sObjectMgr->GetAllCreatureData())
+        {
+            if (pair.second.id1 != entry)
+            {
+                continue;
+            }
+
+            spawnpoints.emplace_back(&pair.second);
+        }
+
+        return spawnpoints;
+    }
+
     static GameObjectData const* GetGameObjectData(ChatHandler* handler, uint32 entry)
     {
         GameObjectData const* spawnpoint = nullptr;
@@ -531,6 +585,22 @@ public:
         }
 
         return spawnpoint;
+    }
+
+    static std::vector<GameObjectData const*> GetGameObjectDataList(uint32 entry)
+    {
+        std::vector<GameObjectData const*> spawnpoints;
+        for (auto const& pair : sObjectMgr->GetAllGOData())
+        {
+            if (pair.second.id != entry)
+            {
+                continue;
+            }
+
+            spawnpoints.emplace_back(&pair.second);
+        }
+
+        return spawnpoints;
     }
 };
 
