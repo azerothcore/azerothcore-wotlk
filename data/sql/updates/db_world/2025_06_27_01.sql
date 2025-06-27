@@ -1,3 +1,4 @@
+-- DB update 2025_06_27_00 -> 2025_06_27_01
 --
 DELETE FROM `acore_string` WHERE `entry` = 288;
 INSERT INTO `acore_string` (`entry`,`content_default`) VALUES (288,'Cannot go to spawn {} as only {} exist');
