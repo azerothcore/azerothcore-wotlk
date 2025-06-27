@@ -901,6 +901,7 @@ enum PlayerLoginQueryIndex
     PLAYER_LOGIN_QUERY_LOAD_CHARACTER_SETTINGS           = 36,
     PLAYER_LOGIN_QUERY_LOAD_PET_SLOTS                    = 37,
     PLAYER_LOGIN_QUERY_LOAD_OFFLINE_ACHIEVEMENTS_UPDATES = 38,
+    PLAYER_LOGIN_QUERY_SPELLID                           = 39,
     MAX_PLAYER_LOGIN_QUERY
 };
 
@@ -1716,6 +1717,7 @@ public:
     void learnQuestRewardedSpells();
     void learnQuestRewardedSpells(Quest const* quest);
     void learnSpellHighRank(uint32 spellid);
+    bool CheckSkillLearnedBySpell(uint32 spellId);
     void SetReputation(uint32 factionentry, float value);
     [[nodiscard]] uint32 GetReputation(uint32 factionentry) const;
     std::string const& GetGuildName();
@@ -2731,6 +2733,7 @@ protected:
     void _LoadGroup();
     void _LoadSkills(PreparedQueryResult result);
     void _LoadSpells(PreparedQueryResult result);
+    void UnlearnInvalidSpells(PreparedQueryResult result);
     void _LoadFriendList(PreparedQueryResult result);
     bool _LoadHomeBind(PreparedQueryResult result);
     void _LoadDeclinedNames(PreparedQueryResult result);

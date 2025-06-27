@@ -3099,6 +3099,28 @@ bool Player::addSpell(uint32 spellId, uint8 addSpecMask, bool updateActive, bool
     return true;
 }
 
+bool Player::CheckSkillLearnedBySpell(uint32 spellId)
+{
+    SkillLineAbilityMapBounds skill_bounds = sSpellMgr->GetSkillLineAbilityMapBounds(spellId);
+    for (SkillLineAbilityMap::const_iterator sla = skill_bounds.first; sla != skill_bounds.second; ++sla)
+    {
+        SkillLineEntry const* pSkill = sSkillLineStore.LookupEntry(sla->second->SkillLine);
+        if (!pSkill)
+            continue;
+
+        SkillRaceClassInfoEntry const* rcEntry = GetSkillRaceClassInfo(pSkill->id, getRace(), getClass());
+        if (!rcEntry)
+        {
+            LOG_ERROR("entities.player", "Player {} (GUID: {}), has spell ({}) that teach skill ({}) which is invalid for the race/class combination (Race: {}, Class: {}). Will be deleted.",
+                GetName(), GetGUID().GetCounter(), spellId, pSkill->id, getRace(), getClass());
+
+            return false;
+        }
+    }
+
+    return true;
+}
+
 bool Player::_addSpell(uint32 spellId, uint8 addSpecMask, bool temporary, bool learnFromSkill /*= false*/)
 {
     // pussywizard: this can be called to OVERWRITE currently existing spell params! usually to set active = false for lower ranks of a spell
@@ -3222,18 +3244,6 @@ bool Player::_addSpell(uint32 spellId, uint8 addSpecMask, bool temporary, bool l
     // xinef: set appropriate skill value
     if (spellLearnSkill)
     {
-        // Check if the spell learns a skill that is not allowed for the race/class combination.
-        // If so we need to unlearn it.
-        SkillRaceClassInfoEntry const* rcEntry = GetSkillRaceClassInfo(spellLearnSkill->skill, getRace(), getClass());
-        if (!rcEntry)
-        {
-            LOG_ERROR("entities.player", "Player {} (GUID: {}), has spell ({}) that teach skill ({}) which is invalid for the race/class combination (Race: {}, Class: {}). Will be deleted.",
-                GetName(), GetGUID().GetCounter(), spellId, spellLearnSkill->skill, getRace(), getClass());
-
-            removeSpell(spellId, SPEC_MASK_ALL, false);
-            return false;
-        }
-
         uint32 skill_value = GetPureSkillValue(spellLearnSkill->skill);
         uint32 skill_max_value = GetPureMaxSkillValue(spellLearnSkill->skill);
         uint32 new_skill_max_value = spellLearnSkill->maxvalue == 0 ? maxskill : spellLearnSkill->maxvalue;
@@ -3253,18 +3263,6 @@ bool Player::_addSpell(uint32 spellId, uint8 addSpecMask, bool temporary, bool l
             SkillLineEntry const* pSkill = sSkillLineStore.LookupEntry(_spell_idx->second->SkillLine);
             if (!pSkill)
                 continue;
-
-            // Check if the spell learns a skill that is not allowed for the race/class combination.
-            // If so we need to unlearn it.
-            SkillRaceClassInfoEntry const* rcEntry = GetSkillRaceClassInfo(pSkill->id, getRace(), getClass());
-            if (!rcEntry)
-            {
-                LOG_ERROR("entities.player", "Player {} (GUID: {}), has spell ({}) that teach skill ({}) which is invalid for the race/class combination (Race: {}, Class: {}). Will be deleted.",
-                    GetName(), GetGUID().GetCounter(), spellId, pSkill->id, getRace(), getClass());
-
-                removeSpell(spellId, SPEC_MASK_ALL, false);
-                continue;
-            }
 
             /// @todo confirm if rogues start wth lockpicking skill at level 1 but only recieve the spell to use it at level 16
             // Added for runeforging, it is confirmed via sniff that this happens when death knights learn the spell, not on character creation.

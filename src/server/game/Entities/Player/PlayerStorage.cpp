@@ -5425,6 +5425,7 @@ bool Player::LoadFromDB(ObjectGuid playerGuid, CharacterDatabaseQueryHolder cons
 
     _LoadSpells(holder.GetPreparedResult(PLAYER_LOGIN_QUERY_LOAD_SPELLS));
     _LoadTalents(holder.GetPreparedResult(PLAYER_LOGIN_QUERY_LOAD_TALENTS));
+    UnlearnInvalidSpells(holder.GetPreparedResult(PLAYER_LOGIN_QUERY_SPELLID));
 
     _LoadGlyphs(holder.GetPreparedResult(PLAYER_LOGIN_QUERY_LOAD_GLYPHS));
     _LoadGlyphAuras();
@@ -6475,6 +6476,21 @@ void Player::_LoadSpells(PreparedQueryResult result)
             // xinef: checked
             addSpell((*result)[0].Get<uint32>(), (*result)[1].Get<uint8>(), true);
         while (result->NextRow());
+    }
+}
+
+void Player::UnlearnInvalidSpells(PreparedQueryResult result)
+{
+    // QueryResult* result = CharacterDatabase.Query("SELECT spell FROM character_spell WHERE guid = '{}'", GetGUID().GetCounter());
+    if (result)
+    {
+        do
+        {
+            Field* fields = result->Fetch();
+            uint32 spellId = fields[0].Get<uint32>();
+            if (!CheckSkillLearnedBySpell(spellId))
+                removeSpell(spellId, SPEC_MASK_ALL, false);
+        } while (result->NextRow());
     }
 }
 
