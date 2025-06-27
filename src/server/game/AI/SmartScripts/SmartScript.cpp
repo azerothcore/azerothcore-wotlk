@@ -2506,14 +2506,6 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
         }
         case SMART_ACTION_START_CLOSEST_WAYPOINT:
         {
-            if (!e.action.startClosestWaypoint.pathId1 || !e.action.startClosestWaypoint.pathId2 || e.action.startClosestWaypoint.pathId2 < e.action.startClosestWaypoint.pathId1)
-            {
-                LOG_ERROR("sql.sql", "SmartAIMgr: Entry {} SourceType {} Event {} Action {} has invalid pathId1 ({}) or pathId2 ({}), range is incorrect.",
-                    e.entryOrGuid, e.GetScriptType(), e.event_id, e.GetActionType(),
-                    e.action.startClosestWaypoint.pathId1, e.action.startClosestWaypoint.pathId2);
-                return;
-            }
-
             float distanceToClosest = std::numeric_limits<float>::max();
             uint32 closestWpId = 0;
 
@@ -2546,8 +2538,8 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
 
                         if (closestWpId)
                         {
-                            bool repeat = e.action.startClosestWaypoint.repeat <= 1 ? e.action.startClosestWaypoint.repeat : 0;
-                            bool run = e.action.startClosestWaypoint.run <= 1 ? e.action.startClosestWaypoint.run : 0;
+                            bool repeat = e.action.startClosestWaypoint.repeat;
+                            bool run = e.action.startClosestWaypoint.run;
 
                             CAST_AI(SmartAI, creature->AI())->StartPath(repeat, closestWpId, run);
                         }
