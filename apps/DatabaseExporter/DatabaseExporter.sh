@@ -56,7 +56,7 @@ for DB_NAME in "${!DB_MAP[@]}"; do
 
       # cleanup files
       sed -E '
-        s/VALUES/VALUES\n/;
+        s/VALUES[[:space:]]*/VALUES\n/;
         :a
         s/\),\(/\),\n\(/g;
         ta
