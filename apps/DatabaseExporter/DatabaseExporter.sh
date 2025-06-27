@@ -1,21 +1,31 @@
 #!/bin/bash
 set -euo pipefail
 
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+PROJECT_ROOT="$(cd "$SCRIPT_DIR/../.." && pwd)"
+
+if [[ "$PROJECT_ROOT" =~ ^/([a-zA-Z])/(.*) ]]; then
+  DRIVE_LETTER="${BASH_REMATCH[1]}"
+  PATH_REMAINDER="${BASH_REMATCH[2]}"
+  PROJECT_ROOT="${DRIVE_LETTER^^}:/${PATH_REMAINDER}"
+fi
+
+BASE_OUTPUT_DIR="$PROJECT_ROOT/data/sql/base"
+
 read -p "Enter MySQL username: " DB_USER
 read -p "Enter MySQL password: " DB_PASS
-echo ""
 read -p "Enter MySQL host (default: localhost): " DB_HOST
 DB_HOST=${DB_HOST:-localhost}
 read -p "Enter MySQL port (default: 3306): " DB_PORT
 DB_PORT=${DB_PORT:-3306}
 
 # Prompt for database names
-read -p "Enter name of Auth database [default: db_auth]: " DB_AUTH
-DB_AUTH=${DB_AUTH:-db_auth}
-read -p "Enter name of Characters database [default: db_characters]: " DB_CHARACTERS
-DB_CHARACTERS=${DB_CHARACTERS:-db_characters}
-read -p "Enter name of World database [default: db_world]: " DB_WORLD
-DB_WORLD=${DB_WORLD:-db_world}
+read -p "Enter name of Auth database [default: acore_auth]: " DB_AUTH
+DB_AUTH=${DB_AUTH:-acore_auth}
+read -p "Enter name of Characters database [default: acore_characters]: " DB_CHARACTERS
+DB_CHARACTERS=${DB_CHARACTERS:-acore_characters}
+read -p "Enter name of World database [default: acore_world]: " DB_WORLD
+DB_WORLD=${DB_WORLD:-acore_world}
 
 # Mapping for folder names
 declare -A DB_MAP=(
@@ -28,7 +38,8 @@ declare -A DB_MAP=(
 for DB_NAME in "${!DB_MAP[@]}"; do
   FOLDER_NAME="${DB_MAP[$DB_NAME]}"
   echo "📦 Dumping database '$DB_NAME' into folder '$FOLDER_NAME'"
-  mkdir -p "$FOLDER_NAME"
+  echo "$BASE_OUTPUT_DIR/$FOLDER_NAME"
+  mkdir -p "$BASE_OUTPUT_DIR/$FOLDER_NAME"
 
   TABLES=$(mysql -u "$DB_USER" -p"$DB_PASS" -h "$DB_HOST" -P "$DB_PORT" -N -e "SHOW TABLES FROM \`$DB_NAME\`;")
   
@@ -41,7 +52,7 @@ for DB_NAME in "${!DB_MAP[@]}"; do
     TABLE=$(echo "$raw_table" | tr -d '\r"' | xargs)
     if [[ -n "$TABLE" ]]; then
       echo "  ➤ Dumping table: $TABLE"
-      mysqldump -u $DB_USER -p$DB_PASS -h $DB_HOST -P $DB_PORT --extended-insert $DB_NAME $TABLE > $DB_NAME/$TABLE.sql
+      mysqldump -u $DB_USER -p$DB_PASS -h $DB_HOST -P $DB_PORT --extended-insert $DB_NAME $TABLE > $BASE_OUTPUT_DIR/$FOLDER_NAME/$TABLE.sql
 
       # cleanup files
       sed -E '
@@ -49,8 +60,8 @@ for DB_NAME in "${!DB_MAP[@]}"; do
         :a
         s/\),\(/\),\n\(/g;
         ta
-      ' "$DB_NAME/$TABLE.sql" > "$DB_NAME/${TABLE}_formatted.sql"
-      mv "$DB_NAME/${TABLE}_formatted.sql" "$DB_NAME/$TABLE.sql"
+      ' "$BASE_OUTPUT_DIR/$FOLDER_NAME/$TABLE.sql" > "$BASE_OUTPUT_DIR/$FOLDER_NAME/${TABLE}_formatted.sql"
+      mv "$BASE_OUTPUT_DIR/$FOLDER_NAME/${TABLE}_formatted.sql" "$BASE_OUTPUT_DIR/$FOLDER_NAME/$TABLE.sql"
     fi
   done <<< "$TABLES"
 done
