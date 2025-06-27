@@ -1537,7 +1537,7 @@ bool SmartAIMgr::IsEventValid(SmartScriptHolder& e)
             }
         case SMART_ACTION_START_CLOSEST_WAYPOINT:
         {
-            if (e.action.startClosestWaypoint.pathId1 == 0 || e.action.startClosestWaypoint.pathId2 == 0 && e.action.startClosestWaypoint.pathId2 < e.action.startClosestWaypoint.pathId1)
+            if (e.action.startClosestWaypoint.pathId1 == 0 || e.action.startClosestWaypoint.pathId2 == 0 || e.action.startClosestWaypoint.pathId2 < e.action.startClosestWaypoint.pathId1)
             {
                 LOG_ERROR("sql.sql", "SmartAIMgr: Entry {} SourceType {} Event {} Action {} has invalid pathId1 or pathId2, it must be greater than 0 and pathId1 > pathId2",
                     e.entryOrGuid, e.GetScriptType(), e.event_id, e.GetActionType());
