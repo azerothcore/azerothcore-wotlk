@@ -124,7 +124,7 @@ INSERT INTO `waypoint_data` (`id`, `point`, `position_x`, `position_y`, `positio
 ("2890604", 6, 1784.4916, -5822.41, 136.97614, NULL, 0, 2, 0, 100, 0);
 
 -- Scarlet Ghouls waypoints (must be optimized).
-DELETE FROM `waypoints` WHERE `entry` IN (2889700, 2889701, 2889702, 2889703, 2889704);
+DELETE FROM `waypoints` WHERE `entry` IN (2889700, 2889701, 2889702, 2889703, 2889704, 2889705, 2889706);
 INSERT INTO `waypoints` (`entry`, `pointid`, `position_x`, `position_y`, `position_z`, `orientation`, `point_comment`) VALUES
 ("2889700", 1, 2195.3638, -6096.684, 1.9554013, NULL, 'Scarlet Ghoul'),
 ("2889700", 2, 2134.17, -6095.6626, 6.1250257, NULL, 'Scarlet Ghoul'),
@@ -185,18 +185,54 @@ INSERT INTO `waypoints` (`entry`, `pointid`, `position_x`, `position_y`, `positi
 ("2889703", 9, 1871.814, -5893.7964, 103.64108, NULL, 'Scarlet Ghoul'),
 ("2889703", 10, 1857.1747, -5902.0386, 104.01655, NULL, 'Scarlet Ghoul'),
 ("2889703", 11, 1830.3524, -5917.68, 109.23609, NULL, 'Scarlet Ghoul'),
-
--- Must be optimized
 ("2889704", 1, 2135.5713, -5917.6436, 99.79425, NULL, 'Scarlet Ghoul'),
--- 
-("2889704", 2, 2058.0674, -5929.905, 105.883446, NULL, 'Scarlet Ghoul'),
-("2889704", 3, 1993.3854, -5934.4653, 103.23653, NULL, 'Scarlet Ghoul'),
-("2889704", 4, 1914.4014, -5934.455, 103.03427, NULL, 'Scarlet Ghoul'),
-("2889704", 5, 1897.3982, -5930.1514, 103.310394, NULL, 'Scarlet Ghoul'),
-("2889704", 6, 1879.5057, -5926.649, 104.29986, NULL, 'Scarlet Ghoul'),
-("2889704", 7, 1859.5677, -5922.3164, 104.62177, NULL, 'Scarlet Ghoul'),
-("2889704", 8, 1844.7861, -5919.962, 106.564575, NULL, 'Scarlet Ghoul'),
-("2889704", 9, 1830.4172, -5918.243, 109.36247, NULL, 'Scarlet Ghoul');
+("2889704", 2, 2128.1082, -5918.4746, 102.57842, NULL, 'Scarlet Ghoul'),
+("2889704", 3, 2119.8977, -5919.75, 104.845924, NULL, 'Scarlet Ghoul'),
+("2889704", 4, 2106.674, -5921.8564, 105.8994, NULL, 'Scarlet Ghoul'),
+("2889704", 5, 2098.4468, -5923.068, 106.78917, NULL, 'Scarlet Ghoul'),
+("2889704", 6, 2085.5823, -5925.1177, 105.65261, NULL, 'Scarlet Ghoul'),
+("2889704", 7, 2072.7903, -5927.2314, 106.47965, NULL, 'Scarlet Ghoul'),
+("2889704", 8, 2058.0674, -5929.905, 105.883446, NULL, 'Scarlet Ghoul'),
+("2889704", 9, 1993.3854, -5934.4653, 103.23653, NULL, 'Scarlet Ghoul'),
+("2889704", 10, 1914.4014, -5934.455, 103.03427, NULL, 'Scarlet Ghoul'),
+("2889704", 11, 1897.3982, -5930.1514, 103.310394, NULL, 'Scarlet Ghoul'),
+("2889704", 12, 1879.5057, -5926.649, 104.29986, NULL, 'Scarlet Ghoul'),
+("2889704", 13, 1859.5677, -5922.3164, 104.62177, NULL, 'Scarlet Ghoul'),
+("2889704", 14, 1844.7861, -5919.962, 106.564575, NULL, 'Scarlet Ghoul'),
+("2889704", 15, 1830.4172, -5918.243, 109.36247, NULL, 'Scarlet Ghoul'),
+("2889705", 1, 2339.3877, -5872.3906, 102.40258, NULL, 'Scarlet Ghoul'),
+("2889705", 2, 2277.8735, -5881.4644, 100.51856, NULL, 'Scarlet Ghoul'),
+("2889705", 3, 2237.9512, -5908.162, 100.5426, NULL, 'Scarlet Ghoul'),
+("2889705", 4, 2179.2607, -5916.5723, 100.833466, NULL, 'Scarlet Ghoul'),
+("2889705", 5, 2135.5713, -5917.6436, 99.79425, NULL, 'Scarlet Ghoul'),
+("2889705", 6, 2128.1082, -5918.4746, 102.57842, NULL, 'Scarlet Ghoul'),
+("2889705", 7, 2119.8977, -5919.75, 104.845924, NULL, 'Scarlet Ghoul'),
+("2889705", 8, 2106.674, -5921.8564, 105.8994, NULL, 'Scarlet Ghoul'),
+("2889705", 9, 2098.4468, -5923.068, 106.78917, NULL, 'Scarlet Ghoul'),
+("2889705", 10, 2085.5823, -5925.1177, 105.65261, NULL, 'Scarlet Ghoul'),
+("2889705", 11, 2072.7903, -5927.2314, 106.47965, NULL, 'Scarlet Ghoul'),
+("2889705", 12, 2058.0674, -5929.905, 105.883446, NULL, 'Scarlet Ghoul'),
+("2889705", 13, 1993.3854, -5934.4653, 103.23653, NULL, 'Scarlet Ghoul'),
+("2889705", 14, 1914.4014, -5934.455, 103.03427, NULL, 'Scarlet Ghoul'),
+("2889705", 15, 1897.3982, -5930.1514, 103.310394, NULL, 'Scarlet Ghoul'),
+("2889705", 16, 1879.5057, -5926.649, 104.29986, NULL, 'Scarlet Ghoul'),
+("2889705", 17, 1859.5677, -5922.3164, 104.62177, NULL, 'Scarlet Ghoul'),
+("2889705", 18, 1844.7861, -5919.962, 106.564575, NULL, 'Scarlet Ghoul'),
+("2889705", 19, 1830.4172, -5918.243, 109.36247, NULL, 'Scarlet Ghoul'),
+("2889706", 1, 2278.1655, -5838.218, 100.934555, NULL, 'Scarlet Ghoul'),
+("2889706", 2, 2226.8245, -5841.505, 101.31162, NULL, 'Scarlet Ghoul'),
+("2889706", 3, 2172.0278, -5844.5312, 101.348076, NULL, 'Scarlet Ghoul'),
+("2889706", 4, 2149.137, -5851.649, 101.358665, NULL, 'Scarlet Ghoul'),
+("2889706", 5, 2053.9631, -5848.3438, 102.19084, NULL, 'Scarlet Ghoul'),
+("2889706", 6, 1979.5673, -5854.149, 100.74358, NULL, 'Scarlet Ghoul'),
+("2889706", 7, 1892.4893, -5856.9663, 101.901276, NULL, 'Scarlet Ghoul'),
+("2889706", 8, 1876.3115, -5847.535, 102.11675, NULL, 'Scarlet Ghoul'),
+("2889706", 9, 1854.0287, -5836.069, 101.78623, NULL, 'Scarlet Ghoul'),
+("2889706", 10, 1835.2474, -5825.923, 100.77055, NULL, 'Scarlet Ghoul'),
+("2889706", 11, 1819.5686, -5818.2095, 104.0615, NULL, 'Scarlet Ghoul'),
+("2889706", 12, 1804.9038, -5811.438, 108.21074, NULL, 'Scarlet Ghoul');
+
+
 
 -- Update Spawn Position, MT and WD for Gluttonous Geists
 UPDATE `creature` SET `position_x` = 2388.3235, `position_y` = -5898.371, `position_z` = 108.7139 , `orientation` = 0.833046, `MovementType` = 1, `wander_distance` = 10 WHERE (`guid` IN (130297)) AND (`id1` IN (28905));
@@ -278,7 +314,7 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 DELETE FROM `smart_scripts` WHERE (`source_type` = 9 AND `entryorguid` = 2889700);
 INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `event_param6`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
 (2889700, 9, 0, 0, 0, 0, 100, 0, 2000, 2000, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 23, 0, 0, 0, 0, 0, 0, 0, 0, 'Scarlet Ghoul - Actionlist - Say Line 0'),
-(2889700, 9, 1, 0, 0, 0, 100, 0, 3000, 3000, 0, 0, 0, 0, 113, 2889700, 2889704, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Scarlet Ghoul - Actionlist - Start Closest Waypoint 2889700-2889704');
+(2889700, 9, 1, 0, 0, 0, 100, 0, 3000, 3000, 0, 0, 0, 0, 113, 2889700, 2889706, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Scarlet Ghoul - Actionlist - Start Closest Waypoint 2889700-2889706');
 
 -- Update Scourge Gryphons SmartAI/ActionList
 UPDATE `creature_template` SET `AIName` = 'SmartAI' WHERE `entry` = 28906;
