@@ -295,6 +295,21 @@ UPDATE `creature` SET `position_x` = 2221.4436, `position_y` = -5905.7744, `posi
 -- Update Waypoint ID for Gothik the Harvester
 UPDATE `creature_addon` SET `path_id` = 13012100 WHERE (`guid` IN (130121));
 
+-- Update text_table for Gothik the Harvester
+DELETE FROM `creature_text` WHERE(`CreatureID` = 28890);
+INSERT INTO `creature_text` (`CreatureID`, `GroupID`, `ID`, `Text`, `Type`, `Language`, `Probability`, `Emote`, `Duration`, `Sound`, `BroadcastTextId`, `TextRange`, `comment`) VALUES
+(28890, 0, 0, 'You will fly again, beast...', 12, 0, 100, 5, 0, 0, 29043, 0, 'Gothik the Harvester'),
+(28890, 0, 1, 'Death comes on bony wings...', 12, 0, 100, 5, 0, 0, 29044, 0, 'Gothik the Harvester'),
+(28890, 0, 2, 'Rise, minion. Rise and fly for the Scourge!', 12, 0, 100, 5, 0, 0, 29045, 0, 'Gothik the Harvester'),
+(28890, 1, 0, 'Hrm? Lets see what we get out of this one.', 12, 0, 100, 5, 0, 0, 29032, 0, 'Gothik the Harvester'),
+(28890, 1, 1, 'Blasted geists! They ve practically devoured this one whole...', 12, 0, 100, 5, 0, 0, 29033, 0, 'Gothik the Harvester'),
+(28890, 1, 2, 'Contemptible wretches! Stay away from the bodies!', 12, 0, 100, 5, 0, 0, 29034, 0, 'Gothik the Harvester'),
+(28890, 1, 3, 'This one is especially ugly. Perfect for a ghoul...', 12, 0, 100, 5, 0, 0, 29035, 0, 'Gothik the Harvester'),
+(28890, 1, 4, 'I think its spine is broken. Ghoul it is!', 12, 0, 100, 5, 0, 0, 29036, 0, 'Gothik the Harvester'),
+(28890, 1, 5, 'Is Gothik the Harvester going to have to choke a geist?', 12, 0, 100, 5, 0, 0, 29037, 0, 'Gothik the Harvester'),
+(28890, 1, 6, 'Surprise, surprise! Another ghoul!', 12, 0, 100, 5, 0, 0, 29038, 0, 'Gothik the Harvester'),
+(28890, 2, 0, 'Death is the only escape!', 12, 0, 100, 5, 0, 0, 29039, 0, 'Gothik the Harvester');
+
 -- Create Scarlet Ghouls template_movement.
 DELETE FROM `creature_template_movement` WHERE (`CreatureId` = 28897);
 INSERT INTO `creature_template_movement` (`CreatureId`, `Ground`, `Swim`, `Flight`, `Rooted`, `Chase`, `Random`, `InteractionPauseTimer`) VALUES
