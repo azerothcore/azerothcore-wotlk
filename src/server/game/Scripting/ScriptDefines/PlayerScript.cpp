@@ -609,6 +609,11 @@ bool ScriptMgr::OnPlayerUpdateFishingSkill(Player* player, int32 skill, int32 zo
     CALL_ENABLED_BOOLEAN_HOOKS(PlayerScript, PLAYERHOOK_ON_UPDATE_FISHING_SKILL, !script->OnPlayerUpdateFishingSkill(player, skill, zone_skill, chance, roll));
 }
 
+bool ScriptMgr::OnPlayerCanLootFishingPool(Player* player, int32 skill, int32 zone_skill, GameObject* fishing_pool)
+{
+    CALL_ENABLED_BOOLEAN_HOOKS(PlayerScript, PLAYERHOOK_CAN_LOOT_FISHING_POOL, !script->OnPlayerCanLootFishingPool(player, skill, zone_skill, fishing_pool));
+}
+
 bool ScriptMgr::OnPlayerCanAreaExploreAndOutdoor(Player* player)
 {
     CALL_ENABLED_BOOLEAN_HOOKS(PlayerScript, PLAYERHOOK_CAN_AREA_EXPLORE_AND_OUTDOOR, !script->OnPlayerCanAreaExploreAndOutdoor(player));
