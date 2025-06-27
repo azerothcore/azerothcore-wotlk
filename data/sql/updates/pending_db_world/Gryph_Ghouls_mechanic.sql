@@ -232,8 +232,6 @@ INSERT INTO `waypoints` (`entry`, `pointid`, `position_x`, `position_y`, `positi
 ("2889706", 11, 1819.5686, -5818.2095, 104.0615, NULL, 'Scarlet Ghoul'),
 ("2889706", 12, 1804.9038, -5811.438, 108.21074, NULL, 'Scarlet Ghoul');
 
-
-
 -- Update Spawn Position, MT and WD for Gluttonous Geists
 UPDATE `creature` SET `position_x` = 2388.3235, `position_y` = -5898.371, `position_z` = 108.7139 , `orientation` = 0.833046, `MovementType` = 1, `wander_distance` = 10 WHERE (`guid` IN (130297)) AND (`id1` IN (28905));
 UPDATE `creature` SET `position_x` = 2356.6306, `position_y` = -5879.3896, `position_z` = 104.7101, `orientation` = 1.95747, `MovementType` = 1, `wander_distance` = 10 WHERE (`guid` IN (130298)) AND (`id1` IN (28905));
