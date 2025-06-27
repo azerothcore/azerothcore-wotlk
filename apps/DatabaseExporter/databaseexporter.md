@@ -12,4 +12,5 @@
 
 1. Run DatabaseExporter.sh from the current directory.
 2. Fill in required data within the CLI.
-3. Done.
+3. The tool will autopopulate the basefile directories.
+4. Done.
