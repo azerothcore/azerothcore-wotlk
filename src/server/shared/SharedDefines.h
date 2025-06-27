@@ -391,8 +391,8 @@ enum SpellAttr0 : uint32
     SPELL_ATTR0_HELD_ITEM_ONLY                   = 0x00000200, // TITLE Auto-target mainhand item (client only) DESCRIPTION Client will automatically select main-hand item as cast target
     SPELL_ATTR0_ON_NEXT_SWING                    = 0x00000400, // TITLE On next melee (type 2) DESCRIPTION Both "on next swing" attributes have identical handling in server & client
     SPELL_ATTR0_WEARER_CASTS_PROC_TRIGGER        = 0x00000800, // TITLE Unknown attribute 11@Attr0
-    SPELL_ATTR0_SERVER_ONLY                      = 0x00001000, // TITLE Only usable during daytime (unused)
-    SPELL_ATTR0_ALLOW_ITEM_SPELL_IN_PVP          = 0x00002000, // TITLE Only usable during nighttime (unused)
+    SPELL_ATTR0_SERVER_ONLY                      = 0x00001000, // TITLE Unused attribute 12@Attr0 DESCRIPTION not set in 3.3.5a
+    SPELL_ATTR0_ALLOW_ITEM_SPELL_IN_PVP          = 0x00002000, // TITLE Only usable during nighttime
     SPELL_ATTR0_ONLY_INDOORS                     = 0x00004000, // TITLE Only usable indoors
     SPELL_ATTR0_ONLY_OUTDOORS                    = 0x00008000, // TITLE Only usable outdoors
     SPELL_ATTR0_NOT_SHAPESHIFTED                 = 0x00010000, // TITLE Not usable while shapeshifted
@@ -461,14 +461,14 @@ enum SpellAttr2 : uint32
     SPELL_ATTR2_AUTO_REPEAT                          = 0x00000020, // TITLE Ranged auto-attack spell
     SPELL_ATTR2_CANNOT_CAST_ON_TAPPED                = 0x00000040, // TITLE Cannot target others' tapped units DESCRIPTION Can only target untapped units, or those tapped by caster
     SPELL_ATTR2_DO_NOT_REPORT_SPELL_FAILURE          = 0x00000080, // TITLE Unknown attribute 7@Attr2
-    SPELL_ATTR2_INCLUDE_IN_ADVANCED_COMBAT_LOG       = 0x00000100, // TITLE Unknown attribute 8@Attr2 DESCRIPTION not set in 3.0.3
+    SPELL_ATTR2_INCLUDE_IN_ADVANCED_COMBAT_LOG       = 0x00000100, // TITLE Unused attribute 8@Attr2 DESCRIPTION not set in 3.3.5a
     SPELL_ATTR2_ALWAYS_CAST_AS_UNIT                  = 0x00000200, // TITLE Unknown attribute 9@Attr2
     SPELL_ATTR2_SPECIAL_TAMING_FLAG                  = 0x00000400, // TITLE Unknown attribute 10@Attr2 DESCRIPTION Related to taming?
     SPELL_ATTR2_NO_TARGET_PER_SECOND_COST            = 0x00000800, // TITLE Health Funnel
     SPELL_ATTR2_CHAIN_FROM_CASTER                    = 0x00001000, // TITLE Unknown attribute 12@Attr2 DESCRIPTION Cleave, Heart Strike, Maul, Sunder Armor, Swipe
     SPELL_ATTR2_ENCHANT_OWN_ITEM_ONLY                = 0x00002000, // TITLE Enchant persists when entering arena
     SPELL_ATTR2_ALLOW_WHILE_INVISIBLE                = 0x00004000, // TITLE Unknown attribute 14@Attr2
-    SPELL_ATTR2_DO_NOT_CONSUME_IF_GAINED_DURING_CAST = 0x00008000, // TITLE Unknown attribute 15@Attr2 DESCRIPTION not set in 3.0.3
+    SPELL_ATTR2_DO_NOT_CONSUME_IF_GAINED_DURING_CAST = 0x00008000, // TITLE Unused attribute 15@Attr2 DESCRIPTION not set in 3.3.5a
     SPELL_ATTR2_NO_ACTIVE_PETS                       = 0x00010000, // TITLE Tame Beast
     SPELL_ATTR2_DO_NOT_RESET_COMBAT_TIMERS           = 0x00020000, // TITLE Don't reset swing timer DESCRIPTION Does not reset melee/ranged autoattack timer on cast
     SPELL_ATTR2_NO_JUMP_WHILE_CAST_PENDING           = 0x00040000, // TITLE Requires dead pet
@@ -511,8 +511,8 @@ enum SpellAttr3 : uint32
     SPELL_ATTR3_ALWAYS_HIT                            = 0x00040000, // TITLE Ignore hit result DESCRIPTION Spell cannot miss, or be dodged/parried/blocked
     SPELL_ATTR3_INSTANT_TARGET_PROCS                  = 0x00080000, // TITLE Cannot trigger spells during aura proc
     SPELL_ATTR3_ALLOW_AURA_WHILE_DEAD                 = 0x00100000, // TITLE Persists through death
-    SPELL_ATTR3_ONLY_PROC_OUTDOORS                    = 0x00200000, // TITLE Unknown attribute 21@Attr3
-    SPELL_ATTR3_CASTING_CANCELS_AUTOREPEAT            = 0x00400000, // TITLE Requires equipped Wand (Mainline: Do Not Trigger Target Stand)
+    SPELL_ATTR3_ONLY_PROC_OUTDOORS                    = 0x00200000, // TITLE Unused attribute 21@Attr3 DESCRIPTION Not set in 3.3.5a
+    SPELL_ATTR3_CASTING_CANCELS_AUTOREPEAT            = 0x00400000, // TITLE Unused attribute 22@Attr3 DESCRIPTION Not set in 3.3.5a
     SPELL_ATTR3_NO_DAMAGE_HISTORY                     = 0x00800000, // TITLE Unknown attribute 23@Attr3
     SPELL_ATTR3_REQUIRES_OFF_HAND_WEAPON              = 0x01000000, // TITLE Requires offhand weapon
     SPELL_ATTR3_TREAT_AS_PERIODIC                     = 0x02000000, // TITLE Treat as periodic effect
@@ -571,7 +571,7 @@ enum SpellAttr5 : uint32
     SPELL_ATTR5_TRIGGERS_CHANNELING                            = 0x00000010, // TITLE Unknown attribute 4@Attr5
     SPELL_ATTR5_LIMIT_N                                        = 0x00000020, // TITLE Single-target aura DESCRIPTION Remove previous application to another unit if applied
     SPELL_ATTR5_IGNORE_AREA_EFFECT_PVP_CHECK                   = 0x00000040, // TITLE Unknown attribute 6@Attr5
-    SPELL_ATTR5_NOT_ON_PLAYER                                  = 0x00000080, // TITLE Unknown attribute 7@Attr5
+    SPELL_ATTR5_NOT_ON_PLAYER                                  = 0x00000080, // TITLE Cannot target players
     SPELL_ATTR5_NOT_ON_PLAYER_CONTROLLED_NPC                   = 0x00000100, // TITLE Cannot target player controlled units but can target players
     SPELL_ATTR5_EXTRA_INITIAL_PERIOD                           = 0x00000200, // TITLE Immediately do periodic tick on apply
     SPELL_ATTR5_DO_NOT_DISPLAY_DURATION                        = 0x00000400, // TITLE Do not send aura duration to client
@@ -650,8 +650,8 @@ enum SpellAttr7 : uint32
     SPELL_ATTR7_ALLIANCE_SPECIFIC_SPELL                       = 0x00000200, // TITLE Alliance only
     SPELL_ATTR7_DISPEL_REMOVES_CHARGES                        = 0x00000400, // TITLE Dispel/Spellsteal remove individual charges
     SPELL_ATTR7_CAN_CAUSE_INTERRUPT                           = 0x00000800, // TITLE Only interrupt non-player casting
-    SPELL_ATTR7_CAN_CAUSE_SILENCE                             = 0x00001000, // TITLE Unknown attribute 12@Attr7 DESCRIPTION Not set in 3.2.2a.
-    SPELL_ATTR7_NO_UI_NOT_INTERRUPTIBLE                       = 0x00002000, // TITLE Unknown attribute 13@Attr7 DESCRIPTION Not set in 3.2.2a.
+    SPELL_ATTR7_CAN_CAUSE_SILENCE                             = 0x00001000, // TITLE Unused attribute 12@Attr7 DESCRIPTION Not set in 3.3.5a.
+    SPELL_ATTR7_NO_UI_NOT_INTERRUPTIBLE                       = 0x00002000, // TITLE Unused attribute 13@Attr7 DESCRIPTION Not set in 3.3.5a.
     SPELL_ATTR7_RECAST_ON_RESUMMON                            = 0x00004000, // TITLE Unknown attribute 14@Attr7 DESCRIPTION Only 52150 (Raise Dead - Pet) spell.
     SPELL_ATTR7_RESET_SWING_TIMER_AT_SPELL_START              = 0x00008000, // TITLE Unknown attribute 15@Attr7 DESCRIPTION Exorcism - guaranteed crit vs families?
     SPELL_ATTR7_ONLY_IN_SPELLBOOK_UNTIL_LEARNED               = 0x00010000, // TITLE Can restore secondary power DESCRIPTION Only spells with this attribute can replenish a non-active power type
@@ -659,7 +659,7 @@ enum SpellAttr7 : uint32
     SPELL_ATTR7_ATTACK_ON_CHARGE_TO_UNIT                      = 0x00040000, // TITLE Has charge effect
     SPELL_ATTR7_REPORT_SPELL_FAILURE_TO_UNIT_TARGET           = 0x00080000, // TITLE Is zone teleport
     SPELL_ATTR7_NO_CLIENT_FAIL_WHILE_STUNNED_FLEEING_CONFUSED = 0x00100000, // TITLE Unknown attribute 20@Attr7 DESCRIPTION Invulnerability related?
-    SPELL_ATTR7_RETAIN_COOLDOWN_THROUGH_LOAD                  = 0x00200000, // TITLE Unknown attribute 21@Attr7
+    SPELL_ATTR7_RETAIN_COOLDOWN_THROUGH_LOAD                  = 0x00200000, // TITLE Unused attribute 21@Attr7 DESCRPIPTION Not set in 3.3.5a
     SPELL_ATTR7_IGNORES_COLD_WEATHER_FLYING_REQUIREMENT       = 0x00400000, // TITLE Ignore cold weather flying restriction DESCRIPTION Set for loaner mounts, allows them to be used despite lacking required flight skill
     SPELL_ATTR7_NO_ATTACK_DODGE                               = 0x00800000, // TITLE Spell cannot be dodged 23@Attr7 DESCRIPTION Motivate, Mutilate, Shattering Throw
     SPELL_ATTR7_NO_ATTACK_PARRY                               = 0x01000000, // TITLE Spell cannot be parried 24@Attr7 DESCRIPTION Motivate, Mutilate, Perform Speech, Shattering Throw
