@@ -6473,21 +6473,13 @@ void Player::_LoadSpells(PreparedQueryResult result)
     if (result)
     {
         do
-            // xinef: checked
-            addSpell((*result)[0].Get<uint32>(), (*result)[1].Get<uint8>(), true);
-        while (result->NextRow());
-    }
-}
-
-void Player::UnlearnInvalidSpells(PreparedQueryResult result)
-{
-    // QueryResult* result = CharacterDatabase.Query("SELECT spell FROM character_spell WHERE guid = '{}'", GetGUID().GetCounter());
-    if (result)
-    {
-        do
         {
             Field* fields = result->Fetch();
             uint32 spellId = fields[0].Get<uint32>();
+            uint8 specMask = fields[1].Get<uint8>();
+            
+            addSpell(spellId, specMask, true);
+
             if (!CheckSkillLearnedBySpell(spellId))
                 removeSpell(spellId, SPEC_MASK_ALL, false);
         } while (result->NextRow());
