@@ -14,7 +14,7 @@ How to do the squash.
 > Read the versionupdater.md file to use it properly.
 
 2. Drop all your databases, and run Worldserver to populate a clean database.
-3. Export the databases using the DatabaseExporter.ps1 (Located in ..\apps\DatabaseExporter\)
+3. Export the databases using the DatabaseExporter.sh (Located in ..\apps\DatabaseExporter\)
 
 > [!NOTE]
 > Read the databaseexporter.md file to use it properly.
