@@ -3,10 +3,10 @@
 echo "❗CAUTION"
 echo "This tool is only supposed to be used by AzerothCore Maintainers."
 echo "The tool is used to prepare for, and generate a database squash."
-echo ""
+echo
 echo "Before you continue make sure you have read"
 echo "https://github.com/azerothcore/azerothcore-wotlk/blob/master/data/sql/base/database-squash.md"
-echo ""
+echo
 read -p "Are you sure you want to continue (Y/N)?" choice
 case "$choice" in
   y|Y ) echo "Starting...";;
@@ -26,16 +26,16 @@ VERSION_UPDATER_PATH="$PROJECT_ROOT/apps/DatabaseSquash/VersionUpdater/versionup
 
 "$VERSION_UPDATER_PATH"
 
-echo "VersionUpdater Completed..."
-echo ""
+echo "✅ VersionUpdater Completed..."
+echo
 echo "❗IMPORTANT!"
 echo "1. Before you continue you need to drop all your databases."
 echo "2. Run WorldServer to populate the database."
-echo ""
+echo
 echo "❗DO NOT continue before you have completed the steps above!"
-echo ""
+echo
 echo "The next step will export your database and overwrite the base files."
-echo ""
+echo
 read -p "Are you sure you want to export your database (Y/N)?" choice
 case "$choice" in
   y|Y ) echo "Starting...";;
@@ -46,4 +46,7 @@ DATABASE_EXPORTER_PATH="$PROJECT_ROOT/apps/DatabaseSquash/DatabaseExporter/datab
 
 "$DATABASE_EXPORTER_PATH"
 
-echo "DatabaseExporter Completed..."
+echo "✅ DatabaseExporter Completed..."
+echo "✅ DatabaseSquash Completed... "
+echo
+read -p "Press Enter to exit..."
