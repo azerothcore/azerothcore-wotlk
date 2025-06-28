@@ -516,7 +516,7 @@ inline void Battleground::_ProcessJoin(uint32 diff)
             // Battlegrounds check
             if (configuredPrepTime < BG_ANNOUNCEMENT_120S)
             {
-                // Skip 120s announcement 
+                // Skip 120s announcement
                 m_Events |= BG_STARTING_EVENT_1;
             }
             if (configuredPrepTime < BG_ANNOUNCEMENT_60S)
