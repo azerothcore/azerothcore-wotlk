@@ -4,10 +4,15 @@ import sys
 import re
 import glob
 
-# Get the pending directory of the project
 base_dir = os.getcwd()
+
+# Get the pending directory of the project
 pattern = os.path.join(base_dir, 'data/sql/updates/pending_db_*')
 src_directory = glob.glob(pattern)
+
+# Get files from base dir
+base_pattern = os.path.join(base_dir, 'data/sql/base/db_*')
+base_directory = glob.glob(base_pattern)
 
 # Global variables
 error_handler = False
@@ -43,12 +48,14 @@ def parsing_file(files: list) -> None:
     for file_path in files:
         try:
             with open(file_path, 'r', encoding='utf-8') as file:
-                multiple_blank_lines_check(file, file_path)
-                trailing_whitespace_check(file, file_path)
-                sql_check(file, file_path)
-                insert_delete_safety_check(file, file_path)
-                semicolon_check(file, file_path)
-                backtick_check(file, file_path)
+                if not "base" in file_path:
+                    multiple_blank_lines_check(file, file_path)
+                    trailing_whitespace_check(file, file_path)
+                    sql_check(file, file_path)
+                    insert_delete_safety_check(file, file_path)
+                    semicolon_check(file, file_path)
+                    backtick_check(file, file_path)
+
                 directory_check(file, file_path)
         except UnicodeDecodeError:
             print(f"\n❌ Could not decode file {file_path}")
@@ -347,7 +354,7 @@ def directory_check(file: io, file_path: str) -> None:
         results["Directory check"] = "Failed"
 
 # Collect all files from matching directories
-all_files = collect_files_from_directories(src_directory)
+all_files = collect_files_from_directories([src_directory, base_directory])
 
 # Main function
 parsing_file(all_files)
