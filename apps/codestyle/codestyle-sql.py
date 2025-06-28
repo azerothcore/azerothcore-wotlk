@@ -17,7 +17,8 @@ results = {
     "SQL codestyle check": "Passed",
     "INSERT & DELETE safety usage check": "Passed",
     "Missing semicolon check": "Passed",
-    "Backtick check": "Passed"
+    "Backtick check": "Passed",
+    "Directory check": "Passed"
 }
 
 # Collect all files in all directories
@@ -48,6 +49,7 @@ def parsing_file(files: list) -> None:
                 insert_delete_safety_check(file, file_path)
                 semicolon_check(file, file_path)
                 backtick_check(file, file_path)
+                directory_check(file, file_path)
         except UnicodeDecodeError:
             print(f"\n❌ Could not decode file {file_path}")
             sys.exit(1)
@@ -171,11 +173,6 @@ def semicolon_check(file: io, file_path: str) -> None:
 
     file.seek(0)  # Reset file pointer to the start
     check_failed = False
-
-    sql_statement_regex = re.compile(r'^\s*(SELECT|INSERT|UPDATE|DELETE|REPLACE|SET)\b', re.IGNORECASE)
-    block_comment_start = re.compile(r'/\*')
-    block_comment_end = re.compile(r'\*/')
-    inline_comment = re.compile(r'--.*')
 
     query_open = False
     in_block_comment = False
@@ -322,6 +319,25 @@ def backtick_check(file: io, file_path: str) -> None:
     if check_failed:
         error_handler = True
         results["Backtick check"] = "Failed"
+
+def directory_check(file: io, file_path: str) -> None:
+    global error_handler, results
+    file.seek(0)
+    check_failed = False
+
+    # Fail if '/base/' is part of the path
+    if "base" in file_path:
+        print(f"❗ {file} is changed/added in the base directory. {file_path}\nIf this is intended, please notify a maintainer.")
+        check_failed = True
+
+    # Fail if '/archive/' is part of the path
+    if "archive" in file_path:
+        print(f"❗ {file} is changed/added in the base directory. {file_path}\nIf this is intended, please notify a maintainer.")
+        check_failed = True
+
+    if check_failed:
+        error_handler = True
+        results["Directory check"] = "Failed"
 
 # Collect all files from matching directories
 all_files = collect_files_from_directories(src_directory)
