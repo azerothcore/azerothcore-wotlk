@@ -38,16 +38,19 @@ def collect_files_from_directories(directories: list) -> list:
     return all_files
 
 def get_changed_files() -> list:
+    subprocess.run(["git", "fetch", "origin", "master"], check=True)
     result = subprocess.run(
-        ["git", "diff", "--name-status", "HEAD"],
+        ["git", "diff", "--name-status", "origin/master"],
         stdout=subprocess.PIPE,
         stderr=subprocess.PIPE,
         text=True,
     )
     changed_files = []
     for line in result.stdout.strip().splitlines():
+        if not line:
+            continue
         status, path = line.split(maxsplit=1)
-        if status in ("A", "M"):  # Added or Modified
+        if status in ("A", "M"):
             changed_files.append(path)
     return changed_files
 
