@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-echo "CAUTION!"
+echo "❗CAUTION"
 echo "This tool is only supposed to be used by AzerothCore Maintainers."
 echo "The tool is used to prepare for, and generate a database squash."
 echo ""
@@ -28,12 +28,14 @@ VERSION_UPDATER_PATH="$PROJECT_ROOT/apps/DatabaseSquash/VersionUpdater/versionup
 
 echo "VersionUpdater Completed..."
 echo ""
-echo "IMPORTANT!"
+echo "❗IMPORTANT!"
 echo "1. Before you continue you need to drop all your databases."
 echo "2. Run WorldServer to populate the database."
 echo ""
-echo "DO NOT continue before you have completed these steps."
+echo "❗DO NOT continue before you have completed the steps above!"
+echo ""
 echo "The next step will export your database and overwrite the base files."
+echo ""
 read -p "Are you sure you want to export your database (Y/N)?" choice
 case "$choice" in
   y|Y ) echo "Starting...";;
