@@ -402,80 +402,71 @@ struct npc_midsummer_torch_target : public ScriptedAI
 {
     npc_midsummer_torch_target(Creature* creature) : ScriptedAI(creature)
     {
-        teleTimer = 0;
-        startTimer = 1;
-        posVec.clear();
-        playerGUID.Clear();
+        _posVec.clear();
+        _playerGUID.Clear();
         me->CastSpell(me, SPELL_TARGET_INDICATOR_RANK_1, true);
-        counter = 0;
-        maxCount = 0;
+        _counter = 0;
+        _maxCount = 0;
+
+        scheduler.Schedule(200ms, [this](TaskContext /*context*/)
+            {
+                Start();
+            });
     }
 
-    ObjectGuid playerGUID;
-    uint32 startTimer;
-    uint32 teleTimer;
-    std::vector<Position> posVec;
-    uint8 counter;
-    uint8 maxCount;
+    ObjectGuid _playerGUID;
+    std::vector<Position> _posVec;
+    uint8 _counter;
+    uint8 _maxCount;
 
     void SetPlayerGUID(ObjectGuid guid, uint8 cnt)
     {
-        playerGUID = guid;
-        maxCount = cnt;
+        _playerGUID = guid;
+        _maxCount = cnt;
     }
 
     bool CanBeSeen(Player const* seer) override
     {
-        return seer->GetGUID() == playerGUID;
+        return seer->GetGUID() == _playerGUID;
     }
 
     void SpellHit(Unit* caster, SpellInfo const* spellInfo) override
     {
-        if (posVec.empty())
+        if (_posVec.empty())
             return;
+
         // Triggered spell from torch
         if (spellInfo->Id == SPELL_TORCH_TOSS_LAND && caster->IsPlayer())
         {
             me->CastSpell(me, SPELL_BRAZIERS_HIT_VISUAL, true); // hit visual anim
-            if (++counter >= maxCount)
+            if (++_counter >= _maxCount)
             {
                 caster->CastSpell(caster, (caster->ToPlayer()->GetTeamId() ? SPELL_TORCH_TOSS_SUCCESS_H : SPELL_TORCH_TOSS_SUCCESS_A), true); // quest complete spell
                 me->DespawnOrUnsummon(1);
                 return;
             }
 
-            teleTimer = 1;
+            scheduler.Schedule(750ms, [this](TaskContext /*context*/)
+                {
+                    SelectPosition();
+                })
+                .Schedule(1250ms, [this](TaskContext /*context*/)
+                {
+                    if (Player* plr = ObjectAccessor::GetPlayer(*me, _playerGUID))
+                        plr->UpdateTriggerVisibility();
+                });;
         }
+    }
+
+    void Start()
+    {
+        FillPositions();
+        SelectPosition();
     }
 
     void UpdateAI(uint32 diff) override
     {
-        if (startTimer)
-        {
-            startTimer += diff;
-            if (startTimer >= 200)
-            {
-                startTimer = 0;
-                FillPositions();
-                SelectPosition();
-            }
-        }
-        if (teleTimer)
-        {
-            teleTimer += diff;
-            if (teleTimer >= 750 && teleTimer < 10000)
-            {
-                teleTimer = 10000;
-                SelectPosition();
-            }
-            else if (teleTimer >= 10500)
-            {
-                if (Player* plr = ObjectAccessor::GetPlayer(*me, playerGUID))
-                    plr->UpdateTriggerVisibility();
-
-                teleTimer = 0;
-            }
-        }
+        scheduler.Update(diff);
     }
 
     void FillPositions()
@@ -486,17 +477,18 @@ struct npc_midsummer_torch_target : public ScriptedAI
         {
             Position pos;
             pos.Relocate(*itr);
-            posVec.push_back(pos);
+            _posVec.push_back(pos);
         }
     }
 
     void SelectPosition()
     {
-        if (posVec.empty())
+        if (_posVec.empty())
             return;
-        int8 num = urand(0, posVec.size() - 1);
+
+        int8 num = urand(0, _posVec.size() - 1);
         Position pos;
-        pos.Relocate(posVec.at(num));
+        pos.Relocate(_posVec.at(num));
         me->m_last_notify_position.Relocate(0.0f, 0.0f, 0.0f);
         me->m_last_notify_mstime = GameTime::GetGameTimeMS().count() + 10000;
 
