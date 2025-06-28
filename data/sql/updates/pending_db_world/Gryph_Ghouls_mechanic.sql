@@ -346,6 +346,18 @@ DELETE FROM `smart_scripts` WHERE (`source_type` = 9 AND `entryorguid` = 2890601
 INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `event_param6`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
 (2890601, 9, 0, 0, 0, 0, 100, 0, 3000, 3000, 0, 0, 0, 0, 69, 1, 0, 0, 0, 0, 0, 8, 0, 0, 0, 0, 1831.77, -5913.56, 129.329, 0, 'Scourge Gryphon - Actionlist - Move To Position');
 
+-- Set Despawn on Spellhit 
+UPDATE `creature_template` SET `AIName` = 'SmartAI' WHERE (`entry` IN (28896, 28898, 28892, 28891, 28886, 28893));
+
+DELETE FROM `smart_scripts` WHERE (`source_type` = 0) AND (`entryorguid` IN (28896, 28898, 28892, 28891, 28886, 28893));
+INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `event_param6`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
+(28896, 0, 0, 0, 8, 0, 100, 512, 52683, 0, 0, 0, 0, 0, 41, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Scarlet Infantryman - On Spellhit \'Scarlet Ghoul\' - Despawn Instant'),
+(28898, 0, 0, 0, 8, 0, 100, 512, 52683, 0, 0, 0, 0, 0, 41, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Scarlet Captain - On Spellhit \'Scarlet Ghoul\' - Despawn Instant'),
+(28892, 0, 0, 0, 8, 0, 100, 512, 52683, 0, 0, 0, 0, 0, 41, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Scarlet Peasant - On Spellhit \'Scarlet Ghoul\' - Despawn Instant'),
+(28891, 0, 0, 0, 8, 0, 100, 512, 52683, 0, 0, 0, 0, 0, 41, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Scarlet Miner - On Spellhit \'Scarlet Ghoul\' - Despawn Instant'),
+(28886, 0, 0, 0, 8, 0, 100, 512, 52683, 0, 0, 0, 0, 0, 41, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Scarlet Fleet Defender - On Spellhit \'Scarlet Ghoul\' - Despawn Instant'),
+(28893, 0, 0, 0, 8, 0, 100, 512, 52685, 0, 0, 0, 0, 0, 41, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Scarlet Gryphon - On Spellhit \'Scourge Gryphon\' - Despawn Instant');
+
 -- Acherus Dummies (disable gravity and set active)
 DELETE FROM `creature_template_movement` WHERE (`CreatureId` = 28935);
 INSERT INTO `creature_template_movement` (`CreatureId`, `Ground`, `Swim`, `Flight`, `Rooted`, `Chase`, `Random`, `InteractionPauseTimer`) VALUES
