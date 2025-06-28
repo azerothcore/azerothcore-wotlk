@@ -5886,7 +5886,6 @@ UPDATE `creature_template` SET `ScriptName` = 'npc_pallid_horror' WHERE (`entry`
 -- Pallid Horror, Patchwork Terror
 UPDATE `creature_template` SET `minlevel` = 70, `maxlevel` = 70 WHERE (`entry` IN (16394, 16382));
 -- Flameshocker
-UPDATE `creature_template` SET `minlevel` = 73, `maxlevel` = 73 WHERE (`entry` = 16383);
 DELETE FROM `creature_template_addon` WHERE (`entry` IN (16394, 16382));
 INSERT INTO `creature_template_addon` (`entry`, `path_id`, `mount`, `bytes1`, `bytes2`, `emote`, `visibilityDistanceType`, `auras`) VALUES
 (16394, 0, 0, 0, 0, 0, 0, '28126'),
