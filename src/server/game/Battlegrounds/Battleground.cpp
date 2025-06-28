@@ -508,24 +508,24 @@ inline void Battleground::_ProcessJoin(uint32 diff)
 
         SetStartDelayTime(configuredPrepTime);
 
-    // Pre-mark events for announcements that should be skipped based on configured prep time
-    if (configuredPrepTime < StartDelayTimes[BG_STARTING_EVENT_FIRST])
-    {
-        // Skip first announcement (120s for BG, 60s for Arena)
-        m_Events |= BG_STARTING_EVENT_1;
-
-        if (configuredPrepTime < StartDelayTimes[BG_STARTING_EVENT_SECOND])
+        // Pre-mark events for announcements that should be skipped based on configured prep time
+        if (configuredPrepTime < StartDelayTimes[BG_STARTING_EVENT_FIRST])
         {
-            // Skip second announcement (60s for BG, 30s for Arena)
-            m_Events |= BG_STARTING_EVENT_2;
+            // Skip first announcement (120s for BG, 60s for Arena)
+            m_Events |= BG_STARTING_EVENT_1;
 
-            if (configuredPrepTime < StartDelayTimes[BG_STARTING_EVENT_THIRD])
+            if (configuredPrepTime < StartDelayTimes[BG_STARTING_EVENT_SECOND])
             {
-                // Skip third announcement (30s for BG, 15s for Arena)
-                m_Events |= BG_STARTING_EVENT_3;
+                // Skip second announcement (60s for BG, 30s for Arena)
+                m_Events |= BG_STARTING_EVENT_2;
+
+                if (configuredPrepTime < StartDelayTimes[BG_STARTING_EVENT_THIRD])
+                {
+                    // Skip third announcement (30s for BG, 15s for Arena)
+                    m_Events |= BG_STARTING_EVENT_3;
+                }
             }
         }
-    }
 
         // Mark setup as completed
         m_SetupCompleted = true;
