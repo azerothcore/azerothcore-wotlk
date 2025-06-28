@@ -325,13 +325,17 @@ def directory_check(file: io, file_path: str) -> None:
     file.seek(0)
     check_failed = False
 
+    # Normalize path and split into parts
+    normalized_path = os.path.normpath(file_path)  # handles / and \
+    path_parts = normalized_path.split(os.sep)
+
     # Fail if '/base/' is part of the path
-    if "base" in file_path:
+    if "base" in path_parts:
         print(f"❗ {file} is changed/added in the base directory. {file_path}\nIf this is intended, please notify a maintainer.")
         check_failed = True
 
     # Fail if '/archive/' is part of the path
-    if "archive" in file_path:
+    if "archive" in path_parts:
         print(f"❗ {file} is changed/added in the base directory. {file_path}\nIf this is intended, please notify a maintainer.")
         check_failed = True
 
