@@ -2509,10 +2509,6 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
         }
         case SMART_ACTION_START_CLOSEST_WAYPOINT:
         {
-            std::vector<uint32> waypoints;
-            std::copy_if(e.action.closestWaypointFromList.wps.begin(), e.action.closestWaypointFromList.wps.end(),
-                         std::back_inserter(waypoints), [](uint32 wp) { return wp != 0; });
-
             float distanceToClosest = std::numeric_limits<float>::max();
             uint32 closestWpId = 0;
 
@@ -2522,13 +2518,12 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
                 {
                     if (IsSmart(creature))
                     {
-                        for (uint32 wp : waypoints)
+                        for (uint32 wp = e.action.startClosestWaypoint.pathId1; wp <= e.action.startClosestWaypoint.pathId2; ++wp)
                         {
                             WPPath* path = sSmartWaypointMgr->GetPath(wp);
                             if (!path || path->empty())
                                 continue;
 
-                            //waypoint pointid always starts at 1, never 0!
                             auto itrWp = path->find(1);
                             if (itrWp != path->end())
                             {
@@ -2545,7 +2540,12 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
                         }
 
                         if (closestWpId)
-                            CAST_AI(SmartAI, creature->AI())->StartPath(false, closestWpId, true);
+                        {
+                            bool repeat = e.action.startClosestWaypoint.repeat;
+                            bool run = e.action.startClosestWaypoint.run;
+
+                            CAST_AI(SmartAI, creature->AI())->StartPath(repeat, closestWpId, run);
+                        }
                     }
                 }
             }
