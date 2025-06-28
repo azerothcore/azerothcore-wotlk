@@ -8,18 +8,18 @@ How to do the squash.
 > [!IMPORTANT]
 > A squash needs to be done on a clean database. Drop all tables in Auth, Characters and World.
 
-1. Update the acore.json and DB version by running VersionUpdater.ps1 (Located in ..\apps\VersionUpdater\)
+1. Update the acore.json and DB version by running VersionUpdater.sh (Located in ..\apps\VersionUpdater\)
 
 > [!NOTE]
 > Read the versionupdater.md file to use it properly.
 
-2. Drop all your databases, and run Worldserver to populate a clean database.
-3. Export the databases using the DatabaseExporter.sh (Located in ..\apps\DatabaseExporter\)
+1. Drop all your databases, and run Worldserver to populate a clean database.
+1. Export the databases using the DatabaseExporter.sh (Located in ..\apps\DatabaseExporter\)
 
 > [!NOTE]
 > Read the databaseexporter.md file to use it properly.
 
-6. Make a PR
+1. Make a PR
 
 > [!IMPORTANT]
 > No DB PRs should be merged during this process!
