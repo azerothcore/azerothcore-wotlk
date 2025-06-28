@@ -329,6 +329,9 @@ def directory_check(file: io, file_path: str) -> None:
     normalized_path = os.path.normpath(file_path)  # handles / and \
     path_parts = normalized_path.split(os.sep)
 
+    print(f"{file_path}")
+    print(f"{path_parts}")
+
     # Fail if '/base/' is part of the path
     if "base" in path_parts:
         print(f"❗ {file} is changed/added in the base directory. {file_path}\nIf this is intended, please notify a maintainer.")
