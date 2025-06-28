@@ -617,13 +617,14 @@ protected:
     void _ProcessJoin(uint32 diff);
     void _CheckSafePositions(uint32 diff);
 
-    bool m_AnnouncementsMade[5];  // Array to track which announcements have been made
+    // Setup completion marker
+    bool m_SetupCompleted;
 
     // Absolute announcement times (in milliseconds)
-    static constexpr uint32 BG_ANNOUNCEMENT_TWO_MINUTE          = 120000;  // 2 minutes
-    static constexpr uint32 BG_ANNOUNCEMENT_ONE_MINUTE          = 60000;   // 1 minute
-    static constexpr uint32 BG_ANNOUNCEMENT_HALF_MINUTE         = 30000;   // 30 seconds
-    static constexpr uint32 BG_ANNOUNCEMENT_QUARTER_MINUTE      = 15000;   // 15 seconds
+    static constexpr uint32 BG_ANNOUNCEMENT_120S    = 120000;  // 2 minutes
+    static constexpr uint32 BG_ANNOUNCEMENT_60S     = 60000;   // 1 minute
+    static constexpr uint32 BG_ANNOUNCEMENT_30S     = 30000;   // 30 seconds
+    static constexpr uint32 BG_ANNOUNCEMENT_15S     = 15000;   // 15 seconds
 
     // Scorekeeping
     BattlegroundScoreMap PlayerScores;                // Player scores
