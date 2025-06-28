@@ -74,7 +74,7 @@ public:
 
         if (sGuildMgr->GetGuildByName(guildName))
         {
-            handler->SendErrorMessage(LANG_GUILD_RENAME_ALREADY_EXISTS);
+            handler->SendErrorMessage(LANG_GUILD_RENAME_ALREADY_EXISTS, guildName);
             return false;
         }
 
