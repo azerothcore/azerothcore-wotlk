@@ -454,7 +454,7 @@ struct npc_midsummer_torch_target : public ScriptedAI
                 {
                     if (Player* plr = ObjectAccessor::GetPlayer(*me, _playerGUID))
                         plr->UpdateTriggerVisibility();
-                });;
+                });
         }
     }
 
