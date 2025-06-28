@@ -892,12 +892,12 @@ void World::LoadConfigSettings(bool reload)
     _int_configs[CONFIG_BATTLEGROUND_QUEUE_ANNOUNCER_TIMER]                = sConfigMgr->GetOption<uint32>("Battleground.QueueAnnouncer.Timer", 30000);
     _bool_configs[CONFIG_BATTLEGROUND_STORE_STATISTICS_ENABLE]             = sConfigMgr->GetOption<bool>("Battleground.StoreStatistics.Enable", false);
     _bool_configs[CONFIG_BATTLEGROUND_TRACK_DESERTERS]                     = sConfigMgr->GetOption<bool>("Battleground.TrackDeserters.Enable", false);
-    _int_configs[CONFIG_BATTLEGROUND_PREMATURE_FINISH_TIMER]               = sConfigMgr->GetOption<int32> ("Battleground.PrematureFinishTimer", 5 * MINUTE * IN_MILLISECONDS);
-    _int_configs[CONFIG_BATTLEGROUND_INVITATION_TYPE]                      = sConfigMgr->GetOption<int32>("Battleground.InvitationType", 0);
-    _int_configs[CONFIG_BATTLEGROUND_PREMADE_GROUP_WAIT_FOR_MATCH]         = sConfigMgr->GetOption<int32> ("Battleground.PremadeGroupWaitForMatch", 30 * MINUTE * IN_MILLISECONDS);
+    _int_configs[CONFIG_BATTLEGROUND_PREMATURE_FINISH_TIMER]               = sConfigMgr->GetOption<uint32> ("Battleground.PrematureFinishTimer", 5 * MINUTE * IN_MILLISECONDS);
+    _int_configs[CONFIG_BATTLEGROUND_INVITATION_TYPE]                      = sConfigMgr->GetOption<uint32>("Battleground.InvitationType", 0);
+    _int_configs[CONFIG_BATTLEGROUND_PREMADE_GROUP_WAIT_FOR_MATCH]         = sConfigMgr->GetOption<uint32> ("Battleground.PremadeGroupWaitForMatch", 30 * MINUTE * IN_MILLISECONDS);
     _bool_configs[CONFIG_BG_XP_FOR_KILL]                                   = sConfigMgr->GetOption<bool>("Battleground.GiveXPForKills", false);
-    _int_configs[CONFIG_BATTLEGROUND_REPORT_AFK_TIMER]                     = sConfigMgr->GetOption<int32>("Battleground.ReportAFK.Timer", 4);
-    _int_configs[CONFIG_BATTLEGROUND_REPORT_AFK]                           = sConfigMgr->GetOption<int32>("Battleground.ReportAFK", 3);
+    _int_configs[CONFIG_BATTLEGROUND_REPORT_AFK_TIMER]                     = sConfigMgr->GetOption<uint32>("Battleground.ReportAFK.Timer", 4);
+    _int_configs[CONFIG_BATTLEGROUND_REPORT_AFK]                           = sConfigMgr->GetOption<uint32>("Battleground.ReportAFK", 3);
     if (_int_configs[CONFIG_BATTLEGROUND_REPORT_AFK] < 1)
     {
         LOG_ERROR("server.loading", "Battleground.ReportAFK ({}) must be >0. Using 3 instead.", _int_configs[CONFIG_BATTLEGROUND_REPORT_AFK]);
@@ -939,7 +939,7 @@ void World::LoadConfigSettings(bool reload)
     _int_configs[CONFIG_BATTLEGROUND_ALTERAC_REP_ONBOSSDEATH]              = sConfigMgr->GetOption<uint32>("Battleground.Alterac.ReputationOnBossDeath", 350);
     _int_configs[CONFIG_BATTLEGROUND_EYEOFTHESTORM_CAPTUREPOINTS]          = sConfigMgr->GetOption<uint32>("Battleground.EyeOfTheStorm.CapturePoints", 1600);
 
-    _int_configs[CONFIG_ARENA_PREP_TIME]                            = sConfigMgr->GetOption<int32>("Arena.PrepTime", 60);
+    _int_configs[CONFIG_ARENA_PREP_TIME]                            = sConfigMgr->GetOption<uint32>("Arena.PrepTime", 60);
     _int_configs[CONFIG_ARENA_MAX_RATING_DIFFERENCE]                = sConfigMgr->GetOption<uint32>("Arena.MaxRatingDifference", 150);
     _int_configs[CONFIG_ARENA_RATING_DISCARD_TIMER]                 = sConfigMgr->GetOption<uint32>("Arena.RatingDiscardTimer", 10 * MINUTE * IN_MILLISECONDS);
     _int_configs[CONFIG_ARENA_PREV_OPPONENTS_DISCARD_TIMER]         = sConfigMgr->GetOption<uint32>("Arena.PreviousOpponentsDiscardTimer", 2 * MINUTE * IN_MILLISECONDS);
