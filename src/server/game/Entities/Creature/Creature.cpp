@@ -788,9 +788,7 @@ void Creature::Update(uint32 diff)
                     m_moveBackwardsMovementTime = urand(MOVE_BACKWARDS_CHECK_INTERVAL, MOVE_BACKWARDS_CHECK_INTERVAL * 3);
                 }
                 else
-                {
                     m_moveBackwardsMovementTime -= diff;
-                }
 
                 // Circling the target
                 if (diff >= m_moveCircleMovementTime)
@@ -799,9 +797,17 @@ void Creature::Update(uint32 diff)
                     m_moveCircleMovementTime = urand(MOVE_CIRCLE_CHECK_INTERVAL, MOVE_CIRCLE_CHECK_INTERVAL * 2);
                 }
                 else
-                {
                     m_moveCircleMovementTime -= diff;
+
+                // Periodically check if able to move, if not, extend leash timer
+                if (diff >= m_extendLeashTime)
+                {
+                    if (!CanFreeMove())
+                        UpdateLeashExtensionTime();
+                    m_extendLeashTime = EXTEND_LEASH_CHECK_INTERVAL;
                 }
+                else
+                    m_extendLeashTime -= diff;
             }
 
             // Call for assistance if not disabled
