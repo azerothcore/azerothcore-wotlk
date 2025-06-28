@@ -3,6 +3,7 @@ import os
 import sys
 import re
 import glob
+import subprocess
 
 base_dir = os.getcwd()
 
@@ -36,6 +37,20 @@ def collect_files_from_directories(directories: list) -> list:
                     all_files.append(os.path.join(root, file))
     return all_files
 
+def get_changed_files() -> list:
+    result = subprocess.run(
+        ["git", "diff", "--name-status", "HEAD"],
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
+        text=True,
+    )
+    changed_files = []
+    for line in result.stdout.strip().splitlines():
+        status, path = line.split(maxsplit=1)
+        if status in ("A", "M"):  # Added or Modified
+            changed_files.append(path)
+    return changed_files
+
 # Main function to parse all the files of the project
 def parsing_file(files: list) -> None:
     print("Starting AzerothCore SQL Codestyle check...")
@@ -56,10 +71,15 @@ def parsing_file(files: list) -> None:
                     semicolon_check(file, file_path)
                     backtick_check(file, file_path)
 
-                directory_check(file, file_path)
         except UnicodeDecodeError:
             print(f"\n❌ Could not decode file {file_path}")
             sys.exit(1)
+
+    changed_files = get_changed_files()
+    for file_path in changed_files:
+        with open(file_path, "r", encoding="utf-8") as f:
+            if "base" in file_path:
+                directory_check(f, file_path)
 
     # Output the results
     print("\n ")
@@ -335,9 +355,6 @@ def directory_check(file: io, file_path: str) -> None:
     # Normalize path and split into parts
     normalized_path = os.path.normpath(file_path)  # handles / and \
     path_parts = normalized_path.split(os.sep)
-
-    print(f"{file_path}")
-    print(f"{path_parts}")
 
     # Fail if '/base/' is part of the path
     if "base" in path_parts:
