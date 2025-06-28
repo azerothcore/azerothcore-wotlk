@@ -166,7 +166,7 @@ enum BG_AB_Misc
     BG_AB_HONOR_TICK_NORMAL             = 260,
     BG_AB_HONOR_TICK_WEEKEND            = 160,
     BG_AB_REP_TICK_NORMAL               = 160,
-    BG_AB_REP_TICK_WEEKEND              = 120,
+    BG_AB_REP_TICK_WEEKEND              = 150,
 
     BG_AB_WARNING_NEAR_VICTORY_SCORE    = 1400,
     BG_AB_MAX_TEAM_SCORE                = 1600,
