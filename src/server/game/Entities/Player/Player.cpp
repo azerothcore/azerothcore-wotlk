@@ -10002,6 +10002,16 @@ void Player::RemoveSpellMods(Spell* spell)
                             continue;
                         }
             }
+            // ROGUE MUTILATE WITH COLD BLOOD
+            if (spellInfo->Id == 5374)
+            {
+                SpellInfo const* sp = mod->ownerAura->GetSpellInfo();
+                if (sp->Id == 14177) // Cold Blood
+                {
+                    mod->charges = 1;
+                    continue;
+                }
+            }
 
             if (mod->ownerAura->DropCharge(AURA_REMOVE_BY_EXPIRE))
                 itr = m_spellMods[i].begin();
