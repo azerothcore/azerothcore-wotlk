@@ -376,7 +376,7 @@ def directory_check(file: io, file_path: str) -> None:
 
     # Fail if '/archive/' is part of the path
     if "archive" in path_parts:
-        print(f"❗ {file_path} is changed/added in the base directory.\nIf this is intended, please notify a maintainer.")
+        print(f"❗ {file_path} is changed/added in the archive directory.\nIf this is intended, please notify a maintainer.")
         check_failed = True
 
     if check_failed:

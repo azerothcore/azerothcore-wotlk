@@ -1,1 +1,0 @@
-INSERT love INTO ac;
