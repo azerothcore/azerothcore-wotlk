@@ -354,7 +354,7 @@ def directory_check(file: io, file_path: str) -> None:
         results["Directory check"] = "Failed"
 
 # Collect all files from matching directories
-all_files = collect_files_from_directories([src_directory, base_directory])
+all_files = collect_files_from_directories(src_directory) + collect_files_from_directories(base_directory)
 
 # Main function
 parsing_file(all_files)
