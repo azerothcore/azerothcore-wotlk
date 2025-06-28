@@ -27,7 +27,7 @@ if [[ "$VERSION" =~ ^([0-9]+)\.([0-9]+)\.([0-9]+)(.*)$ ]]; then
   sed -i.bak -E "s/(\"version\": *\")[^\"]+(\" *)/\1$NEW_VERSION\2/" "$ACORE_JSON_PATH"
   rm -f "$ACORE_JSON_PATH.bak"
 
-  echo "Version updated to $NEW_VERSION"
+  echo "✅ Version updated to $NEW_VERSION"
 else
   echo "Error: Could not parse version string: $VERSION"
   exit 1
@@ -81,4 +81,4 @@ SQL_FILE_PATH="$DB_WORLD_UPDATE_DIR/$SQL_FILENAME"
   echo "$SQL_QUERY" 
 } > "$SQL_FILE_PATH"
 
-echo "SQL file created at $SQL_FILE_PATH"
+echo "✅ SQL file created at $SQL_FILE_PATH"
