@@ -500,55 +500,32 @@ inline void Battleground::_ProcessJoin(uint32 diff)
 
         // Special case for Strand of the Ancients - always use 120 seconds due to boat timing mechanics
         if (GetBgTypeID() == BATTLEGROUND_SA)
-        {
             configuredPrepTime = 120 * IN_MILLISECONDS;
-        }
         else
-        {
-            configuredPrepTime = isArena() ? GetArenaPrepTime() * IN_MILLISECONDS : GetBattlegroundPrepTime() * IN_MILLISECONDS;
-        }
+            configuredPrepTime = isArena() ?
+                sWorld->getIntConfig(CONFIG_ARENA_PREP_TIME) * IN_MILLISECONDS :
+                sWorld->getIntConfig(CONFIG_BATTLEGROUND_PREP_TIME) * IN_MILLISECONDS;
 
         SetStartDelayTime(configuredPrepTime);
 
-        // Pre-mark events for announcements that should be skipped based on configured prep time
-        if (!isArena())
+    // Pre-mark events for announcements that should be skipped based on configured prep time
+    if (configuredPrepTime < StartDelayTimes[BG_STARTING_EVENT_FIRST])
+    {
+        // Skip first announcement (120s for BG, 60s for Arena)
+        m_Events |= BG_STARTING_EVENT_1;
+
+        if (configuredPrepTime < StartDelayTimes[BG_STARTING_EVENT_SECOND])
         {
-            // Battlegrounds check
-            if (configuredPrepTime < BG_ANNOUNCEMENT_120S)
+            // Skip second announcement (60s for BG, 30s for Arena)
+            m_Events |= BG_STARTING_EVENT_2;
+
+            if (configuredPrepTime < StartDelayTimes[BG_STARTING_EVENT_THIRD])
             {
-                // Skip 120s announcement
-                m_Events |= BG_STARTING_EVENT_1;
-            }
-            if (configuredPrepTime < BG_ANNOUNCEMENT_60S)
-            {
-                // Skip 60s announcement
-                m_Events |= BG_STARTING_EVENT_2;
-            }
-            if (configuredPrepTime < BG_ANNOUNCEMENT_30S)
-            {
-                // Skip 30s announcement
+                // Skip third announcement (30s for BG, 15s for Arena)
                 m_Events |= BG_STARTING_EVENT_3;
             }
         }
-        else
-        {
-            // Arena check
-            if (configuredPrepTime < BG_ANNOUNCEMENT_60S)
-            {
-                // Skip 60s announcement
-                m_Events |= BG_STARTING_EVENT_1;
-            }
-            if (configuredPrepTime < BG_ANNOUNCEMENT_30S)
-            {
-                // Skip 30s announcement
-                m_Events |= BG_STARTING_EVENT_2;
-            }
-            if (configuredPrepTime < BG_ANNOUNCEMENT_15S)
-            {
-                // Skip 15s announcement
-                m_Events |= BG_STARTING_EVENT_3;
-            }
-        }
+    }
 
         // Mark setup as completed
         m_SetupCompleted = true;

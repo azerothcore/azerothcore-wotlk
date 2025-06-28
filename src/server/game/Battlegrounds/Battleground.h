@@ -329,9 +329,6 @@ public:
     [[nodiscard]] uint32 GetMinLevel() const          { return m_LevelMin; }
     [[nodiscard]] uint32 GetMaxLevel() const          { return m_LevelMax; }
 
-    static uint32 GetBattlegroundPrepTime() { return sWorld->getIntConfig(CONFIG_BATTLEGROUND_PREP_TIME); }
-    static uint32 GetArenaPrepTime() { return sWorld->getIntConfig(CONFIG_ARENA_PREP_TIME); }
-
     [[nodiscard]] bool isTemplate() const             { return m_IsTemplate; }
     [[nodiscard]] bool isMaxLevel() const
     {
@@ -619,12 +616,6 @@ protected:
 
     // Setup completion marker
     bool m_SetupCompleted;
-
-    // Absolute announcement times (in milliseconds)
-    static constexpr uint32 BG_ANNOUNCEMENT_120S    = 120000;  // 2 minutes
-    static constexpr uint32 BG_ANNOUNCEMENT_60S     = 60000;   // 1 minute
-    static constexpr uint32 BG_ANNOUNCEMENT_30S     = 30000;   // 30 seconds
-    static constexpr uint32 BG_ANNOUNCEMENT_15S     = 15000;   // 15 seconds
 
     // Scorekeeping
     BattlegroundScoreMap PlayerScores;                // Player scores
