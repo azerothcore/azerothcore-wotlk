@@ -193,6 +193,9 @@ SpellCastResult UnitAI::DoCast(uint32 spellId)
                 {
                     DefaultTargetSelector targetSelector(me, spellInfo->GetMaxRange(false), false, true, 0);
                     target = SelectTarget(SelectTargetMethod::Random, 0, [&](Unit* target) {
+                        if (!target)
+                            return false;
+
                         if (target->IsPlayer())
                         {
                             if (spellInfo->HasAttribute(SPELL_ATTR5_NOT_ON_PLAYER))
@@ -225,6 +228,9 @@ SpellCastResult UnitAI::DoCast(uint32 spellId)
 
                     DefaultTargetSelector defaultTargetSelector(me, range, false, true, -(int32)spellId);
                     auto targetSelector = [&](Unit* target) {
+                        if (!target)
+                            return false;
+
                         if (target->IsPlayer())
                         {
                             if (spellInfo->HasAttribute(SPELL_ATTR5_NOT_ON_PLAYER))
