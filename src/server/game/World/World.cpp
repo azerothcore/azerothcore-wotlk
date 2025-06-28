@@ -878,7 +878,7 @@ void World::LoadConfigSettings(bool reload)
     _float_configs[CONFIG_LISTEN_RANGE_TEXTEMOTE] = sConfigMgr->GetOption<float>("ListenRange.TextEmote", 25.0f);
     _float_configs[CONFIG_LISTEN_RANGE_YELL]      = sConfigMgr->GetOption<float>("ListenRange.Yell", 300.0f);
 
-    _int_configs[CONFIG_BATTLEGROUND_PREP_TIME]                            = sConfigMgr->GetOption<int32>("Battleground.PrepTime", 120);
+    _int_configs[CONFIG_BATTLEGROUND_PREP_TIME]                            = sConfigMgr->GetOption<uint32>("Battleground.PrepTime", 120);
     _int_configs[CONFIG_BATTLEGROUND_OVERRIDE_LOWLEVELS_MINPLAYERS]        = sConfigMgr->GetOption<uint32>("Battleground.Override.LowLevels.MinPlayers", 0);
     _bool_configs[CONFIG_BATTLEGROUND_DISABLE_QUEST_SHARE_IN_BG]           = sConfigMgr->GetOption<bool>("Battleground.DisableQuestShareInBG", false);
     _bool_configs[CONFIG_BATTLEGROUND_DISABLE_READY_CHECK_IN_BG]           = sConfigMgr->GetOption<bool>("Battleground.DisableReadyCheckInBG", false);
