@@ -972,7 +972,9 @@ enum AcoreStrings
     LANG_GUILD_INFO_BANK_GOLD           = 1181,
     LANG_GUILD_INFO_MOTD                = 1182,
     LANG_GUILD_INFO_EXTRA_INFO          = 1183,
-    // Room for more level 3              1184-1198 not used
+    LANG_GUILD_INFO_RANKS               = 1184,
+    LANG_GUILD_INFO_RANKS_LIST          = 1185,
+    // Room for more level 3              1186-1198 not used
 
     // Debug commands
     LANG_DO_NOT_USE_6X_DEBUG_AREATRIGGER_LEFT = 1999,

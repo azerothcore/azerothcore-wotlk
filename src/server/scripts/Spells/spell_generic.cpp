@@ -5452,6 +5452,22 @@ private:
     uint32 _spellId;
 };
 
+class spell_gen_cooldown_all : public SpellScript
+{
+    PrepareSpellScript(spell_gen_cooldown_all);
+
+    void HandleScript(SpellEffIndex /*effIndex*/)
+    {
+        if (Player* player = GetHitPlayer())
+            player->RemoveAllSpellCooldown();
+    }
+
+    void Register() override
+    {
+        OnEffectHitTarget += SpellEffectFn(spell_gen_cooldown_all::HandleScript, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
+    }
+};
+
 void AddSC_generic_spell_scripts()
 {
     RegisterSpellScript(spell_silithyst);
@@ -5614,4 +5630,5 @@ void AddSC_generic_spell_scripts()
     RegisterSpellScript(spell_gen_proc_on_victim);
     RegisterSpellScriptWithArgs(spell_gen_translocate, "spell_gen_translocate_down", SPELL_TRANSLOCATION_DOWN);
     RegisterSpellScriptWithArgs(spell_gen_translocate, "spell_gen_translocate_up", SPELL_TRANSLOCATION_UP);
+    RegisterSpellScript(spell_gen_cooldown_all);
 }
