@@ -541,10 +541,10 @@ class spell_dk_bone_shield : public AuraScript
             return;
 
         if (!eventInfo.GetSpellInfo() || !eventInfo.GetSpellInfo()->IsTargetingArea())
-            {
+        {
             DropCharge();
             lastChargeUsedTime = currentTime;
-            }
+        }
     }
 
     void Register() override
