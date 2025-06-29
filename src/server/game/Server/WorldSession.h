@@ -48,6 +48,7 @@ class Player;
 class Quest;
 class SpellCastTargets;
 class Unit;
+class VoiceChatChannel;
 class Warden;
 class WorldPacket;
 class WorldSocket;
@@ -540,6 +541,24 @@ public:
     uint32 GetRecruiterId() const { return recruiterId; }
     bool IsARecruiter() const { return isRecruiter; }
 
+    // Voice Chat
+    bool IsVoiceChatEnabled() const { return _voiceEnabled; }
+    bool IsMicEnabled() const { return _micEnabled; }
+    uint16 GetCurrentVoiceChannelId() const { return _currentVoiceChannel; }
+    void SetCurrentVoiceChannelId(uint32 id) { _currentVoiceChannel = id; }
+    static void HandleAddMutedOpcodeCallBack(QueryResult* result, uint32);
+    void HandleAddVoiceIgnoreOpcode(WorldPacket& recvData);
+    void HandleDelVoiceIgnoreOpcode(WorldPacket& recvData);
+    void HandleChannelSilenceOpcode(WorldPacket& recvData);
+    void HandleChannelUnsilenceOpcode(WorldPacket& recvData);
+    void HandlePartySilenceOpcode(WorldPacket& recvData);
+    void HandlePartyUnsilenceOpcode(WorldPacket& recvData);
+    void HandleChannelVoiceOnOpcode(WorldPacket& recvData);
+    void HandleChannelVoiceOffOpcode(WorldPacket& recvData);
+    void HandleVoiceSessionEnableOpcode(WorldPacket& recvData);
+    void HandleSetActiveVoiceChannelOpcode(WorldPacket& recvData);
+    void SetActiveVoiceChannel(VoiceChatChannel* voiceChannel, VoiceChatChannel* currentChannel, Player* player);
+
     // Packets cooldown
     time_t GetCalendarEventCreationCooldown() const { return _calendarEventCreationCooldown; }
     void SetCalendarEventCreationCooldown(time_t cooldown) { _calendarEventCreationCooldown = cooldown; }
@@ -1008,8 +1027,6 @@ public:                                                 // opcodes handlers
     void HandleItemRefundInfoRequest(WorldPacket& recvData);
     void HandleItemRefund(WorldPacket& recvData);
 
-    void HandleChannelVoiceOnOpcode(WorldPacket& recvData);
-    void HandleVoiceSessionEnableOpcode(WorldPacket& recvData);
     void HandleSetActiveVoiceChannel(WorldPacket& recvData);
     void HandleSetTaxiBenchmarkOpcode(WorldPacket& recvData);
 
@@ -1188,6 +1205,11 @@ private:
     bool _kicked;
     // Packets cooldown
     time_t _calendarEventCreationCooldown;
+
+    // Voice Chat
+    bool _micEnabled;
+    bool _voiceEnabled;
+    uint16 _currentVoiceChannel;
 
     // Addon Message count for Metric
     std::atomic<uint32> _addonMessageReceiveCount;

@@ -55,6 +55,7 @@
 #include "Tokenize.h"
 #include "Transport.h"
 #include "Util.h"
+#include "VoiceChatMgr.h"
 #include "World.h"
 #include "WorldPacket.h"
 #include "WorldSession.h"
@@ -827,7 +828,7 @@ void WorldSession::HandlePlayerLoginFromDB(LoginQueryHolder const& holder)
 
     data.Initialize(SMSG_FEATURE_SYSTEM_STATUS, 2);         // added in 2.2.0
     data << uint8(2);                                       // 2 - COMPLAINT_ENABLED_WITH_AUTO_IGNORE
-    data << uint8(0);                                       // enable(1)/disable(0) voice chat interface in client
+    data << uint8(sVoiceChatMgr.IsEnabled());               // enable(1)/disable(0) voice chat interface in client
     SendPacket(&data);
 
     // Send MOTD
@@ -1150,7 +1151,7 @@ void WorldSession::HandlePlayerLoginToCharInWorld(Player* pCurrChar)
 
     data.Initialize(SMSG_FEATURE_SYSTEM_STATUS, 2);         // added in 2.2.0
     data << uint8(2);                                       // unknown value
-    data << uint8(0);                                       // enable(1)/disable(0) voice chat interface in client
+    data << uint8(sVoiceChatMgr.IsEnabled());               // enable(1)/disable(0) voice chat interface in client
     SendPacket(&data);
 
     // Send MOTD
@@ -1249,6 +1250,10 @@ void WorldSession::HandlePlayerLoginToCharInWorld(Player* pCurrChar)
 
     if (pCurrChar->IsGameMaster())
         ChatHandler(pCurrChar->GetSession()).SendNotification(LANG_GM_ON);
+
+    // join available voice channels
+    if (IsVoiceChatEnabled())
+        sVoiceChatMgr.JoinAvailableVoiceChatChannels(this);
 
     m_playerLoading = false;
 }
