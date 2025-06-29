@@ -531,14 +531,13 @@ class spell_dk_bone_shield : public AuraScript
     PrepareAuraScript(spell_dk_bone_shield);
 
     uint32 lastChargeUsedTime = 0;
-    const uint32 ICD_MS = 2000;
 
     void HandleProc(ProcEventInfo& eventInfo)
     {
         PreventDefaultAction();
         uint32 currentTime = getMSTime();
         // Checks for 2 seconds between uses of bone shield charges
-        if ((currentTime - lastChargeUsedTime) < ICD_MS)
+        if ((currentTime - lastChargeUsedTime) < 2000)
             return;
 
         if (!eventInfo.GetSpellInfo() || !eventInfo.GetSpellInfo()->IsTargetingArea())
