@@ -399,12 +399,47 @@ class MovableMapObject
 protected:
     MovableMapObject()  = default;
 
-private:
     [[nodiscard]] Cell const& GetCurrentCell() const { return _currentCell; }
+
+private:
     void SetCurrentCell(Cell const& cell) { _currentCell = cell; }
 
     Cell _currentCell;
     MapObjectCellMoveState _moveState{MAP_OBJECT_CELL_MOVE_NONE};
+};
+
+class UpdatableMapObject
+{
+    friend class Map;
+
+protected:
+    UpdatableMapObject() : _mapUpdateListOffset(0), _isInMapUpdateList(false) { }
+
+private:
+    void SetMapUpdateListOffset(std::size_t const offset)
+    {
+        ASSERT(_isInMapUpdateList, "Attempted to set update list offset when object is not in map update list");
+        _mapUpdateListOffset = offset;
+    }
+
+    size_t GetMapUpdateListOffset() const
+    {
+        return _mapUpdateListOffset;
+    }
+
+    void SetIsInMapUpdateList(bool const val)
+    {
+        _isInMapUpdateList = val;
+    }
+
+    bool IsInMapUpdateList() const
+    {
+        return _isInMapUpdateList;
+    }
+
+private:
+    std::size_t _mapUpdateListOffset;
+    bool _isInMapUpdateList;
 };
 
 class WorldObject : public Object, public WorldLocation
@@ -514,6 +549,7 @@ public:
     virtual void SaveRespawnTime() {}
     void AddObjectToRemoveList();
 
+    float GetCellMarkRange() const;
     [[nodiscard]] float GetGridActivationRange() const;
     [[nodiscard]] float GetVisibilityRange() const;
     virtual float GetSightRange(WorldObject const* target = nullptr) const;
@@ -632,6 +668,9 @@ public:
     [[nodiscard]] bool HasAllowedLooter(ObjectGuid guid) const;
     [[nodiscard]] GuidUnorderedSet const& GetAllowedLooters() const;
     void RemoveAllowedLooter(ObjectGuid guid);
+
+    virtual bool IsUpdateNeeded();
+    bool CanBeAddedToMapUpdateList();
 
     std::string GetDebugInfo() const override;
 

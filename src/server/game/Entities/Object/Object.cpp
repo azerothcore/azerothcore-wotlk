@@ -1188,6 +1188,7 @@ void WorldObject::AddToWorld()
 {
     Object::AddToWorld();
     GetMap()->GetZoneAndAreaId(GetPhaseMask(), _zoneId, _areaId, GetPositionX(), GetPositionY(), GetPositionZ());
+    GetMap()->AddObjectToPendingUpdateList(this);
 }
 
 void WorldObject::RemoveFromWorld()
@@ -1629,6 +1630,14 @@ void WorldObject::UpdateAllowedPositionZ(float x, float y, float& z, float* grou
         if (groundZ)
             *groundZ = ground_z;
     }
+}
+
+float WorldObject::GetCellMarkRange() const
+{
+    if (IsPlayer())
+        return MAX_VISIBILITY_DISTANCE;
+    else
+        return GetGridActivationRange();
 }
 
 float WorldObject::GetGridActivationRange() const
@@ -3219,4 +3228,26 @@ GuidUnorderedSet const& WorldObject::GetAllowedLooters() const
 void WorldObject::RemoveAllowedLooter(ObjectGuid guid)
 {
     _allowedLooters.erase(guid);
+}
+
+bool WorldObject::IsUpdateNeeded()
+{
+    if (isActiveObject())
+        return true;
+
+    return false;
+}
+
+bool WorldObject::CanBeAddedToMapUpdateList()
+{
+    switch (GetTypeId())
+    {
+    case TYPEID_UNIT:
+        return IsCreature();
+    case TYPEID_DYNAMICOBJECT:
+    case TYPEID_GAMEOBJECT:
+        return true;
+    }
+
+    return false;
 }
