@@ -290,9 +290,8 @@ function pm2_create_service() {
     
     # Execute command
     echo -e "${YELLOW}Creating PM2 service: $service_name${NC}"
-    eval "$pm2_cmd"
     
-    if [ $? -eq 0 ]; then
+    if eval "$pm2_cmd"; then
         echo -e "${GREEN}PM2 service '$service_name' created successfully${NC}"
         pm2 save
         return 0
@@ -648,8 +647,7 @@ function create_service() {
     
     # Auto-detect provider if set to auto
     if [ "$provider" = "auto" ]; then
-        provider=$(auto_detect_provider)
-        if [ $? -ne 0 ]; then
+        if ! provider=$(auto_detect_provider); then
             return 1
         fi
         echo -e "${BLUE}Auto-detected provider: $provider${NC}"
@@ -718,19 +716,26 @@ EOF
     local run_engine_cmd="$SCRIPT_DIR/run-engine start $server_binary_path --config $run_engine_config"
     
     # Create the actual service
+    local service_creation_success=false
     if [ "$provider" = "pm2" ]; then
         if [ -n "$pm2_opts" ]; then
-            pm2_create_service "$service_name" "$run_engine_cmd" $pm2_opts
+            if pm2_create_service "$service_name" "$run_engine_cmd" $pm2_opts; then
+                service_creation_success=true
+            fi
         else
-            pm2_create_service "$service_name" "$run_engine_cmd"
+            if pm2_create_service "$service_name" "$run_engine_cmd"; then
+                service_creation_success=true
+            fi
         fi
         
     elif [ "$provider" = "systemd" ]; then
-        systemd_create_service "$service_name" "$run_engine_cmd" "$systemd_type"
+        if systemd_create_service "$service_name" "$run_engine_cmd" "$systemd_type"; then
+            service_creation_success=true
+        fi
     fi
     
     # Check if service creation was successful
-    if [ $? -eq 0 ]; then
+    if [ "$service_creation_success" = "true" ]; then
         # Register the service
         register_service "$service_name" "$provider" "$service_type"
         echo -e "${GREEN}Service '$service_name' created successfully${NC}"
