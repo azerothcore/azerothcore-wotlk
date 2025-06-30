@@ -33,12 +33,12 @@ if [[ $CONTINUOUS_INTEGRATION || $DOCKER ]]; then
   # TODO: update CI / Docker section for Ubuntu 22.04+
   sudo add-apt-repository -y ppa:mhier/libboost-latest && sudo apt update && sudo apt-get -y install build-essential cmake-data  \
   libboost1.74-dev libbz2-dev libncurses5-dev libmysql++-dev libgoogle-perftools-dev libreadline6-dev libssl-dev libtool \
-  openssl zlib1g-dev
+  openssl zlib1g-dev jq bats 
 else
   sudo DEBIAN_FRONTEND="noninteractive" \
   apt-get install -y g++ gdb gdbserver gcc git \
   libboost-all-dev libbz2-dev libncurses-dev libreadline-dev \
-  libssl-dev
+  libssl-dev jq screen tmux
 
   VAR_PATH="$CURRENT_PATH/../../../../var"
 

@@ -143,14 +143,12 @@ function comp_compile() {
       find "$AC_BINPATH_FULL"  -mindepth 1 -maxdepth 1 -type f -exec sudo chown root:root -- {} +
       find "$AC_BINPATH_FULL"  -mindepth 1 -maxdepth 1 -type f -exec sudo chmod u+s  -- {} +
 
-      if [[ -n "$DOCKER" ]]; then
-          [[ -f "$confDir/worldserver.conf.dist" ]] && \
-              cp -nv "$confDir/worldserver.conf.dist" "$confDir/worldserver.conf"
-          [[ -f "$confDir/authserver.conf.dist" ]] && \
-              cp -nv "$confDir/authserver.conf.dist" "$confDir/authserver.conf"
-          [[ -f "$confDir/dbimport.conf.dist" ]] && \
-              cp -nv "$confDir/dbimport.conf.dist" "$confDir/dbimport.conf"
-      fi
+      [[ -f "$confDir/worldserver.conf.dist" ]] && \
+          cp -v --update=none "$confDir/worldserver.conf.dist" "$confDir/worldserver.conf"
+      [[ -f "$confDir/authserver.conf.dist" ]] && \
+          cp -v --update=none "$confDir/authserver.conf.dist" "$confDir/authserver.conf"
+      [[ -f "$confDir/dbimport.conf.dist" ]] && \
+          cp -v --update=none "$confDir/dbimport.conf.dist" "$confDir/dbimport.conf"
 
       echo "Done"
       ;;

@@ -45,6 +45,18 @@ function inst_configureOS() {
     esac
 }
 
+# Use the data/sql/create/create_mysql.sql to initialize the database
+function inst_dbCreate() {
+    echo "Creating database...Please enter your sudo and your MySQL root password if prompted."
+    # Execute the SQL script to create the database
+    $([ "$EUID" -ne 0 ] && echo sudo) mysql -u root -p < "$AC_PATH_ROOT/data/sql/create/create_mysql.sql"
+    if [ $? -ne 0 ]; then
+        echo "Database creation failed. Please check your MySQL server and credentials."
+        exit 1
+    fi
+    echo "Database created successfully."
+}
+
 function inst_updateRepo() {
     cd "$AC_PATH_ROOT"
     if [ ! -z $INSTALLER_PULL_FROM ]; then
@@ -73,7 +85,8 @@ function inst_cleanCompile() {
 function inst_allInOne() {
     inst_configureOS
     inst_compile
-    dbasm_import true true true
+    inst_dbCreate
+    inst_download_client_data
 }
 
 function inst_getVersionBranch() {
@@ -215,7 +228,7 @@ function inst_module_remove {
 
 function inst_simple_restarter {
     echo "Running $1 ..."
-    bash "$AC_PATH_APPS/startup-scripts/simple-restarter" "$AC_BINPATH_FULL" "$1"
+    bash "$AC_PATH_APPS/startup-scripts/src/simple-restarter" "$AC_BINPATH_FULL" "$1"
     echo
     #disown -a
     #jobs -l
