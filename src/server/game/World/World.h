@@ -275,7 +275,7 @@ private:
 
     IntervalTimer _timers[WUPDATE_COUNT];
     Seconds _mail_expire_check_timer;
-    
+
     AccountTypes _allowedSecurityLevel;
     LocaleConstant _defaultDbcLocale;                     // from config for one from loaded DBC locales
     uint32 _availableDbcLocaleMask;                       // by loaded DBC

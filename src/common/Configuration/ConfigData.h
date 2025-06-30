@@ -24,11 +24,6 @@
 #include "Log.h"
 #include <variant>
 
-struct ConfigObject
-{
-    std::variant<std::monostate, float, bool, uint32, std::string> value;
-};
-
 template<typename ConfigEnum>
 class ConfigData
 {
@@ -65,7 +60,7 @@ public:
         bool configValueChanged = false;
         if (_reloading)
         {
-            if (std::get<T>(_configs[configIndex].value) != configValue)
+            if (std::get<T>(_configs[configIndex]) != configValue)
                 configValueChanged = true;
 
             if (reloadable == Reloadable::No)
@@ -76,15 +71,15 @@ public:
             }
         }
         else
-            ASSERT(_configs[configIndex].value.index() == 0, "Config overwriting an existing value");
+            ASSERT(_configs[configIndex].index() == 0, "Config overwriting an existing value");
 
         if (checker && !checker(configValue))
         {
             LOG_ERROR("server.loading", "Server Config (Name: {}) failed validation check '{}'. Default value '{}' will be used instead.", configName, validationErrorText, defaultValue);
-            _configs[configIndex].value = defaultValue;
+            _configs[configIndex] = defaultValue;
         }
         else
-            _configs[configIndex].value = configValue;
+            _configs[configIndex] = configValue;
     }
 
     template<class T>
@@ -92,10 +87,10 @@ public:
     {
         uint32 const configIndex = static_cast<uint32>(config);
         ASSERT(configIndex < _configs.size(), "Config index out of bounds");
-        size_t const oldValueTypeIndex = _configs[configIndex].value.index();
+        size_t const oldValueTypeIndex = _configs[configIndex].index();
         ASSERT(oldValueTypeIndex != 0, "Config value must already be set");
-        _configs[configIndex].value = value;
-        ASSERT(oldValueTypeIndex == _configs[configIndex].value.index(), "Config value type changed");
+        _configs[configIndex] = value;
+        ASSERT(oldValueTypeIndex == _configs[configIndex].index(), "Config value type changed");
     }
 
     template<class T>
@@ -103,9 +98,9 @@ public:
     {
         uint32 const configIndex = static_cast<uint32>(config);
         ASSERT(configIndex < _configs.size(), "Config index out of bounds");
-        ASSERT(_configs[configIndex].value.index() != 0, "Config value must already be set");
+        ASSERT(_configs[configIndex].index() != 0, "Config value must already be set");
 
-        T const* value = std::get_if<T>(&_configs[configIndex].value);
+        T const* value = std::get_if<T>(&_configs[configIndex]);
         ASSERT(value, "Wrong config variant type");
 
         return *value;
@@ -116,9 +111,9 @@ public:
     {
         uint32 const configIndex = static_cast<uint32>(config);
         ASSERT(configIndex < _configs.size(), "Config index out of bounds");
-        ASSERT(_configs[configIndex].value.index() != 0, "Config value must already be set");
+        ASSERT(_configs[configIndex].index() != 0, "Config value must already be set");
 
-        std::string const* stringValue = std::get_if<std::string>(&_configs[configIndex].value);
+        std::string const* stringValue = std::get_if<std::string>(&_configs[configIndex]);
         ASSERT(stringValue, "Wrong config variant type");
 
         return std::string_view(*stringValue);
@@ -131,9 +126,9 @@ private:
     void VerifyAllConfigsLoaded()
     {
         uint32 configIndex = 0;
-        for (ConfigObject const& configObj : _configs)
+        for (auto const& variant : _configs)
         {
-            if (configObj.value.index() == 0)
+            if (variant.index() == 0)
             {
                 LOG_ERROR("server.loading", "Server Config (Index: {}) is defined but not loaded, unable to continue.", configIndex);
                 ASSERT(false);
@@ -143,7 +138,7 @@ private:
         }
     }
 
-    std::vector<ConfigObject> _configs;
+    std::vector<std::variant<std::monostate, float, bool, uint32, std::string>> _configs;
     bool _reloading;
 };
 
