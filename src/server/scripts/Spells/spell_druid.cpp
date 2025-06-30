@@ -64,7 +64,14 @@ enum DruidSpells
 
 enum DruidIcons
 {
-    SPELL_ICON_REVITALIZE                   = 2862
+    SPELL_ICON_REVITALIZE                   = 2862,
+    SPELL_ICON_FUROR                        = 210,
+    SPELL_ICON_MOONKINAURA                  = 46, // SpellId: 24907
+    SPELL_ICON_MASTER_SHAPESHIFTER          = 2851, // SpellId: 48421
+    SPELL_ICON_NURTURING_INSTINCT           = 2254, // SpellId: 47180
+    SPELL_ICON_FERAL_SWIFTNESS_PASSIVE_2A   = 67, // SpellId: 24864
+    SPELL_ICON_LEADER_OF_THE_PACK           = 312, //SpellId: 24932
+    SPELL_ICON_TREE_OF_LIFE                 = 2257 //SpellId: 34123
 };
 
 // 1178 - Bear Form (Passive)
@@ -196,26 +203,18 @@ class spell_dru_omen_of_clarity : public AuraScript
     {
         SpellInfo const* spellInfo = eventInfo.GetSpellInfo();
         if (!spellInfo)
-        {
             return true;
-        }
 
         // Prevent passive spells to proc. (I.e shapeshift passives & passive talents)
         if (spellInfo->IsPassive())
-        {
             return false;
-        }
 
         // Don't proc on crafting items.
         if (spellInfo->HasEffect(SPELL_EFFECT_CREATE_ITEM))
-        {
             return false;
-        }
 
         if (eventInfo.GetTypeMask() & PROC_FLAG_DONE_SPELL_MELEE_DMG_CLASS)
-        {
             return spellInfo->HasAttribute(SPELL_ATTR0_ON_NEXT_SWING) || spellInfo->HasAttribute(SPELL_ATTR0_ON_NEXT_SWING_NO_DAMAGE);
-        }
 
         // Non-damaged/Non-healing spells - only druid abilities
         if (!spellInfo->HasAttribute(SpellCustomAttributes(SPELL_ATTR0_CU_DIRECT_DAMAGE | SPELL_ATTR0_CU_NO_INITIAL_THREAT)))
@@ -223,6 +222,24 @@ class spell_dru_omen_of_clarity : public AuraScript
             if (spellInfo->SpellFamilyName == SPELLFAMILY_DRUID)
             {
                 // Exclude shapeshifting
+                if (spellInfo->SpellIconID == SPELL_ICON_MOONKINAURA)
+                    return false;
+
+                if (spellInfo->SpellIconID == SPELL_ICON_MASTER_SHAPESHIFTER)
+                    return false;
+
+                if (spellInfo->SpellIconID == SPELL_ICON_NURTURING_INSTINCT)
+                    return false;
+
+                if (spellInfo->SpellIconID == SPELL_ICON_FERAL_SWIFTNESS_PASSIVE_2A)
+                    return false;
+
+                if (spellInfo->SpellIconID == SPELL_ICON_LEADER_OF_THE_PACK)
+                    return false;
+
+                if (spellInfo->SpellIconID == SPELL_ICON_TREE_OF_LIFE)
+                    return false;
+
                 return !spellInfo->HasAura(SPELL_AURA_MOD_SHAPESHIFT);
             }
 
@@ -231,9 +248,11 @@ class spell_dru_omen_of_clarity : public AuraScript
 
         // Revitalize
         if (spellInfo->SpellIconID == SPELL_ICON_REVITALIZE)
-        {
             return false;
-        }
+
+        // Furor 210
+        if (spellInfo->SpellIconID == SPELL_ICON_FUROR)
+            return false;
 
         return true;
     }
