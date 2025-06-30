@@ -1200,23 +1200,6 @@ class spell_chapter5_light_of_dawn_aura : public AuraScript
     }
 };
 
-class spell_chapter5_rebuke : public SpellScript
-{
-    PrepareSpellScript(spell_chapter5_rebuke);
-
-    void HandleLeapBack(SpellEffIndex effIndex)
-    {
-        PreventHitEffect(effIndex);
-        if (Unit* unitTarget = GetHitUnit())
-            unitTarget->KnockbackFrom(2282.86f, -5263.45f, 40.0f, 8.0f);
-    }
-
-    void Register() override
-    {
-        OnEffectLaunchTarget += SpellEffectFn(spell_chapter5_rebuke::HandleLeapBack, EFFECT_0, SPELL_EFFECT_LEAP_BACK);
-    }
-};
-
 // 58552 - Return to Orgrimmar
 // 58533 - Return to Stormwind
 enum ReturnToCapital
@@ -1317,6 +1300,5 @@ void AddSC_the_scarlet_enclave_c5()
 {
     new npc_highlord_darion_mograine();
     RegisterSpellScript(spell_chapter5_light_of_dawn_aura);
-    RegisterSpellScript(spell_chapter5_rebuke);
     RegisterSpellScript(spell_chapter5_return_to_capital);
 }
