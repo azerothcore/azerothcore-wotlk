@@ -1495,6 +1495,11 @@ namespace lfg
             for (LfgLockMap::const_iterator it2 = cachedLockMap.begin(); it2 != cachedLockMap.end() && !dungeons.empty(); ++it2)
             {
                 uint32 dungeonId = (it2->first & 0x00FFFFFF); // Compare dungeon ids
+
+                // Skip faction-specific locks if cross-faction is enabled
+                if (sWorld->getBoolConfig(CONFIG_ALLOW_TWO_SIDE_INTERACTION_GROUP) && (it2->second == LFG_LOCKSTATUS_QUEST_NOT_COMPLETED || it2->second == LFG_LOCKSTATUS_MISSING_ITEM))
+                    continue;
+
                 LfgDungeonSet::iterator itDungeon = dungeons.find(dungeonId);
                 if (itDungeon != dungeons.end())
                 {
@@ -1670,11 +1675,8 @@ namespace lfg
             }
             else if (group != grp)
             {
-                // pussywizard:
                 if (!grp->IsFull())
                     grp->AddMember(player);
-                //else // some cleanup? LeaveLFG?
-                //  ;
             }
 
             grp->SetLfgRoles(pguid, proposal.players.find(pguid)->second.role);
@@ -2685,17 +2687,24 @@ namespace lfg
     LFGQueue& LFGMgr::GetQueue(ObjectGuid guid)
     {
         uint8 queueId = 0;
-        if (guid.IsGroup())
+        if (sWorld->getBoolConfig(CONFIG_ALLOW_TWO_SIDE_INTERACTION_GROUP))
         {
-            LfgGuidSet const& players = GetPlayers(guid);
-            ObjectGuid pguid = players.empty() ? ObjectGuid::Empty : (*players.begin());
-            if (pguid)
-                queueId = GetTeam(pguid);
-            else
-                queueId = GetTeam(GetLeader(guid));
+            queueId = TEAM_ALLIANCE;
         }
         else
-            queueId = GetTeam(guid);
+        {
+            if (guid.IsGroup())
+            {
+                LfgGuidSet const& players = GetPlayers(guid);
+                ObjectGuid pguid = players.empty() ? ObjectGuid::Empty : (*players.begin());
+                if (pguid)
+                    queueId = GetTeam(pguid);
+                else
+                    queueId = GetTeam(GetLeader(guid));
+            }
+            else
+                queueId = GetTeam(guid);
+        }
         return QueuesStore[queueId];
     }
 
