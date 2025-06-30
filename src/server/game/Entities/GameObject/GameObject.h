@@ -116,7 +116,7 @@ enum LootState
 // 5 sec for bobber catch
 #define FISHING_BOBBER_READY_TIME 5
 
-class GameObject : public WorldObject, public GridObject<GameObject>, public MovableMapObject
+class GameObject : public WorldObject, public GridObject<GameObject>, public MovableMapObject, public UpdatableMapObject
 {
 public:
     explicit GameObject();
@@ -362,6 +362,8 @@ public:
     void SaveStateToDB();
 
     std::string GetDebugInfo() const override;
+
+    bool IsUpdateNeeded() override;
 protected:
     bool AIM_Initialize();
     GameObjectModel* CreateModel();

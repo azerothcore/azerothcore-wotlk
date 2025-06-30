@@ -34,6 +34,7 @@
 #include "Position.h"
 #include "SharedDefines.h"
 #include "TaskScheduler.h"
+#include "Timer.h"
 #include "GridTerrainData.h"
 #include <bitset>
 #include <list>
@@ -85,6 +86,7 @@ struct ScriptAction
 
 #define DEFAULT_HEIGHT_SEARCH     50.0f                     // default search distance to find height at nearby locations
 #define MIN_UNLOAD_DELAY      1                             // immediate unload
+#define UPDATABLE_OBJECT_LIST_RECHECK_TIMER 30 * IN_MILLISECONDS // Time to recheck update object list
 
 struct PositionFullTerrainStatus
 {
@@ -181,14 +183,7 @@ public:
     template<class T> bool AddToMap(T*, bool checkTransport = false);
     template<class T> void RemoveFromMap(T*, bool);
 
-    void VisitNearbyCellsOf(WorldObject* obj, TypeContainerVisitor<Acore::ObjectUpdater, GridTypeMapContainer>& gridVisitor,
-                            TypeContainerVisitor<Acore::ObjectUpdater, WorldTypeMapContainer>& worldVisitor,
-                            TypeContainerVisitor<Acore::ObjectUpdater, GridTypeMapContainer>& largeGridVisitor,
-                            TypeContainerVisitor<Acore::ObjectUpdater, WorldTypeMapContainer>& largeWorldVisitor);
-    void VisitNearbyCellsOfPlayer(Player* player, TypeContainerVisitor<Acore::ObjectUpdater, GridTypeMapContainer>& gridVisitor,
-                                  TypeContainerVisitor<Acore::ObjectUpdater, WorldTypeMapContainer>& worldVisitor,
-                                  TypeContainerVisitor<Acore::ObjectUpdater, GridTypeMapContainer>& largeGridVisitor,
-                                  TypeContainerVisitor<Acore::ObjectUpdater, WorldTypeMapContainer>& largeWorldVisitor);
+    void MarkNearbyCellsOf(WorldObject* obj);
 
     virtual void Update(const uint32, const uint32, bool thread = true);
 
@@ -317,9 +312,6 @@ public:
     void resetMarkedCells() { marked_cells.reset(); }
     bool isCellMarked(uint32 pCellId) { return marked_cells.test(pCellId); }
     void markCell(uint32 pCellId) { marked_cells.set(pCellId); }
-    void resetMarkedCellsLarge() { marked_cells_large.reset(); }
-    bool isCellMarkedLarge(uint32 pCellId) { return marked_cells_large.test(pCellId); }
-    void markCellLarge(uint32 pCellId) { marked_cells_large.set(pCellId); }
 
     [[nodiscard]] bool HavePlayers() const { return !m_mapRefMgr.IsEmpty(); }
     [[nodiscard]] uint32 GetPlayersCountExceptGMs() const;
@@ -512,6 +504,12 @@ public:
     uint32 GetCreatedCellsInGridCount(uint16 const x, uint16 const y);
     uint32 GetCreatedCellsInMapCount();
 
+    void AddObjectToPendingUpdateList(WorldObject* obj);
+    void RemoveObjectFromMapUpdateList(WorldObject* obj);
+
+    typedef std::vector<WorldObject*> UpdatableObjectList;
+    typedef std::unordered_set<WorldObject*> PendingAddUpdatableObjectList;
+
 private:
 
     template<class T> void InitializeObject(T* obj);
@@ -576,7 +574,6 @@ private:
     Map* m_parentMap;
 
     std::bitset<TOTAL_NUMBER_OF_CELLS_PER_MAP * TOTAL_NUMBER_OF_CELLS_PER_MAP> marked_cells;
-    std::bitset<TOTAL_NUMBER_OF_CELLS_PER_MAP * TOTAL_NUMBER_OF_CELLS_PER_MAP> marked_cells_large;
 
     bool i_scriptLock;
     std::unordered_set<WorldObject*> i_objectsToRemove;
@@ -610,6 +607,11 @@ private:
             m_activeNonPlayers.erase(obj);
     }
 
+    void UpdateNonPlayerObjects(uint32 const diff);
+
+    void _AddObjectToUpdateList(WorldObject* obj);
+    void _RemoveObjectFromUpdateList(WorldObject* obj);
+
     std::unordered_map<ObjectGuid::LowType /*dbGUID*/, time_t> _creatureRespawnTimes;
     std::unordered_map<ObjectGuid::LowType /*dbGUID*/, time_t> _goRespawnTimes;
 
@@ -637,6 +639,10 @@ private:
     std::unordered_set<Corpse*> _corpseBones;
 
     std::unordered_set<Object*> _updateObjects;
+
+    UpdatableObjectList _updatableObjectList;
+    PendingAddUpdatableObjectList _pendingAddUpdatableObjectList;
+    IntervalTimer _updatableObjectListRecheckTimer;
 };
 
 enum InstanceResetMethod
