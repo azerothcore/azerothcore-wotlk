@@ -19,8 +19,8 @@ options=(
     "run-worldserver (rw): execute a simple restarter for worldserver" # 11
     "run-authserver (ra): execute a simple restarter for authserver" # 12
     "docker (dr): Run docker tools" # 13
-    "service-manager (sm): Run service manager to run authserver and worldserver in background" # 14
-    "version (v): Show AzerothCore version"         # 15
+    "version (v): Show AzerothCore version"         # 14
+    "service-manager (sm): Run service manager to run authserver and worldserver in background" # 15
     "quit: Exit from this menu"                     # 16
     )
 

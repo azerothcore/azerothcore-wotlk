@@ -27,24 +27,25 @@ sudo apt update
 
 # shared deps
 sudo DEBIAN_FRONTEND="noninteractive" \
-apt-get -y install ccache clang cmake curl google-perftools libmysqlclient-dev make unzip
-
-if [[ $CONTINUOUS_INTEGRATION || $DOCKER ]]; then
-  # TODO: update CI / Docker section for Ubuntu 22.04+
-  sudo add-apt-repository -y ppa:mhier/libboost-latest && sudo apt update && sudo apt-get -y install build-essential cmake-data  \
-  libboost1.74-dev libbz2-dev libncurses5-dev libmysql++-dev libgoogle-perftools-dev libreadline6-dev libssl-dev libtool \
-  openssl zlib1g-dev jq bats 
-else
-  sudo DEBIAN_FRONTEND="noninteractive" \
-  apt-get install -y g++ gdb gdbserver gcc git \
-  libboost-all-dev libbz2-dev libncurses-dev libreadline-dev \
-  libssl-dev jq screen tmux
+apt-get -y install ccache clang cmake curl google-perftools libmysqlclient-dev make unzip jq screen tmux \
+  libreadline-dev libncurses5-dev libncursesw5-dev libbz2-dev git gcc g++ libssl-dev \
+  libncurses-dev libboost-all-dev gdb gdbserver
 
   VAR_PATH="$CURRENT_PATH/../../../../var"
 
+
+# Do not install MySQL if we are in docker (It will be used a docker container instead) or we are explicitly skipping it.
+if [[ $DOCKER != 1 && $SKIP_MYSQL_INSTALL != 1 ]]; then
   # run noninteractive install for MYSQL 8.4 LTS
   wget https://dev.mysql.com/get/mysql-apt-config_0.8.32-1_all.deb -P "$VAR_PATH"
   sudo DEBIAN_FRONTEND="noninteractive" dpkg -i "$VAR_PATH/mysql-apt-config_0.8.32-1_all.deb"
   sudo apt-get update
   sudo DEBIAN_FRONTEND="noninteractive" apt-get install -y mysql-server
 fi
+
+
+if [[ $CONTINUOUS_INTEGRATION ]]; then
+  sudo systemctl enable mysql.service
+  sudo systemctl start mysql.service
+fi
+

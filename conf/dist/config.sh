@@ -14,6 +14,10 @@ BINPATH="$AC_PATH_ROOT/env/dist"
 # Change it if you really know what you're doing.
 # OSTYPE=""
 
+# Configuration for the installer to skip the MySQL installation.
+# This is useful when your MySQL is in a container or another machine.
+SKIP_MYSQL_INSTALL=${SKIP_MYSQL_INSTALL:-false}
+
 # When using linux, our installer automatically get information about your distro
 # using lsb_release. If your distro is not supported but it's based on ubuntu or debian,
 # please change it to one of these values.

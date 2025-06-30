@@ -36,9 +36,11 @@ jobs:
           ./acore.sh install-deps
 
       - name: Run bash script tests for ${{ matrix.test-module }}
+        env:
+          TERM: xterm-256color
         run: |
           cd apps/test-framework
-          ./run-tests.sh
+          ./run-tests.sh --tap
 
   build-and-test:
     name: Build and Integration Test
@@ -65,10 +67,6 @@ jobs:
           # This runs: install-deps, compile, database setup, client-data download
           ./acore.sh init
         timeout-minutes: 120
-
-      - name: Start mysql service
-        run: |
-          sudo systemctl start mysql.service
 
       - name: Test authserver dry-run
         run: |
