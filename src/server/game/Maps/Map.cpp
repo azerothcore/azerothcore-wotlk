@@ -80,6 +80,7 @@ Map::Map(uint32 id, uint32 InstanceId, uint8 SpawnMode, Map* _parent) :
     m_parentMap = (_parent ? _parent : this);
 
     _zonePlayerCountMap.clear();
+    _updatableObjectListRecheckTimer.SetInterval(UPDATABLE_OBJECT_LIST_RECHECK_TIMER);
 
     //lets initialize visibility distance for map
     Map::InitVisibilityDistance();
@@ -623,30 +624,45 @@ void Map::Update(const uint32 t_diff, const uint32 s_diff, bool  /*thread*/)
 
 void Map::UpdateNonPlayerObjects(uint32 const diff)
 {
-    for (PendingAddUpdatableObjectList::iterator itr = _pendingAddUpdatableObjectList.begin(); itr != _pendingAddUpdatableObjectList.end(); ++itr)
-        _AddObjectToUpdateList((*itr));
+    for (WorldObject* obj : _pendingAddUpdatableObjectList)
+        _AddObjectToUpdateList(obj);
     _pendingAddUpdatableObjectList.clear();
 
-    for (uint32 i = 0; i < _updatableObjectList.size();)
+    _updatableObjectListRecheckTimer.Update(diff);
+    if (_updatableObjectListRecheckTimer.Passed())
     {
-        WorldObject* obj = _updatableObjectList[i];
-
-        if (!obj->IsInWorld())
+        for (uint32 i = 0; i < _updatableObjectList.size();)
         {
-            ++i;
-            continue;
+            WorldObject* obj = _updatableObjectList[i];
+            if (!obj->IsInWorld())
+            {
+                ++i;
+                continue;
+            }
+
+            obj->Update(diff);
+
+            if (!obj->IsUpdateNeeded())
+            {
+                _RemoveObjectFromUpdateList(obj);
+                // Intentional no iteration here, obj is swapped with last element in
+                // _updatableObjectList so next loop will update that object at the same index
+            }
+            else
+                ++i;
         }
-
-        obj->Update(diff);
-
-        if (!obj->IsUpdateNeeded())
+        _updatableObjectListRecheckTimer.Reset();
+    }
+    else
+    {
+        for (uint32 i = 0; i < _updatableObjectList.size(); ++i)
         {
-            _RemoveObjectFromUpdateList(obj);
-            // Intentional no iteration here, obj is swapped with last element in
-            // _updatableObjectList so next loop will update that object at the same index
+            WorldObject* obj = _updatableObjectList[i];
+            if (!obj->IsInWorld())
+                continue;
+
+            obj->Update(diff);
         }
-        else
-            ++i;
     }
 }
 
@@ -656,20 +672,20 @@ void Map::AddObjectToPendingUpdateList(WorldObject* obj)
         return;
 
     UpdatableMapObject* mapUpdatableObject = dynamic_cast<UpdatableMapObject*>(obj);
-    if (mapUpdatableObject->IsInMapUpdateList())
+    if (mapUpdatableObject->GetUpdateState() != UpdatableMapObject::UpdateState::NotUpdating)
         return;
 
     _pendingAddUpdatableObjectList.insert(obj);
-    mapUpdatableObject->SetIsInMapUpdateList(true);
+    mapUpdatableObject->SetUpdateState(UpdatableMapObject::UpdateState::PendingAdd);
 }
 
 // Internal use only
 void Map::_AddObjectToUpdateList(WorldObject* obj)
 {
     UpdatableMapObject* mapUpdatableObject = dynamic_cast<UpdatableMapObject*>(obj);
-    ASSERT(mapUpdatableObject);
-    // Validation of object not being in map update list is already checked for in AddObjectToPendingUpdateList
+    ASSERT(mapUpdatableObject && mapUpdatableObject->GetUpdateState() == UpdatableMapObject::UpdateState::PendingAdd);
 
+    mapUpdatableObject->SetUpdateState(UpdatableMapObject::UpdateState::Updating);
     mapUpdatableObject->SetMapUpdateListOffset(_updatableObjectList.size());
     _updatableObjectList.push_back(obj);
 }
@@ -678,7 +694,7 @@ void Map::_AddObjectToUpdateList(WorldObject* obj)
 void Map::_RemoveObjectFromUpdateList(WorldObject* obj)
 {
     UpdatableMapObject* mapUpdatableObject = dynamic_cast<UpdatableMapObject*>(obj);
-    ASSERT(mapUpdatableObject && mapUpdatableObject->IsInMapUpdateList());
+    ASSERT(mapUpdatableObject && mapUpdatableObject->GetUpdateState() == UpdatableMapObject::UpdateState::Updating);
 
     if (obj != _updatableObjectList.back())
     {
@@ -687,7 +703,7 @@ void Map::_RemoveObjectFromUpdateList(WorldObject* obj)
     }
 
     _updatableObjectList.pop_back();
-    mapUpdatableObject->SetIsInMapUpdateList(false);
+    mapUpdatableObject->SetUpdateState(UpdatableMapObject::UpdateState::NotUpdating);
 }
 
 void Map::RemoveObjectFromMapUpdateList(WorldObject* obj)
@@ -696,11 +712,10 @@ void Map::RemoveObjectFromMapUpdateList(WorldObject* obj)
         return;
 
     UpdatableMapObject* mapUpdatableObject = dynamic_cast<UpdatableMapObject*>(obj);
-    if (!mapUpdatableObject->IsInMapUpdateList())
-        return;
-
-    _pendingAddUpdatableObjectList.erase(obj);
-    _RemoveObjectFromUpdateList(obj);
+    if (mapUpdatableObject->GetUpdateState() == UpdatableMapObject::UpdateState::PendingAdd)
+        _pendingAddUpdatableObjectList.erase(obj);
+    else if (mapUpdatableObject->GetUpdateState() == UpdatableMapObject::UpdateState::Updating)
+        _RemoveObjectFromUpdateList(obj);
 }
 
 void Map::HandleDelayedVisibility()

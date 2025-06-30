@@ -412,13 +412,21 @@ class UpdatableMapObject
 {
     friend class Map;
 
+public:
+    enum UpdateState : uint8
+    {
+        NotUpdating,
+        PendingAdd,
+        Updating
+    };
+
 protected:
-    UpdatableMapObject() : _mapUpdateListOffset(0), _isInMapUpdateList(false) { }
+    UpdatableMapObject() : _mapUpdateListOffset(0), _mapUpdateState(NotUpdating) { }
 
 private:
     void SetMapUpdateListOffset(std::size_t const offset)
     {
-        ASSERT(_isInMapUpdateList, "Attempted to set update list offset when object is not in map update list");
+        ASSERT(_mapUpdateState == Updating, "Attempted to set update list offset when object is not in map update list");
         _mapUpdateListOffset = offset;
     }
 
@@ -427,19 +435,19 @@ private:
         return _mapUpdateListOffset;
     }
 
-    void SetIsInMapUpdateList(bool const val)
+    void SetUpdateState(UpdateState state)
     {
-        _isInMapUpdateList = val;
+        _mapUpdateState = state;
     }
 
-    bool IsInMapUpdateList() const
+    UpdateState GetUpdateState() const
     {
-        return _isInMapUpdateList;
+        return _mapUpdateState;
     }
 
 private:
     std::size_t _mapUpdateListOffset;
-    bool _isInMapUpdateList;
+    UpdateState _mapUpdateState;
 };
 
 class WorldObject : public Object, public WorldLocation

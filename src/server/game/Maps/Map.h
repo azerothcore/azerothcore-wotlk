@@ -34,6 +34,7 @@
 #include "Position.h"
 #include "SharedDefines.h"
 #include "TaskScheduler.h"
+#include "Timer.h"
 #include "GridTerrainData.h"
 #include <bitset>
 #include <list>
@@ -85,6 +86,7 @@ struct ScriptAction
 
 #define DEFAULT_HEIGHT_SEARCH     50.0f                     // default search distance to find height at nearby locations
 #define MIN_UNLOAD_DELAY      1                             // immediate unload
+#define UPDATABLE_OBJECT_LIST_RECHECK_TIMER 30 * IN_MILLISECONDS // Time to recheck update object list
 
 struct PositionFullTerrainStatus
 {
@@ -640,6 +642,7 @@ private:
 
     UpdatableObjectList _updatableObjectList;
     PendingAddUpdatableObjectList _pendingAddUpdatableObjectList;
+    IntervalTimer _updatableObjectListRecheckTimer;
 };
 
 enum InstanceResetMethod
