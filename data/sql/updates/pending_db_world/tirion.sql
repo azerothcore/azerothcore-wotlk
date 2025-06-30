@@ -1,5 +1,6 @@
 -- DB update 2025_06_29_02 -> 2025_06_29_03
 --
+SET @NPC := 29175;
 SET @PATH := @NPC * 10;
 DELETE FROM `waypoint_data` WHERE `id`=@PATH;
 INSERT INTO `waypoint_data` (`id`,`point`,`position_x`,`position_y`,`position_z`,`orientation`,`delay`,`move_type`,`action`,`action_chance`,`wpguid`) VALUES
