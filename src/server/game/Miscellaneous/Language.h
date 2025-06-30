@@ -1171,8 +1171,10 @@ enum AcoreStrings
     LANG_GM_ANNOUNCE_COLOR               = 6615,
 
     LANG_GM_SILENCE                      = 6616,              // "Silence is ON for %s" - Spell 1852
+    LANG_GM_SPECTATOR_ON                 = 6617,
+    LANG_GM_SPECTATOR_OFF                = 6618,
 
-    // Free strings 6617-7522
+    // Free strings 6619-7522
 
     LANG_WORLD_CLOSED                    = 7523,
     LANG_WORLD_OPENED                    = 7524,
