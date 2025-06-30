@@ -290,6 +290,8 @@ function start_service() {
         if [ -n "$binary_location" ]; then
             detected_binpath="$(dirname "$binary_location")"
             echo "Binary found in system PATH: $binary_location"
+            # Set BINPATH to the detected location so starter script can find the binary
+            BINPATH="$detected_binpath"
         fi
         
         # Set up log paths based on detected or fallback location

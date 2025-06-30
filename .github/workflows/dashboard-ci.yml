@@ -19,6 +19,9 @@ concurrency:
   group: ${{ github.head_ref }} || concat(${{ github.ref }}, ${{ github.workflow }})
   cancel-in-progress: true
 
+env:
+  CONTINUOUS_INTEGRATION: true
+
 jobs:
   test-bash-scripts:
     name: Test Bash Scripts
