@@ -24,16 +24,16 @@
 
 class Player;
 
-#define CHANNEL_BAN_DURATION            DAY*60
+#define CHANNEL_BAN_DURATION DAY*60
 
 // EnumUtils: DESCRIBE THIS
 enum ChatNotify : uint8
 {
     CHAT_JOINED_NOTICE                = 0x00,           //+ "%s joined channel.";
     CHAT_LEFT_NOTICE                  = 0x01,           //+ "%s left channel.";
-    //CHAT_SUSPENDED_NOTICE             = 0x01,           // "%s left channel.";
+    //CHAT_SUSPENDED_NOTICE           = 0x01,           // "%s left channel.";
     CHAT_YOU_JOINED_NOTICE            = 0x02,           //+ "Joined Channel: [%s]"; -- You joined
-    //CHAT_YOU_CHANGED_NOTICE           = 0x02,           // "Changed Channel: [%s]";
+    //CHAT_YOU_CHANGED_NOTICE         = 0x02,           // "Changed Channel: [%s]";
     CHAT_YOU_LEFT_NOTICE              = 0x03,           //+ "Left Channel: [%s]"; -- You left
     CHAT_WRONG_PASSWORD_NOTICE        = 0x04,           //+ "Wrong password for %s.";
     CHAT_NOT_MEMBER_NOTICE            = 0x05,           //+ "Not on channel %s.";
@@ -73,7 +73,7 @@ enum ChannelFlags
 {
     CHANNEL_FLAG_NONE       = 0x00,
     CHANNEL_FLAG_CUSTOM     = 0x01,
-    // 0x02
+                           // 0x02
     CHANNEL_FLAG_TRADE      = 0x04,
     CHANNEL_FLAG_NOT_LFG    = 0x08,
     CHANNEL_FLAG_GENERAL    = 0x10,
@@ -90,16 +90,16 @@ enum ChannelFlags
 enum ChannelDBCFlags
 {
     CHANNEL_DBC_FLAG_NONE       = 0x00000,
-    CHANNEL_DBC_FLAG_INITIAL    = 0x00001,              // General, Trade, LocalDefense, LFG
-    CHANNEL_DBC_FLAG_ZONE_DEP   = 0x00002,              // General, Trade, LocalDefense, GuildRecruitment
-    CHANNEL_DBC_FLAG_GLOBAL     = 0x00004,              // WorldDefense
-    CHANNEL_DBC_FLAG_TRADE      = 0x00008,              // Trade, LFG
-    CHANNEL_DBC_FLAG_CITY_ONLY  = 0x00010,              // Trade, GuildRecruitment, LFG
-    CHANNEL_DBC_FLAG_CITY_ONLY2 = 0x00020,              // Trade, GuildRecruitment, LFG
-    CHANNEL_DBC_FLAG_DEFENSE    = 0x10000,              // LocalDefense, WorldDefense
-    CHANNEL_DBC_FLAG_GUILD_REQ  = 0x20000,              // GuildRecruitment
-    CHANNEL_DBC_FLAG_LFG        = 0x40000,              // LFG
-    CHANNEL_DBC_FLAG_UNK1       = 0x80000               // General
+    CHANNEL_DBC_FLAG_INITIAL    = 0x00001, // General, Trade, LocalDefense, LFG
+    CHANNEL_DBC_FLAG_ZONE_DEP   = 0x00002, // General, Trade, LocalDefense, GuildRecruitment
+    CHANNEL_DBC_FLAG_GLOBAL     = 0x00004, // WorldDefense
+    CHANNEL_DBC_FLAG_TRADE      = 0x00008, // Trade, LFG
+    CHANNEL_DBC_FLAG_CITY_ONLY  = 0x00010, // Trade, GuildRecruitment, LFG
+    CHANNEL_DBC_FLAG_CITY_ONLY2 = 0x00020, // Trade, GuildRecruitment, LFG
+    CHANNEL_DBC_FLAG_DEFENSE    = 0x10000, // LocalDefense, WorldDefense
+    CHANNEL_DBC_FLAG_GUILD_REQ  = 0x20000, // GuildRecruitment
+    CHANNEL_DBC_FLAG_LFG        = 0x40000, // LFG
+    CHANNEL_DBC_FLAG_UNK1       = 0x80000  // General
 };
 
 enum ChannelMemberFlags
@@ -111,8 +111,8 @@ enum ChannelMemberFlags
     MEMBER_FLAG_MUTED       = 0x08,
     MEMBER_FLAG_CUSTOM      = 0x10,
     MEMBER_FLAG_MIC_MUTED   = 0x20
-                              // 0x40
-                              // 0x80
+                           // 0x40
+                           // 0x80
 };
 
 class ChannelRights
@@ -129,15 +129,15 @@ public:
 
 enum eChannelRights
 {
-    CHANNEL_RIGHT_FORCE_NO_ANNOUNCEMENTS    = 0x001,
-    CHANNEL_RIGHT_FORCE_ANNOUNCEMENTS       = 0x002,
-    CHANNEL_RIGHT_NO_OWNERSHIP              = 0x004,
-    CHANNEL_RIGHT_CANT_SPEAK                = 0x008,
-    CHANNEL_RIGHT_CANT_BAN                  = 0x010,
-    CHANNEL_RIGHT_CANT_KICK                 = 0x020,
-    CHANNEL_RIGHT_CANT_MUTE                 = 0x040,
-    CHANNEL_RIGHT_CANT_CHANGE_PASSWORD      = 0x080,
-    CHANNEL_RIGHT_DONT_PRESERVE             = 0x100,
+    CHANNEL_RIGHT_FORCE_NO_ANNOUNCEMENTS = 0x001,
+    CHANNEL_RIGHT_FORCE_ANNOUNCEMENTS    = 0x002,
+    CHANNEL_RIGHT_NO_OWNERSHIP           = 0x004,
+    CHANNEL_RIGHT_CANT_SPEAK             = 0x008,
+    CHANNEL_RIGHT_CANT_BAN               = 0x010,
+    CHANNEL_RIGHT_CANT_KICK              = 0x020,
+    CHANNEL_RIGHT_CANT_MUTE              = 0x040,
+    CHANNEL_RIGHT_CANT_CHANGE_PASSWORD   = 0x080,
+    CHANNEL_RIGHT_DONT_PRESERVE          = 0x100,
 };
 
 class Channel
@@ -153,29 +153,51 @@ class Channel
         [[nodiscard]] bool IsOwner() const { return flags & MEMBER_FLAG_OWNER; }
         void SetOwner(bool state)
         {
-            if (state) flags |= MEMBER_FLAG_OWNER;
-            else flags &= ~MEMBER_FLAG_OWNER;
+            if (state)
+                flags |= MEMBER_FLAG_OWNER;
+            else
+                flags &= ~MEMBER_FLAG_OWNER;
         }
         [[nodiscard]] bool IsOwnerGM() const { return _gmStatus; }
         void SetOwnerGM(bool on) { _gmStatus = on; }
         [[nodiscard]] bool IsModerator() const { return flags & MEMBER_FLAG_MODERATOR; }
         void SetModerator(bool state)
         {
-            if (state) flags |= MEMBER_FLAG_MODERATOR;
-            else flags &= ~MEMBER_FLAG_MODERATOR;
+            if (state)
+                flags |= MEMBER_FLAG_MODERATOR;
+            else
+                flags &= ~MEMBER_FLAG_MODERATOR;
         }
         [[nodiscard]] bool IsMuted() const { return flags & MEMBER_FLAG_MUTED; }
         void SetMuted(bool state)
         {
-            if (state) flags |= MEMBER_FLAG_MUTED;
-            else flags &= ~MEMBER_FLAG_MUTED;
+            if (state)
+                flags |= MEMBER_FLAG_MUTED;
+            else
+                flags &= ~MEMBER_FLAG_MUTED;
+        }
+        [[nodiscard]] bool IsMicMuted() const { return flags & MEMBER_FLAG_MIC_MUTED; }
+        void SetMicMuted(bool state)
+        {
+            if (state)
+                flags |= MEMBER_FLAG_MIC_MUTED;
+            else
+                flags &= ~MEMBER_FLAG_MIC_MUTED;
+        }
+        [[nodiscard]] bool IsVoiced() const { return flags & MEMBER_FLAG_VOICED; }
+        void SetVoiced(bool state)
+        {
+            if (state)
+                flags |= MEMBER_FLAG_VOICED;
+            else
+                flags &= ~MEMBER_FLAG_VOICED;
         }
     private:
         bool _gmStatus = false;
     };
 
 public:
-    Channel(std::string const& name, uint32 channel_id, uint32 channelDBId, TeamId teamId = TEAM_NEUTRAL, bool announce = true, bool ownership = true);
+    Channel(std::string const& name, uint32 channelId, uint32 channelDBId, TeamId teamId = TEAM_NEUTRAL, bool announce = true, bool ownership = true);
     [[nodiscard]] std::string const& GetName() const { return _name; }
     [[nodiscard]] uint32 GetChannelId() const { return _channelId; }
     [[nodiscard]] uint32 GetChannelDBId() const { return _channelDBId; }
@@ -205,7 +227,9 @@ public:
     void UnsetModerator(Player const* player, std::string const& newname) { SetMode(player, newname, true, false); }
     void SetMute(Player const* player, std::string const& newname) { SetMode(player, newname, false, true); }
     void UnsetMute(Player const* player, std::string const& newname) { SetMode(player, newname, false, false); }
-    void List(Player const* player);
+    // inline void SetMicMute(Player* player, const char* targetName, bool set) { SetModeFlags(player, targetName, MEMBER_FLAG_MIC_MUTED, set); }
+    // inline void SetVoiced(Player* player, const char* targetName, bool set) { SetModeFlags(player, targetName, MEMBER_FLAG_VOICED, set); } // Not used
+    void List(Player const* player, bool display = false);
     void Announce(Player const* player);
     void Say(ObjectGuid guid, std::string const& what, uint32 lang);
     void Invite(Player const* player, std::string const& newp);
@@ -217,48 +241,54 @@ public:
     static void CleanOldChannelsInDB();
     void ToggleModeration(Player* p);
 
+    [[nodiscard]] bool IsOn(ObjectGuid who) const { return playersStore.find(who) != playersStore.end(); }
+    [[nodiscard]] bool IsBanned(ObjectGuid guid) const;
+
     // pussywizard:
     void AddWatching(Player* p);
     void RemoveWatching(Player* p);
 
+    bool IsVoiceEnabled() const { return HasFlag(CHANNEL_FLAG_VOICE); }
+    void ToggleVoice(Player* player = nullptr);
+    void AddVoiceChatMembersAfterCreate();
 private:
     // initial packet data (notify type and channel name)
     void MakeNotifyPacket(WorldPacket* data, uint8 notify_type);
     // type specific packet data
-    void MakeJoined(WorldPacket* data, ObjectGuid guid);                        //+ 0x00
-    void MakeLeft(WorldPacket* data, ObjectGuid guid);                          //+ 0x01
-    void MakeYouJoined(WorldPacket* data);                                      //+ 0x02
-    void MakeYouLeft(WorldPacket* data);                                        //+ 0x03
-    void MakeWrongPassword(WorldPacket* data);                                  //? 0x04
-    void MakeNotMember(WorldPacket* data);                                      //? 0x05
-    void MakeNotModerator(WorldPacket* data);                                   //? 0x06
-    void MakePasswordChanged(WorldPacket* data, ObjectGuid guid);               //+ 0x07
-    void MakeOwnerChanged(WorldPacket* data, ObjectGuid guid);                  //? 0x08
-    void MakePlayerNotFound(WorldPacket* data, std::string const& name);        //+ 0x09
-    void MakeNotOwner(WorldPacket* data);                                       //? 0x0A
-    void MakeChannelOwner(WorldPacket* data);                                   //? 0x0B
-    void MakeModeChange(WorldPacket* data, ObjectGuid guid, uint8 oldflags);    //+ 0x0C
-    void MakeAnnouncementsOn(WorldPacket* data, ObjectGuid guid);               //+ 0x0D
-    void MakeAnnouncementsOff(WorldPacket* data, ObjectGuid guid);              //+ 0x0E
-    void MakeMuted(WorldPacket* data);                                          //? 0x11
-    void MakePlayerKicked(WorldPacket* data, ObjectGuid bad, ObjectGuid good);  //? 0x12
-    void MakeBanned(WorldPacket* data);                                         //? 0x13
-    void MakePlayerBanned(WorldPacket* data, ObjectGuid bad, ObjectGuid good);  //? 0x14
-    void MakePlayerUnbanned(WorldPacket* data, ObjectGuid bad, ObjectGuid good);//? 0x15
-    void MakePlayerNotBanned(WorldPacket* data, std::string const& name);       //? 0x16
-    void MakePlayerAlreadyMember(WorldPacket* data, ObjectGuid guid);           //+ 0x17
-    void MakeInvite(WorldPacket* data, ObjectGuid guid);                        //? 0x18
-    void MakeInviteWrongFaction(WorldPacket* data);                             //? 0x19
-    void MakeWrongFaction(WorldPacket* data);                                   //? 0x1A
-    void MakeInvalidName(WorldPacket* data);                                    //? 0x1B
-    void MakeNotModerated(WorldPacket* data);                                   //? 0x1C
-    void MakePlayerInvited(WorldPacket* data, std::string const& name);         //+ 0x1D
-    void MakePlayerInviteBanned(WorldPacket* data, std::string const& name);    //? 0x1E
-    void MakeThrottled(WorldPacket* data);                                      //? 0x1F
-    void MakeNotInArea(WorldPacket* data);                                      //? 0x20
-    void MakeNotInLfg(WorldPacket* data);                                       //? 0x21
-    void MakeVoiceOn(WorldPacket* data, ObjectGuid guid);                       //+ 0x22
-    void MakeVoiceOff(WorldPacket* data, ObjectGuid guid);                      //+ 0x23
+    void MakeJoined(WorldPacket* data, ObjectGuid guid);                         //+ 0x00
+    void MakeLeft(WorldPacket* data, ObjectGuid guid);                           //+ 0x01
+    void MakeYouJoined(WorldPacket* data);                                       //+ 0x02
+    void MakeYouLeft(WorldPacket* data);                                         //+ 0x03
+    void MakeWrongPassword(WorldPacket* data);                                   //? 0x04
+    void MakeNotMember(WorldPacket* data);                                       //? 0x05
+    void MakeNotModerator(WorldPacket* data);                                    //? 0x06
+    void MakePasswordChanged(WorldPacket* data, ObjectGuid guid);                //+ 0x07
+    void MakeOwnerChanged(WorldPacket* data, ObjectGuid guid);                   //? 0x08
+    void MakePlayerNotFound(WorldPacket* data, std::string const& name);         //+ 0x09
+    void MakeNotOwner(WorldPacket* data);                                        //? 0x0A
+    void MakeChannelOwner(WorldPacket* data);                                    //? 0x0B
+    void MakeModeChange(WorldPacket* data, ObjectGuid guid, uint8 oldflags);     //+ 0x0C
+    void MakeAnnouncementsOn(WorldPacket* data, ObjectGuid guid);                //+ 0x0D
+    void MakeAnnouncementsOff(WorldPacket* data, ObjectGuid guid);               //+ 0x0E
+    void MakeMuted(WorldPacket* data);                                           //? 0x11
+    void MakePlayerKicked(WorldPacket* data, ObjectGuid bad, ObjectGuid good);   //? 0x12
+    void MakeBanned(WorldPacket* data);                                          //? 0x13
+    void MakePlayerBanned(WorldPacket* data, ObjectGuid bad, ObjectGuid good);   //? 0x14
+    void MakePlayerUnbanned(WorldPacket* data, ObjectGuid bad, ObjectGuid good); //? 0x15
+    void MakePlayerNotBanned(WorldPacket* data, std::string const& name);        //? 0x16
+    void MakePlayerAlreadyMember(WorldPacket* data, ObjectGuid guid);            //+ 0x17
+    void MakeInvite(WorldPacket* data, ObjectGuid guid);                         //? 0x18
+    void MakeInviteWrongFaction(WorldPacket* data);                              //? 0x19
+    void MakeWrongFaction(WorldPacket* data);                                    //? 0x1A
+    void MakeInvalidName(WorldPacket* data);                                     //? 0x1B
+    void MakeNotModerated(WorldPacket* data);                                    //? 0x1C
+    void MakePlayerInvited(WorldPacket* data, std::string const& name);          //+ 0x1D
+    void MakePlayerInviteBanned(WorldPacket* data, std::string const& name);     //? 0x1E
+    void MakeThrottled(WorldPacket* data);                                       //? 0x1F
+    void MakeNotInArea(WorldPacket* data);                                       //? 0x20
+    void MakeNotInLfg(WorldPacket* data);                                        //? 0x21
+    void MakeVoiceOn(WorldPacket* data, ObjectGuid guid);                        //+ 0x22
+    void MakeVoiceOff(WorldPacket* data, ObjectGuid guid);                       //+ 0x23
     void MakeModerationOn(WorldPacket* data, ObjectGuid guid);
     void MakeModerationOff(WorldPacket* data, ObjectGuid guid);
 
@@ -268,9 +298,6 @@ private:
     void SendToAllWatching(WorldPacket* data);
 
     bool ShouldAnnouncePlayer(Player const* player) const;
-
-    [[nodiscard]] bool IsOn(ObjectGuid who) const { return playersStore.find(who) != playersStore.end(); }
-    [[nodiscard]] bool IsBanned(ObjectGuid guid) const;
 
     void UpdateChannelInDB() const;
     void UpdateChannelUseageInDB() const;
@@ -329,6 +356,7 @@ private:
     ObjectGuid _ownerGUID;
     std::string _name;
     std::string _password;
+    bool _voice = false;
     ChannelRights _channelRights;
     PlayerContainer playersStore;
     BannedContainer bannedStore;

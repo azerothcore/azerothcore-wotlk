@@ -35,6 +35,7 @@
 #include "SharedDefines.h"
 #include "UpdateFieldFlags.h"
 #include "Util.h"
+#include "VoiceChatMgr.h"
 #include "World.h"
 #include "WorldPacket.h"
 #include "WorldSession.h"
@@ -314,6 +315,9 @@ void Group::ConvertToRaid()
     // pussywizard: client automatically clears df "eye" near minimap, so remove from raid browser
     if (sLFGMgr->GetState(GetLeaderGUID()) == lfg::LFG_STATE_RAIDBROWSER)
         sLFGMgr->LeaveLfg(GetLeaderGUID());
+
+    if (!isBGGroup() && !isBFGroup())
+        sVoiceChatMgr.ConvertToRaidChannel(GetGroupId());
 }
 
 bool Group::AddInvite(Player* player)
@@ -537,6 +541,19 @@ bool Group::AddMember(Player* player)
 
         if (m_maxEnchantingLevel < player->GetSkillValue(SKILL_ENCHANTING))
             m_maxEnchantingLevel = player->GetSkillValue(SKILL_ENCHANTING);
+
+        if (player->GetSession()->IsVoiceChatEnabled())
+        {
+            if (!isBGGroup() && !isBFGroup())
+            {
+                if (isRaidGroup())
+                    sVoiceChatMgr.AddToRaidVoiceChatChannel(player->GetGUID(), GetGroupId());
+                else
+                    sVoiceChatMgr.AddToGroupVoiceChatChannel(player->GetGUID(), GetGroupId());
+            }
+            else
+                sVoiceChatMgr.AddToBattlegroundVoiceChatChannel(player->GetGUID());
+        }
     }
 
     return true;
@@ -672,6 +689,14 @@ bool Group::RemoveMember(ObjectGuid guid, const RemoveMethod& method /*= GROUP_R
 
         SendUpdate();
 
+        if (!isBGGroup() && !isBFGroup())
+        {
+            sVoiceChatMgr.RemoveFromGroupVoiceChatChannel(guid, GetGroupId());
+            sVoiceChatMgr.RemoveFromRaidVoiceChatChannel(guid, GetGroupId());
+        }
+        else
+            sVoiceChatMgr.RemoveFromBattlegroundVoiceChatChannel(guid);
+
         if (!validLeader)
         {
             // pussywizard: temp do nothing, something causes crashes in MakeNewGroup
@@ -732,6 +757,17 @@ void Group::ChangeLeader(ObjectGuid newLeaderGuid)
         CharacterDatabase.CommitTransaction(trans);
 
         sInstanceSaveMgr->CopyBinds(m_leaderGuid, newLeaderGuid, newLeader);
+    }
+
+    VoiceChatChannel* voiceChannel = sVoiceChatMgr.GetGroupVoiceChatChannel(GetGroupId());
+    if (voiceChannel && voiceChannel->GetType() != VOICECHAT_CHANNEL_CUSTOM)
+    {
+        if (VoiceChatMember* oldLeader = voiceChannel->GetVoiceChatMember(m_leaderGuid))
+            oldLeader->SetLowPriority();
+        if (VoiceChatMember* newLeader = voiceChannel->GetVoiceChatMember(newLeaderGuid))
+            newLeader->SetLowPriority();
+
+        voiceChannel->SendVoiceRosterUpdate(false, true);
     }
 
     if (Player* oldLeader = ObjectAccessor::FindConnectedPlayer(m_leaderGuid))
@@ -840,6 +876,19 @@ void Group::Disband(bool hideDestroy /* = false */)
 
     // Cleaning up instance saved data for gameobjects when a group is disbanded
     sInstanceSaveMgr->DeleteInstanceSavedData(instanceId);
+
+    if (!isBGGroup() && !isBFGroup())
+    {
+        sVoiceChatMgr.DeleteGroupVoiceChatChannel(GetGroupId());
+        sVoiceChatMgr.DeleteRaidVoiceChatChannel(GetGroupId());
+    }
+    else
+    {
+        if (m_bgGroup->GetBgRaid(TEAM_ALLIANCE) == this)
+            sVoiceChatMgr.DeleteBattlegroundVoiceChatChannel(m_bgGroup->GetInstanceID(), TEAM_ALLIANCE);
+        else if (m_bgGroup->GetBgRaid(TEAM_HORDE) == this)
+            sVoiceChatMgr.DeleteBattlegroundVoiceChatChannel(m_bgGroup->GetInstanceID(), TEAM_HORDE);
+    }
 
     sGroupMgr->RemoveGroup(this);
     delete this;
@@ -2359,6 +2408,14 @@ bool Group::IsAssistant(ObjectGuid guid) const
     return mslot->flags & MEMBER_FLAG_ASSISTANT;
 }
 
+bool Group::IsMainAssistant(ObjectGuid guid) const
+{
+    member_citerator mSlot = _getMemberCSlot(guid);
+    if (mSlot == m_memberSlots.end())
+        return false;
+    return mSlot->flags & MEMBER_FLAG_MAINASSIST;
+}
+
 bool Group::SameSubGroup(ObjectGuid guid1, ObjectGuid guid2) const
 {
     member_citerator mslot2 = _getMemberCSlot(guid2);
@@ -2549,4 +2606,9 @@ void Group::DoForAllMembers(std::function<void(Player*)> const& worker)
 
         worker(member);
     }
+}
+
+uint32 Group::GetGroupId()
+{
+    return GetGUID().GetCounter();
 }
