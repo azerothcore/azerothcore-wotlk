@@ -55,6 +55,19 @@ jobs:
         with:
           fetch-depth: 1
 
+      - name: Set up MySQL
+        run: |
+          # Install MySQL server if not already installed
+          sudo apt-get update
+          sudo apt-get install -y mysql-server
+          
+          # Start MySQL service
+          sudo systemctl start mysql.service
+          
+          # Ensure MySQL root user has no password for CI
+          sudo mysql -e "ALTER USER 'root'@'localhost' IDENTIFIED WITH mysql_native_password BY '';" || true
+          sudo mysql -e "FLUSH PRIVILEGES;" || true
+
       - name: Configure AzerothCore settings
         run: |
           # Create basic configuration

@@ -110,7 +110,7 @@ EOF
     rm -f "$GDB_TEMP_FILE"
 else
     if [ -n "$CONFIG" ]; then
-        script -q -e -c "$EXECPATH -c '$CONFIG'"
+        script -q -e -c "$EXECPATH -c \"$CONFIG\""
     else
         script -q -e -c "$EXECPATH"
     fi
