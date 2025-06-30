@@ -37,7 +37,7 @@ ObjectData const creatureData[] =
 class instance_shadow_labyrinth : public InstanceMapScript
 {
 public:
-    instance_shadow_labyrinth() : InstanceMapScript("instance_shadow_labyrinth", 555) { }
+    instance_shadow_labyrinth() : InstanceMapScript("instance_shadow_labyrinth", MAP_AUCHINDOUN_SHADOW_LABYRINTH) { }
 
     InstanceScript* GetInstanceScript(InstanceMap* map) const override
     {

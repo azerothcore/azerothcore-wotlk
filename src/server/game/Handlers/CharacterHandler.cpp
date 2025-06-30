@@ -16,6 +16,7 @@
  */
 
 #include "AccountMgr.h"
+#include "AreaDefines.h"
 #include "ArenaTeamMgr.h"
 #include "AuctionHouseMgr.h"
 #include "Battleground.h"
@@ -882,8 +883,9 @@ void WorldSession::HandlePlayerLoginFromDB(LoginQueryHolder const& holder)
                 pCurrChar->SendCinematicStart(rEntry->CinematicSequence);
 
             // send new char string if not empty
-            if (!sWorld->GetNewCharString().empty())
-                chH.PSendSysMessage("{}", sWorld->GetNewCharString());
+            std::string_view newCharString = sWorld->getStringConfig(CONFIG_NEW_CHAR_STRING);
+            if (!newCharString.empty())
+                chH.PSendSysMessage("{}", newCharString);
         }
     }
 
@@ -2324,13 +2326,13 @@ void WorldSession::HandleCharFactionOrRaceChangeCallback(std::shared_ptr<Charact
 
             if (newTeam == TEAM_ALLIANCE)
             {
-                loc.WorldRelocate(0, -8867.68f, 673.373f, 97.9034f, 0.0f);
-                zoneId = 1519;
+                loc.WorldRelocate(MAP_EASTERN_KINGDOMS, -8867.68f, 673.373f, 97.9034f, 0.0f);
+                zoneId = AREA_STORMWIND_CITY;
             }
             else
             {
-                loc.WorldRelocate(1, 1633.33f, -4439.11f, 15.7588f, 0.0f);
-                zoneId = 1637;
+                loc.WorldRelocate(MAP_KALIMDOR, 1633.33f, -4439.11f, 15.7588f, 0.0f);
+                zoneId = AREA_ORGRIMMAR;
             }
 
             stmt->SetData(1, loc.GetMapId());

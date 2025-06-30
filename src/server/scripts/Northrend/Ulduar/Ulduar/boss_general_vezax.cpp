@@ -17,6 +17,7 @@
 
 #include "AccountMgr.h"
 #include "AchievementCriteriaScript.h"
+#include "AreaDefines.h"
 #include "BanMgr.h"
 #include "CreatureScript.h"
 #include "GameObjectScript.h"
@@ -527,7 +528,7 @@ class spell_mark_of_the_faceless_periodic_aura : public AuraScript
     {
         if (Unit* caster = GetCaster())
             if (Unit* target = GetTarget())
-                if (target->GetMapId() == 603)
+                if (target->GetMapId() == MAP_ULDUAR)
                 {
                     int32 dmg = 5000;
                     caster->CastCustomSpell(target, SPELL_MARK_OF_THE_FACELESS_EFFECT, 0, &dmg, 0, true);

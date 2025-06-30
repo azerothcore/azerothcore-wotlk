@@ -47,7 +47,7 @@ ObjectData const creatureData[] =
 class instance_the_slave_pens : public InstanceMapScript
 {
 public:
-    instance_the_slave_pens() : InstanceMapScript(SPScriptName, 547) { }
+    instance_the_slave_pens() : InstanceMapScript(SPScriptName, MAP_COILFANG_THE_SLAVE_PENS) { }
 
     struct instance_the_slave_pens_InstanceMapScript : public InstanceScript
     {

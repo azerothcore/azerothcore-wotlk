@@ -1150,6 +1150,36 @@ class spell_pal_seal_of_vengeance : public SpellScript
     }
 };
 
+// 1022 - Hand of Protection
+class spell_pal_hand_of_protection : public SpellScript
+{
+    PrepareSpellScript(spell_pal_hand_of_protection);
+
+    SpellCastResult CheckCast()
+    {
+        Unit* caster = GetCaster();
+
+        if (!caster->GetTarget() || caster->GetTarget() == caster->GetGUID())
+            return SPELL_CAST_OK;
+
+        if (caster->HasStunAura())
+            return SPELL_FAILED_STUNNED;
+
+        if (caster->HasConfuseAura())
+            return SPELL_FAILED_CONFUSED;
+
+        if (caster->GetUnitFlags() & UNIT_FLAG_FLEEING)
+            return SPELL_FAILED_FLEEING;
+
+        return SPELL_CAST_OK;
+    }
+
+    void Register() override
+    {
+        OnCheckCast += SpellCheckCastFn(spell_pal_hand_of_protection::CheckCast);
+    }
+};
+
 void AddSC_paladin_spell_scripts()
 {
     RegisterSpellAndAuraScriptPair(spell_pal_seal_of_command, spell_pal_seal_of_command_aura);
@@ -1178,4 +1208,5 @@ void AddSC_paladin_spell_scripts()
     RegisterSpellScript(spell_pal_righteous_defense);
     RegisterSpellScript(spell_pal_seal_of_righteousness);
     RegisterSpellScript(spell_pal_seal_of_vengeance);
+    RegisterSpellScript(spell_pal_hand_of_protection);
 }
