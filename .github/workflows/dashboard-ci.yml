@@ -60,11 +60,8 @@ jobs:
         run: |
           # Create basic configuration
           cp conf/dist/config.sh conf/config.sh
-          # Configure database connection
-          sed -i 's/DB_HOST=.*/DB_HOST="127.0.0.1"/' conf/config.sh
-          sed -i 's/DB_USERNAME=.*/DB_USERNAME="root"/' conf/config.sh
-          sed -i 's/DB_PASSWORD=.*/DB_PASSWORD="password"/' conf/config.sh
-          sed -i 's/DB_PORT=.*/DB_PORT="3306"/' conf/config.sh
+          # Configure dashboard
+          sed -i 's/MTHREADS=.*/MTHREADS="4"/' conf/config.sh
 
       - name: Run complete installation (deps, compile, database, client-data)
         run: |
