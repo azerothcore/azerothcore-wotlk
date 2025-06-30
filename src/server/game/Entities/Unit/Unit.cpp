@@ -22318,6 +22318,10 @@ void Unit::PatchValuesUpdate(ByteBuffer& valuesUpdateBuf, BuildValuesCachePosPoi
         {
             valuesUpdateBuf.put(posPointers.UnitFieldFactionTemplatePos, uint32(target->GetFaction()));
         }
+        else if (target->IsGMSpectator() && IsControlledByPlayer())
+        {
+            valuesUpdateBuf.put(posPointers.UnitFieldFactionTemplatePos, uint32(target->GetFaction()));
+        }
         //npcbot
         else if (IsNPCBotOrPet() && IsInRaidWith(target))
         {

@@ -38,13 +38,14 @@ public:
     {
         static ChatCommandTable gmCommandTable =
         {
-            { "chat",    HandleGMChatCommand,       SEC_GAMEMASTER,     Console::No  },
-            { "fly",     HandleGMFlyCommand,        SEC_GAMEMASTER,     Console::No  },
-            { "ingame",  HandleGMListIngameCommand, SEC_PLAYER,         Console::Yes },
-            { "list",    HandleGMListFullCommand,   SEC_ADMINISTRATOR,  Console::Yes },
-            { "visible", HandleGMVisibleCommand,    SEC_GAMEMASTER,     Console::No  },
-            { "on",      HandleGMOnCommand,         SEC_MODERATOR,      Console::No  },
-            { "off",     HandleGMOffCommand,        SEC_MODERATOR,      Console::No  }
+            { "chat",      HandleGMChatCommand,       SEC_GAMEMASTER,     Console::No  },
+            { "fly",       HandleGMFlyCommand,        SEC_GAMEMASTER,     Console::No  },
+            { "ingame",    HandleGMListIngameCommand, SEC_PLAYER,         Console::Yes },
+            { "list",      HandleGMListFullCommand,   SEC_ADMINISTRATOR,  Console::Yes },
+            { "visible",   HandleGMVisibleCommand,    SEC_GAMEMASTER,     Console::No  },
+            { "on",        HandleGMOnCommand,         SEC_MODERATOR,      Console::No  },
+            { "off",       HandleGMOffCommand,        SEC_MODERATOR,      Console::No  },
+            { "spectator", HandleGMSpectatorCommand,  SEC_GAMEMASTER,     Console::No  },
         };
         static ChatCommandTable commandTable =
         {
@@ -234,6 +235,19 @@ public:
         handler->GetPlayer()->SetGameMaster(false);
         handler->GetPlayer()->UpdateTriggerVisibility();
         handler->SendNotification(LANG_GM_OFF);
+        return true;
+    }
+
+    static bool HandleGMSpectatorCommand(ChatHandler* handler, Optional<bool> enable)
+    {
+        Player* player = handler->GetSession()->GetPlayer();
+
+        if (enable.has_value())
+            player->SetGMSpectator(*enable);
+        else
+            player->SetGMSpectator(!player->IsGMSpectator());
+        handler->SendNotification(player->IsGMSpectator() ? LANG_GM_SPECTATOR_ON : LANG_GM_SPECTATOR_OFF);
+
         return true;
     }
 };
