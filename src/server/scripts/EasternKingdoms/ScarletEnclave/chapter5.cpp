@@ -501,8 +501,12 @@ public:
             if (Creature* tirion = me->SummonCreature(NPC_HIGHLORD_TIRION_FORDRING, LightOfDawnPos[6], TEMPSUMMON_TIMED_OR_CORPSE_DESPAWN, 600000))
             {
                 tirion->LoadEquipment(0, true);
-                tirion->AI()->Talk(SAY_LIGHT_OF_DAWN25);
-                tirion->GetMotionMaster()->MovePath(NPC_HIGHLORD_TIRION_FORDRING * 10, false);
+                tirion->AI()->Talk(SAY_LIGHT_OF_DAWN25, 4s);
+
+                tirion->m_Events.AddEventAtOffset([&, tirion] {
+                    tirion->GetMotionMaster()->MovePath(NPC_HIGHLORD_TIRION_FORDRING * 10, false);
+                }, 14s);
+
                 events.Reset();
                 events.ScheduleEvent(EVENT_FINISH_FIGHT_1, 10s);
                 events.ScheduleEvent(EVENT_FINISH_FIGHT_2, 20s);
