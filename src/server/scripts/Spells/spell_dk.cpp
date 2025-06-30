@@ -530,11 +530,21 @@ class spell_dk_bone_shield : public AuraScript
 {
     PrepareAuraScript(spell_dk_bone_shield);
 
+    uint32 lastChargeUsedTime = 0;
+
     void HandleProc(ProcEventInfo& eventInfo)
     {
         PreventDefaultAction();
+        uint32 currentTime = getMSTime();
+        // Checks for 2 seconds between uses of bone shield charges
+        if ((currentTime - lastChargeUsedTime) < 2000)
+            return;
+
         if (!eventInfo.GetSpellInfo() || !eventInfo.GetSpellInfo()->IsTargetingArea())
+        {
             DropCharge();
+            lastChargeUsedTime = currentTime;
+        }
     }
 
     void Register() override
@@ -1727,6 +1737,16 @@ class spell_dk_pestilence : public SpellScript
 {
     PrepareSpellScript(spell_dk_pestilence);
 
+    bool Validate(SpellInfo const* /*spellInfo*/) override
+    {
+        return ValidateSpellInfo(
+        {
+            SPELL_DK_GLYPH_OF_DISEASE,
+            SPELL_DK_BLOOD_PLAGUE,
+            SPELL_DK_FROST_FEVER
+        });
+    }
+
     void HandleScriptEffect(SpellEffIndex /*effIndex*/)
     {
         Unit* caster = GetCaster();
@@ -1743,11 +1763,38 @@ class spell_dk_pestilence : public SpellScript
 
             // And spread them on target
             // Blood Plague
-            if (target->GetAura(SPELL_DK_BLOOD_PLAGUE, caster->GetGUID()))
-                caster->CastSpell(hitUnit, SPELL_DK_BLOOD_PLAGUE, true);
+            if (Aura* disOld = target->GetAura(SPELL_DK_BLOOD_PLAGUE, caster->GetGUID()))
+                if (AuraEffect* effOld = disOld->GetEffect(EFFECT_0))
+                {
+                    float pctMods = effOld->GetPctMods();
+                    float crit = effOld->GetCritChance();
+                    caster->CastSpell(hitUnit, SPELL_DK_BLOOD_PLAGUE, true);
+
+                    if (Aura* disNew = hitUnit->GetAura(SPELL_DK_BLOOD_PLAGUE, caster->GetGUID()))
+                        if (AuraEffect* effNew = disNew->GetEffect(EFFECT_0))
+                        {
+                            effNew->SetPctMods(pctMods);
+                            effNew->SetCritChance(crit);
+                            effNew->SetAmount(effNew->CalculateAmount(effNew->GetCaster()));
+                        }
+                }
+
             // Frost Fever
-            if (target->GetAura(SPELL_DK_FROST_FEVER, caster->GetGUID()))
-                caster->CastSpell(hitUnit, SPELL_DK_FROST_FEVER, true);
+            if (Aura* disOld = target->GetAura(SPELL_DK_FROST_FEVER, caster->GetGUID()))
+                if (AuraEffect* effOld = disOld->GetEffect(EFFECT_0))
+                {
+                    float pctMods = effOld->GetPctMods();
+                    float crit = effOld->GetCritChance();
+                    caster->CastSpell(hitUnit, SPELL_DK_FROST_FEVER, true);
+
+                    if (Aura* disNew = hitUnit->GetAura(SPELL_DK_FROST_FEVER, caster->GetGUID()))
+                        if (AuraEffect* effNew = disNew->GetEffect(EFFECT_0))
+                        {
+                            effNew->SetPctMods(pctMods);
+                            effNew->SetCritChance(crit);
+                            effNew->SetAmount(effNew->CalculateAmount(effNew->GetCaster()));
+                        }
+                }
         }
     }
 
