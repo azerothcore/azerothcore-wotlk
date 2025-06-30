@@ -15,8 +15,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef CONFIGDATA_H
-#define CONFIGDATA_H
+#ifndef CONFIGVALUECACHE_H
+#define CONFIGVALUECACHE_H
 
 #include "Common.h"
 #include "Config.h"
@@ -25,7 +25,7 @@
 #include <variant>
 
 template<typename ConfigEnum>
-class ConfigData
+class ConfigValueCache
 {
     static_assert(std::is_enum_v<ConfigEnum>);
 
@@ -36,7 +36,7 @@ public:
         Yes = true
     };
 
-    ConfigData(ConfigEnum const configCount)
+    ConfigValueCache(ConfigEnum const configCount)
     {
         _configs.resize(static_cast<uint32>(configCount));
         _reloading = false;

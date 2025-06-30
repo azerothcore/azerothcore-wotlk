@@ -27,12 +27,12 @@ void WorldConfig::BuildConfigCache()
     SetConfigValue<uint32>(CONFIG_ENABLE_SINFO_LOGIN, "Server.LoginInfo", 0);
 
     ///- Read all rates from the config file
-    SetConfigValue<float>(RATE_HEALTH, "Rate.Health", 1, ConfigData::Reloadable::Yes, [](float const& value) { return value > 0; }, "> 0");
-    SetConfigValue<float>(RATE_POWER_MANA, "Rate.Mana", 1, ConfigData::Reloadable::Yes, [](float const& value) { return value > 0; }, "> 0");
+    SetConfigValue<float>(RATE_HEALTH, "Rate.Health", 1, ConfigValueCache::Reloadable::Yes, [](float const& value) { return value > 0; }, "> 0");
+    SetConfigValue<float>(RATE_POWER_MANA, "Rate.Mana", 1, ConfigValueCache::Reloadable::Yes, [](float const& value) { return value > 0; }, "> 0");
     SetConfigValue<float>(RATE_POWER_RAGE_INCOME, "Rate.Rage.Income", 1);
-    SetConfigValue<float>(RATE_POWER_RAGE_LOSS, "Rate.Rage.Loss", 1, ConfigData::Reloadable::Yes, [](float const& value) { return value > 0; }, "> 0");
+    SetConfigValue<float>(RATE_POWER_RAGE_LOSS, "Rate.Rage.Loss", 1, ConfigValueCache::Reloadable::Yes, [](float const& value) { return value > 0; }, "> 0");
     SetConfigValue<float>(RATE_POWER_RUNICPOWER_INCOME, "Rate.RunicPower.Income", 1);
-    SetConfigValue<float>(RATE_POWER_RUNICPOWER_LOSS, "Rate.RunicPower.Loss", 1, ConfigData::Reloadable::Yes, [](float const& value) { return value > 0; }, "> 0");
+    SetConfigValue<float>(RATE_POWER_RUNICPOWER_LOSS, "Rate.RunicPower.Loss", 1, ConfigValueCache::Reloadable::Yes, [](float const& value) { return value > 0; }, "> 0");
     SetConfigValue<float>(RATE_POWER_FOCUS, "Rate.Focus", 1);
     SetConfigValue<float>(RATE_POWER_ENERGY, "Rate.Energy", 1);
 
@@ -64,7 +64,7 @@ void WorldConfig::BuildConfigCache()
     SetConfigValue<float>(RATE_XP_EXPLORE, "Rate.XP.Explore", 1);
     SetConfigValue<float>(RATE_XP_PET, "Rate.XP.Pet", 1);
     SetConfigValue<float>(RATE_XP_PET_NEXT_LEVEL, "Rate.Pet.LevelXP", 0);
-    SetConfigValue<float>(RATE_REPAIRCOST, "Rate.RepairCost", 1, ConfigData::Reloadable::Yes, [](float const& value) { return value >= 0; }, ">= 0");
+    SetConfigValue<float>(RATE_REPAIRCOST, "Rate.RepairCost", 1, ConfigValueCache::Reloadable::Yes, [](float const& value) { return value >= 0; }, ">= 0");
 
     SetConfigValue<float>(RATE_SELLVALUE_ITEM_POOR, "Rate.SellValue.Item.Poor", 1);
     SetConfigValue<float>(RATE_SELLVALUE_ITEM_NORMAL, "Rate.SellValue.Item.Normal", 1);
@@ -120,28 +120,28 @@ void WorldConfig::BuildConfigCache()
     SetConfigValue<float>(RATE_MISS_CHANCE_MULTIPLIER_TARGET_PLAYER, "Rate.MissChanceMultiplier.TargetPlayer", 7);
     SetConfigValue<bool>(CONFIG_MISS_CHANCE_MULTIPLIER_ONLY_FOR_PLAYERS, "Rate.MissChanceMultiplier.OnlyAffectsPlayer", false);
 
-    SetConfigValue<float>(RATE_TALENT, "Rate.Talent", 1, ConfigData::Reloadable::Yes, [](float const& value) { return value >= 0; }, ">= 0");
-    SetConfigValue<float>(RATE_TALENT_PET, "Rate.Talent.Pet", 1, ConfigData::Reloadable::Yes, [](float const& value) { return value >= 0; }, ">= 0");
+    SetConfigValue<float>(RATE_TALENT, "Rate.Talent", 1, ConfigValueCache::Reloadable::Yes, [](float const& value) { return value >= 0; }, ">= 0");
+    SetConfigValue<float>(RATE_TALENT_PET, "Rate.Talent.Pet", 1, ConfigValueCache::Reloadable::Yes, [](float const& value) { return value >= 0; }, ">= 0");
     // Controls Player movespeed rate.
-    SetConfigValue<float>(RATE_MOVESPEED_PLAYER, "Rate.MoveSpeed.Player", 1, ConfigData::Reloadable::Yes, [](float const& value) { return value >= 0; }, ">= 0");
+    SetConfigValue<float>(RATE_MOVESPEED_PLAYER, "Rate.MoveSpeed.Player", 1, ConfigValueCache::Reloadable::Yes, [](float const& value) { return value >= 0; }, ">= 0");
 
     // Controls all npc movespeed rate.
-    SetConfigValue<float>(RATE_MOVESPEED_NPC, "Rate.MoveSpeed.NPC", 1, ConfigData::Reloadable::Yes, [](float const& value) { return value >= 0; }, ">= 0");
+    SetConfigValue<float>(RATE_MOVESPEED_NPC, "Rate.MoveSpeed.NPC", 1, ConfigValueCache::Reloadable::Yes, [](float const& value) { return value >= 0; }, ">= 0");
 
     SetConfigValue<float>(RATE_CORPSE_DECAY_LOOTED, "Rate.Corpse.Decay.Looted", 0);
 
-    SetConfigValue<float>(RATE_DURABILITY_LOSS_ON_DEATH, "DurabilityLoss.OnDeath", 10, ConfigData::Reloadable::Yes, [](float const& value) { return value >= 0 && value <= 100; }, ">= 0 && <= 100");
+    SetConfigValue<float>(RATE_DURABILITY_LOSS_ON_DEATH, "DurabilityLoss.OnDeath", 10, ConfigValueCache::Reloadable::Yes, [](float const& value) { return value >= 0 && value <= 100; }, ">= 0 && <= 100");
 
-    SetConfigValue<float>(RATE_DURABILITY_LOSS_DAMAGE, "DurabilityLossChance.Damage", 0, ConfigData::Reloadable::Yes, [](float const& value) { return value >= 0; }, ">= 0");
-    SetConfigValue<float>(RATE_DURABILITY_LOSS_ABSORB, "DurabilityLossChance.Absorb", 0, ConfigData::Reloadable::Yes, [](float const& value) { return value >= 0; }, ">= 0");
-    SetConfigValue<float>(RATE_DURABILITY_LOSS_PARRY, "DurabilityLossChance.Parry", 0, ConfigData::Reloadable::Yes, [](float const& value) { return value >= 0; }, ">= 0");
-    SetConfigValue<float>(RATE_DURABILITY_LOSS_BLOCK, "DurabilityLossChance.Block", 0, ConfigData::Reloadable::Yes, [](float const& value) { return value >= 0; }, ">= 0");
+    SetConfigValue<float>(RATE_DURABILITY_LOSS_DAMAGE, "DurabilityLossChance.Damage", 0, ConfigValueCache::Reloadable::Yes, [](float const& value) { return value >= 0; }, ">= 0");
+    SetConfigValue<float>(RATE_DURABILITY_LOSS_ABSORB, "DurabilityLossChance.Absorb", 0, ConfigValueCache::Reloadable::Yes, [](float const& value) { return value >= 0; }, ">= 0");
+    SetConfigValue<float>(RATE_DURABILITY_LOSS_PARRY, "DurabilityLossChance.Parry", 0, ConfigValueCache::Reloadable::Yes, [](float const& value) { return value >= 0; }, ">= 0");
+    SetConfigValue<float>(RATE_DURABILITY_LOSS_BLOCK, "DurabilityLossChance.Block", 0, ConfigValueCache::Reloadable::Yes, [](float const& value) { return value >= 0; }, ">= 0");
 
     ///- Read other configuration items from the config file
 
     SetConfigValue<bool>(CONFIG_DURABILITY_LOSS_IN_PVP, "DurabilityLoss.InPvP", false);
 
-    SetConfigValue<uint32>(CONFIG_COMPRESSION, "Compression", 1, ConfigData::Reloadable::Yes, [](uint32 const& value) { return value > 0 && value < 10; }, "> 0 && < 10");
+    SetConfigValue<uint32>(CONFIG_COMPRESSION, "Compression", 1, ConfigValueCache::Reloadable::Yes, [](uint32 const& value) { return value > 0 && value < 10; }, "> 0 && < 10");
 
     SetConfigValue<bool>(CONFIG_ADDON_CHANNEL, "AddonChannel", true);
     SetConfigValue<bool>(CONFIG_CLEAN_CHARACTER_DB, "CleanCharacterDB", false);
@@ -161,13 +161,13 @@ void WorldConfig::BuildConfigCache()
     SetConfigValue<uint32>(CONFIG_INTERVAL_DISCONNECT_TOLERANCE, "DisconnectToleranceInterval", 0);
     SetConfigValue<bool>(CONFIG_STATS_SAVE_ONLY_ON_LOGOUT, "PlayerSave.Stats.SaveOnlyOnLogout", true);
 
-    SetConfigValue<uint32>(CONFIG_MIN_LEVEL_STAT_SAVE, "PlayerSave.Stats.MinLevel", 0, ConfigData::Reloadable::Yes, [](uint32 const& value) { return value < MAX_LEVEL; }, "< MAX_LEVEL");
+    SetConfigValue<uint32>(CONFIG_MIN_LEVEL_STAT_SAVE, "PlayerSave.Stats.MinLevel", 0, ConfigValueCache::Reloadable::Yes, [](uint32 const& value) { return value < MAX_LEVEL; }, "< MAX_LEVEL");
 
-    SetConfigValue<uint32>(CONFIG_INTERVAL_MAPUPDATE, "MapUpdateInterval", 10, ConfigData::Reloadable::Yes, [](uint32 const& value) { return value >= MIN_MAP_UPDATE_DELAY; }, ">= MIN_MAP_UPDATE_DELAY");
+    SetConfigValue<uint32>(CONFIG_INTERVAL_MAPUPDATE, "MapUpdateInterval", 10, ConfigValueCache::Reloadable::Yes, [](uint32 const& value) { return value >= MIN_MAP_UPDATE_DELAY; }, ">= MIN_MAP_UPDATE_DELAY");
 
     SetConfigValue<uint32>(CONFIG_INTERVAL_CHANGEWEATHER, "ChangeWeatherInterval", 10);
 
-    SetConfigValue<uint32>(CONFIG_PORT_WORLD, "WorldServerPort", 8085, ConfigData::Reloadable::No);
+    SetConfigValue<uint32>(CONFIG_PORT_WORLD, "WorldServerPort", 8085, ConfigValueCache::Reloadable::No);
 
     SetConfigValue<bool>(CONFIG_CLOSE_IDLE_CONNECTIONS, "CloseIdleConnections", true);
     SetConfigValue<uint32>(CONFIG_SOCKET_TIMEOUTTIME, "SocketTimeOutTime", 900000);
@@ -179,8 +179,8 @@ void WorldConfig::BuildConfigCache()
 
     SetConfigValue<float>(CONFIG_SIGHT_MONSTER, "MonsterSight", 50);
 
-    SetConfigValue<uint32>(CONFIG_GAME_TYPE, "GameType", 0, ConfigData::Reloadable::No);
-    SetConfigValue<uint32>(CONFIG_REALM_ZONE, "RealmZone", REALM_ZONE_DEVELOPMENT, ConfigData::Reloadable::No);
+    SetConfigValue<uint32>(CONFIG_GAME_TYPE, "GameType", 0, ConfigValueCache::Reloadable::No);
+    SetConfigValue<uint32>(CONFIG_REALM_ZONE, "RealmZone", REALM_ZONE_DEVELOPMENT, ConfigValueCache::Reloadable::No);
 
     SetConfigValue<bool>(CONFIG_STRICT_NAMES_RESERVED, "StrictNames.Reserved", true);
     SetConfigValue<bool>(CONFIG_STRICT_NAMES_PROFANITY, "StrictNames.Profanity", true);
@@ -203,9 +203,9 @@ void WorldConfig::BuildConfigCache()
     SetConfigValue<bool>(CONFIG_ALLOW_TWO_SIDE_TRADE, "AllowTwoSide.Trade", false);
     SetConfigValue<bool>(CONFIG_ALLOW_TWO_SIDE_INTERACTION_EMOTE, "AllowTwoSide.Interaction.Emote", false);
 
-    SetConfigValue<uint32>(CONFIG_MIN_PLAYER_NAME, "MinPlayerName", 2, ConfigData::Reloadable::Yes, [](uint32 const& value) { return value > 0 && value <= MAX_PLAYER_NAME; }, "> 0 && <= MAX_PLAYER_NAME");
-    SetConfigValue<uint32>(CONFIG_MIN_CHARTER_NAME, "MinCharterName", 2, ConfigData::Reloadable::Yes, [](uint32 const& value) { return value > 0 && value <= MAX_CHARTER_NAME; }, "> 0 && <= MAX_CHARTER_NAME");
-    SetConfigValue<uint32>(CONFIG_MIN_PET_NAME, "MinPetName", 2, ConfigData::Reloadable::Yes, [](uint32 const& value) { return value > 0 && value <= MAX_PET_NAME; }, "> 0 && <= MAX_PET_NAME");
+    SetConfigValue<uint32>(CONFIG_MIN_PLAYER_NAME, "MinPlayerName", 2, ConfigValueCache::Reloadable::Yes, [](uint32 const& value) { return value > 0 && value <= MAX_PLAYER_NAME; }, "> 0 && <= MAX_PLAYER_NAME");
+    SetConfigValue<uint32>(CONFIG_MIN_CHARTER_NAME, "MinCharterName", 2, ConfigValueCache::Reloadable::Yes, [](uint32 const& value) { return value > 0 && value <= MAX_CHARTER_NAME; }, "> 0 && <= MAX_CHARTER_NAME");
+    SetConfigValue<uint32>(CONFIG_MIN_PET_NAME, "MinPetName", 2, ConfigValueCache::Reloadable::Yes, [](uint32 const& value) { return value > 0 && value <= MAX_PET_NAME; }, "> 0 && <= MAX_PET_NAME");
 
     SetConfigValue<uint32>(CONFIG_CHARTER_COST_GUILD, "Guild.CharterCost", 1000);
     SetConfigValue<uint32>(CONFIG_CHARTER_COST_ARENA_2v2, "ArenaTeam.CharterCost.2v2", 800000);
@@ -219,37 +219,37 @@ void WorldConfig::BuildConfigCache()
 
     SetConfigValue<uint32>(CONFIG_CHARACTER_CREATING_DISABLED_CLASSMASK, "CharacterCreating.Disabled.ClassMask", 0);
 
-    SetConfigValue<uint32>(CONFIG_CHARACTERS_PER_REALM, "CharactersPerRealm", 10, ConfigData::Reloadable::Yes, [](uint32 const& value) { return value > 0 && value <= 10; }, "> 0 && <= 10");
+    SetConfigValue<uint32>(CONFIG_CHARACTERS_PER_REALM, "CharactersPerRealm", 10, ConfigValueCache::Reloadable::Yes, [](uint32 const& value) { return value > 0 && value <= 10; }, "> 0 && <= 10");
 
     // must be after CONFIG_CHARACTERS_PER_REALM
-    SetConfigValue<uint32>(CONFIG_CHARACTERS_PER_ACCOUNT, "CharactersPerAccount", 50, ConfigData::Reloadable::Yes, [this](uint32 const& value) { return value >= GetConfigValue<uint32>(CONFIG_CHARACTERS_PER_REALM); }, ">= CONFIG_CHARACTERS_PER_REALM");
-    SetConfigValue<uint32>(CONFIG_HEROIC_CHARACTERS_PER_REALM, "HeroicCharactersPerRealm", 1, ConfigData::Reloadable::Yes, [](uint32 const& value) { return value <= 10; }, "<= 10");
+    SetConfigValue<uint32>(CONFIG_CHARACTERS_PER_ACCOUNT, "CharactersPerAccount", 50, ConfigValueCache::Reloadable::Yes, [this](uint32 const& value) { return value >= GetConfigValue<uint32>(CONFIG_CHARACTERS_PER_REALM); }, ">= CONFIG_CHARACTERS_PER_REALM");
+    SetConfigValue<uint32>(CONFIG_HEROIC_CHARACTERS_PER_REALM, "HeroicCharactersPerRealm", 1, ConfigValueCache::Reloadable::Yes, [](uint32 const& value) { return value <= 10; }, "<= 10");
 
     SetConfigValue<uint32>(CONFIG_CHARACTER_CREATING_MIN_LEVEL_FOR_HEROIC_CHARACTER, "CharacterCreating.MinLevelForHeroicCharacter", 55);
 
-    SetConfigValue<uint32>(CONFIG_SKIP_CINEMATICS, "SkipCinematics", 0, ConfigData::Reloadable::Yes, [](uint32 const& value) { return value <= 2; }, "<= 2");
+    SetConfigValue<uint32>(CONFIG_SKIP_CINEMATICS, "SkipCinematics", 0, ConfigValueCache::Reloadable::Yes, [](uint32 const& value) { return value <= 2; }, "<= 2");
 
-    SetConfigValue<uint32>(CONFIG_MAX_PLAYER_LEVEL, "MaxPlayerLevel", DEFAULT_MAX_LEVEL, ConfigData::Reloadable::No, [](uint32 const& value) { return value > 0 && value <= MAX_LEVEL; }, "> 0 && <= MAX_LEVEL");
+    SetConfigValue<uint32>(CONFIG_MAX_PLAYER_LEVEL, "MaxPlayerLevel", DEFAULT_MAX_LEVEL, ConfigValueCache::Reloadable::No, [](uint32 const& value) { return value > 0 && value <= MAX_LEVEL; }, "> 0 && <= MAX_LEVEL");
 
     SetConfigValue<uint32>(CONFIG_MIN_DUALSPEC_LEVEL, "MinDualSpecLevel", 40);
 
-    SetConfigValue<uint32>(CONFIG_START_PLAYER_LEVEL, "StartPlayerLevel", 1, ConfigData::Reloadable::Yes, [this](uint32 const& value) { return value > 0 && value <= GetConfigValue<uint32>(CONFIG_MAX_PLAYER_LEVEL); }, "> 0 && <= CONFIG_MAX_PLAYER_LEVEL");
-    SetConfigValue<uint32>(CONFIG_START_HEROIC_PLAYER_LEVEL, "StartHeroicPlayerLevel", 55, ConfigData::Reloadable::Yes, [this](uint32 const& value) { return value > 0 && value <= GetConfigValue<uint32>(CONFIG_MAX_PLAYER_LEVEL); }, "> 0 && <= CONFIG_MAX_PLAYER_LEVEL");
+    SetConfigValue<uint32>(CONFIG_START_PLAYER_LEVEL, "StartPlayerLevel", 1, ConfigValueCache::Reloadable::Yes, [this](uint32 const& value) { return value > 0 && value <= GetConfigValue<uint32>(CONFIG_MAX_PLAYER_LEVEL); }, "> 0 && <= CONFIG_MAX_PLAYER_LEVEL");
+    SetConfigValue<uint32>(CONFIG_START_HEROIC_PLAYER_LEVEL, "StartHeroicPlayerLevel", 55, ConfigValueCache::Reloadable::Yes, [this](uint32 const& value) { return value > 0 && value <= GetConfigValue<uint32>(CONFIG_MAX_PLAYER_LEVEL); }, "> 0 && <= CONFIG_MAX_PLAYER_LEVEL");
 
-    SetConfigValue<uint32>(CONFIG_START_PLAYER_MONEY, "StartPlayerMoney", 0, ConfigData::Reloadable::Yes, [](uint32 const& value) { return value <= MAX_MONEY_AMOUNT; }, "<= MAX_MONEY_AMOUNT");
-    SetConfigValue<uint32>(CONFIG_START_HEROIC_PLAYER_MONEY, "StartHeroicPlayerMoney", 2000, ConfigData::Reloadable::Yes, [](uint32 const& value) { return value <= MAX_MONEY_AMOUNT; }, "<= MAX_MONEY_AMOUNT");
+    SetConfigValue<uint32>(CONFIG_START_PLAYER_MONEY, "StartPlayerMoney", 0, ConfigValueCache::Reloadable::Yes, [](uint32 const& value) { return value <= MAX_MONEY_AMOUNT; }, "<= MAX_MONEY_AMOUNT");
+    SetConfigValue<uint32>(CONFIG_START_HEROIC_PLAYER_MONEY, "StartHeroicPlayerMoney", 2000, ConfigValueCache::Reloadable::Yes, [](uint32 const& value) { return value <= MAX_MONEY_AMOUNT; }, "<= MAX_MONEY_AMOUNT");
 
     SetConfigValue<uint32>(CONFIG_MAX_HONOR_POINTS, "MaxHonorPoints", 75000);
 
     SetConfigValue<uint32>(CONFIG_MAX_HONOR_POINTS_MONEY_PER_POINT, "MaxHonorPointsMoneyPerPoint", 0);
 
-    SetConfigValue<uint32>(CONFIG_START_HONOR_POINTS, "StartHonorPoints", 0, ConfigData::Reloadable::Yes, [this](uint32 const& value) { return value <= GetConfigValue<uint32>(CONFIG_MAX_HONOR_POINTS); }, "<= CONFIG_MAX_HONOR_POINTS");
+    SetConfigValue<uint32>(CONFIG_START_HONOR_POINTS, "StartHonorPoints", 0, ConfigValueCache::Reloadable::Yes, [this](uint32 const& value) { return value <= GetConfigValue<uint32>(CONFIG_MAX_HONOR_POINTS); }, "<= CONFIG_MAX_HONOR_POINTS");
 
     SetConfigValue<uint32>(CONFIG_MAX_ARENA_POINTS, "MaxArenaPoints", 10000);
 
-    SetConfigValue<uint32>(CONFIG_START_ARENA_POINTS, "StartArenaPoints", 0, ConfigData::Reloadable::Yes, [this](uint32 const& value) { return value <= GetConfigValue<uint32>(CONFIG_MAX_ARENA_POINTS); }, "<= CONFIG_MAX_ARENA_POINTS");
+    SetConfigValue<uint32>(CONFIG_START_ARENA_POINTS, "StartArenaPoints", 0, ConfigValueCache::Reloadable::Yes, [this](uint32 const& value) { return value <= GetConfigValue<uint32>(CONFIG_MAX_ARENA_POINTS); }, "<= CONFIG_MAX_ARENA_POINTS");
 
-    SetConfigValue<uint32>(CONFIG_MAX_RECRUIT_A_FRIEND_BONUS_PLAYER_LEVEL, "RecruitAFriend.MaxLevel", 60, ConfigData::Reloadable::Yes, [this](uint32 const& value) { return value <= GetConfigValue<uint32>(CONFIG_MAX_PLAYER_LEVEL); }, "<= CONFIG_MAX_PLAYER_LEVEL");
+    SetConfigValue<uint32>(CONFIG_MAX_RECRUIT_A_FRIEND_BONUS_PLAYER_LEVEL, "RecruitAFriend.MaxLevel", 60, ConfigValueCache::Reloadable::Yes, [this](uint32 const& value) { return value <= GetConfigValue<uint32>(CONFIG_MAX_PLAYER_LEVEL); }, "<= CONFIG_MAX_PLAYER_LEVEL");
 
     SetConfigValue<uint32>(CONFIG_MAX_RECRUIT_A_FRIEND_BONUS_PLAYER_LEVEL_DIFFERENCE, "RecruitAFriend.MaxDifference", 4);
     SetConfigValue<bool>(CONFIG_ALL_TAXI_PATHS, "AllFlightPaths", false);
@@ -265,7 +265,7 @@ void WorldConfig::BuildConfigCache()
     SetConfigValue<uint32>(CONFIG_INSTANCE_UNLOAD_DELAY, "Instance.UnloadDelay", 30);
 
     SetConfigValue<uint32>(CONFIG_MAX_PRIMARY_TRADE_SKILL, "MaxPrimaryTradeSkill", 2);
-    SetConfigValue<uint32>(CONFIG_MIN_PETITION_SIGNS, "MinPetitionSigns", 9, ConfigData::Reloadable::Yes, [](uint32 const& value) { return value <= 9; }, "<= 9");
+    SetConfigValue<uint32>(CONFIG_MIN_PETITION_SIGNS, "MinPetitionSigns", 9, ConfigValueCache::Reloadable::Yes, [](uint32 const& value) { return value <= 9; }, "<= 9");
 
     SetConfigValue<uint32>(CONFIG_GM_LOGIN_STATE, "GM.LoginState", 2);
     SetConfigValue<uint32>(CONFIG_GM_VISIBLE_STATE, "GM.Visible", 2);
@@ -274,7 +274,7 @@ void WorldConfig::BuildConfigCache()
 
     SetConfigValue<uint32>(CONFIG_GM_LEVEL_IN_GM_LIST, "GM.InGMList.Level", SEC_ADMINISTRATOR);
     SetConfigValue<uint32>(CONFIG_GM_LEVEL_IN_WHO_LIST, "GM.InWhoList.Level", SEC_ADMINISTRATOR);
-    SetConfigValue<uint32>(CONFIG_START_GM_LEVEL, "GM.StartLevel", 1, ConfigData::Reloadable::Yes, [](uint32 const& value) { return value <= MAX_LEVEL; }, "<= MAX_LEVEL");
+    SetConfigValue<uint32>(CONFIG_START_GM_LEVEL, "GM.StartLevel", 1, ConfigValueCache::Reloadable::Yes, [](uint32 const& value) { return value <= MAX_LEVEL; }, "<= MAX_LEVEL");
 
     SetConfigValue<bool>(CONFIG_ALLOW_GM_GROUP, "GM.AllowInvite", false);
     SetConfigValue<bool>(CONFIG_ALLOW_GM_FRIEND, "GM.AllowFriend", false);
@@ -291,10 +291,10 @@ void WorldConfig::BuildConfigCache()
 
     SetConfigValue<uint32>(CONFIG_MAIL_DELIVERY_DELAY, "MailDeliveryDelay", HOUR);
 
-    SetConfigValue<uint32>(CONFIG_UPTIME_UPDATE, "UpdateUptimeInterval", 10, ConfigData::Reloadable::Yes, [](uint32 const& value) { return value > 0; }, "> 0");
+    SetConfigValue<uint32>(CONFIG_UPTIME_UPDATE, "UpdateUptimeInterval", 10, ConfigValueCache::Reloadable::Yes, [](uint32 const& value) { return value > 0; }, "> 0");
 
     // log db cleanup interval
-    SetConfigValue<uint32>(CONFIG_LOGDB_CLEARINTERVAL, "LogDB.Opt.ClearInterval", 10, ConfigData::Reloadable::Yes, [](uint32 const& value) { return value > 0; }, "> 0");
+    SetConfigValue<uint32>(CONFIG_LOGDB_CLEARINTERVAL, "LogDB.Opt.ClearInterval", 10, ConfigValueCache::Reloadable::Yes, [](uint32 const& value) { return value > 0; }, "> 0");
     SetConfigValue<uint32>(CONFIG_LOGDB_CLEARTIME, "LogDB.Opt.ClearTime", 1209600);
 
     SetConfigValue<uint32>(CONFIG_TELEPORT_TIMEOUT_NEAR, "TeleportTimeoutNear", 25);
@@ -322,7 +322,7 @@ void WorldConfig::BuildConfigCache()
 
     SetConfigValue<uint32>(CONFIG_SKILL_GAIN_WEAPON, "SkillGain.Weapon", 1);
 
-    SetConfigValue<uint32>(CONFIG_MAX_OVERSPEED_PINGS, "MaxOverspeedPings", 2, ConfigData::Reloadable::Yes, [](uint32 const& value) { return value != 1; }, "!= 1");
+    SetConfigValue<uint32>(CONFIG_MAX_OVERSPEED_PINGS, "MaxOverspeedPings", 2, ConfigValueCache::Reloadable::Yes, [](uint32 const& value) { return value != 1; }, "!= 1");
 
     SetConfigValue<bool>(CONFIG_SAVE_RESPAWN_TIME_IMMEDIATELY, "SaveRespawnTimeImmediately", true);
     SetConfigValue<bool>(CONFIG_WEATHER, "ActivateWeather", true);
@@ -331,7 +331,7 @@ void WorldConfig::BuildConfigCache()
 
     SetConfigValue<bool>(CONFIG_ALWAYS_MAX_SKILL_FOR_LEVEL, "AlwaysMaxSkillForLevel", false);
 
-    SetConfigValue<uint32>(CONFIG_EXPANSION, "Expansion", 2, ConfigData::Reloadable::No);
+    SetConfigValue<uint32>(CONFIG_EXPANSION, "Expansion", 2, ConfigValueCache::Reloadable::No);
 
     SetConfigValue<uint32>(CONFIG_CHATFLOOD_MESSAGE_COUNT, "ChatFlood.MessageCount", 10);
     SetConfigValue<uint32>(CONFIG_CHATFLOOD_MESSAGE_DELAY, "ChatFlood.MessageDelay", 1);
@@ -355,15 +355,15 @@ void WorldConfig::BuildConfigCache()
     SetConfigValue<bool>(CONFIG_QUEST_ENABLE_QUEST_TRACKER, "Quests.EnableQuestTracker", false);
 
     // note: disable value (-1) will assigned as 0xFFFFFFF, to prevent overflow at calculations limit it to max possible player level MAX_LEVEL(100)
-    SetConfigValue<uint32>(CONFIG_QUEST_LOW_LEVEL_HIDE_DIFF, "Quests.LowLevelHideDiff", 4, ConfigData::Reloadable::Yes, [](uint32 const& value) { return value <= MAX_LEVEL; }, "<= MAX_LEVEL");
-    SetConfigValue<uint32>(CONFIG_QUEST_HIGH_LEVEL_HIDE_DIFF, "Quests.HighLevelHideDiff", 7, ConfigData::Reloadable::Yes, [](uint32 const& value) { return value <= MAX_LEVEL; }, "<= MAX_LEVEL");
+    SetConfigValue<uint32>(CONFIG_QUEST_LOW_LEVEL_HIDE_DIFF, "Quests.LowLevelHideDiff", 4, ConfigValueCache::Reloadable::Yes, [](uint32 const& value) { return value <= MAX_LEVEL; }, "<= MAX_LEVEL");
+    SetConfigValue<uint32>(CONFIG_QUEST_HIGH_LEVEL_HIDE_DIFF, "Quests.HighLevelHideDiff", 7, ConfigValueCache::Reloadable::Yes, [](uint32 const& value) { return value <= MAX_LEVEL; }, "<= MAX_LEVEL");
     SetConfigValue<bool>(CONFIG_QUEST_IGNORE_RAID, "Quests.IgnoreRaid", false);
     SetConfigValue<bool>(CONFIG_QUEST_IGNORE_AUTO_ACCEPT, "Quests.IgnoreAutoAccept", false);
     SetConfigValue<bool>(CONFIG_QUEST_IGNORE_AUTO_COMPLETE, "Quests.IgnoreAutoComplete", false);
 
-    SetConfigValue<uint32>(CONFIG_RANDOM_BG_RESET_HOUR, "Battleground.Random.ResetHour", 6, ConfigData::Reloadable::Yes, [](uint32 const& value) { return value <= 23; }, "<= 23");
-    SetConfigValue<uint32>(CONFIG_CALENDAR_DELETE_OLD_EVENTS_HOUR, "Calendar.DeleteOldEventsHour", 6, ConfigData::Reloadable::Yes, [](uint32 const& value) { return value <= 23; }, "<= 23");
-    SetConfigValue<uint32>(CONFIG_GUILD_RESET_HOUR, "Guild.ResetHour", 6, ConfigData::Reloadable::Yes, [](uint32 const& value) { return value <= 23; }, "<= 23");
+    SetConfigValue<uint32>(CONFIG_RANDOM_BG_RESET_HOUR, "Battleground.Random.ResetHour", 6, ConfigValueCache::Reloadable::Yes, [](uint32 const& value) { return value <= 23; }, "<= 23");
+    SetConfigValue<uint32>(CONFIG_CALENDAR_DELETE_OLD_EVENTS_HOUR, "Calendar.DeleteOldEventsHour", 6, ConfigValueCache::Reloadable::Yes, [](uint32 const& value) { return value <= 23; }, "<= 23");
+    SetConfigValue<uint32>(CONFIG_GUILD_RESET_HOUR, "Guild.ResetHour", 6, ConfigValueCache::Reloadable::Yes, [](uint32 const& value) { return value <= 23; }, "<= 23");
 
     SetConfigValue<uint32>(CONFIG_GUILD_BANK_INITIAL_TABS, "Guild.BankInitialTabs", 0);
     SetConfigValue<uint32>(CONFIG_GUILD_BANK_TAB_COST_0, "Guild.BankTabCost0", 1000000);
@@ -424,11 +424,11 @@ void WorldConfig::BuildConfigCache()
     SetConfigValue<uint32>(CONFIG_BATTLEGROUND_PREMADE_GROUP_WAIT_FOR_MATCH, "Battleground.PremadeGroupWaitForMatch", 30);
     SetConfigValue<bool>(CONFIG_BG_XP_FOR_KILL, "Battleground.GiveXPForKills", false);
     SetConfigValue<uint32>(CONFIG_BATTLEGROUND_REPORT_AFK_TIMER, "Battleground.ReportAFK.Timer", 4);
-    SetConfigValue<uint32>(CONFIG_BATTLEGROUND_REPORT_AFK, "Battleground.ReportAFK", 3, ConfigData::Reloadable::Yes, [](uint32 const& value) { return value > 0 && value <= 9; }, "> 0 && value <= 9");
-    SetConfigValue<uint32>(CONFIG_BATTLEGROUND_PLAYER_RESPAWN, "Battleground.PlayerRespawn", 30, ConfigData::Reloadable::Yes, [](uint32 const& value) { return value >= 3; }, ">= 3");
-    SetConfigValue<uint32>(CONFIG_BATTLEGROUND_RESTORATION_BUFF_RESPAWN, "Battleground.RestorationBuffRespawn", 20, ConfigData::Reloadable::Yes, [](uint32 const& value) { return value > 0; }, "> 0");
-    SetConfigValue<uint32>(CONFIG_BATTLEGROUND_BERSERKING_BUFF_RESPAWN, "Battleground.BerserkingBuffRespawn", 120, ConfigData::Reloadable::Yes, [](uint32 const& value) { return value > 0; }, "> 0");
-    SetConfigValue<uint32>(CONFIG_BATTLEGROUND_SPEED_BUFF_RESPAWN, "Battleground.SpeedBuffRespawn", 150, ConfigData::Reloadable::Yes, [](uint32 const& value) { return value > 0; }, "> 0");
+    SetConfigValue<uint32>(CONFIG_BATTLEGROUND_REPORT_AFK, "Battleground.ReportAFK", 3, ConfigValueCache::Reloadable::Yes, [](uint32 const& value) { return value > 0 && value <= 9; }, "> 0 && value <= 9");
+    SetConfigValue<uint32>(CONFIG_BATTLEGROUND_PLAYER_RESPAWN, "Battleground.PlayerRespawn", 30, ConfigValueCache::Reloadable::Yes, [](uint32 const& value) { return value >= 3; }, ">= 3");
+    SetConfigValue<uint32>(CONFIG_BATTLEGROUND_RESTORATION_BUFF_RESPAWN, "Battleground.RestorationBuffRespawn", 20, ConfigValueCache::Reloadable::Yes, [](uint32 const& value) { return value > 0; }, "> 0");
+    SetConfigValue<uint32>(CONFIG_BATTLEGROUND_BERSERKING_BUFF_RESPAWN, "Battleground.BerserkingBuffRespawn", 120, ConfigValueCache::Reloadable::Yes, [](uint32 const& value) { return value > 0; }, "> 0");
+    SetConfigValue<uint32>(CONFIG_BATTLEGROUND_SPEED_BUFF_RESPAWN, "Battleground.SpeedBuffRespawn", 150, ConfigValueCache::Reloadable::Yes, [](uint32 const& value) { return value > 0; }, "> 0");
 
     SetConfigValue<uint32>(CONFIG_BATTLEGROUND_WARSONG_FLAGS, "Battleground.Warsong.Flags", 3);
     SetConfigValue<uint32>(CONFIG_BATTLEGROUND_ARATHI_CAPTUREPOINTS, "Battleground.Arathi.CapturePoints", 1600);
@@ -457,14 +457,14 @@ void WorldConfig::BuildConfigCache()
     SetConfigValue<bool>(CONFIG_OFFHAND_CHECK_AT_SPELL_UNLEARN, "OffhandCheckAtSpellUnlearn", true);
     SetConfigValue<uint32>(CONFIG_CREATURE_STOP_FOR_PLAYER, "Creature.MovingStopTimeForPlayer", 3);
 
-    SetConfigValue<uint32>(CONFIG_WATER_BREATH_TIMER, "WaterBreath.Timer", 180000, ConfigData::Reloadable::Yes, [](uint32 const& value) { return value > 0; }, "> 0");
+    SetConfigValue<uint32>(CONFIG_WATER_BREATH_TIMER, "WaterBreath.Timer", 180000, ConfigValueCache::Reloadable::Yes, [](uint32 const& value) { return value > 0; }, "> 0");
 
     SetConfigValue<uint32>(CONFIG_CLIENTCACHE_VERSION, "ClientCacheVersion", 0);
 
     SetConfigValue<uint32>(CONFIG_INSTANT_LOGOUT, "InstantLogout", SEC_MODERATOR);
 
-    SetConfigValue<uint32>(CONFIG_GUILD_EVENT_LOG_COUNT, "Guild.EventLogRecordsCount", GUILD_EVENTLOG_MAX_RECORDS, ConfigData::Reloadable::Yes, [](uint32 const& value) { return value <= GUILD_EVENTLOG_MAX_RECORDS; }, "<= GUILD_EVENTLOG_MAX_RECORDS");
-    SetConfigValue<uint32>(CONFIG_GUILD_BANK_EVENT_LOG_COUNT, "Guild.BankEventLogRecordsCount", GUILD_BANKLOG_MAX_RECORDS, ConfigData::Reloadable::Yes, [](uint32 const& value) { return value <= GUILD_BANKLOG_MAX_RECORDS; }, "<= GUILD_BANKLOG_MAX_RECORDS");
+    SetConfigValue<uint32>(CONFIG_GUILD_EVENT_LOG_COUNT, "Guild.EventLogRecordsCount", GUILD_EVENTLOG_MAX_RECORDS, ConfigValueCache::Reloadable::Yes, [](uint32 const& value) { return value <= GUILD_EVENTLOG_MAX_RECORDS; }, "<= GUILD_EVENTLOG_MAX_RECORDS");
+    SetConfigValue<uint32>(CONFIG_GUILD_BANK_EVENT_LOG_COUNT, "Guild.BankEventLogRecordsCount", GUILD_BANKLOG_MAX_RECORDS, ConfigValueCache::Reloadable::Yes, [](uint32 const& value) { return value <= GUILD_BANKLOG_MAX_RECORDS; }, "<= GUILD_BANKLOG_MAX_RECORDS");
 
     ///- Load the CharDelete related config options
     SetConfigValue<uint32>(CONFIG_CHARDELETE_METHOD, "CharDelete.Method", 0);
@@ -521,7 +521,7 @@ void WorldConfig::BuildConfigCache()
     SetConfigValue<bool>(CONFIG_PVP_TOKEN_ENABLE, "PvPToken.Enable", false);
     SetConfigValue<uint32>(CONFIG_PVP_TOKEN_MAP_TYPE, "PvPToken.MapAllowType", 4);
     SetConfigValue<uint32>(CONFIG_PVP_TOKEN_ID, "PvPToken.ItemID", 29434);
-    SetConfigValue<uint32>(CONFIG_PVP_TOKEN_COUNT, "PvPToken.ItemCount", 1, ConfigData::Reloadable::Yes, [](uint32 const& value) { return value > 0; }, "> 0");
+    SetConfigValue<uint32>(CONFIG_PVP_TOKEN_COUNT, "PvPToken.ItemCount", 1, ConfigValueCache::Reloadable::Yes, [](uint32 const& value) { return value > 0; }, "> 0");
 
     SetConfigValue<bool>(CONFIG_NO_RESET_TALENT_COST, "NoResetTalentsCost", false);
     SetConfigValue<uint32>(CONFIG_TOGGLE_XP_COST, "ToggleXP.Cost", 100000);
@@ -605,7 +605,7 @@ void WorldConfig::BuildConfigCache()
     SetConfigValue<bool>(CONFIG_SET_ALL_CREATURES_WITH_WAYPOINT_MOVEMENT_ACTIVE, "SetAllCreaturesWithWaypointMovementActive", false);
 
     // packet spoof punishment
-    SetConfigValue<uint32>(CONFIG_PACKET_SPOOF_BANMODE, "PacketSpoof.BanMode", 0, ConfigData::Reloadable::Yes, [](uint32 const& value) { return value == 0; }, "== 0");
+    SetConfigValue<uint32>(CONFIG_PACKET_SPOOF_BANMODE, "PacketSpoof.BanMode", 0, ConfigValueCache::Reloadable::Yes, [](uint32 const& value) { return value == 0; }, "== 0");
     SetConfigValue<uint32>(CONFIG_PACKET_SPOOF_BANDURATION, "PacketSpoof.BanDuration", 86400);
 
     // Random Battleground Rewards
@@ -638,15 +638,15 @@ void WorldConfig::BuildConfigCache()
     SetConfigValue<bool>(CONFIG_ALLOW_LOGGING_IP_ADDRESSES_IN_DATABASE, "AllowLoggingIPAddressesInDatabase", true);
 
     // LFG group mechanics.
-    SetConfigValue<uint32>(CONFIG_LFG_MAX_KICK_COUNT, "LFG.MaxKickCount", 2, ConfigData::Reloadable::Yes, [](uint32 const& value) { return value <= 3; }, "<= 3");
+    SetConfigValue<uint32>(CONFIG_LFG_MAX_KICK_COUNT, "LFG.MaxKickCount", 2, ConfigValueCache::Reloadable::Yes, [](uint32 const& value) { return value <= 3; }, "<= 3");
 
-    SetConfigValue<uint32>(CONFIG_LFG_KICK_PREVENTION_TIMER, "LFG.KickPreventionTimer", 15, ConfigData::Reloadable::Yes, [](uint32 const& value) { return value <= 15 * MINUTE * IN_MILLISECONDS; }, "<= 15 * MINUTE * IN_MILLISECONDS");
+    SetConfigValue<uint32>(CONFIG_LFG_KICK_PREVENTION_TIMER, "LFG.KickPreventionTimer", 15, ConfigValueCache::Reloadable::Yes, [](uint32 const& value) { return value <= 15 * MINUTE * IN_MILLISECONDS; }, "<= 15 * MINUTE * IN_MILLISECONDS");
 
     // Realm Availability
     SetConfigValue<bool>(CONFIG_REALM_LOGIN_ENABLED, "World.RealmAvailability", true);
 
     // AH Worker threads
-    SetConfigValue<uint32>(CONFIG_AUCTIONHOUSE_WORKERTHREADS, "AuctionHouse.WorkerThreads", 1, ConfigData::Reloadable::No, [](uint32 const& value) { return value >= 1; }, ">= 1");
+    SetConfigValue<uint32>(CONFIG_AUCTIONHOUSE_WORKERTHREADS, "AuctionHouse.WorkerThreads", 1, ConfigValueCache::Reloadable::No, [](uint32 const& value) { return value >= 1; }, ">= 1");
 
     // SpellQueue
     SetConfigValue<bool>(CONFIG_SPELL_QUEUE_ENABLED, "SpellQueue.Enabled", true);

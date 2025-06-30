@@ -18,7 +18,7 @@
 #ifndef WORLDCONFIG_H
 #define WORLDCONFIG_H
 
-#include "ConfigData.h"
+#include "ConfigValueCache.h"
 
 enum ServerConfigs
 {
@@ -476,10 +476,10 @@ enum ServerConfigs
     MAX_NUM_SERVER_CONFIGS
 };
 
-class WorldConfig : public ConfigData<ServerConfigs>
+class WorldConfig : public ConfigValueCache<ServerConfigs>
 {
 public:
-    WorldConfig() : ConfigData(MAX_NUM_SERVER_CONFIGS) { }
+    WorldConfig() : ConfigValueCache(MAX_NUM_SERVER_CONFIGS) { }
 
     void BuildConfigCache() override;
 };
