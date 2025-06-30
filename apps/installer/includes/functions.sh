@@ -48,10 +48,21 @@ function inst_configureOS() {
 # Use the data/sql/create/create_mysql.sql to initialize the database
 function inst_dbCreate() {
     echo "Creating database..."
-    
+
+    # Attempt to connect with MYSQL_ROOT_PASSWORD
+    if [ ! -z "$MYSQL_ROOT_PASSWORD" ]; then
+        if $([ "$EUID" -ne 0 ] && echo sudo) mysql -u root -p"$MYSQL_ROOT_PASSWORD" < "$AC_PATH_ROOT/data/sql/create/create_mysql.sql" 2>/dev/null; then
+            echo "Database created successfully."
+            return 0
+        else
+            echo "Failed to connect with provided password, falling back to interactive mode..."
+        fi
+    fi
+
     # In CI environments or when no password is set, try without password first
     if [[ "$CONTINUOUS_INTEGRATION" == "true" ]]; then
         echo "CI environment detected, attempting connection without password..."
+        
         if $([ "$EUID" -ne 0 ] && echo sudo) mysql -u root < "$AC_PATH_ROOT/data/sql/create/create_mysql.sql" 2>/dev/null; then
             echo "Database created successfully."
             return 0
