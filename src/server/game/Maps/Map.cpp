@@ -559,6 +559,7 @@ void Map::Update(const uint32 t_diff, const uint32 s_diff, bool  /*thread*/)
         return;
     }
 
+    _updatableObjectListRecheckTimer.Update(t_diff);
     resetMarkedCells();
 
     // Update players
@@ -571,26 +572,32 @@ void Map::Update(const uint32 t_diff, const uint32 s_diff, bool  /*thread*/)
 
         player->Update(s_diff);
 
-        MarkNearbyCellsOf(player);
-
-        // If player is using far sight, update viewpoint
-        if (WorldObject* viewPoint = player->GetViewpoint())
+        if (_updatableObjectListRecheckTimer.Passed())
         {
-            if (Creature* viewCreature = viewPoint->ToCreature())
-                MarkNearbyCellsOf(viewCreature);
-            else if (DynamicObject* viewObject = viewPoint->ToDynObject())
-                MarkNearbyCellsOf(viewObject);
+            MarkNearbyCellsOf(player);
+
+            // If player is using far sight, update viewpoint
+            if (WorldObject* viewPoint = player->GetViewpoint())
+            {
+                if (Creature* viewCreature = viewPoint->ToCreature())
+                    MarkNearbyCellsOf(viewCreature);
+                else if (DynamicObject* viewObject = viewPoint->ToDynObject())
+                    MarkNearbyCellsOf(viewObject);
+            }
         }
     }
 
-    // Mark all cells near active objects
-    for (m_activeNonPlayersIter = m_activeNonPlayers.begin(); m_activeNonPlayersIter != m_activeNonPlayers.end(); ++m_activeNonPlayersIter)
+    if (_updatableObjectListRecheckTimer.Passed())
     {
-        WorldObject* obj = *m_activeNonPlayersIter;
-        if (!obj || !obj->IsInWorld())
-            continue;
+        // Mark all cells near active objects
+        for (m_activeNonPlayersIter = m_activeNonPlayers.begin(); m_activeNonPlayersIter != m_activeNonPlayers.end(); ++m_activeNonPlayersIter)
+        {
+            WorldObject* obj = *m_activeNonPlayersIter;
+            if (!obj || !obj->IsInWorld())
+                continue;
 
-        MarkNearbyCellsOf(obj);
+            MarkNearbyCellsOf(obj);
+        }
     }
 
     UpdateNonPlayerObjects(t_diff);
@@ -628,7 +635,6 @@ void Map::UpdateNonPlayerObjects(uint32 const diff)
         _AddObjectToUpdateList(obj);
     _pendingAddUpdatableObjectList.clear();
 
-    _updatableObjectListRecheckTimer.Update(diff);
     if (_updatableObjectListRecheckTimer.Passed())
     {
         for (uint32 i = 0; i < _updatableObjectList.size();)
