@@ -3247,6 +3247,8 @@ bool WorldObject::CanBeAddedToMapUpdateList()
     case TYPEID_DYNAMICOBJECT:
     case TYPEID_GAMEOBJECT:
         return true;
+    default:
+        return false;
     }
 
     return false;
