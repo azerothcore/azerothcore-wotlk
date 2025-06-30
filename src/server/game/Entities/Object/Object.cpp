@@ -1632,14 +1632,6 @@ void WorldObject::UpdateAllowedPositionZ(float x, float y, float& z, float* grou
     }
 }
 
-float WorldObject::GetCellMarkRange() const
-{
-    if (IsPlayer())
-        return MAX_VISIBILITY_DISTANCE;
-    else
-        return GetGridActivationRange();
-}
-
 float WorldObject::GetGridActivationRange() const
 {
     if (ToPlayer())

@@ -557,7 +557,6 @@ public:
     virtual void SaveRespawnTime() {}
     void AddObjectToRemoveList();
 
-    float GetCellMarkRange() const;
     [[nodiscard]] float GetGridActivationRange() const;
     [[nodiscard]] float GetVisibilityRange() const;
     virtual float GetSightRange(WorldObject const* target = nullptr) const;
