@@ -45,7 +45,7 @@ MinionData const minionData[] =
 class instance_gruuls_lair : public InstanceMapScript
 {
 public:
-    instance_gruuls_lair() : InstanceMapScript("instance_gruuls_lair", 565) { }
+    instance_gruuls_lair() : InstanceMapScript("instance_gruuls_lair", MAP_GRUULS_LAIR) { }
 
     struct instance_gruuls_lair_InstanceMapScript : public InstanceScript
     {

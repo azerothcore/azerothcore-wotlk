@@ -23,7 +23,6 @@
 #include "ScriptedGossip.h"
 #include "SpellInfo.h"
 
-// Ours
 class npc_attracted_reef_bull : public CreatureScript
 {
 public:
@@ -169,7 +168,6 @@ public:
     }
 };
 
-// Theirs
 /*######
 ## npc_apothecary_hanes
 ######*/
@@ -397,11 +395,8 @@ public:
 
 void AddSC_howling_fjord()
 {
-    // Ours
     new npc_attracted_reef_bull();
     new npc_your_inner_turmoil();
-
-    // Theirs
     new npc_apothecary_hanes();
     new npc_plaguehound_tracker();
     new npc_razael_and_lyana();

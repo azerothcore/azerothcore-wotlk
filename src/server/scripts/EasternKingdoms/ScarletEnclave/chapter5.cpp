@@ -21,6 +21,7 @@
 #include "ScriptedGossip.h"
 #include "SpellScript.h"
 #include "SpellScriptLoader.h"
+#include "WorldStateDefines.h"
 
 enum LightOfDawnSays
 {
@@ -120,7 +121,7 @@ enum LightOfDawnEncounter
     EVENT_SPELL_DEATH_STRIKE,
     EVENT_SPELL_DEATH_EMBRACE,
     EVENT_SPELL_UNHOLY_BLIGHT,
-    EVENT_SPELL_TALK,
+    EVENT_SPELL_DARION_MOD_DAMAGE,
     // Positioning
     EVENT_FINISH_FIGHT_1,
     EVENT_FINISH_FIGHT_2,
@@ -198,13 +199,6 @@ enum LightOfDawnEncounter
     ENCOUNTER_TOTAL_DEFENDERS           = 300,
     ENCOUNTER_TOTAL_SCOURGE             = 10000,
 
-    WORLD_STATE_DEFENDERS_COUNT         = 3590,
-    WORLD_STATE_SCOURGE_COUNT           = 3591,
-    WORLD_STATE_SOLDIERS_ENABLE         = 3592,
-    WORLD_STATE_COUNTDOWN_ENABLE        = 3603,
-    WORLD_STATE_COUNTDOWN_TIME          = 3604,
-    WORLD_STATE_EVENT_BEGIN_ENABLE      = 3605,
-
     ENCOUNTER_STATE_NONE                = 0,
     ENCOUNTER_STATE_FIGHT               = 1,
     ENCOUNTER_STATE_OUTRO               = 2,
@@ -259,6 +253,7 @@ enum LightOfDawnSpells
     SPELL_DEATH_EMBRACE                 = 53635,
     SPELL_ICY_TOUCH1                    = 49723,
     SPELL_UNHOLY_BLIGHT                 = 53640,
+    SPELL_DARION_MOD_DAMAGE             = 53645,
 
     // Outro
     SPELL_THE_LIGHT_OF_DAWN             = 53658,
@@ -343,7 +338,7 @@ public:
         if (creature->IsQuestGiver())
             player->PrepareQuestMenu(creature->GetGUID());
 
-        if (player->GetQuestStatus(12801) == QUEST_STATUS_INCOMPLETE && !creature->AI()->GetData(WORLD_STATE_SOLDIERS_ENABLE))
+        if (player->GetQuestStatus(12801) == QUEST_STATUS_INCOMPLETE && !creature->AI()->GetData(WORLD_STATE_BATTLE_FOR_LIGHTS_HOPE_SOLDIERS_ENABLE))
             AddGossipItemFor(player, 9795, 0, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
 
         SendGossipMenuFor(player, player->GetGossipTextId(creature), creature->GetGUID());
@@ -414,17 +409,17 @@ public:
         {
             switch (type)
             {
-                case WORLD_STATE_DEFENDERS_COUNT:
+                case WORLD_STATE_BATTLE_FOR_LIGHTS_HOPE_DEFENDERS_COUNT:
                     return defendersRemaining;
-                case WORLD_STATE_SCOURGE_COUNT:
+                case WORLD_STATE_BATTLE_FOR_LIGHTS_HOPE_SCOURGE_COUNT:
                     return scourgeRemaining;
-                case WORLD_STATE_SOLDIERS_ENABLE:
+                case WORLD_STATE_BATTLE_FOR_LIGHTS_HOPE_SOLDIERS_ENABLE:
                     return me->IsAlive() && (startTimeRemaining || battleStarted);
-                case WORLD_STATE_COUNTDOWN_ENABLE:
+                case WORLD_STATE_BATTLE_FOR_LIGHTS_HOPE_COUNTDOWN_ENABLE:
                     return me->IsAlive() && startTimeRemaining;
-                case WORLD_STATE_COUNTDOWN_TIME:
+                case WORLD_STATE_BATTLE_FOR_LIGHTS_HOPE_COUNTDOWN_TIME:
                     return startTimeRemaining;
-                case WORLD_STATE_EVENT_BEGIN_ENABLE:
+                case WORLD_STATE_BATTLE_FOR_LIGHTS_HOPE_EVENT_BEGIN_ENABLE:
                     return me->IsAlive() && !startTimeRemaining && battleStarted;
             }
             return 0;
@@ -442,12 +437,12 @@ public:
 
         void SendInitialWorldStates()
         {
-            SendUpdateWorldState(WORLD_STATE_DEFENDERS_COUNT, GetData(WORLD_STATE_DEFENDERS_COUNT));
-            SendUpdateWorldState(WORLD_STATE_SCOURGE_COUNT, GetData(WORLD_STATE_SCOURGE_COUNT));
-            SendUpdateWorldState(WORLD_STATE_SOLDIERS_ENABLE, GetData(WORLD_STATE_SOLDIERS_ENABLE));
-            SendUpdateWorldState(WORLD_STATE_COUNTDOWN_ENABLE, GetData(WORLD_STATE_COUNTDOWN_ENABLE));
-            SendUpdateWorldState(WORLD_STATE_COUNTDOWN_TIME, GetData(WORLD_STATE_COUNTDOWN_TIME));
-            SendUpdateWorldState(WORLD_STATE_EVENT_BEGIN_ENABLE, GetData(WORLD_STATE_EVENT_BEGIN_ENABLE));
+            SendUpdateWorldState(WORLD_STATE_BATTLE_FOR_LIGHTS_HOPE_DEFENDERS_COUNT, GetData(WORLD_STATE_BATTLE_FOR_LIGHTS_HOPE_DEFENDERS_COUNT));
+            SendUpdateWorldState(WORLD_STATE_BATTLE_FOR_LIGHTS_HOPE_SCOURGE_COUNT, GetData(WORLD_STATE_BATTLE_FOR_LIGHTS_HOPE_SCOURGE_COUNT));
+            SendUpdateWorldState(WORLD_STATE_BATTLE_FOR_LIGHTS_HOPE_SOLDIERS_ENABLE, GetData(WORLD_STATE_BATTLE_FOR_LIGHTS_HOPE_SOLDIERS_ENABLE));
+            SendUpdateWorldState(WORLD_STATE_BATTLE_FOR_LIGHTS_HOPE_COUNTDOWN_ENABLE, GetData(WORLD_STATE_BATTLE_FOR_LIGHTS_HOPE_COUNTDOWN_ENABLE));
+            SendUpdateWorldState(WORLD_STATE_BATTLE_FOR_LIGHTS_HOPE_COUNTDOWN_TIME, GetData(WORLD_STATE_BATTLE_FOR_LIGHTS_HOPE_COUNTDOWN_TIME));
+            SendUpdateWorldState(WORLD_STATE_BATTLE_FOR_LIGHTS_HOPE_EVENT_BEGIN_ENABLE, GetData(WORLD_STATE_BATTLE_FOR_LIGHTS_HOPE_EVENT_BEGIN_ENABLE));
         }
 
         void JustSummoned(Creature* cr) override
@@ -482,12 +477,12 @@ public:
             if (creature->GetEntry() >= NPC_RAMPAGING_ABOMINATION)
             {
                 --scourgeRemaining;
-                SendUpdateWorldState(WORLD_STATE_SCOURGE_COUNT, GetData(WORLD_STATE_SCOURGE_COUNT));
+                SendUpdateWorldState(WORLD_STATE_BATTLE_FOR_LIGHTS_HOPE_SCOURGE_COUNT, GetData(WORLD_STATE_BATTLE_FOR_LIGHTS_HOPE_SCOURGE_COUNT));
             }
             else
             {
                 --defendersRemaining;
-                SendUpdateWorldState(WORLD_STATE_DEFENDERS_COUNT, GetData(WORLD_STATE_DEFENDERS_COUNT));
+                SendUpdateWorldState(WORLD_STATE_BATTLE_FOR_LIGHTS_HOPE_DEFENDERS_COUNT, GetData(WORLD_STATE_BATTLE_FOR_LIGHTS_HOPE_DEFENDERS_COUNT));
 
                 if (defendersRemaining == 200)
                     FinishFight();
@@ -530,7 +525,7 @@ public:
             events.RescheduleEvent(EVENT_SPELL_DEATH_STRIKE, 8000);
             events.RescheduleEvent(EVENT_SPELL_DEATH_EMBRACE, 5000);
             events.RescheduleEvent(EVENT_SPELL_UNHOLY_BLIGHT, 10000);
-            events.RescheduleEvent(EVENT_SPELL_TALK, 10000);
+            events.RescheduleEvent(EVENT_SPELL_DARION_MOD_DAMAGE, 500);
         }
 
         void Reset() override
@@ -610,25 +605,25 @@ public:
             switch (eventId)
             {
                 case EVENT_START_COUNTDOWN_1:
-                    SendUpdateWorldState(WORLD_STATE_COUNTDOWN_TIME, 4);
+                    SendUpdateWorldState(WORLD_STATE_BATTLE_FOR_LIGHTS_HOPE_COUNTDOWN_TIME, 4);
                     break;
                 case EVENT_START_COUNTDOWN_2:
-                    SendUpdateWorldState(WORLD_STATE_COUNTDOWN_TIME, 3);
+                    SendUpdateWorldState(WORLD_STATE_BATTLE_FOR_LIGHTS_HOPE_COUNTDOWN_TIME, 3);
                     break;
                 case EVENT_START_COUNTDOWN_3:
-                    SendUpdateWorldState(WORLD_STATE_COUNTDOWN_TIME, 2);
+                    SendUpdateWorldState(WORLD_STATE_BATTLE_FOR_LIGHTS_HOPE_COUNTDOWN_TIME, 2);
                     break;
                 case EVENT_START_COUNTDOWN_4:
                     Talk(SAY_LIGHT_OF_DAWN02);
-                    SendUpdateWorldState(WORLD_STATE_COUNTDOWN_TIME, 1);
+                    SendUpdateWorldState(WORLD_STATE_BATTLE_FOR_LIGHTS_HOPE_COUNTDOWN_TIME, 1);
                     break;
                 case EVENT_START_COUNTDOWN_5:
                     battleStarted = ENCOUNTER_STATE_FIGHT;
                     me->ReplaceAllNpcFlags(UNIT_NPC_FLAG_NONE);
                     Talk(SAY_LIGHT_OF_DAWN04); // Wrong order in DB!
-                    SendUpdateWorldState(WORLD_STATE_COUNTDOWN_TIME, 0);
-                    SendUpdateWorldState(WORLD_STATE_COUNTDOWN_ENABLE, 0);
-                    SendUpdateWorldState(WORLD_STATE_EVENT_BEGIN_ENABLE, 1);
+                    SendUpdateWorldState(WORLD_STATE_BATTLE_FOR_LIGHTS_HOPE_COUNTDOWN_TIME, 0);
+                    SendUpdateWorldState(WORLD_STATE_BATTLE_FOR_LIGHTS_HOPE_COUNTDOWN_ENABLE, 0);
+                    SendUpdateWorldState(WORLD_STATE_BATTLE_FOR_LIGHTS_HOPE_EVENT_BEGIN_ENABLE, 1);
                     break;
                 case EVENT_START_COUNTDOWN_6:
                 case EVENT_START_COUNTDOWN_7:
@@ -667,7 +662,7 @@ public:
                         me->SetHomePosition(pos);
                         me->SetWalk(false);
                         me->GetMotionMaster()->MovePoint(1, pos.GetPositionX(), pos.GetPositionY(), pos.GetPositionZ(), true, true);
-                        me->CastSpell(me, SPELL_THE_MIGHT_OF_MOGRAINE, true);
+                        DoCastSelf(SPELL_THE_MIGHT_OF_MOGRAINE, true);
                         break;
                     }
                 case EVENT_START_COUNTDOWN_14:
@@ -1152,23 +1147,24 @@ public:
             {
                 case EVENT_SPELL_ANTI_MAGIC_ZONE:
                     DoCast(me, SPELL_ANTI_MAGIC_ZONE1);
-                    events.RescheduleEvent(eventId, 25s, 30s);
+                    events.RescheduleEvent(eventId, 30s, 45s);
                     break;
                 case EVENT_SPELL_DEATH_STRIKE:
                     DoCastVictim(SPELL_DEATH_STRIKE);
-                    events.RescheduleEvent(eventId, 5s, 10s);
+                    events.RescheduleEvent(eventId, 5s, 35s);
                     break;
                 case EVENT_SPELL_DEATH_EMBRACE:
                     DoCastVictim(SPELL_DEATH_EMBRACE);
-                    events.RescheduleEvent(eventId, 15s, 20s);
+                    events.RescheduleEvent(eventId, 45s, 60s);
                     break;
                 case EVENT_SPELL_UNHOLY_BLIGHT:
                     DoCast(me, SPELL_UNHOLY_BLIGHT);
                     events.RescheduleEvent(eventId, 60s);
                     break;
-                case EVENT_SPELL_TALK:
+                case EVENT_SPELL_DARION_MOD_DAMAGE:
+                    DoCast(me, SPELL_DARION_MOD_DAMAGE);
                     Talk(SAY_LIGHT_OF_DAWN09);
-                    events.RescheduleEvent(eventId, 15s, 20s);
+                    events.RescheduleEvent(eventId, 15s, 25s);
                     break;
             }
 
@@ -1204,26 +1200,105 @@ class spell_chapter5_light_of_dawn_aura : public AuraScript
     }
 };
 
-class spell_chapter5_rebuke : public SpellScript
+// 58552 - Return to Orgrimmar
+// 58533 - Return to Stormwind
+enum ReturnToCapital
 {
-    PrepareSpellScript(spell_chapter5_rebuke);
+    SPELL_RETURN_TO_ORGRIMMAR_APPLE  = 58509,
+    SPELL_RETURN_TO_ORGRIMMAR_BANANA = 58513,
+    SPELL_RETURN_TO_ORGRIMMAR_SPIT   = 58520,
 
-    void HandleLeapBack(SpellEffIndex effIndex)
+    EMOTE_THROW_APPLE    = 2,
+    EMOTE_THROW_BANANA   = 3,
+    EMOTE_THROW_SPIT     = 4,
+    SAY_INSULT_TO_DK     = 5,
+
+    NPC_SW_GUARD         = 68,
+    NPC_ROYAL_GUARD      = 1756,
+    NPC_CITY_PATROLLER   = 1976,
+    NPC_OG_GUARD         = 3296,
+    NPC_KOR_ELITE        = 14304,
+
+    TEXT_BROADCAST_COWER = 31670 // "%s cowers in fear."
+};
+
+uint32 ReturnToCapitalSpells[3] =
+{
+    58509, // Apple
+    58513, // Banana
+    58520  // Spit
+};
+
+class spell_chapter5_return_to_capital : public SpellScript
+{
+    PrepareSpellScript(spell_chapter5_return_to_capital);
+
+    bool Validate(SpellInfo const* /*spellInfo*/) override
     {
-        PreventHitEffect(effIndex);
-        if (Unit* unitTarget = GetHitUnit())
-            unitTarget->KnockbackFrom(2282.86f, -5263.45f, 40.0f, 8.0f);
+        return ValidateSpellInfo({ SPELL_RETURN_TO_ORGRIMMAR_APPLE, SPELL_RETURN_TO_ORGRIMMAR_BANANA, SPELL_RETURN_TO_ORGRIMMAR_SPIT});
+    }
+
+    void HandleHit(SpellEffIndex /*effIndex*/)
+    {
+        Creature* creature = GetHitUnit()->ToCreature();
+        Player* player = GetCaster()->ToPlayer();
+        uint32 spellId = GetSpellInfo()->Id;
+
+        if (!spellId || !creature || !player || player->IsGameMaster() || !player->IsAlive() || !creature->IsAlive() || creature->IsInCombat())
+            return;
+
+        if (creature->HasSpellCooldown(spellId))
+            return;
+
+        if (creature->GetEntry() == NPC_SW_GUARD || creature->GetEntry() == NPC_ROYAL_GUARD || creature->GetEntry() == NPC_CITY_PATROLLER || creature->GetEntry() == NPC_OG_GUARD || creature->GetEntry() == NPC_KOR_ELITE)
+        {
+            _emote = urand(2,4);
+            if (creature)
+            {
+                creature->PauseMovement(5000);
+                creature->SetTimedFacingToObject(player, 30000);
+
+                if (roll_chance_i(30))
+                {
+                    creature->AI()->Talk(_emote, player);
+                    creature->CastSpell(player, ReturnToCapitalSpells[_emote - 2]);
+                }
+                else
+                {
+                    creature->AI()->Talk(SAY_INSULT_TO_DK, player);
+                    creature->HandleEmoteCommand(RAND(EMOTE_ONESHOT_POINT,EMOTE_ONESHOT_RUDE));
+                }
+            }
+        }
+        /*/// @todo: This needs to be further investigated as there are some "guard" npcs, that have civilian flags and non guard npcs should also insult the dk.
+        else
+            if (creature->GetCreatureTemplate()->flags_extra & CREATURE_FLAG_EXTRA_CIVILIAN)
+            {
+                creature->HandleEmoteCommand(EMOTE_STATE_COWER); // from sniff, emote 431 for a while, then reset (with "%s cowers in fear." text)
+                creature->PlayDirectSound(14556); // from sniff
+                if (player)
+                {
+                    LocaleConstant loc_idx = player->GetSession()->GetSessionDbLocaleIndex();
+                        if (BroadcastText const* bct = sObjectMgr->GetBroadcastText(TEXT_BROADCAST_COWER))
+                            creature->TextEmote(bct->GetText(loc_idx, creature->getGender()), creature);
+                }
+            }
+        */
+
+        creature->AddSpellCooldown(spellId, 0, 30000);
     }
 
     void Register() override
     {
-        OnEffectLaunchTarget += SpellEffectFn(spell_chapter5_rebuke::HandleLeapBack, EFFECT_0, SPELL_EFFECT_LEAP_BACK);
+        OnEffectHitTarget += SpellEffectFn(spell_chapter5_return_to_capital::HandleHit, EFFECT_0, SPELL_EFFECT_DUMMY);
     }
+private:
+    uint8 _emote;
 };
 
 void AddSC_the_scarlet_enclave_c5()
 {
     new npc_highlord_darion_mograine();
     RegisterSpellScript(spell_chapter5_light_of_dawn_aura);
-    RegisterSpellScript(spell_chapter5_rebuke);
+    RegisterSpellScript(spell_chapter5_return_to_capital);
 }

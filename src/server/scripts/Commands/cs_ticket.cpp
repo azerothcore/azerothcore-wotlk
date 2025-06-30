@@ -15,13 +15,6 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-/* ScriptData
-Name: ticket_commandscript
-%Complete: 100
-Comment: All ticket related commands
-Category: commandscripts
-EndScriptData */
-
 #include "AccountMgr.h"
 #include "Chat.h"
 #include "CommandScript.h"
@@ -199,7 +192,7 @@ public:
         return true;
     }
 
-    static bool HandleGMTicketCompleteCommand(ChatHandler* handler, uint32 ticketId)
+    static bool HandleGMTicketCompleteCommand(ChatHandler* handler, uint32 ticketId, std::optional<std::string> response)
     {
         GmTicket* ticket = sTicketMgr->GetTicket(ticketId);
         if (!ticket || ticket->IsClosed() || ticket->IsCompleted())
@@ -217,9 +210,8 @@ public:
             return true;
         }
 
-        char* response = strtok(nullptr, "\n");
         if (response)
-            ticket->AppendResponse(response);
+            ticket->AppendResponse(response.value());
 
         if (Player* player2 = ticket->GetPlayer())
         {

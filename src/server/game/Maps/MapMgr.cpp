@@ -214,6 +214,7 @@ Map::EnterState MapMgr::PlayerCannotEnter(uint32 mapid, Player* player, bool log
         else
         {
             LOG_DEBUG("maps", "Map::PlayerCannotEnter - player '{}' is dead but does not have a corpse!", player->GetName());
+            return Map::CANNOT_ENTER_CORPSE_IN_DIFFERENT_INSTANCE;
         }
     }
 

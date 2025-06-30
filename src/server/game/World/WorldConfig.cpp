@@ -343,6 +343,7 @@ void WorldConfig::BuildConfigCache()
 
     SetConfigValue<uint32>(CONFIG_EVENT_ANNOUNCE, "Event.Announce", 0);
 
+    SetConfigValue<float>(CONFIG_CREATURE_LEASH_RADIUS, "CreatureLeashRadius", 30.0f);
     SetConfigValue<float>(CONFIG_CREATURE_FAMILY_FLEE_ASSISTANCE_RADIUS, "CreatureFamilyFleeAssistanceRadius", 30);
     SetConfigValue<float>(CONFIG_CREATURE_FAMILY_ASSISTANCE_RADIUS, "CreatureFamilyAssistanceRadius", 10);
     SetConfigValue<uint32>(CONFIG_CREATURE_FAMILY_ASSISTANCE_DELAY, "CreatureFamilyAssistanceDelay", 2000);
@@ -371,6 +372,8 @@ void WorldConfig::BuildConfigCache()
     SetConfigValue<uint32>(CONFIG_GUILD_BANK_TAB_COST_3, "Guild.BankTabCost3", 10000000);
     SetConfigValue<uint32>(CONFIG_GUILD_BANK_TAB_COST_4, "Guild.BankTabCost4", 25000000);
     SetConfigValue<uint32>(CONFIG_GUILD_BANK_TAB_COST_5, "Guild.BankTabCost5", 50000000);
+
+    SetConfigValue<uint32>(CONFIG_GUILD_MEMBER_LIMIT, "Guild.MemberLimit", 0);
 
     SetConfigValue<bool>(CONFIG_DETECT_POS_COLLISION, "DetectPosCollision", true);
 
@@ -565,9 +568,9 @@ void WorldConfig::BuildConfigCache()
 
     // Wintergrasp
     SetConfigValue<uint32>(CONFIG_WINTERGRASP_ENABLE, "Wintergrasp.Enable", 1);
-    SetConfigValue<uint32>(CONFIG_WINTERGRASP_PLR_MAX, "Wintergrasp.PlayerMax", 100);
+    SetConfigValue<uint32>(CONFIG_WINTERGRASP_PLR_MAX, "Wintergrasp.PlayerMax", 120);
     SetConfigValue<uint32>(CONFIG_WINTERGRASP_PLR_MIN, "Wintergrasp.PlayerMin", 0);
-    SetConfigValue<uint32>(CONFIG_WINTERGRASP_PLR_MIN_LVL, "Wintergrasp.PlayerMinLvl", 77);
+    SetConfigValue<uint32>(CONFIG_WINTERGRASP_PLR_MIN_LVL, "Wintergrasp.PlayerMinLvl", 75);
     SetConfigValue<uint32>(CONFIG_WINTERGRASP_BATTLETIME, "Wintergrasp.BattleTimer", 30);
     SetConfigValue<uint32>(CONFIG_WINTERGRASP_NOBATTLETIME, "Wintergrasp.NoBattleTimer", 150);
     SetConfigValue<uint32>(CONFIG_WINTERGRASP_RESTART_AFTER_CRASH, "Wintergrasp.CrashRestartTimer", 10);

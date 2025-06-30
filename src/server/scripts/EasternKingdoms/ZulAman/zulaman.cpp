@@ -39,6 +39,7 @@ enum ForestFrog
     SPELL_SUMMON_AMANI_CHARM_CHEST_2  = 43756, // Amani Charm Box (186734)
     SPELL_SUMMON_MONEY_BAG            = 43774, // Money Bag (186736)
     SPELL_STEALTH_                    = 34189,
+    SPELL_FIXATE                      = 43360,
 
     // Creatures
     NPC_FOREST_FROG                   = 24396,
@@ -86,6 +87,12 @@ struct npc_forest_frog : public ScriptedAI
         if (eventTimer)
         {
             Player* player = ObjectAccessor::GetPlayer(me->GetMap(), PlayerGUID);
+            if (!player)
+            {
+                events.CancelEvent(eventTimer);
+                eventTimer = 0;
+                return;
+            }
             switch (events.ExecuteEvent())
             {
             case 1:
@@ -141,7 +148,7 @@ struct npc_forest_frog : public ScriptedAI
                 if (me->GetEntry() == NPC_ADARRAH)
                     Talk(SAY_CHEST_TALK + 1, player);
                 else
-                    Talk(SAY_CHEST_TALK);
+                    Talk(SAY_CHEST_TALK, player);
 
                 eventTimer = 4;
                 if (me->GetEntry() == NPC_GUNTER || me->GetEntry() == NPC_KYREN)
@@ -155,7 +162,7 @@ struct npc_forest_frog : public ScriptedAI
                 if (me->GetEntry() == NPC_ADARRAH)
                     Talk(SAY_GOODBYE + 1, player);
                 else
-                    Talk(SAY_GOODBYE);
+                    Talk(SAY_GOODBYE, player);
 
                 eventTimer = 5;
                 events.ScheduleEvent(eventTimer, 2000);
@@ -201,6 +208,9 @@ struct npc_forest_frog : public ScriptedAI
         events.ScheduleEvent(eventTimer, 3000);
 
         me->UpdateEntry(cEntry);
+
+        if (Player* player = ObjectAccessor::GetPlayer(me->GetMap(), PlayerGUID))
+            me->SetFacingToObject(player);
     }
 
     void SpellHit(Unit* caster, SpellInfo const* spell) override
@@ -208,7 +218,6 @@ struct npc_forest_frog : public ScriptedAI
         if (spell->Id == SPELL_REMOVE_AMANI_CURSE && caster->IsPlayer() && me->GetEntry() == NPC_FOREST_FROG)
         {
             me->GetMotionMaster()->MoveIdle();
-            me->SetFacingToObject(caster);
             PlayerGUID = caster->GetGUID();
 
             if (roll_chance_i(2))
@@ -223,7 +232,6 @@ struct npc_forest_frog : public ScriptedAI
 
     private:
         InstanceScript* instance;
-        EventMap events;
         uint8 eventTimer;
         ObjectGuid PlayerGUID;
 };
@@ -750,7 +758,10 @@ struct npc_amanishi_scout : public ScriptedAI
         triggers.remove_if([](Creature* trigger) {return !IsDrum(trigger);});
         triggers.sort(Acore::ObjectDistanceOrderPred(me));
         if (triggers.empty())
+        {
             ScheduleCombat();
+            return;
+        }
         Creature* closestDrum = triggers.front();
         me->GetMotionMaster()->MoveFollow(closestDrum, 0.0f, 0.0f);
         _drumGUID = closestDrum->GetGUID();
@@ -874,6 +885,26 @@ class spell_summon_amanishi_sentries : public SpellScript
     }
 };
 
+class spell_call_of_the_beast : public SpellScript
+{
+    PrepareSpellScript(spell_call_of_the_beast);
+
+    bool Validate(SpellInfo const* /*spellInfo*/) override
+    {
+        return ValidateSpellInfo({ SPELL_FIXATE });
+    }
+
+    void HandleEffect(SpellEffIndex /*effIndex*/)
+    {
+        GetHitUnit()->CastSpell(GetHitUnit(), SPELL_FIXATE, true);
+    }
+
+    void Register() override
+    {
+        OnEffectHitTarget += SpellEffectFn(spell_call_of_the_beast::HandleEffect, EFFECT_0, SPELL_EFFECT_APPLY_AURA);
+    }
+};
+
 void AddSC_zulaman()
 {
     RegisterZulAmanCreatureAI(npc_forest_frog);
@@ -886,4 +917,5 @@ void AddSC_zulaman()
     RegisterZulAmanCreatureAI(npc_amanishi_scout);
     RegisterSpellScript(spell_alert_drums);
     RegisterSpellScript(spell_summon_amanishi_sentries);
+    RegisterSpellScript(spell_call_of_the_beast);
 }

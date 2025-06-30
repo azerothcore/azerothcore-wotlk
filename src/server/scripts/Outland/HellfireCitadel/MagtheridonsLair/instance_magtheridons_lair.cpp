@@ -39,7 +39,7 @@ MinionData const minionData[] =
 class instance_magtheridons_lair : public InstanceMapScript
 {
 public:
-    instance_magtheridons_lair() : InstanceMapScript("instance_magtheridons_lair", 544) { }
+    instance_magtheridons_lair() : InstanceMapScript("instance_magtheridons_lair", MAP_MAGTHERIDONS_LAIR) { }
 
     struct instance_magtheridons_lair_InstanceMapScript : public InstanceScript
     {

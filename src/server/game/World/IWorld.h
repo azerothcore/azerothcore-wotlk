@@ -92,11 +92,8 @@ public:
     [[nodiscard]] virtual float getFloatConfig(ServerConfigs index) const = 0;
     virtual void setIntConfig(ServerConfigs index, uint32 value) = 0;
     [[nodiscard]] virtual uint32 getIntConfig(ServerConfigs index) const = 0;
-    virtual void setWorldState(uint32 index, uint64 value) = 0;
-    [[nodiscard]] virtual uint64 getWorldState(uint32 index) const = 0;
     virtual void setStringConfig(ServerConfigs index, std::string const& value) = 0;
     virtual std::string_view getStringConfig(ServerConfigs index) const = 0;
-    virtual void LoadWorldStates() = 0;
     [[nodiscard]] virtual bool IsPvPRealm() const = 0;
     [[nodiscard]] virtual bool IsFFAPvPRealm() const = 0;
     virtual uint32 GetNextWhoListUpdateDelaySecs() = 0;

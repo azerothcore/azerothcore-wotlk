@@ -15,13 +15,6 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-/* ScriptData
-Name: character_commandscript
-%Complete: 100
-Comment: All character related commands
-Category: commandscripts
-EndScriptData */
-
 #include "AccountMgr.h"
 #include "AchievementMgr.h"
 #include "Chat.h"
