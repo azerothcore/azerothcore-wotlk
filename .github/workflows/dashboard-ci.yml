@@ -24,10 +24,6 @@ jobs:
     name: Test Bash Scripts
     runs-on: ubuntu-24.04
     if: github.repository == 'azerothcore/azerothcore-wotlk' && !github.event.pull_request.draft
-    strategy:
-      fail-fast: false
-      matrix:
-        test-module: ['core', 'installer', 'compiler', 'db-tools']
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -36,6 +32,7 @@ jobs:
 
       - name: Install requirements
         run: |
+          sudo apt install -y bats
           ./acore.sh install-deps
 
       - name: Run bash script tests for ${{ matrix.test-module }}
@@ -56,13 +53,12 @@ jobs:
       - name: Configure AzerothCore settings
         run: |
           # Create basic configuration
-          mkdir -p env/dist/etc
-          cp conf/config.sh.dist conf/config.sh
+          cp conf/dist/config.sh conf/config.sh
           # Configure database connection
-          sed -i 's/DB_HOST=.*/DB_HOST="127.0.0.1"/' conf/config.sh
-          sed -i 's/DB_USERNAME=.*/DB_USERNAME="root"/' conf/config.sh
-          sed -i 's/DB_PASSWORD=.*/DB_PASSWORD="password"/' conf/config.sh
-          sed -i 's/DB_PORT=.*/DB_PORT="3306"/' conf/config.sh
+          #sed -i 's/DB_HOST=.*/DB_HOST="127.0.0.1"/' conf/config.sh
+          #sed -i 's/DB_USERNAME=.*/DB_USERNAME="root"/' conf/config.sh
+          #sed -i 's/DB_PASSWORD=.*/DB_PASSWORD="password"/' conf/config.sh
+          #sed -i 's/DB_PORT=.*/DB_PORT="3306"/' conf/config.sh
 
       - name: Run complete installation (deps, compile, database, client-data)
         run: |
