@@ -1,0 +1,117 @@
+#!/usr/bin/env bash
+
+# AzerothCore Starter Script
+# This script handles the execution of AzerothCore binaries with optional GDB support
+#
+# Usage: starter <binary> [gdb_file] [config] [syslog] [syserr] [gdb_enabled] [crashes_path]
+#
+# Parameters:
+#   $1 - Binary to execute (required)
+#   $2 - GDB configuration file (optional)
+#   $3 - Configuration file path (optional)
+#   $4 - System log file (optional)
+#   $5 - System error file (optional)  
+#   $6 - GDB enabled flag (0/1, optional)
+#   $7 - Crashes directory path (optional)
+
+BINPATH="$1"
+BINFILE="$2"
+GDB_FILE="$3"
+CONFIG="$4"
+SYSLOG="$5"
+SYSERR="$6"
+GDB_ENABLED="${7:-0}"
+CRASHES_PATH="$8"
+
+BINARY=$(realpath "$BINPATH/$BINFILE")
+
+# Default values
+CURRENT_PATH="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+DEFAULT_CRASHES_PATH="$CURRENT_PATH/logs/crashes"
+DEFAULT_GDB_FILE="$CURRENT_PATH/gdb.conf"
+
+# Set defaults if not provided
+CONFIG="${CONFIG:-""}"
+CRASHES_PATH="${CRASHES_PATH:-$DEFAULT_CRASHES_PATH}"
+GDB_FILE="${GDB_FILE:-$DEFAULT_GDB_FILE}"
+
+# Validate binary
+if [ -z "$BINARY" ]; then
+    echo "Error: Binary parameter is required"
+    echo "Usage: $0 <binary> [gdb_file] [config] [syslog] [syserr] [gdb_enabled] [crashes_path]"
+    exit 1
+fi
+
+if [ ! -f "$BINARY" ]; then
+    echo "Error: Binary '$BINARY' not found"
+    exit 1
+fi
+
+# Create crashes directory if it doesn't exist
+mkdir -p "$CRASHES_PATH"
+
+cd $BINPATH || {
+    echo "Error: Could not change to binary path '$BINPATH'"
+    exit 1
+}
+
+EXECPATH=$(realpath "$BINFILE")
+
+if [ "$GDB_ENABLED" -eq 1 ]; then
+    echo "Starting $EXECPATH with GDB enabled"
+    
+    # Generate GDB configuration on the fly
+    TIMESTAMP=$(date +%Y-%m-%d-%H-%M-%S)
+    GDB_TEMP_FILE="$CRASHES_PATH/gdb-$TIMESTAMP.conf"
+    GDB_OUTPUT_FILE="$CRASHES_PATH/gdb-$TIMESTAMP.txt"
+    
+    # Create GDB configuration
+    cat > "$GDB_TEMP_FILE" << EOF
+set logging file $GDB_OUTPUT_FILE
+set logging enabled on
+set debug timestamp
+EOF
+
+    # Add run command with config if specified
+    if [ -n "$CONFIG" ]; then
+        echo "run -c $CONFIG" >> "$GDB_TEMP_FILE"
+    else
+        echo "run" >> "$GDB_TEMP_FILE"
+    fi
+    
+    cat >> "$GDB_TEMP_FILE" << EOF
+bt
+bt full
+info thread
+thread apply all backtrace full
+EOF
+
+    # Create log files if specified
+    if [ -n "$SYSLOG" ]; then
+        [ ! -f "$SYSLOG" ] && touch "$SYSLOG"
+    fi
+    if [ -n "$SYSERR" ]; then
+        [ ! -f "$SYSERR" ] && touch "$SYSERR"
+    fi
+
+    # Execute with GDB
+    if [ "${WITH_CONSOLE:-0}" -eq 0 ] && [ -n "$SYSLOG" ] && [ -n "$SYSERR" ]; then
+        gdb -x "$GDB_TEMP_FILE" --batch "$EXECPATH" >> "$SYSLOG" 2>> "$SYSERR"
+    else
+        echo "> Console enabled"
+        if [ -n "$SYSLOG" ] && [ -n "$SYSERR" ]; then
+            gdb -x "$GDB_TEMP_FILE" --batch "$EXECPATH" > >(tee "$SYSLOG") 2> >(tee "$SYSERR" >&2)
+        else
+            gdb -x "$GDB_TEMP_FILE" --batch "$EXECPATH"
+        fi
+    fi
+    
+    # Cleanup temporary GDB file
+    rm -f "$GDB_TEMP_FILE"
+else
+    if [ -n "$CONFIG" ]; then
+        script -q -e -c "$EXECPATH -c \"$CONFIG\""
+    else
+        script -q -e -c "$EXECPATH"
+    fi
+fi
