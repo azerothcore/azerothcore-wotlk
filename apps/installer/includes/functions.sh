@@ -1,3 +1,8 @@
+#!/usr/bin/env bash
+
+# Set SUDO variable - one liner
+SUDO=$([ "$EUID" -ne 0 ] && echo "sudo" || echo "")
+
 function inst_configureOS() {
     echo "Platform: $OSTYPE"
     case "$OSTYPE" in
@@ -51,7 +56,7 @@ function inst_dbCreate() {
 
     # Attempt to connect with MYSQL_ROOT_PASSWORD
     if [ ! -z "$MYSQL_ROOT_PASSWORD" ]; then
-        if $([ "$EUID" -ne 0 ] && echo sudo) mysql -u root -p"$MYSQL_ROOT_PASSWORD" < "$AC_PATH_ROOT/data/sql/create/create_mysql.sql" 2>/dev/null; then
+        if $SUDO mysql -u root -p"$MYSQL_ROOT_PASSWORD" < "$AC_PATH_ROOT/data/sql/create/create_mysql.sql" 2>/dev/null; then
             echo "Database created successfully."
             return 0
         else
@@ -63,7 +68,7 @@ function inst_dbCreate() {
     if [[ "$CONTINUOUS_INTEGRATION" == "true" ]]; then
         echo "CI environment detected, attempting connection without password..."
         
-        if $([ "$EUID" -ne 0 ] && echo sudo) mysql -u root < "$AC_PATH_ROOT/data/sql/create/create_mysql.sql" 2>/dev/null; then
+        if $SUDO mysql -u root < "$AC_PATH_ROOT/data/sql/create/create_mysql.sql" 2>/dev/null; then
             echo "Database created successfully."
             return 0
         else
@@ -73,7 +78,7 @@ function inst_dbCreate() {
     
     # Try with password (interactive mode)
     echo "Please enter your sudo and your MySQL root password if prompted."
-    $([ "$EUID" -ne 0 ] && echo sudo) mysql -u root -p < "$AC_PATH_ROOT/data/sql/create/create_mysql.sql"
+    $SUDO mysql -u root -p < "$AC_PATH_ROOT/data/sql/create/create_mysql.sql"
     if [ $? -ne 0 ]; then
         echo "Database creation failed. Please check your MySQL server and credentials."
         exit 1
