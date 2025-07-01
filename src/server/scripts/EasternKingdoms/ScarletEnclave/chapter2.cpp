@@ -799,7 +799,7 @@ public:
                         for (uint32 entry : corpseEntries)
                         {
                             // Search up to 60 yards for each type
-                            if (Creature* corpse = me->FindNearestCreature(entry, 60.0f, false))
+                            if (Creature* corpse = me->FindNearestCreature(entry, 60.0f, true))
                             {
                                 float dist = me->GetDistance(corpse);
                                 if (dist < nearestDist)
@@ -980,7 +980,7 @@ public:
                         for (uint32 entry : corpseEntries)
                         {
                             // Search up to 60 yards for each type
-                            if (Creature* corpse = me->FindNearestCreature(entry, 60.0f, false))
+                            if (Creature* corpse = me->FindNearestCreature(entry, 60.0f, true))
                             {
                                 float dist = me->GetDistance(corpse);
                                 if (dist < nearestDist)
