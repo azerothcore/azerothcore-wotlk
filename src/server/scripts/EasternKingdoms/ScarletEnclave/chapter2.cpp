@@ -823,10 +823,10 @@ public:
                         
                         // Pause waypoint movement and move to the corpse
                         me->PauseMovement();
-                        me->GetMotionMaster()->MovePoint(POINT_CORPSE_REACHED,
-                                                         nearestCorpse->GetPositionX(),
-                                                         nearestCorpse->GetPositionY(),
-                                                         nearestCorpse->GetPositionZ());
+                        float x, y, z;
+                        // Keep it at a distance from the corpse
+                        nearestCorpse->GetClosePoint(x, y, z, me->GetObjectSize());
+                        me->GetMotionMaster()->MovePoint(POINT_CORPSE_REACHED, x, y, z);
                         break;
                     }
 
@@ -834,6 +834,7 @@ public:
                     {
                         if (Creature* geist = ObjectAccessor::GetCreature(*me, geistGUID))
                         {
+                            me->SetFacingToObject(geist);
                             DoCast(geist, SPELL_GHOULPLOSION);
                         }
                         break;
@@ -844,6 +845,7 @@ public:
                         if (Creature* corpse = ObjectAccessor::GetCreature(*me, targetCorpseGUID))
                         {
                             // Cast Scarlet Ghoul on the corpse (always a humanoid for necromancer)
+                            me->SetFacingToObject(corpse);
                             DoCast(corpse, SPELL_SCARLET_GHOUL);
                         }
                         break;
@@ -853,7 +855,9 @@ public:
                     {
                         // Resume waypoint movement
                         isOnRitual = false;
-                        
+
+                        targetCorpseGUID.Clear();
+
                         // Resume paused waypoint movement
                         me->ResumeMovement();
                         
@@ -876,6 +880,7 @@ public:
                 Creature* geist = me->FindNearestCreature(NPC_GLUTTONOUS_GEIST, 3.0f, true);
                 if (geist)
                 {
+                    me->SetFacingToObject(geist);
                     geistGUID = geist->GetGUID();
                     // Geist found: schedule Ghoulplosion at +3s, then raising at +6s, then resume at +9s
                     events.ScheduleEvent(EVENT_GHOULPLOSION, 3000);
@@ -885,6 +890,13 @@ public:
                 else
                 {
                     // No Geist: just raise after 3s, resume 3s later
+
+                    Creature* corpse = ObjectAccessor::GetCreature(*me, targetCorpseGUID);
+                    if (corpse)
+                    {
+                        me->SetFacingToObject(corpse);
+                    }
+
                     events.ScheduleEvent(EVENT_RAISE_GHOUL, 3000);
                     events.ScheduleEvent(EVENT_RESUME_WP, 6000);
                 }
@@ -1003,10 +1015,10 @@ public:
                         
                         // Pause waypoint movement and move to the corpse
                         me->PauseMovement();
-                        me->GetMotionMaster()->MovePoint(POINT_CORPSE_REACHED,
-                                                         nearestCorpse->GetPositionX(),
-                                                         nearestCorpse->GetPositionY(),
-                                                         nearestCorpse->GetPositionZ());
+                        float x, y, z;
+                        // Keep it at a distance from the corpse
+                        nearestCorpse->GetClosePoint(x, y, z, me->GetObjectSize());
+                        me->GetMotionMaster()->MovePoint(POINT_CORPSE_REACHED, x, y, z);
                         break;
                     }
 
@@ -1016,6 +1028,7 @@ public:
                         if (Creature* geist = ObjectAccessor::GetCreature(*me, geistGUID))
                         {
                             Talk(SAY_GEIST);
+                            me->SetFacingToObject(geist);
                             DoCast(geist, SPELL_GHOULPLOSION);
                         }
                         break;
@@ -1026,6 +1039,7 @@ public:
                         // Cast the appropriate raise spell on the corpse (griffon or ghoul)
                         if (Creature* corpse = ObjectAccessor::GetCreature(*me, targetCorpseGUID))
                         {
+                            me->SetFacingToObject(corpse);
                             uint32 entry = corpse->GetEntry();
                             if (entry == NPC_DEAD_SCARLET_GRYPHON)
                             {
@@ -1043,6 +1057,8 @@ public:
                     {
                         // Resume waypoint movement
                         isOnRitual = false;
+
+                        targetCorpseGUID.Clear();
                         
                         // Resume paused waypoint movement
                         me->ResumeMovement();
@@ -1063,6 +1079,7 @@ public:
                 Creature* corpse = ObjectAccessor::GetCreature(*me, targetCorpseGUID);
                 if (corpse)
                 {
+                    me->SetFacingToObject(corpse);
                     // Say line depending on corpse type (gryphon or humanoid)
                     if (corpse->GetEntry() == NPC_DEAD_SCARLET_GRYPHON)
                         Talk(SAY_GRYPHON);
@@ -1073,6 +1090,7 @@ public:
                 Creature* geist = me->FindNearestCreature(NPC_GLUTTONOUS_GEIST, 3.0f, true);
                 if (geist)
                 {
+                    me->SetFacingToObject(geist);
                     geistGUID = geist->GetGUID();
                     // Geist present: Ghoulplosion in 3s (with SAY_GEIST), raise in 6s, resume in 9s
                     events.ScheduleEvent(EVENT_GHOULPLOSION, 3000);
