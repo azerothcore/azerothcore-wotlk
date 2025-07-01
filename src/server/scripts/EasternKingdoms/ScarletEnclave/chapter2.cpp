@@ -949,7 +949,6 @@ public:
             targetCorpseGUID.Clear();
             geistGUID.Clear();
             isOnRitual = false;
-            
             // Start waypoint movement using WaypointMovementGenerator
             if (uint32 pathId = me->GetWaypointPath())
             {
@@ -959,7 +958,6 @@ public:
             // Schedule the first ritual after 50-60s
             events.ScheduleEvent(EVENT_START_RITUAL, urand(50000, 60000));
         }
-
         void UpdateAI(uint32 diff) override
         {
             events.Update(diff);
@@ -1006,7 +1004,6 @@ public:
                         isOnRitual = true;
                         targetCorpseGUID = nearestCorpse->GetGUID();
                         geistGUID.Clear();
-                        
                         // Pause waypoint movement and move to the corpse
                         me->PauseMovement();
                         float x, y, z;
@@ -1045,17 +1042,13 @@ public:
                         }
                         break;
                     }
-
                     case EVENT_RESUME_WP:
                     {
                         // Resume waypoint movement
                         isOnRitual = false;
-
                         targetCorpseGUID.Clear();
-                        
                         // Resume paused waypoint movement
                         me->ResumeMovement();
-                        
                         // Schedule next ritual in 50-60s
                         events.ScheduleEvent(EVENT_START_RITUAL, urand(50000, 60000));
                         break;
