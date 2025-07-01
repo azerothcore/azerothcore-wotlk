@@ -267,16 +267,16 @@ UPDATE `creature` SET `position_x` = 2126.696, `position_y` = -6146.5674, `posit
 UPDATE `creature` SET `position_x` = 2116.3901, `position_y` = -6183.808, `position_z` = 13.845215, `orientation` = 1.570796, `MovementType` = 1, `wander_distance` = 10 WHERE (`guid` IN (130331)) AND (`id1` IN (28905));
 
 -- Update Spawn Position, MT and WD for Acherus Necromancers
-UPDATE `creature` SET `position_x` = 2190.7517, `position_y` = -5913.1743, `position_z` = 101.022514, `orientation` = 1.20243, `wander_distance` = 0, `MovementType` = 2 WHERE (`guid` IN (130118)) AND (`id1` IN (28889));
-UPDATE `creature` SET `position_x` = 2299.1343, `position_y` = -5867.592, `position_z` = 100.96091, `orientation` = 0.84453, `wander_distance` = 0, `MovementType` = 2 WHERE (`guid` IN (130119)) AND (`id1` IN (28889));
-UPDATE `creature` SET `position_x` = 2092.2913, `position_y` = -5813.873, `position_z` = 102.13019, `orientation` = 5.17755, `wander_distance` = 0, `MovementType` = 2 WHERE (`guid` IN (130120)) AND (`id1` IN (28889));
+UPDATE `creature` SET `position_x` = 2190.7517, `position_y` = -5913.1743, `position_z` = 101.022514, `orientation` = 1.20243, `wander_distance` = 0, `MovementType` = 0 WHERE (`guid` IN (130118)) AND (`id1` IN (28889));
+UPDATE `creature` SET `position_x` = 2299.1343, `position_y` = -5867.592, `position_z` = 100.96091, `orientation` = 0.84453, `wander_distance` = 0, `MovementType` = 0 WHERE (`guid` IN (130119)) AND (`id1` IN (28889));
+UPDATE `creature` SET `position_x` = 2092.2913, `position_y` = -5813.873, `position_z` = 102.13019, `orientation` = 5.17755, `wander_distance` = 0, `MovementType` = 0 WHERE (`guid` IN (130120)) AND (`id1` IN (28889));
 
 -- Add new Acherus Necromancers
 DELETE FROM `creature` WHERE (`guid` IN (130225, 130226, 130275)) AND (`id1` = 28889);
 INSERT INTO `creature` (`guid`, `id1`, `id2`, `id3`, `map`, `zoneId`, `areaId`, `spawnMask`, `phaseMask`, `equipment_id`, `position_x`, `position_y`, `position_z`, `orientation`, `spawntimesecs`, `wander_distance`, `currentwaypoint`, `curhealth`, `curmana`, `MovementType`, `npcflag`, `unit_flags`, `dynamicflags`, `ScriptName`, `VerifiedBuild`, `CreateObject`, `Comment`) VALUES
-(130225, 28889, 0, 0, 609, 0, 0, 1, 4, 0, 2240.6729, -6085.976, 5.9909015, 5.99090, 360, 0, 0, 8982, 3155, 2, 0, 0, 0, '', 0, 0, NULL),
-(130226, 28889, 0, 0, 609, 0, 0, 1, 4, 0, 2192.4177, -6164.6465, 1.7256374, 1.58369, 360, 0, 0, 8982, 3155, 2, 0, 0, 0, '', 0, 0, NULL),
-(130275, 28889, 0, 0, 609, 0, 0, 1, 4, 0, 2148.8723, -6160.114, 1.278019, 2.03137, 360, 0, 0, 8982, 3155, 2, 0, 0, 0, '', 0, 0, NULL);
+(130225, 28889, 0, 0, 609, 0, 0, 1, 4, 0, 2240.6729, -6085.976, 5.9909015, 5.99090, 360, 0, 0, 8982, 3155, 0, 0, 0, 0, '', 0, 0, NULL),
+(130226, 28889, 0, 0, 609, 0, 0, 1, 4, 0, 2192.4177, -6164.6465, 1.7256374, 1.58369, 360, 0, 0, 8982, 3155, 0, 0, 0, 0, '', 0, 0, NULL),
+(130275, 28889, 0, 0, 609, 0, 0, 1, 4, 0, 2148.8723, -6160.114, 1.278019, 2.03137, 360, 0, 0, 8982, 3155, 0, 0, 0, 0, '', 0, 0, NULL);
 
 -- Add creature addon for Acherus Necromancers
 DELETE FROM `creature_addon` WHERE (`guid` IN (130118, 130119, 130120, 130225, 130226, 130275));
@@ -289,7 +289,7 @@ INSERT INTO `creature_addon` (`guid`, `path_id`, `mount`, `bytes1`, `bytes2`, `e
 (130275, 13027500, 0, 0, 0, 0, 0, '');
 
 -- Update Spawn and MT for Gothik the Harvester
-UPDATE `creature` SET `position_x` = 2221.4436, `position_y` = -5905.7744, `position_z` = 101.2207, `orientation` = 3.2595, `wander_distance` = 0, `MovementType` = 2 WHERE (`guid` IN (130121)) AND (`id1` IN (28890));
+UPDATE `creature` SET `position_x` = 2221.4436, `position_y` = -5905.7744, `position_z` = 101.2207, `orientation` = 3.2595, `wander_distance` = 0, `MovementType` = 0 WHERE (`guid` IN (130121)) AND (`id1` IN (28890));
 
 -- Update Waypoint ID for Gothik the Harvester
 UPDATE `creature_addon` SET `path_id` = 13012100 WHERE (`guid` IN (130121));
