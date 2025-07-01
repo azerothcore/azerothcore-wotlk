@@ -371,12 +371,3 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 -- Link creature entries to the implemented C++ scripts
 UPDATE `creature_template` SET `ScriptName` = 'npc_acherus_necromancer' WHERE `entry` = 28889;
 UPDATE `creature_template` SET `ScriptName` = 'npc_gothik_the_harvester' WHERE `entry` = 28890;
-
--- Creature texts for Gothik the Harvester (entry 28890)
--- SAY_GRYPHON (index 0): "You will fly again, beast..."
--- SAY_GHOUL   (index 1): "Surprise, surprise! Another ghoul!"
--- SAY_GEIST   (index 2): "Is Gothik the Harvester going to have to choke a geist?"
-INSERT INTO `creature_text` (`Entry`, `GroupID`, `ID`, `Text`, `Type`, `Language`, `Probability`, `Emote`, `Duration`, `Sound`, `Comment`) VALUES
-(28890, 0, 0, 'You will fly again, beast...', 12, 0, 100, 0, 0, 0, 'Gothik - raising Scourge Gryphon'),
-(28890, 1, 0, 'Surprise, surprise! Another ghoul!', 12, 0, 100, 0, 0, 0, 'Gothik - raising Scarlet Ghoul'),
-(28890, 2, 0, 'Is Gothik the Harvester going to have to choke a geist?', 12, 0, 100, 0, 0, 0, 'Gothik - before killing Geist');
