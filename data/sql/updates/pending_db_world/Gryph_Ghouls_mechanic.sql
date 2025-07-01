@@ -374,5 +374,5 @@ UPDATE `creature_template` SET `ScriptName` = 'npc_gothik_the_harvester' WHERE `
 
 -- Fixes missing condition for Scarlet Ghoul
 DELETE FROM `conditions` WHERE (`SourceTypeOrReferenceId` = 13 AND `SourceGroup` = 1 AND `SourceEntry` = 52683 AND `SourceId` = 0 AND `ConditionTypeOrReference` = 31 AND `ConditionTarget` = 0 AND `ConditionValue1` = 3 AND `ConditionValue2` = 28895 AND `ConditionValue3` = 0);
-INSERT INTO `conditions` (`SourceTypeOrReferenceId`,`SourceGroup`,`SourceEntry`,`SourceId`,`ElseGroup`,`ConditionTypeOrReference`,`ConditionTarget`,`ConditionValue1`,`ConditionValue2`,`ConditionValue3`,`NegativeCondition`,`ErrorType`,`ErrorTextId`,`ScriptName`,`Comment`)
-	VALUES (13,1,52683,0,5,31,0,3,28895,0,0,0,0,'','Scarlet Ghoul only targets Scarlet Medic')
+INSERT INTO `conditions` (`SourceTypeOrReferenceId`,`SourceGroup`,`SourceEntry`,`SourceId`,`ElseGroup`,`ConditionTypeOrReference`,`ConditionTarget`,`ConditionValue1`,`ConditionValue2`,`ConditionValue3`,`NegativeCondition`,`ErrorType`,`ErrorTextId`,`ScriptName`,`Comment`) VALUES 
+(13,1,52683,0,5,31,0,3,28895,0,0,0,0,'','Scarlet Ghoul only targets Scarlet Medic');
