@@ -817,7 +817,6 @@ public:
                         isOnRitual = true;
                         targetCorpseGUID = nearestCorpse->GetGUID();
                         geistGUID.Clear();
-                        
                         // Pause waypoint movement and move to the corpse
                         me->PauseMovement();
                         float x, y, z;
@@ -857,7 +856,6 @@ public:
 
                         // Resume paused waypoint movement
                         me->ResumeMovement();
-                        
                         // Schedule next ritual in 20-30s
                         events.ScheduleEvent(EVENT_START_RITUAL, urand(20000, 30000));
                         break;
@@ -1004,7 +1002,6 @@ public:
                             events.ScheduleEvent(EVENT_START_RITUAL, urand(5000, 10000));
                             break;
                         }
-                        
                         // Start ritual
                         isOnRitual = true;
                         targetCorpseGUID = nearestCorpse->GetGUID();
@@ -1018,7 +1015,6 @@ public:
                         me->GetMotionMaster()->MovePoint(POINT_CORPSE_REACHED, x, y, z);
                         break;
                     }
-
                     case EVENT_GHOULPLOSION:
                     {
                         // Cast Ghoulplosion on the Geist and say the Geist line
