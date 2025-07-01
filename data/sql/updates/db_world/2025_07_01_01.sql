@@ -1,3 +1,4 @@
+-- DB update 2025_07_01_00 -> 2025_07_01_01
 -- Death Knight Initiates (Remove Wrong Guids)
 DELETE FROM `creature` WHERE (`id1` = 28406) AND (`guid` IN (129516, 129517, 129518, 129544, 129545, 129555));
 DELETE FROM `creature_addon` WHERE (`guid` IN (129516, 129517, 129518, 129544, 129545, 129555));
