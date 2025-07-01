@@ -954,7 +954,6 @@ public:
             {
                 me->GetMotionMaster()->MovePath(pathId, true); // true = repeatable
             }
-            
             // Schedule the first ritual after 50-60s
             events.ScheduleEvent(EVENT_START_RITUAL, urand(50000, 60000));
         }
