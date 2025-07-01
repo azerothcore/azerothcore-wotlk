@@ -1,3 +1,4 @@
+-- DB update 2025_07_01_01 -> 2025_07_01_02
 
 -- Korfax, Champion of the Light
 DELETE FROM `creature_text` WHERE (`CreatureID` = 29176) AND (`GroupID` = 0);
