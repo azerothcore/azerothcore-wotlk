@@ -739,6 +739,7 @@ public:
         EventMap events;
         ObjectGuid targetCorpseGUID;
         ObjectGuid geistGUID;
+        bool isOnRitual;
 
         // Event timers (IDs)
         enum Events
@@ -760,22 +761,16 @@ public:
             events.Reset();
             targetCorpseGUID.Clear();
             geistGUID.Clear();
+            isOnRitual = false;
             
-            // Start waypoint movement using path from creature_addon
-            StartWaypointMovement();
+            // Start waypoint movement using WaypointMovementGenerator
+            if (uint32 pathId = me->GetWaypointPath())
+            {
+                me->GetMotionMaster()->MovePath(pathId, true); // true = repeatable
+            }
             
             // Schedule the first ritual after 20-30s
             events.ScheduleEvent(EVENT_START_RITUAL, urand(20000, 30000));
-        }
-
-        void StartWaypointMovement()
-        {
-            // Get the path_id from creature_addon table
-            uint32 pathId = me->GetWaypointPath();
-            if (pathId > 0)
-            {
-                me->GetMotionMaster()->MovePath(pathId, true); // true = repeat path
-            }
         }
 
         void UpdateAI(uint32 diff) override
@@ -788,6 +783,12 @@ public:
                 {
                     case EVENT_START_RITUAL:
                     {
+                        if (isOnRitual) // Already performing ritual
+                        {
+                            events.ScheduleEvent(EVENT_START_RITUAL, urand(5000, 10000));
+                            break;
+                        }
+
                         // Find nearest dead Scarlet humanoid (exclude gryphon)
                         Creature* nearestCorpse = nullptr;
                         float nearestDist = std::numeric_limits<float>::max();
@@ -814,12 +815,14 @@ public:
                             events.ScheduleEvent(EVENT_START_RITUAL, urand(5000, 10000));
                             break;
                         }
-                        // Store target corpse and prepare to move
+                        
+                        // Start ritual
+                        isOnRitual = true;
                         targetCorpseGUID = nearestCorpse->GetGUID();
                         geistGUID.Clear();
-                        // Pause current movement and move to the corpse
-                        me->StopMoving();
-                        me->GetMotionMaster()->Clear();
+                        
+                        // Pause waypoint movement and move to the corpse
+                        me->PauseMovement();
                         me->GetMotionMaster()->MovePoint(POINT_CORPSE_REACHED,
                                                          nearestCorpse->GetPositionX(),
                                                          nearestCorpse->GetPositionY(),
@@ -848,18 +851,12 @@ public:
 
                     case EVENT_RESUME_WP:
                     {
-                        // Resume waypoint movement using the original path from database
-                        uint32 pathId = me->GetWaypointPath();
-                        me->GetMotionMaster()->Clear();
-                        if (pathId > 0)
-                        {
-                            me->GetMotionMaster()->MovePath(pathId, true); // true = repeat path
-                        }
-                        else
-                        {
-                            // Fallback: return to spawn position
-                            me->GetMotionMaster()->MoveTargetedHome();
-                        }
+                        // Resume waypoint movement
+                        isOnRitual = false;
+                        
+                        // Resume paused waypoint movement
+                        me->ResumeMovement();
+                        
                         // Schedule next ritual in 20-30s
                         events.ScheduleEvent(EVENT_START_RITUAL, urand(20000, 30000));
                         break;
@@ -916,6 +913,7 @@ public:
         EventMap events;
         ObjectGuid targetCorpseGUID;
         ObjectGuid geistGUID;
+        bool isOnRitual;
 
         enum Events
         {
@@ -943,22 +941,16 @@ public:
             events.Reset();
             targetCorpseGUID.Clear();
             geistGUID.Clear();
+            isOnRitual = false;
             
-            // Start waypoint movement using path from creature_addon
-            StartWaypointMovement();
+            // Start waypoint movement using WaypointMovementGenerator
+            if (uint32 pathId = me->GetWaypointPath())
+            {
+                me->GetMotionMaster()->MovePath(pathId, true); // true = repeatable
+            }
             
             // Schedule the first ritual after 50-60s
             events.ScheduleEvent(EVENT_START_RITUAL, urand(50000, 60000));
-        }
-
-        void StartWaypointMovement()
-        {
-            // Get the path_id from creature_addon table
-            uint32 pathId = me->GetWaypointPath();
-            if (pathId > 0)
-            {
-                me->GetMotionMaster()->MovePath(pathId, true); // true = repeat path
-            }
         }
 
         void UpdateAI(uint32 diff) override
@@ -971,6 +963,12 @@ public:
                 {
                     case EVENT_START_RITUAL:
                     {
+                        if (isOnRitual) // Already performing ritual
+                        {
+                            events.ScheduleEvent(EVENT_START_RITUAL, urand(5000, 10000));
+                            break;
+                        }
+
                         // Find nearest dead Scarlet NPC (including gryphon)
                         Creature* nearestCorpse = nullptr;
                         float nearestDist = std::numeric_limits<float>::max();
@@ -997,10 +995,14 @@ public:
                             events.ScheduleEvent(EVENT_START_RITUAL, urand(5000, 10000));
                             break;
                         }
+                        
+                        // Start ritual
+                        isOnRitual = true;
                         targetCorpseGUID = nearestCorpse->GetGUID();
                         geistGUID.Clear();
-                        me->StopMoving();
-                        me->GetMotionMaster()->Clear();
+                        
+                        // Pause waypoint movement and move to the corpse
+                        me->PauseMovement();
                         me->GetMotionMaster()->MovePoint(POINT_CORPSE_REACHED,
                                                          nearestCorpse->GetPositionX(),
                                                          nearestCorpse->GetPositionY(),
@@ -1039,17 +1041,12 @@ public:
 
                     case EVENT_RESUME_WP:
                     {
-                        // Resume waypoint movement using the original path from database
-                        uint32 pathId = me->GetWaypointPath();
-                        me->GetMotionMaster()->Clear();
-                        if (pathId > 0)
-                        {
-                            me->GetMotionMaster()->MovePath(pathId, true); // true = repeat path
-                        }
-                        else
-                        {
-                            me->GetMotionMaster()->MoveTargetedHome();
-                        }
+                        // Resume waypoint movement
+                        isOnRitual = false;
+                        
+                        // Resume paused waypoint movement
+                        me->ResumeMovement();
+                        
                         // Schedule next ritual in 50-60s
                         events.ScheduleEvent(EVENT_START_RITUAL, urand(50000, 60000));
                         break;
