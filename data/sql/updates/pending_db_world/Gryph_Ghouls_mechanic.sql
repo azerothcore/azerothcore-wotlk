@@ -1,4 +1,3 @@
-
 -- Death Knight Initiates (Remove Wrong Guids)
 DELETE FROM `creature` WHERE (`id1` = 28406) AND (`guid` IN (129516, 129517, 129518, 129544, 129545, 129555));
 DELETE FROM `creature_addon` WHERE (`guid` IN (129516, 129517, 129518, 129544, 129545, 129555));
@@ -368,3 +367,16 @@ UPDATE `creature_template` SET `AIName` = 'SmartAI' WHERE `entry` = 28935;
 DELETE FROM `smart_scripts` WHERE (`source_type` = 0 AND `entryorguid` = 28935);
 INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `event_param6`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
 (28935, 0, 0, 0, 25, 0, 100, 0, 0, 0, 0, 0, 0, 0, 48, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Acherus Dummy - On Reset - Set Active On');
+
+-- Link creature entries to the implemented C++ scripts
+UPDATE `creature_template` SET `ScriptName` = 'npc_acherus_necromancer' WHERE `entry` = 28889;
+UPDATE `creature_template` SET `ScriptName` = 'npc_gothik_the_harvester' WHERE `entry` = 28890;
+
+-- Creature texts for Gothik the Harvester (entry 28890)
+-- SAY_GRYPHON (index 0): "You will fly again, beast..."
+-- SAY_GHOUL   (index 1): "Surprise, surprise! Another ghoul!"
+-- SAY_GEIST   (index 2): "Is Gothik the Harvester going to have to choke a geist?"
+INSERT INTO `creature_text` (`Entry`, `GroupID`, `ID`, `Text`, `Type`, `Language`, `Probability`, `Emote`, `Duration`, `Sound`, `Comment`) VALUES
+(28890, 0, 0, 'You will fly again, beast...', 12, 0, 100, 0, 0, 0, 'Gothik - raising Scourge Gryphon'),
+(28890, 1, 0, 'Surprise, surprise! Another ghoul!', 12, 0, 100, 0, 0, 0, 'Gothik - raising Scarlet Ghoul'),
+(28890, 2, 0, 'Is Gothik the Harvester going to have to choke a geist?', 12, 0, 100, 0, 0, 0, 'Gothik - before killing Geist');
