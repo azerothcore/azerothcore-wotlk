@@ -762,13 +762,11 @@ public:
             targetCorpseGUID.Clear();
             geistGUID.Clear();
             isOnRitual = false;
-            
             // Start waypoint movement using WaypointMovementGenerator
             if (uint32 pathId = me->GetWaypointPath())
             {
                 me->GetMotionMaster()->MovePath(pathId, true); // true = repeatable
             }
-            
             // Schedule the first ritual after 20-30s
             events.ScheduleEvent(EVENT_START_RITUAL, urand(20000, 30000));
         }
@@ -815,7 +813,6 @@ public:
                             events.ScheduleEvent(EVENT_START_RITUAL, urand(5000, 10000));
                             break;
                         }
-                        
                         // Start ritual
                         isOnRitual = true;
                         targetCorpseGUID = nearestCorpse->GetGUID();
