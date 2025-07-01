@@ -760,8 +760,22 @@ public:
             events.Reset();
             targetCorpseGUID.Clear();
             geistGUID.Clear();
+            
+            // Start waypoint movement using path from creature_addon
+            StartWaypointMovement();
+            
             // Schedule the first ritual after 20-30s
             events.ScheduleEvent(EVENT_START_RITUAL, urand(20000, 30000));
+        }
+
+        void StartWaypointMovement()
+        {
+            // Get the path_id from creature_addon table
+            uint32 pathId = me->GetWaypointPath();
+            if (pathId > 0)
+            {
+                me->GetMotionMaster()->MovePath(pathId, true); // true = repeat path
+            }
         }
 
         void UpdateAI(uint32 diff) override
@@ -834,16 +848,16 @@ public:
 
                     case EVENT_RESUME_WP:
                     {
-                        // Resume the waypoint path movement
+                        // Resume waypoint movement using the original path from database
                         uint32 pathId = me->GetWaypointPath();
                         me->GetMotionMaster()->Clear();
-                        if (pathId)
+                        if (pathId > 0)
                         {
-                            me->GetMotionMaster()->MovePath(pathId, true);
+                            me->GetMotionMaster()->MovePath(pathId, true); // true = repeat path
                         }
                         else
                         {
-                            // Fallback: return to spawn/home position if no path
+                            // Fallback: return to spawn position
                             me->GetMotionMaster()->MoveTargetedHome();
                         }
                         // Schedule next ritual in 20-30s
@@ -929,8 +943,22 @@ public:
             events.Reset();
             targetCorpseGUID.Clear();
             geistGUID.Clear();
+            
+            // Start waypoint movement using path from creature_addon
+            StartWaypointMovement();
+            
             // Schedule the first ritual after 50-60s
             events.ScheduleEvent(EVENT_START_RITUAL, urand(50000, 60000));
+        }
+
+        void StartWaypointMovement()
+        {
+            // Get the path_id from creature_addon table
+            uint32 pathId = me->GetWaypointPath();
+            if (pathId > 0)
+            {
+                me->GetMotionMaster()->MovePath(pathId, true); // true = repeat path
+            }
         }
 
         void UpdateAI(uint32 diff) override
@@ -1011,12 +1039,12 @@ public:
 
                     case EVENT_RESUME_WP:
                     {
-                        // Resume waypoint movement
+                        // Resume waypoint movement using the original path from database
                         uint32 pathId = me->GetWaypointPath();
                         me->GetMotionMaster()->Clear();
-                        if (pathId)
+                        if (pathId > 0)
                         {
-                            me->GetMotionMaster()->MovePath(pathId, true);
+                            me->GetMotionMaster()->MovePath(pathId, true); // true = repeat path
                         }
                         else
                         {
