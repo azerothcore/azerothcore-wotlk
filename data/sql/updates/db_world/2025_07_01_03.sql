@@ -1,3 +1,4 @@
+-- DB update 2025_07_01_02 -> 2025_07_01_03
 
 -- Scourge Gryphons
 UPDATE `creature_template` SET `AIName` = 'SmartAI' WHERE `entry` = 28906;
