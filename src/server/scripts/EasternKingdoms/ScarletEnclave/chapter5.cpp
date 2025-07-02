@@ -280,14 +280,14 @@ const Position LightOfDawnPos[] =
     {2289.259f, -5280.355f, 86.112f, 4.41f},    // 3  Koltira Loc1
     {2273.289f, -5273.675f, 86.701f, 5.01f},    // 4  Thassarian Loc1
     {2280.81f, -5284.09f, 86.608f, 4.76f},      // 5  Morgraine Loc1
-    {2281.335f, -5300.409f, 85.170f, 1.528f},   // 6  Tirion Summon loc
+    {2165.711f, -5266.1235f, 95.5025f, 0.13962634f },   // 6  Tirion Summon loc
     {2281.198f, -5257.397f, 80.224f, 4.66f},    // 7  Alexandros loc1
     {2281.156f, -5259.934f, 80.647f, 0},        // 8  Alexandros loc2
     {2281.294f, -5281.895f, 82.445f, 1.35f},    // 9  Darion loc1
     {2281.093f, -5263.013f, 81.125f, 0},        // 10 Darion loc2
     {2283.896f, -5287.914f, 83.066f, 1.55f},    // 11 Tirion Fordring loc2
-    {2281.313f, -5250.282f, 79.322f, 4.69f},    // 12 Lich King spawns
-    {2281.523f, -5261.058f, 80.877f, 0},        // 13 Lich king moves forward
+    {2280.304f, -5257.205f, 80.09781f, 4.6251f },// 12 Lich King spawns
+    {2280.687f, -5262.276f, 81.082634f, 0.0f   },// 13 Lich king moves forward
     {2264.27f, -5267.29f, 80.16f, 0},           // 14 Tirion Fordring loc3
     {2270.99f, -5278.00f, 81.89f, 0}            // 15 Tirion Fordring loc4
 };
@@ -501,7 +501,12 @@ public:
             if (Creature* tirion = me->SummonCreature(NPC_HIGHLORD_TIRION_FORDRING, LightOfDawnPos[6], TEMPSUMMON_TIMED_OR_CORPSE_DESPAWN, 600000))
             {
                 tirion->LoadEquipment(0, true);
-                tirion->AI()->Talk(SAY_LIGHT_OF_DAWN25);
+                tirion->AI()->Talk(SAY_LIGHT_OF_DAWN25, 4s);
+
+                tirion->m_Events.AddEventAtOffset([&, tirion] {
+                    tirion->GetMotionMaster()->MovePath(NPC_HIGHLORD_TIRION_FORDRING * 10, false);
+                }, 14s);
+
                 events.Reset();
                 events.ScheduleEvent(EVENT_FINISH_FIGHT_1, 10s);
                 events.ScheduleEvent(EVENT_FINISH_FIGHT_2, 20s);
@@ -898,7 +903,12 @@ public:
                     if (Creature* lk = GetEntryFromSummons(NPC_THE_LICH_KING))
                     {
                         lk->AI()->Talk(SAY_LIGHT_OF_DAWN46);
-                        lk->CastSpell(me, SPELL_REBUKE, false);
+                        // Mograine's charge puts him inside the Lich King's collision, so we need to teleport him out
+                        // Otherwise, Rebuke will kick him the wrong direction
+                        me->NearTeleportTo(2279.7493f, -5258.1f, 80.065f, 4.3419204f);
+                        lk->m_Events.AddEventAtOffset([&, lk] {
+                            lk->CastSpell(me, SPELL_REBUKE, false);
+                        }, 1s);
                     }
                     break;
                 case EVENT_OUTRO_SCENE_28:
@@ -1200,23 +1210,6 @@ class spell_chapter5_light_of_dawn_aura : public AuraScript
     }
 };
 
-class spell_chapter5_rebuke : public SpellScript
-{
-    PrepareSpellScript(spell_chapter5_rebuke);
-
-    void HandleLeapBack(SpellEffIndex effIndex)
-    {
-        PreventHitEffect(effIndex);
-        if (Unit* unitTarget = GetHitUnit())
-            unitTarget->KnockbackFrom(2282.86f, -5263.45f, 40.0f, 8.0f);
-    }
-
-    void Register() override
-    {
-        OnEffectLaunchTarget += SpellEffectFn(spell_chapter5_rebuke::HandleLeapBack, EFFECT_0, SPELL_EFFECT_LEAP_BACK);
-    }
-};
-
 // 58552 - Return to Orgrimmar
 // 58533 - Return to Stormwind
 enum ReturnToCapital
@@ -1317,6 +1310,5 @@ void AddSC_the_scarlet_enclave_c5()
 {
     new npc_highlord_darion_mograine();
     RegisterSpellScript(spell_chapter5_light_of_dawn_aura);
-    RegisterSpellScript(spell_chapter5_rebuke);
     RegisterSpellScript(spell_chapter5_return_to_capital);
 }
