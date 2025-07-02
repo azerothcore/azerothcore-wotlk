@@ -1,3 +1,4 @@
+-- DB update 2025_07_01_03 -> 2025_07_02_00
 
 -- Remove Mount from creature_template_addon
 UPDATE `creature_template_addon` SET `mount` = 0 WHERE (`entry` = 29175);
