@@ -392,107 +392,63 @@ enum torchToss
 
     SPELL_TARGET_INDICATOR_RANK_1   = 43313,
     SPELL_TORCH_TOSS_LAND           = 46054,
-    SPELL_BRAZIERS_HIT_VISUAL       = 45724,
+
+    // visual hit animation
+    // hit counter on player
+    SPELL_BRAZIERS_HIT              = 45724,
     SPELL_TORCH_TOSS_SUCCESS_A      = 45719,
     SPELL_TORCH_TOSS_SUCCESS_H      = 46651,
+    // requires 8 hits
     SPELL_TORCH_TOSS_TRAINING       = 45716,
+
+    // requires 20 hits
+    SPELL_TORCH_TOSSING_PRACTICE    = 46630,
+
+    // cleanup / remove all torch toss quest auras
+    SPELL_REMOVE_TORCHES            = 46074,
+
+    // marks a valid target for torch toss (no visual)
+    SPELL_TARGET_INDICATOR          = 45723,
+
+    // visual target indicator
+    SPELL_TARGET_INDICATOR_COSMETIC = 46901,
+
+    // selects the next valid target
+    SPELL_TORCH_TARGET_PICKER       = 45907,
+
+    // what is the purpose of this (?)
+    // the master flame eater also casted this onto one player
+    // 47143 (Handle: Not on Quest but has Torch Tossing Aura)
 };
 
 struct npc_midsummer_torch_target : public ScriptedAI
 {
     npc_midsummer_torch_target(Creature* creature) : ScriptedAI(creature)
     {
-        _posVec.clear();
-        _playerGUID.Clear();
-        me->CastSpell(me, SPELL_TARGET_INDICATOR_RANK_1, true);
-        _counter = 0;
-        _maxCount = 0;
-
-        scheduler.Schedule(200ms, [this](TaskContext /*context*/)
-            {
-                Start();
-            });
     }
 
-    ObjectGuid _playerGUID;
-    std::vector<Position> _posVec;
-    uint8 _counter;
-    uint8 _maxCount;
-
-    void SetPlayerGUID(ObjectGuid guid, uint8 cnt)
-    {
-        _playerGUID = guid;
-        _maxCount = cnt;
-    }
-
-    bool CanBeSeen(Player const* seer) override
-    {
-        return seer->GetGUID() == _playerGUID;
-    }
+    //bool CanBeSeen(Player const* seer) override
+    //{
+    //    return true;
+    //}
 
     void SpellHit(Unit* caster, SpellInfo const* spellInfo) override
     {
-        if (_posVec.empty())
-            return;
-
         // Triggered spell from torch
-        if (spellInfo->Id == SPELL_TORCH_TOSS_LAND && caster->IsPlayer())
+        if (spellInfo->Id == SPELL_TORCH_TARGET_PICKER)
         {
-            me->CastSpell(me, SPELL_BRAZIERS_HIT_VISUAL, true); // hit visual anim
-            if (++_counter >= _maxCount)
-            {
-                caster->CastSpell(caster, (caster->ToPlayer()->GetTeamId() ? SPELL_TORCH_TOSS_SUCCESS_H : SPELL_TORCH_TOSS_SUCCESS_A), true); // quest complete spell
-                me->DespawnOrUnsummon(1);
-                return;
-            }
+            LOG_ERROR("scripts.midsummer", "SpellHit");
 
-            scheduler.Schedule(750ms, [this](TaskContext /*context*/)
-                {
-                    SelectPosition();
-                })
-                .Schedule(1250ms, [this](TaskContext /*context*/)
-                {
-                    if (Player* plr = ObjectAccessor::GetPlayer(*me, _playerGUID))
-                        plr->UpdateTriggerVisibility();
-                });
+            DoCastSelf(SPELL_TARGET_INDICATOR, true);
+
+            // sniffed spell not working properly and showing no animation
+            DoCastSelf(SPELL_TARGET_INDICATOR_COSMETIC, true);
         }
-    }
-
-    void Start()
-    {
-        FillPositions();
-        SelectPosition();
     }
 
     void UpdateAI(uint32 diff) override
     {
         scheduler.Update(diff);
-    }
-
-    void FillPositions()
-    {
-        std::list<GameObject*> gobjList;
-        me->GetGameObjectListWithEntryInGrid(gobjList, GO_TORCH_TARGET_BRAZIER, 30.0f);
-        for (std::list<GameObject*>::const_iterator itr = gobjList.begin(); itr != gobjList.end(); ++itr)
-        {
-            Position pos;
-            pos.Relocate(*itr);
-            _posVec.push_back(pos);
-        }
-    }
-
-    void SelectPosition()
-    {
-        if (_posVec.empty())
-            return;
-
-        int8 num = urand(0, _posVec.size() - 1);
-        Position pos;
-        pos.Relocate(_posVec.at(num));
-        me->m_last_notify_position.Relocate(0.0f, 0.0f, 0.0f);
-        me->m_last_notify_mstime = GameTime::GetGameTimeMS().count() + 10000;
-
-        me->NearTeleportTo(pos.GetPositionX(), pos.GetPositionY(), pos.GetPositionZ(), pos.GetOrientation());
     }
 };
 
@@ -969,7 +925,7 @@ class spell_midsummer_torch_quest : public AuraScript
 
     bool Load() override
     {
-        torchGUID.Clear();
+        //torchGUID.Clear();
         return true;
     }
 
@@ -977,24 +933,54 @@ class spell_midsummer_torch_quest : public AuraScript
 
     void HandleEffectApply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
     {
-        Unit* ar = GetTarget();
-        if (Creature* cr = ar->SummonCreature(NPC_TORCH_TOSS_TARGET_BUNNY, ar->GetPositionX(), ar->GetPositionY(), ar->GetPositionZ(), 0.0f, TEMPSUMMON_TIMED_DESPAWN, 90000))
-        {
-            torchGUID = cr->GetGUID();
-            CAST_AI(npc_midsummer_torch_target, cr->AI())->SetPlayerGUID(ar->GetGUID(), (GetId() == SPELL_TORCH_TOSS_TRAINING ? 8 : 20));
-        }
+        //Unit* ar = GetTarget();
+        //if (Creature* cr = ar->SummonCreature(NPC_TORCH_TOSS_TARGET_BUNNY, ar->GetPositionX(), ar->GetPositionY(), ar->GetPositionZ(), 0.0f, TEMPSUMMON_TIMED_DESPAWN, 90000))
+        //{
+        //    torchGUID = cr->GetGUID();
+        //    //CAST_AI(npc_midsummer_torch_target, cr->AI())->SetPlayerGUID(ar->GetGUID(), (GetId() == SPELL_TORCH_TOSS_TRAINING ? 8 : 20));
+        //}
     }
 
     void HandleEffectRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
     {
-        if (Creature* cr = ObjectAccessor::GetCreature(*GetTarget(), torchGUID))
-            cr->DespawnOrUnsummon(1);
+        //if (Creature* cr = ObjectAccessor::GetCreature(*GetTarget(), torchGUID))
+        //    cr->DespawnOrUnsummon(1);
     }
 
     void Register() override
     {
         OnEffectApply += AuraEffectApplyFn(spell_midsummer_torch_quest::HandleEffectApply, EFFECT_0, SPELL_AURA_DETECT_AMORE, AURA_EFFECT_HANDLE_REAL);
         OnEffectRemove += AuraEffectRemoveFn(spell_midsummer_torch_quest::HandleEffectRemove, EFFECT_0, SPELL_AURA_DETECT_AMORE, AURA_EFFECT_HANDLE_REAL);
+    }
+};
+
+// 45907 Torch Target Picker
+class spell_torch_target_picker : public SpellScript
+{
+    PrepareSpellScript(spell_torch_target_picker)
+
+    // TODO: condition for implicit target of TARGET_UNIT_SRC_AREA_ENTRY)
+    // then filter targets, select 1 randomly
+
+    void SelectTargets(std::list<WorldObject*>& targets)
+    {
+        if (targets.empty())
+            return;
+
+        LOG_ERROR("scripts.midsummer", "SelectTargets 1 - {}", targets.size());
+
+        // keep single random element only
+        WorldObject* const bunny = Acore::Containers::SelectRandomContainerElement(targets);
+        targets.clear();
+        targets.push_back(bunny);
+
+        LOG_ERROR("scripts.midsummer", "SelectTargets 2 - {}", targets.size());
+    }
+
+    void Register() override
+    {
+        OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_torch_target_picker::SelectTargets, EFFECT_0, TARGET_UNIT_SRC_AREA_ENTRY);
+        //OnDestinationTargetSelect += SpellDestinationTargetSelectFn(spell_midsummer_ribbon_pole_firework::ModDestHeight, EFFECT_0, TARGET_DEST_CASTER_RANDOM);
     }
 };
 
@@ -1296,4 +1282,5 @@ void AddSC_event_midsummer_scripts()
     RegisterSpellScript(spell_midsummer_juggling_torch);
     RegisterSpellScript(spell_midsummer_torch_catch);
     RegisterSpellScript(spell_midsummer_summon_ahune_lieutenant);
+    RegisterSpellScript(spell_torch_target_picker);
 }
