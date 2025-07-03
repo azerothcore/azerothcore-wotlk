@@ -1,3 +1,4 @@
+-- DB update 2025_07_03_01 -> 2025_07_03_02
 -- The Aldor
 -- Venom Sac: From Hatred to Neutral
 UPDATE `quest_template_addon` SET  `RequiredMinRepValue` = 0, `RequiredMaxRepValue` = 0, `RequiredMinRepFaction` = 0, `RequiredMaxRepFaction` = 932 WHERE `id` IN (10017, 10019);
