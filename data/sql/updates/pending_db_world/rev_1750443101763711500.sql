@@ -26,19 +26,13 @@ INSERT INTO `gossip_menu_option` (`MenuID`, `OptionID`, `OptionIcon`, `OptionTex
 (9832, 12, 0, 'I\'ve lost my Battle Tabard of the Defilers.', 30355, 1, 1, 0, 0, 0, 0, '', 0, 0);
 
 -- Alliance check for Tabard Arathor Battle Tabard and quest Control Five Bases
-DELETE FROM `conditions` WHERE (`SourceTypeOrReferenceId` = 15) AND (`SourceGroup` = 9832) AND (`SourceEntry` = 11) AND (`SourceId` = 0) AND (`ElseGroup` = 0) AND (`ConditionTypeOrReference` = 2) AND (`ConditionTarget` = 0) AND (`ConditionValue1` = 20132) AND (`ConditionValue2` = 1) AND (`ConditionValue3` = 1);
+DELETE FROM `conditions` WHERE `SourceTypeOrReferenceId` = 15 AND `SourceGroup` = 9832 AND `SourceEntry` IN (11, 12) AND `ConditionTypeOrReference` IN (2, 8);
 INSERT INTO `conditions` (`SourceTypeOrReferenceId`, `SourceGroup`, `SourceEntry`, `SourceId`, `ElseGroup`, `ConditionTypeOrReference`, `ConditionTarget`, `ConditionValue1`, `ConditionValue2`, `ConditionValue3`, `NegativeCondition`, `ErrorType`, `ErrorTextId`, `ScriptName`, `Comment`) VALUES
-(15, 9832, 11, 0, 0, 2, 0, 20132, 1, 1, 1, 0, 0, '', 'Only show gossip if player doesn\'t have Arathor Battle Tabard');
-DELETE FROM `conditions` WHERE (`SourceTypeOrReferenceId` = 15) AND (`SourceGroup` = 9832) AND (`SourceEntry` = 11) AND (`SourceId` = 0) AND (`ElseGroup` = 0) AND (`ConditionTypeOrReference` = 8) AND (`ConditionTarget` = 0) AND (`ConditionValue1` = 8115) AND (`ConditionValue2` = 0) AND (`ConditionValue3` = 0);
-INSERT INTO `conditions` (`SourceTypeOrReferenceId`, `SourceGroup`, `SourceEntry`, `SourceId`, `ElseGroup`, `ConditionTypeOrReference`, `ConditionTarget`, `ConditionValue1`, `ConditionValue2`, `ConditionValue3`, `NegativeCondition`, `ErrorType`, `ErrorTextId`, `ScriptName`, `Comment`) VALUES
-(15, 9832, 11, 0, 0, 8, 0, 8115, 0, 0, 0, 0, 0, '', 'Only show gossip if player already finished quest Control Five Bases');
-
+-- Alliance check for Tabard Arathor Battle Tabard and quest Control Five Bases
+(15, 9832, 11, 0, 0, 2, 0, 20132, 1, 1, 1, 0, 0, '', 'Only show gossip if player doesn\'t have Arathor Battle Tabard'),
+(15, 9832, 11, 0, 0, 8, 0, 8115, 0, 0, 0, 0, 0, '', 'Only show gossip if player already finished quest Control Five Bases'),
 -- Horde check for Tabard Battle Tabard of the Defilers and quest Take Five Bases
-DELETE FROM `conditions` WHERE (`SourceTypeOrReferenceId` = 15) AND (`SourceGroup` = 9832) AND (`SourceEntry` = 12) AND (`SourceId` = 0) AND (`ElseGroup` = 0) AND (`ConditionTypeOrReference` = 2) AND (`ConditionTarget` = 0) AND (`ConditionValue1` = 20131) AND (`ConditionValue2` = 1) AND (`ConditionValue3` = 1);
-INSERT INTO `conditions` (`SourceTypeOrReferenceId`, `SourceGroup`, `SourceEntry`, `SourceId`, `ElseGroup`, `ConditionTypeOrReference`, `ConditionTarget`, `ConditionValue1`, `ConditionValue2`, `ConditionValue3`, `NegativeCondition`, `ErrorType`, `ErrorTextId`, `ScriptName`, `Comment`) VALUES
-(15, 9832, 12, 0, 0, 2, 0, 20131, 1, 1, 1, 0, 0, '', 'Only show gossip if player doesn\'t have Battle Tabard of the Defilers');
-DELETE FROM `conditions` WHERE (`SourceTypeOrReferenceId` = 15) AND (`SourceGroup` = 9832) AND (`SourceEntry` = 12) AND (`SourceId` = 0) AND (`ElseGroup` = 0) AND (`ConditionTypeOrReference` = 8) AND (`ConditionTarget` = 0) AND (`ConditionValue1` = 8122) AND (`ConditionValue2` = 0) AND (`ConditionValue3` = 0);
-INSERT INTO `conditions` (`SourceTypeOrReferenceId`, `SourceGroup`, `SourceEntry`, `SourceId`, `ElseGroup`, `ConditionTypeOrReference`, `ConditionTarget`, `ConditionValue1`, `ConditionValue2`, `ConditionValue3`, `NegativeCondition`, `ErrorType`, `ErrorTextId`, `ScriptName`, `Comment`) VALUES
+(15, 9832, 12, 0, 0, 2, 0, 20131, 1, 1, 1, 0, 0, '', 'Only show gossip if player doesn\'t have Battle Tabard of the Defilers'),
 (15, 9832, 12, 0, 0, 8, 0, 8122, 0, 0, 0, 0, 0, '', 'Only show gossip if player already finished quest Take Five Bases');
 
 -- This changes the link from 10 to 100, allowing more tabards to be added and not havign the close gossip lost in the middle SAI (makes harder to see)
