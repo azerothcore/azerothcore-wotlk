@@ -26,7 +26,13 @@ env:
 jobs:
   test-bash-scripts:
     name: Test Bash Scripts
-    runs-on: ubuntu-24.04
+    strategy:
+      fail-fast: true
+      matrix:
+        include:
+          - os: ubuntu-22.04
+          - os: ubuntu-24.04
+    runs-on: ${{ matrix.os }}
     if: github.repository == 'azerothcore/azerothcore-wotlk' && !github.event.pull_request.draft
     steps:
       - name: Checkout repository
@@ -48,7 +54,13 @@ jobs:
 
   build-and-test:
     name: Build and Integration Test
-    runs-on: ubuntu-24.04
+    strategy:
+      fail-fast: true
+      matrix:
+        include:
+          - os: ubuntu-22.04
+          - os: ubuntu-24.04
+    runs-on: ${{ matrix.os }}
     if: github.repository == 'azerothcore/azerothcore-wotlk' && !github.event.pull_request.draft
     steps:
       - name: Checkout repository
