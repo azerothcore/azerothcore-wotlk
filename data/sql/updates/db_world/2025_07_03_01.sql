@@ -1,3 +1,4 @@
+-- DB update 2025_07_03_00 -> 2025_07_03_01
 -- Bracket 20-29 | `The Battle for Arathi Basin!` (1/4) (Alliance and Horde).
 UPDATE `quest_template_addon` SET `MaxLevel` = 29 WHERE `ID` IN (8168, 8171);
 
