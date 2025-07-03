@@ -148,11 +148,11 @@ function comp_compile() {
       find "$AC_BINPATH_FULL"  -mindepth 1 -maxdepth 1 -type f -exec $SUDO chmod u+s  -- {} +
 
       [[ -f "$confDir/worldserver.conf.dist" ]] && \
-          cp -v --update=none "$confDir/worldserver.conf.dist" "$confDir/worldserver.conf"
+          cp -v --no-clobber "$confDir/worldserver.conf.dist" "$confDir/worldserver.conf"
       [[ -f "$confDir/authserver.conf.dist" ]] && \
-          cp -v --update=none "$confDir/authserver.conf.dist" "$confDir/authserver.conf"
+          cp -v --no-clobber "$confDir/authserver.conf.dist" "$confDir/authserver.conf"
       [[ -f "$confDir/dbimport.conf.dist" ]] && \
-          cp -v --update=none "$confDir/dbimport.conf.dist" "$confDir/dbimport.conf"
+          cp -v --no-clobber "$confDir/dbimport.conf.dist" "$confDir/dbimport.conf"
 
       echo "Done"
       ;;
