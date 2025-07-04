@@ -700,8 +700,7 @@ struct ItemTemplate
         return GetMaxStackSize() == 1 &&
                Class != ITEM_CLASS_CONSUMABLE &&
                Class != ITEM_CLASS_QUEST &&
-               !HasFlag(ITEM_FLAG_NO_CREATOR) &&
-               ItemId != 6948; /*Hearthstone*/
+               !HasFlag(ITEM_FLAG_NO_CREATOR);
     }
 
     [[nodiscard]] bool CanChangeEquipStateInCombat() const
