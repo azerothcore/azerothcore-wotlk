@@ -19,17 +19,6 @@ INSERT INTO `creature` (`guid`, `id1`, `map`, `spawnMask`, `phaseMask`, `equipme
 DELETE FROM `game_event_creature` WHERE (`eventEntry` = 1) AND (`guid` IN (SELECT `guid` FROM `creature` WHERE `id1` IN (25536)));
 INSERT INTO `game_event_creature` (SELECT 1, `guid` FROM `creature` WHERE `id1` IN (25536));
 
--- 25536 [DNT] Torch Tossing Target Bunny Controller
-UPDATE `creature_template` SET `AIName` = 'SmartAI' WHERE `entry` = 25536;
-
-DELETE FROM `smart_scripts` WHERE (`source_type` = 0 AND `entryorguid` = 25536);
-INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `event_param6`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
-(25536, 0, 0, 0, 1, 0, 100, 0, 3280, 3280, 3280, 3280, 0, 0, 11, 45907, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, '[DNT] Torch Tossing Target Bunny Controller - Out of Combat - Cast \'Torch Target Picker\'');
-
-DELETE FROM `conditions` WHERE (`SourceTypeOrReferenceId` = 13) AND (`SourceGroup` = 1) AND (`SourceEntry` = 45907) AND (`SourceId` = 0) AND (`ElseGroup` = 0) AND (`ConditionTypeOrReference` = 31) AND (`ConditionTarget` = 0) AND (`ConditionValue1` = 3) AND (`ConditionValue2` = 25535) AND (`ConditionValue3` = 0);
-INSERT INTO `conditions` (`SourceTypeOrReferenceId`, `SourceGroup`, `SourceEntry`, `SourceId`, `ElseGroup`, `ConditionTypeOrReference`, `ConditionTarget`, `ConditionValue1`, `ConditionValue2`, `ConditionValue3`, `NegativeCondition`, `ErrorType`, `ErrorTextId`, `ScriptName`, `Comment`) VALUES
-(13, 1, 45907, 0, 0, 31, 0, 3, 25535, 0, 0, 0, 0, '', 'Spell \'Torch Target Picker\' targets \'[DNT] Torch Tossing Target Bunny\'');
-
 -- Update creature '[DNT] Torch Tossing Target Bunny' with sniffed values
 -- new spawns
 DELETE FROM `creature` WHERE (`id1` IN (25535)) AND (`guid` BETWEEN 67061 AND 67100);
@@ -78,6 +67,17 @@ INSERT INTO `creature` (`guid`, `id1`, `map`, `spawnMask`, `phaseMask`, `equipme
 -- enable all spawns for eventEntry 1
 DELETE FROM `game_event_creature` WHERE (`eventEntry` = 1) AND (`guid` IN (SELECT `guid` FROM `creature` WHERE `id1` IN (25535)));
 INSERT INTO `game_event_creature` (SELECT 1, `guid` FROM `creature` WHERE `id1` IN (25535));
+
+-- 25536 [DNT] Torch Tossing Target Bunny Controller
+UPDATE `creature_template` SET `AIName` = 'SmartAI' WHERE `entry` = 25536;
+
+DELETE FROM `smart_scripts` WHERE (`source_type` = 0 AND `entryorguid` = 25536);
+INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `event_param6`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
+(25536, 0, 0, 0, 1, 0, 100, 0, 3280, 3280, 3280, 3280, 0, 0, 11, 45907, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, '[DNT] Torch Tossing Target Bunny Controller - Out of Combat - Cast \'Torch Target Picker\'');
+
+DELETE FROM `conditions` WHERE (`SourceTypeOrReferenceId` = 13) AND (`SourceGroup` = 1) AND (`SourceEntry` = 45907) AND (`SourceId` = 0) AND (`ElseGroup` = 0) AND (`ConditionTypeOrReference` = 31) AND (`ConditionTarget` = 0) AND (`ConditionValue1` = 3) AND (`ConditionValue2` = 25535) AND (`ConditionValue3` = 0);
+INSERT INTO `conditions` (`SourceTypeOrReferenceId`, `SourceGroup`, `SourceEntry`, `SourceId`, `ElseGroup`, `ConditionTypeOrReference`, `ConditionTarget`, `ConditionValue1`, `ConditionValue2`, `ConditionValue3`, `NegativeCondition`, `ErrorType`, `ErrorTextId`, `ScriptName`, `Comment`) VALUES
+(13, 1, 45907, 0, 0, 31, 0, 3, 25535, 0, 0, 0, 0, '', 'Spell \'Torch Target Picker\' targets \'[DNT] Torch Tossing Target Bunny\'');
 
 -- 25535 [DNT] Torch Tossing Target Bunny
 UPDATE `creature_template` SET `ScriptName` = '', `AIName` = 'SmartAI' WHERE `entry` = 25535;
