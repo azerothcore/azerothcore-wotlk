@@ -387,31 +387,11 @@ struct npc_midsummer_bonfire_despawner : public ScriptedAI
 
 enum torchToss
 {
-    GO_TORCH_TARGET_BRAZIER         = 187708,
-    NPC_TORCH_TOSS_TARGET_BUNNY     = 25535,
-
-    SPELL_TORCH_TOSS_LAND           = 46054,
-
-    // visual hit animation
-    // hit counter on player
-    SPELL_BRAZIERS_HIT              = 45724,
-    SPELL_TORCH_TOSS_SUCCESS_A      = 45719,
-    SPELL_TORCH_TOSS_SUCCESS_H      = 46651,
-    // requires 8 hits
-    SPELL_TORCH_TOSS_TRAINING       = 45716,
-
-    // requires 20 hits
-    SPELL_TORCH_TOSSING_PRACTICE    = 46630,
-
-    // cleanup / remove all torch toss quest auras
-    SPELL_REMOVE_TORCHES            = 46074,
-
-    // selects the next valid target
-    SPELL_TORCH_TARGET_PICKER       = 45907,
-
-    // what is the purpose of this (?)
-    // the master flame eater also casted this onto one player
-    // 47143 (Handle: Not on Quest but has Torch Tossing Aura)
+    SPELL_TORCH_TOSSING_TRAINING_SUCCESS_A  = 45719,
+    SPELL_TORCH_TOSSING_TRAINING_SUCCESS_H  = 46651,
+    SPELL_TORCH_TOSSING_TRAINING            = 45716,
+    SPELL_TORCH_TOSSING_PRACTICE            = 46630,
+    SPELL_REMOVE_TORCHES                    = 46074,
 };
 
 ///////////////////////////////
@@ -881,38 +861,43 @@ class spell_midsummer_ribbon_pole_visual : public SpellScript
     }
 };
 
-class spell_midsummer_torch_quest : public AuraScript
+class spell_braziers_hit : public AuraScript
 {
-    PrepareAuraScript(spell_midsummer_torch_quest)
+    PrepareAuraScript(spell_braziers_hit)
 
-    bool Load() override
+    bool Validate(SpellInfo const* /*spell*/) override
     {
-        //torchGUID.Clear();
-        return true;
+        return ValidateSpellInfo(
+            {
+                SPELL_TORCH_TOSSING_TRAINING_SUCCESS_A,
+                SPELL_TORCH_TOSSING_TRAINING_SUCCESS_H,
+                SPELL_TORCH_TOSSING_TRAINING,
+                SPELL_TORCH_TOSSING_PRACTICE,
+                SPELL_REMOVE_TORCHES
+            });
     }
 
-    ObjectGuid torchGUID;
-
-    void HandleEffectApply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
+    void HandleAfterEffectApply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
     {
-        //Unit* ar = GetTarget();
-        //if (Creature* cr = ar->SummonCreature(NPC_TORCH_TOSS_TARGET_BUNNY, ar->GetPositionX(), ar->GetPositionY(), ar->GetPositionZ(), 0.0f, TEMPSUMMON_TIMED_DESPAWN, 90000))
-        //{
-        //    torchGUID = cr->GetGUID();
-        //    //CAST_AI(npc_midsummer_torch_target, cr->AI())->SetPlayerGUID(ar->GetGUID(), (GetId() == SPELL_TORCH_TOSS_TRAINING ? 8 : 20));
-        //}
-    }
+        Player* const player = GetTarget()->ToPlayer();
 
-    void HandleEffectRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
-    {
-        //if (Creature* cr = ObjectAccessor::GetCreature(*GetTarget(), torchGUID))
-        //    cr->DespawnOrUnsummon(1);
+        if (!player)
+            return;
+
+        if (GetStackAmount() >= (player->HasAura(SPELL_TORCH_TOSSING_TRAINING) ? 8 : 20))
+        {
+            player->CastSpell(player, SPELL_TORCH_TOSSING_TRAINING_SUCCESS_A, true);
+            player->CastSpell(player, SPELL_TORCH_TOSSING_TRAINING_SUCCESS_H, true);
+            player->CastSpell(player, SPELL_REMOVE_TORCHES);
+
+            player->RemoveAurasDueToSpell(SPELL_TORCH_TOSSING_TRAINING);
+            player->RemoveAurasDueToSpell(SPELL_TORCH_TOSSING_PRACTICE);
+        }
     }
 
     void Register() override
     {
-        OnEffectApply += AuraEffectApplyFn(spell_midsummer_torch_quest::HandleEffectApply, EFFECT_0, SPELL_AURA_DETECT_AMORE, AURA_EFFECT_HANDLE_REAL);
-        OnEffectRemove += AuraEffectRemoveFn(spell_midsummer_torch_quest::HandleEffectRemove, EFFECT_0, SPELL_AURA_DETECT_AMORE, AURA_EFFECT_HANDLE_REAL);
+        AfterEffectApply += AuraEffectApplyFn(spell_braziers_hit::HandleAfterEffectApply, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL_OR_REAPPLY_MASK);
     }
 };
 
@@ -921,28 +906,20 @@ class spell_torch_target_picker : public SpellScript
 {
     PrepareSpellScript(spell_torch_target_picker)
 
-    // TODO: condition for implicit target of TARGET_UNIT_SRC_AREA_ENTRY)
-    // then filter targets, select 1 randomly
-
     void SelectTargets(std::list<WorldObject*>& targets)
     {
         if (targets.empty())
             return;
 
-        LOG_ERROR("scripts.midsummer", "SelectTargets 1 - {}", targets.size());
-
         // keep single random element only
         WorldObject* const bunny = Acore::Containers::SelectRandomContainerElement(targets);
         targets.clear();
         targets.push_back(bunny);
-
-        LOG_ERROR("scripts.midsummer", "SelectTargets 2 - {}", targets.size());
     }
 
     void Register() override
     {
         OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_torch_target_picker::SelectTargets, EFFECT_0, TARGET_UNIT_SRC_AREA_ENTRY);
-        //OnDestinationTargetSelect += SpellDestinationTargetSelectFn(spell_midsummer_ribbon_pole_firework::ModDestHeight, EFFECT_0, TARGET_DEST_CASTER_RANDOM);
     }
 };
 
@@ -1238,10 +1215,10 @@ void AddSC_event_midsummer_scripts()
     RegisterSpellScript(spell_midsummer_ribbon_pole_firework);
     RegisterSpellScript(spell_midsummer_ribbon_pole);
     RegisterSpellScript(spell_midsummer_ribbon_pole_visual);
-    RegisterSpellScript(spell_midsummer_torch_quest);
     RegisterSpellScript(spell_midsummer_fling_torch);
     RegisterSpellScript(spell_midsummer_juggling_torch);
     RegisterSpellScript(spell_midsummer_torch_catch);
     RegisterSpellScript(spell_midsummer_summon_ahune_lieutenant);
+    RegisterSpellScript(spell_braziers_hit);
     RegisterSpellScript(spell_torch_target_picker);
 }
