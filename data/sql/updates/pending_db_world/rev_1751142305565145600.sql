@@ -19,26 +19,18 @@ INSERT INTO `creature` (`guid`, `id1`, `map`, `spawnMask`, `phaseMask`, `equipme
 DELETE FROM `game_event_creature` WHERE (`eventEntry` = 1) AND (`guid` IN (SELECT `guid` FROM `creature` WHERE `id1` IN (25536)));
 INSERT INTO `game_event_creature` (SELECT 1, `guid` FROM `creature` WHERE `id1` IN (25536));
 
---
+-- [DNT] Torch Tossing Target Bunny Controller
 UPDATE `creature_template` SET `AIName` = 'SmartAI' WHERE `entry` = 25536;
 
 DELETE FROM `smart_scripts` WHERE (`source_type` = 0 AND `entryorguid` = 25536);
 INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `event_param6`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
 (25536, 0, 0, 0, 1, 0, 100, 0, 3280, 3280, 3280, 3280, 0, 0, 11, 45907, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, '[DNT] Torch Tossing Target Bunny Controller - Out of Combat - Cast \'Torch Target Picker\'');
 
--- 
--- DELETE FROM spell_linked_spell WHERE spell_trigger=46074 AND spell_effect=-45724 AND `type`=0;
--- INSERT INTO spell_linked_spell (spell_trigger, spell_effect, `type`, comment) VALUES(46074, -45724, 0, 'Remove Torches: Remove Aura: Braziers Hit');
-
--- DELETE FROM spell_script_names WHERE spell_id=45907 AND ScriptName='spell_torch_target_picker';
--- INSERT INTO spell_script_names (spell_id, ScriptName) VALUES(45907, 'spell_torch_target_picker');
-
 DELETE FROM `conditions` WHERE (`SourceTypeOrReferenceId` = 13) AND (`SourceGroup` = 1) AND (`SourceEntry` = 45907) AND (`SourceId` = 0) AND (`ElseGroup` = 0) AND (`ConditionTypeOrReference` = 31) AND (`ConditionTarget` = 0) AND (`ConditionValue1` = 3) AND (`ConditionValue2` = 25535) AND (`ConditionValue3` = 0);
 INSERT INTO `conditions` (`SourceTypeOrReferenceId`, `SourceGroup`, `SourceEntry`, `SourceId`, `ElseGroup`, `ConditionTypeOrReference`, `ConditionTarget`, `ConditionValue1`, `ConditionValue2`, `ConditionValue3`, `NegativeCondition`, `ErrorType`, `ErrorTextId`, `ScriptName`, `Comment`) VALUES
 (13, 1, 45907, 0, 0, 31, 0, 3, 25535, 0, 0, 0, 0, '', 'Spell \'Torch Target Picker\' targets \'[DNT] Torch Tossing Target Bunny\'');
 
 -- Update creature '[DNT] Torch Tossing Target Bunny' with sniffed values
-
 -- new spawns
 DELETE FROM `creature` WHERE (`id1` IN (25535)) AND (`guid` BETWEEN 67061 AND 67100);
 INSERT INTO `creature` (`guid`, `id1`, `map`, `spawnMask`, `phaseMask`, `equipment_id`, `position_x`, `position_y`, `position_z`, `orientation`, `spawntimesecs`, `wander_distance`, `MovementType`, `npcflag`, `unit_flags`, `dynamicflags`, `ScriptName`, `VerifiedBuild`, `CreateObject`, `Comment`) VALUES
@@ -88,12 +80,9 @@ DELETE FROM `game_event_creature` WHERE (`eventEntry` = 1) AND (`guid` IN (SELEC
 INSERT INTO `game_event_creature` (SELECT 1, `guid` FROM `creature` WHERE `id1` IN (25535));
 
 -- target bunny SAI
-UPDATE `creature_template` SET `ScriptName` = 'npc_midsummer_torch_target' WHERE (`entry` = 25535);
--- UPDATE `creature_template` SET `AIName` = 'SmartAI' WHERE `entry` = 25535;
+UPDATE `creature_template` SET `ScriptName` = '', `AIName` = 'SmartAI' WHERE `entry` = 25535;
 
---DELETE FROM `smart_scripts` WHERE (`source_type` = 0 AND `entryorguid` = 25535);
---INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `event_param6`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
---(25535, 0, 0, 0, 8, 0, 100, 0, 45907, 0, 0, 0, 0, 0, 11, 46901, 2, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, '[DNT] Torch Tossing Target Bunny - On Spellhit \'Torch Target Picker\' - Cast \'Target Indicator (Cosmetic)\'');
-
--- make selectable for testing purposes
---UPDATE `creature_template` SET `unit_flags` = 512 WHERE (`entry` = 25535);
+DELETE FROM `smart_scripts` WHERE (`source_type` = 0 AND `entryorguid` = 25535);
+INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `event_param6`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
+(25535, 0, 0, 0, 8, 0, 100, 0, 45907, 0, 0, 0, 0, 0, 11, 45723, 2, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, '[DNT] Torch Tossing Target Bunny - On Spellhit \'Torch Target Picker\' - Cast \'Target Indicator\''),
+(25535, 0, 1, 0, 8, 0, 100, 0, 45907, 0, 0, 0, 0, 0, 11, 46901, 2, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, '[DNT] Torch Tossing Target Bunny - On Spellhit \'Torch Target Picker\' - Cast \'Target Indicator (Cosmetic)\'');

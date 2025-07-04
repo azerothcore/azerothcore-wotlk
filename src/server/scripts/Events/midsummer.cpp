@@ -390,7 +390,6 @@ enum torchToss
     GO_TORCH_TARGET_BRAZIER         = 187708,
     NPC_TORCH_TOSS_TARGET_BUNNY     = 25535,
 
-    SPELL_TARGET_INDICATOR_RANK_1   = 43313,
     SPELL_TORCH_TOSS_LAND           = 46054,
 
     // visual hit animation
@@ -407,49 +406,12 @@ enum torchToss
     // cleanup / remove all torch toss quest auras
     SPELL_REMOVE_TORCHES            = 46074,
 
-    // marks a valid target for torch toss (no visual)
-    SPELL_TARGET_INDICATOR          = 45723,
-
-    // visual target indicator
-    SPELL_TARGET_INDICATOR_COSMETIC = 46901,
-
     // selects the next valid target
     SPELL_TORCH_TARGET_PICKER       = 45907,
 
     // what is the purpose of this (?)
     // the master flame eater also casted this onto one player
     // 47143 (Handle: Not on Quest but has Torch Tossing Aura)
-};
-
-struct npc_midsummer_torch_target : public ScriptedAI
-{
-    npc_midsummer_torch_target(Creature* creature) : ScriptedAI(creature)
-    {
-    }
-
-    //bool CanBeSeen(Player const* seer) override
-    //{
-    //    return true;
-    //}
-
-    void SpellHit(Unit* caster, SpellInfo const* spellInfo) override
-    {
-        // Triggered spell from torch
-        if (spellInfo->Id == SPELL_TORCH_TARGET_PICKER)
-        {
-            LOG_ERROR("scripts.midsummer", "SpellHit");
-
-            DoCastSelf(SPELL_TARGET_INDICATOR, true);
-
-            // sniffed spell not working properly and showing no animation
-            DoCastSelf(SPELL_TARGET_INDICATOR_COSMETIC, true);
-        }
-    }
-
-    void UpdateAI(uint32 diff) override
-    {
-        scheduler.Update(diff);
-    }
 };
 
 ///////////////////////////////
@@ -1267,7 +1229,6 @@ void AddSC_event_midsummer_scripts()
     // NPCs
     RegisterCreatureAI(npc_midsummer_bonfire);
     RegisterCreatureAI(npc_midsummer_bonfire_despawner);
-    RegisterCreatureAI(npc_midsummer_torch_target);
     RegisterCreatureAI(npc_midsummer_ribbon_pole_target);
 
     // Spells
