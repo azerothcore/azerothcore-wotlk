@@ -901,7 +901,6 @@ class spell_braziers_hit : public AuraScript
     }
 };
 
-// 45907 Torch Target Picker
 class spell_torch_target_picker : public SpellScript
 {
     PrepareSpellScript(spell_torch_target_picker)

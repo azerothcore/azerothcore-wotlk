@@ -19,6 +19,12 @@ INSERT INTO `creature` (`guid`, `id1`, `map`, `spawnMask`, `phaseMask`, `equipme
 DELETE FROM `game_event_creature` WHERE (`eventEntry` = 1) AND (`guid` IN (SELECT `guid` FROM `creature` WHERE `id1` IN (25536)));
 INSERT INTO `game_event_creature` (SELECT 1, `guid` FROM `creature` WHERE `id1` IN (25536));
 
+UPDATE `creature_template` SET `AIName` = 'SmartAI' WHERE `entry` = 25536;
+
+DELETE FROM `smart_scripts` WHERE (`source_type` = 0 AND `entryorguid` = 25536);
+INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `event_param6`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
+(25536, 0, 0, 0, 1, 0, 100, 0, 3280, 3280, 3280, 3280, 0, 0, 11, 45907, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, '[DNT] Torch Tossing Target Bunny Controller - Out of Combat - Cast \'Torch Target Picker\'');
+
 -- Update creature '[DNT] Torch Tossing Target Bunny' with sniffed values
 -- new spawns
 DELETE FROM `creature` WHERE (`id1` IN (25535)) AND (`guid` BETWEEN 67061 AND 67100);
@@ -68,18 +74,6 @@ INSERT INTO `creature` (`guid`, `id1`, `map`, `spawnMask`, `phaseMask`, `equipme
 DELETE FROM `game_event_creature` WHERE (`eventEntry` = 1) AND (`guid` IN (SELECT `guid` FROM `creature` WHERE `id1` IN (25535)));
 INSERT INTO `game_event_creature` (SELECT 1, `guid` FROM `creature` WHERE `id1` IN (25535));
 
--- 25536 [DNT] Torch Tossing Target Bunny Controller
-UPDATE `creature_template` SET `AIName` = 'SmartAI' WHERE `entry` = 25536;
-
-DELETE FROM `smart_scripts` WHERE (`source_type` = 0 AND `entryorguid` = 25536);
-INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `event_param6`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
-(25536, 0, 0, 0, 1, 0, 100, 0, 3280, 3280, 3280, 3280, 0, 0, 11, 45907, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, '[DNT] Torch Tossing Target Bunny Controller - Out of Combat - Cast \'Torch Target Picker\'');
-
-DELETE FROM `conditions` WHERE (`SourceTypeOrReferenceId` = 13) AND (`SourceGroup` = 1) AND (`SourceEntry` = 45907) AND (`SourceId` = 0) AND (`ElseGroup` = 0) AND (`ConditionTypeOrReference` = 31) AND (`ConditionTarget` = 0) AND (`ConditionValue1` = 3) AND (`ConditionValue2` = 25535) AND (`ConditionValue3` = 0);
-INSERT INTO `conditions` (`SourceTypeOrReferenceId`, `SourceGroup`, `SourceEntry`, `SourceId`, `ElseGroup`, `ConditionTypeOrReference`, `ConditionTarget`, `ConditionValue1`, `ConditionValue2`, `ConditionValue3`, `NegativeCondition`, `ErrorType`, `ErrorTextId`, `ScriptName`, `Comment`) VALUES
-(13, 1, 45907, 0, 0, 31, 0, 3, 25535, 0, 0, 0, 0, '', 'Spell \'Torch Target Picker\' targets \'[DNT] Torch Tossing Target Bunny\'');
-
--- 25535 [DNT] Torch Tossing Target Bunny
 UPDATE `creature_template` SET `ScriptName` = '', `AIName` = 'SmartAI' WHERE `entry` = 25535;
 
 DELETE FROM `smart_scripts` WHERE (`source_type` = 0 AND `entryorguid` = 25535);
@@ -88,29 +82,24 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 (25535, 0, 1, 0, 8, 0, 100, 0, 45907, 0, 0, 0, 0, 0, 11, 46901, 2, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, '[DNT] Torch Tossing Target Bunny - On Spellhit \'Torch Target Picker\' - Cast \'Target Indicator (Cosmetic)\''),
 (25535, 0, 2, 0, 8, 0, 100, 0, 46054, 0, 0, 0, 0, 0, 11, 45724, 2, 0, 0, 0, 0, 7, 0, 0, 0, 0, 0, 0, 0, 0, '[DNT] Torch Tossing Target Bunny - On Spellhit \'Torch Toss (land)\' - Cast \'Braziers Hit!\'');
 
--- 46054 Torch Toss (land)
-DELETE FROM `conditions` WHERE (`SourceTypeOrReferenceId` = 13) AND (`SourceGroup` = 1) AND (`SourceEntry` = 46054) AND (`SourceId` = 0) AND (`ElseGroup` = 0) AND (`ConditionTypeOrReference` = 31) AND (`ConditionTarget` = 0) AND (`ConditionValue1` = 3) AND (`ConditionValue2` = 25535) AND (`ConditionValue3` = 0);
-INSERT INTO `conditions` (`SourceTypeOrReferenceId`, `SourceGroup`, `SourceEntry`, `SourceId`, `ElseGroup`, `ConditionTypeOrReference`, `ConditionTarget`, `ConditionValue1`, `ConditionValue2`, `ConditionValue3`, `NegativeCondition`, `ErrorType`, `ErrorTextId`, `ScriptName`, `Comment`) VALUES
-(13, 1, 46054, 0, 0, 31, 0, 3, 25535, 0, 0, 0, 0, '', 'Spell \'Torch Toss (land)\' targets \'[DNT] Torch Tossing Target Bunny\'');
-
-DELETE FROM `conditions` WHERE (`SourceTypeOrReferenceId` = 13) AND (`SourceGroup` = 1) AND (`SourceEntry` = 46054) AND (`SourceId` = 0) AND (`ElseGroup` = 0) AND (`ConditionTypeOrReference` = 1) AND (`ConditionTarget` = 0) AND (`ConditionValue1` = 45723) AND (`ConditionValue2` = 0) AND (`ConditionValue3` = 0);
-INSERT INTO `conditions` (`SourceTypeOrReferenceId`, `SourceGroup`, `SourceEntry`, `SourceId`, `ElseGroup`, `ConditionTypeOrReference`, `ConditionTarget`, `ConditionValue1`, `ConditionValue2`, `ConditionValue3`, `NegativeCondition`, `ErrorType`, `ErrorTextId`, `ScriptName`, `Comment`) VALUES
-(13, 1, 46054, 0, 0, 1, 0, 45723, 0, 0, 0, 0, 0, '', '\'Torch Toss (land)\' requires target with aura \'Target Indicator\'');
-
 -- 45724 Braziers Hit!
 -- SPELL_ATTR0_CU_SINGLE_AURA_STACK
 DELETE FROM `spell_custom_attr` WHERE `spell_id` = 45724;
 INSERT INTO `spell_custom_attr` (`spell_id`, `attributes`) VALUES
 (45724, 4194304);
 
-DELETE FROM `spell_script_names` WHERE `spell_id` = 45724 AND `ScriptName` = 'spell_braziers_hit';
-INSERT INTO `spell_script_names` (`spell_id`, `ScriptName`) VALUES
-(45724, 'spell_braziers_hit');
-
 DELETE FROM `spell_linked_spell` WHERE `spell_trigger` IN(-45716, -46630) AND `spell_effect` = -45724 AND `type` = 0;
 INSERT INTO `spell_linked_spell` (`spell_trigger`, `spell_effect`, `type`, `comment`) VALUES
 (-45716, -45724, 0, '\'Torch Tossing Training\' removes \'Braziers Hit!\''),
 (-46630, -45724, 0, '\'Torch Tossing Practice\' removes \'Braziers Hit!\'');
 
--- cleanup
-DELETE FROM `spell_script_names` WHERE `spell_id` IN (45716, 46630) AND `ScriptName` = 'spell_midsummer_torch_quest';
+DELETE FROM `spell_script_names` WHERE `spell_id` IN (45716, 46630, 45907, 45724);
+INSERT INTO `spell_script_names` (`spell_id`, `ScriptName`) VALUES
+(45907, 'spell_torch_target_picker'),
+(45724, 'spell_braziers_hit');
+
+DELETE FROM `conditions` WHERE (`SourceTypeOrReferenceId` = 13) AND (`SourceGroup` = 1) AND (`SourceEntry` IN(46054, 45907)) AND (`SourceId` = 0) AND (`ElseGroup` = 0) AND (`ConditionTypeOrReference` IN (1, 31)) AND (`ConditionTarget` = 0) AND (`ConditionValue1` IN (3, 45723)) AND (`ConditionValue2` IN (25535, 0)) AND (`ConditionValue3` = 0);
+INSERT INTO `conditions` (`SourceTypeOrReferenceId`, `SourceGroup`, `SourceEntry`, `SourceId`, `ElseGroup`, `ConditionTypeOrReference`, `ConditionTarget`, `ConditionValue1`, `ConditionValue2`, `ConditionValue3`, `NegativeCondition`, `ErrorType`, `ErrorTextId`, `ScriptName`, `Comment`) VALUES
+(13, 1, 46054, 0, 0, 31, 0, 3, 25535, 0, 0, 0, 0, '', 'Spell \'Torch Toss (land)\' targets \'[DNT] Torch Tossing Target Bunny\''),
+(13, 1, 46054, 0, 0, 1, 0, 45723, 0, 0, 0, 0, 0, '', 'Spell \'Torch Toss (land)\' requires target with aura \'Target Indicator\''),
+(13, 1, 45907, 0, 0, 31, 0, 3, 25535, 0, 0, 0, 0, '', 'Spell \'Torch Target Picker\' targets \'[DNT] Torch Tossing Target Bunny\'');
