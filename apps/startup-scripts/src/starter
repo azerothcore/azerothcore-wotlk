@@ -27,12 +27,10 @@ CRASHES_PATH="$8"
 # Default values
 CURRENT_PATH="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 DEFAULT_CRASHES_PATH="$CURRENT_PATH/logs/crashes"
-DEFAULT_GDB_FILE="$CURRENT_PATH/gdb.conf"
 [ -n "$CONFIG" ] && CONFIG_ABS=$(realpath "$CONFIG")
 
 # Set defaults if not provided
 CRASHES_PATH="${CRASHES_PATH:-$DEFAULT_CRASHES_PATH}"
-GDB_FILE="${GDB_FILE:-$DEFAULT_GDB_FILE}"
 
 # Validate binary
 if [ -z "$BINPATH" ] || [ -z "$BINFILE" ]; then
@@ -76,8 +74,8 @@ set debug timestamp
 EOF
 
     # Add run command with config if specified
-    if [ -n "$CONFIG" ]; then
-        echo "run -c $CONFIG" >> "$GDB_TEMP_FILE"
+    if [ -n "$CONFIG_ABS" ]; then
+        echo "run -c $CONFIG_ABS" >> "$GDB_TEMP_FILE"
     else
         echo "run" >> "$GDB_TEMP_FILE"
     fi
@@ -126,14 +124,14 @@ else
     # check if it's running under PM2 or `script` command does not exist
     # Note: script is used to capture output in non-interactive sessions such as systemd (without tmux/screen)
     if [[ -n "$pm_id" || -n "$PM2_HOME" || ! -x "$(command -v script)" ]]; then
-        if [ -n "$CONFIG" ]; then
-            "$EXECPATH" -c "$CONFIG"
+        if [ -n "$CONFIG_ABS" ]; then
+            "$EXECPATH" -c "$CONFIG_ABS"
         else
             "$EXECPATH"
         fi
     else
-        if [ -n "$CONFIG" ]; then
-            script -q -e -c "$EXECPATH -c \"$CONFIG\""
+        if [ -n "$CONFIG_ABS" ]; then
+            script -q -e -c "$EXECPATH -c \"$CONFIG_ABS\""
         else
             script -q -e -c "$EXECPATH"
         fi
