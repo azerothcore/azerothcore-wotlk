@@ -276,7 +276,7 @@ function pm2_create_service() {
     done
     
     # Build PM2 start command with AzerothCore environment variable
-    local pm2_cmd="pm2 start '$command$additional_args' --name '$service_name' --env AC_LAUNCHED_BY_PM2=1"
+    local pm2_cmd="AC_LAUNCHED_BY_PM2=1 pm2 start '$command$additional_args' --name '$service_name'"
     
     # Add memory limit if specified
     if [ -n "$max_memory" ]; then
@@ -301,6 +301,7 @@ function pm2_create_service() {
     fi
 }
 
+
 function pm2_remove_service() {
     local service_name="$1"
     
@@ -309,12 +310,24 @@ function pm2_remove_service() {
     echo -e "${YELLOW}Stopping and removing PM2 service: $service_name${NC}"
     
     # Stop the service if it's running
-    if pm2 id "$service_name" > /dev/null 2>&1; then
+    if pm2 describe "$service_name" >/dev/null 2>&1; then
         pm2 stop "$service_name" 2>/dev/null || true
-        pm2 delete "$service_name" 2>/dev/null
+        pm2 delete "$service_name" 2>/dev/null 
         
+        # Wait for PM2 to process the stop/delete command with timeout
+        local timeout=10
+        local elapsed=0
+        while pm2 describe "$service_name" >/dev/null 2>&1; do
+            if [ "$elapsed" -ge "$timeout" ]; then
+                echo -e "${RED}Timeout reached while waiting for PM2 service '$service_name' to stop${NC}"
+                return 1
+            fi
+            sleep 0.5
+            elapsed=$((elapsed + 1))
+        done
+
         # Verify the service was removed
-        if pm2 id "$service_name" > /dev/null 2>&1; then
+        if pm2 describe "$service_name" >/dev/null 2>&1; then
             echo -e "${RED}Failed to remove PM2 service '$service_name'${NC}"
             return 1
         fi
