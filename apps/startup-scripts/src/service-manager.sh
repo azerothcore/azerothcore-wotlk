@@ -398,6 +398,31 @@ function systemd_create_service() {
         mkdir -p "$systemd_dir"
     fi
     
+    # Determine service type and ExecStop for systemd
+    local service_type="simple"
+    local exec_stop=""
+    
+    # Load the run-engine config to check the session manager
+    local run_engine_config_path="$CONFIG_DIR/$service_name-run-engine.conf"
+    local session_manager="none"
+    local session_name="$service_name"
+
+    if [ -f "$run_engine_config_path" ]; then
+        # Read the session manager and name from the config file without sourcing it
+        session_manager=$(grep -oP 'SESSION_MANAGER="\K[^"]+' "$run_engine_config_path" || echo "none")
+        session_name=$(grep -oP 'SESSION_NAME="\K[^"]+' "$run_engine_config_path" || echo "$service_name")
+    fi
+
+    if [ "$session_manager" = "tmux" ]; then
+        service_type="forking"
+        # Provide a direct and absolute path for the ExecStop command
+        exec_stop="ExecStop=/usr/bin/tmux kill-session -t $session_name"
+    elif [ "$session_manager" = "screen" ]; then
+        service_type="forking"
+        # Provide a direct and absolute path for the ExecStop command
+        exec_stop="ExecStop=/usr/bin/screen -S $session_name -X quit"
+    fi
+    
     # Create service file
     echo -e "${YELLOW}Creating systemd service: $service_name${NC}"
     
@@ -409,8 +434,9 @@ Description=AzerothCore $service_name
 After=network.target
 
 [Service]
-Type=forking
+Type=${service_type}
 ExecStart=$command
+${exec_stop}
 Restart=always
 RestartSec=3
 User=$(whoami)
@@ -430,8 +456,9 @@ Description=AzerothCore $service_name
 After=network.target
 
 [Service]
-Type=forking
+Type=${service_type}
 ExecStart=$command
+${exec_stop}
 Restart=always
 RestartSec=3
 WorkingDirectory=$(realpath "$bin_path")
@@ -536,7 +563,19 @@ function systemd_service_action() {
     fi
     
     echo -e "${YELLOW}${action^} systemd service: $service_name${NC}"
-    
+
+    # stop tmux or screen session if applicable && action is stop or restart
+    if [[ "$action" == "stop" || "$action" == "restart" ]]; then
+        local session_manager=$(grep -oP 'SESSION_MANAGER="\K[^"]+' "$CONFIG_DIR/$service_name-run-engine.conf" || echo "none")
+        if [ "$session_manager" = "tmux" ]; then
+            echo -e "${YELLOW}Stopping tmux session for service: $service_name${NC}"
+            tmux kill-session -t "$service_name"
+        elif [ "$session_manager" = "screen" ]; then
+            echo -e "${YELLOW}Stopping screen session for service: $service_name${NC}"
+            screen -S "$service_name" -X quit
+        fi
+    fi
+
     if [ "$systemd_type" = "--system" ]; then
         systemctl "$action" "$service_name.service"
     else
@@ -662,6 +701,7 @@ function create_service() {
     # Determine server binary based on service type
     local server_bin="${service_type}server"
     local server_binary_path=$(realpath "$bin_path/$server_bin")
+    local real_config_path=$(realpath "$server_config")
 
     # Check if binary exists
     if [ ! -f "$server_binary_path" ]; then
@@ -681,6 +721,10 @@ export GDB_ENABLED=$gdb_enabled
 # Session manager (none|auto|tmux|screen)
 export SESSION_MANAGER="$session_manager"
 
+# Service mode - indicates this is running under a service manager (systemd/pm2)
+# When true, AC_DISABLE_INTERACTIVE will be set if no interactive session manager is used
+export SERVICE_MODE="true"
+
 # Session name for tmux/screen (optional)
 export SESSION_NAME="${service_name}"
 
@@ -691,7 +735,7 @@ export BINPATH="$bin_path"
 export SERVERBIN="$server_bin"
 
 # Server configuration file path
-export CONFIG="$server_config"
+export CONFIG="$real_config_path"
 
 # Show console output for easier debugging
 export WITH_CONSOLE=1
@@ -841,6 +885,9 @@ export GDB_ENABLED=${GDB_ENABLED:-0}
 
 # Session manager (none|auto|tmux|screen)
 export SESSION_MANAGER="${SESSION_MANAGER:-none}"
+
+# Service mode - indicates this is running under a service manager (systemd/pm2)
+export SERVICE_MODE="true"
 
 # Session name for tmux/screen
 export SESSION_NAME="${service_name}"
