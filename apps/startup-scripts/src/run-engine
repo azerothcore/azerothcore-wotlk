@@ -60,7 +60,7 @@ function load_config() {
     SESSION_MANAGER="${RUN_ENGINE_SESSION_MANAGER:-$SESSION_MANAGER}"
     LOGS_PATH="${RUN_ENGINE_LOGS_PATH:-$LOGS_PATH}"
     CRASHES_PATH="${RUN_ENGINE_CRASHES_PATH:-$CRASHES_PATH}"
-    }
+}
 
 # Detect available session manager
 function detect_session_manager() {
