@@ -116,6 +116,9 @@ void GridObjectUnloader::Visit(GridRefMgr<T>& m)
         //Example: Flame Leviathan Turret 33139 is summoned when a creature is deleted
         //TODO: Check if that script has the correct logic. Do we really need to summons something before deleting?
         obj->CleanupsBeforeDelete();
+
+        obj->GetMap()->RemoveObjectFromMapUpdateList(obj);
+
         ///- object will get delinked from the manager when deleted
         delete obj;
     }

@@ -154,16 +154,6 @@ namespace Acore
         }
     };
 
-    struct ObjectUpdater
-    {
-        uint32 i_timeDiff;
-        bool i_largeOnly;
-        explicit ObjectUpdater(const uint32 diff, bool largeOnly) : i_timeDiff(diff), i_largeOnly(largeOnly) {}
-        template<class T> void Visit(GridRefMgr<T>& m);
-        void Visit(PlayerMapType&) {}
-        void Visit(CorpseMapType&) {}
-    };
-
     // SEARCHERS & LIST SEARCHERS & WORKERS
 
     // WorldObject searchers & workers
