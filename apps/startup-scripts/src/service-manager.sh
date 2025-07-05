@@ -1126,33 +1126,67 @@ function attach_to_service() {
     source "$RUN_ENGINE_CONFIG_FILE"
     
     # Auto-detect session manager and attach accordingly
-    case "$SESSION_MANAGER" in
-        "tmux")
-            attach_tmux_session "$service_name" "$provider"
-            ;;
-        "screen")
-            attach_screen_session "$service_name" "$provider"
-            ;;
-        "none"|"auto"|*)
-            # No session manager - launch interactive shell directly
-            attach_interactive_shell "$service_name" "$provider"
-            ;;
-    esac
+    if [ "$provider" = "pm2" ]; then
+        # PM2 has built-in attach functionality
+        attach_pm2_process "$service_name"
+    else
+        # For systemd, check session manager
+        case "$SESSION_MANAGER" in
+            "tmux")
+                attach_tmux_session "$service_name" "$provider"
+                ;;
+            "screen")
+                attach_screen_session "$service_name" "$provider"
+                ;;
+            "none"|"auto"|*)
+                # No session manager - show helpful message for systemd
+                attach_interactive_shell "$service_name" "$provider"
+                ;;
+        esac
+    fi
+}
+
+function attach_pm2_process() {
+    local service_name="$1"
+    
+    
+    # First check if the service exists and get its ID
+    local pm2_id=$(pm2 id "$service_name" 2>/dev/null)
+    if [ -z "$pm2_id" ] || [ "$pm2_id" = "[]" ]; then
+        echo -e "${RED}Error: PM2 process '$service_name' not found${NC}"
+        return 1
+    fi
+    
+    # Extract the numeric ID from the JSON response
+    local numeric_id=$(echo "$pm2_id" | jq -r '.[0] // empty')
+    if [ -z "$numeric_id" ]; then
+        echo -e "${RED}Error: Could not determine PM2 process ID for '$service_name'${NC}"
+        return 1
+    fi
+    
+    echo -e "${YELLOW}Attaching to PM2 process: $service_name (ID: $numeric_id)${NC}"
+    pm2 attach "$numeric_id"
 }
 
 function attach_interactive_shell() {
     local service_name="$1"
     local provider="$2"
     
-    # Get service info again to access configuration
+    # For PM2, use PM2's attach functionality
+    if [ "$provider" = "pm2" ]; then
+        attach_pm2_process "$service_name"
+        return $?
+    fi
+    
+    # For systemd without session manager, show helpful message
     local service_info=$(get_service_info "$service_name")
     local config_file=$(echo "$service_info" | jq -r '.config')
     
     source "$config_file"
     source "$RUN_ENGINE_CONFIG_FILE"
     
-    echo -e "${RED}Error: Cannot attach to service '$service_name'${NC} [for now]"
-    echo -e "${YELLOW}Interactive attachment requires a session manager (tmux or screen).${NC}"
+    echo -e "${RED}Error: Cannot attach to systemd service '$service_name'${NC}"
+    echo -e "${YELLOW}Interactive attachment for systemd requires a session manager (tmux or screen).${NC}"
     echo ""
     echo -e "${BLUE}Current session manager: $SESSION_MANAGER${NC}"
     echo ""

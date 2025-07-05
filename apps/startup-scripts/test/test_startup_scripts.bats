@@ -23,7 +23,7 @@ teardown() {
 @test "starter: should fail with missing parameters" {
     run timeout 3s "$SCRIPT_DIR/starter" '' ''
     [ "$status" -ne 0 ]
-    [[ "$output" =~ "Error: Binary '/' not found" ]]
+    [[ "$output" =~ "Error: Binary path and file are required" ]]
 }
 
 @test "starter: should start with valid binary" {
@@ -38,7 +38,7 @@ teardown() {
 @test "starter: should validate binary path exists" {
     run "$SCRIPT_DIR/starter" "/nonexistent/path" "test-server"
     [ "$status" -ne 0 ]
-    [[ "$output" =~ "Binary parameter is required" ]] || [[ "$output" =~ "No such file or directory" ]]
+    [[ "$output" =~ "Binary '/nonexistent/path/test-server' not found" ]]
 }
 
 # ===== SIMPLE RESTARTER TESTS =====
@@ -46,7 +46,7 @@ teardown() {
 @test "simple-restarter: should fail with missing parameters" {
     run timeout 3s "$SCRIPT_DIR/simple-restarter" '' ''
     [ "$status" -ne 0 ]
-    [[ "$output" =~ "Error: Binary '/' not found" ]]
+    [[ "$output" =~ "Error: Binary path and file are required" ]]
 }
 
 @test "simple-restarter: should fail with missing binary" {
