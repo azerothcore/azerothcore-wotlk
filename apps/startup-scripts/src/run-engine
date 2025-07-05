@@ -254,7 +254,7 @@ function start_service() {
     # Use environment/config values if not set from command line
     BINPATH="${BINPATH:-$RUN_ENGINE_BINPATH}"
     SERVERBIN="${SERVERBIN:-$RUN_ENGINE_SERVERBIN}"
-    CONFIG="${serverconfig:-$RUN_ENGINE_CONFIG}"
+    CONFIG="${serverconfig:-$CONFIG}"
 
     echo "SERVERBIN: $SERVERBIN"
     
@@ -331,6 +331,20 @@ function start_service() {
         echo "Server config: $CONFIG"
     else
         echo "Server config: default (not specified)"
+    fi
+    
+    # Set AC_DISABLE_INTERACTIVE when running as a service without interactive session manager
+    # This prevents AzerothCore from showing interactive prompts when running under systemd/pm2
+    if [[ "${SERVICE_MODE:-false}" == "true" && "$session_manager" == "none" ]]; then
+        export AC_DISABLE_INTERACTIVE=1
+        echo "Service mode: Non-interactive mode enabled (AC_DISABLE_INTERACTIVE=1)"
+    else
+        export AC_DISABLE_INTERACTIVE=0
+        if [[ "${SERVICE_MODE:-false}" == "true" ]]; then
+            echo "Service mode: Interactive mode enabled (session manager: $session_manager)"
+        else
+            echo "Direct execution: Interactive mode enabled"
+        fi
     fi
     
     if [ "$use_restarter" = "true" ]; then
