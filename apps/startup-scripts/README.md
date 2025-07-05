@@ -377,6 +377,27 @@ pm2 startup                # Auto-start on boot
 
 NOTE: pm2 cannot run tmux/screen sessions, but you can always use the `attach` command to connect to the service console because pm2 supports interactive mode.
 
+### Environment Variables
+
+The startup scripts recognize several environment variables for configuration and runtime behavior:
+
+#### Service Detection Variables
+
+- **`AC_LAUNCHED_BY_PM2`**: Set to `1` when launched by PM2 (automatically set by service-manager)
+  - Disables the use of the `script` command for output capture
+  - Enables non-interactive mode to prevent prompts
+  - More robust than relying on PM2's internal variables
+  
+- **`AC_DISABLE_INTERACTIVE`**: Controls interactive mode (0=enabled, 1=disabled)
+  - Automatically set based on execution context
+  - Prevents AzerothCore from showing interactive prompts in service environments
+
+#### Configuration Variables
+
+- **`RUN_ENGINE_*`**: See [Configuration](#configuration) section for complete list
+- **`SERVICE_MODE`**: Set to `true` to enable service-specific behavior
+- **`SESSION_MANAGER`**: Override session manager choice (tmux, screen, none, auto)
+
 ### Systemd Services
 
 When using systemd as the service provider:

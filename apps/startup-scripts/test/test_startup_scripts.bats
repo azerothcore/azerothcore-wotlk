@@ -41,6 +41,15 @@ teardown() {
     [[ "$output" =~ "Binary '/nonexistent/path/test-server' not found" ]]
 }
 
+@test "starter: should detect PM2 environment properly" {
+    cd "$TEST_DIR"
+    # Test with AC_LAUNCHED_BY_PM2=1 (should not use script command)
+    AC_LAUNCHED_BY_PM2=1 run timeout 5s "$SCRIPT_DIR/starter" "$TEST_DIR/bin" "test-server" "" "$TEST_DIR/test-server.conf" "" "" 0
+    debug_on_failure
+    # Should start without using script command
+    [[ "$output" =~ "Test server starting" ]]
+}
+
 # ===== SIMPLE RESTARTER TESTS =====
 
 @test "simple-restarter: should fail with missing parameters" {

@@ -123,7 +123,8 @@ EOF
 else
     # check if it's running under PM2 or `script` command does not exist
     # Note: script is used to capture output in non-interactive sessions such as systemd (without tmux/screen)
-    if [[ -n "$pm_id" || -n "$PM2_HOME" || ! -x "$(command -v script)" ]]; then
+    # We use AC_LAUNCHED_BY_PM2 environment variable set by service-manager for robust PM2 detection
+    if [[ "$AC_LAUNCHED_BY_PM2" == "1" || ! -x "$(command -v script)" ]]; then
         if [ -n "$CONFIG_ABS" ]; then
             "$EXECPATH" -c "$CONFIG_ABS"
         else

@@ -275,8 +275,8 @@ function pm2_create_service() {
         esac
     done
     
-    # Build PM2 start command
-    local pm2_cmd="pm2 start '$command$additional_args' --name '$service_name'"
+    # Build PM2 start command with AzerothCore environment variable
+    local pm2_cmd="pm2 start '$command$additional_args' --name '$service_name' --env AC_LAUNCHED_BY_PM2=1"
     
     # Add memory limit if specified
     if [ -n "$max_memory" ]; then
