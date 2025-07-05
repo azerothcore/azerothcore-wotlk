@@ -1000,15 +1000,6 @@ function list_services() {
         return
     fi
     
-    # Show PM2 services
-    if [ -z "$provider_filter" ] || [ "$provider_filter" = "pm2" ]; then
-        local pm2_services=$(jq -r '.[] | select(.provider == "pm2") | .name' "$REGISTRY_FILE" 2>/dev/null)
-        if [ -n "$pm2_services" ] && command -v pm2 >/dev/null 2>&1; then
-            echo -e "\n${YELLOW}PM2 Services:${NC}"
-            pm2 list
-        fi
-    fi
-    
     # Show systemd services
     if [ -z "$provider_filter" ] || [ "$provider_filter" = "systemd" ]; then
         local systemd_services=$(jq -r '.[] | select(.provider == "systemd") | .name' "$REGISTRY_FILE" 2>/dev/null)
@@ -1036,6 +1027,15 @@ function list_services() {
                     echo ""
                 done
             fi
+        fi
+    fi
+
+    # Show PM2 services
+    if [ -z "$provider_filter" ] || [ "$provider_filter" = "pm2" ]; then
+        local pm2_services=$(jq -r '.[] | select(.provider == "pm2") | .name' "$REGISTRY_FILE" 2>/dev/null)
+        if [ -n "$pm2_services" ] && command -v pm2 >/dev/null 2>&1; then
+            echo -e "\n${YELLOW}PM2 Services:${NC}"
+            pm2 list
         fi
     fi
 }
