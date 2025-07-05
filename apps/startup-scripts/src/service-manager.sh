@@ -100,6 +100,7 @@ function print_help() {
     echo "  --bin-path <path>           - Path to the server binary directory (required)"
     echo "  --server-config <path>      - Path to the server configuration file"
     echo "  --session-manager <type>    - Session manager (none|tmux|screen, default: none)"
+    echo "                                Note: PM2 doesn't support tmux/screen, always uses 'none'"
     echo "  --gdb-enabled <0|1>         - Enable GDB debugging (default: 0)"
     echo "  --system                    - Create as system service (systemd only, requires sudo)"
     echo "  --user                      - Create as user service (systemd only, default)"
@@ -137,6 +138,7 @@ function print_help() {
     echo "  - Use --server-config for the actual server configuration file"
     echo "  - Services use run-engine in 'start' mode for single-shot execution"
     echo "  - Restart on crash is handled by PM2 or systemd, not by run-engine"
+    echo "  - PM2 services always use session-manager 'none' and have built-in attach functionality"
     echo "  - attach command automatically detects the configured session manager and connects appropriately"
     echo "  - attach always provides interactive access to the server console"
     echo "  - Use 'logs' command to view service logs without interaction"
@@ -166,9 +168,11 @@ function validate_service_exists() {
     local provider="$2"
     
     if [ "$provider" = "pm2" ]; then
-        # Check if service exists in PM2
-        if ! pm2 id "$service_name" > /dev/null 2>&1; then
-            return 1  # Service not found
+        # Check if service exists in PM2 using pm2 describe (most reliable)
+        if pm2 describe "$service_name" >/dev/null 2>&1; then
+            return 0  # Service exists
+        else
+            return 1  # Service doesn't exist
         fi
     elif [ "$provider" = "systemd" ]; then
         # Check if service exists in systemd
@@ -711,6 +715,16 @@ function create_service() {
         return 1
     fi
     
+    # PM2 specific validation and adjustments
+    if [ "$provider" = "pm2" ]; then
+        # PM2 doesn't support session managers (tmux/screen), force to none
+        if [ "$session_manager" != "none" ]; then
+            echo -e "${YELLOW}Warning: PM2 doesn't support session managers. Setting session-manager to 'none'${NC}"
+            echo -e "${BLUE}PM2 has built-in attach functionality via: $0 attach $service_name${NC}"
+            session_manager="none"
+        fi
+    fi
+    
     # Determine server binary based on service type
     local server_bin="${service_type}server"
     local server_binary_path=$(realpath "$bin_path/$server_bin")
@@ -886,6 +900,14 @@ function update_service() {
                 ;;
         esac
     done
+    
+    # PM2 specific validation for session manager
+    if [ "$provider" = "pm2" ] && [ -n "$SESSION_MANAGER" ] && [ "$SESSION_MANAGER" != "none" ]; then
+        echo -e "${YELLOW}Warning: PM2 doesn't support session managers. Setting session-manager to 'none'${NC}"
+        echo -e "${BLUE}PM2 has built-in attach functionality via: $0 attach $service_name${NC}"
+        export SESSION_MANAGER="none"
+        config_updated=true
+    fi
     
     if [ "$config_updated" = "true" ]; then
         # Update run-engine configuration file
