@@ -288,7 +288,7 @@ function pm2_create_service() {
         esac
     done
     
-    # Build PM2 start command with AzerothCore environment variable
+
     # Set stop exit codes based on restart policy
     local stop_exit_codes=""
     if [ "$restart_policy" = "always" ]; then
@@ -298,7 +298,7 @@ function pm2_create_service() {
         # PM2 will not restart on clean shutdown (exit code 0)
         stop_exit_codes=" --stop-exit-codes 0"
     fi
-    
+    # Build PM2 start command with AzerothCore environment variable
     local pm2_cmd="AC_LAUNCHED_BY_PM2=1 pm2 start '$command$additional_args' --name '$service_name'$stop_exit_codes"
     
     # Add memory limit if specified
@@ -731,13 +731,13 @@ function create_service() {
         echo -e "${RED}Error: Invalid provider. Use 'pm2', 'systemd', or 'auto'${NC}"
         return 1
     fi
-    
+
     # Validate restart policy
     if [[ "$restart_policy" != "on-failure" && "$restart_policy" != "always" ]]; then
         echo -e "${RED}Error: Invalid restart policy. Use 'on-failure' or 'always'${NC}"
         return 1
     fi
-    
+
     # PM2 specific validation and adjustments
     if [ "$provider" = "pm2" ]; then
         # PM2 doesn't support session managers (tmux/screen), force to none
@@ -946,13 +946,13 @@ function update_service() {
         export SESSION_MANAGER="none"
         config_updated=true
     fi
-    
+
     # Validate restart policy if provided
     if [ -n "$RESTART_POLICY" ] && [[ "$RESTART_POLICY" != "on-failure" && "$RESTART_POLICY" != "always" ]]; then
         echo -e "${RED}Error: Invalid restart policy. Use 'on-failure' or 'always'${NC}"
         return 1
     fi
-    
+
     if [ "$config_updated" = "true" ]; then
         # Update run-engine configuration file
         cat > "$RUN_ENGINE_CONFIG_FILE" << EOF
