@@ -752,9 +752,8 @@ function create_service() {
     local server_bin="${service_type}server"
     local server_binary_path=$(realpath "$bin_path/$server_bin")
     local real_config_path=""
-    if [ -z "$server_config" ]; then
-        # Default to server config in bin path
-        real_config_path="$bin_path/${service_type}server.conf"
+    if [ -n "$server_config" ]; then
+        real_config_path=$(realpath "$server_config")
     fi
 
     # Check if binary exists
