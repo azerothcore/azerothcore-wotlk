@@ -27,7 +27,7 @@ $SUDO apt-get install -y gdbserver gdb unzip curl \
                      libncurses-dev libreadline-dev clang g++ \
                      gcc git cmake make ccache \
                      libssl-dev libbz2-dev \
-                     libboost-all-dev gnupg wget jq screen tmux
+                     libboost-all-dev gnupg wget jq screen tmux expect
 
 VAR_PATH="$CURRENT_PATH/../../../../var"
 

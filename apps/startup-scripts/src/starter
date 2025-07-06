@@ -121,9 +121,17 @@ EOF
         rm -f "$GDB_TEMP_FILE"
     fi
 else
-    if [ -n "$CONFIG_ABS" ]; then
-        "$EXECPATH" -c "$CONFIG_ABS"
+    echo "Starting $BINFILE without GDB"
+    if [[ "$AC_LAUNCHED_BY_PM2" == "1" ]]; then
+        echo "Running under PM2"
+        "$EXECPATH" ${CONFIG_ABS:+-c "$CONFIG_ABS"}
     else
-        "$EXECPATH"
+        if command -v unbuffer >/dev/null 2>&1; then
+            export AC_DISABLE_INTERACTIVE=0
+            unbuffer "$EXECPATH" ${CONFIG_ABS:+-c "$CONFIG_ABS"}
+        else
+            echo "⚠️  unbuffer not found, the output may not be line-buffered. Try installing expect."
+            exec "$EXECPATH" ${CONFIG_ABS:+-c "$CONFIG_ABS"}
+        fi
     fi
 fi

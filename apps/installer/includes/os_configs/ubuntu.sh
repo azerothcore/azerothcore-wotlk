@@ -32,7 +32,7 @@ $SUDO apt update
 DEBIAN_FRONTEND="noninteractive" $SUDO \
 apt-get -y install ccache clang cmake curl google-perftools libmysqlclient-dev make unzip jq screen tmux \
   libreadline-dev libncurses5-dev libncursesw5-dev libbz2-dev git gcc g++ libssl-dev \
-  libncurses-dev libboost-all-dev gdb gdbserver
+  libncurses-dev libboost-all-dev gdb gdbserver expect
 
   VAR_PATH="$CURRENT_PATH/../../../../var"
 
