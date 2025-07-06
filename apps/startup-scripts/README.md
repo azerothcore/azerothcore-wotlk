@@ -266,7 +266,7 @@ Production-ready service management:
 
 Services support two restart policies:
 
-- **`on-failure`** (default): Restart only on crashes or errors (exit code != 0)
+- **`on-failure`** (default): Restart only on crashes or errors (exit code != 0, only works with PM2 or systemd without tmux/screen)
 - **`always`**: Restart on any exit, including clean shutdown (exit code 0)
 
 **Important**: When using `--restart-policy always`, the in-game command `server shutdown X` will behave like `server restart X` - the service will automatically restart after shutdown. Only the shutdown message differs from a restart message.
