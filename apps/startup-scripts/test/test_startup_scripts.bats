@@ -118,6 +118,31 @@ teardown() {
     [[ "$output" =~ "Missing required arguments" ]] || [[ "$output" =~ "Error:" ]]
 }
 
+@test "service-manager: should validate restart policy values" {
+    run "$SCRIPT_DIR/service-manager.sh" create auth test-auth --bin-path /nonexistent --restart-policy invalid
+    [ "$status" -ne 0 ]
+    [[ "$output" =~ "Invalid restart policy" ]]
+}
+
+@test "service-manager: should accept valid restart policy values" {
+    # Test on-failure (should be accepted)
+    run "$SCRIPT_DIR/service-manager.sh" create auth test-auth --bin-path /nonexistent --restart-policy on-failure
+    # Should fail due to missing binary, not restart policy validation
+    [[ ! "$output" =~ "Invalid restart policy" ]]
+    
+    # Test always (should be accepted)
+    run "$SCRIPT_DIR/service-manager.sh" create auth test-auth2 --bin-path /nonexistent --restart-policy always
+    # Should fail due to missing binary, not restart policy validation
+    [[ ! "$output" =~ "Invalid restart policy" ]]
+}
+
+@test "service-manager: should include restart policy in help output" {
+    run "$SCRIPT_DIR/service-manager.sh" help
+    [ "$status" -eq 0 ]
+    [[ "$output" =~ "--restart-policy" ]]
+    [[ "$output" =~ "on-failure|always" ]]
+}
+
 # ===== EXAMPLE SCRIPTS TESTS =====
 
 @test "examples: restarter-world should show configuration error" {
