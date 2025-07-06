@@ -922,7 +922,21 @@ class spell_dru_starfall_dummy : public SpellScript
 
     void FilterTargets(std::list<WorldObject*>& targets)
     {
+        // Get caster object
+        Unit* caster = GetCaster();
+        // Remove targets if they are outside line of sight with respect to caster
+        targets.remove_if([&](WorldObject const* target)
+            {
+                if (Unit const* unitTarget = target->ToUnit())
+                {
+                    if (!caster->IsWithinLOS(target->GetPositionX(), target->GetPositionY(), target->GetPositionZ()))
+                        return true;
+                }
+                return false;
+            });
+        // Take 2 random targets from remaining within line of sight targets
         Acore::Containers::RandomResize(targets, 2);
+
     }
 
     void HandleDummy(SpellEffIndex /*effIndex*/)
