@@ -88,13 +88,19 @@ DELETE FROM `spell_custom_attr` WHERE `spell_id` = 45724;
 INSERT INTO `spell_custom_attr` (`spell_id`, `attributes`) VALUES
 (45724, 4194304);
 
-DELETE FROM `spell_linked_spell` WHERE `spell_trigger` IN(-45716, -46630) AND `spell_effect` = -45724 AND `type` = 0;
+DELETE FROM `spell_linked_spell` WHERE `spell_trigger` IN(45719, 46651, -45716, -46630) AND `spell_effect` IN (-45716, -46630, -45724) AND `type` = 0;
 INSERT INTO `spell_linked_spell` (`spell_trigger`, `spell_effect`, `type`, `comment`) VALUES
-(-45716, -45724, 0, '\'Torch Tossing Training\' removes \'Braziers Hit!\''),
-(-46630, -45724, 0, '\'Torch Tossing Practice\' removes \'Braziers Hit!\'');
+(45719, -45716, 0, '\'Torch Tossing Training Success\' removes \'Torch Tossing Training\''),
+(45719, -46630, 0, '\'Torch Tossing Training Success\' removes \'Torch Tossing Practice\''),
+(46651, -45716, 0, '\'Torch Tossing Training Success\' removes \'Torch Tossing Training\''),
+(46651, -46630, 0, '\'Torch Tossing Training Success\' removes \'Torch Tossing Practice\''),
+(-45716, -45724, 0, 'Removing \'Torch Tossing Training\' removes \'Braziers Hit!\''),
+(-46630, -45724, 0, 'Removing \'Torch Tossing Practice\' removes \'Braziers Hit!\'');
 
 DELETE FROM `spell_script_names` WHERE `spell_id` IN (45716, 46630, 45907, 45724);
 INSERT INTO `spell_script_names` (`spell_id`, `ScriptName`) VALUES
+(45716, 'spell_torch_tossing_training'),
+(46630, 'spell_torch_tossing_training'),
 (45907, 'spell_torch_target_picker'),
 (45724, 'spell_braziers_hit');
 

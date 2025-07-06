@@ -873,8 +873,7 @@ class spell_braziers_hit : public AuraScript
                 SPELL_TORCH_TOSSING_TRAINING_SUCCESS_H,
                 SPELL_TORCH_TOSSING_TRAINING,
                 SPELL_TORCH_TOSSING_PRACTICE,
-                SPELL_REMOVE_TORCHES
-            });
+             });
     }
 
     void HandleAfterEffectApply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
@@ -884,14 +883,11 @@ class spell_braziers_hit : public AuraScript
         if (!player)
             return;
 
-        if (GetStackAmount() >= (player->HasAura(SPELL_TORCH_TOSSING_TRAINING) ? 8 : 20))
+        if ((player->HasAura(SPELL_TORCH_TOSSING_TRAINING) && (GetStackAmount() >= 8)) ||
+            (player->HasAura(SPELL_TORCH_TOSSING_PRACTICE) && (GetStackAmount() >= 20)))
         {
             player->CastSpell(player, SPELL_TORCH_TOSSING_TRAINING_SUCCESS_A, true);
             player->CastSpell(player, SPELL_TORCH_TOSSING_TRAINING_SUCCESS_H, true);
-            player->CastSpell(player, SPELL_REMOVE_TORCHES);
-
-            player->RemoveAurasDueToSpell(SPELL_TORCH_TOSSING_TRAINING);
-            player->RemoveAurasDueToSpell(SPELL_TORCH_TOSSING_PRACTICE);
         }
     }
 
@@ -919,6 +915,27 @@ class spell_torch_target_picker : public SpellScript
     void Register() override
     {
         OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_torch_target_picker::SelectTargets, EFFECT_0, TARGET_UNIT_SRC_AREA_ENTRY);
+    }
+};
+
+class spell_torch_tossing_training : public AuraScript
+{
+    PrepareAuraScript(spell_torch_tossing_training)
+
+    bool Validate(SpellInfo const* /*spell*/) override
+    {
+        return ValidateSpellInfo({ SPELL_REMOVE_TORCHES });
+    }
+
+    void HandleAfterEffectRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
+    {
+        if (Unit* const target = GetTarget())
+            target->CastSpell(target, SPELL_REMOVE_TORCHES);
+    }
+
+    void Register() override
+    {
+        AfterEffectRemove += AuraEffectApplyFn(spell_torch_tossing_training::HandleAfterEffectRemove, EFFECT_0, SPELL_AURA_DETECT_AMORE, AURA_EFFECT_HANDLE_REAL_OR_REAPPLY_MASK);
     }
 };
 
@@ -1220,4 +1237,5 @@ void AddSC_event_midsummer_scripts()
     RegisterSpellScript(spell_midsummer_summon_ahune_lieutenant);
     RegisterSpellScript(spell_braziers_hit);
     RegisterSpellScript(spell_torch_target_picker);
+    RegisterSpellScript(spell_torch_tossing_training);
 }
