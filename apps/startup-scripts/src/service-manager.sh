@@ -1310,9 +1310,7 @@ function attach_tmux_session() {
     else
         echo -e "${RED}Error: tmux session '$tmux_session' not found${NC}"
         echo -e "${YELLOW}Available tmux sessions:${NC}"
-        tmux list-sessions 2>/dev/null || echo "No active tmux sessions"
-        echo -e "${BLUE}Starting new interactive session instead...${NC}"
-        attach_interactive_shell "$service_name" "$provider"
+        tmux list-sessions 2>/dev/null || echo "No active tmux sessions (is it stopped or restarting?)"
     fi
 }
 
@@ -1338,9 +1336,7 @@ function attach_screen_session() {
     else
         echo -e "${RED}Error: screen session '$screen_session' not found${NC}"
         echo -e "${YELLOW}Available screen sessions:${NC}"
-        screen -list 2>/dev/null || echo "No active screen sessions"
-        echo -e "${BLUE}Starting new interactive session instead...${NC}"
-        attach_interactive_shell "$service_name" "$provider"
+        screen -list 2>/dev/null || echo "No active screen sessions (is it stopped or restarting?)"
     fi
 }
 
