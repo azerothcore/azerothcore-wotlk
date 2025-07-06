@@ -31,11 +31,9 @@ CRASHES_PATH="$8"
 BINARY="$BINPATH/$BINFILE"
 
 # Default values (same as starter)
-DEFAULT_CRASHES_PATH="./crashes"
 DEFAULT_GDB_FILE="$CURRENT_PATH/gdb.conf"
 
 # Set defaults if not provided
-CRASHES_PATH="${CRASHES_PATH:-$DEFAULT_CRASHES_PATH}"
 GDB_FILE="${GDB_FILE:-$DEFAULT_GDB_FILE}"
 
 # Counters for crash detection
