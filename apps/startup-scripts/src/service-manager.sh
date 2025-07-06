@@ -97,7 +97,7 @@ function print_help() {
     echo ""
     echo "Options:"
     echo "  --provider <type>           - Service provider (pm2|systemd|auto, default: auto)"
-    echo "  --bin-path <path>           - Path to the server binary directory (required)"
+    echo "  --bin-path <path>           - Path to the server binary directory"
     echo "  --server-config <path>      - Path to the server configuration file"
     echo "  --session-manager <type>    - Session manager (none|tmux|screen, default: none)"
     echo "                                Note: PM2 doesn't support tmux/screen, always uses 'none'"
@@ -106,6 +106,9 @@ function print_help() {
     echo "  --user                      - Create as user service (systemd only, default)"
     echo "  --max-memory <value>        - Maximum memory limit (PM2 only)"
     echo "  --max-restarts <value>      - Maximum restart attempts (PM2 only)"
+    echo "  --restart-policy <policy>   - Restart policy (on-failure|always, default: always)"
+    echo "                                on-failure: restart only on crash/error (only works with PM2 or systemd without tmux/screen)"
+    echo "                                always: restart on any exit (including 'server shutdown')"
     echo "  --no-start                  - Do not start the service after creation"
     echo ""
     echo "Examples:"
@@ -124,6 +127,9 @@ function print_help() {
     echo "  # Create service without starting it"
     echo "  $base_name create auth authserver --bin-path /home/user/azerothcore/bin --no-start"
     echo ""
+    echo "  # Create service with always restart policy"
+    echo "  $base_name create world worldserver --bin-path /home/user/azerothcore/bin --restart-policy always"
+    echo ""
     echo "  # Update run-engine configuration"
     echo "  $base_name update worldserver-realm1 --session-manager screen --gdb-enabled 0"
     echo ""
@@ -138,6 +144,8 @@ function print_help() {
     echo "  - Use --server-config for the actual server configuration file"
     echo "  - Services use run-engine in 'start' mode for single-shot execution"
     echo "  - Restart on crash is handled by PM2 or systemd, not by run-engine"
+    echo "  - When restart-policy is 'always': 'server shutdown X' behaves like 'server restart X'"
+    echo "    (only the in-game message differs, but the service will restart automatically)"
     echo "  - PM2 services always use session-manager 'none' and have built-in attach functionality"
     echo "  - attach command automatically detects the configured session manager and connects appropriately"
     echo "  - attach always provides interactive access to the server console"
@@ -253,7 +261,8 @@ function get_service_info() {
 function pm2_create_service() {
     local service_name="$1"
     local command="$2"
-    shift 2
+    local restart_policy="$3"
+    shift 3
     
     check_pm2 || return 1
     
@@ -279,8 +288,18 @@ function pm2_create_service() {
         esac
     done
     
+
+    # Set stop exit codes based on restart policy
+    local stop_exit_codes=""
+    if [ "$restart_policy" = "always" ]; then
+        # PM2 will restart on any exit code (including 0)
+        stop_exit_codes=""
+    else
+        # PM2 will not restart on clean shutdown (exit code 0)
+        stop_exit_codes=" --stop-exit-codes 0"
+    fi
     # Build PM2 start command with AzerothCore environment variable
-    local pm2_cmd="AC_LAUNCHED_BY_PM2=1 pm2 start '$command$additional_args' --name '$service_name'"
+    local pm2_cmd="AC_LAUNCHED_BY_PM2=1 pm2 start '$command$additional_args' --name '$service_name'$stop_exit_codes"
     
     # Add memory limit if specified
     if [ -n "$max_memory" ]; then
@@ -382,8 +401,9 @@ function get_systemd_dir() {
 function systemd_create_service() {
     local service_name="$1"
     local command="$2"
+    local restart_policy="$3"
     local systemd_type="--user"
-    shift 2
+    shift 3
     
     check_systemd || return 1
     
@@ -430,14 +450,8 @@ function systemd_create_service() {
         session_name=$(grep -oP 'SESSION_NAME="\K[^"]+' "$run_engine_config_path" || echo "$service_name")
     fi
 
-    if [ "$session_manager" = "tmux" ]; then
+    if [ "$session_manager" = "tmux" ] || [ "$session_manager" = "screen" ]; then
         service_type="forking"
-        # Provide a direct and absolute path for the ExecStop command
-        exec_stop="ExecStop=/usr/bin/tmux kill-session -t $session_name"
-    elif [ "$session_manager" = "screen" ]; then
-        service_type="forking"
-        # Provide a direct and absolute path for the ExecStop command
-        exec_stop="ExecStop=/usr/bin/screen -S $session_name -X quit"
     fi
     
     # Create service file
@@ -453,8 +467,7 @@ After=network.target
 [Service]
 Type=${service_type}
 ExecStart=$command
-${exec_stop}
-Restart=always
+Restart=$restart_policy
 RestartSec=3
 User=$(whoami)
 Group=$(id -gn)
@@ -475,8 +488,7 @@ After=network.target
 [Service]
 Type=${service_type}
 ExecStart=$command
-${exec_stop}
-Restart=always
+Restart=$restart_policy
 RestartSec=3
 WorkingDirectory=$(realpath "$bin_path")
 StandardOutput=journal+console
@@ -651,6 +663,7 @@ function create_service() {
     local server_config=""
     local session_manager="none"
     local gdb_enabled="0"
+    local restart_policy="always"
     local systemd_type="--user"
     local pm2_opts=""
     local auto_start="true"
@@ -676,6 +689,10 @@ function create_service() {
                 ;;
             --gdb-enabled)
                 gdb_enabled="$2"
+                shift 2
+                ;;
+            --restart-policy)
+                restart_policy="$2"
                 shift 2
                 ;;
             --system)
@@ -714,7 +731,13 @@ function create_service() {
         echo -e "${RED}Error: Invalid provider. Use 'pm2', 'systemd', or 'auto'${NC}"
         return 1
     fi
-    
+
+    # Validate restart policy
+    if [[ "$restart_policy" != "on-failure" && "$restart_policy" != "always" ]]; then
+        echo -e "${RED}Error: Invalid restart policy. Use 'on-failure' or 'always'${NC}"
+        return 1
+    fi
+
     # PM2 specific validation and adjustments
     if [ "$provider" = "pm2" ]; then
         # PM2 doesn't support session managers (tmux/screen), force to none
@@ -728,11 +751,14 @@ function create_service() {
     # Determine server binary based on service type
     local server_bin="${service_type}server"
     local server_binary_path=$(realpath "$bin_path/$server_bin")
-    local real_config_path=$(realpath "$server_config")
+    local real_config_path=""
+    if [ -n "$server_config" ]; then
+        real_config_path=$(realpath "$server_config")
+    fi
 
     # Check if binary exists
     if [ ! -f "$server_binary_path" ]; then
-        echo -e "${RED}Error: Server binary not found: $server_binary_path${NC}"
+        echo -e "${RED}Error: Server binary not found: $server_binary_path, please check your --bin-path option ${NC}"
         return 1
     fi
     
@@ -747,6 +773,9 @@ export GDB_ENABLED=$gdb_enabled
 
 # Session manager (none|auto|tmux|screen)
 export SESSION_MANAGER="$session_manager"
+
+# Restart policy (on-failure|always)
+export RESTART_POLICY="$restart_policy"
 
 # Service mode - indicates this is running under a service manager (systemd/pm2)
 # When true, AC_DISABLE_INTERACTIVE will be set if no interactive session manager is used
@@ -778,6 +807,9 @@ EOF
 # run-engine configuration file
 RUN_ENGINE_CONFIG_FILE="$run_engine_config"
 
+# Restart policy
+RESTART_POLICY="$restart_policy"
+
 # Provider-specific options
 SYSTEMD_TYPE="$systemd_type"
 PM2_OPTS="$pm2_opts"
@@ -790,17 +822,17 @@ EOF
     local service_creation_success=false
     if [ "$provider" = "pm2" ]; then
         if [ -n "$pm2_opts" ]; then
-            if pm2_create_service "$service_name" "$run_engine_cmd" $pm2_opts; then
+            if pm2_create_service "$service_name" "$run_engine_cmd" "$restart_policy" $pm2_opts; then
                 service_creation_success=true
             fi
         else
-            if pm2_create_service "$service_name" "$run_engine_cmd"; then
+            if pm2_create_service "$service_name" "$run_engine_cmd" "$restart_policy"; then
                 service_creation_success=true
             fi
         fi
         
     elif [ "$provider" = "systemd" ]; then
-        if systemd_create_service "$service_name" "$run_engine_cmd" "$systemd_type"; then
+        if systemd_create_service "$service_name" "$run_engine_cmd" "$restart_policy" "$systemd_type"; then
             service_creation_success=true
         fi
     fi
@@ -882,6 +914,11 @@ function update_service() {
                 config_updated=true
                 shift 2
                 ;;
+            --restart-policy)
+                export RESTART_POLICY="$2"
+                config_updated=true
+                shift 2
+                ;;
             --system)
                 SYSTEMD_TYPE="--system"
                 shift
@@ -908,7 +945,13 @@ function update_service() {
         export SESSION_MANAGER="none"
         config_updated=true
     fi
-    
+
+    # Validate restart policy if provided
+    if [ -n "$RESTART_POLICY" ] && [[ "$RESTART_POLICY" != "on-failure" && "$RESTART_POLICY" != "always" ]]; then
+        echo -e "${RED}Error: Invalid restart policy. Use 'on-failure' or 'always'${NC}"
+        return 1
+    fi
+
     if [ "$config_updated" = "true" ]; then
         # Update run-engine configuration file
         cat > "$RUN_ENGINE_CONFIG_FILE" << EOF
@@ -920,6 +963,9 @@ export GDB_ENABLED=${GDB_ENABLED:-0}
 
 # Session manager (none|auto|tmux|screen)
 export SESSION_MANAGER="${SESSION_MANAGER:-none}"
+
+# Restart policy (on-failure|always)
+export RESTART_POLICY="${RESTART_POLICY:-on-failure}"
 
 # Service mode - indicates this is running under a service manager (systemd/pm2)
 export SERVICE_MODE="true"
@@ -952,6 +998,9 @@ EOF
 
 # run-engine configuration file
 RUN_ENGINE_CONFIG_FILE="$RUN_ENGINE_CONFIG_FILE"
+
+# Restart policy
+RESTART_POLICY="${RESTART_POLICY:-on-failure}"
 
 # Provider-specific options
 SYSTEMD_TYPE="$SYSTEMD_TYPE"
@@ -1261,9 +1310,7 @@ function attach_tmux_session() {
     else
         echo -e "${RED}Error: tmux session '$tmux_session' not found${NC}"
         echo -e "${YELLOW}Available tmux sessions:${NC}"
-        tmux list-sessions 2>/dev/null || echo "No active tmux sessions"
-        echo -e "${BLUE}Starting new interactive session instead...${NC}"
-        attach_interactive_shell "$service_name" "$provider"
+        tmux list-sessions 2>/dev/null || echo "No active tmux sessions (is it stopped or restarting?)"
     fi
 }
 
@@ -1289,9 +1336,7 @@ function attach_screen_session() {
     else
         echo -e "${RED}Error: screen session '$screen_session' not found${NC}"
         echo -e "${YELLOW}Available screen sessions:${NC}"
-        screen -list 2>/dev/null || echo "No active screen sessions"
-        echo -e "${BLUE}Starting new interactive session instead...${NC}"
-        attach_interactive_shell "$service_name" "$provider"
+        screen -list 2>/dev/null || echo "No active screen sessions (is it stopped or restarting?)"
     fi
 }
 
