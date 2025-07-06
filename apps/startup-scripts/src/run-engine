@@ -279,8 +279,9 @@ function start_service() {
         
         # Set up directories and logging relative to BINPATH
         LOGS_PATH="${LOGS_PATH:-"$BINPATH/logs"}"
+        CRASHES_PATH="${CRASHES_PATH:-"$BINPATH/crashes"}"
         mkdir -p "$LOGS_PATH"
-        mkdir -p "$LOGS_PATH/crashes"
+        mkdir -p "$CRASHES_PATH"
     else
         # For system binaries, try to detect binary location and create logs accordingly
         local detected_binpath=""
@@ -297,12 +298,13 @@ function start_service() {
         # Set up log paths based on detected or fallback location
         if [ -n "$detected_binpath" ]; then
             LOGS_PATH="${LOGS_PATH:-"$detected_binpath/logs"}"
+            CRASHES_PATH="${CRASHES_PATH:-"$detected_binpath/crashes"}"
         else
             # Fallback to current directory for logs
             LOGS_PATH="${LOGS_PATH:-./logs}"
+            CRASHES_PATH="${CRASHES_PATH:-"$./crashes"}"
         fi
             
-        CRASHES_PATH="${CRASHES_PATH:-"$LOGS_PATH/crashes"}"
         
         mkdir -p "$LOGS_PATH"
         mkdir -p "$CRASHES_PATH"

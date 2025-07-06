@@ -26,7 +26,7 @@ CRASHES_PATH="$8"
 
 # Default values
 CURRENT_PATH="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-DEFAULT_CRASHES_PATH="$CURRENT_PATH/logs/crashes"
+DEFAULT_CRASHES_PATH=$(realpath "$BINPATH/crashes")
 [ -n "$CONFIG" ] && CONFIG_ABS=$(realpath "$CONFIG")
 
 # Set defaults if not provided
@@ -121,20 +121,9 @@ EOF
         rm -f "$GDB_TEMP_FILE"
     fi
 else
-    # check if it's running under PM2 or `script` command does not exist
-    # Note: script is used to capture output in non-interactive sessions such as systemd (without tmux/screen)
-    # We use AC_LAUNCHED_BY_PM2 environment variable set by service-manager for robust PM2 detection
-    if [[ "$AC_LAUNCHED_BY_PM2" == "1" || ! -x "$(command -v script)" ]]; then
-        if [ -n "$CONFIG_ABS" ]; then
-            "$EXECPATH" -c "$CONFIG_ABS"
-        else
-            "$EXECPATH"
-        fi
+    if [ -n "$CONFIG_ABS" ]; then
+        "$EXECPATH" -c "$CONFIG_ABS"
     else
-        if [ -n "$CONFIG_ABS" ]; then
-            script -q -e -c "$EXECPATH -c \"$CONFIG_ABS\""
-        else
-            script -q -e -c "$EXECPATH"
-        fi
+        "$EXECPATH"
     fi
 fi
