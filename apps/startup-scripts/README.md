@@ -410,7 +410,7 @@ The startup scripts recognize several environment variables for configuration an
 #### Service Detection Variables
 
 - **`AC_LAUNCHED_BY_PM2`**: Set to `1` when launched by PM2 (automatically set by service-manager)
-  - Disables the use of the `script` command for output capture
+  - Disables the use of the `unbuffer` command for output capture
   - Enables non-interactive mode to prevent prompts
   - More robust than relying on PM2's internal variables
   
