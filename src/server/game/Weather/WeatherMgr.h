@@ -27,17 +27,13 @@
 class Weather;
 class Player;
 
+struct WeatherData;
+
 namespace WeatherMgr
 {
     void LoadWeatherData();
 
-    Weather* FindWeather(uint32 id);
-    Weather* AddWeather(uint32 zoneID);
-    void RemoveWeather(uint32 zoneID);
-
-    void SendFineWeatherUpdateToPlayer(Player* player);
-
-    void Update(uint32 diff);
+    WeatherData const* GetWeatherData(uint32 zoneID);
 }
 
 #endif

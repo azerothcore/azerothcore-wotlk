@@ -15,68 +15,26 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-/** \file
-    \ingroup world
-*/
-
-#include "WeatherMgr.h"
+#include "Containers.h"
 #include "Log.h"
 #include "MiscPackets.h"
 #include "ObjectMgr.h"
 #include "Player.h"
+#include "Timer.h"
 #include "Weather.h"
-#include "WorldSession.h"
+#include "WeatherMgr.h"
 
 namespace WeatherMgr
 {
 
     namespace
     {
-        typedef std::unordered_map<uint32, std::unique_ptr<Weather>> WeatherMap;
-        typedef std::unordered_map<uint32, WeatherData> WeatherZoneMap;
-
-        WeatherMap _weathers;
-        WeatherZoneMap mWeatherZoneMap;
-
-        WeatherData const* GetWeatherData(uint32 zoneID)
-        {
-            WeatherZoneMap::const_iterator itr = mWeatherZoneMap.find(zoneID);
-            return (itr != mWeatherZoneMap.end()) ? &itr->second : nullptr;
-        }
+        std::unordered_map<uint32, WeatherData> _weatherData;
     }
 
-    /// Find a Weather object by the given zoneid
-    Weather* FindWeather(uint32 id)
+    WeatherData const* GetWeatherData(uint32 zoneID)
     {
-        WeatherMap::const_iterator itr = _weathers.find(id);
-        return (itr != _weathers.end()) ? itr->second.get() : 0;
-    }
-
-    /// Remove a Weather object for the given zoneid
-    void RemoveWeather(uint32 id)
-    {
-        // not called at the moment. Kept for completeness
-        WeatherMap::iterator itr = _weathers.find(id);
-
-        if (itr != _weathers.end())
-            _weathers.erase(itr);
-    }
-
-    /// Add a Weather object to the list
-    Weather* AddWeather(uint32 zoneID)
-    {
-        WeatherData const* weatherChances = GetWeatherData(zoneID);
-
-        // zone does not have weather, ignore
-        if (!weatherChances)
-            return nullptr;
-
-        Weather* w = new Weather(zoneID, weatherChances);
-        _weathers[w->GetZone()].reset(w);
-        w->ReGenerate();
-        w->UpdateWeather();
-
-        return w;
+        return Acore::Containers::MapGetValuePtr(_weatherData, zoneID);
     }
 
     void LoadWeatherData()
@@ -105,7 +63,7 @@ namespace WeatherMgr
 
             uint32 zoneID = fields[0].Get<uint32>();
 
-            WeatherData& wzc = mWeatherZoneMap[zoneID];
+            WeatherData& wzc = _weatherData[zoneID];
 
             for (uint8 season = 0; season < WEATHER_SEASONS; ++season)
             {
@@ -139,28 +97,6 @@ namespace WeatherMgr
 
         LOG_INFO("server.loading", ">> Loaded {} Weather Definitions in {} ms", count, GetMSTimeDiffToNow(oldMSTime));
         LOG_INFO("server.loading", " ");
-    }
-
-    void SendFineWeatherUpdateToPlayer(Player* player)
-    {
-        WorldPackets::Misc::Weather weather(WEATHER_STATE_FINE);
-        player->SendDirectMessage(weather.Write());
-    }
-
-    void Update(uint32 diff)
-    {
-        ///- Send an update signal to Weather objects
-        WeatherMap::iterator itr, next;
-        for (itr = _weathers.begin(); itr != _weathers.end(); itr = next)
-        {
-            next = itr;
-            ++next;
-
-            ///- and remove Weather objects for zones with no player
-            // As interval > WorldTick
-            if (!itr->second->Update(diff))
-                _weathers.erase(itr);
-        }
     }
 
 } // namespace

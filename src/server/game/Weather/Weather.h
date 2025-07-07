@@ -72,6 +72,7 @@ public:
     bool UpdateWeather();
 
     void SendWeatherUpdateToPlayer(Player* player);
+    static void SendFineWeatherUpdateToPlayer(Player* player);
     void SetWeather(WeatherType type, float intensity);
 
     [[nodiscard]] uint32 GetZone() const { return _zone; };

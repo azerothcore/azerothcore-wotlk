@@ -190,6 +190,12 @@ void Weather::SendWeatherUpdateToPlayer(Player* player)
     player->SendDirectMessage(weather.Write());
 }
 
+void Weather::SendFineWeatherUpdateToPlayer(Player* player)
+{
+    WorldPackets::Misc::Weather weather(WEATHER_STATE_FINE);
+    player->SendDirectMessage(weather.Write());
+}
+
 /// Send the new weather to all players in the zone
 bool Weather::UpdateWeather()
 {

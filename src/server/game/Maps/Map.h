@@ -33,6 +33,7 @@
 #include "PathGenerator.h"
 #include "Position.h"
 #include "SharedDefines.h"
+#include "Timer.h"
 #include "TaskScheduler.h"
 #include "GridTerrainData.h"
 #include <bitset>
@@ -61,6 +62,7 @@ class Transport;
 class StaticTransport;
 class MotionTransport;
 class PathGenerator;
+class Weather;
 
 enum WeatherState : uint32;
 
@@ -130,8 +132,9 @@ struct ZoneDynamicInfo
     ZoneDynamicInfo();
 
     uint32 MusicId;
+    std::unique_ptr<Weather> DefaultWeather;
     WeatherState WeatherId;
-    float WeatherGrade;
+    float Intensity;
     uint32 OverrideLightId;
     uint32 LightFadeInTime;
 };
@@ -461,13 +464,17 @@ public:
 
     void SendInitTransports(Player* player);
     void SendRemoveTransports(Player* player);
-    void SendZoneDynamicInfo(Player* player);
     void SendInitSelf(Player* player);
+
+    void SendZoneDynamicInfo(uint32 zoneId, Player* player) const;
+    void SendZoneWeather(uint32 zoneId, Player* player) const;
+    void SendZoneWeather(ZoneDynamicInfo const& zoneDynamicInfo, Player* player) const;
 
     void PlayDirectSoundToMap(uint32 soundId, uint32 zoneId = 0);
     void SetZoneMusic(uint32 zoneId, uint32 musicId);
-    void SetZoneWeather(uint32 zoneId, WeatherState weatherId, float weatherGrade);
-    void SetZoneOverrideLight(uint32 zoneId, uint32 lightId, Milliseconds fadeInTime);
+    Weather* GetOrGenerateZoneDefaultWeather(uint32 zoneId);
+    void SetZoneWeather(uint32 zoneID, WeatherState weatherID, float intensity);
+    void SetZoneOverrideLight(uint32 zoneID, uint32 lightID, Milliseconds fadeInTime);
 
     // Checks encounter state at kill/spellcast, originally in InstanceScript however not every map has instance script :(
     void UpdateEncounterState(EncounterCreditType type, uint32 creditEntry, Unit* source);
@@ -616,6 +623,7 @@ private:
     std::unordered_map<uint32, uint32> _zonePlayerCountMap;
 
     ZoneDynamicInfoMap _zoneDynamicInfo;
+    IntervalTimer _weatherUpdateTimer;
     uint32 _defaultLight;
 
     template<HighGuid high>
