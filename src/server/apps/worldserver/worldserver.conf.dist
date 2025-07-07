@@ -678,6 +678,7 @@ Appender.Errors=2,5,0,Errors.log,w
 #
 
 Logger.root=2,Console Server
+#Logger.metric=2,Console Server
 #Logger.commands.gm=4,Console GM
 Logger.diff=3,Console Server
 Logger.mmaps=4,Server
@@ -812,6 +813,37 @@ Log.Async.Enable = 0
 Metric.Enable = 0
 
 #
+#    Metric.InfluxDB
+#        Description: Connection settings for InfluxDB.
+#
+#        For InfluxDB v1:
+#                     Only fill in Metric.InfluxDB.Connection.
+#
+#        Example:
+#                     Metric.InfluxDB.Connection = "hostname;port;database"
+#
+#        For InfluxDB v2:
+#                     Fill in every field.
+#
+#        NOTE:        Currently, Grafana will not work with the provided json files to visualize
+#                     data from InfluxDB v2.
+#
+#        Example:
+#                     Metric.InfluxDB.Connection = "hostname;port"
+#                     Metric.InfluxDB.v2 = 0 - (Disabled)
+#                                          1 - (Enabled)
+#                     Metric.InfluxDB.Org = "my-org"
+#                     Metric.InfluxDB.Bucket = "my-bucket"
+#                     Metric.InfluxDB.Token = "my-token"
+#
+
+Metric.InfluxDB.Connection = "127.0.0.1;8086;worldserver"
+Metric.InfluxDB.v2 = 0
+Metric.InfluxDB.Org = ""
+Metric.InfluxDB.Bucket = ""
+Metric.InfluxDB.Token = ""
+
+#
 #    Metric.Interval
 #        Description: Interval between every batch of data sent in seconds.
 #                     Longer interval means larger batch of data. If the batch
@@ -820,15 +852,6 @@ Metric.Enable = 0
 #
 
 Metric.Interval = 1
-
-#
-#    Metric.ConnectionInfo
-#        Description: Connection settings for metric database (currently InfluxDB).
-#        Example:     "hostname;port;database"
-#        Default:     "127.0.0.1;8086;worldserver"
-#
-
-Metric.ConnectionInfo = "127.0.0.1;8086;worldserver"
 
 #
 #    Metric.OverallStatusInterval

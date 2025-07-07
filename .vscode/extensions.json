@@ -10,6 +10,9 @@
         "github.vscode-pull-request-github",
         "eamodio.gitlens",
         "cschlosser.doxdocgen",
-        "sanaajani.taskrunnercode"
+        "sanaajani.taskrunnercode",
+        "mads-hartmann.bash-ide-vscode",
+        "jetmartin.bats",
+        "ms-vscode.makefile-tools",
     ]
 }
