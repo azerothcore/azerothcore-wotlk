@@ -1,3 +1,4 @@
+-- DB update 2025_07_03_03 -> 2025_07_07_00
 
 -- On death remove aura
 UPDATE `creature_template` SET `AIName` = 'SmartAI' WHERE `entry` = 28511;
