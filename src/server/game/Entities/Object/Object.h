@@ -432,6 +432,7 @@ private:
 
     size_t GetMapUpdateListOffset() const
     {
+        ASSERT(_mapUpdateState == Updating, "Attempted to get update list offset when object is not in map update list");
         return _mapUpdateListOffset;
     }
 

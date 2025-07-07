@@ -3911,5 +3911,8 @@ bool Creature::IsUpdateNeeded()
     if (GetMotionMaster()->HasMovementGeneratorType(WAYPOINT_MOTION_TYPE))
         return true;
 
+    if (HasUnitState(UNIT_STATE_EVADE))
+        return true;
+
     return false;
 }
