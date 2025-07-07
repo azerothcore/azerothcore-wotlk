@@ -35,12 +35,12 @@ namespace WeatherMgr
         typedef std::unordered_map<uint32, std::unique_ptr<Weather>> WeatherMap;
         typedef std::unordered_map<uint32, WeatherData> WeatherZoneMap;
 
-        WeatherMap m_weathers;
+        WeatherMap _weathers;
         WeatherZoneMap mWeatherZoneMap;
 
-        WeatherData const* GetWeatherData(uint32 zone_id)
+        WeatherData const* GetWeatherData(uint32 zoneID)
         {
-            WeatherZoneMap::const_iterator itr = mWeatherZoneMap.find(zone_id);
+            WeatherZoneMap::const_iterator itr = mWeatherZoneMap.find(zoneID);
             return (itr != mWeatherZoneMap.end()) ? &itr->second : nullptr;
         }
     }
@@ -48,31 +48,31 @@ namespace WeatherMgr
     /// Find a Weather object by the given zoneid
     Weather* FindWeather(uint32 id)
     {
-        WeatherMap::const_iterator itr = m_weathers.find(id);
-        return (itr != m_weathers.end()) ? itr->second.get() : 0;
+        WeatherMap::const_iterator itr = _weathers.find(id);
+        return (itr != _weathers.end()) ? itr->second.get() : 0;
     }
 
     /// Remove a Weather object for the given zoneid
     void RemoveWeather(uint32 id)
     {
         // not called at the moment. Kept for completeness
-        WeatherMap::iterator itr = m_weathers.find(id);
+        WeatherMap::iterator itr = _weathers.find(id);
 
-        if (itr != m_weathers.end())
-            m_weathers.erase(itr);
+        if (itr != _weathers.end())
+            _weathers.erase(itr);
     }
 
     /// Add a Weather object to the list
-    Weather* AddWeather(uint32 zone_id)
+    Weather* AddWeather(uint32 zoneID)
     {
-        WeatherData const* weatherChances = GetWeatherData(zone_id);
+        WeatherData const* weatherChances = GetWeatherData(zoneID);
 
         // zone does not have weather, ignore
         if (!weatherChances)
             return nullptr;
 
-        Weather* w = new Weather(zone_id, weatherChances);
-        m_weathers[w->GetZone()].reset(w);
+        Weather* w = new Weather(zoneID, weatherChances);
+        _weathers[w->GetZone()].reset(w);
         w->ReGenerate();
         w->UpdateWeather();
 
@@ -103,9 +103,9 @@ namespace WeatherMgr
         {
             Field* fields = result->Fetch();
 
-            uint32 zone_id = fields[0].Get<uint32>();
+            uint32 zoneID = fields[0].Get<uint32>();
 
-            WeatherData& wzc = mWeatherZoneMap[zone_id];
+            WeatherData& wzc = mWeatherZoneMap[zoneID];
 
             for (uint8 season = 0; season < WEATHER_SEASONS; ++season)
             {
@@ -116,19 +116,19 @@ namespace WeatherMgr
                 if (wzc.data[season].rainChance > 100)
                 {
                     wzc.data[season].rainChance = 25;
-                    LOG_ERROR("sql.sql", "Weather for zone {} season {} has wrong rain chance > 100%", zone_id, season);
+                    LOG_ERROR("sql.sql", "Weather for zone {} season {} has wrong rain chance > 100%", zoneID, season);
                 }
 
                 if (wzc.data[season].snowChance > 100)
                 {
                     wzc.data[season].snowChance = 25;
-                    LOG_ERROR("sql.sql", "Weather for zone {} season {} has wrong snow chance > 100%", zone_id, season);
+                    LOG_ERROR("sql.sql", "Weather for zone {} season {} has wrong snow chance > 100%", zoneID, season);
                 }
 
                 if (wzc.data[season].stormChance > 100)
                 {
                     wzc.data[season].stormChance = 25;
-                    LOG_ERROR("sql.sql", "Weather for zone {} season {} has wrong storm chance > 100%", zone_id, season);
+                    LOG_ERROR("sql.sql", "Weather for zone {} season {} has wrong storm chance > 100%", zoneID, season);
                 }
             }
 
@@ -151,7 +151,7 @@ namespace WeatherMgr
     {
         ///- Send an update signal to Weather objects
         WeatherMap::iterator itr, next;
-        for (itr = m_weathers.begin(); itr != m_weathers.end(); itr = next)
+        for (itr = _weathers.begin(); itr != _weathers.end(); itr = next)
         {
             next = itr;
             ++next;
@@ -159,7 +159,7 @@ namespace WeatherMgr
             ///- and remove Weather objects for zones with no player
             // As interval > WorldTick
             if (!itr->second->Update(diff))
-                m_weathers.erase(itr);
+                _weathers.erase(itr);
         }
     }
 

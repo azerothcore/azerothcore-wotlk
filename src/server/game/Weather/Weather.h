@@ -45,6 +45,7 @@ enum WeatherState : uint32
 {
     WEATHER_STATE_FINE              = 0,
     WEATHER_STATE_FOG               = 1,
+    WEATHER_STATE_DRIZZLE           = 2,
     WEATHER_STATE_LIGHT_RAIN        = 3,
     WEATHER_STATE_MEDIUM_RAIN       = 4,
     WEATHER_STATE_HEAVY_RAIN        = 5,
@@ -63,7 +64,7 @@ enum WeatherState : uint32
 class Weather
 {
 public:
-    Weather(uint32 zone, WeatherData const* weatherChances);
+    Weather(uint32 zoneID, WeatherData const* weatherChances);
     ~Weather() = default;
 
     bool Update(uint32 diff);
@@ -71,18 +72,17 @@ public:
     bool UpdateWeather();
 
     void SendWeatherUpdateToPlayer(Player* player);
-    void SetWeather(WeatherType type, float grade);
+    void SetWeather(WeatherType type, float intensity);
 
-    /// For which zone is this weather?
-    [[nodiscard]] uint32 GetZone() const { return m_zone; };
-    [[nodiscard]] uint32 GetScriptId() const { return m_weatherChances->ScriptId; }
+    [[nodiscard]] uint32 GetZone() const { return _zone; };
+    [[nodiscard]] uint32 GetScriptId() const { return _weatherChances->ScriptId; }
 
 private:
     [[nodiscard]] WeatherState GetWeatherState() const;
-    uint32 m_zone;
-    WeatherType m_type;
-    float m_grade;
-    IntervalTimer m_timer;
-    WeatherData const* m_weatherChances;
+    uint32 _zone;
+    WeatherType _type;
+    float _intensity;
+    IntervalTimer _timer;
+    WeatherData const* _weatherChances;
 };
 #endif

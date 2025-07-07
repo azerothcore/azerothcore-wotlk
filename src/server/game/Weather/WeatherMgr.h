@@ -32,8 +32,8 @@ namespace WeatherMgr
     void LoadWeatherData();
 
     Weather* FindWeather(uint32 id);
-    Weather* AddWeather(uint32 zone_id);
-    void RemoveWeather(uint32 zone_id);
+    Weather* AddWeather(uint32 zoneID);
+    void RemoveWeather(uint32 zoneID);
 
     void SendFineWeatherUpdateToPlayer(Player* player);
 
