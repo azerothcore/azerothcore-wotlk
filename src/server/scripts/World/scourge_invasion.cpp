@@ -254,8 +254,7 @@ struct npc_necropolis_health : public ScriptedAI
         me->GetGameObjectListWithEntryInGrid(
             necropolisList,
             { GO_NECROPOLIS_TINY, GO_NECROPOLIS_SMALL, GO_NECROPOLIS_MEDIUM, GO_NECROPOLIS_BIG, GO_NECROPOLIS_HUGE },
-            ATTACK_DISTANCE // ATTACK_DISTANCE
-            // 30.0f // ATTACK_DISTANCE
+            ATTACK_DISTANCE
         );
         for (GameObject* const& necropolis : necropolisList)
             necropolis->DespawnOrUnsummon();
@@ -958,7 +957,6 @@ struct npc_pallid_horror : public ScriptedAI
                 float angle = static_cast<float>(i) * (M_PIf / (static_cast<float>(amount) / 2.f)) + me->GetOrientation();
                 summon->GetMotionMaster()->Clear(true);
                 summon->GetMotionMaster()->MoveFollow(me, 2.5f, angle);
-                // summon->AI()->SetData(DATA_FLAMESHOCKER_IS_FOLLOWER, 1);
                 _summons.Summon(summon);
             }
         }
@@ -988,7 +986,6 @@ struct npc_pallid_horror : public ScriptedAI
         // Spawn necrotic crystal gobject
         DoCastSelf((me->GetZoneId() == AREA_UNDERCITY ? SPELL_SUMMON_FAINT_NECROTIC_CRYSTAL : SPELL_SUMMON_CRACKED_NECROTIC_CRYSTAL), true);
 
-        // TimePoint now = me->GetMap()->GetCurrentClockTime();
         TimePoint now = std::chrono::steady_clock::now();
         uint32 cityAttackTimer = urand(CITY_ATTACK_TIMER_MIN, CITY_ATTACK_TIMER_MAX);
         TimePoint nextAttack = now + std::chrono::seconds(cityAttackTimer);
