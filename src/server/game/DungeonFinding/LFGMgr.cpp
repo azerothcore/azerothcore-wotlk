@@ -1496,10 +1496,6 @@ namespace lfg
             {
                 uint32 dungeonId = (it2->first & 0x00FFFFFF); // Compare dungeon ids
 
-                // Skip faction-specific locks if cross-faction is enabled
-                if (sWorld->getBoolConfig(CONFIG_ALLOW_TWO_SIDE_INTERACTION_GROUP) && (it2->second == LFG_LOCKSTATUS_QUEST_NOT_COMPLETED || it2->second == LFG_LOCKSTATUS_MISSING_ITEM))
-                    continue;
-
                 LfgDungeonSet::iterator itDungeon = dungeons.find(dungeonId);
                 if (itDungeon != dungeons.end())
                 {
