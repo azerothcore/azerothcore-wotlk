@@ -960,7 +960,8 @@ enum win_friends
     NPC_SCARLET_PREACHER     = 28939,
     NPC_SCARLET_COMMANDER    = 28936,
     NPC_SCARLET_CRUSADER     = 28940,
-    NPC_SCARLET_MARKSMAN     = 28610
+    NPC_SCARLET_MARKSMAN     = 28610,
+    NPC_SCARLET_LORD_MCCREE  = 28964
 };
 
 // 52781 - Persuasive Strike
@@ -982,7 +983,7 @@ class spell_chapter2_persuasive_strike : public SpellScript
         if (!creature || !player)
             return;
 
-        if (!creature->EntryEquals(NPC_SCARLET_PREACHER, NPC_SCARLET_COMMANDER, NPC_SCARLET_CRUSADER, NPC_SCARLET_MARKSMAN))
+        if (!creature->EntryEquals(NPC_SCARLET_PREACHER, NPC_SCARLET_COMMANDER, NPC_SCARLET_CRUSADER, NPC_SCARLET_MARKSMAN, NPC_SCARLET_LORD_MCCREE))
             return;
 
         sCreatureTextMgr->SendChat(creature, SAY_PERSUADE_RAND, nullptr, CHAT_MSG_ADDON, LANG_ADDON, TEXT_RANGE_NORMAL, 0, TEAM_NEUTRAL, false, player);
