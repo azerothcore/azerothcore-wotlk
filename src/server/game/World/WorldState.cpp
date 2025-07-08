@@ -1253,9 +1253,40 @@ void WorldState::SetScourgeInvasionState(SIState state)
     Save(SAVE_ID_SCOURGE_INVASION);
 }
 
-void WorldState::StartScourgeInvasion(bool /*sendMail*/)
+void WorldState::SendScourgeInvasionMail()
+{
+    QueryResult result = CharacterDatabase.Query("SELECT guid FROM characters WHERE level >= 50");
+    if (result)
+    {
+        CharacterDatabaseTransaction trans = CharacterDatabase.BeginTransaction();
+        MailDraft draft(MAIL_TEMPLATE_ARGENT_DAWN_NEEDS_YOUR_HELP);
+        uint32 count = 0;
+        do
+        {
+            Field* fields = result->Fetch();
+            ObjectGuid playerGUID = ObjectGuid::Create<HighGuid::Player>(fields[0].Get<uint32>());
+
+            // Add item manually. SendMailTo does not add items for offline players
+            if (Item* item = Item::CreateItem(ITEM_A_LETTER_FROM_THE_KEEPER_OF_THE_ROLLS, 1))
+            {
+                item->SaveToDB(trans);
+                draft.AddItem(item);
+            }
+
+            draft.SendMailTo(trans, MailReceiver(playerGUID.GetCounter()), NPC_ARGENT_EMISSARY, MAIL_CHECK_MASK_HAS_BODY);
+            ++count;
+        } while (result->NextRow());
+        CharacterDatabase.CommitTransaction(trans);
+        LOG_INFO("WorldState", "SendScourgeInvasionMail sent to {} characters", count);
+    }
+}
+
+void WorldState::StartScourgeInvasion(bool sendMail)
 {
     sGameEventMgr->StartEvent(GAME_EVENT_SCOURGE_INVASION, false);
+
+    if (sendMail)
+        SendScourgeInvasionMail();
 
     BroadcastSIWorldstates();
     if (m_siData.m_state == STATE_1_ENABLED)

@@ -109,13 +109,14 @@ enum WorldStateGameEvents
 
 enum SIMisc
 {
-    // scourge_invasion.h
-    // @todo: imports?
     EVENT_HERALD_OF_THE_LICH_KING_ZONE_START     = 7,
     EVENT_HERALD_OF_THE_LICH_KING_ZONE_STOP      = 8,
     NPC_PALLID_HORROR                            = 16394,
     NPC_PATCHWORK_TERROR                         = 16382,
     NPC_HERALD_OF_THE_LICH_KING                  = 16995,
+    ITEM_A_LETTER_FROM_THE_KEEPER_OF_THE_ROLLS   = 22723,
+    NPC_ARGENT_EMISSARY                          = 16285,
+    MAIL_TEMPLATE_ARGENT_DAWN_NEEDS_YOUR_HELP    = 171,
 };
 
 enum SIState : uint32
@@ -368,6 +369,7 @@ class WorldState
         void OnDisable(ScourgeInvasionData::InvasionZone& zone);
         void OnDisable(ScourgeInvasionData::CityAttack& zone);
     private:
+        void SendScourgeInvasionMail();
         ScourgeInvasionData m_siData;
 
 };
