@@ -955,8 +955,6 @@ enum win_friends
     SAY_PERSUADED5           = 6,
     SAY_PERSUADED6           = 7,
     SAY_PERSUADE_RAND        = 8,
-    SPELL_PERSUASIVE_STRIKE  = 52781,
-    SPELL_THREAT_PULSE       = 58111,
     QUEST_HOW_TO_WIN_FRIENDS = 12720,
 
     NPC_SCARLET_PREACHER     = 28939,
