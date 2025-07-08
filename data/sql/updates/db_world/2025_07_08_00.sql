@@ -1,3 +1,4 @@
+-- DB update 2025_07_07_00 -> 2025_07_08_00
 
 -- Set Spell Script
 DELETE FROM `spell_script_names` WHERE `ScriptName` = 'spell_chapter2_persuasive_strike';
