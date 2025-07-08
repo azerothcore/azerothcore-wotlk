@@ -24,6 +24,9 @@
 #include "ScriptedEscortAI.h"
 #include "SpellInfo.h"
 #include "SpellScript.h"
+#include "MotionMaster.h"
+#include "ObjectAccessor.h"
+#include <limits>
 
 //How to win friends and influence enemies
 // texts signed for creature 28939 but used for 28939, 28940, 28610
@@ -701,10 +704,406 @@ public:
     };
 };
 
+// Spell and NPC IDs for Scourge Assault event
+enum NecroSpells
+{
+    SPELL_SCARLET_GHOUL   = 52683,  // Raises a Scarlet Ghoul from a humanoid corpse
+    SPELL_SCOURGE_GRYPHON = 52685,  // Raises a Scourge Gryphon from a gryphon corpse
+    SPELL_GHOULPLOSION    = 52672   // Causes a Gluttonous Geist to explode (kill)
+};
+
+enum NecroNPCs
+{
+    NPC_GLUTTONOUS_GEIST            = 28905,
+    NPC_DEAD_SCARLET_MEDIC          = 28895,
+    NPC_DEAD_SCARLET_INFANTRYMAN    = 28896,
+    NPC_DEAD_SCARLET_CAPTAIN        = 28898,
+    NPC_DEAD_SCARLET_PEASANT        = 28892,
+    NPC_DEAD_SCARLET_MINER          = 28891,
+    NPC_DEAD_SCARLET_FLEET_DEFENDER = 28886,
+    NPC_DEAD_SCARLET_GRYPHON        = 28893
+};
+
+/*######
+## npc_acherus_necromancer (Entry 28889)
+######*/
+class npc_acherus_necromancer : public CreatureScript
+{
+public:
+    npc_acherus_necromancer() : CreatureScript("npc_acherus_necromancer") { }
+
+    struct npc_acherus_necromancerAI : public ScriptedAI
+    {
+        npc_acherus_necromancerAI(Creature* creature) : ScriptedAI(creature) { }
+
+        EventMap events;
+        ObjectGuid targetCorpseGUID;
+        ObjectGuid geistGUID;
+        bool isOnRitual;
+
+        // Event timers (IDs)
+        enum Events
+        {
+            EVENT_START_RITUAL = 1,
+            EVENT_GHOULPLOSION,
+            EVENT_RAISE_GHOUL,
+            EVENT_RESUME_WP
+        };
+
+        // Point ID for movement
+        enum Points
+        {
+            POINT_CORPSE_REACHED = 1
+        };
+
+        void Reset() override
+        {
+            events.Reset();
+            targetCorpseGUID.Clear();
+            geistGUID.Clear();
+            isOnRitual = false;
+            // Start waypoint movement using WaypointMovementGenerator
+            if (uint32 pathId = me->GetWaypointPath())
+            {
+                me->GetMotionMaster()->MovePath(pathId, true); // true = repeatable
+            }
+            // Schedule the first ritual after 20-30s
+            events.ScheduleEvent(EVENT_START_RITUAL, urand(20000, 30000));
+        }
+
+        void UpdateAI(uint32 diff) override
+        {
+            events.Update(diff);
+
+            if (uint32 eventId = events.ExecuteEvent())
+            {
+                switch (eventId)
+                {
+                    case EVENT_START_RITUAL:
+                    {
+                        if (isOnRitual) // Already performing ritual
+                        {
+                            events.ScheduleEvent(EVENT_START_RITUAL, urand(5000, 10000));
+                            break;
+                        }
+
+                        // Find nearest dead Scarlet humanoid (exclude gryphon)
+                        Creature* nearestCorpse = nullptr;
+                        float nearestDist = std::numeric_limits<float>::max();
+                        static const uint32 corpseEntries[] = {
+                            NPC_DEAD_SCARLET_MEDIC, NPC_DEAD_SCARLET_INFANTRYMAN, NPC_DEAD_SCARLET_CAPTAIN,
+                            NPC_DEAD_SCARLET_PEASANT, NPC_DEAD_SCARLET_MINER, NPC_DEAD_SCARLET_FLEET_DEFENDER
+                        };
+                        for (uint32 entry : corpseEntries)
+                        {
+                            // Search up to 60 yards for each type
+                            if (Creature* corpse = me->FindNearestCreature(entry, 60.0f, true))
+                            {
+                                float dist = me->GetDistance(corpse);
+                                if (dist < nearestDist)
+                                {
+                                    nearestDist = dist;
+                                    nearestCorpse = corpse;
+                                }
+                            }
+                        }
+                        if (!nearestCorpse)
+                        {
+                            // No corpse found nearby: try again later
+                            events.ScheduleEvent(EVENT_START_RITUAL, urand(5000, 10000));
+                            break;
+                        }
+                        // Start ritual
+                        isOnRitual = true;
+                        targetCorpseGUID = nearestCorpse->GetGUID();
+                        geistGUID.Clear();
+                        // Pause waypoint movement and move to the corpse
+                        me->PauseMovement();
+                        float x, y, z;
+                        // Keep it at a distance from the corpse
+                        nearestCorpse->GetClosePoint(x, y, z, me->GetObjectSize());
+                        me->GetMotionMaster()->MovePoint(POINT_CORPSE_REACHED, x, y, z);
+                        break;
+                    }
+
+                    case EVENT_GHOULPLOSION:
+                    {
+                        if (Creature* geist = ObjectAccessor::GetCreature(*me, geistGUID))
+                        {
+                            me->SetFacingToObject(geist);
+                            DoCast(geist, SPELL_GHOULPLOSION);
+                        }
+                        break;
+                    }
+
+                    case EVENT_RAISE_GHOUL:
+                    {
+                        if (Creature* corpse = ObjectAccessor::GetCreature(*me, targetCorpseGUID))
+                        {
+                            // Cast Scarlet Ghoul on the corpse (always a humanoid for necromancer)
+                            me->SetFacingToObject(corpse);
+                            DoCast(corpse, SPELL_SCARLET_GHOUL);
+                        }
+                        break;
+                    }
+
+                    case EVENT_RESUME_WP:
+                    {
+                        // Resume waypoint movement
+                        isOnRitual = false;
+
+                        targetCorpseGUID.Clear();
+
+                        // Resume paused waypoint movement
+                        me->ResumeMovement();
+                        // Schedule next ritual in 20-30s
+                        events.ScheduleEvent(EVENT_START_RITUAL, urand(20000, 30000));
+                        break;
+                    }
+                }
+            }
+
+            // Necromancers are not expected to engage in combat; no melee UpdateAI needed beyond events.
+        }
+
+        void MovementInform(uint32 type, uint32 id) override
+        {
+            if (type == POINT_MOTION_TYPE && id == POINT_CORPSE_REACHED)
+            {
+                // Reached the corpse
+                // Check for nearby Gluttonous Geist within ~3 yards
+                Creature* geist = me->FindNearestCreature(NPC_GLUTTONOUS_GEIST, 3.0f, true);
+                if (geist)
+                {
+                    me->SetFacingToObject(geist);
+                    geistGUID = geist->GetGUID();
+                    // Geist found: schedule Ghoulplosion at +3s, then raising at +6s, then resume at +9s
+                    events.ScheduleEvent(EVENT_GHOULPLOSION, 3000);
+                    events.ScheduleEvent(EVENT_RAISE_GHOUL, 6000);
+                    events.ScheduleEvent(EVENT_RESUME_WP, 9000);
+                }
+                else
+                {
+                    // No Geist: just raise after 3s, resume 3s later
+
+                    Creature* corpse = ObjectAccessor::GetCreature(*me, targetCorpseGUID);
+                    if (corpse)
+                    {
+                        me->SetFacingToObject(corpse);
+                    }
+
+                    events.ScheduleEvent(EVENT_RAISE_GHOUL, 3000);
+                    events.ScheduleEvent(EVENT_RESUME_WP, 6000);
+                }
+            }
+        }
+    };
+
+    CreatureAI* GetAI(Creature* creature) const override
+    {
+        return new npc_acherus_necromancerAI(creature);
+    }
+};
+
+/*######
+## npc_gothik_the_harvester (Entry 28890)
+######*/
+class npc_gothik_the_harvester : public CreatureScript
+{
+public:
+    npc_gothik_the_harvester() : CreatureScript("npc_gothik_the_harvester") { }
+
+    struct npc_gothik_the_harvesterAI : public ScriptedAI
+    {
+        npc_gothik_the_harvesterAI(Creature* creature) : ScriptedAI(creature) { }
+
+        EventMap events;
+        ObjectGuid targetCorpseGUID;
+        ObjectGuid geistGUID;
+        bool isOnRitual;
+
+        enum Events
+        {
+            EVENT_START_RITUAL = 1,
+            EVENT_GHOULPLOSION,
+            EVENT_RAISE_DEAD,
+            EVENT_RESUME_WP
+        };
+
+        enum Points
+        {
+            POINT_CORPSE_REACHED = 1
+        };
+
+        // Text identifiers for creature_text (see SQL below)
+        enum Says
+        {
+            SAY_GRYPHON = 0,  // "You will fly again, beast..."
+            SAY_GHOUL   = 1,  // "Surprise, surprise! Another ghoul!"
+            SAY_GEIST   = 2   // "Is Gothik the Harvester going to have to choke a geist?"
+        };
+
+        void Reset() override
+        {
+            events.Reset();
+            targetCorpseGUID.Clear();
+            geistGUID.Clear();
+            isOnRitual = false;
+            // Start waypoint movement using WaypointMovementGenerator
+            if (uint32 pathId = me->GetWaypointPath())
+            {
+                me->GetMotionMaster()->MovePath(pathId, true); // true = repeatable
+            }
+            // Schedule the first ritual after 50-60s
+            events.ScheduleEvent(EVENT_START_RITUAL, urand(50000, 60000));
+        }
+        void UpdateAI(uint32 diff) override
+        {
+            events.Update(diff);
+
+            if (uint32 eventId = events.ExecuteEvent())
+            {
+                switch (eventId)
+                {
+                    case EVENT_START_RITUAL:
+                    {
+                        if (isOnRitual) // Already performing ritual
+                        {
+                            events.ScheduleEvent(EVENT_START_RITUAL, urand(5000, 10000));
+                            break;
+                        }
+
+                        // Find nearest dead Scarlet NPC (including gryphon)
+                        Creature* nearestCorpse = nullptr;
+                        float nearestDist = std::numeric_limits<float>::max();
+                        static const uint32 corpseEntries[] = {
+                            NPC_DEAD_SCARLET_MEDIC, NPC_DEAD_SCARLET_INFANTRYMAN, NPC_DEAD_SCARLET_CAPTAIN,
+                            NPC_DEAD_SCARLET_PEASANT, NPC_DEAD_SCARLET_MINER, NPC_DEAD_SCARLET_FLEET_DEFENDER,
+                            NPC_DEAD_SCARLET_GRYPHON
+                        };
+                        for (uint32 entry : corpseEntries)
+                        {
+                            // Search up to 60 yards for each type
+                            if (Creature* corpse = me->FindNearestCreature(entry, 60.0f, true))
+                            {
+                                float dist = me->GetDistance(corpse);
+                                if (dist < nearestDist)
+                                {
+                                    nearestDist = dist;
+                                    nearestCorpse = corpse;
+                                }
+                            }
+                        }
+                        if (!nearestCorpse)
+                        {
+                            events.ScheduleEvent(EVENT_START_RITUAL, urand(5000, 10000));
+                            break;
+                        }
+                        // Start ritual
+                        isOnRitual = true;
+                        targetCorpseGUID = nearestCorpse->GetGUID();
+                        geistGUID.Clear();
+                        // Pause waypoint movement and move to the corpse
+                        me->PauseMovement();
+                        float x, y, z;
+                        // Keep it at a distance from the corpse
+                        nearestCorpse->GetClosePoint(x, y, z, me->GetObjectSize());
+                        me->GetMotionMaster()->MovePoint(POINT_CORPSE_REACHED, x, y, z);
+                        break;
+                    }
+                    case EVENT_GHOULPLOSION:
+                    {
+                        // Cast Ghoulplosion on the Geist and say the Geist line
+                        if (Creature* geist = ObjectAccessor::GetCreature(*me, geistGUID))
+                        {
+                            Talk(SAY_GEIST);
+                            me->SetFacingToObject(geist);
+                            DoCast(geist, SPELL_GHOULPLOSION);
+                        }
+                        break;
+                    }
+
+                    case EVENT_RAISE_DEAD:
+                    {
+                        // Cast the appropriate raise spell on the corpse (griffon or ghoul)
+                        if (Creature* corpse = ObjectAccessor::GetCreature(*me, targetCorpseGUID))
+                        {
+                            me->SetFacingToObject(corpse);
+                            uint32 entry = corpse->GetEntry();
+                            if (entry == NPC_DEAD_SCARLET_GRYPHON)
+                            {
+                                DoCast(corpse, SPELL_SCOURGE_GRYPHON);
+                            }
+                            else
+                            {
+                                DoCast(corpse, SPELL_SCARLET_GHOUL);
+                            }
+                        }
+                        break;
+                    }
+                    case EVENT_RESUME_WP:
+                    {
+                        // Resume waypoint movement
+                        isOnRitual = false;
+                        targetCorpseGUID.Clear();
+                        // Resume paused waypoint movement
+                        me->ResumeMovement();
+                        // Schedule next ritual in 50-60s
+                        events.ScheduleEvent(EVENT_START_RITUAL, urand(50000, 60000));
+                        break;
+                    }
+                }
+            }
+        }
+
+        void MovementInform(uint32 type, uint32 id) override
+        {
+            if (type == POINT_MOTION_TYPE && id == POINT_CORPSE_REACHED)
+            {
+                // Reached the target corpse
+                Creature* corpse = ObjectAccessor::GetCreature(*me, targetCorpseGUID);
+                if (corpse)
+                {
+                    me->SetFacingToObject(corpse);
+                    // Say line depending on corpse type (gryphon or humanoid)
+                    if (corpse->GetEntry() == NPC_DEAD_SCARLET_GRYPHON)
+                        Talk(SAY_GRYPHON);
+                    else
+                        Talk(SAY_GHOUL);
+                }
+                // Check for Geist nearby
+                Creature* geist = me->FindNearestCreature(NPC_GLUTTONOUS_GEIST, 3.0f, true);
+                if (geist)
+                {
+                    me->SetFacingToObject(geist);
+                    geistGUID = geist->GetGUID();
+                    // Geist present: Ghoulplosion in 3s (with SAY_GEIST), raise in 6s, resume in 9s
+                    events.ScheduleEvent(EVENT_GHOULPLOSION, 3000);
+                    events.ScheduleEvent(EVENT_RAISE_DEAD, 6000);
+                    events.ScheduleEvent(EVENT_RESUME_WP, 9000);
+                }
+                else
+                {
+                    // No Geist: raise in 3s, resume in 6s
+                    events.ScheduleEvent(EVENT_RAISE_DEAD, 3000);
+                    events.ScheduleEvent(EVENT_RESUME_WP, 6000);
+                }
+            }
+        }
+    };
+
+    CreatureAI* GetAI(Creature* creature) const override
+    {
+        return new npc_gothik_the_harvesterAI(creature);
+    }
+};
+
 void AddSC_the_scarlet_enclave_c2()
 {
     new npc_crusade_persuaded();
     new npc_scarlet_courier();
     new npc_koltira_deathweaver();
     new npc_a_special_surprise();
+    new npc_acherus_necromancer();
+    new npc_gothik_the_harvester();
 }

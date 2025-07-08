@@ -1,0 +1,94 @@
+name: Dashboard CI
+description: |
+  This workflow runs tests and builds for the AzerothCore dashboard.
+  It includes testing of bash scripts and integration testing of the AzerothCore server.
+  Do not remove this if something is broken here and you don't know how to fix it, ping Yehonal instead.
+
+on:
+  push:
+    branches:
+      - 'master'
+  pull_request:
+    types:
+      - opened
+      - reopened
+      - synchronize
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.head_ref }} || concat(${{ github.ref }}, ${{ github.workflow }})
+  cancel-in-progress: true
+
+env:
+  CONTINUOUS_INTEGRATION: true
+  MYSQL_ROOT_PASSWORD: root
+
+jobs:
+  test-bash-scripts:
+    name: Test Bash Scripts
+    strategy:
+      fail-fast: true
+      matrix:
+        include:
+          - os: ubuntu-22.04
+          - os: ubuntu-24.04
+    runs-on: ${{ matrix.os }}
+    if: github.repository == 'azerothcore/azerothcore-wotlk' && !github.event.pull_request.draft
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - name: Install requirements
+        run: |
+          sudo apt install -y bats
+          ./acore.sh install-deps
+
+      - name: Run bash script tests for ${{ matrix.test-module }}
+        env:
+          TERM: xterm-256color
+        run: |
+          cd apps/test-framework
+          ./run-tests.sh --tap
+
+  build-and-test:
+    name: Build and Integration Test
+    strategy:
+      fail-fast: true
+      matrix:
+        include:
+          - os: ubuntu-22.04
+          - os: ubuntu-24.04
+    runs-on: ${{ matrix.os }}
+    if: github.repository == 'azerothcore/azerothcore-wotlk' && !github.event.pull_request.draft
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - name: Configure AzerothCore settings
+        run: |
+          # Create basic configuration
+          cp conf/dist/config.sh conf/config.sh
+          # Configure dashboard
+          sed -i 's/MTHREADS=.*/MTHREADS="4"/' conf/config.sh
+
+      - name: Run complete installation (deps, compile, database, client-data)
+        run: |
+          # This runs: install-deps, compile, database setup, client-data download
+          ./acore.sh init
+        timeout-minutes: 120
+
+      - name: Test authserver dry-run
+        run: |
+          cd env/dist/bin
+          timeout 5m ./authserver -dry-run
+        continue-on-error: false
+
+      - name: Test worldserver dry-run
+        run: |
+          cd env/dist/bin
+          timeout 5m ./worldserver -dry-run
+        continue-on-error: false
