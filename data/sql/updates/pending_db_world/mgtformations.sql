@@ -3,12 +3,10 @@ INSERT INTO `creature_formations` (`leaderGUID`, `memberGUID`, `dist`, `angle`, 
 (96764, 96764, 0, 0, 3, 0, 0),
 (96764, 96765, 0, 0, 3, 0, 0);
 
-
 DELETE FROM `creature_formations` WHERE `leaderGUID` = 96786;
 INSERT INTO `creature_formations` (`leaderGUID`, `memberGUID`, `dist`, `angle`, `groupAI`, `point_1`, `point_2`) VALUES
 (96786, 96786, 0, 0, 515, 0, 0),
 (96786, 96814, 2, 270, 515, 0, 0);
-
 
 DELETE FROM `creature_formations` WHERE `leaderGUID` = 96763;
 INSERT INTO `creature_formations` (`leaderGUID`, `memberGUID`, `dist`, `angle`, `groupAI`, `point_1`, `point_2`) VALUES
@@ -17,7 +15,6 @@ INSERT INTO `creature_formations` (`leaderGUID`, `memberGUID`, `dist`, `angle`, 
 (96763, 96801, 0, 0, 3, 0, 0),
 (96763, 96816, 0, 0, 3, 0, 0);
 
-
 DELETE FROM `creature_formations` WHERE `leaderGUID` = 96776;
 INSERT INTO `creature_formations` (`leaderGUID`, `memberGUID`, `dist`, `angle`, `groupAI`, `point_1`, `point_2`) VALUES
 (96776, 96776, 0, 0, 3, 0, 0),
@@ -25,14 +22,12 @@ INSERT INTO `creature_formations` (`leaderGUID`, `memberGUID`, `dist`, `angle`, 
 (96776, 96799, 0, 0, 3, 0, 0),
 (96776, 96815, 0, 0, 3, 0, 0);
 
-
 DELETE FROM `creature_formations` WHERE `leaderGUID` = 96775;
 INSERT INTO `creature_formations` (`leaderGUID`, `memberGUID`, `dist`, `angle`, `groupAI`, `point_1`, `point_2`) VALUES
 (96775, 96775, 0, 0, 3, 0, 0),
 (96775, 96813, 0, 0, 3, 0, 0),
 (96775, 96797, 0, 0, 3, 0, 0),
 (96775, 96785, 0, 0, 3, 0, 0);
-
 
 DELETE FROM `creature_formations` WHERE `leaderGUID` = 96828;
 INSERT INTO `creature_formations` (`leaderGUID`, `memberGUID`, `dist`, `angle`, `groupAI`, `point_1`, `point_2`) VALUES
@@ -43,12 +38,10 @@ INSERT INTO `creature_formations` (`leaderGUID`, `memberGUID`, `dist`, `angle`, 
 (96828, 96837, 0, 0, 3, 0, 0),
 (96828, 96838, 0, 0, 3, 0, 0);
 
-
 DELETE FROM `creature_formations` WHERE `leaderGUID` = 96825;
 INSERT INTO `creature_formations` (`leaderGUID`, `memberGUID`, `dist`, `angle`, `groupAI`, `point_1`, `point_2`) VALUES
 (96825, 96825, 0, 0, 3, 0, 0),
 (96825, 96830, 0, 0, 3, 0, 0);
-
 
 DELETE FROM `creature_formations` WHERE `leaderGUID` = 96831;
 INSERT INTO `creature_formations` (`leaderGUID`, `memberGUID`, `dist`, `angle`, `groupAI`, `point_1`, `point_2`) VALUES
@@ -59,7 +52,6 @@ INSERT INTO `creature_formations` (`leaderGUID`, `memberGUID`, `dist`, `angle`, 
 (96831, 96827, 0, 0, 3, 0, 0),
 (96831, 96835, 0, 0, 3, 0, 0);
 
-
 DELETE FROM `creature_formations` WHERE `leaderGUID` = 96778;
 INSERT INTO `creature_formations` (`leaderGUID`, `memberGUID`, `dist`, `angle`, `groupAI`, `point_1`, `point_2`) VALUES
 (96778, 96778, 0, 0, 3, 0, 0),
@@ -68,7 +60,6 @@ INSERT INTO `creature_formations` (`leaderGUID`, `memberGUID`, `dist`, `angle`, 
 (96778, 96843, 0, 0, 3, 0, 0),
 (96778, 96789, 0, 0, 3, 0, 0);
 
-
 DELETE FROM `creature_formations` WHERE `leaderGUID` = 96777;
 INSERT INTO `creature_formations` (`leaderGUID`, `memberGUID`, `dist`, `angle`, `groupAI`, `point_1`, `point_2`) VALUES
 (96777, 96777, 0, 0, 3, 0, 0),
@@ -76,14 +67,12 @@ INSERT INTO `creature_formations` (`leaderGUID`, `memberGUID`, `dist`, `angle`, 
 (96777, 96766, 0, 0, 3, 0, 0),
 (96777, 96817, 0, 0, 3, 0, 0);
 
-
 DELETE FROM `creature_formations` WHERE `leaderGUID` = 96824;
 INSERT INTO `creature_formations` (`leaderGUID`, `memberGUID`, `dist`, `angle`, `groupAI`, `point_1`, `point_2`) VALUES
 (96824, 96824, 0, 0, 3, 0, 0),
 (96824, 96774, 0, 0, 3, 0, 0),
 (96824, 96796, 0, 0, 3, 0, 0),
 (96824, 96812, 0, 0, 3, 0, 0);
-
 
 DELETE FROM `creature_formations` WHERE `leaderGUID` = 96780;
 INSERT INTO `creature_formations` (`leaderGUID`, `memberGUID`, `dist`, `angle`, `groupAI`, `point_1`, `point_2`) VALUES
@@ -93,7 +82,6 @@ INSERT INTO `creature_formations` (`leaderGUID`, `memberGUID`, `dist`, `angle`, 
 (96780, 96791, 0, 0, 3, 0, 0),
 (96780, 96846, 0, 0, 3, 0, 0);
 
-
 DELETE FROM `creature_formations` WHERE `leaderGUID` = 96767;
 INSERT INTO `creature_formations` (`leaderGUID`, `memberGUID`, `dist`, `angle`, `groupAI`, `point_1`, `point_2`) VALUES
 (96767, 96767, 0, 0, 3, 0, 0),
@@ -101,7 +89,6 @@ INSERT INTO `creature_formations` (`leaderGUID`, `memberGUID`, `dist`, `angle`, 
 (96767, 96803, 0, 0, 3, 0, 0),
 (96767, 96818, 0, 0, 3, 0, 0),
 (96767, 96842, 0, 0, 3, 0, 0);
-
 
 DELETE FROM `creature_formations` WHERE `leaderGUID` = 96769;
 INSERT INTO `creature_formations` (`leaderGUID`, `memberGUID`, `dist`, `angle`, `groupAI`, `point_1`, `point_2`) VALUES
@@ -111,14 +98,12 @@ INSERT INTO `creature_formations` (`leaderGUID`, `memberGUID`, `dist`, `angle`, 
 (96769, 96840, 0, 0, 3, 0, 0),
 (96769, 96844, 0, 0, 3, 0, 0);
 
-
 DELETE FROM `creature_formations` WHERE `leaderGUID` = 96773;
 INSERT INTO `creature_formations` (`leaderGUID`, `memberGUID`, `dist`, `angle`, `groupAI`, `point_1`, `point_2`) VALUES
 (96773, 96773, 0, 0, 3, 0, 0),
 (96773, 96784, 0, 0, 3, 0, 0),
 (96773, 96811, 0, 0, 3, 0, 0),
 (96773, 96795, 0, 0, 3, 0, 0);
-
 
 DELETE FROM `creature_formations` WHERE `leaderGUID` = 96779;
 INSERT INTO `creature_formations` (`leaderGUID`, `memberGUID`, `dist`, `angle`, `groupAI`, `point_1`, `point_2`) VALUES
@@ -128,14 +113,12 @@ INSERT INTO `creature_formations` (`leaderGUID`, `memberGUID`, `dist`, `angle`, 
 (96779, 96790, 0, 0, 3, 0, 0),
 (96779, 96845, 0, 0, 3, 0, 0);
 
-
 DELETE FROM `creature_formations` WHERE `leaderGUID` = 96771;
 INSERT INTO `creature_formations` (`leaderGUID`, `memberGUID`, `dist`, `angle`, `groupAI`, `point_1`, `point_2`) VALUES
 (96771, 96771, 0, 0, 3, 0, 0),
 (96771, 96810, 0, 0, 3, 0, 0),
 (96771, 96793, 0, 0, 3, 0, 0),
 (96771, 96821, 0, 0, 3, 0, 0);
-
 
 DELETE FROM `creature_formations` WHERE `leaderGUID` = 96781;
 INSERT INTO `creature_formations` (`leaderGUID`, `memberGUID`, `dist`, `angle`, `groupAI`, `point_1`, `point_2`) VALUES
