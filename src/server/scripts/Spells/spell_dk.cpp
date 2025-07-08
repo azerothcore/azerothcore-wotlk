@@ -74,6 +74,7 @@ enum DeathKnightSpells
     SPELL_DK_UNHOLY_PRESENCE_TRIGGERED          = 49772,
     SPELL_DK_WILL_OF_THE_NECROPOLIS_TALENT_R1   = 49189,
     SPELL_DK_WILL_OF_THE_NECROPOLIS_AURA_R1     = 52284,
+    SPELL_DK_ICY_TALONS_TALENT_R1               = 50880,
     // Risen Ally
     SPELL_DK_RAISE_ALLY                         = 46619,
     SPELL_DK_THRASH                             = 47480,
@@ -1732,6 +1733,76 @@ class spell_dk_improved_unholy_presence : public AuraScript
     }
 };
 
+/* 55078 - Blood Plague
+   55095 - Frost Fever */
+class spell_dk_disease : public AuraScript
+{
+    PrepareAuraScript(spell_dk_disease);
+
+    public:
+        static void ApplyCryptFever (Unit* caster, Unit* target, AuraEffect const* disease)
+        {
+            // Can't proc on self
+            if (caster->GetGUID() == target->GetGUID())
+                return;
+
+            AuraEffect* aurEff = nullptr;
+            // Ebon Plaguebringer / Crypt Fever
+            Unit::AuraEffectList const& TalentAuras = caster->GetAuraEffectsByType(SPELL_AURA_OVERRIDE_CLASS_SCRIPTS);
+            for (Unit::AuraEffectList::const_iterator itr = TalentAuras.begin(); itr != TalentAuras.end(); ++itr)
+            {
+                if ((*itr)->GetMiscValue() == 7282)
+                {
+                    aurEff = *itr;
+                    // Ebon Plaguebringer - end search if found
+                    if ((*itr)->GetSpellInfo()->SpellIconID == 1766)
+                        break;
+                }
+            }
+            if (aurEff)
+            {
+                uint32 spellId = 0;
+                switch (aurEff->GetId())
+                {
+                    // Ebon Plague
+                    case 51161:
+                        spellId = 51735;
+                        break;
+                    case 51160:
+                        spellId = 51734;
+                        break;
+                    case 51099:
+                        spellId = 51726;
+                        break;
+                    // Crypt Fever
+                    case 49632:
+                        spellId = 50510;
+                        break;
+                    case 49631:
+                        spellId = 50509;
+                        break;
+                    case 49032:
+                        spellId = 50508;
+                        break;
+                    default:
+                        LOG_ERROR("spells.aura", "Aura::HandleAuraSpecificMods: Unknown rank of Crypt Fever/Ebon Plague ({}) found", aurEff->GetId());
+                }
+                caster->CastSpell(target, spellId, true, 0, disease);
+            }
+        }
+
+    private:
+        void HandleApply (AuraEffect const* aurEff, AuraEffectHandleModes /*mode*/)
+        {
+            ApplyCryptFever(GetCaster(), GetTarget(), aurEff);
+        }
+
+        void Register() override
+        {
+            AfterEffectApply += AuraEffectApplyFn(spell_dk_disease::HandleApply, EFFECT_0, SPELL_AURA_PERIODIC_DAMAGE, AURA_EFFECT_HANDLE_REAL_OR_REAPPLY_MASK);
+        }
+};
+
 // 50842 - Pestilence
 class spell_dk_pestilence : public SpellScript
 {
@@ -1743,7 +1814,8 @@ class spell_dk_pestilence : public SpellScript
         {
             SPELL_DK_GLYPH_OF_DISEASE,
             SPELL_DK_BLOOD_PLAGUE,
-            SPELL_DK_FROST_FEVER
+            SPELL_DK_FROST_FEVER,
+            SPELL_DK_ICY_TALONS_TALENT_R1
         });
     }
 
@@ -1755,46 +1827,30 @@ class spell_dk_pestilence : public SpellScript
         if (!target)
             return;
 
-        if (target != hitUnit || caster->GetAura(SPELL_DK_GLYPH_OF_DISEASE))
+        // Blood Plague
+        if (Aura* disease = target->GetAura(SPELL_DK_BLOOD_PLAGUE, caster->GetGUID()))
         {
-            // xinef: checked in target selection
-            //if (!m_targets.GetUnitTarget()->IsWithinLOSInMap(unitTarget))
-            //  return;
+            if (target != hitUnit)
+                caster->CastSpell(hitUnit, SPELL_DK_BLOOD_PLAGUE, true);
+            else if (caster->GetAura(SPELL_DK_GLYPH_OF_DISEASE))
+            {
+                disease->RefreshDuration();
+                spell_dk_disease::ApplyCryptFever(caster, target, disease->GetEffect(EFFECT_0));
+            }
+        }
 
-            // And spread them on target
-            // Blood Plague
-            if (Aura* disOld = target->GetAura(SPELL_DK_BLOOD_PLAGUE, caster->GetGUID()))
-                if (AuraEffect* effOld = disOld->GetEffect(EFFECT_0))
-                {
-                    float pctMods = effOld->GetPctMods();
-                    float crit = effOld->GetCritChance();
-                    caster->CastSpell(hitUnit, SPELL_DK_BLOOD_PLAGUE, true);
-
-                    if (Aura* disNew = hitUnit->GetAura(SPELL_DK_BLOOD_PLAGUE, caster->GetGUID()))
-                        if (AuraEffect* effNew = disNew->GetEffect(EFFECT_0))
-                        {
-                            effNew->SetPctMods(pctMods);
-                            effNew->SetCritChance(crit);
-                            effNew->SetAmount(effNew->CalculateAmount(effNew->GetCaster()));
-                        }
-                }
-
-            // Frost Fever
-            if (Aura* disOld = target->GetAura(SPELL_DK_FROST_FEVER, caster->GetGUID()))
-                if (AuraEffect* effOld = disOld->GetEffect(EFFECT_0))
-                {
-                    float pctMods = effOld->GetPctMods();
-                    float crit = effOld->GetCritChance();
-                    caster->CastSpell(hitUnit, SPELL_DK_FROST_FEVER, true);
-
-                    if (Aura* disNew = hitUnit->GetAura(SPELL_DK_FROST_FEVER, caster->GetGUID()))
-                        if (AuraEffect* effNew = disNew->GetEffect(EFFECT_0))
-                        {
-                            effNew->SetPctMods(pctMods);
-                            effNew->SetCritChance(crit);
-                            effNew->SetAmount(effNew->CalculateAmount(effNew->GetCaster()));
-                        }
-                }
+        // Frost Fever
+        if (Aura* disease = target->GetAura(SPELL_DK_FROST_FEVER, caster->GetGUID()))
+        {
+            if (target != hitUnit)
+                caster->CastSpell(hitUnit, SPELL_DK_FROST_FEVER, true);
+            else if (caster->GetAura(SPELL_DK_GLYPH_OF_DISEASE))
+            {
+                disease->RefreshDuration();
+                spell_dk_disease::ApplyCryptFever(caster, target, disease->GetEffect(EFFECT_0));
+                if (Aura const* talons = caster->GetAuraOfRankedSpell(SPELL_DK_ICY_TALONS_TALENT_R1))
+                    caster->CastSpell(caster, talons->GetSpellInfo()->Effects[EFFECT_0].TriggerSpell, true);
+            }
         }
     }
 
@@ -2355,6 +2411,7 @@ void AddSC_deathknight_spell_scripts()
     RegisterSpellScript(spell_dk_improved_frost_presence);
     RegisterSpellScript(spell_dk_improved_unholy_presence);
     RegisterSpellScript(spell_dk_pestilence);
+    RegisterSpellScript(spell_dk_disease);
     RegisterSpellScript(spell_dk_presence);
     RegisterSpellScript(spell_dk_raise_dead);
     RegisterSpellScript(spell_dk_rune_tap_party);
