@@ -926,19 +926,17 @@ class spell_dru_starfall_dummy : public SpellScript
         Unit* caster = GetCaster();
         if (!caster)
             return; // If caster is null, exit early
+
         // Remove targets if they are outside line of sight with respect to caster
         targets.remove_if([caster](WorldObject const* target)
             {
-                if (Unit const* unitTarget = target->ToUnit())
-                {
-                    if (!caster->IsWithinLOS(target->GetPositionX(), target->GetPositionY(), target->GetPositionZ()))
-                        return true;
-                }
+                if (!caster->IsWithinLOS(target->GetPositionX(), target->GetPositionY(), target->GetPositionZ()))
+                    return true;
                 return false;
             });
+
         // Take 2 random targets from remaining within line of sight targets
         Acore::Containers::RandomResize(targets, 2);
-
     }
 
     void HandleDummy(SpellEffIndex /*effIndex*/)
