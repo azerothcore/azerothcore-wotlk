@@ -924,6 +924,8 @@ class spell_dru_starfall_dummy : public SpellScript
     {
         // Get caster object
         Unit* caster = GetCaster();
+        if (!caster)
+            return; // If caster is null, exit early
         // Remove targets if they are outside line of sight with respect to caster
         targets.remove_if([&](WorldObject const* target)
             {
