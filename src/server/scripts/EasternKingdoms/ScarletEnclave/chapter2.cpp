@@ -1054,7 +1054,9 @@ class spell_portal_effect_acherus : public SpellScript
 
     void HandleScriptEffect(SpellEffIndex effIndex)
     {
-        GetCaster()->CastSpell(GetHitUnit(), GetEffectValue(), true);
+        if (Unit* caster = GetCaster())
+            if (Player* player = GetHitPlayer())
+                caster->CastSpell(player, GetEffectValue(), true);
     }
 
     void Register() override
