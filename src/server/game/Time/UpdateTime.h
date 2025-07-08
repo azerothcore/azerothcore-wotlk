@@ -68,7 +68,6 @@ public:
     void LoadFromConfig();
     void SetRecordUpdateTimeInterval(Milliseconds t);
     void RecordUpdateTime(Milliseconds gameTimeMs, uint32 diff, uint32 sessionCount);
-    void RecordUpdateTimeDuration(std::string const& text);
 
 private:
     Milliseconds _recordUpdateTimeInverval;
