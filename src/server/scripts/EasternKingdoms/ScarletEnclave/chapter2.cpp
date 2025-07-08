@@ -982,10 +982,7 @@ class spell_chapter2_persuasive_strike : public SpellScript
         if (!creature || !player)
             return;
 
-        if (creature->GetEntry() != NPC_SCARLET_PREACHER &&
-            creature->GetEntry() != NPC_SCARLET_COMMANDER &&
-            creature->GetEntry() != NPC_SCARLET_CRUSADER &&
-            creature->GetEntry() != NPC_SCARLET_MARKSMAN)
+        if (!creature->EntryEquals(NPC_SCARLET_PREACHER, NPC_SCARLET_COMMANDER, NPC_SCARLET_CRUSADER, NPC_SCARLET_MARKSMAN))
             return;
 
         sCreatureTextMgr->SendChat(creature, SAY_PERSUADE_RAND, nullptr, CHAT_MSG_ADDON, LANG_ADDON, TEXT_RANGE_NORMAL, 0, TEAM_NEUTRAL, false, player);
