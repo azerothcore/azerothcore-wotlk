@@ -1351,7 +1351,7 @@ bool Guardian::InitStatsForLevel(uint8 petlevel)
                             AddAura(SPELL_DK_PET_SCALING_03, this);
                             AddAura(SPELL_NIGHT_OF_THE_DEAD_AVOIDANCE, this);
                             AddAura(SPELL_ORC_RACIAL_COMMAND_DK, this);
-                            AddAura(SPELL_PET_SCALING_MASTER_02, this);
+                            AddAura(SPELL_PET_SCALING_MASTER_03, this);
                             AddAura(SPELL_PET_SCALING_MASTER_06, this);
                             break;
                         }

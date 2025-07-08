@@ -134,7 +134,7 @@ enum NPCEntries
 enum PetScalingSpells
 {
     SPELL_PET_AVOIDANCE                 = 32233,
-    SPELL_PET_SCALING_MASTER_02         = 67557, // Serverside - Pet Scaling - Master Spell 03 - Intellect, Spirit, Resilience
+    SPELL_PET_SCALING_MASTER_03         = 67557, // Serverside - Pet Scaling - Master Spell 03 - Intellect, Spirit, Resilience
     SPELL_PET_SCALING_MASTER_06         = 67561, // Serverside - Pet Scaling - Master Spell 06 - Spell Hit, Expertise, Spell Penetration
 
     // Hunter
