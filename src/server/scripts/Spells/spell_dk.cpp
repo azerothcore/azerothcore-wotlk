@@ -1767,11 +1767,11 @@ class spell_dk_pestilence : public SpellScript
         if (target != hitUnit)
         {
             // Blood Plague
-            if (Aura* disease = target->GetAura(SPELL_DK_BLOOD_PLAGUE, caster->GetGUID()))
+            if (target->GetAura(SPELL_DK_BLOOD_PLAGUE, caster->GetGUID()))
                 caster->CastSpell(hitUnit, SPELL_DK_BLOOD_PLAGUE, true);
 
             // Frost Fever
-            if (Aura* disease = target->GetAura(SPELL_DK_FROST_FEVER, caster->GetGUID()))
+            if (target->GetAura(SPELL_DK_FROST_FEVER, caster->GetGUID()))
                 caster->CastSpell(hitUnit, SPELL_DK_FROST_FEVER, true);
         }
         // Refresh on target
