@@ -6479,7 +6479,7 @@ void Player::_LoadSpells(PreparedQueryResult result)
 
             if (CheckSkillLearnedBySpell(spellId))
                 addSpell(spellId, specMask, true);
-             else
+            else
                 removeSpell(spellId, SPEC_MASK_ALL, false);
         } while (result->NextRow());
     }
