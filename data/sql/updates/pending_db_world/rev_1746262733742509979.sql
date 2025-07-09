@@ -4,5 +4,8 @@ UPDATE `spell_proc_event` SET `SpellFamilyMask0`=`SpellFamilyMask0` | (0x0002 | 
 
 -- Sudden Death: copy FamilyMask from Sword Specialization
 DELETE FROM `spell_proc_event` WHERE `entry`=-29723;
-INSERT INTO `spell_proc_event` (`entry`, `SchoolMask`, `SpellFamilyName`, `SpellFamilyMask0`, `SpellFamilyMask1`, `SpellFamilyMask2`) VALUES
-(-29723, 0, 4, 2858435686, 4194565, 0);
+INSERT INTO `spell_proc_event` (`entry`, `SchoolMask`, `SpellFamilyName`, `SpellFamilyMask0`, `SpellFamilyMask1`, `SpellFamilyMask2`, `procPhase`) VALUES
+(-29723, 0, 4, 2858435686, 4194565, 0, 2|4);
+
+DELETE FROM `spell_script_names` WHERE `spell_id` = -29723 AND `ScriptName` = 'spell_war_sudden_death_aura';
+INSERT INTO `spell_script_names` (`spell_id`, `ScriptName`) VALUES(-29723, 'spell_war_sudden_death_aura');
