@@ -1,3 +1,4 @@
+-- DB update 2025_07_08_01 -> 2025_07_09_00
 
 -- Edit Spell_Area
 UPDATE `spell_area` SET `quest_start` = 12801, `quest_start_status` = `quest_start_status` &~ 10 WHERE `spell` = 58354;
