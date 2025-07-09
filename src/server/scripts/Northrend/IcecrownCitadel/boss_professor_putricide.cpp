@@ -209,7 +209,7 @@ public:
 
     bool operator()(Unit const* target) const
     {
-        if (!me || !target || !target->IsPlayer())
+        if (!me || !target || !target->IsPlayer() || target == me->GetThreatMgr().GetCurrentVictim())
             return false;
 
         if (me->IsWithinCombatRange(target, 7.0f))
@@ -640,7 +640,7 @@ public:
                     }
                     else
                     {
-                        if (Unit* target = SelectTarget(SelectTargetMethod::Random, 1, MalleableGooSelector(me)))
+                        if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, MalleableGooSelector(me)))
                         {
                             Talk(EMOTE_MALLEABLE_GOO);
                             me->CastSpell(target, SPELL_MALLEABLE_GOO, true);

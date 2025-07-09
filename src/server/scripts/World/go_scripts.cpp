@@ -15,6 +15,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "AreaDefines.h"
 #include "CellImpl.h"
 #include "Chat.h"
 #include "CreatureScript.h"
@@ -26,23 +27,6 @@
 #include "ScriptedCreature.h"
 #include "ScriptedGossip.h"
 #include "Spell.h"
-
-// Ours
-/*######
-## go_noblegarden_colored_egg
-######*/
-class go_noblegarden_colored_egg : public GameObjectScript
-{
-public:
-    go_noblegarden_colored_egg() : GameObjectScript("go_noblegarden_colored_egg") { }
-
-    bool OnGossipHello(Player* player, GameObject* /*go*/) override
-    {
-        if (roll_chance_i(5))
-            player->CastSpell(player, 61734, true); // SPELL NOBLEGARDEN BUNNY
-        return false;
-    }
-};
 
 class go_seer_of_zebhalak : public GameObjectScript
 {
@@ -472,7 +456,8 @@ public:
 ####*/
 enum L70ETCMusic
 {
-    MUSIC_L70_ETC_MUSIC = 11803
+    MUSIC_L70_ETC_MUSIC      = 11803,
+    MUSIC_L70_ETC_MUSIC_LOUD = 12868
 };
 
 enum L70ETCMusicEvents
@@ -500,7 +485,10 @@ public:
                 switch (eventId)
                 {
                 case EVENT_ETC_START_MUSIC:
-                    me->PlayDirectMusic(MUSIC_L70_ETC_MUSIC);
+                    if (me->GetMapId() == MAP_BLACKROCK_DEPTHS)
+                        me->PlayDirectMusic(MUSIC_L70_ETC_MUSIC_LOUD);
+                    else
+                        me->PlayDirectMusic(MUSIC_L70_ETC_MUSIC);
                     _events.ScheduleEvent(EVENT_ETC_START_MUSIC, 1600);  // Every 1.6 seconds SMSG_PLAY_MUSIC packet (PlayDirectMusic) is pushed to the client (sniffed value)
                     break;
                 default:
@@ -518,7 +506,6 @@ public:
     }
 };
 
-// Theirs
 /*####
 ## go_brewfest_music
 ####*/
@@ -542,21 +529,6 @@ enum BrewfestMusicTime
     EVENT_BREWFESTGOBLIN01_TIME = 68000,
     EVENT_BREWFESTGOBLIN02_TIME = 93000,
     EVENT_BREWFESTGOBLIN03_TIME = 28000
-};
-
-enum BrewfestMusicAreas
-{
-    SILVERMOON = 3430, // Horde
-    UNDERCITY = 1497,
-    ORGRIMMAR_1 = 1296,
-    ORGRIMMAR_2 = 14,
-    THUNDERBLUFF = 1638,
-    IRONFORGE_1 = 809, // Alliance
-    IRONFORGE_2 = 1,
-    STORMWIND = 12,
-    EXODAR = 3557,
-    DARNASSUS = 1657,
-    SHATTRATH = 3703 // General
 };
 
 enum BrewfestMusicEvents
@@ -596,7 +568,7 @@ public:
                             //Restart the current selected music
                             _currentMusicEvent = 0;
                             //Check zone to play correct music
-                            if (me->GetAreaId() == SILVERMOON || me->GetAreaId() == UNDERCITY || me->GetAreaId() == ORGRIMMAR_1 || me->GetAreaId() == ORGRIMMAR_2 || me->GetAreaId() == THUNDERBLUFF)
+                            if (me->GetAreaId() == AREA_EVERSONG_WOODS || me->GetAreaId() == AREA_UNDERCITY || me->GetAreaId() == AREA_ROCKTUSK_FARM || me->GetAreaId() == AREA_DUROTAR || me->GetAreaId() == AREA_THUNDER_BLUFF)
                             {
                                 switch (rnd)
                                 {
@@ -616,7 +588,7 @@ public:
                                         break;
                                 }
                             }
-                            else if (me->GetAreaId() == IRONFORGE_1 || me->GetAreaId() == IRONFORGE_2 || me->GetAreaId() == STORMWIND || me->GetAreaId() == EXODAR || me->GetAreaId() == DARNASSUS)
+                            else if (me->GetAreaId() == AREA_GATES_OF_IRONFORGE || me->GetAreaId() == AREA_DUN_MOROGH || me->GetAreaId() == AREA_ELWYNN_FOREST || me->GetAreaId() == AREA_THE_EXODAR || me->GetAreaId() == AREA_DARNASSUS)
                             {
                                 switch (rnd)
                                 {
@@ -636,7 +608,7 @@ public:
                                         break;
                                 }
                             }
-                            else if (me->GetAreaId() == SHATTRATH)
+                            else if (me->GetAreaId() == AREA_SHATTRATH_CITY)
                             {
                                 rnd = urand(0, 5);
                                 switch (rnd)
@@ -1749,28 +1721,6 @@ enum BellHourlySoundFX
     LIGHTHOUSEFOGHORN  = 7197
 };
 
-enum BellHourlySoundZones
-{
-    TIRISFAL_ZONE            = 85,
-    UNDERCITY_ZONE           = 1497,
-    DUN_MOROGH_ZONE          = 1,
-    IRONFORGE_ZONE           = 1537,
-    TELDRASSIL_ZONE          = 141,
-    DARNASSUS_ZONE           = 1657,
-    ASHENVALE_ZONE           = 331,
-    HILLSBRAD_FOOTHILLS_ZONE = 267,
-    DUSKWOOD_ZONE            = 10,
-    WESTFALL_ZONE            = 40,
-    DUSTWALLOW_MARSH_ZONE    = 15,
-    SHATTRATH_ZONE           = 3703
-};
-
-enum LightHouseAreas
-{
-    AREA_ALCAZ_ISLAND        = 2079,
-    AREA_WESTFALL_LIGHTHOUSE = 115
-};
-
 enum BellHourlyObjects
 {
     GO_HORDE_BELL     = 175885,
@@ -1802,10 +1752,10 @@ public:
             {
                 switch (zoneId)
                 {
-                case TIRISFAL_ZONE:
-                case UNDERCITY_ZONE:
-                case HILLSBRAD_FOOTHILLS_ZONE:
-                case DUSKWOOD_ZONE:
+                case AREA_TIRISFAL_GLADES:
+                case AREA_UNDERCITY:
+                case AREA_HILLSBRAD_FOOTHILLS:
+                case AREA_DUSKWOOD:
                     _soundId = BELLTOLLHORDE;
                     break;
                 default:
@@ -1818,17 +1768,17 @@ public:
             {
                 switch (zoneId)
                 {
-                case IRONFORGE_ZONE:
-                case DUN_MOROGH_ZONE:
+                case AREA_IRONFORGE:
+                case AREA_DUN_MOROGH:
                     _soundId = BELLTOLLDWARFGNOME;
                     break;
-                case DARNASSUS_ZONE:
-                case TELDRASSIL_ZONE:
-                case ASHENVALE_ZONE:
-                case SHATTRATH_ZONE:
+                case AREA_DARNASSUS:
+                case AREA_TELDRASSIL:
+                case AREA_ASHENVALE:
+                case AREA_SHATTRATH_CITY:
                     _soundId = BELLTOLLNIGHTELF;
                     break;
-                case WESTFALL_ZONE:
+                case AREA_WESTFALL:
                     if (go->GetAreaId() == AREA_WESTFALL_LIGHTHOUSE)
                     {
                         _soundId = LIGHTHOUSEFOGHORN;
@@ -1838,7 +1788,7 @@ public:
                         _soundId = BELLTOLLALLIANCE;
                     }
                     break;
-                case DUSTWALLOW_MARSH_ZONE:
+                case AREA_DUSTWALLOW_MARSH:
                     if (go->GetAreaId() == AREA_ALCAZ_ISLAND)
                     {
                         _soundId = LIGHTHOUSEFOGHORN;
@@ -1947,8 +1897,6 @@ public:
 
 void AddSC_go_scripts()
 {
-    // Ours
-    new go_noblegarden_colored_egg();
     new go_seer_of_zebhalak();
     new go_mistwhisper_treasure();
     new go_witherbark_totem_bundle();
@@ -1962,8 +1910,6 @@ void AddSC_go_scripts()
     new go_bear_trap();
     new go_duskwither_spire_power_source();
     new go_l70_etc_music();
-
-    // Theirs
     new go_brewfest_music();
     new go_pirate_day_music();
     new go_darkmoon_faire_music();

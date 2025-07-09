@@ -391,12 +391,15 @@ public:
     void ClearLastLeashExtensionTimePtr();
     time_t GetLastLeashExtensionTime() const;
     void UpdateLeashExtensionTime();
+    uint8 GetLeashTimer() const;
 
     bool IsFreeToMove();
     static constexpr uint32 MOVE_CIRCLE_CHECK_INTERVAL = 3000;
     static constexpr uint32 MOVE_BACKWARDS_CHECK_INTERVAL = 2000;
+    static constexpr uint32 EXTEND_LEASH_CHECK_INTERVAL = 3000;
     uint32 m_moveCircleMovementTime = MOVE_CIRCLE_CHECK_INTERVAL;
     uint32 m_moveBackwardsMovementTime = MOVE_BACKWARDS_CHECK_INTERVAL;
+    uint32 m_extendLeashTime = EXTEND_LEASH_CHECK_INTERVAL;
 
     [[nodiscard]] bool HasSwimmingFlagOutOfCombat() const
     {

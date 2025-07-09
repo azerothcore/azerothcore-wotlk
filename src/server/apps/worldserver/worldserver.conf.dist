@@ -656,7 +656,7 @@ Allow.IP.Based.Action.Logging = 0
 Appender.Console=1,4,0,"1 9 3 6 5 8"
 Appender.Server=2,5,0,Server.log,w
 # Appender.GM=2,5,15,gm_%s.log
-Appender.Errors=2,5,0,Errors.log
+Appender.Errors=2,5,0,Errors.log,w
 # Appender.DB=3,5,0
 
 #  Logger config values: Given a logger "name"
@@ -678,6 +678,7 @@ Appender.Errors=2,5,0,Errors.log
 #
 
 Logger.root=2,Console Server
+#Logger.metric=2,Console Server
 #Logger.commands.gm=4,Console GM
 Logger.diff=3,Console Server
 Logger.mmaps=4,Server
@@ -812,6 +813,37 @@ Log.Async.Enable = 0
 Metric.Enable = 0
 
 #
+#    Metric.InfluxDB
+#        Description: Connection settings for InfluxDB.
+#
+#        For InfluxDB v1:
+#                     Only fill in Metric.InfluxDB.Connection.
+#
+#        Example:
+#                     Metric.InfluxDB.Connection = "hostname;port;database"
+#
+#        For InfluxDB v2:
+#                     Fill in every field.
+#
+#        NOTE:        Currently, Grafana will not work with the provided json files to visualize
+#                     data from InfluxDB v2.
+#
+#        Example:
+#                     Metric.InfluxDB.Connection = "hostname;port"
+#                     Metric.InfluxDB.v2 = 0 - (Disabled)
+#                                          1 - (Enabled)
+#                     Metric.InfluxDB.Org = "my-org"
+#                     Metric.InfluxDB.Bucket = "my-bucket"
+#                     Metric.InfluxDB.Token = "my-token"
+#
+
+Metric.InfluxDB.Connection = "127.0.0.1;8086;worldserver"
+Metric.InfluxDB.v2 = 0
+Metric.InfluxDB.Org = ""
+Metric.InfluxDB.Bucket = ""
+Metric.InfluxDB.Token = ""
+
+#
 #    Metric.Interval
 #        Description: Interval between every batch of data sent in seconds.
 #                     Longer interval means larger batch of data. If the batch
@@ -820,15 +852,6 @@ Metric.Enable = 0
 #
 
 Metric.Interval = 1
-
-#
-#    Metric.ConnectionInfo
-#        Description: Connection settings for metric database (currently InfluxDB).
-#        Example:     "hostname;port;database"
-#        Default:     "127.0.0.1;8086;worldserver"
-#
-
-Metric.ConnectionInfo = "127.0.0.1;8086;worldserver"
 
 #
 #    Metric.OverallStatusInterval
@@ -962,7 +985,7 @@ Expansion = 2
 #    ClientCacheVersion
 #        Description: Client cache version for client cache data reset. Use any value different
 #                     from DB and not recently been used to trigger client side cache reset.
-#        Default:     0 - (Use DB value from world DB db_version.cache_id field)
+#        Default:     0 - (Use DB value from world DB version.cache_id field)
 
 ClientCacheVersion = 0
 
@@ -2825,6 +2848,14 @@ Rate.Creature.Aggro = 1
 CreatureFamilyFleeAssistanceRadius = 30
 
 #
+#    CreatureLeashRadius
+#        Description: Distance (in yards) for default leash due to being too far from pulled position.
+#        Default:     30 - (Enabled)
+#                     0  - (Disabled)
+
+CreatureLeashRadius = 30
+
+#
 #    CreatureFamilyAssistanceRadius
 #        Description: Distance for creatures calling for assistance from other creatures without
 #                     moving.
@@ -3436,14 +3467,14 @@ Wintergrasp.Enable = 1
 
 #
 #     Wintergrasp.PlayerMax
-#         Description: Maximum number of players allowed in Wintergrasp.
-#         Default:     100
+#         Description: Maximum number of players allowed in Wintergrasp per team.
+#         Default:     120
 
-Wintergrasp.PlayerMax = 100
+Wintergrasp.PlayerMax = 120
 
 #
 #     Wintergrasp.PlayerMin
-#         Description: Minimum number of players required for Wintergrasp.
+#         Description: Minimum number of players required for Wintergrasp per team.
 #         Default:     0
 
 Wintergrasp.PlayerMin = 0
@@ -3451,9 +3482,9 @@ Wintergrasp.PlayerMin = 0
 #
 #     Wintergrasp.PlayerMinLvl
 #         Description: Required character level for the Wintergrasp battle.
-#         Default:     77
+#         Default:     75
 
-Wintergrasp.PlayerMinLvl = 77
+Wintergrasp.PlayerMinLvl = 75
 
 #
 #     Wintergrasp.BattleTimer
@@ -4207,7 +4238,8 @@ AllowTwoSide.Interaction.Arena = 0
 
 #
 #    AllowTwoSide.Interaction.Auction
-#        Description: Allow auctions between factions.
+#        Description: Allow auctions between factions. This flags all auction houses as Neutral,
+#                     and would also take a Neutral auction house cut from auctions.
 #        Default:     0 - (Disabled)
 #                     1 - (Enabled)
 
