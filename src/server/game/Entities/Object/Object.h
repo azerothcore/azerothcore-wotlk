@@ -230,6 +230,12 @@ public:
 
     DataMap CustomData;
 
+    template<typename... T>
+    [[nodiscard]] bool EntryEquals(T... entries) const
+    {
+        return ((GetEntry() == entries) || ...);
+    }
+
 protected:
     Object();
 
