@@ -887,8 +887,9 @@ class spell_hun_misdirection : public AuraScript
     bool CheckProc(ProcEventInfo& eventInfo)
     {
         // Do not trigger from Mend Pet
-        if (eventInfo.GetProcSpell() && (eventInfo.GetProcSpell()->GetSpellInfo()->SpellFamilyFlags[0] & 0x800000))
+        if ((eventInfo.GetProcSpell() && (eventInfo.GetProcSpell()->GetSpellInfo()->SpellFamilyFlags[0] & 0x800000)) || (eventInfo.GetHealInfo() && (eventInfo.GetHealInfo()->GetSpellInfo()->SpellFamilyFlags[0] & 0x800000)))
             return false;
+
         return GetTarget()->GetRedirectThreatTarget();
     }
 
