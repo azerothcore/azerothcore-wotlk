@@ -76,11 +76,7 @@ enum DeathKnightSpells
     SPELL_DK_WILL_OF_THE_NECROPOLIS_AURA_R1     = 52284,
     SPELL_DK_ICY_TALONS_TALENT_R1               = 50880,
     SPELL_DK_CRYPT_FEVER_R1                     = 50508,
-    SPELL_DK_CRYPT_FEVER_R2                     = 50509,
-    SPELL_DK_CRYPT_FEVER_R3                     = 50510,
     SPELL_DK_EBON_PLAGUE_R1                     = 51726,
-    SPELL_DK_EBON_PLAGUE_R2                     = 51734,
-    SPELL_DK_EBON_PLAGUE_R3                     = 51735,
     // Risen Ally
     SPELL_DK_RAISE_ALLY                         = 46619,
     SPELL_DK_THRASH                             = 47480,
@@ -1789,17 +1785,9 @@ class spell_dk_pestilence : public SpellScript
                     caster->CastSpell(caster, talons->GetSpellInfo()->Effects[EFFECT_0].TriggerSpell, true);
             }
 
-            if (Aura* disease = target->GetAura(SPELL_DK_CRYPT_FEVER_R1, caster->GetGUID()))
+            if (Aura* disease = target->GetAuraOfRankedSpell(SPELL_DK_EBON_PLAGUE_R1, caster->GetGUID()))
                 disease->RefreshDuration();
-            else if (Aura* disease = target->GetAura(SPELL_DK_CRYPT_FEVER_R2, caster->GetGUID()))
-                disease->RefreshDuration();
-            else if (Aura* disease = target->GetAura(SPELL_DK_CRYPT_FEVER_R3, caster->GetGUID()))
-                disease->RefreshDuration();
-            else if (Aura* disease = target->GetAura(SPELL_DK_EBON_PLAGUE_R1, caster->GetGUID()))
-                disease->RefreshDuration();
-            else if (Aura* disease = target->GetAura(SPELL_DK_EBON_PLAGUE_R2, caster->GetGUID()))
-                disease->RefreshDuration();
-            else if (Aura* disease = target->GetAura(SPELL_DK_EBON_PLAGUE_R3, caster->GetGUID()))
+            else if (Aura* disease = target->GetAuraOfRankedSpell(SPELL_DK_CRYPT_FEVER_R1, caster->GetGUID()))
                 disease->RefreshDuration();
         }
     }
