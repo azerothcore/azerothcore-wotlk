@@ -18,15 +18,14 @@
 #include "CombatAI.h"
 #include "CreatureScript.h"
 #include "CreatureTextMgr.h"
-#include "MotionMaster.h"
-#include "ObjectAccessor.h"
+#include "ScriptedGossip.h"
 #include "Player.h"
 #include "ScriptedCreature.h"
 #include "ScriptedEscortAI.h"
-#include "ScriptedGossip.h"
 #include "SpellInfo.h"
 #include "SpellScript.h"
-#include "SpellScriptLoader.h"
+#include "MotionMaster.h"
+#include "ObjectAccessor.h"
 #include <limits>
 
 /*######
