@@ -17,6 +17,8 @@
 
 #include "AreaTriggerScript.h"
 #include "CreatureScript.h"
+#include "GameObjectAI.h"
+#include "GameObjectScript.h"
 #include "Player.h"
 #include "ScriptedCreature.h"
 #include "SpellInfo.h"
@@ -488,6 +490,22 @@ public:
     }
 };
 
+struct go_eredar_twins_blaze : GameObjectAI
+{
+    explicit go_eredar_twins_blaze(GameObject *object) : GameObjectAI(object) { };
+
+    void InitializeAI() override
+    {
+        // required for the trap to apply its startDelay
+        if (InstanceScript* instance = me->GetInstanceScript())
+            if (ObjectGuid creatureGUID = instance->GetGuidData(DATA_ALYTHESS))
+            {
+                me->SetOwnerGUID(creatureGUID);
+                me->SetLootState(GO_NOT_READY);
+            }
+     }
+};
+
 void AddSC_boss_eredar_twins()
 {
     RegisterSunwellPlateauCreatureAI(boss_sacrolash);
@@ -501,4 +519,5 @@ void AddSC_boss_eredar_twins()
     RegisterSpellScriptWithArgs(spell_eredar_twins_handle_touch_periodic, "spell_eredar_twins_handle_flame_touched_periodic", SPELL_FLAME_TOUCHED, EFFECT_2, SPELL_AURA_PERIODIC_TRIGGER_SPELL);
     RegisterSpellScriptWithArgs(spell_eredar_twins_handle_touch_periodic, "spell_eredar_twins_handle_flame_touched_flame_sear", SPELL_FLAME_TOUCHED, EFFECT_1, SPELL_AURA_PERIODIC_DAMAGE);
     new at_sunwell_eredar_twins();
+    RegisterGameObjectAI(go_eredar_twins_blaze);
 }

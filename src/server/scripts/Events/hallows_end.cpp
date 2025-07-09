@@ -15,6 +15,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "AreaDefines.h"
 #include "CellImpl.h"
 #include "CreatureScript.h"
 #include "GameObjectAI.h"
@@ -371,42 +372,42 @@ struct npc_costumed_orphan_matron : public ScriptedAI
     {
         switch (me->GetAreaId())
         {
-        case 87: // Goldshire
+        case AREA_GOLDSHIRE:
             x = -9494.4f;
             y = 48.53f;
             z = 70.5f;
             o = 0.5f;
             path = 235431;
             break;
-        case 131: // Kharanos
+        case AREA_KHARANOS:
             x = -5558.34f;
             y = -499.46f;
             z = 414.12f;
             o = 2.08f;
             path = 235432;
             break;
-        case 3576: // Azure Watch
+        case AREA_AZURE_WATCH:
             x = -4163.58f;
             y = -12460.30f;
             z = 63.02f;
             o = 4.31f;
             path = 235433;
             break;
-        case 362: // Razor Hill
+        case AREA_RAZOR_HILL:
             x = 373.2f;
             y = -4723.4f;
             z = 31.2f;
             o = 3.2f;
             path = 235434;
             break;
-        case 159: // Brill
+        case AREA_BRILL:
             x = 2195.2f;
             y = 264.0f;
             z = 55.62f;
             o = 0.15f;
             path = 235435;
             break;
-        case 3665: // Falcon Wing Square
+        case AREA_FALCONWING_SQUARE:
             x = 9547.91f;
             y = -6809.9f;
             z = 27.96f;

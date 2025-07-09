@@ -31,4 +31,4 @@ if ! command -v cmake &>/dev/null ; then
 fi
 ##########################################
 
-brew install openssl@3 readline boost bash-completion curl unzip mysql ccache
+brew install openssl@3 readline boost bash-completion curl unzip mysql ccache expect tmux screen jq

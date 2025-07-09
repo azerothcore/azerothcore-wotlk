@@ -47,7 +47,7 @@ void OutdoorPvPGH::SendRemoveWorldStates(Player* player)
 
 OPvPCapturePointGH::OPvPCapturePointGH(OutdoorPvP* pvp) : OPvPCapturePoint(pvp)
 {
-    SetCapturePointData(189310, 571, 2483.68f, -1873.6f, 10.6877f, -0.104719f, 0.0f, 0.0f, 0.0f, 1.0f);
+    SetCapturePointData(189310, MAP_NORTHREND, 2483.68f, -1873.6f, 10.6877f, -0.104719f, 0.0f, 0.0f, 0.0f, 1.0f);
 }
 
 void OPvPCapturePointGH::FillInitialWorldStates(WorldPackets::WorldState::InitWorldStates& packet)
@@ -108,7 +108,7 @@ void OPvPCapturePointGH::ChangeState()
             break;
     }
 
-    Map* map = sMapMgr->FindMap(571, 0);
+    Map* map = sMapMgr->FindMap(MAP_NORTHREND, 0);
     auto bounds = map->GetGameObjectBySpawnIdStore().equal_range(m_capturePointSpawnId);
     for (auto itr = bounds.first; itr != bounds.second; ++itr)
         itr->second->SetGoArtKit(artkit);
