@@ -79,6 +79,11 @@ bool ScriptMgr::CanGuildSendBankList(Guild const* guild, WorldSession* session, 
     CALL_ENABLED_BOOLEAN_HOOKS(GuildScript, GUILDHOOK_CAN_GUILD_SEND_BANK_LIST, !script->CanGuildSendBankList(guild, session, tabId, sendAllSlots));
 }
 
+void ScriptMgr::OnGuildNameQueryOpcode(Guild const* guild, WorldSession* session, std::string& name)
+{
+    CALL_ENABLED_HOOKS(GuildScript, GUILDHOOK_ON_NAME_QUERY_OPCODE, script->OnNameQueryOpcode(guild, session, name));
+}
+
 GuildScript::GuildScript(const char* name, std::vector<uint16> enabledHooks)
     : ScriptObject(name, GUILDHOOK_END)
 {

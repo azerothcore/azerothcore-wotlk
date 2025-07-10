@@ -210,6 +210,7 @@ enum PlayerHook
     PLAYERHOOK_CAN_RESURRECT,
     PLAYERHOOK_ON_CAN_GIVE_LEVEL,
     PLAYERHOOK_ON_SEND_LIST_INVENTORY,
+    PLAYERHOOK_ON_SEND_NAME_QUERY_OPCODE,
     PLAYERHOOK_END
 };
 
@@ -803,6 +804,14 @@ public:
      * @param vendorEntry Entry of the vendor player is interacting with
      */
     virtual void OnPlayerSendListInventory(Player* /*player*/, ObjectGuid /*vendorGuid*/, uint32& /*vendorEntry*/) {}
+
+    /**
+     * @brief This hooks is called whenever a players name is sent to the client, can be used to alter it
+     *
+     * @param player Contains information about the Player
+     * @param name Name about to be sent to the client for the player
+     */
+    virtual void OnPlayerSendNameQueryOpcode(Player* /*player*/, std::string& /*name*/) {}
 };
 
 #endif
