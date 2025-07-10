@@ -1,3 +1,4 @@
+-- DB update 2025_07_09_00 -> 2025_07_10_00
 
 -- Set SmartAI
 UPDATE `creature_template` SET `AIName` = 'SmartAI' WHERE (`entry` IN (28610, 28936, 28940, 28939, 28964));
