@@ -334,7 +334,8 @@ void WorldState::Update(uint32 diff)
                     HandleActiveZone(GetTimerIdForZone(zone.second.zoneId), zone.second.zoneId, zone.second.remainingNecropoli, now);
             }
         }
-        else m_siData.m_broadcastTimer -= diff;
+        else
+            m_siData.m_broadcastTimer -= diff;
     }
 }
 
@@ -1665,9 +1666,7 @@ void WorldState::StartNewCityAttack(uint32 zoneId)
 
     ScourgeInvasionData::CityAttack& zone = m_siData.m_cityAttacks[zoneId];
 
-    // @todo: enable others
-    // int32 SpawnLocationID = (urand(0, zone.pallid.size() - 1));
-    uint32 SpawnLocationID = 1;
+    uint32 SpawnLocationID = urand(0, static_cast<uint32>(zone.pallid.size() - 1));
 
     Map* map = GetMap(zone.map, zone.pallid[SpawnLocationID]);
 
@@ -1681,9 +1680,6 @@ void WorldState::StartNewCityAttack(uint32 zoneId)
 
     if (m_siData.m_pendingPallids.find(zoneId) != m_siData.m_pendingPallids.end())
         return;
-
-    /*if (!m_siData.m_attackPoints[zoneId].pallidGuid.IsEmpty())
-        return;*/
 
     if (map && SummonPallid(map, zone, zone.pallid[SpawnLocationID], SpawnLocationID))
         LOG_DEBUG("gameevent", "ScourgeInvasionEvent::StartNewCityAttackIfTime pallid spawned in {}.", zone.map);
@@ -1757,7 +1753,6 @@ bool WorldState::SummonPallid(Map* map, ScourgeInvasionData::CityAttack& zone, c
         existingPallid->AddObjectToRemoveList();
 
     // if (Creature* pallid = map->SummonCreature(RAND(NPC_PALLID_HORROR, NPC_PATCHWORK_TERROR), position))
-    // @todo: include patchwork terror?
     if (Creature* pallid = map->SummonCreature(NPC_PALLID_HORROR, position))
     {
         pallid->GetMotionMaster()->Clear(false);
@@ -1795,8 +1790,6 @@ void WorldState::HandleActiveZone(uint32 attackTimeVar, uint32 zoneId, uint32 re
 
     if (zone.mouthGuid)
     {
-        // map->GetMessager().AddMessage([=](Map* map)
-        // {
         // Handles the inactive zone, without a Mouth of Kel'Thuzad summoned (which spawns the whole zone event).
         Creature* mouth = map->GetCreature(zone.mouthGuid);
         if (!mouth)
@@ -1816,7 +1809,6 @@ void WorldState::HandleActiveZone(uint32 attackTimeVar, uint32 zoneId, uint32 re
                 else
                     LOG_ERROR("gameevent", "ScourgeInvasionEvent::HandleActiveZone ObjectGuid {} not found.", zone.mouthGuid.ToString());
         }
-        // });
     }
     else
     {

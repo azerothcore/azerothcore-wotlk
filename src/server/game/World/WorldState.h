@@ -371,7 +371,6 @@ class WorldState
     private:
         void SendScourgeInvasionMail();
         ScourgeInvasionData m_siData;
-
 };
 
 #define sWorldState WorldState::instance()
