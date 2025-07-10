@@ -548,6 +548,7 @@ public:
             summons.DespawnAll();
 
             me->SetImmuneToAll(true);
+            me->LoadEquipment(1, true);
             me->ReplaceAllNpcFlags(UNIT_NPC_FLAG_GOSSIP | UNIT_NPC_FLAG_QUESTGIVER);
             me->SetStandState(UNIT_STAND_STATE_STAND);
             me->SetVisible(true);
