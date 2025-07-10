@@ -11,7 +11,7 @@ DELETE FROM `command` WHERE `name` IN (
 
 INSERT INTO `command` (`name`, `security`, `help`) VALUES
 ('worldstate scourgeinvasion show',       3, 'Syntax: .worldstate scourgeinvasion show\nDisplays the current status of the Scourge Invasion.'),
-('worldstate scourgeinvasion state',      3, 'Syntax: .worldstate scourgeinvasion state <value>\nSets the Scourge Invasion state.\nValid values:\n0: Disabled\n1: Enabled\n2: Debug'),
+('worldstate scourgeinvasion state',      3, 'Syntax: .worldstate scourgeinvasion state <value>\nSets the Scourge Invasion state.\nValid values:\n0: Disabled\n1: Enabled'),
 ('worldstate scourgeinvasion battleswon', 3, 'Syntax: .worldstate scourgeinvasion battleswon <value>\nAdjusts the Scourge Invasion battles won count by <value> (can be negative).'),
 ('worldstate scourgeinvasion startzone',  3, 'Syntax: .worldstate scourgeinvasion startzone <id>\nStarts a Scourge Invasion event in the zone specified by <id>.\nValid zone IDs: 0-7.');
 
