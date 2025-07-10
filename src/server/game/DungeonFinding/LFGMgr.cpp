@@ -2683,24 +2683,17 @@ namespace lfg
     LFGQueue& LFGMgr::GetQueue(ObjectGuid guid)
     {
         uint8 queueId = 0;
-        if (sWorld->getBoolConfig(CONFIG_ALLOW_TWO_SIDE_INTERACTION_GROUP))
+        if (guid.IsGroup())
         {
-            queueId = TEAM_ALLIANCE;
+            LfgGuidSet const& players = GetPlayers(guid);
+            ObjectGuid pguid = players.empty() ? ObjectGuid::Empty : (*players.begin());
+            if (pguid)
+                queueId = GetTeam(pguid);
+            else
+                queueId = GetTeam(GetLeader(guid));
         }
         else
-        {
-            if (guid.IsGroup())
-            {
-                LfgGuidSet const& players = GetPlayers(guid);
-                ObjectGuid pguid = players.empty() ? ObjectGuid::Empty : (*players.begin());
-                if (pguid)
-                    queueId = GetTeam(pguid);
-                else
-                    queueId = GetTeam(GetLeader(guid));
-            }
-            else
-                queueId = GetTeam(guid);
-        }
+            queueId = GetTeam(guid);
         return QueuesStore[queueId];
     }
 
