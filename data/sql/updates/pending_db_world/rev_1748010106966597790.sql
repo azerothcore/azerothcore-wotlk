@@ -8,7 +8,6 @@ DELETE FROM `command` WHERE `name` IN (
     'worldstate scourgeinvasion battleswon',
     'worldstate scourgeinvasion startzone'
 );
-
 INSERT INTO `command` (`name`, `security`, `help`) VALUES
 ('worldstate scourgeinvasion show',       3, 'Syntax: .worldstate scourgeinvasion show\nDisplays the current status of the Scourge Invasion.'),
 ('worldstate scourgeinvasion state',      3, 'Syntax: .worldstate scourgeinvasion state <value>\nSets the Scourge Invasion state.\nValid values:\n0: Disabled\n1: Enabled'),
@@ -27,14 +26,14 @@ SET
 @scourge_50_invasions_done   = 127,
 @scourge_100_invasions_done  = 128,
 @scourge_150_invasions_done  = 129,
-@scourge_invasions_done      = 130;
+@scourge_invasions_done      = 130,
+@GAMEEVENT_INTERNAL = 5; -- never handled in GameEventMgr update
 
 DELETE FROM `game_event` WHERE `eventEntry` IN (
     @scourge_boss_in_instance,  @scourge_winterspring, @scourge_tanaris, @scourge_azshara,
     @scourge_blasted_lands,     @scourge_eastern_plaguelands, @scourge_burning_steppes,
     @scourge_50_invasions_done, @scourge_100_invasions_done, @scourge_150_invasions_done, @scourge_invasions_done
 );
-SET @GAMEEVENT_INTERNAL = 5; -- never handled in GameEventMgr update
 INSERT INTO `game_event` (`eventEntry`, `description`, `world_event`) VALUES
 (@scourge_boss_in_instance,    'Scourge Invasion - Boss in instance activation', @GAMEEVENT_INTERNAL),
 (@scourge_winterspring,        'Scourge Invasion - Attacking Winterspring', @GAMEEVENT_INTERNAL),
@@ -5935,9 +5934,8 @@ INSERT INTO `waypoint_data` (`id`, `point`, `position_x`, `position_y`, `positio
 (@PATH_ID+1, 33, -8497.76, 404.19, 108.386, 100, 0, 0, 0),
 (@PATH_ID+1, 34, -8477.23, 378.372, 112.258, 100, 0, 0, 0),
 (@PATH_ID+1, 35, -8457.71, 353.894, 120.084, 100, 0, 0, 0),
-(@PATH_ID+1, 36, -8441.52, 333.366, 122.579, 100, 0, 0, 0); -- action: 151912
+(@PATH_ID+1, 36, -8441.52, 333.366, 122.579, 100, 0, 0, 0), -- action: 151912
 -- Stormwind Trade District
-INSERT INTO `waypoint_data` (`id`, `point`, `position_x`, `position_y`, `position_z`, `orientation`, `delay`, `action`, `move_type`) VALUES
 (@PATH_ID+2, 1, -8571.98, 891.327, 90.7048, 100, 0, 0, 0),
 (@PATH_ID+2, 2, -8564.43, 897.362, 96.6816, 100, 0, 0, 0),
 (@PATH_ID+2, 3, -8543.69, 868.857, 96.678, 100, 0, 0, 0),
@@ -5977,10 +5975,9 @@ INSERT INTO `waypoint_data` (`id`, `point`, `position_x`, `position_y`, `positio
 (@PATH_ID+2, 37, -8804.64, 647.774, 94.4579, 100, 0, 0, 0),
 (@PATH_ID+2, 38, -8798.51, 658.14, 95.7397, 100, 0, 0, 0),
 (@PATH_ID+2, 39, -8791.07, 679.552, 102.017, 100, 0, 0, 0),
-(@PATH_ID+2, 40, -8807.04, 683.424, 100.21, 100, 0, 0, 0); -- action: 151921
+(@PATH_ID+2, 40, -8807.04, 683.424, 100.21, 100, 0, 0, 0), -- action: 151921
 
 -- Undercity Trade Quarter
-INSERT INTO `waypoint_data` (`id`, `point`, `position_x`, `position_y`, `position_z`, `orientation`, `delay`, `action`, `move_type`) VALUES
 (@PATH_ID+3, 1, 1660.98, 257.238, -62.1777, 100, 0, 0, 0),
 (@PATH_ID+3, 2, 1659.01, 234.474, -62.1776, 100, 0, 0, 0), -- action: 149711
 (@PATH_ID+3, 3, 1657.83, 213.584, -62.179, 100, 0, 0, 0),
@@ -6005,9 +6002,8 @@ INSERT INTO `waypoint_data` (`id`, `point`, `position_x`, `position_y`, `positio
 (@PATH_ID+3, 22, 1568.61, 264.061, -43.1027, 100, 0, 0, 0),
 (@PATH_ID+3, 23, 1578.92, 273.572, -43.1027, 100, 0, 0, 0),
 (@PATH_ID+3, 24, 1585.38, 276.608, -43.1027, 100, 0, 0, 0),
-(@PATH_ID+3, 25, 1605.34, 276.451, -43.1027, 100, 0, 0, 0); -- action: 149713
+(@PATH_ID+3, 25, 1605.34, 276.451, -43.1027, 100, 0, 0, 0), -- action: 149713
 -- Undercity Royal Quarter
-INSERT INTO `waypoint_data` (`id`, `point`, `position_x`, `position_y`, `position_z`, `orientation`, `delay`, `action`, `move_type`) VALUES
 (@PATH_ID+4, 1, 1596.72, 423.488, -46.3713, 100, 0, 0, 0), -- action: 149720
 (@PATH_ID+4, 2, 1603.8, 423.409, -46.3814, 100, 0, 0, 0),
 (@PATH_ID+4, 3, 1615.01, 423.43, -53.2855, 100, 0, 0, 0),
