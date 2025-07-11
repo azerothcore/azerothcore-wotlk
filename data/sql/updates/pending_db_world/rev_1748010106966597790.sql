@@ -27,8 +27,9 @@ SET
 @scourge_50_invasions_done   = 127,
 @scourge_100_invasions_done  = 128,
 @scourge_150_invasions_done  = 129,
-@scourge_invasions_done      = 130,
-@GAMEEVENT_INTERNAL = 5; -- never handled in GameEventMgr update
+@scourge_invasions_done      = 130;
+
+SET @GAMEEVENT_INTERNAL = 5; -- never handled in GameEventMgr update
 
 DELETE FROM `game_event` WHERE `eventEntry` IN (
     @scourge_boss_in_instance,  @scourge_winterspring, @scourge_tanaris, @scourge_azshara,
