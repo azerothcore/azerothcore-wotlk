@@ -217,7 +217,7 @@ def insert_delete_safety_check(file: io, file_path: str) -> None:
                 check_failed = True
             else:
                 previous_line = line_number - 1
-                while previous_line > 0 and (lines[previous_line - 1].strip().startswith('--') or lines[previous_line - 1].strip() == ""):
+                while previous_line > 0 and lines[previous_line - 1].strip().startswith('--'):
                     previous_line -= 1
                 if previous_line <= 0 or previous_line not in deletes:
                     print(f"❌ DELETE for `{table}` must be directly above the INSERT in {file_path} at line {line_number}")
