@@ -197,7 +197,7 @@ def insert_delete_safety_check(file: io, file_path: str) -> None:
         match = re.match(r"DELETE FROM\s+`([^`]+)`", line.strip(), re.IGNORECASE)
         if match:
             table_name = match.group(1)
-            print(f"Found DELETE from `{table_name}` at line {line_number}")
+            #print(f"Found DELETE from `{table_name}` at line {line_number}")
             if table_name in not_delete:
                 print(
                     f"❌ Entries from {table_name} should not be deleted! {file_path} at line {line_number}\nIf this error is intended, please notify a maintainer")
@@ -210,7 +210,7 @@ def insert_delete_safety_check(file: io, file_path: str) -> None:
         insert_match = re.match(r"INSERT INTO\s+`([^`]+)`", line.strip(), re.IGNORECASE)
         if insert_match:
             table = insert_match.group(1)
-            print(f"Found INSERT into `{table}` at line {line_number}")
+            #print(f"Found INSERT into `{table}` at line {line_number}")
             deletes = delete_lines.get(table)
             if not deletes:
                 print(f"❌ No DELETE keyword found before the INSERT in {file_path} at line {line_number}\nIf this error is intended, please notify a maintainer")
