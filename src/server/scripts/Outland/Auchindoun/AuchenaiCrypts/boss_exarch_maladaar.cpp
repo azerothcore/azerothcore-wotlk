@@ -67,8 +67,6 @@ struct boss_exarch_maladaar : public BossAI
         });
     }
 
-    bool _talked;
-
     void Reset() override
     {
         _Reset();
@@ -115,10 +113,29 @@ struct boss_exarch_maladaar : public BossAI
                     summon->SetDisplayId(target->GetDisplayId());
                     summon->AI()->DoAction(target->getClass());
                     summon->AI()->AttackStart(target);
+
+                    auto targetGuid = target->GetGUID();
+                    _stolenSoulTarget[summon->GetGUID()] = targetGuid;
+                    _stolenSoulCounter[targetGuid]++;
                 }
             }
             context.Repeat(25s, 30s);
         });
+    }
+
+    void SummonedCreatureDies(Creature* summon, Unit* /*killer*/) override
+    {
+        auto summonGuid = summon->GetGUID();
+        auto targetGuid = _stolenSoulTarget[summonGuid];
+        _stolenSoulTarget.erase(summonGuid);
+        if (--_stolenSoulCounter[targetGuid] == 0)
+        {
+            // No Stolen Souls remain on this target, remove debuff
+            auto target = ObjectAccessor::GetUnit(*me, targetGuid);
+            if (target) {
+                target->RemoveAurasDueToSpell(SPELL_STOLEN_SOUL);
+            }
+        }
     }
 
     void KilledUnit(Unit* victim) override
@@ -152,20 +169,22 @@ struct boss_exarch_maladaar : public BossAI
 
         DoMeleeAttackIfReady();
     }
+private:
+    bool _talked;
+    std::map<ObjectGuid, ObjectGuid> _stolenSoulTarget;
+    std::map<ObjectGuid, size_t> _stolenSoulCounter;
 };
 
 struct npc_stolen_soul : public ScriptedAI
 {
     npc_stolen_soul(Creature* creature) : ScriptedAI(creature) {}
 
-    uint8 myClass;
-
     void Reset() override
     {
-        myClass = CLASS_WARRIOR;
+        _myClass = CLASS_WARRIOR;
         _scheduler.Schedule(1s, [this] (TaskContext /*context*/)
         {
-            switch (myClass)
+            switch (_myClass)
             {
                 case CLASS_WARRIOR:
                     _scheduler.Schedule(0ms, [this](TaskContext context)
@@ -243,7 +262,7 @@ struct npc_stolen_soul : public ScriptedAI
 
     void DoAction(int32 pClass) override
     {
-        myClass = pClass;
+        _myClass = pClass;
     }
 
     void UpdateAI(uint32 diff) override
@@ -257,6 +276,7 @@ struct npc_stolen_soul : public ScriptedAI
 
 private:
     TaskScheduler _scheduler;
+    uint8 _myClass;
 };
 
 void AddSC_boss_exarch_maladaar()
