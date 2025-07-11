@@ -375,59 +375,32 @@ def backtick_check(file: io, file_path: str) -> None:
         matches = pattern.findall(sanitized_line)
         
         for clause, content in matches:
-            # Skip checking inside SET if it contains variables with assignment and commas (multi-line SET)
-            if clause.upper() == "SET" and ("\n" in content or "," in content):
-                # Split content by commas for multi assignment
-                assignments = re.split(r',\s*(?=@)', content)
-                for assign in assignments:
-                    words = re.findall(r'\b(?<!@)([a-zA-Z_][a-zA-Z0-9_]*)\b', assign)
-                    for word in words:
-                        if word.upper() in {"SELECT", "FROM", "JOIN", "WHERE", "GROUP", "BY", "ORDER",
-                                            "DELETE", "UPDATE", "INSERT", "INTO", "SET", "VALUES", "AND",
-                                            "IN", "OR", "REPLACE", "NOT", "BETWEEN",
-                                            "DISTINCT", "HAVING", "LIMIT", "OFFSET", "AS", "ON", "INNER",
-                                            "LEFT", "RIGHT", "FULL", "OUTER", "CROSS", "NATURAL",
-                                            "EXISTS", "LIKE", "IS", "NULL", "UNION", "ALL", "ASC", "DESC",
-                                            "CASE", "WHEN", "THEN", "ELSE", "END", "CREATE", "TABLE",
-                                            "ALTER", "DROP", "DATABASE", "INDEX", "VIEW", "TRIGGER",
-                                            "PROCEDURE", "FUNCTION", "PRIMARY", "KEY", "FOREIGN", "REFERENCES",
-                                            "CONSTRAINT", "DEFAULT", "AUTO_INCREMENT", "UNIQUE", "CHECK",
-                                            "SHOW", "DESCRIBE", "EXPLAIN", "USE", "GRANT", "REVOKE",
-                                            "BEGIN", "COMMIT", "ROLLBACK", "SAVEPOINT", "LOCK", "UNLOCK",
-                                            "WITH", "RECURSIVE", "COLUMN", "ENGINE", "CHARSET", "COLLATE",
-                                            "IF", "ELSEIF", "LOOP", "WHILE", "DO", "HANDLER", "LEAVE",
-                                            "ITERATE", "DECLARE", "CURSOR", "FETCH", "OPEN", "CLOSE"}:
-                            continue
-                        if not re.search(rf'`{re.escape(word)}`', assign):
-                            print(f"❌ Missing backticks around ({word}). {file_path} at line {line_number}")
-                            check_failed = True
-            else:
-                # Find all words and exclude @variables
-                words = re.findall(r'\b(?<!@)([a-zA-Z_][a-zA-Z0-9_]*)\b', content)
+            # Find all words and exclude @variables
+            words = re.findall(r'\b(?<!@)([a-zA-Z_][a-zA-Z0-9_]*)\b', content)
 
-                for word in words:
-                    # Skip MySQL keywords
-                    if word.upper() in {"SELECT", "FROM", "JOIN", "WHERE", "GROUP", "BY", "ORDER",
-                                        "DELETE", "UPDATE", "INSERT", "INTO", "SET", "VALUES", "AND",
-                                        "IN", "OR", "REPLACE", "NOT", "BETWEEN",
-                                        "DISTINCT", "HAVING", "LIMIT", "OFFSET", "AS", "ON", "INNER",
-                                        "LEFT", "RIGHT", "FULL", "OUTER", "CROSS", "NATURAL",
-                                        "EXISTS", "LIKE", "IS", "NULL", "UNION", "ALL", "ASC", "DESC",
-                                        "CASE", "WHEN", "THEN", "ELSE", "END", "CREATE", "TABLE",
-                                        "ALTER", "DROP", "DATABASE", "INDEX", "VIEW", "TRIGGER",
-                                        "PROCEDURE", "FUNCTION", "PRIMARY", "KEY", "FOREIGN", "REFERENCES",
-                                        "CONSTRAINT", "DEFAULT", "AUTO_INCREMENT", "UNIQUE", "CHECK",
-                                        "SHOW", "DESCRIBE", "EXPLAIN", "USE", "GRANT", "REVOKE",
-                                        "BEGIN", "COMMIT", "ROLLBACK", "SAVEPOINT", "LOCK", "UNLOCK",
-                                        "WITH", "RECURSIVE", "COLUMN", "ENGINE", "CHARSET", "COLLATE",
-                                        "IF", "ELSEIF", "LOOP", "WHILE", "DO", "HANDLER", "LEAVE",
-                                        "ITERATE", "DECLARE", "CURSOR", "FETCH", "OPEN", "CLOSE"}:
-                        continue
+            for word in words:
+                # Skip MySQL keywords
+                if word.upper() in {"SELECT", "FROM", "JOIN", "WHERE", "GROUP", "BY", "ORDER",
+                                    "DELETE", "UPDATE", "INSERT", "INTO", "SET", "VALUES", "AND",
+                                    "IN", "OR", "REPLACE", "NOT", "BETWEEN",
+                                    "DISTINCT", "HAVING", "LIMIT", "OFFSET", "AS", "ON", "INNER",
+                                    "LEFT", "RIGHT", "FULL", "OUTER", "CROSS", "NATURAL",
+                                    "EXISTS", "LIKE", "IS", "NULL", "UNION", "ALL", "ASC", "DESC",
+                                    "CASE", "WHEN", "THEN", "ELSE", "END", "CREATE", "TABLE",
+                                    "ALTER", "DROP", "DATABASE", "INDEX", "VIEW", "TRIGGER",
+                                    "PROCEDURE", "FUNCTION", "PRIMARY", "KEY", "FOREIGN", "REFERENCES",
+                                    "CONSTRAINT", "DEFAULT", "AUTO_INCREMENT", "UNIQUE", "CHECK",
+                                    "SHOW", "DESCRIBE", "EXPLAIN", "USE", "GRANT", "REVOKE",
+                                    "BEGIN", "COMMIT", "ROLLBACK", "SAVEPOINT", "LOCK", "UNLOCK",
+                                    "WITH", "RECURSIVE", "COLUMN", "ENGINE", "CHARSET", "COLLATE",
+                                    "IF", "ELSEIF", "LOOP", "WHILE", "DO", "HANDLER", "LEAVE",
+                                    "ITERATE", "DECLARE", "CURSOR", "FETCH", "OPEN", "CLOSE"}:
+                    continue
 
-                    # Make sure the word is enclosed in backticks
-                    if not re.search(rf'`{re.escape(word)}`', content):
-                        print(f"❌ Missing backticks around ({word}). {file_path} at line {line_number}")
-                        check_failed = True
+                # Make sure the word is enclosed in backticks
+                if not re.search(rf'`{re.escape(word)}`', content):
+                    print(f"❌ Missing backticks around ({word}). {file_path} at line {line_number}")
+                    check_failed = True
 
     if check_failed:
         error_handler = True
