@@ -1039,7 +1039,7 @@ class spell_portal_effect_acherus : public SpellScript
 
     bool Validate(SpellInfo const* /*spellInfo*/) override
     {
-        return ValidateSpellInfo({  SPELL_PORTAL_EFFECT_ACHERUS });
+        return ValidateSpellInfo({ SPELL_PORTAL_EFFECT_ACHERUS });
     }
 
     SpellCastResult CheckCast()
