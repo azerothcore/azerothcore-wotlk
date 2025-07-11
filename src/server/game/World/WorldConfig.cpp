@@ -443,6 +443,7 @@ void WorldConfig::BuildConfigCache()
     SetConfigValue<uint32>(CONFIG_ARENA_AUTO_DISTRIBUTE_INTERVAL_DAYS, "Arena.AutoDistributeInterval", 7);
     SetConfigValue<uint32>(CONFIG_ARENA_GAMES_REQUIRED, "Arena.GamesRequired", 10);
     SetConfigValue<uint32>(CONFIG_ARENA_START_RATING, "Arena.ArenaStartRating", 0);
+    SetConfigValue<uint32>(CONFIG_LEGACY_ARENA_START_RATING, "Arena.LegacyArenaStartRating", 1500);
     SetConfigValue<uint32>(CONFIG_LEGACY_ARENA_POINTS_CALC, "Arena.LegacyArenaPoints", 0);
     SetConfigValue<uint32>(CONFIG_ARENA_START_PERSONAL_RATING, "Arena.ArenaStartPersonalRating", 0);
     SetConfigValue<uint32>(CONFIG_ARENA_START_MATCHMAKER_RATING, "Arena.ArenaStartMatchmakerRating", 1500);
