@@ -71,6 +71,10 @@ private:
     std::string _hostname;
     std::string _port;
     std::string _databaseName;
+    bool _useV2 = false;
+    std::string _org;
+    std::string _bucket;
+    std::string _token;
     std::function<void()> _overallStatusLogger;
     std::string _realmName;
     std::unordered_map<std::string, int64> _thresholds;

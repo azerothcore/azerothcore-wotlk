@@ -1,3 +1,8 @@
+#!/usr/bin/env bash
+
+# Set SUDO variable - one liner
+SUDO=$([ "$EUID" -ne 0 ] && echo "sudo" || echo "")
+
 function inst_configureOS() {
     echo "Platform: $OSTYPE"
     case "$OSTYPE" in
@@ -45,6 +50,42 @@ function inst_configureOS() {
     esac
 }
 
+# Use the data/sql/create/create_mysql.sql to initialize the database
+function inst_dbCreate() {
+    echo "Creating database..."
+
+    # Attempt to connect with MYSQL_ROOT_PASSWORD
+    if [ ! -z "$MYSQL_ROOT_PASSWORD" ]; then
+        if $SUDO mysql -u root -p"$MYSQL_ROOT_PASSWORD" < "$AC_PATH_ROOT/data/sql/create/create_mysql.sql" 2>/dev/null; then
+            echo "Database created successfully."
+            return 0
+        else
+            echo "Failed to connect with provided password, falling back to interactive mode..."
+        fi
+    fi
+
+    # In CI environments or when no password is set, try without password first
+    if [[ "$CONTINUOUS_INTEGRATION" == "true" ]]; then
+        echo "CI environment detected, attempting connection without password..."
+        
+        if $SUDO mysql -u root < "$AC_PATH_ROOT/data/sql/create/create_mysql.sql" 2>/dev/null; then
+            echo "Database created successfully."
+            return 0
+        else
+            echo "Failed to connect without password, falling back to interactive mode..."
+        fi
+    fi
+    
+    # Try with password (interactive mode)
+    echo "Please enter your sudo and your MySQL root password if prompted."
+    $SUDO mysql -u root -p < "$AC_PATH_ROOT/data/sql/create/create_mysql.sql"
+    if [ $? -ne 0 ]; then
+        echo "Database creation failed. Please check your MySQL server and credentials."
+        exit 1
+    fi
+    echo "Database created successfully."
+}
+
 function inst_updateRepo() {
     cd "$AC_PATH_ROOT"
     if [ ! -z $INSTALLER_PULL_FROM ]; then
@@ -73,7 +114,8 @@ function inst_cleanCompile() {
 function inst_allInOne() {
     inst_configureOS
     inst_compile
-    dbasm_import true true true
+    inst_dbCreate
+    inst_download_client_data
 }
 
 function inst_getVersionBranch() {
@@ -215,7 +257,7 @@ function inst_module_remove {
 
 function inst_simple_restarter {
     echo "Running $1 ..."
-    bash "$AC_PATH_APPS/startup-scripts/simple-restarter" "$AC_BINPATH_FULL" "$1"
+    bash "$AC_PATH_APPS/startup-scripts/src/simple-restarter" "$AC_BINPATH_FULL" "$1"
     echo
     #disown -a
     #jobs -l

@@ -3076,3 +3076,21 @@ std::string GameObject::GetDebugInfo() const
         << "SpawnId: " << GetSpawnId() << " GoState: " << std::to_string(GetGoState()) << " ScriptId: " << GetScriptId() << " AIName: " << GetAIName();
     return sstr.str();
 }
+
+// Note: This is called in a tight (heavy) loop, is it critical that all checks are FAST and are hopefully only simple conditionals.
+bool GameObject::IsUpdateNeeded()
+{
+    if (WorldObject::IsUpdateNeeded())
+        return true;
+
+    if (GetMap()->isCellMarked(GetCurrentCell().GetCellCoord().GetId()))
+        return true;
+
+    if (IsVisibilityOverridden())
+        return true;
+
+    if (IsTransport())
+        return true;
+
+    return false;
+}
