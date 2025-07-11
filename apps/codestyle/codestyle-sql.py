@@ -256,6 +256,8 @@ def semicolon_check(file: io, file_path: str) -> None:
     lines = file.readlines()
     total_lines = len(lines)
 
+    set_open = False  # Track if currently inside a SET statement
+
     def get_next_non_blank_line(start):
         """ Get the next non-blank, non-comment line starting from `start` """
         for idx in range(start, total_lines):
@@ -284,16 +286,25 @@ def semicolon_check(file: io, file_path: str) -> None:
                 in_block_comment = True
                 stripped_line = stripped_line.split('/*', 1)[0].strip()
 
-        # Skip empty lines (unless inside values block)
-        if not stripped_line and not inside_values_block:
+        # Skip empty lines (unless inside values block or inside SET block)
+        if not stripped_line and not inside_values_block and not set_open:
             continue
 
         # Remove inline comments after SQL
         stripped_line = stripped_line.split('--', 1)[0].strip()
 
-        if stripped_line.upper().startswith("SET") and not stripped_line.endswith(";"):
-            print(f"❌ Missing semicolon in {file_path} at line {line_number}")
-            check_failed = True
+        # Detect start of multi-line SET statement
+        if stripped_line.upper().startswith("SET"):
+            set_open = True
+
+        # If inside a SET statement, check if it ends with a semicolon
+        if set_open:
+            if stripped_line.endswith(';'):
+                set_open = False  # SET statement closed properly
+            elif line_number == total_lines:
+                # End of file but SET not closed properly
+                print(f"❌ Missing semicolon in {file_path} at line {line_number}")
+                check_failed = True
 
         # Detect query start
         if not query_open and any(keyword in stripped_line.upper() for keyword in ["SELECT", "INSERT", "UPDATE", "DELETE", "REPLACE"]):
@@ -311,7 +322,7 @@ def semicolon_check(file: io, file_path: str) -> None:
             if stripped_line.startswith('('):
                 # Get next non-blank line to detect if we're at the last row
                 next_line = get_next_non_blank_line(line_number)
-                
+
                 if next_line and next_line.startswith('('):
                     # Expect comma if another row follows
                     if not stripped_line.endswith(','):
