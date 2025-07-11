@@ -191,39 +191,54 @@ def insert_delete_safety_check(file: io, file_path: str) -> None:
     lines = file.readlines()
 
     # Parse all the file
-    for line_number, line in enumerate(lines, start = 1):
-        if line.strip().startswith("--"):
+    line_num = 0
+    while line_num < len(lines):
+        line = lines[line_num]
+        stripped = line.strip()
+        if stripped.startswith("--") or not stripped:
+            line_num += 1
             continue
-        match = re.match(r"DELETE FROM\s+`([^`]+)`", line.strip(), re.IGNORECASE)
+        match = re.match(r"DELETE\s+FROM\s+`?([^`\s]+)`?", stripped, re.IGNORECASE)
         if match:
             table_name = match.group(1)
-            #print(f"Found DELETE from `{table_name}` at line {line_number}")
             if table_name in not_delete:
                 print(
-                    f"❌ Entries from {table_name} should not be deleted! {file_path} at line {line_number}\nIf this error is intended, please notify a maintainer")
+                    f"❌ Entries from {table_name} should not be deleted! {file_path} at line {line_num + 1}\nIf this error is intended, please notify a maintainer")
                 check_failed = True
-            delete_lines.setdefault(table_name, []).append(line_number)
+            start = line_num
+            while line_num < len(lines) and ";" not in lines[line_num]:
+                line_num += 1
+            end = line_num
+            delete_lines.setdefault(table_name, []).append(end + 1)
+        line_num += 1
 
     for line_number, line in enumerate(lines, start=1):
         if line.strip().startswith('--'):
             continue
-        insert_match = re.match(r"INSERT INTO\s+`([^`]+)`", line.strip(), re.IGNORECASE)
+        insert_match = re.match(r"INSERT\s+INTO\s+`?([^`\s]+)`?", line.strip(), re.IGNORECASE)
         if insert_match:
             table = insert_match.group(1)
-            #print(f"Found INSERT into `{table}` at line {line_number}")
             deletes = delete_lines.get(table)
             if not deletes:
                 print(f"❌ No DELETE keyword found before the INSERT in {file_path} at line {line_number}\nIf this error is intended, please notify a maintainer")
                 check_failed = True
             else:
-                previous_line = line_number - 1
-                while previous_line > 0 and lines[previous_line - 1].strip().startswith('--'):
-                    previous_line -= 1
-                if previous_line <= 0 or previous_line not in deletes:
+                valid = False
+                for del_line in deletes:
+                    if del_line >= line_number:
+                        continue
+                    prev_line = line_number - 1
+                    while prev_line > del_line:
+                        if lines[prev_line - 1].strip() and not lines[prev_line - 1].strip().startswith("--"):
+                            break
+                        prev_line -= 1
+                    if prev_line == del_line:
+                        valid = True
+                        break
+                if not valid:
                     print(f"❌ DELETE for `{table}` query must be directly above the INSERT  (case of multipe lines) in {file_path} at line {line_number}")
                     check_failed = True
 
-    # Handle the script error and update the result output
     if check_failed:
         error_handler = True
         results["INSERT & DELETE safety usage check"] = "Failed"
