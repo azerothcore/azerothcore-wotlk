@@ -371,7 +371,7 @@ def backtick_check(file: io, file_path: str) -> None:
             continue
 
         # Sanitize single- and doublequotes to prevent false positives
-        sanitized_line = quote_pattern.sub('', line)
+        sanitized_line = quote_pattern.sub('', line).split('--')[0]
         matches = pattern.findall(sanitized_line)
         
         for clause, content in matches:
