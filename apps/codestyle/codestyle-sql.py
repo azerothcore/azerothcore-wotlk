@@ -213,9 +213,11 @@ def insert_delete_safety_check(file: io, file_path: str) -> None:
             if not deletes:
                 print(f"❌ No DELETE keyword found before the INSERT in {file_path} at line {line_number}\nIf this error is intended, please notify a maintainer")
                 check_failed = True
-            elif not any(delete_line in range(line_number - 10, line_number) for delete_line in deletes):
-                print(f"❌ DELETE for `{table}` exists, but it must be placed directly above the INSERT in {file_path} at line {line_number}")
-                check_failed = True
+            else:
+                start_line = max(line_number - 10, 1)
+                if not any(delete_line in range(start_line, line_number) for delete_line in deletes):
+                    print(f"❌ DELETE for `{table}` exists, but it must be placed directly above the INSERT in {file_path} at line {line_number}")
+                    check_failed = True
 
     # Handle the script error and update the result output
     if check_failed:
