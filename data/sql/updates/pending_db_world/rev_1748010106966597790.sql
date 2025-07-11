@@ -8,6 +8,7 @@ DELETE FROM `command` WHERE `name` IN (
     'worldstate scourgeinvasion battleswon',
     'worldstate scourgeinvasion startzone'
 );
+-- test
 INSERT INTO `command` (`name`, `security`, `help`) VALUES
 ('worldstate scourgeinvasion show',       3, 'Syntax: .worldstate scourgeinvasion show\nDisplays the current status of the Scourge Invasion.'),
 ('worldstate scourgeinvasion state',      3, 'Syntax: .worldstate scourgeinvasion state <value>\nSets the Scourge Invasion state.\nValid values:\n0: Disabled\n1: Enabled'),
