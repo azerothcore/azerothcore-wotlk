@@ -216,9 +216,11 @@ def insert_delete_safety_check(file: io, file_path: str) -> None:
                 print(f"❌ No DELETE keyword found before the INSERT in {file_path} at line {line_number}\nIf this error is intended, please notify a maintainer")
                 check_failed = True
             else:
-                start_line = max(line_number - 10, 1)
-                if not any(delete_line in range(start_line, line_number) for delete_line in deletes):
-                    print(f"❌ DELETE for `{table}` exists, but it must be placed directly above the INSERT in {file_path} at line {line_number}")
+                previous_line = line_number - 1
+                while previous_line > 0 and (lines[previous_line - 1].strip().startswith('--') or lines[previous_line - 1].strip() == ""):
+                    previous_line -= 1
+                if previous_line <= 0 or previous_line not in deletes:
+                    print(f"❌ DELETE for `{table}` must be directly above the INSERT in {file_path} at line {line_number}")
                     check_failed = True
 
     # Handle the script error and update the result output
