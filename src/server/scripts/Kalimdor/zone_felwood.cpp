@@ -25,17 +25,29 @@
 ## npcs_riverbreeze_and_silversky
 ######*/
 
-#define GOSSIP_ITEM_BEACON  "Please make me a Cenarion Beacon"
-
 enum RiverbreezeAndSilversky
 {
     SPELL_CENARION_BEACON       = 15120,
+    ITEM_CENARION_BEACON        = 11511,
+    ACTION_CREATE_CENARION_BEACON = GOSSIP_ACTION_INFO_DEF + 1,
 
     NPC_ARATHANDRIS_SILVERSKY   = 9528,
     NPC_MAYBESS_RIVERBREEZE     = 9529,
 
     QUEST_CLEASING_FELWOOD_A    = 4101,
-    QUEST_CLEASING_FELWOOD_H    = 4102
+    QUEST_CLEASING_FELWOOD_H    = 4102,
+
+    // Texts
+    GOSSIP_MENU_SILVERSKY = 2208,
+    GOSSIP_MENU_RIVERBREEZE = 21400,
+    GOSSIP_OPTION_BEACON = 0,
+
+    SILVERSKY_TEXT_1 = 2848,
+    SILVERSKY_TEXT_2 = 2845,
+    SILVERSKY_TEXT_3 = 2844,
+    RIVERBREEZE_TEXT_1 = 2849,
+    RIVERBREEZE_TEXT_2 = 2843,
+    RIVERBREEZE_TEXT_3 = 2842,
 };
 
 class npcs_riverbreeze_and_silversky : public CreatureScript
@@ -46,7 +58,7 @@ public:
     bool OnGossipSelect(Player* player, Creature* creature, uint32 /*sender*/, uint32 action) override
     {
         ClearGossipMenuFor(player);
-        if (action == GOSSIP_ACTION_INFO_DEF + 1)
+        if (action == ACTION_CREATE_CENARION_BEACON)
         {
             CloseGossipMenuFor(player);
             creature->CastSpell(player, SPELL_CENARION_BEACON, false);
@@ -65,26 +77,28 @@ public:
         {
             if (player->GetQuestRewardStatus(QUEST_CLEASING_FELWOOD_A))
             {
-                AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_ITEM_BEACON, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
-                SendGossipMenuFor(player, 2848, creature->GetGUID());
+                if (!player->HasItemCount(ITEM_CENARION_BEACON, 1, true))
+                   AddGossipItemFor(player, GOSSIP_MENU_SILVERSKY, GOSSIP_OPTION_BEACON, GOSSIP_SENDER_MAIN, ACTION_CREATE_CENARION_BEACON);
+                SendGossipMenuFor(player, SILVERSKY_TEXT_1, creature->GetGUID());
             }
             else if (player->GetTeamId() == TEAM_HORDE)
-                SendGossipMenuFor(player, 2845, creature->GetGUID());
+                SendGossipMenuFor(player, SILVERSKY_TEXT_2, creature->GetGUID());
             else
-                SendGossipMenuFor(player, 2844, creature->GetGUID());
+                SendGossipMenuFor(player, SILVERSKY_TEXT_3, creature->GetGUID());
         }
 
         if (creatureId == NPC_MAYBESS_RIVERBREEZE)
         {
             if (player->GetQuestRewardStatus(QUEST_CLEASING_FELWOOD_H))
             {
-                AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_ITEM_BEACON, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
-                SendGossipMenuFor(player, 2849, creature->GetGUID());
+                if (!player->HasItemCount(ITEM_CENARION_BEACON, 1, true))
+                    AddGossipItemFor(player, GOSSIP_MENU_RIVERBREEZE, GOSSIP_OPTION_BEACON, GOSSIP_SENDER_MAIN, ACTION_CREATE_CENARION_BEACON);
+                SendGossipMenuFor(player, RIVERBREEZE_TEXT_1, creature->GetGUID());
             }
             else if (player->GetTeamId() == TEAM_ALLIANCE)
-                SendGossipMenuFor(player, 2843, creature->GetGUID());
+                SendGossipMenuFor(player, RIVERBREEZE_TEXT_2, creature->GetGUID());
             else
-                SendGossipMenuFor(player, 2842, creature->GetGUID());
+                SendGossipMenuFor(player, RIVERBREEZE_TEXT_3, creature->GetGUID());
         }
 
         return true;
