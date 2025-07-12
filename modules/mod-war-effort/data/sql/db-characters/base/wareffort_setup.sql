@@ -15,8 +15,9 @@ CREATE TABLE `wareffort` (
 `metals03` INT UNSIGNED NOT NULL,
 `leather01` INT UNSIGNED NOT NULL,
 `leather02` INT UNSIGNED NOT NULL,
-`leather03` INT UNSIGNED NOT NULL
+`leather03` INT UNSIGNED NOT NULL,
+`gongBanged` TINYINT NOT NULL
 );
 
-insert into `wareffort` (`id`, `faction`, `bandages01`, `bandages02`, `bandages03`, `food01`, `food02`, `food03`, `herbs01`, `herbs02`, `herbs03`, `metals01`, `metals02`, `metals03`, `leather01`, `leather02`, `leather03`) values('1','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0');
-insert into `wareffort` (`id`, `faction`, `bandages01`, `bandages02`, `bandages03`, `food01`, `food02`, `food03`, `herbs01`, `herbs02`, `herbs03`, `metals01`, `metals02`, `metals03`, `leather01`, `leather02`, `leather03`) values('1','1','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0');
+insert into `wareffort` (`id`, `faction`, `bandages01`, `bandages02`, `bandages03`, `food01`, `food02`, `food03`, `herbs01`, `herbs02`, `herbs03`, `metals01`, `metals02`, `metals03`, `leather01`, `leather02`, `leather03`, `gongBanged`) values('1','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0');
+insert into `wareffort` (`id`, `faction`, `bandages01`, `bandages02`, `bandages03`, `food01`, `food02`, `food03`, `herbs01`, `herbs02`, `herbs03`, `metals01`, `metals02`, `metals03`, `leather01`, `leather02`, `leather03`, `gongBanged`) values('1','1','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0');

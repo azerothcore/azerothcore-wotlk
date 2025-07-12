@@ -10,6 +10,7 @@
 #include "ScriptMgr.h"
 #include "TaskScheduler.h"
 #include "WarEffort.h"
+#include "GameEventMgr.h"
 
 WarEffort* WarEffort::instance()
 {
@@ -48,6 +49,15 @@ void WarEffort::SaveData()
         sWarEffort->materialsAlliance[MATERIAL_LIGHT_LEATHER], sWarEffort->materialsAlliance[MATERIAL_MEDIUM_LEATHER], sWarEffort->materialsAlliance[MATERIAL_THICK_LEATHER_A],
         sConfigMgr->GetOption<uint32>("ModWarEffort.Id", 1), TEAM_ALLIANCE
     );
+	
+    if (sWarEffort->gongBanged)
+    {
+		CharacterDatabase.Query("UPDATE wareffort SET "
+								"gongBanged = {} "
+								"WHERE id = {} AND faction = {}",
+			sWarEffort->gongBanged, sConfigMgr->GetOption<uint32>("ModWarEffort.Id", 1), TEAM_ALLIANCE
+		);		
+    }
 }
 
 void WarEffort::LoadData()
@@ -73,6 +83,8 @@ void WarEffort::LoadData()
                 sWarEffort->materialsAlliance[MATERIAL_LIGHT_LEATHER] = (*result)[14].Get<uint32>();
                 sWarEffort->materialsAlliance[MATERIAL_MEDIUM_LEATHER] = (*result)[15].Get<uint32>();
                 sWarEffort->materialsAlliance[MATERIAL_THICK_LEATHER_A] = (*result)[16].Get<uint32>();
+                if ((*result)[17].Get<uint32>())
+                    sWarEffort->gongBanged = true;
             }
             else
             {
@@ -93,6 +105,11 @@ void WarEffort::LoadData()
                 sWarEffort->materialsHorde[MATERIAL_THICK_LEATHER_B] = (*result)[16].Get<uint32>();
             }
         } while (result->NextRow());
+    }
+
+    if (!sWarEffort->gongBanged)
+    {
+        sGameEventMgr->StartEvent(GAME_EVENT_WAREFFORT, true);
     }
 
     if (IsWarEffortComplete(TEAM_NEUTRAL))
@@ -247,7 +264,8 @@ void WarEffort::CheckGoal(Unit* unit, uint8 material, uint8 team)
             {
                 if (sWarEffort->IsBellowPercentGathered(material, team, 0.20f))
                 {
-                    //
+                    Position pos = WarEffortGameobjectPositions[GO_BANDAGES_ALLIANCE_INITIAL];
+                    unit->GetMap()->SummonGameObject(GO_BANDAGES_ALLIANCE_INITIAL, pos, 0.0f, 0.0f, 0.0f, 0.0f, 14 * DAY * MINUTE);
                 }
                 else if (!sWarEffort->IsBellowPercentGathered(material, team, 0.20f) && sWarEffort->IsBellowPercentGathered(material, team, 0.40f))
                 {
@@ -348,7 +366,12 @@ void WarEffort::CheckGoal(Unit* unit, uint8 material, uint8 team)
             {
                 if (sWarEffort->IsBellowPercentGathered(material, team, 0.20f))
                 {
-                    //
+                    // Both Food and Herbs use same initial
+                    if (!unit->FindNearestGameObject(GO_HERBS_FOOD_ALLIANCE_INITIAL, 50.0f)) 
+                    {
+                        Position pos = WarEffortGameobjectPositions[GO_HERBS_FOOD_ALLIANCE_INITIAL];
+                        unit->GetMap()->SummonGameObject(GO_HERBS_FOOD_ALLIANCE_INITIAL, pos, 0.0f, 0.0f, 0.0f, 0.0f, 14 * DAY * MINUTE);
+                    }
                 }
                 else if (!sWarEffort->IsBellowPercentGathered(material, team, 0.20f) && sWarEffort->IsBellowPercentGathered(material, team, 0.40f))
                 {
@@ -470,7 +493,11 @@ void WarEffort::CheckGoal(Unit* unit, uint8 material, uint8 team)
             {
                 if (sWarEffort->IsBellowPercentGathered(material, team, 0.20f))
                 {
-                    // Already spawned by default
+                    if (!unit->FindNearestGameObject(GO_HERBS_FOOD_ALLIANCE_INITIAL, 50.0f))
+                    {
+                        Position pos = WarEffortGameobjectPositions[GO_HERBS_FOOD_ALLIANCE_INITIAL];
+                        unit->GetMap()->SummonGameObject(GO_HERBS_FOOD_ALLIANCE_INITIAL, pos, 0.0f, 0.0f, 0.0f, 0.0f, 14 * DAY * MINUTE);
+                    }
                 }
                 else if (!sWarEffort->IsBellowPercentGathered(material, team, 0.20f) && sWarEffort->IsBellowPercentGathered(material, team, 0.40f))
                 {
@@ -588,7 +615,8 @@ void WarEffort::CheckGoal(Unit* unit, uint8 material, uint8 team)
             {
                 if (sWarEffort->IsBellowPercentGathered(material, team, 0.20f))
                 {
-                    //
+                    Position pos = WarEffortGameobjectPositions[GO_METAL_ALLIANCE_INITIAL];
+                    unit->GetMap()->SummonGameObject(GO_METAL_ALLIANCE_INITIAL, pos, 0.0f, 0.0f, 0.0f, 0.0f, 14 * DAY * MINUTE);
                 }
                 else if (!sWarEffort->IsBellowPercentGathered(material, team, 0.20f) && sWarEffort->IsBellowPercentGathered(material, team, 0.40f))
                 {
@@ -705,7 +733,8 @@ void WarEffort::CheckGoal(Unit* unit, uint8 material, uint8 team)
             {
                 if (sWarEffort->IsBellowPercentGathered(material, team, 0.20f))
                 {
-                    // Already spawned
+                    Position pos = WarEffortGameobjectPositions[GO_LEATHER_ALLIANCE_INITIAL];
+                    unit->GetMap()->SummonGameObject(GO_LEATHER_ALLIANCE_INITIAL, pos, 0.0f, 0.0f, 0.0f, 0.0f, 14 * DAY * MINUTE);
                 }
                 else if (!sWarEffort->IsBellowPercentGathered(material, team, 0.20f) && sWarEffort->IsBellowPercentGathered(material, team, 0.40f))
                 {
@@ -898,6 +927,7 @@ public:
                     {
                         rajaxx->SetUnitFlag(UNIT_FLAG_IMMUNE_TO_NPC | UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_NON_ATTACKABLE);
                         rajaxx->AI()->Talk(12);
+                        sGameEventMgr->StartEvent(GAME_EVENT_WAREVENT, true);						
                     }
                 }, 10s);
             }
@@ -958,13 +988,20 @@ public:
 
     void OnAfterConfigLoad(bool /*reload*/) override
     {
-        ScheduleTasks();
+        if (sWarEffort->IsEnabled())
+        {
+
+            ScheduleTasks();
+        }
     }
 
     void OnStartup() override
     {
-        ScheduleTasks();
-        sWarEffort->LoadData();
+        if (sWarEffort->IsEnabled())
+        {		
+            ScheduleTasks();
+            sWarEffort->LoadData();
+        }
     }
 
     void OnUpdate(uint32 diff) override
