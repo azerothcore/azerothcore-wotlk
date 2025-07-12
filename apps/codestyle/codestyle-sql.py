@@ -198,6 +198,14 @@ def insert_delete_safety_check(file: io, file_path: str) -> None:
         if stripped.startswith("--") or not stripped:
             line_num += 1
             continue
+
+        if "DELETE" in stripped.upper() and "FROM" in stripped.upper():
+            if not re.match(r"DELETE FROM `([^`]+)`", stripped, re.IGNORECASE):
+                print(f"❌ Invalid DELETE syntax (must have exactly one space between DELETE and FROM) {file_path} at line {line_num + 1}")
+                check_failed = True
+                line_num += 1
+                continue
+
         match = re.match(r"DELETE FROM `([^`]+)`", stripped, re.IGNORECASE)
         if match:
             table_name = match.group(1)
