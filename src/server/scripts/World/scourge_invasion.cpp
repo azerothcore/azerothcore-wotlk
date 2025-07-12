@@ -582,12 +582,12 @@ struct npc_necrotic_shard : public ScriptedAI
         {
             for (int i = 0; i < 4; ++i)
             {
-                float angle = (float(i) * (M_PIf / 2.f)) + go->GetOrientation();
+                float angle = (float(i) * (M_PI / 2.f)) + go->GetOrientation();
                 float x = go->GetPositionX() + 6.95f * std::cos(angle);
                 float y = go->GetPositionY() + 6.75f * std::sin(angle);
                 float z = go->GetPositionZ() + 5.0f;
                 me->UpdateGroundPositionZ(x, y, z);
-                me->SummonCreature(NPC_CULTIST_ENGINEER, x, y, z, angle - M_PIf, TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, IN_MILLISECONDS * HOUR);
+                me->SummonCreature(NPC_CULTIST_ENGINEER, x, y, z, angle - M_PI, TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, IN_MILLISECONDS * HOUR);
             }
         }
     }
@@ -954,7 +954,7 @@ struct npc_pallid_horror : public ScriptedAI
             if (Creature* summon = me->SummonCreature(
                     NPC_FLAMESHOCKER, me->GetPositionX(), me->GetPositionY(), me->GetPositionZ(), 0.0f, TEMPSUMMON_TIMED_OR_CORPSE_DESPAWN, HOUR * IN_MILLISECONDS))
             {
-                float angle = static_cast<float>(i) * (M_PIf / (static_cast<float>(amount) / 2.f)) + me->GetOrientation();
+                float angle = static_cast<float>(i) * (M_PI / (static_cast<float>(amount) / 2.f)) + me->GetOrientation();
                 summon->GetMotionMaster()->Clear(true);
                 summon->GetMotionMaster()->MoveFollow(me, 2.5f, angle);
                 _summons.Summon(summon);
