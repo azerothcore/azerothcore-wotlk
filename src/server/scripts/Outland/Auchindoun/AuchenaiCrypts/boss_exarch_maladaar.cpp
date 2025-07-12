@@ -111,31 +111,13 @@ struct boss_exarch_maladaar : public BossAI
                 {
                     summon->CastSpell(summon, SPELL_STOLEN_SOUL_VISUAL, false);
                     summon->SetDisplayId(target->GetDisplayId());
+                    summon->AI()->SetGUID(target->GetGUID());
                     summon->AI()->DoAction(target->getClass());
                     summon->AI()->AttackStart(target);
-
-                    auto targetGuid = target->GetGUID();
-                    _stolenSoulTarget[summon->GetGUID()] = targetGuid;
-                    _stolenSoulCounter[targetGuid]++;
                 }
             }
             context.Repeat(25s, 30s);
         });
-    }
-
-    void SummonedCreatureDies(Creature* summon, Unit* /*killer*/) override
-    {
-        auto summonGuid = summon->GetGUID();
-        auto targetGuid = _stolenSoulTarget[summonGuid];
-        _stolenSoulTarget.erase(summonGuid);
-        if (--_stolenSoulCounter[targetGuid] == 0)
-        {
-            // No Stolen Souls remain on this target, remove debuff
-            auto target = ObjectAccessor::GetUnit(*me, targetGuid);
-            if (target) {
-                target->RemoveAurasDueToSpell(SPELL_STOLEN_SOUL);
-            }
-        }
     }
 
     void KilledUnit(Unit* victim) override
@@ -169,10 +151,9 @@ struct boss_exarch_maladaar : public BossAI
 
         DoMeleeAttackIfReady();
     }
+
 private:
     bool _talked;
-    std::map<ObjectGuid, ObjectGuid> _stolenSoulTarget;
-    std::map<ObjectGuid, size_t> _stolenSoulCounter;
 };
 
 struct npc_stolen_soul : public ScriptedAI
@@ -260,6 +241,11 @@ struct npc_stolen_soul : public ScriptedAI
         });
     }
 
+    void SetGUID(ObjectGuid guid, int32 /*id*/) override
+    {
+        _targetGuid = guid;
+    }
+
     void DoAction(int32 pClass) override
     {
         _myClass = pClass;
@@ -274,8 +260,16 @@ struct npc_stolen_soul : public ScriptedAI
         DoMeleeAttackIfReady();
     }
 
+    void JustDied(Unit* /*killer*/) override
+    {
+        auto target = ObjectAccessor::GetUnit(*me, _targetGuid);
+        if (target)
+            target->RemoveAurasDueToSpell(SPELL_STOLEN_SOUL);
+    }
+
 private:
     TaskScheduler _scheduler;
+    ObjectGuid _targetGuid;
     uint8 _myClass;
 };
 
