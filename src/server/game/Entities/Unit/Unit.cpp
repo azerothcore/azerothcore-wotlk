@@ -13730,7 +13730,7 @@ void Unit::CombatStart(Unit* victim, bool initialAggro)
         victim->SetInCombatWith(this);
 
         // Update leash timer when attacking creatures
-        if (victim->IsCreature())
+        if (victim->IsCreature() && this != victim)
             victim->ToCreature()->UpdateLeashExtensionTime();
 
         // Xinef: If pet started combat - put owner in combat

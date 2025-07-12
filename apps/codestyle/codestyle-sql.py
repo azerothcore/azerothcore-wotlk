@@ -28,7 +28,8 @@ results = {
     "INSERT & DELETE safety usage check": "Passed",
     "Missing semicolon check": "Passed",
     "Backtick check": "Passed",
-    "Directory check": "Passed"
+    "Directory check": "Passed",
+    "Table engine check": "Passed"
 }
 
 # Collect all files in all directories
@@ -78,6 +79,7 @@ def parsing_file(files: list) -> None:
                     insert_delete_safety_check(file, file_path)
                     semicolon_check(file, file_path)
                     backtick_check(file, file_path)
+                    non_innodb_engine_check(file, file_path)
             except UnicodeDecodeError:
                 print(f"\n❌ Could not decode file {file_path}")
                 sys.exit(1)
@@ -382,6 +384,25 @@ def directory_check(file: io, file_path: str) -> None:
     if check_failed:
         error_handler = True
         results["Directory check"] = "Failed"
+
+def non_innodb_engine_check(file: io, file_path: str) -> None:
+    global error_handler, results
+    file.seek(0)
+    check_failed = False
+
+    engine_pattern = re.compile(r'ENGINE\s*=\s*([a-zA-Z0-9_]+)', re.IGNORECASE)
+
+    for line_number, line in enumerate(file, start=1):
+        match = engine_pattern.search(line)
+        if match:
+            engine = match.group(1).lower()
+            if engine != "innodb":
+                print(f"❌ Non-InnoDB engine found: '{engine}' in {file_path} at line {line_number}")
+                check_failed = True
+
+    if check_failed:
+        error_handler = True
+        results["Table engine check"] = "Failed"    
 
 # Collect all files from matching directories
 all_files = collect_files_from_directories(src_directory) + collect_files_from_directories(base_directory) + collect_files_from_directories(archive_directory)
