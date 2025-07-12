@@ -198,7 +198,7 @@ def insert_delete_safety_check(file: io, file_path: str) -> None:
         if stripped.startswith("--") or not stripped:
             line_num += 1
             continue
-        match = re.match(r"DELETE\s+FROM\s+`?([^`\s]+)`?", stripped, re.IGNORECASE)
+        match = re.match(r"DELETE FROM\s+`?([^`\s]+)`?", stripped, re.IGNORECASE)
         if match:
             table_name = match.group(1)
             if table_name in not_delete:
