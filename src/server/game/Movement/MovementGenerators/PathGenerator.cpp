@@ -556,7 +556,7 @@ void PathGenerator::BuildPointPath(const float* startPoint, const float* endPoin
     }
 
     // Special case with start and end positions very close to each other
-    if (_polyLength == 1 && pointCount == 1)
+    if (_polyLength == 1 && pointCount == 1 && !(dtResult & DT_SLOPE_TOO_STEEP))
     {
         // First point is start position, append end position
         dtVcopy(&pathPoints[1 * VERTEX_SIZE], endPoint);
