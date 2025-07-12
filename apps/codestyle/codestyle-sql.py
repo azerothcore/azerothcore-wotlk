@@ -223,6 +223,13 @@ def insert_delete_safety_check(file: io, file_path: str) -> None:
     for line_number, line in enumerate(lines, start=1):
         if line.strip().startswith('--'):
             continue
+
+        if "INSERT" in stripped.upper() and "INTO" in stripped.upper():
+            if not re.match(r"INSERT INTO `([^`]+)`", stripped, re.IGNORECASE):
+                print(f"❌ Invalid INSERT syntax (must have exactly one space between INSERT and INTO) {file_path} at line {line_number}")
+                check_failed = True
+                continue
+
         insert_match = re.match(r"INSERT INTO `?([^`\s]+)`?", line.strip(), re.IGNORECASE)
         if insert_match:
             table = insert_match.group(1)
