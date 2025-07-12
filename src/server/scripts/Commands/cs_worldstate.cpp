@@ -39,9 +39,18 @@ public:
             { "gatecounter", HandleSunwellGateCounterCommand,           SEC_ADMINISTRATOR, Console::Yes },
         };
 
+        static ChatCommandTable scourgeInvasionCommandTable =
+        {
+            { "show",       HandleScourgeInvasionCommand,           SEC_ADMINISTRATOR, Console::Yes },
+            { "state",      HandleScourgeInvasionStateCommand,      SEC_ADMINISTRATOR, Console::Yes },
+            { "battleswon", HandleScourgeInvasionBattlesWonCommand, SEC_ADMINISTRATOR, Console::Yes },
+            { "startzone",  HandleScourgeInvasionStartZone,         SEC_ADMINISTRATOR, Console::Yes },
+        };
+
         static ChatCommandTable worldStateCommandTable =
         {
-            { "sunsreach", sunsreachCommandTable }
+            { "sunsreach", sunsreachCommandTable },
+            { "scourgeinvasion", scourgeInvasionCommandTable }
         };
 
         static ChatCommandTable commandTable =
@@ -116,6 +125,46 @@ public:
         }
         sWorldState->SetSunwellGateCounter(SunwellGateCounters(index.value()), value.value());
         handler->PSendSysMessage(sWorldState->GetSunsReachPrintout());
+        return true;
+    }
+
+    static bool HandleScourgeInvasionCommand(ChatHandler* handler)
+    {
+        handler->PSendSysMessage(sWorldState->GetScourgeInvasionPrintout());
+        return true;
+    }
+
+    static bool HandleScourgeInvasionStateCommand(ChatHandler* handler, uint32 value)
+    {
+        if (value >= SI_STATE_MAX)
+        {
+            handler->PSendSysMessage("Syntax: .worldstate scourgeinvasion state <value>.");
+            handler->PSendSysMessage("Valid values are: 0 (Disabled), 1 (Enabled).");
+            return true;
+        }
+        sWorldState->SetScourgeInvasionState(SIState(value));
+        handler->PSendSysMessage("Scourge Invasion state set to {}.", value);
+        handler->PSendSysMessage(sWorldState->GetScourgeInvasionPrintout());
+        return true;
+    }
+
+    static bool HandleScourgeInvasionBattlesWonCommand(ChatHandler* /* handler */, int32 value)
+    {
+        sWorldState->AddBattlesWon(value);
+        return true;
+    }
+
+    static bool HandleScourgeInvasionStartZone(ChatHandler* handler, uint32 value)
+    {
+
+        if (value >= SI_TIMER_MAX)
+        {
+            handler->PSendSysMessage("Syntax: .worldstate scourgeinvasion startzone <value>.\nvalid values: 0-7");
+            return true;
+        }
+        sWorldState->StartZoneEvent(SIZoneIds(value));
+        handler->PSendSysMessage("Scourge Invasion event started for zone {}.", value);
+        handler->PSendSysMessage(sWorldState->GetScourgeInvasionPrintout());
         return true;
     }
 };
