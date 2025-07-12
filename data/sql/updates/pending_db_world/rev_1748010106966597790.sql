@@ -1,40 +1,21 @@
 --
-SET @CGUID := 153321; -- creature start guid
-SET @GGUID := 83038; -- gameobject start guid
+-- creature start guid
+SET @CGUID := 153321;
+-- gameobject start guid
+SET @GGUID := 83038;
 
-DELETE FROM `command` WHERE `name` IN (
-    'worldstate scourgeinvasion show',
-    'worldstate scourgeinvasion state',
-    'worldstate scourgeinvasion battleswon',
-    'worldstate scourgeinvasion startzone'
-);
-
+DELETE FROM `command` WHERE `name` IN ('worldstate scourgeinvasion show', 'worldstate scourgeinvasion state', 'worldstate scourgeinvasion battleswon', 'worldstate scourgeinvasion startzone');
 INSERT INTO `command` (`name`, `security`, `help`) VALUES
 ('worldstate scourgeinvasion show',       3, 'Syntax: .worldstate scourgeinvasion show\nDisplays the current status of the Scourge Invasion.'),
 ('worldstate scourgeinvasion state',      3, 'Syntax: .worldstate scourgeinvasion state <value>\nSets the Scourge Invasion state.\nValid values:\n0: Disabled\n1: Enabled'),
 ('worldstate scourgeinvasion battleswon', 3, 'Syntax: .worldstate scourgeinvasion battleswon <value>\nAdjusts the Scourge Invasion battles won count by <value> (can be negative).'),
 ('worldstate scourgeinvasion startzone',  3, 'Syntax: .worldstate scourgeinvasion startzone <id>\nStarts a Scourge Invasion event in the zone specified by <id>.\nValid zone IDs: 0-7.');
 
-SET
-@scourge_invasion            = 17,
-@scourge_boss_in_instance    = 120,
-@scourge_winterspring        = 121,
-@scourge_tanaris             = 122,
-@scourge_azshara             = 123,
-@scourge_blasted_lands       = 124,
-@scourge_eastern_plaguelands = 125,
-@scourge_burning_steppes     = 126,
-@scourge_50_invasions_done   = 127,
-@scourge_100_invasions_done  = 128,
-@scourge_150_invasions_done  = 129,
-@scourge_invasions_done      = 130;
+SET @scourge_invasion = 17, @scourge_boss_in_instance = 120, @scourge_winterspring = 121, @scourge_tanaris = 122, @scourge_azshara = 123, @scourge_blasted_lands = 124, @scourge_eastern_plaguelands = 125, @scourge_burning_steppes = 126, @scourge_50_invasions_done = 127, @scourge_100_invasions_done = 128, @scourge_150_invasions_done = 129, @scourge_invasions_done = 130;
 
-DELETE FROM `game_event` WHERE `eventEntry` IN (
-    @scourge_boss_in_instance,  @scourge_winterspring, @scourge_tanaris, @scourge_azshara,
-    @scourge_blasted_lands,     @scourge_eastern_plaguelands, @scourge_burning_steppes,
-    @scourge_50_invasions_done, @scourge_100_invasions_done, @scourge_150_invasions_done, @scourge_invasions_done
-);
-SET @GAMEEVENT_INTERNAL = 5; -- never handled in GameEventMgr update
+-- never handled in GameEventMgr update
+SET @GAMEEVENT_INTERNAL = 5;
+DELETE FROM `game_event` WHERE `eventEntry` IN (@scourge_boss_in_instance, @scourge_winterspring, @scourge_tanaris, @scourge_azshara, @scourge_blasted_lands, @scourge_eastern_plaguelands, @scourge_burning_steppes, @scourge_50_invasions_done, @scourge_100_invasions_done, @scourge_150_invasions_done, @scourge_invasions_done);
 INSERT INTO `game_event` (`eventEntry`, `description`, `world_event`) VALUES
 (@scourge_boss_in_instance,    'Scourge Invasion - Boss in instance activation', @GAMEEVENT_INTERNAL),
 (@scourge_winterspring,        'Scourge Invasion - Attacking Winterspring', @GAMEEVENT_INTERNAL),
@@ -5605,10 +5586,14 @@ INSERT INTO `creature_template_movement` (`CreatureId`, `Ground`, `Swim`, `Fligh
 (16398, 0, 0, 1, 0, 0, 0, 0),
 (16401, 0, 0, 1, 0, 0, 0, 0),
 (16421, 0, 0, 1, 0, 0, 0, 0);
-UPDATE `creature_template` SET `MovementType`= 0 WHERE (`entry` = 16398); -- Do not let the proxies move
-UPDATE `creature_template` SET `MovementType`= 0 WHERE (`entry` = 16386); -- Do not let the relay move
-UPDATE `creature_template` SET `unit_flags`= `unit_flags` | 33554432 WHERE `entry` IN (16356, 16336, 16306, 16338, 16421, 16386, 16398, 16401); -- Set NOT_SELECTABLE for Invisible Helper NPCs
-UPDATE `creature_template` SET `ArmorModifier` = 120 WHERE (`entry` = 16421); -- Add armor to the necropolis health npc so that is takes 14 damage per zap hit
+-- Do not let the proxies move
+UPDATE `creature_template` SET `MovementType`= 0 WHERE (`entry` = 16398);
+-- Do not let the relay move
+UPDATE `creature_template` SET `MovementType`= 0 WHERE (`entry` = 16386);
+-- Set NOT_SELECTABLE for Invisible Helper NPCs
+UPDATE `creature_template` SET `unit_flags`= `unit_flags` | 33554432 WHERE `entry` IN (16356, 16336, 16306, 16338, 16421, 16386, 16398, 16401);
+-- Add armor to the necropolis health npc so that is takes 14 damage per zap hit
+UPDATE `creature_template` SET `ArmorModifier` = 120 WHERE (`entry` = 16421);
 UPDATE `creature_template` SET `RegenHealth` = 0 WHERE (`entry` = 16421);
 UPDATE `creature_template` SET `minlevel` = 1, `maxlevel` = 1 WHERE (`entry` IN (16421, 16401, 16398, 16386));
 -- Allow Necropoli to target proxies
@@ -5838,7 +5823,8 @@ UPDATE `creature_template` SET `ScriptName` = 'npc_minion_spawner' WHERE (`entry
 UPDATE `creature_template` SET `ScriptName` = 'npc_herald_of_the_lich_king' WHERE (`entry` = 16995);
 UPDATE `creature_template` SET `ScriptName` = 'npc_necropolis' WHERE (`entry` = 16401);
 UPDATE `creature_template` SET `ScriptName` = 'npc_necropolis_health' WHERE (`entry` = 16421);
-UPDATE `creature_template_addon` SET `visibilityDistanceType` = 5 WHERE (`entry` = 16421); -- 3 -> infinite (3000.0f)
+-- 3 -> infinite (3000.0f)
+UPDATE `creature_template_addon` SET `visibilityDistanceType` = 5 WHERE (`entry` = 16421);
 UPDATE `creature_template` SET `ScriptName` = 'npc_necropolis_proxy' WHERE (`entry` = 16398);
 UPDATE `creature_template` SET `ScriptName` = 'npc_necropolis_relay' WHERE (`entry` = 16386);
 UPDATE `creature_template` SET `ScriptName` = 'npc_necrotic_shard' WHERE (`entry` IN (16136, 16172));
@@ -5898,7 +5884,7 @@ UPDATE `creature_template_addon` SET `path_id` = @PATH_ID+1 WHERE (`entry` = 163
 -- UPDATE `creature_template_addon` SET `path_id` = 163941 WHERE (`entry` = 16394);
 UPDATE `creature_template` SET `MovementType` = 2 WHERE (`entry` = 16394);
 -- Stormwind Keep
-DELETE FROM `waypoint_data` WHERE `id` BETWEEN @PATH_ID+1 AND @PATH_ID+4;
+DELETE FROM `waypoint_data` WHERE `id` = @PATH_ID+1;
 INSERT INTO `waypoint_data` (`id`, `point`, `position_x`, `position_y`, `position_z`, `orientation`, `delay`, `action`, `move_type`) VALUES
 (@PATH_ID+1, 1, -8571.98, 891.327, 90.7048, 100, 0, 0, 0),
 (@PATH_ID+1, 2, -8564.43, 897.362, 96.6816, 100, 0, 0, 0),
@@ -5937,6 +5923,7 @@ INSERT INTO `waypoint_data` (`id`, `point`, `position_x`, `position_y`, `positio
 (@PATH_ID+1, 35, -8457.71, 353.894, 120.084, 100, 0, 0, 0),
 (@PATH_ID+1, 36, -8441.52, 333.366, 122.579, 100, 0, 0, 0); -- action: 151912
 -- Stormwind Trade District
+DELETE FROM `waypoint_data` WHERE `id` = @PATH_ID+2;
 INSERT INTO `waypoint_data` (`id`, `point`, `position_x`, `position_y`, `position_z`, `orientation`, `delay`, `action`, `move_type`) VALUES
 (@PATH_ID+2, 1, -8571.98, 891.327, 90.7048, 100, 0, 0, 0),
 (@PATH_ID+2, 2, -8564.43, 897.362, 96.6816, 100, 0, 0, 0),
@@ -5978,8 +5965,8 @@ INSERT INTO `waypoint_data` (`id`, `point`, `position_x`, `position_y`, `positio
 (@PATH_ID+2, 38, -8798.51, 658.14, 95.7397, 100, 0, 0, 0),
 (@PATH_ID+2, 39, -8791.07, 679.552, 102.017, 100, 0, 0, 0),
 (@PATH_ID+2, 40, -8807.04, 683.424, 100.21, 100, 0, 0, 0); -- action: 151921
-
 -- Undercity Trade Quarter
+DELETE FROM `waypoint_data` WHERE `id` = @PATH_ID+3;
 INSERT INTO `waypoint_data` (`id`, `point`, `position_x`, `position_y`, `position_z`, `orientation`, `delay`, `action`, `move_type`) VALUES
 (@PATH_ID+3, 1, 1660.98, 257.238, -62.1777, 100, 0, 0, 0),
 (@PATH_ID+3, 2, 1659.01, 234.474, -62.1776, 100, 0, 0, 0), -- action: 149711
@@ -6007,6 +5994,7 @@ INSERT INTO `waypoint_data` (`id`, `point`, `position_x`, `position_y`, `positio
 (@PATH_ID+3, 24, 1585.38, 276.608, -43.1027, 100, 0, 0, 0),
 (@PATH_ID+3, 25, 1605.34, 276.451, -43.1027, 100, 0, 0, 0); -- action: 149713
 -- Undercity Royal Quarter
+DELETE FROM `waypoint_data` WHERE `id` = @PATH_ID+4;
 INSERT INTO `waypoint_data` (`id`, `point`, `position_x`, `position_y`, `position_z`, `orientation`, `delay`, `action`, `move_type`) VALUES
 (@PATH_ID+4, 1, 1596.72, 423.488, -46.3713, 100, 0, 0, 0), -- action: 149720
 (@PATH_ID+4, 2, 1603.8, 423.409, -46.3814, 100, 0, 0, 0),
