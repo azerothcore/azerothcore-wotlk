@@ -1,6 +1,5 @@
 --
-UPDATE `spell_dbc`
-SET `Attributes`=`Attributes`|64, `AttributesEx4`=34603008, `ProcChance`=101, `DurationIndex`=21,
+UPDATE `spell_dbc` SET `Attributes`=`Attributes`|64, `AttributesEx4`=34603008, `ProcChance`=101, `DurationIndex`=21,
 `Effect_1`=6, `Effect_2`=6, `Effect_3`=6, `EffectBasePoints_1`=-1, `EffectBasePoints_2`=-1, `EffectBasePoints_3`=-1,
 `ImplicitTargetA_1`=1, `ImplicitTargetA_2`=1, `ImplicitTargetA_3`=1,
 `EffectAura_1`=29, `EffectAura_2`=29, `EffectAura_3`=189,
