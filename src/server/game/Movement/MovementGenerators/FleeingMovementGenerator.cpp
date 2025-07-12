@@ -137,9 +137,12 @@ void FleeingMovementGenerator<T>::SetTargetLocation(T* owner)
         _path->Clear();
     }
 
+    if (owner->IsPlayer())
+        _path->SetSlopeCheck(true);
+
     _path->SetPathLengthLimit(30.0f);
     bool result = _path->CalculatePath(destination.GetPositionX(), destination.GetPositionY(), destination.GetPositionZ());
-    if (!result || (_path->GetPathType() & PathType(PATHFIND_NOPATH | PATHFIND_SHORTCUT | PATHFIND_FARFROMPOLY)))
+    if (!result || (_path->GetPathType() & PathType(PATHFIND_NOPATH | PATHFIND_SHORTCUT | PATHFIND_FARFROMPOLY | PATHFIND_NOT_USING_PATH)))
     {
         _timer.Reset(100);
         return;
