@@ -187,25 +187,75 @@ def insert_delete_safety_check(file: io, file_path: str) -> None:
     file.seek(0)  # Reset file pointer to the beginning
     not_delete = ["creature_template", "gameobject_template", "item_template", "quest_template"]
     check_failed = False
-    previous_line = ""
+    delete_lines = {}
+    lines = file.readlines()
 
     # Parse all the file
-    for line_number, line in enumerate(file, start = 1):
-        if line.startswith("--"):
+    line_num = 0
+    while line_num < len(lines):
+        line = lines[line_num]
+        stripped = line.strip()
+        if stripped.startswith("--") or not stripped:
+            line_num += 1
             continue
-        if "INSERT" in line and "DELETE" not in previous_line:
-            print(f"❌ No DELETE keyword found before the INSERT in {file_path} at line {line_number}\nIf this error is intended, please notify a maintainer")
-            check_failed = True
-        previous_line = line
-        match = re.match(r"DELETE FROM\s+`([^`]+)`", line, re.IGNORECASE)
+
+        if "DELETE" in stripped.upper() and "FROM" in stripped.upper():
+            if not re.match(r"DELETE FROM `([^`]+)`", stripped, re.IGNORECASE):
+                print(f"❌ Invalid DELETE syntax (must have exactly one space between DELETE and FROM) {file_path} at line {line_num + 1}")
+                check_failed = True
+                line_num += 1
+                continue
+
+        match = re.match(r"DELETE FROM `([^`]+)`", stripped, re.IGNORECASE)
         if match:
             table_name = match.group(1)
             if table_name in not_delete:
                 print(
-                    f"❌ Entries from {table_name} should not be deleted! {file_path} at line {line_number}\nIf this error is intended, please notify a maintainer")
+                    f"❌ Entries from {table_name} should not be deleted! {file_path} at line {line_num + 1}\nIf this error is intended, please notify a maintainer")
                 check_failed = True
+            start = line_num
+            while line_num < len(lines) and ";" not in lines[line_num]:
+                line_num += 1
+            end = line_num
+            delete_lines.setdefault(table_name, []).append(end + 1)
+        line_num += 1
 
-    # Handle the script error and update the result output
+    for line_number, line in enumerate(lines, start=1):
+        if line.strip().startswith('--'):
+            continue
+
+        stripped = line.strip() 
+
+        if "INSERT" in stripped.upper() and "INTO" in stripped.upper():
+            if not re.match(r"INSERT INTO `([^`]+)`", stripped, re.IGNORECASE):
+                print(f"❌ Invalid INSERT syntax (must have exactly one space between INSERT and INTO) {file_path} at line {line_number}")
+                check_failed = True
+                continue
+
+        insert_match = re.match(r"INSERT INTO `?([^`\s]+)`?", line.strip(), re.IGNORECASE)
+        if insert_match:
+            table = insert_match.group(1)
+            deletes = delete_lines.get(table)
+            if not deletes:
+                print(f"❌ No DELETE keyword found before the INSERT in {file_path} at line {line_number}\nIf this error is intended, please notify a maintainer")
+                check_failed = True
+            else:
+                valid = False
+                for del_line in deletes:
+                    if del_line >= line_number:
+                        continue
+                    prev_line = line_number - 1
+                    while prev_line > del_line:
+                        if lines[prev_line - 1].strip() and not lines[prev_line - 1].strip().startswith("--"):
+                            break
+                        prev_line -= 1
+                    if prev_line == del_line:
+                        valid = True
+                        break
+                if not valid:
+                    print(f"❌ DELETE for `{table}` query must be directly above the INSERT  (case of multipe lines) in {file_path} at line {line_number}")
+                    check_failed = True
+
     if check_failed:
         error_handler = True
         results["INSERT & DELETE safety usage check"] = "Failed"
@@ -222,6 +272,8 @@ def semicolon_check(file: io, file_path: str) -> None:
 
     lines = file.readlines()
     total_lines = len(lines)
+
+    set_open = False  # Track if currently inside a SET statement
 
     def get_next_non_blank_line(start):
         """ Get the next non-blank, non-comment line starting from `start` """
@@ -251,16 +303,25 @@ def semicolon_check(file: io, file_path: str) -> None:
                 in_block_comment = True
                 stripped_line = stripped_line.split('/*', 1)[0].strip()
 
-        # Skip empty lines (unless inside values block)
-        if not stripped_line and not inside_values_block:
+        # Skip empty lines (unless inside values block or inside SET block)
+        if not stripped_line and not inside_values_block and not set_open:
             continue
 
         # Remove inline comments after SQL
         stripped_line = stripped_line.split('--', 1)[0].strip()
 
-        if stripped_line.upper().startswith("SET") and not stripped_line.endswith(";"):
-            print(f"❌ Missing semicolon in {file_path} at line {line_number}")
-            check_failed = True
+        # Detect start of multi-line SET statement
+        if stripped_line.upper().startswith("SET"):
+            set_open = True
+
+        # If inside a SET statement, check if it ends with a semicolon
+        if set_open:
+            if stripped_line.endswith(';'):
+                set_open = False  # SET statement closed properly
+            elif line_number == total_lines:
+                # End of file but SET not closed properly
+                print(f"❌ Missing semicolon in {file_path} at line {line_number}")
+                check_failed = True
 
         # Detect query start
         if not query_open and any(keyword in stripped_line.upper() for keyword in ["SELECT", "INSERT", "UPDATE", "DELETE", "REPLACE"]):
@@ -278,7 +339,7 @@ def semicolon_check(file: io, file_path: str) -> None:
             if stripped_line.startswith('('):
                 # Get next non-blank line to detect if we're at the last row
                 next_line = get_next_non_blank_line(line_number)
-                
+
                 if next_line and next_line.startswith('('):
                     # Expect comma if another row follows
                     if not stripped_line.endswith(','):
@@ -327,7 +388,7 @@ def backtick_check(file: io, file_path: str) -> None:
             continue
 
         # Sanitize single- and doublequotes to prevent false positives
-        sanitized_line = quote_pattern.sub('', line)
+        sanitized_line = quote_pattern.sub('', line).split('--')[0]
         matches = pattern.findall(sanitized_line)
         
         for clause, content in matches:
