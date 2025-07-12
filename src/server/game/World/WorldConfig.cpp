@@ -603,8 +603,6 @@ void WorldConfig::BuildConfigCache()
     SetConfigValue<uint32>(CONFIG_ICC_BUFF_HORDE, "ICC.Buff.Horde", 73822);
     SetConfigValue<uint32>(CONFIG_ICC_BUFF_ALLIANCE, "ICC.Buff.Alliance", 73828);
 
-    SetConfigValue<bool>(CONFIG_SET_ALL_CREATURES_WITH_WAYPOINT_MOVEMENT_ACTIVE, "SetAllCreaturesWithWaypointMovementActive", false);
-
     // packet spoof punishment
     SetConfigValue<uint32>(CONFIG_PACKET_SPOOF_BANMODE, "PacketSpoof.BanMode", 0, ConfigValueCache::Reloadable::Yes, [](uint32 const& value) { return value == 0; }, "== 0");
     SetConfigValue<uint32>(CONFIG_PACKET_SPOOF_BANDURATION, "PacketSpoof.BanDuration", 86400);
