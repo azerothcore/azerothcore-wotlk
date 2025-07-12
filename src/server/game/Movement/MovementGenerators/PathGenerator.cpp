@@ -564,6 +564,22 @@ void PathGenerator::BuildPointPath(const float* startPoint, const float* endPoin
     }
     else if (pointCount < 2 || dtStatusFailed(dtResult))
     {
+        // If its too steep, just return incomplete path.
+        if (pointCount > 0 && dtResult & DT_SLOPE_TOO_STEEP)
+        {
+            _pathPoints.resize(pointCount);
+            for (uint32 i = 0; i < pointCount; ++i)
+                _pathPoints[i] = G3D::Vector3(pathPoints[i * VERTEX_SIZE + 2], pathPoints[i * VERTEX_SIZE], pathPoints[i * VERTEX_SIZE + 1]);
+
+            NormalizePath();
+
+            // first point is always our current location - we need the next one
+            SetActualEndPosition(_pathPoints[pointCount - 1]);
+
+            _type = PathType(_type | PATHFIND_INCOMPLETE);
+            return;
+        }
+
         // only happens if pass bad data to findStraightPath or navmesh is broken
         // single point paths can be generated here
         /// @todo check the exact cases
@@ -884,7 +900,9 @@ dtStatus PathGenerator::FindSmoothPath(float const* startPos, float const* endPo
 
         if (canCheckSlope && !IsSwimmableSegment(iterPos, steerPos) && !IsWalkableClimb(iterPos, steerPos))
         {
-            return DT_FAILURE;
+            nsmoothPath--;
+            *smoothPathSize = nsmoothPath;
+            return DT_FAILURE | DT_SLOPE_TOO_STEEP;
         }
 
         // Handle end of path and off-mesh links when close enough.
