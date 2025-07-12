@@ -1051,7 +1051,7 @@ class spell_portal_effect_acherus : public SpellScript
         return SPELL_FAILED_DONT_REPORT;
     }
 
-    void HandleScriptEffect(SpellEffIndex effIndex)
+    void HandleScriptEffect(SpellEffIndex /*effIndex*/)
     {
         if (Unit* caster = GetCaster())
             if (Player* player = GetHitPlayer())
