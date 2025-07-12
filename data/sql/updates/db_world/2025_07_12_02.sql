@@ -1,3 +1,4 @@
+-- DB update 2025_07_12_01 -> 2025_07_12_02
 --
 -- Creates the reference loot (40110) for Haunted Memento (40110)
 DELETE FROM `reference_loot_template` WHERE `Entry` = 40110 AND `Item` = 40110;

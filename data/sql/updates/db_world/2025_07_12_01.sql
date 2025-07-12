@@ -1,3 +1,4 @@
+-- DB update 2025_07_12_00 -> 2025_07_12_01
 --
 -- creature start guid
 SET @CGUID := 153321;
