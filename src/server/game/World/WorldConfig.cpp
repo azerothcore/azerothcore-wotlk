@@ -445,6 +445,7 @@ void WorldConfig::BuildConfigCache()
     SetConfigValue<uint32>(CONFIG_ARENA_AUTO_DISTRIBUTE_INTERVAL_DAYS, "Arena.AutoDistributeInterval", 7);
     SetConfigValue<uint32>(CONFIG_ARENA_GAMES_REQUIRED, "Arena.GamesRequired", 10);
     SetConfigValue<uint32>(CONFIG_ARENA_START_RATING, "Arena.ArenaStartRating", 0);
+    SetConfigValue<uint32>(CONFIG_LEGACY_ARENA_START_RATING, "Arena.LegacyArenaStartRating", 1500);
     SetConfigValue<uint32>(CONFIG_LEGACY_ARENA_POINTS_CALC, "Arena.LegacyArenaPoints", 0);
     SetConfigValue<uint32>(CONFIG_ARENA_START_PERSONAL_RATING, "Arena.ArenaStartPersonalRating", 0);
     SetConfigValue<uint32>(CONFIG_ARENA_START_MATCHMAKER_RATING, "Arena.ArenaStartMatchmakerRating", 1500);
@@ -603,8 +604,6 @@ void WorldConfig::BuildConfigCache()
     // ICC buff override
     SetConfigValue<uint32>(CONFIG_ICC_BUFF_HORDE, "ICC.Buff.Horde", 73822);
     SetConfigValue<uint32>(CONFIG_ICC_BUFF_ALLIANCE, "ICC.Buff.Alliance", 73828);
-
-    SetConfigValue<bool>(CONFIG_SET_ALL_CREATURES_WITH_WAYPOINT_MOVEMENT_ACTIVE, "SetAllCreaturesWithWaypointMovementActive", false);
 
     // packet spoof punishment
     SetConfigValue<uint32>(CONFIG_PACKET_SPOOF_BANMODE, "PacketSpoof.BanMode", 0, ConfigValueCache::Reloadable::Yes, [](uint32 const& value) { return value == 0; }, "== 0");
