@@ -33,3 +33,20 @@ INSERT INTO `creature` (`guid`, `id1`, `id2`, `id3`, `map`, `zoneId`, `areaId`, 
 (@GUID, 15701, 0, 0, 0, 0, 0, 1, 1, 0, -4977.4976, -1172.4156, 501.7317,  2.282009840011596679, 300, 0, 0, 30520, 0, 0, 0, 0, 0, '', 61582, 2, NULL), -- Field Marshal Snowfall <War Effort Commander> (MOVEMENT!)
 -- Orgrimmar
 (@GUID, ID, 0, 0, 1, 0, 0, 1, 1, 0, X, Y, Z, O, 300, 0, 0, HEALTH, 0, 0, 0, 0, 0, '', 61582, 2, NULL),
+
+-- War Effort Recruiters
+(@GUID, 15702, 0, 0, 1, 0, 0, 1, 1, 0, -1209.5848, 100.22011,  134.661,   3.159045934677124023, 300, 0, 0, 15260, 0, 0, 0, 0, 0, '', 61582, 1, NULL), -- Senior Sergeant Taiga <War Effort Recruiter>
+(@GUID, 15703, 0, 0, 0, 0, 0, 1, 1, 0, 1572.5758,  272.70654,  -43.01935, 5.026548385620117187, 300, 0, 0, 15260, 0, 0, 0, 0, 0, '', 61582, 1, NULL), -- Senior Sergeant Grimsford <War Effort Recruiter>
+(@GUID, 15704, 0, 0, 1, 0, 0, 1, 1, 0, 1653.0684,  -4403.811,  18.581886, 4.450589656829833984, 300, 0, 0, 15260, 0, 0, 0, 0, 0, '', 61582, 1, NULL), -- Senior Sergeant Kai'jin <War Effort Recruiter>
+(@GUID, 15707, 0, 0, 0, 0, 0, 1, 1, 0, -4956.0864, -931.13306, 503.3468,  5.375614166259765625, 300, 0, 0, 15260, 0, 0, 0, 0, 0, '', 61582, 1, NULL), -- Master Sergeant Fizzlebolt <War Effort Recruiter>
+(@GUID, 15708, 0, 0, 0, 0, 0, 1, 1, 0, -8813.751,  654.0678,   96.16028,  4.834561824798583984, 300, 0, 0, 15260, 0, 0, 0, 0, 0, '', 61582, 1, NULL), -- Master Sergeant Maclure <War Effort Recruiter>
+(@GUID, 15709, 0, 0, 1, 0, 0, 1, 1, 0, 9945.1455,  2494.2393,  1317.5244, 4.206243515014648437, 300, 0, 0, 15260, 0, 0, 0, 0, 0, '', 61582, 1, NULL), -- Master Sergeant Moonshadow <War Effort Recruiter>
+-- Commendation Officers
+(@GUID, 15761, 0, 0, 1, 0, 0, 1, 1, 0, 1945.322,   -4330.305,  22.101057,  3.50811171531677246,  300, 0, 0, 2914, 0, 0, 0, 0, 0, '', 61582, 1, NULL), -- Officer Vu'Shalay <Darkspear Commendations>
+(@GUID, 15762, 0, 0, 1, 0, 0, 1, 1, 0, 9965.52,    2533.7234,  1319.0049,  0.471238881349563598, 300, 0, 0, 2614, 0, 0, 0, 0, 0, '', 61582, 1, NULL), -- Officer Lunalight <Darnassus Commendations>
+(@GUID, 15763, 0, 0, 0, 0, 0, 1, 1, 0, -4811.9756, -1264.849,  501.95117,  3.054326057434082031, 300, 0, 0, 2614, 0, 0, 0, 0, 0, '', 61582, 1, NULL), -- Officer Porterhouse <Gnomeregan Commendations>
+(@GUID, 15764, 0, 0, 0, 0, 0, 1, 1, 0, -4814.475,  -1055.5201, 502.26733,  6.213372230529785156, 300, 0, 0, 2614, 0, 0, 0, 0, 0, '', 61582, 1, NULL), -- Officer Ironbeard <Ironforge Commendations>
+(@GUID, 15765, 0, 0, 1, 0, 0, 1, 1, 0, 1911.704,   -4276.771,  31.655682,  4.886921882629394531, 300, 0, 0, 2914, 0, 0, 0, 0, 0, '', 61582, 1, NULL), -- Officer Redblade <Orgrimmar Commendations>
+(@GUID, 15766, 0, 0, 0, 0, 0, 1, 1, 0, -8859.14,   638.28687,  96.34692,   1.815142393112182617, 300, 0, 0, 2614, 0, 0, 0, 0, 0, '', 61582, 1, NULL), -- Officer Maloof <Stormwind Commendations>
+(@GUID, 15767, 0, 0, 1, 0, 0, 1, 1, 0, -1246.4849, 74.262695,  128.36818,  5.026548385620117187, 300, 0, 0, 2614, 0, 0, 0, 0, 0, '', 61582, 1, NULL), -- Officer Thunderstrider <Thunder Bluff Commendations>
+(@GUID, 15768, 0, 0, 0, 0, 0, 1, 1, 0, 1587.8914,  279.28018,  -43.019344, 4.852015495300292968, 300, 0, 0, 2614, 0, 0, 0, 0, 0, '', 61582, 1, NULL), -- Officer Gothena <Undercity Commendations>
