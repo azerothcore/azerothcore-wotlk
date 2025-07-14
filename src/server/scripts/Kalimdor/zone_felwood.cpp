@@ -80,7 +80,7 @@ public:
                 if (!player->HasItemCount(ITEM_CENARION_BEACON, 1, true))
                    AddGossipItemFor(player, GOSSIP_MENU_SILVERSKY, GOSSIP_OPTION_BEACON, GOSSIP_SENDER_MAIN, ACTION_CREATE_CENARION_BEACON);
 
-                SendGossipMenuFor(player, SILVERSKY_TEXT_1, creature->GetGUID());
+                SendGossipMenuFor(player, TEXT_SILVERSKY_1, creature->GetGUID());
             }
             else if (player->GetTeamId() == TEAM_HORDE)
                 SendGossipMenuFor(player, TEXT_SILVERSKY_2, creature->GetGUID());
