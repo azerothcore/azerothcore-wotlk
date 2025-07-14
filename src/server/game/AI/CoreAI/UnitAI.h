@@ -137,12 +137,16 @@ struct PowerUsersSelector : public Acore::unary_function<Unit*, bool>
     Powers const _power;
     float const _dist;
     bool const _playerOnly;
+    bool const _withTank;
 
-    PowerUsersSelector(Unit const* unit, Powers power, float dist, bool playerOnly) : _me(unit), _power(power), _dist(dist), _playerOnly(playerOnly) { }
+    PowerUsersSelector(Unit const* unit, Powers power, float dist, bool playerOnly, bool withTank = true) : _me(unit), _power(power), _dist(dist), _playerOnly(playerOnly), _withTank(withTank) { }
 
     bool operator()(Unit const* target) const
     {
         if (!_me || !target)
+            return false;
+
+        if (!_withTank && target == _me->GetThreatMgr().GetCurrentVictim())
             return false;
 
         if (target->getPowerType() != _power)
@@ -161,9 +165,10 @@ struct PowerUsersSelector : public Acore::unary_function<Unit*, bool>
     }
 };
 
-struct FarthestTargetSelector : public Acore::unary_function<Unit*, bool>
+// Simple selector based on range and Los
+struct RangeSelector : public Acore::unary_function<Unit*, bool>
 {
-    FarthestTargetSelector(Unit const* unit, float maxDist, bool playerOnly, bool inLos, float minDist = 0.f) : _me(unit), _minDist(minDist), _maxDist(maxDist), _playerOnly(playerOnly), _inLos(inLos) {}
+    RangeSelector(Unit const* unit, float maxDist, bool playerOnly, bool inLos, float minDist = 0.f) : _me(unit), _minDist(minDist), _maxDist(maxDist), _playerOnly(playerOnly), _inLos(inLos) {}
 
     bool operator()(Unit const* target) const
     {
@@ -294,18 +299,12 @@ public:
         }
         else
         {
-            Unit* currentVictim = mgr.GetCurrentVictim();
-            if (currentVictim)
-                targetList.push_back(currentVictim);
-
             for (ThreatReference const* ref : mgr.GetSortedThreatList())
             {
                 if (ref->IsOffline())
                     continue;
 
-                Unit* thisTarget = ref->GetVictim();
-                if (thisTarget != currentVictim)
-                    targetList.push_back(thisTarget);
+                targetList.push_back(ref->GetVictim());
             }
         }
 
@@ -359,7 +358,7 @@ public:
     virtual void JustExitedCombat() { }
 
     /// @brief Called at any Damage to any victim (before damage apply)
-    virtual void DamageDealt(Unit* /*victim*/, uint32& /*damage*/, DamageEffectType /*damageType*/) { }
+    virtual void DamageDealt(Unit* /*victim*/, uint32& /*damage*/, DamageEffectType /*damageType*/, SpellSchoolMask /*damageSchoolMask*/) {}
 
     /** @brief Called at any Damage from any attacker (before damage apply)
      *

@@ -19,10 +19,12 @@
 #include "InstanceMapScript.h"
 #include "InstanceScript.h"
 #include "Player.h"
+#include "SpellScript.h"
 #include "SpellScriptLoader.h"
 #include "WorldPacket.h"
+#include "WorldStateDefines.h"
+#include "WorldStatePackets.h"
 #include "ruby_sanctum.h"
-#include "SpellScript.h"
 
 BossBoundaryData const boundaries =
 {
@@ -47,7 +49,7 @@ DoorData const doorData[] =
 class instance_ruby_sanctum : public InstanceMapScript
 {
 public:
-    instance_ruby_sanctum() : InstanceMapScript("instance_ruby_sanctum", 724) { }
+    instance_ruby_sanctum() : InstanceMapScript("instance_ruby_sanctum", MAP_THE_RUBY_SANCTUM) { }
 
     struct instance_ruby_sanctum_InstanceMapScript : public InstanceScript
     {
@@ -63,7 +65,6 @@ public:
         {
             if (GetBossState(DATA_HALION_INTRO_DONE) != DONE && GetBossState(DATA_GENERAL_ZARITHRIAN) == DONE)
             {
-                instance->LoadGrid(3156.0f, 537.0f);
                 if (Creature* halionController = instance->GetCreature(HalionControllerGUID))
                     halionController->AI()->DoAction(ACTION_INTRO_HALION);
             }
@@ -208,9 +209,9 @@ public:
                             halionController->AI()->DoAction(ACTION_INTRO_HALION);
                     break;
                 case DATA_HALION:
-                    DoUpdateWorldState(WORLDSTATE_CORPOREALITY_TOGGLE, 0);
-                    DoUpdateWorldState(WORLDSTATE_CORPOREALITY_TWILIGHT, 0);
-                    DoUpdateWorldState(WORLDSTATE_CORPOREALITY_MATERIAL, 0);
+                    DoUpdateWorldState(WORLD_STATE_RUBY_SANCTUM_CORPOREALITY_TOGGLE, 0);
+                    DoUpdateWorldState(WORLD_STATE_RUBY_SANCTUM_CORPOREALITY_TWILIGHT, 0);
+                    DoUpdateWorldState(WORLD_STATE_RUBY_SANCTUM_CORPOREALITY_MATERIAL, 0);
                     HandleGameObject(FlameRingGUID, true);
                     break;
             }
@@ -218,11 +219,12 @@ public:
             return true;
         }
 
-        void FillInitialWorldStates(WorldPacket& data) override
+        void FillInitialWorldStates(WorldPackets::WorldState::InitWorldStates& packet) override
         {
-            data << uint32(WORLDSTATE_CORPOREALITY_MATERIAL) << uint32(50);
-            data << uint32(WORLDSTATE_CORPOREALITY_TWILIGHT) << uint32(50);
-            data << uint32(WORLDSTATE_CORPOREALITY_TOGGLE) << uint32(0);
+            packet.Worldstates.reserve(3);
+            packet.Worldstates.emplace_back(WORLD_STATE_RUBY_SANCTUM_CORPOREALITY_MATERIAL, 50);
+            packet.Worldstates.emplace_back(WORLD_STATE_RUBY_SANCTUM_CORPOREALITY_TWILIGHT, 50);
+            packet.Worldstates.emplace_back(WORLD_STATE_RUBY_SANCTUM_CORPOREALITY_TOGGLE, 0);
         }
 
     protected:

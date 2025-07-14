@@ -53,8 +53,9 @@ ObjectData const creatureData[] =
 
 ObjectData const objectData[] =
 {
-    { GO_PORTCULLIS_CHROMAGGUS, DATA_GO_CHROMAGGUS_DOOR },
-    { GO_PORTCULLIS_CHROMAGGUS_EXIT, DATA_GO_CHROMAGGUS_DOOR_EXIT }
+    { GO_PORTCULLIS_CHROMAGGUS,      DATA_GO_CHROMAGGUS_DOOR      },
+    { GO_PORTCULLIS_CHROMAGGUS_EXIT, DATA_GO_CHROMAGGUS_DOOR_EXIT },
+    { 0,                             0                            }
 };
 
 Position const SummonPosition[8] =
@@ -74,7 +75,7 @@ uint32 const Entry[3] = { 12422, 12416, 12420 };
 class instance_blackwing_lair : public InstanceMapScript
 {
 public:
-    instance_blackwing_lair() : InstanceMapScript(BWLScriptName, 469) { }
+    instance_blackwing_lair() : InstanceMapScript(BWLScriptName, MAP_BLACKWING_LAIR) { }
 
     struct instance_blackwing_lair_InstanceMapScript : public InstanceScript
     {
@@ -503,8 +504,7 @@ class spell_bwl_shadowflame : public SpellScript
 
 enum orb_of_command_misc
 {
-    QUEST_BLACKHANDS_COMMAND = 7761,
-    MAP_BWL                  = 469
+    QUEST_BLACKHANDS_COMMAND = 7761
 };
 
 const Position orbOfCommandTP = { -7672.46f, -1107.19f, 396.65f, 0.59f };
@@ -518,7 +518,7 @@ public:
     {
         if (!player->IsAlive() && player->GetQuestRewardStatus(QUEST_BLACKHANDS_COMMAND))
         {
-            player->TeleportTo(MAP_BWL, orbOfCommandTP.m_positionX, orbOfCommandTP.m_positionY, orbOfCommandTP.m_positionZ, orbOfCommandTP.m_orientation);
+            player->TeleportTo(MAP_BLACKWING_LAIR, orbOfCommandTP.m_positionX, orbOfCommandTP.m_positionY, orbOfCommandTP.m_positionZ, orbOfCommandTP.m_orientation);
             return true;
         }
         return false;

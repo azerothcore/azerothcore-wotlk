@@ -857,7 +857,7 @@ public:
                     events.Repeat(9s, 13s);
                     break;
                 case EVENT_SPELL_ADHERENT_CURSE_OF_TORPOR:
-                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 1))
+                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 0.0f, false, false))
                         me->CastSpell(target, SPELL_CURSE_OF_TORPOR, false);
                     events.Repeat(9s, 13s);
                     break;
@@ -1021,18 +1021,25 @@ public:
         void JustDied(Unit* killer) override
         {
             events.Reset();
-            if (Player* owner = killer->GetCharmerOrOwnerPlayerOrPlayerItself())
+
+            if (!killer)
+                return;
+
+            Player* owner = killer->GetCharmerOrOwnerPlayerOrPlayerItself();
+            if (!owner)
+                return;
+
+            Group* group = owner->GetGroup();
+            if (!group)
             {
-                if (Group* group = owner->GetGroup())
-                {
-                    for (GroupReference* itr = group->GetFirstMember(); itr != nullptr; itr = itr->next())
-                        if (Player* member = itr->GetSource())
-                            if (member->IsInMap(owner))
-                                member->FailQuest(QUEST_DEPROGRAMMING);
-                }
-                else
-                    owner->FailQuest(QUEST_DEPROGRAMMING);
+                owner->FailQuest(QUEST_DEPROGRAMMING);
+                return;
             }
+
+            for (GroupReference* itr = group->GetFirstMember(); itr != nullptr; itr = itr->next())
+                if (Player* member = itr->GetSource())
+                    if (member->IsInMap(owner))
+                        member->FailQuest(QUEST_DEPROGRAMMING);
         }
 
         void MovementInform(uint32 type, uint32 id) override

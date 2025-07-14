@@ -897,7 +897,8 @@ void GameObject::Update(uint32 diff)
                     return;
                 }
 
-                m_respawnTime = GameTime::GetGameTime().count() + m_respawnDelayTime;
+                uint32 dynamicRespawnDelay = GetMap()->ApplyDynamicModeRespawnScaling(this, m_respawnDelayTime);
+                m_respawnTime = GameTime::GetGameTime().count() + dynamicRespawnDelay;
 
                 // if option not set then object will be saved at grid unload
                 if (GetMap()->IsDungeon())
@@ -1758,7 +1759,7 @@ void GameObject::Use(Unit* user)
 
                             LOG_DEBUG("entities.gameobject", "Fishing check (skill: {} zone min skill: {} chance {} roll: {}", skill, zone_skill, chance, roll);
 
-                            if (sScriptMgr->OnUpdateFishingSkill(player, skill, zone_skill, chance, roll))
+                            if (sScriptMgr->OnPlayerUpdateFishingSkill(player, skill, zone_skill, chance, roll))
                             {
                                 player->UpdateFishingSkill();
                             }
@@ -3074,4 +3075,22 @@ std::string GameObject::GetDebugInfo() const
     sstr << WorldObject::GetDebugInfo() << "\n"
         << "SpawnId: " << GetSpawnId() << " GoState: " << std::to_string(GetGoState()) << " ScriptId: " << GetScriptId() << " AIName: " << GetAIName();
     return sstr.str();
+}
+
+// Note: This is called in a tight (heavy) loop, is it critical that all checks are FAST and are hopefully only simple conditionals.
+bool GameObject::IsUpdateNeeded()
+{
+    if (WorldObject::IsUpdateNeeded())
+        return true;
+
+    if (GetMap()->isCellMarked(GetCurrentCell().GetCellCoord().GetId()))
+        return true;
+
+    if (IsVisibilityOverridden())
+        return true;
+
+    if (IsTransport())
+        return true;
+
+    return false;
 }

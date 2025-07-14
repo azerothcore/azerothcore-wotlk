@@ -16,6 +16,7 @@
  */
 
 #include "Group.h"
+#include "AreaDefines.h"
 #include "Battleground.h"
 #include "BattlegroundMgr.h"
 #include "Config.h"
@@ -1116,6 +1117,8 @@ void Group::GroupLoot(Loot* loot, WorldObject* pLootedObject)
 
             if (member->IsAtLootRewardDistance(pLootedObject))
             {
+                r->totalPlayersRolling++;
+
                 RollVote vote = NOT_EMITED_YET;
                 if (!CanRollOnItem(*i, member, loot))
                 {
@@ -1478,7 +1481,7 @@ void Group::CountTheRoll(Rolls::iterator rollI, Map* allowedMap)
                         AllowedLooterSet looters = item->GetAllowedLooters();
                         Item* _item = player->StoreNewItem(dest, roll->itemid, true, item->randomPropertyId, looters);
                         if (_item)
-                            sScriptMgr->OnGroupRollRewardItem(player, _item, _item->GetCount(), NEED, roll);
+                            sScriptMgr->OnPlayerGroupRollRewardItem(player, _item, _item->GetCount(), NEED, roll);
                         player->UpdateLootAchievements(item, roll->getLoot());
                     }
                     else
@@ -1548,7 +1551,7 @@ void Group::CountTheRoll(Rolls::iterator rollI, Map* allowedMap)
                             AllowedLooterSet looters = item->GetAllowedLooters();
                             Item* _item = player->StoreNewItem(dest, roll->itemid, true, item->randomPropertyId, looters);
                             if (_item)
-                                sScriptMgr->OnGroupRollRewardItem(player, _item, _item->GetCount(), GREED, roll);
+                                sScriptMgr->OnPlayerGroupRollRewardItem(player, _item, _item->GetCount(), GREED, roll);
                             player->UpdateLootAchievements(item, roll->getLoot());
                         }
                         else
@@ -2011,7 +2014,7 @@ GroupJoinBattlegroundResult Group::CanJoinBattlegroundQueue(Battleground const* 
             return ERR_IN_NON_RANDOM_BG;
 
         // don't let Death Knights join BG queues when they are not allowed to be teleported yet
-        if (member->IsClass(CLASS_DEATH_KNIGHT, CLASS_CONTEXT_TELEPORT) && member->GetMapId() == 609 && !member->IsGameMaster() && !member->HasSpell(50977))
+        if (member->IsClass(CLASS_DEATH_KNIGHT, CLASS_CONTEXT_TELEPORT) && member->GetMapId() == MAP_EBON_HOLD && !member->IsGameMaster() && !member->HasSpell(50977))
             return ERR_GROUP_JOIN_BATTLEGROUND_FAIL;
 
         if (!member->GetBGAccessByLevel(bgTemplate->GetBgTypeID()))

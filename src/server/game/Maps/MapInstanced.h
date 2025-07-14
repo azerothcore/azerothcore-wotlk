@@ -50,7 +50,7 @@ public:
     void InitVisibilityDistance() override;
 
 private:
-    InstanceMap* CreateInstance(uint32 InstanceId, InstanceSave* save, Difficulty difficulty);
+    InstanceMap* CreateInstance(uint32 InstanceId, InstanceSave* save, Difficulty difficulty, Player* player);
     BattlegroundMap* CreateBattleground(uint32 InstanceId, Battleground* bg);
 
     InstancedMaps m_InstancedMaps;

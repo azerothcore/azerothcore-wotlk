@@ -18,6 +18,7 @@
 #include "InstanceMapScript.h"
 #include "InstanceScript.h"
 #include "Player.h"
+#include "WorldStateDefines.h"
 #include "the_black_morass.h"
 
 const Position PortalLocation[4] =
@@ -37,7 +38,7 @@ ObjectData const creatureData[] =
 class instance_the_black_morass : public InstanceMapScript
 {
 public:
-    instance_the_black_morass() : InstanceMapScript("instance_the_black_morass", 269) { }
+    instance_the_black_morass() : InstanceMapScript("instance_the_black_morass", MAP_OPENING_OF_THE_DARK_PORTAL) { }
 
     InstanceScript* GetInstanceScript(InstanceMap* map) const override
     {
@@ -74,7 +75,6 @@ public:
             // prevent getting stuck if event fails during boss break
             _noBossSpawnDelay = true;
 
-            instance->LoadGrid(-2023.0f, 7121.0f);
             if (Creature* medivh = GetCreature(DATA_MEDIVH))
             {
                 medivh->Respawn();
@@ -181,9 +181,9 @@ public:
                 CleanupInstance();
             }
 
-            player->SendUpdateWorldState(WORLD_STATE_BM, _eventStatus);
-            player->SendUpdateWorldState(WORLD_STATE_BM_SHIELD, _shieldPercent);
-            player->SendUpdateWorldState(WORLD_STATE_BM_RIFT, _currentRift);
+            player->SendUpdateWorldState(WORLD_STATE_BLACK_MORASS, _eventStatus);
+            player->SendUpdateWorldState(WORLD_STATE_BLACK_MORASS_SHIELD, _shieldPercent);
+            player->SendUpdateWorldState(WORLD_STATE_BLACK_MORASS_RIFT, _currentRift);
         }
 
         void ScheduleNextPortal(Milliseconds time, Position lastPosition)
@@ -206,10 +206,12 @@ public:
                     {
                         if (_availableRiftPositions.size() > 1)
                         {
-                            spawnPos = Acore::Containers::SelectRandomContainerElementIf(_availableRiftPositions, [&](Position pos) -> bool
+                            auto spawnPosItr = Acore::Containers::SelectRandomContainerElementIf(_availableRiftPositions, [&](Position const& pos) -> bool
                             {
                                 return pos != lastPosition;
                             });
+                            if (spawnPosItr != _availableRiftPositions.end())
+                                spawnPos = *spawnPosItr;
                         }
                         else
                         {
@@ -218,7 +220,7 @@ public:
 
                         _availableRiftPositions.remove(spawnPos);
 
-                        DoUpdateWorldState(WORLD_STATE_BM_RIFT, ++_currentRift);
+                        DoUpdateWorldState(WORLD_STATE_BLACK_MORASS_RIFT, ++_currentRift);
 
                         instance->SummonCreature(NPC_TIME_RIFT, spawnPos);
 
@@ -317,9 +319,9 @@ public:
                 {
                     _eventStatus = EVENT_IN_PROGRESS;
 
-                    DoUpdateWorldState(WORLD_STATE_BM, _eventStatus);
-                    DoUpdateWorldState(WORLD_STATE_BM_SHIELD, _shieldPercent);
-                    DoUpdateWorldState(WORLD_STATE_BM_RIFT, _currentRift);
+                    DoUpdateWorldState(WORLD_STATE_BLACK_MORASS, _eventStatus);
+                    DoUpdateWorldState(WORLD_STATE_BLACK_MORASS_SHIELD, _shieldPercent);
+                    DoUpdateWorldState(WORLD_STATE_BLACK_MORASS_RIFT, _currentRift);
 
                     ScheduleNextPortal(3s, Position(0.0f, 0.0f, 0.0f, 0.0f));
 
@@ -338,7 +340,7 @@ public:
                         _shieldPercent = 0;
                     }
 
-                    DoUpdateWorldState(WORLD_STATE_BM_SHIELD, _shieldPercent);
+                    DoUpdateWorldState(WORLD_STATE_BLACK_MORASS_SHIELD, _shieldPercent);
 
                     if (!_shieldPercent)
                     {
@@ -420,9 +422,9 @@ public:
                                             {
                                                 CleanupInstance();
 
-                                                DoUpdateWorldState(WORLD_STATE_BM, _eventStatus);
-                                                DoUpdateWorldState(WORLD_STATE_BM_SHIELD, _shieldPercent);
-                                                DoUpdateWorldState(WORLD_STATE_BM_RIFT, _currentRift);
+                                                DoUpdateWorldState(WORLD_STATE_BLACK_MORASS, _eventStatus);
+                                                DoUpdateWorldState(WORLD_STATE_BLACK_MORASS_SHIELD, _shieldPercent);
+                                                DoUpdateWorldState(WORLD_STATE_BLACK_MORASS_RIFT, _currentRift);
                                             });
                                         });
                                     });

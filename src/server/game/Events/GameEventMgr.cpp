@@ -31,6 +31,8 @@
 #include "Transport.h"
 #include "UnitAI.h"
 #include "World.h"
+#include "WorldSessionMgr.h"
+#include "WorldState.h"
 #include "WorldStatePackets.h"
 #include <time.h>
 
@@ -155,7 +157,7 @@ bool GameEventMgr::StartEvent(uint16 eventId, bool overwrite)
         auto itr = _gameEventSeasonalQuestsMap.find(eventId);
         if (itr != _gameEventSeasonalQuestsMap.end() && !itr->second.empty())
         {
-            sWorld->setWorldState(eventId, GameTime::GetGameTime().count());
+            sWorldState->setWorldState(eventId, GameTime::GetGameTime().count());
         }
 
         return false;
@@ -197,7 +199,7 @@ void GameEventMgr::StopEvent(uint16 eventId, bool overwrite)
     UnApplyEvent(eventId);
 
      // When event is stopped, clean up its worldstate
-    sWorld->setWorldState(eventId, 0);
+    sWorldState->setWorldState(eventId, 0);
 
     if (overwrite && !serverwide_evt)
     {
@@ -510,7 +512,7 @@ void GameEventMgr::LoadEventCreatureData()
             Field* fields = result->Fetch();
 
             ObjectGuid::LowType guid = fields[0].Get<uint32>();
-            int16 eventId = fields[1].Get<int8>();
+            int16 eventId = fields[1].Get<int16>();
 
             CreatureData const* data = sObjectMgr->GetCreatureData(guid);
             if (!data)
@@ -560,7 +562,7 @@ void GameEventMgr::LoadEventGameObjectData()
             Field* fields = result->Fetch();
 
             ObjectGuid::LowType guid = fields[0].Get<uint32>();
-            int16 eventId = fields[1].Get<int8>();
+            int16 eventId = fields[1].Get<int16>();
 
             int32 internal_event_id = _gameEvent.size() + eventId - 1;
 
@@ -1018,7 +1020,7 @@ void GameEventMgr::LoadEventPoolData()
             Field* fields = result->Fetch();
 
             uint32 entry = fields[0].Get<uint32>();
-            int16 eventId = fields[1].Get<int8>();
+            int16 eventId = fields[1].Get<int16>();
 
             int32 internal_event_id = _gameEvent.size() + eventId - 1;
 
@@ -1163,34 +1165,6 @@ uint32 GameEventMgr::StartSystem()                           // return the next 
     return delay;
 }
 
-void GameEventMgr::StartArenaSeason()
-{
-    uint8 season = sWorld->getIntConfig(CONFIG_ARENA_SEASON_ID);
-
-    WorldDatabasePreparedStatement* stmt = WorldDatabase.GetPreparedStatement(WORLD_SEL_GAME_EVENT_ARENA_SEASON);
-    stmt->SetData(0, season);
-    PreparedQueryResult result = WorldDatabase.Query(stmt);
-
-    if (!result)
-    {
-        LOG_ERROR("gameevent", "ArenaSeason ({}) must be an existant Arena Season", season);
-        return;
-    }
-
-    Field* fields = result->Fetch();
-    uint16 eventId = fields[0].Get<uint8>();
-
-    if (eventId >= _gameEvent.size())
-    {
-        LOG_ERROR("gameevent", "EventEntry {} for ArenaSeason ({}) does not exists", eventId, season);
-        return;
-    }
-
-    StartEvent(eventId, true);
-    LOG_INFO("server.loading", "Arena Season {} started...", season);
-    LOG_INFO("server.loading", " ");
-}
-
 uint32 GameEventMgr::Update()                               // return the next event delay in ms
 {
     time_t currenttime = GameTime::GetGameTime().count();
@@ -1232,7 +1206,7 @@ uint32 GameEventMgr::Update()                               // return the next e
         else
         {
             // If event is inactive, periodically clean up its worldstate
-            sWorld->setWorldState(itr, 0);
+            sWorldState->setWorldState(itr, 0);
 
             if (IsActiveEvent(itr))
             {
@@ -1323,7 +1297,7 @@ void GameEventMgr::ApplyNewEvent(uint16 eventId)
 
     // If event's worldstate is 0, it means the event hasn't been started yet. In that case, reset seasonal quests.
     // When event ends (if it expires or if it's stopped via commands) worldstate will be set to 0 again, ready for another seasonal quest reset.
-    if (sWorld->getWorldState(eventId) == 0)
+    if (sWorldState->getWorldState(eventId) == 0)
     {
         sWorld->ResetEventSeasonalQuests(eventId);
     }
@@ -1714,7 +1688,7 @@ void GameEventMgr::UpdateWorldStates(uint16 eventId, bool Activate)
                 WorldPackets::WorldState::UpdateWorldState worldstate;
                 worldstate.VariableID = bl->HolidayWorldStateId;
                 worldstate.Value = Activate ? 1 : 0;
-                sWorld->SendGlobalMessage(worldstate.Write());
+                sWorldSessionMgr->SendGlobalMessage(worldstate.Write());
             }
         }
     }

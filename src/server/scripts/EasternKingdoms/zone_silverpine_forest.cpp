@@ -15,18 +15,6 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-/* ScriptData
-SDName: Silverpine_Forest
-SD%Complete: 100
-SDComment: Quest support: 435, 452
-SDCategory: Silverpine Forest
-EndScriptData */
-
-/* ContentData
-npc_deathstalker_erland
-pyrewood_ambush
-EndContentData */
-
 #include "CreatureScript.h"
 #include "PassiveAI.h"
 #include "Player.h"
@@ -174,6 +162,7 @@ struct npc_deathstalker_fearleia : public ScriptedAI
         {
             _playerGUID.Clear();
             _summons.DespawnAll();
+            me->SetNpcFlag(UNIT_NPC_FLAG_QUESTGIVER);
         }
     }
 
@@ -183,6 +172,7 @@ struct npc_deathstalker_fearleia : public ScriptedAI
         {
             _questInProgress = true;
             _playerGUID = player->GetGUID();
+            me->RemoveNpcFlag(UNIT_NPC_FLAG_QUESTGIVER);
         }
 
         Talk(NPCSAY_INIT, player);
@@ -204,7 +194,6 @@ struct npc_deathstalker_fearleia : public ScriptedAI
                     SummonCreatureWithRandomTarget(2065, 0);
                     break;
                 case 4:
-                    SummonCreatureWithRandomTarget(2066, 1);
                     SummonCreatureWithRandomTarget(2066, 1);
                     SummonCreatureWithRandomTarget(2067, 0);
                     SummonCreatureWithRandomTarget(2068, 2);

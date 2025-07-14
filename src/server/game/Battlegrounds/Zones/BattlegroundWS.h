@@ -86,17 +86,6 @@ enum BG_WS_SpellId
     BG_WS_SPELL_BRUTAL_ASSAULT          = 46393
 };
 
-enum BG_WS_WorldStates
-{
-    BG_WS_FLAG_CAPTURES_ALLIANCE  = 1581,
-    BG_WS_FLAG_CAPTURES_HORDE     = 1582,
-    BG_WS_FLAG_CAPTURES_MAX       = 1601,
-    BG_WS_FLAG_STATE_HORDE        = 2338,
-    BG_WS_FLAG_STATE_ALLIANCE     = 2339,
-    BG_WS_STATE_TIMER             = 4248,
-    BG_WS_STATE_TIMER_ACTIVE      = 4247
-};
-
 enum BG_WS_ObjectTypes
 {
     BG_WS_OBJECT_DOOR_A_1       = 0,
@@ -252,7 +241,7 @@ public:
     bool UpdatePlayerScore(Player* player, uint32 type, uint32 value, bool doAddHonor = true) override;
     void SetDroppedFlagGUID(ObjectGuid guid, TeamId teamId) override { _droppedFlagGUID[teamId] = guid; }
     ObjectGuid GetDroppedFlagGUID(TeamId teamId) const { return _droppedFlagGUID[teamId];}
-    void FillInitialWorldStates(WorldPacket& data) override;
+    void FillInitialWorldStates(WorldPackets::WorldState::InitWorldStates& packet) override;
 
     /* Scorekeeping */
     void AddPoints(TeamId teamId, uint32 points) { m_TeamScores[teamId] += points; }
@@ -272,6 +261,7 @@ private:
     uint32 _reputationCapture;
     uint32 _honorWinKills;
     uint32 _honorEndKills;
+    uint32 _configurableMaxTeamScore;
 
     void PostUpdateImpl(uint32 diff) override;
 };

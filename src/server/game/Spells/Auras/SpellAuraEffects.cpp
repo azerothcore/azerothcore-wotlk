@@ -16,6 +16,7 @@
  */
 
 #include "SpellAuraEffects.h"
+#include "AreaDefines.h"
 #include "BattlefieldMgr.h"
 #include "Battleground.h"
 #include "CellImpl.h"
@@ -701,6 +702,7 @@ void AuraEffect::CalculateSpellMod()
                 m_spellmod->spellId = GetId();
                 m_spellmod->mask = GetSpellInfo()->Effects[GetEffIndex()].SpellClassMask;
                 m_spellmod->charges = GetBase()->GetCharges();
+                m_spellmod->priority = GetSpellInfo()->SpellPriority;
             }
             m_spellmod->value = GetAmount();
             break;
@@ -2017,7 +2019,7 @@ void AuraEffect::HandleAuraModShapeshift(AuraApplication const* aurApp, uint8 mo
         if (modelid > 0)
         {
             bool allow = true;
-            if (target->getTransForm() && !(target->GetMapId() == 560 /*The Escape From Durnholde*/))
+            if (target->getTransForm() && !(target->GetMapId() == MAP_THE_ESCAPE_FROM_DURNHOLDE))
                 if (SpellInfo const* transformSpellInfo = sSpellMgr->GetSpellInfo(target->getTransForm()))
                     if (transformSpellInfo->HasAttribute(SPELL_ATTR0_NO_IMMUNITIES) || !transformSpellInfo->IsPositive())
                         allow = false;
@@ -3677,13 +3679,6 @@ void AuraEffect::HandleAuraControlVehicle(AuraApplication const* aurApp, uint8 m
     }
     else
     {
-        if (GetId() == 53111) // Devour Humanoid
-        {
-            Unit::Kill(target, caster);
-            if (caster->IsCreature())
-                caster->ToCreature()->RemoveCorpse();
-        }
-
         caster->_ExitVehicle();
         // some SPELL_AURA_CONTROL_VEHICLE auras have a dummy effect on the player - remove them
         caster->RemoveAurasDueToSpell(GetId());
@@ -4663,6 +4658,8 @@ void AuraEffect::HandleModPowerRegen(AuraApplication const* aurApp, uint8 mode, 
     // Update manaregen value
     if (GetMiscValue() == POWER_MANA)
         target->ToPlayer()->UpdateManaRegen();
+    else if (GetMiscValue() == POWER_ENERGY)
+        target->ToPlayer()->UpdateEnergyRegen();
     else if (GetMiscValue() == POWER_RUNE)
         target->ToPlayer()->UpdateRuneRegen(RuneType(GetMiscValueB()));
     // other powers are not immediate effects - implemented in Player::Regenerate, Creature::Regenerate
@@ -6692,9 +6689,17 @@ void AuraEffect::HandlePeriodicDamageAurasTick(Unit* target, Unit* caster) const
         damage = Unit::SpellCriticalDamageBonus(caster, m_spellInfo, damage, target);
 
     // Auras reducing damage from AOE spells
-    if (GetSpellInfo()->Effects[GetEffIndex()].IsAreaAuraEffect() || GetSpellInfo()->Effects[GetEffIndex()].IsTargetingArea() || GetSpellInfo()->Effects[GetEffIndex()].Effect == SPELL_EFFECT_PERSISTENT_AREA_AURA) // some persistent area auras have targets like A=53 B=28
+    if (!GetSpellInfo()->HasAttribute(SPELL_ATTR4_IGNORE_DAMAGE_TAKEN_MODIFIERS))
     {
-        damage = target->CalculateAOEDamageReduction(damage, GetSpellInfo()->SchoolMask, caster);
+        if (GetSpellInfo()->Effects[GetEffIndex()].IsAreaAuraEffect() ||
+            GetSpellInfo()->Effects[GetEffIndex()].IsTargetingArea() ||
+            GetSpellInfo()->Effects[GetEffIndex()].Effect == SPELL_EFFECT_PERSISTENT_AREA_AURA || // some persistent area auras have targets like A=53 B=28
+            GetSpellInfo()->HasAttribute(SPELL_ATTR5_TREAT_AS_AREA_EFFECT) ||
+            GetSpellInfo()->HasAttribute(SPELL_ATTR7_TREAT_AS_NPC_AOE))
+        {
+            bool npcCaster = (caster && !caster->IsControlledByPlayer()) || GetSpellInfo()->HasAttribute(SPELL_ATTR7_TREAT_AS_NPC_AOE);
+            damage = target->CalculateAOEDamageReduction(damage, GetSpellInfo()->SchoolMask, npcCaster);
+        }
     }
 
     int32 dmg = damage;
@@ -6847,8 +6852,10 @@ void AuraEffect::HandlePeriodicHealthLeechAuraTick(Unit* target, Unit* caster) c
     heal = uint32(caster->SpellHealingBonusTaken(caster, GetSpellInfo(), heal, DOT, GetBase()->GetStackAmount()));
 
     HealInfo healInfo(caster, caster, heal, GetSpellInfo(), GetSpellInfo()->GetSchoolMask());
-    int32 gain = caster->HealBySpell(healInfo);
-    caster->getHostileRefMgr().threatAssist(caster, gain * 0.5f, GetSpellInfo());
+    float threat = float(caster->HealBySpell(healInfo)) * 0.5f;
+    if (caster->IsClass(CLASS_PALADIN))
+        threat *= 0.5f;
+    caster->getHostileRefMgr().threatAssist(caster, threat, GetSpellInfo());
 }
 
 void AuraEffect::HandlePeriodicHealthFunnelAuraTick(Unit* target, Unit* caster) const
@@ -6995,7 +7002,13 @@ void AuraEffect::HandlePeriodicHealAurasTick(Unit* target, Unit* caster) const
     target->SendPeriodicAuraLog(&pInfo);
 
     if (caster)
-        target->getHostileRefMgr().threatAssist(caster, float(gain) * 0.5f, GetSpellInfo());
+    {
+        float threat = float(gain) * 0.5f;
+        if (caster->IsClass(CLASS_PALADIN))
+            threat *= 0.5f;
+
+        target->getHostileRefMgr().threatAssist(caster, threat, GetSpellInfo());
+    }
 
     bool haveCastItem = GetBase()->GetCastItemGUID();
 

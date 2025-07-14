@@ -26,6 +26,7 @@
 #include "ItemTemplate.h"
 #include "MotionMaster.h"
 #include "Object.h"
+#include "SharedDefines.h"
 #include "SpellAuraDefines.h"
 #include "SpellDefines.h"
 #include "ThreatMgr.h"
@@ -599,23 +600,6 @@ enum ReactiveType
     MAX_REACTIVE
 };
 
-#define SUMMON_SLOT_PET     0
-#define SUMMON_SLOT_TOTEM   1
-#define MAX_TOTEM_SLOT      5
-#define SUMMON_SLOT_MINIPET 5
-#define SUMMON_SLOT_QUEST   6
-#define MAX_SUMMON_SLOT     7
-
-#define MAX_GAMEOBJECT_SLOT 4
-
-enum PlayerTotemType
-{
-    SUMMON_TYPE_TOTEM_FIRE  = 63,
-    SUMMON_TYPE_TOTEM_EARTH = 81,
-    SUMMON_TYPE_TOTEM_WATER = 82,
-    SUMMON_TYPE_TOTEM_AIR   = 83,
-};
-
 /// Spell cooldown flags sent in SMSG_SPELL_COOLDOWN
 enum SpellCooldownFlags
 {
@@ -759,7 +743,7 @@ public:
     // Unit type methods
     [[nodiscard]] bool IsSummon() const { return m_unitTypeMask & UNIT_MASK_SUMMON; }
     [[nodiscard]] bool IsGuardian() const { return m_unitTypeMask & UNIT_MASK_GUARDIAN; }
-    [[nodiscard]] bool IsControllableGuardian() const { return m_unitTypeMask & UNIT_MASK_CONTROLABLE_GUARDIAN; }
+    [[nodiscard]] bool IsControllableGuardian() const { return m_unitTypeMask & UNIT_MASK_CONTROLLABLE_GUARDIAN; }
     [[nodiscard]] bool IsPet() const { return m_unitTypeMask & UNIT_MASK_PET; }
     [[nodiscard]] bool IsHunterPet() const { return m_unitTypeMask & UNIT_MASK_HUNTER_PET; }
     [[nodiscard]] bool IsTotem() const { return m_unitTypeMask & UNIT_MASK_TOTEM; }
@@ -986,6 +970,13 @@ public:
 
         return false;
     }
+    [[nodiscard]] bool RespondsToCallForHelp() const
+    {
+        if (FactionTemplateEntry const* entry = GetFactionTemplateEntry())
+            return entry->FactionRespondsToCallForHelp();
+
+        return false;
+    }
     [[nodiscard]] bool IsInSanctuary() const { return HasByteFlag(UNIT_FIELD_BYTES_2, 1, UNIT_BYTE2_FLAG_SANCTUARY); }
     [[nodiscard]] bool IsPvP() const { return HasByteFlag(UNIT_FIELD_BYTES_2, 1, UNIT_BYTE2_FLAG_PVP); }
     [[nodiscard]] bool IsFFAPvP() const { return HasByteFlag(UNIT_FIELD_BYTES_2, 1, UNIT_BYTE2_FLAG_FFA_PVP); }
@@ -1187,7 +1178,7 @@ public:
     uint32 SpellDamageBonusTaken(Unit* caster, SpellInfo const* spellProto, uint32 pdamage, DamageEffectType damagetype, uint32 stack = 1);
 
     // AOE damages
-    int32 CalculateAOEDamageReduction(int32 damage, uint32 schoolMask, Unit* caster) const;
+    int32 CalculateAOEDamageReduction(int32 damage, uint32 schoolMask, bool npcCaster) const;
 
     // Armor reduction
     static bool IsDamageReducedByArmor(SpellSchoolMask damageSchoolMask, SpellInfo const* spellInfo = nullptr, uint8 effIndex = MAX_SPELL_EFFECTS);
@@ -1890,8 +1881,7 @@ public:
     void RestoreDisplayId();
     void SetNativeDisplayId(uint32 displayId) { SetUInt32Value(UNIT_FIELD_NATIVEDISPLAYID, displayId); }
 
-    [[nodiscard]] uint32 GetModelForForm(ShapeshiftForm form, uint32 spellId) const;
-    uint32 GetModelForTotem(PlayerTotemType totemType);
+    [[nodiscard]] uint32 GetModelForForm(ShapeshiftForm form, uint32 spellId);
 
     // Unit positons
     [[nodiscard]] virtual bool IsInWater() const;
@@ -1903,6 +1893,7 @@ public:
     void SetInFront(WorldObject const* target);
     void SetFacingTo(float ori);
     void SetFacingToObject(WorldObject* object);
+    void SetTimedFacingToObject(WorldObject* object, uint32 time); // Reset to home orientation after given time
 
     bool isInAccessiblePlaceFor(Creature const* c) const;
     bool isInFrontInMap(Unit const* target, float distance, float arc = M_PI) const;

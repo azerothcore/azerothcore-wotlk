@@ -15,12 +15,13 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "Group.h"
 #include "InstanceMapScript.h"
+#include "InstanceScript.h"
 #include "MapMgr.h"
 #include "Transport.h"
+#include "WorldStateDefines.h"
 #include "halls_of_reflection.h"
-#include "InstanceScript.h"
-#include "Group.h"
 
 class UtherBatteredHiltEvent : public BasicEvent
 {
@@ -129,7 +130,7 @@ private:
 class instance_halls_of_reflection : public InstanceMapScript
 {
 public:
-    instance_halls_of_reflection() : InstanceMapScript("instance_halls_of_reflection", 668) { }
+    instance_halls_of_reflection() : InstanceMapScript("instance_halls_of_reflection", MAP_HALLS_OF_REFLECTION) { }
 
     InstanceScript* GetInstanceScript(InstanceMap* pMap) const override
     {
@@ -325,7 +326,6 @@ public:
                     }
                     else
                     {
-                        instance->LoadGrid(PathWaypoints[PATH_WP_COUNT - 1].GetPositionX(), PathWaypoints[PATH_WP_COUNT - 1].GetPositionY());
                         creature->UpdatePosition(PathWaypoints[PATH_WP_COUNT - 1], true);
                         creature->StopMovingOnCurrentPos();
                     }
@@ -436,7 +436,7 @@ public:
                                 c->HandleEmoteCommand(EMOTE_ONESHOT_EMERGE);
                             }
                             WaveNumber = 0;
-                            DoUpdateWorldState(WORLD_STATE_HOR_COUNTER, 0);
+                            DoUpdateWorldState(WORLD_STATE_HALLS_OF_REFLECTION_WAVES_ENABLED, 0);
 
                             // give quest
                             Map::PlayerList const& pl = instance->GetPlayers();
@@ -515,7 +515,6 @@ public:
                     {
                         break;
                     }
-                    instance->LoadGrid(LeaderEscapePos.GetPositionX(), LeaderEscapePos.GetPositionY());
                     if (Creature* c = instance->GetCreature(NPC_LeaderGUID))
                     {
                         if (!c->IsAlive())
@@ -567,7 +566,6 @@ public:
                 case DATA_LICH_KING:
                     if (data == DONE)
                     {
-                        instance->LoadGrid(PathWaypoints[0].GetPositionX(), PathWaypoints[0].GetPositionY());
                         EncounterMask |= (1 << DATA_LICH_KING);
                         if (Creature* c = instance->GetCreature(NPC_LeaderGUID))
                             c->setActive(false);
@@ -806,8 +804,8 @@ public:
             if (WaveNumber >= 6)
                 bFinished5Waves = true;
 
-            DoUpdateWorldState(WORLD_STATE_HOR_COUNTER, 1);
-            DoUpdateWorldState(WORLD_STATE_HOR_WAVE_COUNT, WaveNumber);
+            DoUpdateWorldState(WORLD_STATE_HALLS_OF_REFLECTION_WAVES_ENABLED, 1);
+            DoUpdateWorldState(WORLD_STATE_HALLS_OF_REFLECTION_WAVE_COUNT, WaveNumber);
             HandleGameObject(GO_FrontDoorGUID, false);
 
             // some of them could go back to spawn due to vanish, etc.
@@ -872,8 +870,8 @@ public:
             if (!WaveNumber)
                 return;
 
-            DoUpdateWorldState(WORLD_STATE_HOR_COUNTER, 0);
-            DoUpdateWorldState(WORLD_STATE_HOR_WAVE_COUNT, 0);
+            DoUpdateWorldState(WORLD_STATE_HALLS_OF_REFLECTION_WAVES_ENABLED, 0);
+            DoUpdateWorldState(WORLD_STATE_HALLS_OF_REFLECTION_WAVE_COUNT, 0);
             HandleGameObject(GO_FrontDoorGUID, true);
 
             TrashCounter = NUM_OF_TRASH;

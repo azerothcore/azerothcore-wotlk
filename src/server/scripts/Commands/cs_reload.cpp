@@ -15,13 +15,6 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-/* ScriptData
-Name: reload_commandscript
-%Complete: 100
-Comment: All reload related commands
-Category: commandscripts
-EndScriptData */
-
 #include "AchievementMgr.h"
 #include "AuctionHouseMgr.h"
 #include "AutobroadcastMgr.h"
@@ -38,6 +31,7 @@ EndScriptData */
 #include "MotdMgr.h"
 #include "ObjectMgr.h"
 #include "ScriptMgr.h"
+#include "ServerMailMgr.h"
 #include "SkillDiscovery.h"
 #include "SkillExtraItems.h"
 #include "SmartAI.h"
@@ -47,6 +41,7 @@ EndScriptData */
 #include "Tokenize.h"
 #include "WardenCheckMgr.h"
 #include "WaypointMgr.h"
+#include "WorldGlobals.h"
 
 using namespace Acore::ChatCommands;
 
@@ -73,6 +68,7 @@ public:
         };
         static ChatCommandTable reloadCommandTable =
         {
+            { "antidos_opcode_policies",       HandleReloadAntiDosOpcodePoliciesCommand,      SEC_ADMINISTRATOR, Console::Yes },
             { "auctions",                      HandleReloadAuctionsCommand,                   SEC_ADMINISTRATOR, Console::Yes },
             { "dungeon_access_template",       HandleReloadDungeonAccessCommand,              SEC_ADMINISTRATOR, Console::Yes },
             { "dungeon_access_requirements",   HandleReloadDungeonAccessCommand,              SEC_ADMINISTRATOR, Console::Yes },
@@ -1194,8 +1190,16 @@ public:
     static bool HandleReloadMailServerTemplateCommand(ChatHandler* handler)
     {
         LOG_INFO("server.loading", "Reloading `server_mail_template` table");
-        sObjectMgr->LoadMailServerTemplates();
+        sServerMailMgr->LoadMailServerTemplates();
         handler->SendGlobalGMSysMessage("DB table `server_mail_template` reloaded.");
+        return true;
+    }
+
+    static bool HandleReloadAntiDosOpcodePoliciesCommand(ChatHandler* handler)
+    {
+        LOG_INFO("server.loading", "Reloading AntiDos opcode policies...");
+        sWorldGlobals->LoadAntiDosOpcodePolicies();
+        handler->SendGlobalGMSysMessage("AntiDos opcode policies reloaded.");
         return true;
     }
 

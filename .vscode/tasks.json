@@ -13,18 +13,7 @@
         "problemMatcher": []
       },
       {
-        "label": "AzerothCore: Import/update database",
-        "type": "shell",
-        "command": "./acore.sh db-assembler import-all",
-        "group": "build",
-        "presentation": {
-          "reveal": "always",
-          "panel": "new"
-        },
-        "problemMatcher": []
-      },
-      {
-        "label": "AzerothCore: download client-data",
+        "label": "AzerothCore: Download client-data",
         "type": "shell",
         "command": "./acore.sh client-data",
         "group": "none",
@@ -53,6 +42,28 @@
           "kind": "build",
           "isDefault": true
         },
+        "presentation": {
+          "reveal": "always",
+          "panel": "new"
+        },
+        "problemMatcher": []
+      },
+      {
+        "label": "AzerothCore: Check codestyle cpp",
+        "type": "shell",
+        "command": "python apps/codestyle/codestyle-cpp.py",
+        "group": "none",
+        "presentation": {
+          "reveal": "always",
+          "panel": "new"
+        },
+        "problemMatcher": []
+      },
+      {
+        "label": "AzerothCore: Check codestyle sql",
+        "type": "shell",
+        "command": "python apps/codestyle/codestyle-sql.py",
+        "group": "none",
         "presentation": {
           "reveal": "always",
           "panel": "new"

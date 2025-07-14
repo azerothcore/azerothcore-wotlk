@@ -133,11 +133,10 @@ public:
         // grid tile location
         Player* player = handler->GetSession()->GetPlayer();
 
-        int32 gx = 32 - player->GetPositionX() / SIZE_OF_GRIDS;
-        int32 gy = 32 - player->GetPositionY() / SIZE_OF_GRIDS;
+        GridCoord const gridCoord = Acore::ComputeGridCoord(player->GetPositionX(), player->GetPositionY());
 
-        handler->PSendSysMessage("{}{}{}.mmtile", player->GetMapId(), gx, gy);
-        handler->PSendSysMessage("gridloc [{}, {}]", gy, gx);
+        handler->PSendSysMessage("{}{}{}.mmtile", player->GetMapId(), gridCoord.x_coord, gridCoord.y_coord);
+        handler->PSendSysMessage("gridloc [{}, {}]", gridCoord.x_coord, gridCoord.y_coord);
 
         // calculate navmesh tile location
         dtNavMesh const* navmesh = MMAP::MMapFactory::createOrGetMMapMgr()->GetNavMesh(handler->GetSession()->GetPlayer()->GetMapId());

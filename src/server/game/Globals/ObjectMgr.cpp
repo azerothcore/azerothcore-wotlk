@@ -1785,6 +1785,139 @@ void ObjectMgr::LoadCreatureModelInfo()
     LOG_INFO("server.loading", " ");
 }
 
+void ObjectMgr::LoadPlayerTotemModels()
+{
+    uint32 oldMSTime = getMSTime();
+
+    QueryResult result = WorldDatabase.Query("SELECT TotemID, RaceID, ModelID from player_totem_model");
+
+    if (!result)
+    {
+        LOG_INFO("server.loading", ">> Loaded 0 player totem model records. DB table `player_totem_model` is empty.");
+        return;
+    }
+
+    uint32 count = 0;
+    do
+    {
+        Field* fields = result->Fetch();
+
+        SummonSlot totemSlot = SummonSlot(fields[0].Get<uint8>());
+        uint8 race = fields[1].Get<uint8>();
+        uint32 displayId = fields[2].Get<uint32>();
+
+        if (totemSlot < SUMMON_SLOT_TOTEM_FIRE || totemSlot >= MAX_TOTEM_SLOT)
+        {
+            LOG_ERROR("sql.sql", "Wrong TotemSlot {} in `player_totem_model` table, skipped.", totemSlot);
+            continue;
+        }
+
+        ChrRacesEntry const* raceEntry = sChrRacesStore.LookupEntry(race);
+        if (!raceEntry)
+        {
+            LOG_ERROR("sql.sql", "Race {} defined in `player_totem_model` does not exists, skipped.", uint32(race));
+            continue;
+        }
+
+        CreatureDisplayInfoEntry const* displayEntry = sCreatureDisplayInfoStore.LookupEntry(displayId);
+        if (!displayEntry)
+        {
+            LOG_ERROR("sql.sql", "TotemSlot: {} defined in `player_totem_model` has non-existing model ({}), skipped.", totemSlot, displayId);
+            continue;
+        }
+
+        _playerTotemModel[std::make_pair(totemSlot, Races(race))] = displayId;
+        ++count;
+    } while (result->NextRow());
+
+    LOG_INFO("server.loading", ">> Loaded {} player totem model records in {} ms", count, GetMSTimeDiffToNow(oldMSTime));
+    LOG_INFO("server.loading", " ");
+}
+
+uint32 ObjectMgr::GetModelForTotem(SummonSlot totemSlot, Races race) const
+{
+    auto itr = _playerTotemModel.find(std::make_pair(totemSlot, race));
+    if (itr != _playerTotemModel.end())
+        return itr->second;
+
+    LOG_ERROR("misc", "TotemSlot {} with RaceID ({}) have no totem model data defined, set to default model.", totemSlot, race);
+    return 0;
+}
+
+void ObjectMgr::LoadPlayerShapeshiftModels()
+{
+    uint32 oldMSTime = getMSTime();
+
+    QueryResult result = WorldDatabase.Query("SELECT ShapeshiftID, RaceID, CustomizationID, GenderID, ModelID from player_shapeshift_model");
+
+    if (!result)
+    {
+        LOG_INFO("server.loading", ">> Loaded 0 player shapeshift model records. DB table `player_shapeshift_model` is empty.");
+        return;
+    }
+
+    uint32 count = 0;
+    do
+    {
+        Field* fields = result->Fetch();
+
+        ShapeshiftForm shapeshiftForm = ShapeshiftForm(fields[0].Get<uint8>());
+        uint8 race = fields[1].Get<uint8>();
+        uint8 customizationID = fields[2].Get<uint8>();
+        uint8 genderID = Gender(fields[3].Get<uint8>());
+        uint32 modelId = fields[4].Get<uint32>();
+
+        ChrRacesEntry const* raceEntry = sChrRacesStore.LookupEntry(race);
+        if (!raceEntry)
+        {
+            LOG_ERROR("sql.sql", "Race {} defined in `player_shapeshift_model` does not exists, skipped.", uint32(race));
+            continue;
+        }
+
+        CreatureDisplayInfoEntry const* displayEntry = sCreatureDisplayInfoStore.LookupEntry(modelId);
+        if (!displayEntry)
+        {
+            LOG_ERROR("sql.sql", "ShapeshiftForm: {}, Race: {} defined in `player_shapeshift_model` has non-existing model ({}), skipped.", shapeshiftForm, race, modelId);
+            continue;
+        }
+
+        _playerShapeshiftModel[std::make_tuple(shapeshiftForm, race, customizationID, genderID)] = modelId;
+        ++count;
+    } while (result->NextRow());
+
+    LOG_INFO("server.loading", ">> Loaded {} player totem model records in {} ms", count, GetMSTimeDiffToNow(oldMSTime));
+    LOG_INFO("server.loading", " ");
+}
+
+uint32 ObjectMgr::GetModelForShapeshift(ShapeshiftForm form, Player* player) const
+{
+    uint8 customizationID;
+
+    if (player->GetTeamId() == TEAM_ALLIANCE)
+        customizationID = player->GetByteValue(PLAYER_BYTES, 3); // Use Hair Color
+    else
+        customizationID = player->GetByteValue(PLAYER_BYTES, 0); // Use Skin Color
+
+    auto itr = _playerShapeshiftModel.find(std::make_tuple(form, player->getRace(), customizationID, player->getGender()));
+    if (itr != _playerShapeshiftModel.end())
+        return itr->second; // Explicit combination
+
+    itr = _playerShapeshiftModel.find(std::make_tuple(form, player->getRace(), customizationID, GENDER_NONE));
+    if (itr != _playerShapeshiftModel.end())
+        return itr->second; // Combination applied to both genders
+
+    itr = _playerShapeshiftModel.find(std::make_tuple(form, player->getRace(), 255, player->getGender()));
+    if (itr != _playerShapeshiftModel.end())
+        return itr->second; // Default gender-dependent model
+
+    itr = _playerShapeshiftModel.find(std::make_tuple(form, player->getRace(), 255, GENDER_NONE));
+    if (itr != _playerShapeshiftModel.end())
+        return itr->second; // Last resort
+
+    LOG_DEBUG("entities.player", "ShapeshiftForm {} with RaceID ({}) have no shapeshift model data defined, using fallback data.", form, player->getRace());
+    return 0;
+}
+
 void ObjectMgr::LoadLinkedRespawn()
 {
     uint32 oldMSTime = getMSTime();
@@ -2184,7 +2317,7 @@ void ObjectMgr::LoadCreatures()
         data.movementType       = fields[15].Get<uint8>();
         data.spawnMask          = fields[16].Get<uint8>();
         data.phaseMask          = fields[17].Get<uint32>();
-        int16 gameEvent         = fields[18].Get<int8>();
+        int16 gameEvent         = fields[18].Get<int16>();
         uint32 PoolId           = fields[19].Get<uint32>();
         data.npcflag            = fields[20].Get<uint32>();
         data.unit_flags         = fields[21].Get<uint32>();
@@ -2341,8 +2474,8 @@ void ObjectMgr::AddCreatureToGrid(ObjectGuid::LowType guid, CreatureData const* 
     {
         if (mask & 1)
         {
-            CellCoord cellCoord = Acore::ComputeCellCoord(data->posX, data->posY);
-            CellObjectGuids& cell_guids = _mapObjectGuidsStore[MAKE_PAIR32(data->mapid, i)][cellCoord.GetId()];
+            GridCoord gridCoord = Acore::ComputeGridCoord(data->posX, data->posY);
+            CellObjectGuids& cell_guids = _mapObjectGuidsStore[MAKE_PAIR32(data->mapid, i)][gridCoord.GetId()];
             cell_guids.creatures.insert(guid);
         }
     }
@@ -2355,14 +2488,14 @@ void ObjectMgr::RemoveCreatureFromGrid(ObjectGuid::LowType guid, CreatureData co
     {
         if (mask & 1)
         {
-            CellCoord cellCoord = Acore::ComputeCellCoord(data->posX, data->posY);
-            CellObjectGuids& cell_guids = _mapObjectGuidsStore[MAKE_PAIR32(data->mapid, i)][cellCoord.GetId()];
+            GridCoord gridCoord = Acore::ComputeGridCoord(data->posX, data->posY);
+            CellObjectGuids& cell_guids = _mapObjectGuidsStore[MAKE_PAIR32(data->mapid, i)][gridCoord.GetId()];
             cell_guids.creatures.erase(guid);
         }
     }
 }
 
-uint32 ObjectMgr::AddGOData(uint32 entry, uint32 mapId, float x, float y, float z, float o, uint32 spawntimedelay, float rotation0, float rotation1, float rotation2, float rotation3)
+ObjectGuid::LowType ObjectMgr::AddGOData(uint32 entry, uint32 mapId, float x, float y, float z, float o, uint32 spawntimedelay, float rotation0, float rotation1, float rotation2, float rotation3)
 {
     GameObjectTemplate const* goinfo = GetGameObjectTemplate(entry);
     if (!goinfo)
@@ -2413,7 +2546,7 @@ uint32 ObjectMgr::AddGOData(uint32 entry, uint32 mapId, float x, float y, float 
     return spawnId;
 }
 
-uint32 ObjectMgr::AddCreData(uint32 entry, uint32 mapId, float x, float y, float z, float o, uint32 spawntimedelay)
+ObjectGuid::LowType ObjectMgr::AddCreData(uint32 entry, uint32 mapId, float x, float y, float z, float o, uint32 spawntimedelay)
 {
     CreatureTemplate const* cInfo = GetCreatureTemplate(entry);
     if (!cInfo)
@@ -2454,7 +2587,7 @@ uint32 ObjectMgr::AddCreData(uint32 entry, uint32 mapId, float x, float y, float
     AddCreatureToGrid(spawnId, &data);
 
     // Spawn if necessary (loaded grids only)
-    if (!map->Instanceable() && !map->IsRemovalGrid(x, y))
+    if (!map->Instanceable() && map->IsGridLoaded(x, y))
     {
         Creature* creature = new Creature();
         if (!creature->LoadCreatureFromDB(spawnId, map, true, true))
@@ -2576,7 +2709,7 @@ void ObjectMgr::LoadGameobjects()
             LOG_ERROR("sql.sql", "Table `gameobject` has gameobject (GUID: {} Entry: {}) that has wrong spawn mask {} including not supported difficulty modes for map (Id: {}), skip", guid, data.id, data.spawnMask, data.mapid);
 
         data.phaseMask      = fields[15].Get<uint32>();
-        int16 gameEvent     = fields[16].Get<int8>();
+        int16 gameEvent     = fields[16].Get<int16>();
         uint32 PoolId        = fields[17].Get<uint32>();
 
         if (data.rotation.x < -1.0f || data.rotation.x > 1.0f)
@@ -2644,8 +2777,8 @@ void ObjectMgr::AddGameobjectToGrid(ObjectGuid::LowType guid, GameObjectData con
     {
         if (mask & 1)
         {
-            CellCoord cellCoord = Acore::ComputeCellCoord(data->posX, data->posY);
-            CellObjectGuids& cell_guids = _mapObjectGuidsStore[MAKE_PAIR32(data->mapid, i)][cellCoord.GetId()];
+            GridCoord gridCoord = Acore::ComputeGridCoord(data->posX, data->posY);
+            CellObjectGuids& cell_guids = _mapObjectGuidsStore[MAKE_PAIR32(data->mapid, i)][gridCoord.GetId()];
             cell_guids.gameobjects.insert(guid);
         }
     }
@@ -2658,8 +2791,8 @@ void ObjectMgr::RemoveGameobjectFromGrid(ObjectGuid::LowType guid, GameObjectDat
     {
         if (mask & 1)
         {
-            CellCoord cellCoord = Acore::ComputeCellCoord(data->posX, data->posY);
-            CellObjectGuids& cell_guids = _mapObjectGuidsStore[MAKE_PAIR32(data->mapid, i)][cellCoord.GetId()];
+            GridCoord gridCoord = Acore::ComputeGridCoord(data->posX, data->posY);
+            CellObjectGuids& cell_guids = _mapObjectGuidsStore[MAKE_PAIR32(data->mapid, i)][gridCoord.GetId()];
             cell_guids.gameobjects.erase(guid);
         }
     }
@@ -2692,6 +2825,30 @@ void ObjectMgr::LoadItemLocales()
 
     LOG_INFO("server.loading", ">> Loaded {} Item Locale Strings in {} ms", (uint32)_itemLocaleStore.size(), GetMSTimeDiffToNow(oldMSTime));
 }
+
+ServerConfigs const qualityToBuyValueConfig[MAX_ITEM_QUALITY] =
+{
+    RATE_BUYVALUE_ITEM_POOR,                                    // ITEM_QUALITY_POOR
+    RATE_BUYVALUE_ITEM_NORMAL,                                  // ITEM_QUALITY_NORMAL
+    RATE_BUYVALUE_ITEM_UNCOMMON,                                // ITEM_QUALITY_UNCOMMON
+    RATE_BUYVALUE_ITEM_RARE,                                    // ITEM_QUALITY_RARE
+    RATE_BUYVALUE_ITEM_EPIC,                                    // ITEM_QUALITY_EPIC
+    RATE_BUYVALUE_ITEM_LEGENDARY,                               // ITEM_QUALITY_LEGENDARY
+    RATE_BUYVALUE_ITEM_ARTIFACT,                                // ITEM_QUALITY_ARTIFACT
+    RATE_BUYVALUE_ITEM_HEIRLOOM,                                // ITEM_QUALITY_HEIRLOOM
+};
+
+ServerConfigs const qualityToSellValueConfig[MAX_ITEM_QUALITY] =
+{
+    RATE_SELLVALUE_ITEM_POOR,                                   // ITEM_QUALITY_POOR
+    RATE_SELLVALUE_ITEM_NORMAL,                                 // ITEM_QUALITY_NORMAL
+    RATE_SELLVALUE_ITEM_UNCOMMON,                               // ITEM_QUALITY_UNCOMMON
+    RATE_SELLVALUE_ITEM_RARE,                                   // ITEM_QUALITY_RARE
+    RATE_SELLVALUE_ITEM_EPIC,                                   // ITEM_QUALITY_EPIC
+    RATE_SELLVALUE_ITEM_LEGENDARY,                              // ITEM_QUALITY_LEGENDARY
+    RATE_SELLVALUE_ITEM_ARTIFACT,                               // ITEM_QUALITY_ARTIFACT
+    RATE_SELLVALUE_ITEM_HEIRLOOM,                               // ITEM_QUALITY_HEIRLOOM
+};
 
 void ObjectMgr::LoadItemTemplates()
 {
@@ -2760,8 +2917,8 @@ void ObjectMgr::LoadItemTemplates()
         itemTemplate.Flags                     = ItemFlags(fields[7].Get<uint32>());
         itemTemplate.Flags2                    = ItemFlags2(fields[8].Get<uint32>());
         itemTemplate.BuyCount                  = uint32(fields[9].Get<uint8>());
-        itemTemplate.BuyPrice                  = int32(fields[10].Get<int64>() * sWorld->getRate((Rates)(RATE_BUYVALUE_ITEM_POOR + itemTemplate.Quality)));
-        itemTemplate.SellPrice                 = uint32(fields[11].Get<uint32>() * sWorld->getRate((Rates)(RATE_SELLVALUE_ITEM_POOR + itemTemplate.Quality)));
+        itemTemplate.BuyPrice                  = int32(fields[10].Get<int64>());
+        itemTemplate.SellPrice                 = uint32(fields[11].Get<uint32>());
         itemTemplate.InventoryType             = uint32(fields[12].Get<uint8>());
         itemTemplate.AllowableClass            = fields[13].Get<int32>();
         itemTemplate.AllowableRace             = fields[14].Get<int32>();
@@ -3242,6 +3399,10 @@ void ObjectMgr::LoadItemTemplates()
             LOG_ERROR("sql.sql", "Item (Entry {}) has flag ITEM_FLAGS_CU_DURATION_REAL_TIME but it does not have duration limit", entry);
             itemTemplate.FlagsCu = static_cast<ItemFlagsCustom>(static_cast<uint32>(itemTemplate.FlagsCu) & ~ITEM_FLAGS_CU_DURATION_REAL_TIME);
         }
+
+        // Set after checks to ensure valid item quality
+        itemTemplate.BuyPrice *= sWorld->getRate(qualityToBuyValueConfig[itemTemplate.Quality]);
+        itemTemplate.SellPrice *= sWorld->getRate(qualityToSellValueConfig[itemTemplate.Quality]);
 
         // Fill categories map
         for (uint8 i = 0; i < MAX_ITEM_PROTO_SPELLS; ++i)
@@ -5848,7 +6009,11 @@ void ObjectMgr::LoadPageTextLocales()
     QueryResult result = WorldDatabase.Query("SELECT ID, locale, Text FROM page_text_locale");
 
     if (!result)
+    {
+        LOG_WARN("server.loading", ">> Loaded 0 page texts. DB table `page_text_locale` is empty!");
+        LOG_INFO("server.loading", " ");
         return;
+    }
 
     do
     {
@@ -5876,7 +6041,7 @@ void ObjectMgr::LoadInstanceTemplate()
 
     if (!result)
     {
-        LOG_WARN("server.loading", ">> Loaded 0 instance templates. DB table `page_text` is empty!");
+        LOG_WARN("server.loading", ">> Loaded 0 instance templates. DB table `instance_template` is empty!");
         LOG_INFO("server.loading", " ");
         return;
     }
@@ -10292,117 +10457,4 @@ uint32 ObjectMgr::GetQuestMoneyReward(uint8 level, uint32 questMoneyDifficulty) 
     }
 
     return 0;
-}
-
-void ObjectMgr::SendServerMail(Player* player, uint32 id, uint32 reqLevel, uint32 reqPlayTime, uint32 rewardMoneyA, uint32 rewardMoneyH, uint32 rewardItemA, uint32 rewardItemCountA, uint32 rewardItemH, uint32 rewardItemCountH, std::string subject, std::string body, uint8 active) const
-{
-    if (active)
-    {
-        if (player->GetLevel() < reqLevel)
-            return;
-
-        if (player->GetTotalPlayedTime() < reqPlayTime)
-            return;
-
-        CharacterDatabaseTransaction trans = CharacterDatabase.BeginTransaction();
-
-        MailSender sender(MAIL_NORMAL, player->GetGUID().GetCounter(), MAIL_STATIONERY_GM);
-        MailDraft draft(subject, body);
-
-        draft.AddMoney(player->GetTeamId() == TEAM_ALLIANCE ? rewardMoneyA : rewardMoneyH);
-        if (Item* mailItem = Item::CreateItem(player->GetTeamId() == TEAM_ALLIANCE ? rewardItemA : rewardItemH, player->GetTeamId() == TEAM_ALLIANCE ? rewardItemCountA : rewardItemCountH))
-        {
-            mailItem->SaveToDB(trans);
-            draft.AddItem(mailItem);
-        }
-
-        draft.SendMailTo(trans, MailReceiver(player), sender);
-        CharacterDatabase.CommitTransaction(trans);
-
-        CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_REP_MAIL_SERVER_CHARACTER);
-        stmt->SetData(0, player->GetGUID().GetCounter());
-        stmt->SetData(1, id);
-        CharacterDatabase.Execute(stmt);
-
-        LOG_DEBUG("entities.player", "ObjectMgr::SendServerMail() Sent mail id {} to {}", id, player->GetGUID().ToString());
-    }
-}
-
-void ObjectMgr::LoadMailServerTemplates()
-{
-    uint32 oldMSTime = getMSTime();
-
-    _serverMailStore.clear(); // for reload case
-
-    //                                                    0     1           2              3         4         5        6             7       8             9          10      11
-    QueryResult result = CharacterDatabase.Query("SELECT `id`, `reqLevel`, `reqPlayTime`, `moneyA`, `moneyH`, `itemA`, `itemCountA`, `itemH`,`itemCountH`, `subject`, `body`, `active` FROM `mail_server_template`");
-    if (!result)
-    {
-        LOG_INFO("sql.sql", ">> Loaded 0 server mail rewards. DB table `mail_server_template` is empty.");
-        LOG_INFO("server.loading", " ");
-        return;
-    }
-
-    _serverMailStore.rehash(result->GetRowCount());
-
-    do
-    {
-        Field* fields = result->Fetch();
-
-        uint32 id = fields[0].Get<uint32>();
-
-        ServerMail& servMail = _serverMailStore[id];
-
-        servMail.id          = id;
-        servMail.reqLevel    = fields[1].Get<uint8>();
-        servMail.reqPlayTime = fields[2].Get<uint32>();
-        servMail.moneyA      = fields[3].Get<uint32>();
-        servMail.moneyH      = fields[4].Get<uint32>();
-        servMail.itemA       = fields[5].Get<uint32>();
-        servMail.itemCountA  = fields[6].Get<uint32>();
-        servMail.itemH       = fields[7].Get<uint32>();
-        servMail.itemCountH  = fields[8].Get<uint32>();
-        servMail.subject     = fields[9].Get<std::string>();
-        servMail.body        = fields[10].Get<std::string>();
-        servMail.active      = fields[11].Get<uint8>();
-
-        if (servMail.reqLevel > sWorld->getIntConfig(CONFIG_MAX_PLAYER_LEVEL))
-        {
-            LOG_ERROR("sql.sql", "Table `mail_server_template` has reqLevel {} but max level is {} for id {}, skipped.", servMail.reqLevel, sWorld->getIntConfig(CONFIG_MAX_PLAYER_LEVEL), servMail.id);
-            return;
-        }
-
-        if (servMail.moneyA > MAX_MONEY_AMOUNT || servMail.moneyH > MAX_MONEY_AMOUNT)
-        {
-            LOG_ERROR("sql.sql", "Table `mail_server_template` has moneyA {} or moneyH {} larger than MAX_MONEY_AMOUNT {} for id {}, skipped.", servMail.moneyA, servMail.moneyH, MAX_MONEY_AMOUNT, servMail.id);
-            return;
-        }
-
-        ItemTemplate const* itemTemplateA = sObjectMgr->GetItemTemplate(servMail.itemA);
-        if (!itemTemplateA && servMail.itemA)
-        {
-            LOG_ERROR("sql.sql", "Table `mail_server_template` has invalid item in itemA {} for id {}, skipped.", servMail.itemA, servMail.id);
-            return;
-        }
-        ItemTemplate const* itemTemplateH = sObjectMgr->GetItemTemplate(servMail.itemH);
-        if (!itemTemplateH && servMail.itemH)
-        {
-            LOG_ERROR("sql.sql", "Table `mail_server_template` has invalid item in itemH {} for id {}, skipped.", servMail.itemH, servMail.id);
-            return;
-        }
-
-        if (!servMail.itemA && servMail.itemCountA)
-        {
-            LOG_ERROR("sql.sql", "Table `mail_server_template` has itemCountA {} with no ItemA, set to 0", servMail.itemCountA);
-            servMail.itemCountA = 0;
-        }
-        if (!servMail.itemH && servMail.itemCountH)
-        {
-            LOG_ERROR("sql.sql", "Table `mail_server_template` has itemCountH {} with no ItemH, set to 0", servMail.itemCountH);
-            servMail.itemCountH = 0;
-        }
-    } while (result->NextRow());
-
-    LOG_INFO("server.loading", ">> Loaded {} Mail Server Template in {} ms", _serverMailStore.size(), GetMSTimeDiffToNow(oldMSTime));
-    LOG_INFO("server.loading", " ");
 }

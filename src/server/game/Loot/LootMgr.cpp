@@ -30,7 +30,7 @@
 #include "Util.h"
 #include "World.h"
 
-static Rates const qualityToRate[MAX_ITEM_QUALITY] =
+ServerConfigs const qualityToRate[] =
 {
     RATE_DROP_ITEM_POOR,                                    // ITEM_QUALITY_POOR
     RATE_DROP_ITEM_NORMAL,                                  // ITEM_QUALITY_NORMAL
@@ -322,8 +322,9 @@ bool LootStoreItem::Roll(bool rate, Player const* player, Loot& loot, LootStore 
         return roll_chance_f(_chance * (rate ? sWorld->getRate(RATE_DROP_ITEM_REFERENCED) : 1.0f));
 
     ItemTemplate const* pProto = sObjectMgr->GetItemTemplate(itemid);
-
-    float qualityModifier = pProto && rate ? sWorld->getRate(qualityToRate[pProto->Quality]) : 1.0f;
+    float qualityModifier = 1.0f;
+    if (pProto && pProto->Quality < ITEM_QUALITY_HEIRLOOM && rate)
+        qualityModifier = sWorld->getRate(qualityToRate[pProto->Quality]);
 
     return roll_chance_f(_chance * qualityModifier);
 }
@@ -696,7 +697,7 @@ QuestItemList* Loot::FillQuestLoot(Player* player)
     {
         LootItem& item = quest_items[i];
 
-        sScriptMgr->OnBeforeFillQuestLootItem(player, item);
+        sScriptMgr->OnPlayerBeforeFillQuestLootItem(player, item);
 
         // Quest item is not free for all and is already assigned to another player
         // or player doesn't need it

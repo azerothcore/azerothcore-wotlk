@@ -15,6 +15,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "AreaDefines.h"
 #include "Battleground.h"
 #include "CreatureScript.h"
 #include "ObjectMgr.h"
@@ -2995,7 +2996,7 @@ class spell_item_socrethars_stone : public SpellScript
 
     bool Load() override
     {
-        return (GetCaster()->GetAreaId() == 3900 || GetCaster()->GetAreaId() == 3742);
+        return (GetCaster()->GetAreaId() == AREA_INVASION_POINT_OVERLORD || GetCaster()->GetAreaId() == AREA_SOCRETHARS_SEAT);
     }
 
     bool Validate(SpellInfo const* /*spell*/) override
@@ -3008,10 +3009,10 @@ class spell_item_socrethars_stone : public SpellScript
         Unit* caster = GetCaster();
         switch (caster->GetAreaId())
         {
-            case 3900:
+            case AREA_INVASION_POINT_OVERLORD:
                 caster->CastSpell(caster, SPELL_SOCRETHAR_TO_SEAT, true);
                 break;
-            case 3742:
+            case AREA_SOCRETHARS_SEAT:
                 caster->CastSpell(caster, SPELL_SOCRETHAR_FROM_SEAT, true);
                 break;
             default:
@@ -4186,6 +4187,28 @@ class spell_item_multiphase_goggles : public AuraScript
     }
 };
 
+// 60244 - Blood Parrot Despawn Aura (Item: 12185 - Bloodsail Admiral's Hat)
+enum BloodsailAdmiralHat
+{
+    NPC_ADMIRAL_HAT_PARROT = 11236, // Blood Parrot
+};
+
+class spell_item_bloodsail_admiral_hat : public AuraScript
+{
+    PrepareAuraScript(spell_item_bloodsail_admiral_hat);
+
+    void OnRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
+    {
+        if (Player* player = GetCaster()->ToPlayer())
+            player->RemoveAllMinionsByEntry(NPC_ADMIRAL_HAT_PARROT);
+    }
+
+    void Register() override
+    {
+        OnEffectRemove += AuraEffectRemoveFn(spell_item_bloodsail_admiral_hat::OnRemove, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
+    }
+};
+
 void AddSC_item_spell_scripts()
 {
     RegisterSpellScript(spell_item_massive_seaforium_charge);
@@ -4314,4 +4337,5 @@ void AddSC_item_spell_scripts()
     RegisterSpellScript(spell_item_luffa);
     RegisterSpellScript(spell_item_spell_reflectors);
     RegisterSpellScript(spell_item_multiphase_goggles);
+    RegisterSpellScript(spell_item_bloodsail_admiral_hat);
 }

@@ -19,6 +19,7 @@
 #include "InstanceMapScript.h"
 #include "InstanceScript.h"
 #include "Player.h"
+#include "WorldStateDefines.h"
 #include "old_hillsbrad.h"
 
 static Position const instancePositions[INSTANCE_POSITIONS_COUNT] =
@@ -40,7 +41,7 @@ const Position thrallPositions[THRALL_POSITIONS_COUNT] =
 class instance_old_hillsbrad : public InstanceMapScript
 {
 public:
-    instance_old_hillsbrad() : InstanceMapScript("instance_old_hillsbrad", 560) { }
+    instance_old_hillsbrad() : InstanceMapScript("instance_old_hillsbrad", MAP_THE_ESCAPE_FROM_DURNHOLDE) { }
 
     InstanceScript* GetInstanceScript(InstanceMap* map) const override
     {
@@ -69,10 +70,8 @@ public:
             if (instance->GetPlayersCountExceptGMs() <= 1)
                 CleanupInstance();
 
-            EnsureGridLoaded();
-
             if (_encounterProgress < ENCOUNTER_PROGRESS_BARRELS)
-                player->SendUpdateWorldState(WORLD_STATE_BARRELS_PLANTED, _barrelCount);
+                player->SendUpdateWorldState(WORLD_STATE_OLD_HILLSBRAD_BARRELS_PLANTED, _barrelCount);
         }
 
         void CleanupInstance()
@@ -155,7 +154,7 @@ public:
                         if (_barrelCount >= 5 || _encounterProgress > ENCOUNTER_PROGRESS_NONE)
                             return;
 
-                        DoUpdateWorldState(WORLD_STATE_BARRELS_PLANTED, ++_barrelCount);
+                        DoUpdateWorldState(WORLD_STATE_OLD_HILLSBRAD_BARRELS_PLANTED, ++_barrelCount);
                         if (_barrelCount == 5)
                         {
                             _events.ScheduleEvent(EVENT_INITIAL_BARRELS_FLAME, 4000);
@@ -197,9 +196,6 @@ public:
             {
                 case EVENT_INITIAL_BARRELS_FLAME:
                     {
-                        instance->LoadGrid(instancePositions[0].GetPositionX(), instancePositions[0].GetPositionY());
-                        instance->LoadGrid(instancePositions[1].GetPositionX(), instancePositions[1].GetPositionY());
-
                         for (ObjectGuid const& guid : _prisonersSet)
                             if (Creature* orc = instance->GetCreature(guid))
                             {
@@ -220,9 +216,6 @@ public:
                     }
                 case EVENT_FINAL_BARRELS_FLAME:
                     {
-                        instance->LoadGrid(instancePositions[0].GetPositionX(), instancePositions[0].GetPositionY());
-                        instance->LoadGrid(instancePositions[1].GetPositionX(), instancePositions[1].GetPositionY());
-
                         if (_encounterProgress == ENCOUNTER_PROGRESS_NONE)
                         {
                             Map::PlayerList const& players = instance->GetPlayers();
@@ -245,12 +238,11 @@ public:
                                     orc->HandleEmoteCommand(EMOTE_ONESHOT_CHEER);
 
                         SetData(DATA_ESCORT_PROGRESS, ENCOUNTER_PROGRESS_BARRELS);
-                        DoUpdateWorldState(WORLD_STATE_BARRELS_PLANTED, 0);
+                        DoUpdateWorldState(WORLD_STATE_OLD_HILLSBRAD_BARRELS_PLANTED, 0);
                         break;
                     }
                 case EVENT_SUMMON_LIEUTENANT:
                     {
-                        instance->LoadGrid(instancePositions[2].GetPositionX(), instancePositions[2].GetPositionY());
                         instance->SummonCreature(NPC_LIEUTENANT_DRAKE, instancePositions[2]);
                         break;
                     }
@@ -261,7 +253,6 @@ public:
                             if (!thrall->IsAlive())
                             {
                                 ++_attemptsCount;
-                                EnsureGridLoaded();
                                 thrall->SetVisible(false);
                                 Reposition(thrall);
                                 thrall->setDeathState(DeathState::Dead);
@@ -291,12 +282,6 @@ public:
                     thrall->SetFacingTo(thrallPositions[data - ENCOUNTER_PROGRESS_THRALL_ARMORED].GetOrientation());
                     break;
             }
-        }
-
-        void EnsureGridLoaded()
-        {
-            for (uint8 i = 0; i < THRALL_POSITIONS_COUNT; ++i)
-                instance->LoadGrid(thrallPositions[i].GetPositionX(), thrallPositions[i].GetPositionY());
         }
 
         void ReadSaveDataMore(std::istringstream& data) override

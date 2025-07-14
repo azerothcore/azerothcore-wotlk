@@ -15,13 +15,6 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
- /* ScriptData
- Name: debug_commandscript
- %Complete: 100
- Comment: All debug related commands
- Category: commandscripts
- EndScriptData */
-
 #include "Bag.h"
 #include "BattlegroundMgr.h"
 #include "CellImpl.h"
@@ -104,7 +97,9 @@ public:
             { "moveflags",      HandleDebugMoveflagsCommand,           SEC_ADMINISTRATOR, Console::No },
             { "unitstate",      HandleDebugUnitStateCommand,           SEC_ADMINISTRATOR, Console::No },
             { "objectcount",    HandleDebugObjectCountCommand,         SEC_ADMINISTRATOR, Console::Yes},
-            { "dummy",          HandleDebugDummyCommand,               SEC_ADMINISTRATOR, Console::No }
+            { "dummy",          HandleDebugDummyCommand,               SEC_ADMINISTRATOR, Console::No },
+            { "mapdata",        HandleDebugMapDataCommand,             SEC_ADMINISTRATOR, Console::No },
+            { "boundary",       HandleDebugBoundaryCommand,            SEC_ADMINISTRATOR, Console::No }
         };
         static ChatCommandTable commandTable =
         {
@@ -1371,6 +1366,41 @@ public:
     static bool HandleDebugDummyCommand(ChatHandler* handler)
     {
         handler->SendSysMessage("This command does nothing right now. Edit your local core (cs_debug.cpp) to make it do whatever you need for testing.");
+        return true;
+    }
+
+    static bool HandleDebugMapDataCommand(ChatHandler* handler)
+    {
+        Cell cell(handler->GetPlayer()->GetPositionX(), handler->GetPlayer()->GetPositionY());
+        Map* map = handler->GetPlayer()->GetMap();
+
+        handler->PSendSysMessage("GridX {} GridY {}", cell.GridX(), cell.GridY());
+        handler->PSendSysMessage("CellX {} CellY {}", cell.CellX(), cell.CellY());
+        handler->PSendSysMessage("Created Grids: {} / {}", map->GetCreatedGridsCount(), MAX_NUMBER_OF_GRIDS * MAX_NUMBER_OF_GRIDS);
+        handler->PSendSysMessage("Loaded Grids: {} / {}", map->GetLoadedGridsCount(), MAX_NUMBER_OF_GRIDS * MAX_NUMBER_OF_GRIDS);
+        handler->PSendSysMessage("Created Cells In Grid: {} / {}", map->GetCreatedCellsInGridCount(cell.GridX(), cell.GridY()), MAX_NUMBER_OF_CELLS * MAX_NUMBER_OF_CELLS);
+        handler->PSendSysMessage("Created Cells In Map: {} / {}", map->GetCreatedCellsInMapCount(), TOTAL_NUMBER_OF_CELLS_PER_MAP * TOTAL_NUMBER_OF_CELLS_PER_MAP);
+        return true;
+    }
+
+    static bool HandleDebugBoundaryCommand(ChatHandler* handler, Optional<uint32> durationArg, Optional<EXACT_SEQUENCE("fill")> fill, Optional<EXACT_SEQUENCE("z")> checkZ)
+    {
+        Player* player = handler->GetPlayer();
+        if (!player)
+            return false;
+
+        Creature* target = handler->getSelectedCreature();
+        if (!target || !target->IsAIEnabled)
+            return false;
+
+        uint32 duration = durationArg.value_or(5 * IN_MILLISECONDS);
+        if (duration > 180 * IN_MILLISECONDS) // arbitrary upper limit
+            duration = 180 * IN_MILLISECONDS;
+
+        int32 errMsg = target->AI()->VisualizeBoundary(duration, player, fill.has_value(), checkZ.has_value());
+        if (errMsg > 0)
+            handler->PSendSysMessage(errMsg);
+
         return true;
     }
 };

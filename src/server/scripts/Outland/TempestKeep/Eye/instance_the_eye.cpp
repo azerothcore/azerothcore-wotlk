@@ -54,7 +54,7 @@ BossBoundaryData const boundaries =
 class instance_the_eye : public InstanceMapScript
 {
 public:
-    instance_the_eye() : InstanceMapScript("instance_the_eye", 550) { }
+    instance_the_eye() : InstanceMapScript("instance_the_eye", MAP_TEMPEST_KEEP) { }
 
     struct instance_the_eye_InstanceMapScript : public InstanceScript
     {

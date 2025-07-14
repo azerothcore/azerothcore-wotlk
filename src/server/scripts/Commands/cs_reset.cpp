@@ -15,13 +15,6 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-/* ScriptData
-Name: reset_commandscript
-%Complete: 100
-Comment: All reset related commands
-Category: commandscripts
-EndScriptData */
-
 #include "AchievementMgr.h"
 #include "Chat.h"
 #include "CommandScript.h"
@@ -29,6 +22,7 @@ EndScriptData */
 #include "Pet.h"
 #include "Player.h"
 #include "ScriptMgr.h"
+#include "WorldSessionMgr.h"
 
 using namespace Acore::ChatCommands;
 
@@ -302,7 +296,7 @@ public:
         stmt->SetData(0, uint16(atLogin));
         CharacterDatabase.Execute(stmt);
 
-        sWorld->DoForAllOnlinePlayers([&] (Player* player){
+        sWorldSessionMgr->DoForAllOnlinePlayers([&] (Player* player){
             player->SetAtLoginFlag(atLogin);
         });
 

@@ -29,7 +29,7 @@
 class instance_sunken_temple : public InstanceMapScript
 {
 public:
-    instance_sunken_temple() : InstanceMapScript("instance_sunken_temple", 109) { }
+    instance_sunken_temple() : InstanceMapScript("instance_sunken_temple", MAP_SUNKEN_TEMPLE) { }
 
     struct instance_sunken_temple_InstanceMapScript : public InstanceScript
     {
@@ -116,7 +116,6 @@ public:
                     ++_defendersKilled;
                     if (_defendersKilled == DEFENDERS_COUNT)
                     {
-                        instance->LoadGrid(-425.89f, -86.07f);
                         if (Creature* jammal = instance->GetCreature(_jammalanGUID))
                             jammal->AI()->Talk(0);
                         if (GameObject* forcefield = instance->GetGameObject(_forcefieldGUID))

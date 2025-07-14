@@ -181,7 +181,7 @@ void WorldSession::HandleGossipSelectOptionOpcode(WorldPacket& recv_data)
         }
         else
         {
-            sScriptMgr->OnGossipSelectCode(_player, menuId, _player->PlayerTalkClass->GetGossipOptionSender(gossipListId), _player->PlayerTalkClass->GetGossipOptionAction(gossipListId), code.c_str());
+            sScriptMgr->OnPlayerGossipSelectCode(_player, menuId, _player->PlayerTalkClass->GetGossipOptionSender(gossipListId), _player->PlayerTalkClass->GetGossipOptionAction(gossipListId), code.c_str());
         }
     }
     else
@@ -204,7 +204,7 @@ void WorldSession::HandleGossipSelectOptionOpcode(WorldPacket& recv_data)
         }
         else
         {
-            sScriptMgr->OnGossipSelect(_player, menuId, _player->PlayerTalkClass->GetGossipOptionSender(gossipListId), _player->PlayerTalkClass->GetGossipOptionAction(gossipListId));
+            sScriptMgr->OnPlayerGossipSelect(_player, menuId, _player->PlayerTalkClass->GetGossipOptionSender(gossipListId), _player->PlayerTalkClass->GetGossipOptionAction(gossipListId));
         }
     }
 }
@@ -742,7 +742,7 @@ void WorldSession::HandleAreaTriggerOpcode(WorldPacket& recv_data)
             if (player->HasByteFlag(UNIT_FIELD_BYTES_2, 1, UNIT_BYTE2_FLAG_FFA_PVP))
             {
                 player->RemoveByteFlag(UNIT_FIELD_BYTES_2, 1, UNIT_BYTE2_FLAG_FFA_PVP);
-                sScriptMgr->OnFfaPvpStateUpdate(player, false);
+                sScriptMgr->OnPlayerFfaPvpStateUpdate(player, false);
 
             }
         }
@@ -1416,8 +1416,8 @@ void WorldSession::HandleSetRaidDifficultyOpcode(WorldPacket& recv_data)
                 }
             }
 
-            Map* homeMap571 = sMapMgr->CreateMap(571, nullptr);
-            Map* homeMap0 = sMapMgr->CreateMap(0, nullptr);
+            Map* homeMap571 = sMapMgr->CreateMap(MAP_NORTHREND, nullptr);
+            Map* homeMap0 = sMapMgr->CreateMap(MAP_EASTERN_KINGDOMS, nullptr);
             ASSERT(homeMap0 && homeMap571);
 
             std::map<Player*, Position> playerTeleport;
@@ -1444,7 +1444,7 @@ void WorldSession::HandleSetRaidDifficultyOpcode(WorldPacket& recv_data)
                 oldMap->AfterPlayerUnlinkFromMap();
                 p->SetMap(homeMap0);
                 p->Relocate(0.0f, 0.0f, 0.0f, 0.0f);
-                if (!p->TeleportTo(571, 5790.20f, 2071.36f, 636.07f, 3.60f))
+                if (!p->TeleportTo(MAP_NORTHREND, 5790.20f, 2071.36f, 636.07f, 3.60f))
                     p->GetSession()->KickPlayer("HandleSetRaidDifficultyOpcode 1");
             }
 

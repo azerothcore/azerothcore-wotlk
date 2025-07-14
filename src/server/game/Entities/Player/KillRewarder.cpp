@@ -167,7 +167,7 @@ void KillRewarder::_RewardXP(Player* player, float rate)
             AddPct(xp, (*i)->GetAmount());
 
         // 4.2.3. Give XP to player.
-        sScriptMgr->OnGivePlayerXP(player, xp, _victim, PlayerXPSource::XPSOURCE_KILL);
+        sScriptMgr->OnPlayerGiveXP(player, xp, _victim, PlayerXPSource::XPSOURCE_KILL);
         player->GiveXP(xp, _victim, _groupRate);
         if (Pet* pet = player->GetPet())
             // 4.2.4. If player has pet, reward pet with XP (100% for single player, 50% for group case).
@@ -210,7 +210,7 @@ void KillRewarder::_RewardPlayer(Player* player, bool isDungeon)
     if (!_isPvP || _isBattleGround)
     {
         float xpRate = _group ? _groupRate * float(player->GetLevel()) / _aliveSumLevel : /*Personal rate is 100%.*/ 1.0f; // Group rate depends on the sum of levels.
-        sScriptMgr->OnRewardKillRewarder(player, this, isDungeon, xpRate);                                              // Personal rate is 100%.
+        sScriptMgr->OnPlayerRewardKillRewarder(player, this, isDungeon, xpRate);                                              // Personal rate is 100%.
 
         if (_xp)
         {
