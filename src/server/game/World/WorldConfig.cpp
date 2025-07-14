@@ -27,115 +27,115 @@ void WorldConfig::BuildConfigCache()
     SetConfigValue<uint32>(CONFIG_ENABLE_SINFO_LOGIN, "Server.LoginInfo", 0);
 
     ///- Read all rates from the config file
-    SetConfigValue<float>(RATE_HEALTH, "Rate.Health", 1, ConfigValueCache::Reloadable::Yes, [](float const& value) { return value > 0; }, "> 0");
-    SetConfigValue<float>(RATE_POWER_MANA, "Rate.Mana", 1, ConfigValueCache::Reloadable::Yes, [](float const& value) { return value > 0; }, "> 0");
-    SetConfigValue<float>(RATE_POWER_RAGE_INCOME, "Rate.Rage.Income", 1);
-    SetConfigValue<float>(RATE_POWER_RAGE_LOSS, "Rate.Rage.Loss", 1, ConfigValueCache::Reloadable::Yes, [](float const& value) { return value > 0; }, "> 0");
-    SetConfigValue<float>(RATE_POWER_RUNICPOWER_INCOME, "Rate.RunicPower.Income", 1);
-    SetConfigValue<float>(RATE_POWER_RUNICPOWER_LOSS, "Rate.RunicPower.Loss", 1, ConfigValueCache::Reloadable::Yes, [](float const& value) { return value > 0; }, "> 0");
-    SetConfigValue<float>(RATE_POWER_FOCUS, "Rate.Focus", 1);
-    SetConfigValue<float>(RATE_POWER_ENERGY, "Rate.Energy", 1);
+    SetConfigValue<float>(RATE_HEALTH, "Rate.Health", 1.0f, ConfigValueCache::Reloadable::Yes, [](float const& value) { return value > 0.0f; }, "> 0");
+    SetConfigValue<float>(RATE_POWER_MANA, "Rate.Mana", 1.0f, ConfigValueCache::Reloadable::Yes, [](float const& value) { return value > 0.0f; }, "> 0");
+    SetConfigValue<float>(RATE_POWER_RAGE_INCOME, "Rate.Rage.Income", 1.0f);
+    SetConfigValue<float>(RATE_POWER_RAGE_LOSS, "Rate.Rage.Loss", 1.0f, ConfigValueCache::Reloadable::Yes, [](float const& value) { return value > 0.0f; }, "> 0");
+    SetConfigValue<float>(RATE_POWER_RUNICPOWER_INCOME, "Rate.RunicPower.Income", 1.0f);
+    SetConfigValue<float>(RATE_POWER_RUNICPOWER_LOSS, "Rate.RunicPower.Loss", 1, ConfigValueCache::Reloadable::Yes, [](float const& value) { return value > 0.0f; }, "> 0");
+    SetConfigValue<float>(RATE_POWER_FOCUS, "Rate.Focus", 1.0f);
+    SetConfigValue<float>(RATE_POWER_ENERGY, "Rate.Energy", 1.0f);
 
-    SetConfigValue<float>(RATE_SKILL_DISCOVERY, "Rate.Skill.Discovery", 1);
+    SetConfigValue<float>(RATE_SKILL_DISCOVERY, "Rate.Skill.Discovery", 1.0f);
 
-    SetConfigValue<float>(RATE_DROP_ITEM_POOR, "Rate.Drop.Item.Poor", 1);
-    SetConfigValue<float>(RATE_DROP_ITEM_NORMAL, "Rate.Drop.Item.Normal", 1);
-    SetConfigValue<float>(RATE_DROP_ITEM_UNCOMMON, "Rate.Drop.Item.Uncommon", 1);
-    SetConfigValue<float>(RATE_DROP_ITEM_RARE, "Rate.Drop.Item.Rare", 1);
-    SetConfigValue<float>(RATE_DROP_ITEM_EPIC, "Rate.Drop.Item.Epic", 1);
-    SetConfigValue<float>(RATE_DROP_ITEM_LEGENDARY, "Rate.Drop.Item.Legendary", 1);
-    SetConfigValue<float>(RATE_DROP_ITEM_ARTIFACT, "Rate.Drop.Item.Artifact", 1);
-    SetConfigValue<float>(RATE_DROP_ITEM_REFERENCED, "Rate.Drop.Item.Referenced", 1);
-    SetConfigValue<float>(RATE_DROP_ITEM_REFERENCED_AMOUNT, "Rate.Drop.Item.ReferencedAmount", 1);
-    SetConfigValue<float>(RATE_DROP_ITEM_GROUP_AMOUNT, "Rate.Drop.Item.GroupAmount", 1);
-    SetConfigValue<float>(RATE_DROP_MONEY, "Rate.Drop.Money", 1);
+    SetConfigValue<float>(RATE_DROP_ITEM_POOR, "Rate.Drop.Item.Poor", 1.0f);
+    SetConfigValue<float>(RATE_DROP_ITEM_NORMAL, "Rate.Drop.Item.Normal", 1.0f);
+    SetConfigValue<float>(RATE_DROP_ITEM_UNCOMMON, "Rate.Drop.Item.Uncommon", 1.0f);
+    SetConfigValue<float>(RATE_DROP_ITEM_RARE, "Rate.Drop.Item.Rare", 1.0f);
+    SetConfigValue<float>(RATE_DROP_ITEM_EPIC, "Rate.Drop.Item.Epic", 1.0f);
+    SetConfigValue<float>(RATE_DROP_ITEM_LEGENDARY, "Rate.Drop.Item.Legendary", 1.0f);
+    SetConfigValue<float>(RATE_DROP_ITEM_ARTIFACT, "Rate.Drop.Item.Artifact", 1.0f);
+    SetConfigValue<float>(RATE_DROP_ITEM_REFERENCED, "Rate.Drop.Item.Referenced", 1.0f);
+    SetConfigValue<float>(RATE_DROP_ITEM_REFERENCED_AMOUNT, "Rate.Drop.Item.ReferencedAmount", 1.0f);
+    SetConfigValue<float>(RATE_DROP_ITEM_GROUP_AMOUNT, "Rate.Drop.Item.GroupAmount", 1.0f);
+    SetConfigValue<float>(RATE_DROP_MONEY, "Rate.Drop.Money", 1.0f);
 
-    SetConfigValue<float>(RATE_REWARD_QUEST_MONEY, "Rate.RewardQuestMoney", 1);
-    SetConfigValue<float>(RATE_REWARD_BONUS_MONEY, "Rate.RewardBonusMoney", 1);
-    SetConfigValue<float>(RATE_XP_KILL, "Rate.XP.Kill", 1);
-    SetConfigValue<float>(RATE_XP_BG_KILL_AV, "Rate.XP.BattlegroundKillAV", 1);
-    SetConfigValue<float>(RATE_XP_BG_KILL_WSG, "Rate.XP.BattlegroundKillWSG", 1);
-    SetConfigValue<float>(RATE_XP_BG_KILL_AB, "Rate.XP.BattlegroundKillAB", 1);
-    SetConfigValue<float>(RATE_XP_BG_KILL_EOTS, "Rate.XP.BattlegroundKillEOTS", 1);
-    SetConfigValue<float>(RATE_XP_BG_KILL_SOTA, "Rate.XP.BattlegroundKillSOTA", 1);
-    SetConfigValue<float>(RATE_XP_BG_KILL_IC, "Rate.XP.BattlegroundKillIC", 1);
-    SetConfigValue<float>(RATE_XP_QUEST, "Rate.XP.Quest", 1);
-    SetConfigValue<float>(RATE_XP_QUEST_DF, "Rate.XP.Quest.DF", 1);
-    SetConfigValue<float>(RATE_XP_EXPLORE, "Rate.XP.Explore", 1);
-    SetConfigValue<float>(RATE_XP_PET, "Rate.XP.Pet", 1);
-    SetConfigValue<float>(RATE_XP_PET_NEXT_LEVEL, "Rate.Pet.LevelXP", 0.05);
-    SetConfigValue<float>(RATE_REPAIRCOST, "Rate.RepairCost", 1, ConfigValueCache::Reloadable::Yes, [](float const& value) { return value >= 0; }, ">= 0");
+    SetConfigValue<float>(RATE_REWARD_QUEST_MONEY, "Rate.RewardQuestMoney", 1.0f);
+    SetConfigValue<float>(RATE_REWARD_BONUS_MONEY, "Rate.RewardBonusMoney", 1.0f);
+    SetConfigValue<float>(RATE_XP_KILL, "Rate.XP.Kill", 1.0f);
+    SetConfigValue<float>(RATE_XP_BG_KILL_AV, "Rate.XP.BattlegroundKillAV", 1.0f);
+    SetConfigValue<float>(RATE_XP_BG_KILL_WSG, "Rate.XP.BattlegroundKillWSG", 1.0f);
+    SetConfigValue<float>(RATE_XP_BG_KILL_AB, "Rate.XP.BattlegroundKillAB", 1.0f);
+    SetConfigValue<float>(RATE_XP_BG_KILL_EOTS, "Rate.XP.BattlegroundKillEOTS", 1.0f);
+    SetConfigValue<float>(RATE_XP_BG_KILL_SOTA, "Rate.XP.BattlegroundKillSOTA", 1.0f);
+    SetConfigValue<float>(RATE_XP_BG_KILL_IC, "Rate.XP.BattlegroundKillIC", 1.0f);
+    SetConfigValue<float>(RATE_XP_QUEST, "Rate.XP.Quest", 1.0f);
+    SetConfigValue<float>(RATE_XP_QUEST_DF, "Rate.XP.Quest.DF", 1.0f);
+    SetConfigValue<float>(RATE_XP_EXPLORE, "Rate.XP.Explore", 1.0f);
+    SetConfigValue<float>(RATE_XP_PET, "Rate.XP.Pet", 1.0f);
+    SetConfigValue<float>(RATE_XP_PET_NEXT_LEVEL, "Rate.Pet.LevelXP", 0.05f);
+    SetConfigValue<float>(RATE_REPAIRCOST, "Rate.RepairCost", 1.0f, ConfigValueCache::Reloadable::Yes, [](float const& value) { return value >= 0.0f; }, ">= 0");
 
-    SetConfigValue<float>(RATE_SELLVALUE_ITEM_POOR, "Rate.SellValue.Item.Poor", 1);
-    SetConfigValue<float>(RATE_SELLVALUE_ITEM_NORMAL, "Rate.SellValue.Item.Normal", 1);
-    SetConfigValue<float>(RATE_SELLVALUE_ITEM_UNCOMMON, "Rate.SellValue.Item.Uncommon", 1);
-    SetConfigValue<float>(RATE_SELLVALUE_ITEM_RARE, "Rate.SellValue.Item.Rare", 1);
-    SetConfigValue<float>(RATE_SELLVALUE_ITEM_EPIC, "Rate.SellValue.Item.Epic", 1);
-    SetConfigValue<float>(RATE_SELLVALUE_ITEM_LEGENDARY, "Rate.SellValue.Item.Legendary", 1);
-    SetConfigValue<float>(RATE_SELLVALUE_ITEM_ARTIFACT, "Rate.SellValue.Item.Artifact", 1);
-    SetConfigValue<float>(RATE_SELLVALUE_ITEM_HEIRLOOM, "Rate.SellValue.Item.Heirloom", 1);
+    SetConfigValue<float>(RATE_SELLVALUE_ITEM_POOR, "Rate.SellValue.Item.Poor", 1.0f);
+    SetConfigValue<float>(RATE_SELLVALUE_ITEM_NORMAL, "Rate.SellValue.Item.Normal", 1.0f);
+    SetConfigValue<float>(RATE_SELLVALUE_ITEM_UNCOMMON, "Rate.SellValue.Item.Uncommon", 1.0f);
+    SetConfigValue<float>(RATE_SELLVALUE_ITEM_RARE, "Rate.SellValue.Item.Rare", 1.0f);
+    SetConfigValue<float>(RATE_SELLVALUE_ITEM_EPIC, "Rate.SellValue.Item.Epic", 1.0f);
+    SetConfigValue<float>(RATE_SELLVALUE_ITEM_LEGENDARY, "Rate.SellValue.Item.Legendary", 1.0f);
+    SetConfigValue<float>(RATE_SELLVALUE_ITEM_ARTIFACT, "Rate.SellValue.Item.Artifact", 1.0f);
+    SetConfigValue<float>(RATE_SELLVALUE_ITEM_HEIRLOOM, "Rate.SellValue.Item.Heirloom", 1.0f);
 
-    SetConfigValue<float>(RATE_BUYVALUE_ITEM_POOR, "Rate.BuyValue.Item.Poor", 1);
-    SetConfigValue<float>(RATE_BUYVALUE_ITEM_NORMAL, "Rate.BuyValue.Item.Normal", 1);
-    SetConfigValue<float>(RATE_BUYVALUE_ITEM_UNCOMMON, "Rate.BuyValue.Item.Uncommon", 1);
-    SetConfigValue<float>(RATE_BUYVALUE_ITEM_RARE, "Rate.BuyValue.Item.Rare", 1);
-    SetConfigValue<float>(RATE_BUYVALUE_ITEM_EPIC, "Rate.BuyValue.Item.Epic", 1);
-    SetConfigValue<float>(RATE_BUYVALUE_ITEM_LEGENDARY, "Rate.BuyValue.Item.Legendary", 1);
-    SetConfigValue<float>(RATE_BUYVALUE_ITEM_ARTIFACT, "Rate.BuyValue.Item.Artifact", 1);
-    SetConfigValue<float>(RATE_BUYVALUE_ITEM_HEIRLOOM, "Rate.BuyValue.Item.Heirloom", 1);
+    SetConfigValue<float>(RATE_BUYVALUE_ITEM_POOR, "Rate.BuyValue.Item.Poor", 1.0f);
+    SetConfigValue<float>(RATE_BUYVALUE_ITEM_NORMAL, "Rate.BuyValue.Item.Normal", 1.0f);
+    SetConfigValue<float>(RATE_BUYVALUE_ITEM_UNCOMMON, "Rate.BuyValue.Item.Uncommon", 1.0f);
+    SetConfigValue<float>(RATE_BUYVALUE_ITEM_RARE, "Rate.BuyValue.Item.Rare", 1.0f);
+    SetConfigValue<float>(RATE_BUYVALUE_ITEM_EPIC, "Rate.BuyValue.Item.Epic", 1.0f);
+    SetConfigValue<float>(RATE_BUYVALUE_ITEM_LEGENDARY, "Rate.BuyValue.Item.Legendary", 1.0f);
+    SetConfigValue<float>(RATE_BUYVALUE_ITEM_ARTIFACT, "Rate.BuyValue.Item.Artifact", 1.0f);
+    SetConfigValue<float>(RATE_BUYVALUE_ITEM_HEIRLOOM, "Rate.BuyValue.Item.Heirloom", 1.0f);
 
-    SetConfigValue<float>(RATE_REPUTATION_GAIN, "Rate.Reputation.Gain", 1);
-    SetConfigValue<float>(RATE_REPUTATION_LOWLEVEL_KILL, "Rate.Reputation.LowLevel.Kill", 1);
-    SetConfigValue<float>(RATE_REPUTATION_LOWLEVEL_QUEST, "Rate.Reputation.LowLevel.Quest", 1);
-    SetConfigValue<float>(RATE_REPUTATION_RECRUIT_A_FRIEND_BONUS, "Rate.Reputation.RecruitAFriendBonus", 0.1);
-    SetConfigValue<float>(RATE_CREATURE_NORMAL_DAMAGE, "Rate.Creature.Normal.Damage", 1);
-    SetConfigValue<float>(RATE_CREATURE_ELITE_ELITE_DAMAGE, "Rate.Creature.Elite.Elite.Damage", 1);
-    SetConfigValue<float>(RATE_CREATURE_ELITE_RAREELITE_DAMAGE, "Rate.Creature.Elite.RAREELITE.Damage", 1);
-    SetConfigValue<float>(RATE_CREATURE_ELITE_WORLDBOSS_DAMAGE, "Rate.Creature.Elite.WORLDBOSS.Damage", 1);
-    SetConfigValue<float>(RATE_CREATURE_ELITE_RARE_DAMAGE, "Rate.Creature.Elite.RARE.Damage", 1);
-    SetConfigValue<float>(RATE_CREATURE_NORMAL_HP, "Rate.Creature.Normal.HP", 1);
-    SetConfigValue<float>(RATE_CREATURE_ELITE_ELITE_HP, "Rate.Creature.Elite.Elite.HP", 1);
-    SetConfigValue<float>(RATE_CREATURE_ELITE_RAREELITE_HP, "Rate.Creature.Elite.RAREELITE.HP", 1);
-    SetConfigValue<float>(RATE_CREATURE_ELITE_WORLDBOSS_HP, "Rate.Creature.Elite.WORLDBOSS.HP", 1);
-    SetConfigValue<float>(RATE_CREATURE_ELITE_RARE_HP, "Rate.Creature.Elite.RARE.HP", 1);
-    SetConfigValue<float>(RATE_CREATURE_NORMAL_SPELLDAMAGE, "Rate.Creature.Normal.SpellDamage", 1);
-    SetConfigValue<float>(RATE_CREATURE_ELITE_ELITE_SPELLDAMAGE, "Rate.Creature.Elite.Elite.SpellDamage", 1);
-    SetConfigValue<float>(RATE_CREATURE_ELITE_RAREELITE_SPELLDAMAGE, "Rate.Creature.Elite.RAREELITE.SpellDamage", 1);
-    SetConfigValue<float>(RATE_CREATURE_ELITE_WORLDBOSS_SPELLDAMAGE, "Rate.Creature.Elite.WORLDBOSS.SpellDamage", 1);
-    SetConfigValue<float>(RATE_CREATURE_ELITE_RARE_SPELLDAMAGE, "Rate.Creature.Elite.RARE.SpellDamage", 1);
-    SetConfigValue<float>(RATE_CREATURE_AGGRO, "Rate.Creature.Aggro", 1);
-    SetConfigValue<float>(RATE_REST_INGAME, "Rate.Rest.InGame", 1);
-    SetConfigValue<float>(RATE_REST_OFFLINE_IN_TAVERN_OR_CITY, "Rate.Rest.Offline.InTavernOrCity", 1);
-    SetConfigValue<float>(RATE_REST_OFFLINE_IN_WILDERNESS, "Rate.Rest.Offline.InWilderness", 1);
-    SetConfigValue<float>(RATE_REST_MAX_BONUS, "Rate.Rest.MaxBonus", 1.5);
-    SetConfigValue<float>(RATE_DAMAGE_FALL, "Rate.Damage.Fall", 1);
-    SetConfigValue<float>(RATE_AUCTION_TIME, "Rate.Auction.Time", 1);
-    SetConfigValue<float>(RATE_AUCTION_DEPOSIT, "Rate.Auction.Deposit", 1);
-    SetConfigValue<float>(RATE_AUCTION_CUT, "Rate.Auction.Cut", 1);
-    SetConfigValue<float>(RATE_HONOR, "Rate.Honor", 1);
-    SetConfigValue<float>(RATE_ARENA_POINTS, "Rate.ArenaPoints", 1);
-    SetConfigValue<float>(RATE_INSTANCE_RESET_TIME, "Rate.InstanceResetTime", 1);
+    SetConfigValue<float>(RATE_REPUTATION_GAIN, "Rate.Reputation.Gain", 1.0f);
+    SetConfigValue<float>(RATE_REPUTATION_LOWLEVEL_KILL, "Rate.Reputation.LowLevel.Kill", 1.0f);
+    SetConfigValue<float>(RATE_REPUTATION_LOWLEVEL_QUEST, "Rate.Reputation.LowLevel.Quest", 1.0f);
+    SetConfigValue<float>(RATE_REPUTATION_RECRUIT_A_FRIEND_BONUS, "Rate.Reputation.RecruitAFriendBonus", 0.1f);
+    SetConfigValue<float>(RATE_CREATURE_NORMAL_DAMAGE, "Rate.Creature.Normal.Damage", 1.0f);
+    SetConfigValue<float>(RATE_CREATURE_ELITE_ELITE_DAMAGE, "Rate.Creature.Elite.Elite.Damage", 1.0f);
+    SetConfigValue<float>(RATE_CREATURE_ELITE_RAREELITE_DAMAGE, "Rate.Creature.Elite.RAREELITE.Damage", 1.0f);
+    SetConfigValue<float>(RATE_CREATURE_ELITE_WORLDBOSS_DAMAGE, "Rate.Creature.Elite.WORLDBOSS.Damage", 1.0f);
+    SetConfigValue<float>(RATE_CREATURE_ELITE_RARE_DAMAGE, "Rate.Creature.Elite.RARE.Damage", 1.0f);
+    SetConfigValue<float>(RATE_CREATURE_NORMAL_HP, "Rate.Creature.Normal.HP", 1.0f);
+    SetConfigValue<float>(RATE_CREATURE_ELITE_ELITE_HP, "Rate.Creature.Elite.Elite.HP", 1.0f);
+    SetConfigValue<float>(RATE_CREATURE_ELITE_RAREELITE_HP, "Rate.Creature.Elite.RAREELITE.HP", 1.0f);
+    SetConfigValue<float>(RATE_CREATURE_ELITE_WORLDBOSS_HP, "Rate.Creature.Elite.WORLDBOSS.HP", 1.0f);
+    SetConfigValue<float>(RATE_CREATURE_ELITE_RARE_HP, "Rate.Creature.Elite.RARE.HP", 1.0f);
+    SetConfigValue<float>(RATE_CREATURE_NORMAL_SPELLDAMAGE, "Rate.Creature.Normal.SpellDamage", 1.0f);
+    SetConfigValue<float>(RATE_CREATURE_ELITE_ELITE_SPELLDAMAGE, "Rate.Creature.Elite.Elite.SpellDamage", 1.0f);
+    SetConfigValue<float>(RATE_CREATURE_ELITE_RAREELITE_SPELLDAMAGE, "Rate.Creature.Elite.RAREELITE.SpellDamage", 1.0f);
+    SetConfigValue<float>(RATE_CREATURE_ELITE_WORLDBOSS_SPELLDAMAGE, "Rate.Creature.Elite.WORLDBOSS.SpellDamage", 1.0f);
+    SetConfigValue<float>(RATE_CREATURE_ELITE_RARE_SPELLDAMAGE, "Rate.Creature.Elite.RARE.SpellDamage", 1.0f);
+    SetConfigValue<float>(RATE_CREATURE_AGGRO, "Rate.Creature.Aggro", 1.0f);
+    SetConfigValue<float>(RATE_REST_INGAME, "Rate.Rest.InGame", 1.0f);
+    SetConfigValue<float>(RATE_REST_OFFLINE_IN_TAVERN_OR_CITY, "Rate.Rest.Offline.InTavernOrCity", 1.0f);
+    SetConfigValue<float>(RATE_REST_OFFLINE_IN_WILDERNESS, "Rate.Rest.Offline.InWilderness", 1.0f);
+    SetConfigValue<float>(RATE_REST_MAX_BONUS, "Rate.Rest.MaxBonus", 1.5f);
+    SetConfigValue<float>(RATE_DAMAGE_FALL, "Rate.Damage.Fall", 1.0f);
+    SetConfigValue<float>(RATE_AUCTION_TIME, "Rate.Auction.Time", 1.0f);
+    SetConfigValue<float>(RATE_AUCTION_DEPOSIT, "Rate.Auction.Deposit", 1.0f);
+    SetConfigValue<float>(RATE_AUCTION_CUT, "Rate.Auction.Cut", 1.0f);
+    SetConfigValue<float>(RATE_HONOR, "Rate.Honor", 1.0f);
+    SetConfigValue<float>(RATE_ARENA_POINTS, "Rate.ArenaPoints", 1.0f);
+    SetConfigValue<float>(RATE_INSTANCE_RESET_TIME, "Rate.InstanceResetTime", 1.0f);
 
-    SetConfigValue<float>(RATE_MISS_CHANCE_MULTIPLIER_TARGET_CREATURE, "Rate.MissChanceMultiplier.TargetCreature", 11);
-    SetConfigValue<float>(RATE_MISS_CHANCE_MULTIPLIER_TARGET_PLAYER, "Rate.MissChanceMultiplier.TargetPlayer", 7);
+    SetConfigValue<float>(RATE_MISS_CHANCE_MULTIPLIER_TARGET_CREATURE, "Rate.MissChanceMultiplier.TargetCreature", 11.0f);
+    SetConfigValue<float>(RATE_MISS_CHANCE_MULTIPLIER_TARGET_PLAYER, "Rate.MissChanceMultiplier.TargetPlayer", 7.0f);
     SetConfigValue<bool>(CONFIG_MISS_CHANCE_MULTIPLIER_ONLY_FOR_PLAYERS, "Rate.MissChanceMultiplier.OnlyAffectsPlayer", false);
 
-    SetConfigValue<float>(RATE_TALENT, "Rate.Talent", 1, ConfigValueCache::Reloadable::Yes, [](float const& value) { return value >= 0; }, ">= 0");
-    SetConfigValue<float>(RATE_TALENT_PET, "Rate.Talent.Pet", 1, ConfigValueCache::Reloadable::Yes, [](float const& value) { return value >= 0; }, ">= 0");
+    SetConfigValue<float>(RATE_TALENT, "Rate.Talent", 1.0f, ConfigValueCache::Reloadable::Yes, [](float const& value) { return value >= 0.0f; }, ">= 0");
+    SetConfigValue<float>(RATE_TALENT_PET, "Rate.Talent.Pet", 1.0f, ConfigValueCache::Reloadable::Yes, [](float const& value) { return value >= 0.0f; }, ">= 0");
     // Controls Player movespeed rate.
-    SetConfigValue<float>(RATE_MOVESPEED_PLAYER, "Rate.MoveSpeed.Player", 1, ConfigValueCache::Reloadable::Yes, [](float const& value) { return value >= 0; }, ">= 0");
+    SetConfigValue<float>(RATE_MOVESPEED_PLAYER, "Rate.MoveSpeed.Player", 1.0f, ConfigValueCache::Reloadable::Yes, [](float const& value) { return value >= 0.0f; }, ">= 0");
 
     // Controls all npc movespeed rate.
-    SetConfigValue<float>(RATE_MOVESPEED_NPC, "Rate.MoveSpeed.NPC", 1, ConfigValueCache::Reloadable::Yes, [](float const& value) { return value >= 0; }, ">= 0");
+    SetConfigValue<float>(RATE_MOVESPEED_NPC, "Rate.MoveSpeed.NPC", 1.0f, ConfigValueCache::Reloadable::Yes, [](float const& value) { return value >= 0.0f; }, ">= 0");
 
-    SetConfigValue<float>(RATE_CORPSE_DECAY_LOOTED, "Rate.Corpse.Decay.Looted", 0.5);
+    SetConfigValue<float>(RATE_CORPSE_DECAY_LOOTED, "Rate.Corpse.Decay.Looted", 0.5f);
 
-    SetConfigValue<float>(RATE_DURABILITY_LOSS_ON_DEATH, "DurabilityLoss.OnDeath", 10, ConfigValueCache::Reloadable::Yes, [](float const& value) { return value >= 0 && value <= 100; }, ">= 0 && <= 100");
+    SetConfigValue<float>(RATE_DURABILITY_LOSS_ON_DEATH, "DurabilityLoss.OnDeath", 10.0f, ConfigValueCache::Reloadable::Yes, [](float const& value) { return value >= 0.0f && value <= 100.0f; }, ">= 0 && <= 100");
 
-    SetConfigValue<float>(RATE_DURABILITY_LOSS_DAMAGE, "DurabilityLossChance.Damage", 0.5, ConfigValueCache::Reloadable::Yes, [](float const& value) { return value >= 0; }, ">= 0");
-    SetConfigValue<float>(RATE_DURABILITY_LOSS_ABSORB, "DurabilityLossChance.Absorb", 0.5, ConfigValueCache::Reloadable::Yes, [](float const& value) { return value >= 0; }, ">= 0");
-    SetConfigValue<float>(RATE_DURABILITY_LOSS_PARRY, "DurabilityLossChance.Parry", 0.05, ConfigValueCache::Reloadable::Yes, [](float const& value) { return value >= 0; }, ">= 0");
-    SetConfigValue<float>(RATE_DURABILITY_LOSS_BLOCK, "DurabilityLossChance.Block", 0.05, ConfigValueCache::Reloadable::Yes, [](float const& value) { return value >= 0; }, ">= 0");
+    SetConfigValue<float>(RATE_DURABILITY_LOSS_DAMAGE, "DurabilityLossChance.Damage", 0.5f, ConfigValueCache::Reloadable::Yes, [](float const& value) { return value >= 0.0f; }, ">= 0");
+    SetConfigValue<float>(RATE_DURABILITY_LOSS_ABSORB, "DurabilityLossChance.Absorb", 0.5f, ConfigValueCache::Reloadable::Yes, [](float const& value) { return value >= 0.0f; }, ">= 0");
+    SetConfigValue<float>(RATE_DURABILITY_LOSS_PARRY, "DurabilityLossChance.Parry", 0.05f, ConfigValueCache::Reloadable::Yes, [](float const& value) { return value >= 0.0f; }, ">= 0");
+    SetConfigValue<float>(RATE_DURABILITY_LOSS_BLOCK, "DurabilityLossChance.Block", 0.05f, ConfigValueCache::Reloadable::Yes, [](float const& value) { return value >= 0.0f; }, ">= 0");
 
     ///- Read other configuration items from the config file
 
@@ -174,10 +174,10 @@ void WorldConfig::BuildConfigCache()
     SetConfigValue<uint32>(CONFIG_SOCKET_TIMEOUTTIME_ACTIVE, "SocketTimeOutTimeActive", 60000);
     SetConfigValue<uint32>(CONFIG_SESSION_ADD_DELAY, "SessionAddDelay", 10000);
 
-    SetConfigValue<float>(CONFIG_GROUP_XP_DISTANCE, "MaxGroupXPDistance", 74);
-    SetConfigValue<float>(CONFIG_MAX_RECRUIT_A_FRIEND_DISTANCE, "MaxRecruitAFriendBonusDistance", 100);
+    SetConfigValue<float>(CONFIG_GROUP_XP_DISTANCE, "MaxGroupXPDistance", 74.0f);
+    SetConfigValue<float>(CONFIG_MAX_RECRUIT_A_FRIEND_DISTANCE, "MaxRecruitAFriendBonusDistance", 100.0f);
 
-    SetConfigValue<float>(CONFIG_SIGHT_MONSTER, "MonsterSight", 50);
+    SetConfigValue<float>(CONFIG_SIGHT_MONSTER, "MonsterSight", 50.0f);
 
     SetConfigValue<uint32>(CONFIG_GAME_TYPE, "GameType", 0, ConfigValueCache::Reloadable::No);
     SetConfigValue<uint32>(CONFIG_REALM_ZONE, "RealmZone", REALM_ZONE_DEVELOPMENT, ConfigValueCache::Reloadable::No);
@@ -279,7 +279,7 @@ void WorldConfig::BuildConfigCache()
     SetConfigValue<bool>(CONFIG_ALLOW_GM_GROUP, "GM.AllowInvite", false);
     SetConfigValue<bool>(CONFIG_ALLOW_GM_FRIEND, "GM.AllowFriend", false);
     SetConfigValue<bool>(CONFIG_GM_LOWER_SECURITY, "GM.LowerSecurity", false);
-    SetConfigValue<float>(CONFIG_CHANCE_OF_GM_SURVEY, "GM.TicketSystem.ChanceOfGMSurvey", 50);
+    SetConfigValue<float>(CONFIG_CHANCE_OF_GM_SURVEY, "GM.TicketSystem.ChanceOfGMSurvey", 50.0f);
 
     SetConfigValue<uint32>(CONFIG_GROUP_VISIBILITY, "Visibility.GroupMode", 1);
 
@@ -344,8 +344,8 @@ void WorldConfig::BuildConfigCache()
     SetConfigValue<uint32>(CONFIG_EVENT_ANNOUNCE, "Event.Announce", 0);
 
     SetConfigValue<float>(CONFIG_CREATURE_LEASH_RADIUS, "CreatureLeashRadius", 30.0f);
-    SetConfigValue<float>(CONFIG_CREATURE_FAMILY_FLEE_ASSISTANCE_RADIUS, "CreatureFamilyFleeAssistanceRadius", 30);
-    SetConfigValue<float>(CONFIG_CREATURE_FAMILY_ASSISTANCE_RADIUS, "CreatureFamilyAssistanceRadius", 10);
+    SetConfigValue<float>(CONFIG_CREATURE_FAMILY_FLEE_ASSISTANCE_RADIUS, "CreatureFamilyFleeAssistanceRadius", 30.0f);
+    SetConfigValue<float>(CONFIG_CREATURE_FAMILY_ASSISTANCE_RADIUS, "CreatureFamilyAssistanceRadius", 10.0f);
     SetConfigValue<uint32>(CONFIG_CREATURE_FAMILY_ASSISTANCE_DELAY, "CreatureFamilyAssistanceDelay", 2000);
     SetConfigValue<uint32>(CONFIG_CREATURE_FAMILY_ASSISTANCE_PERIOD, "CreatureFamilyAssistancePeriod", 3000);
     SetConfigValue<uint32>(CONFIG_CREATURE_FAMILY_FLEE_DELAY, "CreatureFamilyFleeDelay", 7000);
@@ -402,9 +402,9 @@ void WorldConfig::BuildConfigCache()
     // always use declined names in the russian client
     SetConfigValue<bool>(CONFIG_DECLINED_NAMES_USED, "DeclinedNames", GetConfigValue<uint32>(CONFIG_REALM_ZONE) == REALM_ZONE_RUSSIAN);
 
-    SetConfigValue<float>(CONFIG_LISTEN_RANGE_SAY, "ListenRange.Say", 40);
-    SetConfigValue<float>(CONFIG_LISTEN_RANGE_TEXTEMOTE, "ListenRange.TextEmote", 40);
-    SetConfigValue<float>(CONFIG_LISTEN_RANGE_YELL, "ListenRange.Yell", 300);
+    SetConfigValue<float>(CONFIG_LISTEN_RANGE_SAY, "ListenRange.Say", 40.0f);
+    SetConfigValue<float>(CONFIG_LISTEN_RANGE_TEXTEMOTE, "ListenRange.TextEmote", 40.0f);
+    SetConfigValue<float>(CONFIG_LISTEN_RANGE_YELL, "ListenRange.Yell", 300.0f);
 
     SetConfigValue<uint32>(CONFIG_BATTLEGROUND_OVERRIDE_LOWLEVELS_MINPLAYERS, "Battleground.Override.LowLevels.MinPlayers", 0);
     SetConfigValue<bool>(CONFIG_BATTLEGROUND_DISABLE_QUEST_SHARE_IN_BG, "Battleground.DisableQuestShareInBG", false);
@@ -447,10 +447,10 @@ void WorldConfig::BuildConfigCache()
     SetConfigValue<uint32>(CONFIG_LEGACY_ARENA_POINTS_CALC, "Arena.LegacyArenaPoints", 0);
     SetConfigValue<uint32>(CONFIG_ARENA_START_PERSONAL_RATING, "Arena.ArenaStartPersonalRating", 0);
     SetConfigValue<uint32>(CONFIG_ARENA_START_MATCHMAKER_RATING, "Arena.ArenaStartMatchmakerRating", 1500);
-    SetConfigValue<float>(CONFIG_ARENA_WIN_RATING_MODIFIER_1, "Arena.ArenaWinRatingModifier1", 48);
-    SetConfigValue<float>(CONFIG_ARENA_WIN_RATING_MODIFIER_2, "Arena.ArenaWinRatingModifier2", 24);
-    SetConfigValue<float>(CONFIG_ARENA_LOSE_RATING_MODIFIER, "Arena.ArenaLoseRatingModifier", 24);
-    SetConfigValue<float>(CONFIG_ARENA_MATCHMAKER_RATING_MODIFIER, "Arena.ArenaMatchmakerRatingModifier", 24);
+    SetConfigValue<float>(CONFIG_ARENA_WIN_RATING_MODIFIER_1, "Arena.ArenaWinRatingModifier1", 48.0f);
+    SetConfigValue<float>(CONFIG_ARENA_WIN_RATING_MODIFIER_2, "Arena.ArenaWinRatingModifier2", 24.0f);
+    SetConfigValue<float>(CONFIG_ARENA_LOSE_RATING_MODIFIER, "Arena.ArenaLoseRatingModifier", 24.0f);
+    SetConfigValue<float>(CONFIG_ARENA_MATCHMAKER_RATING_MODIFIER, "Arena.ArenaMatchmakerRatingModifier", 24.0f);
     SetConfigValue<bool>(CONFIG_ARENA_QUEUE_ANNOUNCER_ENABLE, "Arena.QueueAnnouncer.Enable", false);
     SetConfigValue<bool>(CONFIG_ARENA_QUEUE_ANNOUNCER_PLAYERONLY, "Arena.QueueAnnouncer.PlayerOnly", false);
     SetConfigValue<uint32>(CONFIG_ARENA_QUEUE_ANNOUNCER_DETAIL, "Arena.QueueAnnouncer.Detail", 3);
@@ -502,10 +502,10 @@ void WorldConfig::BuildConfigCache()
     SetConfigValue<uint32>(CONFIG_DAILY_RBG_MIN_LEVEL_AP_REWARD, "DailyRBGArenaPoints.MinLevel", 71);
 
     // Respawn
-    SetConfigValue<float>(CONFIG_RESPAWN_DYNAMICRATE_CREATURE, "Respawn.DynamicRateCreature", 1);
+    SetConfigValue<float>(CONFIG_RESPAWN_DYNAMICRATE_CREATURE, "Respawn.DynamicRateCreature", 1.0f);
     SetConfigValue<uint32>(CONFIG_RESPAWN_DYNAMICMINIMUM_CREATURE, "Respawn.DynamicMinimumCreature", 10);
 
-    SetConfigValue<float>(CONFIG_RESPAWN_DYNAMICRATE_GAMEOBJECT, "Respawn.DynamicRateGameObject", 1);
+    SetConfigValue<float>(CONFIG_RESPAWN_DYNAMICRATE_GAMEOBJECT, "Respawn.DynamicRateGameObject", 1.0f);
     SetConfigValue<uint32>(CONFIG_RESPAWN_DYNAMICMINIMUM_GAMEOBJECT, "Respawn.DynamicMinimumGameObject", 10);
 
     SetConfigValue<bool>(CONFIG_VMAP_INDOOR_CHECK, "vmap.enableIndoorCheck", true);
