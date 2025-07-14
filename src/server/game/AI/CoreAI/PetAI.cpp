@@ -286,6 +286,7 @@ void PetAI::UpdateAI(uint32 diff)
                 {
                     if (!spellUsed)
                         delete spell;
+
                     continue; // Pets must only jump to target
                 }
 
