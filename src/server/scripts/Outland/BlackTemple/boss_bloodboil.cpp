@@ -99,7 +99,7 @@ struct boss_gurtogg_bloodboil : public BossAI
         }, 15s);
 
         ScheduleTimedEvent(1min, [&] {
-            if (Unit* target = SelectTarget(SelectTargetMethod::Random, 1, 40.0f, true))
+            if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 40.0f, true, false))
             {
                 me->RemoveAurasByType(SPELL_AURA_MOD_TAUNT);
                 me->RemoveAurasDueToSpell(SPELL_ACIDIC_WOUND);

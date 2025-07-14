@@ -78,7 +78,7 @@ ObjectData const summonData[] =
 class instance_sunwell_plateau : public InstanceMapScript
 {
 public:
-    instance_sunwell_plateau() : InstanceMapScript("instance_sunwell_plateau", 580) { }
+    instance_sunwell_plateau() : InstanceMapScript("instance_sunwell_plateau", MAP_THE_SUNWELL) { }
 
     struct instance_sunwell_plateau_InstanceMapScript : public InstanceScript
     {
@@ -184,7 +184,10 @@ struct npc_sunblade_scout : public ScriptedAI
         protectors.remove_if([](Creature* trigger) {return !trigger->HasAura(SPELL_COSMETIC_STUN_IMMUNE_PERMANENT);});
         protectors.sort(Acore::ObjectDistanceOrderPred(me));
         if (protectors.empty())
+        {
             ScheduleCombat();
+            return;
+        }
         Creature* closestProtector = protectors.front();
         me->GetMotionMaster()->MoveFollow(closestProtector, 0.0f, 0.0f);
         _protectorGUID = closestProtector->GetGUID();
@@ -247,9 +250,116 @@ private:
     ObjectGuid _protectorGUID;
 };
 
+enum SunwellTeleportSpells
+{
+    SPELL_TELEPORT_TO_APEX_POINT = 46881,
+    SPELL_TELEPORT_TO_WITCHS_SANCTUM = 46883,
+    SPELL_TELEPORT_TO_SUNWELL_PLATEAU = 46884,
+};
+class spell_sunwell_teleport : public SpellScript
+{
+    PrepareSpellScript(spell_sunwell_teleport);
+public:
+    spell_sunwell_teleport(uint32 triggeredSpellId) : SpellScript(), _triggeredSpellId(triggeredSpellId) { }
+
+    bool Validate(SpellInfo const* /*spellInfo*/) override
+    {
+        return ValidateSpellInfo({ _triggeredSpellId });
+    }
+
+    void HandleScript(SpellEffIndex effIndex)
+    {
+        PreventHitDefaultEffect(effIndex);
+        if (Player* target = GetHitPlayer())
+            target->CastSpell(target, _triggeredSpellId, true);
+    }
+
+    void Register() override
+    {
+        OnEffectHitTarget += SpellEffectFn(spell_sunwell_teleport::HandleScript, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
+    }
+private:
+    uint32 _triggeredSpellId;
+};
+
+enum SunbladeArchMageSpells
+{
+    SPELL_ARCANE_EXPLOSION    = 46553,
+    SPELL_BLINK               = 28401,
+    SPELL_FROST_NOVA          = 46555
+};
+
+struct npc_sunblade_arch_mage : public ScriptedAI
+{
+    npc_sunblade_arch_mage(Creature* creature) : ScriptedAI(creature)
+    {
+        scheduler.SetValidator([this]
+        {
+            return !me->HasUnitState(UNIT_STATE_CASTING);
+        });
+    }
+
+    void Reset() override
+    {
+        scheduler.CancelAll();
+    }
+
+    void JustEngagedWith(Unit* /*who*/) override
+    {
+        scheduler.Schedule(6s, 12s, [this](TaskContext context)
+        {
+            DoCastAOE(SPELL_ARCANE_EXPLOSION);
+            context.Repeat(12s, 18s);
+        });
+
+        scheduler.Schedule(8s, 15s, [this](TaskContext context)
+        {
+            if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 30.0f, true))
+            {
+                DoCast(target, SPELL_BLINK, true);
+                DoCastAOE(SPELL_FROST_NOVA, true);
+            }
+            context.Repeat(20s, 25s);
+        });
+    }
+
+    void UpdateAI(uint32 diff) override
+    {
+        if (!UpdateVictim())
+            return;
+
+        scheduler.Update(diff);
+        DoMeleeAttackIfReady();
+    }
+
+private:
+    TaskScheduler scheduler;
+};
+
+class spell_spell_fury_aura : public AuraScript
+{
+    PrepareAuraScript(spell_spell_fury_aura);
+
+    void OnApply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
+    {
+        if (GetUnitOwner()->ToPlayer())
+            ModStackAmount(5);
+    }
+
+    void Register() override
+    {
+        OnEffectApply += AuraEffectApplyFn(spell_spell_fury_aura::OnApply, EFFECT_0, SPELL_AURA_MOD_CASTING_SPEED_NOT_STACK, AURA_EFFECT_HANDLE_REAL);
+    }
+};
+
 void AddSC_instance_sunwell_plateau()
 {
     new instance_sunwell_plateau();
     RegisterSpellScript(spell_cataclysm_breath);
+    RegisterSunwellPlateauCreatureAI(npc_sunblade_arch_mage);
     RegisterSunwellPlateauCreatureAI(npc_sunblade_scout);
+    RegisterSpellScriptWithArgs(spell_sunwell_teleport, "spell_teleport_to_apex_point", SPELL_TELEPORT_TO_APEX_POINT);
+    RegisterSpellScriptWithArgs(spell_sunwell_teleport, "spell_teleport_to_witchs_sanctum", SPELL_TELEPORT_TO_WITCHS_SANCTUM);
+    RegisterSpellScriptWithArgs(spell_sunwell_teleport, "spell_teleport_to_sunwell_plateau", SPELL_TELEPORT_TO_SUNWELL_PLATEAU);
+    RegisterSpellScript(spell_spell_fury_aura);
 }

@@ -15,17 +15,6 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-/* ScriptData
-SDName: Westfall
-SD%Complete: 90
-SDComment: Quest support: 155
-SDCategory: Westfall
-EndScriptData */
-
-/* ContentData
-npc_daphne_stilwell
-EndContentData */
-
 #include "CreatureScript.h"
 #include "Player.h"
 #include "ScriptedCreature.h"

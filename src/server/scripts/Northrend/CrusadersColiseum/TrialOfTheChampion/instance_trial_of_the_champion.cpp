@@ -41,7 +41,7 @@ class Group;
 class instance_trial_of_the_champion : public InstanceMapScript
 {
 public:
-    instance_trial_of_the_champion() : InstanceMapScript("instance_trial_of_the_champion", 650) { }
+    instance_trial_of_the_champion() : InstanceMapScript("instance_trial_of_the_champion", MAP_TRIAL_OF_THE_CHAMPION) { }
 
     InstanceScript* GetInstanceScript(InstanceMap* pMap) const override
     {

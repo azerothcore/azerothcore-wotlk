@@ -29,7 +29,7 @@
 class instance_sunken_temple : public InstanceMapScript
 {
 public:
-    instance_sunken_temple() : InstanceMapScript("instance_sunken_temple", 109) { }
+    instance_sunken_temple() : InstanceMapScript("instance_sunken_temple", MAP_SUNKEN_TEMPLE) { }
 
     struct instance_sunken_temple_InstanceMapScript : public InstanceScript
     {

@@ -15,18 +15,6 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-/* ScriptData
-SDName: Ungoro Crater
-SD%Complete: 100
-SDComment: Support for Quest: 4245, 4491
-SDCategory: Ungoro Crater
-EndScriptData */
-
-/* ContentData
-npc_a-me
-npc_ringo
-EndContentData */
-
 #include "CreatureScript.h"
 #include "Player.h"
 #include "ScriptedCreature.h"

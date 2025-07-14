@@ -19,7 +19,9 @@ options=(
     "run-worldserver (rw): execute a simple restarter for worldserver" # 11
     "run-authserver (ra): execute a simple restarter for authserver" # 12
     "docker (dr): Run docker tools" # 13
-    "quit: Exit from this menu"                     # 14
+    "version (v): Show AzerothCore version"         # 14
+    "service-manager (sm): Run service manager to run authserver and worldserver in background" # 15
+    "quit: Exit from this menu"                     # 16
     )
 
 function _switch() {
@@ -72,7 +74,11 @@ function _switch() {
             printf "AzerothCore Rev. %s\n" "$ACORE_VERSION"
             exit
             ;;
-        ""|"quit"|"15")
+        ""|"sm"|"service-manager"|"15")
+            bash "$AC_PATH_APPS/startup-scripts/src/service-manager.sh" "${@:2}"
+            exit
+            ;;
+        ""|"quit"|"16")
             echo "Goodbye!"
             exit
             ;;
