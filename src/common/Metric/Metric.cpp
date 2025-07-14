@@ -118,7 +118,7 @@ void Metric::LoadFromConfigs()
                 LOG_ERROR("metric", "Metric.InfluxDB.Connection specified with wrong format in configuration file.");
                 return;
             }
-            
+
             _org = sConfigMgr->GetOption<std::string>("Metric.InfluxDB.Org", "");
             _bucket = sConfigMgr->GetOption<std::string>("Metric.InfluxDB.Bucket", "");
             _token = sConfigMgr->GetOption<std::string>("Metric.InfluxDB.Token", "");
