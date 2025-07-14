@@ -63,7 +63,7 @@ void WorldConfig::BuildConfigCache()
     SetConfigValue<float>(RATE_XP_QUEST_DF, "Rate.XP.Quest.DF", 1);
     SetConfigValue<float>(RATE_XP_EXPLORE, "Rate.XP.Explore", 1);
     SetConfigValue<float>(RATE_XP_PET, "Rate.XP.Pet", 1);
-    SetConfigValue<float>(RATE_XP_PET_NEXT_LEVEL, "Rate.Pet.LevelXP", 0);
+    SetConfigValue<float>(RATE_XP_PET_NEXT_LEVEL, "Rate.Pet.LevelXP", 0.05);
     SetConfigValue<float>(RATE_REPAIRCOST, "Rate.RepairCost", 1, ConfigValueCache::Reloadable::Yes, [](float const& value) { return value >= 0; }, ">= 0");
 
     SetConfigValue<float>(RATE_SELLVALUE_ITEM_POOR, "Rate.SellValue.Item.Poor", 1);
@@ -87,7 +87,7 @@ void WorldConfig::BuildConfigCache()
     SetConfigValue<float>(RATE_REPUTATION_GAIN, "Rate.Reputation.Gain", 1);
     SetConfigValue<float>(RATE_REPUTATION_LOWLEVEL_KILL, "Rate.Reputation.LowLevel.Kill", 1);
     SetConfigValue<float>(RATE_REPUTATION_LOWLEVEL_QUEST, "Rate.Reputation.LowLevel.Quest", 1);
-    SetConfigValue<float>(RATE_REPUTATION_RECRUIT_A_FRIEND_BONUS, "Rate.Reputation.RecruitAFriendBonus", 0);
+    SetConfigValue<float>(RATE_REPUTATION_RECRUIT_A_FRIEND_BONUS, "Rate.Reputation.RecruitAFriendBonus", 0.1);
     SetConfigValue<float>(RATE_CREATURE_NORMAL_DAMAGE, "Rate.Creature.Normal.Damage", 1);
     SetConfigValue<float>(RATE_CREATURE_ELITE_ELITE_DAMAGE, "Rate.Creature.Elite.Elite.Damage", 1);
     SetConfigValue<float>(RATE_CREATURE_ELITE_RAREELITE_DAMAGE, "Rate.Creature.Elite.RAREELITE.Damage", 1);
@@ -107,7 +107,7 @@ void WorldConfig::BuildConfigCache()
     SetConfigValue<float>(RATE_REST_INGAME, "Rate.Rest.InGame", 1);
     SetConfigValue<float>(RATE_REST_OFFLINE_IN_TAVERN_OR_CITY, "Rate.Rest.Offline.InTavernOrCity", 1);
     SetConfigValue<float>(RATE_REST_OFFLINE_IN_WILDERNESS, "Rate.Rest.Offline.InWilderness", 1);
-    SetConfigValue<float>(RATE_REST_MAX_BONUS, "Rate.Rest.MaxBonus", 1);
+    SetConfigValue<float>(RATE_REST_MAX_BONUS, "Rate.Rest.MaxBonus", 1.5);
     SetConfigValue<float>(RATE_DAMAGE_FALL, "Rate.Damage.Fall", 1);
     SetConfigValue<float>(RATE_AUCTION_TIME, "Rate.Auction.Time", 1);
     SetConfigValue<float>(RATE_AUCTION_DEPOSIT, "Rate.Auction.Deposit", 1);
@@ -128,14 +128,14 @@ void WorldConfig::BuildConfigCache()
     // Controls all npc movespeed rate.
     SetConfigValue<float>(RATE_MOVESPEED_NPC, "Rate.MoveSpeed.NPC", 1, ConfigValueCache::Reloadable::Yes, [](float const& value) { return value >= 0; }, ">= 0");
 
-    SetConfigValue<float>(RATE_CORPSE_DECAY_LOOTED, "Rate.Corpse.Decay.Looted", 0);
+    SetConfigValue<float>(RATE_CORPSE_DECAY_LOOTED, "Rate.Corpse.Decay.Looted", 0.5);
 
     SetConfigValue<float>(RATE_DURABILITY_LOSS_ON_DEATH, "DurabilityLoss.OnDeath", 10, ConfigValueCache::Reloadable::Yes, [](float const& value) { return value >= 0 && value <= 100; }, ">= 0 && <= 100");
 
-    SetConfigValue<float>(RATE_DURABILITY_LOSS_DAMAGE, "DurabilityLossChance.Damage", 0, ConfigValueCache::Reloadable::Yes, [](float const& value) { return value >= 0; }, ">= 0");
-    SetConfigValue<float>(RATE_DURABILITY_LOSS_ABSORB, "DurabilityLossChance.Absorb", 0, ConfigValueCache::Reloadable::Yes, [](float const& value) { return value >= 0; }, ">= 0");
-    SetConfigValue<float>(RATE_DURABILITY_LOSS_PARRY, "DurabilityLossChance.Parry", 0, ConfigValueCache::Reloadable::Yes, [](float const& value) { return value >= 0; }, ">= 0");
-    SetConfigValue<float>(RATE_DURABILITY_LOSS_BLOCK, "DurabilityLossChance.Block", 0, ConfigValueCache::Reloadable::Yes, [](float const& value) { return value >= 0; }, ">= 0");
+    SetConfigValue<float>(RATE_DURABILITY_LOSS_DAMAGE, "DurabilityLossChance.Damage", 0.5, ConfigValueCache::Reloadable::Yes, [](float const& value) { return value >= 0; }, ">= 0");
+    SetConfigValue<float>(RATE_DURABILITY_LOSS_ABSORB, "DurabilityLossChance.Absorb", 0.5, ConfigValueCache::Reloadable::Yes, [](float const& value) { return value >= 0; }, ">= 0");
+    SetConfigValue<float>(RATE_DURABILITY_LOSS_PARRY, "DurabilityLossChance.Parry", 0.05, ConfigValueCache::Reloadable::Yes, [](float const& value) { return value >= 0; }, ">= 0");
+    SetConfigValue<float>(RATE_DURABILITY_LOSS_BLOCK, "DurabilityLossChance.Block", 0.05, ConfigValueCache::Reloadable::Yes, [](float const& value) { return value >= 0; }, ">= 0");
 
     ///- Read other configuration items from the config file
 
@@ -157,7 +157,7 @@ void WorldConfig::BuildConfigCache()
     SetConfigValue<bool>(CONFIG_ALLOW_PLAYER_COMMANDS, "AllowPlayerCommands", 1);
     SetConfigValue<bool>(CONFIG_PRESERVE_CUSTOM_CHANNELS, "PreserveCustomChannels", false);
     SetConfigValue<uint32>(CONFIG_PRESERVE_CUSTOM_CHANNEL_DURATION, "PreserveCustomChannelDuration", 14);
-    SetConfigValue<uint32>(CONFIG_INTERVAL_SAVE, "PlayerSaveInterval", 15);
+    SetConfigValue<uint32>(CONFIG_INTERVAL_SAVE, "PlayerSaveInterval", 900000);
     SetConfigValue<uint32>(CONFIG_INTERVAL_DISCONNECT_TOLERANCE, "DisconnectToleranceInterval", 0);
     SetConfigValue<bool>(CONFIG_STATS_SAVE_ONLY_ON_LOGOUT, "PlayerSave.Stats.SaveOnlyOnLogout", true);
 
@@ -165,7 +165,7 @@ void WorldConfig::BuildConfigCache()
 
     SetConfigValue<uint32>(CONFIG_INTERVAL_MAPUPDATE, "MapUpdateInterval", 10, ConfigValueCache::Reloadable::Yes, [](uint32 const& value) { return value >= MIN_MAP_UPDATE_DELAY; }, ">= MIN_MAP_UPDATE_DELAY");
 
-    SetConfigValue<uint32>(CONFIG_INTERVAL_CHANGEWEATHER, "ChangeWeatherInterval", 10);
+    SetConfigValue<uint32>(CONFIG_INTERVAL_CHANGEWEATHER, "ChangeWeatherInterval", 600000);
 
     SetConfigValue<uint32>(CONFIG_PORT_WORLD, "WorldServerPort", 8085, ConfigValueCache::Reloadable::No);
 
@@ -258,11 +258,11 @@ void WorldConfig::BuildConfigCache()
     SetConfigValue<bool>(CONFIG_INSTANCE_IGNORE_LEVEL, "Instance.IgnoreLevel", false);
     SetConfigValue<bool>(CONFIG_INSTANCE_IGNORE_RAID, "Instance.IgnoreRaid", false);
     SetConfigValue<bool>(CONFIG_INSTANCE_GMSUMMON_PLAYER, "Instance.GMSummonPlayer", false);
-    SetConfigValue<bool>(CONFIG_INSTANCE_SHARED_ID, "Instance.SharedNormalHeroicId", false);
+    SetConfigValue<bool>(CONFIG_INSTANCE_SHARED_ID, "Instance.SharedNormalHeroicId", true);
 
     SetConfigValue<uint32>(CONFIG_INSTANCE_RESET_TIME_HOUR, "Instance.ResetTimeHour", 4);
     SetConfigValue<uint32>(CONFIG_INSTANCE_RESET_TIME_RELATIVE_TIMESTAMP, "Instance.ResetTimeRelativeTimestamp", 1135814400);
-    SetConfigValue<uint32>(CONFIG_INSTANCE_UNLOAD_DELAY, "Instance.UnloadDelay", 30);
+    SetConfigValue<uint32>(CONFIG_INSTANCE_UNLOAD_DELAY, "Instance.UnloadDelay", 1800000);
 
     SetConfigValue<uint32>(CONFIG_MAX_PRIMARY_TRADE_SKILL, "MaxPrimaryTradeSkill", 2);
     SetConfigValue<uint32>(CONFIG_MIN_PETITION_SIGNS, "MinPetitionSigns", 9, ConfigValueCache::Reloadable::Yes, [](uint32 const& value) { return value <= 9; }, "<= 9");
@@ -402,8 +402,8 @@ void WorldConfig::BuildConfigCache()
     // always use declined names in the russian client
     SetConfigValue<bool>(CONFIG_DECLINED_NAMES_USED, "DeclinedNames", GetConfigValue<uint32>(CONFIG_REALM_ZONE) == REALM_ZONE_RUSSIAN);
 
-    SetConfigValue<float>(CONFIG_LISTEN_RANGE_SAY, "ListenRange.Say", 25);
-    SetConfigValue<float>(CONFIG_LISTEN_RANGE_TEXTEMOTE, "ListenRange.TextEmote", 25);
+    SetConfigValue<float>(CONFIG_LISTEN_RANGE_SAY, "ListenRange.Say", 40);
+    SetConfigValue<float>(CONFIG_LISTEN_RANGE_TEXTEMOTE, "ListenRange.TextEmote", 40);
     SetConfigValue<float>(CONFIG_LISTEN_RANGE_YELL, "ListenRange.Yell", 300);
 
     SetConfigValue<uint32>(CONFIG_BATTLEGROUND_OVERRIDE_LOWLEVELS_MINPLAYERS, "Battleground.Override.LowLevels.MinPlayers", 0);
@@ -419,9 +419,9 @@ void WorldConfig::BuildConfigCache()
     SetConfigValue<uint32>(CONFIG_BATTLEGROUND_QUEUE_ANNOUNCER_TIMER, "Battleground.QueueAnnouncer.Timer", 30000);
     SetConfigValue<bool>(CONFIG_BATTLEGROUND_STORE_STATISTICS_ENABLE, "Battleground.StoreStatistics.Enable", false);
     SetConfigValue<bool>(CONFIG_BATTLEGROUND_TRACK_DESERTERS, "Battleground.TrackDeserters.Enable", false);
-    SetConfigValue<uint32>(CONFIG_BATTLEGROUND_PREMATURE_FINISH_TIMER, "Battleground.PrematureFinishTimer", 5);
+    SetConfigValue<uint32>(CONFIG_BATTLEGROUND_PREMATURE_FINISH_TIMER, "Battleground.PrematureFinishTimer", 300000);
     SetConfigValue<uint32>(CONFIG_BATTLEGROUND_INVITATION_TYPE, "Battleground.InvitationType", 0);
-    SetConfigValue<uint32>(CONFIG_BATTLEGROUND_PREMADE_GROUP_WAIT_FOR_MATCH, "Battleground.PremadeGroupWaitForMatch", 30);
+    SetConfigValue<uint32>(CONFIG_BATTLEGROUND_PREMADE_GROUP_WAIT_FOR_MATCH, "Battleground.PremadeGroupWaitForMatch", 1800000);
     SetConfigValue<bool>(CONFIG_BG_XP_FOR_KILL, "Battleground.GiveXPForKills", false);
     SetConfigValue<uint32>(CONFIG_BATTLEGROUND_REPORT_AFK_TIMER, "Battleground.ReportAFK.Timer", 4);
     SetConfigValue<uint32>(CONFIG_BATTLEGROUND_REPORT_AFK, "Battleground.ReportAFK", 3, ConfigValueCache::Reloadable::Yes, [](uint32 const& value) { return value > 0 && value <= 9; }, "> 0 && value <= 9");
@@ -437,8 +437,8 @@ void WorldConfig::BuildConfigCache()
     SetConfigValue<uint32>(CONFIG_BATTLEGROUND_EYEOFTHESTORM_CAPTUREPOINTS, "Battleground.EyeOfTheStorm.CapturePoints", 1600);
 
     SetConfigValue<uint32>(CONFIG_ARENA_MAX_RATING_DIFFERENCE, "Arena.MaxRatingDifference", 150);
-    SetConfigValue<uint32>(CONFIG_ARENA_RATING_DISCARD_TIMER, "Arena.RatingDiscardTimer", 10);
-    SetConfigValue<uint32>(CONFIG_ARENA_PREV_OPPONENTS_DISCARD_TIMER, "Arena.PreviousOpponentsDiscardTimer", 2);
+    SetConfigValue<uint32>(CONFIG_ARENA_RATING_DISCARD_TIMER, "Arena.RatingDiscardTimer", 600000);
+    SetConfigValue<uint32>(CONFIG_ARENA_PREV_OPPONENTS_DISCARD_TIMER, "Arena.PreviousOpponentsDiscardTimer", 120000);
     SetConfigValue<bool>(CONFIG_ARENA_AUTO_DISTRIBUTE_POINTS, "Arena.AutoDistributePoints", false);
     SetConfigValue<uint32>(CONFIG_ARENA_AUTO_DISTRIBUTE_INTERVAL_DAYS, "Arena.AutoDistributeInterval", 7);
     SetConfigValue<uint32>(CONFIG_ARENA_GAMES_REQUIRED, "Arena.GamesRequired", 10);
@@ -456,7 +456,7 @@ void WorldConfig::BuildConfigCache()
     SetConfigValue<uint32>(CONFIG_ARENA_QUEUE_ANNOUNCER_DETAIL, "Arena.QueueAnnouncer.Detail", 3);
 
     SetConfigValue<bool>(CONFIG_OFFHAND_CHECK_AT_SPELL_UNLEARN, "OffhandCheckAtSpellUnlearn", true);
-    SetConfigValue<uint32>(CONFIG_CREATURE_STOP_FOR_PLAYER, "Creature.MovingStopTimeForPlayer", 3);
+    SetConfigValue<uint32>(CONFIG_CREATURE_STOP_FOR_PLAYER, "Creature.MovingStopTimeForPlayer", 180000);
 
     SetConfigValue<uint32>(CONFIG_WATER_BREATH_TIMER, "WaterBreath.Timer", 180000, ConfigValueCache::Reloadable::Yes, [](uint32 const& value) { return value > 0; }, "> 0");
 
@@ -639,7 +639,7 @@ void WorldConfig::BuildConfigCache()
     // LFG group mechanics.
     SetConfigValue<uint32>(CONFIG_LFG_MAX_KICK_COUNT, "LFG.MaxKickCount", 2, ConfigValueCache::Reloadable::Yes, [](uint32 const& value) { return value <= 3; }, "<= 3");
 
-    SetConfigValue<uint32>(CONFIG_LFG_KICK_PREVENTION_TIMER, "LFG.KickPreventionTimer", 15, ConfigValueCache::Reloadable::Yes, [](uint32 const& value) { return value <= 15 * MINUTE * IN_MILLISECONDS; }, "<= 15 * MINUTE * IN_MILLISECONDS");
+    SetConfigValue<uint32>(CONFIG_LFG_KICK_PREVENTION_TIMER, "LFG.KickPreventionTimer", 900, ConfigValueCache::Reloadable::Yes, [](uint32 const& value) { return value <= 15 * MINUTE * IN_MILLISECONDS; }, "<= 15 * MINUTE * IN_MILLISECONDS");
 
     // Realm Availability
     SetConfigValue<bool>(CONFIG_REALM_LOGIN_ENABLED, "World.RealmAvailability", true);
