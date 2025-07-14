@@ -41,12 +41,12 @@ enum RiverbreezeAndSilversky
     GOSSIP_MENU_RIVERBREEZE = 21400,
     GOSSIP_OPTION_BEACON = 0,
 
-    SILVERSKY_TEXT_1 = 2848,
-    SILVERSKY_TEXT_2 = 2845,
-    SILVERSKY_TEXT_3 = 2844,
-    RIVERBREEZE_TEXT_1 = 2849,
-    RIVERBREEZE_TEXT_2 = 2843,
-    RIVERBREEZE_TEXT_3 = 2842,
+    TEXT_SILVERSKY_1 = 2848,
+    TEXT_SILVERSKY_2 = 2845,
+    TEXT_SILVERSKY_3 = 2844,
+    TEXT_RIVERBREEZE_1 = 2849,
+    TEXT_RIVERBREEZE_2 = 2843,
+    TEXT_RIVERBREEZE_3 = 2842,
 };
 
 class npcs_riverbreeze_and_silversky : public CreatureScript
@@ -70,7 +70,7 @@ public:
         if (creature->IsQuestGiver())
             player->PrepareQuestMenu(creature->GetGUID());
 
-        uint32 creatureId = creature->GetEntry();
+        uint32 const creatureId = creature->GetEntry();
 
         if (creatureId == NPC_ARATHANDRIS_SILVERSKY)
         {
@@ -78,12 +78,13 @@ public:
             {
                 if (!player->HasItemCount(ITEM_CENARION_BEACON, 1, true))
                    AddGossipItemFor(player, GOSSIP_MENU_SILVERSKY, GOSSIP_OPTION_BEACON, GOSSIP_SENDER_MAIN, ACTION_CREATE_CENARION_BEACON);
+
                 SendGossipMenuFor(player, SILVERSKY_TEXT_1, creature->GetGUID());
             }
             else if (player->GetTeamId() == TEAM_HORDE)
-                SendGossipMenuFor(player, SILVERSKY_TEXT_2, creature->GetGUID());
+                SendGossipMenuFor(player, TEXT_SILVERSKY_2, creature->GetGUID());
             else
-                SendGossipMenuFor(player, SILVERSKY_TEXT_3, creature->GetGUID());
+                SendGossipMenuFor(player, TEXT_SILVERSKY_3, creature->GetGUID());
         }
 
         if (creatureId == NPC_MAYBESS_RIVERBREEZE)
@@ -92,12 +93,13 @@ public:
             {
                 if (!player->HasItemCount(ITEM_CENARION_BEACON, 1, true))
                     AddGossipItemFor(player, GOSSIP_MENU_RIVERBREEZE, GOSSIP_OPTION_BEACON, GOSSIP_SENDER_MAIN, ACTION_CREATE_CENARION_BEACON);
-                SendGossipMenuFor(player, RIVERBREEZE_TEXT_1, creature->GetGUID());
+
+                SendGossipMenuFor(player, TEXT_RIVERBREEZE_1, creature->GetGUID());
             }
             else if (player->GetTeamId() == TEAM_ALLIANCE)
-                SendGossipMenuFor(player, RIVERBREEZE_TEXT_2, creature->GetGUID());
+                SendGossipMenuFor(player, TEXT_RIVERBREEZE_2, creature->GetGUID());
             else
-                SendGossipMenuFor(player, RIVERBREEZE_TEXT_3, creature->GetGUID());
+                SendGossipMenuFor(player, TEXT_RIVERBREEZE_3, creature->GetGUID());
         }
 
         return true;
