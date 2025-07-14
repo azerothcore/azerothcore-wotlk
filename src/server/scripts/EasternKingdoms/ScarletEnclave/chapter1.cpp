@@ -671,6 +671,9 @@ public:
 
         void EventStart(Creature* anchor, Player* target)
         {
+            if (phase != PHASE_CHAINED)
+                return;
+
             wait_timer = 5000;
             phase = PHASE_TO_EQUIP;
 
@@ -823,16 +826,6 @@ class go_acherus_soul_prison : public GameObjectScript
 {
 public:
     go_acherus_soul_prison() : GameObjectScript("go_acherus_soul_prison") {}
-
-    bool OnGossipHello(Player* player, GameObject* go) override
-    {
-        if (Creature* anchor = go->FindNearestCreature(29521, 15))
-            if (ObjectGuid prisonerGUID = anchor->AI()->GetGUID())
-                if (Creature* prisoner = ObjectAccessor::GetCreature(*player, prisonerGUID))
-                    CAST_AI(npc_unworthy_initiate::npc_unworthy_initiateAI, prisoner->AI())->EventStart(anchor, player);
-
-        return false;
-    }
 
     struct go_acherus_soul_prisonAI : public GameObjectAI
     {
