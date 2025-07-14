@@ -426,6 +426,19 @@ void BattlegroundWS::HandleAreaTrigger(Player* player, uint32 trigger)
 
 bool BattlegroundWS::SetupBattleground()
 {
+    if (sBattlegroundMgr->IsBGWeekend(GetBgTypeID(true)))
+    {
+        _reputationCapture = 45;
+        _honorWinKills = 3;
+        _honorEndKills = 4;
+    }
+    else
+    {
+        _reputationCapture = 35;
+        _honorWinKills = 1;
+        _honorEndKills = 2;
+    }
+
     // flags
     AddObject(BG_WS_OBJECT_A_FLAG, BG_OBJECT_A_FLAG_WS_ENTRY, 1540.423f, 1481.325f, 351.8284f, 3.089233f, 0, 0, 0.9996573f, 0.02617699f, RESPAWN_IMMEDIATELY);
     AddObject(BG_WS_OBJECT_H_FLAG, BG_OBJECT_H_FLAG_WS_ENTRY, 916.0226f, 1434.405f, 345.413f, 0.01745329f, 0, 0, 0.008726535f, 0.9999619f, RESPAWN_IMMEDIATELY);
@@ -485,19 +498,6 @@ void BattlegroundWS::Init()
     _flagState[TEAM_ALLIANCE]       = BG_WS_FLAG_STATE_ON_BASE;
     _flagState[TEAM_HORDE]          = BG_WS_FLAG_STATE_ON_BASE;
     _lastFlagCaptureTeam            = TEAM_NEUTRAL;
-
-    if (sBattlegroundMgr->IsBGWeekend(GetBgTypeID(true)))
-    {
-        _reputationCapture = 45;
-        _honorWinKills = 3;
-        _honorEndKills = 4;
-    }
-    else
-    {
-        _reputationCapture = 35;
-        _honorWinKills = 1;
-        _honorEndKills = 2;
-    }
 
     uint32 bgWarsongFlagsConfig = sWorld->getIntConfig(CONFIG_BATTLEGROUND_WARSONG_FLAGS);
     _configurableMaxTeamScore = bgWarsongFlagsConfig > 0

@@ -1495,6 +1495,7 @@ namespace lfg
             for (LfgLockMap::const_iterator it2 = cachedLockMap.begin(); it2 != cachedLockMap.end() && !dungeons.empty(); ++it2)
             {
                 uint32 dungeonId = (it2->first & 0x00FFFFFF); // Compare dungeon ids
+
                 LfgDungeonSet::iterator itDungeon = dungeons.find(dungeonId);
                 if (itDungeon != dungeons.end())
                 {
@@ -1670,11 +1671,8 @@ namespace lfg
             }
             else if (group != grp)
             {
-                // pussywizard:
                 if (!grp->IsFull())
                     grp->AddMember(player);
-                //else // some cleanup? LeaveLFG?
-                //  ;
             }
 
             grp->SetLfgRoles(pguid, proposal.players.find(pguid)->second.role);
