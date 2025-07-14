@@ -29,7 +29,6 @@ enum RiverbreezeAndSilversky
 {
     SPELL_CENARION_BEACON       = 15120,
     ITEM_CENARION_BEACON        = 11511,
-    ACTION_CREATE_CENARION_BEACON = GOSSIP_ACTION_INFO_DEF + 1,
 
     NPC_ARATHANDRIS_SILVERSKY   = 9528,
     NPC_MAYBESS_RIVERBREEZE     = 9529,
@@ -58,7 +57,7 @@ public:
     bool OnGossipSelect(Player* player, Creature* creature, uint32 /*sender*/, uint32 action) override
     {
         ClearGossipMenuFor(player);
-        if (action == ACTION_CREATE_CENARION_BEACON)
+        if (action == GOSSIP_ACTION_INFO_DEF + 1)
         {
             CloseGossipMenuFor(player);
             creature->CastSpell(player, SPELL_CENARION_BEACON, false);
