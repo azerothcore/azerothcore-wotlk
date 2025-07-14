@@ -18,6 +18,7 @@
 #include "CombatAI.h"
 #include "CreatureScript.h"
 #include "CreatureTextMgr.h"
+#include "GameObjectAI.h"
 #include "GameObjectScript.h"
 #include "MoveSplineInit.h"
 #include "ObjectMgr.h"
@@ -821,7 +822,7 @@ public:
 class go_acherus_soul_prison : public GameObjectScript
 {
 public:
-    go_acherus_soul_prison() : GameObjectScript("go_acherus_soul_prison") { }
+    go_acherus_soul_prison() : GameObjectScript("go_acherus_soul_prison") {}
 
     bool OnGossipHello(Player* player, GameObject* go) override
     {
@@ -831,6 +832,26 @@ public:
                     CAST_AI(npc_unworthy_initiate::npc_unworthy_initiateAI, prisoner->AI())->EventStart(anchor, player);
 
         return false;
+    }
+
+    struct go_acherus_soul_prisonAI : public GameObjectAI
+    {
+        go_acherus_soul_prisonAI(GameObject* go) : GameObjectAI(go) {}
+
+        bool GossipHello(Player* player, bool /*reportUse*/) override
+        {
+            if (Creature* anchor = me->FindNearestCreature(29521, 15))
+                if (ObjectGuid prisonerGUID = anchor->AI()->GetGUID())
+                    if (Creature* prisoner = ObjectAccessor::GetCreature(*player, prisonerGUID))
+                        CAST_AI(npc_unworthy_initiate::npc_unworthy_initiateAI, prisoner->AI())->EventStart(anchor, player);
+
+            return false;
+        }
+    };
+
+    GameObjectAI* GetAI(GameObject* go) const override
+    {
+        return new go_acherus_soul_prisonAI(go);
     }
 };
 
