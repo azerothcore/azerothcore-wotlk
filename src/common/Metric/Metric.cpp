@@ -107,18 +107,18 @@ void Metric::LoadFromConfigs()
         }
 
         std::vector<std::string_view> tokens = Acore::Tokenize(connectionInfo, ';', true);
+
+        if (tokens.size() != 3)
+        {
+            LOG_ERROR("metric", "Metric.InfluxDB.Connection specified with wrong format in configuration file.");
+            return;
+        }
         _hostname.assign(tokens[0]);
         _port.assign(tokens[1]);
 
         _useV2 = sConfigMgr->GetOption<bool>("Metric.InfluxDB.v2", false);
         if (_useV2)
         {
-            if (tokens.size() != 2)
-            {
-                LOG_ERROR("metric", "Metric.InfluxDB.Connection specified with wrong format in configuration file.");
-                return;
-            }
-
             _org = sConfigMgr->GetOption<std::string>("Metric.InfluxDB.Org", "");
             _bucket = sConfigMgr->GetOption<std::string>("Metric.InfluxDB.Bucket", "");
             _token = sConfigMgr->GetOption<std::string>("Metric.InfluxDB.Token", "");
@@ -131,12 +131,6 @@ void Metric::LoadFromConfigs()
         }
         else
         {
-            if (tokens.size() != 3)
-            {
-                LOG_ERROR("metric", "Metric.InfluxDB.Connection specified with wrong format in configuration file.");
-                return;
-            }
-
             _databaseName.assign(tokens[2]);
         }
 
