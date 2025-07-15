@@ -1067,7 +1067,7 @@ class spell_mage_arcane_concentration : public AuraScript
 {
     PrepareAuraScript(spell_mage_arcane_concentration);
 
-    bool Load()
+    bool Load() override
     {
         BlizzardlastTick = 0;
         return true;
