@@ -29,23 +29,18 @@
 #define SEND_MSG_NEAR_LOSE              120
 
 #define BG_AV_KILL_BOSS                 4
-#define BG_AV_REP_BOSS                  (sWorld->getIntConfig(CONFIG_BATTLEGROUND_ALTERAC_REP_ONBOSSDEATH)) // Blizzlike default is 350
 
 #define BG_AV_KILL_CAPTAIN              3
-#define BG_AV_REP_CAPTAIN               125
 #define BG_AV_RES_CAPTAIN               100
 
 #define BG_AV_KILL_TOWER                3
-#define BG_AV_REP_TOWER                 12
 #define BG_AV_RES_TOWER                 75
 
 #define BG_AV_GET_COMMANDER             1 //for a safely returned wingcommander
 //bonushonor at the end
 #define BG_AV_KILL_SURVIVING_TOWER      2
-#define BG_AV_REP_SURVIVING_TOWER       12
 
 #define BG_AV_KILL_SURVIVING_CAPTAIN    2
-#define BG_AV_REP_SURVIVING_CAPTAIN     125
 
 #define AV_EVENT_START_BATTLE           9166 // Achievement: The Alterac Blitz
 
@@ -1546,7 +1541,7 @@ enum BG_AV_States
     POINT_NEUTRAL              =  0,
     POINT_ASSAULTED            =  1,
     POINT_DESTROYED            =  2,
-    POINT_CONTROLED            =  3
+    POINT_CONTROLLED            =  3
 };
 
 //alliance_control neutral_control horde_control
@@ -1847,6 +1842,14 @@ private:
     uint32 m_Mine_Reclaim_Timer[2] {};
     uint32 m_CaptainBuffTimer[2] {};
     bool m_CaptainAlive[2] {};
+
+    uint32 _reputationTower = 0; // 12, 18
+    uint32 _reputationCaptain = 0; // 125, 185
+    uint32 _reputationBoss = 0; // 350, 525
+    uint32 _reputationPerOwnedGraveyard = 0; // 12, 18
+    uint32 _reputationSurvivingCaptain = 0; // 125, 175
+    uint32 _reputationSurvivingTower = 0; // 12, 18
+    uint32 _reputationPerOwnedMine = 0; // 24, 36
 
     bool m_IsInformedNearVictory[2] {};
 };

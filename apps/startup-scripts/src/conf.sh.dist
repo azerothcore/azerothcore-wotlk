@@ -51,7 +51,7 @@ export SCREEN_OPTIONS="${RUN_ENGINE_SCREEN_OPTIONS:-}"
 # If disabled, output will be redirected to logging files
 export WITH_CONSOLE="${RUN_ENGINE_WITH_CONSOLE:-0}"
 
-# Server PID (needed when GDB_ENABLED=1)
-export SERVERPID="${RUN_ENGINE_SERVERPID:-}"
+# Restart policy (on-failure|always)
+export RESTART_POLICY="always"
 
 

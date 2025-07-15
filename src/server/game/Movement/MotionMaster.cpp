@@ -969,6 +969,20 @@ MovementGeneratorType MotionMaster::GetMotionSlotType(int slot) const
         return Impl[slot]->GetMovementGeneratorType();
 }
 
+bool MotionMaster::HasMovementGeneratorType(MovementGeneratorType type) const
+{
+    if (empty() && type == IDLE_MOTION_TYPE)
+        return true;
+
+    for (int i = _top; i >= 0; --i)
+    {
+        if (Impl[i] && Impl[i]->GetMovementGeneratorType() == type)
+            return true;
+    }
+
+    return false;
+}
+
 // Xinef: Escort system
 uint32 MotionMaster::GetCurrentSplineId() const
 {
