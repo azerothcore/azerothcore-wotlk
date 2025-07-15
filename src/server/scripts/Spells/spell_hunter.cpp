@@ -1357,6 +1357,7 @@ class spell_hun_explosive_shot : public SpellScript
         // Handling of explosive shot initial cast without LnL proc
         if (!GetCaster() || !GetCaster()->IsPlayer())
             return;
+
         if (!GetCaster()->HasAura(SPELL_LOCK_AND_LOAD_TRIGGER))
             GetSpell()->TakeAmmo();
     }
