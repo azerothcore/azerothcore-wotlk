@@ -52,14 +52,12 @@ const Position startPath[WAYPOINTS_COUNT] =
 
 struct boss_captain_skarloc : public BossAI
 {
-    boss_captain_skarloc(Creature* creature) : BossAI(creature, DATA_CAPTAIN_SKARLOC), summons(me)
+    boss_captain_skarloc(Creature* creature) : BossAI(creature, DATA_CAPTAIN_SKARLOC), summons(me), _spawnedAdds(false)
     {
         scheduler.SetValidator([this]
         {
             return !me->HasUnitState(UNIT_STATE_CASTING);
         });
-
-        me->SetReactState(REACT_PASSIVE);
     }
 
     SummonList summons;
@@ -80,6 +78,7 @@ struct boss_captain_skarloc : public BossAI
             thrall->AI()->JustSummoned(summon);
         }
         summon->SetImmuneToAll(true);
+        summon->SetReactState(REACT_PASSIVE);
         if (summon->GetEntry() == NPC_SKARLOC_MOUNT)
             return;
 
@@ -104,6 +103,7 @@ struct boss_captain_skarloc : public BossAI
         }
         me->GetMotionMaster()->MoveSplinePath(&path);
         me->SetImmuneToAll(true);
+        me->SetReactState(REACT_PASSIVE);
         me->Mount(SKARLOC_MOUNT_MODEL);
     }
 
@@ -142,12 +142,12 @@ struct boss_captain_skarloc : public BossAI
 
         if (me->movespline->Finalized())
         {
-            me->SetReactState(REACT_AGGRESSIVE);
             Talk(SAY_ENTER, 500ms);
 
             me->m_Events.AddEventAtOffset([this]()
             {
                 me->SetImmuneToAll(false);
+                me->SetReactState(REACT_AGGRESSIVE);
                 me->SetInCombatWithZone();
                 summons.DoForAllSummons([&](WorldObject* summon)
                 {
@@ -156,6 +156,7 @@ struct boss_captain_skarloc : public BossAI
                         if (adds->GetEntry() != NPC_SKARLOC_MOUNT)
                         {
                             adds->SetImmuneToAll(false);
+                            adds->SetReactState(REACT_AGGRESSIVE);
                             adds->SetInCombatWithZone();
                         }
                     }
