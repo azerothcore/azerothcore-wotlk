@@ -1,3 +1,4 @@
+-- DB update 2025_07_15_00 -> 2025_07_15_01
 -- Update creature '[DNT] Torch Tossing Target Bunny Controller' with sniffed values
 -- updated spawns
 DELETE FROM `creature` WHERE (`id1` IN (25536)) AND (`guid` IN (46914));
