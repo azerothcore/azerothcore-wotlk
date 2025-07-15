@@ -1161,5 +1161,5 @@ void AddSC_mage_spell_scripts()
     RegisterSpellScript(spell_mage_summon_water_elemental);
     RegisterSpellScript(spell_mage_fingers_of_frost_proc_aura);
     RegisterSpellScript(spell_mage_fingers_of_frost_proc);
-	RegisterSpellScript(spell_mage_arcane_concentration);
+    RegisterSpellScript(spell_mage_arcane_concentration);
 }
