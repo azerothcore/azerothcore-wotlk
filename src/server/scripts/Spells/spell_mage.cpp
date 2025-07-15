@@ -1062,6 +1062,80 @@ class spell_mage_fingers_of_frost_proc : public AuraScript
     }
 };
 
+// -11213, Arcane Concentration
+class spell_mage_arcane_concentration : public AuraScript
+{
+    PrepareAuraScript(spell_mage_arcane_concentration);
+
+    bool Load()
+    {
+        BlizzardlastTick = 0;
+        return true;
+    }
+
+    bool CheckProc(ProcEventInfo& eventInfo)
+    {
+        Spell const* procSpell = eventInfo.GetProcSpell();
+        Player* owner = GetOwner()->ToPlayer();
+        if (!procSpell || !owner)
+            return false;
+
+        DamageInfo* damageInfo = eventInfo.GetDamageInfo();
+
+        // handle Blizzard ourselves
+        if (procSpell->m_spellInfo->GetFirstRankSpell()->Id == 42208)
+        {
+            if (damageInfo && eventInfo.GetDamageInfo()->GetDamage())
+            {
+                if (BlizzardlastTick < procSpell->GetTriggeredByAuraTickNumber())
+                {
+                    if (roll_chance_i(GetSpellInfo()->ProcChance))
+                    {
+                        if (Aura* Clearcasting = owner->GetAura(12536))
+                            Clearcasting->RefreshDuration();
+                        else
+                            owner->AddAura(12536, owner);
+                    }
+
+                    BlizzardlastTick = procSpell->GetTriggeredByAuraTickNumber();
+                }
+            }
+
+            return false;
+        }
+
+        return true;
+    }
+
+    void CalcPeriodic(AuraEffect const* /*aurEff*/, bool& isPeriodic, int32& amplitude)
+    {
+        isPeriodic = true;
+        amplitude = 200;
+    }
+
+    void HandleUpdatePeriodic(AuraEffect* aurEff)
+    {
+        Player* owner = GetOwner()->ToPlayer();
+        if (!owner)
+            return;
+
+        aurEff->CalculatePeriodic(owner);
+
+        if (!owner->GetAuraOfRankedSpell(10)) // Casting Blizzard
+            BlizzardlastTick = 0;
+    }
+
+    void Register() override
+    {
+        DoCheckProc += AuraCheckProcFn(spell_mage_arcane_concentration::CheckProc);
+        DoEffectCalcPeriodic += AuraEffectCalcPeriodicFn(spell_mage_arcane_concentration::CalcPeriodic, EFFECT_0, SPELL_AURA_PROC_TRIGGER_SPELL);
+        OnEffectUpdatePeriodic += AuraEffectUpdatePeriodicFn(spell_mage_arcane_concentration::HandleUpdatePeriodic, EFFECT_0, SPELL_AURA_PROC_TRIGGER_SPELL);
+    }
+
+private:
+    uint32 BlizzardlastTick;
+};
+
 void AddSC_mage_spell_scripts()
 {
     RegisterSpellScript(spell_mage_arcane_blast);
@@ -1087,4 +1161,5 @@ void AddSC_mage_spell_scripts()
     RegisterSpellScript(spell_mage_summon_water_elemental);
     RegisterSpellScript(spell_mage_fingers_of_frost_proc_aura);
     RegisterSpellScript(spell_mage_fingers_of_frost_proc);
+	RegisterSpellScript(spell_mage_arcane_concentration);
 }
