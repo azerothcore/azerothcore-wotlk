@@ -107,7 +107,6 @@ void Metric::LoadFromConfigs()
         }
 
         std::vector<std::string_view> tokens = Acore::Tokenize(connectionInfo, ';', true);
-
         if (tokens.size() != 3)
         {
             LOG_ERROR("metric", "Metric.InfluxDB.Connection specified with wrong format in configuration file.");
