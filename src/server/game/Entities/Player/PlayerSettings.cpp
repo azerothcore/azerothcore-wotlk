@@ -62,7 +62,7 @@ void Player::_LoadCharacterSettings(PreparedQueryResult result)
 PlayerSetting Player::GetPlayerSetting(const std::string& source, uint8 index)
 {
     auto it = m_charSettingsMap.find(source);
-    if (it == m_charSettingsMap.end() || index >= it->second.size())
+    if (it == m_charSettingsMap.end() || static_cast<size_t>(index) >= it->second.size())
     {
         UpdatePlayerSetting(source, index, 0);
         return m_charSettingsMap[source][index];
