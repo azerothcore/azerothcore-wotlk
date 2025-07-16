@@ -135,6 +135,9 @@ export CONFIG="/path/to/worldserver.conf"
 export SESSION_MANAGER="tmux"  # none|auto|tmux|screen
 export SESSION_NAME="ac-world"
 
+# Interactive mode control
+export AC_DISABLE_INTERACTIVE="0"  # Set to 1 to disable interactive prompts (useful for non-interactive services)
+
 # Debugging
 export GDB_ENABLED="1"  # 0 or 1
 export GDB="/path/to/gdb.conf"
@@ -254,6 +257,29 @@ Production-ready service management:
 
 # Force systemd
 ./service-manager.sh create world worldserver --provider systemd --bin-path /path/to/bin
+
+# Create service with restart policy
+./service-manager.sh create world worldserver --bin-path /path/to/bin --restart-policy always
+```
+
+#### Restart Policies
+
+Services support two restart policies:
+
+- **`on-failure`** (default): Restart only on crashes or errors (exit code != 0, only works with PM2 or systemd without tmux/screen)
+- **`always`**: Restart on any exit, including clean shutdown (exit code 0)
+
+**Important**: When using `--restart-policy always`, the in-game command `server shutdown X` will behave like `server restart X` - the service will automatically restart after shutdown. Only the shutdown message differs from a restart message.
+
+```bash
+# Service that restarts only on crashes (default behavior)
+./service-manager.sh create auth authserver --bin-path /path/to/bin --restart-policy on-failure
+
+# Service that always restarts (even on manual shutdown)
+./service-manager.sh create world worldserver --bin-path /path/to/bin --restart-policy always
+
+# Update existing service restart policy
+./service-manager.sh update worldserver --restart-policy always
 ```
 
 #### Service Operations
@@ -293,19 +319,22 @@ Production-ready service management:
 ### Method 1: Using Service Manager (Recommended)
 
 ```bash
-# Create multiple world server instances
+# Create multiple world server instances with different restart policies
 ./service-manager.sh create world1 worldserver \
   --bin-path /path/to/bin \
-  --server-config /path/to/worldserver-realm1.conf
+  --server-config /path/to/worldserver-realm1.conf \
+  --restart-policy on-failure
 
 ./service-manager.sh create world2 worldserver \
   --bin-path /path/to/bin \
-  --server-config /path/to/worldserver-realm2.conf
+  --server-config /path/to/worldserver-realm2.conf \
+  --restart-policy always
 
-# Single auth server for all realms
+# Single auth server for all realms (always restart for stability)
 ./service-manager.sh create auth authserver \
   --bin-path /path/to/bin \
-  --server-config /path/to/authserver.conf
+  --server-config /path/to/authserver.conf \
+  --restart-policy always
 ```
 
 ### Method 2: Using Run Engine with Different Configurations
@@ -372,6 +401,29 @@ pm2 save
 pm2 startup                # Auto-start on boot
 ```
 
+NOTE: pm2 cannot run tmux/screen sessions, but you can always use the `attach` command to connect to the service console because pm2 supports interactive mode.
+
+### Environment Variables
+
+The startup scripts recognize several environment variables for configuration and runtime behavior:
+
+#### Service Detection Variables
+
+- **`AC_LAUNCHED_BY_PM2`**: Set to `1` when launched by PM2 (automatically set by service-manager)
+  - Disables the use of the `unbuffer` command for output capture
+  - Enables non-interactive mode to prevent prompts
+  - More robust than relying on PM2's internal variables
+  
+- **`AC_DISABLE_INTERACTIVE`**: Controls interactive mode (0=enabled, 1=disabled)
+  - Automatically set based on execution context
+  - Prevents AzerothCore from showing interactive prompts in service environments
+
+#### Configuration Variables
+
+- **`RUN_ENGINE_*`**: See [Configuration](#configuration) section for complete list
+- **`SERVICE_MODE`**: Set to `true` to enable service-specific behavior
+- **`SESSION_MANAGER`**: Override session manager choice (tmux, screen, none, auto)
+
 ### Systemd Services
 
 When using systemd as the service provider:
@@ -387,6 +439,11 @@ systemctl --user enable acore-auth     # Enable auto-start
 sudo systemctl status acore-auth
 sudo systemctl enable acore-auth
 ```
+
+**Enhanced systemd Integration:**
+- **Automatic Service Type**: When using session managers (tmux/screen), services are automatically configured with `Type=forking` for proper daemon behavior
+- **Smart ExecStop**: Services with session managers get automatic `ExecStop` commands to properly terminate tmux/screen sessions when stopping the service
+- **Non-Interactive Mode**: Services without session managers automatically set `AC_DISABLE_INTERACTIVE=1` to prevent hanging on prompts
 
 ### Session Management in Services
 

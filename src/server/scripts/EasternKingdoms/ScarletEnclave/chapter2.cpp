@@ -28,161 +28,6 @@
 #include "ObjectAccessor.h"
 #include <limits>
 
-//How to win friends and influence enemies
-// texts signed for creature 28939 but used for 28939, 28940, 28610
-enum win_friends
-{
-    SAY_AGGRO                         = 0,
-    SAY_CRUSADER                      = 1,
-    SAY_PERSUADED1                    = 2,
-    SAY_PERSUADED2                    = 3,
-    SAY_PERSUADED3                    = 4,
-    SAY_PERSUADED4                    = 5,
-    SAY_PERSUADED5                    = 6,
-    SAY_PERSUADED6                    = 7,
-    SAY_PERSUADE_RAND                 = 8,
-    SPELL_PERSUASIVE_STRIKE           = 52781,
-    SPELL_THREAT_PULSE                = 58111,
-    QUEST_HOW_TO_WIN_FRIENDS          = 12720,
-};
-
-class npc_crusade_persuaded : public CreatureScript
-{
-public:
-    npc_crusade_persuaded() : CreatureScript("npc_crusade_persuaded") { }
-
-    CreatureAI* GetAI(Creature* creature) const override
-    {
-        return new npc_crusade_persuadedAI(creature);
-    }
-
-    struct npc_crusade_persuadedAI : public CombatAI
-    {
-        npc_crusade_persuadedAI(Creature* creature) : CombatAI(creature) { }
-
-        const uint32 SAY_AGGRO_CHANCE = 33;
-        const uint32 PERSUADE_SUCCESS_CHANCE = 3; // 30% chance
-        const uint32 SPEECH_TIMER_DEFAULT = 1000;
-        const uint32 SPEECH_TIMER_FOR_ROLEPLAY = 8000;
-        const uint32 SPEECH_COUNTER_PREVENT_SUCCESS_ROLEPLAY = 0;
-        const uint32 SPEECH_COUNTER_START_SUCCESS_ROLEPLAY = 1;
-
-        uint32 speechTimer;
-        uint32 speechCounter;
-        ObjectGuid playerGUID;
-        bool persuaded;
-
-        void Reset() override
-        {
-            speechTimer = 0;
-            speechCounter = SPEECH_COUNTER_PREVENT_SUCCESS_ROLEPLAY;
-            playerGUID.Clear();
-            me->SetReactState(REACT_AGGRESSIVE);
-            me->RestoreFaction();
-        }
-
-        void JustEngagedWith(Unit*) override
-        {
-            if (roll_chance_i(SAY_AGGRO_CHANCE))
-                Talk(SAY_AGGRO);
-        }
-
-        void SpellHit(Unit* caster, SpellInfo const* spell) override
-        {
-            if (spell->Id == SPELL_PERSUASIVE_STRIKE && caster->IsPlayer() && me->IsAlive() && !speechCounter)
-            {
-                if (Player* player = caster->ToPlayer())
-                {
-                    playerGUID = player->GetGUID();
-                    speechTimer = SPEECH_TIMER_DEFAULT;
-                    speechCounter = SPEECH_COUNTER_START_SUCCESS_ROLEPLAY;
-                    uint32 persuadeRoll = urand(1, 10);
-
-                    sCreatureTextMgr->SendChat(me, SAY_PERSUADE_RAND, nullptr, CHAT_MSG_ADDON, LANG_ADDON, TEXT_RANGE_NORMAL, 0, TEAM_NEUTRAL, false, player);
-
-                    if (persuadeRoll <= PERSUADE_SUCCESS_CHANCE && player->GetQuestStatus(QUEST_HOW_TO_WIN_FRIENDS) == QUEST_STATUS_INCOMPLETE)
-                    {
-                        persuaded = true;
-                        me->SetFaction(player->GetFaction());
-                        me->CombatStop(true);
-                        me->GetMotionMaster()->MoveIdle();
-                        me->SetReactState(REACT_PASSIVE);
-                    }
-                    else
-                        persuaded = false;
-                }
-            }
-        }
-
-        void UpdateAI(uint32 diff) override
-        {
-            if (speechCounter)
-            {
-                if (speechTimer <= diff)
-                {
-                    Player* player = ObjectAccessor::GetPlayer(*me, playerGUID);
-                    if (!player)
-                    {
-                        EnterEvadeMode();
-                        return;
-                    }
-
-                    if (persuaded)
-                    {
-                        switch (speechCounter)
-                        {
-                        case 1:
-                            Talk(SAY_PERSUADED1);
-                            speechTimer = SPEECH_TIMER_FOR_ROLEPLAY;
-                            break;
-
-                        case 2:
-                            Talk(SAY_PERSUADED2);
-                            speechTimer = SPEECH_TIMER_FOR_ROLEPLAY;
-                            break;
-
-                        case 3:
-                            Talk(SAY_PERSUADED3);
-                            speechTimer = SPEECH_TIMER_FOR_ROLEPLAY;
-                            break;
-
-                        case 4:
-                            Talk(SAY_PERSUADED4);
-                            speechTimer = SPEECH_TIMER_FOR_ROLEPLAY;
-                            break;
-
-                        case 5:
-                            sCreatureTextMgr->SendChat(me, SAY_PERSUADED5, nullptr, CHAT_MSG_ADDON, LANG_ADDON, TEXT_RANGE_NORMAL, 0, TEAM_NEUTRAL, false, player);
-                            speechTimer = SPEECH_TIMER_FOR_ROLEPLAY;
-                            break;
-
-                        case 6:
-                            Talk(SAY_PERSUADED6);
-                            Unit::Kill(player, me);
-                            speechCounter = SPEECH_COUNTER_PREVENT_SUCCESS_ROLEPLAY;
-                            player->GroupEventHappens(QUEST_HOW_TO_WIN_FRIENDS, me);
-                            return;
-                        }
-
-                        ++speechCounter;
-                    }
-                    else
-                    {
-                        Talk(SAY_CRUSADER);
-                        speechCounter = SPEECH_COUNTER_PREVENT_SUCCESS_ROLEPLAY;
-                    }
-                }
-                else
-                    speechTimer = (speechTimer > diff) ? (speechTimer - diff) : 0;
-
-                return;
-            }
-
-            CombatAI::UpdateAI(diff);
-        }
-    };
-};
-
 /*######
 ## npc_koltira_deathweaver
 ######*/
@@ -1098,12 +943,135 @@ public:
     }
 };
 
+//How to win friends and influence enemies
+// texts signed for creature 28939 but used for 28939, 28940, 28610
+enum win_friends
+{
+    SAY_CRUSADER             = 1,
+    SAY_PERSUADED1           = 2,
+    SAY_PERSUADED2           = 3,
+    SAY_PERSUADED3           = 4,
+    SAY_PERSUADED4           = 5,
+    SAY_PERSUADED5           = 6,
+    SAY_PERSUADED6           = 7,
+    SAY_PERSUADE_RAND        = 8,
+    QUEST_HOW_TO_WIN_FRIENDS = 12720,
+
+    NPC_SCARLET_PREACHER     = 28939,
+    NPC_SCARLET_COMMANDER    = 28936,
+    NPC_SCARLET_CRUSADER     = 28940,
+    NPC_SCARLET_MARKSMAN     = 28610,
+    NPC_SCARLET_LORD_MCCREE  = 28964
+};
+
+// 52781 - Persuasive Strike
+class spell_chapter2_persuasive_strike : public SpellScript
+{
+    PrepareSpellScript(spell_chapter2_persuasive_strike);
+
+    bool Load() override
+    {
+        return GetCaster() && GetCaster()->IsPlayer()
+            && GetCaster()->ToPlayer()->GetQuestStatus(QUEST_HOW_TO_WIN_FRIENDS) == QUEST_STATUS_INCOMPLETE;
+    }
+
+    void HandleHit(SpellEffIndex /*effIndex*/)
+    {
+        Creature* creature = GetHitCreature();
+        Player* player = GetCaster()->ToPlayer();
+
+        if (!creature || !player)
+            return;
+
+        if (!creature->EntryEquals(NPC_SCARLET_PREACHER, NPC_SCARLET_COMMANDER, NPC_SCARLET_CRUSADER, NPC_SCARLET_MARKSMAN, NPC_SCARLET_LORD_MCCREE))
+            return;
+
+        sCreatureTextMgr->SendChat(creature, SAY_PERSUADE_RAND, nullptr, CHAT_MSG_ADDON, LANG_ADDON, TEXT_RANGE_NORMAL, 0, TEAM_NEUTRAL, false, player);
+
+        if (roll_chance_f(30.0f))
+        {
+            creature->CombatStop(true);
+            creature->GetMotionMaster()->MoveIdle();
+            creature->SetImmuneToPC(true);
+            creature->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
+            creature->SetReactState(REACT_PASSIVE);
+
+            creature->AI()->Talk(SAY_PERSUADED1, 8s);
+            creature->AI()->Talk(SAY_PERSUADED2, 16s);
+            creature->AI()->Talk(SAY_PERSUADED3, 24s);
+            creature->AI()->Talk(SAY_PERSUADED4, 32s);
+
+            creature->m_Events.AddEventAtOffset([creature, player]
+            {
+                if (player)
+                    sCreatureTextMgr->SendChat(creature, SAY_PERSUADED5, nullptr, CHAT_MSG_ADDON, LANG_ADDON, TEXT_RANGE_NORMAL, 0, TEAM_NEUTRAL, false, player);
+            }, 40s);
+
+            creature->m_Events.AddEventAtOffset([creature, player]
+            {
+                creature->AI()->Talk(SAY_PERSUADED6);
+                if (player)
+                {
+                    Unit::Kill(player, creature);
+                    player->GroupEventHappens(QUEST_HOW_TO_WIN_FRIENDS, creature);
+                }
+            }, 48s);
+        }
+        else
+            creature->AI()->Talk(SAY_CRUSADER, 1s);
+    }
+
+    void Register() override
+    {
+        OnEffectHitTarget += SpellEffectFn(spell_chapter2_persuasive_strike::HandleHit, EFFECT_0, SPELL_EFFECT_DUMMY);
+    }
+};
+
+enum AcherusPortal
+{
+    SPELL_PORTAL_EFFECT_ACHERUS   = 53098,
+    QUEST_SCARLET_ARMIES_APPROACH = 12757
+};
+
+class spell_portal_effect_acherus : public SpellScript
+{
+    PrepareSpellScript(spell_portal_effect_acherus);
+
+    bool Validate(SpellInfo const* /*spellInfo*/) override
+    {
+        return ValidateSpellInfo({ SPELL_PORTAL_EFFECT_ACHERUS });
+    }
+
+    SpellCastResult CheckCast()
+    {
+        Unit* target = GetExplTargetUnit();
+        if (target && target->IsPlayer() && target->ToPlayer()->HasQuest(QUEST_SCARLET_ARMIES_APPROACH))
+            return SPELL_CAST_OK;
+
+        return SPELL_FAILED_DONT_REPORT;
+    }
+
+    void HandleScriptEffect(SpellEffIndex /*effIndex*/)
+    {
+        if (Unit* caster = GetCaster())
+            if (Player* player = GetHitPlayer())
+                caster->CastSpell(player, GetEffectValue(), true);
+    }
+
+    void Register() override
+    {
+        OnCheckCast += SpellCheckCastFn(spell_portal_effect_acherus::CheckCast);
+        OnEffectHitTarget += SpellEffectFn(spell_portal_effect_acherus::HandleScriptEffect, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
+    }
+};
+
 void AddSC_the_scarlet_enclave_c2()
 {
-    new npc_crusade_persuaded();
     new npc_scarlet_courier();
     new npc_koltira_deathweaver();
     new npc_a_special_surprise();
     new npc_acherus_necromancer();
     new npc_gothik_the_harvester();
+    RegisterSpellScript(spell_chapter2_persuasive_strike);
+    RegisterSpellScript(spell_portal_effect_acherus);
 }
