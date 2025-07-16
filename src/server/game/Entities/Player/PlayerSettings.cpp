@@ -76,7 +76,7 @@ void Player::_SavePlayerSettings(CharacterDatabaseTransaction trans)
     if (!sWorld->getBoolConfig(CONFIG_PLAYER_SETTINGS_ENABLED))
         return;
 
-    for (const auto& [source, settings] : m_charSettingsMap)
+    for (auto const& [source, settings] : m_charSettingsMap)
     {
         if (settings.empty())
             continue;
