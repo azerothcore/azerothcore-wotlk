@@ -51,7 +51,7 @@ void Player::_LoadCharacterSettings(PreparedQueryResult result)
 
             // Try to parse the value safely
             if (auto parsed = Acore::StringTo<uint32>(token))
-                settings.push_back(PlayerSetting{ *parsed });
+                settings.emplace_back(*parsed);
         }
 
         m_charSettingsMap.emplace(std::move(source), std::move(settings));
