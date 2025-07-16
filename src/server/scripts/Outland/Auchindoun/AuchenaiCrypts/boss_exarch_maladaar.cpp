@@ -262,8 +262,7 @@ struct npc_stolen_soul : public ScriptedAI
 
     void JustDied(Unit* /*killer*/) override
     {
-        auto target = ObjectAccessor::GetUnit(*me, _targetGuid);
-        if (target)
+        if (Unit* target = ObjectAccessor::GetUnit(*me, _targetGuid))
             target->RemoveAurasDueToSpell(SPELL_STOLEN_SOUL);
     }
 
