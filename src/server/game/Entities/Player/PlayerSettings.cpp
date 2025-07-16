@@ -95,7 +95,7 @@ void Player::_SavePlayerSettings(CharacterDatabaseTransaction trans)
     }
 }
 
-void Player::UpdatePlayerSetting(const std::string& source, uint8 index, uint32 value)
+void Player::UpdatePlayerSetting(std::string const& source, uint8 index, uint32 value)
 {
     auto it = m_charSettingsMap.find(source);
     size_t const requiredSize = static_cast<size_t>(index) + 1;
