@@ -1,4 +1,4 @@
-SET @GUID = 0;
+SET @GUID = 67061;
 
 DELETE FROM `creature` WHERE `id1` IN (3296, 5595, 15383, 15431, 15432, 15434, 15437, 15445, 15446, 15448, 15450, 15451, 15452, 15453, 15455, 15456, 15457, 15458, 15459, 15460, 15469, 15477, 15508, 15512, 15515, 15522, 15525, 15528, 15529, 15532, 15533, 15534, 15535, 15539, 15663, 15696, 15700, 15701, 15702, 15703, 15704, 15707, 15708, 15709, 15731, 15733, 15734, 15735, 15736, 15737, 15738, 15739, 15761, 15762, 15763, 15764, 15765, 15766, 15767, 15768) AND `guid` BETWEEN @GUID AND @GUID+69;
 INSERT INTO `creature` (`guid`, `id1`, `id2`, `id3`, `map`, `zoneId`, `areaId`, `spawnMask`, `phaseMask`, `equipment_id`, `position_x`, `position_y`, `position_z`, `orientation`, `spawntimesecs`, `wander_distance`, `currentwaypoint`, `curhealth`, `curmana`, `MovementType`, `npcflag`, `unit_flags`, `dynamicflags`, `ScriptName`, `VerifiedBuild`, `CreateObject`, `Comment`) VALUES
@@ -76,4 +76,7 @@ INSERT INTO `creature` (`guid`, `id1`, `id2`, `id3`, `map`, `zoneId`, `areaId`, 
 (@GUID+66, 15765, 0, 0, 1, 0, 0, 1, 1, 0, 1911.704,   -4276.771,  31.655682,  4.886921882629394531, 300, 0, 0, 2914, 0, 0, 0, 0, 0, '', 61582, 1, NULL), -- Officer Redblade <Orgrimmar Commendations>
 (@GUID+67, 15766, 0, 0, 0, 0, 0, 1, 1, 0, -8859.14,   638.28687,  96.34692,   1.815142393112182617, 300, 0, 0, 2614, 0, 0, 0, 0, 0, '', 61582, 1, NULL), -- Officer Maloof <Stormwind Commendations>
 (@GUID+68, 15767, 0, 0, 1, 0, 0, 1, 1, 0, -1246.4849, 74.262695,  128.36818,  5.026548385620117187, 300, 0, 0, 2614, 0, 0, 0, 0, 0, '', 61582, 1, NULL), -- Officer Thunderstrider <Thunder Bluff Commendations>
-(@GUID+69, 15768, 0, 0, 0, 0, 0, 1, 1, 0, 1587.8914,  279.28018,  -43.019344, 4.852015495300292968, 300, 0, 0, 2614, 0, 0, 0, 0, 0, '', 61582, 1, NULL), -- Officer Gothena <Undercity Commendations>
+(@GUID+69, 15768, 0, 0, 0, 0, 0, 1, 1, 0, 1587.8914,  279.28018,  -43.019344, 4.852015495300292968, 300, 0, 0, 2614, 0, 0, 0, 0, 0, '', 61582, 1, NULL); -- Officer Gothena <Undercity Commendations>
+
+-- Old spawns
+DELETE FROM `creature` WHERE `guid` IN (37, 2032, 6519, 6520, 25997, 32076, 46803) AND `id1` IN (14724, 15761, 15762, 15764, 15765, 15767, 15768);
