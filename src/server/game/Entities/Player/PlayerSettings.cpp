@@ -59,7 +59,7 @@ void Player::_LoadCharacterSettings(PreparedQueryResult result)
     } while (result->NextRow());
 }
 
-PlayerSetting Player::GetPlayerSetting(const std::string& source, uint8 index)
+PlayerSetting Player::GetPlayerSetting(std::string& const source, uint8 index)
 {
     auto it = m_charSettingsMap.find(source);
     if (it == m_charSettingsMap.end() || static_cast<size_t>(index) >= it->second.size())
@@ -98,7 +98,7 @@ void Player::_SavePlayerSettings(CharacterDatabaseTransaction trans)
 void Player::UpdatePlayerSetting(const std::string& source, uint8 index, uint32 value)
 {
     auto it = m_charSettingsMap.find(source);
-    const size_t requiredSize = static_cast<size_t>(index) + 1;
+    size_t const requiredSize = static_cast<size_t>(index) + 1;
 
     if (it == m_charSettingsMap.end())
     {

@@ -2639,7 +2639,7 @@ public:
 
     // Settings
     [[nodiscard]] PlayerSetting GetPlayerSetting(const std::string& source, uint8 index);
-    void UpdatePlayerSetting(const std::string& source, uint8 index, uint32 value);
+    void UpdatePlayerSetting(std::string& source const, uint8 index, uint32 value);
 
     void SendSystemMessage(std::string_view msg, bool escapeCharacters = false);
 
