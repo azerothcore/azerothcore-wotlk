@@ -712,7 +712,7 @@ public:
                             }
                         }
 
-                        if (prison)
+                        if (prison && prison->getLootState() != GO_NOT_READY)
                             prison->ResetDoorOrButton();
                     }
                     break;
