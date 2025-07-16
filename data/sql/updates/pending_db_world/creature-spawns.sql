@@ -80,3 +80,4 @@ INSERT INTO `creature` (`guid`, `id1`, `id2`, `id3`, `map`, `zoneId`, `areaId`, 
 
 -- Old spawns
 DELETE FROM `creature` WHERE `guid` IN (37, 2032, 6519, 6520, 25997, 32076, 46803) AND `id1` IN (14724, 15761, 15762, 15764, 15765, 15767, 15768);
+DELETE FROM `creature_addon` WHERE `guid` IN (6519, 6520, 25997, 32076, 46803);
