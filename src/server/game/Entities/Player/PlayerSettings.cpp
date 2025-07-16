@@ -59,7 +59,7 @@ void Player::_LoadCharacterSettings(PreparedQueryResult result)
     } while (result->NextRow());
 }
 
-PlayerSetting Player::GetPlayerSetting(std::string& const source, uint8 index)
+PlayerSetting Player::GetPlayerSetting(std::string const& source, uint8 index)
 {
     auto it = m_charSettingsMap.find(source);
     if (it == m_charSettingsMap.end() || static_cast<size_t>(index) >= it->second.size())
