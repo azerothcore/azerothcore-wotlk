@@ -126,7 +126,7 @@ INSERT INTO `game_event` (`eventEntry`, `start_time`, `end_time`, `occurence`, `
 (@AQWarHordeCookedGoodsT4,         '2000-01-01 14:00:00', '2000-01-01 14:00:00', 5184000, 2592000, 0, 0, 'Ahn''Qiraj War Effort - Horde Cooked Goods Tier 4',     5, 2),
 (@AQWarHordeCookedGoodsT5,         '2000-01-01 14:00:00', '2000-01-01 14:00:00', 5184000, 2592000, 0, 0, 'Ahn''Qiraj War Effort - Horde Cooked Goods Tier 5',     5, 2);
 
-DELETE FROM `game_event_creature` WHERE `eventEntry` = 22 AND `guid` BETWEEN @CGUID AND @CGUID+69
+DELETE FROM `game_event_creature` WHERE `eventEntry` = 22 AND `guid` BETWEEN @CGUID AND @CGUID+69;
 INSERT INTO `game_event_creature` (`eventEntry`, `guid`) VALUES
 (22, @CGUID+0),
 (22, @CGUID+1),
