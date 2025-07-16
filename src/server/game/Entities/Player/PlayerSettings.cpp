@@ -44,7 +44,7 @@ void Player::_LoadCharacterSettings(PreparedQueryResult result)
         PlayerSettingVector settings;
         settings.reserve(tokens.size()); // reserve capacity but don't resize
 
-        for (auto token : tokens)
+        for (auto const& token : tokens)
         {
             if (token.empty())
                 continue;
