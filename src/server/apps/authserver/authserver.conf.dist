@@ -40,7 +40,7 @@
 #        Example:     "/home/youruser/azerothcore/logs"
 #        Default:     "" - (Log files will be stored in the current path)
 
-LogsDir = ""
+LogsDir = "./Logs"
 
 #
 #    MaxPingTime
