@@ -82,13 +82,10 @@ void Player::_SavePlayerSettings(CharacterDatabaseTransaction trans)
             continue;
 
         std::ostringstream data;
+        data << settings[0].value;
 
-        for (size_t i = 0; i < settings.size(); ++i)
-        {
-            if (i > 0)
-                data << ' ';
-            data << settings[i].value;
-        }
+        for (size_t i = 1; i < settings.size(); ++i)
+            data << ' ' << settings[i].value;
 
         CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_REP_CHAR_SETTINGS);
         stmt->SetData(0, GetGUID().GetCounter());
