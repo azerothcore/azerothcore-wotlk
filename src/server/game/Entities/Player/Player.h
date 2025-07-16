@@ -2638,7 +2638,7 @@ public:
     std::string GetPlayerName();
 
     // Settings
-    [[nodiscard]] PlayerSetting GetPlayerSetting(const std::string& source, uint8 index);
+    [[nodiscard]] PlayerSetting GetPlayerSetting(std::string const& source, uint8 index);
     void UpdatePlayerSetting(std::string& source const, uint8 index, uint32 value);
 
     void SendSystemMessage(std::string_view msg, bool escapeCharacters = false);
