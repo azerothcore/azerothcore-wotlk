@@ -1,4 +1,4 @@
-SET @GUID = 67061;
+SET @GUID = 82950;
 
 DELETE FROM `creature` WHERE `id1` IN (3296, 5595, 15383, 15431, 15432, 15434, 15437, 15445, 15446, 15448, 15450, 15451, 15452, 15453, 15455, 15456, 15457, 15458, 15459, 15460, 15469, 15477, 15508, 15512, 15515, 15522, 15525, 15528, 15529, 15532, 15533, 15534, 15535, 15539, 15663, 15696, 15700, 15701, 15702, 15703, 15704, 15707, 15708, 15709, 15731, 15733, 15734, 15735, 15736, 15737, 15738, 15739, 15761, 15762, 15763, 15764, 15765, 15766, 15767, 15768) AND `guid` BETWEEN @GUID AND @GUID+69;
 INSERT INTO `creature` (`guid`, `id1`, `id2`, `id3`, `map`, `zoneId`, `areaId`, `spawnMask`, `phaseMask`, `equipment_id`, `position_x`, `position_y`, `position_z`, `orientation`, `spawntimesecs`, `wander_distance`, `currentwaypoint`, `curhealth`, `curmana`, `MovementType`, `npcflag`, `unit_flags`, `dynamicflags`, `ScriptName`, `VerifiedBuild`, `CreateObject`, `Comment`) VALUES
