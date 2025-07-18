@@ -185,6 +185,15 @@ public:
 
     void MarkNearbyCellsOf(WorldObject* obj);
 
+    void VisitNearbyCellsOf(WorldObject* obj, TypeContainerVisitor<Acore::ObjectUpdater, GridTypeMapContainer>& gridVisitor,
+                            TypeContainerVisitor<Acore::ObjectUpdater, WorldTypeMapContainer>& worldVisitor,
+                            TypeContainerVisitor<Acore::ObjectUpdater, GridTypeMapContainer>& largeGridVisitor,
+                            TypeContainerVisitor<Acore::ObjectUpdater, WorldTypeMapContainer>& largeWorldVisitor);
+    void VisitNearbyCellsOfPlayer(Player* player, TypeContainerVisitor<Acore::ObjectUpdater, GridTypeMapContainer>& gridVisitor,
+                                  TypeContainerVisitor<Acore::ObjectUpdater, WorldTypeMapContainer>& worldVisitor,
+                                  TypeContainerVisitor<Acore::ObjectUpdater, GridTypeMapContainer>& largeGridVisitor,
+                                  TypeContainerVisitor<Acore::ObjectUpdater, WorldTypeMapContainer>& largeWorldVisitor);
+
     virtual void Update(const uint32, const uint32, bool thread = true);
 
     [[nodiscard]] float GetVisibilityRange() const { return m_VisibleDistance; }
@@ -312,6 +321,9 @@ public:
     void resetMarkedCells() { marked_cells.reset(); }
     bool isCellMarked(uint32 pCellId) { return marked_cells.test(pCellId); }
     void markCell(uint32 pCellId) { marked_cells.set(pCellId); }
+    void resetMarkedCellsLarge() { marked_cells_large.reset(); }
+    bool isCellMarkedLarge(uint32 pCellId) { return marked_cells_large.test(pCellId); }
+    void markCellLarge(uint32 pCellId) { marked_cells_large.set(pCellId); }
 
     [[nodiscard]] bool HavePlayers() const { return !m_mapRefMgr.IsEmpty(); }
     [[nodiscard]] uint32 GetPlayersCountExceptGMs() const;
@@ -574,6 +586,7 @@ private:
     Map* m_parentMap;
 
     std::bitset<TOTAL_NUMBER_OF_CELLS_PER_MAP * TOTAL_NUMBER_OF_CELLS_PER_MAP> marked_cells;
+    std::bitset<TOTAL_NUMBER_OF_CELLS_PER_MAP * TOTAL_NUMBER_OF_CELLS_PER_MAP> marked_cells_large;
 
     bool i_scriptLock;
     std::unordered_set<WorldObject*> i_objectsToRemove;
