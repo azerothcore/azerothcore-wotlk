@@ -25,6 +25,8 @@
 #include <vector>
 #include <map>
 
+#include "StringFormat.h"
+
 // ******************************************
 // Map file format defines
 // ******************************************
@@ -78,12 +80,21 @@ struct map_liquidHeader
 #define MAP_LIQUID_TYPE_SLIME       0x08
 #define MAP_LIQUID_TYPE_DARK_WATER  0x10
 
+
 namespace MMAP
 {
 
+    static char const* const MAP_FILE_NAME_FORMAT  = "{}/{:03}{:02}{:02}.map";
+
     uint32 const MAP_VERSION_MAGIC = 9;
 
-    TerrainBuilder::TerrainBuilder(bool skipLiquid) : m_skipLiquid (skipLiquid) { }
+    TerrainBuilder::TerrainBuilder(const std::string &dataDirPath, bool skipLiquid) :
+                m_mapsPath(std::filesystem::path(dataDirPath) / "maps"),
+                m_vmapsPath(std::filesystem::path(dataDirPath) / "vmaps"),
+                m_skipLiquid (skipLiquid)
+    {
+    }
+
     TerrainBuilder::~TerrainBuilder() = default;
 
     /**************************************************************************/
@@ -134,10 +145,13 @@ namespace MMAP
     /**************************************************************************/
     bool TerrainBuilder::loadMap(uint32 mapID, uint32 tileX, uint32 tileY, MeshData& meshData, Spot portion)
     {
-        char mapFileName[255];
-        sprintf(mapFileName, "maps/%03u%02u%02u.map", mapID, tileY, tileX);
+        const std::string mapFileName = Acore::StringFormat(
+            MAP_FILE_NAME_FORMAT,
+            m_mapsPath,
+            mapID, tileY, tileX
+        );
 
-        FILE* mapFile = fopen(mapFileName, "rb");
+        FILE* mapFile = fopen(mapFileName.c_str(), "rb");
         if (!mapFile)
             return false;
 
@@ -146,7 +160,7 @@ namespace MMAP
                 fheader.versionMagic != MAP_VERSION_MAGIC)
         {
             fclose(mapFile);
-            printf("%s is the wrong version, please extract new .map files\n", mapFileName);
+            printf("%s is the wrong version, please extract new .map files\n", mapFileName.c_str());
             return false;
         }
 
@@ -665,7 +679,7 @@ namespace MMAP
     bool TerrainBuilder::loadVMap(uint32 mapID, uint32 tileX, uint32 tileY, MeshData& meshData)
     {
         IVMapMgr* vmapMgr = new VMapMgr2();
-        int result = vmapMgr->loadMap("vmaps", mapID, tileX, tileY);
+        int result = vmapMgr->loadMap(m_vmapsPath.c_str(), mapID, tileX, tileY);
         bool retval = false;
 
         do
