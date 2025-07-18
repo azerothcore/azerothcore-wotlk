@@ -1,5 +1,8 @@
 Generator command line args
 
+--config            [file.*]        The path the yaml config file
+                                    Default: "mmaps-config.yaml"
+
 --threads           [#]             Max number of threads used by the generator
                                     Default: 3
 
@@ -10,39 +13,6 @@ Generator command line args
 
 --silent            []              Make us script friendly. Do not wait for user input
                                     on error or completion.
-
---bigBaseUnit       [true|false]    Generate tile/map using bigger basic unit.
-                                    Use this option only if you have unexpected gaps.
-
-                                    false: use normal metrics (default)
-
---maxAngle          [#]             Max walkable inclination angle
-
-                                    float between 45 and 90 degrees (default 60)
-
---skipLiquid        [true|false]    extract liquid data for maps
-
-                                    false: include liquid data (default)
-
---skipContinents    [true|false]    continents are maps 0 (Eastern Kingdoms),
-                                    1 (Kalimdor), 530 (Outlands), 571 (Northrend)
-
-                                    false: build continents (default)
-
---skipJunkMaps      [true|false]    junk maps include some unused
-                                    maps, transport maps, and some other
-
-                                    true: skip junk maps (default)
-
---skipBattlegrounds [true|false]    does not include PVP arenas
-
-                                    false: skip battlegrounds (default)
-
---debugOutput       [true|false]    create debugging files for use with RecastDemo
-                                    if you are only creating mmaps for use with Moongose,
-                                    you don't want debugging files
-
-                                    false: don't create debugging files (default)
 
 --tile              [#,#]           Build the specified tile
                                     seperate number with a comma ','
@@ -57,9 +27,6 @@ examples:
 
 movement_extractor
 builds maps using the default settings (see above for defaults)
-
-movement_extractor --skipContinents true
-builds the default maps, except continents
 
 movement_extractor 0
 builds all tiles of map 0

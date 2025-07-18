@@ -76,7 +76,7 @@ namespace MMAP
     class TerrainBuilder
     {
     public:
-        TerrainBuilder(bool skipLiquid);
+        TerrainBuilder(const std::string &mapsPath, bool skipLiquid);
         ~TerrainBuilder();
 
         TerrainBuilder(const TerrainBuilder& tb) = delete;
@@ -121,6 +121,9 @@ namespace MMAP
 
         /// Get the liquid type for a specific position
         uint8 getLiquidType(int square, const uint8 liquid_type[16][16]);
+
+        std::string m_mapsPath;
+        std::string m_vmapsPath;
     };
 }
 
