@@ -1832,6 +1832,8 @@ public:
 
         bool CanAIAttack(Unit const* target) const override
         {
+            if (!target->IsPlayer()) //Ignore non-players such as totems and pets.
+                return false;
             return IsValidPlatformTarget(target) && !target->GetVehicle();
         }
     };
@@ -3381,6 +3383,8 @@ public:
 
         bool CanAIAttack(Unit const* target) const override
         {
+            if (!target->IsPlayer()) //Ignore non-players such as totems and pets.
+                return false;
             return IsValidPlatformTarget(target) && !target->GetVehicle();
         }
     };
