@@ -44,14 +44,14 @@ bool checkDirectories(const std::string &dataDirPath, bool debugOutput)
     dirFiles.clear();
     if (getDirContents(dirFiles, (std::filesystem::path(dataDirPath) / "mmaps").string()) == LISTFILE_DIRECTORY_NOT_FOUND)
     {
-        return boost::filesystem::create_directory(std::string(std::filesystem::path(dataDirPath) / "mmaps"));
+        return boost::filesystem::create_directory((std::filesystem::path(dataDirPath) / "mmaps").string());
     }
 
     dirFiles.clear();
     if (debugOutput && getDirContents(dirFiles, (std::filesystem::path(dataDirPath) / "meshes").string()) == LISTFILE_DIRECTORY_NOT_FOUND)
     {
         printf("'meshes' directory does not exist creating...\n");
-        return boost::filesystem::create_directory(std::string(std::filesystem::path(dataDirPath) / "meshes"));
+        return boost::filesystem::create_directory((std::filesystem::path(dataDirPath) / "meshes").string());
     }
 
     return true;

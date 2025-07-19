@@ -80,7 +80,6 @@ struct map_liquidHeader
 #define MAP_LIQUID_TYPE_SLIME       0x08
 #define MAP_LIQUID_TYPE_DARK_WATER  0x10
 
-
 namespace MMAP
 {
     static char const* const MAP_FILE_NAME_FORMAT  = "{}/{:03}{:02}{:02}.map";
