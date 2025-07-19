@@ -2418,6 +2418,7 @@ void ObjectMgr::LoadCreatures()
             stmt->SetData(2, spawnId);
 
             WorldDatabase.Execute(stmt);
+            LOG_DEBUG("server.loading", "Added zoneId: {}, areaId: {} to creature GUID: {}", zoneId, areaId, spawnId);
         }
 
         // Add to grid if not managed by the game event or pool system
@@ -2760,6 +2761,7 @@ void ObjectMgr::LoadGameobjects()
             stmt->SetData(2, guid);
 
             WorldDatabase.Execute(stmt);
+            LOG_DEBUG("server.loading", "Added zoneId: {}, areaId: {} to gameobject GUID: {}", zoneId, areaId, guid);
         }
 
         if (gameEvent == 0 && PoolId == 0)                      // if not this is to be managed by GameEvent System or Pool system
