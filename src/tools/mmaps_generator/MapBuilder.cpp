@@ -565,7 +565,7 @@ namespace MMAP
 
         const std::string fileName = Acore::StringFormat(
             MAP_FILE_NAME_FORMAT,
-            m_config->MMapsPath(),
+            m_config->DataDirPath(),
             mapID
         );
 
@@ -864,7 +864,7 @@ namespace MMAP
             // file output
             const std::string fileName = Acore::StringFormat(
                 TILE_FILE_NAME_FORMAT,
-                m_mapBuilder->getConfig().MMapsPath(),
+                m_mapBuilder->getConfig().DataDirPath(),
                 mapID, tileY, tileX
             );
 
@@ -1036,7 +1036,7 @@ namespace MMAP
     {
         const std::string fileName = Acore::StringFormat(
             TILE_FILE_NAME_FORMAT,
-            m_mapBuilder->getConfig().MMapsPath(),
+            m_mapBuilder->getConfig().DataDirPath(),
             mapID, tileY, tileX
         );
 
