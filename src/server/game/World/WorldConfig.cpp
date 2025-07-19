@@ -406,6 +406,7 @@ void WorldConfig::BuildConfigCache()
     SetConfigValue<float>(CONFIG_LISTEN_RANGE_TEXTEMOTE, "ListenRange.TextEmote", 40.0f);
     SetConfigValue<float>(CONFIG_LISTEN_RANGE_YELL, "ListenRange.Yell", 300.0f);
 
+    SetConfigValue<uint32>(CONFIG_BATTLEGROUND_PREP_TIME, "Battleground.PrepTime", 120);
     SetConfigValue<uint32>(CONFIG_BATTLEGROUND_OVERRIDE_LOWLEVELS_MINPLAYERS, "Battleground.Override.LowLevels.MinPlayers", 0);
     SetConfigValue<bool>(CONFIG_BATTLEGROUND_DISABLE_QUEST_SHARE_IN_BG, "Battleground.DisableQuestShareInBG", false);
     SetConfigValue<bool>(CONFIG_BATTLEGROUND_DISABLE_READY_CHECK_IN_BG, "Battleground.DisableReadyCheckInBG", false);
@@ -436,6 +437,7 @@ void WorldConfig::BuildConfigCache()
     SetConfigValue<uint32>(CONFIG_BATTLEGROUND_ALTERAC_REP_ONBOSSDEATH, "Battleground.Alterac.ReputationOnBossDeath", 350);
     SetConfigValue<uint32>(CONFIG_BATTLEGROUND_EYEOFTHESTORM_CAPTUREPOINTS, "Battleground.EyeOfTheStorm.CapturePoints", 1600);
 
+    SetConfigValue<uint32>(CONFIG_ARENA_PREP_TIME, "Arena.PrepTime", 60);
     SetConfigValue<uint32>(CONFIG_ARENA_MAX_RATING_DIFFERENCE, "Arena.MaxRatingDifference", 150);
     SetConfigValue<uint32>(CONFIG_ARENA_RATING_DISCARD_TIMER, "Arena.RatingDiscardTimer", 600000);
     SetConfigValue<uint32>(CONFIG_ARENA_PREV_OPPONENTS_DISCARD_TIMER, "Arena.PreviousOpponentsDiscardTimer", 120000);
