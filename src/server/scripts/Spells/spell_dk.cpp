@@ -787,7 +787,7 @@ class spell_dk_pet_scaling : public AuraScript
             if (AuraEffect* impurityEff = owner->GetDummyAuraEffect(SPELLFAMILY_DEATHKNIGHT, 1986, EFFECT_0))
                 AddPct(modifier, impurityEff->GetAmount());
 
-            amount = CalculatePct(std::max<int32>(0, owner->GetTotalAttackPowerValue(BASE_ATTACK)), modifier);
+            amount = CalculatePct(std::max<int32>(0, static_cast<int32>(owner->GetTotalAttackPowerValue(BASE_ATTACK))), modifier);
 
             // xinef: Update appropriate player field
             if (owner->IsPlayer())
