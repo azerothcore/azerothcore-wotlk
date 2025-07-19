@@ -44,6 +44,9 @@ mmapsConfig:
     # Maximum height difference (in cell units) NPCs can step up or down.
     # Higher values allow walking over fences, ledges, or steps.
     # To convert to world units, multiply by cellSize (see "Cell Size Calculation").
+    #
+    # Vanilla WotLK uses 6, which allows creatures to "jump" over fences.
+    # Classic WotLK uses 4, which forces creatures to walk around fences.
     walkableClimb: 6
 
     # Minimum distance (in cell units) around walkable surfaces.
