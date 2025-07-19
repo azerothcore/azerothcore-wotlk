@@ -776,13 +776,14 @@ class spell_dk_pet_scaling : public AuraScript
 
     void CalculateSPAmount(AuraEffect const*  /*aurEff*/, int32& amount, bool& /*canBeRecalculated*/)
     {
-        // xinef: dk gargoyle inherits 33% of SP
         if (GetUnitOwner()->GetEntry() != NPC_EBON_GARGOYLE)
             return;
 
         if (Unit* owner = GetUnitOwner()->GetOwner())
         {
-            int32 modifier = 33;
+            // Percentage of the owner's attack power to be inherited as spell power
+            // This value was chosen based on experimental damage of Gargoyle Strike
+            int32 modifier = 75;
 
             if (AuraEffect* impurityEff = owner->GetDummyAuraEffect(SPELLFAMILY_DEATHKNIGHT, 1986, EFFECT_0))
                 AddPct(modifier, impurityEff->GetAmount());
