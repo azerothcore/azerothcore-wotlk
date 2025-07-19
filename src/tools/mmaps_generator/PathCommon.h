@@ -20,6 +20,7 @@
 
 #include <string>
 #include <vector>
+#include <boost/dll/runtime_symbol_info.hpp>
 
 #ifndef _WIN32
 #include <cstddef>
@@ -35,6 +36,11 @@
 
 namespace MMAP
 {
+    inline std::string executableDirectoryPath()
+    {
+        return boost::dll::program_location().parent_path().string();
+    }
+
     inline bool matchWildcardFilter(const char* filter, const char* str)
     {
         if (!filter || !str)
