@@ -1,8 +1,8 @@
--- MySQL dump 10.13  Distrib 8.0.34, for Win64 (x86_64)
+-- MySQL dump 10.13  Distrib 8.4.3, for Win64 (x86_64)
 --
--- Host: 127.0.0.1    Database: acore_world
+-- Host: localhost    Database: acore_world
 -- ------------------------------------------------------
--- Server version	8.0.34
+-- Server version	8.4.3
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
 /*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
@@ -1968,6 +1968,12 @@ INSERT INTO `gossip_menu_option` VALUES
 (7149,0,2,'Yes, I\'d like to purchase a ride down to the Ghostlands.',12085,4,8192,0,0,0,0,'',0,0),
 (7153,0,0,'Arcanist Vandril, what are the Forsaken doing here?',12230,1,1,7211,0,0,0,'',0,0),
 (7162,0,1,'I want to browse your goods.',3370,3,128,0,0,0,0,'',0,0),
+(7164,0,0,'What\'s happening?',12176,1,1,7193,0,0,0,'',0,0),
+(7164,1,0,'What can I do?',12207,1,1,7203,0,0,0,'',0,0),
+(7164,2,0,'Where are we battling the Scourge?',12434,1,1,7254,0,0,0,'',0,0),
+(7164,3,0,'How many battles have we won?',12398,1,1,7246,0,0,0,'',0,0),
+(7165,0,1,'I would like to spend my runes.',31735,3,128,0,0,0,0,'',0,0),
+(7166,0,0,'Use 8 necrotic runes and disrupt his ritual.',12112,1,1,0,0,0,0,'',0,0),
 (7171,0,3,'Master chef, can you train me in the culinary arts?',14250,5,16,0,0,0,0,'',0,0),
 (7171,1,1,'Have you any cooking supplies?',14252,3,128,0,0,0,0,'',0,0),
 (7173,0,0,'Trick or Treat!',10693,1,1,0,0,0,0,'',0,0),
@@ -1982,6 +1988,16 @@ INSERT INTO `gossip_menu_option` VALUES
 (7185,0,0,'<Administer the restorative draught.>',12159,1,1,7186,0,0,0,'',0,0),
 (7186,0,0,'You\'re free to go now.  The way out is safe.',12162,1,1,0,0,0,0,'',0,0),
 (7187,0,0,'I seek a sample of your restorative draught, apothecary.',12170,1,1,0,0,0,0,'',0,0),
+(7193,0,0,'I have another question.',12241,1,1,7164,0,0,0,'',0,0),
+(7199,0,0,'Where else are we battling the Scourge?',12479,1,1,7254,0,0,0,'',0,0),
+(7199,1,0,'I have another question.',12241,1,1,7164,0,0,0,'',0,0),
+(7200,0,0,'Where else are we battling the Scourge?',12479,1,1,7254,0,0,0,'',0,0),
+(7200,1,0,'I have another question.',12241,1,1,7164,0,0,0,'',0,0),
+(7201,0,0,'Where else are we battling the Scourge?',12479,1,1,7254,0,0,0,'',0,0),
+(7201,1,0,'I have another question.',12241,1,1,7164,0,0,0,'',0,0),
+(7202,0,0,'Where else are we battling the Scourge?',12479,1,1,7254,0,0,0,'',0,0),
+(7202,1,0,'I have another question.',12241,1,1,7164,0,0,0,'',0,0),
+(7203,0,0,'I have another question.',12241,1,1,7164,0,0,0,'',0,0),
 (7208,0,0,'Friendly',12237,1,1,7213,0,0,0,'',0,0),
 (7208,1,0,'Honored',12238,1,1,7209,0,0,0,'',0,0),
 (7208,2,0,'Revered',12239,1,1,7210,0,0,0,'',0,0),
@@ -1990,6 +2006,14 @@ INSERT INTO `gossip_menu_option` VALUES
 (7243,0,1,'Let me browse your goods.',8097,3,128,0,0,0,0,'',0,0),
 (7244,0,1,'Let me browse your goods.',8097,3,128,0,0,0,0,'',0,0),
 (7245,0,1,'Let me browse your goods.',8097,3,128,0,0,0,0,'',0,0),
+(7246,0,0,'I have another question.',12241,1,1,7164,0,0,0,'',0,0),
+(7254,0,0,'Is Azshara currently under attack?',12476,1,1,7266,0,0,0,'',0,0),
+(7254,1,0,'Are the Blasted Lands currently under attack?',12203,1,1,7201,0,0,0,'',0,0),
+(7254,2,0,'Are the Burning Steppes currently under attack?',12205,1,1,7202,0,0,0,'',0,0),
+(7254,3,0,'Are the Eastern Plaguelands currently under attack?',12477,1,1,7267,0,0,0,'',0,0),
+(7254,4,0,'Is Tanaris currently under attack?',12201,1,1,7200,0,0,0,'',0,0),
+(7254,5,0,'Is Winterspring currently under attack?',12198,1,1,7199,0,0,0,'',0,0),
+(7254,6,0,'I have another question.',12241,1,1,7164,0,0,0,'',0,0),
 (7256,0,3,'I wish to learn more about blacksmithing.',14017,5,16,0,0,0,0,'',0,0),
 (7256,1,1,'May I see your wares?',12790,3,128,0,0,0,0,'',0,0),
 (7260,0,3,'I would like to train further in the ways of the Light.',5299,5,16,0,0,0,0,'',0,0),
@@ -2007,6 +2031,10 @@ INSERT INTO `gossip_menu_option` VALUES
 (7265,0,3,'I seek more training in the priestly ways.',7169,5,16,0,0,0,0,'',0,0),
 (7265,1,0,'I wish to unlearn my talents.',62295,16,16,4461,0,0,0,'',0,0),
 (7265,2,0,'I wish to know about Dual Talent Specialization.',33762,20,1,10371,0,0,0,'',0,0),
+(7266,0,0,'Where else are we battling the Scourge?',12479,1,1,7254,0,0,0,'',0,0),
+(7266,1,0,'I have another question.',12241,1,1,7164,0,0,0,'',0,0),
+(7267,0,0,'Where else are we battling the Scourge?',12479,1,1,7254,0,0,0,'',0,0),
+(7267,1,0,'I have another question.',12241,1,1,7164,0,0,0,'',0,0),
 (7268,0,0,'But his son is dead.',12511,1,1,7284,0,0,0,'',0,0),
 (7269,0,0,'You tell an incredible tale, Fairbanks. What of the blade? Is it beyond redemption?',12509,1,1,7268,0,0,0,'',0,0),
 (7270,0,0,'And you did...',12507,1,1,7269,0,0,0,'',0,0),
@@ -2950,6 +2978,10 @@ INSERT INTO `gossip_menu_option` VALUES
 (9043,1,0,'Food & Drink',66664,1,1,9041,0,0,0,'',0,0),
 (9043,2,0,'Goods & Gear',23963,1,1,9042,0,0,0,'',0,0),
 (9045,0,0,'I don\'t have time for chit-chat, Lou. Take me to Scalawag Point.',23975,1,1,0,0,0,0,'',0,0),
+(9046,0,0,'What news of the fight to take the Sun\'s Reach Armory?',24222,1,1,51000,0,0,0,'',0,0),
+(9046,1,0,'How close are we to the completion of the anvil and forge at the Sun\'s Reach Armory?',24224,1,1,51001,0,0,0,'',0,0),
+(9046,2,0,'Exarch, have we taken the Sun\'s Reach Harbor yet?',24227,1,1,51002,0,0,0,'',0,0),
+(9046,3,0,'Nasuun, do you know how long until we have an alchemy lab at the Sun\'s Reach Harbor?',24229,1,1,51003,0,0,0,'',0,0),
 (9046,7,0,'What do you know about the magical gates at the Sunwell Plateau being brought down?',24231,1,1,9307,0,0,0,'',0,0),
 (9050,0,1,'Let me browse your goods.',8097,3,128,0,0,0,0,'',0,0),
 (9061,0,1,'I want to browse your goods.',3370,3,128,0,0,0,0,'',0,0),
@@ -3087,6 +3119,9 @@ INSERT INTO `gossip_menu_option` VALUES
 (9283,0,0,'Who is Malygos?',25459,1,1,9284,0,0,0,'',0,0),
 (9285,0,0,'Give me a situation report, Captain.',25524,1,1,9287,0,0,0,'',0,0),
 (9286,2,0,'What is the current state of the Sunwell\'s Gates?',25533,1,1,9293,0,0,0,'',0,0),
+(9286,3,0,'With Kalecgos freed, can you provide a teleport up to Apex Point?',25538,1,1,0,0,0,0,'',0,0),
+(9286,4,0,'Now that Lady Sacrolsash and Grand Warlock Alythess have been defeated, can you teleport me to the Witch\'s Sanctum.',25539,1,1,0,0,0,0,'',0,0),
+(9286,5,0,'We\'ve cleared the way to Kil\'jaeden! Can you transport me close to the Sunwell?',25540,1,1,0,0,0,0,'',0,0),
 (9287,0,0,'What went wrong?',25526,1,1,9288,0,0,0,'',0,0),
 (9288,0,0,'Why did they stop?',25528,1,1,9289,0,0,0,'',0,0),
 (9289,0,0,'Your insight is appreciated.',25530,1,1,9290,0,0,0,'',0,0),
@@ -3405,6 +3440,7 @@ INSERT INTO `gossip_menu_option` VALUES
 (9750,0,3,'Train me.',3266,5,16,0,0,0,0,'',0,0),
 (9754,0,0,'Noth, where is Heigan?',29063,1,1,9753,0,0,0,'',0,0),
 (9761,0,0,'I require water breathing, Garren.',29212,1,1,0,0,0,0,NULL,0,0),
+(9762,0,0,'Koltira, let\'s get out of here!',29243,1,1,0,0,0,0,NULL,0,NULL),
 (9763,1,5,'Make this inn your home.',2822,8,65536,0,0,0,0,'',0,0),
 (9763,2,1,'Let me browse your goods.',8097,3,128,0,0,0,0,'',0,0),
 (9765,0,0,'I challenge you, death knight!',29255,1,1,0,0,0,0,'',0,0),
@@ -3465,6 +3501,8 @@ INSERT INTO `gossip_menu_option` VALUES
 (9832,8,0,'I\'ve lost my Loremaster\'s Colors.',31596,1,1,0,0,0,0,'',0,0),
 (9832,9,0,'I\'ve lost my Tabard of the Explorer.',31603,1,1,0,0,0,0,'',0,0),
 (9832,10,0,'I\'ve lost my Tabard of the Achiever.',30362,1,1,0,0,0,0,'',0,0),
+(9832,11,0,'I\'ve lost my Arathor Battle Tabard.',30354,1,1,0,0,0,0,'',0,0),
+(9832,12,0,'I\'ve lost my Battle Tabard of the Defilers.',30355,1,1,0,0,0,0,'',0,0),
 (9833,0,3,'Train me.',3266,5,16,0,0,0,0,'',0,0),
 (9833,1,1,'I want to browse your goods.',3370,3,128,0,0,0,0,'',0,0),
 (9838,0,8,'I want to create a guild crest.',3415,11,524288,0,0,0,0,'',0,0),
@@ -4571,6 +4609,10 @@ INSERT INTO `gossip_menu_option` VALUES
 (50004,0,0,'Yes...',0,1,1,50005,0,0,0,NULL,0,0),
 (50005,0,0,'Ok, I\'ll try to remember that.',0,1,1,50006,0,0,0,NULL,0,0),
 (50006,0,0,'A key? Ok!',0,1,1,0,0,0,0,NULL,0,0),
+(51000,0,0,'I have something else to ask you about.',24226,1,1,9046,0,0,0,'',0,0),
+(51001,0,0,'I have something else to ask you about.',24226,1,1,9046,0,0,0,'',0,0),
+(51002,0,0,'I have something else to ask you about.',24226,1,1,9046,0,0,0,'',0,0),
+(51003,0,0,'I have something else to ask you about.',24226,1,1,9046,0,0,0,'',0,0),
 (54000,0,0,'Lift the frost leopard\'s tail to check if it\'s a male or a female.',33190,1,1,0,0,0,0,NULL,0,0),
 (55000,0,0,'Lift the icepaw bear\'s tail to check if it\'s a male or a female.',33194,1,1,0,0,0,0,NULL,0,0),
 (55002,1,0,'I want to release the saber to Winna.',5936,1,131,0,0,0,0,NULL,0,0),
@@ -4609,5 +4651,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2024-12-17 22:33:56
-
+-- Dump completed on 2025-07-19 12:09:05

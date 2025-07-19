@@ -1,8 +1,8 @@
--- MySQL dump 10.13  Distrib 8.0.34, for Win64 (x86_64)
+-- MySQL dump 10.13  Distrib 8.4.3, for Win64 (x86_64)
 --
--- Host: 127.0.0.1    Database: acore_characters
+-- Host: localhost    Database: acore_characters
 -- ------------------------------------------------------
--- Server version	8.0.34
+-- Server version	8.4.3
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
 /*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
@@ -36,7 +36,7 @@ LOCK TABLES `worldstates` WRITE;
 /*!40000 ALTER TABLE `worldstates` DISABLE KEYS */;
 INSERT INTO `worldstates` VALUES
 (1,0,NULL),
-(2,1734471110,NULL),
+(2,0,NULL),
 (3,0,NULL),
 (4,0,NULL),
 (5,0,NULL),
@@ -125,6 +125,46 @@ INSERT INTO `worldstates` VALUES
 (88,0,NULL),
 (89,0,NULL),
 (90,0,NULL),
+(91,0,NULL),
+(92,0,NULL),
+(93,0,NULL),
+(94,0,NULL),
+(95,0,NULL),
+(96,0,NULL),
+(97,0,NULL),
+(98,0,NULL),
+(99,0,NULL),
+(100,0,NULL),
+(101,0,NULL),
+(102,0,NULL),
+(103,0,NULL),
+(104,0,NULL),
+(105,0,NULL),
+(106,0,NULL),
+(107,0,NULL),
+(108,0,NULL),
+(109,0,NULL),
+(110,0,NULL),
+(111,0,NULL),
+(112,0,NULL),
+(113,0,NULL),
+(114,0,NULL),
+(115,0,NULL),
+(116,0,NULL),
+(117,0,NULL),
+(118,0,NULL),
+(119,0,NULL),
+(120,0,NULL),
+(121,0,NULL),
+(122,0,NULL),
+(123,0,NULL),
+(124,0,NULL),
+(125,0,NULL),
+(126,0,NULL),
+(127,0,NULL),
+(128,0,NULL),
+(129,0,NULL),
+(130,0,NULL),
 (197,0,'Fishing Extravaganza - STV_FISHING_PREV_WIN_TIME'),
 (198,0,'Fishing Extravaganza - STV_FISHING_HAS_WINNER'),
 (199,0,'Fishing Extravaganza - STV_FISHING_ANNOUNCE_EVENT_BEGIN'),
@@ -133,13 +173,13 @@ INSERT INTO `worldstates` VALUES
 (3801,0,NULL),
 (3802,1,NULL),
 (20001,1454691600,'NextArenaPointDistributionTime'),
-(20002,1734584400,'NextWeeklyQuestResetTime'),
-(20003,1734498000,'NextBGRandomDailyResetTime'),
+(20002,1753329600,'NextWeeklyQuestResetTime'),
+(20003,1752984000,'NextBGRandomDailyResetTime'),
 (20004,0,'cleaning_flags'),
-(20005,1734498000,'NextDailyQuestResetTime'),
-(20006,1734498000,'NextGuildDailyResetTime'),
-(20007,1735707600,'NextMonthlyQuestResetTime'),
-(20008,1734498000,NULL);
+(20005,1752984000,'NextDailyQuestResetTime'),
+(20006,1752984000,'NextGuildDailyResetTime'),
+(20007,1754020800,'NextMonthlyQuestResetTime'),
+(20008,1752984000,NULL);
 /*!40000 ALTER TABLE `worldstates` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -151,5 +191,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2024-12-17 22:33:13
-
+-- Dump completed on 2025-07-19 12:10:18
