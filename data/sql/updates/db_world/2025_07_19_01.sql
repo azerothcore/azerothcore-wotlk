@@ -1,3 +1,4 @@
+-- DB update 2025_07_19_00 -> 2025_07_19_01
 --
 -- Bone Witch
 UPDATE `creature_template` SET `minlevel` = 71, `maxlevel` = 71 WHERE (`entry` = 16380);
