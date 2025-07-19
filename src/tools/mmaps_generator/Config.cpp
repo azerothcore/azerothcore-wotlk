@@ -16,7 +16,6 @@
  */
 
 #include "Config.h"
-#include <cmath>
 #include <filesystem>
 #include <fkYAML/node.hpp>
 #include "PathCommon.h"
@@ -209,9 +208,11 @@ namespace MMAP
         tryFloat(mmapsNode, "maxSimplificationError", _global.maxSimplificationError);
 
         // Map overrides
-        if (mmapsNode.contains("mapsOverrides")) {
+        if (mmapsNode.contains("mapsOverrides"))
+        {
             fkyaml::node maps = mmapsNode["mapsOverrides"];
-            for (const auto& mapEntry : maps.as_map()) {
+            for (auto const& mapEntry : maps.as_map())
+            {
                 uint32 mapId = std::stoi(mapEntry.first.as_str());
 
                 MapOverride override;
@@ -233,9 +234,11 @@ namespace MMAP
                     override.cellSizeVertical = mapNode["cellSizeVertical"].get_value<float>();
 
                 // Tile overrides
-                if (mapNode.contains("tilesOverrides")) {
+                if (mapNode.contains("tilesOverrides"))
+                {
                     fkyaml::node tiles = mapNode["tilesOverrides"];
-                    for (const auto& tileEntry : tiles.as_map()) {
+                    for (const auto& tileEntry : tiles.as_map())
+                    {
                         std::string key = tileEntry.first.as_str();
                         fkyaml::node tileNode = tileEntry.second;
 
@@ -266,10 +269,8 @@ namespace MMAP
 
         // Resolve data dir path. Maybe we need to use an executable path instead of the current dir.
         if (isCurrentDirectory(_dataDir) && !std::filesystem::exists(MapsPath()))
-        {
             if (auto execPath = std::filesystem::path(executableDirectoryPath()); std::filesystem::exists(execPath/ "maps"))
                 _dataDir = execPath;
-        }
 
         return true;
     }

@@ -71,10 +71,10 @@ namespace MMAP
         bool ShouldSkipBattlegrounds() const { return _skipBattlegrounds; }
         bool IsDebugOutputEnabled() const { return _debugOutput; }
 
-        std::string VMapsPath() const { return _dataDir / "vmaps"; }
-        std::string MapsPath() const { return _dataDir / "maps"; }
-        std::string MMapsPath() const { return _dataDir / "mmaps"; }
-        std::string DataDirPath() const { return _dataDir; }
+        std::string VMapsPath() const { return (_dataDir / "vmaps").string(); }
+        std::string MapsPath() const { return (_dataDir / "maps").string(); }
+        std::string MMapsPath() const { return (_dataDir / "mmaps").string(); }
+        std::string DataDirPath() const { return _dataDir.string(); }
 
     private:
         explicit Config();
