@@ -28,33 +28,30 @@ bool checkDirectories(const std::string &dataDirPath, bool debugOutput)
 {
     std::vector<std::string> dirFiles;
 
-    if (getDirContents(dirFiles, std::filesystem::path(dataDirPath) / "maps") == LISTFILE_DIRECTORY_NOT_FOUND || dirFiles.empty())
+    if (getDirContents(dirFiles, (std::filesystem::path(dataDirPath) / "maps").string()) == LISTFILE_DIRECTORY_NOT_FOUND || dirFiles.empty())
     {
         printf("'maps' directory is empty or does not exist\n");
         return false;
     }
 
     dirFiles.clear();
-    if (getDirContents(dirFiles, std::filesystem::path(dataDirPath) / "vmaps", "*.vmtree") == LISTFILE_DIRECTORY_NOT_FOUND || dirFiles.empty())
+    if (getDirContents(dirFiles, (std::filesystem::path(dataDirPath) / "vmaps").string(), "*.vmtree") == LISTFILE_DIRECTORY_NOT_FOUND || dirFiles.empty())
     {
         printf("'vmaps' directory is empty or does not exist\n");
         return false;
     }
 
     dirFiles.clear();
-    if (getDirContents(dirFiles, std::filesystem::path(dataDirPath) / "mmaps") == LISTFILE_DIRECTORY_NOT_FOUND)
+    if (getDirContents(dirFiles, (std::filesystem::path(dataDirPath) / "mmaps").string()) == LISTFILE_DIRECTORY_NOT_FOUND)
     {
         return boost::filesystem::create_directory(std::string(std::filesystem::path(dataDirPath) / "mmaps"));
     }
 
     dirFiles.clear();
-    if (debugOutput)
+    if (debugOutput && getDirContents(dirFiles, (std::filesystem::path(dataDirPath) / "meshes").string()) == LISTFILE_DIRECTORY_NOT_FOUND)
     {
-        if (getDirContents(dirFiles, std::filesystem::path(dataDirPath) / "meshes") == LISTFILE_DIRECTORY_NOT_FOUND)
-        {
-            printf("'meshes' directory does not exist (no place to put debugOutput files)\n");
-            return false;
-        }
+        printf("'meshes' directory does not exist creating...\n");
+        return boost::filesystem::create_directory(std::string(std::filesystem::path(dataDirPath) / "meshes"));
     }
 
     return true;

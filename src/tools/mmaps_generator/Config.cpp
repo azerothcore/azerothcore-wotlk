@@ -68,7 +68,6 @@ namespace MMAP
         return config;
     }
 
-
     Config::Config()
     {
     }
@@ -237,7 +236,7 @@ namespace MMAP
                 if (mapNode.contains("tilesOverrides"))
                 {
                     fkyaml::node tiles = mapNode["tilesOverrides"];
-                    for (const auto& tileEntry : tiles.as_map())
+                    for (auto const& tileEntry : tiles.as_map())
                     {
                         std::string key = tileEntry.first.as_str();
                         fkyaml::node tileNode = tileEntry.second;
@@ -268,7 +267,7 @@ namespace MMAP
         }
 
         // Resolve data dir path. Maybe we need to use an executable path instead of the current dir.
-        if (isCurrentDirectory(_dataDir) && !std::filesystem::exists(MapsPath()))
+        if (isCurrentDirectory(_dataDir.string()) && !std::filesystem::exists(MapsPath()))
             if (auto execPath = std::filesystem::path(executableDirectoryPath()); std::filesystem::exists(execPath/ "maps"))
                 _dataDir = execPath;
 

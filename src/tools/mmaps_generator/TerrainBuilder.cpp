@@ -83,15 +83,14 @@ struct map_liquidHeader
 
 namespace MMAP
 {
-
     static char const* const MAP_FILE_NAME_FORMAT  = "{}/{:03}{:02}{:02}.map";
 
     uint32 const MAP_VERSION_MAGIC = 9;
 
     TerrainBuilder::TerrainBuilder(const std::string &dataDirPath, bool skipLiquid) :
-                m_mapsPath(std::filesystem::path(dataDirPath) / "maps"),
-                m_vmapsPath(std::filesystem::path(dataDirPath) / "vmaps"),
-                m_skipLiquid (skipLiquid)
+                m_skipLiquid (skipLiquid),
+                m_mapsPath((std::filesystem::path(dataDirPath) / "maps").string()),
+                m_vmapsPath((std::filesystem::path(dataDirPath) / "vmaps").string())
     {
     }
 
