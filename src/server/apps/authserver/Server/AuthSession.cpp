@@ -469,20 +469,6 @@ bool AuthSession::HandleLogonProof()
         return false;
     }
 
-    uint32 AccountLoginLimit = sConfigMgr->GetOption<uint32>("AccountLoginLimit", 0);
-    if (AccountLoginLimit && _accountInfo.SecurityLevel == SEC_PLAYER)
-    {
-        QueryResult result = LoginDatabase.Query("SELECT 1 FROM account WHERE online > 0 AND last_ip = '{}'", GetRemoteIpAddress().to_string());
-        if (result && (uint32(result->GetRowCount()) >= AccountLoginLimit))
-        {
-            ByteBuffer packet;
-            packet << uint8(AUTH_LOGON_PROOF);
-            packet << uint8(WOW_FAIL_DISCONNECTED);
-            SendPacket(packet);
-            return true;
-        }
-    }
-
     // Check if SRP6 results match (password is correct), else send an error
     if (Optional<SessionKey> K = _srp6->VerifyChallengeResponse(logonProof->A, logonProof->clientM))
     {
