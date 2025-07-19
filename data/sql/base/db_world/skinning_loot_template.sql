@@ -1,13 +1,15 @@
--- MySQL dump 10.13  Distrib 8.0.34, for Win64 (x86_64)
+-- MySQL dump 10.13  Distrib 8.4.3, for Win64 (x86_64)
 --
--- Host: 127.0.0.1    Database: acore_world
+-- Host: localhost    Database: acore_world
 -- ------------------------------------------------------
--- Server version	8.0.34
+-- Server version	8.4.3
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
 /*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
 /*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
 /*!50503 SET NAMES utf8mb4 */;
+/*!40103 SET @OLD_TIME_ZONE=@@TIME_ZONE */;
+/*!40103 SET TIME_ZONE='+00:00' */;
 /*!40014 SET @OLD_UNIQUE_CHECKS=@@UNIQUE_CHECKS, UNIQUE_CHECKS=0 */;
 /*!40014 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0 */;
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
@@ -190,8 +192,6 @@ INSERT INTO `skinning_loot_template` VALUES
 (1895,783,0,5.51,0,1,0,1,1,'Pyrewood Elder - Light Hide'),
 (1895,2318,0,63.78,0,1,0,1,1,'Pyrewood Elder - Light Leather'),
 (1895,2934,0,30.71,0,1,0,1,1,'Pyrewood Elder - Ruined Leather Scraps'),
-(1985,2318,0,10,0,1,1,1,1,'Thistle Boar - Light Leather'),
-(1985,2934,0,88,0,1,1,1,1,'Thistle Boar - Ruined Leather Scraps'),
 (2173,17057,0,100,0,1,1,1,1,'Reef Frenzy - Shiny Fish Scales'),
 (2174,17057,0,100,0,1,1,1,1,'Coastal Frenzy - Shiny Fish Scales'),
 (2347,4234,0,79.4118,0,1,1,1,1,'Wild Gryphon - Heavy Leather'),
@@ -269,8 +269,6 @@ INSERT INTO `skinning_loot_template` VALUES
 (2926,4304,0,73.2,0,1,1,1,1,'Silvermane Stalker - Thick Leather'),
 (2926,8169,0,5,0,1,1,1,1,'Silvermane Stalker - Thick Hide'),
 (2926,8170,0,21.8,0,1,1,1,1,'Silvermane Stalker - Rugged Leather'),
-(3124,2318,0,10,0,1,1,1,1,'Light Leather'),
-(3124,2934,0,88,0,1,1,1,1,'Ruined Leather Scraps'),
 (3529,2318,0,50,0,1,1,1,1,'Moonrage Armorer - Light Leather'),
 (3529,2934,0,50,0,1,1,1,1,'Moonrage Armorer - Ruined Leather Scraps'),
 (3530,783,0,4.55,0,1,0,1,1,'Pyrewood Tailor - Light Hide'),
@@ -1985,6 +1983,7 @@ INSERT INTO `skinning_loot_template` VALUES
 (100015,2934,0,35,0,1,1,1,1,'10-15 drops - Ruined Leather Scraps');
 /*!40000 ALTER TABLE `skinning_loot_template` ENABLE KEYS */;
 UNLOCK TABLES;
+/*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
 
 /*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
 /*!40014 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS */;
@@ -1994,5 +1993,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2024-12-17 22:34:36
-
+-- Dump completed on 2025-07-19 10:19:49

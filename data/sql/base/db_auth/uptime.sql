@@ -1,13 +1,15 @@
--- MySQL dump 10.13  Distrib 8.0.34, for Win64 (x86_64)
+-- MySQL dump 10.13  Distrib 8.4.3, for Win64 (x86_64)
 --
--- Host: 127.0.0.1    Database: acore_auth
+-- Host: localhost    Database: acore_auth
 -- ------------------------------------------------------
--- Server version	8.0.34
+-- Server version	8.4.3
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
 /*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
 /*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
 /*!50503 SET NAMES utf8mb4 */;
+/*!40103 SET @OLD_TIME_ZONE=@@TIME_ZONE */;
+/*!40103 SET TIME_ZONE='+00:00' */;
 /*!40014 SET @OLD_UNIQUE_CHECKS=@@UNIQUE_CHECKS, UNIQUE_CHECKS=0 */;
 /*!40014 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0 */;
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
@@ -40,9 +42,12 @@ INSERT INTO `uptime` VALUES
 (1,1721169877,0,0,'AzerothCore rev. bdf204f1eb0c 2024-07-16 16:28:59 +0000 (time-for-A-SQUASH branch) (Win64, RelWithDebInfo, Static)'),
 (1,1734468956,0,0,'AzerothCore rev. 2923a4aa43d0 2024-12-17 12:28:46 -0300 (master branch) (Win64, RelWithDebInfo, Static)'),
 (1,1734470333,0,0,'AzerothCore rev. 2923a4aa43d0 2024-12-17 12:28:46 -0300 (master branch) (Win64, RelWithDebInfo, Static)'),
-(1,1734471110,0,0,'AzerothCore rev. 2923a4aa43d0 2024-12-17 12:28:46 -0300 (master branch) (Win64, RelWithDebInfo, Static)');
+(1,1734471110,0,0,'AzerothCore rev. 2923a4aa43d0 2024-12-17 12:28:46 -0300 (master branch) (Win64, RelWithDebInfo, Static)'),
+(1,1752912822,0,0,'AzerothCore rev. 9415d1bef80d 2025-07-05 11:29:15 +0200 (whisper-something-something branch) (Win64, RelWithDebInfo, Static)'),
+(1,1752913079,0,0,'AzerothCore rev. 9415d1bef80d 2025-07-05 11:29:15 +0200 (whisper-something-something branch) (Win64, RelWithDebInfo, Static)');
 /*!40000 ALTER TABLE `uptime` ENABLE KEYS */;
 UNLOCK TABLES;
+/*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
 
 /*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
 /*!40014 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS */;
@@ -52,5 +57,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2024-12-17 22:32:57
-
+-- Dump completed on 2025-07-19 10:20:33
