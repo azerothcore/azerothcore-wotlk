@@ -1,8 +1,8 @@
--- MySQL dump 10.13  Distrib 8.0.34, for Win64 (x86_64)
+-- MySQL dump 10.13  Distrib 8.4.3, for Win64 (x86_64)
 --
--- Host: 127.0.0.1    Database: acore_world
+-- Host: localhost    Database: acore_world
 -- ------------------------------------------------------
--- Server version	8.0.34
+-- Server version	8.4.3
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
 /*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
@@ -72,6 +72,7 @@ INSERT INTO `disables` VALUES
 (0,28110,64,'','','Feugen Tesla Periodic - Ignore LoS'),
 (0,28111,64,'','','Feugen Tesla Visual - Ignore LoS'),
 (0,28170,8,'','','Spell for deprecated item'),
+(0,28395,64,'','','Ignore LoS for Communique Timer, Necropolis'),
 (0,29916,64,'','','Disable LOS for Quest Little Morsels (9440)'),
 (0,29917,64,'','','Disable LOS for Quest Little Morsels (9440)'),
 (0,31696,64,'','','Ignore LOS on Thane'),
@@ -806,28 +807,8 @@ INSERT INTO `disables` VALUES
 (1,12626,0,'','','Deprecated quest'),
 (1,12682,0,'','','Deprecated quest:Uncharted Territory (DEPRECATED)'),
 (1,12731,0,'','','Deprecated quest: '),
-(1,12752,0,'0','0','Disable quest from Scourge Invasion for undead'),
-(1,12753,0,'0','0','Disable quest from Scourge Invasion for Dwarves'),
 (1,12764,0,'','','Deprecated quest:The Secret to Kungaloosh (DEPRECATED)'),
 (1,12765,0,'','','Deprecated quest:Kungaloosh (DEPRECATED)'),
-(1,12771,0,'0','0','Disable quest from Scourge Invasion for Dwarves'),
-(1,12772,0,'0','0','Disable quest from Scourge Invasion for Night Elves'),
-(1,12773,0,'0','0','Disable quest from Scourge Invasion for Night Elves'),
-(1,12774,0,'0','0','Disable quest from Scourge Invasion for Human'),
-(1,12775,0,'0','0','Disable quest from Scourge Invasion for Human'),
-(1,12776,0,'0','0','Disable quest from Scourge Invasion for Draenei'),
-(1,12777,0,'0','0','Disable quest from Scourge Invasion for Draenei'),
-(1,12782,0,'0','0','Disable quest from Scourge Invasion for Blood Elves'),
-(1,12783,0,'0','0','Disable quest from Scourge Invasion for Orcs'),
-(1,12784,0,'0','0','Disable quest from Scourge Invasion for Tauren'),
-(1,12785,0,'0','0','Disable quest from Scourge Invasion for Trolls'),
-(1,12786,0,'0','0','Disable quest from Scourge Invasion for Tauren'),
-(1,12787,0,'0','0','Disable quest from Scourge Invasion for undead'),
-(1,12788,0,'0','0','Disable quest from Scourge Invasion for Blood Elves'),
-(1,12808,0,'0','0','Disable quest from Scourge Invasion for Gnomes'),
-(1,12809,0,'0','0','Disable quest from Scourge Invasion for Gnomes'),
-(1,12811,0,'0','0','Disable quest from Scourge Invasion for Trolls'),
-(1,12812,0,'0','0','Disable quest from Scourge Invasion for Orcs'),
 (1,12911,0,'','','Deprecated quest: Kill Credit Test'),
 (1,12923,0,'','','Deprecated quest: '),
 (1,13123,0,'','','Deprecated quest: WotLK Collector\'s Edition: - DEM - E - FLAG'),
@@ -959,5 +940,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2024-12-17 22:33:43
-
+-- Dump completed on 2025-07-19 12:08:53
