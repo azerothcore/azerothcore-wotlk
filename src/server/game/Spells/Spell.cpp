@@ -2246,14 +2246,7 @@ void Spell::SearchChainTargets(std::list<WorldObject*>& targets, uint32 chainTar
     // remove targets which are always invalid for chain spells
     // for some spells allow only chain targets in front of caster (swipe for example)
     if (!isBouncingFar)
-    {
-        for (std::list<WorldObject*>::iterator itr = tempTargets.begin(); itr != tempTargets.end();)
-        {
-            std::list<WorldObject*>::iterator checkItr = itr++;
-            if (!m_caster->HasInArc(static_cast<float>(M_PI), *checkItr))
-                tempTargets.erase(checkItr);
-        }
-    }
+        tempTargets.remove_if([this](WorldObject* target) { return !m_caster->HasInArc(static_cast<float>(M_PI), target); });
 
     while (chainTargets)
     {
