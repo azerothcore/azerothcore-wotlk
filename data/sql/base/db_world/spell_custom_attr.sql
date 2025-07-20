@@ -1,8 +1,8 @@
--- MySQL dump 10.13  Distrib 8.0.34, for Win64 (x86_64)
+-- MySQL dump 10.13  Distrib 8.4.3, for Win64 (x86_64)
 --
--- Host: 127.0.0.1    Database: acore_world
+-- Host: localhost    Database: acore_world
 -- ------------------------------------------------------
--- Server version	8.0.34
+-- Server version	8.4.3
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
 /*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
@@ -147,6 +147,7 @@ INSERT INTO `spell_custom_attr` VALUES
 (27005,131072),
 (27130,100663296),
 (27441,131072),
+(28282,67108864),
 (28310,12288),
 (28456,65536),
 (28884,8),
@@ -246,13 +247,21 @@ INSERT INTO `spell_custom_attr` VALUES
 (43512,12288),
 (43530,64),
 (44132,4194304),
+(44406,4194304),
 (45150,8),
+(45402,536870912),
+(45724,4194304),
+(45770,4194304),
+(46102,134217728),
+(46305,4194304),
+(46340,2048),
 (46619,16777216),
 (47585,167772160),
 (48571,131072),
 (48572,131072),
 (48578,131072),
 (48579,131072),
+(48585,4194304),
 (48656,131072),
 (48657,131072),
 (48675,131072),
@@ -269,6 +278,7 @@ INSERT INTO `spell_custom_attr` VALUES
 (52890,32768),
 (53338,64),
 (53454,32768),
+(53642,2048),
 (54836,12288),
 (55550,524288),
 (57467,8),
@@ -367,5 +377,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2024-12-17 22:34:38
-
+-- Dump completed on 2025-07-19 12:09:39

@@ -1,8 +1,8 @@
--- MySQL dump 10.13  Distrib 8.0.34, for Win64 (x86_64)
+-- MySQL dump 10.13  Distrib 8.4.3, for Win64 (x86_64)
 --
--- Host: 127.0.0.1    Database: acore_world
+-- Host: localhost    Database: acore_world
 -- ------------------------------------------------------
--- Server version	8.0.34
+-- Server version	8.4.3
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
 /*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
@@ -2805,10 +2805,10 @@ INSERT INTO `item_loot_template` VALUES
 (17726,17722,0,17,0,1,1,1,1,'Smokywood Pastures Special Gift - Pattern: Gloves of the Greatfather'),
 (17726,17724,0,17,0,1,1,1,1,'Smokywood Pastures Special Gift - Pattern: Green Holiday Shirt'),
 (17726,17725,0,17,0,1,1,1,1,'Smokywood Pastures Special Gift - Formula: Enchant Weapon - Winter\'s Might'),
-(17727,785,0,27.5,0,1,0,10,10,'Smokywood Pastures Gift Pack - Mageroyal'),
-(17727,2318,0,24.2,0,1,0,10,10,'Smokywood Pastures Gift Pack - Light Leather'),
-(17727,2840,0,21.3,0,1,0,10,10,'Smokywood Pastures Gift Pack - Copper Bar'),
-(17727,2996,0,26.9,0,1,0,4,4,'Smokywood Pastures Gift Pack - Bolt of Linen Cloth'),
+(17727,785,0,0,0,1,1,10,10,'Smokywood Pastures Gift Pack - Mageroyal'),
+(17727,2318,0,0,0,1,1,10,10,'Smokywood Pastures Gift Pack - Light Leather'),
+(17727,2840,0,0,0,1,1,10,10,'Smokywood Pastures Gift Pack - Copper Bar'),
+(17727,2996,0,0,0,1,1,4,4,'Smokywood Pastures Gift Pack - Bolt of Linen Cloth'),
 (17962,1529,0,67.6,0,1,0,1,3,'Blue Sack of Gems - Jade'),
 (17962,3864,0,55.9,0,1,0,1,3,'Blue Sack of Gems - Citrine'),
 (17962,7909,0,64.7,0,1,0,1,3,'Blue Sack of Gems - Aquamarine'),
@@ -5042,5 +5042,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2024-12-17 22:34:00
-
+-- Dump completed on 2025-07-19 12:09:10
