@@ -1,3 +1,4 @@
+-- DB update 2025_07_20_00 -> 2025_07_20_01
 -- Stackable debuffs
 SET @flag := 4194304;
 
