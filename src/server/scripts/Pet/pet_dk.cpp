@@ -47,6 +47,8 @@ enum DeathKnightSpells
     // Risen Ally
     SPELL_DK_RAISE_ALLY             = 46619,
     SPELL_GHOUL_FRENZY              = 62218,
+    // Gargoyle
+    SPELL_GARGOYLE_STRIKE           = 51963,
 };
 
 struct npc_pet_dk_ebon_gargoyle : ScriptedAI
@@ -89,12 +91,13 @@ struct npc_pet_dk_ebon_gargoyle : ScriptedAI
         me->AddUnitState(UNIT_STATE_NO_ENVIRONMENT_UPD);
         _selectionTimer = 2000;
         _initialCastTimer = 0;
+        _castDelay = 0;
     }
 
     void MySelectNextTarget()
     {
         Unit* owner = me->GetOwner();
-        if (owner && owner->IsPlayer() && (!me->GetVictim() || me->GetVictim()->IsImmunedToSpell(sSpellMgr->GetSpellInfo(51963)) || !me->IsValidAttackTarget(me->GetVictim()) || !owner->CanSeeOrDetect(me->GetVictim())))
+        if (owner && owner->IsPlayer() && (!me->GetVictim() || me->GetVictim()->IsImmunedToSpell(sSpellMgr->GetSpellInfo(SPELL_GARGOYLE_STRIKE)) || !me->IsValidAttackTarget(me->GetVictim()) || !owner->CanSeeOrDetect(me->GetVictim())))
         {
             Unit* selection = owner->ToPlayer()->GetSelectedUnit();
             if (selection && selection != me->GetVictim() && me->IsValidAttackTarget(selection))
@@ -118,7 +121,7 @@ struct npc_pet_dk_ebon_gargoyle : ScriptedAI
         RemoveTargetAura();
         _targetGUID = who->GetGUID();
         me->AddAura(SPELL_DK_SUMMON_GARGOYLE_1, who);
-        ScriptedAI::AttackStart(who);
+        ScriptedAI::AttackStartCaster(who, 40);
     }
 
     void RemoveTargetAura()
@@ -198,7 +201,22 @@ struct npc_pet_dk_ebon_gargoyle : ScriptedAI
                 _selectionTimer = 0;
             }
             if (_initialCastTimer >= 2000 && !me->HasUnitState(UNIT_STATE_CASTING | UNIT_STATE_LOST_CONTROL) && me->GetMotionMaster()->GetMotionSlotType(MOTION_SLOT_CONTROLLED) == NULL_MOTION_TYPE)
-                me->CastSpell(me->GetVictim(), 51963, false);
+            {
+                _castDelay -= diff;
+
+                if (_castDelay <= 0)
+                {
+                    if (me->HasSilenceAura() || me->IsSpellProhibited(SPELL_SCHOOL_MASK_NATURE))
+                        me->GetMotionMaster()->MoveChase(me->GetVictim());
+                    else
+                    {
+                        me->GetMotionMaster()->MoveChase(me->GetVictim(), 40);
+                        if (DoCastVictim(SPELL_GARGOYLE_STRIKE) == SPELL_CAST_OK)
+                            _castDelay = irand(0,1000);
+                    }
+                }
+            }
+
         }
         else
         {
@@ -217,6 +235,7 @@ private:
     uint32 _despawnTimer;
     uint32 _selectionTimer;
     uint32 _initialCastTimer;
+    int32 _castDelay;
     bool _despawning;
     bool _initialSelection;
 };
