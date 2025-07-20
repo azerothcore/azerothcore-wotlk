@@ -22,10 +22,21 @@
 #include "Util.h"
 #include <boost/algorithm/string/join.hpp>
 #include <boost/iostreams/copy.hpp>
-#include "boost/process.hpp"
 #include <filesystem>
 
+#if BOOST_VERSION < 108800
+#include <boost/process.hpp>
 using namespace boost::process;
+#else
+#include <boost/process/v1/args.hpp>
+#include <boost/process/v1/child.hpp>
+#include <boost/process/v1/env.hpp>
+#include <boost/process/v1/exe.hpp>
+#include <boost/process/v1/io.hpp>
+#include <boost/process/v1/search_path.hpp>
+using namespace boost::process::v1;
+#endif
+
 using namespace boost::iostreams;
 
 namespace Acore
@@ -118,7 +129,11 @@ namespace Acore
                     exe = std::filesystem::absolute(executable).string(),
                     args = argsVector,
                     env = environment(boost::this_process::environment()),
+#if BOOST_VERSION < 108800
                     std_in = boost::process::close,
+#else
+                    std_in = boost::process::v1::close,
+#endif
                     std_out = outStream,
                     std_err = errStream
                 };

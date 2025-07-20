@@ -67,8 +67,6 @@ struct boss_exarch_maladaar : public BossAI
         });
     }
 
-    bool _talked;
-
     void Reset() override
     {
         _Reset();
@@ -113,6 +111,7 @@ struct boss_exarch_maladaar : public BossAI
                 {
                     summon->CastSpell(summon, SPELL_STOLEN_SOUL_VISUAL, false);
                     summon->SetDisplayId(target->GetDisplayId());
+                    summon->AI()->SetGUID(target->GetGUID());
                     summon->AI()->DoAction(target->getClass());
                     summon->AI()->AttackStart(target);
                 }
@@ -152,20 +151,21 @@ struct boss_exarch_maladaar : public BossAI
 
         DoMeleeAttackIfReady();
     }
+
+private:
+    bool _talked;
 };
 
 struct npc_stolen_soul : public ScriptedAI
 {
     npc_stolen_soul(Creature* creature) : ScriptedAI(creature) {}
 
-    uint8 myClass;
-
     void Reset() override
     {
-        myClass = CLASS_WARRIOR;
+        _myClass = CLASS_WARRIOR;
         _scheduler.Schedule(1s, [this] (TaskContext /*context*/)
         {
-            switch (myClass)
+            switch (_myClass)
             {
                 case CLASS_WARRIOR:
                     _scheduler.Schedule(0ms, [this](TaskContext context)
@@ -241,9 +241,14 @@ struct npc_stolen_soul : public ScriptedAI
         });
     }
 
+    void SetGUID(ObjectGuid guid, int32 /*id*/) override
+    {
+        _targetGuid = guid;
+    }
+
     void DoAction(int32 pClass) override
     {
-        myClass = pClass;
+        _myClass = pClass;
     }
 
     void UpdateAI(uint32 diff) override
@@ -255,8 +260,16 @@ struct npc_stolen_soul : public ScriptedAI
         DoMeleeAttackIfReady();
     }
 
+    void JustDied(Unit* /*killer*/) override
+    {
+        if (Unit* target = ObjectAccessor::GetUnit(*me, _targetGuid))
+            target->RemoveAurasDueToSpell(SPELL_STOLEN_SOUL);
+    }
+
 private:
     TaskScheduler _scheduler;
+    ObjectGuid _targetGuid;
+    uint8 _myClass;
 };
 
 void AddSC_boss_exarch_maladaar()

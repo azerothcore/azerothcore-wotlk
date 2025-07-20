@@ -5,12 +5,14 @@
         "xaver.clang-format",
         "bbenoist.doxygen",
         "ms-vscode.cpptools",
-        "austin.code-gnu-global",
-        "twxs.cmake",
+        "ms-vscode.cmake-tools",
         "mhutchie.git-graph",
         "github.vscode-pull-request-github",
         "eamodio.gitlens",
         "cschlosser.doxdocgen",
-        "sanaajani.taskrunnercode"
+        "sanaajani.taskrunnercode",
+        "mads-hartmann.bash-ide-vscode",
+        "jetmartin.bats",
+        "ms-vscode.makefile-tools",
     ]
 }

@@ -85,6 +85,7 @@ enum Misc
 
     GROUP_START_INTRO           = 0,
     GROUP_BREATH                = 1,
+    GROUP_TAKEOFF               = 2,
 
     NPC_FOG_TRIGGER             = 23472,
     NPC_KALECGOS_FELMYST        = 24844, // Same as Magister's Terrace
@@ -107,7 +108,8 @@ const Position RightSideLanes[3] =
 
 const Position RightSide = { 1458.5555f, 502.1995f, 59.899513f, 1.605702f };
 const Position LeftSide = { 1469.0642f, 729.5854f, 59.823853f, 4.6774f };
-const Position LandingPos = { 1476.77f, 665.094f, 20.6423f };
+const Position LandingLeftPos = { 1476.77f, 665.094f, 20.6423f };
+const Position LandingRightPos = { 1469.93f, 557.009f, 22.631699f };
 
 class CorruptTriggers : public BasicEvent
 {
@@ -213,19 +215,25 @@ struct boss_felmyst : public BossAI
         }, 7500ms);
 
         ScheduleTimedEvent(13s, 30s, [&] {
-            Talk(YELL_BREATH);
-            DoCastVictim(SPELL_CORROSION);
+            if (scheduler.GetNextGroupOccurrence(GROUP_TAKEOFF) > 2s)
+            {
+                Talk(YELL_BREATH);
+                DoCastVictim(SPELL_CORROSION);
+            }
         }, 30s, 39s);
 
         ScheduleTimedEvent(18s, 43s, [&] {
-            DoCastSelf(SPELL_GAS_NOVA);
+            if (scheduler.GetNextGroupOccurrence(GROUP_TAKEOFF) > 2s)
+                DoCastSelf(SPELL_GAS_NOVA);
         }, 18s, 43s);
 
         ScheduleTimedEvent(26s, 53s, [&] {
-            DoCastRandomTarget(SPELL_ENCAPSULATE_CHANNEL, 0, 50.0f);
+            if (scheduler.GetNextGroupOccurrence(GROUP_TAKEOFF) > 9s)
+                DoCastRandomTarget(SPELL_ENCAPSULATE_CHANNEL, 0, 50.0f);
         }, 26s, 53s);
 
-        me->m_Events.AddEventAtOffset([&] {
+        scheduler.Schedule(1min, GROUP_TAKEOFF, [&](TaskContext)
+        {
             Talk(YELL_TAKEOFF);
             scheduler.CancelAll();
             me->SetReactState(REACT_PASSIVE);
@@ -240,7 +248,7 @@ struct boss_felmyst : public BossAI
             SetInvincibility(true);
             me->HandleEmoteCommand(EMOTE_ONESHOT_LIFTOFF);
             me->GetMotionMaster()->MovePoint(POINT_TAKEOFF, me->GetPositionX(), me->GetPositionY(), me->GetPositionZ() + 20.0f);
-        }, 1min);
+        });
     }
 
     void MovementInform(uint32 type, uint32 point) override
@@ -285,21 +293,25 @@ struct boss_felmyst : public BossAI
 
                 scheduler.Schedule(27s, GROUP_BREATH, [this](TaskContext)
                 {
-                    me->GetMotionMaster()->MovePoint(POINT_AIR_UP, RightSide);
+                    if (me->GetDistance(LeftSide) < me->GetDistance(RightSide))
+                        me->GetMotionMaster()->MovePoint(POINT_AIR_UP, LeftSide);
+                    else
+                        me->GetMotionMaster()->MovePoint(POINT_AIR_UP, RightSide);
                 });
                 break;
             case POINT_AIR_UP:
                 me->m_Events.AddEventAtOffset([&] {
+                    bool isRightSide = me->FindNearestCreature(NPC_WORLD_TRIGGER_RIGHT, 30.0f);
                     if (_strafeCount >= 3)
                     {
                         _strafeCount = 0;
-                        me->GetMotionMaster()->MoveLand(POINT_GROUND, LandingPos);
+                        me->GetMotionMaster()->MoveLand(POINT_GROUND, isRightSide ? LandingRightPos : LandingLeftPos);
                         return;
                     }
 
                     ++_strafeCount;
                     _currentLane = urand(0, 2);
-                    if (me->FindNearestCreature(NPC_WORLD_TRIGGER_RIGHT, 30.0f))
+                    if (isRightSide)
                         me->GetMotionMaster()->MovePoint(POINT_LANE, RightSideLanes[_currentLane], false);
                     else
                         me->GetMotionMaster()->MovePoint(POINT_LANE, LeftSideLanes[_currentLane], false);

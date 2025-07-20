@@ -18,6 +18,7 @@
 #ifndef _OBJECT_H
 #define _OBJECT_H
 
+#include "AreaDefines.h"
 #include "Common.h"
 #include "DataMap.h"
 #include "EventProcessor.h"
@@ -229,6 +230,12 @@ public:
 
     DataMap CustomData;
 
+    template<typename... T>
+    [[nodiscard]] bool EntryEquals(T... entries) const
+    {
+        return ((GetEntry() == entries) || ...);
+    }
+
 protected:
     Object();
 
@@ -398,12 +405,56 @@ class MovableMapObject
 protected:
     MovableMapObject()  = default;
 
-private:
     [[nodiscard]] Cell const& GetCurrentCell() const { return _currentCell; }
+
+private:
     void SetCurrentCell(Cell const& cell) { _currentCell = cell; }
 
     Cell _currentCell;
     MapObjectCellMoveState _moveState{MAP_OBJECT_CELL_MOVE_NONE};
+};
+
+class UpdatableMapObject
+{
+    friend class Map;
+
+public:
+    enum UpdateState : uint8
+    {
+        NotUpdating,
+        PendingAdd,
+        Updating
+    };
+
+protected:
+    UpdatableMapObject() : _mapUpdateListOffset(0), _mapUpdateState(NotUpdating) { }
+
+private:
+    void SetMapUpdateListOffset(std::size_t const offset)
+    {
+        ASSERT(_mapUpdateState == Updating, "Attempted to set update list offset when object is not in map update list");
+        _mapUpdateListOffset = offset;
+    }
+
+    size_t GetMapUpdateListOffset() const
+    {
+        ASSERT(_mapUpdateState == Updating, "Attempted to get update list offset when object is not in map update list");
+        return _mapUpdateListOffset;
+    }
+
+    void SetUpdateState(UpdateState state)
+    {
+        _mapUpdateState = state;
+    }
+
+    UpdateState GetUpdateState() const
+    {
+        return _mapUpdateState;
+    }
+
+private:
+    std::size_t _mapUpdateListOffset;
+    UpdateState _mapUpdateState;
 };
 
 class WorldObject : public Object, public WorldLocation
@@ -425,13 +476,13 @@ public:
     void GetNearPoint(WorldObject const* searcher, float& x, float& y, float& z, float searcher_size, float distance2d, float absAngle, float controlZ = 0, Position const* startPos = nullptr) const;
     void GetVoidClosePoint(float& x, float& y, float& z, float size, float distance2d = 0, float relAngle = 0, float controlZ = 0) const;
     bool GetClosePoint(float& x, float& y, float& z, float size, float distance2d = 0, float angle = 0, WorldObject const* forWho = nullptr, bool force = false) const;
-    void MovePosition(Position& pos, float dist, float angle, bool disableWarning = false);
-    Position GetNearPosition(float dist, float angle, bool disableWarning = false);
+    void MovePosition(Position& pos, float dist, float angle);
+    Position GetNearPosition(float dist, float angle);
     void MovePositionToFirstCollision(Position& pos, float dist, float angle);
     Position GetFirstCollisionPosition(float startX, float startY, float startZ, float destX, float destY);
     Position GetFirstCollisionPosition(float destX, float destY, float destZ);
     Position GetFirstCollisionPosition(float dist, float angle);
-    Position GetRandomNearPosition(float radius, bool disableWarning = false);
+    Position GetRandomNearPosition(float radius);
 
     void GetContactPoint(WorldObject const* obj, float& x, float& y, float& z, float distance2d = CONTACT_DISTANCE) const;
     void GetChargeContactPoint(WorldObject const* obj, float& x, float& y, float& z, float distance2d = CONTACT_DISTANCE) const;
@@ -553,7 +604,9 @@ public:
 
     [[nodiscard]] Player* SelectNearestPlayer(float distance = 0) const;
     void GetGameObjectListWithEntryInGrid(std::list<GameObject*>& lList, uint32 uiEntry, float fMaxSearchRange) const;
+    void GetGameObjectListWithEntryInGrid(std::list<GameObject*>& gameobjectList, std::vector<uint32> const& entries, float maxSearchRange) const;
     void GetCreatureListWithEntryInGrid(std::list<Creature*>& lList, uint32 uiEntry, float fMaxSearchRange) const;
+    void GetCreatureListWithEntryInGrid(std::list<Creature*>& creatureList, std::vector<uint32> const& entries, float maxSearchRange) const;
     void GetDeadCreatureListInGrid(std::list<Creature*>& lList, float maxSearchRange, bool alive = false) const;
 
     void DestroyForNearbyPlayers();
@@ -588,7 +641,7 @@ public:
 
     [[nodiscard]] bool IsInWintergrasp() const
     {
-        return GetMapId() == 571 && GetPositionX() > 3733.33331f && GetPositionX() < 5866.66663f && GetPositionY() > 1599.99999f && GetPositionY() < 4799.99997f;
+        return GetMapId() == MAP_NORTHREND && GetPositionX() > 3733.33331f && GetPositionX() < 5866.66663f && GetPositionY() > 1599.99999f && GetPositionY() < 4799.99997f;
     }
 
     uint32  LastUsedScriptID;
@@ -611,6 +664,10 @@ public:
     [[nodiscard]] virtual float GetStationaryZ() const { return GetPositionZ(); }
     [[nodiscard]] virtual float GetStationaryO() const { return GetOrientation(); }
 
+    [[nodiscard]] float GetMapWaterOrGroundLevel(Position pos, float* ground = nullptr) const
+    {
+        return GetMapWaterOrGroundLevel(pos.GetPositionX(), pos.GetPositionY(), pos.GetPositionZ(), ground);
+    };
     [[nodiscard]] float GetMapWaterOrGroundLevel(float x, float y, float z, float* ground = nullptr) const;
     [[nodiscard]] float GetMapHeight(float x, float y, float z, bool vmap = true, float distanceToSearch = 50.0f) const; // DEFAULT_HEIGHT_SEARCH in map.h
 
@@ -627,6 +684,9 @@ public:
     [[nodiscard]] bool HasAllowedLooter(ObjectGuid guid) const;
     [[nodiscard]] GuidUnorderedSet const& GetAllowedLooters() const;
     void RemoveAllowedLooter(ObjectGuid guid);
+
+    virtual bool IsUpdateNeeded();
+    bool CanBeAddedToMapUpdateList();
 
     std::string GetDebugInfo() const override;
 

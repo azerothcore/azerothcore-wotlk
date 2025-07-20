@@ -1,8 +1,8 @@
--- MySQL dump 10.13  Distrib 8.0.34, for Win64 (x86_64)
+-- MySQL dump 10.13  Distrib 8.4.3, for Win64 (x86_64)
 --
--- Host: 127.0.0.1    Database: acore_world
+-- Host: localhost    Database: acore_world
 -- ------------------------------------------------------
--- Server version	8.0.34
+-- Server version	8.4.3
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
 /*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
@@ -96,11 +96,8 @@ INSERT INTO `acore_string` VALUES
 (52,'Invalid item count ({}) for item {}',NULL,NULL,'Ungültige Itemanzahl ({}) für das Item {}','无效的物品数量 ({}) 制造 {}。',NULL,'Recuento de elementos no válido ({}) para el elemento {}','Recuento de elementos no válido ({}) para el elemento {}',NULL),
 (53,'Mail can\'t have more {} item stacks',NULL,NULL,'Mail kann nicht mehr als {} Itemplätze haben','邮件已经达到物品最大的数量{}。',NULL,'El correo no puede tener más pilas de artículos {}','El correo no puede tener más pilas de artículos {}',NULL),
 (54,'The new passwords do not match',NULL,NULL,'Die neuen Passwörter stimmen nicht überein','新密码两次输入不一致。',NULL,'Las nuevas contraseñas no coinciden','Las nuevas contraseñas no coinciden',NULL),
-(55,'Your password can\'t be longer than 16 characters (client limit),
-\n password not changed!',NULL,NULL,'Das Passwort kann nicht länger als 16 Zeichen sein (Client Limit). Das Passwort wurde nicht geändert!','你的新密码不能超过16个字符 (客户端限制)， 密码没有修改！',NULL,'Su contraseña no puede tener más de 16 caracteres (límite del cliente),
-\n ¡la contraseña no se cambia!','Su contraseña no puede tener más de 16 caracteres (límite del cliente),
-\n ¡la contraseña no se cambia!',NULL),
-(56,'Current Message of the day: \r\n{}',NULL,NULL,'Aktuelle Nachricht des Tages: \r\n{}','当前每日信息: \r\n{}',NULL,'Mensaje actual del día: \r\n{}','Mensaje actual del día: \r\n{}',NULL),
+(55,'Your password can\'t be longer than 16 characters (client limit), password not changed!',NULL,'Le mot de passe ne doit pas dépasser 16 caractères (limitation technique du client), le mot de passe n\'a pas été changé!','Das Passwort kann nicht länger als 16 Zeichen sein (Client Limit). Das Passwort wurde nicht geändert!','你的新密码不能超过16个字符 (客户端限制)， 密码没有修改！',NULL,'Su contraseña no puede tener más de 16 caracteres (límite del cliente), ¡la contraseña no se cambia!','Su contraseña no puede tener más de 16 caracteres (límite del cliente), ¡la contraseña no se cambia!','Ваш пароль не может быть длиннее 16 символов (клиентский лимит), пароль не изменен!'),
+(56,'Current Message of the day:',NULL,NULL,'Aktuelle Nachricht des Tages:','当前每日信息:',NULL,'Mensaje actual del día:','Mensaje actual del día:',NULL),
 (57,'Using World DB: {}',NULL,NULL,'Verwende World-DB: {}','使用世界数据库: {}',NULL,'Uso de la base de datos mundial: {}','Uso de la base de datos mundial: {}',NULL),
 (58,'Using script library: {}',NULL,NULL,'Verwende Script-Bibliothek: {}','使用脚本库: {}',NULL,'Utilizando la biblioteca de scripts: {}','Utilizando la biblioteca de scripts: {}',NULL),
 (59,'Using creature EventAI: {}',NULL,NULL,'Verwende creature EventAI: {}','使用生物AI: {}',NULL,'Usando la criatura EventAI: {}','Usando la criatura EventAI: {}',NULL),
@@ -126,6 +123,7 @@ INSERT INTO `acore_string` VALUES
 (79,'Couldn\'t revoke permission {} ({}) realmId {}. Account {} ({}) does not have that permission',NULL,NULL,NULL,'不能撤销角色 {} ({}) 不同阵营 {}. 帐户 {} ({}) 不具备这个角色',NULL,'No se ha podido revocar el permiso {} ({}) realmId {}. La cuenta {} ({}) no tiene ese permiso','No se ha podido revocar el permiso {} ({}) realmId {}. La cuenta {} ({}) no tiene ese permiso',NULL),
 (80,'BattleGround victories in the last 7 days\nAlliance: {}\nHorde: {}',NULL,NULL,NULL,NULL,NULL,'Victorias en el campo de batalla en los últimos 7 días\nAlianza: {}\nHorda: {}','Victorias en el campo de batalla en los últimos 7 días\nAlianza: {}\nHorda: {}',NULL),
 (81,'BattleGround scores storing is disabled!',NULL,NULL,NULL,NULL,NULL,'El registro de puntuaciones de campos de batalla está desactivado.','El registro de puntuaciones de campos de batalla está desactivado.',NULL),
+(82,'{}: {}',NULL,NULL,'{}: {}','{}: {}',NULL,'{}: {}','{}: {}',NULL),
 (87,'UNKNOWN_ERROR',NULL,NULL,NULL,NULL,NULL,'ERROR DESCONOCIDO','ERROR DESCONOCIDO',NULL),
 (88,'Two-factor authentication commands are not properly setup.',NULL,NULL,NULL,NULL,NULL,'Los comandos de autenticación de doble factor no están configurados correctamente.','Los comandos de autenticación de doble factor no están configurados correctamente.',NULL),
 (89,'Two-factor authentication is already enabled for this account.',NULL,NULL,NULL,NULL,NULL,'La autenticación de dos factores ya está activada para esta cuenta.','La autenticación de dos factores ya está activada para esta cuenta.',NULL),
@@ -255,7 +253,7 @@ INSERT INTO `acore_string` VALUES
 (220,'Creature (GUID: {}) No waypoint found.',NULL,NULL,'Kreatur (GUID: {}) Kein Wegpunkt gefunden.','生物 (GUID: {}) 没有飞行点发现.',NULL,'Criatura (GUID: {}) No se ha encontrado ningún waypoint.','Criatura (GUID: {}) No se ha encontrado ningún waypoint.',NULL),
 (221,'Creature (GUID: {}) Last waypoint not found.',NULL,NULL,'Kreatur (GUID: {}) Letzter Wegpunkt nicht gefunden.','生物 (GUID: {}) 飞行终点没有找到.',NULL,'Criatura (GUID: {}) Último waypoint no encontrado.','Criatura (GUID: {}) Último waypoint no encontrado.',NULL),
 (222,'Creature (GUID: {}) No waypoint found - used \'wpguid\'. Now trying to find it by its position...',NULL,NULL,'Kreatur (GUID: {}) Kein Wegpunkt gefunden - \'wpguid\' wurde verwendet. Versuche ihn nun durch dessen Position zu finden...','生物 (GUID: {}) 没有飞行点发现 - 请用  \'wpguid\'. 现在设法发现它由它的位置...',NULL,'Criatura (GUID: {}) No se ha encontrado ningún waypoint - se ha utilizado \'wpguid\'. Ahora intento encontrarlo por su posición...','Criatura (GUID: {}) No se ha encontrado ningún waypoint - se ha utilizado \'wpguid\'. Ahora intento encontrarlo por su posición...',NULL),
-(223,'Creature (GUID: {}) No waypoints found - This is a MaNGOS db problem (single float).',NULL,NULL,'Kreatur (GUID: {}) Keine Wegpunkte gefunden - Dies ist ein Trinity-DB Problem (single float).','生物 (GUID: {}) 没有飞行点发现 - 这是一个MaNGOS db 问题 (single float).',NULL,'Criatura (GUID: {}) No se han encontrado waypoints - Se trata de un problema de AzerothCore (flotador único).','Criatura (GUID: {}) No se han encontrado waypoints - Se trata de un problema de AzerothCore (flotador único).',NULL),
+(223,'No waypoint information was found for Creature (GUID: {}). Make sure \'wp show on\' command was properly executed.',NULL,NULL,'Keine Wegpunktinformationen wurden für das Wesen (GUID: {}) gefunden. Stellen Sie sicher, dass der Befehl \'wp show on\' korrekt ausgeführt wurde.','未找到生物（GUID: {}）的路径点信息。请确保正确执行了“wp show on”命令。',NULL,'No se encontraron información de punto de ruta para la criatura (GUID: {}). Asegúrese de que el comando \'wp show on\' se haya ejecutado correctamente.','No se encontraron información de punto de ruta para la criatura (GUID: {}). Asegúrese de que el comando \'wp show on\' se haya ejecutado correctamente.',NULL),
 (224,'Selected creature is ignored - provided GUID is used',NULL,NULL,'Angewählte Kreatur wird ignoriert - bereitgestellte GUID wird verwendet','选择的生物被忽略 - 提供的 GUID 已经被占用.',NULL,'La criatura seleccionada se ignora - siempre que se utilice el GUID','La criatura seleccionada se ignora - siempre que se utilice el GUID',NULL),
 (225,'Creature (GUID: {}) not found',NULL,NULL,'Kreatur (GUID: {}) nicht gefunden','生物 (GUID: {}) 没有找到.',NULL,'Criatura (GUID: {}) no encontrada','Criatura (GUID: {}) no encontrada',NULL),
 (226,'You must select a visual waypoint.',NULL,NULL,'Ihr müsst einen visuellen Wegpunkt wählen.','您必须选择一个视觉飞行点.',NULL,'Debe seleccionar un waypoint visual.','Debe seleccionar un waypoint visual.',NULL),
@@ -286,8 +284,7 @@ INSERT INTO `acore_string` VALUES
 (251,'Text{} (ID: {}): {}',NULL,NULL,'Text {} (ID: {}): {}','文本{} (ID: {}): {}',NULL,'Texto {} (ID: {}): {}','Texto {} (ID: {}): {}',NULL),
 (252,'AIScript: {}',NULL,NULL,'AIScript: {}','AI脚本: {}',NULL,'AIScript: {}','AIScript: {}',NULL),
 (253,'Forced rename for player {} will be requested at next login.',NULL,NULL,'Spieler {} muss beim nächsten Login umbenannt werden.','强制修改玩家名 {}, 将于下次登录时生效.',NULL,'Se solicitará un cambio de nombre forzado para el jugador {} en el próximo inicio de sesión.','Se solicitará un cambio de nombre forzado para el jugador {} en el próximo inicio de sesión.',NULL),
-(254,'Forced rename for player {} (GUID #{}) will be requested at next login.',NULL,NULL,'Spieler {} (GUID #{}) muss beim nächsten Login umbenannt werden.','强制修改玩家名 {} (GUID #{}),
-\n 将于下次登录时生效.',NULL,'Se solicitará un cambio de nombre forzado para el jugador {} (GUID #{}) en el próximo inicio de sesión.','Se solicitará un cambio de nombre forzado para el jugador {} (GUID #{}) en el próximo inicio de sesión.',NULL),
+(254,'Forced rename for player {} (GUID #{}) will be requested at next login.',NULL,NULL,'Spieler {} (GUID #{}) muss beim nächsten Login umbenannt werden.','强制修改玩家名 {} (GUID #{}),\n\n 将于下次登录时生效.',NULL,'Se solicitará un cambio de nombre forzado para el jugador {} (GUID #{}) en el próximo inicio de sesión.','Se solicitará un cambio de nombre forzado para el jugador {} (GUID #{}) en el próximo inicio de sesión.',NULL),
 (255,'Waypoint-Creature (GUID: {}) Not found',NULL,NULL,'Wegpunkt-Kreatur (GUID: {}) Nicht gefunden','飞行点-生物 (GUID: {}) 没有找到.',NULL,'Criatura de la ruta (GUID: {}) no encontrada','Criatura de la ruta (GUID: {}) no encontrada',NULL),
 (256,'Could not find NPC...',NULL,NULL,'Konnte den NPC nicht finden...','不能查找NPC...',NULL,'No se ha podido encontrar el NPC...','No se ha podido encontrar el NPC...',NULL),
 (257,'Creature movement type set to \'{}\', waypoints removed (if any).',NULL,NULL,'Bewegungsart der Kreatur wurde auf \'{}\' gesetzt, Wegpunkte wurde entfernt (falls sie vorhanden waren).','生物运动方式设置为 \'{}\', 飞行点去除 (如果任何).',NULL,'El tipo de movimiento de la criatura se ha establecido en \'{}\', los waypoints se han eliminado (si los hay).','El tipo de movimiento de la criatura se ha establecido en \'{}\', los waypoints se han eliminado (si los hay).',NULL),
@@ -321,7 +318,7 @@ INSERT INTO `acore_string` VALUES
 (285,'Accepting Whisper: ON',NULL,NULL,'Flüstern erlauben: AN (ON)','接受悄悄话: ON',NULL,'Aceptando Susurro: ON','Aceptando Susurro: ON',NULL),
 (286,'Accepting Whisper: OFF',NULL,NULL,'Flüstern erlauben: AUS (OFF)','接受悄悄话: OFF',NULL,'Aceptando Susurro: OFF','Aceptando Susurro: OFF',NULL),
 (287,'Creature (GUID: {}) not found',NULL,NULL,'Kreatur (GUID: {}) nicht gefunden','生物 (GUID: {}) 没有找到.',NULL,'Criatura (GUID: {}) no encontrada','Criatura (GUID: {}) no encontrada',NULL),
-(288,'Tickets count: {} show new tickets: {}\n',NULL,NULL,'Anzahl der Tickets: {} zeige neue Tickets: {}','票数量: {} 出示新的票: {}',NULL,'Recuento de tickets: {} mostrar nuevos tickets: {}\n','Recuento de tickets: {} mostrar nuevos tickets: {}\n',NULL),
+(288,'Cannot go to spawn {} as only {} exist',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL),
 (289,'New ticket from {}',NULL,NULL,'Neues Ticket von {}','新票开始于 {}',NULL,'Nuevo ticket de {}','Nuevo ticket de {}',NULL),
 (290,'Ticket of {} (Last updated: {}):\n{}',NULL,NULL,'Ticket von {} (Letzte aktuallisierung: {}):\n{}','票 {}(最後的更新: {}):\n{}',NULL,'Ticket de {} (Última actualización: {}):\n{}','Ticket de {} (Última actualización: {}):\n{}',NULL),
 (291,'New ticket show: ON',NULL,NULL,'Neue Tickets zeigen: AN','新票显示: ON',NULL,'Mostrar nuevo ticket: ON','Mostrar nuevo ticket: ON',NULL),
@@ -618,14 +615,10 @@ INSERT INTO `acore_string` VALUES
 (708,'{} is Away from Keyboard: {}',NULL,NULL,'{} ist abwesend von der Tastatur: {}','{} 不在机器旁: {}',NULL,NULL,NULL,NULL),
 (709,'Do not Disturb',NULL,NULL,'Bitte nicht stören.','请勿打扰',NULL,NULL,NULL,NULL),
 (710,'Away from Keyboard',NULL,NULL,'Abwesend von der Tastatur','不在机器旁',NULL,NULL,NULL,NULL),
-(711,'Queue status for {} (Lvl: {} to {})\nQueued alliances: {} (Need at least {} more)\nQueued hordes: {} (Need at least {} more)',NULL,NULL,'Warteschlangenstatus für {} (Lvl: {} to {})\n Warteschlange Allianz: {} (Brauchen noch mindestens {} mehr)\n Warteschlange Horde: {} (Brauchen noch mindestens {} mehr)','|cffff0000[战场公告]:|r {} -- [{}-{}] 联盟: 目前{}人 (需要: {}人),
-\n 部落: 目前{}人 (需要: {}人)|r',NULL,NULL,NULL,NULL),
-(712,'|cffff0000[BG Queue Announcer]:|r {} -- [{}-{}] [{}/{}]|r',NULL,NULL,'|cffff0000[BG Ansager für Warteschlange]:|r {} -- [{}-{}] A: {}/{}, H: {}/{}|r','|cffff0000[战场公告]:|r {} -- [{}-{}] 联盟: 目前{}人 (需要: {}人),
-\n 部落: 目前{}人 (需要: {}人)|r',NULL,NULL,NULL,NULL),
+(711,'Queue status for {} (Lvl: {} to {})\nQueued alliances: {} (Need at least {} more)\nQueued hordes: {} (Need at least {} more)',NULL,NULL,'Warteschlangenstatus für {} (Lvl: {} to {})\n Warteschlange Allianz: {} (Brauchen noch mindestens {} mehr)\n Warteschlange Horde: {} (Brauchen noch mindestens {} mehr)','|cffff0000[战场公告]:|r {} -- [{}-{}] 联盟: 目前{}人 (需要: {}人),\n\n 部落: 目前{}人 (需要: {}人)|r',NULL,NULL,NULL,NULL),
+(712,'|cffff0000[BG Queue Announcer]:|r {} -- [{}-{}] [{}/{}]|r',NULL,NULL,'|cffff0000[BG Ansager für Warteschlange]:|r {} -- [{}-{}] A: {}/{}, H: {}/{}|r','|cffff0000[战场公告]:|r {} -- [{}-{}] 联盟: 目前{}人 (需要: {}人),\n\n 部落: 目前{}人 (需要: {}人)|r',NULL,NULL,NULL,NULL),
 (713,'Queue status for {} (skirmish {}) (Lvl: {} to {})\nQueued: {} (Need at least {} more)',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL),
-(714,'Map: {}, Area: {}, Zone: {}, Phase: {}',NULL,NULL,'¦ Account: {} (ID: {}),
-\n GMLevel: {}','│ 帐号: {} (ID: {}),
-\n GM等级: {}',NULL,NULL,NULL,NULL),
+(714,'Map: {}, Area: {}, Zone: {}, Phase: {}',NULL,NULL,'¦ Account: {} (ID: {}),\n\n GMLevel: {}','│ 帐号: {} (ID: {}),\n\n GM等级: {}',NULL,NULL,NULL,NULL),
 (715,'You don\'t meet Battleground level requirements',NULL,NULL,'Ihr erfüllt die Vorraussetzungen für das Schlachtfeld nicht','不能达到进入战场的要求.',NULL,NULL,NULL,NULL),
 (716,'Map: {}, Area: {}',NULL,NULL,'¦ Letzter Login: {} (Falsche Logins: {})','│最後登录： ％s（登录失败： ％u ）',NULL,NULL,NULL,NULL),
 (717,'|cffff0000[BG Queue Announcer]:|r {} -- [{}-{}] Started!|r',NULL,NULL,'|cffff0000[BG Ansager für Warteschlange]:|r {} -- [{}-{}] beginnt!|r','|cffff0000[战场列队公告]:|r {} -- [{}-{}] 开始！|r',NULL,NULL,NULL,NULL),
@@ -767,8 +760,7 @@ INSERT INTO `acore_string` VALUES
 (1002,'Account {} NOT deleted (probably sql file format was updated)',NULL,NULL,'Account {} wurde NICHT gelöscht (SQL Dateiformat wurde warscheinlich aktualisiert)','账号 {} 没有被删除 (可能是SQL格式已经更新)',NULL,NULL,NULL,NULL),
 (1003,'Account {} NOT deleted (unknown error)',NULL,NULL,'Account {} wurde NICHT gelöscht (unbekannter Fehler)','账号 {} 没有被删除 (未知错误)',NULL,NULL,NULL,NULL),
 (1004,'Account created: {}',NULL,NULL,'Account erstellt: {}','创建帐号: {}',NULL,NULL,NULL,NULL),
-(1005,'Account name can\'t be longer than 20 characters (client limit),
-\n account not created!',NULL,NULL,'Account Name kann nicht länger als 16 Zeichen sein (Client Limit). Account wurde nicht erstellt!','帐号名长度不能超过16个字符（客户端限制），帐户创建失败！',NULL,NULL,NULL,NULL),
+(1005,'Account name can\'t be longer than 17 characters (client limit), account not created!',NULL,'Le nom de compte ne doit pas dépasser 17 caractères (limitation technique du client), le compte n\'a pas été créé!','Der Account Name kann nicht länger als 17 Zeichen sein (Client Limit). Account wurde nicht erstellt!','帐号名长度不能超过17个字符（客户端限制），帐户创建失败！',NULL,'El nombre de la cuenta no puede tener más de 17 caracteres (límite de cliente), ¡cuenta no creada!','El nombre de la cuenta no puede tener más de 17 caracteres (límite de cliente), ¡cuenta no creada!','Имя учетной записи не может быть длиннее 17 символов (ограничение для клиента), учетная запись не создана!'),
 (1006,'Account with this name already exist!',NULL,NULL,'Es existiert bereits ein Account mit diesem Namen!','账号名称有重复！',NULL,NULL,NULL,NULL),
 (1007,'Account {} NOT created (probably sql file format was updated)',NULL,NULL,'Account {} wurde NICHT erstellt (SQL Dateiformat wurde warscheinlich aktualisiert)','账号 {} 创建失败 (可能是SQL格式已经更新)',NULL,NULL,NULL,NULL),
 (1008,'Account {} NOT created (unknown error)',NULL,NULL,'Account {} wurde NICHT erstellt (unbekannter Fehler)','账号 {} 创建失败 (未知错误)',NULL,NULL,NULL,NULL),
@@ -843,13 +835,10 @@ INSERT INTO `acore_string` VALUES
 (1147,'{} is not in a group!',NULL,NULL,NULL,'{} 没有在一个队伍中！',NULL,NULL,NULL,NULL),
 (1148,'Group is full!',NULL,NULL,NULL,'队伍人数已经满了。',NULL,NULL,NULL,NULL),
 (1149,'Group type: {} and consists of {} players.',NULL,NULL,NULL,'队伍类型: 由{} 和 {} 的玩家组成。',NULL,NULL,NULL,NULL),
-(1150,'Name: {} ({}),
-\n Zone: {}, Phase: {}, GUID: {}, Flags: {}, Roles: {}',NULL,NULL,NULL,'名称: {} ({}),
-\n 空间: {}, 层面: {}, 唯一码: {}, 标识: {}, 角色: {}',NULL,NULL,NULL,NULL),
+(1150,'Name: {} ({}),\n\n Zone: {}, Phase: {}, GUID: {}, Flags: {}, Roles: {}',NULL,NULL,NULL,'名称: {} ({}),\n\n 空间: {}, 层面: {}, 唯一码: {}, 标识: {}, 角色: {}',NULL,NULL,NULL,NULL),
 (1151,'Mail List Info: # of mails: {}, Player: {}({})',NULL,NULL,NULL,'邮件信息: # 邮件: {}， 玩家: {}({})',NULL,NULL,NULL,NULL),
 (1152,'Mail Id: {} Title: \"{}\" Money: {}g{}s{}c',NULL,NULL,NULL,'邮箱ID: {} 标题: \"{}\" 金钱: {}g{}s{}c',NULL,NULL,NULL,NULL),
-(1153,'Sender: {}({}),
-\n Receiver: {}({})',NULL,NULL,NULL,'发件人: {}({})， 收件人: {}({})',NULL,NULL,NULL,NULL),
+(1153,'Sender: {}({}),\n\n Receiver: {}({})',NULL,NULL,NULL,'发件人: {}({})， 收件人: {}({})',NULL,NULL,NULL,NULL),
 (1154,'Time deliver: {}, Time expire: {}',NULL,NULL,NULL,'邮寄时间: {}， 到期时间: {}',NULL,NULL,NULL,NULL),
 (1155,'Item: {}[Entry:{} Guid:{} Count:{}]',NULL,NULL,NULL,'物品: {}[编号:{} Guid:{} 数量:{}]',NULL,NULL,NULL,NULL),
 (1156,'Mail List Info: No mail found for this character.',NULL,NULL,NULL,'邮件信息：目前没有这个角色的邮件。',NULL,NULL,NULL,NULL),
@@ -880,6 +869,8 @@ INSERT INTO `acore_string` VALUES
 (1181,'| Guild Bank: {} gold',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL),
 (1182,'| Guild MOTD: {}',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL),
 (1183,'| Guild Information: {}',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL),
+(1184,'| Guild Ranks:',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL),
+(1185,'| {} - {}',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL),
 (1200,'You try to view cinematic {} but it doesn\'t exist.',NULL,NULL,'Ihr versucht den Film {} anzusehen, dieser existiert jedoch nicht.','你尝试播放动画{}，这个动画不存在。',NULL,NULL,NULL,NULL),
 (1201,'You try to view movie {} but it doesn\'t exist.',NULL,NULL,'Ihr versucht den Film {} anzusehen, dieser existiert jedoch nicht.','你尝试播放电影{}，这个电影不存在。',NULL,NULL,NULL,NULL),
 (1202,'Areatrigger debugging turned on.',NULL,NULL,'Areatrigger debugging eingeschaltet.','区域触发调试：开启。',NULL,NULL,NULL,NULL),
@@ -1020,6 +1011,8 @@ INSERT INTO `acore_string` VALUES
 (5083,'Character {} ({}) moved from account {} ({}) to account {} ({}).',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL),
 (5084,'Spell cast failed! SpellCastResult returned: {} ({}).',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL),
 (5085,'Object {} (entry :{} guid: {}) respawned!',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL),
+(5086,'No doors found within range ({} yards).',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL),
+(5087,'Door {} (Entry: {}) opened!',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL),
 (6604,'You cannot say, yell or emote until you become level {}.',NULL,NULL,'Ihr müsst mindestens Level {} sein, bevor Ihr sprechen, rufen oder emotes nutzen dürft.','你的等级必须大于|CFF9900CC{}|R才可以说话或者使用表情。',NULL,NULL,NULL,NULL),
 (6605,'You cannot whisper until you become level {}.',NULL,NULL,'Ihr müsst mindestens Level {} sein, bevor Ihr flüstern dürft.','你的等级大于|CFF9900CC{}|R才可以说悄悄话。',NULL,NULL,NULL,NULL),
 (6606,'You cannot write to channels until you become level {}.',NULL,NULL,'Ihr müsst mindestens Level {} sein, bevor Ihr in Channels schreiben dürft.','你的等级大于|CFF9900CC{}|R才可以使用聊天频道。',NULL,NULL,NULL,NULL),
@@ -1033,11 +1026,11 @@ INSERT INTO `acore_string` VALUES
 (6614,'Notification to GM\'s - ',NULL,NULL,'Mitteilung an GM\'s - ','管理员通知 -',NULL,NULL,NULL,NULL),
 (6615,'|cffffff00[|c1f40af20GM Announce by|r |cffff0000{}|cffffff00]:|r {}|r',NULL,NULL,'|cffffff00[|c1f40af20GM Ankündigung von|r |cffff0000{}|cffffff00]:|r {}|r','|cffffff00[|c1f40af20管理员广播|r |cffff0000{}|cffffff00]:|r {}|r',NULL,NULL,NULL,NULL),
 (6616,'Silence is ON for {}',NULL,NULL,'Ruhe ist AN für {}','静音ON {}',NULL,NULL,NULL,NULL),
-(6617,'No acore_string for id: {} found.',NULL,NULL,'Es wurde kein acore_string mit der id: {} gefunden.',NULL,NULL,NULL,NULL,NULL),
+(6617,'GM Spectator is ON',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL),
+(6618,'GM Spectator is OFF',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL),
 (7523,'WORLD: Denying connections.',NULL,NULL,'Welt: Verweigere Verbindungen','世界：拒绝连接。',NULL,NULL,NULL,NULL),
 (7524,'WORLD: Accepting connections.',NULL,NULL,'Welt: Akzeptiere Verbindungen','世界：允许连接。',NULL,NULL,NULL,NULL),
-(9980,'Player name: {}, State: {}, Dungeons: {} ({}),
-\n Roles: {}, Comment: {}',NULL,NULL,NULL,'玩家名称: {}， 状态: {}， 地下城: {} ({})， 角色: {}， 备注: {}',NULL,NULL,NULL,NULL),
+(9980,'Player name: {}, State: {}, Dungeons: {} ({}),\n\n Roles: {}, Comment: {}',NULL,NULL,NULL,'玩家名称: {}， 状态: {}， 地下城: {} ({})， 角色: {}， 备注: {}',NULL,NULL,NULL,NULL),
 (9981,'LfgGroup?: {}, State: {}, Dungeon: {}',NULL,NULL,NULL,'组队: {}， 状态: {}， 地下城: {}',NULL,NULL,NULL,NULL),
 (9982,'Not in group',NULL,NULL,NULL,'不在队伍中。',NULL,NULL,NULL,NULL),
 (9983,'Queues cleared',NULL,NULL,NULL,'清理排列的队伍',NULL,NULL,NULL,NULL),
@@ -1201,8 +1194,7 @@ INSERT INTO `acore_string` VALUES
 (35401,'¦ GM Mode active, Phase: -1',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL),
 (35402,'├─ Banned: (Type: {}, Reason: {}, Time: {}, By: {})',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL),
 (35403,'├─ Muted: (Reason: {}, Time: {}, By: {})',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL),
-(35404,'¦ Account: {} (ID: {}),
-\n GMLevel: {}',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL),
+(35404,'¦ Account: {} (ID: {}),\n\n GMLevel: {}',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL),
 (35405,'¦ Last Login: {} (Failed Logins: {})',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL),
 (35406,'¦ Registration Email: {} - Email: {}',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL),
 (35407,'No reason given.',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL),
@@ -1219,5 +1211,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2024-12-17 22:33:15
-
+-- Dump completed on 2025-07-19 12:08:36

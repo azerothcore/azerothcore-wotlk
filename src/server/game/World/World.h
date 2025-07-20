@@ -127,18 +127,6 @@ enum RealmZone
     REALM_ZONE_CN5_8         = 37                           // basic-Latin at create, any at login
 };
 
-enum WorldStates
-{
-    WS_ARENA_DISTRIBUTION_TIME                 = 20001,                     // Next arena distribution time
-    WS_WEEKLY_QUEST_RESET_TIME                 = 20002,                     // Next weekly reset time
-    WS_BG_DAILY_RESET_TIME                     = 20003,                     // Next daily BG reset time
-    WS_CLEANING_FLAGS                          = 20004,                     // Cleaning Flags
-    WS_DAILY_QUEST_RESET_TIME                  = 20005,                     // Next daily reset time
-    WS_GUILD_DAILY_RESET_TIME                  = 20006,                     // Next guild cap reset time
-    WS_MONTHLY_QUEST_RESET_TIME                = 20007,                     // Next monthly reset time
-    WS_DAILY_CALENDAR_DELETION_OLD_EVENTS_TIME = 20008                      // Next daily calendar deletions of old events time
-};
-
 // xinef: petitions storage
 struct PetitionData
 {
@@ -172,11 +160,6 @@ public:
     /// Allow/Disallow object movements
     void SetAllowMovement(bool allow) override { _allowMovement = allow; }
 
-    /// Set the string for new characters (first login)
-    void SetNewCharString(std::string const& str) override { _newCharString = str; }
-    /// Get the string for new characters (first login)
-    [[nodiscard]] std::string const& GetNewCharString() const override { return _newCharString; }
-
     [[nodiscard]] LocaleConstant GetDefaultDbcLocale() const override { return _defaultDbcLocale; }
 
     /// Get the path where data (dbc, maps) are stored on disk
@@ -209,53 +192,20 @@ public:
 
     void Update(uint32 diff) override;
 
-    /// Set a server rate (see #Rates)
-    void setRate(Rates rate, float value) override { _rate_values[rate] = value; }
-    /// Get a server rate (see #Rates)
-    [[nodiscard]] float getRate(Rates rate) const override { return _rate_values[rate]; }
+    void setRate(ServerConfigs index, float value) override;
+    float getRate(ServerConfigs index) const override;
 
-    /// Set a server configuration element (see #WorldConfigs)
-    void setBoolConfig(WorldBoolConfigs index, bool value) override
-    {
-        if (index < BOOL_CONFIG_VALUE_COUNT)
-            _bool_configs[index] = value;
-    }
+    void setBoolConfig(ServerConfigs index, bool value) override;
+    bool getBoolConfig(ServerConfigs index) const override;
 
-    /// Get a server configuration element (see #WorldConfigs)
-    [[nodiscard]] bool getBoolConfig(WorldBoolConfigs index) const override
-    {
-        return index < BOOL_CONFIG_VALUE_COUNT ? _bool_configs[index] : false;
-    }
+    void setFloatConfig(ServerConfigs index, float value) override;
+    float getFloatConfig(ServerConfigs index) const override;
 
-    /// Set a server configuration element (see #WorldConfigs)
-    void setFloatConfig(WorldFloatConfigs index, float value) override
-    {
-        if (index < FLOAT_CONFIG_VALUE_COUNT)
-            _float_configs[index] = value;
-    }
+    void setIntConfig(ServerConfigs index, uint32 value) override;
+    uint32 getIntConfig(ServerConfigs index) const override;
 
-    /// Get a server configuration element (see #WorldConfigs)
-    [[nodiscard]] float getFloatConfig(WorldFloatConfigs index) const override
-    {
-        return index < FLOAT_CONFIG_VALUE_COUNT ? _float_configs[index] : 0;
-    }
-
-    /// Set a server configuration element (see #WorldConfigs)
-    void setIntConfig(WorldIntConfigs index, uint32 value) override
-    {
-        if (index < INT_CONFIG_VALUE_COUNT)
-            _int_configs[index] = value;
-    }
-
-    /// Get a server configuration element (see #WorldConfigs)
-    [[nodiscard]] uint32 getIntConfig(WorldIntConfigs index) const override
-    {
-        return index < INT_CONFIG_VALUE_COUNT ? _int_configs[index] : 0;
-    }
-
-    void setWorldState(uint32 index, uint64 value) override;
-    [[nodiscard]] uint64 getWorldState(uint32 index) const override;
-    void LoadWorldStates() override;
+    void setStringConfig(ServerConfigs index, std::string const& value) override;
+    std::string_view getStringConfig(ServerConfigs index) const override;
 
     /// Are we on a "Player versus Player" server?
     [[nodiscard]] bool IsPvPRealm() const override;
@@ -311,6 +261,8 @@ protected:
     void CalendarDeleteOldEvents();
     void ResetGuildCap();
 private:
+    WorldConfig _worldConfig;
+
     static std::atomic_long _stopEvent;
     static uint8 _exitCode;
     uint32 _shutdownTimer;
@@ -324,14 +276,6 @@ private:
     IntervalTimer _timers[WUPDATE_COUNT];
     Seconds _mail_expire_check_timer;
 
-    std::string _newCharString;
-
-    float _rate_values[MAX_RATES];
-    uint32 _int_configs[INT_CONFIG_VALUE_COUNT];
-    bool _bool_configs[BOOL_CONFIG_VALUE_COUNT];
-    float _float_configs[FLOAT_CONFIG_VALUE_COUNT];
-    typedef std::map<uint32, uint64> WorldStatesMap;
-    WorldStatesMap _worldstates;
     AccountTypes _allowedSecurityLevel;
     LocaleConstant _defaultDbcLocale;                     // from config for one from loaded DBC locales
     uint32 _availableDbcLocaleMask;                       // by loaded DBC
@@ -359,6 +303,7 @@ private:
 
     // used versions
     std::string _dbVersion;
+    uint32 _dbClientCacheVersion;
 
     void ProcessQueryCallbacks();
     QueryCallbackProcessor _queryProcessor;

@@ -74,7 +74,7 @@ struct boss_servant_quarters : public BossAI
                 context.Repeat(12s, 18s);
             }).Schedule(10s, [this](TaskContext context)
             {
-                if (Unit* target = SelectTarget(SelectTargetMethod::MinDistance, 0, FarthestTargetSelector(me, 40.0f, false, true)))
+                if (Unit* target = SelectTarget(SelectTargetMethod::MinDistance, 0, RangeSelector(me, 40.0f, false, true)))
                 {
                     me->CastSpell(target, SPELL_DIVE);
                 }

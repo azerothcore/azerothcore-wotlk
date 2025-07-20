@@ -16,6 +16,7 @@
  */
 
 #include "Pet.h"
+#include "AreaDefines.h"
 #include "ArenaSpectator.h"
 #include "CharmInfo.h"
 #include "Common.h"
@@ -59,9 +60,9 @@ Pet::Pet(Player* owner, PetType type) : Guardian(nullptr, owner ? owner->GetGUID
     if (type == HUNTER_PET)
         m_unitTypeMask |= UNIT_MASK_HUNTER_PET;
 
-    if (!(m_unitTypeMask & UNIT_MASK_CONTROLABLE_GUARDIAN))
+    if (!(m_unitTypeMask & UNIT_MASK_CONTROLLABLE_GUARDIAN))
     {
-        m_unitTypeMask |= UNIT_MASK_CONTROLABLE_GUARDIAN;
+        m_unitTypeMask |= UNIT_MASK_CONTROLLABLE_GUARDIAN;
         InitCharmInfo();
     }
 
@@ -81,7 +82,7 @@ void Pet::AddToWorld()
     }
 
     // pussywizard: apply ICC buff to pets
-    if (GetOwnerGUID().IsPlayer() && GetMapId() == 631 && FindMap() && FindMap()->ToInstanceMap() && FindMap()->ToInstanceMap()->GetInstanceScript() && FindMap()->ToInstanceMap()->GetInstanceScript()->GetData(251 /*DATA_BUFF_AVAILABLE*/))
+    if (GetOwnerGUID().IsPlayer() && GetMapId() == MAP_ICECROWN_CITADEL && FindMap() && FindMap()->ToInstanceMap() && FindMap()->ToInstanceMap()->GetInstanceScript() && FindMap()->ToInstanceMap()->GetInstanceScript()->GetData(251 /*DATA_BUFF_AVAILABLE*/))
         if (Unit* owner = GetOwner())
             if (Player* plr = owner->ToPlayer())
             {
@@ -1344,11 +1345,14 @@ bool Guardian::InitStatsForLevel(uint8 petlevel)
                                 SetCreateMana(28 + 10 * petlevel);
                                 SetCreateHealth(28 + 30 * petlevel);
                             }
-
-                            AddAura(SPELL_HUNTER_PET_SCALING_04, this);
+                            AddAura(SPELL_SUMMON_HEAL, this);
                             AddAura(SPELL_DK_PET_SCALING_01, this);
                             AddAura(SPELL_DK_PET_SCALING_02, this);
                             AddAura(SPELL_DK_PET_SCALING_03, this);
+                            AddAura(SPELL_NIGHT_OF_THE_DEAD_AVOIDANCE, this);
+                            AddAura(SPELL_ORC_RACIAL_COMMAND_DK, this);
+                            AddAura(SPELL_PET_SCALING_MASTER_03, this);
+                            AddAura(SPELL_PET_SCALING_MASTER_06, this);
                             break;
                         }
                     case NPC_BLOODWORM:
@@ -1400,9 +1404,9 @@ bool Guardian::InitStatsForLevel(uint8 petlevel)
         // 100% energy after summon
         SetPower(POWER_ENERGY, GetMaxPower(POWER_ENERGY));
 
-        // xinef: fixes orc death knight command racial
-        if (owner->getRace() == RACE_ORC)
-            CastSpell(this, SPELL_ORC_RACIAL_COMMAND_DK, true, nullptr, nullptr, owner->GetGUID());
+        AddAura(SPELL_ORC_RACIAL_COMMAND_DK, this);
+
+        AddAura(SPELL_RISEN_GHOUL_SELF_STUN, this);
 
         // Avoidance, Night of the Dead
         if (Aura* aur = AddAura(SPELL_NIGHT_OF_THE_DEAD_AVOIDANCE, this))
@@ -1410,13 +1414,16 @@ bool Guardian::InitStatsForLevel(uint8 petlevel)
                 if (aur->GetEffect(0))
                     aur->GetEffect(0)->SetAmount(-aurEff->GetSpellInfo()->Effects[EFFECT_2].CalcValue());
 
-        AddAura(SPELL_HUNTER_PET_SCALING_04, this);
         // Added to perm ghoul by default
         if (!IsPet())
         {
             AddAura(SPELL_DK_PET_SCALING_01, this);
             AddAura(SPELL_DK_PET_SCALING_02, this);
+            AddAura(SPELL_DK_PET_SCALING_03, this);
         }
+
+        AddAura(SPELL_PET_SCALING_MASTER_03, this);
+        AddAura(SPELL_PET_SCALING_MASTER_06, this);
     }
 
     sScriptMgr->OnInitStatsForLevel(this, petlevel);

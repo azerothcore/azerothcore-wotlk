@@ -806,7 +806,7 @@ bool SmartAIMgr::CheckUnusedActionParams(SmartScriptHolder const& e)
             case SMART_ACTION_REMOVE_POWER: return sizeof(SmartAction::power);
             case SMART_ACTION_GAME_EVENT_STOP: return sizeof(SmartAction::gameEventStop);
             case SMART_ACTION_GAME_EVENT_START: return sizeof(SmartAction::gameEventStart);
-            case SMART_ACTION_START_CLOSEST_WAYPOINT: return sizeof(SmartAction::closestWaypointFromList);
+            case SMART_ACTION_START_CLOSEST_WAYPOINT: return sizeof(SmartAction::startClosestWaypoint);
             case SMART_ACTION_RISE_UP: return sizeof(SmartAction::moveRandom);
             case SMART_ACTION_RANDOM_SOUND: return sizeof(SmartAction::randomSound);
             case SMART_ACTION_SET_CORPSE_DELAY: return sizeof(SmartAction::corpseDelay);
@@ -1536,15 +1536,22 @@ bool SmartAIMgr::IsEventValid(SmartScriptHolder& e)
                 break;
             }
         case SMART_ACTION_START_CLOSEST_WAYPOINT:
+        {
+            if (e.action.startClosestWaypoint.pathId1 == 0 || e.action.startClosestWaypoint.pathId2 == 0 || e.action.startClosestWaypoint.pathId2 < e.action.startClosestWaypoint.pathId1)
             {
-                if (std::all_of(e.action.closestWaypointFromList.wps.begin(), e.action.closestWaypointFromList.wps.end(), [](uint32 wp) { return wp == 0; }))
-                {
-                    LOG_ERROR("sql.sql", "SmartAIMgr: Entry {} SourceType {} Event {} Action {} does not have any non-zero waypoint id",
-                                 e.entryOrGuid, e.GetScriptType(), e.event_id, e.GetActionType());
-                    return false;
-                }
-                break;
+                LOG_ERROR("sql.sql", "SmartAIMgr: Entry {} SourceType {} Event {} Action {} has invalid pathId1 or pathId2, it must be greater than 0 and pathId1 > pathId2",
+                    e.entryOrGuid, e.GetScriptType(), e.event_id, e.GetActionType());
+                return false;
             }
+            if (e.action.startClosestWaypoint.repeat > 1 || e.action.startClosestWaypoint.run > 1)
+            {
+                LOG_ERROR("sql.sql", "SmartAIMgr: Entry {} SourceType {} Event {} Action {} has invalid run ({}) or repeat ({}) parameter, must be 0 or 1.",
+                    e.entryOrGuid, e.GetScriptType(), e.event_id, e.GetActionType(),
+                    e.action.startClosestWaypoint.repeat, e.action.startClosestWaypoint.run);
+                return false;
+            }
+            break;
+        }
         case SMART_ACTION_INVOKER_CAST:
             if (e.GetScriptType() != SMART_SCRIPT_TYPE_TIMED_ACTIONLIST && e.GetEventType() != SMART_EVENT_LINK && !EventHasInvoker(e.event.type))
             {
