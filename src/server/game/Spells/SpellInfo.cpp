@@ -561,6 +561,9 @@ float SpellEffectInfo::CalcRadius(Unit* caster, Spell* spell) const
         radius = std::min(radius, RadiusEntry->RadiusMax);
         if (Player* modOwner = caster->GetSpellModOwner())
             modOwner->ApplySpellMod(_spellInfo->Id, SPELLMOD_RADIUS, radius, spell);
+
+        if (caster->HasLeewayMovement())
+            radius += 2.0f;
     }
 
     return radius;
