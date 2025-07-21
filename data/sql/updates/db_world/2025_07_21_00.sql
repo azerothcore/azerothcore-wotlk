@@ -1,3 +1,4 @@
+-- DB update 2025_07_20_02 -> 2025_07_21_00
 --
 DELETE FROM `conditions` WHERE `SourceTypeOrReferenceId` = 23 AND `SourceGroup` IN (2482, 3044, 4165, 5173, 5698, 11038, 14450, 15006, 16543);
 DELETE FROM `conditions` WHERE `SourceTypeOrReferenceId` = 15 AND `SourceGroup` IN (4533, 4566, 4821, 6470, 8730);
