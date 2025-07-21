@@ -1766,6 +1766,16 @@ CleanCharacterDB = 0
 PersistentCharacterCleanFlags = 0
 
 #
+#    SkipInvalidSkillChecks
+#        Description: If enabled (1), players will keep spells even if they're invalid for their race/class.
+#        Default:     0 - (Disabled, enforce valid spells)
+#                     1 - (Enabled, allow invalid spells)
+#        Enabling this and then having your character learn spells which require DBC edits can result in the character not being saved in the database
+#        ENABLE AT YOUR OWN RISK
+
+SkipInvalidSkillChecks = 0
+
+#
 ###################################################################################################
 
 ###################################################################################################
