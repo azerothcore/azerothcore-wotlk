@@ -1767,7 +1767,7 @@ PersistentCharacterCleanFlags = 0
 
 #
 #    ValidateSkillLearnedBySpells
-#        Description: If enabled (1), players will lose spells that are invalid for their race/class.
+#        Description: If enabled, players will lose spells that are invalid for their race/class.
 #        Default:     1 - (Enabled, enforce valid spells)
 #                     0 - (Disabled, allow invalid spells)
 #        Disabling this and then having your character learn spells which require DBC edits can result in the character not being saved in the database
