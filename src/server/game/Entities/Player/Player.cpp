@@ -3103,7 +3103,7 @@ bool Player::addSpell(uint32 spellId, uint8 addSpecMask, bool updateActive, bool
 
 bool Player::CheckSkillLearnedBySpell(uint32 spellId)
 {
-    if (sConfigMgr->GetOption<bool>("SkipInvalidSkillChecks", false))
+    if (sConfigMgr->GetOption<bool>("ValidateSkillLearnedBySpells", true))
         return true;
 
     SkillLineAbilityMapBounds skill_bounds = sSpellMgr->GetSkillLineAbilityMapBounds(spellId);
