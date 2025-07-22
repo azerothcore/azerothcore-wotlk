@@ -1,3 +1,4 @@
+-- DB update 2025_07_21_01 -> 2025_07_22_00
 
 -- Edit Random Movement Flag
 UPDATE `creature_template_movement` SET `Random` = 2 WHERE (`CreatureId` = 26369);
