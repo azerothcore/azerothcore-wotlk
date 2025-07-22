@@ -95,7 +95,7 @@ namespace AccountMgr
 
     bool HasAccountFlag(uint32 accountId, uint32 flag);
     void UpdateAccountFlag(uint32 accountId, uint32 flag, bool remove = false);
-    void ValidateAccountFlags(uint32 accountId, uint32 flag, uint32 security);
+    void ValidateAccountFlags(uint32 accountId, uint32 flags, uint32 security);
 };
 
 #endif
