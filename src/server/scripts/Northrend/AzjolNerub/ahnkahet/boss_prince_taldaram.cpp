@@ -366,8 +366,6 @@ private:
 
     void ScheduleCombatEvents()
     {
-        events.Reset();
-
         scheduler.Schedule(10s, [this](TaskContext context)
         {
             DoCastVictim(SPELL_BLOODTHIRST);
