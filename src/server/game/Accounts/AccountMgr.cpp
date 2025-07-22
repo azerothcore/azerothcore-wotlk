@@ -321,10 +321,9 @@ namespace AccountMgr
         LoginDatabase.Execute(stmt);
     }
 
-    void ValidateAccountFlags(uint32 accountId)
+    void ValidateAccountFlags(uint32 accountId, uint32 flag, uint32 security)
     {
-        uint32 security = GetSecurity(accountId);
-        bool hasGMFlag = HasAccountFlag(accountId, FLAG_GM);
+        bool hasGMFlag = (flag & FLAG_GM) != 0;
 
         if (IsGMAccount(security) && !hasGMFlag)
             UpdateAccountFlag(accountId, FLAG_GM);
