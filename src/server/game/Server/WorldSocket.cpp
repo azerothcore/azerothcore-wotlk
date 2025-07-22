@@ -696,6 +696,8 @@ void WorldSocket::HandleAuthSessionCallback(std::shared_ptr<AuthSession> authSes
 
     LoginDatabase.Execute(stmt);
 
+    AccountMgr::ValidateAccountFlags(account.Id);
+
     // At this point, we can safely hook a successful login
     sScriptMgr->OnAccountLogin(account.Id);
 
