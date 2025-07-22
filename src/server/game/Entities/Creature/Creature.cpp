@@ -2686,7 +2686,7 @@ bool Creature::CanCreatureAttack(Unit const* victim, bool skipDistCheck) const
 
     float dist = sWorld->getFloatConfig(CONFIG_CREATURE_LEASH_RADIUS);
 
-    if (const Unit *unit = GetCharmerOrOwner())
+    if (Unit *unit = GetCharmerOrOwner())
     {
         const auto visibilityDist = std::min<float>(GetMap()->GetVisibilityRange() + GetObjectSize() * 2, 150.0f);
         if (!victim->IsWithinDist(unit, visibilityDist))
