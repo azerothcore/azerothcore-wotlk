@@ -10421,23 +10421,27 @@ bool Unit::Attack(Unit* victim, bool meleeAttack)
     if (meleeAttack)
         AddUnitState(UNIT_STATE_MELEE_ATTACKING);
 
-    auto owner = GetCharmerOrOwner();
-    auto ownerCreature = owner ? owner->ToCreature() : nullptr;
+    Unit* owner = GetCharmerOrOwner();
+    Creature* ownerCreature = owner ? owner->ToCreature() : nullptr;
     Creature* controlledCreatureWithSameVictim = nullptr;
     if (creature && !m_Controlled.empty())
+    {
         for (ControlSet::iterator itr = m_Controlled.begin(); itr != m_Controlled.end(); ++itr)
+        {
             if ((*itr)->ToCreature() && (*itr)->GetVictim() == victim)
             {
                 controlledCreatureWithSameVictim = (*itr)->ToCreature();
                 break;
             }
+        }
+    }
 
     // Share leash timer with controlled unit
     if (controlledCreatureWithSameVictim)
         creature->SetLastLeashExtensionTimePtr(controlledCreatureWithSameVictim->GetLastLeashExtensionTimePtr());
     // Share leash timer with owner
     else if (creature && ownerCreature && ownerCreature->GetVictim() == victim)
-        creature->SetLastLeashExtensionTimePtr(owner->ToCreature()->GetLastLeashExtensionTimePtr());
+        creature->SetLastLeashExtensionTimePtr(ownerCreature->GetLastLeashExtensionTimePtr());
     // Update leash timer when attacking creatures
     else if (victim->IsCreature())
         victim->ToCreature()->UpdateLeashExtensionTime();
