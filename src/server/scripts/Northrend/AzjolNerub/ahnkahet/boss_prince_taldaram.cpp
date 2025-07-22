@@ -208,7 +208,7 @@ struct boss_taldaram : public BossAI
         me->SetReactState(REACT_AGGRESSIVE);
 
         ScheduleHealthCheckEvent({ 75, 50, 25 }, [&] {
-            scheduler.Schedule(1s, [this](TaskContext context)
+            scheduler.Schedule(1s, [this](TaskContext)
             {
                 Talk(SAY_VANISH);
                 DoCastSelf(SPELL_VANISH, false);
