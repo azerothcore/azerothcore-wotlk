@@ -6477,7 +6477,7 @@ void Player::_LoadSpells(PreparedQueryResult result)
             uint32 spellId = fields[0].Get<uint32>();
             uint8 specMask = fields[1].Get<uint8>();
 
-            if (CheckSkillLearnedBySpell(spellId, this))
+            if (CheckSkillLearnedBySpell(spellId))
                 addSpell(spellId, specMask, true);
             else
                 removeSpell(spellId, SPEC_MASK_ALL, false);

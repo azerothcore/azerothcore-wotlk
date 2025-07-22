@@ -3101,7 +3101,7 @@ bool Player::addSpell(uint32 spellId, uint8 addSpecMask, bool updateActive, bool
     return true;
 }
 
-bool Player::CheckSkillLearnedBySpell(uint32 spellId, Player* player)
+bool Player::CheckSkillLearnedBySpell(uint32 spellId)
 {
     if (!sWorld->getBoolConfig(CONFIG_VALIDATE_SKILL_LEARNED_BY_SPELLS))
         return true;
