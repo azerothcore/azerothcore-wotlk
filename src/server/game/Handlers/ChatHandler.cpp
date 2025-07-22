@@ -420,13 +420,6 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket& recvData)
                 if (!senderIsPlayer && !sender->isAcceptWhispers() && !sender->IsInWhisperWhiteList(receiver->GetGUID()))
                     sender->AddWhisperWhiteList(receiver->GetGUID());
 
-                if (!sScriptMgr->OnPlayerCanUseChat(GetPlayer(), type, lang, msg, receiver))
-                {
-                    return;
-                }
-
-                sScriptMgr->OnPlayerChat(GetPlayer(), type, lang, msg, receiver);
-
                 GetPlayer()->Whisper(msg, Language(lang), receiver);
             }
             break;
