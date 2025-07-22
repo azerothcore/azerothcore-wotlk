@@ -1,3 +1,4 @@
+-- DB update 2025_07_22_00 -> 2025_07_22_01
 
 -- Delete some guids.
 DELETE FROM `gameobject` WHERE (`id` = 188691) AND (`guid` IN (55959, 55960, 55961, 55962));
