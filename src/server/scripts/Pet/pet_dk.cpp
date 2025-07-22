@@ -91,7 +91,7 @@ struct npc_pet_dk_ebon_gargoyle : ScriptedAI
         me->AddUnitState(UNIT_STATE_NO_ENVIRONMENT_UPD);
         _selectionTimer = 2000;
         _initialCastTimer = 0;
-        _castDelay = 0;
+        _decisionTimer = 0;
     }
 
     void MySelectNextTarget()
@@ -187,6 +187,7 @@ struct npc_pet_dk_ebon_gargoyle : ScriptedAI
         if (_despawnTimer > 4000)
         {
             _despawnTimer -= diff;
+            _decisionTimer -= diff;
             if (!UpdateVictimWithGaze())
             {
                 MySelectNextTarget();
@@ -200,23 +201,19 @@ struct npc_pet_dk_ebon_gargoyle : ScriptedAI
                 MySelectNextTarget();
                 _selectionTimer = 0;
             }
-            if (_initialCastTimer >= 2000 && !me->HasUnitState(UNIT_STATE_CASTING | UNIT_STATE_LOST_CONTROL) && me->GetMotionMaster()->GetMotionSlotType(MOTION_SLOT_CONTROLLED) == NULL_MOTION_TYPE)
-            {
-                _castDelay -= diff;
 
-                if (_castDelay <= 0)
-                {
+            if (_decisionTimer <= 0)
+            {
+                _decisionTimer += 400;
+                if (_initialCastTimer >= 2000 && !me->HasUnitState(UNIT_STATE_CASTING | UNIT_STATE_LOST_CONTROL) && me->GetMotionMaster()->GetMotionSlotType(MOTION_SLOT_CONTROLLED) == NULL_MOTION_TYPE && rand_chance() > 20.0f)
                     if (me->HasSilenceAura() || me->IsSpellProhibited(SPELL_SCHOOL_MASK_NATURE))
                         me->GetMotionMaster()->MoveChase(me->GetVictim());
                     else
                     {
                         me->GetMotionMaster()->MoveChase(me->GetVictim(), 40);
-                        if (DoCastVictim(SPELL_GARGOYLE_STRIKE) == SPELL_CAST_OK)
-                            _castDelay = irand(0,1000);
+                        DoCastVictim(SPELL_GARGOYLE_STRIKE);
                     }
-                }
             }
-
         }
         else
         {
@@ -235,7 +232,7 @@ private:
     uint32 _despawnTimer;
     uint32 _selectionTimer;
     uint32 _initialCastTimer;
-    int32 _castDelay;
+    int32 _decisionTimer;
     bool _despawning;
     bool _initialSelection;
 };
