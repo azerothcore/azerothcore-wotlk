@@ -3101,9 +3101,9 @@ bool Player::addSpell(uint32 spellId, uint8 addSpecMask, bool updateActive, bool
     return true;
 }
 
-bool Player::CheckSkillLearnedBySpell(uint32 spellId)
+bool Player::CheckSkillLearnedBySpell(uint32 spellId, Player* player)
 {
-    if (!sConfigMgr->GetOption<bool>("ValidateSkillLearnedBySpells", true))
+    if (!sWorld->getBoolConfig(CONFIG_VALIDATE_SKILL_LEARNED_BY_SPELLS))
         return true;
 
     SkillLineAbilityMapBounds skill_bounds = sSpellMgr->GetSkillLineAbilityMapBounds(spellId);
