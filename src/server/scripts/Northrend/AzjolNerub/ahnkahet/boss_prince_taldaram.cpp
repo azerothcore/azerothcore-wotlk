@@ -67,9 +67,7 @@ enum Actions
 enum Event
 {
     EVENT_PRINCE_FLAME_SPHERES              = 1,
-    EVENT_PRINCE_VANISH,
     EVENT_PRINCE_BLOODTHIRST,
-    EVENT_PRINCE_VANISH_RUN,
     EVENT_PRINCE_RESCHEDULE,
 };
 
@@ -178,9 +176,12 @@ private:
 
 struct boss_taldaram : public BossAI
 {
-    boss_taldaram(Creature* pCreature) : BossAI(pCreature, DATA_PRINCE_TALDARAM),
-        vanishDamage(0)
+    boss_taldaram(Creature* pCreature) : BossAI(pCreature, DATA_PRINCE_TALDARAM), vanishDamage(0)
     {
+        scheduler.SetValidator([this]
+        {
+            return !me->HasUnitState(UNIT_STATE_CASTING);
+        });
     }
 
     void InitializeAI() override
@@ -193,19 +194,16 @@ struct boss_taldaram : public BossAI
             me->SetImmuneToAll(true);
             me->SetDisableGravity(true);
             me->SetHover(true);
+
             if (!me->HasAura(SPELL_BEAM_VISUAL))
-            {
                 DoCastSelf(SPELL_BEAM_VISUAL, true);
-            }
 
             me->SummonCreatureGroup(SUMMON_GROUP_TRIGGERS);
             return;
         }
 
         if (instance->GetPersistentData(DATA_TELDRAM_SPHERE1) == DONE && instance->GetPersistentData(DATA_TELDRAM_SPHERE2) == DONE)
-        {
             DoAction(ACTION_REMOVE_PRISON_AT_RESET);
-        }
     }
 
     void Reset() override
@@ -213,7 +211,37 @@ struct boss_taldaram : public BossAI
         _Reset();
 
         vanishDamage = 0;
-        vanishTarget_GUID.Clear();
+
+        me->SetReactState(REACT_AGGRESSIVE);
+
+        ScheduleHealthCheckEvent({ 75, 50, 25 }, [&] {
+            scheduler.Schedule(1s, [this](TaskContext context)
+            {
+                Talk(SAY_VANISH);
+                DoCastSelf(SPELL_VANISH, false);
+                me->SetReactState(REACT_PASSIVE);
+                me->GetMotionMaster()->Clear();
+                DoStopAttack();
+            });
+        });
+    }
+
+    void OnAuraRemove(AuraApplication* auraApp, AuraRemoveMode mode) override
+    {
+        if (auraApp->GetBase()->GetId() == SPELL_VANISH && mode == AURA_REMOVE_BY_EXPIRE)
+        {
+            scheduler.Schedule(2500ms, [this](TaskContext)
+            {
+                if (Unit* vanishTarget = SelectTarget(SelectTargetMethod::Random, 0, 100.0f, true))
+                {
+                    vanishDamage = 0;
+                    DoCast(vanishTarget, SPELL_SHADOWSTEP);
+                    DoCast(vanishTarget, SPELL_EMBRACE_OF_THE_VAMPYR);
+                }
+
+                events.ScheduleEvent(EVENT_PRINCE_RESCHEDULE, 20s);
+            });
+        }
     }
 
     void DoAction(int32 action) override
@@ -256,20 +284,20 @@ struct boss_taldaram : public BossAI
         }
     }
 
-    void DamageTaken(Unit* /*attacker*/, uint32& damage, DamageEffectType /*damageType*/, SpellSchoolMask /*school*/) override
+    void DamageTaken(Unit* attacker, uint32& damage, DamageEffectType damageType, SpellSchoolMask school) override
     {
-        if (vanishTarget_GUID)
+        BossAI::DamageTaken(attacker, damage, damageType, school);
+
+        if (me->FindCurrentSpellBySpellId(SPELL_EMBRACE_OF_THE_VAMPYR))
         {
-            if (me->FindCurrentSpellBySpellId(SPELL_EMBRACE_OF_THE_VAMPYR))
+            vanishDamage += damage;
+            if (vanishDamage >= DUNGEON_MODE<uint32>(MAX_EMBRACE_DMG, MAX_EMBRACE_DMG_H))
             {
-                vanishDamage += damage;
-                if (vanishDamage >= DUNGEON_MODE<uint32>(MAX_EMBRACE_DMG, MAX_EMBRACE_DMG_H))
-                {
-                    ScheduleCombatEvents();
-                    me->CastStop();
-                    vanishTarget_GUID.Clear();
-                    vanishDamage = 0;
-                }
+                ScheduleCombatEvents();
+                me->CastStop();
+                me->ResumeChasingVictim();
+                me->SetReactState(REACT_AGGRESSIVE);
+                vanishDamage = 0;
             }
         }
     }
@@ -283,17 +311,9 @@ struct boss_taldaram : public BossAI
     void KilledUnit(Unit* victim) override
     {
         if (!victim->IsPlayer())
-        {
             return;
-        }
 
         Talk(SAY_SLAY);
-
-        if (vanishTarget_GUID && victim->GetGUID() == vanishTarget_GUID)
-        {
-            vanishTarget_GUID.Clear();
-            vanishDamage = 0;
-        }
     }
 
     void JustEngagedWith(Unit* /*who*/) override
@@ -309,9 +329,7 @@ struct boss_taldaram : public BossAI
     void SpellHitTarget(Unit* /*target*/, SpellInfo const* spellInfo) override
     {
         if (spellInfo->Id == SPELL_CONJURE_FLAME_SPHERE)
-        {
             summons.DoAction(ACTION_SPHERE);
-        }
     }
 
     void JustSummoned(Creature* summon) override
@@ -324,9 +342,7 @@ struct boss_taldaram : public BossAI
             case NPC_FLAME_SPHERE_3:
             {
                 if (npc_taldaram_flamesphere* summonAI = dynamic_cast<npc_taldaram_flamesphere*>(summon->AI()))
-                {
                     summonAI->SetVictimPos(victimSperePos);
-                }
 
                 break;
             }
@@ -341,16 +357,13 @@ struct boss_taldaram : public BossAI
     void UpdateAI(uint32 diff) override
     {
         if (!UpdateVictim())
-        {
             return;
-        }
 
         events.Update(diff);
+        scheduler.Update(diff);
 
         if (me->HasUnitState(UNIT_STATE_CASTING))
-        {
             return;
-        }
 
         while (uint32 const eventId = events.ExecuteEvent())
         {
@@ -370,66 +383,7 @@ struct boss_taldaram : public BossAI
                         victimSperePos = victim->GetPosition();
                     }
 
-                    if (!events.GetNextEventTime(EVENT_PRINCE_VANISH))
-                    {
-                        events.RescheduleEvent(EVENT_PRINCE_VANISH, 14s);
-                    }
-                    else
-                    {
-                        // Make sure that Vanish won't get triggered at same time as sphere summon
-                        events.DelayEvents(4s);
-                    }
-
                     events.Repeat(15s);
-                    break;
-                }
-                case EVENT_PRINCE_VANISH:
-                {
-                    //Count alive players
-                    uint8 count = 0;
-                    std::list<HostileReference*> const t_list = me->GetThreatMgr().GetThreatList();
-                    if (!t_list.empty())
-                    {
-                        for (HostileReference const* reference : t_list)
-                        {
-                            if (reference)
-                            {
-                                Unit const* pTarget = ObjectAccessor::GetUnit(*me, reference->getUnitGuid());
-                                if (pTarget && pTarget->IsPlayer() && pTarget->IsAlive())
-                                {
-                                    ++count;
-                                }
-                            }
-                        }
-                    }
-
-                    // He only vanishes if there are 3 or more alive players
-                    if (count > 2)
-                    {
-                        Talk(SAY_VANISH);
-                        DoCastSelf(SPELL_VANISH, false);
-                        if (Unit* pEmbraceTarget = SelectTarget(SelectTargetMethod::Random, 0, 100, true))
-                        {
-                            vanishTarget_GUID = pEmbraceTarget->GetGUID();
-                        }
-
-                        events.CancelEvent(EVENT_PRINCE_FLAME_SPHERES);
-                        events.CancelEvent(EVENT_PRINCE_BLOODTHIRST);
-                        events.ScheduleEvent(EVENT_PRINCE_VANISH_RUN, 2499ms);
-                    }
-                    break;
-                }
-                case EVENT_PRINCE_VANISH_RUN:
-                {
-                    if (Unit* _vanishTarget = ObjectAccessor::GetUnit(*me, vanishTarget_GUID))
-                    {
-                        vanishDamage = 0;
-                        DoCast(_vanishTarget, SPELL_SHADOWSTEP);
-                        me->CastSpell(_vanishTarget, SPELL_EMBRACE_OF_THE_VAMPYR, false);
-                        me->RemoveAura(SPELL_VANISH);
-                    }
-
-                    events.ScheduleEvent(EVENT_PRINCE_RESCHEDULE, 20s);
                     break;
                 }
                 case EVENT_PRINCE_RESCHEDULE:
@@ -440,20 +394,15 @@ struct boss_taldaram : public BossAI
             }
 
             if (me->HasUnitState(UNIT_STATE_CASTING))
-            {
                 return;
-            }
         }
 
         if (me->IsVisible())
-        {
             DoMeleeAttackIfReady();
-        }
     }
 
 private:
     Position victimSperePos;
-    ObjectGuid vanishTarget_GUID;
     uint32 vanishDamage;
 
     void ScheduleCombatEvents()
@@ -461,7 +410,6 @@ private:
         events.Reset();
         events.RescheduleEvent(EVENT_PRINCE_FLAME_SPHERES, 10s);
         events.RescheduleEvent(EVENT_PRINCE_BLOODTHIRST, 10s);
-        vanishTarget_GUID.Clear();
         vanishDamage = 0;
     }
 };
