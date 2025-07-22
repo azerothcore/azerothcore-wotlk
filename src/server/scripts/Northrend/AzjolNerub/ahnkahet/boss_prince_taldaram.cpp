@@ -349,17 +349,6 @@ struct boss_taldaram : public BossAI
         }
     }
 
-    void UpdateAI(uint32 diff) override
-    {
-        if (!UpdateVictim())
-            return;
-
-        scheduler.Update(diff);
-
-        if (me->IsVisible())
-            DoMeleeAttackIfReady();
-    }
-
 private:
     Position victimSperePos;
     uint32 vanishDamage;
