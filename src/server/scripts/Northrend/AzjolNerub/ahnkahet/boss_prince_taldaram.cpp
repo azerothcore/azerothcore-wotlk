@@ -64,13 +64,6 @@ enum Actions
     ACTION_SPHERE,
 };
 
-enum Event
-{
-    EVENT_PRINCE_FLAME_SPHERES              = 1,
-    EVENT_PRINCE_BLOODTHIRST,
-    EVENT_PRINCE_RESCHEDULE,
-};
-
 enum Yells
 {
     //SAY_SPHERE_ACTIVATED                    = 0,
@@ -239,7 +232,9 @@ struct boss_taldaram : public BossAI
                     DoCast(vanishTarget, SPELL_EMBRACE_OF_THE_VAMPYR);
                 }
 
-                events.ScheduleEvent(EVENT_PRINCE_RESCHEDULE, 20s);
+                me->m_Events.AddEventAtOffset([&] {
+                    ScheduleCombatEvents();
+                }, 20s);
             });
         }
     }
@@ -359,43 +354,7 @@ struct boss_taldaram : public BossAI
         if (!UpdateVictim())
             return;
 
-        events.Update(diff);
         scheduler.Update(diff);
-
-        if (me->HasUnitState(UNIT_STATE_CASTING))
-            return;
-
-        while (uint32 const eventId = events.ExecuteEvent())
-        {
-            switch (eventId)
-            {
-                case EVENT_PRINCE_BLOODTHIRST:
-                {
-                    DoCastVictim(SPELL_BLOODTHIRST);
-                    events.Repeat(10s);
-                    break;
-                }
-                case EVENT_PRINCE_FLAME_SPHERES:
-                {
-                    if (Unit* victim = me->GetVictim())
-                    {
-                        DoCast(victim, SPELL_CONJURE_FLAME_SPHERE);
-                        victimSperePos = victim->GetPosition();
-                    }
-
-                    events.Repeat(15s);
-                    break;
-                }
-                case EVENT_PRINCE_RESCHEDULE:
-                {
-                    ScheduleCombatEvents();
-                    break;
-                }
-            }
-
-            if (me->HasUnitState(UNIT_STATE_CASTING))
-                return;
-        }
 
         if (me->IsVisible())
             DoMeleeAttackIfReady();
@@ -408,8 +367,22 @@ private:
     void ScheduleCombatEvents()
     {
         events.Reset();
-        events.RescheduleEvent(EVENT_PRINCE_FLAME_SPHERES, 10s);
-        events.RescheduleEvent(EVENT_PRINCE_BLOODTHIRST, 10s);
+
+        scheduler.Schedule(10s, [this](TaskContext context)
+        {
+            DoCastVictim(SPELL_BLOODTHIRST);
+            context.Repeat(15s);
+        }).Schedule(10s, [this](TaskContext context)
+        {
+            if (Unit* victim = me->GetVictim())
+            {
+                DoCast(victim, SPELL_CONJURE_FLAME_SPHERE);
+                victimSperePos = victim->GetPosition();
+            }
+
+            context.Repeat(15s);
+        });
+
         vanishDamage = 0;
     }
 };
