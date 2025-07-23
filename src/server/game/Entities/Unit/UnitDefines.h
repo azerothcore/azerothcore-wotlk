@@ -161,7 +161,7 @@ enum UnitTypeMask
     UNIT_MASK_VEHICLE                   = 0x00000020,
     UNIT_MASK_PUPPET                    = 0x00000040,
     UNIT_MASK_HUNTER_PET                = 0x00000080,
-    UNIT_MASK_CONTROLABLE_GUARDIAN      = 0x00000100,
+    UNIT_MASK_CONTROLLABLE_GUARDIAN     = 0x00000100,
     UNIT_MASK_ACCESSORY                 = 0x00000200
 };
 

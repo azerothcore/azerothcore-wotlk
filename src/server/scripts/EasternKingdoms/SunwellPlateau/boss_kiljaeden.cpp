@@ -381,14 +381,8 @@ struct boss_kiljaeden : public BossAI
                     if (Creature* anveena = instance->GetCreature(DATA_ANVEENA))
                     {
                         anveena->RemoveAllAuras();
-                        anveena->DespawnOrUnsummon(3500);
-                    }
-                }, 34s);
-
-                me->m_Events.AddEventAtOffset([&] {
-                    if (Creature* anveena = instance->GetCreature(DATA_ANVEENA))
-                    {
                         anveena->CastSpell(anveena, SPELL_SACRIFICE_OF_ANVEENA, true);
+                        anveena->DespawnOrUnsummon(1500);
                         DoCastSelf(SPELL_CUSTOM_08_STATE, true);
                         me->SetUnitFlag(UNIT_FLAG_PACIFIED);
                         scheduler.CancelAll();
@@ -1055,6 +1049,9 @@ class spell_kiljaeden_darkness_aura : public AuraScript
 
     void HandleRemove(AuraEffect const*  /*aurEff*/, AuraEffectHandleModes /*mode*/)
     {
+        if (GetTargetApplication()->GetRemoveMode() != AURA_REMOVE_BY_EXPIRE)
+            return;
+
         if (GetUnitOwner()->IsCreature())
             GetUnitOwner()->ToCreature()->AI()->DoAction(ACTION_NO_KILL_TALK);
 
