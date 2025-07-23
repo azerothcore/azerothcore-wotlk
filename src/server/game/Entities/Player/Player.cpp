@@ -3104,7 +3104,7 @@ bool Player::addSpell(uint32 spellId, uint8 addSpecMask, bool updateActive, bool
 bool Player::CheckSkillLearnedBySpell(uint32 spellId)
 {
     SkillLineAbilityMapBounds skill_bounds = sSpellMgr->GetSkillLineAbilityMapBounds(spellId);
-    uint32 errorSkill;
+    uint32 errorSkill = 0;
     for (SkillLineAbilityMap::const_iterator sla = skill_bounds.first; sla != skill_bounds.second; ++sla)
     {
         SkillLineEntry const* pSkill = sSkillLineStore.LookupEntry(sla->second->SkillLine);
