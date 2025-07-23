@@ -324,12 +324,12 @@ namespace AccountMgr
 
     void ValidateAccountFlags(uint32 accountId, uint32 flags, uint32 security)
     {
-        bool hasGMFlag = (flags & FLAG_GM) != 0;
+        bool hasGMFlag = (flags & ACCOUNT_FLAG_GM) != 0;
 
         if (IsGMAccount(security) && !hasGMFlag)
-            UpdateAccountFlag(accountId, FLAG_GM);
+            UpdateAccountFlag(accountId, ACCOUNT_FLAG_GM);
         else if (hasGMFlag && !IsGMAccount(security))
-            UpdateAccountFlag(accountId, FLAG_GM, true);
+            UpdateAccountFlag(accountId, ACCOUNT_FLAG_GM, true);
     }
 
     uint32 GetCharactersCount(uint32 accountId)

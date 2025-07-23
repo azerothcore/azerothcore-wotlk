@@ -532,7 +532,7 @@ bool AuthSession::HandleLogonProof()
             proof.M2 = M2;
             proof.cmd = AUTH_LOGON_PROOF;
             proof.error = 0;
-            proof.AccountFlags = FLAG_PROPASS_LOCK;    // enum AccountFlag
+            proof.AccountFlags = ACCOUNT_FLAG_PROPASS_LOCK;    // enum AccountFlag
             proof.SurveyId = 0;
             proof.LoginFlags = 0;               // 0x1 = has account message
 
