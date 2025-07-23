@@ -1,3 +1,4 @@
+-- DB update 2025_07_22_03 -> 2025_07_23_00
 
 -- Add Unit Flags (Immune To PC and Immune To NPC).
 UPDATE `creature_template` SET `unit_flags` = `unit_flags` |256|512 WHERE (`entry` = 28416);
