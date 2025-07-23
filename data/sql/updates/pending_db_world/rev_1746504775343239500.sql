@@ -7,4 +7,5 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 (19635, 0, 7, 0, 61, 0, 100, 0, 0, 0, 0, 0, 0, 0, 45, 1, 1, 0, 0, 0, 0, 204, 21005, 0, 0, 0, 0, 0, 0, 0, 'Captain Arathyn - In Combat - Set Data 1 1 to Azurebeak (No Repeat)'),
 (19635, 0, 8, 0, 25, 0, 100, 0, 0, 0, 0, 0, 0, 0, 41, 0, 0, 0, 0, 0, 0, 204, 21005, 0, 0, 0, 0, 0, 0, 0, 'Captain Arathyn - On Reset - Despawn Summons'),
 (21005, 0, 0, 0, 0, 0, 100, 0, 9100, 9100, 11000, 14000, 0, 0, 11, 31273, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Azurebeak - In Combat - Cast \'Screech\''),
-(21005, 0, 1, 0, 38, 0, 100, 0, 1, 1, 0, 0, 0, 0, 49, 0, 0, 0, 0, 0, 0, 12, 1, 0, 0, 0, 0, 0, 0, 0, 'Azurebeak - On Data Set 1 1 - Start Attacking');
+(21005, 0, 1, 0, 38, 0, 100, 0, 1, 1, 0, 0, 0, 0, 49, 0, 0, 0, 0, 0, 0, 12, 1, 0, 0, 0, 0, 0, 0, 0, 'Azurebeak - On Data Set 1 1 - Start Attacking'),
+(21005, 0, 2, 0, 1, 0, 100, 0, 2000, 2000, 2000, 2000, 0, 0, 41, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Azurebeak - Out of Combat - Despawn Instant');
