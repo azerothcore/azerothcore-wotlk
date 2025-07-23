@@ -19,6 +19,7 @@
 #define _ACCMGR_H
 
 #include "Define.h"
+#include "Common.h"
 #include <string>
 
 enum AccountOpResult
@@ -30,43 +31,6 @@ enum AccountOpResult
     AOR_NAME_ALREADY_EXIST,
     AOR_NAME_NOT_EXIST,
     AOR_DB_INTERNAL_ERROR
-};
-
-enum AccountFlag
-{
-    FLAG_GM                   = 0x1,        // Account is GM
-    FLAG_NOKICK               = 0x2,        // NYI UNK
-    FLAG_COLLECTOR            = 0x4,        // NYI UNK
-    FLAG_TRIAL                = 0x8,        // NYI UNK
-    FLAG_CANCELLED            = 0x10,       // NYI UNK
-    FLAG_IGR                  = 0x20,       // NYI UNK
-    FLAG_WHOLESALER           = 0x40,       // NYI UNK
-    FLAG_PRIVILEGED           = 0x80,       // NYI UNK
-    FLAG_EU_FORBID_ELV        = 0x100,      // NYI UNK
-    FLAG_EU_FORBID_BILLING    = 0x200,      // NYI UNK
-    FLAG_RESTRICTED           = 0x400,      // NYI UNK
-    FLAG_REFERRAL             = 0x800,      // NYI UNK
-    FLAG_BLIZZARD             = 0x1000,     // NYI UNK
-    FLAG_RECURRING_BILLING    = 0x2000,     // NYI UNK
-    FLAG_NOELECTUP            = 0x4000,     // NYI UNK
-    FLAG_KR_CERTIFICATE       = 0x8000,     // NYI UNK
-    FLAG_EXPANSION_COLLECTOR  = 0x10000,    // NYI UNK
-    FLAG_DISABLE_VOICE        = 0x20000,    // NYI Can't join voice chat
-    FLAG_DISABLE_VOICE_SPEAK  = 0x40000,    // NYI Can't speak in voice chat
-    FLAG_REFERRAL_RESURRECT   = 0x80000,    // NYI UNK
-    FLAG_EU_FORBID_CC         = 0x100000,   // NYI UNK
-    FLAG_OPENBETA_DELL        = 0x200000,   // NYI UNK
-    FLAG_PROPASS              = 0x400000,   // NYI UNK
-    FLAG_PROPASS_LOCK         = 0x800000,   // NYI UNK
-    FLAG_PENDING_UPGRADE      = 0x1000000,  // NYI UNK
-    FLAG_RETAIL_FROM_TRIAL    = 0x2000000,  // NYI UNK
-    FLAG_EXPANSION2_COLLECTOR = 0x4000000,  // NYI UNK
-    FLAG_OVERMIND_LINKED      = 0x8000000,  // NYI UNK
-    FLAG_DEMOS                = 0x10000000, // NYI UNK
-    FLAG_DEATH_KNIGHT_OK      = 0x20000000, // NYI UNK
-    FLAG_S2_REQUIRE_IGR       = 0x40000000, // NYI UNK
-    FLAG_S2_TRIAL             = 0x80000000, // NYI UNK
-    FLAG_S2_RESTRICTED        = 0xFFFFFFFF  // NYI UNK
 };
 
 #define MAX_ACCOUNT_STR 17
