@@ -56,6 +56,8 @@ enum Misc
     MAX_EMBRACE_DMG_H                       = 40000,
 
     SUMMON_GROUP_TRIGGERS                   = 0,
+
+    GROUP_COMBAT_ABILITIES                  = 1,
 };
 
 enum Actions
@@ -215,6 +217,7 @@ struct boss_taldaram : public BossAI
                 me->SetReactState(REACT_PASSIVE);
                 me->GetMotionMaster()->Clear();
                 DoStopAttack();
+                scheduler.CancelGroup(GROUP_COMBAT_ABILITIES);
             });
         });
     }
@@ -233,7 +236,12 @@ struct boss_taldaram : public BossAI
                 }
 
                 me->m_Events.AddEventAtOffset([&] {
-                    ScheduleCombatEvents();
+                    if (!scheduler.IsGroupScheduled(GROUP_COMBAT_ABILITIES))
+                    {
+                        ScheduleCombatEvents();
+                        me->SetReactState(REACT_AGGRESSIVE);
+                        me->ResumeChasingVictim();
+                    }
                 }, 20s);
             });
         }
@@ -355,11 +363,11 @@ private:
 
     void ScheduleCombatEvents()
     {
-        scheduler.Schedule(10s, [this](TaskContext context)
+        scheduler.Schedule(10s, GROUP_COMBAT_ABILITIES, [this](TaskContext context)
         {
             DoCastVictim(SPELL_BLOODTHIRST);
             context.Repeat(15s);
-        }).Schedule(10s, [this](TaskContext context)
+        }).Schedule(10s, GROUP_COMBAT_ABILITIES, [this](TaskContext context)
         {
             if (Unit* victim = me->GetVictim())
             {
