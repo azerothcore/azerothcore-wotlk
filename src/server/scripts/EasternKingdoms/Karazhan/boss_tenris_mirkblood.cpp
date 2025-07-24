@@ -118,8 +118,10 @@ struct boss_tenris_mirkblood : public BossAI
     {
     }
 
-    void DamageTaken(Unit* /*attacker*/, uint32& damage, DamageEffectType /*damagetype*/, SpellSchoolMask /*damageSchoolMask*/) override
+    void DamageTaken(Unit* attacker, uint32& damage, DamageEffectType damageType, SpellSchoolMask damageSchoolMask) override
     {
+        BossAI::DamageTaken(attacker, damage, damageType, damageSchoolMask);
+
         if (!me->HasAura(SPELL_BLOOD_MIRROR0))
             return;
 
