@@ -193,7 +193,7 @@ class spell_mirkblood_blood_mirror_target_picker : public SpellScript
         if (!caster->ToCreature())
             return;
 
-        Unit* target = caster->GetAI()->SelectTarget(SelectTargetMethod::Random, caster->GetThreatMgr().GetThreatListSize(), 0.0f, true, false);
+        Unit* target = caster->GetAI()->SelectTarget(SelectTargetMethod::Random, 0, 0.0f, true, false);
 
         if (!target) // Only Blood Mirror the tank if they're the only one around
             target = caster->GetVictim();
