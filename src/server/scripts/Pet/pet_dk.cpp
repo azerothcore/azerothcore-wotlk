@@ -225,12 +225,12 @@ struct npc_pet_dk_ghoul : public CombatAI
 {
     npc_pet_dk_ghoul(Creature* c) : CombatAI(c) { }
 
-    void IsSummonedBy(Unit* owner)
+    void IsSummonedBy(WorldObject* summoner) override
     {
-        if (!owner || owner->GetTypeId() != TYPEID_PLAYER)
+        if (!summoner || !summoner->IsPlayer())
             return;
 
-        Player* player = owner->ToPlayer();
+        Player* player = summoner->ToPlayer();
 
         if (Unit* victim = player->GetVictim())
         {
