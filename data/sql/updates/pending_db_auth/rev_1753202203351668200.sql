@@ -1,0 +1,3 @@
+--
+ALTER TABLE `account`
+    ADD COLUMN `Flags` INT UNSIGNED NOT NULL DEFAULT '0' AFTER `expansion`;
