@@ -1760,14 +1760,8 @@ public:
                     break;
                 case EVENT_SPELL_PLASMA_BALL:
                     if (!immobilized)
-                    {
                         if (Unit* victim = me->GetVictim())
-                        {
                             me->CastSpell(victim, SPELL_PLASMA_BALL, false);
-                            if (Phase != 3)
-                                me->SetFacingToObject(victim);
-                        }
-                    }
                     events.Repeat(3s);
                     break;
                 case EVENT_SUMMON_BOMB_BOT:
