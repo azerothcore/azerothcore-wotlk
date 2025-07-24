@@ -2257,6 +2257,9 @@ void ObjectMgr::LoadCreatures()
         return;
     }
 
+    if (sWorld->getBoolConfig(CONFIG_CALCULATE_CREATURE_ZONE_AREA_DATA))
+        LOG_INFO("server.loading", "Calculating zone and area fields. This may take a moment...");
+
     // Build single time for check spawnmask
     std::map<uint32, uint32> spawnMasks;
     for (uint32 i = 0; i < sMapStore.GetNumRows(); ++i)
@@ -2418,7 +2421,6 @@ void ObjectMgr::LoadCreatures()
             stmt->SetData(2, spawnId);
 
             WorldDatabase.Execute(stmt);
-            LOG_DEBUG("server.loading", "Added zoneId: {}, areaId: {} to creature GUID: {}", zoneId, areaId, spawnId);
         }
 
         // Add to grid if not managed by the game event or pool system
@@ -2622,6 +2624,9 @@ void ObjectMgr::LoadGameobjects()
         return;
     }
 
+    if (sWorld->getBoolConfig(CONFIG_CALCULATE_GAMEOBJECT_ZONE_AREA_DATA))
+        LOG_INFO("server.loading", "Calculating zone and area fields. This may take a moment...");
+
     // build single time for check spawnmask
     std::map<uint32, uint32> spawnMasks;
     for (uint32 i = 0; i < sMapStore.GetNumRows(); ++i)
@@ -2761,7 +2766,6 @@ void ObjectMgr::LoadGameobjects()
             stmt->SetData(2, guid);
 
             WorldDatabase.Execute(stmt);
-            LOG_DEBUG("server.loading", "Added zoneId: {}, areaId: {} to gameobject GUID: {}", zoneId, areaId, guid);
         }
 
         if (gameEvent == 0 && PoolId == 0)                      // if not this is to be managed by GameEvent System or Pool system
