@@ -95,19 +95,18 @@ struct boss_tenris_mirkblood : public BossAI
         Talk(SAY_AGGRO);
         DoZoneInCombat();
 
-        scheduler.Schedule(1s, 5s, [this](TaskContext context)
-            { // Blood Mirror
-                DoCast(SPELL_BLOOD_MIRROR_TARGET_PICKER);
-                context.Repeat(20s, 50s);
-            }).Schedule(30s, [this](TaskContext context)
-            { // Blood Swoop
-                DoCast(SPELL_DASH_GASH_PRE_SPELL);
-                context.Repeat(15s, 40s);
-            }).Schedule(6s, 15s, [this](TaskContext context)
-            {
-                DoCast(SPELL_SUMMON_SANGUINE_SPIRIT_SHORT_MISSILE_BURST);
-                context.Repeat(6s, 15s);
-            });
+        ScheduleTimedEvent(1s, 5s, [&] {
+            // Blood Mirror
+            DoCast(SPELL_BLOOD_MIRROR_TARGET_PICKER);
+            }, 20s, 50s);
+        ScheduleTimedEvent(30s, [&] {
+            // Blood Swoop
+            DoCast(SPELL_DASH_GASH_PRE_SPELL);
+            }, 15s, 40s);
+        ScheduleTimedEvent(6s, 15s, [&] {
+            // Sanguine Spirit
+            DoCast(SPELL_SUMMON_SANGUINE_SPIRIT_SHORT_MISSILE_BURST);
+            }, 6s, 15s);
     }
 
     void JustSummoned(Creature* summoned) override
