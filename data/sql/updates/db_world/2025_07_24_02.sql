@@ -1,3 +1,4 @@
+-- DB update 2025_07_24_01 -> 2025_07_24_02
 -- Add Creature Text (Emery Neill)
 DELETE FROM `creature_text` WHERE (`CreatureID` = 30570);
 INSERT INTO `creature_text` (`CreatureID`, `GroupID`, `ID`, `Text`, `Type`, `Language`, `Probability`, `Emote`, `Duration`, `Sound`, `BroadcastTextId`, `TextRange`, `comment`) VALUES
