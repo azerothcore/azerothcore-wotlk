@@ -3104,22 +3104,26 @@ bool Player::addSpell(uint32 spellId, uint8 addSpecMask, bool updateActive, bool
 bool Player::CheckSkillLearnedBySpell(uint32 spellId)
 {
     SkillLineAbilityMapBounds skill_bounds = sSpellMgr->GetSkillLineAbilityMapBounds(spellId);
+    uint32 errorSkill = 0;
     for (SkillLineAbilityMap::const_iterator sla = skill_bounds.first; sla != skill_bounds.second; ++sla)
     {
         SkillLineEntry const* pSkill = sSkillLineStore.LookupEntry(sla->second->SkillLine);
         if (!pSkill)
             continue;
 
-        SkillRaceClassInfoEntry const* rcEntry = GetSkillRaceClassInfo(pSkill->id, getRace(), getClass());
-        if (!rcEntry)
-        {
-            LOG_ERROR("entities.player", "Player {} (GUID: {}), has spell ({}) that teach skill ({}) which is invalid for the race/class combination (Race: {}, Class: {}). Will be deleted.",
-                GetName(), GetGUID().GetCounter(), spellId, pSkill->id, getRace(), getClass());
-
-            return false;
-        }
+        if (GetSkillRaceClassInfo(pSkill->id, getRace(), getClass()))
+            return true;
+        else
+            errorSkill = pSkill->id;
     }
 
+    if (errorSkill)
+    {
+        LOG_ERROR("entities.player", "Player {} (GUID: {}), has spell ({}) that teach skill ({}) which is invalid for the race/class combination (Race: {}, Class: {}). Will be deleted.",
+            GetName(), GetGUID().GetCounter(), spellId, errorSkill, getRace(), getClass());
+
+        return false;
+    }
     return true;
 }
 
