@@ -1761,18 +1761,11 @@ public:
                 case EVENT_SPELL_PLASMA_BALL:
                     if (!immobilized)
                     {
-                        if (Phase == 3)
+                        if (Unit* victim = me->GetVictim())
                         {
-                            if (Unit* victim = me->GetVictim())
-                                me->CastSpell(victim, SPELL_PLASMA_BALL, false);
-                        }
-                        else
-                        {
-                            if (Unit* victim = SelectTarget(SelectTargetMethod::Random, 0, 27.5f, true))
-                            {
+                            me->CastSpell(victim, SPELL_PLASMA_BALL, false);
+                            if (Phase != 3)
                                 me->SetFacingToObject(victim);
-                                me->CastSpell(victim, SPELL_PLASMA_BALL, false);
-                            }
                         }
                     }
                     events.Repeat(3s);
