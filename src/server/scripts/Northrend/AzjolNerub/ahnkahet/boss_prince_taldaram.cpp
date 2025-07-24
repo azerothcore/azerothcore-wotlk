@@ -213,7 +213,7 @@ struct boss_taldaram : public BossAI
             scheduler.Schedule(1s, [this](TaskContext)
             {
                 Talk(SAY_VANISH);
-                DoCastSelf(SPELL_VANISH, false);
+                DoCastSelf(SPELL_VANISH);
                 me->SetReactState(REACT_PASSIVE);
                 me->GetMotionMaster()->Clear();
                 DoStopAttack();
