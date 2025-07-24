@@ -16,6 +16,7 @@
  */
 
 #include "AccountMgr.h"
+#include "Common.h"
 #include "DatabaseEnv.h"
 #include "ObjectAccessor.h"
 #include "Player.h"
@@ -298,6 +299,39 @@ namespace AccountMgr
         return false;
     }
 
+    bool HasAccountFlag(uint32 accountId, uint32 flag)
+    {
+        LoginDatabasePreparedStatement* stmt = LoginDatabase.GetPreparedStatement(LOGIN_SEL_ACCOUNT_FLAG);
+        stmt->SetData(0, accountId);
+        if (PreparedQueryResult result = LoginDatabase.Query(stmt))
+        {
+            uint32 flags = (*result)[0].Get<uint32>();
+            return (flags & flag) != 0;
+        }
+
+        return false;
+    }
+
+    void UpdateAccountFlag(uint32 accountId, uint32 flag, bool remove /*= false*/)
+    {
+        LoginDatabasePreparedStatement* stmt = LoginDatabase.GetPreparedStatement(
+            remove ? LOGIN_UPD_REMOVE_ACCOUNT_FLAG : LOGIN_UPD_ADD_ACCOUNT_FLAG
+        );
+        stmt->SetData(0, flag);
+        stmt->SetData(1, accountId);
+        LoginDatabase.Execute(stmt);
+    }
+
+    void ValidateAccountFlags(uint32 accountId, uint32 flags, uint32 security)
+    {
+        bool hasGMFlag = (flags & ACCOUNT_FLAG_GM) != 0;
+
+        if (IsGMAccount(security) && !hasGMFlag)
+            UpdateAccountFlag(accountId, ACCOUNT_FLAG_GM);
+        else if (hasGMFlag && !IsGMAccount(security))
+            UpdateAccountFlag(accountId, ACCOUNT_FLAG_GM, true);
+    }
+
     uint32 GetCharactersCount(uint32 accountId)
     {
         // check character count
@@ -311,6 +345,11 @@ namespace AccountMgr
     bool IsPlayerAccount(uint32 gmlevel)
     {
         return gmlevel == SEC_PLAYER;
+    }
+
+    bool IsGMAccount(uint32 gmlevel)
+    {
+        return gmlevel >= SEC_GAMEMASTER;
     }
 
     bool IsAdminAccount(uint32 gmlevel)
