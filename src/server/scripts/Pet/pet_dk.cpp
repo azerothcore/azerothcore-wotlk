@@ -225,7 +225,7 @@ struct npc_pet_dk_ghoul : public CombatAI
 {
     npc_pet_dk_ghoul(Creature* c) : CombatAI(c) { }
 
-    void IsSummonedBy(Unit* owner) override
+    void IsSummonedBy(Unit* owner)
     {
         if (!owner || owner->GetTypeId() != TYPEID_PLAYER)
             return;
