@@ -131,11 +131,6 @@ struct boss_tenris_mirkblood : public BossAI
         me->CastCustomSpell(_mirrorTarget, SPELL_BLOOD_MIRROR_DAMAGE, &damageTaken, &damageTaken, &damageTaken, true, nullptr, nullptr, me->GetGUID());
     }
 
-    void JustDied(Unit* /*killer*/) override
-    {
-        _JustDied();
-    }
-
     void DoAction(int32 actionId) override
     {
         ObjectGuid guid = ObjectGuid::Create<HighGuid::Player>(instance->GetPersistentData(DATA_MIRKBLOOD_APPROACH));
