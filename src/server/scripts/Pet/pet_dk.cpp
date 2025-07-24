@@ -225,6 +225,20 @@ struct npc_pet_dk_ghoul : public CombatAI
 {
     npc_pet_dk_ghoul(Creature* c) : CombatAI(c) { }
 
+    void IsSummonedBy(Unit* owner) override
+    {
+        if (!owner || owner->GetTypeId() != TYPEID_PLAYER)
+            return;
+
+        Player* player = owner->ToPlayer();
+
+        if (Unit* victim = player->GetVictim())
+        {
+            me->Attack(victim, true);
+            me->GetMotionMaster()->MoveChase(victim);
+        }
+    }
+
     void JustDied(Unit* /*who*/) override
     {
         if (me->IsGuardian() || me->IsSummon())
