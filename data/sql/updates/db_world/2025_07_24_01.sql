@@ -1,3 +1,4 @@
+-- DB update 2025_07_24_00 -> 2025_07_24_01
 
 -- Set Waypoint (Martha Goslin)
 DELETE FROM `waypoints` WHERE `entry` IN (2788400);
