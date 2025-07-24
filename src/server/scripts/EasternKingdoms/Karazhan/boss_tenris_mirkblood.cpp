@@ -203,7 +203,7 @@ class spell_mirkblood_blood_mirror_target_picker : public SpellScript
 
         caster->CastSpell(caster, SPELL_BLOOD_MIRROR_TRANSITION_VISUAL, TRIGGERED_FULL_MASK);
         caster->CastSpell(target, SPELL_BLOOD_MIRROR_TRANSITION_VISUAL, TRIGGERED_FULL_MASK);
-        
+
         caster->AddAura(SPELL_BLOOD_MIRROR1, caster); // Should be a cast, but channeled spell results in either Mirkblood or player being unactionable
         caster->AddAura(SPELL_BLOOD_MIRROR1, target); // Adding aura manually causes visual to not appear properly, but better than breaking gameplay
 
