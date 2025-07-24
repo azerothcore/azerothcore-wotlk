@@ -147,3 +147,8 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 (30571, 0, 5, 0, 61, 0, 100, 0, 0, 0, 0, 0, 0, 0, 80, 3057101, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Michael Belfast - On Point 2 of Path 3057100 Reached - Run Script'),
 (30571, 0, 6, 7, 40, 0, 100, 0, 3, 3057100, 0, 0, 0, 0, 54, 10000, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Michael Belfast - On Point 3 of Path 3057100 Reached - Pause Waypoint'),
 (30571, 0, 7, 0, 61, 0, 100, 0, 0, 0, 0, 0, 0, 0, 80, 3057102, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Michael Belfast - On Point 3 of Path 3057100 Reached - Run Script');
+
+-- Add Creature Template Addon (Roger Owens)
+DELETE FROM `creature_template_addon` WHERE (`entry` = 27903);
+INSERT INTO `creature_template_addon` (`entry`, `path_id`, `mount`, `bytes1`, `bytes2`, `emote`, `visibilityDistanceType`, `auras`) VALUES
+(27903, 0, 0, 8, 0, 0, 0, '');
