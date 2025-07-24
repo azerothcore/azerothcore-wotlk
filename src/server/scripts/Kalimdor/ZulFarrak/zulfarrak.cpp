@@ -36,18 +36,6 @@
 //  see: https://github.com/azerothcore/azerothcore-wotlk/issues/9766
 #include "GridNotifiersImpl.h"
 
-/* ScriptData
-SDName: Zulfarrak
-SD%Complete: 50
-SDComment: Consider it temporary, no instance script made for this instance yet.
-SDCategory: Zul'Farrak
-EndScriptData */
-
-/* ContentData
-npc_sergeant_bly
-npc_weegli_blastfuse
-EndContentData */
-
 /*######
 ## npc_sergeant_bly
 ######*/

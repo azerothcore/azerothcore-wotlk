@@ -2317,7 +2317,7 @@ void ObjectMgr::LoadCreatures()
         data.movementType       = fields[15].Get<uint8>();
         data.spawnMask          = fields[16].Get<uint8>();
         data.phaseMask          = fields[17].Get<uint32>();
-        int16 gameEvent         = fields[18].Get<int8>();
+        int16 gameEvent         = fields[18].Get<int16>();
         uint32 PoolId           = fields[19].Get<uint32>();
         data.npcflag            = fields[20].Get<uint32>();
         data.unit_flags         = fields[21].Get<uint32>();
@@ -2709,7 +2709,7 @@ void ObjectMgr::LoadGameobjects()
             LOG_ERROR("sql.sql", "Table `gameobject` has gameobject (GUID: {} Entry: {}) that has wrong spawn mask {} including not supported difficulty modes for map (Id: {}), skip", guid, data.id, data.spawnMask, data.mapid);
 
         data.phaseMask      = fields[15].Get<uint32>();
-        int16 gameEvent     = fields[16].Get<int8>();
+        int16 gameEvent     = fields[16].Get<int16>();
         uint32 PoolId        = fields[17].Get<uint32>();
 
         if (data.rotation.x < -1.0f || data.rotation.x > 1.0f)
@@ -2826,6 +2826,30 @@ void ObjectMgr::LoadItemLocales()
     LOG_INFO("server.loading", ">> Loaded {} Item Locale Strings in {} ms", (uint32)_itemLocaleStore.size(), GetMSTimeDiffToNow(oldMSTime));
 }
 
+ServerConfigs const qualityToBuyValueConfig[MAX_ITEM_QUALITY] =
+{
+    RATE_BUYVALUE_ITEM_POOR,                                    // ITEM_QUALITY_POOR
+    RATE_BUYVALUE_ITEM_NORMAL,                                  // ITEM_QUALITY_NORMAL
+    RATE_BUYVALUE_ITEM_UNCOMMON,                                // ITEM_QUALITY_UNCOMMON
+    RATE_BUYVALUE_ITEM_RARE,                                    // ITEM_QUALITY_RARE
+    RATE_BUYVALUE_ITEM_EPIC,                                    // ITEM_QUALITY_EPIC
+    RATE_BUYVALUE_ITEM_LEGENDARY,                               // ITEM_QUALITY_LEGENDARY
+    RATE_BUYVALUE_ITEM_ARTIFACT,                                // ITEM_QUALITY_ARTIFACT
+    RATE_BUYVALUE_ITEM_HEIRLOOM,                                // ITEM_QUALITY_HEIRLOOM
+};
+
+ServerConfigs const qualityToSellValueConfig[MAX_ITEM_QUALITY] =
+{
+    RATE_SELLVALUE_ITEM_POOR,                                   // ITEM_QUALITY_POOR
+    RATE_SELLVALUE_ITEM_NORMAL,                                 // ITEM_QUALITY_NORMAL
+    RATE_SELLVALUE_ITEM_UNCOMMON,                               // ITEM_QUALITY_UNCOMMON
+    RATE_SELLVALUE_ITEM_RARE,                                   // ITEM_QUALITY_RARE
+    RATE_SELLVALUE_ITEM_EPIC,                                   // ITEM_QUALITY_EPIC
+    RATE_SELLVALUE_ITEM_LEGENDARY,                              // ITEM_QUALITY_LEGENDARY
+    RATE_SELLVALUE_ITEM_ARTIFACT,                               // ITEM_QUALITY_ARTIFACT
+    RATE_SELLVALUE_ITEM_HEIRLOOM,                               // ITEM_QUALITY_HEIRLOOM
+};
+
 void ObjectMgr::LoadItemTemplates()
 {
     uint32 oldMSTime = getMSTime();
@@ -2893,8 +2917,8 @@ void ObjectMgr::LoadItemTemplates()
         itemTemplate.Flags                     = ItemFlags(fields[7].Get<uint32>());
         itemTemplate.Flags2                    = ItemFlags2(fields[8].Get<uint32>());
         itemTemplate.BuyCount                  = uint32(fields[9].Get<uint8>());
-        itemTemplate.BuyPrice                  = int32(fields[10].Get<int64>() * sWorld->getRate((Rates)(RATE_BUYVALUE_ITEM_POOR + itemTemplate.Quality)));
-        itemTemplate.SellPrice                 = uint32(fields[11].Get<uint32>() * sWorld->getRate((Rates)(RATE_SELLVALUE_ITEM_POOR + itemTemplate.Quality)));
+        itemTemplate.BuyPrice                  = int32(fields[10].Get<int64>());
+        itemTemplate.SellPrice                 = uint32(fields[11].Get<uint32>());
         itemTemplate.InventoryType             = uint32(fields[12].Get<uint8>());
         itemTemplate.AllowableClass            = fields[13].Get<int32>();
         itemTemplate.AllowableRace             = fields[14].Get<int32>();
@@ -3375,6 +3399,10 @@ void ObjectMgr::LoadItemTemplates()
             LOG_ERROR("sql.sql", "Item (Entry {}) has flag ITEM_FLAGS_CU_DURATION_REAL_TIME but it does not have duration limit", entry);
             itemTemplate.FlagsCu = static_cast<ItemFlagsCustom>(static_cast<uint32>(itemTemplate.FlagsCu) & ~ITEM_FLAGS_CU_DURATION_REAL_TIME);
         }
+
+        // Set after checks to ensure valid item quality
+        itemTemplate.BuyPrice *= sWorld->getRate(qualityToBuyValueConfig[itemTemplate.Quality]);
+        itemTemplate.SellPrice *= sWorld->getRate(qualityToSellValueConfig[itemTemplate.Quality]);
 
         // Fill categories map
         for (uint8 i = 0; i < MAX_ITEM_PROTO_SPELLS; ++i)

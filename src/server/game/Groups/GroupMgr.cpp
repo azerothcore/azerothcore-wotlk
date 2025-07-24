@@ -51,7 +51,7 @@ void GroupMgr::InitGroupIds()
     }
 }
 
-void GroupMgr::RegisterGroupId(uint32 groupId)
+void GroupMgr::RegisterGroupId(ObjectGuid::LowType groupId)
 {
     // Allocation was done in InitGroupIds()
     _groupIds[groupId] = true;

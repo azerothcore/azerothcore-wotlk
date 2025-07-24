@@ -15,13 +15,6 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-/* ScriptData
-SDName: FollowerAI
-SD%Complete: 50
-SDComment: This AI is under development
-SDCategory: Npc
-EndScriptData */
-
 #include "ScriptedFollowerAI.h"
 #include "Group.h"
 #include "Player.h"

@@ -726,7 +726,7 @@ public:
     // Movement flags
     void AddUnitMovementFlag(uint32 f) { m_movementInfo.flags |= f; }
     void RemoveUnitMovementFlag(uint32 f) { m_movementInfo.flags &= ~f; }
-    [[nodiscard]] bool HasUnitMovementFlag(uint32 f) const { return (m_movementInfo.flags & f) == f; }
+    [[nodiscard]] bool HasUnitMovementFlag(uint32 f) const { return (m_movementInfo.flags & f) != 0; }
     [[nodiscard]] uint32 GetUnitMovementFlags() const { return m_movementInfo.flags; }
     void SetUnitMovementFlags(uint32 f) { m_movementInfo.flags = f; }
 
@@ -1893,6 +1893,7 @@ public:
     void SetInFront(WorldObject const* target);
     void SetFacingTo(float ori);
     void SetFacingToObject(WorldObject* object);
+    void SetTimedFacingToObject(WorldObject* object, uint32 time); // Reset to home orientation after given time
 
     bool isInAccessiblePlaceFor(Creature const* c) const;
     bool isInFrontInMap(Unit const* target, float distance, float arc = M_PI) const;

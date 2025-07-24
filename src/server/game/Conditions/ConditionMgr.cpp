@@ -573,7 +573,7 @@ bool Condition::Meets(ConditionSourceInfo& sourceInfo)
     }
     case CONDITION_WORLD_SCRIPT:
     {
-        condMeets = sWorldState->IsConditionFulfilled(static_cast<WorldStateCondition>(ConditionValue1), static_cast<WorldStateConditionState>(ConditionValue2));
+        condMeets = sWorldState->IsConditionFulfilled(ConditionValue1, ConditionValue2);
         break;
     }
     default:

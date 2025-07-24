@@ -28,7 +28,6 @@
 #include "Vehicle.h"
 #include "WaypointMgr.h"
 
-// Ours
 enum qSniffing
 {
     SPELL_SUMMON_PURSUERS_PERIODIC          = 54993,
@@ -678,7 +677,6 @@ class spell_q13007_iron_colossus : public SpellScript
     }
 };
 
-// Theirs
 /*######
 ## npc_roxi_ramrocket
 ######*/

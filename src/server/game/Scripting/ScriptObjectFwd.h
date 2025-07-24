@@ -24,7 +24,6 @@
 class AchievementGlobalMgr;
 class AchievementMgr;
 class ArenaTeam;
-class AuctionEntry;
 class AuctionHouseMgr;
 class AuctionHouseObject;
 class Aura;
@@ -98,6 +97,7 @@ enum WeatherState : uint32;
 struct AchievementCriteriaEntry;
 struct AchievementEntry;
 struct AreaTrigger;
+struct AuctionEntry;
 struct CompletedAchievementData;
 struct Condition;
 struct ConditionSourceInfo;
