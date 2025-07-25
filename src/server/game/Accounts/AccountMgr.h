@@ -21,6 +21,7 @@
 #include "Define.h"
 #include "Common.h"
 #include <string>
+#include <unordered_map>
 
 enum AccountOpResult
 {
