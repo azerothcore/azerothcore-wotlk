@@ -21,7 +21,6 @@
 #include "Define.h"
 #include "Common.h"
 #include <string>
-#include <unordered_map>
 
 enum AccountOpResult
 {
@@ -37,8 +36,6 @@ enum AccountOpResult
 #define MAX_ACCOUNT_STR 17
 #define MAX_PASS_STR 16
 #define MAX_EMAIL_STR 255
-
-typedef std::unordered_map<uint32, uint32> AccountFlagsContainer;
 
 namespace AccountMgr
 {
@@ -59,11 +56,6 @@ namespace AccountMgr
     bool IsGMAccount(uint32 gmlevel);
     bool IsAdminAccount(uint32 gmlevel);
     bool IsConsoleAccount(uint32 gmlevel);
-
-    extern AccountFlagsContainer _accountFlagsStore;
-    bool HasAccountFlag(uint32 accountId, uint32 flag);
-    void UpdateAccountFlag(uint32 accountId, uint32 flag, bool remove = false);
-    void ValidateAccountFlags(uint32 accountId, uint32 security);
 };
 
 #endif
