@@ -92,7 +92,7 @@ enum AccountFlag
     ACCOUNT_FLAG_EXPANSION2_COLLECTOR = 0x4000000,  // NYI WotLK Collector's Edition
     ACCOUNT_FLAG_OVERMIND_LINKED      = 0x8000000,  // NYI Linked with Battle.net account
     ACCOUNT_FLAG_DEMOS                = 0x10000000, // NYI UNK
-    ACCOUNT_FLAG_DEATH_KNIGHT_OK      = 0x20000000, // NYI Has level 55 on account?
+    ACCOUNT_FLAG_DEATH_KNIGHT_OK      = 0x20000000, // NYI Allowed to create Death Knight
     // Below might be StarCraft II related
     ACCOUNT_FLAG_S2_REQUIRE_IGR       = 0x40000000, // NYI UNK
     ACCOUNT_FLAG_S2_TRIAL             = 0x80000000, // NYI UNK
