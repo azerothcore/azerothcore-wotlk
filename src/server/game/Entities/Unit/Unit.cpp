@@ -7205,16 +7205,6 @@ bool Unit::HandleDummyAuraProc(Unit* victim, uint32 damage, AuraEffect* triggere
             }
         case SPELLFAMILY_WARRIOR:
             {
-                switch (dummySpell->Id)
-                {
-                    // Victorious
-                    case 32216:
-                        {
-                            RemoveAura(dummySpell->Id);
-                            return false;
-                        }
-                }
-
                 // Second Wind
                 if (dummySpell->SpellIconID == 1697)
                 {

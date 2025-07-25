@@ -1710,6 +1710,7 @@ public:
     void learnQuestRewardedSpells();
     void learnQuestRewardedSpells(Quest const* quest);
     void learnSpellHighRank(uint32 spellid);
+    bool CheckSkillLearnedBySpell(uint32 spellId);
     void SetReputation(uint32 factionentry, float value);
     [[nodiscard]] uint32 GetReputation(uint32 factionentry) const;
     std::string const& GetGuildName();
@@ -2629,8 +2630,8 @@ public:
     std::string GetPlayerName();
 
     // Settings
-    [[nodiscard]] PlayerSetting GetPlayerSetting(std::string source, uint8 index);
-    void UpdatePlayerSetting(std::string source, uint8 index, uint32 value);
+    [[nodiscard]] PlayerSetting GetPlayerSetting(std::string const& source, uint8 index);
+    void UpdatePlayerSetting(std::string const& source, uint8 index, uint32 value);
 
     void SendSystemMessage(std::string_view msg, bool escapeCharacters = false);
 
