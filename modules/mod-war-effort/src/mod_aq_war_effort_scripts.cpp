@@ -888,7 +888,8 @@ class ModAQWarEffortPlayerScript : public PlayerScript
 {
 public:
     ModAQWarEffortPlayerScript() : PlayerScript("ModAQWarEffortPlayerScript", {
-        PLAYERHOOK_ON_PLAYER_COMPLETE_QUEST
+        PLAYERHOOK_ON_PLAYER_COMPLETE_QUEST,
+        PLAYERHOOK_ON_LOGIN
     }) { }
 
     void OnPlayerCompleteQuest(Player* player, Quest const* quest) override
@@ -974,6 +975,19 @@ public:
             }
         }
     }
+
+    void OnPlayerLogin(Player* player) override
+    {
+        if (sWarEffort->IsEnabled())
+        {
+            for (MaterialCategory MatCat : { MaterialCategory::MATERIAL_CAT_BANDAGES, MaterialCategory::MATERIAL_CAT_FOOD, MaterialCategory::MATERIAL_CAT_HERBS, MaterialCategory::MATERIAL_CAT_METAL, MaterialCategory::MATERIAL_CAT_LEATHER })
+            {
+                sWarEffort->CheckGoal(player, static_cast<uint8>(MatCat), TEAM_ALLIANCE);
+                sWarEffort->CheckGoal(player, static_cast<uint8>(MatCat), TEAM_HORDE);
+            }
+        }
+    }
+
 };
 
 class ModWarEffortWorldScript : public WorldScript
@@ -1168,6 +1182,9 @@ struct npc_mod_war_effort_quartermaster : public ScriptedAI
                 }
                 break;
         }
+
+        if (text.empty())
+            text = "Nothing to report.";
 
         me->Whisper(text, LANG_UNIVERSAL, player);
         CloseGossipMenuFor(player);
