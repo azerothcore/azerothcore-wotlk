@@ -122,12 +122,16 @@ EOF
     fi
 else
     echo "Starting $BINFILE without GDB"
-    if [[ "$AC_LAUNCHED_BY_PM2" == "1" ]]; then
-        echo "Running under PM2"
+    if [[ "$AC_LAUNCHED_BY_PM2" == "1" || "$AC_DISABLE_INTERACTIVE" != "1" ]]; then
+        echo "Running AC interactively"
         "$EXECPATH" ${CONFIG_ABS:+-c "$CONFIG_ABS"}
     else
+        # When SERVICE_MODE is set without a session manager, AC_DISABLE_INTERACTIVE is set to 1 
+        # This means we are using systemd and we need to run AC 
+        # with unbuffer for line-buffered output 
+        # NOTE unbuffer doesn't fully support interactive mode
         if command -v unbuffer >/dev/null 2>&1; then
-            export AC_DISABLE_INTERACTIVE=0
+            echo "Running with unbuffer for line-buffered output"
             unbuffer "$EXECPATH" ${CONFIG_ABS:+-c "$CONFIG_ABS"}
         else
             echo "⚠️  unbuffer not found, the output may not be line-buffered. Try installing expect."
