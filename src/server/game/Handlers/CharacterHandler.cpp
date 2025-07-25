@@ -361,6 +361,13 @@ void WorldSession::HandleCharCreateOpcode(WorldPacket& recvData)
         return;
     }
 
+    // Speed check if heroic character minimum is greater than max player level
+    if (sWorld->getIntConfig(CONFIG_CHARACTER_CREATING_MIN_LEVEL_FOR_HEROIC_CHARACTER) > sWorld->getIntConfig(CONFIG_MAX_PLAYER_LEVEL))
+    {
+        SendCharCreate(CHAR_CREATE_LEVEL_REQUIREMENT);
+        return;
+    }
+
     CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_CHECK_NAME);
     stmt->SetData(0, createInfo->Name);
 
