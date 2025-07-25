@@ -1,8 +1,8 @@
--- MySQL dump 10.13  Distrib 8.0.34, for Win64 (x86_64)
+-- MySQL dump 10.13  Distrib 8.4.3, for Win64 (x86_64)
 --
--- Host: 127.0.0.1    Database: acore_world
+-- Host: localhost    Database: acore_world
 -- ------------------------------------------------------
--- Server version	8.0.34
+-- Server version	8.4.3
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
 /*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
@@ -525,8 +525,8 @@ INSERT INTO `spell_area` VALUES
 (57940,4813,0,0,0,0,2,1,0,0),
 (57940,4820,0,0,0,0,2,1,0,0),
 (58045,4197,0,0,0,0,2,1,64,11),
-(58354,4281,13165,13189,0,690,2,1,74,11),
-(58354,4281,13165,13188,0,1101,2,1,74,11),
+(58354,4281,12801,13189,0,690,2,1,64,11),
+(58354,4281,12801,13188,0,1101,2,1,64,11),
 (58361,4281,13166,13166,0,0,2,1,74,11),
 (58530,0,13165,13188,-58354,1101,2,1,64,11),
 (58551,0,13165,13189,-58354,690,2,1,64,11),
@@ -755,5 +755,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2024-12-17 22:34:37
-
+-- Dump completed on 2025-07-19 12:09:39

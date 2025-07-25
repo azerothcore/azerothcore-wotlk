@@ -1293,7 +1293,7 @@ Visibility.GroupMode = 1
 #        Description: Visibility distance to see other players or gameobjects.
 #                     Visibility on continents on retail ~100 yards. In BG/Arenas ~250.
 #                     For instances default ~170.
-#                     Max limited by active player zone: ~ 333
+#                     Max: 250
 #                     Min limit is max aggro radius (45) * Rate.Creature.Aggro
 #        Default:     100  - (Visibility.Distance.Continents)
 #                     170 - (Visibility.Distance.Instances)
@@ -4470,7 +4470,8 @@ Minigob.Manabonk.Enable = 1
 
 #
 #     Calculate.Creature.Zone.Area.Data
-#        Description: Calculate at loading creature zoneId / areaId and save in creature table (WARNING: SLOW WORLD SERVER STARTUP)
+#        Description: Calculate at loading creature zoneId / areaId and save in creature table
+#                     WARNING: SLOW WORLD SERVER STARTUP. Should only be used for debugging.
 #        Default:     0  - (Do not show)
 #
 
@@ -4478,7 +4479,8 @@ Calculate.Creature.Zone.Area.Data = 0
 
 #
 #     Calculate.Gameoject.Zone.Area.Data
-#        Description: Calculate at loading gameobject zoneId / areaId and save in gameobject table (WARNING: SLOW WORLD SERVER STARTUP)
+#        Description: Calculate at loading gameobject zoneId / areaId and save in gameobject table
+#                     WARNING: SLOW WORLD SERVER STARTUP. Should only be used for debugging.
 #        Default:     0  - (Do not show)
 #
 
