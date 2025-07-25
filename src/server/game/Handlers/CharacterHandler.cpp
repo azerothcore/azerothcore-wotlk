@@ -361,22 +361,6 @@ void WorldSession::HandleCharCreateOpcode(WorldPacket& recvData)
         return;
     }
 
-    // speedup check for heroic class disabled case
-    uint32 heroic_free_slots = sWorld->getIntConfig(CONFIG_HEROIC_CHARACTERS_PER_REALM);
-    if (heroic_free_slots == 0 && AccountMgr::IsPlayerAccount(GetSecurity()) && createInfo->Class == CLASS_DEATH_KNIGHT)
-    {
-        SendCharCreate(CHAR_CREATE_UNIQUE_CLASS_LIMIT);
-        return;
-    }
-
-    // speedup check for heroic class disabled case
-    uint32 req_level_for_heroic = sWorld->getIntConfig(CONFIG_CHARACTER_CREATING_MIN_LEVEL_FOR_HEROIC_CHARACTER);
-    if (AccountMgr::IsPlayerAccount(GetSecurity()) && createInfo->Class == CLASS_DEATH_KNIGHT && req_level_for_heroic > sWorld->getIntConfig(CONFIG_MAX_PLAYER_LEVEL))
-    {
-        SendCharCreate(CHAR_CREATE_LEVEL_REQUIREMENT);
-        return;
-    }
-
     CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_CHECK_NAME);
     stmt->SetData(0, createInfo->Name);
 
@@ -438,7 +422,6 @@ void WorldSession::HandleCharCreateOpcode(WorldPacket& recvData)
             }
             bool haveSameRace = false;
             uint32 heroicReqLevel = sWorld->getIntConfig(CONFIG_CHARACTER_CREATING_MIN_LEVEL_FOR_HEROIC_CHARACTER);
-            bool hasHeroicReqLevel = (heroicReqLevel == 0);
             bool allowTwoSideAccounts = !sWorld->IsPvPRealm() || sWorld->getBoolConfig(CONFIG_ALLOW_TWO_SIDE_ACCOUNTS) || !AccountMgr::IsPlayerAccount(GetSecurity());
             uint32 skipCinematics = sWorld->getIntConfig(CONFIG_SKIP_CINEMATICS);
             bool checkDeathKnightReqs = AccountMgr::IsPlayerAccount(GetSecurity()) && createInfo->Class == CLASS_DEATH_KNIGHT;
@@ -466,11 +449,11 @@ void WorldSession::HandleCharCreateOpcode(WorldPacket& recvData)
                         }
                     }
 
-                    if (!hasHeroicReqLevel)
+                    if (!AccountMgr::HasAccountFlag(GetAccountId(), ACCOUNT_FLAG_DEATH_KNIGHT_OK))
                     {
                         uint8 accLevel = field[0].Get<uint8>();
-                        if (accLevel >= heroicReqLevel)
-                            hasHeroicReqLevel = true;
+                        if (Expansion() >= EXPANSION_WRATH_OF_THE_LICH_KING && accLevel >= heroicReqLevel)
+                            AccountMgr::UpdateAccountFlag(GetAccountId(), ACCOUNT_FLAG_DEATH_KNIGHT_OK);
                     }
                 }
 
@@ -517,20 +500,29 @@ void WorldSession::HandleCharCreateOpcode(WorldPacket& recvData)
                             }
                         }
 
-                        if (!hasHeroicReqLevel)
+                        if (!AccountMgr::HasAccountFlag(GetAccountId(), ACCOUNT_FLAG_DEATH_KNIGHT_OK))
                         {
-                            uint8 acc_level = field[0].Get<uint8>();
-                            if (acc_level >= heroicReqLevel)
-                                hasHeroicReqLevel = true;
+                            uint8 accLevel = field[0].Get<uint8>();
+                            if (Expansion() >= EXPANSION_WRATH_OF_THE_LICH_KING && accLevel >= heroicReqLevel)
+                                AccountMgr::UpdateAccountFlag(GetAccountId(), ACCOUNT_FLAG_DEATH_KNIGHT_OK);
                         }
                     }
                 }
             }
 
-            if (checkDeathKnightReqs && !hasHeroicReqLevel)
+            if (checkDeathKnightReqs)
             {
-                SendCharCreate(CHAR_CREATE_LEVEL_REQUIREMENT);
-                return;
+                if (Expansion() < EXPANSION_WRATH_OF_THE_LICH_KING)
+                {
+                    SendCharCreate(CHAR_CREATE_EXPANSION_CLASS);
+                    return;
+                }
+
+                if (!AccountMgr::HasAccountFlag(GetAccountId(), ACCOUNT_FLAG_DEATH_KNIGHT_OK))
+                {
+                    SendCharCreate(CHAR_CREATE_LEVEL_REQUIREMENT);
+                    return;
+                }
             }
 
             // Check name uniqueness in the same step as saving to database
