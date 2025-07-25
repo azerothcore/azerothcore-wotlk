@@ -178,11 +178,6 @@ WorldSession::~WorldSession()
     LoginDatabase.Execute("UPDATE account SET online = 0 WHERE id = {};", GetAccountId());     // One-time query
 }
 
-bool WorldSession::HasAccountFlag(uint32 flags) const
-{
-    return (_accountFlags & flags) != 0;
-}
-
 void WorldSession::UpdateAccountFlag(uint32 flag, bool remove /*= flase*/)
 {
     if (remove)
