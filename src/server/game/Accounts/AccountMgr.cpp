@@ -299,32 +299,34 @@ namespace AccountMgr
         return false;
     }
 
+    AccountFlagsContainer _accountFlagsStore;
     bool HasAccountFlag(uint32 accountId, uint32 flag)
     {
-        LoginDatabasePreparedStatement* stmt = LoginDatabase.GetPreparedStatement(LOGIN_SEL_ACCOUNT_FLAG);
-        stmt->SetData(0, accountId);
-        if (PreparedQueryResult result = LoginDatabase.Query(stmt))
-        {
-            uint32 flags = (*result)[0].Get<uint32>();
-            return (flags & flag) != 0;
-        }
+        auto itr = _accountFlagsStore.find(accountId);
+        if (itr == _accountFlagsStore.end())
+            return false;
 
-        return false;
+        return (itr->second & flag) != 0;
     }
 
     void UpdateAccountFlag(uint32 accountId, uint32 flag, bool remove /*= false*/)
     {
-        LoginDatabasePreparedStatement* stmt = LoginDatabase.GetPreparedStatement(
-            remove ? LOGIN_UPD_REMOVE_ACCOUNT_FLAG : LOGIN_UPD_ADD_ACCOUNT_FLAG
-        );
-        stmt->SetData(0, flag);
+        uint32& flags = _accountFlagsStore[accountId];
+        if (remove)
+            flags &= ~flag;
+        else
+            flags |= flag;
+
+        // Async update
+        LoginDatabasePreparedStatement* stmt = LoginDatabase.GetPreparedStatement(LOGIN_UPD_SET_ACCOUNT_FLAG);
+        stmt->SetData(0, flags);
         stmt->SetData(1, accountId);
         LoginDatabase.Execute(stmt);
     }
 
-    void ValidateAccountFlags(uint32 accountId, uint32 flags, uint32 security)
+    void ValidateAccountFlags(uint32 accountId, uint32 security)
     {
-        bool hasGMFlag = (flags & ACCOUNT_FLAG_GM) != 0;
+        bool hasGMFlag = HasAccountFlag(accountId, ACCOUNT_FLAG_GM);
 
         if (IsGMAccount(security) && !hasGMFlag)
             UpdateAccountFlag(accountId, ACCOUNT_FLAG_GM);
