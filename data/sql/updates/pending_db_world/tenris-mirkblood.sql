@@ -1,7 +1,7 @@
 SET @SAY_APPROACH = 0,
 @SAY_AGGRO = 1,
 @SAY_SUMMON = 2,
-@GUID = 12741;
+@GUID = 12748;
 
 DELETE FROM `areatrigger_scripts` WHERE `entry` IN (5014, 5015);
 INSERT INTO `areatrigger_scripts` (`entry`, `ScriptName`) VALUES
@@ -52,18 +52,18 @@ INSERT INTO `creature` (`guid`, `id1`, `id2`, `id3`, `map`, `zoneId`, `areaId`, 
 (@GUID+8, 28493, 0, 0, 532, 0, 0, 1, 1, 0, -11091.594, -1962.1276, 78.054115, 2.146754980087280273, 300, 0, 0, 4050, 0, 0, 0, 0, 0, '', 49345, 2, NULL),
 (@GUID+9, 28493, 0, 0, 532, 0, 0, 1, 1, 0, -11087.617, -1996.2291, 77.72322,  0.436332315206527709, 300, 0, 0, 4050, 0, 0, 0, 0, 0, '', 49345, 2, NULL);
 
-DELETE FROM `game_event_creature` WHERE `eventEntry` = 17 AND `guid` BETWEEN @GUID+0 AND @GUID+9;
+DELETE FROM `game_event_creature` WHERE `eventEntry` = 120 AND `guid` BETWEEN @GUID+0 AND @GUID+9;
 INSERT INTO `game_event_creature` (`eventEntry`, `guid`) VALUES
-(17, @GUID+0),
-(17, @GUID+1),
-(17, @GUID+2),
-(17, @GUID+3),
-(17, @GUID+4),
-(17, @GUID+5),
-(17, @GUID+6),
-(17, @GUID+7),
-(17, @GUID+8),
-(17, @GUID+9);
+(120, @GUID+0),
+(120, @GUID+1),
+(120, @GUID+2),
+(120, @GUID+3),
+(120, @GUID+4),
+(120, @GUID+5),
+(120, @GUID+6),
+(120, @GUID+7),
+(120, @GUID+8),
+(120, @GUID+9);
 
 DELETE FROM `smart_scripts` WHERE (`entryorguid` = 28485) AND (`source_type` = 0) AND (`id` IN (0));
 INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES

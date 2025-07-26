@@ -132,20 +132,6 @@ struct boss_tenris_mirkblood : public BossAI
         me->CastCustomSpell(_mirrorTarget, SPELL_BLOOD_MIRROR_DAMAGE, &damageTaken, &damageTaken, &damageTaken, true, nullptr, nullptr, me->GetGUID());
     }
 
-    void DoAction(int32 actionId) override
-    {
-        ObjectGuid guid = ObjectGuid::Create<HighGuid::Player>(instance->GetPersistentData(DATA_MIRKBLOOD_APPROACH));
-        if (!guid)
-            return;
-
-        if (actionId == DATA_MIRKBLOOD_APPROACH)
-            Talk(SAY_APPROACH, ObjectAccessor::FindPlayer(guid));
-        else if (actionId == DATA_MIRKBLOOD_ENTRANCE)
-        {
-            // AREA TRIGGER 5015 MAY ENGAGE OR JUST RELEASE NOT_SELECTABLE FLAG
-        }
-    }
-
     void SpellHit(Unit* caster, SpellInfo const* spell) override
     {
         LOG_ERROR("sql.sql", "spell hit!");
@@ -265,21 +251,10 @@ public:
 
     bool OnTrigger(Player* player, AreaTrigger const* /*trigger*/) override
     {
-        LOG_ERROR("sql.sql", "hit approach");
         if (InstanceScript* instance = player->GetInstanceScript())
-        {
-            LOG_ERROR("sql.sql", "approach-script");
             if (instance->GetBossState(DATA_MIRKBLOOD) != DONE)
-            {
-                LOG_ERROR("sql.sql", "approach-state");
                 if (Creature* mirkblood = instance->GetCreature(DATA_MIRKBLOOD))
-                {
-                    LOG_ERROR("sql.sql", "approach-creature");
-                    instance->SetData(DATA_MIRKBLOOD_APPROACH, player->GetGUID().GetCounter());
-                    mirkblood->AI()->DoAction(DATA_MIRKBLOOD_APPROACH);
-                }
-            }
-        }
+                    mirkblood->AI()->Talk(SAY_APPROACH, player);
 
         return false;
     }
@@ -292,21 +267,13 @@ public:
 
     bool _OnTrigger(Player* player, AreaTrigger const* /*trigger*/) override
     {
-        LOG_ERROR("sql.sql", "hit entrance");
         if (InstanceScript* instance = player->GetInstanceScript())
-        {
-            LOG_ERROR("sql.sql", "entrance-script");
             if (instance->GetBossState(DATA_MIRKBLOOD) != DONE)
-            {
-                LOG_ERROR("sql.sql", "entrance-state");
                 if (Creature* mirkblood = instance->GetCreature(DATA_MIRKBLOOD))
                 {
-                    LOG_ERROR("sql.sql", "entrance-script");
-                    instance->SetData(DATA_MIRKBLOOD_ENTRANCE, player->GetGUID().GetCounter());
-                    mirkblood->AI()->DoAction(DATA_MIRKBLOOD_ENTRANCE);
+                    // AREA TRIGGER 5015 MAY ENGAGE OR JUST RELEASE NOT_SELECTABLE FLAG
+                    mirkblood->Talk(std::string_view("gwuh"), CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, 100.0f, mirkblood);
                 }
-            }
-        }
 
         return false;
     }
