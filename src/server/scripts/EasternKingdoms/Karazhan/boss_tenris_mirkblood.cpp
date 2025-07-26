@@ -112,15 +112,13 @@ struct boss_tenris_mirkblood : public BossAI
             }, 6s, 15s);
     }
 
-    /*
-    void JustSummoned(Creature* summoned) override
-    {
-    }
-
     void KilledUnit(Unit* victim) override
     {
+        if (!victim)
+            return;
+
+        DoCast(victim, SPELL_SUMMON_SANGUINE_SPIRIT_ON_KILL);
     }
-    */
 
     void DamageTaken(Unit* attacker, uint32& damage, DamageEffectType damageType, SpellSchoolMask damageSchoolMask) override
     {
@@ -146,6 +144,40 @@ struct boss_tenris_mirkblood : public BossAI
 
 private:
     Unit* _mirrorTarget = nullptr;
+};
+
+struct npc_sanguine_spirit : public ScriptedAI
+{
+    npc_sanguine_spirit(Creature* creature) : ScriptedAI(creature) {}
+
+    void Reset() override
+    {
+        scheduler.CancelAll();
+        LOG_ERROR("sql.sql", "hit!");
+        me->SetReactState(REACT_PASSIVE);
+
+        DoCastSelf(SPELL_SANGUINE_SPIRIT_PRE_AURA);
+
+        scheduler.Schedule(5s, [this](TaskContext /*context*/)
+        {
+            DoCastSelf(SPELL_SANGUINE_SPIRIT_PRE_AURA2);
+        }).Schedule(3s, [this](TaskContext /*context*/)
+        {
+            me->SetReactState(REACT_AGGRESSIVE);
+            me->SetInCombatWithZone();
+            DoCastSelf(SPELL_SANGUINE_SPIRIT_AURA);
+        });
+    }
+
+    void DamageTaken(Unit* /*done_by*/, uint32& damage, DamageEffectType, SpellSchoolMask) override
+    {
+        damage = 0;
+    }
+
+    void UpdateAI(uint32 diff) override
+    {
+        scheduler.Update(diff);
+    }
 };
 
 class spell_mirkblood_blood_mirror : public SpellScript
@@ -234,21 +266,6 @@ class spell_mirkblood_dash_gash_return_to_tank_pre_spell : public SpellScript
     }
 };
 
-class spell_mirkblood_summon_sanguine_spirit : public SpellScript
-{
-    PrepareSpellScript(spell_mirkblood_summon_sanguine_spirit)
-
-    void HandleSummon(SpellEffIndex /*effIndex*/)
-    {
-        LOG_ERROR("sql.sql", "sanguine spirit hit");
-    }
-
-    void Register() override
-    {
-        OnEffectHit += SpellEffectFn(spell_mirkblood_summon_sanguine_spirit::HandleSummon, EFFECT_ALL, SPELL_EFFECT_SUMMON);
-    }
-};
-
 class at_karazhan_mirkblood_approach : public AreaTriggerScript
 {
 public:
@@ -284,10 +301,10 @@ public:
 void AddSC_boss_tenris_mirkblood()
 {
     RegisterKarazhanCreatureAI(boss_tenris_mirkblood);
+    RegisterKarazhanCreatureAI(npc_sanguine_spirit);
     RegisterSpellScript(spell_mirkblood_blood_mirror);
     RegisterSpellScript(spell_mirkblood_blood_mirror_target_picker);
     RegisterSpellScript(spell_mirkblood_dash_gash_return_to_tank_pre_spell);
-    RegisterSpellScript(spell_mirkblood_summon_sanguine_spirit);
     new at_karazhan_mirkblood_approach();
     new at_karazhan_mirkblood_entrance();
 }
