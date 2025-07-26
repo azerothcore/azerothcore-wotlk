@@ -265,12 +265,12 @@ public:
     }
 };
 
-class at_karazhan_mirkblood_entrance : public OnlyOnceAreaTriggerScript
+class at_karazhan_mirkblood_entrance : public AreaTriggerScript
 {
 public:
-    at_karazhan_mirkblood_entrance() : OnlyOnceAreaTriggerScript("at_karazhan_mirkblood_entrance") {}
+    at_karazhan_mirkblood_entrance() : AreaTriggerScript("at_karazhan_mirkblood_entrance") {}
 
-    bool _OnTrigger(Player* player, AreaTrigger const* /*trigger*/) override
+    bool OnTrigger(Player* player, AreaTrigger const* /*trigger*/) override
     {
         if (InstanceScript* instance = player->GetInstanceScript())
             if (instance->GetBossState(DATA_MIRKBLOOD) != DONE)
