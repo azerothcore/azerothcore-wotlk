@@ -648,6 +648,9 @@ protected:
     void _ProcessJoin(uint32 diff);
     void _CheckSafePositions(uint32 diff);
 
+    // Setup completion marker
+    bool m_SetupCompleted;
+
     // Scorekeeping
     BattlegroundScoreMap PlayerScores;                // Player scores
     //npcbot
