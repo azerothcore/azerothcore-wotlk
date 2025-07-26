@@ -8,13 +8,17 @@ INSERT INTO `areatrigger_scripts` (`entry`, `ScriptName`) VALUES
 (5014, 'at_karazhan_mirkblood_approach'),
 (5015, 'at_karazhan_mirkblood_entrance');
 
-UPDATE `creature_template` SET `minlevel` = 73, `maxlevel` = 73, `ScriptName` = 'boss_tenris_mirkblood' WHERE `entry` = 28194;
+UPDATE `creature_template` SET `minlevel` = 73, `maxlevel` = 73, `speed_run` = 1.85714285714, `ScriptName` = 'boss_tenris_mirkblood' WHERE `entry` = 28194;
+UPDATE `creature_template` SET `speed_walk` = 0.4, `speed_run` = 0.14285714285 WHERE `entry` = 28232;
 UPDATE `creature_template` SET `unit_flags` = 33554432, `AIName` = 'SmartAI' WHERE `entry` = 28485;
 UPDATE `creature_template` SET `unit_flags` = 33555200 WHERE `entry` = 28493;
 
+UPDATE `creature_model_info` SET `BoundingRadius` = 0.200000002980232238, `CombatReach` = 0.400000005960464477 WHERE `DisplayID` = 25296;
+UPDATE `creature_model_info` SET `BoundingRadius` = 0.465000003576278686, `CombatReach` = 1.5 WHERE `DisplayID` = 25541;
+
 DELETE FROM `creature_text` WHERE `CreatureID` = 28194;
 INSERT INTO `creature_text` (`CreatureID`, `GroupID`, `ID`, `Text`, `Type`, `Language`, `Probability`, `Emote`, `Duration`, `Sound`, `BroadcastTextId`, `TextRange`, `comment`) VALUES
-(28194, @SAY_APPROACH, 0, 'I smell... $r.  Delicious!',                          14, 0, 100, 0, 0, 0, 27780, 0, 'Prince Tenris Mirkblood - SAY_APPROACH'), -- Nothing sniffed, types need verification
+(28194, @SAY_APPROACH, 0, 'I smell... $r.  Delicious!',                          14, 0, 100, 0, 0, 0, 27780, 0, 'Prince Tenris Mirkblood - SAY_APPROACH'),
 (28194, @SAY_AGGRO,    0, 'I shall consume you!',                                14, 0, 100, 0, 0, 0, 27781, 0, 'Prince Tenris Mirkblood - SAY_AGGRO'),
 (28194, @SAY_SUMMON,   0, 'Drink, mortals!  Taste my blood!  Taste your death!', 12, 0, 100, 0, 0, 0, 27712, 0, 'Prince Tenris Mirkblood - SAY_SUMMON');
 
@@ -29,8 +33,9 @@ DELETE FROM `spell_linked_spell` WHERE `spell_trigger` = -50845 AND `spell_effec
 INSERT INTO `spell_linked_spell` (`spell_trigger`, `spell_effect`, `type`, `comment`) VALUES
 (-50845, -50844, 0, 'Tenris Mirkblood Blood Mirror');
 
-DELETE FROM `creature_template_addon` WHERE `entry` IN (28485, 28493);
+DELETE FROM `creature_template_addon` WHERE `entry` IN (28232, 28485, 28493);
 INSERT INTO `creature_template_addon` (`entry`, `path_id`, `mount`, `bytes1`, `bytes2`, `emote`, `visibilityDistanceType`, `auras`) VALUES
+(28232, 0, 0, 0, 0, 0,   0, '51282'),
 (28485, 0, 0, 0, 0, 0,   0, '30987'),
 (28493, 0, 0, 0, 0, 383, 0, '');
 

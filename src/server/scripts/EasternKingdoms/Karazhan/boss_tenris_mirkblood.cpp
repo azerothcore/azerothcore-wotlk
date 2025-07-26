@@ -45,8 +45,8 @@ enum Spells
     SPELL_BLOOD_SWOOP                             = 50922, // charge, periodic damage, trigger 50925
     SPELL_DASH_GASH_PRE_SPELL                     = 50923, // script, trigger 50922
     SPELL_DASH_GASH_RETURN_TO_TANK                = 50924, // charge
-    SPELL_DASH_GASH_RETURN_TO_TANK_PRE_SPELL      = 50925, // null
-    SPELL_DASH_GASH_RETURN_TO_TANK_PRE_SPELL_ROOT = 50932, // null
+    // SPELL_DASH_GASH_RETURN_TO_TANK_PRE_SPELL      = 50925, // null
+    // SPELL_DASH_GASH_RETURN_TO_TANK_PRE_SPELL_ROOT = 50932, // null
 
     SPELL_DESPAWN_SANGUINE_SPIRIT_VISUAL             = 51214, // dummy
     SPELL_DESPAWN_SANGUINE_SPIRITS                   = 51212, // script, dummy
@@ -55,11 +55,12 @@ enum Spells
     SPELL_SANGUINE_SPIRIT_PRE_AURA2                  = 51283, // size mod
     SPELL_SUMMON_SANGUINE_SPIRIT0                    = 50996, // null
     SPELL_SUMMON_SANGUINE_SPIRIT1                    = 50998, // trigger missile 50996
-    SPELL_SUMMON_SANGUINE_SPIRIT2                    = 51204, // trigger missile 50996
+    // SPELL_SUMMON_SANGUINE_SPIRIT2                 = 51204, // trigger missile 50996
     SPELL_SUMMON_SANGUINE_SPIRIT_MISSILE_BURST       = 51208, // periodic trigger 50998
     SPELL_SUMMON_SANGUINE_SPIRIT_SHORT_MISSILE_BURST = 51280, // periodic trigger 50998
     SPELL_SUMMON_SANGUINE_SPIRIT_ON_KILL             = 51205, // dummy
     SPELL_EXSANGUINATE                               = 51013, // damage
+    SPELL_DUMMY_NUKE_RANGE_SELF                      = 51106, // null
 };
 
 struct boss_tenris_mirkblood : public BossAI
@@ -76,17 +77,17 @@ struct boss_tenris_mirkblood : public BossAI
     {
         _Reset();
 
+        me->SetImmuneToPC(true);
+
         ScheduleHealthCheckEvent(50, [&] {
             Talk(SAY_SUMMON);
             DoCast(SPELL_SUMMON_SANGUINE_SPIRIT_MISSILE_BURST);
             });
 
         ScheduleHealthCheckEvent(45, [&] {
-            scheduler.Schedule(10s, 15s, [this](TaskContext context)
-                {
-                    DoCast(SPELL_BLOOD_TAP);
-                    context.Repeat(15s, 40s);
-                });
+            ScheduleTimedEvent(10s, 15s, [&] {
+                DoCast(SPELL_BLOOD_TAP);
+                }, 15s, 40s);
             });
 
         scheduler.CancelAll();
@@ -274,10 +275,7 @@ public:
         if (InstanceScript* instance = player->GetInstanceScript())
             if (instance->GetBossState(DATA_MIRKBLOOD) != DONE)
                 if (Creature* mirkblood = instance->GetCreature(DATA_MIRKBLOOD))
-                {
-                    // AREA TRIGGER 5015 MAY ENGAGE OR JUST RELEASE NOT_SELECTABLE FLAG
-                    mirkblood->Talk(std::string_view("gwuh"), CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, 100.0f, mirkblood);
-                }
+                    mirkblood->SetImmuneToPC(false);
 
         return false;
     }
