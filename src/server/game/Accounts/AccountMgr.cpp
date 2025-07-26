@@ -299,17 +299,19 @@ namespace AccountMgr
         return false;
     }
 
-    bool HasAccountFlag(uint32 accountId, uint32 flag)
+    uint32 GetAccountFlag(uint32 accountId)
     {
         LoginDatabasePreparedStatement* stmt = LoginDatabase.GetPreparedStatement(LOGIN_SEL_ACCOUNT_FLAG);
         stmt->SetData(0, accountId);
         if (PreparedQueryResult result = LoginDatabase.Query(stmt))
-        {
-            uint32 flags = (*result)[0].Get<uint32>();
-            return (flags & flag) != 0;
-        }
+            return (*result)[0].Get<uint32>();
 
-        return false;
+        return 0;
+    }
+
+    bool HasAccountFlag(uint32 accountId, uint32 flag)
+    {
+        return (GetAccountFlag(accountId) & flag) != 0;
     }
 
     void UpdateAccountFlag(uint32 accountId, uint32 flag, bool remove /*= false*/)

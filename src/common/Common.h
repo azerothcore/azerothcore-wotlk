@@ -61,6 +61,7 @@ enum AccountTypes
     SEC_CONSOLE        = 4                                  // must be always last in list, accounts must have less security level always also
 };
 
+#define MAX_ACCOUNT_FLAG 32
 enum AccountFlag
 {
     ACCOUNT_FLAG_GM                   = 0x1,        // Account is GM
@@ -96,7 +97,7 @@ enum AccountFlag
     // Below might be StarCraft II related
     ACCOUNT_FLAG_S2_REQUIRE_IGR       = 0x40000000, // NYI UNK
     ACCOUNT_FLAG_S2_TRIAL             = 0x80000000, // NYI UNK
-    ACCOUNT_FLAG_S2_RESTRICTED        = 0xFFFFFFFF  // NYI UNK
+    // ACCOUNT_FLAG_S2_RESTRICTED        = 0xFFFFFFFF,  // NYI UNK
 };
 
 enum LocaleConstant

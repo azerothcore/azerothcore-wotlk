@@ -57,6 +57,7 @@ namespace AccountMgr
     bool IsAdminAccount(uint32 gmlevel);
     bool IsConsoleAccount(uint32 gmlevel);
 
+    uint32 GetAccountFlag(uint32 accountId);
     bool HasAccountFlag(uint32 accountId, uint32 flag);
     void UpdateAccountFlag(uint32 accountId, uint32 flag, bool remove = false);
     void ValidateAccountFlags(uint32 accountId, uint32 flags, uint32 security);
