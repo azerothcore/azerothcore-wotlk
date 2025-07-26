@@ -89,9 +89,9 @@
 #
 #    AuctionHouseBot.ElapsingTimeClass
 #        The elapsing time for the sold items. There are three classes:
-#        0 = long, auctions lasts from one to three days
-#        1 = medium, auctions lasts within a day
-#        2 = shorts, auctions lasts within an hour
+#        0 = long, auctions last from 1 to 3 days
+#        1 = medium, auctions last from 1 to 24 hours
+#        2 = shorts, auctions last from 10 to 60 minutes
 #    Default 1
 #
 ###############################################################################
