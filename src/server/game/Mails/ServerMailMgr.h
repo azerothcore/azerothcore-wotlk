@@ -53,6 +53,7 @@ enum class ServerMailConditionType : uint8
     Faction     = 6, ///< Requires the player to be a part of a specific faction. Horde/Alliance.
     Race        = 7, ///< Requires the player to be a specific race.
     Class       = 8, ///< Requires the player to be a specific class.
+    AccountFlags = 9, ///< Requires the player to have a specific AccountFlag (bit)
 };
 
 /**
@@ -67,7 +68,8 @@ constexpr std::pair<std::string_view, ServerMailConditionType> ServerMailConditi
     { "Reputation",  ServerMailConditionType::Reputation  },
     { "Faction",     ServerMailConditionType::Faction     },
     { "Race",        ServerMailConditionType::Race        },
-    { "Class",       ServerMailConditionType::Class       }
+    { "Class",       ServerMailConditionType::Class       },
+    { "AccountFlags", ServerMailConditionType::AccountFlags }
 };
 
 /**
