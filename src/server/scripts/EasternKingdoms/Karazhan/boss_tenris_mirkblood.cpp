@@ -258,6 +258,60 @@ class spell_mirkblood_summon_sanguine_spirit : public SpellScript
     }
 };
 
+class at_karazhan_mirkblood_approach : public AreaTriggerScript
+{
+public:
+    at_karazhan_mirkblood_approach() : AreaTriggerScript("at_karazhan_mirkblood_approach") {}
+
+    bool OnTrigger(Player* player, AreaTrigger const* /*trigger*/) override
+    {
+        LOG_ERROR("sql.sql", "hit approach");
+        if (InstanceScript* instance = player->GetInstanceScript())
+        {
+            LOG_ERROR("sql.sql", "approach-script");
+            if (instance->GetBossState(DATA_MIRKBLOOD) != DONE)
+            {
+                LOG_ERROR("sql.sql", "approach-state");
+                if (Creature* mirkblood = instance->GetCreature(DATA_MIRKBLOOD))
+                {
+                    LOG_ERROR("sql.sql", "approach-creature");
+                    instance->SetData(DATA_MIRKBLOOD_APPROACH, player->GetGUID().GetCounter());
+                    mirkblood->AI()->DoAction(DATA_MIRKBLOOD_APPROACH);
+                }
+            }
+        }
+
+        return false;
+    }
+};
+
+class at_karazhan_mirkblood_entrance : public OnlyOnceAreaTriggerScript
+{
+public:
+    at_karazhan_mirkblood_entrance() : OnlyOnceAreaTriggerScript("at_karazhan_mirkblood_entrance") {}
+
+    bool _OnTrigger(Player* player, AreaTrigger const* /*trigger*/) override
+    {
+        LOG_ERROR("sql.sql", "hit entrance");
+        if (InstanceScript* instance = player->GetInstanceScript())
+        {
+            LOG_ERROR("sql.sql", "entrance-script");
+            if (instance->GetBossState(DATA_MIRKBLOOD) != DONE)
+            {
+                LOG_ERROR("sql.sql", "entrance-state");
+                if (Creature* mirkblood = instance->GetCreature(DATA_MIRKBLOOD))
+                {
+                    LOG_ERROR("sql.sql", "entrance-script");
+                    instance->SetData(DATA_MIRKBLOOD_ENTRANCE, player->GetGUID().GetCounter());
+                    mirkblood->AI()->DoAction(DATA_MIRKBLOOD_ENTRANCE);
+                }
+            }
+        }
+
+        return false;
+    }
+};
+
 void AddSC_boss_tenris_mirkblood()
 {
     RegisterKarazhanCreatureAI(boss_tenris_mirkblood);
@@ -265,4 +319,6 @@ void AddSC_boss_tenris_mirkblood()
     RegisterSpellScript(spell_mirkblood_blood_mirror_target_picker);
     RegisterSpellScript(spell_mirkblood_dash_gash_return_to_tank_pre_spell);
     RegisterSpellScript(spell_mirkblood_summon_sanguine_spirit);
+    new at_karazhan_mirkblood_approach();
+    new at_karazhan_mirkblood_entrance();
 }
