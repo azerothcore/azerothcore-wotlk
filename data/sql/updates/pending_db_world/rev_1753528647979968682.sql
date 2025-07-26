@@ -1,4 +1,8 @@
 --
+DROP PROCEDURE IF EXISTS DropColumnIfExists;
+
+delimiter ';;'
+
 CREATE PROCEDURE DropColumnIfExists()
 BEGIN
     DECLARE `column_exists` INT DEFAULT 0;
@@ -7,7 +11,9 @@ BEGIN
     IF `column_exists` > 0 THEN
         ALTER TABLE `item_template` DROP COLUMN `StatsCount`;
     END IF;
-END;
+END;;
+
+delimiter ';'
 
 CALL DropColumnIfExists();
 
