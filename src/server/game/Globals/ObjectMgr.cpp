@@ -2865,7 +2865,7 @@ void ObjectMgr::LoadItemTemplates()
                          //                                              13              14           15          16             17               18                19              20
                          "AllowableClass, AllowableRace, ItemLevel, RequiredLevel, RequiredSkill, RequiredSkillRank, requiredspell, requiredhonorrank, "
                          //                                              21                      22                       23               24        25          26             27           28
-                         "RequiredCityRank, RequiredReputationFaction, RequiredReputationRank, maxcount, stackable, ContainerSlots, StatsCount, stat_type1, "
+                         "RequiredCityRank, RequiredReputationFaction, RequiredReputationRank, maxcount, stackable, ContainerSlots, 0 as StatsCount, stat_type1, "
                          //                                            29           30          31           32          33           34          35           36          37           38
                          "stat_value1, stat_type2, stat_value2, stat_type3, stat_value3, stat_type4, stat_value4, stat_type5, stat_value5, stat_type6, "
                          //                                            39           40          41           42           43          44           45           46           47
@@ -2940,13 +2940,20 @@ void ObjectMgr::LoadItemTemplates()
         itemTemplate.MaxCount                  = fields[24].Get<int32>();
         itemTemplate.Stackable                 = fields[25].Get<int32>();
         itemTemplate.ContainerSlots            = uint32(fields[26].Get<uint8>());
-        itemTemplate.StatsCount                = uint32(fields[27].Get<uint8>());
 
-        for (uint8 i = 0; i < itemTemplate.StatsCount; ++i)
+        uint8 statsCount = 0;
+        while (statsCount < MAX_ITEM_PROTO_STATS)
         {
-            itemTemplate.ItemStat[i].ItemStatType  = uint32(fields[28 + i * 2].Get<uint8>());
-            itemTemplate.ItemStat[i].ItemStatValue = fields[29 + i * 2].Get<int32>();
+            uint32 statType = uint32(fields[28 + statsCount * 2].Get<uint8>());
+            int32 statValue = fields[29 + statsCount * 2].Get<int32>();
+            if (statType == 0)
+                break;
+
+            itemTemplate.ItemStat[statsCount].ItemStatType  = statType;
+            itemTemplate.ItemStat[statsCount].ItemStatValue = statValue;
+            statsCount++;
         }
+        itemTemplate.StatsCount = statsCount;
 
         itemTemplate.ScalingStatDistribution = uint32(fields[48].Get<uint16>());
         itemTemplate.ScalingStatValue        = fields[49].Get<int32>();
@@ -3169,12 +3176,6 @@ void ObjectMgr::LoadItemTemplates()
         {
             LOG_ERROR("sql.sql", "Item (Entry: {}) has too large value in ContainerSlots ({}), replace by hardcoded limit ({}).", entry, itemTemplate.ContainerSlots, MAX_BAG_SIZE);
             itemTemplate.ContainerSlots = MAX_BAG_SIZE;
-        }
-
-        if (itemTemplate.StatsCount > MAX_ITEM_PROTO_STATS)
-        {
-            LOG_ERROR("sql.sql", "Item (Entry: {}) has too large value in statscount ({}), replace by hardcoded limit ({}).", entry, itemTemplate.StatsCount, MAX_ITEM_PROTO_STATS);
-            itemTemplate.StatsCount = MAX_ITEM_PROTO_STATS;
         }
 
         for (uint8 j = 0; j < itemTemplate.StatsCount; ++j)
