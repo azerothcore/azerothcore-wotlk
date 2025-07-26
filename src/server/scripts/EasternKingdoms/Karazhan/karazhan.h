@@ -75,9 +75,7 @@ enum KZDataTypes
     DATA_TINHEAD                    = 43,
     DATA_TITO                       = 44,
 
-    DATA_MIRKBLOOD                  = 45,
-    DATA_MIRKBLOOD_APPROACH         = 46,
-    DATA_MIRKBLOOD_ENTRANCE         = 47
+    DATA_MIRKBLOOD                  = 45
 };
 
 enum KZOperaEvents
