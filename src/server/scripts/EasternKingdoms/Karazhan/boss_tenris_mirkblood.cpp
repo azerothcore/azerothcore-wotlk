@@ -153,6 +153,7 @@ struct npc_sanguine_spirit : public ScriptedAI
     void Reset() override
     {
         scheduler.CancelAll();
+        me->ApplySpellImmune(0, IMMUNITY_SCHOOL, SPELL_SCHOOL_MASK_ALL, true);
         LOG_ERROR("sql.sql", "hit!");
         me->SetReactState(REACT_PASSIVE);
 
@@ -169,14 +170,10 @@ struct npc_sanguine_spirit : public ScriptedAI
         });
     }
 
-    void DamageTaken(Unit* /*done_by*/, uint32& damage, DamageEffectType, SpellSchoolMask) override
-    {
-        damage = 0;
-    }
-
     void UpdateAI(uint32 diff) override
     {
         scheduler.Update(diff);
+        UpdateVictim();
     }
 };
 
