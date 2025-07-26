@@ -109,6 +109,7 @@ struct boss_tenris_mirkblood : public BossAI
             }, 6s, 15s);
     }
 
+    /*
     void JustSummoned(Creature* summoned) override
     {
     }
@@ -116,6 +117,7 @@ struct boss_tenris_mirkblood : public BossAI
     void KilledUnit(Unit* victim) override
     {
     }
+    */
 
     void DamageTaken(Unit* attacker, uint32& damage, DamageEffectType damageType, SpellSchoolMask damageSchoolMask) override
     {
