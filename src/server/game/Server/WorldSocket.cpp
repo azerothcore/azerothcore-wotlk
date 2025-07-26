@@ -698,8 +698,6 @@ void WorldSocket::HandleAuthSessionCallback(std::shared_ptr<AuthSession> authSes
 
     LoginDatabase.Execute(stmt);
 
-    AccountMgr::ValidateAccountFlags(account.Id, account.Flags, account.Security);
-
     // At this point, we can safely hook a successful login
     sScriptMgr->OnAccountLogin(account.Id);
 
@@ -707,7 +705,7 @@ void WorldSocket::HandleAuthSessionCallback(std::shared_ptr<AuthSession> authSes
 
     sScriptMgr->OnLastIpUpdate(account.Id, address);
 
-    _worldSession = new WorldSession(account.Id, std::move(authSession->Account), shared_from_this(), account.Security,
+    _worldSession = new WorldSession(account.Id, std::move(authSession->Account), account.Flags, shared_from_this(), account.Security,
         account.Expansion, account.MuteTime, account.Locale, account.Recruiter, account.IsRectuiter, account.Security ? true : false, account.TotalTime);
 
     _worldSession->ReadAddonsInfo(authSession->AddonInfo);
@@ -717,6 +715,8 @@ void WorldSocket::HandleAuthSessionCallback(std::shared_ptr<AuthSession> authSes
     {
         _worldSession->InitWarden(account.SessionKey, account.OS);
     }
+
+    _worldSession->ValidateAccountFlags();
 
     sWorldSessionMgr->AddSession(_worldSession);
 
