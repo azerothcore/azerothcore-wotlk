@@ -354,7 +354,7 @@ bool ServerMailCondition::CheckCondition(Player* player) const
     case ServerMailConditionType::Class:
         return (player->getClassMask() & value) != 0;
     case ServerMailConditionType::AccountFlags:
-        return (player->GetSession()->HasAccountFlag(value)) != 0;
+        return player->GetSession()->HasAccountFlag(value);
     default:
         [[unlikely]] LOG_ERROR("server.mail", "Unknown server mail condition type '{}'", static_cast<uint32>(type));
         return false;
