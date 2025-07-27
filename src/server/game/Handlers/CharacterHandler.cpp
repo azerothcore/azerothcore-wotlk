@@ -361,6 +361,14 @@ void WorldSession::HandleCharCreateOpcode(WorldPacket& recvData)
         return;
     }
 
+    // speedup check for heroic class disabled case
+    uint32 heroic_free_slots = sWorld->getIntConfig(CONFIG_HEROIC_CHARACTERS_PER_REALM);
+    if (heroic_free_slots == 0 && AccountMgr::IsPlayerAccount(GetSecurity()) && createInfo->Class == CLASS_DEATH_KNIGHT)
+    {
+        SendCharCreate(CHAR_CREATE_UNIQUE_CLASS_LIMIT);
+        return;
+    }
+
     // Speed check if heroic character minimum is greater than max player level
     if (sWorld->getIntConfig(CONFIG_CHARACTER_CREATING_MIN_LEVEL_FOR_HEROIC_CHARACTER) > sWorld->getIntConfig(CONFIG_MAX_PLAYER_LEVEL))
     {
