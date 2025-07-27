@@ -137,7 +137,6 @@ struct boss_tenris_mirkblood : public BossAI
 
     void SpellHit(Unit* caster, SpellInfo const* spell) override
     {
-        LOG_ERROR("sql.sql", "spell hit!");
         if (spell->Id == SPELL_BLOOD_MIRROR0 && caster != me)
             _mirrorTarget = caster;
     }
@@ -154,7 +153,7 @@ struct npc_sanguine_spirit : public ScriptedAI
     {
         scheduler.CancelAll();
         me->ApplySpellImmune(0, IMMUNITY_SCHOOL, SPELL_SCHOOL_MASK_ALL, true);
-        LOG_ERROR("sql.sql", "hit!");
+
         me->SetReactState(REACT_PASSIVE);
 
         DoCastSelf(SPELL_SANGUINE_SPIRIT_PRE_AURA);
@@ -183,8 +182,6 @@ class spell_mirkblood_blood_mirror : public SpellScript
 
     void HandleCast()
     {
-        LOG_ERROR("sql.sql", "blood mirror hit");
-
         if (!GetCaster())
             return;
     }
@@ -206,8 +203,6 @@ class spell_mirkblood_blood_mirror_target_picker : public SpellScript
 
     void HandleHit()
     {
-        LOG_ERROR("sql.sql", "target picker hit");
-
         Unit* caster = GetCaster();
 
         if (!caster->ToCreature())
@@ -247,7 +242,6 @@ class spell_mirkblood_dash_gash_return_to_tank_pre_spell : public SpellScript
 
     void HandleCast()
     {
-        LOG_ERROR("sql.sql", "dash gash hit");
         if (!GetCaster() || !GetCaster()->GetThreatMgr().GetCurrentVictim())
             return;
         // Probably wrong, maybe don't charge if would charge the same target?
