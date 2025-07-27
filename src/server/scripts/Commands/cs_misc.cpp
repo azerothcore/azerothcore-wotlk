@@ -2239,7 +2239,7 @@ public:
 
         if (playerTarget)
         {
-            uint32 accountFlags = AccountMgr::GetAccountFlag(playerTarget->GetSession()->GetAccountId());
+            uint32 accountFlags = playerTarget->GetSession()->GetAccountFlags();
             handler->PSendSysMessage(LANG_ACCOUNT_FLAGS_PINFO);
             for (uint8 i = 0; i < MAX_ACCOUNT_FLAG; i++)
                 if (accountFlags & static_cast<uint32>(accountFlagText[i].flag))
