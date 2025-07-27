@@ -5176,7 +5176,7 @@ void ObjectMgr::LoadQuests()
             uint32 id = qinfo->RewardItemId[j];
             if (id)
             {
-                if (!    GetItemTemplate(id))
+                if (!GetItemTemplate(id))
                 {
                     LOG_ERROR("sql.sql", "Quest {} has `RewardItemId{}` = {} but item with entry {} does not exist, quest will not reward this item.",
                                      qinfo->GetQuestId(), j + 1, id, id);
