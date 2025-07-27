@@ -19,6 +19,7 @@
 #define _ACCMGR_H
 
 #include "Define.h"
+#include "Common.h"
 #include <string>
 
 enum AccountOpResult
@@ -52,6 +53,7 @@ namespace AccountMgr
     uint32 GetCharactersCount(uint32 accountId);
 
     bool IsPlayerAccount(uint32 gmlevel);
+    bool IsGMAccount(uint32 gmlevel);
     bool IsAdminAccount(uint32 gmlevel);
     bool IsConsoleAccount(uint32 gmlevel);
 };
