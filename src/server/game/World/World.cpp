@@ -1010,15 +1010,23 @@ void World::SetInitialWorldSettings()
 
             if (mapEntry && !mapEntry->Instanceable())
             {
-                Map* map = sMapMgr->CreateBaseMap(mapEntry->MapID);
-
-                if (map)
+                if (sMapMgr->GetMapUpdater()->activated())
+                    sMapMgr->GetMapUpdater()->schedule_map_preload(mapEntry->MapID);
+                else
                 {
-                    LOG_INFO("server.loading", ">> Loading All Grids For Map {}", map->GetId());
-                    map->LoadAllGrids();
+                    Map* map = sMapMgr->CreateBaseMap(mapEntry->MapID);
+
+                    if (map)
+                    {
+                        LOG_INFO("server.loading", ">> Loading All Grids For Map {}", map->GetId());
+                        map->LoadAllGrids();
+                    }
                 }
             }
         }
+
+        if (sMapMgr->GetMapUpdater()->activated())
+            sMapMgr->GetMapUpdater()->wait();
     }
 
     uint32 startupDuration = GetMSTimeDiffToNow(startupBegin);

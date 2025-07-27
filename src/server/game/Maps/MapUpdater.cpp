@@ -52,6 +52,27 @@ private:
     uint32 s_diff;
 };
 
+class MapPreloadRequest : public UpdateRequest
+{
+public:
+    MapPreloadRequest(uint32 mapId, MapUpdater& updater)
+        : _mapId(mapId), _updater(updater)
+    {
+    }
+
+    void call() override
+    {
+        Map* map = sMapMgr->CreateBaseMap(_mapId);
+        LOG_INFO("server.loading", ">> Loading All Grids For Map {} ({})", map->GetId(), map->GetMapName());
+        map->LoadAllGrids();
+        _updater.update_finished();
+    }
+
+private:
+    uint32 _mapId;
+    MapUpdater& _updater;
+};
+
 class LFGUpdateRequest : public UpdateRequest
 {
 public:
@@ -118,6 +139,11 @@ void MapUpdater::schedule_task(UpdateRequest* request)
 void MapUpdater::schedule_update(Map& map, uint32 diff, uint32 s_diff)
 {
     schedule_task(new MapUpdateRequest(map, *this, diff, s_diff));
+}
+
+void MapUpdater::schedule_map_preload(uint32 mapid)
+{
+    schedule_task(new MapPreloadRequest(mapid, *this));
 }
 
 void MapUpdater::schedule_lfg_update(uint32 diff)
