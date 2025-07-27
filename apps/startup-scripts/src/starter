@@ -124,7 +124,14 @@ else
     echo "Starting $BINFILE without GDB"
     # use normal interactive execution if we are running the binary under PM2 
     # or when AC_DISABLE_INTERACTIVE is not set
-    if [[ "$AC_LAUNCHED_BY_PM2" == "1" || "$AC_DISABLE_INTERACTIVE" != "1" ]]; then
+    # Determine if PM2 is active
+    is_pm2_active="$([ "$AC_LAUNCHED_BY_PM2" == "1" ] && echo "1" || echo "0")"
+    
+    # Determine if interactive mode is enabled
+    is_interactive_enabled="$([ "$AC_DISABLE_INTERACTIVE" != "1" ] && echo "1" || echo "0")"
+    
+    # Use interactive mode if PM2 is active or interactive mode is enabled
+    if [[ "$is_pm2_active" == "1" || "$is_interactive_enabled" == "1" ]]; then
         echo "Running AC interactively"
         "$EXECPATH" ${CONFIG_ABS:+-c "$CONFIG_ABS"}
     else
