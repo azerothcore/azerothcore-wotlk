@@ -2257,6 +2257,9 @@ void ObjectMgr::LoadCreatures()
         return;
     }
 
+    if (sWorld->getBoolConfig(CONFIG_CALCULATE_CREATURE_ZONE_AREA_DATA))
+        LOG_INFO("server.loading", "Calculating zone and area fields. This may take a moment...");
+
     // Build single time for check spawnmask
     std::map<uint32, uint32> spawnMasks;
     for (uint32 i = 0; i < sMapStore.GetNumRows(); ++i)
@@ -2620,6 +2623,9 @@ void ObjectMgr::LoadGameobjects()
         LOG_INFO("server.loading", " ");
         return;
     }
+
+    if (sWorld->getBoolConfig(CONFIG_CALCULATE_GAMEOBJECT_ZONE_AREA_DATA))
+        LOG_INFO("server.loading", "Calculating zone and area fields. This may take a moment...");
 
     // build single time for check spawnmask
     std::map<uint32, uint32> spawnMasks;

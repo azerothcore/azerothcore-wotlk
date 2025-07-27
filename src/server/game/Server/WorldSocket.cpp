@@ -352,6 +352,7 @@ struct AccountInfo
     bool IsLockedToIP;
     std::string LockCountry;
     uint8 Expansion;
+    uint32 Flags;
     int64 MuteTime;
     LocaleConstant Locale;
     uint32 Recruiter;
@@ -363,9 +364,9 @@ struct AccountInfo
 
     explicit AccountInfo(Field* fields)
     {
-        //           0             1          2         3               4            5           6         7            8     9           10          11
-        // SELECT a.id, a.sessionkey, a.last_ip, a.locked, a.lock_country, a.expansion, a.mutetime, a.locale, a.recruiter, a.os, a.totaltime, aa.gmLevel,
-        //                                                           12    13
+        //           0             1          2         3               4            5        6          7         8            9    10           11          12
+        // SELECT a.id, a.sessionkey, a.last_ip, a.locked, a.lock_country, a.expansion, a.Flags a.mutetime, a.locale, a.recruiter, a.os, a.totaltime, aa.gmLevel,
+        //                                                           13    14
         // ab.unbandate > UNIX_TIMESTAMP() OR ab.unbandate = ab.bandate, r.id
         // FROM account a
         // LEFT JOIN account_access aa ON a.id = aa.AccountID AND aa.RealmID IN (-1, ?)
@@ -378,14 +379,15 @@ struct AccountInfo
         IsLockedToIP = fields[3].Get<bool>();
         LockCountry = fields[4].Get<std::string>();
         Expansion = fields[5].Get<uint8>();
-        MuteTime = fields[6].Get<int64>();
-        Locale = LocaleConstant(fields[7].Get<uint8>());
-        Recruiter = fields[8].Get<uint32>();
-        OS = fields[9].Get<std::string>();
-        TotalTime = fields[10].Get<uint32>();
-        Security = AccountTypes(fields[11].Get<uint8>());
-        IsBanned = fields[12].Get<uint64>() != 0;
-        IsRectuiter = fields[13].Get<uint32>() != 0;
+        Flags = fields[6].Get<uint32>();
+        MuteTime = fields[7].Get<int64>();
+        Locale = LocaleConstant(fields[8].Get<uint8>());
+        Recruiter = fields[9].Get<uint32>();
+        OS = fields[10].Get<std::string>();
+        TotalTime = fields[11].Get<uint32>();
+        Security = AccountTypes(fields[12].Get<uint8>());
+        IsBanned = fields[13].Get<uint64>() != 0;
+        IsRectuiter = fields[14].Get<uint32>() != 0;
 
         uint32 world_expansion = sWorld->getIntConfig(CONFIG_EXPANSION);
         if (Expansion > world_expansion)
@@ -703,7 +705,7 @@ void WorldSocket::HandleAuthSessionCallback(std::shared_ptr<AuthSession> authSes
 
     sScriptMgr->OnLastIpUpdate(account.Id, address);
 
-    _worldSession = new WorldSession(account.Id, std::move(authSession->Account), shared_from_this(), account.Security,
+    _worldSession = new WorldSession(account.Id, std::move(authSession->Account), account.Flags, shared_from_this(), account.Security,
         account.Expansion, account.MuteTime, account.Locale, account.Recruiter, account.IsRectuiter, account.Security ? true : false, account.TotalTime);
 
     _worldSession->ReadAddonsInfo(authSession->AddonInfo);
@@ -713,6 +715,8 @@ void WorldSocket::HandleAuthSessionCallback(std::shared_ptr<AuthSession> authSes
     {
         _worldSession->InitWarden(account.SessionKey, account.OS);
     }
+
+    _worldSession->ValidateAccountFlags();
 
     sWorldSessionMgr->AddSession(_worldSession);
 
