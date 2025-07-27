@@ -3849,13 +3849,13 @@ PetLevelInfo const* ObjectMgr::GetPetLevelInfo(uint32 creature_id, uint8 level) 
     return &itr->second[level - 1];                         // data for level 1 stored in [0] array element, ...
 }
 
-void ObjectMgr::PlayerCreateInfoAddItemHelper(uint32 race_, uint32 class_, uint32 itemId, int32 count)
+void ObjectMgr::PlayerCreateInfoAddItemHelper(uint32 race_, uint32 class_, uint32 itemId, int32 count, bool collectorEdition)
 {
     if (!_playerInfo[race_][class_])
         return;
 
     if (count > 0)
-        _playerInfo[race_][class_]->item.push_back(PlayerCreateInfoItem(itemId, count));
+        _playerInfo[race_][class_]->item.push_back(PlayerCreateInfoItem(itemId, count, collectorEdition));
     else
     {
         if (count < -1)
@@ -3975,8 +3975,8 @@ void ObjectMgr::LoadPlayerInfo()
     LOG_INFO("server.loading", "Loading Player Create Items Data...");
     {
         uint32 oldMSTime = getMSTime();
-        //                                                0     1      2       3
-        QueryResult result = WorldDatabase.Query("SELECT race, class, itemid, amount FROM playercreateinfo_item");
+        //                                               0     1      2       3       4
+        QueryResult result = WorldDatabase.Query("SELECT race, class, itemid, amount, CollectorEdition FROM playercreateinfo_item");
 
         if (!result)
         {
@@ -4006,7 +4006,6 @@ void ObjectMgr::LoadPlayerInfo()
                 }
 
                 uint32 item_id = fields[2].Get<uint32>();
-
                 if (!GetItemTemplate(item_id))
                 {
                     LOG_ERROR("sql.sql", "Item id {} (race {} class {}) in `playercreateinfo_item` table but not listed in `item_template`, ignoring.", item_id, current_race, current_class);
@@ -4014,12 +4013,19 @@ void ObjectMgr::LoadPlayerInfo()
                 }
 
                 int32 amount = fields[3].Get<int32>();
-
                 if (!amount)
                 {
                     LOG_ERROR("sql.sql", "Item id {} (class {} race {}) have amount == 0 in `playercreateinfo_item` table, ignoring.", item_id, current_race, current_class);
                     continue;
                 }
+
+                uint8 ce = fields[4].Get<uint8>();
+                if (ce > 1)
+                {
+                    LOG_ERROR("sql.sql", "Item id {} (class {} race {}) have CE {} in `playercreateinfo_item` table. Need to be 0/1, ignoring.", item_id, current_race, current_class, ce);
+                    continue;
+                }
+                bool collectorEdition = ce != 0;
 
                 if (!current_race || !current_class)
                 {
@@ -4029,10 +4035,10 @@ void ObjectMgr::LoadPlayerInfo()
                     uint32 max_class = current_class ? current_class + 1 : MAX_CLASSES;
                     for (uint32 r = min_race; r < max_race; ++r)
                         for (uint32 c = min_class; c < max_class; ++c)
-                            PlayerCreateInfoAddItemHelper(r, c, item_id, amount);
+                            PlayerCreateInfoAddItemHelper(r, c, item_id, amount, collectorEdition);
                 }
                 else
-                    PlayerCreateInfoAddItemHelper(current_race, current_class, item_id, amount);
+                    PlayerCreateInfoAddItemHelper(current_race, current_class, item_id, amount, collectorEdition);
 
                 ++count;
             } while (result->NextRow());
