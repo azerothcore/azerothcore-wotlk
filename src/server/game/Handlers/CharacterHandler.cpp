@@ -440,6 +440,8 @@ void WorldSession::HandleCharCreateOpcode(WorldPacket& recvData)
 
                 Field* field = result->Fetch();
                 uint8 accRace = field[1].Get<uint8>();
+                uint8 accLevel = field[0].Get<uint8>();
+                bool accLevelMeetHeroicReqLevel = accLevel >= heroicReqLevel;
 
                 if (checkDeathKnightReqs)
                 {
@@ -456,11 +458,13 @@ void WorldSession::HandleCharCreateOpcode(WorldPacket& recvData)
                         }
                     }
 
-                    if (!AccountMgr::HasAccountFlag(GetAccountId(), ACCOUNT_FLAG_DEATH_KNIGHT_OK))
+                    if (HasAccountFlag(ACCOUNT_FLAG_DEATH_KNIGHT_OK) && !accLevelMeetHeroicReqLevel)
+                        UpdateAccountFlag(ACCOUNT_FLAG_DEATH_KNIGHT_OK, true);
+
+                    if (!HasAccountFlag(ACCOUNT_FLAG_DEATH_KNIGHT_OK) &&
+                        Expansion() >= EXPANSION_WRATH_OF_THE_LICH_KING && accLevelMeetHeroicReqLevel)
                     {
-                        uint8 accLevel = field[0].Get<uint8>();
-                        if (Expansion() >= EXPANSION_WRATH_OF_THE_LICH_KING && accLevel >= heroicReqLevel)
-                            AccountMgr::UpdateAccountFlag(GetAccountId(), ACCOUNT_FLAG_DEATH_KNIGHT_OK);
+                        UpdateAccountFlag(ACCOUNT_FLAG_DEATH_KNIGHT_OK);
                     }
                 }
 
@@ -507,14 +511,19 @@ void WorldSession::HandleCharCreateOpcode(WorldPacket& recvData)
                             }
                         }
 
-                        if (!AccountMgr::HasAccountFlag(GetAccountId(), ACCOUNT_FLAG_DEATH_KNIGHT_OK))
+                        if (!HasAccountFlag(ACCOUNT_FLAG_DEATH_KNIGHT_OK) &&
+                            Expansion() >= EXPANSION_WRATH_OF_THE_LICH_KING && accLevelMeetHeroicReqLevel)
                         {
-                            uint8 accLevel = field[0].Get<uint8>();
-                            if (Expansion() >= EXPANSION_WRATH_OF_THE_LICH_KING && accLevel >= heroicReqLevel)
-                                AccountMgr::UpdateAccountFlag(GetAccountId(), ACCOUNT_FLAG_DEATH_KNIGHT_OK);
+                            UpdateAccountFlag(ACCOUNT_FLAG_DEATH_KNIGHT_OK);
                         }
                     }
                 }
+            }
+            else
+            {
+                // Edge case if player has removed all characters from the account and should therefore not be eligible to create a DK.
+                if (HasAccountFlag(ACCOUNT_FLAG_DEATH_KNIGHT_OK))
+                    UpdateAccountFlag(ACCOUNT_FLAG_DEATH_KNIGHT_OK, true);
             }
 
             if (checkDeathKnightReqs)
@@ -525,7 +534,7 @@ void WorldSession::HandleCharCreateOpcode(WorldPacket& recvData)
                     return;
                 }
 
-                if (!AccountMgr::HasAccountFlag(GetAccountId(), ACCOUNT_FLAG_DEATH_KNIGHT_OK))
+                if (!HasAccountFlag(ACCOUNT_FLAG_DEATH_KNIGHT_OK))
                 {
                     SendCharCreate(CHAR_CREATE_LEVEL_REQUIREMENT);
                     return;
