@@ -18,6 +18,7 @@
 #include "MapUpdater.h"
 #include "DatabaseEnv.h"
 #include "LFGMgr.h"
+#include "Log.h"
 #include "Map.h"
 #include "MapMgr.h"
 #include "Metric.h"
