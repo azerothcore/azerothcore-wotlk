@@ -1,3 +1,4 @@
+-- DB update 2025_07_27_01 -> 2025_07_27_02
 
 -- Haerthsinger Forresten
 DELETE FROM `creature_text` WHERE (`CreatureID` = 30551);
