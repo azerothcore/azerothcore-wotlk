@@ -4022,7 +4022,7 @@ void ObjectMgr::LoadPlayerInfo()
                 uint8 ce = fields[4].Get<uint8>();
                 if (ce > 1)
                 {
-                    LOG_ERROR("sql.sql", "Item id {} (class {} race {}) have CE {} in `playercreateinfo_item` table. Need to be 0/1, ignoring.", item_id, current_race, current_class, ce);
+                    LOG_ERROR("sql.sql", "Item id {} (class {} race {}) have CollectorEdition {} in `playercreateinfo_item` table. Need to be 0/1, ignoring.", item_id, current_race, current_class, ce);
                     continue;
                 }
                 bool collectorEdition = ce != 0;
