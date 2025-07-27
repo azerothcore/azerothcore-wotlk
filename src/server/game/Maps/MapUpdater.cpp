@@ -19,6 +19,7 @@
 #include "DatabaseEnv.h"
 #include "LFGMgr.h"
 #include "Map.h"
+#include "MapMgr.h"
 #include "Metric.h"
 
 class UpdateRequest
