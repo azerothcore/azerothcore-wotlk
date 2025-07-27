@@ -3471,7 +3471,7 @@ void ObjectMgr::LoadItemTemplates()
     LOG_INFO("server.loading", " ");
 }
 
-ItemTemplate const* ObjectMgr::GetItemTemplate(uint32 entry) const
+ItemTemplate const* ObjectMgr::GetItemTemplate(uint32 entry)
 {
     return entry < _itemTemplateStoreFast.size() ? _itemTemplateStoreFast[entry] : nullptr;
 }
@@ -9692,7 +9692,7 @@ bool ObjectMgr::IsVendorItemValid(uint32 vendor_entry, uint32 item_id, int32 max
     }
     */
 
-    if (!GetItemTemplate(item_id))
+    if (!sObjectMgr->GetItemTemplate(item_id))
     {
         if (player)
             ChatHandler(player->GetSession()).PSendSysMessage(LANG_ITEM_NOT_FOUND, item_id);
