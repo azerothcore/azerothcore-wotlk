@@ -492,6 +492,8 @@ void WorldSession::HandleCharCreateOpcode(WorldPacket& recvData)
 
                     field = result->Fetch();
                     accRace = field[1].Get<uint8>();
+                    accLevel = field[0].Get<uint8>();
+                    accLevelMeetHeroicReqLevel = accLevel >= heroicReqLevel;
 
                     if (!haveSameRace)
                         haveSameRace = createInfo->Race == accRace;
