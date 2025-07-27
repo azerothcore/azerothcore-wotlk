@@ -261,7 +261,7 @@ void ServerMailMgr::LoadMailServerTemplatesConditions()
             }
             break;
         case ServerMailConditionType::AccountFlags:
-            if (conditionValue & ~ACCOUNT_FLAGS_ALL)
+            if ((conditionValue & ~ACCOUNT_FLAGS_ALL) != 0)
             {
                 LOG_ERROR("sql.sql", "Table `mail_server_template_conditions` has conditionType 'AccountFlags' with invalid conditionValue ({}) for templateID {}, skipped.", conditionValue, templateID);
                 continue;
