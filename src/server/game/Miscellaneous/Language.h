@@ -217,7 +217,11 @@ enum AcoreStrings
     LANG_INVALID_GAMEOBJECT_TYPE        = 176,
     LANG_GAMEOBJECT_DAMAGED             = 177,
     LANG_GRID_POSITION                  = 178,
-    // 179-185 used in other client versions
+
+    LANG_ACCOUNT_FLAGS_PINFO            = 179,
+
+    // Free 180-185
+
     LANG_TRANSPORT_POSITION             = 186,
     LANG_PROFANITY_NAME                 = 187,
     LANG_2FA_SECRET_TOO_LONG            = 188,
