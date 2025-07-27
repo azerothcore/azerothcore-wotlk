@@ -299,41 +299,6 @@ namespace AccountMgr
         return false;
     }
 
-    uint32 GetAccountFlag(uint32 accountId)
-    {
-        LoginDatabasePreparedStatement* stmt = LoginDatabase.GetPreparedStatement(LOGIN_SEL_ACCOUNT_FLAG);
-        stmt->SetData(0, accountId);
-        if (PreparedQueryResult result = LoginDatabase.Query(stmt))
-            return (*result)[0].Get<uint32>();
-
-        return 0;
-    }
-
-    bool HasAccountFlag(uint32 accountId, uint32 flag)
-    {
-        return (GetAccountFlag(accountId) & flag) != 0;
-    }
-
-    void UpdateAccountFlag(uint32 accountId, uint32 flag, bool remove /*= false*/)
-    {
-        LoginDatabasePreparedStatement* stmt = LoginDatabase.GetPreparedStatement(
-            remove ? LOGIN_UPD_REMOVE_ACCOUNT_FLAG : LOGIN_UPD_ADD_ACCOUNT_FLAG
-        );
-        stmt->SetData(0, flag);
-        stmt->SetData(1, accountId);
-        LoginDatabase.Execute(stmt);
-    }
-
-    void ValidateAccountFlags(uint32 accountId, uint32 flags, uint32 security)
-    {
-        bool hasGMFlag = (flags & ACCOUNT_FLAG_GM) != 0;
-
-        if (IsGMAccount(security) && !hasGMFlag)
-            UpdateAccountFlag(accountId, ACCOUNT_FLAG_GM);
-        else if (hasGMFlag && !IsGMAccount(security))
-            UpdateAccountFlag(accountId, ACCOUNT_FLAG_GM, true);
-    }
-
     uint32 GetCharactersCount(uint32 accountId)
     {
         // check character count
