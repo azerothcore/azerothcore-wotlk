@@ -26,7 +26,7 @@ struct ItemTemplate;
 struct Position;
 struct PvPDifficultyEntry;
 
-enum LocaleConstant : uint8;
+enum LocaleConstant;
 
 constexpr float MIN_WANDER_NODE_DISTANCE = 50.0f; // VISIBILITY_DISTANCE_NORMAL * 0.5f;
 constexpr float MAX_WANDER_NODE_DISTANCE = 800.0f; //SIZE_OF_GRIDS * 1.5f;
