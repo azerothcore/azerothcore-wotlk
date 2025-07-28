@@ -94,6 +94,7 @@ public:
         InstanceScript* pInstance;
         EventMap events;
         float ZapAngle;
+        uint8 step = 0;
 
         void Reset() override
         {
@@ -185,32 +186,37 @@ public:
                     {
                         Talk(SAY_AZURE);
                         Talk(SAY_AZURE_EMOTE);
-                        switch (events.ExecuteEvent())
+                        switch (step)
                         {
-                            case EVENT_CALL_AZURE_RING_CAPTAIN_1:
-                                me->CastSpell(me, SPELL_CALL_AZURE_RING_CAPTAIN_1, true);
+                            case 0:
+                                DoCast(SPELL_CALL_AZURE_RING_CAPTAIN_1);
                                 events.ScheduleEvent(EVENT_CALL_AZURE_RING_CAPTAIN_2, 16s);
                                 break;
-                            case EVENT_CALL_AZURE_RING_CAPTAIN_2:
-                                me->CastSpell(me, SPELL_CALL_AZURE_RING_CAPTAIN_2, true);
+                            case 1:
+                                DoCast(SPELL_CALL_AZURE_RING_CAPTAIN_2);
                                 events.ScheduleEvent(EVENT_CALL_AZURE_RING_CAPTAIN_3, 16s);
                                 break;
-                            case EVENT_CALL_AZURE_RING_CAPTAIN_3:
-                                me->CastSpell(me, SPELL_CALL_AZURE_RING_CAPTAIN_3, true);
+                            case 2:
+                                DoCast(SPELL_CALL_AZURE_RING_CAPTAIN_3);
                                 events.ScheduleEvent(EVENT_CALL_AZURE_RING_CAPTAIN_4, 16s);
                                 break;
-                            case EVENT_CALL_AZURE_RING_CAPTAIN_4:
-                                me->CastSpell(me, SPELL_CALL_AZURE_RING_CAPTAIN_4, true);
+                            case 3:
+                                DoCast(SPELL_CALL_AZURE_RING_CAPTAIN_4);
                                 events.ScheduleEvent(EVENT_CALL_AZURE_RING_CAPTAIN_1, 16s);
                                 break;
                         }
+
+                        step++;
+                        if (step > 3)
+                            step = 0;
+
                         if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 100.0f, true))
                         {
                             if (Creature* trigger = me->SummonCreature(NPC_ARCANE_BEAM, target->GetPositionX(), target->GetPositionY(), target->GetPositionZ(), 0.0f, TEMPSUMMON_TIMED_DESPAWN, 13000))
                             {
                                 if (Creature* c = me->FindNearestCreature(NPC_AZURE_RING_CAPTAIN, 500.0f, true))
                                     c->CastSpell(trigger, SPELL_ARCANE_BEAM_VISUAL, true);
-                                trigger->GetMotionMaster()->MoveChase(target, 0.1f);
+                                trigger->GetMotionMaster()->MoveFollow(target, 0.0f, 0.0f, MOTION_SLOT_ACTIVE, false, false); /// @todo: sniff speed for NPC_ARCANE_BEAM (ID: 28239)
                                 trigger->CastSpell(me, SPELL_ARCANE_BEAM_PERIODIC_DAMAGE, true);
                             }
                         }

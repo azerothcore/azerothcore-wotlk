@@ -15,13 +15,6 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-/* ScriptData
-Name: lookup_commandscript
-%Complete: 100
-Comment: All lookup related commands
-Category: commandscripts
-EndScriptData */
-
 #include "CharacterCache.h"
 #include "Chat.h"
 #include "CommandScript.h"

@@ -271,6 +271,7 @@ public:
                             king->SetDisableGravity(true);
                             me->RemoveUnitFlag(UNIT_FLAG_DISABLE_MOVE);
                             me->GetMotionMaster()->MoveChase(me->GetVictim());
+                            events.CancelEventGroup(1);
                             switch (BoatOrder[BoatNum - 1])
                             {
                                 case 0:
@@ -298,7 +299,7 @@ public:
                             sf->SetSpeed(MOVE_RUN, 0.4f);
                             sf->AddAura(IsHeroic() ? SPELL_SPIRIT_FOUNT_H : SPELL_SPIRIT_FOUNT_N, sf);
                             sf->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
-                            sf->GetMotionMaster()->MoveFollow(me->GetVictim(), 0, rand_norm()*M_PI * 2);
+                            sf->GetMotionMaster()->MoveFollow(me->GetVictim(), 0, rand_norm()*M_PI * 2, MOTION_SLOT_ACTIVE, false, false);
                         }
                         break;
                     }

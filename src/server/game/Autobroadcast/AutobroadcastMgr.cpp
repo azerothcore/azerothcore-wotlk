@@ -167,7 +167,7 @@ void AutobroadcastMgr::SendWorldAnnouncement(uint8 textId)
         // Get player's locale
         LocaleConstant locale = player->GetSession()->GetSessionDbLocaleIndex();
 
-        if (!_autobroadcasts.empty())
+        if (!_autobroadcasts.contains(textId))
             return;
 
         std::string_view localizedMessage = ObjectMgr::GetLocaleString(_autobroadcasts[textId], locale);
@@ -188,7 +188,7 @@ void AutobroadcastMgr::SendNotificationAnnouncement(uint8 textId)
         // Retrieve player's locale
         LocaleConstant locale = player->GetSession()->GetSessionDbLocaleIndex();
 
-        if (!_autobroadcasts.count(textId))
+        if (!_autobroadcasts.contains(textId))
             return;
 
         // Get localized message

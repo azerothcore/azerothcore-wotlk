@@ -224,15 +224,14 @@ public:
 
             Illusions_Check_Timer = 250;
 
-            if (_illusionGuids.empty())
+            if (_minions.empty())
                 return;
 
-            for (std::list<ObjectGuid>::const_iterator itr = _illusionGuids.begin(); itr != _illusionGuids.end(); ++itr)
+            for (Creature* ill : _minions)
             {
-                Creature* ill = ObjectAccessor::GetCreature(*me, *itr);
                 if (!ill)
                 {
-                    BOT_LOG_ERROR("entities.player", "bm_bot::IllusionsCheck(): unit {} is not found in world!", (*itr).ToString().c_str());
+                    BOT_LOG_ERROR("entities.player", "bm_bot::IllusionsCheck(): illusion is not found in world!");
                     continue;
                 }
 
@@ -512,7 +511,7 @@ public:
 
             for (uint8 i = 0; i != illusionsCount; ++i)
             {
-                Creature* illusion = me->SummonCreature(NPC_MIRROR_IMAGE_BM, *me, TEMPSUMMON_MANUAL_DESPAWN);
+                Creature* illusion = me->SummonCreature(NPC_MIRROR_IMAGE_BM, *me, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 50);
                 if (!illusion)
                     continue;
 
@@ -520,7 +519,7 @@ public:
                     ASSERT(master->GetBotMgr()->AddBot(illusion));
 
                 illusion->SetCreator(master); //TempSummon* Map::SummonCreature()
-                illusion->SetOwnerGUID(me->GetGUID());
+                (dynamic_cast<blademaster_botAI*>(illusion->GetAI()))->SetGUID(me->GetGUID());
 
                 //copy visuals
                 //illusion->SetEntry(me->GetEntry());
@@ -557,7 +556,7 @@ public:
 
                 illusion->GetBotAI()->SetBotCommandState(BOT_COMMAND_COMBATRESET);
 
-                _illusionGuids.push_back(illusion->GetGUID());
+                _minions.insert(illusion);
             }
 
             SetBotCommandState(BOT_COMMAND_COMBATRESET);
@@ -575,13 +574,12 @@ public:
             }
 
             uint8 counter = 0;
-            uint8 r = urand(0, uint8(_illusionGuids.size() - 1));
+            uint8 r = urand(0, uint8(_minions.size() - 1));
             uint32 phaseMask = IAmFree() ? PHASEMASK_NORMAL : master->GetPhaseMask();
 
-            for (std::list<ObjectGuid>::const_iterator itr = _illusionGuids.begin(); itr != _illusionGuids.end(); ++itr)
+            for (Creature* illusion : _minions)
             {
-                if (Creature* illusion = ObjectAccessor::GetCreature(*me, *itr))
-                    illusion->SetPhaseMask(phaseMask, true);
+                illusion->SetPhaseMask(phaseMask, true);
 
                 if (counter == r)
                     me->SetPhaseMask(phaseMask, true);
@@ -812,11 +810,10 @@ public:
         {
             TerminateEvent();
 
-            if (IsTempBot())
-                if (me->GetCreatorGUID().IsCreature())
-                    if (Unit* bot = ObjectAccessor::GetUnit(*me, me->GetCreatorGUID()))
-                        if (bot->IsNPCBot())
-                            bot->ToCreature()->OnBotDespawn(me);
+            if (IsTempBot() && _summonerGUID)
+                if (Unit* bot = ObjectAccessor::GetUnit(*me, _summonerGUID))
+                    if (bot->IsNPCBot())
+                        bot->ToCreature()->OnBotDespawn(me);
 
             bot_ai::JustDied(u);
 
@@ -829,11 +826,11 @@ public:
             if (!summon)
                 return;
 
-            for (std::list<ObjectGuid>::iterator itr = _illusionGuids.begin(); itr != _illusionGuids.end(); ++itr)
+            for (auto citr = _minions.cbegin(); citr != _minions.cend(); ++citr)
             {
-                if (*itr == summon->GetGUID())
+                if (*citr == summon)
                 {
-                    _illusionGuids.erase(itr);
+                    _minions.erase(citr);
                     return;
                 }
             }
@@ -841,13 +838,13 @@ public:
 
         void UnsummonAll(bool /*savePets*/ = true) override
         {
-            while (!_illusionGuids.empty())
+            while (!_minions.empty())
             {
-                std::list<ObjectGuid>::iterator itr = _illusionGuids.begin();
-                if (Creature* illusion = ObjectAccessor::GetCreature(*me, *itr))
+                auto cit = _minions.cbegin();
+                if (Creature* illusion = *cit)
                     illusion->AI()->JustDied(nullptr);
                 else
-                    _illusionGuids.erase(itr);
+                    _minions.erase(cit);
             }
         }
 
@@ -864,11 +861,17 @@ public:
             }
         }
 
+        void SetGUID(ObjectGuid/* const&*/ guid, int32 /*id*/ = 0) override
+        {
+            _summonerGUID = guid;
+        }
+
         void Reset() override
         {
             UnsummonAll(false);
 
             _dmdevent = nullptr;
+            _summonerGUID = ObjectGuid::Empty;
             Windwalk_Timer = 0;
             criticalStikeMult = 1;
             illusionsCount = 0;
@@ -893,14 +896,17 @@ public:
         {
             uint8 lvl = me->GetLevel();
 
- /*Special*/lvl >= 10 ? InitSpellMap(WINDWALK_1) : RemoveSpell(WINDWALK_1);
- /*Special*/lvl >= 20 ? InitSpellMap(MIRROR_IMAGE_1) : RemoveSpell(MIRROR_IMAGE_1);
-
             criticalStikeMult =
                 lvl < 10 ? 1 :
                 lvl < 30 ? 2 :
                 lvl < 50 ? 3 :
                 lvl < 82 ? 4 : 5;
+
+            if (IsTempBot())
+                return;
+
+ /*Special*/lvl >= 10 ? InitSpellMap(WINDWALK_1) : RemoveSpell(WINDWALK_1);
+ /*Special*/lvl >= 20 ? InitSpellMap(MIRROR_IMAGE_1) : RemoveSpell(MIRROR_IMAGE_1);
 
             illusionsCount =
                 lvl < 20 ? 0 :
@@ -946,8 +952,10 @@ public:
 
     private:
         DelayedMeleeDamageEvent* _dmdevent;
-        std::list<ObjectGuid> _illusionGuids;
+        typedef std::set<Creature*> Summons;
+        Summons _minions;
         Position _illusPos[MAX_ILLUSION_POSITIONS];
+        ObjectGuid _summonerGUID;
 
         uint32 Windwalk_Timer;
         uint32 Illusions_Check_Timer;

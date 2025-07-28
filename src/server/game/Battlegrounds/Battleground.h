@@ -60,16 +60,6 @@ enum BattlegroundDesertionType : uint8
     ARENA_DESERTION_TYPE_INVITE_LOGOUT   = 8, // player is invited to join arena and logs out
 };
 
-enum BattlegroundMaps
-{
-    MAP_BG_ALTERAC_VALLEY           = 30,
-    MAP_BG_WARSONG_GULCH            = 489,
-    MAP_BG_ARATHI_BASIN             = 529,
-    MAP_BG_EYE_OF_THE_STORM         = 566,
-    MAP_BG_STRAND_OF_THE_ANCIENTS   = 607,
-    MAP_BG_ISLE_OF_CONQUEST         = 628
-};
-
 enum BattlegroundBroadcastTexts
 {
     BG_TEXT_ALLIANCE_WINS           = 10633,
