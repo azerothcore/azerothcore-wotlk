@@ -1388,7 +1388,7 @@ void BattlegroundAV::EventBotAssaultsPoint(Creature* bot, uint32 object)
         }
         else if (m_Nodes[node].TotalOwnerId == TEAM_NEUTRAL) //recapping, when no team owns this node realy
         {
-            if (!(m_Nodes[node].State != POINT_CONTROLED))
+            if (!(m_Nodes[node].State != POINT_CONTROLLED))
                 return;
 
             if (teamId == TEAM_ALLIANCE)
@@ -1599,7 +1599,7 @@ GraveyardStruct const* BattlegroundAV::GetClosestGraveyardForBot(Creature* bot) 
     minDist = (pGraveyard->x - x) * (pGraveyard->x - x) + (pGraveyard->y - y) * (pGraveyard->y - y);
 
     for (uint8 i = BG_AV_NODES_FIRSTAID_STATION; i <= BG_AV_NODES_FROSTWOLF_HUT; ++i)
-        if (m_Nodes[i].OwnerId == GetBotTeamId(bot->GetGUID()) && m_Nodes[i].State == POINT_CONTROLED)
+        if (m_Nodes[i].OwnerId == GetBotTeamId(bot->GetGUID()) && m_Nodes[i].State == POINT_CONTROLLED)
         {
             entry = sGraveyard->GetGraveyard(BG_AV_GraveyardIds[i]);
             if (entry)
