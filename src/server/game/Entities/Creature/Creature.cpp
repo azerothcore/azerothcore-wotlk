@@ -296,7 +296,6 @@ Creature::Creature(bool isWorldObject): Unit(isWorldObject), MovableMapObject(),
 
     ResetLootMode(); // restore default loot mode
     TriggerJustRespawned = false;
-    m_isTempWorldObject = false;
     _focusSpell = nullptr;
 
     m_respawnedTime = time_t(0);

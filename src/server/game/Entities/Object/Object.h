@@ -635,9 +635,7 @@ public:
     [[nodiscard]] bool IsFarVisible() const { return m_isFarVisible; }
     [[nodiscard]] bool IsVisibilityOverridden() const { return m_visibilityDistanceOverride.has_value(); }
     void SetVisibilityDistanceOverride(VisibilityDistanceType type);
-    void SetWorldObject(bool apply);
-    [[nodiscard]] bool IsPermanentWorldObject() const { return m_isWorldObject; }
-    [[nodiscard]] bool IsWorldObject() const;
+    [[nodiscard]] bool IsWorldObject() const { return m_isWorldObject; }
 
     [[nodiscard]] bool IsInWintergrasp() const
     {
