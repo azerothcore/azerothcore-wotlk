@@ -19623,7 +19623,7 @@ WanderNode const* bot_ai::GetNextBGTravelNode() const
                         else if (c.OwnerId == myTeamId)
                             assaulted_nodes.emplace(uint8(counter), &c);
                     }
-                    else if (c.State == BG_AV_States::POINT_NEUTRAL || (c.State == BG_AV_States::POINT_CONTROLED && c.OwnerId != myTeamId))
+                    else if (c.State == BG_AV_States::POINT_NEUTRAL || (c.State == BG_AV_States::POINT_CONTROLLED && c.OwnerId != myTeamId))
                         assaultable_nodes.emplace(uint8(counter), &c);
                     else if (counter == (teamId == TEAM_ALLIANCE ? BG_AV_NODES_FROSTWOLF_HUT : BG_AV_NODES_FIRSTAID_STATION))
                         assaultable_nodes.emplace(uint8(counter), &c);
