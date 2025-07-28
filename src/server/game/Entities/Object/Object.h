@@ -236,6 +236,12 @@ public:
 
     DataMap CustomData;
 
+    template<typename... T>
+    [[nodiscard]] bool EntryEquals(T... entries) const
+    {
+        return ((GetEntry() == entries) || ...);
+    }
+
 protected:
     Object();
 
@@ -405,12 +411,56 @@ class MovableMapObject
 protected:
     MovableMapObject()  = default;
 
-private:
     [[nodiscard]] Cell const& GetCurrentCell() const { return _currentCell; }
+
+private:
     void SetCurrentCell(Cell const& cell) { _currentCell = cell; }
 
     Cell _currentCell;
     MapObjectCellMoveState _moveState{MAP_OBJECT_CELL_MOVE_NONE};
+};
+
+class UpdatableMapObject
+{
+    friend class Map;
+
+public:
+    enum UpdateState : uint8
+    {
+        NotUpdating,
+        PendingAdd,
+        Updating
+    };
+
+protected:
+    UpdatableMapObject() : _mapUpdateListOffset(0), _mapUpdateState(NotUpdating) { }
+
+private:
+    void SetMapUpdateListOffset(std::size_t const offset)
+    {
+        ASSERT(_mapUpdateState == Updating, "Attempted to set update list offset when object is not in map update list");
+        _mapUpdateListOffset = offset;
+    }
+
+    size_t GetMapUpdateListOffset() const
+    {
+        ASSERT(_mapUpdateState == Updating, "Attempted to get update list offset when object is not in map update list");
+        return _mapUpdateListOffset;
+    }
+
+    void SetUpdateState(UpdateState state)
+    {
+        _mapUpdateState = state;
+    }
+
+    UpdateState GetUpdateState() const
+    {
+        return _mapUpdateState;
+    }
+
+private:
+    std::size_t _mapUpdateListOffset;
+    UpdateState _mapUpdateState;
 };
 
 class WorldObject : public Object, public WorldLocation
@@ -560,7 +610,9 @@ public:
 
     [[nodiscard]] Player* SelectNearestPlayer(float distance = 0) const;
     void GetGameObjectListWithEntryInGrid(std::list<GameObject*>& lList, uint32 uiEntry, float fMaxSearchRange) const;
+    void GetGameObjectListWithEntryInGrid(std::list<GameObject*>& gameobjectList, std::vector<uint32> const& entries, float maxSearchRange) const;
     void GetCreatureListWithEntryInGrid(std::list<Creature*>& lList, uint32 uiEntry, float fMaxSearchRange) const;
+    void GetCreatureListWithEntryInGrid(std::list<Creature*>& creatureList, std::vector<uint32> const& entries, float maxSearchRange) const;
     void GetDeadCreatureListInGrid(std::list<Creature*>& lList, float maxSearchRange, bool alive = false) const;
 
     void DestroyForNearbyPlayers();
@@ -641,6 +693,9 @@ public:
     [[nodiscard]] bool HasAllowedLooter(ObjectGuid guid) const;
     [[nodiscard]] GuidUnorderedSet const& GetAllowedLooters() const;
     void RemoveAllowedLooter(ObjectGuid guid);
+
+    virtual bool IsUpdateNeeded();
+    bool CanBeAddedToMapUpdateList();
 
     std::string GetDebugInfo() const override;
 

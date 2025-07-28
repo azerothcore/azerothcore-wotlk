@@ -601,6 +601,7 @@ enum PlayerExtraFlags
     PLAYER_EXTRA_SPECTATOR_ON       = 0x0080,               // Marks if player is spectactor
     PLAYER_EXTRA_PVP_DEATH          = 0x0100,               // store PvP death status until corpse creating.
     PLAYER_EXTRA_SHOW_DK_PET        = 0x0400,               // Marks if player should see ghoul on login screen
+    PLAYER_EXTRA_GM_SPECTATOR       = 0x0800,
 };
 
 // 2^n values
@@ -1181,6 +1182,9 @@ public:
     void SetGameMaster(bool on);
     [[nodiscard]] bool isGMChat() const { return m_ExtraFlags & PLAYER_EXTRA_GM_CHAT; }
     void SetGMChat(bool on) { if (on) m_ExtraFlags |= PLAYER_EXTRA_GM_CHAT; else m_ExtraFlags &= ~PLAYER_EXTRA_GM_CHAT; }
+    [[nodiscard]] bool IsGMSpectator() const { return m_ExtraFlags & PLAYER_EXTRA_GM_SPECTATOR; }
+    void SetGMSpectator(bool on) { if (on) m_ExtraFlags |= PLAYER_EXTRA_GM_SPECTATOR; else m_ExtraFlags &= ~PLAYER_EXTRA_GM_SPECTATOR; }
+
     [[nodiscard]] bool isTaxiCheater() const { return m_ExtraFlags & PLAYER_EXTRA_TAXICHEAT; }
     void SetTaxiCheater(bool on) { if (on) m_ExtraFlags |= PLAYER_EXTRA_TAXICHEAT; else m_ExtraFlags &= ~PLAYER_EXTRA_TAXICHEAT; }
     [[nodiscard]] bool isGMVisible() const { return !(m_ExtraFlags & PLAYER_EXTRA_GM_INVISIBLE); }
@@ -1720,6 +1724,7 @@ public:
     void learnQuestRewardedSpells();
     void learnQuestRewardedSpells(Quest const* quest);
     void learnSpellHighRank(uint32 spellid);
+    bool CheckSkillLearnedBySpell(uint32 spellId);
     void SetReputation(uint32 factionentry, float value);
     [[nodiscard]] uint32 GetReputation(uint32 factionentry) const;
     std::string const& GetGuildName();
@@ -2638,8 +2643,8 @@ public:
     std::string GetPlayerName();
 
     // Settings
-    [[nodiscard]] PlayerSetting GetPlayerSetting(std::string source, uint8 index);
-    void UpdatePlayerSetting(std::string source, uint8 index, uint32 value);
+    [[nodiscard]] PlayerSetting GetPlayerSetting(std::string const& source, uint8 index);
+    void UpdatePlayerSetting(std::string const& source, uint8 index, uint32 value);
 
     void SendSystemMessage(std::string_view msg, bool escapeCharacters = false);
 

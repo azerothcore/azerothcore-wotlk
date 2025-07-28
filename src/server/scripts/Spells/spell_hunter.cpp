@@ -903,8 +903,9 @@ class spell_hun_misdirection : public AuraScript
     bool CheckProc(ProcEventInfo& eventInfo)
     {
         // Do not trigger from Mend Pet
-        if (eventInfo.GetProcSpell() && (eventInfo.GetProcSpell()->GetSpellInfo()->SpellFamilyFlags[0] & 0x800000))
+        if ((eventInfo.GetProcSpell() && (eventInfo.GetProcSpell()->GetSpellInfo()->SpellFamilyFlags[0] & 0x800000)) || (eventInfo.GetHealInfo() && (eventInfo.GetHealInfo()->GetSpellInfo()->SpellFamilyFlags[0] & 0x800000)))
             return false;
+
         return GetTarget()->GetRedirectThreatTarget();
     }
 
@@ -1362,6 +1363,27 @@ class spell_hun_target_self_and_pet : public SpellScript
     }
 };
 
+// -53301 - Explosive Shot
+class spell_hun_explosive_shot : public SpellScript
+{
+    PrepareSpellScript(spell_hun_explosive_shot);
+
+    void HandleFinish()
+    {
+        // Handling of explosive shot initial cast without LnL proc
+        if (!GetCaster() || !GetCaster()->IsPlayer())
+            return;
+
+        if (!GetCaster()->HasAura(SPELL_LOCK_AND_LOAD_TRIGGER))
+            GetSpell()->TakeAmmo();
+    }
+
+    void Register() override
+    {
+        AfterCast += SpellCastFn(spell_hun_explosive_shot::HandleFinish);
+    }
+};
+
 void AddSC_hunter_spell_scripts()
 {
     RegisterSpellScript(spell_hun_check_pet_los);
@@ -1393,4 +1415,5 @@ void AddSC_hunter_spell_scripts()
     RegisterSpellScript(spell_hun_intimidation);
     RegisterSpellScript(spell_hun_bestial_wrath);
     RegisterSpellScript(spell_hun_target_self_and_pet);
+    RegisterSpellScript(spell_hun_explosive_shot);
 }

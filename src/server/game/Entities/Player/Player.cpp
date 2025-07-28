@@ -106,7 +106,7 @@ enum CharacterFlags
 {
     CHARACTER_FLAG_NONE                 = 0x00000000,
     CHARACTER_FLAG_UNK1                 = 0x00000001,
-    CHARACTER_FLAG_UNK2                 = 0x00000002,
+    CHARACTER_FLAG_RESTING              = 0x00000002,
     CHARACTER_LOCKED_FOR_TRANSFER       = 0x00000004,
     CHARACTER_FLAG_UNK4                 = 0x00000008,
     CHARACTER_FLAG_UNK5                 = 0x00000010,
@@ -810,8 +810,8 @@ uint32 Player::EnvironmentalDamage(EnviromentalDamage type, uint32 damage)
         if (type == DAMAGE_FALL)                               // DealDamage not apply item durability loss at self damage
         {
             LOG_DEBUG("entities.player", "Player::EnvironmentalDamage: Player '{}' ({}) fall to death, losing {} durability",
-                GetName(), GetGUID().ToString(), sWorld->getRate(RATE_DURABILITY_LOSS_ON_DEATH));
-            DurabilityLossAll(sWorld->getRate(RATE_DURABILITY_LOSS_ON_DEATH), false);
+                GetName(), GetGUID().ToString(), sWorld->getRate(RATE_DURABILITY_LOSS_ON_DEATH) / 100.0f);
+            DurabilityLossAll(sWorld->getRate(RATE_DURABILITY_LOSS_ON_DEATH) / 100.0f, false);
             // durability lost message
             SendDurabilityLoss();
         }
@@ -1169,6 +1169,8 @@ bool Player::BuildEnumData(PreparedQueryResult result, WorldPacket* data)
 
     *data << uint32(fields[16].Get<uint32>());                 // guild id
 
+    if (playerFlags & PLAYER_FLAGS_RESTING)
+        playerFlags |= CHARACTER_FLAG_RESTING;
     if (atLoginFlags & AT_LOGIN_RESURRECT)
         playerFlags &= ~PLAYER_FLAGS_GHOST;
     if (playerFlags & PLAYER_FLAGS_HIDE_HELM)
@@ -3198,6 +3200,35 @@ bool Player::addSpell(uint32 spellId, uint8 addSpecMask, bool updateActive, bool
     return true;
 }
 
+bool Player::CheckSkillLearnedBySpell(uint32 spellId)
+{
+    if (!sWorld->getBoolConfig(CONFIG_VALIDATE_SKILL_LEARNED_BY_SPELLS))
+        return true;
+
+    SkillLineAbilityMapBounds skill_bounds = sSpellMgr->GetSkillLineAbilityMapBounds(spellId);
+    uint32 errorSkill = 0;
+    for (SkillLineAbilityMap::const_iterator sla = skill_bounds.first; sla != skill_bounds.second; ++sla)
+    {
+        SkillLineEntry const* pSkill = sSkillLineStore.LookupEntry(sla->second->SkillLine);
+        if (!pSkill)
+            continue;
+
+        if (GetSkillRaceClassInfo(pSkill->id, getRace(), getClass()))
+            return true;
+        else
+            errorSkill = pSkill->id;
+    }
+
+    if (errorSkill)
+    {
+        LOG_ERROR("entities.player", "Player {} (GUID: {}), has spell ({}) that teach skill ({}) which is invalid for the race/class combination (Race: {}, Class: {}). Will be deleted.",
+            GetName(), GetGUID().GetCounter(), spellId, errorSkill, getRace(), getClass());
+
+        return false;
+    }
+    return true;
+}
+
 bool Player::_addSpell(uint32 spellId, uint8 addSpecMask, bool temporary, bool learnFromSkill /*= false*/)
 {
     // pussywizard: this can be called to OVERWRITE currently existing spell params! usually to set active = false for lower ranks of a spell
@@ -3339,27 +3370,17 @@ bool Player::_addSpell(uint32 spellId, uint8 addSpecMask, bool temporary, bool l
         {
             SkillLineEntry const* pSkill = sSkillLineStore.LookupEntry(_spell_idx->second->SkillLine);
             if (!pSkill)
-            {
                 continue;
-            }
 
-           /// @todo confirm if rogues start wth lockpicking skill at level 1 but only recieve the spell to use it at level 16
+            /// @todo confirm if rogues start wth lockpicking skill at level 1 but only recieve the spell to use it at level 16
             // Added for runeforging, it is confirmed via sniff that this happens when death knights learn the spell, not on character creation.
             if ((_spell_idx->second->AcquireMethod == SKILL_LINE_ABILITY_LEARNED_ON_SKILL_LEARN && !HasSkill(pSkill->id)) || ((pSkill->id == SKILL_LOCKPICKING || pSkill->id == SKILL_RUNEFORGING) && _spell_idx->second->TrivialSkillLineRankHigh == 0))
-            {
                 LearnDefaultSkill(pSkill->id, 0);
-            }
 
             if (pSkill->id == SKILL_MOUNTS && !Has310Flyer(false))
-            {
                 for (uint8 i = 0; i < MAX_SPELL_EFFECTS; ++i)
-                {
                     if (spellInfo->Effects[i].ApplyAuraName == SPELL_AURA_MOD_INCREASE_MOUNTED_FLIGHT_SPEED && spellInfo->Effects[i].CalcValue() == 310)
-                    {
                         SetHas310Flyer(true);
-                    }
-                }
-            }
         }
     }
 
@@ -10158,6 +10179,16 @@ void Player::RemoveSpellMods(Spell* spell)
                             continue;
                         }
             }
+            // ROGUE MUTILATE WITH COLD BLOOD
+            if (spellInfo->Id == 5374)
+            {
+                SpellInfo const* sp = mod->ownerAura->GetSpellInfo();
+                if (sp->Id == 14177) // Cold Blood
+                {
+                    mod->charges = 1;
+                    continue;
+                }
+            }
 
             if (mod->ownerAura->DropCharge(AURA_REMOVE_BY_EXPIRE))
                 itr = m_spellMods[i].begin();
@@ -13802,7 +13833,11 @@ void Player::_LoadSkills(PreparedQueryResult result)
             SkillRaceClassInfoEntry const* rcEntry = GetSkillRaceClassInfo(skill, getRace(), getClass());
             if (!rcEntry)
             {
-                LOG_ERROR("entities.player", "Character {} has skill {} that does not exist.", GetGUID().ToString(), skill);
+                LOG_ERROR("entities.player", "Player {} (GUID: {}), has skill ({}) that is invalid for the race/class combination (Race: {}, Class: {}). Will be deleted.",
+                    GetName(), GetGUID().GetCounter(), skill, getRace(), getClass());
+
+                // Mark skill for deletion in the database
+                mSkillStatus.insert(SkillStatusMap::value_type(skill, SkillStatusData(0, SKILL_DELETED)));
                 continue;
             }
 
@@ -13823,7 +13858,8 @@ void Player::_LoadSkills(PreparedQueryResult result)
 
             if (value == 0)
             {
-                LOG_ERROR("entities.player", "Character {} has skill {} with value 0. Will be deleted.", GetGUID().ToString(), skill);
+                LOG_ERROR("entities.player", "Player {} (GUID: {}), has skill ({}) with value 0. Will be deleted.",
+                    GetName(), GetGUID().GetCounter(), skill);
 
                 CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_CHARACTER_SKILL);
 

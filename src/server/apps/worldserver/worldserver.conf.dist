@@ -679,6 +679,7 @@ Appender.NpcBots=1,2,0
 #
 
 Logger.root=2,Console Server
+#Logger.metric=2,Console Server
 #Logger.commands.gm=4,Console GM
 Logger.diff=3,Console Server
 Logger.mmaps=4,Server
@@ -814,6 +815,37 @@ Log.Async.Enable = 0
 Metric.Enable = 0
 
 #
+#    Metric.InfluxDB
+#        Description: Connection settings for InfluxDB.
+#
+#        For InfluxDB v1:
+#                     Only fill in Metric.InfluxDB.Connection.
+#
+#        Example:
+#                     Metric.InfluxDB.Connection = "hostname;port;database"
+#
+#        For InfluxDB v2:
+#                     Fill in every field.
+#
+#        NOTE:        Currently, Grafana will not work with the provided json files to visualize
+#                     data from InfluxDB v2.
+#
+#        Example:
+#                     Metric.InfluxDB.Connection = "hostname;port"
+#                     Metric.InfluxDB.v2 = 0 - (Disabled)
+#                                          1 - (Enabled)
+#                     Metric.InfluxDB.Org = "my-org"
+#                     Metric.InfluxDB.Bucket = "my-bucket"
+#                     Metric.InfluxDB.Token = "my-token"
+#
+
+Metric.InfluxDB.Connection = "127.0.0.1;8086;worldserver"
+Metric.InfluxDB.v2 = 0
+Metric.InfluxDB.Org = ""
+Metric.InfluxDB.Bucket = ""
+Metric.InfluxDB.Token = ""
+
+#
 #    Metric.Interval
 #        Description: Interval between every batch of data sent in seconds.
 #                     Longer interval means larger batch of data. If the batch
@@ -822,15 +854,6 @@ Metric.Enable = 0
 #
 
 Metric.Interval = 1
-
-#
-#    Metric.ConnectionInfo
-#        Description: Connection settings for metric database (currently InfluxDB).
-#        Example:     "hostname;port;database"
-#        Default:     "127.0.0.1;8086;worldserver"
-#
-
-Metric.ConnectionInfo = "127.0.0.1;8086;worldserver"
 
 #
 #    Metric.OverallStatusInterval
@@ -1272,7 +1295,7 @@ Visibility.GroupMode = 1
 #        Description: Visibility distance to see other players or gameobjects.
 #                     Visibility on continents on retail ~100 yards. In BG/Arenas ~250.
 #                     For instances default ~170.
-#                     Max limited by active player zone: ~ 333
+#                     Max: 250
 #                     Min limit is max aggro radius (45) * Rate.Creature.Aggro
 #        Default:     100  - (Visibility.Distance.Continents)
 #                     170 - (Visibility.Distance.Instances)
@@ -1397,18 +1420,6 @@ CheckGameObjectLoS = 1
 #                     1 - (Enabled)
 
 PreloadAllNonInstancedMapGrids = 0
-
-#
-#    SetAllCreaturesWithWaypointMovementActive
-#        Description: Set all creatures with waypoint movement active. This means that they will start
-#                     movement once they are loaded (which happens on grid load) and keep moving even
-#                     when no player is near. This will increase CPU usage significantly and can be
-#                     used with enabled "PreloadAllNonInstancedMapGrids" to start waypoint movement on
-#                     server startup.
-#        Default:     0 - (Disabled)
-#                     1 - (Enabled)
-
-SetAllCreaturesWithWaypointMovementActive = 0
 
 #
 #     DontCacheRandomMovementPaths
@@ -1755,6 +1766,16 @@ CleanCharacterDB = 0
 #        Default:     0  - (All cleanup methods will be disabled after the next cleanup)
 
 PersistentCharacterCleanFlags = 0
+
+#
+#    ValidateSkillLearnedBySpells
+#        Description: If enabled, players will lose spells that are invalid for their race/class.
+#        Default:     1 - (Enabled, enforce valid spells)
+#                     0 - (Disabled, allow invalid spells)
+#        Disabling this and then having your character learn spells which require DBC edits can result in the character not being saved in the database
+#        Disable AT YOUR OWN RISK
+
+ValidateSkillLearnedBySpells = 1
 
 #
 ###################################################################################################
@@ -3493,6 +3514,14 @@ Wintergrasp.CrashRestartTimer = 10
 ###################################################################################################
 # BATTLEGROUND
 #
+#    Battleground.PrepTime
+#        Description: Time (in seconds) for battleground preparation phase. Strand of the Ancients will be
+#        the exception and will always use the default 120 seconds timer, due to its boat timing mechanic.
+#        Default:     120
+
+Battleground.PrepTime = 120
+
+#
 #    Battleground.CastDeserter
 #        Description: Cast Deserter spell at players who leave battlegrounds in progress.
 #        Default:     1 - (Enabled)
@@ -3758,6 +3787,13 @@ Battleground.EyeOfTheStorm.CapturePoints = 1600
 ###################################################################################################
 # ARENA
 #
+#    Arena.PrepTime
+#        Description: Time (in seconds) for arena preparation phase.
+#        Default:     60
+
+Arena.PrepTime = 60
+
+#
 #    Arena.MaxRatingDifference
 #        Description: Maximum rating difference between two teams in rated matches.
 #        Default:     150 - (Enabled)
@@ -3835,10 +3871,17 @@ Arena.QueueAnnouncer.Detail = 3
 
 #
 #    Arena.ArenaStartRating
-#        Description: Start rating for new arena teams.
+#        Description: Start rating for new arena teams. (Applies to season 6 and higher)
 #        Default:     0
 
 Arena.ArenaStartRating = 0
+
+#
+#    Arena.LegacyArenaStartRating
+#        Description: Start rating for new arena teams. (Only applies to season 1 - 5)
+#        Default:     1500
+
+Arena.LegacyArenaStartRating = 1500
 
 #
 #    Arena.ArenaStartPersonalRating
@@ -4439,7 +4482,8 @@ Minigob.Manabonk.Enable = 1
 
 #
 #     Calculate.Creature.Zone.Area.Data
-#        Description: Calculate at loading creature zoneId / areaId and save in creature table (WARNING: SLOW WORLD SERVER STARTUP)
+#        Description: Calculate at loading creature zoneId / areaId and save in creature table
+#                     WARNING: SLOW WORLD SERVER STARTUP. Should only be used for debugging.
 #        Default:     0  - (Do not show)
 #
 
@@ -4447,7 +4491,8 @@ Calculate.Creature.Zone.Area.Data = 0
 
 #
 #     Calculate.Gameoject.Zone.Area.Data
-#        Description: Calculate at loading gameobject zoneId / areaId and save in gameobject table (WARNING: SLOW WORLD SERVER STARTUP)
+#        Description: Calculate at loading gameobject zoneId / areaId and save in gameobject table
+#                     WARNING: SLOW WORLD SERVER STARTUP. Should only be used for debugging.
 #        Default:     0  - (Do not show)
 #
 

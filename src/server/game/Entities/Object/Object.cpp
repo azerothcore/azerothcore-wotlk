@@ -1197,6 +1197,7 @@ void WorldObject::AddToWorld()
 {
     Object::AddToWorld();
     GetMap()->GetZoneAndAreaId(GetPhaseMask(), _zoneId, _areaId, GetPositionX(), GetPositionY(), GetPositionZ());
+    GetMap()->AddObjectToPendingUpdateList(this);
 }
 
 void WorldObject::RemoveFromWorld()
@@ -2569,10 +2570,24 @@ void WorldObject::GetGameObjectListWithEntryInGrid(std::list<GameObject*>& gameo
     Cell::VisitGridObjects(this, searcher, maxSearchRange);
 }
 
+void WorldObject::GetGameObjectListWithEntryInGrid(std::list<GameObject*>& gameobjectList, std::vector<uint32> const& entries, float maxSearchRange) const
+{
+    Acore::AllGameObjectsMatchingOneEntryInRange check(this, entries, maxSearchRange);
+    Acore::GameObjectListSearcher searcher(this, gameobjectList, check);
+    Cell::VisitGridObjects(this, searcher, maxSearchRange);
+}
+
 void WorldObject::GetCreatureListWithEntryInGrid(std::list<Creature*>& creatureList, uint32 entry, float maxSearchRange) const
 {
     Acore::AllCreaturesOfEntryInRange check(this, entry, maxSearchRange);
     Acore::CreatureListSearcher<Acore::AllCreaturesOfEntryInRange> searcher(this, creatureList, check);
+    Cell::VisitGridObjects(this, searcher, maxSearchRange);
+}
+
+void WorldObject::GetCreatureListWithEntryInGrid(std::list<Creature*>& creatureList, std::vector<uint32> const& entries, float maxSearchRange) const
+{
+    Acore::AllCreaturesMatchingOneEntryInRange check(this, entries, maxSearchRange);
+    Acore::CreatureListSearcher searcher(this, creatureList, check);
     Cell::VisitGridObjects(this, searcher, maxSearchRange);
 }
 
@@ -3278,4 +3293,28 @@ GuidUnorderedSet const& WorldObject::GetAllowedLooters() const
 void WorldObject::RemoveAllowedLooter(ObjectGuid guid)
 {
     _allowedLooters.erase(guid);
+}
+
+bool WorldObject::IsUpdateNeeded()
+{
+    if (isActiveObject())
+        return true;
+
+    return false;
+}
+
+bool WorldObject::CanBeAddedToMapUpdateList()
+{
+    switch (GetTypeId())
+    {
+    case TYPEID_UNIT:
+        return IsCreature();
+    case TYPEID_DYNAMICOBJECT:
+    case TYPEID_GAMEOBJECT:
+        return true;
+    default:
+        return false;
+    }
+
+    return false;
 }

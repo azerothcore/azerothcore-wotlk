@@ -2509,12 +2509,8 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
         }
         case SMART_ACTION_START_CLOSEST_WAYPOINT:
         {
-            std::vector<uint32> waypoints;
-            std::copy_if(e.action.closestWaypointFromList.wps.begin(), e.action.closestWaypointFromList.wps.end(),
-                         std::back_inserter(waypoints), [](uint32 wp) { return wp != 0; });
-
             float distanceToClosest = std::numeric_limits<float>::max();
-            WayPoint* closestWp = nullptr;
+            uint32 closestWpId = 0;
 
             for (WorldObject* target : targets)
             {
@@ -2522,29 +2518,34 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
                 {
                     if (IsSmart(creature))
                     {
-                        for (uint32 wp : waypoints)
+                        for (uint32 wp = e.action.startClosestWaypoint.pathId1; wp <= e.action.startClosestWaypoint.pathId2; ++wp)
                         {
                             WPPath* path = sSmartWaypointMgr->GetPath(wp);
                             if (!path || path->empty())
                                 continue;
 
-                            auto itrWp = path->find(0);
+                            auto itrWp = path->find(1);
                             if (itrWp != path->end())
                             {
-                                if (WayPoint* wp = itrWp->second)
+                                if (WayPoint* wpData = itrWp->second)
                                 {
-                                    float distToThisPath = creature->GetDistance(wp->x, wp->y, wp->z);
+                                    float distToThisPath = creature->GetExactDistSq(wpData->x, wpData->y, wpData->z);
                                     if (distToThisPath < distanceToClosest)
                                     {
                                         distanceToClosest = distToThisPath;
-                                        closestWp = wp;
+                                        closestWpId = wp;
                                     }
                                 }
                             }
                         }
 
-                        if (closestWp)
-                            CAST_AI(SmartAI, creature->AI())->StartPath(false, closestWp->id, true);
+                        if (closestWpId)
+                        {
+                            bool repeat = e.action.startClosestWaypoint.repeat;
+                            bool run = e.action.startClosestWaypoint.run;
+
+                            CAST_AI(SmartAI, creature->AI())->StartPath(repeat, closestWpId, run);
+                        }
                     }
                 }
             }
@@ -3518,7 +3519,7 @@ void SmartScript::GetTargets(ObjectVector& targets, SmartScriptHolder const& e, 
         case SMART_TARGET_FARTHEST:
             if (me)
             {
-                if (Unit* u = me->AI()->SelectTarget(SelectTargetMethod::MinDistance, 0, FarthestTargetSelector(me, e.target.farthest.maxDist, e.target.farthest.playerOnly, e.target.farthest.isInLos, e.target.farthest.minDist)))
+                if (Unit* u = me->AI()->SelectTarget(SelectTargetMethod::MinDistance, 0, RangeSelector(me, e.target.farthest.maxDist, e.target.farthest.playerOnly, e.target.farthest.isInLos, e.target.farthest.minDist)))
                     targets.push_back(u);
             }
             break;
@@ -3710,10 +3711,12 @@ void SmartScript::GetTargets(ObjectVector& targets, SmartScriptHolder const& e, 
 
             if (!units.empty() && baseObject)
                 for (WorldObject* unit : units)
-                    if (IsPlayer(unit) && baseObject->IsInRange(unit, float(e.target.playerRange.minDist), float(e.target.playerRange.maxDist)))
+                    if (IsPlayer(unit) && !unit->ToPlayer()->IsGameMaster() && baseObject->IsInRange(unit, float(e.target.playerRange.minDist), float(e.target.playerRange.maxDist)))
                         targets.push_back(unit);
+
             if (e.target.playerRange.maxCount)
                 Acore::Containers::RandomResize(targets, e.target.playerRange.maxCount);
+
             break;
         }
         case SMART_TARGET_PLAYER_DISTANCE:
@@ -4667,12 +4670,11 @@ void SmartScript::ProcessEvent(SmartScriptHolder& e, Unit* unit, uint32 var0, ui
             if (!targets.empty())
             {
                 for (WorldObject* target : targets)
-                {
-                    if (IsPlayer(target))
+                    if (IsPlayer(target) && !target->ToPlayer()->IsGameMaster())
                         playerCount++;
-                }
-                    if (playerCount >= e.event.nearPlayer.minCount)
-                        ProcessAction(e, unit);
+
+                if (playerCount >= e.event.nearPlayer.minCount)
+                    ProcessAction(e, unit);
             }
             RecalcTimer(e, e.event.nearPlayer.repeatMin, e.event.nearPlayer.repeatMax);
             break;
@@ -4686,10 +4688,8 @@ void SmartScript::ProcessEvent(SmartScriptHolder& e, Unit* unit, uint32 var0, ui
             if (!targets.empty())
             {
                 for (WorldObject* target : targets)
-                {
-                    if (IsPlayer(target))
+                    if (IsPlayer(target) && !target->ToPlayer()->IsGameMaster())
                         playerCount++;
-                }
 
                 if (playerCount < e.event.nearPlayerNegation.maxCount)
                     ProcessAction(e, unit);
