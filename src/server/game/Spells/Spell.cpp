@@ -9040,7 +9040,7 @@ namespace Acore
                 case TARGET_CHECK_PARTY:
                     if (unitTarget->IsTotem())
                         return false;
-                    if (unitTarget->IsGuardian())
+                    if (unitTarget->IsGuardian() && !unitTarget->IsControllableGuardian())
                         return false;
                     if (!_caster->_IsValidAssistTarget(unitTarget, _spellInfo))
                         return false;
@@ -9054,7 +9054,7 @@ namespace Acore
                 case TARGET_CHECK_RAID:
                     if (unitTarget->IsTotem())
                         return false;
-                    if (unitTarget->IsGuardian())
+                    if (unitTarget->IsGuardian() && !unitTarget->IsControllableGuardian())
                         return false;
                     if (!_caster->_IsValidAssistTarget(unitTarget, _spellInfo))
                         return false;
