@@ -674,6 +674,9 @@ bool Unit::IsWithinMeleeRange(Unit const* obj, float dist) const
 
     float maxdist = dist + GetMeleeRange(obj);
 
+    if ((IsPlayer() || obj->IsPlayer()) && HasLeewayMovement() && obj->HasLeewayMovement())
+        maxdist += LEEWAY_BONUS_RANGE;
+
     return distsq < maxdist * maxdist;
 }
 
