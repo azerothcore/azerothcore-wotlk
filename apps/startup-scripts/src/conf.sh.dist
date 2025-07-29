@@ -1,0 +1,57 @@
+# AzerothCore Run Engine Default Configuration
+# This file contains default values that can be overridden by environment variables
+# Priority order: conf.sh > environment variables > conf.sh.dist (this file)
+
+# Enable/disable GDB execution
+export GDB_ENABLED="${RUN_ENGINE_GDB_ENABLED:-0}"
+
+# [optional] GDB configuration file
+# default: gdb.conf
+export GDB="${RUN_ENGINE_GDB:-}"
+
+# Directory where binaries are stored
+export BINPATH="${RUN_ENGINE_BINPATH:-}"
+
+# Server binary name (e.g., worldserver, authserver)
+export SERVERBIN="${RUN_ENGINE_SERVERBIN:-}"
+
+# Path to server configuration file (including the file name)
+# ex: /home/user/azerothcore/etc/worldserver.conf
+export CONFIG="${RUN_ENGINE_CONFIG:-}"
+
+# Session manager to use: none|auto|tmux|screen
+# auto will detect the best available option
+export SESSION_MANAGER="${RUN_ENGINE_SESSION_MANAGER:-none}"
+
+# Default session manager (fallback when SESSION_MANAGER is not set)
+export DEFAULT_SESSION_MANAGER="${RUN_ENGINE_DEFAULT_SESSION_MANAGER:-none}"
+
+# Path of the crashes directory
+# If not specified, it will be created in the same directory as logs named "crashes"
+export CRASHES_PATH="${RUN_ENGINE_CRASHES_PATH:-}"
+
+# Path of log files directory
+export LOGS_PATH="${RUN_ENGINE_LOGS_PATH:-}"
+
+# Prefix name for log files to avoid collision with other instances
+export LOG_PREFIX_NAME="${RUN_ENGINE_LOG_PREFIX_NAME:-}"
+
+# [optional] Name of session (tmux session or screen session)
+# If not specified, a default name will be generated based on server binary
+export SESSION_NAME="${RUN_ENGINE_SESSION_NAME:-}"
+
+# [optional] Screen-specific options: -A -m -d -S
+# WARNING: if you are running it under a systemd service
+# please do not remove -m -d arguments from screen if you are using it,
+# or keep WITH_CONSOLE=0. Otherwise the journald-logging system will take 
+# 100% of CPU slowing down the whole machine.
+export SCREEN_OPTIONS="${RUN_ENGINE_SCREEN_OPTIONS:-}"
+
+# Enable/disable console output
+# If disabled, output will be redirected to logging files
+export WITH_CONSOLE="${RUN_ENGINE_WITH_CONSOLE:-0}"
+
+# Restart policy (on-failure|always)
+export RESTART_POLICY="always"
+
+

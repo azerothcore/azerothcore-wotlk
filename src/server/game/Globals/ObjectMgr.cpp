@@ -871,7 +871,7 @@ void ObjectMgr::LoadCreatureTemplateAddons()
 
         uint32 entry = fields[0].Get<uint32>();
 
-        if (!sObjectMgr->GetCreatureTemplate(entry))
+        if (!GetCreatureTemplate(entry))
         {
             LOG_ERROR("sql.sql", "Creature template (Entry: {}) does not exist but has a record in `creature_template_addon`", entry);
             continue;
@@ -1501,7 +1501,7 @@ void ObjectMgr::LoadEquipmentTemplates()
 
         uint32 entry = fields[0].Get<uint32>();
 
-        if (!sObjectMgr->GetCreatureTemplate(entry))
+        if (!GetCreatureTemplate(entry))
         {
             LOG_ERROR("sql.sql", "Creature template (CreatureID: {}) does not exist but has a record in `creature_equip_template`", entry);
             continue;
@@ -2257,6 +2257,9 @@ void ObjectMgr::LoadCreatures()
         return;
     }
 
+    if (sWorld->getBoolConfig(CONFIG_CALCULATE_CREATURE_ZONE_AREA_DATA))
+        LOG_INFO("server.loading", "Calculating zone and area fields. This may take a moment...");
+
     // Build single time for check spawnmask
     std::map<uint32, uint32> spawnMasks;
     for (uint32 i = 0; i < sMapStore.GetNumRows(); ++i)
@@ -2317,7 +2320,7 @@ void ObjectMgr::LoadCreatures()
         data.movementType       = fields[15].Get<uint8>();
         data.spawnMask          = fields[16].Get<uint8>();
         data.phaseMask          = fields[17].Get<uint32>();
-        int16 gameEvent         = fields[18].Get<int8>();
+        int16 gameEvent         = fields[18].Get<int16>();
         uint32 PoolId           = fields[19].Get<uint32>();
         data.npcflag            = fields[20].Get<uint32>();
         data.unit_flags         = fields[21].Get<uint32>();
@@ -2452,7 +2455,7 @@ void ObjectMgr::LoadCreatureSparring()
         ObjectGuid::LowType spawnId     = fields[0].Get<uint32>();
         float sparringHealthPct         = fields[1].Get<float>();
 
-        if (!sObjectMgr->GetCreatureData(spawnId))
+        if (!GetCreatureData(spawnId))
         {
             LOG_ERROR("sql.sql", "Entry {} has a record in `creature_sparring` but doesn't exist in `creatures` table");
             continue;
@@ -2532,7 +2535,7 @@ ObjectGuid::LowType ObjectMgr::AddGOData(uint32 entry, uint32 mapId, float x, fl
     // We use spawn coords to spawn
     if (!map->Instanceable() && map->IsGridLoaded(x, y))
     {
-        GameObject* go = sObjectMgr->IsGameObjectStaticTransport(data.id) ? new StaticTransport() : new GameObject();
+        GameObject* go = IsGameObjectStaticTransport(data.id) ? new StaticTransport() : new GameObject();
         if (!go->LoadGameObjectFromDB(spawnId, map))
         {
             LOG_ERROR("sql.sql", "AddGOData: cannot add gameobject entry {} to map", entry);
@@ -2620,6 +2623,9 @@ void ObjectMgr::LoadGameobjects()
         LOG_INFO("server.loading", " ");
         return;
     }
+
+    if (sWorld->getBoolConfig(CONFIG_CALCULATE_GAMEOBJECT_ZONE_AREA_DATA))
+        LOG_INFO("server.loading", "Calculating zone and area fields. This may take a moment...");
 
     // build single time for check spawnmask
     std::map<uint32, uint32> spawnMasks;
@@ -2709,7 +2715,7 @@ void ObjectMgr::LoadGameobjects()
             LOG_ERROR("sql.sql", "Table `gameobject` has gameobject (GUID: {} Entry: {}) that has wrong spawn mask {} including not supported difficulty modes for map (Id: {}), skip", guid, data.id, data.spawnMask, data.mapid);
 
         data.phaseMask      = fields[15].Get<uint32>();
-        int16 gameEvent     = fields[16].Get<int8>();
+        int16 gameEvent     = fields[16].Get<int16>();
         uint32 PoolId        = fields[17].Get<uint32>();
 
         if (data.rotation.x < -1.0f || data.rotation.x > 1.0f)
@@ -2826,6 +2832,30 @@ void ObjectMgr::LoadItemLocales()
     LOG_INFO("server.loading", ">> Loaded {} Item Locale Strings in {} ms", (uint32)_itemLocaleStore.size(), GetMSTimeDiffToNow(oldMSTime));
 }
 
+ServerConfigs const qualityToBuyValueConfig[MAX_ITEM_QUALITY] =
+{
+    RATE_BUYVALUE_ITEM_POOR,                                    // ITEM_QUALITY_POOR
+    RATE_BUYVALUE_ITEM_NORMAL,                                  // ITEM_QUALITY_NORMAL
+    RATE_BUYVALUE_ITEM_UNCOMMON,                                // ITEM_QUALITY_UNCOMMON
+    RATE_BUYVALUE_ITEM_RARE,                                    // ITEM_QUALITY_RARE
+    RATE_BUYVALUE_ITEM_EPIC,                                    // ITEM_QUALITY_EPIC
+    RATE_BUYVALUE_ITEM_LEGENDARY,                               // ITEM_QUALITY_LEGENDARY
+    RATE_BUYVALUE_ITEM_ARTIFACT,                                // ITEM_QUALITY_ARTIFACT
+    RATE_BUYVALUE_ITEM_HEIRLOOM,                                // ITEM_QUALITY_HEIRLOOM
+};
+
+ServerConfigs const qualityToSellValueConfig[MAX_ITEM_QUALITY] =
+{
+    RATE_SELLVALUE_ITEM_POOR,                                   // ITEM_QUALITY_POOR
+    RATE_SELLVALUE_ITEM_NORMAL,                                 // ITEM_QUALITY_NORMAL
+    RATE_SELLVALUE_ITEM_UNCOMMON,                               // ITEM_QUALITY_UNCOMMON
+    RATE_SELLVALUE_ITEM_RARE,                                   // ITEM_QUALITY_RARE
+    RATE_SELLVALUE_ITEM_EPIC,                                   // ITEM_QUALITY_EPIC
+    RATE_SELLVALUE_ITEM_LEGENDARY,                              // ITEM_QUALITY_LEGENDARY
+    RATE_SELLVALUE_ITEM_ARTIFACT,                               // ITEM_QUALITY_ARTIFACT
+    RATE_SELLVALUE_ITEM_HEIRLOOM,                               // ITEM_QUALITY_HEIRLOOM
+};
+
 void ObjectMgr::LoadItemTemplates()
 {
     uint32 oldMSTime = getMSTime();
@@ -2893,8 +2923,8 @@ void ObjectMgr::LoadItemTemplates()
         itemTemplate.Flags                     = ItemFlags(fields[7].Get<uint32>());
         itemTemplate.Flags2                    = ItemFlags2(fields[8].Get<uint32>());
         itemTemplate.BuyCount                  = uint32(fields[9].Get<uint8>());
-        itemTemplate.BuyPrice                  = int32(fields[10].Get<int64>() * sWorld->getRate((Rates)(RATE_BUYVALUE_ITEM_POOR + itemTemplate.Quality)));
-        itemTemplate.SellPrice                 = uint32(fields[11].Get<uint32>() * sWorld->getRate((Rates)(RATE_SELLVALUE_ITEM_POOR + itemTemplate.Quality)));
+        itemTemplate.BuyPrice                  = int32(fields[10].Get<int64>());
+        itemTemplate.SellPrice                 = uint32(fields[11].Get<uint32>());
         itemTemplate.InventoryType             = uint32(fields[12].Get<uint8>());
         itemTemplate.AllowableClass            = fields[13].Get<int32>();
         itemTemplate.AllowableRace             = fields[14].Get<int32>();
@@ -2982,7 +3012,7 @@ void ObjectMgr::LoadItemTemplates()
         itemTemplate.Duration                = fields[129].Get<uint32>();
         itemTemplate.ItemLimitCategory       = uint32(fields[130].Get<int16>());
         itemTemplate.HolidayId               = fields[131].Get<uint32>();
-        itemTemplate.ScriptId                = sObjectMgr->GetScriptId(fields[132].Get<std::string>());
+        itemTemplate.ScriptId                = GetScriptId(fields[132].Get<std::string>());
         itemTemplate.DisenchantID            = fields[133].Get<uint32>();
         itemTemplate.FoodType                = uint32(fields[134].Get<uint8>());
         itemTemplate.MinMoneyLoot            = fields[135].Get<uint32>();
@@ -3376,6 +3406,10 @@ void ObjectMgr::LoadItemTemplates()
             itemTemplate.FlagsCu = static_cast<ItemFlagsCustom>(static_cast<uint32>(itemTemplate.FlagsCu) & ~ITEM_FLAGS_CU_DURATION_REAL_TIME);
         }
 
+        // Set after checks to ensure valid item quality
+        itemTemplate.BuyPrice *= sWorld->getRate(qualityToBuyValueConfig[itemTemplate.Quality]);
+        itemTemplate.SellPrice *= sWorld->getRate(qualityToSellValueConfig[itemTemplate.Quality]);
+
         // Fill categories map
         for (uint8 i = 0; i < MAX_ITEM_PROTO_SPELLS; ++i)
             if (itemTemplate.Spells[i].SpellId && itemTemplate.Spells[i].SpellCategory && itemTemplate.Spells[i].SpellCategoryCooldown)
@@ -3536,7 +3570,7 @@ void ObjectMgr::LoadItemSetNames()
         {
             uint32 entry = *itr;
             // add data from item_template if available
-            pProto = sObjectMgr->GetItemTemplate(entry);
+            pProto = GetItemTemplate(entry);
             if (pProto)
             {
                 LOG_ERROR("sql.sql", "Item set part (Entry: {}) does not have entry in `item_set_names`, adding data from `item_template`.", entry);
@@ -3583,13 +3617,13 @@ void ObjectMgr::LoadVehicleTemplateAccessories()
         uint8  uiSummonType = fields[4].Get<uint8>();
         uint32 uiSummonTimer = fields[5].Get<uint32>();
 
-        if (!sObjectMgr->GetCreatureTemplate(uiEntry))
+        if (!GetCreatureTemplate(uiEntry))
         {
             LOG_ERROR("sql.sql", "Table `vehicle_template_accessory`: creature template entry {} does not exist.", uiEntry);
             continue;
         }
 
-        if (!sObjectMgr->GetCreatureTemplate(uiAccessory))
+        if (!GetCreatureTemplate(uiAccessory))
         {
             LOG_ERROR("sql.sql", "Table `vehicle_template_accessory`: Accessory {} does not exist.", uiAccessory);
             continue;
@@ -3639,7 +3673,7 @@ void ObjectMgr::LoadVehicleAccessories()
         uint8  uiSummonType = fields[4].Get<uint8>();
         uint32 uiSummonTimer = fields[5].Get<uint32>();
 
-        if (!sObjectMgr->GetCreatureTemplate(uiAccessory))
+        if (!GetCreatureTemplate(uiAccessory))
         {
             LOG_ERROR("sql.sql", "Table `vehicle_accessory`: Accessory {} does not exist.", uiAccessory);
             continue;
@@ -3731,7 +3765,7 @@ void ObjectMgr::LoadPetLevelInfo()
         Field* fields = result->Fetch();
 
         uint32 creature_id = fields[0].Get<uint32>();
-        if (!sObjectMgr->GetCreatureTemplate(creature_id))
+        if (!GetCreatureTemplate(creature_id))
         {
             LOG_ERROR("sql.sql", "Wrong creature id {} in `pet_levelstats` table, ignoring.", creature_id);
             continue;
@@ -4964,7 +4998,7 @@ void ObjectMgr::LoadQuests()
 
         if (qinfo->StartItem)
         {
-            if (!sObjectMgr->GetItemTemplate(qinfo->StartItem))
+            if (!GetItemTemplate(qinfo->StartItem))
             {
                 LOG_ERROR("sql.sql", "Quest {} has `StartItem` = {} but item with entry {} does not exist, quest can't be done.",
                                  qinfo->GetQuestId(), qinfo->StartItem, qinfo->StartItem);
@@ -5015,7 +5049,7 @@ void ObjectMgr::LoadQuests()
 
                 qinfo->SetSpecialFlag(QUEST_SPECIAL_FLAGS_DELIVER);
 
-                if (!sObjectMgr->GetItemTemplate(id))
+                if (!GetItemTemplate(id))
                 {
                     LOG_ERROR("sql.sql", "Quest {} has `RequiredItemId{}` = {} but item with entry {} does not exist, quest can't be done.",
                                      qinfo->GetQuestId(), j + 1, id, id);
@@ -5035,7 +5069,7 @@ void ObjectMgr::LoadQuests()
             uint32 id = qinfo->ItemDrop[j];
             if (id)
             {
-                if (!sObjectMgr->GetItemTemplate(id))
+                if (!GetItemTemplate(id))
                 {
                     LOG_ERROR("sql.sql", "Quest {} has `ItemDrop{}` = {} but item with entry {} does not exist, quest can't be done.",
                                      qinfo->GetQuestId(), j + 1, id, id);
@@ -5056,14 +5090,14 @@ void ObjectMgr::LoadQuests()
         for (uint8 j = 0; j < QUEST_OBJECTIVES_COUNT; ++j)
         {
             int32 id = qinfo->RequiredNpcOrGo[j];
-            if (id < 0 && !sObjectMgr->GetGameObjectTemplate(-id))
+            if (id < 0 && !GetGameObjectTemplate(-id))
             {
                 LOG_ERROR("sql.sql", "Quest {} has `RequiredNpcOrGo{}` = {} but gameobject {} does not exist, quest can't be done.",
                                  qinfo->GetQuestId(), j + 1, id, uint32(-id));
                 qinfo->RequiredNpcOrGo[j] = 0;            // quest can't be done for this requirement
             }
 
-            if (id > 0 && !sObjectMgr->GetCreatureTemplate(id))
+            if (id > 0 && !GetCreatureTemplate(id))
             {
                 LOG_ERROR("sql.sql", "Quest {} has `RequiredNpcOrGo{}` = {} but creature with entry {} does not exist, quest can't be done.",
                                  qinfo->GetQuestId(), j + 1, id, uint32(id));
@@ -5096,7 +5130,7 @@ void ObjectMgr::LoadQuests()
             uint32 id = qinfo->RewardChoiceItemId[j];
             if (id)
             {
-                if (!sObjectMgr->GetItemTemplate(id))
+                if (!GetItemTemplate(id))
                 {
                     LOG_ERROR("sql.sql", "Quest {} has `RewardChoiceItemId{}` = {} but item with entry {} does not exist, quest will not reward this item.",
                                      qinfo->GetQuestId(), j + 1, id, id);
@@ -5142,7 +5176,7 @@ void ObjectMgr::LoadQuests()
             uint32 id = qinfo->RewardItemId[j];
             if (id)
             {
-                if (!sObjectMgr->GetItemTemplate(id))
+                if (!GetItemTemplate(id))
                 {
                     LOG_ERROR("sql.sql", "Quest {} has `RewardItemId{}` = {} but item with entry {} does not exist, quest will not reward this item.",
                                      qinfo->GetQuestId(), j + 1, id, id);
@@ -5726,7 +5760,7 @@ void ObjectMgr::LoadEventScripts()
 
     std::set<uint32> evt_scripts;
     // Load all possible script entries from gameobjects
-    GameObjectTemplateContainer const* gotc = sObjectMgr->GetGameObjectTemplates();
+    GameObjectTemplateContainer const* gotc = GetGameObjectTemplates();
     for (GameObjectTemplateContainer::const_iterator itr = gotc->begin(); itr != gotc->end(); ++itr)
         if (uint32 eventId = itr->second.GetEventScriptId())
             evt_scripts.insert(eventId);
@@ -6035,7 +6069,7 @@ void ObjectMgr::LoadInstanceTemplate()
 
         instanceTemplate.AllowMount = fields[3].Get<bool>();
         instanceTemplate.Parent     = uint32(fields[1].Get<uint16>());
-        instanceTemplate.ScriptId   = sObjectMgr->GetScriptId(fields[2].Get<std::string>());
+        instanceTemplate.ScriptId   = GetScriptId(fields[2].Get<std::string>());
 
         _instanceTemplateStore[mapID] = instanceTemplate;
 
@@ -6481,14 +6515,14 @@ void ObjectMgr::LoadQuestGreetings()
         switch (type)
         {
             case 0: // Creature
-                if (!sObjectMgr->GetCreatureTemplate(id))
+                if (!GetCreatureTemplate(id))
                 {
                     LOG_ERROR("sql.sql", "Table `quest_greeting`: creature template entry {} does not exist.", id);
                     continue;
                 }
                 break;
             case 1: // GameObject
-                if (!sObjectMgr->GetGameObjectTemplate(id))
+                if (!GetGameObjectTemplate(id))
                 {
                     LOG_ERROR("sql.sql", "Table `quest_greeting`: gameobject template entry {} does not exist.", id);
                     continue;
@@ -6534,14 +6568,14 @@ void ObjectMgr::LoadQuestGreetingsLocales()
         switch (type)
         {
         case 0: // Creature
-            if (!sObjectMgr->GetCreatureTemplate(id))
+            if (!GetCreatureTemplate(id))
             {
                 LOG_ERROR("sql.sql", "Table `quest_greeting_locale`: creature template entry {} does not exist.", id);
                 continue;
             }
             break;
         case 1: // GameObject
-            if (!sObjectMgr->GetGameObjectTemplate(id))
+            if (!GetGameObjectTemplate(id))
             {
                 LOG_ERROR("sql.sql", "Table `quest_greeting_locale`: gameobject template entry {} does not exist.", id);
                 continue;
@@ -7543,7 +7577,7 @@ void ObjectMgr::LoadGameObjectTemplateAddons()
 
         uint32 entry = fields[0].Get<uint32>();
 
-        GameObjectTemplate const* got = sObjectMgr->GetGameObjectTemplate(entry);
+        GameObjectTemplate const* got = GetGameObjectTemplate(entry);
         if (!got)
         {
             LOG_ERROR("sql.sql",
@@ -8188,7 +8222,7 @@ void ObjectMgr::LoadNPCSpellClickSpells()
 
     // all spellclick data loaded, now we check if there are creatures with NPC_FLAG_SPELLCLICK but with no data
     // NOTE: It *CAN* be the other way around: no spellclick flag but with spellclick data, in case of creature-only vehicle accessories
-    CreatureTemplateContainer const* ctc = sObjectMgr->GetCreatureTemplates();
+    CreatureTemplateContainer const* ctc = GetCreatureTemplates();
     for (CreatureTemplateContainer::const_iterator itr = ctc->begin(); itr != ctc->end(); ++itr)
     {
         if ((itr->second.npcflag & UNIT_NPC_FLAG_SPELLCLICK) && _spellClickInfoStore.find(itr->second.Entry) == _spellClickInfoStore.end())
@@ -8713,7 +8747,7 @@ void ObjectMgr::LoadGameObjectForQuests()
 {
     uint32 oldMSTime = getMSTime();
 
-    if (sObjectMgr->GetGameObjectTemplates()->empty())
+    if (GetGameObjectTemplates()->empty())
     {
         LOG_WARN("server.loading", ">> Loaded 0 GameObjects for quests");
         LOG_INFO("server.loading", " ");
@@ -8723,7 +8757,7 @@ void ObjectMgr::LoadGameObjectForQuests()
     uint32 count = 0;
 
     // collect GO entries for GO that must activated
-    GameObjectTemplateContainer* gotc = const_cast<GameObjectTemplateContainer*>(sObjectMgr->GetGameObjectTemplates());
+    GameObjectTemplateContainer* gotc = const_cast<GameObjectTemplateContainer*>(GetGameObjectTemplates());
     for (GameObjectTemplateContainer::iterator itr = gotc->begin(); itr != gotc->end(); ++itr)
     {
         itr->second.IsForQuests = false;
@@ -9632,7 +9666,7 @@ bool ObjectMgr::RemoveVendorItem(uint32 entry, uint32 item, bool persist /*= tru
 bool ObjectMgr::IsVendorItemValid(uint32 vendor_entry, uint32 item_id, int32 maxcount, uint32 incrtime, uint32 ExtendedCost, Player* player, std::set<uint32>* /*skip_vendors*/, uint32 /*ORnpcflag*/) const
 {
     /*
-    CreatureTemplate const* cInfo = sObjectMgr->GetCreatureTemplate(vendor_entry);
+    CreatureTemplate const* cInfo = GetCreatureTemplate(vendor_entry);
     if (!cInfo)
     {
         if (player)
@@ -10006,7 +10040,7 @@ void ObjectMgr::LoadCreatureClassLevelStats()
         ++count;
     } while (result->NextRow());
 
-    CreatureTemplateContainer const* ctc = sObjectMgr->GetCreatureTemplates();
+    CreatureTemplateContainer const* ctc = GetCreatureTemplates();
     for (CreatureTemplateContainer::const_iterator itr = ctc->begin(); itr != ctc->end(); ++itr)
     {
         for (uint16 lvl = itr->second.minlevel; lvl <= itr->second.maxlevel; ++lvl)
@@ -10114,9 +10148,9 @@ void ObjectMgr::LoadFactionChangeQuests()
         uint32 alliance = fields[0].Get<uint32>();
         uint32 horde = fields[1].Get<uint32>();
 
-        if (!sObjectMgr->GetQuestTemplate(alliance))
+        if (!GetQuestTemplate(alliance))
             LOG_ERROR("sql.sql", "Quest {} (alliance_id) referenced in `player_factionchange_quests` does not exist, pair skipped!", alliance);
-        else if (!sObjectMgr->GetQuestTemplate(horde))
+        else if (!GetQuestTemplate(horde))
             LOG_ERROR("sql.sql", "Quest {} (horde_id) referenced in `player_factionchange_quests` does not exist, pair skipped!", horde);
         else
             FactionChangeQuests[alliance] = horde;

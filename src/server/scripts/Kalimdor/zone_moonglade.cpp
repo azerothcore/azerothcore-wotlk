@@ -15,21 +15,6 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-/* ScriptData
-SDName: Moonglade
-SD%Complete: 100
-SDComment: Quest support: 30, 272, 5929, 5930, 10965. Special Flight Paths for Druid class.
-SDCategory: Moonglade
-EndScriptData */
-
-/* ContentData
-npc_bunthen_plainswind
-npc_great_bear_spirit
-npc_silva_filnaveth
-npc_clintar_spirit
-npc_clintar_dreamwalker
-EndContentData */
-
 #include "Cell.h"
 #include "CreatureScript.h"
 #include "GridNotifiers.h"

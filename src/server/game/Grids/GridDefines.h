@@ -52,7 +52,7 @@ class ObjectGuid;
 #define MAP_HALFSIZE            (MAP_SIZE/2)
 
 // Creature used instead pet to simplify *::Visit templates (not required duplicate code for Creature->Pet case)
-typedef TYPELIST_5(GameObject, Player, Creature/*pets*/, Corpse/*resurrectable*/, DynamicObject/*farsight target*/) AllWorldObjectTypes;
+typedef TYPELIST_4(GameObject, Player, Creature/*pets*/, Corpse/*resurrectable*/) AllWorldObjectTypes;
 typedef TYPELIST_4(GameObject, Creature/*except pets*/, DynamicObject, Corpse/*Bones*/) AllGridObjectTypes;
 typedef TYPELIST_5(Creature, GameObject, DynamicObject, Pet, Corpse) AllMapStoredObjectTypes;
 
@@ -172,8 +172,8 @@ namespace Acore
     template<class RET_TYPE, int CENTER_VAL>
     inline RET_TYPE Compute(float x, float y, float size)
     {
-        int gx = (int)(CENTER_VAL - x / size);
-        int gy = (int)(CENTER_VAL - y / size);
+        int gx = std::max<int>(0, (CENTER_VAL - x / size));
+        int gy = std::max<int>(0, (CENTER_VAL - y / size));
 
         return RET_TYPE(gx, gy);
     }

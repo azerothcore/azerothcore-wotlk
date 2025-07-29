@@ -31,7 +31,7 @@
 
 int32 PetAI::Permissible(Creature const* creature)
 {
-    if (creature->HasUnitTypeMask(UNIT_MASK_CONTROLABLE_GUARDIAN))
+    if (creature->HasUnitTypeMask(UNIT_MASK_CONTROLLABLE_GUARDIAN))
     {
         if (reinterpret_cast<Guardian const*>(creature)->GetOwner()->IsPlayer())
             return PERMIT_BASE_PROACTIVE;
@@ -280,6 +280,14 @@ void PetAI::UpdateAI(uint32 diff)
                         targetSpellStore.emplace_back(target, spell);
                         spellUsed = true;
                     }
+                }
+
+                if (spellInfo->HasEffect(SPELL_EFFECT_JUMP_DEST))
+                {
+                    if (!spellUsed)
+                        delete spell;
+
+                    continue; // Pets must only jump to target
                 }
 
                 // No enemy, check friendly

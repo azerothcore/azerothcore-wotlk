@@ -1,8 +1,8 @@
--- MySQL dump 10.13  Distrib 8.0.34, for Win64 (x86_64)
+-- MySQL dump 10.13  Distrib 8.4.3, for Win64 (x86_64)
 --
--- Host: 127.0.0.1    Database: acore_world
+-- Host: localhost    Database: acore_world
 -- ------------------------------------------------------
--- Server version	8.0.34
+-- Server version	8.4.3
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
 /*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
@@ -26,9 +26,7 @@ CREATE TABLE `pool_creature` (
   `chance` float NOT NULL DEFAULT '0',
   `description` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   PRIMARY KEY (`guid`),
-
   KEY `idx_guid` (`guid`),
-
   CONSTRAINT `pool_creature_chk_1` CHECK ((`chance` >= 0))
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
@@ -355,6 +353,18 @@ INSERT INTO `pool_creature` VALUES
 (91113,1072,0,'Mirelow (14424) - Spawn 1'),
 (91119,1550,0,'BRD Lyceum shadowforge flame keepers'),
 (91120,1550,0,'BRD Lyceum shadowforge flame keepers'),
+(100400,22412,0,'Azure Spellbinder/Inquisitor (2-2)'),
+(100402,22413,0,'Azure Spellbinder/Inquisitor (2-2)'),
+(100404,22411,0,'Azure Spellbinder/Inquisitor (2-2)'),
+(100405,22408,0,'Azure Spellbinder/Inquisitor (1-2)'),
+(100406,22409,0,'Azure Spellbinder/Inquisitor (1-2)'),
+(100409,22410,0,'Azure Spellbinder/Inquisitor (1-2)'),
+(100411,22411,0,'Azure Spellbinder/Inquisitor (1-2)'),
+(100414,22412,0,'Azure Spellbinder/Inquisitor (1-2)'),
+(100415,22413,0,'Azure Spellbinder/Inquisitor (1-2)'),
+(100416,22409,0,'Azure Spellbinder/Inquisitor (2-2)'),
+(100418,22408,0,'Azure Spellbinder/Inquisitor (2-2)'),
+(100419,22410,0,'Azure Spellbinder/Inquisitor (2-2)'),
 (100861,1076,0,'Crippler (18689)'),
 (100862,1076,0,'Crippler (18689)'),
 (100863,1076,0,'Crippler (18689)'),
@@ -366,6 +376,50 @@ INSERT INTO `pool_creature` VALUES
 (100869,1081,0,'Hemathion (18692)'),
 (100870,1081,0,'Hemathion (18692)'),
 (112864,201212,0,'Serfex the Reaver 4'),
+(128910,22399,0,'Citizen of Havenshire (2/2)'),
+(128911,22400,0,'Citizen of Havenshire (2/2)'),
+(128912,22401,0,'Citizen of Havenshire (2/2)'),
+(128913,22402,0,'Citizen of Havenshire (2/2)'),
+(128914,22403,0,'Citizen of Havenshire (2/2)'),
+(128915,22404,0,'Citizen of Havenshire (2/2)'),
+(128916,22396,0,'Citizen of Havenshire (2/2)'),
+(128917,22405,0,'Citizen of Havenshire (2/2)'),
+(128918,22406,0,'Citizen of Havenshire (2/2)'),
+(128919,22407,0,'Citizen of Havenshire (2/2)'),
+(128920,22395,0,'Citizen of Havenshire (2/2)'),
+(128922,22386,0,'Citizen of Havenshire (1/2)'),
+(128924,22390,0,'Citizen of Havenshire (2/2)'),
+(128926,22394,0,'Citizen of Havenshire (2/2)'),
+(128927,22387,0,'Citizen of Havenshire (1/2)'),
+(128928,22388,0,'Citizen of Havenshire (1/2)'),
+(128929,22392,0,'Citizen of Havenshire (2/2)'),
+(128930,22389,0,'Citizen of Havenshire (1/2)'),
+(128934,22393,0,'Citizen of Havenshire (2/2)'),
+(128935,22397,0,'Citizen of Havenshire (2/2)'),
+(128948,22398,0,'Citizen of Havenshire (2/2)'),
+(128954,22391,0,'Citizen of Havenshire (2/2)'),
+(128958,22399,0,'Citizen of Havenshire (1/2)'),
+(128959,22400,0,'Citizen of Havenshire (1/2)'),
+(128960,22401,0,'Citizen of Havenshire (1/2)'),
+(128961,22402,0,'Citizen of Havenshire (1/2)'),
+(128962,22403,0,'Citizen of Havenshire (1/2)'),
+(128963,22404,0,'Citizen of Havenshire (1/2)'),
+(128964,22405,0,'Citizen of Havenshire (1/2)'),
+(128965,22406,0,'Citizen of Havenshire (1/2)'),
+(128966,22389,0,'Citizen of Havenshire (2/2)'),
+(128967,22407,0,'Citizen of Havenshire (1/2)'),
+(128968,22395,0,'Citizen of Havenshire (1/2)'),
+(128970,22388,0,'Citizen of Havenshire (2/2)'),
+(128973,22390,0,'Citizen of Havenshire (1/2)'),
+(128976,22391,0,'Citizen of Havenshire (1/2)'),
+(128978,22392,0,'Citizen of Havenshire (1/2)'),
+(128979,22386,0,'Citizen of Havenshire (2/2)'),
+(128980,22393,0,'Citizen of Havenshire (1/2)'),
+(128981,22394,0,'Citizen of Havenshire (1/2)'),
+(128986,22387,0,'Citizen of Havenshire (2/2)'),
+(128991,22397,0,'Citizen of Havenshire (1/2)'),
+(128992,22398,0,'Citizen of Havenshire (1/2)'),
+(128993,22396,0,'Citizen of Havenshire (1/2)'),
 (129214,22383,0,'Havenshire Stallion (28605)'),
 (129235,22383,0,'Havenshire Mare (28606)'),
 (129236,22383,0,'Havenshire Mare (28606)'),
@@ -1655,5 +1709,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2024-12-17 22:34:19
-
+-- Dump completed on 2025-07-19 12:09:27
