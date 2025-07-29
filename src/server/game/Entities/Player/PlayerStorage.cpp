@@ -4620,11 +4620,11 @@ void Player::ApplyEnchantment(Item* item, EnchantmentSlot slot, bool apply, bool
                         case ITEM_MOD_SPELL_HEALING_DONE:
                             ApplySpellHealingBonus(enchant_amount, apply);
                             LOG_DEBUG("entities.player.items", "+ {} SPELL_HEALING", enchant_amount);
-                             break;
-                         case ITEM_MOD_SPELL_DAMAGE_DONE:
-                             ApplySpellDamageBonus(enchant_amount, apply);
-                             LOG_DEBUG("entities.player.items", "+ {} SPELL_DAMAGE", enchant_amount);
-                             break;
+                            break;
+                        case ITEM_MOD_SPELL_DAMAGE_DONE:
+                            ApplySpellDamageBonus(enchant_amount, apply);
+                            LOG_DEBUG("entities.player.items", "+ {} SPELL_DAMAGE", enchant_amount);
+                            break;
                         default:
                             break;
                     }
