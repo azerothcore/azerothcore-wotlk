@@ -1089,7 +1089,10 @@ void Creature::DoFleeToGetAssistance()
             //TODO: use 31365
             SetControlled(true, UNIT_STATE_FLEEING, GetVictim());
         else
+        {
+            UpdateLeashExtensionTime();
             GetMotionMaster()->MoveSeekAssistance(creature->GetPositionX(), creature->GetPositionY(), creature->GetPositionZ());
+        }
     }
 }
 
