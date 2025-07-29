@@ -11224,7 +11224,7 @@ void Unit::RemovePlayerFromVision(Player* player)
     m_sharedVision.remove(player);
     player->m_isInSharedVisionOf.erase(this);
 
-    // @TODO: This isn't right, if a previously active object was set to active with e.g. Mind Vision this will make them no longer active
+    /// @todo: This isn't right, if a previously active object was set to active with e.g. Mind Vision this will make them no longer active
     if (m_sharedVision.empty())
         setActive(false);
 }
