@@ -1,3 +1,4 @@
+-- DB update 2025_07_29_02 -> 2025_07_29_03
 --
 DELETE FROM `command` WHERE `name` = "go gameobject";
 INSERT INTO `command` (`name`, `security`, `help`) VALUES
