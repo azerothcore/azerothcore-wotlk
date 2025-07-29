@@ -10424,31 +10424,6 @@ bool Unit::Attack(Unit* victim, bool meleeAttack)
     if (meleeAttack)
         AddUnitState(UNIT_STATE_MELEE_ATTACKING);
 
-    Unit* owner = GetCharmerOrOwner();
-    Creature* ownerCreature = owner ? owner->ToCreature() : nullptr;
-    Creature* controlledCreatureWithSameVictim = nullptr;
-    if (creature && !m_Controlled.empty())
-    {
-        for (ControlSet::iterator itr = m_Controlled.begin(); itr != m_Controlled.end(); ++itr)
-        {
-            if ((*itr)->ToCreature() && (*itr)->GetVictim() == victim)
-            {
-                controlledCreatureWithSameVictim = (*itr)->ToCreature();
-                break;
-            }
-        }
-    }
-
-    // Share leash timer with controlled unit
-    if (controlledCreatureWithSameVictim)
-        creature->SetLastLeashExtensionTimePtr(controlledCreatureWithSameVictim->GetLastLeashExtensionTimePtr());
-    // Share leash timer with owner
-    else if (creature && ownerCreature && ownerCreature->GetVictim() == victim)
-        creature->SetLastLeashExtensionTimePtr(ownerCreature->GetLastLeashExtensionTimePtr());
-    // Update leash timer when attacking creatures
-    else if (victim->IsCreature())
-        victim->ToCreature()->UpdateLeashExtensionTime();
-
     // set position before any AI calls/assistance
     //if (IsCreature())
     //    ToCreature()->SetCombatStartPosition(GetPositionX(), GetPositionY(), GetPositionZ());
@@ -13759,10 +13734,6 @@ void Unit::CombatStart(Unit* victim, bool initialAggro)
         SetInCombatWith(victim);
         victim->SetInCombatWith(this);
 
-        // Update leash timer when attacking creatures
-        if (victim->IsCreature() && this != victim)
-            victim->ToCreature()->UpdateLeashExtensionTime();
-
         // Xinef: If pet started combat - put owner in combat
         if (!alreadyInCombat && IsInCombat())
         {
@@ -13799,12 +13770,6 @@ void Unit::CombatStartOnCast(Unit* target, bool initialAggro, uint32 duration)
         // Xinef: If pet started combat - put owner in combat
         if (Unit* owner = GetOwner())
             owner->SetInCombatWith(target, duration);
-
-        // Update leash timer when attacking creatures
-        if (target->IsCreature())
-            target->ToCreature()->UpdateLeashExtensionTime();
-        else if (ToCreature()) // Reset leash if it is a spell caster, else it may evade inbetween casts
-            ToCreature()->UpdateLeashExtensionTime();
     }
 
     Unit* who = target->GetCharmerOrOwnerOrSelf();
