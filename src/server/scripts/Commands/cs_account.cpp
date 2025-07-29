@@ -69,12 +69,20 @@ public:
             { "country",    HandleAccountRemoveLockCountryCommand,  SEC_ADMINISTRATOR, Console::Yes },
         };
 
+        static ChatCommandTable accountFlagCommandTable =
+        {
+            { "add",        HandleAccountFlagAddCommand,    SEC_CONSOLE, Console::Yes },
+            { "remove",     HandleAccountFlagRemoveCommand, SEC_CONSOLE, Console::Yes },
+            { "list",       HandleAccountFlagListCommand,   SEC_CONSOLE, Console::Yes }
+        };
+
         static ChatCommandTable accountCommandTable =
         {
             { "2fa",        account2faCommandTable                                       },
             { "addon",      HandleAccountAddonCommand,       SEC_MODERATOR, Console::No  },
             { "create",     HandleAccountCreateCommand,      SEC_CONSOLE,   Console::Yes },
             { "delete",     HandleAccountDeleteCommand,      SEC_CONSOLE,   Console::Yes },
+            { "flag",       accountFlagCommandTable,                                     },
             { "onlinelist", HandleAccountOnlineListCommand,  SEC_CONSOLE,   Console::Yes },
             { "lock",       accountLockCommandTable                                      },
             { "set",        accountSetCommandTable                                       },
@@ -89,6 +97,77 @@ public:
         };
 
         return commandTable;
+    }
+
+    static bool HandleAccountFlagAddCommand(ChatHandler* handler, uint32 flag, Optional<PlayerIdentifier> target)
+    {
+        if (!target)
+            target = PlayerIdentifier::FromTargetOrSelf(handler);
+
+        if (!target)
+            return false;
+
+        if (!flag || (flag & ~ACCOUNT_FLAGS_ALL) != 0)
+        {
+            handler->PSendSysMessage("Invalid account flag: {}.", flag);
+            return false;
+        }
+
+        Player* playerTarget = target->GetConnectedPlayer();
+        if (!playerTarget)
+            return false;
+
+        playerTarget->GetSession()->UpdateAccountFlag(flag);
+        for (uint8 i = 0; i < MAX_ACCOUNT_FLAG; i++)
+            if (flag & static_cast<uint32>(accountFlagText[i].flag))
+                handler->PSendSysMessage("Account flag {} added to player {}.", accountFlagText[i].text, playerTarget->GetName());
+        return true;
+    }
+
+    static bool HandleAccountFlagRemoveCommand(ChatHandler* handler, uint32 flag, Optional<PlayerIdentifier> target)
+    {
+        if (!target)
+            target = PlayerIdentifier::FromTargetOrSelf(handler);
+
+        if (!target)
+            return false;
+
+        if ((flag & ~ACCOUNT_FLAGS_ALL) != 0)
+        {
+            handler->PSendSysMessage("Invalid account flag: {}.", flag);
+            return false;
+        }
+
+        Player* playerTarget = target->GetConnectedPlayer();
+        if (playerTarget)
+        {
+            playerTarget->GetSession()->UpdateAccountFlag(flag, true);
+            handler->PSendSysMessage("Account flag removed.");
+            return true;
+        }
+
+        return false;
+    }
+
+    static bool HandleAccountFlagListCommand(ChatHandler* handler, Optional<PlayerIdentifier> target)
+    {
+        if (!target)
+            target = PlayerIdentifier::FromTargetOrSelf(handler);
+
+        if (!target)
+            return false;
+
+        Player* playerTarget = target->GetConnectedPlayer();
+        if (playerTarget)
+        {
+            uint32 accountFlags = playerTarget->GetSession()->GetAccountFlags();
+            handler->PSendSysMessage(LANG_ACCOUNT_FLAGS_PINFO);
+            for (uint8 i = 0; i < MAX_ACCOUNT_FLAG; i++)
+                if (accountFlags & static_cast<uint32>(accountFlagText[i].flag))
+                    handler->PSendSysMessage(LANG_SUBCMDS_LIST_ENTRY, accountFlagText[i].text);
+        }
+
+        return false;
     }
 
     static bool HandleAccount2FASetupCommand(ChatHandler* handler, char const* args)
