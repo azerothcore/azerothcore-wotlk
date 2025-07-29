@@ -1,3 +1,4 @@
+-- DB update 2025_07_29_01 -> 2025_07_29_02
 -- improved shadow bolt into spell crit debuff
 DELETE FROM `spell_group` WHERE `id` = 1010 AND `spell_id` IN (17800);
 INSERT INTO `spell_group` VALUES (1010, 17800, 0);
