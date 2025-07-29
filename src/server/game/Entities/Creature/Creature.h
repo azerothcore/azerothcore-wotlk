@@ -388,7 +388,7 @@ public:
     void SetLastLeashExtensionTimePtr(std::shared_ptr<time_t> const& timer);
     void ClearLastLeashExtensionTimePtr();
     time_t GetLastLeashExtensionTime() const;
-    void UpdateLeashExtensionTime();
+    void UpdateLeashExtensionTime() const;
     uint8 GetLeashTimer() const;
 
     bool IsFreeToMove();
