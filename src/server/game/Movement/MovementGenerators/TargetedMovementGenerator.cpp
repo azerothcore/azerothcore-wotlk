@@ -84,7 +84,7 @@ bool ChaseMovementGenerator<T>::DoUpdate(T* owner, uint32 time_diff)
             if (isStoppedBecauseOfCasting)
             {
                 // Don't reset leash timer if it's a spell like Shoot with a short cast time.
-                // @TODO: Research how it should actually work.
+                /// @todo: Research how it should actually work.
                 Spell *spell = cOwner->GetFirstCurrentCastingSpell();
                 bool spellHasLongCast = spell && spell->GetCastTime() > 1 * SECOND * IN_MILLISECONDS;
                 if (spellHasLongCast)
