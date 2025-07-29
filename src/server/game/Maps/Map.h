@@ -306,7 +306,6 @@ public:
     }
 
     void AddObjectToRemoveList(WorldObject* obj);
-    void AddObjectToSwitchList(WorldObject* obj, bool on);
     virtual void DelayedUpdate(const uint32 diff);
 
     void resetMarkedCells() { marked_cells.reset(); }
@@ -327,8 +326,7 @@ public:
     //per-map script storage
     void ScriptsStart(std::map<uint32, std::multimap<uint32, ScriptInfo> > const& scripts, uint32 id, Object* source, Object* target);
     void ScriptCommandStart(ScriptInfo const& script, uint32 delay, Object* source, Object* target);
-
-    template<class T> void SwitchGridContainers(T* obj, bool on);
+    
     CreatureGroupHolderType CreatureGroupHolder;
 
     void UpdateIteratorBack(Player* player);
@@ -562,7 +560,6 @@ private:
 
     bool i_scriptLock;
     std::unordered_set<WorldObject*> i_objectsToRemove;
-    std::map<WorldObject*, bool> i_objectsToSwitch;
     std::unordered_set<WorldObject*> i_worldObjects;
 
     typedef std::multimap<time_t, ScriptAction> ScriptScheduleMap;
