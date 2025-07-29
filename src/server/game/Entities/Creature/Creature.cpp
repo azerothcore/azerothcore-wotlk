@@ -801,7 +801,7 @@ void Creature::Update(uint32 diff)
                 // Periodically check if able to move, if not, extend leash timer
                 if (diff >= m_extendLeashTime)
                 {
-                    if (!CanFreeMove())
+                    if (HasUnitState(UNIT_STATE_LOST_CONTROL))
                         UpdateLeashExtensionTime();
                     m_extendLeashTime = EXTEND_LEASH_CHECK_INTERVAL;
                 }
@@ -2685,10 +2685,11 @@ bool Creature::CanCreatureAttack(Unit const* victim, bool skipDistCheck) const
 
     float dist = sWorld->getFloatConfig(CONFIG_CREATURE_LEASH_RADIUS);
 
-    if (GetCharmerOrOwner())
+    if (Unit* unit = GetCharmerOrOwner())
     {
-        dist = std::min<float>(GetMap()->GetVisibilityRange() + GetObjectSize() * 2, 150.0f);
-        return IsWithinDist(victim, dist);
+        float visibilityDist = std::min<float>(GetMap()->GetVisibilityRange() + GetObjectSize() * 2, 150.0f);
+        if (!victim->IsWithinDist(unit, visibilityDist))
+            return false;
     }
 
     if (!dist)
