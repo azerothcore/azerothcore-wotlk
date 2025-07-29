@@ -3730,7 +3730,7 @@ time_t Creature::GetLastLeashExtensionTime() const
     return *GetLastLeashExtensionTimePtr();
 }
 
-void Creature::UpdateLeashExtensionTime()
+void Creature::UpdateLeashExtensionTime() const
 {
     (*GetLastLeashExtensionTimePtr()) = GameTime::GetGameTime().count();
 }
