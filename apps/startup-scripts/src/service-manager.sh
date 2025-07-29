@@ -11,8 +11,8 @@ SCRIPT_DIR="$CURRENT_PATH"
 
 ROOT_DIR="$(cd "$CURRENT_PATH/../../.." && pwd)"
 
-# Configuration directory
-CONFIG_DIR="${XDG_CONFIG_HOME:-$HOME/.config}/azerothcore/services"
+# Configuration directory (can be overridden with AC_SERVICE_CONFIG_DIR)
+CONFIG_DIR="${AC_SERVICE_CONFIG_DIR:-${XDG_CONFIG_HOME:-$HOME/.config}/azerothcore/services}"
 REGISTRY_FILE="$CONFIG_DIR/service_registry.json"
 
 # Colors for output
@@ -36,6 +36,195 @@ check_dependencies() {
         echo -e "${RED}Error: jq is required but not installed. Please install jq package.${NC}"
         exit 1
     }
+}
+
+# Registry management functions
+function add_service_to_registry() {
+    local service_name="$1"
+    local provider="$2"
+    local service_type="$3"
+    local bin_path="$4"
+    local args="$5"
+    local systemd_type="$6"
+    local restart_policy="$7"
+    local session_manager="$8"
+    local gdb_enabled="$9"
+    local pm2_opts="${10}"
+    local server_config="${11}"
+
+    # Remove any existing entry with the same service name to avoid duplicates
+    local tmp_file=$(mktemp)
+    jq --arg name "$service_name" 'map(select(.name != $name))' "$REGISTRY_FILE" > "$tmp_file" && mv "$tmp_file" "$REGISTRY_FILE"
+
+    # Add the new entry to the registry
+    tmp_file=$(mktemp)
+    jq --arg name "$service_name" \
+       --arg provider "$provider" \
+       --arg type "$service_type" \
+       --arg bin_path "$bin_path" \
+       --arg args "$args" \
+       --arg created "$(date -Iseconds)" \
+       --arg systemd_type "$systemd_type" \
+       --arg restart_policy "$restart_policy" \
+       --arg session_manager "$session_manager" \
+       --arg gdb_enabled "$gdb_enabled" \
+       --arg pm2_opts "$pm2_opts" \
+       --arg server_config "$server_config" \
+       '. += [{"name": $name, "provider": $provider, "type": $type, "bin_path": $bin_path, "args": $args, "created": $created, "status": "active", "systemd_type": $systemd_type, "restart_policy": $restart_policy, "session_manager": $session_manager, "gdb_enabled": $gdb_enabled, "pm2_opts": $pm2_opts, "server_config": $server_config}]' \
+       "$REGISTRY_FILE" > "$tmp_file" && mv "$tmp_file" "$REGISTRY_FILE"
+
+    echo -e "${GREEN}Service '$service_name' added to registry${NC}"
+}
+
+function remove_service_from_registry() {
+    local service_name="$1"
+    
+    if [ -f "$REGISTRY_FILE" ]; then
+        local tmp_file=$(mktemp)
+        jq --arg name "$service_name" \
+           'map(select(.name != $name))' \
+           "$REGISTRY_FILE" > "$tmp_file" && mv "$tmp_file" "$REGISTRY_FILE"
+        echo -e "${GREEN}Service '$service_name' removed from registry${NC}"
+    fi
+}
+
+function restore_missing_services() {
+    echo -e "${BLUE}Checking for missing services...${NC}"
+    
+    if [ ! -f "$REGISTRY_FILE" ] || [ ! -s "$REGISTRY_FILE" ]; then
+        echo -e "${YELLOW}No services registry found or empty${NC}"
+        return 0
+    fi
+    
+    local missing_services=()
+    local services_count=$(jq length "$REGISTRY_FILE")
+    
+    if [ "$services_count" -eq 0 ]; then
+        echo -e "${YELLOW}No services registered${NC}"
+        return 0
+    fi
+    
+    echo -e "${BLUE}Found $services_count registered services. Checking status...${NC}"
+    
+    # Check each service
+    for i in $(seq 0 $((services_count-1))); do
+        local service=$(jq -r ".[$i]" "$REGISTRY_FILE")
+        local name=$(echo "$service" | jq -r '.name')
+        local provider=$(echo "$service" | jq -r '.provider') 
+        local service_type=$(echo "$service" | jq -r '.type')
+        local bin_path=$(echo "$service" | jq -r '.bin_path // "unknown"')
+        local args=$(echo "$service" | jq -r '.args // ""')
+        local status=$(echo "$service" | jq -r '.status // "active"')
+        local systemd_type=$(echo "$service" | jq -r '.systemd_type // "--user"')
+        local restart_policy=$(echo "$service" | jq -r '.restart_policy // "always"')
+        local session_manager=$(echo "$service" | jq -r '.session_manager // "none"')
+        local gdb_enabled=$(echo "$service" | jq -r '.gdb_enabled // "0"')
+        local pm2_opts=$(echo "$service" | jq -r '.pm2_opts // ""')
+        local server_config=$(echo "$service" | jq -r '.server_config // ""')
+        
+        local service_exists=false
+        
+        if [ "$provider" = "pm2" ]; then
+            if pm2 describe "$name" >/dev/null 2>&1; then
+                service_exists=true
+            fi
+        elif [ "$provider" = "systemd" ]; then
+            local user_unit="${XDG_CONFIG_HOME:-$HOME/.config}/systemd/user/$name.service"
+            local system_unit="/etc/systemd/system/$name.service"
+            if [ -f "$user_unit" ] || [ -f "$system_unit" ]; then
+                # File unit presente, ora puoi anche controllare se è attivo
+                service_exists=true
+            else
+                # File unit mancante: servizio da ricreare!
+                service_exists=false
+            fi
+        fi
+        
+        if [ "$service_exists" = false ]; then
+            missing_services+=("$i")
+            echo -e "${YELLOW}Missing service: $name ($provider)${NC}"
+        else
+            echo -e "${GREEN}✓ Service $name ($provider) exists${NC}"
+        fi
+    done
+    
+    # Handle missing services
+    if [ ${#missing_services[@]} -eq 0 ]; then
+        echo -e "${GREEN}All registered services are present${NC}"
+        return 0
+    fi
+    
+    echo -e "${YELLOW}Found ${#missing_services[@]} missing services${NC}"
+    
+    for index in "${missing_services[@]}"; do
+        local service=$(jq -r ".[$index]" "$REGISTRY_FILE")
+        local name=$(echo "$service" | jq -r '.name')
+        local provider=$(echo "$service" | jq -r '.provider')
+        local service_type=$(echo "$service" | jq -r '.type') 
+        local bin_path=$(echo "$service" | jq -r '.bin_path')
+        local args=$(echo "$service" | jq -r '.args')
+        local systemd_type=$(echo "$service" | jq -r '.systemd_type // "--user"')
+        local restart_policy=$(echo "$service" | jq -r '.restart_policy // "always"')
+        local session_manager=$(echo "$service" | jq -r '.session_manager // "none"')
+        local gdb_enabled=$(echo "$service" | jq -r '.gdb_enabled // "0"')
+        local pm2_opts=$(echo "$service" | jq -r '.pm2_opts // ""')
+        local server_config=$(echo "$service" | jq -r '.server_config // ""')
+        
+        echo ""
+        echo -e "${YELLOW}Service '$name' ($provider) is missing${NC}"
+        echo "  Type: $service_type"
+        echo "  Status: $status"
+        
+        if [ "$bin_path" = "unknown" ] || [ "$bin_path" = "null" ] || [ "$status" = "migrated" ]; then
+            echo "  Binary: <needs manual configuration>"
+            echo "  Args: <needs manual configuration>"
+            echo ""
+            echo -e "${YELLOW}This service needs to be recreated manually:${NC}"
+            echo "  $0 create $service_type $name --provider $provider --bin-path /path/to/your/bin"
+        else
+            echo "  Binary: $bin_path"
+            echo "  Args: $args"
+        fi
+        echo ""
+        
+        read -p "Do you want to (r)ecreate, (d)elete from registry, or (s)kip? [r/d/s]: " choice
+        
+        case "$choice" in
+            r|R|recreate)
+                if [ "$bin_path" = "unknown" ] || [ "$status" = "migrated" ]; then
+                    echo -e "${YELLOW}Please recreate manually with full create command${NC}"
+                    read -p "Remove this entry from registry? [y/n]: " remove_entry
+                    if [[ "$remove_entry" =~ ^[Yy]$ ]]; then
+                        remove_service_from_registry "$name"
+                    fi
+                else
+                    echo -e "${BLUE}Recreating service '$name'...${NC}"
+                    if [ "$provider" = "pm2" ]; then
+                        if [ "$args" != "null" ] && [ -n "$args" ]; then
+                            pm2_create_service "$name" "$bin_path $args" "$restart_policy" $pm2_opts
+                        else
+                            pm2_create_service "$name" "$bin_path" "$restart_policy" $pm2_opts
+                        fi
+                    elif [ "$provider" = "systemd" ]; then
+                        echo -e "${BLUE}Attempting to recreate systemd service '$name' automatically...${NC}"
+                        if systemd_create_service "$name" "$bin_path $args" "$restart_policy" "$systemd_type" "$session_manager" "$gdb_enabled" "$server_config"; then
+                            echo -e "${GREEN}Systemd service '$name' recreated successfully${NC}"
+                        else
+                            echo -e "${RED}Failed to recreate systemd service '$name'. Please recreate manually.${NC}"
+                            echo "  $0 create $name $service_type --provider systemd --bin-path $bin_path"
+                        fi
+                    fi
+                fi
+                ;;
+            d|D|delete)
+                echo -e "${BLUE}Removing '$name' from registry...${NC}"
+                remove_service_from_registry "$name"
+                ;;
+            s|S|skip|*)
+                echo -e "${BLUE}Skipping '$name'${NC}"
+                ;;
+        esac
+    done
 }
 
 # Check if PM2 is installed
@@ -81,6 +270,7 @@ function print_help() {
     echo "  $base_name update <service-name> [options]"
     echo "  $base_name delete <service-name>"
     echo "  $base_name list [provider]"
+    echo "  $base_name restore"
     echo "  $base_name start|stop|restart|status <service-name>"
     echo "  $base_name logs <service-name> [--follow]"
     echo "  $base_name attach <service-name>"
@@ -139,6 +329,9 @@ function print_help() {
     echo "  $base_name attach worldserver-realm1"
     echo "  $base_name list pm2"
     echo ""
+    echo "  # Restore missing services from registry"
+    echo "  $base_name restore"
+    echo ""
     echo "Notes:"
     echo "  - Configuration editing modifies run-engine settings (GDB, session manager, etc.)"
     echo "  - Use --server-config for the actual server configuration file"
@@ -150,26 +343,13 @@ function print_help() {
     echo "  - attach command automatically detects the configured session manager and connects appropriately"
     echo "  - attach always provides interactive access to the server console"
     echo "  - Use 'logs' command to view service logs without interaction"
+    echo "  - restore command checks registry and helps recreate missing services"
+    echo ""
+    echo "Environment Variables:"
+    echo "  AC_SERVICE_CONFIG_DIR   - Override default config directory for services registry"
 }
 
-function register_service() {
-    local service_name="$1"
-    local provider="$2"
-    local service_type="$3"
-    local config_file="$CONFIG_DIR/$service_name.conf"
-    
-    # Add to registry
-    local tmp_file=$(mktemp)
-    jq --arg name "$service_name" \
-       --arg provider "$provider" \
-       --arg type "$service_type" \
-       --arg config "$config_file" \
-       '. += [{"name": $name, "provider": $provider, "type": $type, "config": $config}]' \
-       "$REGISTRY_FILE" > "$tmp_file"
-    mv "$tmp_file" "$REGISTRY_FILE"
-    
-    echo -e "${GREEN}Service $service_name registered successfully${NC}"
-}
+
 
 function validate_service_exists() {
     local service_name="$1"
@@ -210,47 +390,42 @@ function validate_service_exists() {
 function sync_registry() {
     echo -e "${YELLOW}Syncing service registry with actual services...${NC}"
     
-    local services=$(jq -c '.[]' "$REGISTRY_FILE")
-    local tmp_file=$(mktemp)
+    if [ ! -f "$REGISTRY_FILE" ] || [ ! -s "$REGISTRY_FILE" ]; then
+        echo -e "${YELLOW}No services registry found or empty${NC}"
+        return 0
+    fi
     
-    # Initialize with empty array
+    local services_count=$(jq length "$REGISTRY_FILE")
+    if [ "$services_count" -eq 0 ]; then
+        echo -e "${YELLOW}No services registered${NC}"
+        return 0
+    fi
+    
+    local tmp_file=$(mktemp)
     echo "[]" > "$tmp_file"
     
     # Check each service in registry
-    while read -r service_info; do
-        if [ -n "$service_info" ]; then
-            local name=$(echo "$service_info" | jq -r '.name')
-            local provider=$(echo "$service_info" | jq -r '.provider')
-            
-            if validate_service_exists "$name" "$provider"; then
-                # Service exists, add it to the new registry
-                jq --argjson service "$service_info" '. += [$service]' "$tmp_file" > "$tmp_file.new"
-                mv "$tmp_file.new" "$tmp_file"
-            else
-                echo -e "${YELLOW}Service '$name' no longer exists. Removing from registry.${NC}"
-                # Don't add to new registry
-            fi
+    for i in $(seq 0 $((services_count-1))); do
+        local service=$(jq -r ".[$i]" "$REGISTRY_FILE")
+        local name=$(echo "$service" | jq -r '.name')
+        local provider=$(echo "$service" | jq -r '.provider')
+        
+        if validate_service_exists "$name" "$provider"; then
+            # Service exists, add it to the new registry
+            jq --argjson service "$service" '. += [$service]' "$tmp_file" > "$tmp_file.new"
+            mv "$tmp_file.new" "$tmp_file"
+        else
+            echo -e "${YELLOW}Service '$name' no longer exists. Removing from registry.${NC}"
+            # Don't add to new registry
         fi
-    done <<< "$services"
+    done
     
     # Replace registry with synced version
     mv "$tmp_file" "$REGISTRY_FILE"
     echo -e "${GREEN}Registry synchronized.${NC}"
 }
 
-function unregister_service() {
-    local service_name="$1"
-    
-    # Remove from registry
-    local tmp_file=$(mktemp)
-    jq --arg name "$service_name" '. | map(select(.name != $name))' "$REGISTRY_FILE" > "$tmp_file"
-    mv "$tmp_file" "$REGISTRY_FILE"
-    
-    # Remove configuration file
-    rm -f "$CONFIG_DIR/$service_name.conf"
-    
-    echo -e "${GREEN}Service $service_name unregistered${NC}"
-}
+
 
 function get_service_info() {
     local service_name="$1"
@@ -306,7 +481,7 @@ function pm2_create_service() {
         pm2_cmd+=" --max-memory-restart $max_memory"
     fi
     
-    # Add max restarts if specified
+    # Add max reboots if specified
     if [ -n "$max_restarts" ]; then
         pm2_cmd+=" --max-restarts $max_restarts"
     fi
@@ -317,6 +492,15 @@ function pm2_create_service() {
     if eval "$pm2_cmd"; then
         echo -e "${GREEN}PM2 service '$service_name' created successfully${NC}"
         pm2 save
+        
+        # Setup PM2 startup for persistence across reboots
+        echo -e "${BLUE}Configuring PM2 startup for persistence...${NC}"
+        pm2 startup --auto >/dev/null 2>&1 || true
+        
+        # Add to registry (extract command and args from the full command)
+        local clean_command="$command$additional_args"
+        add_service_to_registry "$service_name" "pm2" "executable" "$command" "$additional_args" "" "$restart_policy" "none" "0" "$max_memory $max_restarts" ""
+        
         return 0
     else
         echo -e "${RED}Failed to create PM2 service '$service_name'${NC}"
@@ -357,8 +541,13 @@ function pm2_remove_service() {
         
         pm2 save
         echo -e "${GREEN}PM2 service '$service_name' stopped and removed${NC}"
+        
+        # Remove from registry
+        remove_service_from_registry "$service_name"
     else
         echo -e "${YELLOW}PM2 service '$service_name' not found or already removed${NC}"
+        # Still try to remove from registry in case it's orphaned
+        remove_service_from_registry "$service_name"
     fi
     
     return 0
@@ -391,6 +580,7 @@ function pm2_service_logs() {
 # Systemd service management functions
 function get_systemd_dir() {
     local type="$1"
+    
     if [ "$type" = "--system" ]; then
         echo "/etc/systemd/system"
     else
@@ -513,6 +703,10 @@ EOF
     fi
     
     echo -e "${GREEN}Systemd service '$service_name' created successfully${NC}"
+    
+    # Add to registry
+    add_service_to_registry "$service_name" "systemd" "service" "$command" "" "$systemd_type" "$restart_policy" "$session_manager" "$gdb_enabled" "" "$server_config"
+    
     return 0
 }
 
@@ -572,6 +766,10 @@ function systemd_remove_service() {
         if [ "$removal_failed" = "true" ]; then
             echo -e "${YELLOW}Note: Service may still be running but configuration was removed${NC}"
         fi
+        
+        # Remove from registry
+        remove_service_from_registry "$service_name"
+        
         return 0
     else
         echo -e "${RED}Failed to remove systemd service file '$service_file'${NC}"
@@ -839,8 +1037,6 @@ EOF
     
     # Check if service creation was successful
     if [ "$service_creation_success" = "true" ]; then
-        # Register the service
-        register_service "$service_name" "$provider" "$service_type"
         echo -e "${GREEN}Service '$service_name' created successfully${NC}"
         echo -e "${BLUE}Run-engine config: $run_engine_config${NC}"
         
@@ -880,7 +1076,7 @@ function update_service() {
     # Extract service information
     local provider=$(echo "$service_info" | jq -r '.provider')
     local service_type=$(echo "$service_info" | jq -r '.type')
-    local config_file=$(echo "$service_info" | jq -r '.config')
+    local config_file="$CONFIG_DIR/$service_name.conf"
     
     # Load current configuration
     source "$config_file"
@@ -1020,7 +1216,7 @@ function delete_service() {
     
     # Extract provider and config
     local provider=$(echo "$service_info" | jq -r '.provider')
-    local config_file=$(echo "$service_info" | jq -r '.config')
+    local config_file="$CONFIG_DIR/$service_name.conf"
     
     # Load configuration to get run-engine config file
     if [ -f "$config_file" ]; then
@@ -1048,8 +1244,9 @@ function delete_service() {
             echo -e "${GREEN}Removed run-engine config: $RUN_ENGINE_CONFIG_FILE${NC}"
         fi
         
-        # Unregister service
-        unregister_service "$service_name"
+        # Remove configuration file
+        rm -f "$config_file"
+        
         echo -e "${GREEN}Service '$service_name' deleted successfully${NC}"
     else
         echo -e "${RED}Failed to remove service '$service_name' from $provider${NC}"
@@ -1166,7 +1363,7 @@ function edit_config() {
     fi
     
     # Get configuration file path
-    local config_file=$(echo "$service_info" | jq -r '.config')
+    local config_file="$CONFIG_DIR/$service_name.conf"
     
     # Load configuration to get run-engine config file
     source "$config_file"
@@ -1191,7 +1388,7 @@ function attach_to_service() {
     
     # Extract provider
     local provider=$(echo "$service_info" | jq -r '.provider')
-    local config_file=$(echo "$service_info" | jq -r '.config')
+    local config_file="$CONFIG_DIR/$service_name.conf"
     
     # Load configuration to get run-engine config file
     if [ ! -f "$config_file" ]; then
@@ -1374,6 +1571,9 @@ case "${1:-help}" in
         ;;
     list)
         list_services "$2"
+        ;;
+    restore)
+        restore_missing_services
         ;;
     start|stop|restart|status)
         if [ $# -lt 2 ]; then
