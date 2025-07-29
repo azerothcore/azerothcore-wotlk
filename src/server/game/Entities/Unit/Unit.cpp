@@ -2256,7 +2256,7 @@ void Unit::CalcAbsorbResist(DamageInfo& dmgInfo, bool Splited)
     // We're going to call functions which can modify content of the list during iteration over it's elements
     // Let's copy the list so we can prevent iterator invalidation
     AuraEffectList vSchoolAbsorbCopy(victim->GetAuraEffectsByType(SPELL_AURA_SCHOOL_ABSORB));
-    vSchoolAbsorbCopy.sort(Acore::AbsorbAuraOrderPred());
+    std::sort(vSchoolAbsorbCopy.begin(), vSchoolAbsorbCopy.end(), Acore::AbsorbAuraOrderPred());
 
     // absorb without mana cost
     for (AuraEffectList::iterator itr = vSchoolAbsorbCopy.begin(); (itr != vSchoolAbsorbCopy.end()) && (dmgInfo.GetDamage() > 0); ++itr)
@@ -2439,7 +2439,7 @@ void Unit::CalcAbsorbResist(DamageInfo& dmgInfo, bool Splited)
         // We're going to call functions which can modify content of the list during iteration over it's elements
         // Let's copy the list so we can prevent iterator invalidation
         AuraEffectList vSplitDamagePctCopy(victim->GetAuraEffectsByType(SPELL_AURA_SPLIT_DAMAGE_PCT));
-        for (AuraEffectList::iterator itr = vSplitDamagePctCopy.begin(), next; (itr != vSplitDamagePctCopy.end()) &&  (dmgInfo.GetDamage() > 0); ++itr)
+        for (AuraEffectList::iterator itr = vSplitDamagePctCopy.begin(); (itr != vSplitDamagePctCopy.end()) && (dmgInfo.GetDamage() > 0); ++itr)
         {
             // Check if aura was removed during iteration - we don't need to work on such auras
             AuraApplication const* aurApp = (*itr)->GetBase()->GetApplicationOfTarget(victim->GetGUID());
@@ -2565,7 +2565,7 @@ void Unit::CalcHealAbsorb(HealInfo& healInfo)
             {
                 uint32 removedAuras = healInfo.GetTarget()->m_removedAurasCount;
                 auraEff->GetBase()->Remove(AURA_REMOVE_BY_ENEMY_SPELL);
-                if (removedAuras + 1 < healInfo.GetTarget()->m_removedAurasCount)
+                if (healInfo.GetTarget()->m_removedAurasCount > removedAuras)
                     i = vHealAbsorb.begin();
             }
         }
@@ -4732,7 +4732,7 @@ void Unit::_RegisterAuraEffect(AuraEffect* aurEff, bool apply)
     if (apply)
         m_modAuras[aurEff->GetAuraType()].push_back(aurEff);
     else
-        m_modAuras[aurEff->GetAuraType()].remove(aurEff);
+        m_modAuras[aurEff->GetAuraType()].erase(std::remove(m_modAuras[aurEff->GetAuraType()].begin(), m_modAuras[aurEff->GetAuraType()].end(), aurEff), m_modAuras[aurEff->GetAuraType()].end());
 }
 
 // All aura base removes should go threw this function!
@@ -5158,7 +5158,7 @@ void Unit::RemoveAurasByType(AuraType auraType, ObjectGuid casterGUID, Aura* exc
         {
             uint32 removedAuras = m_removedAurasCount;
             RemoveAura(aurApp);
-            if (m_removedAurasCount > removedAuras + 1)
+            if (m_removedAurasCount > removedAuras)
                 iter = m_modAuras[auraType].begin();
         }
     }
