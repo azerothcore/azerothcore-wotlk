@@ -55,16 +55,6 @@ Map::~Map()
 
     sScriptMgr->OnDestroyMap(this);
 
-    while (!i_worldObjects.empty())
-    {
-        WorldObject* obj = *i_worldObjects.begin();
-        ASSERT(obj->IsWorldObject());
-        LOG_DEBUG("maps", "Map::~Map: WorldObject TypeId is not a corpse! ({})", static_cast<uint8>(obj->GetTypeId()));
-        //ASSERT(obj->IsCorpse());
-        obj->RemoveFromWorld();
-        obj->ResetMap();
-    }
-
     if (!m_scriptSchedule.empty())
         sScriptMgr->DecreaseScheduledScriptCount(m_scriptSchedule.size());
 
@@ -117,43 +107,16 @@ template<class T>
 void Map::AddToGrid(T* obj, Cell const& cell)
 {
     MapGridType* grid = GetMapGrid(cell.GridX(), cell.GridY());
-    if (obj->IsWorldObject())
-        grid->AddWorldObject<T>(cell.CellX(), cell.CellY(), obj);
-    else
-        grid->AddGridObject<T>(cell.CellX(), cell.CellY(), obj);
-}
-
-template<>
-void Map::AddToGrid(Creature* obj, Cell const& cell)
-{
-    MapGridType* grid = GetMapGrid(cell.GridX(), cell.GridY());
-    if (obj->IsWorldObject())
-        grid->AddWorldObject(cell.CellX(), cell.CellY(), obj);
-    else
-        grid->AddGridObject(cell.CellX(), cell.CellY(), obj);
+    grid->AddGridObject<T>(cell.CellX(), cell.CellY(), obj);
 
     obj->SetCurrentCell(cell);
 }
 
 template<>
-void Map::AddToGrid(GameObject* obj, Cell const& cell)
+void Map::AddToGrid(Player* obj, Cell const& cell)
 {
     MapGridType* grid = GetMapGrid(cell.GridX(), cell.GridY());
     grid->AddGridObject(cell.CellX(), cell.CellY(), obj);
-
-    obj->SetCurrentCell(cell);
-}
-
-template<>
-void Map::AddToGrid(DynamicObject* obj, Cell const& cell)
-{
-    MapGridType* grid = GetMapGrid(cell.GridX(), cell.GridY());
-    if (obj->IsWorldObject())
-        grid->AddWorldObject(cell.CellX(), cell.CellY(), obj);
-    else
-        grid->AddGridObject(cell.CellX(), cell.CellY(), obj);
-
-    obj->SetCurrentCell(cell);
 }
 
 template<>
@@ -167,12 +130,7 @@ void Map::AddToGrid(Corpse* obj, Cell const& cell)
     // so we need to explicitly check it here (Map::AddToGrid is only called from Player::BuildPlayerRepop, not from ObjectGridLoader)
     // to avoid failing an assertion in GridObject::AddToGrid
     if (grid->IsObjectDataLoaded())
-    {
-        if (obj->IsWorldObject())
-            grid->AddWorldObject(cell.CellX(), cell.CellY(), obj);
-        else
-            grid->AddGridObject(cell.CellX(), cell.CellY(), obj);
-    }
+        grid->AddGridObject(cell.CellX(), cell.CellY(), obj);
 }
 
 template<class T>
@@ -2392,7 +2350,7 @@ GameObject* Map::GetGameObject(ObjectGuid const guid)
 
 Pet* Map::GetPet(ObjectGuid const guid)
 {
-    return _objectsStore.Find<Pet>(guid);
+    return dynamic_cast<Pet*>(_objectsStore.Find<Creature>(guid));
 }
 
 Transport* Map::GetTransport(ObjectGuid guid)

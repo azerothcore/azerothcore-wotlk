@@ -149,7 +149,7 @@ static uint32 copseReclaimDelay[MAX_DEATH_COUNT] = { 30, 60, 120 };
 #ifdef _MSC_VER
 #pragma warning(disable:4355)
 #endif
-Player::Player(WorldSession* session): Unit(true), m_mover(this)
+Player::Player(WorldSession* session): Unit(), m_mover(this)
 {
 #ifdef _MSC_VER
 #pragma warning(default:4355)
@@ -5705,7 +5705,7 @@ void Player::SendMessageToSetInRange(WorldPacket const* data, float dist, bool s
         SendDirectMessage(data);
 
     Acore::MessageDistDeliverer notifier(this, data, dist);
-    Cell::VisitWorldObjects(this, notifier, dist);
+    Cell::VisitObjects(this, notifier, dist);
 }
 
 void Player::SendMessageToSetInRange(WorldPacket const* data, float dist, bool self, bool includeMargin, bool ownTeamOnly, bool required3dDist) const
@@ -5718,7 +5718,7 @@ void Player::SendMessageToSetInRange(WorldPacket const* data, float dist, bool s
         dist += VISIBILITY_COMPENSATION; // pussywizard: to ensure everyone receives all important packets
 
     Acore::MessageDistDeliverer notifier(this, data, dist, ownTeamOnly, nullptr, required3dDist);
-    Cell::VisitWorldObjects(this, notifier, dist);
+    Cell::VisitObjects(this, notifier, dist);
 }
 
 void Player::SendMessageToSet(WorldPacket const* data, Player const* skipped_rcvr) const
@@ -5727,7 +5727,7 @@ void Player::SendMessageToSet(WorldPacket const* data, Player const* skipped_rcv
         SendDirectMessage(data);
 
     Acore::MessageDistDeliverer notifier(this, data, GetVisibilityRange(), false, skipped_rcvr);
-    Cell::VisitWorldObjects(this, notifier, GetVisibilityRange());
+    Cell::VisitObjects(this, notifier, GetVisibilityRange());
 }
 
 void Player::SendDirectMessage(WorldPacket const* data) const

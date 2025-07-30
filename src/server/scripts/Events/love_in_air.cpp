@@ -407,7 +407,7 @@ class spell_love_is_in_the_air_romantic_picnic : public AuraScript
         std::list<Player*> playerList;
         Acore::AnyPlayerInObjectRangeCheck checker(target, INTERACTION_DISTANCE * 2);
         Acore::PlayerListSearcher<Acore::AnyPlayerInObjectRangeCheck> searcher(target, playerList, checker);
-        Cell::VisitWorldObjects(target, searcher, INTERACTION_DISTANCE * 2);
+        Cell::VisitObjects(target, searcher, INTERACTION_DISTANCE * 2);
         for (std::list<Player*>::const_iterator itr = playerList.begin(); itr != playerList.end(); ++itr)
         {
             if ((*itr) != target && (*itr)->HasAura(GetId())) // && (*itr)->getStandState() == UNIT_STAND_STATE_SIT)

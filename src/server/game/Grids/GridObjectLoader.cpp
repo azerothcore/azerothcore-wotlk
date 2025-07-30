@@ -55,7 +55,7 @@ void GridObjectLoader::LoadCreatures(CellGuidSet const& guid_set, Map* map)
             {
                 // call MoveInLineOfSight for nearby grid creatures
                 Acore::AIRelocationNotifier notifier(*obj);
-                Cell::VisitGridObjects(obj, notifier, 60.f);
+                Cell::VisitObjects(obj, notifier, 60.f);
             }
         }
     }
@@ -93,11 +93,7 @@ void GridObjectLoader::LoadAllCellsInGrid()
 
             CellCoord cellCoord = Acore::ComputeCellCoord(corpse->GetPositionX(), corpse->GetPositionY());
             Cell cell(cellCoord);
-
-            if (corpse->IsWorldObject())
-                _grid.AddWorldObject(cell.CellX(), cell.CellY(), corpse);
-            else
-                _grid.AddGridObject(cell.CellX(), cell.CellY(), corpse);
+            _grid.AddGridObject(cell.CellX(), cell.CellY(), corpse);
         }
     }
 }
