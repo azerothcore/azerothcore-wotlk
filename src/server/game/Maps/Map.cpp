@@ -113,6 +113,24 @@ void Map::AddToGrid(T* obj, Cell const& cell)
 }
 
 template<>
+void Map::AddToGrid(Creature* obj, Cell const& cell)
+{
+    MapGridType* grid = GetMapGrid(cell.GridX(), cell.GridY());
+    grid->AddGridObject(cell.CellX(), cell.CellY(), obj);
+
+    obj->SetCurrentCell(cell);
+}
+
+template<>
+void Map::AddToGrid(GameObject* obj, Cell const& cell)
+{
+    MapGridType* grid = GetMapGrid(cell.GridX(), cell.GridY());
+    grid->AddGridObject(cell.CellX(), cell.CellY(), obj);
+
+    obj->SetCurrentCell(cell);
+}
+
+template<>
 void Map::AddToGrid(Player* obj, Cell const& cell)
 {
     MapGridType* grid = GetMapGrid(cell.GridX(), cell.GridY());
