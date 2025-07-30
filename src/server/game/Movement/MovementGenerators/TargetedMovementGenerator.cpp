@@ -163,7 +163,7 @@ bool ChaseMovementGenerator<T>::DoUpdate(T* owner, uint32 time_diff)
 
     if (cOwner)
     {
-        if (owner->movespline->Finalized() && cOwner->IsWithinMeleeRange(target))
+        if (owner->movespline->Finalized() /*&& cOwner->IsWithinMeleeRange(target)*/)
         { // Mobs should chase you infinitely if you stop and wait every few seconds.
             i_leashExtensionTimer.Update(time_diff);
             if (i_leashExtensionTimer.Passed())
