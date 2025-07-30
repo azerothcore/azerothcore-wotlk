@@ -379,6 +379,12 @@ void Creature::RemoveFromWorld()
             Acore::Containers::MultimapErasePair(GetMap()->GetCreatureBySpawnIdStore(), m_spawnId, this);
 
         GetMap()->GetObjectsStore().Remove<Creature>(GetGUID());
+
+    //NPCBot
+        if (Map* map = GetMap())
+            map->RemoveObjectFromMapUpdateList(this);
+    //End NPCBOT
+
     }
 }
 
@@ -2936,11 +2942,7 @@ bool Creature::LoadCreaturesAddon(bool reload)
 
     //Load Path
     if (cainfo->path_id != 0)
-    {
-        if (sWorld->getBoolConfig(CONFIG_SET_ALL_CREATURES_WITH_WAYPOINT_MOVEMENT_ACTIVE))
-            setActive(true);
         m_path_id = cainfo->path_id;
-    }
 
     if (!cainfo->auras.empty())
     {

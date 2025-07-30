@@ -500,45 +500,7 @@ bool Map::AddToMap(MotionTransport* obj, bool /*checkTransport*/)
     return true;
 }
 
-void Map::VisitNearbyCellsOfPlayer(Player* player, TypeContainerVisitor<Acore::ObjectUpdater, GridTypeMapContainer>& gridVisitor,
-                                   TypeContainerVisitor<Acore::ObjectUpdater, WorldTypeMapContainer>& worldVisitor,
-                                   TypeContainerVisitor<Acore::ObjectUpdater, GridTypeMapContainer>& largeGridVisitor,
-                                   TypeContainerVisitor<Acore::ObjectUpdater, WorldTypeMapContainer>& largeWorldVisitor)
-{
-    // check for valid position
-    if (!player->IsPositionValid())
-        return;
-
-    // check normal grid activation range of the player
-    VisitNearbyCellsOf(player, gridVisitor, worldVisitor, largeGridVisitor, largeWorldVisitor);
-
-    // check maximum visibility distance for large creatures
-    CellArea area = Cell::CalculateCellArea(player->GetPositionX(), player->GetPositionY(), MAX_VISIBILITY_DISTANCE);
-
-    for (uint32 x = area.low_bound.x_coord; x <= area.high_bound.x_coord; ++x)
-    {
-        for (uint32 y = area.low_bound.y_coord; y <= area.high_bound.y_coord; ++y)
-        {
-            // marked cells are those that have been visited
-            // don't visit the same cell twice
-            uint32 cell_id = (y * TOTAL_NUMBER_OF_CELLS_PER_MAP) + x;
-            if (isCellMarkedLarge(cell_id))
-                continue;
-
-            markCellLarge(cell_id);
-            CellCoord pair(x, y);
-            Cell cell(pair);
-
-            Visit(cell, largeGridVisitor);
-            Visit(cell, largeWorldVisitor);
-        }
-    }
-}
-
-void Map::VisitNearbyCellsOf(WorldObject* obj, TypeContainerVisitor<Acore::ObjectUpdater, GridTypeMapContainer>& gridVisitor,
-                             TypeContainerVisitor<Acore::ObjectUpdater, WorldTypeMapContainer>& worldVisitor,
-                             TypeContainerVisitor<Acore::ObjectUpdater, GridTypeMapContainer>& largeGridVisitor,
-                             TypeContainerVisitor<Acore::ObjectUpdater, WorldTypeMapContainer>& largeWorldVisitor)
+void Map::MarkNearbyCellsOf(WorldObject* obj)
 {
     // Check for valid position
     if (!obj->IsPositionValid())
@@ -546,30 +508,13 @@ void Map::VisitNearbyCellsOf(WorldObject* obj, TypeContainerVisitor<Acore::Objec
 
     // Update mobs/objects in ALL visible cells around object!
     CellArea area = Cell::CalculateCellArea(obj->GetPositionX(), obj->GetPositionY(), obj->GetGridActivationRange());
-
     for (uint32 x = area.low_bound.x_coord; x <= area.high_bound.x_coord; ++x)
     {
         for (uint32 y = area.low_bound.y_coord; y <= area.high_bound.y_coord; ++y)
         {
             // marked cells are those that have been visited
-            // don't visit the same cell twice
             uint32 cell_id = (y * TOTAL_NUMBER_OF_CELLS_PER_MAP) + x;
-            if (isCellMarked(cell_id))
-                continue;
-
             markCell(cell_id);
-            CellCoord pair(x, y);
-            Cell cell(pair);
-
-            Visit(cell, gridVisitor);
-            Visit(cell, worldVisitor);
-
-            if (!isCellMarkedLarge(cell_id))
-            {
-                markCellLarge(cell_id);
-                Visit(cell, largeGridVisitor);
-                Visit(cell, largeWorldVisitor);
-            }
         }
     }
 }
@@ -621,39 +566,10 @@ void Map::Update(const uint32 t_diff, const uint32 s_diff, bool  /*thread*/)
         return;
     }
 
-    /// update active cells around players and active objects
+    _updatableObjectListRecheckTimer.Update(t_diff);
     resetMarkedCells();
-    resetMarkedCellsLarge();
 
-    // Prepare object updaters
-    Acore::ObjectUpdater updater(t_diff, false);
-
-    // For creature
-    TypeContainerVisitor<Acore::ObjectUpdater, GridTypeMapContainer> grid_object_update(updater);
-
-    // For pets
-    TypeContainerVisitor<Acore::ObjectUpdater, WorldTypeMapContainer> world_object_update(updater);
-
-    // For large creatures
-    Acore::ObjectUpdater largeObjectUpdater(t_diff, true);
-    TypeContainerVisitor<Acore::ObjectUpdater, GridTypeMapContainer> grid_large_object_update(largeObjectUpdater);
-    TypeContainerVisitor<Acore::ObjectUpdater, WorldTypeMapContainer> world_large_object_update(largeObjectUpdater);
-
-    // pussywizard: container for far creatures in combat with players
-    std::vector<Creature*> updateList;
-    updateList.reserve(10);
-
-    // Update non-player active objects
-    for (m_activeNonPlayersIter = m_activeNonPlayers.begin(); m_activeNonPlayersIter != m_activeNonPlayers.end();)
-    {
-        WorldObject* obj = *m_activeNonPlayersIter;
-        ++m_activeNonPlayersIter;
-
-        if (obj && obj->IsInWorld())
-            VisitNearbyCellsOf(obj, grid_object_update, world_object_update, grid_large_object_update, world_large_object_update);
-    }
-
-    // Update players and their associated objects
+    // Update players
     for (m_mapRefIter = m_mapRefMgr.begin(); m_mapRefIter != m_mapRefMgr.end(); ++m_mapRefIter)
     {
         Player* player = m_mapRefIter->GetSource();
@@ -662,52 +578,36 @@ void Map::Update(const uint32 t_diff, const uint32 s_diff, bool  /*thread*/)
             continue;
 
         player->Update(s_diff);
-        VisitNearbyCellsOfPlayer(player, grid_object_update, world_object_update, grid_large_object_update, world_large_object_update);
 
-        // If player is using far sight, update viewpoint
-        if (WorldObject* viewPoint = player->GetViewpoint())
+        if (_updatableObjectListRecheckTimer.Passed())
         {
-            if (Creature* viewCreature = viewPoint->ToCreature())
-            {
-                VisitNearbyCellsOf(viewCreature, grid_object_update, world_object_update, grid_large_object_update, world_large_object_update);
-            }
-            else if (DynamicObject* viewObject = viewPoint->ToDynObject())
-            {
-                VisitNearbyCellsOf(viewObject, grid_object_update, world_object_update, grid_large_object_update, world_large_object_update);
-            }
-        }
+            MarkNearbyCellsOf(player);
 
-        // handle updates for creatures in combat with player and are more than X yards away
-        if (player->IsInCombat())
-        {
-            updateList.clear();
-            float rangeSq = player->GetGridActivationRange() - 1.0f;
-            rangeSq *= rangeSq;
-
-            HostileReference* ref = player->getHostileRefMgr().getFirst();
-            while (ref)
+            // If player is using far sight, update viewpoint
+            if (WorldObject* viewPoint = player->GetViewpoint())
             {
-                if (Unit* unit = ref->GetSource()->GetOwner())
-                    if (Creature* cre = unit->ToCreature())
-                        if (cre->FindMap() == player->FindMap() && cre->GetExactDist2dSq(player) > rangeSq)
-                            updateList.push_back(cre);
-                ref = ref->next();
+                if (Creature* viewCreature = viewPoint->ToCreature())
+                    MarkNearbyCellsOf(viewCreature);
+                else if (DynamicObject* viewObject = viewPoint->ToDynObject())
+                    MarkNearbyCellsOf(viewObject);
             }
-
-            for (Creature* cre : updateList)
-                VisitNearbyCellsOf(cre, grid_object_update, world_object_update, grid_large_object_update, world_large_object_update);
         }
     }
 
-    // Update transports - pussywizard: transports updated after VisitNearbyCellsOf, grids around are loaded, everything ok
-    for (_transportsUpdateIter = _transports.begin(); _transportsUpdateIter != _transports.end();)
+    if (_updatableObjectListRecheckTimer.Passed())
     {
-        MotionTransport* transport = *_transportsUpdateIter;
-        ++_transportsUpdateIter;
+        // Mark all cells near active objects
+        for (m_activeNonPlayersIter = m_activeNonPlayers.begin(); m_activeNonPlayersIter != m_activeNonPlayers.end(); ++m_activeNonPlayersIter)
+        {
+            WorldObject* obj = *m_activeNonPlayersIter;
+            if (!obj || !obj->IsInWorld())
+                continue;
 
-        if (transport->IsInWorld())
-            transport->Update(t_diff);
+            MarkNearbyCellsOf(obj);
+        }
     }
+
+    UpdateNonPlayerObjects(t_diff);
 
     SendObjectUpdates();
 
