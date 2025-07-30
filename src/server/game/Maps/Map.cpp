@@ -1849,7 +1849,7 @@ void Map::AddToActive(GameObject* d)
 }
 
 template<>
-void Map::AddToActive(Corpse* c)
+void Map::AddToActive(Corpse*)
 {
     // do nothing for corpses
 }
