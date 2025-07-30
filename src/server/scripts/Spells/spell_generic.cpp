@@ -1361,10 +1361,6 @@ class spell_gen_cannibalize : public SpellScript
         Cell::VisitObjects(caster, searcher, max_range);
         if (!result)
         {
-            Cell::VisitObjects(caster, searcher, max_range);
-        }
-        if (!result)
-        {
             return SPELL_FAILED_NO_EDIBLE_CORPSES;
         }
         return SPELL_CAST_OK;

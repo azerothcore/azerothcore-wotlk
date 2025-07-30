@@ -846,10 +846,6 @@ class spell_hun_pet_carrion_feeder : public SpellScript
         Cell::VisitObjects(caster, searcher, max_range);
         if (!result)
         {
-            Cell::VisitObjects(caster, searcher, max_range);
-        }
-        if (!result)
-        {
             return SPELL_FAILED_NO_EDIBLE_CORPSES;
         }
         return SPELL_CAST_OK;
