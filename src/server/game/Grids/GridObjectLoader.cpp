@@ -30,7 +30,7 @@ void GridObjectLoader::AddObjectHelper(Map* map, T* obj)
     CellCoord cellCoord = Acore::ComputeCellCoord(obj->GetPositionX(), obj->GetPositionY());
     Cell cell(cellCoord);
 
-    map->AddToGrid(obj, cell);
+    map->AddToGrid<T>(obj, cell);
     obj->AddToWorld();
     if (obj->isActiveObject())
         map->AddToActive(obj);
