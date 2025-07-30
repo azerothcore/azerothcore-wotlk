@@ -91,15 +91,7 @@ void GridObjectLoader::LoadAllCellsInGrid()
             if (corpse->IsInGrid())
                 continue;
 
-            CellCoord cellCoord = Acore::ComputeCellCoord(corpse->GetPositionX(), corpse->GetPositionY());
-            Cell cell(cellCoord);
-
-            if (corpse->IsWorldObject())
-                _grid.AddWorldObject(cell.CellX(), cell.CellY(), corpse);
-            else
-                _grid.AddGridObject(cell.CellX(), cell.CellY(), corpse);
-
-            corpse->AddToWorld();
+            AddObjectHelper<Corpse>(_map, corpse);
         }
     }
 }
