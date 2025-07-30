@@ -910,7 +910,7 @@ class spell_warr_heroic_strike : public SpellScript
         Unit* target = GetHitUnit();
         if (!target)
             return;
-        std::list<AuraEffect*> AuraEffectList = target->GetAuraEffectsByType(SPELL_AURA_MOD_DECREASE_SPEED);
+        Unit::AuraEffectList const& AuraEffectList = target->GetAuraEffectsByType(SPELL_AURA_MOD_DECREASE_SPEED);
         bool bonusDamage = false;
         for (AuraEffect* eff : AuraEffectList)
         {
