@@ -72,15 +72,27 @@ bool ChaseMovementGenerator<T>::DoUpdate(T* owner, uint32 time_diff)
         return false;
 
     Creature* cOwner = owner->ToCreature();
+    bool isStoppedBecauseOfCasting = cOwner && cOwner->IsMovementPreventedByCasting();
 
     // the owner might be unable to move (rooted or casting), or we have lost the target, pause movement
-    if (owner->HasUnitState(UNIT_STATE_NOT_MOVE) || HasLostTarget(owner) || (cOwner && cOwner->IsMovementPreventedByCasting()))
+    if (owner->HasUnitState(UNIT_STATE_NOT_MOVE) || HasLostTarget(owner) || isStoppedBecauseOfCasting)
     {
         owner->StopMoving();
         _lastTargetPosition.reset();
         if (cOwner)
         {
-            cOwner->UpdateLeashExtensionTime();
+            if (isStoppedBecauseOfCasting)
+            {
+                // Don't reset leash timer if it's a spell like Shoot with a short cast time.
+                /// @todo: Research how it should actually work.
+                Spell *spell = cOwner->GetFirstCurrentCastingSpell();
+                bool spellHasLongCast = spell && spell->GetCastTime() > 1 * SECOND * IN_MILLISECONDS;
+                if (spellHasLongCast)
+                    cOwner->UpdateLeashExtensionTime();
+            }
+            else
+                cOwner->UpdateLeashExtensionTime();
+
             cOwner->SetCannotReachTarget();
         }
         return true;
