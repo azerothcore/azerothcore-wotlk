@@ -376,8 +376,6 @@ public:
 
     float m_SightDistance, m_CombatDistance;
 
-    bool m_isTempWorldObject; //true when possessed
-
     // Handling caster facing during spellcast
     void SetTarget(ObjectGuid guid = ObjectGuid::Empty) override;
     void ClearTarget() { SetTarget(); };
