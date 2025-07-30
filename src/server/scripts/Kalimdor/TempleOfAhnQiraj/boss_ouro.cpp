@@ -178,7 +178,7 @@ struct boss_ouro : public BossAI
         std::list<WorldObject*> targets;
         Acore::AllWorldObjectsInRange checker(me, 10.0f);
         Acore::WorldObjectListSearcher<Acore::AllWorldObjectsInRange> searcher(me, targets, checker);
-        Cell::VisitAllObjects(me, searcher, 10.0f);
+        Cell::VisitObjects(me, searcher, 10.0f);
 
         for (WorldObject* target : targets)
         {

@@ -498,7 +498,7 @@ class spell_zulfarrak_unlocking : public SpellScript
         std::list<WorldObject*> cagesList;
         Acore::AllWorldObjectsInRange objects(GetCaster(), 15.0f);
         Acore::WorldObjectListSearcher<Acore::AllWorldObjectsInRange> searcher(GetCaster(), cagesList, objects);
-        Cell::VisitAllObjects(GetCaster(), searcher, 15.0f);
+        Cell::VisitObjects(GetCaster(), searcher, 15.0f);
         for (std::list<WorldObject*>::const_iterator itr = cagesList.begin(); itr != cagesList.end(); ++itr)
         {
             if (GameObject* go = (*itr)->ToGameObject())

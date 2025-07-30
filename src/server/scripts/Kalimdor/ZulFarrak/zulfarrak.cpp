@@ -653,7 +653,7 @@ public:
                 Unit* unit = nullptr;
                 Acore::MostHPMissingInRange u_check(me, 40.f, 1500);
                 Acore::UnitLastSearcher<Acore::MostHPMissingInRange> searcher(me, unit, u_check);
-                Cell::VisitGridObjects(me, searcher, 40.f);
+                Cell::VisitObjects(me, searcher, 40.f);
                 if (unit)
                 {
                     DoCast(unit, SPELL_HEAL);
@@ -671,7 +671,7 @@ public:
                 Unit* unit = nullptr;
                 Acore::MostHPMissingInRange u_check(me, 40.f, 700);
                 Acore::UnitLastSearcher<Acore::MostHPMissingInRange> searcher(me, unit, u_check);
-                Cell::VisitGridObjects(me, searcher, 40.f);
+                Cell::VisitObjects(me, searcher, 40.f);
                 if (unit)
                 {
                     DoCast(unit, SPELL_RENEW);

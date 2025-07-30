@@ -805,7 +805,7 @@ Creature* Battlefield::SpawnCreature(uint32 entry, float x, float y, float z, fl
         return nullptr;
     }
 
-    Creature* creature = new Creature(true);
+    Creature* creature = new Creature();
     if (!creature->Create(map->GenerateLowGuid<HighGuid::Unit>(), map, PHASEMASK_NORMAL, entry, 0, x, y, z, o))
     {
         LOG_ERROR("bg.battlefield", "Battlefield::SpawnCreature: Can't create creature entry: {}", entry);
@@ -1019,7 +1019,7 @@ bool BfCapturePoint::Update(uint32 diff)
     std::list<Player*> players;
     Acore::AnyPlayerInObjectRangeCheck checker(capturePoint, radius);
     Acore::PlayerListSearcher<Acore::AnyPlayerInObjectRangeCheck> searcher(capturePoint, players, checker);
-    Cell::VisitWorldObjects(capturePoint, searcher, radius);
+    Cell::VisitObjects(capturePoint, searcher, radius);
 
     for (std::list<Player*>::iterator itr = players.begin(); itr != players.end(); ++itr)
         if ((*itr)->IsOutdoorPvPActive())

@@ -931,7 +931,7 @@ struct npc_pallid_horror : public ScriptedAI
             std::list<Creature*> targets;
             FlameshockerCheck check;
             Acore::CreatureListSearcher<FlameshockerCheck> searcher(me, targets, check);
-            Cell::VisitGridObjects(me, searcher, VISIBILITY_DISTANCE_NORMAL);
+            Cell::VisitObjects(me, searcher, VISIBILITY_DISTANCE_NORMAL);
 
             if (!targets.empty())
             {

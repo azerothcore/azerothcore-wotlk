@@ -34,7 +34,7 @@ enum DynamicObjectType
 class DynamicObject : public WorldObject, public GridObject<DynamicObject>, public MovableMapObject, public UpdatableMapObject
 {
 public:
-    DynamicObject(bool isWorldObject);
+    DynamicObject();
     ~DynamicObject() override;
 
     void AddToWorld() override;
