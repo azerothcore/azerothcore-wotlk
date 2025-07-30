@@ -73,7 +73,7 @@ bool ChaseMovementGenerator<T>::DoUpdate(T* owner, uint32 time_diff)
 
     Creature* cOwner = owner->ToCreature();
 
-    r_leashExtensionTimer.Update(time_diff);
+    i_rangedLeashExtensionTimer.Update(time_diff);
     // the owner might be unable to move (rooted or casting), or we have lost the target, pause movement
     if (owner->HasUnitState(UNIT_STATE_NOT_MOVE) || HasLostTarget(owner) || (cOwner && cOwner->IsMovementPreventedByCasting()))
     {
@@ -81,11 +81,11 @@ bool ChaseMovementGenerator<T>::DoUpdate(T* owner, uint32 time_diff)
         _lastTargetPosition.reset();
         if (cOwner)
         {
-            if (r_leashExtensionTimer.Passed())
+            if (i_rangedLeashExtensionTimer.Passed())
             {
                 if (!i_target->isMoving())
                 {
-                    r_leashExtensionTimer.Reset(cOwner->GetAttackTime(RANGED_ATTACK));
+                    i_rangedLeashExtensionTimer.Reset(cOwner->GetAttackTime(RANGED_ATTACK));
                     cOwner->UpdateLeashExtensionTime();
                 }
             }
@@ -309,7 +309,7 @@ void ChaseMovementGenerator<Creature>::DoInitialize(Creature* owner)
     _lastTargetPosition.reset();
     i_recheckDistance.Reset(0);
     i_leashExtensionTimer.Reset(owner->GetAttackTime(BASE_ATTACK));
-    r_leashExtensionTimer.Reset(owner->GetAttackTime(RANGED_ATTACK));
+    i_rangedLeashExtensionTimer.Reset(owner->GetAttackTime(RANGED_ATTACK));
     owner->SetWalk(false);
     owner->AddUnitState(UNIT_STATE_CHASE);
 }
