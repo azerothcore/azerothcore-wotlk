@@ -1848,6 +1848,12 @@ void Map::AddToActive(GameObject* d)
     AddToActiveHelper(d);
 }
 
+template<>
+void Map::AddToActive(Corpse* c)
+{
+    // do nothing for corpses
+}
+
 template<class T>
 void Map::RemoveFromActive(T* obj)
 {
