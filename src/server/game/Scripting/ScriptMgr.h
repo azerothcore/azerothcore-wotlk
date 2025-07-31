@@ -32,6 +32,7 @@
 #include "LFGMgr.h"
 #include "ObjectMgr.h"
 #include "PetDefines.h"
+#include "Player.h"
 #include "SharedDefines.h"
 #include "Tuples.h"
 #include "Weather.h"
@@ -311,6 +312,21 @@ public: /* PlayerScript */
     void OnPlayerMoneyChanged(Player* player, int32& amount);
     void OnPlayerBeforeLootMoney(Player* player, Loot* loot);
     void OnPlayerGiveXP(Player* player, uint32& amount, Unit* victim, uint8 xpSource);
+
+    /**
+     * @brief Called before a player gains or looses Reputation
+     *
+     * @param [in] player instance of the current player
+     * @param [in] factionId id of the faction which reputation changes
+     * @param[in,out] amount the amount of reputation the player gets or loses
+     * @param[in] reputationSource an enum which determinate the source used to gain or loose reputation
+     * @param[in] victim the unit which was killed to gain reputation
+     * @param[in] quest the quest which was turn in to gain reputation
+     * @param[in] spell the spell which was used to gain reputation
+     * @remark victim, quest and spell might be null, check reputationSource first
+     */
+    void OnPlayerBeforeReputationChange(Player* /*player*/, uint32 /*factionId*/, float& /*amount*/, ReputationSource /*reputationSource*/, Unit const* /*victim*/, Quest const* /*quest*/, Spell const* /*spell*/);
+
     bool OnPlayerReputationChange(Player* player, uint32 factionID, int32& standing, bool incremental);
     void OnPlayerReputationRankChange(Player* player, uint32 factionID, ReputationRank newRank, ReputationRank oldRank, bool increased);
     void OnPlayerLearnSpell(Player* player, uint32 spellID);

@@ -21,6 +21,7 @@
 #include "ObjectMgr.h"
 #include "Player.h"
 #include "ReputationMgr.h"
+#include "ScriptMgr.h"
 
 using namespace Acore::ChatCommands;
 
@@ -302,7 +303,9 @@ public:
                 {
                     if (FactionEntry const* factionEntry = sFactionStore.LookupEntry(repFaction))
                     {
-                        player->GetReputationMgr().SetReputation(factionEntry, static_cast<float>(repValue));
+                        auto repDiv = static_cast<float>(repValue - curRep);
+                        sScriptMgr->OnPlayerBeforeReputationChange(player, repFaction, repDiv, ReputationSource::Console, nullptr, nullptr, nullptr);
+                        player->GetReputationMgr().SetReputation(factionEntry, repDiv + curRep);
                     }
                 }
             }
@@ -316,7 +319,9 @@ public:
                 {
                     if (FactionEntry const* factionEntry = sFactionStore.LookupEntry(repFaction))
                     {
-                        player->GetReputationMgr().SetReputation(factionEntry, static_cast<float>(repValue2));
+                        auto repDiv = static_cast<float>(repValue2 - curRep);
+                        sScriptMgr->OnPlayerBeforeReputationChange(player, repFaction, repDiv, ReputationSource::Console, nullptr, nullptr, nullptr);
+                        player->GetReputationMgr().SetReputation(factionEntry, repDiv + curRep);
                     }
                 }
             }
