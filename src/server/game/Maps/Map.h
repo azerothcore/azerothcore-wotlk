@@ -359,10 +359,10 @@ public:
     typedef std::unordered_multimap<ObjectGuid::LowType, GameObject*> GameObjectBySpawnIdContainer;
     GameObjectBySpawnIdContainer& GetGameObjectBySpawnIdStore() { return _gameobjectBySpawnIdStore; }
 
-    [[nodiscard]] std::unordered_set<Corpse*> const* GetCorpsesInCell(uint32 cellId) const
+    [[nodiscard]] std::unordered_set<Corpse*> const* GetCorpsesInGrid(uint32 gridId) const
     {
-        auto itr = _corpsesByCell.find(cellId);
-        if (itr != _corpsesByCell.end())
+        auto itr = _corpsesByGrid.find(gridId);
+        if (itr != _corpsesByGrid.end())
             return &itr->second;
 
         return nullptr;
@@ -631,7 +631,7 @@ private:
     MapStoredObjectTypesContainer _objectsStore;
     CreatureBySpawnIdContainer _creatureBySpawnIdStore;
     GameObjectBySpawnIdContainer _gameobjectBySpawnIdStore;
-    std::unordered_map<uint32/*cellId*/, std::unordered_set<Corpse*>> _corpsesByCell;
+    std::unordered_map<uint32/*gridId*/, std::unordered_set<Corpse*>> _corpsesByGrid;
     std::unordered_map<ObjectGuid, Corpse*> _corpsesByPlayer;
     std::unordered_set<Corpse*> _corpseBones;
 

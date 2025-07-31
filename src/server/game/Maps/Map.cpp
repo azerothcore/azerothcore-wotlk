@@ -1055,7 +1055,7 @@ void Map::UnloadAll()
 
     _transports.clear();
 
-    for (auto& cellCorpsePair : _corpsesByCell)
+    for (auto& cellCorpsePair : _corpsesByGrid)
     {
         for (Corpse* corpse : cellCorpsePair.second)
         {
@@ -1065,7 +1065,7 @@ void Map::UnloadAll()
         }
     }
 
-    _corpsesByCell.clear();
+    _corpsesByGrid.clear();
     _corpsesByPlayer.clear();
     _corpseBones.clear();
 }
@@ -1889,6 +1889,12 @@ void Map::AddToActive(GameObject* d)
     AddToActiveHelper(d);
 }
 
+template<>
+void Map::AddToActive(Corpse* /*c*/)
+{
+    // do nothing for corpses
+}
+
 template<class T>
 void Map::RemoveFromActive(T* obj)
 {
@@ -2708,7 +2714,8 @@ void Map::AddCorpse(Corpse* corpse)
 {
     corpse->SetMap(this);
 
-    _corpsesByCell[corpse->GetCellCoord().GetId()].insert(corpse);
+    GridCoord const gridCoord = Acore::ComputeGridCoord(corpse->GetPositionX(), corpse->GetPositionY());
+    _corpsesByGrid[gridCoord.GetId()].insert(corpse);
     if (corpse->GetType() != CORPSE_BONES)
         _corpsesByPlayer[corpse->GetOwnerGUID()] = corpse;
     else
@@ -2718,6 +2725,7 @@ void Map::AddCorpse(Corpse* corpse)
 void Map::RemoveCorpse(Corpse* corpse)
 {
     ASSERT(corpse);
+    GridCoord const gridCoord = Acore::ComputeGridCoord(corpse->GetPositionX(), corpse->GetPositionY());
 
     corpse->DestroyForNearbyPlayers();
     if (corpse->IsInGrid())
@@ -2728,7 +2736,7 @@ void Map::RemoveCorpse(Corpse* corpse)
         corpse->ResetMap();
     }
 
-    _corpsesByCell[corpse->GetCellCoord().GetId()].erase(corpse);
+    _corpsesByGrid[gridCoord.GetId()].erase(corpse);
     if (corpse->GetType() != CORPSE_BONES)
         _corpsesByPlayer.erase(corpse->GetOwnerGUID());
     else
