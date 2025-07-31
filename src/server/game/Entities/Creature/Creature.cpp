@@ -2683,7 +2683,6 @@ bool Creature::CanCreatureAttack(Unit const* victim, bool skipDistCheck) const
     if (skipDistCheck)
         return true;
 
-
     if (Unit* unit = GetCharmerOrOwner())
     {
         float visibilityDist = std::min<float>(GetMap()->GetVisibilityRange() + GetObjectSize() * 2, DEFAULT_VISIBILITY_DISTANCE);
