@@ -6,8 +6,8 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 
 -- Allow Skittering Infector's Acid Splash ability to stack, rather than just refresh.
 DELETE FROM `spell_custom_attr` WHERE `spell_id`=52446;
-DELETE FROM `spell_custom_attr` WHERE `spell_id`=59363;
 INSERT INTO `spell_custom_attr` (`spell_id`, `attributes`) VALUES (52446, 4194304);
+DELETE FROM `spell_custom_attr` WHERE `spell_id`=59363;
 INSERT INTO `spell_custom_attr` (`spell_id`, `attributes`) VALUES (59363, 4194304);
 
 -- Fix misplaced spell IDs in spelldifficulty for Skittering Infector's Acid Splash
