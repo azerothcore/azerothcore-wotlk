@@ -4,6 +4,8 @@
 # A unified interface for managing AzerothCore services with PM2 or systemd
 # This script provides commands to create, update, delete, and manage server instances
 
+set -euo pipefail  # Strict error handling
+
 # Script location
 CURRENT_PATH="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
@@ -16,11 +18,11 @@ CONFIG_DIR="${AC_SERVICE_CONFIG_DIR:-${XDG_CONFIG_HOME:-$HOME/.config}/azerothco
 REGISTRY_FILE="$CONFIG_DIR/service_registry.json"
 
 # Colors for output
-YELLOW='\033[1;33m'
-GREEN='\033[0;32m'
-RED='\033[0;31m'
-BLUE='\033[0;34m'
-NC='\033[0m' # No Color
+readonly YELLOW='\033[1;33m'
+readonly GREEN='\033[0;32m'
+readonly RED='\033[0;31m'
+readonly BLUE='\033[0;34m'
+readonly NC='\033[0m' # No Color
 
 # Create config directory if it doesn't exist
 mkdir -p "$CONFIG_DIR"
@@ -53,7 +55,8 @@ function add_service_to_registry() {
     local server_config="${11}"
 
     # Remove any existing entry with the same service name to avoid duplicates
-    local tmp_file=$(mktemp)
+    local tmp_file
+    tmp_file=$(mktemp)
     jq --arg name "$service_name" 'map(select(.name != $name))' "$REGISTRY_FILE" > "$tmp_file" && mv "$tmp_file" "$REGISTRY_FILE"
 
     # Add the new entry to the registry
@@ -80,7 +83,8 @@ function remove_service_from_registry() {
     local service_name="$1"
     
     if [ -f "$REGISTRY_FILE" ]; then
-        local tmp_file=$(mktemp)
+        local tmp_file
+        tmp_file=$(mktemp)
         jq --arg name "$service_name" \
            'map(select(.name != $name))' \
            "$REGISTRY_FILE" > "$tmp_file" && mv "$tmp_file" "$REGISTRY_FILE"
@@ -97,7 +101,8 @@ function restore_missing_services() {
     fi
     
     local missing_services=()
-    local services_count=$(jq length "$REGISTRY_FILE")
+    local services_count
+    services_count=$(jq length "$REGISTRY_FILE")
     
     if [ "$services_count" -eq 0 ]; then
         echo -e "${YELLOW}No services registered${NC}"
@@ -519,7 +524,7 @@ function pm2_remove_service() {
     # Stop the service if it's running
     if pm2 describe "$service_name" >/dev/null 2>&1; then
         pm2 stop "$service_name" 2>/dev/null || true
-        pm2 delete "$service_name" 2>/dev/null 
+        pm2 delete "$service_name" 2>/dev/null || true
         
         # Wait for PM2 to process the stop/delete command with timeout
         local timeout=10
@@ -593,16 +598,31 @@ function systemd_create_service() {
     local command="$2"
     local restart_policy="$3"
     local systemd_type="--user"
+    local bin_path=""
+    local gdb_enabled="0"
+    local server_config=""
     shift 3
     
     check_systemd || return 1
     
-    # Parse systemd type
+    # Parse systemd type and extract additional parameters
     while [[ $# -gt 0 ]]; do
         case "$1" in
             --system|--user)
                 systemd_type="$1"
                 shift
+                ;;
+            --bin-path)
+                bin_path="$2"
+                shift 2
+                ;;
+            --gdb-enabled)
+                gdb_enabled="$2"
+                shift 2
+                ;;
+            --server-config)
+                server_config="$2"
+                shift 2
                 ;;
             *)
                 command+=" $1"
@@ -610,6 +630,18 @@ function systemd_create_service() {
                 ;;
         esac
     done
+    
+    # If bin_path is not provided, try to extract from command
+    if [ -z "$bin_path" ]; then
+        # Try to extract bin path from run-engine command
+        if [[ "$command" =~ run-engine[[:space:]]+start[[:space:]]+([^[:space:]]+) ]]; then
+            local binary_path="${BASH_REMATCH[1]}"
+            bin_path="$(dirname "$binary_path")"
+        else
+            # Fallback to current directory
+            bin_path="$(pwd)"
+        fi
+    fi
     
     local systemd_dir=$(get_systemd_dir "$systemd_type")
     local service_file="$systemd_dir/$service_name.service"
@@ -647,6 +679,11 @@ function systemd_create_service() {
     # Create service file
     echo -e "${YELLOW}Creating systemd service: $service_name${NC}"
     
+    # Ensure bin_path is absolute
+    if [[ ! "$bin_path" = /* ]]; then
+        bin_path="$(realpath "$bin_path")"
+    fi
+    
     if [ "$systemd_type" = "--system" ]; then
         # System service template (with User directive)
         cat > "$service_file" << EOF
@@ -661,7 +698,7 @@ Restart=$restart_policy
 RestartSec=3
 User=$(whoami)
 Group=$(id -gn)
-WorkingDirectory=$(realpath "$bin_path")
+WorkingDirectory=$bin_path
 StandardOutput=journal+console
 StandardError=journal+console
 
@@ -680,17 +717,13 @@ Type=${service_type}
 ExecStart=$command
 Restart=$restart_policy
 RestartSec=3
-WorkingDirectory=$(realpath "$bin_path")
+WorkingDirectory=$bin_path
 StandardOutput=journal+console
 StandardError=journal+console
 
 [Install]
 WantedBy=default.target
 EOF
-    fi
-
-    if [ "$systemd_type" = "--system" ]; then
-        sed -i 's/WantedBy=default.target/WantedBy=multi-user.target/' "$service_file"
     fi
     
     # Reload systemd and enable service
@@ -857,7 +890,7 @@ function create_service() {
     
     # Default values for run-engine configuration
     local provider="auto"
-    local bin_path="$BINPATH/bin" # get from config or environment
+    local bin_path="${BINPATH:-$ROOT_DIR/bin}" # get from config or environment
     local server_config=""
     local session_manager="none"
     local gdb_enabled="0"
@@ -1079,11 +1112,17 @@ function update_service() {
     local config_file="$CONFIG_DIR/$service_name.conf"
     
     # Load current configuration
+    if [ ! -f "$config_file" ]; then
+        echo -e "${RED}Error: Service configuration file not found: $config_file${NC}"
+        return 1
+    fi
     source "$config_file"
     
     # Load current run-engine configuration
     if [ -f "$RUN_ENGINE_CONFIG_FILE" ]; then
         source "$RUN_ENGINE_CONFIG_FILE"
+    else
+        echo -e "${YELLOW}Warning: Run-engine configuration file not found: $RUN_ENGINE_CONFIG_FILE${NC}"
     fi
     
     # Parse options to update
@@ -1221,6 +1260,8 @@ function delete_service() {
     # Load configuration to get run-engine config file
     if [ -f "$config_file" ]; then
         source "$config_file"
+    else
+        echo -e "${YELLOW}Warning: Service configuration file not found: $config_file${NC}"
     fi
     
     echo -e "${YELLOW}Deleting service '$service_name' (provider: $provider)...${NC}"
@@ -1405,6 +1446,12 @@ function attach_to_service() {
     fi
     
     source "$RUN_ENGINE_CONFIG_FILE"
+    if [ ! -f "$RUN_ENGINE_CONFIG_FILE" ]; then
+        echo -e "${RED}Error: Run-engine configuration file not found: $RUN_ENGINE_CONFIG_FILE${NC}"
+        return 1
+    fi
+    
+    source "$RUN_ENGINE_CONFIG_FILE"
     
     # Auto-detect session manager and attach accordingly
     if [ "$provider" = "pm2" ]; then
@@ -1461,9 +1508,22 @@ function attach_interactive_shell() {
     
     # For systemd without session manager, show helpful message
     local service_info=$(get_service_info "$service_name")
-    local config_file=$(echo "$service_info" | jq -r '.config')
+    local config_file="$CONFIG_DIR/$service_name.conf"
+    
+    # Check if config file exists before sourcing
+    if [ ! -f "$config_file" ]; then
+        echo -e "${RED}Error: Service configuration file not found: $config_file${NC}"
+        return 1
+    fi
     
     source "$config_file"
+    
+    # Check if RUN_ENGINE_CONFIG_FILE exists before sourcing
+    if [ ! -f "$RUN_ENGINE_CONFIG_FILE" ]; then
+        echo -e "${RED}Error: Run-engine configuration file not found: $RUN_ENGINE_CONFIG_FILE${NC}"
+        return 1
+    fi
+    
     source "$RUN_ENGINE_CONFIG_FILE"
     
     echo -e "${RED}Error: Cannot attach to systemd service '$service_name'${NC}"
