@@ -174,6 +174,23 @@ void Player::ApplySpellPowerBonus(int32 amount, bool apply)
         ApplyModInt32Value(PLAYER_FIELD_MOD_DAMAGE_DONE_POS + i, amount, apply);
 }
 
+void Player::ApplySpellDamageBonus(int32 amount, bool apply)
+{
+    apply = _ModifyUInt32(apply, m_baseSpellDamage, amount);
+
+    // For speed just update for client
+    for (int i = SPELL_SCHOOL_HOLY; i < MAX_SPELL_SCHOOL; ++i)
+        ApplyModInt32Value(PLAYER_FIELD_MOD_DAMAGE_DONE_POS + i, amount, apply);
+}
+
+void Player::ApplySpellHealingBonus(int32 amount, bool apply)
+{
+    apply = _ModifyUInt32(apply, m_baseSpellHealing, amount);
+
+    // For speed just update for client
+    ApplyModUInt32Value(PLAYER_FIELD_MOD_HEALING_DONE_POS, amount, apply);
+}
+
 void Player::UpdateSpellDamageAndHealingBonus()
 {
     // Magic damage modifiers implemented in Unit::SpellDamageBonusDone
