@@ -379,8 +379,13 @@ void Creature::RemoveFromWorld()
 
         GetMap()->GetObjectsStore().Remove<Creature>(GetGUID());
 
-        if (Map* map = GetMap())
-            map->RemoveObjectFromMapUpdateList(this);
+        //NPCBOT
+        if (IsNPCBotOrPet())
+        {
+            if (Map* map = GetMap())
+                map->RemoveObjectFromMapUpdateList(this);
+        }
+        //End NPCBOT```
     }
 }
 
