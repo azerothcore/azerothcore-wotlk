@@ -164,6 +164,20 @@ struct boss_malchezaar : public BossAI
         }
     }
 
+    void UpdateAI(uint32 diff) override
+    {
+        scheduler.Update(diff, std::bind(&BossAI::DoMeleeAttackIfReady, this));
+
+        if (me->GetDistance2d(-10944.0f, -2031.0f) > 92.0f) // reset the boss when pull out the hall
+        {
+            EnterEvadeMode();
+            return;
+        }
+
+        if (!UpdateVictim())
+            return;
+    }
+
     bool MaxSpawns(std::list<Creature*> spawns)
     {
         return spawns.size() == 0;
