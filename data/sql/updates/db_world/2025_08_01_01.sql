@@ -1,3 +1,4 @@
+-- DB update 2025_08_01_00 -> 2025_08_01_01
 -- fix quest 12616 'Chamber of Secrets'
 UPDATE `gameobject_template` SET `AIName` = 'SmartGameObjectAI' WHERE `entry` = 190610;
 
