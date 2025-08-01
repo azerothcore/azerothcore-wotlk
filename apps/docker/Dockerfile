@@ -1,10 +1,10 @@
 ARG UBUNTU_VERSION=22.04 # lts
-ARG TZ=Etc/UTC
 
 # This target lays out the general directory skeleton for AzerothCore,
 # This target isn't intended to be directly used
 FROM ubuntu:$UBUNTU_VERSION AS skeleton
 
+ARG TZ=Etc/UTC
 ARG DOCKER=1
 ARG DEBIAN_FRONTEND=noninteractive
 
