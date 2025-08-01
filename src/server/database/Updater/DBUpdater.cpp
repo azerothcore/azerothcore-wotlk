@@ -517,7 +517,7 @@ void DBUpdater<T>::ApplyFile(DatabaseWorkerPool<T>& pool, std::string const& hos
             "If you are a developer, please fix your sql query.",
             path.generic_string(), pool.GetConnectionInfo()->database);
 
-        if (!sConfigMgr->isDryRun()
+        if (!sConfigMgr->isDryRun())
             throw UpdateException("update failed");
     }
 }
