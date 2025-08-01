@@ -1,3 +1,4 @@
+-- DB update 2025_07_29_03 -> 2025_08_01_00
 --
 ALTER TABLE `item_template` DROP COLUMN `StatsCount`;
 
