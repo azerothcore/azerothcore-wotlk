@@ -742,6 +742,8 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
 
                     if (e.action.cast.castFlags & SMARTCAST_COMBAT_MOVE)
                     {
+                        CAST_AI(SmartAI, me->AI())->SetChaseOnInterrupt(true);
+
                         if (!me->isMoving()) // Don't try to reposition while we are moving
                         {
                             // If cast flag SMARTCAST_COMBAT_MOVE is set combat movement will not be allowed unless target is outside spell range, out of mana, or LOS.
