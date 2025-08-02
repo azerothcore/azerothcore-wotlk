@@ -176,81 +176,6 @@ void Map::AddToGrid(Corpse* obj, Cell const& cell)
 }
 
 template<class T>
-void Map::SwitchGridContainers(T* /*obj*/, bool /*on*/)
-{
-}
-
-template<>
-void Map::SwitchGridContainers(Creature* obj, bool on)
-{
-    ASSERT(!obj->IsPermanentWorldObject());
-    CellCoord p = Acore::ComputeCellCoord(obj->GetPositionX(), obj->GetPositionY());
-    if (!p.IsCoordValid())
-    {
-        LOG_ERROR("maps", "Map::SwitchGridContainers: Object {} has invalid coordinates X:{} Y:{} grid cell [{}:{}]",
-            obj->GetGUID().ToString(), obj->GetPositionX(), obj->GetPositionY(), p.x_coord, p.y_coord);
-        return;
-    }
-
-    Cell cell(p);
-    if (!IsGridLoaded(GridCoord(cell.data.Part.grid_x, cell.data.Part.grid_y)))
-        return;
-
-    LOG_DEBUG("maps", "Switch object {} from grid[{}, {}] {}", obj->GetGUID().ToString(), cell.GridX(), cell.GridY(), on);
-    MapGridType* grid = GetMapGrid(cell.GridX(), cell.GridY());
-    ASSERT(grid);
-
-    obj->RemoveFromGrid(); //This step is not really necessary but we want to do ASSERT in remove/add
-
-    if (on)
-    {
-        grid->AddWorldObject(cell.CellX(), cell.CellY(), obj);
-        AddWorldObject(obj);
-    }
-    else
-    {
-        grid->AddGridObject(cell.CellX(), cell.CellY(), obj);
-        RemoveWorldObject(obj);
-    }
-
-    obj->m_isTempWorldObject = on;
-}
-
-template<>
-void Map::SwitchGridContainers(GameObject* obj, bool on)
-{
-    ASSERT(!obj->IsPermanentWorldObject());
-    CellCoord p = Acore::ComputeCellCoord(obj->GetPositionX(), obj->GetPositionY());
-    if (!p.IsCoordValid())
-    {
-        LOG_ERROR("maps", "Map::SwitchGridContainers: Object {} has invalid coordinates X:{} Y:{} grid cell [{}:{}]",
-            obj->GetGUID().ToString(), obj->GetPositionX(), obj->GetPositionY(), p.x_coord, p.y_coord);
-        return;
-    }
-
-    Cell cell(p);
-    if (!IsGridLoaded(GridCoord(cell.data.Part.grid_x, cell.data.Part.grid_y)))
-        return;
-
-    //LOG_DEBUG(LOG_FILTER_MAPS, "Switch object {} from grid[{}, {}] {}", obj->GetGUID().ToString(), cell.data.Part.grid_x, cell.data.Part.grid_y, on);
-    MapGridType* grid = GetMapGrid(cell.GridX(), cell.GridY());
-    ASSERT(grid);
-
-    obj->RemoveFromGrid(); //This step is not really necessary but we want to do ASSERT in remove/add
-
-    if (on)
-    {
-        grid->AddWorldObject(cell.CellX(), cell.CellY(), obj);
-        AddWorldObject(obj);
-    }
-    else
-    {
-        grid->AddGridObject(cell.CellX(), cell.CellY(), obj);
-        RemoveWorldObject(obj);
-    }
-}
-
-template<class T>
 void Map::DeleteFromWorld(T* obj)
 {
     // Note: In case resurrectable corpse and pet its removed from global lists in own destructor
@@ -1108,7 +1033,7 @@ void Map::UnloadAll()
 
     _transports.clear();
 
-    for (auto& cellCorpsePair : _corpsesByCell)
+    for (auto& cellCorpsePair : _corpsesByGrid)
     {
         for (Corpse* corpse : cellCorpsePair.second)
         {
@@ -1118,7 +1043,7 @@ void Map::UnloadAll()
         }
     }
 
-    _corpsesByCell.clear();
+    _corpsesByGrid.clear();
     _corpsesByPlayer.clear();
     _corpseBones.clear();
 }
@@ -1849,49 +1774,8 @@ void Map::AddObjectToRemoveList(WorldObject* obj)
     //LOG_DEBUG("maps", "Object ({}) added to removing list.", obj->GetGUID().ToString());
 }
 
-void Map::AddObjectToSwitchList(WorldObject* obj, bool on)
-{
-    ASSERT(obj->GetMapId() == GetId() && obj->GetInstanceId() == GetInstanceId());
-    // i_objectsToSwitch is iterated only in Map::RemoveAllObjectsInRemoveList() and it uses
-    // the contained objects only if IsCreature() , so we can return in all other cases
-    if (!obj->IsCreature() && !obj->IsGameObject())
-        return;
-
-    std::map<WorldObject*, bool>::iterator itr = i_objectsToSwitch.find(obj);
-    if (itr == i_objectsToSwitch.end())
-        i_objectsToSwitch.insert(itr, std::make_pair(obj, on));
-    else if (itr->second != on)
-        i_objectsToSwitch.erase(itr);
-    else
-        ABORT();
-}
-
 void Map::RemoveAllObjectsInRemoveList()
 {
-    while (!i_objectsToSwitch.empty())
-    {
-        std::map<WorldObject*, bool>::iterator itr = i_objectsToSwitch.begin();
-        WorldObject* obj = itr->first;
-        bool on = itr->second;
-        i_objectsToSwitch.erase(itr);
-
-        if (!obj->IsPermanentWorldObject())
-        {
-            switch (obj->GetTypeId())
-            {
-                case TYPEID_UNIT:
-                    SwitchGridContainers<Creature>(obj->ToCreature(), on);
-                    break;
-                case TYPEID_GAMEOBJECT:
-                    SwitchGridContainers<GameObject>(obj->ToGameObject(), on);
-                    break;
-                default:
-                    break;
-            }
-        }
-    }
-
-    //LOG_DEBUG("maps", "Object remover 1 check.");
     while (!i_objectsToRemove.empty())
     {
         std::unordered_set<WorldObject*>::iterator itr = i_objectsToRemove.begin();
@@ -1929,8 +1813,6 @@ void Map::RemoveAllObjectsInRemoveList()
                 break;
         }
     }
-
-    //LOG_DEBUG("maps", "Object remover 2 check.");
 }
 
 uint32 Map::GetPlayersCountExceptGMs() const
@@ -1970,6 +1852,12 @@ template<>
 void Map::AddToActive(GameObject* d)
 {
     AddToActiveHelper(d);
+}
+
+template<>
+void Map::AddToActive(Corpse* /*c*/)
+{
+    // do nothing for corpses
 }
 
 template<class T>
@@ -2791,7 +2679,8 @@ void Map::AddCorpse(Corpse* corpse)
 {
     corpse->SetMap(this);
 
-    _corpsesByCell[corpse->GetCellCoord().GetId()].insert(corpse);
+    GridCoord const gridCoord = Acore::ComputeGridCoord(corpse->GetPositionX(), corpse->GetPositionY());
+    _corpsesByGrid[gridCoord.GetId()].insert(corpse);
     if (corpse->GetType() != CORPSE_BONES)
         _corpsesByPlayer[corpse->GetOwnerGUID()] = corpse;
     else
@@ -2801,6 +2690,7 @@ void Map::AddCorpse(Corpse* corpse)
 void Map::RemoveCorpse(Corpse* corpse)
 {
     ASSERT(corpse);
+    GridCoord const gridCoord = Acore::ComputeGridCoord(corpse->GetPositionX(), corpse->GetPositionY());
 
     corpse->DestroyForNearbyPlayers();
     if (corpse->IsInGrid())
@@ -2811,7 +2701,7 @@ void Map::RemoveCorpse(Corpse* corpse)
         corpse->ResetMap();
     }
 
-    _corpsesByCell[corpse->GetCellCoord().GetId()].erase(corpse);
+    _corpsesByGrid[gridCoord.GetId()].erase(corpse);
     if (corpse->GetType() != CORPSE_BONES)
         _corpsesByPlayer.erase(corpse->GetOwnerGUID());
     else

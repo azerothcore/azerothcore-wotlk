@@ -104,7 +104,7 @@ bool WorldSessionFilter::Process(WorldPacket* packet)
 }
 
 /// WorldSession constructor
-WorldSession::WorldSession(uint32 id, std::string&& name, std::shared_ptr<WorldSocket> sock, AccountTypes sec, uint8 expansion,
+WorldSession::WorldSession(uint32 id, std::string&& name, uint32 accountFlags, std::shared_ptr<WorldSocket> sock, AccountTypes sec, uint8 expansion,
     time_t mute_time, LocaleConstant locale, uint32 recruiter, bool isARecruiter, bool skipQueue, uint32 TotalTime, bool isBot) :
     m_muteTime(mute_time),
     m_timeOutTime(0),
@@ -116,6 +116,7 @@ WorldSession::WorldSession(uint32 id, std::string&& name, std::shared_ptr<WorldS
     _skipQueue(skipQueue),
     _accountId(id),
     _accountName(std::move(name)),
+    _accountFlags(accountFlags),
     m_expansion(expansion),
     m_total_time(TotalTime),
     _logoutTime(0),
@@ -180,6 +181,30 @@ WorldSession::~WorldSession()
         delete packet;
 
     LoginDatabase.Execute("UPDATE account SET online = 0 WHERE id = {};", GetAccountId());     // One-time query
+}
+
+void WorldSession::UpdateAccountFlag(uint32 flag, bool remove /*= flase*/)
+{
+    if (remove)
+        _accountFlags &= ~flag;
+    else
+        _accountFlags |= flag;
+
+    // Async update
+    LoginDatabasePreparedStatement* stmt = LoginDatabase.GetPreparedStatement(LOGIN_UPD_SET_ACCOUNT_FLAG);
+    stmt->SetData(0, _accountFlags);
+    stmt->SetData(1, GetAccountId());
+    LoginDatabase.Execute(stmt);
+}
+
+void WorldSession::ValidateAccountFlags()
+{
+    bool hasGMFlag = HasAccountFlag(ACCOUNT_FLAG_GM);
+
+    if (IsGMAccount() && !hasGMFlag)
+        UpdateAccountFlag(ACCOUNT_FLAG_GM);
+    else if (hasGMFlag && !IsGMAccount())
+        UpdateAccountFlag(ACCOUNT_FLAG_GM, true);
 }
 
 bool WorldSession::IsGMAccount() const

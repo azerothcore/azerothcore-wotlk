@@ -84,20 +84,14 @@ void GridObjectLoader::LoadAllCellsInGrid()
     LoadGameObjects(cell_guids.gameobjects, _map);
     LoadCreatures(cell_guids.creatures, _map);
 
-    if (std::unordered_set<Corpse*> const* corpses = _map->GetCorpsesInCell(_grid.GetId()))
+    if (std::unordered_set<Corpse*> const* corpses = _map->GetCorpsesInGrid(_grid.GetId()))
     {
         for (Corpse* corpse : *corpses)
         {
             if (corpse->IsInGrid())
                 continue;
 
-            CellCoord cellCoord = Acore::ComputeCellCoord(corpse->GetPositionX(), corpse->GetPositionY());
-            Cell cell(cellCoord);
-
-            if (corpse->IsWorldObject())
-                _grid.AddWorldObject(cell.CellX(), cell.CellY(), corpse);
-            else
-                _grid.AddGridObject(cell.CellX(), cell.CellY(), corpse);
+            AddObjectHelper<Corpse>(_map, corpse);
         }
     }
 }

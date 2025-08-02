@@ -48,6 +48,8 @@
 #define NOMINAL_MELEE_RANGE         5.0f
 #define MELEE_RANGE                 (NOMINAL_MELEE_RANGE - MIN_MELEE_REACH * 2) //center to center for players
 #define DEFAULT_COLLISION_HEIGHT    2.03128f                // Most common value in dbc
+#define LEEWAY_MIN_MOVE_SPEED       4.97f                   // NYI
+#define LEEWAY_BONUS_RANGE          2.66f
 
 // used for creating values for respawn for example
 inline uint32 PAIR64_HIPART(uint64 x);
