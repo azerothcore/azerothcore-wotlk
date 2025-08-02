@@ -465,7 +465,7 @@ enum SpellAttr2 : uint32
     SPELL_ATTR2_ALWAYS_CAST_AS_UNIT                  = 0x00000200, // TITLE Unknown attribute 9@Attr2
     SPELL_ATTR2_SPECIAL_TAMING_FLAG                  = 0x00000400, // TITLE Unknown attribute 10@Attr2 DESCRIPTION Related to taming?
     SPELL_ATTR2_NO_TARGET_PER_SECOND_COST            = 0x00000800, // TITLE Health Funnel
-    SPELL_ATTR2_CHAIN_FROM_CASTER                    = 0x00001000, // TITLE Unknown attribute 12@Attr2 DESCRIPTION Cleave, Heart Strike, Maul, Sunder Armor, Swipe
+    SPELL_ATTR2_CHAIN_FROM_CASTER                    = 0x00001000, // TITLE Chain from caster DESCRIPTION Cleave, Heart Strike, Maul, Sunder Armor, Swipe
     SPELL_ATTR2_ENCHANT_OWN_ITEM_ONLY                = 0x00002000, // TITLE Enchant persists when entering arena
     SPELL_ATTR2_ALLOW_WHILE_INVISIBLE                = 0x00004000, // TITLE Unknown attribute 14@Attr2
     SPELL_ATTR2_DO_NOT_CONSUME_IF_GAINED_DURING_CAST = 0x00008000, // TITLE Unused attribute 15@Attr2 DESCRIPTION not set in 3.3.5a

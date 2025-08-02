@@ -1954,6 +1954,8 @@ public:
     void UpdateAttackPowerAndDamage(bool ranged = false) override;
     void UpdateShieldBlockValue();
     void ApplySpellPowerBonus(int32 amount, bool apply);
+    void ApplySpellDamageBonus(int32 amount, bool apply);
+    void ApplySpellHealingBonus(int32 amount, bool apply);
     void UpdateSpellDamageAndHealingBonus();
     void ApplyRatingMod(CombatRating cr, int32 value, bool apply);
     void UpdateRating(CombatRating cr);
@@ -1972,6 +1974,8 @@ public:
     [[nodiscard]] float GetRatingMultiplier(CombatRating cr) const;
     [[nodiscard]] float GetRatingBonusValue(CombatRating cr) const;
     uint32 GetBaseSpellPowerBonus() { return m_baseSpellPower; }
+    uint32 GetBaseSpellDamageBonus() { return m_baseSpellDamage; }
+    uint32 GetBaseSpellHealingBonus() { return m_baseSpellHealing; }
     [[nodiscard]] int32 GetSpellPenetrationItemMod() const { return m_spellPenetrationItemMod; }
 
     [[nodiscard]] float GetExpertiseDodgeOrParryReduction(WeaponAttackType attType) const;
@@ -2831,6 +2835,8 @@ protected:
     float m_auraBaseMod[BASEMOD_END][MOD_END];
     int32 m_baseRatingValue[MAX_COMBAT_RATING];
     uint32 m_baseSpellPower;
+    uint32 m_baseSpellDamage;
+    uint32 m_baseSpellHealing;
     uint32 m_baseFeralAP;
     uint32 m_baseManaRegen;
     uint32 m_baseHealthRegen;

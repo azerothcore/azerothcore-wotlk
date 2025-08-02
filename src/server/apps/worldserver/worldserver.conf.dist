@@ -1768,6 +1768,16 @@ CleanCharacterDB = 0
 PersistentCharacterCleanFlags = 0
 
 #
+#    ValidateSkillLearnedBySpells
+#        Description: If enabled, players will lose spells that are invalid for their race/class.
+#        Default:     1 - (Enabled, enforce valid spells)
+#                     0 - (Disabled, allow invalid spells)
+#        Disabling this and then having your character learn spells which require DBC edits can result in the character not being saved in the database
+#        Disable AT YOUR OWN RISK
+
+ValidateSkillLearnedBySpells = 1
+
+#
 ###################################################################################################
 
 ###################################################################################################
@@ -3504,6 +3514,14 @@ Wintergrasp.CrashRestartTimer = 10
 ###################################################################################################
 # BATTLEGROUND
 #
+#    Battleground.PrepTime
+#        Description: Time (in seconds) for battleground preparation phase. Strand of the Ancients will be
+#        the exception and will always use the default 120 seconds timer, due to its boat timing mechanic.
+#        Default:     120
+
+Battleground.PrepTime = 120
+
+#
 #    Battleground.CastDeserter
 #        Description: Cast Deserter spell at players who leave battlegrounds in progress.
 #        Default:     1 - (Enabled)
@@ -3768,6 +3786,13 @@ Battleground.EyeOfTheStorm.CapturePoints = 1600
 
 ###################################################################################################
 # ARENA
+#
+#    Arena.PrepTime
+#        Description: Time (in seconds) for arena preparation phase.
+#        Default:     60
+
+Arena.PrepTime = 60
+
 #
 #    Arena.MaxRatingDifference
 #        Description: Maximum rating difference between two teams in rated matches.
