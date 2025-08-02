@@ -18,17 +18,33 @@ INSERT INTO `creature_questender` (`id`, `quest`) VALUES
 (29441, 12816); -- Lieutenant Julek
 
 -- areatrigger
-DELETE FROM areatrigger_involvedrelation WHERE id IN (4094, 4096, 4100, 4103, 4105);
-INSERT INTO areatrigger_involvedrelation (id, quest) VALUES
-(4094, 9260),
-(4096, 9260),
-(4100, 9265),
-(4103, 9264),
-(4105, 9262);
+DELETE FROM `areatrigger_involvedrelation` WHERE `id` IN (4092, 4094, 4095, 4096, 4098, 4099, 4100, 4101, 4103, 4104, 4105, 5151, 5152, 5153, 5154, 5158, 5159, 5160, 5161);
+INSERT INTO `areatrigger_involvedrelation` (`id`, `quest`) VALUES
+(4092, 9260),  -- guid 83048
+(4094, 9260),  -- guid 83044
+(4095, 9260),  -- guid 83049
+(4096, 9260),  -- guid 83046
+(4098, 9261),  -- guid 83047
+(4099, 9261),  -- guid 83045
+(4100, 9265),  -- guid 83041
+-- (4102, 9263),  -- guid 83043 -- too far away from circle somehow
+-- apparently blizzlike bug according to wowhead comments, only 1 circle outside orgrimmar giving quest progress correctly
+(4101, 9263),  -- guid 83042
+(4103, 9264),  -- guid 83040
+(4104, 9262),  -- guid 83039
+(4105, 9262),  -- guid 83038
+(5151, 12817), -- guid 684
+(5152, 12817), -- guid 685
+(5153, 12817), -- guid 687
+(5154, 12817), -- guid 686
+(5158, 12816), -- guid 691
+(5159, 12816), -- guid 690
+(5160, 12816), -- guid 689
+(5161, 12816); -- guid 688
 
 -- Update gameobject 'Circle' with sniffed values
 -- updated spawns
-DELETE FROM `gameobject` WHERE (`id` IN (181227)) AND (`guid` IN (83038, 83039, 83040, 83041, 83042, 83043, 83044, 83045, 83046, 83047, 83048, 83049));
+DELETE FROM `gameobject` WHERE (`id` IN (181227)) AND (`guid` BETWEEN 83038 AND 83049);
 INSERT INTO `gameobject` (`guid`, `id`, `map`, `zoneId`, `areaId`, `spawnMask`, `phaseMask`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecs`, `animprogress`, `state`, `ScriptName`, `VerifiedBuild`, `Comment`) VALUES
 (83038, 181227, 1, 0, 0, 1, 1, 9948.0205078125, 1932.390625, 1328.691162109375, 3.682650327682495117, 0, 0, -0.96362972259521484, 0.26724100112915039, 120, 255, 1, "", 46248, NULL),
 (83039, 181227, 1, 0, 0, 1, 1, 9914.181640625, 1864.6636962890625, 1321.25927734375, 2.914689540863037109, 0, 0, 0.993571281433105468, 0.113208353519439697, 120, 255, 1, "", 46248, NULL),
@@ -60,40 +76,34 @@ DELETE FROM `game_event_gameobject` WHERE (`eventEntry` = 17) AND (`guid` IN (SE
 INSERT INTO `game_event_gameobject` (SELECT 17, `guid` FROM `gameobject` WHERE `id` IN (181227));
 
 -- TODO: update creature spawns with sniffed values
+-- TODO: check quest pois - there's like 4 pois for each quest on the map - one should be sufficient imo (?)
+-- TODO: ensure these do not count towards loremaster
 
 -- 9260 Investigate the Scourge of Stormwind (A)
 -- .go c id 16478
--- done
 
 -- 9261 Investigate the Scourge of Ironforge (A)
 -- .go c id 16484
--- missing circle and mobs in front of town
--- missing areatrigger link
+-- missing mobs in front of town
 
 -- 9262 Investigate the Scourge of Darnassus (A)
 -- .go c id 16495
--- done
 
 -- 9263 Investigate the Scourge of Orgrimmar (H)
 -- .go c id 16493
--- has 2 circles and countless mobs in front of orgrimmar, apparently in the wrong spot, does not match quest poi
--- missing circle and mobs in front of town
--- missing areatrigger link
+-- has quite a few mobs in front of orgrimmar, apparently in the wrong spot, does not match quest poi
+-- missing mobs in front of town
 
--- 9264 Investigate the Scourge of Thunder Bluff
+-- 9264 Investigate the Scourge of Thunder Bluff (H)
 -- .go c id 16490
--- done
 
 -- 9265 Investigate the Scourge of the Undercity (H)
 -- .go c id 16494
--- done
 
--- 12816 Investigate the Scourge of Silvermoon
+-- 12816 Investigate the Scourge of Silvermoon (H)
 -- .go c id 29441
--- missing circle and mobs in front of town
--- missing areatrigger link
+-- missing mobs in front of town
 
--- 12817 Investigate the Scourge of Exodar
+-- 12817 Investigate the Scourge of Exodar (A)
 -- .go c id 29442
--- missing circle and mobs in front of town
--- missing areatrigger link
+-- missing mobs in front of town
