@@ -81,6 +81,12 @@ while true; do
         echo "Please check your system configuration and logs"
         exit 1
     fi
+
+    # Exit cleanly if shutdown was requested by command or SIGINT (exit code 0)
+    if [ $_exit_code -eq 0 ]; then
+        echo "$(basename "$BINARY") shutdown safely"
+        exit 0
+    fi
     
     echo "$(basename "$BINARY") will restart in 3 seconds..."
     sleep 3
