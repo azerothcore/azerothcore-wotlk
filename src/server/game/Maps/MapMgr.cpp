@@ -223,7 +223,7 @@ Map::EnterState MapMgr::PlayerCannotEnter(uint32 mapid, Player* player, bool log
     {
         uint32 destInstId = sInstanceSaveMgr->PlayerGetDestinationInstanceId(player, mapid, targetDifficulty);
         if (destInstId)
-            if (Map* boundMap = sMapMgr->FindMap(mapid, destInstId))
+            if (Map* boundMap = FindMap(mapid, destInstId))
                 if (Map::EnterState denyReason = boundMap->CannotEnter(player, loginCheck))
                     return denyReason;
     }
