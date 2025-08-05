@@ -159,7 +159,7 @@ public:
             {
                 me->UpdatePosition(me->GetPositionX(), me->GetPositionY(), h, me->GetOrientation(), true); // move to ground
                 me->StopMovingOnCurrentPos();
-                me->DestroyForNearbyPlayers();
+                me->DestroyForVisiblePlayers();
             }
         }
 

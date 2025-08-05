@@ -33,6 +33,7 @@
 #include "Position.h"
 #include "UpdateData.h"
 #include "UpdateMask.h"
+#include "ObjectVisibilityContainer.h"
 #include <memory>
 #include <set>
 #include <sstream>
@@ -559,6 +560,29 @@ public:
     void PlayDirectMusic(uint32 music_id, Player* target = nullptr);
     void PlayRadiusMusic(uint32 music_id, float radius);
 
+    // Warning: Possible iterator invalidation in uses that may modify visibility map
+    template<typename Worker>
+    void DoForAllVisiblePlayers(Worker&& worker)
+    {
+        for (auto const& kvPair : GetObjectVisibilityContainer().GetVisiblePlayersMap())
+            worker(kvPair.second);
+    }
+
+    // Warning: Possible iterator invalidation in uses that may modify visibility map
+    template<typename Worker>
+    void DoForAllVisibleWorldObjects(Worker&& worker)
+    {
+        // Not a player, no access to this map
+        VisibleWorldObjectsMap const* visibleWorldObjectsMap = GetObjectVisibilityContainer().GetVisibleWorldObjectsMap();
+        if (!visibleWorldObjectsMap)
+            return;
+
+        for (auto const& kvPair : *visibleWorldObjectsMap)
+            worker(kvPair.second);
+    }
+
+    void DestroyForVisiblePlayers();
+
     void SendObjectDeSpawnAnim(ObjectGuid guid);
 
     virtual void SaveRespawnTime() {}
@@ -609,7 +633,6 @@ public:
     void GetCreatureListWithEntryInGrid(std::list<Creature*>& creatureList, std::vector<uint32> const& entries, float maxSearchRange) const;
     void GetDeadCreatureListInGrid(std::list<Creature*>& lList, float maxSearchRange, bool alive = false) const;
 
-    void DestroyForNearbyPlayers();
     virtual void UpdateObjectVisibility(bool forced = true, bool fromUpdate = false);
     virtual void UpdateObjectVisibilityOnCreate() { UpdateObjectVisibility(true); }
     void BuildUpdate(UpdateDataMapType& data_map, UpdatePlayerSet& player_set) override;
@@ -688,6 +711,9 @@ public:
 
     std::string GetDebugInfo() const override;
 
+    ObjectVisibilityContainer& GetObjectVisibilityContainer() { return _objectVisibilityContainer; }
+    ObjectVisibilityContainer const& GetObjectVisibilityContainer() const { return _objectVisibilityContainer; }
+
     // Event handler
     ElunaEventProcessor* elunaEvents;
     EventProcessor m_Events;
@@ -745,6 +771,8 @@ private:
     bool CanDetectStealthOf(WorldObject const* obj, bool checkAlert = false) const;
 
     GuidUnorderedSet _allowedLooters;
+
+    ObjectVisibilityContainer _objectVisibilityContainer;
 };
 
 namespace Acore
