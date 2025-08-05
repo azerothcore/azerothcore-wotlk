@@ -20,8 +20,8 @@
 
 #include "Common.h"
 #include "ObjectGuid.h"
-#include <unordered_map>
 #include <memory>
+#include <unordered_map>
 
 class Player;
 class WorldObject;

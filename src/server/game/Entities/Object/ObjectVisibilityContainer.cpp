@@ -15,9 +15,9 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "ObjectVisibilityContainer.h"
 #include "Object.h"
 #include "Player.h"
-#include "ObjectVisibilityContainer.h"
 
 /*
 * Some implementation notes:
