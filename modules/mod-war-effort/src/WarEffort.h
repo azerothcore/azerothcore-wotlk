@@ -161,7 +161,6 @@ enum WarEffortGameobjectIds
     GO_LEATHER_HORDE_TIER_5   = 180817,
 
     // Alliance
-    // GO_INITIAL_*s are already spawned - Removed to make everything work the same
 	GO_HERBS_FOOD_ALLIANCE_INITIAL  = 180679,
     GO_HERBS_ALLIANCE_TIER_1  = 180801,
     GO_HERBS_ALLIANCE_TIER_2  = 180802,
@@ -197,8 +196,14 @@ enum WarEffortGameobjectIds
     GO_METAL_ALLIANCE_TIER_5  = 180784
 };
 
+enum Says
+{
+    SAY_DISMISS               = 0
+};
+
 enum WarEffortNpcs
 {
+    NPC_GENERAL_ZOG           = 15539,
     NPC_JONATHAN              = 15693
 };
 
@@ -258,22 +263,24 @@ std::map<uint32, Position> WarEffortGameobjectPositions =
     { GO_HERBS_HORDE_TIER_4, Position(1629.21f, -4080.47f, 32.6781f, 3.49859f) },
     { GO_HERBS_HORDE_TIER_5, Position(1626.37f, -4085.38f, 30.0f, 3.9f) },
 
+// DONE
     { GO_HERBS_FOOD_ALLIANCE_INITIAL, Position(-4937.29f, -1282.74f, 501.672f, 2.26893f) },
     { GO_LEATHER_ALLIANCE_INITIAL, Position(-4958.51f, -1179.32f, 501.659f, 2.26893f) },
     { GO_METAL_ALLIANCE_INITIAL, Position(-4913.85f, -1226.0f, 501.651f, 2.25148f) },
     { GO_BANDAGES_ALLIANCE_INITIAL, Position(-4971.55f, -1148.57f, 501.648f, 2.28638f) },
 
-    { GO_HERBS_ALLIANCE_TIER_1, Position(-4962.77f, -1261.97f, 501.672f, 1.10063f) },
-    { GO_FOOD_ALLIANCE_TIER_1, Position(-4931.66f, -1258.2f, 501.661f, 5.24509f) },
-    { GO_LEATHER_ALLIANCE_TIER_1, Position(-4970.71f, -1176.37f, 501.641f) },
-    { GO_METAL_ALLIANCE_TIER_1, Position(-4916.41f, -1236.17f, 501.658f) },
+// Some Done
+    { GO_HERBS_ALLIANCE_TIER_1, Position(-4935.336f, -1283.7869f, 501.6703f, 2.28856f) }, // Done
+    { GO_FOOD_ALLIANCE_TIER_1, Position(-4937.29f, -1282.74f, 501.672f, 2.26893f) }, // Done
+    { GO_LEATHER_ALLIANCE_TIER_1, Position(-4958.51f, -1179.32f, 501.659f, 2.26893f) }, // Done
+    { GO_METAL_ALLIANCE_TIER_1, Position(-4935.336f, -1283.7869f, 501.6703f, 2.28856f) }, // Done
     { GO_BANDAGES_ALLIANCE_TIER_1, Position(-4985.06f, -1140.51f, 501.659f, 4.10423f) },
 
-// NO COORDS YET
-    { GO_FOOD_ALLIANCE_TIER_2, Position(1626.65f, -4086.06f, 32.1115f, 3.51757f) },
-    { GO_FOOD_ALLIANCE_TIER_3, Position(1632.56f, -4074.87f, 36.1896f, 2.96728f) },
-    { GO_FOOD_ALLIANCE_TIER_4, Position(1629.21f, -4080.47f, 32.6781f, 3.49859f) },
-    { GO_FOOD_ALLIANCE_TIER_5, Position(1626.37f, -4085.38f, 30.0f, 3.9f) },
+// DONE
+    { GO_FOOD_ALLIANCE_TIER_2, Position(-4935.336f, -1283.7869f, 501.6703f, 2.28856f) },
+    { GO_FOOD_ALLIANCE_TIER_3, Position(-4935.336f, -1283.7869f, 501.6703f, 2.28856f) },
+    { GO_FOOD_ALLIANCE_TIER_4, Position(-4935.336f, -1283.7869f, 501.6703f, 2.28856f) },
+    { GO_FOOD_ALLIANCE_TIER_5, Position(-4935.336f, -1283.7869f, 501.6703f, 2.28856f) },
 
 // NO COORDS YET
     { GO_BANDAGES_ALLIANCE_TIER_2, Position(1626.65f, -4086.06f, 32.1115f, 3.51757f) },
@@ -281,23 +288,23 @@ std::map<uint32, Position> WarEffortGameobjectPositions =
     { GO_BANDAGES_ALLIANCE_TIER_4, Position(1629.21f, -4080.47f, 32.6781f, 3.49859f) },
     { GO_BANDAGES_ALLIANCE_TIER_5, Position(1626.37f, -4085.38f, 30.0f, 3.9f) },
 
-// NO COORDS YET
-    { GO_LEATHER_ALLIANCE_TIER_2, Position(1626.65f, -4086.06f, 32.1115f, 3.51757f) },
-    { GO_LEATHER_ALLIANCE_TIER_3, Position(1632.56f, -4074.87f, 36.1896f, 2.96728f) },
-    { GO_LEATHER_ALLIANCE_TIER_4, Position(1629.21f, -4080.47f, 32.6781f, 3.49859f) },
-    { GO_LEATHER_ALLIANCE_TIER_5, Position(1626.37f, -4085.38f, 30.0f, 3.9f) },
+// DONE
+    { GO_LEATHER_ALLIANCE_TIER_2, Position(-4958.51f, -1179.32f, 501.659f, 2.26893f) },
+    { GO_LEATHER_ALLIANCE_TIER_3, Position(-4958.51f, -1179.32f, 501.659f, 2.26893f) },
+    { GO_LEATHER_ALLIANCE_TIER_4, Position(-4958.51f, -1179.32f, 501.659f, 2.26893f) },
+    { GO_LEATHER_ALLIANCE_TIER_5, Position(-4958.51f, -1179.32f, 501.659f, 2.26893f) },
 
-// NO COORDS YET
-    { GO_METAL_ALLIANCE_TIER_2, Position(1626.65f, -4086.06f, 32.1115f, 3.51757f) },
-    { GO_METAL_ALLIANCE_TIER_3, Position(1632.56f, -4074.87f, 36.1896f, 2.96728f) },
-    { GO_METAL_ALLIANCE_TIER_4, Position(1629.21f, -4080.47f, 32.6781f, 3.49859f) },
-    { GO_METAL_ALLIANCE_TIER_5, Position(1626.37f, -4085.38f, 30.0f, 3.9f) },
+// DONE
+    { GO_METAL_ALLIANCE_TIER_2, Position(-4913.85f, -1226.0f, 501.651f, 2.25148f) },
+    { GO_METAL_ALLIANCE_TIER_3, Position(-4913.85f, -1226.0f, 501.651f, 2.25148f) },
+    { GO_METAL_ALLIANCE_TIER_4, Position(-4913.85f, -1226.0f, 501.651f, 2.25148f) },
+    { GO_METAL_ALLIANCE_TIER_5, Position(-4913.85f, -1226.0f, 501.651f, 2.25148f) },
 
-// NO COORDS YET
-    { GO_HERBS_ALLIANCE_TIER_2, Position(1626.65f, -4086.06f, 32.1115f, 3.51757f) },
-    { GO_HERBS_ALLIANCE_TIER_3, Position(1632.56f, -4074.87f, 36.1896f, 2.96728f) },
-    { GO_HERBS_ALLIANCE_TIER_4, Position(1629.21f, -4080.47f, 32.6781f, 3.49859f) },
-    { GO_HERBS_ALLIANCE_TIER_5, Position(1626.37f, -4085.38f, 30.0f, 3.9f) }
+// DONE
+    { GO_HERBS_ALLIANCE_TIER_2, Position(-4935.336f, -1283.7869f, 501.6703f, 2.28856f) },
+    { GO_HERBS_ALLIANCE_TIER_3, Position(-4935.336f, -1283.7869f, 501.6703f, 2.28856f) },
+    { GO_HERBS_ALLIANCE_TIER_4, Position(-4935.336f, -1283.7869f, 501.6703f, 2.28856f) },
+    { GO_HERBS_ALLIANCE_TIER_5, Position(-4935.336f, -1283.7869f, 501.6703f, 2.28856f) }
 };
 
 
