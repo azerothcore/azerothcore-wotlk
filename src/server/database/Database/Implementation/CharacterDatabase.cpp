@@ -650,7 +650,6 @@ void CharacterDatabaseConnection::DoPrepareStatements()
     PrepareStatement(CHAR_INS_NPCBOT_LOG, "INSERT INTO characters_npcbot_logs (entry, owner, mapid, inmap, inworld, type, param1, param2, param3, param4, param5) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", CONNECTION_ASYNC);
     PrepareStatement(CHAR_SEL_NPCBOT_ACC_BOT_COUNT, "SELECT COUNT(entry) FROM characters_npcbot WHERE owner IN (SELECT guid FROM characters WHERE account = ?);", CONNECTION_SYNCH);
     // End NPCBots
-
 }
 
 CharacterDatabaseConnection::CharacterDatabaseConnection(MySQLConnectionInfo& connInfo) : MySQLConnection(connInfo)

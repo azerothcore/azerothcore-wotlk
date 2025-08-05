@@ -378,15 +378,6 @@ void Creature::RemoveFromWorld()
             Acore::Containers::MultimapErasePair(GetMap()->GetCreatureBySpawnIdStore(), m_spawnId, this);
 
         GetMap()->GetObjectsStore().Remove<Creature>(GetGUID());
-
-    //NPCBot
-//        if (IsNPCBotOrPet())
-//        {
-//            if (Map* map = GetMap())
-//                map->RemoveObjectFromMapUpdateList(this);
-//        }
-    //End NPCBOT
-
     }
 }
 
