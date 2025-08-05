@@ -1683,7 +1683,6 @@ void Map::SendRemoveTransports(Player* player)
 void Map::SendObjectUpdates()
 {
     UpdateDataMapType update_players;
-    UpdatePlayerSet player_set;
 
     while (!_updateObjects.empty())
     {
@@ -1691,7 +1690,7 @@ void Map::SendObjectUpdates()
         ASSERT(obj->IsInWorld());
 
         _updateObjects.erase(_updateObjects.begin());
-        obj->BuildUpdate(update_players, player_set);
+        obj->BuildUpdate(update_players);
     }
 
     WorldPacket packet;                                     // here we allocate a std::vector with a size of 0x10000

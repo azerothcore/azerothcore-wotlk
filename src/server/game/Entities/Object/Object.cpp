@@ -2988,7 +2988,7 @@ void WorldObject::AddToNotify(uint16 f)
         }
 }
 
-void WorldObject::BuildUpdate(UpdateDataMapType& data_map, UpdatePlayerSet& player_set)
+void WorldObject::BuildUpdate(UpdateDataMapType& data_map)
 {
     // Build update for self
     if (IsPlayer())

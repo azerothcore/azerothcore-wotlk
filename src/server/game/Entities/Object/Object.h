@@ -97,7 +97,6 @@ class MotionTransport;
 struct PositionFullTerrainStatus;
 
 typedef std::unordered_map<Player*, UpdateData> UpdateDataMapType;
-typedef GuidUnorderedSet UpdatePlayerSet;
 
 static constexpr Milliseconds HEARTBEAT_INTERVAL = 5s + 200ms;
 
@@ -190,7 +189,7 @@ public:
 
     [[nodiscard]] virtual bool hasQuest(uint32 /* quest_id */) const { return false; }
     [[nodiscard]] virtual bool hasInvolvedQuest(uint32 /* quest_id */) const { return false; }
-    virtual void BuildUpdate(UpdateDataMapType&, UpdatePlayerSet&) {}
+    virtual void BuildUpdate(UpdateDataMapType&) {}
     void BuildFieldsUpdate(Player*, UpdateDataMapType&);
 
     void SetFieldNotifyFlag(uint16 flag) { _fieldNotifyFlags |= flag; }
@@ -635,7 +634,7 @@ public:
 
     virtual void UpdateObjectVisibility(bool forced = true, bool fromUpdate = false);
     virtual void UpdateObjectVisibilityOnCreate() { UpdateObjectVisibility(true); }
-    void BuildUpdate(UpdateDataMapType& data_map, UpdatePlayerSet& player_set) override;
+    void BuildUpdate(UpdateDataMapType& data_map) override;
     void GetCreaturesWithEntryInRange(std::list<Creature*>& creatureList, float radius, uint32 entry);
 
     void SetPositionDataUpdate();
