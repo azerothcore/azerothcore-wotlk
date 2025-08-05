@@ -49,6 +49,13 @@
 #include "WorldPacket.h"
 #include "WorldSessionMgr.h"
 
+//npcbot
+#include "bot_ai.h"
+#include "botdatamgr.h"
+#include "botmgr.h"
+#include "bpet_ai.h"
+//end npcbot
+
 /// @todo: this import is not necessary for compilation and marked as unused by the IDE
 //  however, for some reasons removing it would cause a damn linking issue
 //  there is probably some underlying problem with imports which should properly addressed
@@ -58,13 +65,6 @@
 CreatureMovementData::CreatureMovementData() : Ground(CreatureGroundMovementType::Run), Flight(CreatureFlightMovementType::None),
                                                Swim(true), Rooted(false), Chase(CreatureChaseMovementType::Run),
                                                Random(CreatureRandomMovementType::Walk), InteractionPauseTimer(sWorld->getIntConfig(CONFIG_CREATURE_STOP_FOR_PLAYER)) {}
-
-//npcbot
-#include "bot_ai.h"
-#include "botdatamgr.h"
-#include "botmgr.h"
-#include "bpet_ai.h"
-//end npcbot
 
 std::string CreatureMovementData::ToString() const
 {
@@ -380,11 +380,11 @@ void Creature::RemoveFromWorld()
         GetMap()->GetObjectsStore().Remove<Creature>(GetGUID());
 
     //NPCBot
-        if (IsNPCBotOrPet())
-        {
-            if (Map* map = GetMap())
-                map->RemoveObjectFromMapUpdateList(this);
-        }
+//        if (IsNPCBotOrPet())
+//        {
+//            if (Map* map = GetMap())
+//                map->RemoveObjectFromMapUpdateList(this);
+//        }
     //End NPCBOT
 
     }

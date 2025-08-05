@@ -114,7 +114,7 @@ constexpr uint32 ACCOUNT_FLAGS_ALL =
     ACCOUNT_FLAG_S2_REQUIRE_IGR | ACCOUNT_FLAG_S2_TRIAL;
 
 //npcbot
-enum LocaleConstant : uint8
+enum LocaleConstant: uint8
 //end npcbot
 {
     LOCALE_enUS = 0,
