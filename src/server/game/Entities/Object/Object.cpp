@@ -2909,10 +2909,13 @@ void WorldObject::PlayDirectSound(uint32 sound_id, Player* target /*= nullptr*/)
 
 void WorldObject::PlayRadiusSound(uint32 sound_id, float radius)
 {
-    DoForAllVisiblePlayers([sound_id](Player* player)
-    {
+    std::vector<Player*> targets;
+    Acore::AnyPlayerInObjectRangeCheck check(this, radius, false);
+    Acore::PlayerListSearcher<Acore::AnyPlayerInObjectRangeCheck> searcher(this, targets, check);
+    Cell::VisitWorldObjects(this, searcher, radius);
+
+    for (Player* player : targets)
         player->SendDirectMessage(WorldPackets::Misc::Playsound(sound_id).Write());
-    });
 }
 
 void WorldObject::PlayDirectMusic(uint32 music_id, Player* target /*= nullptr*/)
@@ -2925,10 +2928,13 @@ void WorldObject::PlayDirectMusic(uint32 music_id, Player* target /*= nullptr*/)
 
 void WorldObject::PlayRadiusMusic(uint32 music_id, float radius)
 {
-    DoForAllVisiblePlayers([music_id](Player* player)
-    {
+    std::vector<Player*> targets;
+    Acore::AnyPlayerInObjectRangeCheck check(this, radius, false);
+    Acore::PlayerListSearcher<Acore::AnyPlayerInObjectRangeCheck> searcher(this, targets, check);
+    Cell::VisitWorldObjects(this, searcher, radius);
+
+    for (Player* player : targets)
         player->SendDirectMessage(WorldPackets::Misc::PlayMusic(music_id).Write());
-    });
 }
 
 // Removes us from visibility for all players who are currently able to see us
@@ -2941,11 +2947,6 @@ void WorldObject::DestroyForVisiblePlayers()
     for (VisiblePlayersMap::iterator itr = visiblePlayerMap.begin(); itr != visiblePlayerMap.end();)
     {
         Player* player = itr->second;
-        /*if (_selfObject->IsUnit() && ((Unit*)this)->GetCharmerGUID() == player->GetGUID()) /// @todo: this is for puppet
-        {
-            ++itr;
-            continue;
-        }*/
 
         DestroyForPlayer(player);
 
