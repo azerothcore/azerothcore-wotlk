@@ -377,29 +377,6 @@ INSERT INTO `game_event_creature` (`eventEntry`, `guid`) VALUES
 (-17, 55938), -- Springpaw Stalker
 (-17, 55939); -- Springpaw Stalker
 
--- TODO: check quest pois - there's like 4 pois for each quest on the map - one should be sufficient imo (?)
--- TODO: ensure these do not count towards loremaster
-
--- 9260 Investigate the Scourge of Stormwind (A)
--- .go c id 16478
-
--- 9261 Investigate the Scourge of Ironforge (A)
--- .go c id 16484
-
--- 9262 Investigate the Scourge of Darnassus (A)
--- .go c id 16495
-
--- 9263 Investigate the Scourge of Orgrimmar (H)
--- .go c id 16493
-
--- 9264 Investigate the Scourge of Thunder Bluff (H)
--- .go c id 16490
-
--- 9265 Investigate the Scourge of the Undercity (H)
--- .go c id 16494
-
--- 12816 Investigate the Scourge of Silvermoon (H)
--- .go c id 29441
-
--- 12817 Investigate the Scourge of Exodar (A)
--- .go c id 29442
+-- current DB quest pois already match a 51832 brute
+-- therefore mark them as sniffed
+UPDATE `quest_poi_points` SET `VerifiedBuild` = 51832 WHERE `QuestID` IN (9260, 9261, 9262, 9263, 9264, 9265, 12816, 12817) AND (`Idx1` BETWEEN 0 and 9) AND (`Idx2` BETWEEN 0 AND 8);
