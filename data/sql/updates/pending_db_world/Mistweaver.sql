@@ -1,6 +1,6 @@
 
 -- Set flag Only Swim (sniffed flags)
-UPDATE `creature_template` SET `unit_flags` = `unit_flags` |32768 WHERE (`entry` = 25479);
+UPDATE `creature_template` SET `unit_flags` = `unit_flags`|32768 WHERE (`entry` = 25479);
 
 -- Remove Swim and Flight flags
 UPDATE `creature_template_movement` SET `Swim` = 0, `Flight` = 0 WHERE (`CreatureId` = 25479);
