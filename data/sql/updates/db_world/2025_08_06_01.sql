@@ -1,3 +1,4 @@
+-- DB update 2025_08_06_00 -> 2025_08_06_01
 
 -- Set flag Only Swim (sniffed flags)
 UPDATE `creature_template` SET `unit_flags` = `unit_flags`|32768 WHERE (`entry` = 25479);
