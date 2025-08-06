@@ -4,6 +4,8 @@ ARG UBUNTU_VERSION=22.04 # lts
 # This target isn't intended to be directly used
 FROM ubuntu:$UBUNTU_VERSION AS skeleton
 
+# Note: ARG instructions defined after FROM are available in this build stage.
+# Placing ARG TZ here (after FROM) ensures it is accessible for configuring the timezone below.
 ARG TZ=Etc/UTC
 ARG DOCKER=1
 ARG DEBIAN_FRONTEND=noninteractive
