@@ -1,3 +1,4 @@
+-- DB update 2025_08_06_03 -> 2025_08_06_04
 
 -- Edit creature_text tables (Anok'ra, Sinrok, Tivax)
 DELETE FROM `creature_text` WHERE (`CreatureID` IN (26769, 26770, 26771));
