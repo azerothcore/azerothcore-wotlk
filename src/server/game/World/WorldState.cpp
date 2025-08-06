@@ -47,7 +47,9 @@ WorldState::~WorldState()
 
 void WorldState::Load()
 {
-    QueryResult result = CharacterDatabase.Query("SELECT Id, Data FROM world_state");
+    CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_WORLD_STATE);
+    PreparedQueryResult result = CharacterDatabase.Query(stmt);
+
     if (result)
     {
         do
@@ -205,8 +207,10 @@ void WorldState::Save(WorldStateSaveIds saveId)
 
 void WorldState::SaveHelper(std::string& stringToSave, WorldStateSaveIds saveId)
 {
-    CharacterDatabase.Execute("DELETE FROM world_state WHERE Id='{}'", saveId);
-    CharacterDatabase.Execute("INSERT INTO world_state(Id,Data) VALUES('{}','{}')", saveId, stringToSave.data());
+    CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_REP_WORLD_STATE);
+    stmt->SetData(0, saveId);
+    stmt->SetData(1, stringToSave);
+    CharacterDatabase.Execute(stmt);
 }
 
 bool WorldState::IsConditionFulfilled(uint32 conditionId, uint32 state) const
