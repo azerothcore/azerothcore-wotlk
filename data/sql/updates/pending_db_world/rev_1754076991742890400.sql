@@ -379,4 +379,4 @@ INSERT INTO `game_event_creature` (`eventEntry`, `guid`) VALUES
 
 -- current DB quest pois already match a 51832 brute
 -- therefore mark them as sniffed
-UPDATE `quest_poi_points` SET `VerifiedBuild` = 51832 WHERE `QuestID` IN (9260, 9261, 9262, 9263, 9264, 9265, 12816, 12817) AND (`Idx1` BETWEEN 0 and 9) AND (`Idx2` BETWEEN 0 AND 8);
+UPDATE `quest_poi_points` SET `VerifiedBuild` = 51831 WHERE `QuestID` IN (9260, 9261, 9262, 9263, 9264, 9265, 12816, 12817) AND (`Idx1` BETWEEN 0 and 9) AND (`Idx2` BETWEEN 0 AND 8);
