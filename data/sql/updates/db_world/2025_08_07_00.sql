@@ -1,3 +1,4 @@
+-- DB update 2025_08_06_04 -> 2025_08_07_00
 
 -- Init creature_template_addon (Wastes Scavenger)
 DELETE FROM `creature_template_addon` WHERE (`entry` = 28005);
