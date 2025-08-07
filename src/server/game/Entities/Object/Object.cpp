@@ -1050,7 +1050,8 @@ void MovementInfo::OutDebug()
 WorldObject::WorldObject(bool isWorldObject) : WorldLocation(),
     LastUsedScriptID(0), m_name(""), m_isActive(false), m_visibilityDistanceOverride(), m_isWorldObject(isWorldObject), m_zoneScript(nullptr),
     _zoneId(0), _areaId(0), _floorZ(INVALID_HEIGHT), _outdoors(false), _liquidData(), _updatePositionData(false), m_transport(nullptr),
-    m_currMap(nullptr), _heartbeatTimer(HEARTBEAT_INTERVAL), m_InstanceId(0), m_phaseMask(PHASEMASK_NORMAL), m_useCombinedPhases(true), m_notifyflags(0), m_executed_notifies(0)
+    m_currMap(nullptr), _heartbeatTimer(HEARTBEAT_INTERVAL), m_InstanceId(0), m_phaseMask(PHASEMASK_NORMAL), m_useCombinedPhases(true),
+    m_notifyflags(0), m_executed_notifies(0), _objectVisibilityContainer(this)
 {
     m_serverSideVisibility.SetValue(SERVERSIDE_VISIBILITY_GHOST, GHOST_VISIBILITY_ALIVE | GHOST_VISIBILITY_GHOST);
     m_serverSideVisibilityDetect.SetValue(SERVERSIDE_VISIBILITY_GHOST, GHOST_VISIBILITY_ALIVE);
@@ -1177,7 +1178,9 @@ void WorldObject::RemoveFromWorld()
     if (!IsInWorld())
         return;
 
-    DestroyForNearbyPlayers();
+    DestroyForVisiblePlayers();
+
+    GetObjectVisibilityContainer().CleanVisibilityReferences();
 
     Object::RemoveFromWorld();
 }
@@ -2073,19 +2076,19 @@ void Unit::BuildHeartBeatMsg(WorldPacket* data) const
 void WorldObject::SendMessageToSet(WorldPacket const* data, bool self) const
 {
     if (IsInWorld())
-        SendMessageToSetInRange(data, GetVisibilityRange(), self);
+        SendMessageToSetInRange(data, 0.0f, self);
 }
 
 void WorldObject::SendMessageToSetInRange(WorldPacket const* data, float dist, bool /*self*/) const
 {
     Acore::MessageDistDeliverer notifier(this, data, dist);
-    Cell::VisitWorldObjects(this, notifier, dist);
+    notifier.Visit(GetObjectVisibilityContainer().GetVisiblePlayersMap());
 }
 
 void WorldObject::SendMessageToSet(WorldPacket const* data, Player const* skipped_rcvr) const
 {
-    Acore::MessageDistDeliverer notifier(this, data, GetVisibilityRange(), false, skipped_rcvr);
-    Cell::VisitWorldObjects(this, notifier, GetVisibilityRange());
+    Acore::MessageDistDeliverer notifier(this, data, 0.0f, false, skipped_rcvr);
+    notifier.Visit(GetObjectVisibilityContainer().GetVisiblePlayersMap());
 }
 
 void WorldObject::SendObjectDeSpawnAnim(ObjectGuid guid)
@@ -2906,72 +2909,49 @@ void WorldObject::PlayDirectSound(uint32 sound_id, Player* target /*= nullptr*/)
 
 void WorldObject::PlayRadiusSound(uint32 sound_id, float radius)
 {
-    std::list<Player*> targets;
+    std::vector<Player*> targets;
     Acore::AnyPlayerInObjectRangeCheck check(this, radius, false);
     Acore::PlayerListSearcher<Acore::AnyPlayerInObjectRangeCheck> searcher(this, targets, check);
     Cell::VisitWorldObjects(this, searcher, radius);
 
     for (Player* player : targets)
-    {
-        if (player)
-        {
-            player->SendDirectMessage(WorldPackets::Misc::Playsound(sound_id).Write());
-        }
-    }
+        player->SendDirectMessage(WorldPackets::Misc::Playsound(sound_id).Write());
 }
 
 void WorldObject::PlayDirectMusic(uint32 music_id, Player* target /*= nullptr*/)
 {
     if (target)
-    {
         target->SendDirectMessage(WorldPackets::Misc::PlayMusic(music_id).Write());
-    }
     else
-    {
         SendMessageToSet(WorldPackets::Misc::PlayMusic(music_id).Write(), true);
-    }
 }
 
 void WorldObject::PlayRadiusMusic(uint32 music_id, float radius)
 {
-    std::list<Player*> targets;
+    std::vector<Player*> targets;
     Acore::AnyPlayerInObjectRangeCheck check(this, radius, false);
     Acore::PlayerListSearcher<Acore::AnyPlayerInObjectRangeCheck> searcher(this, targets, check);
     Cell::VisitWorldObjects(this, searcher, radius);
 
     for (Player* player : targets)
-    {
-        if (player)
-        {
-            player->SendDirectMessage(WorldPackets::Misc::PlayMusic(music_id).Write());
-        }
-    }
+        player->SendDirectMessage(WorldPackets::Misc::PlayMusic(music_id).Write());
 }
 
-void WorldObject::DestroyForNearbyPlayers()
+// Removes us from visibility for all players who are currently able to see us
+void WorldObject::DestroyForVisiblePlayers()
 {
     if (!IsInWorld())
         return;
 
-    std::list<Player*> targets;
-    Acore::AnyPlayerInObjectRangeCheck check(this, GetVisibilityRange() + VISIBILITY_COMPENSATION, false);
-    Acore::PlayerListSearcherWithSharedVision<Acore::AnyPlayerInObjectRangeCheck> searcher(this, targets, check);
-    Cell::VisitWorldObjects(this, searcher, GetVisibilityRange());
-    for (std::list<Player*>::const_iterator iter = targets.begin(); iter != targets.end(); ++iter)
+    VisiblePlayersMap& visiblePlayerMap = GetObjectVisibilityContainer().GetVisiblePlayersMap();
+    for (VisiblePlayersMap::iterator itr = visiblePlayerMap.begin(); itr != visiblePlayerMap.end();)
     {
-        Player* player = (*iter);
-
-        if (player == this)
-            continue;
-
-        if (!player->HaveAtClient(this))
-            continue;
-
-        if (IsUnit() && ((Unit*)this)->GetCharmerGUID() == player->GetGUID()) /// @todo: this is for puppet
-            continue;
+        Player* player = itr->second;
 
         DestroyForPlayer(player);
-        player->m_clientGUIDs.erase(GetGUID());
+
+        // Clean up visibility references now
+        itr = GetObjectVisibilityContainer().UnlinkVisibilityFromWorldObject(player, itr);
     }
 }
 
@@ -3008,84 +2988,17 @@ void WorldObject::AddToNotify(uint16 f)
         }
 }
 
-struct WorldObjectChangeAccumulator
+void WorldObject::BuildUpdate(UpdateDataMapType& data_map)
 {
-    UpdateDataMapType& i_updateDatas;
-    UpdatePlayerSet& i_playerSet;
-    WorldObject& i_object;
-    WorldObjectChangeAccumulator(WorldObject& obj, UpdateDataMapType& d, UpdatePlayerSet& p) : i_updateDatas(d), i_playerSet(p), i_object(obj)
+    // Build update for self
+    if (IsPlayer())
+        BuildFieldsUpdate(ToPlayer(), data_map);
+
+    // Build update for visible players
+    DoForAllVisiblePlayers([this, &data_map](Player* player)
     {
-        i_playerSet.clear();
-    }
-    void Visit(PlayerMapType& m)
-    {
-        Player* source = nullptr;
-        for (PlayerMapType::iterator iter = m.begin(); iter != m.end(); ++iter)
-        {
-            source = iter->GetSource();
-
-            BuildPacket(source);
-
-            if (source->HasSharedVision())
-            {
-                SharedVisionList::const_iterator it = source->GetSharedVisionList().begin();
-                for (; it != source->GetSharedVisionList().end(); ++it)
-                    BuildPacket(*it);
-            }
-        }
-    }
-
-    void Visit(CreatureMapType& m)
-    {
-        Creature* source = nullptr;
-        for (CreatureMapType::iterator iter = m.begin(); iter != m.end(); ++iter)
-        {
-            source = iter->GetSource();
-            if (source->HasSharedVision())
-            {
-                SharedVisionList::const_iterator it = source->GetSharedVisionList().begin();
-                for (; it != source->GetSharedVisionList().end(); ++it)
-                    BuildPacket(*it);
-            }
-        }
-    }
-
-    void Visit(DynamicObjectMapType& m)
-    {
-        DynamicObject* source = nullptr;
-        for (DynamicObjectMapType::iterator iter = m.begin(); iter != m.end(); ++iter)
-        {
-            source = iter->GetSource();
-            ObjectGuid guid = source->GetCasterGUID();
-
-            if (guid)
-            {
-                //Caster may be nullptr if DynObj is in removelist
-                if (Player* caster = ObjectAccessor::FindPlayer(guid))
-                    if (caster->GetGuidValue(PLAYER_FARSIGHT) == source->GetGUID())
-                        BuildPacket(caster);
-            }
-        }
-    }
-
-    void BuildPacket(Player* player)
-    {
-        // Only send update once to a player
-        if (i_playerSet.find(player->GetGUID()) == i_playerSet.end() && player->HaveAtClient(&i_object))
-        {
-            i_object.BuildFieldsUpdate(player, i_updateDatas);
-            i_playerSet.insert(player->GetGUID());
-        }
-    }
-
-    template<class SKIP> void Visit(GridRefMgr<SKIP>&) {}
-};
-
-void WorldObject::BuildUpdate(UpdateDataMapType& data_map, UpdatePlayerSet& player_set)
-{
-    WorldObjectChangeAccumulator notifier(*this, data_map, player_set);
-    //we must build packets for all visible players
-    Cell::VisitWorldObjects(this, notifier, GetVisibilityRange());
+        BuildFieldsUpdate(player, data_map);
+    });
 
     ClearUpdateMask(false);
 }
