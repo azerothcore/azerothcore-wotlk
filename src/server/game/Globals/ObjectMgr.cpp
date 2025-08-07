@@ -2862,35 +2862,35 @@ void ObjectMgr::LoadItemTemplates()
 
     //                                                 0      1       2               3              4        5        6       7          8         9        10        11           12
     QueryResult result = WorldDatabase.Query("SELECT entry, class, subclass, SoundOverrideSubclass, name, displayid, Quality, Flags, FlagsExtra, BuyCount, BuyPrice, SellPrice, InventoryType, "
-                         //                                              13              14           15          16             17               18                19              20
+                         //     13              14           15          16             17               18                19              20
                          "AllowableClass, AllowableRace, ItemLevel, RequiredLevel, RequiredSkill, RequiredSkillRank, requiredspell, requiredhonorrank, "
-                         //                                              21                      22                       23               24        25          26             27           28
-                         "RequiredCityRank, RequiredReputationFaction, RequiredReputationRank, maxcount, stackable, ContainerSlots, StatsCount, stat_type1, "
-                         //                                            29           30          31           32          33           34          35           36          37           38
+                         //      21                      22                       23               24        25          26             27
+                         "RequiredCityRank, RequiredReputationFaction, RequiredReputationRank, maxcount, stackable, ContainerSlots, stat_type1, "
+                         //   28           29          30           31          32           33          34           35          36           37
                          "stat_value1, stat_type2, stat_value2, stat_type3, stat_value3, stat_type4, stat_value4, stat_type5, stat_value5, stat_type6, "
-                         //                                            39           40          41           42           43          44           45           46           47
+                         //   38           39          40           41           42          43           44           45           46
                          "stat_value6, stat_type7, stat_value7, stat_type8, stat_value8, stat_type9, stat_value9, stat_type10, stat_value10, "
-                         //                                                   48                    49           50        51        52         53        54         55      56      57        58
+                         //          47                    48           49        50        51         52        53         54      55      56        57
                          "ScalingStatDistribution, ScalingStatValue, dmg_min1, dmg_max1, dmg_type1, dmg_min2, dmg_max2, dmg_type2, armor, holy_res, fire_res, "
-                         //                                            59          60         61          62       63       64            65            66          67               68
+                         //   58          59         60          61       62       63            64            65          66               67
                          "nature_res, frost_res, shadow_res, arcane_res, delay, ammo_type, RangedModRange, spellid_1, spelltrigger_1, spellcharges_1, "
-                         //                                              69              70                71                 72                 73           74               75
+                         //    68              69                70                 71                 72           73               74
                          "spellppmRate_1, spellcooldown_1, spellcategory_1, spellcategorycooldown_1, spellid_2, spelltrigger_2, spellcharges_2, "
-                         //                                              76               77              78                  79                 80           81               82
+                         //    75               76              77                  78                 79           80               81
                          "spellppmRate_2, spellcooldown_2, spellcategory_2, spellcategorycooldown_2, spellid_3, spelltrigger_3, spellcharges_3, "
-                         //                                              83               84              85                  86                 87           88               89
+                         //    82               83              84                  85                 86           87               88
                          "spellppmRate_3, spellcooldown_3, spellcategory_3, spellcategorycooldown_3, spellid_4, spelltrigger_4, spellcharges_4, "
-                         //                                              90               91              92                  93                  94          95               96
+                         //    89               90              91                  92                  93          94               95
                          "spellppmRate_4, spellcooldown_4, spellcategory_4, spellcategorycooldown_4, spellid_5, spelltrigger_5, spellcharges_5, "
-                         //                                              97               98              99                  100                 101        102         103       104          105
+                         //    96               97              98                  99                 100        101         102       103          104
                          "spellppmRate_5, spellcooldown_5, spellcategory_5, spellcategorycooldown_5, bonding, description, PageText, LanguageID, PageMaterial, "
-                         //                                            106       107     108      109          110            111       112     113         114       115   116     117
+                         //  105       106     107      108          109            110       111     112         113       114   115     116
                          "startquest, lockid, Material, sheath, RandomProperty, RandomSuffix, block, itemset, MaxDurability, area, Map, BagFamily, "
-                         //                                            118             119             120             121             122            123              124            125
+                         //    117             118             119             120             121            122              123            124
                          "TotemCategory, socketColor_1, socketContent_1, socketColor_2, socketContent_2, socketColor_3, socketContent_3, socketBonus, "
-                         //                                            126                 127                     128            129            130            131         132         133
+                         //   125                 126                     127            128            129            130         131         132
                          "GemProperties, RequiredDisenchantSkill, ArmorDamageModifier, duration, ItemLimitCategory, HolidayId, ScriptName, DisenchantID, "
-                         //                                           134        135            136
+                         //  133        134            135          136
                          "FoodType, minMoneyLoot, maxMoneyLoot, flagsCustom FROM item_template");
 
     if (!result)
@@ -2940,84 +2940,91 @@ void ObjectMgr::LoadItemTemplates()
         itemTemplate.MaxCount                  = fields[24].Get<int32>();
         itemTemplate.Stackable                 = fields[25].Get<int32>();
         itemTemplate.ContainerSlots            = uint32(fields[26].Get<uint8>());
-        itemTemplate.StatsCount                = uint32(fields[27].Get<uint8>());
 
-        for (uint8 i = 0; i < itemTemplate.StatsCount; ++i)
+        uint8 statsCount = 0;
+        while (statsCount < MAX_ITEM_PROTO_STATS)
         {
-            itemTemplate.ItemStat[i].ItemStatType  = uint32(fields[28 + i * 2].Get<uint8>());
-            itemTemplate.ItemStat[i].ItemStatValue = fields[29 + i * 2].Get<int32>();
-        }
+            uint32 statType = uint32(fields[27 + statsCount * 2].Get<uint8>());
+            int32 statValue = fields[28 + statsCount * 2].Get<int32>();
+            if (statType == 0)
+                break;
 
-        itemTemplate.ScalingStatDistribution = uint32(fields[48].Get<uint16>());
-        itemTemplate.ScalingStatValue        = fields[49].Get<int32>();
+            itemTemplate.ItemStat[statsCount].ItemStatType = statType;
+            itemTemplate.ItemStat[statsCount].ItemStatValue = statValue;
+            statsCount++;
+        }
+        itemTemplate.StatsCount = statsCount;
+
+        itemTemplate.ScalingStatDistribution = uint32(fields[47].Get<uint16>());
+        itemTemplate.ScalingStatValue        = fields[48].Get<int32>();
 
         for (uint8 i = 0; i < MAX_ITEM_PROTO_DAMAGES; ++i)
         {
-            itemTemplate.Damage[i].DamageMin  = fields[50 + i * 3].Get<float>();
-            itemTemplate.Damage[i].DamageMax  = fields[51 + i * 3].Get<float>();
-            itemTemplate.Damage[i].DamageType = uint32(fields[52 + i * 3].Get<uint8>());
+            itemTemplate.Damage[i].DamageMin  = fields[49 + i * 3].Get<float>();
+            itemTemplate.Damage[i].DamageMax  = fields[50 + i * 3].Get<float>();
+            itemTemplate.Damage[i].DamageType = uint32(fields[51 + i * 3].Get<uint8>());
         }
 
-        itemTemplate.Armor          = fields[56].Get<uint32>();
-        itemTemplate.HolyRes        = fields[57].Get<int32>();
-        itemTemplate.FireRes        = fields[58].Get<int32>();
-        itemTemplate.NatureRes      = fields[59].Get<int32>();
-        itemTemplate.FrostRes       = fields[60].Get<int32>();
-        itemTemplate.ShadowRes      = fields[61].Get<int32>();
-        itemTemplate.ArcaneRes      = fields[62].Get<int32>();
-        itemTemplate.Delay          = uint32(fields[63].Get<uint16>());
-        itemTemplate.AmmoType       = uint32(fields[64].Get<uint8>());
-        itemTemplate.RangedModRange = fields[65].Get<float>();
+        itemTemplate.Armor          = fields[55].Get<uint32>();
+        itemTemplate.HolyRes        = fields[56].Get<int32>();
+        itemTemplate.FireRes        = fields[57].Get<int32>();
+        itemTemplate.NatureRes      = fields[58].Get<int32>();
+        itemTemplate.FrostRes       = fields[59].Get<int32>();
+        itemTemplate.ShadowRes      = fields[60].Get<int32>();
+        itemTemplate.ArcaneRes      = fields[61].Get<int32>();
+        itemTemplate.Delay          = uint32(fields[62].Get<uint16>());
+        itemTemplate.AmmoType       = uint32(fields[63].Get<uint8>());
+        itemTemplate.RangedModRange = fields[64].Get<float>();
 
         for (uint8 i = 0; i < MAX_ITEM_PROTO_SPELLS; ++i)
         {
-            itemTemplate.Spells[i].SpellId               = fields[66 + i * 7  ].Get<int32>();
-            itemTemplate.Spells[i].SpellTrigger          = uint32(fields[67 + i * 7].Get<uint8>());
-            itemTemplate.Spells[i].SpellCharges          = int32(fields[68 + i * 7].Get<int16>());
-            itemTemplate.Spells[i].SpellPPMRate          = fields[69 + i * 7].Get<float>();
-            itemTemplate.Spells[i].SpellCooldown         = fields[70 + i * 7].Get<int32>();
-            itemTemplate.Spells[i].SpellCategory         = uint32(fields[71 + i * 7].Get<uint16>());
-            itemTemplate.Spells[i].SpellCategoryCooldown = fields[72 + i * 7].Get<int32>();
+            itemTemplate.Spells[i].SpellId               = fields[65 + i * 7  ].Get<int32>();
+            itemTemplate.Spells[i].SpellTrigger          = uint32(fields[66 + i * 7].Get<uint8>());
+            itemTemplate.Spells[i].SpellCharges          = int32(fields[67 + i * 7].Get<int16>());
+            itemTemplate.Spells[i].SpellPPMRate          = fields[68 + i * 7].Get<float>();
+            itemTemplate.Spells[i].SpellCooldown         = fields[69 + i * 7].Get<int32>();
+            itemTemplate.Spells[i].SpellCategory         = uint32(fields[70 + i * 7].Get<uint16>());
+            itemTemplate.Spells[i].SpellCategoryCooldown = fields[71 + i * 7].Get<int32>();
         }
 
-        itemTemplate.Bonding        = uint32(fields[101].Get<uint8>());
-        itemTemplate.Description    = fields[102].Get<std::string>();
-        itemTemplate.PageText       = fields[103].Get<uint32>();
-        itemTemplate.LanguageID     = uint32(fields[104].Get<uint8>());
-        itemTemplate.PageMaterial   = uint32(fields[105].Get<uint8>());
-        itemTemplate.StartQuest     = fields[106].Get<uint32>();
-        itemTemplate.LockID         = fields[107].Get<uint32>();
-        itemTemplate.Material       = int32(fields[108].Get<int8>());
-        itemTemplate.Sheath         = uint32(fields[109].Get<uint8>());
-        itemTemplate.RandomProperty = fields[110].Get<int32>();
-        itemTemplate.RandomSuffix   = fields[111].Get<int32>();
-        itemTemplate.Block          = fields[112].Get<uint32>();
-        itemTemplate.ItemSet        = fields[113].Get<uint32>();
-        itemTemplate.MaxDurability  = uint32(fields[114].Get<uint16>());
-        itemTemplate.Area           = fields[115].Get<uint32>();
-        itemTemplate.Map            = uint32(fields[116].Get<uint16>());
-        itemTemplate.BagFamily      = fields[117].Get<uint32>();
-        itemTemplate.TotemCategory  = fields[118].Get<uint32>();
+        itemTemplate.Bonding        = uint32(fields[100].Get<uint8>());
+        itemTemplate.Description    = fields[101].Get<std::string>();
+        itemTemplate.PageText       = fields[102].Get<uint32>();
+        itemTemplate.LanguageID     = uint32(fields[103].Get<uint8>());
+        itemTemplate.PageMaterial   = uint32(fields[104].Get<uint8>());
+        itemTemplate.StartQuest     = fields[105].Get<uint32>();
+        itemTemplate.LockID         = fields[106].Get<uint32>();
+        itemTemplate.Material       = int32(fields[107].Get<int8>());
+        itemTemplate.Sheath         = uint32(fields[108].Get<uint8>());
+        itemTemplate.RandomProperty = fields[109].Get<int32>();
+        itemTemplate.RandomSuffix   = fields[110].Get<int32>();
+        itemTemplate.Block          = fields[111].Get<uint32>();
+        itemTemplate.ItemSet        = fields[112].Get<uint32>();
+        itemTemplate.MaxDurability  = uint32(fields[113].Get<uint16>());
+        itemTemplate.Area           = fields[114].Get<uint32>();
+        itemTemplate.Map            = uint32(fields[115].Get<uint16>());
+        itemTemplate.BagFamily      = fields[116].Get<uint32>();
+        itemTemplate.TotemCategory  = fields[117].Get<uint32>();
 
         for (uint8 i = 0; i < MAX_ITEM_PROTO_SOCKETS; ++i)
         {
-            itemTemplate.Socket[i].Color   = uint32(fields[119 + i * 2].Get<uint8>());
-            itemTemplate.Socket[i].Content = fields[120 + i * 2].Get<uint32>();
+            itemTemplate.Socket[i].Color   = uint32(fields[118 + i * 2].Get<uint8>());
+            itemTemplate.Socket[i].Content = fields[119 + i * 2].Get<uint32>();
         }
 
-        itemTemplate.socketBonus             = fields[125].Get<uint32>();
-        itemTemplate.GemProperties           = fields[126].Get<uint32>();
-        itemTemplate.RequiredDisenchantSkill = uint32(fields[127].Get<int16>());
-        itemTemplate.ArmorDamageModifier     = fields[128].Get<float>();
-        itemTemplate.Duration                = fields[129].Get<uint32>();
-        itemTemplate.ItemLimitCategory       = uint32(fields[130].Get<int16>());
-        itemTemplate.HolidayId               = fields[131].Get<uint32>();
-        itemTemplate.ScriptId                = GetScriptId(fields[132].Get<std::string>());
-        itemTemplate.DisenchantID            = fields[133].Get<uint32>();
-        itemTemplate.FoodType                = uint32(fields[134].Get<uint8>());
-        itemTemplate.MinMoneyLoot            = fields[135].Get<uint32>();
-        itemTemplate.MaxMoneyLoot            = fields[136].Get<uint32>();
-        itemTemplate.FlagsCu                 = ItemFlagsCustom(fields[137].Get<uint32>());
+        itemTemplate.socketBonus             = fields[124].Get<uint32>();
+        itemTemplate.GemProperties           = fields[125].Get<uint32>();
+        itemTemplate.RequiredDisenchantSkill = uint32(fields[126].Get<int16>());
+        itemTemplate.ArmorDamageModifier     = fields[127].Get<float>();
+        itemTemplate.Duration                = fields[128].Get<uint32>();
+        itemTemplate.ItemLimitCategory       = uint32(fields[129].Get<int16>());
+        itemTemplate.HolidayId               = fields[130].Get<uint32>();
+        itemTemplate.ScriptId                = GetScriptId(fields[131].Get<std::string>());
+        itemTemplate.DisenchantID            = fields[132].Get<uint32>();
+        itemTemplate.FoodType                = uint32(fields[133].Get<uint8>());
+        itemTemplate.MinMoneyLoot            = fields[134].Get<uint32>();
+        itemTemplate.MaxMoneyLoot            = fields[135].Get<uint32>();
+        itemTemplate.FlagsCu                 = ItemFlagsCustom(fields[136].Get<uint32>());
 
         // Checks
         ItemEntry const* dbcitem = sItemStore.LookupEntry(entry);
@@ -3171,12 +3178,6 @@ void ObjectMgr::LoadItemTemplates()
             itemTemplate.ContainerSlots = MAX_BAG_SIZE;
         }
 
-        if (itemTemplate.StatsCount > MAX_ITEM_PROTO_STATS)
-        {
-            LOG_ERROR("sql.sql", "Item (Entry: {}) has too large value in statscount ({}), replace by hardcoded limit ({}).", entry, itemTemplate.StatsCount, MAX_ITEM_PROTO_STATS);
-            itemTemplate.StatsCount = MAX_ITEM_PROTO_STATS;
-        }
-
         for (uint8 j = 0; j < itemTemplate.StatsCount; ++j)
         {
             // for ItemStatValue != 0
@@ -3189,7 +3190,8 @@ void ObjectMgr::LoadItemTemplates()
             switch (itemTemplate.ItemStat[j].ItemStatType)
             {
                 case ITEM_MOD_SPELL_HEALING_DONE:
-                    LOG_ERROR("sql.sql", "Item (Entry: {}) has deprecated stat_type{} ({})", entry, j + 1, itemTemplate.ItemStat[j].ItemStatType);
+                case ITEM_MOD_SPELL_DAMAGE_DONE:
+                    LOG_WARN("sql.sql", "Item (Entry: {}) has deprecated stat_type{} ({})", entry, j + 1, itemTemplate.ItemStat[j].ItemStatType);
                     break;
                 default:
                     break;

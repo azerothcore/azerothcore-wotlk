@@ -5363,7 +5363,7 @@ class spell_pet_intellect_spirit_resilience_scaling : public AuraScript
         DoEffectCalcAmount += AuraEffectCalcAmountFn(spell_pet_intellect_spirit_resilience_scaling::CalculateSpiritAmount, EFFECT_1,SPELL_AURA_MOD_STAT);
         // The resilience scaling is not used. The owner's resilience is used directly
         // DoEffectCalcAmount += AuraEffectCalcAmountFn(spell_pet_intellect_spirit_resilience_scaling::CalculateResilienceAmount, EFFECT_2, SPELL_AURA_MOD_RATING);
-        OnEffectApply += AuraEffectApplyFn(spell_pet_intellect_spirit_resilience_scaling::HandleEffectApply, EFFECT_ALL, SPELL_AURA_ANY, AURA_EFFECT_HANDLE_REAL);
+        OnEffectApply += AuraEffectApplyFn(spell_pet_intellect_spirit_resilience_scaling::HandleEffectApply, EFFECT_2, SPELL_AURA_ANY, AURA_EFFECT_HANDLE_REAL);
         DoEffectCalcPeriodic += AuraEffectCalcPeriodicFn(spell_pet_intellect_spirit_resilience_scaling::CalcPeriodic, EFFECT_ALL, SPELL_AURA_ANY);
         OnEffectPeriodic += AuraEffectPeriodicFn(spell_pet_intellect_spirit_resilience_scaling::HandlePeriodic, EFFECT_ALL, SPELL_AURA_ANY);
     }
