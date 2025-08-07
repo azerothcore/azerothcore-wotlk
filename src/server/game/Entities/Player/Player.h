@@ -2043,7 +2043,6 @@ public:
 
     void SendMessageToSet(WorldPacket const* data, bool self) const override;
     void SendMessageToSetInRange(WorldPacket const* data, float dist, bool self) const override;
-    void SendMessageToSetInRange(WorldPacket const* data, float dist, bool self, bool includeMargin, bool ownTeamOnly, bool required3dDist = false) const;
     void SendMessageToSet(WorldPacket const* data, Player const* skipped_rcvr) const override;
     void SendTeleportAckPacket();
 
@@ -2397,7 +2396,6 @@ public:
     void SetEntryPoint();
 
     // currently visible objects at player client
-    GuidUnorderedSet m_clientGUIDs;
     std::vector<Unit*> m_newVisible; // pussywizard
 
     [[nodiscard]] bool HaveAtClient(WorldObject const* u) const;

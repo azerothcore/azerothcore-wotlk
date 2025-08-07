@@ -54,7 +54,7 @@ public:
 
     bool CreateMoTrans(ObjectGuid::LowType guidlow, uint32 entry, uint32 mapid, float x, float y, float z, float ang, uint32 animprogress);
     void CleanupsBeforeDelete(bool finalCleanup = true) override;
-    void BuildUpdate(UpdateDataMapType& data_map, UpdatePlayerSet&) override;
+    void BuildUpdate(UpdateDataMapType& data_map) override;
 
     void Update(uint32 diff) override;
     void DelayedUpdate(uint32 diff);
@@ -117,7 +117,7 @@ public:
 
     bool Create(ObjectGuid::LowType guidlow, uint32 name_id, Map* map, uint32 phaseMask, float x, float y, float z, float ang, G3D::Quat const& rotation, uint32 animprogress, GOState go_state, uint32 artKit = 0) override;
     void CleanupsBeforeDelete(bool finalCleanup = true) override;
-    void BuildUpdate(UpdateDataMapType& data_map, UpdatePlayerSet&) override;
+    void BuildUpdate(UpdateDataMapType& data_map) override;
 
     void Update(uint32 diff) override;
     void RelocateToProgress(uint32 progress);

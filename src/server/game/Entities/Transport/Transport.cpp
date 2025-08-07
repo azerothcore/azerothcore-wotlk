@@ -123,7 +123,7 @@ void MotionTransport::CleanupsBeforeDelete(bool finalCleanup /*= true*/)
     GameObject::CleanupsBeforeDelete(finalCleanup);
 }
 
-void MotionTransport::BuildUpdate(UpdateDataMapType& data_map, UpdatePlayerSet&)
+void MotionTransport::BuildUpdate(UpdateDataMapType& data_map)
 {
     Map::PlayerList const& players = GetMap()->GetPlayers();
     if (players.IsEmpty())
@@ -812,7 +812,7 @@ void StaticTransport::CleanupsBeforeDelete(bool finalCleanup /*= true*/)
     GameObject::CleanupsBeforeDelete(finalCleanup);
 }
 
-void StaticTransport::BuildUpdate(UpdateDataMapType& data_map, UpdatePlayerSet&)
+void StaticTransport::BuildUpdate(UpdateDataMapType& data_map)
 {
     Map::PlayerList const& players = GetMap()->GetPlayers();
     if (players.IsEmpty())

@@ -371,7 +371,7 @@ void Creature::RemoveFromWorld()
 
 void Creature::DisappearAndDie()
 {
-    DestroyForNearbyPlayers();
+    DestroyForVisiblePlayers();
     //SetVisibility(VISIBILITY_OFF);
     //ObjectAccessor::UpdateObjectVisibility(this);
     if (IsAlive())
@@ -408,7 +408,7 @@ void Creature::RemoveCorpse(bool setSpawnTime, bool skipVisibility)
     setDeathState(DeathState::Dead);
     RemoveAllAuras();
     if (!skipVisibility) // pussywizard
-        DestroyForNearbyPlayers(); // pussywizard: previous UpdateObjectVisibility()
+        DestroyForVisiblePlayers(); // pussywizard: previous UpdateObjectVisibility()
     loot.clear();
     uint32 respawnDelay = m_respawnDelay;
     if (IsAIEnabled)
