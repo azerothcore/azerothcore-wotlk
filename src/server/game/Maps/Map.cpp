@@ -293,7 +293,6 @@ bool Map::AddPlayerToMap(Player* player)
     SendInitSelf(player);
     SendZoneDynamicInfo(player);
 
-    player->m_clientGUIDs.clear();
     player->UpdateObjectVisibility(false);
 
     if (player->IsAlive())
@@ -683,12 +682,8 @@ void Map::RemovePlayerFromMap(Player* player, bool remove)
     player->UpdateZone(MAP_INVALID_ZONE, 0);
     player->getHostileRefMgr().deleteReferences(true); // pussywizard: multithreading crashfix
 
-    bool inWorld = player->IsInWorld();
     player->RemoveFromWorld();
     SendRemoveTransports(player);
-
-    if (!inWorld) // pussywizard: if was in world, RemoveFromWorld() called DestroyForNearbyPlayers()
-        player->DestroyForNearbyPlayers(); // pussywizard: previous player->UpdateObjectVisibility(true)
 
     if (player->IsInGrid())
         player->RemoveFromGrid();
@@ -709,14 +704,10 @@ void Map::AfterPlayerUnlinkFromMap()
 template<class T>
 void Map::RemoveFromMap(T* obj, bool remove)
 {
-    bool inWorld = obj->IsInWorld() && obj->GetTypeId() >= TYPEID_UNIT && obj->GetTypeId() <= TYPEID_GAMEOBJECT;
     obj->RemoveFromWorld();
 
     if (obj->isActiveObject())
         RemoveFromActive(obj);
-
-    if (!inWorld) // pussywizard: if was in world, RemoveFromWorld() called DestroyForNearbyPlayers()
-        obj->DestroyForNearbyPlayers(); // pussywizard: previous player->UpdateObjectVisibility()
 
     obj->RemoveFromGrid();
 
@@ -1675,6 +1666,9 @@ void Map::SendInitTransports(Player* player)
         if (*itr != player->GetTransport())
             (*itr)->BuildCreateUpdateBlockForPlayer(&transData, player);
 
+    if (!transData.HasData())
+        return;
+
     WorldPacket packet;
     transData.BuildPacket(packet);
     player->GetSession()->SendPacket(&packet);
@@ -1689,7 +1683,7 @@ void Map::SendRemoveTransports(Player* player)
             (*itr)->BuildOutOfRangeUpdateBlock(&transData);
 
     // pussywizard: remove static transports from client
-    for (GuidUnorderedSet::const_iterator it = player->m_clientGUIDs.begin(); it != player->m_clientGUIDs.end(); )
+    /*for (GuidUnorderedSet::const_iterator it = player->m_clientGUIDs.begin(); it != player->m_clientGUIDs.end(); )
     {
         if ((*it).IsTransport())
         {
@@ -1698,7 +1692,10 @@ void Map::SendRemoveTransports(Player* player)
         }
         else
             ++it;
-    }
+    }*/
+
+    if (!transData.HasData())
+        return;
 
     WorldPacket packet;
     transData.BuildPacket(packet);
@@ -1708,7 +1705,6 @@ void Map::SendRemoveTransports(Player* player)
 void Map::SendObjectUpdates()
 {
     UpdateDataMapType update_players;
-    UpdatePlayerSet player_set;
 
     while (!_updateObjects.empty())
     {
@@ -1716,7 +1712,7 @@ void Map::SendObjectUpdates()
         ASSERT(obj->IsInWorld());
 
         _updateObjects.erase(_updateObjects.begin());
-        obj->BuildUpdate(update_players, player_set);
+        obj->BuildUpdate(update_players);
     }
 
     WorldPacket packet;                                     // here we allocate a std::vector with a size of 0x10000
@@ -2727,7 +2723,7 @@ void Map::RemoveCorpse(Corpse* corpse)
     ASSERT(corpse);
     GridCoord const gridCoord = Acore::ComputeGridCoord(corpse->GetPositionX(), corpse->GetPositionY());
 
-    corpse->DestroyForNearbyPlayers();
+    corpse->DestroyForVisiblePlayers();
     if (corpse->IsInGrid())
         RemoveFromMap(corpse, false);
     else

@@ -1648,35 +1648,35 @@ void Player::UpdateObjectVisibility(bool forced, bool fromUpdate)
 }
 
 template <class T>
-inline void UpdateVisibilityOf_helper(GuidUnorderedSet& s64, T* target,
+inline void UpdateVisibilityOf_helper(Player* player, T* target,
                                       std::vector<Unit*>& /*v*/)
 {
-    s64.insert(target->GetGUID());
+    player->GetObjectVisibilityContainer().LinkWorldObjectVisibility(target);
 }
 
 template <>
-inline void UpdateVisibilityOf_helper(GuidUnorderedSet& s64, GameObject* target,
+inline void UpdateVisibilityOf_helper(Player* player, GameObject* target,
                                       std::vector<Unit*>& /*v*/)
 {
     // @HACK: This is to prevent objects like deeprun tram from disappearing
     // when player moves far from its spawn point while riding it
     if ((target->GetGOInfo()->type != GAMEOBJECT_TYPE_TRANSPORT))
-        s64.insert(target->GetGUID());
+        player->GetObjectVisibilityContainer().LinkWorldObjectVisibility(target);
 }
 
 template <>
-inline void UpdateVisibilityOf_helper(GuidUnorderedSet& s64, Creature* target,
+inline void UpdateVisibilityOf_helper(Player* player, Creature* target,
                                       std::vector<Unit*>& v)
 {
-    s64.insert(target->GetGUID());
+    player->GetObjectVisibilityContainer().LinkWorldObjectVisibility(target);
     v.push_back(target);
 }
 
 template <>
-inline void UpdateVisibilityOf_helper(GuidUnorderedSet& s64, Player* target,
+inline void UpdateVisibilityOf_helper(Player* player, Player* target,
                                       std::vector<Unit*>& v)
 {
-    s64.insert(target->GetGUID());
+    player->GetObjectVisibilityContainer().LinkWorldObjectVisibility(target);
     v.push_back(target);
 }
 
@@ -1705,7 +1705,7 @@ void Player::UpdateVisibilityOf(T* target, UpdateData& data,
             BeforeVisibilityDestroy<T>(target, this);
 
             target->BuildOutOfRangeUpdateBlock(&data);
-            m_clientGUIDs.erase(target->GetGUID());
+            GetObjectVisibilityContainer().UnlinkWorldObjectVisibility(target);
         }
     }
     else
@@ -1713,7 +1713,7 @@ void Player::UpdateVisibilityOf(T* target, UpdateData& data,
         if (CanSeeOrDetect(target, false, true))
         {
             target->BuildCreateUpdateBlockForPlayer(&data, this);
-            UpdateVisibilityOf_helper(m_clientGUIDs, target, visibleNow);
+            UpdateVisibilityOf_helper(this, target, visibleNow);
         }
     }
 }
@@ -1739,7 +1739,7 @@ void Player::UpdateVisibilityOf(WorldObject* target)
                 BeforeVisibilityDestroy<Creature>(target->ToCreature(), this);
 
             target->DestroyForPlayer(this);
-            m_clientGUIDs.erase(target->GetGUID());
+            GetObjectVisibilityContainer().UnlinkWorldObjectVisibility(target);
         }
     }
     else
@@ -1747,7 +1747,7 @@ void Player::UpdateVisibilityOf(WorldObject* target)
         if (CanSeeOrDetect(target, false, true))
         {
             target->SendUpdateToPlayer(this);
-            m_clientGUIDs.insert(target->GetGUID());
+            GetObjectVisibilityContainer().LinkWorldObjectVisibility(target);
 
             // target aura duration for caster show only if target exist at
             // caster client send data at target visibility change (adding to
@@ -1760,69 +1760,67 @@ void Player::UpdateVisibilityOf(WorldObject* target)
 
 void Player::UpdateTriggerVisibility()
 {
-    if (m_clientGUIDs.empty())
-        return;
-
     if (!IsInWorld())
         return;
 
-    UpdateData  udata;
-    WorldPacket packet;
-    for (GuidUnorderedSet::iterator itr = m_clientGUIDs.begin();
-         itr != m_clientGUIDs.end(); ++itr)
+    if (GetObjectVisibilityContainer().GetVisibleWorldObjectsMap()->empty())
+        return;
+
+    UpdateData udata;
+    DoForAllVisibleWorldObjects([this, &udata](WorldObject* worldObject)
     {
-        if ((*itr).IsCreatureOrVehicle())
+        if (worldObject->IsCreature())
         {
-            Creature* creature = GetMap()->GetCreature(*itr);
+            Creature* creature = worldObject->ToCreature();
             // Update fields of triggers, transformed units or unselectable
             // units (values dependent on GM state)
             if (!creature || (!creature->IsTrigger() &&
-                              !creature->HasTransformAura() &&
-                              !creature->HasUnitFlag(UNIT_FLAG_NOT_SELECTABLE)))
-                continue;
+                !creature->HasTransformAura() &&
+                !creature->HasUnitFlag(UNIT_FLAG_NOT_SELECTABLE)))
+                return;
 
             creature->SetFieldNotifyFlag(UF_FLAG_PUBLIC);
             creature->BuildValuesUpdateBlockForPlayer(&udata, this);
             creature->RemoveFieldNotifyFlag(UF_FLAG_PUBLIC);
         }
-        else if ((*itr).IsGameObject())
+        else if (worldObject->IsGameObject())
         {
-            GameObject* go = GetMap()->GetGameObject(*itr);
+            GameObject* go = worldObject->ToGameObject();
             if (!go)
-                continue;
+                return;
 
             go->SetFieldNotifyFlag(UF_FLAG_PUBLIC);
             go->BuildValuesUpdateBlockForPlayer(&udata, this);
             go->RemoveFieldNotifyFlag(UF_FLAG_PUBLIC);
         }
-    }
+    });
 
     if (!udata.HasData())
         return;
 
+    WorldPacket packet;
     udata.BuildPacket(packet);
     GetSession()->SendPacket(&packet);
 }
 
 void Player::UpdateForQuestWorldObjects()
 {
-    if (m_clientGUIDs.empty())
+    if (GetObjectVisibilityContainer().GetVisibleWorldObjectsMap()->empty())
         return;
 
-    UpdateData  udata;
-    WorldPacket packet;
-    for (GuidUnorderedSet::iterator itr = m_clientGUIDs.begin(); itr != m_clientGUIDs.end(); ++itr)
+    UpdateData udata;
+    DoForAllVisibleWorldObjects([this, &udata](WorldObject* worldObject)
     {
-        if ((*itr).IsGameObject())
+        if (worldObject->IsGameObject())
         {
-            if (GameObject* obj = ObjectAccessor::GetGameObject(*this, *itr))
+            if (GameObject* obj = worldObject->ToGameObject())
                 obj->BuildValuesUpdateBlockForPlayer(&udata, this);
         }
-        else if ((*itr).IsCreatureOrVehicle())
+        else if (worldObject->IsCreature())
         {
-            Creature* obj = ObjectAccessor::GetCreatureOrPetOrVehicle(*this, *itr);
+            Creature* obj = worldObject->ToCreature();
             if (!obj)
-                continue;
+                return;
 
             // check if this unit requires quest specific flags
             if (obj->HasNpcFlag(UNIT_NPC_FLAG_SPELLCLICK))
@@ -1846,12 +1844,14 @@ void Player::UpdateForQuestWorldObjects()
                 }
             }
             else if (obj->HasNpcFlag(UNIT_NPC_FLAG_VENDOR_MASK | UNIT_NPC_FLAG_TRAINER))
-            {
                 obj->BuildValuesUpdateBlockForPlayer(&udata, this);
-            }
         }
-    }
+    });
 
+    if (!udata.HasData())
+        return;
+
+    WorldPacket packet;
     udata.BuildPacket(packet);
     GetSession()->SendPacket(&packet);
 }
