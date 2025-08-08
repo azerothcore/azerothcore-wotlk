@@ -2643,6 +2643,7 @@ public:
     // Settings
     [[nodiscard]] PlayerSetting GetPlayerSetting(std::string const& source, uint8 index);
     void UpdatePlayerSetting(std::string const& source, uint8 index, uint32 value);
+    void StoreNewSetting(std::string source, PlayerSettingVector settings) { m_charSettingsMap.emplace(std::move(source), std::move(settings)); };
 
     void SendSystemMessage(std::string_view msg, bool escapeCharacters = false);
 
@@ -2748,7 +2749,7 @@ protected:
     void _LoadTalents(PreparedQueryResult result);
     void _LoadInstanceTimeRestrictions(PreparedQueryResult result);
     void _LoadBrewOfTheMonth(PreparedQueryResult result);
-    void _LoadCharacterSettings(PreparedQueryResult result);
+    void _LoadCharacterSettings(WorldSession* session);
     void _LoadPetStable(uint8 petStableSlots, PreparedQueryResult result);
 
     /*********************************************************/

@@ -23,40 +23,53 @@
 /***              PLAYER SETTINGS SYSTEM               ***/
 /*********************************************************/
 
-void Player::_LoadCharacterSettings(PreparedQueryResult result)
+void Player::_LoadCharacterSettings(WorldSession* session)
 {
     m_charSettingsMap.clear();
 
     if (!sWorld->getBoolConfig(CONFIG_PLAYER_SETTINGS_ENABLED))
         return;
 
-    if (!result)
-        return;
-
-    do
+    // load them asynchronously
     {
-        Field* fields = result->Fetch();
-        std::string source = fields[0].Get<std::string>();
-        std::string data = fields[1].Get<std::string>();
+        CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_CHAR_SETTINGS);
+        stmt->SetData(0, GetGUID().GetCounter());
 
-        std::vector<std::string_view> tokens = Acore::Tokenize(data, ' ', false);
-
-        PlayerSettingVector settings;
-        settings.reserve(tokens.size()); // reserve capacity but don't resize
-
-        for (auto const& token : tokens)
+        session->GetQueryProcessor().AddCallback(CharacterDatabase.AsyncQuery(stmt)
+            .WithPreparedCallback([session](PreparedQueryResult result)
         {
-            if (token.empty())
-                continue;
+            if (!result || !session)
+                return;
 
-            // Try to parse the value safely
-            if (auto parsed = Acore::StringTo<uint32>(token))
-                settings.emplace_back(*parsed);
-        }
+            if (Player* thisPlayer = session->GetPlayer())
+            {
+                do
+                {
+                    Field* fields = result->Fetch();
+                    std::string source = fields[0].Get<std::string>();
+                    std::string data = fields[1].Get<std::string>();
 
-        m_charSettingsMap.emplace(std::move(source), std::move(settings));
+                    std::vector<std::string_view> tokens = Acore::Tokenize(data, ' ', false);
 
-    } while (result->NextRow());
+                    PlayerSettingVector settings;
+                    settings.reserve(tokens.size()); // reserve capacity but don't resize
+
+                    for (auto const& token : tokens)
+                    {
+                        if (token.empty())
+                            continue;
+
+                        // Try to parse the value safely
+                        if (auto parsed = Acore::StringTo<uint32>(token))
+                            settings.emplace_back(*parsed);
+                    }
+
+                    thisPlayer->StoreNewSetting(source, settings);
+
+                } while (result->NextRow());
+            }
+        }));
+    }
 }
 
 PlayerSetting Player::GetPlayerSetting(std::string const& source, uint8 index)
