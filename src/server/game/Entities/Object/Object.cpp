@@ -1083,31 +1083,14 @@ void WorldObject::setActive(bool on)
 
     m_isActive = on;
 
-    if (on && !IsInWorld())
+    if (!on || !IsInWorld())
         return;
 
     Map* map = FindMap();
     if (!map)
         return;
 
-    if (on)
-    {
-        if (IsCreature())
-            map->AddToActive(this->ToCreature());
-        else if (IsDynamicObject())
-            map->AddToActive((DynamicObject*)this);
-        else if (IsGameObject())
-            map->AddToActive((GameObject*)this);
-    }
-    else
-    {
-        if (IsCreature())
-            map->RemoveFromActive(this->ToCreature());
-        else if (IsDynamicObject())
-            map->RemoveFromActive((DynamicObject*)this);
-        else if (IsGameObject())
-            map->RemoveFromActive((GameObject*)this);
-    }
+    map->AddObjectToPendingUpdateList(this);
 }
 
 void WorldObject::SetVisibilityDistanceOverride(VisibilityDistanceType type)

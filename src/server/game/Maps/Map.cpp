@@ -73,8 +73,7 @@ Map::~Map()
 
 Map::Map(uint32 id, uint32 InstanceId, uint8 SpawnMode, Map* _parent) :
     _mapGridManager(this), i_mapEntry(sMapStore.LookupEntry(id)), i_spawnMode(SpawnMode), i_InstanceId(InstanceId),
-    m_unloadTimer(0), m_VisibleDistance(DEFAULT_VISIBILITY_DISTANCE),
-    _instanceResetPeriod(0), m_activeNonPlayersIter(m_activeNonPlayers.end()),
+    m_unloadTimer(0), m_VisibleDistance(DEFAULT_VISIBILITY_DISTANCE), _instanceResetPeriod(0),
     _transportsUpdateIter(_transports.end()), i_scriptLock(false), _defaultLight(GetDefaultMapLight(id))
 {
     m_parentMap = (_parent ? _parent : this);
@@ -357,9 +356,6 @@ bool Map::AddToMap(T* obj, bool checkTransport)
 
     InitializeObject(obj);
 
-    if (obj->isActiveObject())
-        AddToActive(obj);
-
     //something, such as vehicle, needs to be update immediately
     //also, trigger needs to cast spell, if not update, cannot see visual
     obj->UpdateObjectVisibility(true);
@@ -392,9 +388,6 @@ bool Map::AddToMap(MotionTransport* obj, bool /*checkTransport*/)
         EnsureGridLoaded(cell);
 
     obj->AddToWorld();
-
-    if (obj->isActiveObject())
-        AddToActive(obj);
 
     _transports.insert(obj);
 
@@ -508,19 +501,6 @@ void Map::Update(const uint32 t_diff, const uint32 s_diff, bool  /*thread*/)
                 else if (DynamicObject* viewObject = viewPoint->ToDynObject())
                     MarkNearbyCellsOf(viewObject);
             }
-        }
-    }
-
-    if (_updatableObjectListRecheckTimer.Passed())
-    {
-        // Mark all cells near active objects
-        for (m_activeNonPlayersIter = m_activeNonPlayers.begin(); m_activeNonPlayersIter != m_activeNonPlayers.end(); ++m_activeNonPlayersIter)
-        {
-            WorldObject* obj = *m_activeNonPlayersIter;
-            if (!obj || !obj->IsInWorld())
-                continue;
-
-            MarkNearbyCellsOf(obj);
         }
     }
 
@@ -699,9 +679,6 @@ void Map::RemoveFromMap(T* obj, bool remove)
 {
     obj->RemoveFromWorld();
 
-    if (obj->isActiveObject())
-        RemoveFromActive(obj);
-
     obj->RemoveFromGrid();
 
     obj->ResetMap();
@@ -717,8 +694,6 @@ template<>
 void Map::RemoveFromMap(MotionTransport* obj, bool remove)
 {
     obj->RemoveFromWorld();
-    if (obj->isActiveObject())
-        RemoveFromActive(obj);
 
     Map::PlayerList const& players = GetPlayers();
     if (!players.IsEmpty())
@@ -1818,60 +1793,6 @@ void Map::SendToPlayers(WorldPacket const* data) const
 {
     for (MapRefMgr::const_iterator itr = m_mapRefMgr.begin(); itr != m_mapRefMgr.end(); ++itr)
         itr->GetSource()->GetSession()->SendPacket(data);
-}
-
-template<class T>
-void Map::AddToActive(T* obj)
-{
-    AddToActiveHelper(obj);
-}
-
-template <>
-void Map::AddToActive(Creature* c)
-{
-    AddToActiveHelper(c);
-}
-
-template<>
-void Map::AddToActive(DynamicObject* d)
-{
-    AddToActiveHelper(d);
-}
-
-template<>
-void Map::AddToActive(GameObject* d)
-{
-    AddToActiveHelper(d);
-}
-
-template<>
-void Map::AddToActive(Corpse* /*c*/)
-{
-    // do nothing for corpses
-}
-
-template<class T>
-void Map::RemoveFromActive(T* obj)
-{
-    RemoveFromActiveHelper(obj);
-}
-
-template <>
-void Map::RemoveFromActive(Creature* c)
-{
-    RemoveFromActiveHelper(c);
-}
-
-template<>
-void Map::RemoveFromActive(DynamicObject* obj)
-{
-    RemoveFromActiveHelper(obj);
-}
-
-template<>
-void Map::RemoveFromActive(GameObject* obj)
-{
-    RemoveFromActiveHelper(obj);
 }
 
 template bool Map::AddToMap(Corpse*, bool);
