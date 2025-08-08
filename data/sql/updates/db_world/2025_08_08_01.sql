@@ -1,3 +1,4 @@
+-- DB update 2025_08_08_00 -> 2025_08_08_01
 -- fix low level scourge invasion quests
 -- queststarters / questenders
 UPDATE `creature_template` SET `npcflag` = `npcflag` | 2 WHERE (`entry` IN (16484, 16490, 16493, 16495, 29441));
