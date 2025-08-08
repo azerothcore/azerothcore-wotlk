@@ -914,7 +914,7 @@ void GameObject::Update(uint32 diff)
                 if (!m_spawnedByDefault)
                 {
                     m_respawnTime = 0;
-                    DestroyForNearbyPlayers(); // xinef: old UpdateObjectVisibility();
+                    DestroyForVisiblePlayers(); // xinef: old UpdateObjectVisibility();
                     return;
                 }
 
@@ -925,7 +925,7 @@ void GameObject::Update(uint32 diff)
                 if (GetMap()->IsDungeon())
                     SaveRespawnTime();
 
-                DestroyForNearbyPlayers(); // xinef: old UpdateObjectVisibility();
+                DestroyForVisiblePlayers(); // xinef: old UpdateObjectVisibility();
                 break;
             }
     }

@@ -43,14 +43,13 @@ namespace Acore
     struct VisibleNotifier
     {
         Player& i_player;
-        GuidUnorderedSet vis_guids;
         std::vector<Unit*>& i_visibleNow;
         bool i_gobjOnly;
         bool i_largeOnly;
         UpdateData i_data;
 
         VisibleNotifier(Player& player, bool gobjOnly, bool largeOnly) :
-            i_player(player), vis_guids(player.m_clientGUIDs), i_visibleNow(player.m_newVisible), i_gobjOnly(gobjOnly), i_largeOnly(largeOnly)
+            i_player(player), i_visibleNow(player.m_newVisible), i_gobjOnly(gobjOnly), i_largeOnly(largeOnly)
         {
             i_visibleNow.clear();
         }
@@ -111,6 +110,7 @@ namespace Acore
             , skipped_receiver(skipped), required3dDist(req3dDist)
         {
         }
+        void Visit(VisiblePlayersMap const& m);
         void Visit(PlayerMapType& m);
         void Visit(CreatureMapType& m);
         void Visit(DynamicObjectMapType& m);
