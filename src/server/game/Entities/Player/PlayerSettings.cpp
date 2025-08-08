@@ -30,6 +30,9 @@ void Player::_LoadCharacterSettings(WorldSession* session)
     if (!sWorld->getBoolConfig(CONFIG_PLAYER_SETTINGS_ENABLED))
         return;
 
+    if (!session)
+        return;
+
     // load them asynchronously
     {
         CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_CHAR_SETTINGS);
@@ -38,7 +41,7 @@ void Player::_LoadCharacterSettings(WorldSession* session)
         session->GetQueryProcessor().AddCallback(CharacterDatabase.AsyncQuery(stmt)
             .WithPreparedCallback([session](PreparedQueryResult result)
         {
-            if (!result || !session)
+            if (!result)
                 return;
 
             if (Player* thisPlayer = session->GetPlayer())
