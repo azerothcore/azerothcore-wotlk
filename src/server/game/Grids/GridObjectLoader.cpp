@@ -32,8 +32,6 @@ void GridObjectLoader::AddObjectHelper(Map* map, T* obj)
 
     map->AddToGrid(obj, cell);
     obj->AddToWorld();
-    if (obj->isActiveObject())
-        map->AddToActive(obj);
 }
 
 void GridObjectLoader::LoadCreatures(CellGuidSet const& guid_set, Map* map)
