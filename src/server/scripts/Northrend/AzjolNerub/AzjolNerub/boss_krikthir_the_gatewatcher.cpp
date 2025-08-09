@@ -58,7 +58,7 @@ public:
 
     struct boss_krik_thirAI : public BossAI
     {
-        boss_krik_thirAI(Creature* creature) : BossAI(creature, DATA_KRIKTHIR_THE_GATEWATCHER_EVENT)
+        boss_krik_thirAI(Creature* creature) : BossAI(creature, DATA_KRIKTHIR)
         {
             _initTalk = false;
             _canTalk = true;

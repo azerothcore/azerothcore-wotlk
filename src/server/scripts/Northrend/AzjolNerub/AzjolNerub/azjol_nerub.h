@@ -26,8 +26,8 @@
 
 enum ANData
 {
-    DATA_KRIKTHIR_THE_GATEWATCHER_EVENT = 0,
-    DATA_HADRONOX_EVENT                 = 1,
+    DATA_KRIKTHIR                       = 0,
+    DATA_HADRONOX                       = 1,
     DATA_ANUBARAK_EVENT                 = 2,
     MAX_ENCOUNTERS                      = 3
 };
