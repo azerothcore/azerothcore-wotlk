@@ -1,7 +1,0 @@
-// Find the section where auras are checked for stacking
-if (m_spellProto->AttributesEx7 & SPELL_ATTR7_CAN_STACK_FROM_DIFF_CASTER)
-{
-    // Allow stacking from different casters
-    // ...existing code...
-}
-// ...existing code...
