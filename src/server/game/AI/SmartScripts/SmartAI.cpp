@@ -72,7 +72,7 @@ SmartAI::SmartAI(Creature* c) : CreatureAI(c)
 
     mcanSpawn = true;
 
-    ChaseOnInterrupt = false;
+    _chaseOnInterrupt = false;
 
     // Xinef: Vehicle conditions
     m_ConditionsTimer = 0;

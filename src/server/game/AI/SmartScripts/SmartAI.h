@@ -212,8 +212,8 @@ public:
     // Xinef
     void SetWPPauseTimer(uint32 time) { mWPPauseTimer = time; }
 
-    void SetChaseOnInterrupt(bool apply) { ChaseOnInterrupt = apply; }
-    [[nodiscard]] bool CanChaseOnInterrupt() const { return ChaseOnInterrupt; }
+    void SetChaseOnInterrupt(bool apply) { _chaseOnInterrupt = apply; }
+    [[nodiscard]] bool CanChaseOnInterrupt() const { return _chaseOnInterrupt; }
 
 private:
     bool mIsCharmed;
@@ -261,7 +261,7 @@ private:
     ConditionList conditions;
     uint32 m_ConditionsTimer;
 
-    bool ChaseOnInterrupt;
+    bool _chaseOnInterrupt;
 };
 
 class SmartGameObjectAI : public GameObjectAI
