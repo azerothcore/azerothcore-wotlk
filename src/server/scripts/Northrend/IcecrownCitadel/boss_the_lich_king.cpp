@@ -673,7 +673,7 @@ public:
             // Reset The Frozen Throne gameobjects
             FrozenThroneResetWorker reset;
             Acore::GameObjectWorker<FrozenThroneResetWorker> worker(me, reset);
-            Cell::VisitGridObjects(me, worker, 333.0f);
+            Cell::VisitObjects(me, worker, 333.0f);
 
             me->AddAura(SPELL_EMOTE_SIT_NO_SHEATH, me);
             me->SetImmuneToPC(true);

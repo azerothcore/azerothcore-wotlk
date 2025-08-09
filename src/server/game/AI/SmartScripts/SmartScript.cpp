@@ -4033,7 +4033,7 @@ void SmartScript::GetWorldObjectsInDist(ObjectVector& targets, float dist) const
 
     Acore::AllWorldObjectsInRange u_check(obj, dist);
     Acore::WorldObjectListSearcher<Acore::AllWorldObjectsInRange> searcher(obj, targets, u_check);
-    Cell::VisitAllObjects(obj, searcher, dist);
+    Cell::VisitObjects(obj, searcher, dist);
 }
 
 void SmartScript::ProcessEvent(SmartScriptHolder& e, Unit* unit, uint32 var0, uint32 var1, bool bvar, SpellInfo const* spell, GameObject* gob)
@@ -5255,7 +5255,7 @@ Unit* SmartScript::DoSelectLowestHpFriendly(float range, uint32 MinHPDiff) const
 
     Acore::MostHPMissingInRange u_check(me, range, MinHPDiff);
     Acore::UnitLastSearcher<Acore::MostHPMissingInRange> searcher(me, unit, u_check);
-    Cell::VisitGridObjects(me, searcher, range);
+    Cell::VisitObjects(me, searcher, range);
     return unit;
 }
 
@@ -5269,7 +5269,7 @@ Unit* SmartScript::DoSelectLowestHpPercentFriendly(float range, uint32 minHpPct,
     Unit* unit = nullptr;
     Acore::MostHPPercentMissingInRange u_check(me, range, minHpPct, maxHpPct);
     Acore::UnitLastSearcher<Acore::MostHPPercentMissingInRange> searcher(me, unit, u_check);
-    Cell::VisitGridObjects(me, searcher, range);
+    Cell::VisitObjects(me, searcher, range);
     return unit;
 }
 
@@ -5280,7 +5280,7 @@ void SmartScript::DoFindFriendlyCC(std::vector<Creature*>& creatures, float rang
 
     Acore::FriendlyCCedInRange u_check(me, range);
     Acore::CreatureListSearcher<Acore::FriendlyCCedInRange> searcher(me, creatures, u_check);
-    Cell::VisitGridObjects(me, searcher, range);
+    Cell::VisitObjects(me, searcher, range);
 }
 
 void SmartScript::DoFindFriendlyMissingBuff(std::vector<Creature*>& creatures, float range, uint32 spellid) const
@@ -5290,7 +5290,7 @@ void SmartScript::DoFindFriendlyMissingBuff(std::vector<Creature*>& creatures, f
 
     Acore::FriendlyMissingBuffInRange u_check(me, range, spellid);
     Acore::CreatureListSearcher<Acore::FriendlyMissingBuffInRange> searcher(me, creatures, u_check);
-    Cell::VisitGridObjects(me, searcher, range);
+    Cell::VisitObjects(me, searcher, range);
 }
 
 Unit* SmartScript::DoFindClosestFriendlyInRange(float range, bool playerOnly) const
@@ -5301,7 +5301,7 @@ Unit* SmartScript::DoFindClosestFriendlyInRange(float range, bool playerOnly) co
     Unit* unit = nullptr;
     Acore::AnyFriendlyNotSelfUnitInObjectRangeCheck u_check(me, me, range, playerOnly);
     Acore::UnitLastSearcher<Acore::AnyFriendlyNotSelfUnitInObjectRangeCheck> searcher(me, unit, u_check);
-    Cell::VisitAllObjects(me, searcher, range);
+    Cell::VisitObjects(me, searcher, range);
     return unit;
 }
 

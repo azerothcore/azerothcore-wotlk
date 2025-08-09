@@ -1614,13 +1614,13 @@ void Player::UpdateVisibilityForPlayer(bool mapChange)
     Acore::VisibleNotifier notifierNoLarge(
         *this, mapChange,
         false); // visit only objects which are not large; default distance
-    Cell::VisitAllObjects(m_seer, notifierNoLarge,
+    Cell::VisitObjects(m_seer, notifierNoLarge,
                           GetSightRange() + VISIBILITY_INC_FOR_GOBJECTS);
     notifierNoLarge.SendToSelf();
 
     Acore::VisibleNotifier notifierLarge(
         *this, mapChange, true); // visit only large objects; maximum distance
-    Cell::VisitAllObjects(m_seer, notifierLarge, GetSightRange());
+    Cell::VisitObjects(m_seer, notifierLarge, GetSightRange());
     notifierLarge.SendToSelf();
 
     if (mapChange)
