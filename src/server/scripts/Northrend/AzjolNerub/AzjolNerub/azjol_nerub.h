@@ -34,6 +34,9 @@ enum ANData
 
 enum ANIds
 {
+    NPC_WATCHER_NARJIL                  = 28729,
+    NPC_WATCHER_GASHRA                  = 28730,
+    NPC_WATCHER_SILTHIK                 = 28731,
     NPC_SKITTERING_SWARMER              = 28735,
     NPC_SKITTERING_INFECTIOR            = 28736,
     NPC_KRIKTHIR_THE_GATEWATCHER        = 28684,

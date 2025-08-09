@@ -82,30 +82,11 @@ public:
             InstanceScript::OnCreatureCreate(creature);
         }
 
-        void OnGameObjectCreate(GameObject* go) override
+        void OnCreatureEvade(Creature* creature) override
         {
-            switch (go->GetEntry())
-            {
-                case GO_KRIKTHIR_DOORS:
-                case GO_ANUBARAK_DOORS1:
-                case GO_ANUBARAK_DOORS2:
-                case GO_ANUBARAK_DOORS3:
-                    AddDoor(go);
-                    break;
-            }
-        }
-
-        void OnGameObjectRemove(GameObject* go) override
-        {
-            switch (go->GetEntry())
-            {
-                case GO_KRIKTHIR_DOORS:
-                case GO_ANUBARAK_DOORS1:
-                case GO_ANUBARAK_DOORS2:
-                case GO_ANUBARAK_DOORS3:
-                    RemoveDoor(go);
-                    break;
-            }
+            if (creature->EntryEquals(NPC_WATCHER_NARJIL, NPC_WATCHER_GASHRA, NPC_WATCHER_SILTHIK))
+                if (Creature* krikthir = GetCreature(DATA_KRIKTHIR_THE_GATEWATCHER_EVENT))
+                    krikthir->AI()->EnterEvadeMode();
         }
     };
 
