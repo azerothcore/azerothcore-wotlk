@@ -2451,7 +2451,7 @@ public:
 
         Acore::RespawnDo u_do;
         Acore::WorldObjectWorker<Acore::RespawnDo> worker(player, u_do);
-        Cell::VisitGridObjects(player, worker, player->GetGridActivationRange());
+        Cell::VisitObjects(player, worker, player->GetGridActivationRange());
 
         return true;
     }

@@ -104,7 +104,7 @@ void TotemAI::UpdateAI(uint32 /*diff*/)
         victim = nullptr;
         Acore::NearestAttackableUnitInObjectRangeCheck u_check(me, me, max_range);
         Acore::UnitLastSearcher<Acore::NearestAttackableUnitInObjectRangeCheck> checker(me, victim, u_check);
-        Cell::VisitAllObjects(me, checker, max_range);
+        Cell::VisitObjects(me, checker, max_range);
     }
 
     if (!victim && me->GetCharmerOrOwnerOrSelf()->IsInCombat())

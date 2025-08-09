@@ -30,7 +30,7 @@ void GridObjectLoader::AddObjectHelper(Map* map, T* obj)
     CellCoord cellCoord = Acore::ComputeCellCoord(obj->GetPositionX(), obj->GetPositionY());
     Cell cell(cellCoord);
 
-    map->AddToGrid(obj, cell);
+    map->AddToGrid<T>(obj, cell);
     obj->AddToWorld();
 }
 
@@ -53,7 +53,7 @@ void GridObjectLoader::LoadCreatures(CellGuidSet const& guid_set, Map* map)
             {
                 // call MoveInLineOfSight for nearby grid creatures
                 Acore::AIRelocationNotifier notifier(*obj);
-                Cell::VisitGridObjects(obj, notifier, 60.f);
+                Cell::VisitObjects(obj, notifier, 60.f);
             }
         }
     }

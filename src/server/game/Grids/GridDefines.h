@@ -51,10 +51,11 @@ class ObjectGuid;
 #define MAP_SIZE                (SIZE_OF_GRIDS*MAX_NUMBER_OF_GRIDS)
 #define MAP_HALFSIZE            (MAP_SIZE/2)
 
-// Creature used instead pet to simplify *::Visit templates (not required duplicate code for Creature->Pet case)
-typedef TYPELIST_4(GameObject, Player, Creature/*pets*/, Corpse/*resurrectable*/) AllWorldObjectTypes;
-typedef TYPELIST_4(GameObject, Creature/*except pets*/, DynamicObject, Corpse/*Bones*/) AllGridObjectTypes;
-typedef TYPELIST_5(Creature, GameObject, DynamicObject, Pet, Corpse) AllMapStoredObjectTypes;
+// List of object types stored in a map grid
+typedef TYPELIST_5(GameObject, Player, Creature, Corpse, DynamicObject) AllMapGridStoredObjectTypes;
+
+// List of object types stored on map level
+typedef TYPELIST_4(Creature, GameObject, DynamicObject, Corpse) AllMapStoredObjectTypes;
 
 typedef GridRefMgr<Corpse>          CorpseMapType;
 typedef GridRefMgr<Creature>        CreatureMapType;
@@ -72,11 +73,10 @@ enum GridMapTypeMask
     GRID_MAP_TYPE_MASK_ALL              = 0x1F
 };
 
-typedef GridCell<AllWorldObjectTypes, AllGridObjectTypes> GridCellType;
-typedef MapGrid<AllWorldObjectTypes, AllGridObjectTypes> MapGridType;
+typedef GridCell<AllMapGridStoredObjectTypes> GridCellType;
+typedef MapGrid<AllMapGridStoredObjectTypes> MapGridType;
 
-typedef TypeMapContainer<AllGridObjectTypes> GridTypeMapContainer;
-typedef TypeMapContainer<AllWorldObjectTypes> WorldTypeMapContainer;
+typedef TypeMapContainer<AllMapGridStoredObjectTypes> GridTypeMapContainer;
 typedef TypeUnorderedMapContainer<AllMapStoredObjectTypes, ObjectGuid> MapStoredObjectTypesContainer;
 
 template<uint32 LIMIT>

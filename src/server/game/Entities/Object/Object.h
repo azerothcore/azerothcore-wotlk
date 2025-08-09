@@ -460,7 +460,7 @@ private:
 class WorldObject : public Object, public WorldLocation
 {
 protected:
-    explicit WorldObject(bool isWorldObject); //note: here it means if it is in grid object list or world object list
+    explicit WorldObject();
 public:
     ~WorldObject() override;
 
@@ -657,7 +657,6 @@ public:
     [[nodiscard]] bool IsFarVisible() const { return m_isFarVisible; }
     [[nodiscard]] bool IsVisibilityOverridden() const { return m_visibilityDistanceOverride.has_value(); }
     void SetVisibilityDistanceOverride(VisibilityDistanceType type);
-    [[nodiscard]] bool IsWorldObject() const { return m_isWorldObject; }
 
     [[nodiscard]] bool IsInWintergrasp() const
     {
@@ -722,7 +721,6 @@ protected:
     bool m_isActive;
     bool m_isFarVisible;
     Optional<float> m_visibilityDistanceOverride;
-    const bool m_isWorldObject;
     ZoneScript* m_zoneScript;
 
     virtual void ProcessPositionDataChanged(PositionFullTerrainStatus const& data);

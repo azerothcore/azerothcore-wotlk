@@ -615,7 +615,7 @@ bool OPvPCapturePointNA::Update(uint32 diff)
     std::list<Player*> players;
     Acore::AnyPlayerInObjectRangeCheck checker(_capturePoint, radius);
     Acore::PlayerListSearcher<Acore::AnyPlayerInObjectRangeCheck> searcher(_capturePoint, players, checker);
-    Cell::VisitWorldObjects(_capturePoint, searcher, radius);
+    Cell::VisitObjects(_capturePoint, searcher, radius);
 
     for (Player* player : players)
     {

@@ -251,7 +251,7 @@ void CreatureTextMgr::SendChatPacket(WorldObject* source, Builder const& builder
         dist = 250.0f;
 
     Acore::PlayerDistWorker<CreatureTextLocalizer<Builder> > worker(source, dist, localizer);
-    Cell::VisitWorldObjects(source, worker, dist);
+    Cell::VisitObjects(source, worker, dist);
 }
 
 #endif

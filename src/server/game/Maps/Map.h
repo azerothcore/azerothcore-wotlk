@@ -315,9 +315,6 @@ public:
     [[nodiscard]] bool HavePlayers() const { return !m_mapRefMgr.IsEmpty(); }
     [[nodiscard]] uint32 GetPlayersCountExceptGMs() const;
 
-    void AddWorldObject(WorldObject* obj) { i_worldObjects.insert(obj); }
-    void RemoveWorldObject(WorldObject* obj) { i_worldObjects.erase(obj); }
-
     void SendToPlayers(WorldPacket const* data) const;
 
     typedef MapRefMgr PlayerList;
@@ -560,7 +557,6 @@ private:
 
     bool i_scriptLock;
     std::unordered_set<WorldObject*> i_objectsToRemove;
-    std::unordered_set<WorldObject*> i_worldObjects;
 
     typedef std::multimap<time_t, ScriptAction> ScriptScheduleMap;
     ScriptScheduleMap m_scriptSchedule;
