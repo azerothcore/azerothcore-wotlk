@@ -131,18 +131,25 @@ public:
             BossAI::JustEngagedWith(who);
             Talk(SAY_AGGRO);
 
-            ScheduleTimedEvent(13s, [&] {
+            // Timing parameters
+            auto const& mindFlayFirst = IsInFrenzy() ? 5s : 8s;
+            auto const& mindFlayRepeat = IsInFrenzy() ? 9s : 14s;
+
+            auto const& swarmFirst = IsInFrenzy() ? 7s : 10s;
+            auto const& swarmRepeat = IsInFrenzy() ? 17s : 30s;
+
+            ScheduleTimedEvent(mindFlayFirst, mindFlayRepeat, [&] {
                 DoCastVictim(SPELL_MIND_FLAY);
-            }, 15s);
+            }, mindFlayFirst, mindFlayRepeat);
 
-            ScheduleTimedEvent(8s, [&] {
-                DoCastRandomTarget(SPELL_CURSE_OF_FATIGUE, true);
-            }, 10s);
-
-            ScheduleTimedEvent(17s, [&] {
+            ScheduleTimedEvent(swarmFirst, swarmRepeat, [&] {
                 Talk(SAY_SWARM);
                 DoCastAOE(SPELL_SWARM);
-            }, 20s);
+            }, swarmFirst, swarmRepeat);
+
+            ScheduleTimedEvent(27s, 35s, [&] {
+                DoCastRandomTarget(SPELL_CURSE_OF_FATIGUE, true);
+            }, 27s, 35s);
 
             summons.DoZoneInCombat();
         }
@@ -181,6 +188,8 @@ public:
         bool _initTalk;
         bool _canTalk;
         bool _minionInCombat;
+
+        [[nodiscard]] bool IsInFrenzy() const { return me->HasAura(SPELL_FRENZY); }
     };
 
     CreatureAI* GetAI(Creature* creature) const override
