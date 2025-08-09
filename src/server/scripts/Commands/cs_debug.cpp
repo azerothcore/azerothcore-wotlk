@@ -911,7 +911,7 @@ public:
             Creature* passenger = nullptr;
             Acore::AllCreaturesOfEntryInRange check(handler->GetPlayer(), entry, 20.0f);
             Acore::CreatureSearcher<Acore::AllCreaturesOfEntryInRange> searcher(handler->GetPlayer(), passenger, check);
-            Cell::VisitAllObjects(handler->GetPlayer(), searcher, 30.0f);
+            Cell::VisitObjects(handler->GetPlayer(), searcher, 30.0f);
 
             if (!passenger || passenger == target)
                 return false;
@@ -1347,11 +1347,11 @@ public:
 
     static void HandleDebugObjectCountMap(ChatHandler* handler, Map* map)
     {
-        handler->PSendSysMessage("Map Id: {} Name: '{}' Instance Id: {} Creatures: {} GameObjects: {} SetActive Objects: {}",
+        handler->PSendSysMessage("Map Id: {} Name: '{}' Instance Id: {} Creatures: {} GameObjects: {} Update Objects: {}",
                 map->GetId(), map->GetMapName(), map->GetInstanceId(),
                 uint64(map->GetObjectsStore().Size<Creature>()),
                 uint64(map->GetObjectsStore().Size<GameObject>()),
-                uint64(map->GetActiveNonPlayersCount()));
+                uint64(map->GetUpdateObjectsCount()));
 
         CreatureCountWorker worker;
         TypeContainerVisitor<CreatureCountWorker, MapStoredObjectTypesContainer> visitor(worker);

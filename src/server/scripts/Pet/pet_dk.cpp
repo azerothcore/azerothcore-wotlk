@@ -174,7 +174,7 @@ struct npc_pet_dk_ebon_gargoyle : ScriptedAI
             std::list<Unit*> targets;
             Acore::AnyUnfriendlyUnitInObjectRangeCheck u_check(me, me, 50.0f);
             Acore::UnitListSearcher<Acore::AnyUnfriendlyUnitInObjectRangeCheck> searcher(me, targets, u_check);
-            Cell::VisitAllObjects(me, searcher, 50.0f);
+            Cell::VisitObjects(me, searcher, 50.0f);
             for (auto const& target : targets)
                 if (target->GetAura(SPELL_DK_SUMMON_GARGOYLE_1, me->GetOwnerGUID()))
                 {
