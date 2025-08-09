@@ -856,7 +856,7 @@ public:
                 std::list<Creature*> temp;
                 FrostwingVrykulSearcher check(me, 150.0f);
                 Acore::CreatureListSearcher<FrostwingVrykulSearcher> searcher(me, temp, check);
-                Cell::VisitGridObjects(me, searcher, 150.0f);
+                Cell::VisitObjects(me, searcher, 150.0f);
 
                 _aliveTrash.clear();
                 for (std::list<Creature*>::iterator itr = temp.begin(); itr != temp.end(); ++itr)
@@ -901,14 +901,14 @@ public:
                 Player* player = nullptr;
                 Acore::AnyPlayerInObjectRangeCheck check(me, 140.0f);
                 Acore::PlayerSearcher<Acore::AnyPlayerInObjectRangeCheck> searcher(me, player, check);
-                Cell::VisitWorldObjects(me, searcher, 140.0f);
+                Cell::VisitObjects(me, searcher, 140.0f);
                 // wipe
                 if (!player || me->GetExactDist(4357.0f, 2606.0f, 350.0f) > 125.0f)
                 {
                     //Talk(SAY_CROK_DEATH);
                     FrostwingGauntletRespawner respawner;
                     Acore::CreatureWorker<FrostwingGauntletRespawner> worker(me, respawner);
-                    Cell::VisitGridObjects(me, worker, 333.0f);
+                    Cell::VisitObjects(me, worker, 333.0f);
                     return;
                 }
             }
@@ -1365,7 +1365,7 @@ public:
             Creature* target = nullptr;
             Acore::MostHPMissingInRange u_check(me, 60.0f, 0);
             Acore::CreatureLastSearcher<Acore::MostHPMissingInRange> searcher(me, target, u_check);
-            Cell::VisitGridObjects(me, searcher, 60.0f);
+            Cell::VisitObjects(me, searcher, 60.0f);
             return target;
         }
     };
@@ -2261,7 +2261,7 @@ public:
                     {
                         FrostwingGauntletRespawner respawner;
                         Acore::CreatureWorker<FrostwingGauntletRespawner> worker(crok, respawner);
-                        Cell::VisitGridObjects(crok, worker, 333.0f);
+                        Cell::VisitObjects(crok, worker, 333.0f);
                         return true;
                     }
                     else
