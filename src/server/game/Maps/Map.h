@@ -479,7 +479,7 @@ public:
         _updateObjects.erase(obj);
     }
 
-    size_t GetUpdateObjectsCount() const { return _updateObjects.size(); }
+    size_t GetUpdatableObjectsCount() const { return _updatableObjectList.size(); }
 
     virtual std::string GetDebugInfo() const;
 
