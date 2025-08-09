@@ -172,7 +172,7 @@ public:
                 };
                 Creature* creature = nullptr;
                 Bcore::CreatureLastSearcher searcher(me, creature, corpse_pred);
-                Cell::VisitAllObjects(me, searcher, ceinfo->RangeEntry->RangeMax[0]);
+                Cell::VisitObjects(me, searcher, ceinfo->RangeEntry->RangeMax[0]);
 
                 if (creature)
                 {
@@ -192,7 +192,7 @@ public:
                         std::list<Unit*> units;
                         NearbyHostileUnitCheck check(me, ceradius, this, 0, c);
                         Bcore::UnitListSearcher searcher(c, units, check);
-                        Cell::VisitAllObjects(c, searcher, ceradius);
+                        Cell::VisitObjects(c, searcher, ceradius);
                         if (units.size() > maxmob)
                         {
                             maxmob = units.size();
@@ -204,7 +204,7 @@ public:
                 };
                 std::list<Creature*> corpses;
                 Bcore::CreatureListSearcher searcher(me, corpses, corpse_pred);
-                Cell::VisitAllObjects(me, searcher, ceinfo->RangeEntry->RangeMax[0]);
+                Cell::VisitObjects(me, searcher, ceinfo->RangeEntry->RangeMax[0]);
 
                 if (Creature* corpse = corpses.empty() ? nullptr : corpses.size() == 1 ? corpses.front() :
                     Bcore::Containers::SelectRandomContainerElement(corpses))
@@ -236,7 +236,7 @@ public:
             };
             Creature* creature = nullptr;
             Bcore::CreatureLastSearcher searcher(me, creature, corpse_pred);
-            Cell::VisitAllObjects(me, searcher, 25.f);
+            Cell::VisitObjects(me, searcher, 25.f);
 
             if (creature)
             {

@@ -594,7 +594,7 @@ struct npc_watch_commander_leonus : public ScriptedAI
                     {
                         Acore::AllCreaturesOfEntryInRange pred(me, entry);
                         Acore::CreatureListSearcher<Acore::AllCreaturesOfEntryInRange> searcher(me, dummies, pred);
-                        Cell::VisitAllObjects(me, searcher, 500.0f);
+                        Cell::VisitObjects(me, searcher, 500.0f);
                     }
 
                     for (Creature* dummy : dummies)
@@ -636,7 +636,7 @@ struct npc_infernal_rain_hellfire : public ScriptedAI
         std::vector<Creature*> others;
         Acore::AllCreaturesOfEntryInRange pred(me, NPC_INFERNAL_RAIN);
         Acore::CreatureListSearcher<Acore::AllCreaturesOfEntryInRange> searcher(me, others, pred);
-        Cell::VisitAllObjects(me, searcher, 500.0f);
+        Cell::VisitObjects(me, searcher, 500.0f);
         for (Creature* other : others)
             if (other->GetCreatureData()->movementType == 2)
                 _targets.push_back(other->GetGUID());

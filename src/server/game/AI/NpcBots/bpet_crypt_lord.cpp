@@ -251,7 +251,7 @@ public:
                 {
                     Bcore::AnyUnfriendlyUnitInObjectRangeCheck check(petOwner, petOwner, LOCUST_SWARM_EFFECTIVE_RADIUS);
                     Bcore::UnitListSearcher searcher(petOwner, targets, check);
-                    Cell::VisitAllObjects(petOwner, searcher, LOCUST_SWARM_EFFECTIVE_RADIUS);
+                    Cell::VisitObjects(petOwner, searcher, LOCUST_SWARM_EFFECTIVE_RADIUS);
 
                     targets.remove_if([poguid = petOwner->GetGUID(), combat = petOwner->IsInCombat(), max_attackers = _attackers](Unit const* unit) {
                         Unit::AttackerSet const& attackers = unit->getAttackers();

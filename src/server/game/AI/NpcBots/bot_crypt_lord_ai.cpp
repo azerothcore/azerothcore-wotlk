@@ -204,7 +204,7 @@ public:
             };
             Creature* creature = nullptr;
             Bcore::CreatureSearcher searcher(me, creature, corpse_pred);
-            Cell::VisitAllObjects(me, searcher, 30.f);
+            Cell::VisitObjects(me, searcher, 30.f);
 
             if (creature)
             {

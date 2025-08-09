@@ -1643,7 +1643,7 @@ public:
                         GameObject* platform = nullptr;
                         Bcore::NearestGameObjectEntryInObjectRangeCheck check(*player, 202161, 100.0f);
                         Bcore::GameObjectSearcher<Bcore::NearestGameObjectEntryInObjectRangeCheck> searcher(player, platform, check);
-                        Cell::VisitAllObjects(player, searcher, 100.0f);
+                        Cell::VisitObjects(player, searcher, 100.0f);
                         if (!platform)
                         {
                             handler->SendSysMessage("Cannot find platform id 202161!");

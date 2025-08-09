@@ -4035,7 +4035,7 @@ Unit* bot_ai::_getVehicleTarget(BotVehicleStrats /*strat*/) const
     Unit* t = nullptr;
     NearbyHostileVehicleTargetCheck check(veh, maxdist, this);
     Bcore::UnitSearcher <NearbyHostileVehicleTargetCheck> searcher(veh, t, check);
-    Cell::VisitAllObjects(veh, searcher, maxdist);
+    Cell::VisitObjects(veh, searcher, maxdist);
     //veh->VisitNearbyObject(maxdist, searcher);
 
     return t;
@@ -4131,7 +4131,7 @@ std::tuple<Unit*, Unit*> bot_ai::_getTargets(bool byspell, bool ranged, bool &re
 
             std::list<Creature*> cList;
             Bcore::CreatureListSearcher searcher(me, cList, boneSpikeCheck);
-            Cell::VisitAllObjects(me, searcher, 50.f);
+            Cell::VisitObjects(me, searcher, 50.f);
 
             if (Creature* spike = cList.empty() ? nullptr : cList.size() == 1 ? cList.front() :
                 Bcore::Containers::SelectRandomContainerElement(cList))
@@ -4164,7 +4164,7 @@ std::tuple<Unit*, Unit*> bot_ai::_getTargets(bool byspell, bool ranged, bool &re
 
             std::list<Creature*> cList;
             Bcore::CreatureListSearcher searcher(master, cList, SiItCheck);
-            Cell::VisitAllObjects(me, searcher, 200.f);
+            Cell::VisitObjects(me, searcher, 200.f);
 
             if (!cList.empty())
             {
@@ -4235,7 +4235,7 @@ std::tuple<Unit*, Unit*> bot_ai::_getTargets(bool byspell, bool ranged, bool &re
 
             Creature* valkyr = nullptr;
             Bcore::CreatureSearcher searcher(me, valkyr, valkyrCheck);
-            Cell::VisitAllObjects(me, searcher, 50.f);
+            Cell::VisitObjects(me, searcher, 50.f);
 
             if (valkyr)
                 return { valkyr, nullptr };
@@ -4256,7 +4256,7 @@ std::tuple<Unit*, Unit*> bot_ai::_getTargets(bool byspell, bool ranged, bool &re
 
             Creature* sphere = nullptr;
             Bcore::CreatureLastSearcher searcher2(usearcher, sphere, iceSphereCheck);
-            Cell::VisitAllObjects(usearcher, searcher2, 30.f);
+            Cell::VisitObjects(usearcher, searcher2, 30.f);
 
             if (sphere)
                 return { sphere, nullptr };
@@ -4617,7 +4617,7 @@ std::tuple<Unit*, Unit*> bot_ai::_getTargets(bool byspell, bool ranged, bool &re
     std::list<Unit*> unitList;
     NearestHostileUnitCheck check(me, maxdist, byspell, this);
     Bcore::UnitListSearcher searcher(master->ToUnit(), unitList, check);
-    Cell::VisitAllObjects(HasBotCommandState(BOT_COMMAND_STAY) ? me->ToUnit() : master->ToUnit(), searcher, maxdist);
+    Cell::VisitObjects(HasBotCommandState(BOT_COMMAND_STAY) ? me->ToUnit() : master->ToUnit(), searcher, maxdist);
 
     if (IAmFree())
     {
@@ -4861,7 +4861,7 @@ bool bot_ai::ProcessImmediateNonAttackTarget()
             std::list<GameObject*> goList;
             Bcore::AllGameObjectsWithEntryInRange check(me, 179784, max_range); // Suppression Device
             Bcore::GameObjectListSearcher<Bcore::AllGameObjectsWithEntryInRange> searcher(me, goList, check);
-            Cell::VisitAllObjects(me, searcher, max_range);
+            Cell::VisitObjects(me, searcher, max_range);
 
             goList.remove_if([](GameObject const* gobject) { return gobject->HasGameObjectFlag(GO_FLAG_NOT_SELECTABLE); });
 
@@ -4889,7 +4889,7 @@ bool bot_ai::ProcessImmediateNonAttackTarget()
             std::list<Creature*> cList;
             Bcore::AllCreaturesOfEntryInRange check(me, 25744, 30.f); // Dark Fiend
             Bcore::CreatureListSearcher<Bcore::AllCreaturesOfEntryInRange> searcher(me, cList, check);
-            Cell::VisitAllObjects(me, searcher, 30.f);
+            Cell::VisitObjects(me, searcher, 30.f);
 
             //Dark Fiends do not die instantly, remove purged ones
             cList.remove_if(Bcore::UnitAuraCheck(false, 45934)); // "Dark Fiend"
@@ -4916,7 +4916,7 @@ bool bot_ai::ProcessImmediateNonAttackTarget()
                     static const uint32 CREATURE_HIGH_WARLORD_NAJENTUS = 22887u;
                     Bcore::AllCreaturesOfEntryInRange check(master, CREATURE_HIGH_WARLORD_NAJENTUS, 60.f);
                     Bcore::CreatureSearcher<Bcore::AllCreaturesOfEntryInRange> searcher(master, najentus, check);
-                    Cell::VisitAllObjects(master, searcher, 60.f);
+                    Cell::VisitObjects(master, searcher, 60.f);
                 }
 
                 if (najentus && najentus->HasAuraTypeWithMiscvalue(SPELL_AURA_SCHOOL_IMMUNITY, 127)) // Tidal Shield
@@ -4977,7 +4977,7 @@ bool bot_ai::ProcessImmediateNonAttackTarget()
                 {
                     Bcore::GameObjectInRangeCheck check(u->GetPositionX(), u->GetPositionY(), u->GetPositionZ(), 5.f, 185584);
                     Bcore::GameObjectLastSearcher<Bcore::GameObjectInRangeCheck> searcher(u, spine, check);
-                    Cell::VisitAllObjects(u, searcher, 5.f);
+                    Cell::VisitObjects(u, searcher, 5.f);
                 }
                 if (spine && spine->getLootState() != GO_JUST_DEACTIVATED)
                 {
@@ -5017,7 +5017,7 @@ bool bot_ai::ProcessImmediateNonAttackTarget()
             std::list<Creature*> cList;
             Bcore::AllCreaturesOfEntryInRange check(me, ShieldGeneratorTriggerNPC, 100.f); // Invis KV Shield Generator
             Bcore::CreatureListSearcher<Bcore::AllCreaturesOfEntryInRange> csearcher(me, cList, check);
-            Cell::VisitAllObjects(me, csearcher, 100.f);
+            Cell::VisitObjects(me, csearcher, 100.f);
 
             std::list<GameObject*> gList;
             auto is_shield_go = [](GameObject const* gobject) {
@@ -5033,7 +5033,7 @@ bool bot_ai::ProcessImmediateNonAttackTarget()
                 }
             };
             Bcore::GameObjectListSearcher gsearcher(me, gList, is_shield_go);
-            Cell::VisitAllObjects(me, gsearcher, 100.f);
+            Cell::VisitObjects(me, gsearcher, 100.f);
 
             static const auto get_shield_creature = [](GameObject const* gobject, std::list<Creature*> const& clist) {
                 Creature* c = nullptr;
@@ -5095,7 +5095,7 @@ bool bot_ai::ProcessImmediateNonAttackTarget()
                     static const uint32 CREATURE_SISTER_SVALNA_H = 37126; //Acore - same id is used
                     Bcore::AllCreaturesOfEntryInRange check(master, me->GetMap()->IsHeroic() ? CREATURE_SISTER_SVALNA_H : CREATURE_SISTER_SVALNA_N, 60.f);
                     Bcore::CreatureSearcher<Bcore::AllCreaturesOfEntryInRange> searcher(master, svalna, check);
-                    Cell::VisitAllObjects(master, searcher, 60.f);
+                    Cell::VisitObjects(master, searcher, 60.f);
                 }
 
                 if (svalna && svalna->HasAuraTypeWithMiscvalue(SPELL_AURA_SCHOOL_IMMUNITY, 127)) // Aether Shield
@@ -5155,7 +5155,7 @@ bool bot_ai::ProcessImmediateNonAttackTarget()
                 Creature* spear = nullptr;
                 Bcore::NearestCreatureEntryWithLiveStateInObjectRangeCheck check(*u, 38248, true, 5.f);
                 Bcore::CreatureSearcher<Bcore::NearestCreatureEntryWithLiveStateInObjectRangeCheck> searcher(u, spear, check);
-                Cell::VisitAllObjects(u, searcher, 5.f);
+                Cell::VisitObjects(u, searcher, 5.f);
 
                 if (spear)
                 {
@@ -5182,7 +5182,7 @@ void bot_ai::CalculateAoeSpots(Unit const* unit, AoeSpotsVec& spots)
     NearbyHostileAoEDynobjectCheck check(unit, 60.f);
     Bcore::WorldObjectListSearcher<NearbyHostileAoEDynobjectCheck> searcher(unit, doList, check, GRID_MAP_TYPE_MASK_DYNAMICOBJECT);
     //unit->VisitNearbyObject(60.f, searcher);
-    Cell::VisitAllObjects(unit, searcher, 60.f);
+    Cell::VisitObjects(unit, searcher, 60.f);
 
     //if (!doList.empty())
     //    BOT_LOG_ERROR("scripts", "CalculateAoeSpots %u aoes around %s", uint32(doList.size()), unit->GetName().c_str());
@@ -5218,7 +5218,7 @@ void bot_ai::CalculateAoeSpots(Unit const* unit, AoeSpotsVec& spots)
         std::list<GameObject*> gListMC;
         Bcore::AllGameObjectsWithEntryInRange checkMC(unit, GAMEOBJECT_HOT_COAL, 60.f);
         Bcore::GameObjectListSearcher<Bcore::AllGameObjectsWithEntryInRange> searcherMC(unit, gListMC, checkMC);
-        Cell::VisitAllObjects(unit, searcherMC, 60.f);
+        Cell::VisitObjects(unit, searcherMC, 60.f);
 
         float radius = 15.0f + DEFAULT_COMBAT_REACH;
         for (std::list<GameObject*>::const_iterator ci = gListMC.cbegin(); ci != gListMC.cend(); ++ci)
@@ -5232,7 +5232,7 @@ void bot_ai::CalculateAoeSpots(Unit const* unit, AoeSpotsVec& spots)
             return (c->GetEntry() == CREATURE_FOCUS_FIRE_N || c->GetEntry() == CREATURE_FOCUS_FIRE_H);
         };
         Bcore::CreatureSearcher searcher2(unit, creature, focus_fire_check);
-        Cell::VisitAllObjects(unit, searcher2, 50.f);
+        Cell::VisitObjects(unit, searcher2, 50.f);
 
         if (creature)
         {
@@ -5249,7 +5249,7 @@ void bot_ai::CalculateAoeSpots(Unit const* unit, AoeSpotsVec& spots)
             return (c->GetEntry() == CREATURE_MT_PHOENIX || c->GetEntry() == CREATURE_MT_ARCANE_SPHERE_N || c->GetEntry() == CREATURE_MT_ARCANE_SPHERE_H);
         };
         Bcore::CreatureListSearcher searcher3(unit, cList, kael_aoe_check);
-        Cell::VisitAllObjects(unit, searcher3, 40.f);
+        Cell::VisitObjects(unit, searcher3, 40.f);
 
         if (!cList.empty())
         {
@@ -5266,7 +5266,7 @@ void bot_ai::CalculateAoeSpots(Unit const* unit, AoeSpotsVec& spots)
         Bcore::AllCreaturesOfEntryInRange check2(unit->GetVehicleBase(), CREATURE_EOE_STATIC_FIELD, 60.f);
         Bcore::CreatureListSearcher<Bcore::AllCreaturesOfEntryInRange> searcher2(unit->GetVehicleBase(), cList, check2);
         //unit->GetVehicleBase()->VisitNearbyObject(60.f, searcher2);
-        Cell::VisitAllObjects(unit->GetVehicleBase(), searcher2, 60.f);
+        Cell::VisitObjects(unit->GetVehicleBase(), searcher2, 60.f);
 
         spellInfo = sSpellMgr->GetSpellInfo(57429); //Static Field damage
         float radius = spellInfo->Effects[0].CalcRadius() + unit->GetVehicleBase()->GetCombatReach() * 1.2f;
@@ -5280,7 +5280,7 @@ void bot_ai::CalculateAoeSpots(Unit const* unit, AoeSpotsVec& spots)
         Bcore::AllCreaturesOfEntryInRange check2(unit, CREATURE_ZA_FIRE_BOMB, 40.f);
         Bcore::CreatureListSearcher<Bcore::AllCreaturesOfEntryInRange> searcher2(unit, cList, check2);
         //unit->VisitNearbyObject(40.f, searcher2);
-        Cell::VisitAllObjects(unit, searcher2, 40.f);
+        Cell::VisitObjects(unit, searcher2, 40.f);
 
         spellInfo = sSpellMgr->GetSpellInfo(42630); //Fire Bomb
         float radius = spellInfo->Effects[0].CalcRadius() + DEFAULT_COMBAT_REACH * 1.2f;
@@ -5295,7 +5295,7 @@ void bot_ai::CalculateAoeSpots(Unit const* unit, AoeSpotsVec& spots)
             return (c->GetEntry() == CREATURE_UK_SHADOW_AXE_N || c->GetEntry() == CREATURE_UK_SHADOW_AXE_H);
         };
         Bcore::CreatureSearcher searcher2(unit, creature, shadow_axe_check);
-        Cell::VisitAllObjects(unit, searcher2, 40.f);
+        Cell::VisitObjects(unit, searcher2, 40.f);
 
         if (creature)
         {
@@ -5311,7 +5311,7 @@ void bot_ai::CalculateAoeSpots(Unit const* unit, AoeSpotsVec& spots)
         Bcore::AllCreaturesOfEntryInRange check2(unit, CREATURE_ICC_OOZE_PUDDLE, 50.f);
         Bcore::CreatureListSearcher<Bcore::AllCreaturesOfEntryInRange> searcher2(unit, cList, check2);
         //unit->VisitNearbyObject(50.f, searcher2);
-        Cell::VisitAllObjects(unit, searcher2, 50.f);
+        Cell::VisitObjects(unit, searcher2, 50.f);
 
         for (std::list<Creature*>::const_iterator ci = cList.begin(); ci != cList.end(); ++ci)
         {
@@ -6541,7 +6541,7 @@ WorldObject* bot_ai::GetNearbyRezTarget(float dist) const
 
     NearbyRezTargetCheck check(me, dist, this);
     Bcore::WorldObjectListSearcher <NearbyRezTargetCheck> searcher(me, list, check);
-    Cell::VisitWorldObjects(me, searcher, dist);
+    Cell::VisitObjects(me, searcher, dist);
 
     if (list.empty())
         return nullptr;
@@ -6561,7 +6561,7 @@ Unit* bot_ai::FindImmunityShieldDispelTarget(float dist) const
 
     ImmunityShieldDispelTargetCheck check(me, dist, this);
     Bcore::UnitSearcher <ImmunityShieldDispelTargetCheck> searcher(me, unit, check);
-    Cell::VisitAllObjects(me, searcher, dist);
+    Cell::VisitObjects(me, searcher, dist);
     //me->VisitNearbyObject(dist, searcher);
 
     return unit;
@@ -6574,7 +6574,7 @@ Unit* bot_ai::FindHostileDispelTarget(float dist, bool stealable) const
 
     HostileDispelTargetCheck check(me, dist, stealable, this);
     Bcore::UnitListSearcher <HostileDispelTargetCheck> searcher(me, unitList, check);
-    Cell::VisitAllObjects(me, searcher, dist);
+    Cell::VisitObjects(me, searcher, dist);
     //me->VisitNearbyObject(dist, searcher);
 
     if (unitList.empty())
@@ -6608,7 +6608,7 @@ Unit* bot_ai::FindAffectedTarget(uint32 spellId, ObjectGuid caster, float dist, 
 
     AffectedTargetCheck check(caster, dist, spellId, master, hostile);
     Bcore::UnitSearcher <AffectedTargetCheck> searcher(master, unit, check);
-    Cell::VisitAllObjects(me, searcher, dist);
+    Cell::VisitObjects(me, searcher, dist);
     //me->VisitNearbyObject(dist, searcher);
 
     return unit;
@@ -6620,7 +6620,7 @@ Unit* bot_ai::FindPolyTarget(float dist) const
 
     PolyUnitCheck check(me, dist);
     Bcore::UnitListSearcher <PolyUnitCheck> searcher(me, unitList, check);
-    Cell::VisitAllObjects(me, searcher, dist);
+    Cell::VisitObjects(me, searcher, dist);
     //me->VisitNearbyObject(dist, searcher);
 
     if (unitList.empty())
@@ -6640,7 +6640,7 @@ Unit* bot_ai::FindFearTarget(float dist) const
 
     FearUnitCheck check(me, dist, this);
     Bcore::UnitListSearcher <FearUnitCheck> searcher(me, unitList, check);
-    Cell::VisitAllObjects(me, searcher, dist);
+    Cell::VisitObjects(me, searcher, dist);
     //me->VisitNearbyObject(dist, searcher);
 
     if (unitList.empty())
@@ -6660,7 +6660,7 @@ Unit* bot_ai::FindStunTarget(float dist) const
 
     StunUnitCheck check(me, dist);
     Bcore::UnitListSearcher <StunUnitCheck> searcher(me, unitList, check);
-    Cell::VisitAllObjects(me, searcher, dist);
+    Cell::VisitObjects(me, searcher, dist);
     //me->VisitNearbyObject(dist, searcher);
 
     if (unitList.empty())
@@ -6683,7 +6683,7 @@ Unit* bot_ai::FindUndeadCCTarget(float dist, uint32 spellId, bool unattacked) co
 
     UndeadCCUnitCheck check(me, dist, this, spellId, unattacked);
     Bcore::UnitListSearcher <UndeadCCUnitCheck> searcher(me, unitList, check);
-    Cell::VisitAllObjects(me, searcher, dist);
+    Cell::VisitObjects(me, searcher, dist);
     //me->VisitNearbyObject(dist, searcher);
 
     if (unitList.empty())
@@ -6706,7 +6706,7 @@ Unit* bot_ai::FindRootTarget(float dist, uint32 spellId) const
 
     RootUnitCheck check(me, dist, this, spellId);
     Bcore::UnitListSearcher <RootUnitCheck> searcher(me, unitList, check);
-    Cell::VisitAllObjects(me, searcher, dist);
+    Cell::VisitObjects(me, searcher, dist);
     //me->VisitNearbyObject(dist, searcher);
 
     if (unitList.empty())
@@ -6727,7 +6727,7 @@ Unit* bot_ai::FindCastingTarget(float maxdist, float mindist, uint32 spellId, ui
 
     CastingUnitCheck check(me, mindist, maxdist, spellId, minHpPct);
     Bcore::UnitListSearcher <CastingUnitCheck> searcher(me, unitList, check);
-    Cell::VisitAllObjects(me, searcher, maxdist);
+    Cell::VisitObjects(me, searcher, maxdist);
     //me->VisitNearbyObject(maxdist, searcher);
 
     if (unitList.empty())
@@ -6814,7 +6814,7 @@ Unit* bot_ai::FindSplashTarget(float dist, Unit* To, float splashdist) const
 
     SecondEnemyCheck check(me, dist, splashdist, To, this);
     Bcore::UnitSearcher <SecondEnemyCheck> searcher(me, unit, check);
-    Cell::VisitAllObjects(me, searcher, dist);
+    Cell::VisitObjects(me, searcher, dist);
     //me->VisitNearbyObject(dist, searcher);
 
     return unit;
@@ -6832,7 +6832,7 @@ Unit* bot_ai::FindSplashTarget(float dist, Unit* To, float splashdist, uint8 min
 
     SecondEnemyCheck check(me, dist, splashdist, To, this);
     Bcore::UnitListSearcher <SecondEnemyCheck> searcher(me, unitList, check);
-    Cell::VisitAllObjects(me, searcher, dist);
+    Cell::VisitObjects(me, searcher, dist);
     //me->VisitNearbyObject(dist, searcher);
 
     if (uint8(unitList.size()) < minTargets)
@@ -6849,7 +6849,7 @@ Unit* bot_ai::FindTranquilTarget(float mindist, float maxdist) const
 
     TranquilTargetCheck check(me, mindist, maxdist, this);
     Bcore::UnitSearcher <TranquilTargetCheck> searcher(me, unit, check);
-    Cell::VisitAllObjects(me, searcher, maxdist);
+    Cell::VisitObjects(me, searcher, maxdist);
     //me->VisitNearbyObject(maxdist, searcher);
 
     return unit;
@@ -6862,7 +6862,7 @@ Unit* bot_ai::FindDistantTauntTarget(float maxdist, bool ally) const
 
     FarTauntUnitCheck check(me, maxdist, ally, this);
     Bcore::UnitListSearcher <FarTauntUnitCheck> searcher(me, unitList, check);
-    Cell::VisitAllObjects(me, searcher, maxdist);
+    Cell::VisitObjects(me, searcher, maxdist);
     //me->VisitNearbyObject(maxdist, searcher);
 
     if (unitList.empty())
@@ -6879,7 +6879,7 @@ Unit* bot_ai::FindDrainTarget(float maxdist) const
 
     ManaDrainUnitCheck check(me, maxdist, this);
     Bcore::UnitLastSearcher <ManaDrainUnitCheck> searcher(me, unit, check);
-    Cell::VisitAllObjects(me, searcher, maxdist);
+    Cell::VisitObjects(me, searcher, maxdist);
     //me->VisitNearbyObject(maxdist, searcher);
 
     return unit;
@@ -6896,7 +6896,7 @@ void bot_ai::GetNearbyTargetsList(std::list<Unit*> &targets, float maxdist, uint
 
     NearbyHostileUnitCheck check(me, maxdist, this, CCoption, source);
     Bcore::UnitListSearcher <NearbyHostileUnitCheck> searcher(me, targets, check);
-    Cell::VisitAllObjects(me, searcher, maxdist);
+    Cell::VisitObjects(me, searcher, maxdist);
     //me->VisitNearbyObject(maxdist, searcher);
 }
 //Find all targets within given range in cone in front of caster; angle is PI/2 (TC confirmed)
@@ -6906,7 +6906,7 @@ void bot_ai::GetNearbyTargetsInConeList(std::list<Unit*> &targets, float maxdist
 {
     NearbyHostileUnitInConeCheck check(me, maxdist, this);
     Bcore::UnitListSearcher <NearbyHostileUnitInConeCheck> searcher(me, targets, check);
-    Cell::VisitAllObjects(me, searcher, maxdist);
+    Cell::VisitObjects(me, searcher, maxdist);
     //me->VisitNearbyObject(maxdist, searcher);
 }
 //Finds all friendly targets within given range
@@ -6915,7 +6915,7 @@ void bot_ai::GetNearbyFriendlyTargetsList(std::list<Unit*> &targets, float maxdi
 {
     NearbyFriendlyUnitCheck check(me, maxdist, this);
     Bcore::UnitListSearcher <NearbyFriendlyUnitCheck> searcher(me, targets, check);
-    Cell::VisitAllObjects(me, searcher, maxdist);
+    Cell::VisitObjects(me, searcher, maxdist);
     //me->VisitNearbyObject(maxdist, searcher);
 }
 //////////
@@ -8367,7 +8367,7 @@ bool bot_ai::OnGossipSelect(Player* player, Creature* creature/* == me*/, uint32
                         GameObject* obj = nullptr;
                         NearestLockedGameObjectInRangeCheck check(player, 4.f);
                         Bcore::GameObjectLastSearcher<NearestLockedGameObjectInRangeCheck> searcher(player, obj, check);
-                        Cell::VisitAllObjects(player, searcher, 4.f);
+                        Cell::VisitObjects(player, searcher, 4.f);
                         //player->VisitNearbyGridObject(4.f, searcher);
                         if (obj)
                         {
@@ -8794,7 +8794,7 @@ bool bot_ai::OnGossipSelect(Player* player, Creature* creature/* == me*/, uint32
                             GameObject* obj = nullptr;
                             NearestLockedGameObjectInRangeCheck check(player, 4.f);
                             Bcore::GameObjectLastSearcher<NearestLockedGameObjectInRangeCheck> searcher(player, obj, check);
-                            Cell::VisitAllObjects(player, searcher, 4.f);
+                            Cell::VisitObjects(player, searcher, 4.f);
                             //player->VisitNearbyGridObject(4.f, searcher);
                             if (obj)
                             {
@@ -17427,7 +17427,7 @@ void bot_ai::DoEmeraldDrakeVehicleStrats(uint32 diff)
             Bcore::AnyUnfriendlyUnitInObjectRangeCheck check(drake, drake, 60.f);
             Bcore::UnitListSearcher <Bcore::AnyUnfriendlyUnitInObjectRangeCheck> searcher(drake, targets, check);
             //drake->VisitNearbyObject(60.f, searcher);
-            Cell::VisitAllObjects(drake, searcher, 60.f);
+            Cell::VisitObjects(drake, searcher, 60.f);
             targets.remove_if(BOTAI_PRED::UnitExclude(opponent));
             targets.remove_if(BOTAI_PRED::UnitCombatStateExclude(false));
             targets.remove_if(BOTAI_PRED::AuraedTargetExcludeByCaster(drakespell, drake->GetGUID(), 3));
@@ -17516,7 +17516,7 @@ void bot_ai::DoAmberDrakeVehicleStrats(uint32 diff)
             Bcore::AnyUnfriendlyUnitInObjectRangeCheck check(drake, drake, 60.f);
             Bcore::UnitListSearcher <Bcore::AnyUnfriendlyUnitInObjectRangeCheck> searcher(drake, targets, check);
             //drake->VisitNearbyObject(60.f, searcher);
-            Cell::VisitAllObjects(drake, searcher, 60.f);
+            Cell::VisitObjects(drake, searcher, 60.f);
             targets.remove_if(BOTAI_PRED::UnitExclude(opponent));
 
             if (!targets.empty())
@@ -18006,7 +18006,7 @@ bool bot_ai::GlobalUpdate(uint32 diff)
                 std::list<Player*> plist;
                 Bcore::AllWorldObjectsInExactRange pcheck(me, 15.0f, false);
                 Bcore::PlayerListSearcher<decltype(pcheck)> searcher(me, plist, pcheck);
-                Cell::VisitWorldObjects(me, searcher, 20.f);
+                Cell::VisitObjects(me, searcher, 20.f);
                 _canAppearInWorld = std::any_of(plist.cbegin(), plist.cend(), [](Player const* pl) { return pl->GetSession()->GetSecurity() > SEC_PLAYER; });
                 if (!CanAppearInWorld() && !IsDuringTeleport())
                     BotMgr::TeleportBot(me, mymap, me, true);
@@ -18391,7 +18391,7 @@ bool bot_ai::GlobalUpdate(uint32 diff)
             std::list<WorldObject*> woList;
             NearbyObjectBySkillCheck check(master, INTERACTION_DISTANCE - 1.0f, (_roleMask & BOT_ROLE_MASK_GATHERING));
             Bcore::WorldObjectListSearcher<NearbyObjectBySkillCheck> searcher(me, woList, check, GRID_MAP_TYPE_MASK_CREATURE|GRID_MAP_TYPE_MASK_GAMEOBJECT);
-            Cell::VisitAllObjects(me, searcher, 20.f);
+            Cell::VisitObjects(me, searcher, 20.f);
             //me->VisitNearbyObject(20.f, searcher);
             //BOT_LOG_ERROR("spells", "bot_ai:UpdateEx: list is %s", woList.empty() ? "empty" : "not empty");
             if (!woList.empty())
@@ -18468,7 +18468,7 @@ bool bot_ai::GlobalUpdate(uint32 diff)
             std::list<Unit*> crList;
             NearbyLootableCreatureCheck check(master, std::min(30.f, std::max(5.f, sWorld->getFloatConfig(CONFIG_GROUP_XP_DISTANCE) - 10.f)));
             Bcore::UnitListSearcher<NearbyLootableCreatureCheck> searcher(me, crList, check);
-            Cell::VisitAllObjects(me, searcher, 40.f);
+            Cell::VisitObjects(me, searcher, 40.f);
             //me->VisitNearbyObject(40.f, searcher);
             for (std::list<Unit*>::iterator itr = crList.begin(); itr != crList.end();)
             {
@@ -18677,7 +18677,7 @@ bool bot_ai::GlobalUpdate(uint32 diff)
                         static const std::function<bool(Unit const*)> flag_carrier_pred = [](Unit const* u) { return bot_ai::IsFlagCarrier(u); };
                         Unit* nmover = nullptr;
                         Bcore::UnitSearcher searcher(me, nmover, flag_carrier_pred);
-                        Cell::VisitAllObjects(me, searcher, 80.0f);
+                        Cell::VisitObjects(me, searcher, 80.0f);
                         if (nmover)
                             mmover = nmover;
                     }
@@ -20854,7 +20854,7 @@ Unit* bot_ai::SpawnVehicle(uint32 creEntry, uint32 vehEntry)
     {
         o = master->GetOrientation();
         me->GetClosePoint(x, y, z, me->GetCombatReach());
-        vc = new TempSummon(nullptr, me->GetGUID(), false);
+        vc = new TempSummon(nullptr, me->GetGUID());
         ASSERT(vc->Create(map->GenerateLowGuid<HighGuid::Unit>(), map, master->GetPhaseMask(), creEntry, vehEntry, x,y,z,o));
         vc->ClearZoneScript();
         vc->SetTempSummonType(TEMPSUMMON_CORPSE_DESPAWN);
@@ -20873,7 +20873,7 @@ Unit* bot_ai::SpawnVehicle(uint32 creEntry, uint32 vehEntry)
         z = me->GetTransOffsetZ();
         Position vehpos(x, y, z, o);
         me->GetTransport()->CalculatePassengerPosition(x, y, z, &o);
-        vc = new TempSummon(nullptr, me->GetGUID(), false);
+        vc = new TempSummon(nullptr, me->GetGUID());
         ASSERT(vc->Create(map->GenerateLowGuid<HighGuid::Unit>(), map, master->GetPhaseMask(), creEntry, vehEntry, x,y,z,o));
         vc->ClearZoneScript();
 
@@ -21586,13 +21586,13 @@ void bot_ai::SetContestedPvP()
     {
         me->AddUnitState(UNIT_STATE_ATTACK_PLAYER);
         Bcore::AIRelocationNotifier notifier(*me);
-        Cell::VisitWorldObjects(me, notifier, me->GetVisibilityRange());
+        Cell::VisitObjects(me, notifier, me->GetVisibilityRange());
     }
     if (botPet && !botPet->HasUnitState(UNIT_STATE_ATTACK_PLAYER))
     {
         botPet->AddUnitState(UNIT_STATE_ATTACK_PLAYER);
         Bcore::AIRelocationNotifier notifier(*botPet);
-        Cell::VisitWorldObjects(me, notifier, me->GetVisibilityRange());
+        Cell::VisitObjects(me, notifier, me->GetVisibilityRange());
     }
 }
 void bot_ai::ResetContestedPvP()
