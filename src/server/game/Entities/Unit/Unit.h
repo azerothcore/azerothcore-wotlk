@@ -2035,7 +2035,7 @@ public:
     Movement::MoveSpline* movespline;
 
 protected:
-    explicit Unit (bool isWorldObject);
+    explicit Unit();
 
     void BuildValuesUpdate(uint8 updateType, ByteBuffer* data, Player* target) override;
 

@@ -35,19 +35,12 @@
 
 template
 <
-    class WORLD_OBJECT_TYPES,
     class GRID_OBJECT_TYPES
 >
 class GridCell
 {
 public:
     ~GridCell() = default;
-
-    template<class SPECIFIC_OBJECT> void AddWorldObject(SPECIFIC_OBJECT* obj)
-    {
-        _worldObjects.template insert<SPECIFIC_OBJECT>(obj);
-        ASSERT(obj->IsInGrid());
-    }
 
     template<class SPECIFIC_OBJECT> void AddGridObject(SPECIFIC_OBJECT* obj)
     {
@@ -62,14 +55,7 @@ public:
         visitor.Visit(_gridObjects);
     }
 
-    // Visit world objects
-    template<class T>
-    void Visit(TypeContainerVisitor<T, TypeMapContainer<WORLD_OBJECT_TYPES> >& visitor)
-    {
-        visitor.Visit(_worldObjects);
-    }
 private:
     TypeMapContainer<GRID_OBJECT_TYPES> _gridObjects;
-    TypeMapContainer<WORLD_OBJECT_TYPES> _worldObjects;
 };
 #endif

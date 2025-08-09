@@ -1175,7 +1175,6 @@ void WorldSession::HandlePlayerLoginToCharInWorld(Player* pCurrChar)
     pCurrChar->GetMap()->SendInitTransports(pCurrChar);
     pCurrChar->GetMap()->SendInitSelf(pCurrChar);
     pCurrChar->GetMap()->SendZoneDynamicInfo(pCurrChar);
-    pCurrChar->m_clientGUIDs.clear();
     pCurrChar->UpdateObjectVisibility(false);
 
     pCurrChar->CleanupChannels();
