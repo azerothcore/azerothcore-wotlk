@@ -132,11 +132,11 @@ public:
             Talk(SAY_AGGRO);
 
             // Timing parameters
-            auto const& mindFlayFirst = IsInFrenzy() ? 5s : 8s;
-            auto const& mindFlayRepeat = IsInFrenzy() ? 9s : 14s;
+            Seconds const& mindFlayFirst = IsInFrenzy() ? 5s : 8s;
+            Seconds const& mindFlayRepeat = IsInFrenzy() ? 9s : 14s;
 
-            auto const& swarmFirst = IsInFrenzy() ? 7s : 10s;
-            auto const& swarmRepeat = IsInFrenzy() ? 17s : 30s;
+            Seconds const& swarmFirst = IsInFrenzy() ? 7s : 10s;
+            Seconds const& swarmRepeat = IsInFrenzy() ? 17s : 30s;
 
             ScheduleTimedEvent(mindFlayFirst, mindFlayRepeat, [&] {
                 DoCastVictim(SPELL_MIND_FLAY);
@@ -184,7 +184,6 @@ public:
         }
 
     private:
-        EventMap events2;
         bool _initTalk;
         bool _canTalk;
         bool _minionInCombat;
