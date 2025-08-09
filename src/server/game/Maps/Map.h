@@ -315,9 +315,6 @@ public:
     [[nodiscard]] bool HavePlayers() const { return !m_mapRefMgr.IsEmpty(); }
     [[nodiscard]] uint32 GetPlayersCountExceptGMs() const;
 
-    void AddWorldObject(WorldObject* obj) { i_worldObjects.insert(obj); }
-    void RemoveWorldObject(WorldObject* obj) { i_worldObjects.erase(obj); }
-
     void SendToPlayers(WorldPacket const* data) const;
 
     typedef MapRefMgr PlayerList;
@@ -326,14 +323,6 @@ public:
     //per-map script storage
     void ScriptsStart(std::map<uint32, std::multimap<uint32, ScriptInfo> > const& scripts, uint32 id, Object* source, Object* target);
     void ScriptCommandStart(ScriptInfo const& script, uint32 delay, Object* source, Object* target);
-
-    // must called with AddToWorld
-    template<class T>
-    void AddToActive(T* obj);
-
-    // must called with RemoveFromWorld
-    template<class T>
-    void RemoveFromActive(T* obj);
 
     CreatureGroupHolderType CreatureGroupHolder;
 
@@ -490,10 +479,7 @@ public:
         _updateObjects.erase(obj);
     }
 
-    std::size_t GetActiveNonPlayersCount() const
-    {
-        return m_activeNonPlayers.size();
-    }
+    size_t GetUpdateObjectsCount() const { return _updateObjects.size(); }
 
     virtual std::string GetDebugInfo() const;
 
@@ -549,10 +535,6 @@ protected:
     MapRefMgr m_mapRefMgr;
     MapRefMgr::iterator m_mapRefIter;
 
-    typedef std::set<WorldObject*> ActiveNonPlayers;
-    ActiveNonPlayers m_activeNonPlayers;
-    ActiveNonPlayers::iterator m_activeNonPlayersIter;
-
     // Objects that must update even in inactive grids without activating them
     TransportsContainer _transports;
     TransportsContainer::iterator _transportsUpdateIter;
@@ -575,34 +557,12 @@ private:
 
     bool i_scriptLock;
     std::unordered_set<WorldObject*> i_objectsToRemove;
-    std::unordered_set<WorldObject*> i_worldObjects;
 
     typedef std::multimap<time_t, ScriptAction> ScriptScheduleMap;
     ScriptScheduleMap m_scriptSchedule;
 
     template<class T>
     void DeleteFromWorld(T*);
-
-    void AddToActiveHelper(WorldObject* obj)
-    {
-        m_activeNonPlayers.insert(obj);
-    }
-
-    void RemoveFromActiveHelper(WorldObject* obj)
-    {
-        // Map::Update for active object in proccess
-        if (m_activeNonPlayersIter != m_activeNonPlayers.end())
-        {
-            ActiveNonPlayers::iterator itr = m_activeNonPlayers.find(obj);
-            if (itr == m_activeNonPlayers.end())
-                return;
-            if (itr == m_activeNonPlayersIter)
-                ++m_activeNonPlayersIter;
-            m_activeNonPlayers.erase(itr);
-        }
-        else
-            m_activeNonPlayers.erase(obj);
-    }
 
     void UpdateNonPlayerObjects(uint32 const diff);
 

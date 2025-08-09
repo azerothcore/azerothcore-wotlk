@@ -42,7 +42,7 @@ class CreatureGroup;
 class Creature : public Unit, public GridObject<Creature>, public MovableMapObject, public UpdatableMapObject
 {
 public:
-    explicit Creature(bool isWorldObject = false);
+    explicit Creature();
     ~Creature() override;
 
     void AddToWorld() override;

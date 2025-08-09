@@ -643,7 +643,7 @@ GameObject* ChatHandler::GetNearbyGameObject() const
     GameObject* obj = nullptr;
     Acore::NearestGameObjectCheck check(*pl);
     Acore::GameObjectLastSearcher<Acore::NearestGameObjectCheck> searcher(pl, obj, check);
-    Cell::VisitGridObjects(pl, searcher, SIZE_OF_GRIDS);
+    Cell::VisitObjects(pl, searcher, SIZE_OF_GRIDS);
     return obj;
 }
 

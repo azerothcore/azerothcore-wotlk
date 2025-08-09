@@ -110,10 +110,11 @@ public:
     {
         if (Player* target = ObjectAccessor::GetPlayer(_owner, _targetGUID))
         {
-            target->m_clientGUIDs.insert(_owner.GetGUID());
+            // @todo: wtf? this is wrong but I cba looking into it.
+            target->GetObjectVisibilityContainer().LinkWorldObjectVisibility(&_owner);
             _owner.CastSpell(target, SPELL_ENVENOM, true);
             target->RemoveAurasDueToSpell(SPELL_DEADLY_POISON);
-            target->m_clientGUIDs.erase(_owner.GetGUID());
+            target->GetObjectVisibilityContainer().UnlinkWorldObjectVisibility(&_owner);
         }
         return true;
     }

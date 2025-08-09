@@ -807,7 +807,7 @@ struct npc_hallows_end_soh : public ScriptedAI
         std::list<Player*> players;
         Acore::AnyPlayerInObjectRangeCheck checker(me, 60.f);
         Acore::PlayerListSearcher<Acore::AnyPlayerInObjectRangeCheck> searcher(me, players, checker);
-        Cell::VisitWorldObjects(me, searcher, 60.f);
+        Cell::VisitObjects(me, searcher, 60.f);
         if (players.empty())
         {
             return;
@@ -887,7 +887,7 @@ struct npc_hallows_end_soh : public ScriptedAI
         std::list<Player*> players;
         Acore::AnyPlayerInObjectRangeCheck checker(me, radius);
         Acore::PlayerListSearcher<Acore::AnyPlayerInObjectRangeCheck> searcher(me, players, checker);
-        Cell::VisitWorldObjects(me, searcher, radius);
+        Cell::VisitObjects(me, searcher, radius);
 
         for (Player* player : players)
         {
