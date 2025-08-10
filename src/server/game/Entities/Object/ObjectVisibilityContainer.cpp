@@ -66,6 +66,10 @@ void ObjectVisibilityContainer::LinkWorldObjectVisibility(WorldObject* worldObje
     if (worldObject == _selfObject)
         return;
 
+    // Transports are special and should not be added to our visibility map
+    if (worldObject->IsGameObject() && worldObject->ToGameObject()->IsTransport())
+        return;
+
     // Only players can link visibility
     if (!_visibleWorldObjectsMap)
         return;

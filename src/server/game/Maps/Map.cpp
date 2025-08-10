@@ -345,7 +345,7 @@ bool Map::AddToMap(T* obj, bool checkTransport)
 }
 
 template<>
-bool Map::AddToMap(MotionTransport* obj, bool /*checkTransport*/)
+bool Map::AddToMap(Transport* obj, bool /*checkTransport*/)
 {
     //TODO: Needs clean up. An object should not be added to map twice.
     if (obj->IsInWorld())
@@ -360,26 +360,22 @@ bool Map::AddToMap(MotionTransport* obj, bool /*checkTransport*/)
     }
 
     Cell cell(cellCoord);
-    if (obj->isActiveObject())
-        EnsureGridLoaded(cell);
+    EnsureGridLoaded(cell);
 
     obj->AddToWorld();
 
     _transports.insert(obj);
 
     // Broadcast creation to players
-    if (!GetPlayers().IsEmpty())
+    for (Map::PlayerList::const_iterator itr = GetPlayers().begin(); itr != GetPlayers().end(); ++itr)
     {
-        for (Map::PlayerList::const_iterator itr = GetPlayers().begin(); itr != GetPlayers().end(); ++itr)
+        if (itr->GetSource()->GetTransport() != obj)
         {
-            if (itr->GetSource()->GetTransport() != obj)
-            {
-                UpdateData data;
-                obj->BuildCreateUpdateBlockForPlayer(&data, itr->GetSource());
-                WorldPacket packet;
-                data.BuildPacket(packet);
-                itr->GetSource()->SendDirectMessage(&packet);
-            }
+            UpdateData data;
+            obj->BuildCreateUpdateBlockForPlayer(&data, itr->GetSource());
+            WorldPacket packet;
+            data.BuildPacket(packet);
+            itr->GetSource()->SendDirectMessage(&packet);
         }
     }
 
@@ -667,7 +663,7 @@ void Map::RemoveFromMap(T* obj, bool remove)
 }
 
 template<>
-void Map::RemoveFromMap(MotionTransport* obj, bool remove)
+void Map::RemoveFromMap(Transport* obj, bool remove)
 {
     obj->RemoveFromWorld();
 
@@ -697,8 +693,6 @@ void Map::RemoveFromMap(MotionTransport* obj, bool remove)
 
     obj->ResetMap();
 
-    // Transports are never actually deleted, but it *should* be safe to clear
-    // from update list when removing from world
     RemoveObjectFromMapUpdateList(obj);
 
     if (remove)
@@ -966,11 +960,10 @@ void Map::UnloadAll()
 
     for (TransportsContainer::iterator itr = _transports.begin(); itr != _transports.end();)
     {
-        MotionTransport* transport = *itr;
+        Transport* transport = *itr;
         ++itr;
 
-        transport->RemoveFromWorld();
-        delete transport;
+        RemoveFromMap<Transport>(transport, true);
     }
 
     _transports.clear();
@@ -1589,6 +1582,9 @@ void Map::SendInitSelf(Player* player)
 
 void Map::SendInitTransports(Player* player)
 {
+    if (_transports.empty())
+        return;
+
     // Hack to send out transports
     UpdateData transData;
     for (TransportsContainer::const_iterator itr = _transports.begin(); itr != _transports.end(); ++itr)
@@ -1605,23 +1601,14 @@ void Map::SendInitTransports(Player* player)
 
 void Map::SendRemoveTransports(Player* player)
 {
+    if (_transports.empty())
+        return;
+
     // Hack to send out transports
     UpdateData transData;
     for (TransportsContainer::const_iterator itr = _transports.begin(); itr != _transports.end(); ++itr)
         if (*itr != player->GetTransport())
             (*itr)->BuildOutOfRangeUpdateBlock(&transData);
-
-    // pussywizard: remove static transports from client
-    /*for (GuidUnorderedSet::const_iterator it = player->m_clientGUIDs.begin(); it != player->m_clientGUIDs.end(); )
-    {
-        if ((*it).IsTransport())
-        {
-            transData.AddOutOfRangeGUID(*it);
-            it = player->m_clientGUIDs.erase(it);
-        }
-        else
-            ++it;
-    }*/
 
     if (!transData.HasData())
         return;
@@ -1693,7 +1680,7 @@ void Map::DelayedUpdate(const uint32 t_diff)
 {
     for (_transportsUpdateIter = _transports.begin(); _transportsUpdateIter != _transports.end();)
     {
-        MotionTransport* transport = *_transportsUpdateIter;
+        Transport* transport = *_transportsUpdateIter;
         ++_transportsUpdateIter;
 
         if (!transport->IsInWorld())
@@ -1738,7 +1725,7 @@ void Map::RemoveAllObjectsInRemoveList()
                 RemoveFromMap((DynamicObject*)obj, true);
                 break;
             case TYPEID_GAMEOBJECT:
-                if (MotionTransport* transport = obj->ToGameObject()->ToMotionTransport())
+                if (Transport* transport = obj->ToGameObject()->ToTransport())
                     RemoveFromMap(transport, true);
                 else
                     RemoveFromMap(obj->ToGameObject(), true);
