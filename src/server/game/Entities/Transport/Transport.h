@@ -38,7 +38,7 @@ public:
     virtual void RemovePassenger(WorldObject* passenger, bool withAll = false) = 0;
     PassengerSet const& GetPassengers() const { return _passengers; }
 
-    virtual void DelayedUpdate(uint32 diff) { }
+    virtual void DelayedUpdate(uint32 /*diff*/) {}
 
     uint32 GetPathProgress() const { return GetGOValue()->Transport.PathProgress; }
     void SetPathProgress(uint32 val) { m_goValue.Transport.PathProgress = val; }
