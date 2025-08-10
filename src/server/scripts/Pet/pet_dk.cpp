@@ -292,6 +292,32 @@ struct npc_pet_dk_army_of_the_dead : public CombatAI
         CombatAI::InitializeAI();
         ((Minion*)me)->SetFollowAngle(rand_norm() * 2 * M_PI);
     }
+
+    void IsSummonedBy(WorldObject* summoner) override
+    {
+        if (Unit* owner = summoner->ToUnit())
+        {
+            // If the owner is a player
+            if (owner->IsPlayer())
+            {
+                Unit* victim = owner->GetVictim();
+
+                if (victim && me->IsValidAttackTarget(victim))
+                {
+                    AttackStart(victim);
+                }
+                else
+                {
+                    // If there is no victim, look for the nearest enemy
+                    if (Unit* nearest = me->SelectNearbyTarget(nullptr, 30.0f))
+                    {
+                        if (me->IsValidAttackTarget(nearest))
+                            AttackStart(nearest);
+                    }
+                }
+            }
+        }
+    }
 };
 
 struct npc_pet_dk_dancing_rune_weapon : public NullCreatureAI
