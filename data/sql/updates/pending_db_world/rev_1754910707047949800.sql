@@ -5,5 +5,3 @@ INSERT INTO `spell_custom_attr` (`spell_id`, `attributes`) VALUES (53617, 419430
 -- Anub'ar Venomancer - Poison Bolt(H)
 DELETE FROM `spell_custom_attr` WHERE `spell_id` = (59359);
 INSERT INTO `spell_custom_attr` (`spell_id`, `attributes`) VALUES (59359, 4194304);
-
-
