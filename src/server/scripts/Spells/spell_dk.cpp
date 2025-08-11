@@ -347,7 +347,7 @@ class spell_dk_death_and_decay : public SpellScript
             OnHit += SpellHitFn(spell_dk_death_and_decay::RecalculateDamage);
 
         if (m_scriptSpellId == 43265) // Death and Decay
-            OnAfterCast += SpellCastFn(spell_dk_death_and_decay::HandleAfterCast);
+            AfterCast += SpellCastFn(spell_dk_death_and_decay::HandleAfterCast);
     }
 };
 
