@@ -1,3 +1,4 @@
+-- DB update 2025_08_10_01 -> 2025_08_12_00
 
 -- Set SmartAI (Wreckage A, B, C)
 UPDATE `gameobject_template` SET `AIName` = 'SmartGameObjectAI' WHERE (`entry`IN (188087, 188088, 188089));
