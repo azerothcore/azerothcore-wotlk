@@ -63,6 +63,11 @@ public:
             _initTalk = false;
             _canTalk = true;
             _minionInCombat = false;
+
+            scheduler.SetValidator([this]
+            {
+                return !me->HasUnitState(UNIT_STATE_CASTING);
+            });
         }
 
         void Reset() override
@@ -138,9 +143,7 @@ public:
                     context.Repeat();
                 else
                     context.Repeat(5s, 9s);
-            });
-
-            scheduler.Schedule(10s, 30s, [&](TaskContext context)
+            }).Schedule(10s, 30s, [&](TaskContext context)
             {
                 Talk(SAY_SWARM);
                 DoCastAOE(SPELL_SWARM);
@@ -152,7 +155,7 @@ public:
             });
 
             ScheduleTimedEvent(27s, 35s, [&] {
-                DoCastRandomTarget(SPELL_CURSE_OF_FATIGUE, true);
+                DoCastRandomTarget(SPELL_CURSE_OF_FATIGUE, 0, 100.0f, true, true);
             }, 27s, 35s);
 
             summons.DoZoneInCombat();
