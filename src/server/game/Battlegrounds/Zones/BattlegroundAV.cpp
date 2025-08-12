@@ -194,21 +194,30 @@ void BattlegroundAV::HandleQuestComplete(uint32 questid, Player* player)
         case AV_QUEST_A_COMMANDER1:
         case AV_QUEST_H_COMMANDER1:
             m_Team_QuestStatus[teamId][1]++;
-            RewardReputationToTeam(teamId, 1, teamId);
+            {
+                float bgRepRate = sConfigMgr->GetFloat("Rate.Reputation.Gain.BG", 1.0f);
+                RewardReputationToTeam(teamId, uint32(1 * bgRepRate), teamId);
+            }
             if (m_Team_QuestStatus[teamId][1] == 30)
                 LOG_DEBUG("bg.battleground", "BG_AV Quest {} completed (need to implement some events here", questid);
             break;
         case AV_QUEST_A_COMMANDER2:
         case AV_QUEST_H_COMMANDER2:
             m_Team_QuestStatus[teamId][2]++;
-            RewardReputationToTeam(teamId, 1, teamId);
+            {
+                float bgRepRate = sConfigMgr->GetFloat("Rate.Reputation.Gain.BG", 1.0f);
+                RewardReputationToTeam(teamId, uint32(1 * bgRepRate), teamId);
+            }
             if (m_Team_QuestStatus[teamId][2] == 60)
                 LOG_DEBUG("bg.battleground", "BG_AV Quest {} completed (need to implement some events here", questid);
             break;
         case AV_QUEST_A_COMMANDER3:
         case AV_QUEST_H_COMMANDER3:
             m_Team_QuestStatus[teamId][3]++;
-            RewardReputationToTeam(teamId, 1, teamId);
+            {
+                float bgRepRate = sConfigMgr->GetFloat("Rate.Reputation.Gain.BG", 1.0f);
+                RewardReputationToTeam(teamId, uint32(1 * bgRepRate), teamId);
+            }
             if (m_Team_QuestStatus[teamId][3] == 120)
                 LOG_DEBUG("bg.battleground", "BG_AV Quest {} completed (need to implement some events here", questid);
             break;
@@ -316,21 +325,21 @@ Creature* BattlegroundAV::AddAVCreature(uint16 cinfoid, uint16 type)
         type -= AV_CPLACE_MAX;
         cinfoid = uint16(BG_AV_StaticCreaturePos[type][4]);
         creature = AddCreature(BG_AV_StaticCreatureInfo[cinfoid],
-                               type + AV_CPLACE_MAX,
-                               BG_AV_StaticCreaturePos[type][0],
-                               BG_AV_StaticCreaturePos[type][1],
-                               BG_AV_StaticCreaturePos[type][2],
-                               BG_AV_StaticCreaturePos[type][3]);
+                                type + AV_CPLACE_MAX,
+                                BG_AV_StaticCreaturePos[type][0],
+                                BG_AV_StaticCreaturePos[type][1],
+                                BG_AV_StaticCreaturePos[type][2],
+                                BG_AV_StaticCreaturePos[type][3]);
         isStatic = true;
     }
     else
     {
         creature = AddCreature(BG_AV_CreatureInfo[cinfoid],
-                               type,
-                               BG_AV_CreaturePos[type][0],
-                               BG_AV_CreaturePos[type][1],
-                               BG_AV_CreaturePos[type][2],
-                               BG_AV_CreaturePos[type][3]);
+                                type,
+                                BG_AV_CreaturePos[type][0],
+                                BG_AV_CreaturePos[type][1],
+                                BG_AV_CreaturePos[type][2],
+                                BG_AV_CreaturePos[type][3]);
     }
     if (!creature)
         return nullptr;
@@ -344,7 +353,7 @@ Creature* BattlegroundAV::AddAVCreature(uint16 cinfoid, uint16 type)
             (cinfoid >= AV_NPC_H_GRAVEDEFENSE0 && cinfoid <= AV_NPC_H_GRAVEDEFENSE3))))
     {
         if (!isStatic && ((cinfoid >= AV_NPC_A_GRAVEDEFENSE0 && cinfoid <= AV_NPC_A_GRAVEDEFENSE3)
-                          || (cinfoid >= AV_NPC_H_GRAVEDEFENSE0 && cinfoid <= AV_NPC_H_GRAVEDEFENSE3)))
+                            || (cinfoid >= AV_NPC_H_GRAVEDEFENSE0 && cinfoid <= AV_NPC_H_GRAVEDEFENSE3)))
         {
             CreatureData& data = sObjectMgr->NewOrExistCreatureData(creature->GetSpawnId());
             data.wander_distance = 5;
@@ -814,11 +823,11 @@ void BattlegroundAV::PopulateNode(BG_AV_Nodes node)
     if (!trigger)
     {
         trigger = AddCreature(WORLD_TRIGGER,
-                              node + 302,
-                              BG_AV_CreaturePos[node + 302][0],
-                              BG_AV_CreaturePos[node + 302][1],
-                              BG_AV_CreaturePos[node + 302][2],
-                              BG_AV_CreaturePos[node + 302][3]);
+                                node + 302,
+                                BG_AV_CreaturePos[node + 302][0],
+                                BG_AV_CreaturePos[node + 302][1],
+                                BG_AV_CreaturePos[node + 302][2],
+                                BG_AV_CreaturePos[node + 302][3]);
     }
 
     //add bonus honor aura trigger creature when node is accupied
@@ -1240,25 +1249,29 @@ GraveyardStruct const* BattlegroundAV::GetClosestGraveyard(Player* player)
 
 bool BattlegroundAV::SetupBattleground()
 {
+    // Get the custom BG reputation rate from the config file
+    float bgRepRate = sConfigMgr->GetFloat("Rate.Reputation.Gain.BG", 1.0f);
+
     if (sBattlegroundMgr->IsBGWeekend(GetBgTypeID(true)))
     {
-        _reputationTower = 18;
-        _reputationCaptain = 185;
-        _reputationBoss = 525;
-        _reputationPerOwnedGraveyard = 18;
-        _reputationSurvivingCaptain = 175;
-        _reputationSurvivingTower = 18;
-        _reputationPerOwnedMine = 36;
+        _reputationTower = uint32(18 * bgRepRate);
+        _reputationCaptain = uint32(185 * bgRepRate);
+        _reputationBoss = uint32(525 * bgRepRate);
+        _reputationPerOwnedGraveyard = uint32(18 * bgRepRate);
+        _reputationSurvivingCaptain = uint32(175 * bgRepRate);
+        _reputationSurvivingTower = uint32(18 * bgRepRate);
+        _reputationPerOwnedMine = uint32(36 * bgRepRate);
     }
     else
     {
-        _reputationTower = 12;
-        _reputationCaptain = 125;
-        _reputationBoss = sWorld->getIntConfig(CONFIG_BATTLEGROUND_ALTERAC_REP_ONBOSSDEATH);
-        _reputationPerOwnedGraveyard = 12;
-        _reputationSurvivingCaptain = 125;
-        _reputationSurvivingTower = 12;
-        _reputationPerOwnedMine = 24;
+        _reputationTower = uint32(12 * bgRepRate);
+        _reputationCaptain = uint32(125 * bgRepRate);
+        // Special case: This value comes from another config setting, but we still apply our multiplier
+        _reputationBoss = uint32(sWorld->getIntConfig(CONFIG_BATTLEGROUND_ALTERAC_REP_ONBOSSDEATH) * bgRepRate);
+        _reputationPerOwnedGraveyard = uint32(12 * bgRepRate);
+        _reputationSurvivingCaptain = uint32(125 * bgRepRate);
+        _reputationSurvivingTower = uint32(12 * bgRepRate);
+        _reputationPerOwnedMine = uint32(24 * bgRepRate);
     }
 
     // Create starting objects
@@ -1898,5 +1911,5 @@ TeamId BattlegroundAV::GetPrematureWinner()
     if (GetTeamScore(TEAM_ALLIANCE) > GetTeamScore(TEAM_HORDE))
         return TEAM_ALLIANCE;
 
-    return GetTeamScore(TEAM_HORDE) > GetTeamScore(TEAM_ALLIANCE) ? TEAM_HORDE : Battleground::GetPrematureWinner();
+    return GetTeamScore(TEAM_HORDE) > GetTeamScore(TEAM_ALLIANCE) ? Battleground::GetPrematureWinner() : TEAM_NEUTRAL;
 }

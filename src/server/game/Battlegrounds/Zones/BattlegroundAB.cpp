@@ -115,7 +115,17 @@ void BattlegroundAB::PostUpdateImpl(uint32 diff)
                         if (honorRewards < uint8(m_TeamScores[teamId] / _honorTics))
                             RewardHonorToTeam(GetBonusHonorFromKill(1), teamId);
                         if (reputationRewards < uint8(m_TeamScores[teamId] / _reputationTics))
-                            RewardReputationToTeam(teamId == TEAM_ALLIANCE ? 509 : 510, 10, teamId);
+                        {
+                            // Get the custom BG reputation rate from the config file
+                            float bgRepRate = sConfigMgr->GetFloat("Rate.Reputation.Gain.BG", 1.0f);
+    
+                            // Calculate the scaled reputation reward (base value is 10)
+                            uint32 scaledReputation = uint32(10 * bgRepRate);
+    
+                            // Award the modified reputation to the team
+                            RewardReputationToTeam(teamId == TEAM_ALLIANCE ? 509 : 510, scaledReputation, teamId);
+                        }
+
                         if (information < uint8(m_TeamScores[teamId] / BG_AB_WARNING_NEAR_VICTORY_SCORE))
                         {
                             if (teamId == TEAM_ALLIANCE)

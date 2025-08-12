@@ -2343,6 +2343,14 @@ Rate.Reputation.LowLevel.Quest = 1
 Rate.Reputation.RecruitAFriendBonus = 0.1
 
 #
+#    Rate.Reputation.Gain.BG
+#        Description: Reputation bonus rate for battlegrounds.
+#                     This is applied IN ADDITION to the global Rate.Reputation.Gain.
+#        Default:     1
+
+Rate.Reputation.Gain.BG = 1
+
+#
 ###################################################################################################
 
 ###################################################################################################
