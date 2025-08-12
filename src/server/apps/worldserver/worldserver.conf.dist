@@ -686,6 +686,7 @@ Logger.scripts.hotswap=4,Console Server
 Logger.server=4,Console Server
 Logger.sql.sql=2,Console Errors
 Logger.sql.updates=2,Console Errors
+Logger.sql.updates=4,Console Server
 Logger.sql=4,Console Server
 Logger.time.update=4,Console Server
 Logger.module=4,Console Server
