@@ -297,23 +297,19 @@ struct npc_pet_dk_army_of_the_dead : public CombatAI
     {
         if (Unit* owner = summoner->ToUnit())
         {
-            // If the owner is a player
-            if (owner->IsPlayer())
+            Unit* victim = owner->GetVictim();
+    
+            if (victim && me->IsValidAttackTarget(victim))
             {
-                Unit* victim = owner->GetVictim();
-
-                if (victim && me->IsValidAttackTarget(victim))
+                AttackStart(victim);
+            }
+            else
+            {
+                // If there is no valid target, attack the nearest enemy within 30m
+                if (Unit* nearest = me->SelectNearbyTarget(nullptr, 30.0f))
                 {
-                    AttackStart(victim);
-                }
-                else
-                {
-                    // If there is no victim, look for the nearest enemy
-                    if (Unit* nearest = me->SelectNearbyTarget(nullptr, 30.0f))
-                    {
-                        if (me->IsValidAttackTarget(nearest))
-                            AttackStart(nearest);
-                    }
+                    if (me->IsValidAttackTarget(nearest))
+                        AttackStart(nearest);
                 }
             }
         }
