@@ -131,21 +131,25 @@ public:
             BossAI::JustEngagedWith(who);
             Talk(SAY_AGGRO);
 
-            // Timing parameters
-            Seconds const& mindFlayFirst = IsInFrenzy() ? 5s : 8s;
-            Seconds const& mindFlayRepeat = IsInFrenzy() ? 9s : 14s;
-
-            Seconds const& swarmFirst = IsInFrenzy() ? 7s : 10s;
-            Seconds const& swarmRepeat = IsInFrenzy() ? 17s : 30s;
-
-            ScheduleTimedEvent(mindFlayFirst, mindFlayRepeat, [&] {
+            scheduler.Schedule(8s, 14s, [&](TaskContext context)
+            {
                 DoCastVictim(SPELL_MIND_FLAY);
-            }, mindFlayFirst, mindFlayRepeat);
+                if (!IsInFrenzy())
+                    context.Repeat();
+                else
+                    context.Repeat(5s, 9s);
+            });
 
-            ScheduleTimedEvent(swarmFirst, swarmRepeat, [&] {
+            scheduler.Schedule(10s, 30s, [&](TaskContext context)
+            {
                 Talk(SAY_SWARM);
                 DoCastAOE(SPELL_SWARM);
-            }, swarmFirst, swarmRepeat);
+
+                if (!IsInFrenzy())
+                    context.Repeat();
+                else
+                    context.Repeat(7s, 17s);
+            });
 
             ScheduleTimedEvent(27s, 35s, [&] {
                 DoCastRandomTarget(SPELL_CURSE_OF_FATIGUE, true);
