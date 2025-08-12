@@ -224,20 +224,20 @@ bool WarEffort::IsWarEffortComplete(uint8 team)
     {
         if (team == TEAM_ALLIANCE)
         {
-            if (IsBellowPercentGathered(cat, TEAM_ALLIANCE, 100.0f))
+            if (IsBellowPercentGathered(cat, TEAM_ALLIANCE, 1.0f)) //100.0f
                 return false;
 
         } else if (team == TEAM_HORDE)
         {
-            if (IsBellowPercentGathered(cat, TEAM_HORDE, 100.0f))
+            if (IsBellowPercentGathered(cat, TEAM_HORDE, 1.0f)) //100.0f
                 return false;
         }
         else
         {
-            if (IsBellowPercentGathered(cat, TEAM_ALLIANCE, 100.0f))
+            if (IsBellowPercentGathered(cat, TEAM_ALLIANCE, 1.0f)) //100.0f
                 return false;
 
-            if (IsBellowPercentGathered(cat, TEAM_HORDE, 100.0f))
+            if (IsBellowPercentGathered(cat, TEAM_HORDE, 1.0f)) //100.0f
                 return false;
         }
     }
@@ -264,47 +264,55 @@ void WarEffort::CheckGoal(Unit* unit, uint8 material, uint8 team)
             {
                 if (sWarEffort->IsBellowPercentGathered(material, team, 0.20f))
                 {
-                    Position pos = WarEffortGameobjectPositions[GO_BANDAGES_ALLIANCE_INITIAL];
-                    unit->GetMap()->SummonGameObject(GO_BANDAGES_ALLIANCE_INITIAL, pos, 0.0f, 0.0f, 0.0f, 0.0f, 14 * DAY * MINUTE);
+                    if (!unit->FindNearestGameObject(GO_BANDAGES_ALLIANCE_INITIAL, 50.0f))
+                    {
+                        Position pos = WarEffortGameobjectPositions[GO_BANDAGES_ALLIANCE_INITIAL];
+                        unit->GetMap()->SummonGameObject(GO_BANDAGES_ALLIANCE_INITIAL, pos, 0.0f, 0.0f, 0.0f, 0.0f, 14 * DAY * MINUTE);
+                    }
                 }
-                else if (!sWarEffort->IsBellowPercentGathered(material, team, 0.20f) && sWarEffort->IsBellowPercentGathered(material, team, 0.40f))
+                if (!sWarEffort->IsBellowPercentGathered(material, team, 0.20f) && sWarEffort->IsBellowPercentGathered(material, team, 0.40f))
                 {
                     if (!unit->FindNearestGameObject(GO_BANDAGES_ALLIANCE_TIER_1, 50.0f))
                     {
+                        LOG_INFO("server.server", "WarEffort: Started stage 1 - Alliance - Bandages");
                         Position pos = WarEffortGameobjectPositions[GO_BANDAGES_ALLIANCE_TIER_1];
-                        //unit->GetMap()->SummonGameObject(GO_BANDAGES_ALLIANCE_TIER_1, pos, 0.0f, 0.0f, -0.886385f, -0.462949f, 14 * DAY * MINUTE);
+                        unit->GetMap()->SummonGameObject(GO_BANDAGES_ALLIANCE_TIER_1, pos, 0.0f, 0.0f, 0.0f, 0.0f, 14 * DAY * MINUTE);
                     }
                 }
-                else if (!sWarEffort->IsBellowPercentGathered(material, team, 0.40f) && sWarEffort->IsBellowPercentGathered(material, team, 0.60f))
+                if (!sWarEffort->IsBellowPercentGathered(material, team, 0.40f) && sWarEffort->IsBellowPercentGathered(material, team, 0.60f))
                 {
                     if (!unit->FindNearestGameObject(GO_BANDAGES_ALLIANCE_TIER_2, 50.0f))
                     {
-                        Position pos = WarEffortGameobjectPositions[GO_BANDAGES_ALLIANCE_TIER_1];
-                        //unit->GetMap()->SummonGameObject(GO_BANDAGES_ALLIANCE_TIER_2, pos, 0.0f, 0.0f, -0.886385f, -0.462949f, 14 * DAY * MINUTE);
+                        LOG_INFO("server.server", "WarEffort: Started stage 2 - Alliance - Bandages");
+                        Position pos = WarEffortGameobjectPositions[GO_BANDAGES_ALLIANCE_TIER_2];
+                        unit->GetMap()->SummonGameObject(GO_BANDAGES_ALLIANCE_TIER_2, pos, 0.0f, 0.0f, 0.0f, 0.0f, 14 * DAY * MINUTE);
                     }
                 }
-                else if (!sWarEffort->IsBellowPercentGathered(material, team, 0.60f) && sWarEffort->IsBellowPercentGathered(material, team, 0.80))
+                if (!sWarEffort->IsBellowPercentGathered(material, team, 0.60f) && sWarEffort->IsBellowPercentGathered(material, team, 0.80f))
                 {
                     if (!unit->FindNearestGameObject(GO_BANDAGES_ALLIANCE_TIER_3, 50.0f))
                     {
-                        Position pos = WarEffortGameobjectPositions[GO_BANDAGES_ALLIANCE_TIER_1];
-                        //unit->GetMap()->SummonGameObject(GO_BANDAGES_ALLIANCE_TIER_3, pos, 0.0f, 0.0f, -0.886385f, -0.462949f, 14 * DAY * MINUTE);
+                        LOG_INFO("server.server", "WarEffort: Started stage 3 - Alliance - Bandages");
+                        Position pos = WarEffortGameobjectPositions[GO_BANDAGES_ALLIANCE_TIER_3];
+                        unit->GetMap()->SummonGameObject(GO_BANDAGES_ALLIANCE_TIER_3, pos, 0.0f, 0.0f, 0.0f, 0.0f, 14 * DAY * MINUTE);
                     }
                 }
-                else if (!sWarEffort->IsBellowPercentGathered(material, team, 0.80) && sWarEffort->IsBellowPercentGathered(material, team, 1.0f))
+                if (!sWarEffort->IsBellowPercentGathered(material, team, 0.80f) && sWarEffort->IsBellowPercentGathered(material, team, 1.0f))
                 {
                     if (!unit->FindNearestGameObject(GO_BANDAGES_ALLIANCE_TIER_4, 50.0f))
                     {
-                        Position pos = WarEffortGameobjectPositions[GO_BANDAGES_ALLIANCE_TIER_1];
-                       // unit->GetMap()->SummonGameObject(GO_BANDAGES_ALLIANCE_TIER_4, pos, 0.0f, 0.0f, -0.886385f, -0.462949f, 14 * DAY * MINUTE);
+                        LOG_INFO("server.server", "WarEffort: Started stage 4 - Alliance - Bandages");
+                        Position pos = WarEffortGameobjectPositions[GO_BANDAGES_ALLIANCE_TIER_4];
+                        unit->GetMap()->SummonGameObject(GO_BANDAGES_ALLIANCE_TIER_4, pos, 0.0f, 0.0f, 0.0f, 0.0f, 14 * DAY * MINUTE);
                     }
                 }
-                else
+                if (!sWarEffort->IsBellowPercentGathered(material, team, 1.0f))
                 {
                     if (!unit->FindNearestGameObject(GO_BANDAGES_ALLIANCE_TIER_5, 50.0f))
                     {
-                        Position pos = WarEffortGameobjectPositions[GO_BANDAGES_ALLIANCE_TIER_1];
-                        //unit->GetMap()->SummonGameObject(GO_BANDAGES_ALLIANCE_TIER_5, pos, 0.0f, 0.0f, -0.886385f, -0.462949f, 14 * DAY * MINUTE);
+                        LOG_INFO("server.server", "WarEffort: Started stage 5 - Alliance - Bandages");
+                        Position pos = WarEffortGameobjectPositions[GO_BANDAGES_ALLIANCE_TIER_5];
+                        unit->GetMap()->SummonGameObject(GO_BANDAGES_ALLIANCE_TIER_5, pos, 0.0f, 0.0f, 0.0f, 0.0f, 14 * DAY * MINUTE);
                     }
                 }
             }
@@ -320,40 +328,45 @@ void WarEffort::CheckGoal(Unit* unit, uint8 material, uint8 team)
                 {
                     if (!unit->FindNearestGameObject(GO_BANDAGES_HORDE_TIER_1, 50.0f))
                     {
-                        Position pos = WarEffortGameobjectPositions[GO_BANDAGES_HORDE_INITIAL];
-                        //unit->GetMap()->SummonGameObject(GO_BANDAGES_HORDE_TIER_1, pos.GetPositionX(), pos.GetPositionY(), pos.GetPositionZ() + 0.7f, pos.GetOrientation(), 0.0f, 0.0f, 0.0f, 0.0f, 14 * DAY * MINUTE);
+                        LOG_INFO("server.server", "WarEffort: Started stage 1 - Horde - Bandages");
+                        Position pos = WarEffortGameobjectPositions[GO_BANDAGES_HORDE_TIER_1];
+                        unit->GetMap()->SummonGameObject(GO_BANDAGES_HORDE_TIER_1, pos, 0.0f, 0.0f, 0.0f, 0.0f, 14 * DAY * MINUTE);
                     }
                 }
-                else if (!sWarEffort->IsBellowPercentGathered(material, team, 0.40f) && sWarEffort->IsBellowPercentGathered(material, team, 0.60f))
+                if (!sWarEffort->IsBellowPercentGathered(material, team, 0.40f) && sWarEffort->IsBellowPercentGathered(material, team, 0.60f))
                 {
                     if (!unit->FindNearestGameObject(GO_BANDAGES_HORDE_TIER_2, 50.0f))
                     {
-                        Position pos = WarEffortGameobjectPositions[GO_BANDAGES_HORDE_INITIAL];
-                        //unit->GetMap()->SummonGameObject(GO_BANDAGES_HORDE_TIER_2, pos, 0.0f, 0.0f, 0.0f, 0.0f, 14 * DAY * MINUTE);
+                        LOG_INFO("server.server", "WarEffort: Started stage 2 - Horde - Bandages");
+                        Position pos = WarEffortGameobjectPositions[GO_BANDAGES_HORDE_TIER_2];
+                        unit->GetMap()->SummonGameObject(GO_BANDAGES_HORDE_TIER_2, pos, 0.0f, 0.0f, 0.0f, 0.0f, 14 * DAY * MINUTE);
                     }
                 }
-                else if (!sWarEffort->IsBellowPercentGathered(material, team, 0.60f) && sWarEffort->IsBellowPercentGathered(material, team, 0.80))
+                if (!sWarEffort->IsBellowPercentGathered(material, team, 0.60f) && sWarEffort->IsBellowPercentGathered(material, team, 0.80f))
                 {
                     if (!unit->FindNearestGameObject(GO_BANDAGES_HORDE_TIER_3, 50.0f))
                     {
-                        Position pos = WarEffortGameobjectPositions[GO_BANDAGES_HORDE_INITIAL];
-                       // unit->GetMap()->SummonGameObject(GO_BANDAGES_HORDE_TIER_3, pos, 0.0f, 0.0f, 0.0f, 0.0f, 14 * DAY * MINUTE);
+                        LOG_INFO("server.server", "WarEffort: Started stage 3 - Horde - Bandages");
+                        Position pos = WarEffortGameobjectPositions[GO_BANDAGES_HORDE_TIER_3];
+                        unit->GetMap()->SummonGameObject(GO_BANDAGES_HORDE_TIER_3, pos, 0.0f, 0.0f, 0.0f, 0.0f, 14 * DAY * MINUTE);
                     }
                 }
-                else if (!sWarEffort->IsBellowPercentGathered(material, team, 0.80) && sWarEffort->IsBellowPercentGathered(material, team, 1.0f))
+                if (!sWarEffort->IsBellowPercentGathered(material, team, 0.80f) && sWarEffort->IsBellowPercentGathered(material, team, 1.0f))
                 {
                     if (!unit->FindNearestGameObject(GO_BANDAGES_HORDE_TIER_4, 50.0f))
                     {
-                        Position pos = WarEffortGameobjectPositions[GO_BANDAGES_HORDE_INITIAL];
-                        //unit->GetMap()->SummonGameObject(GO_BANDAGES_HORDE_TIER_4, pos, 0.0f, 0.0f, 0.0f, 0.0f, 14 * DAY * MINUTE);
+                        LOG_INFO("server.server", "WarEffort: Started stage 4 - Horde - Bandages");
+                        Position pos = WarEffortGameobjectPositions[GO_BANDAGES_HORDE_TIER_4];
+                        unit->GetMap()->SummonGameObject(GO_BANDAGES_HORDE_TIER_4, pos, 0.0f, 0.0f, 0.0f, 0.0f, 14 * DAY * MINUTE);
                     }
                 }
-                else
+                if (!sWarEffort->IsBellowPercentGathered(material, team, 1.0f))
                 {
                     if (!unit->FindNearestGameObject(GO_BANDAGES_HORDE_TIER_5, 50.0f))
                     {
-                        Position pos = WarEffortGameobjectPositions[GO_BANDAGES_HORDE_INITIAL];
-                       // unit->GetMap()->SummonGameObject(GO_BANDAGES_HORDE_TIER_5, pos, 0.0f, 0.0f, 0.0f, 0.0f, 0);
+                        LOG_INFO("server.server", "WarEffort: Started stage 5 - Horde - Bandages");
+                        Position pos = WarEffortGameobjectPositions[GO_BANDAGES_HORDE_TIER_5];
+                        unit->GetMap()->SummonGameObject(GO_BANDAGES_HORDE_TIER_5, pos, 0.0f, 0.0f, 0.0f, 0.0f, 14 * DAY * MINUTE);
                     }
                 }
             }
@@ -373,50 +386,47 @@ void WarEffort::CheckGoal(Unit* unit, uint8 material, uint8 team)
                         unit->GetMap()->SummonGameObject(GO_HERBS_FOOD_ALLIANCE_INITIAL, pos, 0.0f, 0.0f, 0.0f, 0.0f, 14 * DAY * MINUTE);
                     }
                 }
-                else if (!sWarEffort->IsBellowPercentGathered(material, team, 0.20f) && sWarEffort->IsBellowPercentGathered(material, team, 0.40f))
+                if (!sWarEffort->IsBellowPercentGathered(material, team, 0.20f) && sWarEffort->IsBellowPercentGathered(material, team, 0.40f))
                 {
                     if (!unit->FindNearestGameObject(GO_FOOD_ALLIANCE_TIER_1, 50.0f))
                     {
+                        LOG_INFO("server.server", "WarEffort: Started stage 1 - Alliance - Food");
                         Position pos = WarEffortGameobjectPositions[GO_FOOD_ALLIANCE_TIER_1];
                         unit->GetMap()->SummonGameObject(GO_FOOD_ALLIANCE_TIER_1, pos, 0.0f, 0.0f, 0.0f, 0.0f, 14 * DAY * MINUTE);
                     }
                 }
-                else if (!sWarEffort->IsBellowPercentGathered(material, team, 0.40f) && sWarEffort->IsBellowPercentGathered(material, team, 0.60f))
+                if (!sWarEffort->IsBellowPercentGathered(material, team, 0.40f) && sWarEffort->IsBellowPercentGathered(material, team, 0.60f))
                 {
-                    sWarEffort->RemoveNearbyObject(GO_FOOD_ALLIANCE_TIER_1, unit);
-
                     if (!unit->FindNearestGameObject(GO_FOOD_ALLIANCE_TIER_2, 50.0f))
                     {
+                        LOG_INFO("server.server", "WarEffort: Started stage 2 - Alliance - Food");
                         Position pos = WarEffortGameobjectPositions[GO_FOOD_ALLIANCE_TIER_2];
                         unit->GetMap()->SummonGameObject(GO_FOOD_ALLIANCE_TIER_2, pos, 0.0f, 0.0f, 0.0f, 0.0f, 14 * DAY * MINUTE);
                     }
                 }
-                else if (!sWarEffort->IsBellowPercentGathered(material, team, 0.60f) && sWarEffort->IsBellowPercentGathered(material, team, 0.80))
+                if (!sWarEffort->IsBellowPercentGathered(material, team, 0.60f) && sWarEffort->IsBellowPercentGathered(material, team, 0.80f))
                 {
-                    sWarEffort->RemoveNearbyObject(GO_FOOD_ALLIANCE_TIER_2, unit);
-
                     if (!unit->FindNearestGameObject(GO_FOOD_ALLIANCE_TIER_3, 50.0f))
                     {
+                        LOG_INFO("server.server", "WarEffort: Started stage 3 - Alliance - Food");
                         Position pos = WarEffortGameobjectPositions[GO_FOOD_ALLIANCE_TIER_3];
                         unit->GetMap()->SummonGameObject(GO_FOOD_ALLIANCE_TIER_3, pos, 0.0f, 0.0f, 0.0f, 0.0f, 14 * DAY * MINUTE);
                     }
                 }
-                else if (!sWarEffort->IsBellowPercentGathered(material, team, 0.80) && sWarEffort->IsBellowPercentGathered(material, team, 1.0f))
+                if (!sWarEffort->IsBellowPercentGathered(material, team, 0.80f) && sWarEffort->IsBellowPercentGathered(material, team, 1.0f))
                 {
-                    sWarEffort->RemoveNearbyObject(GO_FOOD_ALLIANCE_TIER_3, unit);
-
                     if (!unit->FindNearestGameObject(GO_FOOD_ALLIANCE_TIER_4, 50.0f))
                     {
+                        LOG_INFO("server.server", "WarEffort: Started stage 4 - Alliance - Food");
                         Position pos = WarEffortGameobjectPositions[GO_FOOD_ALLIANCE_TIER_4];
                         unit->GetMap()->SummonGameObject(GO_FOOD_ALLIANCE_TIER_4, pos, 0.0f, 0.0f, 0.0f, 0.0f, 14 * DAY * MINUTE);
                     }
                 }
-                else
+                if (!sWarEffort->IsBellowPercentGathered(material, team, 1.0f))
                 {
-                    sWarEffort->RemoveNearbyObject(GO_FOOD_ALLIANCE_TIER_4, unit);
-
                     if (!unit->FindNearestGameObject(GO_FOOD_ALLIANCE_TIER_5, 50.0f))
                     {
+                        LOG_INFO("server.server", "WarEffort: Started stage 5 - Alliance - Food");
                         Position pos = WarEffortGameobjectPositions[GO_FOOD_ALLIANCE_TIER_5];
                         unit->GetMap()->SummonGameObject(GO_FOOD_ALLIANCE_TIER_5, pos, 0.0f, 0.0f, 0.0f, 0.0f, 14 * DAY * MINUTE);
                     }
@@ -426,63 +436,57 @@ void WarEffort::CheckGoal(Unit* unit, uint8 material, uint8 team)
             {
                 if (!unit->FindNearestGameObject(GO_FOOD_HORDE_INITIAL, 50.0f))
                 {
-                    LOG_INFO("server.server", "WarEffort: Started stage 0 - Horde - Food");
                     Position pos = WarEffortGameobjectPositions[GO_FOOD_HORDE_INITIAL];
                     unit->GetMap()->SummonGameObject(GO_FOOD_HORDE_INITIAL, pos, 0.0f, 0.0f, 0.0f, 0.0f, 14 * DAY * MINUTE);
                 }
 
                 if (!sWarEffort->IsBellowPercentGathered(material, team, 0.20f))
                 {
-                    LOG_INFO("server.server", "WarEffort: Started stage 1 - Horde - Food");
-
                     if (!unit->FindNearestGameObject(GO_FOOD_HORDE_TIER_1, 50.0f))
                     {
+                        LOG_INFO("server.server", "WarEffort: Started stage 1 - Horde - Food");
                         Position pos = WarEffortGameobjectPositions[GO_FOOD_HORDE_TIER_1];
-                        //unit->GetMap()->SummonGameObject(GO_FOOD_HORDE_TIER_1, pos, 0.0f, 0.0f, -0.983634f, -0.180176f, 14 * DAY * MINUTE);
+                        unit->GetMap()->SummonGameObject(GO_FOOD_HORDE_TIER_1, pos, 0.0f, 0.0f, 0.0f, 0.0f, 14 * DAY * MINUTE);
                     }
                 }
 
                 if (!sWarEffort->IsBellowPercentGathered(material, team, 0.40f))
                 {
-                    LOG_INFO("server.server", "WarEffort: Started stage 2 - Horde - Food");
-
                     if (!unit->FindNearestGameObject(GO_FOOD_HORDE_TIER_2, 50.0f))
                     {
+                        LOG_INFO("server.server", "WarEffort: Started stage 2 - Horde - Food");
                         Position pos = WarEffortGameobjectPositions[GO_FOOD_HORDE_TIER_2];
-                        //unit->GetMap()->SummonGameObject(GO_FOOD_HORDE_TIER_2, pos, 0.0f, 0.0f, -0.982382f, 0.186883f, 14 * DAY * MINUTE);
+                        unit->GetMap()->SummonGameObject(GO_FOOD_HORDE_TIER_2, pos, 0.0f, 0.0f, 0.0f, 0.0f, 14 * DAY * MINUTE);
                     }
                 }
 
                 if (!sWarEffort->IsBellowPercentGathered(material, team, 0.60f))
                 {
-                    LOG_INFO("server.server", "WarEffort: Started stage 3 - Horde - Food");
-
                     if (!unit->FindNearestGameObject(GO_FOOD_HORDE_TIER_3, 50.0f))
                     {
+                        LOG_INFO("server.server", "WarEffort: Started stage 3 - Horde - Food");
                         Position pos = WarEffortGameobjectPositions[GO_FOOD_HORDE_TIER_3];
-                        //unit->GetMap()->SummonGameObject(GO_FOOD_HORDE_TIER_3, pos, 0.0f, 0.0f, -0.996204f, -0.0870461f, 14 * DAY * MINUTE);
+                        unit->GetMap()->SummonGameObject(GO_FOOD_HORDE_TIER_3, pos, 0.0f, 0.0f, 0.0f, 0.0f, 14 * DAY * MINUTE);
                     }
                 }
 
                 if (!sWarEffort->IsBellowPercentGathered(material, team, 0.80f))
                 {
-                    LOG_INFO("server.server", "WarEffort: Started stage 4 - Horde - Food");
-
                     if (!unit->FindNearestGameObject(GO_FOOD_HORDE_TIER_4, 50.0f))
                     {
+                        LOG_INFO("server.server", "WarEffort: Started stage 4 - Horde - Food");
                         Position pos = WarEffortGameobjectPositions[GO_FOOD_HORDE_TIER_4];
-                        //unit->GetMap()->SummonGameObject(GO_FOOD_HORDE_TIER_4, pos, 0.0f, 0.0f, -0.984112f, 0.177551f, 14 * DAY * MINUTE);
+                        unit->GetMap()->SummonGameObject(GO_FOOD_HORDE_TIER_4, pos, 0.0f, 0.0f, 0.0f, 0.0f, 14 * DAY * MINUTE);
                     }
                 }
 
                 if (!sWarEffort->IsBellowPercentGathered(material, team, 1.0f))
                 {
-                    LOG_INFO("server.server", "WarEffort: Started stage 5 - Horde - Food");
-
                     if (!unit->FindNearestGameObject(GO_FOOD_HORDE_TIER_5, 50.0f))
                     {
+                        LOG_INFO("server.server", "WarEffort: Started stage 5 - Horde - Food");
                         Position pos = WarEffortGameobjectPositions[GO_FOOD_HORDE_TIER_5];
-                        //unit->GetMap()->SummonGameObject(GO_FOOD_HORDE_TIER_5, pos.GetPositionX(), pos.GetPositionY(), pos.GetPositionZ() - 4.0f, pos.GetOrientation(), 0.0f, 0.0f, -0.92896f, 0.370181f, 14 * DAY * MINUTE);
+                        unit->GetMap()->SummonGameObject(GO_FOOD_HORDE_TIER_5, pos, 0.0f, 0.0f, 0.0f, 0.0f, 14 * DAY * MINUTE);
                     }
                 }
             }
@@ -499,52 +503,48 @@ void WarEffort::CheckGoal(Unit* unit, uint8 material, uint8 team)
                         unit->GetMap()->SummonGameObject(GO_HERBS_FOOD_ALLIANCE_INITIAL, pos, 0.0f, 0.0f, 0.0f, 0.0f, 14 * DAY * MINUTE);
                     }
                 }
-                else if (!sWarEffort->IsBellowPercentGathered(material, team, 0.20f) && sWarEffort->IsBellowPercentGathered(material, team, 0.40f))
+                if (!sWarEffort->IsBellowPercentGathered(material, team, 0.20f) && sWarEffort->IsBellowPercentGathered(material, team, 0.40f))
                 {
-                    LOG_INFO("server.server", "WarEffort: Started stage 1 - Alliance - Herbs");
                     if (!unit->FindNearestGameObject(GO_HERBS_ALLIANCE_TIER_1, 50.0f))
                     {
+                        LOG_INFO("server.server", "WarEffort: Started stage 1 - Alliance - Herbs");
                         Position pos = WarEffortGameobjectPositions[GO_HERBS_ALLIANCE_TIER_1];
                         unit->GetMap()->SummonGameObject(GO_HERBS_ALLIANCE_TIER_1, pos, 0.0f, 0.0f, 0.0f, 0.0f, 14 * DAY * MINUTE);
                     }
                 }
-                else if (!sWarEffort->IsBellowPercentGathered(material, team, 0.40f) && sWarEffort->IsBellowPercentGathered(material, team, 0.60f))
+                if (!sWarEffort->IsBellowPercentGathered(material, team, 0.40f) && sWarEffort->IsBellowPercentGathered(material, team, 0.60f))
                 {
-                    LOG_INFO("server.server", "WarEffort: Started stage 2 - Alliance - Herbs");
-
                     if (!unit->FindNearestGameObject(GO_HERBS_ALLIANCE_TIER_2, 50.0f))
                     {
-                        Position pos = WarEffortGameobjectPositions[GO_HERBS_ALLIANCE_TIER_1];
+                        LOG_INFO("server.server", "WarEffort: Started stage 2 - Alliance - Herbs");
+                        Position pos = WarEffortGameobjectPositions[GO_HERBS_ALLIANCE_TIER_2];
                         unit->GetMap()->SummonGameObject(GO_HERBS_ALLIANCE_TIER_2, pos, 0.0f, 0.0f, 0.0f, 0.0f, 14 * DAY * MINUTE);
                     }
                 }
-                else if (!sWarEffort->IsBellowPercentGathered(material, team, 0.60f) && sWarEffort->IsBellowPercentGathered(material, team, 0.80))
+                if (!sWarEffort->IsBellowPercentGathered(material, team, 0.60f) && sWarEffort->IsBellowPercentGathered(material, team, 0.80f))
                 {
-                    LOG_INFO("server.server", "WarEffort: Started stage 3 - Alliance - Herbs");
-
                     if (!unit->FindNearestGameObject(GO_HERBS_ALLIANCE_TIER_3, 50.0f))
                     {
-                        Position pos = WarEffortGameobjectPositions[GO_HERBS_ALLIANCE_TIER_1];
+                        LOG_INFO("server.server", "WarEffort: Started stage 3 - Alliance - Herbs");
+                        Position pos = WarEffortGameobjectPositions[GO_HERBS_ALLIANCE_TIER_3];
                         unit->GetMap()->SummonGameObject(GO_HERBS_ALLIANCE_TIER_3, pos, 0.0f, 0.0f, 0.0f, 0.0f, 14 * DAY * MINUTE);
                     }
                 }
-                else if (!sWarEffort->IsBellowPercentGathered(material, team, 0.80f) && sWarEffort->IsBellowPercentGathered(material, team, 1.0f))
+                if (!sWarEffort->IsBellowPercentGathered(material, team, 0.80f) && sWarEffort->IsBellowPercentGathered(material, team, 1.0f))
                 {
-                    LOG_INFO("server.server", "WarEffort: Started stage 4 - Alliance - Herbs");
-
                     if (!unit->FindNearestGameObject(GO_HERBS_ALLIANCE_TIER_4, 50.0f))
                     {
-                        Position pos = WarEffortGameobjectPositions[GO_HERBS_ALLIANCE_TIER_1];
+                        LOG_INFO("server.server", "WarEffort: Started stage 4 - Alliance - Herbs");
+                        Position pos = WarEffortGameobjectPositions[GO_HERBS_ALLIANCE_TIER_4];
                         unit->GetMap()->SummonGameObject(GO_HERBS_ALLIANCE_TIER_4, pos, 0.0f, 0.0f, 0.0f, 0.0f, 14 * DAY * MINUTE);
                     }
                 }
-                else
+                if (!sWarEffort->IsBellowPercentGathered(material, team, 1.0f))
                 {
-                    LOG_INFO("server.server", "WarEffort: Started stage 5 - Alliance - Herbs");
-
                     if (!unit->FindNearestGameObject(GO_HERBS_ALLIANCE_TIER_5, 50.0f))
                     {
-                        Position pos = WarEffortGameobjectPositions[GO_HERBS_ALLIANCE_TIER_1];
+                        LOG_INFO("server.server", "WarEffort: Started stage 5 - Alliance - Herbs");
+                        Position pos = WarEffortGameobjectPositions[GO_HERBS_ALLIANCE_TIER_5];
                         unit->GetMap()->SummonGameObject(GO_HERBS_ALLIANCE_TIER_5, pos, 0.0f, 0.0f, 0.0f, 0.0f, 14 * DAY * MINUTE);
                     }
                 }
@@ -559,52 +559,47 @@ void WarEffort::CheckGoal(Unit* unit, uint8 material, uint8 team)
 
                 if (!sWarEffort->IsBellowPercentGathered(material, team, 0.20f) && sWarEffort->IsBellowPercentGathered(material, team, 0.40f))
                 {
-                    LOG_INFO("server.server", "WarEffort: Started stage 1 - Horde - Herbs");
-
                     if (!unit->FindNearestGameObject(GO_HERBS_HORDE_TIER_1, 50.0f))
                     {
-                        Position pos = WarEffortGameobjectPositions[GO_HERBS_HORDE_INITIAL];
-                        //unit->GetMap()->SummonGameObject(GO_HERBS_HORDE_TIER_1, pos, 0.0f, 0.0f, 0.0f, 0.0f, 14 * DAY * MINUTE);
+                        LOG_INFO("server.server", "WarEffort: Started stage 1 - Horde - Herbs");
+                        Position pos = WarEffortGameobjectPositions[GO_HERBS_HORDE_TIER_1];
+                        unit->GetMap()->SummonGameObject(GO_HERBS_HORDE_TIER_1, pos, 0.0f, 0.0f, 0.0f, 0.0f, 14 * DAY * MINUTE);
                     }
                 }
-                else if (!sWarEffort->IsBellowPercentGathered(material, team, 0.40f) && sWarEffort->IsBellowPercentGathered(material, team, 0.60f))
+                if (!sWarEffort->IsBellowPercentGathered(material, team, 0.40f) && sWarEffort->IsBellowPercentGathered(material, team, 0.60f))
                 {
-                    LOG_INFO("server.server", "WarEffort: Started stage 2 - Horde - Herbs");
-
                     if (!unit->FindNearestGameObject(GO_HERBS_HORDE_TIER_2, 50.0f))
                     {
-                        Position pos = WarEffortGameobjectPositions[GO_HERBS_HORDE_INITIAL];
-                        //unit->GetMap()->SummonGameObject(GO_HERBS_HORDE_TIER_2, pos, 0.0f, 0.0f, 0.0f, 0.0f, 14 * DAY * MINUTE);
+                        LOG_INFO("server.server", "WarEffort: Started stage 2 - Horde - Herbs");
+                        Position pos = WarEffortGameobjectPositions[GO_HERBS_HORDE_TIER_2];
+                        unit->GetMap()->SummonGameObject(GO_HERBS_HORDE_TIER_2, pos, 0.0f, 0.0f, 0.0f, 0.0f, 14 * DAY * MINUTE);
                     }
                 }
-                else if (!sWarEffort->IsBellowPercentGathered(material, team, 0.60f) && sWarEffort->IsBellowPercentGathered(material, team, 0.80))
+                if (!sWarEffort->IsBellowPercentGathered(material, team, 0.60f) && sWarEffort->IsBellowPercentGathered(material, team, 0.80f))
                 {
-                    LOG_INFO("server.server", "WarEffort: Started stage 3 - Horde - Herbs");
-
                     if (!unit->FindNearestGameObject(GO_HERBS_HORDE_TIER_3, 50.0f))
                     {
-                        Position pos = WarEffortGameobjectPositions[GO_HERBS_HORDE_INITIAL];
-                        //unit->GetMap()->SummonGameObject(GO_HERBS_HORDE_TIER_3, pos, 0.0f, 0.0f, 0.0f, 0.0f, 14 * DAY * MINUTE);
+                        LOG_INFO("server.server", "WarEffort: Started stage 3 - Horde - Herbs");
+                        Position pos = WarEffortGameobjectPositions[GO_HERBS_HORDE_TIER_3];
+                        unit->GetMap()->SummonGameObject(GO_HERBS_HORDE_TIER_3, pos, 0.0f, 0.0f, 0.0f, 0.0f, 14 * DAY * MINUTE);
                     }
                 }
-                else if (!sWarEffort->IsBellowPercentGathered(material, team, 0.80) && sWarEffort->IsBellowPercentGathered(material, team, 1.0f))
+                if (!sWarEffort->IsBellowPercentGathered(material, team, 0.80f) && sWarEffort->IsBellowPercentGathered(material, team, 1.0f))
                 {
-                    LOG_INFO("server.server", "WarEffort: Started stage 4 - Horde - Herbs");
-
                     if (!unit->FindNearestGameObject(GO_HERBS_HORDE_TIER_4, 50.0f))
                     {
-                        Position pos = WarEffortGameobjectPositions[GO_HERBS_HORDE_INITIAL];
-                        //unit->GetMap()->SummonGameObject(GO_HERBS_HORDE_TIER_4, pos, 0.0f, 0.0f, 0.0f, 0.0f, 14 * DAY * MINUTE);
+                        LOG_INFO("server.server", "WarEffort: Started stage 4 - Horde - Herbs");
+                        Position pos = WarEffortGameobjectPositions[GO_HERBS_HORDE_TIER_4];
+                        unit->GetMap()->SummonGameObject(GO_HERBS_HORDE_TIER_4, pos, 0.0f, 0.0f, 0.0f, 0.0f, 14 * DAY * MINUTE);
                     }
                 }
-                else
+                if (!sWarEffort->IsBellowPercentGathered(material, team, 1.0f))
                 {
-                    LOG_INFO("server.server", "WarEffort: Started stage 5 - Horde - Herbs");
-
                     if (!unit->FindNearestGameObject(GO_HERBS_HORDE_TIER_5, 50.0f))
                     {
-                        Position pos = WarEffortGameobjectPositions[GO_HERBS_HORDE_INITIAL];
-                        //unit->GetMap()->SummonGameObject(GO_HERBS_HORDE_TIER_5, pos, 0.0f, 0.0f, 0.0f, 0.0f, 14 * DAY * MINUTE);
+                        LOG_INFO("server.server", "WarEffort: Started stage 5 - Horde - Herbs");
+                        Position pos = WarEffortGameobjectPositions[GO_HERBS_HORDE_TIER_5];
+                        unit->GetMap()->SummonGameObject(GO_HERBS_HORDE_TIER_5, pos, 0.0f, 0.0f, 0.0f, 0.0f, 14 * DAY * MINUTE);
                     }
                 }
             }
@@ -615,54 +610,54 @@ void WarEffort::CheckGoal(Unit* unit, uint8 material, uint8 team)
             {
                 if (sWarEffort->IsBellowPercentGathered(material, team, 0.20f))
                 {
-                    Position pos = WarEffortGameobjectPositions[GO_METAL_ALLIANCE_INITIAL];
-                    unit->GetMap()->SummonGameObject(GO_METAL_ALLIANCE_INITIAL, pos, 0.0f, 0.0f, 0.0f, 0.0f, 14 * DAY * MINUTE);
+                    if (!unit->FindNearestGameObject(GO_METAL_ALLIANCE_INITIAL, 50.0f))
+                    {
+                        Position pos = WarEffortGameobjectPositions[GO_METAL_ALLIANCE_INITIAL];
+                        unit->GetMap()->SummonGameObject(GO_METAL_ALLIANCE_INITIAL, pos, 0.0f, 0.0f, 0.0f, 0.0f, 14 * DAY * MINUTE);
+                    }
                 }
-                else if (!sWarEffort->IsBellowPercentGathered(material, team, 0.20f) && sWarEffort->IsBellowPercentGathered(material, team, 0.40f))
+                if (!sWarEffort->IsBellowPercentGathered(material, team, 0.20f) && sWarEffort->IsBellowPercentGathered(material, team, 0.40f))
                 {
                     if (!unit->FindNearestGameObject(GO_METAL_ALLIANCE_TIER_1, 50.0f))
                     {
+                        LOG_INFO("server.server", "WarEffort: Started stage 1 - Alliance - Metal");
                         Position pos = WarEffortGameobjectPositions[GO_METAL_ALLIANCE_TIER_1];
                         unit->GetMap()->SummonGameObject(GO_METAL_ALLIANCE_TIER_1, pos, 0.0f, 0.0f, 0.0f, 0.0f, 14 * DAY * MINUTE);
                     }
                 }
-                else if (!sWarEffort->IsBellowPercentGathered(material, team, 0.40f) && sWarEffort->IsBellowPercentGathered(material, team, 0.60f))
+                if (!sWarEffort->IsBellowPercentGathered(material, team, 0.40f) && sWarEffort->IsBellowPercentGathered(material, team, 0.60f))
                 {
-                    sWarEffort->RemoveNearbyObject(GO_METAL_ALLIANCE_TIER_1, unit);
-
                     if (!unit->FindNearestGameObject(GO_METAL_ALLIANCE_TIER_2, 50.0f))
                     {
-                        Position pos = WarEffortGameobjectPositions[GO_METAL_ALLIANCE_TIER_1];
+                        LOG_INFO("server.server", "WarEffort: Started stage 2 - Alliance - Metal");
+                        Position pos = WarEffortGameobjectPositions[GO_METAL_ALLIANCE_TIER_2];
                         unit->GetMap()->SummonGameObject(GO_METAL_ALLIANCE_TIER_2, pos, 0.0f, 0.0f, 0.0f, 0.0f, 14 * DAY * MINUTE);
                     }
                 }
-                else if (!sWarEffort->IsBellowPercentGathered(material, team, 0.60f) && sWarEffort->IsBellowPercentGathered(material, team, 0.80))
+                if (!sWarEffort->IsBellowPercentGathered(material, team, 0.60f) && sWarEffort->IsBellowPercentGathered(material, team, 0.80f))
                 {
-                    sWarEffort->RemoveNearbyObject(GO_METAL_ALLIANCE_TIER_2, unit);
-
                     if (!unit->FindNearestGameObject(GO_METAL_ALLIANCE_TIER_3, 50.0f))
                     {
-                        Position pos = WarEffortGameobjectPositions[GO_METAL_ALLIANCE_TIER_1];
+                        LOG_INFO("server.server", "WarEffort: Started stage 3 - Alliance - Metal");
+                        Position pos = WarEffortGameobjectPositions[GO_METAL_ALLIANCE_TIER_3];
                         unit->GetMap()->SummonGameObject(GO_METAL_ALLIANCE_TIER_3, pos, 0.0f, 0.0f, 0.0f, 0.0f, 14 * DAY * MINUTE);
                     }
                 }
-                else if (!sWarEffort->IsBellowPercentGathered(material, team, 0.80f) && sWarEffort->IsBellowPercentGathered(material, team, 1.0f))
+                if (!sWarEffort->IsBellowPercentGathered(material, team, 0.80f) && sWarEffort->IsBellowPercentGathered(material, team, 1.0f))
                 {
-                    sWarEffort->RemoveNearbyObject(GO_METAL_ALLIANCE_TIER_3, unit);
-
                     if (!unit->FindNearestGameObject(GO_METAL_ALLIANCE_TIER_4, 50.0f))
                     {
-                        Position pos = WarEffortGameobjectPositions[GO_METAL_ALLIANCE_TIER_1];
+                        LOG_INFO("server.server", "WarEffort: Started stage 4 - Alliance - Metal");
+                        Position pos = WarEffortGameobjectPositions[GO_METAL_ALLIANCE_TIER_4];
                         unit->GetMap()->SummonGameObject(GO_METAL_ALLIANCE_TIER_4, pos, 0.0f, 0.0f, 0.0f, 0.0f, 14 * DAY * MINUTE);
                     }
                 }
-                else
+                if (!sWarEffort->IsBellowPercentGathered(material, team, 1.0f))
                 {
-                    sWarEffort->RemoveNearbyObject(GO_METAL_ALLIANCE_TIER_4, unit);
-
                     if (!unit->FindNearestGameObject(GO_METAL_ALLIANCE_TIER_5, 50.0f))
                     {
-                        Position pos = WarEffortGameobjectPositions[GO_METAL_ALLIANCE_TIER_1];
+                        LOG_INFO("server.server", "WarEffort: Started stage 5 - Alliance - Metal");
+                        Position pos = WarEffortGameobjectPositions[GO_METAL_ALLIANCE_TIER_5];
                         unit->GetMap()->SummonGameObject(GO_METAL_ALLIANCE_TIER_5, pos, 0.0f, 0.0f, 0.0f, 0.0f, 14 * DAY * MINUTE);
                     }
                 }
@@ -672,57 +667,52 @@ void WarEffort::CheckGoal(Unit* unit, uint8 material, uint8 team)
                 if (!unit->FindNearestGameObject(GO_METAL_HORDE_INITIAL, 50.0f))
                 {
                     Position pos = WarEffortGameobjectPositions[GO_METAL_HORDE_INITIAL];
-                    unit->GetMap()->SummonGameObject(GO_METAL_HORDE_INITIAL, pos.GetPositionX(), pos.GetPositionY(), pos.GetPositionZ(), pos.GetOrientation(), -0.0f, -0.0f, -0.987771f, 0.155913f, 14 * DAY * MINUTE);
+                    unit->GetMap()->SummonGameObject(GO_METAL_HORDE_INITIAL, pos, 0.0f, 0.0f, 0.0f, 0.0f, 14 * DAY * MINUTE);
                 }
 
                 if (!sWarEffort->IsBellowPercentGathered(material, team, 0.20f) && sWarEffort->IsBellowPercentGathered(material, team, 0.40f))
                 {
-                    sWarEffort->RemoveNearbyObject(GO_METAL_HORDE_INITIAL, unit);
-
                     if (!unit->FindNearestGameObject(GO_METAL_HORDE_TIER_1, 50.0f))
                     {
-                        Position pos = WarEffortGameobjectPositions[GO_HERBS_HORDE_INITIAL];
-                        //unit->GetMap()->SummonGameObject(GO_METAL_HORDE_TIER_1, pos.GetPositionX(), pos.GetPositionY(), pos.GetPositionZ(), pos.GetOrientation(), 0.0f, 0.0f, 0.0f, 0.0f, 14 * DAY * MINUTE);
+                        LOG_INFO("server.server", "WarEffort: Started stage 1 - Horde - Metal");
+                        Position pos = WarEffortGameobjectPositions[GO_METAL_HORDE_TIER_1];
+                        unit->GetMap()->SummonGameObject(GO_METAL_HORDE_TIER_1, pos, 0.0f, 0.0f, 0.0f, 0.0f, 14 * DAY * MINUTE);
                     }
                 }
-                else if (!sWarEffort->IsBellowPercentGathered(material, team, 0.40f) && sWarEffort->IsBellowPercentGathered(material, team, 0.60f))
+                if (!sWarEffort->IsBellowPercentGathered(material, team, 0.40f) && sWarEffort->IsBellowPercentGathered(material, team, 0.60f))
                 {
-                    sWarEffort->RemoveNearbyObject(GO_METAL_HORDE_TIER_1, unit);
-
                     if (!unit->FindNearestGameObject(GO_METAL_HORDE_TIER_2, 50.0f))
                     {
-                        Position pos = WarEffortGameobjectPositions[GO_HERBS_HORDE_INITIAL];
-                       // unit->GetMap()->SummonGameObject(GO_METAL_HORDE_TIER_2, pos.GetPositionX(), pos.GetPositionY(), pos.GetPositionZ(), pos.GetOrientation(), 0.0f, 0.0f, 0.0f, 0.0f, 14 * DAY * MINUTE);
+                        LOG_INFO("server.server", "WarEffort: Started stage 2 - Horde - Metal");
+                        Position pos = WarEffortGameobjectPositions[GO_METAL_HORDE_TIER_2];
+                        unit->GetMap()->SummonGameObject(GO_METAL_HORDE_TIER_2, pos, 0.0f, 0.0f, 0.0f, 0.0f, 14 * DAY * MINUTE);
                     }
                 }
-                else if (!sWarEffort->IsBellowPercentGathered(material, team, 0.60f) && sWarEffort->IsBellowPercentGathered(material, team, 0.80))
+                if (!sWarEffort->IsBellowPercentGathered(material, team, 0.60f) && sWarEffort->IsBellowPercentGathered(material, team, 0.80f))
                 {
-                    sWarEffort->RemoveNearbyObject(GO_METAL_HORDE_TIER_2, unit);
-
                     if (!unit->FindNearestGameObject(GO_METAL_HORDE_TIER_3, 50.0f))
                     {
-                        Position pos = WarEffortGameobjectPositions[GO_HERBS_HORDE_INITIAL];
-                       // unit->GetMap()->SummonGameObject(GO_METAL_HORDE_TIER_3, pos.GetPositionX(), pos.GetPositionY(), pos.GetPositionZ(), pos.GetOrientation(), 0.0f, 0.0f, 0.0f, 0.0f, 14 * DAY * MINUTE);
+                        LOG_INFO("server.server", "WarEffort: Started stage 3 - Horde - Metal");
+                        Position pos = WarEffortGameobjectPositions[GO_METAL_HORDE_TIER_3];
+                        unit->GetMap()->SummonGameObject(GO_METAL_HORDE_TIER_3, pos, 0.0f, 0.0f, 0.0f, 0.0f, 14 * DAY * MINUTE);
                     }
                 }
-                else if (!sWarEffort->IsBellowPercentGathered(material, team, 0.80) && sWarEffort->IsBellowPercentGathered(material, team, 1.0f))
+                if (!sWarEffort->IsBellowPercentGathered(material, team, 0.80f) && sWarEffort->IsBellowPercentGathered(material, team, 1.0f))
                 {
-                    sWarEffort->RemoveNearbyObject(GO_METAL_HORDE_TIER_3, unit);
-
                     if (!unit->FindNearestGameObject(GO_METAL_HORDE_TIER_4, 50.0f))
                     {
-                        Position pos = WarEffortGameobjectPositions[GO_HERBS_HORDE_INITIAL];
-                        //unit->GetMap()->SummonGameObject(GO_METAL_HORDE_TIER_4, pos.GetPositionX(), pos.GetPositionY(), pos.GetPositionZ(), pos.GetOrientation(), 0.0f, 0.0f, 0.0f, 0.0f, 14 * DAY * MINUTE);
+                        LOG_INFO("server.server", "WarEffort: Started stage 4 - Horde - Metal");
+                        Position pos = WarEffortGameobjectPositions[GO_METAL_HORDE_TIER_4];
+                        unit->GetMap()->SummonGameObject(GO_METAL_HORDE_TIER_4, pos, 0.0f, 0.0f, 0.0f, 0.0f, 14 * DAY * MINUTE);
                     }
                 }
-                else
+                if (!sWarEffort->IsBellowPercentGathered(material, team, 1.0f))
                 {
-                    sWarEffort->RemoveNearbyObject(GO_METAL_HORDE_TIER_4, unit);
-
                     if (!unit->FindNearestGameObject(GO_METAL_HORDE_TIER_5, 50.0f))
                     {
-                        Position pos = WarEffortGameobjectPositions[GO_HERBS_HORDE_INITIAL];
-                        //unit->GetMap()->SummonGameObject(GO_METAL_HORDE_TIER_5, pos.GetPositionX(), pos.GetPositionY(), pos.GetPositionZ(), pos.GetOrientation(), 0.0f, 0.0f, 0.0f, 0.0f, 14 * DAY * MINUTE);
+                        LOG_INFO("server.server", "WarEffort: Started stage 5 - Horde - Metal");
+                        Position pos = WarEffortGameobjectPositions[GO_METAL_HORDE_TIER_5];
+                        unit->GetMap()->SummonGameObject(GO_METAL_HORDE_TIER_5, pos, 0.0f, 0.0f, 0.0f, 0.0f, 14 * DAY * MINUTE);
                     }
                 }
             }
@@ -733,54 +723,54 @@ void WarEffort::CheckGoal(Unit* unit, uint8 material, uint8 team)
             {
                 if (sWarEffort->IsBellowPercentGathered(material, team, 0.20f))
                 {
-                    Position pos = WarEffortGameobjectPositions[GO_LEATHER_ALLIANCE_INITIAL];
-                    unit->GetMap()->SummonGameObject(GO_LEATHER_ALLIANCE_INITIAL, pos, 0.0f, 0.0f, 0.0f, 0.0f, 14 * DAY * MINUTE);
+                    if (!unit->FindNearestGameObject(GO_LEATHER_ALLIANCE_INITIAL, 50.0f))
+                    {
+                        Position pos = WarEffortGameobjectPositions[GO_LEATHER_ALLIANCE_INITIAL];
+                        unit->GetMap()->SummonGameObject(GO_LEATHER_ALLIANCE_INITIAL, pos, 0.0f, 0.0f, 0.0f, 0.0f, 14 * DAY * MINUTE);
+                    }
                 }
-                else if (!sWarEffort->IsBellowPercentGathered(material, team, 0.20f) && sWarEffort->IsBellowPercentGathered(material, team, 0.40f))
+                if (!sWarEffort->IsBellowPercentGathered(material, team, 0.20f) && sWarEffort->IsBellowPercentGathered(material, team, 0.40f))
                 {
                     if (!unit->FindNearestGameObject(GO_LEATHER_ALLIANCE_TIER_1, 50.0f))
                     {
+                        LOG_INFO("server.server", "WarEffort: Started stage 1 - Alliance - Leather");
                         Position pos = WarEffortGameobjectPositions[GO_LEATHER_ALLIANCE_TIER_1];
                         unit->GetMap()->SummonGameObject(GO_LEATHER_ALLIANCE_TIER_1, pos, 0.0f, 0.0f, 0.0f, 0.0f, 14 * DAY * MINUTE);
                     }
                 }
-                else if (!sWarEffort->IsBellowPercentGathered(material, team, 0.40f) && sWarEffort->IsBellowPercentGathered(material, team, 0.60f))
+                if (!sWarEffort->IsBellowPercentGathered(material, team, 0.40f) && sWarEffort->IsBellowPercentGathered(material, team, 0.60f))
                 {
-                    sWarEffort->RemoveNearbyObject(GO_LEATHER_ALLIANCE_TIER_1, unit);
-
                     if (!unit->FindNearestGameObject(GO_LEATHER_ALLIANCE_TIER_2, 50.0f))
                     {
-                        Position pos = WarEffortGameobjectPositions[GO_LEATHER_ALLIANCE_TIER_1];
+                        LOG_INFO("server.server", "WarEffort: Started stage 2 - Alliance - Leather");
+                        Position pos = WarEffortGameobjectPositions[GO_LEATHER_ALLIANCE_TIER_2];
                         unit->GetMap()->SummonGameObject(GO_LEATHER_ALLIANCE_TIER_2, pos, 0.0f, 0.0f, 0.0f, 0.0f, 14 * DAY * MINUTE);
                     }
                 }
-                else if (!sWarEffort->IsBellowPercentGathered(material, team, 0.60f) && sWarEffort->IsBellowPercentGathered(material, team, 0.80))
+                if (!sWarEffort->IsBellowPercentGathered(material, team, 0.60f) && sWarEffort->IsBellowPercentGathered(material, team, 0.80f))
                 {
-                    sWarEffort->RemoveNearbyObject(GO_LEATHER_ALLIANCE_TIER_2, unit);
-
                     if (!unit->FindNearestGameObject(GO_LEATHER_ALLIANCE_TIER_3, 50.0f))
                     {
-                        Position pos = WarEffortGameobjectPositions[GO_LEATHER_ALLIANCE_TIER_1];
+                        LOG_INFO("server.server", "WarEffort: Started stage 3 - Alliance - Leather");
+                        Position pos = WarEffortGameobjectPositions[GO_LEATHER_ALLIANCE_TIER_3];
                         unit->GetMap()->SummonGameObject(GO_LEATHER_ALLIANCE_TIER_3, pos, 0.0f, 0.0f, 0.0f, 0.0f, 14 * DAY * MINUTE);
                     }
                 }
-                else if (!sWarEffort->IsBellowPercentGathered(material, team, 0.80) && sWarEffort->IsBellowPercentGathered(material, team, 1.0f))
+                if (!sWarEffort->IsBellowPercentGathered(material, team, 0.80f) && sWarEffort->IsBellowPercentGathered(material, team, 1.0f))
                 {
-                    sWarEffort->RemoveNearbyObject(GO_LEATHER_ALLIANCE_TIER_3, unit);
-
                     if (!unit->FindNearestGameObject(GO_LEATHER_ALLIANCE_TIER_4, 50.0f))
                     {
-                        Position pos = WarEffortGameobjectPositions[GO_LEATHER_ALLIANCE_TIER_1];
+                        LOG_INFO("server.server", "WarEffort: Started stage 4 - Alliance - Leather");
+                        Position pos = WarEffortGameobjectPositions[GO_LEATHER_ALLIANCE_TIER_4];
                         unit->GetMap()->SummonGameObject(GO_LEATHER_ALLIANCE_TIER_4, pos, 0.0f, 0.0f, 0.0f, 0.0f, 14 * DAY * MINUTE);
                     }
                 }
-                else
+                if (!sWarEffort->IsBellowPercentGathered(material, team, 1.0f))
                 {
-                    sWarEffort->RemoveNearbyObject(GO_LEATHER_ALLIANCE_TIER_4, unit);
-
                     if (!unit->FindNearestGameObject(GO_LEATHER_ALLIANCE_TIER_5, 50.0f))
                     {
-                        Position pos = WarEffortGameobjectPositions[GO_LEATHER_ALLIANCE_TIER_1];
+                        LOG_INFO("server.server", "WarEffort: Started stage 5 - Alliance - Leather");
+                        Position pos = WarEffortGameobjectPositions[GO_LEATHER_ALLIANCE_TIER_5];
                         unit->GetMap()->SummonGameObject(GO_LEATHER_ALLIANCE_TIER_5, pos, 0.0f, 0.0f, 0.0f, 0.0f, 14 * DAY * MINUTE);
                     }
                 }
@@ -795,52 +785,47 @@ void WarEffort::CheckGoal(Unit* unit, uint8 material, uint8 team)
 
                 if (!sWarEffort->IsBellowPercentGathered(material, team, 0.20f) && sWarEffort->IsBellowPercentGathered(material, team, 0.40f))
                 {
-                    sWarEffort->RemoveNearbyObject(GO_METAL_HORDE_INITIAL, unit);
-
                     if (!unit->FindNearestGameObject(GO_LEATHER_HORDE_TIER_1, 50.0f))
                     {
-                        Position pos = WarEffortGameobjectPositions[GO_LEATHER_HORDE_INITIAL];
-                        //unit->GetMap()->SummonGameObject(GO_LEATHER_HORDE_TIER_1, pos.GetPositionX(), pos.GetPositionY(), pos.GetPositionZ(), pos.GetOrientation(), 0.0f, 0.0f, 0.0f, 0.0f, 14 * DAY * MINUTE);
+                        LOG_INFO("server.server", "WarEffort: Started stage 1 - Horde - Leather");
+                        Position pos = WarEffortGameobjectPositions[GO_LEATHER_HORDE_TIER_1];
+                        unit->GetMap()->SummonGameObject(GO_LEATHER_HORDE_TIER_1, pos, 0.0f, 0.0f, 0.0f, 0.0f, 14 * DAY * MINUTE);
                     }
                 }
-                else if (!sWarEffort->IsBellowPercentGathered(material, team, 0.40f) && sWarEffort->IsBellowPercentGathered(material, team, 0.60f))
+                if (!sWarEffort->IsBellowPercentGathered(material, team, 0.40f) && sWarEffort->IsBellowPercentGathered(material, team, 0.60f))
                 {
-                    sWarEffort->RemoveNearbyObject(GO_METAL_HORDE_INITIAL, unit);
-
                     if (!unit->FindNearestGameObject(GO_LEATHER_HORDE_TIER_2, 50.0f))
                     {
-                        Position pos = WarEffortGameobjectPositions[GO_LEATHER_HORDE_INITIAL];
-                       // unit->GetMap()->SummonGameObject(GO_LEATHER_HORDE_TIER_2, pos.GetPositionX(), pos.GetPositionY(), pos.GetPositionZ(), pos.GetOrientation(), 0.0f, 0.0f, 0.0f, 0.0f, 14 * DAY * MINUTE);
+                        LOG_INFO("server.server", "WarEffort: Started stage 2 - Horde - Leather");
+                        Position pos = WarEffortGameobjectPositions[GO_LEATHER_HORDE_TIER_2];
+                        unit->GetMap()->SummonGameObject(GO_LEATHER_HORDE_TIER_2, pos, 0.0f, 0.0f, 0.0f, 0.0f, 14 * DAY * MINUTE);
                     }
                 }
-                else if (!sWarEffort->IsBellowPercentGathered(material, team, 0.60f) && sWarEffort->IsBellowPercentGathered(material, team, 0.80))
+                if (!sWarEffort->IsBellowPercentGathered(material, team, 0.60f) && sWarEffort->IsBellowPercentGathered(material, team, 0.80f))
                 {
-                    sWarEffort->RemoveNearbyObject(GO_LEATHER_HORDE_TIER_2, unit);
-
                     if (!unit->FindNearestGameObject(GO_LEATHER_HORDE_TIER_3, 50.0f))
                     {
-                        Position pos = WarEffortGameobjectPositions[GO_LEATHER_HORDE_INITIAL];
-                        //unit->GetMap()->SummonGameObject(GO_LEATHER_HORDE_TIER_3, pos.GetPositionX(), pos.GetPositionY(), pos.GetPositionZ(), pos.GetOrientation(), 0.0f, 0.0f, 0.0f, 0.0f, 14 * DAY * MINUTE);
+                        LOG_INFO("server.server", "WarEffort: Started stage 3 - Horde - Leather");
+                        Position pos = WarEffortGameobjectPositions[GO_LEATHER_HORDE_TIER_3];
+                        unit->GetMap()->SummonGameObject(GO_LEATHER_HORDE_TIER_3, pos, 0.0f, 0.0f, 0.0f, 0.0f, 14 * DAY * MINUTE);
                     }
                 }
-                else if (!sWarEffort->IsBellowPercentGathered(material, team, 0.80f) && sWarEffort->IsBellowPercentGathered(material, team, 1.0f))
+                if (!sWarEffort->IsBellowPercentGathered(material, team, 0.80f) && sWarEffort->IsBellowPercentGathered(material, team, 1.0f))
                 {
-                    sWarEffort->RemoveNearbyObject(GO_LEATHER_HORDE_TIER_3, unit);
-
                     if (!unit->FindNearestGameObject(GO_LEATHER_HORDE_TIER_4, 50.0f))
                     {
-                        Position pos = WarEffortGameobjectPositions[GO_LEATHER_HORDE_INITIAL];
-                        //unit->GetMap()->SummonGameObject(GO_LEATHER_HORDE_TIER_4, pos.GetPositionX(), pos.GetPositionY(), pos.GetPositionZ(), pos.GetOrientation(), 0.0f, 0.0f, 0.0f, 0.0f, 14 * DAY * MINUTE);
+                        LOG_INFO("server.server", "WarEffort: Started stage 4 - Horde - Leather");
+                        Position pos = WarEffortGameobjectPositions[GO_LEATHER_HORDE_TIER_4];
+                        unit->GetMap()->SummonGameObject(GO_LEATHER_HORDE_TIER_4, pos, 0.0f, 0.0f, 0.0f, 0.0f, 14 * DAY * MINUTE);
                     }
                 }
-                else
+                if (!sWarEffort->IsBellowPercentGathered(material, team, 1.0f))
                 {
-                    sWarEffort->RemoveNearbyObject(GO_LEATHER_HORDE_TIER_4, unit);
-
                     if (!unit->FindNearestGameObject(GO_LEATHER_HORDE_TIER_5, 50.0f))
                     {
-                        Position pos = WarEffortGameobjectPositions[GO_LEATHER_HORDE_INITIAL];
-                       // unit->GetMap()->SummonGameObject(GO_LEATHER_HORDE_TIER_5, pos.GetPositionX(), pos.GetPositionY(), pos.GetPositionZ(), pos.GetOrientation(), 0.0f, 0.0f, 0.0f, 0.0f, 14 * DAY * MINUTE);
+                        LOG_INFO("server.server", "WarEffort: Started stage 5 - Horde - Leather");
+                        Position pos = WarEffortGameobjectPositions[GO_LEATHER_HORDE_TIER_5];
+                        unit->GetMap()->SummonGameObject(GO_LEATHER_HORDE_TIER_5, pos, 0.0f, 0.0f, 0.0f, 0.0f, 14 * DAY * MINUTE);
                     }
                 }
             }

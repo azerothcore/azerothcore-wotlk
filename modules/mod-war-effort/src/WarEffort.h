@@ -223,45 +223,45 @@ enum GoAccessories
 
 std::map<uint32, Position> WarEffortGameobjectPositions =
 {
-    { GO_BANDAGES_HORDE_INITIAL, Position(1582.97f, -4112.28f, 34.0149f, 3.38216f) },
-    { GO_HERBS_HORDE_INITIAL, Position(1633.08f, -4140.41f, 34.3886f, 3.79286f) },
-    { GO_LEATHER_HORDE_INITIAL, Position(1588.53f, -4173.9f, 39.2266f, 3.90826f) },
-    { GO_METAL_HORDE_INITIAL, Position(1682.33f, -4136.71f, 40.8444f, 3.4547f) },
-    { GO_FOOD_HORDE_INITIAL, Position(1623.2f, -4094.17f, 35.3933f, 3.9846f) },
+    { GO_BANDAGES_HORDE_INITIAL, Position(1582.97f, -4112.28f, 34.0149f, 3.38216f) }, // Done
+    { GO_HERBS_HORDE_INITIAL, Position(1633.08f, -4140.41f, 34.3886f, 3.79286f) }, // Done
+    { GO_LEATHER_HORDE_INITIAL, Position(1588.53f, -4173.9f, 39.2266f, 3.90826f) }, // Done
+    { GO_METAL_HORDE_INITIAL, Position(1682.33f, -4136.71f, 40.8444f, 3.4547f) }, // Done
+    { GO_FOOD_HORDE_INITIAL, Position(1623.2f, -4094.17f, 34.39212f, 3.9846f) }, // Done
+// Done
+    { GO_FOOD_HORDE_TIER_1, Position(1623.2f, -4094.17f, 34.39212f, 3.9846f) },
+    { GO_FOOD_HORDE_TIER_2, Position(1623.2f, -4094.17f, 34.39212f, 3.9846f) },
+    { GO_FOOD_HORDE_TIER_3, Position(1623.2f, -4094.17f, 34.39212f, 3.9846f) },
+    { GO_FOOD_HORDE_TIER_4, Position(1623.2f, -4094.17f, 34.39212f, 3.9846f) },
+    { GO_FOOD_HORDE_TIER_5, Position(1623.2f, -4094.17f, 34.39212f, 3.9846f) },
 
-    { GO_FOOD_HORDE_TIER_1, Position(1630.44f, -4073.68f, 36.0707f, 2.77926f) },
-    { GO_FOOD_HORDE_TIER_2, Position(1626.65f, -4086.06f, 32.1115f, 3.51757f) },
-    { GO_FOOD_HORDE_TIER_3, Position(1632.56f, -4074.87f, 36.1896f, 2.96728f) },
-    { GO_FOOD_HORDE_TIER_4, Position(1629.21f, -4080.47f, 32.6781f, 3.49859f) },
-    { GO_FOOD_HORDE_TIER_5, Position(1626.37f, -4085.38f, 30.0f, 3.9f) },
+// Done
+    { GO_BANDAGES_HORDE_TIER_1, Position(1582.97f, -4112.28f, 34.0149f, 3.38216f) },
+    { GO_BANDAGES_HORDE_TIER_2, Position(1582.97f, -4112.28f, 34.0149f, 3.38216f) },
+    { GO_BANDAGES_HORDE_TIER_3, Position(1582.97f, -4112.28f, 34.0149f, 3.38216f) },
+    { GO_BANDAGES_HORDE_TIER_4, Position(1582.97f, -4112.28f, 34.0149f, 3.38216f) },
+    { GO_BANDAGES_HORDE_TIER_5, Position(1582.97f, -4112.28f, 34.0149f, 3.38216f) },
 
-// NO COORDS YET
-    { GO_BANDAGES_HORDE_TIER_1, Position(1630.44f, -4073.68f, 36.0707f, 2.77926f) },
-    { GO_BANDAGES_HORDE_TIER_2, Position(1626.65f, -4086.06f, 32.1115f, 3.51757f) },
-    { GO_BANDAGES_HORDE_TIER_3, Position(1632.56f, -4074.87f, 36.1896f, 2.96728f) },
-    { GO_BANDAGES_HORDE_TIER_4, Position(1629.21f, -4080.47f, 32.6781f, 3.49859f) },
-    { GO_BANDAGES_HORDE_TIER_5, Position(1626.37f, -4085.38f, 30.0f, 3.9f) },
+// Done
+    { GO_LEATHER_HORDE_TIER_1, Position(1588.53f, -4173.9f, 39.2266f, 3.90826f) },
+    { GO_LEATHER_HORDE_TIER_2, Position(1588.53f, -4173.9f, 39.2266f, 3.90826f) },
+    { GO_LEATHER_HORDE_TIER_3, Position(1588.53f, -4173.9f, 39.2266f, 3.90826f) },
+    { GO_LEATHER_HORDE_TIER_4, Position(1588.53f, -4173.9f, 39.2266f, 3.90826f) },
+    { GO_LEATHER_HORDE_TIER_5, Position(1588.53f, -4173.9f, 39.2266f, 3.90826f) },
 
-// NO COORDS YET
-    { GO_LEATHER_HORDE_TIER_1, Position(1630.44f, -4073.68f, 36.0707f, 2.77926f) },
-    { GO_LEATHER_HORDE_TIER_2, Position(1626.65f, -4086.06f, 32.1115f, 3.51757f) },
-    { GO_LEATHER_HORDE_TIER_3, Position(1632.56f, -4074.87f, 36.1896f, 2.96728f) },
-    { GO_LEATHER_HORDE_TIER_4, Position(1629.21f, -4080.47f, 32.6781f, 3.49859f) },
-    { GO_LEATHER_HORDE_TIER_5, Position(1626.37f, -4085.38f, 30.0f, 3.9f) },
+// Done
+    { GO_METAL_HORDE_TIER_1, Position(1682.33f, -4136.71f, 40.8444f, 3.4547f) },
+    { GO_METAL_HORDE_TIER_2, Position(1682.33f, -4136.71f, 40.8444f, 3.4547f) },
+    { GO_METAL_HORDE_TIER_3, Position(1682.33f, -4136.71f, 40.8444f, 3.4547f) },
+    { GO_METAL_HORDE_TIER_4, Position(1682.33f, -4136.71f, 40.8444f, 3.4547f) },
+    { GO_METAL_HORDE_TIER_5, Position(1682.33f, -4136.71f, 40.8444f, 3.4547f) },
 
-// NO COORDS YET
-    { GO_METAL_HORDE_TIER_1, Position(1630.44f, -4073.68f, 36.0707f, 2.77926f) },
-    { GO_METAL_HORDE_TIER_2, Position(1626.65f, -4086.06f, 32.1115f, 3.51757f) },
-    { GO_METAL_HORDE_TIER_3, Position(1632.56f, -4074.87f, 36.1896f, 2.96728f) },
-    { GO_METAL_HORDE_TIER_4, Position(1629.21f, -4080.47f, 32.6781f, 3.49859f) },
-    { GO_METAL_HORDE_TIER_5, Position(1626.37f, -4085.38f, 30.0f, 3.9f) },
-
-// NO COORDS YET
-    { GO_HERBS_HORDE_TIER_1, Position(1630.44f, -4073.68f, 36.0707f, 2.77926f) },
-    { GO_HERBS_HORDE_TIER_2, Position(1626.65f, -4086.06f, 32.1115f, 3.51757f) },
-    { GO_HERBS_HORDE_TIER_3, Position(1632.56f, -4074.87f, 36.1896f, 2.96728f) },
-    { GO_HERBS_HORDE_TIER_4, Position(1629.21f, -4080.47f, 32.6781f, 3.49859f) },
-    { GO_HERBS_HORDE_TIER_5, Position(1626.37f, -4085.38f, 30.0f, 3.9f) },
+// Done
+    { GO_HERBS_HORDE_TIER_1, Position(1633.08f, -4140.41f, 34.3886f, 3.79286f) },
+    { GO_HERBS_HORDE_TIER_2, Position(1633.08f, -4140.41f, 34.3886f, 3.79286f) },
+    { GO_HERBS_HORDE_TIER_3, Position(1633.08f, -4140.41f, 34.3886f, 3.79286f) },
+    { GO_HERBS_HORDE_TIER_4, Position(1633.08f, -4140.41f, 34.3886f, 3.79286f) },
+    { GO_HERBS_HORDE_TIER_5, Position(1633.08f, -4140.41f, 34.3886f, 3.79286f) },
 
 // DONE
     { GO_HERBS_FOOD_ALLIANCE_INITIAL, Position(-4937.29f, -1282.74f, 501.672f, 2.26893f) },
@@ -269,12 +269,12 @@ std::map<uint32, Position> WarEffortGameobjectPositions =
     { GO_METAL_ALLIANCE_INITIAL, Position(-4913.85f, -1226.0f, 501.651f, 2.25148f) },
     { GO_BANDAGES_ALLIANCE_INITIAL, Position(-4971.55f, -1148.57f, 501.648f, 2.28638f) },
 
-// Some Done
+// Done
     { GO_HERBS_ALLIANCE_TIER_1, Position(-4935.336f, -1283.7869f, 501.6703f, 2.28856f) }, // Done
     { GO_FOOD_ALLIANCE_TIER_1, Position(-4937.29f, -1282.74f, 501.672f, 2.26893f) }, // Done
     { GO_LEATHER_ALLIANCE_TIER_1, Position(-4958.51f, -1179.32f, 501.659f, 2.26893f) }, // Done
     { GO_METAL_ALLIANCE_TIER_1, Position(-4935.336f, -1283.7869f, 501.6703f, 2.28856f) }, // Done
-    { GO_BANDAGES_ALLIANCE_TIER_1, Position(-4985.06f, -1140.51f, 501.659f, 4.10423f) },
+    { GO_BANDAGES_ALLIANCE_TIER_1, Position(-4968.334f, -1152.9038f, 501.9264f, 2.27140f) }, // Done
 
 // DONE
     { GO_FOOD_ALLIANCE_TIER_2, Position(-4935.336f, -1283.7869f, 501.6703f, 2.28856f) },
@@ -282,11 +282,11 @@ std::map<uint32, Position> WarEffortGameobjectPositions =
     { GO_FOOD_ALLIANCE_TIER_4, Position(-4935.336f, -1283.7869f, 501.6703f, 2.28856f) },
     { GO_FOOD_ALLIANCE_TIER_5, Position(-4935.336f, -1283.7869f, 501.6703f, 2.28856f) },
 
-// NO COORDS YET
-    { GO_BANDAGES_ALLIANCE_TIER_2, Position(1626.65f, -4086.06f, 32.1115f, 3.51757f) },
-    { GO_BANDAGES_ALLIANCE_TIER_3, Position(1632.56f, -4074.87f, 36.1896f, 2.96728f) },
-    { GO_BANDAGES_ALLIANCE_TIER_4, Position(1629.21f, -4080.47f, 32.6781f, 3.49859f) },
-    { GO_BANDAGES_ALLIANCE_TIER_5, Position(1626.37f, -4085.38f, 30.0f, 3.9f) },
+// Done (some Game object don't show anything so can't get Coords)
+    { GO_BANDAGES_ALLIANCE_TIER_2, Position(-4982.9277f, -1136.2239f, 501.6599f, 2.3f) }, //Game object doesn't show anything
+    { GO_BANDAGES_ALLIANCE_TIER_3, Position(-4982.9277f, -1136.2239f, 501.6599f, 2.3f) },
+    { GO_BANDAGES_ALLIANCE_TIER_4, Position(-4982.9277f, -1136.2239f, 501.6599f, 2.3f) }, //Game object doesn't show anything
+    { GO_BANDAGES_ALLIANCE_TIER_5, Position(-4982.9277f, -1136.2239f, 501.6599f, 2.3f) }, //Game object doesn't show anything
 
 // DONE
     { GO_LEATHER_ALLIANCE_TIER_2, Position(-4958.51f, -1179.32f, 501.659f, 2.26893f) },
