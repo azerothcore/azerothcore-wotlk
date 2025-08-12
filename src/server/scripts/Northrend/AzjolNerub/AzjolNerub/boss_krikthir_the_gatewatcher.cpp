@@ -136,6 +136,8 @@ public:
             BossAI::JustEngagedWith(who);
             Talk(SAY_AGGRO);
 
+            me->m_Events.KillAllEvents(false);
+
             scheduler.Schedule(8s, 14s, [&](TaskContext context)
             {
                 DoCastVictim(SPELL_MIND_FLAY);
