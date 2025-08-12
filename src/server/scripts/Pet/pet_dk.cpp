@@ -298,7 +298,7 @@ struct npc_pet_dk_army_of_the_dead : public CombatAI
         if (Unit* owner = summoner->ToUnit())
         {
             Unit* victim = owner->GetVictim();
-    
+
             if (victim && me->IsValidAttackTarget(victim))
             {
                 AttackStart(victim);
