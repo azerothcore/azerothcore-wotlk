@@ -4049,9 +4049,9 @@ void SmartScript::ProcessEvent(SmartScriptHolder& e, Unit* unit, uint32 var0, ui
     // A recursion protection
     if (g_smartScriptProcessing)
         return;
-    
+
     SmartScriptProcessorGuard guard;
-	
+
     if (!e.active && e.GetEventType() != SMART_EVENT_LINK)
         return;
 
