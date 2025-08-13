@@ -1,5 +1,5 @@
 -- Anub'ar Venomancer - Poison Bolt
-DELETE FROM `spell_custom_attr` WHERE `spell_id` = (53617);
+DELETE FROM `spell_custom_attr` WHERE `spell_id` = 53617;
 INSERT INTO `spell_custom_attr` (`spell_id`, `attributes`) VALUES (53617, 4194304);
 
 -- Anub'ar Venomancer - Poison Bolt(H)
