@@ -2344,7 +2344,7 @@ Rate.Reputation.RecruitAFriendBonus = 0.1
 
 #
 #    Rate.Reputation.Gain.BG
-#        Description: Reputation bonus rate for battlegrounds.
+#        Description: Reputation bonus rate for WSG, AB and AV battlegrounds.
 #                     This is applied IN ADDITION to the global Rate.Reputation.Gain.
 #        Default:     1
 

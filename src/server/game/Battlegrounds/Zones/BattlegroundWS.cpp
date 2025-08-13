@@ -427,7 +427,7 @@ void BattlegroundWS::HandleAreaTrigger(Player* player, uint32 trigger)
 bool BattlegroundWS::SetupBattleground()
 {
     // Get the custom BG reputation rate from the config file
-    float bgRepRate = sConfigMgr->GetFloat("Rate.Reputation.Gain.BG", 1.0f);
+    float bgRepRate = sWorld->getRate(RATE_REPUTATION_GAIN_BG);
 
     if (sBattlegroundMgr->IsBGWeekend(GetBgTypeID(true)))
     {
