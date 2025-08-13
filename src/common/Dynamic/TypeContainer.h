@@ -35,7 +35,6 @@
 template<class OBJECT>
 struct ContainerMapList
 {
-    //std::map<OBJECT_HANDLE, OBJECT *> _element;
     GridRefMgr<OBJECT> _element;
 };
 

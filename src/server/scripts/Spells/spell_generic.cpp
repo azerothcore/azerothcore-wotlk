@@ -1358,11 +1358,7 @@ class spell_gen_cannibalize : public SpellScript
         // search for nearby enemy corpse in range
         Acore::AnyDeadUnitSpellTargetInRangeCheck check(caster, max_range, GetSpellInfo(), TARGET_CHECK_CORPSE);
         Acore::WorldObjectSearcher<Acore::AnyDeadUnitSpellTargetInRangeCheck> searcher(caster, result, check);
-        Cell::VisitWorldObjects(caster, searcher, max_range);
-        if (!result)
-        {
-            Cell::VisitGridObjects(caster, searcher, max_range);
-        }
+        Cell::VisitObjects(caster, searcher, max_range);
         if (!result)
         {
             return SPELL_FAILED_NO_EDIBLE_CORPSES;
@@ -5363,7 +5359,7 @@ class spell_pet_intellect_spirit_resilience_scaling : public AuraScript
         DoEffectCalcAmount += AuraEffectCalcAmountFn(spell_pet_intellect_spirit_resilience_scaling::CalculateSpiritAmount, EFFECT_1,SPELL_AURA_MOD_STAT);
         // The resilience scaling is not used. The owner's resilience is used directly
         // DoEffectCalcAmount += AuraEffectCalcAmountFn(spell_pet_intellect_spirit_resilience_scaling::CalculateResilienceAmount, EFFECT_2, SPELL_AURA_MOD_RATING);
-        OnEffectApply += AuraEffectApplyFn(spell_pet_intellect_spirit_resilience_scaling::HandleEffectApply, EFFECT_ALL, SPELL_AURA_ANY, AURA_EFFECT_HANDLE_REAL);
+        OnEffectApply += AuraEffectApplyFn(spell_pet_intellect_spirit_resilience_scaling::HandleEffectApply, EFFECT_2, SPELL_AURA_ANY, AURA_EFFECT_HANDLE_REAL);
         DoEffectCalcPeriodic += AuraEffectCalcPeriodicFn(spell_pet_intellect_spirit_resilience_scaling::CalcPeriodic, EFFECT_ALL, SPELL_AURA_ANY);
         OnEffectPeriodic += AuraEffectPeriodicFn(spell_pet_intellect_spirit_resilience_scaling::HandlePeriodic, EFFECT_ALL, SPELL_AURA_ANY);
     }
