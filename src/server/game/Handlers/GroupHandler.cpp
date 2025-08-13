@@ -549,10 +549,8 @@ void WorldSession::HandleRandomRollOpcode(WorldPackets::Misc::RandomRollClient& 
     maximum = packet.Max;
 
     /** error handling **/
-    if (minimum > maximum || maximum > 10000) // < 32768 for urand call
-    {
+    if (minimum > maximum || maximum > 1000000) // Blizzlike clamp (Classic)
         return;
-    }
 
     GetPlayer()->DoRandomRoll(minimum, maximum);
 }
