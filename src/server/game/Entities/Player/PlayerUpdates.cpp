@@ -1601,13 +1601,13 @@ void Player::UpdateVisibilityForPlayer(bool mapChange)
     Acore::VisibleNotifier notifierNoLarge(
         *this, mapChange,
         false); // visit only objects which are not large; default distance
-    Cell::VisitAllObjects(m_seer, notifierNoLarge,
+    Cell::VisitObjects(m_seer, notifierNoLarge,
                           GetSightRange() + VISIBILITY_INC_FOR_GOBJECTS);
     notifierNoLarge.SendToSelf();
 
     Acore::VisibleNotifier notifierLarge(
         *this, mapChange, true); // visit only large objects; maximum distance
-    Cell::VisitAllObjects(m_seer, notifierLarge, GetSightRange());
+    Cell::VisitObjects(m_seer, notifierLarge, GetSightRange());
     notifierLarge.SendToSelf();
 
     if (mapChange)
@@ -1645,10 +1645,7 @@ template <>
 inline void UpdateVisibilityOf_helper(Player* player, GameObject* target,
                                       std::vector<Unit*>& /*v*/)
 {
-    // @HACK: This is to prevent objects like deeprun tram from disappearing
-    // when player moves far from its spawn point while riding it
-    if ((target->GetGOInfo()->type != GAMEOBJECT_TYPE_TRANSPORT))
-        player->GetObjectVisibilityContainer().LinkWorldObjectVisibility(target);
+    player->GetObjectVisibilityContainer().LinkWorldObjectVisibility(target);
 }
 
 template <>

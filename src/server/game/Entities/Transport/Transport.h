@@ -38,6 +38,8 @@ public:
     virtual void RemovePassenger(WorldObject* passenger, bool withAll = false) = 0;
     PassengerSet const& GetPassengers() const { return _passengers; }
 
+    virtual void DelayedUpdate(uint32 /*diff*/) {}
+
     uint32 GetPathProgress() const { return GetGOValue()->Transport.PathProgress; }
     void SetPathProgress(uint32 val) { m_goValue.Transport.PathProgress = val; }
 
@@ -57,7 +59,7 @@ public:
     void BuildUpdate(UpdateDataMapType& data_map) override;
 
     void Update(uint32 diff) override;
-    void DelayedUpdate(uint32 diff);
+    void DelayedUpdate(uint32 diff) override;
     void UpdatePosition(float x, float y, float z, float o);
 
     void AddPassenger(WorldObject* passenger, bool withAll = false) override;
@@ -115,6 +117,8 @@ public:
     StaticTransport();
     ~StaticTransport() override;
 
+    bool LoadFromDB(ObjectGuid::LowType guid, Map* map) override { return LoadGameObjectFromDB(guid, map, false); }
+    bool LoadGameObjectFromDB(ObjectGuid::LowType guid, Map* map, bool addToMap = true) override;
     bool Create(ObjectGuid::LowType guidlow, uint32 name_id, Map* map, uint32 phaseMask, float x, float y, float z, float ang, G3D::Quat const& rotation, uint32 animprogress, GOState go_state, uint32 artKit = 0) override;
     void CleanupsBeforeDelete(bool finalCleanup = true) override;
     void BuildUpdate(UpdateDataMapType& data_map) override;
