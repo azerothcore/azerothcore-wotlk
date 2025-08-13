@@ -145,19 +145,19 @@ public:
                     context.Repeat();
                 else
                     context.Repeat(5s, 9s);
-            }).Schedule(10s, 30s, [&](TaskContext context)
+            }).Schedule(10s, 13s, [&](TaskContext context)
             {
                 Talk(SAY_SWARM);
                 DoCastAOE(SPELL_SWARM);
 
                 if (!IsInFrenzy())
-                    context.Repeat();
+                    context.Repeat(26s, 30s);
                 else
                     context.Repeat(7s, 17s);
             });
 
             ScheduleTimedEvent(27s, 35s, [&] {
-                DoCastRandomTarget(SPELL_CURSE_OF_FATIGUE, 0, 100.0f, true, true);
+                DoCastRandomTarget(SPELL_CURSE_OF_FATIGUE);
             }, 27s, 35s);
 
             summons.DoZoneInCombat();
