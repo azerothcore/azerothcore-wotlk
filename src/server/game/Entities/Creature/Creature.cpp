@@ -269,7 +269,7 @@ bool TemporaryThreatModifierEvent::Execute(uint64 /*e_time*/, uint32 /*p_time*/)
     return true;
 }
 
-Creature::Creature(bool isWorldObject): Unit(isWorldObject), MovableMapObject(), m_groupLootTimer(0), lootingGroupLowGUID(0), m_lootRecipientGroup(0),
+Creature::Creature(): Unit(), MovableMapObject(), m_groupLootTimer(0), lootingGroupLowGUID(0), m_lootRecipientGroup(0),
     m_corpseRemoveTime(0), m_respawnTime(0), m_respawnDelay(300), m_corpseDelay(60), m_wanderDistance(0.0f), m_boundaryCheckTime(2500),
     m_transportCheckTimer(1000), lootPickPocketRestoreTime(0), m_combatPulseTime(0), m_combatPulseDelay(0), m_reactState(REACT_AGGRESSIVE), m_defaultMovementType(IDLE_MOTION_TYPE),
     m_spawnId(0), m_equipmentId(0), m_originalEquipmentId(0), m_AlreadyCallAssistance(false),
@@ -296,7 +296,6 @@ Creature::Creature(bool isWorldObject): Unit(isWorldObject), MovableMapObject(),
 
     ResetLootMode(); // restore default loot mode
     TriggerJustRespawned = false;
-    m_isTempWorldObject = false;
     _focusSpell = nullptr;
 
     m_respawnedTime = time_t(0);
@@ -372,7 +371,7 @@ void Creature::RemoveFromWorld()
 
 void Creature::DisappearAndDie()
 {
-    DestroyForNearbyPlayers();
+    DestroyForVisiblePlayers();
     //SetVisibility(VISIBILITY_OFF);
     //ObjectAccessor::UpdateObjectVisibility(this);
     if (IsAlive())
@@ -409,7 +408,7 @@ void Creature::RemoveCorpse(bool setSpawnTime, bool skipVisibility)
     setDeathState(DeathState::Dead);
     RemoveAllAuras();
     if (!skipVisibility) // pussywizard
-        DestroyForNearbyPlayers(); // pussywizard: previous UpdateObjectVisibility()
+        DestroyForVisiblePlayers(); // pussywizard: previous UpdateObjectVisibility()
     loot.clear();
     uint32 respawnDelay = m_respawnDelay;
     if (IsAIEnabled)
@@ -802,7 +801,7 @@ void Creature::Update(uint32 diff)
                 // Periodically check if able to move, if not, extend leash timer
                 if (diff >= m_extendLeashTime)
                 {
-                    if (!CanFreeMove())
+                    if (HasUnitState(UNIT_STATE_LOST_CONTROL))
                         UpdateLeashExtensionTime();
                     m_extendLeashTime = EXTEND_LEASH_CHECK_INTERVAL;
                 }
@@ -1080,7 +1079,7 @@ void Creature::DoFleeToGetAssistance()
         Acore::NearestAssistCreatureInCreatureRangeCheck u_check(this, GetVictim(), radius);
         Acore::CreatureLastSearcher<Acore::NearestAssistCreatureInCreatureRangeCheck> searcher(this, creature, u_check);
 
-        Cell::VisitGridObjects(this, searcher, radius);
+        Cell::VisitObjects(this, searcher, radius);
 
         SetNoSearchAssistance(true);
         UpdateSpeed(MOVE_RUN, false);
@@ -2401,7 +2400,7 @@ Unit* Creature::SelectNearestTarget(float dist, bool playerOnly /* = false */) c
 
     Acore::NearestHostileUnitCheck u_check(this, dist, playerOnly);
     Acore::UnitLastSearcher<Acore::NearestHostileUnitCheck> searcher(this, target, u_check);
-    Cell::VisitAllObjects(this, searcher, dist);
+    Cell::VisitObjects(this, searcher, dist);
     return target;
 }
 
@@ -2418,7 +2417,7 @@ Unit* Creature::SelectNearestTargetInAttackDistance(float dist) const
     Unit* target = nullptr;
     Acore::NearestHostileUnitInAttackDistanceCheck u_check(this, dist);
     Acore::UnitLastSearcher<Acore::NearestHostileUnitInAttackDistanceCheck> searcher(this, target, u_check);
-    Cell::VisitAllObjects(this, searcher, std::max(dist, ATTACK_DISTANCE));
+    Cell::VisitObjects(this, searcher, std::max(dist, ATTACK_DISTANCE));
 
     return target;
 }
@@ -2454,7 +2453,7 @@ void Creature::CallAssistance(Unit* target /*= nullptr*/)
 
             Acore::AnyAssistCreatureInRangeCheck u_check(this, target, radius);
             Acore::CreatureListSearcher<Acore::AnyAssistCreatureInRangeCheck> searcher(this, assistList, u_check);
-            Cell::VisitGridObjects(this, searcher, radius);
+            Cell::VisitObjects(this, searcher, radius);
 
             if (!assistList.empty())
             {
@@ -2490,7 +2489,7 @@ void Creature::CallForHelp(float radius, Unit* target /*= nullptr*/)
 
     Acore::CallOfHelpCreatureInRangeDo u_do(this, target, radius);
     Acore::CreatureWorker<Acore::CallOfHelpCreatureInRangeDo> worker(this, u_do);
-    Cell::VisitGridObjects(this, worker, radius);
+    Cell::VisitObjects(this, worker, radius);
 }
 
 bool Creature::CanAssistTo(Unit const* u, Unit const* enemy, bool checkfaction /*= true*/) const
@@ -2684,14 +2683,13 @@ bool Creature::CanCreatureAttack(Unit const* victim, bool skipDistCheck) const
     if (skipDistCheck)
         return true;
 
-    float dist = sWorld->getFloatConfig(CONFIG_CREATURE_LEASH_RADIUS);
-
-    if (GetCharmerOrOwner())
+    if (Unit* unit = GetCharmerOrOwner())
     {
-        dist = std::min<float>(GetMap()->GetVisibilityRange() + GetObjectSize() * 2, 150.0f);
-        return IsWithinDist(victim, dist);
+        float visibilityDist = std::min<float>(GetMap()->GetVisibilityRange() + GetObjectSize() * 2, DEFAULT_VISIBILITY_DISTANCE);
+        return victim->IsWithinDist(unit, visibilityDist);
     }
 
+    float dist = sWorld->getFloatConfig(CONFIG_CREATURE_LEASH_RADIUS);
     if (!dist)
         return true;
 
@@ -3905,7 +3903,7 @@ bool Creature::IsUpdateNeeded()
     if (IsInCombat())
         return true;
 
-    if (IsVisibilityOverridden())
+    if (!GetObjectVisibilityContainer().GetVisiblePlayersMap().empty())
         return true;
 
     if (ToTempSummon())
