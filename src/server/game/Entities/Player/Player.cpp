@@ -3924,26 +3924,18 @@ TrainerSpellState Player::GetTrainerSpellState(TrainerSpell const* trainer_spell
     if (!trainer_spell)
         return TRAINER_SPELL_RED;
 
-    for (uint8 i = 0; i < MAX_SPELL_EFFECTS; ++i)
-    {
-        if (!trainer_spell->learnedSpell[i])
-            continue;
-
-        if (uint32 firstRankSpell = sSpellMgr->GetFirstSpellInChain(trainer_spell->learnedSpell[i]))
-        {
-            for (uint32 spellId = firstRankSpell; spellId; spellId = sSpellMgr->GetNextSpellInChain(spellId))
-            {
-                if (HasSpell(spellId))
-                    return TRAINER_SPELL_GRAY;
-            }
-        }
-    }
-
     bool hasSpell = true;
     for (uint8 i = 0; i < MAX_SPELL_EFFECTS; ++i)
     {
         if (!trainer_spell->learnedSpell[i])
             continue;
+
+        uint32 firstRankSpell = sSpellMgr->GetFirstSpellInChain(trainer_spell->learnedSpell[i]);
+        for (uint32 spellId = firstRankSpell; spellId; spellId = sSpellMgr->GetNextSpellInChain(spellId))
+        {
+            if (HasSpell(spellId))
+                continue;
+        }
 
         if (!HasSpell(trainer_spell->learnedSpell[i]))
         {
@@ -3951,6 +3943,7 @@ TrainerSpellState Player::GetTrainerSpellState(TrainerSpell const* trainer_spell
             break;
         }
     }
+
     // known spell
     if (hasSpell)
         return TRAINER_SPELL_GRAY;
