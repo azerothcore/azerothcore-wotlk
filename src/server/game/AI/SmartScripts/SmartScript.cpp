@@ -43,6 +43,15 @@
 //  see: https://github.com/azerothcore/azerothcore-wotlk/issues/9766
 #include "GridNotifiersImpl.h"
 
+// Definition of some variables / structs for the recursion railguard
+thread_local bool g_smartScriptProcessing = false;
+
+struct SmartScriptProcessorGuard
+{
+    SmartScriptProcessorGuard() { g_smartScriptProcessing = true; }
+    ~SmartScriptProcessorGuard() { g_smartScriptProcessing = false; }
+};
+
 SmartScript::SmartScript()
 {
     go = nullptr;
@@ -4037,6 +4046,12 @@ void SmartScript::GetWorldObjectsInDist(ObjectVector& targets, float dist) const
 
 void SmartScript::ProcessEvent(SmartScriptHolder& e, Unit* unit, uint32 var0, uint32 var1, bool bvar, SpellInfo const* spell, GameObject* gob)
 {
+	// A recursion protection
+	if (g_smartScriptProcessing)
+        return;
+
+    SmartScriptProcessorGuard guard;
+	
     if (!e.active && e.GetEventType() != SMART_EVENT_LINK)
         return;
 

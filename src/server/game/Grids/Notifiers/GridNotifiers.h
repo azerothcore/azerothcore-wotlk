@@ -1141,6 +1141,10 @@ namespace Acore
         {}
         void operator()(Creature* u)
         {
+			// Prevents Chain Reactions to mobs - causing a cascade error
+			if (u->IsInCombat())
+				return;
+			
             if (u == i_funit)
                 return;
 
