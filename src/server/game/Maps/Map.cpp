@@ -650,7 +650,7 @@ template<class T>
 void Map::RemoveFromMap(T* obj, bool remove)
 {
     obj->RemoveFromWorld();
-	
+
     // This should prevent double removals and therefore crashes under heavy-load
     if (!obj->IsInGrid())
         return;

@@ -4046,10 +4046,10 @@ void SmartScript::GetWorldObjectsInDist(ObjectVector& targets, float dist) const
 
 void SmartScript::ProcessEvent(SmartScriptHolder& e, Unit* unit, uint32 var0, uint32 var1, bool bvar, SpellInfo const* spell, GameObject* gob)
 {
-	// A recursion protection
-	if (g_smartScriptProcessing)
+    // A recursion protection
+    if (g_smartScriptProcessing)
         return;
-
+    
     SmartScriptProcessorGuard guard;
 	
     if (!e.active && e.GetEventType() != SMART_EVENT_LINK)
