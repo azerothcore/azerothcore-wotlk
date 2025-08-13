@@ -48,7 +48,8 @@ enum Yells
 
 enum MiscActions
 {
-    ACTION_MINION_ENGAGED               = 1
+    ACTION_MINION_ENGAGED               = 1,
+    GROUP_SWARM                         = 1
 };
 
 class boss_krik_thir : public CreatureScript
@@ -86,6 +87,15 @@ public:
 
             ScheduleHealthCheckEvent(25, [&] {
                 DoCastSelf(SPELL_FRENZY, true);
+
+                scheduler.CancelGroup(GROUP_SWARM);
+
+                scheduler.Schedule(7s, 17s, GROUP_SWARM, [&](TaskContext context)
+                {
+                    Talk(SAY_SWARM);
+                    DoCastAOE(SPELL_SWARM);
+                    context.Repeat(20s);
+                });
             });
 
             _canTalk = true;
@@ -145,15 +155,11 @@ public:
                     context.Repeat();
                 else
                     context.Repeat(5s, 9s);
-            }).Schedule(10s, 13s, [&](TaskContext context)
+            }).Schedule(10s, 13s, GROUP_SWARM, [&](TaskContext context)
             {
                 Talk(SAY_SWARM);
                 DoCastAOE(SPELL_SWARM);
-
-                if (!IsInFrenzy())
-                    context.Repeat(26s, 30s);
-                else
-                    context.Repeat(7s, 17s);
+                context.Repeat(26s, 30s);
             });
 
             ScheduleTimedEvent(27s, 35s, [&] {
