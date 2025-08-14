@@ -152,7 +152,7 @@ public:
             {
                 DoCastVictim(SPELL_MIND_FLAY);
                 if (!IsInFrenzy())
-                    context.Repeat();
+                    context.Repeat(8s, 14s);
                 else
                     context.Repeat(5s, 9s);
             }).Schedule(10s, 13s, GROUP_SWARM, [&](TaskContext context)
