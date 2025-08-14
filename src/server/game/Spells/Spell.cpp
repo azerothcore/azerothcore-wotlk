@@ -2364,7 +2364,12 @@ void Spell::CleanupTargetList()
     m_UniqueTargetInfo.clear();
     m_UniqueGOTargetInfo.clear();
     m_UniqueItemInfo.clear();
-    m_targets.Clear();
+    m_targets.m_targetMask       = 0;
+    m_targets.m_objectTargetGUID = 0;
+    m_targets.m_itemTargetGUID   = 0;
+    m_targets.m_src              = WorldLocation();
+    m_targets.m_dst              = WorldLocation();
+    m_targets.m_strTarget.clear();
     m_delayMoment = 0;
     m_delayTrajectory = 0;
 }
