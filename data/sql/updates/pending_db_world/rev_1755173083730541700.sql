@@ -100,3 +100,16 @@ INSERT INTO `quest_template` (`ID`, `Flags`) VALUES (54321, @quest_flags);
 INSERT INTO `spell_proc` (`SpellID`, `ProcFlags`) VALUES (12345, (1<<5)|(1<<10));
 
 UPDATE `creature` SET `unit_flags` = 489;
+
+DELETE FROM `table_1` WHERE `entry` = 1000;
+DELETE FROM `table_1` WHERE `entry` = 2000;
+DELETE FROM `table_1` WHERE `entry` = 3000;
+
+
+INSERT INTO `table_1` VALUES (1000, ...);
+INSERT INTO `table_1` VALUES (2000, ...);
+INSERT INTO `table_1` VALUES (3000, ...);
+
+UPDATE `table_1` SET `field_1` = 'someValue' WHERE `entry` = 1000;
+UPDATE `table_1` SET `field_1` = 'someValue' WHERE `entry` = 2000;
+UPDATE `table_1` SET `field_1` = 'someValue' WHERE `entry` = 3000;
