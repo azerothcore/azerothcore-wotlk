@@ -59,6 +59,7 @@ UPDATE `test_table` SET `active` = 1 WHERE `id` = 1;
 UPDATE `test_table` SET `active` = 1 WHERE `id` = 2;
 UPDATE `test_table` SET `active` = 1 WHERE `id` = 3;
 
+-- bugged_cli?
 
 -- Multiple blank lines above (violation for blank lines check)
 
