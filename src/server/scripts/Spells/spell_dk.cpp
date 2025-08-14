@@ -328,26 +328,10 @@ class spell_dk_death_and_decay : public SpellScript
         SetHitDamage(damage);
     }
 
-    void HandleAfterCast()
-    {
-        if (Unit* caster = GetCaster())
-        {
-            // If it is still marked as an active generic spell, free up the slot
-            if (caster->GetCurrentSpell(CURRENT_GENERIC_SPELL) &&
-                caster->GetCurrentSpell(CURRENT_GENERIC_SPELL)->GetSpellInfo()->Id == 43265)
-            {
-                caster->InterruptSpell(CURRENT_GENERIC_SPELL, false); // Does not remove the aura on the ground
-            }
-        }
-    }
-
     void Register() override
     {
         if (m_scriptSpellId == SPELL_DK_DEATH_AND_DECAY_TRIGGER)
             OnHit += SpellHitFn(spell_dk_death_and_decay::RecalculateDamage);
-
-        if (m_scriptSpellId == 43265) // Death and Decay
-            AfterCast += SpellCastFn(spell_dk_death_and_decay::HandleAfterCast);
     }
 };
 
