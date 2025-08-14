@@ -2364,7 +2364,6 @@ void Spell::CleanupTargetList()
     m_UniqueTargetInfo.clear();
     m_UniqueGOTargetInfo.clear();
     m_UniqueItemInfo.clear();
-    m_targets.Clear();
     m_targets.SetUnitTarget(nullptr);
     m_targets.SetGOTarget(nullptr);
     m_targets.SetItemTarget(nullptr);
