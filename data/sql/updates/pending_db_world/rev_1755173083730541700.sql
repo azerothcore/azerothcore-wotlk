@@ -1,66 +1,41 @@
--- Test file designed to trigger ALL codestyle check failures
-USE azerothcore_world;
+-- testing purposes from https://github.com/azerothcore/azerothcore-wotlk/pull/22676/files
+-- Fix Heb''Drakkar Headhunter waypoints error in server console
+UPDATE `waypoint_data`
+SET `action` = 0
+WHERE `id` = 1133640 AND `point` = 3;
 
--- Multiple semicolons for SQL codestyle check
-INSERT INTO `test_table` VALUES (1);;
+DELETE FROM `smart_scripts`
+WHERE `entryorguid` = 28600 AND `source_type` = 0 AND `id` = 0;
+INSERT INTO `smart_scripts` (
+  `entryorguid`, `source_type`, `id`, `link`,
+  `event_type`, `event_param1`, `event_param2`, `event_param3`, `event_param4`,
+  `action_type`, `action_param1`, `action_param2`, `action_param3`,
+  `target_type`, `comment`
+) VALUES (
+  28600, 0, 0, 0,
+  40, 3, 0, 0, 0,        -- SMART_EVENT_WAYPOINT_REACHED, point 3
+  11, 52059, 0, 0,       -- SMART_ACTION_CAST, spell 52059
+  1, 'Heb''Drakkar Headhunter - WP3 - Cast 52059 on self'  -- SMART_TARGET_SELF
+);
 
--- Tab character instead of spaces for SQL codestyle check
-    UPDATE test_table SET value = 1;
+-- Joseph Wilson  waypoints error in server console
 
--- EntryOrGuid violation for SQL codestyle check  
-UPDATE `smart_scripts` SET EntryOrGuid = 123 WHERE id = 1;
+-- 1) Add a delay (4000 ms) at step 4
+UPDATE `waypoints`
+SET `delay` = 4000
+WHERE `entry` = 33589 AND `pointid` = 4;
 
--- broadcast_text violation for SQL codestyle check
-INSERT INTO `broadcast_text` (`ID`, `Text`) VALUES (1, 'test');
-
--- Missing backticks for backtick check
-SELECT entry FROM creature_template WHERE name = 'test';
-
--- Trailing whitespace (line below has spaces at end)    
-UPDATE `test_table` SET `value` = 1 WHERE `id` = 1;
-
--- INSERT without DELETE for safety check
-INSERT INTO `creature_template` (`entry`, `name`) VALUES (999999, 'Test Creature');
-
--- DELETE from protected table for safety check
-DELETE FROM `creature_template` WHERE `entry` = 999999;
-
--- REPLACE INTO statement for safety check
-REPLACE INTO `test_table` (`id`, `value`) VALUES (1, 100);
-
--- Invalid INSERT syntax for safety check
-INSERT  INTO`test_table` VALUES (1);
-
--- Invalid DELETE syntax for safety check  
-DELETE  FROM`test_table` WHERE id = 1;
-
--- Missing semicolon for semicolon check
-UPDATE `test_table` SET `value` = 2 WHERE `id` = 1
-
--- Non-InnoDB engine for engine check
-CREATE TABLE `test_engine` (
-    `id` INT PRIMARY KEY
-) ENGINE=MyISAM;
-
--- Bitwise mask violations for bitwise check
-UPDATE `creature` SET `npcflag` = 123 WHERE `guid` = 1;
-INSERT INTO `creature` (`guid`, `id`, `npcflag`) VALUES (1, 2, 456);
-
--- Multiple queries that could be consolidated for compact queries check
-DELETE FROM `test_table` WHERE `id` = 1;
-DELETE FROM `test_table` WHERE `id` = 2;
-DELETE FROM `test_table` WHERE `id` = 3;
-
-INSERT INTO `test_table` (`id`, `name`) VALUES (1, 'test1');
-INSERT INTO `test_table` (`id`, `name`) VALUES (2, 'test2');
-INSERT INTO `test_table` (`id`, `name`) VALUES (3, 'test3');
-
-UPDATE `test_table` SET `active` = 1 WHERE `id` = 1;
-UPDATE `test_table` SET `active` = 1 WHERE `id` = 2;
-UPDATE `test_table` SET `active` = 1 WHERE `id` = 3;
-
--- bugged_cli?
-
--- Multiple blank lines above (violation for blank lines check)
-
--- File ends without proper newline (will be violation for newline check)
+-- 2) Remove the redundant pause + the linked action
+DELETE FROM `smart_scripts`
+WHERE `source_type` = 0 AND `entryorguid` = 33589 AND `id` IN (2,3);
+-- 3) Recreate the orientation as a direct event on WP 4
+INSERT INTO `smart_scripts` (
+  `entryorguid`, `source_type`, `id`, `link`,
+  `event_type`, `event_param1`, `event_param2`, `event_param3`, `event_param4`,
+  `action_type`, `action_param1`, `action_param2`, `action_param3`,
+  `target_type`, `comment`
+) VALUES (
+  33589, 0, 2, 0,
+  40, 4, 0, 0, 0,             -- SMART_EVENT_WAYPOINT_REACHED, point 4
+  66, 3, 0, 0,                -- SMART_ACTION_SET_ORIENTATION, orientation 3
+  8, 'Joseph Wilson - On WP 4 Reached - Set Orientation 3');
