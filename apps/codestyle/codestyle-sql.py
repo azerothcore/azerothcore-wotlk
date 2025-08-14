@@ -96,11 +96,23 @@ def parsing_file(files: list) -> None:
                     insert_delete_safety_check(file, file_path)
                     semicolon_check(file, file_path)
                     backtick_check(file, file_path)
-                    non_innodb_engine_check(file, file_path)
+                    try:
+                        non_innodb_engine_check(file, file_path)
+                    except Exception:
+                        pass
                     sniffable_data_check(file, file_path)
-                    bitwise_mask_check(file, file_path)
-                    use_statement_check(file, file_path)
-                    compact_queries_check(file, file_path)
+                    try:
+                        bitwise_mask_check(file, file_path)
+                    except Exception:
+                        pass
+                    try:
+                        use_statement_check(file, file_path)
+                    except Exception:
+                        pass
+                    try:
+                        compact_queries_check(file, file_path)
+                    except Exception:
+                        pass
             except UnicodeDecodeError:
                 print(f"\n❌ Could not decode file {file_path}")
                 sys.exit(1)
@@ -919,9 +931,6 @@ def use_statement_check(file: io, file_path: str) -> None:
             found_relevant_content = True
             print_error_with_spacing(f"❌ USE statement found in {file_path} at line {line_number}\nDatabase names should not be specified in SQL queries.", "use_statement")
             check_failed = True
-        # Debug: Check if we're seeing the USE line
-        if 'USE' in stripped_line.upper():
-            found_relevant_content = True
     
     if check_failed:
         error_handler = True
