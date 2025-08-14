@@ -96,23 +96,11 @@ def parsing_file(files: list) -> None:
                     insert_delete_safety_check(file, file_path)
                     semicolon_check(file, file_path)
                     backtick_check(file, file_path)
-                    try:
-                        non_innodb_engine_check(file, file_path)
-                    except Exception:
-                        pass
+                    non_innodb_engine_check(file, file_path)
                     sniffable_data_check(file, file_path)
-                    try:
-                        bitwise_mask_check(file, file_path)
-                    except Exception:
-                        pass
-                    try:
-                        use_statement_check(file, file_path)
-                    except Exception:
-                        pass
-                    try:
-                        compact_queries_check(file, file_path)
-                    except Exception:
-                        pass
+                    bitwise_mask_check(file, file_path)
+                    use_statement_check(file, file_path)
+                    compact_queries_check(file, file_path)
             except UnicodeDecodeError:
                 print(f"\n❌ Could not decode file {file_path}")
                 sys.exit(1)
@@ -834,32 +822,33 @@ def bitwise_mask_check(file: io, file_path: str) -> None:
             
         # For updates
         update_match = re.match(r'UPDATE\s+`?([^`\s]+)`?\s+SET\s+(.*?)(?:\s+WHERE|$)', line.strip(), re.IGNORECASE)
-        if update_match:
+        if update_match and len(update_match.groups()) >= 2:
             table_name = update_match.group(1)
             set_clause = update_match.group(2)
             
-            if table_name in bitwise_columns:
+            if table_name and table_name in bitwise_columns and set_clause:
                 # Extract column=value pairs
                 column_assignments = re.findall(r'`?([^`\s=]+)`?\s*=\s*([^,]+)', set_clause)
                 
                 for column, value in column_assignments:
-                    if column in bitwise_columns[table_name]:
+                    if column and column in bitwise_columns[table_name] and value:
                         found_relevant_content = True
                         # Only checks for the value (numeric)
                         clean_value = value.strip().strip('"\'')
                         
-                        # Check for bitmask operation is valid or not
-                        if re.match(r'^\d+$', clean_value):
-                            print_error_with_spacing(f"❌ Non-bitwise value '{clean_value}' used for mask column `{column}` in table `{table_name}`. Use bitwise operators instead. {file_path} at line {line_number}", "bitwise")
-                            check_failed = True
-                        
-                        # good patterns for bitwise
-                        elif not re.search(r'[|&^~]|<<|>>', clean_value):
-                            # If it doesn't contain bitwise operators and it's not 0 or NULL, it's likely wrong
-                            if clean_value not in ['0', 'NULL', 'null']:
-                                if not re.match(r'^[@`]|^\w+\(', clean_value):
-                                    print_error_with_spacing(f"❌ Value '{clean_value}' for mask column `{column}` in table `{table_name}` should use bitwise operators. {file_path} at line {line_number}", "bitwise")
-                                    check_failed = True
+                        if clean_value:  # Only process non-empty values
+                            # Check for bitmask operation is valid or not
+                            if re.match(r'^\d+$', clean_value):
+                                print_error_with_spacing(f"❌ Non-bitwise value '{clean_value}' used for mask column `{column}` in table `{table_name}`. Use bitwise operators instead. {file_path} at line {line_number}", "bitwise")
+                                check_failed = True
+                            
+                            # good patterns for bitwise
+                            elif not re.search(r'[|&^~]|<<|>>', clean_value):
+                                # If it doesn't contain bitwise operators and it's not 0 or NULL, it's likely wrong
+                                if clean_value not in ['0', 'NULL', 'null']:
+                                    if not re.match(r'^[@`]|^\w+\(', clean_value):
+                                        print_error_with_spacing(f"❌ Value '{clean_value}' for mask column `{column}` in table `{table_name}` should use bitwise operators. {file_path} at line {line_number}", "bitwise")
+                                        check_failed = True
                             # If it doesn't contain bitwise operators and it's not 0 or NULL, it's likely wrong
                             if clean_value not in ['0', 'NULL', 'null']:
                                 if not re.match(r'^[@`]|^\w+\(', clean_value):
@@ -868,35 +857,36 @@ def bitwise_mask_check(file: io, file_path: str) -> None:
         
         # For inserts
         insert_match = re.match(r'INSERT\s+INTO\s+`?([^`\s]+)`?\s*\(\s*([^)]+)\s*\)\s*VALUES?\s*\(\s*([^)]+)\s*\)', line.strip(), re.IGNORECASE)
-        if insert_match:
+        if insert_match and len(insert_match.groups()) >= 3:
             table_name = insert_match.group(1)
             columns_str = insert_match.group(2)
             values_str = insert_match.group(3)
             
-            if table_name in bitwise_columns:
+            if table_name and table_name in bitwise_columns and columns_str and values_str:
                 # Extract column names and values
-                columns = [col.strip().strip('`') for col in columns_str.split(',')]
-                values = [val.strip().strip('"\'') for val in values_str.split(',')]
+                columns = [col.strip().strip('`') for col in columns_str.split(',') if col.strip()]
+                values = [val.strip().strip('"\'') for val in values_str.split(',') if val.strip()]
                 
                 # Check each column-value pair
                 for i, column in enumerate(columns):
-                    if column in bitwise_columns[table_name] and i < len(values):
+                    if column and column in bitwise_columns[table_name] and i < len(values):
                         found_relevant_content = True
                         value = values[i]
                         
-                        # Check if it's a plain integer (bad)
-                        if re.match(r'^\d+$', value):
-                            print_error_with_spacing(f"❌ Non-bitwise value '{value}' used for mask column `{column}` in table `{table_name}`. Use bitwise operators instead. {file_path} at line {line_number}", "bitwise")
-                            check_failed = True
-                        
-                        # Check for proper bitwise operators (good patterns)
-                        elif not re.search(r'[|&^~]|<<|>>', value):
-                            # If it doesn't contain bitwise operators and it's not 0 or NULL, it's likely wrong
-                            if value not in ['0', 'NULL', 'null']:
-                                # Allow for variable references like @variable or function calls
-                                if not re.match(r'^[@`]|^\w+\(', value):
-                                    print_error_with_spacing(f"❌ Value '{value}' for mask column `{column}` in table `{table_name}` should use bitwise operators. {file_path} at line {line_number}", "bitwise")
-                                    check_failed = True
+                        if value:  # Only process non-empty values
+                            # Check if it's a plain integer (bad)
+                            if re.match(r'^\d+$', value):
+                                print_error_with_spacing(f"❌ Non-bitwise value '{value}' used for mask column `{column}` in table `{table_name}`. Use bitwise operators instead. {file_path} at line {line_number}", "bitwise")
+                                check_failed = True
+                            
+                            # Check for proper bitwise operators (good patterns)
+                            elif not re.search(r'[|&^~]|<<|>>', value):
+                                # If it doesn't contain bitwise operators and it's not 0 or NULL, it's likely wrong
+                                if value not in ['0', 'NULL', 'null']:
+                                    # Allow for variable references like @variable or function calls
+                                    if not re.match(r'^[@`]|^\w+\(', value):
+                                        print_error_with_spacing(f"❌ Value '{value}' for mask column `{column}` in table `{table_name}` should use bitwise operators. {file_path} at line {line_number}", "bitwise")
+                                        check_failed = True
                         
                         # Check for proper bitwise operators (good patterns)
                         elif not re.search(r'[|&^~]|<<|>>', value):
