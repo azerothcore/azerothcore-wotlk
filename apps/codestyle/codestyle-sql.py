@@ -34,6 +34,7 @@ results = {
     "Newline check": "Passed",
     "Compact queries check": "Passed",
     "Bitwise mask check": "Passed",
+    "USE statement check": "Passed",
     "Table engine check": "Passed"
 }
 
@@ -98,6 +99,7 @@ def parsing_file(files: list) -> None:
                     non_innodb_engine_check(file, file_path)
                     sniffable_data_check(file, file_path)
                     bitwise_mask_check(file, file_path)
+                    use_statement_check(file, file_path)
                     compact_queries_check(file, file_path)
             except UnicodeDecodeError:
                 print(f"\n❌ Could not decode file {file_path}")
@@ -145,7 +147,7 @@ def parsing_file(files: list) -> None:
     print("Check Categories:")
     print("• Mandatory (always runs): Directory, SQL codestyle, Multiple blank lines,")
     print("  Trailing whitespace, Backtick, INSERT & DELETE safety usage, Missing semicolon, Newline")
-    print("• Optional runs (when applicable): Compact queries, Bitwise mask, Table engine")
+    print("• Optional runs (when applicable): Compact queries, Bitwise mask, USE statement, Table engine")
     
     if error_handler:
         print()
@@ -884,6 +886,31 @@ def bitwise_mask_check(file: io, file_path: str) -> None:
         results["Bitwise mask check"] = "Failed"
     elif not found_relevant_content:
         results["Bitwise mask check"] = "Skipped"
+
+def use_statement_check(file: io, file_path: str) -> None:
+    global error_handler, results
+    file.seek(0)
+    check_failed = False
+    found_relevant_content = False
+    
+    for line_number, line in enumerate(file, start=1):
+        stripped_line = line.strip()
+        
+        # Skip/ignore comments
+        if stripped_line.startswith('--'):
+            continue
+            
+        # Check for USE 
+        if re.match(r'^\s*USE\s+', stripped_line, re.IGNORECASE):
+            found_relevant_content = True
+            print_error_with_spacing(f"❌ USE statement found in {file_path} at line {line_number}\nDatabase names should not be specified in SQL queries.", "use_statement")
+            check_failed = True
+    
+    if check_failed:
+        error_handler = True
+        results["USE statement check"] = "Failed"
+    elif not found_relevant_content:
+        results["USE statement check"] = "Skipped"
 
 def compact_queries_check(file: io, file_path: str) -> None:
     global error_handler, results
