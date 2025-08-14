@@ -122,7 +122,14 @@ def parsing_file(files: list) -> None:
     # Output the results
     print("\n ")
     for check, result in results.items():
-        status_icon = "✅" if result == "Passed" else "❌"
+        if result == "Passed":
+            status_icon = "✅"
+        elif result == "Failed":
+            status_icon = "❌"
+        elif result == "Skipped":
+            status_icon = "⊘"
+        else:
+            status_icon = "❓"  # Fallback for unexpected status
         print(f"{status_icon} {check}")
     
     print("\n ")
@@ -142,9 +149,12 @@ def multiple_blank_lines_check(file: io, file_path: str) -> None:
     global error_handler, results
     file.seek(0)  # Reset file pointer to the beginning
     check_failed = False
+    found_relevant_content = False
     consecutive_blank_lines = 0
     # Parse all the file
     for line_number, line in enumerate(file, start = 1):
+        # Any line counts as content for this check
+        found_relevant_content = True
         if line.strip() == '':
             consecutive_blank_lines += 1
             if consecutive_blank_lines > 1:
@@ -160,29 +170,41 @@ def multiple_blank_lines_check(file: io, file_path: str) -> None:
     if check_failed:
         error_handler = True
         results["Multiple blank lines check"] = "Failed"
+    elif not found_relevant_content:
+        results["Multiple blank lines check"] = "Skipped"
 
 # Codestyle patterns checking for whitespace at the end of the lines
 def trailing_whitespace_check(file: io, file_path: str) -> None:
     global error_handler, results
     file.seek(0)  # Reset file pointer to the beginning
     check_failed = False
+    found_relevant_content = False
     # Parse all the file
     for line_number, line in enumerate(file, start = 1):
+        # Any line counts as content for this check
+        found_relevant_content = True
         if line.endswith(' \n'):
             print_error_with_spacing(f"❌ Trailing whitespace found: {file_path} at line {line_number}", "whitespace")
             check_failed = True
     if check_failed:
         error_handler = True
         results["Trailing whitespace check"] = "Failed"
+    elif not found_relevant_content:
+        results["Trailing whitespace check"] = "Skipped"
 
 # Codestyle patterns checking for various codestyle issues
 def sql_check(file: io, file_path: str) -> None:
     global error_handler, results
     file.seek(0)  # Reset file pointer to the beginning
     check_failed = False
+    found_relevant_content = False
 
     # Parse all the file
     for line_number, line in enumerate(file, start = 1):
+        # Only mark as relevant if line has actual SQL content (not just comments/empty)
+        if line.strip() and not line.strip().startswith('--'):
+            found_relevant_content = True
+            
         if [match for match in ['broadcast_text'] if match in line]:
             print_error_with_spacing(
                 f"❌ DON'T EDIT broadcast_text TABLE UNLESS YOU KNOW WHAT YOU ARE DOING!\nThis error can safely be ignored if the changes are approved to be sniffed: {file_path} at line {line_number}", "sql_codestyle")
@@ -210,12 +232,15 @@ def sql_check(file: io, file_path: str) -> None:
     if check_failed:
         error_handler = True
         results["SQL codestyle check"] = "Failed"
+    elif not found_relevant_content:
+        results["SQL codestyle check"] = "Skipped"
 
 def insert_delete_safety_check(file: io, file_path: str) -> None:
     global error_handler, results
     file.seek(0)  # Reset file pointer to the beginning
     not_delete = ["creature_template", "gameobject_template", "item_template", "quest_template"]
     check_failed = False
+    found_relevant_content = False
     delete_lines = {}
     lines = file.readlines()
 
@@ -229,6 +254,7 @@ def insert_delete_safety_check(file: io, file_path: str) -> None:
             continue
 
         if "DELETE" in stripped.upper() and "FROM" in stripped.upper():
+            found_relevant_content = True
             if not re.match(r"DELETE FROM `([^`]+)`", stripped, re.IGNORECASE):
                 print_error_with_spacing(f"❌ Invalid DELETE syntax (must have exactly one space between DELETE and FROM) {file_path} at line {line_num + 1}", "insert_delete")
                 check_failed = True
@@ -237,6 +263,7 @@ def insert_delete_safety_check(file: io, file_path: str) -> None:
 
         match = re.match(r"DELETE FROM `([^`]+)`", stripped, re.IGNORECASE)
         if match:
+            found_relevant_content = True
             table_name = match.group(1)
             if table_name in not_delete:
                 print_error_with_spacing(
@@ -257,6 +284,7 @@ def insert_delete_safety_check(file: io, file_path: str) -> None:
 
         # Check for REPLACE INTO statements
         if "REPLACE" in stripped.upper() and "INTO" in stripped.upper():
+            found_relevant_content = True
             replace_match = re.match(r"REPLACE INTO `?([^`\s]+)`?", stripped, re.IGNORECASE)
             if replace_match:
                 print_error_with_spacing(f"❌ REPLACE INTO statement found in {file_path} at line {line_number}\nUse INSERT/DELETE or UPDATE instead.", "insert_delete")
@@ -264,6 +292,7 @@ def insert_delete_safety_check(file: io, file_path: str) -> None:
                 continue
 
         if "INSERT" in stripped.upper() and "INTO" in stripped.upper():
+            found_relevant_content = True
             if not re.match(r"INSERT INTO `([^`]+)`", stripped, re.IGNORECASE):
                 print_error_with_spacing(f"❌ Invalid INSERT syntax (must have exactly one space between INSERT and INTO) {file_path} at line {line_number}", "insert_delete")
                 check_failed = True
@@ -271,6 +300,7 @@ def insert_delete_safety_check(file: io, file_path: str) -> None:
 
         insert_match = re.match(r"INSERT INTO `?([^`\s]+)`?", line.strip(), re.IGNORECASE)
         if insert_match:
+            found_relevant_content = True
             table = insert_match.group(1)
             deletes = delete_lines.get(table)
             if not deletes:
@@ -296,12 +326,15 @@ def insert_delete_safety_check(file: io, file_path: str) -> None:
     if check_failed:
         error_handler = True
         results["INSERT & DELETE safety usage check"] = "Failed"
+    elif not found_relevant_content:
+        results["INSERT & DELETE safety usage check"] = "Skipped"
 
 def semicolon_check(file: io, file_path: str) -> None:
     global error_handler, results
 
     file.seek(0)  # Reset file pointer to the start
     check_failed = False
+    found_relevant_content = False
 
     query_open = False
     in_block_comment = False
@@ -349,6 +382,7 @@ def semicolon_check(file: io, file_path: str) -> None:
 
         # Detect start of multi-line SET statement
         if stripped_line.upper().startswith("SET"):
+            found_relevant_content = True
             set_open = True
 
         # If inside a SET statement, check if it ends with a semicolon
@@ -362,10 +396,12 @@ def semicolon_check(file: io, file_path: str) -> None:
 
         # Detect query start
         if not query_open and any(keyword in stripped_line.upper() for keyword in ["SELECT", "INSERT", "UPDATE", "DELETE", "REPLACE"]):
+            found_relevant_content = True
             query_open = True
 
         # Detect start of multi-line VALUES block
         if any(kw in stripped_line.upper() for kw in ["INSERT", "REPLACE"]) and "VALUES" in stripped_line.upper():
+            found_relevant_content = True
             inside_values_block = True
             query_open = True  # Ensure query is marked open too
 
@@ -404,11 +440,14 @@ def semicolon_check(file: io, file_path: str) -> None:
     if check_failed:
         error_handler = True
         results["Missing semicolon check"] = "Failed"
+    elif not found_relevant_content:
+        results["Missing semicolon check"] = "Skipped"
 
 def backtick_check(file: io, file_path: str) -> None:
     global error_handler, results
     file.seek(0)
     check_failed = False
+    found_relevant_content = False
 
     # Find SQL clauses
     pattern = re.compile(
@@ -429,6 +468,7 @@ def backtick_check(file: io, file_path: str) -> None:
         matches = pattern.findall(sanitized_line)
         
         for clause, content in matches:
+            found_relevant_content = True
             # Find all words and exclude @variables
             words = re.findall(r'\b(?<!@)([a-zA-Z_][a-zA-Z0-9_]*)\b', content)
 
@@ -459,11 +499,14 @@ def backtick_check(file: io, file_path: str) -> None:
     if check_failed:
         error_handler = True
         results["Backtick check"] = "Failed"
+    elif not found_relevant_content:
+        results["Backtick check"] = "Skipped"
 
 def directory_check(file: io, file_path: str) -> None:
     global error_handler, results
     file.seek(0)
     check_failed = False
+    found_relevant_content = True  # Always relevant since we're checking the file path itself
 
     # Normalize path and split into parts
     normalized_path = os.path.normpath(file_path)  # handles / and \
@@ -482,17 +525,20 @@ def directory_check(file: io, file_path: str) -> None:
     if check_failed:
         error_handler = True
         results["Directory check"] = "Failed"
+    # Note: Directory check is always relevant, so no "Skipped" status needed
 
 def non_innodb_engine_check(file: io, file_path: str) -> None:
     global error_handler, results
     file.seek(0)
     check_failed = False
+    found_relevant_content = False
 
     engine_pattern = re.compile(r'ENGINE\s*=\s*([a-zA-Z0-9_]+)', re.IGNORECASE)
 
     for line_number, line in enumerate(file, start=1):
         match = engine_pattern.search(line)
         if match:
+            found_relevant_content = True
             engine = match.group(1).lower()
             if engine != "innodb":
                 print_error_with_spacing(f"❌ Non-InnoDB engine found: '{engine}' in {file_path} at line {line_number}", "engine")
@@ -500,7 +546,9 @@ def non_innodb_engine_check(file: io, file_path: str) -> None:
 
     if check_failed:
         error_handler = True
-        results["Table engine check"] = "Failed"    
+        results["Table engine check"] = "Failed"
+    elif not found_relevant_content:
+        results["Table engine check"] = "Skipped"    
 
 def sniffable_data_check(file: io, file_path: str) -> None:
     global warnings_list
@@ -705,6 +753,7 @@ def bitwise_mask_check(file: io, file_path: str) -> None:
     global error_handler, results
     file.seek(0)
     check_failed = False
+    found_relevant_content = False
     
     # Define the tables and columns for column that require bitmask operations
     # Data extract using: https://gist.github.com/TheSCREWEDSoftware/acd855a85678b2400edcb9ee7c89acdb
@@ -777,6 +826,7 @@ def bitwise_mask_check(file: io, file_path: str) -> None:
                 
                 for column, value in column_assignments:
                     if column in bitwise_columns[table_name]:
+                        found_relevant_content = True
                         # Only checks for the value (numeric)
                         clean_value = value.strip().strip('"\'')
                         
@@ -808,6 +858,7 @@ def bitwise_mask_check(file: io, file_path: str) -> None:
                 # Check each column-value pair
                 for i, column in enumerate(columns):
                     if column in bitwise_columns[table_name] and i < len(values):
+                        found_relevant_content = True
                         value = values[i]
                         
                         # Check if it's a plain integer (bad)
@@ -827,11 +878,14 @@ def bitwise_mask_check(file: io, file_path: str) -> None:
     if check_failed:
         error_handler = True
         results["Bitwise mask check"] = "Failed"
+    elif not found_relevant_content:
+        results["Bitwise mask check"] = "Skipped"
 
 def compact_queries_check(file: io, file_path: str) -> None:
     global error_handler, results
     file.seek(0)
     check_failed = False
+    found_relevant_content = False
     
     lines = file.readlines()
     
@@ -850,6 +904,7 @@ def compact_queries_check(file: io, file_path: str) -> None:
         # For DELETEs
         delete_match = re.match(r'DELETE\s+FROM\s+`?([^`\s]+)`?\s+WHERE\s+(.+);?$', line, re.IGNORECASE)
         if delete_match:
+            found_relevant_content = True
             table_name = delete_match.group(1)
             where_clause = delete_match.group(2).strip().rstrip(';')
             
@@ -862,6 +917,7 @@ def compact_queries_check(file: io, file_path: str) -> None:
         # For inserts
         insert_match = re.match(r'INSERT\s+INTO\s+`?([^`\s]+)`?\s*\(\s*([^)]+)\s*\)\s*VALUES?\s*\(\s*([^)]+)\s*\);?$', line, re.IGNORECASE)
         if insert_match:
+            found_relevant_content = True
             table_name = insert_match.group(1)
             columns = insert_match.group(2).strip()
             values = insert_match.group(3).strip()
@@ -873,6 +929,7 @@ def compact_queries_check(file: io, file_path: str) -> None:
         # for updates
         update_match = re.match(r'UPDATE\s+`?([^`\s]+)`?\s+SET\s+(.+?)\s+WHERE\s+(.+);?$', line, re.IGNORECASE)
         if update_match:
+            found_relevant_content = True
             table_name = update_match.group(1)
             set_clause = update_match.group(2).strip()
             where_clause = update_match.group(3).strip().rstrip(';')
@@ -925,6 +982,8 @@ def compact_queries_check(file: io, file_path: str) -> None:
     if check_failed:
         error_handler = True
         results["Compact queries check"] = "Failed"
+    elif not found_relevant_content:
+        results["Compact queries check"] = "Skipped"
 
 # Collect all files from matching directories
 all_files = collect_files_from_directories(src_directory) + collect_files_from_directories(base_directory) + collect_files_from_directories(archive_directory)

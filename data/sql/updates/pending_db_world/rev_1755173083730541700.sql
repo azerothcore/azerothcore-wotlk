@@ -4,6 +4,8 @@ UPDATE `waypoint_data`
 SET `action` = 0
 WHERE `id` = 1133640 AND `point` = 3;
 
+DELETE FROM `smart_scripts`
+WHERE `entryorguid` = 28600 AND `source_type` = 0 AND `id` = 0;
 INSERT INTO `smart_scripts` (
   `entryorguid`, `source_type`, `id`, `link`,
   `event_type`, `event_param1`, `event_param2`, `event_param3`, `event_param4`,
