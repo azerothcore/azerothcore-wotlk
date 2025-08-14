@@ -39,3 +39,4 @@ INSERT INTO `smart_scripts` (
   40, 4, 0, 0, 0,             -- SMART_EVENT_WAYPOINT_REACHED, point 4
   66, 3, 0, 0,                -- SMART_ACTION_SET_ORIENTATION, orientation 3
   8, 'Joseph Wilson - On WP 4 Reached - Set Orientation 3');
+  
