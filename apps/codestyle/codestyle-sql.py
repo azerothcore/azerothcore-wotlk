@@ -21,6 +21,7 @@ archive_directory = glob.glob(archive_pattern)
 
 # Global variables
 error_handler = False
+current_error_category = None
 results = {
     "Multiple blank lines check": "Passed",
     "Trailing whitespace check": "Passed",
@@ -32,6 +33,16 @@ results = {
     "Table engine check": "Passed",
     "Bitwise mask check": "Passed"
 }
+
+def print_error_with_spacing(error_message: str, category: str) -> None:
+    global current_error_category
+    
+    # Add spacing only when switching to a different category
+    if current_error_category is not None and current_error_category != category:
+        print()  # Add spacing between different error categories
+    
+    print(error_message)
+    current_error_category = category
 
 # Collect all files in all directories
 def collect_files_from_directories(directories: list) -> list:
@@ -102,7 +113,13 @@ def parsing_file(files: list) -> None:
     # Output the results
     print("\n ")
     for check, result in results.items():
-        print(f"{check} : {result}")
+        status_icon = "✅" if result == "Passed" else "❌"
+        print(f"{status_icon} {check}")
+    
+    print("\n ")
+    print("Please read the SQL Standards for AzerothCore:")
+    print("https://www.azerothcore.org/wiki/sql-standards")
+    
     if error_handler:
         print("\n ")
         print("\n❌ Please fix the codestyle issues above.")
@@ -122,13 +139,13 @@ def multiple_blank_lines_check(file: io, file_path: str) -> None:
         if line.strip() == '':
             consecutive_blank_lines += 1
             if consecutive_blank_lines > 1:
-                print(f"❌ Multiple blank lines found in {file_path} at line {line_number - 1}")
+                print_error_with_spacing(f"❌ Multiple blank lines found in {file_path} at line {line_number - 1}", "blank_lines")
                 check_failed = True
         else:
             consecutive_blank_lines = 0
     # Additional check for the end of the file
     if consecutive_blank_lines >= 1:
-        print(f"❌ Multiple blank lines found at the end of: {file_path}")
+        print_error_with_spacing(f"❌ Multiple blank lines found at the end of: {file_path}", "blank_lines")
         check_failed = True
     # Handle the script error and update the result output
     if check_failed:
@@ -143,7 +160,7 @@ def trailing_whitespace_check(file: io, file_path: str) -> None:
     # Parse all the file
     for line_number, line in enumerate(file, start = 1):
         if line.endswith(' \n'):
-            print(f"❌ Trailing whitespace found: {file_path} at line {line_number}")
+            print_error_with_spacing(f"❌ Trailing whitespace found: {file_path} at line {line_number}", "whitespace")
             check_failed = True
     if check_failed:
         error_handler = True
@@ -158,26 +175,26 @@ def sql_check(file: io, file_path: str) -> None:
     # Parse all the file
     for line_number, line in enumerate(file, start = 1):
         if [match for match in ['broadcast_text'] if match in line]:
-            print(
-                f"❌ DON'T EDIT broadcast_text TABLE UNLESS YOU KNOW WHAT YOU ARE DOING!\nThis error can safely be ignored if the changes are approved to be sniffed: {file_path} at line {line_number}")
+            print_error_with_spacing(
+                f"❌ DON'T EDIT broadcast_text TABLE UNLESS YOU KNOW WHAT YOU ARE DOING!\nThis error can safely be ignored if the changes are approved to be sniffed: {file_path} at line {line_number}", "sql_codestyle")
             check_failed = True
         if "EntryOrGuid" in line:
-            print(
-                f"❌ Please use entryorguid syntax instead of EntryOrGuid in {file_path} at line {line_number}\nWe recommend to use keira to have the right syntax in auto-query generation")
+            print_error_with_spacing(
+                f"❌ Please use entryorguid syntax instead of EntryOrGuid in {file_path} at line {line_number}\nWe recommend to use keira to have the right syntax in auto-query generation", "sql_codestyle")
             check_failed = True
         if [match for match in [';;'] if match in line]:
-            print(
-                f"❌ Double semicolon (;;) found in {file_path} at line {line_number}")
+            print_error_with_spacing(
+                f"❌ Double semicolon (;;) found in {file_path} at line {line_number}", "sql_codestyle")
             check_failed = True
         if re.match(r"\t", line):
-            print(
-                f"❌ Tab found! Replace it to 4 spaces: {file_path} at line {line_number}")
+            print_error_with_spacing(
+                f"❌ Tab found! Replace it to 4 spaces: {file_path} at line {line_number}", "sql_codestyle")
             check_failed = True
 
         last_line = line[-1].strip()
         if last_line:
-            print(
-                f"❌ The last line is not a newline. Please add a newline: {file_path}")
+            print_error_with_spacing(
+                f"❌ The last line is not a newline. Please add a newline: {file_path}", "sql_codestyle")
             check_failed = True
 
     # Handle the script error and update the result output
@@ -204,7 +221,7 @@ def insert_delete_safety_check(file: io, file_path: str) -> None:
 
         if "DELETE" in stripped.upper() and "FROM" in stripped.upper():
             if not re.match(r"DELETE FROM `([^`]+)`", stripped, re.IGNORECASE):
-                print(f"❌ Invalid DELETE syntax (must have exactly one space between DELETE and FROM) {file_path} at line {line_num + 1}")
+                print_error_with_spacing(f"❌ Invalid DELETE syntax (must have exactly one space between DELETE and FROM) {file_path} at line {line_num + 1}", "insert_delete")
                 check_failed = True
                 line_num += 1
                 continue
@@ -213,8 +230,8 @@ def insert_delete_safety_check(file: io, file_path: str) -> None:
         if match:
             table_name = match.group(1)
             if table_name in not_delete:
-                print(
-                    f"❌ Entries from {table_name} should not be deleted! {file_path} at line {line_num + 1}\nIf this error is intended, please notify a maintainer")
+                print_error_with_spacing(
+                    f"❌ Entries from {table_name} should not be deleted! {file_path} at line {line_num + 1}\nIf this error is intended, please notify a maintainer", "insert_delete")
                 check_failed = True
             start = line_num
             while line_num < len(lines) and ";" not in lines[line_num]:
@@ -231,7 +248,7 @@ def insert_delete_safety_check(file: io, file_path: str) -> None:
 
         if "INSERT" in stripped.upper() and "INTO" in stripped.upper():
             if not re.match(r"INSERT INTO `([^`]+)`", stripped, re.IGNORECASE):
-                print(f"❌ Invalid INSERT syntax (must have exactly one space between INSERT and INTO) {file_path} at line {line_number}")
+                print_error_with_spacing(f"❌ Invalid INSERT syntax (must have exactly one space between INSERT and INTO) {file_path} at line {line_number}", "insert_delete")
                 check_failed = True
                 continue
 
@@ -240,7 +257,7 @@ def insert_delete_safety_check(file: io, file_path: str) -> None:
             table = insert_match.group(1)
             deletes = delete_lines.get(table)
             if not deletes:
-                print(f"❌ No DELETE keyword found before the INSERT in {file_path} at line {line_number}\nIf this error is intended, please notify a maintainer")
+                print_error_with_spacing(f"❌ No DELETE keyword found before the INSERT in {file_path} at line {line_number}\nIf this error is intended, please notify a maintainer", "insert_delete")
                 check_failed = True
             else:
                 valid = False
@@ -256,7 +273,7 @@ def insert_delete_safety_check(file: io, file_path: str) -> None:
                         valid = True
                         break
                 if not valid:
-                    print(f"❌ DELETE for `{table}` query must be directly above the INSERT  (case of multipe lines) in {file_path} at line {line_number}")
+                    print_error_with_spacing(f"❌ DELETE for `{table}` query must be directly above the INSERT  (case of multipe lines) in {file_path} at line {line_number}", "insert_delete")
                     check_failed = True
 
     if check_failed:
@@ -323,7 +340,7 @@ def semicolon_check(file: io, file_path: str) -> None:
                 set_open = False  # SET statement closed properly
             elif line_number == total_lines:
                 # End of file but SET not closed properly
-                print(f"❌ Missing semicolon in {file_path} at line {line_number}")
+                print_error_with_spacing(f"❌ Missing semicolon in {file_path} at line {line_number}", "semicolon")
                 check_failed = True
 
         # Detect query start
@@ -346,12 +363,12 @@ def semicolon_check(file: io, file_path: str) -> None:
                 if next_line and next_line.startswith('('):
                     # Expect comma if another row follows
                     if not stripped_line.endswith(','):
-                        print(f"❌ Missing comma in {file_path} at line {line_number}")
+                        print_error_with_spacing(f"❌ Missing comma in {file_path} at line {line_number}", "semicolon")
                         check_failed = True
                 else:
                     # Expect semicolon if this is the final row
                     if not stripped_line.endswith(';'):
-                        print(f"❌ Missing semicolon in {file_path} at line {line_number}")
+                        print_error_with_spacing(f"❌ Missing semicolon in {file_path} at line {line_number}", "semicolon")
                         check_failed = True
                         inside_values_block = False
                         query_open = False
@@ -361,7 +378,7 @@ def semicolon_check(file: io, file_path: str) -> None:
         elif query_open and not inside_values_block:
             # Normal query handling (outside multi-row VALUES block)
             if line_number == total_lines and not stripped_line.endswith(';'):
-                print(f"❌ Missing semicolon in {file_path} at the last line {line_number}")
+                print_error_with_spacing(f"❌ Missing semicolon in {file_path} at the last line {line_number}", "semicolon")
                 check_failed = True
                 query_open = False
             elif stripped_line.endswith(';'):
@@ -419,7 +436,7 @@ def backtick_check(file: io, file_path: str) -> None:
 
                 # Make sure the word is enclosed in backticks
                 if not re.search(rf'`{re.escape(word)}`', content):
-                    print(f"❌ Missing backticks around ({word}). {file_path} at line {line_number}")
+                    print_error_with_spacing(f"❌ Missing backticks around ({word}). {file_path} at line {line_number}", "backtick")
                     check_failed = True
 
     if check_failed:
@@ -437,12 +454,12 @@ def directory_check(file: io, file_path: str) -> None:
 
     # Fail if '/base/' is part of the path
     if "base" in path_parts:
-        print(f"❗ {file_path} is changed/added in the base directory.\nIf this is intended, please notify a maintainer.")
+        print_error_with_spacing(f"❗ {file_path} is changed/added in the base directory.\nIf this is intended, please notify a maintainer.", "directory")
         check_failed = True
 
     # Fail if '/archive/' is part of the path
     if "archive" in path_parts:
-        print(f"❗ {file_path} is changed/added in the archive directory.\nIf this is intended, please notify a maintainer.")
+        print_error_with_spacing(f"❗ {file_path} is changed/added in the archive directory.\nIf this is intended, please notify a maintainer.", "directory")
         check_failed = True
 
     if check_failed:
@@ -461,7 +478,7 @@ def non_innodb_engine_check(file: io, file_path: str) -> None:
         if match:
             engine = match.group(1).lower()
             if engine != "innodb":
-                print(f"❌ Non-InnoDB engine found: '{engine}' in {file_path} at line {line_number}")
+                print_error_with_spacing(f"❌ Non-InnoDB engine found: '{engine}' in {file_path} at line {line_number}", "engine")
                 check_failed = True
 
     if check_failed:
@@ -747,7 +764,7 @@ def bitwise_mask_check(file: io, file_path: str) -> None:
                         
                         # Check for bitmask operation is valid or not
                         if re.match(r'^\d+$', clean_value):
-                            print(f"❌ Hardcoded value '{clean_value}' used for mask column `{column}` in table `{table_name}`. Use bitwise operators instead (e.g., |, &, ^, <<, >>, ~). {file_path} at line {line_number}")
+                            print_error_with_spacing(f"❌ Hardcoded value '{clean_value}' used for mask column `{column}` in table `{table_name}`. Use bitwise operators instead (e.g., |, &, ^, <<, >>, ~). {file_path} at line {line_number}", "bitwise")
                             check_failed = True
                         
                         # good patterns for bitwise
@@ -755,7 +772,7 @@ def bitwise_mask_check(file: io, file_path: str) -> None:
                             # If it doesn't contain bitwise operators and it's not 0 or NULL, it's likely wrong
                             if clean_value not in ['0', 'NULL', 'null']:
                                 if not re.match(r'^[@`]|^\w+\(', clean_value):
-                                    print(f"❌ Value '{clean_value}' for mask column `{column}` in table `{table_name}` should use bitwise operators. {file_path} at line {line_number}")
+                                    print_error_with_spacing(f"❌ Value '{clean_value}' for mask column `{column}` in table `{table_name}` should use bitwise operators. {file_path} at line {line_number}", "bitwise")
                                     check_failed = True
         
         # For inserts
@@ -777,7 +794,7 @@ def bitwise_mask_check(file: io, file_path: str) -> None:
                         
                         # Check if it's a plain integer (bad)
                         if re.match(r'^\d+$', value):
-                            print(f"❌ Hardcoded value '{value}' used for mask column `{column}` in table `{table_name}`. Use bitwise operators instead (e.g., |, &, ^, <<, >>, ~). {file_path} at line {line_number}")
+                            print_error_with_spacing(f"❌ Hardcoded value '{value}' used for mask column `{column}` in table `{table_name}`. Use bitwise operators instead (e.g., |, &, ^, <<, >>, ~). {file_path} at line {line_number}", "bitwise")
                             check_failed = True
                         
                         # Check for proper bitwise operators (good patterns)
@@ -786,7 +803,7 @@ def bitwise_mask_check(file: io, file_path: str) -> None:
                             if value not in ['0', 'NULL', 'null']:
                                 # Allow for variable references like @variable or function calls
                                 if not re.match(r'^[@`]|^\w+\(', value):
-                                    print(f"❌ Value '{value}' for mask column `{column}` in table `{table_name}` should use bitwise operators. {file_path} at line {line_number}")
+                                    print_error_with_spacing(f"❌ Value '{value}' for mask column `{column}` in table `{table_name}` should use bitwise operators. {file_path} at line {line_number}", "bitwise")
                                     check_failed = True
     
     if check_failed:
