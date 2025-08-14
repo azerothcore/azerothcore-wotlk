@@ -2364,6 +2364,8 @@ void Spell::CleanupTargetList()
     m_UniqueTargetInfo.clear();
     m_UniqueGOTargetInfo.clear();
     m_UniqueItemInfo.clear();
+    m_targetUnitMap.clear();
+    m_targets.clear();
     m_delayMoment = 0;
     m_delayTrajectory = 0;
 }
@@ -4530,6 +4532,8 @@ void Spell::finish(bool ok)
                 if (m_caster->HasAura(14177))
                     m_caster->RemoveAura(14177);
         }
+
+        CleanupTargetList();
         return;
     }
 
@@ -4546,6 +4550,7 @@ void Spell::finish(bool ok)
         {
             LOG_DEBUG("spells.aura", "Statue {} is unsummoned in spell {} finish", m_caster->GetGUID().ToString(), m_spellInfo->Id);
             m_caster->setDeathState(DeathState::JustDied);
+            CleanupTargetList();
             return;
         }
     }
@@ -4566,6 +4571,8 @@ void Spell::finish(bool ok)
     // Stop Attack for some spells
     if (m_spellInfo->HasAttribute(SPELL_ATTR0_CANCELS_AUTO_ATTACK_COMBAT))
         m_caster->AttackStop();
+
+    CleanupTargetList();
 }
 
 void Spell::WriteCastResultInfo(WorldPacket& data, Player* caster, SpellInfo const* spellInfo, uint8 castCount, SpellCastResult result, SpellCustomErrors customError)
