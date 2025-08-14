@@ -919,6 +919,9 @@ def use_statement_check(file: io, file_path: str) -> None:
             found_relevant_content = True
             print_error_with_spacing(f"❌ USE statement found in {file_path} at line {line_number}\nDatabase names should not be specified in SQL queries.", "use_statement")
             check_failed = True
+        # Debug: Check if we're seeing the USE line
+        if 'USE' in stripped_line.upper():
+            found_relevant_content = True
     
     if check_failed:
         error_handler = True
