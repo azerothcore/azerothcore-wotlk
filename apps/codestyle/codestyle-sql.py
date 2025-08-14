@@ -32,10 +32,10 @@ results = {
     "INSERT & DELETE safety usage check": "Passed",
     "Missing semicolon check": "Passed",
     "Newline check": "Passed",
-    "Compact queries check": "Passed",
-    "Bitwise mask check": "Passed",
-    "USE statement check": "Passed",
-    "Table engine check": "Passed"
+    "Compact queries check": "Skipped",
+    "Bitwise mask check": "Skipped",
+    "USE statement check": "Skipped",
+    "Table engine check": "Skipped"
 }
 
 def print_error_with_spacing(error_message: str, category: str) -> None:
@@ -553,8 +553,7 @@ def non_innodb_engine_check(file: io, file_path: str) -> None:
     if check_failed:
         error_handler = True
         results["Table engine check"] = "Failed"
-    else:
-        results["Table engine check"] = "Skipped"    
+    # If no violations found, stays "Skipped"    
 
 def sniffable_data_check(file: io, file_path: str) -> None:
     global warnings_list
@@ -900,8 +899,7 @@ def bitwise_mask_check(file: io, file_path: str) -> None:
     if check_failed:
         error_handler = True
         results["Bitwise mask check"] = "Failed"
-    else:
-        results["Bitwise mask check"] = "Skipped"
+    # If no violations found, stays "Skipped"
 
 def use_statement_check(file: io, file_path: str) -> None:
     global error_handler, results
@@ -921,12 +919,12 @@ def use_statement_check(file: io, file_path: str) -> None:
             found_relevant_content = True
             print_error_with_spacing(f"❌ USE statement found in {file_path} at line {line_number}\nDatabase names should not be specified in SQL queries.", "use_statement")
             check_failed = True
+            break  # Found violation, no need to continue
     
     if check_failed:
         error_handler = True
         results["USE statement check"] = "Failed"
-    else:
-        results["USE statement check"] = "Skipped"
+    # If no violations found, stays "Skipped"
 
 def compact_queries_check(file: io, file_path: str) -> None:
     global error_handler, results
@@ -1029,8 +1027,7 @@ def compact_queries_check(file: io, file_path: str) -> None:
     if check_failed:
         error_handler = True
         results["Compact queries check"] = "Failed"
-    else:
-        results["Compact queries check"] = "Skipped"
+    # If no violations found, stays "Skipped"
 
 # Collect all files from matching directories
 all_files = collect_files_from_directories(src_directory) + collect_files_from_directories(base_directory) + collect_files_from_directories(archive_directory)
