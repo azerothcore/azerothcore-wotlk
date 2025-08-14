@@ -25,3 +25,5 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 (28731, 0, 5, 0, 8, 0, 100, 0, 52343, 0, 0, 0, 0, 0, 38, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Watcher Silthik - On Spellhit \'Krik`Thir Subboss Aggro Trigger\' - Set In Combat With Zone'),
 (28731, 0, 6, 0, 0, 0, 100, 1, 500, 500, 0, 0, 0, 0, 39, 4, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Watcher Silthik - In Combat - Call For Help (No Repeat)'),
 (28731, 0, 1, 0, 4, 0, 100, 0, 0, 0, 0, 0, 0, 0, 223, 1, 0, 0, 0, 0, 0, 205, 0, 1, 0, 0, 0, 0, 0, 0, 'Watcher Silthik - On Aggro - Do Action ID 1');
+
+UPDATE `creature_template` SET `mechanic_immune_mask` = `mechanic_immune_mask` &~ 33554432 WHERE `entry` IN (28684, 31612);
