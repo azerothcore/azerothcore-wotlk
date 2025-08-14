@@ -208,7 +208,7 @@ def newline_check(file: io, file_path: str) -> None:
     # Check if the very last line ends with a newline
     if lines and not lines[-1].endswith('\n'):
         print_error_with_spacing(
-            f"❌ The last line is not a newline. Please add a newline: {file_path}", "newline")
+            f"❌ The last line is not a newline (in case of false-positives, check your LF or CRLF). Please add a newline: {file_path}", "newline")
         check_failed = True
 
     # Handle the script error and update the result output
