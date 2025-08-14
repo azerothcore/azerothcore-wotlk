@@ -149,12 +149,9 @@ def multiple_blank_lines_check(file: io, file_path: str) -> None:
     global error_handler, results
     file.seek(0)  # Reset file pointer to the beginning
     check_failed = False
-    found_relevant_content = False
     consecutive_blank_lines = 0
     # Parse all the file
     for line_number, line in enumerate(file, start = 1):
-        # Any line counts as content for this check
-        found_relevant_content = True
         if line.strip() == '':
             consecutive_blank_lines += 1
             if consecutive_blank_lines > 1:
@@ -170,43 +167,33 @@ def multiple_blank_lines_check(file: io, file_path: str) -> None:
     if check_failed:
         error_handler = True
         results["Multiple blank lines check"] = "Failed"
-    elif not found_relevant_content:
-        results["Multiple blank lines check"] = "Skipped"
+    # This check always runs - no "Skipped" status
 
 # Codestyle patterns checking for whitespace at the end of the lines
 def trailing_whitespace_check(file: io, file_path: str) -> None:
     global error_handler, results
     file.seek(0)  # Reset file pointer to the beginning
     check_failed = False
-    found_relevant_content = False
     # Parse all the file
     for line_number, line in enumerate(file, start = 1):
-        # Any line counts as content for this check
-        found_relevant_content = True
         if line.endswith(' \n'):
             print_error_with_spacing(f"❌ Trailing whitespace found: {file_path} at line {line_number}", "whitespace")
             check_failed = True
     if check_failed:
         error_handler = True
         results["Trailing whitespace check"] = "Failed"
-    elif not found_relevant_content:
-        results["Trailing whitespace check"] = "Skipped"
+    # This check always runs - no "Skipped" status
 
 # Codestyle patterns checking for various codestyle issues
 def sql_check(file: io, file_path: str) -> None:
     global error_handler, results
     file.seek(0)  # Reset file pointer to the beginning
     check_failed = False
-    found_relevant_content = False
 
     lines = file.readlines()
     
     # Parse all the file
     for line_number, line in enumerate(lines, start = 1):
-        # Only mark as relevant if line has actual SQL content (not just comments/empty)
-        if line.strip() and not line.strip().startswith('--'):
-            found_relevant_content = True
-            
         if [match for match in ['broadcast_text'] if match in line]:
             print_error_with_spacing(
                 f"❌ DON'T EDIT broadcast_text TABLE UNLESS YOU KNOW WHAT YOU ARE DOING!\nThis error can safely be ignored if the changes are approved to be sniffed: {file_path} at line {line_number}", "sql_codestyle")
@@ -234,8 +221,7 @@ def sql_check(file: io, file_path: str) -> None:
     if check_failed:
         error_handler = True
         results["SQL codestyle check"] = "Failed"
-    elif not found_relevant_content:
-        results["SQL codestyle check"] = "Skipped"
+    # This check always runs - no "Skipped" status
 
 def insert_delete_safety_check(file: io, file_path: str) -> None:
     global error_handler, results
@@ -336,7 +322,6 @@ def semicolon_check(file: io, file_path: str) -> None:
 
     file.seek(0)  # Reset file pointer to the start
     check_failed = False
-    found_relevant_content = False
 
     query_open = False
     in_block_comment = False
@@ -384,7 +369,6 @@ def semicolon_check(file: io, file_path: str) -> None:
 
         # Detect start of multi-line SET statement
         if stripped_line.upper().startswith("SET"):
-            found_relevant_content = True
             set_open = True
 
         # If inside a SET statement, check if it ends with a semicolon
@@ -398,12 +382,10 @@ def semicolon_check(file: io, file_path: str) -> None:
 
         # Detect query start
         if not query_open and any(keyword in stripped_line.upper() for keyword in ["SELECT", "INSERT", "UPDATE", "DELETE", "REPLACE"]):
-            found_relevant_content = True
             query_open = True
 
         # Detect start of multi-line VALUES block
         if any(kw in stripped_line.upper() for kw in ["INSERT", "REPLACE"]) and "VALUES" in stripped_line.upper():
-            found_relevant_content = True
             inside_values_block = True
             query_open = True  # Ensure query is marked open too
 
@@ -442,14 +424,12 @@ def semicolon_check(file: io, file_path: str) -> None:
     if check_failed:
         error_handler = True
         results["Missing semicolon check"] = "Failed"
-    elif not found_relevant_content:
-        results["Missing semicolon check"] = "Skipped"
+    # This check always runs - no "Skipped" status
 
 def backtick_check(file: io, file_path: str) -> None:
     global error_handler, results
     file.seek(0)
     check_failed = False
-    found_relevant_content = False
 
     # Find SQL clauses
     pattern = re.compile(
@@ -470,7 +450,6 @@ def backtick_check(file: io, file_path: str) -> None:
         matches = pattern.findall(sanitized_line)
         
         for clause, content in matches:
-            found_relevant_content = True
             # Find all words and exclude @variables
             words = re.findall(r'\b(?<!@)([a-zA-Z_][a-zA-Z0-9_]*)\b', content)
 
@@ -501,8 +480,7 @@ def backtick_check(file: io, file_path: str) -> None:
     if check_failed:
         error_handler = True
         results["Backtick check"] = "Failed"
-    elif not found_relevant_content:
-        results["Backtick check"] = "Skipped"
+    # This check always runs - no "Skipped" status
 
 def directory_check(file: io, file_path: str) -> None:
     global error_handler, results
