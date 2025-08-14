@@ -848,6 +848,11 @@ def bitwise_mask_check(file: io, file_path: str) -> None:
                                 if not re.match(r'^[@`]|^\w+\(', clean_value):
                                     print_error_with_spacing(f"❌ Value '{clean_value}' for mask column `{column}` in table `{table_name}` should use bitwise operators. {file_path} at line {line_number}", "bitwise")
                                     check_failed = True
+                            # If it doesn't contain bitwise operators and it's not 0 or NULL, it's likely wrong
+                            if clean_value not in ['0', 'NULL', 'null']:
+                                if not re.match(r'^[@`]|^\w+\(', clean_value):
+                                    print_error_with_spacing(f"❌ Value '{clean_value}' for mask column `{column}` in table `{table_name}` should use bitwise operators. {file_path} at line {line_number}", "bitwise")
+                                    check_failed = True
         
         # For inserts
         insert_match = re.match(r'INSERT\s+INTO\s+`?([^`\s]+)`?\s*\(\s*([^)]+)\s*\)\s*VALUES?\s*\(\s*([^)]+)\s*\)', line.strip(), re.IGNORECASE)
@@ -880,6 +885,15 @@ def bitwise_mask_check(file: io, file_path: str) -> None:
                                 if not re.match(r'^[@`]|^\w+\(', value):
                                     print_error_with_spacing(f"❌ Value '{value}' for mask column `{column}` in table `{table_name}` should use bitwise operators. {file_path} at line {line_number}", "bitwise")
                                     check_failed = True
+                        
+                        # Check for proper bitwise operators (good patterns)
+                        elif not re.search(r'[|&^~]|<<|>>', value):
+                            # If it doesn't contain bitwise operators and it's not 0 or NULL, it's likely wrong
+                            if value not in ['0', 'NULL', 'null']:
+                                # Allow for variable references like @variable or function calls
+                                if not re.match(r'^[@`]|^\w+\(', value):
+                                    print_error_with_spacing(f"❌ Value '{value}' for mask column `{column}` in table `{table_name}` should use bitwise operators. {file_path} at line {line_number}", "bitwise")
+                                    check_failed = True
     
     if check_failed:
         error_handler = True
@@ -900,8 +914,8 @@ def use_statement_check(file: io, file_path: str) -> None:
         if stripped_line.startswith('--'):
             continue
             
-        # Check for USE 
-        if re.match(r'^\s*USE\s+', stripped_line, re.IGNORECASE):
+        # Check for USE statements (case insensitive)
+        if re.match(r'^USE\s+', stripped_line, re.IGNORECASE):
             found_relevant_content = True
             print_error_with_spacing(f"❌ USE statement found in {file_path} at line {line_number}\nDatabase names should not be specified in SQL queries.", "use_statement")
             check_failed = True
