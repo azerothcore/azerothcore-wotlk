@@ -22,6 +22,7 @@ archive_directory = glob.glob(archive_pattern)
 # Global variables
 error_handler = False
 current_error_category = None
+warnings_list = []
 results = {
     "Multiple blank lines check": "Passed",
     "Trailing whitespace check": "Passed",
@@ -31,7 +32,8 @@ results = {
     "Backtick check": "Passed",
     "Directory check": "Passed",
     "Table engine check": "Passed",
-    "Bitwise mask check": "Passed"
+    "Bitwise mask check": "Passed",
+    "Compact queries check": "Passed"
 }
 
 def print_error_with_spacing(error_message: str, category: str) -> None:
@@ -56,7 +58,7 @@ def collect_files_from_directories(directories: list) -> list:
 
 # Used to find changed or added files compared to master.
 def get_changed_files() -> list:
-    subprocess.run(["git", "fetch", "origin", "master"], check=True)
+    subprocess.run(["git", "fetch", "origin", "master"], check=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     result = subprocess.run(
         ["git", "diff", "--name-status", "origin/master"],
         stdout=subprocess.PIPE,
@@ -94,6 +96,7 @@ def parsing_file(files: list) -> None:
                     non_innodb_engine_check(file, file_path)
                     sniffable_data_check(file, file_path)
                     bitwise_mask_check(file, file_path)
+                    compact_queries_check(file, file_path)
             except UnicodeDecodeError:
                 print(f"\n❌ Could not decode file {file_path}")
                 sys.exit(1)
@@ -109,6 +112,12 @@ def parsing_file(files: list) -> None:
             except UnicodeDecodeError:
                 print(f"\n❌ Could not decode file {file_path}")
                 sys.exit(1)
+
+    # Shows warnings between errors and checks (in the end)
+    if warnings_list:
+        print() 
+        for warning in warnings_list:
+            print(warning)
 
     # Output the results
     print("\n ")
@@ -245,6 +254,14 @@ def insert_delete_safety_check(file: io, file_path: str) -> None:
             continue
 
         stripped = line.strip() 
+
+        # Check for REPLACE INTO statements
+        if "REPLACE" in stripped.upper() and "INTO" in stripped.upper():
+            replace_match = re.match(r"REPLACE INTO `?([^`\s]+)`?", stripped, re.IGNORECASE)
+            if replace_match:
+                print_error_with_spacing(f"❌ REPLACE INTO statement found in {file_path} at line {line_number}\nUse INSERT/DELETE or UPDATE instead.", "insert_delete")
+                check_failed = True
+                continue
 
         if "INSERT" in stripped.upper() and "INTO" in stripped.upper():
             if not re.match(r"INSERT INTO `([^`]+)`", stripped, re.IGNORECASE):
@@ -486,7 +503,8 @@ def non_innodb_engine_check(file: io, file_path: str) -> None:
         results["Table engine check"] = "Failed"    
 
 def sniffable_data_check(file: io, file_path: str) -> None:
-    global results
+    global warnings_list
+    
     file.seek(0)
     
     # Define sniffable tables and their columns
@@ -662,7 +680,7 @@ def sniffable_data_check(file: io, file_path: str) -> None:
                 
                 if sniffable_columns:
                     columns_str = ", ".join(sniffable_columns)
-                    print(f"❗ Column(s) {columns_str} from `{table_name}` are being changed, these values are sniffable. {file_path} at line {line_number}")
+                    warnings_list.append(f"❗ Column(s) {columns_str} from `{table_name}` are being changed, these values are sniffable. {file_path} at line {line_number}")
         
         # For INSERTs
         insert_match = re.match(r'INSERT\s+INTO\s+`?([^`\s]+)`?\s*\(\s*([^)]+)\s*\)', line.strip(), re.IGNORECASE)
@@ -681,7 +699,7 @@ def sniffable_data_check(file: io, file_path: str) -> None:
                 
                 if sniffable_columns:
                     columns_str = ", ".join(sniffable_columns)
-                    print(f"❗ Column(s) {columns_str} from `{table_name}` are being inserted, these values are sniffable. {file_path} at line {line_number}")
+                    warnings_list.append(f"❗ Column(s) {columns_str} from `{table_name}` are being inserted, these values are sniffable. {file_path} at line {line_number}")
 
 def bitwise_mask_check(file: io, file_path: str) -> None:
     global error_handler, results
@@ -764,7 +782,7 @@ def bitwise_mask_check(file: io, file_path: str) -> None:
                         
                         # Check for bitmask operation is valid or not
                         if re.match(r'^\d+$', clean_value):
-                            print_error_with_spacing(f"❌ Hardcoded value '{clean_value}' used for mask column `{column}` in table `{table_name}`. Use bitwise operators instead (e.g., |, &, ^, <<, >>, ~). {file_path} at line {line_number}", "bitwise")
+                            print_error_with_spacing(f"❌ Non-bitwise value '{clean_value}' used for mask column `{column}` in table `{table_name}`. Use bitwise operators instead. {file_path} at line {line_number}", "bitwise")
                             check_failed = True
                         
                         # good patterns for bitwise
@@ -794,7 +812,7 @@ def bitwise_mask_check(file: io, file_path: str) -> None:
                         
                         # Check if it's a plain integer (bad)
                         if re.match(r'^\d+$', value):
-                            print_error_with_spacing(f"❌ Hardcoded value '{value}' used for mask column `{column}` in table `{table_name}`. Use bitwise operators instead (e.g., |, &, ^, <<, >>, ~). {file_path} at line {line_number}", "bitwise")
+                            print_error_with_spacing(f"❌ Non-bitwise value '{value}' used for mask column `{column}` in table `{table_name}`. Use bitwise operators instead. {file_path} at line {line_number}", "bitwise")
                             check_failed = True
                         
                         # Check for proper bitwise operators (good patterns)
@@ -809,6 +827,104 @@ def bitwise_mask_check(file: io, file_path: str) -> None:
     if check_failed:
         error_handler = True
         results["Bitwise mask check"] = "Failed"
+
+def compact_queries_check(file: io, file_path: str) -> None:
+    global error_handler, results
+    file.seek(0)
+    check_failed = False
+    
+    lines = file.readlines()
+    
+    # Track patterns for consolidation opportunities
+    delete_patterns = {}  # table -> set of WHERE conditions
+    insert_patterns = {}  # table -> list of (columns, values) tuples
+    update_patterns = {}  # table -> list of (set_clause, where_clause) tuples
+    
+    for line_number, line in enumerate(lines, start=1):
+        line = line.strip()
+        
+        # Ignore/skip comments 
+        if not line or line.startswith('--'):
+            continue
+            
+        # For DELETEs
+        delete_match = re.match(r'DELETE\s+FROM\s+`?([^`\s]+)`?\s+WHERE\s+(.+);?$', line, re.IGNORECASE)
+        if delete_match:
+            table_name = delete_match.group(1)
+            where_clause = delete_match.group(2).strip().rstrip(';')
+            
+            # Look for  the ID where it consolidates
+            if re.match(r'`?(\w+)`?\s*=\s*\d+$', where_clause):
+                if table_name not in delete_patterns:
+                    delete_patterns[table_name] = []
+                delete_patterns[table_name].append((line_number, where_clause))
+        
+        # For inserts
+        insert_match = re.match(r'INSERT\s+INTO\s+`?([^`\s]+)`?\s*\(\s*([^)]+)\s*\)\s*VALUES?\s*\(\s*([^)]+)\s*\);?$', line, re.IGNORECASE)
+        if insert_match:
+            table_name = insert_match.group(1)
+            columns = insert_match.group(2).strip()
+            values = insert_match.group(3).strip()
+            
+            if table_name not in insert_patterns:
+                insert_patterns[table_name] = []
+            insert_patterns[table_name].append((line_number, columns, values))
+        
+        # for updates
+        update_match = re.match(r'UPDATE\s+`?([^`\s]+)`?\s+SET\s+(.+?)\s+WHERE\s+(.+);?$', line, re.IGNORECASE)
+        if update_match:
+            table_name = update_match.group(1)
+            set_clause = update_match.group(2).strip()
+            where_clause = update_match.group(3).strip().rstrip(';')
+            
+            # Look for  the ID where it consolidates
+            if re.match(r'`?(\w+)`?\s*=\s*\d+$', where_clause):
+                if table_name not in update_patterns:
+                    update_patterns[table_name] = []
+                update_patterns[table_name].append((line_number, set_clause, where_clause))
+    
+    # More than 1 DELETE found with the same column(s)
+    for table_name, deletes in delete_patterns.items():
+        if len(deletes) >= 3:  # 3 or more similar DELETE statements
+            line_numbers = [str(line_num) for line_num, _ in deletes]
+            print_error_with_spacing(f"❌ Multiple DELETE statements for table `{table_name}` can be consolidated using IN clause. Found {len(deletes)} statements at lines {', '.join(line_numbers)}. {file_path}", "compact")
+            check_failed = True
+    
+    # More than 1 INSERT found with the same column(s)
+    for table_name, inserts in insert_patterns.items():
+        if len(inserts) >= 3:  # 3 or more INSERT statements
+            # Group by column name
+            column_groups = {}
+            for line_num, columns, values in inserts:
+                if columns not in column_groups:
+                    column_groups[columns] = []
+                column_groups[columns].append(line_num)
+            
+            for columns, line_numbers in column_groups.items():
+                if len(line_numbers) >= 3:
+                    line_numbers_str = [str(ln) for ln in line_numbers]
+                    print_error_with_spacing(f"❌ Multiple INSERT statements for table `{table_name}` with same columns can be consolidated into multi-row INSERT. Found {len(line_numbers)} statements at lines {', '.join(line_numbers_str)}. {file_path}", "compact")
+                    check_failed = True
+    
+    # More than 1 UPDATE found with the same SET column(s)
+    for table_name, updates in update_patterns.items():
+        if len(updates) >= 3:  # 3 or more similar UPDATE statements
+            # Group by SET
+            set_groups = {}
+            for line_num, set_clause, where_clause in updates:
+                if set_clause not in set_groups:
+                    set_groups[set_clause] = []
+                set_groups[set_clause].append(line_num)
+            
+            for set_clause, line_numbers in set_groups.items():
+                if len(line_numbers) >= 3:
+                    line_numbers_str = [str(ln) for ln in line_numbers]
+                    print_error_with_spacing(f"❌ Multiple UPDATE statements for table `{table_name}` with same SET clause can be consolidated using IN clause. Found {len(line_numbers)} statements at lines {', '.join(line_numbers_str)}. {file_path}", "compact")
+                    check_failed = True
+    
+    if check_failed:
+        error_handler = True
+        results["Compact queries check"] = "Failed"
 
 # Collect all files from matching directories
 all_files = collect_files_from_directories(src_directory) + collect_files_from_directories(base_directory) + collect_files_from_directories(archive_directory)
