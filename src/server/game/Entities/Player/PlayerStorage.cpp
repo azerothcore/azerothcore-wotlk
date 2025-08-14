@@ -4616,8 +4616,15 @@ void Player::ApplyEnchantment(Item* item, EnchantmentSlot slot, bool apply, bool
                             HandleBaseModValue(SHIELD_BLOCK_VALUE, FLAT_MOD, float(enchant_amount), apply);
                             LOG_DEBUG("entities.player.items", "+ {} BLOCK_VALUE", enchant_amount);
                             break;
-                        case ITEM_MOD_SPELL_HEALING_DONE:   // deprecated
-                        case ITEM_MOD_SPELL_DAMAGE_DONE:    // deprecated
+                        /// @deprecated item mods
+                        case ITEM_MOD_SPELL_HEALING_DONE:
+                            ApplySpellHealingBonus(enchant_amount, apply);
+                            LOG_DEBUG("entities.player.items", "+ {} SPELL_HEALING", enchant_amount);
+                            break;
+                        case ITEM_MOD_SPELL_DAMAGE_DONE:
+                            ApplySpellDamageBonus(enchant_amount, apply);
+                            LOG_DEBUG("entities.player.items", "+ {} SPELL_DAMAGE", enchant_amount);
+                            break;
                         default:
                             break;
                     }
@@ -6472,9 +6479,16 @@ void Player::_LoadSpells(PreparedQueryResult result)
     if (result)
     {
         do
-            // xinef: checked
-            addSpell((*result)[0].Get<uint32>(), (*result)[1].Get<uint8>(), true);
-        while (result->NextRow());
+        {
+            Field* fields = result->Fetch();
+            uint32 spellId = fields[0].Get<uint32>();
+            uint8 specMask = fields[1].Get<uint8>();
+
+            if (CheckSkillLearnedBySpell(spellId))
+                addSpell(spellId, specMask, true);
+            else
+                removeSpell(spellId, SPEC_MASK_ALL, false);
+        } while (result->NextRow());
     }
 }
 
