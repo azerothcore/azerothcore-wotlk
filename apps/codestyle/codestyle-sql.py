@@ -27,6 +27,7 @@ results = {
     "Multiple blank lines check": "Passed",
     "Trailing whitespace check": "Passed",
     "SQL codestyle check": "Passed",
+    "Newline check": "Passed",
     "INSERT & DELETE safety usage check": "Passed",
     "Missing semicolon check": "Passed",
     "Backtick check": "Passed",
@@ -90,6 +91,7 @@ def parsing_file(files: list) -> None:
                     multiple_blank_lines_check(file, file_path)
                     trailing_whitespace_check(file, file_path)
                     sql_check(file, file_path)
+                    newline_check(file, file_path)
                     insert_delete_safety_check(file, file_path)
                     semicolon_check(file, file_path)
                     backtick_check(file, file_path)
@@ -124,25 +126,34 @@ def parsing_file(files: list) -> None:
     for check, result in results.items():
         if result == "Passed":
             status_icon = "✅"
+            status_text = "Passed"
         elif result == "Failed":
             status_icon = "❌"
+            status_text = "Failed"
         elif result == "Skipped":
             status_icon = "⊘"
+            status_text = "Skipped (not applicable)"
         else:
             status_icon = "❓"  # Fallback for unexpected status
-        print(f"{status_icon} {check}")
+            status_text = "Unknown"
+        print(f"{status_icon} {check}: {status_text}")
     
     print("\n ")
     print("Please read the SQL Standards for AzerothCore:")
     print("https://www.azerothcore.org/wiki/sql-standards")
+    print()
+    print("Check Categories:")
+    print("• Always runs (mandatory): Multiple blank lines, Trailing whitespace, SQL codestyle,")
+    print("  Newline, INSERT & DELETE safety usage, Missing semicolon, Backtick, Directory")
+    print("• Optional runs (when applicable): Table engine, Bitwise mask, Compact queries")
     
     if error_handler:
-        print("\n ")
-        print("\n❌ Please fix the codestyle issues above.")
+        print()
+        print("❌ Please fix the codestyle issues above.")
         sys.exit(1)
     else:
-        print("\n ")
-        print(f"\n✅ Everything looks good")
+        print()
+        print("✅ Everything looks good")
 
 # Codestyle patterns checking for multiple blank lines
 def multiple_blank_lines_check(file: io, file_path: str) -> None:
@@ -184,6 +195,26 @@ def trailing_whitespace_check(file: io, file_path: str) -> None:
         results["Trailing whitespace check"] = "Failed"
     # This check always runs - no "Skipped" status
 
+# Codestyle patterns checking for newline at end of file
+def newline_check(file: io, file_path: str) -> None:
+    global error_handler, results
+    file.seek(0)  # Reset file pointer to the beginning
+    check_failed = False
+
+    lines = file.readlines()
+    
+    # Check if the very last line ends with a newline
+    if lines and not lines[-1].endswith('\n'):
+        print_error_with_spacing(
+            f"❌ The last line is not a newline. Please add a newline: {file_path}", "newline")
+        check_failed = True
+
+    # Handle the script error and update the result output
+    if check_failed:
+        error_handler = True
+        results["Newline check"] = "Failed"
+    # This check always runs - no "Skipped" status
+
 # Codestyle patterns checking for various codestyle issues
 def sql_check(file: io, file_path: str) -> None:
     global error_handler, results
@@ -210,12 +241,6 @@ def sql_check(file: io, file_path: str) -> None:
             print_error_with_spacing(
                 f"❌ Tab found! Replace it to 4 spaces: {file_path} at line {line_number}", "sql_codestyle")
             check_failed = True
-
-    # Check if the very last line ends with a newline
-    if lines and not lines[-1].endswith('\n'):
-        print_error_with_spacing(
-            f"❌ The last line is not a newline. Please add a newline: {file_path}", "sql_codestyle")
-        check_failed = True
 
     # Handle the script error and update the result output
     if check_failed:
@@ -314,8 +339,7 @@ def insert_delete_safety_check(file: io, file_path: str) -> None:
     if check_failed:
         error_handler = True
         results["INSERT & DELETE safety usage check"] = "Failed"
-    elif not found_relevant_content:
-        results["INSERT & DELETE safety usage check"] = "Skipped"
+    # This check should always run when there are SQL statements - no "Skipped" status
 
 def semicolon_check(file: io, file_path: str) -> None:
     global error_handler, results
