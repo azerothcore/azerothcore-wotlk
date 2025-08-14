@@ -885,14 +885,14 @@ def compact_queries_check(file: io, file_path: str) -> None:
     
     # More than 1 DELETE found with the same column(s)
     for table_name, deletes in delete_patterns.items():
-        if len(deletes) >= 3:  # 3 or more similar DELETE statements
+        if len(deletes) >= 2:  # 2 or more similar DELETE statements
             line_numbers = [str(line_num) for line_num, _ in deletes]
             print_error_with_spacing(f"❌ Multiple DELETE statements for table `{table_name}` can be consolidated using IN clause. Found {len(deletes)} statements at lines {', '.join(line_numbers)}. {file_path}", "compact")
             check_failed = True
     
     # More than 1 INSERT found with the same column(s)
     for table_name, inserts in insert_patterns.items():
-        if len(inserts) >= 3:  # 3 or more INSERT statements
+        if len(inserts) >= 2:  # 2 or more INSERT statements
             # Group by column name
             column_groups = {}
             for line_num, columns, values in inserts:
@@ -901,14 +901,14 @@ def compact_queries_check(file: io, file_path: str) -> None:
                 column_groups[columns].append(line_num)
             
             for columns, line_numbers in column_groups.items():
-                if len(line_numbers) >= 3:
+                if len(line_numbers) >= 2:
                     line_numbers_str = [str(ln) for ln in line_numbers]
                     print_error_with_spacing(f"❌ Multiple INSERT statements for table `{table_name}` with same columns can be consolidated into multi-row INSERT. Found {len(line_numbers)} statements at lines {', '.join(line_numbers_str)}. {file_path}", "compact")
                     check_failed = True
     
     # More than 1 UPDATE found with the same SET column(s)
     for table_name, updates in update_patterns.items():
-        if len(updates) >= 3:  # 3 or more similar UPDATE statements
+        if len(updates) >= 2:  # 2 or more similar UPDATE statements
             # Group by SET
             set_groups = {}
             for line_num, set_clause, where_clause in updates:
@@ -917,7 +917,7 @@ def compact_queries_check(file: io, file_path: str) -> None:
                 set_groups[set_clause].append(line_num)
             
             for set_clause, line_numbers in set_groups.items():
-                if len(line_numbers) >= 3:
+                if len(line_numbers) >= 2:
                     line_numbers_str = [str(ln) for ln in line_numbers]
                     print_error_with_spacing(f"❌ Multiple UPDATE statements for table `{table_name}` with same SET clause can be consolidated using IN clause. Found {len(line_numbers)} statements at lines {', '.join(line_numbers_str)}. {file_path}", "compact")
                     check_failed = True
