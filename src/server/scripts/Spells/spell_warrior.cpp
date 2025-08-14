@@ -102,23 +102,15 @@ class spell_warr_victory_rush : public SpellScript
 {
     PrepareSpellScript(spell_warr_victory_rush);
 
-    void VictoryRushHit()
+    void HandleCast()
     {
-        if (Unit* player = GetCaster())
-        {
-            if (Unit* victim = GetHitUnit())
-            {
-                if (victim->isDead())
-                {
-                    player->CastSpell(player, SPELL_VICTORIOUS, true);
-                }
-            }
-        }
+        if (Unit* caster = GetCaster())
+            caster->RemoveAurasDueToSpell(SPELL_VICTORIOUS);
     }
 
     void Register() override
     {
-        AfterHit += SpellHitFn(spell_warr_victory_rush::VictoryRushHit);
+        OnCast += SpellCastFn(spell_warr_victory_rush::HandleCast);
     }
 };
 
@@ -918,7 +910,7 @@ class spell_warr_heroic_strike : public SpellScript
         Unit* target = GetHitUnit();
         if (!target)
             return;
-        std::list<AuraEffect*> AuraEffectList = target->GetAuraEffectsByType(SPELL_AURA_MOD_DECREASE_SPEED);
+        Unit::AuraEffectList const& AuraEffectList = target->GetAuraEffectsByType(SPELL_AURA_MOD_DECREASE_SPEED);
         bool bonusDamage = false;
         for (AuraEffect* eff : AuraEffectList)
         {

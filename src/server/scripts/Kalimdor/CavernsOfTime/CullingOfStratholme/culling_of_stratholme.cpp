@@ -692,6 +692,7 @@ public:
                         // Start Event
                         Start(true, false);
                         SetDespawnAtEnd(false);
+                        SetDespawnAtFar(false);
 
                         ScheduleNextEvent(currentEvent, 9000);
                         break;

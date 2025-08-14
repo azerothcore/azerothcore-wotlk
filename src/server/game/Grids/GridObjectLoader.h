@@ -47,6 +47,7 @@ class GridObjectCleaner
 {
 public:
     template<class T> void Visit(GridRefMgr<T>&);
+    void Visit(PlayerMapType&) { }
 };
 
 // Delete objects before deleting NGrid
@@ -54,6 +55,7 @@ class GridObjectUnloader
 {
 public:
     void Visit(CorpseMapType&) { }    // corpses are deleted with Map
+    void Visit(PlayerMapType&) { }
     template<class T> void Visit(GridRefMgr<T>& m);
 };
 #endif

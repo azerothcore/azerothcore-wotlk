@@ -16,6 +16,7 @@
  */
 
 #include "AccountMgr.h"
+#include "Common.h"
 #include "DatabaseEnv.h"
 #include "ObjectAccessor.h"
 #include "Player.h"
@@ -311,6 +312,11 @@ namespace AccountMgr
     bool IsPlayerAccount(uint32 gmlevel)
     {
         return gmlevel == SEC_PLAYER;
+    }
+
+    bool IsGMAccount(uint32 gmlevel)
+    {
+        return gmlevel >= SEC_GAMEMASTER;
     }
 
     bool IsAdminAccount(uint32 gmlevel)
