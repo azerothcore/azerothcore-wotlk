@@ -27,6 +27,9 @@ WHERE entry = 33589 AND pointid = 4;
 DELETE FROM smart_scripts
 WHERE source_type = 0 AND entryorguid = 33589 AND id IN (2,3);
 
+-- From 0 (all) to 690 (only horde)
+UPDATE `quest_template` SET `AllowableRaces` = 690 WHERE `ID` = 2283;
+
 -- 3) Recreate the orientation as a direct event on WP 4
 INSERT INTO smart_scripts (
   entryorguid, source_type, id, `link`,
