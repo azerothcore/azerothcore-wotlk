@@ -199,8 +199,10 @@ def sql_check(file: io, file_path: str) -> None:
     check_failed = False
     found_relevant_content = False
 
+    lines = file.readlines()
+    
     # Parse all the file
-    for line_number, line in enumerate(file, start = 1):
+    for line_number, line in enumerate(lines, start = 1):
         # Only mark as relevant if line has actual SQL content (not just comments/empty)
         if line.strip() and not line.strip().startswith('--'):
             found_relevant_content = True
@@ -222,11 +224,11 @@ def sql_check(file: io, file_path: str) -> None:
                 f"❌ Tab found! Replace it to 4 spaces: {file_path} at line {line_number}", "sql_codestyle")
             check_failed = True
 
-        last_line = line[-1].strip()
-        if last_line:
-            print_error_with_spacing(
-                f"❌ The last line is not a newline. Please add a newline: {file_path}", "sql_codestyle")
-            check_failed = True
+    # Check if the very last line ends with a newline
+    if lines and not lines[-1].endswith('\n'):
+        print_error_with_spacing(
+            f"❌ The last line is not a newline. Please add a newline: {file_path}", "sql_codestyle")
+        check_failed = True
 
     # Handle the script error and update the result output
     if check_failed:
