@@ -43,13 +43,40 @@
 //  see: https://github.com/azerothcore/azerothcore-wotlk/issues/9766
 #include "GridNotifiersImpl.h"
 
-// Definition of some variables / structs for the recursion railguard
-thread_local bool g_smartScriptProcessing = false;
+// Maximum allowed nested calls of any kind to prevent a stack overflow
+#define MAX_GLOBAL_RECURSION_DEPTH 20
+// Maximum allowed nested calls for the same event to prevent simple infinite loops
+#define MAX_PER_EVENT_RECURSION 3
+
+// Global depth counter variable
+thread_local uint32_t g_smartScriptGlobalDepth = 0;
+
+// The counter map (per event)
+// Key -> A "tuple" of {entryOrGuid, source_type, event_id} which identifies a script line (uniquely)
+// Value -> The recursion count for that specific event
+thread_local std::map<std::tuple<int32_t, uint8_t, uint32_t>, uint32_t> g_smartScriptEventMap;
 
 struct SmartScriptProcessorGuard
 {
-    SmartScriptProcessorGuard() { g_smartScriptProcessing = true; }
-    ~SmartScriptProcessorGuard() { g_smartScriptProcessing = false; }
+    // Stores the key for the event
+    std::tuple<int32_t, uint8_t, uint32_t> m_key;
+
+    SmartScriptProcessorGuard(const SmartScriptHolder& e)
+    {
+        // Create a unique key
+        m_key = std::make_tuple(e.entryOrGuid, e.source_type, e.event_id);
+
+        // Increments the global and the specific event counters
+        ++g_smartScriptGlobalDepth;
+        g_smartScriptEventMap[m_key]++;
+    }
+
+    ~SmartScriptProcessorGuard()
+    {
+        // Decrements the counters when the function scope is left
+        g_smartScriptEventMap[m_key]--;
+        --g_smartScriptGlobalDepth;
+    }
 };
 
 SmartScript::SmartScript()
@@ -4046,11 +4073,21 @@ void SmartScript::GetWorldObjectsInDist(ObjectVector& targets, float dist) const
 
 void SmartScript::ProcessEvent(SmartScriptHolder& e, Unit* unit, uint32 var0, uint32 var1, bool bvar, SpellInfo const* spell, GameObject* gob)
 {
-    // A recursion protection
-    if (g_smartScriptProcessing)
-        return;
+    auto key = std::make_tuple(e.entryOrGuid, e.source_type, e.event_id);
 
-    SmartScriptProcessorGuard guard;
+    if (g_smartScriptGlobalDepth >= MAX_GLOBAL_RECURSION_DEPTH)
+    {
+        LOG_ERROR("sql.sql", "SmartScript: Terminating script processing - Exceeded max global recursion depth of {}. Problem in script Entry/GUID: {}, SourceType: {}, Event: {}.", MAX_GLOBAL_RECURSION_DEPTH, e.entryOrGuid, e.source_type, e.event_id);
+        return;
+    }
+
+    if (g_smartScriptEventMap[key] >= MAX_PER_EVENT_RECURSION)
+    {
+        LOG_ERROR("sql.sql", "SmartScript: Terminating script processing - Exceeded max per-event recursion of {}. Infinite loop detected for script Entry/GUID: {}, SourceType: {}, Event: {}.", MAX_PER_EVENT_RECURSION, e.entryOrGuid, e.source_type, e.event_id);
+        return;
+    }
+
+    SmartScriptProcessorGuard guard(e);
 
     if (!e.active && e.GetEventType() != SMART_EVENT_LINK)
         return;
