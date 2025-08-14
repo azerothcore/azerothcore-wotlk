@@ -120,7 +120,7 @@ public:
             {
                 _minionInCombat = true;
 
-                for (auto const& timer : { 10s, 40s, 70s })
+                for (Seconds const& timer : { 10s, 40s, 70s })
                 {
                     me->m_Events.AddEventAtOffset([this] {
                         me->CastCustomSpell(SPELL_SUBBOSS_AGGRO_TRIGGER, SPELLVALUE_MAX_TARGETS, 1, me, true);
