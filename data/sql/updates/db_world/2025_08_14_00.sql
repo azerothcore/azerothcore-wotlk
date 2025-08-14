@@ -1,3 +1,4 @@
+-- DB update 2025_08_13_00 -> 2025_08_14_00
 -- Allow Anub'ar warrior to use Strike ability. (Set the event_type 0 to "incombat update" instead of "out of combat update")
 UPDATE `creature_template` SET `AIName` = 'SmartAI' WHERE `entry` = 28732;
 DELETE FROM `smart_scripts` WHERE (`entryorguid` = 28732) AND (`source_type` = 0) AND (`id` IN (0));
