@@ -553,7 +553,7 @@ def non_innodb_engine_check(file: io, file_path: str) -> None:
     if check_failed:
         error_handler = True
         results["Table engine check"] = "Failed"
-    elif not found_relevant_content:
+    else:
         results["Table engine check"] = "Skipped"    
 
 def sniffable_data_check(file: io, file_path: str) -> None:
@@ -900,7 +900,7 @@ def bitwise_mask_check(file: io, file_path: str) -> None:
     if check_failed:
         error_handler = True
         results["Bitwise mask check"] = "Failed"
-    elif not found_relevant_content:
+    else:
         results["Bitwise mask check"] = "Skipped"
 
 def use_statement_check(file: io, file_path: str) -> None:
@@ -925,7 +925,7 @@ def use_statement_check(file: io, file_path: str) -> None:
     if check_failed:
         error_handler = True
         results["USE statement check"] = "Failed"
-    elif not found_relevant_content:
+    else:
         results["USE statement check"] = "Skipped"
 
 def compact_queries_check(file: io, file_path: str) -> None:
@@ -1029,7 +1029,7 @@ def compact_queries_check(file: io, file_path: str) -> None:
     if check_failed:
         error_handler = True
         results["Compact queries check"] = "Failed"
-    elif not found_relevant_content:
+    else:
         results["Compact queries check"] = "Skipped"
 
 # Collect all files from matching directories
