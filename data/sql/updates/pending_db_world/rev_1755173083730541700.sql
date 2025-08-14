@@ -58,8 +58,6 @@ UPDATE `quest_template` SET `Flags` = 4194304 WHERE `ID` = 54321;
 -- Example 5: INSERT with hardcoded values
 INSERT INTO `creature_template` (`entry`, `mechanic_immune_mask`) VALUES (12345, 617299803);
 
--- ✅ Good Examples (Will Pass the Bitwise Mask Check)
-
 -- 1. Using Bitwise OR to Add Flags
 UPDATE `creature_template` SET `mechanic_immune_mask`=`mechanic_immune_mask`|64|256|1024 WHERE `entry` = 7727;
 UPDATE `item_template` SET `Flags`=`Flags`|2048 WHERE `entry` = 12345;
@@ -99,4 +97,6 @@ INSERT INTO `creature_template` (`entry`, `mechanic_immune_mask`) VALUES (12345,
 INSERT INTO `item_template` (`entry`, `Flags`) VALUES (98765, 1<<11);
 INSERT INTO `creature` (`guid`, `unit_flags`) VALUES (12345, 0);
 INSERT INTO `quest_template` (`ID`, `Flags`) VALUES (54321, @quest_flags);
-INSERT INTO `spell_proc` (`SpellID`, `ProcFlags`)
+INSERT INTO `spell_proc` (`SpellID`, `ProcFlags`) VALUES (12345, (1<<5)|(1<<10));
+
+UPDATE `creature` SET `unit_flags` = 489;
