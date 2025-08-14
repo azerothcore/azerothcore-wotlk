@@ -2364,7 +2364,6 @@ void Spell::CleanupTargetList()
     m_UniqueTargetInfo.clear();
     m_UniqueGOTargetInfo.clear();
     m_UniqueItemInfo.clear();
-    m_targetUnitMap.clear();
     m_targets.clear();
     m_delayMoment = 0;
     m_delayTrajectory = 0;
