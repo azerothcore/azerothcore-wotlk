@@ -29,7 +29,8 @@ results = {
     "Missing semicolon check": "Passed",
     "Backtick check": "Passed",
     "Directory check": "Passed",
-    "Table engine check": "Passed"
+    "Table engine check": "Passed",
+    "Bitwise mask check": "Passed"
 }
 
 # Collect all files in all directories
@@ -81,6 +82,7 @@ def parsing_file(files: list) -> None:
                     backtick_check(file, file_path)
                     non_innodb_engine_check(file, file_path)
                     sniffable_data_check(file, file_path)
+                    bitwise_mask_check(file, file_path)
             except UnicodeDecodeError:
                 print(f"\n❌ Could not decode file {file_path}")
                 sys.exit(1)
@@ -663,6 +665,133 @@ def sniffable_data_check(file: io, file_path: str) -> None:
                 if sniffable_columns:
                     columns_str = ", ".join(sniffable_columns)
                     print(f"❗ Column(s) {columns_str} from `{table_name}` are being inserted, these values are sniffable. {file_path} at line {line_number}")
+
+def bitwise_mask_check(file: io, file_path: str) -> None:
+    global error_handler, results
+    file.seek(0)
+    check_failed = False
+    
+    # Define the tables and columns for column that require bitmask operations
+    # Data extract using: https://gist.github.com/TheSCREWEDSoftware/acd855a85678b2400edcb9ee7c89acdb
+    bitwise_columns = {
+        "broadcast_text": ["Flags"],
+        
+        "creature": ["dynamicflags", "npcflag", "phaseMask", "spawnMask", "unit_flags"],
+        
+        "creature_template": ["dynamicflags", "flags_extra", "mechanic_immune_mask", "npcflag", "spell_school_immune_mask", "type_flags", "unit_flags", "unit_flags2"],
+        
+        "disables": ["flags"],
+        
+        "game_event_battleground_holiday": ["bgflag"],
+        
+        "game_event_npcflag": ["npcflag"],
+        
+        "gameobject": ["phaseMask", "spawnMask"],
+        
+        "gameobject_template_addon": ["flags"],
+        
+        "gossip_menu_option": ["OptionNpcFlag"],
+        
+        "item_template": ["Flags", "flagsCustom", "FlagsExtra"],
+        
+        "mail_level_reward": ["raceMask"],
+        
+        "npc_spellclick_spells": ["cast_flags"],
+        
+        "playercreateinfo_cast_spell": ["classMask", "raceMask"],
+        
+        "playercreateinfo_skills": ["classMask", "raceMask"],
+        
+        "playercreateinfo_spell_custom": ["classmask", "racemask"],
+        
+        "points_of_interest": ["Flags"],
+        
+        "quest_poi": ["Flags"],
+        
+        "quest_template": ["Flags"],
+        
+        "quest_template_addon": ["SpecialFlags"],
+        
+        "smart_scripts": ["event_flags", "event_phase_mask"],
+        
+        "spell_area": ["racemask"],
+        
+        "spell_enchant_proc_data": ["attributeMask"],
+        
+        "spell_group": ["special_flag"],
+        
+        "spell_proc": ["AttributesMask", "HitMask", "ProcFlags", "SchoolMask", "SpellFamilyMask0", "SpellFamilyMask1", "SpellFamilyMask2", "SpellPhaseMask", "SpellTypeMask"],
+        
+        "spell_proc_event": ["procFlags", "SchoolMask", "SpellFamilyMask0", "SpellFamilyMask1", "SpellFamilyMask2"]
+    }
+    
+    for line_number, line in enumerate(file, start=1):
+        # Skip/ignore comments
+        if line.strip().startswith('--'):
+            continue
+            
+        # For updates
+        update_match = re.match(r'UPDATE\s+`?([^`\s]+)`?\s+SET\s+(.*?)(?:\s+WHERE|$)', line.strip(), re.IGNORECASE)
+        if update_match:
+            table_name = update_match.group(1)
+            set_clause = update_match.group(2)
+            
+            if table_name in bitwise_columns:
+                # Extract column=value pairs
+                column_assignments = re.findall(r'`?([^`\s=]+)`?\s*=\s*([^,]+)', set_clause)
+                
+                for column, value in column_assignments:
+                    if column in bitwise_columns[table_name]:
+                        # Only checks for the value (numeric)
+                        clean_value = value.strip().strip('"\'')
+                        
+                        # Check for bitmask operation is valid or not
+                        if re.match(r'^\d+$', clean_value):
+                            print(f"❌ Hardcoded value '{clean_value}' used for mask column `{column}` in table `{table_name}`. Use bitwise operators instead (e.g., |, &, ^, <<, >>, ~). {file_path} at line {line_number}")
+                            check_failed = True
+                        
+                        # good patterns for bitwise
+                        elif not re.search(r'[|&^~]|<<|>>', clean_value):
+                            # If it doesn't contain bitwise operators and it's not 0 or NULL, it's likely wrong
+                            if clean_value not in ['0', 'NULL', 'null']:
+                                if not re.match(r'^[@`]|^\w+\(', clean_value):
+                                    print(f"❌ Value '{clean_value}' for mask column `{column}` in table `{table_name}` should use bitwise operators. {file_path} at line {line_number}")
+                                    check_failed = True
+        
+        # For inserts
+        insert_match = re.match(r'INSERT\s+INTO\s+`?([^`\s]+)`?\s*\(\s*([^)]+)\s*\)\s*VALUES?\s*\(\s*([^)]+)\s*\)', line.strip(), re.IGNORECASE)
+        if insert_match:
+            table_name = insert_match.group(1)
+            columns_str = insert_match.group(2)
+            values_str = insert_match.group(3)
+            
+            if table_name in bitwise_columns:
+                # Extract column names and values
+                columns = [col.strip().strip('`') for col in columns_str.split(',')]
+                values = [val.strip().strip('"\'') for val in values_str.split(',')]
+                
+                # Check each column-value pair
+                for i, column in enumerate(columns):
+                    if column in bitwise_columns[table_name] and i < len(values):
+                        value = values[i]
+                        
+                        # Check if it's a plain integer (bad)
+                        if re.match(r'^\d+$', value):
+                            print(f"❌ Hardcoded value '{value}' used for mask column `{column}` in table `{table_name}`. Use bitwise operators instead (e.g., |, &, ^, <<, >>, ~). {file_path} at line {line_number}")
+                            check_failed = True
+                        
+                        # Check for proper bitwise operators (good patterns)
+                        elif not re.search(r'[|&^~]|<<|>>', value):
+                            # If it doesn't contain bitwise operators and it's not 0 or NULL, it's likely wrong
+                            if value not in ['0', 'NULL', 'null']:
+                                # Allow for variable references like @variable or function calls
+                                if not re.match(r'^[@`]|^\w+\(', value):
+                                    print(f"❌ Value '{value}' for mask column `{column}` in table `{table_name}` should use bitwise operators. {file_path} at line {line_number}")
+                                    check_failed = True
+    
+    if check_failed:
+        error_handler = True
+        results["Bitwise mask check"] = "Failed"
 
 # Collect all files from matching directories
 all_files = collect_files_from_directories(src_directory) + collect_files_from_directories(base_directory) + collect_files_from_directories(archive_directory)
