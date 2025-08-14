@@ -24,17 +24,17 @@ error_handler = False
 current_error_category = None
 warnings_list = []
 results = {
+    "Directory check": "Passed",
+    "SQL codestyle check": "Passed",
     "Multiple blank lines check": "Passed",
     "Trailing whitespace check": "Passed",
-    "SQL codestyle check": "Passed",
-    "Newline check": "Passed",
+    "Backtick check": "Passed",
     "INSERT & DELETE safety usage check": "Passed",
     "Missing semicolon check": "Passed",
-    "Backtick check": "Passed",
-    "Directory check": "Passed",
-    "Table engine check": "Passed",
+    "Newline check": "Passed",
+    "Compact queries check": "Passed",
     "Bitwise mask check": "Passed",
-    "Compact queries check": "Passed"
+    "Table engine check": "Passed"
 }
 
 def print_error_with_spacing(error_message: str, category: str) -> None:
@@ -143,9 +143,9 @@ def parsing_file(files: list) -> None:
     print("https://www.azerothcore.org/wiki/sql-standards")
     print()
     print("Check Categories:")
-    print("• Always runs (mandatory): Multiple blank lines, Trailing whitespace, SQL codestyle,")
-    print("  Newline, INSERT & DELETE safety usage, Missing semicolon, Backtick, Directory")
-    print("• Optional runs (when applicable): Table engine, Bitwise mask, Compact queries")
+    print("• Mandatory (always runs): Directory, SQL codestyle, Multiple blank lines,")
+    print("  Trailing whitespace, Backtick, INSERT & DELETE safety usage, Missing semicolon, Newline")
+    print("• Optional runs (when applicable): Compact queries, Bitwise mask, Table engine")
     
     if error_handler:
         print()
