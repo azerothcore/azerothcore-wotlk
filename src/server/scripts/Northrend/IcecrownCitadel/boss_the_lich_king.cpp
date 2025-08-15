@@ -2835,6 +2835,12 @@ class spell_the_lich_king_vile_spirit_move_target_search : public SpellScript
 
     void SelectTarget(std::list<WorldObject*>& targets)
     {
+        targets.remove_if([](WorldObject* obj)
+        {
+            Unit* unit = obj->ToUnit();
+            return !unit || !unit->IsPlayer();
+        });
+
         if (targets.empty())
             return;
 
