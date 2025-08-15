@@ -116,7 +116,7 @@ void BattlegroundAB::PostUpdateImpl(uint32 diff)
                             RewardHonorToTeam(GetBonusHonorFromKill(1), teamId);
                         if (reputationRewards < uint8(m_TeamScores[teamId] / _reputationTics))
                         {
-                            float bgRepRate = sWorld->getRate(RATE_REPUTATION_GAIN_BG);
+                            float bgRepRate = sWorld->getRate(RATE_REPUTATION_GAIN_AB);
                             uint32 scaledReputation = uint32(10 * bgRepRate);
                             RewardReputationToTeam(teamId == TEAM_ALLIANCE ? 509 : 510, scaledReputation, teamId);
                         }

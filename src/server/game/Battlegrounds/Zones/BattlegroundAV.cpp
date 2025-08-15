@@ -195,7 +195,7 @@ void BattlegroundAV::HandleQuestComplete(uint32 questid, Player* player)
         case AV_QUEST_H_COMMANDER1:
             m_Team_QuestStatus[teamId][1]++;
             {
-                float bgRepRate = sWorld->getRate(RATE_REPUTATION_GAIN_BG);
+                float bgRepRate = sWorld->getRate(RATE_REPUTATION_GAIN_AV);
                 RewardReputationToTeam(teamId, uint32(1 * bgRepRate), teamId);
             }
             if (m_Team_QuestStatus[teamId][1] == 30)
@@ -205,7 +205,7 @@ void BattlegroundAV::HandleQuestComplete(uint32 questid, Player* player)
         case AV_QUEST_H_COMMANDER2:
             m_Team_QuestStatus[teamId][2]++;
             {
-                float bgRepRate = sWorld->getRate(RATE_REPUTATION_GAIN_BG);
+                float bgRepRate = sWorld->getRate(RATE_REPUTATION_GAIN_AV);
                 RewardReputationToTeam(teamId, uint32(1 * bgRepRate), teamId);
             }
             if (m_Team_QuestStatus[teamId][2] == 60)
@@ -215,7 +215,7 @@ void BattlegroundAV::HandleQuestComplete(uint32 questid, Player* player)
         case AV_QUEST_H_COMMANDER3:
             m_Team_QuestStatus[teamId][3]++;
             {
-                float bgRepRate = sWorld->getRate(RATE_REPUTATION_GAIN_BG);
+                float bgRepRate = sWorld->getRate(RATE_REPUTATION_GAIN_AV);
                 RewardReputationToTeam(teamId, uint32(1 * bgRepRate), teamId);
             }
             if (m_Team_QuestStatus[teamId][3] == 120)
@@ -1250,7 +1250,7 @@ GraveyardStruct const* BattlegroundAV::GetClosestGraveyard(Player* player)
 bool BattlegroundAV::SetupBattleground()
 {
     // Get the custom BG reputation rate from the config file
-    float bgRepRate = sWorld->getRate(RATE_REPUTATION_GAIN_BG);
+    float bgRepRate = sWorld->getRate(RATE_REPUTATION_GAIN_AV);
 
     if (sBattlegroundMgr->IsBGWeekend(GetBgTypeID(true)))
     {

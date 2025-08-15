@@ -83,12 +83,13 @@ void WorldConfig::BuildConfigCache()
     SetConfigValue<float>(RATE_BUYVALUE_ITEM_LEGENDARY, "Rate.BuyValue.Item.Legendary", 1.0f);
     SetConfigValue<float>(RATE_BUYVALUE_ITEM_ARTIFACT, "Rate.BuyValue.Item.Artifact", 1.0f);
     SetConfigValue<float>(RATE_BUYVALUE_ITEM_HEIRLOOM, "Rate.BuyValue.Item.Heirloom", 1.0f);
-
     SetConfigValue<float>(RATE_REPUTATION_GAIN, "Rate.Reputation.Gain", 1.0f);
+    SetConfigValue<float>(RATE_REPUTATION_GAIN_AB, "Rate.Reputation.Gain.AB", 1.0f);
+    SetConfigValue<float>(RATE_REPUTATION_GAIN_AV, "Rate.Reputation.Gain.AV", 1.0f);
+    SetConfigValue<float>(RATE_REPUTATION_GAIN_WSG, "Rate.Reputation.Gain.WSG", 1.0f);
     SetConfigValue<float>(RATE_REPUTATION_LOWLEVEL_KILL, "Rate.Reputation.LowLevel.Kill", 1.0f);
     SetConfigValue<float>(RATE_REPUTATION_LOWLEVEL_QUEST, "Rate.Reputation.LowLevel.Quest", 1.0f);
     SetConfigValue<float>(RATE_REPUTATION_RECRUIT_A_FRIEND_BONUS, "Rate.Reputation.RecruitAFriendBonus", 0.1f);
-    SetConfigValue<float>(RATE_REPUTATION_GAIN_BG, "Rate.Reputation.Gain.BG", 1.0f);
     SetConfigValue<float>(RATE_CREATURE_NORMAL_DAMAGE, "Rate.Creature.Normal.Damage", 1.0f);
     SetConfigValue<float>(RATE_CREATURE_ELITE_ELITE_DAMAGE, "Rate.Creature.Elite.Elite.Damage", 1.0f);
     SetConfigValue<float>(RATE_CREATURE_ELITE_RAREELITE_DAMAGE, "Rate.Creature.Elite.RAREELITE.Damage", 1.0f);
