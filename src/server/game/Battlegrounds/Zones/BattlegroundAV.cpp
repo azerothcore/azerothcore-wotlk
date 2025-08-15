@@ -1911,5 +1911,5 @@ TeamId BattlegroundAV::GetPrematureWinner()
     if (GetTeamScore(TEAM_ALLIANCE) > GetTeamScore(TEAM_HORDE))
         return TEAM_ALLIANCE;
 
-    return GetTeamScore(TEAM_HORDE) > GetTeamScore(TEAM_ALLIANCE) ? Battleground::GetPrematureWinner() : TEAM_NEUTRAL;
+    return GetTeamScore(TEAM_HORDE) > GetTeamScore(TEAM_ALLIANCE) ? TEAM_HORDE : Battleground::GetPrematureWinner();
 }
