@@ -3915,5 +3915,8 @@ bool Creature::IsUpdateNeeded()
     if (HasUnitState(UNIT_STATE_EVADE))
         return true;
 
+    if (m_formation && m_formation->GetLeader() != this)
+        return true;
+
     return false;
 }
