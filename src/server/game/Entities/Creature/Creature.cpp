@@ -3918,17 +3918,21 @@ bool Creature::IsUpdateNeeded()
     // Group members should also follow the movement
     if (m_formation)
     {
-        CreatureGroup::CreatureGroupMemberType const& members = m_formation->GetMembers();
-        for (auto const& [member, info] : members)
+        Creature* leader = m_formation->GetLeader();
+        if (leader && leader->GetMotionMaster()->HasMovementGeneratorType(WAYPOINT_MOTION_TYPE))
         {
-            if (!member || member == m_formation->GetLeader())
-                continue;
+            CreatureGroup::CreatureGroupMemberType const& members = m_formation->GetMembers();
+            for (auto const& [member, info] : members)
+            {
+                if (!info.HasGroupFlag(std::underlying_type_t<GroupAIFlags>(GroupAIFlags::GROUP_AI_FLAG_FOLLOW_LEADER)))
+                    break;
 
-            if (!info.HasGroupFlag(std::underlying_type_t<GroupAIFlags>(GroupAIFlags::GROUP_AI_FLAG_FOLLOW_LEADER)))
-                continue;
+                if (!member || member == leader)
+                    continue;
 
-            if (member == this)
-                return true;
+                if (member == this)
+                    return true;
+            }
         }
     }
 
