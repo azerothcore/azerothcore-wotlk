@@ -83,6 +83,7 @@ void WorldConfig::BuildConfigCache()
     SetConfigValue<float>(RATE_BUYVALUE_ITEM_LEGENDARY, "Rate.BuyValue.Item.Legendary", 1.0f);
     SetConfigValue<float>(RATE_BUYVALUE_ITEM_ARTIFACT, "Rate.BuyValue.Item.Artifact", 1.0f);
     SetConfigValue<float>(RATE_BUYVALUE_ITEM_HEIRLOOM, "Rate.BuyValue.Item.Heirloom", 1.0f);
+
     SetConfigValue<float>(RATE_REPUTATION_GAIN, "Rate.Reputation.Gain", 1.0f);
     SetConfigValue<float>(RATE_REPUTATION_GAIN_AB, "Rate.Reputation.Gain.AB", 1.0f);
     SetConfigValue<float>(RATE_REPUTATION_GAIN_AV, "Rate.Reputation.Gain.AV", 1.0f);
