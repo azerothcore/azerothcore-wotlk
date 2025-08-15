@@ -656,7 +656,7 @@ Allow.IP.Based.Action.Logging = 0
 Appender.Console=1,4,0,"1 9 3 6 5 8"
 Appender.Server=2,5,0,Server.log,w
 # Appender.GM=2,5,15,gm_%s.log
-Appender.Errors=2,5,0,Errors.log,w
+Appender.Errors=2,2,0,Errors.log,w
 # Appender.DB=3,5,0
 
 #  Logger config values: Given a logger "name"
@@ -685,6 +685,7 @@ Logger.mmaps=4,Server
 Logger.scripts.hotswap=4,Console Server
 Logger.server=4,Console Server
 Logger.sql.sql=2,Console Errors
+Logger.sql.updates=4,Console Server Errors
 Logger.sql=4,Console Server
 Logger.time.update=4,Console Server
 Logger.module=4,Console Server
@@ -783,7 +784,6 @@ Logger.spells.scripts=2,Console Errors
 #Logger.spells=4,Console Server
 #Logger.sql.dev=4,Console Server
 #Logger.sql.driver=4,Console Server
-#Logger.sql.updates=4,Console Server
 #Logger.vehicles=4,Console Server
 #Logger.warden=4,Console Server
 #Logger.weather=4,Console Server
