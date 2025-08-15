@@ -3925,7 +3925,7 @@ bool Creature::IsUpdateNeeded()
             for (auto const& [member, info] : members)
             {
                 if (!info.HasGroupFlag(std::underlying_type_t<GroupAIFlags>(GroupAIFlags::GROUP_AI_FLAG_FOLLOW_LEADER)))
-                    break;
+                    continue;
 
                 if (!member || member == leader)
                     continue;
