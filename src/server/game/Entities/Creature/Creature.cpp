@@ -3915,5 +3915,22 @@ bool Creature::IsUpdateNeeded()
     if (HasUnitState(UNIT_STATE_EVADE))
         return true;
 
+    // Group members should also follow the movement
+    if (m_formation)
+    {
+        CreatureGroup::CreatureGroupMemberType const& members = m_formation->GetMembers();
+        for (auto const& [member, info] : members)
+        {
+            if (!member || member == m_formation->GetLeader())
+                continue;
+
+            if (!info.HasGroupFlag(std::underlying_type_t<GroupAIFlags>(GroupAIFlags::GROUP_AI_FLAG_FOLLOW_LEADER)))
+                continue;
+
+            if (member == this)
+                return true;
+        }
+    }
+
     return false;
 }
