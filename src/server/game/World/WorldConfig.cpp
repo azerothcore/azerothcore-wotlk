@@ -658,9 +658,9 @@ void WorldConfig::BuildConfigCache()
 
     // Voice Chat
     SetConfigValue<bool>(CONFIG_VOICE_CHAT_ENABLED, "VoiceChat.Enabled", false);
-    SetConfigValue<uint16>(CONFIG_VOICE_CHAT_SERVER_PORT, "VoiceChat.ServerPort", 3725);
-    SetConfigValue<uint16>(CONFIG_VOICE_CHAT_VOICE_PORT, "VoiceChat.VoicePort", 3724);
-    SetConfigValue<int32>(CONFIG_VOICE_CHAT_MAX_CONNECT_ATTEMPTS, "VoiceChat.MaxConnectAttempts", -1);
+    SetConfigValue<uint32>(CONFIG_VOICE_CHAT_SERVER_PORT, "VoiceChat.ServerPort", 3725);
+    SetConfigValue<uint32>(CONFIG_VOICE_CHAT_VOICE_PORT, "VoiceChat.VoicePort", 3724);
+    SetConfigValue<uint32>(CONFIG_VOICE_CHAT_MAX_CONNECT_ATTEMPTS, "VoiceChat.MaxConnectAttempts", -1); // Negative value, but only unsigned allowed
 
     SetConfigValue<std::string>(CONFIG_NEW_CHAR_STRING, "PlayerStart.String", "");
 }
