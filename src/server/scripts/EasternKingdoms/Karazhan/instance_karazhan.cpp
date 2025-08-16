@@ -47,6 +47,7 @@ ObjectData const creatureData[] =
     { NPC_JULIANNE,             DATA_JULIANNE  },
     { NPC_NIGHTBANE,            DATA_NIGHTBANE },
     { NPC_TERESTIAN_ILLHOOF,    DATA_TERESTIAN },
+    { NPC_TENRIS_MIRKBLOOD,     DATA_MIRKBLOOD },
     { 0,                        0              }
 };
 
