@@ -93,6 +93,29 @@ namespace WorldPackets
             uint32 SoundKitID = 0;
         };
 
+        class MinimapPingClient final : public ClientPacket
+        {
+        public:
+            MinimapPingClient(WorldPacket&& packet) : ClientPacket(MSG_MINIMAP_PING, std::move(packet)) {}
+
+            void Read() override;
+
+            float X = 0.0f;
+            float Y = 0.0f;
+        };
+
+        class MinimapPing final : public ServerPacket
+        {
+        public:
+            MinimapPing() : ServerPacket(MSG_MINIMAP_PING, 8 + 4 + 4) { }
+
+            WorldPacket const* Write() override;
+
+            ObjectGuid Guid;
+            float X = 0.0f;
+            float Y = 0.0f;
+        };
+
         class RandomRollClient final : public ClientPacket
         {
         public:

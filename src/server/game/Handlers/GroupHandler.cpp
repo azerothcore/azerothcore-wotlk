@@ -522,24 +522,23 @@ void WorldSession::HandleLootRoll(WorldPacket& recvData)
     }
 }
 
-void WorldSession::HandleMinimapPingOpcode(WorldPacket& recvData)
+void WorldSession::HandleMinimapPingOpcode(WorldPackets::Misc::MinimapPingClient& packet)
 {
-    if (!GetPlayer()->GetGroup())
+    Group* group = GetPlayer()->GetGroup();
+
+    if (!group)
         return;
 
     float x, y;
-    recvData >> x;
-    recvData >> y;
+    x = packet.X;
+    y = packet.Y;
 
-    /** error handling **/
-    /********************/
+    WorldPackets::Misc::MinimapPing minimapPing;
+    minimapPing.Guid = GetPlayer()->GetGUID();
+    minimapPing.X = x;
+    minimapPing.Y = y;
 
-    // everything's fine, do it
-    WorldPacket data(MSG_MINIMAP_PING, (8 + 4 + 4));
-    data << GetPlayer()->GetGUID();
-    data << float(x);
-    data << float(y);
-    GetPlayer()->GetGroup()->BroadcastPacket(&data, true, -1, GetPlayer()->GetGUID());
+    group->BroadcastPacket(minimapPing.Write(), true, -1, GetPlayer()->GetGUID());
 }
 
 void WorldSession::HandleRandomRollOpcode(WorldPackets::Misc::RandomRollClient& packet)
