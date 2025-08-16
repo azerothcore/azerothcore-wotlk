@@ -88,7 +88,7 @@ static uint16 GetCheckPacketSize(WardenCheck const* check)
 }
 
 // Returns config id for specific type id
-static WorldIntConfigs GetMaxWardenChecksForType(uint8 type)
+static ServerConfigs GetMaxWardenChecksForType(uint8 type)
 {
     // Should never be higher type than defined
     ASSERT(type < MAX_WARDEN_CHECK_TYPES);

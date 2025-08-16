@@ -793,7 +793,7 @@ struct npc_brewfest_super_brew_trigger : public ScriptedAI
             Player* player = nullptr;
             Acore::AnyPlayerInObjectRangeCheck checker(me, 2.0f);
             Acore::PlayerSearcher<Acore::AnyPlayerInObjectRangeCheck> searcher(me, player, checker);
-            Cell::VisitWorldObjects(me, searcher, 2.0f);
+            Cell::VisitObjects(me, searcher, 2.0f);
             if (player)
             {
                 player->CastSpell(player, SPELL_DRUNKEN_MASTER, true);

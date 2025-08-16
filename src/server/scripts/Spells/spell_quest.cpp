@@ -1876,7 +1876,7 @@ class spell_q11010_q11102_q11023_choose_loc : public SpellScript
         std::list<Player*> playerList;
         Acore::AnyPlayerInObjectRangeCheck checker(caster, 65.0f);
         Acore::PlayerListSearcher<Acore::AnyPlayerInObjectRangeCheck> searcher(caster, playerList, checker);
-        Cell::VisitWorldObjects(caster, searcher, 65.0f);
+        Cell::VisitObjects(caster, searcher, 65.0f);
         for (std::list<Player*>::const_iterator itr = playerList.begin(); itr != playerList.end(); ++itr)
             // Check if found player target is on fly mount or using flying form
             if ((*itr)->HasFlyAura() || (*itr)->HasIncreaseMountedFlightSpeedAura())
@@ -2269,7 +2269,10 @@ class spell_q12619_emblazon_runeblade_effect : public SpellScript
 enum Quest_The_Storm_King
 {
     SPELL_RIDE_GYMER            = 43671,
-    SPELL_GRABBED               = 55424
+    SPELL_GRABBED               = 55424,
+    SPELL_HEALING_WINDS         = 55549,
+
+    NPC_STORM_CLOUD             = 29939
 };
 
 class spell_q12919_gymers_grab : public SpellScript
@@ -2284,10 +2287,14 @@ class spell_q12919_gymers_grab : public SpellScript
     void HandleScript(SpellEffIndex /*effIndex*/)
     {
         int8 seatId = 2;
-        if (!GetHitCreature())
-            return;
-        GetHitCreature()->CastCustomSpell(SPELL_RIDE_GYMER, SPELLVALUE_BASE_POINT0, seatId, GetCaster(), true);
-        GetHitCreature()->CastSpell(GetHitCreature(), SPELL_GRABBED, true);
+        if (Creature* creature = GetHitCreature())
+        {
+            creature->CastCustomSpell(SPELL_RIDE_GYMER, SPELLVALUE_BASE_POINT0, seatId, GetCaster(), true);
+            creature->CastSpell(creature, SPELL_GRABBED, true);
+
+            if (creature->GetEntry() == NPC_STORM_CLOUD)
+                creature->CastSpell(GetCaster(), SPELL_HEALING_WINDS, true);
+        }
     }
 
     void Register() override

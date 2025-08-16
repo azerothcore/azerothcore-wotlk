@@ -4187,6 +4187,28 @@ class spell_item_multiphase_goggles : public AuraScript
     }
 };
 
+// 60244 - Blood Parrot Despawn Aura (Item: 12185 - Bloodsail Admiral's Hat)
+enum BloodsailAdmiralHat
+{
+    NPC_ADMIRAL_HAT_PARROT = 11236, // Blood Parrot
+};
+
+class spell_item_bloodsail_admiral_hat : public AuraScript
+{
+    PrepareAuraScript(spell_item_bloodsail_admiral_hat);
+
+    void OnRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
+    {
+        if (Player* player = GetCaster()->ToPlayer())
+            player->RemoveAllMinionsByEntry(NPC_ADMIRAL_HAT_PARROT);
+    }
+
+    void Register() override
+    {
+        OnEffectRemove += AuraEffectRemoveFn(spell_item_bloodsail_admiral_hat::OnRemove, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
+    }
+};
+
 void AddSC_item_spell_scripts()
 {
     RegisterSpellScript(spell_item_massive_seaforium_charge);
@@ -4315,4 +4337,5 @@ void AddSC_item_spell_scripts()
     RegisterSpellScript(spell_item_luffa);
     RegisterSpellScript(spell_item_spell_reflectors);
     RegisterSpellScript(spell_item_multiphase_goggles);
+    RegisterSpellScript(spell_item_bloodsail_admiral_hat);
 }

@@ -37,12 +37,15 @@ enum AnnouncerFlags : uint8
 
 struct PlayerSetting
 {
+    PlayerSetting() = default;
+    explicit PlayerSetting(uint32 val) : value(val) { }
+
     uint32 value;
 
-    [[nodiscard]] bool HasFlag(uint32 flag) { return (value & flag) != 0; }
-    [[nodiscard]] bool IsEnabled(uint32 equals = 1) { return value == equals; }
-    void AddFlag(uint32 flag) { value = value | flag; }
-    void RemoveFlag(uint32 flag) { value = value &~ flag; }
+    [[nodiscard]] bool HasFlag(uint32 flag) const { return (value & flag) != 0; }
+    [[nodiscard]] bool IsEnabled(uint32 equals = 1) const { return value == equals; }
+    void AddFlag(uint32 flag) { value |= flag; }
+    void RemoveFlag(uint32 flag) { value &= ~flag; }
 };
 
 typedef std::vector<PlayerSetting> PlayerSettingVector;

@@ -72,15 +72,27 @@ bool ChaseMovementGenerator<T>::DoUpdate(T* owner, uint32 time_diff)
         return false;
 
     Creature* cOwner = owner->ToCreature();
+    bool isStoppedBecauseOfCasting = cOwner && cOwner->IsMovementPreventedByCasting();
 
     // the owner might be unable to move (rooted or casting), or we have lost the target, pause movement
-    if (owner->HasUnitState(UNIT_STATE_NOT_MOVE) || HasLostTarget(owner) || (cOwner && cOwner->IsMovementPreventedByCasting()))
+    if (owner->HasUnitState(UNIT_STATE_NOT_MOVE) || HasLostTarget(owner) || isStoppedBecauseOfCasting)
     {
         owner->StopMoving();
         _lastTargetPosition.reset();
         if (cOwner)
         {
-            cOwner->UpdateLeashExtensionTime();
+            if (isStoppedBecauseOfCasting)
+            {
+                // Don't reset leash timer if it's a spell like Shoot with a short cast time.
+                /// @todo: Research how it should actually work.
+                Spell *spell = cOwner->GetFirstCurrentCastingSpell();
+                bool spellHasLongCast = spell && spell->GetCastTime() > 1 * SECOND * IN_MILLISECONDS;
+                if (spellHasLongCast)
+                    cOwner->UpdateLeashExtensionTime();
+            }
+            else
+                cOwner->UpdateLeashExtensionTime();
+
             cOwner->SetCannotReachTarget();
         }
         return true;
@@ -153,18 +165,20 @@ bool ChaseMovementGenerator<T>::DoUpdate(T* owner, uint32 time_diff)
         MovementInform(owner);
     }
 
-    if (owner->movespline->Finalized())
-    { // Mobs should chase you infinitely if you stop and wait every few seconds.
-        i_leashExtensionTimer.Update(time_diff);
-        if (i_leashExtensionTimer.Passed())
-        {
-            i_leashExtensionTimer.Reset(5000);
-            if (cOwner)
+    if (cOwner)
+    {
+        if (owner->movespline->Finalized() && cOwner->IsWithinMeleeRange(target))
+        { // Mobs should chase you infinitely if you stop and wait every few seconds.
+            i_leashExtensionTimer.Update(time_diff);
+            if (i_leashExtensionTimer.Passed())
+            {
+                i_leashExtensionTimer.Reset(cOwner->GetAttackTime(BASE_ATTACK));
                 cOwner->UpdateLeashExtensionTime();
+            }
         }
+        else if (i_recalculateTravel)
+            i_leashExtensionTimer.Reset(cOwner->GetAttackTime(BASE_ATTACK));
     }
-    else if (i_recalculateTravel)
-        i_leashExtensionTimer.Reset(5000);
 
     // if the target moved, we have to consider whether to adjust
     if (!_lastTargetPosition || target->GetPosition() != _lastTargetPosition.value() || mutualChase != _mutualChase || !owner->IsWithinLOSInMap(target))
@@ -298,6 +312,7 @@ void ChaseMovementGenerator<Creature>::DoInitialize(Creature* owner)
     i_path = nullptr;
     _lastTargetPosition.reset();
     i_recheckDistance.Reset(0);
+    i_leashExtensionTimer.Reset(owner->GetAttackTime(BASE_ATTACK));
     owner->SetWalk(false);
     owner->AddUnitState(UNIT_STATE_CHASE);
 }
