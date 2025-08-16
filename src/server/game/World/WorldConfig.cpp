@@ -656,5 +656,11 @@ void WorldConfig::BuildConfigCache()
 
     SetConfigValue<uint32>(CONFIG_SUNSREACH_COUNTER_MAX, "Sunsreach.CounterMax", 10000);
 
+    // Voice Chat
+    SetConfigValue<bool>(CONFIG_VOICE_CHAT_ENABLED, "VoiceChat.Enabled", false);
+    SetConfigValue<uint16>(CONFIG_VOICE_CHAT_SERVER_PORT, "VoiceChat.ServerPort", 3725);
+    SetConfigValue<uint16>(CONFIG_VOICE_CHAT_VOICE_PORT, "VoiceChat.VoicePort", 3724);
+    SetConfigValue<int32>(CONFIG_VOICE_CHAT_MAX_CONNECT_ATTEMPTS, "VoiceChat.MaxConnectAttempts", -1);
+
     SetConfigValue<std::string>(CONFIG_NEW_CHAR_STRING, "PlayerStart.String", "");
 }
