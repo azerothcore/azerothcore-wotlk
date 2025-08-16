@@ -58,7 +58,7 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 (2677200, 9, 1, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 19, 262912, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Icemist Warrior - Actionlist - Remove Flags Immune To Players & Immune To NPC\'s & Stunned');
 
 -- Set Conditions for Icemist's Blessing
-DELETE FROM `conditions` WHERE SourceTypeOrReferenceId = 13 AND SourceEntry = 47379;
+DELETE FROM `conditions` WHERE `SourceTypeOrReferenceId` = 13 AND `SourceEntry` = 47379;
 INSERT INTO `conditions`(`SourceTypeOrReferenceId`, `SourceGroup`, `SourceEntry`, `SourceId`, `ElseGroup`, `ConditionTypeOrReference`, `ConditionTarget`, `ConditionValue1`, `ConditionValue2`, `ConditionValue3`, `NegativeCondition`, `ErrorType`, `ErrorTextId`, `ScriptName`, `Comment`) VALUES
 (13,3,47379,0,0,31,0,3,26654,0,0,0,0,'','Icemist\'s Blessing (47379) - target is Roanauk Icemist'),
 (13,3,47379,0,1,31,0,3,26772,0,0,0,0,'','Icemist\'s Blessing (47379) - target is Icemist Warrior'),
