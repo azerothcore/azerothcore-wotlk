@@ -1241,15 +1241,15 @@ class spell_item_healing_trance : public AuraScript
             });
     }
 
-    void HandleProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
+    void HandleProc(AuraEffect const* aurEff, ProcEventInfo& /*eventInfo*/)
     {
         PreventDefaultAction();
         if (Unit* unitTarget = GetTarget())
         {
-            uint32 procSpell = GetSpellInfo()->Id;
+            uint32 itemSpell = GetSpellInfo()->Id;
             uint32 spellId = 0;
 
-            if (procSpell == SPELL_HEALING_DISCOUNT)
+            if (itemSpell == SPELL_HEALING_DISCOUNT)
             {
                 switch (unitTarget->getClass())
                 {
@@ -1269,7 +1269,7 @@ class spell_item_healing_trance : public AuraScript
                     return; // ignore for non-healing classes
                 }
             }
-            else if (procSpell == SPELL_SOUL_PRESERVER)
+            else if (itemSpell == SPELL_SOUL_PRESERVER)
             {
                 switch (unitTarget->getClass())
                 {
