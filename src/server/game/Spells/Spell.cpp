@@ -4574,6 +4574,11 @@ void Spell::finish(bool ok)
         m_caster->AttackStop();
 
     CleanupTargetList();
+
+    if (m_caster && m_spellInfo->IsChanneled())
+    {
+        m_caster->RemoveAurasDueToSpell(m_spellInfo->Id);
+    }
 }
 
 void Spell::WriteCastResultInfo(WorldPacket& data, Player* caster, SpellInfo const* spellInfo, uint8 castCount, SpellCastResult result, SpellCustomErrors customError)
