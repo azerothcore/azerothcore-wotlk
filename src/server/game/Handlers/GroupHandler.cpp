@@ -22,6 +22,7 @@
 #include "LFGMgr.h"
 #include "Language.h"
 #include "Log.h"
+#include "MapMgr.h"
 #include "MiscPackets.h"
 #include "ObjectMgr.h"
 #include "Opcodes.h"
@@ -524,21 +525,15 @@ void WorldSession::HandleLootRoll(WorldPacket& recvData)
 
 void WorldSession::HandleMinimapPingOpcode(WorldPackets::Misc::MinimapPingClient& packet)
 {
+    if (!sMapMgr->IsValidMapCoord(GetPlayer()->GetMap()->GetId(), packet.MapX, packet.MapY))
+        return;
+
     Group* group = GetPlayer()->GetGroup();
 
     if (!group)
         return;
 
-    float x, y;
-    x = packet.X;
-    y = packet.Y;
-
-    WorldPackets::Misc::MinimapPing minimapPing;
-    minimapPing.Guid = GetPlayer()->GetGUID();
-    minimapPing.X = x;
-    minimapPing.Y = y;
-
-    group->BroadcastPacket(minimapPing.Write(), true, -1, GetPlayer()->GetGUID());
+    group->DoMinimapPing(GetPlayer()->GetGUID(), packet.MapX, packet.MapY);
 }
 
 void WorldSession::HandleRandomRollOpcode(WorldPackets::Misc::RandomRollClient& packet)

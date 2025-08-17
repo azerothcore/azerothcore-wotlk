@@ -100,8 +100,8 @@ namespace WorldPackets
 
             void Read() override;
 
-            float X = 0.0f;
-            float Y = 0.0f;
+            float MapX = 0.0f; // Raw position coordinates
+            float MapY = 0.0f;
         };
 
         class MinimapPing final : public ServerPacket
@@ -111,9 +111,9 @@ namespace WorldPackets
 
             WorldPacket const* Write() override;
 
-            ObjectGuid Guid;
-            float X = 0.0f;
-            float Y = 0.0f;
+            ObjectGuid SourceGuid;
+            float MapX = 0.0f;
+            float MapY = 0.0f;
         };
 
         class RandomRollClient final : public ClientPacket
