@@ -321,33 +321,17 @@ class spell_dk_death_and_decay : public SpellScript
         if (AuraEffect* aurEff = caster->GetAuraEffect(58629, EFFECT_0))
             AddPct(damage, aurEff->GetAmount());
 
-        // Xinef: include AOE damage reducing auras
+        // Include AOE damage reducing auras
         if (target)
             damage = target->CalculateAOEDamageReduction(damage, GetSpellInfo()->SchoolMask, false);
 
         SetHitDamage(damage);
     }
 
-    void HandleAfterCast()
-    {
-        if (Unit* caster = GetCaster())
-        {
-            // Free the generic spell slot if Death and Decay is still marked as active
-            if (caster->GetCurrentSpell(CURRENT_GENERIC_SPELL) &&
-                caster->GetCurrentSpell(CURRENT_GENERIC_SPELL)->GetSpellInfo()->Id == 43265)
-            {
-                caster->InterruptSpell(CURRENT_GENERIC_SPELL, false); // Does not remove the aura on the ground
-            }
-        }
-    }
-
     void Register() override
     {
         if (m_scriptSpellId == SPELL_DK_DEATH_AND_DECAY_TRIGGER)
             OnHit += SpellHitFn(spell_dk_death_and_decay::RecalculateDamage);
-
-        if (m_scriptSpellId == 43265) // Death and Decay
-            AfterCast += SpellCastFn(spell_dk_death_and_decay::HandleAfterCast);
     }
 };
 
@@ -365,10 +349,19 @@ class spell_dk_death_and_decay_aura : public AuraScript
         }
     }
 
+    void OnRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
+    {
+        if (Unit* caster = GetCaster())
+            caster->RemoveAurasDueToSpell(SPELL_DK_DEATH_AND_DECAY_TRIGGER);
+    }
+
     void Register() override
     {
         if (m_scriptSpellId != SPELL_DK_DEATH_AND_DECAY_TRIGGER)
+        {
             OnEffectPeriodic += AuraEffectPeriodicFn(spell_dk_death_and_decay_aura::HandlePeriodic, EFFECT_0, SPELL_AURA_PERIODIC_DUMMY);
+            OnEffectRemove += AuraEffectRemoveFn(spell_dk_death_and_decay_aura::OnRemove, EFFECT_0, SPELL_AURA_PERIODIC_DUMMY, AURA_EFFECT_HANDLE_REAL);
+        }
     }
 };
 
