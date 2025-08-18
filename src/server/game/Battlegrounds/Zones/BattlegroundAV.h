@@ -1846,6 +1846,7 @@ private:
     uint32 _reputationSurvivingCaptain = 0; // 125, 175
     uint32 _reputationSurvivingTower = 0; // 12, 18
     uint32 _reputationPerOwnedMine = 0; // 24, 36
+    float _avReputationRate;
 
     bool m_IsInformedNearVictory[2] {};
 };

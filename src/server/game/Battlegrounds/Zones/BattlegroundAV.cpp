@@ -195,8 +195,7 @@ void BattlegroundAV::HandleQuestComplete(uint32 questid, Player* player)
         case AV_QUEST_H_COMMANDER1:
             m_Team_QuestStatus[teamId][1]++;
             {
-                float bgRepRate = sWorld->getRate(RATE_REPUTATION_GAIN_AV);
-                RewardReputationToTeam(teamId, uint32(1 * bgRepRate), teamId);
+                RewardReputationToTeam(teamId, uint32(1 * _avReputationRate), teamId);
             }
             if (m_Team_QuestStatus[teamId][1] == 30)
                 LOG_DEBUG("bg.battleground", "BG_AV Quest {} completed (need to implement some events here", questid);
@@ -205,8 +204,7 @@ void BattlegroundAV::HandleQuestComplete(uint32 questid, Player* player)
         case AV_QUEST_H_COMMANDER2:
             m_Team_QuestStatus[teamId][2]++;
             {
-                float bgRepRate = sWorld->getRate(RATE_REPUTATION_GAIN_AV);
-                RewardReputationToTeam(teamId, uint32(1 * bgRepRate), teamId);
+                RewardReputationToTeam(teamId, uint32(1 * _avReputationRate), teamId);
             }
             if (m_Team_QuestStatus[teamId][2] == 60)
                 LOG_DEBUG("bg.battleground", "BG_AV Quest {} completed (need to implement some events here", questid);
@@ -215,8 +213,7 @@ void BattlegroundAV::HandleQuestComplete(uint32 questid, Player* player)
         case AV_QUEST_H_COMMANDER3:
             m_Team_QuestStatus[teamId][3]++;
             {
-                float bgRepRate = sWorld->getRate(RATE_REPUTATION_GAIN_AV);
-                RewardReputationToTeam(teamId, uint32(1 * bgRepRate), teamId);
+                RewardReputationToTeam(teamId, uint32(1 * _avReputationRate), teamId);
             }
             if (m_Team_QuestStatus[teamId][3] == 120)
                 LOG_DEBUG("bg.battleground", "BG_AV Quest {} completed (need to implement some events here", questid);
@@ -1249,29 +1246,28 @@ GraveyardStruct const* BattlegroundAV::GetClosestGraveyard(Player* player)
 
 bool BattlegroundAV::SetupBattleground()
 {
-    // Get the custom BG reputation rate from the config file
-    float bgRepRate = sWorld->getRate(RATE_REPUTATION_GAIN_AV);
+    _avReputationRate = sWorld->getRate(RATE_REPUTATION_GAIN_AV);
 
     if (sBattlegroundMgr->IsBGWeekend(GetBgTypeID(true)))
     {
-        _reputationTower = uint32(18 * bgRepRate);
-        _reputationCaptain = uint32(185 * bgRepRate);
-        _reputationBoss = uint32(525 * bgRepRate);
-        _reputationPerOwnedGraveyard = uint32(18 * bgRepRate);
-        _reputationSurvivingCaptain = uint32(175 * bgRepRate);
-        _reputationSurvivingTower = uint32(18 * bgRepRate);
-        _reputationPerOwnedMine = uint32(36 * bgRepRate);
+        _reputationTower = uint32(18 * _avReputationRate);
+        _reputationCaptain = uint32(185 * _avReputationRate);
+        _reputationBoss = uint32(525 * _avReputationRate);
+        _reputationPerOwnedGraveyard = uint32(18 * _avReputationRate);
+        _reputationSurvivingCaptain = uint32(175 * _avReputationRate);
+        _reputationSurvivingTower = uint32(18 * _avReputationRate);
+        _reputationPerOwnedMine = uint32(36 * _avReputationRate);
     }
     else
     {
-        _reputationTower = uint32(12 * bgRepRate);
-        _reputationCaptain = uint32(125 * bgRepRate);
+        _reputationTower = uint32(12 * _avReputationRate);
+        _reputationCaptain = uint32(125 * _avReputationRate);
         // Special case: This value comes from another config setting, but we still apply our multiplier
-        _reputationBoss = uint32(sWorld->getIntConfig(CONFIG_BATTLEGROUND_ALTERAC_REP_ONBOSSDEATH) * bgRepRate);
-        _reputationPerOwnedGraveyard = uint32(12 * bgRepRate);
-        _reputationSurvivingCaptain = uint32(125 * bgRepRate);
-        _reputationSurvivingTower = uint32(12 * bgRepRate);
-        _reputationPerOwnedMine = uint32(24 * bgRepRate);
+        _reputationBoss = uint32(sWorld->getIntConfig(CONFIG_BATTLEGROUND_ALTERAC_REP_ONBOSSDEATH) * _avReputationRate);
+        _reputationPerOwnedGraveyard = uint32(12 * _avReputationRate);
+        _reputationSurvivingCaptain = uint32(125 * _avReputationRate);
+        _reputationSurvivingTower = uint32(12 * _avReputationRate);
+        _reputationPerOwnedMine = uint32(24 * _avReputationRate);
     }
 
     // Create starting objects
