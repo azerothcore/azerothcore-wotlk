@@ -116,8 +116,7 @@ void BattlegroundAB::PostUpdateImpl(uint32 diff)
                             RewardHonorToTeam(GetBonusHonorFromKill(1), teamId);
                         if (reputationRewards < uint8(m_TeamScores[teamId] / _reputationTics))
                         {
-                            uint32 scaledReputation = uint32(10 * _abReputationRate);
-                            RewardReputationToTeam(teamId == TEAM_ALLIANCE ? 509 : 510, scaledReputation, teamId);
+                            RewardReputationToTeam(teamId == TEAM_ALLIANCE ? 509 : 510, uint32(10 * _abReputationRate), teamId);
                         }
 
                         if (information < uint8(m_TeamScores[teamId] / BG_AB_WARNING_NEAR_VICTORY_SCORE))
