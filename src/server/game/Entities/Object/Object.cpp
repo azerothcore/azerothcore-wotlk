@@ -1705,7 +1705,7 @@ bool WorldObject::CanSeeOrDetect(WorldObject const* obj, bool ignoreStealth, boo
     if (this == obj)
         return true;
 
-    if (obj->IsNeverVisible() || CanNeverSee(obj))
+    if (CanNeverSee(obj))
         return false;
 
     if (obj->IsAlwaysVisibleFor(this) || CanAlwaysSee(obj))
@@ -1849,6 +1849,12 @@ bool WorldObject::CanSeeOrDetect(WorldObject const* obj, bool ignoreStealth, boo
 
 bool WorldObject::CanNeverSee(WorldObject const* obj) const
 {
+    if (!IsInWorld())
+        return true;
+
+    if (obj->IsNeverVisible())
+        return true;
+
     if (IsCreature() && obj->IsCreature())
         return GetMap() != obj->GetMap() || (!InSamePhase(obj) && ToUnit()->GetVehicleBase() != obj && this != obj->ToUnit()->GetVehicleBase());
     return GetMap() != obj->GetMap() || !InSamePhase(obj);
