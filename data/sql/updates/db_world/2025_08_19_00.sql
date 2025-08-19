@@ -1,3 +1,4 @@
+-- DB update 2025_08_18_01 -> 2025_08_19_00
 
 -- Remove Unit Flags from Roanauk Icemist (IMMUNE_TO_PC, IMMUNE_TO_NPC)
 UPDATE `creature_template` SET `unit_flags` = `unit_flags` &~(256|512) WHERE (`entry` = 26654);
