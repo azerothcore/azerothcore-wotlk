@@ -268,7 +268,7 @@ public:
         std::list<Creature*> creatureList;
         Acore::AnyUnitInObjectRangeCheck go_check(object, radius);
         Acore::CreatureListSearcher<Acore::AnyUnitInObjectRangeCheck> go_search(object, creatureList, go_check);
-        Cell::VisitGridObjects(object, go_search, radius);
+        Cell::VisitObjects(object, go_search, radius);
 
         if (!creatureList.empty())
         {

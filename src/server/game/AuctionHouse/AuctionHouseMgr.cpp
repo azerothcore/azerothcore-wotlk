@@ -155,7 +155,7 @@ void AuctionHouseMgr::SendAuctionWonMail(AuctionEntry* auction, CharacterDatabas
         }
     }
     else
-        sAuctionMgr->RemoveAItem(auction->item_guid, true, &trans);
+        RemoveAItem(auction->item_guid, true, &trans);
 }
 
 void AuctionHouseMgr::SendAuctionSalePendingMail(AuctionEntry* auction, CharacterDatabaseTransaction trans, bool sendMail)
@@ -256,7 +256,7 @@ void AuctionHouseMgr::SendAuctionExpiredMail(AuctionEntry* auction, CharacterDat
         }
     }
     else
-        sAuctionMgr->RemoveAItem(auction->item_guid, true, &trans);
+        RemoveAItem(auction->item_guid, true, &trans);
 }
 
 //this function sends mail to old bidder
@@ -488,7 +488,7 @@ void AuctionHouseObject::AddAuction(AuctionEntry* auction)
 
 bool AuctionHouseObject::RemoveAuction(AuctionEntry* auction)
 {
-    bool wasInMap = !!_auctionsMap.erase(auction->Id);
+    bool wasInMap = _auctionsMap.erase(auction->Id);
     sAuctionMgr->GetAuctionHouseSearcher()->RemoveAuction(auction);
 
     sScriptMgr->OnAuctionRemove(this, auction);
