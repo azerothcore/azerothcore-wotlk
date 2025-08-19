@@ -488,7 +488,7 @@ void AuctionHouseObject::AddAuction(AuctionEntry* auction)
 
 bool AuctionHouseObject::RemoveAuction(AuctionEntry* auction)
 {
-    bool wasInMap = !!_auctionsMap.erase(auction->Id);
+    bool wasInMap = _auctionsMap.erase(auction->Id);
     sAuctionMgr->GetAuctionHouseSearcher()->RemoveAuction(auction);
 
     sScriptMgr->OnAuctionRemove(this, auction);
