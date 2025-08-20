@@ -184,6 +184,17 @@ void SmartAIMgr::LoadSmartAIFromDB()
                         }
                         break;
                     }
+                case SMART_SCRIPT_TYPE_AREATRIGGER:
+                    {
+                        if (!sObjectMgr->GetAreaTrigger((uint32)temp.entryOrGuid))
+                        {
+                            LOG_ERROR("sql.sql", "SmartAIMgr::LoadSmartAIFromDB: AreaTrigger entry ({}) does not exist, skipped loading.", uint32(temp.entryOrGuid));
+                            continue;
+                        }
+                        break;
+                    }
+                case SMART_SCRIPT_TYPE_TIMED_ACTIONLIST:
+                    break;//nothing to check, really
                 default:
                     LOG_ERROR("sql.sql", "SmartAIMgr::LoadSmartAIFromDB: not yet implemented source_type {}", (uint32)source_type);
                     continue;
@@ -209,16 +220,6 @@ void SmartAIMgr::LoadSmartAIFromDB()
                             LOG_ERROR("sql.sql", "SmartAIMgr::LoadSmartAIFromDB: GameObject guid ({}) does not exist, skipped loading.", uint32(temp.entryOrGuid));
                             continue;
                         }
-                        break;
-                    }
-                case SMART_SCRIPT_TYPE_AREATRIGGER:
-                    {
-                        LOG_ERROR("sql.sql", "SmartAIMgr::LoadSmartAIFromDB: not yet implemented source_type {}", (uint32)source_type);
-                        break;
-                    }
-                case SMART_SCRIPT_TYPE_TIMED_ACTIONLIST:
-                    {
-                        LOG_ERROR("sql.sql", "SmartAIMgr::LoadSmartAIFromDB: not yet implemented source_type {}", (uint32)source_type);
                         break;
                     }
                 default:
