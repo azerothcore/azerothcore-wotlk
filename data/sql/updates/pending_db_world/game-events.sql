@@ -1,6 +1,6 @@
 SET @EventID = 131,
     @OGUID   = 3639,
-    @CGUID   = 82950;
+    @CGUID   = 83113;
 
 SET @AQWarAllianceBarsInitial        = @EventID+0,
     @AQWarAllianceBarsT1             = @EventID+1,
