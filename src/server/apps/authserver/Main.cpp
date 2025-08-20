@@ -293,17 +293,11 @@ variables_map GetConsoleArguments(int argc, char** argv, fs::path& configFile)
     }
 
     if (variablesMap.count("help"))
-    {
         std::cout << all << "\n";
-    }
     else if (variablesMap.count("version"))
-    {
         std::cout << GitRevision::GetFullVersion() << "\n";
-    }
     else if (variablesMap.count("dry-run"))
-    {
         sConfigMgr->setDryRun(true);
-    }
 
     return variablesMap;
 }
