@@ -530,20 +530,28 @@ public:
     {
         _owner->SetReactState(REACT_AGGRESSIVE);
 
-        if (Spell* moveSpell = _owner->GetCurrentSpell())
+        std::list<Unit*> validPlayers;
+
+        _owner->GetMap()->ForEachPlayer([&](Player* player)
         {
-            if (moveSpell->GetSpellInfo()->Id == SPELL_VILE_SPIRIT_MOVE_SEARCH)
-            {
-                moveSpell->SetCustomTargetFilter([](WorldObject* obj)
-                {
-                    Unit* unit = obj->ToUnit();
-                    return unit && unit->IsPlayer();
-                });
-            }
+            if (!player->IsAlive())
+                return;
+
+            if (!_owner->IsWithinDistInMap(player, 100.0f))
+                return;
+
+            validPlayers.push_back(player);
+        });
+
+        if (!validPlayers.empty())
+        {
+            Unit* target = Trinity::Containers::SelectRandomContainerElement(validPlayers);
+            _owner->AI()->AttackStart(target);
+            _owner->AddThreat(target, _owner->GetMaxHealth() * 0.2f);
         }
 
         _owner->CastSpell(_owner, SPELL_VILE_SPIRIT_MOVE_SEARCH, true);
-        _owner->CastSpell((Unit*)nullptr, SPELL_VILE_SPIRIT_DAMAGE_SEARCH, true);
+        _owner->CastSpell(nullptr, SPELL_VILE_SPIRIT_DAMAGE_SEARCH, true);
 
         return true;
     }
