@@ -202,10 +202,29 @@ void SmartAIMgr::LoadSmartAIFromDB()
         }
         else
         {
-            if (!sObjectMgr->GetCreatureData(uint32(std::abs(temp.entryOrGuid))))
+            switch (source_type)
             {
-                LOG_ERROR("sql.sql", "SmartAIMgr::LoadSmartAIFromDB: Creature guid ({}) does not exist, skipped loading.", uint32(std::abs(temp.entryOrGuid)));
-                continue;
+                case SMART_SCRIPT_TYPE_CREATURE:
+                    {
+                        if (!sObjectMgr->GetCreatureData(uint32(std::abs(temp.entryOrGuid))))
+                        {
+                            LOG_ERROR("sql.sql", "SmartAIMgr::LoadSmartAIFromDB: Creature guid ({}) does not exist, skipped loading.", uint32(std::abs(temp.entryOrGuid)));
+                            continue;
+                        }
+                        break;
+                    }
+                case SMART_SCRIPT_TYPE_GAMEOBJECT:
+                    {
+                        if (!sObjectMgr->GetGameObjectData(uint32(std::abs(temp.entryOrGuid))))
+                        {
+                            LOG_ERROR("sql.sql", "SmartAIMgr::LoadSmartAIFromDB: GameObject guid ({}) does not exist, skipped loading.", uint32(temp.entryOrGuid));
+                            continue;
+                        }
+                        break;
+                    }
+                default:
+                    LOG_ERROR("sql.sql", "SmartAIMgr::LoadSmartAIFromDB: not yet implemented source_type {}", (uint32)source_type);
+                    continue;
             }
         }
 

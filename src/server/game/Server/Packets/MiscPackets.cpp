@@ -67,6 +67,21 @@ WorldPacket const* WorldPackets::Misc::Playsound::Write()
     return &_worldPacket;
 }
 
+void WorldPackets::Misc::MinimapPingClient::Read()
+{
+    _worldPacket >> MapX;
+    _worldPacket >> MapY;
+}
+
+WorldPacket const* WorldPackets::Misc::MinimapPing::Write()
+{
+    _worldPacket << SourceGuid;
+    _worldPacket << float(MapX);
+    _worldPacket << float(MapY);
+
+    return &_worldPacket;
+}
+
 void WorldPackets::Misc::RandomRollClient::Read()
 {
     _worldPacket >> Min;
