@@ -529,8 +529,22 @@ public:
     bool Execute(uint64 /*time*/, uint32 /*diff*/) override
     {
         _owner->SetReactState(REACT_AGGRESSIVE);
+
+        if (Spell* moveSpell = _owner->GetCurrentSpell())
+        {
+            if (moveSpell->GetSpellInfo()->Id == SPELL_VILE_SPIRIT_MOVE_SEARCH)
+            {
+                moveSpell->SetCustomTargetFilter([](WorldObject* obj)
+                {
+                    Unit* unit = obj->ToUnit();
+                    return unit && unit->IsPlayer();
+                });
+            }
+        }
+
         _owner->CastSpell(_owner, SPELL_VILE_SPIRIT_MOVE_SEARCH, true);
         _owner->CastSpell((Unit*)nullptr, SPELL_VILE_SPIRIT_DAMAGE_SEARCH, true);
+
         return true;
     }
 
@@ -2835,12 +2849,6 @@ class spell_the_lich_king_vile_spirit_move_target_search : public SpellScript
 
     void SelectTarget(std::list<WorldObject*>& targets)
     {
-        targets.remove_if([](WorldObject* obj)
-        {
-            Unit* unit = obj->ToUnit();
-            return !unit || !unit->IsPlayer();
-        });
-
         if (targets.empty())
             return;
 
