@@ -530,7 +530,7 @@ public:
     {
         _owner->CastSpell(_owner, SPELL_VILE_SPIRIT_MOVE_SEARCH, true);
         _owner->SetReactState(REACT_AGGRESSIVE);
-        _owner->CastSpell(nullptr, SPELL_VILE_SPIRIT_DAMAGE_SEARCH, true);
+        _owner->CastSpell((Unit*)nullptr, SPELL_VILE_SPIRIT_DAMAGE_SEARCH, true);
         return true;
     }
 
