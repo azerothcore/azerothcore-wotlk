@@ -30,6 +30,10 @@ time cmake ../../../ \
 -DBOOST_ROOT=/opt/homebrew/opt/boost \
 -DBoost_LIBRARY_DIR=/opt/homebrew/lib \
 -DBoost_INCLUDE_DIR=/opt/homebrew/include \
+-DBoost_USE_STATIC_LIBS=OFF \
+-DBoost_USE_MULTITHREADED=ON \
+-DBoost_USE_STATIC_RUNTIME=OFF \
+-DBoost_REQUIRED_COMPONENTS=system,filesystem,thread,date_time,regex \
 -DMYSQL_ADD_INCLUDE_PATH=$mysql_include_path \
 -DMYSQL_LIBRARY=$mysql_lib_path \
 -DREADLINE_INCLUDE_DIR=$(brew --prefix readline)/include \
