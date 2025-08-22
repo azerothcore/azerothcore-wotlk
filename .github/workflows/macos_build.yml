@@ -49,7 +49,7 @@ jobs:
             git clone --recursive --depth 1 --branch boost-1.89.0 https://github.com/boostorg/boost.git /tmp/boost-src
             cd /tmp/boost-src
             ./bootstrap.sh
-            ./b2 link=shared,static threading=multi
+            ./b2 --with-system link=shared,static threading=multi -d2
             echo "[BOOST BUILD] Listing stage/lib contents:"
             ls -l stage/lib
             echo "[BOOST BUILD] Searching for libboost_system files:"
