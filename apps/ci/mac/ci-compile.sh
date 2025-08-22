@@ -27,6 +27,9 @@ time cmake ../../../ \
 -DSCRIPTS=static \
 -DCMAKE_BUILD_TYPE=Release \
 -DBoost_NO_BOOST_CMAKE=ON \
+-DBOOST_ROOT=/opt/homebrew/opt/boost \
+-DBoost_LIBRARY_DIR=/opt/homebrew/lib \
+-DBoost_INCLUDE_DIR=/opt/homebrew/include \
 -DMYSQL_ADD_INCLUDE_PATH=$mysql_include_path \
 -DMYSQL_LIBRARY=$mysql_lib_path \
 -DREADLINE_INCLUDE_DIR=$(brew --prefix readline)/include \
