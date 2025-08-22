@@ -29,7 +29,7 @@
 #include <boost/process.hpp>
 using namespace boost::process;
 #elif BOOST_VERSION < 108900
- // Boost 1.88.x
+ // Boost 1.88.x only – process headers are under boost/process/v1
 #include <boost/process/v1/args.hpp>
 #include <boost/process/v1/child.hpp>
 #include <boost/process/v1/env.hpp>
@@ -38,12 +38,10 @@ using namespace boost::process;
 #include <boost/process/v1/search_path.hpp>
 using namespace boost::process::v1;
 #else
- // Boost >= 1.89
+ // Boost >= 1.89 – moved back under boost::process, but pipe may need explicit header
 #include <boost/process.hpp>
+#include <boost/process/pipe.hpp>
 using namespace boost::process;
-
-// pipe is still in v1 namespace in 1.89+
-using boost::process::v1::pipe;
 #endif
 
 using namespace boost::iostreams;
