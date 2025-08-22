@@ -51,6 +51,7 @@ jobs:
             ./bootstrap.sh --with-libraries=system
             ./b2 link=shared,static threading=multi --with-system
             ls -l stage/lib
+            find /tmp/boost-src -name 'libboost_system*'
             cp stage/lib/libboost_system.* /opt/homebrew/lib/
           fi
       - name: Set CMAKE_PREFIX_PATH
