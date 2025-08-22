@@ -50,8 +50,11 @@ jobs:
             cd /tmp/boost-src
             ./bootstrap.sh
             ./b2 link=shared,static threading=multi
+            echo "[BOOST BUILD] Listing stage/lib contents:"
             ls -l stage/lib
+            echo "[BOOST BUILD] Searching for libboost_system files:"
             find /tmp/boost-src -name 'libboost_system*'
+            echo "[BOOST BUILD] Attempting to copy libboost_system files:"
             cp stage/lib/libboost_system.* /opt/homebrew/lib/
           fi
       - name: Set CMAKE_PREFIX_PATH
