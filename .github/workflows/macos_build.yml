@@ -43,10 +43,14 @@ jobs:
         run: ls -l /opt/homebrew/lib | grep boost || true
       - name: List all Boost libraries in Cellar
         run: ls -l /opt/homebrew/Cellar/boost/1.89.0/lib || true
-      - name: Symlink boost_system if missing
+      - name: Build Boost system library from source if missing
         run: |
-          if [ ! -e /opt/homebrew/lib/libboost_system.dylib ] && [ -e /opt/homebrew/Cellar/boost/1.89.0/lib/libboost_system.dylib ]; then
-            ln -s /opt/homebrew/Cellar/boost/1.89.0/lib/libboost_system.* /opt/homebrew/lib/
+          if [ ! -e /opt/homebrew/lib/libboost_system.dylib ]; then
+            git clone --depth 1 --branch boost-1.89.0 https://github.com/boostorg/boost.git /tmp/boost-src
+            cd /tmp/boost-src
+            ./bootstrap.sh --with-libraries=system
+            ./b2 link=shared threading=multi --with-system
+            cp stage/lib/libboost_system.* /opt/homebrew/lib/
           fi
       - name: Set CMAKE_PREFIX_PATH
         run: echo "CMAKE_PREFIX_PATH=/opt/homebrew" >> $GITHUB_ENV
