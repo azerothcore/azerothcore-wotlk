@@ -41,6 +41,9 @@ using namespace boost::process::v1;
  // Boost >= 1.89
 #include <boost/process.hpp>
 using namespace boost::process;
+
+// pipe is still in v1 namespace in 1.89+
+using boost::process::v1::pipe;
 #endif
 
 using namespace boost::iostreams;
