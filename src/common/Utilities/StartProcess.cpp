@@ -24,7 +24,12 @@
 #include <boost/iostreams/copy.hpp>
 #include <filesystem>
 
-#if BOOST_VERSION == 108800
+#if BOOST_VERSION < 108800
+ // Boost < 1.88
+#include <boost/process.hpp>
+using namespace boost::process;
+#elif BOOST_VERSION < 108900
+ // Boost 1.88.x
 #include <boost/process/v1/args.hpp>
 #include <boost/process/v1/child.hpp>
 #include <boost/process/v1/env.hpp>
@@ -33,7 +38,7 @@
 #include <boost/process/v1/search_path.hpp>
 using namespace boost::process::v1;
 #else
- // Boost 1.89+ – use modern Boost.Process
+ // Boost >= 1.89
 #include <boost/process.hpp>
 using namespace boost::process;
 #endif
@@ -89,12 +94,14 @@ namespace Acore
     boost/process/pipe.hpp(304,42): message : see reference to class template instantiation 'boost::process::basic_pipebuf<char,std::char_traits<char>>' being compiled
 */
 #endif
-#if BOOST_VERSION == 108800
+#if BOOST_VERSION < 108900
         ipstream outStream;
         ipstream errStream;
 #else
-        boost::process::ipstream outStream;
-        boost::process::ipstream errStream;
+        boost::process::pipe outPipe;
+        boost::process::pipe errPipe;
+        boost::process::pistream outStream(outPipe);
+        boost::process::pistream errStream(errPipe);
 #endif
 
 #if AC_COMPILER == AC_COMPILER_MICROSOFT
@@ -125,8 +132,13 @@ namespace Acore
                     args = argsVector,
                     env = environment(boost::this_process::environment()),
                     std_in = inputFile.get(),
+#if BOOST_VERSION < 108900
                     std_out = outStream,
                     std_err = errStream
+#else
+                    std_out = outPipe,
+                    std_err = errPipe
+#endif
                 };
             }
             else
@@ -138,11 +150,18 @@ namespace Acore
                     env = environment(boost::this_process::environment()),
 #if BOOST_VERSION < 108800
                     std_in = boost::process::close,
-#else
+#elif BOOST_VERSION < 108900
                     std_in = boost::process::v1::close,
+#else
+                    std_in = boost::process::close,
 #endif
+#if BOOST_VERSION < 108900
                     std_out = outStream,
                     std_err = errStream
+#else
+                    std_out = outPipe,
+                    std_err = errPipe
+#endif
                 };
             }
         }();
