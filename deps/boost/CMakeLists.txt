@@ -22,7 +22,13 @@ endif()
 
 set(Boost_NO_WARN_NEW_VERSIONS ON)
 
-include (CheckCXXSourceCompiles)
+
+# Set CMake policy to allow FindBoost (for Homebrew/macOS compatibility)
+if(POLICY CMP0167)
+  cmake_policy(SET CMP0167 OLD)
+endif()
+
+include(CheckCXXSourceCompiles)
 
 if (WIN32)
   # On windows the requirements are higher according to the wiki.
@@ -31,12 +37,12 @@ else()
   set(BOOST_REQUIRED_VERSION 1.74)
 endif()
 
-find_package(Boost ${BOOST_REQUIRED_VERSION} REQUIRED system filesystem program_options iostreams regex)
+
+# Use classic FindBoost module for better compatibility with Homebrew/macOS
+find_package(Boost ${BOOST_REQUIRED_VERSION} REQUIRED COMPONENTS system filesystem program_options iostreams regex)
 
 if(NOT Boost_FOUND)
-  if(NOT DEFINED ENV{Boost_ROOT} AND NOT DEFINED Boost_DIR AND NOT DEFINED BOOST_ROOT AND NOT DEFINED BOOSTROOT)
-    message(FATAL_ERROR "No Boost_ROOT environment variable could be found! Please make sure it is set and the points to your Boost installation.")
-  endif()
+  message(FATAL_ERROR "Boost not found! On macOS, ensure you have installed boost via Homebrew (brew install boost) and that CMake can find it. You may need to set CMAKE_PREFIX_PATH or Boost_ROOT.")
 endif()
 
 add_library(boost INTERFACE)
