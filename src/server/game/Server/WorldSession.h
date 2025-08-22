@@ -148,6 +148,7 @@ namespace WorldPackets
 
     namespace Misc
     {
+        class MinimapPingClient;
         class RandomRollClient;
     }
 
@@ -933,7 +934,7 @@ public:                                                 // opcodes handlers
 
     void HandleWardenDataOpcode(WorldPacket& recvData);
     void HandleWorldTeleportOpcode(WorldPacket& recvData);
-    void HandleMinimapPingOpcode(WorldPacket& recvData);
+    void HandleMinimapPingOpcode(WorldPackets::Misc::MinimapPingClient& packet);
     void HandleRandomRollOpcode(WorldPackets::Misc::RandomRollClient& packet);
     void HandleFarSightOpcode(WorldPacket& recvData);
     void HandleSetDungeonDifficultyOpcode(WorldPacket& recvData);
