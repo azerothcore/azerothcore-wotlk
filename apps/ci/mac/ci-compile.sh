@@ -8,6 +8,10 @@ export CCACHE_COMPRESS=1
 export CCACHE_COMPRESSLEVEL=9
 ccache -s
 
+export BOOST_ROOT=/opt/homebrew/opt/boost
+export BOOST_INCLUDEDIR=$BOOST_ROOT/include
+export BOOST_LIBRARYDIR=$BOOST_ROOT/lib
+
 cd var/build/obj
 
 mysql_include_path=$(brew --prefix mysql)/include/mysql
@@ -26,6 +30,14 @@ time cmake ../../../ \
 -DBUILD_TESTING=1 \
 -DSCRIPTS=static \
 -DCMAKE_BUILD_TYPE=Release \
+-DBoost_NO_BOOST_CMAKE=ON \
+-DBoost_INCLUDE_DIR=$BOOST_INCLUDEDIR \
+-DBoost_LIBRARY_DIR=$BOOST_LIBRARYDIR \
+-DBoost_SYSTEM_LIBRARY=$BOOST_LIBRARYDIR/libboost_system.dylib \
+-DBoost_FILESYSTEM_LIBRARY=$BOOST_LIBRARYDIR/libboost_filesystem.dylib \
+-DBoost_THREAD_LIBRARY=$BOOST_LIBRARYDIR/libboost_thread.dylib \
+-DBoost_DATE_TIME_LIBRARY=$BOOST_LIBRARYDIR/libboost_date_time.dylib \
+-DBoost_REGEX_LIBRARY=$BOOST_LIBRARYDIR/libboost_regex.dylib \
 -DMYSQL_ADD_INCLUDE_PATH=$mysql_include_path \
 -DMYSQL_LIBRARY=$mysql_lib_path \
 -DREADLINE_INCLUDE_DIR=$(brew --prefix readline)/include \
