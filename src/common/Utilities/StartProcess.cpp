@@ -27,7 +27,7 @@
 #if BOOST_VERSION < 108800
 #include <boost/process.hpp>
 using namespace boost::process;
-#else
+#elif BOOST_VERSION < 108900
 #include <boost/process/v1/args.hpp>
 #include <boost/process/v1/child.hpp>
 #include <boost/process/v1/env.hpp>
@@ -35,6 +35,10 @@ using namespace boost::process;
 #include <boost/process/v1/io.hpp>
 #include <boost/process/v1/search_path.hpp>
 using namespace boost::process::v1;
+#else
+ // Boost 1.89+ – use modern Boost.Process
+#include <boost/process.hpp>
+using namespace boost::process;
 #endif
 
 using namespace boost::iostreams;
