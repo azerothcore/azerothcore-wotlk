@@ -32,3 +32,5 @@ fi
 ##########################################
 
 brew install openssl@3 readline boost bash-completion curl unzip mysql ccache expect tmux screen jq
+
+arch -arm64 brew reinstall boost
