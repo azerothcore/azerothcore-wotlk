@@ -30,9 +30,13 @@ endif()
 
 include(CheckCXXSourceCompiles)
 
+
 if (WIN32)
   # On windows the requirements are higher according to the wiki.
   set(BOOST_REQUIRED_VERSION 1.78)
+elseif(APPLE)
+  set(BOOST_REQUIRED_VERSION 1.74)
+  set(Boost_NO_BOOST_CMAKE ON)
 else()
   set(BOOST_REQUIRED_VERSION 1.74)
 endif()
