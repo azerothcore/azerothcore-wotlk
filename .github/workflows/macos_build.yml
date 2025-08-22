@@ -46,7 +46,7 @@ jobs:
       - name: Build Boost system library from source if missing
         run: |
           if [ ! -e /opt/homebrew/lib/libboost_system.dylib ]; then
-            git clone --depth 1 --branch boost-1.89.0 https://github.com/boostorg/boost.git /tmp/boost-src
+            git clone --recursive --depth 1 --branch boost-1.89.0 https://github.com/boostorg/boost.git /tmp/boost-src
             cd /tmp/boost-src
             ./bootstrap.sh --with-libraries=system
             ./b2 link=shared threading=multi --with-system
