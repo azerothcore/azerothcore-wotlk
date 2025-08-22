@@ -39,5 +39,7 @@ jobs:
         run: brew install bash
       - name: Configure OS
         run: source ./acore.sh install-deps
+      - name: List Homebrew Boost libraries
+        run: ls -l /opt/homebrew/lib | grep boost || true
       - name: Build
         run: source ./apps/ci/mac/ci-compile.sh
