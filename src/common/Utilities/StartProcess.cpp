@@ -24,10 +24,7 @@
 #include <boost/iostreams/copy.hpp>
 #include <filesystem>
 
-#if BOOST_VERSION < 108800
-#include <boost/process.hpp>
-using namespace boost::process;
-#elif BOOST_VERSION < 108900
+#if BOOST_VERSION == 108800
 #include <boost/process/v1/args.hpp>
 #include <boost/process/v1/child.hpp>
 #include <boost/process/v1/env.hpp>
@@ -92,8 +89,14 @@ namespace Acore
     boost/process/pipe.hpp(304,42): message : see reference to class template instantiation 'boost::process::basic_pipebuf<char,std::char_traits<char>>' being compiled
 */
 #endif
+#if BOOST_VERSION == 108800
         ipstream outStream;
         ipstream errStream;
+#else
+        boost::process::ipstream outStream;
+        boost::process::ipstream errStream;
+#endif
+
 #if AC_COMPILER == AC_COMPILER_MICROSOFT
 #pragma warning(pop)
 #endif
