@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+#!/usr/bin/env bash test
 
 export OPENSSL_ROOT_DIR=$(brew --prefix openssl@3)
 
