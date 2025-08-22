@@ -27,9 +27,8 @@ time cmake ../../../ \
 -DSCRIPTS=static \
 -DCMAKE_BUILD_TYPE=Release \
 -DBoost_NO_BOOST_CMAKE=ON \
--DBOOST_ROOT=/opt/homebrew/opt/boost \
--DBoost_LIBRARY_DIR=/opt/homebrew/lib \
 -DBoost_INCLUDE_DIR=/opt/homebrew/include \
+-DBoost_LIBRARY_DIR=/opt/homebrew/lib \
 -DBoost_USE_STATIC_LIBS=OFF \
 -DBoost_USE_MULTITHREADED=ON \
 -DBoost_USE_STATIC_RUNTIME=OFF \
