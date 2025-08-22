@@ -49,7 +49,8 @@ jobs:
             git clone --recursive --depth 1 --branch boost-1.89.0 https://github.com/boostorg/boost.git /tmp/boost-src
             cd /tmp/boost-src
             ./bootstrap.sh --with-libraries=system
-            ./b2 link=shared threading=multi --with-system
+            ./b2 link=shared,static threading=multi --with-system
+            ls -l stage/lib
             cp stage/lib/libboost_system.* /opt/homebrew/lib/
           fi
       - name: Set CMAKE_PREFIX_PATH
