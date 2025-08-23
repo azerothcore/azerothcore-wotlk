@@ -57,7 +57,7 @@ namespace PlayerSettingsStore
 {
     // Update a single setting value for any player by GUID (works for online or offline players).
     // This reads the existing "source" row from character_settings, adjusts the index, and REPLACE's it back.
-    void UpdateSetting(uint32 playerLowGuid, std::string const& source, uint8 index, uint32 value);
+    void UpdateSetting(uint32 playerLowGuid, std::string const& source, uint32 index, uint32 value);
 
     // Common helpers for parsing and serializing settings data
     PlayerSettingVector ParseSettingsData(std::string const& data);
