@@ -210,7 +210,7 @@ enum WarEffortNpcs
 enum WarEffortEvents
 {
     GAME_EVENT_WAREFFORT      = 22,
-    GAME_EVENT_WAREVENT       = 151
+    GAME_EVENT_WAREVENT       = 252
 };
 
 // Not blizzlike, not sniffed, not researched
