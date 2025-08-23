@@ -22,7 +22,7 @@ INSERT INTO `creature_text` (`CreatureID`, `GroupID`, `ID`, `Text`, `Type`, `Lan
 (28194, @SAY_AGGRO,    0, 'I shall consume you!',                                14, 0, 100, 0, 0, 0, 27781, 0, 'Prince Tenris Mirkblood - SAY_AGGRO'),
 (28194, @SAY_SUMMON,   0, 'Drink, mortals!  Taste my blood!  Taste your death!', 12, 0, 100, 0, 0, 0, 27712, 0, 'Prince Tenris Mirkblood - SAY_SUMMON');
 
-UPDATE `gameobject_template` SET `ScriptName` = 'go_blood_drenched_door';
+UPDATE `gameobject_template` SET `ScriptName` = 'go_blood_drenched_door' WHERE `entry` = 181032;
 
 DELETE FROM `spell_script_names` WHERE `spell_id` IN (50883, 50925, 51013);
 INSERT INTO `spell_script_names` (`spell_id`, `ScriptName`) VALUES

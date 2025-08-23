@@ -145,6 +145,12 @@ struct boss_tenris_mirkblood : public BossAI
             _mirrorTarget = caster;
     }
 
+    void EnterEvadeMode(EvadeReason why) override
+    {
+        _EnterEvadeMode(why);
+        me->SetImmuneToPC(false);
+    }
+
 private:
     Unit* _mirrorTarget = nullptr;
 };
