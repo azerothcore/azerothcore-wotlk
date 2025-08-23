@@ -19,6 +19,7 @@
 #include "AreaTriggerScript.h"
 #include "CreatureScript.h"
 #include "GameObjectAI.h"
+#include "GameObjectScript.h"
 #include "Player.h"
 #include "ScriptedCreature.h"
 #include "SpellInfo.h"
