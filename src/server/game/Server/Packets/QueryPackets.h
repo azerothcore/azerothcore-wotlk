@@ -44,7 +44,7 @@ namespace WorldPackets
 
             PackedGuid Guid;
             uint8 NameUnknown = 0;
-            std::string Name;
+            std::string_view Name;
             uint8 RealmName = 0;
             uint8 Race = RACE_NONE;
             uint8 Sex = GENDER_MALE;
