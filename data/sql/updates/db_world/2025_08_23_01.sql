@@ -1,3 +1,4 @@
+-- DB update 2025_08_23_00 -> 2025_08_23_01
 SET @EventID = 131,
     @OGUID   = 3639,
     @CGUID   = 83113;
