@@ -18,6 +18,7 @@
 #include "karazhan.h"
 #include "AreaTriggerScript.h"
 #include "CreatureScript.h"
+#include "GameObjectAI.h"
 #include "Player.h"
 #include "ScriptedCreature.h"
 #include "SpellInfo.h"
@@ -63,6 +64,12 @@ enum Spells
     SPELL_DUMMY_NUKE_RANGE_SELF                      = 51106,
 };
 
+enum Events
+{
+    EVENT_SAY  = 1,
+    EVENT_FLAG = 2
+};
+
 struct boss_tenris_mirkblood : public BossAI
 {
     boss_tenris_mirkblood(Creature* creature) : BossAI(creature, DATA_MIRKBLOOD)
@@ -93,7 +100,6 @@ struct boss_tenris_mirkblood : public BossAI
 
     void JustEngagedWith(Unit* /*who*/) override
     {
-        Talk(SAY_AGGRO);
         DoZoneInCombat();
 
         ScheduleTimedEvent(1s, 5s, [&] {
@@ -289,6 +295,66 @@ public:
     }
 };
 
+class go_blood_drenched_door : public GameObjectScript
+{
+public:
+    go_blood_drenched_door() : GameObjectScript("go_blood_drenched_door") {}
+
+    struct go_blood_drenched_doorAI : public GameObjectAI
+    {
+        go_blood_drenched_doorAI(GameObject* go) : GameObjectAI(go) {}
+
+        EventMap events;
+        Creature* mirkblood;
+        Player* opener;
+
+        bool GossipHello(Player* player, bool /*reportUse*/) override
+        {
+            events.Reset();
+
+            if (InstanceScript* instance = player->GetInstanceScript())
+                if (instance->GetBossState(DATA_MIRKBLOOD) != DONE)
+                {
+                    opener = player;
+                    mirkblood = instance->GetCreature(DATA_MIRKBLOOD);
+
+                    events.ScheduleEvent(EVENT_SAY, 1s);
+                    events.ScheduleEvent(EVENT_FLAG, 5s);
+                    me->SetGameObjectFlag(GO_FLAG_NOT_SELECTABLE);
+                }
+
+            return true;
+        }
+
+        void UpdateAI(uint32 diff) override
+        {
+            if (events.Empty())
+                return;
+
+            events.Update(diff);
+            switch (events.ExecuteEvent())
+            {
+            case EVENT_SAY:
+                if (!mirkblood)
+                    return;
+                mirkblood->AI()->Talk(SAY_AGGRO, opener);
+                break;
+            case EVENT_FLAG:
+                if (!mirkblood)
+                    return;
+                mirkblood->SetImmuneToPC(false);
+                me->Delete();
+                break;
+            }
+        }
+    };
+
+    GameObjectAI* GetAI(GameObject* go) const override
+    {
+        return new go_blood_drenched_doorAI(go);
+    }
+};
+
 void AddSC_boss_tenris_mirkblood()
 {
     RegisterKarazhanCreatureAI(boss_tenris_mirkblood);
@@ -298,4 +364,5 @@ void AddSC_boss_tenris_mirkblood()
     RegisterSpellScript(spell_mirkblood_exsanguinate);
     new at_karazhan_mirkblood_approach();
     new at_karazhan_mirkblood_entrance();
+    new go_blood_drenched_door();
 }
