@@ -160,6 +160,11 @@ namespace WorldPackets
         class PetSpellAutocast;
         class RequestPetInfo;
     }
+
+    namespace Query
+    {
+        class NameQuery;
+    }
 }
 
 enum AccountDataType
@@ -661,7 +666,7 @@ public:                                                 // opcodes handlers
     void HandleGameObjectUseOpcode(WorldPacket& recPacket);
     void HandleGameobjectReportUse(WorldPacket& recvPacket);
 
-    void HandleNameQueryOpcode(WorldPacket& recvPacket);
+    void HandleNameQueryOpcode(WorldPackets::Query::NameQuery& packet);
 
     void HandleQueryTimeOpcode(WorldPacket& recvPacket);
 

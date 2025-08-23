@@ -15,20 +15,31 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef AllPackets_h__
-#define AllPackets_h__
-
-#include "BankPackets.h"
-#include "CharacterPackets.h"
-#include "ChatPackets.h"
-#include "CombatLogPackets.h"
-#include "CombatPackets.h"
-#include "GuildPackets.h"
-#include "LFGPackets.h"
-#include "MiscPackets.h"
-#include "PetPackets.h"
 #include "QueryPackets.h"
-#include "TotemPackets.h"
-#include "WorldStatePackets.h"
 
-#endif // AllPackets_h__
+void WorldPackets::Query::NameQuery::Read()
+{
+    _worldPacket >> Guid;
+}
+
+WorldPacket const* WorldPackets::Query::NameQueryResponse::Write()
+{
+    _worldPacket << Guid;
+    _worldPacket << NameUnknown;
+    if (NameUnknown)
+        return &_worldPacket;
+
+    _worldPacket << Name;
+    _worldPacket << RealmName;
+    _worldPacket << Race;
+    _worldPacket << Sex;
+    _worldPacket << Class;
+    _worldPacket << Declined;
+    if (Declined)
+    {
+        for (uint8 i = 0; i < MAX_DECLINED_NAME_CASES; ++i)
+            _worldPacket << DeclinedNames.name[i];
+    }
+
+    return &_worldPacket;
+}

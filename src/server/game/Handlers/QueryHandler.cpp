@@ -24,6 +24,7 @@
 #include "Opcodes.h"
 #include "Pet.h"
 #include "Player.h"
+#include "QueryPackets.h"
 #include "World.h"
 #include "WorldPacket.h"
 #include "WorldSession.h"
@@ -32,47 +33,41 @@ void WorldSession::SendNameQueryOpcode(ObjectGuid guid)
 {
     CharacterCacheEntry const* playerData = sCharacterCache->GetCharacterCacheByGuid(guid);
 
-    WorldPacket data(SMSG_NAME_QUERY_RESPONSE, (8 + 1 + 1 + 1 + 1 + 1 + 10));
-    data << guid.WriteAsPacked();
+    WorldPackets::Query::NameQueryResponse nameQueryResponse;
+    nameQueryResponse.Guid = guid.WriteAsPacked();
     if (!playerData)
     {
-        data << uint8(1);                           // name unknown
-        SendPacket(&data);
+        nameQueryResponse.NameUnknown = uint8(1);
+        SendPacket(nameQueryResponse.Write());
         return;
     }
 
     Player* player = ObjectAccessor::FindConnectedPlayer(guid);
 
-    data << uint8(0);                               // name known
-    data << playerData->Name;                       // played name
-    data << uint8(0);                               // realm name - only set for cross realm interaction (such as Battlegrounds)
-    data << uint8(player ? player->getRace() : playerData->Race);
-    data << uint8(playerData->Sex);
-    data << uint8(playerData->Class);
+    nameQueryResponse.NameUnknown = uint8(0);
+    nameQueryResponse.Name = playerData->Name;
+    nameQueryResponse.RealmName = uint8(0); // Only set for cross realm interaction (such as Battlegrounds)
+    nameQueryResponse.Race = uint8(player ? player->getRace() : playerData->Race);
+    nameQueryResponse.Sex = uint8(player ? player->getGender() : playerData->Sex);
+    nameQueryResponse.Class = uint8(player ? player->getClass() : playerData->Class);
 
-    // pussywizard: optimization
-    /*Player* player = ObjectAccessor::FindConnectedPlayer(guid);
     if (DeclinedName const* names = (player ? player->GetDeclinedNames() : nullptr))
     {
-        data << uint8(1);                           // Name is declined
-        for (uint8 i = 0; i < MAX_DECLINED_NAME_CASES; ++i)
-            data << names->name[i];
+        nameQueryResponse.Declined = uint8(1);
+        nameQueryResponse.DeclinedNames = *names;
     }
-    else*/
-    data << uint8(0);                           // Name is not declined
+    else
+        nameQueryResponse.Declined = uint8(0);
 
-    SendPacket(&data);
+    SendPacket(nameQueryResponse.Write());
 }
 
-void WorldSession::HandleNameQueryOpcode(WorldPacket& recvData)
+void WorldSession::HandleNameQueryOpcode(WorldPackets::Query::NameQuery& packet)
 {
-    ObjectGuid guid;
-    recvData >> guid;
-
     // This is disable by default to prevent lots of console spam
     // LOG_INFO("network.opcode", "HandleNameQueryOpcode {}", guid);
 
-    SendNameQueryOpcode(guid);
+    SendNameQueryOpcode(packet.Guid);
 }
 
 void WorldSession::HandleQueryTimeOpcode(WorldPacket& /*recvData*/)
