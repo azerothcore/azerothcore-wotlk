@@ -378,7 +378,7 @@ public:
     }
 
     void SendSetPhaseShift(uint32 phaseShift);
-    void SendQueryTimeResponse();
+    void SendTimeQueryResponse();
 
     void SendAuthResponse(uint8 code, bool shortForm, uint32 queuePos = 0);
     void SendClientCacheVersion(uint32 version);
@@ -670,7 +670,7 @@ public:                                                 // opcodes handlers
 
     void HandleNameQueryOpcode(WorldPackets::Query::NameQuery& packet);
 
-    void HandleQueryTimeOpcode(WorldPackets::Query::TimeQuery& packet);
+    void HandleTimeQueryOpcode(WorldPackets::Query::TimeQuery& packet);
 
     void HandleCreatureQueryOpcode(WorldPacket& recvPacket);
 

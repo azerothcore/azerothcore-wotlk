@@ -70,12 +70,12 @@ void WorldSession::HandleNameQueryOpcode(WorldPackets::Query::NameQuery& packet)
     SendNameQueryOpcode(packet.Guid);
 }
 
-void WorldSession::HandleQueryTimeOpcode(WorldPackets::Query::TimeQuery& /*packet*/)
+void WorldSession::HandleTimeQueryOpcode(WorldPackets::Query::TimeQuery& /*packet*/)
 {
-    SendQueryTimeResponse();
+    SendTimeQueryResponse();
 }
 
-void WorldSession::SendQueryTimeResponse()
+void WorldSession::SendTimeQueryResponse()
 {
     auto timeResponse = sWorld->GetNextDailyQuestsResetTime() - GameTime::GetGameTime();
 
