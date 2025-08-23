@@ -555,7 +555,7 @@ enum WatchCommanderLeonus
     EVENT_CAST  = 2,
     EVENT_END   = 3,
 
-    GAME_EVENT_HELLFIRE = 126,
+    GAME_EVENT_HELLFIRE = 250,
 
     NPC_INFERNAL_RAIN   = 18729,
     NPC_FEAR_CONTROLLER = 19393,
