@@ -46,7 +46,6 @@ void WorldSession::SendNameQueryOpcode(ObjectGuid guid)
 
     nameQueryResponse.NameUnknown = false;
     nameQueryResponse.Name = playerData->Name;
-    nameQueryResponse.RealmName = 0; // Only set for cross realm interaction (such as Battlegrounds)
     nameQueryResponse.Race = player ? player->getRace() : playerData->Race;
     nameQueryResponse.Sex = player ? player->getGender() : playerData->Sex;
     nameQueryResponse.Class = player ? player->getClass() : playerData->Class;

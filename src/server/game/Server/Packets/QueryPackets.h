@@ -45,7 +45,7 @@ namespace WorldPackets
             PackedGuid Guid;
             uint8 NameUnknown = 0;
             std::string_view Name;
-            uint8 RealmName = 0;
+            std::string_view RealmName = ""; // Only set for cross realm interaction (such as Battlegrounds)
             uint8 Race = RACE_NONE;
             uint8 Sex = GENDER_MALE;
             uint8 Class = CLASS_NONE;
