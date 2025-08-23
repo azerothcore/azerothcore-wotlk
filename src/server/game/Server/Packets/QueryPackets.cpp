@@ -51,3 +51,8 @@ WorldPacket const* WorldPackets::Query::TimeQueryResponse::Write()
 
     return &_worldPacket;
 }
+
+void WorldPackets::Query::CorpseMapPositionQuery::Read()
+{
+    _worldPacket >> unk;
+}

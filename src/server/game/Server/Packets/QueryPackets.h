@@ -71,6 +71,16 @@ namespace WorldPackets
             uint32 ServerTime;
             uint32 TimeResponse;
         };
+
+        class CorpseMapPositionQuery final : public ClientPacket
+        {
+        public:
+            CorpseMapPositionQuery(WorldPacket&& packet) : ClientPacket(CMSG_CORPSE_MAP_POSITION_QUERY, std::move(packet)) {}
+
+            void Read() override;
+
+            uint32 unk;
+        };
     }
 }
 

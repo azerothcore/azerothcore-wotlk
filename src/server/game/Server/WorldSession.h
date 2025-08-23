@@ -165,6 +165,7 @@ namespace WorldPackets
     {
         class NameQuery;
         class TimeQuery;
+        class CorpseMapPositionQuery;
     }
 }
 
@@ -869,7 +870,7 @@ public:                                                 // opcodes handlers
 
     void HandleReclaimCorpseOpcode(WorldPacket& recvPacket);
     void HandleCorpseQueryOpcode(WorldPacket& recvPacket);
-    void HandleCorpseMapPositionQuery(WorldPacket& recvPacket);
+    void HandleCorpseMapPositionQuery(WorldPackets::Query::CorpseMapPositionQuery& packet);
     void HandleResurrectResponseOpcode(WorldPacket& recvPacket);
     void HandleSummonResponseOpcode(WorldPacket& recvData);
 
