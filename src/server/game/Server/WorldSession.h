@@ -164,6 +164,7 @@ namespace WorldPackets
     namespace Query
     {
         class NameQuery;
+        class TimeQuery;
     }
 }
 
@@ -668,7 +669,7 @@ public:                                                 // opcodes handlers
 
     void HandleNameQueryOpcode(WorldPackets::Query::NameQuery& packet);
 
-    void HandleQueryTimeOpcode(WorldPacket& recvPacket);
+    void HandleQueryTimeOpcode(WorldPackets::Query::TimeQuery& packet);
 
     void HandleCreatureQueryOpcode(WorldPacket& recvPacket);
 

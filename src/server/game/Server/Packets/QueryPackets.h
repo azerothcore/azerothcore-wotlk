@@ -38,7 +38,7 @@ namespace WorldPackets
         class NameQueryResponse final : public ServerPacket
         {
         public:
-            NameQueryResponse() : ServerPacket(SMSG_NAME_QUERY_RESPONSE, 8 + 1 + 1 + 1 + 1 + 1 + 10) { }
+            NameQueryResponse() : ServerPacket(SMSG_NAME_QUERY_RESPONSE, 8 + 1 + 1 + 1 + 1 + 1 + 10) {}
 
             WorldPacket const* Write() override;
 
@@ -51,6 +51,25 @@ namespace WorldPackets
             uint8 Class = CLASS_NONE;
             uint8 Declined = 0;
             DeclinedName DeclinedNames;
+        };
+
+        class TimeQuery final : public ClientPacket
+        {
+        public:
+            TimeQuery(WorldPacket&& packet) : ClientPacket(CMSG_QUERY_TIME, std::move(packet)) {}
+
+            void Read() override {};
+        };
+
+        class TimeQueryResponse final : public ServerPacket
+        {
+        public:
+            TimeQueryResponse() : ServerPacket(SMSG_QUERY_TIME_RESPONSE, 4 + 4) {}
+
+            WorldPacket const* Write() override;
+
+            uint32 ServerTime;
+            uint32 TimeResponse;
         };
     }
 }

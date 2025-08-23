@@ -43,3 +43,11 @@ WorldPacket const* WorldPackets::Query::NameQueryResponse::Write()
 
     return &_worldPacket;
 }
+
+WorldPacket const* WorldPackets::Query::TimeQueryResponse::Write()
+{
+    _worldPacket << ServerTime;
+    _worldPacket << TimeResponse;
+
+    return &_worldPacket;
+}
