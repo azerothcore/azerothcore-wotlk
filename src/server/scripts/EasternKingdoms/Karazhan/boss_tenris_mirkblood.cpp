@@ -89,8 +89,6 @@ struct boss_tenris_mirkblood : public BossAI
                 DoCast(SPELL_BLOOD_TAP);
                 }, 15s, 40s);
             });
-
-        scheduler.CancelAll();
     }
 
     void JustEngagedWith(Unit* /*who*/) override
@@ -173,22 +171,6 @@ struct npc_sanguine_spirit : public ScriptedAI
     {
         scheduler.Update(diff);
         UpdateVictim();
-    }
-};
-
-class spell_mirkblood_blood_mirror : public SpellScript
-{
-    PrepareSpellScript(spell_mirkblood_blood_mirror)
-
-    void HandleCast()
-    {
-        if (!GetCaster())
-            return;
-    }
-
-    void Register() override
-    {
-        OnCast += SpellCastFn(spell_mirkblood_blood_mirror::HandleCast);
     }
 };
 
@@ -293,7 +275,6 @@ void AddSC_boss_tenris_mirkblood()
 {
     RegisterKarazhanCreatureAI(boss_tenris_mirkblood);
     RegisterKarazhanCreatureAI(npc_sanguine_spirit);
-    RegisterSpellScript(spell_mirkblood_blood_mirror);
     RegisterSpellScript(spell_mirkblood_blood_mirror_target_picker);
     RegisterSpellScript(spell_mirkblood_dash_gash_return_to_tank_pre_spell);
     new at_karazhan_mirkblood_approach();
