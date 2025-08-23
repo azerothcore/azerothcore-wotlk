@@ -43,13 +43,13 @@ namespace WorldPackets
             WorldPacket const* Write() override;
 
             PackedGuid Guid;
-            uint8 NameUnknown = 0;
+            uint8 NameUnknown = false;
             std::string_view Name;
             std::string_view RealmName = ""; // Only set for cross realm interaction (such as Battlegrounds)
             uint8 Race = RACE_NONE;
             uint8 Sex = GENDER_MALE;
             uint8 Class = CLASS_NONE;
-            uint8 Declined = 0;
+            uint8 Declined = false;
             DeclinedName DeclinedNames;
         };
 
