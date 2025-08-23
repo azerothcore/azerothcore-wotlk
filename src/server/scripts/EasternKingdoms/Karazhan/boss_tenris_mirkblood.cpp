@@ -239,6 +239,24 @@ class spell_mirkblood_dash_gash_return_to_tank_pre_spell : public SpellScript
     }
 };
 
+class spell_mirkblood_exsanguinate : public SpellScript
+{
+    PrepareSpellScript(spell_mirkblood_exsanguinate)
+
+    void CalculateDamage()
+    {
+        if (!GetHitUnit())
+            return;
+
+        SetHitDamage(GetHitUnit()->GetHealth() * 0.66f);
+    }
+
+    void Register() override
+    {
+        OnHit += SpellHitFn(spell_mirkblood_exsanguinate::CalculateDamage);
+    }
+};
+
 class at_karazhan_mirkblood_approach : public AreaTriggerScript
 {
 public:
@@ -277,6 +295,7 @@ void AddSC_boss_tenris_mirkblood()
     RegisterKarazhanCreatureAI(npc_sanguine_spirit);
     RegisterSpellScript(spell_mirkblood_blood_mirror_target_picker);
     RegisterSpellScript(spell_mirkblood_dash_gash_return_to_tank_pre_spell);
+    RegisterSpellScript(spell_mirkblood_exsanguinate);
     new at_karazhan_mirkblood_approach();
     new at_karazhan_mirkblood_entrance();
 }
