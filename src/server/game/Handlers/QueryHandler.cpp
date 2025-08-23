@@ -37,27 +37,27 @@ void WorldSession::SendNameQueryOpcode(ObjectGuid guid)
     nameQueryResponse.Guid = guid.WriteAsPacked();
     if (!playerData)
     {
-        nameQueryResponse.NameUnknown = uint8(1);
+        nameQueryResponse.NameUnknown = true;
         SendPacket(nameQueryResponse.Write());
         return;
     }
 
     Player* player = ObjectAccessor::FindConnectedPlayer(guid);
 
-    nameQueryResponse.NameUnknown = uint8(0);
+    nameQueryResponse.NameUnknown = false;
     nameQueryResponse.Name = playerData->Name;
-    nameQueryResponse.RealmName = uint8(0); // Only set for cross realm interaction (such as Battlegrounds)
-    nameQueryResponse.Race = uint8(player ? player->getRace() : playerData->Race);
-    nameQueryResponse.Sex = uint8(player ? player->getGender() : playerData->Sex);
-    nameQueryResponse.Class = uint8(player ? player->getClass() : playerData->Class);
+    nameQueryResponse.RealmName = 0; // Only set for cross realm interaction (such as Battlegrounds)
+    nameQueryResponse.Race = player ? player->getRace() : playerData->Race;
+    nameQueryResponse.Sex = player ? player->getGender() : playerData->Sex;
+    nameQueryResponse.Class = player ? player->getClass() : playerData->Class;
 
     if (DeclinedName const* names = (player ? player->GetDeclinedNames() : nullptr))
     {
-        nameQueryResponse.Declined = uint8(1);
+        nameQueryResponse.Declined = true;
         nameQueryResponse.DeclinedNames = *names;
     }
     else
-        nameQueryResponse.Declined = uint8(0);
+        nameQueryResponse.Declined = false;
 
     SendPacket(nameQueryResponse.Write());
 }
@@ -80,8 +80,8 @@ void WorldSession::SendQueryTimeResponse()
     auto timeResponse = sWorld->GetNextDailyQuestsResetTime() - GameTime::GetGameTime();
 
     WorldPackets::Query::TimeQueryResponse timeQueryResponse;
-    timeQueryResponse.ServerTime = uint32(GameTime::GetGameTime().count());
-    timeQueryResponse.TimeResponse = uint32(timeResponse.count());
+    timeQueryResponse.ServerTime = GameTime::GetGameTime().count();
+    timeQueryResponse.TimeResponse = timeResponse.count();
     SendPacket(timeQueryResponse.Write());
 }
 
