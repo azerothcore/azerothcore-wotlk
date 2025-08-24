@@ -261,7 +261,7 @@ class spell_mirkblood_exsanguinate : public SpellScript
         if (!GetHitUnit())
             return;
 
-        SetHitDamage(GetHitUnit()->GetHealth() * 0.66f);
+        SetHitDamage(std::max((GetHitUnit()->GetHealth() * 0.66f), 2000.0f));
     }
 
     void Register() override
