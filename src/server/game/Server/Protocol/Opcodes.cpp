@@ -590,7 +590,7 @@ void OpcodeTable::Initialize()
     /*0x1CB*/ DEFINE_SERVER_OPCODE_HANDLER(SMSG_NOTIFICATION,                                       STATUS_NEVER);
     /*0x1CC*/ DEFINE_HANDLER(CMSG_PLAYED_TIME,                                                      STATUS_LOGGEDIN,   PROCESS_INPLACE,        &WorldSession::HandlePlayedTime                         );
     /*0x1CD*/ DEFINE_SERVER_OPCODE_HANDLER(SMSG_PLAYED_TIME,                                        STATUS_NEVER);
-    /*0x1CE*/ DEFINE_HANDLER(CMSG_QUERY_TIME,                                                       STATUS_LOGGEDIN,   PROCESS_INPLACE,        &WorldSession::HandleQueryTimeOpcode                    );
+    /*0x1CE*/ DEFINE_HANDLER(CMSG_QUERY_TIME,                                                       STATUS_LOGGEDIN,   PROCESS_INPLACE,        &WorldSession::HandleTimeQueryOpcode                    );
     /*0x1CF*/ DEFINE_SERVER_OPCODE_HANDLER(SMSG_QUERY_TIME_RESPONSE,                                STATUS_NEVER);
     /*0x1D0*/ DEFINE_SERVER_OPCODE_HANDLER(SMSG_LOG_XPGAIN,                                         STATUS_NEVER);
     /*0x1D1*/ DEFINE_SERVER_OPCODE_HANDLER(SMSG_AURACASTLOG,                                        STATUS_NEVER);
