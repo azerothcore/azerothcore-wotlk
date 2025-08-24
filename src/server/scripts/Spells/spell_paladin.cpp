@@ -965,6 +965,20 @@ class spell_pal_lay_on_hands : public SpellScript
         return true;
     }
 
+    // Handling of healing percentage modifiers
+    void HandleHeal(SpellEffIndex /*effIndex*/)
+    {
+        if (Unit* target = GetHitUnit())
+        {
+            float modifier = 1.0f;
+            for (AuraEffect* aurEff : target->GetAuraEffectsByType(SPELL_AURA_MOD_HEALING_PCT))
+                modifier *= (1.0f + aurEff->GetAmount() / 100.0f);
+            for (AuraEffect* aurEff : target->GetAuraEffectsByType(SPELL_AURA_MOD_HEALING_DONE_PERCENT))
+                modifier *= (1.0f + aurEff->GetAmount() / 100.0f);
+            SetHitHeal(-(target->GetMaxHealth() * (1 - modifier)));
+        }
+    }
+
     SpellCastResult CheckCast()
     {
         Unit* caster = GetCaster();
@@ -1004,6 +1018,7 @@ class spell_pal_lay_on_hands : public SpellScript
     {
         OnCheckCast += SpellCheckCastFn(spell_pal_lay_on_hands::CheckCast);
         AfterHit += SpellHitFn(spell_pal_lay_on_hands::HandleScript);
+        OnEffectHitTarget += SpellEffectFn(spell_pal_lay_on_hands::HandleHeal, EFFECT_0, SPELL_EFFECT_HEAL_MAX_HEALTH);
     }
 
     int32 _manaAmount;
