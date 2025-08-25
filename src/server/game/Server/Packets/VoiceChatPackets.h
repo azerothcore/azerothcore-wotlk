@@ -18,6 +18,7 @@
 #ifndef VoiceChatPackets_h__
 #define VoiceChatPackets_h__
 
+#include "ObjectGuid.h"
 #include "Packet.h"
 
 namespace WorldPackets
