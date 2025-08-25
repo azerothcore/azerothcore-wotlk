@@ -25,6 +25,7 @@
 #include "Log.h"
 #include "Player.h"
 #include "SharedDefines.h"
+#include "VoiceChatPackets.h"
 #include "WorldSession.h"
 #include "WorldSessionMgr.h"
 #include <boost/asio.hpp>
@@ -1289,15 +1290,27 @@ void VoiceChatMgr::RemoveFromVoiceChatChannels(ObjectGuid guid)
 
 void VoiceChatMgr::SendVoiceChatStatus(bool status)
 {
-    WorldPacket data(SMSG_VOICE_CHAT_STATUS, 1);
-    data << uint8(status);
-    sWorldSessionMgr->SendGlobalMessage(&data);
+    WorldPackets::VoiceChat::VoiceChatStatus voiceChatStatus;
+    voiceChatStatus.Status = status;
+    sWorldSessionMgr->SendGlobalMessage(voiceChatStatus.Write());
 }
 
-void VoiceChatMgr::SendVoiceChatServiceMessage(Opcodes opcode)
+void VoiceChatMgr::SendVoiceChatServiceDisconnect()
 {
-    WorldPacket data(opcode);
-    sWorldSessionMgr->SendGlobalMessage(&data);
+    WorldPackets::VoiceChat::ComSatDisconnect packet;
+    sWorldSessionMgr->SendGlobalMessage(packet.Write());
+}
+
+void VoiceChatMgr::SendVoiceChatServiceConnectFail()
+{
+    WorldPackets::VoiceChat::ComSatConnectFail packet;
+    sWorldSessionMgr->SendGlobalMessage(packet.Write());
+}
+
+void VoiceChatMgr::SendVoiceChatServiceReconnected()
+{
+    WorldPackets::VoiceChat::ComSatReconnectTry packet;
+    sWorldSessionMgr->SendGlobalMessage(packet.Write());
 }
 
 // command handlers

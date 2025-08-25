@@ -158,10 +158,9 @@ public:
 private:
 
     static void SendVoiceChatStatus(bool status);
-    static void SendVoiceChatServiceMessage(Opcodes opcode);
-    static void SendVoiceChatServiceDisconnect() { SendVoiceChatServiceMessage(SMSG_COMSAT_DISCONNECT); }
-    static void SendVoiceChatServiceConnectFail() { SendVoiceChatServiceMessage(SMSG_COMSAT_CONNECT_FAIL); }
-    static void SendVoiceChatServiceReconnected() { SendVoiceChatServiceMessage(SMSG_COMSAT_RECONNECT_TRY); }
+    static void SendVoiceChatServiceDisconnect();
+    static void SendVoiceChatServiceConnectFail();
+    static void SendVoiceChatServiceReconnected();
 
     void HandleVoiceChatServerPacket(VoiceChatServerPacket& packet);
     void ProcessByteBufferException(VoiceChatServerPacket const& packet);

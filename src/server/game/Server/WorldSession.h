@@ -168,6 +168,20 @@ namespace WorldPackets
         class TimeQuery;
         class CorpseMapPositionQuery;
     }
+
+    namespace VoiceChat
+    {
+        class VoiceSessionEnable;
+        class ChannelVoiceOn;
+        class SetActiveVoiceChannel;
+        class ChannelVoiceOff;
+        class AddVoiceIgnore;
+        class DeleteVoiceIgnore;
+        class PartySilence;
+        class PartyUnsilence;
+        class ChannelSilence;
+        class ChannelUnsilence;
+    }
 }
 
 enum AccountDataType
@@ -560,16 +574,16 @@ public:
     uint16 GetCurrentVoiceChannelId() const { return _currentVoiceChannel; }
     void SetCurrentVoiceChannelId(uint32 id) { _currentVoiceChannel = id; }
     static void HandleAddMutedOpcodeCallBack(QueryResult* result, uint32);
-    void HandleAddVoiceIgnoreOpcode(WorldPacket& recvData);
-    void HandleDelVoiceIgnoreOpcode(WorldPacket& recvData);
-    void HandleChannelSilenceOpcode(WorldPacket& recvData);
-    void HandleChannelUnsilenceOpcode(WorldPacket& recvData);
-    void HandlePartySilenceOpcode(WorldPacket& recvData);
-    void HandlePartyUnsilenceOpcode(WorldPacket& recvData);
-    void HandleChannelVoiceOnOpcode(WorldPacket& recvData);
-    void HandleChannelVoiceOffOpcode(WorldPacket& recvData);
-    void HandleVoiceSessionEnableOpcode(WorldPacket& recvData);
-    void HandleSetActiveVoiceChannelOpcode(WorldPacket& recvData);
+    void HandleAddVoiceIgnoreOpcode(WorldPackets::VoiceChat::AddVoiceIgnore& packet);
+    void HandleDeleteVoiceIgnoreOpcode(WorldPackets::VoiceChat::DeleteVoiceIgnore& packet);
+    void HandleChannelSilenceOpcode(WorldPackets::VoiceChat::ChannelSilence& packet);
+    void HandleChannelUnsilenceOpcode(WorldPackets::VoiceChat::ChannelUnsilence& packet);
+    void HandlePartySilenceOpcode(WorldPackets::VoiceChat::PartySilence& packet);
+    void HandlePartyUnsilenceOpcode(WorldPackets::VoiceChat::PartyUnsilence& packet);
+    void HandleChannelVoiceOnOpcode(WorldPackets::VoiceChat::ChannelVoiceOn& packet);
+    void HandleChannelVoiceOffOpcode(WorldPackets::VoiceChat::ChannelVoiceOff& packet);
+    void HandleVoiceSessionEnableOpcode(WorldPackets::VoiceChat::VoiceSessionEnable& packet);
+    void HandleSetActiveVoiceChannelOpcode(WorldPackets::VoiceChat::SetActiveVoiceChannel& packet);
     void SetActiveVoiceChannel(VoiceChatChannel* voiceChannel, VoiceChatChannel* currentChannel, Player* player);
 
     // Packets cooldown
@@ -1039,8 +1053,6 @@ public:                                                 // opcodes handlers
 
     void HandleItemRefundInfoRequest(WorldPacket& recvData);
     void HandleItemRefund(WorldPacket& recvData);
-
-    void HandleSetActiveVoiceChannel(WorldPacket& recvData);
     void HandleSetTaxiBenchmarkOpcode(WorldPacket& recvData);
 
     // Guild Bank

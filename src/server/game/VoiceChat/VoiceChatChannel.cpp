@@ -20,6 +20,7 @@
 #include "ChannelMgr.h"
 #include "GroupMgr.h"
 #include "Player.h"
+#include "VoiceChatPackets.h"
 #include "VoiceChatMgr.h"
 
 VoiceChatChannel::VoiceChatChannel(VoiceChatChannelTypes type, uint32 id, uint32 groupId, std::string name, TeamId team)
@@ -101,15 +102,12 @@ void VoiceChatChannel::SendAvailableVoiceChatChannel(WorldSession* session)
 
     LOG_DEBUG("network", "Sending SMSG_AVAILABLE_VOICE_CHANNEL for player {}", plr->GetGUID().ToString());
 
-    WorldPacket data(SMSG_AVAILABLE_VOICE_CHANNEL);
-    data << _sessionId;
-    data << uint8(_type);
-    if (_type == VOICECHAT_CHANNEL_CUSTOM)
-        data << _channelName;
-    else
-        data << uint8(0);
-    data << plr->GetGUID();
-    session->SendPacket(&data);
+    WorldPackets::VoiceChat::AvailableVoiceChannel availableVoiceChannel;
+    availableVoiceChannel.SessionId = _sessionId;
+    availableVoiceChannel.Type = _type;
+    availableVoiceChannel.ChannelName = _channelName;
+    availableVoiceChannel.PlayerGuid = plr->GetGUID();
+    session->SendPacket(availableVoiceChannel.Write());
 }
 
 // send voice members list to all members
@@ -123,7 +121,7 @@ void VoiceChatChannel::SendVoiceRosterUpdate(bool empty, bool toAll, ObjectGuid 
     if (_isMassAdding)
         return;
 
-    WorldPacket data(SMSG_VOICE_SESSION_ROSTER_UPDATE, 31 + (_members.size() * 11));
+    WorldPacket data(SMSG_VOICE_SESSION_ROSTER_UPDATE, 31 + (_members.size() * 11)); // @todo: modern packet class
     data << uint64(_sessionId);
     data << uint16(_channelId);
     data << uint8(_type);
@@ -206,10 +204,10 @@ void VoiceChatChannel::SendLeaveVoiceChatSession(WorldSession* session) const
 
     LOG_DEBUG("network", "Sending SMSG_VOICE_SESSION_LEAVE for player {}", plr->GetGUID().ToString());
 
-    WorldPacket data(SMSG_VOICE_SESSION_LEAVE, 16);
-    data << plr->GetGUID();
-    data << _sessionId;
-    session->SendPacket(&data);
+    WorldPackets::VoiceChat::VoiceSessionLeave voiceSessionLeave;
+    voiceSessionLeave.PlayerGuid = plr->GetGUID();
+    voiceSessionLeave.SessionId = _sessionId;
+    session->SendPacket(voiceSessionLeave.Write());
 }
 
 void VoiceChatChannel::SendLeaveVoiceChatSession(ObjectGuid guid)
@@ -220,10 +218,10 @@ void VoiceChatChannel::SendLeaveVoiceChatSession(ObjectGuid guid)
         {
             if (WorldSession* session = plr->GetSession())
             {
-                WorldPacket data(SMSG_VOICE_SESSION_LEAVE, 16);
-                data << guid;
-                data << _sessionId;
-                session->SendPacket(&data);
+                WorldPackets::VoiceChat::VoiceSessionLeave voiceSessionLeave;
+                voiceSessionLeave.PlayerGuid = guid;
+                voiceSessionLeave.SessionId = _sessionId;
+                session->SendPacket(voiceSessionLeave.Write());
             }
         }
     }
@@ -290,8 +288,8 @@ void VoiceChatChannel::AddVoiceChatMember(ObjectGuid guid)
     if (!userId)
     {
         LOG_INFO("voice-chat", "Could not add voice member, no free slots!");
-        WorldPacket data(SMSG_VOICESESSION_FULL);
-        sess->SendPacket(&data);
+        WorldPackets::VoiceChat::VoiceSessionFull voiceSessionFull;
+        sess->SendPacket(voiceSessionFull.Write());
         return;
     }
 
