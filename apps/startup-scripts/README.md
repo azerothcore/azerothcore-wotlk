@@ -312,6 +312,9 @@ Services support two restart policies:
 
 # Edit configuration
 ./service-manager.sh edit world
+
+# Restore missing services from registry
+./service-manager.sh restore
 ```
 
 ## 🌍 Multiple Realms Setup
@@ -384,28 +387,84 @@ cp examples/restarter-world.sh restarter-realm2.sh
 
 ## 🛠️ Service Management
 
+### Service Registry and Persistence
+
+The service manager includes a comprehensive registry system that tracks all created services and enables automatic restoration:
+
+#### Service Registry Features
+
+- **Automatic Tracking**: All services are automatically registered when created
+- **Cross-Reboot Persistence**: PM2 services are configured with startup persistence
+- **Service Restoration**: Missing services can be detected and restored from registry
+- **Migration Support**: Legacy service configurations can be migrated to the new format
+
+#### Using the Registry
+
+```bash
+# Check for missing services and restore them
+./service-manager.sh restore
+
+# List all registered services (includes status)
+./service-manager.sh list
+
+# Services are automatically added to registry on creation
+./service-manager.sh create auth authserver --bin-path /path/to/bin
+```
+
+#### Custom Configuration Directories
+
+You can customize where service configurations and PM2/systemd files are stored:
+
+```bash
+# Set custom directories
+export AC_SERVICE_CONFIG_DIR="/path/to/your/project/services"
+
+# Now all service operations will use these custom directories
+./service-manager.sh create auth authserver --bin-path /path/to/bin
+```
+
+This is particularly useful for:
+- **Version Control**: Keep service configurations in your project repository
+- **Multiple Projects**: Separate service configurations per project
+- **Team Collaboration**: Share service setups across development teams
+
+#### Migration from Legacy Format
+
+If you have existing services in the old format, use the migration script:
+
+```bash
+# Migrate existing registry to new format
+./migrate-registry.sh
+
+# The script will:
+# - Detect old format automatically
+# - Create a backup of the old registry
+# - Convert to new format with proper tracking
+# - Preserve all existing service information
+```
+
 ### PM2 Services
 
 When using PM2 as the service provider:
 
-```bash
-# PM2-specific commands
-pm2 list                    # List all PM2 processes
-pm2 logs auth              # View logs
-pm2 monit                  # Real-time monitoring
-pm2 restart auth           # Restart service
-pm2 delete auth            # Remove service
+* [PM2 CLI Documentation](https://pm2.io/docs/runtime/reference/pm2-cli/)
 
-# Save PM2 configuration
-pm2 save
-pm2 startup                # Auto-start on boot
-```
+**Automatic PM2 Persistence**: The service manager automatically configures PM2 for persistence across reboots by:
+- Running `pm2 startup` to set up the startup script
+- Running `pm2 save` after each service creation/modification
+- This ensures your services automatically start when the system reboots
 
 NOTE: pm2 cannot run tmux/screen sessions, but you can always use the `attach` command to connect to the service console because pm2 supports interactive mode.
 
 ### Environment Variables
 
 The startup scripts recognize several environment variables for configuration and runtime behavior:
+
+#### Configuration Directory Variables
+
+- **`AC_SERVICE_CONFIG_DIR`**: Override the default configuration directory for services registry and configurations
+  - Default: `${XDG_CONFIG_HOME:-$HOME/.config}/azerothcore/services`
+  - Used for storing service registry and run-engine configurations
 
 #### Service Detection Variables
 
@@ -550,5 +609,19 @@ npm install -g pm2
 # or
 sudo npm install -g pm2
 ```
+
+#### 7. Registry Out of Sync
+```bash
+# If the service registry shows services that don't actually exist
+```
+**Solution**: Use registry sync or restore
+```bash
+# Check and restore missing services (also cleans up orphaned entries)
+./service-manager.sh restore
+
+# If you have a very old registry format, migrate it
+./migrate-registry.sh
+```
+
 
 
