@@ -1180,7 +1180,10 @@ void WorldSession::HandlePlayerLoginToCharInWorld(Player* pCurrChar)
     pCurrChar->GetMap()->SendInitTransports(pCurrChar);
     pCurrChar->GetMap()->SendInitSelf(pCurrChar);
     pCurrChar->GetMap()->SendZoneDynamicInfo(pCurrChar);
-    pCurrChar->m_clientGUIDs.clear();
+
+    // If we are logging into an existing player, simply clear visibility references
+    // so player will receive a fresh list of new objects on the next vis update.
+    pCurrChar->GetObjectVisibilityContainer().CleanVisibilityReferences();
     pCurrChar->UpdateObjectVisibility(false);
 
     pCurrChar->CleanupChannels();
