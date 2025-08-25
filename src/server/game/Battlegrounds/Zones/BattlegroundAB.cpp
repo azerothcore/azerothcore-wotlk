@@ -115,7 +115,7 @@ void BattlegroundAB::PostUpdateImpl(uint32 diff)
                         if (honorRewards < uint8(m_TeamScores[teamId] / _honorTics))
                             RewardHonorToTeam(GetBonusHonorFromKill(1), teamId);
                         if (reputationRewards < uint8(m_TeamScores[teamId] / _reputationTics))
-                            RewardReputationToTeam(teamId == TEAM_ALLIANCE ? 509 : 510, 10, teamId);
+                            RewardReputationToTeam(teamId == TEAM_ALLIANCE ? 509 : 510, uint32(10 * _abReputationRate), teamId);
                         if (information < uint8(m_TeamScores[teamId] / BG_AB_WARNING_NEAR_VICTORY_SCORE))
                         {
                             if (teamId == TEAM_ALLIANCE)
@@ -421,6 +421,7 @@ bool BattlegroundAB::SetupBattleground()
 {
     _honorTics = BattlegroundMgr::IsBGWeekend(GetBgTypeID(true)) ? BG_AB_HONOR_TICK_WEEKEND : BG_AB_HONOR_TICK_NORMAL;
     _reputationTics = BattlegroundMgr::IsBGWeekend(GetBgTypeID(true)) ? BG_AB_REP_TICK_WEEKEND : BG_AB_REP_TICK_NORMAL;
+    _abReputationRate = sWorld->getRate(RATE_REPUTATION_GAIN_AB);
 
     for (uint32 i = 0; i < BG_AB_DYNAMIC_NODES_COUNT; ++i)
     {
