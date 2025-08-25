@@ -5,7 +5,6 @@
 
 set -euo pipefail  # Strict error handling
 
-# SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"  # Unused currently
 CONFIG_DIR="${AC_SERVICE_CONFIG_DIR:-${XDG_CONFIG_HOME:-$HOME/.config}/azerothcore/services}"
 REGISTRY_FILE="$CONFIG_DIR/service_registry.json"
 BACKUP_FILE="$CONFIG_DIR/service_registry.json.backup"

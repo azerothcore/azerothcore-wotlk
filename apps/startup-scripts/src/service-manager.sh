@@ -486,7 +486,7 @@ function pm2_create_service() {
         pm2_cmd+=" --max-memory-restart $max_memory"
     fi
     
-    # Add max reboots if specified
+    # Add max restarts if specified
     if [ -n "$max_restarts" ]; then
         pm2_cmd+=" --max-restarts $max_restarts"
     fi
@@ -505,7 +505,7 @@ function pm2_create_service() {
         # Add to registry (extract command and args from the full command)
         local clean_command="$command$additional_args"
         add_service_to_registry "$service_name" "pm2" "executable" "$command" "$additional_args" "" "$restart_policy" "none" "0" "$max_memory $max_restarts" ""
-        
+
         return 0
     else
         echo -e "${RED}Failed to create PM2 service '$service_name'${NC}"
@@ -523,8 +523,8 @@ function pm2_remove_service() {
     
     # Stop the service if it's running
     if pm2 describe "$service_name" >/dev/null 2>&1; then
-        pm2 stop "$service_name" 2>/dev/null || true
-        pm2 delete "$service_name" 2>/dev/null || true
+        pm2 stop "$service_name" 2>&1 || true
+        pm2 delete "$service_name" 2>&1 || true
         
         # Wait for PM2 to process the stop/delete command with timeout
         local timeout=10
@@ -1444,8 +1444,7 @@ function attach_to_service() {
         echo -e "${RED}Error: Run-engine configuration file not found: $RUN_ENGINE_CONFIG_FILE${NC}"
         return 1
     fi
-    
-    source "$RUN_ENGINE_CONFIG_FILE"
+
     if [ ! -f "$RUN_ENGINE_CONFIG_FILE" ]; then
         echo -e "${RED}Error: Run-engine configuration file not found: $RUN_ENGINE_CONFIG_FILE${NC}"
         return 1
