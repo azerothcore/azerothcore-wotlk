@@ -283,10 +283,11 @@ typedef std::map<uint8, ActionButton> ActionButtonList;
 
 struct PlayerCreateInfoItem
 {
-    PlayerCreateInfoItem(uint32 id, uint32 amount) : item_id(id), item_amount(amount) {}
+    PlayerCreateInfoItem(uint32 id, uint32 amount, bool collectorEdition) : item_id(id), item_amount(amount), collectorEdition(collectorEdition) {}
 
     uint32 item_id;
     uint32 item_amount;
+    bool collectorEdition;
 };
 
 typedef std::list<PlayerCreateInfoItem> PlayerCreateInfoItems;
