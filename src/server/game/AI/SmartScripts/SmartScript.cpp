@@ -895,7 +895,7 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
                         go->SetLootState(GO_READY);
                     }
 
-                    go->UseDoorOrButton(0, !!e.action.activateObject.alternative, unit);
+                    go->UseDoorOrButton(0, e.action.activateObject.alternative, unit);
                     LOG_DEBUG("sql.sql", "SmartScript::ProcessAction:: SMART_ACTION_ACTIVATE_GOBJECT. Gameobject {} activated", go->GetGUID().ToString());
                 }
             }
@@ -1485,14 +1485,14 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
         {
             for (WorldObject* target : targets)
                 if (IsUnit(target))
-                    target->ToUnit()->SetVisible(!!e.action.visibility.state);
+                    target->ToUnit()->SetVisible(e.action.visibility.state);
 
             break;
         }
         case SMART_ACTION_SET_ACTIVE:
         {
             for (WorldObject* target : targets)
-                target->setActive(!!e.action.setActive.state);
+                target->setActive(e.action.setActive.state);
             break;
         }
         case SMART_ACTION_ATTACK_START:

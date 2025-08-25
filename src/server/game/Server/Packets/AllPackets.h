@@ -27,6 +27,7 @@
 #include "LFGPackets.h"
 #include "MiscPackets.h"
 #include "PetPackets.h"
+#include "QueryPackets.h"
 #include "TotemPackets.h"
 #include "WorldStatePackets.h"
 

@@ -128,7 +128,7 @@ int main(int argc, char** argv)
     auto vm = GetConsoleArguments(argc, argv, configFile, configService);
 
     // exit if help or version is enabled
-    if (vm.count("help"))
+    if (vm.count("help") || vm.count("version"))
         return 0;
 
 #if AC_PLATFORM == AC_PLATFORM_WINDOWS
@@ -736,13 +736,11 @@ variables_map GetConsoleArguments(int argc, char** argv, fs::path& configFile, [
     }
 
     if (vm.count("help"))
-    {
         std::cout << all << "\n";
-    }
+    else if (vm.count("version"))
+        std::cout << GitRevision::GetFullVersion() << "\n";
     else if (vm.count("dry-run"))
-    {
         sConfigMgr->setDryRun(true);
-    }
 
     return vm;
 }

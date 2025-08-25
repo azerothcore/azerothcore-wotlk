@@ -1692,7 +1692,7 @@ public:
 
     bool RemoveMItem(ObjectGuid::LowType itemLowGuid)
     {
-        return !!mMitems.erase(itemLowGuid);
+        return mMitems.erase(itemLowGuid);
     }
 
     void PetSpellInitialize();
@@ -2641,8 +2641,8 @@ public:
     std::string GetPlayerName();
 
     // Settings
-    [[nodiscard]] PlayerSetting GetPlayerSetting(std::string const& source, uint8 index);
-    void UpdatePlayerSetting(std::string const& source, uint8 index, uint32 value);
+    [[nodiscard]] PlayerSetting GetPlayerSetting(std::string const& source, uint32 index);
+    void UpdatePlayerSetting(std::string const& source, uint32 index, uint32 value);
 
     void SendSystemMessage(std::string_view msg, bool escapeCharacters = false);
 
