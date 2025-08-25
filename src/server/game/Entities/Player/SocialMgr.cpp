@@ -195,6 +195,11 @@ bool PlayerSocial::HasIgnore(ObjectGuid ignore_guid) const
     return _checkContact(ignore_guid, SOCIAL_FLAG_IGNORED);
 }
 
+bool PlayerSocial::HasMute(ObjectGuid ignoreGuid) const
+{
+    return _checkContact(ignoreGuid, SOCIAL_FLAG_MUTED);
+}
+
 SocialMgr::SocialMgr()
 {
 }
