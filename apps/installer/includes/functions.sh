@@ -118,6 +118,59 @@ function inst_allInOne() {
     inst_download_client_data
 }
 
+############################################################
+# Module helpers and dispatcher                             #
+############################################################
+
+# Returns the default branch name of a GitHub repo in the azerothcore org.
+# If the API call fails, defaults to "master".
+function inst_get_default_branch() {
+    local repo="$1"
+    local def
+    def=$(curl --silent "https://api.github.com/repos/azerothcore/${repo}" \
+        | "$AC_PATH_DEPS/jsonpath/JSONPath.sh" -b '$.default_branch')
+    if [ -z "$def" ]; then
+        def="master"
+    fi
+    echo "$def"
+}
+
+# Dispatcher for the unified `module` command.
+# Usage: ./acore.sh module <search|install|update|remove> [args...]
+function inst_module() {
+    # Normalize arguments into an array
+    local tokens=()
+    read -r -a tokens <<< "$*"
+    local cmd="${tokens[0]}"
+    local args=("${tokens[@]:1}")
+
+    case "$cmd" in
+        ""|"help"|"-h"|"--help")
+            echo "Usage:"
+            echo "  ./acore.sh module search   [terms...]"
+            echo "  ./acore.sh module install  [modules...]"
+            echo "  ./acore.sh module update   [modules...]"
+            echo "  ./acore.sh module remove   [modules...]"
+            ;;
+        "search"|"s")
+            inst_module_search "${args[@]}"
+            ;;
+        "install"|"i")
+            inst_module_install "${args[@]}"
+            ;;
+        "update"|"u")
+            inst_module_update "${args[@]}"
+            ;;
+        "remove"|"r")
+            inst_module_remove "${args[@]}"
+            ;;
+        *)
+            echo "Unknown subcommand: $cmd"
+            echo "Try: ./acore.sh module help"
+            ;;
+    esac
+}
+
 function inst_getVersionBranch() {
     local res="master"
     local v="not-defined"
@@ -154,104 +207,155 @@ function inst_getVersionBranch() {
 
 function inst_module_search {
 
-    local res="$1"
-    local idx=0;
-
-    if [ -z "$1" ]; then
-        echo "Type what to search or leave blank for full list"
-        read -p "Insert name: " res
+    # Accept 0..N search terms; if none provided, prompt the user.
+    local terms=("$@")
+    if [ ${#terms[@]} -eq 0 ]; then
+        echo "Type what to search (blank for full list)"
+        read -p "Insert name(s): " _line
+        if [ -n "$_line" ]; then
+            read -r -a terms <<< "$_line"
+        fi
     fi
 
-    local search="+$res"
+    # Build GitHub search query: org + topic + fork + optional in:name filters
+    local q_base="org:azerothcore+topic:azerothcore-module"
+    local q_terms=""
+    local t
+    for t in "${terms[@]}"; do
+        [ -z "$t" ] && continue
+        q_terms+="+in:name+${t}"
+    done
 
-    echo "Searching $res..."
-    echo "";
+    echo "Searching ${terms[*]}..."
+    echo ""
 
-    readarray -t MODS < <(curl --silent "https://api.github.com/search/repositories?q=org%3Aazerothcore${search}+fork%3Atrue+topic%3Acore-module+sort%3Astars&type=" \
+    # Ask GitHub API (per_page to widen results). Sort outside of q.
+    readarray -t MODS < <(curl --silent "https://api.github.com/search/repositories?q=${q_base}${q_terms}&sort=stars&order=desc&per_page=100" \
         | "$AC_PATH_DEPS/jsonpath/JSONPath.sh" -b '$.items.*.name')
+
+    if (( ${#MODS[@]} == 0 )); then
+        echo "No results."
+        echo ""
+        return 0
+    fi
+
+    local idx=0
     while (( ${#MODS[@]} > idx )); do
-        mod="${MODS[idx++]}"
+        local mod="${MODS[idx++]}"
         read v b < <(inst_getVersionBranch "https://raw.githubusercontent.com/azerothcore/$mod/master/acore-module.json")
 
         if [[ "$b" != "none" ]]; then
             echo "-> $mod (tested with AC version: $v)"
         else
-            echo "-> $mod (no revision available for AC v$AC_VERSION, it could not work!)"
+            echo "-> $mod (no revision available for AC v$ACORE_VERSION, it could not work!)"
         fi
     done
 
-    echo "";
-    echo "";
+    echo ""
+    echo ""
 }
 
 function inst_module_install {
-    local res
-    if [ -z "$1" ]; then
-        echo "Type the name of the module to install"
-        read -p "Insert name: " res
-    else
-        res="$1"
+    # Support multiple modules; prompt if none specified.
+    local modules=("$@")
+    if [ ${#modules[@]} -eq 0 ]; then
+        echo "Type the name(s) of the module(s) to install"
+        read -p "Insert name(s): " _line
+        read -r -a modules <<< "$_line"
     fi
 
-    read v b < <(inst_getVersionBranch "https://raw.githubusercontent.com/azerothcore/$res/master/acore-module.json")
+    local res v b def
+    for res in "${modules[@]}"; do
+        [ -z "$res" ] && continue
 
-    if [[ "$b" != "none" ]]; then
-        Joiner:add_repo "https://github.com/azerothcore/$res" "$res" "$b" && echo "Done, please re-run compiling and db assembly. Read instruction on module repository for more information"
-    else
-        echo "Cannot install $res module: it doesn't exists or no version compatible with AC v$ACORE_VERSION are available"
-    fi
+        read v b < <(inst_getVersionBranch "https://raw.githubusercontent.com/azerothcore/$res/master/acore-module.json")
 
-    echo "";
-    echo "";
+        # If the module json is missing or no compat branch found, warn and use default branch
+        if [[ "$v" == "none" || "$v" == "not-defined" || "$b" == "none" ]]; then
+            def="$(inst_get_default_branch "$res")"
+            echo "Warning: $res has no compatible acore-module.json; installing from branch '$def' (latest commit)."
+            b="$def"
+        fi
+
+        if Joiner:add_repo "https://github.com/azerothcore/$res" "$res" "$b"; then
+            echo "[$res] Done, please re-run compiling and db assembly. Read instructions on module repository for more information"
+        else
+            echo "[$res] Install failed or module not found"
+        fi
+    done
+
+    echo ""
+    echo ""
 }
 
 function inst_module_update {
-    local res;
-    local _tmp;
-    local branch;
-    local p;
-
-    if [ -z "$1" ]; then
-        echo "Type the name of the module to update"
-        read -p "Insert name: " res
-    else
-        res="$1"
+    # Support multiple modules; prompt if none specified.
+    local modules=("$@")
+    if [ ${#modules[@]} -eq 0 ]; then
+        echo "Type the name(s) of the module(s) to update"
+        read -p "Insert name(s): " _line
+        read -r -a modules <<< "$_line"
     fi
 
-    _tmp=$PWD
+    local _tmp=$PWD
+    local res v b branch def
 
-    if [ -d "$J_PATH_MODULES/$res/" ]; then
-        read v b < <(inst_getVersionBranch "https://raw.githubusercontent.com/azerothcore/$res/master/acore-module.json")
+    for res in "${modules[@]}"; do
+        [ -z "$res" ] && continue
 
-        cd "$J_PATH_MODULES/$res/"
+        if [ -d "$J_PATH_MODULES/$res/" ]; then
+            read v b < <(inst_getVersionBranch "https://raw.githubusercontent.com/azerothcore/$res/master/acore-module.json")
 
-        # use current branch if something wrong with json
-        if [[ "$v" == "none" || "$v" == "not-defined" ]]; then
-            b=`git rev-parse --abbrev-ref HEAD`
+            cd "$J_PATH_MODULES/$res/" || { echo "[$res] Cannot enter module directory"; cd "$_tmp"; continue; }
+
+            # If json missing or no compat branch: prefer current branch, else fallback to default branch
+            if [[ "$v" == "none" || "$v" == "not-defined" || "$b" == "none" ]]; then
+                if branch=$(git rev-parse --abbrev-ref HEAD 2>/dev/null); then
+                    echo "Warning: $res has no compatible acore-module.json; updating current branch '$branch'."
+                    b="$branch"
+                else
+                    def="$(inst_get_default_branch "$res")"
+                    echo "Warning: $res has no compatible acore-module.json and no git branch detected; updating default branch '$def'."
+                    b="$def"
+                fi
+            fi
+
+            if Joiner:upd_repo "https://github.com/azerothcore/$res" "$res" "$b"; then
+                echo "[$res] Done, please re-run compiling and db assembly"
+            else
+                echo "[$res] Cannot update"
+            fi
+            cd "$_tmp"
+        else
+            echo "[$res] Cannot update! Path doesn't exist ($J_PATH_MODULES/$res/)"
         fi
+    done
 
-        Joiner:upd_repo "https://github.com/azerothcore/$res" "$res" "$b" && echo "Done, please re-run compiling and db assembly" || echo "Cannot update"
-        cd $_tmp
-    else
-        echo "Cannot update! Path doesn't exist"
-    fi;
-
-    echo "";
-    echo "";
+    echo ""
+    echo ""
 }
 
 function inst_module_remove {
-    if [ -z "$1" ]; then
-        echo "Type the name of the module to remove"
-        read -p "Insert name: " res
-    else
-        res="$1"
+    # Support multiple modules; prompt if none specified.
+    local modules=("$@")
+    if [ ${#modules[@]} -eq 0 ]; then
+        echo "Type the name(s) of the module(s) to remove"
+        read -p "Insert name(s): " _line
+        read -r -a modules <<< "$_line"
     fi
 
-    Joiner:remove "$res" && echo "Done, please re-run compiling"  || echo "Cannot remove"
+    local res
+    for res in "${modules[@]}"; do
+        [ -z "$res" ] && continue
+        if Joiner:remove "$res"; then
+            echo "[$res] Done, please re-run compiling"
+        else
+            echo "[$res] Cannot remove"
+        fi
+    done
 
-    echo "";
-    echo "";
+    echo ""
+    echo ""
 }
 
 
