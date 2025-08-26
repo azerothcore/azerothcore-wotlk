@@ -148,7 +148,8 @@ function inst_module() {
         ""|"help"|"-h"|"--help")
             echo "Usage:"
             echo "  ./acore.sh module search   [terms...]"
-            echo "  ./acore.sh module install  [modules...]"
+            echo "  ./acore.sh module install  [--all | modules...]"
+            echo "      modules can be specified as: name[:branch[:commit]]"
             echo "  ./acore.sh module update   [modules...]"
             echo "  ./acore.sh module remove   [modules...]"
             ;;
@@ -169,6 +170,97 @@ function inst_module() {
             echo "Try: ./acore.sh module help"
             ;;
     esac
+}
+# Parse a module spec of the form: name[:branch[:commit]]
+# Prints: "name branch commit" (empty fields if omitted)
+function inst_parse_module_spec() {
+    local spec="$1"
+    local parts i n repo_part branch commit
+    IFS=':' read -r -a parts <<< "$spec"
+    n=${#parts[@]}
+    # Default values
+    commit=""
+    branch=""
+    repo_part=""
+
+    # Detect URL-like specs which contain '://' or start with git@ (they include ':' in the URL)
+    if [[ "$spec" =~ :// ]] || [[ "$spec" =~ ^git@ ]]; then
+        # For URL forms, repo is comprised by the first two parts when splitting by ':'
+        # e.g. git@github.com:owner/name.git[:branch[:commit]] -> parts[0]=git@github.com, parts[1]=owner/name.git
+        if (( n >= 3 )); then
+            # repo is parts[0] + ':' + parts[1]
+            repo_part="${parts[0]}:${parts[1]}"
+            if (( n == 3 )); then
+                branch="${parts[2]}"
+            elif (( n >= 4 )); then
+                # last may be commit
+                last="${parts[n-1]}"
+                prev="${parts[n-2]}"
+                if [[ "$last" =~ ^[0-9a-fA-F]{7,40}$ ]]; then
+                    commit="$last"
+                    branch="$prev"
+                else
+                    branch="$last"
+                fi
+            fi
+        elif (( n == 2 )); then
+            repo_part="${parts[0]}:${parts[1]}"
+        else
+            repo_part="$spec"
+        fi
+    else
+        # Non-URL form: owner/name or name[:branch[:commit]]
+        if (( n >= 3 )); then
+            last="${parts[n-1]}"
+            prev="${parts[n-2]}"
+            if [[ "$last" =~ ^[0-9a-fA-F]{7,40}$ ]]; then
+                commit="$last"
+                branch="$prev"
+                repo_part="${parts[0]}"
+                for ((i=1;i<=n-3;i++)); do repo_part+=":${parts[i]}"; done
+            else
+                branch="$last"
+                repo_part="${parts[0]}"
+                for ((i=1;i<=n-2;i++)); do repo_part+=":${parts[i]}"; done
+            fi
+        elif (( n == 2 )); then
+            repo_part="${parts[0]}"
+            branch="${parts[1]}"
+        else
+            repo_part="${parts[0]}"
+        fi
+    fi
+
+    # Normalize repo reference and extract owner/name.
+    local repo_ref owner name url owner_repo
+    repo_ref="$repo_part"
+
+    # If repo_ref is a URL, extract owner/name from path when possible
+    if [[ "$repo_ref" =~ :// ]] || [[ "$repo_ref" =~ ^git@ ]]; then
+        # Extract owner/name (last two path components)
+        owner_repo=$(echo "$repo_ref" | sed -E 's#(git@[^:]+:|https?://[^/]+/|ssh://[^/]+/)?(.*?)(\.git)?$#\2#')
+        owner="$(echo "$owner_repo" | awk -F'/' '{print $(NF-1)}')"
+        name="$(echo "$owner_repo" | awk -F'/' '{print $NF}' | sed -E 's/\.git$//')"
+    else
+        owner_repo="$repo_ref"
+        if [[ "$owner_repo" == *"/"* ]]; then
+            owner="$(echo "$owner_repo" | cut -d'/' -f1)"
+            name="$(echo "$owner_repo" | cut -d'/' -f2)"
+        else
+            owner="azerothcore"
+            name="$owner_repo"
+            repo_ref="$owner/$name"
+        fi
+    fi
+
+    # Build URL only if repo_ref is not already a URL
+    if [[ "$repo_ref" =~ :// ]] || [[ "$repo_ref" =~ ^git@ ]]; then
+        url="$repo_ref"
+    else
+        url="https://github.com/${repo_ref}"
+    fi
+
+    echo "$repo_ref" "$owner" "$name" "${branch:--}" "${commit:--}" "$url"
 }
 
 function inst_getVersionBranch() {
@@ -203,6 +295,156 @@ function inst_getVersionBranch() {
     fi
 
     echo "$v" "$res"
+}
+
+# ----------------------------------------------
+# Modules list helpers (branch + commit tracking)
+# ----------------------------------------------
+
+# Extract owner/name from any repository reference (URL, owner/name, or simple name)
+# This enables intelligent matching regardless of how the module was specified
+function inst_extract_owner_name() {
+    local spec="$1"
+    
+    # If it's already in owner/name format (and not a URL)
+    if [[ "$spec" =~ ^[^/]+/[^/]+$ ]] && [[ ! "$spec" =~ :// ]] && [[ ! "$spec" =~ ^git@ ]]; then
+        echo "$spec"
+        return
+    fi
+    
+    # If it's just a name, add default azerothcore owner
+    if [[ ! "$spec" =~ [/:] ]]; then
+        echo "azerothcore/$spec"
+        return
+    fi
+    
+    # Extract from URL (any git host)
+    local path
+    if [[ "$spec" =~ ^git@ ]]; then
+        # git@host:owner/name.git -> owner/name.git
+        path="${spec#*:}"
+    elif [[ "$spec" =~ :// ]]; then
+        # https://host/owner/name.git -> extract path after host
+        # Remove protocol and host, keep only path
+        path="${spec}"
+        path="${path#*://}"      # Remove protocol
+        path="${path#*/}"        # Remove host
+        # Now we have owner/name.git or similar
+    else
+        # Fallback for other formats
+        path="$spec"
+    fi
+    
+    # Remove .git extension and any query parameters
+    path="${path%.git}"
+    path="${path%\?*}"  # remove query params
+    path="${path%\#*}"  # remove fragments
+    
+    echo "$path"
+}
+
+# Check if a module is already installed by comparing owner/name
+# Returns the existing repo_ref if found, empty if not found
+function inst_mod_is_installed() {
+    local spec="$1"
+    local target_owner_name
+    target_owner_name=$(inst_extract_owner_name "$spec")
+    
+    # Use a different approach: read into a variable first, then process
+    local modules_content
+    modules_content=$(inst_mod_list_read)
+    
+    # Process each line
+    while IFS= read -r line; do
+        [[ -z "$line" ]] && continue
+        read -r repo_ref branch commit <<< "$line"
+        local existing_owner_name
+        existing_owner_name=$(inst_extract_owner_name "$repo_ref")
+        if [[ "$existing_owner_name" == "$target_owner_name" ]]; then
+            echo "$repo_ref"  # Return the existing entry
+            return 0
+        fi
+    done <<< "$modules_content"
+    
+    return 1
+}
+
+# Returns path to modules list file (configurable via MODULES_LIST_FILE).
+function inst_modules_list_path() {
+    local path="${MODULES_LIST_FILE:-"$AC_PATH_ROOT/conf/modules.list"}"
+    echo "$path"
+}
+
+# Ensure the modules list file exists and its directory is created.
+function inst_mod_list_ensure() {
+    local file
+    file="$(inst_modules_list_path)"
+    mkdir -p "$(dirname "$file")"
+    [ -f "$file" ] || touch "$file"
+}
+
+# Read modules list into stdout as triplets: "name branch commit"
+# Skips comments (# ...) and blank lines.
+function inst_mod_list_read() {
+    local file
+    file="$(inst_modules_list_path)"
+    [ -f "$file" ] || return 0
+    # shellcheck disable=SC2013
+    while IFS= read -r line; do
+        [[ -z "$line" || "$line" =~ ^[[:space:]]*# ]] && continue
+        echo "$line"
+    done < "$file"
+}
+
+# Add or update an entry in the list: repo_ref branch commit
+# Removes any existing entries with the same owner/name to avoid duplicates
+function inst_mod_list_upsert() {
+    local repo_ref="$1"; shift
+    local branch="$1"; shift
+    local commit="$1"; shift
+    local target_owner_name
+    target_owner_name=$(inst_extract_owner_name "$repo_ref")
+    
+    inst_mod_list_ensure
+    local file tmp
+    file="$(inst_modules_list_path)"
+    tmp="${file}.tmp"
+
+    # Remove any existing entries with same owner/name, then add new entry
+    {
+        inst_mod_list_read | while read -r existing_ref existing_branch existing_commit; do
+            local existing_owner_name
+            existing_owner_name=$(inst_extract_owner_name "$existing_ref")
+            if [[ "$existing_owner_name" != "$target_owner_name" ]]; then
+                echo "$existing_ref $existing_branch $existing_commit"
+            fi
+        done
+        # Add the new entry (preserving original repo_ref format)
+        echo "$repo_ref $branch $commit"
+    } > "$tmp" && mv "$tmp" "$file"
+}
+
+# Remove an entry from the list by matching owner/name.
+# This allows removing modules regardless of how they were specified (URL vs owner/name)
+function inst_mod_list_remove() {
+    local repo_ref="$1"
+    local target_owner_name
+    target_owner_name=$(inst_extract_owner_name "$repo_ref")
+    
+    local file
+    file="$(inst_modules_list_path)"
+    [ -f "$file" ] || return 0
+    
+    local tmp="${file}.tmp"
+    
+    # Keep only lines where owner/name doesn't match
+    inst_mod_list_read | while read -r existing_ref existing_branch existing_commit; do
+        local existing_owner_name
+        existing_owner_name=$(inst_extract_owner_name "$existing_ref")
+        if [[ "$existing_owner_name" != "$target_owner_name" ]]; then
+            echo "$existing_ref $existing_branch $existing_commit"
+        fi
+    done > "$tmp" && mv "$tmp" "$file"
 }
 
 function inst_module_search {
@@ -256,80 +498,207 @@ function inst_module_search {
 }
 
 function inst_module_install {
-    # Support multiple modules; prompt if none specified.
-    local modules=("$@")
-    if [ ${#modules[@]} -eq 0 ]; then
-        echo "Type the name(s) of the module(s) to install"
-        read -p "Insert name(s): " _line
-        read -r -a modules <<< "$_line"
+    # Support multiple modules and the --all flag; prompt if none specified.
+    local args=("$@")
+    local use_all=false
+    if [ ${#args[@]} -gt 0 ] && { [ "${args[0]}" = "--all" ] || [ "${args[0]}" = "-a" ]; }; then
+        use_all=true
+        shift || true
     fi
 
-    local res v b def
-    for res in "${modules[@]}"; do
-        [ -z "$res" ] && continue
+    local modules=("$@")
 
-        read v b < <(inst_getVersionBranch "https://raw.githubusercontent.com/azerothcore/$res/master/acore-module.json")
+    echo "Installing modules: ${modules[*]}"
 
-        # If the module json is missing or no compat branch found, warn and use default branch
-        if [[ "$v" == "none" || "$v" == "not-defined" || "$b" == "none" ]]; then
-            def="$(inst_get_default_branch "$res")"
-            echo "Warning: $res has no compatible acore-module.json; installing from branch '$def' (latest commit)."
-            b="$def"
+    if $use_all; then
+        # Install all modules from the list (respecting recorded branch and commit).
+        inst_mod_list_ensure
+        local line name branch commit
+        while read -r line; do
+            [ -z "$line" ] && continue
+            repo_ref=$(echo "$line" | awk '{print $1}')
+            branch=$(echo "$line" | awk '{print $2}')
+            commit=$(echo "$line" | awk '{print $3}')
+            parsed_output=$(inst_parse_module_spec "$repo_ref")
+            IFS=' ' read -r _ owner modname _ _ url <<< "$parsed_output"
+            basedir="$owner"
+            if [ -d "$J_PATH_MODULES/$basedir/$modname" ]; then
+                echo "[$repo_ref] Already installed (skipping)."
+                continue
+            fi
+            if Joiner:add_repo "$url" "$modname" "$branch" "$basedir"; then
+                # Checkout the recorded commit if present
+                if [ -n "$commit" ]; then
+                    git -C "$J_PATH_MODULES/$basedir/$modname" fetch --all --quiet || true
+                    if git -C "$J_PATH_MODULES/$basedir/$modname" rev-parse --verify "$commit" >/dev/null 2>&1; then
+                        git -C "$J_PATH_MODULES/$basedir/$modname" checkout --quiet "$commit"
+                    fi
+                fi
+                local curCommit
+                curCommit=$(git -C "$J_PATH_MODULES/$basedir/$modname" rev-parse HEAD 2>/dev/null || echo "")
+                inst_mod_list_upsert "$repo_ref" "$branch" "$curCommit"
+                echo "[$repo_ref] Installed."
+            else
+                echo "[$repo_ref] Install failed."
+            fi
+        done < <(inst_mod_list_read)
+    else
+        # Install specified modules; prompt if none specified.
+        if [ ${#modules[@]} -eq 0 ]; then
+            echo "Type the name(s) of the module(s) to install"
+            read -p "Insert name(s): " _line
+            read -r -a modules <<< "$_line"
         fi
 
-        if Joiner:add_repo "https://github.com/azerothcore/$res" "$res" "$b"; then
-            echo "[$res] Done, please re-run compiling and db assembly. Read instructions on module repository for more information"
-        else
-            echo "[$res] Install failed or module not found"
-        fi
-    done
+        local spec name override_branch override_commit v b def curCommit existing_repo_ref
+        for spec in "${modules[@]}"; do
+            [ -z "$spec" ] && continue
+            
+            # Check if module is already installed (by owner/name matching)
+            existing_repo_ref=$(inst_mod_is_installed "$spec" || true)
+            if [ -n "$existing_repo_ref" ]; then
+                echo "[$spec] Already installed as [$existing_repo_ref] (skipping)."
+                continue
+            fi
+            
+            parsed_output=$(inst_parse_module_spec "$spec")
+            IFS=' ' read -r repo_ref owner modname override_branch override_commit url <<< "$parsed_output"
+            [ -z "$repo_ref" ] && continue
+
+            # override_branch takes precedence; otherwise consult acore-module.json on azerothcore unless repo_ref contains owner or URL
+            if [ -n "$override_branch" ] && [ "$override_branch" != "-" ]; then
+                b="$override_branch"
+            else
+                # For GitHub repositories, use raw.githubusercontent.com to check acore-module.json
+                if [[ "$url" =~ github.com ]] || [[ "$repo_ref" =~ ^[^/]+/[^/]+$ ]]; then
+                    read v b < <(inst_getVersionBranch "https://raw.githubusercontent.com/${owner}/${modname}/master/acore-module.json")
+                else
+                    # Unknown host: try the repository URL as-is (may fail)
+                    read v b < <(inst_getVersionBranch "${url}/master/acore-module.json")
+                fi
+                if [[ "$v" == "none" || "$v" == "not-defined" || "$b" == "none" ]]; then
+                    def="$(inst_get_default_branch "$repo_ref")"
+                    echo "Warning: $repo_ref has no compatible acore-module.json; installing from branch '$def' (latest commit)."
+                    b="$def"
+                fi
+            fi
+
+            basedir="$owner"
+            if [ -d "$J_PATH_MODULES/$basedir/$modname" ]; then
+                echo "[$repo_ref] Already installed (skipping)."
+                curCommit=$(git -C "$J_PATH_MODULES/$basedir/$modname" rev-parse HEAD 2>/dev/null || echo "")
+                inst_mod_list_upsert "$repo_ref" "$b" "$curCommit"
+                continue
+            fi
+
+            if Joiner:add_repo "$url" "$modname" "$b" "$basedir"; then
+                # If a commit was provided, try to checkout it
+                if [ -n "$override_commit" ] && [ "$override_commit" != "-" ]; then
+                    git -C "$J_PATH_MODULES/$basedir/$modname" fetch --all --quiet || true
+                    if git -C "$J_PATH_MODULES/$basedir/$modname" rev-parse --verify "$override_commit" >/dev/null 2>&1; then
+                        git -C "$J_PATH_MODULES/$basedir/$modname" checkout --quiet "$override_commit"
+                    else
+                        echo "[$repo_ref] Warning: provided commit '$override_commit' not found; staying on branch '$b' HEAD."
+                    fi
+                fi
+                curCommit=$(git -C "$J_PATH_MODULES/$basedir/$modname" rev-parse HEAD 2>/dev/null || echo "")
+                inst_mod_list_upsert "$repo_ref" "$b" "$curCommit"
+                echo "[$repo_ref] Done, please re-run compiling and db assembly. Read instructions on module repository for more information"
+            else
+                echo "[$repo_ref] Install failed or module not found"
+            fi
+        done
+    fi
 
     echo ""
     echo ""
 }
 
 function inst_module_update {
-    # Support multiple modules; prompt if none specified.
-    local modules=("$@")
-    if [ ${#modules[@]} -eq 0 ]; then
-        echo "Type the name(s) of the module(s) to update"
-        read -p "Insert name(s): " _line
-        read -r -a modules <<< "$_line"
+    # Support multiple modules and the --all flag; prompt if none specified.
+    local args=("$@")
+    local use_all=false
+    if [ ${#args[@]} -gt 0 ] && { [ "${args[0]}" = "--all" ] || [ "${args[0]}" = "-a" ]; }; then
+        use_all=true
+        shift || true
     fi
 
     local _tmp=$PWD
-    local res v b branch def
 
-    for res in "${modules[@]}"; do
-        [ -z "$res" ] && continue
+    if $use_all; then
+        local line repo_ref branch commit newCommit owner modname url
+        while read -r line; do
+            [ -z "$line" ] && continue
+            repo_ref=$(echo "$line" | awk '{print $1}')
+            branch=$(echo "$line" | awk '{print $2}')
+            commit=$(echo "$line" | awk '{print $3}')
+            parsed_output=$(inst_parse_module_spec "$repo_ref")
+            IFS=' ' read -r _ owner modname _ _ url <<< "$parsed_output"
 
-        if [ -d "$J_PATH_MODULES/$res/" ]; then
-            read v b < <(inst_getVersionBranch "https://raw.githubusercontent.com/azerothcore/$res/master/acore-module.json")
-
-            cd "$J_PATH_MODULES/$res/" || { echo "[$res] Cannot enter module directory"; cd "$_tmp"; continue; }
-
-            # If json missing or no compat branch: prefer current branch, else fallback to default branch
-            if [[ "$v" == "none" || "$v" == "not-defined" || "$b" == "none" ]]; then
-                if branch=$(git rev-parse --abbrev-ref HEAD 2>/dev/null); then
-                    echo "Warning: $res has no compatible acore-module.json; updating current branch '$branch'."
-                    b="$branch"
-                else
-                    def="$(inst_get_default_branch "$res")"
-                    echo "Warning: $res has no compatible acore-module.json and no git branch detected; updating default branch '$def'."
-                    b="$def"
-                fi
+            basedir="$owner"
+            if [ ! -d "$J_PATH_MODULES/$basedir/$modname/" ]; then
+                echo "[$repo_ref] Not installed locally, skipping."
+                continue
             fi
 
-            if Joiner:upd_repo "https://github.com/azerothcore/$res" "$res" "$b"; then
-                echo "[$res] Done, please re-run compiling and db assembly"
+            if Joiner:upd_repo "$url" "$modname" "$branch" "$basedir"; then
+                newCommit=$(git -C "$J_PATH_MODULES/$basedir/$modname" rev-parse HEAD 2>/dev/null || echo "")
+                inst_mod_list_upsert "$repo_ref" "$branch" "$newCommit"
+                echo "[$repo_ref] Updated to latest commit on '$branch'."
             else
-                echo "[$res] Cannot update"
+                echo "[$repo_ref] Cannot update"
             fi
-            cd "$_tmp"
-        else
-            echo "[$res] Cannot update! Path doesn't exist ($J_PATH_MODULES/$res/)"
+        done < <(inst_mod_list_read)
+    else
+        local modules=("$@")
+        if [ ${#modules[@]} -eq 0 ]; then
+            echo "Type the name(s) of the module(s) to update"
+            read -p "Insert name(s): " _line
+            read -r -a modules <<< "$_line"
         fi
-    done
+
+        local spec repo_ref override_branch override_commit owner modname url v b branch def newCommit
+        for spec in "${modules[@]}"; do
+            [ -z "$spec" ] && continue
+            parsed_output=$(inst_parse_module_spec "$spec")
+            IFS=' ' read -r repo_ref owner modname override_branch override_commit url <<< "$parsed_output"
+
+            basedir="$owner"
+            if [ -d "$J_PATH_MODULES/$basedir/$modname/" ]; then
+                # determine preferred branch if not provided
+                if [ -n "$override_branch" ] && [ "$override_branch" != "-" ]; then
+                    b="$override_branch"
+                else
+                    # try reading acore-module.json for this repo
+                    if [[ "$url" =~ github.com ]]; then
+                        read v b < <(inst_getVersionBranch "https://raw.githubusercontent.com/${owner}/${modname}/master/acore-module.json")
+                    else
+                        read v b < <(inst_getVersionBranch "${url}/master/acore-module.json")
+                    fi
+                    if [[ "$v" == "none" || "$v" == "not-defined" || "$b" == "none" ]]; then
+                        if branch=$(git -C "$J_PATH_MODULES/$basedir/$modname" rev-parse --abbrev-ref HEAD 2>/dev/null); then
+                            echo "Warning: $repo_ref has no compatible acore-module.json; updating current branch '$branch'."
+                            b="$branch"
+                        else
+                            def="$(inst_get_default_branch "$repo_ref")"
+                            echo "Warning: $repo_ref has no compatible acore-module.json and no git branch detected; updating default branch '$def'."
+                            b="$def"
+                        fi
+                    fi
+                fi
+
+                if Joiner:upd_repo "$url" "$modname" "$b" "$basedir"; then
+                    newCommit=$(git -C "$J_PATH_MODULES/$basedir/$modname" rev-parse HEAD 2>/dev/null || echo "")
+                    inst_mod_list_upsert "$repo_ref" "$b" "$newCommit"
+                    echo "[$repo_ref] Done, please re-run compiling and db assembly"
+                else
+                    echo "[$repo_ref] Cannot update"
+                fi
+            else
+                echo "[$repo_ref] Cannot update! Path doesn't exist ($J_PATH_MODULES/$basedir/$modname/)"
+            fi
+        done
+    fi
 
     echo ""
     echo ""
@@ -344,13 +713,19 @@ function inst_module_remove {
         read -r -a modules <<< "$_line"
     fi
 
-    local res
-    for res in "${modules[@]}"; do
-        [ -z "$res" ] && continue
-        if Joiner:remove "$res"; then
-            echo "[$res] Done, please re-run compiling"
+    local spec repo_ref owner modname url override_branch override_commit
+    for spec in "${modules[@]}"; do
+        [ -z "$spec" ] && continue
+        parsed_output=$(inst_parse_module_spec "$spec")
+        IFS=' ' read -r repo_ref owner modname override_branch override_commit url <<< "$parsed_output"
+        [ -z "$repo_ref" ] && continue
+        
+        basedir="$owner"
+        if Joiner:remove "$modname" "$basedir"; then
+            inst_mod_list_remove "$repo_ref"
+            echo "[$repo_ref] Done, please re-run compiling"
         else
-            echo "[$res] Cannot remove"
+            echo "[$repo_ref] Cannot remove"
         fi
     done
 
