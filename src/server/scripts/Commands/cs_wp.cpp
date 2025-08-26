@@ -58,45 +58,45 @@ public:
     */
     static void RemoveWaypointsFromQueryResult(ChatHandler* handler, const PreparedQueryResult& result)
     {
-        if (handler && result)
+        if (!handler || !result)
+            return;
+
+        bool hasError = false;
+
+        do
         {
-            bool hasError = false;
-
-            do
+            const Field* fields = result->Fetch();
+            const ObjectGuid::LowType guid = fields[0].Get<uint32>();
+            auto const creatureRange = handler->GetSession()->GetPlayer()->GetMap()->GetCreatureBySpawnIdStore().equal_range(guid);
+            if (creatureRange.first != creatureRange.second)
             {
-                const Field* fields = result->Fetch();
-                const ObjectGuid::LowType guid = fields[0].Get<uint32>();
-                auto const creatureRange = handler->GetSession()->GetPlayer()->GetMap()->GetCreatureBySpawnIdStore().equal_range(guid);
-                if (creatureRange.first != creatureRange.second)
-                {
-                    std::for_each(
-                        creatureRange.first,
-                        creatureRange.second,
-                        [&](auto& guidCreaturePair) {
-                            Creature* creature = guidCreaturePair.second;
-                            creature->CombatStop();
-                            creature->DeleteFromDB();
-                            creature->AddObjectToRemoveList();
-                        }
-                    );
-                }
-                else
-                {
-                    handler->PSendSysMessage(LANG_WAYPOINT_NOTREMOVED, guid);
-                    hasError = true;
-
-                    WorldDatabasePreparedStatement* stmt = WorldDatabase.GetPreparedStatement(WORLD_DEL_CREATURE);
-                    stmt->SetData(0, guid);
-                    WorldDatabase.Execute(stmt);
-                }
-            } while (result->NextRow());
-
-            if (hasError)
-            {
-                handler->PSendSysMessage(LANG_WAYPOINT_TOOFAR1);
-                handler->PSendSysMessage(LANG_WAYPOINT_TOOFAR2);
-                handler->PSendSysMessage(LANG_WAYPOINT_TOOFAR3);
+                std::for_each(
+                    creatureRange.first,
+                    creatureRange.second,
+                    [&](auto& guidCreaturePair) {
+                        Creature* creature = guidCreaturePair.second;
+                        creature->CombatStop();
+                        creature->DeleteFromDB();
+                        creature->AddObjectToRemoveList();
+                    }
+                );
             }
+            else
+            {
+                handler->PSendSysMessage(LANG_WAYPOINT_NOTREMOVED, guid);
+                hasError = true;
+
+                WorldDatabasePreparedStatement* stmt = WorldDatabase.GetPreparedStatement(WORLD_DEL_CREATURE);
+                stmt->SetData(0, guid);
+                WorldDatabase.Execute(stmt);
+            }
+        } while (result->NextRow());
+
+        if (hasError)
+        {
+            handler->PSendSysMessage(LANG_WAYPOINT_TOOFAR1);
+            handler->PSendSysMessage(LANG_WAYPOINT_TOOFAR2);
+            handler->PSendSysMessage(LANG_WAYPOINT_TOOFAR3);
         }
     }
 
