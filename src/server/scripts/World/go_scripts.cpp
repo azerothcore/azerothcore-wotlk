@@ -80,7 +80,7 @@ public:
                 if (_timer > 5000)
                 {
                     me->CastSpell(nullptr, 9056);
-                    me->DestroyForNearbyPlayers();
+                    me->DestroyForVisiblePlayers();
                     _timer = 0;
                 }
             }
@@ -322,7 +322,7 @@ public:
                 std::list<Player*> players;
                 Acore::AnyPlayerExactPositionInGameObjectRangeCheck checker(me, 0.3f);
                 Acore::PlayerListSearcher<Acore::AnyPlayerExactPositionInGameObjectRangeCheck> searcher(me, players, checker);
-                Cell::VisitWorldObjects(me, searcher, 0.3f);
+                Cell::VisitObjects(me, searcher, 0.3f);
 
                 if (players.size() > 0)
                 {
@@ -369,7 +369,7 @@ public:
                 std::list<Player*> players;
                 Acore::AnyPlayerExactPositionInGameObjectRangeCheck checker(me, 0.3f);
                 Acore::PlayerListSearcher<Acore::AnyPlayerExactPositionInGameObjectRangeCheck> searcher(me, players, checker);
-                Cell::VisitWorldObjects(me, searcher, 0.3f);
+                Cell::VisitObjects(me, searcher, 0.3f);
 
                 if (players.size() > 0)
                 {
@@ -823,7 +823,7 @@ public:
                             std::list<Player*> targets;
                             Acore::AnyPlayerInObjectRangeCheck check(me, me->GetVisibilityRange(), false);
                             Acore::PlayerListSearcherWithSharedVision<Acore::AnyPlayerInObjectRangeCheck> searcher(me, targets, check);
-                            Cell::VisitWorldObjects(me, searcher, me->GetVisibilityRange());
+                            Cell::VisitObjects(me, searcher, me->GetVisibilityRange());
                             for (Player* player : targets)
                             {
                                 if (player->GetTeamId() == TEAM_HORDE)

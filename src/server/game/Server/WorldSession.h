@@ -148,6 +148,7 @@ namespace WorldPackets
 
     namespace Misc
     {
+        class MinimapPingClient;
         class RandomRollClient;
     }
 
@@ -158,6 +159,13 @@ namespace WorldPackets
         class PetStopAttack;
         class PetSpellAutocast;
         class RequestPetInfo;
+    }
+
+    namespace Query
+    {
+        class NameQuery;
+        class TimeQuery;
+        class CorpseMapPositionQuery;
     }
 }
 
@@ -329,8 +337,13 @@ struct PacketCounter
 class WorldSession
 {
 public:
-    WorldSession(uint32 id, std::string&& name, std::shared_ptr<WorldSocket> sock, AccountTypes sec, uint8 expansion, time_t mute_time, LocaleConstant locale, uint32 recruiter, bool isARecruiter, bool skipQueue, uint32 TotalTime);
+    WorldSession(uint32 id, std::string&& name, uint32 accountFlags, std::shared_ptr<WorldSocket> sock, AccountTypes sec, uint8 expansion, time_t mute_time, LocaleConstant locale, uint32 recruiter, bool isARecruiter, bool skipQueue, uint32 TotalTime);
     ~WorldSession();
+
+    uint32 GetAccountFlags() const { return _accountFlags; }
+    bool HasAccountFlag(uint32 flag) const { return (_accountFlags & flag) != 0; }
+    void UpdateAccountFlag(uint32 flag, bool remove = false);
+    void ValidateAccountFlags();
 
     bool IsGMAccount() const;
 
@@ -365,7 +378,7 @@ public:
     }
 
     void SendSetPhaseShift(uint32 phaseShift);
-    void SendQueryTimeResponse();
+    void SendTimeQueryResponse();
 
     void SendAuthResponse(uint8 code, bool shortForm, uint32 queuePos = 0);
     void SendClientCacheVersion(uint32 version);
@@ -655,9 +668,9 @@ public:                                                 // opcodes handlers
     void HandleGameObjectUseOpcode(WorldPacket& recPacket);
     void HandleGameobjectReportUse(WorldPacket& recvPacket);
 
-    void HandleNameQueryOpcode(WorldPacket& recvPacket);
+    void HandleNameQueryOpcode(WorldPackets::Query::NameQuery& packet);
 
-    void HandleQueryTimeOpcode(WorldPacket& recvPacket);
+    void HandleTimeQueryOpcode(WorldPackets::Query::TimeQuery& packet);
 
     void HandleCreatureQueryOpcode(WorldPacket& recvPacket);
 
@@ -857,7 +870,7 @@ public:                                                 // opcodes handlers
 
     void HandleReclaimCorpseOpcode(WorldPacket& recvPacket);
     void HandleCorpseQueryOpcode(WorldPacket& recvPacket);
-    void HandleCorpseMapPositionQuery(WorldPacket& recvPacket);
+    void HandleCorpseMapPositionQuery(WorldPackets::Query::CorpseMapPositionQuery& packet);
     void HandleResurrectResponseOpcode(WorldPacket& recvPacket);
     void HandleSummonResponseOpcode(WorldPacket& recvData);
 
@@ -928,7 +941,7 @@ public:                                                 // opcodes handlers
 
     void HandleWardenDataOpcode(WorldPacket& recvData);
     void HandleWorldTeleportOpcode(WorldPacket& recvData);
-    void HandleMinimapPingOpcode(WorldPacket& recvData);
+    void HandleMinimapPingOpcode(WorldPackets::Misc::MinimapPingClient& packet);
     void HandleRandomRollOpcode(WorldPackets::Misc::RandomRollClient& packet);
     void HandleFarSightOpcode(WorldPacket& recvData);
     void HandleSetDungeonDifficultyOpcode(WorldPacket& recvData);
@@ -1158,6 +1171,7 @@ private:
     bool _skipQueue;
     uint32 _accountId;
     std::string _accountName;
+    uint32 _accountFlags;
     uint8 m_expansion;
     uint32 m_total_time;
 

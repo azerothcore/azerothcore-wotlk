@@ -4616,8 +4616,15 @@ void Player::ApplyEnchantment(Item* item, EnchantmentSlot slot, bool apply, bool
                             HandleBaseModValue(SHIELD_BLOCK_VALUE, FLAT_MOD, float(enchant_amount), apply);
                             LOG_DEBUG("entities.player.items", "+ {} BLOCK_VALUE", enchant_amount);
                             break;
-                        case ITEM_MOD_SPELL_HEALING_DONE:   // deprecated
-                        case ITEM_MOD_SPELL_DAMAGE_DONE:    // deprecated
+                        /// @deprecated item mods
+                        case ITEM_MOD_SPELL_HEALING_DONE:
+                            ApplySpellHealingBonus(enchant_amount, apply);
+                            LOG_DEBUG("entities.player.items", "+ {} SPELL_HEALING", enchant_amount);
+                            break;
+                        case ITEM_MOD_SPELL_DAMAGE_DONE:
+                            ApplySpellDamageBonus(enchant_amount, apply);
+                            LOG_DEBUG("entities.player.items", "+ {} SPELL_DAMAGE", enchant_amount);
+                            break;
                         default:
                             break;
                     }
