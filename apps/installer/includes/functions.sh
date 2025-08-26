@@ -175,62 +175,60 @@ function inst_module() {
 # Prints: "name branch commit" (empty fields if omitted)
 function inst_parse_module_spec() {
     local spec="$1"
-    local parts i n repo_part branch commit
-    IFS=':' read -r -a parts <<< "$spec"
-    n=${#parts[@]}
-    # Default values
-    commit=""
-    branch=""
-    repo_part=""
-
-    # Detect URL-like specs which contain '://' or start with git@ (they include ':' in the URL)
-    if [[ "$spec" =~ :// ]] || [[ "$spec" =~ ^git@ ]]; then
-        # For URL forms, repo is comprised by the first two parts when splitting by ':'
-        # e.g. git@github.com:owner/name.git[:branch[:commit]] -> parts[0]=git@github.com, parts[1]=owner/name.git
-        if (( n >= 3 )); then
-            # repo is parts[0] + ':' + parts[1]
-            repo_part="${parts[0]}:${parts[1]}"
-            if (( n == 3 )); then
-                branch="${parts[2]}"
-            elif (( n >= 4 )); then
-                # last may be commit
-                last="${parts[n-1]}"
-                prev="${parts[n-2]}"
-                if [[ "$last" =~ ^[0-9a-fA-F]{7,40}$ ]]; then
-                    commit="$last"
-                    branch="$prev"
-                else
-                    branch="$last"
-                fi
-            fi
-        elif (( n == 2 )); then
-            repo_part="${parts[0]}:${parts[1]}"
+    
+    # Handle legacy syntax: module:branch:commit (backwards compatibility)
+    # vs new syntax: module[:dirname][@branch[:commit]]
+    
+    local dirname="" branch="" commit="" repo_part=""
+    
+    # Check if this uses @ syntax (new format) or legacy : syntax
+    if [[ "$spec" =~ @ ]]; then
+        # New syntax: repo[:dirname][@branch[:commit]]
+        
+        # First, extract custom directory name if present (format: repo:dirname@branch)
+        local repo_with_branch="$spec"
+        if [[ "$spec" =~ ^([^@:]+):([^@:]+)(@.*)?$ ]]; then
+            repo_with_branch="${BASH_REMATCH[1]}${BASH_REMATCH[3]}"
+            dirname="${BASH_REMATCH[2]}"
+        fi
+        
+        # Now parse branch and commit from the repo part
+        if [[ "$repo_with_branch" =~ ^([^@]+)@([^:]+)(:(.+))?$ ]]; then
+            repo_part="${BASH_REMATCH[1]}"
+            branch="${BASH_REMATCH[2]}"
+            commit="${BASH_REMATCH[4]:-}"
         else
-            repo_part="$spec"
+            repo_part="$repo_with_branch"
         fi
     else
-        # Non-URL form: owner/name or name[:branch[:commit]]
-        if (( n >= 3 )); then
-            last="${parts[n-1]}"
-            prev="${parts[n-2]}"
-            if [[ "$last" =~ ^[0-9a-fA-F]{7,40}$ ]]; then
-                commit="$last"
-                branch="$prev"
-                repo_part="${parts[0]}"
-                for ((i=1;i<=n-3;i++)); do repo_part+=":${parts[i]}"; done
-            else
-                branch="$last"
-                repo_part="${parts[0]}"
-                for ((i=1;i<=n-2;i++)); do repo_part+=":${parts[i]}"; done
-            fi
+        # Legacy syntax: repo:branch:commit or new syntax without dirname
+        local parts
+        IFS=':' read -r -a parts <<< "$spec"
+        local n=${#parts[@]}
+        
+        if (( n == 1 )); then
+            # Just repo name
+            repo_part="${parts[0]}"
         elif (( n == 2 )); then
+            # Could be repo:dirname (new) or repo:branch (legacy)
+            # Check if second part looks like a commit hash (branch in legacy)
+            if [[ "${parts[1]}" =~ ^[a-z]+$ ]]; then
+                # Looks like branch name, use legacy format
+                repo_part="${parts[0]}"
+                branch="${parts[1]}"
+            else
+                # Assume it's dirname (new format)
+                repo_part="${parts[0]}"
+                dirname="${parts[1]}"
+            fi
+        elif (( n == 3 )); then
+            # repo:branch:commit (legacy)
             repo_part="${parts[0]}"
             branch="${parts[1]}"
-        else
-            repo_part="${parts[0]}"
+            commit="${parts[2]}"
         fi
     fi
-
+    
     # Normalize repo reference and extract owner/name.
     local repo_ref owner name url owner_repo
     repo_ref="$repo_part"
@@ -260,7 +258,12 @@ function inst_parse_module_spec() {
         url="https://github.com/${repo_ref}"
     fi
 
-    echo "$repo_ref" "$owner" "$name" "${branch:--}" "${commit:--}" "$url"
+    # Use custom dirname if provided, otherwise default to module name
+    if [ -z "$dirname" ]; then
+        dirname="$name"
+    fi
+
+    echo "$repo_ref" "$owner" "$name" "${branch:--}" "${commit:--}" "$url" "$dirname"
 }
 
 function inst_getVersionBranch() {
@@ -520,7 +523,7 @@ function inst_module_install {
             branch=$(echo "$line" | awk '{print $2}')
             commit=$(echo "$line" | awk '{print $3}')
             parsed_output=$(inst_parse_module_spec "$repo_ref")
-            IFS=' ' read -r _ owner modname _ _ url <<< "$parsed_output"
+            IFS=' ' read -r _ owner modname _ _ url dirname <<< "$parsed_output"
             basedir="$owner"
             if [ -d "$J_PATH_MODULES/$basedir/$modname" ]; then
                 echo "[$repo_ref] Already installed (skipping)."
@@ -562,8 +565,13 @@ function inst_module_install {
             fi
             
             parsed_output=$(inst_parse_module_spec "$spec")
-            IFS=' ' read -r repo_ref owner modname override_branch override_commit url <<< "$parsed_output"
+            IFS=' ' read -r repo_ref owner modname override_branch override_commit url dirname <<< "$parsed_output"
             [ -z "$repo_ref" ] && continue
+
+            # Check for directory conflicts with custom directory names
+            if ! inst_check_module_conflict "$dirname" "$repo_ref"; then
+                continue
+            fi
 
             # override_branch takes precedence; otherwise consult acore-module.json on azerothcore unless repo_ref contains owner or URL
             if [ -n "$override_branch" ] && [ "$override_branch" != "-" ]; then
@@ -583,27 +591,27 @@ function inst_module_install {
                 fi
             fi
 
-            basedir="$owner"
-            if [ -d "$J_PATH_MODULES/$basedir/$modname" ]; then
+            # Use flat directory structure with custom directory name
+            if [ -d "$J_PATH_MODULES/$dirname" ]; then
                 echo "[$repo_ref] Already installed (skipping)."
-                curCommit=$(git -C "$J_PATH_MODULES/$basedir/$modname" rev-parse HEAD 2>/dev/null || echo "")
+                curCommit=$(git -C "$J_PATH_MODULES/$dirname" rev-parse HEAD 2>/dev/null || echo "")
                 inst_mod_list_upsert "$repo_ref" "$b" "$curCommit"
                 continue
             fi
 
-            if Joiner:add_repo "$url" "$modname" "$b" "$basedir"; then
+            if Joiner:add_repo "$url" "$dirname" "$b" ""; then
                 # If a commit was provided, try to checkout it
                 if [ -n "$override_commit" ] && [ "$override_commit" != "-" ]; then
-                    git -C "$J_PATH_MODULES/$basedir/$modname" fetch --all --quiet || true
-                    if git -C "$J_PATH_MODULES/$basedir/$modname" rev-parse --verify "$override_commit" >/dev/null 2>&1; then
-                        git -C "$J_PATH_MODULES/$basedir/$modname" checkout --quiet "$override_commit"
+                    git -C "$J_PATH_MODULES/$dirname" fetch --all --quiet || true
+                    if git -C "$J_PATH_MODULES/$dirname" rev-parse --verify "$override_commit" >/dev/null 2>&1; then
+                        git -C "$J_PATH_MODULES/$dirname" checkout --quiet "$override_commit"
                     else
                         echo "[$repo_ref] Warning: provided commit '$override_commit' not found; staying on branch '$b' HEAD."
                     fi
                 fi
-                curCommit=$(git -C "$J_PATH_MODULES/$basedir/$modname" rev-parse HEAD 2>/dev/null || echo "")
+                curCommit=$(git -C "$J_PATH_MODULES/$dirname" rev-parse HEAD 2>/dev/null || echo "")
                 inst_mod_list_upsert "$repo_ref" "$b" "$curCommit"
-                echo "[$repo_ref] Done, please re-run compiling and db assembly. Read instructions on module repository for more information"
+                echo "[$repo_ref] Installed in '$dirname'. Please re-run compiling and db assembly."
             else
                 echo "[$repo_ref] Install failed or module not found"
             fi
@@ -771,4 +779,77 @@ function inst_download_client_data {
         && echo "unzip downloaded file in $path..." && unzip -q -o "$zipPath" -d "$path/" \
         && echo "Remove downloaded file" && rm "$zipPath" \
         && echo "INSTALLED_VERSION=$VERSION" > "$dataVersionFile"
+}
+
+# Parse directory name from module spec (supports syntax: repo[:dirname])
+function inst_parse_dirname {
+    local spec="$1"
+    local default_name="$2"
+    
+    # Check if spec contains a custom directory name after ':' but before '@'
+    if [[ "$spec" =~ ^([^:@]+):([^@:]+)(@.*)?$ ]]; then
+        echo "${BASH_REMATCH[2]}"
+    else
+        echo "$default_name"
+    fi
+}
+
+# Check for module directory conflicts
+function inst_check_module_conflict {
+    local dirname="$1"
+    local repo_ref="$2"
+    
+    if [ -d "$J_PATH_MODULES/$dirname" ]; then
+        echo "Error: Directory '$dirname' already exists."
+        echo "Possible solutions:"
+        echo "  1. Use a different directory name: $repo_ref:my-custom-name"
+        echo "  2. Remove the existing directory first"
+        echo "  3. Use the update command if this is the same module"
+        return 1
+    fi
+    return 0
+}
+
+# Extract owner/name from any repo reference format for intelligent matching
+function inst_extract_owner_name {
+    local repo_ref="$1"
+    
+    # For URLs, don't remove dirname suffix since : is part of the URL
+    local base_ref="$repo_ref"
+    if [[ ! "$repo_ref" =~ :// ]] && [[ ! "$repo_ref" =~ ^git@ ]]; then
+        # Only remove dirname suffix for non-URL formats
+        base_ref="${repo_ref%%:*}"
+    fi
+    
+    if [[ "$base_ref" =~ ^https?://github\.com/([^/]+)/([^/]+)(\.git)?(/.*)?$ ]]; then
+        # HTTPS URL format - check this first before owner/name pattern
+        local name="${BASH_REMATCH[2]}"
+        name="${name%.git}"  # Remove .git suffix if present
+        echo "${BASH_REMATCH[1]}/$name"
+    elif [[ "$base_ref" =~ ^https?://gitlab\.com/([^/]+)/([^/]+)(\.git)?(/.*)?$ ]]; then
+        # GitLab URL format
+        local name="${BASH_REMATCH[2]}"
+        name="${name%.git}"  # Remove .git suffix if present
+        echo "${BASH_REMATCH[1]}/$name"
+    elif [[ "$base_ref" =~ ^git@github\.com:([^/]+)/([^/]+)(\.git)?$ ]]; then
+        # SSH URL format
+        local name="${BASH_REMATCH[2]}"
+        name="${name%.git}"  # Remove .git suffix if present
+        echo "${BASH_REMATCH[1]}/$name"
+    elif [[ "$base_ref" =~ ^[^/]+/[^/]+$ ]]; then
+        # Format: owner/name (check after URL patterns)
+        echo "$base_ref"
+    elif [[ "$base_ref" =~ ^(mod-|module-)?([a-zA-Z0-9-]+)$ ]]; then
+        # Simple module name, assume azerothcore namespace
+        local modname="${BASH_REMATCH[2]}"
+        if [[ "$base_ref" == mod-* ]]; then
+            modname="$base_ref"
+        else
+            modname="mod-$modname"
+        fi
+        echo "azerothcore/$modname"
+    else
+        # Unknown format, return as-is
+        echo "$base_ref"
+    fi
 }

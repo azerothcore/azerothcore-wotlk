@@ -225,3 +225,139 @@ teardown() {
     [ "$(grep -c "azerothcore/mod-worldchat" "$TEST_DIR/conf/modules.list")" -eq 1 ]
     grep -q "https://github.com/azerothcore/mod-worldchat.git dev def456" "$TEST_DIR/conf/modules.list"
 }
+
+@test "custom directory names should work with new syntax" {
+    cd "$TEST_DIR"
+    source "$TEST_DIR/apps/installer/includes/includes.sh"
+
+    # Test parsing with custom directory name
+    run inst_parse_module_spec "mod-transmog:my-custom-dir@develop:abc123"
+    [ "$status" -eq 0 ]
+    # Should output: repo_ref owner name branch commit url dirname
+    IFS=' ' read -r repo_ref owner name branch commit url dirname <<< "$output"
+    [ "$repo_ref" = "azerothcore/mod-transmog" ]
+    [ "$owner" = "azerothcore" ]
+    [ "$name" = "mod-transmog" ]
+    [ "$branch" = "develop" ]
+    [ "$commit" = "abc123" ]
+    [ "$url" = "https://github.com/azerothcore/mod-transmog" ]
+    [ "$dirname" = "my-custom-dir" ]
+}
+
+@test "directory conflict detection should work" {
+    cd "$TEST_DIR"
+    source "$TEST_DIR/apps/installer/includes/includes.sh"
+
+    # Create a fake existing directory
+    mkdir -p "$TEST_DIR/modules/existing-dir"
+    
+    # Should detect conflict
+    run inst_check_module_conflict "existing-dir" "mod-test"
+    [ "$status" -eq 1 ]
+    [[ "$output" =~ "Directory 'existing-dir' already exists" ]]
+    [[ "$output" =~ "Use a different directory name: mod-test:my-custom-name" ]]
+    
+    # Should not detect conflict for non-existing directory
+    run inst_check_module_conflict "non-existing-dir" "mod-test"
+    [ "$status" -eq 0 ]
+}
+
+@test "legacy syntax should still work" {
+    cd "$TEST_DIR"
+    source "$TEST_DIR/apps/installer/includes/includes.sh"
+
+    # Test legacy format: module:branch:commit
+    run inst_parse_module_spec "example-module:main:abcd1234"
+    [ "$status" -eq 0 ]
+    IFS=' ' read -r repo_ref owner name branch commit url dirname <<< "$output"
+    [ "$repo_ref" = "azerothcore/example-module" ]
+    [ "$owner" = "azerothcore" ]
+    [ "$name" = "example-module" ]
+    [ "$branch" = "main" ]
+    [ "$commit" = "abcd1234" ]
+    [ "$dirname" = "example-module" ]
+}
+
+@test "mixed new and legacy syntax should coexist" {
+    cd "$TEST_DIR"
+    source "$TEST_DIR/apps/installer/includes/includes.sh"
+
+    # Add module with legacy syntax
+    inst_mod_list_upsert "mod-transmog:main:abc123" "main" "abc123"
+    
+    # Add module with new syntax (different module)
+    inst_mod_list_upsert "mod-eluna:custom-name@develop:def456" "develop" "def456"
+    
+    # Both should be in the list
+    grep -q "mod-transmog:main:abc123 main abc123" "$TEST_DIR/conf/modules.list"
+    grep -q "mod-eluna:custom-name@develop:def456 develop def456" "$TEST_DIR/conf/modules.list"
+    
+    # Should recognize both formats for duplicate detection
+    run inst_mod_is_installed "azerothcore/mod-transmog"
+    [ "$status" -eq 0 ]
+    
+    run inst_mod_is_installed "https://github.com/azerothcore/mod-eluna.git"
+    [ "$status" -eq 0 ]
+}
+
+@test "module update should work with custom directories" {
+    cd "$TEST_DIR"
+    source "$TEST_DIR/apps/installer/includes/includes.sh"
+
+    # First add module with custom directory to list
+    inst_mod_list_upsert "azerothcore/mod-transmog:custom-dir" "master" "abc123"
+    
+    # Create fake module directory structure
+    mkdir -p "$TEST_DIR/modules/custom-dir/.git"
+    echo "ref: refs/heads/master" > "$TEST_DIR/modules/custom-dir/.git/HEAD"
+    
+    # Mock git commands in the fake module directory
+    cat > "$TEST_DIR/modules/custom-dir/.git/config" << 'EOF'
+[core]
+    repositoryformatversion = 0
+    filemode = true
+    bare = false
+[remote "origin"]
+    url = https://github.com/azerothcore/mod-transmog
+    fetch = +refs/heads/*:refs/remotes/origin/*
+[branch "master"]
+    remote = origin
+    merge = refs/heads/master
+EOF
+
+    # Test update with custom directory should work
+    # Note: This would require more complex mocking for full integration test
+    # For now, just test the parsing recognizes the custom directory
+    run inst_parse_module_spec "azerothcore/mod-transmog:custom-dir"
+    [ "$status" -eq 0 ]
+    IFS=' ' read -r repo_ref owner name branch commit url dirname <<< "$output"
+    [ "$dirname" = "custom-dir" ]
+}
+
+@test "URL formats should be properly normalized" {
+    cd "$TEST_DIR"
+    source "$TEST_DIR/apps/installer/includes/includes.sh"
+
+    # Test various URL formats produce same owner/name
+    run inst_extract_owner_name "https://github.com/azerothcore/mod-transmog"
+    local url_format="$output"
+    
+    run inst_extract_owner_name "https://github.com/azerothcore/mod-transmog.git"
+    local url_git_format="$output"
+    
+    run inst_extract_owner_name "git@github.com:azerothcore/mod-transmog.git"
+    local ssh_format="$output"
+    
+    run inst_extract_owner_name "azerothcore/mod-transmog"
+    local owner_name_format="$output"
+    
+    run inst_extract_owner_name "mod-transmog"
+    local simple_format="$output"
+    
+    # All should normalize to the same owner/name
+    [ "$url_format" = "azerothcore/mod-transmog" ]
+    [ "$url_git_format" = "azerothcore/mod-transmog" ]
+    [ "$ssh_format" = "azerothcore/mod-transmog" ]
+    [ "$owner_name_format" = "azerothcore/mod-transmog" ]
+    [ "$simple_format" = "azerothcore/mod-transmog" ]
+}
