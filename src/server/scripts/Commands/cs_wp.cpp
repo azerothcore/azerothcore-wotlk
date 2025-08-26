@@ -58,7 +58,7 @@ public:
     */
     static void RemoveWaypointsFromQueryResult(ChatHandler* handler, const PreparedQueryResult& result)
     {
-        if (result)
+        if (handler && result)
         {
             bool hasError = false;
 
@@ -66,7 +66,7 @@ public:
             {
                 const Field* fields = result->Fetch();
                 const ObjectGuid::LowType guid = fields[0].Get<uint32>();
-                const auto creatureRange = handler->GetSession()->GetPlayer()->GetMap()->GetCreatureBySpawnIdStore().equal_range(guid);
+                auto const creatureRange = handler->GetSession()->GetPlayer()->GetMap()->GetCreatureBySpawnIdStore().equal_range(guid);
                 if (creatureRange.first != creatureRange.second)
                 {
                     std::for_each(
@@ -803,7 +803,7 @@ public:
         uint32 pathid = 0;
         Creature* target = handler->getSelectedCreature();
 
-        const std::string show = show_str;
+        std::string_view const show = show_str;
 
         // If command equals "off" we do not need a guid or target, just delete all WPs
         if (show != "off")
