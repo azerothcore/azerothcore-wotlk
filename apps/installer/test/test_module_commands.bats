@@ -35,10 +35,6 @@ Joiner:remove() {
     echo "REM $@" > "$TEST_DIR/joiner_called.txt"
     return 0
 }
-# Provide legacy double-colon variants
-Joiner::add_repo() { Joiner:add_repo "$@"; }
-Joiner::upd_repo() { Joiner:upd_repo "$@"; }
-Joiner::remove() { Joiner:remove "$@"; }
 EOF
     chmod +x "$TEST_DIR/deps/acore/joiner/joiner.sh"
 
@@ -75,7 +71,7 @@ teardown() {
     cd "$TEST_DIR"
 
     # Source installer includes and call the install function directly to avoid menu interaction
-    run bash -c "source '$TEST_DIR/apps/installer/includes/includes.sh' && inst_module_install example-module:main:abcd1234"
+    run bash -c "source '$TEST_DIR/apps/installer/includes/includes.sh' && inst_module_install example-module@main:abcd1234"
 
     # Check that joiner was called
     [ -f "$TEST_DIR/joiner_called.txt" ]
@@ -259,44 +255,6 @@ teardown() {
     
     # Should not detect conflict for non-existing directory
     run inst_check_module_conflict "non-existing-dir" "mod-test"
-    [ "$status" -eq 0 ]
-}
-
-@test "legacy syntax should still work" {
-    cd "$TEST_DIR"
-    source "$TEST_DIR/apps/installer/includes/includes.sh"
-
-    # Test legacy format: module:branch:commit
-    run inst_parse_module_spec "example-module:main:abcd1234"
-    [ "$status" -eq 0 ]
-    IFS=' ' read -r repo_ref owner name branch commit url dirname <<< "$output"
-    [ "$repo_ref" = "azerothcore/example-module" ]
-    [ "$owner" = "azerothcore" ]
-    [ "$name" = "example-module" ]
-    [ "$branch" = "main" ]
-    [ "$commit" = "abcd1234" ]
-    [ "$dirname" = "example-module" ]
-}
-
-@test "mixed new and legacy syntax should coexist" {
-    cd "$TEST_DIR"
-    source "$TEST_DIR/apps/installer/includes/includes.sh"
-
-    # Add module with legacy syntax
-    inst_mod_list_upsert "mod-transmog:main:abc123" "main" "abc123"
-    
-    # Add module with new syntax (different module)
-    inst_mod_list_upsert "mod-eluna:custom-name@develop:def456" "develop" "def456"
-    
-    # Both should be in the list
-    grep -q "mod-transmog:main:abc123 main abc123" "$TEST_DIR/conf/modules.list"
-    grep -q "mod-eluna:custom-name@develop:def456 develop def456" "$TEST_DIR/conf/modules.list"
-    
-    # Should recognize both formats for duplicate detection
-    run inst_mod_is_installed "azerothcore/mod-transmog"
-    [ "$status" -eq 0 ]
-    
-    run inst_mod_is_installed "https://github.com/azerothcore/mod-eluna.git"
     [ "$status" -eq 0 ]
 }
 
