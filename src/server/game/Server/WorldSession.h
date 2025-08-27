@@ -148,6 +148,7 @@ namespace WorldPackets
 
     namespace Misc
     {
+        class MinimapPingClient;
         class RandomRollClient;
     }
 
@@ -158,6 +159,13 @@ namespace WorldPackets
         class PetStopAttack;
         class PetSpellAutocast;
         class RequestPetInfo;
+    }
+
+    namespace Query
+    {
+        class NameQuery;
+        class TimeQuery;
+        class CorpseMapPositionQuery;
     }
 }
 
@@ -389,7 +397,7 @@ public:
     }
 
     void SendSetPhaseShift(uint32 phaseShift);
-    void SendQueryTimeResponse();
+    void SendTimeQueryResponse();
 
     void SendAuthResponse(uint8 code, bool shortForm, uint32 queuePos = 0);
     void SendClientCacheVersion(uint32 version);
@@ -680,9 +688,9 @@ public:                                                 // opcodes handlers
     void HandleGameObjectUseOpcode(WorldPacket& recPacket);
     void HandleGameobjectReportUse(WorldPacket& recvPacket);
 
-    void HandleNameQueryOpcode(WorldPacket& recvPacket);
+    void HandleNameQueryOpcode(WorldPackets::Query::NameQuery& packet);
 
-    void HandleQueryTimeOpcode(WorldPacket& recvPacket);
+    void HandleTimeQueryOpcode(WorldPackets::Query::TimeQuery& packet);
 
     void HandleCreatureQueryOpcode(WorldPacket& recvPacket);
 
@@ -882,7 +890,7 @@ public:                                                 // opcodes handlers
 
     void HandleReclaimCorpseOpcode(WorldPacket& recvPacket);
     void HandleCorpseQueryOpcode(WorldPacket& recvPacket);
-    void HandleCorpseMapPositionQuery(WorldPacket& recvPacket);
+    void HandleCorpseMapPositionQuery(WorldPackets::Query::CorpseMapPositionQuery& packet);
     void HandleResurrectResponseOpcode(WorldPacket& recvPacket);
     void HandleSummonResponseOpcode(WorldPacket& recvData);
 
@@ -953,7 +961,7 @@ public:                                                 // opcodes handlers
 
     void HandleWardenDataOpcode(WorldPacket& recvData);
     void HandleWorldTeleportOpcode(WorldPacket& recvData);
-    void HandleMinimapPingOpcode(WorldPacket& recvData);
+    void HandleMinimapPingOpcode(WorldPackets::Misc::MinimapPingClient& packet);
     void HandleRandomRollOpcode(WorldPackets::Misc::RandomRollClient& packet);
     void HandleFarSightOpcode(WorldPacket& recvData);
     void HandleSetDungeonDifficultyOpcode(WorldPacket& recvData);

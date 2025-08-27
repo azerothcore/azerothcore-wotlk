@@ -73,7 +73,9 @@ enum KZDataTypes
     DATA_ROAR                       = 41,
     DATA_STRAWMAN                   = 42,
     DATA_TINHEAD                    = 43,
-    DATA_TITO                       = 44
+    DATA_TITO                       = 44,
+
+    DATA_MIRKBLOOD                  = 45
 };
 
 enum KZOperaEvents
@@ -135,7 +137,9 @@ enum KZCreatures
 
     // Malchezaar Helpers
     NPC_INFERNAL_TARGET                 = 17644,
-    NPC_INFERNAL_RELAY                  = 17645
+    NPC_INFERNAL_RELAY                  = 17645,
+
+    NPC_TENRIS_MIRKBLOOD                = 28194
 
 };
 

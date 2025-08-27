@@ -1987,8 +1987,6 @@ void Creature::setDeathState(DeathState state, bool despawn)
 
         Dismount();     // if creature is mounted on a virtual mount, remove it at death
 
-        setActive(false);
-
         if (HasSearchedAssistance())
         {
             SetNoSearchAssistance(false);
@@ -3904,7 +3902,7 @@ bool Creature::IsUpdateNeeded()
     if (IsInCombat())
         return true;
 
-    if (IsVisibilityOverridden())
+    if (!GetObjectVisibilityContainer().GetVisiblePlayersMap().empty())
         return true;
 
     if (ToTempSummon())

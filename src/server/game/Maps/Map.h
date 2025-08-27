@@ -146,7 +146,7 @@ struct ZoneDynamicInfo
 
 typedef std::map<uint32/*leaderDBGUID*/, CreatureGroup*>        CreatureGroupHolderType;
 typedef std::unordered_map<uint32 /*zoneId*/, ZoneDynamicInfo> ZoneDynamicInfoMap;
-typedef std::set<MotionTransport*> TransportsContainer;
+typedef std::unordered_set<Transport*> TransportsContainer;
 
 enum EncounterCreditType : uint8
 {
@@ -479,7 +479,7 @@ public:
         _updateObjects.erase(obj);
     }
 
-    size_t GetUpdateObjectsCount() const { return _updateObjects.size(); }
+    size_t GetUpdatableObjectsCount() const { return _updatableObjectList.size(); }
 
     virtual std::string GetDebugInfo() const;
 
@@ -535,7 +535,6 @@ protected:
     MapRefMgr m_mapRefMgr;
     MapRefMgr::iterator m_mapRefIter;
 
-    // Objects that must update even in inactive grids without activating them
     TransportsContainer _transports;
     TransportsContainer::iterator _transportsUpdateIter;
 

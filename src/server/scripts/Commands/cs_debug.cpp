@@ -73,7 +73,7 @@ public:
             { "hostile",        HandleDebugHostileRefListCommand,      SEC_ADMINISTRATOR, Console::No },
             { "anim",           HandleDebugAnimCommand,                SEC_ADMINISTRATOR, Console::No },
             { "arena",          HandleDebugArenaCommand,               SEC_ADMINISTRATOR, Console::No },
-            { "bg",             HandleDebugBattlegroundCommand,        SEC_ADMINISTRATOR, Console::No },
+            { "bg",             HandleDebugBattlegroundCommand,        SEC_ADMINISTRATOR, Console::Yes},
             { "cooldown",       HandleDebugCooldownCommand,            SEC_ADMINISTRATOR, Console::No },
             { "getitemstate",   HandleDebugGetItemStateCommand,        SEC_ADMINISTRATOR, Console::No },
             { "lootrecipient",  HandleDebugGetLootRecipientCommand,    SEC_ADMINISTRATOR, Console::No },
@@ -92,7 +92,7 @@ public:
             { "update",         HandleDebugUpdateCommand,              SEC_ADMINISTRATOR, Console::No },
             { "itemexpire",     HandleDebugItemExpireCommand,          SEC_ADMINISTRATOR, Console::No },
             { "areatriggers",   HandleDebugAreaTriggersCommand,        SEC_ADMINISTRATOR, Console::No },
-            { "lfg",            HandleDebugDungeonFinderCommand,       SEC_ADMINISTRATOR, Console::No },
+            { "lfg",            HandleDebugDungeonFinderCommand,       SEC_ADMINISTRATOR, Console::Yes},
             { "los",            HandleDebugLoSCommand,                 SEC_ADMINISTRATOR, Console::No },
             { "moveflags",      HandleDebugMoveflagsCommand,           SEC_ADMINISTRATOR, Console::No },
             { "unitstate",      HandleDebugUnitStateCommand,           SEC_ADMINISTRATOR, Console::No },
@@ -1351,7 +1351,7 @@ public:
                 map->GetId(), map->GetMapName(), map->GetInstanceId(),
                 uint64(map->GetObjectsStore().Size<Creature>()),
                 uint64(map->GetObjectsStore().Size<GameObject>()),
-                uint64(map->GetUpdateObjectsCount()));
+                uint64(map->GetUpdatableObjectsCount()));
 
         CreatureCountWorker worker;
         TypeContainerVisitor<CreatureCountWorker, MapStoredObjectTypesContainer> visitor(worker);
