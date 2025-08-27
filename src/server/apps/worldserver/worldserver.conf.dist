@@ -3142,6 +3142,16 @@ LeaveGroupOnLogout.Enabled = 0
 Group.Raid.LevelRestriction = 10
 
 #
+#    Group.RandomRollMaximum
+#
+#     The maximum value for use with the client '/roll' command.
+#     Blizzlike and maximum value is 1000000. (Based on Classic and 3.3.5a client testing respectively)
+#        Default: 1000000
+#
+
+Group.RandomRollMaximum = 1000000
+
+#
 ###################################################################################################
 
 ###################################################################################################
