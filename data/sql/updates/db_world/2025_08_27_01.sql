@@ -1,3 +1,4 @@
+-- DB update 2025_08_27_00 -> 2025_08_27_01
 SET @SAY_APPROACH = 0,
 @SAY_AGGRO = 1,
 @SAY_SUMMON = 2,
