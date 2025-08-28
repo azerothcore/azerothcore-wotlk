@@ -152,12 +152,6 @@ struct boss_tenris_mirkblood : public BossAI
         me->SetImmuneToPC(false);
     }
 
-    void JustDied(Unit* /*killer*/) override
-    {
-        me->GetMap()->ToInstanceMap()->PermBindAllPlayers();
-        _JustDied();
-    }
-
 private:
     Unit* _mirrorTarget = nullptr;
 };
