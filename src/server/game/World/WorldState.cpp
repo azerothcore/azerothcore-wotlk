@@ -1312,6 +1312,8 @@ void WorldState::StartScourgeInvasion(bool sendMail)
         Acore::Containers::RandomShuffle(randomIds);
         for (uint32 id : randomIds)
             OnEnable(m_siData.m_activeInvasions[id]);
+
+        sGameEventMgr->StartEvent(GAME_EVENT_SCOURGE_INVASION_BOSSES);
     }
 }
 
