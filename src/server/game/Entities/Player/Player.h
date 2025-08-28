@@ -2210,6 +2210,9 @@ public:
 
     void ResetAllPowers();
 
+    void CastAllObtainSpells();
+    void ApplyItemObtainSpells(Item* item, bool apply);
+
     SpellSchoolMask GetMeleeDamageSchoolMask(WeaponAttackType attackType = BASE_ATTACK, uint8 damageIndex = 0) const override;
 
     void _ApplyWeaponDependentAuraMods(Item* item, WeaponAttackType attackType, bool apply);
