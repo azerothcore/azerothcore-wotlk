@@ -264,18 +264,18 @@ enum AcoreStrings
     LANG_RESETALL_TALENTS               = 219,
 
     LANG_WAYPOINT_NOTFOUND              = 220,
-    LANG_WAYPOINT_NOTFOUNDLAST          = 221,
+    LANG_WAYPOINT_NOTFOUNDLAST          = 221,  // Not used
     LANG_WAYPOINT_NOTFOUNDSEARCH        = 222,
     LANG_WAYPOINT_NOTFOUNDDBPROBLEM     = 223,
     LANG_WAYPOINT_CREATSELECTED         = 224,
-    LANG_WAYPOINT_CREATNOTFOUND         = 225,
+    LANG_WAYPOINT_CREATNOTFOUND         = 225,  // Not used
     LANG_WAYPOINT_VP_SELECT             = 226,
     LANG_WAYPOINT_VP_NOTFOUND           = 227,
     LANG_WAYPOINT_VP_NOTCREATED         = 228,
     LANG_WAYPOINT_VP_ALLREMOVED         = 229,
-    LANG_WAYPOINT_NOTCREATED            = 230,
-    LANG_WAYPOINT_NOGUID                = 231,
-    LANG_WAYPOINT_NOWAYPOINTGIVEN       = 232,
+    LANG_WAYPOINT_NOTCREATED            = 230,  // Not used
+    LANG_WAYPOINT_NOGUID                = 231,  // Not used
+    LANG_WAYPOINT_NOWAYPOINTGIVEN       = 232,  // Not used
     LANG_WAYPOINT_ARGUMENTREQ           = 233,
     LANG_WAYPOINT_ADDED                 = 234,
     LANG_WAYPOINT_ADDED_NO              = 235,
@@ -287,8 +287,8 @@ enum AcoreStrings
     LANG_WAYPOINT_REMOVED               = 241,
     LANG_WAYPOINT_NOTREMOVED            = 242,
     LANG_WAYPOINT_TOOFAR1               = 243,
-    LANG_WAYPOINT_TOOFAR2               = 244,
-    LANG_WAYPOINT_TOOFAR3               = 245,
+    LANG_WAYPOINT_TOOFAR2               = 244,  // Not used
+    LANG_WAYPOINT_TOOFAR3               = 245,  // Not used
     LANG_WAYPOINT_INFO_TITLE            = 246,
     LANG_WAYPOINT_INFO_WAITTIME         = 247,
     LANG_WAYPOINT_INFO_MODEL            = 248,
