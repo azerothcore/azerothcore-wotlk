@@ -65,6 +65,7 @@ enum WorldStateGameEvents
 {
     // Scourge Invasion
     GAME_EVENT_SCOURGE_INVASION                         = 17,
+    GAME_EVENT_SCOURGE_INVASION_BOSSES                  = 120,
     GAME_EVENT_SCOURGE_INVASION_WINTERSPRING            = 121,
     GAME_EVENT_SCOURGE_INVASION_TANARIS                 = 122,
     GAME_EVENT_SCOURGE_INVASION_AZSHARA                 = 123,
