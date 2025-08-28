@@ -143,7 +143,8 @@ public:
                 creatureRange.first,
                 creatureRange.second,
                 [&](auto& guidCreaturePair) {
-                    if (deleteFromWaypointData) {
+                    if (deleteFromWaypointData)
+                    {
                         // Set "wpguid" column to "empty"
                         WorldDatabasePreparedStatement* stmt = WorldDatabase.GetPreparedStatement(WORLD_UPD_WAYPOINT_DATA_BY_WPGUID);
                         stmt->SetData(0, guid);
@@ -887,7 +888,8 @@ public:
                 pathid = target->GetWaypointPath();
 
                 // If target hasn't got a path -> we should return an error
-                if (pathid == 0) {
+                if (pathid == 0)
+                {
                     handler->SendErrorMessage(LANG_WAYPOINT_NOTFOUND, target->GetEntry());
                     return false;
                 }
