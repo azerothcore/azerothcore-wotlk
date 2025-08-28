@@ -235,17 +235,6 @@ enum ActionButtonType
     ACTION_BUTTON_ITEM      = 0x80
 };
 
-enum ReputationSource
-{
-    REPUTATION_SOURCE_KILL,
-    REPUTATION_SOURCE_QUEST,
-    REPUTATION_SOURCE_DAILY_QUEST,
-    REPUTATION_SOURCE_WEEKLY_QUEST,
-    REPUTATION_SOURCE_MONTHLY_QUEST,
-    REPUTATION_SOURCE_REPEATABLE_QUEST,
-    REPUTATION_SOURCE_SPELL
-};
-
 enum QuestSound
 {
     QUEST_SOUND_FAILURE = 847
@@ -2216,6 +2205,9 @@ public:
     void _RemoveAllStatBonuses();
 
     void ResetAllPowers();
+
+    void CastAllObtainSpells();
+    void ApplyItemObtainSpells(Item* item, bool apply);
 
     SpellSchoolMask GetMeleeDamageSchoolMask(WeaponAttackType attackType = BASE_ATTACK, uint8 damageIndex = 0) const override;
 
