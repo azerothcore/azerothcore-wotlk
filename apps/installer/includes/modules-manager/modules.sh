@@ -368,21 +368,50 @@ function inst_module_search {
         fi
     fi
 
-    # Build GitHub search query: org + topic + fork + optional in:name filters
-    local q_base="org:azerothcore+topic:azerothcore-module"
-    local q_terms=""
-    local t
-    for t in "${terms[@]}"; do
-        [ -z "$t" ] && continue
-        q_terms+="+in:name+${t}"
-    done
+    local CATALOG_URL="https://www.azerothcore.org/data/catalogue.json"
 
     echo "Searching ${terms[*]}..."
     echo ""
 
-    # Ask GitHub API (per_page to widen results). Sort outside of q.
-    readarray -t MODS < <(curl --silent "https://api.github.com/search/repositories?q=${q_base}${q_terms}&sort=stars&order=desc&per_page=100" \
-        | "$AC_PATH_DEPS/jsonpath/JSONPath.sh" -b '$.items.*.name')
+    # Build candidate list from catalogue (full_name = owner/repo)
+    local MODS=()
+    if command -v jq >/dev/null 2>&1; then
+        mapfile -t MODS < <(curl --silent -L "$CATALOG_URL" \
+            | jq -r '
+                [ .. | objects
+                  | select(.full_name and .topics)
+                  | select(.topics | index("azerothcore-module"))
+                ]
+                | unique_by(.full_name)
+                | sort_by(.stargazers_count // 0) | reverse
+                | .[].full_name
+            ')
+    else
+        # Fallback without jq: best-effort extraction of owner/repo
+        mapfile -t MODS < <(curl --silent -L "$CATALOG_URL" \
+            | grep -oE '\"full_name\"\\s*:\\s*\"[^\"/[:space:]]+/[^\"[:space:]]+\"' \
+            | sed -E 's/.*\"full_name\"\\s*:\\s*\"([^\"]+)\".*/\\1/' \
+            | sort -u)
+    fi
+
+    # Local AND filter on user terms (case-insensitive) against full_name
+    if (( ${#terms[@]} > 0 )); then
+        local filtered=()
+        local item
+        for item in "${MODS[@]}"; do
+            local keep=1
+            local lower="${item,,}"
+            local t
+            for t in "${terms[@]}"; do
+                [ -z "$t" ] && continue
+                if [[ "$lower" != *"${t,,}"* ]]; then
+                    keep=0; break
+                fi
+            done
+            (( keep )) && filtered+=("$item")
+        done
+        MODS=("${filtered[@]}")
+    fi
 
     if (( ${#MODS[@]} == 0 )); then
         echo "No results."
@@ -392,19 +421,21 @@ function inst_module_search {
 
     local idx=0
     while (( ${#MODS[@]} > idx )); do
-        local mod="${MODS[idx++]}"
-        read v b < <(inst_getVersionBranch "https://raw.githubusercontent.com/azerothcore/$mod/master/acore-module.json")
+        local mod_full="${MODS[idx++]}"     # owner/repo
+        local mod="${mod_full##*/}"         # repo name only for display
+        read v b < <(inst_getVersionBranch "https://raw.githubusercontent.com/${mod_full}/master/acore-module.json")
 
         if [[ "$b" != "none" ]]; then
             echo "-> $mod (tested with AC version: $v)"
         else
-            echo "-> $mod (no revision available for AC v$ACORE_VERSION, it could not work!)"
+            echo "-> $mod (NOTE: The module latest tested AC revision is Unknown)"
         fi
     done
 
     echo ""
     echo ""
 }
+
 
 # Install one or more modules with advanced syntax support
 function inst_module_install {
