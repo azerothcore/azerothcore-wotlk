@@ -412,10 +412,8 @@ MotionTransport* TransportMgr::CreateTransport(uint32 entry, ObjectGuid::LowType
     if (map && map->IsDungeon())
         trans->m_zoneScript = map->ToInstanceMap()->GetInstanceScript();
 
-    // xinef: transports are active so passengers can be relocated (grids must be loaded)
-    trans->setActive(true);
     HashMapHolder<MotionTransport>::Insert(trans);
-    trans->GetMap()->AddToMap<MotionTransport>(trans);
+    trans->GetMap()->AddToMap<Transport>(trans);
     return trans;
 }
 
