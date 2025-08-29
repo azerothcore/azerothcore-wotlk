@@ -499,7 +499,7 @@ struct npc_necrotic_shard : public ScriptedAI
     // Only Minions and the shard itself can deal damage.
     void DamageTaken(Unit* attacker, uint32& damage, DamageEffectType /*damageType*/, SpellSchoolMask /*damageSchoolMask*/) override
     {
-        if (attacker->GetFactionTemplateEntry() != me->GetFactionTemplateEntry())
+        if (attacker && attacker->GetFactionTemplateEntry() != me->GetFactionTemplateEntry())
             damage = 0;
     }
 
