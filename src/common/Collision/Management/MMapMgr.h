@@ -39,6 +39,9 @@ inline void dtCustomFree(void* ptr)
 //  move map related classes
 namespace MMAP
 {
+    static char const* const MAP_FILE_NAME_FORMAT = "{}/mmaps/{:03}.mmap";
+    static char const* const TILE_FILE_NAME_FORMAT = "{}/mmaps/{:03}{:02}{:02}.mmtile";
+
     typedef std::unordered_map<uint32, dtTileRef> MMapTileSet;
     typedef std::unordered_map<uint32, dtNavMeshQuery*> NavMeshQuerySet;
 
