@@ -235,17 +235,6 @@ enum ActionButtonType
     ACTION_BUTTON_ITEM      = 0x80
 };
 
-enum ReputationSource
-{
-    REPUTATION_SOURCE_KILL,
-    REPUTATION_SOURCE_QUEST,
-    REPUTATION_SOURCE_DAILY_QUEST,
-    REPUTATION_SOURCE_WEEKLY_QUEST,
-    REPUTATION_SOURCE_MONTHLY_QUEST,
-    REPUTATION_SOURCE_REPEATABLE_QUEST,
-    REPUTATION_SOURCE_SPELL
-};
-
 enum QuestSound
 {
     QUEST_SOUND_FAILURE = 847
@@ -1692,7 +1681,7 @@ public:
 
     bool RemoveMItem(ObjectGuid::LowType itemLowGuid)
     {
-        return !!mMitems.erase(itemLowGuid);
+        return mMitems.erase(itemLowGuid);
     }
 
     void PetSpellInitialize();
@@ -2217,6 +2206,9 @@ public:
 
     void ResetAllPowers();
 
+    void CastAllObtainSpells();
+    void ApplyItemObtainSpells(Item* item, bool apply);
+
     SpellSchoolMask GetMeleeDamageSchoolMask(WeaponAttackType attackType = BASE_ATTACK, uint8 damageIndex = 0) const override;
 
     void _ApplyWeaponDependentAuraMods(Item* item, WeaponAttackType attackType, bool apply);
@@ -2641,8 +2633,8 @@ public:
     std::string GetPlayerName();
 
     // Settings
-    [[nodiscard]] PlayerSetting GetPlayerSetting(std::string const& source, uint8 index);
-    void UpdatePlayerSetting(std::string const& source, uint8 index, uint32 value);
+    [[nodiscard]] PlayerSetting GetPlayerSetting(std::string const& source, uint32 index);
+    void UpdatePlayerSetting(std::string const& source, uint32 index, uint32 value);
 
     void SendSystemMessage(std::string_view msg, bool escapeCharacters = false);
 
