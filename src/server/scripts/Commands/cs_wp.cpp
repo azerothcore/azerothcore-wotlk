@@ -861,8 +861,18 @@ public:
         uint32 pathid = 0;
         Creature* target = handler->getSelectedCreature();
 
+        // Checks for early return
+        if (show == "info")
+        {
+            // Check if the user is targeting a visual waypoint
+            if (!target || target->GetEntry() != wpEntry)
+            {
+                handler->SendErrorMessage(LANG_WAYPOINT_VP_SELECT);
+                return false;
+            }
+        }
         // If command equals "off" we do not need a guid or target, just delete all WPs in the current map
-        if (show != "off")
+        else if (show != "off")
         {
             // Did player provide a PathID?
             if (guid)
@@ -899,13 +909,6 @@ public:
         // Show info for the selected waypoint
         if (show == "info")
         {
-            // Check if the user did specify a visual waypoint
-            if (!target || target->GetEntry() != wpEntry)
-            {
-                handler->SendErrorMessage(LANG_WAYPOINT_VP_SELECT);
-                return false;
-            }
-
             WorldDatabasePreparedStatement* stmt = WorldDatabase.GetPreparedStatement(WORLD_SEL_WAYPOINT_DATA_ALL_BY_WPGUID);
 
             stmt->SetData(0, target->GetSpawnId());
