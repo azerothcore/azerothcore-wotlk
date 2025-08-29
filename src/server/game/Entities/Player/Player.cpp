@@ -149,7 +149,7 @@ static uint32 copseReclaimDelay[MAX_DEATH_COUNT] = { 30, 60, 120 };
 #ifdef _MSC_VER
 #pragma warning(disable:4355)
 #endif
-Player::Player(WorldSession* session): Unit(true), m_mover(this)
+Player::Player(WorldSession* session): Unit(), m_mover(this)
 {
 #ifdef _MSC_VER
 #pragma warning(default:4355)
@@ -412,6 +412,9 @@ Player::Player(WorldSession* session): Unit(true), m_mover(this)
     m_isInstantFlightOn = true;
 
     _wasOutdoor = true;
+
+    GetObjectVisibilityContainer().InitForPlayer();
+
     sScriptMgr->OnConstructPlayer(this);
 }
 
@@ -4547,6 +4550,9 @@ void Player::ResurrectPlayer(float restore_percent, bool applySickness)
     // update visibility
     UpdateObjectVisibility();
 
+    // recast lost by death auras of any items held in the inventory
+    CastAllObtainSpells();
+
     sScriptMgr->OnPlayerResurrect(this, restore_percent, applySickness);
 
     if (!applySickness)
@@ -5707,20 +5713,7 @@ void Player::SendMessageToSetInRange(WorldPacket const* data, float dist, bool s
         SendDirectMessage(data);
 
     Acore::MessageDistDeliverer notifier(this, data, dist);
-    Cell::VisitWorldObjects(this, notifier, dist);
-}
-
-void Player::SendMessageToSetInRange(WorldPacket const* data, float dist, bool self, bool includeMargin, bool ownTeamOnly, bool required3dDist) const
-{
-    if (self)
-        SendDirectMessage(data);
-
-    dist += GetObjectSize();
-    if (includeMargin)
-        dist += VISIBILITY_COMPENSATION; // pussywizard: to ensure everyone receives all important packets
-
-    Acore::MessageDistDeliverer notifier(this, data, dist, ownTeamOnly, nullptr, required3dDist);
-    Cell::VisitWorldObjects(this, notifier, dist);
+    notifier.Visit(GetObjectVisibilityContainer().GetVisiblePlayersMap());
 }
 
 void Player::SendMessageToSet(WorldPacket const* data, Player const* skipped_rcvr) const
@@ -5728,8 +5721,8 @@ void Player::SendMessageToSet(WorldPacket const* data, Player const* skipped_rcv
     if (skipped_rcvr != this)
         SendDirectMessage(data);
 
-    Acore::MessageDistDeliverer notifier(this, data, GetVisibilityRange(), false, skipped_rcvr);
-    Cell::VisitWorldObjects(this, notifier, GetVisibilityRange());
+    Acore::MessageDistDeliverer notifier(this, data, 0.0f, false, skipped_rcvr);
+    notifier.Visit(GetObjectVisibilityContainer().GetVisiblePlayersMap());
 }
 
 void Player::SendDirectMessage(WorldPacket const* data) const
@@ -6018,6 +6011,7 @@ void Player::RewardReputation(Unit* victim)
     if (Rep->RepFaction1 && (!Rep->TeamDependent || teamId == TEAM_ALLIANCE))
     {
         float donerep1 = CalculateReputationGain(REPUTATION_SOURCE_KILL, victim->GetLevel(), static_cast<float>(Rep->RepValue1), ChampioningFaction ? ChampioningFaction : Rep->RepFaction1);
+        sScriptMgr->OnPlayerGiveReputation(this, Rep->RepFaction1, donerep1, REPUTATION_SOURCE_KILL);
 
         FactionEntry const* factionEntry1 = sFactionStore.LookupEntry(ChampioningFaction ? ChampioningFaction : Rep->RepFaction1);
         if (factionEntry1)
@@ -6029,6 +6023,7 @@ void Player::RewardReputation(Unit* victim)
     if (Rep->RepFaction2 && (!Rep->TeamDependent || teamId == TEAM_HORDE))
     {
         float donerep2 = CalculateReputationGain(REPUTATION_SOURCE_KILL, victim->GetLevel(), static_cast<float>(Rep->RepValue2), ChampioningFaction ? ChampioningFaction : Rep->RepFaction2);
+        sScriptMgr->OnPlayerGiveReputation(this, Rep->RepFaction2, donerep2, REPUTATION_SOURCE_KILL);
 
         FactionEntry const* factionEntry2 = sFactionStore.LookupEntry(ChampioningFaction ? ChampioningFaction : Rep->RepFaction2);
         if (factionEntry2)
@@ -6068,22 +6063,27 @@ void Player::RewardReputation(Quest const* quest)
         if (quest->IsDaily())
         {
             rep = CalculateReputationGain(REPUTATION_SOURCE_DAILY_QUEST, GetQuestLevel(quest), rep, quest->RewardFactionId[i], false);
+            sScriptMgr->OnPlayerGiveReputation(this, quest->RewardFactionId[i], rep, REPUTATION_SOURCE_DAILY_QUEST);
         }
         else if (quest->IsWeekly())
         {
             rep = CalculateReputationGain(REPUTATION_SOURCE_WEEKLY_QUEST, GetQuestLevel(quest), rep, quest->RewardFactionId[i], false);
+            sScriptMgr->OnPlayerGiveReputation(this, quest->RewardFactionId[i], rep, REPUTATION_SOURCE_WEEKLY_QUEST);
         }
         else if (quest->IsMonthly())
         {
             rep = CalculateReputationGain(REPUTATION_SOURCE_MONTHLY_QUEST, GetQuestLevel(quest), rep, quest->RewardFactionId[i], false);
+            sScriptMgr->OnPlayerGiveReputation(this, quest->RewardFactionId[i], rep, REPUTATION_SOURCE_MONTHLY_QUEST);
         }
         else if (quest->IsRepeatable())
         {
             rep = CalculateReputationGain(REPUTATION_SOURCE_REPEATABLE_QUEST, GetQuestLevel(quest), rep, quest->RewardFactionId[i], false);
+            sScriptMgr->OnPlayerGiveReputation(this, quest->RewardFactionId[i], rep, REPUTATION_SOURCE_REPEATABLE_QUEST);
         }
         else
         {
             rep = CalculateReputationGain(REPUTATION_SOURCE_QUEST, GetQuestLevel(quest), rep, quest->RewardFactionId[i], false);
+            sScriptMgr->OnPlayerGiveReputation(this, quest->RewardFactionId[i], rep, REPUTATION_SOURCE_QUEST);
         }
 
         if (FactionEntry const* factionEntry = sFactionStore.LookupEntry(quest->RewardFactionId[i]))
@@ -7027,6 +7027,46 @@ void Player::_ApplyWeaponDamage(uint8 slot, ItemTemplate const* proto, ScalingSt
         UpdateDamagePhysical(WeaponAttackType(attType));
 }
 
+void Player::CastAllObtainSpells()
+{
+    for (uint8 slot = INVENTORY_SLOT_ITEM_START; slot < INVENTORY_SLOT_ITEM_END; ++slot)
+        if (Item* item = GetItemByPos(INVENTORY_SLOT_BAG_0, slot))
+            ApplyItemObtainSpells(item, true);
+
+    for (uint8 i = INVENTORY_SLOT_BAG_START; i < INVENTORY_SLOT_BAG_END; ++i)
+    {
+        Bag* bag = GetBagByPos(i);
+        if (!bag)
+            continue;
+
+        for (uint32 slot = 0; slot < bag->GetBagSize(); ++slot)
+            if (Item* item = bag->GetItemByPos(slot))
+                ApplyItemObtainSpells(item, true);
+    }
+}
+
+void Player::ApplyItemObtainSpells(Item* item, bool apply)
+{
+    ItemTemplate const* itemTemplate = item->GetTemplate();
+    for (uint8 i = 0; i < MAX_ITEM_PROTO_SPELLS; ++i)
+    {
+        if (itemTemplate->Spells[i].SpellTrigger != ITEM_SPELLTRIGGER_ON_NO_DELAY_USE) // On obtain trigger
+            continue;
+
+        int32 const spellId = itemTemplate->Spells[i].SpellId;
+        if (spellId <= 0)
+            continue;
+
+        if (apply)
+        {
+            if (!HasAura(spellId))
+                CastSpell(this, spellId, true, item);
+        }
+        else
+            RemoveAurasDueToSpell(spellId);
+    }
+}
+
 SpellSchoolMask Player::GetMeleeDamageSchoolMask(WeaponAttackType attackType /*= BASE_ATTACK*/, uint8 damageIndex /*= 0*/) const
 {
     if (Item const* weapon = GetWeaponForAttack(attackType, true))
@@ -7711,23 +7751,26 @@ bool Player::CheckAmmoCompatibility(ItemTemplate const* ammo_proto) const
 
 void Player::SendQuestGiverStatusMultiple()
 {
+    if (GetObjectVisibilityContainer().GetVisibleWorldObjectsMap()->empty())
+        return;
+
     uint32 count = 0;
 
     WorldPacket data(SMSG_QUESTGIVER_STATUS_MULTIPLE, 4);
     data << uint32(count); // placeholder
 
-    for (GuidUnorderedSet::const_iterator itr = m_clientGUIDs.begin(); itr != m_clientGUIDs.end(); ++itr)
+    DoForAllVisibleWorldObjects([this, &data, &count](WorldObject* worldObject)
     {
         uint32 questStatus = DIALOG_STATUS_NONE;
 
-        if ((*itr).IsAnyTypeCreature())
+        if (worldObject->IsCreature())
         {
             // need also pet quests case support
-            Creature* questgiver = ObjectAccessor::GetCreatureOrPetOrVehicle(*this, *itr);
+            Creature* questgiver = worldObject->ToCreature();
             if (!questgiver || questgiver->IsHostileTo(this))
-                continue;
+                return;
             if (!questgiver->HasNpcFlag(UNIT_NPC_FLAG_QUESTGIVER))
-                continue;
+                return;
 
             questStatus = GetQuestDialogStatus(questgiver);
 
@@ -7735,11 +7778,11 @@ void Player::SendQuestGiverStatusMultiple()
             data << uint8(questStatus);
             ++count;
         }
-        else if ((*itr).IsGameObject())
+        else if (worldObject->IsGameObject())
         {
-            GameObject* questgiver = GetMap()->GetGameObject(*itr);
+            GameObject* questgiver = worldObject->ToGameObject();
             if (!questgiver || questgiver->GetGoType() != GAMEOBJECT_TYPE_QUESTGIVER)
-                continue;
+                return;
 
             questStatus = GetQuestDialogStatus(questgiver);
 
@@ -7747,7 +7790,7 @@ void Player::SendQuestGiverStatusMultiple()
             data << uint8(questStatus);
             ++count;
         }
-    }
+    });
 
     data.put<uint32>(0, count); // write real count
     GetSession()->SendPacket(&data);
@@ -9383,7 +9426,12 @@ void Player::Say(std::string_view text, Language language, WorldObject const* /*
 
     WorldPacket data;
     ChatHandler::BuildChatPacket(data, CHAT_MSG_SAY, language, this, this, _text);
-    SendMessageToSetInRange(&data, sWorld->getFloatConfig(CONFIG_LISTEN_RANGE_SAY), true, false, false, true);
+
+    SendDirectMessage(&data);
+
+    // Special handling for messages, do not use visibility map for stealthed units
+    Acore::MessageDistDeliverer notifier(this, &data, sWorld->getFloatConfig(CONFIG_LISTEN_RANGE_SAY), false, nullptr, true);
+    Cell::VisitObjects(this, notifier, sWorld->getFloatConfig(CONFIG_LISTEN_RANGE_SAY));
 }
 
 void Player::Say(uint32 textId, WorldObject const* target /*= nullptr*/)
@@ -9404,7 +9452,12 @@ void Player::Yell(std::string_view text, Language language, WorldObject const* /
 
     WorldPacket data;
     ChatHandler::BuildChatPacket(data, CHAT_MSG_YELL, language, this, this, _text);
-    SendMessageToSetInRange(&data, sWorld->getFloatConfig(CONFIG_LISTEN_RANGE_YELL), true, false, false, true);
+
+    SendDirectMessage(&data);
+
+    // Special handling for messages, do not use visibility map for stealthed units
+    Acore::MessageDistDeliverer notifier(this, &data, sWorld->getFloatConfig(CONFIG_LISTEN_RANGE_YELL), false, nullptr, true);
+    Cell::VisitObjects(this, notifier, sWorld->getFloatConfig(CONFIG_LISTEN_RANGE_YELL));
 }
 
 void Player::Yell(uint32 textId, WorldObject const* target /*= nullptr*/)
@@ -9426,7 +9479,11 @@ void Player::TextEmote(std::string_view text, WorldObject const* /*= nullptr*/, 
     WorldPacket data;
     ChatHandler::BuildChatPacket(data, CHAT_MSG_EMOTE, LANG_UNIVERSAL, this, this, _text);
 
-    SendMessageToSetInRange(&data, sWorld->getFloatConfig(CONFIG_LISTEN_RANGE_TEXTEMOTE), true, false, !sWorld->getBoolConfig(CONFIG_ALLOW_TWO_SIDE_INTERACTION_EMOTE), true);
+    SendDirectMessage(&data);
+
+    // Special handling for messages, do not use visibility map for stealthed units
+    Acore::MessageDistDeliverer notifier(this, &data, sWorld->getFloatConfig(CONFIG_LISTEN_RANGE_TEXTEMOTE), !sWorld->getBoolConfig(CONFIG_ALLOW_TWO_SIDE_INTERACTION_EMOTE), nullptr, true);
+    Cell::VisitObjects(this, notifier, sWorld->getFloatConfig(CONFIG_LISTEN_RANGE_TEXTEMOTE));
 }
 
 void Player::TextEmote(uint32 textId, WorldObject const* target /*= nullptr*/, bool /*isBossEmote = false*/)
@@ -10487,35 +10544,24 @@ void Player::ContinueTaxiFlight()
 
 void Player::SendTaxiNodeStatusMultiple()
 {
-    for (auto itr = m_clientGUIDs.begin(); itr != m_clientGUIDs.end(); ++itr)
+    DoForAllVisibleWorldObjects([this](WorldObject* worldObject)
     {
-        if (!itr->IsCreature())
-        {
-            continue;
-        }
-
-        Creature* creature = ObjectAccessor::GetCreature(*this, *itr);
+        Creature* creature = worldObject->ToCreature();
         if (!creature || creature->IsHostileTo(this))
-        {
-            continue;
-        }
+            return;
 
         if (!creature->HasNpcFlag(UNIT_NPC_FLAG_FLIGHTMASTER))
-        {
-            continue;
-        }
+            return;
 
         uint32 nearestNode = sObjectMgr->GetNearestTaxiNode(creature->GetPositionX(), creature->GetPositionY(), creature->GetPositionZ(), creature->GetMapId(), GetTeamId());
         if (!nearestNode)
-        {
-            continue;
-        }
+            return;
 
         WorldPacket data(SMSG_TAXINODE_STATUS, 9);
-        data << *itr;
+        data << creature->GetGUID();
         data << uint8(m_taxi.IsTaximaskNodeKnown(nearestNode) ? 1 : 0);
         SendDirectMessage(&data);
-    }
+    });
 }
 
 void Player::ProhibitSpellSchool(SpellSchoolMask idSchoolMask, uint32 unTimeMs)
@@ -11393,31 +11439,22 @@ WorldLocation Player::GetStartPosition() const
 
 bool Player::HaveAtClient(WorldObject const* u) const
 {
-    if (u == this)
-    {
-        return true;
-    }
-
     // Motion Transports are always present in player's client
     if (GameObject const* gameobject = u->ToGameObject())
     {
         if (gameobject->IsMotionTransport())
-        {
             return true;
-        }
     }
 
-    return m_clientGUIDs.find(u->GetGUID()) != m_clientGUIDs.end();
+    return HaveAtClient(u->GetGUID());
 }
 
 bool Player::HaveAtClient(ObjectGuid guid) const
 {
     if (guid == GetGUID())
-    {
         return true;
-    }
 
-    return m_clientGUIDs.find(guid) != m_clientGUIDs.end();
+    return GetObjectVisibilityContainer().GetVisibleWorldObjectsMap()->find(guid) != GetObjectVisibilityContainer().GetVisibleWorldObjectsMap()->end();
 }
 
 bool Player::IsNeverVisible() const

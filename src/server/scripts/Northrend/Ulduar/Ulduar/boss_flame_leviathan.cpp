@@ -1665,7 +1665,7 @@ class spell_vehicle_throw_passenger : public SpellScript
                 std::list<WorldObject*> targetList;
                 Acore::WorldObjectSpellAreaTargetCheck check(99, GetExplTargetDest(), GetCaster(), GetCaster(), GetSpellInfo(), TARGET_CHECK_DEFAULT, nullptr);
                 Acore::WorldObjectListSearcher<Acore::WorldObjectSpellAreaTargetCheck> searcher(GetCaster(), targetList, check);
-                Cell::VisitAllObjects(GetCaster(), searcher, 99.0f);
+                Cell::VisitObjects(GetCaster(), searcher, 99.0f);
                 float minDist = 99 * 99;
                 Unit* target = nullptr;
                 for (std::list<WorldObject*>::iterator itr = targetList.begin(); itr != targetList.end(); ++itr)

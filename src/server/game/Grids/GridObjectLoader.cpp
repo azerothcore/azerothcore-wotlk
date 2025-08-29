@@ -30,10 +30,8 @@ void GridObjectLoader::AddObjectHelper(Map* map, T* obj)
     CellCoord cellCoord = Acore::ComputeCellCoord(obj->GetPositionX(), obj->GetPositionY());
     Cell cell(cellCoord);
 
-    map->AddToGrid(obj, cell);
+    map->AddToGrid<T>(obj, cell);
     obj->AddToWorld();
-    if (obj->isActiveObject())
-        map->AddToActive(obj);
 }
 
 void GridObjectLoader::LoadCreatures(CellGuidSet const& guid_set, Map* map)
@@ -55,7 +53,7 @@ void GridObjectLoader::LoadCreatures(CellGuidSet const& guid_set, Map* map)
             {
                 // call MoveInLineOfSight for nearby grid creatures
                 Acore::AIRelocationNotifier notifier(*obj);
-                Cell::VisitGridObjects(obj, notifier, 60.f);
+                Cell::VisitObjects(obj, notifier, 60.f);
             }
         }
     }
@@ -66,15 +64,28 @@ void GridObjectLoader::LoadGameObjects(CellGuidSet const& guid_set, Map* map)
     for (ObjectGuid::LowType const& guid : guid_set)
     {
         GameObjectData const* data = sObjectMgr->GetGameObjectData(guid);
-        GameObject* obj = data && sObjectMgr->IsGameObjectStaticTransport(data->id) ? new StaticTransport() : new GameObject();
 
-        if (!obj->LoadFromDB(guid, map))
+        if (data && sObjectMgr->IsGameObjectStaticTransport(data->id))
         {
-            delete obj;
-            continue;
-        }
+            StaticTransport* transport = new StaticTransport();
 
-        AddObjectHelper<GameObject>(map, obj);
+            // Special case for static transports - we are loaded via grids
+            // but we do not want to actually be stored in the grid
+            if (!transport->LoadGameObjectFromDB(guid, map, true))
+                delete transport;
+        }
+        else
+        {
+            GameObject* obj = new GameObject();
+
+            if (!obj->LoadFromDB(guid, map))
+            {
+                delete obj;
+                continue;
+            }
+
+            AddObjectHelper<GameObject>(map, obj);
+        }
     }
 }
 
