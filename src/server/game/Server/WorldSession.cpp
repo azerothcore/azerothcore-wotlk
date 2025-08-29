@@ -132,6 +132,7 @@ WorldSession::WorldSession(uint32 id, std::string&& name, uint32 accountFlags, s
     recruiterId(recruiter),
     isRecruiter(isARecruiter),
     m_currentVendorEntry(0),
+    m_currentTrainerEntry(0),
     _calendarEventCreationCooldown(0),
     _addonMessageReceiveCount(0),
     _timeSyncClockDeltaQueue(6),
