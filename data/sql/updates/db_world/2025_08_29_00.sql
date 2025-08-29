@@ -1,3 +1,4 @@
+-- DB update 2025_08_28_00 -> 2025_08_29_00
 -- Necrotic Runes
 DELETE FROM `creature_loot_template` WHERE `Item` = 22484;
 INSERT INTO `creature_loot_template` (`Entry`, `Item`, `Reference`, `Chance`, `QuestRequired`, `LootMode`, `GroupId`, `MinCount`, `MaxCount`, `Comment`) VALUES
