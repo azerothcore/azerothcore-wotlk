@@ -572,7 +572,7 @@ public: /* AllCreatureScript */
     //listener function (OnAllCreatureUpdate) is called by OnCreatureUpdate
     //void OnAllCreatureUpdate(Creature* creature, uint32 diff);
     void OnBeforeCreatureSelectLevel(const CreatureTemplate* cinfo, Creature* creature, uint8& level);
-    void Creature_SelectLevel(const CreatureTemplate* cinfo, Creature* creature);
+    void OnCreatureSelectLevel(const CreatureTemplate* cinfo, Creature* creature);
     void OnCreatureSaveToDB(Creature* creature);
 
 public: /* AllGameobjectScript */
