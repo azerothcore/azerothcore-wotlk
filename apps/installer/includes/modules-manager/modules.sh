@@ -481,6 +481,7 @@ function inst_module_install {
                 echo "[$repo_ref] Installed."
             else
                 echo "[$repo_ref] Install failed."
+                exit 1;
             fi
         done < <(inst_mod_list_read)
     else
@@ -552,6 +553,7 @@ function inst_module_install {
                 echo "[$repo_ref] Installed in '$dirname'. Please re-run compiling and db assembly."
             else
                 echo "[$repo_ref] Install failed or module not found"
+                exit 1;
             fi
         done
     fi
