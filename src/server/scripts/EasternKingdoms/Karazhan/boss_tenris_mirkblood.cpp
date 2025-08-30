@@ -177,6 +177,9 @@ struct npc_sanguine_spirit : public ScriptedAI
             me->SetReactState(REACT_AGGRESSIVE);
             me->SetInCombatWithZone();
             DoCastSelf(SPELL_SANGUINE_SPIRIT_AURA);
+        }).Schedule(30s, [this](TaskContext /*context*/)
+        {
+            me->DespawnOrUnsummon();
         });
     }
 
@@ -320,6 +323,7 @@ public:
             events.Reset();
 
             if (InstanceScript* instance = player->GetInstanceScript())
+            {
                 if (instance->GetBossState(DATA_MIRKBLOOD) != DONE)
                 {
                     opener = player;
@@ -327,8 +331,10 @@ public:
 
                     events.ScheduleEvent(EVENT_SAY, 1s);
                     events.ScheduleEvent(EVENT_FLAG, 5s);
-                    me->SetGameObjectFlag(GO_FLAG_NOT_SELECTABLE);
                 }
+            }
+
+            me->SetGameObjectFlag(GO_FLAG_NOT_SELECTABLE);
 
             return true;
         }
@@ -342,14 +348,13 @@ public:
             switch (events.ExecuteEvent())
             {
             case EVENT_SAY:
-                if (!mirkblood)
+                if (!mirkblood || !mirkblood->IsAlive())
                     return;
                 mirkblood->AI()->Talk(SAY_AGGRO, opener);
                 break;
             case EVENT_FLAG:
-                if (!mirkblood)
-                    return;
-                mirkblood->SetImmuneToPC(false);
+                if (mirkblood)
+                    mirkblood->SetImmuneToPC(false);
                 me->Delete();
                 break;
             }
