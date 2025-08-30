@@ -546,7 +546,7 @@ function inst_module_install {
             read -r -a modules <<< "$_line"
         fi
 
-        local spec name override_branch override_commit v b def curCommit existing_repo_ref
+    local spec name override_branch override_commit v b def curCommit existing_repo_ref dirname
         for spec in "${modules[@]}"; do
             [ -z "$spec" ] && continue
             
@@ -629,7 +629,7 @@ function inst_module_update {
     local _tmp=$PWD
 
     if $use_all; then
-        local line repo_ref branch commit newCommit owner modname url
+        local line repo_ref branch commit newCommit owner modname url dirname
         while read -r repo_ref branch commit; do
             [ -z "$repo_ref" ] && continue
             parsed_output=$(inst_parse_module_spec "$repo_ref")
@@ -657,11 +657,11 @@ function inst_module_update {
             read -r -a modules <<< "$_line"
         fi
 
-        local spec repo_ref override_branch override_commit owner modname url v b branch def newCommit
+        local spec repo_ref override_branch override_commit owner modname url dirname v b branch def newCommit
         for spec in "${modules[@]}"; do
             [ -z "$spec" ] && continue
             parsed_output=$(inst_parse_module_spec "$spec")
-            IFS=' ' read -r repo_ref owner modname override_branch override_commit url <<< "$parsed_output"
+            IFS=' ' read -r repo_ref owner modname override_branch override_commit url dirname <<< "$parsed_output"
 
             dirname="${dirname:-$modname}"
             if [ -d "$J_PATH_MODULES/$dirname/" ]; then
@@ -714,11 +714,11 @@ function inst_module_remove {
         read -r -a modules <<< "$_line"
     fi
 
-    local spec repo_ref owner modname url override_branch override_commit
+    local spec repo_ref owner modname url override_branch override_commit dirname
     for spec in "${modules[@]}"; do
         [ -z "$spec" ] && continue
         parsed_output=$(inst_parse_module_spec "$spec")
-        IFS=' ' read -r repo_ref owner modname override_branch override_commit url <<< "$parsed_output"
+        IFS=' ' read -r repo_ref owner modname override_branch override_commit url dirname <<< "$parsed_output"
         [ -z "$repo_ref" ] && continue
         
         dirname="${dirname:-$modname}"

@@ -223,6 +223,38 @@ teardown() {
     grep -q "https://github.com/azerothcore/mod-worldchat.git dev def456" "$TEST_DIR/conf/modules.list"
 }
 
+@test "module update --all uses flat structure (no branch subfolders)" {
+    cd "$TEST_DIR"
+    source "$TEST_DIR/apps/installer/includes/includes.sh"
+
+    # Prepare modules.list with one entry and a matching local directory
+    mkdir -p "$TEST_DIR/conf"
+    echo "azerothcore/mod-transmog master abc123" > "$TEST_DIR/conf/modules.list"
+    mkdir -p "$TEST_DIR/modules/mod-transmog"
+
+    # Run update all
+    run bash -c "source '$TEST_DIR/apps/installer/includes/includes.sh' && inst_module_update --all"
+
+    # Verify Joiner:upd_repo received flat structure args (no basedir)
+    [ -f "$TEST_DIR/joiner_called.txt" ]
+    grep -q "UPD https://github.com/azerothcore/mod-transmog mod-transmog master" "$TEST_DIR/joiner_called.txt"
+}
+
+@test "module update specific uses flat structure with override branch" {
+    cd "$TEST_DIR"
+    source "$TEST_DIR/apps/installer/includes/includes.sh"
+
+    # Create local directory so update proceeds
+    mkdir -p "$TEST_DIR/modules/mymodule"
+
+    # Run update specifying owner/name and branch
+    run bash -c "source '$TEST_DIR/apps/installer/includes/includes.sh' && inst_module_update myorg/mymodule@dev"
+
+    # Should call joiner with name 'mymodule' and branch 'dev' (no basedir)
+    [ -f "$TEST_DIR/joiner_called.txt" ]
+    grep -q "UPD https://github.com/myorg/mymodule mymodule dev" "$TEST_DIR/joiner_called.txt"
+}
+
 @test "custom directory names should work with new syntax" {
     cd "$TEST_DIR"
     source "$TEST_DIR/apps/installer/includes/includes.sh"
