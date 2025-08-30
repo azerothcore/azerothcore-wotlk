@@ -42,7 +42,12 @@ jobs:
 
       - name: Install requirements
         run: |
-          sudo apt install -y bats
+          sudo apt-get update
+          # Install bats-core >= 1.5.0 to support bats_require_minimum_version
+          sudo apt-get install -y git curl
+          git clone --depth 1 https://github.com/bats-core/bats-core.git /tmp/bats-core
+          sudo /tmp/bats-core/install.sh /usr/local
+          bats --version
           ./acore.sh install-deps
 
       - name: Run bash script tests for ${{ matrix.test-module }}
@@ -50,7 +55,7 @@ jobs:
           TERM: xterm-256color
         run: |
           cd apps/test-framework
-          ./run-tests.sh --tap
+          ./run-tests.sh --tap --all
 
   build-and-test:
     name: Build and Integration Test
