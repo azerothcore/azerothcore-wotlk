@@ -1,3 +1,4 @@
+-- DB update 2025_08_30_00 -> 2025_08_30_01
 -- Update creature 'Tahu Sagewind' with sniffed values
 -- new spawns
 DELETE FROM `creature` WHERE (`id1` IN (34528)) AND (`guid` IN (37));

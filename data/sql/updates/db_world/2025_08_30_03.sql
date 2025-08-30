@@ -1,3 +1,4 @@
+-- DB update 2025_08_30_02 -> 2025_08_30_03
 -- Update gameobject 'Stranglekelp Sack' with sniffed values
 -- updated spawns
 DELETE FROM `gameobject` WHERE (`id` IN (185004)) AND (`guid` IN (25928));
