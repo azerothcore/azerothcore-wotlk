@@ -490,9 +490,8 @@ function inst_module_install {
         # First pass: detect duplicate target directories (flat structure)
         declare -A _seen _first
         local dup_error=0
-        while read -r line; do
-            [ -z "$line" ] && continue
-            repo_ref=$(echo "$line" | awk '{print $1}')
+        while read -r repo_ref branch commit; do
+            [ -z "$repo_ref" ] && continue
             parsed_output=$(inst_parse_module_spec "$repo_ref")
             IFS=' ' read -r _ owner modname _ _ url dirname <<< "$parsed_output"
             # dirname defaults to repo name; flat install path uses dirname only
@@ -512,11 +511,8 @@ function inst_module_install {
         fi
 
         # Second pass: install in flat modules directory (no owner subfolders)
-        while read -r line; do
-            [ -z "$line" ] && continue
-            repo_ref=$(echo "$line" | awk '{print $1}')
-            branch=$(echo "$line" | awk '{print $2}')
-            commit=$(echo "$line" | awk '{print $3}')
+        while read -r repo_ref branch commit; do
+            [ -z "$repo_ref" ] && continue
             parsed_output=$(inst_parse_module_spec "$repo_ref")
             IFS=' ' read -r _ owner modname _ _ url dirname <<< "$parsed_output"
 
@@ -634,13 +630,10 @@ function inst_module_update {
 
     if $use_all; then
         local line repo_ref branch commit newCommit owner modname url
-        while read -r line; do
-            [ -z "$line" ] && continue
-            repo_ref=$(echo "$line" | awk '{print $1}')
-            branch=$(echo "$line" | awk '{print $2}')
-            commit=$(echo "$line" | awk '{print $3}')
+        while read -r repo_ref branch commit; do
+            [ -z "$repo_ref" ] && continue
             parsed_output=$(inst_parse_module_spec "$repo_ref")
-            IFS=' ' read -r _ owner modname _ _ url <<< "$parsed_output"
+            IFS=' ' read -r _ owner modname _ _ url dirname <<< "$parsed_output"
 
             dirname="${dirname:-$modname}"
             if [ ! -d "$J_PATH_MODULES/$dirname/" ]; then
