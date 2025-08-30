@@ -108,7 +108,8 @@ teardown() {
 
     # Check that joiner remove was called
     [ -f "$TEST_DIR/joiner_called.txt" ]
-    grep -q "REM test-module azerothcore" "$TEST_DIR/joiner_called.txt"
+    # With flat structure, basedir is empty; ensure name is present
+    grep -q "REM test-module" "$TEST_DIR/joiner_called.txt"
 
     # Check modules list no longer contains the entry
     [ -f "$TEST_DIR/conf/modules.list" ]

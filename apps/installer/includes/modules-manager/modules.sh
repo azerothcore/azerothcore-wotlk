@@ -454,7 +454,33 @@ function inst_module_install {
     if $use_all; then
         # Install all modules from the list (respecting recorded branch and commit).
         inst_mod_list_ensure
-        local line name branch commit
+        local line repo_ref branch commit url owner modname dirname
+
+        # First pass: detect duplicate target directories (flat structure)
+        declare -A _seen _first
+        local dup_error=0
+        while read -r line; do
+            [ -z "$line" ] && continue
+            repo_ref=$(echo "$line" | awk '{print $1}')
+            parsed_output=$(inst_parse_module_spec "$repo_ref")
+            IFS=' ' read -r _ owner modname _ _ url dirname <<< "$parsed_output"
+            # dirname defaults to repo name; flat install path uses dirname only
+            if [[ -n "${_seen[$dirname]:-}" ]]; then
+                echo "Error: duplicate module target directory '$dirname' detected in modules.list:"
+                echo " - ${_first[$dirname]}"
+                echo " - ${repo_ref}"
+                echo "Use a custom folder name to disambiguate, e.g.: ${repo_ref}:$dirname-alt"
+                dup_error=1
+            else
+                _seen[$dirname]=1
+                _first[$dirname]="$repo_ref"
+            fi
+        done < <(inst_mod_list_read)
+        if [[ "$dup_error" -ne 0 ]]; then
+            return 1
+        fi
+
+        # Second pass: install in flat modules directory (no owner subfolders)
         while read -r line; do
             [ -z "$line" ] && continue
             repo_ref=$(echo "$line" | awk '{print $1}')
@@ -462,21 +488,22 @@ function inst_module_install {
             commit=$(echo "$line" | awk '{print $3}')
             parsed_output=$(inst_parse_module_spec "$repo_ref")
             IFS=' ' read -r _ owner modname _ _ url dirname <<< "$parsed_output"
-            basedir="$owner"
-            if [ -d "$J_PATH_MODULES/$basedir/$modname" ]; then
+
+            if [ -d "$J_PATH_MODULES/$dirname" ]; then
                 echo "[$repo_ref] Already installed (skipping)."
                 continue
             fi
-            if Joiner:add_repo "$url" "$modname" "$branch" "$basedir"; then
+
+            if Joiner:add_repo "$url" "$dirname" "$branch" ""; then
                 # Checkout the recorded commit if present
                 if [ -n "$commit" ]; then
-                    git -C "$J_PATH_MODULES/$basedir/$modname" fetch --all --quiet || true
-                    if git -C "$J_PATH_MODULES/$basedir/$modname" rev-parse --verify "$commit" >/dev/null 2>&1; then
-                        git -C "$J_PATH_MODULES/$basedir/$modname" checkout --quiet "$commit"
+                    git -C "$J_PATH_MODULES/$dirname" fetch --all --quiet || true
+                    if git -C "$J_PATH_MODULES/$dirname" rev-parse --verify "$commit" >/dev/null 2>&1; then
+                        git -C "$J_PATH_MODULES/$dirname" checkout --quiet "$commit"
                     fi
                 fi
                 local curCommit
-                curCommit=$(git -C "$J_PATH_MODULES/$basedir/$modname" rev-parse HEAD 2>/dev/null || echo "")
+                curCommit=$(git -C "$J_PATH_MODULES/$dirname" rev-parse HEAD 2>/dev/null || echo "")
                 inst_mod_list_upsert "$repo_ref" "$branch" "$curCommit"
                 echo "[$repo_ref] Installed."
             else
@@ -584,14 +611,14 @@ function inst_module_update {
             parsed_output=$(inst_parse_module_spec "$repo_ref")
             IFS=' ' read -r _ owner modname _ _ url <<< "$parsed_output"
 
-            basedir="$owner"
-            if [ ! -d "$J_PATH_MODULES/$basedir/$modname/" ]; then
+            dirname="${dirname:-$modname}"
+            if [ ! -d "$J_PATH_MODULES/$dirname/" ]; then
                 echo "[$repo_ref] Not installed locally, skipping."
                 continue
             fi
 
-            if Joiner:upd_repo "$url" "$modname" "$branch" "$basedir"; then
-                newCommit=$(git -C "$J_PATH_MODULES/$basedir/$modname" rev-parse HEAD 2>/dev/null || echo "")
+            if Joiner:upd_repo "$url" "$dirname" "$branch" ""; then
+                newCommit=$(git -C "$J_PATH_MODULES/$dirname" rev-parse HEAD 2>/dev/null || echo "")
                 inst_mod_list_upsert "$repo_ref" "$branch" "$newCommit"
                 echo "[$repo_ref] Updated to latest commit on '$branch'."
             else
@@ -612,8 +639,8 @@ function inst_module_update {
             parsed_output=$(inst_parse_module_spec "$spec")
             IFS=' ' read -r repo_ref owner modname override_branch override_commit url <<< "$parsed_output"
 
-            basedir="$owner"
-            if [ -d "$J_PATH_MODULES/$basedir/$modname/" ]; then
+            dirname="${dirname:-$modname}"
+            if [ -d "$J_PATH_MODULES/$dirname/" ]; then
                 # determine preferred branch if not provided
                 if [ -n "$override_branch" ] && [ "$override_branch" != "-" ]; then
                     b="$override_branch"
@@ -625,7 +652,7 @@ function inst_module_update {
                         read v b < <(inst_getVersionBranch "${url}/master/acore-module.json")
                     fi
                     if [[ "$v" == "none" || "$v" == "not-defined" || "$b" == "none" ]]; then
-                        if branch=$(git -C "$J_PATH_MODULES/$basedir/$modname" rev-parse --abbrev-ref HEAD 2>/dev/null); then
+                        if branch=$(git -C "$J_PATH_MODULES/$dirname" rev-parse --abbrev-ref HEAD 2>/dev/null); then
                             echo "Warning: $repo_ref has no compatible acore-module.json; updating current branch '$branch'."
                             b="$branch"
                         else
@@ -636,15 +663,15 @@ function inst_module_update {
                     fi
                 fi
 
-                if Joiner:upd_repo "$url" "$modname" "$b" "$basedir"; then
-                    newCommit=$(git -C "$J_PATH_MODULES/$basedir/$modname" rev-parse HEAD 2>/dev/null || echo "")
+                if Joiner:upd_repo "$url" "$dirname" "$b" ""; then
+                    newCommit=$(git -C "$J_PATH_MODULES/$dirname" rev-parse HEAD 2>/dev/null || echo "")
                     inst_mod_list_upsert "$repo_ref" "$b" "$newCommit"
                     echo "[$repo_ref] Done, please re-run compiling and db assembly"
                 else
                     echo "[$repo_ref] Cannot update"
                 fi
             else
-                echo "[$repo_ref] Cannot update! Path doesn't exist ($J_PATH_MODULES/$basedir/$modname/)"
+                echo "[$repo_ref] Cannot update! Path doesn't exist ($J_PATH_MODULES/$dirname/)"
             fi
         done
     fi
@@ -670,8 +697,8 @@ function inst_module_remove {
         IFS=' ' read -r repo_ref owner modname override_branch override_commit url <<< "$parsed_output"
         [ -z "$repo_ref" ] && continue
         
-        basedir="$owner"
-        if Joiner:remove "$modname" "$basedir"; then
+        dirname="${dirname:-$modname}"
+        if Joiner:remove "$dirname" ""; then
             inst_mod_list_remove "$repo_ref"
             echo "[$repo_ref] Done, please re-run compiling"
         else
