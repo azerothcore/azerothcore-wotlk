@@ -1,7 +1,9 @@
 #!/usr/bin/env bats
 
-# Require minimum BATS version to avoid warnings
-bats_require_minimum_version 1.5.0
+# Require minimum BATS version when supported (older distro packages lack this)
+if type -t bats_require_minimum_version >/dev/null 2>&1; then
+  bats_require_minimum_version 1.5.0
+fi
 
 # AzerothCore Compiler Scripts Test Suite
 # Tests the functionality of the compiler scripts using the unified test framework
