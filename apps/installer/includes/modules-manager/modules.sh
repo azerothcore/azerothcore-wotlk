@@ -230,22 +230,37 @@ function inst_mod_list_upsert() {
     target_owner_name=$(inst_extract_owner_name "$repo_ref")
     
     inst_mod_list_ensure
-    local file tmp
+    local file tmp tmp_uns tmp_sorted
     file="$(inst_modules_list_path)"
     tmp="${file}.tmp"
+    tmp_uns="${file}.unsorted"
+    tmp_sorted="${file}.sorted"
 
-    # Remove any existing entries with same owner/name, then add new entry
-    {
-        inst_mod_list_read | while read -r existing_ref existing_branch existing_commit; do
-            local existing_owner_name
-            existing_owner_name=$(inst_extract_owner_name "$existing_ref")
-            if [[ "$existing_owner_name" != "$target_owner_name" ]]; then
-                echo "$existing_ref $existing_branch $existing_commit"
-            fi
-        done
-        # Add the new entry (preserving original repo_ref format)
-        echo "$repo_ref $branch $commit"
-    } > "$tmp" && mv "$tmp" "$file"
+    # Build a list without existing duplicates
+    : > "$tmp_uns"
+    while read -r existing_ref existing_branch existing_commit; do
+        [[ -z "$existing_ref" ]] && continue
+        local existing_owner_name
+        existing_owner_name=$(inst_extract_owner_name "$existing_ref")
+        if [[ "$existing_owner_name" != "$target_owner_name" ]]; then
+            echo "$existing_ref $existing_branch $existing_commit" >> "$tmp_uns"
+        fi
+    done < <(inst_mod_list_read)
+    # Add/replace the new entry (preserving original repo_ref format)
+    echo "$repo_ref $branch $commit" >> "$tmp_uns"
+
+    # Create key-prefixed lines to sort by normalized owner/name
+    : > "$tmp"
+    while read -r r b c; do
+        [[ -z "$r" ]] && continue
+        local k
+        k=$(inst_extract_owner_name "$r")
+        printf "%s\t%s %s %s\n" "$k" "$r" "$b" "$c" >> "$tmp"
+    done < "$tmp_uns"
+
+    # Stable sort by key and strip the key
+    LC_ALL=C sort -t $'\t' -k1,1 -s "$tmp" | cut -f2- > "$tmp_sorted" && mv "$tmp_sorted" "$file"
+    rm -f "$tmp" "$tmp_uns" "$tmp_sorted" 2>/dev/null || true
 }
 
 # Remove an entry from the list by matching owner/name.
@@ -259,16 +274,32 @@ function inst_mod_list_remove() {
     file="$(inst_modules_list_path)"
     [ -f "$file" ] || return 0
     
+    local tmp_uns="${file}.unsorted"
     local tmp="${file}.tmp"
-    
+    local tmp_sorted="${file}.sorted"
+
     # Keep only lines where owner/name doesn't match
-    inst_mod_list_read | while read -r existing_ref existing_branch existing_commit; do
+    : > "$tmp_uns"
+    while read -r existing_ref existing_branch existing_commit; do
+        [[ -z "$existing_ref" ]] && continue
         local existing_owner_name
         existing_owner_name=$(inst_extract_owner_name "$existing_ref")
         if [[ "$existing_owner_name" != "$target_owner_name" ]]; then
-            echo "$existing_ref $existing_branch $existing_commit"
+            echo "$existing_ref $existing_branch $existing_commit" >> "$tmp_uns"
         fi
-    done > "$tmp" && mv "$tmp" "$file"
+    done < <(inst_mod_list_read)
+
+    # Key-prefix and sort for deterministic alphabetical order
+    : > "$tmp"
+    while read -r r b c; do
+        [[ -z "$r" ]] && continue
+        local k
+        k=$(inst_extract_owner_name "$r")
+        printf "%s\t%s %s %s\n" "$k" "$r" "$b" "$c" >> "$tmp"
+    done < "$tmp_uns"
+
+    LC_ALL=C sort -t $'\t' -k1,1 -s "$tmp" | cut -f2- > "$tmp_sorted" && mv "$tmp_sorted" "$file"
+    rm -f "$tmp" "$tmp_uns" "$tmp_sorted" 2>/dev/null || true
 }
 
 # Check if a module is already installed by comparing owner/name
