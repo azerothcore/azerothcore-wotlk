@@ -353,9 +353,7 @@ public:
                 mirkblood->AI()->Talk(SAY_AGGRO, opener);
                 break;
             case EVENT_FLAG:
-                if (!mirkblood)
-                    return;
-                else
+                if (mirkblood)
                     mirkblood->SetImmuneToPC(false);
                 me->Delete();
                 break;
