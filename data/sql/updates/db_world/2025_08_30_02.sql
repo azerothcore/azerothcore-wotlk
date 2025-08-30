@@ -1,3 +1,4 @@
+-- DB update 2025_08_30_01 -> 2025_08_30_02
 -- Update gameobject 'Mag'har Rug' with sniffed values
 -- updated spawns
 DELETE FROM `gameobject` WHERE (`id` IN (182257)) AND (`guid` IN (22684, 22685, 22686));
