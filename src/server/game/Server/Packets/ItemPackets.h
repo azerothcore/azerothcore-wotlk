@@ -18,6 +18,7 @@
 #ifndef ItemPackets_h__
 #define ItemPackets_h__
 
+#include "Item.h"
 #include "ObjectGuid.h"
 #include "Packet.h"
 
