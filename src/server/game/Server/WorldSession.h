@@ -167,6 +167,28 @@ namespace WorldPackets
         class TimeQuery;
         class CorpseMapPositionQuery;
     }
+
+    namespace Item
+    {
+        class SplitItem;
+        class SwapInventoryItem;
+        class AutoEquipItemSlot;
+        class SwapItem;
+        class AutoEquipItem;
+        class DestroyItem;
+        class ReadItem;
+        class SellItem;
+        class BuybackItem;
+        class BuyItemInSlot;
+        class BuyItem;
+        class ListInventory;
+        class AutoStoreBagItem;
+        class WrapItem;
+        class SocketGems;
+        class CancelTempEnchantment;
+        class ItemRefundInfo;
+        class ItemRefund;
+    }
 }
 
 enum AccountDataType
@@ -810,21 +832,21 @@ public:                                                 // opcodes handlers
     void HandleQueryNextMailTime(WorldPacket& recvData);
     void HandleCancelChanneling(WorldPacket& recvData);
 
-    void HandleSplitItemOpcode(WorldPacket& recvPacket);
-    void HandleSwapInvItemOpcode(WorldPacket& recvPacket);
-    void HandleDestroyItemOpcode(WorldPacket& recvPacket);
-    void HandleAutoEquipItemOpcode(WorldPacket& recvPacket);
+    void HandleSplitItemOpcode(WorldPackets::Item::SplitItem& packet);
+    void HandleSwapInvItemOpcode(WorldPackets::Item::SwapInventoryItem& packet);
+    void HandleDestroyItemOpcode(WorldPackets::Item::DestroyItem& packet);
+    void HandleAutoEquipItemOpcode(WorldPackets::Item::AutoEquipItem& packet);
     void HandleItemQuerySingleOpcode(WorldPacket& recvPacket);
-    void HandleSellItemOpcode(WorldPacket& recvPacket);
-    void HandleBuyItemInSlotOpcode(WorldPacket& recvPacket);
-    void HandleBuyItemOpcode(WorldPacket& recvPacket);
-    void HandleListInventoryOpcode(WorldPacket& recvPacket);
-    void HandleAutoStoreBagItemOpcode(WorldPacket& recvPacket);
-    void HandleReadItem(WorldPacket& recvPacket);
-    void HandleAutoEquipItemSlotOpcode(WorldPacket& recvPacket);
-    void HandleSwapItem(WorldPacket& recvPacket);
-    void HandleBuybackItem(WorldPacket& recvPacket);
-    void HandleWrapItemOpcode(WorldPacket& recvPacket);
+    void HandleSellItemOpcode(WorldPackets::Item::SellItem& packet);
+    void HandleBuyItemInSlotOpcode(WorldPackets::Item::BuyItemInSlot& packet);
+    void HandleBuyItemOpcode(WorldPackets::Item::BuyItem& packet);
+    void HandleListInventoryOpcode(WorldPackets::Item::ListInventory& packet);
+    void HandleAutoStoreBagItemOpcode(WorldPackets::Item::AutoStoreBagItem& packet);
+    void HandleReadItem(WorldPackets::Item::ReadItem& packet);
+    void HandleAutoEquipItemSlotOpcode(WorldPackets::Item::AutoEquipItemSlot& packet);
+    void HandleSwapItem(WorldPackets::Item::SwapItem& packet);
+    void HandleBuybackItem(WorldPackets::Item::BuybackItem& packet);
+    void HandleWrapItemOpcode(WorldPackets::Item::WrapItem& packet);
 
     void HandleAttackSwingOpcode(WorldPacket& recvPacket);
     void HandleAttackStopOpcode(WorldPacket& recvPacket);
@@ -1014,12 +1036,12 @@ public:                                                 // opcodes handlers
     void HandleRequestPetInfo(WorldPackets::Pet::RequestPetInfo& packet);
 
     // Socket gem
-    void HandleSocketOpcode(WorldPacket& recvData);
+    void HandleSocketOpcode(WorldPackets::Item::SocketGems& packet);
 
-    void HandleCancelTempEnchantmentOpcode(WorldPacket& recvData);
+    void HandleCancelTempEnchantmentOpcode(WorldPackets::Item::CancelTempEnchantment& packet);
 
-    void HandleItemRefundInfoRequest(WorldPacket& recvData);
-    void HandleItemRefund(WorldPacket& recvData);
+    void HandleItemRefundInfoRequest(WorldPackets::Item::ItemRefundInfo& packet);
+    void HandleItemRefund(WorldPackets::Item::ItemRefund& packet);
 
     void HandleChannelVoiceOnOpcode(WorldPacket& recvData);
     void HandleVoiceSessionEnableOpcode(WorldPacket& recvData);
