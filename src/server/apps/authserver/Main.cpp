@@ -29,6 +29,7 @@
 #include "Config.h"
 #include "DatabaseEnv.h"
 #include "DatabaseLoader.h"
+#include "GitRevision.h"
 #include "IPLocation.h"
 #include "IoContext.h"
 #include "Log.h"
@@ -75,7 +76,7 @@ int main(int argc, char** argv)
     auto vm = GetConsoleArguments(argc, argv, configFile);
 
     // exit if help or version is enabled
-    if (vm.count("help"))
+    if (vm.count("help") || vm.count("version"))
         return 0;
 
     // Add file and args in config
@@ -292,13 +293,11 @@ variables_map GetConsoleArguments(int argc, char** argv, fs::path& configFile)
     }
 
     if (variablesMap.count("help"))
-    {
         std::cout << all << "\n";
-    }
+    else if (variablesMap.count("version"))
+        std::cout << GitRevision::GetFullVersion() << "\n";
     else if (variablesMap.count("dry-run"))
-    {
         sConfigMgr->setDryRun(true);
-    }
 
     return variablesMap;
 }

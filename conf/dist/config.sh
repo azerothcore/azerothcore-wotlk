@@ -149,4 +149,17 @@ export CPUPROFILESIGNAL=${CPUPROFILESIGNAL:-12}
 # Other values for HEAPCHECK: minimal, normal (equivalent to "1"), strict, draconian
 #export HEAPCHECK=${HEAPCHECK:-normal}
 
+##############################################
+#
+#  MODULES LIST FILE (for installer `module` commands)
+#
+# Path to the file where the installer records installed modules
+# with their branch and commit. You can override this path by
+# setting the MODULES_LIST_FILE inside your config.sh or as an environment variable.
+# By default it points inside the repository conf folder.
+# Format of each line:
+#   <module-name> <branch> <commit>
+# Lines starting with '#' and empty lines are ignored.
+export MODULES_LIST_FILE=${MODULES_LIST_FILE:-"$AC_PATH_ROOT/conf/modules.list"}
+
 

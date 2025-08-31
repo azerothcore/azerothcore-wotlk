@@ -80,7 +80,7 @@ namespace PlayerSettingsStore
         return result;
     }
 
-    void UpdateSetting(uint32 playerLowGuid, std::string const& source, uint8 index, uint32 value)
+    void UpdateSetting(uint32 playerLowGuid, std::string const& source, uint32 index, uint32 value)
     {
         if (!sWorld->getBoolConfig(CONFIG_PLAYER_SETTINGS_ENABLED))
             return;
@@ -129,7 +129,7 @@ void Player::_LoadCharacterSettings(PreparedQueryResult result)
     } while (result->NextRow());
 }
 
-PlayerSetting Player::GetPlayerSetting(std::string const& source, uint8 index)
+PlayerSetting Player::GetPlayerSetting(std::string const& source, uint32 index)
 {
     auto it = m_charSettingsMap.find(source);
     if (it == m_charSettingsMap.end() || static_cast<size_t>(index) >= it->second.size())
@@ -156,7 +156,7 @@ void Player::_SavePlayerSettings(CharacterDatabaseTransaction trans)
     }
 }
 
-void Player::UpdatePlayerSetting(std::string const& source, uint8 index, uint32 value)
+void Player::UpdatePlayerSetting(std::string const& source, uint32 index, uint32 value)
 {
     auto it = m_charSettingsMap.find(source);
     size_t const requiredSize = static_cast<size_t>(index) + 1;
