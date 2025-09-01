@@ -1645,10 +1645,7 @@ template <>
 inline void UpdateVisibilityOf_helper(Player* player, GameObject* target,
                                       std::vector<Unit*>& /*v*/)
 {
-    // @HACK: This is to prevent objects like deeprun tram from disappearing
-    // when player moves far from its spawn point while riding it
-    if ((target->GetGOInfo()->type != GAMEOBJECT_TYPE_TRANSPORT))
-        player->GetObjectVisibilityContainer().LinkWorldObjectVisibility(target);
+    player->GetObjectVisibilityContainer().LinkWorldObjectVisibility(target);
 }
 
 template <>
