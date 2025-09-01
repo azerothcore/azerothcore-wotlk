@@ -65,7 +65,7 @@ namespace WorldPackets
 
             void Read() override;
 
-            uint32 Mode = 0;
+            uint32 Mode = DUNGEON_DIFFICULTY_NORMAL;
         };
 
         class ResetFailedNotify final : public ServerPacket
@@ -97,7 +97,7 @@ namespace WorldPackets
 
             void Read() override;
 
-            uint32 Mode = 0;
+            uint32 Mode = RAID_DIFFICULTY_10MAN_NORMAL;
         };
 
         class ResetInstances final : public ClientPacket
