@@ -116,7 +116,7 @@ struct npc_taldaram_flamesphere : public NullCreatureAI
     {
         if (type == POINT_MOTION_TYPE && id == POINT_ORB)
         {
-            me->DisappearAndDie();
+            me->KillSelf();
         }
     }
 
