@@ -19,6 +19,7 @@
 #define InstancePackets_h__
 
 #include "Packet.h"
+#include "Player.h"
 
 namespace WorldPackets
 {
@@ -41,12 +42,7 @@ namespace WorldPackets
 
             WorldPacket const* Write() override;
 
-            /* Reasons for instance reset failure:
-            // 0: There are players inside the instance.
-            // 1: There are players offline in your party.
-            // 2>: There are players in your party attempting to zone into an instance.
-            */
-            uint32 Reason = 0;
+            InstanceResetFailureReason Reason = INSTANCE_RESET_FAILED;
             uint32 MapId = 0;
         };
 

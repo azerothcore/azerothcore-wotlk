@@ -217,7 +217,7 @@ void Player::ResetInstances(ObjectGuid guid, uint8 method, bool isRaid)
                 }
                 else
                 {
-                    p->SendResetInstanceFailed(0, instanceSave->GetMapId());
+                    p->SendResetInstanceFailed(INSTANCE_RESET_FAILED, instanceSave->GetMapId());
                 }
 
                 sInstanceSaveMgr->DeleteInstanceSavedData(instanceSave->GetInstanceId());
@@ -252,7 +252,7 @@ void Player::ResetInstances(ObjectGuid guid, uint8 method, bool isRaid)
                 }
                 else
                 {
-                    p->SendResetInstanceFailed(0, instanceSave->GetMapId());
+                    p->SendResetInstanceFailed(INSTANCE_RESET_FAILED, instanceSave->GetMapId());
                 }
 
                 sInstanceSaveMgr->DeleteInstanceSavedData(instanceSave->GetInstanceId());
@@ -327,7 +327,7 @@ void Player::SendResetInstanceSuccess(uint32 MapId)
     GetSession()->SendPacket(instanceReset.Write());
 }
 
-void Player::SendResetInstanceFailed(uint32 reason, uint32 MapId)
+void Player::SendResetInstanceFailed(InstanceResetFailureReason reason, uint32 MapId)
 {
     WorldPackets::Instance::InstanceResetFailed instanceResetFailed;
     instanceResetFailed.Reason = reason;
