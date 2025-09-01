@@ -22,6 +22,7 @@
 #include "OutdoorPvPScript.h"
 #include "Player.h"
 #include "WorldPacket.h"
+#include "WorldStateDefines.h"
 
 OutdoorPvPGH::OutdoorPvPGH()
 {
@@ -39,41 +40,42 @@ bool OutdoorPvPGH::SetupOutdoorPvP()
 
 void OutdoorPvPGH::SendRemoveWorldStates(Player* player)
 {
-    player->SendUpdateWorldState(GH_UI_SLIDER_DISPLAY, 0);
-    player->SendUpdateWorldState(GH_UI_SLIDER_POS, 0);
-    player->SendUpdateWorldState(GH_UI_SLIDER_N, 0);
+    player->SendUpdateWorldState(WORLD_STATE_OPVP_GH_UI_SLIDER_DISPLAY, 0);
+    player->SendUpdateWorldState(WORLD_STATE_OPVP_GH_UI_SLIDER_POS, 0);
+    player->SendUpdateWorldState(WORLD_STATE_OPVP_GH_UI_SLIDER_N, 0);
 }
 
 OPvPCapturePointGH::OPvPCapturePointGH(OutdoorPvP* pvp) : OPvPCapturePoint(pvp)
 {
-    SetCapturePointData(189310, 571, 2483.68f, -1873.6f, 10.6877f, -0.104719f, 0.0f, 0.0f, 0.0f, 1.0f);
+    SetCapturePointData(189310, MAP_NORTHREND, 2483.68f, -1873.6f, 10.6877f, -0.104719f, 0.0f, 0.0f, 0.0f, 1.0f);
 }
 
-void OPvPCapturePointGH::FillInitialWorldStates(WorldPacket& data)
+void OPvPCapturePointGH::FillInitialWorldStates(WorldPackets::WorldState::InitWorldStates& packet)
 {
-    data << GH_UI_SLIDER_DISPLAY << uint32(0);
-    data << GH_UI_SLIDER_POS << uint32(50);
-    data << GH_UI_SLIDER_N << uint32(20);
+    packet.Worldstates.reserve(3);
+    packet.Worldstates.emplace_back(WORLD_STATE_OPVP_GH_UI_SLIDER_DISPLAY, 0);
+    packet.Worldstates.emplace_back(WORLD_STATE_OPVP_GH_UI_SLIDER_POS, 50);
+    packet.Worldstates.emplace_back(WORLD_STATE_OPVP_GH_UI_SLIDER_N, 20);
 }
 
 void OPvPCapturePointGH::SendChangePhase()
 {
     // send this too, sometimes the slider disappears, dunno why :(
-    SendUpdateWorldState(GH_UI_SLIDER_DISPLAY, 1);
+    SendUpdateWorldState(WORLD_STATE_OPVP_GH_UI_SLIDER_DISPLAY, 1);
     // send these updates to only the ones in this objective
     uint32 phase = (uint32)ceil((_value + _maxValue) / (2 * _maxValue) * 100.0f);
-    SendUpdateWorldState(GH_UI_SLIDER_POS, phase);
-    SendUpdateWorldState(GH_UI_SLIDER_N, _neutralValuePct);
+    SendUpdateWorldState(WORLD_STATE_OPVP_GH_UI_SLIDER_POS, phase);
+    SendUpdateWorldState(WORLD_STATE_OPVP_GH_UI_SLIDER_N, _neutralValuePct);
 }
 
 bool OPvPCapturePointGH::HandlePlayerEnter(Player* player)
 {
     if (OPvPCapturePoint::HandlePlayerEnter(player))
     {
-        player->SendUpdateWorldState(GH_UI_SLIDER_DISPLAY, 1);
+        player->SendUpdateWorldState(WORLD_STATE_OPVP_GH_UI_SLIDER_DISPLAY, 1);
         uint32 phase = (uint32)ceil((_value + _maxValue) / (2 * _maxValue) * 100.0f);
-        player->SendUpdateWorldState(GH_UI_SLIDER_POS, phase);
-        player->SendUpdateWorldState(GH_UI_SLIDER_N, _neutralValuePct);
+        player->SendUpdateWorldState(WORLD_STATE_OPVP_GH_UI_SLIDER_POS, phase);
+        player->SendUpdateWorldState(WORLD_STATE_OPVP_GH_UI_SLIDER_N, _neutralValuePct);
         return true;
     }
     return false;
@@ -81,7 +83,7 @@ bool OPvPCapturePointGH::HandlePlayerEnter(Player* player)
 
 void OPvPCapturePointGH::HandlePlayerLeave(Player* player)
 {
-    player->SendUpdateWorldState(GH_UI_SLIDER_DISPLAY, 0);
+    player->SendUpdateWorldState(WORLD_STATE_OPVP_GH_UI_SLIDER_DISPLAY, 0);
     OPvPCapturePoint::HandlePlayerLeave(player);
 }
 
@@ -106,7 +108,7 @@ void OPvPCapturePointGH::ChangeState()
             break;
     }
 
-    Map* map = sMapMgr->FindMap(571, 0);
+    Map* map = sMapMgr->FindMap(MAP_NORTHREND, 0);
     auto bounds = map->GetGameObjectBySpawnIdStore().equal_range(m_capturePointSpawnId);
     for (auto itr = bounds.first; itr != bounds.second; ++itr)
         itr->second->SetGoArtKit(artkit);

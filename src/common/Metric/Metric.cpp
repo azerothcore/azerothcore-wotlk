@@ -17,8 +17,8 @@
 
 #include "Metric.h"
 #include "Config.h"
-#include "DeadlineTimer.h"
 #include "Log.h"
+#include "SteadyTimer.h"
 #include "Strand.h"
 #include "Tokenize.h"
 #include <boost/algorithm/string/replace.hpp>
@@ -42,8 +42,8 @@ void Metric::Initialize(std::string const& realmName, Acore::Asio::IoContext& io
 {
     _dataStream = std::make_unique<boost::asio::ip::tcp::iostream>();
     _realmName = FormatInfluxDBTagValue(realmName);
-    _batchTimer = std::make_unique<Acore::Asio::DeadlineTimer>(ioContext);
-    _overallStatusTimer = std::make_unique<Acore::Asio::DeadlineTimer>(ioContext);
+    _batchTimer = std::make_unique<boost::asio::steady_timer>(ioContext);
+    _overallStatusTimer = std::make_unique<boost::asio::steady_timer>(ioContext);
     _overallStatusLogger = overallStatusLogger;
     LoadFromConfigs();
 }
@@ -99,25 +99,49 @@ void Metric::LoadFromConfigs()
     // Cancel any scheduled operation if the config changed from Enabled to Disabled.
     if (_enabled && !previousValue)
     {
-        std::string connectionInfo = sConfigMgr->GetOption<std::string>("Metric.ConnectionInfo", "");
+        std::string connectionInfo = sConfigMgr->GetOption<std::string>("Metric.InfluxDB.Connection", "");
         if (connectionInfo.empty())
         {
-            LOG_ERROR("metric", "'Metric.ConnectionInfo' not specified in configuration file.");
+            LOG_ERROR("metric", "Metric.InfluxDB.Connection not specified in configuration file.");
             return;
         }
 
         std::vector<std::string_view> tokens = Acore::Tokenize(connectionInfo, ';', true);
-        if (tokens.size() != 3)
+        _useV2 = sConfigMgr->GetOption<bool>("Metric.InfluxDB.v2", false);
+        if (_useV2)
         {
-            LOG_ERROR("metric", "'Metric.ConnectionInfo' specified with wrong format in configuration file.");
-            return;
+            if (tokens.size() != 2)
+            {
+                LOG_ERROR("metric", "Metric.InfluxDB.Connection specified with wrong format in configuration file. (hostname;port)");
+                return;
+            }
+
+            _hostname.assign(tokens[0]);
+            _port.assign(tokens[1]);
+            _org = sConfigMgr->GetOption<std::string>("Metric.InfluxDB.Org", "");
+            _bucket = sConfigMgr->GetOption<std::string>("Metric.InfluxDB.Bucket", "");
+            _token = sConfigMgr->GetOption<std::string>("Metric.InfluxDB.Token", "");
+
+            if (_org.empty() || _bucket.empty() || _token.empty())
+            {
+                LOG_ERROR("metric", "InfluxDB v2 parameters missing: org, bucket, or token.");
+                return;
+            }
+        }
+        else
+        {
+            if (tokens.size() != 3)
+            {
+                LOG_ERROR("metric", "Metric.InfluxDB.Connection specified with wrong format in configuration file. (hostname;port;database)");
+                return;
+            }
+
+            _hostname.assign(tokens[0]);
+            _port.assign(tokens[1]);
+            _databaseName.assign(tokens[2]);
         }
 
-        _hostname.assign(tokens[0]);
-        _port.assign(tokens[1]);
-        _databaseName.assign(tokens[2]);
         Connect();
-
         ScheduleSend();
         ScheduleOverallStatusLog();
     }
@@ -206,8 +230,18 @@ void Metric::SendBatch()
     if (!GetDataStream().good() && !Connect())
         return;
 
-    GetDataStream() << "POST " << "/write?db=" << _databaseName << " HTTP/1.1\r\n";
-    GetDataStream() << "Host: " << _hostname << ":" << _port << "\r\n";
+    if (_useV2)
+    {
+        GetDataStream() << "POST " << "/api/v2/write?bucket=" << _bucket
+                        << "&org=" << _org << "&precision=ns HTTP/1.1\r\n";
+        GetDataStream() << "Host: " << _hostname << ":" << _port << "\r\n";
+        GetDataStream() << "Authorization: Token " << _token << "\r\n";
+    }
+    else
+    {
+        GetDataStream() << "POST " << "/write?db=" << _databaseName << " HTTP/1.1\r\n";
+        GetDataStream() << "Host: " << _hostname << ":" << _port << "\r\n";
+    }
     GetDataStream() << "Accept: */*\r\n";
     GetDataStream() << "Content-Type: application/octet-stream\r\n";
     GetDataStream() << "Content-Transfer-Encoding: binary\r\n";
@@ -247,7 +281,7 @@ void Metric::ScheduleSend()
 {
     if (_enabled)
     {
-        _batchTimer->expires_from_now(boost::posix_time::seconds(_updateInterval));
+        _batchTimer->expires_at(Acore::Asio::SteadyTimer::GetExpirationTime(_updateInterval));
         _batchTimer->async_wait(std::bind(&Metric::SendBatch, this));
     }
     else
@@ -280,7 +314,7 @@ void Metric::ScheduleOverallStatusLog()
 {
     if (_enabled)
     {
-        _overallStatusTimer->expires_from_now(boost::posix_time::seconds(_overallStatusTimerInterval));
+        _overallStatusTimer->expires_at(Acore::Asio::SteadyTimer::GetExpirationTime(_overallStatusTimerInterval));
         _overallStatusTimer->async_wait([this](const boost::system::error_code&)
         {
             _overallStatusTimerTriggered = true;

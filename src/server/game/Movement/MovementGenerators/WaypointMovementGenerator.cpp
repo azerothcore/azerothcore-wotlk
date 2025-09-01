@@ -240,21 +240,16 @@ bool WaypointMovementGenerator<Creature>::DoUpdate(Creature* creature, uint32 di
     }
     else
     {
-        if (creature->IsStopped())
-            Stop(sWorld->getIntConfig(CONFIG_WAYPOINT_MOVEMENT_STOP_TIME_FOR_PLAYER) * IN_MILLISECONDS);
-        else
-        {
-            bool finished = creature->movespline->Finalized();
-            // xinef: code to detect pre-empetively if we should start movement to next waypoint
-            // xinef: do not start pre-empetive movement if current node has delay or we are ending waypoint movement
-            //if (!finished && !i_path->at(i_currentNode)->delay && ((i_currentNode != i_path->size() - 1) || repeating))
-            //    finished = (creature->movespline->_Spline().length(creature->movespline->_currentSplineIdx() + 1) - creature->movespline->timePassed()) < 200;
+        bool finished = creature->movespline->Finalized();
+        // xinef: code to detect pre-empetively if we should start movement to next waypoint
+        // xinef: do not start pre-empetive movement if current node has delay or we are ending waypoint movement
+        //if (!finished && !i_path->at(i_currentNode)->delay && ((i_currentNode != i_path->size() - 1) || repeating))
+        //    finished = (creature->movespline->_Spline().length(creature->movespline->_currentSplineIdx() + 1) - creature->movespline->timePassed()) < 200;
 
-            if (finished)
-            {
-                OnArrived(creature);
-                return StartMove(creature);
-            }
+        if (finished)
+        {
+            OnArrived(creature);
+            return StartMove(creature);
         }
     }
     return true;
@@ -287,10 +282,16 @@ void WaypointMovementGenerator<Creature>::MovementInform(Creature* creature)
     }
 }
 
-void WaypointMovementGenerator<Creature>::Pause(uint32 /*timer*/)
+void WaypointMovementGenerator<Creature>::Pause(uint32 timer)
 {
-    stalled = true;
-    i_nextMoveTime.Reset(1);
+    if (timer)
+        i_nextMoveTime.Reset(timer);
+    else
+    {
+        // No timer? Will be paused forever until ::Resume is called
+        stalled = true;
+        i_nextMoveTime.Reset(1);
+    }
 }
 
 void WaypointMovementGenerator<Creature>::Resume(uint32 /*overrideTimer/*/)

@@ -18,6 +18,7 @@
 #include "WardenCheckMgr.h"
 #include "Database/DatabaseEnv.h"
 #include "Log.h"
+#include "QueryResult.h"
 #include "Util.h"
 #include "Warden.h"
 #include "WorldSession.h"

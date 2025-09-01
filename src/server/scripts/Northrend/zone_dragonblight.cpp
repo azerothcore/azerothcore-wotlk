@@ -15,6 +15,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "AreaDefines.h"
 #include "AreaTriggerScript.h"
 #include "CellImpl.h"
 #include "Chat.h"
@@ -32,7 +33,6 @@
 #include "SpellScriptLoader.h"
 #include "Vehicle.h"
 
-// Ours
 /********
 QUEST Conversing With the Depths (12032)
 ********/
@@ -656,8 +656,7 @@ enum WintergardeGryphon
     POINT_TAKE_OFF                              = 2,
 
     QUEST_FLIGHT_OF_THE_WINTERGARDE_DEFENDER    = 12237,
-    GO_TEMP_GRYPHON_STATION                     = 188679,
-    AREA_WINTERGARDE_KEEP                       = 4177
+    GO_TEMP_GRYPHON_STATION                     = 188679
 };
 
 class npc_wintergarde_gryphon : public VehicleAI
@@ -1068,7 +1067,7 @@ public:
                 go->Delete();
             WretchedGhoulCleaner cleaner;
             Acore::CreatureWorker<WretchedGhoulCleaner> worker(me, cleaner);
-            Cell::VisitGridObjects(me, worker, 150.0f);
+            Cell::VisitObjects(me, worker, 150.0f);
         }
 
         void Reset() override
@@ -1282,7 +1281,7 @@ public:
                     {
                         WretchedGhoulCleaner cleaner;
                         Acore::CreatureWorker<WretchedGhoulCleaner> worker(me, cleaner);
-                        Cell::VisitGridObjects(me, worker, 150.0f);
+                        Cell::VisitObjects(me, worker, 150.0f);
 
                         if (Creature* c = me->FindNearestCreature(NPC_SAC_LIGHTS_VENGEANCE, 150.0f, true))
                             if (Creature* v = me->FindNearestCreature(NPC_SAC_VEGARD_1, 50.0f, true))
@@ -1663,8 +1662,6 @@ public:
         }
     };
 };
-
-// Theirs
 
 /*#####
 # npc_commander_eligor_dawnbringer
@@ -2245,7 +2242,6 @@ class spell_dragonblight_corrosive_spit : public AuraScript
 
 void AddSC_dragonblight()
 {
-    // Ours
     new npc_conversing_with_the_depths_trigger();
     new go_the_pearl_of_the_depths();
     new npc_hourglass_of_eternity();
@@ -2266,12 +2262,9 @@ void AddSC_dragonblight()
     new npc_q24545_vegard_dummy();
     new npc_q24545_vegard();
     new npc_spiritual_insight();
-
-    // Theirs
     new npc_commander_eligor_dawnbringer();
     RegisterSpellScript(spell_q12096_q12092_dummy);
     RegisterSpellScript(spell_q12096_q12092_bark);
     new npc_torturer_lecraft();
-
     RegisterSpellScript(spell_dragonblight_corrosive_spit);
 }

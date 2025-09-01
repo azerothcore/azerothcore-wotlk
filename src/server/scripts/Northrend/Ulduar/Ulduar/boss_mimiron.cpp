@@ -1129,7 +1129,7 @@ public:
                 DoMeleeAttackIfReady();
 
             Unit* cannon = GetS3();
-            if (!cannon || cannon->HasUnitState(UNIT_STATE_CASTING) || me->HasUnitState(UNIT_STATE_CASTING) || me->HasAuraType(SPELL_AURA_MOD_SILENCE))
+            if (!cannon || cannon->HasUnitState(UNIT_STATE_CASTING) || me->HasUnitState(UNIT_STATE_CASTING) || me->HasSilenceAura())
                 return;
 
             switch (events.ExecuteEvent())
@@ -1760,21 +1760,7 @@ public:
                     break;
                 case EVENT_SPELL_PLASMA_BALL:
                     if (!immobilized)
-                    {
-                        if (Phase == 3)
-                        {
-                            if (Unit* victim = me->GetVictim())
-                                me->CastSpell(victim, SPELL_PLASMA_BALL, false);
-                        }
-                        else
-                        {
-                            if (Unit* victim = SelectTarget(SelectTargetMethod::Random, 0, 27.5f, true))
-                            {
-                                me->SetFacingToObject(victim);
-                                me->CastSpell(victim, SPELL_PLASMA_BALL, false);
-                            }
-                        }
-                    }
+                        DoCastVictim(SPELL_PLASMA_BALL);
                     events.Repeat(3s);
                     break;
                 case EVENT_SUMMON_BOMB_BOT:

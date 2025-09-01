@@ -23,9 +23,10 @@
 #include "ScriptedGossip.h"
 #include "SpellAuras.h"
 #include "SpellInfo.h"
+#include "SpellScript.h"
+#include "SpellScriptLoader.h"
 #include "Vehicle.h"
 
-// Ours
 enum AlchemistItemRequirements
 {
     QUEST_ALCHEMIST_APPRENTICE      = 12541,
@@ -233,88 +234,6 @@ public:
     }
 };
 
-enum eFeedinDaGoolz
-{
-    NPC_DECAYING_GHOUL                          = 28565,
-    GO_BOWL                                     = 190656,
-};
-
-class npc_feedin_da_goolz : public CreatureScript
-{
-public:
-    npc_feedin_da_goolz() : CreatureScript("npc_feedin_da_goolz") { }
-
-    CreatureAI* GetAI(Creature* creature) const override
-    {
-        return new npc_feedin_da_goolzAI(creature);
-    }
-
-    struct npc_feedin_da_goolzAI : public NullCreatureAI
-    {
-        npc_feedin_da_goolzAI(Creature* creature) : NullCreatureAI(creature) { findTimer = 1; checkTimer = 0; }
-
-        uint32 findTimer;
-        uint32 checkTimer;
-        ObjectGuid ghoulFed;
-
-        void UpdateAI(uint32 diff) override
-        {
-            if (findTimer)
-            {
-                findTimer += diff;
-                if (findTimer >= 1000)
-                {
-                    if (Creature* ghoul = me->FindNearestCreature(NPC_DECAYING_GHOUL, 30.0f, true))
-                    {
-                        ghoul->SetReactState(REACT_DEFENSIVE);
-                        float o = me->GetAngle(ghoul);
-                        ghoul->GetMotionMaster()->MovePoint(1, me->GetPositionX() + 2 * cos(o), me->GetPositionY() + 2 * std::sin(o), me->GetPositionZ());
-                        checkTimer = 1;
-                        findTimer = 0;
-                    }
-                    else
-                        findTimer = 1;
-                }
-                return;
-            }
-
-            if (checkTimer)
-            {
-                checkTimer += diff;
-                if (checkTimer >= 1500)
-                {
-                    checkTimer = 1;
-                    if (!ghoulFed)
-                    {
-                        if (Creature* ghoul = me->FindNearestCreature(NPC_DECAYING_GHOUL, 3.0f, true))
-                        {
-                            ghoulFed = ghoul->GetGUID();
-                            ghoul->HandleEmoteCommand(EMOTE_ONESHOT_EAT);
-                        }
-                    }
-                    else
-                    {
-                        if (GameObject* bowl = me->FindNearestGameObject(GO_BOWL, 10.0f))
-                            bowl->Delete();
-
-                        if (Creature* ghoul = ObjectAccessor::GetCreature(*me, ghoulFed))
-                        {
-                            ghoul->SetReactState(REACT_AGGRESSIVE);
-                            ghoul->GetMotionMaster()->MoveTargetedHome();
-                        }
-
-                        if (Unit* owner = me->ToTempSummon()->GetSummonerUnit())
-                            if (Player* player = owner->ToPlayer())
-                                player->KilledMonsterCredit(me->GetEntry());
-
-                        me->DespawnOrUnsummon(1);
-                    }
-                }
-            }
-        }
-    };
-};
-
 enum overlordDrakuru
 {
     SPELL_SHADOW_BOLT                   = 54113,
@@ -322,6 +241,7 @@ enum overlordDrakuru
     SPELL_THROW_BRIGHT_CRYSTAL          = 54087,
     SPELL_TELEPORT_EFFECT               = 52096,
     SPELL_SCOURGE_DISGUISE              = 51966,
+    SPELL_SCOURGE_DISGUISE_INSTANT_CAST = 52192,
     SPELL_BLIGHT_FOG                    = 54104,
     SPELL_THROW_PORTAL_CRYSTAL          = 54209,
     SPELL_ARTHAS_PORTAL                 = 51807,
@@ -751,7 +671,6 @@ public:
     }
 };
 
-// Theirs
 /*####
 ## npc_released_offspring_harkoa
 ####*/
@@ -900,67 +819,61 @@ public:
     }
 };
 
-enum StormCloud
+enum ScourgeDisguiseInstability
 {
-    STORM_COULD         = 29939,
-    HEALING_WINDS       = 55549,
-    STORM_VISUAL        = 55708,
-    GYMERS_GRAB         = 55516,
-    RIDE_VEHICLE        = 43671
+    SCOURGE_DISGUISE_FAILING_MESSAGE_1       = 28552, // Scourge Disguise Failing! Find a safe place!
+    SCOURGE_DISGUISE_FAILING_MESSAGE_2       = 28758, // Scourge Disguise Failing! Run for cover!
+    SCOURGE_DISGUISE_FAILING_MESSAGE_3       = 28759, // Scourge Disguise Failing! Hide quickly!
 };
+std::vector<uint32> const scourgeDisguiseTextIDs = { SCOURGE_DISGUISE_FAILING_MESSAGE_1, SCOURGE_DISGUISE_FAILING_MESSAGE_2, SCOURGE_DISGUISE_FAILING_MESSAGE_3 };
 
-class npc_storm_cloud : public CreatureScript
+class spell_scourge_disguise_instability : public AuraScript
 {
-public:
-    npc_storm_cloud() : CreatureScript("npc_storm_cloud") { }
+    PrepareAuraScript(spell_scourge_disguise_instability);
 
-    struct npc_storm_cloudAI : public ScriptedAI
+    bool Validate(SpellInfo const* /*spellInfo*/) override
     {
-        npc_storm_cloudAI(Creature* creature) : ScriptedAI(creature) { }
+        return ValidateSpellInfo({ SPELL_SCOURGE_DISGUISE_EXPIRING });
+    }
 
-        void Reset() override
+    void HandleApply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
+    {
+        SetDuration(urand(3 * MINUTE * IN_MILLISECONDS, 5 * MINUTE * IN_MILLISECONDS));
+    }
+
+    void HandleRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
+    {
+        if (Unit* caster = GetCaster())
         {
-            me->CastSpell(me, STORM_VISUAL, true);
-        }
-
-        void JustRespawned() override
-        {
-            Reset();
-        }
-
-        void SpellHit(Unit* caster, SpellInfo const* spell) override
-        {
-            if (spell->Id != GYMERS_GRAB)
-                return;
-
-            if (Vehicle* veh = caster->GetVehicleKit())
-                if (veh->GetAvailableSeatCount() != 0)
+            if (Player* player = caster->ToPlayer())
+            {
+                if (player->HasAnyAuras(SPELL_SCOURGE_DISGUISE, SPELL_SCOURGE_DISGUISE_INSTANT_CAST))
                 {
-                    me->CastSpell(caster, RIDE_VEHICLE, true);
-                    me->CastSpell(caster, HEALING_WINDS, true);
+                    uint32 textId = Acore::Containers::SelectRandomContainerElement(scourgeDisguiseTextIDs);
+                    player->Unit::Whisper(textId, player, true);
+                    player->CastSpell(player, SPELL_SCOURGE_DISGUISE_EXPIRING, true);
                 }
+            }
         }
-    };
+    }
 
-    CreatureAI* GetAI(Creature* creature) const override
+    void Register() override
     {
-        return new npc_storm_cloudAI(creature);
+        OnEffectApply += AuraEffectApplyFn(spell_scourge_disguise_instability::HandleApply, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
+        OnEffectRemove += AuraEffectRemoveFn(spell_scourge_disguise_instability::HandleRemove, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
     }
 };
 
 void AddSC_zuldrak()
 {
-    // Ours
     new npc_finklestein();
     new go_finklestein_cauldron();
-    new npc_feedin_da_goolz();
     new npc_overlord_drakuru_betrayal();
     new npc_drakuru_shackles();
     new npc_captured_rageclaw();
-
-    // Theirs
     new npc_released_offspring_harkoa();
     new npc_crusade_recruit();
     new go_scourge_enclosure();
-    new npc_storm_cloud();
+
+    RegisterSpellScript(spell_scourge_disguise_instability);
 }

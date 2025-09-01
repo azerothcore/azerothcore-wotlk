@@ -58,7 +58,8 @@ namespace Acore
 
         void operator()(WorldPacket& data, LocaleConstant loc_idx)
         {
-            char const* text = sObjectMgr->GetAcoreString(_textId, loc_idx);
+            std::string strtext = sObjectMgr->GetAcoreString(_textId, loc_idx);
+            char const* text = strtext.c_str();
             if (_args)
             {
                 // we need copy va_list before use or original va_list will corrupted
@@ -95,9 +96,12 @@ namespace Acore
 
         void operator()(WorldPacket& data, LocaleConstant loc_idx)
         {
-            char const* text = sObjectMgr->GetAcoreString(_textId, loc_idx);
-            char const* arg1str = _arg1 ? sObjectMgr->GetAcoreString(_arg1, loc_idx) : "";
-            char const* arg2str = _arg2 ? sObjectMgr->GetAcoreString(_arg2, loc_idx) : "";
+            std::string strtext = sObjectMgr->GetAcoreString(_textId, loc_idx);
+            char const* text = strtext.c_str();
+            std::string stragr1str = sObjectMgr->GetAcoreString(_arg1, loc_idx);
+            char const* arg1str = _arg1 ? stragr1str.c_str() : "";
+            std::string strarg2str = sObjectMgr->GetAcoreString(_arg2, loc_idx);
+            char const* arg2str = _arg2 ? strarg2str.c_str() : "";
 
             char str[2048];
             snprintf(str, 2048, text, arg1str, arg2str);
@@ -190,6 +194,8 @@ Battleground::Battleground()
     m_PrematureCountDownTimer = 0;
 
     m_HonorMode = BG_NORMAL;
+
+    m_SetupCompleted = false;
 
     StartDelayTimes[BG_STARTING_EVENT_FIRST]  = BG_START_DELAY_2M;
     StartDelayTimes[BG_STARTING_EVENT_SECOND] = BG_START_DELAY_1M;
@@ -471,10 +477,8 @@ inline void Battleground::_ProcessJoin(uint32 diff)
             itr->second->ResetAllPowers();
     }
 
-    if (!(m_Events & BG_STARTING_EVENT_1))
+    if (!m_SetupCompleted)
     {
-        m_Events |= BG_STARTING_EVENT_1;
-
         if (!FindBgMap())
         {
             LOG_ERROR("bg.battleground", "Battleground::_ProcessJoin: map (map id: {}, instance id: {}) is not created!", m_MapId, m_InstanceID);
@@ -490,13 +494,52 @@ inline void Battleground::_ProcessJoin(uint32 diff)
         }
 
         StartingEventCloseDoors();
-        SetStartDelayTime(StartDelayTimes[BG_STARTING_EVENT_FIRST]);
 
-        // First start warning - 2 or 1 minute
+        // Get the configured prep time
+        uint32 configuredPrepTime;
+
+        // Special case for Strand of the Ancients - always use 120 seconds due to boat timing mechanics
+        if (GetBgTypeID() == BATTLEGROUND_SA)
+            configuredPrepTime = 120 * IN_MILLISECONDS;
+        else
+            configuredPrepTime = isArena() ?
+                sWorld->getIntConfig(CONFIG_ARENA_PREP_TIME) * IN_MILLISECONDS :
+                sWorld->getIntConfig(CONFIG_BATTLEGROUND_PREP_TIME) * IN_MILLISECONDS;
+
+        SetStartDelayTime(configuredPrepTime);
+
+        // Pre-mark events for announcements that should be skipped based on configured prep time
+        if (configuredPrepTime < StartDelayTimes[BG_STARTING_EVENT_FIRST])
+        {
+            // Skip first announcement (120s for BG, 60s for Arena)
+            m_Events |= BG_STARTING_EVENT_1;
+
+            if (configuredPrepTime < StartDelayTimes[BG_STARTING_EVENT_SECOND])
+            {
+                // Skip second announcement (60s for BG, 30s for Arena)
+                m_Events |= BG_STARTING_EVENT_2;
+
+                if (configuredPrepTime < StartDelayTimes[BG_STARTING_EVENT_THIRD])
+                {
+                    // Skip third announcement (30s for BG, 15s for Arena)
+                    m_Events |= BG_STARTING_EVENT_3;
+                }
+            }
+        }
+
+        // Mark setup as completed
+        m_SetupCompleted = true;
+    }
+
+    // First announcement at 120s or 60s (Depending on BG or Arena and configured time)
+    if (GetStartDelayTime() <= StartDelayTimes[BG_STARTING_EVENT_FIRST] && !(m_Events & BG_STARTING_EVENT_1))
+    {
+        m_Events |= BG_STARTING_EVENT_1;
+
         if (StartMessageIds[BG_STARTING_EVENT_FIRST])
             SendBroadcastText(StartMessageIds[BG_STARTING_EVENT_FIRST], CHAT_MSG_BG_SYSTEM_NEUTRAL);
     }
-    // After 1 minute or 30 seconds, warning is signaled
+    // Second announcement at 60s or 30s
     else if (GetStartDelayTime() <= StartDelayTimes[BG_STARTING_EVENT_SECOND] && !(m_Events & BG_STARTING_EVENT_2))
     {
         m_Events |= BG_STARTING_EVENT_2;
@@ -504,7 +547,7 @@ inline void Battleground::_ProcessJoin(uint32 diff)
         if (StartMessageIds[BG_STARTING_EVENT_SECOND])
             SendBroadcastText(StartMessageIds[BG_STARTING_EVENT_SECOND], CHAT_MSG_BG_SYSTEM_NEUTRAL);
     }
-    // After 30 or 15 seconds, warning is signaled
+    // Third announcement at 30s or 15s
     else if (GetStartDelayTime() <= StartDelayTimes[BG_STARTING_EVENT_THIRD] && !(m_Events & BG_STARTING_EVENT_3))
     {
         m_Events |= BG_STARTING_EVENT_3;
@@ -539,11 +582,12 @@ inline void Battleground::_ProcessJoin(uint32 diff)
                     break;
             }
     }
-    // Delay expired (after 2 or 1 minute)
+    // Delay expired (after configured prep time)
     else if (GetStartDelayTime() <= 0 && !(m_Events & BG_STARTING_EVENT_4))
     {
         m_Events |= BG_STARTING_EVENT_4;
 
+        // Start the battle
         StartingEventOpenDoors();
 
         if (StartMessageIds[BG_STARTING_EVENT_FOURTH])
@@ -844,7 +888,7 @@ void Battleground::EndBattleground(PvPTeamId winnerTeamId)
         TeamId bgTeamId = player->GetBgTeamId();
 
         // should remove spirit of redemption
-        if (player->HasAuraType(SPELL_AURA_SPIRIT_OF_REDEMPTION))
+        if (player->HasSpiritOfRedemptionAura())
             player->RemoveAurasByType(SPELL_AURA_MOD_SHAPESHIFT);
 
         if (!player->IsAlive())
@@ -1008,7 +1052,7 @@ void Battleground::RemovePlayerAtLeave(Player* player)
     RemovePlayer(player);
 
     // should remove spirit of redemption
-    if (player->HasAuraType(SPELL_AURA_SPIRIT_OF_REDEMPTION))
+    if (player->HasSpiritOfRedemptionAura())
         player->RemoveAurasByType(SPELL_AURA_MOD_SHAPESHIFT);
 
     // if the player was a match participant
@@ -1657,13 +1701,6 @@ void Battleground::EndNow()
     RemoveFromBGFreeSlotQueue();
     SetStatus(STATUS_WAIT_LEAVE);
     SetEndTime(0);
-}
-
-// To be removed
-char const* Battleground::GetAcoreString(int32 entry)
-{
-    // FIXME: now we have different DBC locales and need localized message for each target client
-    return sObjectMgr->GetAcoreStringForDBCLocale(entry);
 }
 
 void Battleground::HandleTriggerBuff(GameObject* gameObject)

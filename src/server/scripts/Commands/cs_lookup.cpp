@@ -15,13 +15,6 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-/* ScriptData
-Name: lookup_commandscript
-%Complete: 100
-Comment: All lookup related commands
-Category: commandscripts
-EndScriptData */
-
 #include "CharacterCache.h"
 #include "Chat.h"
 #include "CommandScript.h"
@@ -269,17 +262,13 @@ public:
     static bool HandleLookupEventCommand(ChatHandler* handler, Tail namePart)
     {
         if (namePart.empty())
-        {
             return false;
-        }
 
         std::wstring wNamePart;
 
         // converting string that we try to find to lower case
         if (!Utf8toWStr(namePart, wNamePart))
-        {
             return false;
-        }
 
         wstrToLower(wNamePart);
 
@@ -294,11 +283,9 @@ public:
         {
             GameEventData const& eventData = events[id];
 
-            std::string descr = eventData.description;
+            std::string descr = eventData.Description;
             if (descr.empty())
-            {
                 continue;
-            }
 
             if (Utf8FitTo(descr, wNamePart))
             {
@@ -308,28 +295,20 @@ public:
                     return true;
                 }
 
-                char const* active = activeEvents.find(id) != activeEvents.end() ? handler->GetAcoreString(LANG_ACTIVE) : "";
+                std::string active = activeEvents.find(id) != activeEvents.end() ? handler->GetAcoreString(LANG_ACTIVE) : "";
 
                 if (handler->GetSession())
-                {
-                    handler->PSendSysMessage(LANG_EVENT_ENTRY_LIST_CHAT, id, id, eventData.description, active);
-                }
+                    handler->PSendSysMessage(LANG_EVENT_ENTRY_LIST_CHAT, id, id, eventData.Description, active);
                 else
-                {
-                    handler->PSendSysMessage(LANG_EVENT_ENTRY_LIST_CONSOLE, id, eventData.description, active);
-                }
+                    handler->PSendSysMessage(LANG_EVENT_ENTRY_LIST_CONSOLE, id, eventData.Description, active);
 
                 if (!found)
-                {
                     found = true;
-                }
             }
         }
 
         if (!found)
-        {
             handler->SendSysMessage(LANG_NOEVENTFOUND);
-        }
 
         return true;
     }
@@ -806,7 +785,7 @@ public:
                                 return true;
                             }
 
-                            char const* statusStr = "";
+                            std::string statusStr = "";
 
                             if (target)
                             {
@@ -862,7 +841,7 @@ public:
                     return true;
                 }
 
-                char const* statusStr = "";
+                std::string statusStr = "";
 
                 if (target)
                 {
@@ -1498,20 +1477,16 @@ public:
                     return true;
                 }
 
-                char const* knownStr = target && target->HasTitle(titleInfo) ? handler->GetAcoreString(LANG_KNOWN) : "";
-                char const* activeStr = target && target->GetUInt32Value(PLAYER_CHOSEN_TITLE) == titleInfo->bit_index ? handler->GetAcoreString(LANG_ACTIVE) : "";
+                std::string knownStr = target && target->HasTitle(titleInfo) ? handler->GetAcoreString(LANG_KNOWN) : "";
+                std::string activeStr = target && target->GetUInt32Value(PLAYER_CHOSEN_TITLE) == titleInfo->bit_index ? handler->GetAcoreString(LANG_ACTIVE) : "";
 
                 std::string titleNameStr = Acore::StringFormat(name, targetName);
 
                 // send title in "id (idx:idx) - [namedlink locale]" format
                 if (handler->GetSession())
-                {
                     handler->PSendSysMessage(LANG_TITLE_LIST_CHAT, titleInfo->ID, titleInfo->bit_index, titleInfo->ID, titleNameStr, localeNames[locale], knownStr, activeStr);
-                }
                 else
-                {
                     handler->PSendSysMessage(LANG_TITLE_LIST_CONSOLE, titleInfo->ID, titleInfo->bit_index, titleNameStr, localeNames[locale], knownStr, activeStr);
-                }
 
                 ++counter;
             }

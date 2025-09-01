@@ -18,7 +18,7 @@
 #ifndef ACORE_WAYPOINTMANAGER_H
 #define ACORE_WAYPOINTMANAGER_H
 
-#include "Common.h"
+#include "Define.h"
 #include <optional>
 #include <unordered_map>
 #include <vector>

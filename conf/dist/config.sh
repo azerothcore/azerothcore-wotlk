@@ -14,6 +14,10 @@ BINPATH="$AC_PATH_ROOT/env/dist"
 # Change it if you really know what you're doing.
 # OSTYPE=""
 
+# Configuration for the installer to skip the MySQL installation.
+# This is useful when your MySQL is in a container or another machine.
+SKIP_MYSQL_INSTALL=${SKIP_MYSQL_INSTALL:-false}
+
 # When using linux, our installer automatically get information about your distro
 # using lsb_release. If your distro is not supported but it's based on ubuntu or debian,
 # please change it to one of these values.
@@ -84,6 +88,7 @@ CCOREPCH=${CCOREPCH:-ON}
 CAPPS_BUILD=${CAPPS_BUILD:-all}
 
 # build tools list variable
+# example: none, db-only, maps-only, all
 CTOOLS_BUILD=${CTOOLS_BUILD:-none}
 
 # build apps list
@@ -143,5 +148,18 @@ export CPUPROFILESIGNAL=${CPUPROFILESIGNAL:-12}
 
 # Other values for HEAPCHECK: minimal, normal (equivalent to "1"), strict, draconian
 #export HEAPCHECK=${HEAPCHECK:-normal}
+
+##############################################
+#
+#  MODULES LIST FILE (for installer `module` commands)
+#
+# Path to the file where the installer records installed modules
+# with their branch and commit. You can override this path by
+# setting the MODULES_LIST_FILE inside your config.sh or as an environment variable.
+# By default it points inside the repository conf folder.
+# Format of each line:
+#   <module-name> <branch> <commit>
+# Lines starting with '#' and empty lines are ignored.
+export MODULES_LIST_FILE=${MODULES_LIST_FILE:-"$AC_PATH_ROOT/conf/modules.list"}
 
 

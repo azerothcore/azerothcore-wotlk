@@ -1111,10 +1111,10 @@ bool SpellArea::IsFitToRequirements(Player const* player, uint32 newZone, uint32
                 AreaTableEntry const* pArea = sAreaTableStore.LookupEntry(player->GetAreaId());
                 if (!(pArea && pArea->flags & AREA_FLAG_NO_FLY_ZONE))
                     return false;
-                if (!player->HasAuraType(SPELL_AURA_MOD_INCREASE_MOUNTED_FLIGHT_SPEED) && !player->HasAuraType(SPELL_AURA_FLY))
+                if (!player->HasIncreaseMountedFlightSpeedAura() && !player->HasFlyAura())
                     return false;
                 // Xinef: Underbelly elixir
-                if (player->GetPositionZ() < 637.0f && player->HasAuraType(SPELL_AURA_TRANSFORM))
+                if (player->GetPositionZ() < 637.0f && player->HasTransformAura())
                     return false;
                 break;
             }
@@ -1124,7 +1124,7 @@ bool SpellArea::IsFitToRequirements(Player const* player, uint32 newZone, uint32
                     return false;
 
                 Battlefield* Bf = sBattlefieldMgr->GetBattlefieldToZoneId(player->GetZoneId());
-                if (!Bf || Bf->CanFlyIn() || (!player->HasAuraType(SPELL_AURA_MOD_INCREASE_MOUNTED_FLIGHT_SPEED) && !player->HasAuraType(SPELL_AURA_FLY)))
+                if (!Bf || Bf->CanFlyIn() || (!player->HasIncreaseMountedFlightSpeedAura() && !player->HasFlyAura()))
                     return false;
                 break;
             }
@@ -1614,7 +1614,7 @@ void SpellMgr::LoadSpellTargetPositions()
         }
         if (found)
         {
-            if (!sSpellMgr->GetSpellTargetPosition(i))
+            if (!GetSpellTargetPosition(i))
                 LOG_DEBUG("spells.aura", "Spell (ID: {}) does not have record in `spell_target_position`", i);
         }
     }*/
@@ -2348,7 +2348,7 @@ void SpellMgr::LoadPetLevelupSpellMap()
     LOG_INFO("server.loading", " ");
 }
 
-bool LoadPetDefaultSpells_helper(CreatureTemplate const* cInfo, PetDefaultSpellsEntry& petDefSpells)
+static bool LoadPetDefaultSpells_helper(CreatureTemplate const* cInfo, PetDefaultSpellsEntry& petDefSpells)
 {
     // skip empty list;
     bool have_spell = false;
@@ -2913,16 +2913,6 @@ void SpellMgr::LoadSpellInfoCustomAttributes()
                     }
                 }
                 break;
-                case SPELL_AURA_PERIODIC_HEAL:
-                case SPELL_AURA_PERIODIC_DAMAGE:
-                case SPELL_AURA_PERIODIC_DAMAGE_PERCENT:
-                case SPELL_AURA_PERIODIC_LEECH:
-                case SPELL_AURA_PERIODIC_MANA_LEECH:
-                case SPELL_AURA_PERIODIC_HEALTH_FUNNEL:
-                case SPELL_AURA_PERIODIC_ENERGIZE:
-                case SPELL_AURA_OBS_MOD_HEALTH:
-                case SPELL_AURA_OBS_MOD_POWER:
-                case SPELL_AURA_POWER_BURN:
                 case SPELL_AURA_TRACK_CREATURES:
                 case SPELL_AURA_MOD_RANGED_HASTE:
                 case SPELL_AURA_MOD_POSSESS_PET:
@@ -3458,9 +3448,9 @@ void SpellMgr::LoadSpellInfoCustomAttributes()
 
         spellInfo->_InitializeExplicitTargetMask();
 
-        if (sSpellMgr->HasSpellCooldownOverride(spellInfo->Id))
+        if (HasSpellCooldownOverride(spellInfo->Id))
         {
-            SpellCooldownOverride spellOverride = sSpellMgr->GetSpellCooldownOverride(spellInfo->Id);
+            SpellCooldownOverride spellOverride = GetSpellCooldownOverride(spellInfo->Id);
 
             if (spellInfo->RecoveryTime != spellOverride.RecoveryTime)
             {
@@ -3507,7 +3497,7 @@ void SpellMgr::LoadSpellInfoCustomAttributes()
                     case SPELL_AURA_PERIODIC_TRIGGER_SPELL:
                     case SPELL_AURA_PERIODIC_TRIGGER_SPELL_FROM_CLIENT:
                     case SPELL_AURA_PERIODIC_TRIGGER_SPELL_WITH_VALUE:
-                        if (SpellInfo const* triggerSpell = sSpellMgr->GetSpellInfo(spellInfo->Effects[j].TriggerSpell))
+                        if (SpellInfo const* triggerSpell = GetSpellInfo(spellInfo->Effects[j].TriggerSpell))
                         {
                             overrideAttr = true;
                             if (triggerSpell->AttributesCu & SPELL_ATTR0_CU_BINARY_SPELL)

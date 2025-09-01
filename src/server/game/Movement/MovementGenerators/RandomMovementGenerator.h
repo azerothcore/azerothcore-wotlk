@@ -20,6 +20,7 @@
 
 #include "MovementGenerator.h"
 #include "PathGenerator.h"
+#include "Timer.h"
 
 #define RANDOM_POINTS_NUMBER        12
 #define RANDOM_LINKS_COUNT          7

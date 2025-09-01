@@ -185,10 +185,7 @@ void Channel::JoinChannel(Player* player, std::string const& pass)
         return;
     }
 
-    if (HasFlag(CHANNEL_FLAG_LFG) &&
-            sWorld->getBoolConfig(CONFIG_RESTRICTED_LFG_CHANNEL) &&
-            AccountMgr::IsPlayerAccount(player->GetSession()->GetSecurity()) &&
-            player->GetGroup())
+    if (IsLFG() && sWorld->getBoolConfig(CONFIG_RESTRICTED_LFG_CHANNEL) && !player->IsUsingLfg())
     {
         WorldPacket data;
         MakeNotInLfg(&data);
@@ -1233,8 +1230,8 @@ void Channel::ToggleModeration(Player* player)
         return;
     }
 
-    const uint32 level = sWorld->getIntConfig(CONFIG_GM_LEVEL_CHANNEL_MODERATION);
-    const bool gm = (level && player->GetSession()->GetSecurity() >= level);
+    const AccountTypes level = static_cast<AccountTypes>(sWorld->getIntConfig(CONFIG_GM_LEVEL_CHANNEL_MODERATION));
+    const bool gm = (player->GetSession()->GetSecurity() >= level);
 
     if (!playersStore[guid].IsModerator() && !gm)
     {

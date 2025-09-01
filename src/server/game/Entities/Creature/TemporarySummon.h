@@ -39,12 +39,13 @@ struct TempSummonData
 class TempSummon : public Creature
 {
 public:
-    explicit TempSummon(SummonPropertiesEntry const* properties, ObjectGuid owner, bool isWorldObject);
+    explicit TempSummon(SummonPropertiesEntry const* properties, ObjectGuid owner);
     ~TempSummon() override = default;
     void Update(uint32 time) override;
     virtual void InitStats(uint32 lifetime);
     virtual void InitSummon();
     virtual void UnSummon(uint32 msTime = 0);
+    void UpdateObjectVisibilityOnCreate() override;
     void RemoveFromWorld() override;
     void SetTempSummonType(TempSummonType type);
     void SaveToDB(uint32 /*mapid*/, uint8 /*spawnMask*/, uint32 /*phaseMask*/) override {}
@@ -75,7 +76,7 @@ private:
 class Minion : public TempSummon
 {
 public:
-    Minion(SummonPropertiesEntry const* properties, ObjectGuid owner, bool isWorldObject);
+    Minion(SummonPropertiesEntry const* properties, ObjectGuid owner);
     void InitStats(uint32 duration) override;
     void RemoveFromWorld() override;
     [[nodiscard]] Unit* GetOwner() const;
@@ -94,7 +95,7 @@ protected:
 class Guardian : public Minion
 {
 public:
-    Guardian(SummonPropertiesEntry const* properties, ObjectGuid owner, bool isWorldObject);
+    Guardian(SummonPropertiesEntry const* properties, ObjectGuid owner);
     void InitStats(uint32 duration) override;
     bool InitStatsForLevel(uint8 level);
     void InitSummon() override;

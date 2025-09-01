@@ -58,11 +58,7 @@ uint32 ScriptMgr::DealDamage(Unit* AttackerUnit, Unit* pVictim, uint32 damage, D
 
     for (auto const& [scriptID, script] : ScriptRegistry<UnitScript>::ScriptPointerList)
     {
-        auto const& dmg = script->DealDamage(AttackerUnit, pVictim, damage, damagetype);
-        if (dmg != damage)
-        {
-            return damage;
-        }
+        damage = script->DealDamage(AttackerUnit, pVictim, damage, damagetype);
     }
 
     return damage;
@@ -146,6 +142,11 @@ void ScriptMgr::OnUnitEnterCombat(Unit* unit, Unit* victim)
 void ScriptMgr::OnUnitDeath(Unit* unit, Unit* killer)
 {
     CALL_ENABLED_HOOKS(UnitScript, UNITHOOK_ON_UNIT_DEATH, script->OnUnitDeath(unit, killer));
+}
+
+void ScriptMgr::OnUnitSetShapeshiftForm(Unit* unit, uint8 form)
+{
+    CALL_ENABLED_HOOKS(UnitScript, UNITHOOK_ON_UNIT_SET_SHAPESHIFT_FORM, script->OnUnitSetShapeshiftForm(unit, form));
 }
 
 UnitScript::UnitScript(const char* name, bool addToScripts, std::vector<uint16> enabledHooks)

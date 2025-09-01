@@ -38,13 +38,14 @@ MinionData const minionData[] =
     { NPC_KROSH_FIREHAND,       DATA_MAULGAR },
     { NPC_OLM_THE_SUMMONER,     DATA_MAULGAR },
     { NPC_KIGGLER_THE_CRAZED,   DATA_MAULGAR },
-    { NPC_BLINDEYE_THE_SEER,    DATA_MAULGAR }
+    { NPC_BLINDEYE_THE_SEER,    DATA_MAULGAR },
+    { 0, 0 } // END
 };
 
 class instance_gruuls_lair : public InstanceMapScript
 {
 public:
-    instance_gruuls_lair() : InstanceMapScript("instance_gruuls_lair", 565) { }
+    instance_gruuls_lair() : InstanceMapScript("instance_gruuls_lair", MAP_GRUULS_LAIR) { }
 
     struct instance_gruuls_lair_InstanceMapScript : public InstanceScript
     {

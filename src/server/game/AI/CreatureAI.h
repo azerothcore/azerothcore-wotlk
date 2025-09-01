@@ -96,6 +96,8 @@ public:
     void Talk(uint8 id, WorldObject const* whisperTarget = nullptr, Milliseconds delay = 0s);
     void Talk(uint8 id, Milliseconds delay) { Talk(id, nullptr, delay); }
 
+    WorldObject* GetSummoner() const;
+
     explicit CreatureAI(Creature* creature) : UnitAI(creature), me(creature), _boundary(nullptr), _negateBoundary(false), m_MoveInLineOfSight_locked(false) { }
 
     ~CreatureAI() override {}
@@ -206,6 +208,9 @@ public:
     virtual bool CanAlwaysBeDetectable(WorldObject const* /*seer*/) { return false; }
 
     virtual void PetStopAttack() { }
+
+    // intended for encounter design/debugging. do not use for other purposes. expensive.
+    int32 VisualizeBoundary(uint32 duration, Unit* owner = nullptr, bool fill = false, bool checkZ = false) const;
 
     // boundary system methods
     virtual bool CheckInRoom();

@@ -443,7 +443,7 @@ public:
             {
                 if (Unit* trapped = summ->GetSummonerUnit())
                 {
-                    if (!trapped->IsOnVehicle(me) || !trapped->IsAlive() || !me->GetInstanceScript() || me->GetInstanceScript()->GetBossState(DATA_LORD_MARROWGAR) != IN_PROGRESS || trapped->HasAuraType(SPELL_AURA_SPIRIT_OF_REDEMPTION))
+                    if (!trapped->IsOnVehicle(me) || !trapped->IsAlive() || !me->GetInstanceScript() || me->GetInstanceScript()->GetBossState(DATA_LORD_MARROWGAR) != IN_PROGRESS || trapped->HasSpiritOfRedemptionAura())
                     {
                         DoAction(-1337);
                         return;
@@ -482,7 +482,7 @@ class spell_marrowgar_coldflame : public SpellScript
     void SelectTarget(std::list<WorldObject*>& targets)
     {
         targets.clear();
-        Unit* target = GetCaster()->GetAI()->SelectTarget(SelectTargetMethod::Random, 1, -1.0f, true,true,  -SPELL_IMPALED); // -1.0f as it takes into account object size
+        Unit* target = GetCaster()->GetAI()->SelectTarget(SelectTargetMethod::Random, 0, -1.0f, true, false,  -SPELL_IMPALED); // -1.0f as it takes into account object size
         if (!target)
             target = GetCaster()->GetAI()->SelectTarget(SelectTargetMethod::Random, 0, 0.0f, true); // if only tank or noone outside of boss' model
         if (!target)

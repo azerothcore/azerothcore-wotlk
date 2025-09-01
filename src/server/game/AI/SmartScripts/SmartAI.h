@@ -131,7 +131,7 @@ public:
     void IsSummonedBy(WorldObject* summoner) override;
 
     // Called at any Damage to any victim (before damage apply)
-    void DamageDealt(Unit* doneTo, uint32& damage, DamageEffectType damagetyp) override;
+    void DamageDealt(Unit* doneTo, uint32& damage, DamageEffectType damagetyp, SpellSchoolMask damageSchoolMask) override;
 
     // Called when a summoned creature dissapears (UnSommoned)
     void SummonedCreatureDespawn(Creature* unit) override;
@@ -212,6 +212,9 @@ public:
     // Xinef
     void SetWPPauseTimer(uint32 time) { mWPPauseTimer = time; }
 
+    void SetChaseOnInterrupt(bool apply) { _chaseOnInterrupt = apply; }
+    [[nodiscard]] bool CanChaseOnInterrupt() const { return _chaseOnInterrupt; }
+
 private:
     bool mIsCharmed;
     uint32 mFollowCreditType;
@@ -257,6 +260,8 @@ private:
     void CheckConditions(const uint32 diff);
     ConditionList conditions;
     uint32 m_ConditionsTimer;
+
+    bool _chaseOnInterrupt;
 };
 
 class SmartGameObjectAI : public GameObjectAI

@@ -16,6 +16,7 @@
  */
 
 #include "AchievementCriteriaScript.h"
+#include "AreaDefines.h"
 #include "CreatureScript.h"
 #include "PassiveAI.h"
 #include "Player.h"
@@ -1244,7 +1245,7 @@ class spell_hodir_biting_cold_player_aura : public AuraScript
     {
         if (Unit* target = GetTarget())
         {
-            if (target->GetMapId() == 603)
+            if (target->GetMapId() == MAP_ULDUAR)
                 SetDuration(GetMaxDuration());
             if (target->HasAura(SPELL_FLASH_FREEZE_TRAPPED_PLAYER))
                 return;
@@ -1527,7 +1528,7 @@ public:
 
     bool OnCheck(Player* player, Unit*  /*target*/, uint32 /*criteria_id*/) override
     {
-        return player && player->HasAura(SPELL_MAGE_TOASTY_FIRE_AURA) && player->HasAura(SPELL_DRUID_STARLIGHT_AREA_AURA) && player->HasAura(SPELL_SHAMAN_STORM_POWER_10);
+        return player && player->HasAllAuras(SPELL_MAGE_TOASTY_FIRE_AURA, SPELL_DRUID_STARLIGHT_AREA_AURA, SPELL_SHAMAN_STORM_POWER_10);
     }
 };
 
@@ -1538,7 +1539,7 @@ public:
 
     bool OnCheck(Player* player, Unit*  /*target*/, uint32 /*criteria_id*/) override
     {
-        return player && player->HasAura(SPELL_MAGE_TOASTY_FIRE_AURA) && player->HasAura(SPELL_DRUID_STARLIGHT_AREA_AURA) && player->HasAura(SPELL_SHAMAN_STORM_POWER_25);
+        return player && player->HasAllAuras(SPELL_MAGE_TOASTY_FIRE_AURA, SPELL_DRUID_STARLIGHT_AREA_AURA, SPELL_SHAMAN_STORM_POWER_25);
     }
 };
 

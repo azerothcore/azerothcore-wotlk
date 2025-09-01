@@ -19,6 +19,7 @@
 #define _FORMATIONS_H
 
 #include "Define.h"
+#include "ObjectGuid.h"
 #include "Unit.h"
 #include <map>
 #include <unordered_map>
@@ -66,7 +67,7 @@ struct FormationInfo
     uint32 point_1;
     uint32 point_2;
 
-    bool HasGroupFlag(uint16 flag) const { return !!(groupAI & flag); }
+    bool HasGroupFlag(uint16 flag) const { return (groupAI & flag); }
 };
 
 typedef std::unordered_map<ObjectGuid::LowType/*memberDBGUID*/, FormationInfo /*formationInfo*/>   CreatureGroupInfoType;

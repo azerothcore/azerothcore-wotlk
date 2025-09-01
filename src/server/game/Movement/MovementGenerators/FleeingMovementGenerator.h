@@ -18,13 +18,15 @@
 #ifndef ACORE_FLEEINGMOVEMENTGENERATOR_H
 #define ACORE_FLEEINGMOVEMENTGENERATOR_H
 
+#include "Creature.h"
 #include "MovementGenerator.h"
+#include "Timer.h"
 
 template<class T>
 class FleeingMovementGenerator : public MovementGeneratorMedium< T, FleeingMovementGenerator<T> >
 {
     public:
-        explicit FleeingMovementGenerator(ObjectGuid fleeTargetGUID) : _path(nullptr), _fleeTargetGUID(fleeTargetGUID), _timer(0), _interrupt(false), _shortPathsCount(0) { }
+        explicit FleeingMovementGenerator(ObjectGuid fleeTargetGUID) : _path(nullptr), _fleeTargetGUID(fleeTargetGUID), _timer(0), _interrupt(false), _invalidPathsCount(0) { }
 
         MovementGeneratorType GetMovementGeneratorType() override { return FLEEING_MOTION_TYPE; }
 
@@ -41,7 +43,7 @@ class FleeingMovementGenerator : public MovementGeneratorMedium< T, FleeingMovem
         ObjectGuid _fleeTargetGUID;
         TimeTracker _timer;
         bool _interrupt;
-        uint8 _shortPathsCount;
+        uint8 _invalidPathsCount;
 };
 
 class TimedFleeingMovementGenerator : public FleeingMovementGenerator<Creature>

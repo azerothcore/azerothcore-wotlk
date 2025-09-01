@@ -15,6 +15,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "AreaDefines.h"
 #include "Battleground.h"
 #include "CreatureScript.h"
 #include "ObjectMgr.h"
@@ -2881,7 +2882,7 @@ class spell_item_reindeer_transformation : public SpellScript
     void HandleDummy(SpellEffIndex /* effIndex */)
     {
         Unit* caster = GetCaster();
-        if (caster->HasAuraType(SPELL_AURA_MOUNTED))
+        if (caster->HasMountedAura())
         {
             float flyspeed = caster->GetSpeedRate(MOVE_FLIGHT);
             float speed = caster->GetSpeedRate(MOVE_RUN);
@@ -2995,7 +2996,7 @@ class spell_item_socrethars_stone : public SpellScript
 
     bool Load() override
     {
-        return (GetCaster()->GetAreaId() == 3900 || GetCaster()->GetAreaId() == 3742);
+        return (GetCaster()->GetAreaId() == AREA_INVASION_POINT_OVERLORD || GetCaster()->GetAreaId() == AREA_SOCRETHARS_SEAT);
     }
 
     bool Validate(SpellInfo const* /*spell*/) override
@@ -3008,10 +3009,10 @@ class spell_item_socrethars_stone : public SpellScript
         Unit* caster = GetCaster();
         switch (caster->GetAreaId())
         {
-            case 3900:
+            case AREA_INVASION_POINT_OVERLORD:
                 caster->CastSpell(caster, SPELL_SOCRETHAR_TO_SEAT, true);
                 break;
-            case 3742:
+            case AREA_SOCRETHARS_SEAT:
                 caster->CastSpell(caster, SPELL_SOCRETHAR_FROM_SEAT, true);
                 break;
             default:
@@ -3172,7 +3173,7 @@ class spell_item_brewfest_mount_transformation : public SpellScript
             return;
         }
 
-        if (caster->HasAuraType(SPELL_AURA_MOUNTED))
+        if (caster->HasMountedAura())
         {
             caster->RemoveAurasByType(SPELL_AURA_MOUNTED);
             uint32 spell_id;
@@ -4141,6 +4142,73 @@ class spell_item_luffa : public SpellScript
     }
 };
 
+// 23097 - Fire Reflector
+// 23131 - Frost Reflector
+// 23132 - Shadow Reflector
+class spell_item_spell_reflectors: public AuraScript
+{
+    PrepareAuraScript(spell_item_spell_reflectors);
+
+    void CalculateAmount(AuraEffect const* /*aurEff*/, int32& amount, bool& /*canBeRecalculated*/)
+    {
+        if (GetCaster()->GetLevel() > 70)
+            amount = 4;
+        else if (GetCaster()->GetLevel() > 60)
+            amount = 50;
+    }
+
+    void Register() override
+    {
+        DoEffectCalcAmount += AuraEffectCalcAmountFn(spell_item_spell_reflectors::CalculateAmount, EFFECT_0, SPELL_AURA_REFLECT_SPELLS_SCHOOL);
+    }
+};
+
+// 46273 - Multiphase Goggles
+class spell_item_multiphase_goggles : public AuraScript
+{
+    PrepareAuraScript(spell_item_multiphase_goggles);
+
+    void OnApply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
+    {
+        if (Player* player = GetTarget()->ToPlayer())
+            player->SetFlag(PLAYER_TRACK_CREATURES, uint32(1) << (CREATURE_TYPE_GAS_CLOUD - 1));
+    }
+
+    void OnRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
+    {
+        if (Player* player = GetTarget()->ToPlayer())
+            player->RemoveFlag(PLAYER_TRACK_CREATURES, uint32(1) << (CREATURE_TYPE_GAS_CLOUD - 1));
+    }
+
+    void Register() override
+    {
+        OnEffectApply += AuraEffectApplyFn(spell_item_multiphase_goggles::OnApply, EFFECT_0, SPELL_AURA_MOD_INVISIBILITY_DETECT , AURA_EFFECT_HANDLE_REAL);
+        OnEffectRemove += AuraEffectRemoveFn(spell_item_multiphase_goggles::OnRemove, EFFECT_0, SPELL_AURA_MOD_INVISIBILITY_DETECT , AURA_EFFECT_HANDLE_REAL);
+    }
+};
+
+// 60244 - Blood Parrot Despawn Aura (Item: 12185 - Bloodsail Admiral's Hat)
+enum BloodsailAdmiralHat
+{
+    NPC_ADMIRAL_HAT_PARROT = 11236, // Blood Parrot
+};
+
+class spell_item_bloodsail_admiral_hat : public AuraScript
+{
+    PrepareAuraScript(spell_item_bloodsail_admiral_hat);
+
+    void OnRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
+    {
+        if (Player* player = GetCaster()->ToPlayer())
+            player->RemoveAllMinionsByEntry(NPC_ADMIRAL_HAT_PARROT);
+    }
+
+    void Register() override
+    {
+        OnEffectRemove += AuraEffectRemoveFn(spell_item_bloodsail_admiral_hat::OnRemove, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
+    }
+};
+
 void AddSC_item_spell_scripts()
 {
     RegisterSpellScript(spell_item_massive_seaforium_charge);
@@ -4267,4 +4335,7 @@ void AddSC_item_spell_scripts()
     RegisterSpellScript(spell_item_gor_dreks_ointment);
     RegisterSpellScript(spell_item_skyguard_blasting_charges);
     RegisterSpellScript(spell_item_luffa);
+    RegisterSpellScript(spell_item_spell_reflectors);
+    RegisterSpellScript(spell_item_multiphase_goggles);
+    RegisterSpellScript(spell_item_bloodsail_admiral_hat);
 }

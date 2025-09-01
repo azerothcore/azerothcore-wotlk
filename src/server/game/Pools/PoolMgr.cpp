@@ -20,6 +20,7 @@
 #include "Log.h"
 #include "MapMgr.h"
 #include "ObjectMgr.h"
+#include "QueryResult.h"
 #include "Transport.h"
 
 ////////////////////////////////////////////////////////////

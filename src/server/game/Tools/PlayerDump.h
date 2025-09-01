@@ -19,7 +19,6 @@
 #define _PLAYER_DUMP_H
 
 #include "ObjectGuid.h"
-#include <map>
 #include <set>
 
 enum DumpTableType

@@ -22,12 +22,14 @@
 #include "ScriptedCreature.h"
 #include "SpellInfo.h"
 #include "TemporarySummon.h"
+#include "WorldStateDefines.h"
+#include "WorldStatePackets.h"
 #include "culling_of_stratholme.h"
 
 class instance_culling_of_stratholme : public InstanceMapScript
 {
 public:
-    instance_culling_of_stratholme() : InstanceMapScript("instance_culling_of_stratholme", 595) { }
+    instance_culling_of_stratholme() : InstanceMapScript("instance_culling_of_stratholme", MAP_THE_CULLING_OF_STRATHOLME) { }
 
     InstanceScript* GetInstanceScript(InstanceMap* pMap) const override
     {
@@ -53,21 +55,20 @@ public:
             return false;
         }
 
-        void FillInitialWorldStates(WorldPacket& data) override
+        void FillInitialWorldStates(WorldPackets::WorldState::InitWorldStates& packet) override
         {
-            data << uint32(WORLDSTATE_SHOW_CRATES) << uint32(0);
-            data << uint32(WORLDSTATE_CRATES_REVEALED) << uint32(_crateCount);
-            data << uint32(WORLDSTATE_WAVE_COUNT) << uint32(0);
-            data << uint32(WORLDSTATE_TIME_GUARDIAN) << uint32(25);
-            data << uint32(WORLDSTATE_TIME_GUARDIAN_SHOW) << uint32(0);
+            packet.Worldstates.reserve(5);
+            packet.Worldstates.emplace_back(WORLD_STATE_CULLING_OF_STRATHOLME_SHOW_CRATES, 0);
+            packet.Worldstates.emplace_back(WORLD_STATE_CULLING_OF_STRATHOLME_CRATES_REVEALED, _crateCount);
+            packet.Worldstates.emplace_back(WORLD_STATE_CULLING_OF_STRATHOLME_WAVE_COUNT, 0);
+            packet.Worldstates.emplace_back(WORLD_STATE_CULLING_OF_STRATHOLME_TIME_GUARDIAN, 25);
+            packet.Worldstates.emplace_back(WORLD_STATE_CULLING_OF_STRATHOLME_TIME_GUARDIAN_SHOW, 0);
         }
 
         void OnPlayerEnter(Player* plr) override
         {
             if (instance->GetPlayersCountExceptGMs() == 1)
                 SetData(DATA_ARTHAS_REPOSITION, 2);
-
-            EnsureGridLoaded();
 
             if (plr->getRace() != RACE_HUMAN && plr->getRace() != RACE_DWARF && plr->getRace() != RACE_GNOME)
                 plr->CastSpell(plr, ((plr->getGender() == GENDER_MALE) ? SPELL_HUMAN_MALE : SPELL_HUMAN_FEMALE), true);
@@ -112,13 +113,13 @@ public:
             switch (type)
             {
                 case DATA_SHOW_CRATES:
-                    DoUpdateWorldState(WORLDSTATE_SHOW_CRATES, data);
+                    DoUpdateWorldState(WORLD_STATE_CULLING_OF_STRATHOLME_SHOW_CRATES, data);
                     return;
                 case DATA_SHOW_INFINITE_TIMER:
                     if (!instance->IsHeroic() || !_guardianTimer)
                         return;
-                    DoUpdateWorldState(WORLDSTATE_TIME_GUARDIAN_SHOW, data);
-                    DoUpdateWorldState(WORLDSTATE_TIME_GUARDIAN, uint32(_guardianTimer / (MINUTE * IN_MILLISECONDS)));
+                    DoUpdateWorldState(WORLD_STATE_CULLING_OF_STRATHOLME_TIME_GUARDIAN_SHOW, data);
+                    DoUpdateWorldState(WORLD_STATE_CULLING_OF_STRATHOLME_TIME_GUARDIAN, uint32(_guardianTimer / (MINUTE * IN_MILLISECONDS)));
                     if (data == 0)
                     {
                         _guardianTimer = 0;
@@ -128,10 +129,10 @@ public:
                         instance->SummonCreature(NPC_INFINITE, EventPos[EVENT_SRC_CORRUPTOR]);
                     return;
                 case DATA_START_WAVES:
-                    DoUpdateWorldState(WORLDSTATE_WAVE_COUNT, 1);
+                    DoUpdateWorldState(WORLD_STATE_CULLING_OF_STRATHOLME_WAVE_COUNT, 1);
                     if (instance->IsHeroic())
                     {
-                        DoUpdateWorldState(WORLDSTATE_TIME_GUARDIAN_SHOW, true);
+                        DoUpdateWorldState(WORLD_STATE_CULLING_OF_STRATHOLME_TIME_GUARDIAN_SHOW, true);
                         _guardianTimer = 26 * MINUTE * IN_MILLISECONDS;
                         if (!_infiniteGUID)
                             instance->SummonCreature(NPC_INFINITE, EventPos[EVENT_SRC_CORRUPTOR]);
@@ -151,7 +152,7 @@ public:
                             SetData(DATA_ARTHAS_EVENT, COS_PROGRESS_CRATES_FOUND);
                     }
 
-                    DoUpdateWorldState(WORLDSTATE_CRATES_REVEALED, _crateCount);
+                    DoUpdateWorldState(WORLD_STATE_CULLING_OF_STRATHOLME_CRATES_REVEALED, _crateCount);
                     return;
                 case DATA_ARTHAS_EVENT:
                     // Start Event
@@ -224,7 +225,6 @@ public:
                 {
                     if (!arthas->IsAlive())
                     {
-                        EnsureGridLoaded();
                         arthas->setDeathState(DeathState::Dead);
                         arthas->Respawn();
                     }
@@ -257,7 +257,7 @@ public:
                 if (divAfter == 0)
                 {
                     _guardianTimer = 0;
-                    DoUpdateWorldState(WORLDSTATE_TIME_GUARDIAN_SHOW, 0);
+                    DoUpdateWorldState(WORLD_STATE_CULLING_OF_STRATHOLME_TIME_GUARDIAN_SHOW, 0);
 
                     // Inform infinite we run out of time
                     if (instance->IsHeroic() && _infiniteGUID)
@@ -271,7 +271,7 @@ public:
                     else if (divAfter == 1)
                         ChromieWhisper(2);
 
-                    DoUpdateWorldState(WORLDSTATE_TIME_GUARDIAN, divAfter);
+                    DoUpdateWorldState(WORLD_STATE_CULLING_OF_STRATHOLME_TIME_GUARDIAN, divAfter);
                     SaveToDB();
                 }
             }
@@ -291,7 +291,7 @@ public:
                     ChromieWhisper(0);
 
                     // hide crates count
-                    DoUpdateWorldState(WORLDSTATE_SHOW_CRATES, 0);
+                    DoUpdateWorldState(WORLD_STATE_CULLING_OF_STRATHOLME_SHOW_CRATES, 0);
                     _showCrateTimer = 0;
                     _encounterState = COS_PROGRESS_CRATES_FOUND;
                 }
@@ -350,16 +350,6 @@ public:
                     arthas->SetFacingTo(LeaderIntroPos6.GetOrientation());
                     break;
             }
-        }
-
-        void EnsureGridLoaded()
-        {
-            instance->LoadGrid(LeaderIntroPos1.GetPositionX(), LeaderIntroPos1.GetPositionY());
-            instance->LoadGrid(LeaderIntroPos2.GetPositionX(), LeaderIntroPos2.GetPositionY());
-            instance->LoadGrid(LeaderIntroPos3.GetPositionX(), LeaderIntroPos3.GetPositionY());
-            instance->LoadGrid(LeaderIntroPos4.GetPositionX(), LeaderIntroPos4.GetPositionY());
-            instance->LoadGrid(LeaderIntroPos5.GetPositionX(), LeaderIntroPos5.GetPositionY());
-            instance->LoadGrid(LeaderIntroPos6.GetPositionX(), LeaderIntroPos6.GetPositionY());
         }
 
         std::string GetSaveData() override

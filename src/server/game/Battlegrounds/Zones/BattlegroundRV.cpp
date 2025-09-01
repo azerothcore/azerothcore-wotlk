@@ -22,6 +22,7 @@
 #include "ObjectAccessor.h"
 #include "Player.h"
 #include "WorldPacket.h"
+#include "WorldStateDefines.h"
 
 static constexpr Milliseconds BG_RV_PILLAR_SWITCH_TIMER  = 25s;
 static constexpr Milliseconds BG_RV_FIRE_TO_PILLAR_TIMER = 20s;
@@ -95,7 +96,7 @@ void BattlegroundRV::PostUpdateImpl(uint32 diff)
                     if (player->GetPositionZ() < 27.0f)
                         TeleportUnitToNewZ(player, 28.28f, true);
 
-                    for (uint8 i = SUMMON_SLOT_TOTEM; i < MAX_TOTEM_SLOT; ++i)
+                    for (uint8 i = SUMMON_SLOT_TOTEM_FIRE; i < MAX_TOTEM_SLOT; ++i)
                         if (player->m_SummonSlot[i])
                             if (Creature* totem = GetBgMap()->GetCreature(player->m_SummonSlot[i]))
                                 if (totem->GetPositionZ() < 28.0f)
@@ -204,10 +205,10 @@ void BattlegroundRV::HandleAreaTrigger(Player* player, uint32 trigger)
     }
 }
 
-void BattlegroundRV::FillInitialWorldStates(WorldPacket& data)
+void BattlegroundRV::FillInitialWorldStates(WorldPackets::WorldState::InitWorldStates& packet)
 {
-    data << uint32(BG_RV_WORLD_STATE) << uint32(1);
-    Arena::FillInitialWorldStates(data);
+    packet.Worldstates.emplace_back(WORLD_STATE_BATTLEGROUND_RV_ARENA_SHOW, 1);
+    Arena::FillInitialWorldStates(packet);
 }
 
 void BattlegroundRV::Init()

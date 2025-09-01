@@ -20,8 +20,9 @@
 
 #include "Common.h"
 #include "NPCHandler.h"
-#include "Object.h"
+#include "ObjectGuid.h"
 #include "QuestDef.h"
+#include <map>
 
 class WorldSession;
 class ObjectGuid;

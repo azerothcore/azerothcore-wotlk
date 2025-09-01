@@ -39,7 +39,8 @@ void Acore::CustomChatTextBuilder::operator()(WorldPacket& data, LocaleConstant 
 
 void Acore::AcoreStringChatBuilder::operator()(WorldPacket& data, LocaleConstant locale) const
 {
-    char const* text = sObjectMgr->GetAcoreString(_textId, locale);
+    std::string strtext = sObjectMgr->GetAcoreString(_textId, locale);
+    char const* text = strtext.c_str();
 
     if (_args)
     {

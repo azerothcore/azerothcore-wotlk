@@ -37,12 +37,11 @@ class spell_q11065_wrangle_some_aether_rays : public SpellScript
 
     SpellCastResult CheckCast()
     {
-        // if thane is present and not in combat - allow cast
         if (Unit* target = GetExplTargetUnit())
             if (target->GetHealthPct() < 40.0f)
                 return SPELL_CAST_OK;
 
-        return SPELL_FAILED_CASTER_AURASTATE;
+        return SPELL_FAILED_BAD_TARGETS;
     }
 
     void Register() override
@@ -77,6 +76,13 @@ class spell_q11065_wrangle_some_aether_rays_aura : public AuraScript
     void HandleEffectApply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
     {
         SetDuration(5000);
+
+        if (GetTarget() && GetTarget()->ToCreature())
+            if (Creature* ar = GetTarget()->ToCreature())
+            {
+                ar->AttackStop();
+                ar->SetReactState(REACT_PASSIVE);
+            }
     }
 
     void Register() override
@@ -1830,7 +1836,7 @@ class spell_q11010_q11102_q11023_aggro_check : public SpellScript
     {
         if (Player* playerTarget = GetHitPlayer())
             // Check if found player target is on fly mount or using flying form
-            if (playerTarget->HasAuraType(SPELL_AURA_FLY) || playerTarget->HasAuraType(SPELL_AURA_MOD_INCREASE_MOUNTED_FLIGHT_SPEED))
+            if (playerTarget->HasFlyAura() || playerTarget->HasIncreaseMountedFlightSpeedAura())
                 playerTarget->CastSpell(playerTarget, SPELL_FLAK_CANNON_TRIGGER, TRIGGERED_FULL_MASK);
     }
 
@@ -1870,10 +1876,10 @@ class spell_q11010_q11102_q11023_choose_loc : public SpellScript
         std::list<Player*> playerList;
         Acore::AnyPlayerInObjectRangeCheck checker(caster, 65.0f);
         Acore::PlayerListSearcher<Acore::AnyPlayerInObjectRangeCheck> searcher(caster, playerList, checker);
-        Cell::VisitWorldObjects(caster, searcher, 65.0f);
+        Cell::VisitObjects(caster, searcher, 65.0f);
         for (std::list<Player*>::const_iterator itr = playerList.begin(); itr != playerList.end(); ++itr)
             // Check if found player target is on fly mount or using flying form
-            if ((*itr)->HasAuraType(SPELL_AURA_FLY) || (*itr)->HasAuraType(SPELL_AURA_MOD_INCREASE_MOUNTED_FLIGHT_SPEED))
+            if ((*itr)->HasFlyAura() || (*itr)->HasIncreaseMountedFlightSpeedAura())
                 // Summom Fel Cannon (bunny version) at found player
                 caster->SummonCreature(NPC_FEL_CANNON2, (*itr)->GetPositionX(), (*itr)->GetPositionY(), (*itr)->GetPositionZ());
     }
@@ -1894,7 +1900,7 @@ class spell_q11010_q11102_q11023_q11008_check_fly_mount : public SpellScript
     {
         Unit* caster = GetCaster();
         // This spell will be cast only if caster has one of these auras
-        if (!(caster->HasAuraType(SPELL_AURA_FLY) || caster->HasAuraType(SPELL_AURA_MOD_INCREASE_MOUNTED_FLIGHT_SPEED)))
+        if (!(caster->HasFlyAura() || caster->HasIncreaseMountedFlightSpeedAura()))
             return SPELL_FAILED_CANT_DO_THAT_RIGHT_NOW;
         return SPELL_CAST_OK;
     }
@@ -2263,7 +2269,10 @@ class spell_q12619_emblazon_runeblade_effect : public SpellScript
 enum Quest_The_Storm_King
 {
     SPELL_RIDE_GYMER            = 43671,
-    SPELL_GRABBED               = 55424
+    SPELL_GRABBED               = 55424,
+    SPELL_HEALING_WINDS         = 55549,
+
+    NPC_STORM_CLOUD             = 29939
 };
 
 class spell_q12919_gymers_grab : public SpellScript
@@ -2278,10 +2287,14 @@ class spell_q12919_gymers_grab : public SpellScript
     void HandleScript(SpellEffIndex /*effIndex*/)
     {
         int8 seatId = 2;
-        if (!GetHitCreature())
-            return;
-        GetHitCreature()->CastCustomSpell(SPELL_RIDE_GYMER, SPELLVALUE_BASE_POINT0, seatId, GetCaster(), true);
-        GetHitCreature()->CastSpell(GetHitCreature(), SPELL_GRABBED, true);
+        if (Creature* creature = GetHitCreature())
+        {
+            creature->CastCustomSpell(SPELL_RIDE_GYMER, SPELLVALUE_BASE_POINT0, seatId, GetCaster(), true);
+            creature->CastSpell(creature, SPELL_GRABBED, true);
+
+            if (creature->GetEntry() == NPC_STORM_CLOUD)
+                creature->CastSpell(GetCaster(), SPELL_HEALING_WINDS, true);
+        }
     }
 
     void Register() override
