@@ -245,7 +245,7 @@ def sql_check(file: io, file_path: str) -> None:
             print_error_with_spacing(
                 f"❌ MEDIUMINT type is not allowed (use INT instead). Found in {file_path} at line {line_number}", "sql_codestyle")
             check_failed = True
-        # ...existing code...
+            
         if [match for match in ['broadcast_text'] if match in line]:
             print_error_with_spacing(
                 f"❌ DON'T EDIT broadcast_text TABLE UNLESS YOU KNOW WHAT YOU ARE DOING!\nThis error can safely be ignored if the changes are approved to be sniffed: {file_path} at line {line_number}", "sql_codestyle")
@@ -262,6 +262,11 @@ def sql_check(file: io, file_path: str) -> None:
             print_error_with_spacing(
                 f"❌ Tab found! Replace it to 4 spaces: {file_path} at line {line_number}", "sql_codestyle")
             check_failed = True
+
+        # FLOAT, DOUBLE, DECIMAL with UNSIGNED warning
+        if re.search(r'\b(float|double|decimal)\b[^,]*\bunsigned\b', line, re.IGNORECASE):
+            warnings_list.append(
+                f"❗ UNSIGNED is not allowed for FLOAT, DOUBLE, or DECIMAL. Use a CHECK (column >= 0) if needed, but MySQL may not enforce it. Found in {file_path} at line {line_number}")
 
     # Handle the script error and update the result output
     if check_failed:
