@@ -574,9 +574,46 @@ def non_innodb_engine_check(file: io, file_path: str) -> None:
         if collate_match:
             found_relevant_content = True
             collate = collate_match.group(1).lower()
-            if collate != "utf8mb4_unicode_ci":
-                print_error_with_spacing(f"❌ Non-utf8mb4_unicode_ci COLLATE found: '{collate}' in {file_path} at line {line_number}", "collate")
-                check_failed = True
+            # Exception for 'name' column in specific tables
+            # Look for table and column context in the line
+            exception_tables = {"characters", "profanity_name", "reserved_name"}
+            exception_column = "name"
+            # Try to detect if this is a column-level COLLATE (e.g. `name` varchar(...) COLLATE ...)
+            column_collate_match = re.search(r'`(\w+)`\s+\w+\s*\([^)]*\)?\s*COLLATE\s*=\s*([a-zA-Z0-9_]+)', line, re.IGNORECASE)
+            table_match = re.search(r'CREATE\s+TABLE\s+`?(\w+)`?', line, re.IGNORECASE)
+            if column_collate_match:
+                col_name = column_collate_match.group(1).lower()
+                col_collate = column_collate_match.group(2).lower()
+                # Try to get table name from previous context or line
+                table_name = None
+                if table_match:
+                    table_name = table_match.group(1).lower()
+                else:
+                    # Try to find table name in previous lines (look back up to 10 lines)
+                    for back in range(1, 11):
+                        if line_number-back >= 1:
+                            prev_line = file.readline()
+                            prev_table_match = re.search(r'CREATE\s+TABLE\s+`?(\w+)`?', prev_line, re.IGNORECASE)
+                            if prev_table_match:
+                                table_name = prev_table_match.group(1).lower()
+                                break
+                if table_name in exception_tables and col_name == exception_column:
+                    if col_collate != "utf8mb4_bin":
+                        print_error_with_spacing(
+                            f"❌ The only exception (to utf8mb4_unicode_ci) is where we use a character name, here we need to use utf8mb4_bin to allow the name to be accent-sensitive. Found COLLATE '{col_collate}' for column '{col_name}' in table '{table_name}' in {file_path} at line {line_number}",
+                            "collate")
+                        check_failed = True
+                else:
+                    if col_collate != "utf8mb4_unicode_ci":
+                        print_error_with_spacing(
+                            f"❌ Non-utf8mb4_unicode_ci COLLATE found: '{col_collate}' for column '{col_name}' in {file_path} at line {line_number}",
+                            "collate")
+                        check_failed = True
+            else:
+                # Table-level COLLATE (not column-specific)
+                if collate != "utf8mb4_unicode_ci":
+                    print_error_with_spacing(f"❌ Non-utf8mb4_unicode_ci COLLATE found: '{collate}' in {file_path} at line {line_number}", "collate")
+                    check_failed = True
 
     if check_failed:
         error_handler = True
