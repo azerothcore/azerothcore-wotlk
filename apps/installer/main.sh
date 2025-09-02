@@ -6,22 +6,22 @@ source "$CURRENT_PATH/includes/includes.sh"
 
 PS3='[Please enter your choice]: '
 options=(
-    "init (i): First Installation"                  # 1
-    "install-deps (d): Configure OS dep"            # 2
-    "pull (u): Update Repository"                   # 3
-    "reset (r): Reset & Clean Repository"           # 4
-    "compiler (c): Run compiler tool"               # 5
-    "module-search (ms): Module Search by keyword" # 6
-    "module-install (mi): Module Install by name"  # 7
-    "module-update (mu): Module Update by name"    # 8
-    "module-remove: (mr): Module Remove by name"   # 9
-    "client-data: (gd): download client data from github repository (beta)"   # 10
-    "run-worldserver (rw): execute a simple restarter for worldserver" # 11
-    "run-authserver (ra): execute a simple restarter for authserver" # 12
-    "docker (dr): Run docker tools" # 13
-    "version (v): Show AzerothCore version"         # 14
-    "service-manager (sm): Run service manager to run authserver and worldserver in background" # 15
-    "quit: Exit from this menu"                     # 16
+    "init (i): First Installation"
+    "install-deps (d): Configure OS dep"
+    "pull (u): Update Repository"
+    "reset (r): Reset & Clean Repository"
+    "compiler (c): Run compiler tool"
+    "module (m): Module manager (search/install/update/remove)"
+    "module-install (mi): Module Install by name [DEPRECATED]"
+    "module-update (mu): Module Update by name [DEPRECATED]"
+    "module-remove: (mr): Module Remove by name [DEPRECATED]"
+    "client-data: (gd): download client data from github repository (beta)"
+    "run-worldserver (rw): execute a simple restarter for worldserver"
+    "run-authserver (ra): execute a simple restarter for authserver"
+    "docker (dr): Run docker tools"
+    "version (v): Show AzerothCore version"
+    "service-manager (sm): Run service manager to run authserver and worldserver in background"
+    "quit (q): Exit from this menu"
     )
 
 function _switch() {
@@ -29,56 +29,64 @@ function _switch() {
     _opt="$2"
 
     case $_reply in
-        ""|"i"|"init"|"1")
+        ""|"i"|"init")
             inst_allInOne
             ;;
-        ""|"d"|"install-deps"|"2")
+        ""|"d"|"install-deps")
             inst_configureOS
             ;;
-        ""|"u"|"pull"|"3")
+        ""|"u"|"pull")
             inst_updateRepo
             ;;
-        ""|"r"|"reset"|"4")
+        ""|"r"|"reset")
             inst_resetRepo
             ;;
-        ""|"c"|"compiler"|"5")
+        ""|"c"|"compiler")
             bash "$AC_PATH_APPS/compiler/compiler.sh" $_opt
             ;;
-        ""|"ms"|"module-search"|"6")
-            inst_module_search "$_opt"
+        ""|"m"|"module")
+            # Unified module command: supports subcommands search|install|update|remove
+            inst_module "${@:2}"
             ;;
-        ""|"mi"|"module-install"|"7")
-            inst_module_install "$_opt"
+        ""|"ms"|"module-search")
+            echo "[DEPRECATED] Use: ./acore.sh module search <terms...>"
+            inst_module_search "${@:2}"
             ;;
-        ""|"mu"|"module-update"|"8")
-            inst_module_update "$_opt"
+        ""|"mi"|"module-install")
+            echo "[DEPRECATED] Use: ./acore.sh module install <modules...>"
+            inst_module_install "${@:2}"
             ;;
-        ""|"mr"|"module-remove"|"9")
-            inst_module_remove "$_opt"
+        ""|"mu"|"module-update")
+            echo "[DEPRECATED] Use: ./acore.sh module update <modules...>"
+            inst_module_update "${@:2}"
             ;;
-        ""|"gd"|"client-data"|"10")
+        ""|"mr"|"module-remove")
+            echo "[DEPRECATED] Use: ./acore.sh module remove <modules...>"
+            inst_module_remove "${@:2}"
+            ;;
+        ""|"gd"|"client-data")
             inst_download_client_data
             ;;
-        ""|"rw"|"run-worldserver"|"11")
+        ""|"rw"|"run-worldserver")
             inst_simple_restarter worldserver
             ;;
-        ""|"ra"|"run-authserver"|"12")
+        ""|"ra"|"run-authserver")
             inst_simple_restarter authserver
             ;;
-        ""|"dr"|"docker"|"13")
+        ""|"dr"|"docker")
             DOCKER=1 bash "$AC_PATH_ROOT/apps/docker/docker-cmd.sh" "${@:2}"
             exit
             ;;
-        ""|"v"|"version"|"14")
+        ""|"v"|"version")
             # denoRunFile "$AC_PATH_APPS/installer/main.ts" "version"
             printf "AzerothCore Rev. %s\n" "$ACORE_VERSION"
             exit
             ;;
-        ""|"sm"|"service-manager"|"15")
+        ""|"sm"|"service-manager")
             bash "$AC_PATH_APPS/startup-scripts/src/service-manager.sh" "${@:2}"
             exit
             ;;
-        ""|"quit"|"16")
+        ""|"q"|"quit")
             echo "Goodbye!"
             exit
             ;;
@@ -102,4 +110,5 @@ do
         _switch $REPLY
         break
     done
+    echo "opt: $opt"
 done

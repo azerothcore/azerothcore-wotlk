@@ -4550,6 +4550,9 @@ void Player::ResurrectPlayer(float restore_percent, bool applySickness)
     // update visibility
     UpdateObjectVisibility();
 
+    // recast lost by death auras of any items held in the inventory
+    CastAllObtainSpells();
+
     sScriptMgr->OnPlayerResurrect(this, restore_percent, applySickness);
 
     if (!applySickness)
@@ -6008,6 +6011,7 @@ void Player::RewardReputation(Unit* victim)
     if (Rep->RepFaction1 && (!Rep->TeamDependent || teamId == TEAM_ALLIANCE))
     {
         float donerep1 = CalculateReputationGain(REPUTATION_SOURCE_KILL, victim->GetLevel(), static_cast<float>(Rep->RepValue1), ChampioningFaction ? ChampioningFaction : Rep->RepFaction1);
+        sScriptMgr->OnPlayerGiveReputation(this, Rep->RepFaction1, donerep1, REPUTATION_SOURCE_KILL);
 
         FactionEntry const* factionEntry1 = sFactionStore.LookupEntry(ChampioningFaction ? ChampioningFaction : Rep->RepFaction1);
         if (factionEntry1)
@@ -6019,6 +6023,7 @@ void Player::RewardReputation(Unit* victim)
     if (Rep->RepFaction2 && (!Rep->TeamDependent || teamId == TEAM_HORDE))
     {
         float donerep2 = CalculateReputationGain(REPUTATION_SOURCE_KILL, victim->GetLevel(), static_cast<float>(Rep->RepValue2), ChampioningFaction ? ChampioningFaction : Rep->RepFaction2);
+        sScriptMgr->OnPlayerGiveReputation(this, Rep->RepFaction2, donerep2, REPUTATION_SOURCE_KILL);
 
         FactionEntry const* factionEntry2 = sFactionStore.LookupEntry(ChampioningFaction ? ChampioningFaction : Rep->RepFaction2);
         if (factionEntry2)
@@ -6058,22 +6063,27 @@ void Player::RewardReputation(Quest const* quest)
         if (quest->IsDaily())
         {
             rep = CalculateReputationGain(REPUTATION_SOURCE_DAILY_QUEST, GetQuestLevel(quest), rep, quest->RewardFactionId[i], false);
+            sScriptMgr->OnPlayerGiveReputation(this, quest->RewardFactionId[i], rep, REPUTATION_SOURCE_DAILY_QUEST);
         }
         else if (quest->IsWeekly())
         {
             rep = CalculateReputationGain(REPUTATION_SOURCE_WEEKLY_QUEST, GetQuestLevel(quest), rep, quest->RewardFactionId[i], false);
+            sScriptMgr->OnPlayerGiveReputation(this, quest->RewardFactionId[i], rep, REPUTATION_SOURCE_WEEKLY_QUEST);
         }
         else if (quest->IsMonthly())
         {
             rep = CalculateReputationGain(REPUTATION_SOURCE_MONTHLY_QUEST, GetQuestLevel(quest), rep, quest->RewardFactionId[i], false);
+            sScriptMgr->OnPlayerGiveReputation(this, quest->RewardFactionId[i], rep, REPUTATION_SOURCE_MONTHLY_QUEST);
         }
         else if (quest->IsRepeatable())
         {
             rep = CalculateReputationGain(REPUTATION_SOURCE_REPEATABLE_QUEST, GetQuestLevel(quest), rep, quest->RewardFactionId[i], false);
+            sScriptMgr->OnPlayerGiveReputation(this, quest->RewardFactionId[i], rep, REPUTATION_SOURCE_REPEATABLE_QUEST);
         }
         else
         {
             rep = CalculateReputationGain(REPUTATION_SOURCE_QUEST, GetQuestLevel(quest), rep, quest->RewardFactionId[i], false);
+            sScriptMgr->OnPlayerGiveReputation(this, quest->RewardFactionId[i], rep, REPUTATION_SOURCE_QUEST);
         }
 
         if (FactionEntry const* factionEntry = sFactionStore.LookupEntry(quest->RewardFactionId[i]))
@@ -7015,6 +7025,46 @@ void Player::_ApplyWeaponDamage(uint8 slot, ItemTemplate const* proto, ScalingSt
 
     if (CanModifyStats() && (GetWeaponDamageRange(WeaponAttackType(attType), MAXDAMAGE) || proto->Delay))
         UpdateDamagePhysical(WeaponAttackType(attType));
+}
+
+void Player::CastAllObtainSpells()
+{
+    for (uint8 slot = INVENTORY_SLOT_ITEM_START; slot < INVENTORY_SLOT_ITEM_END; ++slot)
+        if (Item* item = GetItemByPos(INVENTORY_SLOT_BAG_0, slot))
+            ApplyItemObtainSpells(item, true);
+
+    for (uint8 i = INVENTORY_SLOT_BAG_START; i < INVENTORY_SLOT_BAG_END; ++i)
+    {
+        Bag* bag = GetBagByPos(i);
+        if (!bag)
+            continue;
+
+        for (uint32 slot = 0; slot < bag->GetBagSize(); ++slot)
+            if (Item* item = bag->GetItemByPos(slot))
+                ApplyItemObtainSpells(item, true);
+    }
+}
+
+void Player::ApplyItemObtainSpells(Item* item, bool apply)
+{
+    ItemTemplate const* itemTemplate = item->GetTemplate();
+    for (uint8 i = 0; i < MAX_ITEM_PROTO_SPELLS; ++i)
+    {
+        if (itemTemplate->Spells[i].SpellTrigger != ITEM_SPELLTRIGGER_ON_NO_DELAY_USE) // On obtain trigger
+            continue;
+
+        int32 const spellId = itemTemplate->Spells[i].SpellId;
+        if (spellId <= 0)
+            continue;
+
+        if (apply)
+        {
+            if (!HasAura(spellId))
+                CastSpell(this, spellId, true, item);
+        }
+        else
+            RemoveAurasDueToSpell(spellId);
+    }
 }
 
 SpellSchoolMask Player::GetMeleeDamageSchoolMask(WeaponAttackType attackType /*= BASE_ATTACK*/, uint8 damageIndex /*= 0*/) const

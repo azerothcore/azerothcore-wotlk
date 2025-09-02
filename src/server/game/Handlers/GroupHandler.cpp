@@ -22,6 +22,7 @@
 #include "LFGMgr.h"
 #include "Language.h"
 #include "Log.h"
+#include "MapMgr.h"
 #include "MiscPackets.h"
 #include "ObjectMgr.h"
 #include "Opcodes.h"
@@ -522,24 +523,17 @@ void WorldSession::HandleLootRoll(WorldPacket& recvData)
     }
 }
 
-void WorldSession::HandleMinimapPingOpcode(WorldPacket& recvData)
+void WorldSession::HandleMinimapPingOpcode(WorldPackets::Misc::MinimapPingClient& packet)
 {
-    if (!GetPlayer()->GetGroup())
+    if (!sMapMgr->IsValidMapCoord(GetPlayer()->GetMap()->GetId(), packet.MapX, packet.MapY))
         return;
 
-    float x, y;
-    recvData >> x;
-    recvData >> y;
+    Group* group = GetPlayer()->GetGroup();
 
-    /** error handling **/
-    /********************/
+    if (!group)
+        return;
 
-    // everything's fine, do it
-    WorldPacket data(MSG_MINIMAP_PING, (8 + 4 + 4));
-    data << GetPlayer()->GetGUID();
-    data << float(x);
-    data << float(y);
-    GetPlayer()->GetGroup()->BroadcastPacket(&data, true, -1, GetPlayer()->GetGUID());
+    group->DoMinimapPing(GetPlayer()->GetGUID(), packet.MapX, packet.MapY);
 }
 
 void WorldSession::HandleRandomRollOpcode(WorldPackets::Misc::RandomRollClient& packet)
@@ -549,10 +543,8 @@ void WorldSession::HandleRandomRollOpcode(WorldPackets::Misc::RandomRollClient& 
     maximum = packet.Max;
 
     /** error handling **/
-    if (minimum > maximum || maximum > 10000) // < 32768 for urand call
-    {
+    if (minimum > maximum || maximum > sWorld->getIntConfig(CONFIG_RANDOM_ROLL_MAXIMUM))
         return;
-    }
 
     GetPlayer()->DoRandomRoll(minimum, maximum);
 }

@@ -28,6 +28,7 @@
 #include "LFGMgr.h"
 #include "Log.h"
 #include "MapMgr.h"
+#include "MiscPackets.h"
 #include "ObjectMgr.h"
 #include "Opcodes.h"
 #include "Player.h"
@@ -2057,6 +2058,16 @@ GroupJoinBattlegroundResult Group::CanJoinBattlegroundQueue(Battleground const* 
     }
 
     return GroupJoinBattlegroundResult(bgTemplate->GetBgTypeID());
+}
+
+void Group::DoMinimapPing(ObjectGuid sourceGuid, float mapX, float mapY)
+{
+    WorldPackets::Misc::MinimapPing minimapPing;
+    minimapPing.SourceGuid = sourceGuid;
+    minimapPing.MapX = mapX;
+    minimapPing.MapY = mapY;
+
+    BroadcastPacket(minimapPing.Write(), true, -1, sourceGuid);
 }
 
 //===================================================

@@ -172,7 +172,7 @@ void WorldSession::HandleGMTicketDeleteOpcode(WorldPacket& /*recv_data*/)
 
 void WorldSession::HandleGMTicketGetTicketOpcode(WorldPacket& /*recv_data*/)
 {
-    SendQueryTimeResponse();
+    SendTimeQueryResponse();
 
     if (GmTicket* ticket = sTicketMgr->GetTicketByPlayer(GetPlayer()->GetGUID()))
     {

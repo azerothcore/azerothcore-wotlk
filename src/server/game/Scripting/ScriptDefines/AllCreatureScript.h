@@ -33,7 +33,7 @@ public:
     virtual void OnBeforeCreatureSelectLevel(const CreatureTemplate* /*cinfo*/, Creature* /*creature*/, uint8& /*level*/) { }
 
     // Called from End of Creature SelectLevel.
-    virtual void Creature_SelectLevel(const CreatureTemplate* /*cinfo*/, Creature* /*creature*/) { }
+    virtual void OnCreatureSelectLevel(const CreatureTemplate* /*cinfo*/, Creature* /*creature*/) { }
 
     /**
      * @brief This hook runs after add creature in world
