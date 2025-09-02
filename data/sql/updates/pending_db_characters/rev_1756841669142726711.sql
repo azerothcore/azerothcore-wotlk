@@ -19,8 +19,8 @@ ALTER TABLE `petition`
 ALTER TABLE `petition_sign`
     ADD COLUMN `petition_id` INT UNSIGNED NOT NULL DEFAULT 0 AFTER `petitionguid`;
 
-UPDATE `petition_sign` `ps`
-JOIN `petition` `p` ON `p`.`petitionguid` = `ps`.`petitionguid`
+UPDATE `petition_sign` AS `ps`
+JOIN `petition` AS `p` ON `p`.`petitionguid` = `ps`.`petitionguid`
 SET `ps`.`petition_id` = `p`.`petition_id`
 WHERE `ps`.`petition_id` = 0;
 
@@ -29,7 +29,7 @@ ALTER TABLE `petition_sign`
     ADD INDEX `idx_petition_id_player` (`petition_id`, `playerguid`);
 
 -- Repair existing charter items: set first enchantment token to petition_id
-UPDATE `item_instance` `ii`
-JOIN `petition` `p` ON `p`.`petitionguid` = `ii`.`guid`
+UPDATE `item_instance` AS `ii`
+JOIN `petition` AS `p` ON `p`.`petitionguid` = `ii`.`guid`
 SET `ii`.`enchantments` = CONCAT(`p`.`petition_id`, SUBSTRING(`ii`.`enchantments`, LOCATE(' ', `ii`.`enchantments`)))
 WHERE `ii`.`enchantments` IS NOT NULL AND `ii`.`enchantments` <> '';
