@@ -542,6 +542,8 @@ def non_innodb_engine_check(file: io, file_path: str) -> None:
 
     engine_pattern = re.compile(r'ENGINE\s*=\s*([a-zA-Z0-9_]+)', re.IGNORECASE)
 
+    row_format_pattern = re.compile(r'ROW_FORMAT\s*=\s*([a-zA-Z0-9_]+)', re.IGNORECASE)
+
     for line_number, line in enumerate(file, start=1):
         match = engine_pattern.search(line)
         if match:
@@ -549,6 +551,14 @@ def non_innodb_engine_check(file: io, file_path: str) -> None:
             engine = match.group(1).lower()
             if engine != "innodb":
                 print_error_with_spacing(f"❌ Non-InnoDB engine found: '{engine}' in {file_path} at line {line_number}", "engine")
+                check_failed = True
+
+        row_match = row_format_pattern.search(line)
+        if row_match:
+            found_relevant_content = True
+            row_format = row_match.group(1).lower()
+            if row_format != "default":
+                print_error_with_spacing(f"❌ Non-DEFAULT ROW_FORMAT found: '{row_format}' in {file_path} at line {line_number}", "row_format")
                 check_failed = True
 
     if check_failed:
