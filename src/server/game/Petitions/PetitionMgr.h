@@ -20,7 +20,7 @@
 
 #include "ObjectGuid.h"
 
-#include <map>
+#include <unordered_map>
 
 #define CHARTER_DISPLAY_ID 16161
 
@@ -95,7 +95,7 @@ protected:
     PetitionContainer PetitionStore;
     SignatureContainer SignatureStore;
     // Mapping id -> item-guid to support DB-id lookups
-    std::map<uint32, ObjectGuid> PetitionIdToItemGuid;
+    std::unordered_map<uint32, ObjectGuid> PetitionIdToItemGuid;
     // Next petition id (kept < 2^31)
     uint32 _nextPetitionId = 1;
 };
