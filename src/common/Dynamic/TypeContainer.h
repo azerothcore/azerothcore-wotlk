@@ -26,6 +26,7 @@
 #include "Dynamic/TypeList.h"
 #include "GridRefMgr.h"
 #include <unordered_map>
+#include <vector>
 
 /*
  * @class ContainerMapList is a mulit-type container for map elements
