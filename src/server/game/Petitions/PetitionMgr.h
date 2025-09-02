@@ -21,6 +21,7 @@
 #include "ObjectGuid.h"
 
 #include <unordered_map>
+#include <map>
 
 #define CHARTER_DISPLAY_ID 16161
 
