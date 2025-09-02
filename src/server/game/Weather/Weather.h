@@ -63,7 +63,7 @@ enum WeatherState : uint32
 class Weather
 {
 public:
-    Weather(uint32 zone, WeatherData const* weatherChances);
+    Weather(Map* map, uint32 zone, WeatherData const* weatherChances);
     ~Weather() = default;
 
     bool Update(uint32 diff);
@@ -71,6 +71,7 @@ public:
     bool UpdateWeather();
 
     void SendWeatherUpdateToPlayer(Player* player);
+    static void SendFineWeatherUpdateToPlayer(Player* player);
     void SetWeather(WeatherType type, float grade);
 
     /// For which zone is this weather?
@@ -79,6 +80,7 @@ public:
 
 private:
     [[nodiscard]] WeatherState GetWeatherState() const;
+    Map* m_map;
     uint32 m_zone;
     WeatherType m_type;
     float m_grade;
