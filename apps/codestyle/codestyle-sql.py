@@ -490,6 +490,7 @@ def backtick_check(file: io, file_path: str) -> None:
                                     "CASE", "WHEN", "THEN", "ELSE", "END", "CREATE", "TABLE",
                                     "ALTER", "DROP", "DATABASE", "INDEX", "VIEW", "TRIGGER",
                                     "PROCEDURE", "FUNCTION", "PRIMARY", "KEY", "FOREIGN", "REFERENCES",
+                                    "CONCAT", "SUBSTRING", "LOCATE",
                                     "CONSTRAINT", "DEFAULT", "AUTO_INCREMENT", "UNIQUE", "CHECK",
                                     "SHOW", "DESCRIBE", "EXPLAIN", "USE", "GRANT", "REVOKE",
                                     "BEGIN", "COMMIT", "ROLLBACK", "SAVEPOINT", "LOCK", "UNLOCK",
