@@ -75,7 +75,7 @@ Map::Map(uint32 id, uint32 InstanceId, uint8 SpawnMode, Map* _parent) :
     //lets initialize visibility distance for map
     Map::InitVisibilityDistance();
 
-    _weatherUpdateTimer.SetInterval(time_t(1 * IN_MILLISECONDS));
+    _weatherUpdateTimer.SetInterval(1 * IN_MILLISECONDS);
 }
 
 // Hook called after map is created AND after added to map list
