@@ -1,3 +1,4 @@
+-- DB update 2025_08_30_03 -> 2025_09_02_00
 
 -- Morbid Carcass, Vault Geist, Rabid Cannibal, Death Knight Master
 UPDATE `creature_template` SET `AIName` = 'SmartAI' WHERE (`entry` IN (29719, 29720, 29722, 29738));
