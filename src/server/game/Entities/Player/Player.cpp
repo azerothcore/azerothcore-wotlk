@@ -3930,20 +3930,12 @@ TrainerSpellState Player::GetTrainerSpellState(TrainerSpell const* trainer_spell
         if (!trainer_spell->learnedSpell[i])
             continue;
 
-        uint32 firstRankSpell = sSpellMgr->GetFirstSpellInChain(trainer_spell->learnedSpell[i]);
-        for (uint32 spellId = firstRankSpell; spellId; spellId = sSpellMgr->GetNextSpellInChain(spellId))
-        {
-            if (HasSpell(spellId))
-                continue;
-        }
-
         if (!HasSpell(trainer_spell->learnedSpell[i]))
         {
             hasSpell = false;
             break;
         }
     }
-
     // known spell
     if (hasSpell)
         return TRAINER_SPELL_GRAY;
