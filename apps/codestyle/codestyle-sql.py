@@ -235,6 +235,16 @@ def sql_check(file: io, file_path: str) -> None:
                 print_error_with_spacing(
                     f"❌ Do not specify width for {int_type.upper()} columns (parentheses are deprecated). Found in {file_path} at line {line_number}", "sql_codestyle")
                 check_failed = True
+
+        # BOOL and MEDIUMINT type check
+        if re.search(r'\bbool\b', line, re.IGNORECASE):
+            print_error_with_spacing(
+                f"❌ BOOL type is not allowed (use TINYINT instead). Found in {file_path} at line {line_number}", "sql_codestyle")
+            check_failed = True
+        if re.search(r'\bmediumint\b', line, re.IGNORECASE):
+            print_error_with_spacing(
+                f"❌ MEDIUMINT type is not allowed (use INT instead). Found in {file_path} at line {line_number}", "sql_codestyle")
+            check_failed = True
         # ...existing code...
         if [match for match in ['broadcast_text'] if match in line]:
             print_error_with_spacing(
