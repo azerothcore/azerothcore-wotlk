@@ -543,6 +543,7 @@ def non_innodb_engine_check(file: io, file_path: str) -> None:
     engine_pattern = re.compile(r'ENGINE\s*=\s*([a-zA-Z0-9_]+)', re.IGNORECASE)
     row_format_pattern = re.compile(r'ROW_FORMAT\s*=\s*([a-zA-Z0-9_]+)', re.IGNORECASE)
     charset_pattern = re.compile(r'CHARSET\s*=\s*([a-zA-Z0-9_]+)', re.IGNORECASE)
+    collate_pattern = re.compile(r'COLLATE\s*=\s*([a-zA-Z0-9_]+)', re.IGNORECASE)
 
     for line_number, line in enumerate(file, start=1):
         match = engine_pattern.search(line)
@@ -567,6 +568,14 @@ def non_innodb_engine_check(file: io, file_path: str) -> None:
             charset = charset_match.group(1).lower()
             if charset != "utf8mb4":
                 print_error_with_spacing(f"❌ Non-utf8mb4 CHARSET found: '{charset}' in {file_path} at line {line_number}", "charset")
+                check_failed = True
+
+        collate_match = collate_pattern.search(line)
+        if collate_match:
+            found_relevant_content = True
+            collate = collate_match.group(1).lower()
+            if collate != "utf8mb4_unicode_ci":
+                print_error_with_spacing(f"❌ Non-utf8mb4_unicode_ci COLLATE found: '{collate}' in {file_path} at line {line_number}", "collate")
                 check_failed = True
 
     if check_failed:
