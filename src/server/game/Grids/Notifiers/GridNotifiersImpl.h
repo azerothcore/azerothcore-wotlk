@@ -28,8 +28,8 @@
 template<class T>
 inline void Acore::VisibleNotifier::Visit(std::vector<T>& m)
 {
-    for (typename std::vector<T>::iterator iter = m.begin(); iter != m.end(); ++iter)
-        i_player.UpdateVisibilityOf((*iter), i_data, i_visibleNow);
+    for (T& obj : m)
+        i_player.UpdateVisibilityOf(obj, i_data, i_visibleNow);
 }
 
 template<class T>
