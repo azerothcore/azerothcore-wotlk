@@ -227,6 +227,15 @@ def sql_check(file: io, file_path: str) -> None:
     
     # Parse all the file
     for line_number, line in enumerate(lines, start = 1):
+        # INT width check
+        int_types = ["int", "tinyint", "smallint", "bigint"]
+        for int_type in int_types:
+            # Match column definitions like `colname` INT(11) ...
+            if re.search(rf'\b{int_type}\s*\(', line, re.IGNORECASE):
+                print_error_with_spacing(
+                    f"❌ Do not specify width for {int_type.upper()} columns (parentheses are deprecated). Found in {file_path} at line {line_number}", "sql_codestyle")
+                check_failed = True
+        # ...existing code...
         if [match for match in ['broadcast_text'] if match in line]:
             print_error_with_spacing(
                 f"❌ DON'T EDIT broadcast_text TABLE UNLESS YOU KNOW WHAT YOU ARE DOING!\nThis error can safely be ignored if the changes are approved to be sniffed: {file_path} at line {line_number}", "sql_codestyle")
@@ -575,16 +584,14 @@ def non_innodb_engine_check(file: io, file_path: str) -> None:
             found_relevant_content = True
             collate = collate_match.group(1).lower()
             # Exception for 'name' column in specific tables
-            # Look for table and column context in the line
             exception_tables = {"characters", "profanity_name", "reserved_name"}
             exception_column = "name"
-            # Try to detect if this is a column-level COLLATE (e.g. `name` varchar(...) COLLATE ...)
+
             column_collate_match = re.search(r'`(\w+)`\s+\w+\s*\([^)]*\)?\s*COLLATE\s*=\s*([a-zA-Z0-9_]+)', line, re.IGNORECASE)
             table_match = re.search(r'CREATE\s+TABLE\s+`?(\w+)`?', line, re.IGNORECASE)
             if column_collate_match:
                 col_name = column_collate_match.group(1).lower()
                 col_collate = column_collate_match.group(2).lower()
-                # Try to get table name from previous context or line
                 table_name = None
                 if table_match:
                     table_name = table_match.group(1).lower()
