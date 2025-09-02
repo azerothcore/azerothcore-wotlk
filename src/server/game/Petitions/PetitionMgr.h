@@ -37,14 +37,21 @@ typedef std::map<ObjectGuid, uint32> SignatureMap;
 
 struct Petition
 {
+    // Item GUID of the charter item (used to find the item in inventory)
     ObjectGuid petitionGuid;
+    // New 31-bit safe petition identifier used in packets/DB relations
+    uint32 petitionId;
+    // Owner character GUID
     ObjectGuid ownerGuid;
+    // Petition type (guild / arena)
     uint8  petitionType;
+    // Name associated with the petition (guild/arena name)
     std::string petitionName;
 };
 
 struct Signatures
 {
+    // Keep keying by item-guid for backward compatibility in code paths
     ObjectGuid petitionGuid;
     SignatureMap signatureMap;
 };
@@ -65,10 +72,11 @@ public:
     void LoadSignatures();
 
     // Petitions
-    void AddPetition(ObjectGuid petitionGUID, ObjectGuid ownerGuid, std::string const& name, uint8 type);
+    void AddPetition(ObjectGuid petitionGUID, ObjectGuid ownerGuid, std::string const& name, uint8 type, uint32 petitionId);
     void RemovePetition(ObjectGuid petitionGUID);
     void RemovePetitionByOwnerAndType(ObjectGuid ownerGuid, uint8 type);
     Petition const* GetPetition(ObjectGuid petitionGUID) const;
+    Petition const* GetPetitionById(uint32 petitionId) const;
     Petition const* GetPetitionByOwnerWithType(ObjectGuid ownerGuid, uint8 type) const;
     PetitionContainer* GetPetitionStore() { return &PetitionStore; }
 
@@ -79,9 +87,17 @@ public:
     Signatures const* GetSignature(ObjectGuid petitionGUID) const;
     SignatureContainer* GetSignatureStore() { return &SignatureStore; }
 
+    uint32 GeneratePetitionId();
+    uint32 GetPetitionIdByItemGuid(ObjectGuid petitionItemGuid) const;
+    ObjectGuid GetItemGuidByPetitionId(uint32 petitionId) const;
+
 protected:
     PetitionContainer PetitionStore;
     SignatureContainer SignatureStore;
+    // Mapping id -> item-guid to support DB-id lookups
+    std::map<uint32, ObjectGuid> PetitionIdToItemGuid;
+    // Next petition id (kept < 2^31)
+    uint32 _nextPetitionId = 1;
 };
 
 #define sPetitionMgr PetitionMgr::instance()
