@@ -443,6 +443,8 @@ public:
     void SendZoneDynamicInfo(Player* player);
     void SendInitSelf(Player* player);
 
+    void UpdateExpiredCorpses(uint32 const diff);
+
     void PlayDirectSoundToMap(uint32 soundId, uint32 zoneId = 0);
     void SetZoneMusic(uint32 zoneId, uint32 musicId);
     void SetZoneWeather(uint32 zoneId, WeatherState weatherId, float weatherGrade);
@@ -575,6 +577,8 @@ private:
 
     ZoneDynamicInfoMap _zoneDynamicInfo;
     uint32 _defaultLight;
+
+    IntervalTimer _corpseUpdateTimer;
 
     template<HighGuid high>
     inline ObjectGuidGeneratorBase& GetGuidSequenceGenerator()
