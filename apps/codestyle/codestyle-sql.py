@@ -1080,8 +1080,13 @@ def compact_queries_check(file: io, file_path: str) -> None:
     for table_name, deletes in delete_patterns.items():
         if len(deletes) >= 2:  # 2 or more similar DELETE statements
             line_numbers = [str(line_num) for line_num, _ in deletes]
-            print_error_with_spacing(f"❌ Multiple DELETE statements for table `{table_name}` can be consolidated using IN clause. Found {len(deletes)} statements at lines {', '.join(line_numbers)}. {file_path}", "compact")
-            check_failed = True
+            # Special handling for smart_scripts and conditions
+            if table_name in ["smart_scripts", "conditions"]:
+                warnings_list.append(
+                    f"❗ Multiple DELETE statements for table `{table_name}` can be consolidated using IN clause, but queries should be kept readable. If too many are bundled, separate them for review. Found {len(deletes)} statements at lines {', '.join(line_numbers)}. {file_path}")
+            else:
+                print_error_with_spacing(f"❌ Multiple DELETE statements for table `{table_name}` can be consolidated using IN clause. Found {len(deletes)} statements at lines {', '.join(line_numbers)}. {file_path}", "compact")
+                check_failed = True
     
     # More than 1 INSERT found with the same column(s)
     for table_name, inserts in insert_patterns.items():
@@ -1092,13 +1097,16 @@ def compact_queries_check(file: io, file_path: str) -> None:
                 if columns not in column_groups:
                     column_groups[columns] = []
                 column_groups[columns].append(line_num)
-            
             for columns, line_numbers in column_groups.items():
                 if len(line_numbers) >= 2:
                     line_numbers_str = [str(ln) for ln in line_numbers]
-                    print_error_with_spacing(f"❌ Multiple INSERT statements for table `{table_name}` with same columns can be consolidated into multi-row INSERT. Found {len(line_numbers)} statements at lines {', '.join(line_numbers_str)}. {file_path}", "compact")
-                    check_failed = True
-    
+                    # exception to the rule for SAI and Conditions table, throw a warning instead of a error
+                    if table_name in ["smart_scripts", "conditions"]:
+                        warnings_list.append(
+                            f"❗ Multiple INSERT statements for table `{table_name}` with same columns can be consolidated, but queries should be kept readable. If too many are bundled, separate them for review. Found {len(line_numbers)} statements at lines {', '.join(line_numbers_str)}. {file_path}")
+                    else:
+                        print_error_with_spacing(f"❌ Multiple INSERT statements for table `{table_name}` with same columns can be consolidated into multi-row INSERT. Found {len(line_numbers)} statements at lines {', '.join(line_numbers_str)}. {file_path}", "compact")
+                        check_failed = True
     # More than 1 UPDATE found with the same SET column(s)
     for table_name, updates in update_patterns.items():
         if len(updates) >= 2:  # 2 or more similar UPDATE statements
