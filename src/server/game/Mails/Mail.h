@@ -158,7 +158,7 @@ private:
 
 struct MailItemInfo
 {
-    ObjectGuid::LowType item_guid;
+    uint64 item_guid;
     uint32 item_template;
 };
 typedef std::vector<MailItemInfo> MailItemInfoVec;

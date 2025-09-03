@@ -239,11 +239,18 @@ public:
     [[nodiscard]] bool IsBoundByEnchant() const;
     [[nodiscard]] bool IsBoundByTempEnchant() const;
     virtual void SaveToDB(CharacterDatabaseTransaction trans);
+    // Legacy: Load by low-guid (pre-decoupling)
     virtual bool LoadFromDB(ObjectGuid::LowType guid, ObjectGuid owner_guid, Field* fields, uint32 entry);
+    // Decoupled: Load by persistent db-guid (64-bit), will map to a transient low-guid
+    virtual bool LoadFromDB64(uint64 dbGuid, ObjectGuid owner_guid, Field* fields, uint32 entry);
     static void DeleteFromDB(CharacterDatabaseTransaction trans, ObjectGuid::LowType itemGuid);
     virtual void DeleteFromDB(CharacterDatabaseTransaction trans);
     static void DeleteFromInventoryDB(CharacterDatabaseTransaction trans, ObjectGuid::LowType itemGuid);
     void DeleteFromInventoryDB(CharacterDatabaseTransaction trans);
+
+    // Decoupled: DB GUID accessors
+    uint64 GetDbGuid() const { return m_dbGuid; }
+    void SetDbGuid(uint64 v) { m_dbGuid = v; }
     void SaveRefundDataToDB();
     void DeleteRefundDataFromDB(CharacterDatabaseTransaction* trans);
 
@@ -376,5 +383,6 @@ private:
     uint32 m_paidMoney;
     uint32 m_paidExtendedCost;
     AllowedLooterSet allowedGUIDs;
+    uint64 m_dbGuid = 0;                                // Persistent DB identifier (64-bit)
 };
 #endif

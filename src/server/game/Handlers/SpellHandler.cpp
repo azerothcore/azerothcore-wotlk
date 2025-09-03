@@ -273,7 +273,7 @@ void WorldSession::HandleOpenItemOpcode(WorldPacket& recvPacket)
         if (item->IsWrapped())// wrapped?
         {
             CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_CHARACTER_GIFT_BY_ITEM);
-            stmt->SetData(0, item->GetGUID().GetCounter());
+            stmt->SetData(0, static_cast<uint64>(item->GetDbGuid()));
             _queryProcessor.AddCallback(CharacterDatabase.AsyncQuery(stmt)
                 .WithPreparedCallback(std::bind(&WorldSession::HandleOpenWrappedItemCallback, this, bagIndex, slot, item->GetGUID().GetCounter(), std::placeholders::_1)));
         }
@@ -318,7 +318,7 @@ void WorldSession::HandleOpenWrappedItemCallback(uint8 bagIndex, uint8 slot, Obj
     GetPlayer()->SaveInventoryAndGoldToDB(trans);
 
     CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_GIFT);
-    stmt->SetData(0, item->GetGUID().GetCounter());
+    stmt->SetData(0, static_cast<uint64>(item->GetDbGuid()));
     trans->Append(stmt);
 
     CharacterDatabase.CommitTransaction(trans);

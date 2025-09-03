@@ -31,6 +31,7 @@
 #include "ScriptMgr.h"
 #include "WorldPacket.h"
 #include "WorldSession.h"
+#include "Entities/Item/ItemGuidMap.h"
 
 #define MAX_INBOX_CLIENT_CAPACITY 50
 
@@ -73,13 +74,13 @@ void WorldSession::HandleSendMail(WorldPacket& recvData)
 
     recvData >> subject;
 
+    recvData >> body;
+
     // prevent client crash
     if (subject.find("| |") != std::string::npos || body.find("| |") != std::string::npos)
     {
         return;
     }
-
-    recvData >> body;
 
     recvData >> unk1;                                      // stationery?
     recvData >> unk2;                                      // 0x00000000
@@ -712,7 +713,7 @@ void WorldSession::HandleGetMailList(WorldPacket& recvData)
 
         for (uint8 i = 0; i < item_count; ++i)
         {
-            Item* item = player->GetMItem(mail->items[i].item_guid);
+            Item* item = player->GetMItem(static_cast<ObjectGuid::LowType>(mail->items[i].item_guid));
             // item index (0-6?)
             data << uint8(i);
             // item guid low?
@@ -775,7 +776,7 @@ void WorldSession::HandleMailCreateTextItem(WorldPacket& recvData)
     }
 
     Item* bodyItem = new Item;                              // This is not bag and then can be used new Item.
-    if (!bodyItem->Create(sObjectMgr->GetGenerator<HighGuid::Item>().Generate(), MAIL_BODY_ITEM_TEMPLATE, player))
+    if (!bodyItem->Create(sItemGuidMap->AcquireForNew(), MAIL_BODY_ITEM_TEMPLATE, player))
     {
         delete bodyItem;
         return;

@@ -63,6 +63,7 @@
 #include "Util.h"
 #include "World.h"
 #include "WorldPacket.h"
+#include "Entities/Item/ItemGuidMap.h"
 
 /// @todo: this import is not necessary for compilation and marked as unused by the IDE
 //  however, for some reasons removing it would cause a damn linking issue
@@ -2561,7 +2562,7 @@ Item* Player::StoreNewItem(ItemPosCountVec const& dest, uint32 item, bool update
                 ss << ' ' << (*itr).GetCounter();
 
             CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_INS_ITEM_BOP_TRADE);
-            stmt->SetData(0, pItem->GetGUID().GetCounter());
+            stmt->SetData(0, static_cast<uint64>(pItem->GetDbGuid()));
             stmt->SetData(1, ss.str());
             CharacterDatabase.Execute(stmt);
         }
@@ -3032,7 +3033,7 @@ void Player::DestroyItem(uint8 bag, uint8 slot, bool update)
         if (pItem->IsWrapped())
         {
             CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_GIFT);
-            stmt->SetData(0, pItem->GetGUID().GetCounter());
+            stmt->SetData(0, static_cast<uint64>(pItem->GetDbGuid()));
             CharacterDatabase.Execute(stmt);
         }
 
@@ -5969,20 +5970,21 @@ void Player::_LoadInventory(PreparedQueryResult result, uint32 timeDiff)
 Item* Player::_LoadItem(CharacterDatabaseTransaction trans, uint32 zoneId, uint32 timeDiff, Field* fields)
 {
     Item* item = nullptr;
-    ObjectGuid::LowType itemGuid  = fields[13].Get<uint32>();
+    uint64 itemGuidDb  = fields[13].Get<uint64>();
     uint32 itemEntry = fields[14].Get<uint32>();
     if (ItemTemplate const* proto = sObjectMgr->GetItemTemplate(itemEntry))
     {
         bool remove = false;
         item = NewItemOrBag(proto);
-        if (item->LoadFromDB(itemGuid, GetGUID(), fields, itemEntry))
+        bool ok = item->LoadFromDB64(itemGuidDb, GetGUID(), fields, itemEntry);
+        if (ok)
         {
             CharacterDatabasePreparedStatement* stmt = nullptr;
 
             // Do not allow to have item limited to another map/zone in alive state
             if (IsAlive() && item->IsLimitedToAnotherMapOrZone(GetMapId(), zoneId))
             {
-                LOG_DEBUG("entities.player.loading", "Player::_LoadInventory: player ({}, name: '{}', map: {}) has item ({}, entry: {}) limited to another map ({}). Deleting item.",
+                        LOG_DEBUG("entities.player.loading", "Player::_LoadInventory: player ({}, name: '{}', map: {}) has item ({}, entry: {}) limited to another map ({}). Deleting item.",
                           GetGUID().ToString(), GetName(), GetMapId(), item->GetGUID().ToString(), item->GetEntry(), zoneId);
                 remove = true;
             }
@@ -6000,7 +6002,7 @@ Item* Player::_LoadItem(CharacterDatabaseTransaction trans, uint32 zoneId, uint3
                     LOG_DEBUG("entities.player.loading", "Player::_LoadInventory: player ({}, name: '{}') has item ({}, entry: {}) with expired refund time ({}). Deleting refund data and removing refundable flag.",
                               GetGUID().ToString(), GetName(), item->GetGUID().ToString(), item->GetEntry(), item->GetPlayedTime());
                     stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_ITEM_REFUND_INSTANCE);
-                    stmt->SetData(0, item->GetGUID().GetCounter());
+                    stmt->SetData(0, static_cast<uint64>(item->GetDbGuid()));
                     trans->Append(stmt);
 
                     item->RemoveFlag(ITEM_FIELD_FLAGS, ITEM_FIELD_FLAG_REFUNDABLE);
@@ -6009,7 +6011,7 @@ Item* Player::_LoadItem(CharacterDatabaseTransaction trans, uint32 zoneId, uint3
                 {
                     // xinef: sync query
                     stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_ITEM_REFUNDS);
-                    stmt->SetData(0, item->GetGUID().GetCounter());
+                    stmt->SetData(0, static_cast<uint64>(item->GetDbGuid()));
                     stmt->SetData(1, GetGUID().GetCounter());
                     if (PreparedQueryResult result = CharacterDatabase.Query(stmt))
                     {
@@ -6029,7 +6031,7 @@ Item* Player::_LoadItem(CharacterDatabaseTransaction trans, uint32 zoneId, uint3
             else if (item->IsBOPTradable())
             {
                 stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_ITEM_BOP_TRADE);
-                stmt->SetData(0, item->GetGUID().GetCounter());
+                stmt->SetData(0, static_cast<uint64>(item->GetDbGuid()));
 
                 if (PreparedQueryResult result = CharacterDatabase.Query(stmt))
                 {
@@ -6079,13 +6081,15 @@ Item* Player::_LoadItem(CharacterDatabaseTransaction trans, uint32 zoneId, uint3
         else
         {
             LOG_ERROR("entities.player", "Player::_LoadInventory: player ({}, name: '{}') has broken item (GUID: {}, entry: {}) in inventory. Deleting item.",
-                      GetGUID().ToString(), GetName(), itemGuid, itemEntry);
+                      GetGUID().ToString(), GetName(), itemGuidDb, itemEntry);
             remove = true;
         }
         // Remove item from inventory if necessary
         if (remove)
         {
-            Item::DeleteFromInventoryDB(trans, itemGuid);
+            CharacterDatabasePreparedStatement* delStmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_CHAR_INVENTORY_BY_ITEM);
+            delStmt->SetData(0, static_cast<uint64>(item->GetDbGuid()));
+            trans->Append(delStmt);
             item->FSetState(ITEM_REMOVED);
             item->SaveToDB(trans);                           // it also deletes item object!
             item = nullptr;
@@ -6095,8 +6099,12 @@ Item* Player::_LoadItem(CharacterDatabaseTransaction trans, uint32 zoneId, uint3
     {
         LOG_ERROR("entities.player", "Player::_LoadInventory: player ({}, name: '{}') has unknown item (entry: {}) in inventory. Deleting item.",
                   GetGUID().ToString(), GetName(), itemEntry);
-        Item::DeleteFromInventoryDB(trans, itemGuid);
-        Item::DeleteFromDB(trans, itemGuid);
+        CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_CHAR_INVENTORY_BY_ITEM);
+        stmt->SetData(0, static_cast<uint64>(itemGuidDb));
+        trans->Append(stmt);
+        stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_ITEM_INSTANCE);
+        stmt->SetData(0, static_cast<uint64>(itemGuidDb));
+        trans->Append(stmt);
     }
     return item;
 }
@@ -6104,19 +6112,19 @@ Item* Player::_LoadItem(CharacterDatabaseTransaction trans, uint32 zoneId, uint3
 // load mailed item which should receive current player
 Item* Player::_LoadMailedItem(ObjectGuid const& playerGuid, Player* player, uint32 mailId, Mail* mail, Field* fields)
 {
-    ObjectGuid::LowType itemGuid = fields[11].Get<uint32>();
+    uint64 itemGuidDb = fields[11].Get<uint64>();
     uint32 itemEntry = fields[12].Get<uint32>();
 
     ItemTemplate const* proto = sObjectMgr->GetItemTemplate(itemEntry);
     if (!proto)
     {
         LOG_ERROR("entities.player", "Player {} ({}) has unknown item in mailed items (GUID: {}, Entry: {}) in mail ({}), deleted.",
-            player ? player->GetName() : "<unknown>", playerGuid.ToString(), itemGuid, itemEntry, mailId);
+            player ? player->GetName() : "<unknown>", playerGuid.ToString(), itemGuidDb, itemEntry, mailId);
 
         CharacterDatabaseTransaction trans = CharacterDatabase.BeginTransaction();
 
         CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_INVALID_MAIL_ITEM);
-        stmt->SetData(0, itemGuid);
+        stmt->SetData(0, static_cast<uint64>(itemGuidDb));
         trans->Append(stmt);
 
         CharacterDatabase.CommitTransaction(trans);
@@ -6126,12 +6134,12 @@ Item* Player::_LoadMailedItem(ObjectGuid const& playerGuid, Player* player, uint
     Item* item = NewItemOrBag(proto);
 
     ObjectGuid ownerGuid = fields[13].Get<uint32>() ? ObjectGuid::Create<HighGuid::Player>(fields[13].Get<uint32>()) : ObjectGuid::Empty;
-    if (!item->LoadFromDB(itemGuid, ownerGuid, fields, itemEntry))
+    if (!item->LoadFromDB64(itemGuidDb, ownerGuid, fields, itemEntry))
     {
-        LOG_ERROR("entities.player", "Player::_LoadMailedItems: Item (GUID: {}) in mail ({}) doesn't exist, deleted from mail.", itemGuid, mailId);
+        LOG_ERROR("entities.player", "Player::_LoadMailedItems: Item (GUID: {}) in mail ({}) doesn't exist, deleted from mail.", itemGuidDb, mailId);
 
         CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_MAIL_ITEM);
-        stmt->SetData(0, itemGuid);
+        stmt->SetData(0, static_cast<uint64>(itemGuidDb));
         CharacterDatabase.Execute(stmt);
 
         item->FSetState(ITEM_REMOVED);
@@ -6143,7 +6151,7 @@ Item* Player::_LoadMailedItem(ObjectGuid const& playerGuid, Player* player, uint
 
     if (mail)
     {
-        mail->AddItem(itemGuid, itemEntry);
+        mail->AddItem(item->GetGUID().GetCounter(), itemEntry);
     }
 
     if (player)
@@ -7267,11 +7275,11 @@ void Player::_SaveInventory(CharacterDatabaseTransaction trans)
         }
 
         stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_CHAR_INVENTORY_BY_ITEM);
-        stmt->SetData(0, item->GetGUID().GetCounter());
+        stmt->SetData(0, static_cast<uint64>(item->GetDbGuid()));
         trans->Append(stmt);
 
         stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_ITEM_INSTANCE);
-        stmt->SetData(0, item->GetGUID().GetCounter());
+        stmt->SetData(0, static_cast<uint64>(item->GetDbGuid()));
         trans->Append(stmt);
         m_items[i]->FSetState(ITEM_NEW);
 
@@ -7365,16 +7373,23 @@ void Player::_SaveInventory(CharacterDatabaseTransaction trans)
         {
             case ITEM_NEW:
             case ITEM_CHANGED:
+                // Ensure a DB GUID is assigned before writing character_inventory
+                if (item->GetDbGuid() == 0)
+                {
+                    uint64 newDbGuid = sItemGuidMap->AcquireDbGuid();
+                    sItemGuidMap->Bind(newDbGuid, item->GetGUID().GetCounter());
+                    item->SetDbGuid(newDbGuid);
+                }
                 stmt = CharacterDatabase.GetPreparedStatement(CHAR_REP_INVENTORY_ITEM);
                 stmt->SetData(0, lowGuid);
                 stmt->SetData(1, bag_guid);
                 stmt->SetData (2, item->GetSlot());
-                stmt->SetData(3, item->GetGUID().GetCounter());
+                stmt->SetData(3, static_cast<uint64>(item->GetDbGuid()));
                 trans->Append(stmt);
                 break;
             case ITEM_REMOVED:
                 stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_CHAR_INVENTORY_BY_ITEM);
-                stmt->SetData(0, item->GetGUID().GetCounter());
+                stmt->SetData(0, static_cast<uint64>(item->GetDbGuid()));
                 trans->Append(stmt);
             case ITEM_UNCHANGED:
                 break;
