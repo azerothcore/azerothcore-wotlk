@@ -1,3 +1,4 @@
+-- DB update 2025_07_29_00 -> 2025_09_03_00
 -- Add petition_id column to petition table
 ALTER TABLE `petition` ADD COLUMN `petition_id` INT UNSIGNED NOT NULL DEFAULT 0 AFTER `petitionguid`;
 -- Populate petition_id based on petitionguid
