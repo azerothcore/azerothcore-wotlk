@@ -1072,8 +1072,8 @@ std::string WorldState::GetScourgeInvasionPrintout()
     {
         TimePoint tp = m_siData.m_timers[timerId];
         std::string timerStr;
-        if (tp.time_since_epoch().count() == 0)
-            timerStr = "0 (not set)";
+        if (tp == TimePoint())
+            timerStr = "Not set";
         else if (tp <= now)
             timerStr = "Elapsed";
         else
