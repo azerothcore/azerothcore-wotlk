@@ -22,6 +22,7 @@
 #include "ScriptedEscortAI.h"
 #include "ScriptedGossip.h"
 #include "SpellInfo.h"
+#include "SpellScript.h"
 
 class npc_attracted_reef_bull : public CreatureScript
 {
@@ -393,6 +394,36 @@ public:
     }
 };
 
+enum HawkHunting
+{
+    SPELL_HAWK_HUNTING_ITEM = 44408
+};
+
+// 44407 - Spell hawk Hunting
+class spell_hawk_hunting : public SpellScript
+{
+    PrepareSpellScript(spell_hawk_hunting);
+
+    bool Validate(SpellInfo const* /*spellInfo*/) override
+    {
+        return ValidateSpellInfo({ SPELL_HAWK_HUNTING_ITEM });
+    }
+
+    void HandleScriptEffect(SpellEffIndex /*effIndex*/)
+    {
+        if (!GetCaster())
+            return;
+
+        GetCaster()->CastSpell(GetCaster(), SPELL_HAWK_HUNTING_ITEM, true);
+        GetHitUnit()->ToCreature()->DespawnOrUnsummon();
+    }
+
+    void Register() override
+    {
+        OnEffectHitTarget += SpellEffectFn(spell_hawk_hunting::HandleScriptEffect, EFFECT_1, SPELL_EFFECT_SCRIPT_EFFECT);
+    }
+};
+
 void AddSC_howling_fjord()
 {
     new npc_attracted_reef_bull();
@@ -400,4 +431,5 @@ void AddSC_howling_fjord()
     new npc_apothecary_hanes();
     new npc_plaguehound_tracker();
     new npc_razael_and_lyana();
+    RegisterSpellScript(spell_hawk_hunting);
 }
