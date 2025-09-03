@@ -825,6 +825,14 @@ def sniffable_data_check(file: io, file_path: str) -> None:
                 if sniffable_columns:
                     columns_str = ", ".join(sniffable_columns)
                     warnings_list.append(f"❗ Column(s) {columns_str} from `{table_name}` are being changed, these values are sniffable. {file_path} at line {line_number}")
+                # Check for AIName or ScriptName changes and throw a warning
+                ai_script_columns = []
+                for column in re.findall(r'`?([^`\s=]+)`?\s*=', set_clause):
+                    if column in ["AIName", "ScriptName"]:
+                        ai_script_columns.append(column)
+                if ai_script_columns:
+                    columns_str = ", ".join(ai_script_columns)
+                    warnings_list.append(f"❗ UPDATE changes {columns_str} in `{table_name}`. Check if the current entry doesn't already have this defined, otherwise you may be repeating code or overiting existing AI/script settings. {file_path} at line {line_number}")
         
         # For INSERTs
         insert_match = re.match(r'INSERT\s+INTO\s+`?([^`\s]+)`?\s*\(\s*([^)]+)\s*\)', line.strip(), re.IGNORECASE)
