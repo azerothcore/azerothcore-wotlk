@@ -1072,8 +1072,8 @@ std::string WorldState::GetScourgeInvasionPrintout()
     {
         TimePoint tp = m_siData.m_timers[timerId];
         std::string timerStr;
-        if (tp.time_since_epoch().count() == 0)
-            timerStr = "0 (not set)";
+        if (tp == TimePoint())
+            timerStr = "Not set";
         else if (tp <= now)
             timerStr = "Elapsed";
         else
@@ -1420,10 +1420,15 @@ void ScourgeInvasionData::Reset()
 std::string ScourgeInvasionData::GetData()
 {
     std::string output = std::to_string(m_state) + " ";
-    for (auto& timer : m_timers)
-        output += std::to_string(timer.time_since_epoch().count()) + " ";
+    for (TimePoint& timer : m_timers)
+    {
+        if (timer == TimePoint())
+            output += "0 ";
+        else
+            output += std::to_string(std::chrono::duration_cast<std::chrono::milliseconds>(timer.time_since_epoch()).count()) + " ";
+    }
     output += std::to_string(m_battlesWon) + " " + std::to_string(m_lastAttackZone) + " ";
-    for (auto& remaining : m_remaining)
+    for (uint32& remaining : m_remaining)
         output += std::to_string(remaining) + " ";
     return output;
 }
