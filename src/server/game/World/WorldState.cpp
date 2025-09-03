@@ -1423,7 +1423,7 @@ std::string ScourgeInvasionData::GetData()
     for (auto& timer : m_timers)
         output += std::to_string(timer.time_since_epoch().count()) + " ";
     output += std::to_string(m_battlesWon) + " " + std::to_string(m_lastAttackZone) + " ";
-    for (auto& remaining : m_remaining)
+    for (uint32& remaining : m_remaining)
         output += std::to_string(remaining) + " ";
     return output;
 }
