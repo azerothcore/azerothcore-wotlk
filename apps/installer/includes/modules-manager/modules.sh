@@ -129,15 +129,8 @@ function inst_module_list() {
 function inst_module() {
     # If no arguments provided, start interactive menu
     if [[ $# -eq 0 ]]; then
-        # Check if menu system is available
-        if declare -f menu_run >/dev/null 2>&1; then
-            menu_run "module_menu_items" "MODULE MANAGER" "handle_module_command"
-            return $?
-        else
-            # Fallback to help if menu system not available
-            inst_module_help
-            return 0
-        fi
+        menu_run "MODULE MANAGER" handle_module_command "${module_menu_items[@]}"
+        return $?
     fi
     
     # Normalize arguments into an array

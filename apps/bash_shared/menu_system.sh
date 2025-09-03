@@ -123,7 +123,7 @@ function menu_direct_execute() {
         "$callback" "${_MENU_KEYS[$idx]}" "$@"
         return $?
     else
-        echo "Invalid option. Use --help to see available commands."
+        echo "Invalid option. Use --help to see available commands." >&2
         return 1
     fi
 }
@@ -152,7 +152,7 @@ function menu_interactive() {
         if [[ $idx -ge 0 ]]; then
             "$callback" "${_MENU_KEYS[$idx]}"
         else
-            echo "Invalid option. Please try again or use 'help' for available commands."
+            echo "Invalid option. Please try again or use 'help' for available commands." >&2
             echo ""
         fi
     done
