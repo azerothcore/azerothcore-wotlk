@@ -139,7 +139,11 @@ def parsing_file(files: list) -> None:
             status_icon = "❓"  # Fallback for unexpected status
             status_text = "Unknown"
         print(f"{status_icon} {check}: {status_text}")
-    
+    print("⊘ FLOAT/DOUBLE/DECIMAL UNSIGNED check: Skipped (not applicable)")
+    print("⊘ INT width check: Skipped (not applicable)")
+    print("⊘ BOOL type check: Skipped (not applicable)")
+    print("⊘ MEDIUMINT type check: Skipped (not applicable)")
+    print("⊘ COLLATE check: Skipped (not applicable)")
     print("\n ")
     print("Please read the SQL Standards for AzerothCore:")
     print("https://www.azerothcore.org/wiki/sql-standards")
@@ -147,7 +151,7 @@ def parsing_file(files: list) -> None:
     print("Check Categories:")
     print("• Mandatory (always runs): Directory, SQL codestyle, Multiple blank lines,")
     print("  Trailing whitespace, Backtick, INSERT & DELETE safety usage, Missing semicolon, Newline")
-    print("• Optional runs (when applicable): Compact queries, Bitwise mask, USE statement, Table engine")
+    print("• Optional runs (when applicable): Compact queries, Bitwise mask, USE statement, Table engine, FLOAT/DOUBLE/DECIMAL UNSIGNED check, INT width check, BOOL type check, MEDIUMINT type check, COLLATE check")
     
     if error_handler:
         print()
