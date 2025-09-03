@@ -58,6 +58,9 @@ EOF
 # minimal stub
 EOF
 
+    # Copy the menu system needed by modules.sh
+    cp "$AC_TEST_ROOT/apps/bash_shared/menu_system.sh" "$TEST_DIR/apps/bash_shared/"
+
     # Copy the real installer app into the test apps dir
     mkdir -p "$TEST_DIR/apps"
     cp -r "$(cd "$AC_TEST_ROOT/apps/installer" && pwd)" "$TEST_DIR/apps/installer"
