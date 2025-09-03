@@ -1420,8 +1420,13 @@ void ScourgeInvasionData::Reset()
 std::string ScourgeInvasionData::GetData()
 {
     std::string output = std::to_string(m_state) + " ";
-    for (auto& timer : m_timers)
-        output += std::to_string(timer.time_since_epoch().count()) + " ";
+    for (TimePoint& timer : m_timers)
+    {
+        if (timer == TimePoint())
+            output += "0 ";
+        else
+            output += std::to_string(std::chrono::duration_cast<std::chrono::milliseconds>(timer.time_since_epoch()).count()) + " ";
+    }
     output += std::to_string(m_battlesWon) + " " + std::to_string(m_lastAttackZone) + " ";
     for (uint32& remaining : m_remaining)
         output += std::to_string(remaining) + " ";
