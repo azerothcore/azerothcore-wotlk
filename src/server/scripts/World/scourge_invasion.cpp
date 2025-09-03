@@ -92,6 +92,7 @@ struct npc_herald_of_the_lich_king : public ScriptedAI
             Talk(HERALD_OF_THE_LICH_KING_SAY_ATTACK_END);
             ChangeZoneEventStatus(false);
             UpdateWeather(false);
+            me->DespawnOrUnsummon();
         }
     }
 
