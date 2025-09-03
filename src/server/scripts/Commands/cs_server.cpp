@@ -21,6 +21,7 @@
 #include "GameTime.h"
 #include "GitRevision.h"
 #include "Log.h"
+#include "MapMgr.h"
 #include "ModuleMgr.h"
 #include "MotdMgr.h"
 #include "MySQLThreading.h"
@@ -99,9 +100,12 @@ public:
     }
 
     // Triggering corpses expire check in world
-    static bool HandleServerCorpsesCommand(ChatHandler* /*handler*/)
+    static bool HandleServerCorpsesCommand(ChatHandler* handler)
     {
-        sWorld->RemoveOldCorpses();
+        sMapMgr->DoForAllMaps([](Map* map)
+        {
+            map->RemoveOldCorpses();
+        });
         return true;
     }
 
