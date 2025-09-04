@@ -9302,13 +9302,8 @@ void ObjectMgr::LoadMailLevelRewards()
 void ObjectMgr::AddSpellToTrainer(uint32 entry, uint32 spell, uint32 spellCost, uint32 reqSkill, uint32 reqSkillValue, uint32 reqLevel, uint32 reqSpell)
 {
     CreatureTemplate const* cInfo = GetCreatureTemplate(entry);
-    if (!cInfo)
-    {
-        LOG_ERROR("sql.sql", "Table `npc_trainer` contains an entry for a non-existing creature template (Entry: {}), ignoring", entry);
-        return;
-    }
 
-    if (!(cInfo->npcflag & UNIT_NPC_FLAG_TRAINER))
+    if (cInfo && !(cInfo->npcflag & UNIT_NPC_FLAG_TRAINER))
     {
         LOG_ERROR("sql.sql", "Table `npc_trainer` contains an entry for a creature template (Entry: {}) without trainer flag, ignoring", entry);
         return;
