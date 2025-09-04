@@ -1,3 +1,4 @@
+-- DB update 2025_09_04_01 -> 2025_09_04_02
 -- Update gameobject 'Gravestone' with sniffed values
 -- updated spawns
 DELETE FROM `gameobject` WHERE (`id` IN (192256)) AND (`guid` IN (76993));
