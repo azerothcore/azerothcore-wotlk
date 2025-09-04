@@ -5644,7 +5644,25 @@ void AuraEffect::HandleAuraDummy(AuraApplication const* aurApp, uint8 mode, bool
                         case 58600: // Restricted Flight Area
                         case 58730: // Restricted Flight Area
                             if (aurApp->GetRemoveMode() == AURA_REMOVE_BY_EXPIRE)
-                                target->CastSpell(target, 58601, true);
+                            {
+                                float posX = target->GetPositionX();
+                                float posY = target->GetPositionY();
+                                float posZ = target->GetPositionZ();
+                                float groundZ = target->GetMapHeight(posX, posY, posZ);
+                                float HeightAboveGround = posZ - groundZ;
+                                float MinParachuteHeight = 8.0f;
+
+                                if (HeightAboveGround >= MinParachuteHeight)
+                                {
+                                    target->CastSpell(target, 58601, true);
+                                }
+
+                                if (HeightAboveGround < MinParachuteHeight)
+                                {
+                                    target->RemoveAurasByType(SPELL_AURA_FLY);
+                                    target->RemoveAurasByType(SPELL_AURA_MOD_INCREASE_MOUNTED_FLIGHT_SPEED);
+                                }
+                            }
                             break;
                         case 46374: // quest The Power of the Elements (11893)
                             {
