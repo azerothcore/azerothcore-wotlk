@@ -983,6 +983,25 @@ class spell_pri_shadowfiend_death : public AuraScript
     }
 };
 
+// -596 - Prayer of Healing
+class spell_pri_prayer_of_healing : public SpellScript
+{
+    PrepareSpellScript(spell_pri_prayer_of_healing);
+
+    SpellCastResult CheckCast()
+    {
+        // Check that the target is in line of sight
+        if (!GetCaster()->IsWithinLOSInMap(GetExplTargetUnit()))
+            return SPELL_FAILED_LINE_OF_SIGHT;
+        return SPELL_CAST_OK;
+    }
+
+    void Register() override
+    {
+        OnCheckCast += SpellCheckCastFn(spell_pri_prayer_of_healing::CheckCast);
+    }
+};
+
 void AddSC_priest_spell_scripts()
 {
     RegisterSpellScript(spell_pri_shadowfiend_scaling);
@@ -1008,4 +1027,5 @@ void AddSC_priest_spell_scripts()
     RegisterSpellScript(spell_pri_mind_control);
     RegisterSpellScript(spell_pri_t4_4p_bonus);
     RegisterSpellScript(spell_pri_shadowfiend_death);
+    RegisterSpellScript(spell_pri_prayer_of_healing);
 }
