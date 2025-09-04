@@ -5645,19 +5645,18 @@ void AuraEffect::HandleAuraDummy(AuraApplication const* aurApp, uint8 mode, bool
                         case 58730: // Restricted Flight Area
                             if (aurApp->GetRemoveMode() == AURA_REMOVE_BY_EXPIRE)
                             {
-                                float posX = target->GetPositionX();
-                                float posY = target->GetPositionY();
-                                float posZ = target->GetPositionZ();
-                                float groundZ = target->GetMapHeight(posX, posY, posZ);
-                                float HeightAboveGround = posZ - groundZ;
-                                float MinParachuteHeight = 8.0f;
+                                float const posX = target->GetPositionX();
+                                float const posY = target->GetPositionY();
+                                float const posZ = target->GetPositionZ();
+                                float const groundZ = target->GetMapHeight(posX, posY, posZ);
+                                float const HeightAboveGround = posZ - groundZ;
+                                float const MinParachuteHeight = 8.0f;
 
                                 if (HeightAboveGround >= MinParachuteHeight)
                                 {
-                                    target->CastSpell(target, 58601, true);
+                                    target->CastSpell(target, 58601/*Remove Flight Auras*/, true);
                                 }
-
-                                if (HeightAboveGround < MinParachuteHeight)
+                                else if (HeightAboveGround < MinParachuteHeight)
                                 {
                                     target->RemoveAurasByType(SPELL_AURA_FLY);
                                     target->RemoveAurasByType(SPELL_AURA_MOD_INCREASE_MOUNTED_FLIGHT_SPEED);
