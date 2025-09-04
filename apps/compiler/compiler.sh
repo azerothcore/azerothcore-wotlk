@@ -49,7 +49,7 @@ function handle_compiler_command() {
             ;;
         "quit")
             echo "Closing compiler menu..."
-            exit 0
+            return 0
             ;;
         *)
             echo "Invalid option. Use --help to see available commands."
@@ -61,20 +61,5 @@ function handle_compiler_command() {
 # Hook support (preserved from original)
 runHooks "ON_AFTER_OPTIONS" # you can create your custom options
 
-# Legacy switch function (preserved for compatibility)
-function _switch() {
-    local reply="$1"
-    local opt="$2"
-
-    case "$reply" in
-        ""|"--help")
-            menu_show_help
-            ;;
-        *)
-            run_option "$reply" "$opt"
-            ;;
-    esac
-}
-
 # Run the menu system
-menu_run "ACORE COMPILER" handle_compiler_command "${comp_menu_items[@]}" "$@"
+menu_run_with_items "ACORE COMPILER" handle_compiler_command -- "${comp_menu_items[@]}" -- "$@"
