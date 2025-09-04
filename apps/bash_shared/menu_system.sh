@@ -102,13 +102,6 @@ function menu_direct_execute() {
     local user_input="$1"
     shift
     
-    # Handle help requests directly
-    if [[ "$user_input" == "--help" || "$user_input" == "help" || "$user_input" == "-h" ]]; then
-        echo "Available commands:"
-        printf '%s\n' "${_MENU_OPTIONS[@]}"
-        return 0
-    fi
-    
     # Disable numeric selection in direct mode
     if [[ "$user_input" =~ ^[0-9]+$ ]]; then
         echo "Invalid option. Numeric selection is not allowed when passing arguments."
@@ -118,11 +111,25 @@ function menu_direct_execute() {
     
     # Find command and execute
     local idx
-    idx=$(menu_find_index "$user_input")
+    # try-catch
+    { 
+        idx=$(menu_find_index "$user_input") 
+    } || 
+    {
+        idx=-1
+    }
+
     if [[ $idx -ge 0 ]]; then
         "$callback" "${_MENU_KEYS[$idx]}" "$@"
         return $?
     else
+        # Handle help requests directly
+        if [[ "$user_input" == "--help" || "$user_input" == "help" || "$user_input" == "-h" ]]; then
+            echo "Available commands:"
+            printf '%s\n' "${_MENU_OPTIONS[@]}"
+            return 0
+        fi
+
         echo "Invalid option. Use --help to see available commands." >&2
         return 1
     fi
@@ -138,20 +145,32 @@ function menu_interactive() {
         menu_display "$title"
         read -r -p "Please enter your choice: " REPLY
         
-        # Handle help request
-        if [[ "$REPLY" == "--help" || "$REPLY" == "help" || "$REPLY" == "h" ]]; then
-            echo "Available commands:"
-            printf '%s\n' "${_MENU_OPTIONS[@]}"
-            echo ""
-            continue
-        fi
+        # Parse input to separate command from arguments
+        local input_parts=()
+        read -r -a input_parts <<< "$REPLY"
+        local user_command="${input_parts[0]}"
+        local user_args=("${input_parts[@]:1}")
         
         # Find and execute command
         local idx
-        idx=$(menu_find_index "$REPLY")
+        idx=$(menu_find_index "$user_command")
         if [[ $idx -ge 0 ]]; then
-            "$callback" "${_MENU_KEYS[$idx]}"
+            # Pass the command key and any additional arguments
+            "$callback" "${_MENU_KEYS[$idx]}" "${user_args[@]}"
+            local exit_code=$?
+            # Exit loop if callback returns 0 (e.g., quit command)
+            if [[ $exit_code -eq 0 && "${_MENU_KEYS[$idx]}" == "quit" ]]; then
+                break
+            fi
         else
+            # Handle help request
+            if [[ "$REPLY" == "--help" || "$REPLY" == "help" || "$REPLY" == "h" ]]; then
+                echo "Available commands:"
+                printf '%s\n' "${_MENU_OPTIONS[@]}"
+                echo ""
+                continue
+            fi
+
             echo "Invalid option. Please try again or use 'help' for available commands." >&2
             echo ""
         fi
@@ -159,35 +178,65 @@ function menu_interactive() {
 }
 
 # Main menu runner function
-# Usage: menu_run "Menu Title" callback_function menu_item1 menu_item2 ... "$@"
+# Usage: menu_run "Menu Title" callback_function "$@"
+# The menu items array should be defined globally before calling this function
 function menu_run() {
     local title="$1"
     local callback="$2"
     shift 2
     
-    # Extract menu items (all arguments until we find command line args)
-    local menu_items=()
-    local found_args=false
+    # Define menu from globally available menu items array
+    # This expects the calling script to have set up the menu items
     
-    # Separate menu items from command line arguments
-    while [[ $# -gt 0 ]]; do
-        if [[ "$1" =~ \| ]]; then
-            # This looks like a menu item (contains pipe)
-            menu_items+=("$1")
-            shift
-        else
-            # This is a command line argument
-            found_args=true
-            break
-        fi
+    # Handle direct execution if arguments provided
+    if [[ $# -gt 0 ]]; then
+        menu_direct_execute "$callback" "$@"
+        return $?
+    fi
+    
+    # Run interactive menu
+    menu_interactive "$callback" "$title"
+}
+
+# Alternative menu runner that accepts menu items directly
+# Usage: menu_run_with_items "Menu Title" callback_function -- "${menu_items_array[@]}" -- "$@"
+function menu_run_with_items() {
+    local title="$1"
+    local callback="$2"
+    shift 2
+    
+    # Parse parameters: menu items are between first and second "--"
+    local menu_items=()
+    local script_args=()
+    
+    # Skip first "--"
+    if [[ "$1" == "--" ]]; then
+        shift
+    else
+        echo "Error: menu_run_with_items requires -- separator before menu items" >&2
+        return 1
+    fi
+    
+    # Collect menu items until second "--"
+    while [[ $# -gt 0 && "$1" != "--" ]]; do
+        menu_items+=("$1")
+        shift
     done
     
-    # Define menu from collected items
+    # Skip second "--" if present
+    if [[ "$1" == "--" ]]; then
+        shift
+    fi
+    
+    # Remaining args are script arguments
+    script_args=("$@")
+    
+    # Define menu from provided array
     menu_define "${menu_items[@]}"
     
     # Handle direct execution if arguments provided
-    if [[ $found_args == true ]]; then
-        menu_direct_execute "$callback" "$@"
+    if [[ ${#script_args[@]} -gt 0 ]]; then
+        menu_direct_execute "$callback" "${script_args[@]}"
         return $?
     fi
     

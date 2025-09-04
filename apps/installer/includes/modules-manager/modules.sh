@@ -25,6 +25,7 @@
 CURRENT_PATH=$( cd "$(dirname "${BASH_SOURCE[0]}")" || exit ; pwd )
 
 source "$CURRENT_PATH/../../../bash_shared/includes.sh"
+source "$CURRENT_PATH/../includes.sh"
 source "$AC_PATH_APPS/bash_shared/menu_system.sh"
 
 # Module management menu definition
@@ -65,7 +66,7 @@ function handle_module_command() {
             ;;
         "quit")
             echo "Exiting module manager..."
-            exit 0
+            return 0
             ;;
         *)
             echo "Invalid option. Use 'help' to see available commands."
@@ -129,7 +130,7 @@ function inst_module_list() {
 function inst_module() {
     # If no arguments provided, start interactive menu
     if [[ $# -eq 0 ]]; then
-        menu_run "MODULE MANAGER" handle_module_command "${module_menu_items[@]}"
+        menu_run_with_items "MODULE MANAGER" handle_module_command -- "${module_menu_items[@]}" --
         return $?
     fi
     
@@ -727,6 +728,12 @@ function inst_module_install {
 
 # Update one or more modules
 function inst_module_update {
+    # Handle help request
+    if [[ "$1" == "--help" || "$1" == "-h" ]]; then
+        inst_module_help
+        return 0
+    fi
+    
     # Support multiple modules and the --all flag; prompt if none specified.
     local args=("$@")
     local use_all=false

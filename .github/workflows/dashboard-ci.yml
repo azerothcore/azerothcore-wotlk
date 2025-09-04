@@ -80,11 +80,29 @@ jobs:
           # Configure dashboard
           sed -i 's/MTHREADS=.*/MTHREADS="4"/' conf/config.sh
 
+      - name: Test module commands
+        run: |
+          ./acore.sh module install mod-autobalance
+          ./acore.sh module install mod-duel-reset
+          
+          ./acore.sh module list
+
+          ./acore.sh module install --all
+          ./acore.sh module update mod-autobalance
+          ./acore.sh module update --all
+
       - name: Run complete installation (deps, compile, database, client-data)
         run: |
           # This runs: install-deps, compile, database setup, client-data download
           ./acore.sh init
         timeout-minutes: 120
+
+      - name: Test module removal
+        run: |
+          ./acore.sh module remove mod-autobalance
+          ./acore.sh module list
+          ./acore.sh module remove mod-duel-reset
+          ./acore.sh module list
 
       - name: Test authserver dry-run
         run: |

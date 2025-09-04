@@ -104,4 +104,4 @@ function handle_menu_command() {
 }
 
 # Run the menu system
-menu_run "ACORE DASHBOARD" handle_menu_command "${menu_items[@]}" "$@"
+menu_run_with_items "ACORE DASHBOARD" handle_menu_command -- "${menu_items[@]}" -- "$@"
