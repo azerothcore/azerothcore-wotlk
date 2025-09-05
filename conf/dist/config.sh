@@ -166,7 +166,7 @@ export MODULES_LIST_FILE=${MODULES_LIST_FILE:-"$AC_PATH_ROOT/conf/modules.list"}
 # 'module install --all' and 'module update --all'. Items can be specified
 # as simple names (e.g., mod-transmog), owner/name, or full URLs.
 # Example:
-# export MODULES_EXCLUDE_LIST="azerothcore/mod-transmog chromiecraft/mod-ptr-template"
+# export MODULES_EXCLUDE_LIST="azerothcore/mod-transmog azerothcore/mod-autobalance"
 export MODULES_EXCLUDE_LIST=""
 
 NO_COLOR=${NO_COLOR:-}

@@ -230,11 +230,26 @@ function inst_parse_module_spec() {
     
     # Parse the new syntax: repo[:dirname][@branch[:commit]]
     
-    # First, extract custom directory name if present (format: repo:dirname@branch)
+    # First, check if this is a URL (contains :// or starts with git@)
+    local is_url=0
+    if [[ "$spec" =~ :// ]] || [[ "$spec" =~ ^git@ ]]; then
+        is_url=1
+    fi
+    
+    # Parse directory and branch differently for URLs vs simple names
     local repo_with_branch="$spec"
-    if [[ "$spec" =~ ^([^@:]+):([^@:]+)(@.*)?$ ]]; then
-        repo_with_branch="${BASH_REMATCH[1]}${BASH_REMATCH[3]}"
-        dirname="${BASH_REMATCH[2]}"
+    if [[ $is_url -eq 1 ]]; then
+        # For URLs, look for :dirname pattern after .git or at the end
+        if [[ "$spec" =~ ^([^@]+)(\.git)?:([^@]+)(@.*)?$ ]]; then
+            repo_with_branch="${BASH_REMATCH[1]}${BASH_REMATCH[2]}${BASH_REMATCH[4]}"
+            dirname="${BASH_REMATCH[3]}"
+        fi
+    else
+        # For simple names, use the original logic
+        if [[ "$spec" =~ ^([^@:]+):([^@:]+)(@.*)?$ ]]; then
+            repo_with_branch="${BASH_REMATCH[1]}${BASH_REMATCH[3]}"
+            dirname="${BASH_REMATCH[2]}"
+        fi
     fi
     
     # Now parse branch and commit from the repo part
