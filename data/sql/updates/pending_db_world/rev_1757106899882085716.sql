@@ -10,6 +10,8 @@ UPDATE `creature_template` SET `type_flags` = 134217728 WHERE `entry` = 14682;
 UPDATE `creature_template` SET `unit_class` = 2, `type_flags` = 134217728 WHERE `entry` IN (14684, 14686, 14690, 14693);
 -- Makes Balzaphon and Revanchion immune to Charge
 UPDATE `creature_template` SET `mechanic_immune_mask` = (`mechanic_immune_mask` | 2048) WHERE `entry` IN (14684, 14690);
+-- Scorn immune to root
+UPDATE `creature_template` SET `mechanic_immune_mask` = (`mechanic_immune_mask` | 64) WHERE `entry` IN (14693);
 
 -- Adds SAI to Sever, Balzaphon, Lady Falther'ess, Revanchion and Lord Blackwood
 UPDATE `creature_template` SET `AIName` = 'SmartAI' WHERE `entry` IN (14682, 14684, 14686, 14695);
