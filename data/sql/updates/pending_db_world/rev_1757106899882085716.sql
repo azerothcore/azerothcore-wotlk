@@ -1,6 +1,4 @@
--- NPC ID - Name - Status / Note - Video Timestamp (HH:MM:SS):
--- 14693 - Scorn [Has SAI, and should only spawn/visible after the other boss is killed, missing waypoints] - 00:31:22
-
+--
 -- Changes Scorn's spawn from Event 17 (Scourge Invasion) to 120 (Scourge Invasion - Boss in instance activation)
 UPDATE `game_event_creature` SET `eventEntry` = 120 WHERE `guid` = 248652;
 
