@@ -1,8 +1,6 @@
 -- NPC ID - Name - Status / Note - Video Timestamp (HH:MM:SS):
 -- 14682 - Sever [Done] - 00:10:03
--- 14684 - Balzaphon [Done], should be immune to charge - 02:19:51
 -- 14686 - Lady Falther'ess [Done] - 01:00:52
--- 14690 - Revanchion [Done], should be immune to charge - 01:50:49
 -- 14695 - Lord Blackwood [No video or sniff only realised after the 2nd time i missed all the time 1 of the bosses]
 -- 14693 - Scorn [Has SAI, and should only spawn/visible after the other boss is killed, missing waypoints] - 00:31:22
 
@@ -13,6 +11,8 @@ UPDATE `game_event_creature` SET `eventEntry` = 120 WHERE `guid` = 248652;
 UPDATE `creature_template` SET `type_flags` = 134217728 WHERE `entry` = 14682;
 -- Adds "FORCE_GOSSIP" and changes from "Warrior" to "Paladin" for Balzaphon, Lady Falther'ess and Scorn
 UPDATE `creature_template` SET `unit_class` = 2, `type_flags` = 134217728 WHERE `entry` IN (14684, 14686, 14690, 14693);
+-- Makes Balzaphon and Revanchion immune to Charge
+UPDATE `creature_template` SET `mechanic_immune_mask` = (`mechanic_immune_mask` | 2048) WHERE `entry` IN (14684, 14690);
 
 -- Adds SAI to Sever, Balzaphon, Lady Falther'ess, Revanchion and Lord Blackwood
 UPDATE `creature_template` SET `AIName` = 'SmartAI' WHERE `entry` IN (14682, 14684, 14686, 14695);
