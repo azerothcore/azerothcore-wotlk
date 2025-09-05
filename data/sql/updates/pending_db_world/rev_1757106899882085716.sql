@@ -1,7 +1,4 @@
 -- NPC ID - Name - Status / Note - Video Timestamp (HH:MM:SS):
--- 14682 - Sever [Done] - 00:10:03
--- 14686 - Lady Falther'ess [Done] - 01:00:52
--- 14695 - Lord Blackwood [No video or sniff only realised after the 2nd time i missed all the time 1 of the bosses]
 -- 14693 - Scorn [Has SAI, and should only spawn/visible after the other boss is killed, missing waypoints] - 00:31:22
 
 -- Changes Scorn's spawn from Event 17 (Scourge Invasion) to 120 (Scourge Invasion - Boss in instance activation)
