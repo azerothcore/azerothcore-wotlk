@@ -1,9 +1,9 @@
 -- NPC ID - Name - Status / Note - Video Timestamp (HH:MM:SS):
--- 14682 - Sever [Done] - 00:10:03 
+-- 14682 - Sever [Done] - 00:10:03
 -- 14684 - Balzaphon [Done], should be immune to charge - 02:19:51
 -- 14686 - Lady Falther'ess [Done] - 01:00:52
 -- 14690 - Revanchion [Done], should be immune to charge - 01:50:49
--- 14695 - Lord Blackwood [No video or sniff only realised after the 2nd time i missed all the time 1 of the bosses] 
+-- 14695 - Lord Blackwood [No video or sniff only realised after the 2nd time i missed all the time 1 of the bosses]
 -- 14693 - Scorn [Has SAI, and should only spawn/visible after the other boss is killed, missing waypoints] - 00:31:22
 
 -- Changes Scorn's spawn from Event 17 (Scourge Invasion) to 120 (Scourge Invasion - Boss in instance activation)
@@ -18,17 +18,17 @@ UPDATE `creature_template` SET `unit_class` = 2, `type_flags` = 134217728 WHERE 
 UPDATE `creature_template` SET `AIName` = 'SmartAI' WHERE `entry` IN (14682, 14684, 14686, 14695);
 
 -- Adds Spirit Particles (purple) to Lord Blackwood
-UPDATE `creature_template_addon` SET `auras` = 28126 WHERE `entry` = 14695; 
+UPDATE `creature_template_addon` SET `auras` = '28126' WHERE `entry` = 14695;
 
 -- Adds Spirit Particles (purple) and Frost Armor to Revanchion
-UPDATE `creature_template_addon` SET `auras` = "28126 12556" WHERE `entry` = 14690 ; 
+UPDATE `creature_template_addon` SET `auras` = '28126 12556' WHERE `entry` = 14690 ;
 
 -- Adds SAI to Holding Pen (157819)
 UPDATE `gameobject_template` SET `AIName` = 'SmartGameObjectAI' WHERE `entry` = 157819;
 
 -- Adds Spirit Particles (purple) to Sever, Balzaphon, Revanchion and Scorn
 DELETE FROM `creature_template_addon` WHERE `entry` IN (14684, 14686, 14690, 14693, 14682);
-INSERT INTO `creature_template_addon` (`entry`, `path_id`, `mount`, `bytes1`, `bytes2`, `emote`, `visibilityDistanceType`, `auras`) VALUES 
+INSERT INTO `creature_template_addon` (`entry`, `path_id`, `mount`, `bytes1`, `bytes2`, `emote`, `visibilityDistanceType`, `auras`) VALUES
 (14682, 0, 0, 0, 1, 0, 0, '28126'),  -- Sever
 (14684, 0, 0, 0, 1, 0, 0, '28126'),  -- Balzaphon
 (14690, 0, 0, 0, 1, 0, 0, '28126'),  -- Revanchion
@@ -72,6 +72,6 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 (14686, 0, 7, 0, 0, 0, 100, 0, 2500, 8000, 10000, 18000, 0, 0, 11, 22743, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Lady Falther\'ess - In Combat - Cast \'Ribbon of Souls\''),
 (14686, 0, 8, 0, 0, 0, 100, 0, 17500, 20000, 19000, 22000, 0, 0, 11, 17105, 0, 0, 0, 0, 0, 5, 30, 1, 2, 17105, 0, 0, 0, 0, 'Lady Falther\'ess - In Combat - Cast \'Banshee Curse\''),
 (14686, 0, 9, 0, 101, 0, 100, 0, 2, 10, 7500, 5000, 6000, 0, 11, 16838, 0, 0, 5, 0, 0, 17, 0, 5, 5, 0, 0, 0, 0, 0, 'Lady Falther\'ess - On 2 or More Players in Range - Cast \'Banshee Shriek\''),
--- Revanchion 
+-- Revanchion
 (14690, 0, 0, 0, 0, 0, 100, 0, 10000, 15000, 12500, 14000, 0, 0, 11, 15245, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Revanchion - In Combat - Cast \'Shadow Bolt Volley\''),
 (14690, 0, 1, 0, 0, 0, 100, 0, 13000, 16000, 14000, 18000, 0, 0, 11, 14907, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Revanchion - In Combat - Cast \'Frost Nova\'');
