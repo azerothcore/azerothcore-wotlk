@@ -1,3 +1,4 @@
+-- DB update 2025_09_04_03 -> 2025_09_05_00
 -- Prevent removal on evade
 DELETE FROM `spell_custom_attr` WHERE `spell_id` IN (50665, 50681, 50695);
 INSERT INTO `spell_custom_attr` (`spell_id`, `attributes`) VALUES
