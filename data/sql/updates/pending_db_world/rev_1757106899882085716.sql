@@ -71,4 +71,9 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 (14686, 0, 9, 0, 101, 0, 100, 0, 2, 10, 7500, 5000, 6000, 0, 11, 16838, 0, 0, 5, 0, 0, 17, 0, 5, 5, 0, 0, 0, 0, 0, 'Lady Falther\'ess - On 2 or More Players in Range - Cast \'Banshee Shriek\''),
 -- Revanchion
 (14690, 0, 0, 0, 0, 0, 100, 0, 10000, 15000, 12500, 14000, 0, 0, 11, 15245, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Revanchion - In Combat - Cast \'Shadow Bolt Volley\''),
-(14690, 0, 1, 0, 0, 0, 100, 0, 13000, 16000, 14000, 18000, 0, 0, 11, 14907, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Revanchion - In Combat - Cast \'Frost Nova\'');
+(14690, 0, 1, 0, 0, 0, 100, 0, 13000, 16000, 14000, 18000, 0, 0, 11, 14907, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Revanchion - In Combat - Cast \'Frost Nova\''),
+-- Lord Blackwood
+(14695, 0, 0, 0, 0, 0, 100, 0, 8000, 16000, 20000, 20000, 0, 0, 11, 7964, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Lord Blackwood - In Combat - Cast \'Smoke Bomb\''),
+(14695, 0, 1, 0, 105, 0, 100, 0, 10000, 12000, 10000, 12000, 0, 5, 11, 11972, 0, 0, 0, 0, 0, 7, 0, 0, 0, 0, 0, 0, 0, 0, 'Lord Blackwood - On Hostile Casting in Range - Cast \'Shield Bash\''),
+(14695, 0, 2, 0, 0, 0, 100, 0, 2000, 20000, 20000, 20000, 0, 0, 11, 20733, 64, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Lord Blackwood - In Combat - Cast \'Black Arrow\''),
+(14695, 0, 3, 0, 0, 0, 100, 0, 0, 0, 2400, 2400, 0, 0, 11, 16496, 64, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Lord Blackwood - In Combat - Cast \'Shoot\'');
