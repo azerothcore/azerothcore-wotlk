@@ -62,12 +62,28 @@ struct boss_captain_skarloc : public BossAI
 
     SummonList summons;
     bool _spawnedAdds;
+    bool resetEscort;
 
     void Reset() override
     {
         _Reset();
         summons.DespawnAll();
         _spawnedAdds = false;
+        resetEscort = false;
+    }
+
+    void MoveInLineOfSight(Unit* who) override
+    {
+        if (!who->IsPlayer())
+            return;
+
+        if (!me->IsInCombat() && me->movespline->Finalized() && !resetEscort)
+        {
+            me->GetInstanceScript()->SetData(DATA_CAPTAIN_SKARLOC, NOT_STARTED);
+            Reset();
+            InitializeAI();
+            resetEscort = true;
+        }
     }
 
     void JustSummoned(Creature* summon) override
@@ -78,7 +94,6 @@ struct boss_captain_skarloc : public BossAI
             thrall->AI()->JustSummoned(summon);
         }
         summon->SetImmuneToAll(true);
-        summon->SetReactState(REACT_PASSIVE);
         if (summon->GetEntry() == NPC_SKARLOC_MOUNT)
             return;
 
@@ -103,7 +118,6 @@ struct boss_captain_skarloc : public BossAI
         }
         me->GetMotionMaster()->MoveSplinePath(&path);
         me->SetImmuneToAll(true);
-        me->SetReactState(REACT_PASSIVE);
         me->Mount(SKARLOC_MOUNT_MODEL);
     }
 
@@ -147,7 +161,6 @@ struct boss_captain_skarloc : public BossAI
             me->m_Events.AddEventAtOffset([this]()
             {
                 me->SetImmuneToAll(false);
-                me->SetReactState(REACT_AGGRESSIVE);
                 me->SetInCombatWithZone();
                 summons.DoForAllSummons([&](WorldObject* summon)
                 {
@@ -156,7 +169,6 @@ struct boss_captain_skarloc : public BossAI
                         if (adds->GetEntry() != NPC_SKARLOC_MOUNT)
                         {
                             adds->SetImmuneToAll(false);
-                            adds->SetReactState(REACT_AGGRESSIVE);
                             adds->SetInCombatWithZone();
                         }
                     }
