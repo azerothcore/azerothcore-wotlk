@@ -77,3 +77,4 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 (14695, 0, 1, 0, 105, 0, 100, 0, 10000, 12000, 10000, 12000, 0, 5, 11, 11972, 0, 0, 0, 0, 0, 7, 0, 0, 0, 0, 0, 0, 0, 0, 'Lord Blackwood - On Hostile Casting in Range - Cast \'Shield Bash\''),
 (14695, 0, 2, 0, 110, 0, 100, 0, 2000, 20000, 20000, 20000, 0, 1, 11, 20733, 64, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Lord Blackwood - On Melee Range Target - Cast \'Black Arrow\''),
 (14695, 0, 3, 0, 110, 0, 100, 0, 0, 0, 2400, 2400, 0, 1, 11, 16496, 64, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Lord Blackwood - On Melee Range Target - Cast \'Shoot\'');
+
