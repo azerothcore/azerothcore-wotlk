@@ -10,11 +10,6 @@
 # implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 #
 
-# Suppress FindBoost deprecation warning in CMake 3.30+
-if(POLICY CMP0167)
-  cmake_policy(SET CMP0167 OLD)
-endif()
-
 if(WIN32)
   if(DEFINED ENV{Boost_ROOT})
     set(Boost_ROOT $ENV{Boost_ROOT})
@@ -36,16 +31,8 @@ else()
   set(BOOST_REQUIRED_VERSION 1.74)
 endif()
 
-# First try to find Boost without system component (for Boost 1.69+)
-find_package(Boost ${BOOST_REQUIRED_VERSION} QUIET COMPONENTS filesystem program_options iostreams regex)
-
-if(NOT Boost_FOUND)
-  # If that fails, try with system component (for Boost < 1.69)
-  find_package(Boost ${BOOST_REQUIRED_VERSION} REQUIRED COMPONENTS system filesystem program_options iostreams regex)
-else()
-  # Re-run find_package with REQUIRED to get proper error messages if needed
-  find_package(Boost ${BOOST_REQUIRED_VERSION} REQUIRED COMPONENTS filesystem program_options iostreams regex)
-endif()
+# Boost.System is header-only since 1.69; do not require it explicitly.
+find_package(Boost ${BOOST_REQUIRED_VERSION} REQUIRED COMPONENTS filesystem program_options iostreams regex)
 
 if(NOT Boost_FOUND)
   if(NOT DEFINED ENV{Boost_ROOT} AND NOT DEFINED Boost_DIR AND NOT DEFINED BOOST_ROOT AND NOT DEFINED BOOSTROOT)
