@@ -305,6 +305,31 @@ Services support two restart policies:
 ./service-manager.sh delete auth
 ```
 
+#### Health and Console Commands
+
+Use these commands to programmatically check service health and interact with the console (used by CI workflows):
+
+```bash
+# Check if service is currently running (exit 0 if running)
+./service-manager.sh is-running world
+
+# Print current uptime in seconds (fails if not running)
+./service-manager.sh uptime-seconds world
+
+# Wait until uptime >= 10s (optional timeout 240s)
+./service-manager.sh wait-uptime world 10 240
+
+# Send a console command (uses pm2 send or tmux/screen)
+./service-manager.sh send world "server info"
+
+# Show provider, configs and run-engine settings
+./service-manager.sh show-config world
+```
+
+Notes:
+- For `send`, PM2 provider uses `pm2 send` with the process ID; systemd provider requires a session manager (tmux/screen). If no attachable session is configured, the command fails.
+- `wait-uptime` fails with a non-zero exit code if the service does not reach the requested uptime within the timeout window.
+
 #### Service Configuration
 ```bash
 # Update service settings
@@ -622,6 +647,5 @@ sudo npm install -g pm2
 # If you have a very old registry format, migrate it
 ./migrate-registry.sh
 ```
-
 
 
