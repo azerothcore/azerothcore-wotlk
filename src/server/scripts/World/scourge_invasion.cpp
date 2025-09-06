@@ -362,7 +362,6 @@ struct npc_necrotic_shard : public ScriptedAI
     {
         scheduler.Schedule(5s, [this](TaskContext context) // Spawn Cultists every 60 minutes.
         {
-            me->SetFullHealth();
             DespawnShadowsOfDoom(); // Despawn all remaining Shadows before respawning the Cultists?
             SummonCultists();
             context.Repeat(1h);
