@@ -1545,8 +1545,7 @@ function service_send_command() {
     fi
 
     # shellcheck source=/dev/null
-    source "$RUN_ENGINE_CONFIG_FILE"
-    if [ $? -ne 0 ]; then
+    if ! source "$RUN_ENGINE_CONFIG_FILE"; then
         echo -e "${RED}Error: Failed to source run-engine configuration file: $RUN_ENGINE_CONFIG_FILE${NC}" >&2
         return 1
     fi
