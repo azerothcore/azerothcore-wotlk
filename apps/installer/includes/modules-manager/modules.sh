@@ -13,16 +13,127 @@
 # - Cross-format module recognition (URLs, SSH, simple names)
 # - Custom directory naming to prevent conflicts
 # - Intelligent duplicate prevention
+# - Interactive menu system for easy management
 #
 # Usage:
 #   source "path/to/modules.sh"
 #   inst_module_install "mod-transmog:my-custom-dir@develop:abc123"
+#   inst_module                    # Interactive menu
+#   inst_module search "transmog"  # Direct command
 #
 # =============================================================================
+CURRENT_PATH=$( cd "$(dirname "${BASH_SOURCE[0]}")" || exit ; pwd )
+
+source "$CURRENT_PATH/../../../bash_shared/includes.sh"
+source "$CURRENT_PATH/../includes.sh"
+source "$AC_PATH_APPS/bash_shared/menu_system.sh"
+
+# Module management menu definition
+# Format: "key|short|description"
+module_menu_items=(
+    "search|s|Search for available modules"
+    "install|i|Install one or more modules"
+    "update|u|Update installed modules"
+    "remove|r|Remove installed modules"
+    "list|l|List installed modules"
+    "help|h|Show detailed help"
+    "quit|q|Close this menu"
+)
+
+# Menu command handler for module operations
+function handle_module_command() {
+    local key="$1"
+    shift
+    
+    case "$key" in
+        "search")
+            inst_module_search "$@"
+            ;;
+        "install")
+            inst_module_install "$@"
+            ;;
+        "update")
+            inst_module_update "$@"
+            ;;
+        "remove")
+            inst_module_remove "$@"
+            ;;
+        "list")
+            inst_module_list "$@"
+            ;;
+        "help")
+            inst_module_help
+            ;;
+        "quit")
+            echo "Exiting module manager..."
+            return 0
+            ;;
+        *)
+            echo "Invalid option. Use 'help' to see available commands."
+            return 1
+            ;;
+    esac
+}
+
+# Show detailed module help
+function inst_module_help() {
+    echo "AzerothCore Module Manager Help"
+    echo "==============================="
+    echo ""
+    echo "Usage:"
+    echo "  ./acore.sh module                    # Interactive menu"
+    echo "  ./acore.sh module search   [terms...]"
+    echo "  ./acore.sh module install  [--all | modules...]"
+    echo "  ./acore.sh module update   [--all | modules...]"
+    echo "  ./acore.sh module remove   [modules...]"
+    echo "  ./acore.sh module list              # List installed modules"
+    echo ""
+    echo "Module Specification Syntax:"
+    echo "  name                    # Simple name (e.g., mod-transmog)"
+    echo "  owner/name              # GitHub repository"
+    echo "  name:branch             # Specific branch"
+    echo "  name:branch:commit      # Specific commit"
+    echo "  name:dirname@branch     # Custom directory name"
+    echo "  https://github.com/...  # Full URL"
+    echo ""
+    echo "Examples:"
+    echo "  ./acore.sh module install mod-transmog"
+    echo "  ./acore.sh module install azerothcore/mod-transmog:develop"
+    echo "  ./acore.sh module update --all"
+    echo "  ./acore.sh module remove mod-transmog"
+    echo ""
+}
+
+# List installed modules
+function inst_module_list() {
+    echo "Installed Modules:"
+    echo "=================="
+    local count=0
+    while read -r repo_ref branch commit; do
+        [[ -z "$repo_ref" ]] && continue
+        count=$((count + 1))
+        echo "  $count. $repo_ref ($branch)"
+        if [[ "$commit" != "-" ]]; then
+            echo "      Commit: $commit"
+        fi
+    done < <(inst_mod_list_read)
+    
+    if [[ $count -eq 0 ]]; then
+        echo "  No modules installed."
+    fi
+    echo ""
+}
 
 # Dispatcher for the unified `module` command.
 # Usage: ./acore.sh module <search|install|update|remove> [args...]
+#        ./acore.sh module                    # Interactive menu
 function inst_module() {
+    # If no arguments provided, start interactive menu
+    if [[ $# -eq 0 ]]; then
+        menu_run_with_items "MODULE MANAGER" handle_module_command -- "${module_menu_items[@]}" --
+        return $?
+    fi
+    
     # Normalize arguments into an array
     local tokens=()
     read -r -a tokens <<< "$*"
@@ -31,12 +142,7 @@ function inst_module() {
 
     case "$cmd" in
         ""|"help"|"-h"|"--help")
-            echo "Usage:"
-            echo "  ./acore.sh module search   [terms...]"
-            echo "  ./acore.sh module install  [--all | modules...]"
-            echo "      modules can be specified as: name[:branch[:commit]]"
-            echo "  ./acore.sh module update   [modules...]"
-            echo "  ./acore.sh module remove   [modules...]"
+            inst_module_help
             ;;
         "search"|"s")
             inst_module_search "${args[@]}"
@@ -50,9 +156,13 @@ function inst_module() {
         "remove"|"r")
             inst_module_remove "${args[@]}"
             ;;
+        "list"|"l")
+            inst_module_list "${args[@]}"
+            ;;
         *)
-            echo "Unknown subcommand: $cmd"
-            echo "Try: ./acore.sh module help"
+            echo "Unknown module command: $cmd"
+            echo "Use 'help' to see available commands."
+            return 1
             ;;
     esac
 }
@@ -618,6 +728,12 @@ function inst_module_install {
 
 # Update one or more modules
 function inst_module_update {
+    # Handle help request
+    if [[ "$1" == "--help" || "$1" == "-h" ]]; then
+        inst_module_help
+        return 0
+    fi
+    
     # Support multiple modules and the --all flag; prompt if none specified.
     local args=("$@")
     local use_all=false

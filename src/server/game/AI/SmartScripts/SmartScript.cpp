@@ -3834,19 +3834,20 @@ void SmartScript::GetTargets(ObjectVector& targets, SmartScriptHolder const& e, 
                 {
                     targets.clear();
 
-                    if (owner->ToCreature())
+                    if (IsCreature(owner))
                     {
                         if (Unit* base = ObjectAccessor::GetUnit(*owner, owner->ToCreature()->GetCharmerOrOwnerGUID()))
-                        {
                             targets.push_back(base);
-                        }
                     }
-                    else
+                    else if (IsGameObject(owner))
                     {
                         if (Unit* base = ObjectAccessor::GetUnit(*owner, owner->ToGameObject()->GetOwnerGUID()))
-                        {
                             targets.push_back(base);
-                        }
+                    }
+                    else if (IsPlayer(owner))
+                    {
+                        if (Unit* base = owner->ToPlayer()->GetCharmerOrOwner())
+                            targets.push_back(base);
                     }
                 }
             }
