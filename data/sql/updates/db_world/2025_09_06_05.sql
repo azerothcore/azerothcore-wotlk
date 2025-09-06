@@ -1,3 +1,4 @@
+-- DB update 2025_09_06_04 -> 2025_09_06_05
 -- Update gameobject 'Doodad_FrostGiantIceShard' with sniffed values
 -- updated spawns
 DELETE FROM `gameobject` WHERE (`id` IN (192193, 192194, 192195)) AND (`guid` IN (20924, 20925, 20926));
