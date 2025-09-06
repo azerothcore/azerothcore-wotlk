@@ -119,7 +119,7 @@ jobs:
 
       - name: Test worldserver with startup scripts
         run: |
-          ./acore.sh sm create world worldserver -- --bin-path ./env/dist/bin --provider pm2
+          ./acore.sh sm create world worldserver --bin-path ./env/dist/bin --provider pm2
           ./acore.sh sm show-config worldserver
           ./acore.sh sm start worldserver
           ./acore.sh sm wait-uptime worldserver 10 300
@@ -134,7 +134,7 @@ jobs:
 
       - name: Test authserver with startup scripts
         run: |
-          ./acore.sh sm create auth authserver -- --bin-path ./env/dist/bin --provider pm2
+          ./acore.sh sm create auth authserver --bin-path ./env/dist/bin --provider pm2
           ./acore.sh sm show-config authserver
           ./acore.sh sm start authserver
           ./acore.sh sm wait-uptime authserver 10 300
