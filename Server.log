@@ -1,0 +1,29 @@
+AzerothCore rev. f5a66886d195 2025-09-06 13:42:04 +0000 (copilot/fix-22817 branch) (Unix, Release, Static) (worldserver-daemon)
+<Ctrl-C> to stop.
+
+   █████╗ ███████╗███████╗██████╗  ██████╗ ████████╗██╗  ██╗
+  ██╔══██╗╚══███╔╝██╔════╝██╔══██╗██╔═══██╗╚══██╔══╝██║  ██║
+  ███████║  ███╔╝ █████╗  ██████╔╝██║   ██║   ██║   ███████║
+  ██╔══██║ ███╔╝  ██╔══╝  ██╔══██╗██║   ██║   ██║   ██╔══██║
+  ██║  ██║███████╗███████╗██║  ██║╚██████╔╝   ██║   ██║  ██║
+  ╚═╝  ╚═╝╚══════╝╚══════╝╚═╝  ╚═╝ ╚═════╝    ╚═╝   ╚═╝  ╚═╝
+                                 ██████╗ ██████╗ ██████╗ ███████╗
+                                ██╔════╝██╔═══██╗██╔══██╗██╔════╝
+                                ██║     ██║   ██║██████╔╝█████╗
+                                ██║     ██║   ██║██╔══██╗██╔══╝
+                                ╚██████╗╚██████╔╝██║  ██║███████╗
+                                 ╚═════╝ ╚═════╝ ╚═╝  ╚═╝╚══════╝
+
+     AzerothCore 3.3.5a  -  www.azerothcore.org
+
+> Using configuration file       /home/runner/work/azerothcore-wotlk/azerothcore-wotlk/env/dist/etc/worldserver.conf
+> Using SSL version:             OpenSSL 3.0.13 30 Jan 2024 (library: OpenSSL 3.0.13 30 Jan 2024)
+> Using Boost version:           1.83.0
+ 
+Process priority class set to -15
+Initializing Scripts...
+> Loading C++ scripts
+ 
+Opening DatabasePool 'acore_auth'. Asynchronous connections: 1, synchronous connections: 1.
+Could not connect to MySQL database at 127.0.0.1: Access denied for user 'acore'@'localhost' (using password: YES)
+DatabasePool Login NOT opened. There were errors opening the MySQL connections. Check your log file for specific errors
