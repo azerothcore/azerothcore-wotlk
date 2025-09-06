@@ -146,6 +146,27 @@ teardown() {
     [ "$output" = "myorg/mymodule" ]
 }
 
+@test "inst_extract_owner_name should handle URLs with ports correctly" {
+    cd "$TEST_DIR"
+    source "$TEST_DIR/apps/installer/includes/includes.sh"
+
+    # Test HTTPS URL with port
+    run inst_extract_owner_name "https://example.com:8080/user/repo.git"
+    [ "$output" = "user/repo" ]
+
+    # Test SSH URL with port  
+    run inst_extract_owner_name "ssh://git@example.com:2222/owner/module"
+    [ "$output" = "owner/module" ]
+
+    # Test URL with port and custom directory (should ignore the directory part)
+    run inst_extract_owner_name "https://gitlab.internal:9443/team/project.git:custom-dir"
+    [ "$output" = "team/project" ]
+
+    # Test complex URL with port (should extract owner/name correctly)
+    run inst_extract_owner_name "https://git.company.com:8443/department/awesome-module.git"
+    [ "$output" = "department/awesome-module" ]
+}
+
 @test "duplicate module entries should be prevented across different formats" {
     cd "$TEST_DIR"
     source "$TEST_DIR/apps/installer/includes/includes.sh"
@@ -186,6 +207,30 @@ teardown() {
     
     # Non-existent module should not be detected
     run inst_mod_is_installed "mod-nonexistent"
+    [ "$status" -ne 0 ]
+}
+
+@test "module installed via URL with port should be recognized correctly" {
+    cd "$TEST_DIR"
+    source "$TEST_DIR/apps/installer/includes/includes.sh"
+
+    # Install via URL with port
+    inst_mod_list_upsert "https://gitlab.internal:9443/myorg/my-module.git" "master" "abc123"
+    
+    # Should be detected as installed using normalized owner/name
+    run inst_mod_is_installed "myorg/my-module"
+    [ "$status" -eq 0 ]
+    
+    # Should be detected when checking with different URL format
+    run inst_mod_is_installed "ssh://git@gitlab.internal:9443/myorg/my-module"
+    [ "$status" -eq 0 ]
+    
+    # Should be detected when checking with custom directory syntax
+    run inst_mod_is_installed "myorg/my-module:custom-dir"
+    [ "$status" -eq 0 ]
+    
+    # Different module should not be detected
+    run inst_mod_is_installed "myorg/different-module"
     [ "$status" -ne 0 ]
 }
 
@@ -534,6 +579,122 @@ EOF
     [ "$branch" = "develop" ]
     [ "$commit" = "abc123" ]
     [ "$dirname" = "custom-dir" ]
+}
+
+@test "parsing should handle URLs with ports correctly (fix for port/dirname confusion)" {
+    cd "$TEST_DIR"
+    source "$TEST_DIR/apps/installer/includes/includes.sh"
+
+    # Test HTTPS URL with port - should NOT treat port as dirname
+    run inst_parse_module_spec "https://example.com:8080/user/repo.git"
+    [ "$status" -eq 0 ]
+    IFS=' ' read -r repo_ref owner name branch commit url dirname <<< "$output"
+    [ "$repo_ref" = "https://example.com:8080/user/repo.git" ]
+    [ "$owner" = "user" ]
+    [ "$name" = "repo" ]
+    [ "$branch" = "-" ]
+    [ "$commit" = "-" ]
+    [ "$url" = "https://example.com:8080/user/repo.git" ]
+    [ "$dirname" = "repo" ]  # Should default to repo name, NOT port number
+}
+
+@test "parsing should handle URLs with ports and custom directory correctly" {
+    cd "$TEST_DIR"
+    source "$TEST_DIR/apps/installer/includes/includes.sh"
+
+    # Test URL with port AND custom directory - should parse custom directory correctly
+    run inst_parse_module_spec "https://example.com:8080/user/repo.git:custom-dir"
+    [ "$status" -eq 0 ]
+    IFS=' ' read -r repo_ref owner name branch commit url dirname <<< "$output"
+    [ "$repo_ref" = "https://example.com:8080/user/repo.git" ]
+    [ "$owner" = "user" ]
+    [ "$name" = "repo" ]
+    [ "$branch" = "-" ]
+    [ "$commit" = "-" ]
+    [ "$url" = "https://example.com:8080/user/repo.git" ]
+    [ "$dirname" = "custom-dir" ]  # Should be custom-dir, not port number
+}
+
+@test "parsing should handle SSH URLs with ports correctly" {
+    cd "$TEST_DIR"
+    source "$TEST_DIR/apps/installer/includes/includes.sh"
+
+    # Test SSH URL with port
+    run inst_parse_module_spec "ssh://git@example.com:2222/user/repo"
+    [ "$status" -eq 0 ]
+    IFS=' ' read -r repo_ref owner name branch commit url dirname <<< "$output"
+    [ "$repo_ref" = "ssh://git@example.com:2222/user/repo" ]
+    [ "$owner" = "user" ]
+    [ "$name" = "repo" ]
+    [ "$dirname" = "repo" ]  # Should be repo name, not port number
+}
+
+@test "parsing should handle SSH URLs with ports and custom directory" {
+    cd "$TEST_DIR"
+    source "$TEST_DIR/apps/installer/includes/includes.sh"
+
+    # Test SSH URL with port and custom directory
+    run inst_parse_module_spec "ssh://git@example.com:2222/user/repo:my-custom-dir@develop"
+    [ "$status" -eq 0 ]
+    IFS=' ' read -r repo_ref owner name branch commit url dirname <<< "$output"
+    [ "$repo_ref" = "ssh://git@example.com:2222/user/repo" ]
+    [ "$owner" = "user" ]
+    [ "$name" = "repo" ]
+    [ "$branch" = "develop" ]
+    [ "$dirname" = "my-custom-dir" ]
+}
+
+@test "parsing should handle complex URLs with ports, custom dirs, and branches" {
+    cd "$TEST_DIR"
+    source "$TEST_DIR/apps/installer/includes/includes.sh"
+
+    # Test comprehensive URL with port, custom directory, branch, and commit
+    run inst_parse_module_spec "https://gitlab.example.com:9443/myorg/myrepo.git:custom-name@feature-branch:abc123def"
+    [ "$status" -eq 0 ]
+    IFS=' ' read -r repo_ref owner name branch commit url dirname <<< "$output"
+    [ "$repo_ref" = "https://gitlab.example.com:9443/myorg/myrepo.git" ]
+    [ "$owner" = "myorg" ]
+    [ "$name" = "myrepo" ]
+    [ "$branch" = "feature-branch" ]
+    [ "$commit" = "abc123def" ]
+    [ "$url" = "https://gitlab.example.com:9443/myorg/myrepo.git" ]
+    [ "$dirname" = "custom-name" ]
+}
+
+@test "URL port parsing regression test - ensure ports are not confused with directory names" {
+    cd "$TEST_DIR"
+    source "$TEST_DIR/apps/installer/includes/includes.sh"
+
+    # These are the problematic cases that the fix addresses
+    local test_cases=(
+        "https://example.com:8080/repo.git"
+        "https://gitlab.internal:9443/group/project.git" 
+        "ssh://git@server.com:2222/owner/repo"
+        "https://git.company.com:8443/team/module.git"
+    )
+
+    for spec in "${test_cases[@]}"; do
+        run inst_parse_module_spec "$spec"
+        [ "$status" -eq 0 ]
+        IFS=' ' read -r repo_ref owner name branch commit url dirname <<< "$output"
+        
+        # Critical: dirname should NEVER be a port number
+        [[ ! "$dirname" =~ ^[0-9]+$ ]] || {
+            echo "FAIL: Port number '$dirname' incorrectly parsed as directory name for spec: $spec"
+            return 1
+        }
+        
+        # dirname should be the repository name by default
+        local expected_name
+        if [[ "$spec" =~ /([^/]+)(\.git)?$ ]]; then
+            expected_name="${BASH_REMATCH[1]}"
+            expected_name="${expected_name%.git}"
+        fi
+        [ "$dirname" = "$expected_name" ] || {
+            echo "FAIL: Expected dirname '$expected_name' but got '$dirname' for spec: $spec"
+            return 1
+        }
+    done
 }
 
 @test "parsing should handle URL with custom directory but no branch" {

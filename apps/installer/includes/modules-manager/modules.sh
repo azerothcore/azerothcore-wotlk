@@ -239,11 +239,20 @@ function inst_parse_module_spec() {
     # Parse directory and branch differently for URLs vs simple names
     local repo_with_branch="$spec"
     if [[ $is_url -eq 1 ]]; then
-        # For URLs, look for :dirname pattern after .git or at the end
-        if [[ "$spec" =~ ^([^@]+)(\.git)?:([^@]+)(@.*)?$ ]]; then
-            repo_with_branch="${BASH_REMATCH[1]}${BASH_REMATCH[2]}${BASH_REMATCH[4]}"
-            dirname="${BASH_REMATCH[3]}"
+        # For URLs, look for :dirname pattern, but be careful about ports
+        # Strategy: only match :dirname if it's clearly after the repository path
+        
+        # Look for :dirname patterns at the end, but not if it looks like a port
+        if [[ "$spec" =~ ^(.*\.git):([^@/:]+)(@.*)?$ ]]; then
+            # Repo ending with .git:dirname
+            repo_with_branch="${BASH_REMATCH[1]}${BASH_REMATCH[3]}"
+            dirname="${BASH_REMATCH[2]}"
+        elif [[ "$spec" =~ ^(.*://[^/]+/[^:]*[^0-9]):([^@/:]+)(@.*)?$ ]]; then
+            # URL with path ending in non-digit:dirname (avoid matching ports)
+            repo_with_branch="${BASH_REMATCH[1]}${BASH_REMATCH[3]}"
+            dirname="${BASH_REMATCH[2]}"
         fi
+        # If no custom dirname found, repo_with_branch remains the original spec
     else
         # For simple names, use the original logic
         if [[ "$spec" =~ ^([^@:]+):([^@:]+)(@.*)?$ ]]; then
@@ -253,12 +262,40 @@ function inst_parse_module_spec() {
     fi
     
     # Now parse branch and commit from the repo part
-    if [[ "$repo_with_branch" =~ ^([^@]+)@([^:]+)(:(.+))?$ ]]; then
-        repo_part="${BASH_REMATCH[1]}"
-        branch="${BASH_REMATCH[2]}"
-        commit="${BASH_REMATCH[4]:-}"
+    # Be careful not to confuse URL @ with branch @
+    if [[ "$repo_with_branch" =~ :// ]]; then
+        # For URLs, look for @ after the authority part
+        if [[ "$repo_with_branch" =~ ^[^/]*//[^/]+/.*@([^:]+)(:(.+))?$ ]]; then
+            # @ found in path part - treat as branch
+            repo_part="${repo_with_branch%@*}"
+            branch="${BASH_REMATCH[1]}"
+            commit="${BASH_REMATCH[3]:-}"
+        elif [[ "$repo_with_branch" =~ ^([^@]*@[^/]+/.*)@([^:]+)(:(.+))?$ ]]; then
+            # @ found after URL authority @ - treat as branch
+            repo_part="${BASH_REMATCH[1]}"
+            branch="${BASH_REMATCH[2]}"
+            commit="${BASH_REMATCH[4]:-}"
+        else
+            repo_part="$repo_with_branch"
+        fi
+    elif [[ "$repo_with_branch" =~ ^git@ ]]; then
+        # Git SSH format - look for @ after the initial git@host: part
+        if [[ "$repo_with_branch" =~ ^git@[^:]+:.*@([^:]+)(:(.+))?$ ]]; then
+            repo_part="${repo_with_branch%@*}"
+            branch="${BASH_REMATCH[1]}"
+            commit="${BASH_REMATCH[3]:-}"
+        else
+            repo_part="$repo_with_branch"
+        fi
     else
-        repo_part="$repo_with_branch"
+        # Non-URL format - use original logic
+        if [[ "$repo_with_branch" =~ ^([^@]+)@([^:]+)(:(.+))?$ ]]; then
+            repo_part="${BASH_REMATCH[1]}"
+            branch="${BASH_REMATCH[2]}"
+            commit="${BASH_REMATCH[4]:-}"
+        else
+            repo_part="$repo_with_branch"
+        fi
     fi
     
     # Normalize repo reference and extract owner/name.
@@ -267,10 +304,39 @@ function inst_parse_module_spec() {
 
     # If repo_ref is a URL, extract owner/name from path when possible
     if [[ "$repo_ref" =~ :// ]] || [[ "$repo_ref" =~ ^git@ ]]; then
-        # Extract owner/name (last two path components)
-        owner_repo=$(echo "$repo_ref" | sed -E 's#(git@[^:]+:|https?://[^/]+/|ssh://[^/]+/)?(.*?)(\.git)?$#\2#')
-        owner="$(echo "$owner_repo" | awk -F'/' '{print $(NF-1)}')"
-        name="$(echo "$owner_repo" | awk -F'/' '{print $NF}' | sed -E 's/\.git$//')"
+        # Handle various URL formats
+        local path_part=""
+        if [[ "$repo_ref" =~ ^https?://[^/]+:?[0-9]*/(.+)$ ]]; then
+            # HTTPS URL (with or without port)
+            path_part="${BASH_REMATCH[1]}"
+        elif [[ "$repo_ref" =~ ^ssh://.*@[^/]+:?[0-9]*/(.+)$ ]]; then
+            # SSH URL with user@host:port/path format
+            path_part="${BASH_REMATCH[1]}"
+        elif [[ "$repo_ref" =~ ^ssh://[^@/]+:?[0-9]*/(.+)$ ]]; then
+            # SSH URL with host:port/path format (no user@)
+            path_part="${BASH_REMATCH[1]}"
+        elif [[ "$repo_ref" =~ ^git@[^:]+:(.+)$ ]]; then
+            # Git SSH format (git@host:path)
+            path_part="${BASH_REMATCH[1]}"
+        fi
+        
+        # Extract owner/name from path
+        if [[ -n "$path_part" ]]; then
+            # Remove .git suffix and any :dirname suffix
+            path_part="${path_part%.git}"
+            path_part="${path_part%:*}"
+            
+            if [[ "$path_part" == *"/"* ]]; then
+                owner="$(echo "$path_part" | awk -F'/' '{print $(NF-1)}')"
+                name="$(echo "$path_part" | awk -F'/' '{print $NF}')"
+            else
+                owner="unknown"
+                name="$path_part"
+            fi
+        else
+            owner="unknown"
+            name="unknown"
+        fi
     else
         owner_repo="$repo_ref"
         if [[ "$owner_repo" == *"/"* ]]; then
@@ -323,21 +389,28 @@ function inst_extract_owner_name {
         base_ref="${repo_ref%%:*}"
     fi
     
-    if [[ "$base_ref" =~ ^https?://github\.com/([^/]+)/([^/]+)(\.git)?(/.*)?$ ]]; then
-        # HTTPS URL format - check this first before owner/name pattern
+    # Handle various URL formats with possible ports
+    if [[ "$base_ref" =~ ^https?://[^/]+:?[0-9]*/([^/]+)/([^/?]+) ]]; then
+        # HTTPS URL format (with or without port) - matches github.com, gitlab.com, custom hosts
+        local owner="${BASH_REMATCH[1]}"
         local name="${BASH_REMATCH[2]}"
-        name="${name%.git}"  # Remove .git suffix if present
-        echo "${BASH_REMATCH[1]}/$name"
-    elif [[ "$base_ref" =~ ^https?://gitlab\.com/([^/]+)/([^/]+)(\.git)?(/.*)?$ ]]; then
-        # GitLab URL format
+        name="${name%:*}"    # Remove any :dirname suffix first
+        name="${name%.git}"  # Then remove .git suffix if present
+        echo "$owner/$name"
+    elif [[ "$base_ref" =~ ^ssh://[^/]+:?[0-9]*/([^/]+)/([^/?]+) ]]; then
+        # SSH URL format (with or without port)
+        local owner="${BASH_REMATCH[1]}"
         local name="${BASH_REMATCH[2]}"
-        name="${name%.git}"  # Remove .git suffix if present
-        echo "${BASH_REMATCH[1]}/$name"
-    elif [[ "$base_ref" =~ ^git@github\.com:([^/]+)/([^/]+)(\.git)?$ ]]; then
-        # SSH URL format
+        name="${name%:*}"    # Remove any :dirname suffix first
+        name="${name%.git}"  # Then remove .git suffix if present
+        echo "$owner/$name"
+    elif [[ "$base_ref" =~ ^git@[^:]+:([^/]+)/([^/?]+) ]]; then
+        # Git SSH format (git@host:owner/repo)
+        local owner="${BASH_REMATCH[1]}"
         local name="${BASH_REMATCH[2]}"
-        name="${name%.git}"  # Remove .git suffix if present
-        echo "${BASH_REMATCH[1]}/$name"
+        name="${name%:*}"    # Remove any :dirname suffix first
+        name="${name%.git}"  # Then remove .git suffix if present
+        echo "$owner/$name"
     elif [[ "$base_ref" =~ ^[^/]+/[^/]+$ ]]; then
         # Format: owner/name (check after URL patterns)
         echo "$base_ref"
@@ -403,7 +476,12 @@ function inst_mod_is_excluded() {
 
     # Split on default IFS (space, tab, newline)
     local items=()
-    read -r -a items <<< "${MODULES_EXCLUDE_LIST}"
+    # Use mapfile to split MODULES_EXCLUDE_LIST on newlines; fallback to space if no newlines
+    if [[ "${MODULES_EXCLUDE_LIST}" == *$'\n'* ]]; then
+        mapfile -t items <<< "${MODULES_EXCLUDE_LIST}"
+    else
+        read -r -a items <<< "${MODULES_EXCLUDE_LIST}"
+    fi
 
     local it it_owner
     for it in "${items[@]}"; do
