@@ -62,28 +62,12 @@ struct boss_captain_skarloc : public BossAI
 
     SummonList summons;
     bool _spawnedAdds;
-    bool resetEscort;
 
     void Reset() override
     {
         _Reset();
         summons.DespawnAll();
         _spawnedAdds = false;
-        resetEscort = false;
-    }
-
-    void MoveInLineOfSight(Unit* who) override
-    {
-        if (!who->IsPlayer())
-            return;
-
-        if (!me->IsInCombat() && me->movespline->Finalized() && !resetEscort)
-        {
-            me->GetInstanceScript()->SetData(DATA_CAPTAIN_SKARLOC, NOT_STARTED);
-            Reset();
-            InitializeAI();
-            resetEscort = true;
-        }
     }
 
     void JustSummoned(Creature* summon) override

@@ -152,6 +152,11 @@ inline void CreatureUnitRelocationWorker(Creature* c, Unit* u)
         return;
     }
 
+    if (c->HasUnitFlag(UNIT_FLAG_IMMUNE_TO_NPC) || c->HasUnitFlag(UNIT_FLAG_IMMUNE_TO_PC))
+    {
+        return;
+    }
+
     if (!c->HasUnitState(UNIT_STATE_SIGHTLESS))
     {
         if (c->IsAIEnabled && c->CanSeeOrDetect(u, false, true))
