@@ -49,7 +49,6 @@ jobs:
           sudo /tmp/bats-core/install.sh /usr/local
           bats --version
           ./acore.sh install-deps
-          npm install -g pm2
 
       - name: Run bash script tests for ${{ matrix.test-module }}
         env:
@@ -96,6 +95,7 @@ jobs:
         run: |
           # This runs: install-deps, compile, database setup, client-data download
           ./acore.sh init
+          sudo npm install -g pm2
         timeout-minutes: 120
 
       - name: Test module removal
