@@ -1,3 +1,4 @@
+-- DB update 2025_09_06_01 -> 2025_09_06_02
 --
 -- Changes Scorn's spawn from Event 17 (Scourge Invasion) to 120 (Scourge Invasion - Boss in instance activation)
 UPDATE `game_event_creature` SET `eventEntry` = 120 WHERE `guid` = 248652;
