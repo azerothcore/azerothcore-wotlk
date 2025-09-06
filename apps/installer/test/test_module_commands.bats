@@ -417,6 +417,20 @@ EOF
     run inst_mod_is_excluded "mod-test"
     [ "$status" -eq 0 ]
 
+    # Test exclusion with space-separated list
+    export MODULES_EXCLUDE_LIST="mod-one mod-two mod-three"
+    run inst_mod_is_excluded "mod-two"
+    [ "$status" -eq 0 ]
+
+    # Test exclusion with newline-separated list
+    export MODULES_EXCLUDE_LIST="\
+    mod-alpha\
+    mod-beta\
+    mod-gamma\
+    "
+    run inst_mod_is_excluded "mod-beta"
+    [ "$status" -eq 0 ]
+
     # Test exclusion with URL format
     export MODULES_EXCLUDE_LIST="https://github.com/azerothcore/mod-transmog.git"
     run inst_mod_is_excluded "mod-transmog"
