@@ -115,3 +115,30 @@ jobs:
           cd env/dist/bin
           timeout 5m ./worldserver -dry-run
         continue-on-error: false
+
+
+      - name: Test worldserver with startup scripts
+        run: |
+          ./acore.sh sm create worldserver -- engine=worldserver
+          ./acore.sh sm show-config worldserver
+          ./acore.sh sm start worldserver
+          ./acore.sh sm wait-uptime worldserver 10 300
+          ./acore.sh sm send worldserver "account create tester password 3"
+          ./acore.sh sm send worldserver "account set gm tester 3"
+          ./acore.sh sm send worldserver "account set addon tester 1"
+          ./acore.sh sm wait-uptime worldserver 10 300
+          ./acore.sh sm stop worldserver
+          ./acore.sh sm delete worldserver
+        timeout-minutes: 30
+        continue-on-error: false
+
+      - name: Test authserver with startup scripts
+        run: |
+          ./acore.sh sm create authserver -- engine=authserver
+          ./acore.sh sm show-config authserver
+          ./acore.sh sm start authserver
+          ./acore.sh sm wait-uptime authserver 10 300
+          ./acore.sh sm stop authserver
+          ./acore.sh sm delete authserver
+        timeout-minutes: 30
+        continue-on-error: false
