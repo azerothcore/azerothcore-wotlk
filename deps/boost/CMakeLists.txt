@@ -31,7 +31,21 @@ else()
   set(BOOST_REQUIRED_VERSION 1.74)
 endif()
 
-find_package(Boost ${BOOST_REQUIRED_VERSION} REQUIRED system filesystem program_options iostreams regex)
+# First load Boost just enough to learn its version (and provide headers target).
+find_package(Boost ${BOOST_REQUIRED_VERSION} REQUIRED COMPONENTS headers)
+
+# Build the component list depending on Boost version.
+if(Boost_VERSION GREATER_EQUAL 108900)
+  # Boost >= 1.89: 'system' is header-only; no CMake package is exported for it.
+  set(AC_BOOST_COMPONENTS filesystem program_options iostreams regex)
+else()
+  # Older Boost: still need the 'system' component.
+  set(AC_BOOST_COMPONENTS system filesystem program_options iostreams regex)
+endif()
+
+# Now request the actual components.
+find_package(Boost ${BOOST_REQUIRED_VERSION} REQUIRED COMPONENTS ${AC_BOOST_COMPONENTS})
+
 
 if(NOT Boost_FOUND)
   if(NOT DEFINED ENV{Boost_ROOT} AND NOT DEFINED Boost_DIR AND NOT DEFINED BOOST_ROOT AND NOT DEFINED BOOSTROOT)
