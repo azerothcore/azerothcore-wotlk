@@ -29,11 +29,11 @@
 #include "WorldSession.h"
 #include <cmath>
 
+#include "ItemPackets.h"
+
 // npcbot
 #include "botmgr.h"
 //end npcbot
-
-#include "ItemPackets.h"
 
 void WorldSession::HandleSplitItemOpcode(WorldPackets::Item::SplitItem& packet)
 {
