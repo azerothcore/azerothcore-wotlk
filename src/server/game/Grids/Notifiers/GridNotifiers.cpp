@@ -152,7 +152,8 @@ inline void CreatureUnitRelocationWorker(Creature* c, Unit* u)
         return;
     }
 
-    if (c->HasUnitFlag(UNIT_FLAG_IMMUNE_TO_NPC) || c->HasUnitFlag(UNIT_FLAG_IMMUNE_TO_PC))
+    // Prevents AI reaction when immunity flags are active
+    if (c->HasUnitFlag(UNIT_FLAG_IMMUNE_TO_NPC))
     {
         return;
     }
