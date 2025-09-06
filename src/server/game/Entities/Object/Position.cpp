@@ -138,39 +138,25 @@ bool Position::IsWithinBox(const Position& center, float xradius, float yradius,
     return true;
 }
 
-bool Position::HasInArc(float arc, const Position* obj, float targetRadius) const
+bool Position::HasInArc(float arc, Position const* obj, float border) const
 {
     // always have self in arc
     if (obj == this)
         return true;
 
     // move arc to range 0.. 2*pi
-    arc = Position::NormalizeOrientation(arc);
-
-    float angle = GetAngle(obj);
-    angle -= m_orientation;
+    arc = NormalizeOrientation(arc);
 
     // move angle to range -pi ... +pi
-    angle = Position::NormalizeOrientation(angle);
-    if (angle > M_PI)
-        angle -= 2.0f * M_PI;
+    float angle = GetRelativeAngle(obj);
 
-    float lborder = -1 * (arc / 2.0f);                      // in range -pi..0
-    float rborder = (arc / 2.0f);                           // in range 0..pi
+    if (angle > float(M_PI))
+        angle -= 2.0f * float(M_PI);
 
-    // pussywizard: take into consideration target size
-    if (targetRadius > 0.0f)
-    {
-        float distSq = GetExactDist2dSq(obj);
-        // pussywizard: at least a part of target's model is in every direction
-        if (distSq < targetRadius * targetRadius)
-            return true;
-        float angularRadius = 2.0f * atan(targetRadius / (2.0f * sqrt(distSq)));
-        lborder -= angularRadius;
-        rborder += angularRadius;
-    }
+    float lborder = -1 * (arc / border);                        // in range -pi..0
+    float rborder = (arc / border);                             // in range 0..pi
 
-    return (angle >= lborder) && (angle <= rborder);
+    return ((angle >= lborder) && (angle <= rborder));
 }
 
 bool Position::IsPositionValid() const
