@@ -103,6 +103,14 @@ struct npc_taldaram_flamesphere : public NullCreatureAI
         }
     }
 
+    void MovementInform(uint32 type, uint32 id) override
+    {
+        if (type == POINT_MOTION_TYPE && id == POINT_ORB)
+        {
+            me->KillSelf();
+        }
+    }
+
     void IsSummonedBy(WorldObject* /*summoner*/) override
     {
         // Replace sphere instantly if sphere is summoned after prince death
