@@ -84,7 +84,7 @@ public:
 
     struct boss_hadronoxAI : public BossAI
     {
-        boss_hadronoxAI(Creature* creature) : BossAI(creature, DATA_HADRONOX_EVENT)
+        boss_hadronoxAI(Creature* creature) : BossAI(creature, DATA_HADRONOX)
         {
         }
 
@@ -99,7 +99,7 @@ public:
         {
             if (param == ACTION_START_EVENT)
             {
-                instance->SetBossState(DATA_HADRONOX_EVENT, IN_PROGRESS);
+                instance->SetBossState(DATA_HADRONOX, IN_PROGRESS);
                 me->setActive(true);
                 events.ScheduleEvent(EVENT_HADRONOX_MOVE1, 20s);
                 events.ScheduleEvent(EVENT_HADRONOX_MOVE2, 40s);
@@ -342,7 +342,7 @@ public:
         PreventDefaultAction();
         Unit* owner = GetUnitOwner();
         if (InstanceScript* instance = owner->GetInstanceScript())
-            if (instance->GetBossState(DATA_HADRONOX_EVENT) != DONE)
+            if (!instance->IsBossDone(DATA_HADRONOX))
             {
                 if (!owner->HasAura(SPELL_WEB_FRONT_DOORS))
                     owner->CastSpell(owner, _spellEntry, true);
