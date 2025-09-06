@@ -29,8 +29,8 @@ We support the following versions of dependencies.
 | 20.04 ≤        |    :red_circle:    |                      |
 
 | macOS |       Status       |     Recommended      |
-| :---- | :----------------: | :------------------: |
-| 14    | :white_check_mark: | :large_blue_diamond: |
+|:------| :----------------: | :------------------: |
+| 15    | :white_check_mark: | :large_blue_diamond: |
 | 12 ≤  |    :red_circle:    |                      |
 
 | Windows       |       Status       |     Recommended      |
