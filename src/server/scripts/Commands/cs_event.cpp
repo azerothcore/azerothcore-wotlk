@@ -71,7 +71,7 @@ public:
         if (counter == 0)
             handler->SendSysMessage(LANG_NOEVENTFOUND);
 
-        handler->SetSentErrorMessage(true);
+        handler->SetSentErrorMessage(false);
 
         return true;
     }
