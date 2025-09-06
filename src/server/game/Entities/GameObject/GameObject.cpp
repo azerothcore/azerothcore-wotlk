@@ -431,15 +431,11 @@ bool GameObject::Create(ObjectGuid::LowType guidlow, uint32 name_id, Map* map, u
 
     // Check if GameObject is Large
     if (goinfo->IsLargeGameObject())
-    {
         SetVisibilityDistanceOverride(VisibilityDistanceType::Large);
-    }
 
     // Check if GameObject is Infinite
     if (goinfo->IsInfiniteGameObject())
-    {
         SetVisibilityDistanceOverride(VisibilityDistanceType::Infinite);
-    }
 
     return true;
 }

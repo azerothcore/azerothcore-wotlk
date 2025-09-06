@@ -99,7 +99,8 @@ public:
             { "objectcount",    HandleDebugObjectCountCommand,         SEC_ADMINISTRATOR, Console::Yes},
             { "dummy",          HandleDebugDummyCommand,               SEC_ADMINISTRATOR, Console::No },
             { "mapdata",        HandleDebugMapDataCommand,             SEC_ADMINISTRATOR, Console::No },
-            { "boundary",       HandleDebugBoundaryCommand,            SEC_ADMINISTRATOR, Console::No }
+            { "boundary",       HandleDebugBoundaryCommand,            SEC_ADMINISTRATOR, Console::No },
+            { "visibilitydata", HandleDebugVisibilityDataCommand,      SEC_ADMINISTRATOR, Console::No }
         };
         static ChatCommandTable commandTable =
         {
@@ -1401,6 +1402,44 @@ public:
         if (errMsg > 0)
             handler->PSendSysMessage(errMsg);
 
+        return true;
+    }
+
+    static bool HandleDebugVisibilityDataCommand(ChatHandler* handler)
+    {
+        Player* player = handler->GetPlayer();
+        if (!player)
+            return false;
+
+        uint32 creatureCount = 0, playerCount = 0, gameobjectCount = 0, dynamicobjectCount = 0, corpseCount = 0;
+
+        ObjectVisibilityContainer const& objectVisibilityContainer = player->GetObjectVisibilityContainer();
+        for (auto& kvPair : *objectVisibilityContainer.GetVisibleWorldObjectsMap())
+        {
+            WorldObject* obj = kvPair.second;
+            switch (obj->GetTypeId())
+            {
+                case TYPEID_UNIT: ++creatureCount; break;
+                case TYPEID_PLAYER: ++playerCount; break;
+                case TYPEID_GAMEOBJECT: ++gameobjectCount; break;
+                case TYPEID_DYNAMICOBJECT: ++dynamicobjectCount; break;
+                case TYPEID_CORPSE: ++corpseCount; break;
+                default: break;
+            }
+        }
+
+        uint32 zoneWideVisibleObjectsInZone = 0;
+        if (ZoneWideVisibleWorldObjectsSet const* farVisibleSet = player->GetMap()->GetZoneWideVisibleWorldObjectsForZone(player->GetZoneId()))
+            zoneWideVisibleObjectsInZone = farVisibleSet->size();
+
+        handler->PSendSysMessage("Visibility Range: {}", player->GetVisibilityRange());
+        handler->PSendSysMessage("Visible Creatures: {}", creatureCount);
+        handler->PSendSysMessage("Visible Players: {}", playerCount);
+        handler->PSendSysMessage("Visible GameObjects: {}", gameobjectCount);
+        handler->PSendSysMessage("Visible DynamicObjects: {}", dynamicobjectCount);
+        handler->PSendSysMessage("Visible Corpses: {}", corpseCount);
+        handler->PSendSysMessage("Players we are visible to: {}", objectVisibilityContainer.GetVisiblePlayersMap().size());
+        handler->PSendSysMessage("Zone wide visible objects in zone: {}", zoneWideVisibleObjectsInZone);
         return true;
     }
 };

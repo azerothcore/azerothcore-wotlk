@@ -147,6 +147,8 @@ struct ZoneDynamicInfo
 typedef std::map<uint32/*leaderDBGUID*/, CreatureGroup*>        CreatureGroupHolderType;
 typedef std::unordered_map<uint32 /*zoneId*/, ZoneDynamicInfo> ZoneDynamicInfoMap;
 typedef std::unordered_set<Transport*> TransportsContainer;
+typedef std::unordered_set<WorldObject*> ZoneWideVisibleWorldObjectsSet;
+typedef std::unordered_map<uint32 /*ZoneId*/, ZoneWideVisibleWorldObjectsSet> ZoneWideVisibleWorldObjectsMap;
 
 enum EncounterCreditType : uint8
 {
@@ -496,6 +498,12 @@ public:
     typedef std::vector<WorldObject*> UpdatableObjectList;
     typedef std::unordered_set<WorldObject*> PendingAddUpdatableObjectList;
 
+    void AddWorldObjectToFarVisibleMap(WorldObject* obj);
+    void RemoveWorldObjectFromFarVisibleMap(WorldObject* obj);
+    void AddWorldObjectToZoneWideVisibleMap(uint32 zoneId, WorldObject* obj);
+    void RemoveWorldObjectFromZoneWideVisibleMap(uint32 zoneId, WorldObject* obj);
+    ZoneWideVisibleWorldObjectsSet const* GetZoneWideVisibleWorldObjectsForZone(uint32 zoneId) const;
+
 private:
 
     template<class T> void InitializeObject(T* obj);
@@ -603,6 +611,7 @@ private:
     UpdatableObjectList _updatableObjectList;
     PendingAddUpdatableObjectList _pendingAddUpdatableObjectList;
     IntervalTimer _updatableObjectListRecheckTimer;
+    ZoneWideVisibleWorldObjectsMap _zoneWideVisibleWorldObjectsMap;
 };
 
 enum InstanceResetMethod

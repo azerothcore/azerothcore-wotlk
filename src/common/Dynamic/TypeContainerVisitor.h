@@ -56,6 +56,27 @@ template<class VISITOR, class OBJECT_TYPES> void VisitorHelper(VISITOR& v, TypeM
     VisitorHelper(v, c.GetElements());
 }
 
+// VectorContainer
+template<class VISITOR> void VisitorHelper(VISITOR& /*v*/, ContainerVector<TypeNull>& /*c*/) {}
+
+template<class VISITOR, class T> void VisitorHelper(VISITOR& v, ContainerVector<T>& c)
+{
+    v.Visit(c._element);
+}
+
+// recursion container map list
+template<class VISITOR, class H, class T> void VisitorHelper(VISITOR& v, ContainerVector<TypeList<H, T>>& c)
+{
+    VisitorHelper(v, c._elements);
+    VisitorHelper(v, c._TailElements);
+}
+
+// for TypeMapContainer
+template<class VISITOR, class OBJECT_TYPES> void VisitorHelper(VISITOR& v, TypeVectorContainer<OBJECT_TYPES>& c)
+{
+    VisitorHelper(v, c.GetElements());
+}
+
 // TypeUnorderedMapContainer
 template<class VISITOR, class KEY_TYPE>
 void VisitorHelper(VISITOR& /*v*/, ContainerUnorderedMap<TypeNull, KEY_TYPE>& /*c*/) { }
