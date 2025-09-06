@@ -2654,9 +2654,7 @@ Item* Player::_StoreItem(uint16 pos, Item* pItem, uint32 count, bool clone, bool
 
         AddEnchantmentDurations(pItem);
         AddItemDurations(pItem);
-
-        if (bag == INVENTORY_SLOT_BAG_0 || (bag >= INVENTORY_SLOT_BAG_START && bag < INVENTORY_SLOT_BAG_END))
-            ApplyItemObtainSpells(pItem, true);
+        UpdateItemObtainSpells(pItem, bag, slot);
 
         return pItem;
     }
@@ -2694,8 +2692,7 @@ Item* Player::_StoreItem(uint16 pos, Item* pItem, uint32 count, bool clone, bool
 
         pItem2->SetState(ITEM_CHANGED, this);
 
-        if (bag == INVENTORY_SLOT_BAG_0 || (bag >= INVENTORY_SLOT_BAG_START && bag < INVENTORY_SLOT_BAG_END))
-            ApplyItemObtainSpells(pItem2, true);
+        UpdateItemObtainSpells(pItem2, bag, slot);
 
         return pItem2;
     }

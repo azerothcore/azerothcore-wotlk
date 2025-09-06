@@ -7067,6 +7067,14 @@ void Player::ApplyItemObtainSpells(Item* item, bool apply)
     }
 }
 
+void Player::UpdateItemObtainSpells(Item* item, uint8 bag, uint8 slot)
+{
+    if (IsBankPos(bag, slot))
+        ApplyItemObtainSpells(item, false);
+    else if (bag == INVENTORY_SLOT_BAG_0 || (bag >= INVENTORY_SLOT_BAG_START && bag < INVENTORY_SLOT_BAG_END))
+        ApplyItemObtainSpells(item, true);
+}
+
 SpellSchoolMask Player::GetMeleeDamageSchoolMask(WeaponAttackType attackType /*= BASE_ATTACK*/, uint8 damageIndex /*= 0*/) const
 {
     if (Item const* weapon = GetWeaponForAttack(attackType, true))
