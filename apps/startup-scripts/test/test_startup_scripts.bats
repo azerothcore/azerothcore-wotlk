@@ -18,6 +18,17 @@ teardown() {
     acore_test_teardown
 }
 
+# Helper function to get mock uptime in milliseconds
+get_mock_uptime() {
+    local offset=$1
+    if date +%s%N >/dev/null 2>&1; then
+      nowms=$(( $(date +%s%N) / 1000000 ))
+    else
+      nowms=$(( $(date +%s) * 1000 ))
+    fi
+    echo $(( nowms - offset ))
+}
+
 # ===== STARTER SCRIPT TESTS =====
 
 @test "starter: should fail with missing parameters" {
@@ -175,12 +186,7 @@ EOF
 case "$1" in
   jlist)
     # Produce a JSON with uptime ~20 seconds
-    if date +%s%N >/dev/null 2>&1; then
-      nowms=$(( $(date +%s%N) / 1000000 ))
-    else
-      nowms=$(( $(date +%s) * 1000 ))
-    fi
-    up=$(( nowms - 20000 ))
+    up=$(get_mock_uptime 20000)
     echo "[{\"name\":\"test-world\",\"pm2_env\":{\"status\":\"online\",\"pm_uptime\":$up}}]"
     ;;
   id)
@@ -228,12 +234,7 @@ EOF
 #!/usr/bin/env bash
 case "$1" in
   jlist)
-    if date +%s%N >/dev/null 2>&1; then
-      nowms=$(( $(date +%s%N) / 1000000 ))
-    else
-      nowms=$(( $(date +%s) * 1000 ))
-    fi
-    up=$(( nowms - 15000 ))
+    up=$(get_mock_uptime 15000)
     echo "[{\"name\":\"test-world\",\"pm2_env\":{\"status\":\"online\",\"pm_uptime\":$up}}]"
     ;;
   id)
