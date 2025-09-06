@@ -49,6 +49,7 @@ jobs:
           sudo /tmp/bats-core/install.sh /usr/local
           bats --version
           ./acore.sh install-deps
+          npm install -g pm2
 
       - name: Run bash script tests for ${{ matrix.test-module }}
         env:
