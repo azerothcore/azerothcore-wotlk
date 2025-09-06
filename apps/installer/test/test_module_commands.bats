@@ -423,11 +423,11 @@ EOF
     [ "$status" -eq 0 ]
 
     # Test exclusion with newline-separated list
-    export MODULES_EXCLUDE_LIST="\
-    mod-alpha\
-    mod-beta\
-    mod-gamma\
-    "
+    export MODULES_EXCLUDE_LIST="
+mod-alpha
+mod-beta
+mod-gamma
+"
     run inst_mod_is_excluded "mod-beta"
     [ "$status" -eq 0 ]
 
