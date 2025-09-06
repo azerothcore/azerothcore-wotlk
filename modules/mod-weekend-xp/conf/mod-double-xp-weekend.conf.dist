@@ -53,3 +53,34 @@ XPWeekend.QuestOnly = 0
 #
 
 XPWeekend.MaxLevel = 80
+
+# XPWeekend.IsDKStartZoneRequired = 0
+#     If set to 1 (enabled), players must have completed the Death Knight starting zone to receive the bonus experience.
+#     Default: 0 (Disabled)
+
+XPWeekend.IsDKStartZoneRequired = 0
+
+# XPWeekend.IsJoyousJourneysActive = 0
+#     Promotional event, adds yet another layer of bonus on top of the current bonus (yay!)
+#     Default: 0 (Disabled)
+
+XPWeekend.IsJoyousJourneysActive = 0
+
+# XPWeekend.JoyousJourneysXPRate = 1
+#     Bonus experience rate during joyous journeys.
+#     ADDS to the base one. So if base 2x + 1x from this = 3x (50% increase).
+#     Default: 1
+
+XPWeekend.JoyousJourneysXPRate = 1
+
+# XPWeekend.JoyousJourneysRepRate = 1.10
+#     Reputation bonus while joyous journeys is active.
+#     Default: 1.10 (10%)
+
+XPWeekend.JoyousJourneysRepRate = 1.10
+
+# XPWeekend.ExcludeInsaneReps = 1
+#     Exclude the insane title reputations e.g ravenholdt
+#     Default: 1 (Enabled)
+
+XPWeekend.ExcludeInsaneReps = 1

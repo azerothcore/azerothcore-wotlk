@@ -11,6 +11,7 @@ enum WeekendXP
     SETTING_WEEKEND_XP_RATE = 0,
     SETTING_WEEKEND_XP_DISABLE = 1,
     SETTING_WEEKEND_XP_VERSION = 2,
+    SETTING_WEEKEND_XP_JOYOUS_JOURNEYS = 3,
 
     LANG_CMD_WEEKEND_XP_SET   = 11120,
     LANG_CMD_WEEKEND_XP_ERROR = 11121,
@@ -38,9 +39,14 @@ public:
         return &instance;
     }
 
-    uint32 OnGiveXP(Player* player, uint32 originalAmount, uint8 xpSource) const
+    uint32 OnPlayerGiveXP(Player* player, uint32 originalAmount, uint8 xpSource) const
     {
         if (!IsEventActive())
+        {
+            return originalAmount;
+        }
+
+        if (ConfigIsDKStartZoneRequired() && player->getClass() == CLASS_DEATH_KNIGHT && !IsDKStartZoneComplete(player))
         {
             return originalAmount;
         }
@@ -59,7 +65,7 @@ public:
         return (uint32) newAmount;
     }
 
-    void OnLogin(Player* player, ChatHandler* handler) const
+    void OnPlayerLogin(Player* player, ChatHandler* handler) const
     {
         // TODO I am assuming that this is always called when a character logs in...
         // if that is not the case, thing migh get weird... Adding some asserts or warnings would be nice
@@ -136,6 +142,12 @@ public:
         return true;
     }
 
+    bool IsJoyousJourneysActive() const { return sConfigMgr->GetOption<bool>("XPWeekend.IsJoyousJourneysActive", false); }
+    float ConfigJoyousJourneysXPRate() const { return sConfigMgr->GetOption<float>("XPWeekend.JoyousJourneysXPRate", 1.0f); }
+    float ConfigJoyousJourneysRepRate() const { return sConfigMgr->GetOption<float>("XPWeekend.JoyousJourneysRepRate", 1.10f); }
+    bool ExcludeInsaneReps() const { return sConfigMgr->GetOption<bool>("XPWeekend.ExcludeInsaneReps", true); }
+    float ConfigMaxAllowedRate() const { return sConfigMgr->GetOption<float>("XPWeekend.MaxAllowedRate", 2.0f); }
+
 private:
 
     // NOTE keep options together to prevent having more than 1 potential default value
@@ -146,7 +158,12 @@ private:
     float ConfigxpAmount() const { return sConfigMgr->GetOption<float>("XPWeekend.xpAmount", 2.0f); }
     bool ConfigIndividualXPEnabled() const { return sConfigMgr->GetOption<bool>("XPWeekend.IndividualXPEnabled", false); }
     bool ConfigEnabled() const { return sConfigMgr->GetOption<bool>("XPWeekend.Enabled", false); }
-    float ConfigMaxAllowedRate() const { return sConfigMgr->GetOption<float>("XPWeekend.MaxAllowedRate", 2.0f); }
+    bool ConfigIsDKStartZoneRequired() const { return sConfigMgr->GetOption<bool>("XPWeekend.IsDKStartZoneRequired", false); }
+
+    bool IsDKStartZoneComplete(Player* player) const
+    {
+        return player->IsQuestRewarded(13188) || player->IsQuestRewarded(13189);
+    }
 
     void PlayerSettingSetRate(Player* player, float rate) const
     {
@@ -223,6 +240,18 @@ private:
         if (ConfigIndividualXPEnabled())
         {
             rate = PlayerSettingGetRate(player);
+
+            // If config changed, cap it to max allowed
+            if (rate > ConfigMaxAllowedRate())
+            {
+                rate = ConfigMaxAllowedRate();
+                player->UpdatePlayerSetting("mod-double-xp-weekend", SETTING_WEEKEND_XP_RATE, ConfigMaxAllowedRate());
+            }
+        }
+
+        if (IsJoyousJourneysActive() && !player->GetPlayerSetting("mod-double-xp-weekend", SETTING_WEEKEND_XP_JOYOUS_JOURNEYS).IsEnabled())
+        {
+            rate += ConfigJoyousJourneysXPRate();
         }
 
         // Prevent returning 0% rate.
@@ -259,6 +288,7 @@ public:
         {
             { "weekendxp rate", HandleSetXPBonusCommand, SEC_PLAYER, Console::No },
             { "weekendxp config", HandleGetCurrentConfigCommand, SEC_PLAYER, Console::No },
+            { "weekendxp joyousjourneys", HandleJoyousJourneysCommand, SEC_PLAYER, Console::No }
         };
 
         return commandTable;
@@ -275,24 +305,72 @@ public:
         DoubleXpWeekend* mod = DoubleXpWeekend::instance();
         return mod->HandleGetCurrentConfigCommand(handler);
     }
+
+    static bool HandleJoyousJourneysCommand(ChatHandler* handler, bool enable)
+    {
+        DoubleXpWeekend* mod = DoubleXpWeekend::instance();
+        if (!mod->IsJoyousJourneysActive())
+        {
+            handler->PSendSysMessage("The Joyous Journeys event is not enabled on this server.");
+            handler->SetSentErrorMessage(true);
+            return true;
+        }
+
+        handler->GetPlayer()->UpdatePlayerSetting("mod-double-xp-weekend", SETTING_WEEKEND_XP_JOYOUS_JOURNEYS, !enable);
+        handler->PSendSysMessage("Joyous Journeys experience boost {}.", !enable ? "disabled" : "enabled");
+        return true;
+    }
 };
 
 class DoubleXpWeekendPlayerScript : public PlayerScript
 {
 public:
-    DoubleXpWeekendPlayerScript() : PlayerScript("DoubleXpWeekend") { }
+    DoubleXpWeekendPlayerScript() : PlayerScript("DoubleXpWeekend", {
+        PLAYERHOOK_ON_LOGIN,
+        PLAYERHOOK_ON_GIVE_EXP,
+        PLAYERHOOK_ON_GIVE_REPUTATION
+    }) { }
 
     void OnPlayerLogin(Player* player) override
     {
         DoubleXpWeekend* mod = DoubleXpWeekend::instance();
         ChatHandler handler = ChatHandler(player->GetSession());
-        mod->OnLogin(player, &handler);
+        mod->OnPlayerLogin(player, &handler);
+
+        if (mod->IsJoyousJourneysActive() && mod->ConfigJoyousJourneysXPRate())
+            handler.PSendSysMessage("|cff00ccffThe Joyous Journeys event is active! Experience gains have been increased. Type .weekendxp j off to disable it.|r");
     }
 
     void OnPlayerGiveXP(Player* player, uint32& amount, Unit* /*victim*/, uint8 xpSource) override
     {
         DoubleXpWeekend* mod = DoubleXpWeekend::instance();
-        amount = mod->OnGiveXP(player, amount, xpSource);
+        amount = mod->OnPlayerGiveXP(player, amount, xpSource);
+    }
+
+    void OnPlayerGiveReputation(Player* /*player*/, int32 factionID, float& amount, ReputationSource /*repSource*/) override
+    {
+        DoubleXpWeekend* mod = DoubleXpWeekend::instance();
+        if (!mod->IsJoyousJourneysActive() || !mod->ConfigJoyousJourneysRepRate())
+            return;
+
+        if (mod->ExcludeInsaneReps())
+        {
+            switch (factionID)
+            {
+                case 349: // Ravenholdt
+                case 87:  // bloodsail bucaneers
+                case 21:  // Booty Bay
+                case 169: // Steemwhedle Cartel
+                case 577: // Everlook
+                case 369: // Gadgetzan
+                case 470: // Ratchet
+                case 909: // Darkmoon Faire
+                case 809: // Shen'dralar
+                    return;
+            }
+        }
+
+        amount *= mod->ConfigJoyousJourneysRepRate();
     }
 
 };
