@@ -10,6 +10,10 @@
 # implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 #
 
+if(POLICY CMP0167)
+  cmake_policy(SET CMP0167 NEW)
+endif()
+
 if(WIN32)
   if(DEFINED ENV{Boost_ROOT})
     set(Boost_ROOT $ENV{Boost_ROOT})
@@ -31,20 +35,19 @@ else()
   set(BOOST_REQUIRED_VERSION 1.74)
 endif()
 
-# First load Boost just enough to learn its version (and provide headers target).
-find_package(Boost ${BOOST_REQUIRED_VERSION} REQUIRED COMPONENTS headers)
+# First get Boost + version without pulling any library components yet.
+find_package(Boost ${BOOST_REQUIRED_VERSION} CONFIG REQUIRED COMPONENTS headers)
 
-# Build the component list depending on Boost version.
-if(Boost_VERSION GREATER_EQUAL 108900)
-  # Boost >= 1.89: 'system' is header-only; no CMake package is exported for it.
-  set(AC_BOOST_COMPONENTS filesystem program_options iostreams regex)
-else()
-  # Older Boost: still need the 'system' component.
+# Choose components depending on Boost version (string compare!)
+if(Boost_VERSION VERSION_LESS "1.89.0")
   set(AC_BOOST_COMPONENTS system filesystem program_options iostreams regex)
+else()
+  # Boost.System is header-only in 1.89+; do not request 'system'.
+  set(AC_BOOST_COMPONENTS filesystem program_options iostreams regex headers)
 endif()
 
-# Now request the actual components.
-find_package(Boost ${BOOST_REQUIRED_VERSION} REQUIRED COMPONENTS ${AC_BOOST_COMPONENTS})
+# Now request the actual components
+find_package(Boost ${BOOST_REQUIRED_VERSION} CONFIG REQUIRED COMPONENTS ${AC_BOOST_COMPONENTS})
 
 
 if(NOT Boost_FOUND)
