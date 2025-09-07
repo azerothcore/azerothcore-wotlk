@@ -16311,11 +16311,23 @@ float Player::GetSightRange(WorldObject const* target) const
 {
     float sightRange = WorldObject::GetSightRange(target);
     if (_farSightDistance)
-    {
         sightRange += *_farSightDistance;
-    }
 
     return sightRange;
+}
+
+bool Player::IsWorldObjectOutOfSightRange(WorldObject const* target) const
+{
+    // Special handling for Infinite visibility override objects -> they are zone wide visible
+    if (target->GetVisibilityOverrideType() == VisibilityDistanceType::Infinite)
+    {
+        // Same zone, always visible
+        if (target->GetZoneId() == GetZoneId())
+            return false;
+    }
+
+    // Check if out of range
+    return !m_seer->IsWithinDist(target, GetSightRange(target), true);
 }
 
 std::string Player::GetPlayerName()

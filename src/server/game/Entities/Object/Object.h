@@ -358,9 +358,20 @@ template<class T>
 class GridObject
 {
 public:
-    [[nodiscard]] bool IsInGrid() const { return _gridRef.isValid(); }
-    void AddToGrid(GridRefMgr<T>& m) { ASSERT(!IsInGrid()); _gridRef.link(&m, (T*)this); }
-    void RemoveFromGrid() { ASSERT(IsInGrid()); _gridRef.unlink(); }
+    bool IsInGrid() const
+    {
+        return _gridRef.isValid();
+    }
+    void AddToGrid(GridRefMgr<T>& m)
+    {
+        ASSERT(!IsInGrid());
+        _gridRef.link(&m, (T*)this);
+    }
+    void RemoveFromGrid()
+    {
+        ASSERT(IsInGrid());
+        _gridRef.unlink();
+    }
 private:
     GridReference<T> _gridRef;
 };
@@ -654,8 +665,11 @@ public:
 
     [[nodiscard]] bool isActiveObject() const { return m_isActive; }
     void setActive(bool isActiveObject);
-    [[nodiscard]] bool IsFarVisible() const { return m_isFarVisible; }
-    [[nodiscard]] bool IsVisibilityOverridden() const { return m_visibilityDistanceOverride.has_value(); }
+    VisibilityDistanceType GetVisibilityOverrideType() const { return _visibilityDistanceOverrideType; }
+    bool IsVisibilityOverridden() const { return _visibilityDistanceOverrideType > VisibilityDistanceType::Normal; }
+    bool IsZoneWideVisible() const { return _visibilityDistanceOverrideType == VisibilityDistanceType::Infinite; }
+    bool IsFarVisible() const { return _visibilityDistanceOverrideType == VisibilityDistanceType::Large || _visibilityDistanceOverrideType == VisibilityDistanceType::Gigantic; }
+    float GetVisibilityOverrideDistance() const;
     void SetVisibilityDistanceOverride(VisibilityDistanceType type);
 
     [[nodiscard]] bool IsInWintergrasp() const
@@ -719,8 +733,7 @@ public:
 protected:
     std::string m_name;
     bool m_isActive;
-    bool m_isFarVisible;
-    Optional<float> m_visibilityDistanceOverride;
+    VisibilityDistanceType _visibilityDistanceOverrideType;
     ZoneScript* m_zoneScript;
 
     virtual void ProcessPositionDataChanged(PositionFullTerrainStatus const& data);
