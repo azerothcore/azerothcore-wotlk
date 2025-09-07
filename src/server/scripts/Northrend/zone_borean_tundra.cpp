@@ -563,6 +563,7 @@ private:
 ## Quest 11590: Abduction
 ######*/
 
+// NPC 25316: Beryl Sorcerer
 enum BerylSorcerer
 {
     EVENT_FROSTBOLT                                = 1,
