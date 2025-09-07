@@ -685,17 +685,13 @@ public:
                         {
                             DoCast(me, SPELL_BLINK, true);
                             _blinkUsed = true;
-                            
-                            // Stop movement and disable pathing
+
                             me->StopMoving();
                             me->GetMotionMaster()->Clear();
                             me->GetMotionMaster()->MoveIdle();
                             _movementPaused = true;
-                            
-                            // Schedule next frostbolt after blink
+
                             _events.ScheduleEvent(EVENT_FROSTBOLT, 1000);
-                            
-                            // Schedule resuming movement after a delay
                             _events.ScheduleEvent(EVENT_RESUME_MOVEMENT, 3500);
                         }
                         break;
