@@ -107,3 +107,4 @@ local.properties
 /bin/*.vcxproj.*
 /bin/*
 
+wsc.png
