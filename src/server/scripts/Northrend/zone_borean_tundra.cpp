@@ -645,7 +645,7 @@ public:
 
             bool wasCasting = _isCasting;
             _isCasting = me->HasUnitState(UNIT_STATE_CASTING);
-            
+
             if (wasCasting && !_isCasting && _shouldScheduleBlink)
             {
                 _shouldScheduleBlink = false;
@@ -698,12 +698,12 @@ public:
                         {
                             DoCast(me, SPELL_BLINK, true);
                             _blinkUsed = true;
-                            
+
                             me->StopMoving();
                             me->GetMotionMaster()->Clear();
                             me->GetMotionMaster()->MoveIdle();
                             _movementPaused = true;
-                            
+
                             _events.ScheduleEvent(EVENT_FROSTBOLT, 1000);
                             _events.ScheduleEvent(EVENT_RESUME_MOVEMENT, 3500);
                         }
@@ -722,7 +722,7 @@ public:
                         break;
                 }
             }
-            
+
             if (!_movementPaused)
             {
                 DoMeleeAttackIfReady();
