@@ -608,7 +608,7 @@ void WorldSession::HandleQuestPushResult(WorldPackets::Quest::QuestPushResultCli
         {
             WorldPackets::Quest::QuestPushResult questPushResult;
             questPushResult.PlayerGuid = _player->GetGUID();
-            questPushResult.QuestShareMessage = packet.QuestShareMessage;          
+            questPushResult.QuestShareMessage = packet.QuestShareMessage;
             player->GetSession()->SendPacket(questPushResult.Write());
             _player->SetDivider();
         }
