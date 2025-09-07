@@ -25,6 +25,7 @@
 #include "Banner.h"
 #include "BattlegroundMgr.h"
 #include "BigNumber.h"
+#include "CharacterWebService.h"
 #include "CliRunnable.h"
 #include "Common.h"
 #include "Config.h"
@@ -356,8 +357,32 @@ int main(int argc, char** argv)
         return 1;
     }
 
-    std::shared_ptr<void> sWorldSocketMgrHandle(nullptr, [](void*)
+    // Start Character Web Service if enabled
+    std::unique_ptr<CharacterWebService> charWebService;
+    if (sConfigMgr->GetOption<bool>("CharacterWebService.Enable", false))
     {
+        uint16 webPort = sConfigMgr->GetOption<uint16>("CharacterWebService.Port", 8080);
+        charWebService = std::make_unique<CharacterWebService>(*ioContext, webPort);
+        if (charWebService->Start())
+        {
+            LOG_INFO("server.worldserver", "Character Web Service started on port {}", webPort);
+        }
+        else
+        {
+            LOG_ERROR("server.worldserver", "Failed to start Character Web Service");
+            charWebService.reset();
+        }
+    }
+
+    std::shared_ptr<void> sWorldSocketMgrHandle(nullptr, [&charWebService](void*)
+    {
+        // Stop Character Web Service
+        if (charWebService)
+        {
+            charWebService->Stop();
+            charWebService.reset();
+        }
+
         sWorldSessionMgr->KickAll();         // save and kick all players
         sWorldSessionMgr->UpdateSessions(1); // real players unload required UpdateSessions call
 

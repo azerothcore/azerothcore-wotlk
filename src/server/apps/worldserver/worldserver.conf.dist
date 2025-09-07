@@ -390,6 +390,22 @@ Network.TcpNodelay = 1
 Network.EnableProxyProtocol = 0
 
 #
+#    CharacterWebService.Enable
+#        Description: Enable HTTP web service for character gear management.
+#                     This service allows external applications to modify character
+#                     equipment and enchantments via JSON API calls.
+#        Default:     0 - (Disabled)
+
+CharacterWebService.Enable = 0
+
+#
+#    CharacterWebService.Port
+#        Description: Port for the character web service.
+#        Default:     8080
+
+CharacterWebService.Port = 8080
+
+#
 ###################################################################################################
 
 ###################################################################################################
