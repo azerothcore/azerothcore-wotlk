@@ -86,6 +86,7 @@ struct npc_herald_of_the_lich_king : public ScriptedAI
             Talk(HERALD_OF_THE_LICH_KING_SAY_ATTACK_END);
             ChangeZoneEventStatus(false);
             UpdateWeather(false);
+            me->DespawnOrUnsummon();
         }
     }
 
@@ -355,7 +356,6 @@ struct npc_necrotic_shard : public ScriptedAI
     {
         scheduler.Schedule(5s, [this](TaskContext context) // Spawn Cultists every 60 minutes.
         {
-            me->SetFullHealth();
             DespawnShadowsOfDoom(); // Despawn all remaining Shadows before respawning the Cultists?
             SummonCultists();
             context.Repeat(1h);

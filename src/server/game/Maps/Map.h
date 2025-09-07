@@ -452,6 +452,7 @@ public:
     void SendInitSelf(Player* player);
 
     void UpdateWeather(uint32 const diff);
+    void UpdateExpiredCorpses(uint32 const diff);
 
     void PlayDirectSoundToMap(uint32 soundId, uint32 zoneId = 0);
     void SetZoneMusic(uint32 zoneId, uint32 musicId);
@@ -587,6 +588,8 @@ private:
     ZoneDynamicInfoMap _zoneDynamicInfo;
     IntervalTimer _weatherUpdateTimer;
     uint32 _defaultLight;
+
+    IntervalTimer _corpseUpdateTimer;
 
     template<HighGuid high>
     inline ObjectGuidGeneratorBase& GetGuidSequenceGenerator()
