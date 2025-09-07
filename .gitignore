@@ -102,3 +102,8 @@ local.properties
 #  !modules/yourmodule
 #
 # ==================
+
+# Build directory and generated files
+/bin/*.vcxproj.*
+/bin/*
+

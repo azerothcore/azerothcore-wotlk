@@ -48,6 +48,19 @@ BattlegroundWS::BattlegroundWS()
     _reputationCapture = 0;
     _honorWinKills = 0;
     _honorEndKills = 0;
+
+    // WarsongCore configurables
+    _maxTeamScore = 0;
+    _maxTime = 0;
+    _huts = true;
+    _hutsTimer = 0;
+    _leafs = true;
+    _leafsTimer = 0;
+    _boots = true;
+    _bootsTimer = 0;
+    _randomBuffs = false;
+    _consumables = {}; // List of allowed consumables -- add them via spells
+    
 }
 
 BattlegroundWS::~BattlegroundWS()
@@ -136,10 +149,13 @@ void BattlegroundWS::StartingEventOpenDoors()
     SpawnBGObject(BG_WS_OBJECT_DOOR_H_4, RESPAWN_ONE_DAY);
 
     StartTimedAchievement(ACHIEVEMENT_TIMED_TYPE_EVENT, WS_EVENT_START_BATTLE);
-    UpdateWorldState(WORLD_STATE_BATTLEGROUND_WS_STATE_TIMER_ACTIVE, 1);
-    _bgEvents.ScheduleEvent(BG_WS_EVENT_UPDATE_GAME_TIME, 0);
-    _bgEvents.ScheduleEvent(BG_WS_EVENT_NO_TIME_LEFT, BG_WS_TOTAL_GAME_TIME - 2 * MINUTE * IN_MILLISECONDS); // 27 - 2 = 25 minutes
-    _bgEvents.ScheduleEvent(BG_WS_EVENT_DESPAWN_DOORS, BG_WS_DOOR_DESPAWN_TIME);
+
+    if (_timerActive) { // WSC: No timer active
+        UpdateWorldState(WORLD_STATE_BATTLEGROUND_WS_STATE_TIMER_ACTIVE, 1);
+        _bgEvents.ScheduleEvent(BG_WS_EVENT_UPDATE_GAME_TIME, 0);
+        _bgEvents.ScheduleEvent(BG_WS_EVENT_NO_TIME_LEFT, BG_WS_TOTAL_GAME_TIME - 2 * MINUTE * IN_MILLISECONDS); // 27 - 2 = 25 minutes
+        _bgEvents.ScheduleEvent(BG_WS_EVENT_DESPAWN_DOORS, BG_WS_DOOR_DESPAWN_TIME);
+    }
 }
 
 void BattlegroundWS::AddPlayer(Player* player)
@@ -559,8 +575,10 @@ void BattlegroundWS::FillInitialWorldStates(WorldPackets::WorldState::InitWorldS
     packet.Worldstates.emplace_back(WORLD_STATE_BATTLEGROUND_WS_FLAG_CAPTURES_HORDE, GetTeamScore(TEAM_HORDE));
     packet.Worldstates.emplace_back(WORLD_STATE_BATTLEGROUND_WS_FLAG_CAPTURES_MAX, _configurableMaxTeamScore);
 
-    packet.Worldstates.emplace_back(WORLD_STATE_BATTLEGROUND_WS_STATE_TIMER_ACTIVE, GetStatus() == STATUS_IN_PROGRESS ? 1 : 0);
-    packet.Worldstates.emplace_back(WORLD_STATE_BATTLEGROUND_WS_STATE_TIMER, GetMatchTime());
+    if (_timerActive) { // WSC: Is timer active?
+        packet.Worldstates.emplace_back(WORLD_STATE_BATTLEGROUND_WS_STATE_TIMER_ACTIVE, GetStatus() == STATUS_IN_PROGRESS ? 1 : 0);
+        packet.Worldstates.emplace_back(WORLD_STATE_BATTLEGROUND_WS_STATE_TIMER, GetMatchTime());
+    }
 
     packet.Worldstates.emplace_back(WORLD_STATE_BATTLEGROUND_WS_FLAG_STATE_HORDE, GetFlagState(TEAM_HORDE));
     packet.Worldstates.emplace_back(WORLD_STATE_BATTLEGROUND_WS_FLAG_STATE_ALLIANCE, GetFlagState(TEAM_ALLIANCE));

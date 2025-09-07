@@ -263,6 +263,19 @@ private:
     uint32 _honorEndKills;
     uint32 _configurableMaxTeamScore;
 
+    // WarsongCore configurables
+    bool _timerActive;
+    uint32 _maxTeamScore;
+    uint32 _maxTime;
+    bool _huts;
+    uint32 _hutsTimer;
+    bool _leafs;
+    uint32 _leafsTimer;
+    bool _boots;
+    uint32 _bootsTimer;
+    bool _randomBuffs;
+    std::vector<uint32> _consumables;
+
     void PostUpdateImpl(uint32 diff) override;
 };
 
