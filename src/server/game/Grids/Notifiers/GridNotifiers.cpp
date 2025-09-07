@@ -62,7 +62,8 @@ void VisibleNotifier::SendToSelf()
     for (VisibleWorldObjectsMap::iterator itr = visibleWorldObjects->begin(); itr != visibleWorldObjects->end();)
     {
         WorldObject* obj = itr->second;
-        if (!i_player.IsWorldObjectOutOfSightRange(obj))
+        if (!i_player.IsWorldObjectOutOfSightRange(obj)
+            || i_player.CanSeeOrDetect(obj, false, true))
         {
             ++itr;
             continue;
