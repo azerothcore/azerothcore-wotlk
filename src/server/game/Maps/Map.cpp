@@ -73,6 +73,8 @@ Map::Map(uint32 id, uint32 InstanceId, uint8 SpawnMode, Map* _parent) :
 
     //lets initialize visibility distance for map
     Map::InitVisibilityDistance();
+
+    _corpseUpdateTimer.SetInterval(20 * MINUTE * IN_MILLISECONDS);
 }
 
 // Hook called after map is created AND after added to map list
@@ -497,6 +499,8 @@ void Map::Update(const uint32 t_diff, const uint32 s_diff, bool  /*thread*/)
     MoveAllDynamicObjectsInMoveList();
 
     HandleDelayedVisibility();
+
+    UpdateExpiredCorpses(t_diff);
 
     sScriptMgr->OnMapUpdate(this, t_diff);
 
@@ -1642,6 +1646,17 @@ void Map::SendInitSelf(Player* player)
 
     data.BuildPacket(packet);
     player->SendDirectMessage(&packet);
+}
+
+void Map::UpdateExpiredCorpses(uint32 const diff)
+{
+    _corpseUpdateTimer.Update(diff);
+    if (!_corpseUpdateTimer.Passed())
+        return;
+
+    RemoveOldCorpses();
+
+    _corpseUpdateTimer.Reset();
 }
 
 void Map::SendInitTransports(Player* player)

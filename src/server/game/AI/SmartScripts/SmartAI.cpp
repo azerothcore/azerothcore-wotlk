@@ -72,6 +72,8 @@ SmartAI::SmartAI(Creature* c) : CreatureAI(c)
 
     mcanSpawn = true;
 
+    _chaseOnInterrupt = false;
+
     // Xinef: Vehicle conditions
     m_ConditionsTimer = 0;
     if (me->GetVehicleKit())
@@ -658,6 +660,7 @@ void SmartAI::EnterEvadeMode(EvadeReason /*why*/)
     if (me->GetCharmerGUID().IsPlayer() || me->HasUnitFlag(UNIT_FLAG_POSSESSED))
     {
         me->AttackStop();
+        me->RemoveUnitFlag(UNIT_FLAG_IN_COMBAT);
         return;
     }
 
