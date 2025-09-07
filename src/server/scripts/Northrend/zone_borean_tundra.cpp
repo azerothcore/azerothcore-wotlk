@@ -563,7 +563,6 @@ private:
 ## Quest 11590: Abduction
 ######*/
 
-// NPC 25316: Beryl Sorcerer
 enum BerylSorcerer
 {
     EVENT_FROSTBOLT                                = 1,
@@ -571,6 +570,7 @@ enum BerylSorcerer
     EVENT_CHECK_HEALTH                             = 3,
     EVENT_BLINK                                    = 4,
     EVENT_RESUME_MOVEMENT                          = 5,
+    EVENT_DELAY_BLINK                              = 6,
     NPC_LIBRARIAN_DONATHAN                         = 25262,
     NPC_CAPTURED_BERLY_SORCERER                    = 25474,
     SPELL_FROSTBOLT                                = 9672,
@@ -600,7 +600,7 @@ public:
             _chainsCast = false;
             _blinkUsed = false;
             _movementPaused = false;
-            _frostboltFinished = false;
+            _shouldScheduleBlink = false;
         }
 
         void Reset() override
@@ -633,19 +633,6 @@ public:
             }
         }
 
-        void OnSpellCastFinished(SpellInfo const* spell, SpellFinishReason reason) override
-        {
-            if (spell->Id == SPELL_FROSTBOLT && reason == SPELL_FINISHED_SUCCESSFUL_CAST)
-            {
-                if (me->HealthBelowPct(50) && !_blinkUsed && !_frostboltFinished)
-                {
-                    _frostboltFinished = true;
-                    _events.CancelEvent(EVENT_FROSTBOLT);
-                    _events.ScheduleEvent(EVENT_BLINK, 250);
-                }
-            }
-        }
-
         void UpdateAI(uint32 diff) override
         {
             if (!UpdateVictim())
@@ -655,7 +642,17 @@ public:
 
             _events.Update(diff);
 
-            if (me->HasUnitState(UNIT_STATE_CASTING))
+            bool wasCasting = _isCasting;
+            _isCasting = me->HasUnitState(UNIT_STATE_CASTING);
+            
+            if (wasCasting && !_isCasting && _shouldScheduleBlink)
+            {
+                _shouldScheduleBlink = false;
+                _events.CancelEvent(EVENT_FROSTBOLT);
+                _events.ScheduleEvent(EVENT_DELAY_BLINK, 250);
+            }
+
+            if (_isCasting)
                 return;
 
             if (uint32 eventId = _events.ExecuteEvent())
@@ -678,19 +675,34 @@ public:
                         }
                         break;
                     case EVENT_CHECK_HEALTH:
+                        if (me->HealthBelowPct(50) && !_blinkUsed)
+                        {
+                            if (_isCasting)
+                            {
+                                _shouldScheduleBlink = true;
+                            }
+                            else
+                            {
+                                _events.CancelEvent(EVENT_FROSTBOLT);
+                                _events.ScheduleEvent(EVENT_DELAY_BLINK, 0);
+                            }
+                        }
                         _events.ScheduleEvent(EVENT_CHECK_HEALTH, 1s);
+                        break;
+                    case EVENT_DELAY_BLINK:
+                        _events.ScheduleEvent(EVENT_BLINK, 0);
                         break;
                     case EVENT_BLINK:
                         if (!_blinkUsed)
                         {
                             DoCast(me, SPELL_BLINK, true);
                             _blinkUsed = true;
-
+                            
                             me->StopMoving();
                             me->GetMotionMaster()->Clear();
                             me->GetMotionMaster()->MoveIdle();
                             _movementPaused = true;
-
+                            
                             _events.ScheduleEvent(EVENT_FROSTBOLT, 1000);
                             _events.ScheduleEvent(EVENT_RESUME_MOVEMENT, 3500);
                         }
@@ -709,7 +721,7 @@ public:
                         break;
                 }
             }
-
+            
             if (!_movementPaused)
             {
                 DoMeleeAttackIfReady();
@@ -722,7 +734,8 @@ public:
         bool       _chainsCast;
         bool       _blinkUsed;
         bool       _movementPaused;
-        bool       _frostboltFinished;
+        bool       _shouldScheduleBlink;
+        bool       _isCasting = false;
     };
 
     CreatureAI* GetAI(Creature* creature) const override
