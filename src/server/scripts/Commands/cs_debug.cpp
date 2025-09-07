@@ -1411,21 +1411,13 @@ public:
         if (!player)
             return false;
 
-        uint32 creatureCount = 0, playerCount = 0, gameobjectCount = 0, dynamicobjectCount = 0, corpseCount = 0;
+        std::array<uint32, NUM_CLIENT_OBJECT_TYPES> objectByTypeCount = {};
 
         ObjectVisibilityContainer const& objectVisibilityContainer = player->GetObjectVisibilityContainer();
-        for (auto& kvPair : *objectVisibilityContainer.GetVisibleWorldObjectsMap())
+        for (auto const& kvPair : *objectVisibilityContainer.GetVisibleWorldObjectsMap())
         {
-            WorldObject* obj = kvPair.second;
-            switch (obj->GetTypeId())
-            {
-                case TYPEID_UNIT: ++creatureCount; break;
-                case TYPEID_PLAYER: ++playerCount; break;
-                case TYPEID_GAMEOBJECT: ++gameobjectCount; break;
-                case TYPEID_DYNAMICOBJECT: ++dynamicobjectCount; break;
-                case TYPEID_CORPSE: ++corpseCount; break;
-                default: break;
-            }
+            WorldObject const* obj = kvPair.second;
+            ++objectByTypeCount[obj->GetTypeId()];
         }
 
         uint32 zoneWideVisibleObjectsInZone = 0;
@@ -1433,11 +1425,11 @@ public:
             zoneWideVisibleObjectsInZone = farVisibleSet->size();
 
         handler->PSendSysMessage("Visibility Range: {}", player->GetVisibilityRange());
-        handler->PSendSysMessage("Visible Creatures: {}", creatureCount);
-        handler->PSendSysMessage("Visible Players: {}", playerCount);
-        handler->PSendSysMessage("Visible GameObjects: {}", gameobjectCount);
-        handler->PSendSysMessage("Visible DynamicObjects: {}", dynamicobjectCount);
-        handler->PSendSysMessage("Visible Corpses: {}", corpseCount);
+        handler->PSendSysMessage("Visible Creatures: {}", objectByTypeCount[TYPEID_UNIT]);
+        handler->PSendSysMessage("Visible Players: {}", objectByTypeCount[TYPEID_PLAYER]);
+        handler->PSendSysMessage("Visible GameObjects: {}", objectByTypeCount[TYPEID_GAMEOBJECT]);
+        handler->PSendSysMessage("Visible DynamicObjects: {}", objectByTypeCount[TYPEID_DYNAMICOBJECT]);
+        handler->PSendSysMessage("Visible Corpses: {}", objectByTypeCount[TYPEID_CORPSE]);
         handler->PSendSysMessage("Players we are visible to: {}", objectVisibilityContainer.GetVisiblePlayersMap().size());
         handler->PSendSysMessage("Zone wide visible objects in zone: {}", zoneWideVisibleObjectsInZone);
         return true;
