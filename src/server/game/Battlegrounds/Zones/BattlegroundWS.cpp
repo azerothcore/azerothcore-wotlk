@@ -25,6 +25,8 @@
 #include "World.h"
 #include "WorldPacket.h"
 #include "WorldStateDefines.h"
+#include <algorithm>
+#include <vector>
 
 void BattlegroundWGScore::BuildObjectivesBlock(WorldPacket& data)
 {
@@ -52,14 +54,15 @@ BattlegroundWS::BattlegroundWS()
     // WarsongCore configurables
     _maxTeamScore = 0;
     _maxTime = 0;
-    _huts = true;
-    _hutsTimer = 0;
+    _berserkerHuts = true;
+    _berserkerHutsTimer = 0;
     _leafs = true;
     _leafsTimer = 0;
     _boots = true;
     _bootsTimer = 0;
     _randomBuffs = false;
     _consumables = {}; // List of allowed consumables -- add them via spells
+    _maxOfflineTime = MAX_OFFLINE_TIME;
     
 }
 
@@ -458,13 +461,57 @@ bool BattlegroundWS::SetupBattleground()
     // flags
     AddObject(BG_WS_OBJECT_A_FLAG, BG_OBJECT_A_FLAG_WS_ENTRY, 1540.423f, 1481.325f, 351.8284f, 3.089233f, 0, 0, 0.9996573f, 0.02617699f, RESPAWN_IMMEDIATELY);
     AddObject(BG_WS_OBJECT_H_FLAG, BG_OBJECT_H_FLAG_WS_ENTRY, 916.0226f, 1434.405f, 345.413f, 0.01745329f, 0, 0, 0.008726535f, 0.9999619f, RESPAWN_IMMEDIATELY);
-    // buffs
-    AddObject(BG_WS_OBJECT_SPEEDBUFF_1, BG_OBJECTID_SPEEDBUFF_ENTRY, 1449.93f, 1470.71f, 342.6346f, -1.64061f, 0, 0, 0.7313537f, -0.6819983f, SPEED_BUFF_RESPAWN_TIME);
-    AddObject(BG_WS_OBJECT_SPEEDBUFF_2, BG_OBJECTID_SPEEDBUFF_ENTRY, 1005.171f, 1447.946f, 335.9032f, 1.64061f, 0, 0, 0.7313537f, 0.6819984f, SPEED_BUFF_RESPAWN_TIME);
-    AddObject(BG_WS_OBJECT_REGENBUFF_1, BG_OBJECTID_REGENBUFF_ENTRY, 1317.506f, 1550.851f, 313.2344f, -0.2617996f, 0, 0, 0.1305263f, -0.9914448f, RESTORATION_BUFF_RESPAWN_TIME);
-    AddObject(BG_WS_OBJECT_REGENBUFF_2, BG_OBJECTID_REGENBUFF_ENTRY, 1110.451f, 1353.656f, 316.5181f, -0.6806787f, 0, 0, 0.333807f, -0.9426414f, RESTORATION_BUFF_RESPAWN_TIME);
-    AddObject(BG_WS_OBJECT_BERSERKBUFF_1, BG_OBJECTID_BERSERKERBUFF_ENTRY, 1320.09f, 1378.79f, 314.7532f, 1.186824f, 0, 0, 0.5591929f, 0.8290376f, BERSERKING_BUFF_RESPAWN_TIME);
-    AddObject(BG_WS_OBJECT_BERSERKBUFF_2, BG_OBJECTID_BERSERKERBUFF_ENTRY, 1139.688f, 1560.288f, 306.8432f, -2.443461f, 0, 0, 0.9396926f, -0.3420201f, BERSERKING_BUFF_RESPAWN_TIME);
+    
+    // WSC Random Buffs Mode
+
+    // buffs - randomize if RandomBuffsEnabled is true
+    if (_randomBuffs)
+    {
+        // Enable buff change in the base class
+        m_BuffChange = true;
+        
+        // Initialize with random buffs and track them
+        uint32 buff1 = GetRandomBuffEntry();
+        uint32 buff2 = GetRandomBuffEntry();
+        uint32 buff3 = GetRandomBuffEntry();
+        uint32 buff4 = GetRandomBuffEntry();
+        uint32 buff5 = GetRandomBuffEntry();
+        uint32 buff6 = GetRandomBuffEntry();
+        
+        AddObject(BG_WS_OBJECT_SPEEDBUFF_1, buff1, 1449.93f, 1470.71f, 342.6346f, -1.64061f, 0, 0, 0.7313537f, -0.6819983f, SPEED_BUFF_RESPAWN_TIME);
+        AddObject(BG_WS_OBJECT_SPEEDBUFF_2, buff2, 1005.171f, 1447.946f, 335.9032f, 1.64061f, 0, 0, 0.7313537f, 0.6819984f, SPEED_BUFF_RESPAWN_TIME);
+        AddObject(BG_WS_OBJECT_REGENBUFF_1, buff3, 1317.506f, 1550.851f, 313.2344f, -0.2617996f, 0, 0, 0.1305263f, -0.9914448f, RESTORATION_BUFF_RESPAWN_TIME);
+        AddObject(BG_WS_OBJECT_REGENBUFF_2, buff4, 1110.451f, 1353.656f, 316.5181f, -0.6806787f, 0, 0, 0.333807f, -0.9426414f, RESTORATION_BUFF_RESPAWN_TIME);
+        AddObject(BG_WS_OBJECT_BERSERKBUFF_1, buff5, 1320.09f, 1378.79f, 314.7532f, 1.186824f, 0, 0, 0.5591929f, 0.8290376f, BERSERKING_BUFF_RESPAWN_TIME);
+        AddObject(BG_WS_OBJECT_BERSERKBUFF_2, buff6, 1139.688f, 1560.288f, 306.8432f, -2.443461f, 0, 0, 0.9396926f, -0.3420201f, BERSERKING_BUFF_RESPAWN_TIME);
+        
+        // Track the buff types for each location
+        _currentBuffTypes[BG_WS_OBJECT_SPEEDBUFF_1] = buff1;
+        _currentBuffTypes[BG_WS_OBJECT_SPEEDBUFF_2] = buff2;
+        _currentBuffTypes[BG_WS_OBJECT_REGENBUFF_1] = buff3;
+        _currentBuffTypes[BG_WS_OBJECT_REGENBUFF_2] = buff4;
+        _currentBuffTypes[BG_WS_OBJECT_BERSERKBUFF_1] = buff5;
+        _currentBuffTypes[BG_WS_OBJECT_BERSERKBUFF_2] = buff6;
+    }
+    else
+    {
+        // Use traditional buff setup when random buffs are disabled
+        if (_boots)
+        {
+            AddObject(BG_WS_OBJECT_SPEEDBUFF_1, BG_OBJECTID_SPEEDBUFF_ENTRY, 1449.93f, 1470.71f, 342.6346f, -1.64061f, 0, 0, 0.7313537f, -0.6819983f, SPEED_BUFF_RESPAWN_TIME);
+            AddObject(BG_WS_OBJECT_SPEEDBUFF_2, BG_OBJECTID_SPEEDBUFF_ENTRY, 1005.171f, 1447.946f, 335.9032f, 1.64061f, 0, 0, 0.7313537f, 0.6819984f, SPEED_BUFF_RESPAWN_TIME);
+        }
+        if (_leafs)
+        {
+            AddObject(BG_WS_OBJECT_REGENBUFF_1, BG_OBJECTID_REGENBUFF_ENTRY, 1317.506f, 1550.851f, 313.2344f, -0.2617996f, 0, 0, 0.1305263f, -0.9914448f, RESTORATION_BUFF_RESPAWN_TIME);
+            AddObject(BG_WS_OBJECT_REGENBUFF_2, BG_OBJECTID_REGENBUFF_ENTRY, 1110.451f, 1353.656f, 316.5181f, -0.6806787f, 0, 0, 0.333807f, -0.9426414f, RESTORATION_BUFF_RESPAWN_TIME);
+        }
+        if (_berserkerHuts)
+        {
+            AddObject(BG_WS_OBJECT_BERSERKBUFF_1, BG_OBJECTID_BERSERKERBUFF_ENTRY, 1320.09f, 1378.79f, 314.7532f, 1.186824f, 0, 0, 0.5591929f, 0.8290376f, BERSERKING_BUFF_RESPAWN_TIME);
+            AddObject(BG_WS_OBJECT_BERSERKBUFF_2, BG_OBJECTID_BERSERKERBUFF_ENTRY, 1139.688f, 1560.288f, 306.8432f, -2.443461f, 0, 0, 0.9396926f, -0.3420201f, BERSERKING_BUFF_RESPAWN_TIME);
+        }
+    }
     // alliance gates
     AddObject(BG_WS_OBJECT_DOOR_A_1, BG_OBJECT_DOOR_A_1_WS_ENTRY, 1503.335f, 1493.466f, 352.1888f, 3.115414f, 0, 0, 0.9999143f, 0.01308903f, RESPAWN_IMMEDIATELY);
     AddObject(BG_WS_OBJECT_DOOR_A_2, BG_OBJECT_DOOR_A_2_WS_ENTRY, 1492.478f, 1457.912f, 342.9689f, 3.115414f, 0, 0, 0.9999143f, 0.01308903f, RESPAWN_IMMEDIATELY);
@@ -519,6 +566,28 @@ void BattlegroundWS::Init()
     _configurableMaxTeamScore = bgWarsongFlagsConfig > 0
         ? bgWarsongFlagsConfig
         : static_cast<uint32>(BG_WS_MAX_TEAM_SCORE);
+
+    // Load WarsongCore configuration values
+    _timerActive = sWorld->getBoolConfig(CONFIG_BATTLEGROUND_WARSONG_TIMER_ACTIVE);
+    
+    uint32 maxTeamScoreConfig = sWorld->getIntConfig(CONFIG_BATTLEGROUND_WARSONG_MAX_TEAM_SCORE);
+    _maxTeamScore = maxTeamScoreConfig > 0 ? maxTeamScoreConfig : _configurableMaxTeamScore;
+    
+    _maxTime = sWorld->getIntConfig(CONFIG_BATTLEGROUND_WARSONG_MAX_TIME);
+    
+    _berserkerHuts = sWorld->getBoolConfig(CONFIG_BATTLEGROUND_WARSONG_BERSERKER_HUTS_ENABLED);
+    _berserkerHutsTimer = sWorld->getIntConfig(CONFIG_BATTLEGROUND_WARSONG_BERSERKER_HUTS_TIMER);
+    
+    _leafs = sWorld->getBoolConfig(CONFIG_BATTLEGROUND_WARSONG_LEAFS_ENABLED);
+    _leafsTimer = sWorld->getIntConfig(CONFIG_BATTLEGROUND_WARSONG_LEAFS_TIMER);
+    
+    _boots = sWorld->getBoolConfig(CONFIG_BATTLEGROUND_WARSONG_BOOTS_ENABLED);
+    _bootsTimer = sWorld->getIntConfig(CONFIG_BATTLEGROUND_WARSONG_BOOTS_TIMER);
+    
+    _randomBuffs = sWorld->getBoolConfig(CONFIG_BATTLEGROUND_WARSONG_RANDOM_BUFFS_ENABLED);
+    
+    uint32 maxOfflineTimeConfig = sWorld->getIntConfig(CONFIG_BATTLEGROUND_WARSONG_MAX_OFFLINE_TIME);
+    _maxOfflineTime = maxOfflineTimeConfig > 0 ? maxOfflineTimeConfig : MAX_OFFLINE_TIME;
 }
 
 void BattlegroundWS::EndBattleground(TeamId winnerTeamId)
@@ -614,4 +683,106 @@ void BattlegroundWS::RemoveAssaultAuras()
         player->RemoveAurasDueToSpell(BG_WS_SPELL_FOCUSED_ASSAULT);
         player->RemoveAurasDueToSpell(BG_WS_SPELL_BRUTAL_ASSAULT);
     }
+}
+
+// Warsong Core Random Buffs Mode
+
+uint32 BattlegroundWS::GetRandomBuffEntry() const
+{
+    const uint32 buffEntries[3] = { BG_OBJECTID_SPEEDBUFF_ENTRY, BG_OBJECTID_REGENBUFF_ENTRY, BG_OBJECTID_BERSERKERBUFF_ENTRY };
+    return buffEntries[urand(0, 2)];
+}
+
+uint32 BattlegroundWS::GetRandomBuffEntryExcluding(const std::vector<uint32>& excludeEntries) const
+{
+    std::vector<uint32> availableBuffs;
+    const uint32 allBuffs[3] = { BG_OBJECTID_SPEEDBUFF_ENTRY, BG_OBJECTID_REGENBUFF_ENTRY, BG_OBJECTID_BERSERKERBUFF_ENTRY };
+    
+    // Add buffs that are not in the exclude list
+    for (uint32 i = 0; i < 3; ++i)
+    {
+        bool isExcluded = false;
+        for (uint32 excludeEntry : excludeEntries)
+        {
+            if (allBuffs[i] == excludeEntry)
+            {
+                isExcluded = true;
+                break;
+            }
+        }
+        if (!isExcluded)
+            availableBuffs.push_back(allBuffs[i]);
+    }
+    
+    // If all buffs are excluded (shouldn't happen), just return a random one
+    if (availableBuffs.empty())
+        return GetRandomBuffEntry();
+    
+    // Return a random buff from available ones
+    return availableBuffs[urand(0, availableBuffs.size() - 1)];
+}
+
+void BattlegroundWS::HandleTriggerBuff(GameObject* gameObject)
+{
+    // If random buffs are not enabled, use base class behavior
+    if (!_randomBuffs)
+    {
+        Battleground::HandleTriggerBuff(gameObject);
+        return;
+    }
+    
+    // Custom logic for random buffs with no duplicates
+    if (GetStatus() != STATUS_IN_PROGRESS || !GetPlayersSize() || BgObjects.empty())
+        return;
+
+    uint32 index = 0;
+    for (; index < BgObjects.size() && BgObjects[index] != gameObject->GetGUID(); ++index);
+    if (BgObjects[index] != gameObject->GetGUID())
+        return;
+
+    // Get all currently active buff types (excluding the one being taken)
+    std::vector<uint32> currentBuffTypes;
+    for (const auto& pair : _currentBuffTypes)
+    {
+        if (pair.first != index) // Don't exclude the buff that's being taken
+            currentBuffTypes.push_back(pair.second);
+    }
+    
+    // Remove duplicates from the current buff types list
+    std::sort(currentBuffTypes.begin(), currentBuffTypes.end());
+    currentBuffTypes.erase(std::unique(currentBuffTypes.begin(), currentBuffTypes.end()), currentBuffTypes.end());
+    
+    // Get a new random buff that's different from currently active types
+    uint32 newBuffEntry = GetRandomBuffEntryExcluding(currentBuffTypes);
+    
+    // Update our tracking
+    _currentBuffTypes[index] = newBuffEntry;
+    
+    // Find the correct respawn time based on the new buff type
+    uint32 respawnTime = SPEED_BUFF_RESPAWN_TIME;
+    switch (newBuffEntry)
+    {
+        case BG_OBJECTID_REGENBUFF_ENTRY:
+            respawnTime = RESTORATION_BUFF_RESPAWN_TIME;
+            break;
+        case BG_OBJECTID_BERSERKERBUFF_ENTRY:
+            respawnTime = BERSERKING_BUFF_RESPAWN_TIME;
+            break;
+        default:
+            break;
+    }
+    
+    // Despawn current object
+    SpawnBGObject(index, RESPAWN_ONE_DAY);
+    
+    // Change the object to the new buff type and respawn it
+    if (Map* map = FindBgMap())
+    {
+        if (GameObject* obj = map->GetGameObject(BgObjects[index]))
+        {
+            obj->SetEntry(newBuffEntry);
+        }
+    }
+    
+    SpawnBGObject(index, respawnTime);
 }

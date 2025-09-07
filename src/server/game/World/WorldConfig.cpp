@@ -433,6 +433,17 @@ void WorldConfig::BuildConfigCache()
     SetConfigValue<uint32>(CONFIG_BATTLEGROUND_SPEED_BUFF_RESPAWN, "Battleground.SpeedBuffRespawn", 150, ConfigValueCache::Reloadable::Yes, [](uint32 const& value) { return value > 0; }, "> 0");
 
     SetConfigValue<uint32>(CONFIG_BATTLEGROUND_WARSONG_FLAGS, "Battleground.Warsong.Flags", 3);
+    SetConfigValue<bool>(CONFIG_BATTLEGROUND_WARSONG_TIMER_ACTIVE, "Battleground.Warsong.TimerActive", true);
+    SetConfigValue<uint32>(CONFIG_BATTLEGROUND_WARSONG_MAX_TEAM_SCORE, "Battleground.Warsong.MaxTeamScore", 0);
+    SetConfigValue<uint32>(CONFIG_BATTLEGROUND_WARSONG_MAX_TIME, "Battleground.Warsong.MaxTime", 0);
+    SetConfigValue<bool>(CONFIG_BATTLEGROUND_WARSONG_BERSERKER_HUTS_ENABLED, "Battleground.Warsong.BerserkerHutsEnabled", true);
+    SetConfigValue<uint32>(CONFIG_BATTLEGROUND_WARSONG_BERSERKER_HUTS_TIMER, "Battleground.Warsong.BerserkerHutsTimer", 0);
+    SetConfigValue<bool>(CONFIG_BATTLEGROUND_WARSONG_LEAFS_ENABLED, "Battleground.Warsong.LeafsEnabled", true);
+    SetConfigValue<uint32>(CONFIG_BATTLEGROUND_WARSONG_LEAFS_TIMER, "Battleground.Warsong.LeafsTimer", 0);
+    SetConfigValue<bool>(CONFIG_BATTLEGROUND_WARSONG_BOOTS_ENABLED, "Battleground.Warsong.BootsEnabled", true);
+    SetConfigValue<uint32>(CONFIG_BATTLEGROUND_WARSONG_BOOTS_TIMER, "Battleground.Warsong.BootsTimer", 0);
+    SetConfigValue<bool>(CONFIG_BATTLEGROUND_WARSONG_RANDOM_BUFFS_ENABLED, "Battleground.Warsong.RandomBuffsEnabled", false);
+    SetConfigValue<uint32>(CONFIG_BATTLEGROUND_WARSONG_MAX_OFFLINE_TIME, "Battleground.Warsong.MaxOfflineTime", 300);
     SetConfigValue<uint32>(CONFIG_BATTLEGROUND_ARATHI_CAPTUREPOINTS, "Battleground.Arathi.CapturePoints", 1600);
     SetConfigValue<uint32>(CONFIG_BATTLEGROUND_ALTERAC_REINFORCEMENTS, "Battleground.Alterac.Reinforcements", 600);
     SetConfigValue<uint32>(CONFIG_BATTLEGROUND_ALTERAC_REP_ONBOSSDEATH, "Battleground.Alterac.ReputationOnBossDeath", 350);

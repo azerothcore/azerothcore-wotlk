@@ -21,6 +21,7 @@
 #include "Battleground.h"
 #include "BattlegroundScore.h"
 #include "EventMap.h"
+#include <unordered_map>
 
 enum BG_WS_Events
 {
@@ -251,6 +252,14 @@ public:
     uint32 GetAssaultSpellId() const;
     void RemoveAssaultAuras();
 
+    // WarsongCore configurables getters
+    uint32 GetMaxOfflineTime() const { return _maxOfflineTime; }
+    
+    // WarsongCore methods
+    uint32 GetRandomBuffEntry() const;
+    uint32 GetRandomBuffEntryExcluding(const std::vector<uint32>& excludeEntries) const;
+    void HandleTriggerBuff(GameObject* gameObject) override;
+
 private:
     EventMap _bgEvents;
 
@@ -267,14 +276,18 @@ private:
     bool _timerActive;
     uint32 _maxTeamScore;
     uint32 _maxTime;
-    bool _huts;
-    uint32 _hutsTimer;
+    bool _berserkerHuts;
+    uint32 _berserkerHutsTimer;
     bool _leafs;
     uint32 _leafsTimer;
     bool _boots;
     uint32 _bootsTimer;
     bool _randomBuffs;
     std::vector<uint32> _consumables;
+    uint32 _maxOfflineTime;
+    
+    // Random buff tracking (maps object index to buff entry type)
+    std::unordered_map<uint32, uint32> _currentBuffTypes;
 
     void PostUpdateImpl(uint32 diff) override;
 };

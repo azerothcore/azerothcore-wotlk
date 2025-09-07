@@ -17,6 +17,7 @@
 
 #include "AccountMgr.h"
 #include "ArenaTeamMgr.h"
+#include "Battleground.h"
 #include "BattlegroundMgr.h"
 #include "CellImpl.h"
 #include "CharacterCache.h"
@@ -193,7 +194,9 @@ public:
             { "skirmish",          HandleSkirmishCommand,          SEC_ADMINISTRATOR,      Console::No  },
             { "mailbox",           HandleMailBoxCommand,           SEC_MODERATOR,          Console::No  },
             { "string",            HandleStringCommand,            SEC_GAMEMASTER,         Console::No  },
-            { "opendoor",          HandleOpenDoorCommand,          SEC_GAMEMASTER,         Console::No  }
+            { "opendoor",          HandleOpenDoorCommand,          SEC_GAMEMASTER,         Console::No  },
+            { "bgstart",           HandleBgStartCommand,           SEC_GAMEMASTER,         Console::No  },
+            { "bgstop",            HandleBgStopCommand,            SEC_GAMEMASTER,         Console::No  }
         };
 
         return commandTable;
@@ -3074,6 +3077,64 @@ public:
 
         handler->SendErrorMessage(LANG_CMD_NO_DOOR_FOUND, range ? *range : 5.0f);
         return false;
+    }
+
+    static bool HandleBgStartCommand(ChatHandler* handler)
+    {
+        Player* player = handler->GetSession()->GetPlayer();
+        if (!player)
+        {
+            handler->SendErrorMessage(LANG_NO_CHAR_SELECTED);
+            return false;
+        }
+
+        Battleground* bg = player->GetBattleground();
+        if (!bg)
+        {
+            handler->PSendSysMessage("You are not in a battleground.");
+            return false;
+        }
+
+        if (bg->GetStatus() != STATUS_WAIT_JOIN)
+        {
+            handler->PSendSysMessage("Battleground is not in waiting state.");
+            return false;
+        }
+
+        // Execute bgstart logic
+        bg->ExecuteBgStart();
+        
+        handler->PSendSysMessage("Battleground starting immediately...");
+        return true;
+    }
+
+    static bool HandleBgStopCommand(ChatHandler* handler)
+    {
+        Player* player = handler->GetSession()->GetPlayer();
+        if (!player)
+        {
+            handler->SendErrorMessage(LANG_NO_CHAR_SELECTED);
+            return false;
+        }
+
+        Battleground* bg = player->GetBattleground();
+        if (!bg)
+        {
+            handler->PSendSysMessage("You are not in a battleground.");
+            return false;
+        }
+
+        if (bg->GetStatus() != STATUS_IN_PROGRESS)
+        {
+            handler->PSendSysMessage("Battleground is not in progress.");
+            return false;
+        }
+
+        // End the battleground with no winner (draw)
+        bg->EndBattleground(TEAM_NEUTRAL);
+        
+        handler->PSendSysMessage("Battleground stopped.");
+        return true;
     }
 };
 

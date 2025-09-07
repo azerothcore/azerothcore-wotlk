@@ -3754,6 +3754,88 @@ Battleground.Override.LowLevels.MinPlayers = 0
 Battleground.Warsong.Flags = 3
 
 #
+#    Battleground.Warsong.TimerActive
+#        Description: Enable/disable the battleground timer in Warsong Gulch
+#        Default:     1 (Enabled - Blizzlike)
+#                     0 (Disabled)
+
+Battleground.Warsong.TimerActive = 1
+
+#
+#    Battleground.Warsong.MaxTeamScore
+#        Description: Set the maximum team score for Warsong Gulch (0 = use Flags setting)
+#        Default:     0 (Use Flags setting)
+
+Battleground.Warsong.MaxTeamScore = 0
+
+#
+#    Battleground.Warsong.MaxTime
+#        Description: Set the maximum time in minutes for Warsong Gulch (0 = use default)
+#        Default:     0 (Use default 27 minutes)
+
+Battleground.Warsong.MaxTime = 0
+
+#
+#    Battleground.Warsong.BerserkerHutsEnabled
+#        Description: Enable/disable berserker hut buffs in Warsong Gulch
+#        Default:     1 (Enabled - Blizzlike)
+#                     0 (Disabled)
+
+Battleground.Warsong.BerserkerHutsEnabled = 1
+
+#
+#    Battleground.Warsong.BerserkerHutsTimer
+#        Description: Set the respawn timer for berserker hut buffs in Warsong Gulch (in seconds)
+#        Default:     0 (Use default timing)
+
+Battleground.Warsong.BerserkerHutsTimer = 0
+
+#
+#    Battleground.Warsong.LeafsEnabled
+#        Description: Enable/disable leaf buffs in Warsong Gulch
+#        Default:     1 (Enabled - Blizzlike)
+#                     0 (Disabled)
+
+Battleground.Warsong.LeafsEnabled = 1
+
+#
+#    Battleground.Warsong.LeafsTimer
+#        Description: Set the respawn timer for leaf buffs in Warsong Gulch (in seconds)
+#        Default:     0 (Use default timing)
+
+Battleground.Warsong.LeafsTimer = 0
+
+#
+#    Battleground.Warsong.BootsEnabled
+#        Description: Enable/disable boot buffs in Warsong Gulch
+#        Default:     1 (Enabled - Blizzlike)
+#                     0 (Disabled)
+
+Battleground.Warsong.BootsEnabled = 1
+
+#
+#    Battleground.Warsong.BootsTimer
+#        Description: Set the respawn timer for boot buffs in Warsong Gulch (in seconds)
+#        Default:     0 (Use default timing)
+
+Battleground.Warsong.BootsTimer = 0
+
+#
+#    Battleground.Warsong.RandomBuffsEnabled
+#        Description: Enable/disable random buffs in Warsong Gulch
+#        Default:     0 (Disabled - Blizzlike)
+#                     1 (Enabled)
+
+Battleground.Warsong.RandomBuffsEnabled = 0
+
+#
+#    Battleground.Warsong.MaxOfflineTime
+#        Description: Set the maximum time (in seconds) a player can be offline before being kicked from Warsong Gulch
+#        Default:     300 (5 minutes - Blizzlike)
+
+Battleground.Warsong.MaxOfflineTime = 300
+
+#
 #    Battleground.Arathi.CapturePoints
 #        Description: Set the number of capture points required for a team to win in Arathi battleground
 #        Default:     1600 (WotLK)

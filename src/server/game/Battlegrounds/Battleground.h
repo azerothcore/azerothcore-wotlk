@@ -376,6 +376,7 @@ public:
 
     void ModifyStartDelayTime(int32 diff) { m_StartDelayTime -= diff; }
     void SetStartDelayTime(int32 Time)    { m_StartDelayTime = Time; }
+    void ExecuteBgStart(); // WSC Execute bgstart command logic
 
     void SetMaxPlayersPerTeam(uint32 MaxPlayers) { m_MaxPlayersPerTeam = MaxPlayers; }
     void SetMinPlayersPerTeam(uint32 MinPlayers) { m_MinPlayersPerTeam = MinPlayers; }
@@ -531,7 +532,7 @@ public:
     virtual void RemovePlayerAtLeave(Player* player);
     // can be extended in in BG subclass
 
-    void HandleTriggerBuff(GameObject* gameObject);
+    virtual void HandleTriggerBuff(GameObject* gameObject);
     void SetHoliday(bool is_holiday);
 
     /// @todo: make this protected:

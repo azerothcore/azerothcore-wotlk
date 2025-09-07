@@ -529,6 +529,13 @@ inline void Battleground::_ProcessJoin(uint32 diff)
 
         // Mark setup as completed
         m_SetupCompleted = true;
+        
+        // WSC: Auto-trigger bgstart when first player enters if debug bg is active
+        // This runs once after setup is completed and delay time is properly configured
+        if (sBattlegroundMgr->isTesting() && GetPlayersSize() >= 1)
+        {
+            ExecuteBgStart();
+        }
     }
 
     // First announcement at 120s or 60s (Depending on BG or Arena and configured time)
@@ -1889,4 +1896,30 @@ void Battleground::RewardXPAtKill(Player* killer, Player* victim)
 uint8 Battleground::GetUniqueBracketId() const
 {
     return GetMaxLevel() / 10;
+}
+
+void Battleground::ExecuteBgStart()
+{
+    // Validate battleground state
+    if (GetStatus() != STATUS_WAIT_JOIN)
+        return;
+
+    // If there's already no delay, force immediate start
+    if (GetStartDelayTime() <= 0)
+    {
+        // Directly start the battleground by calling StartingEventOpenDoors
+        StartingEventOpenDoors();
+        return;
+    }
+
+    // Calculate the remaining warmup time that will be skipped
+    int32 remainingWarmupTime = GetStartDelayTime();
+    
+    // Advance the start time by the skipped warmup time so the remaining match time is correct
+    // This ensures the timer shows the proper remaining time accounting for the skipped warmup
+    SetStartTime(GetStartTime() + remainingWarmupTime);
+    
+    // Force the battleground to start immediately by setting delay to 0
+    // This will trigger StartingEventOpenDoors() on the next update cycle
+    SetStartDelayTime(0);
 }
