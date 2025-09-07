@@ -138,25 +138,27 @@ bool Position::IsWithinBox(const Position& center, float xradius, float yradius,
     return true;
 }
 
-bool Position::HasInArc(float arc, Position const* obj, float border) const
+bool Position::HasInArc(float arc, const Position* obj, float targetRadius) const
 {
     // always have self in arc
     if (obj == this)
         return true;
 
     // move arc to range 0.. 2*pi
-    arc = NormalizeOrientation(arc);
+    arc = Position::NormalizeOrientation(arc);
+
+    float angle = GetAngle(obj);
+    angle -= m_orientation;
 
     // move angle to range -pi ... +pi
-    float angle = GetRelativeAngle(obj);
+    angle = Position::NormalizeOrientation(angle);
+    if (angle > M_PI)
+        angle -= 2.0f * M_PI;
 
-    if (angle > float(M_PI))
-        angle -= 2.0f * float(M_PI);
+    float lborder = -1 * (arc / targetRadius);                      // in range -pi..0
+    float rborder = (arc / targetRadius);                           // in range 0..pi
 
-    float lborder = -1 * (arc / border);                        // in range -pi..0
-    float rborder = (arc / border);                             // in range 0..pi
-
-    return ((angle >= lborder) && (angle <= rborder));
+    return (angle >= lborder) && (angle <= rborder);
 }
 
 bool Position::IsPositionValid() const
