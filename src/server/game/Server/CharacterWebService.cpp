@@ -344,6 +344,22 @@ bool CharacterWebService::ApplyCharacterGear(const CharacterRequest& request)
         // Update equipment cache so character appears equipped on character select
         UpdateEquipmentCache(characterGuid, request.items, trans);
         
+        // Remove all non-equipped items (bags and inventory contents)
+        // Keep only equipped items by deleting inventory entries for bag slots (slots 19-22 and their contents)
+        for (uint8 slot = 19; slot <= 22; ++slot) // Bag slots
+        {
+            trans->Append("DELETE FROM character_inventory WHERE guid = {} AND slot = {}", characterGuid, slot);
+        }
+        
+        // Delete any items in bag slots (slots 23-38 for bag 1, 39-54 for bag 2, etc.)
+        for (uint8 slot = 23; slot <= 150; ++slot) // All possible bag inventory slots
+        {
+            trans->Append("DELETE FROM character_inventory WHERE guid = {} AND slot = {}", characterGuid, slot);
+        }
+        
+        // Also delete bank items (slots 39-66 for bank, 67-74 for bank bags)
+        trans->Append("DELETE FROM character_inventory WHERE guid = {} AND slot >= 39", characterGuid);
+        
         CharacterDatabase.CommitTransaction(trans);
         LOG_INFO("server.worldserver", "Successfully applied configuration and gear to character '{}'", request.character.name);
     }
@@ -826,10 +842,10 @@ bool CharacterWebService::DeleteCharacterFromDatabase(const std::string& charact
     // Delete ALL character-related data comprehensively
     // Order matters - delete child records before parent records
     
-    // Delete items owned by the character
+    // Delete ALL items owned by the character (both equipped and in bags)
     trans->Append("DELETE FROM item_instance WHERE owner_guid = {}", characterGuid);
     
-    // Delete character inventory
+    // Delete all character inventory entries (this includes equipped items and bag contents)
     trans->Append("DELETE FROM character_inventory WHERE guid = {}", characterGuid);
     
     // Delete character spells
@@ -883,8 +899,17 @@ bool CharacterWebService::CreateCharacterInDatabase(const CharacterRequest& requ
     }
     
     // Generate new character GUID using a simple approach
-    // Find the highest existing character GUID and add 1
-    QueryResult maxGuidResult = CharacterDatabase.Query("SELECT MAX(guid) FROM characters");
+    // Find the highest existing character GUID across all relevant tables and add 1
+    QueryResult maxGuidResult = CharacterDatabase.Query(
+        "SELECT MAX(max_guid) FROM ("
+        "  SELECT COALESCE(MAX(guid), 0) as max_guid FROM characters "
+        "  UNION ALL "
+        "  SELECT COALESCE(MAX(guid), 0) as max_guid FROM character_stats "
+        "  UNION ALL "
+        "  SELECT COALESCE(MAX(guid), 0) as max_guid FROM character_homebind"
+        ") as all_guids"
+    );
+    
     uint32 newGuid = 1;
     if (maxGuidResult)
     {
@@ -925,9 +950,9 @@ bool CharacterWebService::CreateCharacterInDatabase(const CharacterRequest& requ
         newGuid
     );
     
-    // Create character_stats entry
+    // Create character_stats entry (use INSERT IGNORE in case it exists from a failed previous attempt)
     trans->Append(
-        "INSERT INTO character_stats (guid, maxhealth, maxpower1, maxpower2, maxpower3, maxpower4, maxpower5, maxpower6, maxpower7, "
+        "INSERT IGNORE INTO character_stats (guid, maxhealth, maxpower1, maxpower2, maxpower3, maxpower4, maxpower5, maxpower6, maxpower7, "
         "strength, agility, stamina, intellect, spirit, armor, resHoly, resFire, resNature, resFrost, resShadow, resArcane, "
         "blockPct, dodgePct, parryPct, critPct, rangedCritPct, spellCritPct, attackPower, rangedAttackPower, spellPower, "
         "resilience) VALUES "

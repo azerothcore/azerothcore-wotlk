@@ -406,6 +406,16 @@ CharacterWebService.Enable = 0
 CharacterWebService.Port = 8080
 
 #
+#    PreventItemUnequip
+#        Description: Prevent ALL item movement in player inventory.
+#                     When enabled, players cannot move any items at all - no equipping,
+#                     unequipping, moving items in bags, swapping rings/trinkets, etc.
+#        Default:     0 - (Disabled, players can move items normally)
+#                     1 - (Enabled, ALL item movement is blocked)
+
+PreventItemUnequip = 0
+
+#
 ###################################################################################################
 
 ###################################################################################################

@@ -3016,6 +3016,10 @@ void Player::MoveItemToInventory(ItemPosCountVec const& dest, Item* pItem, bool 
 
 void Player::DestroyItem(uint8 bag, uint8 slot, bool update)
 {
+    // Prevent destroying equipped items if unequipping is disabled
+    if (sWorld->getIntConfig(CONFIG_PREVENT_ITEM_UNEQUIP) && IsEquipmentPos(bag, slot))
+        return;
+    
     Item* pItem = GetItemByPos(bag, slot);
     if (pItem)
     {
@@ -3540,6 +3544,13 @@ void Player::SwapItem(uint16 src, uint16 dst)
         return;
 
     LOG_DEBUG("entities.player.items", "STORAGE: SwapItem bag = {}, slot = {}, item = {}", dstbag, dstslot, pSrcItem->GetEntry());
+
+    // Block ALL item movement when PreventItemUnequip is enabled
+    if (sWorld->getIntConfig(CONFIG_PREVENT_ITEM_UNEQUIP))
+    {
+        SendEquipError(EQUIP_ERR_CANT_DO_RIGHT_NOW, pSrcItem, pDstItem);
+        return;
+    }
 
     if (!IsAlive())
     {
