@@ -2,6 +2,10 @@
 DELETE FROM `spell_script_names` WHERE `spell_id`=48297;
 INSERT INTO `spell_script_names` (`spell_id`, `ScriptName`) VALUES (48297, 'spell_handover_reins');
 
+DELETE FROM `vehicle_seat_addon` WHERE `SeatEntry`=742;
+INSERT INTO `vehicle_seat_addon` (`SeatEntry`, `SeatOrientation`, `ExitParamX`, `ExitParamY`, `ExitParamZ`, `ExitParamO`, `ExitParamValue`) VALUES
+(742, 0, 0, -2, 0, 0, 1);
+
 -- Set Phase from 5 to 1 for id 2
 -- Generate comments with Keira
 DELETE FROM `smart_scripts` WHERE (`source_type` = 0 AND `entryorguid` = 27213);
