@@ -406,6 +406,16 @@ CharacterWebService.Enable = 0
 CharacterWebService.Port = 8080
 
 #
+#    CharacterWebService.RaceCustomization
+#        Description: When enabled, grants a one-time use appearance customization spell to characters created through the web service.
+#                     The spell flags the character for customization on next login, allowing gender and appearance changes.
+#                     When disabled, randomizes gender since we don't have gender data from imports.
+#        Default:     1 - (Enabled - grant customization spell)
+#                     0 - (Disabled - randomize gender)
+
+CharacterWebService.RaceCustomization = 1
+
+#
 #    PreventItemUnequip
 #        Description: Prevent ALL item movement in player inventory.
 #                     When enabled, players cannot move any items at all - no equipping,
@@ -414,6 +424,14 @@ CharacterWebService.Port = 8080
 #                     1 - (Enabled, ALL item movement is blocked)
 
 PreventItemUnequip = 0
+
+#
+#    RaceCustomization
+#        Description: Allow race/gender customization for web-created characters.
+#        Default:     1 - (Enabled, flag characters for race change)
+#                     0 - (Disabled, randomize gender instead)
+
+RaceCustomization = 1
 
 #
 ###################################################################################################

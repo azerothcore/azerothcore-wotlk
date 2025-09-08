@@ -21,17 +21,20 @@
 #include "ObjectMgr.h"
 #include "ObjectAccessor.h"
 #include "World.h"
+#include "WorldConfig.h"
 #include "Log.h"
 #include "SharedDefines.h"
 #include "SpellMgr.h"
 #include "DBCStores.h"
 #include "DatabaseEnv.h"
 #include "ObjectGuid.h"
+#include "CharacterCache.h"
 #include <boost/beast/version.hpp>
 #include <sstream>
 #include <thread>
 #include <regex>
 #include <unordered_map>
+#include <random>
 
 CharacterWebService::CharacterWebService(Acore::Asio::IoContext& ioContext, uint16 port)
     : _ioContext(ioContext), _acceptor(ioContext, tcp::endpoint(tcp::v4(), port)), _port(port), _running(false)
@@ -327,10 +330,15 @@ bool CharacterWebService::ApplyCharacterGear(const CharacterRequest& request)
         LOG_INFO("server.worldserver", "Successfully deleted existing character '{}'", request.character.name);
     }
     
+    // Determine if we should enable customization based on config
+    bool enableCustomization = sWorld->getIntConfig(CONFIG_RACE_CUSTOMIZATION) == 1;
+    LOG_INFO("server.worldserver", "CONFIG_RACE_CUSTOMIZATION = {}, enableCustomization = {}", 
+             sWorld->getIntConfig(CONFIG_RACE_CUSTOMIZATION), enableCustomization ? "true" : "false");
+    
     // Create new character in first transaction
     CharacterDatabaseTransaction createTrans = CharacterDatabase.BeginTransaction();
     uint32 newCharacterGuid = 0;
-    if (!CreateCharacterInDatabase(request, accountId, createTrans, newCharacterGuid))
+    if (!CreateCharacterInDatabase(request, accountId, createTrans, newCharacterGuid, enableCustomization))
     {
         LOG_ERROR("server.worldserver", "Failed to create character '{}'", request.character.name);
         return false;
@@ -1204,7 +1212,7 @@ bool CharacterWebService::DeleteCharacterFromDatabase(const std::string& charact
     return true;
 }
 
-bool CharacterWebService::CreateCharacterInDatabase(const CharacterRequest& request, uint32 accountId, CharacterDatabaseTransaction& trans, uint32& outGuid)
+bool CharacterWebService::CreateCharacterInDatabase(const CharacterRequest& request, uint32 accountId, CharacterDatabaseTransaction& trans, uint32& outGuid, bool enableCustomization)
 {
     uint8 classId = GetClassId(request.character.gameClass);
     uint8 raceId = GetRaceId(request.character.race);
@@ -1248,17 +1256,40 @@ bool CharacterWebService::CreateCharacterInDatabase(const CharacterRequest& requ
         teamId = 1; // Horde
     }
     
+    // Determine gender and login flags based on config
+    uint8 gender = 0;  // Default to male
+    uint32 atLoginFlags = 0;
+    
+    if (enableCustomization)
+    {
+        // Flag character for customization on first login
+        atLoginFlags |= AT_LOGIN_CUSTOMIZE;
+        LOG_INFO("server.worldserver", "Flagging character '{}' for customization on first login", request.character.name);
+    }
+    else
+    {
+        // Randomize gender when customization is disabled
+        std::random_device rd;
+        std::mt19937 gen(rd());
+        std::uniform_int_distribution<> dis(0, 1);
+        gender = dis(gen);
+        LOG_INFO("server.worldserver", "Setting random gender {} for character '{}'", 
+                 gender == 0 ? "male" : "female", request.character.name);
+    }
+    
     // Create the main character record with all required fields (including those without defaults)
     trans->Append(
         "INSERT INTO characters "
         "(guid, account, name, race, class, gender, level, xp, money, "
+        "skin, face, hairStyle, hairColor, facialStyle, "
         "position_x, position_y, position_z, map, orientation, taximask, cinematic, "
-        "zone, online, health, power1, equipmentCache, exploredZones, knownTitles, actionBars, innTriggerId) "
+        "zone, online, health, power1, equipmentCache, exploredZones, knownTitles, actionBars, innTriggerId, at_login) "
         "VALUES "
-        "({}, {}, '{}', {}, {}, 0, {}, 0, 0, "
+        "({}, {}, '{}', {}, {}, {}, {}, 0, 0, "
+        "0, 0, 0, 0, 0, "
         "-8949.95, -132.493, 83.5312, 0, 0, '', 1, "
-        "12, 0, 100, 100, '', '', '', 0, 0)",
-        newGuid, accountId, request.character.name, raceId, classId, request.character.level
+        "12, 0, 100, 100, '', '', '', 0, 0, {})",
+        newGuid, accountId, request.character.name, raceId, classId, gender, request.character.level, atLoginFlags
     );
     
     // Create character_homebind entry
@@ -1281,8 +1312,12 @@ bool CharacterWebService::CreateCharacterInDatabase(const CharacterRequest& requ
     // Note: character_account_data is account-wide, not character-specific
     // So we don't need to create entries for it here
     
-    LOG_INFO("server.worldserver", "Created character '{}' with GUID {}, class {}, race {}, level {}", 
-             request.character.name, newGuid, classId, raceId, request.character.level);
+    LOG_INFO("server.worldserver", "Created character '{}' with GUID {}, class {}, race {}, gender {}, level {}, at_login flags: {}", 
+             request.character.name, newGuid, classId, raceId, gender, request.character.level, atLoginFlags);
+    
+    // Add character to cache (required for customization to work)
+    sCharacterCache->AddCharacterCacheEntry(ObjectGuid(HighGuid::Player, newGuid), accountId, request.character.name, 
+                                            gender, raceId, classId, request.character.level);
     
     return true;
 }

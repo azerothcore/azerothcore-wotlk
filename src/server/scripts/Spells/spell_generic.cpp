@@ -69,6 +69,49 @@ class spell_gen_5000_gold : public SpellScript
     }
 };
 
+// 80001 - Gender Change (One-Time Use)
+class spell_gen_gender_change : public SpellScript
+{
+    PrepareSpellScript(spell_gen_gender_change);
+
+    SpellCastResult CheckCast()
+    {
+        if (!GetCaster()->IsPlayer())
+            return SPELL_FAILED_TARGET_NOT_PLAYER;
+        
+        return SPELL_CAST_OK;
+    }
+
+    void HandleScript(SpellEffIndex /*effIndex*/)
+    {
+        if (Player* player = GetCaster()->ToPlayer())
+        {
+            // Simply flag the player for customization on next login
+            // This is the safest approach that uses existing game mechanics
+            player->SetAtLoginFlag(AT_LOGIN_CUSTOMIZE);
+            
+            // Update database to set the at_login flag
+            CharacterDatabase.Execute("UPDATE characters SET at_login = at_login | {} WHERE guid = {}", 
+                                    AT_LOGIN_CUSTOMIZE, player->GetGUID().GetCounter());
+            
+            // Send notification to player
+            ChatHandler(player->GetSession()).PSendSysMessage("Gender change activated! Please relog to customize your character's appearance including gender.");
+            
+            // Remove the spell from the player's spellbook after use
+            player->removeSpell(GetSpellInfo()->Id, SPEC_MASK_ALL, false);
+            
+            LOG_INFO("server.worldserver", "Player {} (GUID: {}) used gender change spell, flagged for customization", 
+                     player->GetName(), player->GetGUID().GetCounter());
+        }
+    }
+
+    void Register() override
+    {
+        OnCheckCast += SpellCheckCastFn(spell_gen_gender_change::CheckCast);
+        OnEffectHitTarget += SpellEffectFn(spell_gen_gender_change::HandleScript, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
+    }
+};
+
 // 24401 - Test Pet Passive
 class spell_gen_model_visible : public AuraScript
 {
@@ -5496,6 +5539,7 @@ void AddSC_generic_spell_scripts()
 {
     RegisterSpellScript(spell_silithyst);
     RegisterSpellScript(spell_gen_5000_gold);
+    RegisterSpellScript(spell_gen_gender_change);
     RegisterSpellScript(spell_gen_model_visible);
     RegisterSpellScript(spell_the_flag_of_ownership);
     RegisterSpellScript(spell_gen_have_item_auras);
