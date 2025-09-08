@@ -611,13 +611,24 @@ void Map::RemoveObjectFromMapUpdateList(WorldObject* obj)
 // Used in VisibilityDistanceType::Large and VisibilityDistanceType::Gigantic
 void Map::AddWorldObjectToFarVisibleMap(WorldObject* obj)
 {
-    Cell curr_cell(obj->GetPositionX(), obj->GetPositionY());
-    MapGridType* grid = GetMapGrid(curr_cell.GridX(), curr_cell.GridY());
+    if (Creature* creature = obj->ToCreature())
+    {
+        if (!creature->IsInGrid())
+            return;
 
-    if (obj->IsCreature())
-        grid->AddFarVisibleObject(curr_cell.CellX(), curr_cell.CellY(), obj->ToCreature());
-    else if (obj->IsGameObject())
-        grid->AddFarVisibleObject(curr_cell.CellX(), curr_cell.CellY(), obj->ToGameObject());
+        Cell curr_cell = creature->GetCurrentCell();
+        MapGridType* grid = GetMapGrid(curr_cell.GridX(), curr_cell.GridY());
+        grid->AddFarVisibleObject(curr_cell.CellX(), curr_cell.CellY(), creature);
+    }
+    else if (GameObject* go = obj->ToGameObject())
+    {
+        if (!go->IsInGrid())
+            return;
+
+        Cell curr_cell = go->GetCurrentCell();
+        MapGridType* grid = GetMapGrid(curr_cell.GridX(), curr_cell.GridY());
+        grid->AddFarVisibleObject(curr_cell.CellX(), curr_cell.CellY(), go);
+    }
 }
 
 void Map::RemoveWorldObjectFromFarVisibleMap(WorldObject* obj)
