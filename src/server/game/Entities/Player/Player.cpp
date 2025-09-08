@@ -16498,7 +16498,7 @@ bool Player::IsWorldObjectOutOfSightRange(WorldObject const* target) const
     }
 
     // Check if out of range
-    return !m_seer->IsWithinDist(target, GetSightRange(target), true);
+    return !m_seer->IsWithinDist(target, GetSightRange(target), false);
 }
 
 std::string Player::GetPlayerName()
