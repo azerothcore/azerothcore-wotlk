@@ -31,6 +31,7 @@
 #include <sstream>
 #include <thread>
 #include <regex>
+#include <unordered_map>
 
 CharacterWebService::CharacterWebService(Acore::Asio::IoContext& ioContext, uint16 port)
     : _ioContext(ioContext), _acceptor(ioContext, tcp::endpoint(tcp::v4(), port)), _port(port), _running(false)
@@ -262,49 +263,67 @@ bool CharacterWebService::ApplyCharacterGear(const CharacterRequest& request)
         return false;
     }
 
-    // Get character data from database
+    // Check if character exists and get account info
     uint32 characterGuid = 0;
     QueryResult result = CharacterDatabase.Query("SELECT guid, account FROM characters WHERE name = '{}'", request.character.name);
     
-    if (!result)
-    {
-        LOG_ERROR("server.worldserver", "Character '{}' not found in database", request.character.name);
-        return false;
-    }
+    uint32 accountId = 0;
+    bool characterExists = false;
     
-    Field* fields = result->Fetch();
-    characterGuid = fields[0].Get<uint32>();
-    uint32 accountId = fields[1].Get<uint32>();
-
-    // Check if character is in a battleground by checking their map ID
-    // Battleground map IDs: 30 (AV), 489 (WS), 529 (AB), 566 (EY), 607 (SA), 628 (IC)
-    // Arena map IDs: 572 (Nagrand), 562 (Blade's Edge), 617 (Ruins), 618 (Ring of Valor)
-    QueryResult mapResult = CharacterDatabase.Query("SELECT map FROM characters WHERE guid = {}", characterGuid);
-    
-    if (mapResult)
+    if (result)
     {
-        Field* mapFields = mapResult->Fetch();
-        uint32 mapId = mapFields[0].Get<uint32>();
+        Field* fields = result->Fetch();
+        characterGuid = fields[0].Get<uint32>();
+        accountId = fields[1].Get<uint32>();
+        characterExists = true;
         
-        // Check if the map is a battleground or arena
-        if (mapId == 30 || mapId == 489 || mapId == 529 || mapId == 566 || 
-            mapId == 607 || mapId == 628 || mapId == 572 || mapId == 562 || 
-            mapId == 617 || mapId == 618)
-        {
-            LOG_ERROR("server.worldserver", "Character '{}' is currently in a battleground/arena (map {}) and cannot have gear changed", 
-                     request.character.name, mapId);
-            return false;
-        }
+        LOG_INFO("server.worldserver", "Found existing character '{}' with GUID {}, will delete and recreate", request.character.name, characterGuid);
+    }
+    else
+    {
+        // If character doesn't exist, we need an account ID - for now, use account 1
+        // In a real implementation, you'd get this from the request or authentication
+        accountId = 1;
+        LOG_INFO("server.worldserver", "Character '{}' not found, will create new character", request.character.name);
     }
 
     bool success = true;
+    
+    // Delete existing character if it exists (in separate transaction to ensure it completes)
+    if (characterExists)
+    {
+        CharacterDatabaseTransaction deleteTrans = CharacterDatabase.BeginTransaction();
+        if (!DeleteCharacterFromDatabase(request.character.name, accountId, deleteTrans))
+        {
+            LOG_ERROR("server.worldserver", "Failed to delete existing character '{}'", request.character.name);
+            return false;
+        }
+        CharacterDatabase.CommitTransaction(deleteTrans);
+        LOG_INFO("server.worldserver", "Successfully deleted existing character '{}'", request.character.name);
+    }
+    
+    // Create new character in first transaction
+    CharacterDatabaseTransaction createTrans = CharacterDatabase.BeginTransaction();
+    uint32 newCharacterGuid = 0;
+    if (!CreateCharacterInDatabase(request, accountId, createTrans, newCharacterGuid))
+    {
+        LOG_ERROR("server.worldserver", "Failed to create character '{}'", request.character.name);
+        return false;
+    }
+    CharacterDatabase.CommitTransaction(createTrans);
+    
+    characterGuid = newCharacterGuid;
+    LOG_INFO("server.worldserver", "Created new character '{}' with GUID {}", request.character.name, characterGuid);
+    
+    // Now apply gear, spells, etc. in a second transaction
     CharacterDatabaseTransaction trans = CharacterDatabase.BeginTransaction();
     
-    // Update character level, class, race, and faction if provided
-    if (!UpdateCharacterConfiguration(characterGuid, request.character, trans))
+    // Grant all class spells available for the character's level and class
+    uint8 classId = GetClassId(request.character.gameClass);
+    uint8 raceId = GetRaceId(request.character.race);
+    if (classId > 0 && raceId > 0)
     {
-        LOG_ERROR("server.worldserver", "Failed to update character configuration for '{}'", request.character.name);
-        success = false;
+        GrantAllClassSpells(characterGuid, request.character.level, classId, raceId, trans);
     }
     
     // Grant necessary proficiencies before applying gear
@@ -315,8 +334,7 @@ bool CharacterWebService::ApplyCharacterGear(const CharacterRequest& request)
     {
         if (!ApplyItemToDatabase(characterGuid, itemData, trans))
         {
-            LOG_ERROR("server.worldserver", "Failed to equip item '{}' on character '{}'", 
-                     itemData.name, request.character.name);
+            LOG_ERROR("server.worldserver", "Failed to apply item '{}' to character '{}'", itemData.name, request.character.name);
             success = false;
         }
     }
@@ -324,10 +342,10 @@ bool CharacterWebService::ApplyCharacterGear(const CharacterRequest& request)
     if (success)
     {
         // Update equipment cache so character appears equipped on character select
-        UpdateEquipmentCache(characterGuid, trans);
+        UpdateEquipmentCache(characterGuid, request.items, trans);
         
         CharacterDatabase.CommitTransaction(trans);
-        LOG_INFO("server.worldserver", "Successfully updated configuration and gear for offline character '{}'", request.character.name);
+        LOG_INFO("server.worldserver", "Successfully applied configuration and gear to character '{}'", request.character.name);
     }
     else
     {
@@ -342,6 +360,7 @@ void CharacterWebService::GrantRequiredProficiencies(uint32 characterGuid, const
 {
     // Check which items require special proficiencies and grant them
     bool needsFishing = false;
+    bool needsEngineering = false;
     bool needsWeaponSkills = false;
     
     for (const auto& itemData : items)
@@ -356,6 +375,23 @@ void CharacterWebService::GrantRequiredProficiencies(uint32 characterGuid, const
             needsFishing = true;
         }
         
+        // Check for Engineering items
+        // Spellpower Goggles Xtreme and other engineering goggles
+        if (itemData.id == 10502 || itemData.id == 10503 || itemData.id == 10504 || // Spellpower Goggles variants
+            itemData.id == 10518 || // Parachute Cloak  
+            itemData.id == 10501 || itemData.id == 10500 || // Other engineering goggles
+            itemData.id == 9491 || // Hotshot Pilot's Gloves
+            itemData.id == 10506 || itemData.id == 10507 || itemData.id == 10508) // More goggles
+        {
+            needsEngineering = true;
+        }
+        
+        // Also check if item has Engineering requirement from template
+        if (itemTemplate->RequiredSkill == 202) // Engineering skill ID
+        {
+            needsEngineering = true;
+        }
+        
         // Check for weapon proficiency requirements based on item class/subclass
         if (itemTemplate->Class == ITEM_CLASS_WEAPON)
         {
@@ -368,6 +404,15 @@ void CharacterWebService::GrantRequiredProficiencies(uint32 characterGuid, const
         // Grant fishing skill (356) with max value for level 80
         trans->Append("INSERT INTO character_skills (guid, skill, value, max) VALUES ({}, 356, 450, 450) "
                      "ON DUPLICATE KEY UPDATE value = 450, max = 450", characterGuid);
+        LOG_INFO("server.worldserver", "Granted Fishing skill to character {}", characterGuid);
+    }
+    
+    if (needsEngineering)
+    {
+        // Grant engineering skill (202) with max value
+        trans->Append("INSERT INTO character_skills (guid, skill, value, max) VALUES ({}, 202, 450, 450) "
+                     "ON DUPLICATE KEY UPDATE value = 450, max = 450", characterGuid);
+        LOG_INFO("server.worldserver", "Granted Engineering skill to character {}", characterGuid);
     }
     
     if (needsWeaponSkills)
@@ -569,50 +614,40 @@ uint8 CharacterWebService::GetEquipmentSlot(const std::string& slotName)
     return it != slotMap.end() ? it->second : EQUIPMENT_SLOT_END;
 }
 
-void CharacterWebService::UpdateEquipmentCache(uint32 characterGuid, CharacterDatabaseTransaction& trans)
+void CharacterWebService::UpdateEquipmentCache(uint32 characterGuid, const std::vector<ItemData>& items, CharacterDatabaseTransaction& trans)
 {
     // Build equipment cache string for character select screen display
     // Format: ALL 19 equipment slots (item1 enchant1 item2 enchant2 ... for slots 0-18)
     // Based on Player.cpp _SaveCharacter function: for (uint32 i = 0; i < EQUIPMENT_SLOT_END * 2; ++i)
+    
+    // Create a map of slot -> item data for quick lookup
+    std::unordered_map<uint8, const ItemData*> slotItemMap;
+    for (const auto& item : items)
+    {
+        uint8 slot = GetEquipmentSlot(item.slot);
+        if (slot < 19) // Valid equipment slot
+        {
+            slotItemMap[slot] = &item;
+        }
+    }
+    
     std::string equipmentCache;
     
-    // Process ALL equipment slots (0-18) in sequential order, not just visible ones
+    // Process ALL equipment slots (0-18) in sequential order
     for (uint8 slot = 0; slot < 19; ++slot)  // EQUIPMENT_SLOT_END = 19
     {
-        // Query the item in this slot
-        QueryResult result = CharacterDatabase.Query(
-            "SELECT ii.itemEntry, ii.enchantments "
-            "FROM character_inventory ci "
-            "JOIN item_instance ii ON ci.item = ii.guid "
-            "WHERE ci.guid = {} AND ci.slot = {} AND ci.bag = 0",
-            characterGuid, slot);
-            
-        if (result)
+        auto it = slotItemMap.find(slot);
+        if (it != slotItemMap.end())
         {
-            Field* fields = result->Fetch();
-            uint32 itemEntry = fields[0].Get<uint32>();
-            std::string enchantments = fields[1].Get<std::string>();
+            // We have an item in this slot
+            uint32 itemId = it->second->id;
+            uint32 enchantId = it->second->enchant.id;
             
-            // Extract main enchant from enchantments string (first enchant slot)
-            uint32 enchantId = 0;
-            if (!enchantments.empty())
-            {
-                std::istringstream iss(enchantments);
-                std::string enchantStr;
-                if (std::getline(iss, enchantStr, ' '))
-                {
-                    try {
-                        enchantId = std::stoul(enchantStr);
-                    } catch (...) {
-                        enchantId = 0;
-                    }
-                }
-            }
-            
-            equipmentCache += std::to_string(itemEntry) + " " + std::to_string(enchantId) + " ";
+            equipmentCache += std::to_string(itemId) + " " + std::to_string(enchantId) + " ";
         }
         else
         {
+            // Empty slot
             equipmentCache += "0 0 ";
         }
     }
@@ -627,4 +662,284 @@ void CharacterWebService::UpdateEquipmentCache(uint32 characterGuid, CharacterDa
     trans->Append("UPDATE characters SET equipmentCache = '{}' WHERE guid = {}", equipmentCache, characterGuid);
     
     LOG_INFO("server.worldserver", "Updated equipment cache for character {}: {}", characterGuid, equipmentCache);
+}
+
+void CharacterWebService::GrantAllClassSpells(uint32 characterGuid, uint8 level, uint8 classId, uint8 raceId, CharacterDatabaseTransaction& trans)
+{
+    // TODO: This spell granting logic needs further manual review
+    // Currently grants some skills/spells that shouldn't be automatically given
+    // May need to filter out more passive abilities, profession spells, or other special cases
+    
+    // First, clear existing spells to avoid duplicates
+    trans->Append("DELETE FROM character_spell WHERE guid = {}", characterGuid);
+    
+    uint32 spellsGranted = 0;
+    uint32 raceMask = 1 << (raceId - 1);
+    uint32 classMask = 1 << (classId - 1);
+    
+    // Define the main talent tree skill lines for each class
+    // For Druid: Balance (574), Feral Combat (134), Restoration (573)
+    std::vector<uint32> mainSkillLines;
+    
+    switch (classId)
+    {
+        case 11: // DRUID
+            mainSkillLines = {574, 134, 573}; // Balance, Feral Combat, Restoration
+            break;
+        case 1: // WARRIOR  
+            mainSkillLines = {26, 256, 257}; // Arms, Fury, Protection
+            break;
+        case 2: // PALADIN
+            mainSkillLines = {594, 267, 184}; // Holy, Protection, Retribution
+            break;
+        case 3: // HUNTER
+            mainSkillLines = {50, 51, 163}; // Beast Mastery, Marksmanship, Survival
+            break;
+        case 4: // ROGUE
+            mainSkillLines = {253, 38, 39}; // Assassination, Combat, Subtlety
+            break;
+        case 5: // PRIEST
+            mainSkillLines = {56, 78, 613}; // Discipline, Holy, Shadow
+            break;
+        case 6: // DEATH_KNIGHT
+            mainSkillLines = {770, 771, 772}; // Blood, Frost, Unholy
+            break;
+        case 7: // SHAMAN
+            mainSkillLines = {261, 263, 262}; // Elemental, Enhancement, Restoration
+            break;
+        case 8: // MAGE
+            mainSkillLines = {237, 6, 8}; // Arcane, Fire, Frost
+            break;
+        case 9: // WARLOCK
+            mainSkillLines = {355, 354, 593}; // Affliction, Demonology, Destruction
+            break;
+        default:
+            LOG_ERROR("server.worldserver", "Unsupported class {} for spell granting", classId);
+            return;
+    }
+    
+    // Iterate through all SkillLineAbility entries to find spells from main talent trees only
+    for (uint32 i = 0; i < sSkillLineAbilityStore.GetNumRows(); ++i)
+    {
+        SkillLineAbilityEntry const* skillEntry = sSkillLineAbilityStore.LookupEntry(i);
+        if (!skillEntry)
+            continue;
+            
+        // Only process spells from the main talent tree skill lines
+        bool isMainSkillLine = false;
+        for (uint32 skillLine : mainSkillLines)
+        {
+            if (skillEntry->SkillLine == skillLine)
+            {
+                isMainSkillLine = true;
+                break;
+            }
+        }
+        
+        if (!isMainSkillLine)
+            continue;
+            
+        SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(skillEntry->Spell);
+        if (!spellInfo)
+            continue;
+            
+        // Skip server-side/triggered spells (they have no spell level)
+        if (spellInfo->SpellLevel == 0 && spellInfo->BaseLevel == 0)
+            continue;
+            
+        // Only learn spells up to character level
+        uint32 spellLevel = std::max(spellInfo->BaseLevel, spellInfo->SpellLevel);
+        if (spellLevel > level)
+            continue;
+            
+        // Check if spell fits this race/class combination
+        if (skillEntry->RaceMask != 0 && !(skillEntry->RaceMask & raceMask))
+            continue;
+            
+        if (skillEntry->ClassMask != 0 && !(skillEntry->ClassMask & classMask))
+            continue;
+            
+        // Skip broken or invalid spells
+        if (!SpellMgr::IsSpellValid(spellInfo))
+            continue;
+            
+        // Skip talents (these should be learned separately)
+        if (GetTalentSpellCost(skillEntry->Spell) > 0)
+            continue;
+            
+        // Skip passive spells that are learned automatically
+        if (spellInfo->IsPassive() && spellInfo->HasAura(SPELL_AURA_MOD_SKILL))
+            continue;
+            
+        // Add spell to character_spell table
+        trans->Append("INSERT INTO character_spell (guid, spell, specMask) VALUES ({}, {}, 255) ON DUPLICATE KEY UPDATE specMask = 255",
+                     characterGuid, skillEntry->Spell);
+        
+        spellsGranted++;
+    }
+    
+    // Get class and race names for logging
+    const char* className = "Unknown";
+    switch (classId) {
+        case 1: className = "Warrior"; break;
+        case 2: className = "Paladin"; break;
+        case 3: className = "Hunter"; break;
+        case 4: className = "Rogue"; break;
+        case 5: className = "Priest"; break;
+        case 6: className = "Death Knight"; break;
+        case 7: className = "Shaman"; break;
+        case 8: className = "Mage"; break;
+        case 9: className = "Warlock"; break;
+        case 11: className = "Druid"; break;
+    }
+    
+    const char* raceName = "Unknown";
+    switch (raceId) {
+        case 1: raceName = "Human"; break;
+        case 2: raceName = "Orc"; break;
+        case 3: raceName = "Dwarf"; break;
+        case 4: raceName = "Night Elf"; break;
+        case 5: raceName = "Undead"; break;
+        case 6: raceName = "Tauren"; break;
+        case 7: raceName = "Gnome"; break;
+        case 8: raceName = "Troll"; break;
+        case 10: raceName = "Blood Elf"; break;
+        case 11: raceName = "Draenei"; break;
+    }
+    
+    LOG_INFO("server.worldserver", "Granted {} main talent tree spells to character {} (level {} {} {})", 
+             spellsGranted, characterGuid, level, className, raceName);
+}
+
+bool CharacterWebService::DeleteCharacterFromDatabase(const std::string& characterName, uint32 accountId, CharacterDatabaseTransaction& trans)
+{
+    // Get character GUID first
+    QueryResult result = CharacterDatabase.Query("SELECT guid FROM characters WHERE name = '{}'", characterName);
+    if (!result)
+    {
+        LOG_ERROR("server.worldserver", "Character '{}' not found for deletion", characterName);
+        return false;
+    }
+    
+    uint32 characterGuid = result->Fetch()[0].Get<uint32>();
+    
+    // Delete ALL character-related data comprehensively
+    // Order matters - delete child records before parent records
+    
+    // Delete items owned by the character
+    trans->Append("DELETE FROM item_instance WHERE owner_guid = {}", characterGuid);
+    
+    // Delete character inventory
+    trans->Append("DELETE FROM character_inventory WHERE guid = {}", characterGuid);
+    
+    // Delete character spells
+    trans->Append("DELETE FROM character_spell WHERE guid = {}", characterGuid);
+    
+    // Delete character skills  
+    trans->Append("DELETE FROM character_skills WHERE guid = {}", characterGuid);
+    
+    // Delete character homebind
+    trans->Append("DELETE FROM character_homebind WHERE guid = {}", characterGuid);
+    
+    // Delete character stats
+    trans->Append("DELETE FROM character_stats WHERE guid = {}", characterGuid);
+    
+    // Delete character_account_data if it exists (might not exist for never-logged-in characters)
+    trans->Append("DELETE FROM character_account_data WHERE guid = {}", characterGuid);
+    
+    // Delete other character tables that might exist
+    trans->Append("DELETE FROM character_action WHERE guid = {}", characterGuid);
+    trans->Append("DELETE FROM character_aura WHERE guid = {}", characterGuid);
+    trans->Append("DELETE FROM character_glyphs WHERE guid = {}", characterGuid);
+    trans->Append("DELETE FROM character_queststatus WHERE guid = {}", characterGuid);
+    trans->Append("DELETE FROM character_queststatus_rewarded WHERE guid = {}", characterGuid);
+    trans->Append("DELETE FROM character_reputation WHERE guid = {}", characterGuid);
+    trans->Append("DELETE FROM character_talent WHERE guid = {}", characterGuid);
+    trans->Append("DELETE FROM character_achievement WHERE guid = {}", characterGuid);
+    trans->Append("DELETE FROM character_achievement_progress WHERE guid = {}", characterGuid);
+    trans->Append("DELETE FROM character_equipmentsets WHERE guid = {}", characterGuid);
+    trans->Append("DELETE FROM character_pet WHERE owner = {}", characterGuid);
+    trans->Append("DELETE FROM mail WHERE receiver = {}", characterGuid);
+    trans->Append("DELETE FROM character_social WHERE guid = {} OR friend = {}", characterGuid, characterGuid);
+    trans->Append("DELETE FROM guild_member WHERE guid = {}", characterGuid);
+    
+    // Delete the main character record last
+    trans->Append("DELETE FROM characters WHERE guid = {}", characterGuid);
+    
+    LOG_INFO("server.worldserver", "Queued deletion of character '{}' (GUID {}) from all tables", characterName, characterGuid);
+    return true;
+}
+
+bool CharacterWebService::CreateCharacterInDatabase(const CharacterRequest& request, uint32 accountId, CharacterDatabaseTransaction& trans, uint32& outGuid)
+{
+    uint8 classId = GetClassId(request.character.gameClass);
+    uint8 raceId = GetRaceId(request.character.race);
+    
+    if (classId == 0 || raceId == 0)
+    {
+        LOG_ERROR("server.worldserver", "Invalid class '{}' or race '{}' for character creation", 
+                 request.character.gameClass, request.character.race);
+        return false;
+    }
+    
+    // Generate new character GUID using a simple approach
+    // Find the highest existing character GUID and add 1
+    QueryResult maxGuidResult = CharacterDatabase.Query("SELECT MAX(guid) FROM characters");
+    uint32 newGuid = 1;
+    if (maxGuidResult)
+    {
+        Field* fields = maxGuidResult->Fetch();
+        if (!fields[0].IsNull())
+        {
+            newGuid = fields[0].Get<uint32>() + 1;
+        }
+    }
+    
+    // Return the generated GUID so caller can use it
+    outGuid = newGuid;
+    
+    // Determine faction based on race
+    uint8 teamId = 0; // Alliance
+    if (raceId == 2 || raceId == 5 || raceId == 6 || raceId == 8 || raceId == 10) // Orc, Undead, Tauren, Troll, Blood Elf
+    {
+        teamId = 1; // Horde
+    }
+    
+    // Create the main character record with all required fields (including those without defaults)
+    trans->Append(
+        "INSERT INTO characters "
+        "(guid, account, name, race, class, gender, level, xp, money, "
+        "position_x, position_y, position_z, map, orientation, taximask, cinematic, "
+        "zone, online, health, power1, equipmentCache, exploredZones, knownTitles, actionBars, innTriggerId) "
+        "VALUES "
+        "({}, {}, '{}', {}, {}, 0, {}, 0, 0, "
+        "-8949.95, -132.493, 83.5312, 0, 0, '', 1, "
+        "12, 0, 100, 100, '', '', '', 0, 0)",
+        newGuid, accountId, request.character.name, raceId, classId, request.character.level
+    );
+    
+    // Create character_homebind entry
+    trans->Append(
+        "INSERT INTO character_homebind (guid, mapId, zoneId, posX, posY, posZ) "
+        "VALUES ({}, 0, 12, -8949.95, -132.493, 83.5312)",
+        newGuid
+    );
+    
+    // Create character_stats entry
+    trans->Append(
+        "INSERT INTO character_stats (guid, maxhealth, maxpower1, maxpower2, maxpower3, maxpower4, maxpower5, maxpower6, maxpower7, "
+        "strength, agility, stamina, intellect, spirit, armor, resHoly, resFire, resNature, resFrost, resShadow, resArcane, "
+        "blockPct, dodgePct, parryPct, critPct, rangedCritPct, spellCritPct, attackPower, rangedAttackPower, spellPower, "
+        "resilience) VALUES "
+        "({}, 100, 100, 0, 0, 0, 0, 0, 0, 10, 10, 10, 10, 10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)",
+        newGuid
+    );
+    
+    // Note: character_account_data is account-wide, not character-specific
+    // So we don't need to create entries for it here
+    
+    LOG_INFO("server.worldserver", "Created character '{}' with GUID {}, class {}, race {}, level {}", 
+             request.character.name, newGuid, classId, raceId, request.character.level);
+    
+    return true;
 }

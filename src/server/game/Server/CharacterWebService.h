@@ -85,13 +85,16 @@ private:
     bool ApplyCharacterGear(const CharacterRequest& request);
     bool UpdateCharacterConfiguration(uint32 characterGuid, const CharacterData& charData, CharacterDatabaseTransaction& trans);
     void GrantRequiredProficiencies(uint32 characterGuid, const std::vector<ItemData>& items, CharacterDatabaseTransaction& trans);
-    void UpdateEquipmentCache(uint32 characterGuid, CharacterDatabaseTransaction& trans);
+    void UpdateEquipmentCache(uint32 characterGuid, const std::vector<ItemData>& items, CharacterDatabaseTransaction& trans);
     bool ApplyItemToDatabase(uint32 characterGuid, const ItemData& itemData, CharacterDatabaseTransaction& trans);
     bool ApplyEnchantmentToDatabase(uint32 itemGuid, const ItemData::EnchantData& enchantData, CharacterDatabaseTransaction& trans);
     uint8 GetEquipmentSlot(const std::string& slotName);
     uint8 GetClassId(const std::string& className);
     uint8 GetRaceId(const std::string& raceName);
     uint32 GenerateItemGuid();
+    void GrantAllClassSpells(uint32 characterGuid, uint8 level, uint8 classId, uint8 raceId, CharacterDatabaseTransaction& trans);
+    bool DeleteCharacterFromDatabase(const std::string& characterName, uint32 accountId, CharacterDatabaseTransaction& trans);
+    bool CreateCharacterInDatabase(const CharacterRequest& request, uint32 accountId, CharacterDatabaseTransaction& trans, uint32& outGuid);
     
     Acore::Asio::IoContext& _ioContext;
     tcp::acceptor _acceptor;
