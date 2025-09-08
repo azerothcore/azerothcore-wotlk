@@ -114,7 +114,7 @@ private:
     void ApplyCharacterGlyphs(uint32 characterGuid, const std::vector<GlyphData>& glyphs, CharacterDatabaseTransaction& trans);
     uint32 GetGlyphSpellId(uint32 itemId);
     bool DeleteCharacterFromDatabase(const std::string& characterName, uint32 accountId, CharacterDatabaseTransaction& trans);
-    bool CreateCharacterInDatabase(const CharacterRequest& request, uint32 accountId, CharacterDatabaseTransaction& trans, uint32& outGuid, bool grantGenderChangeSpell = false);
+    bool CreateCharacterInDatabase(const CharacterRequest& request, uint32 accountId, CharacterDatabaseTransaction& trans, uint32& outGuid, bool enableCustomization = false);
     
     Acore::Asio::IoContext& _ioContext;
     tcp::acceptor _acceptor;

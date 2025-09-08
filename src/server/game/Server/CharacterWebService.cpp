@@ -28,7 +28,6 @@
 #include "DBCStores.h"
 #include "DatabaseEnv.h"
 #include "ObjectGuid.h"
-#include "CharacterCache.h"
 #include <boost/beast/version.hpp>
 #include <sstream>
 #include <thread>
@@ -1281,12 +1280,10 @@ bool CharacterWebService::CreateCharacterInDatabase(const CharacterRequest& requ
     trans->Append(
         "INSERT INTO characters "
         "(guid, account, name, race, class, gender, level, xp, money, "
-        "skin, face, hairStyle, hairColor, facialStyle, "
         "position_x, position_y, position_z, map, orientation, taximask, cinematic, "
         "zone, online, health, power1, equipmentCache, exploredZones, knownTitles, actionBars, innTriggerId, at_login) "
         "VALUES "
         "({}, {}, '{}', {}, {}, {}, {}, 0, 0, "
-        "0, 0, 0, 0, 0, "
         "-8949.95, -132.493, 83.5312, 0, 0, '', 1, "
         "12, 0, 100, 100, '', '', '', 0, 0, {})",
         newGuid, accountId, request.character.name, raceId, classId, gender, request.character.level, atLoginFlags
@@ -1312,12 +1309,8 @@ bool CharacterWebService::CreateCharacterInDatabase(const CharacterRequest& requ
     // Note: character_account_data is account-wide, not character-specific
     // So we don't need to create entries for it here
     
-    LOG_INFO("server.worldserver", "Created character '{}' with GUID {}, class {}, race {}, gender {}, level {}, at_login flags: {}", 
-             request.character.name, newGuid, classId, raceId, gender, request.character.level, atLoginFlags);
-    
-    // Add character to cache (required for customization to work)
-    sCharacterCache->AddCharacterCacheEntry(ObjectGuid(HighGuid::Player, newGuid), accountId, request.character.name, 
-                                            gender, raceId, classId, request.character.level);
+    LOG_INFO("server.worldserver", "Created character '{}' with GUID {}, class {}, race {}, level {}", 
+             request.character.name, newGuid, classId, raceId, request.character.level);
     
     return true;
 }
