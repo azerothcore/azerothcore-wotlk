@@ -1,8 +1,10 @@
-# ![logo](https://raw.githubusercontent.com/n4ru/warsongcore-azeroth/d96441e757a0cd8cb05fc5486e41d8edb3e2f3b0/wsc.png)
+<p align="center">
+  <img src="https://raw.githubusercontent.com/n4ru/warsongcore-azeroth/d96441e757a0cd8cb05fc5486e41d8edb3e2f3b0/wsc.png">
+</p>
 
 ## Introduction
 
-WarsongCore is a modification of AzerothCore, with the expressed goal of optimizing for a pure battlegrounds only experience.
+WarsongCore is a modification of AzerothCore, with the expressed goal of optimizing for a pure battlegrounds only experience, and in particular replicating the experience of Blizzlike Warsong Gulch premades across twink brackets (and more).
 
 ## Philosophy
 
