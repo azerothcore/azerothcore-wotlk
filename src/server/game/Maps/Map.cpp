@@ -921,11 +921,10 @@ void Map::MoveAllCreaturesInMoveList()
 
         Cell const& old_cell = c->GetCurrentCell();
         Cell new_cell(c->GetPositionX(), c->GetPositionY());
-        MapGridType* oldGrid = GetMapGrid(old_cell.GridX(), old_cell.GridY());
         if (c->IsFarVisible())
         {
-            oldGrid->RemoveFarVisibleObject(old_cell.CellX(), old_cell.CellY(), c);
-            AddWorldObjectToFarVisibleMap(c);
+            // Removes via GetCurrentCell, added back in AddToGrid
+            RemoveWorldObjectFromFarVisibleMap(c);
         }
 
         c->RemoveFromGrid();
@@ -956,11 +955,11 @@ void Map::MoveAllGameObjectsInMoveList()
 
         Cell const& old_cell = go->GetCurrentCell();
         Cell new_cell(go->GetPositionX(), go->GetPositionY());
-        MapGridType* oldGrid = GetMapGrid(old_cell.GridX(), old_cell.GridY());
+
         if (go->IsFarVisible())
         {
-            oldGrid->RemoveFarVisibleObject(old_cell.CellX(), old_cell.CellY(), go);
-            AddWorldObjectToFarVisibleMap(go);
+            // Removes via GetCurrentCell, added back in AddToGrid
+            RemoveWorldObjectFromFarVisibleMap(go);
         }
 
         go->RemoveFromGrid();
