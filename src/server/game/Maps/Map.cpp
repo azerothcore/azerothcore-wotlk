@@ -622,12 +622,18 @@ void Map::AddWorldObjectToFarVisibleMap(WorldObject* obj)
 
 void Map::RemoveWorldObjectFromFarVisibleMap(WorldObject* obj)
 {
-    Cell curr_cell(obj->GetPositionX(), obj->GetPositionY());
-    MapGridType* grid = GetMapGrid(curr_cell.GridX(), curr_cell.GridY());
-    if (obj->IsCreature())
-        grid->RemoveFarVisibleObject(curr_cell.CellX(), curr_cell.CellY(), obj->ToCreature());
-    else if (obj->IsGameObject())
-        grid->RemoveFarVisibleObject(curr_cell.CellX(), curr_cell.CellY(), obj->ToGameObject());
+    if (Creature* creature = obj->ToCreature())
+    {
+        Cell curr_cell = creature->GetCurrentCell();
+        MapGridType* grid = GetMapGrid(curr_cell.GridX(), curr_cell.GridY());
+        grid->RemoveFarVisibleObject(curr_cell.CellX(), curr_cell.CellY(), creature);
+    }
+    else if (GameObject* go = obj->ToGameObject())
+    {
+        Cell curr_cell = go->GetCurrentCell();
+        MapGridType* grid = GetMapGrid(curr_cell.GridX(), curr_cell.GridY());
+        grid->RemoveFarVisibleObject(curr_cell.CellX(), curr_cell.CellY(), go);
+    }
 }
 
 // Used in VisibilityDistanceType::Infinite
