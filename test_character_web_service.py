@@ -20,45 +20,72 @@ def test_character_web_service(host="localhost", port=8080):
     
     # Sample data from the original request
     test_data = {
-    "name": "Balance",
-    "phase": 1,
+    "name": "H",
+    "phase": 5,
+    "links": {
+        "talents": "https://sixtyupgrades.com/wotlk/talents/druid/0Ab4e?g=0h1d"
+    },
     "character": {
         "name": "Thirk",
-        "level": 29,
-        "gameClass": "MAGE",
-        "race": "HUMAN",
+        "level": 19,
+        "gameClass": "DRUID",
+        "race": "NIGHTELF",
         "faction": "ALLIANCE"
     },
     "items": [
         {
-            "name": "Spellpower Goggles Xtreme",
-            "id": 10502,
+            "name": "Lucky Fishing Hat",
+            "id": 19972,
+            "enchant": {
+                "name": "Lesser Arcanum of Constitution",
+                "id": 1503,
+                "itemId": 11642
+            },
             "slot": "HEAD"
         },
         {
-            "name": "River Pride Choker",
-            "id": 13087,
-            "acquired": True,
+            "name": "Thick Bronze Necklace",
+            "id": 21933,
             "slot": "NECK"
         },
         {
-            "name": "Robes of Arugal",
-            "id": 6324,
+            "name": "Talbar Mantle",
+            "id": 10657,
             "enchant": {
-                "name": "Enchant Chest - Major Health",
-                "id": 1892,
-                "spellId": 20026
+                "name": "Resilience of the Scourge",
+                "id": 2715,
+                "itemId": 23547
+            },
+            "slot": "SHOULDERS"
+        },
+        {
+            "name": "Robe of the Moccasin",
+            "id": 6465,
+            "enchant": {
+                "name": "Enchant Chest - Exceptional Health",
+                "id": 2659,
+                "spellId": 27957
             },
             "slot": "CHEST"
         },
         {
-            "name": "Highlander's Cloth Girdle",
-            "id": 20099,
+            "name": "Keller's Girdle",
+            "id": 2911,
             "slot": "WAIST"
         },
         {
-            "name": "Highlander's Cloth Boots",
-            "id": 20096,
+            "name": "Darkweave Breeches",
+            "id": 12987,
+            "enchant": {
+                "name": "Golden Spellthread",
+                "id": 2746,
+                "itemId": 24276
+            },
+            "slot": "LEGS"
+        },
+        {
+            "name": "Nat Pagle's Extreme Anglin' Boots",
+            "id": 19969,
             "enchant": {
                 "name": "Enchant Boots - Fortitude",
                 "id": 2649,
@@ -67,58 +94,67 @@ def test_character_web_service(host="localhost", port=8080):
             "slot": "FEET"
         },
         {
-            "name": "Vital Bracelets",
-            "id": 14206,
+            "name": "Mindthrust Bracers",
+            "id": 1974,
             "enchant": {
-                "name": "Enchant Bracer - Superior Stamina",
-                "id": 1886,
-                "spellId": 20011
+                "name": "Enchant Bracer - Superior Healing",
+                "id": 2650,
+                "spellId": 27911
             },
             "slot": "WRISTS"
         },
         {
-            "name": "Hotshot Pilot's Gloves",
-            "id": 9491,
+            "name": "Serpent Gloves",
+            "id": 5970,
             "enchant": {
-                "name": "Enchant Gloves - Frost Power",
-                "id": 2615,
-                "spellId": 25074
+                "name": "Enchant Gloves - Major Healing",
+                "id": 2322,
+                "spellId": 33999
             },
-            "acquired": True,
             "slot": "HANDS"
         },
         {
-            "name": "Deadman's Hand",
-            "id": 34227,
+            "name": "Seal of Sylvanas",
+            "id": 6414,
+            "enchant": {
+                "name": "Enchant Ring - Healing Power",
+                "id": 2930,
+                "spellId": 27926
+            },
             "slot": "FINGER_1"
         },
         {
-            "name": "Rune of Perfection",
-            "id": 21566,
-            "slot": "TRINKET_1"
+            "name": "Blood Ring",
+            "id": 4998,
+            "enchant": {
+                "name": "Enchant Ring - Healing Power",
+                "id": 2930,
+                "spellId": 27926
+            },
+            "slot": "FINGER_2"
         },
         {
             "name": "Arena Grand Master",
             "id": 19024,
+            "slot": "TRINKET_1"
+        },
+        {
+            "name": "Hook of the Master Angler",
+            "id": 19979,
             "slot": "TRINKET_2"
         },
         {
-            "name": "Parachute Cloak",
-            "id": 10518,
-            "enchant": {
-                "name": "Enchant Cloak - Spell Penetration",
-                "id": 2938,
-                "spellId": 34003
-            },
+            "name": "Caretaker's Cape",
+            "id": 20428,
             "slot": "BACK"
         },
         {
-            "name": "Zealot Blade",
-            "id": 13033,
+            "name": "Devout Aurastone Hammer",
+            "id": 42948,
             "enchant": {
-                "name": "Enchant Weapon - Spellpower",
-                "id": 2504,
-                "spellId": 22749
+                "name": "Enchant Weapon - Major Healing",
+                "id": 3846,
+                "spellId": 34010
             },
             "slot": "MAIN_HAND"
         },
@@ -126,30 +162,54 @@ def test_character_web_service(host="localhost", port=8080):
             "name": "Furbolg Medicine Pouch",
             "id": 16768,
             "slot": "OFF_HAND"
-        },
-        {
-            "name": "Gravestone Scepter",
-            "id": 7001,
-            "slot": "RANGED"
         }
     ],
     "consumables": [],
     "buffs": [],
-    "talents": [],
-    "glyphs": [],
+    "talents": [
+        {
+            "name": "Starlight Wrath",
+            "id": 762,
+            "rank": 5,
+            "spellId": 16818
+        },
+        {
+            "name": "Improved Moonfire",
+            "id": 763,
+            "rank": 1,
+            "spellId": 16821
+        },
+        {
+            "name": "Genesis",
+            "id": 2238,
+            "rank": 4,
+            "spellId": 57813
+        }
+    ],
+    "glyphs": [
+        {
+            "name": "Glyph of Healing Touch",
+            "id": 40914,
+            "type": "MAJOR"
+        },
+        {
+            "name": "Glyph of the Wild",
+            "id": 43335,
+            "type": "MINOR"
+        }
+    ],
     "points": [
         {
-            "name": "Fire",
+            "name": "Balance",
             "stats": {
                 "spellDamage": 1,
-                "fireDamage": 1,
-                "critRating": 0.84,
-                "hasteRating": 0.66,
-                "hitRating": 1.5,
-                "intellect": 0.56,
-                "mp5": 0.35,
-                "spirit": 0.68,
-                "metaSockets": 30,
+                "arcaneDamage": 1,
+                "critRating": 0.7,
+                "hasteRating": 0.7,
+                "hitRating": 1.2,
+                "intellect": 0.41,
+                "spirit": 0.34,
+                "metaSockets": 164,
                 "redSockets": 19,
                 "yellowSockets": 19,
                 "blueSockets": 19,
@@ -158,34 +218,30 @@ def test_character_web_service(host="localhost", port=8080):
         }
     ],
     "stats": {
-        "agility": 33,
-        "arcaneDamage": 120,
-        "armor": 410,
-        "armorBonus": 110,
+        "agility": 35,
+        "arcaneDamage": 183,
+        "armor": 339,
         "attackPower": 44,
-        "crit": 5.42,
-        "defense": 145,
-        "dodge": 5.37,
-        "expertise": 3,
-        "fireDamage": 120,
-        "frostDamage": 140,
-        "healing": 120,
-        "health": 1673,
-        "holyDamage": 120,
-        "intellect": 91,
-        "mainHandSpeed": 2.8,
-        "mana": 1677,
-        "natureDamage": 120,
+        "crit": 10.24,
+        "defense": 95,
+        "dodge": 10.41,
+        "fireDamage": 183,
+        "frostDamage": 183,
+        "healing": 183,
+        "health": 1773,
+        "holyDamage": 183,
+        "intellect": 82,
+        "mainHandSpeed": 2.7,
+        "mana": 1279,
+        "mp5": 6,
+        "natureDamage": 183,
         "parry": 5,
-        "rangedSpeed": 1.5,
-        "shadowDamage": 120,
-        "shadowResist": 5,
-        "spellCrit": 3.87,
-        "spellDamage": 120,
-        "spellPen": 30,
-        "spirit": 81,
-        "stamina": 138,
-        "strength": 27
+        "shadowDamage": 183,
+        "spellCrit": 6.46,
+        "spellDamage": 183,
+        "spirit": 59,
+        "stamina": 147,
+        "strength": 32
     },
     "exportOptions": {
         "buffs": True,

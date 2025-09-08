@@ -231,18 +231,43 @@ void CharacterWebService::ProcessCharacterRequest(const std::string& body, std::
             request.items.push_back(item);
         }
 
+        // Extract talents array if present
+        std::vector<std::string> talentStrings = ExtractJsonArray(body, "talents");
+        for (const auto& talentStr : talentStrings)
+        {
+            TalentData talent;
+            talent.name = ExtractJsonString(talentStr, "name");
+            talent.id = ExtractJsonNumber(talentStr, "id");
+            talent.rank = ExtractJsonNumber(talentStr, "rank");
+            talent.spellId = ExtractJsonNumber(talentStr, "spellId");
+            request.talents.push_back(talent);
+        }
+
+        // Extract glyphs array if present
+        std::vector<std::string> glyphStrings = ExtractJsonArray(body, "glyphs");
+        for (const auto& glyphStr : glyphStrings)
+        {
+            GlyphData glyph;
+            glyph.name = ExtractJsonString(glyphStr, "name");
+            glyph.id = ExtractJsonNumber(glyphStr, "id");
+            glyph.type = ExtractJsonString(glyphStr, "type");
+            request.glyphs.push_back(glyph);
+        }
+
         bool success = ApplyCharacterGear(request);
         
         // Build response JSON manually
         std::ostringstream oss;
         oss << "{\"success\":" << (success ? "true" : "false") 
             << ",\"character\":\"" << request.character.name << "\""
-            << ",\"itemsApplied\":" << (success ? request.items.size() : 0);
+            << ",\"itemsApplied\":" << (success ? request.items.size() : 0)
+            << ",\"talentsApplied\":" << (success ? request.talents.size() : 0)
+            << ",\"glyphsApplied\":" << (success ? request.glyphs.size() : 0);
         
         if (success)
-            oss << ",\"message\":\"Character configuration and gear updated successfully\"";
+            oss << ",\"message\":\"Character configuration, gear, talents and glyphs updated successfully\"";
         else
-            oss << ",\"error\":\"Failed to update character configuration and gear\"";
+            oss << ",\"error\":\"Failed to update character configuration, gear, talents and glyphs\"";
             
         oss << "}";
         response = oss.str();
@@ -324,6 +349,18 @@ bool CharacterWebService::ApplyCharacterGear(const CharacterRequest& request)
     if (classId > 0 && raceId > 0)
     {
         GrantAllClassSpells(characterGuid, request.character.level, classId, raceId, trans);
+    }
+    
+    // Apply talents if provided
+    if (!request.talents.empty())
+    {
+        ApplyCharacterTalents(characterGuid, request.talents, trans);
+    }
+    
+    // Apply glyphs if provided
+    if (!request.glyphs.empty())
+    {
+        ApplyCharacterGlyphs(characterGuid, request.glyphs, trans);
     }
     
     // Grant necessary proficiencies before applying gear
@@ -825,6 +862,287 @@ void CharacterWebService::GrantAllClassSpells(uint32 characterGuid, uint8 level,
     
     LOG_INFO("server.worldserver", "Granted {} main talent tree spells to character {} (level {} {} {})", 
              spellsGranted, characterGuid, level, className, raceName);
+}
+
+void CharacterWebService::ApplyCharacterTalents(uint32 characterGuid, const std::vector<TalentData>& talents, CharacterDatabaseTransaction& trans)
+{
+    // First, clear existing talents
+    trans->Append("DELETE FROM character_talent WHERE guid = {}", characterGuid);
+    
+    // Apply each talent
+    for (const auto& talent : talents)
+    {
+        // Add the talent entry
+        // specMask 255 means active for all specs
+        trans->Append("INSERT INTO character_talent (guid, spell, specMask) VALUES ({}, {}, 255)", 
+                     characterGuid, talent.spellId);
+        
+        // Also add the spell to character_spell if it's not already there
+        trans->Append("INSERT INTO character_spell (guid, spell, specMask) VALUES ({}, {}, 255) "
+                     "ON DUPLICATE KEY UPDATE specMask = 255", 
+                     characterGuid, talent.spellId);
+        
+        LOG_DEBUG("server.worldserver", "Applied talent '{}' (spell {}) rank {} to character {}", 
+                  talent.name, talent.spellId, talent.rank, characterGuid);
+    }
+    
+    LOG_INFO("server.worldserver", "Applied {} talents to character {}", 
+             talents.size(), characterGuid);
+}
+
+uint32 CharacterWebService::GetGlyphSpellId(uint32 itemId)
+{
+    // Query the item_template table to get the spell that the item casts
+    // For glyphs, this spell will have SPELL_EFFECT_APPLY_GLYPH effect
+    QueryResult result = WorldDatabase.Query(
+        "SELECT class, spellid_1, spellid_2, spellid_3, spellid_4, spellid_5, spelltrigger_1, spelltrigger_2 FROM item_template WHERE entry = {}",
+        itemId
+    );
+    
+    if (!result)
+    {
+        LOG_WARN("server.worldserver", "Item {} not found in item_template", itemId);
+        return 0;
+    }
+    
+    Field* fields = result->Fetch();
+    uint32 itemClass = fields[0].Get<uint32>();
+    
+    // Check if it's a glyph (class 16)
+    if (itemClass != 16)
+    {
+        LOG_WARN("server.worldserver", "Item {} is not a glyph (class {}), expected class 16", itemId, itemClass);
+        return 0;
+    }
+    
+    // Find the spell with ITEM_SPELLTRIGGER_ON_USE (trigger = 0)
+    uint32 useSpellId = 0;
+    for (int i = 0; i < 5; ++i)
+    {
+        uint32 spellId = fields[1 + i].Get<uint32>();
+        if (spellId > 0)
+        {
+            // Check spell trigger if it's one of the first two spells
+            if (i < 2)
+            {
+                uint32 trigger = fields[6 + i].Get<uint32>();
+                if (trigger == 0) // ITEM_SPELLTRIGGER_ON_USE
+                {
+                    useSpellId = spellId;
+                    LOG_DEBUG("server.worldserver", "Found use spell {} in spellid_{} for glyph item {}", spellId, i + 1, itemId);
+                    break;
+                }
+            }
+            else if (useSpellId == 0)
+            {
+                // Fallback to any spell if no ON_USE trigger found
+                useSpellId = spellId;
+                LOG_DEBUG("server.worldserver", "Using spell {} from spellid_{} for glyph item {}", spellId, i + 1, itemId);
+            }
+        }
+    }
+    
+    if (useSpellId == 0)
+    {
+        LOG_WARN("server.worldserver", "Glyph item {} has no spells", itemId);
+        return 0;
+    }
+    
+    // Now get the spell info to find the MiscValue which contains the glyph ID
+    SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(useSpellId);
+    if (!spellInfo)
+    {
+        LOG_WARN("server.worldserver", "Spell {} not found for glyph item {}", useSpellId, itemId);
+        return 0;
+    }
+    
+    // Find the SPELL_EFFECT_APPLY_GLYPH effect
+    for (uint8 i = 0; i < MAX_SPELL_EFFECTS; ++i)
+    {
+        if (spellInfo->Effects[i].Effect == SPELL_EFFECT_APPLY_GLYPH)
+        {
+            uint32 glyphId = spellInfo->Effects[i].MiscValue;
+            
+            // Look up the glyph properties to get the actual glyph spell
+            if (GlyphPropertiesEntry const* gp = sGlyphPropertiesStore.LookupEntry(glyphId))
+            {
+                LOG_DEBUG("server.worldserver", "Found glyph spell {} for item {} (glyph id {})", 
+                          gp->SpellId, itemId, glyphId);
+                return gp->SpellId;
+            }
+            else
+            {
+                LOG_WARN("server.worldserver", "Glyph properties not found for glyph id {} (item {})", 
+                         glyphId, itemId);
+                return 0;
+            }
+        }
+    }
+    
+    LOG_WARN("server.worldserver", "No SPELL_EFFECT_APPLY_GLYPH found in spell {} for item {}", useSpellId, itemId);
+    return 0;
+}
+
+void CharacterWebService::ApplyCharacterGlyphs(uint32 characterGuid, const std::vector<GlyphData>& glyphs, CharacterDatabaseTransaction& trans)
+{
+    // First, clear existing glyphs
+    trans->Append("DELETE FROM character_glyphs WHERE guid = {}", characterGuid);
+    
+    // In WotLK, glyph slots are indexed 0-5 with specific types:
+    // Slots 0, 2, 4: Major glyphs (even indexes)
+    // Slots 1, 3, 5: Minor glyphs (odd indexes)
+    // They unlock in order: 0 (lvl 15), 1 (lvl 15), 2 (lvl 30), 3 (lvl 50), 4 (lvl 70), 5 (lvl 80)
+    
+    uint32 glyphEntryIds[6] = {0, 0, 0, 0, 0, 0}; // The glyph IDs for character_glyphs table
+    uint8 majorCount = 0;
+    uint8 minorCount = 0;
+    
+    for (const auto& glyph : glyphs)
+    {
+        // Get both glyph entry ID and spell ID
+        uint32 glyphEntryId = 0;
+        uint32 glyphSpellId = 0;
+        
+        // Query the item to get the use spell
+        QueryResult itemResult = WorldDatabase.Query(
+            "SELECT class, spellid_1, spellid_2, spellid_3, spellid_4, spellid_5, spelltrigger_1, spelltrigger_2 FROM item_template WHERE entry = {}",
+            glyph.id
+        );
+        
+        if (!itemResult)
+        {
+            LOG_ERROR("server.worldserver", "Glyph item {} not found, skipping", glyph.id);
+            continue;
+        }
+        
+        Field* fields = itemResult->Fetch();
+        uint32 itemClass = fields[0].Get<uint32>();
+        
+        if (itemClass != 16) // Not a glyph
+        {
+            LOG_ERROR("server.worldserver", "Item {} is not a glyph (class {}), skipping", glyph.id, itemClass);
+            continue;
+        }
+        
+        // Find the use spell
+        uint32 useSpellId = 0;
+        for (int i = 0; i < 5; ++i)
+        {
+            uint32 spellId = fields[1 + i].Get<uint32>();
+            if (spellId > 0)
+            {
+                if (i < 2)
+                {
+                    uint32 trigger = fields[6 + i].Get<uint32>();
+                    if (trigger == 0) // ITEM_SPELLTRIGGER_ON_USE
+                    {
+                        useSpellId = spellId;
+                        break;
+                    }
+                }
+                else if (useSpellId == 0)
+                {
+                    useSpellId = spellId;
+                }
+            }
+        }
+        
+        if (useSpellId == 0)
+        {
+            LOG_ERROR("server.worldserver", "No use spell found for glyph item {}, skipping", glyph.id);
+            continue;
+        }
+        
+        // Get the spell info to find the glyph entry ID
+        SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(useSpellId);
+        if (!spellInfo)
+        {
+            LOG_ERROR("server.worldserver", "Spell {} not found for glyph item {}, skipping", useSpellId, glyph.id);
+            continue;
+        }
+        
+        // Find SPELL_EFFECT_APPLY_GLYPH effect to get the glyph entry ID
+        for (uint8 i = 0; i < MAX_SPELL_EFFECTS; ++i)
+        {
+            if (spellInfo->Effects[i].Effect == SPELL_EFFECT_APPLY_GLYPH)
+            {
+                glyphEntryId = spellInfo->Effects[i].MiscValue;
+                
+                // Look up the glyph properties to get the glyph spell
+                if (GlyphPropertiesEntry const* gp = sGlyphPropertiesStore.LookupEntry(glyphEntryId))
+                {
+                    glyphSpellId = gp->SpellId;
+                    break;
+                }
+            }
+        }
+        
+        if (glyphEntryId == 0 || glyphSpellId == 0)
+        {
+            LOG_ERROR("server.worldserver", "Could not find glyph data for item {}, skipping", glyph.id);
+            continue;
+        }
+        
+        // Add the glyph spell to the character's spell list
+        trans->Append("INSERT INTO character_spell (guid, spell, specMask) VALUES ({}, {}, 255) "
+                     "ON DUPLICATE KEY UPDATE specMask = 255", 
+                     characterGuid, glyphSpellId);
+        
+        // Get the actual glyph type from GlyphProperties
+        GlyphPropertiesEntry const* glyphProps = sGlyphPropertiesStore.LookupEntry(glyphEntryId);
+        if (!glyphProps)
+        {
+            LOG_ERROR("server.worldserver", "Could not find GlyphProperties for glyph {}, skipping", glyphEntryId);
+            continue;
+        }
+        
+        // TypeFlags: 0 = Major, 1 = Minor
+        bool isMajor = (glyphProps->TypeFlags == 0);
+        
+        if (isMajor)
+        {
+            // Major glyphs go in even slots: 0, 2, 4
+            if (majorCount < 3)
+            {
+                uint8 slotIndex = majorCount * 2; // 0, 2, 4
+                glyphEntryIds[slotIndex] = glyphEntryId;
+                LOG_DEBUG("server.worldserver", "Applied MAJOR glyph '{}' (item {} -> glyph {} -> spell {}) to slot {}", 
+                          glyph.name, glyph.id, glyphEntryId, glyphSpellId, slotIndex);
+                majorCount++;
+            }
+            else
+            {
+                LOG_ERROR("server.worldserver", "Too many major glyphs for character {}, skipping glyph '{}'", 
+                         characterGuid, glyph.name);
+            }
+        }
+        else  // Minor glyph
+        {
+            // Minor glyphs go in odd slots: 1, 3, 5
+            if (minorCount < 3)
+            {
+                uint8 slotIndex = (minorCount * 2) + 1; // 1, 3, 5
+                glyphEntryIds[slotIndex] = glyphEntryId;
+                LOG_DEBUG("server.worldserver", "Applied MINOR glyph '{}' (item {} -> glyph {} -> spell {}) to slot {}", 
+                          glyph.name, glyph.id, glyphEntryId, glyphSpellId, slotIndex);
+                minorCount++;
+            }
+            else
+            {
+                LOG_ERROR("server.worldserver", "Too many minor glyphs for character {}, skipping glyph '{}'", 
+                         characterGuid, glyph.name);
+            }
+        }
+    }
+    
+    // Insert all glyphs in a single row
+    // talentGroup 0 is the primary spec
+    trans->Append("INSERT INTO character_glyphs (guid, talentGroup, glyph1, glyph2, glyph3, glyph4, glyph5, glyph6) "
+                 "VALUES ({}, 0, {}, {}, {}, {}, {}, {})", 
+                 characterGuid, glyphEntryIds[0], glyphEntryIds[1], glyphEntryIds[2], glyphEntryIds[3], glyphEntryIds[4], glyphEntryIds[5]);
+    
+    LOG_INFO("server.worldserver", "Applied {} glyphs ({} major, {} minor) to character {}", 
+             glyphs.size(), majorCount, minorCount, characterGuid);
 }
 
 bool CharacterWebService::DeleteCharacterFromDatabase(const std::string& characterName, uint32 accountId, CharacterDatabaseTransaction& trans)

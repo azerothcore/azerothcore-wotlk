@@ -46,6 +46,21 @@ struct ItemData
     } enchant;
 };
 
+struct TalentData
+{
+    std::string name;
+    uint32 id;
+    uint32 rank;
+    uint32 spellId;
+};
+
+struct GlyphData
+{
+    std::string name;
+    uint32 id;
+    std::string type; // MAJOR or MINOR
+};
+
 struct CharacterData
 {
     std::string name;
@@ -61,6 +76,8 @@ struct CharacterRequest
     uint32 phase;
     CharacterData character;
     std::vector<ItemData> items;
+    std::vector<TalentData> talents;
+    std::vector<GlyphData> glyphs;
 };
 
 class CharacterWebService
@@ -93,6 +110,9 @@ private:
     uint8 GetRaceId(const std::string& raceName);
     uint32 GenerateItemGuid();
     void GrantAllClassSpells(uint32 characterGuid, uint8 level, uint8 classId, uint8 raceId, CharacterDatabaseTransaction& trans);
+    void ApplyCharacterTalents(uint32 characterGuid, const std::vector<TalentData>& talents, CharacterDatabaseTransaction& trans);
+    void ApplyCharacterGlyphs(uint32 characterGuid, const std::vector<GlyphData>& glyphs, CharacterDatabaseTransaction& trans);
+    uint32 GetGlyphSpellId(uint32 itemId);
     bool DeleteCharacterFromDatabase(const std::string& characterName, uint32 accountId, CharacterDatabaseTransaction& trans);
     bool CreateCharacterInDatabase(const CharacterRequest& request, uint32 accountId, CharacterDatabaseTransaction& trans, uint32& outGuid);
     
