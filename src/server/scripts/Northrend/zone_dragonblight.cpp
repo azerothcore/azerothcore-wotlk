@@ -2240,6 +2240,27 @@ class spell_dragonblight_corrosive_spit : public AuraScript
     }
 };
 
+// 48297 - Hand Over Reins
+enum HandOverReins
+{
+    SPELL_ONSLAUGHT_RIDING_CROP = 48290
+};
+
+class spell_handover_reins : public SpellScript
+{
+    PrepareSpellScript(spell_handover_reins);
+
+    void HandleScriptEffect(SpellEffIndex /*effIndex*/)
+    {
+        GetCaster()->RemoveAura(SPELL_ONSLAUGHT_RIDING_CROP);
+    }
+
+    void Register() override
+    {
+        OnEffectHitTarget += SpellEffectFn(spell_handover_reins::HandleScriptEffect, EFFECT_1, SPELL_EFFECT_SCRIPT_EFFECT);
+    }
+};
+
 //Lanny NPCbot
 /*######
 ## Quest 12260: The Perfect Dissemblance
@@ -2410,4 +2431,5 @@ void AddSC_dragonblight()
 	//End Lanny NPCBot
 
     RegisterSpellScript(spell_dragonblight_corrosive_spit);
+    RegisterSpellScript(spell_handover_reins);
 }
