@@ -22,4 +22,3 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 (27213, 0, 9, 0, 61, 2, 100, 512, 0, 0, 0, 0, 0, 0, 22, 3, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Onslaught Warhorse - On Aura \'Onslaught Riding Crop\' - Set Event Phase 3 (Phase 2)'),
 (27213, 0, 10, 11, 31, 4, 100, 513, 48297, 0, 0, 0, 0, 0, 22, 4, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Onslaught Warhorse - On Target Spellhit \'Hand Over Reins\' - Set Event Phase 4 (Phase 3) (No Repeat)'),
 (27213, 0, 11, 0, 61, 8, 100, 512, 0, 0, 0, 0, 0, 0, 80, 2721301, 2, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Onslaught Warhorse - On Target Spellhit \'Hand Over Reins\' - Run Script (Phase 3) (No Repeat)');
-
