@@ -1018,6 +1018,8 @@ class spell_chapter2_persuasive_strike : public SpellScript
                     Unit::Kill(caster, creature);
                     caster->GroupEventHappens(QUEST_HOW_TO_WIN_FRIENDS, creature);
                 }
+                else
+                    creature->KillSelf();
             }, 48s);
         }
         else
