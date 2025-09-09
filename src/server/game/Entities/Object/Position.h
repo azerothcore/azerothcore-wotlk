@@ -229,7 +229,7 @@ struct Position
     }
 
     [[nodiscard]] bool IsWithinBox(const Position& center, float xradius, float yradius, float zradius) const;
-    bool HasInArc(float arcangle, const Position* pos, float targetRadius = 2.0f) const;
+    bool HasInArc(float arcangle, const Position* pos, float border = 2.0f) const;
     bool HasInLine(Position const* pos, float width) const;
     [[nodiscard]] std::string ToString() const;
 
