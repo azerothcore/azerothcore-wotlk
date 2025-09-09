@@ -2124,6 +2124,25 @@ public:
     }
 };
 
+// 45612 - Necropolis Beam
+class spell_necropolis_beam: public SpellScript
+{
+    PrepareSpellScript(spell_necropolis_beam);
+
+    void SetDest(SpellDestination& dest)
+    {
+        Unit* caster = GetCaster();
+        float floorZ = caster->GetMapHeight(caster->GetPositionX(), caster->GetPositionY(), caster->GetPositionZ());
+        if (floorZ > INVALID_HEIGHT)
+            dest._position.m_positionZ = floorZ;
+    }
+
+    void Register() override
+    {
+        OnDestinationTargetSelect += SpellDestinationTargetSelectFn(spell_necropolis_beam::SetDest, EFFECT_0, TARGET_DEST_CASTER);
+    }
+};
+
 void AddSC_borean_tundra()
 {
     RegisterSpellScript(spell_q11919_q11940_drake_hunt_aura);
@@ -2148,4 +2167,5 @@ void AddSC_borean_tundra()
     RegisterSpellScript(spell_q11719_bloodspore_ruination_45997);
     new npc_bloodmage_laurith();
     RegisterCreatureAI(npc_jenny);
+    RegisterSpellScript(spell_necropolis_beam);
 }
