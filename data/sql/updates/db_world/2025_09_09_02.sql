@@ -1,3 +1,4 @@
+-- DB update 2025_09_09_01 -> 2025_09_09_02
 -- Update gameobject 'Death's Gaze Orb' with sniffed values
 -- new spawns
 DELETE FROM `gameobject` WHERE (`id` IN (192917)) AND (`guid` IN (174, 175, 176));

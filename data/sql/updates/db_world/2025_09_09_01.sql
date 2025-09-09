@@ -1,3 +1,4 @@
+-- DB update 2025_09_09_00 -> 2025_09_09_01
 -- Update gameobject 'Meat Wagon' with sniffed values
 -- updated spawns
 DELETE FROM `gameobject` WHERE (`id` IN (193616, 193618, 193620)) AND (`guid` IN (62425, 62426, 62430, 62435, 62436, 62437));
