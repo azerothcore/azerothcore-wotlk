@@ -20,7 +20,6 @@
 #include "gundrak.h"
 #include "GameObjectAI.h"
 
-
 DoorData const doorData[] =
 {
     { GO_ECK_DOORS,             DATA_MOORABI,           DOOR_TYPE_PASSAGE },
