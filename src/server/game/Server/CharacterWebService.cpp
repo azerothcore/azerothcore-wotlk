@@ -317,17 +317,68 @@ bool CharacterWebService::ApplyCharacterGear(const CharacterRequest& request)
 
     bool success = true;
     
-    // Delete existing character if it exists (in separate transaction to ensure it completes)
-    if (characterExists)
+    // WSC-CL
+    // Check config to determine deletion behavior
+    bool deleteAllCharacters = sWorld->getIntConfig(CONFIG_WEB_SERVICE_DELETE_ALL_CHARS) == 1;
+    
+    if (deleteAllCharacters)
     {
-        CharacterDatabaseTransaction deleteTrans = CharacterDatabase.BeginTransaction();
-        if (!DeleteCharacterFromDatabase(request.character.name, accountId, deleteTrans))
+        // Delete ALL existing characters for this account before importing the new one
+        LOG_INFO("server.worldserver", "Deleting all existing characters for account {} before import", accountId);
+        
+        CharacterDatabaseTransaction deleteAllTrans = CharacterDatabase.BeginTransaction();
+        
+        // Delete from all character-related tables using account ID directly where possible
+        // For tables that need character GUIDs, we use subqueries
+        deleteAllTrans->Append("DELETE FROM character_account_data WHERE guid IN (SELECT guid FROM characters WHERE account = {})", accountId);
+        deleteAllTrans->Append("DELETE FROM character_action WHERE guid IN (SELECT guid FROM characters WHERE account = {})", accountId);
+        deleteAllTrans->Append("DELETE FROM character_aura WHERE guid IN (SELECT guid FROM characters WHERE account = {})", accountId);
+        deleteAllTrans->Append("DELETE FROM character_homebind WHERE guid IN (SELECT guid FROM characters WHERE account = {})", accountId);
+        deleteAllTrans->Append("DELETE FROM character_instance WHERE guid IN (SELECT guid FROM characters WHERE account = {})", accountId);
+        deleteAllTrans->Append("DELETE FROM character_inventory WHERE guid IN (SELECT guid FROM characters WHERE account = {})", accountId);
+        deleteAllTrans->Append("DELETE FROM item_instance WHERE owner_guid IN (SELECT guid FROM characters WHERE account = {})", accountId);
+        deleteAllTrans->Append("DELETE FROM character_pet WHERE owner IN (SELECT guid FROM characters WHERE account = {})", accountId);
+        deleteAllTrans->Append("DELETE FROM character_queststatus WHERE guid IN (SELECT guid FROM characters WHERE account = {})", accountId);
+        deleteAllTrans->Append("DELETE FROM character_queststatus_rewarded WHERE guid IN (SELECT guid FROM characters WHERE account = {})", accountId);
+        deleteAllTrans->Append("DELETE FROM character_reputation WHERE guid IN (SELECT guid FROM characters WHERE account = {})", accountId);
+        deleteAllTrans->Append("DELETE FROM character_spell WHERE guid IN (SELECT guid FROM characters WHERE account = {})", accountId);
+        deleteAllTrans->Append("DELETE FROM character_spell_cooldown WHERE guid IN (SELECT guid FROM characters WHERE account = {})", accountId);
+        deleteAllTrans->Append("DELETE FROM character_stats WHERE guid IN (SELECT guid FROM characters WHERE account = {})", accountId);
+        deleteAllTrans->Append("DELETE FROM character_skills WHERE guid IN (SELECT guid FROM characters WHERE account = {})", accountId);
+        deleteAllTrans->Append("DELETE FROM character_glyphs WHERE guid IN (SELECT guid FROM characters WHERE account = {})", accountId);
+        deleteAllTrans->Append("DELETE FROM character_talent WHERE guid IN (SELECT guid FROM characters WHERE account = {})", accountId);
+        deleteAllTrans->Append("DELETE FROM character_achievement WHERE guid IN (SELECT guid FROM characters WHERE account = {})", accountId);
+        deleteAllTrans->Append("DELETE FROM character_achievement_progress WHERE guid IN (SELECT guid FROM characters WHERE account = {})", accountId);
+        deleteAllTrans->Append("DELETE FROM character_equipmentsets WHERE guid IN (SELECT guid FROM characters WHERE account = {})", accountId);
+        deleteAllTrans->Append("DELETE FROM mail WHERE receiver IN (SELECT guid FROM characters WHERE account = {})", accountId);
+        deleteAllTrans->Append("DELETE FROM character_social WHERE guid IN (SELECT guid FROM characters WHERE account = {}) OR friend IN (SELECT guid FROM characters WHERE account = {})", accountId, accountId);
+        deleteAllTrans->Append("DELETE FROM guild_member WHERE guid IN (SELECT guid FROM characters WHERE account = {})", accountId);
+        
+        // Finally delete the character records themselves
+        deleteAllTrans->Append("DELETE FROM characters WHERE account = {}", accountId);
+        
+        CharacterDatabase.CommitTransaction(deleteAllTrans);
+        LOG_INFO("server.worldserver", "Successfully deleted all existing characters for account {}", accountId);
+    }
+    else
+    {
+        // Only delete the character with the same name if it exists
+        if (characterExists)
         {
-            LOG_ERROR("server.worldserver", "Failed to delete existing character '{}'", request.character.name);
-            return false;
+            LOG_INFO("server.worldserver", "Found existing character '{}' with GUID {}, will delete and recreate", request.character.name, characterGuid);
+            CharacterDatabaseTransaction deleteTrans = CharacterDatabase.BeginTransaction();
+            if (!DeleteCharacterFromDatabase(request.character.name, accountId, deleteTrans))
+            {
+                LOG_ERROR("server.worldserver", "Failed to delete existing character '{}'", request.character.name);
+                return false;
+            }
+            CharacterDatabase.CommitTransaction(deleteTrans);
+            LOG_INFO("server.worldserver", "Successfully deleted existing character '{}'", request.character.name);
         }
-        CharacterDatabase.CommitTransaction(deleteTrans);
-        LOG_INFO("server.worldserver", "Successfully deleted existing character '{}'", request.character.name);
+        else
+        {
+            LOG_INFO("server.worldserver", "Character '{}' not found, will create new character", request.character.name);
+        }
     }
     
     // Determine if we should enable customization based on config
@@ -1229,27 +1280,32 @@ bool CharacterWebService::CreateCharacterInDatabase(const CharacterRequest& requ
         return false;
     }
     
-    // Generate new character GUID using a simple approach
-    // Find the highest existing character GUID across all relevant tables and add 1
-    QueryResult maxGuidResult = CharacterDatabase.Query(
-        "SELECT MAX(max_guid) FROM ("
-        "  SELECT COALESCE(MAX(guid), 0) as max_guid FROM characters "
-        "  UNION ALL "
-        "  SELECT COALESCE(MAX(guid), 0) as max_guid FROM character_stats "
-        "  UNION ALL "
-        "  SELECT COALESCE(MAX(guid), 0) as max_guid FROM character_homebind"
-        ") as all_guids"
-    );
+    // WSC-CL
+    // Use the ObjectMgr's GUID generator to avoid conflicts with manual character creation
+    uint32 newGuid = sObjectMgr->GetGenerator<HighGuid::Player>().Generate();
+
     
-    uint32 newGuid = 1;
-    if (maxGuidResult)
-    {
-        Field* fields = maxGuidResult->Fetch();
-        if (!fields[0].IsNull())
-        {
-            newGuid = fields[0].Get<uint32>() + 1;
-        }
-    }
+    //// Generate new character GUID using a simple approach
+    //// Find the highest existing character GUID across all relevant tables and add 1
+    //QueryResult maxGuidResult = CharacterDatabase.Query(
+    //    "SELECT MAX(max_guid) FROM ("
+    //    "  SELECT COALESCE(MAX(guid), 0) as max_guid FROM characters "
+    //    "  UNION ALL "
+    //    "  SELECT COALESCE(MAX(guid), 0) as max_guid FROM character_stats "
+    //    "  UNION ALL "
+    //    "  SELECT COALESCE(MAX(guid), 0) as max_guid FROM character_homebind"
+    //    ") as all_guids"
+    //);
+    //
+    //uint32 newGuid = 1;
+    //if (maxGuidResult)
+    //{
+    //    Field* fields = maxGuidResult->Fetch();
+    //    if (!fields[0].IsNull())
+    //    {
+    //        newGuid = fields[0].Get<uint32>() + 1;
+    //    }
+    //}
     
     // Return the generated GUID so caller can use it
     outGuid = newGuid;
