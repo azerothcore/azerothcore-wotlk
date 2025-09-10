@@ -28,6 +28,7 @@
 #include "DBCStores.h"
 #include "DatabaseEnv.h"
 #include "ObjectGuid.h"
+#include "CharacterCache.h"
 #include <boost/beast/version.hpp>
 #include <sstream>
 #include <thread>
@@ -347,12 +348,17 @@ bool CharacterWebService::ApplyCharacterGear(const CharacterRequest& request)
     characterGuid = newCharacterGuid;
     LOG_INFO("server.worldserver", "Created new character '{}' with GUID {}", request.character.name, characterGuid);
     
+    // Update the character cache so deletion/customization works properly
+    uint8 classId = GetClassId(request.character.gameClass);
+    uint8 raceId = GetRaceId(request.character.race);
+    uint8 gender = 0; // Default to male for now (will be set properly if customization is enabled)
+    sCharacterCache->AddCharacterCacheEntry(ObjectGuid(HighGuid::Player, characterGuid), accountId, request.character.name, gender, raceId, classId, request.character.level);
+    LOG_INFO("server.worldserver", "Added character '{}' to character cache", request.character.name);
+    
     // Now apply gear, spells, etc. in a second transaction
     CharacterDatabaseTransaction trans = CharacterDatabase.BeginTransaction();
     
     // Grant all class spells available for the character's level and class
-    uint8 classId = GetClassId(request.character.gameClass);
-    uint8 raceId = GetRaceId(request.character.race);
     if (classId > 0 && raceId > 0)
     {
         GrantAllClassSpells(characterGuid, request.character.level, classId, raceId, trans);
