@@ -312,7 +312,7 @@ public:
                     events.ScheduleEvent(EVENT_SORROWGRAVE_FLAMES2, 0ms);
                     events.ScheduleEvent(EVENT_SORROWGRAVE_FLAMES2, 2s);
                     events.ScheduleEvent(EVENT_SORROWGRAVE_FLAMES2, 4s);
-                    events.ScheduleEvent(EVENT_SORROWGRAVE_FLAMES, 25s, 30s);
+                    events.ScheduleEvent(EVENT_SORROWGRAVE_FLAMES, 8s, 12s);
                     break;
                 case EVENT_SORROWGRAVE_FLAMES2:
                     {
