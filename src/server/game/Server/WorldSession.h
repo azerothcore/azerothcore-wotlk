@@ -181,6 +181,7 @@ namespace WorldPackets
         class PartyUnsilence;
         class ChannelSilence;
         class ChannelUnsilence;
+    }
 
     namespace Item
     {
