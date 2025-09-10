@@ -92,3 +92,82 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 (2573000, 9, 16, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 11, 45949, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'En\'kilah Necrolord - Actionlist - Cast \'Release Aberration\''),
 (2573000, 9, 17, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 101, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'En\'kilah Necrolord - Actionlist - Set Home Position');
 
+-- Varidus the Flenser
+-- Set target nearest player for Talk
+DELETE FROM `smart_scripts` WHERE (`entryorguid` = 2561800) AND (`source_type` = 9) AND (`id` IN (14));
+INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `event_param6`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
+(2561800, 9, 14, 0, 0, 0, 100, 0, 7000, 7000, 0, 0, 0, 0, 1, 6, 0, 0, 0, 0, 0, 21, 50, 0, 0, 0, 0, 0, 0, 0, 'Varidus the Flenser - Actionlist - Say Line 6');
+
+-- Varidus the Flenser
+-- Increase forced despawn timer from 100s to 180s
+DELETE FROM `smart_scripts` WHERE (`entryorguid` = 2561800) AND (`source_type` = 9) AND (`id` IN (24));
+INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `event_param6`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
+(2561800, 9, 24, 0, 0, 0, 100, 0, 180000, 180000, 0, 0, 0, 0, 41, 0, 0, 0, 0, 0, 0, 19, 25729, 100, 0, 0, 0, 0, 0, 0, 'Varidus the Flenser - Actionlist - Despawn Instant');
+
+-- Update template to High Overlord Saurfang
+DELETE FROM `smart_scripts` WHERE (`entryorguid` = 2573000) AND (`source_type` = 9) AND (`id` IN (6));
+INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `event_param6`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
+(2573000, 9, 6, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 36, 25749, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'En\'kilah Necrolord - Actionlist - Update Template To \'High Overlord Saurfang\'');
+
+-- Shadowstalker Getry
+-- Talk before starting waypoint
+DELETE FROM `smart_scripts` WHERE (`entryorguid` = 25729) AND (`source_type` = 0) AND (`id` IN (0, 1, 2, 3));
+INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `event_param6`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
+(25729, 0, 0, 1, 19, 0, 100, 512, 11705, 0, 0, 0, 0, 0, 1, 0, 3000, 0, 0, 0, 0, 7, 0, 0, 0, 0, 0, 0, 0, 0, 'Shadowstalker Getry - On Quest \'Foolish Endeavors\' Taken - Say Line 0'),
+(25729, 0, 1, 0, 61, 0, 100, 512, 0, 0, 0, 0, 0, 0, 45, 25729, 0, 0, 0, 0, 0, 19, 25618, 150, 0, 0, 0, 0, 0, 0, 'Shadowstalker Getry - On Quest \'Foolish Endeavors\' Taken - Set Data 25729 0'),
+(25729, 0, 2, 3, 52, 0, 100, 512, 0, 25729, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Shadowstalker Getry - On Text 0 Over - Say Line 1'),
+(25729, 0, 3, 0, 61, 0, 100, 512, 0, 0, 0, 0, 0, 0, 53, 0, 25729, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Shadowstalker Getry - On Text 0 Over - Start Waypoint Path 25729');
+
+-- High Overlord Saurfang
+-- Copy texts from 25751 to 25749
+DELETE FROM `creature_text` WHERE (`CreatureID` = 25749) AND (`GroupID` IN (0, 1, 2, 3, 4, 5, 6, 7));
+INSERT INTO `creature_text` (`CreatureID`, `GroupID`, `ID`, `Text`, `Type`, `Language`, `Probability`, `Emote`, `Duration`, `Sound`, `BroadcastTextId`, `TextRange`, `comment`) VALUES
+(25749, 0, 0, 'I\'ll rip your shriveled heart out with my bare hands before any harm comes to $n, necromancer.', 12, 1, 100, 5, 0, 0, 24918, 0, 'High Overlord Saurfang'),
+(25749, 1, 0, 'You were never alone, $n.', 12, 1, 100, 1, 0, 0, 24919, 0, 'High Overlord Saurfang'),
+(25749, 2, 0, 'This world that you seek to destroy is our home.', 12, 1, 100, 1, 0, 0, 24920, 0, 'High Overlord Saurfang'),
+(25749, 3, 0, 'We will fight you with every fiber of our being - until we are nothing more than dust and debris. We will fight until the end.', 12, 1, 100, 1, 0, 0, 24924, 0, 'High Overlord Saurfang'),
+(25749, 4, 0, 'A fool who is about to end you, necrolord. There will be nothing left of you for the Lich King to reanimate!', 12, 1, 100, 397, 0, 0, 24927, 0, 'High Overlord Saurfang'),
+(25749, 5, 0, '%s\'s eyes glow red for a brief moment.', 16, 0, 100, 0, 0, 0, 11563, 0, 'High Overlord Saurfang'),
+(25749, 6, 0, 'Is that the best you can do?', 12, 0, 100, 0, 0, 0, 13130, 0, 'High Overlord Saurfang'),
+(25749, 7, 0, 'You\'ll make no mention of me. Either of you!', 12, 1, 100, 0, 0, 0, 24938, 0, 'High Overlord Saurfang');
+
+-- Shadowstalker Getry
+-- Update id to 25749
+DELETE FROM `smart_scripts` WHERE (`entryorguid` = 2572900) AND (`source_type` = 9) AND (`id` IN (2, 3));
+INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `event_param6`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
+(2572900, 9, 2, 0, 0, 0, 100, 0, 8000, 8000, 0, 0, 0, 0, 1, 5, 0, 0, 0, 0, 0, 19, 25749, 30, 0, 0, 0, 0, 0, 0, 'Shadowstalker Getry - Actionlist - Say Line 5'),
+(2572900, 9, 3, 0, 0, 0, 100, 0, 3000, 3000, 0, 0, 0, 0, 41, 0, 0, 0, 0, 0, 0, 19, 25749, 30, 0, 0, 0, 0, 0, 0, 'Shadowstalker Getry - Actionlist - Despawn Instant');
+-- Varidus the Flenser
+-- Update id to 25749
+DELETE FROM `smart_scripts` WHERE (`entryorguid` = 2561800) AND (`source_type` = 9) AND (`id` IN (23, 25));
+INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `event_param6`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
+(2561800, 9, 23, 0, 0, 0, 100, 0, 2000, 2000, 0, 0, 0, 0, 49, 0, 0, 0, 0, 0, 0, 19, 25749, 30, 0, 0, 0, 0, 0, 0, 'Varidus the Flenser - Actionlist - Start Attacking'),
+(2561800, 9, 25, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 41, 0, 0, 0, 0, 0, 0, 19, 25749, 100, 0, 0, 0, 0, 0, 0, 'Varidus the Flenser - Actionlist - Despawn Instant');
+
+-- Shadowstalker Getry
+-- add '%s nods.'
+DELETE FROM `creature_text` WHERE (`CreatureID` = 25729) AND (`GroupID` IN (5));
+INSERT INTO `creature_text` (`CreatureID`, `GroupID`, `ID`, `Text`, `Type`, `Language`, `Probability`, `Emote`, `Duration`, `Sound`, `BroadcastTextId`, `TextRange`, `comment`) VALUES
+(25729, 5, 0, '%s nods.', 16, 0, 0, 273, 0, 0, 24935, 0, '');
+DELETE FROM `smart_scripts` WHERE (`entryorguid` = 2572900) AND (`source_type` = 9) AND (`id` IN (2, 3, 4, 5, 6));
+INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `event_param6`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
+(2572900, 9, 2, 0, 0, 0, 100, 0, 8000, 8000, 0, 0, 0, 0, 1, 7, 0, 0, 0, 0, 0, 19, 25749, 30, 0, 0, 0, 0, 0, 0, 'Shadowstalker Getry - Actionlist - Say Line 7'),
+(2572900, 9, 3, 0, 0, 0, 100, 0, 1000, 1000, 0, 0, 0, 0, 1, 5, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Shadowstalker Getry - Actionlist - Say Line 5'),
+(2572900, 9, 4, 0, 0, 0, 100, 0, 1000, 1000, 0, 0, 0, 0, 1, 4, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Shadowstalker Getry - Actionlist - Say Line 4'),
+(2572900, 9, 5, 0, 0, 0, 100, 0, 3000, 3000, 0, 0, 0, 0, 41, 0, 0, 0, 0, 0, 0, 19, 25749, 30, 0, 0, 0, 0, 0, 0, 'Shadowstalker Getry - Actionlist - Despawn Instant'),
+(2572900, 9, 6, 0, 0, 0, 100, 0, 1000, 1000, 0, 0, 0, 0, 41, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Shadowstalker Getry - Actionlist - Despawn Instant');
+
+-- Varidus the Flenser
+-- Set unit_flags to 770 (not attackable, immune to players, immune to NPC)
+UPDATE `creature_template` SET `unit_flags` = `unit_flags` | (2 | 256 | 512)  WHERE (`entry` = 25618);
+
+-- Shadowstalker Getry attack Varidus the Flenser
+DELETE FROM `smart_scripts` WHERE (`entryorguid` = 25729) AND (`source_type` = 0) AND (`id` IN (10));
+INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `event_param6`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
+(25729, 0, 10, 0, 38, 0, 100, 512, 25618, 1, 0, 0, 0, 0, 49, 0, 0, 0, 0, 0, 0, 19, 25618, 30, 0, 0, 0, 0, 0, 0, 'Shadowstalker Getry - On Data Set 25618 1 - Start Attacking');
+DELETE FROM `smart_scripts` WHERE (`entryorguid` = 2561800) AND (`source_type` = 9) AND (`id` IN (24, 25, 26, 27));
+INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `event_param6`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
+(2561800, 9, 24, 0, 0, 0, 100, 0, 2000, 2000, 0, 0, 0, 0, 45, 25618, 1, 0, 0, 0, 0, 19, 25729, 30, 0, 0, 0, 0, 0, 0, 'Varidus the Flenser - Actionlist - Set Data 25618 1'),
+(2561800, 9, 25, 0, 0, 0, 100, 0, 180000, 180000, 0, 0, 0, 0, 41, 0, 0, 0, 0, 0, 0, 19, 25729, 100, 0, 0, 0, 0, 0, 0, 'Varidus the Flenser - Actionlist - Despawn Instant'),
+(2561800, 9, 26, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 41, 0, 0, 0, 0, 0, 0, 19, 25749, 100, 0, 0, 0, 0, 0, 0, 'Varidus the Flenser - Actionlist - Despawn Instant'),
+(2561800, 9, 27, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 41, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Varidus the Flenser - Actionlist - Despawn Instant');
