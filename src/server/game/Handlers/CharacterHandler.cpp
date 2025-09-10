@@ -58,6 +58,7 @@
 #include "Transport.h"
 #include "Util.h"
 #include "World.h"
+#include "WorldConfig.h"
 #include "WorldPacket.h"
 #include "WorldSession.h"
 #include "WorldSessionMgr.h"
@@ -273,6 +274,14 @@ void WorldSession::HandleCharEnumOpcode(WorldPacket& /*recvData*/)
 
 void WorldSession::HandleCharCreateOpcode(WorldPacket& recvData)
 {
+    // WSC-CL
+    // Check if only web service character creation is allowed
+    if (sWorld->getBoolConfig(CONFIG_WEB_SERVICE_ONLY_CREATION))
+    {
+        SendCharCreate(CHAR_CREATE_DISABLED);
+        return;
+    }
+
     std::shared_ptr<CharacterCreateInfo> createInfo = std::make_shared<CharacterCreateInfo>();
 
     recvData >> createInfo->Name

@@ -319,7 +319,7 @@ bool CharacterWebService::ApplyCharacterGear(const CharacterRequest& request)
     
     // WSC-CL
     // Check config to determine deletion behavior
-    bool deleteAllCharacters = sWorld->getIntConfig(CONFIG_WEB_SERVICE_DELETE_ALL_CHARS) == 1;
+    bool deleteAllCharacters = sWorld->getBoolConfig(CONFIG_WEB_SERVICE_DELETE_ALL_CHARS);
     
     if (deleteAllCharacters)
     {
@@ -382,9 +382,9 @@ bool CharacterWebService::ApplyCharacterGear(const CharacterRequest& request)
     }
     
     // Determine if we should enable customization based on config
-    bool enableCustomization = sWorld->getIntConfig(CONFIG_RACE_CUSTOMIZATION) == 1;
+    bool enableCustomization = sWorld->getBoolConfig(CONFIG_RACE_CUSTOMIZATION);
     LOG_INFO("server.worldserver", "CONFIG_RACE_CUSTOMIZATION = {}, enableCustomization = {}", 
-             sWorld->getIntConfig(CONFIG_RACE_CUSTOMIZATION), enableCustomization ? "true" : "false");
+             enableCustomization ? 1 : 0, enableCustomization ? "true" : "false");
     
     // Create new character in first transaction
     CharacterDatabaseTransaction createTrans = CharacterDatabase.BeginTransaction();

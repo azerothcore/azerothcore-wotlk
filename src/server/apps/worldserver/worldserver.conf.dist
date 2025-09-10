@@ -416,6 +416,25 @@ CharacterWebService.Port = 8080
 CharacterWebService.RaceCustomization = 1
 
 #
+#    CharacterWebService.DeleteAllCharacters
+#        Description: When importing a character via web service, determines deletion behavior.
+#                     When enabled, deletes ALL characters on the account before importing.
+#                     When disabled, only deletes the character with the same name if it exists.
+#        Default:     1 - (Enabled - delete all characters on account)
+#                     0 - (Disabled - only delete character with same name)
+
+CharacterWebService.DeleteAllCharacters = 1
+
+#
+#    CharacterWebService.OnlyAllowWebServiceCreation
+#        Description: When enabled, disables character creation through the normal game client.
+#                     Only the web service will be able to create new characters.
+#        Default:     0 - (Disabled - allow normal character creation)
+#                     1 - (Enabled - only allow web service character creation)
+
+CharacterWebService.OnlyAllowWebServiceCreation = 1
+
+#
 #    PreventItemUnequip
 #        Description: Prevent ALL item movement in player inventory.
 #                     When enabled, players cannot move any items at all - no equipping,
