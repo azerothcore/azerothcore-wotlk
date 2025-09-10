@@ -79,3 +79,10 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 (-127226, 0, 2, 3, 38, 0, 100, 0, 0, 3, 0, 0, 0, 0, 28, 46598, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Drakkari Raider - On Data Set 0 3 - Remove Aura \'Ride Vehicle Hardcoded\''),
 (-127226, 0, 3, 4, 61, 0, 100, 0, 0, 0, 0, 0, 0, 0, 203, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Drakkari Raider - On Data Set 0 3 - Exit vehicle'),
 (-127226, 0, 4, 0, 61, 0, 100, 0, 0, 0, 0, 0, 0, 0, 101, 0, 0, 0, 0, 0, 0, 8, 0, 0, 0, 0, 1771.29, 738.667, 119.4, 3.1151, 'Drakkari Raider - On Data Set 0 3 - Set Home Position');
+
+-- Correct exit points (I was unable to find another solution).
+DELETE FROM `vehicle_seat_addon` WHERE `SeatEntry` IN (2178, 2179, 2180);
+INSERT INTO `vehicle_seat_addon` (`SeatEntry`, `SeatOrientation`, `ExitParamX`, `ExitParamY`, `ExitParamZ`, `ExitParamO`, `ExitParamValue`) VALUES
+(2178, 0, 7.9178,  0.0000, -0.4759, 0, 1),
+(2179, 0, 5.9427, -5.0106, -0.4759, 0, 1),
+(2180, 0, 3.3464,  5.0329, -0.4759, 0, 1);
