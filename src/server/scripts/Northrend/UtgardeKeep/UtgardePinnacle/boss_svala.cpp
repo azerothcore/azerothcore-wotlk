@@ -309,9 +309,11 @@ public:
                 case EVENT_SORROWGRAVE_FLAMES:
                     summons.DespawnAll();
                     me->CastSpell(me, SPELL_CALL_FLAMES, false);
-                    events.ScheduleEvent(EVENT_SORROWGRAVE_FLAMES2, 500ms);
-                    events.ScheduleEvent(EVENT_SORROWGRAVE_FLAMES2, 1s);
-                    events.ScheduleEvent(EVENT_SORROWGRAVE_FLAMES, 8s, 12s);
+                    events.ScheduleEvent(EVENT_SORROWGRAVE_FLAMES2, 3s);
+                    events.ScheduleEvent(EVENT_SORROWGRAVE_FLAMES2, 6s);
+                    events.ScheduleEvent(EVENT_SORROWGRAVE_FLAMES2, 9s);
+                    events.ScheduleEvent(EVENT_SORROWGRAVE_FLAMES2, 12s);
+                    events.ScheduleEvent(EVENT_SORROWGRAVE_FLAMES, 25s, 30s);
                     break;
                 case EVENT_SORROWGRAVE_FLAMES2:
                     {
