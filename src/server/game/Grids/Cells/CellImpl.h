@@ -181,4 +181,14 @@ inline void Cell::VisitObjects(float x, float y, Map* map, T& visitor, float rad
     cell.Visit(p, gnotifier, *map, x, y, radius);
 }
 
+template<class T>
+inline void Cell::VisitFarVisibleObjects(WorldObject const* center_obj, T& visitor, float radius)
+{
+    CellCoord p(Acore::ComputeCellCoord(center_obj->GetPositionX(), center_obj->GetPositionY()));
+    Cell cell(p);
+
+    TypeContainerVisitor<T, FarVisibleGridContainer> gnotifier(visitor);
+    cell.Visit(p, gnotifier, *center_obj->GetMap(), *center_obj, radius);
+}
+
 #endif

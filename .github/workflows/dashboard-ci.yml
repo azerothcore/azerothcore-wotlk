@@ -42,7 +42,12 @@ jobs:
 
       - name: Install requirements
         run: |
-          sudo apt install -y bats
+          sudo apt-get update
+          # Install bats-core >= 1.5.0 to support bats_require_minimum_version
+          sudo apt-get install -y git curl
+          git clone --depth 1 https://github.com/bats-core/bats-core.git /tmp/bats-core
+          sudo /tmp/bats-core/install.sh /usr/local
+          bats --version
           ./acore.sh install-deps
 
       - name: Run bash script tests for ${{ matrix.test-module }}
@@ -50,7 +55,7 @@ jobs:
           TERM: xterm-256color
         run: |
           cd apps/test-framework
-          ./run-tests.sh --tap
+          ./run-tests.sh --tap --all
 
   build-and-test:
     name: Build and Integration Test
@@ -75,11 +80,30 @@ jobs:
           # Configure dashboard
           sed -i 's/MTHREADS=.*/MTHREADS="4"/' conf/config.sh
 
+      - name: Test module commands
+        run: |
+          ./acore.sh module install mod-autobalance
+          ./acore.sh module install mod-duel-reset
+          
+          ./acore.sh module list
+
+          ./acore.sh module install --all
+          ./acore.sh module update mod-autobalance
+          ./acore.sh module update --all
+
       - name: Run complete installation (deps, compile, database, client-data)
         run: |
           # This runs: install-deps, compile, database setup, client-data download
           ./acore.sh init
+          sudo npm install -g pm2
         timeout-minutes: 120
+
+      - name: Test module removal
+        run: |
+          ./acore.sh module remove mod-autobalance
+          ./acore.sh module list
+          ./acore.sh module remove mod-duel-reset
+          ./acore.sh module list
 
       - name: Test authserver dry-run
         run: |
@@ -91,4 +115,31 @@ jobs:
         run: |
           cd env/dist/bin
           timeout 5m ./worldserver -dry-run
+        continue-on-error: false
+
+
+      - name: Test worldserver with startup scripts
+        run: |
+          ./acore.sh sm create world worldserver --bin-path ./env/dist/bin --provider pm2
+          ./acore.sh sm show-config worldserver
+          ./acore.sh sm start worldserver
+          ./acore.sh sm wait-uptime worldserver 10 300
+          ./acore.sh sm send worldserver "account create tester password 3"
+          ./acore.sh sm send worldserver "account set gm tester 3"
+          ./acore.sh sm send worldserver "account set addon tester 1"
+          ./acore.sh sm wait-uptime worldserver 10 300
+          ./acore.sh sm stop worldserver
+          ./acore.sh sm delete worldserver
+        timeout-minutes: 30
+        continue-on-error: false
+
+      - name: Test authserver with startup scripts
+        run: |
+          ./acore.sh sm create auth authserver --bin-path ./env/dist/bin --provider pm2
+          ./acore.sh sm show-config authserver
+          ./acore.sh sm start authserver
+          ./acore.sh sm wait-uptime authserver 10 300
+          ./acore.sh sm stop authserver
+          ./acore.sh sm delete authserver
+        timeout-minutes: 30
         continue-on-error: false

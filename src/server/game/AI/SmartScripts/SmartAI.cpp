@@ -660,6 +660,7 @@ void SmartAI::EnterEvadeMode(EvadeReason /*why*/)
     if (me->GetCharmerGUID().IsPlayer() || me->HasUnitFlag(UNIT_FLAG_POSSESSED))
     {
         me->AttackStop();
+        me->RemoveUnitFlag(UNIT_FLAG_IN_COMBAT);
         return;
     }
 

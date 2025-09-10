@@ -29,38 +29,31 @@ void VisibleNotifier::Visit(GameObjectMapType& m)
     for (GameObjectMapType::iterator iter = m.begin(); iter != m.end(); ++iter)
     {
         GameObject* go = iter->GetSource();
-        if (i_largeOnly != go->IsVisibilityOverridden())
-            continue;
-
         i_player.UpdateVisibilityOf(go, i_data, i_visibleNow);
     }
 }
 
 void VisibleNotifier::SendToSelf()
 {
-    // at this moment i_clientGUIDs have guids that not iterate at grid level checks
-    // but exist one case when this possible and object not out of range: transports
-    if (Transport* transport = i_player.GetTransport())
+    // Update far visible objects
+    ZoneWideVisibleWorldObjectsSet const* zoneWideVisibleObjects = i_player.GetMap()->GetZoneWideVisibleWorldObjectsForZone(i_player.GetZoneId());
+    if (zoneWideVisibleObjects)
     {
-        for (Transport::PassengerSet::const_iterator itr = transport->GetPassengers().begin(); itr != transport->GetPassengers().end(); ++itr)
+        for (WorldObject* obj : *zoneWideVisibleObjects)
         {
-            if (i_largeOnly != (*itr)->IsVisibilityOverridden())
-                continue;
-
-            switch ((*itr)->GetTypeId())
+            switch (obj->GetTypeId())
             {
-            case TYPEID_GAMEOBJECT:
-                i_player.UpdateVisibilityOf((*itr)->ToGameObject(), i_data, i_visibleNow);
-                break;
-            case TYPEID_PLAYER:
-                i_player.UpdateVisibilityOf((*itr)->ToPlayer(), i_data, i_visibleNow);
-                (*itr)->ToPlayer()->UpdateVisibilityOf(&i_player);
-                break;
-            case TYPEID_UNIT:
-                i_player.UpdateVisibilityOf((*itr)->ToCreature(), i_data, i_visibleNow);
-                break;
-            default:
-                break;
+                case TYPEID_GAMEOBJECT:
+                    i_player.UpdateVisibilityOf(obj->ToGameObject(), i_data, i_visibleNow);
+                    break;
+                case TYPEID_UNIT:
+                    i_player.UpdateVisibilityOf(obj->ToCreature(), i_data, i_visibleNow);
+                    break;
+                case TYPEID_DYNAMICOBJECT:
+                    i_player.UpdateVisibilityOf(obj->ToDynObject(), i_data, i_visibleNow);
+                    break;
+                default:
+                    break;
             }
         }
     }
@@ -69,26 +62,8 @@ void VisibleNotifier::SendToSelf()
     for (VisibleWorldObjectsMap::iterator itr = visibleWorldObjects->begin(); itr != visibleWorldObjects->end();)
     {
         WorldObject* obj = itr->second;
-        if (i_largeOnly != obj->IsVisibilityOverridden())
-        {
-            ++itr;
-            continue;
-        }
-
-        // pussywizard: static transports are removed only in RemovePlayerFromMap and here if can no longer detect (eg. phase changed)
-        if (itr->first.IsTransport())
-        {
-            if (GameObject* staticTrans = obj->ToGameObject())
-            {
-                if (i_player.CanSeeOrDetect(staticTrans, false, true))
-                {
-                    ++itr;
-                    continue;
-                }
-            }
-        }
-
-        if (i_player.m_seer->IsWithinDist(obj, i_player.GetSightRange(obj), true))
+        if (!i_player.IsWorldObjectOutOfSightRange(obj)
+            || i_player.CanSeeOrDetect(obj, false, true))
         {
             ++itr;
             continue;
@@ -111,12 +86,7 @@ void VisibleNotifier::SendToSelf()
     i_player.GetSession()->SendPacket(&packet);
 
     for (std::vector<Unit*>::const_iterator it = i_visibleNow.begin(); it != i_visibleNow.end(); ++it)
-    {
-        if (i_largeOnly != (*it)->IsVisibilityOverridden())
-            continue;
-
         i_player.GetInitialVisiblePackets(*it);
-    }
 }
 
 void VisibleChangesNotifier::Visit(PlayerMapType& m)

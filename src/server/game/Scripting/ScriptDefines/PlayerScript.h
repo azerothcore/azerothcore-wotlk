@@ -210,6 +210,7 @@ enum PlayerHook
     PLAYERHOOK_CAN_RESURRECT,
     PLAYERHOOK_ON_CAN_GIVE_LEVEL,
     PLAYERHOOK_ON_SEND_LIST_INVENTORY,
+    PLAYERHOOK_ON_GIVE_REPUTATION,
     PLAYERHOOK_END
 };
 
@@ -282,6 +283,9 @@ public:
 
     // Called when a player's reputation rank changes (before it is actually changed)
     virtual void OnPlayerReputationRankChange(Player* /*player*/, uint32 /*factionID*/, ReputationRank /*newRank*/, ReputationRank /*olRank*/, bool /*increased*/) { }
+
+    // Called when a player gains Reputation (before anything is given)
+    virtual void OnPlayerGiveReputation(Player* /*player*/, int32 /*factionID*/, float& /*amount*/, ReputationSource /*repSource*/) { }
 
     // Called when a player learned new spell
     virtual void OnPlayerLearnSpell(Player* /*player*/, uint32 /*spellID*/) {}

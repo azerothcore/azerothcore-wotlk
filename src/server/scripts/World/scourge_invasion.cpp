@@ -92,6 +92,7 @@ struct npc_herald_of_the_lich_king : public ScriptedAI
             Talk(HERALD_OF_THE_LICH_KING_SAY_ATTACK_END);
             ChangeZoneEventStatus(false);
             UpdateWeather(false);
+            me->DespawnOrUnsummon();
         }
     }
 
@@ -361,7 +362,6 @@ struct npc_necrotic_shard : public ScriptedAI
     {
         scheduler.Schedule(5s, [this](TaskContext context) // Spawn Cultists every 60 minutes.
         {
-            me->SetFullHealth();
             DespawnShadowsOfDoom(); // Despawn all remaining Shadows before respawning the Cultists?
             SummonCultists();
             context.Repeat(1h);
@@ -499,7 +499,7 @@ struct npc_necrotic_shard : public ScriptedAI
     // Only Minions and the shard itself can deal damage.
     void DamageTaken(Unit* attacker, uint32& damage, DamageEffectType /*damageType*/, SpellSchoolMask /*damageSchoolMask*/) override
     {
-        if (attacker->GetFactionTemplateEntry() != me->GetFactionTemplateEntry())
+        if (attacker && attacker->GetFactionTemplateEntry() != me->GetFactionTemplateEntry())
             damage = 0;
     }
 
@@ -519,7 +519,8 @@ struct npc_necrotic_shard : public ScriptedAI
                 // Buff Players.
                 DoCastSelf(SPELL_SOUL_REVIVAL, true);
                 // Sending the Death Bolt.
-                DoCastAOE(SPELL_COMMUNIQUE_CAMP_TO_RELAY_DEATH, true);
+                if (Creature* relay = GetClosestCreatureWithEntry(me, NPC_NECROPOLIS_RELAY, 200.0f))
+                    me->CastSpell(relay, SPELL_COMMUNIQUE_CAMP_TO_RELAY_DEATH, true);
                 DespawnCultists(); // Despawn remaining Cultists (should never happen).
                 DespawnEventDoodads();
                 sWorldState->Save(SAVE_ID_SCOURGE_INVASION);
@@ -802,69 +803,6 @@ struct npc_cultist_engineer : public ScriptedAI
     }
 };
 
-struct npc_shadow_of_doom : public CombatAI
-{
-    npc_shadow_of_doom(Creature* creature) : CombatAI(creature) { }
-
-    void JustEngagedWith(Unit* /*who*/) override
-    {
-        scheduler.Schedule(2s, [&](TaskContext context)
-        {
-            DoCastVictim(SPELL_MINDFLAY);
-            context.Repeat(6500ms, 13s);
-        }).Schedule(2s, [&](TaskContext context)
-        {
-            DoCastVictim(SPELL_FEAR);
-            context.Repeat(14500ms, 14500ms);
-        });
-    }
-
-    void Reset() override
-    {
-        scheduler.CancelAll();
-        me->SetImmuneToPC(false);
-    }
-
-    void IsSummonedBy(WorldObject* summoner) override
-    {
-        if (!summoner)
-            return;
-
-        if (Player* player = summoner->ToPlayer())
-        {
-            me->SetImmuneToPC(true);
-            me->SetFacingToObject(player);
-
-            Talk(SHADOW_OF_DOOM_SAY_AGGRO, player);
-            DoCastSelf(SPELL_SPAWN_SMOKE, true);
-
-            scheduler.Schedule(5s, [this, player](TaskContext const& /*context*/)
-            {
-                me->SetImmuneToPC(false);
-                if (me->CanStartAttack(player))
-                    AttackStart(player);
-            });
-        }
-    }
-
-    void JustDied(Unit* /*pKiller*/) override
-    {
-        DoCastSelf(SPELL_ZAP_CRYSTAL_CORPSE, true);
-    }
-
-    void SpellHit(Unit* /* caster */, SpellInfo const* spell) override
-    {
-        if (spell->Id == SPELL_SPIRIT_SPAWN_OUT)
-            me->DespawnOrUnsummon(3000);
-    }
-
-    void UpdateAI(uint32 const diff) override
-    {
-        scheduler.Update(diff);
-        DoMeleeAttackIfReady();
-    }
-};
-
 struct npc_flameshocker : public CombatAI
 {
     npc_flameshocker(Creature* creature) : CombatAI(creature) { }
@@ -1121,7 +1059,6 @@ void AddSC_scourge_invasion()
     RegisterCreatureAI(npc_minion_spawner);
     RegisterCreatureAI(npc_pallid_horror);
     RegisterCreatureAI(npc_cultist_engineer);
-    RegisterCreatureAI(npc_shadow_of_doom);
     RegisterCreatureAI(npc_flameshocker);
     RegisterSpellScript(spell_communique_trigger);
     RegisterSpellScript(spell_despawner_self);
