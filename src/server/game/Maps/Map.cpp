@@ -118,6 +118,8 @@ void Map::AddToGrid(Creature* obj, Cell const& cell)
 {
     MapGridType* grid = GetMapGrid(cell.GridX(), cell.GridY());
     grid->AddGridObject(cell.CellX(), cell.CellY(), obj);
+    if (obj->IsFarVisible())
+        grid->AddFarVisibleObject(cell.CellX(), cell.CellY(), obj);
 
     obj->SetCurrentCell(cell);
 }
@@ -127,6 +129,8 @@ void Map::AddToGrid(GameObject* obj, Cell const& cell)
 {
     MapGridType* grid = GetMapGrid(cell.GridX(), cell.GridY());
     grid->AddGridObject(cell.CellX(), cell.CellY(), obj);
+    if (obj->IsFarVisible())
+        grid->AddFarVisibleObject(cell.CellX(), cell.CellY(), obj);
 
     obj->SetCurrentCell(cell);
 }
@@ -604,6 +608,69 @@ void Map::RemoveObjectFromMapUpdateList(WorldObject* obj)
         _RemoveObjectFromUpdateList(obj);
 }
 
+// Used in VisibilityDistanceType::Large and VisibilityDistanceType::Gigantic
+void Map::AddWorldObjectToFarVisibleMap(WorldObject* obj)
+{
+    if (Creature* creature = obj->ToCreature())
+    {
+        if (!creature->IsInGrid())
+            return;
+
+        Cell curr_cell = creature->GetCurrentCell();
+        MapGridType* grid = GetMapGrid(curr_cell.GridX(), curr_cell.GridY());
+        grid->AddFarVisibleObject(curr_cell.CellX(), curr_cell.CellY(), creature);
+    }
+    else if (GameObject* go = obj->ToGameObject())
+    {
+        if (!go->IsInGrid())
+            return;
+
+        Cell curr_cell = go->GetCurrentCell();
+        MapGridType* grid = GetMapGrid(curr_cell.GridX(), curr_cell.GridY());
+        grid->AddFarVisibleObject(curr_cell.CellX(), curr_cell.CellY(), go);
+    }
+}
+
+void Map::RemoveWorldObjectFromFarVisibleMap(WorldObject* obj)
+{
+    if (Creature* creature = obj->ToCreature())
+    {
+        Cell curr_cell = creature->GetCurrentCell();
+        MapGridType* grid = GetMapGrid(curr_cell.GridX(), curr_cell.GridY());
+        grid->RemoveFarVisibleObject(curr_cell.CellX(), curr_cell.CellY(), creature);
+    }
+    else if (GameObject* go = obj->ToGameObject())
+    {
+        Cell curr_cell = go->GetCurrentCell();
+        MapGridType* grid = GetMapGrid(curr_cell.GridX(), curr_cell.GridY());
+        grid->RemoveFarVisibleObject(curr_cell.CellX(), curr_cell.CellY(), go);
+    }
+}
+
+// Used in VisibilityDistanceType::Infinite
+void Map::AddWorldObjectToZoneWideVisibleMap(uint32 zoneId, WorldObject* obj)
+{
+    _zoneWideVisibleWorldObjectsMap[zoneId].insert(obj);
+}
+
+void Map::RemoveWorldObjectFromZoneWideVisibleMap(uint32 zoneId, WorldObject* obj)
+{
+    ZoneWideVisibleWorldObjectsMap::iterator itr = _zoneWideVisibleWorldObjectsMap.find(zoneId);
+    if (itr == _zoneWideVisibleWorldObjectsMap.end())
+        return;
+
+    itr->second.erase(obj);
+}
+
+ZoneWideVisibleWorldObjectsSet const* Map::GetZoneWideVisibleWorldObjectsForZone(uint32 zoneId) const
+{
+    ZoneWideVisibleWorldObjectsMap::const_iterator itr = _zoneWideVisibleWorldObjectsMap.find(zoneId);
+    if (itr == _zoneWideVisibleWorldObjectsMap.end())
+        return nullptr;
+
+    return &itr->second;
+}
+
 void Map::HandleDelayedVisibility()
 {
     if (i_objectsForDelayedVisibility.empty())
@@ -656,6 +723,8 @@ void Map::RemoveFromMap(T* obj, bool remove)
     obj->RemoveFromWorld();
 
     obj->RemoveFromGrid();
+    if (obj->IsFarVisible())
+        RemoveWorldObjectFromFarVisibleMap(obj);
 
     obj->ResetMap();
 
@@ -852,6 +921,11 @@ void Map::MoveAllCreaturesInMoveList()
 
         Cell const& old_cell = c->GetCurrentCell();
         Cell new_cell(c->GetPositionX(), c->GetPositionY());
+        if (c->IsFarVisible())
+        {
+            // Removes via GetCurrentCell, added back in AddToGrid
+            RemoveWorldObjectFromFarVisibleMap(c);
+        }
 
         c->RemoveFromGrid();
         if (old_cell.DiffGrid(new_cell))
@@ -881,6 +955,12 @@ void Map::MoveAllGameObjectsInMoveList()
 
         Cell const& old_cell = go->GetCurrentCell();
         Cell new_cell(go->GetPositionX(), go->GetPositionY());
+
+        if (go->IsFarVisible())
+        {
+            // Removes via GetCurrentCell, added back in AddToGrid
+            RemoveWorldObjectFromFarVisibleMap(go);
+        }
 
         go->RemoveFromGrid();
         if (old_cell.DiffGrid(new_cell))
