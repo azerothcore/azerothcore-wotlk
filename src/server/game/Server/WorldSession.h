@@ -1076,9 +1076,6 @@ public:                                                 // opcodes handlers
     void HandleItemRefundInfoRequest(WorldPackets::Item::ItemRefundInfo& packet);
     void HandleItemRefund(WorldPackets::Item::ItemRefund& packet);
 
-    void HandleChannelVoiceOnOpcode(WorldPacket& recvData);
-    void HandleVoiceSessionEnableOpcode(WorldPacket& recvData);
-    void HandleSetActiveVoiceChannel(WorldPacket& recvData);
     void HandleSetTaxiBenchmarkOpcode(WorldPacket& recvData);
 
     // Guild Bank
