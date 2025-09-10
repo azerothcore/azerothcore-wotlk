@@ -30,6 +30,8 @@ enum Spells
     SPELL_LEECHING_SWARM                = 53467,
     SPELL_POUND                         = 53472,
     SPELL_POUND_DAMAGE                  = 53509,
+    SPELL_POUND_H                       = 59433,
+    SPELL_POUND_DAMAGE_H                = 59432,
     SPELL_IMPALE_PERIODIC               = 53456,
     SPELL_EMERGE                        = 53500,
     SPELL_SUBMERGE                      = 53421,
@@ -183,7 +185,8 @@ class boss_anub_arak : public CreatureScript
                             me->DisableRotate(true);
                             me->SendMovementFlagUpdate();
                             events.ScheduleEvent(EVENT_ENABLE_ROTATE, 3300ms);
-                            me->CastSpell(target, SPELL_POUND, false);
+                            uint32 poundSpell = DUNGEON_MODE(SPELL_POUND, SPELL_POUND_H);
+                            me->CastSpell(target, poundSpell, false);
                         }
                         events.ScheduleEvent(EVENT_POUND, 18s);
                         break;
@@ -253,7 +256,6 @@ class spell_azjol_nerub_carrion_beetels : public AuraScript
 
     void HandleEffectPeriodic(AuraEffect const*  /*aurEff*/)
     {
-        // Xinef: 2 each second
         GetUnitOwner()->CastSpell(GetUnitOwner(), SPELL_SUMMON_CARRION_BEETLES, true);
         GetUnitOwner()->CastSpell(GetUnitOwner(), SPELL_SUMMON_CARRION_BEETLES, true);
     }
@@ -271,7 +273,10 @@ class spell_azjol_nerub_pound : public SpellScript
     void HandleApplyAura(SpellEffIndex  /*effIndex*/)
     {
         if (Unit* unitTarget = GetHitUnit())
-            GetCaster()->CastSpell(unitTarget, SPELL_POUND_DAMAGE, true);
+        {
+            uint32 damageSpell = GetSpellInfo()->Id == SPELL_POUND_H ? SPELL_POUND_DAMAGE_H : SPELL_POUND_DAMAGE;
+            GetCaster()->CastSpell(unitTarget, damageSpell, true);
+        }
     }
 
     void Register() override
@@ -286,7 +291,6 @@ class spell_azjol_nerub_impale_summon : public SpellScript
 
     void SetDest(SpellDestination& dest)
     {
-        // Adjust effect summon position
         float floorZ = GetCaster()->GetMapHeight(GetCaster()->GetPositionX(), GetCaster()->GetPositionY(), GetCaster()->GetPositionZ(), true);
         if (floorZ > INVALID_HEIGHT)
             dest._position.m_positionZ = floorZ;
