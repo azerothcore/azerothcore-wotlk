@@ -20,27 +20,6 @@
 #include "Player.h"
 #include "ScriptedCreature.h"
 
-class AreaTrigger_at_voltarus_middle : public AreaTriggerScript
-{
-public:
-    AreaTrigger_at_voltarus_middle()
-        : AreaTriggerScript("at_voltarus_middle")
-    {
-    }
-
-    bool OnTrigger(Player* player, AreaTrigger const* /*trigger*/) override
-    {
-        if (player->IsAlive() && !player->IsInCombat())
-            if (player->HasItemCount(39319)) // Scepter of Domination
-            {
-                player->TeleportTo(MAP_NORTHREND, 6242.67f, -1972.10f, 484.783f, 0.6f);
-                return true;
-            }
-
-        return false;
-    }
-};
-
 /*######
 ## at_coilfang_waterfall
 ######*/
