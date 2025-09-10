@@ -648,7 +648,20 @@ void WorldSession::LogoutPlayer(bool save)
 
         // pussywizard: leave whole bg on logout (character stays ingame when necessary)
         // pussywizard: GetBattleground() checked inside
-        _player->LeaveBattleground();
+        // Modified: Don't immediately leave BG on logout, mark as offline instead
+        if (Battleground* bg = _player->GetBattleground())
+        {
+            // Only immediately leave if BG is already ended or if player is a spectator
+            if (bg->GetStatus() == STATUS_WAIT_LEAVE || _player->IsSpectator())
+            {
+                _player->LeaveBattleground();
+            }
+            else
+            {
+                // Mark player as offline in the battleground instead of removing
+                bg->HandlePlayerOffline(_player);
+            }
+        }
 
         // pussywizard: checked first time
         if (!_player->IsBeingTeleportedFar() && !_player->m_InstanceValid && !_player->IsGameMaster())

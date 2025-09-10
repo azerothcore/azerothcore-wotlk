@@ -31,11 +31,13 @@
 #include "Formulas.h"
 #include "GameEventMgr.h"
 #include "GameGraveyard.h"
+#include "GameTime.h"
 #include "GridNotifiersImpl.h"
 #include "GroupMgr.h"
 #include "MapMgr.h"
 #include "MiscPackets.h"
 #include "Object.h"
+#include "ObjectAccessor.h"
 #include "ObjectMgr.h"
 #include "Pet.h"
 #include "Player.h"
@@ -259,9 +261,47 @@ void Battleground::Update(uint32 diff)
     if (!PreUpdateImpl(diff))
         return;
 
+    // Handle offline players first - remove those who exceeded max offline time
+    if (!m_OfflinePlayers.empty())
+    {
+        uint32 currentTime = GameTime::GetGameTimeMS().count();
+        for (std::map<ObjectGuid, OfflinePlayerInfo>::iterator itr = m_OfflinePlayers.begin(); itr != m_OfflinePlayers.end();)
+        {
+            // Check if player exceeded max offline time (5 minutes by default)
+            if ((currentTime - itr->second.offlineTime) > (MAX_OFFLINE_TIME * IN_MILLISECONDS))
+            {
+                // Remove player completely from battleground
+                if (Player* offlinePlayer = ObjectAccessor::FindPlayer(itr->first))
+                {
+                    offlinePlayer->LeaveBattleground(this);
+                }
+                else
+                {
+                    // Player is not online, we need to clean up manually
+                    // Decrease invited count for their team
+                    if (GetInvitedCount(itr->second.teamId) > 0)
+                        m_BgInvitedPlayers[itr->second.teamId]--;
+                }
+                
+                itr = m_OfflinePlayers.erase(itr);
+            }
+            else
+            {
+                ++itr;
+            }
+        }
+    }
+    
     if (!GetPlayersSize())
     {
-        //BG is empty
+        //BG is empty of active players
+        // Check if we have offline players within the timeout period
+        if (!m_OfflinePlayers.empty())
+        {
+            // Don't delete BG yet, we have offline players who might reconnect
+            return;
+        }
+        
         // if there are no players invited, delete BG
         // this will delete arena or bg object, where any player entered
         // [[   but if you use battleground object again (more battles possible to be played on 1 instance)
@@ -695,6 +735,29 @@ inline void Battleground::_ProcessLeave(uint32 diff)
     if (m_EndTime <= 0)
     {
         m_EndTime = TIME_TO_AUTOREMOVE; // pussywizard: 0 -> TIME_TO_AUTOREMOVE
+        
+        // First, handle offline players - force them to leave
+        for (std::map<ObjectGuid, OfflinePlayerInfo>::iterator offlineItr = m_OfflinePlayers.begin(); offlineItr != m_OfflinePlayers.end();)
+        {
+            ObjectGuid guid = offlineItr->first;
+            
+            // Try to find the offline player and force them to leave
+            if (Player* offlinePlayer = ObjectAccessor::FindPlayer(guid))
+            {
+                offlinePlayer->LeaveBattleground(this);
+            }
+            else
+            {
+                // Player is truly offline, clean up their BG data manually
+                // Decrease invited count for their team
+                if (GetInvitedCount(offlineItr->second.teamId) > 0)
+                    m_BgInvitedPlayers[offlineItr->second.teamId]--;
+            }
+            
+            offlineItr = m_OfflinePlayers.erase(offlineItr);
+        }
+        
+        // Then, handle all active players
         BattlegroundPlayerMap::iterator itr, next;
         for (itr = m_Players.begin(); itr != m_Players.end(); itr = next)
         {
@@ -1113,6 +1176,40 @@ void Battleground::RemovePlayerAtLeave(Player* player)
     sScriptMgr->OnBattlegroundRemovePlayerAtLeave(this, player);
 }
 
+void Battleground::HandlePlayerOffline(Player* player)
+{
+    // Don't handle offline for spectators
+    if (player->IsSpectator())
+    {
+        RemovePlayerAtLeave(player);
+        return;
+    }
+    
+    TeamId teamId = player->GetBgTeamId();
+    ObjectGuid guid = player->GetGUID();
+    
+    // Check if player is actually in the battleground
+    BattlegroundPlayerMap::iterator itr = m_Players.find(guid);
+    if (itr == m_Players.end())
+        return;
+    
+    // Add player to offline tracking
+    OfflinePlayerInfo info;
+    info.offlineTime = GameTime::GetGameTimeMS().count();
+    info.teamId = teamId;
+    m_OfflinePlayers[guid] = info;
+    
+    // Remove from active players but keep invited count
+    UpdatePlayersCountByTeam(teamId, true); // -1 player
+    m_Players.erase(itr);
+    
+    // Remove from resurrect queue if present
+    RemovePlayerFromResurrectQueue(player);
+    
+    // Keep the player's battleground ID so they can reconnect
+    // but don't prevent character operations
+}
+
 // this method is called when creating bg
 void Battleground::Init()
 {
@@ -1135,6 +1232,7 @@ void Battleground::Init()
     _InBGFreeSlotQueue = false;
 
     m_Players.clear();
+    m_OfflinePlayers.clear();
 
     for (auto const& itr : PlayerScores)
         delete itr.second;
@@ -1175,6 +1273,14 @@ void Battleground::AddPlayer(Player* player)
 
     ObjectGuid guid = player->GetGUID();
     TeamId teamId = player->GetBgTeamId();
+    
+    // Check if player is reconnecting from offline state
+    std::map<ObjectGuid, OfflinePlayerInfo>::iterator offlineItr = m_OfflinePlayers.find(guid);
+    if (offlineItr != m_OfflinePlayers.end())
+    {
+        // Player is reconnecting, remove from offline list
+        m_OfflinePlayers.erase(offlineItr);
+    }
 
     // Add to list/maps
     m_Players[guid] = player;

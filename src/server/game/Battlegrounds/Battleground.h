@@ -531,6 +531,8 @@ public:
 
     virtual void RemovePlayerAtLeave(Player* player);
     // can be extended in in BG subclass
+    
+    void HandlePlayerOffline(Player* player);  // Handle player going offline without leaving BG
 
     virtual void HandleTriggerBuff(GameObject* gameObject);
     void SetHoliday(bool is_holiday);
@@ -705,6 +707,14 @@ private:
     // Player lists
     GuidVector m_ResurrectQueue;                // Player GUID
     GuidDeque m_OfflineQueue;                   // Player GUID
+    
+    // Offline players tracking
+    struct OfflinePlayerInfo
+    {
+        uint32 offlineTime;  // Time when player went offline (in ms)
+        TeamId teamId;       // Player's team
+    };
+    std::map<ObjectGuid, OfflinePlayerInfo> m_OfflinePlayers;  // Map of offline players with their info
 
     // Invited counters are useful for player invitation to BG - do not allow, if BG is started to one faction to have 2 more players than another faction
     // Invited counters will be changed only when removing already invited player from queue, removing player from battleground and inviting player to BG

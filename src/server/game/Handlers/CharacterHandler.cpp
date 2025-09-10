@@ -20,6 +20,8 @@
 #include "ArenaTeamMgr.h"
 #include "AuctionHouseMgr.h"
 #include "Battleground.h"
+#include "BattlegroundMgr.h"
+#include "DungeonFinding/LFGMgr.h"
 #include "CalendarMgr.h"
 #include "CharacterCache.h"
 #include "CharacterPackets.h"
@@ -616,10 +618,48 @@ void WorldSession::HandleCharDeleteOpcode(WorldPacket& recvData)
     uint32 initAccountId = GetAccountId();
 
     // can't delete loaded character
-    if (ObjectAccessor::FindConnectedPlayer(guid) || sWorldSessionMgr->FindOfflineSessionForCharacterGUID(guid.GetCounter()))
+    if (ObjectAccessor::FindConnectedPlayer(guid))
     {
         sScriptMgr->OnPlayerFailedDelete(guid, initAccountId);
         return;
+    }
+    
+    // Allow deletion even with offline sessions (needed for web service)
+    // The web service creates offline sessions when updating characters
+    // Clean up any battleground/instance/queue references before deletion
+    if (WorldSession* offlineSession = sWorldSessionMgr->FindOfflineSessionForCharacterGUID(guid.GetCounter()))
+    {
+        if (Player* player = offlineSession->GetPlayer())
+        {
+            // Remove from battleground if present
+            if (Battleground* bg = player->GetBattleground())
+            {
+                player->LeaveBattleground();
+            }
+            
+            // Remove from LFG queues
+            sLFGMgr->LeaveAllLfgQueues(player->GetGUID(), true);
+            
+            // Remove from battleground queues
+            for (uint32 i = 0; i < PLAYER_MAX_BATTLEGROUND_QUEUES; ++i)
+            {
+                if (BattlegroundQueueTypeId bgQueueTypeId = player->GetBattlegroundQueueTypeId(i))
+                    sBattlegroundMgr->GetBattlegroundQueue(bgQueueTypeId).RemovePlayer(player->GetGUID(), true);
+            }
+            
+            // Remove from group if present
+            if (Group* group = player->GetGroup())
+            {
+                group->RemoveMember(player->GetGUID());
+            }
+            
+            // Teleport out of instance if in one
+            if (player->IsInWorld() && player->GetMap() && player->GetMap()->IsDungeon())
+            {
+                player->RepopAtGraveyard();
+            }
+        }
+        // Allow deletion to proceed regardless of offline session
     }
 
     uint32 accountId = 0;
@@ -1130,6 +1170,14 @@ void WorldSession::HandlePlayerLoginFromDB(LoginQueryHolder const& holder)
         pCurrChar->RemoveAtLoginFlag(AT_LOGIN_FIRST);
         sScriptMgr->OnPlayerFirstLogin(pCurrChar);
     }
+    
+    // Remove AT_LOGIN_CUSTOMIZE flag on login
+    // This ensures players can only customize once after being created by web service
+    if (pCurrChar->HasAtLoginFlag(AT_LOGIN_CUSTOMIZE))
+    {
+        pCurrChar->RemoveAtLoginFlag(AT_LOGIN_CUSTOMIZE);
+        LOG_INFO("entities.player.character", "Removed AT_LOGIN_CUSTOMIZE flag for character '{}' on login", pCurrChar->GetName());
+    }
 
     METRIC_EVENT("player_events", "Login", pCurrChar->GetName());
 }
@@ -1634,13 +1682,51 @@ void WorldSession::HandleCharCustomize(WorldPacket& recvData)
     }
 
     // pussywizard:
-    if (ObjectAccessor::FindConnectedPlayer(customizeInfo->Guid) || sWorldSessionMgr->FindOfflineSessionForCharacterGUID(customizeInfo->Guid.GetCounter()))
+    if (ObjectAccessor::FindConnectedPlayer(customizeInfo->Guid))
     {
         recvData.rfinish();
         WorldPacket data(SMSG_CHAR_CUSTOMIZE, 1);
         data << uint8(CHAR_CREATE_ERROR);
         SendPacket(&data);
         return;
+    }
+    
+    // Allow customization even with offline sessions (needed for web service)
+    // The web service creates offline sessions when updating characters
+    // Clean up any battleground/instance/queue references before customization
+    if (WorldSession* offlineSession = sWorldSessionMgr->FindOfflineSessionForCharacterGUID(customizeInfo->Guid.GetCounter()))
+    {
+        if (Player* player = offlineSession->GetPlayer())
+        {
+            // Remove from battleground if present
+            if (Battleground* bg = player->GetBattleground())
+            {
+                player->LeaveBattleground();
+            }
+            
+            // Remove from LFG queues
+            sLFGMgr->LeaveAllLfgQueues(player->GetGUID(), true);
+            
+            // Remove from battleground queues
+            for (uint32 i = 0; i < PLAYER_MAX_BATTLEGROUND_QUEUES; ++i)
+            {
+                if (BattlegroundQueueTypeId bgQueueTypeId = player->GetBattlegroundQueueTypeId(i))
+                    sBattlegroundMgr->GetBattlegroundQueue(bgQueueTypeId).RemovePlayer(player->GetGUID(), true);
+            }
+            
+            // Remove from group if present
+            if (Group* group = player->GetGroup())
+            {
+                group->RemoveMember(player->GetGUID());
+            }
+            
+            // Teleport out of instance if in one
+            if (player->IsInWorld() && player->GetMap() && player->GetMap()->IsDungeon())
+            {
+                player->RepopAtGraveyard();
+            }
+        }
+        // Allow customization to proceed regardless of offline session
     }
 
     recvData >> customizeInfo->Name
@@ -1681,12 +1767,15 @@ void WorldSession::HandleCharCustomizeCallback(std::shared_ptr<CharacterCustomiz
     //uint8 plrGender = fields[3].Get<uint8>();
     uint32 atLoginFlags = fields[4].Get<uint16>();
 
-    if (!(atLoginFlags & AT_LOGIN_CUSTOMIZE))
-    {
-        SendCharCustomize(CHAR_CREATE_ERROR, customizeInfo.get());
-        return;
-    }
+    // Allow customization regardless of AT_LOGIN_CUSTOMIZE flag
+    // This allows the web service to work properly
+    // if (!(atLoginFlags & AT_LOGIN_CUSTOMIZE))
+    // {
+    //     SendCharCustomize(CHAR_CREATE_ERROR, customizeInfo.get());
+    //     return;
+    // }
 
+    // Clear the customize flag if it was set
     atLoginFlags &= ~AT_LOGIN_CUSTOMIZE;
 
     // prevent character rename to invalid name
