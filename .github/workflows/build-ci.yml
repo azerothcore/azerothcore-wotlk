@@ -1,0 +1,216 @@
+name: Build CI
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+env:
+  CORE_PATH: azerothcore-wotlk
+
+jobs:
+  build-windows:
+    runs-on: windows-2022
+    name: Windows Build
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: Configure OS
+        run: |
+          choco install --no-progress openssl
+
+      - name: Setup MSBuild
+        uses: microsoft/setup-msbuild@v1.1
+
+      - name: Setup CMake
+        uses: jwlawson/actions-setup-cmake@v1.14
+        with:
+          cmake-version: '3.27.0'  # Minimum for Windows
+
+      - name: Cache MySQL
+        uses: actions/cache@v3
+        with:
+          path: C:\tools\mysql
+          key: mysql-8.0-windows
+
+      - name: Install MySQL
+        run: |
+          if (-not (Test-Path "C:\tools\mysql")) {
+            choco install mysql --version=8.4.0 --params '/Port:3306 /RootPassword:root' -y  # Recommended MySQL 8.4
+          }
+
+      - name: Configure build
+        run: |
+          mkdir build
+          cd build
+          cmake .. -G "Visual Studio 17 2022" -A x64 `
+            -DCMAKE_BUILD_TYPE=RelWithDebInfo `
+            -DWITH_WARNINGS=1 `
+            -DSCRIPTS=static `
+            -DTOOLS_BUILD=all `
+            -DCMAKE_C_FLAGS="/MP" `
+            -DCMAKE_CXX_FLAGS="/MP"
+
+      - name: Build
+        run: |
+          cd build
+          cmake --build . --config RelWithDebInfo --parallel 4
+
+      - name: Check build artifacts
+        run: |
+          if (-not (Test-Path "build\bin\RelWithDebInfo\worldserver.exe")) {
+            Write-Error "worldserver.exe not found!"
+            exit 1
+          }
+          if (-not (Test-Path "build\bin\RelWithDebInfo\authserver.exe")) {
+            Write-Error "authserver.exe not found!"
+            exit 1
+          }
+          Write-Host "Build successful!"
+
+  build-ubuntu:
+    runs-on: ubuntu-22.04
+    name: Ubuntu Build
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: Cache dependencies
+        uses: actions/cache@v3
+        with:
+          path: ~/deps
+          key: ${{ runner.os }}-deps-${{ hashFiles('**/CMakeLists.txt') }}
+
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            git cmake make gcc g++ clang \
+            libssl-dev libbz2-dev libreadline-dev \
+            libncurses-dev libboost-all-dev \
+            mysql-server libmysqlclient-dev \
+            libace-dev
+
+      - name: Setup MySQL
+        run: |
+          sudo systemctl start mysql
+          sudo mysql -e "ALTER USER 'root'@'localhost' IDENTIFIED WITH mysql_native_password BY 'root';"
+          sudo mysql -proot -e "FLUSH PRIVILEGES;"
+
+      - name: Configure build
+        run: |
+          mkdir build
+          cd build
+          cmake .. \
+            -DCMAKE_BUILD_TYPE=RelWithDebInfo \
+            -DWITH_WARNINGS=1 \
+            -DSCRIPTS=static \
+            -DTOOLS_BUILD=all \
+            -DCMAKE_C_COMPILER=/usr/bin/clang \
+            -DCMAKE_CXX_COMPILER=/usr/bin/clang++
+
+      - name: Build
+        run: |
+          cd build
+          make -j$(nproc)
+
+      - name: Check build artifacts
+        run: |
+          if [ ! -f "build/bin/worldserver" ]; then
+            echo "worldserver not found!"
+            exit 1
+          fi
+          if [ ! -f "build/bin/authserver" ]; then
+            echo "authserver not found!"
+            exit 1
+          fi
+          echo "Build successful!"
+
+  build-macos:
+    runs-on: macos-13  # macOS ≥ 11 required, using 13 for better support
+    name: macOS Build
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: Cache dependencies
+        uses: actions/cache@v3
+        with:
+          path: ~/deps
+          key: ${{ runner.os }}-deps-${{ hashFiles('**/CMakeLists.txt') }}
+
+      - name: Install dependencies
+        run: |
+          brew update
+          brew install cmake openssl@3 readline boost mysql@8.0
+
+      - name: Setup MySQL
+        run: |
+          brew services start mysql
+          mysql -u root -e "ALTER USER 'root'@'localhost' IDENTIFIED WITH mysql_native_password BY 'root';"
+          mysql -u root -proot -e "FLUSH PRIVILEGES;"
+
+      - name: Configure build
+        run: |
+          mkdir build
+          cd build
+          cmake .. \
+            -DCMAKE_BUILD_TYPE=RelWithDebInfo \
+            -DWITH_WARNINGS=1 \
+            -DSCRIPTS=static \
+            -DTOOLS_BUILD=all \
+            -DMYSQL_ADD_INCLUDE_PATH=/usr/local/include \
+            -DMYSQL_LIBRARY=/usr/local/lib/libmysqlclient.dylib \
+            -DREADLINE_INCLUDE_DIR=/usr/local/opt/readline/include \
+            -DREADLINE_LIBRARY=/usr/local/opt/readline/lib/libreadline.dylib \
+            -DOPENSSL_INCLUDE_DIR=/usr/local/opt/openssl@3/include \
+            -DOPENSSL_SSL_LIBRARIES=/usr/local/opt/openssl@3/lib/libssl.dylib \
+            -DOPENSSL_CRYPTO_LIBRARIES=/usr/local/opt/openssl@3/lib/libcrypto.dylib
+
+      - name: Build
+        run: |
+          cd build
+          make -j$(sysctl -n hw.ncpu)
+
+      - name: Check build artifacts
+        run: |
+          if [ ! -f "build/bin/worldserver" ]; then
+            echo "worldserver not found!"
+            exit 1
+          fi
+          if [ ! -f "build/bin/authserver" ]; then
+            echo "authserver not found!"
+            exit 1
+          fi
+          echo "Build successful!"
+
+  test-webservice:
+    runs-on: ubuntu-22.04
+    name: Test Character Web Service
+    needs: [build-ubuntu]
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+
+      - name: Install Python dependencies
+        run: |
+          pip install requests
+
+      - name: Run web service tests
+        run: |
+          # This would run after a successful build
+          # For now, just verify the test file exists
+          if [ -f "test_webservice.py" ]; then
+            echo "Web service test file found"
+          else
+            echo "Warning: test_webservice.py not found"
+          fi

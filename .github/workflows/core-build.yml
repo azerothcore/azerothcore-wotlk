@@ -1,0 +1,153 @@
+name: Core Build
+
+on:
+  push:
+    branches: [ master, develop ]
+    paths:
+      - 'src/**'
+      - 'CMakeLists.txt'
+      - 'cmake/**'
+      - '.github/workflows/core-build.yml'
+  pull_request:
+    branches: [ master ]
+    paths:
+      - 'src/**'
+      - 'CMakeLists.txt'
+      - 'cmake/**'
+
+jobs:
+  build:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-22.04, windows-2022]
+        include:
+          - os: ubuntu-22.04
+            compiler: clang
+            name: Ubuntu
+          - os: windows-2022
+            compiler: msvc
+            name: Windows
+
+    runs-on: ${{ matrix.os }}
+    name: ${{ matrix.name }} Build
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      # Windows specific setup
+      - name: Setup Windows environment
+        if: matrix.os == 'windows-2022'
+        run: |
+          choco install --no-progress openssl
+
+      - name: Setup MSBuild
+        if: matrix.os == 'windows-2022'
+        uses: microsoft/setup-msbuild@v1.1
+
+      # Ubuntu specific setup
+      - name: Setup Ubuntu environment
+        if: matrix.os == 'ubuntu-22.04'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            git cmake make gcc g++ clang \
+            libssl-dev libbz2-dev libreadline-dev \
+            libncurses-dev libboost-all-dev \
+            mysql-server libmysqlclient-dev \
+            libace-dev
+
+      # Common CMake setup
+      - name: Setup CMake
+        uses: jwlawson/actions-setup-cmake@v1.14
+        with:
+          cmake-version: '3.27.0'  # Min 3.27 for Windows, 3.16 for Linux
+
+      # Configure (Windows)
+      - name: Configure Windows build
+        if: matrix.os == 'windows-2022'
+        run: |
+          mkdir build
+          cd build
+          cmake .. -G "Visual Studio 17 2022" -A x64 `
+            -DCMAKE_BUILD_TYPE=RelWithDebInfo `
+            -DWITH_WARNINGS=1 `
+            -DSCRIPTS=static `
+            -DTOOLS_BUILD=all
+
+      # Configure (Ubuntu)
+      - name: Configure Ubuntu build
+        if: matrix.os == 'ubuntu-22.04'
+        run: |
+          mkdir build
+          cd build
+          cmake .. \
+            -DCMAKE_BUILD_TYPE=RelWithDebInfo \
+            -DWITH_WARNINGS=1 \
+            -DSCRIPTS=static \
+            -DTOOLS_BUILD=all \
+            -DCMAKE_C_COMPILER=/usr/bin/clang \
+            -DCMAKE_CXX_COMPILER=/usr/bin/clang++
+
+      # Build (Windows)
+      - name: Build Windows
+        if: matrix.os == 'windows-2022'
+        run: |
+          cd build
+          cmake --build . --config RelWithDebInfo --parallel 4 --target worldserver authserver
+
+      # Build (Ubuntu)
+      - name: Build Ubuntu
+        if: matrix.os == 'ubuntu-22.04'
+        run: |
+          cd build
+          make -j$(nproc) worldserver authserver
+
+      # Verify build artifacts
+      - name: Verify Windows build
+        if: matrix.os == 'windows-2022'
+        run: |
+          $worldserver = "build\bin\RelWithDebInfo\worldserver.exe"
+          $authserver = "build\bin\RelWithDebInfo\authserver.exe"
+          
+          if (-not (Test-Path $worldserver)) {
+            Write-Error "worldserver.exe not found!"
+            exit 1
+          }
+          
+          if (-not (Test-Path $authserver)) {
+            Write-Error "authserver.exe not found!"
+            exit 1
+          }
+          
+          Write-Host "✓ Build artifacts verified successfully"
+
+      - name: Verify Ubuntu build
+        if: matrix.os == 'ubuntu-22.04'
+        run: |
+          if [ ! -f "build/bin/worldserver" ]; then
+            echo "worldserver not found!"
+            exit 1
+          fi
+          
+          if [ ! -f "build/bin/authserver" ]; then
+            echo "authserver not found!"
+            exit 1
+          fi
+          
+          echo "✓ Build artifacts verified successfully"
+
+      # Upload artifacts for debugging failed builds
+      - name: Upload build artifacts on failure
+        if: failure()
+        uses: actions/upload-artifact@v3
+        with:
+          name: build-logs-${{ matrix.name }}
+          path: |
+            build/**/*.log
+            build/**/CMakeCache.txt
+            build/**/CMakeError.log
+            build/**/CMakeOutput.log
