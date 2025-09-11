@@ -5496,7 +5496,7 @@ class spell_gen_cooldown_all : public SpellScript
 // 29008 - Food (Friendship Bread)
 enum HeartFood
 {
-    SPELL_HEART_VISUAL = 6552
+    SPELL_VISUAL_KIT_HEART_EMOTE = 6552
 };
 
 class spell_gen_food_heart_emote : public AuraScript
@@ -5511,12 +5511,12 @@ class spell_gen_food_heart_emote : public AuraScript
 
     void OnApply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
     {
-        GetUnitOwner()->SendPlaySpellVisual(SPELL_HEART_VISUAL);
+        GetUnitOwner()->SendPlaySpellVisual(SPELL_VISUAL_KIT_HEART_EMOTE);
     }
 
     void HandleUpdatePeriodic(AuraEffect* /*aurEff*/)
     {
-        GetUnitOwner()->SendPlaySpellVisual(SPELL_HEART_VISUAL);
+        GetUnitOwner()->SendPlaySpellVisual(SPELL_VISUAL_KIT_HEART_EMOTE);
     }
 
     void Register() override
