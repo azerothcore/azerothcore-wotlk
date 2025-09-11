@@ -2910,6 +2910,7 @@ void Player::RemoveItem(uint8 bag, uint8 slot, bool update, bool swap)
         RemoveEnchantmentDurations(pItem);
         RemoveItemDurations(pItem);
         RemoveTradeableItem(pItem);
+        ApplyItemObtainSpells(pItem, false);
 
         if (bag == INVENTORY_SLOT_BAG_0)
         {
