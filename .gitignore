@@ -110,5 +110,6 @@ local.properties
 !modules/mod-setxpbar
 !modules/mod-individual-xp
 !modules/mod-solocraft
+!modules/mod-ah-bot
 
 !env/dist/etc/modules/
