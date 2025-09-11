@@ -1832,9 +1832,6 @@ void Player::RegenerateAll()
 
         for (auto itr = auraList.begin(); itr != auraList.end(); ++itr)
         {
-            // hardcoded spellids for Friendship Bread and Freshly-Squeezed Lemonade
-            if ((*itr)->GetSpellInfo()->Id == 29007 || (*itr)->GetSpellInfo()->Id == 29008)
-                SendPlaySpellVisual(6552);
             // Food emote comes above drinking emote if we have to decide (mage regen food for example)
             if ((*itr)->GetBase()->HasEffectType(SPELL_AURA_MOD_REGEN) && (*itr)->GetSpellInfo()->AuraInterruptFlags & AURA_INTERRUPT_FLAG_NOT_SEATED)
             {

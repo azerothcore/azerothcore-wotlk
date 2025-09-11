@@ -5492,6 +5492,41 @@ class spell_gen_cooldown_all : public SpellScript
     }
 };
 
+// 29007 - Drink (Freshly-Squeezed Lemonade)
+// 29008 - Food (Friendship Bread)
+enum HeartFood
+{
+    SPELL_HEART_VISUAL = 6552
+};
+
+class spell_gen_heart_food : public AuraScript
+{
+    PrepareAuraScript(spell_gen_heart_food);
+
+    void CalcPeriodic(AuraEffect const* /*effect*/, bool& isPeriodic, int32& amplitude)
+    {
+        isPeriodic = true;
+        amplitude = 5 * IN_MILLISECONDS;
+    }
+
+    void OnApply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
+    {
+        GetUnitOwner()->SendPlaySpellVisual(SPELL_HEART_VISUAL);
+    }
+
+    void HandleUpdatePeriodic(AuraEffect* /*aurEff*/)
+    {
+        GetUnitOwner()->SendPlaySpellVisual(SPELL_HEART_VISUAL);
+    }
+
+    void Register() override
+    {
+        OnEffectApply += AuraEffectApplyFn(spell_gen_heart_food::OnApply, EFFECT_0, SPELL_AURA_MOD_REGEN, AURA_EFFECT_HANDLE_REAL);
+        DoEffectCalcPeriodic += AuraEffectCalcPeriodicFn(spell_gen_heart_food::CalcPeriodic, EFFECT_0, SPELL_AURA_MOD_REGEN);
+        OnEffectUpdatePeriodic += AuraEffectUpdatePeriodicFn(spell_gen_heart_food::HandleUpdatePeriodic, EFFECT_0, SPELL_AURA_MOD_REGEN);
+    }
+};
+
 void AddSC_generic_spell_scripts()
 {
     RegisterSpellScript(spell_silithyst);
@@ -5656,4 +5691,5 @@ void AddSC_generic_spell_scripts()
     RegisterSpellScriptWithArgs(spell_gen_translocate, "spell_gen_translocate_down", SPELL_TRANSLOCATION_DOWN);
     RegisterSpellScriptWithArgs(spell_gen_translocate, "spell_gen_translocate_up", SPELL_TRANSLOCATION_UP);
     RegisterSpellScript(spell_gen_cooldown_all);
+    RegisterSpellScript(spell_gen_heart_food);
 }
