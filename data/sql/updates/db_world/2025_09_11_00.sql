@@ -1,3 +1,4 @@
+-- DB update 2025_09_10_02 -> 2025_09_11_00
 
 -- Remove Drakkari Raiders from vehicle_template_accessory
 DELETE FROM `vehicle_template_accessory` WHERE `entry` = 29931;
