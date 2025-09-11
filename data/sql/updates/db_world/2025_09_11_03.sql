@@ -1,3 +1,4 @@
+-- DB update 2025_09_11_02 -> 2025_09_11_03
 
 -- Add Creature Formations
 DELETE FROM `creature_formations` WHERE (`LeaderGUID` IN (101902, 101916, 101917, 101918, 101919, 101937));
