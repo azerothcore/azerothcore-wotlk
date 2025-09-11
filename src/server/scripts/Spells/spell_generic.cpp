@@ -5521,9 +5521,10 @@ class spell_gen_food_heart_emote : public AuraScript
 
     void Register() override
     {
-        OnEffectApply += AuraEffectApplyFn(spell_gen_food_heart_emote::OnApply, EFFECT_0, SPELL_AURA_MOD_REGEN, AURA_EFFECT_HANDLE_REAL);
-        DoEffectCalcPeriodic += AuraEffectCalcPeriodicFn(spell_gen_food_heart_emote::CalcPeriodic, EFFECT_0, SPELL_AURA_MOD_REGEN);
-        OnEffectUpdatePeriodic += AuraEffectUpdatePeriodicFn(spell_gen_food_heart_emote::HandleUpdatePeriodic, EFFECT_0, SPELL_AURA_MOD_REGEN);
+        AuraType effName = (m_scriptSpellId == 29007) ? SPELL_AURA_MOD_POWER_REGEN : SPELL_AURA_MOD_REGEN;
+        OnEffectApply += AuraEffectApplyFn(spell_gen_food_heart_emote::OnApply, EFFECT_0, effName, AURA_EFFECT_HANDLE_REAL);
+        DoEffectCalcPeriodic += AuraEffectCalcPeriodicFn(spell_gen_food_heart_emote::CalcPeriodic, EFFECT_0, effName);
+        OnEffectUpdatePeriodic += AuraEffectUpdatePeriodicFn(spell_gen_food_heart_emote::HandleUpdatePeriodic, EFFECT_0, effName);
     }
 };
 
