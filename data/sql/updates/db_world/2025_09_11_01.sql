@@ -1,3 +1,4 @@
+-- DB update 2025_09_11_00 -> 2025_09_11_01
 --
 -- Remove movement override
 UPDATE `creature` SET `wander_distance`=0, `MovementType`=0 WHERE `id1` = 28617 AND `guid` IN (114829, 114830, 114831, 114832);
