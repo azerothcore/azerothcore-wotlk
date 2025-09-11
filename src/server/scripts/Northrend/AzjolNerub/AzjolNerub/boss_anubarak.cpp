@@ -137,6 +137,7 @@ class boss_anub_arak : public CreatureScript
 
                 ScheduleHealthCheckEvent({ 75, 50, 25 }, [&]{
                     Talk(SAY_SUBMERGE);
+                    me->InterruptNonMeleeSpells(false);
                     DoCastSelf(SPELL_CLEAR_ALL_DEBUFFS, true);
                     DoCastSelf(SPELL_SUBMERGE, false);
 
