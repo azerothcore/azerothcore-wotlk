@@ -74,6 +74,8 @@ SmartAI::SmartAI(Creature* c) : CreatureAI(c)
 
     _chaseOnInterrupt = false;
 
+    aiDataSet.clear();
+
     // Xinef: Vehicle conditions
     m_ConditionsTimer = 0;
     if (me->GetVehicleKit())
@@ -778,6 +780,7 @@ void SmartAI::JustRespawned()
     mFollowArrivedEntry = 0;
     mFollowCreditType = 0;
     mFollowArrivedAlive = true;
+    aiDataSet.clear();
 }
 
 void SmartAI::JustReachedHome()
@@ -963,8 +966,12 @@ void SmartAI::DoAction(int32 param)
     GetScript()->ProcessEventsFor(SMART_EVENT_ACTION_DONE, nullptr, param);
 }
 
-uint32 SmartAI::GetData(uint32 /*id*/) const
+uint32 SmartAI::GetData(uint32 id) const
 {
+    auto const& itr = aiDataSet.find(id);
+    if (itr != aiDataSet.end())
+        return itr->second;
+
     return 0;
 }
 
@@ -980,6 +987,7 @@ void SmartAI::SetData(uint32 id, uint32 value, WorldObject* invoker)
             gob = invoker->ToGameObject();
     }
 
+    aiDataSet[id] = value;
     GetScript()->ProcessEventsFor(SMART_EVENT_DATA_SET, unit, id, value, false, nullptr, gob);
 }
 
