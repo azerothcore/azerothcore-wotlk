@@ -972,7 +972,6 @@ uint32 SmartAI::GetData(uint32 id) const
     if (itr != aiDataSet.end())
         return itr->second;
 
-    LOG_ERROR("scripts.ai.sai", "SmartAI::GetData Attempted to access a non-existent index {} for creature/GO {}.", id, me->GetEntry());
     return 0;
 }
 
