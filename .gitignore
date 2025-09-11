@@ -109,5 +109,6 @@ local.properties
 !modules/mod-auto-resurrect
 !modules/mod-setxpbar
 !modules/mod-individual-xp
+!modules/mod-solocraft
 
 !env/dist/etc/modules/
