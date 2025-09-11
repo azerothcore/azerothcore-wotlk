@@ -581,7 +581,7 @@ bool Condition::Meets(ConditionSourceInfo& sourceInfo)
     case CONDITION_AI_DATA:
     {
         if (Creature* creature = object->ToCreature())
-            condMeets = creature->AI()->GetData(ConditionValue1) == ConditionValue2;
+            condMeets = creature->AI() && creature->AI()->GetData(ConditionValue1) == ConditionValue2;
         else if (GameObject* go = object->ToGameObject())
             condMeets = go->AI() && go->AI()->GetData(ConditionValue1) == ConditionValue2;
         break;
