@@ -106,3 +106,6 @@ local.properties
 !modules/mod-transmog
 !modules/mod-autobalance
 !modules/mod-solo-lfg
+!modules/mod-auto-resurrect
+
+!env/dist/etc/modules
