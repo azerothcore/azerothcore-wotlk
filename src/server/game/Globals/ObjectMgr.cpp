@@ -9308,7 +9308,7 @@ void ObjectMgr::AddSpellToTrainer(uint32 entry, uint32 spell, uint32 spellCost, 
         return;
     }
 
-    if (cInfo && !(cInfo->npcflag & UNIT_NPC_FLAG_TRAINER))
+    if (!(cInfo->npcflag & UNIT_NPC_FLAG_TRAINER))
     {
         LOG_ERROR("sql.sql", "Table `npc_trainer` contains an entry for a creature template (Entry: {}) without trainer flag, ignoring", entry);
         return;
