@@ -790,7 +790,7 @@ uint32 Condition::GetSearcherTypeMaskForCondition()
         mask |= GRID_MAP_TYPE_MASK_ALL;
         break;
     case CONDITION_AI_DATA:
-        mask |= GRID_MAP_TYPE_MASK_CREATURE | GRID_MAP_TYPE_MASK_PLAYER | GRID_MAP_TYPE_MASK_GAMEOBJECT;
+        mask |= GRID_MAP_TYPE_MASK_CREATURE | GRID_MAP_TYPE_MASK_GAMEOBJECT;
         break;
     default:
         ASSERT(false && "Condition::GetSearcherTypeMaskForCondition - missing condition handling!");
