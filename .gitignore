@@ -104,3 +104,4 @@ local.properties
 # ==================
 
 !modules/mod-transmog
+!modules/mod-autobalance
