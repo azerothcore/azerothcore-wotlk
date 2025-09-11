@@ -25,12 +25,13 @@ class GridTerrainData;
 
 template
 <
-    class GRID_OBJECT_TYPES
+    class GRID_OBJECT_TYPES,
+    class FAR_VISIBLE_OBJECT_TYPES
 >
 class MapGrid
 {
 public:
-    typedef GridCell<GRID_OBJECT_TYPES> GridCellType;
+    typedef GridCell<GRID_OBJECT_TYPES, FAR_VISIBLE_OBJECT_TYPES> GridCellType;
 
     MapGrid(uint16 const x, uint16 const y)
         : _x(x), _y(y), _objectDataLoaded(false), _terrainData(nullptr) { }
@@ -54,9 +55,19 @@ public:
         GetOrCreateCell(x, y).RemoveGridObject(obj);
     }
 
+    template<class SPECIFIC_OBJECT> void AddFarVisibleObject(uint16 const x, uint16 const y, SPECIFIC_OBJECT* obj)
+    {
+        GetOrCreateCell(x, y).AddFarVisibleObject(obj);
+    }
+
+    template<class SPECIFIC_OBJECT> void RemoveFarVisibleObject(uint16 const x, uint16 const y, SPECIFIC_OBJECT* obj)
+    {
+        GetOrCreateCell(x, y).RemoveFarVisibleObject(obj);
+    }
+
     // Visit all cells
     template<class T, class TT>
-    void VisitAllCells(TypeContainerVisitor<T, TypeMapContainer<TT> >& visitor)
+    void VisitAllCells(TypeContainerVisitor<T, TT>& visitor)
     {
         for (auto& cellX : _cells)
         {
@@ -72,7 +83,7 @@ public:
 
     // Visit single cell
     template<class T, class TT>
-    void VisitCell(uint16 const x, uint16 const y, TypeContainerVisitor<T, TypeMapContainer<TT> >& visitor)
+    void VisitCell(uint16 const x, uint16 const y, TypeContainerVisitor<T, TT>& visitor)
     {
         GridCellType* gridCell = GetCell(x, y);
         if (!gridCell)
@@ -81,7 +92,7 @@ public:
         gridCell->Visit(visitor);
     }
 
-    void link(GridRefMgr<MapGrid<GRID_OBJECT_TYPES>>* pTo)
+    void link(GridRefMgr<MapGrid<GRID_OBJECT_TYPES, FAR_VISIBLE_OBJECT_TYPES>>* pTo)
     {
         _gridReference.link(pTo, this);
     }
@@ -134,7 +145,7 @@ private:
 
     bool _objectDataLoaded;
     std::array<std::array<std::unique_ptr<GridCellType>, MAX_NUMBER_OF_CELLS>, MAX_NUMBER_OF_CELLS> _cells; // N * N array
-    GridReference<MapGrid<GRID_OBJECT_TYPES>> _gridReference;
+    GridReference<MapGrid<GRID_OBJECT_TYPES, FAR_VISIBLE_OBJECT_TYPES>> _gridReference;
 
     // Instances will share a copy of the parent maps terrainData
     std::shared_ptr<GridTerrainData> _terrainData;
