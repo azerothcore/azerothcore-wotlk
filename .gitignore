@@ -107,5 +107,7 @@ local.properties
 !modules/mod-autobalance
 !modules/mod-solo-lfg
 !modules/mod-auto-resurrect
+!modules/mod-setxpbar
+!modules/mod-individual-xp
 
-!env/dist/etc/modules
+!env/dist/etc/modules/
