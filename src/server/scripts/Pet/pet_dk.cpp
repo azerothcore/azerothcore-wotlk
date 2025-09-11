@@ -245,6 +245,20 @@ struct npc_pet_dk_ghoul : public CombatAI
 {
     npc_pet_dk_ghoul(Creature* c) : CombatAI(c) { }
 
+    void IsSummonedBy(WorldObject* summoner) override
+    {
+        if (!summoner || !summoner->IsPlayer())
+            return;
+
+        Player* player = summoner->ToPlayer();
+
+        if (Unit* victim = player->GetVictim())
+        {
+            me->Attack(victim, true);
+            me->GetMotionMaster()->MoveChase(victim);
+        }
+    }
+
     void JustDied(Unit* /*who*/) override
     {
         if (me->IsGuardian() || me->IsSummon())
@@ -277,6 +291,28 @@ struct npc_pet_dk_army_of_the_dead : public CombatAI
     {
         CombatAI::InitializeAI();
         ((Minion*)me)->SetFollowAngle(rand_norm() * 2 * M_PI);
+    }
+
+    void IsSummonedBy(WorldObject* summoner) override
+    {
+        if (Unit* owner = summoner->ToUnit())
+        {
+            Unit* victim = owner->GetVictim();
+
+            if (victim && me->IsValidAttackTarget(victim))
+            {
+                AttackStart(victim);
+            }
+            else
+            {
+                // If there is no valid target, attack the nearest enemy within 30m
+                if (Unit* nearest = me->SelectNearbyTarget(nullptr, 30.0f))
+                {
+                    if (me->IsValidAttackTarget(nearest))
+                        AttackStart(nearest);
+                }
+            }
+        }
     }
 };
 

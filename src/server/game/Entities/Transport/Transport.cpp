@@ -607,12 +607,12 @@ void MotionTransport::DelayedTeleportTransport()
     }
 
     Map* newMap = sMapMgr->CreateBaseMap(newMapId);
-    GetMap()->RemoveFromMap<MotionTransport>(this, false);
+    GetMap()->RemoveFromMap<Transport>(this, false);
     newMap->LoadGrid(x, y); // xinef: load before adding passengers to new map
     SetMap(newMap);
 
     Relocate(x, y, z, o);
-    GetMap()->AddToMap<MotionTransport>(this);
+    GetMap()->AddToMap<Transport>(this);
 
     LoadStaticPassengers();
 }
@@ -688,6 +688,40 @@ StaticTransport::StaticTransport() : Transport(), _needDoInitialRelocation(false
 StaticTransport::~StaticTransport()
 {
     ASSERT(_passengers.empty());
+}
+
+bool StaticTransport::LoadGameObjectFromDB(ObjectGuid::LowType spawnId, Map* map, bool addToMap)
+{
+    GameObjectData const* data = sObjectMgr->GetGameObjectData(spawnId);
+
+    if (!data)
+    {
+        LOG_ERROR("sql.sql", "Gameobject (GUID: {}) not found in table `gameobject`, can't load. ", spawnId);
+        return false;
+    }
+
+    uint32 entry = data->id;
+    //uint32 map_id = data->mapid;                          // already used before call
+    uint32 phaseMask = data->phaseMask;
+    float x = data->posX;
+    float y = data->posY;
+    float z = data->posZ;
+    float ang = data->orientation;
+
+    uint32 animprogress = data->animprogress;
+    GOState go_state = data->go_state;
+    uint32 artKit = data->artKit;
+
+    m_goData = data;
+    m_spawnId = spawnId;
+
+    if (!Create(map->GenerateLowGuid<HighGuid::Transport>(), entry, map, phaseMask, x, y, z, ang, data->rotation, animprogress, go_state, artKit))
+        return false;
+
+    if (addToMap && !GetMap()->AddToMap<Transport>(this))
+        return false;
+
+    return true;
 }
 
 bool StaticTransport::Create(ObjectGuid::LowType guidlow, uint32 name_id, Map* map, uint32 phaseMask, float x, float y, float z, float ang, G3D::Quat const& rotation, uint32 animprogress, GOState go_state, uint32 artKit)
@@ -794,7 +828,6 @@ bool StaticTransport::Create(ObjectGuid::LowType guidlow, uint32 name_id, Map* m
     LastUsedScriptID = GetGOInfo()->ScriptId;
     AIM_Initialize();
 
-    this->setActive(true);
     return true;
 }
 
@@ -929,7 +962,9 @@ void StaticTransport::UpdatePosition(float x, float y, float z, float o)
     if (!GetMap()->IsGridLoaded(x, y)) // pussywizard: should not happen, but just in case
         GetMap()->LoadGrid(x, y);
 
-    GetMap()->GameObjectRelocation(this, x, y, z, o); // this also relocates the model
+    Relocate(x, y, z, o);
+    UpdateModelPosition();
+
     UpdatePassengerPositions();
 }
 

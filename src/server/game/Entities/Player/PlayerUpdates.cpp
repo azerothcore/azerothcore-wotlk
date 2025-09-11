@@ -1595,21 +1595,12 @@ void Player::UpdateVisibilityForPlayer(bool mapChange)
     // After added to map seer must be a player - there is no possibility to
     // still have different seer (all charm auras must be already removed)
     if (mapChange && m_seer != this)
-    {
         m_seer = this;
-    }
 
-    Acore::VisibleNotifier notifierNoLarge(
-        *this, mapChange,
-        false); // visit only objects which are not large; default distance
-    Cell::VisitObjects(m_seer, notifierNoLarge,
-                          GetSightRange() + VISIBILITY_INC_FOR_GOBJECTS);
-    notifierNoLarge.SendToSelf();
-
-    Acore::VisibleNotifier notifierLarge(
-        *this, mapChange, true); // visit only large objects; maximum distance
-    Cell::VisitObjects(m_seer, notifierLarge, GetSightRange());
-    notifierLarge.SendToSelf();
+    Acore::VisibleNotifier notifier(*this, mapChange);
+    Cell::VisitObjects(m_seer, notifier, GetSightRange());
+    Cell::VisitFarVisibleObjects(m_seer, notifier, VISIBILITY_DISTANCE_GIGANTIC);
+    notifier.SendToSelf();
 
     if (mapChange)
         m_last_notify_position.Relocate(-5000.0f, -5000.0f, -5000.0f, 0.0f);
@@ -1646,10 +1637,7 @@ template <>
 inline void UpdateVisibilityOf_helper(Player* player, GameObject* target,
                                       std::vector<Unit*>& /*v*/)
 {
-    // @HACK: This is to prevent objects like deeprun tram from disappearing
-    // when player moves far from its spawn point while riding it
-    if ((target->GetGOInfo()->type != GAMEOBJECT_TYPE_TRANSPORT))
-        player->GetObjectVisibilityContainer().LinkWorldObjectVisibility(target);
+    player->GetObjectVisibilityContainer().LinkWorldObjectVisibility(target);
 }
 
 template <>

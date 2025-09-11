@@ -146,7 +146,9 @@ struct ZoneDynamicInfo
 
 typedef std::map<uint32/*leaderDBGUID*/, CreatureGroup*>        CreatureGroupHolderType;
 typedef std::unordered_map<uint32 /*zoneId*/, ZoneDynamicInfo> ZoneDynamicInfoMap;
-typedef std::set<MotionTransport*> TransportsContainer;
+typedef std::unordered_set<Transport*> TransportsContainer;
+typedef std::unordered_set<WorldObject*> ZoneWideVisibleWorldObjectsSet;
+typedef std::unordered_map<uint32 /*ZoneId*/, ZoneWideVisibleWorldObjectsSet> ZoneWideVisibleWorldObjectsMap;
 
 enum EncounterCreditType : uint8
 {
@@ -443,6 +445,8 @@ public:
     void SendZoneDynamicInfo(Player* player);
     void SendInitSelf(Player* player);
 
+    void UpdateExpiredCorpses(uint32 const diff);
+
     void PlayDirectSoundToMap(uint32 soundId, uint32 zoneId = 0);
     void SetZoneMusic(uint32 zoneId, uint32 musicId);
     void SetZoneWeather(uint32 zoneId, WeatherState weatherId, float weatherGrade);
@@ -479,7 +483,7 @@ public:
         _updateObjects.erase(obj);
     }
 
-    size_t GetUpdateObjectsCount() const { return _updateObjects.size(); }
+    size_t GetUpdatableObjectsCount() const { return _updatableObjectList.size(); }
 
     virtual std::string GetDebugInfo() const;
 
@@ -493,6 +497,12 @@ public:
 
     typedef std::vector<WorldObject*> UpdatableObjectList;
     typedef std::unordered_set<WorldObject*> PendingAddUpdatableObjectList;
+
+    void AddWorldObjectToFarVisibleMap(WorldObject* obj);
+    void RemoveWorldObjectFromFarVisibleMap(WorldObject* obj);
+    void AddWorldObjectToZoneWideVisibleMap(uint32 zoneId, WorldObject* obj);
+    void RemoveWorldObjectFromZoneWideVisibleMap(uint32 zoneId, WorldObject* obj);
+    ZoneWideVisibleWorldObjectsSet const* GetZoneWideVisibleWorldObjectsForZone(uint32 zoneId) const;
 
 private:
 
@@ -535,7 +545,6 @@ protected:
     MapRefMgr m_mapRefMgr;
     MapRefMgr::iterator m_mapRefIter;
 
-    // Objects that must update even in inactive grids without activating them
     TransportsContainer _transports;
     TransportsContainer::iterator _transportsUpdateIter;
 
@@ -577,6 +586,8 @@ private:
     ZoneDynamicInfoMap _zoneDynamicInfo;
     uint32 _defaultLight;
 
+    IntervalTimer _corpseUpdateTimer;
+
     template<HighGuid high>
     inline ObjectGuidGeneratorBase& GetGuidSequenceGenerator()
     {
@@ -600,6 +611,7 @@ private:
     UpdatableObjectList _updatableObjectList;
     PendingAddUpdatableObjectList _pendingAddUpdatableObjectList;
     IntervalTimer _updatableObjectListRecheckTimer;
+    ZoneWideVisibleWorldObjectsMap _zoneWideVisibleWorldObjectsMap;
 };
 
 enum InstanceResetMethod

@@ -73,6 +73,8 @@ Map::Map(uint32 id, uint32 InstanceId, uint8 SpawnMode, Map* _parent) :
 
     //lets initialize visibility distance for map
     Map::InitVisibilityDistance();
+
+    _corpseUpdateTimer.SetInterval(20 * MINUTE * IN_MILLISECONDS);
 }
 
 // Hook called after map is created AND after added to map list
@@ -116,6 +118,8 @@ void Map::AddToGrid(Creature* obj, Cell const& cell)
 {
     MapGridType* grid = GetMapGrid(cell.GridX(), cell.GridY());
     grid->AddGridObject(cell.CellX(), cell.CellY(), obj);
+    if (obj->IsFarVisible())
+        grid->AddFarVisibleObject(cell.CellX(), cell.CellY(), obj);
 
     obj->SetCurrentCell(cell);
 }
@@ -125,6 +129,8 @@ void Map::AddToGrid(GameObject* obj, Cell const& cell)
 {
     MapGridType* grid = GetMapGrid(cell.GridX(), cell.GridY());
     grid->AddGridObject(cell.CellX(), cell.CellY(), obj);
+    if (obj->IsFarVisible())
+        grid->AddFarVisibleObject(cell.CellX(), cell.CellY(), obj);
 
     obj->SetCurrentCell(cell);
 }
@@ -345,7 +351,7 @@ bool Map::AddToMap(T* obj, bool checkTransport)
 }
 
 template<>
-bool Map::AddToMap(MotionTransport* obj, bool /*checkTransport*/)
+bool Map::AddToMap(Transport* obj, bool /*checkTransport*/)
 {
     //TODO: Needs clean up. An object should not be added to map twice.
     if (obj->IsInWorld())
@@ -360,26 +366,22 @@ bool Map::AddToMap(MotionTransport* obj, bool /*checkTransport*/)
     }
 
     Cell cell(cellCoord);
-    if (obj->isActiveObject())
-        EnsureGridLoaded(cell);
+    EnsureGridLoaded(cell);
 
     obj->AddToWorld();
 
     _transports.insert(obj);
 
     // Broadcast creation to players
-    if (!GetPlayers().IsEmpty())
+    for (Map::PlayerList::const_iterator itr = GetPlayers().begin(); itr != GetPlayers().end(); ++itr)
     {
-        for (Map::PlayerList::const_iterator itr = GetPlayers().begin(); itr != GetPlayers().end(); ++itr)
+        if (itr->GetSource()->GetTransport() != obj)
         {
-            if (itr->GetSource()->GetTransport() != obj)
-            {
-                UpdateData data;
-                obj->BuildCreateUpdateBlockForPlayer(&data, itr->GetSource());
-                WorldPacket packet;
-                data.BuildPacket(packet);
-                itr->GetSource()->SendDirectMessage(&packet);
-            }
+            UpdateData data;
+            obj->BuildCreateUpdateBlockForPlayer(&data, itr->GetSource());
+            WorldPacket packet;
+            data.BuildPacket(packet);
+            itr->GetSource()->SendDirectMessage(&packet);
         }
     }
 
@@ -498,6 +500,8 @@ void Map::Update(const uint32 t_diff, const uint32 s_diff, bool  /*thread*/)
 
     HandleDelayedVisibility();
 
+    UpdateExpiredCorpses(t_diff);
+
     sScriptMgr->OnMapUpdate(this, t_diff);
 
     METRIC_VALUE("map_creatures", uint64(GetObjectsStore().Size<Creature>()),
@@ -604,6 +608,69 @@ void Map::RemoveObjectFromMapUpdateList(WorldObject* obj)
         _RemoveObjectFromUpdateList(obj);
 }
 
+// Used in VisibilityDistanceType::Large and VisibilityDistanceType::Gigantic
+void Map::AddWorldObjectToFarVisibleMap(WorldObject* obj)
+{
+    if (Creature* creature = obj->ToCreature())
+    {
+        if (!creature->IsInGrid())
+            return;
+
+        Cell curr_cell = creature->GetCurrentCell();
+        MapGridType* grid = GetMapGrid(curr_cell.GridX(), curr_cell.GridY());
+        grid->AddFarVisibleObject(curr_cell.CellX(), curr_cell.CellY(), creature);
+    }
+    else if (GameObject* go = obj->ToGameObject())
+    {
+        if (!go->IsInGrid())
+            return;
+
+        Cell curr_cell = go->GetCurrentCell();
+        MapGridType* grid = GetMapGrid(curr_cell.GridX(), curr_cell.GridY());
+        grid->AddFarVisibleObject(curr_cell.CellX(), curr_cell.CellY(), go);
+    }
+}
+
+void Map::RemoveWorldObjectFromFarVisibleMap(WorldObject* obj)
+{
+    if (Creature* creature = obj->ToCreature())
+    {
+        Cell curr_cell = creature->GetCurrentCell();
+        MapGridType* grid = GetMapGrid(curr_cell.GridX(), curr_cell.GridY());
+        grid->RemoveFarVisibleObject(curr_cell.CellX(), curr_cell.CellY(), creature);
+    }
+    else if (GameObject* go = obj->ToGameObject())
+    {
+        Cell curr_cell = go->GetCurrentCell();
+        MapGridType* grid = GetMapGrid(curr_cell.GridX(), curr_cell.GridY());
+        grid->RemoveFarVisibleObject(curr_cell.CellX(), curr_cell.CellY(), go);
+    }
+}
+
+// Used in VisibilityDistanceType::Infinite
+void Map::AddWorldObjectToZoneWideVisibleMap(uint32 zoneId, WorldObject* obj)
+{
+    _zoneWideVisibleWorldObjectsMap[zoneId].insert(obj);
+}
+
+void Map::RemoveWorldObjectFromZoneWideVisibleMap(uint32 zoneId, WorldObject* obj)
+{
+    ZoneWideVisibleWorldObjectsMap::iterator itr = _zoneWideVisibleWorldObjectsMap.find(zoneId);
+    if (itr == _zoneWideVisibleWorldObjectsMap.end())
+        return;
+
+    itr->second.erase(obj);
+}
+
+ZoneWideVisibleWorldObjectsSet const* Map::GetZoneWideVisibleWorldObjectsForZone(uint32 zoneId) const
+{
+    ZoneWideVisibleWorldObjectsMap::const_iterator itr = _zoneWideVisibleWorldObjectsMap.find(zoneId);
+    if (itr == _zoneWideVisibleWorldObjectsMap.end())
+        return nullptr;
+
+    return &itr->second;
+}
+
 void Map::HandleDelayedVisibility()
 {
     if (i_objectsForDelayedVisibility.empty())
@@ -656,6 +723,8 @@ void Map::RemoveFromMap(T* obj, bool remove)
     obj->RemoveFromWorld();
 
     obj->RemoveFromGrid();
+    if (obj->IsFarVisible())
+        RemoveWorldObjectFromFarVisibleMap(obj);
 
     obj->ResetMap();
 
@@ -667,7 +736,7 @@ void Map::RemoveFromMap(T* obj, bool remove)
 }
 
 template<>
-void Map::RemoveFromMap(MotionTransport* obj, bool remove)
+void Map::RemoveFromMap(Transport* obj, bool remove)
 {
     obj->RemoveFromWorld();
 
@@ -697,8 +766,6 @@ void Map::RemoveFromMap(MotionTransport* obj, bool remove)
 
     obj->ResetMap();
 
-    // Transports are never actually deleted, but it *should* be safe to clear
-    // from update list when removing from world
     RemoveObjectFromMapUpdateList(obj);
 
     if (remove)
@@ -854,6 +921,11 @@ void Map::MoveAllCreaturesInMoveList()
 
         Cell const& old_cell = c->GetCurrentCell();
         Cell new_cell(c->GetPositionX(), c->GetPositionY());
+        if (c->IsFarVisible())
+        {
+            // Removes via GetCurrentCell, added back in AddToGrid
+            RemoveWorldObjectFromFarVisibleMap(c);
+        }
 
         c->RemoveFromGrid();
         if (old_cell.DiffGrid(new_cell))
@@ -883,6 +955,12 @@ void Map::MoveAllGameObjectsInMoveList()
 
         Cell const& old_cell = go->GetCurrentCell();
         Cell new_cell(go->GetPositionX(), go->GetPositionY());
+
+        if (go->IsFarVisible())
+        {
+            // Removes via GetCurrentCell, added back in AddToGrid
+            RemoveWorldObjectFromFarVisibleMap(go);
+        }
 
         go->RemoveFromGrid();
         if (old_cell.DiffGrid(new_cell))
@@ -966,11 +1044,10 @@ void Map::UnloadAll()
 
     for (TransportsContainer::iterator itr = _transports.begin(); itr != _transports.end();)
     {
-        MotionTransport* transport = *itr;
+        Transport* transport = *itr;
         ++itr;
 
-        transport->RemoveFromWorld();
-        delete transport;
+        RemoveFromMap<Transport>(transport, true);
     }
 
     _transports.clear();
@@ -1587,8 +1664,22 @@ void Map::SendInitSelf(Player* player)
     player->SendDirectMessage(&packet);
 }
 
+void Map::UpdateExpiredCorpses(uint32 const diff)
+{
+    _corpseUpdateTimer.Update(diff);
+    if (!_corpseUpdateTimer.Passed())
+        return;
+
+    RemoveOldCorpses();
+
+    _corpseUpdateTimer.Reset();
+}
+
 void Map::SendInitTransports(Player* player)
 {
+    if (_transports.empty())
+        return;
+
     // Hack to send out transports
     UpdateData transData;
     for (TransportsContainer::const_iterator itr = _transports.begin(); itr != _transports.end(); ++itr)
@@ -1605,23 +1696,14 @@ void Map::SendInitTransports(Player* player)
 
 void Map::SendRemoveTransports(Player* player)
 {
+    if (_transports.empty())
+        return;
+
     // Hack to send out transports
     UpdateData transData;
     for (TransportsContainer::const_iterator itr = _transports.begin(); itr != _transports.end(); ++itr)
         if (*itr != player->GetTransport())
             (*itr)->BuildOutOfRangeUpdateBlock(&transData);
-
-    // pussywizard: remove static transports from client
-    /*for (GuidUnorderedSet::const_iterator it = player->m_clientGUIDs.begin(); it != player->m_clientGUIDs.end(); )
-    {
-        if ((*it).IsTransport())
-        {
-            transData.AddOutOfRangeGUID(*it);
-            it = player->m_clientGUIDs.erase(it);
-        }
-        else
-            ++it;
-    }*/
 
     if (!transData.HasData())
         return;
@@ -1699,7 +1781,7 @@ void Map::DelayedUpdate(const uint32 t_diff)
 {
     for (_transportsUpdateIter = _transports.begin(); _transportsUpdateIter != _transports.end();)
     {
-        MotionTransport* transport = *_transportsUpdateIter;
+        Transport* transport = *_transportsUpdateIter;
         ++_transportsUpdateIter;
 
         if (!transport->IsInWorld())
@@ -1744,7 +1826,7 @@ void Map::RemoveAllObjectsInRemoveList()
                 RemoveFromMap((DynamicObject*)obj, true);
                 break;
             case TYPEID_GAMEOBJECT:
-                if (MotionTransport* transport = obj->ToGameObject()->ToMotionTransport())
+                if (Transport* transport = obj->ToGameObject()->ToTransport())
                     RemoveFromMap(transport, true);
                 else
                     RemoveFromMap(obj->ToGameObject(), true);

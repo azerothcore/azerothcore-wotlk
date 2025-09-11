@@ -75,8 +75,6 @@ enum DrakeGiverTexts
 class npc_oculus_drakegiver : public CreatureScript
 {
 public:
-    std::unordered_map<ObjectGuid, bool>openedMenu;
-
     npc_oculus_drakegiver() : CreatureScript("npc_oculus_drakegiver") { }
 
     CreatureAI* GetAI(Creature* creature) const override
@@ -193,20 +191,8 @@ public:
                 SendGossipMenuFor(player, GOSSIP_TEXTID_VERDISA1, creature->GetGUID());
                 break;
             case NPC_BELGARISTRASZ:
-                if (HAS_ESSENCE(player))
-                {
-                    openedMenu[player->GetGUID()] = true;
-                }
-
-                if (!openedMenu[player->GetGUID()])
-                {
-                    AddGossipItemFor(player, 9708, 0, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF);
-                    SendGossipMenuFor(player, GOSSIP_TEXTID_DRAKES, creature->GetGUID());
-                }
-                else
-                {
-                    OnGossipSelect(player, creature, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF);
-                }
+                AddGossipItemFor(player, 9708, 0, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF);
+                SendGossipMenuFor(player, GOSSIP_TEXTID_DRAKES, creature->GetGUID());
                 break;
             case NPC_ETERNOS:
                 AddGossipItemFor(player, 9574, 0, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF);
@@ -277,7 +263,6 @@ public:
             switch (uiAction)
             {
             case GOSSIP_ACTION_INFO_DEF:
-                openedMenu[player->GetGUID()] = true;
                 if (player->HasItemCount(ITEM_AMBER_ESSENCE))
                 {
                     AddGossipItemFor(player, 9575, 1, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);

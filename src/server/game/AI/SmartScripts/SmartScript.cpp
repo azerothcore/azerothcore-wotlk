@@ -742,6 +742,8 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
 
                     if (e.action.cast.castFlags & SMARTCAST_COMBAT_MOVE)
                     {
+                        CAST_AI(SmartAI, me->AI())->SetChaseOnInterrupt(true);
+
                         if (!me->isMoving()) // Don't try to reposition while we are moving
                         {
                             // If cast flag SMARTCAST_COMBAT_MOVE is set combat movement will not be allowed unless target is outside spell range, out of mana, or LOS.
@@ -893,7 +895,7 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
                         go->SetLootState(GO_READY);
                     }
 
-                    go->UseDoorOrButton(0, !!e.action.activateObject.alternative, unit);
+                    go->UseDoorOrButton(0, e.action.activateObject.alternative, unit);
                     LOG_DEBUG("sql.sql", "SmartScript::ProcessAction:: SMART_ACTION_ACTIVATE_GOBJECT. Gameobject {} activated", go->GetGUID().ToString());
                 }
             }
@@ -1483,14 +1485,14 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
         {
             for (WorldObject* target : targets)
                 if (IsUnit(target))
-                    target->ToUnit()->SetVisible(!!e.action.visibility.state);
+                    target->ToUnit()->SetVisible(e.action.visibility.state);
 
             break;
         }
         case SMART_ACTION_SET_ACTIVE:
         {
             for (WorldObject* target : targets)
-                target->setActive(!!e.action.setActive.state);
+                target->setActive(e.action.setActive.state);
             break;
         }
         case SMART_ACTION_ATTACK_START:
@@ -3832,19 +3834,20 @@ void SmartScript::GetTargets(ObjectVector& targets, SmartScriptHolder const& e, 
                 {
                     targets.clear();
 
-                    if (owner->ToCreature())
+                    if (IsCreature(owner))
                     {
                         if (Unit* base = ObjectAccessor::GetUnit(*owner, owner->ToCreature()->GetCharmerOrOwnerGUID()))
-                        {
                             targets.push_back(base);
-                        }
                     }
-                    else
+                    else if (IsGameObject(owner))
                     {
                         if (Unit* base = ObjectAccessor::GetUnit(*owner, owner->ToGameObject()->GetOwnerGUID()))
-                        {
                             targets.push_back(base);
-                        }
+                    }
+                    else if (IsPlayer(owner))
+                    {
+                        if (Unit* base = owner->ToPlayer()->GetCharmerOrOwner())
+                            targets.push_back(base);
                     }
                 }
             }

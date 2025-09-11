@@ -139,6 +139,11 @@ void ScriptMgr::OnPlayerReputationRankChange(Player* player, uint32 factionID, R
     CALL_ENABLED_HOOKS(PlayerScript, PLAYERHOOK_ON_REPUTATION_RANK_CHANGE, script->OnPlayerReputationRankChange(player, factionID, newRank, oldRank, increased));
 }
 
+void ScriptMgr::OnPlayerGiveReputation(Player* player, int32 factionID, float& amount, ReputationSource repSource)
+{
+    CALL_ENABLED_HOOKS(PlayerScript, PLAYERHOOK_ON_GIVE_REPUTATION, script->OnPlayerGiveReputation(player, factionID, amount, repSource));
+}
+
 void ScriptMgr::OnPlayerLearnSpell(Player* player, uint32 spellID)
 {
     CALL_ENABLED_HOOKS(PlayerScript, PLAYERHOOK_ON_LEARN_SPELL, script->OnPlayerLearnSpell(player, spellID));

@@ -149,4 +149,27 @@ export CPUPROFILESIGNAL=${CPUPROFILESIGNAL:-12}
 # Other values for HEAPCHECK: minimal, normal (equivalent to "1"), strict, draconian
 #export HEAPCHECK=${HEAPCHECK:-normal}
 
+##############################################
+#
+#  MODULES LIST FILE (for installer `module` commands)
+#
+# Path to the file where the installer records installed modules
+# with their branch and commit. You can override this path by
+# setting the MODULES_LIST_FILE inside your config.sh or as an environment variable.
+# By default it points inside the repository conf folder.
+# Format of each line:
+#   <module-name> <branch> <commit>
+# Lines starting with '#' and empty lines are ignored.
+export MODULES_LIST_FILE=${MODULES_LIST_FILE:-"$AC_PATH_ROOT/conf/modules.list"}
+
+# Space/newline separated list of modules to exclude when using
+# 'module install --all' and 'module update --all'. Items can be specified
+# as simple names (e.g., mod-transmog), owner/name, or full URLs.
+# Example:
+# export MODULES_EXCLUDE_LIST="azerothcore/mod-transmog azerothcore/mod-autobalance"
+export MODULES_EXCLUDE_LIST=""
+
+NO_COLOR=${NO_COLOR:-}
+FORCE_COLOR=${FORCE_COLOR:-}
+
 
