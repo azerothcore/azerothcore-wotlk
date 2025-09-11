@@ -395,7 +395,6 @@ private:
 
 void AddSC_areatrigger_scripts()
 {
-    new AreaTrigger_at_voltarus_middle();
     new AreaTrigger_at_coilfang_waterfall();
     new AreaTrigger_at_legion_teleporter();
     new AreaTrigger_at_stormwright_shelf();
