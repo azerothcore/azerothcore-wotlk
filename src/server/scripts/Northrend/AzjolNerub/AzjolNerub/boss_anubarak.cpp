@@ -181,7 +181,7 @@ class boss_anub_arak : public CreatureScript
             void SummonHelpers(float x, float y, float z, uint32 spellId)
             {
                 SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(spellId);
-                me->SummonCreature(spellInfo->Effects[EFFECT_0].MiscValue, x, y, z);
+                me->SummonCreature(spellInfo->Effects[EFFECT_0].MiscValue, x, y, z, 0.0f, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 5000);
             }
 
             void UpdateAI(uint32 diff) override
@@ -240,7 +240,6 @@ class boss_anub_arak : public CreatureScript
                         SummonHelpers(589.51f, 240.19f, 236.0f, SPELL_SUMMON_DARTER);
                         break;
                     case EVENT_SUMMON_GUARDIAN:
-                        _summonedMinions = true;
                         SummonHelpers(550.34f, 316.00f, 234.30f, SPELL_SUMMON_GUARDIAN);
                         break;
                     case EVENT_SUMMON_VENOMANCER:
