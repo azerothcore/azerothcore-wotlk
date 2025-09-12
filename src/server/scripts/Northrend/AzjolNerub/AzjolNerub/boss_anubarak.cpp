@@ -86,10 +86,9 @@ class boss_anub_arak : public CreatureScript
             boss_anub_arakAI(Creature* creature) : BossAI(creature, DATA_ANUBARAK_EVENT)
             {
                 me->m_SightDistance = 120.0f;
-                intro = false;
+                _intro = false;
+                _summonedMinions = false;
             }
-
-            bool intro;
 
             void EnterEvadeMode(EvadeReason why) override
             {
@@ -99,9 +98,9 @@ class boss_anub_arak : public CreatureScript
 
             void MoveInLineOfSight(Unit* who) override
             {
-                if (!intro && who->IsPlayer())
+                if (!_intro && who->IsPlayer())
                 {
-                    intro = true;
+                    _intro = true;
                     Talk(SAY_INTRO);
                 }
                 BossAI::MoveInLineOfSight(who);
@@ -132,11 +131,13 @@ class boss_anub_arak : public CreatureScript
             void Reset() override
             {
                 BossAI::Reset();
+                _summonedMinions = false;
                 me->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE|UNIT_FLAG_NOT_SELECTABLE);
                 instance->DoStopTimedAchievement(ACHIEVEMENT_TIMED_TYPE_EVENT, ACHIEV_TIMED_START_EVENT);
 
                 ScheduleHealthCheckEvent({ 75, 50, 25 }, [&]{
                     Talk(SAY_SUBMERGE);
+                    _summonedMinions = false;
                     me->InterruptNonMeleeSpells(false);
                     DoCastSelf(SPELL_CLEAR_ALL_DEBUFFS, true);
                     DoCastSelf(SPELL_SUBMERGE, false);
@@ -159,8 +160,11 @@ class boss_anub_arak : public CreatureScript
 
             void SummonedCreatureDies(Creature* /*summon*/, Unit* /*killer*/) override
             {
-                if (!summons.HasEntry(NPC_ANUBAR_GUARDIAN) && !summons.HasEntry(NPC_ANUBAR_VENOMANCER))
-                    events.ScheduleEvent(EVENT_EMERGE, 5s);
+                if (!me->HasUnitFlag(UNIT_FLAG_NOT_SELECTABLE))
+                    return;
+
+                if (_summonedMinions && !summons.IsAnyCreatureWithEntryAlive(NPC_ANUBAR_GUARDIAN) && !summons.IsAnyCreatureWithEntryAlive(NPC_ANUBAR_VENOMANCER))
+                    events.RescheduleEvent(EVENT_EMERGE, 5s);
             }
 
             void JustEngagedWith(Unit* ) override
@@ -236,9 +240,11 @@ class boss_anub_arak : public CreatureScript
                         SummonHelpers(589.51f, 240.19f, 236.0f, SPELL_SUMMON_DARTER);
                         break;
                     case EVENT_SUMMON_GUARDIAN:
+                        _summonedMinions = true;
                         SummonHelpers(550.34f, 316.00f, 234.30f, SPELL_SUMMON_GUARDIAN);
                         break;
                     case EVENT_SUMMON_VENOMANCER:
+                        _summonedMinions = true;
                         SummonHelpers(550.34f, 316.00f, 234.30f, SPELL_SUMMON_VENOMANCER);
                         break;
                 }
@@ -246,6 +252,10 @@ class boss_anub_arak : public CreatureScript
                 if (!me->HasUnitFlag(UNIT_FLAG_NOT_SELECTABLE))
                     DoMeleeAttackIfReady();
             }
+
+            private:
+                bool _intro;
+                bool _summonedMinions;
         };
 
         CreatureAI* GetAI(Creature* creature) const override
