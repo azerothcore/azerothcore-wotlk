@@ -138,7 +138,6 @@ class boss_anub_arak : public CreatureScript
                 ScheduleHealthCheckEvent({ 75, 50, 25 }, [&]{
                     Talk(SAY_SUBMERGE);
                     _summonedMinions = false;
-                    me->InterruptNonMeleeSpells(false);
                     DoCastSelf(SPELL_CLEAR_ALL_DEBUFFS, true);
                     DoCastSelf(SPELL_SUBMERGE, false);
 
@@ -155,7 +154,7 @@ class boss_anub_arak : public CreatureScript
                     events.ScheduleEvent(EVENT_SUMMON_VENOMANCER, 20s);
                     events.ScheduleEvent(EVENT_SUMMON_DARTER, 30s);
                     events.ScheduleEvent(EVENT_SUMMON_ASSASSINS, 35s);
-                });
+                }, false);
             }
 
             void SummonedCreatureDies(Creature* /*summon*/, Unit* /*killer*/) override
