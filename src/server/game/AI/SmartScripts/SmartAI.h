@@ -262,6 +262,7 @@ private:
     uint32 m_ConditionsTimer;
 
     bool _chaseOnInterrupt;
+    std::unordered_map<uint32, uint32> aiDataSet;
 };
 
 class SmartGameObjectAI : public GameObjectAI
