@@ -1,3 +1,4 @@
+-- DB update 2025_09_11_03 -> 2025_09_12_00
 --
 -- The Aberrations Must Die.
 UPDATE `quest_template_addon` SET `PrevQuestID` = 12925 WHERE (`ID` = 13425);
