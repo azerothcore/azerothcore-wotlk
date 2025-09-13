@@ -568,6 +568,10 @@ enum BerylSorcerer
 {
     EVENT_FROSTBOLT                                = 1,
     EVENT_ARCANE_CHAINS                            = 2,
+    EVENT_CHECK_HEALTH                             = 3,
+    EVENT_BLINK                                    = 4,
+    EVENT_RESUME_MOVEMENT                          = 5,
+    EVENT_DELAY_BLINK                              = 6,
     NPC_LIBRARIAN_DONATHAN                         = 25262,
     NPC_CAPTURED_BERLY_SORCERER                    = 25474,
     SPELL_FROSTBOLT                                = 9672,
@@ -575,7 +579,8 @@ enum BerylSorcerer
     SPELL_ARCANE_CHAINS_CHARACTER_FORCE_CAST       = 45625,
     SPELL_ARCANE_CHAINS_SUMMON_CHAINED_MAGE_HUNTER = 45626,
     SPELL_COSMETIC_ENSLAVE_CHAINS_SELF             = 45631,
-    SPELL_ARCANE_CHAINS_CHANNEL_II                 = 45735
+    SPELL_ARCANE_CHAINS_CHANNEL_II                 = 45735,
+    SPELL_BLINK                                    = 50648
 };
 
 class npc_beryl_sorcerer : public CreatureScript
@@ -583,7 +588,7 @@ class npc_beryl_sorcerer : public CreatureScript
 public:
     npc_beryl_sorcerer() : CreatureScript("npc_beryl_sorcerer") { }
 
-struct npc_beryl_sorcererAI : public CreatureAI
+    struct npc_beryl_sorcererAI : public CreatureAI
     {
         npc_beryl_sorcererAI(Creature* creature) : CreatureAI(creature)
         {
@@ -594,6 +599,9 @@ struct npc_beryl_sorcererAI : public CreatureAI
         {
             _playerGUID.Clear();
             _chainsCast = false;
+            _blinkUsed = false;
+            _movementPaused = false;
+            _shouldScheduleBlink = false;
         }
 
         void Reset() override
@@ -610,6 +618,7 @@ struct npc_beryl_sorcererAI : public CreatureAI
             }
 
             _events.ScheduleEvent(EVENT_FROSTBOLT, 3000, 4000);
+            _events.ScheduleEvent(EVENT_CHECK_HEALTH, 1000);
         }
 
         void SpellHit(Unit* unit, SpellInfo const* spell) override
@@ -634,6 +643,19 @@ struct npc_beryl_sorcererAI : public CreatureAI
 
             _events.Update(diff);
 
+            bool wasCasting = _isCasting;
+            _isCasting = me->HasUnitState(UNIT_STATE_CASTING);
+
+            if (wasCasting && !_isCasting && _shouldScheduleBlink)
+            {
+                _shouldScheduleBlink = false;
+                _events.CancelEvent(EVENT_FROSTBOLT);
+                _events.ScheduleEvent(EVENT_DELAY_BLINK, 250);
+            }
+
+            if (_isCasting)
+                return;
+
             if (uint32 eventId = _events.ExecuteEvent())
             {
                 switch (eventId)
@@ -653,15 +675,68 @@ struct npc_beryl_sorcererAI : public CreatureAI
                             }
                         }
                         break;
+                    case EVENT_CHECK_HEALTH:
+                        if (me->HealthBelowPct(50) && !_blinkUsed)
+                        {
+                            if (_isCasting)
+                            {
+                                _shouldScheduleBlink = true;
+                            }
+                            else
+                            {
+                                _events.CancelEvent(EVENT_FROSTBOLT);
+                                _events.ScheduleEvent(EVENT_DELAY_BLINK, 0);
+                            }
+                        }
+                        _events.ScheduleEvent(EVENT_CHECK_HEALTH, 1s);
+                        break;
+                    case EVENT_DELAY_BLINK:
+                        _events.ScheduleEvent(EVENT_BLINK, 0);
+                        break;
+                    case EVENT_BLINK:
+                        if (!_blinkUsed)
+                        {
+                            DoCast(me, SPELL_BLINK, true);
+                            _blinkUsed = true;
+
+                            me->StopMoving();
+                            me->GetMotionMaster()->Clear();
+                            me->GetMotionMaster()->MoveIdle();
+                            _movementPaused = true;
+
+                            _events.ScheduleEvent(EVENT_FROSTBOLT, 1000);
+                            _events.ScheduleEvent(EVENT_RESUME_MOVEMENT, 3500);
+                        }
+                        break;
+                    case EVENT_RESUME_MOVEMENT:
+                        if (_movementPaused)
+                        {
+                            me->GetMotionMaster()->Clear();
+                            me->SetReactState(REACT_AGGRESSIVE);
+                            if (Unit* victim = me->GetVictim())
+                            {
+                                me->GetMotionMaster()->MoveChase(victim);
+                            }
+                            _movementPaused = false;
+                        }
+                        break;
                 }
             }
-            DoMeleeAttackIfReady();
+
+            if (!_movementPaused)
+            {
+                DoMeleeAttackIfReady();
+            }
         }
 
     private:
         EventMap   _events;
         ObjectGuid _playerGUID;
         bool       _chainsCast;
+        bool       _blinkUsed;
+        bool       _movementPaused;
+        bool       _shouldScheduleBlink;
+        bool       _isCasting = false;
     };
 
     CreatureAI* GetAI(Creature* creature) const override
