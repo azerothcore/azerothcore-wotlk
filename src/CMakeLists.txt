@@ -37,3 +37,28 @@ add_subdirectory(server)
 if (TOOLS_BUILD AND NOT TOOLS_BUILD STREQUAL "none")
   add_subdirectory(tools)
 endif()
+
+# Voice Chat server and handlers
+if(BUILD_VOICECHAT)
+  set(LOCAL_VOICECHAT_DIR "${CMAKE_SOURCE_DIR}/voicechat-server")
+
+  if(EXISTS "${LOCAL_VOICECHAT_DIR}/CMakeLists.txt")
+    message(STATUS "Using local voicechat-server directory: ${LOCAL_VOICECHAT_DIR}")
+    add_subdirectory(${LOCAL_VOICECHAT_DIR} ${CMAKE_BINARY_DIR}/voicechat-server-build)
+  else()
+    include(FetchContent)
+
+    FetchContent_Declare(
+      voicechat-server
+      GIT_REPOSITORY "https://github.com/azerothcore/voicechat-server.git"
+      GIT_TAG "main"
+    )
+
+    message(STATUS "Fetching VoiceChat server...")
+    FetchContent_MakeAvailable(voicechat-server)
+  endif()
+else()
+  if(EXISTS ${CMAKE_SOURCE_DIR}/voicechat-server AND NOT IS_DIRECTORY ${CMAKE_SOURCE_DIR}/voicechat-server/.git)
+    file(REMOVE_RECURSE ${CMAKE_SOURCE_DIR}/voicechat-server)
+  endif()
+endif()
