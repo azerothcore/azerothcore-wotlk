@@ -1656,6 +1656,9 @@ public:
     void UpdateNextMailTimeAndUnreads();
     void AddNewMailDeliverTime(time_t deliver_time);
 
+    void SendUnlearnSpells();
+    static bool IsUnlearnSpellsPacketNeededForSpell(uint32 spellId);
+
     void RemoveMail(uint32 id);
 
     void AddMail(Mail* mail) { m_mail.push_front(mail); }// for call from WorldSession::SendMailTo

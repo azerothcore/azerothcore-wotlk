@@ -2857,6 +2857,49 @@ void Player::SendInitialSpells()
     GetSession()->SendPacket(&data);
 }
 
+void Player::SendUnlearnSpells()
+{
+    WorldPacket data(SMSG_SEND_UNLEARN_SPELLS, 4 + 4 * m_spells.size());
+
+    uint32 spellCount = 0;
+    size_t countPos = data.wpos();
+    data << uint32(spellCount);
+
+    for (auto const& itr : m_spells)
+    {
+        if (itr.second->State == PLAYERSPELL_REMOVED || itr.second->Active)
+            continue;
+
+        auto skillLineAbilities = sSpellMgr->GetSkillLineAbilityMapBounds(itr.first);
+        if (skillLineAbilities.first == skillLineAbilities.second)
+            continue;
+
+        uint32 nextRank = sSpellMgr->GetNextSpellInChain(itr.first);
+        if (!nextRank || !HasSpell(nextRank))
+            continue;
+
+        data << uint32(itr.first);
+        ++spellCount;
+    }
+
+    data.put<uint32>(countPos, spellCount);
+    SendDirectMessage(&data);
+}
+
+bool Player::IsUnlearnSpellsPacketNeededForSpell(uint32 spellId)
+{
+    SpellInfo const* spellInfo = sSpellMgr->AssertSpellInfo(spellId);
+    if (spellInfo->IsRanked() && !spellInfo->IsStackableWithRanks())
+    {
+        auto skillLineAbilities = sSpellMgr->GetSkillLineAbilityMapBounds(spellId);
+        if (skillLineAbilities.first != skillLineAbilities.second)
+        {
+            return true;
+        }
+    }
+    return false;
+}
+
 void Player::RemoveMail(uint32 id)
 {
     for (PlayerMails::iterator itr = m_mail.begin(); itr != m_mail.end(); ++itr)
