@@ -5,7 +5,7 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 (28217, 0, 9, 11, 62, 0, 100, 512, 9684, 0, 0, 0, 0, 0, 2, 775, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Injured Rainspeaker Oracle - On Gossip Option Select - Set Faction (Horde)'),
 (28217, 0, 16, 0, 40, 0, 100, 512, 16, 282170, 0, 0, 0, 0, 80, 2821701, 2, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Injured Rainspeaker Oracle - On Point 16 of Path 282170 Reached - Run Script'),
 (28217, 0, 17, 0, 40, 0, 100, 512, 17, 282171, 0, 0, 0, 0, 80, 2821701, 2, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Injured Rainspeaker Oracle - On Point 17 of Path 282171 Reached - Run Script'),
-(28217, 0, 18, 0, 40, 0, 100, 512, 15, 282172, 0, 0, 0, 0, 80, 2821701, 2, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Injured Rainspeaker Oracle - On Point 15 of Path 282172 Reached - Run Script'),
+(28217, 0, 18, 0, 40, 0, 100, 512, 16, 282172, 0, 0, 0, 0, 80, 2821701, 2, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Injured Rainspeaker Oracle - On Point 16 of Path 282172 Reached - Run Script'),
 (28217, 0, 19, 0, 40, 0, 100, 512, 19, 282173, 0, 0, 0, 0, 80, 2821701, 2, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Injured Rainspeaker Oracle - On Point 19 of Path 282173 Reached - Run Script'),
 (28217, 0, 20, 0, 40, 0, 100, 512, 21, 282174, 0, 0, 0, 0, 80, 2821701, 2, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Injured Rainspeaker Oracle - On Point 21 of Path 282174 Reached - Run Script'),
 (28217, 0, 21, 0, 40, 0, 100, 512, 17, 282175, 0, 0, 0, 0, 80, 2821701, 2, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Injured Rainspeaker Oracle - On Point 17 of Path 282175 Reached - Run Script');
