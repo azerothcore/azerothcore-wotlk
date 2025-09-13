@@ -29,6 +29,7 @@
 #include "MiscPackets.h"
 #include "PetPackets.h"
 #include "QueryPackets.h"
+#include "QuestPackets.h"
 #include "TotemPackets.h"
 #include "WorldStatePackets.h"
 
