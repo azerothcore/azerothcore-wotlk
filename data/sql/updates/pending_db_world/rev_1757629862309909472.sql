@@ -42,19 +42,21 @@ DELETE FROM `waypoints` WHERE `entry` IN (282170, 282171, 282172, 282173, 282174
 INSERT INTO `waypoints` (`entry`, `pointid`, `position_x`, `position_y`, `position_z`, `orientation`, `point_comment`) VALUES
 -- path 1
 (282170, 1, 5399.74, 4528.052, -135.478, NULL, 'Injured Rainspeaker Oracle 1'),
-(282170, 2, 5422.979, 4519.949, -146.1948, NULL, 'Injured Rainspeaker Oracle 1'),
-(282170, 3, 5447.172, 4549.334, -149.498, NULL, 'Injured Rainspeaker Oracle 1'),
-(282170, 4, 5457.187, 4574.096, -147.5059, NULL, 'Injured Rainspeaker Oracle 1'),
-(282170, 5, 5469.797, 4602.933, -145.9535, NULL, 'Injured Rainspeaker Oracle 1'),
-(282170, 6, 5482.532, 4609.663, -139.9535, NULL, 'Injured Rainspeaker Oracle 1'),
-(282170, 7, 5491.722, 4630.365, -135.7035, NULL, 'Injured Rainspeaker Oracle 1'),
-(282170, 8, 5519.538, 4645.676, -135.4096, NULL, 'Injured Rainspeaker Oracle 1'),
-(282170, 9, 5547.847, 4651.108, -134.7803, NULL, 'Injured Rainspeaker Oracle 1'), -- Cmangos scriptId 2821701
-(282170, 10, 5576.821, 4653.372, -136.5378, NULL, 'Injured Rainspeaker Oracle 1'),
-(282170, 11, 5597.359, 4641.149, -136.5378, NULL, 'Injured Rainspeaker Oracle 1'),
-(282170, 12, 5615.371, 4624.71, -137.6426, NULL, 'Injured Rainspeaker Oracle 1'),
-(282170, 13, 5637.85, 4597.664, -137.1443, NULL, 'Injured Rainspeaker Oracle 1'),
-(282170, 14, 5637.85, 4597.664, -137.1443, NULL, 'Injured Rainspeaker Oracle 1'), -- Cmangos scriptId 2821702
+(282170, 2, 5405.5356, 4526.751, -140.8915, NULL, 'Injured Rainspeaker Oracle 1'),
+(282170, 3, 5413.198, 4523.4453, -143.88805, NULL, 'Injured Rainspeaker Oracle 1'),
+(282170, 4, 5422.979, 4519.949, -146.1948, NULL, 'Injured Rainspeaker Oracle 1'),
+(282170, 5, 5447.172, 4549.334, -149.498, NULL, 'Injured Rainspeaker Oracle 1'),
+(282170, 6, 5457.187, 4574.096, -147.5059, NULL, 'Injured Rainspeaker Oracle 1'),
+(282170, 7, 5469.797, 4602.933, -145.9535, NULL, 'Injured Rainspeaker Oracle 1'),
+(282170, 8, 5482.532, 4609.663, -139.9535, NULL, 'Injured Rainspeaker Oracle 1'),
+(282170, 9, 5491.722, 4630.365, -135.7035, NULL, 'Injured Rainspeaker Oracle 1'),
+(282170, 10, 5519.538, 4645.676, -135.4096, NULL, 'Injured Rainspeaker Oracle 1'),
+(282170, 11, 5547.847, 4651.108, -134.7803, NULL, 'Injured Rainspeaker Oracle 1'), -- Cmangos scriptId 2821701
+(282170, 12, 5576.821, 4653.372, -136.5378, NULL, 'Injured Rainspeaker Oracle 1'),
+(282170, 13, 5597.359, 4641.149, -136.5378, NULL, 'Injured Rainspeaker Oracle 1'),
+(282170, 14, 5615.371, 4624.71, -137.6426, NULL, 'Injured Rainspeaker Oracle 1'),
+(282170, 15, 5637.85, 4597.664, -137.1443, NULL, 'Injured Rainspeaker Oracle 1'),
+(282170, 16, 5637.85, 4597.664, -137.1443, NULL, 'Injured Rainspeaker Oracle 1'),
 -- path 2
 (282171, 1, 5484.66, 4455.59, -140.235, NULL, 'Injured Rainspeaker Oracle 2'),
 (282171, 2, 5503.24, 4450.52, -146.32, NULL, 'Injured Rainspeaker Oracle 2'),
@@ -74,21 +76,22 @@ INSERT INTO `waypoints` (`entry`, `pointid`, `position_x`, `position_y`, `positi
 (282171, 16, 5637.85, 4597.664, -137.1443, NULL, 'Injured Rainspeaker Oracle 2'),
 (282171, 17, 5637.85, 4597.664, -137.1443, NULL, 'Injured Rainspeaker Oracle 2'), -- Cmangos scriptId 2821702
 -- path 3
-(282172, 1, 5477.16, 4516.51, -136.586, NULL, 'Injured Rainspeaker Oracle 3'),
-(282172, 2, 5482.25, 4512.48, -142.981, NULL, 'Injured Rainspeaker Oracle 3'),
-(282172, 3, 5485.95, 4513.28, -145.649, NULL, 'Injured Rainspeaker Oracle 3'),
-(282172, 4, 5499.73, 4526.61, -147.318, NULL, 'Injured Rainspeaker Oracle 3'),
-(282172, 5, 5506.38, 4559.37, -141.97 , NULL, 'Injured Rainspeaker Oracle 3'),
-(282172, 6, 5496.35, 4580.67, -139.158, NULL, 'Injured Rainspeaker Oracle 3'),
-(282172, 7, 5492.16, 4614.84, -137.666, NULL, 'Injured Rainspeaker Oracle 3'),
-(282172, 8, 5491.722, 4630.365, -135.7035, NULL, 'Injured Rainspeaker Oracle 3'),
-(282172, 9, 5519.538, 4645.676, -135.4096, NULL, 'Injured Rainspeaker Oracle 3'),
-(282172, 10, 5547.847, 4651.108, -134.7803, NULL, 'Injured Rainspeaker Oracle 3'), -- Cmangos scriptId 2821701
-(282172, 11, 5576.821, 4653.372, -136.5378, NULL, 'Injured Rainspeaker Oracle 3'),
-(282172, 12, 5597.359, 4641.149, -136.5378, NULL, 'Injured Rainspeaker Oracle 3'),
-(282172, 13, 5615.371, 4624.71, -137.6426, NULL, 'Injured Rainspeaker Oracle 3'),
-(282172, 14, 5637.85, 4597.664, -137.1443, NULL, 'Injured Rainspeaker Oracle 3'),
-(282172, 15, 5637.85, 4597.664, -137.1443, NULL, 'Injured Rainspeaker Oracle 3'), -- Cmangos scriptId 2821702
+(282172, 1, 5467.172, 4516.1226, -132.3954, NULL, 'Injured Rainspeaker Oracle 3'),
+(282172, 2, 5477.16, 4516.51, -136.586, NULL, 'Injured Rainspeaker Oracle 3'),
+(282172, 3, 5482.25, 4512.48, -142.981, NULL, 'Injured Rainspeaker Oracle 3'),
+(282172, 4, 5485.95, 4513.28, -145.649, NULL, 'Injured Rainspeaker Oracle 3'),
+(282172, 5, 5499.73, 4526.61, -147.318, NULL, 'Injured Rainspeaker Oracle 3'),
+(282172, 6, 5506.38, 4559.37, -141.97 , NULL, 'Injured Rainspeaker Oracle 3'),
+(282172, 7, 5496.35, 4580.67, -139.158, NULL, 'Injured Rainspeaker Oracle 3'),
+(282172, 8, 5492.16, 4614.84, -137.666, NULL, 'Injured Rainspeaker Oracle 3'),
+(282172, 9, 5491.722, 4630.365, -135.7035, NULL, 'Injured Rainspeaker Oracle 3'),
+(282172, 10, 5519.538, 4645.676, -135.4096, NULL, 'Injured Rainspeaker Oracle 3'),
+(282172, 11, 5547.847, 4651.108, -134.7803, NULL, 'Injured Rainspeaker Oracle 3'), -- Cmangos scriptId 2821701
+(282172, 12, 5576.821, 4653.372, -136.5378, NULL, 'Injured Rainspeaker Oracle 3'),
+(282172, 13, 5597.359, 4641.149, -136.5378, NULL, 'Injured Rainspeaker Oracle 3'),
+(282172, 14, 5615.371, 4624.71, -137.6426, NULL, 'Injured Rainspeaker Oracle 3'),
+(282172, 15, 5637.85, 4597.664, -137.1443, NULL, 'Injured Rainspeaker Oracle 3'),
+(282172, 16, 5637.85, 4597.664, -137.1443, NULL, 'Injured Rainspeaker Oracle 3'),
 -- path 4
 (282173, 1, 5470.1, 4397.22, -141.991, NULL, 'Injured Rainspeaker Oracle 4'),
 (282173, 2, 5474.27, 4418.16, -145.096, NULL, 'Injured Rainspeaker Oracle 4'),
