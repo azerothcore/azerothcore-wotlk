@@ -776,6 +776,7 @@ void BossAI::DamageTaken(Unit* attacker, uint32& damage, DamageEffectType damage
  *
  * @param healthPct The health percent at which the code will be executed.
  * @param exec The fuction to be executed.
+ * @param allowedWhileCasting If false, the event will not be checked while the creature is casting.
  */
 void BossAI::ScheduleHealthCheckEvent(uint32 healthPct, std::function<void()> exec, bool allowedWhileCasting /*=true*/)
 {
