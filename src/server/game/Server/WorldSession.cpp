@@ -184,12 +184,6 @@ void WorldSession::UpdateAccountFlag(uint32 flag, bool remove /*= flase*/)
         _accountFlags &= ~flag;
     else
         _accountFlags |= flag;
-
-    // Async update
-    LoginDatabasePreparedStatement* stmt = LoginDatabase.GetPreparedStatement(LOGIN_UPD_SET_ACCOUNT_FLAG);
-    stmt->SetData(0, _accountFlags);
-    stmt->SetData(1, GetAccountId());
-    LoginDatabase.Execute(stmt);
 }
 
 void WorldSession::ValidateAccountFlags()
@@ -774,10 +768,20 @@ void WorldSession::LogoutPlayer(bool save)
         SendPacket(WorldPackets::Character::LogoutComplete().Write());
         LOG_DEBUG("network", "SESSION: Sent SMSG_LOGOUT_COMPLETE Message");
 
-        //! Since each account can only have one online character at any given time, ensure all characters for active account are marked as offline
-        CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_UPD_ACCOUNT_ONLINE);
-        stmt->SetData(0, GetAccountId());
-        CharacterDatabase.Execute(stmt);
+        {
+            //! Since each account can only have one online character at any given time, ensure all characters for active account are marked as offline
+            CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_UPD_ACCOUNT_ONLINE);
+            stmt->SetData(0, GetAccountId());
+            CharacterDatabase.Execute(stmt);
+        }
+
+        {
+            // Async update
+            LoginDatabasePreparedStatement* stmt = LoginDatabase.GetPreparedStatement(LOGIN_UPD_SET_ACCOUNT_FLAG);
+            stmt->SetData(0, _accountFlags);
+            stmt->SetData(1, GetAccountId());
+            LoginDatabase.Execute(stmt);
+        }
     }
 
     m_playerLogout = false;
