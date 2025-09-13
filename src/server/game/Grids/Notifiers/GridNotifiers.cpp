@@ -62,15 +62,16 @@ void VisibleNotifier::SendToSelf()
     for (VisibleWorldObjectsMap::iterator itr = visibleWorldObjects->begin(); itr != visibleWorldObjects->end();)
     {
         WorldObject* obj = itr->second;
-        if (!i_player.IsWorldObjectOutOfSightRange(obj))
-        {
-            ++itr;
-            continue;
+        if (!i_player.IsWorldObjectOutOfSightRange(obj)
+            || i_player.CanSeeOrDetect(obj, false, true))
 
             //npcbot:
             if (obj->IsNPCBotOrPet() && i_player.GetDistance2d(obj) < i_player.GetVisibilityRange() && i_player.CanSeeOrDetect(obj, false, true))
                 continue;
             //end npcbot
+        {
+            ++itr;
+            continue;
         }
 
         i_data.AddOutOfRangeGUID(obj->GetGUID());
