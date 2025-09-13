@@ -456,11 +456,12 @@ private:
 
 struct HealthCheckEventData
 {
-    HealthCheckEventData(uint8 healthPct, std::function<void()> exec, bool valid = true) : _healthPct(healthPct), _exec(exec), _valid(valid) { };
+    HealthCheckEventData(uint8 healthPct, std::function<void()> exec, bool valid = true, bool allowedWhileCasting = true) : _healthPct(healthPct), _exec(exec), _valid(valid), _allowedWhileCasting(allowedWhileCasting) { };
 
     uint8 _healthPct;
     std::function<void()> _exec;
     bool _valid;
+    bool _allowedWhileCasting;
 };
 
 class BossAI : public ScriptedAI
@@ -482,8 +483,8 @@ public:
 
     void UpdateAI(uint32 diff) override;
 
-    void ScheduleHealthCheckEvent(uint32 healthPct, std::function<void()> exec);
-    void ScheduleHealthCheckEvent(std::initializer_list<uint8> healthPct, std::function<void()> exec);
+    void ScheduleHealthCheckEvent(uint32 healthPct, std::function<void()> exec, bool allowedWhileCasting = true);
+    void ScheduleHealthCheckEvent(std::initializer_list<uint8> healthPct, std::function<void()> exec, bool allowedWhileCasting = true);
 
     // @brief Casts the spell after the fixed time and says the text id if provided. Timer will run even if the creature is casting or out of combat.
     // @param spellId The spell to cast.
