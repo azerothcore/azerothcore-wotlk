@@ -4394,6 +4394,19 @@ Event.Announce = 0
 Sunsreach.CounterMax = 10000
 
 #
+#    ScourgeInvasion.CounterFirst
+#    ScourgeInvasion.CounterSecond
+#    ScourgeInvasion.CounterThird
+#        Description: Counter thresholds to be reached to transition phases
+#        Default:     50  - (ScourgeInvasion.CounterFirst)
+#                     100 - (ScourgeInvasion.CounterSecond)
+#                     150 - (ScourgeInvasion.CounterThird)
+
+ScourgeInvasion.CounterFirst  = 50
+ScourgeInvasion.CounterSecond = 100
+ScourgeInvasion.CounterThird  = 150
+
+#
 ###################################################################################################
 
 ###################################################################################################

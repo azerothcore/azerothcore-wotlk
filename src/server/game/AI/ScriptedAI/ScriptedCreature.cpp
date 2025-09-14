@@ -751,6 +751,10 @@ void BossAI::DamageTaken(Unit* attacker, uint32& damage, DamageEffectType damage
     ScriptedAI::DamageTaken(attacker, damage, damagetype, damageSchoolMask);
 
     if (_nextHealthCheck._valid)
+    {
+        if (!_nextHealthCheck._allowedWhileCasting && me->HasUnitState(UNIT_STATE_CASTING))
+            return;
+
         if (me->HealthBelowPctDamaged(_nextHealthCheck._healthPct, damage))
         {
             _nextHealthCheck._exec();
@@ -764,6 +768,7 @@ void BossAI::DamageTaken(Unit* attacker, uint32& damage, DamageEffectType damage
             if (!_healthCheckEvents.empty())
                 _nextHealthCheck = _healthCheckEvents.front();
         }
+    }
 }
 
 /**
@@ -771,19 +776,18 @@ void BossAI::DamageTaken(Unit* attacker, uint32& damage, DamageEffectType damage
  *
  * @param healthPct The health percent at which the code will be executed.
  * @param exec The fuction to be executed.
+ * @param allowedWhileCasting If false, the event will not be checked while the creature is casting.
  */
-void BossAI::ScheduleHealthCheckEvent(uint32 healthPct, std::function<void()> exec)
+void BossAI::ScheduleHealthCheckEvent(uint32 healthPct, std::function<void()> exec, bool allowedWhileCasting /*=true*/)
 {
-    _healthCheckEvents.push_back(HealthCheckEventData(healthPct, exec));
+    _healthCheckEvents.push_back(HealthCheckEventData(healthPct, exec, true, allowedWhileCasting));
     _nextHealthCheck = _healthCheckEvents.front();
 };
 
-void BossAI::ScheduleHealthCheckEvent(std::initializer_list<uint8> healthPct, std::function<void()> exec)
+void BossAI::ScheduleHealthCheckEvent(std::initializer_list<uint8> healthPct, std::function<void()> exec, bool allowedWhileCasting /*=true*/)
 {
     for (auto const& checks : healthPct)
-    {
-        _healthCheckEvents.push_back(HealthCheckEventData(checks, exec));
-    }
+        _healthCheckEvents.push_back(HealthCheckEventData(checks, exec, true, allowedWhileCasting));
 
     _nextHealthCheck = _healthCheckEvents.front();
 }
