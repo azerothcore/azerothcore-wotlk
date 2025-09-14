@@ -239,11 +239,7 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
             mTextTimer = e.action.talk.duration;
             mUseTextTimer = true;
 
-            if (e.action.talk.delay)
-                talker->AI()->Talk(e.action.talk.textGroupID, talkTarget, Milliseconds(e.action.talk.delay));
-            else
-                sCreatureTextMgr->SendChat(talker, uint8(e.action.talk.textGroupID), talkTarget);
-
+            talker->AI()->Talk(e.action.talk.textGroupID, talkTarget, Milliseconds(e.action.talk.delay));
             LOG_DEBUG("sql.sql", "SmartScript::ProcessAction: SMART_ACTION_TALK: talker: {} ({}), textId: {}", talker->GetName(), talker->GetGUID().ToString(), mLastTextID);
             break;
         }
