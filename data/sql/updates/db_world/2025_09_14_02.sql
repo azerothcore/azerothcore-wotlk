@@ -1,3 +1,4 @@
+-- DB update 2025_09_14_01 -> 2025_09_14_02
 
 -- Remove WD and MT (Gjalerbron Prisoner)
 UPDATE `creature` SET `wander_distance` = 0, `MovementType` = 0 WHERE (`id1` = 24035) AND (`guid` IN (117664, 117670, 117671, 117672, 117677, 117707));
