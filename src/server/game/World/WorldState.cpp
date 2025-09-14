@@ -1442,6 +1442,8 @@ void WorldState::StopScourgeInvasion()
     sGameEventMgr->StopEvent(GAME_EVENT_SCOURGE_INVASION_BLASTED_LANDS);
     sGameEventMgr->StopEvent(GAME_EVENT_SCOURGE_INVASION_EASTERN_PLAGUELANDS);
     sGameEventMgr->StopEvent(GAME_EVENT_SCOURGE_INVASION_BURNING_STEPPES);
+    sGameEventMgr->StopEvent(GAME_EVENT_SCOURGE_INVASION_INVASIONS_DONE);
+    sGameEventMgr->StopEvent(GAME_EVENT_SCOURGE_INVASION_BOSSES);
     BroadcastSIWorldstates();
     m_siData.Reset();
 
