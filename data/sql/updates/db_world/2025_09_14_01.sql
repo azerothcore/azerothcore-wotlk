@@ -1,3 +1,4 @@
+-- DB update 2025_09_14_00 -> 2025_09_14_01
 -- Delete old WP and add the new one (Sniffed).
 DELETE FROM `waypoints` WHERE `entry` IN (28308, 2830800);
 INSERT INTO `waypoints` (`entry`, `pointid`, `position_x`, `position_y`, `position_z`, `orientation`, `point_comment`) VALUES
