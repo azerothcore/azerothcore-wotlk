@@ -2207,10 +2207,12 @@ void Guild::MassInviteToEvent(WorldSession* session, uint32 minLevel, uint32 max
 bool Guild::AddMember(ObjectGuid guid, uint8 rankId)
 {
     Player* player = ObjectAccessor::FindConnectedPlayer(guid);
+    Player* leader = ObjectAccessor::FindConnectedPlayer(this->GetLeaderGUID());
     // Player cannot be in guild
     if (player)
     {
-        if (player->GetGuildId() != 0)
+        if (player->GetGuildId() != 0 ||
+            (!sWorld->getBoolConfig(CONFIG_ALLOW_TWO_SIDE_INTERACTION_GUILD) && (leader->GetTeamId() != player->GetTeamId())))
             return false;
     }
     else if (sCharacterCache->GetCharacterGuildIdByGuid(guid) != 0)
