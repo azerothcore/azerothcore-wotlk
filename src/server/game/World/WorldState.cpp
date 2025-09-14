@@ -1579,7 +1579,8 @@ void WorldState::HandleDefendedZones()
     }
     else if (m_siData.m_battlesWon >= 150)
     {
-        sGameEventMgr->StopEvent(GAME_EVENT_SCOURGE_INVASION);
+        // The event is enabled via command, so we expect it to be disabled via command as well.
+        // sGameEventMgr->StopEvent(GAME_EVENT_SCOURGE_INVASION);
         sGameEventMgr->StopEvent(GAME_EVENT_SCOURGE_INVASION_50_INVASIONS);
         sGameEventMgr->StopEvent(GAME_EVENT_SCOURGE_INVASION_100_INVASIONS);
         sGameEventMgr->StartEvent(GAME_EVENT_SCOURGE_INVASION_INVASIONS_DONE);
