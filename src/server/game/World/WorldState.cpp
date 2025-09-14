@@ -1571,9 +1571,11 @@ void WorldState::HandleDefendedZones()
         sGameEventMgr->StopEvent(GAME_EVENT_SCOURGE_INVASION_100_INVASIONS);
         sGameEventMgr->StopEvent(GAME_EVENT_SCOURGE_INVASION_150_INVASIONS);
     }
-    else if (m_siData.m_battlesWon >= sWorld->getIntConfig(CONFIG_SCOURGEINVASION_COUNTER_FIRST) && m_siData.m_battlesWon < sWorld->getIntConfig(CONFIG_SCOURGEINVASION_COUNTER_SECOND))
+    else if (m_siData.m_battlesWon >= sWorld->getIntConfig(CONFIG_SCOURGEINVASION_COUNTER_FIRST) &&
+             m_siData.m_battlesWon < sWorld->getIntConfig(CONFIG_SCOURGEINVASION_COUNTER_SECOND))
         sGameEventMgr->StartEvent(GAME_EVENT_SCOURGE_INVASION_50_INVASIONS);
-    else if (m_siData.m_battlesWon >= sWorld->getIntConfig(CONFIG_SCOURGEINVASION_COUNTER_SECOND) && m_siData.m_battlesWon < sWorld->getIntConfig(CONFIG_SCOURGEINVASION_COUNTER_THIRD))
+    else if (m_siData.m_battlesWon >= sWorld->getIntConfig(CONFIG_SCOURGEINVASION_COUNTER_SECOND) &&
+             m_siData.m_battlesWon < sWorld->getIntConfig(CONFIG_SCOURGEINVASION_COUNTER_THIRD))
     {
         sGameEventMgr->StopEvent(GAME_EVENT_SCOURGE_INVASION_50_INVASIONS);
         sGameEventMgr->StartEvent(GAME_EVENT_SCOURGE_INVASION_100_INVASIONS);
