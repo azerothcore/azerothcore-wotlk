@@ -264,8 +264,7 @@ void WorldSession::HandleTrainerBuySpellOpcode(WorldPacket& recvData)
     else
         _player->learnSpell(spellId);
 
-    // Send "unlearn" packet only if necessary
-    if (Player::IsUnlearnSpellsPacketNeededForSpell(spellId))
+    if (Player::IsUnlearnNeededForSpell(spellId))
         _player->SendUnlearnSpells();
 
     WorldPacket data(SMSG_TRAINER_BUY_SUCCEEDED, 12);

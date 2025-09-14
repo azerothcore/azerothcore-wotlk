@@ -2886,7 +2886,7 @@ void Player::SendUnlearnSpells()
     SendDirectMessage(&data);
 }
 
-bool Player::IsUnlearnSpellsPacketNeededForSpell(uint32 spellId)
+bool Player::IsUnlearnNeededForSpell(uint32 spellId)
 {
     SpellInfo const* spellInfo = sSpellMgr->AssertSpellInfo(spellId);
     if (spellInfo->IsRanked() && !spellInfo->IsStackableWithRanks())

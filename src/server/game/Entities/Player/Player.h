@@ -1657,7 +1657,7 @@ public:
     void AddNewMailDeliverTime(time_t deliver_time);
 
     void SendUnlearnSpells();
-    static bool IsUnlearnSpellsPacketNeededForSpell(uint32 spellId);
+    static bool IsUnlearnNeededForSpell(uint32 spellId);
 
     void RemoveMail(uint32 id);
 
