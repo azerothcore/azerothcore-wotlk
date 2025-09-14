@@ -2,7 +2,7 @@
 -- Remove WD and MT (Gjalerbron Prisoner)
 UPDATE `creature` SET `wander_distance` = 0, `MovementType` = 0 WHERE (`id1` = 24035) AND (`guid` IN (117664, 117670, 117671, 117672, 117677, 117707));
 
--- Remove Wrong Movement Flag (Gjalerbron Prisoner) 
+-- Remove Wrong Movement Flag (Gjalerbron Prisoner)
 UPDATE `creature_template_movement` SET `Swim` = 0 WHERE (`CreatureId` = 24035);
 
 -- Set Emote State_Drowned and aura (Gjalerbron Prisoner)
