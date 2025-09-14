@@ -972,6 +972,10 @@ void WorldSession::HandleListInventoryOpcode(WorldPackets::Item::ListInventory& 
     if (!GetPlayer()->IsAlive())
         return;
 
+    if (packet.VendorGuid.IsAnyTypeCreature())
+        if (Creature* creature = _player->GetMap()->GetCreature(packet.VendorGuid))
+            creature->SendMirrorSound(_player, 0);
+
     LOG_DEBUG("network", "WORLD: Recvd CMSG_LIST_INVENTORY");
 
     SendListInventory(packet.VendorGuid);

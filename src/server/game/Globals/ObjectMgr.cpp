@@ -24,6 +24,7 @@
 #include "Config.h"
 #include "Containers.h"
 #include "CreatureAIFactory.h"
+#include "CreatureOutfit.h"
 #include "DBCStructure.h"
 #include "DatabaseEnv.h"
 #include "DisableMgr.h"
@@ -1637,6 +1638,7 @@ void ObjectMgr::LoadCreatureMovementOverrides()
 
 CreatureModelInfo const* ObjectMgr::GetCreatureModelInfo(uint32 modelId) const
 {
+    modelId = GetRealDisplayId(modelId);
     CreatureModelContainer::const_iterator itr = _creatureModelStore.find(modelId);
     if (itr != _creatureModelStore.end())
         return &(itr->second);
@@ -1680,6 +1682,16 @@ void ObjectMgr::ChooseCreatureFlags(const CreatureTemplate* cinfo, uint32& npcfl
 
 CreatureModelInfo const* ObjectMgr::GetCreatureModelRandomGender(CreatureModel* model, CreatureTemplate const* creatureTemplate) const
 {
+    {
+        uint32 displayid_temp = GetRealDisplayId(model->CreatureDisplayID);
+        if (displayid_temp != model->CreatureDisplayID)
+        {
+            CreatureModel tempModel = *model;
+            tempModel.CreatureDisplayID = displayid_temp;
+            return GetCreatureModelRandomGender(&tempModel, creatureTemplate);
+        }
+    }
+
     CreatureModelInfo const* modelInfo = GetCreatureModelInfo(model->CreatureDisplayID);
     if (!modelInfo)
         return nullptr;
@@ -1708,6 +1720,131 @@ CreatureModelInfo const* ObjectMgr::GetCreatureModelRandomGender(CreatureModel* 
     }
 
     return modelInfo;
+}
+
+void ObjectMgr::LoadCreatureOutfits()
+{
+    uint32 oldMSTime = getMSTime();
+
+    _creatureOutfitStore.clear();
+
+    QueryResult result = WorldDatabase.Query("SELECT entry, npcsoundsid, race, class, gender, skin, face, hair, haircolor, facialhair, "
+        "head, shoulders, body, chest, waist, "
+        "legs, feet, wrists, hands, back, tabard, "
+        "guildid FROM creature_template_outfits");
+
+    if (!result)
+    {
+        LOG_ERROR("server.loading", ">> Loaded 0 creature outfits. DB table `creature_template_outfits` is empty!");
+        return;
+    }
+
+    uint32 count = 0;
+
+    do
+    {
+        Field* fields = result->Fetch();
+
+        uint32 i = 0;
+        uint32 entry   = fields[i++].Get<uint32>();
+
+        if (!CreatureOutfit::IsFake(entry))
+        {
+            LOG_ERROR("server.loading", ">> Outfit entry {} in `creature_template_outfits` has too low entry (entry <= {}). Ignoring.", entry, CreatureOutfit::max_real_modelid);
+            continue;
+        }
+
+        std::shared_ptr<CreatureOutfit> co(new CreatureOutfit());
+
+        co->id = entry;
+        co->npcsoundsid = fields[i++].Get<uint32>();
+        if (co->npcsoundsid && !sNPCSoundsStore.LookupEntry(co->npcsoundsid))
+        {
+            LOG_ERROR("server.loading", ">> Outfit entry {} in `creature_template_outfits` has incorrect npcsoundsid ({}). Using 0.", entry, co->npcsoundsid);
+            co->npcsoundsid = 0;
+        }
+        co->race         = fields[i++].Get<uint8>();
+        const ChrRacesEntry* rEntry = sChrRacesStore.LookupEntry(co->race);
+        if (!rEntry)
+        {
+            LOG_ERROR("server.loading", ">> Outfit entry {} in `creature_template_outfits` has incorrect race ({}).", entry, uint32(co->race));
+            continue;
+        }
+
+        co->Class = fields[i++].Get<uint8>();
+        const ChrClassesEntry* cEntry = sChrClassesStore.LookupEntry(co->Class);
+        if (!cEntry)
+        {
+            LOG_ERROR("server.loading", ">> Outfit entry {} in `creature_template_outfits` has incorrect class ({}).", entry, uint32(co->Class));
+            continue;
+        }
+
+        co->gender       = fields[i++].Get<uint8>();
+        switch (co->gender)
+        {
+            case GENDER_FEMALE: co->displayId = rEntry->model_f; break;
+            case GENDER_MALE:   co->displayId = rEntry->model_m; break;
+            default:
+                LOG_ERROR("server.loading", ">> Outfit entry {} in `creature_template_outfits` has invalid gender {}", entry, uint32(co->gender));
+                continue;
+        }
+
+        co->skin         = fields[i++].Get<uint8>();
+        co->face         = fields[i++].Get<uint8>();
+        co->hair         = fields[i++].Get<uint8>();
+        co->haircolor    = fields[i++].Get<uint8>();
+        co->facialhair   = fields[i++].Get<uint8>();
+
+        for (EquipmentSlots slot : CreatureOutfit::item_slots)
+        {
+            int32 displayInfo = fields[i++].Get<int32>();
+            if (displayInfo > 0) // entry
+            {
+                uint32 item_entry = static_cast<uint32>(displayInfo);
+                if (ItemTemplate const* proto = sObjectMgr->GetItemTemplate(item_entry))
+                    co->outfitdisplays[slot] = proto->DisplayInfoID;
+                else if (auto * dbcentry = sItemStore.LookupEntry(item_entry))
+                    co->outfitdisplays[slot] = dbcentry->DisplayInfoID;
+                else
+                {
+                    LOG_INFO("server.loading", ">> Outfit entry {} in `creature_template_outfits` has invalid item entry: {}. Ignoring.", entry, item_entry);
+                    co->outfitdisplays[slot] = 0;
+                }
+            }
+            else // display
+            {
+                co->outfitdisplays[slot] = static_cast<uint32>(-displayInfo);
+            }
+        }
+        co->guild = fields[i++].Get<uint32>();
+
+        _creatureOutfitStore[co->id] = std::move(co);
+
+        ++count;
+    }
+    while (result->NextRow());
+
+    LOG_INFO("server.loading", ">> Loaded {} creature outfits in {} ms", count, GetMSTimeDiffToNow(oldMSTime));
+}
+
+std::shared_ptr<CreatureOutfit> const & ObjectMgr::GetOutfit(uint32 modelid) const
+{
+    static std::shared_ptr<CreatureOutfit> empty;
+    if (CreatureOutfit::IsFake(modelid))
+    {
+        auto const & outfits = GetCreatureOutfitMap();
+        auto it = outfits.find(modelid);
+        if (it != outfits.end())
+            return it->second;
+    }
+    return empty;
+}
+
+uint32 ObjectMgr::GetRealDisplayId(uint32 modelid) const
+{
+    if (std::shared_ptr<CreatureOutfit> outfit = GetOutfit(modelid))
+        return outfit->displayId;
+    return modelid;
 }
 
 void ObjectMgr::LoadCreatureModelInfo()
@@ -1819,7 +1956,7 @@ void ObjectMgr::LoadPlayerTotemModels()
             continue;
         }
 
-        CreatureDisplayInfoEntry const* displayEntry = sCreatureDisplayInfoStore.LookupEntry(displayId);
+        CreatureDisplayInfoEntry const* displayEntry = sCreatureDisplayInfoStoreRaw.LookupEntry(displayId);
         if (!displayEntry)
         {
             LOG_ERROR("sql.sql", "TotemSlot: {} defined in `player_totem_model` has non-existing model ({}), skipped.", totemSlot, displayId);
@@ -1874,7 +2011,7 @@ void ObjectMgr::LoadPlayerShapeshiftModels()
             continue;
         }
 
-        CreatureDisplayInfoEntry const* displayEntry = sCreatureDisplayInfoStore.LookupEntry(modelId);
+        CreatureDisplayInfoEntry const* displayEntry = sCreatureDisplayInfoStoreRaw.LookupEntry(modelId);
         if (!displayEntry)
         {
             LOG_ERROR("sql.sql", "ShapeshiftForm: {}, Race: {} defined in `player_shapeshift_model` has non-existing model ({}), skipped.", shapeshiftForm, race, modelId);

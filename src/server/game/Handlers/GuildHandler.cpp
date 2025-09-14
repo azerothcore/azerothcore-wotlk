@@ -277,6 +277,10 @@ void WorldSession::HandleGuildBankerActivate(WorldPackets::Guild::GuildBankActiv
     if (!go)
         return;
 
+    if (packet.Banker.IsAnyTypeCreature())
+        if (Creature* creature = _player->GetMap()->GetCreature(packet.Banker))
+            creature->SendMirrorSound(_player, 0);
+
     Guild* const guild = GetPlayer()->GetGuild();
     if (!guild)
     {

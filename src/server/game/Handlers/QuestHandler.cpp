@@ -80,6 +80,10 @@ void WorldSession::HandleQuestgiverHelloOpcode(WorldPacket& recvData)
     ObjectGuid guid;
     recvData >> guid;
 
+    if (guid.IsAnyTypeCreature())
+        if (Creature* creature = _player->GetMap()->GetCreature(guid))
+            creature->SendMirrorSound(_player, 0);
+
     LOG_DEBUG("network", "WORLD: Received CMSG_QUESTGIVER_HELLO npc {}", guid.ToString());
 
     Creature* creature = GetPlayer()->GetNPCIfCanInteractWith(guid, UNIT_NPC_FLAG_NONE);

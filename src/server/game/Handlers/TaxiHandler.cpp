@@ -61,6 +61,10 @@ void WorldSession::HandleTaxiQueryAvailableNodes(WorldPacket& recvData)
     ObjectGuid guid;
     recvData >> guid;
 
+    if (guid.IsAnyTypeCreature())
+        if (Creature* creature = _player->GetMap()->GetCreature(guid))
+            creature->SendMirrorSound(_player, 0);
+
     // cheating checks
     Creature* unit = GetPlayer()->GetNPCIfCanInteractWith(guid, UNIT_NPC_FLAG_FLIGHTMASTER);
     if (!unit)
