@@ -20,7 +20,7 @@ UPDATE `creature_template` SET `flags_extra` = `flags_extra` |134217728 WHERE (`
 -- Set Comments (Necrolords)
 UPDATE `creature` SET `Comment` = 'Has Specific Guid SAI' WHERE (`id1` = 24014) AND (`guid` IN (115239, 115235, 115236, 115238));
 
--- Add missing spell (Necrolords)
+-- Add missing spells (Necrolords)
 UPDATE `creature_template` SET `AIName` = 'SmartAI' WHERE `entry` = 24014;
 
 DELETE FROM `smart_scripts` WHERE (`source_type` = 0 AND `entryorguid` = 24014);
