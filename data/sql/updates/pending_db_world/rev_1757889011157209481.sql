@@ -1,7 +1,7 @@
 --
 DROP TABLE IF EXISTS `npcsounds_dbc`;
 
-CREATE TABLE IF NOT EXISTS `npcsounds_dbc` ( `Id` INT(10) NOT NULL, `hello` INT(10) DEFAULT 0, `goodbye` INT(10) DEFAULT 0, `pissed` INT(10) DEFAULT 0, `ack` INT(10) DEFAULT 0, PRIMARY KEY (`Id`) );
+CREATE TABLE `npcsounds_dbc` ( `Id` INT(10) NOT NULL, `hello` INT(10) DEFAULT 0, `goodbye` INT(10) DEFAULT 0, `pissed` INT(10) DEFAULT 0, `ack` INT(10) DEFAULT 0, PRIMARY KEY (`Id`) );
 
 DROP TABLE IF EXISTS `creature_template_outfits`;
 
