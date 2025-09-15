@@ -394,6 +394,38 @@ public:
     }
 };
 
+enum RodinLightningSpells
+{
+    SPELL_RODIN_LIGHTNING_START = 44787,
+    SPELL_RODIN_LIGHTNING_END   = 44791,
+
+    NPC_RODIN                   = 24876
+};
+
+struct npc_rodin_lightning_enabler : public ScriptedAI
+{
+    npc_rodin_lightning_enabler(Creature* creature) : ScriptedAI(creature) {}
+
+    void Reset() override
+    {
+        _scheduler.Schedule(1s, [this](TaskContext context)
+        {
+            if (Creature* rodin = me->FindNearestCreature(NPC_RODIN, 10.0f))
+                DoCast(rodin, urand(SPELL_RODIN_LIGHTNING_START, SPELL_RODIN_LIGHTNING_END));
+
+            context.Repeat(2s, 8s);
+        });
+    }
+
+    void UpdateAI(uint32 /*diff*/) override
+    {
+        _scheduler.Update();
+    }
+
+private:
+    TaskScheduler _scheduler;
+};
+
 enum HawkHunting
 {
     SPELL_HAWK_HUNTING_ITEM = 44408
@@ -431,5 +463,6 @@ void AddSC_howling_fjord()
     new npc_apothecary_hanes();
     new npc_plaguehound_tracker();
     new npc_razael_and_lyana();
+    RegisterCreatureAI(npc_rodin_lightning_enabler);
     RegisterSpellScript(spell_hawk_hunting);
 }
