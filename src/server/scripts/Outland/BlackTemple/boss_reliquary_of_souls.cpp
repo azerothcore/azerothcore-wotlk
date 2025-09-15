@@ -141,13 +141,22 @@ public:
 
         void MoveInLineOfSight(Unit* who) override
         {
-            if (!who || me->getStandState() != UNIT_STAND_STATE_SLEEP || !who->IsPlayer() || me->GetDistance2d(who) > 90.0f || who->ToPlayer()->IsGameMaster())
+            if (!who || me->getStandState() != UNIT_STAND_STATE_SLEEP || !who->IsPlayer() || who->ToPlayer()->IsGameMaster())
+                return;
+
+            if (me->GetDistance2d(who) > 90.0f)
+                return;
+
+            if (!me->isInFront(who, M_PI / 4.0f))
+                return;
+
+            if (!me->IsWithinLOSInMap(who))
                 return;
 
             me->SetInCombatWithZone();
             me->SetStandState(UNIT_STAND_STATE_STAND);
 
-            ScheduleUniqueTimedEvent(5s, [&] { // 15s
+            ScheduleUniqueTimedEvent(5s, [&] {
                 me->SetStandState(UNIT_STAND_STATE_SUBMERGED);
                 DoCastSelf(SPELL_SUMMON_ESSENCE_OF_SUFFERING);
             }, EVENT_ESSENCE_OF_SUFFERING);
@@ -296,7 +305,7 @@ public:
                 damage = me->GetHealth() - 1;
                 if (!me->HasUnitFlag(UNIT_FLAG_NON_ATTACKABLE))
                 {
-                    me->RemoveAurasDueToSpell(SPELL_ESSENCE_OF_SUFFERING_PASSIVE); // prevent fixate from triggering
+                    me->RemoveAurasDueToSpell(SPELL_ESSENCE_OF_SUFFERING_PASSIVE);
                     me->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
                     Talk(SUFF_SAY_RECAP);
                     me->SetReactState(REACT_PASSIVE);
@@ -543,7 +552,6 @@ public:
                     ObjectGuid victimGUID = victim->GetGUID();
                     if (targetGUID && targetGUID != victimGUID)
                         DoCastSelf(SPELL_SEETHE);
-                    // victim can be lost
                     targetGUID = victimGUID;
                 }
             }, 1s);
