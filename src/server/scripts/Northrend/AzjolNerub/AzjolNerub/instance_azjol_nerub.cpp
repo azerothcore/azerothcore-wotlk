@@ -141,7 +141,7 @@ class spell_azjol_drain_power : public SpellScript
         return ValidateSpellInfo({ SPELL_DRAIN_POWER_AURA });
     }
 
-    void HandleScriptEffect(SpellEffIndex effIndex)
+    void HandleScriptEffect(SpellEffIndex /*effIndex*/)
     {
         GetCaster()->CastSpell(GetCaster(), SPELL_DRAIN_POWER_AURA, true);
     }
