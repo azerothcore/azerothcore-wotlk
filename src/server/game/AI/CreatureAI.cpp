@@ -62,6 +62,8 @@ void CreatureAI::Talk(uint8 id, WorldObject const* target /*= nullptr*/, Millise
         {
             if (Unit* textTarget = ObjectAccessor::GetUnit(*me, targetGuid))
                 sCreatureTextMgr->SendChat(me, id, textTarget);
+            else
+                sCreatureTextMgr->SendChat(me, id, nullptr);
         }, delay);
     }
     else
