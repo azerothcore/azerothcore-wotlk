@@ -53,7 +53,11 @@ void CreatureAI::Talk(uint8 id, WorldObject const* target /*= nullptr*/, Millise
 {
     if (delay > Seconds::zero())
     {
-        ObjectGuid targetGuid = target->GetGUID();
+        ObjectGuid targetGuid;
+
+        if (target)
+            targetGuid = target->GetGUID();
+        
         me->m_Events.AddEventAtOffset([this, id, targetGuid]()
         {
             if (Unit* textTarget = ObjectAccessor::GetUnit(*me, targetGuid))
