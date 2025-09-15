@@ -141,16 +141,9 @@ public:
 
         void MoveInLineOfSight(Unit* who) override
         {
-            if (!who || me->getStandState() != UNIT_STAND_STATE_SLEEP || !who->IsPlayer() || who->ToPlayer()->IsGameMaster())
-                return;
-
-            if (me->GetDistance2d(who) > 90.0f)
-                return;
-
-            if (!me->isInFront(who, M_PI / 4.0f))
-                return;
-
-            if (!me->IsWithinLOSInMap(who))
+            if (!who || me->getStandState() != UNIT_STAND_STATE_SLEEP || !who->IsPlayer() || 
+                who->ToPlayer()->IsGameMaster() || me->GetDistance2d(who) > 90.0f || 
+                !me->isInFront(who, M_PI / 4.0f) || !me->IsWithinLOSInMap(who))
                 return;
 
             me->SetInCombatWithZone();
