@@ -2159,7 +2159,7 @@ class spell_soul_deflection : public AuraScript
 
     void HandleProc(AuraEffect const* /*aurEff*/, ProcEventInfo& eventInfo)
     {
-        if (!eventInfo.GetDamageInfo() || !eventInfo.GetDamageInfo()->GetDamage())
+        if (!eventInfo.GetDamageInfo() || !eventInfo.GetDamageInfo()->GetDamage() || !GetTarget())
             return;
 
         GetCaster()->CastCustomSpell(SPELL_SOUL_DEFLECTION_DAMAGE, SPELLVALUE_BASE_POINT0, eventInfo.GetDamageInfo()->GetDamage(), GetTarget(), true);
