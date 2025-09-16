@@ -53,17 +53,19 @@ void CreatureAI::Talk(uint8 id, WorldObject const* target /*= nullptr*/, Millise
 {
     if (delay > Seconds::zero())
     {
-        ObjectGuid targetGuid = target->GetGUID();
+        ObjectGuid targetGuid;
+
+        if (target)
+            targetGuid = target->GetGUID();
+
         me->m_Events.AddEventAtOffset([this, id, targetGuid]()
         {
-            if (Unit* textTarget = ObjectAccessor::GetUnit(*me, targetGuid))
-                sCreatureTextMgr->SendChat(me, id, textTarget);
+            // Target can be nullptr here, it will be handled inside the function.
+            sCreatureTextMgr->SendChat(me, id, ObjectAccessor::GetUnit(*me, targetGuid));
         }, delay);
     }
     else
-    {
         sCreatureTextMgr->SendChat(me, id, target);
-    }
 }
 
 /**
