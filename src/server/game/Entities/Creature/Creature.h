@@ -39,6 +39,10 @@ class CreatureGroup;
 
 #define MAX_VENDOR_ITEMS 150    // Limitation in 3.x.x item count in SMSG_LIST_INVENTORY
 
+//used for handling non-repeatable random texts
+typedef std::vector<uint8> CreatureTextRepeatIds;
+typedef std::unordered_map<uint8, CreatureTextRepeatIds> CreatureTextRepeatGroup;
+
 class Creature : public Unit, public GridObject<Creature>, public MovableMapObject, public UpdatableMapObject
 {
 public:
@@ -391,6 +395,10 @@ public:
     void UpdateLeashExtensionTime();
     uint8 GetLeashTimer() const;
 
+    CreatureTextRepeatIds GetTextRepeatGroup(uint8 textGroup);
+    void SetTextRepeatId(uint8 textGroup, uint8 id);
+    void ClearTextRepeatGroup(uint8 textGroup);
+
     bool IsFreeToMove();
     static constexpr uint32 MOVE_CIRCLE_CHECK_INTERVAL = 3000;
     static constexpr uint32 MOVE_BACKWARDS_CHECK_INTERVAL = 2000;
@@ -520,6 +528,8 @@ private:
     uint32 m_cannotReachTimer;
 
     Spell const* _focusSpell;   ///> Locks the target during spell cast for proper facing
+
+    CreatureTextRepeatGroup m_textRepeat;
 
     bool _isMissingSwimmingFlagOutOfCombat;
 
