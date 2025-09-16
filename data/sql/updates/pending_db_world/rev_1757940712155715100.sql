@@ -35,3 +35,43 @@ INSERT INTO `creature` (`guid`, `id1`, `map`, `zoneId`, `areaId`, `spawnMask`, `
 (@CGUID+29, 26094, 571, 3537, 4128, 1, 1, 0, 3752.42529296875, 3629.353271484375, 357.46136474609375, 4.506084442138671875, 120, 0, 0, 2095, 852, 0, 0, 0, 0, 63163), -- 26094
 (@CGUID+30, 26094, 571, 3537, 4128, 1, 1, 0, 3726.805908203125, 3505.173828125, 357.183563232421875, 3.473205089569091796, 120, 0, 0, 2095, 852, 0, 0, 0, 0, 63163), -- 26094
 (@CGUID+31, 26094, 571, 3537, 4128, 1, 1, 0, 3773.9384765625, 3514.71728515625, 383.30303955078125, 0.03490658476948738, 120, 0, 0, 2095, 852, 0, 0, 0, 0, 63163); -- 26094
+
+UPDATE `creature_template_addon` SET `auras` = '32566' WHERE `entry` = 26093;
+
+SET @CGUID = 1107;
+DELETE FROM `creature` WHERE `id1` = 26093;
+INSERT INTO `creature` (`guid`, `id1`, `map`, `zoneId`, `areaId`, `spawnMask`, `phaseMask`, `equipment_id`, `position_x`, `position_y`, `position_z`, `orientation`, `spawntimesecs`, `wander_distance`, `currentwaypoint`, `curhealth`, `curmana`, `MovementType`, `npcflag`, `unit_flags`, `dynamicflags`, `VerifiedBuild`) VALUES
+(@CGUID+0, 26093, 571, 3537, 4128, 1, 1, 0, 3739.39404296875, 3567.0869140625, 374.34088134765625, 3.804817676544189453, 120, 0, 0, 2095, 852, 0, 0, 0, 0, 63163); -- 26093
+
+DELETE FROM `creature_template_movement` WHERE `CreatureID` IN (26093, 26094);
+INSERT INTO `creature_template_movement` (`CreatureID`, `Ground`, `Swim`, `Flight`) VALUES
+(26093, 1, 0, 1),
+(26094, 1, 0, 1);
+
+UPDATE `creature_template` SET `AIName` = 'SmartAI' WHERE `entry` = 26094;
+
+DELETE FROM `smart_scripts` WHERE (`source_type` = 0 AND `entryorguid` = 26094);
+INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `event_param6`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
+(26094, 0, 0, 0, 25, 0, 100, 0, 0, 0, 0, 0, 0, 0, 11, 46477, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Naxxanar Caster - On Reset - Cast \'Naxxanar Beam 1\''),
+(26094, 0, 1, 0, 60, 0, 100, 0, 8000, 8000, 8000, 8000, 0, 0, 11, 46521, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Naxxanar Caster - On Update - Cast \'Naxxanar Beam 3\'');
+
+DELETE FROM `smart_scripts` WHERE (`entryorguid` = 25601) AND (`source_type` = 0) AND (`id` IN (3));
+INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `event_param6`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
+(25601, 0, 3, 0, 25, 0, 100, 0, 0, 0, 0, 0, 0, 0, 11, 46482, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Prince Valanar - On Reset - Cast \'Naxxanar Beam 2\'');
+
+DELETE FROM `conditions` WHERE (`SourceTypeOrReferenceId` = 13) AND (`SourceGroup` = 1) AND (`SourceEntry` = 46477) AND (`SourceId` = 0) AND (`ElseGroup` = 0) AND (`ConditionTypeOrReference` = 31) AND (`ConditionTarget` = 0) AND (`ConditionValue1` = 3) AND (`ConditionValue2` = 26093) AND (`ConditionValue3` = 0);
+INSERT INTO `conditions` (`SourceTypeOrReferenceId`, `SourceGroup`, `SourceEntry`, `SourceId`, `ElseGroup`, `ConditionTypeOrReference`, `ConditionTarget`, `ConditionValue1`, `ConditionValue2`, `ConditionValue3`, `NegativeCondition`, `ErrorType`, `ErrorTextId`, `ScriptName`, `Comment`) VALUES
+(13, 1, 46477, 0, 0, 31, 0, 3, 26093, 0, 0, 0, 0, '', 'Spell Naxxanar Beam 1 only hit Naxxanar Target');
+
+DELETE FROM `conditions` WHERE (`SourceTypeOrReferenceId` = 13) AND (`SourceGroup` = 1) AND (`SourceEntry` = 46482) AND (`SourceId` = 0) AND (`ElseGroup` = 0) AND (`ConditionTypeOrReference` = 31) AND (`ConditionTarget` = 0) AND (`ConditionValue1` = 3) AND (`ConditionValue2` = 26093) AND (`ConditionValue3` = 0);
+INSERT INTO `conditions` (`SourceTypeOrReferenceId`, `SourceGroup`, `SourceEntry`, `SourceId`, `ElseGroup`, `ConditionTypeOrReference`, `ConditionTarget`, `ConditionValue1`, `ConditionValue2`, `ConditionValue3`, `NegativeCondition`, `ErrorType`, `ErrorTextId`, `ScriptName`, `Comment`) VALUES
+(13, 1, 46482, 0, 0, 31, 0, 3, 26093, 0, 0, 0, 0, '', 'Spell Naxxanar Beam 2 only hit Naxxanar Target');
+
+DELETE FROM `conditions` WHERE (`SourceTypeOrReferenceId` = 13) AND (`SourceGroup` = 1) AND (`SourceEntry` = 46521) AND (`SourceId` = 0) AND (`ElseGroup` = 0) AND (`ConditionTypeOrReference` = 31) AND (`ConditionTarget` = 0) AND (`ConditionValue1` = 3) AND (`ConditionValue2` = 26093) AND (`ConditionValue3` = 0);
+INSERT INTO `conditions` (`SourceTypeOrReferenceId`, `SourceGroup`, `SourceEntry`, `SourceId`, `ElseGroup`, `ConditionTypeOrReference`, `ConditionTarget`, `ConditionValue1`, `ConditionValue2`, `ConditionValue3`, `NegativeCondition`, `ErrorType`, `ErrorTextId`, `ScriptName`, `Comment`) VALUES
+(13, 1, 46521, 0, 0, 31, 0, 3, 26093, 0, 0, 0, 0, '', 'Spell Naxxanar Beam 3 only hit Naxxanar Target');
+
+DELETE FROM `conditions` WHERE (`SourceTypeOrReferenceId` = 22) AND `SourceGroup` IN (1, 2) AND (`SourceEntry` = 26094);
+INSERT INTO `conditions` (`SourceTypeOrReferenceId`, `SourceGroup`, `SourceEntry`, `SourceId`, `ElseGroup`, `ConditionTypeOrReference`, `ConditionTarget`, `ConditionValue1`, `ConditionValue2`, `ConditionValue3`, `NegativeCondition`, `ErrorType`, `ErrorTextId`, `ScriptName`, `Comment`) VALUES
+(22, 1, 26094, 0, 0, 29, 1, 26093, 28, 0, 0, 0, 0, '', 'Naxxanar Beam 2 requires Naxxanar Target within 28yd'),
+(22, 2, 26094, 0, 0, 29, 1, 26093, 28, 0, 1, 0, 0, '', 'Naxxanar Beam 2 requires Naxxanar Target NOT within 28yd');
