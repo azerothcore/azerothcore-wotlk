@@ -1,3 +1,4 @@
+-- DB update 2025_09_16_05 -> 2025_09_16_06
 -- Update gameobject 'Sturdy Vine' with sniffed values
 -- updated spawns
 DELETE FROM `gameobject` WHERE (`id` IN (190622)) AND (`guid` IN (59679, 59680, 59681, 59682, 59683, 59684, 59685, 59686, 59687, 59688, 59689, 59690, 59691, 59692, 59693, 59694, 59695, 59696, 59697, 59698, 59699, 59700, 59701, 59702));
