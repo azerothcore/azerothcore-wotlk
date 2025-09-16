@@ -2288,7 +2288,7 @@ class spell_dragonblight_flame_fury : public AuraScript
     }
 
 private:
-    const std::array<uint32, 5> spellIds = { SPELL_FLAME_FURY_1, SPELL_FLAME_FURY_2, SPELL_FLAME_FURY_3, SPELL_FLAME_FURY_4, SPELL_FLAME_FURY_5 };
+    std::array<uint32, 5> const spellIds = { SPELL_FLAME_FURY_1, SPELL_FLAME_FURY_2, SPELL_FLAME_FURY_3, SPELL_FLAME_FURY_4, SPELL_FLAME_FURY_5 };
 
     void Register() override
     {
