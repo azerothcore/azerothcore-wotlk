@@ -1,3 +1,4 @@
+-- DB update 2025_09_15_03 -> 2025_09_16_00
 -- Earthfury Belt
 UPDATE `creature_loot_template` SET `chance` = 0.2 WHERE `item` = 16838 AND `entry` IN(11667,11666);
 UPDATE `creature_loot_template` SET `chance` = 0.3 WHERE `item` = 16838 AND `entry` IN(12100,12076,11665);
