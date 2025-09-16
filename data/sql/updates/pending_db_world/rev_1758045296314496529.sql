@@ -53,8 +53,8 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 
 DELETE FROM `conditions` WHERE `SourceTypeOrReferenceId`=22 AND `SourceEntry`=25742;
 
-DELETE FROM `creature_text` WHERE `entry`IN(24730,25339,25456);
-INSERT INTO `creature_text` (`entry`, `groupid`, `id`, `text`, `type`, `language`, `probability`, `emote`, `duration`, `sound`, `BroadcastTextID`, `comment`) VALUES
+DELETE FROM `creature_text` WHERE `CreatureID`IN(24730,25339,25456);
+INSERT INTO `creature_text` (`CreatureID`, `groupid`, `id`, `text`, `type`, `language`, `probability`, `emote`, `duration`, `sound`, `BroadcastTextID`, `comment`) VALUES
 (24730, 0, 0, 'With the power of the horn, I bind you to its wielder''s will!', 12, 0, 100, 0, 0, 0, 24963, 'Wind Tamer Barah to Player'),
 (25339, 0, 0, 'Oh no... they''ve shackled his spirit!', 12, 1, 100, 5, 0, 0, 24683, 'Spirit Talker Snarlfang'),
 (25456, 0, 0, 'KAGANISHU!', 12, 0, 100, 0, 0, 0, 24658, 'Vision of Kaganishu');
