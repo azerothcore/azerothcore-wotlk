@@ -36,12 +36,11 @@ INSERT INTO `waypoints` (`entry`, `pointid`, `position_x`, `position_y`, `positi
 (25629, 5, 3492.488525, 4548.432617, -12.966542, 'Lord Kryxix'),
 (25629, 6, 3498.693604, 4544.571777, -12.983426, 'Lord Kryxix');
 
-SET @ENTRY := 25652;
-UPDATE `creature_template` SET `AIName`="SmartAI" WHERE `entry`=@ENTRY;
-DELETE FROM `smart_scripts` WHERE `entryorguid`=@ENTRY AND `source_type`=0;
-INSERT INTO `smart_scripts` (`entryorguid`,`source_type`,`id`,`link`,`event_type`,`event_phase_mask`,`event_chance`,`event_flags`,`event_param1`,`event_param2`,`event_param3`,`event_param4`,`action_type`,`action_param1`,`action_param2`,`action_param3`,`action_param4`,`action_param5`,`action_param6`,`target_type`,`target_param1`,`target_param2`,`target_param3`,`target_x`,`target_y`,`target_z`,`target_o`,`comment`) VALUES
-(@ENTRY,0,0,0,38,0,100,0,1,1,0,0,53,0,25652,0,0,0,0,1,0,0,0,0,0,0,0,"Nerub'ar Scarab - On Data Set 1 1 - Start Waypoint"),
-(@ENTRY,0,1,0,40,0,100,0,6,25652,0,0,41,1000,0,0,0,0,0,1,0,0,0,0,0,0,0,"Nerub'ar Scarab - On Waypoint 6 Reached - Despawn In 1000 ms");
+UPDATE `creature_template` SET `AIName` = 'SmartAI' WHERE `entry` = 25652;
+DELETE FROM `smart_scripts` WHERE (`source_type` = 0 AND `entryorguid` = 25652);
+INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `event_param6`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
+(25652, 0, 0, 0, 38, 0, 100, 0, 1, 1, 0, 0, 0, 0, 53, 0, 25652, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Nerub\'ar Scarab - On Data Set 1 1 - Start Waypoint Path 25652'),
+(25652, 0, 1, 0, 40, 0, 100, 0, 6, 25652, 0, 0, 0, 0, 41, 1000, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Nerub\'ar Scarab - On Point 6 of Path 25652 Reached - Despawn In 1000 ms');
 
 DELETE FROM `smart_scripts` WHERE `entryorguid` IN (25629, 25794, 25742) AND `source_type`=0;
 DELETE FROM `smart_scripts` WHERE `entryorguid` IN (2574200, 2574201) AND `source_type`=9;
