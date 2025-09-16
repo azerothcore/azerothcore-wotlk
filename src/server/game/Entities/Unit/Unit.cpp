@@ -4139,7 +4139,7 @@ void Unit::InterruptSpell(CurrentSpellTypes spellType, bool withDelayed, bool wi
                     ai->SetCombatMove(true);
         }
 
-        if (GetTypeId() == TYPEID_UNIT && IsAIEnabled)
+        if (IsCreature() && IsAIEnabled)
             ToCreature()->AI()->OnSpellCastFinished(spell->GetSpellInfo(), SPELL_FINISHED_CANCELED);
     }
 }
