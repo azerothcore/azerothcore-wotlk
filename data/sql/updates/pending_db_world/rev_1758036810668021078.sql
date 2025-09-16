@@ -1,4 +1,17 @@
 --
+DELETE FROM `waypoints` WHERE `entry`=25742;
+INSERT INTO `waypoints` (`entry`, `pointid`, `position_x`, `position_y`, `position_z`, `point_comment`) VALUES
+(25742, 1, 3511.336426, 4519.295898, -11.937509, 'Alluvius');
+
+DELETE FROM `waypoints` WHERE `entry`=25652;
+INSERT INTO `waypoints` (`entry`, `pointid`, `position_x`, `position_y`, `position_z`, `point_comment`) VALUES
+(25652, 1, 3509.71, 4510.5, -14.6752, 'Nerub\'ar Scarab'),
+(25652, 2, 3515.16, 4512.57, -13.4052, 'Nerub\'ar Scarab'),
+(25652, 3, 3520.58, 4511.77, -12.5632, 'Nerub\'ar Scarab'),
+(25652, 4, 3530.14, 4507.88, -12.9948, 'Nerub\'ar Scarab'),
+(25652, 5, 3536.34, 4508.6, -12.9948, 'Nerub\'ar Scarab'),
+(25652, 6, 3553.48, 4510.25, -12.9948, 'Nerub\'ar Scarab');
+
 DELETE FROM `event_scripts` WHERE `id` IN (17084, 16929);
 INSERT INTO `event_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `dataint`, `x`, `y`, `z`, `o`) VALUES
 (17084, 0, 10, 25794, 180000, 0, 3521.26, 4550.4, -12.8893, 3.95449),
@@ -16,6 +29,13 @@ INSERT INTO `waypoints` (`entry`, `pointid`, `position_x`, `position_y`, `positi
 (25629, 4, 3480.046143, 4548.960938, -12.982792, 'Lord Kryxix'),
 (25629, 5, 3492.488525, 4548.432617, -12.966542, 'Lord Kryxix'),
 (25629, 6, 3498.693604, 4544.571777, -12.983426, 'Lord Kryxix');
+
+SET @ENTRY := 25652;
+UPDATE `creature_template` SET `AIName`="SmartAI" WHERE `entry`=@ENTRY;
+DELETE FROM `smart_scripts` WHERE `entryorguid`=@ENTRY AND `source_type`=0;
+INSERT INTO `smart_scripts` (`entryorguid`,`source_type`,`id`,`link`,`event_type`,`event_phase_mask`,`event_chance`,`event_flags`,`event_param1`,`event_param2`,`event_param3`,`event_param4`,`action_type`,`action_param1`,`action_param2`,`action_param3`,`action_param4`,`action_param5`,`action_param6`,`target_type`,`target_param1`,`target_param2`,`target_param3`,`target_x`,`target_y`,`target_z`,`target_o`,`comment`) VALUES
+(@ENTRY,0,0,0,38,0,100,0,1,1,0,0,53,0,25652,0,0,0,0,1,0,0,0,0,0,0,0,"Nerub'ar Scarab - On Data Set 1 1 - Start Waypoint"),
+(@ENTRY,0,1,0,40,0,100,0,6,25652,0,0,41,1000,0,0,0,0,0,1,0,0,0,0,0,0,0,"Nerub'ar Scarab - On Waypoint 6 Reached - Despawn In 1000 ms");
 
 DELETE FROM `smart_scripts` WHERE `entryorguid` IN (25629, 25794, 25742) AND `source_type`=0;
 DELETE FROM `smart_scripts` WHERE `entryorguid` IN (2574200, 2574201) AND `source_type`=9;
