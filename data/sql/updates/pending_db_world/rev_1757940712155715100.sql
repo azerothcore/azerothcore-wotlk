@@ -78,3 +78,5 @@ DELETE FROM `conditions` WHERE (`SourceTypeOrReferenceId` = 22) AND `SourceGroup
 INSERT INTO `conditions` (`SourceTypeOrReferenceId`, `SourceGroup`, `SourceEntry`, `SourceId`, `ElseGroup`, `ConditionTypeOrReference`, `ConditionTarget`, `ConditionValue1`, `ConditionValue2`, `ConditionValue3`, `NegativeCondition`, `ErrorType`, `ErrorTextId`, `ScriptName`, `Comment`) VALUES
 (22, 1, 26094, 0, 0, 29, 1, 26093, 28, 0, 0, 0, 0, '', 'Naxxanar Beam 2 requires Naxxanar Target within 28yd'),
 (22, 2, 26094, 0, 0, 29, 1, 26093, 28, 0, 1, 0, 0, '', 'Naxxanar Beam 2 requires Naxxanar Target NOT within 28yd');
+
+DELETE FROM `creature_addon` WHERE `guid` = 85246;
