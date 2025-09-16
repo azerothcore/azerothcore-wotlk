@@ -1,3 +1,4 @@
+-- DB update 2025_09_16_03 -> 2025_09_16_04
 --
 SET @CGUID = 93770;
 DELETE FROM `creature` WHERE `id1` = 26094;

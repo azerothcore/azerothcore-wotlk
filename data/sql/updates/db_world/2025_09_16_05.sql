@@ -1,3 +1,4 @@
+-- DB update 2025_09_16_04 -> 2025_09_16_05
 --
 
 DELETE FROM `spell_script_names` WHERE `ScriptName` = 'spell_azjol_drain_power';
