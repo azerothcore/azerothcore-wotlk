@@ -55,8 +55,11 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 (26094, 0, 0, 0, 25, 0, 100, 0, 0, 0, 0, 0, 0, 0, 11, 46477, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Naxxanar Caster - On Reset - Cast \'Naxxanar Beam 1\''),
 (26094, 0, 1, 0, 60, 0, 100, 0, 8000, 8000, 8000, 8000, 0, 0, 11, 46521, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Naxxanar Caster - On Update - Cast \'Naxxanar Beam 3\'');
 
-DELETE FROM `smart_scripts` WHERE (`entryorguid` = 25601) AND (`source_type` = 0) AND (`id` IN (3));
+DELETE FROM `smart_scripts` WHERE (`source_type` = 0 AND `entryorguid` = 25601);
 INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `event_param6`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
+(25601, 0, 0, 0, 0, 0, 100, 0, 4000, 8000, 4000, 8000, 0, 0, 11, 15537, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Prince Valanar - In Combat - Cast \'Shadow Bolt\''),
+(25601, 0, 1, 0, 0, 0, 100, 0, 7600, 14000, 6400, 19700, 0, 0, 11, 50992, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Prince Valanar - In Combat - Cast \'Soul Blast\''),
+(25601, 0, 2, 0, 0, 0, 100, 0, 7200, 24100, 14500, 26600, 0, 0, 11, 51009, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Prince Valanar - In Combat - Cast \'Soul Deflection\''),
 (25601, 0, 3, 0, 25, 0, 100, 0, 0, 0, 0, 0, 0, 0, 11, 46482, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Prince Valanar - On Reset - Cast \'Naxxanar Beam 2\'');
 
 DELETE FROM `conditions` WHERE (`SourceTypeOrReferenceId` = 13) AND (`SourceGroup` = 1) AND (`SourceEntry` = 46477) AND (`SourceId` = 0) AND (`ElseGroup` = 0) AND (`ConditionTypeOrReference` = 31) AND (`ConditionTarget` = 0) AND (`ConditionValue1` = 3) AND (`ConditionValue2` = 26093) AND (`ConditionValue3` = 0);
