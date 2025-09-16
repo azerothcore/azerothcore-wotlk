@@ -545,6 +545,7 @@ public:
                     ObjectGuid victimGUID = victim->GetGUID();
                     if (targetGUID && targetGUID != victimGUID)
                         DoCastSelf(SPELL_SEETHE);
+                    // victim can be lost
                     targetGUID = victimGUID;
                 }
             }, 1s);
