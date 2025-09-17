@@ -2208,6 +2208,7 @@ public:
 
     void CastAllObtainSpells();
     void ApplyItemObtainSpells(Item* item, bool apply);
+    void UpdateItemObtainSpells(Item* item, uint8 bag, uint8 slot);
 
     SpellSchoolMask GetMeleeDamageSchoolMask(WeaponAttackType attackType = BASE_ATTACK, uint8 damageIndex = 0) const override;
 
@@ -2629,6 +2630,7 @@ public:
     [[nodiscard]] Optional<float> GetFarSightDistance() const;
 
     float GetSightRange(WorldObject const* target = nullptr) const override;
+    bool IsWorldObjectOutOfSightRange(WorldObject const* target) const;
 
     std::string GetPlayerName();
 
