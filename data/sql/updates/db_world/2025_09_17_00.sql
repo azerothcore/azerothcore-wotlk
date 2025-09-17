@@ -1,3 +1,4 @@
+-- DB update 2025_09_16_06 -> 2025_09_17_00
 --
 DELETE FROM `creature` WHERE `guid` = 117222 AND `id1` = 26335;
 INSERT INTO `creature` (`guid`, `id1`, `map`, `zoneId`, `areaId`, `spawnMask`, `phaseMask`, `equipment_id`, `position_x`, `position_y`, `position_z`, `orientation`, `spawntimesecs`, `wander_distance`, `currentwaypoint`, `curhealth`, `curmana`, `MovementType`, `npcflag`, `unit_flags`, `dynamicflags`, `VerifiedBuild`) VALUES
