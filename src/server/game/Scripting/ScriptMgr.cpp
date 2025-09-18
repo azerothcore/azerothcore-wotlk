@@ -127,7 +127,7 @@ void ScriptMgr::Unload()
     SCR_CLEAR<CreatureScript>();
     SCR_CLEAR<DatabaseScript>();
     SCR_CLEAR<DynamicObjectScript>();
-    SCR_CLEAR<ElunaScript>();
+    SCR_CLEAR<ALEScript>();
     SCR_CLEAR<FormulaScript>();
     SCR_CLEAR<GameEventScript>();
     SCR_CLEAR<GameObjectScript>();

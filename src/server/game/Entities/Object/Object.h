@@ -41,7 +41,7 @@
 
 #include "UpdateFields.h"
 
-class ElunaEventProcessor;
+class ALEEventProcessor;
 
 enum TempSummonType
 {
@@ -727,7 +727,7 @@ public:
     ObjectVisibilityContainer const& GetObjectVisibilityContainer() const { return _objectVisibilityContainer; }
 
     // Event handler
-    ElunaEventProcessor* elunaEvents;
+    ALEEventProcessor* ALEEvents;
     EventProcessor m_Events;
 
 protected:

@@ -39,7 +39,7 @@
 #include "CreatureScript.h"
 #include "DatabaseScript.h"
 #include "DynamicObjectScript.h"
-#include "ElunaScript.h"
+#include "ALEScript.h"
 #include "FormulaScript.h"
 #include "GameEventScript.h"
 #include "GameObjectScript.h"
