@@ -1,6 +1,6 @@
 --
 UPDATE `creature_template` SET `unit_flags`=`unit_flags` | (256 | 512 | 33554432) WHERE `entry`IN (25458, 25769);
-UPDATE `creature_template` SET `unit_flags`=`unit_flags` | (256 | 512 | 32768 | 33554432) WHERE `entry`=25456;
+UPDATE `creature_template` SET `unit_flags`=`unit_flags` | (256 | 512 | 32768 | 33554432) WHERE `entry` IN (25456, 25457);
 
 UPDATE `creature_template` SET `AIName`= 'SmartAI' WHERE `entry` IN (25769, 24730, 25456, 25457, 25458);
 DELETE FROM `smart_scripts` WHERE `entryorguid` IN (25769, 24730, 25456, 25457, 25458) AND `source_type`=0;
