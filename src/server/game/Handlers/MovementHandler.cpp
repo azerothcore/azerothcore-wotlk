@@ -496,21 +496,17 @@ void WorldSession::HandleMovementOpcodes(WorldPacket& recvData)
     if (plrMover && (movementInfo.HasMovementFlag(MOVEMENTFLAG_FLYING) || 
                      movementInfo.HasMovementFlag(MOVEMENTFLAG_CAN_FLY)))
     {
-        // Check if player actually has flight capability
         bool hasFlightAura = plrMover->HasAuraType(SPELL_AURA_FLY) || 
                             plrMover->HasAuraType(SPELL_AURA_MOUNTED) ||
                             plrMover->IsInFlight(); // taxi flight exception
-        
-        // Allow GMs to fly without auras
+
         if (!hasFlightAura && !plrMover->IsGameMaster())
         {
-            LOG_DEBUG("network.opcode", "Player {} sent flight movement without flight aura, correcting client state", 
-                      plrMover->GetName());
-            
-            // Force disable flight capability
+            //LOG_DEBUG("network.opcode", "Player {} sent flight movement without flight aura, correcting client state", 
+                      //plrMover->GetName());
+
             plrMover->SetCanFly(false);
-            
-            // Remove flight flags from movement info
+
             movementInfo.RemoveMovementFlag(MOVEMENTFLAG_FLYING);
             movementInfo.RemoveMovementFlag(MOVEMENTFLAG_CAN_FLY);
             
@@ -520,12 +516,11 @@ void WorldSession::HandleMovementOpcodes(WorldPacket& recvData)
             movementInfo.guid = mover->GetGUID();
             WriteMovementInfo(&correctedData, &movementInfo);
             plrMover->SendMessageToSet(&correctedData, _player);
-            
-            // Update server-side movement info with corrected flags
+
             mover->m_movementInfo = movementInfo;
             mover->UpdatePosition(movementInfo.pos);
             
-            return; // Prevent further processing of the invalid movement packet
+            return;
         }
     }
 
