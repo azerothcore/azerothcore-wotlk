@@ -12,8 +12,6 @@ UPDATE `spell_dbc` SET
 WHERE `Id`=39797;
 
 DELETE FROM `gameobject` WHERE `id`=185541;
-DELETE FROM `gameobject_addon` WHERE `guid` IN (39908, 39909, 39910, 39911, 39912, 39913, 39914, 39915, 39916, 39917, 39918, 39919, 39920);
-DELETE FROM `spawn_group` WHERE `spawnId` IN (39908, 39909, 39910, 39911, 39912, 39913, 39914, 39915, 39916, 39917, 39918, 39919, 39920) AND `spawnType`=1;
 
 UPDATE `creature_template` SET `AIName`='SmartAI', `unit_flags`=768 WHERE  `entry`=22972;
 DELETE FROM `smart_scripts` WHERE `entryorguid`=22972 AND `source_type`=0;
