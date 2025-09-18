@@ -492,6 +492,43 @@ void WorldSession::HandleMovementOpcodes(WorldPacket& recvData)
         movementInfo.transport.Reset();
     }
 
+    // Flight state validation - prevent persistent flight after aura removal
+    if (plrMover && (movementInfo.HasMovementFlag(MOVEMENTFLAG_FLYING) || 
+                     movementInfo.HasMovementFlag(MOVEMENTFLAG_CAN_FLY)))
+    {
+        // Check if player actually has flight capability
+        bool hasFlightAura = plrMover->HasAuraType(SPELL_AURA_FLY) || 
+                            plrMover->HasAuraType(SPELL_AURA_MOUNTED) ||
+                            plrMover->IsInFlight(); // taxi flight exception
+        
+        // Allow GMs to fly without auras
+        if (!hasFlightAura && !plrMover->IsGameMaster())
+        {
+            LOG_DEBUG("network.opcode", "Player {} sent flight movement without flight aura, correcting client state", 
+                      plrMover->GetName());
+            
+            // Force disable flight capability
+            plrMover->SetCanFly(false);
+            
+            // Remove flight flags from movement info
+            movementInfo.RemoveMovementFlag(MOVEMENTFLAG_FLYING);
+            movementInfo.RemoveMovementFlag(MOVEMENTFLAG_CAN_FLY);
+            
+            // Send corrected movement to prevent client desync
+            WorldPacket correctedData(opcode, recvData.size());
+            movementInfo.time = getMSTime(); // Update timestamp
+            movementInfo.guid = mover->GetGUID();
+            WriteMovementInfo(&correctedData, &movementInfo);
+            plrMover->SendMessageToSet(&correctedData, _player);
+            
+            // Update server-side movement info with corrected flags
+            mover->m_movementInfo = movementInfo;
+            mover->UpdatePosition(movementInfo.pos);
+            
+            return; // Prevent further processing of the invalid movement packet
+        }
+    }
+
     // fall damage generation (ignore in flight case that can be triggered also at lags in moment teleportation to another map).
     if (opcode == MSG_MOVE_FALL_LAND && plrMover && !plrMover->IsInFlight())
     {
