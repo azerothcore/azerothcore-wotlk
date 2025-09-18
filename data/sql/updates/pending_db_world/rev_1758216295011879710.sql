@@ -49,9 +49,9 @@ INSERT INTO `conditions` (`SourceTypeOrReferenceId`, `SourceGroup`, `SourceEntry
 (22, 1, 22972, 0, 0, 29, 1, 22986, 40, 0, 1, 0, 0, '', 'Only run SAI if No Invis Rune Stone within 40 yards'),
 (22, 2, 22972, 0, 0, 29, 1, 22986, 40, 0, 0, 0, 0, '', 'Only run SAI if Invis Rune Stone within 40 yards');
 
-UPDATE `creature` SET `spawntimesecs`=320 WHERE `id`=22986;
+UPDATE `creature` SET `spawntimesecs`=320 WHERE `id1`=22986;
 DELETE FROM `creature` WHERE `guid` IN (87298, 87308, 87369, 87376, 91131, 91132, 91133, 128906);
-INSERT INTO `creature` (`guid`, `id`, `map`, `zoneId`, `areaId`, `spawnMask`, `phaseMask`, `modelid`, `equipment_id`, `position_x`, `position_y`, `position_z`, `orientation`, `spawntimesecs`, `wander_distance`, `currentwaypoint`, `curhealth`, `curmana`, `MovementType`, `npcflag`, `unit_flags`, `dynamicflags`, `VerifiedBuild`) VALUES
+INSERT INTO `creature` (`guid`, `id1`, `map`, `zoneId`, `areaId`, `spawnMask`, `phaseMask`, `modelid`, `equipment_id`, `position_x`, `position_y`, `position_z`, `orientation`, `spawntimesecs`, `wander_distance`, `currentwaypoint`, `curhealth`, `curmana`, `MovementType`, `npcflag`, `unit_flags`, `dynamicflags`, `VerifiedBuild`) VALUES
 (87298, 22986, 530, 0, 0, 1, 1, 0, 0, -3709.53, 3744.06, 277.073, 1.62054, 320, 0, 0, 0, 0, 0, 0, 0, 0, 0),
 (87308, 22986, 530, 0, 0, 1, 1, 0, 0, -3758.84, 3732.39, 276.846, 5.73288, 320, 0, 0, 0, 0, 0, 0, 0, 0, 0),
 (87369, 22986, 530, 0, 0, 1, 1, 0, 0, -3687.76, 3677.07, 275.927, 5.73288, 320, 0, 0, 0, 0, 0, 0, 0, 0, 0),
