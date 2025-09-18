@@ -492,35 +492,25 @@ void WorldSession::HandleMovementOpcodes(WorldPacket& recvData)
         movementInfo.transport.Reset();
     }
 
-    // Flight state validation - prevent persistent flight after aura removal
-    if (plrMover && (movementInfo.HasMovementFlag(MOVEMENTFLAG_FLYING) || 
-                     movementInfo.HasMovementFlag(MOVEMENTFLAG_CAN_FLY)))
+    if (plrMover && !plrMover->IsGameMaster() && 
+        (movementInfo.HasMovementFlag(MOVEMENTFLAG_FLYING) || movementInfo.HasMovementFlag(MOVEMENTFLAG_CAN_FLY)))
     {
-        bool hasFlightAura = plrMover->HasAuraType(SPELL_AURA_FLY) || 
-                            plrMover->HasAuraType(SPELL_AURA_MOUNTED) ||
-                            plrMover->IsInFlight(); // taxi flight exception
-
-        if (!hasFlightAura && !plrMover->IsGameMaster())
+        if (!plrMover->IsInFlight())
         {
-            //LOG_DEBUG("network.opcode", "Player {} sent flight movement without flight aura, correcting client state", 
-                      //plrMover->GetName());
+            if (!plrMover->HasAuraType(SPELL_AURA_FLY) && !plrMover->HasAuraType(SPELL_AURA_MOUNTED))
+            {
+                LOG_DEBUG("network.opcode", "Player {} flight desync detected, forcing ground state", plrMover->GetName());
+                
+                // Force disable flight and remove flags
+                plrMover->SetCanFly(false);
+                movementInfo.RemoveMovementFlag(MOVEMENTFLAG_FLYING);
+                movementInfo.RemoveMovementFlag(MOVEMENTFLAG_CAN_FLY);
 
-            plrMover->SetCanFly(false);
-
-            movementInfo.RemoveMovementFlag(MOVEMENTFLAG_FLYING);
-            movementInfo.RemoveMovementFlag(MOVEMENTFLAG_CAN_FLY);
-            
-            // Send corrected movement to prevent client desync
-            WorldPacket correctedData(opcode, recvData.size());
-            movementInfo.time = getMSTime(); // Update timestamp
-            movementInfo.guid = mover->GetGUID();
-            WriteMovementInfo(&correctedData, &movementInfo);
-            plrMover->SendMessageToSet(&correctedData, _player);
-
-            mover->m_movementInfo = movementInfo;
-            mover->UpdatePosition(movementInfo.pos);
-            
-            return;
+                WorldPacket data(SMSG_MOVE_UNSET_CAN_FLY, 12);
+                data << plrMover->GetPackGUID();
+                data << uint32(0); // movement counter
+                plrMover->SendMessageToSet(&data, true);
+            }
         }
     }
 
@@ -639,7 +629,6 @@ void WorldSession::HandleMovementOpcodes(WorldPacket& recvData)
             }
     }
 }
-
 void WorldSession::HandleForceSpeedChangeAck(WorldPacket& recvData)
 {
     uint32 opcode = recvData.GetOpcode();
