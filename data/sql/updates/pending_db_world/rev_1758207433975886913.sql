@@ -15,11 +15,6 @@ INSERT INTO `creature` (`guid`, `id1`, `map`, `zoneId`, `areaId`, `spawnMask`, `
 (@CGUID+6, 27047, 571, 0, 0, 1, 1, 0, 7885.470703125, 910.68682861328125, 451.404388427734375, 0.767944872379302978, 300, 0, 0, 0, 0, 0, 0, 0, 0, 14007), -- 27047 (Area: -1 - Difficulty: 0)
 (@CGUID+7, 27047, 571, 0, 0, 1, 1, 0, 7896.4130859375, 902.90802001953125, 451.40155029296875, 5.98647928237915039, 300, 0, 0, 0, 0, 0, 0, 0, 0, 14007); -- 27047 (Area: -1 - Difficulty: 0)
 
-DELETE FROM `smart_scripts` WHERE `entryorguid`=31731 AND `source_type`=0;
-DELETE FROM `smart_scripts` WHERE `entryorguid`=31702 AND `source_type`=0;
-DELETE FROM `smart_scripts` WHERE `entryorguid`=3170200 AND `source_type`=9;
-DELETE FROM `smart_scripts` WHERE `entryorguid` IN(-123663, -123665, -123667, -123662, -123669, -123666, -123668, -123660, -@CGUID-5, -@CGUID-6, -@CGUID-7) AND `source_type`=0;
-
 DELETE FROM `creature_template_addon` WHERE `entry`=31702;
 INSERT INTO `creature_template_addon` (`entry`, `path_id`, `mount`, `bytes1`, `bytes2`, `emote`, `auras`, `visibilityDistanceType`) VALUES
 (31702, 0, 0, 50331648, 1, 0, NULL,  0);
@@ -28,7 +23,11 @@ DELETE FROM `disables` WHERE `sourceType`=0 AND `entry`=59661;
 INSERT INTO `disables` (`sourceType`, `entry`, `flags`, `params_0`, `params_1`, `comment`) VALUES
 (0, 59661, 64, '', '', 'Icecrown Purple Beam (Ignore Los)');
 
-INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES 
+DELETE FROM `smart_scripts` WHERE `entryorguid`=31731 AND `source_type`=0;
+DELETE FROM `smart_scripts` WHERE `entryorguid`=31702 AND `source_type`=0;
+DELETE FROM `smart_scripts` WHERE `entryorguid`=3170200 AND `source_type`=9;
+DELETE FROM `smart_scripts` WHERE `entryorguid` IN(-123663, -123665, -123667, -123662, -123669, -123666, -123668, -123660, -@CGUID-5, -@CGUID-6, -@CGUID-7) AND `source_type`=0;
+INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
 (31731, 0, 0, 0, 0, 0, 100, 0, 5000, 9000, 15000, 15000, 11, 32063, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 'Wyrm Reanimator - IC - Cast Corruption'),
 (31731, 0, 1, 0, 0, 0, 100, 0, 1000, 1000, 3000, 4000, 11, 9613, 64, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 'Wyrm Reanimator - IC CMC - Cast Shadowbolt'),
 (31731, 0, 2, 0, 0, 0, 100, 0, 4000, 7000, 16000, 22000, 11, 11443, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 'Wyrm Reanimator - IC - Cast Cripple'),
