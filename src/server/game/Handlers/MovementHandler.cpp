@@ -492,7 +492,7 @@ void WorldSession::HandleMovementOpcodes(WorldPacket& recvData)
         movementInfo.transport.Reset();
     }
 
-    if (plrMover && !plrMover->IsGameMaster() && 
+    if (plrMover && !plrMover->IsGameMaster() &&
         (movementInfo.HasMovementFlag(MOVEMENTFLAG_FLYING) || movementInfo.HasMovementFlag(MOVEMENTFLAG_CAN_FLY)))
     {
         if (!plrMover->IsInFlight())
@@ -500,7 +500,7 @@ void WorldSession::HandleMovementOpcodes(WorldPacket& recvData)
             if (!plrMover->HasAuraType(SPELL_AURA_FLY) && !plrMover->HasAuraType(SPELL_AURA_MOUNTED))
             {
                 LOG_DEBUG("network.opcode", "Player {} flight desync detected, forcing ground state", plrMover->GetName());
-                
+
                 // Force disable flight and remove flags
                 plrMover->SetCanFly(false);
                 movementInfo.RemoveMovementFlag(MOVEMENTFLAG_FLYING);
