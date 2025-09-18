@@ -978,7 +978,8 @@ enum AcoreStrings
     LANG_GUILD_INFO_EXTRA_INFO          = 1183,
     LANG_GUILD_INFO_RANKS               = 1184,
     LANG_GUILD_INFO_RANKS_LIST          = 1185,
-    // Room for more level 3              1186-1198 not used
+    LANG_COMMAND_BEASTMASTER_MODE       = 1186,
+    // Room for more level 3              1187-1198 not used
 
     // Debug commands
     LANG_DO_NOT_USE_6X_DEBUG_AREATRIGGER_LEFT = 1999,
