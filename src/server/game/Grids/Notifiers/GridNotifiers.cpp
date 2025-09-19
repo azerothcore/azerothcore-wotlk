@@ -64,11 +64,6 @@ void VisibleNotifier::SendToSelf()
         WorldObject* obj = itr->second;
         if (!i_player.IsWorldObjectOutOfSightRange(obj)
             || i_player.CanSeeOrDetect(obj, false, true))
-
-            //npcbot:
-            if (obj->IsNPCBotOrPet() && i_player.GetDistance2d(obj) < i_player.GetVisibilityRange() && i_player.CanSeeOrDetect(obj, false, true))
-                continue;
-            //end npcbot
         {
             ++itr;
             continue;
