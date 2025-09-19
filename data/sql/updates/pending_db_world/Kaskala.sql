@@ -282,41 +282,41 @@ UPDATE `creature_template` SET `flags_extra` = `flags_extra` |134217728, `AIName
 -- Set General SmartAI (Kaskala Defender)
 DELETE FROM `smart_scripts` WHERE (`source_type` = 0 AND `entryorguid` = 25764);
 INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `event_param6`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
-(25764, 0, 3, 0, 0, 0, 100, 0, 0, 2000, 8000, 12000, 0, 0, 11, 38556, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Kaskala Defender - In Combat - Cast \'Throw\'');
+(25764, 0, 0, 0, 0, 0, 100, 0, 0, 2000, 8000, 12000, 0, 0, 11, 38556, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Kaskala Defender - In Combat - Cast \'Throw\'');
 
 -- Set Personal SmartAI (Kaskala Defender)
 DELETE FROM `smart_scripts` WHERE (`source_type` = 0) AND (`entryorguid` IN (-111318, -111341, -111342, -111343, -111344, -111345, -111346, -111347, -111348, -111349, -111350));
 INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `event_param6`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
-(-111318, 0, 0, 0, 11, 0, 100, 0, 0, 0, 0, 0, 0, 0, 232, 11131800, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Kaskala Defender - On Respawn - Start Path 11131800'),
-(-111318, 0, 1, 0, 1, 0, 100, 1, 90000, 90000, 0, 0, 0, 0, 41, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Kaskala Defender - Out of Combat - Despawn Instant (No Repeat)'),
-(-111341, 0, 0, 1, 11, 0, 100, 0, 0, 0, 0, 0, 0, 0, 69, 0, 0, 0, 0, 0, 0, 8, 0, 0, 0, 0, 3171.17, 4785.69, 6.7834, 0, 'Kaskala Defender - On Respawn - Move To Position'),
-(-111341, 0, 1, 0, 61, 0, 100, 0, 0, 0, 0, 0, 0, 0, 101, 0, 0, 0, 0, 0, 0, 8, 0, 0, 0, 0, 3171.17, 4785.69, 6.7834, -2.4477, 'Kaskala Defender - On Respawn - Set Home Position'),
-(-111341, 0, 2, 0, 1, 0, 100, 1, 90000, 90000, 0, 0, 0, 0, 41, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Kaskala Defender - Out of Combat - Despawn Instant (No Repeat)'),
-(-111342, 0, 0, 0, 11, 0, 100, 0, 0, 0, 0, 0, 0, 0, 232, 11134200, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Kaskala Defender - On Respawn - Start Path 11134200'),
-(-111343, 0, 0, 1, 11, 0, 100, 0, 0, 0, 0, 0, 0, 0, 69, 0, 0, 0, 0, 0, 0, 8, 0, 0, 0, 0, 3165.35, 4803.14, 4.8427, 0, 'Kaskala Defender - On Respawn - Move To Position'),
-(-111343, 0, 1, 0, 61, 0, 100, 0, 0, 0, 0, 0, 0, 0, 101, 0, 0, 0, 0, 0, 0, 8, 0, 0, 0, 0, 3165.35, 4803.14, 4.8427, -2.7471, 'Kaskala Defender - On Respawn - Set Home Position'),
-(-111343, 0, 2, 0, 1, 0, 100, 1, 90000, 90000, 0, 0, 0, 0, 41, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Kaskala Defender - Out of Combat - Despawn Instant (No Repeat)'),
-(-111344, 0, 0, 1, 11, 0, 100, 0, 0, 0, 0, 0, 0, 0, 69, 0, 0, 0, 0, 0, 0, 8, 0, 0, 0, 0, 3161.40, 4796.13, 5.9756, 0, 'Kaskala Defender - On Respawn - Move To Position'),
-(-111344, 0, 1, 0, 61, 0, 100, 0, 0, 0, 0, 0, 0, 0, 101, 0, 0, 0, 0, 0, 0, 8, 0, 0, 0, 0, 3161.40, 4796.13, 5.9756, -2.7423, 'Kaskala Defender - On Respawn - Set Home Position'),
-(-111344, 0, 2, 0, 1, 0, 100, 1, 90000, 90000, 0, 0, 0, 0, 41, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Kaskala Defender - Out of Combat - Despawn Instant (No Repeat)'),
-(-111345, 0, 0, 1, 11, 0, 100, 0, 0, 0, 0, 0, 0, 0, 69, 0, 0, 0, 0, 0, 0, 8, 0, 0, 0, 0, 3175.69, 4736.03, 8.9181, 0, 'Kaskala Defender - On Respawn - Move To Position'),
-(-111345, 0, 1, 0, 61, 0, 100, 0, 0, 0, 0, 0, 0, 0, 101, 0, 0, 0, 0, 0, 0, 8, 0, 0, 0, 0, 3175.69, 4736.03, 8.9181, 2.6456, 'Kaskala Defender - On Respawn - Set Home Position'),
-(-111345, 0, 2, 0, 1, 0, 100, 1, 90000, 90000, 0, 0, 0, 0, 41, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Kaskala Defender - Out of Combat - Despawn Instant (No Repeat)'),
-(-111346, 0, 0, 1, 11, 0, 100, 0, 0, 0, 0, 0, 0, 0, 69, 0, 0, 0, 0, 0, 0, 8, 0, 0, 0, 0, 3163.81, 4721.18, 8.3387, 0, 'Kaskala Defender - On Respawn - Move To Position'),
-(-111346, 0, 1, 0, 61, 0, 100, 0, 0, 0, 0, 0, 0, 0, 101, 0, 0, 0, 0, 0, 0, 8, 0, 0, 0, 0, 3163.81, 4721.18, 8.3387, 2.4666, 'Kaskala Defender - On Respawn - Set Home Position'),
-(-111346, 0, 2, 0, 1, 0, 100, 1, 90000, 90000, 0, 0, 0, 0, 41, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Kaskala Defender - Out of Combat - Despawn Instant (No Repeat)'),
-(-111347, 0, 0, 1, 11, 0, 100, 0, 0, 0, 0, 0, 0, 0, 69, 0, 0, 0, 0, 0, 0, 8, 0, 0, 0, 0, 2933.7798, 4953.8257, 5.445045, 0, 'Kaskala Defender - On Respawn - Move To Position'),
-(-111347, 0, 1, 0, 61, 0, 100, 0, 0, 0, 0, 0, 0, 0, 101, 0, 0, 0, 0, 0, 0, 8, 0, 0, 0, 0, 2933.7798, 4953.8257, 5.445045, 0, 'Kaskala Defender - On Respawn - Set Home Position'),
-(-111347, 0, 2, 0, 1, 0, 100, 1, 90000, 90000, 0, 0, 0, 0, 41, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Kaskala Defender - Out of Combat - Despawn Instant (No Repeat)'),
-(-111348, 0, 0, 1, 11, 0, 100, 0, 0, 0, 0, 0, 0, 0, 69, 0, 0, 0, 0, 0, 0, 8, 0, 0, 0, 0, 2920.374, 4965.801, 6.8121896, 0, 'Kaskala Defender - On Respawn - Move To Position'),
-(-111348, 0, 1, 0, 61, 0, 100, 0, 0, 0, 0, 0, 0, 0, 101, 0, 0, 0, 0, 0, 0, 8, 0, 0, 0, 0, 2920.374, 4965.801, 6.8121896, 0, 'Kaskala Defender - On Respawn - Set Home Position'),
-(-111348, 0, 2, 0, 1, 0, 100, 1, 90000, 90000, 0, 0, 0, 0, 41, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Kaskala Defender - Out of Combat - Despawn Instant (No Repeat)'),
-(-111349, 0, 0, 1, 11, 0, 100, 0, 0, 0, 0, 0, 0, 0, 69, 0, 0, 0, 0, 0, 0, 8, 0, 0, 0, 0, 3023.6384, 4906.197, 0.38545987, 0, 'Kaskala Defender - On Respawn - Move To Position'),
-(-111349, 0, 1, 0, 61, 0, 100, 0, 0, 0, 0, 0, 0, 0, 101, 0, 0, 0, 0, 0, 0, 8, 0, 0, 0, 0, 3023.6384, 4906.197, 0.38545987, 0, 'Kaskala Defender - On Respawn - Set Home Position'),
-(-111349, 0, 2, 0, 1, 0, 100, 1, 90000, 90000, 0, 0, 0, 0, 41, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Kaskala Defender - Out of Combat - Despawn Instant (No Repeat)'),
-(-111350, 0, 0, 1, 11, 0, 100, 0, 0, 0, 0, 0, 0, 0, 69, 0, 0, 0, 0, 0, 0, 8, 0, 0, 0, 0, 3037.3958, 4903.987, 0.38545987, 0, 'Kaskala Defender - On Respawn - Move To Position'),
-(-111350, 0, 1, 0, 61, 0, 100, 0, 0, 0, 0, 0, 0, 0, 101, 0, 0, 0, 0, 0, 0, 8, 0, 0, 0, 0, 3037.3958, 4903.987, 0.38545987, 0, 'Kaskala Defender - On Respawn - Set Home Position'),
-(-111350, 0, 2, 0, 1, 0, 100, 1, 90000, 90000, 0, 0, 0, 0, 41, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Kaskala Defender - Out of Combat - Despawn Instant (No Repeat)');
+(-111318, 0, 1, 0, 11, 0, 100, 0, 0, 0, 0, 0, 0, 0, 232, 11131800, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Kaskala Defender - On Respawn - Start Path 11131800'),
+(-111318, 0, 2, 0, 1, 0, 100, 1, 90000, 90000, 0, 0, 0, 0, 41, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Kaskala Defender - Out of Combat - Despawn Instant (No Repeat)'),
+(-111341, 0, 1, 2, 11, 0, 100, 0, 0, 0, 0, 0, 0, 0, 69, 0, 0, 0, 0, 0, 0, 8, 0, 0, 0, 0, 3171.17, 4785.69, 6.7834, 0, 'Kaskala Defender - On Respawn - Move To Position'),
+(-111341, 0, 2, 0, 61, 0, 100, 0, 0, 0, 0, 0, 0, 0, 101, 0, 0, 0, 0, 0, 0, 8, 0, 0, 0, 0, 3171.17, 4785.69, 6.7834, -2.4477, 'Kaskala Defender - On Respawn - Set Home Position'),
+(-111341, 0, 3, 0, 1, 0, 100, 1, 90000, 90000, 0, 0, 0, 0, 41, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Kaskala Defender - Out of Combat - Despawn Instant (No Repeat)'),
+(-111342, 0, 1, 0, 11, 0, 100, 0, 0, 0, 0, 0, 0, 0, 232, 11134200, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Kaskala Defender - On Respawn - Start Path 11134200'),
+(-111343, 0, 1, 2, 11, 0, 100, 0, 0, 0, 0, 0, 0, 0, 69, 0, 0, 0, 0, 0, 0, 8, 0, 0, 0, 0, 3165.35, 4803.14, 4.8427, 0, 'Kaskala Defender - On Respawn - Move To Position'),
+(-111343, 0, 2, 0, 61, 0, 100, 0, 0, 0, 0, 0, 0, 0, 101, 0, 0, 0, 0, 0, 0, 8, 0, 0, 0, 0, 3165.35, 4803.14, 4.8427, -2.7471, 'Kaskala Defender - On Respawn - Set Home Position'),
+(-111343, 0, 3, 0, 1, 0, 100, 1, 90000, 90000, 0, 0, 0, 0, 41, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Kaskala Defender - Out of Combat - Despawn Instant (No Repeat)'),
+(-111344, 0, 1, 2, 11, 0, 100, 0, 0, 0, 0, 0, 0, 0, 69, 0, 0, 0, 0, 0, 0, 8, 0, 0, 0, 0, 3161.40, 4796.13, 5.9756, 0, 'Kaskala Defender - On Respawn - Move To Position'),
+(-111344, 0, 2, 0, 61, 0, 100, 0, 0, 0, 0, 0, 0, 0, 101, 0, 0, 0, 0, 0, 0, 8, 0, 0, 0, 0, 3161.40, 4796.13, 5.9756, -2.7423, 'Kaskala Defender - On Respawn - Set Home Position'),
+(-111344, 0, 3, 0, 1, 0, 100, 1, 90000, 90000, 0, 0, 0, 0, 41, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Kaskala Defender - Out of Combat - Despawn Instant (No Repeat)'),
+(-111345, 0, 1, 2, 11, 0, 100, 0, 0, 0, 0, 0, 0, 0, 69, 0, 0, 0, 0, 0, 0, 8, 0, 0, 0, 0, 3175.69, 4736.03, 8.9181, 0, 'Kaskala Defender - On Respawn - Move To Position'),
+(-111345, 0, 2, 0, 61, 0, 100, 0, 0, 0, 0, 0, 0, 0, 101, 0, 0, 0, 0, 0, 0, 8, 0, 0, 0, 0, 3175.69, 4736.03, 8.9181, 2.6456, 'Kaskala Defender - On Respawn - Set Home Position'),
+(-111345, 0, 3, 0, 1, 0, 100, 1, 90000, 90000, 0, 0, 0, 0, 41, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Kaskala Defender - Out of Combat - Despawn Instant (No Repeat)'),
+(-111346, 0, 1, 2, 11, 0, 100, 0, 0, 0, 0, 0, 0, 0, 69, 0, 0, 0, 0, 0, 0, 8, 0, 0, 0, 0, 3163.81, 4721.18, 8.3387, 0, 'Kaskala Defender - On Respawn - Move To Position'),
+(-111346, 0, 2, 0, 61, 0, 100, 0, 0, 0, 0, 0, 0, 0, 101, 0, 0, 0, 0, 0, 0, 8, 0, 0, 0, 0, 3163.81, 4721.18, 8.3387, 2.4666, 'Kaskala Defender - On Respawn - Set Home Position'),
+(-111346, 0, 3, 0, 1, 0, 100, 1, 90000, 90000, 0, 0, 0, 0, 41, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Kaskala Defender - Out of Combat - Despawn Instant (No Repeat)'),
+(-111347, 0, 1, 2, 11, 0, 100, 0, 0, 0, 0, 0, 0, 0, 69, 0, 0, 0, 0, 0, 0, 8, 0, 0, 0, 0, 2933.7798, 4953.8257, 5.445045, 0, 'Kaskala Defender - On Respawn - Move To Position'),
+(-111347, 0, 2, 0, 61, 0, 100, 0, 0, 0, 0, 0, 0, 0, 101, 0, 0, 0, 0, 0, 0, 8, 0, 0, 0, 0, 2933.7798, 4953.8257, 5.445045, 0, 'Kaskala Defender - On Respawn - Set Home Position'),
+(-111347, 0, 3, 0, 1, 0, 100, 1, 90000, 90000, 0, 0, 0, 0, 41, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Kaskala Defender - Out of Combat - Despawn Instant (No Repeat)'),
+(-111348, 0, 1, 2, 11, 0, 100, 0, 0, 0, 0, 0, 0, 0, 69, 0, 0, 0, 0, 0, 0, 8, 0, 0, 0, 0, 2920.374, 4965.801, 6.8121896, 0, 'Kaskala Defender - On Respawn - Move To Position'),
+(-111348, 0, 2, 0, 61, 0, 100, 0, 0, 0, 0, 0, 0, 0, 101, 0, 0, 0, 0, 0, 0, 8, 0, 0, 0, 0, 2920.374, 4965.801, 6.8121896, 0, 'Kaskala Defender - On Respawn - Set Home Position'),
+(-111348, 0, 3, 0, 1, 0, 100, 1, 90000, 90000, 0, 0, 0, 0, 41, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Kaskala Defender - Out of Combat - Despawn Instant (No Repeat)'),
+(-111349, 0, 1, 2, 11, 0, 100, 0, 0, 0, 0, 0, 0, 0, 69, 0, 0, 0, 0, 0, 0, 8, 0, 0, 0, 0, 3023.6384, 4906.197, 0.38545987, 0, 'Kaskala Defender - On Respawn - Move To Position'),
+(-111349, 0, 2, 0, 61, 0, 100, 0, 0, 0, 0, 0, 0, 0, 101, 0, 0, 0, 0, 0, 0, 8, 0, 0, 0, 0, 3023.6384, 4906.197, 0.38545987, 0, 'Kaskala Defender - On Respawn - Set Home Position'),
+(-111349, 0, 3, 0, 1, 0, 100, 1, 90000, 90000, 0, 0, 0, 0, 41, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Kaskala Defender - Out of Combat - Despawn Instant (No Repeat)'),
+(-111350, 0, 1, 2, 11, 0, 100, 0, 0, 0, 0, 0, 0, 0, 69, 0, 0, 0, 0, 0, 0, 8, 0, 0, 0, 0, 3037.3958, 4903.987, 0.38545987, 0, 'Kaskala Defender - On Respawn - Move To Position'),
+(-111350, 0, 2, 0, 61, 0, 100, 0, 0, 0, 0, 0, 0, 0, 101, 0, 0, 0, 0, 0, 0, 8, 0, 0, 0, 0, 3037.3958, 4903.987, 0.38545987, 0, 'Kaskala Defender - On Respawn - Set Home Position'),
+(-111350, 0, 3, 0, 1, 0, 100, 1, 90000, 90000, 0, 0, 0, 0, 41, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Kaskala Defender - Out of Combat - Despawn Instant (No Repeat)');
 
 -- Remove some old Spawn Points and add new Sniffed Ones (Kvaldir Raider)
 DELETE FROM `creature` WHERE (`id1` = 25760);
