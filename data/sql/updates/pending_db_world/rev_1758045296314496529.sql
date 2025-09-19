@@ -70,3 +70,7 @@ INSERT INTO `event_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, 
 (16716, 6, 10, 25457, 15000, 0, 4529.922, 5678.596, 82.38788, 2.286381),
 (16716, 7, 10, 25456, 14000, 0, 4525.962, 5677.239, 82.14642, 0.6290413),
 (16716, 12, 10,25458, 9000, 0, 4528.883, 5679.529, 82.23911, 0.6290413);
+
+DELETE FROM `conditions` WHERE (`SourceTypeOrReferenceId` = 13) AND (`SourceGroup` = 1) AND (`SourceEntry` = 45595) AND (`SourceId` = 0) AND (`ElseGroup` = 0) AND (`ConditionTypeOrReference` = 31) AND (`ConditionTarget` = 0) AND (`ConditionValue1` = 3) AND (`ConditionValue2` = 25424) AND (`ConditionValue3` = 0);
+INSERT INTO `conditions` (`SourceTypeOrReferenceId`, `SourceGroup`, `SourceEntry`, `SourceId`, `ElseGroup`, `ConditionTypeOrReference`, `ConditionTarget`, `ConditionValue1`, `ConditionValue2`, `ConditionValue3`, `NegativeCondition`, `ErrorType`, `ErrorTextId`, `ScriptName`, `Comment`) VALUES
+(13, 1, 45595, 0, 0, 31, 0, 3, 25424, 0, 0, 0, 0, '', '45595 Fireball requires target entry 25424');
