@@ -1,3 +1,4 @@
+-- DB update 2025_09_19_03 -> 2025_09_19_04
 --
 DELETE FROM `areatrigger_scripts` WHERE `entry` IN (4725, 4724, 4726);
 INSERT INTO `areatrigger_scripts` (`entry`, `ScriptName`) VALUES
