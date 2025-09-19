@@ -1,3 +1,4 @@
+-- DB update 2025_09_19_04 -> 2025_09_19_05
 --
 UPDATE `creature_template` SET `unit_flags`=`unit_flags` | (256 | 512 | 33554432) WHERE `entry`IN (25458, 25769);
 UPDATE `creature_template` SET `unit_flags`=`unit_flags` | (256 | 512 | 32768 | 33554432) WHERE `entry` IN (25457);
