@@ -3001,6 +3001,15 @@ ListenRange.TextEmote = 40
 ListenRange.Yell = 300
 
 #
+#    Creature.RepositionAgainstNpcs
+#        Description: Enables circling and backwards repositioning during NPC versus NPC combat.
+#                     Set to 0 to keep the legacy optimization that disables these moves for NPCs.
+#        Default:     1 - (Enabled, uses more CPU, but looks better)
+#                     0 - (Disabled, uses less CPU)
+
+Creature.RepositionAgainstNpcs = 1
+
+#
 #    Creature.MovingStopTimeForPlayer
 #        Description: Time (in milliseconds) during which creature will not move after
 #                     interaction with player.
