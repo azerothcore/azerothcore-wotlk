@@ -1,3 +1,4 @@
+-- DB update 2025_09_19_05 -> 2025_09_19_06
 
 -- First Cleaning
 DELETE FROM `creature_addon` WHERE (`guid` IN (111316));
