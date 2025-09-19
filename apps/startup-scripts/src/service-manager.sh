@@ -32,6 +32,120 @@ if [ ! -f "$REGISTRY_FILE" ]; then
     echo "[]" > "$REGISTRY_FILE"
 fi
 
+# Path conversion utilities for portability
+# When AC_SERVICE_CONFIG_DIR (hence CONFIG_DIR) is set, always store paths
+# relative to it. Resolve relative paths back against CONFIG_DIR.
+function make_path_relative() {
+    local input="$1"
+
+    # Pass through empty or non-absolute inputs
+    if [ -z "$input" ] || [[ ! "$input" = /* ]]; then
+        echo "$input"
+        return
+    fi
+
+    # If CONFIG_DIR (derived from AC_SERVICE_CONFIG_DIR) is available, compute
+    # a relative path from it to the absolute input (even if outside CONFIG_DIR).
+    if [ -n "${CONFIG_DIR:-}" ]; then
+        local config_dir_abs
+        config_dir_abs="$(realpath "$CONFIG_DIR" 2>/dev/null || echo "$CONFIG_DIR")"
+        local input_abs
+        input_abs="$(realpath "$input" 2>/dev/null || echo "$input")"
+
+        # Try realpath --relative-to first
+        if relpath=$(realpath --relative-to "$config_dir_abs" "$input_abs" 2>/dev/null); then
+            echo "$relpath"
+            return
+        fi
+
+        # Fallback: manual prefix trim if inside CONFIG_DIR
+        if [[ "$input_abs" == "$config_dir_abs"/* ]]; then
+            echo "${input_abs#$config_dir_abs/}"
+            return
+        fi
+    fi
+
+    # Last resort: return the original absolute input
+    echo "$input"
+}
+
+function make_path_absolute() {
+    local input="$1"
+
+    # Already absolute
+    if [[ "$input" = /* ]]; then
+        echo "$input"
+        return
+    fi
+
+    # Resolve relative paths against CONFIG_DIR when available
+    if [ -n "${CONFIG_DIR:-}" ] && [ -n "$input" ]; then
+        local config_dir_abs
+        config_dir_abs="$(realpath "$CONFIG_DIR" 2>/dev/null || echo "$CONFIG_DIR")"
+        # Join and normalize; do not require the target to exist
+        echo "$(realpath -m "$config_dir_abs/$input" 2>/dev/null || echo "$config_dir_abs/$input")"
+        return
+    fi
+
+    # Fallback: try to normalize relative to current directory
+    echo "$(realpath -m "$input" 2>/dev/null || echo "$input")"
+}
+
+# Relativize absolute paths embedded in a command string (space-separated tokens
+# and key=value forms). Keeps non-path tokens intact.
+function relativize_command_string() {
+    local cmd_str="$1"
+    local token
+    local out=()
+    # Basic tokenization on whitespace. Assumes no spaces in path tokens.
+    # This is acceptable for our repo layout.
+    read -r -a tokens <<< "$cmd_str"
+    for token in "${tokens[@]}"; do
+        # Handle key=value form
+        if [[ "$token" == *=* ]]; then
+            local key="${token%%=*}"
+            local val="${token#*=}"
+            if [[ "$val" = /* ]]; then
+                val="$(make_path_relative "$val")"
+                token="$key=$val"
+            fi
+        else
+            # Plain token starting with absolute path
+            if [[ "$token" = /* ]]; then
+                token="$(make_path_relative "$token")"
+            fi
+        fi
+        out+=("$token")
+    done
+    printf '%s ' "${out[@]}" | sed 's/ $//'
+}
+
+# Absolutize relative paths embedded in a command string by resolving
+# them against CONFIG_DIR. Leaves flags and non-path tokens unchanged.
+function absolutize_command_string() {
+    local cmd_str="$1"
+    local token
+    local out=()
+    read -r -a tokens <<< "$cmd_str"
+    for token in "${tokens[@]}"; do
+        if [[ "$token" == *=* ]]; then
+            local key="${token%%=*}"
+            local val="${token#*=}"
+            if [[ -n "$val" && ! "$val" = /* && "$val" == */* ]]; then
+                val="$(make_path_absolute "$val")"
+                token="$key=$val"
+            fi
+        else
+            # Candidate relative path tokens (contain a slash but aren't absolute)
+            if [[ "$token" == */* && ! "$token" = /* && ! "$token" == -* ]]; then
+                token="$(make_path_absolute "$token")"
+            fi
+        fi
+        out+=("$token")
+    done
+    printf '%s ' "${out[@]}" | sed 's/ $//'
+}
+
 # Check dependencies
 check_dependencies() {
     command -v jq >/dev/null 2>&1 || { 
@@ -53,6 +167,23 @@ function add_service_to_registry() {
     local gdb_enabled="$9"
     local pm2_opts="${10}"
     local server_config="${11}"
+    local real_bin_path="${12:-}" # Optional: execution command (for PM2/systemd this is the run-engine command)
+
+    # Convert paths to relative if possible for portability
+    local relative_bin_path="$(make_path_relative "$bin_path")"
+    local relative_exec_command=""
+    if [ -n "$real_bin_path" ]; then
+        # Treat as a command string; relativize embedded paths
+        relative_exec_command="$(relativize_command_string "$real_bin_path")"
+    fi
+    
+    # Convert server_config to relative if possible for portability  
+    local relative_server_config=""
+    if [ -n "$server_config" ] && [ "$server_config" != "null" ]; then
+        relative_server_config="$(make_path_relative "$server_config")"
+    else
+        relative_server_config="$server_config"
+    fi
 
     # Remove any existing entry with the same service name to avoid duplicates
     local tmp_file
@@ -64,7 +195,8 @@ function add_service_to_registry() {
     jq --arg name "$service_name" \
        --arg provider "$provider" \
        --arg type "$service_type" \
-       --arg bin_path "$bin_path" \
+       --arg bin_path "$relative_bin_path" \
+       --arg real_bin_path "$relative_exec_command" \
        --arg args "$args" \
        --arg created "$(date -Iseconds)" \
        --arg systemd_type "$systemd_type" \
@@ -72,8 +204,8 @@ function add_service_to_registry() {
        --arg session_manager "$session_manager" \
        --arg gdb_enabled "$gdb_enabled" \
        --arg pm2_opts "$pm2_opts" \
-       --arg server_config "$server_config" \
-       '. += [{"name": $name, "provider": $provider, "type": $type, "bin_path": $bin_path, "args": $args, "created": $created, "status": "active", "systemd_type": $systemd_type, "restart_policy": $restart_policy, "session_manager": $session_manager, "gdb_enabled": $gdb_enabled, "pm2_opts": $pm2_opts, "server_config": $server_config}]' \
+       --arg server_config "$relative_server_config" \
+       '. += [{"name": $name, "provider": $provider, "type": $type, "bin_path": $bin_path, "real_bin_path": $real_bin_path, "args": $args, "created": $created, "status": "active", "systemd_type": $systemd_type, "restart_policy": $restart_policy, "session_manager": $session_manager, "gdb_enabled": $gdb_enabled, "pm2_opts": $pm2_opts, "server_config": $server_config}]' \
        "$REGISTRY_FILE" > "$tmp_file" && mv "$tmp_file" "$REGISTRY_FILE"
 
     echo -e "${GREEN}Service '$service_name' added to registry${NC}"
@@ -117,7 +249,7 @@ function restore_missing_services() {
         local name=$(echo "$service" | jq -r '.name')
         local provider=$(echo "$service" | jq -r '.provider') 
         local service_type=$(echo "$service" | jq -r '.type')
-        local bin_path=$(echo "$service" | jq -r '.bin_path // "unknown"')
+        local bin_path_raw=$(echo "$service" | jq -r '.bin_path // "unknown"')
         local args=$(echo "$service" | jq -r '.args // ""')
         local status=$(echo "$service" | jq -r '.status // "active"')
         local systemd_type=$(echo "$service" | jq -r '.systemd_type // "--user"')
@@ -125,7 +257,16 @@ function restore_missing_services() {
         local session_manager=$(echo "$service" | jq -r '.session_manager // "none"')
         local gdb_enabled=$(echo "$service" | jq -r '.gdb_enabled // "0"')
         local pm2_opts=$(echo "$service" | jq -r '.pm2_opts // ""')
-        local server_config=$(echo "$service" | jq -r '.server_config // ""')
+        local server_config_raw=$(echo "$service" | jq -r '.server_config // ""')
+        
+        # Convert paths back to absolute for operation
+        local bin_path="$(make_path_absolute "$bin_path_raw")"
+        local server_config=""
+        if [ -n "$server_config_raw" ] && [ "$server_config_raw" != "null" ] && [ "$server_config_raw" != "" ]; then
+            server_config="$(make_path_absolute "$server_config_raw")"
+        else
+            server_config="$server_config_raw"
+        fi
         
         local service_exists=false
         
@@ -166,14 +307,23 @@ function restore_missing_services() {
         local name=$(echo "$service" | jq -r '.name')
         local provider=$(echo "$service" | jq -r '.provider')
         local service_type=$(echo "$service" | jq -r '.type') 
-        local bin_path=$(echo "$service" | jq -r '.bin_path')
+        local bin_path_raw=$(echo "$service" | jq -r '.bin_path')
         local args=$(echo "$service" | jq -r '.args')
         local systemd_type=$(echo "$service" | jq -r '.systemd_type // "--user"')
         local restart_policy=$(echo "$service" | jq -r '.restart_policy // "always"')
         local session_manager=$(echo "$service" | jq -r '.session_manager // "none"')
         local gdb_enabled=$(echo "$service" | jq -r '.gdb_enabled // "0"')
         local pm2_opts=$(echo "$service" | jq -r '.pm2_opts // ""')
-        local server_config=$(echo "$service" | jq -r '.server_config // ""')
+        local server_config_raw=$(echo "$service" | jq -r '.server_config // ""')
+        
+        # Convert paths back to absolute for operation
+        local bin_path="$(make_path_absolute "$bin_path_raw")"
+        local server_config=""
+        if [ -n "$server_config_raw" ] && [ "$server_config_raw" != "null" ] && [ "$server_config_raw" != "" ]; then
+            server_config="$(make_path_absolute "$server_config_raw")"
+        else
+            server_config="$server_config_raw"
+        fi
         
         echo ""
         echo -e "${YELLOW}Service '$name' ($provider) is missing${NC}"
@@ -342,6 +492,9 @@ function print_help() {
     echo "  # Restore missing services from registry"
     echo "  $base_name restore"
     echo ""
+    echo "  # Normalize registry paths to be relative to AC_SERVICE_CONFIG_DIR"
+    echo "  $base_name registry-normalize"
+    echo ""
     echo "Notes:"
     echo "  - Configuration editing modifies run-engine settings (GDB, session manager, etc.)"
     echo "  - Use --server-config for the actual server configuration file"
@@ -357,6 +510,9 @@ function print_help() {
     echo ""
     echo "Environment Variables:"
     echo "  AC_SERVICE_CONFIG_DIR   - Override default config directory for services registry"
+    echo "                            When set, binary and configuration paths under this directory"
+    echo "                            are stored as relative paths for improved portability."
+    echo "                            Use '$base_name registry-normalize' to rewrite existing entries."
 }
 
 
@@ -442,12 +598,59 @@ function get_service_info() {
     jq --arg name "$service_name" '.[] | select(.name == $name)' "$REGISTRY_FILE"
 }
 
+# Get service info with resolved paths (relative paths converted to absolute)
+function get_service_info_resolved() {
+    local service_name="$1"
+    local service_info="$(get_service_info "$service_name")"
+    
+    if [ -z "$service_info" ] || [ "$service_info" = "null" ]; then
+        echo ""
+        return
+    fi
+    
+    # Extract paths and convert them
+    local bin_path_raw="$(echo "$service_info" | jq -r '.bin_path // ""')"
+    local real_bin_path_raw="$(echo "$service_info" | jq -r '.real_bin_path // ""')"
+    local server_config_raw="$(echo "$service_info" | jq -r '.server_config // ""')"
+    
+    local bin_path_resolved=""
+    local real_bin_path_resolved=""
+    local server_config_resolved=""
+    
+    if [ -n "$bin_path_raw" ] && [ "$bin_path_raw" != "null" ] && [ "$bin_path_raw" != "" ]; then
+        bin_path_resolved="$(make_path_absolute "$bin_path_raw")"
+    else
+        bin_path_resolved="$bin_path_raw"
+    fi
+
+    # real_bin_path contains the exec command; absolutize embedded relative paths
+    if [ -n "$real_bin_path_raw" ] && [ "$real_bin_path_raw" != "null" ]; then
+        real_bin_path_resolved="$(absolutize_command_string "$real_bin_path_raw")"
+    else
+        real_bin_path_resolved="$real_bin_path_raw"
+    fi
+    
+    if [ -n "$server_config_raw" ] && [ "$server_config_raw" != "null" ] && [ "$server_config_raw" != "" ]; then
+        server_config_resolved="$(make_path_absolute "$server_config_raw")"
+    else
+        server_config_resolved="$server_config_raw"
+    fi
+    
+    # Return the service info with resolved paths
+    echo "$service_info" | jq --arg bin_path "$bin_path_resolved" \
+                              --arg real_bin_path "$real_bin_path_resolved" \
+                              --arg server_config "$server_config_resolved" \
+                              '.bin_path = $bin_path | .real_bin_path = $real_bin_path | .server_config = $server_config'
+}
+
 # PM2 service management functions
 function pm2_create_service() {
     local service_name="$1"
     local command="$2"
     local restart_policy="$3"
-    shift 3
+    local real_bin_path="$4"
+    local server_config_path="$5"
+    shift 5
     
     check_pm2 || return 1
     
@@ -507,9 +710,9 @@ function pm2_create_service() {
         echo -e "${BLUE}Configuring PM2 startup for persistence...${NC}"
         pm2 startup --auto >/dev/null 2>&1 || true
         
-        # Add to registry (extract command and args from the full command)
+        # Add to registry (use real binary path instead of command for portability)
         local clean_command="$command$additional_args"
-        add_service_to_registry "$service_name" "pm2" "executable" "$command" "$additional_args" "" "$restart_policy" "none" "0" "$max_memory $max_restarts" ""
+        add_service_to_registry "$service_name" "pm2" "executable" "$real_bin_path" "$additional_args" "" "$restart_policy" "none" "0" "$max_memory $max_restarts" "$server_config_path" "$command"
 
         return 0
     else
@@ -602,11 +805,13 @@ function systemd_create_service() {
     local service_name="$1"
     local command="$2"
     local restart_policy="$3"
+    local real_bin_path="$4"
+    local server_config_path="$5"
     local systemd_type="--user"
     local bin_path=""
     local gdb_enabled="0"
     local server_config=""
-    shift 3
+    shift 5
     
     check_systemd || return 1
     
@@ -743,7 +948,7 @@ EOF
     echo -e "${GREEN}Systemd service '$service_name' created successfully with session manager '$session_manager'${NC}"
     
     # Add to registry
-    add_service_to_registry "$service_name" "systemd" "service" "$command" "" "$systemd_type" "$restart_policy" "$session_manager" "$gdb_enabled" "" "$server_config"
+    add_service_to_registry "$service_name" "systemd" "service" "$real_bin_path" "" "$systemd_type" "$restart_policy" "$session_manager" "$gdb_enabled" "" "$server_config_path" "$command"
     
     return 0
 }
@@ -1058,17 +1263,17 @@ EOF
     local service_creation_success=false
     if [ "$provider" = "pm2" ]; then
         if [ -n "$pm2_opts" ]; then
-            if pm2_create_service "$service_name" "$run_engine_cmd" "$restart_policy" $pm2_opts; then
+            if pm2_create_service "$service_name" "$run_engine_cmd" "$restart_policy" "$server_binary_path" "$server_config" $pm2_opts; then
                 service_creation_success=true
             fi
         else
-            if pm2_create_service "$service_name" "$run_engine_cmd" "$restart_policy"; then
+            if pm2_create_service "$service_name" "$run_engine_cmd" "$restart_policy" "$server_binary_path" "$server_config"; then
                 service_creation_success=true
             fi
         fi
         
     elif [ "$provider" = "systemd" ]; then
-        if systemd_create_service "$service_name" "$run_engine_cmd" "$restart_policy" "$systemd_type"; then
+        if systemd_create_service "$service_name" "$run_engine_cmd" "$restart_policy" "$server_binary_path" "$server_config" --"$systemd_type"; then
             service_creation_success=true
         fi
     fi
@@ -1124,10 +1329,10 @@ function update_service() {
     source "$config_file"
     
     # Load current run-engine configuration
-    if [ -f "$RUN_ENGINE_CONFIG_FILE" ]; then
+    if [ -n "${RUN_ENGINE_CONFIG_FILE:-}" ] && [ -f "$RUN_ENGINE_CONFIG_FILE" ]; then
         source "$RUN_ENGINE_CONFIG_FILE"
     else
-        echo -e "${YELLOW}Warning: Run-engine configuration file not found: $RUN_ENGINE_CONFIG_FILE${NC}"
+        echo -e "${YELLOW}Warning: Run-engine configuration file not found: ${RUN_ENGINE_CONFIG_FILE:-<unset>}${NC}"
     fi
     
     # Parse options to update
@@ -1284,8 +1489,10 @@ function delete_service() {
     fi
     
     if [ "$removal_success" = "true" ]; then
+        # Always ensure registry entry is removed, even if underlying service file was missing
+        remove_service_from_registry "$service_name"
         # Remove run-engine configuration file
-        if [ -n "$RUN_ENGINE_CONFIG_FILE" ] && [ -f "$RUN_ENGINE_CONFIG_FILE" ]; then
+        if [ -n "${RUN_ENGINE_CONFIG_FILE:-}" ] && [ -f "$RUN_ENGINE_CONFIG_FILE" ]; then
             rm -f "$RUN_ENGINE_CONFIG_FILE"
             echo -e "${GREEN}Removed run-engine config: $RUN_ENGINE_CONFIG_FILE${NC}"
         fi
@@ -1416,7 +1623,11 @@ function edit_config() {
     
     # Open run-engine configuration file in editor
     echo -e "${YELLOW}Editing run-engine configuration for: $service_name${NC}"
-    echo -e "${BLUE}File: $RUN_ENGINE_CONFIG_FILE${NC}"
+    echo -e "${BLUE}File: ${RUN_ENGINE_CONFIG_FILE:-<unset>}${NC}"
+    if [ -z "${RUN_ENGINE_CONFIG_FILE:-}" ] || [ ! -f "$RUN_ENGINE_CONFIG_FILE" ]; then
+        echo -e "${RED}Error: Run-engine configuration file not found: ${RUN_ENGINE_CONFIG_FILE:-<unset>}${NC}"
+        return 1
+    fi
     ${EDITOR:-nano} "$RUN_ENGINE_CONFIG_FILE"
     
     echo -e "${GREEN}Configuration updated. Run '$0 restart $service_name' to apply changes.${NC}"
@@ -1445,16 +1656,12 @@ function attach_to_service() {
     source "$config_file"
     
     # Load run-engine configuration
-    if [ ! -f "$RUN_ENGINE_CONFIG_FILE" ]; then
-        echo -e "${RED}Error: Run-engine configuration file not found: $RUN_ENGINE_CONFIG_FILE${NC}"
+    if [ -z "${RUN_ENGINE_CONFIG_FILE:-}" ] || [ ! -f "$RUN_ENGINE_CONFIG_FILE" ]; then
+        echo -e "${RED}Error: Run-engine configuration file not found: ${RUN_ENGINE_CONFIG_FILE:-<unset>}${NC}"
         return 1
     fi
 
-    if [ ! -f "$RUN_ENGINE_CONFIG_FILE" ]; then
-        echo -e "${RED}Error: Run-engine configuration file not found: $RUN_ENGINE_CONFIG_FILE${NC}"
-        return 1
-    fi
-    
+    # Now safe to source
     source "$RUN_ENGINE_CONFIG_FILE"
     
     # Auto-detect session manager and attach accordingly
@@ -1770,8 +1977,8 @@ function attach_interactive_shell() {
     source "$config_file"
     
     # Check if RUN_ENGINE_CONFIG_FILE exists before sourcing
-    if [ ! -f "$RUN_ENGINE_CONFIG_FILE" ]; then
-        echo -e "${RED}Error: Run-engine configuration file not found: $RUN_ENGINE_CONFIG_FILE${NC}"
+    if [ -z "${RUN_ENGINE_CONFIG_FILE:-}" ] || [ ! -f "$RUN_ENGINE_CONFIG_FILE" ]; then
+        echo -e "${RED}Error: Run-engine configuration file not found: ${RUN_ENGINE_CONFIG_FILE:-<unset>}${NC}"
         return 1
     fi
     
@@ -1794,6 +2001,79 @@ function attach_interactive_shell() {
     echo "  $0 logs $service_name --follow"
     
     return 1
+}
+
+# Normalize existing registry entries to use relative paths for fields that
+# represent filesystem paths (bin_path, server_config) and embedded paths in
+# command strings (real_bin_path) when CONFIG_DIR is set.
+function normalize_registry_paths() {
+    if [ ! -f "$REGISTRY_FILE" ]; then
+        echo -e "${YELLOW}No registry file found at: $REGISTRY_FILE${NC}"
+        return 0
+    fi
+
+    # Validate JSON
+    if ! jq empty "$REGISTRY_FILE" >/dev/null 2>&1; then
+        echo -e "${RED}Error: Invalid JSON in $REGISTRY_FILE${NC}"
+        return 1
+    fi
+
+    local tmp_file
+    tmp_file=$(mktemp)
+    echo "[]" > "$tmp_file"
+
+    local count=0
+    while IFS= read -r entry; do
+        [ -z "$entry" ] && continue
+
+        # Extract raw values (empty if null or missing)
+        local bin_path_raw server_config_raw real_cmd_raw
+        bin_path_raw=$(echo "$entry" | jq -r '.bin_path // empty')
+        server_config_raw=$(echo "$entry" | jq -r '.server_config // empty')
+        real_cmd_raw=$(echo "$entry" | jq -r '.real_bin_path // empty')
+
+        # Compute normalized values
+        local bin_path_new server_config_new real_cmd_new
+        if [ -n "$bin_path_raw" ]; then
+            bin_path_new="$(make_path_relative "$bin_path_raw")"
+        else
+            bin_path_new=""
+        fi
+        if [ -n "$server_config_raw" ]; then
+            server_config_new="$(make_path_relative "$server_config_raw")"
+        else
+            server_config_new=""
+        fi
+        if [ -n "$real_cmd_raw" ]; then
+            real_cmd_new="$(relativize_command_string "$real_cmd_raw")"
+        else
+            real_cmd_new=""
+        fi
+
+        # Update entry (only override when non-empty; preserve nulls)
+        local updated
+        updated=$(echo "$entry" | jq \
+            --arg bin "$bin_path_new" \
+            --arg srv "$server_config_new" \
+            --arg rcmd "$real_cmd_new" \
+            '
+              (.bin_path)     |= (if $bin  != "" then $bin  else . end) |
+              (.server_config) |= (if $srv  != "" then $srv  else . end) |
+              (.real_bin_path) |= (if $rcmd != "" then $rcmd else . end)
+            ')
+
+        # Append to new array
+        if ! jq --argjson e "$updated" '. += [$e]' "$tmp_file" > "$tmp_file.new"; then
+            rm -f "$tmp_file" "$tmp_file.new"
+            echo -e "${RED}Error: Failed updating registry${NC}"
+            return 1
+        fi
+        mv "$tmp_file.new" "$tmp_file"
+        count=$((count+1))
+    done < <(jq -c '.[]?' "$REGISTRY_FILE")
+
+    mv "$tmp_file" "$REGISTRY_FILE"
+    echo -e "${GREEN}Normalized $count registry entrie(s) to relative paths${NC}"
 }
 
 function attach_tmux_session() {
@@ -1905,6 +2185,9 @@ case "${1:-help}" in
         else
             service_logs "$2" "false"
         fi
+        ;;
+    registry-normalize)
+        normalize_registry_paths
         ;;
     edit-config)
         if [ $# -lt 2 ]; then

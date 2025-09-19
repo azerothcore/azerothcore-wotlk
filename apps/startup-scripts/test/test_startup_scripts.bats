@@ -279,6 +279,77 @@ EOF
     [[ "$output" =~ "Configuration file not found" ]]
 }
 
+# ===== PATH PORTABILITY TESTS =====
+
+@test "service-manager: path conversion functions work correctly" {
+    # Source the service-manager script to access helper functions
+    source "$SCRIPT_DIR/service-manager.sh"
+    
+    # Test make_path_relative without AC_SERVICE_CONFIG_DIR
+    unset AC_SERVICE_CONFIG_DIR
+    result=$(make_path_relative "/absolute/path/test")
+    [[ "$result" == "/absolute/path/test" ]]
+    
+    # Test make_path_relative with AC_SERVICE_CONFIG_DIR
+    export AC_SERVICE_CONFIG_DIR="/tmp/test-config"
+    mkdir -p "$AC_SERVICE_CONFIG_DIR/subdir"
+    
+    result=$(make_path_relative "$AC_SERVICE_CONFIG_DIR/subdir/binary")
+    [[ "$result" == "subdir/binary" ]]
+    
+    # Test make_path_absolute
+    result=$(make_path_absolute "subdir/binary")
+    [[ "$result" == "$AC_SERVICE_CONFIG_DIR/subdir/binary" ]]
+    
+    # Test absolute path stays absolute
+    result=$(make_path_absolute "/absolute/path")
+    [[ "$result" == "/absolute/path" ]]
+    
+    # Cleanup
+    rm -rf "$AC_SERVICE_CONFIG_DIR"
+    unset AC_SERVICE_CONFIG_DIR
+}
+
+@test "service-manager: registry stores relative paths when possible" {
+    # Set up test environment
+    export AC_SERVICE_CONFIG_DIR="$TEST_DIR/service-config"
+    mkdir -p "$AC_SERVICE_CONFIG_DIR"
+    
+    # Create a temporary service registry in our test directory
+    local test_registry="$AC_SERVICE_CONFIG_DIR/test_registry.json"
+    echo "[]" > "$test_registry"
+    
+    # Source the service-manager and override REGISTRY_FILE
+    source "$SCRIPT_DIR/service-manager.sh"
+    REGISTRY_FILE="$test_registry"
+    
+    # Create test binary directory under config dir
+    mkdir -p "$AC_SERVICE_CONFIG_DIR/bin"
+    
+    # Test that paths under AC_SERVICE_CONFIG_DIR are stored as relative
+    add_service_to_registry "test-service" "pm2" "auth" "$AC_SERVICE_CONFIG_DIR/bin/authserver" "--config test.conf" "" "always" "none" "0" "" "$AC_SERVICE_CONFIG_DIR/etc/test.conf"
+    
+    # Check that paths were stored as relative
+    local stored_bin_path=$(jq -r '.[0].bin_path' "$test_registry")
+    local stored_config_path=$(jq -r '.[0].server_config' "$test_registry")
+    
+    [[ "$stored_bin_path" == "bin/authserver" ]]
+    [[ "$stored_config_path" == "etc/test.conf" ]]
+    
+    # Test that absolute paths outside config dir are stored as absolute
+    add_service_to_registry "test-service2" "pm2" "auth" "/opt/azerothcore/bin/authserver" "--config test.conf" "" "always" "none" "0" "" "/opt/azerothcore/etc/test.conf"
+    
+    local stored_bin_path2=$(jq -r '.[1].bin_path' "$test_registry")
+    local stored_config_path2=$(jq -r '.[1].server_config' "$test_registry")
+    
+    [[ "$stored_bin_path2" == "/opt/azerothcore/bin/authserver" ]]
+    [[ "$stored_config_path2" == "/opt/azerothcore/etc/test.conf" ]]
+    
+    # Cleanup
+    rm -rf "$AC_SERVICE_CONFIG_DIR"
+    unset AC_SERVICE_CONFIG_DIR
+}
+
 @test "examples: restarter-auth should show configuration error" {
     run "$SCRIPT_DIR/examples/restarter-auth.sh"
     [[ "$output" =~ "Configuration file not found" ]]
