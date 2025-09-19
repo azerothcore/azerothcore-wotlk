@@ -4456,6 +4456,9 @@ void Unit::InterruptSpell(CurrentSpellTypes spellType, bool withDelayed, bool wi
                 if (ai->CanChaseOnInterrupt())
                     ai->SetCombatMove(true);
         }
+
+        if (IsCreature() && IsAIEnabled)
+            ToCreature()->AI()->OnSpellCastFinished(spell->GetSpellInfo(), SPELL_FINISHED_CANCELED);
     }
 }
 
