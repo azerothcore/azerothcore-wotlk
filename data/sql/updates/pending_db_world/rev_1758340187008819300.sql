@@ -15,7 +15,7 @@ UPDATE `item_template` SET `stat_type5` = 45, `stat_value5` = 355, `stat_type6` 
 UPDATE `item_template` SET `stat_type4` = 45, `stat_value4` = 28, `stat_type5` = 47, `stat_value5` = 20 WHERE `entry` = 42517; -- Savage Gladiator's Piercing Touch (+28 Spell Power, +20 Spell Pen)
 UPDATE `item_template` SET `stat_type5` = 45, `stat_value5` = 28 WHERE `entry` = 42448; -- Savage Gladiator's Touch of Defeat (+28 Spell Power)
 UPDATE `item_template` SET `stat_type5` = 45, `stat_value5` = 50 WHERE `entry` = 42557; -- Savage Gladiator's Barrier (+50 Spell Power)
-UPDATE `item_template` SET `stat_type5` = 45, `stat_value5` = 50, `stat_type6` = 43, `stat_value6` = 15 WHERE `entry` = 42568; -- Savage Gladiator's Redoubt (+50 Spell Power, +15 mp5)
+UPDATE `item_template` SET `stat_type4` = 45, `stat_value4` = 50, `stat_type5` = 43, `stat_value5` = 15 WHERE `entry` = 42568; -- Savage Gladiator's Redoubt (+50 Spell Power, +15 mp5)
 UPDATE `item_template` SET `spellid_1` = 60648, `spelltrigger_1` = 1 WHERE `entry` = 42612; -- Savage Gladiator's Libram of Justice (Missing Spell ID 60648)
 UPDATE `item_template` SET `spellid_1` = 60675, `spelltrigger_1` = 1 WHERE `entry` = 42618; -- Savage Gladiator's Sigil of Strife (Missing Spell ID 60675)
 
