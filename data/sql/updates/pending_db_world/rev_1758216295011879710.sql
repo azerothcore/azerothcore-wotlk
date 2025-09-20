@@ -48,7 +48,8 @@ INSERT INTO `conditions` (`SourceTypeOrReferenceId`, `SourceGroup`, `SourceEntry
 (22, 2, 22972, 0, 0, 29, 1, 22986, 40, 0, 0, 0, 0, '', 'Only run SAI if Invis Rune Stone within 40 yards');
 
 SET @CGUID := 132442;
-DELETE FROM `creature` WHERE `id1`=22986; -- Replace ALL with sniffed spawns
+-- Replace ALL with sniffed spawns
+DELETE FROM `creature` WHERE `id1`=22986;
 INSERT INTO `creature` (`guid`, `id1`, `id2`, `id3`, `map`, `zoneId`, `areaId`, `spawnMask`, `phaseMask`, `equipment_id`, `position_x`, `position_y`, `position_z`, `orientation`, `spawntimesecs`, `wander_distance`, `currentwaypoint`, `curhealth`, `curmana`, `MovementType`, `npcflag`, `unit_flags`, `dynamicflags`, `ScriptName`, `VerifiedBuild`) VALUES
 (@CGUID+0 , 22986, 0, 0, 530, 3519, 3978, 1, 1, 0, -4180.95, 3124.89, 321.461, 6.14356, 120, 0, 0, 1604, 852, 0, 0, 0, 0, '', 45745),
 (@CGUID+1 , 22986, 0, 0, 530, 3519, 3679, 1, 1, 0, -4116.41, 3212.79, 299.878, 5.55015, 120, 0, 0, 1604, 852, 0, 0, 0, 0, '', 45745),
