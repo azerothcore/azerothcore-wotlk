@@ -163,7 +163,10 @@ class boss_anub_arak : public CreatureScript
                     return;
 
                 if (_summonedMinions && !summons.IsAnyCreatureWithEntryAlive(NPC_ANUBAR_GUARDIAN) && !summons.IsAnyCreatureWithEntryAlive(NPC_ANUBAR_VENOMANCER))
-                    events.RescheduleEvent(EVENT_EMERGE, 5s);
+                {
+                    events.Reset();
+                    events.ScheduleEvent(EVENT_EMERGE, 5s);
+                }
             }
 
             void JustEngagedWith(Unit* ) override
@@ -189,6 +192,8 @@ class boss_anub_arak : public CreatureScript
                     return;
 
                 events.Update(diff);
+                scheduler.Update(diff);
+
                 if (me->HasUnitState(UNIT_STATE_CASTING))
                     return;
 
