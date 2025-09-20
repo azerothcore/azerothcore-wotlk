@@ -663,5 +663,11 @@ void WorldConfig::BuildConfigCache()
     SetConfigValue<uint32>(CONFIG_SCOURGEINVASION_COUNTER_SECOND, "ScourgeInvasion.CounterSecond", 100);
     SetConfigValue<uint32>(CONFIG_SCOURGEINVASION_COUNTER_THIRD, "ScourgeInvasion.CounterThird", 150);
 
+    // Voice Chat
+    SetConfigValue<bool>(CONFIG_VOICE_CHAT_ENABLED, "VoiceChat.Enabled", false);
+    SetConfigValue<uint32>(CONFIG_VOICE_CHAT_SERVER_PORT, "VoiceChat.ServerPort", 3725);
+    SetConfigValue<uint32>(CONFIG_VOICE_CHAT_VOICE_PORT, "VoiceChat.VoicePort", 3724);
+    SetConfigValue<uint32>(CONFIG_VOICE_CHAT_MAX_CONNECT_ATTEMPTS, "VoiceChat.MaxConnectAttempts", -1); // Negative value, but only unsigned allowed
+
     SetConfigValue<std::string>(CONFIG_NEW_CHAR_STRING, "PlayerStart.String", "");
 }
