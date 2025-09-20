@@ -750,7 +750,7 @@ void BossAI::OnSpellCastFinished(SpellInfo const* spellInfo, SpellFinishReason r
 {
     ScriptedAI::OnSpellCastFinished(spellInfo, reason);
     // Check if any health check events are pending (i.e. waiting for the boss to stop casting.
-    if (_nextHealthCheck.IsPending())
+    if (!_nextHealthCheck.IsPending() && me->IsInCombat())
     {
         _nextHealthCheck.UpdateStatus(HEALTH_CHECK_PROCESSED);
         // This must be delayed because creature might still have unit state casting at this point, which might break scripts.
