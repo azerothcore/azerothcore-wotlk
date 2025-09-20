@@ -33,6 +33,9 @@ class Quest;
 class Player;
 class WorldSession;
 class CreatureGroup;
+class CreatureOutfit;
+
+#include <memory>
 
 // max different by z coordinate for creature aggro reaction
 #define CREATURE_Z_ATTACK_RANGE 3
@@ -52,6 +55,13 @@ public:
     void SetObjectScale(float scale) override;
     void SetDisplayId(uint32 displayId, float displayScale = 1.f) override;
     void SetDisplayFromModel(uint32 modelIdx);
+
+    uint32 GetDisplayId() const final;
+    void SetDisplayIdRaw(uint32 modelId, float displayScale = 1.f);
+    std::shared_ptr<CreatureOutfit> & GetOutfit() { return m_outfit; };
+    void SetOutfit(std::shared_ptr<CreatureOutfit> const & outfit);
+    void SetMirrorImageFlag(bool on) { if (on) SetFlag(UNIT_FIELD_FLAGS_2, UNIT_FLAG2_MIRROR_IMAGE); else RemoveFlag(UNIT_FIELD_FLAGS_2, UNIT_FLAG2_MIRROR_IMAGE); };
+    void SendMirrorSound(Player* target, uint8 type);
 
     void DisappearAndDie();
 
@@ -528,6 +538,8 @@ private:
     uint32 _playerDamageReq;
     bool _damagedByPlayer;
     bool _isCombatMovementAllowed;
+
+    std::shared_ptr<CreatureOutfit> m_outfit;
 };
 
 class AssistDelayEvent : public BasicEvent
