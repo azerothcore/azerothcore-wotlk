@@ -1914,7 +1914,6 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
             {
                 if (IsCreature(target))
                 {
-
                     SAIBool isForced = !e.action.moveToPosTarget.disableForceDestination;
 
                     Creature* ctarget = target->ToCreature();
