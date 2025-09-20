@@ -21,6 +21,7 @@
 #include "GridNotifiers.h"
 #include "MapMgr.h"
 #include "ScriptedCreature.h"
+#include "SpellAuras.h"
 #include "SpellAuraEffects.h"
 #include "SpellScript.h"
 #include "SpellScriptLoader.h"
@@ -1344,11 +1345,12 @@ enum Quest12937Data
 {
     SPELL_TRIGGER_AID_OF_THE_EARTHEN    = 55809,
     NPC_FALLEN_EARTHEN_DEFENDER         = 30035,
+    TALK_FALLEN_EARTHEN_HEALED          = 0
 };
 
-class spell_q12937_relief_for_the_fallen : public SpellScript
+class spell_q12937_relief_for_the_fallen : public AuraScript
 {
-    PrepareSpellScript(spell_q12937_relief_for_the_fallen);
+    PrepareAuraScript(spell_q12937_relief_for_the_fallen);
 
     bool Load() override
     {
@@ -1360,20 +1362,28 @@ class spell_q12937_relief_for_the_fallen : public SpellScript
         return ValidateSpellInfo({ SPELL_TRIGGER_AID_OF_THE_EARTHEN });
     }
 
-    void HandleDummy(SpellEffIndex /*effIndex*/)
+    void OnRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
     {
         Player* caster = GetCaster()->ToPlayer();
-        if (Creature* target = GetHitCreature())
+        Unit* target = GetUnitOwner();
+        if (target && target->ToCreature())
         {
-            caster->CastSpell(caster, SPELL_TRIGGER_AID_OF_THE_EARTHEN, true, nullptr);
             caster->KilledMonsterCredit(NPC_FALLEN_EARTHEN_DEFENDER);
-            target->DespawnOrUnsummon();
+            target->ToCreature()->DespawnOrUnsummon(5000);
+            target->SetStandState(UNIT_STAND_STATE_STAND);
+            target->ToCreature()->AI()->Talk(TALK_FALLEN_EARTHEN_HEALED);
+
+            ObjectGuid casterGUID = caster->GetGUID();
+            caster->m_Events.AddEventAtOffset([casterGUID]{
+                if (Player* caster = ObjectAccessor::FindPlayer(casterGUID))
+                    caster->CastSpell(caster, SPELL_TRIGGER_AID_OF_THE_EARTHEN, true);
+            }, 5s);
         }
     }
 
     void Register() override
     {
-        OnEffectHitTarget += SpellEffectFn(spell_q12937_relief_for_the_fallen::HandleDummy, EFFECT_0, SPELL_EFFECT_DUMMY);
+        OnEffectRemove += AuraEffectRemoveFn(spell_q12937_relief_for_the_fallen::OnRemove, EFFECT_0, SPELL_AURA_PERIODIC_HEAL, AURA_EFFECT_HANDLE_REAL);
     }
 };
 
