@@ -387,9 +387,7 @@ void CreatureAI::MoveBackwardsChecks()
     Unit *victim = me->GetVictim();
 
     if (!victim || !me->IsFreeToMove() || me->HasUnitMovementFlag(MOVEMENTFLAG_ROOT))
-    {
         return;
-    }
 
     /**
      *  optimization, disable backwards movement for NPC vs NPC combat
