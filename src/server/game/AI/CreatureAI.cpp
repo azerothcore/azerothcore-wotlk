@@ -375,9 +375,7 @@ void CreatureAI::MoveCircleChecks()
      *  optimization, disable circling movement for NPC vs NPC combat
      */
     if (!sWorld->getBoolConfig(CONFIG_CREATURE_REPOSITION_AGAINST_NPCS) && !victim->IsPlayer() && !victim->IsPet())
-    {
         return;
-    }
 
     me->GetMotionMaster()->MoveCircleTarget(me->GetVictim());
 }
