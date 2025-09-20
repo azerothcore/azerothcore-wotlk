@@ -1,3 +1,4 @@
+-- DB update 2025_09_20_04 -> 2025_09_20_05
 --
 -- Frostbrood Spawn
 DELETE FROM `smart_scripts` WHERE `entryorguid` = 31702 AND `source_type` = 0 AND `id` = 7;
