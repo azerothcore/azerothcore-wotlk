@@ -62,7 +62,7 @@ public:
                 case 2:
                     if (me->HasStealthAura())
                         me->RemoveAurasByType(SPELL_AURA_MOD_STEALTH);
-                    SetRun();
+                    me->SetWalk(false);
                     me->SetFaction(FACTION_ENEMY);
                     break;
             }
@@ -109,7 +109,7 @@ public:
                     me->GetThreatMgr().ClearAllThreat();
                     me->CombatStop(true);
 
-                    SetRun(false);
+                    me->SetWalk(true);
                 }
             }
         }
@@ -138,7 +138,7 @@ public:
                 pSlim->CastSpell(pSlim, SPELL_STEALTH, true);
 
             if (npc_tapoke_slim_jahn::npc_tapoke_slim_jahnAI* pEscortAI = CAST_AI(npc_tapoke_slim_jahn::npc_tapoke_slim_jahnAI, pSlim->AI()))
-                pEscortAI->Start(false, false, player->GetGUID(), quest);
+                pEscortAI->Start(false, player->GetGUID(), quest);
         }
         return false;
     }

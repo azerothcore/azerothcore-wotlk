@@ -1683,10 +1683,7 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
             {
                 if (IsCreature(target))
                 {
-                    if (IsSmart(target->ToCreature()))
-                        CAST_AI(SmartAI, target->ToCreature()->AI())->SetRun(e.action.setRun.run);
-                    else
-                        target->ToCreature()->SetWalk(e.action.setRun.run ? false : true); // Xinef: reversed
+                    target->ToCreature()->SetWalk(e.action.setRun.run ? false : true);
                 }
             }
 
@@ -1731,7 +1728,7 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
             if (!IsSmart())
                 break;
 
-            bool run = e.action.wpStart.run != 0;
+            ForcedMovement forcedMovement = (ForcedMovement)e.action.wpStart.forcedMovement;
             uint32 entry = e.action.wpStart.pathID;
             bool repeat = e.action.wpStart.repeat != 0;
 
@@ -1745,7 +1742,7 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
             }
 
             me->SetReactState((ReactStates)e.action.wpStart.reactState);
-            CAST_AI(SmartAI, me->AI())->StartPath(run, entry, repeat, unit);
+            CAST_AI(SmartAI, me->AI())->StartPath(forcedMovement, entry, repeat, unit);
 
             uint32 quest = e.action.wpStart.quest;
             uint32 DespawnTime = e.action.wpStart.despawnTime;
@@ -2543,9 +2540,9 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
                         if (closestWpId)
                         {
                             bool repeat = e.action.startClosestWaypoint.repeat;
-                            bool run = e.action.startClosestWaypoint.run;
+                            ForcedMovement forcedMovement = (ForcedMovement)e.action.startClosestWaypoint.forcedMovement;
 
-                            CAST_AI(SmartAI, creature->AI())->StartPath(repeat, closestWpId, run);
+                            CAST_AI(SmartAI, creature->AI())->StartPath(forcedMovement, closestWpId, repeat);
                         }
                     }
                 }
