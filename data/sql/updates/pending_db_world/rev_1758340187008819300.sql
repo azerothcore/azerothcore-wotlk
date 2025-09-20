@@ -14,10 +14,13 @@ UPDATE `item_template` SET `stat_type5` = 45, `stat_value5` = 355 WHERE `entry` 
 UPDATE `item_template` SET `stat_type4` = 45, `stat_value4` = 355, `stat_type5` = 43, `stat_value5` = 14 WHERE `entry` = 42344;
 
 -- Savage Gladiator's Piercing Touch (+28 Spell Power, +20 Spell Pen, Fire damage)
-UPDATE `item_template` SET `stat_type4` = 45, `stat_value4` = 28, `stat_type5` = 47, `stat_value5` = 20, `dmg_type1` = 2 WHERE `entry` = 42517;
+UPDATE `item_template` SET `dmg_min1` = 318, `dmg_max1` = 591, `delay` = 1900, `stat_type4` = 45, `stat_value4` = 28, `stat_type5` = 47, `stat_value5` = 20, `dmg_type1` = 2 WHERE `entry` = 42517;
 
 -- Savage Gladiator's Touch of Defeat (+28 Spell Power, Fire damage)
-UPDATE `item_template` SET `stat_type5` = 45, `stat_value5` = 28, `dmg_type1` = 2 WHERE `entry` = 42448;
+UPDATE `item_template` SET `dmg_min1` = 318, `dmg_max1` = 591, `delay` = 1900, `stat_type5` = 45, `stat_value5` = 28, `dmg_type1` = 2 WHERE `entry` = 42448;
+
+-- Savage Gladiator's baton of light
+UPDATE `item_template` SET `dmg_min1` = 318, `dmg_max1` = 591, `delay` = 1900, `dmg_type1` = 2 WHERE `entry` = 42511;
 
 -- Savage Gladiator's Barrier (+50 Spell Power)
 UPDATE `item_template` SET `stat_type5` = 45, `stat_value5` = 50 WHERE `entry` = 42557;
