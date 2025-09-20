@@ -11,13 +11,13 @@ UPDATE `item_template` SET `stat_type4` = 38, `stat_value4` = 48 WHERE `entry` I
 UPDATE `item_template` SET `stat_type5` = 45, `stat_value5` = 355 WHERE `entry` = 42343;
 
 -- Savage Gladiator's Gavel (+355 Spell Power, +14 mp5)
-UPDATE `item_template` SET `stat_type5` = 45, `stat_value5` = 355, `stat_type6` = 43, `stat_value6` = 14 WHERE `entry` = 42344;
+UPDATE `item_template` SET `stat_type4` = 45, `stat_value4` = 355, `stat_type5` = 43, `stat_value5` = 14 WHERE `entry` = 42344;
 
--- Savage Gladiator's Piercing Touch (+28 Spell Power, +20 Spell Pen)
-UPDATE `item_template` SET `stat_type4` = 45, `stat_value4` = 28, `stat_type5` = 47, `stat_value5` = 20 WHERE `entry` = 42517;
+-- Savage Gladiator's Piercing Touch (+28 Spell Power, +20 Spell Pen, Fire damage)
+UPDATE `item_template` SET `stat_type4` = 45, `stat_value4` = 28, `stat_type5` = 47, `stat_value5` = 20, `dmg_type1` = 2 WHERE `entry` = 42517;
 
--- Savage Gladiator's Touch of Defeat (+28 Spell Power)
-UPDATE `item_template` SET `stat_type5` = 45, `stat_value5` = 28 WHERE `entry` = 42448;
+-- Savage Gladiator's Touch of Defeat (+28 Spell Power, Fire damage)
+UPDATE `item_template` SET `stat_type5` = 45, `stat_value5` = 28, `dmg_type1` = 2 WHERE `entry` = 42448;
 
 -- Savage Gladiator's Barrier (+50 Spell Power)
 UPDATE `item_template` SET `stat_type5` = 45, `stat_value5` = 50 WHERE `entry` = 42557;
@@ -31,8 +31,8 @@ UPDATE `item_template` SET `spellid_1` = 60648, `spelltrigger_1` = 1 WHERE `entr
 -- Savage Gladiator's Sigil of Strife (Missing Spell ID 60675)
 UPDATE `item_template` SET `spellid_1` = 60675, `spelltrigger_1` = 1 WHERE `entry` = 42618;
 
--- Hateful Gladiator's Baton of Light, Piercing Touch, Touch of Defeat (350–651 Fire damage, 1.90 speed)
-UPDATE `item_template` SET `dmg_min1` = 350, `dmg_max1` = 651, `delay` = 1900 WHERE `entry` IN (42512, 42518, 42501);
+-- Hateful Gladiator's Baton of Light, Piercing Touch, Touch of Defeat (350–651 Fire damage, 1.90 speed, Fire school)
+UPDATE `item_template` SET `dmg_min1` = 350, `dmg_max1` = 651, `delay` = 1900, `dmg_type1` = 2 WHERE `entry` IN (42512, 42518, 42501);
 
 -- Hateful Gladiator's Redoubt (+18 mp5)
 UPDATE `item_template` SET `stat_type5` = 43, `stat_value5` = 18 WHERE `entry` = 42569;
