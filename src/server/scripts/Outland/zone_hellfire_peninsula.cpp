@@ -171,7 +171,7 @@ public:
         npc_ancestral_wolfAI(Creature* creature) : npc_escortAI(creature)
         {
             if (creature->GetOwner() && creature->GetOwner()->IsPlayer())
-                Start(false, false, creature->GetOwner()->GetGUID());
+                Start(false, creature->GetOwner()->GetGUID());
             creature->SetSpeed(MOVE_WALK, 1.5f);
             DoCast(SPELL_GUIDED_BY_THE_SPIRITS);
             Reset();
@@ -312,7 +312,8 @@ public:
             {
                 me->SetReactState(REACT_AGGRESSIVE);
                 me->SetFaction(FACTION_ESCORTEE_H_PASSIVE);
-                npc_escortAI::Start(true, false, player->GetGUID());
+                me->SetWalk(false);
+                npc_escortAI::Start(false, player->GetGUID());
             }
         }
 
