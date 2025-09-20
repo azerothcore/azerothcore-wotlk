@@ -2344,7 +2344,10 @@ class spell_dragonblight_devour_ghoul_periodic : public AuraScript
             GetCaster()->CastSpell(GetCaster(), SPELL_NOURISHMENT, true);
 
         if (GetUnitOwner() && GetUnitOwner()->ToCreature())
-            GetUnitOwner()->ToCreature()->DespawnOrUnsummon(1000);
+        {
+            GetUnitOwner()->ExitVehicle();
+            GetUnitOwner()->ToCreature()->DespawnOrUnsummon(2000);
+        }
     }
 
     void Register() override
