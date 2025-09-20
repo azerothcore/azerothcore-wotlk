@@ -1,3 +1,4 @@
+-- DB update 2025_09_20_01 -> 2025_09_20_02
 --
 DELETE FROM `creature_template_addon` WHERE `entry` = 25494;
 INSERT INTO `creature_template_addon` (`entry`, `path_id`, `mount`, `bytes1`, `bytes2`, `emote`, `visibilityDistanceType`, `auras`) VALUES
