@@ -15,12 +15,12 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "ElunaScript.h"
+#include "ALEScript.h"
 #include "ScriptMgr.h"
 
-ElunaScript::ElunaScript(const char* name) : ScriptObject(name)
+ALEScript::ALEScript(const char* name) : ScriptObject(name)
 {
-    ScriptRegistry<ElunaScript>::AddScript(this);
+    ScriptRegistry<ALEScript>::AddScript(this);
 }
 
-template class AC_GAME_API ScriptRegistry<ElunaScript>;
+template class AC_GAME_API ScriptRegistry<ALEScript>;
