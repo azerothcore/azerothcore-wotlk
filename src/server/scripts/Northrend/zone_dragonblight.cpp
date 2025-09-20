@@ -2082,27 +2082,6 @@ class spell_q12096_q12092_dummy : public SpellScript
     }
 };
 
-class spell_q12096_q12092_bark : public SpellScript
-{
-    PrepareSpellScript(spell_q12096_q12092_bark);
-
-    void HandleDummy(SpellEffIndex /*effIndex*/)
-    {
-        Creature* lothalor = GetHitCreature();
-        if (!lothalor || lothalor->GetEntry() != NPC_LOTHALOR)
-            return;
-
-        lothalor->AI()->Talk(SAY_LOTHALOR);
-        lothalor->RemoveAura(SPELL_CONFUSED);
-        lothalor->DespawnOrUnsummon(4000);
-    }
-
-    void Register() override
-    {
-        OnEffectHitTarget += SpellEffectFn(spell_q12096_q12092_bark::HandleDummy, EFFECT_0, SPELL_EFFECT_DUMMY);
-    }
-};
-
 /*#####
 # npc_torturer_lecraft
 #####*/
@@ -2320,7 +2299,6 @@ void AddSC_dragonblight()
     new npc_spiritual_insight();
     new npc_commander_eligor_dawnbringer();
     RegisterSpellScript(spell_q12096_q12092_dummy);
-    RegisterSpellScript(spell_q12096_q12092_bark);
     new npc_torturer_lecraft();
     RegisterSpellScript(spell_dragonblight_corrosive_spit);
     RegisterSpellScript(spell_handover_reins);
