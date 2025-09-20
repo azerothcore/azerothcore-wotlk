@@ -141,13 +141,15 @@ public:
 
         void MoveInLineOfSight(Unit* who) override
         {
-            if (!who || me->getStandState() != UNIT_STAND_STATE_SLEEP || !who->IsPlayer() || me->GetDistance2d(who) > 90.0f || who->ToPlayer()->IsGameMaster())
+            if (!who || me->getStandState() != UNIT_STAND_STATE_SLEEP || !who->IsPlayer() ||
+                who->ToPlayer()->IsGameMaster() || me->GetDistance2d(who) > 90.0f ||
+                !me->isInFront(who, M_PI / 4.0f) || !me->IsWithinLOSInMap(who))
                 return;
 
             me->SetInCombatWithZone();
             me->SetStandState(UNIT_STAND_STATE_STAND);
 
-            ScheduleUniqueTimedEvent(5s, [&] { // 15s
+            ScheduleUniqueTimedEvent(5s, [&] {
                 me->SetStandState(UNIT_STAND_STATE_SUBMERGED);
                 DoCastSelf(SPELL_SUMMON_ESSENCE_OF_SUFFERING);
             }, EVENT_ESSENCE_OF_SUFFERING);
