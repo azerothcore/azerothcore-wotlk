@@ -770,7 +770,6 @@ void BossAI::DamageTaken(Unit* attacker, uint32& damage, DamageEffectType damage
 
     if (!_nextHealthCheck.HasBeenProcessed())
     {
-        LOG_ERROR("sql.sql", "value {}", _nextHealthCheck._status);
         if (me->HealthBelowPctDamaged(_nextHealthCheck._healthPct, damage))
         {
             if (!_nextHealthCheck._allowedWhileCasting && me->HasUnitState(UNIT_STATE_CASTING))
