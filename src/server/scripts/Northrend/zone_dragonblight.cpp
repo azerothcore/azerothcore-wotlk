@@ -2356,7 +2356,6 @@ class spell_dragonblight_devour_ghoul_periodic : public AuraScript
     }
 };
 
-
 void AddSC_dragonblight()
 {
     new npc_conversing_with_the_depths_trigger();
