@@ -1421,7 +1421,7 @@ public:
                                 break;
                         }
 
-                        Start(false, true);
+                        Start(true);
                     }
                     else
                         EnterEvadeMode();                       //something went wrong
