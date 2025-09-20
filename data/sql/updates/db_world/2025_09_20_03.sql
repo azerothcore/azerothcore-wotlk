@@ -1,3 +1,4 @@
+-- DB update 2025_09_20_02 -> 2025_09_20_03
 
 -- Deactive "Force Destination"
 DELETE FROM `smart_scripts` WHERE (`entryorguid` = 2576000) AND (`source_type` = 9) AND (`id` IN (1));
