@@ -8,3 +8,11 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 (27996, 0, 5, 6, 61, 0, 100, 0, 0, 0, 0, 0, 0, 0, 1, 2, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Wyrmrest Vanquisher - On Passenger Removed - Say Line 2'),
 (27996, 0, 6, 7, 61, 0, 100, 0, 0, 0, 0, 0, 0, 0, 41, 3000, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Wyrmrest Vanquisher - On Passenger Removed - Despawn In 3000 ms'),
 (27996, 0, 7, 0, 61, 0, 100, 0, 0, 0, 0, 0, 0, 0, 134, 44795, 2, 0, 0, 0, 0, 7, 0, 0, 0, 0, 0, 0, 0, 0, 'Wyrmrest Vanquisher - On Passenger Removed - Invoker Cast \'Parachute\'');
+
+DELETE FROM `smart_scripts` WHERE `entryorguid` = 2800500 AND `source_type` = 9;
+DELETE FROM `smart_scripts` WHERE (`entryorguid` = 28005) AND (`source_type` = 0) AND (`id` IN (1));
+
+DELETE FROM `spell_script_names` WHERE `ScriptName` IN ('spell_dragonblight_devour_ghoul', 'spell_dragonblight_devour_ghoul_periodic');
+INSERT INTO `spell_script_names` (`spell_id`, `ScriptName`) VALUES
+(50430, 'spell_dragonblight_devour_ghoul'),
+(50432, 'spell_dragonblight_devour_ghoul_periodic');
