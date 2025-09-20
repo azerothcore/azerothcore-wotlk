@@ -4114,9 +4114,10 @@ void Spell::_cast(bool skipCheck)
     SetExecutedCurrently(false);
 
     // Call CreatureAI hook OnSpellCastFinished
-    if (Creature* caster = m_originalCaster->ToCreature())
-        if (caster->IsAIEnabled)
-            caster->AI()->OnSpellCastFinished(GetSpellInfo(), SPELL_FINISHED_SUCCESSFUL_CAST);
+    if (m_originalCaster)
+        if (Creature* caster = m_originalCaster->ToCreature())
+            if (caster->IsAIEnabled)
+                caster->AI()->OnSpellCastFinished(GetSpellInfo(), SPELL_FINISHED_SUCCESSFUL_CAST);
 }
 
 void Spell::handle_immediate()
