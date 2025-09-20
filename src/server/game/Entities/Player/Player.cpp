@@ -7067,6 +7067,14 @@ void Player::ApplyItemObtainSpells(Item* item, bool apply)
     }
 }
 
+void Player::UpdateItemObtainSpells(Item* item, uint8 bag, uint8 slot)
+{
+    if (IsBankPos(bag, slot))
+        ApplyItemObtainSpells(item, false);
+    else if (bag == INVENTORY_SLOT_BAG_0 || (bag >= INVENTORY_SLOT_BAG_START && bag < INVENTORY_SLOT_BAG_END))
+        ApplyItemObtainSpells(item, true);
+}
+
 SpellSchoolMask Player::GetMeleeDamageSchoolMask(WeaponAttackType attackType /*= BASE_ATTACK*/, uint8 damageIndex /*= 0*/) const
 {
     if (Item const* weapon = GetWeaponForAttack(attackType, true))
@@ -16303,11 +16311,23 @@ float Player::GetSightRange(WorldObject const* target) const
 {
     float sightRange = WorldObject::GetSightRange(target);
     if (_farSightDistance)
-    {
         sightRange += *_farSightDistance;
-    }
 
     return sightRange;
+}
+
+bool Player::IsWorldObjectOutOfSightRange(WorldObject const* target) const
+{
+    // Special handling for Infinite visibility override objects -> they are zone wide visible
+    if (target->GetVisibilityOverrideType() == VisibilityDistanceType::Infinite)
+    {
+        // Same zone, always visible
+        if (target->GetZoneId() == GetZoneId())
+            return false;
+    }
+
+    // Check if out of range
+    return !m_seer->IsWithinDist(target, GetSightRange(target), false);
 }
 
 std::string Player::GetPlayerName()

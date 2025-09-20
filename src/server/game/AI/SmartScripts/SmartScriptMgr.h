@@ -765,6 +765,7 @@ struct SmartAction
             uint32 textGroupID;
             uint32 duration;
             SAIBool useTalkTarget;
+            uint32 delay;
         } talk;
 
         struct

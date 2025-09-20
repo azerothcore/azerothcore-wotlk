@@ -147,6 +147,8 @@ struct ZoneDynamicInfo
 typedef std::map<uint32/*leaderDBGUID*/, CreatureGroup*>        CreatureGroupHolderType;
 typedef std::unordered_map<uint32 /*zoneId*/, ZoneDynamicInfo> ZoneDynamicInfoMap;
 typedef std::unordered_set<Transport*> TransportsContainer;
+typedef std::unordered_set<WorldObject*> ZoneWideVisibleWorldObjectsSet;
+typedef std::unordered_map<uint32 /*ZoneId*/, ZoneWideVisibleWorldObjectsSet> ZoneWideVisibleWorldObjectsMap;
 
 enum EncounterCreditType : uint8
 {
@@ -443,6 +445,8 @@ public:
     void SendZoneDynamicInfo(Player* player);
     void SendInitSelf(Player* player);
 
+    void UpdateExpiredCorpses(uint32 const diff);
+
     void PlayDirectSoundToMap(uint32 soundId, uint32 zoneId = 0);
     void SetZoneMusic(uint32 zoneId, uint32 musicId);
     void SetZoneWeather(uint32 zoneId, WeatherState weatherId, float weatherGrade);
@@ -493,6 +497,12 @@ public:
 
     typedef std::vector<WorldObject*> UpdatableObjectList;
     typedef std::unordered_set<WorldObject*> PendingAddUpdatableObjectList;
+
+    void AddWorldObjectToFarVisibleMap(WorldObject* obj);
+    void RemoveWorldObjectFromFarVisibleMap(WorldObject* obj);
+    void AddWorldObjectToZoneWideVisibleMap(uint32 zoneId, WorldObject* obj);
+    void RemoveWorldObjectFromZoneWideVisibleMap(uint32 zoneId, WorldObject* obj);
+    ZoneWideVisibleWorldObjectsSet const* GetZoneWideVisibleWorldObjectsForZone(uint32 zoneId) const;
 
 private:
 
@@ -576,6 +586,8 @@ private:
     ZoneDynamicInfoMap _zoneDynamicInfo;
     uint32 _defaultLight;
 
+    IntervalTimer _corpseUpdateTimer;
+
     template<HighGuid high>
     inline ObjectGuidGeneratorBase& GetGuidSequenceGenerator()
     {
@@ -599,6 +611,7 @@ private:
     UpdatableObjectList _updatableObjectList;
     PendingAddUpdatableObjectList _pendingAddUpdatableObjectList;
     IntervalTimer _updatableObjectListRecheckTimer;
+    ZoneWideVisibleWorldObjectsMap _zoneWideVisibleWorldObjectsMap;
 };
 
 enum InstanceResetMethod

@@ -5,72 +5,61 @@ set -e
 CURRENT_PATH="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
 source "$CURRENT_PATH/includes/includes.sh"
+source "$AC_PATH_APPS/bash_shared/menu_system.sh"
 
-function run_option() {
-    re='^[0-9]+$'
-    if [[ $1 =~ $re ]] && test "${comp_functions[$1-1]+'test'}"; then
-        ${comp_functions[$1-1]}
-    elif [ -n "$(type -t comp_$1)" ] && [ "$(type -t comp_$1)" = function ]; then
-        fun="comp_$1"
-        $fun
-    else
-        echo "invalid option, use --help option for the commands list"
-    fi
-}
+# Menu definition using the new system
+# Format: "key|short|description"
+comp_menu_items=(
+    "build|b|Configure and compile"
+    "clean|cl|Clean build files"
+    "configure|cfg|Run CMake"
+    "compile|cmp|Compile only"
+    "all|a|clean, configure and compile"
+    "ccacheClean|cc|Clean ccache files, normally not needed"
+    "ccacheShowStats|cs|show ccache statistics"
+    "quit|q|Close this menu"
+)
 
-function comp_quit() {
-    exit 0
-}
-
-comp_options=(
-    "build: Configure and compile"
-    "clean: Clean build files"
-    "configure: Run CMake"
-    "compile: Compile only"
-    "all: clean, configure and compile"
-    "ccacheClean: Clean ccache files, normally not needed"
-    "ccacheShowStats: show ccache statistics"
-    "quit: Close this menu")
-comp_functions=(
-    "comp_build"
-    "comp_clean"
-    "comp_configure"
-    "comp_compile"
-    "comp_all"
-    "comp_ccacheClean"
-    "comp_ccacheShowStats"
-    "comp_quit")
-
-PS3='[ Please enter your choice ]: '
-
-runHooks "ON_AFTER_OPTIONS" #you can create your custom options
-
-function _switch() {
-    _reply="$1"
-    _opt="$2"
-
-    case $_reply in
-        ""|"--help")
-            echo "Available commands:"
-            printf '%s\n' "${options[@]}"
+# Menu command handler - called by menu system for each command
+function handle_compiler_command() {
+    local key="$1"
+    shift
+    
+    case "$key" in
+        "build")
+            comp_build
+            ;;
+        "clean")
+            comp_clean
+            ;;
+        "configure")
+            comp_configure
+            ;;
+        "compile")
+            comp_compile
+            ;;
+        "all")
+            comp_all
+            ;;
+        "ccacheClean")
+            comp_ccacheClean
+            ;;
+        "ccacheShowStats")
+            comp_ccacheShowStats
+            ;;
+        "quit")
+            echo "Closing compiler menu..."
+            return 0
             ;;
         *)
-            run_option $_reply $_opt
-        ;;
+            echo "Invalid option. Use --help to see available commands."
+            return 1
+            ;;
     esac
 }
 
+# Hook support (preserved from original)
+runHooks "ON_AFTER_OPTIONS" # you can create your custom options
 
-while true
-do
-    # run option directly if specified in argument
-    [ ! -z $1 ] && _switch $@
-    [ ! -z $1 ] && exit 0
-
-    select opt in "${comp_options[@]}"
-    do
-        echo "==== ACORE COMPILER ===="
-        _switch $REPLY
-        break;
-    done
-done
+# Run the menu system
+menu_run_with_items "ACORE COMPILER" handle_compiler_command -- "${comp_menu_items[@]}" -- "$@"

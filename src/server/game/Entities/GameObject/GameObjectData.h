@@ -629,6 +629,8 @@ struct GameObjectTemplate
             return true;
         case GAMEOBJECT_TYPE_TRAPDOOR:
             return true;
+        case GAMEOBJECT_TYPE_DESTRUCTIBLE_BUILDING:
+            return true;
         default:
             return false;
         }

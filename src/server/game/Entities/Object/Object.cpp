@@ -1037,7 +1037,7 @@ void MovementInfo::OutDebug()
 }
 
 WorldObject::WorldObject() : WorldLocation(),
-    LastUsedScriptID(0), m_name(""), m_isActive(false), m_visibilityDistanceOverride(), m_zoneScript(nullptr),
+    LastUsedScriptID(0), m_name(""), m_isActive(false), _visibilityDistanceOverrideType(VisibilityDistanceType::Normal), m_zoneScript(nullptr),
     _zoneId(0), _areaId(0), _floorZ(INVALID_HEIGHT), _outdoors(false), _liquidData(), _updatePositionData(false), m_transport(nullptr),
     m_currMap(nullptr), _heartbeatTimer(HEARTBEAT_INTERVAL), m_InstanceId(0), m_phaseMask(PHASEMASK_NORMAL), m_useCombinedPhases(true),
     m_notifyflags(0), m_executed_notifies(0), _objectVisibilityContainer(this)
@@ -1082,15 +1082,36 @@ void WorldObject::setActive(bool on)
     map->AddObjectToPendingUpdateList(this);
 }
 
+float WorldObject::GetVisibilityOverrideDistance() const
+{
+    ASSERT(_visibilityDistanceOverrideType < VisibilityDistanceType::Max);
+    return VisibilityDistances[AsUnderlyingType(_visibilityDistanceOverrideType)];
+}
+
 void WorldObject::SetVisibilityDistanceOverride(VisibilityDistanceType type)
 {
     ASSERT(type < VisibilityDistanceType::Max);
-    if (IsPlayer())
-    {
+
+    if (type == GetVisibilityOverrideType())
         return;
+
+    if (IsPlayer())
+        return;
+
+    if (IsVisibilityOverridden())
+    {
+        if (IsFarVisible())
+            GetMap()->RemoveWorldObjectFromFarVisibleMap(this);
+        else if (IsZoneWideVisible())
+            GetMap()->RemoveWorldObjectFromZoneWideVisibleMap(GetZoneId(), this);
     }
 
-    m_visibilityDistanceOverride = VisibilityDistances[AsUnderlyingType(type)];
+    if (type == VisibilityDistanceType::Large || type == VisibilityDistanceType::Gigantic)
+        GetMap()->AddWorldObjectToFarVisibleMap(this);
+    else if (type == VisibilityDistanceType::Infinite)
+        GetMap()->AddWorldObjectToZoneWideVisibleMap(GetZoneId(), this);
+
+    _visibilityDistanceOverrideType = type;
 }
 
 void WorldObject::CleanupsBeforeDelete(bool /*finalCleanup*/)
@@ -1127,6 +1148,8 @@ void WorldObject::UpdatePositionData()
 
 void WorldObject::ProcessPositionDataChanged(PositionFullTerrainStatus const& data)
 {
+    uint32 const oldZoneId = _zoneId;
+
     _zoneId = _areaId = data.areaId;
 
     if (AreaTableEntry const* area = sAreaTableStore.LookupEntry(_areaId))
@@ -1136,6 +1159,17 @@ void WorldObject::ProcessPositionDataChanged(PositionFullTerrainStatus const& da
     _outdoors   = data.outdoors;
     _floorZ     = data.floorZ;
     _liquidData = data.liquidInfo;
+
+    // Has zone ID changed?
+    if (oldZoneId != _zoneId)
+    {
+        // If so, check if we are far visibility overridden object and refresh maps if needed.
+        if (IsZoneWideVisible())
+        {
+            GetMap()->RemoveWorldObjectFromZoneWideVisibleMap(oldZoneId, this);
+            GetMap()->AddWorldObjectToZoneWideVisibleMap(_zoneId, this);
+        }
+    }
 }
 
 void WorldObject::AddToWorld()
@@ -1149,6 +1183,9 @@ void WorldObject::RemoveFromWorld()
 {
     if (!IsInWorld())
         return;
+
+    if (IsZoneWideVisible())
+        GetMap()->RemoveWorldObjectFromZoneWideVisibleMap(GetZoneId(), this);
 
     DestroyForVisiblePlayers();
 
@@ -1612,26 +1649,16 @@ float WorldObject::GetGridActivationRange() const
 
 float WorldObject::GetVisibilityRange() const
 {
-    if (IsVisibilityOverridden() && IsCreature())
-    {
-        return *m_visibilityDistanceOverride;
-    }
+    if (IsCreature() && IsVisibilityOverridden())
+        return GetVisibilityOverrideDistance();
     else if (IsGameObject())
     {
-        {
-            if (IsInWintergrasp())
-            {
-                return VISIBILITY_DIST_WINTERGRASP + VISIBILITY_INC_FOR_GOBJECTS;
-            }
-            else if (IsVisibilityOverridden())
-            {
-                return *m_visibilityDistanceOverride;
-            }
-            else
-            {
-                return GetMap()->GetVisibilityRange() + VISIBILITY_INC_FOR_GOBJECTS;
-            }
-        }
+        if (IsInWintergrasp())
+            return VISIBILITY_DIST_WINTERGRASP;
+        else if (IsVisibilityOverridden())
+            return GetVisibilityOverrideDistance();
+        else
+            return GetMap()->GetVisibilityRange();
     }
     else
         return IsInWintergrasp() ? VISIBILITY_DIST_WINTERGRASP : GetMap()->GetVisibilityRange();
@@ -1645,28 +1672,18 @@ float WorldObject::GetSightRange(WorldObject const* target) const
         {
             if (target)
             {
-                if (target->IsVisibilityOverridden() && target->IsCreature())
-                {
-                    return *target->m_visibilityDistanceOverride;
-                }
+                if (target->IsCreature() && target->IsVisibilityOverridden())
+                    return target->GetVisibilityOverrideDistance();
                 else if (target->IsGameObject())
                 {
                     if (IsInWintergrasp() && target->IsInWintergrasp())
-                    {
-                        return VISIBILITY_DIST_WINTERGRASP + VISIBILITY_INC_FOR_GOBJECTS;
-                    }
+                        return VISIBILITY_DIST_WINTERGRASP;
                     else if (target->IsVisibilityOverridden())
-                    {
-                        return *target->m_visibilityDistanceOverride;
-                    }
+                        return target->GetVisibilityOverrideDistance();
                     else if (ToPlayer()->GetCinematicMgr()->IsOnCinematic())
-                    {
                         return DEFAULT_VISIBILITY_INSTANCE;
-                    }
                     else
-                    {
-                        return GetMap()->GetVisibilityRange() + VISIBILITY_INC_FOR_GOBJECTS;
-                    }
+                        return GetMap()->GetVisibilityRange();
                 }
 
                 return IsInWintergrasp() && target->IsInWintergrasp() ? VISIBILITY_DIST_WINTERGRASP : GetMap()->GetVisibilityRange();
@@ -1674,19 +1691,13 @@ float WorldObject::GetSightRange(WorldObject const* target) const
             return IsInWintergrasp() ? VISIBILITY_DIST_WINTERGRASP : GetMap()->GetVisibilityRange();
         }
         else if (ToCreature())
-        {
             return ToCreature()->m_SightDistance;
-        }
         else
-        {
             return SIGHT_RANGE_UNIT;
-        }
     }
 
     if (ToDynObject() && isActiveObject())
-    {
         return GetMap()->GetVisibilityRange();
-    }
 
     return 0.0f;
 }
@@ -1790,7 +1801,7 @@ bool WorldObject::CanSeeOrDetect(WorldObject const* obj, bool ignoreStealth, boo
         }
 
         // Xinef: check reversely obj vs viewpoint, object could be a gameObject which overrides _IsWithinDist function to include gameobject size
-        if (!corpseCheck && !viewpoint->IsWithinDist(obj, GetSightRange(obj), true))
+        if (!corpseCheck && !viewpoint->IsWithinDist(obj, GetSightRange(obj), false))
             return false;
     }
 

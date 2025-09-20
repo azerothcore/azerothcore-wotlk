@@ -1527,12 +1527,27 @@ class spell_q12805_lifeblood_dummy : public SpellScript
     void HandleScript(SpellEffIndex /*effIndex*/)
     {
         Player* caster = GetCaster()->ToPlayer();
-        if (Creature* target = GetHitCreature())
+        Creature* target = GetHitCreature();
+
+        if (!target)
+            return;
+
+        if (Group* group = caster->GetGroup())
         {
-            caster->KilledMonsterCredit(NPC_SHARD_KILL_CREDIT);
-            target->CastSpell(target, uint32(GetEffectValue()), true);
-            target->DespawnOrUnsummon(2000);
+            ObjectGuid targetGUID = target->GetGUID();
+            group->DoForAllMembers([targetGUID](Player* player)
+            {
+                if (Creature* shard = ObjectAccessor::GetCreature(*player, targetGUID))
+                    if (player->IsAtGroupRewardDistance(shard))
+                        player->KilledMonsterCredit(NPC_SHARD_KILL_CREDIT);
+
+            });
         }
+        else
+            caster->KilledMonsterCredit(NPC_SHARD_KILL_CREDIT);
+
+        target->CastSpell(target, uint32(GetEffectValue()), true);
+        target->DespawnOrUnsummon(2000);
     }
 
     void Register() override

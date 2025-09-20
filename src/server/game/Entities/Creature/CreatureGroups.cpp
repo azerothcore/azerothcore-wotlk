@@ -361,8 +361,9 @@ void CreatureGroup::LeaderMoveTo(float x, float y, float z, uint32 move_type)
         if (member == m_leader || !member->IsAlive() || member->GetVictim() || !pFormationInfo.HasGroupFlag(std::underlying_type_t<GroupAIFlags>(GroupAIFlags::GROUP_AI_FLAG_FOLLOW_LEADER)))
             continue;
 
-        // Xinef: If member is stunned / rooted etc don't allow to move him
-        if (member->HasUnitState(UNIT_STATE_NOT_MOVE))
+        // If member is stunned / rooted etc don't allow to move him
+        // Or if charmed/controlled
+        if (member->HasUnitState(UNIT_STATE_NOT_MOVE) || member->isPossessed() || member->HasUnitFlag(UNIT_FLAG_PLAYER_CONTROLLED))
             continue;
 
         // Xinef: this should be automatized, if turn angle is greater than PI/2 (90�) we should swap formation angle

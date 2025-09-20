@@ -57,6 +57,9 @@ typedef TYPELIST_5(GameObject, Player, Creature, Corpse, DynamicObject) AllMapGr
 // List of object types stored on map level
 typedef TYPELIST_4(Creature, GameObject, DynamicObject, Corpse) AllMapStoredObjectTypes;
 
+// List of object types that can have far visible range
+typedef TYPELIST_2(Creature, GameObject) AllFarVisibleObjectTypes;
+
 typedef GridRefMgr<Corpse>          CorpseMapType;
 typedef GridRefMgr<Creature>        CreatureMapType;
 typedef GridRefMgr<DynamicObject>   DynamicObjectMapType;
@@ -73,10 +76,11 @@ enum GridMapTypeMask
     GRID_MAP_TYPE_MASK_ALL              = 0x1F
 };
 
-typedef GridCell<AllMapGridStoredObjectTypes> GridCellType;
-typedef MapGrid<AllMapGridStoredObjectTypes> MapGridType;
+typedef GridCell<AllMapGridStoredObjectTypes, AllFarVisibleObjectTypes> GridCellType;
+typedef MapGrid<AllMapGridStoredObjectTypes, AllFarVisibleObjectTypes> MapGridType;
 
 typedef TypeMapContainer<AllMapGridStoredObjectTypes> GridTypeMapContainer;
+typedef TypeVectorContainer<AllFarVisibleObjectTypes> FarVisibleGridContainer;
 typedef TypeUnorderedMapContainer<AllMapStoredObjectTypes, ObjectGuid> MapStoredObjectTypesContainer;
 
 template<uint32 LIMIT>

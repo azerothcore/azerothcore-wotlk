@@ -33,16 +33,20 @@
 #include "TypeContainer.h"
 #include "TypeContainerVisitor.h"
 
+class WorldObject;
+
 template
 <
-    class GRID_OBJECT_TYPES
+    class GRID_OBJECT_TYPES,
+    class FAR_VISIBLE_OBJECT_TYPES
 >
 class GridCell
 {
 public:
     ~GridCell() = default;
 
-    template<class SPECIFIC_OBJECT> void AddGridObject(SPECIFIC_OBJECT* obj)
+    template<class SPECIFIC_OBJECT>
+    void AddGridObject(SPECIFIC_OBJECT* obj)
     {
         _gridObjects.template insert<SPECIFIC_OBJECT>(obj);
         ASSERT(obj->IsInGrid());
@@ -50,12 +54,32 @@ public:
 
     // Visit grid objects
     template<class T>
-    void Visit(TypeContainerVisitor<T, TypeMapContainer<GRID_OBJECT_TYPES> >& visitor)
+    void Visit(TypeContainerVisitor<T, TypeMapContainer<GRID_OBJECT_TYPES>>& visitor)
     {
         visitor.Visit(_gridObjects);
     }
 
+    template<class SPECIFIC_OBJECT>
+    void AddFarVisibleObject(SPECIFIC_OBJECT* obj)
+    {
+        _farVisibleObjects.template Insert<SPECIFIC_OBJECT>(obj);
+    }
+
+    template<class SPECIFIC_OBJECT>
+    void RemoveFarVisibleObject(SPECIFIC_OBJECT* obj)
+    {
+        _farVisibleObjects.template Remove<SPECIFIC_OBJECT>(obj);
+    }
+
+    // Visit far objects
+    template<class T>
+    void Visit(TypeContainerVisitor<T, TypeVectorContainer<FAR_VISIBLE_OBJECT_TYPES>>& visitor)
+    {
+        visitor.Visit(_farVisibleObjects);
+    }
+
 private:
     TypeMapContainer<GRID_OBJECT_TYPES> _gridObjects;
+    TypeVectorContainer<FAR_VISIBLE_OBJECT_TYPES> _farVisibleObjects;
 };
 #endif

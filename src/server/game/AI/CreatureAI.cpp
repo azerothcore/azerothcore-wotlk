@@ -27,6 +27,7 @@
 #include "Player.h"
 #include "ScriptMgr.h"
 #include "TemporarySummon.h"
+#include "World.h"
 #include "Vehicle.h"
 #include "ZoneScript.h"
 #include <functional>
@@ -53,15 +54,19 @@ void CreatureAI::Talk(uint8 id, WorldObject const* target /*= nullptr*/, Millise
 {
     if (delay > Seconds::zero())
     {
-        me->m_Events.AddEventAtOffset([this, id, target]()
+        ObjectGuid targetGuid;
+
+        if (target)
+            targetGuid = target->GetGUID();
+
+        me->m_Events.AddEventAtOffset([this, id, targetGuid]()
         {
-            sCreatureTextMgr->SendChat(me, id, target);
+            // Target can be nullptr here, it will be handled inside the function.
+            sCreatureTextMgr->SendChat(me, id, ObjectAccessor::GetUnit(*me, targetGuid));
         }, delay);
     }
     else
-    {
         sCreatureTextMgr->SendChat(me, id, target);
-    }
 }
 
 /**
@@ -360,12 +365,17 @@ void CreatureAI::MoveCircleChecks()
     if (
         !victim ||
         !me->IsFreeToMove() || me->HasUnitMovementFlag(MOVEMENTFLAG_ROOT) ||
-        !me->IsWithinMeleeRange(victim) || me == victim->GetVictim() ||
-        (!victim->IsPlayer() && !victim->IsPet())  // only player & pets to save CPU
+        !me->IsWithinMeleeRange(victim) || me == victim->GetVictim()
     )
     {
         return;
     }
+
+    /**
+     *  optimization, disable circling movement for NPC vs NPC combat
+     */
+    if (!sWorld->getBoolConfig(CONFIG_CREATURE_REPOSITION_AGAINST_NPCS) && !victim->IsPlayer() && !victim->IsPet())
+        return;
 
     me->GetMotionMaster()->MoveCircleTarget(me->GetVictim());
 }
@@ -374,8 +384,13 @@ void CreatureAI::MoveBackwardsChecks()
 {
     Unit *victim = me->GetVictim();
 
-    if (!victim || !me->IsFreeToMove() || me->HasUnitMovementFlag(MOVEMENTFLAG_ROOT) ||
-        (!victim->IsPlayer() && !victim->IsPet()))
+    if (!victim || !me->IsFreeToMove() || me->HasUnitMovementFlag(MOVEMENTFLAG_ROOT))
+        return;
+
+    /**
+     *  optimization, disable backwards movement for NPC vs NPC combat
+     */
+    if (!sWorld->getBoolConfig(CONFIG_CREATURE_REPOSITION_AGAINST_NPCS) && !victim->IsPlayer() && !victim->IsPet())
     {
         return;
     }

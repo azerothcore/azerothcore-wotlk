@@ -1167,6 +1167,31 @@ public:
         return new npc_vehicle_d16_propelled_deliveryAI(creature);
     }
 };
+
+enum StormcrestEagle
+{
+    NPC_STORMCREST_EAGLE = 29854
+};
+
+// 56393 - Feed Stormcrest Eagle
+class spell_feed_stormcrest_eagle : public SpellScript
+{
+    PrepareSpellScript(spell_feed_stormcrest_eagle);
+
+    SpellCastResult CheckCast()
+    {
+        if (GetCaster()->FindNearestCreature(NPC_STORMCREST_EAGLE, 15.0f, true))
+            return SPELL_CAST_OK;
+
+        return SPELL_FAILED_BAD_TARGETS;
+    }
+
+    void Register() override
+    {
+        OnCheckCast += SpellCheckCastFn(spell_feed_stormcrest_eagle::CheckCast);
+    }
+};
+
 void AddSC_storm_peaks()
 {
     new npc_frosthound();
@@ -1183,4 +1208,5 @@ void AddSC_storm_peaks()
     RegisterSpellScript(spell_close_rift_aura);
     new npc_vehicle_d16_propelled_delivery();
     RegisterSpellScript(spell_q12823_remove_collapsing_cave_aura);
+    RegisterSpellScript(spell_feed_stormcrest_eagle);
 }

@@ -26,6 +26,13 @@
 #include "WorldSession.h"
 
 template<class T>
+inline void Acore::VisibleNotifier::Visit(std::vector<T>& m)
+{
+    for (typename std::vector<T>::iterator iter = m.begin(); iter != m.end(); ++iter)
+        i_player.UpdateVisibilityOf((*iter), i_data, i_visibleNow);
+}
+
+template<class T>
 inline void Acore::VisibleNotifier::Visit(GridRefMgr<T>& m)
 {
     // Xinef: Update gameobjects only
@@ -33,12 +40,7 @@ inline void Acore::VisibleNotifier::Visit(GridRefMgr<T>& m)
         return;
 
     for (typename GridRefMgr<T>::iterator iter = m.begin(); iter != m.end(); ++iter)
-    {
-        if (i_largeOnly != iter->GetSource()->IsVisibilityOverridden())
-            continue;
-
         i_player.UpdateVisibilityOf(iter->GetSource(), i_data, i_visibleNow);
-    }
 }
 
 // SEARCHERS & LIST SEARCHERS & WORKERS

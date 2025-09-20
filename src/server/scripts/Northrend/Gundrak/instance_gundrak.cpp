@@ -18,6 +18,7 @@
 #include "InstanceMapScript.h"
 #include "ScriptedCreature.h"
 #include "gundrak.h"
+#include "GameObjectAI.h"
 
 DoorData const doorData[] =
 {
@@ -211,6 +212,9 @@ public:
                     if (GameObject* go = instance->GetGameObject(_bridgeGUIDs[i]))
                         go->SetGoState(GO_STATE_ACTIVE_ALTERNATIVE);
             }
+            if (GameObject* collision = instance->GetGameObject(_bridgeGUIDs[4]))
+                if (collision->AI())
+                    collision->AI()->SetData(0, 1);
         }
     };
 };

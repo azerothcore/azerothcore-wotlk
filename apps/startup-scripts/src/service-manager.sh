@@ -279,6 +279,11 @@ function print_help() {
     echo "  $base_name start|stop|restart|status <service-name>"
     echo "  $base_name logs <service-name> [--follow]"
     echo "  $base_name attach <service-name>"
+    echo "  $base_name is-running <service-name>        # exit 0 if running, 1 otherwise"
+    echo "  $base_name uptime-seconds <service-name>    # print uptime in seconds (fails if not running)"
+    echo "  $base_name wait-uptime <service> <sec> [t]  # wait until uptime >= seconds (timeout t, default 120)"
+    echo "  $base_name send <service-name> <command...>  # send console command to service"
+    echo "  $base_name show-config <service-name>       # print current service + run-engine config"
     echo "  $base_name edit-config <service-name>"
     echo ""
     echo "Providers:"
@@ -735,7 +740,7 @@ EOF
         systemctl --user enable "$service_name.service"
     fi
     
-    echo -e "${GREEN}Systemd service '$service_name' created successfully${NC}"
+    echo -e "${GREEN}Systemd service '$service_name' created successfully with session manager '$session_manager'${NC}"
     
     # Add to registry
     add_service_to_registry "$service_name" "systemd" "service" "$command" "" "$systemd_type" "$restart_policy" "$session_manager" "$gdb_enabled" "" "$server_config"
@@ -1473,6 +1478,253 @@ function attach_to_service() {
     fi
 }
 
+#########################################
+# Runtime helpers: status / send / show #
+#########################################
+
+function service_is_running() {
+    local service_name="$1"
+
+    local service_info=$(get_service_info "$service_name")
+    if [ -z "$service_info" ]; then
+        echo -e "${RED}Error: Service '$service_name' not found${NC}" >&2
+        return 1
+    fi
+
+    local provider=$(echo "$service_info" | jq -r '.provider')
+
+    if [ "$provider" = "pm2" ]; then
+        # pm2 jlist -> JSON array with .name and .pm2_env.status
+        if pm2 jlist | jq -e ".[] | select(.name==\"$service_name\" and .pm2_env.status==\"online\")" >/dev/null; then
+            return 0
+        else
+            return 1
+        fi
+    elif [ "$provider" = "systemd" ]; then
+        # Check user service first, then system
+        if systemctl --user is-active --quiet "$service_name.service" 2>/dev/null; then
+            return 0
+        elif systemctl is-active --quiet "$service_name.service" 2>/dev/null; then
+            return 0
+        else
+            return 1
+        fi
+    else
+        return 1
+    fi
+}
+
+function service_send_command() {
+    local service_name="$1"; shift || true
+    local cmd_str="$*"
+    if [ -z "$service_name" ] || [ -z "$cmd_str" ]; then
+        echo -e "${RED}Error: send requires <service-name> and <command>${NC}" >&2
+        return 1
+    fi
+
+    local service_info=$(get_service_info "$service_name")
+    if [ -z "$service_info" ]; then
+        echo -e "${RED}Error: Service '$service_name' not found${NC}" >&2
+        return 1
+    fi
+
+    local provider=$(echo "$service_info" | jq -r '.provider')
+    local config_file="$CONFIG_DIR/$service_name.conf"
+
+    if [ ! -f "$config_file" ]; then
+        echo -e "${RED}Error: Service configuration file not found: $config_file${NC}" >&2
+        return 1
+    fi
+
+    # Load run-engine config path
+    # shellcheck source=/dev/null
+    source "$config_file"
+    if [ -z "${RUN_ENGINE_CONFIG_FILE:-}" ] || [ ! -f "$RUN_ENGINE_CONFIG_FILE" ]; then
+        echo -e "${RED}Error: Run-engine configuration file not found for $service_name${NC}" >&2
+        return 1
+    fi
+
+    # shellcheck source=/dev/null
+    if ! source "$RUN_ENGINE_CONFIG_FILE"; then
+        echo -e "${RED}Error: Failed to source run-engine configuration file: $RUN_ENGINE_CONFIG_FILE${NC}" >&2
+        return 1
+    fi
+
+    local session_manager="${SESSION_MANAGER:-auto}"
+    local session_name="${SESSION_NAME:-$service_name}"
+
+    if [ "$provider" = "pm2" ]; then
+        # Use pm2 send (requires pm2 >= 5)
+        local pm2_id_json
+        pm2_id_json=$(pm2 id "$service_name" 2>/dev/null || true)
+        local numeric_id
+        numeric_id=$(echo "$pm2_id_json" | jq -r '.[0] // empty')
+        if [ -z "$numeric_id" ]; then
+            echo -e "${RED}Error: PM2 process '$service_name' not found${NC}" >&2
+            return 1
+        fi
+        echo -e "${YELLOW}Sending to PM2 process $service_name (ID: $numeric_id): $cmd_str${NC}"
+        pm2 send "$numeric_id" "$cmd_str" ENTER
+        return $?
+    fi
+
+    # systemd provider: need a session manager to interact with the console
+    case "$session_manager" in
+        tmux|auto)
+            if command -v tmux >/dev/null 2>&1 && tmux has-session -t "$session_name" 2>/dev/null; then
+                echo -e "${YELLOW}Sending to tmux session $session_name: $cmd_str${NC}"
+                tmux send-keys -t "$session_name" "$cmd_str" C-m
+                return $?
+            elif [ "$session_manager" = "tmux" ]; then
+                echo -e "${RED}Error: tmux session '$session_name' not available${NC}" >&2
+                return 1
+            fi
+            ;;&
+        screen|auto)
+            if command -v screen >/dev/null 2>&1; then
+                echo -e "${YELLOW}Sending to screen session $session_name: $cmd_str${NC}"
+                screen -S "$session_name" -X stuff "$cmd_str\n"
+                return $?
+            elif [ "$session_manager" = "screen" ]; then
+                echo -e "${RED}Error: screen not installed${NC}" >&2
+                return 1
+            fi
+            ;;
+        none|*)
+            echo -e "${RED}Error: No session manager configured (SESSION_MANAGER=$session_manager). Cannot send command.${NC}" >&2
+            return 1
+            ;;
+    esac
+
+    echo -e "${RED}Error: Unable to find usable session (tmux/screen) to send command.${NC}" >&2
+    return 1
+}
+
+function show_config() {
+    local service_name="$1"
+    if [ -z "$service_name" ]; then
+        echo -e "${RED}Error: Service name required for show-config${NC}"
+        return 1
+    fi
+
+    local service_info=$(get_service_info "$service_name")
+    if [ -z "$service_info" ]; then
+        echo -e "${RED}Error: Service '$service_name' not found${NC}"
+        return 1
+    fi
+
+    local provider=$(echo "$service_info" | jq -r '.provider')
+    local cfg_file="$CONFIG_DIR/$service_name.conf"
+    echo -e "${BLUE}Service: $service_name${NC}"
+    echo "Provider: $provider"
+    echo "Config file: $cfg_file"
+    if [ -f "$cfg_file" ]; then
+        # shellcheck source=/dev/null
+        source "$cfg_file"
+        echo "RUN_ENGINE_CONFIG_FILE: ${RUN_ENGINE_CONFIG_FILE:-<none>}"
+        if [ -n "${RUN_ENGINE_CONFIG_FILE:-}" ] && [ -f "$RUN_ENGINE_CONFIG_FILE" ]; then
+            # shellcheck source=/dev/null
+            source "$RUN_ENGINE_CONFIG_FILE"
+            echo "Session manager: ${SESSION_MANAGER:-}"
+            echo "Session name: ${SESSION_NAME:-}"
+            echo "BINPATH: ${BINPATH:-}"
+            echo "SERVERBIN: ${SERVERBIN:-}"
+            echo "CONFIG: ${CONFIG:-}"
+            echo "RESTART_POLICY: ${RESTART_POLICY:-}"
+        fi
+    else
+        echo "Config file not found"
+    fi
+}
+
+# Return uptime in seconds for a service (echo integer), non-zero exit if not running
+function service_uptime_seconds() {
+    local service_name="$1"
+    local service_info=$(get_service_info "$service_name")
+    if [ -z "$service_info" ]; then
+        echo -e "${RED}Error: Service '$service_name' not found${NC}" >&2
+        return 1
+    fi
+
+    local provider=$(echo "$service_info" | jq -r '.provider')
+
+    if [ "$provider" = "pm2" ]; then
+        check_pm2 || return 1
+        local info_json
+        info_json=$(pm2 jlist 2>/dev/null)
+        local pm_uptime_ms
+        pm_uptime_ms=$(echo "$info_json" | jq -r ".[] | select(.name==\"$service_name\").pm2_env.pm_uptime // empty")
+        local status
+        status=$(echo "$info_json" | jq -r ".[] | select(.name==\"$service_name\").pm2_env.status // empty")
+        if [ -z "$pm_uptime_ms" ] || [ "$status" != "online" ]; then
+            return 1
+        fi
+        # Current time in ms (fallback to seconds*1000 if %N unsupported)
+        local now_ms
+        if date +%s%N >/dev/null 2>&1; then
+            now_ms=$(( $(date +%s%N) / 1000000 ))
+        else
+            now_ms=$(( $(date +%s) * 1000 ))
+        fi
+        local diff_ms=$(( now_ms - pm_uptime_ms ))
+        [ "$diff_ms" -lt 0 ] && diff_ms=0
+        echo $(( diff_ms / 1000 ))
+        return 0
+    elif [ "$provider" = "systemd" ]; then
+        check_systemd || return 1
+        local systemd_type="--user"
+        [ -f "/etc/systemd/system/$service_name.service" ] && systemd_type="--system"
+
+        # Get ActiveEnterTimestampMonotonic in usec and ActiveState
+        local prop
+        if [ "$systemd_type" = "--system" ]; then
+            prop=$(systemctl show "$service_name.service" --property=ActiveEnterTimestampMonotonic,ActiveState 2>/dev/null)
+        else
+            prop=$(systemctl --user show "$service_name.service" --property=ActiveEnterTimestampMonotonic,ActiveState 2>/dev/null)
+        fi
+        local state
+        state=$(echo "$prop" | awk -F= '/^ActiveState=/{print $2}')
+        [ "$state" != "active" ] && return 1
+        local enter_us
+        enter_us=$(echo "$prop" | awk -F= '/^ActiveEnterTimestampMonotonic=/{print $2}')
+        # Current monotonic time in seconds since boot
+        local now_s
+        now_s=$(cut -d' ' -f1 /proc/uptime)
+        # Compute uptime = now_monotonic - enter_monotonic
+        # enter_us may be empty on some systems; fallback to 0
+        enter_us=${enter_us:-0}
+        # Convert now_s to microseconds using awk for precision, then compute diff
+        local diff_s
+        diff_s=$(awk -v now="$now_s" -v enter="$enter_us" 'BEGIN{printf "%d", (now*1000000 - enter)/1000000}')
+        [ "$diff_s" -lt 0 ] && diff_s=0
+        echo "$diff_s"
+        return 0
+    fi
+
+    return 1
+}
+
+# Wait until service has at least <min_seconds> uptime. Optional timeout seconds (default 120)
+function wait_service_uptime() {
+    local service_name="$1"
+    local min_seconds="$2"
+    local timeout="${3:-120}"
+    local waited=0
+
+    while [ "$waited" -le "$timeout" ]; do
+        if secs=$(service_uptime_seconds "$service_name" 2>/dev/null); then
+            if [ "$secs" -ge "$min_seconds" ]; then
+                echo -e "${GREEN}Service '$service_name' has reached ${secs}s uptime (required: ${min_seconds}s)${NC}"
+                return 0
+            fi
+        fi
+        sleep 1
+        waited=$((waited + 1))
+    done
+    echo -e "${RED}Timeout: $service_name did not reach ${min_seconds}s uptime within ${timeout}s${NC}" >&2
+    return 1
+}
+
 function attach_pm2_process() {
     local service_name="$1"
     
@@ -1629,7 +1881,7 @@ case "${1:-help}" in
         delete_service "$2"
         ;;
     list)
-        list_services "$2"
+        list_services "${2:-}"
         ;;
     restore)
         restore_missing_services
@@ -1669,6 +1921,52 @@ case "${1:-help}" in
             exit 1
         fi
         attach_to_service "$2"
+        ;;
+    uptime-seconds)
+        if [ $# -lt 2 ]; then
+            echo -e "${RED}Error: Service name required for uptime-seconds command${NC}"
+            print_help
+            exit 1
+        fi
+        service_uptime_seconds "$2"
+        ;;
+    wait-uptime)
+        if [ $# -lt 3 ]; then
+            echo -e "${RED}Error: Usage: $0 wait-uptime <service-name> <min-seconds> [timeout]${NC}"
+            print_help
+            exit 1
+        fi
+        wait_service_uptime "$2" "$3" "${4:-120}"
+        ;;
+    is-running)
+        if [ $# -lt 2 ]; then
+            echo -e "${RED}Error: Service name required for is-running command${NC}"
+            print_help
+            exit 1
+        fi
+        if service_is_running "$2"; then
+            echo -e "${GREEN}Service '$2' is running${NC}"
+            exit 0
+        else
+            echo -e "${YELLOW}Service '$2' is not running${NC}"
+            exit 1
+        fi
+        ;;
+    send)
+        if [ $# -lt 3 ]; then
+            echo -e "${RED}Error: Not enough arguments for send command${NC}"
+            print_help
+            exit 1
+        fi
+        service_send_command "$2" "${@:3}"
+        ;;
+    show-config)
+        if [ $# -lt 2 ]; then
+            echo -e "${RED}Error: Service name required for show-config command${NC}"
+            print_help
+            exit 1
+        fi
+        show_config "$2"
         ;;
     help|--help|-h)
         print_help
