@@ -454,14 +454,27 @@ private:
     std::unordered_set<uint32> _uniqueTimedEvents;
 };
 
+enum HealthCheckStatus
+{
+    HEALTH_CHECK_PROCESSED,
+    HEALTH_CHECK_SCHEDULED,
+    HEALTH_CHECK_PENDING
+};
+
 struct HealthCheckEventData
 {
-    HealthCheckEventData(uint8 healthPct, std::function<void()> exec, bool valid = true, bool allowedWhileCasting = true) : _healthPct(healthPct), _exec(exec), _valid(valid), _allowedWhileCasting(allowedWhileCasting) { };
+    HealthCheckEventData(uint8 healthPct, std::function<void()> exec, uint8 status = HEALTH_CHECK_SCHEDULED, bool allowedWhileCasting = true, Milliseconds Delay = 0s) : _healthPct(healthPct), _exec(exec), _status(status), _allowedWhileCasting(allowedWhileCasting), _delay(Delay) { };
 
     uint8 _healthPct;
     std::function<void()> _exec;
-    bool _valid;
+    uint8 _status;
     bool _allowedWhileCasting;
+    Milliseconds _delay;
+
+    [[nodiscard]] bool HasBeenProcessed() const { return _status == HEALTH_CHECK_PROCESSED; };
+    [[nodiscard]] bool IsPending() const { return _status == HEALTH_CHECK_PENDING; };
+    [[nodiscard]] Milliseconds GetDelay() const { return _delay; };
+    void UpdateStatus(uint8 status) { _status = status; };
 };
 
 class BossAI : public ScriptedAI
@@ -476,6 +489,7 @@ public:
 
     bool CanRespawn() override;
 
+    void OnSpellCastFinished(SpellInfo const* spell, SpellFinishReason reason) override;
     void DamageTaken(Unit* attacker, uint32& damage, DamageEffectType damagetype, SpellSchoolMask damageSchoolMask) override;
     void JustSummoned(Creature* summon) override;
     void SummonedCreatureDespawn(Creature* summon) override;
@@ -485,6 +499,7 @@ public:
 
     void ScheduleHealthCheckEvent(uint32 healthPct, std::function<void()> exec, bool allowedWhileCasting = true);
     void ScheduleHealthCheckEvent(std::initializer_list<uint8> healthPct, std::function<void()> exec, bool allowedWhileCasting = true);
+    void ProcessHealthCheck();
 
     // @brief Casts the spell after the fixed time and says the text id if provided. Timer will run even if the creature is casting or out of combat.
     // @param spellId The spell to cast.
