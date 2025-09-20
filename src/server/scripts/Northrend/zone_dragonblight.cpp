@@ -2033,12 +2033,8 @@ enum StrengthenAncientsMisc
 {
     SAY_WALKER_FRIENDLY         = 0,
     SAY_WALKER_ENEMY            = 1,
-    SAY_LOTHALOR                = 0,
 
     SPELL_CREATE_ITEM_BARK      = 47550,
-    SPELL_CONFUSED              = 47044,
-
-    NPC_LOTHALOR                = 26321
 };
 
 class spell_q12096_q12092_dummy : public SpellScript
