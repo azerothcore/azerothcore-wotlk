@@ -193,7 +193,8 @@ public:
             { "skirmish",          HandleSkirmishCommand,          SEC_ADMINISTRATOR,      Console::No  },
             { "mailbox",           HandleMailBoxCommand,           SEC_MODERATOR,          Console::No  },
             { "string",            HandleStringCommand,            SEC_GAMEMASTER,         Console::No  },
-            { "opendoor",          HandleOpenDoorCommand,          SEC_GAMEMASTER,         Console::No  }
+            { "opendoor",          HandleOpenDoorCommand,          SEC_GAMEMASTER,         Console::No  },
+            { "bm",                HandleBMCommand,                SEC_GAMEMASTER,         Console::No  }
         };
 
         return commandTable;
@@ -3075,6 +3076,50 @@ public:
         handler->SendErrorMessage(LANG_CMD_NO_DOOR_FOUND, range ? *range : 5.0f);
         return false;
     }
+
+    static bool HandleBMCommand(ChatHandler* handler, Optional<bool> enableArg)
+    {
+        WorldSession* session = handler->GetSession();
+
+        if (!session)
+        {
+            return false;
+        }
+
+        auto SetBMMod = [&](bool enable)
+        {
+            char const* enabled = "ON";
+            char const* disabled = "OFF";
+            handler->SendNotification(LANG_COMMAND_BEASTMASTER_MODE, enable ? enabled : disabled);
+
+            session->GetPlayer()->SetBeastMaster(enable);
+        };
+
+        if (!enableArg)
+        {
+            if (!AccountMgr::IsPlayerAccount(session->GetSecurity()) && session->GetPlayer()->IsDeveloper())
+                SetBMMod(true);
+            else
+                SetBMMod(false);
+
+            return true;
+        }
+
+        if (*enableArg)
+        {
+            SetBMMod(true);
+            return true;
+        }
+        else
+        {
+            SetBMMod(false);
+            return true;
+        }
+
+        handler->SendErrorMessage(LANG_USE_BOL);
+        return false;
+    }
+
 };
 
 void AddSC_misc_commandscript()
