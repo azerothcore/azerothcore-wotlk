@@ -2261,6 +2261,41 @@ class spell_handover_reins : public SpellScript
     }
 };
 
+enum FlameFurySpells
+{
+    SPELL_FLAME_FURY_1 = 50351,
+    SPELL_FLAME_FURY_2 = 50353,
+    SPELL_FLAME_FURY_3 = 50354,
+    SPELL_FLAME_FURY_4 = 50355,
+    SPELL_FLAME_FURY_5 = 50357
+};
+
+// 50348 - Flame Fury
+class spell_dragonblight_flame_fury : public AuraScript
+{
+    PrepareAuraScript(spell_dragonblight_flame_fury);
+
+    bool Validate(SpellInfo const* /*spellInfo*/) override
+    {
+        return ValidateSpellInfo(spellIds);
+    }
+
+    void OnRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
+    {
+        if (Unit* owner = GetUnitOwner())
+            if (GetTargetApplication()->GetRemoveMode() == AURA_REMOVE_BY_EXPIRE && !owner->IsAlive())
+                owner->CastSpell(owner, Acore::Containers::SelectRandomContainerElement(spellIds), true);
+    }
+
+private:
+    std::array<uint32, 5> const spellIds = { SPELL_FLAME_FURY_1, SPELL_FLAME_FURY_2, SPELL_FLAME_FURY_3, SPELL_FLAME_FURY_4, SPELL_FLAME_FURY_5 };
+
+    void Register() override
+    {
+        OnEffectRemove += AuraEffectRemoveFn(spell_dragonblight_flame_fury::OnRemove, EFFECT_0, SPELL_AURA_PERIODIC_DAMAGE, AURA_EFFECT_HANDLE_REAL);
+    }
+};
+
 void AddSC_dragonblight()
 {
     new npc_conversing_with_the_depths_trigger();
@@ -2289,4 +2324,5 @@ void AddSC_dragonblight()
     new npc_torturer_lecraft();
     RegisterSpellScript(spell_dragonblight_corrosive_spit);
     RegisterSpellScript(spell_handover_reins);
+    RegisterSpellScript(spell_dragonblight_flame_fury);
 }
