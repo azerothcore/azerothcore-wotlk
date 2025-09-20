@@ -103,7 +103,8 @@ public:
         {
             if (type == DATA_START_ENCOUNTER)
             {
-                Start(true, true, playerGUID);
+                me->SetWalk(false);
+                Start(true, playerGUID);
                 SetEscortPaused(true);
                 started = true;
 
@@ -605,7 +606,8 @@ public:
             creature->SetFaction(FACTION_ESCORTEE_N_NEUTRAL_PASSIVE);
             creature->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
             creature->AI()->Talk(SAY_BESSY_0);
-            CAST_AI(npc_escortAI, (creature->AI()))->Start(true, false, player->GetGUID());
+            creature->SetWalk(false);
+            CAST_AI(npc_escortAI, (creature->AI()))->Start(false, player->GetGUID());
         }
         return true;
     }
@@ -771,7 +773,7 @@ public:
             if (npc_maxx_a_million_escortAI* pEscortAI = CAST_AI(npc_maxx_a_million_escort::npc_maxx_a_million_escortAI, creature->AI()))
             {
                 creature->SetFaction(FACTION_ESCORTEE_N_NEUTRAL_PASSIVE);
-                pEscortAI->Start(false, false, player->GetGUID());
+                pEscortAI->Start(false, player->GetGUID());
             }
         }
         return true;

@@ -607,7 +607,7 @@ public:
                     break;
             }
 
-            Start(false, true);
+            Start(true);
             uiWaypoint = uiType;
         }
 

@@ -934,7 +934,8 @@ public:
                 case EVENT_START_PATHING:
                     me->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
                     me->SetImmuneToAll(false);
-                    Start(true, true);
+                    me->SetWalk(false);
+                    Start(true);
                     break;
                 case EVENT_SCOURGE_STRIKE:
                     DoCastVictim(SPELL_SCOURGE_STRIKE);

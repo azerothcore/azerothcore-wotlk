@@ -289,7 +289,8 @@ public:
                     case EVENT_START_ESCORT:
                         if (Player* player = ObjectAccessor::GetPlayer(*me, _player))
                         {
-                            npc_escortAI::Start(true, false, player->GetGUID());
+                            me->SetWalk(false);
+                            npc_escortAI::Start(false, player->GetGUID());
                         }
                         _events.ScheduleEvent(EVENT_STAND, 2s);
                         break;

@@ -25,10 +25,10 @@ template<class T>
 class PointMovementGenerator : public MovementGeneratorMedium< T, PointMovementGenerator<T> >
 {
 public:
-    PointMovementGenerator(uint32 _id, float _x, float _y, float _z, float _speed = 0.0f, float orientation = 0.0f, const Movement::PointsArray* _path = nullptr,
+    PointMovementGenerator(uint32 _id, float _x, float _y, float _z, ForcedMovement forcedMovement, float _speed = 0.0f, float orientation = 0.0f, const Movement::PointsArray* _path = nullptr,
         bool generatePath = false, bool forceDestination = false, ObjectGuid chargeTargetGUID = ObjectGuid::Empty)
         : id(_id), i_x(_x), i_y(_y), i_z(_z), speed(_speed), i_orientation(orientation), _generatePath(generatePath), _forceDestination(forceDestination),
-        _chargeTargetGUID(chargeTargetGUID)
+        _chargeTargetGUID(chargeTargetGUID), _forcedMovement(forcedMovement)
     {
         if (_path)
             m_precomputedPath = *_path;
@@ -56,13 +56,14 @@ private:
     bool _generatePath;
     bool _forceDestination;
     ObjectGuid _chargeTargetGUID;
+    ForcedMovement _forcedMovement;
 };
 
 class AssistanceMovementGenerator : public PointMovementGenerator<Creature>
 {
 public:
     AssistanceMovementGenerator(float _x, float _y, float _z) :
-        PointMovementGenerator<Creature>(0, _x, _y, _z) {}
+        PointMovementGenerator<Creature>(0, _x, _y, _z, FORCED_MOVEMENT_NONE) {}
 
     MovementGeneratorType GetMovementGeneratorType() { return ASSISTANCE_MOTION_TYPE; }
     void Finalize(Unit*);

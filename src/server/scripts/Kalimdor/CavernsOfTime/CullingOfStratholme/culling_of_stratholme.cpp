@@ -690,7 +690,8 @@ public:
                         break;
                     case EVENT_ACTION_PHASE1+1:
                         // Start Event
-                        Start(true, false);
+                        me->SetWalk(false);
+                        Start(false);
                         SetDespawnAtEnd(false);
                         SetDespawnAtFar(false);
 
@@ -1242,7 +1243,8 @@ void npc_arthas::npc_arthasAI::JustEngagedWith(Unit* /*who*/)
 
 void npc_arthas::npc_arthasAI::ReorderInstance(uint32 data)
 {
-    Start(true, true);
+    me->SetWalk(false);
+    Start(true);
     SetEscortPaused(true);
     SetDespawnAtEnd(false);
 

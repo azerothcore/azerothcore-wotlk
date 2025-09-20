@@ -934,7 +934,7 @@ public:
         {
             InitWaypoint();
             Reset();
-            Start(false, true);
+            Start(true);
         }
 
         uint32 Timer;
@@ -1020,7 +1020,7 @@ public:
         {
             InitWaypoint();
             Reset();
-            Start(false, true);
+            Start(true);
             SetDespawnAtEnd(false);
         }
 

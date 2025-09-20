@@ -1090,7 +1090,7 @@ public:
         {
             summons.DespawnAll();
             _spellTimer = 0;
-            Start(false, false, ObjectGuid::Empty, nullptr, false, true);
+            Start(false, ObjectGuid::Empty, nullptr, false, true);
             if (Aura* aur = me->AddAura(SPELL_FREYA_DUMMY_YELLOW, me))
             {
                 aur->SetMaxDuration(-1);

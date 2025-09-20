@@ -718,7 +718,7 @@ public:
                 Talk(0);
                 events.Reset();
                 summons.DespawnAll();
-                Start(false, false);
+                Start(false);
 
                 int8 i = -1;
                 std::list<Creature*> cList;

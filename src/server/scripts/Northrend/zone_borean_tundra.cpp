@@ -463,8 +463,9 @@ public:
             if (GameObject* go = creature->FindNearestGameObject(GO_CAGE, 5.0f))
                 go->UseDoorOrButton();
 
+            creature->SetWalk(false);
             if (npc_escortAI* pEscortAI = CAST_AI(npc_lurgglbr::npc_lurgglbrAI, creature->AI()))
-                pEscortAI->Start(true, false, player->GetGUID());
+                pEscortAI->Start(false, player->GetGUID());
 
             creature->SetFaction(player->GetTeamId() == TEAM_ALLIANCE ? FACTION_ESCORTEE_A_PASSIVE : FACTION_ESCORTEE_H_PASSIVE);
             return true;
@@ -914,7 +915,8 @@ public:
             creature->SetFaction(player->GetTeamId() == TEAM_ALLIANCE ? FACTION_ESCORTEE_A_PASSIVE : FACTION_ESCORTEE_H_PASSIVE);
             creature->SetStandState(UNIT_STAND_STATE_STAND);
             creature->AI()->Talk(SAY_1, player);
-            CAST_AI(npc_escortAI, (creature->AI()))->Start(true, false, player->GetGUID());
+            creature->SetWalk(false);
+            CAST_AI(npc_escortAI, (creature->AI()))->Start(false, player->GetGUID());
         }
         return true;
     }
@@ -995,7 +997,8 @@ public:
         {
             creature->SetStandState(UNIT_STAND_STATE_STAND);
             creature->AI()->Talk(SAY_BONKER_2, player);
-            CAST_AI(npc_escortAI, (creature->AI()))->Start(true, true, player->GetGUID());
+            creature->SetWalk(false);
+            CAST_AI(npc_escortAI, (creature->AI()))->Start(true, player->GetGUID());
         }
         return true;
     }

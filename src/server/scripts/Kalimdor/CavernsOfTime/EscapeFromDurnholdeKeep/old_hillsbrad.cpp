@@ -566,7 +566,8 @@ public:
                     me->SummonCreature(NPC_DURNHOLDE_MAGE, 2108.4856f, 189.93457f, 66.30494f, 2.6878f, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 30 * IN_MILLISECONDS);
                     break;
                 case EVENT_START_WP:
-                    Start(true, true);
+                    me->SetWalk(false);
+                    Start(true);
                     SetDespawnAtEnd(false);
                     break;
                 case EVENT_SET_FACING:
@@ -922,7 +923,8 @@ public:
 
         void ReorderInstance(uint32 data)
         {
-            Start(true, true);
+            me->SetWalk(false);
+            Start(true);
             SetEscortPaused(true);
             SetDespawnAtEnd(false);
 
@@ -1008,7 +1010,7 @@ public:
         {
             me->SetStandState(UNIT_STAND_STATE_STAND);
             me->RemoveAllAuras();
-            Start(false, true);
+            Start(true);
         }
 
         void WaypointReached(uint32 waypointId) override
