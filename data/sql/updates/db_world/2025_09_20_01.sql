@@ -1,3 +1,4 @@
+-- DB update 2025_09_20_00 -> 2025_09_20_01
 -- Update gossip option 0 to show after completing quest The Frostborn King 12873
 UPDATE `conditions` SET `ConditionTypeOrReference` = 8, `ConditionValue1` = 12873, `Comment` = 'Show frostborn test gossip only after completing quest The Frostborn King 12873' WHERE `SourceTypeOrReferenceId` = 15 AND `SourceGroup` = 9891 AND `SourceEntry` = 0 AND `ConditionValue1` = 12874;
 
