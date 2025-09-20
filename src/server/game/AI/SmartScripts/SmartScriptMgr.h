@@ -1216,7 +1216,14 @@ struct SmartAction
             uint32 controlled;
             uint32 ContactDistance;
             uint32 combatReach;
+            SAIBool disableForceDestination;
         } moveToPos;
+
+        struct
+        {
+            uint32 pointId;
+            SAIBool disableForceDestination;
+        } moveToPosTarget;
 
         struct
         {
