@@ -1854,8 +1854,8 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
                         if (TransportBase* trans = me->GetDirectTransport())
                             trans->CalculatePassengerPosition(dest.x, dest.y, dest.z);
 
-                    me->GetMotionMaster()->MovePoint(e.action.moveToPos.pointId, dest.x, dest.y, dest.z, true, isForced,
-                        isControlled ? MOTION_SLOT_CONTROLLED : MOTION_SLOT_ACTIVE, e.target.o);
+                    me->GetMotionMaster()->MovePoint(e.action.moveToPos.pointId, dest.x, dest.y, dest.z, FORCED_MOVEMENT_NONE,
+                        0.f, e.target.o, true, isForced, isControlled ? MOTION_SLOT_CONTROLLED : MOTION_SLOT_ACTIVE);
 
                     break;
                 }
@@ -1871,9 +1871,8 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
                             randomPoint.m_positionX,
                             randomPoint.m_positionY,
                             randomPoint.m_positionZ,
-                            true,
-                            isForced,
-                            isControlled ? MOTION_SLOT_CONTROLLED : MOTION_SLOT_ACTIVE
+                            FORCED_MOVEMENT_NONE,
+                            0.f, 0.f, true, isForced, isControlled ? MOTION_SLOT_CONTROLLED : MOTION_SLOT_ACTIVE
                         );
 
                     }
@@ -1897,7 +1896,8 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
                     else if (e.action.moveToPos.ContactDistance)
                         target->GetNearPoint(me, x, y, z, e.action.moveToPos.ContactDistance, 0, target->GetAngle(me));
 
-                    me->GetMotionMaster()->MovePoint(e.action.moveToPos.pointId, x + e.target.x, y + e.target.y, z + e.target.z, true, isForced, isControlled ? MOTION_SLOT_CONTROLLED : MOTION_SLOT_ACTIVE);
+                    me->GetMotionMaster()->MovePoint(e.action.moveToPos.pointId, x + e.target.x, y + e.target.y, z + e.target.z, FORCED_MOVEMENT_NONE,
+                        0.f, 0.f, true, isForced, isControlled ? MOTION_SLOT_CONTROLLED : MOTION_SLOT_ACTIVE);
 
                     break;
                 }
@@ -1914,7 +1914,8 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
                     SAIBool isForced = !e.action.moveToPosTarget.disableForceDestination;
 
                     Creature* ctarget = target->ToCreature();
-                    ctarget->GetMotionMaster()->MovePoint(e.action.moveToPosTarget.pointId, e.target.x, e.target.y, e.target.z, true, isForced, isControlled ? MOTION_SLOT_CONTROLLED : MOTION_SLOT_ACTIVE);
+                    ctarget->GetMotionMaster()->MovePoint(e.action.moveToPosTarget.pointId, e.target.x, e.target.y, e.target.z, FORCED_MOVEMENT_NONE,
+                        0.f, 0.f, true, isForced, isControlled ? MOTION_SLOT_CONTROLLED : MOTION_SLOT_ACTIVE);
                 }
             }
 

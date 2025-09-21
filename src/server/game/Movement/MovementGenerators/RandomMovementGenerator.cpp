@@ -51,7 +51,21 @@ void RandomMovementGenerator<Creature>::_setRandomLocation(Creature* creature)
         creature->AddUnitState(UNIT_STATE_ROAMING_MOVE);
         Movement::MoveSplineInit init(creature);
         init.MoveTo(_currDestPosition.GetPositionX(), _currDestPosition.GetPositionY(), _currDestPosition.GetPositionZ());
-        init.SetWalk(true);
+
+        bool walk = true;
+        switch (creature->GetMovementTemplate().GetRandom())
+        {
+            case CreatureRandomMovementType::CanRun:
+                walk = creature->IsWalking();
+                break;
+            case CreatureRandomMovementType::AlwaysRun:
+                walk = false;
+                break;
+            default:
+                break;
+        }
+
+        init.SetWalk(walk);
         init.Launch();
         if (creature->GetFormation() && creature->GetFormation()->GetLeader() == creature)
             creature->GetFormation()->LeaderMoveTo(_currDestPosition.GetPositionX(), _currDestPosition.GetPositionY(), _currDestPosition.GetPositionZ(), 0);
