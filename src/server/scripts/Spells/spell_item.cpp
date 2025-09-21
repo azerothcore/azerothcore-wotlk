@@ -3169,25 +3169,26 @@ class spell_item_brewfest_mount_transformation : public SpellScript
         Player* caster = GetCaster()->ToPlayer();
 
         if (!caster)
-        {
             return;
-        }
 
         if (caster->HasMountedAura())
         {
+            float speed = caster->GetSpeedRate(MOVE_RUN);
+
             caster->RemoveAurasByType(SPELL_AURA_MOUNTED);
+
             uint32 spell_id;
 
             switch (GetSpellInfo()->Id)
             {
             case SPELL_BREWFEST_MOUNT_TRANSFORM:
-                if (caster->GetSpeedRate(MOVE_RUN) >= 2.0f)
+                if (speed >= 2.0f)
                     spell_id = caster->GetTeamId() == TEAM_ALLIANCE ? SPELL_MOUNT_RAM_100 : SPELL_MOUNT_KODO_100;
                 else
                     spell_id = caster->GetTeamId() == TEAM_ALLIANCE ? SPELL_MOUNT_RAM_60 : SPELL_MOUNT_KODO_60;
                 break;
             case SPELL_BREWFEST_MOUNT_TRANSFORM_REVERSE:
-                if (caster->GetSpeedRate(MOVE_RUN) >= 2.0f)
+                if (speed >= 2.0f)
                     spell_id = caster->GetTeamId() == TEAM_HORDE ? SPELL_MOUNT_RAM_100 : SPELL_MOUNT_KODO_100;
                 else
                     spell_id = caster->GetTeamId() == TEAM_HORDE ? SPELL_MOUNT_RAM_60 : SPELL_MOUNT_KODO_60;
