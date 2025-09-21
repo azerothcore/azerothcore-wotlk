@@ -352,6 +352,7 @@ void MotionMaster::MoveBackwards(Unit* target, float dist)
 
     Movement::MoveSplineInit init(_owner);
     init.MoveTo(point.x, point.y, point.z, false);
+    init.SetWalk(true);
     init.SetFacing(target);
     init.SetOrientationInversed();
     init.Launch();
