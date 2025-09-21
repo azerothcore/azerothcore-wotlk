@@ -3580,9 +3580,6 @@ void ObjectMgr::LoadItemTemplates()
         }
     }
 
-    for (ItemTemplateContainer::iterator itr = _itemTemplateStore.begin(); itr != _itemTemplateStore.end(); ++itr)
-        itr->second.InitializeQueryData();
-
     // Check if item templates for DBC referenced character start outfit are present
     std::set<uint32> notFoundOutfit;
     for (uint32 i = 1; i < sCharStartOutfitStore.GetNumRows(); ++i)
