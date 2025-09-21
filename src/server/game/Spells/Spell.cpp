@@ -5400,15 +5400,16 @@ void Spell::TakeAmmo()
                 // decrease durability for non-stackable throw weapon
                 m_caster->ToPlayer()->DurabilityPointLossForEquipSlot(EQUIPMENT_SLOT_RANGED);
             }
-            else
+            else if (!sWorld->getBoolConfig(CONFIG_ENABLE_INFINITEAMMO))
             {
                 // decrease items amount for stackable throw weapon
-                uint32 count = (sWorld->getBoolConfig(CONFIG_ENABLE_INFINITEAMMO) ? 0 : 1);
+                uint32 count = 1;
                 m_caster->ToPlayer()->DestroyItemCount(pItem, count, true);
             }
         }
-        else if (uint32 ammo = m_caster->ToPlayer()->GetUInt32Value(PLAYER_AMMO_ID))
-            m_caster->ToPlayer()->DestroyItemCount(ammo, sWorld->getBoolConfig(CONFIG_ENABLE_INFINITEAMMO) ? 0 : 1, true);
+        else if (!sWorld->getBoolConfig(CONFIG_ENABLE_INFINITEAMMO))
+            if (uint32 ammo = m_caster->ToPlayer()->GetUInt32Value(PLAYER_AMMO_ID))
+                m_caster->ToPlayer()->DestroyItemCount(ammo, 1, true);
     }
 }
 
