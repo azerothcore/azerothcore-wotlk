@@ -448,31 +448,40 @@ void TransportMgr::SpawnContinentTransports()
         LOG_INFO("server.loading", ">> Spawned {} continent motion transports in {} ms", count, GetMSTimeDiffToNow(oldMSTime));
     }
 
+    // Preloads Deeprun Tram to fix issues with Subway carts syncronization
+    PreloadGridsFromQuery("SELECT map, position_x, position_y FROM gameobject g JOIN gameobject_template t ON g.id = t.entry WHERE t.type = 11 AND g.map = 369", count);
+
     if (sWorld->getBoolConfig(CONFIG_ENABLE_CONTINENT_TRANSPORT_PRELOADING))
     {
         // pussywizard: preload grids for continent static transports
-        QueryResult result2 = WorldDatabase.Query("SELECT map, position_x, position_y FROM gameobject g JOIN gameobject_template t ON g.id = t.entry WHERE t.type = 11");
+        PreloadGridsFromQuery("SELECT map, position_x, position_y FROM gameobject g JOIN gameobject_template t ON g.id = t.entry WHERE t.type = 11 AND g.map != 369", count);
+        LOG_INFO("server.loading", ">> Preloaded grids for {} continent static transports in {} ms", count, GetMSTimeDiffToNow(oldMSTime));
+    }
+}
 
-        if (result2)
+void TransportMgr::PreloadGridsFromQuery(std::string const& query, uint32& count)
+{
+    if (QueryResult result = WorldDatabase.Query(query))
+    {
+        do
         {
-            do
-            {
-                Field* fields = result2->Fetch();
-                uint16 mapId = fields[0].Get<uint16>();
-                float x = fields[1].Get<float>();
-                float y = fields[2].Get<float>();
+            Field* fields = result->Fetch();
+            uint16 mapId = fields[0].Get<uint16>();
+            float x = fields[1].Get<float>();
+            float y = fields[2].Get<float>();
 
-                MapEntry const* mapEntry = sMapStore.LookupEntry(mapId);
-                if (mapEntry && !mapEntry->Instanceable())
+            if (MapEntry const* mapEntry = sMapStore.LookupEntry(mapId))
+            {
+                if (!mapEntry->Instanceable())
+                {
                     if (Map* map = sMapMgr->CreateBaseMap(mapId))
                     {
                         map->LoadGrid(x, y);
                         ++count;
                     }
-            } while (result2->NextRow());
-        }
-
-        LOG_INFO("server.loading", ">> Preloaded grids for {} continent static transports in {} ms", count, GetMSTimeDiffToNow(oldMSTime));
+                }
+            }
+        } while (result->NextRow());
     }
 }
 
