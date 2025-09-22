@@ -990,8 +990,7 @@ bool Player::SatisfyQuestLog(bool msg)
 
     if (msg)
     {
-        WorldPackets::Quest::QuestLogFull questLogFull;
-        GetSession()->SendPacket(questLogFull.Write());
+        GetSession()->SendPacket(WorldPackets::Quest::QuestLogFull().Write());
         LOG_DEBUG("network", "WORLD: Sent SMSG_QUESTLOG_FULL");
     }
     return false;
@@ -2443,8 +2442,7 @@ void Player::SendPushToPartyResponse(Player const* player, QuestShareMessages ms
 
 void Player::SendQuestUpdateAddItem(Quest const* /*quest*/, uint32 /*item_idx*/, uint16 /*count*/)
 {
-    WorldPackets::Quest::QuestUpdateAddItem questUpdateAddItem;
-    GetSession()->SendPacket(questUpdateAddItem.Write());
+    GetSession()->SendPacket(WorldPackets::Quest::QuestUpdateAddItem().Write());
     LOG_DEBUG("network", "WORLD: Sent SMSG_QUESTUPDATE_ADD_ITEM");
 }
 
