@@ -86,7 +86,7 @@ void ChaseMovementGenerator<T>::DistanceYourself(T* owner, float distance)
 
     float x, y, z;
     i_target->GetNearPoint(owner, x, y, z, owner->GetBoundaryRadius(), distance, i_target->GetAngle(owner));
-    if (DispatchSplineToPosition(owner, x, y, z, false, 0.f, false, false))
+    if (DispatchSplineToPosition(owner, x, y, z, false, false, 0.f, false, false))
     {
         m_currentMode = CHASE_MODE_DISTANCING;
         if constexpr (!std::is_same_v<T, Player>)
@@ -104,7 +104,7 @@ bool ChaseMovementGenerator<T>::DispatchSplineToPosition(T* owner, float x, floa
     if (owner->IsHovering())
         owner->UpdateAllowedPositionZ(x, y, z);
 
-    bool success = i_path->CalculatePath(x, y, z, cutPath);
+    bool success = i_path->CalculatePath(x, y, z, forceDest);
     if (!success || i_path->GetPathType() & PATHFIND_NOPATH)
     {
         if (cOwner)
