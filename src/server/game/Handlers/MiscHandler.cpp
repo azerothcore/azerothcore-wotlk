@@ -1152,8 +1152,7 @@ void WorldSession::HandleComplainOpcode(WorldPackets::Misc::Complain& packet)
     // if it's mail spam - ALL mails from this spammer automatically removed by client
 
     // Complaint Received message
-    WorldPackets::Misc::ComplainResult complainResult;
-    SendPacket(complainResult.Write());
+    SendPacket(WorldPackets::Misc::ComplainResult().Write());
 
     LOG_DEBUG("network", "REPORT SPAM: type {}, {}, unk1 {}, unk2 {}, unk3 {}, unk4 {}, message {}",
         packet.SpamType, packet.SpammerGuid.ToString(), packet.Unk1, packet.Unk2, packet.Unk3, packet.Unk4, packet.Description);
