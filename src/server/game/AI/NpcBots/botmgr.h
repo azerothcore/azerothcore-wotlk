@@ -263,7 +263,7 @@ class AC_GAME_API BotMgr
         bool HasBotPetType(uint32 petType) const;
         bool IsBeingResurrected(WorldObject const* corpse) const;
 
-        static uint32 GetNpcBotCostRent();
+        static uint32 GetNpcBotCostRent(uint8 level, uint8 botclass);
         static uint32 GetNpcBotCostHire(uint8 level, uint8 botclass);
         static std::string GetNpcBotCostStr(uint8 level, uint8 botclass);
         static uint8 BotClassByClassName(std::string const& className);
@@ -363,6 +363,7 @@ class AC_GAME_API BotMgr
         static void HandleDelayedTeleports();
 
     private:
+        static uint32 _normalizedCostForLevel(uint32 cost_base, uint8 bot_class, uint8 level);
         static void _teleportBot(Creature* bot, Map* newMap, float x, float y, float z, float ori, bool quick, bool reset, bot_ai* detached_ai);
         static void _reviveBot(Creature* bot, WorldLocation* dest = nullptr);
         void _setBotExactAttackRange(uint8 exactRange);

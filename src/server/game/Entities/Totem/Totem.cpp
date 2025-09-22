@@ -80,6 +80,9 @@ void Totem::InitStats(uint32 duration)
             owner->ToPlayer()->SendDirectMessage(data.Write());
 
             // set display id depending on caster's race
+            //npcbot: handled in class AI for bot totems
+            if (!(GetCreatorGUID().IsCreature() && owner->ToPlayer()->HaveBot() && owner->ToPlayer()->GetBotMgr()->GetBot(GetCreatorGUID())))
+            //end npcbot
             SetDisplayId(sObjectMgr->GetModelForTotem(SummonSlot(slot), Races(owner->getRace())));
         }
 

@@ -96,7 +96,7 @@ struct npc_pet_dk_ebon_gargoyle : ScriptedAI
 
     void MySelectNextTarget()
     {
-        //npcbot: allow bot summons to select bot's target without being engaged themselves
+            //npcbot: allow bot summons to select bot's target without being engaged themselves
             Unit* creator = me->GetCreator();
             if (creator && creator->IsCreature())
             {
@@ -118,7 +118,7 @@ struct npc_pet_dk_ebon_gargoyle : ScriptedAI
                 }
                 return;
             }
-        //end npcbot
+            //end npcbot
 
         Unit* owner = me->GetOwner();
         if (owner && owner->IsPlayer() && (!me->GetVictim() || me->GetVictim()->IsImmunedToSpell(sSpellMgr->GetSpellInfo(SPELL_GARGOYLE_STRIKE)) || !me->IsValidAttackTarget(me->GetVictim()) || !owner->CanSeeOrDetect(me->GetVictim())))

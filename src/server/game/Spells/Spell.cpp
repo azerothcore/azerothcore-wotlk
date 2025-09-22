@@ -4573,15 +4573,15 @@ void Spell::update(uint32 difftime)
 
                     finish();
 
-                    //npcbot: signal channel finish to botmgr
-                    if (m_caster->IsNPCBot())
-                        BotMgr::OnBotChannelFinish(m_caster->ToUnit(), this);
-                    //end npcbot
-
                     // We call the hook here instead of in Spell::finish because we only want to call it for completed channeling. Everything else is handled by interrupts
                     if (Creature* creatureCaster = m_caster->ToCreature())
                         if (creatureCaster->IsAIEnabled)
                             creatureCaster->AI()->OnSpellCastFinished(m_spellInfo, SPELL_FINISHED_CHANNELING_COMPLETE);
+
+                    //npcbot: signal channel finish to botmgr
+                    if (m_caster->IsNPCBot())
+                        BotMgr::OnBotChannelFinish(m_caster->ToUnit(), this);
+                    //end npcbot
                 }
                 // Xinef: Dont update channeled target list on last tick, allow auras to update duration properly
                 // Xinef: Added this strange check because of diffrent update routines for players / creatures

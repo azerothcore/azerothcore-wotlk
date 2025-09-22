@@ -2098,12 +2098,7 @@ bool BotMgr::RemoveAllBotsFromGroup()
     return true;
 }
 
-uint32 BotMgr::GetNpcBotCostRent()
-{
-    return _npcBotsCostRent;
-}
-
-uint32 BotMgr::GetNpcBotCostHire(uint8 level, uint8 botclass)
+uint32 BotMgr::_normalizedCostForLevel(uint32 cost_base, uint8 bot_class, uint8 level)
 {
     //assuming default 1000000
     //level 1: 500  //5  silver
@@ -2114,13 +2109,13 @@ uint32 BotMgr::GetNpcBotCostHire(uint8 level, uint8 botclass)
     //rest is linear
     //rare / rareelite bots have their cost adjusted
     uint32 cost =
-        level < 10 ? _npcBotsCostHire / 2000 : //5 silver
-        level < 20 ? _npcBotsCostHire / 100 :  //1 gold
-        level < 30 ? _npcBotsCostHire / 20 :   //5 gold
-        level < 40 ? _npcBotsCostHire / 5 :    //20 gold
-        (_npcBotsCostHire * (level - (level % 10))) / DEFAULT_MAX_LEVEL; //50 - 100 gold
+        level < 10 ? cost_base / 2000 : //5 silver
+        level < 20 ? cost_base / 100 :  //1 gold
+        level < 30 ? cost_base / 20 :   //5 gold
+        level < 40 ? cost_base / 5 :    //20 gold
+        (cost_base * (level - (level % 10))) / DEFAULT_MAX_LEVEL; //50 - 100 gold
 
-    switch (botclass)
+    switch (bot_class)
     {
         case BOT_CLASS_BM:
         case BOT_CLASS_ARCHMAGE:
@@ -2142,6 +2137,16 @@ uint32 BotMgr::GetNpcBotCostHire(uint8 level, uint8 botclass)
     return cost;
 }
 
+uint32 BotMgr::GetNpcBotCostRent(uint8 level, uint8 botclass)
+{
+    return _normalizedCostForLevel(_npcBotsCostRent, botclass, level);
+}
+
+uint32 BotMgr::GetNpcBotCostHire(uint8 level, uint8 botclass)
+{
+    return _normalizedCostForLevel(_npcBotsCostHire, botclass, level);
+}
+
 std::string BotMgr::GetNpcBotCostStr(uint8 level, uint8 botclass)
 {
     std::ostringstream money;
@@ -2161,7 +2166,7 @@ std::string BotMgr::GetNpcBotCostStr(uint8 level, uint8 botclass)
             money << cost << " |TInterface\\Icons\\INV_Misc_Coin_05:8|t";
     }
 
-    if (uint32 rcost = GetNpcBotCostRent())
+    if (uint32 rcost = GetNpcBotCostRent(level, botclass))
     {
         uint32 gold = uint32(rcost / GOLD);
         rcost -= (gold * GOLD);

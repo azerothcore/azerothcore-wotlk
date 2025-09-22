@@ -17978,12 +17978,13 @@ bool bot_ai::GlobalUpdate(uint32 diff)
         _updateTimerEx2 = urand(2000, 4000);
 
         //Rent Collecting
-        if (_rentTimer >= RENT_COLLECT_TIMER && BotMgr::GetNpcBotCostRent() && !HasBotCommandState(BOT_COMMAND_UNBIND) && !IAmFree())
+        uint32 rent_cost = BotMgr::GetNpcBotCostRent(master->GetLevel(), GetBotClass());
+        if (_rentTimer >= RENT_COLLECT_TIMER && rent_cost && !HasBotCommandState(BOT_COMMAND_UNBIND) && !IAmFree())
         {
             uint32 rent_money = 0;
             while (_rentTimer >= RENT_COLLECT_TIMER)
             {
-                rent_money += uint32(uint64(BotMgr::GetNpcBotCostRent()) * (RENT_COLLECT_TIMER / 1000) / (RENT_TIMER / 1000));
+                rent_money += uint32(uint64(rent_cost) * (RENT_COLLECT_TIMER / 1000) / (RENT_TIMER / 1000));
                 _rentTimer -= RENT_COLLECT_TIMER;
             }
 
@@ -18769,7 +18770,7 @@ void bot_ai::CommonTimers(uint32 diff)
         UpdateReviveTimer(diff);
     else
     {
-        if (BotMgr::GetNpcBotCostRent() && me->IsInWorld() && !HasBotCommandState(BOT_COMMAND_UNBIND))
+        if (BotMgr::GetNpcBotCostRent(me->GetLevel(), GetBotClass()) && me->IsInWorld() && !HasBotCommandState(BOT_COMMAND_UNBIND))
             _rentTimer += diff;
     }
 
@@ -20970,6 +20971,9 @@ void bot_ai::ChooseVehicleForEncounter(uint32 &creEntry, uint32 &vehEntry) const
         case CREATURE_ICC_MUTATED_ABOMINATION7:
         case CREATURE_ICC_MUTATED_ABOMINATION8:
             //no abomination bots
+            break;
+        case CREATURE_GEARGRINDERS_JUMPBOT:
+            //no jumpbot bots
             break;
         default:
             if (VehicleSeatEntry const* seat = mVeh->GetSeatForPassenger(master))

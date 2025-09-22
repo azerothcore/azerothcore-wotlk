@@ -147,13 +147,13 @@ public:
     // Called when spell hits a target
     virtual void SpellHitTarget(Unit* /*target*/, SpellInfo const* /*spell*/) {}
 
+    // Called when a spell either finishes, interrupts or cancels a spell cast
+    virtual void OnSpellCastFinished(SpellInfo const* /*spell*/, SpellFinishReason /*reason*/) {}
+
     //npcbot
     // Called when a spell starts
     virtual void OnSpellStart(SpellInfo const* /*spell*/) { }
     //end npcbot
-
-    // Called when a spell either finishes, interrupts or cancels a spell cast
-    virtual void OnSpellCastFinished(SpellInfo const* /*spell*/, SpellFinishReason /*reason*/) {}
 
     // Called when the creature is target of hostile action: swing, hostile spell landed, fear/etc)
     virtual void AttackedBy(Unit* /*attacker*/) {}

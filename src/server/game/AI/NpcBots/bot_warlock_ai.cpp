@@ -1548,7 +1548,7 @@ public:
                 if (me->GetLevel() >= 15)
                     manaGain = int32(float(manaGain) * 1.2f);
 
-                // me->ModifyHealth(-damage); // Lanny fixes problem where low level warlock get their health adjusted to the negative but don't die. 
+                me->ModifyHealth(-damage);
                 //CastSpellExtraArgs args;
                 //args.AddSpellBP0(manaGain);
                 //me->CastSpell(me, LIFE_TAP_ENERGIZE, args);
