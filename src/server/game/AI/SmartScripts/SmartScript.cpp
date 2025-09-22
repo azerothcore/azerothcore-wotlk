@@ -726,6 +726,8 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
                             continue;
 
                         CAST_AI(SmartAI, me->AI())->SetCurrentRangeMode(true, 0.f);
+                        if (e.action.cast.castFlags & SMARTCAST_ENABLE_COMBAT_MOVE_ON_LOS)
+                            CAST_AI(SmartAI, me->AI())->SetCombatMovement(true, true);
                         continue;
                     }
 
