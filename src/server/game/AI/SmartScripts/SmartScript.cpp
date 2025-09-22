@@ -725,7 +725,7 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
                         if (me->IsRooted()) // Rooted inhabit type, never move/reposition
                             continue;
 
-                        CAST_AI(SmartAI, me->AI())->SetCombatMovement(true, 0.f);
+                        CAST_AI(SmartAI, me->AI())->SetCurrentRangeMode(true, 0.f);
                         continue;
                     }
 
@@ -984,7 +984,7 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
                 break;
 
             bool move = e.action.combatMove.move;
-            CAST_AI(SmartAI, me->AI())->SetCombatMovement(move, false);
+            CAST_AI(SmartAI, me->AI())->SetCombatMovement(move, true);
             LOG_DEBUG("sql.sql", "SmartScript::ProcessAction:: SMART_ACTION_ALLOW_COMBAT_MOVEMENT: Creature {} bool on = {}",
                            me->GetGUID().ToString(), e.action.combatMove.move);
             break;
