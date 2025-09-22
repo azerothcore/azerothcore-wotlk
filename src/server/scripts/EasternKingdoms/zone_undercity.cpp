@@ -2751,7 +2751,8 @@ public:
                     break;
                 // NPC_KHANOK - Inner Sunktum Spawn Middle
                 case 17:
-                    if (Creature* temp = me->SummonCreature(NPC_KHANOK, ThrallSpawn[68].x, ThrallSpawn[68].y, ThrallSpawn[68].z, TEMPSUMMON_DEAD_DESPAWN)) {
+                    if (Creature* temp = me->SummonCreature(NPC_KHANOK, ThrallSpawn[68].x, ThrallSpawn[68].y, ThrallSpawn[68].z, TEMPSUMMON_DEAD_DESPAWN))
+                    {
                         me->AddThreat(temp, 100.0f);
                         me->AI()->AttackStart(temp);
                     }
