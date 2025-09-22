@@ -1469,27 +1469,14 @@ namespace Acore
     class AllCreaturesOfEntryInRange
     {
     public:
-			//Trinitycore - Lanny
-         	AllCreaturesOfEntryInRange(WorldObject const* object, uint32 entry, float maxRange = 0.0f) : m_pObject(object), m_uiEntry(entry), m_fRange(maxRange) { }
-            bool operator()(Unit* unit) const
-            {
-                if (m_uiEntry)
-                {
-                    if (unit->GetEntry() != m_uiEntry)
-                        return false;
-                }
-
-                if (m_fRange)
-                {
-                    if (m_fRange > 0.0f && !m_pObject->IsWithinDist(unit, m_fRange, false))
-                        return false;
-                    if (m_fRange < 0.0f && m_pObject->IsWithinDist(unit, m_fRange, false))
-                        return false;
-                }
-
+        AllCreaturesOfEntryInRange(WorldObject const* object, uint32 entry, float maxRange) : m_pObject(object), m_uiEntry(entry), m_fRange(maxRange) {}
+        bool operator() (Unit* unit)
+        {
+            if (unit->GetEntry() == m_uiEntry && m_pObject->IsWithinDist(unit, m_fRange, false))
                 return true;
-            }
-			//end Trinitycore - NPCBot
+
+            return false;
+        }
 
     private:
         WorldObject const* m_pObject;
