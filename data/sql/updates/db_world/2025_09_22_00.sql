@@ -1,3 +1,4 @@
+-- DB update 2025_09_20_06 -> 2025_09_22_00
 -- Savage Gladiator's Bonegrinder, Decapitator, Greatsword, Pike (+156 Attack Power)
 UPDATE `item_template` SET `stat_type4` = 38, `stat_value4` = 156 WHERE `entry` IN (42295, 42294, 42297, 42296);
 
