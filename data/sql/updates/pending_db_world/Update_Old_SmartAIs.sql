@@ -1,7 +1,8 @@
 
--- Sunfury Magister
-UPDATE `creature_template` SET `AIName` = 'SmartAI' WHERE `entry` = 18855;
+-- Update SmartAIs
+UPDATE `creature_template` SET `AIName` = 'SmartAI' WHERE (`entry` IN (18855, 19643, 21660));
 
+-- Sunfury Magister
 DELETE FROM `smart_scripts` WHERE (`source_type` = 0 AND `entryorguid` = 18855);
 INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `event_param6`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
 (18855, 0, 0, 0, 0, 0, 100, 0, 3000, 6000, 3000, 4000, 0, 0, 11, 9053, 64, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Sunfury Magister - In Combat - Cast \'Fireball\''),
@@ -10,8 +11,6 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 (18855, 0, 3, 0, 1, 0, 50, 0, 10000, 20000, 15000, 30000, 0, 0, 11, 34397, 0, 0, 0, 0, 0, 19, 19421, 30, 0, 0, 0, 0, 0, 0, 'Sunfury Magister - Out of Combat - Cast \'Red Beam\'');
 
 -- Sunfury Astromancer
-UPDATE `creature_template` SET `AIName` = 'SmartAI' WHERE `entry` = 19643;
-
 DELETE FROM `smart_scripts` WHERE (`source_type` = 0 AND `entryorguid` = 19643);
 INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `event_param6`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
 (19643, 0, 0, 0, 1, 0, 100, 0, 1000, 1000, 600000, 600000, 0, 0, 11, 35917, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Sunfury Astromancer - Out of Combat - Cast \'Fiery Intellect\''),
@@ -19,8 +18,6 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 (19643, 0, 2, 0, 0, 0, 100, 0, 12000, 16000, 12000, 16000, 0, 30, 11, 35914, 64, 0, 0, 0, 0, 5, 0, 0, 0, 0, 0, 0, 0, 0, 'Sunfury Astromancer - In Combat - Cast \'Astral Focus\'');
 
 -- Cabal Abjurist
-UPDATE `creature_template` SET `AIName` = 'SmartAI' WHERE `entry` = 21660;
-
 DELETE FROM `smart_scripts` WHERE (`source_type` = 0 AND `entryorguid` = 21660);
 INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `event_param6`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
 (21660, 0, 0, 0, 0, 0, 100, 0, 0, 0, 2400, 3800, 0, 0, 11, 34447, 64, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Cabal Abjurist - In Combat - Cast \'Arcane Missiles\''),
