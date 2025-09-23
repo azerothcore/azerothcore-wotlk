@@ -53,6 +53,7 @@
 #include "Player.h"
 #include "ReputationMgr.h"
 #include "ScriptMgr.h"
+#include "SmartAI.h"
 #include "Spell.h"
 #include "SpellAuraEffects.h"
 #include "SpellAuras.h"
@@ -201,7 +202,7 @@ SpellInfo const* ProcEventInfo::GetSpellInfo() const
 #ifdef _MSC_VER
 #pragma warning(disable:4355)
 #endif
-Unit::Unit(bool isWorldObject) : WorldObject(isWorldObject),
+Unit::Unit() : WorldObject(),
     m_movedByPlayer(nullptr),
     m_lastSanctuaryTime(0),
     IsAIEnabled(false),
@@ -674,6 +675,9 @@ bool Unit::IsWithinMeleeRange(Unit const* obj, float dist) const
 
     float maxdist = dist + GetMeleeRange(obj);
 
+    if ((IsPlayer() || obj->IsPlayer()) && HasLeewayMovement() && obj->HasLeewayMovement())
+        maxdist += LEEWAY_BONUS_RANGE;
+
     return distsq < maxdist * maxdist;
 }
 
@@ -696,6 +700,16 @@ bool Unit::IsWithinRange(Unit const* obj, float dist) const
     auto distsq = dx * dx + dy * dy + dz * dz;
 
     return distsq <= dist * dist;
+}
+
+bool Unit::IsWithinBoundaryRadius(const Unit* obj) const
+{
+    if (!obj || !IsInMap(obj) || !InSamePhase(obj))
+        return false;
+
+    float objBoundaryRadius = std::max(obj->GetBoundaryRadius(), MIN_MELEE_REACH);
+
+    return IsInDist(obj, objBoundaryRadius);
 }
 
 bool Unit::GetRandomContactPoint(Unit const* obj, float& x, float& y, float& z, bool force) const
@@ -2256,7 +2270,7 @@ void Unit::CalcAbsorbResist(DamageInfo& dmgInfo, bool Splited)
     // We're going to call functions which can modify content of the list during iteration over it's elements
     // Let's copy the list so we can prevent iterator invalidation
     AuraEffectList vSchoolAbsorbCopy(victim->GetAuraEffectsByType(SPELL_AURA_SCHOOL_ABSORB));
-    vSchoolAbsorbCopy.sort(Acore::AbsorbAuraOrderPred());
+    std::sort(vSchoolAbsorbCopy.begin(), vSchoolAbsorbCopy.end(), Acore::AbsorbAuraOrderPred());
 
     // absorb without mana cost
     for (AuraEffectList::iterator itr = vSchoolAbsorbCopy.begin(); (itr != vSchoolAbsorbCopy.end()) && (dmgInfo.GetDamage() > 0); ++itr)
@@ -2439,7 +2453,7 @@ void Unit::CalcAbsorbResist(DamageInfo& dmgInfo, bool Splited)
         // We're going to call functions which can modify content of the list during iteration over it's elements
         // Let's copy the list so we can prevent iterator invalidation
         AuraEffectList vSplitDamagePctCopy(victim->GetAuraEffectsByType(SPELL_AURA_SPLIT_DAMAGE_PCT));
-        for (AuraEffectList::iterator itr = vSplitDamagePctCopy.begin(), next; (itr != vSplitDamagePctCopy.end()) &&  (dmgInfo.GetDamage() > 0); ++itr)
+        for (AuraEffectList::iterator itr = vSplitDamagePctCopy.begin(); (itr != vSplitDamagePctCopy.end()) && (dmgInfo.GetDamage() > 0); ++itr)
         {
             // Check if aura was removed during iteration - we don't need to work on such auras
             AuraApplication const* aurApp = (*itr)->GetBase()->GetApplicationOfTarget(victim->GetGUID());
@@ -2565,7 +2579,7 @@ void Unit::CalcHealAbsorb(HealInfo& healInfo)
             {
                 uint32 removedAuras = healInfo.GetTarget()->m_removedAurasCount;
                 auraEff->GetBase()->Remove(AURA_REMOVE_BY_ENEMY_SPELL);
-                if (removedAuras + 1 < healInfo.GetTarget()->m_removedAurasCount)
+                if (healInfo.GetTarget()->m_removedAurasCount > removedAuras)
                     i = vHealAbsorb.begin();
             }
         }
@@ -4096,8 +4110,8 @@ void Unit::InterruptSpell(CurrentSpellTypes spellType, bool withDelayed, bool wi
     //LOG_DEBUG("entities.unit", "Interrupt spell for unit {}.", GetEntry());
     Spell* spell = m_currentSpells[spellType];
     if (spell
-            && (withDelayed || spell->getState() != SPELL_STATE_DELAYED)
-            && (withInstant || spell->GetCastTime() > 0 || spell->getState() == SPELL_STATE_CASTING)) // xinef: or spell is in casting state (channeled spells only)
+        && (withDelayed || spell->getState() != SPELL_STATE_DELAYED)
+        && (withInstant || spell->GetCastTime() > 0 || spell->getState() == SPELL_STATE_CASTING)) // xinef: or spell is in casting state (channeled spells only)
     {
         // for example, do not let self-stun aura interrupt itself
         if (!spell->IsInterruptable())
@@ -4115,6 +4129,18 @@ void Unit::InterruptSpell(CurrentSpellTypes spellType, bool withDelayed, bool wi
             m_currentSpells[spellType] = nullptr;
             spell->SetReferencedFromCurrent(false);
         }
+
+        // SAI creatures only
+        // Start chasing victim if they are spell casters (at least one SMC spell) if interrupted/silenced.
+        if (IsCreature())
+        {
+            if (SmartAI* ai = dynamic_cast<SmartAI*>(ToCreature()->AI()))
+                if (ai->CanChaseOnInterrupt())
+                    ai->SetCombatMove(true);
+        }
+
+        if (IsCreature() && IsAIEnabled)
+            ToCreature()->AI()->OnSpellCastFinished(spell->GetSpellInfo(), SPELL_FINISHED_CANCELED);
     }
 }
 
@@ -4173,6 +4199,15 @@ void Unit::InterruptNonMeleeSpells(bool withDelayed, uint32 spell_id, bool withI
     // channeled spells are interrupted if they are not finished, even if they are delayed
     if (m_currentSpells[CURRENT_CHANNELED_SPELL] && (!spell_id || m_currentSpells[CURRENT_CHANNELED_SPELL]->m_spellInfo->Id == spell_id))
         InterruptSpell(CURRENT_CHANNELED_SPELL, true, true, bySelf);
+}
+
+Spell* Unit::GetFirstCurrentCastingSpell() const
+{
+    for (uint32 i = 0; i < CURRENT_MAX_SPELL; i++)
+        if (m_currentSpells[i] && m_currentSpells[i]->GetCastTimeRemaining() > 0)
+            return m_currentSpells[i];
+
+    return nullptr;
 }
 
 Spell* Unit::FindCurrentSpellBySpellId(uint32 spell_id) const
@@ -4732,7 +4767,7 @@ void Unit::_RegisterAuraEffect(AuraEffect* aurEff, bool apply)
     if (apply)
         m_modAuras[aurEff->GetAuraType()].push_back(aurEff);
     else
-        m_modAuras[aurEff->GetAuraType()].remove(aurEff);
+        m_modAuras[aurEff->GetAuraType()].erase(std::remove(m_modAuras[aurEff->GetAuraType()].begin(), m_modAuras[aurEff->GetAuraType()].end(), aurEff), m_modAuras[aurEff->GetAuraType()].end());
 }
 
 // All aura base removes should go threw this function!
@@ -5158,7 +5193,7 @@ void Unit::RemoveAurasByType(AuraType auraType, ObjectGuid casterGUID, Aura* exc
         {
             uint32 removedAuras = m_removedAurasCount;
             RemoveAura(aurApp);
-            if (m_removedAurasCount > removedAuras + 1)
+            if (m_removedAurasCount > removedAuras)
                 iter = m_modAuras[auraType].begin();
         }
     }
@@ -7205,16 +7240,6 @@ bool Unit::HandleDummyAuraProc(Unit* victim, uint32 damage, AuraEffect* triggere
             }
         case SPELLFAMILY_WARRIOR:
             {
-                switch (dummySpell->Id)
-                {
-                    // Victorious
-                    case 32216:
-                        {
-                            RemoveAura(dummySpell->Id);
-                            return false;
-                        }
-                }
-
                 // Second Wind
                 if (dummySpell->SpellIconID == 1697)
                 {
@@ -10412,8 +10437,29 @@ bool Unit::Attack(Unit* victim, bool meleeAttack)
     if (meleeAttack)
         AddUnitState(UNIT_STATE_MELEE_ATTACKING);
 
+    Unit* owner = GetCharmerOrOwner();
+    Creature* ownerCreature = owner ? owner->ToCreature() : nullptr;
+    Creature* controlledCreatureWithSameVictim = nullptr;
+    if (creature && !m_Controlled.empty())
+    {
+        for (ControlSet::iterator itr = m_Controlled.begin(); itr != m_Controlled.end(); ++itr)
+        {
+            if ((*itr)->ToCreature() && (*itr)->GetVictim() == victim)
+            {
+                controlledCreatureWithSameVictim = (*itr)->ToCreature();
+                break;
+            }
+        }
+    }
+
+    // Share leash timer with controlled unit
+    if (controlledCreatureWithSameVictim)
+        creature->SetLastLeashExtensionTimePtr(controlledCreatureWithSameVictim->GetLastLeashExtensionTimePtr());
+    // Share leash timer with owner
+    else if (creature && ownerCreature && ownerCreature->GetVictim() == victim)
+        creature->SetLastLeashExtensionTimePtr(ownerCreature->GetLastLeashExtensionTimePtr());
     // Update leash timer when attacking creatures
-    if (victim->IsCreature())
+    else if (victim->IsCreature())
         victim->ToCreature()->UpdateLeashExtensionTime();
 
     // set position before any AI calls/assistance
@@ -11222,10 +11268,8 @@ Unit* Unit::GetNextRandomRaidMemberOrPet(float radius)
 void Unit::AddPlayerToVision(Player* player)
 {
     if (m_sharedVision.empty())
-    {
         setActive(true);
-        SetWorldObject(true);
-    }
+
     m_sharedVision.push_back(player);
     player->m_isInSharedVisionOf.insert(this);
 }
@@ -11235,11 +11279,10 @@ void Unit::RemovePlayerFromVision(Player* player)
 {
     m_sharedVision.remove(player);
     player->m_isInSharedVisionOf.erase(this);
+
+    /// @todo: This isn't right, if a previously active object was set to active with e.g. Mind Vision this will make them no longer active
     if (m_sharedVision.empty())
-    {
         setActive(false);
-        SetWorldObject(false);
-    }
 }
 
 void Unit::RemoveBindSightAuras()
@@ -12004,6 +12047,7 @@ int32 Unit::SpellBaseDamageBonusDone(SpellSchoolMask schoolMask)
     {
         // Base value
         DoneAdvertisedBenefit += ToPlayer()->GetBaseSpellPowerBonus();
+        DoneAdvertisedBenefit += ToPlayer()->GetBaseSpellDamageBonus();
 
         // Damage bonus from stats
         AuraEffectList const& mDamageDoneOfStatPercent = GetAuraEffectsByType(SPELL_AURA_MOD_SPELL_DAMAGE_OF_STAT_PERCENT);
@@ -12766,6 +12810,7 @@ int32 Unit::SpellBaseHealingBonusDone(SpellSchoolMask schoolMask)
     {
         // Base value
         AdvertisedBenefit += ToPlayer()->GetBaseSpellPowerBonus();
+        AdvertisedBenefit += ToPlayer()->GetBaseSpellHealingBonus();
 
         // Healing bonus from stats
         AuraEffectList const& mHealingDoneOfStatPercent = GetAuraEffectsByType(SPELL_AURA_MOD_SPELL_HEALING_OF_STAT_PERCENT);
@@ -17028,7 +17073,7 @@ Unit* Unit::SelectNearbyTarget(Unit* exclude, float dist) const
     std::list<Unit*> targets;
     Acore::AnyUnfriendlyUnitInObjectRangeCheck u_check(this, this, dist);
     Acore::UnitListSearcher<Acore::AnyUnfriendlyUnitInObjectRangeCheck> searcher(this, targets, u_check);
-    Cell::VisitAllObjects(this, searcher, dist);
+    Cell::VisitObjects(this, searcher, dist);
 
     // remove current target
     if (GetVictim())
@@ -17063,7 +17108,7 @@ Unit* Unit::SelectNearbyNoTotemTarget(Unit* exclude, float dist) const
     std::list<Unit*> targets;
     Acore::AnyUnfriendlyNoTotemUnitInObjectRangeCheck u_check(this, this, dist);
     Acore::UnitListSearcher<Acore::AnyUnfriendlyNoTotemUnitInObjectRangeCheck> searcher(this, targets, u_check);
-    Cell::VisitAllObjects(this, searcher, dist);
+    Cell::VisitObjects(this, searcher, dist);
 
     // remove current target
     if (GetVictim())
@@ -17300,7 +17345,7 @@ void Unit::SetContestedPvP(Player* attackedPlayer, bool lookForNearContestedGuar
         std::list<Unit*> targets;
         Acore::NearestVisibleDetectableContestedGuardUnitCheck u_check(this);
         Acore::UnitListSearcher<Acore::NearestVisibleDetectableContestedGuardUnitCheck> searcher(this, targets, u_check);
-        Cell::VisitAllObjects(this, searcher, MAX_AGGRO_RADIUS);
+        Cell::VisitObjects(this, searcher, MAX_AGGRO_RADIUS);
 
         // return if there are no contested guards found
         if (!targets.size())
@@ -19192,7 +19237,7 @@ void Unit::UpdateObjectVisibility(bool forced, bool /*fromUpdate*/)
         WorldObject::UpdateObjectVisibility(true);
         Acore::AIRelocationNotifier notifier(*this);
         float radius = 60.0f;
-        Cell::VisitAllObjects(this, notifier, radius);
+        Cell::VisitObjects(this, notifier, radius);
     }
 }
 
@@ -20242,12 +20287,10 @@ void Unit::ExecuteDelayedUnitRelocationEvent()
                     //active->m_last_notify_position.Relocate(active->GetPositionX(), active->GetPositionY(), active->GetPositionZ());
                 }
 
-                Acore::PlayerRelocationNotifier relocateNoLarge(*player, false); // visit only objects which are not large; default distance
-                Cell::VisitAllObjects(viewPoint, relocateNoLarge, player->GetSightRange() + VISIBILITY_INC_FOR_GOBJECTS);
-                relocateNoLarge.SendToSelf();
-                Acore::PlayerRelocationNotifier relocateLarge(*player, true);    // visit only large objects; maximum distance
-                Cell::VisitAllObjects(viewPoint, relocateLarge, MAX_VISIBILITY_DISTANCE);
-                relocateLarge.SendToSelf();
+                Acore::PlayerRelocationNotifier notifier(*player);
+                Cell::VisitObjects(viewPoint, notifier, player->GetSightRange());
+                Cell::VisitFarVisibleObjects(viewPoint, notifier, VISIBILITY_DISTANCE_GIGANTIC);
+                notifier.SendToSelf();
             }
 
     if (Player* player = this->ToPlayer())
@@ -20281,16 +20324,10 @@ void Unit::ExecuteDelayedUnitRelocationEvent()
 
         GetMap()->LoadGridsInRange(*player, MAX_VISIBILITY_DISTANCE);
 
-        Acore::PlayerRelocationNotifier relocateNoLarge(*player, false); // visit only objects which are not large; default distance
-        Cell::VisitAllObjects(viewPoint, relocateNoLarge, player->GetSightRange() + VISIBILITY_INC_FOR_GOBJECTS);
-        relocateNoLarge.SendToSelf();
-
-        if (!player->GetFarSightDistance())
-        {
-            Acore::PlayerRelocationNotifier relocateLarge(*player, true); // visit only large objects; maximum distance
-            Cell::VisitAllObjects(viewPoint, relocateLarge, MAX_VISIBILITY_DISTANCE);
-            relocateLarge.SendToSelf();
-        }
+        Acore::PlayerRelocationNotifier notifier(*player);
+        Cell::VisitObjects(viewPoint, notifier, player->GetSightRange());
+        Cell::VisitFarVisibleObjects(viewPoint, notifier, VISIBILITY_DISTANCE_GIGANTIC);
+        notifier.SendToSelf();
 
         this->AddToNotify(NOTIFY_AI_RELOCATION);
     }
@@ -20310,7 +20347,7 @@ void Unit::ExecuteDelayedUnitRelocationEvent()
         unit->m_last_notify_position.Relocate(unit->GetPositionX(), unit->GetPositionY(), unit->GetPositionZ());
 
         Acore::CreatureRelocationNotifier relocate(*unit);
-        Cell::VisitAllObjects(unit, relocate, unit->GetVisibilityRange() + VISIBILITY_COMPENSATION);
+        Cell::VisitObjects(unit, relocate, unit->GetVisibilityRange());
 
         this->AddToNotify(NOTIFY_AI_RELOCATION);
     }
@@ -20324,7 +20361,7 @@ void Unit::ExecuteDelayedUnitAINotifyEvent()
 
     Acore::AIRelocationNotifier notifier(*this);
     float radius = 60.0f;
-    Cell::VisitAllObjects(this, notifier, radius);
+    Cell::VisitObjects(this, notifier, radius);
 }
 
 void Unit::SetInFront(WorldObject const* target)
@@ -20960,7 +20997,7 @@ void Unit::Talk(std::string_view text, ChatMsg msgType, Language language, float
     Acore::CustomChatTextBuilder builder(this, msgType, text, language, target);
     Acore::LocalizedPacketDo<Acore::CustomChatTextBuilder> localizer(builder);
     Acore::PlayerDistWorker<Acore::LocalizedPacketDo<Acore::CustomChatTextBuilder> > worker(this, textRange, localizer);
-    Cell::VisitWorldObjects(this, worker, textRange);
+    Cell::VisitObjects(this, worker, textRange);
 }
 
 void Unit::Say(std::string_view text, Language language, WorldObject const* target /*= nullptr*/)
@@ -21018,7 +21055,7 @@ void Unit::Talk(uint32 textId, ChatMsg msgType, float textRange, WorldObject con
     Acore::BroadcastTextBuilder builder(this, msgType, textId, getGender(), target);
     Acore::LocalizedPacketDo<Acore::BroadcastTextBuilder> localizer(builder);
     Acore::PlayerDistWorker<Acore::LocalizedPacketDo<Acore::BroadcastTextBuilder> > worker(this, textRange, localizer);
-    Cell::VisitWorldObjects(this, worker, textRange);
+    Cell::VisitObjects(this, worker, textRange);
 }
 
 void Unit::Say(uint32 textId, WorldObject const* target /*= nullptr*/)

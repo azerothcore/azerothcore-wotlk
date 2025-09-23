@@ -38,7 +38,7 @@
 #include <G3D/CoordinateFrame.h>
 #include <G3D/Quat.h>
 
-GameObject::GameObject() : WorldObject(false), MovableMapObject(),
+GameObject::GameObject() : WorldObject(), MovableMapObject(),
     m_model(nullptr), m_goValue(), m_AI(nullptr)
 {
     m_objectType |= TYPEMASK_GAMEOBJECT;
@@ -431,15 +431,11 @@ bool GameObject::Create(ObjectGuid::LowType guidlow, uint32 name_id, Map* map, u
 
     // Check if GameObject is Large
     if (goinfo->IsLargeGameObject())
-    {
         SetVisibilityDistanceOverride(VisibilityDistanceType::Large);
-    }
 
     // Check if GameObject is Infinite
     if (goinfo->IsInfiniteGameObject())
-    {
         SetVisibilityDistanceOverride(VisibilityDistanceType::Infinite);
-    }
 
     return true;
 }
@@ -721,7 +717,7 @@ void GameObject::Update(uint32 diff)
                         {
                             Acore::NearestAttackableNoTotemUnitInObjectRangeCheck checker(this, owner, radius);
                             Acore::UnitSearcher<Acore::NearestAttackableNoTotemUnitInObjectRangeCheck> searcher(this, target, checker);
-                            Cell::VisitAllObjects(this, searcher, radius);
+                            Cell::VisitObjects(this, searcher, radius);
                         }
                         else                                        // environmental trap
                         {
@@ -730,7 +726,7 @@ void GameObject::Update(uint32 diff)
                             Player* player = nullptr;
                             Acore::AnyPlayerInObjectRangeCheck checker(this, radius, true, true);
                             Acore::PlayerSearcher<Acore::AnyPlayerInObjectRangeCheck> searcher(this, player, checker);
-                            Cell::VisitWorldObjects(this, searcher, radius);
+                            Cell::VisitObjects(this, searcher, radius);
                             target = player;
                         }
 
@@ -893,7 +889,7 @@ void GameObject::Update(uint32 diff)
                 if (!m_spawnedByDefault)
                 {
                     m_respawnTime = 0;
-                    DestroyForNearbyPlayers(); // xinef: old UpdateObjectVisibility();
+                    DestroyForVisiblePlayers(); // xinef: old UpdateObjectVisibility();
                     return;
                 }
 
@@ -904,7 +900,7 @@ void GameObject::Update(uint32 diff)
                 if (GetMap()->IsDungeon())
                     SaveRespawnTime();
 
-                DestroyForNearbyPlayers(); // xinef: old UpdateObjectVisibility();
+                DestroyForVisiblePlayers(); // xinef: old UpdateObjectVisibility();
                 break;
             }
     }
@@ -1397,7 +1393,7 @@ GameObject* GameObject::LookupFishingHoleAround(float range)
     Acore::NearestGameObjectFishingHole u_check(*this, range);
     Acore::GameObjectSearcher<Acore::NearestGameObjectFishingHole> checker(this, ok, u_check);
 
-    Cell::VisitGridObjects(this, checker, range);
+    Cell::VisitObjects(this, checker, range);
     return ok;
 }
 
@@ -3086,7 +3082,7 @@ bool GameObject::IsUpdateNeeded()
     if (GetMap()->isCellMarked(GetCurrentCell().GetCellCoord().GetId()))
         return true;
 
-    if (IsVisibilityOverridden())
+    if (!GetObjectVisibilityContainer().GetVisiblePlayersMap().empty())
         return true;
 
     if (IsTransport())

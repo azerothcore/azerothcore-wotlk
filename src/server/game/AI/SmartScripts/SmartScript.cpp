@@ -238,7 +238,8 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
             mLastTextID = e.action.talk.textGroupID;
             mTextTimer = e.action.talk.duration;
             mUseTextTimer = true;
-            sCreatureTextMgr->SendChat(talker, uint8(e.action.talk.textGroupID), talkTarget);
+
+            talker->AI()->Talk(e.action.talk.textGroupID, talkTarget, Milliseconds(e.action.talk.delay));
             LOG_DEBUG("sql.sql", "SmartScript::ProcessAction: SMART_ACTION_TALK: talker: {} ({}), textId: {}", talker->GetName(), talker->GetGUID().ToString(), mLastTextID);
             break;
         }
@@ -742,6 +743,8 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
 
                     if (e.action.cast.castFlags & SMARTCAST_COMBAT_MOVE)
                     {
+                        CAST_AI(SmartAI, me->AI())->SetChaseOnInterrupt(true);
+
                         if (!me->isMoving()) // Don't try to reposition while we are moving
                         {
                             // If cast flag SMARTCAST_COMBAT_MOVE is set combat movement will not be allowed unless target is outside spell range, out of mana, or LOS.
@@ -893,7 +896,7 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
                         go->SetLootState(GO_READY);
                     }
 
-                    go->UseDoorOrButton(0, !!e.action.activateObject.alternative, unit);
+                    go->UseDoorOrButton(0, e.action.activateObject.alternative, unit);
                     LOG_DEBUG("sql.sql", "SmartScript::ProcessAction:: SMART_ACTION_ACTIVATE_GOBJECT. Gameobject {} activated", go->GetGUID().ToString());
                 }
             }
@@ -1483,14 +1486,14 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
         {
             for (WorldObject* target : targets)
                 if (IsUnit(target))
-                    target->ToUnit()->SetVisible(!!e.action.visibility.state);
+                    target->ToUnit()->SetVisible(e.action.visibility.state);
 
             break;
         }
         case SMART_ACTION_SET_ACTIVE:
         {
             for (WorldObject* target : targets)
-                target->setActive(!!e.action.setActive.state);
+                target->setActive(e.action.setActive.state);
             break;
         }
         case SMART_ACTION_ATTACK_START:
@@ -1843,6 +1846,8 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
 
             WorldObject* target = nullptr;
 
+            SAIBool isForced = !e.action.moveToPos.disableForceDestination;
+
             switch (e.GetTargetType())
             {
                 case SMART_TARGET_POSITION:
@@ -1852,7 +1857,7 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
                         if (TransportBase* trans = me->GetDirectTransport())
                             trans->CalculatePassengerPosition(dest.x, dest.y, dest.z);
 
-                    me->GetMotionMaster()->MovePoint(e.action.moveToPos.pointId, dest.x, dest.y, dest.z, true, true,
+                    me->GetMotionMaster()->MovePoint(e.action.moveToPos.pointId, dest.x, dest.y, dest.z, true, isForced,
                         isControlled ? MOTION_SLOT_CONTROLLED : MOTION_SLOT_ACTIVE, e.target.o);
 
                     break;
@@ -1870,7 +1875,7 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
                             randomPoint.m_positionY,
                             randomPoint.m_positionZ,
                             true,
-                            true,
+                            isForced,
                             isControlled ? MOTION_SLOT_CONTROLLED : MOTION_SLOT_ACTIVE
                         );
 
@@ -1895,7 +1900,7 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
                     else if (e.action.moveToPos.ContactDistance)
                         target->GetNearPoint(me, x, y, z, e.action.moveToPos.ContactDistance, 0, target->GetAngle(me));
 
-                    me->GetMotionMaster()->MovePoint(e.action.moveToPos.pointId, x + e.target.x, y + e.target.y, z + e.target.z, true, true, isControlled ? MOTION_SLOT_CONTROLLED : MOTION_SLOT_ACTIVE);
+                    me->GetMotionMaster()->MovePoint(e.action.moveToPos.pointId, x + e.target.x, y + e.target.y, z + e.target.z, true, isForced, isControlled ? MOTION_SLOT_CONTROLLED : MOTION_SLOT_ACTIVE);
 
                     break;
                 }
@@ -1909,8 +1914,10 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
             {
                 if (IsCreature(target))
                 {
+                    SAIBool isForced = !e.action.moveToPosTarget.disableForceDestination;
+
                     Creature* ctarget = target->ToCreature();
-                    ctarget->GetMotionMaster()->MovePoint(e.action.moveToPos.pointId, e.target.x, e.target.y, e.target.z, true, true, isControlled ? MOTION_SLOT_CONTROLLED : MOTION_SLOT_ACTIVE);
+                    ctarget->GetMotionMaster()->MovePoint(e.action.moveToPosTarget.pointId, e.target.x, e.target.y, e.target.z, true, isForced, isControlled ? MOTION_SLOT_CONTROLLED : MOTION_SLOT_ACTIVE);
                 }
             }
 
@@ -3832,19 +3839,20 @@ void SmartScript::GetTargets(ObjectVector& targets, SmartScriptHolder const& e, 
                 {
                     targets.clear();
 
-                    if (owner->ToCreature())
+                    if (IsCreature(owner))
                     {
                         if (Unit* base = ObjectAccessor::GetUnit(*owner, owner->ToCreature()->GetCharmerOrOwnerGUID()))
-                        {
                             targets.push_back(base);
-                        }
                     }
-                    else
+                    else if (IsGameObject(owner))
                     {
                         if (Unit* base = ObjectAccessor::GetUnit(*owner, owner->ToGameObject()->GetOwnerGUID()))
-                        {
                             targets.push_back(base);
-                        }
+                    }
+                    else if (IsPlayer(owner))
+                    {
+                        if (Unit* base = owner->ToPlayer()->GetCharmerOrOwner())
+                            targets.push_back(base);
                     }
                 }
             }
@@ -4030,7 +4038,7 @@ void SmartScript::GetWorldObjectsInDist(ObjectVector& targets, float dist) const
 
     Acore::AllWorldObjectsInRange u_check(obj, dist);
     Acore::WorldObjectListSearcher<Acore::AllWorldObjectsInRange> searcher(obj, targets, u_check);
-    Cell::VisitAllObjects(obj, searcher, dist);
+    Cell::VisitObjects(obj, searcher, dist);
 }
 
 void SmartScript::ProcessEvent(SmartScriptHolder& e, Unit* unit, uint32 var0, uint32 var1, bool bvar, SpellInfo const* spell, GameObject* gob)
@@ -5252,7 +5260,7 @@ Unit* SmartScript::DoSelectLowestHpFriendly(float range, uint32 MinHPDiff) const
 
     Acore::MostHPMissingInRange u_check(me, range, MinHPDiff);
     Acore::UnitLastSearcher<Acore::MostHPMissingInRange> searcher(me, unit, u_check);
-    Cell::VisitGridObjects(me, searcher, range);
+    Cell::VisitObjects(me, searcher, range);
     return unit;
 }
 
@@ -5266,7 +5274,7 @@ Unit* SmartScript::DoSelectLowestHpPercentFriendly(float range, uint32 minHpPct,
     Unit* unit = nullptr;
     Acore::MostHPPercentMissingInRange u_check(me, range, minHpPct, maxHpPct);
     Acore::UnitLastSearcher<Acore::MostHPPercentMissingInRange> searcher(me, unit, u_check);
-    Cell::VisitGridObjects(me, searcher, range);
+    Cell::VisitObjects(me, searcher, range);
     return unit;
 }
 
@@ -5277,7 +5285,7 @@ void SmartScript::DoFindFriendlyCC(std::vector<Creature*>& creatures, float rang
 
     Acore::FriendlyCCedInRange u_check(me, range);
     Acore::CreatureListSearcher<Acore::FriendlyCCedInRange> searcher(me, creatures, u_check);
-    Cell::VisitGridObjects(me, searcher, range);
+    Cell::VisitObjects(me, searcher, range);
 }
 
 void SmartScript::DoFindFriendlyMissingBuff(std::vector<Creature*>& creatures, float range, uint32 spellid) const
@@ -5287,7 +5295,7 @@ void SmartScript::DoFindFriendlyMissingBuff(std::vector<Creature*>& creatures, f
 
     Acore::FriendlyMissingBuffInRange u_check(me, range, spellid);
     Acore::CreatureListSearcher<Acore::FriendlyMissingBuffInRange> searcher(me, creatures, u_check);
-    Cell::VisitGridObjects(me, searcher, range);
+    Cell::VisitObjects(me, searcher, range);
 }
 
 Unit* SmartScript::DoFindClosestFriendlyInRange(float range, bool playerOnly) const
@@ -5298,7 +5306,7 @@ Unit* SmartScript::DoFindClosestFriendlyInRange(float range, bool playerOnly) co
     Unit* unit = nullptr;
     Acore::AnyFriendlyNotSelfUnitInObjectRangeCheck u_check(me, me, range, playerOnly);
     Acore::UnitLastSearcher<Acore::AnyFriendlyNotSelfUnitInObjectRangeCheck> searcher(me, unit, u_check);
-    Cell::VisitAllObjects(me, searcher, range);
+    Cell::VisitObjects(me, searcher, range);
     return unit;
 }
 

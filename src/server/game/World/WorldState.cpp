@@ -25,6 +25,7 @@
 #include "UnitAI.h"
 #include "Weather.h"
 #include "WorldState.h"
+#include "WorldConfig.h"
 #include "WorldStateDefines.h"
 #include <chrono>
 
@@ -47,7 +48,9 @@ WorldState::~WorldState()
 
 void WorldState::Load()
 {
-    QueryResult result = CharacterDatabase.Query("SELECT Id, Data FROM world_state");
+    CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_WORLD_STATE);
+    PreparedQueryResult result = CharacterDatabase.Query(stmt);
+
     if (result)
     {
         do
@@ -205,8 +208,10 @@ void WorldState::Save(WorldStateSaveIds saveId)
 
 void WorldState::SaveHelper(std::string& stringToSave, WorldStateSaveIds saveId)
 {
-    CharacterDatabase.Execute("DELETE FROM world_state WHERE Id='{}'", saveId);
-    CharacterDatabase.Execute("INSERT INTO world_state(Id,Data) VALUES('{}','{}')", saveId, stringToSave.data());
+    CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_REP_WORLD_STATE);
+    stmt->SetData(0, saveId);
+    stmt->SetData(1, stringToSave);
+    CharacterDatabase.Execute(stmt);
 }
 
 bool WorldState::IsConditionFulfilled(uint32 conditionId, uint32 state) const
@@ -1068,8 +1073,8 @@ std::string WorldState::GetScourgeInvasionPrintout()
     {
         TimePoint tp = m_siData.m_timers[timerId];
         std::string timerStr;
-        if (tp.time_since_epoch().count() == 0)
-            timerStr = "0 (not set)";
+        if (tp == TimePoint())
+            timerStr = "Not set";
         else if (tp <= now)
             timerStr = "Elapsed";
         else
@@ -1308,6 +1313,8 @@ void WorldState::StartScourgeInvasion(bool sendMail)
         Acore::Containers::RandomShuffle(randomIds);
         for (uint32 id : randomIds)
             OnEnable(m_siData.m_activeInvasions[id]);
+
+        sGameEventMgr->StartEvent(GAME_EVENT_SCOURGE_INVASION_BOSSES);
     }
 }
 
@@ -1414,10 +1421,15 @@ void ScourgeInvasionData::Reset()
 std::string ScourgeInvasionData::GetData()
 {
     std::string output = std::to_string(m_state) + " ";
-    for (auto& timer : m_timers)
-        output += std::to_string(timer.time_since_epoch().count()) + " ";
+    for (TimePoint& timer : m_timers)
+    {
+        if (timer == TimePoint())
+            output += "0 ";
+        else
+            output += std::to_string(std::chrono::duration_cast<std::chrono::milliseconds>(timer.time_since_epoch()).count()) + " ";
+    }
     output += std::to_string(m_battlesWon) + " " + std::to_string(m_lastAttackZone) + " ";
-    for (auto& remaining : m_remaining)
+    for (uint32& remaining : m_remaining)
         output += std::to_string(remaining) + " ";
     return output;
 }
@@ -1431,6 +1443,8 @@ void WorldState::StopScourgeInvasion()
     sGameEventMgr->StopEvent(GAME_EVENT_SCOURGE_INVASION_BLASTED_LANDS);
     sGameEventMgr->StopEvent(GAME_EVENT_SCOURGE_INVASION_EASTERN_PLAGUELANDS);
     sGameEventMgr->StopEvent(GAME_EVENT_SCOURGE_INVASION_BURNING_STEPPES);
+    sGameEventMgr->StopEvent(GAME_EVENT_SCOURGE_INVASION_INVASIONS_DONE);
+    sGameEventMgr->StopEvent(GAME_EVENT_SCOURGE_INVASION_BOSSES);
     BroadcastSIWorldstates();
     m_siData.Reset();
 
@@ -1553,22 +1567,25 @@ void WorldState::BroadcastSIWorldstates()
 
 void WorldState::HandleDefendedZones()
 {
-    if (m_siData.m_battlesWon < 50)
+    if (m_siData.m_battlesWon < sWorld->getIntConfig(CONFIG_SCOURGEINVASION_COUNTER_FIRST))
     {
         sGameEventMgr->StopEvent(GAME_EVENT_SCOURGE_INVASION_50_INVASIONS);
         sGameEventMgr->StopEvent(GAME_EVENT_SCOURGE_INVASION_100_INVASIONS);
         sGameEventMgr->StopEvent(GAME_EVENT_SCOURGE_INVASION_150_INVASIONS);
     }
-    else if (m_siData.m_battlesWon >= 50 && m_siData.m_battlesWon < 100)
+    else if (m_siData.m_battlesWon >= sWorld->getIntConfig(CONFIG_SCOURGEINVASION_COUNTER_FIRST) &&
+             m_siData.m_battlesWon < sWorld->getIntConfig(CONFIG_SCOURGEINVASION_COUNTER_SECOND))
         sGameEventMgr->StartEvent(GAME_EVENT_SCOURGE_INVASION_50_INVASIONS);
-    else if (m_siData.m_battlesWon >= 100 && m_siData.m_battlesWon < 150)
+    else if (m_siData.m_battlesWon >= sWorld->getIntConfig(CONFIG_SCOURGEINVASION_COUNTER_SECOND) &&
+             m_siData.m_battlesWon < sWorld->getIntConfig(CONFIG_SCOURGEINVASION_COUNTER_THIRD))
     {
         sGameEventMgr->StopEvent(GAME_EVENT_SCOURGE_INVASION_50_INVASIONS);
         sGameEventMgr->StartEvent(GAME_EVENT_SCOURGE_INVASION_100_INVASIONS);
     }
-    else if (m_siData.m_battlesWon >= 150)
+    else if (m_siData.m_battlesWon >= sWorld->getIntConfig(CONFIG_SCOURGEINVASION_COUNTER_THIRD))
     {
-        sGameEventMgr->StopEvent(GAME_EVENT_SCOURGE_INVASION);
+        // The event is enabled via command, so we expect it to be disabled via command as well.
+        // sGameEventMgr->StopEvent(GAME_EVENT_SCOURGE_INVASION);
         sGameEventMgr->StopEvent(GAME_EVENT_SCOURGE_INVASION_50_INVASIONS);
         sGameEventMgr->StopEvent(GAME_EVENT_SCOURGE_INVASION_100_INVASIONS);
         sGameEventMgr->StartEvent(GAME_EVENT_SCOURGE_INVASION_INVASIONS_DONE);

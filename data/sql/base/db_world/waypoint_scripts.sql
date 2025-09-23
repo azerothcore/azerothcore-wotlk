@@ -1,8 +1,8 @@
--- MySQL dump 10.13  Distrib 8.0.34, for Win64 (x86_64)
+-- MySQL dump 10.13  Distrib 8.4.3, for Win64 (x86_64)
 --
--- Host: 127.0.0.1    Database: acore_world
+-- Host: localhost    Database: acore_world
 -- ------------------------------------------------------
--- Server version	8.0.34
+-- Server version	8.4.3
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
 /*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
@@ -614,6 +614,9 @@ INSERT INTO `waypoint_scripts` VALUES
 (1383230,2,1,7,0,0,0,0,0,0,138323),
 (849301,0,16,6596,2,0,0,0,0,0,201194),
 (849910,0,16,6596,2,0,0,0,0,0,201200),
+(1651020,0,15,34427,1,0,0,0,0,0,1651020),
+(1651020,0,1,66,0,0,0,0,0,0,1651021),
+(1651020,0,18,1000,0,0,0,0,0,0,1651022),
 (1841900,0,1,378,1,0,0,0,0,0,1841900),
 (1841901,0,1,69,1,0,0,0,0,0,1841901);
 /*!40000 ALTER TABLE `waypoint_scripts` ENABLE KEYS */;
@@ -627,5 +630,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2024-12-17 22:34:49
-
+-- Dump completed on 2025-07-19 12:09:52

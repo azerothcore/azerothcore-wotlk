@@ -202,10 +202,29 @@ void SmartAIMgr::LoadSmartAIFromDB()
         }
         else
         {
-            if (!sObjectMgr->GetCreatureData(uint32(std::abs(temp.entryOrGuid))))
+            switch (source_type)
             {
-                LOG_ERROR("sql.sql", "SmartAIMgr::LoadSmartAIFromDB: Creature guid ({}) does not exist, skipped loading.", uint32(std::abs(temp.entryOrGuid)));
-                continue;
+                case SMART_SCRIPT_TYPE_CREATURE:
+                    {
+                        if (!sObjectMgr->GetCreatureData(uint32(std::abs(temp.entryOrGuid))))
+                        {
+                            LOG_ERROR("sql.sql", "SmartAIMgr::LoadSmartAIFromDB: Creature guid ({}) does not exist, skipped loading.", uint32(std::abs(temp.entryOrGuid)));
+                            continue;
+                        }
+                        break;
+                    }
+                case SMART_SCRIPT_TYPE_GAMEOBJECT:
+                    {
+                        if (!sObjectMgr->GetGameObjectData(uint32(std::abs(temp.entryOrGuid))))
+                        {
+                            LOG_ERROR("sql.sql", "SmartAIMgr::LoadSmartAIFromDB: GameObject guid ({}) does not exist, skipped loading.", uint32(temp.entryOrGuid));
+                            continue;
+                        }
+                        break;
+                    }
+                default:
+                    LOG_ERROR("sql.sql", "SmartAIMgr::LoadSmartAIFromDB: not yet implemented source_type {}", (uint32)source_type);
+                    continue;
             }
         }
 
@@ -836,7 +855,7 @@ bool SmartAIMgr::CheckUnusedActionParams(SmartScriptHolder const& e)
             case SMART_ACTION_SET_HOVER: return sizeof(SmartAction::setHover);
             case SMART_ACTION_SET_HEALTH_PCT: return sizeof(SmartAction::setHealthPct);
             // case SMART_ACTION_CREATE_CONVERSATION: return sizeof(SmartAction::raw);
-            case SMART_ACTION_MOVE_TO_POS_TARGET: return sizeof(SmartAction::moveToPos);
+            case SMART_ACTION_MOVE_TO_POS_TARGET: return sizeof(SmartAction::moveToPosTarget);
             case SMART_ACTION_EXIT_VEHICLE: return NO_PARAMS;
             case SMART_ACTION_SET_UNIT_MOVEMENT_FLAGS: return sizeof(SmartAction::movementFlag);
             case SMART_ACTION_SET_COMBAT_DISTANCE: return sizeof(SmartAction::combatDistance);

@@ -217,10 +217,10 @@ void World::LoadConfigSettings(bool reload)
 
     //visibility on continents
     _maxVisibleDistanceOnContinents = sConfigMgr->GetOption<float>("Visibility.Distance.Continents", DEFAULT_VISIBILITY_DISTANCE);
-    if (_maxVisibleDistanceOnContinents < 45 * sWorld->getRate(RATE_CREATURE_AGGRO))
+    if (_maxVisibleDistanceOnContinents < 45 * getRate(RATE_CREATURE_AGGRO))
     {
-        LOG_ERROR("server.loading", "Visibility.Distance.Continents can't be less max aggro radius {}", 45 * sWorld->getRate(RATE_CREATURE_AGGRO));
-        _maxVisibleDistanceOnContinents = 45 * sWorld->getRate(RATE_CREATURE_AGGRO);
+        LOG_ERROR("server.loading", "Visibility.Distance.Continents can't be less max aggro radius {}", 45 * getRate(RATE_CREATURE_AGGRO));
+        _maxVisibleDistanceOnContinents = 45 * getRate(RATE_CREATURE_AGGRO);
     }
     else if (_maxVisibleDistanceOnContinents > MAX_VISIBILITY_DISTANCE)
     {
@@ -230,10 +230,10 @@ void World::LoadConfigSettings(bool reload)
 
     //visibility in instances
     _maxVisibleDistanceInInstances = sConfigMgr->GetOption<float>("Visibility.Distance.Instances", DEFAULT_VISIBILITY_INSTANCE);
-    if (_maxVisibleDistanceInInstances < 45 * sWorld->getRate(RATE_CREATURE_AGGRO))
+    if (_maxVisibleDistanceInInstances < 45 * getRate(RATE_CREATURE_AGGRO))
     {
-        LOG_ERROR("server.loading", "Visibility.Distance.Instances can't be less max aggro radius {}", 45 * sWorld->getRate(RATE_CREATURE_AGGRO));
-        _maxVisibleDistanceInInstances = 45 * sWorld->getRate(RATE_CREATURE_AGGRO);
+        LOG_ERROR("server.loading", "Visibility.Distance.Instances can't be less max aggro radius {}", 45 * getRate(RATE_CREATURE_AGGRO));
+        _maxVisibleDistanceInInstances = 45 * getRate(RATE_CREATURE_AGGRO);
     }
     else if (_maxVisibleDistanceInInstances > MAX_VISIBILITY_DISTANCE)
     {
@@ -243,10 +243,10 @@ void World::LoadConfigSettings(bool reload)
 
     //visibility in BG/Arenas
     _maxVisibleDistanceInBGArenas = sConfigMgr->GetOption<float>("Visibility.Distance.BGArenas", DEFAULT_VISIBILITY_BGARENAS);
-    if (_maxVisibleDistanceInBGArenas < 45 * sWorld->getRate(RATE_CREATURE_AGGRO))
+    if (_maxVisibleDistanceInBGArenas < 45 * getRate(RATE_CREATURE_AGGRO))
     {
-        LOG_ERROR("server.loading", "Visibility.Distance.BGArenas can't be less max aggro radius {}", 45 * sWorld->getRate(RATE_CREATURE_AGGRO));
-        _maxVisibleDistanceInBGArenas = 45 * sWorld->getRate(RATE_CREATURE_AGGRO);
+        LOG_ERROR("server.loading", "Visibility.Distance.BGArenas can't be less max aggro radius {}", 45 * getRate(RATE_CREATURE_AGGRO));
+        _maxVisibleDistanceInBGArenas = 45 * getRate(RATE_CREATURE_AGGRO);
     }
     else if (_maxVisibleDistanceInBGArenas > MAX_VISIBILITY_DISTANCE)
     {
@@ -888,8 +888,6 @@ void World::SetInitialWorldSettings()
     _timers[WUPDATE_UPTIME].SetInterval(getIntConfig(CONFIG_UPTIME_UPDATE)*MINUTE * IN_MILLISECONDS);
     //Update "uptime" table based on configuration entry in minutes.
 
-    _timers[WUPDATE_CORPSES].SetInterval(20 * MINUTE * IN_MILLISECONDS);
-    //erase corpses every 20 minutes
     _timers[WUPDATE_CLEANDB].SetInterval(getIntConfig(CONFIG_LOGDB_CLEARINTERVAL)*MINUTE * IN_MILLISECONDS);
     // clean logs table every 14 days by default
     _timers[WUPDATE_AUTOBROADCAST].SetInterval(getIntConfig(CONFIG_AUTOBROADCAST_INTERVAL));
@@ -1000,7 +998,7 @@ void World::SetInitialWorldSettings()
 
     sScriptMgr->OnBeforeWorldInitialized();
 
-    if (sWorld->getBoolConfig(CONFIG_PRELOAD_ALL_NON_INSTANCED_MAP_GRIDS))
+    if (getBoolConfig(CONFIG_PRELOAD_ALL_NON_INSTANCED_MAP_GRIDS))
     {
         LOG_INFO("server.loading", "Loading All Grids For All Non-Instanced Maps...");
 
@@ -1010,15 +1008,23 @@ void World::SetInitialWorldSettings()
 
             if (mapEntry && !mapEntry->Instanceable())
             {
-                Map* map = sMapMgr->CreateBaseMap(mapEntry->MapID);
-
-                if (map)
+                if (sMapMgr->GetMapUpdater()->activated())
+                    sMapMgr->GetMapUpdater()->schedule_map_preload(mapEntry->MapID);
+                else
                 {
-                    LOG_INFO("server.loading", ">> Loading All Grids For Map {}", map->GetId());
-                    map->LoadAllGrids();
+                    Map* map = sMapMgr->CreateBaseMap(mapEntry->MapID);
+
+                    if (map)
+                    {
+                        LOG_INFO("server.loading", ">> Loading All Grids For Map {}", map->GetId());
+                        map->LoadAllGrids();
+                    }
                 }
             }
         }
+
+        if (sMapMgr->GetMapUpdater()->activated())
+            sMapMgr->GetMapUpdater()->wait();
     }
 
     uint32 startupDuration = GetMSTimeDiffToNow(startupBegin);
@@ -1188,7 +1194,7 @@ void World::Update(uint32 diff)
     }
 
     /// <li> Clean logs table
-    if (sWorld->getIntConfig(CONFIG_LOGDB_CLEARTIME) > 0) // if not enabled, ignore the timer
+    if (getIntConfig(CONFIG_LOGDB_CLEARTIME) > 0) // if not enabled, ignore the timer
     {
         if (_timers[WUPDATE_CLEANDB].Passed())
         {
@@ -1197,7 +1203,7 @@ void World::Update(uint32 diff)
             _timers[WUPDATE_CLEANDB].Reset();
 
             LoginDatabasePreparedStatement* stmt = LoginDatabase.GetPreparedStatement(LOGIN_DEL_OLD_LOGS);
-            stmt->SetData(0, sWorld->getIntConfig(CONFIG_LOGDB_CLEARTIME));
+            stmt->SetData(0, getIntConfig(CONFIG_LOGDB_CLEARTIME));
             stmt->SetData(1, uint32(currentGameTime.count()));
             LoginDatabase.Execute(stmt);
         }
@@ -1214,7 +1220,7 @@ void World::Update(uint32 diff)
         sMapMgr->Update(diff);
     }
 
-    if (sWorld->getBoolConfig(CONFIG_AUTOBROADCAST))
+    if (getBoolConfig(CONFIG_AUTOBROADCAST))
     {
         if (_timers[WUPDATE_AUTOBROADCAST].Passed())
         {
@@ -1268,18 +1274,6 @@ void World::Update(uint32 diff)
         stmt->SetData(2, realm.Id.Realm);
         stmt->SetData(3, uint32(GameTime::GetStartTime().count()));
         LoginDatabase.Execute(stmt);
-    }
-
-    ///- Erase corpses once every 20 minutes
-    if (_timers[WUPDATE_CORPSES].Passed())
-    {
-        METRIC_TIMER("world_update_time", METRIC_TAG("type", "Remove old corpses"));
-        _timers[WUPDATE_CORPSES].Reset();
-
-        sMapMgr->DoForAllMaps([](Map* map)
-        {
-            map->RemoveOldCorpses();
-        });
     }
 
     ///- Process Game events when necessary
@@ -1814,11 +1808,6 @@ void World::UpdateAreaDependentAuras()
 void World::ProcessQueryCallbacks()
 {
     _queryProcessor.ProcessReadyCallbacks();
-}
-
-void World::RemoveOldCorpses()
-{
-    _timers[WUPDATE_CORPSES].SetCurrent(_timers[WUPDATE_CORPSES].GetInterval());
 }
 
 bool World::IsPvPRealm() const

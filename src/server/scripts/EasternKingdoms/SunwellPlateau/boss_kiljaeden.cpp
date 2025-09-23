@@ -1181,6 +1181,26 @@ class spell_kiljaeden_dragon_breath : public SpellScript
     }
 };
 
+// 45848 - Shield of the Blue
+class spell_kiljaeden_shield_of_the_blue : public AuraScript
+{
+    PrepareAuraScript(spell_kiljaeden_shield_of_the_blue);
+
+    void HandleEffectApply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
+    {
+        if (Unit* target = GetTarget())
+        {
+            target->RemoveAurasDueToSpell(SPELL_FIRE_BLOOM);
+            target->RemoveMovementImpairingAuras(false);
+        }
+    }
+
+    void Register() override
+    {
+        OnEffectApply += AuraEffectApplyFn(spell_kiljaeden_shield_of_the_blue::HandleEffectApply, EFFECT_0, SPELL_AURA_MOD_DAMAGE_PERCENT_TAKEN, AURA_EFFECT_HANDLE_REAL);
+    }
+};
+
 void AddSC_boss_kiljaeden()
 {
     RegisterSunwellPlateauCreatureAI(npc_kiljaeden_controller);
@@ -1196,4 +1216,5 @@ void AddSC_boss_kiljaeden()
     RegisterSpellScript(spell_kiljaeden_armageddon_periodic_aura);
     RegisterSpellScript(spell_kiljaeden_armageddon_missile);
     RegisterSpellScript(spell_kiljaeden_dragon_breath);
+    RegisterSpellScript(spell_kiljaeden_shield_of_the_blue);
 }
