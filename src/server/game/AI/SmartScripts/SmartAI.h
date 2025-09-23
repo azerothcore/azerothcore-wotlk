@@ -40,6 +40,8 @@ enum SmartEscortVars
     SMART_MAX_AID_DIST                  = SMART_ESCORT_MAX_PLAYER_DIST / 2,
 };
 
+#define DISTANCING_CONSTANT 1.f // buffer for better functionality of distancing
+
 class SmartAI : public CreatureAI
 {
 public:

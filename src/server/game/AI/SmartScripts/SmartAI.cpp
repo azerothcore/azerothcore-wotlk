@@ -1080,12 +1080,10 @@ void SmartAI::SetCurrentRangeMode(bool on, float range)
         me->GetMotionMaster()->MoveChase(victim, _attackDistance);
 }
 
-#define DISTANCING_CONSTANT 1.f
-
 void SmartAI::DistanceYourself(float range)
 {
     Unit* victim = me->GetVictim();
-    if (!victim->IsWithinMeleeRange(me))
+    if (!victim || !victim->IsWithinMeleeRange(me))
         return;
 
     float combatReach = me->GetMeleeRange(victim);
