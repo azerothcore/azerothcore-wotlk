@@ -24,6 +24,8 @@ INSERT INTO `waypoints` (entry, pointid, position_x, position_y, position_z, ori
 (26115, 16, 3946.09, 3627.11, 74.2526, null, 0, 'Darkfallen Bloodbearer'),
 (26115, 17, 3926.76, 3578.1, 70.8602, null, 0, 'Darkfallen Bloodbearer');
 
+DELETE FROM `creature_addon` WHERE (`guid` = 96556);
+
 UPDATE `creature`
 SET `MovementType` = 2, `wander_distance` = 0
 WHERE `id1` = 26115;
