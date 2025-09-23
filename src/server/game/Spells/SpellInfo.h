@@ -39,6 +39,7 @@ struct SpellRadiusEntry;
 struct SpellEntry;
 struct SpellCastTimesEntry;
 struct Condition;
+typedef std::list<Condition*> ConditionList;
 
 enum SpellCastTargetFlags
 {
