@@ -1190,7 +1190,7 @@ float Map::GetHeightAccurate(float x, float y, float z, float radius, bool check
     float vmapHeight = VMAP_INVALID_HEIGHT_VALUE;
     if (checkVMap)
     {
-        VMAP::IVMapManager* vmgr = VMAP::VMapFactory::createOrGetVMapManager();
+        VMAP::IVMapMgr* vmgr = VMAP::VMapFactory::createOrGetVMapMgr();
         vmapHeight = vmgr->getHeight(GetId(), x, y, z, maxSearchDist);   // VMAP: same criterion as GetHeight
     }
 
