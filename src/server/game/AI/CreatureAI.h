@@ -231,6 +231,9 @@ public:
     // Called when an aura is removed or expires.
     virtual void OnAuraRemove(AuraApplication* /*aurApp*/, AuraRemoveMode /*mode*/) { }
 
+    virtual void DistancingStarted() {}
+    virtual void DistancingEnded() {}
+
 protected:
     virtual void MoveInLineOfSight(Unit* /*who*/);
 

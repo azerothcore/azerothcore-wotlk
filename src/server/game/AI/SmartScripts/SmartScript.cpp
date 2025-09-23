@@ -686,7 +686,7 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
                     float spellMinRange = me->GetSpellMinRangeForTarget(target->ToUnit(), spellInfo);
                     float meleeRange = me->GetMeleeRange(target->ToUnit());
 
-                    bool isWithinLOSInMap = me->IsWithinLOSInMap(target->ToUnit());
+                    bool isWithinLOSInMap = me->IsWithinLOSInMap(target->ToUnit(), VMAP::ModelIgnoreFlags::M2);
                     bool isWithinMeleeRange = distanceToTarget <= meleeRange;
                     bool isRangedAttack = spellMaxRange > NOMINAL_MELEE_RANGE;
                     bool isTargetRooted = target->ToUnit()->HasUnitState(UNIT_STATE_ROOT);
@@ -703,7 +703,7 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
                             continue;
 
                         float minDistance = std::max(meleeRange, spellMinRange) - distanceToTarget + NOMINAL_MELEE_RANGE;
-                        CAST_AI(SmartAI, me->AI())->MoveAway(std::min(minDistance, spellMaxRange));
+                        CAST_AI(SmartAI, me->AI())->DistanceYourself(std::min(minDistance, spellMaxRange));
                         continue;
                     }
 
@@ -715,7 +715,7 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
                         if (me->IsRooted()) // Rooted inhabit type, never move/reposition
                             continue;
 
-                        CAST_AI(SmartAI, me->AI())->SetCombatMove(true, std::max(spellMaxRange - NOMINAL_MELEE_RANGE, 0.0f));
+                        CAST_AI(SmartAI, me->AI())->SetCurrentRangeMode(true, std::max(spellMaxRange - NOMINAL_MELEE_RANGE, 0.0f));
                         continue;
                     }
                     else if (distanceToTarget < spellMinRange || !(isWithinLOSInMap || isSpellIgnoreLOS))
@@ -725,7 +725,9 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
                         if (me->IsRooted()) // Rooted inhabit type, never move/reposition
                             continue;
 
-                        CAST_AI(SmartAI, me->AI())->SetCombatMove(true);
+                        CAST_AI(SmartAI, me->AI())->SetCurrentRangeMode(true, 0.f);
+                        if (e.action.cast.castFlags & SMARTCAST_ENABLE_COMBAT_MOVE_ON_LOS)
+                            CAST_AI(SmartAI, me->AI())->SetCombatMovement(true, true);
                         continue;
                     }
 
@@ -743,18 +745,13 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
 
                     if (e.action.cast.castFlags & SMARTCAST_COMBAT_MOVE)
                     {
-                        CAST_AI(SmartAI, me->AI())->SetChaseOnInterrupt(true);
-
-                        if (!me->isMoving()) // Don't try to reposition while we are moving
-                        {
-                            // If cast flag SMARTCAST_COMBAT_MOVE is set combat movement will not be allowed unless target is outside spell range, out of mana, or LOS.
-                            if (result == SPELL_FAILED_OUT_OF_RANGE)
-                                // if we are just out of range, we only chase until we are back in spell range.
-                                CAST_AI(SmartAI, me->AI())->SetCombatMove(true, std::max(spellMaxRange - NOMINAL_MELEE_RANGE, 0.0f));
-                            else
-                                // if spell fail for any other reason, we chase to melee range, or stay where we are if spellcast was successful.
-                                CAST_AI(SmartAI, me->AI())->SetCombatMove(spellCastFailed);
-                        }
+                        // If cast flag SMARTCAST_COMBAT_MOVE is set combat movement will not be allowed unless target is outside spell range, out of mana, or LOS.
+                        if (result == SPELL_FAILED_OUT_OF_RANGE || result == SPELL_CAST_OK)
+                            // if we are just out of range, we only chase until we are back in spell range.
+                            CAST_AI(SmartAI, me->AI())->SetCurrentRangeMode(true, std::max(spellMaxRange - NOMINAL_MELEE_RANGE, 0.0f));
+                        else // move into melee on any other fail
+                            // if spell fail for any other reason, we chase to melee range, or stay where we are if spellcast was successful.
+                            CAST_AI(SmartAI, me->AI())->SetCurrentRangeMode(false, 0.f);
                     }
 
                     if (spellCastFailed)
@@ -989,7 +986,7 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
                 break;
 
             bool move = e.action.combatMove.move;
-            CAST_AI(SmartAI, me->AI())->SetCombatMove(move);
+            CAST_AI(SmartAI, me->AI())->SetCombatMovement(move, true);
             LOG_DEBUG("sql.sql", "SmartScript::ProcessAction:: SMART_ACTION_ALLOW_COMBAT_MOVEMENT: Creature {} bool on = {}",
                            me->GetGUID().ToString(), e.action.combatMove.move);
             break;
@@ -2061,7 +2058,7 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
             for (WorldObject* target : targets)
                 if (Creature* creature = target->ToCreature())
                     if (IsSmart(creature) && creature->GetVictim())
-                        if (CAST_AI(SmartAI, creature->AI())->CanCombatMove())
+                        if (!creature->HasUnitState(UNIT_STATE_NO_COMBAT_MOVEMENT))
                             creature->GetMotionMaster()->MoveChase(creature->GetVictim(), attackDistance, attackAngle);
 
             break;
@@ -2730,26 +2727,9 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
                         me->InterruptNonMeleeSpells(false);
                     }
 
-                    if (e.action.castCustom.flags & SMARTCAST_COMBAT_MOVE)
-                    {
-                        // If cast flag SMARTCAST_COMBAT_MOVE is set combat movement will not be allowed
-                        // unless target is outside spell range, out of mana, or LOS.
-
-                        bool _allowMove = false;
-                        SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(e.action.castCustom.spell); // AssertSpellInfo?
-                        int32 mana = me->GetPower(POWER_MANA);
-
-                        if (me->GetDistance(target->ToUnit()) > spellInfo->GetMaxRange(true) ||
-                            me->GetDistance(target->ToUnit()) < spellInfo->GetMinRange(true) ||
-                            !me->IsWithinLOSInMap(target->ToUnit()) ||
-                            mana < spellInfo->CalcPowerCost(me, spellInfo->GetSchoolMask()))
-                            _allowMove = true;
-
-                        CAST_AI(SmartAI, me->AI())->SetCombatMove(_allowMove);
-                    }
-
                     if (!(e.action.castCustom.flags & SMARTCAST_AURA_NOT_PRESENT) || !target->ToUnit()->HasAura(e.action.castCustom.spell))
                     {
+                        SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(e.action.castCustom.spell);
                         CustomSpellValues values;
                         if (e.action.castCustom.bp1)
                             values.AddSpellMod(SPELLVALUE_BASE_POINT0, e.action.castCustom.bp1);
@@ -2757,7 +2737,19 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
                             values.AddSpellMod(SPELLVALUE_BASE_POINT1, e.action.castCustom.bp2);
                         if (e.action.castCustom.bp3)
                             values.AddSpellMod(SPELLVALUE_BASE_POINT2, e.action.castCustom.bp3);
-                        me->CastCustomSpell(e.action.castCustom.spell, values, target->ToUnit(), (e.action.castCustom.flags & SMARTCAST_TRIGGERED) ? TRIGGERED_FULL_MASK : TRIGGERED_NONE);
+                        SpellCastResult result = me->CastCustomSpell(spellInfo, values, target->ToUnit(), (e.action.castCustom.flags & SMARTCAST_TRIGGERED) ? TRIGGERED_FULL_MASK : TRIGGERED_NONE);
+
+                        float spellMaxRange = me->GetSpellMaxRangeForTarget(target->ToUnit(), spellInfo);
+                        if (e.action.cast.castFlags & SMARTCAST_COMBAT_MOVE)
+                        {
+                            // If cast flag SMARTCAST_COMBAT_MOVE is set combat movement will not be allowed unless target is outside spell range, out of mana, or LOS.
+                            if (result == SPELL_FAILED_OUT_OF_RANGE || result == SPELL_CAST_OK)
+                                // if we are just out of range, we only chase until we are back in spell range.
+                                CAST_AI(SmartAI, me->AI())->SetCurrentRangeMode(true, std::max(spellMaxRange - NOMINAL_MELEE_RANGE, 0.0f));
+                            else // move into melee on any other fail
+                                // if spell fail for any other reason, we chase to melee range, or stay where we are if spellcast was successful.
+                                CAST_AI(SmartAI, me->AI())->SetCurrentRangeMode(false, 0.f);
+                        }
                     }
                 }
             }

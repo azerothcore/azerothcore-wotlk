@@ -1957,7 +1957,8 @@ enum SmartCastFlags
     SMARTCAST_AURA_NOT_PRESENT       = 0x020,                     // Only casts the spell if the target does not have an aura from the spell
     SMARTCAST_COMBAT_MOVE            = 0x040,                     // Prevents combat movement if cast successful. Allows movement on range, OOM, LOS
     SMARTCAST_THREATLIST_NOT_SINGLE  = 0x080,                     // Only cast if the source's threatlist is higher than one. This includes pets (see Skeram's True Fulfillment)
-    SMARTCAST_TARGET_POWER_MANA      = 0x100                      // Only cast if the target has power type mana (e.g. Mana Drain)
+    SMARTCAST_TARGET_POWER_MANA      = 0x100,                     // Only cast if the target has power type mana (e.g. Mana Drain)
+    SMARTCAST_ENABLE_COMBAT_MOVE_ON_LOS = 0x200,
 };
 
 enum SmartFollowType
