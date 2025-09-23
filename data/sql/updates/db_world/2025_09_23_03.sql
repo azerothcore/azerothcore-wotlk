@@ -1,3 +1,4 @@
+-- DB update 2025_09_23_02 -> 2025_09_23_03
 --
 UPDATE `spell_dbc` SET
     `Attributes`=384,
