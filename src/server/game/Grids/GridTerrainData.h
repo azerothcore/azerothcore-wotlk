@@ -245,11 +245,14 @@ public:
     ~GridTerrainData() { };
     TerrainMapDataReadResult Load(std::string const& mapFileName);
 
+    float GetHeightAccurate(float x, float y, float radius) const;
     uint16 getArea(float x, float y) const;
     inline float getHeight(float x, float y) const { return (this->*_gridGetHeight)(x, y); }
     float getMinHeight(float x, float y) const;
     float getLiquidLevel(float x, float y) const;
     LiquidData const GetLiquidData(float x, float y, float z, float collisionHeight, uint8 ReqLiquidType) const;
+private:
+    bool SampleHeights(uint32 xInt, uint32 yInt, float& h1, float& h2, float& h3, float& h4, float& h5) const;
 };
 
 #endif

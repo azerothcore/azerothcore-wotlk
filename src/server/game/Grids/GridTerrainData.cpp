@@ -615,3 +615,148 @@ LiquidData const GridTerrainData::GetLiquidData(float x, float y, float z, float
 
     return liquidData;
 }
+
+static inline float CELL_SIZE() { return SIZE_OF_GRIDS / float(MAP_RESOLUTION); } // ≈ 4.1666667f
+
+bool GridTerrainData::SampleHeights(uint32 xInt, uint32 yInt, float& h1, float& h2, float& h3, float& h4, float& h5) const
+{
+    if (!_loadedHeightData)
+        return false;
+
+    // FLOAT
+    if (_loadedHeightData->floatHeightData)
+    {
+        auto const& v9 = _loadedHeightData->floatHeightData->v9;
+        auto const& v8 = _loadedHeightData->floatHeightData->v8;
+
+        h1 = v9[xInt * 129 + yInt];
+        h2 = v9[(xInt + 1) * 129 + yInt];
+        h3 = v9[xInt * 129 + yInt + 1];
+        h4 = v9[(xInt + 1) * 129 + yInt + 1];
+        h5 = v8[xInt * 128 + yInt];
+        return true;
+    }
+
+    // UINT8
+    if (_loadedHeightData->uint8HeightData)
+    {
+        auto const& d = *_loadedHeightData->uint8HeightData;
+        float k = d.gridIntHeightMultiplier;
+        float base = _loadedHeightData->gridHeight;
+
+        auto v9ptr = &d.v9[xInt * 128 + xInt + yInt]; // == xInt*129 + yInt
+        h1 = float(v9ptr[0]) * k + base;
+        h2 = float(v9ptr[129]) * k + base;
+        h3 = float(v9ptr[1]) * k + base;
+        h4 = float(v9ptr[130]) * k + base;
+
+        uint8 v8val = d.v8[xInt * 128 + yInt];
+        h5 = float(v8val) * k + base;
+        return true;
+    }
+
+    // UINT16
+    if (_loadedHeightData->uint16HeightData)
+    {
+        auto const& d = *_loadedHeightData->uint16HeightData;
+        float k = d.gridIntHeightMultiplier;
+        float base = _loadedHeightData->gridHeight;
+
+        auto v9ptr = &d.v9[xInt * 128 + xInt + yInt]; // == xInt*129 + yInt
+        h1 = float(v9ptr[0]) * k + base;
+        h2 = float(v9ptr[129]) * k + base;
+        h3 = float(v9ptr[1]) * k + base;
+        h4 = float(v9ptr[130]) * k + base;
+
+        uint16 v8val = d.v8[xInt * 128 + yInt];
+        h5 = float(v8val) * k + base;
+        return true;
+    }
+
+    return false;
+}
+
+float GridTerrainData::GetHeightAccurate(float x, float y, float radius) const
+{
+    if (!_loadedHeightData)
+        return INVALID_HEIGHT;
+
+    float xf = MAP_RESOLUTION * (32.0f - x / SIZE_OF_GRIDS);
+    float yf = MAP_RESOLUTION * (32.0f - y / SIZE_OF_GRIDS);
+
+    int xInt = int(xf);
+    int yInt = int(yf);
+    float fx = xf - xInt;
+    float fy = yf - yInt;
+    xInt &= (MAP_RESOLUTION - 1);
+    yInt &= (MAP_RESOLUTION - 1);
+
+    if (isHole(xInt, yInt))
+        return INVALID_HEIGHT;
+
+    float h1, h2, h3, h4, h5;
+    if (!SampleHeights(xInt, yInt, h1, h2, h3, h4, h5))
+        return INVALID_HEIGHT;
+
+    // h1 -> (0,0)
+    // h2 -> (S,0)
+    // h3 -> (0,S)
+    // h4 -> (S,S)
+    // h5 -> (S/2, S/2)
+    const float S  = CELL_SIZE();
+    const float S2 = S * 0.5f;
+
+    G3D::Vector3 P(fx * S, fy * S, 0.0f);
+    G3D::Vector3 A(S2, S2, h5);
+    G3D::Vector3 B, C;
+
+    if (fx + fy < 1.0f)
+    {
+        if (fx > fy)
+        {
+            B = G3D::Vector3(S, 0.0f, h2);
+            C = G3D::Vector3(0.0f, 0.0f, h1);
+        }
+        else
+        {
+            B = G3D::Vector3(0.0f, 0.0f, h1);
+            C = G3D::Vector3(0.0f, S,     h3);
+        }
+    }
+    else
+    {
+        if (fx > fy)
+        {
+            B = G3D::Vector3(S, S, h4);
+            C = G3D::Vector3(S, 0, h2);
+        }
+        else
+        {
+            B = G3D::Vector3(0, S, h3);
+            C = G3D::Vector3(S, S, h4);
+        }
+    }
+
+    G3D::Vector3 U = B - A;
+    G3D::Vector3 V = C - A;
+    G3D::Vector3 n = U.cross(V);
+
+    float nz = n.z;
+    float const eps = 1e-6f;
+
+    if (std::abs(nz) < eps)
+        return getHeight(x, y);
+
+    if (nz < 0.0f)
+        n = -n;
+
+    n = n.unit();
+
+    float d = -n.dot(A);
+    float z = (radius - d - n.x * P.x - n.y * P.y) / n.z;
+
+    if (!std::isfinite(z))
+        return getHeight(x, y);
+
+    return z;
+}

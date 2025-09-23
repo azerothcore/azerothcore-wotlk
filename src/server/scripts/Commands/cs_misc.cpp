@@ -628,6 +628,8 @@ public:
 
         float groundZ = object->GetMapHeight(object->GetPositionX(), object->GetPositionY(), MAX_HEIGHT);
         float floorZ = object->GetMapHeight(object->GetPositionX(), object->GetPositionY(), object->GetPositionZ());
+        float GridZAccurate = map->GetGridHeightAccurate(x, y, object->GetGroundProbeRadius());
+        float MapZAccurate = object->GetMapHeightAccurate(object->GetPositionX(), object->GetPositionY(), object->GetPositionZ(), true, DEFAULT_HEIGHT_SEARCH, object->GetGroundProbeRadius());
 
         uint32 haveMap = GridTerrainLoader::ExistMap(object->GetMapId(), cell.GridX(), cell.GridY()) ? 1 : 0;
         uint32 haveVMap = GridTerrainLoader::ExistVMap(object->GetMapId(), cell.GridX(), cell.GridY()) ? 1 : 0;
@@ -657,6 +659,9 @@ public:
                                  object->GetPositionX(), object->GetPositionY(), object->GetPositionZ(), object->GetOrientation(),
                                  cell.GridX(), cell.GridY(), cell.CellX(), cell.CellY(), object->GetInstanceId(),
                                  zoneX, zoneY, groundZ, floorZ, haveMap, haveVMap, haveMMAP);
+
+        handler->PSendSysMessage("Accurate Height Grid: %f", GridZAccurate);
+        handler->PSendSysMessage("Accurate Height Map: %f", MapZAccurate);
 
         LiquidData const& liquidData = object->GetLiquidData();
 

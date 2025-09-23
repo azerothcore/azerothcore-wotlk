@@ -1175,10 +1175,59 @@ float Map::GetHeight(float x, float y, float z, bool checkVMap /*= true*/, float
     return mapHeight;                               // explicitly use map data
 }
 
+float Map::GetHeightAccurate(float x, float y, float z, float radius, bool checkVMap /*= true*/, float maxSearchDist /*= DEFAULT_HEIGHT_SEARCH*/) const
+{ 
+    // find raw .map surface under Z coordinates
+    float mapHeight = VMAP_INVALID_HEIGHT_VALUE;
+    float gridHeight = GetGridHeightAccurate(x, y, radius);
+    if (gridHeight > INVALID_HEIGHT)
+    {
+        const float tol = std::max(0.1f, 0.5f * radius); // tolerancia dinámica en función del tamaño del que pisa
+        if (G3D::fuzzyGe(z, gridHeight - tol)) 
+            mapHeight = gridHeight;
+    }
+
+    float vmapHeight = VMAP_INVALID_HEIGHT_VALUE;
+    if (checkVMap)
+    {
+        VMAP::IVMapManager* vmgr = VMAP::VMapFactory::createOrGetVMapManager();
+        vmapHeight = vmgr->getHeight(GetId(), x, y, z, maxSearchDist);   // VMAP: mismo criterio que GetHeight
+    }
+
+    // mapHeight set for any above raw ground Z or <= INVALID_HEIGHT
+    // vmapheight set for any under Z value or <= INVALID_HEIGHT
+    if (vmapHeight > INVALID_HEIGHT)
+    {
+        if (mapHeight > INVALID_HEIGHT)
+        {
+            // we have mapheight and vmapheight and must select more appropriate
+
+            // we are already under the surface or vmap height above map heigt
+            // or if the distance of the vmap height is less the land height distance
+            if (vmapHeight > mapHeight || std::fabs(mapHeight - z) > std::fabs(vmapHeight - z))
+                return vmapHeight;
+            else
+                return mapHeight;                           // better use .map surface height
+        }
+        else
+            return vmapHeight;                              // we have only vmapHeight (if have)
+    }
+
+    return mapHeight;                               // explicitly use map data
+}
+
 float Map::GetGridHeight(float x, float y) const
 {
     if (GridTerrainData* gmap = const_cast<Map*>(this)->GetGridTerrainData(x, y))
         return gmap->getHeight(x, y);
+
+    return INVALID_HEIGHT;
+}
+
+float Map::GetGridHeightAccurate(float x, float y, float radius) const
+{
+    if (GridTerrainData* gmap = const_cast<Map*>(this)->GetGridTerrainData(x, y))
+        return gmap->GetHeightAccurate(x, y, radius);
 
     return INVALID_HEIGHT;
 }
@@ -1594,6 +1643,15 @@ float Map::GetHeight(uint32 phasemask, float x, float y, float z, bool vmap/*=tr
 {
     float h1, h2;
     h1 = GetHeight(x, y, z, vmap, maxSearchDist);
+    h2 = _dynamicTree.getHeight(x, y, z, maxSearchDist, phasemask);
+    return std::max<float>(h1, h2);
+}
+
+float Map::GetHeightAccurate(uint32 phasemask, float x, float y, float z, float radius,
+                             bool vmap/*=true*/, float maxSearchDist /*= DEFAULT_HEIGHT_SEARCH*/) const
+{ 
+    float h1, h2;
+    h1 = GetHeightAccurate(x, y, z, radius, vmap, maxSearchDist);
     h2 = _dynamicTree.getHeight(x, y, z, maxSearchDist, phasemask);
     return std::max<float>(h1, h2);
 }

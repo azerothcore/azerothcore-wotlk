@@ -3017,6 +3017,32 @@ float WorldObject::GetMapHeight(float x, float y, float z, bool vmap/* = true*/,
     return GetMap()->GetHeight(GetPhaseMask(), x, y, z, vmap, distanceToSearch);
 }
 
+float WorldObject::GetGroundProbeRadius() const
+{
+    if (Unit const* u = ToUnit())
+        return std::max(0.25f, u->GetFloatValue(UNIT_FIELD_BOUNDINGRADIUS));
+    return 0.3f;
+}
+
+float WorldObject::GetMapHeightAccurate(float x, float y, float z, bool vmap/* = true*/,
+                                        float distanceToSearch/* = DEFAULT_HEIGHT_SEARCH*/, float radius/* = 0.3f*/) const
+{
+    if (radius <= 0.0f)
+    {
+        if (Unit const* u = ToUnit())
+        {
+            radius = std::max(0.25f, u->GetFloatValue(UNIT_FIELD_BOUNDINGRADIUS));
+        }
+        else
+            radius = 0.3f;
+    }
+
+    if (z != MAX_HEIGHT)
+        z += std::max(GetCollisionHeight(), radius + 0.2f);
+
+    return GetMap()->GetHeightAccurate(GetPhaseMask(), x, y, z, radius, vmap, distanceToSearch);
+}
+
 float WorldObject::GetMapWaterOrGroundLevel(float x, float y, float z, float* ground/* = nullptr*/) const
 {
     return GetMap()->GetWaterOrGroundLevel(GetPhaseMask(), x, y, z, ground,
