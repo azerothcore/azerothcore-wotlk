@@ -621,6 +621,7 @@ public:
         AreaTableEntry const* zoneEntry = sAreaTableStore.LookupEntry(zoneId);
         AreaTableEntry const* areaEntry = sAreaTableStore.LookupEntry(areaId);
 
+        Map* map = object->GetMap();
         float zoneX = object->GetPositionX();
         float zoneY = object->GetPositionY();
 
@@ -628,7 +629,7 @@ public:
 
         float groundZ = object->GetMapHeight(object->GetPositionX(), object->GetPositionY(), MAX_HEIGHT);
         float floorZ = object->GetMapHeight(object->GetPositionX(), object->GetPositionY(), object->GetPositionZ());
-        float GridZAccurate = map->GetGridHeightAccurate(x, y, object->GetGroundProbeRadius());
+        float GridZAccurate = map->GetGridHeightAccurate(object->GetPositionX(), object->GetPositionY(), object->GetGroundProbeRadius());
         float MapZAccurate = object->GetMapHeightAccurate(object->GetPositionX(), object->GetPositionY(), object->GetPositionZ(), true, DEFAULT_HEIGHT_SEARCH, object->GetGroundProbeRadius());
 
         uint32 haveMap = GridTerrainLoader::ExistMap(object->GetMapId(), cell.GridX(), cell.GridY()) ? 1 : 0;
