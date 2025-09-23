@@ -3175,9 +3175,8 @@ public:
                                 me->GetCreatureListWithEntryInGrid(HostileList, NPC_DOCTOR_H, 1000.0f);
                                 me->GetCreatureListWithEntryInGrid(HostileList, NPC_CHEMIST_H, 1000.0f);
                                 me->GetCreatureListWithEntryInGrid(HostileList, NPC_BLIGHT_SLINGER, 1000.0f);
-                                if (!HostileList.empty())
-                                    for (std::list<Creature*>::iterator itr = HostileList.begin(); itr != HostileList.end(); ++itr)
-                                        (*itr)->DespawnOrUnsummon();
+                                for (Creature* creature : HostileList)
+                                    creature->DespawnOrUnsummon();
                                 for (uint8 i = 0; i < 7; ++i)
                                     me->SummonGameObject(GO_HORDE_BANNER, ThrallSpawn[i + 37].x, ThrallSpawn[i + 37].y, ThrallSpawn[i + 37].z, ThrallSpawn[i + 37].o, 0.0f, 0.0f, 0.0f, 0.0f, 120 * IN_MILLISECONDS);
                                 SpawnWave(6);
