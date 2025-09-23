@@ -583,7 +583,7 @@ public:
                     {
                         me->RemoveAurasDueToSpell(SPELL_GRIP_OF_AGONY);
                         me->SetDisableGravity(false);
-                        me->MonsterMoveWithSpeed(me->GetPositionX(), me->GetPositionY(), 539.2917f, 10.0f);
+                        me->GetMotionMaster()->MovePoint(0, me->GetPositionX(), me->GetPositionY(), 539.2917f, FORCED_MOVEMENT_NONE, 10.0f);
                         for (std::list<Creature*>::iterator itr = _guardList.begin(); itr != _guardList.end(); ++itr)
                             (*itr)->AI()->DoAction(ACTION_DESPAWN);
 
@@ -845,7 +845,7 @@ public:
                     {
                         me->RemoveAurasDueToSpell(SPELL_GRIP_OF_AGONY);
                         me->SetDisableGravity(false);
-                        me->MonsterMoveWithSpeed(me->GetPositionX(), me->GetPositionY(), 539.2917f, 10.0f);
+                        me->GetMotionMaster()->MovePoint(0, me->GetPositionX(), me->GetPositionY(), 539.2917f, FORCED_MOVEMENT_NONE, 10.0f);
                         for (std::list<Creature*>::iterator itr = _guardList.begin(); itr != _guardList.end(); ++itr)
                             (*itr)->AI()->DoAction(ACTION_DESPAWN);
 

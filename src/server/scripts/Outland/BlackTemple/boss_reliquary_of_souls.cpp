@@ -301,7 +301,7 @@ public:
                     Talk(SUFF_SAY_RECAP);
                     me->SetReactState(REACT_PASSIVE);
                     me->GetMotionMaster()->Clear();
-                    me->GetMotionMaster()->MovePoint(POINT_GO_BACK, me->GetHomePosition(), false);
+                    me->GetMotionMaster()->MovePoint(POINT_GO_BACK, me->GetHomePosition(), FORCED_MOVEMENT_NONE, 0.f, false);
                     scheduler.CancelAll();
                 }
             }
@@ -408,7 +408,7 @@ public:
                     Talk(DESI_SAY_RECAP);
                     me->SetReactState(REACT_PASSIVE);
                     me->GetMotionMaster()->Clear();
-                    me->GetMotionMaster()->MovePoint(POINT_GO_BACK, me->GetHomePosition(), false);
+                    me->GetMotionMaster()->MovePoint(POINT_GO_BACK, me->GetHomePosition(), FORCED_MOVEMENT_NONE, 0.f, false);
                     scheduler.CancelAll();
                 }
             }

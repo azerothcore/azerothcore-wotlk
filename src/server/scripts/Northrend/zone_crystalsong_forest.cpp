@@ -117,7 +117,7 @@ struct npc_preparations_for_war_vehicle : public NullCreatureAI
                                 }
                         }
                         else
-                            me->GetMotionMaster()->MovePoint(0, x, y, z, false, false);
+                            me->GetMotionMaster()->MovePoint(0, x, y, z, FORCED_MOVEMENT_NONE, 0.f, 0.f, false, false);
                         break;
                     }
                 }

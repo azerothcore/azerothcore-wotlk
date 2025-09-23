@@ -66,7 +66,7 @@ public:
             creature->SetFaction(FACTION_ESCORTEE_H_NEUTRAL_ACTIVE); //guessed
 
             if (npc_lakota_windsongAI* pEscortAI = CAST_AI(npc_lakota_windsong::npc_lakota_windsongAI, creature->AI()))
-                pEscortAI->Start(false, false, player->GetGUID(), quest);
+                pEscortAI->Start(false, player->GetGUID(), quest);
         }
         return true;
     }
@@ -148,7 +148,7 @@ public:
             creature->SetFaction(FACTION_ESCORTEE_H_NEUTRAL_ACTIVE); // guessed
 
             if (npc_paoka_swiftmountainAI* pEscortAI = CAST_AI(npc_paoka_swiftmountain::npc_paoka_swiftmountainAI, creature->AI()))
-                pEscortAI->Start(false, false, player->GetGUID(), quest);
+                pEscortAI->Start(false, player->GetGUID(), quest);
         }
         return true;
     }

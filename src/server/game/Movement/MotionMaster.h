@@ -80,6 +80,15 @@ enum RotateDirection
     ROTATE_DIRECTION_RIGHT
 };
 
+enum ForcedMovement
+{
+    FORCED_MOVEMENT_NONE    = 0,
+    FORCED_MOVEMENT_WALK    = 1,
+    FORCED_MOVEMENT_RUN     = 2,
+
+    FORCED_MOVEMENT_MAX
+};
+
 struct ChaseRange
 {
     ChaseRange(float range);
@@ -210,11 +219,11 @@ public:
     void MoveForwards(Unit* target, float dist);
     void MoveConfused();
     void MoveFleeing(Unit* enemy, uint32 time = 0);
-    void MovePoint(uint32 id, const Position& pos, bool generatePath = true, bool forceDestination = true)
-    { MovePoint(id, pos.m_positionX, pos.m_positionY, pos.m_positionZ, generatePath, forceDestination, MOTION_SLOT_ACTIVE, pos.GetOrientation()); }
-    void MovePoint(uint32 id, float x, float y, float z, bool generatePath = true, bool forceDestination = true, MovementSlot slot = MOTION_SLOT_ACTIVE, float orientation = 0.0f);
-    void MoveSplinePath(Movement::PointsArray* path);
-    void MoveSplinePath(uint32 path_id);
+    void MovePoint(uint32 id, const Position& pos, ForcedMovement forcedMovement = FORCED_MOVEMENT_NONE, float speed = 0.f, bool generatePath = true, bool forceDestination = true)
+    { MovePoint(id, pos.m_positionX, pos.m_positionY, pos.m_positionZ, forcedMovement, speed, pos.GetOrientation(), generatePath, forceDestination, MOTION_SLOT_ACTIVE); }
+    void MovePoint(uint32 id, float x, float y, float z, ForcedMovement forcedMovement = FORCED_MOVEMENT_NONE, float speed = 0.f, float orientation = 0.0f, bool generatePath = true, bool forceDestination = true, MovementSlot slot = MOTION_SLOT_ACTIVE);
+    void MoveSplinePath(Movement::PointsArray* path, ForcedMovement forcedMovement = FORCED_MOVEMENT_NONE);
+    void MoveSplinePath(uint32 path_id, ForcedMovement forcedMovement = FORCED_MOVEMENT_NONE);
 
     // These two movement types should only be used with creatures having landing/takeoff animations
     void MoveLand(uint32 id, Position const& pos, float speed = 0.0f);

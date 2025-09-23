@@ -142,7 +142,7 @@ public:
             {
                 summoned->SetDisableGravity(true);
                 float speed = summoned->GetDistance(summoned->GetPositionX(), summoned->GetPositionY(), me->GetPositionZ() + 15.0f) / (1000.0f * 0.001f);
-                summoned->MonsterMoveWithSpeed(summoned->GetPositionX(), summoned->GetPositionY(), me->GetPositionZ() + 15.0f, speed);
+                summoned->GetMotionMaster()->MovePoint(0, summoned->GetPositionX(), summoned->GetPositionY(), me->GetPositionZ() + 15.0f, FORCED_MOVEMENT_NONE, speed);
                 summoned->CastSpell(summoned, SPELL_RIBBON_OF_SOULS, false);
             }
         }
@@ -270,8 +270,7 @@ public:
                 if (EventMoveTimer <= diff)
                 {
                     me->SetDisableGravity(true);
-                    me->MonsterMoveWithSpeed(me->GetPositionX(), me->GetPositionY(), HIGHBORNE_LOC_Y_NEW, me->GetDistance(me->GetPositionX(), me->GetPositionY(), HIGHBORNE_LOC_Y_NEW) / (5000 * 0.001f));
-                    me->SetPosition(me->GetPositionX(), me->GetPositionY(), HIGHBORNE_LOC_Y_NEW, me->GetOrientation());
+                    me->GetMotionMaster()->MovePoint(0, me->GetPositionX(), me->GetPositionY(), HIGHBORNE_LOC_Y_NEW, FORCED_MOVEMENT_NONE, me->GetDistance(me->GetPositionX(), me->GetPositionY(), HIGHBORNE_LOC_Y_NEW) / (5000 * 0.001f));
                     EventMove = false;
                 }
                 else EventMoveTimer -= diff;
@@ -917,7 +916,8 @@ public:
 
                 if (auto ai = CAST_AI(npc_varian_wrynn::npc_varian_wrynnAI, creature->AI()))
                 {
-                    ai->Start(true, true, player->GetGUID());
+                    creature->SetWalk(false);
+                    ai->Start(true, player->GetGUID());
                     if (Creature* jaina = GetClosestCreatureWithEntry(creature, NPC_JAINA, 50.0f))
                         ai->jainaGUID = jaina->GetGUID();
                     else
@@ -1218,27 +1218,27 @@ public:
                         {
                             case 0:
                                 if (Unit* temp = me->SummonCreature(NPC_DOCTOR, AllianceSpawn[4].x - rand32() % 5, AllianceSpawn[4].y - rand32() % 5, AllianceSpawn[4].z, TEMPSUMMON_DEAD_DESPAWN))
-                                    temp->GetMotionMaster()->MovePoint(0, me->GetPositionX(), me->GetPositionY(), me->GetPositionZ(), false);
+                                    temp->GetMotionMaster()->MovePoint(0, me->GetPositionX(), me->GetPositionY(), me->GetPositionZ(), FORCED_MOVEMENT_NONE, 0.f, 0.f, false);
                                 break;
                             case 1:
                                 if (Unit* temp = me->SummonCreature(NPC_CHEMIST, AllianceSpawn[4].x - rand32() % 5, AllianceSpawn[4].y - rand32() % 5, AllianceSpawn[4].z, TEMPSUMMON_DEAD_DESPAWN))
-                                    temp->GetMotionMaster()->MovePoint(0, me->GetPositionX(), me->GetPositionY(), me->GetPositionZ(), false);
+                                    temp->GetMotionMaster()->MovePoint(0, me->GetPositionX(), me->GetPositionY(), me->GetPositionZ(), FORCED_MOVEMENT_NONE, 0.f, 0.f, false);
                                 break;
                             case 2:
                                 if (Unit* temp = me->SummonCreature(NPC_BETRAYER, AllianceSpawn[4].x - rand32() % 5, AllianceSpawn[4].y - rand32() % 5, AllianceSpawn[4].z, TEMPSUMMON_DEAD_DESPAWN))
-                                    temp->GetMotionMaster()->MovePoint(0, me->GetPositionX(), me->GetPositionY(), me->GetPositionZ(), false);
+                                    temp->GetMotionMaster()->MovePoint(0, me->GetPositionX(), me->GetPositionY(), me->GetPositionZ(), FORCED_MOVEMENT_NONE, 0.f, 0.f, false);
                                 break;
                             case 3:
                                 if (Unit* temp = me->SummonCreature(NPC_DOCTOR, AllianceSpawn[5].x - rand32() % 5, AllianceSpawn[5].y - rand32() % 5, AllianceSpawn[5].z, TEMPSUMMON_DEAD_DESPAWN))
-                                    temp->GetMotionMaster()->MovePoint(0, me->GetPositionX(), me->GetPositionY(), me->GetPositionZ(), false);
+                                    temp->GetMotionMaster()->MovePoint(0, me->GetPositionX(), me->GetPositionY(), me->GetPositionZ(), FORCED_MOVEMENT_NONE, 0.f, 0.f, false);
                                 break;
                             case 4:
                                 if (Unit* temp = me->SummonCreature(NPC_CHEMIST, AllianceSpawn[5].x - rand32() % 5, AllianceSpawn[5].y - rand32() % 5, AllianceSpawn[5].z, TEMPSUMMON_DEAD_DESPAWN))
-                                    temp->GetMotionMaster()->MovePoint(0, me->GetPositionX(), me->GetPositionY(), me->GetPositionZ(), false);
+                                    temp->GetMotionMaster()->MovePoint(0, me->GetPositionX(), me->GetPositionY(), me->GetPositionZ(), FORCED_MOVEMENT_NONE, 0.f, 0.f, false);
                                 break;
                             case 5:
                                 if (Unit* temp = me->SummonCreature(NPC_BETRAYER, AllianceSpawn[5].x - rand32() % 5, AllianceSpawn[5].y - rand32() % 5, AllianceSpawn[5].z, TEMPSUMMON_DEAD_DESPAWN))
-                                    temp->GetMotionMaster()->MovePoint(0, me->GetPositionX(), me->GetPositionY(), me->GetPositionZ(), false);
+                                    temp->GetMotionMaster()->MovePoint(0, me->GetPositionX(), me->GetPositionY(), me->GetPositionZ(), FORCED_MOVEMENT_NONE, 0.f, 0.f, false);
                                 break;
                         }
                     }
@@ -1246,7 +1246,7 @@ public:
                 case 5:
                     for (uint8 i = 0; i < WAVE_MAXCOUNT; ++i)
                         if (Unit* temp = me->SummonCreature(NPC_GUARDIAN, AllianceSpawn[6].x - rand32() % 5, AllianceSpawn[6].y - rand32() % 5, AllianceSpawn[6].z, TEMPSUMMON_DEAD_DESPAWN))
-                            temp->GetMotionMaster()->MovePoint(0, me->GetPositionX(), me->GetPositionY(), me->GetPositionZ(), false);
+                            temp->GetMotionMaster()->MovePoint(0, me->GetPositionX(), me->GetPositionY(), me->GetPositionZ(), FORCED_MOVEMENT_NONE, 0.f, 0.f, false);
                     break;
                 case 6:
                     if (Unit* temp = me->SummonCreature(NPC_BLIGHTWORM, AllianceSpawn[7].x, AllianceSpawn[7].y, AllianceSpawn[7].z, TEMPSUMMON_MANUAL_DESPAWN))
@@ -1614,7 +1614,7 @@ public:
                             break;
                         case 22:
                             Talk(WRYNN_SAY_SEWERS_4);
-                            SetRun(false);
+                            me->SetWalk(true);
                             if (Creature* jaina = ObjectAccessor::GetCreature(*me, jainaGUID))
                             {
                                 jaina->GetMotionMaster()->Clear();
@@ -1665,7 +1665,7 @@ public:
                             JumpToNextStep(3 * IN_MILLISECONDS);
                             break;
                         case 31:
-                            SetRun(true);
+                            me->SetWalk(false);
                             if (Creature* jaina = ObjectAccessor::GetCreature(*me, jainaGUID))
                                 jaina->GetMotionMaster()->MoveFollow(me, 1, 0);
                             SetEscortPaused(false);
@@ -1727,7 +1727,7 @@ public:
                             if (Creature* jaina = ObjectAccessor::GetCreature(*me, jainaGUID))
                             {
                                 jaina->GetMotionMaster()->Clear();
-                                jaina->GetMotionMaster()->MovePoint(0, AllianceWP[7].x, AllianceWP[7].y, AllianceWP[7].z, false);
+                                jaina->GetMotionMaster()->MovePoint(0, AllianceWP[7].x, AllianceWP[7].y, AllianceWP[7].z, FORCED_MOVEMENT_NONE, 0.f, 0.f, false);
                             }
                             JumpToNextStep(5 * IN_MILLISECONDS);
                             break;
@@ -1789,7 +1789,7 @@ public:
                             break;
                         case 54:
                             Talk(WRYNN_SAY_APO_7);
-                            SetRun(false);
+                            me->SetWalk(true);
                             JumpToNextStep(4 * IN_MILLISECONDS);
                             break;
                         case 55:
@@ -1845,7 +1845,7 @@ public:
                             JumpToNextStep(1.5 * IN_MILLISECONDS);
                             break;
                         case 65:
-                            SetRun(true);
+                            me->SetWalk(false);
                             SetEscortPaused(false);
                             JumpToNextStep(0.25 * IN_MILLISECONDS);
                             break;
@@ -2236,7 +2236,8 @@ public:
                         if (Creature* sylvannas = GetClosestCreatureWithEntry(creature, NPC_SYLVANAS, 50.0f))
                         {
                             thrall_ai->sylvanasfollowGUID = sylvannas->GetGUID();
-                            thrall_ai->Start(true, true, player->GetGUID());
+                            creature->SetWalk(false);
+                            thrall_ai->Start(true, player->GetGUID());
                             thrall_ai->SetDespawnAtEnd(false);
                             thrall_ai->SetDespawnAtFar(false);
                         }
@@ -2477,7 +2478,7 @@ public:
                             for (std::list<Creature*>::iterator itr = ThroneList.begin(); itr != ThroneList.end(); itr++)
                                 (*itr)->DespawnOrUnsummon();
                         SetEscortPaused(false);
-                        SetRun(false);
+                        me->SetWalk(true);
                         break;
                     }
                 default:
@@ -2972,7 +2973,7 @@ public:
                             SetEscortPaused(false);
                             bStepping = false;
                             JumpToNextStep(0);
-                            SetRun(true);
+                            me->SetWalk(false);
                             if (Creature* sylvanas = ObjectAccessor::GetCreature(*me, sylvanasfollowGUID))
                             {
                                 sylvanas->GetMotionMaster()->MovePath(NPC_SYLVANAS * 100, false);
@@ -3005,7 +3006,7 @@ public:
                                     for (std::list<Creature*>::iterator itr = PlagueList.begin(); itr != PlagueList.end(); itr++)
                                         (*itr)->DespawnOrUnsummon();
                                 SetEscortPaused(false);
-                                SetRun(false);
+                                me->SetWalk(true);
                                 if (Creature* sylvanas = ObjectAccessor::GetCreature(*me, sylvanasfollowGUID))
                                     sylvanas->GetMotionMaster()->MovePath(NPC_SYLVANAS * 1000, false);
                                 JumpToNextStep(3 * IN_MILLISECONDS);
@@ -3077,7 +3078,7 @@ public:
                             FollowThrall();
                             SetEscortPaused(false);
                             bStepping = false;
-                            SetRun(true);
+                            me->SetWalk(false);
                             Talk(THRALL_SAY_COURTYARD_4);
                             UpdateWorldState(me->GetMap(), WORLD_STATE_BATTLE_FOR_UNDERCITY_START_H, 0);
                             UpdateWorldState(me->GetMap(), WORLD_STATE_BATTLE_FOR_UNDERCITY_COURTYARD_FIGHT_H, 1);
@@ -3182,7 +3183,7 @@ public:
                                 SpawnWave(6);
                                 SetEscortPaused(false);
                                 bStepping = false;
-                                SetRun(false);
+                                me->SetWalk(true);
                                 JumpToNextStep(0 * IN_MILLISECONDS);
                                 break;
                             }
@@ -3226,7 +3227,7 @@ public:
                             FollowThrall();
                             SetEscortPaused(false);
                             bStepping = false;
-                            SetRun(false);
+                            me->SetWalk(true);
                             JumpToNextStep(0 * IN_MILLISECONDS);
                             break;
                         // Top of Undercity Discussion
@@ -3266,7 +3267,7 @@ public:
                             FollowThrall();
                             SetEscortPaused(false);
                             bStepping = false;
-                            SetRun(false);
+                            me->SetWalk(true);
                             JumpToNextStep(0 * IN_MILLISECONDS);
                             break;
                         case 63:
@@ -3284,7 +3285,7 @@ public:
                             FollowThrall();
                             SetEscortPaused(false);
                             bStepping = false;
-                            SetRun(false);
+                            me->SetWalk(true);
                             JumpToNextStep(0 * IN_MILLISECONDS);
                             break;
                         case 67:
@@ -3299,7 +3300,7 @@ public:
                             FollowThrall();
                             SetEscortPaused(false);
                             bStepping = false;
-                            SetRun(false);
+                            me->SetWalk(true);
                             JumpToNextStep(0 * IN_MILLISECONDS);
                             break;
                         // KHANOK - Valimathtas Intro
@@ -3475,7 +3476,7 @@ public:
                             FollowThrall();
                             SetEscortPaused(false);
                             bStepping = false;
-                            SetRun(false);
+                            me->SetWalk(true);
                             JumpToNextStep(0 * IN_MILLISECONDS);
                             break;
                         case 109:
@@ -3491,7 +3492,7 @@ public:
                             FollowThrall();
                             SetEscortPaused(false);
                             bStepping = false;
-                            SetRun(true);
+                            me->SetWalk(false);
                             JumpToNextStep(0 * IN_MILLISECONDS);
                             break;
                         case 112:
@@ -3662,7 +3663,7 @@ public:
                         case 143:
                             if (Creature* sylvanas = ObjectAccessor::GetCreature(*me, sylvanasfollowGUID))
                             {
-                                sylvanas->GetMotionMaster()->MovePoint(0, 1289.48f, 314.33f, -57.32f, true);
+                                sylvanas->GetMotionMaster()->MovePoint(0, 1289.48f, 314.33f, -57.32f);
                                 sylvanas->CastSpell(sylvanas, SPELL_LEAP_TO_PLATFORM);
                             }
                             JumpToNextStep(10 * IN_MILLISECONDS);
@@ -3706,7 +3707,7 @@ public:
                                 wrynn->SetImmuneToAll(true);
                                 wrynn->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_STATE_READY2H);
                                 wrynn->SetReactState(REACT_PASSIVE);
-                                wrynn->GetMotionMaster()->MovePoint(0, 1302.543f, 359.472f, -67.295f, true);
+                                wrynn->GetMotionMaster()->MovePoint(0, 1302.543f, 359.472f, -67.295f);
                             }
                             if (Creature* jaina = me->SummonCreature(NPC_JAINA, 1308.862f, 381.809f, -66.044243f, TEMPSUMMON_MANUAL_DESPAWN))
                             {
@@ -3807,7 +3808,7 @@ public:
                             {
                                 SaurfangGUID = saurfang->GetGUID();
                                 saurfang->SetWalk(true);
-                                saurfang->GetMotionMaster()->MovePoint(0, 1300.862f, 353.670f, -66.187f, true);
+                                saurfang->GetMotionMaster()->MovePoint(0, 1300.862f, 353.670f, -66.187f);
                             }
                             JumpToNextStep(7 * IN_MILLISECONDS);
                             break;
