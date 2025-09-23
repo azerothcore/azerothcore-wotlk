@@ -1182,7 +1182,7 @@ float Map::GetHeightAccurate(float x, float y, float z, float radius, bool check
     float gridHeight = GetGridHeightAccurate(x, y, radius);
     if (gridHeight > INVALID_HEIGHT)
     {
-        const float tol = std::max(0.1f, 0.5f * radius); // tolerancia dinámica en función del tamaño del que pisa
+        const float tol = std::max(0.1f, 0.5f * radius); // dynamic tolerance based on the size of the collider
         if (G3D::fuzzyGe(z, gridHeight - tol))
             mapHeight = gridHeight;
     }
@@ -1191,7 +1191,7 @@ float Map::GetHeightAccurate(float x, float y, float z, float radius, bool check
     if (checkVMap)
     {
         VMAP::IVMapManager* vmgr = VMAP::VMapFactory::createOrGetVMapManager();
-        vmapHeight = vmgr->getHeight(GetId(), x, y, z, maxSearchDist);   // VMAP: mismo criterio que GetHeight
+        vmapHeight = vmgr->getHeight(GetId(), x, y, z, maxSearchDist);   // VMAP: same criterion as GetHeight
     }
 
     // mapHeight set for any above raw ground Z or <= INVALID_HEIGHT
