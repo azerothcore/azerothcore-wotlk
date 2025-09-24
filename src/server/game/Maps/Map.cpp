@@ -1671,8 +1671,8 @@ float Map::GetHeightAccurate(uint32 phasemask, float x, float y, float z, float 
 float Map::GetHeightAccurate(uint32 phasemask, float x, float y, float z, float radius, float yaw,
                              bool vmap/*=true*/, float maxSearchDist /*= DEFAULT_HEIGHT_SEARCH*/) const
 {
-    const float hMapMix = GetHeightAccurate(x, y, z, radius, yaw, vmap, maxSearchDist);    
-	const float hDyn    = _dynamicTree.getHeight(x, y, z, maxSearchDist, phasemask);
+    const float hMapMix = GetHeightAccurate(x, y, z, radius, yaw, vmap, maxSearchDist);
+    const float hDyn    = _dynamicTree.getHeight(x, y, z, maxSearchDist, phasemask);
     return std::max<float>(hMapMix, hDyn);
 }
 
