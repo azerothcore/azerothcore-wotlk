@@ -3037,9 +3037,7 @@ float WorldObject::GetMapHeightAccurate(float x, float y, float z, bool vmap/* =
             radius = 0.3f;
     }
 
-    float rScale = 1.0f;
-    if (sWorld)
-        rScale = std::max(0.1f, sWorld->getFloatConfig(CONFIG_HEIGHT_ACCURATE_RADIUS_SCALE));
+    float rScale = sWorld->getFloatConfig(CONFIG_HEIGHT_ACCURATE_RADIUS_SCALE);
     radius *= rScale;
 
     float yaw = GetOrientation();

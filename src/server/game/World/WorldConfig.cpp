@@ -282,13 +282,9 @@ void WorldConfig::BuildConfigCache()
     SetConfigValue<bool>(CONFIG_GM_LOWER_SECURITY, "GM.LowerSecurity", false);
     SetConfigValue<float>(CONFIG_CHANCE_OF_GM_SURVEY, "GM.TicketSystem.ChanceOfGMSurvey", 50.0f);
 
-    SetConfigValue<uint32>(CONFIG_HEIGHT_ACCURATE_SHAPE, "Height.Accurate.Shape", 0);
-    float rawSc = sConfigMgr->GetOption<float>("Height.Accurate.RadiusScale", 1.0f);
-    float clampedSc = std::clamp(rawSc, 0.05f, 4.0f);
-    SetConfigValue<float>(CONFIG_HEIGHT_ACCURATE_RADIUS_SCALE, "Height.Accurate.RadiusScale", clampedSc);
-    float rawSq = sConfigMgr->GetOption<float>("Height.Accurate.SquareBlend", 0.20f);
-    float clampedSq = std::clamp(rawSq, 0.0f, 1.0f);
-    SetConfigValue<float>(CONFIG_HEIGHT_ACCURATE_SQUARE_BLEND, "Height.Accurate.SquareBlend", clampedSq);
+    SetConfigValue<uint32>(CONFIG_HEIGHT_ACCURATE_SHAPE, "Height.Accurate.Shape", 0, ConfigValueCache::Reloadable::Yes, [](uint32 const& value) { return value <= 1; }, "<= 1");
+    SetConfigValue<float>(CONFIG_HEIGHT_ACCURATE_RADIUS_SCALE, "Height.Accurate.RadiusScale", 1.0f, ConfigValueCache::Reloadable::Yes, [](float const& value) { return value >= 0.1f && value <= 4.0f; }, ">= 0.1 and <= 4.0");
+    SetConfigValue<float>(CONFIG_HEIGHT_ACCURATE_SQUARE_BLEND, "Height.Accurate.SquareBlend", 0.20f, ConfigValueCache::Reloadable::Yes, [](float const& value) { return value >= 0.0f && value <= 1.0f; }, ">= 0.0 and <= 1.0");
 
     SetConfigValue<uint32>(CONFIG_GROUP_VISIBILITY, "Visibility.GroupMode", 1);
 

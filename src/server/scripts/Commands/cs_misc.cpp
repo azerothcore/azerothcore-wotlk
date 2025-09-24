@@ -630,20 +630,14 @@ public:
         float groundZ = object->GetMapHeight(object->GetPositionX(), object->GetPositionY(), MAX_HEIGHT);
         float floorZ = object->GetMapHeight(object->GetPositionX(), object->GetPositionY(), object->GetPositionZ());
         float probeR = object->GetGroundProbeRadius();
-        float rScale = 1.0f;
-        float blend  = 0.0f;
-        if (sWorld)
-        {
-            rScale = sWorld->getFloatConfig(CONFIG_HEIGHT_ACCURATE_RADIUS_SCALE);
-            blend  = sWorld->getFloatConfig(CONFIG_HEIGHT_ACCURATE_SQUARE_BLEND);
-        }
-
+        float rScale = sWorld->getFloatConfig(CONFIG_HEIGHT_ACCURATE_RADIUS_SCALE);
+        float blend  = sWorld->getFloatConfig(CONFIG_HEIGHT_ACCURATE_SQUARE_BLEND);
         float yaw = object->GetOrientation();
         float probeRScaled = probeR * rScale;
         float GridZAccurate = map->GetGridHeightAccurate(object->GetPositionX(), object->GetPositionY(), probeRScaled, yaw);
         float MapZAccurate  = object->GetMapHeightAccurate(object->GetPositionX(), object->GetPositionY(), object->GetPositionZ(), /*vmap=*/true, DEFAULT_HEIGHT_SEARCH, probeR);
         const char* shapeStr = "circle";
-        if (sWorld && sWorld->getIntConfig(CONFIG_HEIGHT_ACCURATE_SHAPE) == 1)
+        if (sWorld->getIntConfig(CONFIG_HEIGHT_ACCURATE_SHAPE) == 1)
             shapeStr = "square";
 
         uint32 haveMap = GridTerrainLoader::ExistMap(object->GetMapId(), cell.GridX(), cell.GridY()) ? 1 : 0;

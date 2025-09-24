@@ -742,9 +742,7 @@ float GridTerrainData::GetHeightAccurate(float x, float y, float radius, GroundF
 
         if (shape == GroundFootprintShape::Square)
         {
-            float blend = 0.0f;
-            if (sWorld)
-                blend = std::clamp(sWorld->getFloatConfig(CONFIG_HEIGHT_ACCURATE_SQUARE_BLEND), 0.0f, 1.0f);
+            float blend = sWorld->getFloatConfig(CONFIG_HEIGHT_ACCURATE_SQUARE_BLEND);
             float c = std::cos(yaw), s = std::sin(yaw);
             float rx = n.x * c + n.y * s;
             float ry = -n.x * s + n.y * c;
