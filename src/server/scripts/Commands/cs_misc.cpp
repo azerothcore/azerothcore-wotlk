@@ -631,8 +631,12 @@ public:
         float floorZ = object->GetMapHeight(object->GetPositionX(), object->GetPositionY(), object->GetPositionZ());
         float probeR = object->GetGroundProbeRadius();
         float rScale = 1.0f;
+        float blend  = 0.0f;
         if (sWorld)
+        {
             rScale = sWorld->getFloatConfig(CONFIG_HEIGHT_ACCURATE_RADIUS_SCALE);
+            blend  = sWorld->getFloatConfig(CONFIG_HEIGHT_ACCURATE_SQUARE_BLEND);
+        }
 
         float yaw = object->GetOrientation();
         float probeRScaled = probeR * rScale;
@@ -671,13 +675,6 @@ public:
                                  cell.GridX(), cell.GridY(), cell.CellX(), cell.CellY(), object->GetInstanceId(),
                                  zoneX, zoneY, groundZ, floorZ, haveMap, haveVMap, haveMMAP);
 
-        float rScale = 1.0f;
-        float blend  = 0.0f;
-        if (sWorld)
-        {
-            rScale = sWorld->getFloatConfig(CONFIG_HEIGHT_ACCURATE_RADIUS_SCALE);
-            blend  = sWorld->getFloatConfig(CONFIG_HEIGHT_ACCURATE_SQUARE_BLEND);
-        }
         handler->PSendSysMessage("Accurate Height Shape: {} (SquareBlend: {:0.2f}, RadiusScale: {:0.2f})", shapeStr, blend, rScale);
         handler->PSendSysMessage("Accurate Height Grid: {}", GridZAccurate);
         handler->PSendSysMessage("Accurate Height Map: {}", MapZAccurate);
