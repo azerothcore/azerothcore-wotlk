@@ -3037,10 +3037,16 @@ float WorldObject::GetMapHeightAccurate(float x, float y, float z, bool vmap/* =
             radius = 0.3f;
     }
 
+    float rScale = 1.0f;
+    if (sWorld)
+        rScale = std::max(0.1f, sWorld->getFloatConfig(CONFIG_HEIGHT_ACCURATE_RADIUS_SCALE));
+    radius *= rScale;
+
+    float yaw = GetOrientation();
     if (z != MAX_HEIGHT)
         z += std::max(GetCollisionHeight(), radius + 0.2f);
 
-    return GetMap()->GetHeightAccurate(GetPhaseMask(), x, y, z, radius, vmap, distanceToSearch);
+    return GetMap()->GetHeightAccurate(GetPhaseMask(), x, y, z, radius, yaw, vmap, distanceToSearch);
 }
 
 float WorldObject::GetMapWaterOrGroundLevel(float x, float y, float z, float* ground/* = nullptr*/) const

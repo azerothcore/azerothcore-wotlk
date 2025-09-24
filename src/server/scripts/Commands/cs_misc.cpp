@@ -629,8 +629,12 @@ public:
 
         float groundZ = object->GetMapHeight(object->GetPositionX(), object->GetPositionY(), MAX_HEIGHT);
         float floorZ = object->GetMapHeight(object->GetPositionX(), object->GetPositionY(), object->GetPositionZ());
-        float GridZAccurate = map->GetGridHeightAccurate(object->GetPositionX(), object->GetPositionY(), object->GetGroundProbeRadius());
-        float MapZAccurate = object->GetMapHeightAccurate(object->GetPositionX(), object->GetPositionY(), object->GetPositionZ(), true, DEFAULT_HEIGHT_SEARCH, object->GetGroundProbeRadius());
+        float probeR = object->GetGroundProbeRadius();
+        float GridZAccurate = map->GetGridHeightAccurate(object->GetPositionX(), object->GetPositionY(), probeR);
+        float MapZAccurate = object->GetMapHeightAccurate(object->GetPositionX(), object->GetPositionY(), object->GetPositionZ(), true, DEFAULT_HEIGHT_SEARCH, probeR);
+        const char* shapeStr = "circle";
+        if (sWorld && sWorld->getIntConfig(CONFIG_HEIGHT_ACCURATE_SHAPE) == 1)
+            shapeStr = "square";
 
         uint32 haveMap = GridTerrainLoader::ExistMap(object->GetMapId(), cell.GridX(), cell.GridY()) ? 1 : 0;
         uint32 haveVMap = GridTerrainLoader::ExistVMap(object->GetMapId(), cell.GridX(), cell.GridY()) ? 1 : 0;
@@ -661,8 +665,17 @@ public:
                                  cell.GridX(), cell.GridY(), cell.CellX(), cell.CellY(), object->GetInstanceId(),
                                  zoneX, zoneY, groundZ, floorZ, haveMap, haveVMap, haveMMAP);
 
+        float rScale = 1.0f;
+        float blend  = 0.0f;
+        if (sWorld)
+        {
+            rScale = sWorld->getFloatConfig(CONFIG_HEIGHT_ACCURATE_RADIUS_SCALE);
+            blend  = sWorld->getFloatConfig(CONFIG_HEIGHT_ACCURATE_SQUARE_BLEND);
+        }
+        handler->PSendSysMessage("Accurate Height Shape: %s (SquareBlend: %.2f, RadiusScale: %.2f)", shapeStr, blend, rScale);
         handler->PSendSysMessage("Accurate Height Grid: %f", GridZAccurate);
         handler->PSendSysMessage("Accurate Height Map: %f", MapZAccurate);
+        handler->PSendSysMessage("Probe radius (pre-scale): %.3f", probeR);
 
         LiquidData const& liquidData = object->GetLiquidData();
 

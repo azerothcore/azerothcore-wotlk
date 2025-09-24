@@ -245,7 +245,16 @@ public:
     ~GridTerrainData() { };
     TerrainMapDataReadResult Load(std::string const& mapFileName);
 
+    enum class GroundFootprintShape : uint8
+    {
+        Circle = 0,   // cylinder-plane
+        Square = 1    // upside-down pyramid
+    };
+
     float GetHeightAccurate(float x, float y, float radius) const;
+    float GetHeightAccurate(float x, float y, float radius, GroundFootprintShape shape) const;
+
+    float GetHeightAccurate(float x, float y, float radius, GroundFootprintShape shape, float yaw /*rads*/) const;
     uint16 getArea(float x, float y) const;
     inline float getHeight(float x, float y) const { return (this->*_gridGetHeight)(x, y); }
     float getMinHeight(float x, float y) const;

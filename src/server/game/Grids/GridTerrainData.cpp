@@ -3,6 +3,7 @@
 #include "GridTerrainData.h"
 #include "Log.h"
 #include "MapDefines.h"
+#include "World.h"
 #include <filesystem>
 #include <G3D/Ray.h>
 
@@ -616,6 +617,11 @@ LiquidData const GridTerrainData::GetLiquidData(float x, float y, float z, float
     return liquidData;
 }
 
+namespace
+{
+    constexpr float INV_SQRT2 = 0.70710678118654752440f; // 1/sqrt(2)
+}
+
 static inline float CELL_SIZE() { return SIZE_OF_GRIDS / float(MAP_RESOLUTION); } // ≈ 4.1666667f
 
 bool GridTerrainData::SampleHeights(uint32 xInt, uint32 yInt, float& h1, float& h2, float& h3, float& h4, float& h5) const
@@ -678,6 +684,16 @@ bool GridTerrainData::SampleHeights(uint32 xInt, uint32 yInt, float& h1, float& 
 
 float GridTerrainData::GetHeightAccurate(float x, float y, float radius) const
 {
+    return GetHeightAccurate(x, y, radius, GroundFootprintShape::Circle, 0.0f);
+}
+
+float GridTerrainData::GetHeightAccurate(float x, float y, float radius, GroundFootprintShape shape) const
+{
+    return GetHeightAccurate(x, y, radius, shape, 0.0f);
+}
+
+float GridTerrainData::GetHeightAccurate(float x, float y, float radius, GroundFootprintShape shape, float yaw) const
+{
     if (!_loadedHeightData)
         return INVALID_HEIGHT;
 
@@ -707,56 +723,53 @@ float GridTerrainData::GetHeightAccurate(float x, float y, float radius) const
     const float S2 = S * 0.5f;
 
     G3D::Vector3 P(fx * S, fy * S, 0.0f);
+
     G3D::Vector3 A(S2, S2, h5);
-    G3D::Vector3 B, C;
 
-    if (fx + fy < 1.0f)
+    const float eps = 1e-6f;
+    auto evalTri = [&](G3D::Vector3 const& B, G3D::Vector3 const& C) -> float
     {
-        if (fx > fy)
+        G3D::Vector3 U = B - A;
+        G3D::Vector3 V = C - A;
+        G3D::Vector3 n = U.cross(V);
+        const float nzAbs = std::abs(n.z);
+        if (nzAbs < eps)
+            return -1.0e30f; // inválido
+
+        const float d      = -(n.x * A.x + n.y * A.y + n.z * A.z);
+        const float zPlane = (-d - n.x * P.x - n.y * P.y) / n.z;
+        const float denom  = std::max(eps, nzAbs);
+
+        if (shape == GroundFootprintShape::Square)
         {
-            B = G3D::Vector3(S, 0.0f, h2);
-            C = G3D::Vector3(0.0f, 0.0f, h1);
+            float blend = 0.0f;
+            if (sWorld)
+                blend = std::clamp(sWorld->getFloatConfig(CONFIG_HEIGHT_ACCURATE_SQUARE_BLEND), 0.0f, 1.0f);
+            float c = std::cos(yaw), s = std::sin(yaw);
+            float rx = n.x * c + n.y * s;
+            float ry = -n.x * s + n.y * c;
+            const float slopeL1 = (std::abs(rx) + std::abs(ry)) / denom;
+            const float slopeL2 = std::sqrt(std::max(0.0f, n.x * n.x + n.y * n.y)) / denom;
+            const float addSq   = (radius * (1.0f - blend) * INV_SQRT2) * slopeL1;
+            const float addCir  = (radius * blend) * slopeL2;
+            return zPlane + addSq + addCir;
         }
         else
         {
-            B = G3D::Vector3(0.0f, 0.0f, h1);
-            C = G3D::Vector3(0.0f, S,     h3);
+            const float slopeL2 = std::sqrt(std::max(0.0f, n.x * n.x + n.y * n.y)) / denom;
+            return zPlane + radius * slopeL2;
         }
-    }
-    else
-    {
-        if (fx > fy)
-        {
-            B = G3D::Vector3(S, S, h4);
-            C = G3D::Vector3(S, 0, h2);
-        }
-        else
-        {
-            B = G3D::Vector3(0, S, h3);
-            C = G3D::Vector3(S, S, h4);
-        }
-    }
+    };
 
-    G3D::Vector3 U = B - A;
-    G3D::Vector3 V = C - A;
-    G3D::Vector3 n = U.cross(V);
+    float bestZ = -1.0e30f;
+    bool  have  = false;
+    auto take = [&](float zc) { if (std::isfinite(zc)) { have = true; if (zc > bestZ) bestZ = zc; } };
+    take(evalTri(G3D::Vector3(S,   0.0f, h2), G3D::Vector3(0.0f, 0.0f, h1))); // center-h2-h1
+    take(evalTri(G3D::Vector3(S,   S,    h4), G3D::Vector3(S,   0.0f, h2))); // center-h4-h2
+    take(evalTri(G3D::Vector3(0.0f, S,   h3), G3D::Vector3(S,   S,    h4))); // center-h3-h4
+    take(evalTri(G3D::Vector3(0.0f, 0.0f,h1), G3D::Vector3(0.0f, S,   h3))); // center-h1-h3
 
-    float nz = n.z;
-    float const eps = 1e-6f;
-
-    if (std::abs(nz) < eps)
+    if (!have)
         return getHeight(x, y);
-
-    if (nz < 0.0f)
-        n = -n;
-
-    n = n.unit();
-
-    float d = -n.dot(A);
-    float z = (radius - d - n.x * P.x - n.y * P.y) / n.z;
-
-    if (!std::isfinite(z))
-        return getHeight(x, y);
-
-    return z;
+    return bestZ;
 }

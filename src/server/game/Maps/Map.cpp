@@ -1177,9 +1177,14 @@ float Map::GetHeight(float x, float y, float z, bool checkVMap /*= true*/, float
 
 float Map::GetHeightAccurate(float x, float y, float z, float radius, bool checkVMap /*= true*/, float maxSearchDist /*= DEFAULT_HEIGHT_SEARCH*/) const
 {
+    return GetHeightAccurate(x, y, z, radius, 0.0f, checkVMap, maxSearchDist);
+}
+
+float Map::GetHeightAccurate(float x, float y, float z, float radius, float yaw, bool checkVMap /*= true*/, float maxSearchDist /*= DEFAULT_HEIGHT_SEARCH*/) const
+{
     // find raw .map surface under Z coordinates
     float mapHeight = VMAP_INVALID_HEIGHT_VALUE;
-    float gridHeight = GetGridHeightAccurate(x, y, radius);
+    float gridHeight = GetGridHeightAccurate(x, y, radius, yaw);
     if (gridHeight > INVALID_HEIGHT)
     {
         const float tol = std::max(0.1f, 0.5f * radius); // dynamic tolerance based on the size of the collider
@@ -1224,12 +1229,22 @@ float Map::GetGridHeight(float x, float y) const
     return INVALID_HEIGHT;
 }
 
-float Map::GetGridHeightAccurate(float x, float y, float radius) const
+float Map::GetGridHeightAccurate(float x, float y, float radius, float yaw) const
 {
     if (GridTerrainData* gmap = const_cast<Map*>(this)->GetGridTerrainData(x, y))
-        return gmap->GetHeightAccurate(x, y, radius);
+    {
+        GridTerrainData::GroundFootprintShape shape = GridTerrainData::GroundFootprintShape::Circle;
+        if (sWorld && sWorld->getIntConfig(CONFIG_HEIGHT_ACCURATE_SHAPE) == 1)
+            shape = GridTerrainData::GroundFootprintShape::Square;
+        return gmap->GetHeightAccurate(x, y, radius, shape, yaw);
+    }
 
     return INVALID_HEIGHT;
+}
+
+float Map::GetGridHeightAccurate(float x, float y, float radius) const
+{
+    return GetGridHeightAccurate(x, y, radius, 0.0f);
 }
 
 float Map::GetMinHeight(float x, float y) const
@@ -1650,10 +1665,15 @@ float Map::GetHeight(uint32 phasemask, float x, float y, float z, bool vmap/*=tr
 float Map::GetHeightAccurate(uint32 phasemask, float x, float y, float z, float radius,
                              bool vmap/*=true*/, float maxSearchDist /*= DEFAULT_HEIGHT_SEARCH*/) const
 {
-    float h1, h2;
-    h1 = GetHeightAccurate(x, y, z, radius, vmap, maxSearchDist);
-    h2 = _dynamicTree.getHeight(x, y, z, maxSearchDist, phasemask);
-    return std::max<float>(h1, h2);
+    return GetHeightAccurate(phasemask, x, y, z, radius, 0.0f, vmap, maxSearchDist);
+}
+
+float Map::GetHeightAccurate(uint32 phasemask, float x, float y, float z, float radius, float yaw,
+                             bool vmap/*=true*/, float maxSearchDist /*= DEFAULT_HEIGHT_SEARCH*/) const
+{
+    const float hMapMix = GetHeightAccurate(x, y, z, radius, yaw, vmap, maxSearchDist);    
+	const float hDyn    = _dynamicTree.getHeight(x, y, z, maxSearchDist, phasemask);
+    return std::max<float>(hMapMix, hDyn);
 }
 
 bool Map::IsInWater(uint32 phaseMask, float x, float y, float pZ, float collisionHeight) const
