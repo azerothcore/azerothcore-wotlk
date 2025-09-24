@@ -623,6 +623,8 @@ namespace
 }
 
 static inline float CELL_SIZE() { return SIZE_OF_GRIDS / float(MAP_RESOLUTION); } // ≈ 4.1666667f
+static inline size_t idx129(uint32 x, uint32 y) { return size_t(y) * 129u + x; }
+static inline size_t idx128(uint32 x, uint32 y) { return size_t(y) * 128u + x; }
 
 bool GridTerrainData::SampleHeights(uint32 xInt, uint32 yInt, float& h1, float& h2, float& h3, float& h4, float& h5) const
 {
@@ -635,11 +637,11 @@ bool GridTerrainData::SampleHeights(uint32 xInt, uint32 yInt, float& h1, float& 
         auto const& v9 = _loadedHeightData->floatHeightData->v9;
         auto const& v8 = _loadedHeightData->floatHeightData->v8;
 
-        h1 = v9[xInt * 129 + yInt];
-        h2 = v9[(xInt + 1) * 129 + yInt];
-        h3 = v9[xInt * 129 + yInt + 1];
-        h4 = v9[(xInt + 1) * 129 + yInt + 1];
-        h5 = v8[xInt * 128 + yInt];
+        h1 = v9[idx129(xInt,     yInt    )];
+        h2 = v9[idx129(xInt + 1, yInt    )];
+        h3 = v9[idx129(xInt,     yInt + 1)];
+        h4 = v9[idx129(xInt + 1, yInt + 1)];
+        h5 = v8[idx128(xInt,     yInt    )];
         return true;
     }
 
@@ -650,13 +652,13 @@ bool GridTerrainData::SampleHeights(uint32 xInt, uint32 yInt, float& h1, float& 
         float k = d.gridIntHeightMultiplier;
         float base = _loadedHeightData->gridHeight;
 
-        auto v9ptr = &d.v9[xInt * 128 + xInt + yInt]; // == xInt*129 + yInt
+        auto v9ptr = &d.v9[idx129(xInt, yInt)]; // contiguous row-major
         h1 = float(v9ptr[0]) * k + base;
         h2 = float(v9ptr[129]) * k + base;
         h3 = float(v9ptr[1]) * k + base;
         h4 = float(v9ptr[130]) * k + base;
 
-        uint8 v8val = d.v8[xInt * 128 + yInt];
+        uint8 v8val = d.v8[idx128(xInt, yInt)];
         h5 = float(v8val) * k + base;
         return true;
     }
@@ -668,13 +670,13 @@ bool GridTerrainData::SampleHeights(uint32 xInt, uint32 yInt, float& h1, float& 
         float k = d.gridIntHeightMultiplier;
         float base = _loadedHeightData->gridHeight;
 
-        auto v9ptr = &d.v9[xInt * 128 + xInt + yInt]; // == xInt*129 + yInt
+        auto v9ptr = &d.v9[idx129(xInt, yInt)]; // contiguous row-major
         h1 = float(v9ptr[0]) * k + base;
         h2 = float(v9ptr[129]) * k + base;
         h3 = float(v9ptr[1]) * k + base;
         h4 = float(v9ptr[130]) * k + base;
 
-        uint16 v8val = d.v8[xInt * 128 + yInt];
+        uint16 v8val = d.v8[idx128(xInt, yInt)];
         h5 = float(v8val) * k + base;
         return true;
     }
@@ -727,6 +729,8 @@ float GridTerrainData::GetHeightAccurate(float x, float y, float radius, GroundF
     G3D::Vector3 A(S2, S2, h5);
 
     const float eps = 1e-6f;
+    const float blend = sWorld->getFloatConfig(CONFIG_HEIGHT_ACCURATE_SQUARE_BLEND);
+
     auto evalTri = [&](G3D::Vector3 const& B, G3D::Vector3 const& C) -> float
     {
         G3D::Vector3 U = B - A;
@@ -734,34 +738,38 @@ float GridTerrainData::GetHeightAccurate(float x, float y, float radius, GroundF
         G3D::Vector3 n = U.cross(V);
         const float nzAbs = std::abs(n.z);
         if (nzAbs < eps)
-            return -1.0e30f; // invalid
+            return std::numeric_limits<float>::quiet_NaN();
 
         const float d      = -(n.x * A.x + n.y * A.y + n.z * A.z);
         const float zPlane = (-d - n.x * P.x - n.y * P.y) / n.z;
         const float denom  = std::max(eps, nzAbs);
+        const float slopeL2 = std::sqrt(std::max(0.0f, n.x * n.x + n.y * n.y)) / denom;
 
         if (shape == GroundFootprintShape::Square)
         {
-            float blend = sWorld->getFloatConfig(CONFIG_HEIGHT_ACCURATE_SQUARE_BLEND);
             float c = std::cos(yaw), s = std::sin(yaw);
             float rx = n.x * c + n.y * s;
             float ry = -n.x * s + n.y * c;
             const float slopeL1 = (std::abs(rx) + std::abs(ry)) / denom;
-            const float slopeL2 = std::sqrt(std::max(0.0f, n.x * n.x + n.y * n.y)) / denom;
             const float addSq   = (radius * (1.0f - blend) * INV_SQRT2) * slopeL1;
             const float addCir  = (radius * blend) * slopeL2;
             return zPlane + addSq + addCir;
         }
         else
         {
-            const float slopeL2 = std::sqrt(std::max(0.0f, n.x * n.x + n.y * n.y)) / denom;
             return zPlane + radius * slopeL2;
         }
     };
 
     float bestZ = -1.0e30f;
     bool  have  = false;
-    auto take = [&](float zc) { if (std::isfinite(zc)) { have = true; if (zc > bestZ) bestZ = zc; } };
+    auto take = [&](float zc) {
+        if (std::isfinite(zc)) {
+            have = true;
+            if (zc > bestZ) bestZ = zc;
+        }
+    };
+
     take(evalTri(G3D::Vector3(S,   0.0f, h2), G3D::Vector3(0.0f, 0.0f, h1))); // center-h2-h1
     take(evalTri(G3D::Vector3(S,   S,    h4), G3D::Vector3(S,   0.0f, h2))); // center-h4-h2
     take(evalTri(G3D::Vector3(0.0f, S,   h3), G3D::Vector3(S,   S,    h4))); // center-h3-h4

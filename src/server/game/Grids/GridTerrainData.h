@@ -251,10 +251,21 @@ public:
         Square = 1    // upside-down pyramid
     };
 
+    static inline const char* ToString(GroundFootprintShape s)
+    {
+        switch (s)
+        {
+            case GroundFootprintShape::Circle: return "circle";
+            case GroundFootprintShape::Square: return "square";
+        }
+        return "unknown";
+    }
+
     float GetHeightAccurate(float x, float y, float radius) const;
     float GetHeightAccurate(float x, float y, float radius, GroundFootprintShape shape) const;
 
     float GetHeightAccurate(float x, float y, float radius, GroundFootprintShape shape, float yaw /*rads*/) const;
+    inline std::string to_string(GridTerrainData::GroundFootprintShape s) { return GridTerrainData::ToString(s); }
     uint16 getArea(float x, float y) const;
     inline float getHeight(float x, float y) const { return (this->*_gridGetHeight)(x, y); }
     float getMinHeight(float x, float y) const;

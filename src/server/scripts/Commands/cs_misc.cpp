@@ -629,16 +629,15 @@ public:
 
         float groundZ = object->GetMapHeight(object->GetPositionX(), object->GetPositionY(), MAX_HEIGHT);
         float floorZ = object->GetMapHeight(object->GetPositionX(), object->GetPositionY(), object->GetPositionZ());
-        float probeR = object->GetGroundProbeRadius();
-        float rScale = sWorld->getFloatConfig(CONFIG_HEIGHT_ACCURATE_RADIUS_SCALE);
-        float blend  = sWorld->getFloatConfig(CONFIG_HEIGHT_ACCURATE_SQUARE_BLEND);
-        float yaw = object->GetOrientation();
-        float probeRScaled = probeR * rScale;
-        float GridZAccurate = map->GetGridHeightAccurate(object->GetPositionX(), object->GetPositionY(), probeRScaled, yaw);
-        float MapZAccurate  = object->GetMapHeightAccurate(object->GetPositionX(), object->GetPositionY(), object->GetPositionZ(), /*vmap=*/true, DEFAULT_HEIGHT_SEARCH, probeR);
-        const char* shapeStr = "circle";
-        if (sWorld->getIntConfig(CONFIG_HEIGHT_ACCURATE_SHAPE) == 1)
-            shapeStr = "square";
+        const float probeR = object->GetGroundProbeRadius(); // pre-scale
+        const float rScale = sWorld->getFloatConfig(CONFIG_HEIGHT_ACCURATE_RADIUS_SCALE);
+        const float blend = sWorld->getFloatConfig(CONFIG_HEIGHT_ACCURATE_SQUARE_BLEND);
+        const float yaw = object->GetOrientation();
+        const float probeRScaled = probeR * rScale;
+
+        const float GridZAccurate = map->GetGridHeightAccurate(object->GetPositionX(), object->GetPositionY(), probeRScaled, yaw);
+        const float MapZAccurate  = object->GetMapHeightAccurate(object->GetPositionX(), object->GetPositionY(), object->GetPositionZ(), /*vmap=*/true, DEFAULT_HEIGHT_SEARCH, probeR);
+        const char* shapeStr = GridTerrainData::ToString(static_cast<GridTerrainData::GroundFootprintShape>(sWorld->getIntConfig(CONFIG_HEIGHT_ACCURATE_SHAPE)));
 
         uint32 haveMap = GridTerrainLoader::ExistMap(object->GetMapId(), cell.GridX(), cell.GridY()) ? 1 : 0;
         uint32 haveVMap = GridTerrainLoader::ExistVMap(object->GetMapId(), cell.GridX(), cell.GridY()) ? 1 : 0;
