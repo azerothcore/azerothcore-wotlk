@@ -282,7 +282,6 @@ void WorldConfig::BuildConfigCache()
     SetConfigValue<bool>(CONFIG_GM_LOWER_SECURITY, "GM.LowerSecurity", false);
     SetConfigValue<float>(CONFIG_CHANCE_OF_GM_SURVEY, "GM.TicketSystem.ChanceOfGMSurvey", 50.0f);
 
-    SetConfigValue<bool>(CONFIG_HEIGHT_ACCURATE_ENABLE, "Height.Accurate.Enable", true);
     SetConfigValue<uint32>(CONFIG_HEIGHT_ACCURATE_SHAPE, "Height.Accurate.Shape", 1);
     SetConfigValue<float>(CONFIG_HEIGHT_ACCURATE_RADIUS_SCALE, "Height.Accurate.RadiusScale", 1.0f), 0.05f, 4.0f);
     float raw = sConfigMgr->GetOption<float>("Height.Accurate.SquareBlend", 0.20f);

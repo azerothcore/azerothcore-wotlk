@@ -1390,6 +1390,29 @@ vmap.BlizzlikeLOSInOpenWorld = 1
 vmap.enableIndoorCheck = 1
 
 #
+#    Accurate ground settlement (cylinder–plane) settings
+#    0 = cylinder-circle footprint (recommended), 
+#    1 = square footprint (upside-down-pyramid)
+#
+
+Height.Accurate.Shape = 1
+
+#
+# Scale factor applied to the probe radius (safety margin, do not abuse)
+#
+
+Height.Accurate.RadiusScale = 1.0
+
+#
+# Square and cylinder mix [0..1]
+# 0.00 = pure square
+# 1.00 = cylinder (circle) (equal to Shape=0)
+# Recommended for QA: 0.15–0.25
+#
+
+Height.Accurate.SquareBlend = 0.2
+
+#
 #    DetectPosCollision
 #        Description: Check final move position, summon position, etc for visible collision with
 #                     other objects or walls (walls only if vmaps are enabled).
