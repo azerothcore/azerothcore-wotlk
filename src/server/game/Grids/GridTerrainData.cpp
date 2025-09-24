@@ -623,8 +623,6 @@ namespace
 }
 
 static inline float CELL_SIZE() { return SIZE_OF_GRIDS / float(MAP_RESOLUTION); } // ≈ 4.1666667f
-static inline size_t idx129(uint32 x, uint32 y) { return size_t(y) * 129u + x; }
-static inline size_t idx128(uint32 x, uint32 y) { return size_t(y) * 128u + x; }
 
 bool GridTerrainData::SampleHeights(uint32 xInt, uint32 yInt, float& h1, float& h2, float& h3, float& h4, float& h5) const
 {
@@ -637,11 +635,11 @@ bool GridTerrainData::SampleHeights(uint32 xInt, uint32 yInt, float& h1, float& 
         auto const& v9 = _loadedHeightData->floatHeightData->v9;
         auto const& v8 = _loadedHeightData->floatHeightData->v8;
 
-        h1 = v9[idx129(xInt,     yInt    )];
-        h2 = v9[idx129(xInt + 1, yInt    )];
-        h3 = v9[idx129(xInt,     yInt + 1)];
-        h4 = v9[idx129(xInt + 1, yInt + 1)];
-        h5 = v8[idx128(xInt,     yInt    )];
+        h1 = v9[xInt * 129 + yInt];
+        h2 = v9[(xInt + 1) * 129 + yInt];
+        h3 = v9[xInt * 129 + yInt + 1];
+        h4 = v9[(xInt + 1) * 129 + yInt + 1];
+        h5 = v8[xInt * 128 + yInt];
         return true;
     }
 
@@ -652,13 +650,13 @@ bool GridTerrainData::SampleHeights(uint32 xInt, uint32 yInt, float& h1, float& 
         float k = d.gridIntHeightMultiplier;
         float base = _loadedHeightData->gridHeight;
 
-        auto v9ptr = &d.v9[idx129(xInt, yInt)]; // contiguous row-major
+        auto v9ptr = &d.v9[xInt * 128 + xInt + yInt]; // == xInt*129 + yInt
         h1 = float(v9ptr[0]) * k + base;
         h2 = float(v9ptr[129]) * k + base;
         h3 = float(v9ptr[1]) * k + base;
         h4 = float(v9ptr[130]) * k + base;
 
-        uint8 v8val = d.v8[idx128(xInt, yInt)];
+        uint8 v8val = d.v8[xInt * 128 + yInt];
         h5 = float(v8val) * k + base;
         return true;
     }
@@ -670,13 +668,13 @@ bool GridTerrainData::SampleHeights(uint32 xInt, uint32 yInt, float& h1, float& 
         float k = d.gridIntHeightMultiplier;
         float base = _loadedHeightData->gridHeight;
 
-        auto v9ptr = &d.v9[idx129(xInt, yInt)]; // contiguous row-major
+        auto v9ptr = &d.v9[xInt * 128 + xInt + yInt]; // == xInt*129 + yInt
         h1 = float(v9ptr[0]) * k + base;
         h2 = float(v9ptr[129]) * k + base;
         h3 = float(v9ptr[1]) * k + base;
         h4 = float(v9ptr[130]) * k + base;
 
-        uint16 v8val = d.v8[idx128(xInt, yInt)];
+        uint16 v8val = d.v8[xInt * 128 + yInt];
         h5 = float(v8val) * k + base;
         return true;
     }
