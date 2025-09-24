@@ -752,7 +752,7 @@ float GridTerrainData::GetHeightAccurate(float x, float y, float radius, GroundF
         B = G3D::Vector3(S,   S,    h4);
         C = G3D::Vector3(S,   0.0f, h2);
     } // TR
-    else if (!right && top) 
+    else if (!right && top)
     {
         B = G3D::Vector3(0.0f, S,    h3);
         C = G3D::Vector3(S,   S,    h4);
