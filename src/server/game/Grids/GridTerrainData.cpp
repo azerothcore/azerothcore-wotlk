@@ -811,6 +811,6 @@ float GridTerrainData::GetHeightAccurate(float x, float y, float radius, GroundF
         totalSlope = blend * slopeL2 + (1.0f - blend) * (INV_SQRT2 * slopeL1);
     }
 
-    // Altura final (Minkowski): base + radio * pendiente
+    // Final height (Minkowski): base + radius * slope
     return zPlane + radius * totalSlope;
 }
