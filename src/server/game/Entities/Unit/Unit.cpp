@@ -19280,9 +19280,6 @@ void Unit::KnockbackFrom(float x, float y, float speedXY, float speedZ)
         player->GetSession()->SendPacket(&data);
         player->GetSession()->IncrementOrderCounter();
 
-        if (player->HasIncreaseMountedFlightSpeedAura() || player->HasFlyAura())
-            player->SetCanFly(true, true);
-
         player->SetCanKnockback(true);
     }
 }
@@ -20475,39 +20472,168 @@ bool Unit::SetSwim(bool enable)
  *
  *  Doesn't inform the client.
  */
-bool Unit::SetCanFly(bool enable, bool /*packetOnly = false */)
+void Unit::SetCanFly(bool enable)
 {
-    if (enable == HasUnitMovementFlag(MOVEMENTFLAG_CAN_FLY))
-        return false;
+    bool isClientControlled = IsClientControlled();
 
-    if (enable)
+    if (!isClientControlled)
     {
-        AddUnitMovementFlag(MOVEMENTFLAG_CAN_FLY);
-        RemoveUnitMovementFlag(MOVEMENTFLAG_FALLING);
-    }
-    else
-    {
-        RemoveUnitMovementFlag(MOVEMENTFLAG_CAN_FLY | MOVEMENTFLAG_MASK_MOVING_FLY);
+        if (enable)
+            m_movementInfo.AddMovementFlag(MOVEMENTFLAG_CAN_FLY);
+        else
+            m_movementInfo.RemoveMovementFlag(MOVEMENTFLAG_CAN_FLY);
     }
 
-    return true;
+    if (!IsInWorld()) // is sent on add to map
+        return;
+
+    if (isClientControlled)
+    {
+        if (Player const* player = GetClientControlling())
+        {
+            auto const counter = player->GetSession()->GetOrderCounter();
+
+            WorldPacket data(enable ? SMSG_MOVE_SET_CAN_FLY : SMSG_MOVE_UNSET_CAN_FLY, GetPackGUID().size() + 4);
+            data << GetPackGUID();
+            data << counter;
+            player->GetSession()->SendPacket(&data);
+            player->GetSession()->IncrementOrderCounter();
+            return;
+        }
+    }
+
+    WorldPacket data(enable ? SMSG_SPLINE_MOVE_SET_FLYING : SMSG_SPLINE_MOVE_UNSET_FLYING, 9);
+    data << GetPackGUID();
+    SendMessageToSet(&data, true);
 }
 
-/**
- * @brief Allow to walk on water. Doesn't inform the client.
- * Need to use SendMovementWaterWalking() if it's for players.
- */
-bool Unit::SetWaterWalking(bool enable, bool /*packetOnly = false*/)
+void Unit::SetFeatherFall(bool enable)
 {
-    if (enable == HasUnitMovementFlag(MOVEMENTFLAG_WATERWALKING))
-        return false;
+    bool isClientControlled = IsClientControlled();
+
+    if (!isClientControlled)
+    {
+        if (enable)
+            m_movementInfo.AddMovementFlag(MOVEMENTFLAG_FALLING_SLOW);
+        else
+            m_movementInfo.RemoveMovementFlag(MOVEMENTFLAG_FALLING_SLOW);
+    }
+
+    if (!IsInWorld()) // is sent on add to map
+        return;
+
+    if (isClientControlled)
+    {
+        if (Player const* player = GetClientControlling())
+        {
+            auto const counter = player->GetSession()->GetOrderCounter();
+
+            WorldPacket data(enable ? SMSG_MOVE_FEATHER_FALL : SMSG_MOVE_NORMAL_FALL, GetPackGUID().size() + 4);
+
+            data << GetPackGUID();
+            data << counter;
+            player->GetSession()->SendPacket(&data);
+            player->GetSession()->IncrementOrderCounter();
+
+            // start fall from current height
+            if (!enable)
+                const_cast<Player*>(player)->SetFallInformation(0, GetPositionZ());
+
+            return;
+        }
+    }
+
+    WorldPacket data(enable ? SMSG_SPLINE_MOVE_FEATHER_FALL : SMSG_SPLINE_MOVE_NORMAL_FALL);
+    data << GetPackGUID();
+    SendMessageToSet(&data, true);
+}
+
+void Unit::SetHover(bool enable)
+{
+    bool isClientControlled = IsClientControlled();
+
+    if (!isClientControlled)
+    {
+        if (enable)
+            m_movementInfo.AddMovementFlag(MOVEMENTFLAG_HOVER);
+        else
+            m_movementInfo.RemoveMovementFlag(MOVEMENTFLAG_HOVER);
+    }
+
+    float hoverHeight = GetHoverHeight();
 
     if (enable)
-        AddUnitMovementFlag(MOVEMENTFLAG_WATERWALKING);
+    {
+        if (hoverHeight && GetPositionZ() - GetMap()->GetHeight(GetPhaseMask(), GetPositionX(), GetPositionY(), GetPositionZ()) < hoverHeight)
+            Relocate(GetPositionX(), GetPositionY(), GetPositionZ() + hoverHeight);
+    }
     else
-        RemoveUnitMovementFlag(MOVEMENTFLAG_WATERWALKING);
+    {
+        if (IsAlive() || !IsUnit())
+        {
+            float newZ = std::max<float>(GetMap()->GetHeight(GetPhaseMask(), GetPositionX(), GetPositionY(), GetPositionZ()), GetPositionZ() - hoverHeight);
+            UpdateAllowedPositionZ(GetPositionX(), GetPositionY(), newZ);
+            Relocate(GetPositionX(), GetPositionY(), newZ);
+        }
+    }
 
-    return true;
+    if (!IsInWorld()) // is sent on add to map
+        return;
+
+    if (isClientControlled)
+    {
+        if (Player const* player = GetClientControlling())
+        {
+            WorldPacket data(enable ? SMSG_MOVE_SET_HOVER : SMSG_MOVE_UNSET_HOVER, GetPackGUID().size() + 4);
+
+            auto const counter = player->GetSession()->GetOrderCounter();
+
+            data << GetPackGUID();
+            data << counter;
+            player->GetSession()->SendPacket(&data);
+            player->GetSession()->IncrementOrderCounter();
+            return;
+        }
+    }
+
+    WorldPacket data(enable ? SMSG_SPLINE_MOVE_SET_HOVER : SMSG_SPLINE_MOVE_UNSET_HOVER, 9);
+    data << GetPackGUID();
+    SendMessageToSet(&data, true);
+}
+
+void Unit::SetWaterWalking(bool enable)
+{
+    bool isClientControlled = IsClientControlled();
+
+    if (!isClientControlled)
+    {
+        if (enable)
+            m_movementInfo.AddMovementFlag(MOVEMENTFLAG_WATERWALKING);
+        else
+            m_movementInfo.RemoveMovementFlag(MOVEMENTFLAG_WATERWALKING);
+    }
+
+    if (!IsInWorld()) // is sent on add to map
+        return;
+
+    if (isClientControlled)
+    {
+        if (Player const* player = GetClientControlling())
+        {
+            auto const counter = player->GetSession()->GetOrderCounter();
+
+            WorldPacket data(enable ? SMSG_MOVE_WATER_WALK : SMSG_MOVE_LAND_WALK, GetPackGUID().size() + 4);
+            data << GetPackGUID();
+            data << counter;
+            player->GetSession()->SendPacket(&data);
+            player->GetSession()->IncrementOrderCounter();
+            return;
+        }
+    }
+
+    WorldPacket data(enable ? SMSG_SPLINE_MOVE_WATER_WALK : SMSG_SPLINE_MOVE_LAND_WALK, 9);
+    data << GetPackGUID();
+    SendMessageToSet(&data, true);
 }
 
 void Unit::SendMovementWaterWalking(Player* sendTo)
@@ -20519,19 +20645,6 @@ void Unit::SendMovementWaterWalking(Player* sendTo)
     sendTo->SendDirectMessage(&data);
 }
 
-bool Unit::SetFeatherFall(bool enable, bool /*packetOnly = false*/)
-{
-    if (enable == HasUnitMovementFlag(MOVEMENTFLAG_FALLING_SLOW))
-        return false;
-
-    if (enable)
-        AddUnitMovementFlag(MOVEMENTFLAG_FALLING_SLOW);
-    else
-        RemoveUnitMovementFlag(MOVEMENTFLAG_FALLING_SLOW);
-
-    return true;
-}
-
 void Unit::SendMovementFeatherFall(Player* sendTo)
 {
     if (!movespline->Initialized())
@@ -20539,34 +20652,6 @@ void Unit::SendMovementFeatherFall(Player* sendTo)
     WorldPacket data(SMSG_SPLINE_MOVE_FEATHER_FALL, 9);
     data << GetPackGUID();
     sendTo->SendDirectMessage(&data);
-}
-
-bool Unit::SetHover(bool enable, bool /*packetOnly = false*/, bool /*updateAnimationTier = true*/)
-{
-    if (enable == HasUnitMovementFlag(MOVEMENTFLAG_HOVER))
-        return false;
-
-    float hoverHeight = GetFloatValue(UNIT_FIELD_HOVERHEIGHT);
-
-    if (enable)
-    {
-        AddUnitMovementFlag(MOVEMENTFLAG_HOVER);
-        if (hoverHeight && GetPositionZ() - GetFloorZ() < hoverHeight)
-            UpdateHeight(GetPositionZ() + hoverHeight);
-    }
-    else
-    {
-        RemoveUnitMovementFlag(MOVEMENTFLAG_HOVER);
-        if (hoverHeight && (!isDying() || !IsCreature()))
-        {
-            float newZ = std::max<float>(GetFloorZ(), GetPositionZ() - hoverHeight);
-            UpdateAllowedPositionZ(GetPositionX(), GetPositionY(), newZ);
-            UpdateHeight(newZ);
-        }
-        SendMovementFlagUpdate(); // pussywizard: needed for falling after death (instead of falling onto air at hover height)
-    }
-
-    return true;
 }
 
 void Unit::SendMovementHover(Player* sendTo)
@@ -21237,7 +21322,7 @@ bool Unit::IsClientControlled(Player const* exactClient /*= nullptr*/) const
     }
 
     // By default: players have client control over themselves
-    if (GetTypeId() == TYPEID_PLAYER)
+    if (IsPlayer())
         return (exactClient ? (exactClient == this) : true);
     return false;
 }
@@ -21256,11 +21341,11 @@ Player const* Unit::GetClientControlling() const
             if (HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_POSSESSED))
             {
                 Unit const* charmer = GetCharmer();
-                if (charmer && charmer->GetTypeId() == TYPEID_PLAYER)
+                if (charmer && charmer->IsPlayer())
                     return static_cast<Player const*>(charmer);
             }
         }
-        else if (GetTypeId() == TYPEID_PLAYER)
+        else if (IsPlayer())
         {
             // Check if anything prevents original client from controlling
             if (IsClientControlled(static_cast<Player const*>(this)))

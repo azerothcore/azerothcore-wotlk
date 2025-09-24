@@ -627,11 +627,6 @@ public:                                                 // opcodes handlers
     // new party stats
     void HandleInspectHonorStatsOpcode(WorldPacket& recvPacket);
 
-    void HandleMoveWaterWalkAck(WorldPacket& recvPacket);
-    void HandleFeatherFallAck(WorldPacket& recvData);
-
-    void HandleMoveHoverAck(WorldPacket& recvData);
-
     void HandleMountSpecialAnimOpcode(WorldPacket& recvdata);
 
     // character view
@@ -976,7 +971,7 @@ public:                                                 // opcodes handlers
     void HandleFarSightOpcode(WorldPacket& recvData);
     void HandleSetDungeonDifficultyOpcode(WorldPacket& recvData);
     void HandleSetRaidDifficultyOpcode(WorldPacket& recvData);
-    void HandleMoveSetCanFlyAckOpcode(WorldPacket& recvData);
+    void HandleMoveFlagChangeOpcode(WorldPacket& recvData);
     void HandleSetTitleOpcode(WorldPacket& recvData);
     void HandleRealmSplitOpcode(WorldPacket& recvData);
     void HandleTimeSyncResp(WorldPacket& recvData);

@@ -832,38 +832,6 @@ void WorldSession::HandleMoveKnockBackAck(WorldPacket& recvData)
     _player->SendMessageToSet(&data, false);
 }
 
-void WorldSession::HandleMoveHoverAck(WorldPacket& recvData)
-{
-    LOG_DEBUG("network", "CMSG_MOVE_HOVER_ACK");
-
-    ObjectGuid guid;
-    recvData >> guid.ReadAsPacked();
-
-    recvData.read_skip<uint32>();                          // unk
-
-    MovementInfo movementInfo;
-    movementInfo.guid = guid;
-    ReadMovementInfo(recvData, &movementInfo);
-
-    recvData.read_skip<uint32>();                          // unk2
-}
-
-void WorldSession::HandleMoveWaterWalkAck(WorldPacket& recvData)
-{
-    LOG_DEBUG("network", "CMSG_MOVE_WATER_WALK_ACK");
-
-    ObjectGuid guid;
-    recvData >> guid.ReadAsPacked();
-
-    recvData.read_skip<uint32>();                          // unk
-
-    MovementInfo movementInfo;
-    movementInfo.guid = guid;
-    ReadMovementInfo(recvData, &movementInfo);
-
-    recvData.read_skip<uint32>();                          // unk2
-}
-
 void WorldSession::HandleSummonResponseOpcode(WorldPacket& recvData)
 {
     if (!_player->IsAlive() || _player->IsInCombat())

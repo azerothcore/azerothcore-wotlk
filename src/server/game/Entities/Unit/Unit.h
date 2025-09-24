@@ -1674,10 +1674,10 @@ public:
     virtual bool SetWalk(bool enable);
     virtual bool SetDisableGravity(bool disable, bool packetOnly = false, bool updateAnimationTier = true);
     virtual bool SetSwim(bool enable);
-    virtual bool SetCanFly(bool enable, bool packetOnly = false);
-    virtual bool SetWaterWalking(bool enable, bool packetOnly = false);
-    virtual bool SetFeatherFall(bool enable, bool packetOnly = false);
-    virtual bool SetHover(bool enable, bool packetOnly = false, bool updateAnimationTier = true);
+    void SetCanFly(bool enable);
+    void SetWaterWalking(bool enable);
+    void SetFeatherFall(bool enable);
+    void SetHover(bool enable);
 
     MotionMaster* GetMotionMaster() { return i_motionMaster; }
     [[nodiscard]] const MotionMaster* GetMotionMaster() const { return i_motionMaster; }
