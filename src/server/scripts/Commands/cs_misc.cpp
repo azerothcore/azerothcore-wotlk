@@ -672,10 +672,10 @@ public:
             rScale = sWorld->getFloatConfig(CONFIG_HEIGHT_ACCURATE_RADIUS_SCALE);
             blend  = sWorld->getFloatConfig(CONFIG_HEIGHT_ACCURATE_SQUARE_BLEND);
         }
-        handler->PSendSysMessage("Accurate Height Shape: %s (SquareBlend: %.2f, RadiusScale: %.2f)", shapeStr, blend, rScale);
-        handler->PSendSysMessage("Accurate Height Grid: %f", GridZAccurate);
-        handler->PSendSysMessage("Accurate Height Map: %f", MapZAccurate);
-        handler->PSendSysMessage("Probe radius (pre-scale): %.3f", probeR);
+        handler->PSendSysMessage("Accurate Height Shape: {} (SquareBlend: {:0.2f}, RadiusScale: {:0.2f})", shapeStr, blend, rScale);
+        handler->PSendSysMessage("Accurate Height Grid: {}", GridZAccurate);
+        handler->PSendSysMessage("Accurate Height Map: {}", MapZAccurate);
+        handler->PSendSysMessage("Probe radius (pre-scale): {:0.3f}", probeR);
 
         LiquidData const& liquidData = object->GetLiquidData();
 
