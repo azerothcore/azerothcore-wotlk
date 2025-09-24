@@ -786,7 +786,6 @@ public:
     void LoadSpellInfoStore();
     void LoadSpellCooldownOverrides();
     void UnloadSpellInfoStore();
-    void UnloadSpellInfoImplicitTargetConditionLists();
     void LoadSpellInfoCustomAttributes();
     void LoadSpellInfoCorrections();
     void LoadSpellSpecificAndAuraState();
