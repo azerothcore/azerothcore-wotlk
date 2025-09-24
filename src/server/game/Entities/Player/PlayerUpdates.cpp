@@ -429,9 +429,6 @@ void Player::Heartbeat()
 
     // Group update
     SendUpdateToOutOfRangeGroupMembers();
-
-    // Indoor/Outdoor aura requirements
-    CheckOutdoorsAuraRequirements();
 }
 
 void Player::UpdateMirrorTimers()
