@@ -734,7 +734,7 @@ float GridTerrainData::GetHeightAccurate(float x, float y, float radius, GroundF
         G3D::Vector3 n = U.cross(V);
         const float nzAbs = std::abs(n.z);
         if (nzAbs < eps)
-            return -1.0e30f; // inválido
+            return -1.0e30f; // invalid
 
         const float d      = -(n.x * A.x + n.y * A.y + n.z * A.z);
         const float zPlane = (-d - n.x * P.x - n.y * P.y) / n.z;

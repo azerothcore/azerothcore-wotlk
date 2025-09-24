@@ -1395,7 +1395,7 @@ vmap.enableIndoorCheck = 1
 #    1 = square footprint (upside-down-pyramid)
 #
 
-Height.Accurate.Shape = 1
+Height.Accurate.Shape = 0
 
 #
 # Scale factor applied to the probe radius (safety margin, do not abuse)

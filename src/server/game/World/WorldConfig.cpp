@@ -282,7 +282,7 @@ void WorldConfig::BuildConfigCache()
     SetConfigValue<bool>(CONFIG_GM_LOWER_SECURITY, "GM.LowerSecurity", false);
     SetConfigValue<float>(CONFIG_CHANCE_OF_GM_SURVEY, "GM.TicketSystem.ChanceOfGMSurvey", 50.0f);
 
-    SetConfigValue<uint32>(CONFIG_HEIGHT_ACCURATE_SHAPE, "Height.Accurate.Shape", 1);
+    SetConfigValue<uint32>(CONFIG_HEIGHT_ACCURATE_SHAPE, "Height.Accurate.Shape", 0);
     float rawSc = sConfigMgr->GetOption<float>("Height.Accurate.RadiusScale", 1.0f);
     float clampedSc = std::clamp(rawSc, 0.05f, 4.0f);
     SetConfigValue<float>(CONFIG_HEIGHT_ACCURATE_RADIUS_SCALE, "Height.Accurate.RadiusScale", clampedSc);
