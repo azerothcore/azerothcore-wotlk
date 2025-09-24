@@ -4426,25 +4426,26 @@ void Player::DeleteOldRecoveryItems(uint32 keepDays)
 void Player::SetMovement(PlayerMovementType pType)
 {
     WorldPacket data;
+    const PackedGuid& guid = GetPackGUID();
     switch (pType)
     {
         case MOVE_ROOT:
-            data.Initialize(SMSG_FORCE_MOVE_ROOT,   GetPackGUID().size() + 4);
+            data.Initialize(SMSG_FORCE_MOVE_ROOT, guid.size() + 4);
             break;
         case MOVE_UNROOT:
-            data.Initialize(SMSG_FORCE_MOVE_UNROOT, GetPackGUID().size() + 4);
+            data.Initialize(SMSG_FORCE_MOVE_UNROOT, guid.size() + 4);
             break;
         case MOVE_WATER_WALK:
-            data.Initialize(SMSG_MOVE_WATER_WALK,   GetPackGUID().size() + 4);
+            data.Initialize(SMSG_MOVE_WATER_WALK, guid.size() + 4);
             break;
         case MOVE_LAND_WALK:
-            data.Initialize(SMSG_MOVE_LAND_WALK,    GetPackGUID().size() + 4);
+            data.Initialize(SMSG_MOVE_LAND_WALK, guid.size() + 4);
             break;
         default:
             LOG_ERROR("entities.player", "Player::SetMovement: Unsupported move type ({}), data not sent to client.", pType);
             return;
     }
-    data << GetPackGUID();
+    data << guid;
     data << GetSession()->GetOrderCounter(); // movement counter
     GetSession()->SendPacket(&data);
     GetSession()->IncrementOrderCounter();
