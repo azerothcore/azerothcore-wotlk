@@ -11703,14 +11703,56 @@ void Player::SendInitialPacketsAfterAddToMap()
     if (HasStunAura())
         SetMovement(MOVE_ROOT);
 
+    WorldPacket setCompoundState(SMSG_MULTIPLE_MOVES, 100);
+    setCompoundState << uint32(0); // size placeholder
+
     // manual send package (have code in HandleEffect(this, AURA_EFFECT_HANDLE_SEND_FOR_CLIENT, true); that must not be re-applied.
-    if (HasRootAura())
+    if (IsImmobilizedState())
     {
-        WorldPacket data2(SMSG_FORCE_MOVE_ROOT, 10);
-        data2 << GetPackGUID();
-        data2 << GetSession()->GetOrderCounter(); // movement counter
-        SendMessageToSet(&data2, true);
+        auto const counter = GetSession()->GetOrderCounter();
+        setCompoundState << uint8(2 + GetPackGUID().size() + 4);
+        setCompoundState << uint16(SMSG_FORCE_MOVE_ROOT);
+        setCompoundState << GetPackGUID();
+        setCompoundState << uint32(counter);
         GetSession()->IncrementOrderCounter();
+    }
+
+    if (HasAuraType(SPELL_AURA_FEATHER_FALL))
+    {
+        auto const counter = GetSession()->GetOrderCounter();
+        setCompoundState << uint8(2 + GetPackGUID().size() + 4);
+        setCompoundState << uint16(SMSG_MOVE_FEATHER_FALL);
+        setCompoundState << GetPackGUID();
+        setCompoundState << uint32(counter);
+        GetSession()->IncrementOrderCounter();
+    }
+
+    if (HasAuraType(SPELL_AURA_WATER_WALK))
+    {
+        auto const counter = GetSession()->GetOrderCounter();
+        setCompoundState << uint8(2 + GetPackGUID().size() + 4);
+        setCompoundState << uint16(SMSG_MOVE_WATER_WALK);
+        setCompoundState << GetPackGUID();
+        setCompoundState << uint32(counter);
+        GetSession()->IncrementOrderCounter();
+    }
+
+    if (HasAuraType(SPELL_AURA_HOVER))
+    {
+        auto const counter = GetSession()->GetOrderCounter();
+        setCompoundState << uint8(2 + GetPackGUID().size() + 4);
+        setCompoundState << uint16(SMSG_MOVE_SET_HOVER);
+        setCompoundState << GetPackGUID();
+        setCompoundState << uint32(counter);
+        GetSession()->IncrementOrderCounter();
+    }
+
+    // TODO: Pending mount protocol
+
+    if (setCompoundState.size() > 4)
+    {
+        setCompoundState.put<uint32>(0, setCompoundState.size() - 4);
+        SendDirectMessage(&setCompoundState);
     }
 
     SendEnchantmentDurations();                             // must be after add to map
