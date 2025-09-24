@@ -283,10 +283,12 @@ void WorldConfig::BuildConfigCache()
     SetConfigValue<float>(CONFIG_CHANCE_OF_GM_SURVEY, "GM.TicketSystem.ChanceOfGMSurvey", 50.0f);
 
     SetConfigValue<uint32>(CONFIG_HEIGHT_ACCURATE_SHAPE, "Height.Accurate.Shape", 1);
-    SetConfigValue<float>(CONFIG_HEIGHT_ACCURATE_RADIUS_SCALE, "Height.Accurate.RadiusScale", 1.0f), 0.05f, 4.0f);
-    float raw = sConfigMgr->GetOption<float>("Height.Accurate.SquareBlend", 0.20f);
-    float clamped = std::clamp(raw, 0.0f, 1.0f);
-    SetConfigValue<float>(CONFIG_HEIGHT_ACCURATE_SQUARE_BLEND, "Height.Accurate.SquareBlend", clamped);
+    float rawSc = sConfigMgr->GetOption<float>("Height.Accurate.RadiusScale", 1.0f);
+    float clampedSc = std::clamp(rawSc, 0.05f, 4.0f);
+    SetConfigValue<float>(CONFIG_HEIGHT_ACCURATE_RADIUS_SCALE, "Height.Accurate.RadiusScale", clampedSc);
+    float rawSq = sConfigMgr->GetOption<float>("Height.Accurate.SquareBlend", 0.20f);
+    float clampedSq = std::clamp(rawSq, 0.0f, 1.0f);
+    SetConfigValue<float>(CONFIG_HEIGHT_ACCURATE_SQUARE_BLEND, "Height.Accurate.SquareBlend", clampedSq);
 
     SetConfigValue<uint32>(CONFIG_GROUP_VISIBILITY, "Visibility.GroupMode", 1);
 
