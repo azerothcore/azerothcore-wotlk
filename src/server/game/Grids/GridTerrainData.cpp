@@ -763,12 +763,7 @@ float GridTerrainData::GetHeightAccurate(float x, float y, float radius, GroundF
 
     float bestZ = -1.0e30f;
     bool  have  = false;
-    auto take = [&](float zc) {
-        if (std::isfinite(zc)) {
-            have = true;
-            if (zc > bestZ) bestZ = zc;
-        }
-    };
+    auto take = [&](float zc) { if (std::isfinite(zc)) { have = true; if (zc > bestZ) bestZ = zc; } };
 
     take(evalTri(G3D::Vector3(S,   0.0f, h2), G3D::Vector3(0.0f, 0.0f, h1))); // center-h2-h1
     take(evalTri(G3D::Vector3(S,   S,    h4), G3D::Vector3(S,   0.0f, h2))); // center-h4-h2
