@@ -1413,6 +1413,14 @@ Height.Accurate.RadiusScale = 1.0
 Height.Accurate.SquareBlend = 0.2
 
 #
+# Optional slope clamp (rise/run). 0.0 disables clamping.
+# This limits the gradient magnitude used by both circle and square footprints,
+# preventing extreme lifts on near-vertical faces. Safe upper bound: ~5.0 (≈78.7°).
+#
+
+Height.Accurate.SlopeClamp = 0.0
+
+#
 #    DetectPosCollision
 #        Description: Check final move position, summon position, etc for visible collision with
 #                     other objects or walls (walls only if vmaps are enabled).

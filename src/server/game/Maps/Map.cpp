@@ -1233,8 +1233,10 @@ float Map::GetGridHeightAccurate(float x, float y, float radius, float yaw) cons
 {
     if (GridTerrainData* gmap = const_cast<Map*>(this)->GetGridTerrainData(x, y))
     {
-        auto shape = static_cast<GridTerrainData::GroundFootprintShape>(sWorld->getIntConfig(CONFIG_HEIGHT_ACCURATE_SHAPE));
-        return gmap->GetHeightAccurate(x, y, radius, shape, yaw);
+        const auto shape = static_cast<GridTerrainData::GroundFootprintShape>(sWorld->getIntConfig(CONFIG_HEIGHT_ACCURATE_SHAPE));
+        const float blend = sWorld->getFloatConfig(CONFIG_HEIGHT_ACCURATE_SQUARE_BLEND);
+        const float clamp = sWorld->getFloatConfig(CONFIG_HEIGHT_ACCURATE_SLOPE_CLAMP);
+        return gmap->GetHeightAccurate(x, y, radius, shape, yaw, blend, clamp);
     }
 
     return INVALID_HEIGHT;

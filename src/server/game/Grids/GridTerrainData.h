@@ -261,6 +261,7 @@ public:
         return "unknown";
     }
 
+    float GetHeightAccurate(float x, float y, float radius, GroundFootprintShape shape, float yaw, float squareBlend, float slopeClamp) const;
     float GetHeightAccurate(float x, float y, float radius) const;
     float GetHeightAccurate(float x, float y, float radius, GroundFootprintShape shape) const;
 

@@ -285,6 +285,7 @@ void WorldConfig::BuildConfigCache()
     SetConfigValue<uint32>(CONFIG_HEIGHT_ACCURATE_SHAPE, "Height.Accurate.Shape", 0, ConfigValueCache::Reloadable::Yes, [](uint32 const& value) { return value <= 1; }, "<= 1");
     SetConfigValue<float>(CONFIG_HEIGHT_ACCURATE_RADIUS_SCALE, "Height.Accurate.RadiusScale", 1.0f, ConfigValueCache::Reloadable::Yes, [](float const& value) { return value >= 0.1f && value <= 4.0f; }, ">= 0.1 and <= 4.0");
     SetConfigValue<float>(CONFIG_HEIGHT_ACCURATE_SQUARE_BLEND, "Height.Accurate.SquareBlend", 0.20f, ConfigValueCache::Reloadable::Yes, [](float const& value) { return value >= 0.0f && value <= 1.0f; }, ">= 0.0 and <= 1.0");
+    SetConfigValue<float>(CONFIG_HEIGHT_ACCURATE_SLOPE_CLAMP, "Height.Accurate.SlopeClamp", 0.0f, ConfigValueCache::Reloadable::Yes, [](float const& value) { return value >= 0.0f && value <= 10.0f; }, ">= 0.0 and <= 10.0");
 
     SetConfigValue<uint32>(CONFIG_GROUP_VISIBILITY, "Visibility.GroupMode", 1);
 

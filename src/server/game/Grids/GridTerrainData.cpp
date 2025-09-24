@@ -684,15 +684,21 @@ bool GridTerrainData::SampleHeights(uint32 xInt, uint32 yInt, float& h1, float& 
 
 float GridTerrainData::GetHeightAccurate(float x, float y, float radius) const
 {
-    return GetHeightAccurate(x, y, radius, GroundFootprintShape::Circle, 0.0f);
+    return GetHeightAccurate(x, y, radius, GroundFootprintShape::Circle, 0.0f, 1.0f, 0.0f);
 }
 
 float GridTerrainData::GetHeightAccurate(float x, float y, float radius, GroundFootprintShape shape) const
 {
-    return GetHeightAccurate(x, y, radius, shape, 0.0f);
+    return GetHeightAccurate(x, y, radius, shape, 0.0f, (shape == GroundFootprintShape::Square ? 0.0f : 1.0f), 0.0f);
 }
 
 float GridTerrainData::GetHeightAccurate(float x, float y, float radius, GroundFootprintShape shape, float yaw) const
+{
+    return GetHeightAccurate(x, y, radius, shape, yaw, (shape == GroundFootprintShape::Square ? 0.0f : 1.0f), 0.0f);
+}
+
+float GridTerrainData::GetHeightAccurate(float x, float y, float radius, GroundFootprintShape shape, float yaw,
+                                         float squareBlend, float slopeClamp) const
 {
     if (!_loadedHeightData)
         return INVALID_HEIGHT;
@@ -700,10 +706,14 @@ float GridTerrainData::GetHeightAccurate(float x, float y, float radius, GroundF
     float xf = MAP_RESOLUTION * (32.0f - x / SIZE_OF_GRIDS);
     float yf = MAP_RESOLUTION * (32.0f - y / SIZE_OF_GRIDS);
 
-    int xInt = int(xf);
-    int yInt = int(yf);
-    float fx = xf - xInt;
-    float fy = yf - yInt;
+    int xInt = static_cast<int>(std::floor(xf));
+    int yInt = static_cast<int>(std::floor(yf));
+    float fx = xf - static_cast<float>(xInt);
+    float fy = yf - static_cast<float>(yInt);
+    if (fx < 0.0f) { fx += 1.0f; --xInt; }
+    if (fy < 0.0f) { fy += 1.0f; --yInt; }
+    if (fx >= 1.0f) { fx -= 1.0f; ++xInt; }
+    if (fy >= 1.0f) { fy -= 1.0f; ++yInt; }
     xInt &= (MAP_RESOLUTION - 1);
     yInt &= (MAP_RESOLUTION - 1);
 
@@ -727,48 +737,58 @@ float GridTerrainData::GetHeightAccurate(float x, float y, float radius, GroundF
     G3D::Vector3 A(S2, S2, h5);
 
     const float eps = 1e-6f;
-    const float blend = sWorld->getFloatConfig(CONFIG_HEIGHT_ACCURATE_SQUARE_BLEND);
+    const float blend = std::max(0.0f, std::min(1.0f, squareBlend));
 
-    auto evalTri = [&](G3D::Vector3 const& B, G3D::Vector3 const& C) -> float
-    {
-        G3D::Vector3 U = B - A;
-        G3D::Vector3 V = C - A;
-        G3D::Vector3 n = U.cross(V);
-        const float nzAbs = std::abs(n.z);
-        if (nzAbs < eps)
-            return std::numeric_limits<float>::quiet_NaN();
+    const bool right = (P.x >= A.x);
+    const bool top   = (P.y >= A.y);
+    G3D::Vector3 B, C;
+    if ( right && !top) { B = G3D::Vector3(S,   0.0f, h2); C = G3D::Vector3(0.0f, 0.0f, h1); } // BR
+    else if ( right &&  top) { B = G3D::Vector3(S,   S,    h4); C = G3D::Vector3(S,   0.0f, h2); } // TR
+    else if (!right &&  top) { B = G3D::Vector3(0.0f, S,    h3); C = G3D::Vector3(S,   S,    h4); } // TL
+    else /* !right && !top */{ B = G3D::Vector3(0.0f, 0.0f, h1); C = G3D::Vector3(0.0f, S,    h3); } // BL
 
-        const float d      = -(n.x * A.x + n.y * A.y + n.z * A.z);
-        const float zPlane = (-d - n.x * P.x - n.y * P.y) / n.z;
-        const float denom  = std::max(eps, nzAbs);
-        const float slopeL2 = std::sqrt(std::max(0.0f, n.x * n.x + n.y * n.y)) / denom;
-
-        if (shape == GroundFootprintShape::Square)
-        {
-            float c = std::cos(yaw), s = std::sin(yaw);
-            float rx = n.x * c + n.y * s;
-            float ry = -n.x * s + n.y * c;
-            const float slopeL1 = (std::abs(rx) + std::abs(ry)) / denom;
-            const float addSq   = (radius * (1.0f - blend) * INV_SQRT2) * slopeL1;
-            const float addCir  = (radius * blend) * slopeL2;
-            return zPlane + addSq + addCir;
-        }
-        else
-        {
-            return zPlane + radius * slopeL2;
-        }
-    };
-
-    float bestZ = -1.0e30f;
-    bool  have  = false;
-    auto take = [&](float zc) { if (std::isfinite(zc)) { have = true; if (zc > bestZ) bestZ = zc; } };
-
-    take(evalTri(G3D::Vector3(S,   0.0f, h2), G3D::Vector3(0.0f, 0.0f, h1))); // center-h2-h1
-    take(evalTri(G3D::Vector3(S,   S,    h4), G3D::Vector3(S,   0.0f, h2))); // center-h4-h2
-    take(evalTri(G3D::Vector3(0.0f, S,   h3), G3D::Vector3(S,   S,    h4))); // center-h3-h4
-    take(evalTri(G3D::Vector3(0.0f, 0.0f,h1), G3D::Vector3(0.0f, S,   h3))); // center-h1-h3
-
-    if (!have)
+    const G3D::Vector3 U = B - A;
+    const G3D::Vector3 V = C - A;
+    const G3D::Vector3 n = U.cross(V);
+    const float nzAbs = std::abs(n.z);
+    if (nzAbs < eps)
         return getHeight(x, y);
-    return bestZ;
+
+    const float zPlane = A.z - (n.x * (P.x - A.x) + n.y * (P.y - A.y)) / n.z;
+    const float inv2S = 1.0f / (2.0f * S);
+
+    float a = ((h2 + h4) - (h1 + h3)) * inv2S; // dz/dx
+    float b = ((h3 + h4) - (h1 + h2)) * inv2S; // dz/dy
+
+    if (slopeClamp > 0.0f) {
+        const float g2 = a * a + b * b;
+        const float c2 = slopeClamp * slopeClamp;
+        if (g2 > c2) {
+            const float scale = slopeClamp / std::sqrt(g2);
+            a *= scale; b *= scale;
+        }
+    }
+
+    const float slopeL2 = std::sqrt(std::max(0.0f, a*a + b*b));
+
+    if (radius <= 0.0f)
+        return zPlane;
+
+    float totalSlope = slopeL2;
+    if (shape == GroundFootprintShape::Square && blend < 1.0f) {
+        float slopeL1;
+        if (a == 0.0f && b == 0.0f) {
+            slopeL1 = 0.0f;
+        } else {
+            const float c = std::cos(yaw);
+            const float s = std::sin(yaw);
+            const float rx =  a * c + b * s;
+            const float ry = -a * s + b * c;
+            slopeL1 = std::abs(rx) + std::abs(ry);
+        }
+        totalSlope = blend * slopeL2 + (1.0f - blend) * (INV_SQRT2 * slopeL1);
+    }
+
+    // Altura final (Minkowski): base + radio * pendiente
+    return zPlane + radius * totalSlope;
 }

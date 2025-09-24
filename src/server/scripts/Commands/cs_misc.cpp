@@ -632,11 +632,12 @@ public:
         const float probeR = object->GetGroundProbeRadius(); // pre-scale
         const float rScale = sWorld->getFloatConfig(CONFIG_HEIGHT_ACCURATE_RADIUS_SCALE);
         const float blend = sWorld->getFloatConfig(CONFIG_HEIGHT_ACCURATE_SQUARE_BLEND);
+        const float clamp = sWorld->getFloatConfig(CONFIG_HEIGHT_ACCURATE_SLOPE_CLAMP);
         const float yaw = object->GetOrientation();
         const float probeRScaled = probeR * rScale;
 
         const float GridZAccurate = map->GetGridHeightAccurate(object->GetPositionX(), object->GetPositionY(), probeRScaled, yaw);
-        const float MapZAccurate  = object->GetMapHeightAccurate(object->GetPositionX(), object->GetPositionY(), object->GetPositionZ(), /*vmap=*/true, DEFAULT_HEIGHT_SEARCH, probeR);
+        const float MapZAccurate  = object->GetMapHeightAccurate(object->GetPositionX(), object->GetPositionY(), object->GetPositionZ(), true, DEFAULT_HEIGHT_SEARCH, probeR);
         const char* shapeStr = GridTerrainData::ToString(static_cast<GridTerrainData::GroundFootprintShape>(sWorld->getIntConfig(CONFIG_HEIGHT_ACCURATE_SHAPE)));
 
         uint32 haveMap = GridTerrainLoader::ExistMap(object->GetMapId(), cell.GridX(), cell.GridY()) ? 1 : 0;
@@ -668,7 +669,7 @@ public:
                                  cell.GridX(), cell.GridY(), cell.CellX(), cell.CellY(), object->GetInstanceId(),
                                  zoneX, zoneY, groundZ, floorZ, haveMap, haveVMap, haveMMAP);
 
-        handler->PSendSysMessage("Accurate Height Shape: {} (SquareBlend: {:0.2f}, RadiusScale: {:0.2f})", shapeStr, blend, rScale);
+        handler->PSendSysMessage("Accurate Height Shape: {} (SquareBlend: {:0.2f}, RadiusScale: {:0.2f}, SlopeClamp: {:0.2f})", shapeStr, blend, rScale);
         handler->PSendSysMessage("Accurate Height Grid: {}", GridZAccurate);
         handler->PSendSysMessage("Accurate Height Map: {}", MapZAccurate);
         handler->PSendSysMessage("Probe radius (pre-scale): {:0.3f}", probeR);
