@@ -819,6 +819,11 @@ public:
     bool IsValidAssistTarget(Unit const* target) const;
     bool _IsValidAssistTarget(Unit const* target, SpellInfo const* bySpell) const;
 
+    // Client controlled: check if unit currently is under client control (has active "mover"), optionally check for specific client (server-side)
+    bool IsClientControlled(Player const* exactClient = nullptr) const;
+    // Controlling client: server PoV on which client (player) controls movement of the unit at the moment, obtain "mover" (server-side)
+    Player const* GetClientControlling() const;
+
     // Combat range
     [[nodiscard]] float GetBoundaryRadius() const { return m_floatValues[UNIT_FIELD_BOUNDINGRADIUS]; }
     [[nodiscard]] float GetCombatReach() const override { return m_floatValues[UNIT_FIELD_COMBATREACH]; }
