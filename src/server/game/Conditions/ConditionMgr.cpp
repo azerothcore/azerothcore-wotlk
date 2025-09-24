@@ -1128,7 +1128,6 @@ void ConditionMgr::LoadConditions(bool isReload)
 
         LOG_INFO("server.loading", "Reloading `gossip_menu_option` Table for Conditions!");
         sObjectMgr->LoadGossipMenuItems();
-        sSpellMgr->UnloadSpellInfoImplicitTargetConditionLists();
     }
 
     QueryResult result = WorldDatabase.Query("SELECT SourceTypeOrReferenceId, SourceGroup, SourceEntry, SourceId, ElseGroup, ConditionTypeOrReference, ConditionTarget, "
@@ -1452,7 +1451,7 @@ bool ConditionMgr::addToSpellImplicitTargetConditions(Condition* cond)
 
         // build new shared mask with found effect
         uint32         sharedMask = (1 << i);
-        ConditionList* cmp        = spellInfo->Effects[i].ImplicitTargetConditions;
+        std::shared_ptr<ConditionList> cmp = spellInfo->Effects[i].ImplicitTargetConditions;
         for (uint8 effIndex = i + 1; effIndex < MAX_SPELL_EFFECTS; ++effIndex)
         {
             if (spellInfo->Effects[effIndex].ImplicitTargetConditions == cmp)
@@ -1475,7 +1474,7 @@ bool ConditionMgr::addToSpellImplicitTargetConditions(Condition* cond)
                 return false;
 
             // get shared data
-            ConditionList* sharedList = spellInfo->Effects[firstEffIndex].ImplicitTargetConditions;
+            std::shared_ptr<ConditionList> sharedList = spellInfo->Effects[firstEffIndex].ImplicitTargetConditions;
 
             // there's already data entry for that sharedMask
             if (sharedList)
@@ -1494,22 +1493,25 @@ bool ConditionMgr::addToSpellImplicitTargetConditions(Condition* cond)
             else
             {
                 // add new list, create new shared mask
-                sharedList    = new ConditionList();
+                auto newList = std::make_shared<ConditionList>();
+
                 bool assigned = false;
                 for (uint8 i = firstEffIndex; i < MAX_SPELL_EFFECTS; ++i)
                 {
                     if ((1 << i) & commonMask)
                     {
-                        spellInfo->Effects[i].ImplicitTargetConditions = sharedList;
-                        assigned                                       = true;
+                        spellInfo->Effects[i].ImplicitTargetConditions = newList;
+                        assigned = true;
                     }
                 }
 
-                if (!assigned)
-                    delete sharedList;
+                if (assigned)
+                    sharedList = newList;
             }
+
             if (sharedList)
                 sharedList->push_back(cond);
+
             break;
         }
     }
