@@ -1391,7 +1391,7 @@ vmap.enableIndoorCheck = 1
 
 #
 #    Accurate ground settlement (cylinder–plane) settings
-#    0 = cylinder-circle footprint (recommended), 
+#    0 = cylinder-circle footprint (recommended),
 #    1 = square footprint (upside-down-pyramid)
 #
 
