@@ -244,8 +244,6 @@ Unit::Unit() : WorldObject(),
 
     m_canDualWield = false;
 
-    m_rootTimes = 0;
-
     m_state = 0;
     m_deathState = DeathState::Alive;
 
@@ -13607,9 +13605,10 @@ void Unit::Mount(uint32 mount, uint32 VehicleId, uint32 creatureEntry)
 
         WorldPacket data(SMSG_MOVE_SET_COLLISION_HGT, GetPackGUID().size() + 4 + 4);
         data << GetPackGUID();
-        data << uint32(GameTime::GetGameTime().count());   // Packet counter
+        data << player->GetSession()->GetOrderCounter(); // movement counter
         data << player->GetCollisionHeight();
         player->GetSession()->SendPacket(&data);
+        player->GetSession()->IncrementOrderCounter();
     }
 
     RemoveAurasWithInterruptFlags(AURA_INTERRUPT_FLAG_MOUNT);
@@ -13623,13 +13622,14 @@ void Unit::Dismount()
     SetUInt32Value(UNIT_FIELD_MOUNTDISPLAYID, 0);
     RemoveUnitFlag(UNIT_FLAG_MOUNT);
 
-    if (Player* thisPlayer = ToPlayer())
+    if (Player* player = ToPlayer())
     {
         WorldPacket data(SMSG_MOVE_SET_COLLISION_HGT, GetPackGUID().size() + 4 + 4);
         data << GetPackGUID();
-        data << uint32(GameTime::GetGameTime().count());   // Packet counter
-        data << thisPlayer->GetCollisionHeight();
-        thisPlayer->GetSession()->SendPacket(&data);
+        data << player->GetSession()->GetOrderCounter(); // movement counter
+        data << player->GetCollisionHeight();
+        player->GetSession()->SendPacket(&data);
+        player->GetSession()->IncrementOrderCounter();
     }
 
     WorldPacket data(SMSG_DISMOUNT, 8);
@@ -14643,11 +14643,13 @@ void Unit::SetSpeed(UnitMoveType mtype, float rate, bool forced)
                 return;
         }
         data << GetPackGUID();
-        data << (uint32)0;                                  // moveEvent, NUM_PMOVE_EVTS = 0x39
+        data << (IsPlayer() ? ToPlayer()->GetSession()->GetOrderCounter() : uint32(0)); // movement counter
         if (mtype == MOVE_RUN)
             data << uint8(0);                               // new 2.1.0
         data << float(GetSpeed(mtype));
         SendMessageToSet(&data, true);
+        if (IsPlayer()) // TODO: Resolve this mess
+            ToPlayer()->GetSession()->IncrementOrderCounter();
     }
 }
 
@@ -18302,9 +18304,6 @@ void Unit::SetRooted(bool apply, bool isStun)
 {
     if (apply)
     {
-        if (m_rootTimes > 0) // blizzard internal check?
-            m_rootTimes++;
-
         // MOVEMENTFLAG_ROOT cannot be used in conjunction with MOVEMENTFLAG_MASK_MOVING (tested 3.3.5a)
         // this will freeze clients. That's why we remove MOVEMENTFLAG_MASK_MOVING before
         // setting MOVEMENTFLAG_ROOT
@@ -18336,8 +18335,9 @@ void Unit::SetRooted(bool apply, bool isStun)
         {
             WorldPacket data(SMSG_FORCE_MOVE_ROOT, GetPackGUID().size() + 4);
             data << GetPackGUID();
-            data << m_rootTimes;
+            data << m_movedByPlayer->ToPlayer()->GetSession()->GetOrderCounter(); // movement counter
             m_movedByPlayer->ToPlayer()->SendDirectMessage(&data);
+            m_movedByPlayer->ToPlayer()->GetSession()->IncrementOrderCounter();
         }
         else
         {
@@ -18356,8 +18356,9 @@ void Unit::SetRooted(bool apply, bool isStun)
             {
                 WorldPacket data(SMSG_FORCE_MOVE_UNROOT, GetPackGUID().size() + 4);
                 data << GetPackGUID();
-                data << m_rootTimes;
+                data << m_movedByPlayer->ToPlayer()->GetSession()->GetOrderCounter(); // movement counter
                 m_movedByPlayer->ToPlayer()->SendDirectMessage(&data);
+                m_movedByPlayer->ToPlayer()->GetSession()->IncrementOrderCounter();
             }
             else
             {
@@ -19261,13 +19262,14 @@ void Unit::KnockbackFrom(float x, float y, float speedXY, float speedZ)
 
         WorldPacket data(SMSG_MOVE_KNOCK_BACK, (8 + 4 + 4 + 4 + 4 + 4));
         data << GetPackGUID();
-        data << uint32(0);                                      // counter
+        data << player->GetSession()->GetOrderCounter();        // movement counter
         data << float(vcos);                                    // x direction
         data << float(vsin);                                    // y direction
         data << float(speedXY);                                 // Horizontal speed
         data << float(-speedZ);                                 // Z Movement speed (vertical)
 
         player->GetSession()->SendPacket(&data);
+        player->GetSession()->IncrementOrderCounter();
 
         if (player->HasIncreaseMountedFlightSpeedAura() || player->HasFlyAura())
             player->SetCanFly(true, true);

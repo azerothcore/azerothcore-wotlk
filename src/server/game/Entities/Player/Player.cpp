@@ -1337,9 +1337,10 @@ void Player::SendTeleportAckPacket()
 {
     WorldPacket data(MSG_MOVE_TELEPORT_ACK, 41);
     data << GetPackGUID();
-    data << uint32(0);                                     // this value increments every time
+    data << GetSession()->GetOrderCounter(); // movement counter
     BuildMovementPacket(&data);
     GetSession()->SendPacket(&data);
+    GetSession()->IncrementOrderCounter();
 }
 
 bool Player::TeleportTo(uint32 mapid, float x, float y, float z, float orientation, uint32 options /*= 0*/, Unit* target /*= nullptr*/, bool newInstance /*= false*/)
@@ -4444,8 +4445,9 @@ void Player::SetMovement(PlayerMovementType pType)
             return;
     }
     data << GetPackGUID();
-    data << uint32(0);
+    data << GetSession()->GetOrderCounter(); // movement counter
     GetSession()->SendPacket(&data);
+    GetSession()->IncrementOrderCounter();
 }
 
 /* Preconditions:
@@ -11706,8 +11708,9 @@ void Player::SendInitialPacketsAfterAddToMap()
     {
         WorldPacket data2(SMSG_FORCE_MOVE_ROOT, 10);
         data2 << GetPackGUID();
-        data2 << (uint32)2;
+        data2 << GetSession()->GetOrderCounter(); // movement counter
         SendMessageToSet(&data2, true);
+        GetSession()->IncrementOrderCounter();
     }
 
     SendEnchantmentDurations();                             // must be after add to map
@@ -15932,8 +15935,9 @@ bool Player::SetDisableGravity(bool disable, bool packetOnly /*= false*/, bool /
 
     WorldPacket data(disable ? SMSG_MOVE_GRAVITY_DISABLE : SMSG_MOVE_GRAVITY_ENABLE, 12);
     data << GetPackGUID();
-    data << uint32(0);          //! movement counter
+    data << GetSession()->GetOrderCounter(); // movement counter
     SendDirectMessage(&data);
+    GetSession()->IncrementOrderCounter();
 
     data.Initialize(MSG_MOVE_GRAVITY_CHNG, 64);
     data << GetPackGUID();
@@ -15954,8 +15958,9 @@ bool Player::SetCanFly(bool apply, bool packetOnly /*= false*/)
 
     WorldPacket data(apply ? SMSG_MOVE_SET_CAN_FLY : SMSG_MOVE_UNSET_CAN_FLY, 12);
     data << GetPackGUID();
-    data << uint32(0);          //! movement counter
+    data << GetSession()->GetOrderCounter(); // movement counter
     SendDirectMessage(&data);
+    GetSession()->IncrementOrderCounter();
 
     data.Initialize(MSG_MOVE_UPDATE_CAN_FLY, 64);
     data << GetPackGUID();
@@ -15975,8 +15980,9 @@ bool Player::SetHover(bool apply, bool packetOnly /*= false*/, bool /*updateAnim
 
     WorldPacket data(apply ? SMSG_MOVE_SET_HOVER : SMSG_MOVE_UNSET_HOVER, 12);
     data << GetPackGUID();
-    data << uint32(0);          //! movement counter
+    data << GetSession()->GetOrderCounter(); // movement counter
     SendDirectMessage(&data);
+    GetSession()->IncrementOrderCounter();
 
     data.Initialize(MSG_MOVE_HOVER, 64);
     data << GetPackGUID();
@@ -15996,8 +16002,9 @@ bool Player::SetWaterWalking(bool apply, bool packetOnly /*= false*/)
 
     WorldPacket data(apply ? SMSG_MOVE_WATER_WALK : SMSG_MOVE_LAND_WALK, 12);
     data << GetPackGUID();
-    data << uint32(0);          //! movement counter
+    data << GetSession()->GetOrderCounter(); // movement counter
     SendDirectMessage(&data);
+    GetSession()->IncrementOrderCounter();
 
     data.Initialize(MSG_MOVE_WATER_WALK, 64);
     data << GetPackGUID();
@@ -16017,8 +16024,9 @@ bool Player::SetFeatherFall(bool apply, bool packetOnly /*= false*/)
 
     WorldPacket data(apply ? SMSG_MOVE_FEATHER_FALL : SMSG_MOVE_NORMAL_FALL, 12);
     data << GetPackGUID();
-    data << uint32(0);          //! movement counter
+    data << GetSession()->GetOrderCounter(); // movement counter
     SendDirectMessage(&data);
+    GetSession()->IncrementOrderCounter();
 
     data.Initialize(MSG_MOVE_FEATHER_FALL, 64);
     data << GetPackGUID();

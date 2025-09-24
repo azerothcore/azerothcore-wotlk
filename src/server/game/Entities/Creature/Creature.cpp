@@ -3229,8 +3229,9 @@ bool Creature::SetDisableGravity(bool disable, bool packetOnly /*= false*/, bool
     {
         WorldPacket data(disable ? SMSG_MOVE_GRAVITY_DISABLE : SMSG_MOVE_GRAVITY_ENABLE, 12);
         data << GetPackGUID();
-        data << uint32(0); //! movement counter
+        data << m_movedByPlayer->ToPlayer()->GetSession()->GetOrderCounter(); // movement counter
         m_movedByPlayer->ToPlayer()->SendDirectMessage(&data);
+        m_movedByPlayer->ToPlayer()->GetSession()->IncrementOrderCounter();
 
         data.Initialize(MSG_MOVE_GRAVITY_CHNG, 64);
         data << GetPackGUID();
@@ -3317,8 +3318,9 @@ bool Creature::SetCanFly(bool enable, bool  /*packetOnly*/ /* = false */)
 
         WorldPacket data(enable ? SMSG_MOVE_SET_CAN_FLY : SMSG_MOVE_UNSET_CAN_FLY, 12);
         data << GetPackGUID();
-        data << uint32(0); //! movement counter
+        data << m_movedByPlayer->ToPlayer()->GetSession()->GetOrderCounter(); // movement counter
         m_movedByPlayer->ToPlayer()->SendDirectMessage(&data);
+        m_movedByPlayer->ToPlayer()->GetSession()->IncrementOrderCounter();
 
         data.Initialize(MSG_MOVE_UPDATE_CAN_FLY, 64);
         data << GetPackGUID();
@@ -3342,8 +3344,9 @@ bool Creature::SetWaterWalking(bool enable, bool packetOnly /* = false */)
     {
         WorldPacket data(enable ? SMSG_MOVE_WATER_WALK : SMSG_MOVE_LAND_WALK, 12);
         data << GetPackGUID();
-        data << uint32(0); //! movement counter
+        data << m_movedByPlayer->ToPlayer()->GetSession()->GetOrderCounter(); // movement counter
         m_movedByPlayer->ToPlayer()->SendDirectMessage(&data);
+        m_movedByPlayer->ToPlayer()->GetSession()->IncrementOrderCounter();
 
         data.Initialize(MSG_MOVE_WATER_WALK, 64);
         data << GetPackGUID();
@@ -3367,8 +3370,9 @@ bool Creature::SetFeatherFall(bool enable, bool packetOnly /* = false */)
     {
         WorldPacket data(enable ? SMSG_MOVE_FEATHER_FALL : SMSG_MOVE_NORMAL_FALL, 12);
         data << GetPackGUID();
-        data << uint32(0); //! movement counter
+        data << m_movedByPlayer->ToPlayer()->GetSession()->GetOrderCounter(); // movement counter
         m_movedByPlayer->ToPlayer()->SendDirectMessage(&data);
+        m_movedByPlayer->ToPlayer()->GetSession()->IncrementOrderCounter();
 
         data.Initialize(MSG_MOVE_FEATHER_FALL, 64);
         data << GetPackGUID();
