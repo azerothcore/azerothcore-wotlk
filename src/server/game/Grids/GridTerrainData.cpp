@@ -760,10 +760,12 @@ float GridTerrainData::GetHeightAccurate(float x, float y, float radius, GroundF
     float a = ((h2 + h4) - (h1 + h3)) * inv2S; // dz/dx
     float b = ((h3 + h4) - (h1 + h2)) * inv2S; // dz/dy
 
-    if (slopeClamp > 0.0f) {
+    if (slopeClamp > 0.0f)
+    {
         const float g2 = a * a + b * b;
         const float c2 = slopeClamp * slopeClamp;
-        if (g2 > c2) {
+        if (g2 > c2)
+        {
             const float scale = slopeClamp / std::sqrt(g2);
             a *= scale; b *= scale;
         }
@@ -775,11 +777,15 @@ float GridTerrainData::GetHeightAccurate(float x, float y, float radius, GroundF
         return zPlane;
 
     float totalSlope = slopeL2;
-    if (shape == GroundFootprintShape::Square && blend < 1.0f) {
+    if (shape == GroundFootprintShape::Square && blend < 1.0f)
+    {
         float slopeL1;
-        if (a == 0.0f && b == 0.0f) {
+        if (a == 0.0f && b == 0.0f)
+        {
             slopeL1 = 0.0f;
-        } else {
+        }
+        else
+        {
             const float c = std::cos(yaw);
             const float s = std::sin(yaw);
             const float rx =  a * c + b * s;
