@@ -742,10 +742,26 @@ float GridTerrainData::GetHeightAccurate(float x, float y, float radius, GroundF
     const bool right = (P.x >= A.x);
     const bool top   = (P.y >= A.y);
     G3D::Vector3 B, C;
-    if ( right && !top) { B = G3D::Vector3(S,   0.0f, h2); C = G3D::Vector3(0.0f, 0.0f, h1); } // BR
-    else if ( right &&  top) { B = G3D::Vector3(S,   S,    h4); C = G3D::Vector3(S,   0.0f, h2); } // TR
-    else if (!right &&  top) { B = G3D::Vector3(0.0f, S,    h3); C = G3D::Vector3(S,   S,    h4); } // TL
-    else /* !right && !top */{ B = G3D::Vector3(0.0f, 0.0f, h1); C = G3D::Vector3(0.0f, S,    h3); } // BL
+    if (right && !top)
+    {
+        B = G3D::Vector3(S,   0.0f, h2);
+        C = G3D::Vector3(0.0f, 0.0f, h1);
+    } // BR
+    else if (right && top)
+    {
+        B = G3D::Vector3(S,   S,    h4);
+        C = G3D::Vector3(S,   0.0f, h2);
+    } // TR
+    else if (!right && top) 
+    {
+        B = G3D::Vector3(0.0f, S,    h3);
+        C = G3D::Vector3(S,   S,    h4);
+    } // TL
+    else /* !right && !top */
+    {
+        B = G3D::Vector3(0.0f, 0.0f, h1);
+        C = G3D::Vector3(0.0f, S,    h3);
+    } // BL
 
     const G3D::Vector3 U = B - A;
     const G3D::Vector3 V = C - A;
