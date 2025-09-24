@@ -630,8 +630,14 @@ public:
         float groundZ = object->GetMapHeight(object->GetPositionX(), object->GetPositionY(), MAX_HEIGHT);
         float floorZ = object->GetMapHeight(object->GetPositionX(), object->GetPositionY(), object->GetPositionZ());
         float probeR = object->GetGroundProbeRadius();
-        float GridZAccurate = map->GetGridHeightAccurate(object->GetPositionX(), object->GetPositionY(), probeR);
-        float MapZAccurate = object->GetMapHeightAccurate(object->GetPositionX(), object->GetPositionY(), object->GetPositionZ(), true, DEFAULT_HEIGHT_SEARCH, probeR);
+        float rScale = 1.0f;
+        if (sWorld)
+            rScale = sWorld->getFloatConfig(CONFIG_HEIGHT_ACCURATE_RADIUS_SCALE);
+
+        float yaw = object->GetOrientation();
+        float probeRScaled = probeR * rScale;
+        float GridZAccurate = map->GetGridHeightAccurate(object->GetPositionX(), object->GetPositionY(), probeRScaled, yaw);
+        float MapZAccurate  = object->GetMapHeightAccurate(object->GetPositionX(), object->GetPositionY(), object->GetPositionZ(), /*vmap=*/true, DEFAULT_HEIGHT_SEARCH, probeR);
         const char* shapeStr = "circle";
         if (sWorld && sWorld->getIntConfig(CONFIG_HEIGHT_ACCURATE_SHAPE) == 1)
             shapeStr = "square";
