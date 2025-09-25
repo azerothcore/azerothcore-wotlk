@@ -617,7 +617,7 @@ LiquidData const GridTerrainData::GetLiquidData(float x, float y, float z, float
     return liquidData;
 }
 
-namespace
+namespace 
 {
     constexpr float INV_SQRT2 = 0.70710678118654752440f; // 1/sqrt(2)
 }
@@ -684,21 +684,22 @@ bool GridTerrainData::SampleHeights(uint32 xInt, uint32 yInt, float& h1, float& 
 
 float GridTerrainData::GetHeightAccurate(float x, float y, float radius) const
 {
-    return GetHeightAccurate(x, y, radius, GroundFootprintShape::Circle, 0.0f, 1.0f, 0.0f);
+    return GetHeightAccurate(x, y, radius, GroundFootprintShape::Circle, 0.0f, 1.0f, 0.0f, 0u, 1.0e-6f);
 }
 
 float GridTerrainData::GetHeightAccurate(float x, float y, float radius, GroundFootprintShape shape) const
 {
-    return GetHeightAccurate(x, y, radius, shape, 0.0f, (shape == GroundFootprintShape::Square ? 0.0f : 1.0f), 0.0f);
+    return GetHeightAccurate(x, y, radius, shape, 0.0f, (shape == GroundFootprintShape::Square ? 0.0f : 1.0f), 0.0f, 0u, 1.0e-6f);
 }
 
 float GridTerrainData::GetHeightAccurate(float x, float y, float radius, GroundFootprintShape shape, float yaw) const
 {
-    return GetHeightAccurate(x, y, radius, shape, yaw, (shape == GroundFootprintShape::Square ? 0.0f : 1.0f), 0.0f);
+    // Wrapper with default blend = 1 for circle, 0 for square.
+    return GetHeightAccurate(x, y, radius, shape, yaw, (shape == GroundFootprintShape::Square ? 0.0f : 1.0f), 0.0f, 0u, 1.0e-6f);
 }
 
 float GridTerrainData::GetHeightAccurate(float x, float y, float radius, GroundFootprintShape shape, float yaw,
-                                         float squareBlend, float slopeClamp) const
+                                         float squareBlend, float slopeClamp, uint32 gradientMode, float normalEps) const
 {
     if (!_loadedHeightData)
         return INVALID_HEIGHT;
@@ -710,6 +711,7 @@ float GridTerrainData::GetHeightAccurate(float x, float y, float radius, GroundF
     int yInt = static_cast<int>(std::floor(yf));
     float fx = xf - static_cast<float>(xInt);
     float fy = yf - static_cast<float>(yInt);
+
     if (fx < 0.0f) { fx += 1.0f; --xInt; }
     if (fy < 0.0f) { fy += 1.0f; --yInt; }
     if (fx >= 1.0f) { fx -= 1.0f; ++xInt; }
@@ -767,45 +769,54 @@ float GridTerrainData::GetHeightAccurate(float x, float y, float radius, GroundF
     const G3D::Vector3 V = C - A;
     const G3D::Vector3 n = U.cross(V);
     const float nzAbs = std::abs(n.z);
-    if (nzAbs < eps)
+    if (nzAbs < std::max(eps, normalEps))
         return getHeight(x, y);
 
     const float zPlane = A.z - (n.x * (P.x - A.x) + n.y * (P.y - A.y)) / n.z;
     const float inv2S = 1.0f / (2.0f * S);
+    float gx, gy;
 
-    float a = ((h2 + h4) - (h1 + h3)) * inv2S; // dz/dx
-    float b = ((h3 + h4) - (h1 + h2)) * inv2S; // dz/dy
+    if (gradientMode == 0u)
+    {
+        // Plane-exact gradient: z = (-n.x*x - n.y*y - d)/n.z  =>  ∇z = (-n.x/n.z, -n.y/n.z)
+        gx = -n.x / n.z;
+        gy = -n.y / n.z;
+    }
+    else
+    {
+        // LS gradient (smoother)
+        gx = ((h2 + h4) - (h1 + h3)) * inv2S;
+        gy = ((h3 + h4) - (h1 + h2)) * inv2S;
+    }
 
+    // Optional clamp
     if (slopeClamp > 0.0f)
     {
-        const float g2 = a * a + b * b;
+        const float g2 = gx*gx + gy*gy;
         const float c2 = slopeClamp * slopeClamp;
         if (g2 > c2)
         {
-            const float scale = slopeClamp / std::sqrt(g2);
-            a *= scale; b *= scale;
+            const float s = slopeClamp / std::sqrt(g2);
+            gx *= s; gy *= s;
         }
     }
 
-    const float slopeL2 = std::sqrt(std::max(0.0f, a*a + b*b));
+    const float slopeL2 = std::sqrt(std::max(0.0f, gx*gx + gy*gy));
 
+    // Fast‑path radius 0
     if (radius <= 0.0f)
         return zPlane;
 
-    float totalSlope = slopeL2;
+    float totalSlope = slopeL2; // por defecto: círculo (o blend==1)
     if (shape == GroundFootprintShape::Square && blend < 1.0f)
     {
-        float slopeL1;
-        if (a == 0.0f && b == 0.0f)
-        {
-            slopeL1 = 0.0f;
-        }
-        else
+        float slopeL1 = 0.0f;
+        if (!(gx == 0.0f && gy == 0.0f))
         {
             const float c = std::cos(yaw);
             const float s = std::sin(yaw);
-            const float rx =  a * c + b * s;
-            const float ry = -a * s + b * c;
+            const float rx =  gx * c + gy * s;
+            const float ry = -gx * s + gy * c;
             slopeL1 = std::abs(rx) + std::abs(ry);
         }
         totalSlope = blend * slopeL2 + (1.0f - blend) * (INV_SQRT2 * slopeL1);

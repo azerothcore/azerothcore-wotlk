@@ -261,10 +261,12 @@ public:
         return "unknown";
     }
 
-    float GetHeightAccurate(float x, float y, float radius, GroundFootprintShape shape, float yaw, float squareBlend, float slopeClamp) const;
+    // Accurate height with footprint & yaw. squareBlend in [0..1]. slopeClamp in [0..10] (0 disables).
+    float GetHeightAccurate(float x, float y, float radius, GroundFootprintShape shape, float yaw,
+                            float squareBlend, float slopeClamp, uint32 gradientMode, float normalEps) const;
+    // Convenience wrappers (kept for compatibility).
     float GetHeightAccurate(float x, float y, float radius) const;
     float GetHeightAccurate(float x, float y, float radius, GroundFootprintShape shape) const;
-
     float GetHeightAccurate(float x, float y, float radius, GroundFootprintShape shape, float yaw /*rads*/) const;
     inline std::string to_string(GridTerrainData::GroundFootprintShape s) { return GridTerrainData::ToString(s); }
     uint16 getArea(float x, float y) const;

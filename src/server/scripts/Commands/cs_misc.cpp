@@ -633,6 +633,10 @@ public:
         const float rScale = sWorld->getFloatConfig(CONFIG_HEIGHT_ACCURATE_RADIUS_SCALE);
         const float blend = sWorld->getFloatConfig(CONFIG_HEIGHT_ACCURATE_SQUARE_BLEND);
         const float clamp = sWorld->getFloatConfig(CONFIG_HEIGHT_ACCURATE_SLOPE_CLAMP);
+        const uint32 vmapAcc = sWorld->getIntConfig(CONFIG_HEIGHT_ACCURATE_VMAP_ENABLE);
+        const float  vdelta = sWorld->getFloatConfig(CONFIG_HEIGHT_ACCURATE_VMAP_DELTA);
+        const uint32 dynAcc = sWorld->getIntConfig(CONFIG_HEIGHT_ACCURATE_DYNAMIC_ENABLE);
+        const float  dyndelta = sWorld->getFloatConfig(CONFIG_HEIGHT_ACCURATE_DYNAMIC_DELTA);
         const float yaw = object->GetOrientation();
         const float probeRScaled = probeR * rScale;
 
@@ -669,7 +673,8 @@ public:
                                  cell.GridX(), cell.GridY(), cell.CellX(), cell.CellY(), object->GetInstanceId(),
                                  zoneX, zoneY, groundZ, floorZ, haveMap, haveVMap, haveMMAP);
 
-        handler->PSendSysMessage("Accurate Height Shape: {} (SquareBlend: {:0.2f}, RadiusScale: {:0.2f}, SlopeClamp: {:0.2f})", shapeStr, blend, rScale, clamp);
+        handler->PSendSysMessage("Accurate Height Shape: {} (SquareBlend: {:0.2f}, RadiusScale: {:0.2f}, SlopeClamp: {:0.2f}, GradMode: {}, NormalEps: {:0.6f}, VMapAccurate: {}, VMapDelta: {:0.2f}, DynAccurate: {}, DynDelta: {:0.2f})",
+            shapeStr, blend, rScale, clamp, gmode, neps, vmapAcc, vdelta, dynAcc, dyndelta);
         handler->PSendSysMessage("Accurate Height Grid: {}", GridZAccurate);
         handler->PSendSysMessage("Accurate Height Map: {}", MapZAccurate);
         handler->PSendSysMessage("Probe radius (pre-scale): {:0.3f}", probeR);

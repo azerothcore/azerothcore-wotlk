@@ -286,6 +286,12 @@ void WorldConfig::BuildConfigCache()
     SetConfigValue<float>(CONFIG_HEIGHT_ACCURATE_RADIUS_SCALE, "Height.Accurate.RadiusScale", 1.0f, ConfigValueCache::Reloadable::Yes, [](float const& value) { return value >= 0.1f && value <= 4.0f; }, ">= 0.1 and <= 4.0");
     SetConfigValue<float>(CONFIG_HEIGHT_ACCURATE_SQUARE_BLEND, "Height.Accurate.SquareBlend", 0.20f, ConfigValueCache::Reloadable::Yes, [](float const& value) { return value >= 0.0f && value <= 1.0f; }, ">= 0.0 and <= 1.0");
     SetConfigValue<float>(CONFIG_HEIGHT_ACCURATE_SLOPE_CLAMP, "Height.Accurate.SlopeClamp", 0.0f, ConfigValueCache::Reloadable::Yes, [](float const& value) { return value >= 0.0f && value <= 10.0f; }, ">= 0.0 and <= 10.0");
+    SetConfigValue<uint32>(CONFIG_HEIGHT_ACCURATE_GRADIENT_MODE, "Height.Accurate.GradientMode", 0, ConfigValueCache::Reloadable::Yes, [](uint32 const& value) { return value <= 1; }, "<= 1");
+    SetConfigValue<float>(CONFIG_HEIGHT_ACCURATE_NORMAL_EPS, "Height.Accurate.NormalEps", 1.0e-6f, ConfigValueCache::Reloadable::Yes, [](float const& value) { return value >= 1e-8f && value <= 1e-3f; }, ">= 1e-8f and <= 1e-3f");
+    SetConfigValue<uint32>(CONFIG_HEIGHT_ACCURATE_VMAP_ENABLE, "Height.Accurate.VMap.Enable", 1, ConfigValueCache::Reloadable::Yes, [](uint32 const& value) { return value <= 1; }, "<= 1");
+    SetConfigValue<float>(CONFIG_HEIGHT_ACCURATE_VMAP_DELTA, "Height.Accurate.VMap.Delta", 0.25f, ConfigValueCache::Reloadable::Yes, [](float const& value) { return value >= 0.01f && value <= 1.0f; }, ">= 0.01f and <= 1.0f");
+    SetConfigValue<uint32>(CONFIG_HEIGHT_ACCURATE_DYNAMIC_ENABLE, "Height.Accurate.Dynamic.Enable", 1, ConfigValueCache::Reloadable::Yes, [](uint32 const& value) { return value <= 1; }, "<= 1");
+    SetConfigValue<float>(CONFIG_HEIGHT_ACCURATE_DYNAMIC_DELTA, "Height.Accurate.Dynamic.Delta", 0.25f, ConfigValueCache::Reloadable::Yes, [](float const& value) { return value >= 0.01f && value <= 1.0f; }, ">= 0.01f and <= 1.0f");
 
     SetConfigValue<uint32>(CONFIG_GROUP_VISIBILITY, "Visibility.GroupMode", 1);
 
