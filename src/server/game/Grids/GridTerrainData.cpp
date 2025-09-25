@@ -617,7 +617,7 @@ LiquidData const GridTerrainData::GetLiquidData(float x, float y, float z, float
     return liquidData;
 }
 
-namespace 
+namespace
 {
     constexpr float INV_SQRT2 = 0.70710678118654752440f; // 1/sqrt(2)
 }

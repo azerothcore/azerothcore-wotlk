@@ -1735,7 +1735,7 @@ float Map::GetHeight(uint32 phasemask, float x, float y, float z, bool vmap/*=tr
 
 float Map::GetHeightAccurate(uint32 phasemask, float x, float y, float z, float radius,
                              bool vmap/*=true*/, float maxSearchDist /*= DEFAULT_HEIGHT_SEARCH*/) const
-{ 
+{
     return GetHeightAccurate(phasemask, x, y, z, radius, 0.0f, vmap, maxSearchDist);
 }
 
