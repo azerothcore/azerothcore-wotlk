@@ -633,6 +633,8 @@ public:
         const float rScale = sWorld->getFloatConfig(CONFIG_HEIGHT_ACCURATE_RADIUS_SCALE);
         const float blend = sWorld->getFloatConfig(CONFIG_HEIGHT_ACCURATE_SQUARE_BLEND);
         const float clamp = sWorld->getFloatConfig(CONFIG_HEIGHT_ACCURATE_SLOPE_CLAMP);
+        const uint32 gmode = sWorld->getIntConfig(CONFIG_HEIGHT_ACCURATE_GRADIENT_MODE);
+        const float  neps = sWorld->getFloatConfig(CONFIG_HEIGHT_ACCURATE_NORMAL_EPS);
         const uint32 vmapAcc = sWorld->getIntConfig(CONFIG_HEIGHT_ACCURATE_VMAP_ENABLE);
         const float  vdelta = sWorld->getFloatConfig(CONFIG_HEIGHT_ACCURATE_VMAP_DELTA);
         const uint32 dynAcc = sWorld->getIntConfig(CONFIG_HEIGHT_ACCURATE_DYNAMIC_ENABLE);
