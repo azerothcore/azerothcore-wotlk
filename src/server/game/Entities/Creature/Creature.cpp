@@ -2667,12 +2667,6 @@ bool Creature::CanCreatureAttack(Unit const* victim, bool skipDistCheck) const
     if (victim->IsCreature() && victim->ToCreature()->IsInEvadeMode())
         return false;
 
-    // cannot attack if is during 5 second grace period, unless being attacked
-    if (m_respawnedTime && (GameTime::GetGameTime().count() - m_respawnedTime) < 5 && !IsEngagedBy(victim))
-    {
-        return false;
-    }
-
     // if victim is in FD and we can't see that
     if (victim->HasUnitFlag2(UNIT_FLAG2_FEIGN_DEATH) && !CanIgnoreFeignDeath())
     {
