@@ -669,7 +669,7 @@ public:
                                  cell.GridX(), cell.GridY(), cell.CellX(), cell.CellY(), object->GetInstanceId(),
                                  zoneX, zoneY, groundZ, floorZ, haveMap, haveVMap, haveMMAP);
 
-        handler->PSendSysMessage("Accurate Height Shape: {} (SquareBlend: {:0.2f}, RadiusScale: {:0.2f}, SlopeClamp: {:0.2f})", shapeStr, blend, rScale);
+        handler->PSendSysMessage("Accurate Height Shape: {} (SquareBlend: {:0.2f}, RadiusScale: {:0.2f}, SlopeClamp: {:0.2f})", shapeStr, blend, rScale, clamp);
         handler->PSendSysMessage("Accurate Height Grid: {}", GridZAccurate);
         handler->PSendSysMessage("Accurate Height Map: {}", MapZAccurate);
         handler->PSendSysMessage("Probe radius (pre-scale): {:0.3f}", probeR);
