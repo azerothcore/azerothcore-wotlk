@@ -310,11 +310,28 @@ void MotionMaster::MoveConfused()
 /**
  * @brief Force the unit to chase this target. Doesn't work with UNIT_FLAG_DISABLE_MOVE
  */
-void MotionMaster::MoveChase(Unit* target,  std::optional<ChaseRange> dist, std::optional<ChaseAngle> angle)
+void MotionMaster::MoveChase(Unit* target, std::optional<ChaseRange> dist, std::optional<ChaseAngle> angle)
 {
     // ignore movement request if target not exist
     if (!target || target == _owner || _owner->HasUnitFlag(UNIT_FLAG_DISABLE_MOVE))
         return;
+
+    if (GetCurrentMovementGeneratorType() == CHASE_MOTION_TYPE)
+    {
+        if (_owner->IsPlayer())
+        {
+            ChaseMovementGenerator<Player>* gen = (ChaseMovementGenerator<Player>*)top();
+            gen->SetOffsetAndAngle(dist, angle);
+            gen->SetNewTarget(target);
+        }
+        else
+        {
+            ChaseMovementGenerator<Creature>* gen = (ChaseMovementGenerator<Creature>*)top();
+            gen->SetOffsetAndAngle(dist, angle);
+            gen->SetNewTarget(target);
+        }
+        return;
+    }
 
     //_owner->ClearUnitState(UNIT_STATE_FOLLOW);
     if (_owner->IsPlayer())
@@ -328,6 +345,24 @@ void MotionMaster::MoveChase(Unit* target,  std::optional<ChaseRange> dist, std:
         LOG_DEBUG("movement.motionmaster", "Creature ({}) chase to {} ({})",
             _owner->GetGUID().ToString(), target->IsPlayer() ? "player" : "creature", target->GetGUID().ToString());
         Mutate(new ChaseMovementGenerator<Creature>(target, dist, angle), MOTION_SLOT_ACTIVE);
+    }
+}
+
+void MotionMaster::DistanceYourself(float dist)
+{
+    if (GetCurrentMovementGeneratorType() == CHASE_MOTION_TYPE)
+    {
+        if (_owner->IsPlayer())
+        {
+            ChaseMovementGenerator<Player>* gen = (ChaseMovementGenerator<Player>*)top();
+            gen->DistanceYourself((Player*)_owner, dist);
+        }
+        else
+        {
+            ChaseMovementGenerator<Creature>* gen = (ChaseMovementGenerator<Creature>*)top();
+            gen->DistanceYourself((Creature*)_owner, dist);
+        }
+        return;
     }
 }
 

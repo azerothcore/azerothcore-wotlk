@@ -4564,6 +4564,13 @@ MunchingBlizzlike.Enabled = 1
 Daze.Enabled = 1
 
 #
+#    InfiniteAmmo.Enabled
+#        Description: Enable or disable ammo consumption for ranged attacks and thrown weapons.
+#        Default: 0 - (Blizzlike)
+
+InfiniteAmmo.Enabled = 0
+
+#
 ###################################################################################################
 
 ###################################################################################################

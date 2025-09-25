@@ -268,6 +268,7 @@ public:
     void DoFleeToGetAssistance();
     void CallForHelp(float fRadius, Unit* target = nullptr);
     void CallAssistance(Unit* target = nullptr);
+    void SetNoCallForHelp(bool val) { m_alreadyCallForHelp = val; }
     void SetNoCallAssistance(bool val) { m_AlreadyCallAssistance = val; }
     void SetNoSearchAssistance(bool val) { m_AlreadySearchedAssistance = val; }
     bool HasSearchedAssistance() { return m_AlreadySearchedAssistance; }
@@ -469,6 +470,7 @@ protected:
     uint8 m_equipmentId;
     int8 m_originalEquipmentId; // can be -1
 
+    bool m_alreadyCallForHelp;
     bool m_AlreadyCallAssistance;
     bool m_AlreadySearchedAssistance;
     bool m_regenHealth;

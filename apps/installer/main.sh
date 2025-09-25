@@ -1,16 +1,16 @@
 #!/usr/bin/env bash
 
 # AzerothCore Dashboard Script
-# 
+#
 # This script provides an interactive menu system for AzerothCore management
 # using the unified menu system library.
-# 
+#
 # Usage:
 #   ./acore.sh                    - Interactive mode with numeric and text selection
 #   ./acore.sh <command> [args]   - Direct command execution (only text commands, no numbers)
 #
 # Interactive Mode:
-#   - Select options by number (1, 2, 3...), command name (init, compiler, etc.), 
+#   - Select options by number (1, 2, 3...), command name (init, compiler, etc.),
 #     or short alias (i, c, etc.)
 #   - All selection methods work in interactive mode
 #
@@ -35,6 +35,7 @@ menu_items=(
     "install-deps|d|Configure OS dep"
     "pull|u|Update Repository"
     "reset|r|Reset & Clean Repository"
+    "setup-db|r|Install db only"
     "compiler|c|Run compiler tool"
     "module|m|Module manager (search/install/update/remove)"
     "client-data|gd|download client data from github repository (beta)"
@@ -51,52 +52,55 @@ menu_items=(
 function handle_menu_command() {
     local key="$1"
     shift
-    
+
     case "$key" in
-        "init") 
-            inst_allInOne 
+        "init")
+            inst_allInOne
             ;;
-        "install-deps") 
-            inst_configureOS 
+        "install-deps")
+            inst_configureOS
             ;;
-        "pull") 
-            inst_updateRepo 
+        "pull")
+            inst_updateRepo
             ;;
-        "reset") 
-            inst_resetRepo 
+        "reset")
+            inst_resetRepo
             ;;
-        "compiler") 
-            bash "$AC_PATH_APPS/compiler/compiler.sh" "$@" 
+        "setup-db")
+            inst_dbCreate
             ;;
-        "module") 
-            bash "$AC_PATH_APPS/installer/includes/modules-manager/module-main.sh" "$@" 
+        "compiler")
+            bash "$AC_PATH_APPS/compiler/compiler.sh" "$@"
             ;;
-        "client-data") 
-            inst_download_client_data 
+        "module")
+            bash "$AC_PATH_APPS/installer/includes/modules-manager/module-main.sh" "$@"
             ;;
-        "run-worldserver") 
-            inst_simple_restarter worldserver 
+        "client-data")
+            inst_download_client_data
             ;;
-        "run-authserver") 
-            inst_simple_restarter authserver 
+        "run-worldserver")
+            inst_simple_restarter worldserver
             ;;
-        "docker") 
+        "run-authserver")
+            inst_simple_restarter authserver
+            ;;
+        "docker")
             DOCKER=1 bash "$AC_PATH_ROOT/apps/docker/docker-cmd.sh" "$@"
-            exit 
+            exit
             ;;
-        "version") 
+        "version")
             printf "AzerothCore Rev. %s\n" "$ACORE_VERSION"
-            exit 
+            exit
             ;;
-        "service-manager") 
+        "service-manager")
             bash "$AC_PATH_APPS/startup-scripts/src/service-manager.sh" "$@"
-            exit 
+            exit
             ;;
-        "quit") 
+        "quit")
             echo "Goodbye!"
-            exit 
+            exit
             ;;
-        *) 
+        *)
             echo "Invalid option. Use --help to see available commands."
             return 1
             ;;

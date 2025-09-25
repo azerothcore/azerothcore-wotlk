@@ -863,11 +863,6 @@ SpellInfo::SpellInfo(SpellEntry const* spellEntry)
     _requireCooldownInfo = false;
 }
 
-SpellInfo::~SpellInfo()
-{
-    _UnloadImplicitTargetConditionLists();
-}
-
 uint32 SpellInfo::GetCategory() const
 {
     return CategoryEntry ? CategoryEntry->Id : 0;
@@ -2871,23 +2866,6 @@ bool SpellInfo::_IsPositiveTarget(uint32 targetA, uint32 targetB)
     if (targetB)
         return _IsPositiveTarget(targetB, 0);
     return true;
-}
-
-void SpellInfo::_UnloadImplicitTargetConditionLists()
-{
-    // find the same instances of ConditionList and delete them.
-    for (uint8 i = 0; i < MAX_SPELL_EFFECTS; ++i)
-    {
-        ConditionList* cur = Effects[i].ImplicitTargetConditions;
-        if (!cur)
-            continue;
-        for (uint8 j = i; j < MAX_SPELL_EFFECTS; ++j)
-        {
-            if (Effects[j].ImplicitTargetConditions == cur)
-                Effects[j].ImplicitTargetConditions = nullptr;
-        }
-        delete cur;
-    }
 }
 
 bool SpellInfo::CheckElixirStacking(Unit const* caster) const
