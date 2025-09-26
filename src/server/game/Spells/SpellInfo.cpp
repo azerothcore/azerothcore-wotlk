@@ -912,6 +912,11 @@ SpellInfo const* SpellInfo::TryGetSpellInfoOverride(WorldObject const* caster) c
 }
 //End npcbot
 
+SpellInfo::~SpellInfo()
+{
+    _UnloadImplicitTargetConditionLists();
+}
+
 uint32 SpellInfo::GetCategory() const
 {
     return CategoryEntry ? CategoryEntry->Id : 0;
