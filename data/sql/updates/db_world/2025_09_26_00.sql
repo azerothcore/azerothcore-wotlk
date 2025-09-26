@@ -1,3 +1,4 @@
+-- DB update 2025_09_23_03 -> 2025_09_26_00
 --
 UPDATE `creature_template` SET `AIName` = 'SmartAI' WHERE `entry` = 28600;
 DELETE FROM `waypoint_scripts` WHERE `guid`=776;
