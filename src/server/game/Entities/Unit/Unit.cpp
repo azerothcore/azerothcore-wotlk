@@ -4330,10 +4330,10 @@ void Unit::ProcessTerrainStatusUpdate()
 
     LiquidData const& liquidData = GetLiquidData();
 
-    // remove appropriate auras if we are swimming/not swimming respectively
-    if (liquidData.Status & MAP_LIQUID_STATUS_SWIMMING)
+    // remove appropriate auras if we are swimming/not swimming respectively - exact mirror of client logic
+    if (liquidData.Status & MAP_LIQUID_STATUS_SWIMMING && (liquidData.Level - GetPositionZ()) > GetCollisionHeight() * 0.75f) // Shallow water at ~75% of collision height)
         RemoveAurasWithInterruptFlags(AURA_INTERRUPT_FLAG_NOT_ABOVEWATER);
-    else if (!isSwimming())
+    else
         RemoveAurasWithInterruptFlags(AURA_INTERRUPT_FLAG_NOT_UNDERWATER);
 
     // liquid aura handling
