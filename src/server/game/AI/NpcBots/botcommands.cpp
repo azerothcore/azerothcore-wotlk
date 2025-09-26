@@ -630,10 +630,23 @@ public:
             { "teleport",   HandleNpcBotRecallTeleportCommand,      rbac::RBAC_PERM_COMMAND_NPCBOT_RECALL,             Console::No  },
         };
 
+        static ChatCommandTable npcbotListSpawnedFreeCommandTable =
+        {
+            { "",           HandleNpcBotSpawnedFreeCommand,         rbac::RBAC_PERM_COMMAND_NPCBOT_SPAWNED,            Console::Yes },
+            { "zone",       HandleNPCBotSpawnedFreeZoneCommand,     rbac::RBAC_PERM_COMMAND_NPCBOT_SPAWNED,            Console::Yes },
+            { "class",      HandleNPCBotSpawnedFreeClassCommand,    rbac::RBAC_PERM_COMMAND_NPCBOT_SPAWNED,            Console::Yes },
+            { "level",      HandleNPCBotSpawnedFreeLevelCommand,    rbac::RBAC_PERM_COMMAND_NPCBOT_SPAWNED,            Console::Yes },
+            { "stats",      HandleNpcBotSpawnedFreeStatsCommand,    rbac::RBAC_PERM_COMMAND_NPCBOT_SPAWNED,            Console::Yes },
+        };
+
         static ChatCommandTable npcbotListSpawnedCommandTable =
         {
             { "",           HandleNpcBotSpawnedCommand,             rbac::RBAC_PERM_COMMAND_NPCBOT_SPAWNED,            Console::Yes },
-            { "free",       HandleNpcBotSpawnedFreeCommand,         rbac::RBAC_PERM_COMMAND_NPCBOT_SPAWNED,            Console::Yes },
+            { "zone",       HandleNPCBotSpawnedZoneCommand,         rbac::RBAC_PERM_COMMAND_NPCBOT_SPAWNED,            Console::Yes },
+            { "class",      HandleNPCBotSpawnedClassCommand,        rbac::RBAC_PERM_COMMAND_NPCBOT_SPAWNED,            Console::Yes },
+            { "level",      HandleNPCBotSpawnedLevelCommand,        rbac::RBAC_PERM_COMMAND_NPCBOT_SPAWNED,            Console::Yes },
+            { "stats",      HandleNpcBotSpawnedStatsCommand,        rbac::RBAC_PERM_COMMAND_NPCBOT_SPAWNED,            Console::Yes },
+            { "free",       npcbotListSpawnedFreeCommandTable                                                                       },
         };
 
         static ChatCommandTable npcbotListCommandTable =
@@ -3947,21 +3960,31 @@ public:
         return true;
     }
 
-    static bool HandleNpcBotSpawnedCommand(ChatHandler* handler)
+    static bool HandleNpcBotSpawnedCommandImpl(ChatHandler* handler, Optional<std::string> area_str, Optional<std::string> class_str, Optional<uint32> level_min, Optional<uint32> level_max, bool is_free)
     {
         std::unique_lock<std::shared_mutex> lock(*BotDataMgr::GetLock());
         NpcBotRegistry const& all_bots = BotDataMgr::GetExistingNPCBots();
-        std::stringstream ss;
-        if (all_bots.empty())
-            ss << "No spawned bots found!";
-        else
-        {
-            ss << "Found " << uint32(all_bots.size()) << " bots:";
-            uint32 counter = 0;
-            for (Creature const* bot : all_bots)
-            {
-                ++counter;
+        std::vector<NpcBotRegistry::value_type> found_bots;
+        found_bots.reserve(all_bots.size());
+        std::copy_if(all_bots.cbegin(), all_bots.cend(), std::back_inserter(found_bots), [=](Creature const* bot) {
+            return !is_free || BotDataMgr::SelectNpcBotData(bot->GetEntry())->owner == 0;
+        });
 
+        std::ostringstream ss;
+        const std::string free_str = is_free ? "free " : "";
+        if (!found_bots.empty())
+        {
+            if (area_str)
+                std::ranges::transform(*area_str, area_str->begin(), ::toupper);
+            if (class_str)
+                std::ranges::transform(*class_str, class_str->begin(), ::toupper);
+
+            std::vector<std::string> matched_bots;
+            matched_bots.reserve(found_bots.size());
+            uint32 counter = 0;
+            std::ostringstream bss;
+            for (Creature const* bot : found_bots)
+            {
                 std::string bot_color_str;
                 std::string bot_class_str;
                 GetBotClassNameAndColor(bot->GetBotClass(), bot_color_str, bot_class_str);
@@ -3969,10 +3992,44 @@ public:
                 AreaTableEntry const* zone = sAreaTableStore.LookupEntry(bot->GetBotAI()->GetLastZoneId() ? bot->GetBotAI()->GetLastZoneId() : bot->GetZoneId());
                 std::string zone_name = zone ? zone->area_name[handler->GetSession() ? handler->GetSessionDbLocaleIndex() : 0] : "Unknown";
 
-                ss << "\n" << counter << ") " << bot->GetEntry() << ": "
-                    << bot->GetName() << " - |c" << bot_color_str << bot_class_str << "|r - "
-                    << "level " << uint32(bot->GetLevel()) << " - \"" << zone_name << "\" - "
-                    << (bot->IsFreeBot() ? bot->GetBotAI()->GetBotOwnerGuid() ? "inactive (owned)" : bot->GetBotAI()->IsWanderer() ? "wandering" : "free" : "active");
+                std::string zone_name_upper;
+                if (area_str)
+                {
+                    zone_name_upper = zone_name;
+                    std::ranges::transform(zone_name_upper, zone_name_upper.begin(), ::toupper);
+                }
+
+                std::string bot_class_upper;
+                if (class_str)
+                {
+                    bot_class_upper = bot_class_str;
+                    std::ranges::transform(bot_class_upper, bot_class_upper.begin(), ::toupper);
+                }
+
+                if ((!area_str || zone_name_upper.find(*area_str) != std::string::npos) &&
+                    (!class_str || bot_class_upper.find(*class_str) != std::string::npos) &&
+                    (!level_min || bot->GetLevel() >= *level_min) &&
+                    (!level_max || bot->GetLevel() <= *level_max))
+                {
+                    bss.clear();
+                    bss.str("");
+
+                    ++counter;
+                    bss << '\n' << counter << ") " << bot->GetEntry() << ": "
+                        << bot->GetName() << " - |c" << bot_color_str << bot_class_str << "|r - "
+                        << "level " << uint32(bot->GetLevel()) << " - \"" << zone_name << '"'
+                        << (bot->GetBotAI()->HasRealEquipment() ? " |cff00ffff(has equipment!)|r" : "");
+                    matched_bots.push_back(bss.str());
+                }
+            }
+
+            if (matched_bots.empty())
+                ss << "No " << free_str << "bots found!";
+            else
+            {
+                ss << "Found " << uint32(matched_bots.size()) << ' ' << free_str << "bots:";
+                for (std::string const& bstr : matched_bots)
+                    ss << std::move(bstr);
             }
         }
 
@@ -3980,43 +4037,160 @@ public:
         return true;
     }
 
+    static bool HandleNpcBotSpawnedCommand(ChatHandler* handler)
+    {
+        return HandleNpcBotSpawnedCommandImpl(handler, {}, {}, {}, {}, false);
+    }
+
     static bool HandleNpcBotSpawnedFreeCommand(ChatHandler* handler)
     {
+        return HandleNpcBotSpawnedCommandImpl(handler, {}, {}, {}, {}, true);
+    }
+
+    static bool HandleNpcBotSpawnedStatsCommandImpl(ChatHandler* handler, bool is_free)
+    {
+        std::array<uint32, BRACKETS_COUNT> bot_levels{ 1, 10, 20, 30, 40, 50, 60, 70, 80 };
+        std::array<uint32, BRACKETS_COUNT> bot_count_by_level{};
+        std::array<uint32, BOT_CLASS_END> bot_count_by_class{};
+        std::array<std::string, BOT_CLASS_END> bot_class_names{};
+        std::string dummy{};
+        for (uint8 bclass : NPCBots::index_array<uint8, BOT_CLASS_END>)
+            if ((1 << bclass) & ALL_BOT_CLASSES_MASK)
+                GetBotClassNameAndColor(bclass, dummy, bot_class_names[bclass]);
+
         std::unique_lock<std::shared_mutex> lock(*BotDataMgr::GetLock());
         NpcBotRegistry const& all_bots = BotDataMgr::GetExistingNPCBots();
-        //using std::remove_if with sets requires c++20
-        std::vector<NpcBotRegistry::value_type> free_bots;
-        free_bots.reserve(all_bots.size());
-        for (Creature const* bot : all_bots)
-            if (BotDataMgr::SelectNpcBotData(bot->GetEntry())->owner == 0)
-                free_bots.push_back(bot);
-        std::stringstream ss;
-        if (free_bots.empty())
-            ss << "No free bots found!";
+        std::vector<NpcBotRegistry::value_type> found_bots;
+        found_bots.reserve(all_bots.size());
+        std::copy_if(all_bots.cbegin(), all_bots.cend(), std::back_inserter(found_bots), [=](Creature const* bot) {
+            return !is_free || BotDataMgr::SelectNpcBotData(bot->GetEntry())->owner == 0;
+        });
+
+        std::ostringstream ss;
+        const std::string free_str = is_free ? "free " : "";
+        if (!found_bots.empty())
+            ss << "No " << free_str << "bots found!";
         else
         {
-            ss << "Found " << uint32(free_bots.size()) << " free bots:";
-            uint32 counter = 0;
-            for (Creature const* bot : free_bots)
-            {
-                ++counter;
+            ss << "Found " << uint32(found_bots.size()) << ' ' << free_str << "bots:";
 
-                std::string bot_color_str;
-                std::string bot_class_str;
-                GetBotClassNameAndColor(bot->GetBotClass(), bot_color_str, bot_class_str);
+            for (Creature const* bot : found_bots)
+            {
+                uint32 bot_level = uint32(bot->GetLevel());
+                std::string const& bot_class_str = bot_class_names[bot->GetBotClass()];
 
                 AreaTableEntry const* zone = sAreaTableStore.LookupEntry(bot->GetBotAI()->GetLastZoneId() ? bot->GetBotAI()->GetLastZoneId() : bot->GetZoneId());
                 std::string zone_name = zone ? zone->area_name[handler->GetSession() ? handler->GetSessionDbLocaleIndex() : 0] : "Unknown";
 
-                ss << '\n' << counter << ") " << bot->GetEntry() << ": "
-                    << bot->GetName() << " - |c" << bot_color_str << bot_class_str << "|r - "
-                    << "level " << uint32(bot->GetLevel()) << " - \"" << zone_name << '"'
-                    << (bot->GetBotAI()->HasRealEquipment() ? " |cff00ffff(has equipment!)|r" : "");
+                decltype(bot_class_names)::const_iterator cit = std::ranges::find(bot_class_names, bot_class_str);
+                ASSERT(cit != bot_class_names.cend());
+                bot_count_by_class[std::distance(bot_class_names.cbegin(), cit)]++;
+
+                static_assert(std::is_same_v<decltype(bot_level / 10u), decltype(bot_count_by_level)::value_type>);
+                bot_count_by_level[std::min<uint32>(bot_level / 10u, bot_count_by_level.size() - 1)]++;
             }
-        }
+
+            static_assert(std::size(bot_count_by_class) == std::size(bot_class_names));
+            for (uint8 i = 0; i < bot_class_names.size(); ++i)
+                if (!!bot_count_by_class[i] && !!((1 << i) & ALL_BOT_CLASSES_MASK))
+                    ss << "\n " << bot_class_names[i] << ": " << bot_count_by_class[i] << " bots";
+            ss << '\n';
+
+            static_assert(std::size(bot_levels) == std::size(bot_count_by_level));
+            for (size_t i = 0; i < bot_levels.size(); ++i)
+            {
+                ss << "\n Levels " << bot_levels[i];
+                if (i + 1 < bot_levels.size())
+                    ss << '-' << bot_levels[i + 1] - 1;
+                else
+                    ss << '+';
+                ss << ": " << bot_count_by_level[i] << " bots";
+            }
+        };
 
         handler->SendSysMessage(ss.str());
         return true;
+    }
+
+    static bool HandleNpcBotSpawnedStatsCommand(ChatHandler* handler)
+    {
+        return HandleNpcBotSpawnedStatsCommandImpl(handler, false);
+    }
+
+    static bool HandleNpcBotSpawnedFreeStatsCommand(ChatHandler* handler)
+    {
+        return HandleNpcBotSpawnedStatsCommandImpl(handler, true);
+    }
+
+    static bool HandleNPCBotSpawnedZoneCommandImpl(ChatHandler* handler, Optional<std::string> zone_name, bool is_free)
+    {
+        if (!zone_name || zone_name->empty())
+        {
+            if (!handler->GetPlayer())
+            {
+                handler->SendSysMessage("Syntax: npcbot list spawned [free] zone #zone_name_part");
+                handler->SetSentErrorMessage(true);
+                return false;
+            }
+
+            AreaTableEntry const* zone = sAreaTableStore.LookupEntry(handler->GetPlayer()->GetZoneId());
+            zone_name = zone ? zone->area_name[handler->GetSession() ? handler->GetSessionDbLocaleIndex() : 0] : "Unknown";
+        }
+
+        return HandleNpcBotSpawnedCommandImpl(handler, zone_name, {}, {}, {}, is_free);
+    }
+
+    static bool HandleNPCBotSpawnedZoneCommand(ChatHandler* handler, Optional<std::string> zone_name)
+    {
+        return HandleNPCBotSpawnedZoneCommandImpl(handler, zone_name, false);
+    }
+
+    static bool HandleNPCBotSpawnedFreeZoneCommand(ChatHandler* handler, Optional<std::string> zone_name)
+    {
+        return HandleNPCBotSpawnedZoneCommandImpl(handler, zone_name, true);
+    }
+
+    static bool HandleNPCBotSpawnedClassCommandImpl(ChatHandler* handler, Optional<std::string> class_name, Optional<std::string> zone_name, bool is_free)
+    {
+        if (!class_name || class_name->empty())
+        {
+            handler->SendSysMessage("Syntax: npcbot list spawned [free] class #class #[zone]");
+            handler->SetSentErrorMessage(true);
+            return false;
+        }
+        return HandleNpcBotSpawnedCommandImpl(handler, zone_name, class_name, {}, {}, is_free);
+    }
+
+    static bool HandleNPCBotSpawnedClassCommand(ChatHandler* handler, Optional<std::string> class_name, Optional<std::string> zone_name)
+    {
+        return HandleNPCBotSpawnedClassCommandImpl(handler, class_name, zone_name, false);
+    }
+
+    static bool HandleNPCBotSpawnedFreeClassCommand(ChatHandler* handler, Optional<std::string> class_name, Optional<std::string> zone_name)
+    {
+        return HandleNPCBotSpawnedClassCommandImpl(handler, class_name, zone_name, true);
+    }
+
+    static bool HandleNPCBotSpawnedLevelCommandImpl(ChatHandler* handler, Optional<uint32> level_min, Optional<uint32> level_max, Optional<std::string> zone_name, bool is_free)
+    {
+        if (!level_min || !*level_min)
+        {
+            handler->SendSysMessage("Syntax: npcbot list spawned [free] level #level_min #[level_max] #[zone]");
+            handler->SetSentErrorMessage(true);
+            return false;
+        }
+
+        return HandleNpcBotSpawnedCommandImpl(handler, zone_name, {}, level_min, level_max, is_free);
+    }
+
+    static bool HandleNPCBotSpawnedLevelCommand(ChatHandler* handler, Optional<uint32> level_min, Optional<uint32> level_max, Optional<std::string> zone_name)
+    {
+        return HandleNPCBotSpawnedLevelCommandImpl(handler, level_min, level_max, zone_name, false);
+    }
+
+    static bool HandleNPCBotSpawnedFreeLevelCommand(ChatHandler* handler, Optional<uint32> level_min, Optional<uint32> level_max, Optional<std::string> zone_name)
+    {
+        return HandleNPCBotSpawnedLevelCommandImpl(handler, level_min, level_max, zone_name, true);
     }
 
     static bool HandleNpcBotGearScoreCommand(ChatHandler* handler, Optional<std::string_view> class_name)
