@@ -86,6 +86,7 @@
 #include "Util.h"
 #include "VMapFactory.h"
 #include "VMapMgr2.h"
+#include "VoiceChatMgr.h"
 #include "Warden.h"
 #include "WardenCheckMgr.h"
 #include "WaypointMovementGenerator.h"
@@ -1035,6 +1036,8 @@ void World::SetInitialWorldSettings()
 
     METRIC_EVENT("events", "World initialized", "World Initialized In " + std::to_string(startupDuration / 60000) + " Minutes " + std::to_string((startupDuration % 60000) / 1000) + " Seconds");
 
+    // sVoiceChatSocketMgr->Init();
+
     if (sConfigMgr->isDryRun())
     {
         sMapMgr->UnloadAll();
@@ -1259,6 +1262,11 @@ void World::Update(uint32 diff)
         METRIC_TIMER("world_update_time", METRIC_TAG("type", "Process query callbacks"));
         // execute callbacks from sql queries that were queued recently
         ProcessQueryCallbacks();
+    }
+
+    {
+        METRIC_TIMER("world_update_time", METRIC_TAG("type", "Voice chat update"));
+        sVoiceChatMgr.Update(diff);
     }
 
     /// <li> Update uptime table
