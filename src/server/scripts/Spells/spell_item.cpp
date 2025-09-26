@@ -3147,6 +3147,7 @@ enum BrewfestMountTransformation
     SPELL_MOUNT_KODO_60                         = 49378,
     SPELL_BREWFEST_MOUNT_TRANSFORM              = 49357,
     SPELL_BREWFEST_MOUNT_TRANSFORM_REVERSE      = 52845,
+    SPELL_FRESH_DWARVEN_HOPS                    = 66050,
 };
 
 class spell_item_brewfest_mount_transformation : public SpellScript
@@ -3169,25 +3170,26 @@ class spell_item_brewfest_mount_transformation : public SpellScript
         Player* caster = GetCaster()->ToPlayer();
 
         if (!caster)
-        {
             return;
-        }
 
         if (caster->HasMountedAura())
         {
+            float speed = caster->GetSpeedRate(MOVE_RUN);
+
             caster->RemoveAurasByType(SPELL_AURA_MOUNTED);
+
             uint32 spell_id;
 
             switch (GetSpellInfo()->Id)
             {
             case SPELL_BREWFEST_MOUNT_TRANSFORM:
-                if (caster->GetSpeedRate(MOVE_RUN) >= 2.0f)
+                if (speed >= 2.0f)
                     spell_id = caster->GetTeamId() == TEAM_ALLIANCE ? SPELL_MOUNT_RAM_100 : SPELL_MOUNT_KODO_100;
                 else
                     spell_id = caster->GetTeamId() == TEAM_ALLIANCE ? SPELL_MOUNT_RAM_60 : SPELL_MOUNT_KODO_60;
                 break;
             case SPELL_BREWFEST_MOUNT_TRANSFORM_REVERSE:
-                if (caster->GetSpeedRate(MOVE_RUN) >= 2.0f)
+                if (speed >= 2.0f)
                     spell_id = caster->GetTeamId() == TEAM_HORDE ? SPELL_MOUNT_RAM_100 : SPELL_MOUNT_KODO_100;
                 else
                     spell_id = caster->GetTeamId() == TEAM_HORDE ? SPELL_MOUNT_RAM_60 : SPELL_MOUNT_KODO_60;
@@ -3203,6 +3205,48 @@ class spell_item_brewfest_mount_transformation : public SpellScript
     {
         OnEffectHitTarget += SpellEffectFn(spell_item_brewfest_mount_transformation::HandleDummy, EFFECT_0, SPELL_EFFECT_DUMMY);
     }
+};
+
+class spell_item_brewfest_hops : public AuraScript
+{
+    PrepareAuraScript(spell_item_brewfest_hops);
+
+    bool Validate(SpellInfo const* /*spell*/) override
+    {
+        return ValidateSpellInfo(
+            {
+                SPELL_BREWFEST_MOUNT_TRANSFORM,
+                SPELL_BREWFEST_MOUNT_TRANSFORM_REVERSE,
+            });
+    }
+
+    bool Load() override
+    {
+        _spell_id = GetSpellInfo()->Id == SPELL_FRESH_DWARVEN_HOPS ? SPELL_BREWFEST_MOUNT_TRANSFORM_REVERSE : SPELL_BREWFEST_MOUNT_TRANSFORM;
+        return true;
+    }
+
+    void CalcPeriodic(AuraEffect const* /*effect*/, bool& isPeriodic, int32& amplitude)
+    {
+        isPeriodic = true;
+        amplitude = 3 * IN_MILLISECONDS;
+    }
+
+    void Update(AuraEffect* /*effect*/)
+    {
+        Unit* caster = GetCaster();
+        if (!caster || caster->HasAnyAuras(SPELL_MOUNT_RAM_100, SPELL_MOUNT_RAM_60, SPELL_MOUNT_KODO_100, SPELL_MOUNT_KODO_60))
+            return;
+        caster->CastSpell(caster, _spell_id, true);
+    }
+
+    void Register() override
+    {
+        DoEffectCalcPeriodic += AuraEffectCalcPeriodicFn(spell_item_brewfest_hops::CalcPeriodic, EFFECT_0, SPELL_AURA_DUMMY);
+        OnEffectUpdatePeriodic += AuraEffectUpdatePeriodicFn(spell_item_brewfest_hops::Update, EFFECT_0, SPELL_AURA_DUMMY);
+    }
+private:
+    uint32 _spell_id;
 };
 
 enum NitroBoots
@@ -4338,4 +4382,5 @@ void AddSC_item_spell_scripts()
     RegisterSpellScript(spell_item_spell_reflectors);
     RegisterSpellScript(spell_item_multiphase_goggles);
     RegisterSpellScript(spell_item_bloodsail_admiral_hat);
+    RegisterSpellScript(spell_item_brewfest_hops);
 }

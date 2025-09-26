@@ -1,7 +1,11 @@
 #!/usr/bin/env bash
 
 # Set SUDO variable - one liner
-SUDO=$([ "$EUID" -ne 0 ] && echo "sudo" || echo "")
+if [[ "$OSTYPE" == "msys"* ]]; then
+    SUDO=""
+else
+    SUDO=$([ "$EUID" -ne 0 ] && echo "sudo" || echo "")
+fi
 
 function inst_configureOS() {
     echo "Platform: $OSTYPE"
@@ -67,7 +71,7 @@ function inst_dbCreate() {
     # In CI environments or when no password is set, try without password first
     if [[ "$CONTINUOUS_INTEGRATION" == "true" ]]; then
         echo "CI environment detected, attempting connection without password..."
-        
+
         if $SUDO mysql -u root < "$AC_PATH_ROOT/data/sql/create/create_mysql.sql" 2>/dev/null; then
             echo "Database created successfully."
             return 0
@@ -75,7 +79,7 @@ function inst_dbCreate() {
             echo "Failed to connect without password, falling back to interactive mode..."
         fi
     fi
-    
+
     # Try with password (interactive mode)
     echo "Please enter your sudo and your MySQL root password if prompted."
     $SUDO mysql -u root -p < "$AC_PATH_ROOT/data/sql/create/create_mysql.sql"
