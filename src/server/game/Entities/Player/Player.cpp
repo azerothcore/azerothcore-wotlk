@@ -14267,6 +14267,18 @@ bool Player::CanSeeVendor(Creature const* creature) const
     return true;
 }
 
+bool Player::CanSeeTrainer(Creature const* creature) const
+{
+    if (!creature->HasNpcFlag(UNIT_NPC_FLAG_TRAINER))
+        return true;
+
+    if (auto trainer = sObjectMgr->GetTrainer(creature->GetEntry()))
+        if (!trainer || !trainer->IsTrainerValidForPlayer(this))
+            return false;
+
+    return true;
+}
+
 void Player::BuildPlayerTalentsInfoData(WorldPacket* data)
 {
     *data << uint32(GetFreeTalentPoints());                 // unspentTalentPoints

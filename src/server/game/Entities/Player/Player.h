@@ -2547,6 +2547,7 @@ public:
     //bool isActiveObject() const { return true; }
     bool CanSeeSpellClickOn(Creature const* creature) const;
     [[nodiscard]] bool CanSeeVendor(Creature const* creature) const;
+    [[nodiscard]] bool CanSeeTrainer(Creature const* creature) const;
 
     [[nodiscard]] uint32 GetChampioningFaction() const { return m_ChampioningFaction; }
     void SetChampioningFaction(uint32 faction) { m_ChampioningFaction = faction; }
