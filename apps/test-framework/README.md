@@ -6,7 +6,7 @@ This is the centralized test framework for all AzerothCore bash scripts. It prov
 
 ```
 apps/test-framework/
-├── run-tests.sh           # Universal test runner (single entry point)
+├── run-bash-tests.sh           # Universal test runner (single entry point)
 ├── README.md              # This documentation
 ├── bats_libs/             # Custom BATS libraries
 │   ├── acore-support.bash # Test setup and helpers
@@ -20,35 +20,35 @@ apps/test-framework/
 ### From any module directory:
 ```bash
 # Run tests for current module
-../test-framework/run-tests.sh --dir .
+../test-framework/run-bash-tests.sh --dir .
 
 ```
 
 ### From test-framework directory:
 ```bash
 # Run all tests in all modules
-./run-tests.sh --all
+./run-bash-tests.sh --all
 
 # Run tests for specific module
-./run-tests.sh startup-scripts
+./run-bash-tests.sh startup-scripts
 
 # List available modules
-./run-tests.sh --list
+./run-bash-tests.sh --list
 
 # Run tests with debug info
-./run-tests.sh --all --debug
+./run-bash-tests.sh --all --debug
 ```
 
 ### From project root:
 ```bash
 # Run all tests
-apps/test-framework/run-tests.sh --all
+apps/test-framework/run-bash-tests.sh --all
 
 # Run specific module
-apps/test-framework/run-tests.sh startup-scripts
+apps/test-framework/run-bash-tests.sh startup-scripts
 
 # Run with verbose output
-apps/test-framework/run-tests.sh startup-scripts --verbose
+apps/test-framework/run-bash-tests.sh startup-scripts --verbose
 ```
 
 ## Usage
@@ -57,35 +57,35 @@ apps/test-framework/run-tests.sh startup-scripts --verbose
 
 ```bash
 # Run all tests
-./run-tests.sh --all
+./run-bash-tests.sh --all
 
 # Run tests for specific module
-./run-tests.sh startup-scripts
+./run-bash-tests.sh startup-scripts
 
 # Run tests matching pattern
-./run-tests.sh --filter starter
+./run-bash-tests.sh --filter starter
 
 # Run tests in specific directory
-./run-tests.sh --dir apps/docker
+./run-bash-tests.sh --dir apps/docker
 
 # Show available modules
-./run-tests.sh --list
+./run-bash-tests.sh --list
 
 # Show test count
-./run-tests.sh --count
+./run-bash-tests.sh --count
 ```
 
 ### Output Formats
 
 ```bash
 # Pretty output (default)
-./run-tests.sh --pretty
+./run-bash-tests.sh --pretty
 
 # TAP output for CI/CD
-./run-tests.sh --tap
+./run-bash-tests.sh --tap
 
 # Verbose output with debug info
-./run-tests.sh --verbose --debug
+./run-bash-tests.sh --verbose --debug
 ```
 
 ## Writing Tests
@@ -205,17 +205,17 @@ debug_on_failure
 
 From your module directory:
 ```bash
-../test-framework/run-tests.sh --dir .
+../test-framework/run-bash-tests.sh --dir .
 ```
 
 From the test framework:
 ```bash
-./run-tests.sh my-module
+./run-bash-tests.sh my-module
 ```
 
 From project root:
 ```bash
-apps/test-framework/run-tests.sh my-module
+apps/test-framework/run-bash-tests.sh my-module
 ```
 
 ## CI/CD Integration
@@ -225,35 +225,35 @@ For continuous integration, use TAP output:
 ```bash
 # In your CI script
 cd apps/test-framework
-./run-tests.sh --all --tap > test-results.tap
+./run-bash-tests.sh --all --tap > test-results.tap
 
 # Or from project root
-apps/test-framework/run-tests.sh --all --tap > test-results.tap
+apps/test-framework/run-bash-tests.sh --all --tap > test-results.tap
 ```
 
 ## Available Commands
 
-All functionality is available through the single `run-tests.sh` script:
+All functionality is available through the single `run-bash-tests.sh` script:
 
 ### Basic Test Execution
-- `./run-tests.sh --all` - Run all tests in all modules
-- `./run-tests.sh <module>` - Run tests for specific module
-- `./run-tests.sh --dir <path>` - Run tests in specific directory
-- `./run-tests.sh --list` - List available modules
-- `./run-tests.sh --count` - Show test count
+- `./run-bash-tests.sh --all` - Run all tests in all modules
+- `./run-bash-tests.sh <module>` - Run tests for specific module
+- `./run-bash-tests.sh --dir <path>` - Run tests in specific directory
+- `./run-bash-tests.sh --list` - List available modules
+- `./run-bash-tests.sh --count` - Show test count
 
 ### Output Control
-- `./run-tests.sh --verbose` - Verbose output with debug info
-- `./run-tests.sh --tap` - TAP output for CI/CD
-- `./run-tests.sh --debug` - Debug mode with failure details
-- `./run-tests.sh --pretty` - Pretty output (default)
+- `./run-bash-tests.sh --verbose` - Verbose output with debug info
+- `./run-bash-tests.sh --tap` - TAP output for CI/CD
+- `./run-bash-tests.sh --debug` - Debug mode with failure details
+- `./run-bash-tests.sh --pretty` - Pretty output (default)
 
 ### Test Filtering
-- `./run-tests.sh --filter <pattern>` - Run tests matching pattern
-- `./run-tests.sh <module> --filter <pattern>` - Filter within module
+- `./run-bash-tests.sh --filter <pattern>` - Run tests matching pattern
+- `./run-bash-tests.sh <module> --filter <pattern>` - Filter within module
 
 ### Utility Functions
-- `./run-tests.sh --help` - Show help message
+- `./run-bash-tests.sh --help` - Show help message
 - Install BATS: Use your system package manager (`apt install bats`, `brew install bats-core`, etc.)
 
 
@@ -264,35 +264,35 @@ All functionality is available through the single `run-tests.sh` script:
 ### Running Specific Tests
 ```bash
 # Run only starter-related tests
-./run-tests.sh --filter starter
+./run-bash-tests.sh --filter starter
 
 # Run only tests in startup-scripts module
-./run-tests.sh startup-scripts
+./run-bash-tests.sh startup-scripts
 
 # Run all tests with verbose output
-./run-tests.sh --all --verbose
+./run-bash-tests.sh --all --verbose
 
 # Run tests in specific directory with debug
-./run-tests.sh --dir apps/docker --debug
+./run-bash-tests.sh --dir apps/docker --debug
 ```
 
 ### Development Workflow
 ```bash
 # While developing, run tests frequently from module directory
 cd apps/my-module
-../test-framework/run-tests.sh --dir .
+../test-framework/run-bash-tests.sh --dir .
 
 # Debug failing tests
-../test-framework/run-tests.sh --dir . --debug --verbose
+../test-framework/run-bash-tests.sh --dir . --debug --verbose
 
 # Run specific test pattern
-../test-framework/run-tests.sh --dir . --filter my-feature
+../test-framework/run-bash-tests.sh --dir . --filter my-feature
 
 # From project root - run all tests
-apps/test-framework/run-tests.sh --all
+apps/test-framework/run-bash-tests.sh --all
 
 # Quick test count check
-apps/test-framework/run-tests.sh --count
+apps/test-framework/run-bash-tests.sh --count
 ```
 
 ## Benefits
