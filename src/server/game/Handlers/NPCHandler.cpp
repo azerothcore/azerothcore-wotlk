@@ -48,6 +48,10 @@ void WorldSession::HandleTabardVendorActivateOpcode(WorldPacket& recvData)
     ObjectGuid guid;
     recvData >> guid;
 
+    if (guid.IsAnyTypeCreature())
+        if (Creature* creature = _player->GetMap()->GetCreature(guid))
+            creature->SendMirrorSound(_player, 0);
+
     Creature* unit = GetPlayer()->GetNPCIfCanInteractWith(guid, UNIT_NPC_FLAG_TABARDDESIGNER);
     if (!unit)
     {
@@ -81,6 +85,11 @@ void WorldSession::HandleTrainerListOpcode(WorldPacket& recvData)
     ObjectGuid guid;
 
     recvData >> guid;
+
+    if (guid.IsAnyTypeCreature())
+        if (Creature* creature = _player->GetMap()->GetCreature(guid))
+            creature->SendMirrorSound(_player, 0);
+
     SendTrainerList(guid);
 }
 
@@ -275,6 +284,10 @@ void WorldSession::HandleGossipHelloOpcode(WorldPacket& recvData)
     ObjectGuid guid;
     recvData >> guid;
 
+    if (guid.IsAnyTypeCreature())
+        if (Creature* creature = _player->GetMap()->GetCreature(guid))
+            creature->SendMirrorSound(_player, 0);
+
     Creature* unit = GetPlayer()->GetNPCIfCanInteractWith(guid, UNIT_NPC_FLAG_NONE);
     if (!unit)
     {
@@ -462,6 +475,10 @@ void WorldSession::HandleListStabledPetsOpcode(WorldPacket& recvData)
     ObjectGuid npcGUID;
 
     recvData >> npcGUID;
+
+    if (npcGUID.IsAnyTypeCreature())
+        if (Creature* creature = _player->GetMap()->GetCreature(npcGUID))
+            creature->SendMirrorSound(_player, 0);
 
     if (!CheckStableMaster(npcGUID))
         return;
