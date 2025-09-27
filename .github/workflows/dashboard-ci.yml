@@ -54,8 +54,7 @@ jobs:
         env:
           TERM: xterm-256color
         run: |
-          cd apps/test-framework
-          ./run-tests.sh --tap --all
+          ./acore.sh test bash --tap --all
 
   build-and-test:
     name: Build and Integration Test
@@ -79,6 +78,7 @@ jobs:
           cp conf/dist/config.sh conf/config.sh
           # Configure dashboard
           sed -i 's/MTHREADS=.*/MTHREADS="4"/' conf/config.sh
+          sed -i 's/CBUILD_TESTING=.*/CBUILD_TESTING="ON"/' conf/config.sh
 
       - name: Test module commands
         run: |
@@ -104,6 +104,10 @@ jobs:
           ./acore.sh module list
           ./acore.sh module remove mod-duel-reset
           ./acore.sh module list
+
+      - name: Run core tests
+        run: |
+          ./acore.sh test core
 
       - name: Test authserver dry-run
         run: |
