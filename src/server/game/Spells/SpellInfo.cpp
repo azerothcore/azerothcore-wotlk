@@ -904,17 +904,15 @@ SpellInfo::SpellInfo(SpellEntry const* spellEntry)
     _requireCooldownInfo = false;
 }
 
-//npcbot
+SpellInfo::~SpellInfo()
+{
+    _UnloadImplicitTargetConditionLists();
+}
+
 SpellInfo const* SpellInfo::TryGetSpellInfoOverride(WorldObject const* caster) const
 {
     SpellInfo const* spellInfoOverride = (caster && caster->IsNPCBotOrPet()) ? GetBotSpellInfoOverride(Id) : nullptr;
     return spellInfoOverride ? spellInfoOverride : this;
-}
-//End npcbot
-
-SpellInfo::~SpellInfo()
-{
-    _UnloadImplicitTargetConditionLists();
 }
 
 uint32 SpellInfo::GetCategory() const

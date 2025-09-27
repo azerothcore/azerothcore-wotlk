@@ -4220,7 +4220,7 @@ std::tuple<Unit*, Unit*> bot_ai::_getTargets(bool byspell, bool ranged, bool &re
         }
 
         // Icecrown Citadel - The Lich King
-        if (me->GetMapId() == 631 && isInWMOArea(WMOAreaGroupLichKing) && me->IsInCombat() && HasRole(BOT_ROLE_DPS) && !IsTank())
+        if (me->GetMapId() == 631 && isInWMOArea(WMOAreaGroupLichKing) && me->IsInCombat() && HasRole(BOT_ROLE_DPS) && HasRole(BOT_ROLE_RANGED) && !IsTank())
         {
             static const std::array IceSphereIds = { CREATURE_ICC_ICE_SPHERE1, CREATURE_ICC_ICE_SPHERE2, CREATURE_ICC_ICE_SPHERE3, CREATURE_ICC_ICE_SPHERE4 };
             static const std::array ValkyrShadowguardIds = { CREATURE_ICC_VALKYR_LK1, CREATURE_ICC_VALKYR_LK2, CREATURE_ICC_VALKYR_LK3, CREATURE_ICC_VALKYR_LK4 };
