@@ -29,6 +29,7 @@ class Unit;
 class Creature;
 class Player;
 class SpellInfo;
+enum SpellFinishReason : uint8;
 
 typedef std::vector<AreaBoundary const*> CreatureBoundary;
 
@@ -146,6 +147,9 @@ public:
     // Called when spell hits a target
     virtual void SpellHitTarget(Unit* /*target*/, SpellInfo const* /*spell*/) {}
 
+    // Called when a spell either finishes, interrupts or cancels a spell cast
+    virtual void OnSpellCastFinished(SpellInfo const* /*spell*/, SpellFinishReason /*reason*/) {}
+
     // Called when the creature is target of hostile action: swing, hostile spell landed, fear/etc)
     virtual void AttackedBy(Unit* /*attacker*/) {}
     virtual bool IsEscorted() { return false; }
@@ -226,6 +230,9 @@ public:
 
     // Called when an aura is removed or expires.
     virtual void OnAuraRemove(AuraApplication* /*aurApp*/, AuraRemoveMode /*mode*/) { }
+
+    virtual void DistancingStarted() {}
+    virtual void DistancingEnded() {}
 
 protected:
     virtual void MoveInLineOfSight(Unit* /*who*/);
