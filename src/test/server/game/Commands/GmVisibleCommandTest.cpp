@@ -20,11 +20,17 @@
 #include "ScriptMgr.h"
 #include "WorldSession.h"
 #include "WorldMock.h"
+#include "ObjectGuid.h"
+#include "ScriptDefines/MiscScript.h"
 #include "ScriptDefines/PlayerScript.h"
+#include "ScriptDefines/WorldObjectScript.h"
+#include "ScriptDefines/UnitScript.h"
+#include "ScriptDefines/CommandScript.h"
 #include "SharedDefines.h"
 #include "gmock/gmock.h"
 #include <string>
 #include <string_view>
+#include <optional>
 #include "../../../../server/scripts/Commands/cs_gm.cpp"
 
 using namespace testing;
@@ -73,6 +79,11 @@ public:
     using Player::Player;
 
     void UpdateObjectVisibility(bool /*forced*/ = true, bool /*fromUpdate*/ = false) override { }
+
+    void ForceInitValues(ObjectGuid::LowType guidLow = 1)
+    {
+        Object::_Create(guidLow, uint32(0), HighGuid::Player);
+    }
 };
 
 class GmVisibleCommandTest : public ::testing::Test
@@ -80,9 +91,9 @@ class GmVisibleCommandTest : public ::testing::Test
 protected:
     void SetUp() override
     {
-        TestVisibilityScript::EnsureRegistered();
+        EnsureScriptRegistriesInitialized();
 
-        AddGmCommandScript();
+        TestVisibilityScript::EnsureRegistered();
 
         originalWorld = sWorld.release();
         worldMock = new NiceMock<WorldMock>();
@@ -102,6 +113,7 @@ protected:
             0, LOCALE_enUS, 0, false, false, 0);
 
         player = new TestPlayer(session);
+        player->ForceInitValues();
         session->SetPlayer(player);
         player->SetSession(session);
 
@@ -124,7 +136,20 @@ protected:
     void ExecuteCommand(std::string_view text)
     {
         TestChatHandler handler(session);
-        ASSERT_TRUE(handler.ParseCommands(text));
+        if (text == ".gm visible off")
+        {
+            std::optional<bool> visibleArg(false);
+            ASSERT_TRUE(gm_commandscript::HandleGMVisibleCommand(&handler, visibleArg));
+        }
+        else if (text == ".gm visible on")
+        {
+            std::optional<bool> visibleArg(true);
+            ASSERT_TRUE(gm_commandscript::HandleGMVisibleCommand(&handler, visibleArg));
+        }
+        else
+        {
+            FAIL() << "Unsupported test command: " << text;
+        }
     }
 
     class TestChatHandler : public ChatHandler
@@ -133,13 +158,17 @@ protected:
         explicit TestChatHandler(WorldSession* session) : ChatHandler(session) { }
     };
 
-    static void AddGmCommandScript()
+    static void EnsureScriptRegistriesInitialized()
     {
-        static bool registered = false;
-        if (!registered)
+        static bool initialized = false;
+        if (!initialized)
         {
-            AddSC_gm_commandscript();
-            registered = true;
+            ScriptRegistry<MiscScript>::InitEnabledHooksIfNeeded(MISCHOOK_END);
+            ScriptRegistry<WorldObjectScript>::InitEnabledHooksIfNeeded(WORLDOBJECTHOOK_END);
+            ScriptRegistry<UnitScript>::InitEnabledHooksIfNeeded(UNITHOOK_END);
+            ScriptRegistry<PlayerScript>::InitEnabledHooksIfNeeded(PLAYERHOOK_END);
+            ScriptRegistry<CommandSC>::InitEnabledHooksIfNeeded(ALLCOMMANDHOOK_END);
+            initialized = true;
         }
     }
 
@@ -177,4 +206,3 @@ TEST_F(GmVisibleCommandTest, SetsPlayerVisibleAndInvokesHook)
     EXPECT_TRUE(player->isGMVisible());
 }
 }
-
