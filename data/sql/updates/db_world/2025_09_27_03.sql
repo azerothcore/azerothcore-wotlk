@@ -1,3 +1,4 @@
+-- DB update 2025_09_27_02 -> 2025_09_27_03
 --
 -- Fjorlin Frostbrow SAI
 DELETE FROM `smart_scripts` WHERE (`source_type` = 0 AND `entryorguid` = 29732);
