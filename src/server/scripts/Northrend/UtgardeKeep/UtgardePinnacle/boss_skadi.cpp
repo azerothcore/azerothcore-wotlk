@@ -147,6 +147,7 @@ public:
             me->SetControlled(false, UNIT_STATE_ROOT);
             me->UpdatePosition(343.02f, -507.325f, 104.567f, M_PI, true);
             me->StopMovingOnCurrentPos();
+            me->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
 
             if (m_pInstance)
             {
@@ -177,7 +178,7 @@ public:
                     }
 
                     me->SetControlled(true, UNIT_STATE_ROOT);
-                    me->SetInCombatWithZone();
+                    me->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
                     events.RescheduleEvent(EVENT_SKADI_START, 2s);
                 }
             }
