@@ -28,6 +28,7 @@
 #include "World.h"
 #include "WorldPacket.h"
 #include "WorldSession.h"
+#include "Config.h"
 
 ArenaTeam::ArenaTeam()
     : TeamId(0), Type(0), TeamName(), BackgroundColor(0), EmblemStyle(0), EmblemColor(0),
@@ -36,9 +37,15 @@ ArenaTeam::ArenaTeam()
     Stats.WeekGames   = 0;
     Stats.SeasonGames = 0;
     Stats.Rank        = 0;
-    Stats.Rating = (sArenaSeasonMgr->GetCurrentSeason() < 6)
+    bool worldConfigReady = sWorld->IsConfigInitialized();
+    uint32 legacyStartRating = worldConfigReady
         ? sWorld->getIntConfig(CONFIG_LEGACY_ARENA_START_RATING)
-        : sWorld->getIntConfig(CONFIG_ARENA_START_RATING);
+        : sConfigMgr->GetOption<uint32>("Arena.LegacyArenaStartRating", 1500u, false);
+    uint32 currentStartRating = worldConfigReady
+        ? sWorld->getIntConfig(CONFIG_ARENA_START_RATING)
+        : sConfigMgr->GetOption<uint32>("Arena.ArenaStartRating", 0u, false);
+
+    Stats.Rating = (sArenaSeasonMgr->GetCurrentSeason() < 6) ? legacyStartRating : currentStartRating;
     Stats.WeekWins    = 0;
     Stats.SeasonWins  = 0;
 }

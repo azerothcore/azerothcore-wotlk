@@ -128,6 +128,7 @@ World::World()
     _isClosed = false;
     _cleaningFlags = 0;
     _dbClientCacheVersion = 0;
+    _configInitialized = false;
 }
 
 /// World destructor
@@ -188,6 +189,7 @@ void World::LoadConfigSettings(bool reload)
         sWorldSessionMgr->SetPlayerAmountLimit(sConfigMgr->GetOption<int32>("PlayerLimit", 1000));
 
     _worldConfig.Initialize(reload);
+    _configInitialized = true;
 
     for (uint8 i = 0; i < MAX_MOVE_TYPE; ++i)
         playerBaseMoveSpeed[i] = baseMoveSpeed[i] * getRate(RATE_MOVESPEED_PLAYER);
