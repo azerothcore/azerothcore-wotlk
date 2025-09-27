@@ -96,6 +96,14 @@ namespace Acore
         void Visit(CreatureMapType&);
     };
 
+    struct CreatureAggroGracePeriodExpiredNotifier
+    {
+        Creature& i_creature;
+        CreatureAggroGracePeriodExpiredNotifier(Creature& c) : i_creature(c) {}
+        template<class T> void Visit(GridRefMgr<T>&) {}
+        void Visit(CreatureMapType&);
+        void Visit(PlayerMapType&);
+    };
     struct MessageDistDeliverer
     {
         WorldObject const* i_source;
