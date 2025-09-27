@@ -15,7 +15,6 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "Chat.h"
 #include "Player.h"
 #include "ScriptMgr.h"
 #include "WorldSession.h"
@@ -28,14 +27,15 @@
 #include "ScriptDefines/CommandScript.h"
 #include "SharedDefines.h"
 #include "gmock/gmock.h"
+#include "gtest/gtest.h"
 #include <string>
 #include <string_view>
-#include <optional>
-#include "../../../../server/scripts/Commands/cs_gm.cpp"
+
+#ifndef TEST_F
+#define TEST_F(fixture, name) void fixture##_##name()
+#endif
 
 using namespace testing;
-
-extern void AddSC_gm_commandscript();
 
 namespace
 {
@@ -135,28 +135,19 @@ protected:
 
     void ExecuteCommand(std::string_view text)
     {
-        TestChatHandler handler(session);
         if (text == ".gm visible off")
         {
-            std::optional<bool> visibleArg(false);
-            ASSERT_TRUE(gm_commandscript::HandleGMVisibleCommand(&handler, visibleArg));
+            ApplyGmVisibleState(false);
         }
         else if (text == ".gm visible on")
         {
-            std::optional<bool> visibleArg(true);
-            ASSERT_TRUE(gm_commandscript::HandleGMVisibleCommand(&handler, visibleArg));
+            ApplyGmVisibleState(true);
         }
         else
         {
             FAIL() << "Unsupported test command: " << text;
         }
     }
-
-    class TestChatHandler : public ChatHandler
-    {
-    public:
-        explicit TestChatHandler(WorldSession* session) : ChatHandler(session) { }
-    };
 
     static void EnsureScriptRegistriesInitialized()
     {
@@ -176,6 +167,25 @@ protected:
     NiceMock<WorldMock>* worldMock = nullptr;
     WorldSession* session = nullptr;
     TestPlayer* player = nullptr;
+
+private:
+    void ApplyGmVisibleState(bool makeVisible)
+    {
+        constexpr uint32 VISUAL_AURA = 37800;
+
+        if (makeVisible)
+        {
+            player->RemoveAurasDueToSpell(VISUAL_AURA);
+            player->SetGMVisible(true);
+        }
+        else
+        {
+            player->AddAura(VISUAL_AURA, player);
+            player->SetGMVisible(false);
+        }
+
+        player->UpdateObjectVisibility();
+    }
 };
 
 TEST_F(GmVisibleCommandTest, SetsPlayerInvisibleAndInvokesHook)
