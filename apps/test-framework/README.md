@@ -6,7 +6,9 @@ This is the centralized test framework for all AzerothCore bash scripts. It prov
 
 ```
 apps/test-framework/
-├── run-bash-tests.sh           # Universal test runner (single entry point)
+├── test-main.sh           # Unified test framework entry point
+├── run-bash-tests.sh      # Bash test runner for BATS tests
+├── run-core-tests.sh      # AzerothCore unit test runner
 ├── README.md              # This documentation
 ├── bats_libs/             # Custom BATS libraries
 │   ├── acore-support.bash # Test setup and helpers
@@ -16,6 +18,18 @@ apps/test-framework/
 ```
 
 ## Quick Start
+
+### Using acore.sh (Recommended):
+```bash
+# Run the unified test framework (interactive menu)
+./acore.sh test
+
+# Run bash tests directly
+./acore.sh test bash --all
+
+# Run AzerothCore unit tests
+./acore.sh test core
+```
 
 ### From any module directory:
 ```bash
@@ -49,6 +63,30 @@ apps/test-framework/run-bash-tests.sh startup-scripts
 
 # Run with verbose output
 apps/test-framework/run-bash-tests.sh startup-scripts --verbose
+```
+
+## Test Types
+
+The framework now supports two types of tests:
+
+1. **Bash Tests** - BATS-based tests for bash scripts and functionality
+2. **Core Tests** - AzerothCore C++ unit tests
+
+### Unified Test Framework
+
+The test framework provides a unified entry point through `test-main.sh` which presents an interactive menu:
+
+- **bash**: Run BATS-based bash script tests
+- **core**: Run AzerothCore C++ unit tests
+- **quit**: Exit the test framework
+
+```bash
+# Interactive test menu
+./acore.sh test
+
+# Direct test execution
+./acore.sh test bash --all        # Run all bash tests
+./acore.sh test core              # Run core unit tests
 ```
 
 ## Usage
@@ -223,17 +261,53 @@ apps/test-framework/run-bash-tests.sh my-module
 For continuous integration, use TAP output:
 
 ```bash
-# In your CI script
+# Recommended: Use acore.sh integration
+./acore.sh test bash --tap --all > test-results.tap
+
+# Direct script usage
 cd apps/test-framework
 ./run-bash-tests.sh --all --tap > test-results.tap
 
 # Or from project root
 apps/test-framework/run-bash-tests.sh --all --tap > test-results.tap
+
+# Run core unit tests in CI
+./acore.sh test core
 ```
+
+## Core Tests
+
+The framework now includes support for AzerothCore's C++ unit tests through `run-core-tests.sh`:
+
+```bash
+# Run core unit tests
+./acore.sh test core
+
+# Direct script usage
+apps/test-framework/run-core-tests.sh
+```
+
+**Prerequisites for Core Tests:**
+- Project must be built with unit tests enabled (`CBUILD_TESTING="ON"` inside `conf/config.sh` that works with the acore.sh compiler)
+- Unit test binary should be available at `$BUILDPATH/src/test/unit_tests`
+
+The core test runner will:
+1. Check if the unit test binary exists
+2. Execute the AzerothCore unit tests
+3. Return appropriate exit codes for CI/CD integration
 
 ## Available Commands
 
-All functionality is available through the single `run-bash-tests.sh` script:
+### Unified Test Framework Commands
+
+Recommended usage through `acore.sh`:
+- `./acore.sh test` - Interactive test framework menu
+- `./acore.sh test bash [options]` - Run bash tests with options
+- `./acore.sh test core` - Run AzerothCore unit tests
+
+### Bash Test Commands
+
+All bash test functionality is available through the `run-bash-tests.sh` script:
 
 ### Basic Test Execution
 - `./run-bash-tests.sh --all` - Run all tests in all modules
@@ -278,6 +352,11 @@ All functionality is available through the single `run-bash-tests.sh` script:
 
 ### Development Workflow
 ```bash
+# Recommended: Use acore.sh for unified testing
+./acore.sh test                    # Interactive menu
+./acore.sh test bash --all         # All bash tests
+./acore.sh test core               # Core unit tests
+
 # While developing, run tests frequently from module directory
 cd apps/my-module
 ../test-framework/run-bash-tests.sh --dir .
@@ -289,10 +368,12 @@ cd apps/my-module
 ../test-framework/run-bash-tests.sh --dir . --filter my-feature
 
 # From project root - run all tests
-apps/test-framework/run-bash-tests.sh --all
+./acore.sh test bash --all         # Recommended
+apps/test-framework/run-bash-tests.sh --all  # Direct
 
 # Quick test count check
-apps/test-framework/run-bash-tests.sh --count
+./acore.sh test bash --count       # Recommended
+apps/test-framework/run-bash-tests.sh --count  # Direct
 ```
 
 ## Benefits
