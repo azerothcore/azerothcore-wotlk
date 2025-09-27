@@ -19681,8 +19681,8 @@ void Unit::_ExitVehicle(Position const* exitPosition)
         CastSpell(this, VEHICLE_SPELL_PARACHUTE, true);
     }
 
-    // xinef: move fall, should we support all creatures that exited vehicle in air? Currently Quest Drag and Drop only, Air Assault quest
-    if (IsCreature() && !CanFly() && vehicleInfo && (vehicleInfo->m_ID == 113 || vehicleInfo->m_ID == 8 || vehicleInfo->m_ID == 290 || vehicleInfo->m_ID == 298))
+    // xinef: move fall, should we support all creatures that exited vehicle in air? Currently Quest Drag and Drop only, Air Assault quest, Shoot 'em Up
+    if (IsCreature() && !CanFly() && vehicleInfo && (vehicleInfo->m_ID == 113 || vehicleInfo->m_ID == 8 || vehicleInfo->m_ID == 290 || vehicleInfo->m_ID == 298 || vehicleInfo->m_ID == 228))
     {
         GetMotionMaster()->MoveFall();
     }
