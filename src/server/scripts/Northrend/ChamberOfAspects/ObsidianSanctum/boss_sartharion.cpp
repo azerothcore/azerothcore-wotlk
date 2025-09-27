@@ -628,7 +628,7 @@ public:
             {
                 for (uint8 i = 0; i < MAX_LEFT_LAVA_TSUNAMIS; ++i)
                 {
-                    me->SummonCreature(NPC_FLAME_TSUNAMI, 3208.44f, 580.0f - (i * 50.0f), 55.8f, 0.0f, TEMPSUMMON_TIMED_DESPAWN, 12000);
+                    me->SummonCreature(NPC_FLAME_TSUNAMI, 3208.44f, 578.0f - (i * 45.0f), 55.8f, 0.0f, TEMPSUMMON_TIMED_DESPAWN, 12000);
                 }
 
                 lastLavaSide = LAVA_LEFT_SIDE;
@@ -638,7 +638,7 @@ public:
             {
                 for (uint8 i = 0; i < MAX_RIGHT_LAVA_TSUNAMIS; ++i)
                 {
-                    me->SummonCreature(NPC_FLAME_TSUNAMI, 3283.44f, 555.0f - (i * 50.0f), 55.8f, 3.14f, TEMPSUMMON_TIMED_DESPAWN, 12000);
+                    me->SummonCreature(NPC_FLAME_TSUNAMI, 3283.44f, 555.0f - (i * 50.0f), 57.8f, 3.14f, TEMPSUMMON_TIMED_DESPAWN, 12000);
                 }
 
                 lastLavaSide = LAVA_RIGHT_SIDE;
