@@ -14,4 +14,4 @@ if [[ ! -f "$TEST_PATH" ]]; then
     exit 1
 fi
 
-bash -c "$TEST_PATH" "$@"
+exec "$TEST_PATH" "$@"
