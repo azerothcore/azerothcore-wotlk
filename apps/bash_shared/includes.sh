@@ -17,7 +17,7 @@ source "$AC_PATH_DEPS/acore/bash-lib/src/event/hooks.sh"
 source "$AC_PATH_SHARED/common.sh"
 
 if [[ "$OSTYPE" = "msys" ]]; then
-    AC_BINPATH_FULL="$BINPATH" 
+    AC_BINPATH_FULL="$BINPATH"
 else
     export AC_BINPATH_FULL="$BINPATH/bin"
 fi
