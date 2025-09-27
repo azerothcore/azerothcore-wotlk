@@ -178,7 +178,6 @@ public:
 
     void SetInitialWorldSettings() override;
     void LoadConfigSettings(bool reload = false) override;
-    [[nodiscard]] bool IsConfigInitialized() const override { return _configInitialized; }
 
     /// Are we in the middle of a shutdown?
     [[nodiscard]] bool IsShuttingDown() const override { return _shutdownTimer > 0; }
@@ -260,7 +259,6 @@ protected:
     void ResetGuildCap();
 private:
     WorldConfig _worldConfig;
-    bool _configInitialized = false;
 
     static std::atomic_long _stopEvent;
     static uint8 _exitCode;
