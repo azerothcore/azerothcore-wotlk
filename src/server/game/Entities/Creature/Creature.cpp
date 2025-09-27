@@ -80,15 +80,6 @@ std::string CreatureMovementData::ToString() const
     return str.str();
 }
 
-TrainerSpell const* TrainerSpellData::Find(uint32 spell_id) const
-{
-    TrainerSpellMap::const_iterator itr = spellList.find(spell_id);
-    if (itr != spellList.end())
-        return &itr->second;
-
-    return nullptr;
-}
-
 bool VendorItemData::RemoveItem(uint32 item_id)
 {
     bool found = false;
@@ -1266,52 +1257,13 @@ bool Creature::isCanInteractWithBattleMaster(Player* player, bool msg) const
     return true;
 }
 
-bool Creature::isCanTrainingAndResetTalentsOf(Player* player) const
+bool Creature::CanResetTalents(Player* player) const
 {
-    return player->GetLevel() >= 10
-        && GetCreatureTemplate()->trainer_type == TRAINER_TYPE_CLASS
-        && player->IsClass((Classes)GetCreatureTemplate()->trainer_class, CLASS_CONTEXT_CLASS_TRAINER);
-}
-
-bool Creature::IsValidTrainerForPlayer(Player* player, uint32* npcFlags /*= nullptr*/) const
-{
-    if (!IsTrainer())
-    {
+    Trainer::Trainer const* trainer = sObjectMgr->GetTrainer(GetEntry());
+    if (!trainer)
         return false;
-    }
 
-    switch (m_creatureInfo->trainer_type)
-    {
-        case TRAINER_TYPE_CLASS:
-        case TRAINER_TYPE_PETS:
-            if (m_creatureInfo->trainer_class && !player->IsClass((Classes)m_creatureInfo->trainer_class, CLASS_CONTEXT_CLASS_TRAINER))
-            {
-                if (npcFlags)
-                    *npcFlags &= ~UNIT_NPC_FLAG_TRAINER_CLASS;
-
-                return false;
-            }
-            break;
-        case TRAINER_TYPE_MOUNTS:
-            if (m_creatureInfo->trainer_race && m_creatureInfo->trainer_race != player->getRace())
-            {
-                return false;
-            }
-            break;
-        case TRAINER_TYPE_TRADESKILLS:
-            if (m_creatureInfo->trainer_spell && !player->HasSpell(m_creatureInfo->trainer_spell))
-            {
-                if (npcFlags)
-                    *npcFlags &= ~UNIT_NPC_FLAG_TRAINER_PROFESSION;
-
-                return false;
-            }
-            break;
-        default:
-            break;
-    }
-
-    return true;
+    return player->GetLevel() >= 10 && trainer->IsTrainerValidForPlayer(player);
 }
 
 Player* Creature::GetLootRecipient() const
@@ -3143,11 +3095,6 @@ uint32 Creature::UpdateVendorItemCurrentCount(VendorItem const* vItem, uint32 us
     vCount->count = vCount->count > used_count ? vCount->count - used_count : 0;
     vCount->lastIncrementTime = ptime;
     return vCount->count;
-}
-
-TrainerSpellData const* Creature::GetTrainerSpells() const
-{
-    return sObjectMgr->GetNpcTrainerSpells(GetEntry());
 }
 
 // overwrite WorldObject function for proper name localization

@@ -77,6 +77,7 @@
 #include "StringConvert.h"
 #include "TicketMgr.h"
 #include "Tokenize.h"
+#include "Trainer.h"
 #include "Transport.h"
 #include "UpdateData.h"
 #include "Util.h"
@@ -2135,11 +2136,6 @@ Creature* Player::GetNPCIfCanInteractWith(ObjectGuid guid, uint32 npcflagmask)
     if (!creature->IsWithinDistInMap(this, INTERACTION_DISTANCE))
         return nullptr;
 
-    // pussywizard: many npcs have missing conditions for class training and rogue trainer can for eg. train dual wield to a shaman :/ too many to change in sql and watch in the future
-    // pussywizard: this function is not used when talking, but when already taking action (buy spell, reset talents, show spell list)
-    if (npcflagmask & (UNIT_NPC_FLAG_TRAINER | UNIT_NPC_FLAG_TRAINER_CLASS) && creature->GetCreatureTemplate()->trainer_type == TRAINER_TYPE_CLASS && !IsClass((Classes)creature->GetCreatureTemplate()->trainer_class, CLASS_CONTEXT_CLASS_TRAINER))
-        return nullptr;
-
     return creature;
 }
 
@@ -3917,74 +3913,6 @@ bool Player::HasActiveSpell(uint32 spell) const
 {
     PlayerSpellMap::const_iterator itr = m_spells.find(spell);
     return (itr != m_spells.end() && itr->second->State != PLAYERSPELL_REMOVED && itr->second->Active && itr->second->IsInSpec(m_activeSpec));
-}
-
-TrainerSpellState Player::GetTrainerSpellState(TrainerSpell const* trainer_spell) const
-{
-    if (!trainer_spell)
-        return TRAINER_SPELL_RED;
-
-    bool hasSpell = true;
-    for (uint8 i = 0; i < MAX_SPELL_EFFECTS; ++i)
-    {
-        if (!trainer_spell->learnedSpell[i])
-            continue;
-
-        if (!HasSpell(trainer_spell->learnedSpell[i]))
-        {
-            hasSpell = false;
-            break;
-        }
-    }
-    // known spell
-    if (hasSpell)
-        return TRAINER_SPELL_GRAY;
-
-    // check skill requirement
-    if (trainer_spell->reqSkill && GetBaseSkillValue(trainer_spell->reqSkill) < trainer_spell->reqSkillValue)
-        return TRAINER_SPELL_RED;
-
-    // check level requirement
-    if (GetLevel() < trainer_spell->reqLevel)
-        return TRAINER_SPELL_RED;
-
-    for (uint8 i = 0; i < MAX_SPELL_EFFECTS; ++i)
-    {
-        if (!trainer_spell->learnedSpell[i])
-            continue;
-
-        // check race/class requirement
-        if (!IsSpellFitByClassAndRace(trainer_spell->learnedSpell[i]))
-            return TRAINER_SPELL_RED;
-
-        if (uint32 prevSpell = sSpellMgr->GetPrevSpellInChain(trainer_spell->learnedSpell[i]))
-        {
-            // check prev.rank requirement
-            if (prevSpell && !HasSpell(prevSpell))
-                return TRAINER_SPELL_RED;
-        }
-
-        SpellsRequiringSpellMapBounds spellsRequired = sSpellMgr->GetSpellsRequiredForSpellBounds(trainer_spell->learnedSpell[i]);
-        for (SpellsRequiringSpellMap::const_iterator itr = spellsRequired.first; itr != spellsRequired.second; ++itr)
-        {
-            // check additional spell requirement
-            if (!HasSpell(itr->second))
-                return TRAINER_SPELL_RED;
-        }
-    }
-
-    // check primary prof. limit
-    // first rank of primary profession spell when there are no proffesions avalible is disabled
-    for (uint8 i = 0; i < MAX_SPELL_EFFECTS; ++i)
-    {
-        if (!trainer_spell->learnedSpell[i])
-            continue;
-        SpellInfo const* learnedSpellInfo = sSpellMgr->GetSpellInfo(trainer_spell->learnedSpell[i]);
-        if (learnedSpellInfo && learnedSpellInfo->IsPrimaryProfessionFirstRank() && (GetFreePrimaryProfessionPoints() == 0))
-            return TRAINER_SPELL_GREEN_DISABLED;
-    }
-
-    return TRAINER_SPELL_GREEN;
 }
 
 /**

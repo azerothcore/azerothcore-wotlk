@@ -189,6 +189,12 @@ namespace WorldPackets
         class ItemRefundInfo;
         class ItemRefund;
     }
+
+    namespace NPC
+    {
+        class Hello;
+        class TrainerBuySpell;
+    }
 }
 
 enum AccountDataType
@@ -465,8 +471,7 @@ public:
     //void SendTestCreatureQueryOpcode(uint32 entry, ObjectGuid guid, uint32 testvalue);
     void SendNameQueryOpcode(ObjectGuid guid);
 
-    void SendTrainerList(ObjectGuid guid);
-    void SendTrainerList(ObjectGuid guid, std::string const& strTitle);
+    void SendTrainerList(Creature* npc);
     void SendListInventory(ObjectGuid guid, uint32 vendorEntry = 0);
     void SendShowBank(ObjectGuid guid);
     bool CanOpenMailBox(ObjectGuid guid);
@@ -773,8 +778,8 @@ public:                                                 // opcodes handlers
     void SendActivateTaxiReply(ActivateTaxiReply reply);
 
     void HandleTabardVendorActivateOpcode(WorldPacket& recvPacket);
-    void HandleTrainerListOpcode(WorldPacket& recvPacket);
-    void HandleTrainerBuySpellOpcode(WorldPacket& recvPacket);
+    void HandleTrainerListOpcode(WorldPackets::NPC::Hello& packet);
+    void HandleTrainerBuySpellOpcode(WorldPackets::NPC::TrainerBuySpell& packet);
     void HandlePetitionShowListOpcode(WorldPacket& recvPacket);
     void HandleGossipHelloOpcode(WorldPacket& recvPacket);
     void HandleGossipSelectOptionOpcode(WorldPacket& recvPacket);
