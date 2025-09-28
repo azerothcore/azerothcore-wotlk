@@ -344,6 +344,14 @@ Updates.AllowRehash = 1
 Updates.CleanDeadRefMaxCount = 3
 
 #
+#    Updates.ExceptionShutdownDelay
+#        Description: Delays the application shutdown when fatal exceptions are thrown (e.g SQL file failed to apply).
+#        Default:     10000 - 10 seconds
+#                     0     - Disabled
+
+Updates.ExceptionShutdownDelay = 10000
+
+#
 ###################################################################################################
 
 ###################################################################################################
