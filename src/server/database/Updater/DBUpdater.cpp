@@ -521,7 +521,7 @@ void DBUpdater<T>::ApplyFile(DatabaseWorkerPool<T>& pool, std::string const& hos
         if (!sConfigMgr->isDryRun())
         {
             if (uint32 delay = sConfigMgr->GetOption<int32>("Updates.ExceptionShutdownDelay", 0))
-                std::this_thread::sleep_for(delay);
+                std::this_thread::sleep_for(Milliseconds(delay));
 
             throw UpdateException("update failed");
         }
