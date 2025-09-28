@@ -1,3 +1,4 @@
+-- DB update 2025_09_27_03 -> 2025_09_28_00
 --
 DELETE FROM `areatrigger_scripts` WHERE `entry` = 4991;
 INSERT INTO `areatrigger_scripts` (`entry`, `ScriptName`) VALUES (4991, 'SmartTrigger');
