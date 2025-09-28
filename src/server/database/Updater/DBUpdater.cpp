@@ -27,6 +27,7 @@
 #include <filesystem>
 #include <fstream>
 #include <iostream>
+#include <thread>
 
 std::string DBUpdaterUtil::GetCorrectedMySQLExecutable()
 {
