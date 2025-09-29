@@ -55,10 +55,10 @@ enum Misc
     EMOTE_ALTAR                         = 1,
 
     EVENT_COLOSSUS_MIGHTY_BLOW          = 1,
-    EVENT_COLOSSUS_HEALTH_1             = 2,
-    EVENT_COLOSSUS_HEALTH_2             = 3,
-    EVENT_COLOSSUS_START_FIGHT          = 4,
-    EVENT_COLOSSUS_MORTAL_STRIKE        = 5,
+    EVENT_COLOSSUS_MORTAL_STRIKE        = 2,
+    EVENT_COLOSSUS_HEALTH_1             = 3,
+    EVENT_COLOSSUS_HEALTH_2             = 4,
+    EVENT_COLOSSUS_START_FIGHT          = 5,
 
     EVENT_ELEMENTAL_HEALTH              = 10,
     EVENT_ELEMENTAL_SURGE               = 11,
