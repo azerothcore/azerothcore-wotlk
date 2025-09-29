@@ -1179,7 +1179,6 @@ void WorldSession::HandlePlayerLoginToCharInWorld(Player* pCurrChar)
     // necessary actions from AddPlayerToMap:
     pCurrChar->GetMap()->SendInitTransports(pCurrChar);
     pCurrChar->GetMap()->SendInitSelf(pCurrChar);
-    pCurrChar->GetMap()->SendZoneDynamicInfo(pCurrChar);
 
     // If we are logging into an existing player, simply clear visibility references
     // so player will receive a fresh list of new objects on the next vis update.

@@ -2271,6 +2271,66 @@ private:
     }
 };
 
+enum DevourGhoulSpells
+{
+    SPELL_DEVOUR_GHOUL_RIDE_VEHICLE = 50437,
+    SPELL_DEVOUR_PERIODIC           = 50432,
+    SPELL_NOURISHMENT               = 50443
+};
+
+// 50430 - Devour Ghoul
+class spell_dragonblight_devour_ghoul: public SpellScript
+{
+    PrepareSpellScript(spell_dragonblight_devour_ghoul);
+
+    bool Validate(SpellInfo const* /*spellInfo*/) override
+    {
+        return ValidateSpellInfo({ SPELL_DEVOUR_GHOUL_RIDE_VEHICLE });
+    }
+
+    void HandleScriptEffect(SpellEffIndex /*effIndex*/)
+    {
+        if (GetCaster())
+        {
+            GetHitUnit()->CastSpell(GetCaster(), SPELL_DEVOUR_GHOUL_RIDE_VEHICLE, true);
+            GetCaster()->CastSpell(GetHitUnit(), SPELL_DEVOUR_PERIODIC, true);
+        }
+    }
+
+    void Register() override
+    {
+        OnEffectHitTarget += SpellEffectFn(spell_dragonblight_devour_ghoul::HandleScriptEffect, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
+    }
+};
+
+// 50432 - Devour Ghoul
+class spell_dragonblight_devour_ghoul_periodic : public AuraScript
+{
+    PrepareAuraScript(spell_dragonblight_devour_ghoul_periodic);
+
+    bool Validate(SpellInfo const* /*spellInfo*/) override
+    {
+        return ValidateSpellInfo({ SPELL_NOURISHMENT });
+    }
+
+    void OnRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
+    {
+        if (GetTargetApplication()->GetRemoveMode() == AURA_REMOVE_BY_EXPIRE && GetCaster())
+            GetCaster()->CastSpell(GetCaster(), SPELL_NOURISHMENT, true);
+
+        if (GetUnitOwner() && GetUnitOwner()->ToCreature())
+        {
+            GetUnitOwner()->ExitVehicle();
+            GetUnitOwner()->ToCreature()->DespawnOrUnsummon(2000);
+        }
+    }
+
+    void Register() override
+    {
+        OnEffectRemove += AuraEffectRemoveFn(spell_dragonblight_devour_ghoul_periodic::OnRemove, EFFECT_0, SPELL_AURA_PERIODIC_DAMAGE, AURA_EFFECT_HANDLE_REAL);
+    }
+};
+
 void AddSC_dragonblight()
 {
     new npc_conversing_with_the_depths_trigger();
@@ -2299,4 +2359,6 @@ void AddSC_dragonblight()
     RegisterSpellScript(spell_dragonblight_corrosive_spit);
     RegisterSpellScript(spell_handover_reins);
     RegisterSpellScript(spell_dragonblight_flame_fury);
+    RegisterSpellScript(spell_dragonblight_devour_ghoul);
+    RegisterSpellScript(spell_dragonblight_devour_ghoul_periodic);
 }
